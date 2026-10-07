@@ -7,8 +7,8 @@
       550
     ],
     "runtime_pixel": [
-      515,
-      389
+      457,
+      414
     ]
   },
   {
@@ -19,8 +19,8 @@
       1283
     ],
     "runtime_pixel": [
-      496,
-      820
+      399,
+      943
     ]
   },
   {
@@ -31,8 +31,20 @@
       1444
     ],
     "runtime_pixel": [
-      195,
-      898
+      142,
+      1082
+    ]
+  },
+  {
+    "name": "ripe orange",
+    "surface": "Lit front face of the leftmost low fruit on the left tree",
+    "reference_pixel": [
+      770,
+      630
+    ],
+    "runtime_pixel": [
+      585,
+      398
     ]
   }
 ]

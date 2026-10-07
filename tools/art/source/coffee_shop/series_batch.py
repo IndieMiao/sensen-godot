@@ -9,7 +9,7 @@ def build(slug):
         name=a.get('asset',a['name']);source=assets[name]
         if source['colliders'] or name=='floor' or any(d.get('material_overrides',{}).get(name,{}).get(key,False) for key in ('unshaded','emission')):continue
         mat='glass' if 'glass' in name else 'room'
-        group='glass' if mat=='glass' else 'botanical' if any(x in name for x in ['flower','bouquet','leaves','grass']) else 'back_dressing' if a['position'][2]<-1 else 'front_dressing'
+        group='glass' if mat=='glass' else 'botanical' if name in d.get('botanical_assets',[]) or any(x in name for x in ['flower','bouquet','leaves','grass']) else 'back_dressing' if a['position'][2]<-1 else 'front_dressing'
         groups.setdefault((group,mat),[]).append({**a,'file':'res://assets/rooms/'+slug+'/'+source['file']})
     for a in d.get('shared_plants',[]):
         group='large_plants' if a['colliders'] or a.get('cast_shadow',False) else 'back_plants' if a['position'][2]<-1 else 'front_plants'

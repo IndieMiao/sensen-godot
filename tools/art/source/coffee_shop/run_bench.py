@@ -32,6 +32,8 @@ layout_file=project/'assets/rooms'/slug/'layout.json'
 layout=json.loads(layout_file.read_text())
 # Preserve yaw/pitch; widen framing for the harness 4:3 viewport so no roof is clipped.
 layout['camera']['size']=max(10.2,float(layout['camera']['size'])*1.065)
+# The extended courtyard path starts outside the building: retain the full avatar.
+if slug=='coffee_shop_0':layout['camera']['size']*=1.15
 layout['camera']['position'][1]+=.08
 layout['camera']['target'][1]+=.08
 layout_file.write_text(json.dumps(layout,indent=2)+'\n')

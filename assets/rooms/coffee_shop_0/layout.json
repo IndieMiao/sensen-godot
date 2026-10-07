@@ -263,7 +263,7 @@
       "position": [
         0,
         -0.3,
-        0.42
+        0.8
       ],
       "yaw_degrees": 0,
       "colliders": []
@@ -432,9 +432,9 @@
       "name": "cookie_jars",
       "file": "cookie_jars.glb",
       "position": [
-        0.8,
-        1.26,
-        -2.15
+        0.87,
+        1.82,
+        -2.32
       ],
       "yaw_degrees": 0,
       "colliders": []
@@ -535,11 +535,11 @@
       "name": "sleeping_cat",
       "file": "sleeping_cat.glb",
       "position": [
-        0.04,
-        0.085,
-        2.44
+        -0.03,
+        -0.008,
+        2.75
       ],
-      "yaw_degrees": -25,
+      "yaw_degrees": 20,
       "colliders": []
     },
     {
@@ -550,7 +550,7 @@
         1.225,
         -0.9
       ],
-      "yaw_degrees": -45,
+      "yaw_degrees": 25,
       "colliders": []
     },
     {
@@ -594,18 +594,18 @@
         0.065,
         -0.05
       ],
-      "yaw_degrees": -30,
+      "yaw_degrees": 5,
       "colliders": []
     },
     {
       "name": "seated_cat",
       "file": "seated_cat.glb",
       "position": [
-        0.58,
+        -0.6,
         0.065,
-        1.97
+        1.6
       ],
-      "yaw_degrees": 115,
+      "yaw_degrees": 35,
       "colliders": []
     },
     {
@@ -655,6 +655,39 @@
           ]
         }
       ]
+    },
+    {
+      "name": "courtyard_orange_tree",
+      "file": "courtyard_orange_tree.glb",
+      "position": [
+        -2.35,
+        0.06,
+        -1.75
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "meadow_pebbles",
+      "file": "meadow_pebbles.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "coffee_jar_glass",
+      "file": "coffee_jar_glass.glb",
+      "position": [
+        0.87,
+        1.82,
+        -2.32
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
     }
   ],
   "instances": [
@@ -752,6 +785,166 @@
       "name": "grass_clump_00",
       "asset": "grass_clump",
       "position": [
+        -3.1485659632229037,
+        -0.2,
+        -3.4227433477009637
+      ],
+      "yaw_degrees": 115.53083973209009
+    },
+    {
+      "name": "grass_clump_01",
+      "asset": "grass_clump",
+      "position": [
+        -1.424943759369548,
+        -0.2,
+        4.206978325147965
+      ],
+      "yaw_degrees": 172.30881171872687
+    },
+    {
+      "name": "grass_clump_02",
+      "asset": "grass_clump",
+      "position": [
+        -3.5583784769391134,
+        -0.2,
+        -2.343335977326145
+      ],
+      "yaw_degrees": 242.6518150643495
+    },
+    {
+      "name": "grass_clump_03",
+      "asset": "grass_clump",
+      "position": [
+        3.731948394578763,
+        -0.2,
+        -0.06468873215404747
+      ],
+      "yaw_degrees": 223.89844461474127
+    },
+    {
+      "name": "grass_clump_04",
+      "asset": "grass_clump",
+      "position": [
+        -2.7972220678397415,
+        -0.2,
+        -3.5854413692907947
+      ],
+      "yaw_degrees": 188.82146813011767
+    },
+    {
+      "name": "grass_clump_05",
+      "asset": "grass_clump",
+      "position": [
+        -0.067393032505501,
+        -0.2,
+        4.227089557477323
+      ],
+      "yaw_degrees": 35.96347496606651
+    },
+    {
+      "name": "grass_clump_06",
+      "asset": "grass_clump",
+      "position": [
+        -3.457834164374146,
+        -0.2,
+        -3.0643395085031884
+      ],
+      "yaw_degrees": 175.47400371720187
+    },
+    {
+      "name": "grass_clump_07",
+      "asset": "grass_clump",
+      "position": [
+        3.7240273718992896,
+        -0.2,
+        -2.2714948768339376
+      ],
+      "yaw_degrees": 90.39358766605511
+    },
+    {
+      "name": "grass_clump_08",
+      "asset": "grass_clump",
+      "position": [
+        3.5755388446316583,
+        -0.2,
+        -3.3362054039475955
+      ],
+      "yaw_degrees": 9.177990597375217
+    },
+    {
+      "name": "grass_clump_09",
+      "asset": "grass_clump",
+      "position": [
+        -3.2755029290483852,
+        -0.2,
+        4.319488235320694
+      ],
+      "yaw_degrees": 117.0767501621303
+    },
+    {
+      "name": "grass_clump_10",
+      "asset": "grass_clump",
+      "position": [
+        -3.6514629399408602,
+        -0.2,
+        -2.219051988740304
+      ],
+      "yaw_degrees": 181.9806647335082
+    },
+    {
+      "name": "grass_clump_11",
+      "asset": "grass_clump",
+      "position": [
+        3.579451454804189,
+        -0.2,
+        4.283962742190269
+      ],
+      "yaw_degrees": 174.1134279817727
+    },
+    {
+      "name": "grass_clump_12",
+      "asset": "grass_clump",
+      "position": [
+        3.374551682660553,
+        -0.2,
+        -3.478303598199974
+      ],
+      "yaw_degrees": 281.4886618487793
+    },
+    {
+      "name": "grass_clump_13",
+      "asset": "grass_clump",
+      "position": [
+        -1.1718555846752343,
+        -0.2,
+        4.254646622750679
+      ],
+      "yaw_degrees": 140.49640453761288
+    },
+    {
+      "name": "grass_clump_14",
+      "asset": "grass_clump",
+      "position": [
+        -3.485593980468945,
+        -0.2,
+        -3.1612203324645787
+      ],
+      "yaw_degrees": 108.09573825279782
+    },
+    {
+      "name": "grass_clump_15",
+      "asset": "grass_clump",
+      "position": [
+        3.5723944118753357,
+        -0.2,
+        0.24739274130236133
+      ],
+      "yaw_degrees": 142.92512754147467
+    },
+    {
+      "name": "grass_clump_16",
+      "asset": "grass_clump",
+      "position": [
         -1.276295712747097,
         -0.2,
         -3.508312401369518
@@ -759,7 +952,7 @@
       "yaw_degrees": 226.96764316407405
     },
     {
-      "name": "grass_clump_01",
+      "name": "grass_clump_17",
       "asset": "grass_clump",
       "position": [
         -0.18839215070662219,
@@ -769,7 +962,7 @@
       "yaw_degrees": 38.84324524363375
     },
     {
-      "name": "grass_clump_02",
+      "name": "grass_clump_18",
       "asset": "grass_clump",
       "position": [
         -3.739396946173315,
@@ -779,7 +972,7 @@
       "yaw_degrees": 139.67126964245688
     },
     {
-      "name": "grass_clump_03",
+      "name": "grass_clump_19",
       "asset": "grass_clump",
       "position": [
         3.5348575335880175,
@@ -789,7 +982,7 @@
       "yaw_degrees": 177.718894051107
     },
     {
-      "name": "grass_clump_04",
+      "name": "grass_clump_20",
       "asset": "grass_clump",
       "position": [
         2.13663214623466,
@@ -799,7 +992,7 @@
       "yaw_degrees": 272.36653405865445
     },
     {
-      "name": "grass_clump_05",
+      "name": "grass_clump_21",
       "asset": "grass_clump",
       "position": [
         -3.267643309768071,
@@ -809,7 +1002,7 @@
       "yaw_degrees": 165.58687841858546
     },
     {
-      "name": "grass_clump_06",
+      "name": "grass_clump_22",
       "asset": "grass_clump",
       "position": [
         -3.739335968184052,
@@ -819,7 +1012,7 @@
       "yaw_degrees": 107.45291713171731
     },
     {
-      "name": "grass_clump_07",
+      "name": "grass_clump_23",
       "asset": "grass_clump",
       "position": [
         3.6162606475935144,
@@ -829,7 +1022,7 @@
       "yaw_degrees": 47.20073345997446
     },
     {
-      "name": "grass_clump_08",
+      "name": "grass_clump_24",
       "asset": "grass_clump",
       "position": [
         -1.6890486422205906,
@@ -839,7 +1032,7 @@
       "yaw_degrees": 115.44337686004795
     },
     {
-      "name": "grass_clump_09",
+      "name": "grass_clump_25",
       "asset": "grass_clump",
       "position": [
         1.9824374344301048,
@@ -849,7 +1042,7 @@
       "yaw_degrees": 277.3004601518718
     },
     {
-      "name": "grass_clump_10",
+      "name": "grass_clump_26",
       "asset": "grass_clump",
       "position": [
         -3.650920404474904,
@@ -859,7 +1052,7 @@
       "yaw_degrees": 137.96735699729865
     },
     {
-      "name": "grass_clump_11",
+      "name": "grass_clump_27",
       "asset": "grass_clump",
       "position": [
         3.7175446802813936,
@@ -869,7 +1062,7 @@
       "yaw_degrees": 243.27416636205635
     },
     {
-      "name": "grass_clump_12",
+      "name": "grass_clump_28",
       "asset": "grass_clump",
       "position": [
         -0.8640647955243246,
@@ -879,7 +1072,7 @@
       "yaw_degrees": 133.3268606308331
     },
     {
-      "name": "grass_clump_13",
+      "name": "grass_clump_29",
       "asset": "grass_clump",
       "position": [
         2.5663873767198413,
@@ -889,7 +1082,7 @@
       "yaw_degrees": 126.35028161776759
     },
     {
-      "name": "grass_clump_14",
+      "name": "grass_clump_30",
       "asset": "grass_clump",
       "position": [
         -3.6432270295232656,
@@ -899,7 +1092,7 @@
       "yaw_degrees": 88.76310362270726
     },
     {
-      "name": "grass_clump_15",
+      "name": "grass_clump_31",
       "asset": "grass_clump",
       "position": [
         3.722982588061473,
@@ -909,7 +1102,7 @@
       "yaw_degrees": 195.62602328728195
     },
     {
-      "name": "grass_clump_16",
+      "name": "grass_clump_32",
       "asset": "grass_clump",
       "position": [
         2.755197853886687,
@@ -919,7 +1112,7 @@
       "yaw_degrees": 172.14221289273326
     },
     {
-      "name": "grass_clump_17",
+      "name": "grass_clump_33",
       "asset": "grass_clump",
       "position": [
         -3.1287541734512296,
@@ -929,7 +1122,7 @@
       "yaw_degrees": 351.76653924221256
     },
     {
-      "name": "grass_clump_18",
+      "name": "grass_clump_34",
       "asset": "grass_clump",
       "position": [
         -3.7144284945136348,
@@ -939,7 +1132,7 @@
       "yaw_degrees": 359.93449095162543
     },
     {
-      "name": "grass_clump_19",
+      "name": "grass_clump_35",
       "asset": "grass_clump",
       "position": [
         3.5429409168147066,
@@ -949,7 +1142,7 @@
       "yaw_degrees": 243.84040307599426
     },
     {
-      "name": "grass_clump_20",
+      "name": "grass_clump_36",
       "asset": "grass_clump",
       "position": [
         -2.9948423825392902,
@@ -959,7 +1152,7 @@
       "yaw_degrees": 38.007910035937236
     },
     {
-      "name": "grass_clump_21",
+      "name": "grass_clump_37",
       "asset": "grass_clump",
       "position": [
         1.3300384319768468,
@@ -969,7 +1162,7 @@
       "yaw_degrees": 339.2254393033176
     },
     {
-      "name": "grass_clump_22",
+      "name": "grass_clump_38",
       "asset": "grass_clump",
       "position": [
         -3.5413987803945823,
@@ -979,7 +1172,7 @@
       "yaw_degrees": 216.62569706015458
     },
     {
-      "name": "grass_clump_23",
+      "name": "grass_clump_39",
       "asset": "grass_clump",
       "position": [
         3.6514806874189016,
@@ -989,7 +1182,7 @@
       "yaw_degrees": 258.60327887636305
     },
     {
-      "name": "grass_clump_24",
+      "name": "grass_clump_40",
       "asset": "grass_clump",
       "position": [
         1.7808938286263545,
@@ -999,225 +1192,621 @@
       "yaw_degrees": 215.84253735962469
     },
     {
-      "name": "grass_clump_25",
-      "asset": "grass_clump",
-      "position": [
-        1.4673705752920987,
-        -0.2,
-        4.117832494726428
-      ],
-      "yaw_degrees": 98.96879212672134
-    },
-    {
-      "name": "grass_clump_26",
-      "asset": "grass_clump",
-      "position": [
-        -3.5820522473286713,
-        -0.2,
-        4.148283552301578
-      ],
-      "yaw_degrees": 36.70159890948096
-    },
-    {
-      "name": "grass_clump_27",
-      "asset": "grass_clump",
-      "position": [
-        3.4854895914104973,
-        -0.2,
-        2.3381022132760063
-      ],
-      "yaw_degrees": 352.6793621841861
-    },
-    {
-      "name": "grass_clump_28",
-      "asset": "grass_clump",
-      "position": [
-        -2.225147375775763,
-        -0.2,
-        -3.288125738502014
-      ],
-      "yaw_degrees": 329.498439180628
-    },
-    {
-      "name": "grass_clump_29",
-      "asset": "grass_clump",
-      "position": [
-        1.8553177027700296,
-        -0.2,
-        4.183680000803936
-      ],
-      "yaw_degrees": 264.6447574221646
-    },
-    {
-      "name": "grass_clump_30",
-      "asset": "grass_clump",
-      "position": [
-        -3.469025134426572,
-        -0.2,
-        3.755031968317826
-      ],
-      "yaw_degrees": 344.84325217725103
-    },
-    {
-      "name": "grass_clump_31",
-      "asset": "grass_clump",
-      "position": [
-        3.7400033765608494,
-        -0.2,
-        -1.7189343889044733
-      ],
-      "yaw_degrees": 283.1685578070711
-    },
-    {
-      "name": "grass_clump_32",
-      "asset": "grass_clump",
-      "position": [
-        -2.450484900763249,
-        -0.2,
-        -3.459560905249801
-      ],
-      "yaw_degrees": 186.64967211670117
-    },
-    {
-      "name": "grass_clump_33",
-      "asset": "grass_clump",
-      "position": [
-        -1.5283768201024643,
-        -0.2,
-        4.1340282969549955
-      ],
-      "yaw_degrees": 65.03329473325032
-    },
-    {
-      "name": "grass_clump_34",
-      "asset": "grass_clump",
-      "position": [
-        -3.4523167136237345,
-        -0.2,
-        -0.9833528738940043
-      ],
-      "yaw_degrees": 269.645823809221
-    },
-    {
-      "name": "grass_clump_35",
-      "asset": "grass_clump",
-      "position": [
-        3.547467792311392,
-        -0.2,
-        3.5915815035688676
-      ],
-      "yaw_degrees": 355.3335317238479
-    },
-    {
-      "name": "grass_clump_36",
-      "asset": "grass_clump",
-      "position": [
-        1.3056734750376182,
-        -0.2,
-        -3.475255128635833
-      ],
-      "yaw_degrees": 348.2638392827459
-    },
-    {
-      "name": "grass_clump_37",
-      "asset": "grass_clump",
-      "position": [
-        -2.022214769925826,
-        -0.2,
-        4.3117952314131855
-      ],
-      "yaw_degrees": 228.21872171280685
-    },
-    {
-      "name": "grass_clump_38",
-      "asset": "grass_clump",
-      "position": [
-        -3.5172239309045747,
-        -0.2,
-        -0.8194992385702835
-      ],
-      "yaw_degrees": 240.68118884410728
-    },
-    {
-      "name": "grass_clump_39",
-      "asset": "grass_clump",
-      "position": [
-        3.7152272768760466,
-        -0.2,
-        -2.972586508659915
-      ],
-      "yaw_degrees": 220.51978905950045
-    },
-    {
-      "name": "grass_clump_40",
-      "asset": "grass_clump",
-      "position": [
-        -3.5784023639262017,
-        -0.2,
-        -3.3243683521645866
-      ],
-      "yaw_degrees": 13.404360964356727
-    }
-  ],
-  "camera": {
-    "position": [
-      11,
-      11.3,
-      12
-    ],
-    "target": [
-      0,
-      1.08,
-      0.42
-    ],
-    "size": 11.5
-  },
-  "revision": "R1",
-  "shared_plants": [
-    {
-      "name": "FruitTreeLeft",
-      "asset": "fruit_tree",
-      "file": "res://assets/rooms/_shared/plants/fruit_tree.glb",
-      "position": [
-        -2.35,
-        0.06,
-        -1.75
-      ],
-      "rotation_degrees": [
-        0,
-        30,
-        0
-      ],
-      "scale": [
-        1.16,
-        1.16,
-        1.16
-      ],
-      "colliders": [],
-      "cast_shadow": true
-    },
-    {
-      "name": "FruitTreeRight",
-      "asset": "fruit_tree",
-      "file": "res://assets/rooms/_shared/plants/fruit_tree.glb",
+      "name": "courtyard_orange_tree_right",
+      "asset": "courtyard_orange_tree",
       "position": [
         2.38,
         0.06,
         -1.75
       ],
-      "rotation_degrees": [
-        0,
-        95,
-        0
-      ],
-      "scale": [
-        1.16,
-        1.16,
-        1.16
-      ],
-      "colliders": [],
-      "cast_shadow": true
+      "yaw_degrees": 73
     },
+    {
+      "name": "r2_meadow_tuft_003",
+      "asset": "grass_clump",
+      "position": [
+        4.161121197897028,
+        -0.21,
+        -0.9654343469491211
+      ],
+      "yaw_degrees": 244.4128805523119
+    },
+    {
+      "name": "r2_meadow_tuft_007",
+      "asset": "grass_clump",
+      "position": [
+        4.730065556198749,
+        -0.21,
+        -4.0251979618499965
+      ],
+      "yaw_degrees": 77.31304676117823
+    },
+    {
+      "name": "r2_meadow_tuft_009",
+      "asset": "grass_clump",
+      "position": [
+        3.396904873486406,
+        -0.21,
+        1.8518478862340952
+      ],
+      "yaw_degrees": 308.5098365777053
+    },
+    {
+      "name": "r2_meadow_tuft_011",
+      "asset": "grass_clump",
+      "position": [
+        -3.9166377171546394,
+        -0.21,
+        0.6816435389152602
+      ],
+      "yaw_degrees": 184.8189928234331
+    },
+    {
+      "name": "r2_meadow_tuft_012",
+      "asset": "grass_clump",
+      "position": [
+        -3.8593521584786856,
+        -0.21,
+        -3.3280114448488627
+      ],
+      "yaw_degrees": 354.8737416820966
+    },
+    {
+      "name": "r2_meadow_tuft_015",
+      "asset": "grass_clump",
+      "position": [
+        -3.922969874832042,
+        -0.21,
+        3.738680172148758
+      ],
+      "yaw_degrees": 324.19903604388605
+    },
+    {
+      "name": "r2_meadow_tuft_016",
+      "asset": "grass_clump",
+      "position": [
+        4.400647781363249,
+        -0.21,
+        2.5936336031651255
+      ],
+      "yaw_degrees": 234.48164890153654
+    },
+    {
+      "name": "r2_meadow_tuft_017",
+      "asset": "grass_clump",
+      "position": [
+        -2.887212974972119,
+        -0.21,
+        3.5252959646238535
+      ],
+      "yaw_degrees": 298.50672960723864
+    },
+    {
+      "name": "r2_meadow_tuft_018",
+      "asset": "grass_clump",
+      "position": [
+        -3.987960139059037,
+        -0.21,
+        -0.29785205153689365
+      ],
+      "yaw_degrees": 81.24751494130085
+    },
+    {
+      "name": "r2_meadow_tuft_019",
+      "asset": "grass_clump",
+      "position": [
+        -4.410400624740493,
+        -0.21,
+        -0.08830477695360006
+      ],
+      "yaw_degrees": 25.305470503957746
+    },
+    {
+      "name": "r2_meadow_tuft_020",
+      "asset": "grass_clump",
+      "position": [
+        3.493648100076328,
+        -0.21,
+        5.597912694501829
+      ],
+      "yaw_degrees": 49.26293183282045
+    },
+    {
+      "name": "r2_meadow_tuft_025",
+      "asset": "grass_clump",
+      "position": [
+        3.5530895143147205,
+        -0.21,
+        4.194819622163083
+      ],
+      "yaw_degrees": 223.4572344893198
+    },
+    {
+      "name": "r2_meadow_tuft_026",
+      "asset": "grass_clump",
+      "position": [
+        3.2809095490559272,
+        -0.21,
+        1.8199329809808136
+      ],
+      "yaw_degrees": 263.6045918151777
+    },
+    {
+      "name": "r2_meadow_tuft_027",
+      "asset": "grass_clump",
+      "position": [
+        -3.7666548043044736,
+        -0.21,
+        5.627094922901259
+      ],
+      "yaw_degrees": 323.77496682361686
+    },
+    {
+      "name": "r2_meadow_tuft_030",
+      "asset": "grass_clump",
+      "position": [
+        -3.9163641249736623,
+        -0.21,
+        -1.4595334120147259
+      ],
+      "yaw_degrees": 168.46615596513686
+    },
+    {
+      "name": "r2_meadow_tuft_031",
+      "asset": "grass_clump",
+      "position": [
+        -3.42001526586525,
+        -0.21,
+        3.3789567655802157
+      ],
+      "yaw_degrees": 247.87092426620495
+    },
+    {
+      "name": "r2_meadow_tuft_032",
+      "asset": "grass_clump",
+      "position": [
+        -4.200909080990796,
+        -0.21,
+        3.1366318560936053
+      ],
+      "yaw_degrees": 94.33121371625558
+    },
+    {
+      "name": "r2_meadow_tuft_034",
+      "asset": "grass_clump",
+      "position": [
+        -1.7195445089230632,
+        -0.21,
+        -3.389208552567065
+      ],
+      "yaw_degrees": 311.54779554984486
+    },
+    {
+      "name": "r2_meadow_tuft_036",
+      "asset": "grass_clump",
+      "position": [
+        4.632615856909739,
+        -0.21,
+        -1.5437874442132054
+      ],
+      "yaw_degrees": 232.51097218815403
+    },
+    {
+      "name": "r2_meadow_tuft_037",
+      "asset": "grass_clump",
+      "position": [
+        -0.4673034135153893,
+        -0.21,
+        4.108344671161197
+      ],
+      "yaw_degrees": 89.76158664199757
+    },
+    {
+      "name": "r2_meadow_tuft_038",
+      "asset": "grass_clump",
+      "position": [
+        2.662380566293848,
+        -0.21,
+        4.9230857647158
+      ],
+      "yaw_degrees": 115.28821677396255
+    },
+    {
+      "name": "r2_meadow_tuft_039",
+      "asset": "grass_clump",
+      "position": [
+        -1.799138311651168,
+        -0.21,
+        4.3297548989717765
+      ],
+      "yaw_degrees": 345.98608210727326
+    },
+    {
+      "name": "r2_meadow_tuft_040",
+      "asset": "grass_clump",
+      "position": [
+        2.5852427658067842,
+        -0.21,
+        5.695491346162013
+      ],
+      "yaw_degrees": 309.68837872581173
+    },
+    {
+      "name": "r2_meadow_tuft_046",
+      "asset": "grass_clump",
+      "position": [
+        0.9052778879922503,
+        -0.21,
+        -4.230026662321768
+      ],
+      "yaw_degrees": 96.79418336119593
+    },
+    {
+      "name": "r2_meadow_tuft_048",
+      "asset": "grass_clump",
+      "position": [
+        -2.0605232784357206,
+        -0.21,
+        4.656970242353484
+      ],
+      "yaw_degrees": 171.52439846968508
+    },
+    {
+      "name": "r2_meadow_tuft_050",
+      "asset": "grass_clump",
+      "position": [
+        -3.664107694598497,
+        -0.21,
+        3.228673011769808
+      ],
+      "yaw_degrees": 164.06103197210038
+    },
+    {
+      "name": "r2_meadow_tuft_051",
+      "asset": "grass_clump",
+      "position": [
+        -2.7838097909000443,
+        -0.21,
+        -4.312738162271637
+      ],
+      "yaw_degrees": 358.4673654285006
+    },
+    {
+      "name": "r2_meadow_tuft_054",
+      "asset": "grass_clump",
+      "position": [
+        3.7200032898762796,
+        -0.21,
+        -1.9778882639626847
+      ],
+      "yaw_degrees": 226.13929594194585
+    },
+    {
+      "name": "r2_meadow_tuft_056",
+      "asset": "grass_clump",
+      "position": [
+        4.566987792853839,
+        -0.21,
+        -3.038485344789404
+      ],
+      "yaw_degrees": 205.74867985334683
+    },
+    {
+      "name": "r2_meadow_tuft_059",
+      "asset": "grass_clump",
+      "position": [
+        4.085639485241108,
+        -0.21,
+        3.1416757471969383
+      ],
+      "yaw_degrees": 219.69253030529265
+    },
+    {
+      "name": "r2_meadow_tuft_060",
+      "asset": "grass_clump",
+      "position": [
+        2.560571858050208,
+        -0.21,
+        -3.34571105361329
+      ],
+      "yaw_degrees": 58.99880860397312
+    },
+    {
+      "name": "r2_meadow_tuft_062",
+      "asset": "grass_clump",
+      "position": [
+        -3.6867864699171813,
+        -0.21,
+        -1.3302698148185277
+      ],
+      "yaw_degrees": 231.7111107559876
+    },
+    {
+      "name": "r2_meadow_tuft_066",
+      "asset": "grass_clump",
+      "position": [
+        -4.145881408857708,
+        -0.21,
+        5.1993081018406215
+      ],
+      "yaw_degrees": 283.4678204898357
+    },
+    {
+      "name": "r2_meadow_tuft_069",
+      "asset": "grass_clump",
+      "position": [
+        -4.5956673937378785,
+        -0.21,
+        -1.3068691386627012
+      ],
+      "yaw_degrees": 1.854985005928338
+    },
+    {
+      "name": "r2_meadow_tuft_070",
+      "asset": "grass_clump",
+      "position": [
+        1.1040988682367239,
+        -0.21,
+        4.992779089997494
+      ],
+      "yaw_degrees": 356.742208588042
+    },
+    {
+      "name": "r2_meadow_tuft_071",
+      "asset": "grass_clump",
+      "position": [
+        3.3458596221951407,
+        -0.21,
+        1.4548886315744456
+      ],
+      "yaw_degrees": 313.543197195733
+    },
+    {
+      "name": "r2_meadow_tuft_073",
+      "asset": "grass_clump",
+      "position": [
+        2.9133949821281178,
+        -0.21,
+        -3.0016945941148503
+      ],
+      "yaw_degrees": 50.015272710785275
+    },
+    {
+      "name": "r2_meadow_tuft_074",
+      "asset": "grass_clump",
+      "position": [
+        4.337741576823765,
+        -0.21,
+        4.002692354461342
+      ],
+      "yaw_degrees": 199.80395690017306
+    },
+    {
+      "name": "r2_meadow_tuft_075",
+      "asset": "grass_clump",
+      "position": [
+        3.8669026562222477,
+        -0.21,
+        4.0164323298656015
+      ],
+      "yaw_degrees": 9.614343895494436
+    },
+    {
+      "name": "r2_meadow_tuft_076",
+      "asset": "grass_clump",
+      "position": [
+        2.3415494556495107,
+        -0.21,
+        5.604313168830503
+      ],
+      "yaw_degrees": 98.98988099723982
+    },
+    {
+      "name": "r2_meadow_tuft_078",
+      "asset": "grass_clump",
+      "position": [
+        4.564140003531943,
+        -0.21,
+        5.611110263775583
+      ],
+      "yaw_degrees": 12.29107825036765
+    },
+    {
+      "name": "r2_meadow_tuft_079",
+      "asset": "grass_clump",
+      "position": [
+        -4.352101804355013,
+        -0.21,
+        -0.8192089917096093
+      ],
+      "yaw_degrees": 252.72290532420325
+    },
+    {
+      "name": "r2_meadow_tuft_080",
+      "asset": "grass_clump",
+      "position": [
+        3.36746272340163,
+        -0.21,
+        4.123357279092081
+      ],
+      "yaw_degrees": 28.17458884518825
+    },
+    {
+      "name": "r2_meadow_tuft_082",
+      "asset": "grass_clump",
+      "position": [
+        2.4695612252185555,
+        -0.21,
+        3.724668671978934
+      ],
+      "yaw_degrees": 129.99015755019184
+    },
+    {
+      "name": "r2_meadow_tuft_083",
+      "asset": "grass_clump",
+      "position": [
+        2.3250871392361443,
+        -0.21,
+        4.412904734688741
+      ],
+      "yaw_degrees": 320.61378705695375
+    },
+    {
+      "name": "r2_meadow_tuft_084",
+      "asset": "grass_clump",
+      "position": [
+        -0.8000193127141495,
+        -0.21,
+        5.703930623887242
+      ],
+      "yaw_degrees": 138.99965157274474
+    },
+    {
+      "name": "r2_meadow_tuft_086",
+      "asset": "grass_clump",
+      "position": [
+        3.6995840224778327,
+        -0.21,
+        0.5313610246754559
+      ],
+      "yaw_degrees": 260.6304086542278
+    },
+    {
+      "name": "r2_meadow_tuft_088",
+      "asset": "grass_clump",
+      "position": [
+        4.0541454986652266,
+        -0.21,
+        0.48576741882554497
+      ],
+      "yaw_degrees": 245.47495962481304
+    },
+    {
+      "name": "r2_meadow_tuft_089",
+      "asset": "grass_clump",
+      "position": [
+        -2.6294498820724725,
+        -0.21,
+        -3.371797222955912
+      ],
+      "yaw_degrees": 30.743663107660026
+    },
+    {
+      "name": "r2_meadow_tuft_091",
+      "asset": "grass_clump",
+      "position": [
+        3.849780057119883,
+        -0.21,
+        0.5021533459340422
+      ],
+      "yaw_degrees": 78.5992586166832
+    },
+    {
+      "name": "r2_meadow_tuft_092",
+      "asset": "grass_clump",
+      "position": [
+        0.06739713278561954,
+        -0.21,
+        4.523333799684718
+      ],
+      "yaw_degrees": 339.9588132616103
+    },
+    {
+      "name": "r2_meadow_tuft_094",
+      "asset": "grass_clump",
+      "position": [
+        -2.329346067441077,
+        -0.21,
+        -3.217539705056602
+      ],
+      "yaw_degrees": 274.5195350120583
+    },
+    {
+      "name": "r2_meadow_tuft_095",
+      "asset": "grass_clump",
+      "position": [
+        -4.130144117818421,
+        -0.21,
+        -0.8869084018287414
+      ],
+      "yaw_degrees": 210.46617200651662
+    },
+    {
+      "name": "r2_meadow_tuft_101",
+      "asset": "grass_clump",
+      "position": [
+        -4.059663485466562,
+        -0.21,
+        -3.5462078936321175
+      ],
+      "yaw_degrees": 296.4625673133654
+    },
+    {
+      "name": "r2_meadow_tuft_102",
+      "asset": "grass_clump",
+      "position": [
+        0.2012178202131949,
+        -0.21,
+        5.785192871197069
+      ],
+      "yaw_degrees": 190.92263421191743
+    },
+    {
+      "name": "r2_meadow_tuft_103",
+      "asset": "grass_clump",
+      "position": [
+        -4.5110040098197555,
+        -0.21,
+        3.2432114191674923
+      ],
+      "yaw_degrees": 167.44958033786415
+    },
+    {
+      "name": "r2_meadow_tuft_106",
+      "asset": "grass_clump",
+      "position": [
+        -2.5222951481952567,
+        -0.21,
+        5.276816207467668
+      ],
+      "yaw_degrees": 260.0532243762034
+    },
+    {
+      "name": "r2_meadow_tuft_107",
+      "asset": "grass_clump",
+      "position": [
+        0.020399464252453647,
+        -0.21,
+        -3.867343297127706
+      ],
+      "yaw_degrees": 358.7137588109871
+    },
+    {
+      "name": "r2_meadow_tuft_109",
+      "asset": "grass_clump",
+      "position": [
+        -4.480965190198495,
+        -0.21,
+        5.34852100596709
+      ],
+      "yaw_degrees": 192.7177255761095
+    }
+  ],
+  "camera": {
+    "position": [
+      10.189503484482316,
+      12.36387712416568,
+      11.008603089038376
+    ],
+    "target": [
+      -0.09014808460444591,
+      1.4096403593505655,
+      0.08483251207310714
+    ],
+    "size": 9.648245339673732
+  },
+  "revision": "R2",
+  "shared_plants": [
     {
       "name": "ArchPeaceLily",
       "asset": "peace_lily",
@@ -1592,6 +2181,9 @@
   "material_overrides": {
     "floor": {
       "roughness": 0.76
+    },
+    "coffee_jar_glass": {
+      "alpha": 0.12
     }
   },
   "boundaries": [
@@ -1600,12 +2192,12 @@
       "at": [
         0,
         -0.32,
-        0.42
+        0.8
       ],
       "size": [
-        8,
+        10,
         0.2,
-        8.3
+        10.8
       ]
     },
     {
@@ -1613,10 +2205,10 @@
       "at": [
         0,
         0.55,
-        4.58
+        6.2
       ],
       "size": [
-        8.2,
+        10.2,
         1.8,
         0.12
       ]
@@ -1626,10 +2218,10 @@
       "at": [
         0,
         0.55,
-        -3.75
+        -4.6
       ],
       "size": [
-        8.2,
+        10.2,
         1.8,
         0.12
       ]
@@ -1637,27 +2229,27 @@
     {
       "name": "meadow_left_limit",
       "at": [
-        -4.02,
+        -5.02,
         0.55,
-        0.42
+        0.8
       ],
       "size": [
         0.12,
         1.8,
-        8.4
+        10.9
       ]
     },
     {
       "name": "meadow_right_limit",
       "at": [
-        4.02,
+        5.02,
         0.55,
-        0.42
+        0.8
       ],
       "size": [
         0.12,
         1.8,
-        8.4
+        10.9
       ]
     }
   ],
@@ -1701,17 +2293,17 @@
   "spawn": [
     0.15,
     -0.2,
-    4.15
+    5.72
   ],
   "bench": {
     "floor_y": -0.22,
     "route": [
       {
-        "name": "path",
+        "name": "outer_path",
         "position": [
-          0.15,
+          0.3,
           -0.2,
-          3.85
+          5.2
         ]
       },
       {
@@ -1851,24 +2443,24 @@
         "from": [
           0.15,
           -0.2,
-          4.17
+          5.75
         ],
         "to": [
           0.15,
           -0.2,
-          5.3
+          6.9
         ],
         "target": "meadow_front_limit"
       },
       {
         "name": "meadow_side",
         "from": [
-          3.6,
+          4.5,
           -0.2,
           3.35
         ],
         "to": [
-          4.7,
+          5.8,
           -0.2,
           3.35
         ],
@@ -2012,6 +2604,92 @@
       }
     }
   },
+  "botanical_assets": [
+    "courtyard_orange_tree"
+  ],
+  "review_camera_fit": {
+    "method": "orthographic fit to plinth edge intersections; no model scaling or image warp",
+    "reference_size": [
+      2048,
+      2048
+    ],
+    "reference_corners_left_front_right": [
+      [
+        152.32,
+        1272.32
+      ],
+      [
+        1130.24,
+        1815.04
+      ],
+      [
+        1932.8,
+        1310.72
+      ]
+    ],
+    "inferred_back": [
+      954.8799999999999,
+      768.0
+    ],
+    "footprint_m": [
+      6.18,
+      5.68
+    ],
+    "plinth_y": -0.15,
+    "render_size": [
+      1400,
+      1400
+    ],
+    "fitted_corners": [
+      [
+        109.02139736623678,
+        878.5379432462997
+      ],
+      [
+        762.0759836633381,
+        1240.9735354597801
+      ],
+      [
+        1326.902618970425,
+        886.9885212939201
+      ]
+    ],
+    "observed_letterboxed_corners": [
+      [
+        104.125,
+        869.75
+      ],
+      [
+        772.625,
+        1240.75
+      ],
+      [
+        1321.25,
+        896.0
+      ]
+    ],
+    "residual_px": [
+      10.059952965510107,
+      10.551384448163137,
+      10.63761484990594
+    ],
+    "pitch_degrees": 36.139999999999986,
+    "yaw_degrees": 43.26000000000001,
+    "camera": {
+      "position": [
+        10.189503484482316,
+        12.36387712416568,
+        11.008603089038376
+      ],
+      "target": [
+        -0.09014808460444591,
+        1.4096403593505655,
+        0.08483251207310714
+      ],
+      "size": 9.648245339673732
+    },
+    "limitation": "Rounded plinth endpoints are estimated edge intersections; concept is not a calibrated physical camera."
+  },
   "render_batches": [
     {
       "name": "botanical",
@@ -2021,6 +2699,7 @@
         "grass_base",
         "blue_vase_flowers",
         "grass_clump",
+        "courtyard_orange_tree",
         "blue_vase_flowers_2",
         "grass_clump_00",
         "grass_clump_01",
@@ -2062,9 +2741,69 @@
         "grass_clump_37",
         "grass_clump_38",
         "grass_clump_39",
-        "grass_clump_40"
+        "grass_clump_40",
+        "courtyard_orange_tree_right",
+        "r2_meadow_tuft_003",
+        "r2_meadow_tuft_007",
+        "r2_meadow_tuft_009",
+        "r2_meadow_tuft_011",
+        "r2_meadow_tuft_012",
+        "r2_meadow_tuft_015",
+        "r2_meadow_tuft_016",
+        "r2_meadow_tuft_017",
+        "r2_meadow_tuft_018",
+        "r2_meadow_tuft_019",
+        "r2_meadow_tuft_020",
+        "r2_meadow_tuft_025",
+        "r2_meadow_tuft_026",
+        "r2_meadow_tuft_027",
+        "r2_meadow_tuft_030",
+        "r2_meadow_tuft_031",
+        "r2_meadow_tuft_032",
+        "r2_meadow_tuft_034",
+        "r2_meadow_tuft_036",
+        "r2_meadow_tuft_037",
+        "r2_meadow_tuft_038",
+        "r2_meadow_tuft_039",
+        "r2_meadow_tuft_040",
+        "r2_meadow_tuft_046",
+        "r2_meadow_tuft_048",
+        "r2_meadow_tuft_050",
+        "r2_meadow_tuft_051",
+        "r2_meadow_tuft_054",
+        "r2_meadow_tuft_056",
+        "r2_meadow_tuft_059",
+        "r2_meadow_tuft_060",
+        "r2_meadow_tuft_062",
+        "r2_meadow_tuft_066",
+        "r2_meadow_tuft_069",
+        "r2_meadow_tuft_070",
+        "r2_meadow_tuft_071",
+        "r2_meadow_tuft_073",
+        "r2_meadow_tuft_074",
+        "r2_meadow_tuft_075",
+        "r2_meadow_tuft_076",
+        "r2_meadow_tuft_078",
+        "r2_meadow_tuft_079",
+        "r2_meadow_tuft_080",
+        "r2_meadow_tuft_082",
+        "r2_meadow_tuft_083",
+        "r2_meadow_tuft_084",
+        "r2_meadow_tuft_086",
+        "r2_meadow_tuft_088",
+        "r2_meadow_tuft_089",
+        "r2_meadow_tuft_091",
+        "r2_meadow_tuft_092",
+        "r2_meadow_tuft_094",
+        "r2_meadow_tuft_095",
+        "r2_meadow_tuft_101",
+        "r2_meadow_tuft_102",
+        "r2_meadow_tuft_103",
+        "r2_meadow_tuft_106",
+        "r2_meadow_tuft_107",
+        "r2_meadow_tuft_109"
       ],
-      "triangles": 10262,
+      "triangles": 20205,
       "cast_shadow": false
     },
     {
@@ -2080,7 +2819,7 @@
         "supply_shelf",
         "cookie_jars"
       ],
-      "triangles": 15820,
+      "triangles": 18552,
       "cast_shadow": true
     },
     {
@@ -2098,9 +2837,10 @@
         "street_signboard",
         "calico_cat",
         "seated_cat",
+        "meadow_pebbles",
         "service_tray_2"
       ],
-      "triangles": 13124,
+      "triangles": 23676,
       "cast_shadow": true
     },
     {
@@ -2108,9 +2848,10 @@
       "file": "res://assets/rooms/coffee_shop_0/batches/review_glass.glb",
       "material": "glass",
       "sources": [
-        "display_glass"
+        "display_glass",
+        "coffee_jar_glass"
       ],
-      "triangles": 8,
+      "triangles": 240,
       "cast_shadow": false
     },
     {
@@ -2118,11 +2859,9 @@
       "file": "res://assets/rooms/coffee_shop_0/batches/review_large_plants.glb",
       "material": "plants",
       "sources": [
-        "FruitTreeLeft",
-        "FruitTreeRight",
         "ArchPeaceLily"
       ],
-      "triangles": 5794,
+      "triangles": 946,
       "cast_shadow": true
     },
     {
@@ -2158,6 +2897,64 @@
       ],
       "triangles": 26422,
       "cast_shadow": false
+    }
+  ],
+  "review_views": [
+    {
+      "name": "cat-orange-counter",
+      "target": [
+        1.32,
+        1.5,
+        -0.9
+      ],
+      "position": [
+        3.3200000000000003,
+        2.9,
+        2.1
+      ],
+      "size": 1.3
+    },
+    {
+      "name": "cat-standing-calico",
+      "target": [
+        -0.38,
+        0.4,
+        -0.05
+      ],
+      "position": [
+        0.2,
+        1.0,
+        0.65
+      ],
+      "size": 1.3
+    },
+    {
+      "name": "cat-seated-gray",
+      "target": [
+        -0.6,
+        0.42,
+        1.6
+      ],
+      "position": [
+        1.4,
+        1.8199999999999998,
+        4.6
+      ],
+      "size": 1.3
+    },
+    {
+      "name": "cat-entry-gray",
+      "target": [
+        -0.03,
+        0.21,
+        2.75
+      ],
+      "position": [
+        1.97,
+        1.6099999999999999,
+        5.75
+      ],
+      "size": 1.3
     }
   ]
 }

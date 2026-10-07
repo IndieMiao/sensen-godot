@@ -1,5 +1,5 @@
 {
-  "revision": "r1",
+  "revision": "r2",
   "method": "9x9 median RGB, HSV circular hue difference; same authored physical surfaces; no pixel registration",
   "checks": [
     {
@@ -10,8 +10,8 @@
         550
       ],
       "runtime_pixel": [
-        515,
-        389
+        457,
+        414
       ],
       "reference": {
         "rgb": [
@@ -26,16 +26,16 @@
       },
       "runtime": {
         "rgb": [
-          244,
-          225,
-          200
+          250,
+          233,
+          207
         ],
-        "hex": "#F4E1C8",
-        "hue_degrees": 34.091,
-        "saturation": 0.1803,
-        "value": 0.9569
+        "hex": "#FAE9CF",
+        "hue_degrees": 36.279,
+        "saturation": 0.172,
+        "value": 0.9804
       },
-      "hue_delta_degrees": 4.207,
+      "hue_delta_degrees": 2.019,
       "passed": true
     },
     {
@@ -46,8 +46,8 @@
         1283
       ],
       "runtime_pixel": [
-        496,
-        820
+        399,
+        943
       ],
       "reference": {
         "rgb": [
@@ -64,14 +64,14 @@
         "rgb": [
           255,
           247,
-          226
+          225
         ],
-        "hex": "#FFF7E2",
-        "hue_degrees": 43.448,
-        "saturation": 0.1137,
+        "hex": "#FFF7E1",
+        "hue_degrees": 44.0,
+        "saturation": 0.1176,
         "value": 1.0
       },
-      "hue_delta_degrees": 9.374,
+      "hue_delta_degrees": 9.926,
       "passed": true
     },
     {
@@ -82,8 +82,8 @@
         1444
       ],
       "runtime_pixel": [
-        195,
-        898
+        142,
+        1082
       ],
       "reference": {
         "rgb": [
@@ -98,16 +98,52 @@
       },
       "runtime": {
         "rgb": [
-          186,
-          205,
-          110
+          193,
+          208,
+          115
         ],
-        "hex": "#BACD6E",
-        "hue_degrees": 72.0,
-        "saturation": 0.4634,
-        "value": 0.8039
+        "hex": "#C1D073",
+        "hue_degrees": 69.677,
+        "saturation": 0.4471,
+        "value": 0.8157
       },
-      "hue_delta_degrees": 6.947,
+      "hue_delta_degrees": 9.27,
+      "passed": true
+    },
+    {
+      "name": "ripe orange",
+      "surface": "Lit front face of the leftmost low fruit on the left tree",
+      "reference_pixel": [
+        770,
+        630
+      ],
+      "runtime_pixel": [
+        585,
+        398
+      ],
+      "reference": {
+        "rgb": [
+          254,
+          159,
+          48
+        ],
+        "hex": "#FE9F30",
+        "hue_degrees": 32.33,
+        "saturation": 0.811,
+        "value": 0.9961
+      },
+      "runtime": {
+        "rgb": [
+          255,
+          187,
+          70
+        ],
+        "hex": "#FFBB46",
+        "hue_degrees": 37.946,
+        "saturation": 0.7255,
+        "value": 1.0
+      },
+      "hue_delta_degrees": 5.616,
       "passed": true
     }
   ],

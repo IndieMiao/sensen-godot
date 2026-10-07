@@ -28,6 +28,8 @@ def cat(color='C7C3BD',lying=False):
         tube('Fur stripe follows body',points,.009,'oak_dark' if color=='D7A04F' else 'iron_edge',5)
 
 def geometry():
+    from liubei_r2 import enable_lettering
+    enable_lettering()
     k.PALETTE.update({'oak':'B6894F','oak_light':'CEA069','porcelain':'EFE9DD','plaster':'E4CE9F','leaf':'5C8449','leaf_light':'85A25A','leaf_dark':'486D3B'})
     s.shell(wall='E7D2AA',accent='D8C299',floor='E3CBA5')
     begin('grass_base',at=(0,-.30,.42))

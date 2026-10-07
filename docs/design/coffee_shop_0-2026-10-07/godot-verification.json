@@ -1,7 +1,7 @@
 {
   "device": "AMD Custom GPU 0405 (RADV VANGOGH)",
-  "draw_calls": 27.0,
-  "instances": 105,
+  "draw_calls": 12.0,
+  "instances": 166,
   "renderer": "mobile",
   "resolution": [
     1400,
@@ -32,14 +32,34 @@
       "view": "model-top"
     },
     {
-      "draw_calls": 26.0,
-      "rendered_objects": 26.0,
+      "draw_calls": 25.0,
+      "rendered_objects": 25.0,
       "view": "godot-detail"
     },
     {
       "draw_calls": 27.0,
       "rendered_objects": 27.0,
       "view": "godot-detail-plants"
+    },
+    {
+      "draw_calls": 15.0,
+      "rendered_objects": 15.0,
+      "view": "cat-orange-counter"
+    },
+    {
+      "draw_calls": 16.0,
+      "rendered_objects": 16.0,
+      "view": "cat-standing-calico"
+    },
+    {
+      "draw_calls": 16.0,
+      "rendered_objects": 16.0,
+      "view": "cat-seated-gray"
+    },
+    {
+      "draw_calls": 12.0,
+      "rendered_objects": 12.0,
+      "view": "cat-entry-gray"
     }
   ]
 }

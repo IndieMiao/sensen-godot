@@ -5,24 +5,8 @@ import series_revision as r
 from kit import begin,cube,cylinder,tube,ellipsoid,mesh
 
 def cat(pose,tone):
-    seated=pose=='sit';lying=pose in ('sleep','loaf');h=.20 if lying else .32
-    ellipsoid('Soft feline torso',(0,.34 if seated else h,0),(.35,.56 if seated else .27 if lying else .37,.39 if seated else .58),tone,16,8)
-    hy=.63 if seated else h+.08
-    ellipsoid('Rounded cat head',(0,hy,.27),(.31,.29,.29),tone,16,8)
-    for x in (-.105,.105):
-        mesh('Triangular soft cat ear',[(x-.07,hy+.085,.24),(x+.06,hy+.085,.24),(x,hy+.27,.23),(x-.05,hy+.085,.32),(x+.045,hy+.085,.32),(x,hy+.235,.30)],[(0,1,2),(3,5,4),(0,3,4,1),(1,4,5,2),(2,5,3,0)],tone,smooth=True)
-        mesh('Blush ear triangle',[(x-.025,hy+.12,.322),(x+.025,hy+.12,.322),(x,hy+.211,.31)],[(0,1,2)],'DAAC9D')
-        if pose=='sleep':tube('Closed sleeping eye',[(x*.65-.021,hy+.06,.406),(x*.65,hy+.053,.414),(x*.65+.021,hy+.065,.409)],.005,'655C53',5)
-        else:ellipsoid('Alert eye',(x*.65,hy+.058,.409),(.028,.036,.015),'4E5046',8,4)
-        ellipsoid('Cream muzzle',(x*.43,hy-.035,.409),(.10,.065,.037),'F0E8D6',10,5)
-        for z in (-.17,.18):ellipsoid('White paw',(x,.067,z),(.13,.13 if lying else .19,.19),'EFE6D8',10,5)
-    ellipsoid('Pink nose',(0,hy-.002,.44),(.032,.021,.016),'C78E91',8,4)
-    tail=[(0,h,-.25),(.18,h,-.35),(.30,h+.04,-.26),(.30,h+.11,-.05)] if lying or seated else [(0,h,-.25),(.12,h+.17,-.35),(.15,h+.44,-.31),(.10,h+.57,-.24)]
-    tube('Posed curved tail',tail,.039,tone,7)
-    if pose=='walk':
-        for x,y,z,sz,c in [(-.11,.41,-.12,(.18,.11,.22),'C58E58'),(.10,.44,.03,(.17,.10,.21),'5F6461'),(-.085,hy+.09,.29,(.13,.09,.16),'6B6861')]:ellipsoid('Calico fur patch',(x,y,z),sz,c,10,5)
-    else:
-        for z in (-.17,-.05,.08):tube('Soft fur stripe',[(-.125,h+.08,z),(-.06,h+.137,z),(0,h+.15,z),(.07,h+.137,z),(.13,h+.07,z)],.013,'B48043' if tone=='D9A558' else '797F85',5)
+    from revision2 import cat as make_cat
+    make_cat(pose,tone)
 
 def meadow_material():
     mat=k.material('799C4E','matte').copy();mat.name='Courtyard baked meadow mottling'
@@ -91,7 +75,7 @@ def revise():
     r.clear('sleeping_cat');cat('sleep','9FA5AA');r.move('sleeping_cat',(.04,.085,2.44))
     r.clear('counter_cat');cat('loaf','D9A558')
     begin('calico_cat',at=(-.38,.065,-.05),yaw=-30);cat('walk','EFE7D9')
-    begin('seated_cat',at=(.58,.065,1.97),yaw=115);cat('sit','C1C6C8')
+    begin('seated_cat',at=(.58,.065,1.97),yaw=115);cat('sit','929DA7')
     r.recolor('entry_step','DA9B51',lambda o:'mat' in o.name.lower())
     k.CURRENT=k.KITS['entry_step'];cube('Lower stone entrance tread',(0,-.065,.33),(2.06,.13,.65),'F2DEC0',.045)
     for j in range(9):cube('Mat fine cream stripe',(-.51+j*.125,.160,0),(.009,.003,.41),'F2D5A7',0)
@@ -103,6 +87,8 @@ def revise():
         if p['name']=='chair_2':p['position'][0]=-.72
         if p['name']=='chair_3':p['position'][0]=.72
     k.KITS['side_low_wall']['collision']=[{'at':[0,.38,0],'size':[5.28,.76,.3]}]
+    from revision2 import revise as revise_r2
+    revise_r2()
     r.sync_instances()
 
 def manifest():
@@ -117,4 +103,7 @@ def manifest():
     d['lighting']['sun_position']=[6,9,4];d['review_lighting']['sun_position']=[6,9,4]
     d['camera']={'position':[11,11.3,12],'target':[0,1.08,.42],'size':11.5}
     from courtyard_bench import bench
-    bench(d);p.write_text(json.dumps(d,indent=2)+'\n');r.append_plants(d)
+    bench(d)
+    from revision2 import manifest as manifest_r2
+    manifest_r2(d)
+    p.write_text(json.dumps(d,indent=2)+'\n');r.append_plants(d)

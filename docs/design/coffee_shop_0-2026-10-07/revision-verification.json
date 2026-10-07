@@ -1,10 +1,10 @@
 {
-  "revision": "r1",
+  "revision": "r2",
   "reference_sha256": "16d1ad0bd5a2f98c517b156bffd7730474009cd5f8e1e852e229694de21610a2",
   "renderer": {
     "device": "AMD Custom GPU 0405 (RADV VANGOGH)",
-    "draw_calls": 27.0,
-    "instances": 105,
+    "draw_calls": 12.0,
+    "instances": 166,
     "renderer": "mobile",
     "resolution": [
       1400,
@@ -35,24 +35,44 @@
         "view": "model-top"
       },
       {
-        "draw_calls": 26.0,
-        "rendered_objects": 26.0,
+        "draw_calls": 25.0,
+        "rendered_objects": 25.0,
         "view": "godot-detail"
       },
       {
         "draw_calls": 27.0,
         "rendered_objects": 27.0,
         "view": "godot-detail-plants"
+      },
+      {
+        "draw_calls": 15.0,
+        "rendered_objects": 15.0,
+        "view": "cat-orange-counter"
+      },
+      {
+        "draw_calls": 16.0,
+        "rendered_objects": 16.0,
+        "view": "cat-standing-calico"
+      },
+      {
+        "draw_calls": 16.0,
+        "rendered_objects": 16.0,
+        "view": "cat-seated-gray"
+      },
+      {
+        "draw_calls": 12.0,
+        "rendered_objects": 12.0,
+        "view": "cat-entry-gray"
       }
     ]
   },
   "budget": {
     "after": {
-      "room_triangles": 88154,
-      "shared_plant_triangles": 43872,
-      "room_botanical_triangles": 10262,
-      "plant_triangles": 54134,
-      "total_triangles": 132026,
+      "room_triangles": 111601,
+      "shared_plant_triangles": 39024,
+      "room_botanical_triangles": 20205,
+      "plant_triangles": 59229,
+      "total_triangles": 150625,
       "static_surfaces": 29
     },
     "limits": {
@@ -69,6 +89,7 @@
           "grass_base",
           "blue_vase_flowers",
           "grass_clump",
+          "courtyard_orange_tree",
           "blue_vase_flowers_2",
           "grass_clump_00",
           "grass_clump_01",
@@ -110,9 +131,69 @@
           "grass_clump_37",
           "grass_clump_38",
           "grass_clump_39",
-          "grass_clump_40"
+          "grass_clump_40",
+          "courtyard_orange_tree_right",
+          "r2_meadow_tuft_003",
+          "r2_meadow_tuft_007",
+          "r2_meadow_tuft_009",
+          "r2_meadow_tuft_011",
+          "r2_meadow_tuft_012",
+          "r2_meadow_tuft_015",
+          "r2_meadow_tuft_016",
+          "r2_meadow_tuft_017",
+          "r2_meadow_tuft_018",
+          "r2_meadow_tuft_019",
+          "r2_meadow_tuft_020",
+          "r2_meadow_tuft_025",
+          "r2_meadow_tuft_026",
+          "r2_meadow_tuft_027",
+          "r2_meadow_tuft_030",
+          "r2_meadow_tuft_031",
+          "r2_meadow_tuft_032",
+          "r2_meadow_tuft_034",
+          "r2_meadow_tuft_036",
+          "r2_meadow_tuft_037",
+          "r2_meadow_tuft_038",
+          "r2_meadow_tuft_039",
+          "r2_meadow_tuft_040",
+          "r2_meadow_tuft_046",
+          "r2_meadow_tuft_048",
+          "r2_meadow_tuft_050",
+          "r2_meadow_tuft_051",
+          "r2_meadow_tuft_054",
+          "r2_meadow_tuft_056",
+          "r2_meadow_tuft_059",
+          "r2_meadow_tuft_060",
+          "r2_meadow_tuft_062",
+          "r2_meadow_tuft_066",
+          "r2_meadow_tuft_069",
+          "r2_meadow_tuft_070",
+          "r2_meadow_tuft_071",
+          "r2_meadow_tuft_073",
+          "r2_meadow_tuft_074",
+          "r2_meadow_tuft_075",
+          "r2_meadow_tuft_076",
+          "r2_meadow_tuft_078",
+          "r2_meadow_tuft_079",
+          "r2_meadow_tuft_080",
+          "r2_meadow_tuft_082",
+          "r2_meadow_tuft_083",
+          "r2_meadow_tuft_084",
+          "r2_meadow_tuft_086",
+          "r2_meadow_tuft_088",
+          "r2_meadow_tuft_089",
+          "r2_meadow_tuft_091",
+          "r2_meadow_tuft_092",
+          "r2_meadow_tuft_094",
+          "r2_meadow_tuft_095",
+          "r2_meadow_tuft_101",
+          "r2_meadow_tuft_102",
+          "r2_meadow_tuft_103",
+          "r2_meadow_tuft_106",
+          "r2_meadow_tuft_107",
+          "r2_meadow_tuft_109"
         ],
-        "triangles": 10262,
+        "triangles": 20205,
         "cast_shadow": false
       },
       {
@@ -128,7 +209,7 @@
           "supply_shelf",
           "cookie_jars"
         ],
-        "triangles": 15820,
+        "triangles": 18552,
         "cast_shadow": true
       },
       {
@@ -146,9 +227,10 @@
           "street_signboard",
           "calico_cat",
           "seated_cat",
+          "meadow_pebbles",
           "service_tray_2"
         ],
-        "triangles": 13124,
+        "triangles": 23676,
         "cast_shadow": true
       },
       {
@@ -156,9 +238,10 @@
         "file": "res://assets/rooms/coffee_shop_0/batches/review_glass.glb",
         "material": "glass",
         "sources": [
-          "display_glass"
+          "display_glass",
+          "coffee_jar_glass"
         ],
-        "triangles": 8,
+        "triangles": 240,
         "cast_shadow": false
       },
       {
@@ -166,11 +249,9 @@
         "file": "res://assets/rooms/coffee_shop_0/batches/review_large_plants.glb",
         "material": "plants",
         "sources": [
-          "FruitTreeLeft",
-          "FruitTreeRight",
           "ArchPeaceLily"
         ],
-        "triangles": 5794,
+        "triangles": 946,
         "cast_shadow": true
       },
       {
@@ -214,7 +295,6 @@
     "single_surface_no_embedded_images": true,
     "files": [
       "assets/rooms/_shared/plants/flower_shrub.glb",
-      "assets/rooms/_shared/plants/fruit_tree.glb",
       "assets/rooms/_shared/plants/peace_lily.glb",
       "assets/rooms/_shared/plants/pothos.glb",
       "assets/rooms/coffee_shop_0/back_cabinet.glb",
@@ -231,11 +311,13 @@
       "assets/rooms/coffee_shop_0/calico_cat.glb",
       "assets/rooms/coffee_shop_0/chair.glb",
       "assets/rooms/coffee_shop_0/coffee_grinder.glb",
+      "assets/rooms/coffee_shop_0/coffee_jar_glass.glb",
       "assets/rooms/coffee_shop_0/cookie_jars.glb",
       "assets/rooms/coffee_shop_0/corner_pier.glb",
       "assets/rooms/coffee_shop_0/counter_cat.glb",
       "assets/rooms/coffee_shop_0/counter_chalkboard.glb",
       "assets/rooms/coffee_shop_0/counter_return.glb",
+      "assets/rooms/coffee_shop_0/courtyard_orange_tree.glb",
       "assets/rooms/coffee_shop_0/display_glass.glb",
       "assets/rooms/coffee_shop_0/entry_step.glb",
       "assets/rooms/coffee_shop_0/espresso_machine.glb",
@@ -247,6 +329,7 @@
       "assets/rooms/coffee_shop_0/grass_clump.glb",
       "assets/rooms/coffee_shop_0/left_crenellations.glb",
       "assets/rooms/coffee_shop_0/left_door_wall.glb",
+      "assets/rooms/coffee_shop_0/meadow_pebbles.glb",
       "assets/rooms/coffee_shop_0/pastry_case.glb",
       "assets/rooms/coffee_shop_0/round_table.glb",
       "assets/rooms/coffee_shop_0/seated_cat.glb",

@@ -101,6 +101,8 @@ void fragment() {
 		["godot-detail",Vector3(5,4.6,8),Vector3(-.15,1.6,-1.8),4.3],
 		["godot-detail-plants",Vector3(5,4.5,8),Vector3(-2.05,1.35,-.4),3.9]
 	]
+	for extra: Dictionary in layout.get("review_views", []):
+		views.append([str(extra.name),_vec(extra.position),_vec(extra.target),float(extra.size)])
 	for view in views:
 		camera.position = view[1]
 		camera.look_at(view[2])

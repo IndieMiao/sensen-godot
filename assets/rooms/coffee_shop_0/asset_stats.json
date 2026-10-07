@@ -6,7 +6,7 @@
     ],
     "file": "room_albedo_ao.png",
     "purpose": "base colour + softened contact AO; padded palette swatches for subpixel detail; no baked direct light",
-    "bytes": 3630844
+    "bytes": 3175600
   },
   "assets": [
     {
@@ -14,21 +14,21 @@
       "vertices": 3232,
       "triangles": 6236,
       "surfaces": 1,
-      "bytes": 215556
+      "bytes": 215684
     },
     {
       "name": "back_wall",
       "vertices": 3068,
       "triangles": 5940,
       "surfaces": 1,
-      "bytes": 224352
+      "bytes": 225376
     },
     {
       "name": "left_door_wall",
       "vertices": 2616,
       "triangles": 5076,
       "surfaces": 1,
-      "bytes": 170692
+      "bytes": 171524
     },
     {
       "name": "front_wall_left",
@@ -60,66 +60,66 @@
     },
     {
       "name": "entry_step",
-      "vertices": 272,
-      "triangles": 480,
+      "vertices": 264,
+      "triangles": 468,
       "surfaces": 1,
-      "bytes": 23452
+      "bytes": 22612
     },
     {
       "name": "grass_base",
       "vertices": 96,
       "triangles": 188,
       "surfaces": 1,
-      "bytes": 7196
+      "bytes": 7324
     },
     {
       "name": "back_crenellations",
       "vertices": 672,
       "triangles": 1316,
       "surfaces": 1,
-      "bytes": 42440
+      "bytes": 43336
     },
     {
       "name": "left_crenellations",
       "vertices": 672,
       "triangles": 1316,
       "surfaces": 1,
-      "bytes": 42440
+      "bytes": 43336
     },
     {
       "name": "back_cabinet",
       "vertices": 1936,
       "triangles": 3752,
       "surfaces": 1,
-      "bytes": 123000
+      "bytes": 122936
     },
     {
       "name": "serving_counter",
       "vertices": 1368,
       "triangles": 2644,
       "surfaces": 1,
-      "bytes": 91232
+      "bytes": 91488
     },
     {
       "name": "counter_return",
       "vertices": 752,
       "triangles": 1456,
       "surfaces": 1,
-      "bytes": 50312
+      "bytes": 50568
     },
     {
       "name": "sink",
       "vertices": 536,
       "triangles": 1032,
       "surfaces": 1,
-      "bytes": 37604
+      "bytes": 37988
     },
     {
       "name": "espresso_machine",
       "vertices": 1670,
       "triangles": 3220,
       "surfaces": 1,
-      "bytes": 120680
+      "bytes": 122472
     },
     {
       "name": "coffee_grinder",
@@ -133,7 +133,7 @@
       "vertices": 2988,
       "triangles": 5660,
       "surfaces": 1,
-      "bytes": 193916
+      "bytes": 194588
     },
     {
       "name": "display_glass",
@@ -147,35 +147,35 @@
       "vertices": 916,
       "triangles": 1776,
       "surfaces": 1,
-      "bytes": 65416
+      "bytes": 66184
     },
     {
       "name": "cookie_jars",
-      "vertices": 784,
-      "triangles": 1456,
+      "vertices": 2264,
+      "triangles": 4188,
       "surfaces": 1,
-      "bytes": 41348
+      "bytes": 105460
     },
     {
       "name": "service_tray",
       "vertices": 541,
       "triangles": 1054,
       "surfaces": 1,
-      "bytes": 41256
+      "bytes": 41704
     },
     {
       "name": "counter_chalkboard",
-      "vertices": 1408,
-      "triangles": 1472,
+      "vertices": 3196,
+      "triangles": 3354,
       "surfaces": 1,
-      "bytes": 78580
+      "bytes": 175604
     },
     {
       "name": "chair",
       "vertices": 2097,
       "triangles": 4018,
       "surfaces": 1,
-      "bytes": 158184
+      "bytes": 156424
     },
     {
       "name": "round_table",
@@ -189,28 +189,28 @@
       "vertices": 2480,
       "triangles": 4596,
       "surfaces": 1,
-      "bytes": 125752
+      "bytes": 125176
     },
     {
       "name": "table_cup",
       "vertices": 373,
       "triangles": 730,
       "surfaces": 1,
-      "bytes": 30084
+      "bytes": 30532
     },
     {
       "name": "sleeping_cat",
-      "vertices": 657,
-      "triangles": 1236,
+      "vertices": 1353,
+      "triangles": 2612,
       "surfaces": 1,
-      "bytes": 45980
+      "bytes": 60352
     },
     {
       "name": "counter_cat",
-      "vertices": 679,
-      "triangles": 1280,
+      "vertices": 1353,
+      "triangles": 2612,
       "surfaces": 1,
-      "bytes": 47140
+      "bytes": 60352
     },
     {
       "name": "garden_stepping_stones",
@@ -221,10 +221,10 @@
     },
     {
       "name": "street_signboard",
-      "vertices": 1064,
-      "triangles": 1240,
+      "vertices": 2514,
+      "triangles": 2754,
       "surfaces": 1,
-      "bytes": 63200
+      "bytes": 144316
     },
     {
       "name": "grass_clump",
@@ -235,17 +235,17 @@
     },
     {
       "name": "calico_cat",
-      "vertices": 730,
-      "triangles": 1382,
+      "vertices": 1652,
+      "triangles": 3194,
       "surfaces": 1,
-      "bytes": 48644
+      "bytes": 73388
     },
     {
       "name": "seated_cat",
-      "vertices": 679,
-      "triangles": 1280,
+      "vertices": 1591,
+      "triangles": 3076,
       "surfaces": 1,
-      "bytes": 47392
+      "bytes": 70728
     },
     {
       "name": "stone_tree_bed_0",
@@ -260,21 +260,42 @@
       "triangles": 432,
       "surfaces": 1,
       "bytes": 16240
+    },
+    {
+      "name": "courtyard_orange_tree",
+      "vertices": 4846,
+      "triangles": 4352,
+      "surfaces": 1,
+      "bytes": 194392
+    },
+    {
+      "name": "meadow_pebbles",
+      "vertices": 460,
+      "triangles": 840,
+      "surfaces": 1,
+      "bytes": 21136
+    },
+    {
+      "name": "coffee_jar_glass",
+      "vertices": 120,
+      "triangles": 232,
+      "surfaces": 1,
+      "bytes": 9680
     }
   ],
-  "unique_triangles": 68377,
-  "scene_triangles": 88154,
-  "static_draw_surfaces": 86,
-  "unique_assets": 36,
-  "placed_instances": 86,
-  "glb_bytes": 2439188,
+  "unique_triangles": 86233,
+  "scene_triangles": 111601,
+  "static_draw_surfaces": 149,
+  "unique_assets": 39,
+  "placed_instances": 149,
+  "glb_bytes": 2988000,
   "scene_budget": {
     "after": {
-      "room_triangles": 88154,
-      "shared_plant_triangles": 43872,
-      "room_botanical_triangles": 10262,
-      "plant_triangles": 54134,
-      "total_triangles": 132026,
+      "room_triangles": 111601,
+      "shared_plant_triangles": 39024,
+      "room_botanical_triangles": 20205,
+      "plant_triangles": 59229,
+      "total_triangles": 150625,
       "static_surfaces": 29
     },
     "limits": {
@@ -291,6 +312,7 @@
           "grass_base",
           "blue_vase_flowers",
           "grass_clump",
+          "courtyard_orange_tree",
           "blue_vase_flowers_2",
           "grass_clump_00",
           "grass_clump_01",
@@ -332,9 +354,69 @@
           "grass_clump_37",
           "grass_clump_38",
           "grass_clump_39",
-          "grass_clump_40"
+          "grass_clump_40",
+          "courtyard_orange_tree_right",
+          "r2_meadow_tuft_003",
+          "r2_meadow_tuft_007",
+          "r2_meadow_tuft_009",
+          "r2_meadow_tuft_011",
+          "r2_meadow_tuft_012",
+          "r2_meadow_tuft_015",
+          "r2_meadow_tuft_016",
+          "r2_meadow_tuft_017",
+          "r2_meadow_tuft_018",
+          "r2_meadow_tuft_019",
+          "r2_meadow_tuft_020",
+          "r2_meadow_tuft_025",
+          "r2_meadow_tuft_026",
+          "r2_meadow_tuft_027",
+          "r2_meadow_tuft_030",
+          "r2_meadow_tuft_031",
+          "r2_meadow_tuft_032",
+          "r2_meadow_tuft_034",
+          "r2_meadow_tuft_036",
+          "r2_meadow_tuft_037",
+          "r2_meadow_tuft_038",
+          "r2_meadow_tuft_039",
+          "r2_meadow_tuft_040",
+          "r2_meadow_tuft_046",
+          "r2_meadow_tuft_048",
+          "r2_meadow_tuft_050",
+          "r2_meadow_tuft_051",
+          "r2_meadow_tuft_054",
+          "r2_meadow_tuft_056",
+          "r2_meadow_tuft_059",
+          "r2_meadow_tuft_060",
+          "r2_meadow_tuft_062",
+          "r2_meadow_tuft_066",
+          "r2_meadow_tuft_069",
+          "r2_meadow_tuft_070",
+          "r2_meadow_tuft_071",
+          "r2_meadow_tuft_073",
+          "r2_meadow_tuft_074",
+          "r2_meadow_tuft_075",
+          "r2_meadow_tuft_076",
+          "r2_meadow_tuft_078",
+          "r2_meadow_tuft_079",
+          "r2_meadow_tuft_080",
+          "r2_meadow_tuft_082",
+          "r2_meadow_tuft_083",
+          "r2_meadow_tuft_084",
+          "r2_meadow_tuft_086",
+          "r2_meadow_tuft_088",
+          "r2_meadow_tuft_089",
+          "r2_meadow_tuft_091",
+          "r2_meadow_tuft_092",
+          "r2_meadow_tuft_094",
+          "r2_meadow_tuft_095",
+          "r2_meadow_tuft_101",
+          "r2_meadow_tuft_102",
+          "r2_meadow_tuft_103",
+          "r2_meadow_tuft_106",
+          "r2_meadow_tuft_107",
+          "r2_meadow_tuft_109"
         ],
-        "triangles": 10262,
+        "triangles": 20205,
         "cast_shadow": false
       },
       {
@@ -350,7 +432,7 @@
           "supply_shelf",
           "cookie_jars"
         ],
-        "triangles": 15820,
+        "triangles": 18552,
         "cast_shadow": true
       },
       {
@@ -368,9 +450,10 @@
           "street_signboard",
           "calico_cat",
           "seated_cat",
+          "meadow_pebbles",
           "service_tray_2"
         ],
-        "triangles": 13124,
+        "triangles": 23676,
         "cast_shadow": true
       },
       {
@@ -378,9 +461,10 @@
         "file": "res://assets/rooms/coffee_shop_0/batches/review_glass.glb",
         "material": "glass",
         "sources": [
-          "display_glass"
+          "display_glass",
+          "coffee_jar_glass"
         ],
-        "triangles": 8,
+        "triangles": 240,
         "cast_shadow": false
       },
       {
@@ -388,11 +472,9 @@
         "file": "res://assets/rooms/coffee_shop_0/batches/review_large_plants.glb",
         "material": "plants",
         "sources": [
-          "FruitTreeLeft",
-          "FruitTreeRight",
           "ArchPeaceLily"
         ],
-        "triangles": 5794,
+        "triangles": 946,
         "cast_shadow": true
       },
       {
