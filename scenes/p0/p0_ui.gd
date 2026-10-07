@@ -458,6 +458,13 @@ func tag(id: String, text: String, screen: Vector2, show: bool, lit := false) ->
 	t.reset_size()
 	t.position = screen - Vector2(t.size.x * 0.5, t.size.y + 6)
 
+## Two world tags that collide (the Homestead sign stands beside the stall): lift `id` clear above `under`.
+func lift_tag(id: String, under: String) -> void:
+	var a: Label = _tags.get(id)
+	var b: Label = _tags.get(under)
+	if a == null or b == null or not a.visible or not b.visible: return
+	if Rect2(a.position, a.size).intersects(Rect2(b.position, b.size)): a.position.y = b.position.y - a.size.y - 2
+
 func float_text(text: String, screen: Vector2, color: Color) -> void:
 	var l := _label(text, 12, color, true)
 	l.add_theme_color_override("font_outline_color", PAPER)

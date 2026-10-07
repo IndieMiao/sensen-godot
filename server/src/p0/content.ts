@@ -34,7 +34,11 @@ export type BoardId = 'stall' | 'market';
 /** What a request asks for: a kind, optionally narrowed to one id, one rarity, the same item or N distinct items. */
 export interface Need { kind: 'crop' | 'fish' | 'dish' | 'material' | 'sow'; id?: string; rarity?: number; same?: boolean; distinct?: number }
 export interface RequestTemplate { title: string; need: Need; skill: Skill; gate: [Skill, number][]; bonus: number; enabled?: boolean }
-export interface ResidentRequest { id: string; title: string; text: string; stage: string; need: Need; qty: number; coins: number }
+export interface ResidentRequest {
+  id: string; title: string; text: string; stage: string; need: Need; qty: number; coins: number;
+  /** The request card's need line when the rule alone would mislead (q(46): the only P0 Rare fish is the Pond koi). */
+  need_line?: string;
+}
 export interface ResidentDef {
   name: string; role: string; portrait: string; likes: string; gift_meal: string; one_per_day: boolean;
   lines: Record<string, string>; requests: ResidentRequest[];

@@ -66,3 +66,59 @@ func test_home_moment_matches_the_page_14_banner() -> void:
 func test_material_icons_exist() -> void:
 	for id in ["wood", "stone", "fiber", "clay", "rock_salt", "coin", "star", "energy", "kitchen", "bag", "board"]:
 		assert_bool(ResourceLoader.exists("res://assets/p0/icons/%s.svg" % id)).is_true()
+
+# ---------------------------------------------------------------- HOME-1 sheet, HOME-2 banner, the sign
+
+const HomePanel = preload("res://scenes/p0/home/p0_home_panel.gd")
+
+func _ui(v: Dictionary) -> P0Ui:
+	var ui: P0Ui = auto_free(P0Ui.new())
+	add_child(ui)
+	ui.set_view(v)
+	return ui
+
+func test_home_1_lays_out_tiles_changes_and_the_gap_on_the_button() -> void:
+	var ui := _ui(_view())
+	HomePanel.open(ui)
+	assert_str(ui.modal_kind).is_equal("homestead")
+	var tiles := ui.find_children("*", "UiNeedTile", true, false)
+	assert_array(tiles.map(func(t): return (t as UiNeedTile).item_name)).is_equal(["Timber", "Stone", "Reeds", "Clay", "Rock Salt", "Coins", "Skills"])
+	var button: UiCommandButton = ui.find_children("*", "UiCommandButton", true, false)[0]
+	assert_str(button.reason).is_equal("Need 6 more Timber")
+	var sent: Array = []
+	ui.command.connect(func(cmd): sent.append(cmd))
+	button.activated.emit()   # the kit only emits activated when ready; here the host wiring is what's under test
+	assert_array(sent).is_equal([{"type": "homestead_upgrade"}])
+	(ui.find_children("*", "UiDismissButton", true, false)[0] as Button).pressed.emit()
+	assert_bool(ui.has_modal()).is_false()
+
+func test_home_1_at_max_level_has_no_tiles_and_says_so() -> void:
+	var v := _view(3)
+	v.homestead.next = null
+	var ui := _ui(v)
+	HomePanel.open(ui)
+	assert_array(ui.find_children("*", "UiNeedTile", true, false)).is_empty()
+	assert_str((ui.find_children("*", "UiCommandButton", true, false)[0] as UiCommandButton).reason).is_equal("Highest level for now")
+
+func test_home_2_banner_sits_under_the_hud_and_a_tap_skips_it() -> void:
+	var ui := _ui(_view())
+	var card := HomePanel.moment(ui, P0Logic.home_moment(_view(), {"level": 3, "energy": 78, "unlocks": ["warming_cabinet"]}))
+	await get_tree().process_frame
+	assert_float(card.position.y).is_equal(HomePanel.MOMENT_TOP)
+	var tap := InputEventMouseButton.new()
+	tap.button_index = MOUSE_BUTTON_LEFT
+	tap.pressed = true
+	card.gui_input.emit(tap)
+	await get_tree().process_frame
+	assert_bool(is_instance_valid(card)).is_false()
+
+func test_the_sign_stands_beside_the_door_off_its_path_and_is_solid() -> void:
+	var bp := P0Garden.blueprint()
+	var sign := P0Garden.sign_point(bp)
+	var door := bp.cell_to_world(P0Garden.ANCHORS.house)
+	assert_float(sign.x - door.x).is_between(0.8, 2.0)          # right of the door
+	assert_bool(bp.world_to_cell(sign).x != P0Garden.ANCHORS.house.x).is_true()
+	P0Garden.block_points(bp, [sign])
+	var c := bp.world_to_cell(sign)
+	assert_str(str(bp.masks.walkable[c.y])[c.x]).is_equal("0")
+	assert_str(str(bp.masks.walkable[c.y])[P0Garden.ANCHORS.house.x]).is_equal("1")   # the door path stays open

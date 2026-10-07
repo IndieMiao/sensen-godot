@@ -11,6 +11,8 @@ extends Node
 ## p0_recenter(), p0_show_spot(where), p0_energy_verb() -> String, p0_dev(step) -> bool,
 ## p0_until(name) -> bool.
 
+const HomePanel = preload("res://scenes/p0/home/p0_home_panel.gd")
+
 static var _instance: P0Runtime
 
 var session: P0Session
@@ -194,6 +196,10 @@ func _on_state(v: Dictionary, events: Array) -> void:
 			"level":
 				var lv: Dictionary = ev
 				ui.queue_card(func(): ui.show_level_up(lv))
+			"homestead":
+				# HOME-2 (SGODOT-228): HOME-1 closes, the MomentBanner says what changed; the farm swaps the fence.
+				if ui.modal_kind == "homestead": ui.close_modal()
+				HomePanel.moment(ui, P0Logic.home_moment(v, ev))
 		dy -= 16.0
 	if ui.modal_kind == "stall" and events.size() > 0:
 		ui.set_view(session.current())
@@ -251,6 +257,10 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 			ui.toast("Bag full · free a slot first")
 		"rest_used":
 			ui.toast("Rest used today")
+		"not_home":
+			ui.toast("At home only")
+		"need_material", "skills_short", "max_level":
+			ui.toast(P0Logic.home_panel(session.current()).reason)
 		"energy_full":
 			ui.toast("Energy full · eat later" if str(cmd.get("type", "")) == "eat" else "Energy full")
 		"not_ready":

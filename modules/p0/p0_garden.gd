@@ -130,6 +130,13 @@ static func fence_block_points(bp: FarmBlueprint) -> Array:
 		for k in 5: points.append(seg.pos + Vector3((k / 4.0 - 0.5) * FENCE_SEG * 0.9, 0, 0))
 	return points
 
+## The Homestead sign (WorldBadges · Farm 1135:79267): right of the farmhouse door, between the house and the
+## yard fence, clear of the door path (cell 9) so the door and the sign stay two tap targets.
+const SIGN_CELL := Vector2i(11, 14)
+
+static func sign_point(bp: FarmBlueprint) -> Vector3:
+	return bp.cell_to_world(SIGN_CELL)
+
 ## Mark scenery rocks solid: each rock blocks the cell it stands in (trees already stand outside the yard).
 static func block_points(bp: FarmBlueprint, points: Array) -> void:
 	for p in points:
