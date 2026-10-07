@@ -141,7 +141,7 @@
 				"name": "checkout_return",
 				"reached": true,
 				"remaining_m": 0.0695670768618584,
-				"seconds": 0.599,
+				"seconds": 0.6,
 				"target": [
 					0.419999986886978,
 					0.0599999986588955,
@@ -245,7 +245,7 @@
 				"name": "entrance_return",
 				"reached": true,
 				"remaining_m": 0.0837857872247696,
-				"seconds": 0.3,
+				"seconds": 0.299,
 				"target": [
 					0.150000005960464,
 					0.0599999986588955,
@@ -262,7 +262,7 @@
 				],
 				"final": [
 					0.300000011920929,
-					0.0501615181565285,
+					0.0430829748511314,
 					-0.832723677158356
 				],
 				"from": [
@@ -271,8 +271,8 @@
 					-0.5
 				],
 				"reached": false,
-				"remaining_m": 0.667348861694336,
-				"seconds": 0.867,
+				"remaining_m": 0.667490720748901,
+				"seconds": 0.882,
 				"target": [
 					0.300000011920929,
 					0.0599999986588955,
@@ -346,7 +346,7 @@
 				],
 				"final": [
 					2.0,
-					0.0500789284706116,
+					0.0423652678728104,
 					-0.519999980926514
 				],
 				"from": [
@@ -355,8 +355,8 @@
 					-0.270000010728836
 				],
 				"reached": false,
-				"remaining_m": 0.780063033103943,
-				"seconds": 0.882,
+				"remaining_m": 0.780199289321899,
+				"seconds": 0.867,
 				"target": [
 					2.0,
 					0.0599999986588955,
@@ -384,7 +384,7 @@
 				],
 				"reached": false,
 				"remaining_m": 0.574999809265137,
-				"seconds": 0.882,
+				"seconds": 0.883,
 				"target": [
 					-2.79999995231628,
 					0.0599999986588955,
@@ -412,7 +412,7 @@
 				],
 				"reached": false,
 				"remaining_m": 0.979560077190399,
-				"seconds": 0.882,
+				"seconds": 0.883,
 				"target": [
 					3.59999990463257,
 					0.0599999986588955,
@@ -447,7 +447,7 @@
 				],
 				"reached": true,
 				"remaining_m": 0.0685543194413185,
-				"seconds": 0.558,
+				"seconds": 0.566,
 				"target": [
 					0.419999986886978,
 					0.0599999986588955,
@@ -481,7 +481,7 @@
 				],
 				"reached": true,
 				"remaining_m": 0.0959759503602982,
-				"seconds": 0.6,
+				"seconds": 0.599,
 				"target": [
 					0.419999986886978,
 					0.0599999986588955,
@@ -515,7 +515,7 @@
 				],
 				"reached": true,
 				"remaining_m": 0.200680062174797,
-				"seconds": 0.3,
+				"seconds": 0.299,
 				"target": [
 					0.150000005960464,
 					-0.170000001788139,
@@ -541,7 +541,7 @@
 					],
 					"reached": true,
 					"remaining_m": 0.0955293402075768,
-					"seconds": 0.299,
+					"seconds": 0.3,
 					"target": [
 						0.150000005960464,
 						0.0599999986588955,
@@ -562,7 +562,7 @@
 					],
 					"reached": true,
 					"remaining_m": 0.209805548191071,
-					"seconds": 0.317,
+					"seconds": 0.316,
 					"target": [
 						0.150000005960464,
 						-0.189999997615814,
@@ -589,7 +589,7 @@
 			"details": [
 				"run",
 				0.15,
-				0.316666666666667
+				0.316645666666667
 			],
 			"name": "Run animation advances in rendered viewport",
 			"passed": true
@@ -610,16 +610,16 @@
 			"passed": true
 		},
 		{
-			"details": 1.74549420922995,
+			"details": 1.74549409002066,
 			"name": "Fixture head-top height measurable",
 			"passed": true
 		},
 		{
 			"details": {
-				"baseline_ratio": 1.334865499799,
+				"baseline_ratio": 1.33486559096423,
 				"difference": 0.0472103004291844,
 				"height": 2.44,
-				"ratio_to_H": 1.39788490107707,
+				"ratio_to_H": 1.39788499654624,
 				"reason": ""
 			},
 			"name": "Scale ±15%: door",
@@ -627,10 +627,10 @@
 		},
 		{
 			"details": {
-				"baseline_ratio": 0.660271454299722,
+				"baseline_ratio": 0.660271499393253,
 				"difference": 0.0433839479392625,
 				"height": 1.1025,
-				"ratio_to_H": 0.631626271900602,
+				"ratio_to_H": 0.631626315037797,
 				"reason": ""
 			},
 			"name": "Scale ±15%: counter",
@@ -646,10 +646,10 @@
 		},
 		{
 			"details": {
-				"baseline_ratio": 0.65024564046003,
+				"baseline_ratio": 0.650245684868843,
 				"difference": 0.0286343612334802,
 				"height": 1.1025,
-				"ratio_to_H": 0.631626271900602,
+				"ratio_to_H": 0.631626315037797,
 				"reason": ""
 			},
 			"name": "Scale ±15%: table",
@@ -657,7 +657,7 @@
 		}
 	],
 	"passed": true,
-	"pid": 1103493,
+	"pid": 1123678,
 	"renderer": "mobile",
 	"route": [
 		{
@@ -763,7 +763,7 @@
 			"name": "checkout_return",
 			"reached": true,
 			"remaining_m": 0.0695670768618584,
-			"seconds": 0.599,
+			"seconds": 0.6,
 			"target": [
 				0.419999986886978,
 				0.0599999986588955,
@@ -851,7 +851,7 @@
 			"name": "entrance_return",
 			"reached": true,
 			"remaining_m": 0.0837857872247696,
-			"seconds": 0.3,
+			"seconds": 0.299,
 			"target": [
 				0.150000005960464,
 				0.0599999986588955,

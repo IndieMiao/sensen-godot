@@ -591,6 +591,28 @@
       ],
       "yaw_degrees": 90,
       "colliders": []
+    },
+    {
+      "name": "chilled_drinks_stock",
+      "file": "chilled_drinks_stock.glb",
+      "position": [
+        -2.68,
+        0.065,
+        -0.72
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "chilled_back_liner",
+      "file": "chilled_back_liner.glb",
+      "position": [
+        -2.68,
+        0.065,
+        -0.72
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
     }
   ],
   "instances": [
@@ -663,6 +685,26 @@
         -1.48
       ],
       "yaw_degrees": 90
+    },
+    {
+      "name": "chilled_drinks_stock_second",
+      "asset": "chilled_drinks_stock",
+      "position": [
+        -2.68,
+        0.065,
+        -1.48
+      ],
+      "yaw_degrees": 90
+    },
+    {
+      "name": "chilled_back_liner_second",
+      "asset": "chilled_back_liner",
+      "position": [
+        -2.68,
+        0.065,
+        -1.48
+      ],
+      "yaw_degrees": 90
     }
   ],
   "camera": {
@@ -678,7 +720,7 @@
     ],
     "size": 8.94702026176918
   },
-  "revision": "R2",
+  "revision": "R2.1",
   "botanical_assets": [
     "entrance_sky"
   ],
@@ -997,7 +1039,8 @@
   ],
   "material_overrides": {
     "chiller_glass": {
-      "alpha": 0.045
+      "alpha": 0.025,
+      "unshaded": true
     },
     "freezer_glass": {
       "alpha": 0.16
@@ -1011,6 +1054,15 @@
     "cold_light_strips": {
       "emission": "D7E8FF",
       "emission_energy": 0.45
+    },
+    "chilled_back_liner": {
+      "emission": "D4EEFF",
+      "emission_energy": 0.65
+    },
+    "chilled_drinks_stock": {
+      "emission": "FFFFFF",
+      "emission_use_atlas": true,
+      "emission_energy": 0.38
     }
   },
   "lighting": {
@@ -1529,6 +1581,20 @@
         -0.15
       ],
       "size": 4.8
+    },
+    {
+      "name": "fridge-detail",
+      "position": [
+        3.2,
+        2.9,
+        3.5
+      ],
+      "target": [
+        -2.48,
+        1.28,
+        -1.04
+      ],
+      "size": 3.0
     }
   ],
   "render_batches": [
@@ -1552,11 +1618,9 @@
       "material": "glass",
       "sources": [
         "entrance_glass",
-        "chiller_glass",
-        "freezer_glass",
-        "chiller_glass_1"
+        "freezer_glass"
       ],
-      "triangles": 48,
+      "triangles": 24,
       "cast_shadow": false
     },
     {

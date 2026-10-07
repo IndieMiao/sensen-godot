@@ -6,7 +6,7 @@
     ],
     "file": "room_albedo_ao.png",
     "purpose": "base colour + softened contact AO; padded palette swatches for subpixel detail; no baked direct light",
-    "bytes": 3693405
+    "bytes": 3689666
   },
   "assets": [
     {
@@ -95,10 +95,10 @@
     },
     {
       "name": "drink_cabinet",
-      "vertices": 1863,
-      "triangles": 3129,
+      "vertices": 1064,
+      "triangles": 2052,
       "surfaces": 1,
-      "bytes": 102820
+      "bytes": 72068
     },
     {
       "name": "chiller_glass",
@@ -211,22 +211,36 @@
       "triangles": 24,
       "surfaces": 1,
       "bytes": 3052
+    },
+    {
+      "name": "chilled_drinks_stock",
+      "vertices": 807,
+      "triangles": 1025,
+      "surfaces": 1,
+      "bytes": 33364
+    },
+    {
+      "name": "chilled_back_liner",
+      "vertices": 8,
+      "triangles": 12,
+      "surfaces": 1,
+      "bytes": 2212
     }
   ],
-  "unique_triangles": 79965,
-  "scene_triangles": 84486,
-  "static_draw_surfaces": 36,
-  "unique_assets": 29,
-  "placed_instances": 36,
-  "glb_bytes": 3046288,
+  "unique_triangles": 79925,
+  "scene_triangles": 84406,
+  "static_draw_surfaces": 40,
+  "unique_assets": 31,
+  "placed_instances": 40,
+  "glb_bytes": 3051112,
   "scene_budget": {
     "after": {
-      "room_triangles": 84486,
+      "room_triangles": 84406,
       "shared_plant_triangles": 24168,
       "room_botanical_triangles": 4944,
       "plant_triangles": 29112,
-      "total_triangles": 108654,
-      "static_surfaces": 30
+      "total_triangles": 108574,
+      "static_surfaces": 36
     },
     "limits": {
       "total_triangles": 200000,
@@ -254,11 +268,9 @@
         "material": "glass",
         "sources": [
           "entrance_glass",
-          "chiller_glass",
-          "freezer_glass",
-          "chiller_glass_1"
+          "freezer_glass"
         ],
-        "triangles": 48,
+        "triangles": 24,
         "cast_shadow": false
       },
       {

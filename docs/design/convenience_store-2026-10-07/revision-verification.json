@@ -1,10 +1,10 @@
 {
-  "revision": "r2",
+  "revision": "r21",
   "reference_sha256": "cb193c5a017295d6773cb6c2859a8fbd5660fdf14943518aa3f2a43139f93615",
   "renderer": {
     "device": "AMD Custom GPU 0405 (RADV VANGOGH)",
-    "draw_calls": 27.0,
-    "instances": 47,
+    "draw_calls": 28.0,
+    "instances": 51,
     "renderer": "mobile",
     "resolution": [
       1400,
@@ -12,58 +12,63 @@
     ],
     "scope": "offline art render; no mobile/gameplay/performance acceptance",
     "slug": "convenience_store",
-    "static_surfaces": 30,
+    "static_surfaces": 36,
     "views": [
       {
-        "draw_calls": 32.0,
-        "rendered_objects": 32.0,
+        "draw_calls": 38.0,
+        "rendered_objects": 38.0,
         "view": "godot-whole"
       },
       {
-        "draw_calls": 32.0,
-        "rendered_objects": 32.0,
+        "draw_calls": 38.0,
+        "rendered_objects": 38.0,
         "view": "model-front"
       },
       {
-        "draw_calls": 32.0,
-        "rendered_objects": 32.0,
+        "draw_calls": 38.0,
+        "rendered_objects": 38.0,
         "view": "model-side"
       },
       {
-        "draw_calls": 32.0,
-        "rendered_objects": 32.0,
+        "draw_calls": 38.0,
+        "rendered_objects": 38.0,
         "view": "model-top"
       },
       {
-        "draw_calls": 23.0,
-        "rendered_objects": 23.0,
+        "draw_calls": 25.0,
+        "rendered_objects": 25.0,
         "view": "godot-detail"
       },
       {
-        "draw_calls": 26.0,
-        "rendered_objects": 26.0,
+        "draw_calls": 32.0,
+        "rendered_objects": 32.0,
         "view": "godot-detail-plants"
       },
       {
-        "draw_calls": 30.0,
-        "rendered_objects": 30.0,
+        "draw_calls": 36.0,
+        "rendered_objects": 36.0,
         "view": "signs-stock-detail"
       },
       {
-        "draw_calls": 27.0,
-        "rendered_objects": 27.0,
+        "draw_calls": 32.0,
+        "rendered_objects": 32.0,
         "view": "groceries-detail"
+      },
+      {
+        "draw_calls": 28.0,
+        "rendered_objects": 28.0,
+        "view": "fridge-detail"
       }
     ]
   },
   "budget": {
     "after": {
-      "room_triangles": 84486,
+      "room_triangles": 84406,
       "shared_plant_triangles": 24168,
       "room_botanical_triangles": 4944,
       "plant_triangles": 29112,
-      "total_triangles": 108654,
-      "static_surfaces": 30
+      "total_triangles": 108574,
+      "static_surfaces": 36
     },
     "limits": {
       "total_triangles": 200000,
@@ -91,11 +96,9 @@
         "material": "glass",
         "sources": [
           "entrance_glass",
-          "chiller_glass",
-          "freezer_glass",
-          "chiller_glass_1"
+          "freezer_glass"
         ],
-        "triangles": 48,
+        "triangles": 24,
         "cast_shadow": false
       },
       {
@@ -179,6 +182,8 @@
       "assets/rooms/convenience_store/checkout.glb",
       "assets/rooms/convenience_store/checkout_flowers.glb",
       "assets/rooms/convenience_store/checkout_small_goods.glb",
+      "assets/rooms/convenience_store/chilled_back_liner.glb",
+      "assets/rooms/convenience_store/chilled_drinks_stock.glb",
       "assets/rooms/convenience_store/chiller_glass.glb",
       "assets/rooms/convenience_store/cold_light_strips.glb",
       "assets/rooms/convenience_store/convenience_sign.glb",

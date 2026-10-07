@@ -1,7 +1,7 @@
 {
   "device": "AMD Custom GPU 0405 (RADV VANGOGH)",
-  "draw_calls": 27.0,
-  "instances": 47,
+  "draw_calls": 28.0,
+  "instances": 51,
   "renderer": "mobile",
   "resolution": [
     1400,
@@ -9,47 +9,52 @@
   ],
   "scope": "offline art render; no mobile/gameplay/performance acceptance",
   "slug": "convenience_store",
-  "static_surfaces": 30,
+  "static_surfaces": 36,
   "views": [
     {
-      "draw_calls": 32.0,
-      "rendered_objects": 32.0,
+      "draw_calls": 38.0,
+      "rendered_objects": 38.0,
       "view": "godot-whole"
     },
     {
-      "draw_calls": 32.0,
-      "rendered_objects": 32.0,
+      "draw_calls": 38.0,
+      "rendered_objects": 38.0,
       "view": "model-front"
     },
     {
-      "draw_calls": 32.0,
-      "rendered_objects": 32.0,
+      "draw_calls": 38.0,
+      "rendered_objects": 38.0,
       "view": "model-side"
     },
     {
-      "draw_calls": 32.0,
-      "rendered_objects": 32.0,
+      "draw_calls": 38.0,
+      "rendered_objects": 38.0,
       "view": "model-top"
     },
     {
-      "draw_calls": 23.0,
-      "rendered_objects": 23.0,
+      "draw_calls": 25.0,
+      "rendered_objects": 25.0,
       "view": "godot-detail"
     },
     {
-      "draw_calls": 26.0,
-      "rendered_objects": 26.0,
+      "draw_calls": 32.0,
+      "rendered_objects": 32.0,
       "view": "godot-detail-plants"
     },
     {
-      "draw_calls": 30.0,
-      "rendered_objects": 30.0,
+      "draw_calls": 36.0,
+      "rendered_objects": 36.0,
       "view": "signs-stock-detail"
     },
     {
-      "draw_calls": 27.0,
-      "rendered_objects": 27.0,
+      "draw_calls": 32.0,
+      "rendered_objects": 32.0,
       "view": "groceries-detail"
+    },
+    {
+      "draw_calls": 28.0,
+      "rendered_objects": 28.0,
+      "view": "fridge-detail"
     }
   ]
 }

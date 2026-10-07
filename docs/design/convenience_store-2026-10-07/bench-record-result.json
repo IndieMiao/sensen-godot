@@ -79,7 +79,7 @@
 				"name": "checkout",
 				"reached": true,
 				"remaining_m": 0.0721634551882744,
-				"seconds": 0.467,
+				"seconds": 0.466,
 				"target": [
 					0.419999986886978,
 					0.0599999986588955,
@@ -131,7 +131,7 @@
 				"name": "checkout_return",
 				"reached": true,
 				"remaining_m": 0.0695670768618584,
-				"seconds": 0.604,
+				"seconds": 0.605,
 				"target": [
 					0.419999986886978,
 					0.0599999986588955,
@@ -157,7 +157,7 @@
 				"name": "freezer",
 				"reached": true,
 				"remaining_m": 0.0947521030902863,
-				"seconds": 0.45,
+				"seconds": 0.462,
 				"target": [
 					2.0,
 					0.0599999986588955,
@@ -183,7 +183,7 @@
 				"name": "aisle_return",
 				"reached": true,
 				"remaining_m": 0.0680781751871109,
-				"seconds": 0.404,
+				"seconds": 0.416,
 				"target": [
 					0.419999986886978,
 					0.0599999986588955,
@@ -246,13 +246,13 @@
 			"passed": true
 		},
 		{
-			"details": 5.844,
+			"details": 5.778,
 			"name": "Full route fits unaccelerated 15s clip",
 			"passed": true
 		}
 	],
 	"passed": true,
-	"pid": 1103573,
+	"pid": 1123768,
 	"renderer": "mobile",
 	"route": [
 		{
@@ -314,7 +314,7 @@
 			"name": "checkout",
 			"reached": true,
 			"remaining_m": 0.0721634551882744,
-			"seconds": 0.467,
+			"seconds": 0.466,
 			"target": [
 				0.419999986886978,
 				0.0599999986588955,
@@ -358,7 +358,7 @@
 			"name": "checkout_return",
 			"reached": true,
 			"remaining_m": 0.0695670768618584,
-			"seconds": 0.604,
+			"seconds": 0.605,
 			"target": [
 				0.419999986886978,
 				0.0599999986588955,
@@ -380,7 +380,7 @@
 			"name": "freezer",
 			"reached": true,
 			"remaining_m": 0.0947521030902863,
-			"seconds": 0.45,
+			"seconds": 0.462,
 			"target": [
 				2.0,
 				0.0599999986588955,
@@ -402,7 +402,7 @@
 			"name": "aisle_return",
 			"reached": true,
 			"remaining_m": 0.0680781751871109,
-			"seconds": 0.404,
+			"seconds": 0.416,
 			"target": [
 				0.419999986886978,
 				0.0599999986588955,

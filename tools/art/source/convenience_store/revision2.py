@@ -99,6 +99,8 @@ def revise():
     rec=k.KITS['entry_step'];k.CURRENT=rec
     for o in rec['objects']:
         if 'mat' in o.name.lower():o.location.x*=1.58;o.scale.x*=1.58;o.scale.y*=1.30
+    from revision21 import revise as revise_r21
+    revise_r21()
     r.sync_instances()
 
 def manifest(d):
@@ -112,3 +114,6 @@ def manifest(d):
     from liubei_r2 import fit_camera
     fit_camera(d,(1544,1544),[(44,934),(790,1413),(1490,991)])
     d['review_views']=[{'name':'signs-stock-detail','position':[4.0,3.3,5.2],'target':[-1.6,1.6,-1.5],'size':4.9},{'name':'groceries-detail','position':[3,3.4,4.5],'target':[.55,1.3,-.15],'size':4.8}]
+
+    from revision21 import manifest as manifest_r21
+    manifest_r21(d)

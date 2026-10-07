@@ -1,5 +1,5 @@
 {
-  "revision": "r2",
+  "revision": "r21",
   "method": "9x9 median RGB, HSV circular hue difference; same authored physical surfaces; no pixel registration",
   "checks": [
     {
@@ -27,15 +27,15 @@
       "runtime": {
         "rgb": [
           199,
-          208,
-          181
+          211,
+          183
         ],
-        "hex": "#C7D0B5",
-        "hue_degrees": 80.0,
-        "saturation": 0.1298,
-        "value": 0.8157
+        "hex": "#C7D3B7",
+        "hue_degrees": 85.714,
+        "saturation": 0.1327,
+        "value": 0.8275
       },
-      "hue_delta_degrees": 8.696,
+      "hue_delta_degrees": 2.981,
       "passed": true
     },
     {
@@ -64,14 +64,14 @@
         "rgb": [
           245,
           222,
-          202
+          200
         ],
-        "hex": "#F5DECA",
-        "hue_degrees": 27.907,
-        "saturation": 0.1755,
+        "hex": "#F5DEC8",
+        "hue_degrees": 29.333,
+        "saturation": 0.1837,
         "value": 0.9608
       },
-      "hue_delta_degrees": 5.866,
+      "hue_delta_degrees": 7.293,
       "passed": true
     },
     {
@@ -100,14 +100,14 @@
         "rgb": [
           255,
           177,
-          130
+          132
         ],
-        "hex": "#FFB182",
-        "hue_degrees": 22.56,
-        "saturation": 0.4902,
+        "hex": "#FFB184",
+        "hue_degrees": 21.951,
+        "saturation": 0.4824,
         "value": 1.0
       },
-      "hue_delta_degrees": 4.279,
+      "hue_delta_degrees": 3.67,
       "passed": true
     }
   ],
