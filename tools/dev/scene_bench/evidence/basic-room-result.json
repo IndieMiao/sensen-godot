@@ -1,0 +1,698 @@
+{
+  "adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+  "checks": [
+    {
+      "details": null,
+      "name": "Default Avatar fixture assembles",
+      "passed": true
+    },
+    {
+      "details": null,
+      "name": "Bench route/probe schema",
+      "passed": true
+    },
+    {
+      "details": 0.0900000035762787,
+      "name": "Spawn stands on authored floor",
+      "passed": true
+    },
+    {
+      "details": "(1.4, 0.09, 1.65)",
+      "name": "Spawn capsule clear",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          1.95859396457672,
+          0.0899310857057571,
+          1.64999997615814
+        ],
+        "from": [
+          1.39999997615814,
+          0.0900000035762787,
+          1.64999997615814
+        ],
+        "name": "east aisle",
+        "reached": true,
+        "remaining_m": 0.0919439047574997,
+        "seconds": 0.052,
+        "target": [
+          2.04999995231628,
+          0.0799999982118607,
+          1.64999997615814
+        ]
+      },
+      "name": "Route: east aisle",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          2.04702115058899,
+          0.0899382904171944,
+          -1.22321259975433
+        ],
+        "from": [
+          1.95859396457672,
+          0.0899310857057571,
+          1.64999997615814
+        ],
+        "name": "door",
+        "reached": true,
+        "remaining_m": 0.0973419398069382,
+        "seconds": 0.783,
+        "target": [
+          2.04999995231628,
+          0.0799999982118607,
+          -1.32000005245209
+        ]
+      },
+      "name": "Route: door",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          0.491165339946747,
+          0.0899375155568123,
+          -1.3146425485611
+        ],
+        "from": [
+          2.04702115058899,
+          0.0899382904171944,
+          -1.22321259975433
+        ],
+        "name": "kitchen",
+        "reached": true,
+        "remaining_m": 0.091861717402935,
+        "seconds": 0.322,
+        "target": [
+          0.400000005960464,
+          0.0799999982118607,
+          -1.32000005245209
+        ]
+      },
+      "name": "Route: kitchen",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          -1.56397342681885,
+          0.0899283364415169,
+          -1.31978487968445
+        ],
+        "from": [
+          0.491165339946747,
+          0.0899375155568123,
+          -1.3146425485611
+        ],
+        "name": "hearth",
+        "reached": true,
+        "remaining_m": 0.0865978375077248,
+        "seconds": 0.444,
+        "target": [
+          -1.64999997615814,
+          0.0799999982118607,
+          -1.32000005245209
+        ]
+      },
+      "name": "Route: hearth",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          -2.06023859977722,
+          0.089933268725872,
+          -0.542293548583984
+        ],
+        "from": [
+          -1.56397342681885,
+          0.0899283364415169,
+          -1.31978487968445
+        ],
+        "name": "window",
+        "reached": true,
+        "remaining_m": 0.0745662003755569,
+        "seconds": 0.267,
+        "target": [
+          -2.09999990463257,
+          0.0799999982118607,
+          -0.479999989271164
+        ]
+      },
+      "name": "Route: window",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          -2.09857487678528,
+          0.0899318009614944,
+          2.08242678642273
+        ],
+        "from": [
+          -2.06023859977722,
+          0.089933268725872,
+          -0.542293548583984
+        ],
+        "name": "west aisle",
+        "reached": true,
+        "remaining_m": 0.0980877950787544,
+        "seconds": 0.716,
+        "target": [
+          -2.09999990463257,
+          0.0799999982118607,
+          2.1800000667572
+        ]
+      },
+      "name": "Route: west aisle",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          0.131114408373833,
+          0.0899313613772392,
+          2.1770761013031
+        ],
+        "from": [
+          -2.09857487678528,
+          0.0899318009614944,
+          2.08242678642273
+        ],
+        "name": "south aisle",
+        "reached": true,
+        "remaining_m": 0.0696592181921005,
+        "seconds": 0.617,
+        "target": [
+          0.200000002980232,
+          0.0799999982118607,
+          2.1800000667572
+        ]
+      },
+      "name": "Route: south aisle",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          1.33021748065948,
+          0.0899273902177811,
+          1.67898666858673
+        ],
+        "from": [
+          0.131114408373833,
+          0.0899313613772392,
+          2.1770761013031
+        ],
+        "name": "spawn return",
+        "reached": true,
+        "remaining_m": 0.0762127190828323,
+        "seconds": 0.367,
+        "target": [
+          1.39999997615814,
+          0.0799999982118607,
+          1.64999997615814
+        ]
+      },
+      "name": "Route: spawn return",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/BasicRoomArt/dining_table/@StaticBody3D@17"
+        ],
+        "final": [
+          0.0,
+          0.0739117711782455,
+          1.43635976314545
+        ],
+        "from": [
+          0.0,
+          0.0900000035762787,
+          1.70000004768372
+        ],
+        "reached": false,
+        "remaining_m": 0.816518247127533,
+        "seconds": 0.883,
+        "target": [
+          0.0,
+          0.0900000035762787,
+          0.620000004768372
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/BasicRoomArt/dining_table/@StaticBody3D@17"
+      },
+      "name": "Blocked: table",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          -2.04999995231628,
+          0.0723652690649033,
+          -1.83772134780884
+        ],
+        "from": [
+          -2.04999995231628,
+          0.0900000035762787,
+          -1.37999999523163
+        ],
+        "reached": false,
+        "remaining_m": 0.73249089717865,
+        "seconds": 0.883,
+        "target": [
+          -2.04999995231628,
+          0.0900000035762787,
+          -2.5699999332428
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/BasicRoomArt/hearth/@StaticBody3D@13"
+      },
+      "name": "Blocked: hearth",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/BasicRoomArt/sink_cabinet/@StaticBody3D@15"
+        ],
+        "final": [
+          -0.400000005960464,
+          0.0731204003095627,
+          -1.96272444725037
+        ],
+        "from": [
+          -0.400000005960464,
+          0.0900000035762787,
+          -1.37999999523163
+        ],
+        "reached": false,
+        "remaining_m": 0.657492160797119,
+        "seconds": 0.883,
+        "target": [
+          -0.400000005960464,
+          0.0900000035762787,
+          -2.61999988555908
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/BasicRoomArt/sink_cabinet/@StaticBody3D@15"
+      },
+      "name": "Blocked: kitchen",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/BasicRoomArt/room_shell/@StaticBody3D@5"
+        ],
+        "final": [
+          -2.76250004768372,
+          0.0804669037461281,
+          -0.600000023841858
+        ],
+        "from": [
+          -2.20000004768372,
+          0.0900000035762787,
+          -0.600000023841858
+        ],
+        "reached": false,
+        "remaining_m": 0.737561583518982,
+        "seconds": 0.883,
+        "target": [
+          -3.5,
+          0.0900000035762787,
+          -0.600000023841858
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/BasicRoomArt/room_shell/@StaticBody3D@5"
+      },
+      "name": "Blocked: west wall",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [
+          "/root/SceneBenchmark/BasicRoomArt/room_shell/@StaticBody3D@9"
+        ],
+        "final": [
+          2.93855214118958,
+          0.0723652690649033,
+          1.60000002384186
+        ],
+        "from": [
+          2.40000009536743,
+          0.0900000035762787,
+          1.60000002384186
+        ],
+        "reached": false,
+        "remaining_m": 0.861628293991089,
+        "seconds": 0.883,
+        "target": [
+          3.79999995231628,
+          0.0900000035762787,
+          1.60000002384186
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/BasicRoomArt/room_shell/@StaticBody3D@9"
+      },
+      "name": "Blocked: east open edge",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          0.0,
+          0.0723652690649033,
+          2.93750023841858
+        ],
+        "from": [
+          0.0,
+          0.0900000035762787,
+          2.25
+        ],
+        "reached": false,
+        "remaining_m": 0.862679958343506,
+        "seconds": 0.883,
+        "target": [
+          0.0,
+          0.0900000035762787,
+          3.79999995231628
+        ],
+        "torso_ray_blocker": "/root/SceneBenchmark/BasicRoomArt/room_shell/@StaticBody3D@11"
+      },
+      "name": "Blocked: south open edge",
+      "passed": true
+    },
+    {
+      "details": {
+        "authored_width": 2.22,
+        "measured_m": 2.22000014781952,
+        "minimum_m": 0.7
+      },
+      "name": "Gap width: table-kitchen aisle",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "final": [
+          -1.71621060371399,
+          0.0899357199668884,
+          -1.25
+        ],
+        "from": [
+          1.89999997615814,
+          0.0900000035762787,
+          -1.25
+        ],
+        "reached": true,
+        "remaining_m": 0.0837893709540367,
+        "seconds": 0.999,
+        "target": [
+          -1.79999995231628,
+          0.0900000035762787,
+          -1.25
+        ]
+      },
+      "name": "Traverse: table-kitchen aisle",
+      "passed": true
+    },
+    {
+      "details": {
+        "collisions": [],
+        "delta": [
+          0.348606586456299,
+          0.000137060880661011,
+          -1.59099018573761
+        ]
+      },
+      "name": "Diagonal collision preserves wall sliding",
+      "passed": true
+    },
+    {
+      "details": [
+        "run",
+        0.15,
+        0.316666666666667
+      ],
+      "name": "Run animation advances in rendered viewport",
+      "passed": true
+    },
+    {
+      "details": null,
+      "name": "Input release stops horizontal motion",
+      "passed": true
+    },
+    {
+      "details": "idle",
+      "name": "Release returns to idle",
+      "passed": true
+    },
+    {
+      "details": null,
+      "name": "Focus loss cancels movement",
+      "passed": true
+    },
+    {
+      "details": 1.74549424648285,
+      "name": "Fixture head-top height measurable",
+      "passed": true
+    },
+    {
+      "details": {
+        "baseline_ratio": 1.33486547130987,
+        "difference": 0.0,
+        "height": 2.33,
+        "ratio_to_H": 1.33486547130987,
+        "reason": ""
+      },
+      "name": "Scale \u00b115%: door",
+      "passed": true
+    },
+    {
+      "details": {
+        "baseline_ratio": 0.660271440207995,
+        "difference": 0.0,
+        "height": 1.1525,
+        "ratio_to_H": 0.660271440207995,
+        "reason": ""
+      },
+      "name": "Scale \u00b115%: counter",
+      "passed": true
+    },
+    {
+      "details": {
+        "baseline_ratio": 0.392438990492388,
+        "difference": 0.0,
+        "height": 0.685,
+        "ratio_to_H": 0.392438990492388,
+        "reason": ""
+      },
+      "name": "Scale \u00b115%: chair",
+      "passed": true
+    },
+    {
+      "details": {
+        "baseline_ratio": 0.650245626582277,
+        "difference": 0.0,
+        "height": 1.135,
+        "ratio_to_H": 0.650245626582277,
+        "reason": ""
+      },
+      "name": "Scale \u00b115%: table",
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "renderer": "mobile",
+  "route": [
+    {
+      "collisions": [],
+      "final": [
+        1.95859396457672,
+        0.0899310857057571,
+        1.64999997615814
+      ],
+      "from": [
+        1.39999997615814,
+        0.0900000035762787,
+        1.64999997615814
+      ],
+      "name": "east aisle",
+      "reached": true,
+      "remaining_m": 0.0919439047574997,
+      "seconds": 0.052,
+      "target": [
+        2.04999995231628,
+        0.0799999982118607,
+        1.64999997615814
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        2.04702115058899,
+        0.0899382904171944,
+        -1.22321259975433
+      ],
+      "from": [
+        1.95859396457672,
+        0.0899310857057571,
+        1.64999997615814
+      ],
+      "name": "door",
+      "reached": true,
+      "remaining_m": 0.0973419398069382,
+      "seconds": 0.783,
+      "target": [
+        2.04999995231628,
+        0.0799999982118607,
+        -1.32000005245209
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        0.491165339946747,
+        0.0899375155568123,
+        -1.3146425485611
+      ],
+      "from": [
+        2.04702115058899,
+        0.0899382904171944,
+        -1.22321259975433
+      ],
+      "name": "kitchen",
+      "reached": true,
+      "remaining_m": 0.091861717402935,
+      "seconds": 0.322,
+      "target": [
+        0.400000005960464,
+        0.0799999982118607,
+        -1.32000005245209
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        -1.56397342681885,
+        0.0899283364415169,
+        -1.31978487968445
+      ],
+      "from": [
+        0.491165339946747,
+        0.0899375155568123,
+        -1.3146425485611
+      ],
+      "name": "hearth",
+      "reached": true,
+      "remaining_m": 0.0865978375077248,
+      "seconds": 0.444,
+      "target": [
+        -1.64999997615814,
+        0.0799999982118607,
+        -1.32000005245209
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        -2.06023859977722,
+        0.089933268725872,
+        -0.542293548583984
+      ],
+      "from": [
+        -1.56397342681885,
+        0.0899283364415169,
+        -1.31978487968445
+      ],
+      "name": "window",
+      "reached": true,
+      "remaining_m": 0.0745662003755569,
+      "seconds": 0.267,
+      "target": [
+        -2.09999990463257,
+        0.0799999982118607,
+        -0.479999989271164
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        -2.09857487678528,
+        0.0899318009614944,
+        2.08242678642273
+      ],
+      "from": [
+        -2.06023859977722,
+        0.089933268725872,
+        -0.542293548583984
+      ],
+      "name": "west aisle",
+      "reached": true,
+      "remaining_m": 0.0980877950787544,
+      "seconds": 0.716,
+      "target": [
+        -2.09999990463257,
+        0.0799999982118607,
+        2.1800000667572
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        0.131114408373833,
+        0.0899313613772392,
+        2.1770761013031
+      ],
+      "from": [
+        -2.09857487678528,
+        0.0899318009614944,
+        2.08242678642273
+      ],
+      "name": "south aisle",
+      "reached": true,
+      "remaining_m": 0.0696592181921005,
+      "seconds": 0.617,
+      "target": [
+        0.200000002980232,
+        0.0799999982118607,
+        2.1800000667572
+      ]
+    },
+    {
+      "collisions": [],
+      "final": [
+        1.33021748065948,
+        0.0899273902177811,
+        1.67898666858673
+      ],
+      "from": [
+        0.131114408373833,
+        0.0899313613772392,
+        2.1770761013031
+      ],
+      "name": "spawn return",
+      "reached": true,
+      "remaining_m": 0.0762127190828323,
+      "seconds": 0.367,
+      "target": [
+        1.39999997615814,
+        0.0799999982118607,
+        1.64999997615814
+      ]
+    }
+  ],
+  "scope": "Rendered desktop fixture motion and injected Godot input events; no physical device claim",
+  "slug": "basic_room"
+}
