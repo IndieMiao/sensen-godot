@@ -39,12 +39,8 @@ const XP := Color("1f8c88")          # --xp-deep (floating XP)
 var view: Dictionary = {}
 var root: Control
 var pad: Control
-var _hud_energy: Label
-var _hud_regen: Label
-var _hud_bar: Control
-var _hud_coins: Label
-var _today: Label
-var _avatar: Control
+var hud: UiHud                   # two-row HUD (SGODOT-222, LOCK-06)
+var _place_text := "Shanghai · Homestead"
 var _fab: Control
 var _fab_icon: TextureRect
 var _fab_verb: Label
@@ -59,13 +55,14 @@ var selected_bait := ""
 ## Where Old Kai keeps shop (a fixed map place since ponds moved to the map).
 var tackle_place := "Reed Pond"
 var bar_mode := "farm"          # "farm" (seeds) or "fish" (bait) — the quick bar holds the current action's consumables
-var _place: Label
 var surface := "farm"
+## Set by the runtime: true when the current world can move its camera to a spot (p0_show_spot). Show
+## buttons (Today, NeedSource) only appear then, so a Show never closes a panel and does nothing (LOCK-08).
+var can_show_spot := Callable()
+var _hud_world := true   # set_surface: the map has no HUD
+var _hud_hash := 0       # last state given to hud.apply
+var _hud_need := -1      # main action's Energy need last seen by the HUD
 var _pending := {}   # surface / place / mode set before the HUD exists (the runtime attaches early)
-var _ecard: Control
-var _right: Control
-var _today_chip: Control
-var _place_chip: Control
 var _dev_box: Control
 var _creel: PanelContainer
 var _creel_count: Label
@@ -129,88 +126,18 @@ func _process(dt: float) -> void:
 		if _teach_left <= 0.0 and _teach: _teach.hide()
 
 func _build_hud() -> void:
-	_avatar = _AvatarRing.new()
-	_avatar.position = Vector2(10, 16)
-	_avatar.size = Vector2(37, 37)
-	_avatar.mouse_filter = Control.MOUSE_FILTER_STOP
-	_avatar.gui_input.connect(func(e: InputEvent):
-		if P0Ui.is_tap(e): open_skills())
-	root.add_child(_avatar)
-	var ecard := PanelContainer.new()
-	ecard.add_theme_stylebox_override("panel", _box(CARD, 12, EDGE, 1, Vector4(8, 5, 8, 5)))
-	ecard.position = Vector2(52, 16)
-	ecard.custom_minimum_size = Vector2(112, 37)
-	var ev := VBoxContainer.new()
-	ev.add_theme_constant_override("separation", 1)
-	var top := HBoxContainer.new()
-	top.add_theme_constant_override("separation", 3)
-	top.add_child(_icon("energy", 13))
-	_hud_energy = _label("200/200", 13, INK, true)
-	top.add_child(_hud_energy)
-	ev.add_child(top)
-	_hud_bar = _EnergyBar.new()
-	_hud_bar.custom_minimum_size = Vector2(80, 4)
-	ev.add_child(_hud_bar)
-	_hud_regen = _label("Full", 8, INK2)
-	ev.add_child(_hud_regen)
-	ecard.add_child(ev)
-	root.add_child(ecard)
-	_ecard = ecard
-	var right := HBoxContainer.new()
-	right.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	right.position = Vector2(-128, 22)
-	right.add_theme_constant_override("separation", 6)
-	var coins := PanelContainer.new()
-	coins.add_theme_stylebox_override("panel", _box(CARD, 12, EDGE, 1, Vector4(10, 4, 8, 4)))
-	var ch := HBoxContainer.new()
-	_hud_coins = _label("180", 12, INK, true)
-	ch.add_child(_hud_coins)
-	ch.add_child(_icon("coin", 13))
-	coins.add_child(ch)
-	right.add_child(coins)
-	var bell := PanelContainer.new()
-	bell.add_theme_stylebox_override("panel", _box(CARD, 16, EDGE, 1, Vector4(6, 6, 6, 6)))
-	bell.add_child(_icon("bell", 18))
-	right.add_child(bell)
-	root.add_child(right)
-	_right = right
-	# row 2: Today chip (left) · place chip "City · Space" (right)
-	var today := PanelContainer.new()
-	today.add_theme_stylebox_override("panel", _box(CARD, 11, EDGE, 1, Vector4(8, 4, 8, 4)))
-	today.position = Vector2(10, 64)
-	today.mouse_filter = Control.MOUSE_FILTER_STOP
-	today.gui_input.connect(func(e: InputEvent):
-		if P0Ui.is_tap(e): open_today())
-	var th := HBoxContainer.new()
-	th.add_child(_label("Today ·", 10, INK, true))
-	_today = _label("Sow your first plot", 10, INK)
-	_today.custom_minimum_size = Vector2(150, 0)
-	_today.clip_text = true
-	th.add_child(_today)
-	today.add_child(th)
-	root.add_child(today)
-	_today_chip = today
-	var place := PanelContainer.new()
-	place.add_theme_stylebox_override("panel", _box(CARD, 11, EDGE, 1, Vector4(8, 4, 8, 4)))
-	place.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	place.grow_horizontal = Control.GROW_DIRECTION_BEGIN   # longer place names grow to the left
-	place.offset_left = -10
-	place.offset_right = -10
-	place.offset_top = 64
-	place.mouse_filter = Control.MOUSE_FILTER_STOP
-	place.gui_input.connect(func(e: InputEvent):
-		if P0Ui.is_tap(e): place_pressed.emit())   # the place chip is the way back to the map
-	var ph := HBoxContainer.new()
-	ph.add_theme_constant_override("separation", 3)
-	ph.add_child(_icon("showmap", 11))
-	_place = _label("Shanghai · Homestead", 10, INK, true)
-	ph.add_child(_place)
-	place.add_child(ph)
-	root.add_child(place)
-	_place_chip = place
+	hud = UiHud.new()
+	hud.theme = UiKit.theme()
+	hud.safe_top = safe_top()
+	hud.avatar_pressed.connect(open_profile)   # LOCK-06: the avatar opens Profile (SGODOT-225)
+	hud.energy_pressed.connect(open_energy_panel)
+	hud.inbox_pressed.connect(open_inbox)
+	hud.today_pressed.connect(open_today)
+	hud.place_pressed.connect(func(): place_pressed.emit())   # the location chip is the way back to the map
+	root.add_child(hud)
 	_creel = PanelContainer.new()
 	_creel.add_theme_stylebox_override("panel", _box(CARD, 11, EDGE, 1, Vector4(6, 3, 8, 3)))
-	_creel.position = Vector2(10, 91)
+	_creel.position = Vector2(UiTokens.SIZE_TODAY_PANEL_X, UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H + UiTokens.SPACE_WITHIN + safe_top())   # under the two-row HUD
 	var crh := HBoxContainer.new()
 	crh.add_theme_constant_override("separation", 4)
 	crh.add_child(_icon("creel", 11))
@@ -306,7 +233,7 @@ func _build_fab() -> void:
 func _build_dev() -> void:
 	var box := HBoxContainer.new()
 	box.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	box.position = Vector2(-96, 118)
+	box.position = Vector2(-96, 118 + safe_top())   # debug time skips, kept under the HUD on notched screens
 	box.add_theme_constant_override("separation", 4)
 	for m in [60, 240]:
 		var b := _pill_button("+%dh" % (m / 60), false)
@@ -321,25 +248,36 @@ func _build_dev() -> void:
 func set_view(v: Dictionary) -> void:
 	view = v
 	if _bag != null and is_instance_valid(_bag) and modal_kind in ["bag", "gear"]: _bag.refresh(v)
-	var e: Dictionary = v.get("energy", {})
-	var val := int(e.get("value", 0))
-	var mx := int(e.get("max", 200))
-	_hud_energy.text = "%d/%d" % [val, mx]
-	_hud_bar.set_meta("pct", clampf(float(val) / maxf(1.0, mx), 0.0, 1.0))
-	_hud_bar.queue_redraw()
-	var nx = e.get("next_in", null)
-	_hud_regen.text = "Full" if nx == null else "+1 in " + P0Logic.duration(float(nx))
-	_hud_coins.text = str(int(v.get("coins", 0)))
-	_today.text = str(P0Logic.today_lines(v)[0])
-	var sk: Dictionary = v.get("skills", {})
-	_avatar.set_meta("farm", _skill_pct(sk.get("farming", {})))
-	_avatar.set_meta("fish", _skill_pct(sk.get("fishing", {})))
-	_avatar.queue_redraw()
+	if _profile != null and is_instance_valid(_profile) and modal_kind == "profile": _profile.update(v)
+	_refresh_hud()
 	_refresh_bar()
 
-func _skill_pct(s: Dictionary) -> float:
-	if s.is_empty() or s.get("next", null) == null: return 1.0
-	return clampf(float(int(s.xp) - int(s.floor)) / maxf(1.0, float(int(s.next) - int(s.floor))), 0.0, 1.0)
+func _skill_pct(s: Dictionary) -> float: return P0Logic.skill_progress(s)
+
+## HUD from the view, the next action's cost (Low = short of it) and where the player actually is: the
+## kitchen is the farmhouse's stove corner, so the chip reads "Shanghai · Farmhouse" there (LOCK-06).
+func _refresh_hud() -> void:
+	if hud == null: return
+	# No HUD before the first server view: an empty view would read as 0 Energy (red) and 0 coins, and its
+	# chips would still take taps.
+	hud.visible = _hud_world and not view.is_empty()
+	if view.is_empty(): return
+	var place := P0Logic.place_info(_place_text, "Farmhouse" if modal_kind == "kitchen" else "")
+	var state := P0Logic.hud_state(view, {"next_cost": int(fab_state().get("need", 0)), "place": place})
+	var h := state.hash()
+	if h == _hud_hash: return   # set_view runs every frame: apply only what changed (the countdown, once a second)
+	_hud_hash = h
+	hud.apply(state)
+
+## Top system inset (status bar, notch) in UI units; 0 on desktop.
+func safe_top() -> float:
+	if not (OS.has_feature("android") or OS.has_feature("ios")): return 0.0
+	return UIMetrics.safe_margins(DisplayServer.get_display_safe_area(), DisplayServer.window_get_size(),
+		get_viewport().get_visible_rect().size, 0.0).y
+
+## The HUD's location chip and its coins / bell corner, for worlds that dock their own controls there.
+func place_chip_rect() -> Rect2: return hud.place_chip_rect() if hud else Rect2()
+func hud_corner_rect() -> Rect2: return hud.balances_rect() if hud else Rect2()
 
 ## Pond vs. plots: place chip, creel badge, fab badge and quick-bar contents follow where the player stands.
 ## Full place chip text: "City · Space" (Shanghai · Homestead / Shanghai · Willow Pond / … · Kitchen).
@@ -347,7 +285,8 @@ func set_place(text: String) -> void:
 	if not is_node_ready():
 		_pending["place"] = text
 		return
-	if _place.text != text: _place.text = text
+	_place_text = text
+	_refresh_hud()
 
 ## Which world the HUD sits on (§10.2.4): action spaces show everything; rooms are facility spaces
 ## (no quick bar, main action or switch key); the map shows only toasts and cards.
@@ -358,8 +297,9 @@ func set_surface(name: String) -> void:
 		return
 	var action := name in ["farm", "pond"]
 	var world := name != "map"
-	for n in [_avatar, _ecard, _right, _today_chip, _place_chip]: n.visible = world
-	_right.visible = world and name != "busy"   # a busy world's own close button sits in that corner
+	_hud_world = world
+	hud.visible = world and not view.is_empty()
+	hud.show_balances = name != "busy"   # a busy world's own close button sits in the coins / bell corner
 	pad.visible = world
 	_fab.visible = action and _modal == null
 	_fab_pills.visible = _fab.visible and bool(_fab_state.get("creel_full", false))
@@ -489,6 +429,10 @@ func set_action(a: Dictionary) -> void:
 	_fab_verb.add_theme_color_override("font_color", AMBER_D if a.get("amber", false) else (INK if a.get("enabled", false) else INK2))
 	_fab.set_meta("state", a)
 	_fab.queue_redraw()
+	var need := int(a.get("need", 0))
+	if need != _hud_need:   # the worlds call set_action every frame
+		_hud_need = need
+		_refresh_hud()   # SGODOT-222: the Energy chip turns Low when short of this action
 
 func _fab_pressed() -> void:
 	fab_verb = ""
@@ -550,7 +494,9 @@ func queue_card(show: Callable) -> void:
 func _drop_modal() -> void:
 	if _modal: _modal.queue_free()
 	_modal = null
+	var was_kitchen := modal_kind == "kitchen"
 	modal_kind = ""
+	if was_kitchen: _refresh_hud()   # back out of the farmhouse
 	_fab.visible = surface in ["farm", "pond"]
 	_bar_box.visible = surface in ["farm", "pond"]
 	_fab_pills.visible = _fab.visible and bool(_fab_state.get("creel_full", false))
@@ -643,7 +589,7 @@ func open_bag(focus := "", side := "") -> void:
 	modal_kind = "bag" if bag_side == "bag" else "gear"
 
 ## A button on the bag card or a Gear row. The drawer only reports; commands go to the server from here.
-func _bag_action(action: StringName, id: String, _payload: Dictionary) -> void:
+func _bag_action(action: StringName, id: String, payload: Dictionary) -> void:
 	match action:
 		&"eat":
 			var confirm := str(P0Logic.eat_button(view, id).get("confirm", ""))
@@ -656,12 +602,26 @@ func _bag_action(action: StringName, id: String, _payload: Dictionary) -> void:
 			command.emit({"type": "eat", "item": id})
 		&"equip":
 			command.emit({"type": "equip", "item": id})
+		&"lock", &"unlock":   # the title-area lock icon (F-07); Sell All skips locked items (SGODOT-228)
+			command.emit({"type": String(action), "item": id})
+		&"store":             # farm storage (SGODOT-228 store / take_out); the card shows Store only at home
+			command.emit({"type": "store", "item": id, "qty": payload.get("qty", "all")})
 		&"pin", &"unpin":
 			pass   # TODO(SGODOT-225 after #12): pin through the quick bar's pin record (P0Ui.bind_quick_bar)
 		_:
 			push_warning("P0 bag: no command for %s" % action)
 
 func _bag_slots() -> Array: return view.get("bag", {}).get("slots", [])
+
+## A tapped NEED-TILE: one source line just above it; Show only moves the camera (LOCK-10 / LOCK-08).
+func _show_need_source(tile: Control, id: String) -> void:
+	var src := P0Logic.need_source(view, id)
+	var go := str(src.go) if spot_reachable() else ""
+	var on_show := Callable() if go == "" else func():
+		close_modal()
+		show_spot.emit(go)
+	var layer := UiNeedSource.popup(root, tile.get_global_rect(), str(src.text), on_show)
+	layer.theme = UiKit.theme()
 
 ## Old Kai's greeting (p(4)): same card, his own line and options; Trade opens the tackle counter.
 func open_kai_greeting() -> void:
@@ -821,10 +781,10 @@ func _board(v: VBoxContainer, board: Dictionary) -> void:
 		card.add_theme_stylebox_override("panel", _box(PAPER if not done else Color(1, 1, 1, 0.5), 14, AMBER if str(r.status) == "accepted" else EDGE, 2 if str(r.status) == "accepted" else 1, Vector4(10, 8, 10, 8)))
 		var h := HBoxContainer.new()
 		h.add_theme_constant_override("separation", 10)
-		var tile := _NeedTile.new()
-		tile.custom_minimum_size = Vector2(56, 56)
-		tile.set_meta("pct", minf(1.0, float(r.have) / maxf(1.0, float(r.qty))))
-		tile.set_meta("icon", P0Logic.icon(str(r.item)))
+		var item_id := str(r.item)
+		var tile := UiNeedTile.new(P0Logic.item_name(view, item_id), int(r.have), int(r.qty), UiNeedTile.Size.M, P0Logic.icon(item_id))
+		tile.theme = UiKit.theme()
+		tile.pressed.connect(func(): _show_need_source(tile, item_id))
 		h.add_child(tile)
 		var mid := VBoxContainer.new()
 		mid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -834,9 +794,8 @@ func _board(v: VBoxContainer, board: Dictionary) -> void:
 		if int(r.qty) > 1 and not str(r.item).begins_with("fish_"): what = P0Logic.plural(what)
 		var line := _label("%d %s · %s · %d coins · Deliver here" % [int(r.qty), what, str(r.get("where", "")), int(r.coins)], 8, INK2)
 		line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		line.custom_minimum_size = Vector2(150, 0)
+		line.custom_minimum_size = Vector2(1, 0)   # wraps in what the NEED-TILE and the button leave
 		mid.add_child(line)
-		mid.add_child(_label("%s %d/%d" % [P0Logic.item_name(view, str(r.item)), mini(int(r.have), int(r.qty)), int(r.qty)], 10, INK, true))
 		h.add_child(mid)
 		if not done:
 			var id := str(r.id)
@@ -851,6 +810,7 @@ func _board(v: VBoxContainer, board: Dictionary) -> void:
 				b = _pill_button("Tracking", false)
 				b.disabled = true
 			b.custom_minimum_size = Vector2(78, 34)
+			b.size_flags_vertical = Control.SIZE_SHRINK_CENTER   # the NEED-TILE makes the card taller
 			h.add_child(b)
 		card.add_child(h)
 		v.add_child(card)
@@ -915,55 +875,37 @@ func _sell_row(id: String) -> Control:
 	return h
 
 ## Energy Card (§3.7.2 / HUD-3): facts, a Wait line, RECOVER tiles that only guide, one button that closes.
+## The ONE Energy interface (LOCK-09): a centred card over the modal scrim. Its only button is
+## `Free to do now` (closes it); tiles only guide (open the bag or move the camera), never act.
 func open_energy_card(need: int, verb: String) -> void:
-	var f := P0Logic.energy_card(view, need, verb)
-	var card := _center_card(310)
+	var f := P0Logic.energy_card(view, need, verb, surface not in ["pond", "busy"])   # away from home: the pond (later the mine)
+	for t in f.tiles: t.icon = P0Logic.icon(str(t.icon))
+	var card := UiEnergyCard.card(f)
+	card.theme = UiKit.theme()
+	card.free_pressed.connect(close_modal)
+	card.tile_pressed.connect(func(go: String):
+		close_modal()
+		if go == "bag": open_bag()
+		else: show_spot.emit(go))
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	center.add_child(card)
+	_open_modal(center, UiTokens.OPACITY_SCRIM_MODAL)
 	modal_kind = "energy"
-	var head := HBoxContainer.new()
-	head.add_child(_icon("energy", 18))
-	head.add_child(_label(str(f.title), 14, Color("d0573f") if f.zero else AMBER_D, true))
-	card.add_child(head)
-	card.add_child(_label(str(f.subtitle), 11, INK, true))
-	var wait := HBoxContainer.new()
-	wait.add_child(_icon("clock", 13))
-	wait.add_child(_label(str(f.wait), 10, INK2, true))
-	card.add_child(wait)
-	var bl := P0Logic.blessing_line(view)
-	if bl != "":
-		var bll := _label(bl, 8, GREEN_D, true)
-		bll.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		bll.custom_minimum_size = Vector2(270, 0)
-		card.add_child(bll)
-	card.add_child(_label("RECOVER", 8, INK2, true))
-	var grid := GridContainer.new()
-	grid.columns = 2
-	grid.add_theme_constant_override("h_separation", 6)
-	grid.add_theme_constant_override("v_separation", 6)
-	for t in f.tiles:
-		var b := Button.new()
-		b.text = "%s · %s%s" % [t.label, t.fact, ("\n%s ›" % t.guide) if str(t.guide) != "" and t.on else ""]
-		b.icon = P0Logic.icon(str(t.icon))
-		b.expand_icon = false
-		b.add_theme_constant_override("icon_max_width", 18)
-		b.add_theme_font_size_override("font_size", 8)
-		b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		b.custom_minimum_size = Vector2(140, 46)
-		_style_button(b, PAPER if t.on else Color(1, 1, 1, 0.4), EDGE, 14)
-		b.disabled = not t.on
-		var go := str(t.go)
-		b.pressed.connect(func():
-			close_modal()
-			if go == "bag": open_bag()
-			elif go != "": show_spot.emit(go))
-		grid.add_child(b)
-	card.add_child(grid)
-	var ok := _pill_button("Free to do now", true)
-	ok.pressed.connect(close_modal)
-	card.add_child(ok)
-	var note := _label("Closes this card · tiles only guide you, nothing is used automatically", 7, INK2)
-	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	card.add_child(note)
+
+## Tapping the HUD Energy chip: the same interface's panel under the chip, pointing at it (LOCK-09).
+func open_energy_panel() -> void:
+	var f := P0Logic.energy_panel(view)
+	for u in f.uses: u.icon = P0Logic.icon(str(u.icon))
+	var panel := UiEnergyCard.panel(f)
+	panel.theme = UiKit.theme()
+	var chip := hud.energy_chip_rect()
+	var x := clampf(chip.position.x - UiTokens.SPACE_WITHIN, UiTokens.SIZE_HUD_X, root.size.x - UiTokens.SIZE_ENERGY_PANEL_W - UiTokens.SIZE_HUD_X)
+	panel.position = Vector2(x, chip.end.y + UiTokens.SPACE_ROW)
+	panel.pointer_x = chip.get_center().x - x
+	_open_modal(panel, 0.0)
+	modal_kind = "energy_panel"
 
 ## The farmhouse (§3.4.3 "回家休息 Rest"; COOK-1 kitchen inside): one card, two doors.
 func open_home_card() -> void:
@@ -1106,23 +1048,61 @@ func open_radial() -> void:
 	_open_modal(layer, 0.18)
 	modal_kind = "radial"
 
-## Today panel (§14.5): the chip's three lines, facts only.
+## Today panel (§14.5, LOCK-06): at most three rows right under the HUD chips; Show only moves the camera.
 func open_today() -> void:
-	var panel := PanelContainer.new()
-	panel.position = Vector2(10, 92)
-	panel.custom_minimum_size = Vector2(240, 0)
-	panel.add_theme_stylebox_override("panel", _box(CARD, 14, EDGE, 1, Vector4(12, 8, 12, 10)))
-	var v := VBoxContainer.new()
-	v.add_theme_constant_override("separation", 5)
-	v.add_child(_label("TODAY", 8, INK2, true))
-	for line in P0Logic.today_lines(view):
-		var l := _label("• " + str(line), 11, INK, true)
-		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		l.custom_minimum_size = Vector2(220, 0)
-		v.add_child(l)
-	panel.add_child(v)
-	_open_modal(panel, 0.12)
+	var rows := P0Logic.today_rows(view)
+	var shown := rows.map(func(r):
+		var d: Dictionary = r.duplicate()
+		d.icon = P0Logic.icon(str(r.icon))
+		d.action = "Show" if str(r.go) != "" and spot_reachable() else ""   # TODO(SGODOT-225): Show on map for targets elsewhere
+		return d)
+	var panel := UiTodayPanel.new(shown)
+	panel.theme = UiKit.theme()
+	panel.position = Vector2(UiTokens.SIZE_TODAY_PANEL_X, UiTokens.SIZE_TODAY_PANEL_Y + safe_top())
+	panel.show_pressed.connect(func(i: int):
+		close_modal()
+		show_spot.emit(str(rows[i].go)))
+	_open_modal(panel, 0.0)
 	modal_kind = "today"
+
+## Whether a Show can move the camera in the current world (the pond has no camera targets yet).
+func spot_reachable() -> bool:
+	return can_show_spot.is_valid() and bool(can_show_spot.call())
+
+## The bell (parcels / letters). TODO(stage 4, Inbox): replace this empty state with the Inbox drawer and its
+## tabs; P0 has no parcels yet, so it only shows the agreed EmptyState line.
+func open_inbox() -> void:
+	var v := _sheet(220, "Inbox", "bell")
+	modal_kind = "inbox"
+	var empty := UiEmptyState.new("No parcels", P0Logic.icon("bell"))
+	empty.theme = UiKit.theme()
+	empty.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	v.add_child(empty)
+
+## Own profile (SGODOT-225; PROFILE-1-P0, LOCK-22), opened from the HUD avatar. A skill ring opens the skill
+## details; Edit look opens the dressing room above the current world and comes back here.
+var _profile: P0ProfilePage
+
+func open_profile() -> void:
+	var page := P0ProfilePage.new(view, safe_top())
+	page.theme = UiKit.theme()
+	page.back_pressed.connect(close_modal)
+	page.skill_pressed.connect(func(_skill: String): open_skills())
+	page.edit_look_pressed.connect(edit_look)
+	_open_modal(page, 0.0, true)
+	_profile = page
+	modal_kind = "profile"
+
+## The existing dressing room (Avatar outfit; the P0 actor follows the saved outfit). The P0 layer hides while
+## it is on top and the profile comes back when it closes (Back or Done).
+func edit_look() -> void:
+	close_modal()
+	var room := AppRouter.push_instance(AppRouter.DRESS)
+	if room == null: return
+	visible = false
+	room.tree_exited.connect(func():
+		visible = true
+		open_profile(), CONNECT_ONE_SHOT)
 
 ## SKILL-1 (P0 cut): three track cards — level ring, XP and how far to go, what the next level opens —
 ## and the "First times" collection tiles. Opened from the avatar ring.
@@ -1136,7 +1116,7 @@ func open_skills() -> void:
 		card.add_theme_stylebox_override("panel", _box(PAPER, 14, EDGE, 1, Vector4(10, 8, 10, 8)))
 		var h := HBoxContainer.new()
 		h.add_theme_constant_override("separation", 10)
-		var ring := _NeedTile.new()
+		var ring := _LevelRing.new()
 		ring.custom_minimum_size = Vector2(58, 58)
 		ring.set_meta("pct", _skill_pct(s))
 		ring.set_meta("text", "Lv %d" % int(s.get("level", 1)))
@@ -1173,19 +1153,11 @@ func open_skills() -> void:
 	var pages: Array = view.get("cooking", {}).get("cookbook", [])
 	var dishes := pages.filter(func(p): return p.get("cooked", false)).size()
 	for t in [["crop_radish", "Crops", crops, (view.get("crops", []) as Array).size()], ["fish_crucian", "Fish", fish, dex.size()], ["dish_grilled_crucian", "Dishes", dishes, pages.size()]]:
-		var col := VBoxContainer.new()
-		col.add_theme_constant_override("separation", 2)
-		var tile := _NeedTile.new()
-		tile.custom_minimum_size = Vector2(60, 60)
-		tile.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-		tile.set_meta("pct", float(t[2]) / maxf(1.0, float(t[3])))
-		tile.set_meta("icon", P0Logic.icon(str(t[0])))
-		col.add_child(tile)
-		var l := _label("%s %d/%d" % [t[1], int(t[2]), int(t[3])], 10, INK, true)
-		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		col.add_child(l)
-		col.custom_minimum_size = Vector2(96, 0)
-		row.add_child(col)
+		# Collection counts: NEED-TILE count state (LOCK-10 q(7)), display only.
+		var tile := UiNeedTile.new(str(t[1]), int(t[2]), int(t[3]), UiNeedTile.Size.M, P0Logic.icon(str(t[0])), true)
+		tile.theme = UiKit.theme()
+		tile.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		row.add_child(tile)
 	v.add_child(row)
 
 # ---------------------------------------------------------------- one-line teaching cards (§14.3)
@@ -1227,6 +1199,7 @@ func open_kitchen(tab := "") -> void:
 	var lvl := int(view.get("skills", {}).get("cooking", {}).get("level", 1))
 	var v := _sheet(540 if _kitchen_tab == "cookbook" else 440, "Stove · Empty · Cooking Lv%d" % lvl, "stove")
 	modal_kind = "kitchen"
+	_refresh_hud()   # the kitchen is the farmhouse's stove corner: the chip reads "Shanghai · Farmhouse"
 	var tabs := HBoxContainer.new()
 	tabs.add_theme_constant_override("separation", 6)
 	var pages: Array = ck.get("cookbook", [])
@@ -1609,13 +1582,12 @@ func open_fishdex() -> void:
 	modal_kind = "fishdex"
 	var top := HBoxContainer.new()
 	top.add_theme_constant_override("separation", 8)
-	var ring := _NeedTile.new()
-	ring.custom_minimum_size = Vector2(54, 54)
-	ring.set_meta("pct", float(got) / maxf(1.0, dex.size()))
-	ring.set_meta("icon", P0Logic.icon("fish_crucian"))
-	top.add_child(ring)
+	var kinds := UiNeedTile.new("Kinds", got, dex.size(), UiNeedTile.Size.M, P0Logic.icon("fish_crucian"), true)
+	kinds.theme = UiKit.theme()
+	kinds.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	top.add_child(kinds)
 	var tv := VBoxContainer.new()
-	tv.add_child(_label("Kinds %d/%d" % [got, dex.size()], 12, INK, true))
+	tv.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	tv.add_child(_label("%s · %s" % [str(view.get("fishing", {}).get("rod", "Starter Rod")), "holds up to %s" % P0Logic.rarity_name(view, int(view.get("fishing", {}).get("rod_reach", 2)))], 9, INK2))
 	top.add_child(tv)
 	v.add_child(top)
@@ -1922,19 +1894,8 @@ class _Slot extends Control:
 			s.set_border_width_all(1)
 		draw_style_box(s, r)
 
-class _AvatarRing extends Control:
-	func _draw() -> void:
-		var c := size * 0.5
-		var r := size.x * 0.5 - 2
-		draw_circle(c, r - 3, Color("e9d3b4"))
-		draw_arc(c, r, -PI * 0.5, PI * 0.5, 32, Color(0.5, 0.78, 0.42, 0.28), 3.0)
-		draw_arc(c, r, -PI * 0.5, -PI * 0.5 + PI * float(get_meta("farm", 0.0)), 32, Color("7fc66a"), 3.0)
-		draw_arc(c, r, PI * 0.5, PI * 1.5, 32, Color(0.44, 0.66, 0.86, 0.28), 3.0)
-		draw_arc(c, r, PI * 0.5, PI * 0.5 + PI * float(get_meta("fish", 0.0)), 32, Color("6fa8dc"), 3.0)
-		draw_circle(c + Vector2(0, -3), r * 0.42, Color("8a5a3b"))
-
-## Material / count progress (Figma NEED-TILE): an icon inside a ring that fills with progress.
-class _NeedTile extends Control:
+## Skill level ring on the Skills sheet (progress within the level). Item have / need is UiNeedTile (LOCK-10).
+class _LevelRing extends Control:
 	func _draw() -> void:
 		var c := size * 0.5
 		var r := minf(size.x, size.y) * 0.5 - 3
@@ -1948,11 +1909,4 @@ class _NeedTile extends Control:
 			var font := get_theme_default_font()
 			var w := font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x
 			draw_string(font, c + Vector2(-w * 0.5, 5), text, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color("2f3a33"))
-
-class _EnergyBar extends Control:
-	func _draw() -> void:
-		var pct := float(get_meta("pct", 1.0))
-		draw_rect(Rect2(Vector2.ZERO, size), Color(0.18, 0.23, 0.2, 0.12))
-		var col := Color("6cbf73") if pct >= 0.25 else (Color("e3b341") if pct >= 0.1 else Color("e07a5f"))
-		draw_rect(Rect2(Vector2.ZERO, Vector2(size.x * pct, size.y)), col)
 

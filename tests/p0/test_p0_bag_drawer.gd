@@ -134,3 +134,54 @@ func test_gear_slot_change_is_reported_for_the_next_open() -> void:
 	assert_array(got).is_equal(["farming"])
 	await get_tree().process_frame   # the fishing rows leave at the end of the frame
 	assert_int(d._gear_box.find_children("*", "UiGearRow", true, false).size()).is_equal(1)
+
+# ---------------------------------------------------------------- profile (PROFILE-1-P0)
+
+func test_profile_data_reads_the_view_and_hides_what_is_missing() -> void:
+	var v := _view()
+	v["skills"] = {"farming": {"level": 2, "xp": 70, "floor": 50, "next": 100}, "fishing": {"level": 1, "xp": 0, "floor": 0, "next": 40},
+		"cooking": {"level": 10, "xp": 999, "floor": 900, "next": null}}
+	v["profile"] = {"name": "Farmer", "city": "Shanghai", "climate": "Subtropical", "since_ms": 1791000000000.0,
+		"farm": {"name": "Farmer's Homestead", "level": 1}}
+	v["plots"] = [{"state": "growing", "crop": "crop_radish", "ready_in": 12720000}, {"state": "tilled"}]
+	v["fishing"] = {"dex": [{"id": "fish_crucian", "caught": 2}, {"id": "fish_perch", "caught": 0}, {"id": "fish_bass", "caught": 1}]}
+	v["cooking"] = {"cookbook": [{"id": "a", "name": "Grilled Crucian"}, {"id": "b", "name": null}]}
+	var d := P0ProfilePage.profile_data(v)
+	assert_str(str(d.name)).is_equal("Farmer")
+	assert_str(str(d.home_line)).starts_with("Shanghai · Subtropical · Since ")
+	assert_that(d.skills.map(func(s): return [s.key, s.level])).is_equal([["farming", 2], ["fishing", 1], ["cooking", 10]])
+	assert_float(float(d.skills[0].progress)).is_equal_approx(0.4, 0.0001)
+	assert_float(float(d.skills[2].progress)).is_equal(1.0)   # top level: full ring
+	assert_str(str(d.farm.name)).is_equal("Farmer's Homestead")
+	assert_str(str(d.farm.level_line)).is_equal("Level 1")
+	assert_str(str(d.farm.status)).is_equal("Radishes ready 3h 32m")
+	assert_that(d.collections.map(func(c): return [c.name, c.have, c.need])).is_equal([["Fish", 2, 3], ["Pages", 1, 2]])
+	var bare := P0ProfilePage.profile_data({})
+	assert_str(str(bare.name)).is_equal("You")
+	assert_str(str(bare.home_line)).is_equal("")
+	assert_str(str(bare.farm.level_line)).is_equal("")
+
+func test_since_reads_month_day_and_the_year_when_not_this_one() -> void:
+	var oct2 := Time.get_unix_time_from_datetime_dict({year = 2026, month = 10, day = 2, hour = 12}) * 1000.0
+	var now := Time.get_unix_time_from_datetime_dict({year = 2026, month = 10, day = 8, hour = 12}) * 1000.0
+	assert_str(P0ProfilePage.since_text(oct2, now)).is_equal("Oct 2")
+	var later := Time.get_unix_time_from_datetime_dict({year = 2027, month = 1, day = 3, hour = 12}) * 1000.0
+	assert_str(P0ProfilePage.since_text(oct2, later)).is_equal("Oct 2, 2026")
+
+func test_profile_page_emits_back_edit_look_and_skill() -> void:
+	var page := P0ProfilePage.new(_view())
+	var host := Control.new()
+	host.theme = UiKit.theme()
+	host.size = Vector2(360, 800)
+	add_child(auto_free(host))
+	host.add_child(page)
+	await get_tree().process_frame
+	var got := []
+	page.back_pressed.connect(func(): got.append("back"))
+	page.edit_look_pressed.connect(func(): got.append("look"))
+	page.skill_pressed.connect(func(k: String): got.append(k))
+	page.top_bar.back_pressed.emit()
+	(page.find_children("*", "UiNavButton", true, false)[0] as UiNavButton).pressed.emit()
+	(page.find_children("*", "UiSkillCard", true, false)[1] as UiSkillCard).pressed.emit()
+	assert_array(got).is_equal(["back", "look", "fishing"])
+	assert_float(page.top_bar.right_button().modulate.a).is_equal(0.0)   # no Settings page in P0 yet
