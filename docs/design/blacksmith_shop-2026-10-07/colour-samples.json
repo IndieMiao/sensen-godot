@@ -11,15 +11,20 @@
     ]
   },
   {
-    "name": "Right wall gray",
+    "name": "Right wall below lantern (lit)",
     "reference_pixel": [
       1245,
       760
     ],
     "runtime_pixel": [
+      1194,
+      790
+    ],
+    "previous_runtime_pixel": [
       1135,
       850
-    ]
+    ],
+    "correction": "R2 used an unlit wall patch below/left of the lantern against a reference patch directly below the lantern. R2.1 compares the same lit zone; the cold unlit wall is documented separately, not recoloured to pass this sample."
   },
   {
     "name": "Right timber post",

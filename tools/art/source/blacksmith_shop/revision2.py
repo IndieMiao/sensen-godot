@@ -1,8 +1,9 @@
-"""SGODOT-178 R2: accepted 172 sections, gray forge, grouped varied tools."""
+"""SGODOT-178 R2.1: accepted 172 sections, gray forge, grouped varied tools."""
 import math,sys
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'tavern'))
 import takeover as t
+import thermal
 import scene_room_pipeline as p
 from scene_room_pipeline import *
 from shop_room_parts import crate
@@ -60,21 +61,8 @@ def forge():
     for side in (-1,1):
         tube('Vertical hood iron strap',[(side*.80,.11,.733),(side*.25,.79,.29)],.034,'iron_edge',6)
         for y in (.34,.63):ellipsoid('Hood strap rivet',(side*(.80-(y-.11)*.81),y,.733-(y-.11)*.65+.025),(.049,.049,.032),'8F9397',10,6)
-    t.clear('smoke')
-    for i,(x,y,z,s) in enumerate([(0,0,0,.25),(.13,.28,.015,.37),(.38,.55,.04,.43),(.74,.80,.10,.46)]):
-        for j,(dx,dy,dz,r) in enumerate([(0,0,0,1),(.18,.07,.03,.72),(-.14,.03,.08,.70)]):ellipsoid('Drifting irregular smoke group '+str(i),(x+dx,y+dy,z+dz),(s*r,s*r*.81,s*r*.92),['B6B9B8','C1C3C1','CDCECB','D6D7D1'][i],12,8)
-    t.clear('fire');random.seed(178)
-    for i in range(7):
-        x=-.44+i*.145;h=[.31,.52,.69,.48,.62,.40,.30][i]
-        for core in (False,True):
-            verts=[];faces=[];scale=.54 if core else 1
-            for j,(yf,r,lean) in enumerate([(0,.067,0),(.20,.095,-.012),(.46,.067,.023),(.72,.039,-.017),(1,.002,.045)]):
-                for q in range(12):
-                    a=q*math.tau/12;verts.append((x+lean*scale+r*math.cos(a)*scale,yf*h*scale,.02+(.067 if core else 0)+r*math.sin(a)*scale*.58))
-            for j in range(4):
-                for q in range(12):faces.append((j*12+q,j*12+(q+1)%12,(j+1)*12+(q+1)%12,(j+1)*12+q))
-            mesh('Curved luminous core' if core else 'Curved flame tongue',verts,faces,'FFDF63' if core else 'F69B19',smooth=True)
-    for o in p.KITS['fire']['objects']:o['atlas_constant_colour']=True
+    thermal.smoke();thermal.fire()
+
 
 
 def details():
@@ -113,7 +101,7 @@ def details():
 
 
 def revise():
-    p.b.PALETTE.update({'oak':'895B43','oak_light':'AA7553','oak_edge':'6B4939','oak_dark':'3C302B','floor':'A57754','floor_light':'AE805D','floor_shade':'906344','plaster':'766D65','iron':'30353A','iron_edge':'5E666C'})
+    p.b.PALETTE.update({'oak':'895B43','oak_light':'AA7553','oak_edge':'6B4939','oak_dark':'3C302B','floor':'A57754','floor_light':'AE805D','floor_shade':'906344','plaster':'4E565F','iron':'30353A','iron_edge':'5E666C'})
     t.structure(6.4,6.0,3.70)
     # Eliminate the old protruding yellow cap; accepted 172 timber stays reddish brown.
     for name in ('window_wall','back_wall'):
@@ -133,12 +121,14 @@ def revise():
         for j in range(16):faces.append((i*16+j,i*16+(j+1)%16,(i+1)*16+(j+1)%16,(i+1)*16+j))
     mesh('Tapered forged horn',verts,faces,'858C93',smooth=True)
     t.delete('shelf_plant');t.delete('right_shelf_plant')
-    d={};t.add_plant(d,'LeftPothos','pothos',(-2.85,2.49,-.29),.66,90);t.add_plant(d,'RightPothos','pothos',(2.63,2.93,-2.73),.65)
-    d['material_overrides']={'fire':{'emission':'FFA928','emission_use_atlas':True,'emission_energy':3.7},'heated_bar_glow':{'emission':'FFB12E','emission_use_atlas':True,'emission_energy':3.0},'lantern_glow':{'emission':'FFCE80','emission_use_atlas':True,'emission_energy':2.5}}
+    d={'revision':'R2.1'};t.add_plant(d,'LeftPothos','pothos',(-2.85,2.49,-.29),.66,90);t.add_plant(d,'RightPothos','pothos',(2.63,2.93,-2.73),.65)
+    d['material_overrides']={'fire':{'emission':'FF841F','emission_use_atlas':True,'emission_energy':.22,'unshaded':True},'forge_coals':{'emission':'FF6225','emission_use_atlas':True,'emission_energy':.65},'heated_bar_glow':{'emission':'FFB12E','emission_use_atlas':True,'emission_energy':3.0},'lantern_glow':{'emission':'FFCE80','emission_use_atlas':True,'emission_energy':2.5}}
     d['local_lights']=[{'name':'forge_fire','position':[-1.35,2.04,-1.16],'energy':3.1,'range':4.25,'color':'FF8B36','attenuation':1.15},{'name':'lantern','position':[2.66,2.50,-2.47],'energy':.85,'range':1.9,'color':'FFD08A'},{'name':'hot_steel','position':[.31,1.92,1.20],'energy':.50,'range':.85,'color':'FFAB37'}]
     d['lighting']={'background':'D5DAD3','ambient':'B7C7D1','ambient_energy':.37,'sun_color':'E1E7E8','sun_energy':.72,'sun_position':[5,8,4],'sun_target':[0,0,-1],'angular_distance':7,'lamps':[]}
     d['review_lighting']={'ambient':.37,'ambient_color':'B7C7D1','sun':.72,'sun_color':'E1E7E8','sun_position':[5,8,4],'sun_target':[0,0,-1],'points':[]}
-    d['review_views']=[{'name':'forge-fire-detail','position':[3.7,3.7,5.5],'target':[-1.48,1.6,-2.03],'size':3.5},{'name':'tools-bench-detail','position':[5,4,7],'target':[1.15,1.75,-1.0],'size':4.3}]
+    d['review_views']=[{'name':'forge-fire-detail','position':[3.7,3.7,5.5],'target':[-1.48,1.6,-2.03],'size':3.5},{'name':'smoke-detail','position':[4.4,6.7,6.0],'target':[-1.15,4.9,-2.29],'size':2.8},{'name':'tools-bench-detail','position':[5,4,7],'target':[1.15,1.75,-1.0],'size':4.3}]
     entry=t.bounds(d,6.4,6,entrance_x=-.95);y=.082;d['spawn']=[-.95,y,2.72]
     d['bench']={'floor_y':y,'route':[{'name':n,'position':[x,y,z],**({'capture':c} if c else {})} for n,x,z,c in [('entry',-.95,2.72,'door'),('left_front',-1.55,2.4,None),('left_bench',-1.48,.57,None),('forge_safe',-1.3,-.72,'main'),('water_side',-1.58,1.29,None),('front',-1.02,2.32,None),('bench_right',1.64,2.28,None),('stump_front',1.77,.28,None),('rear_bench',.45,-1.30,None)]],'blocked':[{'name':n,'from':[a[0],y,a[1]],'to':[b[0],y,b[1]],'target':target} for n,a,b,target in [('mainbench',(-1.55,1.25),(.15,1.25),'/anvil_workbench/'),('furnace',(-1.40,-.75),(-1.40,-2.2),'/brick_forge/'),('water',(-1.55,1.35),(-2.52,1.35),'/quench_barrel/'),('stump',(1.64,-.52),(2.39,-.52),'/stump/'),('smallbench',(1.50,-1.24),(1.5,-1.99),'/back_tool_bench/')]],'gaps':[{'name':'forge_to_mainbench','from':[-1.6,y,-.2],'to':[.7,y,-.2],'measure':[[-.8,.55,-1.48],[-.8,.55,.705]],'width':2.185,'minimum':.80}],'entrance':entry,'slide':{'from':[2.98,y,2.05],'direction':[1,0,-1],'tangent':[0,0,-1],'seconds':.4},'input_start':[-1.30,y,.10],'scale':{'door':{'applicable':False,'reason':'Open-front workshop; no human doorway asset.'},'counter':{'height':1.045,'source':'Main workbench serves as work counter'},'table':{'height':1.045,'source':'Main workbench .97+.075'},'chair':{'height':.66,'source':'Stool (.50+.06)*1.18'}}}
     t.finish(d,[(86,1114),(734,1455),(1394,1117)],(1489,1499),(6.8,6.4))
+
+    if '--geometry-only' not in sys.argv:thermal.export_fire()

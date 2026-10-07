@@ -769,6 +769,7 @@
     ],
     "points": []
   },
+  "revision": "R2.1",
   "shared_plants": [
     {
       "name": "LeftPothos",
@@ -815,9 +816,15 @@
   ],
   "material_overrides": {
     "fire": {
-      "emission": "FFA928",
+      "emission": "FF841F",
       "emission_use_atlas": true,
-      "emission_energy": 3.7
+      "emission_energy": 0.22,
+      "unshaded": true
+    },
+    "forge_coals": {
+      "emission": "FF6225",
+      "emission_use_atlas": true,
+      "emission_energy": 0.65
     },
     "heated_bar_glow": {
       "emission": "FFB12E",
@@ -899,6 +906,20 @@
         -2.03
       ],
       "size": 3.5
+    },
+    {
+      "name": "smoke-detail",
+      "position": [
+        4.4,
+        6.7,
+        6.0
+      ],
+      "target": [
+        -1.15,
+        4.9,
+        -2.29
+      ],
+      "size": 2.8
     },
     {
       "name": "tools-bench-detail",
@@ -1290,7 +1311,6 @@
     },
     "limitation": "Rounded plinth endpoints are estimated edge intersections; concept is not a calibrated physical camera."
   },
-  "revision": "R2",
   "botanical_assets": [],
   "render_batches": [
     {
@@ -1324,7 +1344,6 @@
         "back_wall",
         "forge_hood",
         "smoke",
-        "forge_coals",
         "forge_sign",
         "hammer_wall",
         "tongs_wall",
@@ -1346,7 +1365,7 @@
         "wall_tong_4",
         "wall_tong_5"
       ],
-      "triangles": 19474,
+      "triangles": 25514,
       "cast_shadow": true
     },
     {

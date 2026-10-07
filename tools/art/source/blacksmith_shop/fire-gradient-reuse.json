@@ -1,0 +1,7 @@
+{
+  "source": "assets/rooms/standard_room_5/fire_gradient.png",
+  "source_sha256": "349870df4e628410dc128999d57558a6654b17e5ef4d5a2cabc06db6b8e89f5b",
+  "copied_to": "assets/rooms/blacksmith_shop/fire_gradient.png",
+  "source_read_only": true,
+  "uv": "FireHeightUV, each tongue base 0 / tip 1"
+}
