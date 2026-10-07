@@ -172,6 +172,10 @@ func _on_state(v: Dictionary, events: Array) -> void:
 					ui.float_text("+%d %s" % [int(ev.delta), P0Logic.item_name(v, iid)], at + Vector2(0, dy), Color("4f934b"))
 			"coins":
 				ui.float_text("%+d coins" % int(ev.delta), at + Vector2(0, dy), Color("c9962a"))
+			"parcel":
+				# LOCK-14: a passive reward that did not fit the bag waits in the Inbox (the bell shows the count).
+				var what := "%s ×%d" % [P0Logic.item_name(v, str(ev.id)), int(ev.qty)]
+				ui.toast(("Inbox full · %s saved for later" if bool(ev.get("waiting", false)) else "Bag full · %s sent to Inbox · 24h") % what, 2.0)
 			"catch":
 				# A world that shows the catch itself (the open fishing panel) returns true.
 				if not bool(_call("p0_event", [ev, v])): _on_catch(ev, xp_lines)
@@ -247,7 +251,9 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 		"no_coins":
 			ui.toast("Need %d more coins" % int(detail.get("need", 0)))
 		"bag_full":
-			ui.toast("Bag full · free a slot first")
+			ui.toast("Make room · 1 slot" if str(cmd.get("type", "")).begins_with("claim_parcel") else "Bag full · free a slot first")
+		"parcel_expired", "bad_parcel":
+			ui.toast("This parcel is no longer waiting")
 		"rest_used":
 			ui.toast("Rest used today")
 		"energy_full":

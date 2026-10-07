@@ -86,3 +86,11 @@ func test_today_panel_orders_now_then_countdown_then_skill() -> void:
 	v["skills"] = {"farming": {"level": 1, "xp": 20, "next": 50}, "fishing": {"level": 1, "xp": 60, "next": 70}}
 	v.plots = [{"state": "growing", "crop": "crop_radish", "ready_in": 4320000}, {"state": "sown", "crop": "crop_carrot"}]
 	assert_that(P0Logic.today_lines(v)).is_equal(["Water 1 sown plot · Free", "Radishes ready in 1h 12m", "Fishing Lv2 in 10 XP"])
+
+func test_parcel_countdowns_run_between_responses() -> void:
+	var v := _view()
+	v["inbox"] = {"badge": 1, "parcels": [{"key": "level:fishing:2:0", "id": "bait_worm", "qty": 3, "left": 60000}]}
+	var later := P0Logic.project(v, 45000)
+	assert_float(float(later.inbox.parcels[0].left)).is_equal(15000.0)
+	assert_float(float(P0Logic.project(v, 90000).inbox.parcels[0].left)).is_equal(0.0)
+	assert_float(float(v.inbox.parcels[0].left)).is_equal(60000.0)

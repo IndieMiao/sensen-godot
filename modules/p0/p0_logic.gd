@@ -262,6 +262,8 @@ static func project(view: Dictionary, elapsed_ms: float) -> Dictionary:
 		stove["ready_in"] = maxf(0.0, float(stove.get("ready_in", 0)) - elapsed_ms)
 	var cast = v.get("fishing", {}).get("cast", null)
 	if cast is Dictionary: cast["bite_in"] = maxf(0.0, float(cast.get("bite_in", 0)) - elapsed_ms)
+	for parcel in v.get("inbox", {}).get("parcels", []):
+		parcel["left"] = maxf(0.0, float(parcel.get("left", 0)) - elapsed_ms)
 	return v
 
 # ---------------------------------------------------------------- M2: fishing, cooking, eating
