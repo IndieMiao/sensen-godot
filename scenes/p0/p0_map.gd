@@ -343,6 +343,11 @@ func p0_dev(step: PackedStringArray) -> bool:
 			if step[0] == "pondfish": _open_pond_fish(e)
 		"shop":
 			if city_map: city_map.select(P0Outposts.place_entry(P0Outposts.by_role(step[1] if step.size() > 1 else "tackle")))
+		"listpick":   # as a tap on the place list: select the outpost and fly the camera to it
+			var e := P0Outposts.place_entry(P0Outposts.by_role(step[1] if step.size() > 1 else "post"))
+			if city_map:
+				city_map.select(e)
+				city_map.focus_requested.emit(e)
 		"outpost": _open_outpost(step[1])
 		"enter":
 			if city_map: city_map._on_info_action()
