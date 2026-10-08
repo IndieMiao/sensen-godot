@@ -66,10 +66,11 @@ static func rule_line(view: Dictionary) -> String:
 	if waiting > 0: head += " · %d more waiting" % waiting
 	return head + " · Kept 24h · Claim needs a free slot"
 
-## Under the rows (PARCEL-1 / -3): what happens to what is left unclaimed.
-static func expiry_note(view: Dictionary) -> String:
-	var gifts := parcels(view).any(func(p): return p.get("gift", null) != null)
-	return "Not claimed in 24h: sellable items turn into coins at 80% · " + ("gifts go back to the sender" if gifts else "the rest is lost")
+## Under the rows (PARCEL-1 / -3, q(81)): what happens to what is left unclaimed — one fixed line whatever the list
+## holds, with no `in 24h` (a resident's gift meal goes back at 4:00; each row says its own time).
+const EXPIRY_NOTE := "If not claimed: sellable items turn into coins at 80% · gifts go back · the rest is lost"
+
+static func expiry_note(_view: Dictionary) -> String: return EXPIRY_NOTE
 
 ## `42m left` under an hour, `23h 40m left` from one hour, `22h left` on the hour.
 static func left_text(ms: float) -> String:

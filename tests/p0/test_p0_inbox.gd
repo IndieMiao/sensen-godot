@@ -46,6 +46,8 @@ func test_the_parcels_page_head_rule_and_note() -> void:
 	assert_str(P0Inbox.left_text(2_520_000.0)).is_equal("42m left")
 	assert_str(P0Inbox.left_text(85_200_000.0)).is_equal("23h 40m left")
 	assert_str(P0Inbox.left_text(79_200_000.0)).is_equal("22h left")
+	# one fixed line whatever the list holds (q(81))
+	assert_str(P0Inbox.expiry_note(_view(6, 3))).is_equal("If not claimed: sellable items turn into coins at 80% · gifts go back · the rest is lost")
 
 func test_rows_go_soonest_first_with_name_source_and_time() -> void:
 	var rows := P0Inbox.parcel_rows(_view(6, 3))

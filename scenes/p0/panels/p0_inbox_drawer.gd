@@ -140,7 +140,7 @@ func _build(model: Dictionary) -> void:
 				row.claim_pressed.connect(func(k: String): claim_requested.emit({"type": "claim_parcel", "key": k}, row.claim))
 				_page.add_child(row)
 				rows.append(row)
-			_page.add_child(_wrapped(str(model.note), UiTokens.STYLE_C11_B))
+			if not (model.rows as Array).is_empty(): _page.add_child(_wrapped(str(model.note), UiTokens.STYLE_C11_B))   # q(81): with parcels only
 			var c: Dictionary = model.claim
 			if not c.is_empty():
 				claim_all.label = str(c.label)
