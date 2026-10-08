@@ -13,6 +13,7 @@ p0_v1.py — P0 子集的七日账本复跑（审计 V1，2026-10-08，李白）
 用法：
   python3 p0_v1.py                 # 全部情形，7 天 × 6 seed，输出 Markdown 到 stdout
   python3 p0_v1.py --days 14 --seeds 6
+  python3 p0_v1.py --v2 --seeds 30  # 只跑 D：与蒙恬 V2 真实规则回放对齐的经济基线（q(54)）
 """
 import argparse, copy, os, statistics, sys
 from collections import Counter
@@ -28,7 +29,7 @@ P0_DISHES = ['grilled_crucian', 'grilled_fish', 'radish_salad', 'veggie_plate', 
              'bass_tomato_stew', 'smoked_trout', 'fisher_stew']
 
 
-def p0_config(plots=30):
+def p0_config(plots=30, quartz_to_salt=False):
     cfg = S.base_config()
     cfg['crops'] = {k: v for k, v in cfg['crops'].items() if k in P0_CROPS}
     cfg['perennials'] = {}
@@ -47,7 +48,10 @@ def p0_config(plots=30):
     cfg['tags'] = tags
     cfg['gather'] = {k: v for k, v in cfg['gather'].items() if k != 'hardwood'}
     e, mins, out = cfg['mine']['A']
-    cfg['mine'] = {'A': (e, mins, {k: v for k, v in out.items() if k != 'quartz'})}
+    ores = {k: v for k, v in out.items() if k != 'quartz'}
+    if quartz_to_salt:  # 旋钮 A（q(47)）：P0 第 2 层的石英并入岩盐
+        ores['rock_salt'] = ores.get('rock_salt', 0) + out.get('quartz', 0)
+    cfg['mine'] = {'A': (e, mins, ores)}
     cfg['plot_cap'] = lambda hs, n=plots: n
     cfg['p0_hs_cap'] = 3
     cfg['cook_levelup_energy'] = False
@@ -110,6 +114,34 @@ class P0Player(S.Player):
         if self.hs >= self.cfg.get('p0_hs_cap', 10):
             return
         return super().try_upgrade()
+
+    # —— V2 对齐（q(54)）：按蒙恬 server/tools/p0_week.ts 的机器人打法卖与买 ——
+    def sell(self):
+        if not self.a.get('v2align'):
+            return super().sell()
+        fk, ck = dict(S.FISH_KEEP), dict(S.CROP_KEEP)
+        S.FISH_KEEP.update({k: 2 for k in fk})          # 每种鱼留 2 条做菜，其余卖
+        S.CROP_KEEP.update({k: 3 for k in list(ck) + list(self.cfg['crops'])})   # 每种作物留 3 个
+        try:
+            return super().sell()
+        finally:
+            S.FISH_KEEP.clear(); S.FISH_KEEP.update(fk)
+            S.CROP_KEEP.clear(); S.CROP_KEEP.update(ck)
+
+    def purchases(self):
+        if not self.a.get('v2align'):
+            return super().purchases()
+        # 蚯蚓：每天只在早场结束时补到 10 条（晚场 25 竿里前 10 竿挂饵），不再每场补到 2 倍
+        lv, price, stock = self.cfg['bait_price']['worm']
+        if (self.t % 1440) < 12 * 60 and self.level('fishing') >= lv:
+            n = max(0, min(10 - self.inv['worm'], stock - self.bait_bought_today['worm']))
+            if n > 0 and self.wallet - n * price >= self.cfg['wallet_floor'] + 60:
+                self.pay(n * price, 'bait'); self.inv['worm'] += n; self.bait_bought_today['worm'] += n
+        saved = self.a['worms']; self.a['worms'] = 0
+        try:
+            return super().purchases()
+        finally:
+            self.a['worms'] = saved
 
     def can_make(self, d):
         if self.hs >= self.cfg.get('p0_hs_cap', 10):
@@ -183,15 +215,20 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--days', type=int, default=7)
     ap.add_argument('--seeds', type=int, default=6)
+    ap.add_argument('--v2', action='store_true', help='只跑 D：V2 对齐的经济基线')
     args = ap.parse_args()
     D, N = args.days, args.seeds
     archs = ['P0T', 'P5', 'P30C', 'HEAVY']
-    scens = [
+    if args.v2:
+        scens = [scenario('D · V2 对齐：旋钮 A（第 2 层石英并入岩盐）+ 机器人打法（每种鱼留 2、作物留 3，其余卖；每天补 10 条蚯蚓）',
+                          lambda: p0_config(30, quartz_to_salt=True), ['P0T'], N, D, mutate=lambda a: a.update(v2align=True))]
+    else:
+        scens = [
         scenario('A · 基准：30 格田 + 材料链（采集 + 矿洞 1–2 层）', lambda: p0_config(30), archs, N, D),
         scenario('B · 对照：40 格田 + 材料链', lambda: p0_config(40), archs, N, D),
         scenario('C · 对照：30 格田、没有材料链（无采集、无矿洞）', lambda: p0_config(30), archs, N, D,
                  mutate=lambda a: a.update(gather=False, mine=None)),
-    ]
+        ]
     target = dict(daily=[115, 195, 218, 210, 238, 220, 238], xp_farm=750, xp_fish=1130, xp_cook=660, wallet=274)
     print(f'# P0 子集七日账本复跑（V1）· {D} 天 × {N} seed\n')
     print('§14.6 目标玩家（全量规则推演）：体力 115 / 195 / 218 / 210 / 238 / 220 / 238，合计 1,434；第 7 天 Farming 750（Lv6）、Fishing 1,130（Lv5）、Cooking 660（Lv6）、钱包约 274、Homestead Lv2 在第 5 天、Cooking Lv4 在第 4 天、首道 3 槽菜第 4 天。\n')

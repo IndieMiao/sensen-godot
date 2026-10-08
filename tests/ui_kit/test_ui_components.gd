@@ -99,12 +99,27 @@ func test_zero_quick_slot_dims_the_icon_and_greys_the_count() -> void:
 	var count: Label = _visible_named(c, "Label").filter(func(l): return (l as Label).text == "×0")[0]
 	assert_str(count.get_theme_color(&"font_color").to_html()).is_equal(UiTokens.COLOR_SECONDARY.to_html())
 
+func test_ghost_quick_slot_is_dashed_with_a_dimmed_icon_and_a_grey_family_name() -> void:
+	var c := _quick({state = UiItemCell.State.GHOST, title = "Seeds", quantity = "×5", pinned = true})
+	await _settle()
+	var icon: TextureRect = _visible_named(c, "TextureRect").filter(func(t): return (t as TextureRect).texture != UiItemCell.PIN_GLYPH)[0]
+	assert_float(icon.modulate.a).is_equal_approx(UiTokens.OPACITY_ZERO_ICON, 0.001)
+	var labels := _visible_named(c, "Label")
+	assert_array(labels.map(func(l): return (l as Label).text)).contains_exactly(["Seeds"])   # no count
+	assert_str((labels[0] as Label).get_theme_color(&"font_color").to_html()).is_equal(UiTokens.COLOR_SECONDARY.to_html())
+	assert_bool(_visible_named(c, "TextureRect").any(func(t): return (t as TextureRect).texture == UiItemCell.PIN_GLYPH)).is_false()
+	var box := _surface(c).get_theme_stylebox(&"panel") as UiStyleBox
+	assert_bool(box.dashed).is_true()
+	assert_float(box.dash).is_equal(float(UiTokens.DASH_QUICK[0]))
+
 func test_quick_only_states_fall_back_to_default_on_other_mains() -> void:
 	for d in [UiItemCell.Density.INVENTORY, UiItemCell.Density.KITCHEN, UiItemCell.Density.GEAR]:
 		var c: UiItemCell = auto_free(UiItemCell.new(d))
 		for s in [UiItemCell.State.LIFTED, UiItemCell.State.DROP_TARGET, UiItemCell.State.ZERO]:
 			c.state = s
 			assert_int(c.drawn_state()).is_equal(UiItemCell.State.DEFAULT)
+		c.state = UiItemCell.State.GHOST
+		assert_int(c.drawn_state()).is_equal(UiItemCell.State.EMPTY)
 
 func test_inventory_cell_quantity_pill_and_rarity_dot() -> void:
 	var c: UiItemCell = _host(UiItemCell.new(UiItemCell.Density.INVENTORY))
@@ -221,7 +236,16 @@ func test_vertical_drag_in_a_touch_scroll_is_not_a_tap() -> void:
 	# Real GUI routing: events pushed into the viewport reach the cell inside a TouchScrollContainer.
 	var scroll := TouchScrollContainer.new()
 	scroll.custom_minimum_size = Vector2(360, 120)
-	_host(scroll)
+	# On the top canvas layer: an earlier suite can leave a scene in the tree (tests/scenes leaks a MapPoc whose
+	# HUD would take the press), and this case needs the real GUI routing.
+	var top := CanvasLayer.new()
+	top.layer = 128
+	add_child(auto_free(top))
+	var host := Control.new()
+	host.theme = UiKit.theme()
+	host.size = Vector2(360, 800)
+	top.add_child(host)
+	host.add_child(scroll)
 	var col := VBoxContainer.new()
 	scroll.add_child(col)
 	var cells: Array[UiItemCell] = []
@@ -230,7 +254,7 @@ func test_vertical_drag_in_a_touch_scroll_is_not_a_tap() -> void:
 		col.add_child(c)
 		cells.append(c)
 	await _settle()
-	var c := cells[0]
+	var c := cells[1]   # not the first cell: a window-coordinate mix-up would land on another one
 	assert_int(c.mouse_filter).is_equal(Control.MOUSE_FILTER_PASS)
 	var taps := [0]
 	var kinds := []
@@ -250,7 +274,8 @@ func test_vertical_drag_in_a_touch_scroll_is_not_a_tap() -> void:
 	assert_int(taps[0]).is_equal(1)
 	assert_array(kinds).contains(["cancel"])
 
-func _push(e: InputEvent) -> void: get_viewport().push_input(e)
+## Viewport coordinates: the test window is 720×1280 over a 360×640 viewport, so window coordinates would be halved.
+func _push(e: InputEvent) -> void: get_viewport().push_input(e, true)
 
 func _press(pos: Vector2, down: bool) -> InputEvent:
 	if DisplayServer.is_touchscreen_available():
@@ -426,11 +451,27 @@ func test_empty_state_navigation_row_is_optional() -> void:
 	(nav[0] as Button).pressed.emit()
 	assert_array(hits).is_equal([true])
 
+func test_empty_state_follows_the_panel_and_row_mains() -> void:
+	# EmptyState 1234:87237: Panel = icon in a 56 grey disc + Bold 14 line; Row = 20 icon + Bold 13 line.
+	var panel: UiEmptyState = _host(UiEmptyState.new("Your bag is empty", load("res://assets/p0/icons/bag.svg")))
+	var row: UiEmptyState = _host(UiEmptyState.new("No open requests · next in 3h 12m", load("res://assets/p0/icons/board.svg"), "", UiEmptyState.Kind.ROW))
+	await _settle()
+	var disc: Panel = panel.find_children("*", "Panel", true, false)[0]
+	assert_vector(disc.size).is_equal(Vector2(UiTokens.SIZE_EMPTY_DISC, UiTokens.SIZE_EMPTY_DISC))
+	assert_str((disc.get_theme_stylebox(&"panel") as UiStyleBox).bg_color.to_html()).is_equal(UiTokens.COLOR_DISABLED.to_html())
+	var icon: TextureRect = disc.get_child(0)
+	assert_float(icon.size.x).is_equal(float(UiTokens.SIZE_EMPTY_ICON))
+	assert_float(icon.modulate.a).is_equal_approx(UiTokens.OPACITY_EMPTY_ICON, 0.001)
+	var line: Label = row.find_children("*", "Label", true, false)[0]
+	assert_str(String(line.theme_type_variation)).is_equal(String(UiTokens.STYLE_C13_B))
+	var row_icon: TextureRect = row.find_children("*", "TextureRect", true, false)[0]
+	assert_float(row_icon.size.x).is_equal(float(UiTokens.SIZE_EMPTY_ROW_ICON))
+
 func test_badge_hugs_its_text() -> void:
 	var b: UiBadge = _host(UiBadge.new("Ready"))
 	await _settle()
 	assert_float(b.size.y).is_equal(float(UiTokens.SIZE_STATE_BADGE_H))
-	assert_float(b.size.x).is_less(UiTokens.SIZE_TOAST_W * 0.5)
+	assert_float(b.size.x).is_less((360.0 - UiTokens.SPACE_PAGE * 2.0) * 0.5)
 
 func test_every_gallery_section_fits_the_328_column() -> void:
 	# Registry contract (gallery_sections.gd): a wider section would widen the whole gallery column and

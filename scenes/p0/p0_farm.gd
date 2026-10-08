@@ -36,6 +36,7 @@ var _mine := Vector3.ZERO
 var _focus := Vector3.ZERO
 var _cam_follow := P0Follow.new()
 var _zoom := 1.0
+var _pinch = preload("res://modules/p0/p0_elastic_zoom.gd").new(0.8, 1.4)   # rubber band past 0.8 / 1.4
 var _dev_yaw := -1.0
 var _hold_until := 0.0
 var _front: Dictionary = {}
@@ -61,6 +62,12 @@ func _ready() -> void:
 
 func _exit_tree() -> void:
 	if rt: rt.detach(self)
+
+## Android Back: the UI's top layer (PinMenu, radial, a card or drawer) closes first, one per press; with nothing
+## open, back to the map: AppRouter pops a farm stacked on the map, a farm that is the root scene leaves by itself
+## (int5 hand test 012–013 / 023–024, int5b test 2; rooms do the same, p0_room).
+func is_back_navigation_locked() -> bool:
+	return rt != null and (rt.ui.close_top_layer() or rt.root_back())
 
 ## AppRouter stacking: the map below us hands back its camera and environment on resume.
 func suspend() -> void:
@@ -196,15 +203,21 @@ func _place_camera() -> void:
 
 func _follow(dt: float) -> void:
 	_focus = _cam_follow.step(cam, _focus, actor.position, actor.mover.is_moving(), dt)
+	if _pinch.step(dt): _zoom = _pinch.value   # springing back from past a limit
 	_place_camera()
 
-func p0_zoom(f: float) -> void: _zoom = clampf(_zoom / f, 0.8, 1.4)
+func p0_zoom(f: float) -> void:
+	_pinch.pinch(f)
+	_zoom = _pinch.value
+func p0_zoom_end() -> void: _pinch.release()
 func p0_recenter() -> void:
 	_focus = actor.position
 	_cam_follow.held = false
 
 func p0_show_spot(where: String) -> void:
 	var at := _house if where in ["stove", "bench", "home"] else actor.position
+	if where == "stall": at = _stall
+	elif where == "plots": at = _plots_center()
 	_focus = at
 	_cam_follow.hold()
 	var ring := MeshInstance3D.new()
@@ -231,6 +244,7 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 	actor.step(dt)
 	_door_check()
 	_follow(dt)
+	rt.ui.player_screen = cam.unproject_position(actor.position + Vector3(0, 0.9, 0))   # the radial fans out from here
 	_sync_plots(v, dt)
 	_pick_front(v)
 	rt.ui.set_action(P0Logic.main_action(v, _front, rt.ui.selected_seed, _row))
@@ -251,6 +265,12 @@ func _sync_plots(v: Dictionary, dt: float) -> void:
 	for p in v.get("plots", []):
 		var id := int(p.get("id", -1))
 		if id >= 0 and id < P0Garden.plot_count(): beds.multimesh.set_instance_color(id, P0Garden.bed_tint(str(p.get("state", ""))))
+
+## Middle of the plot beds, for camera-only "Show" from the Today panel and NeedSource (LOCK-08).
+func _plots_center() -> Vector3:
+	var sum := Vector3.ZERO
+	for id in P0Garden.plot_count(): sum += bp.cell_to_world(P0Garden.cell_of(id))
+	return sum / maxf(1.0, float(P0Garden.plot_count()))
 
 ## The bed the player faces from the walkway: nearest bed ahead within reach.
 func _pick_front(v: Dictionary) -> void:
@@ -320,30 +340,39 @@ func _hold_repeat() -> void:
 	if not a.get("enabled", false) or cmd.is_empty() or str(cmd.get("type", "")) == "energy_card": return
 	if rt.ui.fab_verb == "": rt.ui.fab_verb = str(a.get("verb", ""))
 	if str(a.get("verb", "")) != rt.ui.fab_verb: return
+	rt.holding_repeat = true   # the observation log's "hold" (S7); the first press went out as a tap
 	p0_action(cmd)
+	rt.holding_repeat = false
 
-## Facilities respond to taps only (§10.2.2): the stall opens its drawer directly (unattended, p(6)),
-## the farmhouse (Kitchen / Rest), the mine.
+## Facilities respond to taps only (§10.2.2): the stall opens its drawer directly (unattended, p(6)), the farmhouse
+## takes the player in (its kitchen is inside since SGODOT-226; the door card is gone, int5 hand test 37), the mine.
 func p0_tap(screen: Vector2) -> void:
 	if rt.ui.has_modal(): return
 	if cam.unproject_position(_stall + Vector3(0, 0.4, 0)).distance_to(screen) < 56:
 		actor.face(_stall)
 		rt.ui.open_stall()
 	elif cam.unproject_position(_house + Vector3(0, 1.0, 0.6)).distance_to(screen) < 80:
-		rt.ui.open_home_card()
+		actor.face(_door)
+		enter_farmhouse()
 	elif cam.unproject_position(_mine + Vector3(0, 0.8, 0)).distance_to(screen) < 60:
 		rt.ui.toast("The mine opens soon")
 
+## Facility marks (STATE-ICONS) show over the stall; finger cards appear when you walk up (LOCK-07 / LOCK-17).
+## Tapping the card is tapping the facility, so it reuses p0_tap's own hit points.
 func _tags(v: Dictionary) -> void:
-	var near_stall := actor.position.distance_to(_stall) < 3.2
-	var note := ""
+	var stall_top := cam.unproject_position(_stall + Vector3(0, 1.05, 0))
+	var request := -1
 	for r in v.get("stall", {}).get("board", {}).get("requests", []):
-		if str(r.status) == "open" or (str(r.status) == "accepted" and int(r.have) >= int(r.qty)): note = " · !"
-	rt.ui.tag("stall", "Homestead Stall · Tap to shop" + note, cam.unproject_position(_stall + Vector3(0, 1.05, 0)), near_stall or note != "", true)
-	var st = v.get("cooking", {}).get("stove", null)
-	var home := "Home · Kitchen · Rest"
-	if st != null: home = "Home · Dish ready" if float(st.get("ready_in", 0)) <= 0.0 else "Home · Cooking " + P0Logic.duration(float(st.get("ready_in", 0)))
-	rt.ui.tag("home", home, cam.unproject_position(_house + Vector3(0, 2.6, 0.4)), actor.position.distance_to(_house) < 4.2 or st != null, st != null)
+		if str(r.status) == "accepted" and int(r.have) >= int(r.qty): request = UiStatusBadge.State.DELIVERABLE
+		elif str(r.status) == "open" and request < 0: request = UiStatusBadge.State.REQUEST
+	rt.ui.badge("stall", maxi(request, 0), stall_top, request >= 0)
+	rt.ui.tag("stall", "Tap to shop", stall_top - Vector2(0, rt.ui.badge_height("stall")),
+		actor.position.distance_to(_stall) < 3.2, cam.unproject_position(_stall + Vector3(0, 0.4, 0)))
+	# The farmhouse carries no state badge (不知火舞 on SGODOT-221): the stove's state belongs to the stove inside,
+	# and Today already names the dish and its time. Tapping it goes in (the door card is gone; Rest is the bench,
+	# SGODOT-224).
+	rt.ui.tag("home", "Farmhouse · Tap to go in", cam.unproject_position(_house + Vector3(0, 2.6, 0.4)),
+		actor.position.distance_to(_house) < 4.2, cam.unproject_position(_house + Vector3(0, 1.0, 0.6)))
 
 func _teaching(v: Dictionary) -> void:
 	if rt.ui.has_modal(): return

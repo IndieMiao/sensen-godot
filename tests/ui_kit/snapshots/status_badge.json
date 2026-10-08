@@ -1,0 +1,1095 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    308
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiStatusBadge"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        18
+      ],
+      "variation": "CaptionR12",
+      "text": "StatusBadge 1132:79554 · LOCK-11"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        52,
+        328,
+        256
+      ],
+      "children": [
+        {
+          "type": "HFlowContainer",
+          "rect": [
+            0,
+            52,
+            328,
+            188
+          ],
+          "children": [
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                0,
+                52,
+                38,
+                68
+              ],
+              "children": [
+                {
+                  "type": "UiStatusBadge",
+                  "rect": [
+                    5,
+                    52,
+                    28,
+                    28
+                  ],
+                  "children": [
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        5,
+                        52,
+                        28,
+                        28
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            11,
+                            58,
+                            17,
+                            17
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    0,
+                    86,
+                    38,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "available"
+                }
+              ]
+            },
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                50,
+                52,
+                28,
+                68
+              ],
+              "children": [
+                {
+                  "type": "UiStatusBadge",
+                  "rect": [
+                    50,
+                    52,
+                    28,
+                    28
+                  ],
+                  "children": [
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        50,
+                        52,
+                        28,
+                        28
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            56,
+                            58,
+                            17,
+                            17
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    50,
+                    86,
+                    28,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "ready"
+                }
+              ]
+            },
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                90,
+                52,
+                53,
+                68
+              ],
+              "children": [
+                {
+                  "type": "UiStatusBadge",
+                  "rect": [
+                    90,
+                    52,
+                    53,
+                    48
+                  ],
+                  "children": [
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        103,
+                        52,
+                        28,
+                        28
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            108,
+                            58,
+                            17,
+                            17
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "PanelContainer",
+                      "rect": [
+                        90,
+                        82,
+                        53,
+                        18
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            97,
+                            83,
+                            39,
+                            16
+                          ],
+                          "variation": "C11B",
+                          "text": "1h 12m"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    90,
+                    106,
+                    53,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "countdown"
+                }
+              ]
+            },
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                155,
+                52,
+                31,
+                68
+              ],
+              "children": [
+                {
+                  "type": "UiStatusBadge",
+                  "rect": [
+                    156,
+                    52,
+                    28,
+                    28
+                  ],
+                  "children": [
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        156,
+                        52,
+                        28,
+                        28
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            162,
+                            58,
+                            17,
+                            17
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    155,
+                    86,
+                    31,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "cooling"
+                }
+              ]
+            },
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                198,
+                52,
+                46,
+                68
+              ],
+              "children": [
+                {
+                  "type": "UiStatusBadge",
+                  "rect": [
+                    207,
+                    52,
+                    28,
+                    28
+                  ],
+                  "children": [
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        207,
+                        52,
+                        28,
+                        28
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            213,
+                            58,
+                            17,
+                            17
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    198,
+                    86,
+                    46,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "used today"
+                }
+              ]
+            },
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                256,
+                52,
+                28,
+                68
+              ],
+              "children": [
+                {
+                  "type": "UiStatusBadge",
+                  "rect": [
+                    256,
+                    52,
+                    28,
+                    28
+                  ],
+                  "children": [
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        256,
+                        52,
+                        28,
+                        28
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            262,
+                            58,
+                            17,
+                            17
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    256,
+                    86,
+                    28,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "locked"
+                }
+              ]
+            },
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                0,
+                132,
+                46,
+                48
+              ],
+              "children": [
+                {
+                  "type": "UiStatusBadge",
+                  "rect": [
+                    9,
+                    132,
+                    28,
+                    28
+                  ],
+                  "children": [
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        9,
+                        132,
+                        28,
+                        28
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            15,
+                            138,
+                            17,
+                            17
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    0,
+                    166,
+                    46,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "insufficient"
+                }
+              ]
+            },
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                58,
+                132,
+                28,
+                48
+              ],
+              "children": [
+                {
+                  "type": "UiStatusBadge",
+                  "rect": [
+                    58,
+                    132,
+                    28,
+                    28
+                  ],
+                  "children": [
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        58,
+                        132,
+                        28,
+                        28
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            64,
+                            138,
+                            17,
+                            17
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    58,
+                    166,
+                    28,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "full"
+                }
+              ]
+            },
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                98,
+                132,
+                28,
+                48
+              ],
+              "children": [
+                {
+                  "type": "UiStatusBadge",
+                  "rect": [
+                    98,
+                    132,
+                    28,
+                    28
+                  ],
+                  "children": [
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        98,
+                        132,
+                        28,
+                        28
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            104,
+                            138,
+                            17,
+                            17
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    98,
+                    166,
+                    28,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "new"
+                }
+              ]
+            },
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                138,
+                132,
+                32,
+                48
+              ],
+              "children": [
+                {
+                  "type": "UiStatusBadge",
+                  "rect": [
+                    140,
+                    132,
+                    28,
+                    28
+                  ],
+                  "children": [
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        140,
+                        132,
+                        28,
+                        28
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            146,
+                            138,
+                            17,
+                            17
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    138,
+                    166,
+                    32,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "request"
+                }
+              ]
+            },
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                182,
+                132,
+                47,
+                48
+              ],
+              "children": [
+                {
+                  "type": "UiStatusBadge",
+                  "rect": [
+                    191,
+                    132,
+                    28,
+                    28
+                  ],
+                  "children": [
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        191,
+                        132,
+                        28,
+                        28
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            197,
+                            138,
+                            17,
+                            17
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    182,
+                    166,
+                    47,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "deliverable"
+                }
+              ]
+            },
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                241,
+                132,
+                28,
+                48
+              ],
+              "children": [
+                {
+                  "type": "UiStatusBadge",
+                  "rect": [
+                    241,
+                    132,
+                    28,
+                    28
+                  ],
+                  "children": [
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        241,
+                        132,
+                        28,
+                        28
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            247,
+                            138,
+                            17,
+                            17
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    241,
+                    166,
+                    28,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "event"
+                }
+              ]
+            },
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                281,
+                132,
+                28,
+                48
+              ],
+              "children": [
+                {
+                  "type": "UiStatusBadge",
+                  "rect": [
+                    281,
+                    132,
+                    28,
+                    28
+                  ],
+                  "children": [
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        281,
+                        132,
+                        28,
+                        28
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            287,
+                            138,
+                            17,
+                            17
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    281,
+                    166,
+                    28,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "gift"
+                }
+              ]
+            },
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                0,
+                192,
+                33,
+                48
+              ],
+              "children": [
+                {
+                  "type": "UiStatusBadge",
+                  "rect": [
+                    2,
+                    192,
+                    28,
+                    28
+                  ],
+                  "children": [
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        2,
+                        192,
+                        28,
+                        28
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            8,
+                            198,
+                            17,
+                            17
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    0,
+                    226,
+                    33,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "blocked"
+                }
+              ]
+            },
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                45,
+                192,
+                28,
+                48
+              ],
+              "children": [
+                {
+                  "type": "UiStatusBadge",
+                  "rect": [
+                    45,
+                    192,
+                    28,
+                    28
+                  ],
+                  "children": [
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        45,
+                        192,
+                        28,
+                        28
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            51,
+                            198,
+                            17,
+                            17
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    45,
+                    226,
+                    28,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "sell"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "HFlowContainer",
+          "rect": [
+            0,
+            252,
+            328,
+            56
+          ],
+          "children": [
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                0,
+                252,
+                58,
+                56
+              ],
+              "children": [
+                {
+                  "type": "UiStatusBadge",
+                  "rect": [
+                    11,
+                    252,
+                    36,
+                    36
+                  ],
+                  "children": [
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        11,
+                        252,
+                        36,
+                        36
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            18,
+                            259,
+                            22,
+                            22
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    0,
+                    294,
+                    58,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "NPC · request"
+                }
+              ]
+            },
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                70,
+                252,
+                73,
+                56
+              ],
+              "children": [
+                {
+                  "type": "UiStatusBadge",
+                  "rect": [
+                    88,
+                    252,
+                    36,
+                    36
+                  ],
+                  "children": [
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        88,
+                        252,
+                        36,
+                        36
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            95,
+                            259,
+                            22,
+                            22
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    70,
+                    294,
+                    73,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "NPC · deliverable"
+                }
+              ]
+            },
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                155,
+                252,
+                40,
+                56
+              ],
+              "children": [
+                {
+                  "type": "UiStatusBadge",
+                  "rect": [
+                    157,
+                    252,
+                    36,
+                    36
+                  ],
+                  "children": [
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        157,
+                        252,
+                        36,
+                        36
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            164,
+                            259,
+                            22,
+                            22
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    155,
+                    294,
+                    40,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "NPC · gift"
+                }
+              ]
+            },
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                207,
+                252,
+                44,
+                56
+              ],
+              "children": [
+                {
+                  "type": "UiStatusBadge",
+                  "rect": [
+                    211,
+                    252,
+                    36,
+                    36
+                  ],
+                  "children": [
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        211,
+                        252,
+                        36,
+                        36
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            218,
+                            259,
+                            22,
+                            22
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    207,
+                    294,
+                    44,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "NPC · new"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
