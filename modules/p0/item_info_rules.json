@@ -442,7 +442,7 @@
   },
   "rod/counter_buy": {
     "facts": [
-      "{rod_effect}",
+      "{rod_reach}",
       "{owned_line}"
     ],
     "price": true,

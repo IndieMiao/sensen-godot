@@ -310,14 +310,12 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				if ui.modal_kind == "homestead": ui.close_modal()
 				HomePanel.moment(ui, P0Logic.home_moment(v, ev))
 		dy -= 16.0
-	if ui.modal_kind == "stall" and events.size() > 0:
-		ui.set_view(session.current())
-		ui.open_stall()   # refresh after Buy / Sell / Deliver; floats say what changed
+	if ui.modal_kind == "counter" and events.size() > 0:
+		ui.set_view(session.current())   # the counter drawer follows the view; floats say what changed
+		ui.counter_events(events)
 	elif ui.modal_kind == "resident" and events.size() > 0:
 		ui.set_view(session.current())
 		ui.open_resident(ui._resident)   # affinity, gift and request states follow the reply
-	elif ui.modal_kind == "tackle" and events.size() > 0:
-		ui.open_tackle("Strung and ready — it's on your belt. Swap rods in Bag › Gear.")
 
 ## FISH-3 / FISH-5 (§6.6, 16 · FISH-2 → 3 / 5): the first catch of a species gets the catch card, later
 ## ones a float; a gate break-free gets the four-line card once per species, then "Got away · Lv4";
@@ -416,6 +414,12 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 		_:
 			ui.toast("Can't do that (%s)" % code)
 
+## P0_SHOT counters away from the outposts: the keeper ctx the outpost would pass (assets/p0/p0_outposts.json, SGODOT-227).
+static func _dev_ctx(role: String) -> Dictionary:
+	return {"tackle": {"keeper": "Finn", "place": "Xuhui Tackle Shop", "nearest": {"name": "Reed Pond", "site": "pond"}},
+		"tea": {"keeper": "Ama", "place": "Lotus Tea House"}, "post": {"keeper": "Sigrid", "place": "Huangpu Travel Post"},
+		"market": {"keeper": "Mei", "place": "Xuhui Market Square"}}.get(role, {})
+
 # ---------------------------------------------------------------- dev: scripted desktop screenshots
 ## P0_SHOT=/abs/path.png P0_SHOT_STEPS="walk:1:0:1.5,act,..." — run scripted inputs, save one frame, quit.
 ## Generic UI steps live here; world steps (goto, stove, until:bite …) go to world.p0_dev / p0_until.
@@ -440,6 +444,8 @@ func _dev_shot(dt: float) -> void:
 				ui._fab_pressed()
 			"release": ui.fab_held = false
 			"stall": ui.open_stall(step[1] if step.size() > 1 else "")
+			"counter": ui.open_counter(step[1], {"section": step[2] if step.size() > 2 else "buy", "ctx": _dev_ctx(step[1])})
+			"greet": ui.open_keeper_greeting(step[1], _dev_ctx(step[1]))
 			"bag": ui.open_bag(step[1] if step.size() > 1 else "")
 			"bagcat":   # bag drawer on one category tab, e.g. bagcat:Materials (SGODOT-225 storage stacks)
 				if ui._bag != null and is_instance_valid(ui._bag):

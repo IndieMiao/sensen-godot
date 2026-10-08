@@ -318,6 +318,8 @@ static func tokens(view: Dictionary, item_id: String, context: StringName, opts 
 		restock_in = P0Logic.duration(float(view.get("rest", {}).get("resets_in", 0))) if view.get("rest", {}).has("resets_in") else "",
 		coins_short = str(maxi(0, int(offer.get("need", int(offer.get("price", 0)))) + int(offer.get("price", 0)) * (maxi(1, int(opts.get("qty", 1))) - 1) - int(view.get("coins", 0)))),
 		rod_effect = _rod_effect(view, rod),
+		# A buy row has room for the reach only (NPC-2-2 `Lands up to Rare fish`); the card says the bite window too.
+		rod_reach = ("Lands up to %s fish" % P0Logic.rarity_name(view, int(rod.reach))) if rod.has("reach") else "",
 		rod_gate = "" if rod.get("owned", false) or rod.is_empty() else "Fishing Lv%d · Tackle Shop" % int(rod.get("level", 1)),
 		owned_line = "In Gear" if rod.get("owned", false) else "",
 		# Row Hoe (market, LOCK-15 / 李白 q(46)): what it does, from view.gear.hoes.
@@ -398,10 +400,22 @@ static func _price(view: Dictionary, item_id: String, opts: Dictionary) -> Dicti
 	return {each = each, total = each * qty, text = "%d coins" % (each * qty), line = ("%d × %d coins" % [qty, each]) if qty > 1 else ""}
 
 static func _quota(view: Dictionary, item_id: String, kind: String, opts: Dictionary) -> Dictionary:
-	var q := _quota_of(view, item_id, opts)
+	return _quota_line(_quota_of(view, item_id, opts), kind, _counter(opts))
+
+## The counter's own allowance line with nothing selected (the counter drawer's scope row): the first kind it counts
+## against a quota, or "Crops & fish · no daily limit" at the Homestead Stall (FARM-6).
+static func counter_quota(view: Dictionary, role: String) -> Dictionary:
+	if role != "homestead":
+		for e in view.get("shops", {}).get(role, {}).get("sell", []):
+			if e.get("quota", null) != null:
+				return _quota_line(view.get("quotas", {}).get(str(e.quota), {}), str(e.get("kind", "")), role)
+	return _quota_line({}, "", role)
+
+static func _quota_line(quota: Dictionary, kind: String, role: String) -> Dictionary:
+	var q := quota
 	if not q.is_empty() and not q.has("label"): q = q.merged({label = kind.capitalize()})   # "Fish buy-back today 30/80"
 	if q.is_empty():
-		return {text = "Crops & fish · no daily limit", note = "", have = 0, total = 0} if _counter(opts) == "homestead" else {}
+		return {text = "Crops & fish · no daily limit", note = "", have = 0, total = 0} if role == "homestead" else {}
 	# "Buy-back today 30/60" at a market, "Fish buy-back today 30/80" at the tackle shop (F-07): label = category.
 	var text := ("%s buy-back today %d/%d" % [str(q.get("label", "")), int(q.get("used", 0)), int(q.get("cap", 0))]).strip_edges()
 	text = text.left(1).to_upper() + text.substr(1)
