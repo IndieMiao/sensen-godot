@@ -33,9 +33,10 @@ static func build(spot: String, at: Vector3) -> Node3D:
 		"workbench": _workbench(root)
 	return root
 
-## Three of the farm's round trees (tree_1 / tree_2 are otherwise unused) on the yard edge.
+## Three of the farm's round trees (tree_1 / tree_2 are otherwise unused) right of the field. Canopies (about 0.95 m
+## × scale) stay inside the Homestead Lv3 fence ring (east x 12.95 m, SGODOT-228) and off the walk to the workbench.
 static func _grove(root: Node3D) -> void:
-	for p in [[Vector3(0.9, 0, -0.5), "tree_1", 0.78], [Vector3(1.4, 0, 0.55), "tree_2", 0.7], [Vector3(0.6, 0, -1.55), "tree_1", 0.66]]:
+	for p in [[Vector3(0.5, 0, -0.35), "tree_1", 0.78], [Vector3(-0.35, 0, 0.2), "tree_2", 0.7], [Vector3(0.55, 0, 0.6), "tree_1", 0.66]]:
 		var t := Art.instance(str(p[1]), p[0], float(p[2]))
 		t.rotation.y = float(p[0].x) * 2.1
 		root.add_child(t)

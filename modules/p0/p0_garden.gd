@@ -19,15 +19,15 @@ const ANCHORS := {
 	"well": Vector2i(17, 8), "mine": Vector2i(2, 14),
 	# SGODOT-231 / q(45): five gathering spots on the farm edge (no Old Tree in P0) and the workbench on the house's
 	# right past the stall (SGODOT-224's rest bench takes the left, Vector2i(5, 16)).
-	"spot_grove": Vector2i(18, 13), "spot_rock_pile": Vector2i(18, 4), "spot_reed_bank": Vector2i(2, 4),
-	"spot_clay_bank": Vector2i(2, 7), "spot_herb_patch": Vector2i(13, 18), "workbench": Vector2i(17, 16),
+	"spot_grove": Vector2i(17, 12), "spot_rock_pile": Vector2i(18, 4), "spot_reed_bank": Vector2i(2, 4),
+	"spot_clay_bank": Vector2i(2, 7), "spot_herb_patch": Vector2i(13, 17), "workbench": Vector2i(17, 16),
 }
 ## Solid footprints beyond the plots (inclusive rects: x, y, w, h).
 const FOOTPRINTS := {
 	"house": Rect2i(8, 15, 4, 3), "storage": Rect2i(14, 15, 1, 1),
 	"well": Rect2i(17, 8, 1, 1), "mine": Rect2i(1, 13, 2, 2),
-	"spot_grove": Rect2i(18, 13, 1, 1), "spot_rock_pile": Rect2i(18, 4, 1, 1), "spot_reed_bank": Rect2i(2, 4, 1, 1),
-	"spot_clay_bank": Rect2i(2, 7, 1, 1), "spot_herb_patch": Rect2i(13, 18, 1, 1), "workbench": Rect2i(16, 16, 3, 1),
+	"spot_grove": Rect2i(17, 12, 1, 1), "spot_rock_pile": Rect2i(18, 4, 1, 1), "spot_reed_bank": Rect2i(2, 4, 1, 1),
+	"spot_clay_bank": Rect2i(2, 7, 1, 1), "spot_herb_patch": Rect2i(13, 17, 1, 1), "workbench": Rect2i(16, 16, 3, 1),
 }
 ## Scenery trees stand outside the walkable yard, so they are not footprints.
 const WALK_RECT := Rect2i(1, 0, 19, 20)
