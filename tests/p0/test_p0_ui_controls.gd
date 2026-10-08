@@ -289,7 +289,7 @@ func test_a_seed_sown_to_zero_is_deselected_and_a_zero_slot_cannot_be_picked() -
 	assert_str(ui.selected_seed).is_empty()
 	ui._on_slot_tapped("seed_radish")
 	assert_str(ui.selected_seed).is_empty()   # a 0 slot can't be picked
-	assert_str(ui._toast.text).is_equal("Buy at Homestead Stall")
+	assert_str(ui.toast_text()).is_equal("Buy at Homestead Stall")
 
 func test_a_bar_without_the_action_family_shows_its_ghost_in_the_first_empty_slot() -> void:
 	# A-08: Seeds on the farm, Bait at the pond; a tap opens the Bag.
@@ -347,18 +347,18 @@ func test_the_last_bait_toast_waits_for_the_fishing_panel_and_the_catch_card() -
 	ui.set_view(v)
 	ui._on_slot_tapped("bait_worm")
 	ui._on_pin_toggled("bait_worm", true)
-	ui._toast.hide()   # the hook toast from picking the bait
+	ui._toasts.dismiss()   # the hook toast from picking the bait
 	ui.set_surface("busy")   # the fishing presentation
 	v.bag.slots = v.bag.slots.filter(func(s): return s.id != "bait_worm")
 	ui.set_view(v)
 	assert_str(ui.selected_bait).is_empty()
-	assert_bool(ui._toast.visible).is_false()
+	assert_str(ui.toast_text()).is_empty()
 	ui.open_inbox()   # stands in for the first-catch card
 	ui.set_surface("pond")
-	assert_bool(ui._toast.visible).is_false()   # the card is still open
+	assert_str(ui.toast_text()).is_empty()   # the card is still open
 	ui.close_modal()
-	assert_bool(ui._toast.visible).is_true()
-	assert_str(ui._toast.text).is_equal("Out of Worm Bait · no bait on the hook")
+	assert_str(ui.toast_text()).is_not_empty()
+	assert_str(ui.toast_text()).is_equal("Out of Worm Bait · no bait on the hook")
 
 func test_the_last_bait_on_a_hook_empties_the_hook_with_a_toast() -> void:
 	# 李白 q(44) ④: casting goes on without bait.
@@ -373,7 +373,7 @@ func test_the_last_bait_on_a_hook_empties_the_hook_with_a_toast() -> void:
 	v.bag.slots = v.bag.slots.filter(func(s): return s.id != "bait_worm")
 	ui.set_view(v)
 	assert_str(ui.selected_bait).is_empty()
-	assert_str(ui._toast.text).is_equal("Out of Worm Bait · no bait on the hook")
+	assert_str(ui.toast_text()).is_equal("Out of Worm Bait · no bait on the hook")
 
 func test_a_card_tap_cannot_start_a_double_tap() -> void:
 	# PR #12 re-review: a tap elsewhere right after a card tap is a plain tap, not a recenter.

@@ -184,10 +184,14 @@ static func _panels() -> Control:
 		panel.theme_type_variation = p[0]
 		panel.add_child(UiKit.label(p[1], UiTokens.STYLE_BODY_B14))
 		v.add_child(panel)
-	var toast := PanelContainer.new()
-	toast.theme_type_variation = UiTokens.PANEL_TOAST_PANEL
-	toast.add_child(UiKit.label("Bag full · free a slot first", UiTokens.STYLE_BODY_B14, UiTokens.COLOR_SURFACE_RAISED))
-	v.add_child(toast)
+	# Toast R1 tones (1178:82265; SGODOT-233): Success / Info / Error, an Error with its guiding action.
+	for t in [[ToastLayer.Severity.SUCCESS, "Floor 2 cleared · Elevator stop", ""],
+			[ToastLayer.Severity.INFO, "Room 1 is full · you're in Room 2", ""],
+			[ToastLayer.Severity.ERROR, "Creel full · 0 free slots · Sell or cook first", "Open bag"]]:
+		var toast := ToastLayer.card(t[0], t[1], t[2])
+		toast.custom_minimum_size = Vector2(ToastLayer.WIDTH, UiTokens.SIZE_TOAST_MIN_H)
+		toast.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		v.add_child(toast)
 	var badge := PanelContainer.new()
 	badge.theme_type_variation = UiTokens.PANEL_BADGE
 	badge.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN

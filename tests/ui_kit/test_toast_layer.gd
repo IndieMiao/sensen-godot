@@ -1,6 +1,7 @@
 extends GdUnitTestSuite
-## ToastLayer: non-modal queue, duration rule, merging and priority (SGODOT-211, WP7-B F-08 §3);
-## placement above the quick bar / a drawer's fixed decision area (WP2 D-01, SGODOT-202).
+## ToastLayer: one at a time, a new toast replaces the old, the same sentence within 2 s only stays up longer
+## (q(49) ⑤, SGODOT-233), the duration rule (WP7-B F-08 §3), the R1 tone look and action; placement above the
+## quick bar / a drawer's fixed decision area (WP2 D-01, SGODOT-202).
 
 var toasts: ToastLayer
 
@@ -16,39 +17,56 @@ func test_duration_grows_with_length_and_is_capped() -> void:
 	assert_float(ToastLayer.duration_ms("x".repeat(45))).is_equal_approx(float(UiTokens.MOTION_TOAST_BASE_MS + 2 * UiTokens.MOTION_TOAST_PER20_CHARS_MS), 0.01)
 	assert_float(ToastLayer.duration_ms("x".repeat(400))).is_equal_approx(float(UiTokens.MOTION_TOAST_MAX_MS), 0.01)
 
-func test_one_toast_at_a_time_then_the_next() -> void:
+func test_a_new_toast_replaces_the_one_showing() -> void:
 	toasts.show_toast("Sold 3 Radish")
 	toasts.show_toast("Bag full · free a slot first")
-	assert_str(toasts.current_text()).is_equal("Sold 3 Radish")
-	toasts.advance(UiTokens.MOTION_TOAST_BASE_MS / 1000.0 + 0.01)
-	assert_str(toasts.current_text()).is_equal("Bag full · free a slot first")
+	assert_str(toasts.current_text()).is_equal("Bag full · free a slot first")   # no queue (q(49) ⑤)
 	toasts.advance(UiTokens.MOTION_TOAST_BASE_MS / 1000.0 + 0.01)
 	assert_str(toasts.current_text()).is_equal("Bag full · free a slot first")   # 28 chars stay 0.5 s longer
 	toasts.advance(UiTokens.MOTION_TOAST_PER20_CHARS_MS / 1000.0)
 	assert_str(toasts.current_text()).is_empty()
 
-func test_repeats_within_a_second_merge() -> void:
+func test_the_same_sentence_within_two_seconds_only_stays_up_longer() -> void:
+	var pops := [0]
+	toasts.shown.connect(func(_t, _s): pops[0] += 1)
 	toasts.show_toast("Not ready yet", ToastLayer.Severity.REFUSED)
-	toasts.advance(0.5)
+	toasts.advance(1.5)
 	toasts.show_toast("Not ready yet", ToastLayer.Severity.REFUSED)
-	assert_str(toasts.current_text()).is_equal("Not ready yet ×2")
-	assert_array(toasts.queued()).is_empty()
+	assert_str(toasts.current_text()).is_equal("Not ready yet")   # no ×2
+	assert_int(pops[0]).is_equal(1)   # it did not pop again
+	toasts.advance(1.5)
+	assert_str(toasts.current_text()).is_equal("Not ready yet")   # 1.5 s after the repeat it is still up
+	toasts.advance(1.0)
+	assert_str(toasts.current_text()).is_empty()
+	toasts.show_toast("Not ready yet", ToastLayer.Severity.REFUSED)
+	assert_int(pops[0]).is_equal(2)   # gone, so the next one pops
 
-func test_refusals_jump_ahead_of_successes() -> void:
-	toasts.show_toast("Sold 3 Radish", ToastLayer.Severity.SUCCESS)
-	toasts.show_toast("+10 coins", ToastLayer.Severity.SUCCESS)
-	toasts.show_toast("Limit reached", ToastLayer.Severity.REFUSED)
-	assert_str(String(toasts.queued()[0].text)).is_equal("Limit reached")
+func test_tones_follow_toast_r1() -> void:
+	for sev in [ToastLayer.Severity.SUCCESS, ToastLayer.Severity.INFO, ToastLayer.Severity.ERROR]:
+		toasts.show_toast("Sold out · restocks in 9h 12m %d" % sev, sev)
+		var box := toasts._panel.get_theme_stylebox(&"panel") as UiStyleBox
+		var want: Array = {ToastLayer.Severity.SUCCESS: [UiTokens.COLOR_PRIMARY_TINT, UiTokens.COLOR_PRIMARY],
+			ToastLayer.Severity.INFO: [UiTokens.COLOR_SURFACE, UiTokens.COLOR_BORDER],
+			ToastLayer.Severity.ERROR: [UiTokens.COLOR_DANGER_TINT, UiTokens.COLOR_DANGER]}[sev]
+		assert_str(box.bg_color.to_html()).is_equal((want[0] as Color).to_html())
+		assert_str(box.border_color.to_html()).is_equal((want[1] as Color).to_html())
+		assert_object(toasts._glyph.texture).is_same(ToastLayer.glyph(sev))
+	assert_int(toasts.current_severity()).is_equal(ToastLayer.Severity.ERROR)
 
-func test_queue_keeps_three_and_drops_the_oldest_least_important() -> void:
-	toasts.show_toast("showing")
-	for i in 3:
-		toasts.advance(0.01)
-		toasts.show_toast("ok %d" % i, ToastLayer.Severity.SUCCESS)
-	toasts.advance(0.01)
-	toasts.show_toast("Can't reach the farm server", ToastLayer.Severity.ERROR)
-	var texts := toasts.queued().map(func(e): return e.text)
-	assert_array(texts).contains_exactly(["Can't reach the farm server", "ok 1", "ok 2"])
+func test_the_action_line_emits_and_closes() -> void:
+	var got := []
+	toasts.action_pressed.connect(func(a): got.append(a))
+	toasts.show_toast("Creel full · 0 free slots · Sell or cook first", ToastLayer.Severity.ERROR, "Open bag")
+	assert_str(toasts._action.text).is_equal("Open bag ›")
+	assert_bool(toasts._action.is_visible_in_tree()).is_true()
+	var tap := InputEventMouseButton.new()
+	tap.button_index = MOUSE_BUTTON_LEFT
+	tap.pressed = false
+	toasts._action.gui_input.emit(tap)
+	assert_array(got).is_equal(["Open bag"])
+	assert_str(toasts.current_text()).is_empty()
+	toasts.show_toast("Sold 3 Radish")
+	assert_bool(toasts._action.is_visible_in_tree()).is_false()
 
 func test_layer_never_blocks_input_and_tapping_the_toast_dismisses_it() -> void:
 	assert_int(toasts.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)

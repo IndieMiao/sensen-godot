@@ -175,9 +175,9 @@ func test_need_material_from_a_shop_or_the_workbench_names_its_own_gap() -> void
 	rt.session.view = _view()
 	rt.session.view["names"] = {"copper_ore": "Copper Ore"}
 	rt._on_refused("need_material", {"item": "copper_ore", "need": 4, "have": 2}, {"type": "craft", "recipe": "pick_copper"})
-	assert_str(rt.ui._toast.text).is_equal("Need 2 more Copper Ore")
+	assert_str(rt.ui.toast_text()).is_equal("Need 2 more Copper Ore")
 	rt._on_refused("need_material", {"item": "wood", "need": 16, "have": 10}, {"type": "homestead_upgrade"})
-	assert_str(rt.ui._toast.text).is_equal("Need 6 more Timber")   # HOME-1's gap, in tile order
+	assert_str(rt.ui.toast_text()).is_equal("Need 6 more Timber")   # HOME-1's gap, in tile order
 
 func test_the_sign_card_stays_on_screen_and_its_tap_is_the_sign() -> void:
 	# #12's finger cards clamp themselves inside (Pointer flips inward); a tap on the card goes to the sign.

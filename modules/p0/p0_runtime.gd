@@ -308,7 +308,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				var who := str(P0Logic.content().get("residents", {}).get(str(ev.get("resident", "")), {}).get("name", ""))
 				# SGODOT-232: with the bag full the meal waits in the Inbox (to: parcel), gone at 04:00 like any gift meal.
 				if str(ev.get("to", "")) == "parcel": ui.toast("Bag full · %s's meal sent to Inbox" % who)
-				elif bool(ev.get("given", false)): ui.toast("%s gave you %s · in your bag" % [who, P0Logic.item_name(v, str(ev.get("dish", "")))])
+				elif bool(ev.get("given", false)): ui.toast_success("%s gave you %s · in your bag" % [who, P0Logic.item_name(v, str(ev.get("dish", "")))])
 			"homestead":
 				# HOME-2 (SGODOT-228): HOME-1 closes, the MomentBanner says what changed; the farm swaps the fence.
 				if ui.modal_kind == "homestead": ui.close_modal()
@@ -359,66 +359,66 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 	if code == "bag_full" and str(cmd.get("type", "")) == "reel":
 		_call("p0_event", [{"kind": "fish_abort"}, session.view])
 		session.send({"type": "reel", "outcome": "escaped"})
-		ui.toast("Creel full · the fish slipped away")
+		ui.toast_error("Creel full · the fish slipped away")
 		return
 	# Mine and gathering refusals (SGODOT-231): races stay quiet, the rest say why in their own words.
 	var said = P0MaterialLogic.refusal_text(code, detail, cmd)
 	if said != null:
-		if str(said) != "": ui.toast(str(said))
+		if str(said) != "": ui.toast_error(str(said))
 		return
 	match code:
 		"need_energy":
 			ui.open_energy_card(int(detail.get("need", 0)), "Cast" if str(cmd.get("type", "")) == "cast" else P0MaterialLogic.energy_verb(cmd, "Sow ×1"))
 			session.report({"kind": "energy_card", "need": int(detail.get("need", 0)), "refused": str(cmd.get("type", ""))})
 		"locked":
-			ui.toast("%s Lv%d · %d XP to go" % [str(detail.get("skill", "farming")).capitalize(), int(detail.get("level", 2)), int(detail.get("xp_to_go", 0))])
+			ui.toast_error("%s Lv%d · %d XP to go" % [str(detail.get("skill", "farming")).capitalize(), int(detail.get("level", 2)), int(detail.get("xp_to_go", 0))])
 		"no_coins":
-			ui.toast("Need %d more coins" % int(detail.get("need", 0)))
+			ui.toast_error("Need %d more coins" % int(detail.get("need", 0)))
 		"bag_full":
-			ui.toast("Make room · 1 slot" if str(cmd.get("type", "")).begins_with("claim_parcel") else "Bag full · free a slot first")
+			ui.toast_error("Make room · 1 slot" if str(cmd.get("type", "")).begins_with("claim_parcel") else "Bag full · free a slot first")
 		"parcel_expired", "bad_parcel":
-			ui.toast("This parcel is no longer waiting")
+			ui.toast_error("This parcel is no longer waiting")
 		"rest_used":
-			ui.toast("Rest used today")
+			ui.toast_error("Rest used today")
 		"not_home":
-			ui.toast("At home only")
+			ui.toast_error("At home only")
 		"need_material", "skills_short", "max_level":
 			# The shops and the workbench refuse with need_material too: only the upgrade reads HOME-1's gap.
-			if str(cmd.get("type", "")) == "homestead_upgrade": ui.toast(P0Logic.home_panel(session.current()).reason)
+			if str(cmd.get("type", "")) == "homestead_upgrade": ui.toast_error(P0Logic.home_panel(session.current()).reason)
 			elif code == "need_material":
-				ui.toast("Need %d more %s" % [int(detail.get("need", 0)) - int(detail.get("have", 0)),
+				ui.toast_error("Need %d more %s" % [int(detail.get("need", 0)) - int(detail.get("have", 0)),
 					P0Logic.item_name(session.current(), str(detail.get("item", "")))])
-			else: ui.toast("Can't do that (%s)" % code)
+			else: ui.toast_error("Can't do that (%s)" % code)
 		"energy_full":
-			ui.toast("Energy full · eat later" if str(cmd.get("type", "")) == "eat" else "Energy full")
+			ui.toast_error("Energy full · eat later" if str(cmd.get("type", "")) == "eat" else "Energy full")
 		"not_ready":
-			ui.toast("Not ready yet")
+			ui.toast_error("Not ready yet")
 		"creel_full":
-			ui.toast("Creel full · 0 free slots · Sell or cook first")
+			ui.toast_error("Creel full · 0 free slots · Sell or cook first", "Open bag")   # FISH-4, §4.8.6
 		"already_casting":
-			ui.toast("Your line is already in the water")
+			ui.toast_error("Your line is already in the water")
 		"no_bait":
-			ui.toast("No bait left")
+			ui.toast_error("No bait left")
 		"not_at_pond":
-			ui.toast("Fish from a pond · open one from the map")   # the server did not get which pond (q(36))
+			ui.toast_error("Fish from a pond · open one from the map")   # the server did not get which pond (q(36))
 		"too_early", "no_cast":
 			_call("p0_event", [{"kind": "fish_abort"}, session.view])
 		"stove_busy":
-			ui.toast("The stove is busy · %s left" % P0Logic.duration(float(detail.get("ready_in", 0))))
+			ui.toast_error("The stove is busy · %s left" % P0Logic.duration(float(detail.get("ready_in", 0))))
 		"needs_main":
-			ui.toast("Needs a main ingredient")
+			ui.toast_error("Needs a main ingredient")
 		"not_for_cooking":
-			ui.toast("Not for cooking")
+			ui.toast_error("Not for cooking")
 		"missing_ingredients", "not_enough":
-			ui.toast("Missing ingredients")
+			ui.toast_error("Missing ingredients")
 		"sold_out":
-			ui.toast("Sold out today · %d left" % int(detail.get("left", 0)))
+			ui.toast_error("Sold out today · %d left" % int(detail.get("left", 0)))
 		"wrong_state", "bad_plot":
 			pass   # the plot changed under a held repeat; the next frame shows its new state
 		"stale_state":
 			pass   # a retry of something the server already applied; the returned state re-renders the screen
 		_:
-			ui.toast("Can't do that (%s)" % code)
+			ui.toast_error("Can't do that (%s)" % code)
 
 # ---------------------------------------------------------------- dev: scripted desktop screenshots
 ## P0_SHOT=/abs/path.png P0_SHOT_STEPS="walk:1:0:1.5,act,..." — run scripted inputs, save one frame, quit.

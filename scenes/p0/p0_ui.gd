@@ -121,8 +121,7 @@ var _teach: PanelContainer
 var _teach_left := 0.0
 var tips: P0Guide.TipQueue   # the TipCard order and "shown before" (SGODOT-232 U6)
 var _taught := {}
-var _toast: Label
-var _toast_left := 0.0
+var _toasts: ToastLayer   # Toast R1 (SGODOT-233): one at a time, above the quick bar
 var _regular: FontVariation
 
 # ---------------------------------------------------------------- build
@@ -142,15 +141,13 @@ func _ready() -> void:
 	_build_hud()
 	_build_bar()
 	_build_fab()
-	_toast = _label("", 11, INK, true)
-	_toast.add_theme_stylebox_override("normal", _box(Color(1, 1, 1, 0.96), 14, EDGE, 1, Vector4(12, 8, 12, 8)))
-	_toast.set_anchors_preset(Control.PRESET_CENTER_TOP)
-	_toast.position = Vector2(-150, 150)
-	_toast.custom_minimum_size = Vector2(300, 0)
-	_toast.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_toast.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_toast.hide()
-	root.add_child(_toast)
+	_toasts = ToastLayer.new()
+	_toasts.theme = UiKit.theme()
+	root.add_child(_toasts)
+	# Over the quick bar's top edge, left of the main action key; inside the bag the bar is docked at the drawer's
+	# fixed bottom row, so the toast sits above that (WP2 D-01, q(16)). With no bar on screen: the bar's spot.
+	_toasts.anchor_above(_bar)
+	_toasts.action_pressed.connect(_on_toast_action)
 	if OS.is_debug_build(): _build_dev()
 	if _pending.has("mode"): set_mode(_pending.mode)
 	if _pending.has("place"): set_place(_pending.place)
@@ -159,9 +156,6 @@ func _ready() -> void:
 	_pending.clear()
 
 func _process(dt: float) -> void:
-	if _toast_left > 0.0:
-		_toast_left -= dt
-		if _toast_left <= 0.0: _toast.hide()
 	if _teach_left > 0.0:
 		_teach_left -= dt
 		if _teach_left <= 0.0: _hide_tip()
@@ -834,10 +828,27 @@ func float_text(text: String, screen: Vector2, color: Color) -> void:
 	tw.parallel().tween_property(l, "modulate:a", 0.0, 1.1).set_delay(0.5)
 	tw.tween_callback(l.queue_free)
 
-func toast(text: String, seconds := 2.6) -> void:
-	_toast.text = text
-	_toast.show()
-	_toast_left = seconds
+## Toast (Toast R1, §4.8.6; q(49) ⑤): one at a time, a new one replaces the one showing and the same sentence again
+## within 2 s only stays up longer. Info; `seconds` > 0 overrides the length rule (2 s + 0.5 s per 20 characters,
+## at most 5 s). A tap closes it early. Feedback the player must confirm is a card, never a toast.
+func toast(text: String, seconds := 0.0) -> void:
+	if _toasts: _toasts.show_toast(text, ToastLayer.Severity.INFO, "", seconds)
+
+## A refused command (§4.8.6 `命令被拒（非体力）`, wording per appendix B) or FISH-4's full creel. `action` adds a
+## guiding line (`Open bag ›`) that acts in place and never travels (LOCK-08).
+func toast_error(text: String, action := "") -> void:
+	if _toasts: _toasts.show_toast(text, ToastLayer.Severity.ERROR, action)
+
+## Done, worth saying once: a cleared mine floor, a resident's meal (§4.8.6 Toast Success).
+func toast_success(text: String) -> void:
+	if _toasts: _toasts.show_toast(text, ToastLayer.Severity.SUCCESS)
+
+## What the toast says now ("" when none is up).
+func toast_text() -> String: return _toasts.current_text() if _toasts else ""
+
+func _on_toast_action(action: String) -> void:
+	match action:
+		"Open bag": open_bag()
 
 # ---------------------------------------------------------------- modals
 ## Going to the background cancels a slot drag: the slot flies back, nothing changes (LOCK-04 v1.10).
@@ -946,6 +957,7 @@ func _open_modal(content: Control, dim := 0.32, hide_controls := false) -> void:
 			(sb as StyleBoxFlat).bg_color.a = 1.0
 			content.add_theme_stylebox_override("panel", sb)
 	root.add_child(holder)
+	root.move_child(_toasts, -1)   # a toast stays readable over a drawer or card
 	_modal = holder
 	if hide_controls:
 		_keys.visible = false
