@@ -102,10 +102,7 @@ func _init(view_: Dictionary = {}, side_ := "bag", focus := "", gift_to_ := {}) 
 	_gear_box.add_theme_constant_override(&"separation", 0)
 	body.add_child(_gear_box)
 	_build_bag()
-	if not gift_to.is_empty():
-		var dishes := CATEGORIES.find("Dishes")
-		(_chips.get_child(dishes) as Button).button_pressed = true
-		set_category("Dishes")
+	if not gift_to.is_empty(): show_category("Dishes")
 	refresh(view_)
 	if focus != "" and P0Logic.bag_count(view, focus) > 0: grid.select(focus)
 
@@ -141,6 +138,13 @@ func set_side(v: String) -> void:
 	grid.clear_selection()
 	refresh(view, true)
 	side_changed.emit(v)
+
+## Opens on a category page, its chip pressed (a gift: Dishes; the creel badge and a full creel's Open bag ›: Fish).
+func show_category(v: String) -> void:
+	var i := CATEGORIES.find(v)
+	if i < 0: return
+	(_chips.get_child(i) as Button).button_pressed = true
+	set_category(v)
 
 func set_category(v: String) -> void:
 	category = v

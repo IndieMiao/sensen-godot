@@ -90,7 +90,7 @@ func test_reward_and_blessing_lines() -> void:
 	v.meals.cap = 300
 	assert_str(P0Logic.blessing_line(v)).is_equal("Newcomer Blessing · 5 days left · faster Energy, Meals 300")
 
-func test_creel_full_key_carries_the_fish4_reason_and_pills() -> void:
+func test_creel_full_key_carries_the_fish4_reason() -> void:
 	var v := _view()
 	v.bag.free = 0
 	var a := P0Logic.fish_action(v, "")

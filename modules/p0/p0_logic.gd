@@ -675,8 +675,8 @@ static func fish_action(view: Dictionary, bait: String, site := "pond") -> Dicti
 	if f.get("cast", null) != null:
 		return {"icon": "bobber", "verb": "Fishing…", "sub": "Line in the water", "enabled": false, "amber": false, "cmd": {}, "need": 0}
 	if int(view.get("bag", {}).get("free", 1)) < 1:
-		# FISH-4: the key is greyed with the short reason (plan §10.2.2 `Cast · Creel full`); the creel badge and the
-		# toast carry the long one, and Open Bag / Go home pills float above the switch.
+		# FISH-4: the key is greyed with the short reason (plan §10.2.2 `Cast · Creel full`); pressing it or the creel
+		# badge says the long one in the Error toast with Open bag › (q(83): no pills above the switch).
 		return {"icon": "rod", "verb": "Cast", "sub": "Creel full", "enabled": false, "amber": false,
 			"cmd": {}, "need": 0, "creel_full": true}
 

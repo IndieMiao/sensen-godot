@@ -75,7 +75,46 @@ func test_a_full_creel_says_so_and_its_action_opens_the_bag() -> void:
 	tap.pressed = false
 	rt.ui._toasts._action.gui_input.emit(tap)
 	assert_str(rt.ui.modal_kind).is_equal("bag")
+	assert_str(rt.ui._bag.category).is_equal("Fish")   # the creel is the bag: its Fish page (q(83))
 	assert_str(rt.ui.toast_text()).is_empty()
+
+## q(83) (不知火舞 on 235 B1): no pills over the switch; the creel badge full or the greyed Cast · Creel full says the
+## sentence with Open bag ›; the badge not full opens the bag on its Fish page.
+func test_the_creel_badge_and_the_greyed_cast_say_the_creel_is_full() -> void:
+	var v := _view()
+	v.bag["free"] = 0
+	ui.set_surface("pond")
+	ui.set_mode("fish")
+	ui.set_view(v)
+	ui.set_action(P0Logic.fish_action(v, ""))
+	await await_idle_frame()
+	assert_bool(ui._creel.visible).is_true()
+	assert_int(ui._creel.state).is_equal(UiCreelBadge.State.FULL)
+	assert_str(ui._creel.text).is_equal("Creel 2 · 0 free")
+	assert_int(ui.find_children("*", "Button", true, false).filter(func(b): return (b as Button).text in ["Open Bag", "Go home · Free"]).size()).is_equal(0)
+	ui._creel.pressed.emit()
+	assert_str(ui.toast_text()).is_equal(P0Ui.CREEL_FULL)
+	assert_int(ui._toasts.current_severity()).is_equal(ToastLayer.Severity.ERROR)
+	assert_str(ui._toasts.current_action()).is_equal("Open bag")
+	ui.clear_toast()
+	ui._fab_pressed()   # the greyed Cast · Creel full
+	assert_str(ui.toast_text()).is_equal(P0Ui.CREEL_FULL)
+	ui._on_toast_action("Open bag")
+	assert_str(ui.modal_kind).is_equal("bag")
+	assert_str(ui._bag.category).is_equal("Fish")
+
+func test_the_creel_badge_not_full_opens_the_fish_page() -> void:
+	var v := _view()
+	v.bag["free"] = 1
+	ui.set_surface("pond")
+	ui.set_mode("fish")
+	ui.set_view(v)
+	await await_idle_frame()
+	assert_int(ui._creel.state).is_equal(UiCreelBadge.State.LOW)
+	ui._creel.pressed.emit()
+	assert_str(ui.toast_text()).is_empty()
+	assert_str(ui.modal_kind).is_equal("bag")
+	assert_str(ui._bag.category).is_equal("Fish")
 
 ## 周瑜 (int, a05-reason): over a drawer without the quick bar (the workbench), the reason toast is whole, over the
 ## drawer, just above its top edge — not on its rows or its Close key; and every toast keeps Toast R1's 232 width.
