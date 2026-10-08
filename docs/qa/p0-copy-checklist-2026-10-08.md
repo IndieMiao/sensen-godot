@@ -18,7 +18,7 @@
 | 不做跳转 | `Show my plots` / `Show on map` / `Where to fish` 只移动相机或打开面板（LOCK-08） |
 | 世界提示只写名字 | 设施挂图标钮，交互半径内最近的一个展开名字条（图标 + 名字 + 至多一条事实）；门 = 门图标 + 目的地（`Farm` / `Map`）；NPC 头顶只写名字（`Mei`），对话中只保持高亮；座位只有 `i-seat` 图标；任何地方都不出现点按引导语（Tap to …）与手指（LOCK-07 / 16 / 17 / 30 v2，q(62)） |
 | 径向菜单无字 | 四瓣环在屏幕中央，瓣上只有图标，不写行动名与原因；点灰瓣才在环心出单行气泡 `No water nearby` / `Enter the mine` / `Mine floors 3–5`（LOCK-03 v2，q(62)） |
-| 快满写实得 | `Eat · +12 Energy`、`Hot Tea · +12 Energy · 40 coins`、`Rest · +25 Energy`（q(26)） |
+| 快满写实得 | `Eat · +12 Energy`、`Hot Tea · +12 Energy · 40 coins`、`Rest · +25 Energy`（q(26)）。热茶（茶馆）与咖啡（驿站）同价同效：标称都是 +30，当天第 1 / 2 / 3 杯 40 / 50 / 60 coins、两种共用 3 杯；柜台快满时写实得，如差 3 满时 `Coffee · +3 Energy · 40 coins`，不是数值错（§3.4.4） |
 
 ## 1. HUD 与体力卡（LOCK-06、LOCK-09）
 
