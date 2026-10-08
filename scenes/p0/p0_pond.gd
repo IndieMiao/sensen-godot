@@ -248,6 +248,7 @@ func p0_anchor() -> Vector2:
 	return cam.unproject_position(actor.position + Vector3(0, 2.0, 0))
 
 func is_back_navigation_locked() -> bool:
+	if rt != null and rt.ui.close_top_layer(): return true   # Inbox, radial, PinMenu over the pond first
 	if panel and panel.visible:
 		panel.close()
 		return true

@@ -75,6 +75,9 @@ func _init() -> void:
 
 ## The active world takes over input and the HUD surface; the previous one is simply forgotten.
 func attach(w: Node) -> void:
+	# The world being left stops where it is, and the stick ends: no walking on underneath (int5 hand test 035–039).
+	if is_instance_valid(world) and world != w: _call("p0_joystick", [Vector2.ZERO])
+	ui.end_stick()
 	world = w
 	session.space = space_of(w)   # before the read below, which tells the server where the player is
 	session.place = str(w.call("p0_place")) if w.has_method("p0_place") else ""   # which pond (q(36))
@@ -99,6 +102,8 @@ func _first_frame(tag: String) -> void:
 
 func detach(w: Node) -> void:
 	if world == w:
+		_call("p0_joystick", [Vector2.ZERO])
+		ui.end_stick()
 		world = null
 		ui.close_modal()
 		ui.set_surface("map")

@@ -69,6 +69,11 @@ func _ready() -> void:
 func _exit_tree() -> void:
 	if rt: rt.detach(self)
 
+## Android Back: the UI's top layer (PinMenu, radial, a card or drawer) closes first, one per press; with nothing
+## open AppRouter takes the farm back to the map (int5 hand test 012–013 / 023–024; rooms do the same, p0_room).
+func is_back_navigation_locked() -> bool:
+	return rt != null and rt.ui.close_top_layer()
+
 ## AppRouter stacking: the map below us hands back its camera and environment on resume.
 func suspend() -> void:
 	set_process(false)
