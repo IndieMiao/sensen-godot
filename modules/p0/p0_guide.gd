@@ -209,22 +209,39 @@ static func _short(ms: float) -> String:
 
 ## ` · Farming Lv 2 at first harvest` (§14.2 end): what the growing beds' locked XP and first-harvest bonuses reach.
 static func harvest_level_tail(view: Dictionary) -> String:
+	var h := harvest_level(view)
+	return " · Farming Lv %d at first harvest" % int(h.level) if not h.is_empty() else ""
+
+## Whether harvesting reaches the next Farming level (q(69), RETURN-SESSION): {level, now: true} when the plots ready
+## now are enough (`Farming Lv 2 with this harvest`); {level, now: false} when it takes the growing ones too and no crop
+## was ever harvested (`Farming Lv 2 at your first harvest`); {} otherwise. First-harvest bonuses count once a crop.
+static func harvest_level(view: Dictionary) -> Dictionary:
 	var sk: Dictionary = view.get("skills", {}).get("farming", {})
-	if sk.get("next", null) == null: return ""
-	var xp := int(sk.get("xp", 0))
+	if sk.get("next", null) == null: return {}
+	var base := int(sk.get("xp", 0))
+	if base >= int(sk.next): return {}
 	var crops := {}
 	for c in P0Logic.content().get("crops", []): crops[str(c.id)] = c
 	var firsts: Array = view.get("firsts", [])
 	var counted := {}
+	var ready_xp := 0
+	var all_xp := 0
 	for p in view.get("plots", []):
-		if not str(p.get("state", "")) in ["growing", "ready"]: continue
+		var st := str(p.get("state", ""))
+		if not st in ["growing", "ready"]: continue
 		var c: Dictionary = crops.get(str(p.get("crop", "")), {})
 		if c.is_empty(): continue
-		xp += floori(float(c.get("xp", 0)) * float(p.get("xp_pct", 100)) / 100.0)
+		var xp := floori(float(c.get("xp", 0)) * float(p.get("xp_pct", 100)) / 100.0)
 		if not firsts.has("harvest:" + str(c.id)) and not counted.has(c.id):
 			counted[c.id] = true
 			xp += int(c.get("first_xp", 0))
-	return " · Farming Lv %d at first harvest" % (int(sk.get("level", 1)) + 1) if xp >= int(sk.next) and int(sk.get("xp", 0)) < int(sk.next) else ""
+		all_xp += xp
+		if st == "ready": ready_xp += xp
+	var lv := int(sk.get("level", 1)) + 1
+	if base + ready_xp >= int(sk.next) and ready_xp > 0: return {level = lv, now = true}
+	var harvested := firsts.any(func(f): return str(f).begins_with("harvest:"))
+	if not harvested and base + all_xp >= int(sk.next): return {level = lv, now = false}
+	return {}
 
 # ---------------------------------------------------------------- world badges
 

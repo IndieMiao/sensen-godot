@@ -800,50 +800,46 @@ static func unlock_line(view: Dictionary, skill: String, level: int) -> String:
 const CONVENIENCE_NAMES := {"cook_again": "Cook Again", "clue_double": "Double Clue", "hearty_mishap": "Hearty Mishap",
 	"steady_hand_1": "Steady Hand I", "queue_two": "Queue ×2", "quick_fire": "Quick Fire"}
 const LEVEL_TIP := "Levels unlock gear, fish and seeds. Basics never lock."
+## Levels that change the day say so on the banner's Tip instead of the next level (§4.8.3, q(69)).
+const DAY_CHANGES := {"cooking:4": "Today changes: 3-ingredient dishes", "farming:6": "Today changes: no more watering"}
 
-## The MomentBanner for a skill level-up (§4.8.3 / §4.8.6; ev = the server's {skill, level, energy, gifts}):
-##   the account's first: `Fishing Lv 2` / `Fine fish now stay on the hook` / +50 Energy · 3 Worm Bait · 3 Wild Herb /
-##     `Recipe: Herb Grilled Fish` / the teaching tip / `Use bait` when a bait came — ≤ 3 s
-##   later Farming / Fishing: `Farming Lv 3` / `Potato, Chamomile, Compost` / +30 Energy / `Next Lv4 · Tomato, Chili,
-##     Row Hoe · 150 XP` (only `Next Lv5 · 200 XP` when the next level brings nothing this season) — 1.5 s
-##   Cooking: no Energy; `Cooking Lv 2 · Recipe: Fresh Fish Soup`, `Cooking Lv 4 · 3rd slot` with `Today changes:
-##     3-ingredient dishes` (≤ 3 s), conveniences as the subtitle (`Steady Hand I · Queue ×2`).
+## The MomentBanner for a skill level-up (§4.8.3 / §4.8.6; ev = the server's {skill, level, energy, gifts}). Fields as
+## the accepted FARM-LV2 (1368:91797), content and timing as §4.8.6 (不知火舞 233, 10-08):
+##   subtitle  `New for you · Potato, Chamomile, Compost` (what the level opens, q(69)); Fishing `Fine fish now stay on the hook`;
+##             Cooking Lv4 `Three-ingredient dishes now possible`
+##   rewards   pills: the Energy and the level-up gift's items (`+50 Energy` · `+3 Worm Bait` · `+3 Wild Herb`; SKILL-3
+##             482:65; Cooking levels give no Energy)
+##   detail    recipe cards only (`New recipe: Herb Grilled Fish`), else nothing
+##   tip       the next level (`Next Lv4 · Tomato, Chili, Row Hoe · 150 XP`, its new things this season); the account's
+##             first level-up teaches instead, a level that changes the day says `Today changes: …` (q(69))
+##   time      the account's first ≤ 3 s, later ones 1.5 s; `Use bait` when the first one gave bait
 static func level_banner(view: Dictionary, ev: Dictionary, first := false) -> Dictionary:
 	var skill := str(ev.get("skill", "farming"))
 	var lv := int(ev.get("level", 2))
 	var title := "%s Lv %d" % [skill.capitalize(), lv]
-	var recipes: Array = []
 	var rewards: Array = []
 	if int(ev.get("energy", 0)) > 0:
 		rewards.append({text = "+%d Energy" % int(ev.energy), tone = UiFloatText.Tone.ENERGY_GAIN})
+	var recipes: Array = []
 	var bait := ""
 	for g in ev.get("gifts", []):
 		var id := str(g[0])
 		if id.begins_with("recipe:"): recipes.append(item_name(view, id.substr(7)))
 		else:
-			rewards.append({text = "%d %s" % [int(g[1]), item_name(view, id)], tone = UiFloatText.Tone.ITEM, icon = icon(id)})
+			rewards.append({text = "+%d %s" % [int(g[1]), item_name(view, id)], tone = UiFloatText.Tone.ITEM, icon = icon(id)})
 			if id.begins_with("bait_") and bait == "": bait = id
-	var unlocks := level_unlocks(view, skill, lv)
-	var subtitle := ", ".join(unlocks)
-	var detail := ""
-	var seconds := 1.5
+	var opens := level_unlocks(view, skill, lv)
+	var subtitle := ("New for you · " + ", ".join(opens)) if not opens.is_empty() else ""
 	if skill == "fishing": subtitle = fishing_unlock_line(view, lv)
-	if skill == "cooking":
-		if lv == 4:
-			title += " · 3rd slot"
-			subtitle = "Three-ingredient dishes now possible"
-			detail = "Today changes: 3-ingredient dishes"
-			seconds = 3.0   # a level that changes the day (§4.8.3)
-		else: subtitle = " · ".join(unlocks)
-		if not recipes.is_empty(): title += " · Recipe: " + str(recipes[0])
-	if first:
-		seconds = 3.0
-		if detail == "" and not recipes.is_empty() and skill != "cooking": detail = "Recipe: " + ", ".join(recipes)
-	elif detail == "":
-		detail = next_level_line(view, skill, lv)
+	if skill == "cooking" and lv == 4:
+		title += " · 3rd slot"
+		subtitle = "Three-ingredient dishes now possible"
+	var detail := ("New recipe: " + ", ".join(recipes)) if not recipes.is_empty() else ""
+	# Tip: the next level, except the account's first (the teaching line) and a level that changes the day (q(69)).
+	var tip := LEVEL_TIP if first else str(DAY_CHANGES.get("%s:%d" % [skill, lv], next_level_line(view, skill, lv)))
 	return {kind = "level_up", level = str(lv), title = title, subtitle = subtitle, rewards = rewards, detail = detail,
-		tip = LEVEL_TIP if first else "", action = "Use bait" if first and bait != "" else "",
-		action_id = "use_bait" if first and bait != "" else "", seconds = seconds}
+		tip = tip, action = "Use bait" if first and bait != "" else "", action_id = "use_bait" if first and bait != "" else "",
+		seconds = 3.0 if first else 1.5}
 
 ## What a skill level opens this season: Farming — the crops of that gate (main ingredients first), then other stall
 ## goods and tools (Compost, Row Hoe); Fishing — the fish of that level; Cooking — the conveniences of that level.
@@ -851,6 +847,7 @@ static func level_unlocks(view: Dictionary, skill: String, level: int) -> Array:
 	var out: Array = []
 	match skill:
 		"farming":
+			# The crops, main ones first (`Potato, Chamomile`), then other stall goods and tools (`Compost`) — q(69).
 			out = skill_unlocks(view, "farming", level)
 			for o in view.get("stall", {}).get("buy", []):
 				var id := str(o.get("id", ""))
@@ -956,7 +953,18 @@ static func today_rows(view: Dictionary) -> Array:
 		if st == "ready": ready[str(p.crop)] = int(ready.get(str(p.crop), 0)) + 1
 		elif st == "sown": sown += 1
 		elif st == "growing": timed.append([float(p.get("ready_in", 0)), _row("%s ready in %s" % [plural(item_name(view, str(p.crop))), duration(float(p.get("ready_in", 0)))], str(p.crop), "plots")])
-	for c in ready: now_rows.append(_row("Harvest %d %s" % [int(ready[c]), plural(item_name(view, str(c))) if int(ready[c]) > 1 else item_name(view, str(c))], str(c), "plots"))
+	# One harvest row (q(69)): `Harvest 20 Radishes` for one crop, `Harvest 30 crops` for several; the level it brings
+	# follows it as an info row (`Farming Lv 2 with this harvest`, no button — §14.5's exception: it goes with its source).
+	var level := P0Guide.harvest_level(view)
+	if ready.size() == 1:
+		var c: String = ready.keys()[0]
+		now_rows.append(_row("Harvest %d %s" % [int(ready[c]), plural(item_name(view, c)) if int(ready[c]) > 1 else item_name(view, c)], c, "plots"))
+	elif ready.size() > 1:
+		var n := 0
+		for c in ready: n += int(ready[c])
+		now_rows.append(_row("Harvest %d crops" % n, str(ready.keys()[0]), "plots"))
+	if not ready.is_empty() and bool(level.get("now", false)):
+		now_rows.append(_row("Farming Lv %d with this harvest" % int(level.level), "hoe", ""))
 	if sown > 0: now_rows.append(_row("Water %d sown plot%s · Free" % [sown, "" if sown == 1 else "s"], "water", "plots"))
 	var stove = view.get("cooking", {}).get("stove", null)
 	if stove is Dictionary:
@@ -970,25 +978,26 @@ static func today_rows(view: Dictionary) -> Array:
 			if str(st.get("id", "")).begins_with("fish_") and item(view, str(st.id)).get("cook", true): fish += int(st.get("qty", 0))
 		if fish > 0 and not guided_stove: now_rows.append(_row("%d fish · the stove is free" % fish, "pot", "stove"))
 	timed.sort_custom(func(a, b): return float(a[0]) < float(b[0]))
-	# after the first session the soonest crop says what its harvest does: · Farming Lv 2 at first harvest (§14.2 end)
-	if not P0Guide.first_phase(view):
-		var tail := P0Guide.harvest_level_tail(view)
-		for t in timed:
-			if tail != "" and str(t[1].go) == "plots":
-				t[1].line += tail
-				break
 	var rows: Array = now_rows.duplicate()
 	for t in timed:
 		if rows.size() < 3 and not rows.any(func(r): return r.line == t[1].line): rows.append(t[1])
+	# Not harvested yet, the growing crops bring the level: the info row follows the soonest crop's row (q(69), the old
+	# tail on that row read as that crop's own level, §14.2 end).
+	if not level.is_empty() and not bool(level.now) and not P0Guide.first_phase(view):
+		var at := -1
+		for i in rows.size():
+			if str(rows[i].go) == "plots" and at < 0: at = i
+		if at >= 0: rows.insert(at + 1, _row("Farming Lv %d at your first harvest" % int(level.level), "hoe", ""))
 	var best := ""
 	var best_gap := 1 << 30
 	for key in ["farming", "fishing", "cooking"]:
 		var sk: Dictionary = view.get("skills", {}).get(key, {})
 		if sk.get("next", null) == null: continue
+		if key == "farming" and not level.is_empty(): continue   # already said by the harvest's info row
 		var gap := int(sk.next) - int(sk.get("xp", 0))
 		if gap < best_gap:
 			best_gap = gap
-			best = "%s Lv%d in %d XP" % [key.capitalize(), int(sk.get("level", 1)) + 1, gap]
+			best = "%s Lv %d · %d XP to go" % [key.capitalize(), int(sk.get("level", 1)) + 1, gap]   # q(69)
 	if rows.size() < 3 and best != "": rows.append(_row(best, "xp", ""))
 	if rows.is_empty(): rows.append(_first_sow_row(view))
 	return P0Guide.focus_first(rows.slice(0, 3))

@@ -4,7 +4,7 @@
     0,
     0,
     328,
-    668
+    685
   ],
   "children": [
     {
@@ -35,7 +35,7 @@
         0,
         70,
         328,
-        598
+        615
       ],
       "children": [
         {
@@ -172,7 +172,7 @@
                             {
                               "type": "PanelContainer",
                               "rect": [
-                                49,
+                                44,
                                 152,
                                 97,
                                 28
@@ -181,7 +181,7 @@
                                 {
                                   "type": "HBoxContainer",
                                   "rect": [
-                                    57,
+                                    52,
                                     155,
                                     81,
                                     22
@@ -190,7 +190,7 @@
                                     {
                                       "type": "Label",
                                       "rect": [
-                                        57,
+                                        52,
                                         155,
                                         81,
                                         22
@@ -205,25 +205,25 @@
                             {
                               "type": "PanelContainer",
                               "rect": [
-                                154,
+                                149,
                                 152,
-                                125,
+                                134,
                                 28
                               ],
                               "children": [
                                 {
                                   "type": "HBoxContainer",
                                   "rect": [
-                                    162,
+                                    157,
                                     155,
-                                    109,
+                                    118,
                                     22
                                   ],
                                   "children": [
                                     {
                                       "type": "TextureRect",
                                       "rect": [
-                                        162,
+                                        157,
                                         159,
                                         14,
                                         14
@@ -232,13 +232,13 @@
                                     {
                                       "type": "Label",
                                       "rect": [
-                                        180,
+                                        175,
                                         155,
-                                        91,
+                                        100,
                                         22
                                       ],
                                       "variation": "RowTitleXB15",
-                                      "text": "3 Worm Bait"
+                                      "text": "+3 Worm Bait"
                                     }
                                   ]
                                 }
@@ -247,25 +247,25 @@
                             {
                               "type": "PanelContainer",
                               "rect": [
-                                102,
+                                98,
                                 188,
-                                123,
+                                132,
                                 28
                               ],
                               "children": [
                                 {
                                   "type": "HBoxContainer",
                                   "rect": [
-                                    110,
+                                    106,
                                     191,
-                                    107,
+                                    116,
                                     22
                                   ],
                                   "children": [
                                     {
                                       "type": "TextureRect",
                                       "rect": [
-                                        110,
+                                        106,
                                         195,
                                         14,
                                         14
@@ -274,13 +274,13 @@
                                     {
                                       "type": "Label",
                                       "rect": [
-                                        128,
+                                        124,
                                         191,
-                                        89,
+                                        98,
                                         22
                                       ],
                                       "variation": "RowTitleXB15",
-                                      "text": "3 Wild Herb"
+                                      "text": "+3 Wild Herb"
                                     }
                                   ]
                                 }
@@ -299,7 +299,7 @@
                         19
                       ],
                       "variation": "C13B",
-                      "text": "Recipe: Herb Grilled Fish"
+                      "text": "New recipe: Herb Grilled Fish"
                     },
                     {
                       "type": "Label",
@@ -347,7 +347,7 @@
                 14
               ],
               "variation": "C9B",
-              "text": "LevelUp · the account's first (≤ 3 s)"
+              "text": "LevelUp · SKILL-3, the account's first (≤ 3 s)"
             }
           ]
         },
@@ -357,7 +357,7 @@
             0,
             377,
             328,
-            173
+            190
           ],
           "children": [
             {
@@ -366,7 +366,7 @@
                 0,
                 377,
                 328,
-                153
+                170
               ],
               "children": [
                 {
@@ -375,7 +375,7 @@
                     0,
                     377,
                     328,
-                    139
+                    156
                   ],
                   "children": [
                     {
@@ -393,7 +393,7 @@
                         0,
                         393,
                         328,
-                        56
+                        74
                       ],
                       "children": [
                         {
@@ -402,14 +402,14 @@
                             16,
                             397,
                             296,
-                            52
+                            70
                           ],
                           "children": [
                             {
                               "type": "PanelContainer",
                               "rect": [
                                 16,
-                                399,
+                                408,
                                 48,
                                 48
                               ],
@@ -418,12 +418,12 @@
                                   "type": "Label",
                                   "rect": [
                                     16,
-                                    407,
+                                    416,
                                     48,
                                     31
                                   ],
                                   "variation": "TitleXB20",
-                                  "text": "3"
+                                  "text": "2"
                                 }
                               ]
                             },
@@ -433,7 +433,7 @@
                                 76,
                                 397,
                                 236,
-                                52
+                                70
                               ],
                               "children": [
                                 {
@@ -445,7 +445,7 @@
                                     31
                                   ],
                                   "variation": "TitleXB20",
-                                  "text": "Farming Lv 3"
+                                  "text": "Farming Lv 2"
                                 },
                                 {
                                   "type": "Label",
@@ -453,10 +453,10 @@
                                     76,
                                     430,
                                     236,
-                                    19
+                                    37
                                   ],
                                   "variation": "C13B",
-                                  "text": "Potato, Chamomile, Compost"
+                                  "text": "New for you · Carrot Seeds, Herb Seeds"
                                 }
                               ]
                             }
@@ -468,7 +468,7 @@
                       "type": "MarginContainer",
                       "rect": [
                         0,
-                        459,
+                        477,
                         328,
                         28
                       ],
@@ -477,7 +477,7 @@
                           "type": "HFlowContainer",
                           "rect": [
                             16,
-                            459,
+                            477,
                             296,
                             28
                           ],
@@ -485,8 +485,8 @@
                             {
                               "type": "PanelContainer",
                               "rect": [
-                                115,
-                                459,
+                                37,
+                                477,
                                 97,
                                 28
                               ],
@@ -494,8 +494,8 @@
                                 {
                                   "type": "HBoxContainer",
                                   "rect": [
-                                    123,
-                                    462,
+                                    45,
+                                    480,
                                     81,
                                     22
                                   ],
@@ -503,13 +503,55 @@
                                     {
                                       "type": "Label",
                                       "rect": [
-                                        123,
-                                        462,
+                                        45,
+                                        480,
                                         81,
                                         22
                                       ],
                                       "variation": "RowTitleXB15",
                                       "text": "+30 Energy"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "PanelContainer",
+                              "rect": [
+                                142,
+                                477,
+                                149,
+                                28
+                              ],
+                              "children": [
+                                {
+                                  "type": "HBoxContainer",
+                                  "rect": [
+                                    150,
+                                    480,
+                                    133,
+                                    22
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "TextureRect",
+                                      "rect": [
+                                        150,
+                                        484,
+                                        14,
+                                        14
+                                      ]
+                                    },
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        168,
+                                        480,
+                                        115,
+                                        22
+                                      ],
+                                      "variation": "RowTitleXB15",
+                                      "text": "+5 Carrot Seeds"
                                     }
                                   ]
                                 }
@@ -523,12 +565,12 @@
                       "type": "Label",
                       "rect": [
                         0,
-                        497,
+                        515,
                         328,
-                        19
+                        18
                       ],
-                      "variation": "C13B",
-                      "text": "Next Lv4 · Tomato, Chili, Row Hoe · 150 XP"
+                      "variation": "C12B",
+                      "text": "Next Lv3 · 150 XP"
                     }
                   ]
                 }
@@ -538,12 +580,12 @@
               "type": "Label",
               "rect": [
                 0,
-                536,
+                553,
                 328,
                 14
               ],
               "variation": "C9B",
-              "text": "LevelUp · a later level (1.5 s)"
+              "text": "LevelUp · FARM-LV2, a later level (1.5 s)"
             }
           ]
         },
@@ -551,7 +593,7 @@
           "type": "VBoxContainer",
           "rect": [
             0,
-            562,
+            579,
             328,
             106
           ],
@@ -560,7 +602,7 @@
               "type": "UiMomentBanner",
               "rect": [
                 0,
-                562,
+                579,
                 328,
                 86
               ],
@@ -569,7 +611,7 @@
                   "type": "VBoxContainer",
                   "rect": [
                     0,
-                    562,
+                    579,
                     328,
                     72
                   ],
@@ -578,7 +620,7 @@
                       "type": "ColorRect",
                       "rect": [
                         0,
-                        562,
+                        579,
                         328,
                         6
                       ]
@@ -587,7 +629,7 @@
                       "type": "MarginContainer",
                       "rect": [
                         0,
-                        578,
+                        595,
                         328,
                         56
                       ],
@@ -596,7 +638,7 @@
                           "type": "HBoxContainer",
                           "rect": [
                             16,
-                            582,
+                            599,
                             296,
                             52
                           ],
@@ -605,7 +647,7 @@
                               "type": "PanelContainer",
                               "rect": [
                                 16,
-                                584,
+                                601,
                                 48,
                                 48
                               ],
@@ -614,7 +656,7 @@
                                   "type": "TextureRect",
                                   "rect": [
                                     27,
-                                    595,
+                                    612,
                                     26,
                                     26
                                   ]
@@ -625,7 +667,7 @@
                               "type": "VBoxContainer",
                               "rect": [
                                 76,
-                                582,
+                                599,
                                 236,
                                 52
                               ],
@@ -634,7 +676,7 @@
                                   "type": "Label",
                                   "rect": [
                                     76,
-                                    582,
+                                    599,
                                     236,
                                     31
                                   ],
@@ -645,7 +687,7 @@
                                   "type": "Label",
                                   "rect": [
                                     76,
-                                    615,
+                                    632,
                                     236,
                                     19
                                   ],
@@ -666,7 +708,7 @@
               "type": "Label",
               "rect": [
                 0,
-                654,
+                671,
                 328,
                 14
               ],

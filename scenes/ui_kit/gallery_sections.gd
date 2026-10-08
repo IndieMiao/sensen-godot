@@ -1195,19 +1195,19 @@ static func _moment_banners() -> Control:
 	first.level = "2"
 	first.title = "Fishing Lv 2"
 	first.subtitle = "Fine fish now stay on the hook"
-	first.rewards = [UiFloatText.pill("+50 Energy", UiFloatText.Tone.ENERGY_GAIN), UiFloatText.pill("3 Worm Bait", UiFloatText.Tone.ITEM, _tex("bait_worm")),
-		UiFloatText.pill("3 Wild Herb", UiFloatText.Tone.ITEM, _tex("crop_herb"))]
-	first.detail = "Recipe: Herb Grilled Fish"
+	first.rewards = [UiFloatText.pill("+50 Energy", UiFloatText.Tone.ENERGY_GAIN), UiFloatText.pill("+3 Worm Bait", UiFloatText.Tone.ITEM, _tex("bait_worm")),
+		UiFloatText.pill("+3 Wild Herb", UiFloatText.Tone.ITEM, _tex("crop_herb"))]
+	first.detail = "New recipe: Herb Grilled Fish"
 	first.tip = "Levels unlock gear, fish and seeds. Basics never lock."
 	first.action = "Use bait"
-	v.add_child(_captioned(first, "LevelUp · the account's first (≤ 3 s)"))
+	v.add_child(_captioned(first, "LevelUp · SKILL-3, the account's first (≤ 3 s)"))
 	var later := UiMomentBanner.new()
-	later.level = "3"
-	later.title = "Farming Lv 3"
-	later.subtitle = "Potato, Chamomile, Compost"
-	later.rewards = [UiFloatText.pill("+30 Energy", UiFloatText.Tone.ENERGY_GAIN)]
-	later.detail = "Next Lv4 · Tomato, Chili, Row Hoe · 150 XP"
-	v.add_child(_captioned(later, "LevelUp · a later level (1.5 s)"))
+	later.level = "2"
+	later.title = "Farming Lv 2"
+	later.subtitle = "New for you · Carrot Seeds, Herb Seeds"
+	later.rewards = [UiFloatText.pill("+30 Energy", UiFloatText.Tone.ENERGY_GAIN), UiFloatText.pill("+5 Carrot Seeds", UiFloatText.Tone.ITEM, _tex("seed_carrot"))]
+	later.tip = "Next Lv3 · 150 XP"
+	v.add_child(_captioned(later, "LevelUp · FARM-LV2, a later level (1.5 s)"))
 	var done := UiMomentBanner.new()
 	done.kind = UiMomentBanner.Kind.COMPLETE
 	done.title = "Gather Gloves"
