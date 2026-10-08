@@ -66,16 +66,22 @@ func _exit_tree() -> void:
 
 ## AppRouter stacking: the map below us hands back its camera and environment on resume. Going under a room we hand
 ## ours over as well: the viewport uses the first WorldEnvironment in the tree, so the farmhouse otherwise lit with the
-## farm's cool ambient and green backdrop (SGODOT-249; farm.gd and P0Room.suspend() do the same).
+## farm's cool ambient and green backdrop (SGODOT-249; farm.gd and P0Room.suspend() do the same). The canvas layers
+## go too: FarmBackground (layer −1) is the farm's backdrop only under its BG_CANVAS environment; under the room's
+## colour background it would cover the room, and hiding the farm does not hide a CanvasLayer.
 func suspend() -> void:
 	set_process(false)
 	visible = false
 	if world_env.environment: _saved_env = world_env.environment
 	world_env.environment = null
+	for c in get_children():
+		if c is CanvasLayer: c.visible = false
 
 func resume() -> void:
 	get_viewport().transparent_bg = false
 	if _saved_env: world_env.environment = _saved_env
+	for c in get_children():
+		if c is CanvasLayer: c.visible = true
 	visible = true
 	set_process(true)
 	cam.make_current()

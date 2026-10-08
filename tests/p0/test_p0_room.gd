@@ -297,6 +297,8 @@ func test_the_farm_hands_its_environment_to_the_farmhouse_above_it() -> void:
 	assert_object(farm_env).is_not_null()
 	farm.suspend()
 	assert_object(farm.world_env.environment).is_null()
+	# Its canvas backdrop (layer −1, BG_CANVAS only) would otherwise cover the room's colour background.
+	assert_bool(farm.get_node("FarmBackground").visible).is_false()
 	var r := _farmhouse()
 	await get_tree().process_frame
 	assert_object(r.get_viewport().find_world_3d().environment).is_same(r.environment)
@@ -305,6 +307,7 @@ func test_the_farm_hands_its_environment_to_the_farmhouse_above_it() -> void:
 	await get_tree().process_frame
 	assert_object(farm.world_env.environment).is_same(farm_env)
 	assert_object(farm.get_viewport().find_world_3d().environment).is_same(farm_env)
+	assert_bool(farm.get_node("FarmBackground").visible).is_true()
 	farm.suspend()
 	farm.suspend()   # twice in a row still keeps the farm's own
 	farm.resume()
