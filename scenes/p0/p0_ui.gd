@@ -984,19 +984,42 @@ func _marker_area() -> Rect2:
 ## than one line wraps (Layout=Wrap, two lines at most). `tone` also takes the older Color argument (callers in
 ## other PRs, e.g. SGODOT-231's material notices): any colour draws in the ITEM tone.
 func float_text(text: String, screen: Vector2, tone: Variant = UiFloatText.Tone.ITEM, icon: Texture2D = null, stack := 0) -> UiFloatText:
-	var t: UiFloatText.Tone = UiFloatText.Tone.ITEM if tone is Color else int(tone)
-	var f := UiFloatText.new(text, t, icon, UiFloatText.Layout.WRAP if text.length() > _FLOAT_HUG_CHARS else UiFloatText.Layout.HUG)
-	f.theme = UiKit.theme()
-	root.add_child(f)
-	f.play(_float_start(screen, f.shown_size().y, stack), stack)
+	var f := _make_float(text, UiFloatText.Tone.ITEM if tone is Color else int(tone), icon)
+	f.play(_float_start(screen, [f], stack), stack)
 	return f
 
-## A float never rises over the HUD (int6, 李元芳: `+5 Cooking XP ★` crossed the Today chip): its start is pushed
-## down so that, at the top of its rise, the line still sits under the HUD rows.
-func _float_start(screen: Vector2, h: float, stack: int) -> Vector2:
-	var top := _marker_area().position.y + _kit.global_position.y - root.global_position.y
-	var lowest := top + h + UiFloatText._RISE + UiFloatText._STACK_RISE * clampi(stack, 0, UiFloatText._STACK_MAX - 1)
+func _make_float(text: String, tone: int, icon: Texture2D) -> UiFloatText:
+	var f := UiFloatText.new(text, tone, icon, UiFloatText.Layout.WRAP if text.length() > _FLOAT_HUG_CHARS else UiFloatText.Layout.HUG)
+	f.theme = UiKit.theme()
+	root.add_child(f)
+	return f
+
+## Floats never rise over the HUD (int6, 李元芳: `+5 Cooking XP ★` crossed the Today chip; 不知火舞 233): a group's start
+## is pushed down until its top line, at the top of its rise, still clears the HUD rows by FLOAT_HUD_GAP. `top_index`
+## = that line's stack index (the group's lines minus one).
+const FLOAT_HUD_GAP := 8.0
+func _float_start(screen: Vector2, lines: Array, top_index: int) -> Vector2:
+	var hud_bottom := _marker_area().position.y + _kit.global_position.y - root.global_position.y
+	var h := 0.0
+	for f in lines: h = maxf(h, (f as UiFloatText).shown_size().y)
+	var lowest := hud_bottom + FLOAT_HUD_GAP + h + UiFloatText._RISE \
+		+ UiFloatText._STACK_RISE * clampi(top_index, 0, UiFloatText._STACK_MAX - 1)
 	return Vector2(screen.x, maxf(screen.y, lowest))
+
+## The lowest a pushed-down group may start (its bottom): above the quick bar, an open drawer, and the main action key
+## when the group's width reaches over it (不知火舞 233), in this UI's root space.
+func _float_floor(x: float, half_w: float) -> float:
+	var y := root.size.y
+	for c in [_bar, _keys]:
+		if c == null or not (c as Control).is_visible_in_tree(): continue
+		var r := (c as Control).get_global_rect()
+		var gx := x + root.global_position.x
+		if c == _keys and (r.end.x < gx - half_w or r.position.x > gx + half_w): continue
+		y = minf(y, r.position.y)
+	if _modal != null and _modal.get_child_count() > 1:
+		var content := _modal.get_child(1) as Control
+		if content is UiDrawer: y = minf(y, content.get_global_rect().position.y)
+	return y - root.global_position.y
 
 # ---------------------------------------------------------------- one reply's floats (q(49) ①, §4.8.6)
 ## The order of one reply's lines: Energy → XP → items → coins → affinity (q(49) ①).
@@ -1024,10 +1047,10 @@ func float_lines(parts: Array, at: Vector2) -> Array:
 	for k in kinds:
 		if not order.has(k): order.append(k)
 	var shown: Array = []
+	var fresh: Array = []   # [{kind, text, tone, icon, merged, overflow}] lines that need a new float
 	var now := int(float_clock.call())
-	for i in order.size():
+	for i in mini(order.size(), FLOAT_MAX_LINES):
 		var k: String = order[i]
-		if i >= FLOAT_MAX_LINES: break
 		var merged: Dictionary = kinds[k]
 		var extra: Array = order.slice(FLOAT_MAX_LINES) if i == FLOAT_MAX_LINES - 1 else []
 		if extra.is_empty():
@@ -1046,8 +1069,28 @@ func float_lines(parts: Array, at: Vector2) -> Array:
 		# Energy is coloured by what it adds up to; a line of text parts only (a floor fee) keeps its own tone.
 		if k == "energy" and merged.values().any(func(p): return p.has("fmt")):
 			tone = UiFloatText.Tone.ENERGY_COST if _float_sum(merged) < 0 else UiFloatText.Tone.ENERGY_GAIN
-		var f := float_text(text, at, tone, first.get("icon", null), i)
-		if extra.is_empty(): _live_floats[k] = {node = f, parts = merged.duplicate(true), at = at, ms = now}
+		fresh.append({kind = k, text = text, tone = tone, icon = first.get("icon", null), merged = merged, overflow = not extra.is_empty()})
+	if fresh.is_empty(): return shown
+	var base := shown.size()   # lines bumped in place keep the lower places
+	var nodes: Array = fresh.map(func(l): return _make_float(l.text, l.tone, l.icon))
+	var start := _float_start(at, nodes, base + nodes.size() - 1)
+	var half_w := 0.0
+	for n in nodes: half_w = maxf(half_w, (n as UiFloatText).shown_size().x * 0.5)
+	if nodes.size() > 1 and start.y > at.y and start.y > _float_floor(at.x, half_w):
+		# Pushed down under the HUD the group would sit on the bar, the key or a drawer: only the first line stays and
+		# the rest join it (不知火舞 233, same joining as q(49) ①).
+		for n in nodes: (n as UiFloatText).queue_free()
+		var one: Dictionary = fresh[0].duplicate()
+		one.text = " · ".join(fresh.map(func(l): return str(l.text)))
+		one.overflow = true
+		fresh = [one]
+		nodes = [_make_float(one.text, one.tone, one.icon)]
+		start = _float_start(at, nodes, base)
+	for j in nodes.size():
+		var f: UiFloatText = nodes[j]
+		f.play(start, base + j)
+		var l: Dictionary = fresh[j]
+		if not l.overflow: _live_floats[l.kind] = {node = f, parts = (l.merged as Dictionary).duplicate(true), at = at, ms = now}
 		shown.append(f)
 	return shown
 

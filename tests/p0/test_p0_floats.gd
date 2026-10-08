@@ -89,7 +89,37 @@ func test_a_float_stays_under_the_hud() -> void:
 	var f := ui.float_text("+5 Cooking XP ★", Vector2(180, 60), UiFloatText.Tone.XP)
 	var hud_bottom := float(UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H) + ui.safe_top()
 	# Its start (bottom centre) is low enough that the top of the rise clears the HUD.
-	assert_float(f.position.y + f.pivot_offset.y - f.shown_size().y - UiFloatText._RISE).is_greater_equal(hud_bottom - 0.5)
+	assert_float(f.position.y + f.pivot_offset.y - f.shown_size().y - UiFloatText._RISE).is_greater_equal(hud_bottom + P0Ui.FLOAT_HUD_GAP - 0.5)
+	# A whole group counts: its top line (two places up) still clears the HUD by 8 at the top of its rise.
+	var group := ui.float_lines([
+		{kind = "energy", key = "energy", amount = -2, fmt = "%s Energy"},
+		{kind = "xp", key = "%s XP", amount = 5, fmt = "%s XP", tone = UiFloatText.Tone.XP},
+		{kind = "coins", key = "coins", amount = 12, fmt = "%s coins", tone = UiFloatText.Tone.COINS}], Vector2(180, 60))
+	var top_line: UiFloatText = group[2]
+	assert_float(top_line._base_y - UiFloatText._RISE).is_greater_equal(hud_bottom + P0Ui.FLOAT_HUD_GAP - 0.5)
+
+## 不知火舞 233: pushed down, a group never sits on an open drawer (or the bar / the key): only the first line stays,
+## the rest joined into it.
+func test_no_room_under_the_hud_joins_the_group_into_one_line() -> void:
+	var ui := P0Ui.new()
+	ui.quick_store = STORE
+	add_child(auto_free(ui))
+	await get_tree().process_frame
+	ui.set_view({"energy": {"value": 140, "max": 200}, "coins": 52, "bag": {"capacity": 25, "slots": []},
+		"skills": {"farming": {"level": 2, "xp": 60, "floor": 50, "next": 150}}})
+	ui.set_surface("farm")
+	var hud_bottom := float(UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H) + ui.safe_top()
+	# A drawer whose top leaves room for one pushed-down line, not three.
+	var open := UiDrawer.new(ui.root.size.y - (hud_bottom + P0Ui.FLOAT_HUD_GAP + 30.0 + UiFloatText._RISE + 20.0))
+	open.animate = false
+	ui._open_modal(open, 0.32, true)
+	await get_tree().process_frame
+	var parts := [{kind = "energy", key = "energy", amount = -2, fmt = "%s Energy"},
+		{kind = "xp", key = "%s XP", amount = 5, fmt = "%s XP", tone = UiFloatText.Tone.XP},
+		{kind = "coins", key = "coins", amount = 12, fmt = "%s coins", tone = UiFloatText.Tone.COINS}]
+	var shown := ui.float_lines(parts, Vector2(180, 40))   # a head near the top: the group is pushed down
+	assert_int(shown.size()).is_equal(1)
+	assert_str(shown[0].text).is_equal("−2 Energy · +5 XP · +12 coins")
 
 ## A world's own lines of the same reply (a gather's `+6 Timber · Stored`) join the runtime's in one batch.
 func test_a_worlds_lines_join_the_replys_batch() -> void:
