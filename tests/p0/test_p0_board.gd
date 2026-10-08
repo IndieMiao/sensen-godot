@@ -217,9 +217,9 @@ func test_details_lay_the_items_card_over_the_request() -> void:
 	assert_object(sheet.scrim()).is_not_null()   # the request below is dimmed: the card is its own layer
 	assert_object(sheet.scrim().color).is_equal(UiTokens.COLOR_SCRIM_MODAL)
 	assert_str(ui.modal_kind).is_equal("board_request")
-	ui.back_modal()   # closes the card, not the request
+	assert_bool(ui.close_top_layer()).is_true()   # Android Back closes the card, not the request (刘邦 on #73)
 	await await_idle_frame()
 	assert_str(ui.modal_kind).is_equal("board_request")
 	assert_array(ui._modal.find_children("*", "UiInfoSheet", true, false)).is_empty()
-	ui.back_modal()
+	assert_bool(ui.close_top_layer()).is_true()
 	assert_str(ui.modal_kind).is_equal("counter")
