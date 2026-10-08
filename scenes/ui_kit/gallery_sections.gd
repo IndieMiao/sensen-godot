@@ -49,6 +49,7 @@ static func all() -> Array[Dictionary]:
 		{id = "world_prompts", title = "World prompts", figma = "UiWorldIconButton · UiWorldNameBar · UiNpcNameTag · WorldIconButton 1674:101157 · WorldNameBar 1674:101190 · NpcNameTag 1674:101195 · row 51 · LOCK-07 / 16 v2", build = _world_prompts},
 		{id = "entry_card", title = "UiEntryCard", figma = "EntryCard 1468:94344 · LOCK-21 / LOCK-10", build = _entry_cards},
 		{id = "tip_card", title = "UiTipCard", figma = "TipCard 1243:87540 · TUT-2 482:72 · A-03 (SGODOT-232 U6, 235-B2)", build = _tip_cards},
+		{id = "inbox_notice", title = "UiInboxNotice", figma = "InboxNotice 1860:104768 · BAG-5-2 482:146 · FARM-LV2-2 1368:91701 · q(87) (SGODOT-234)", build = _inbox_notices},
 		# SGODOT-222 world display
 		{id = "need_tile", title = "UiNeedTile", figma = "NeedTile 1090:78003 · LOCK-10", build = _need_tiles},
 		{id = "need_source", title = "UiNeedSource", figma = "NeedSource 1092:77266 · LOCK-10 / 08", build = _need_sources},
@@ -1349,6 +1350,19 @@ static func _reward_moments() -> Control:
 	row.add_child(_captioned(_reward_moment({tone = UiRewardMoment.Tone.MILESTONE, event = "Home Cook", icon = _tex("cookbook"),
 		item_name = "Cookbook 8/48", strip = "Title · +50 Energy"}), "Milestone · no buttons"))
 	return row
+
+## q(87): one parcel, several in one reply (the first one named, `+N more`), and a full Inbox (waiting for a place).
+static func _inbox_notices() -> Control:
+	var v := VBoxContainer.new()
+	v.add_theme_constant_override(&"separation", 12)
+	for spec in [{title = "Sent to Inbox", item = "Perch", quantity = "×7", line = "Expires in 24h"},
+			{title = "Sent to Inbox", item = "Carrot Seeds", quantity = "×5", line = "+1 more · Expires in 24h"},
+			{title = "Inbox full · waiting", item = "Herb Grilled Fish ★★", quantity = "×12", line = "+12 more · Claim a parcel first"}]:
+		var card := UiInboxNotice.new()
+		card.show_notice(spec, _tex("parcel"))   # the shared P0 parcel icon, as P0Ui passes it
+		card.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN   # 282, as under the bell
+		v.add_child(card)
+	return v
 
 ## TUT-2 specimens (482:72): the P0 first-session sentences with their icons, 10 apart.
 ## Spaced and centred so each card's halo shows on its own, as at run time (one card at a time, 不知火舞 on 235-B2).

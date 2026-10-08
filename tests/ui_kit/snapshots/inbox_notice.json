@@ -1,0 +1,566 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    316
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiInboxNotice"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        36
+      ],
+      "variation": "CaptionR12",
+      "text": "InboxNotice 1860:104768 · BAG-5-2 482:146 · FARM-LV2-2 1368:91701 · q(87) (SGODOT-234)"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        70,
+        328,
+        246
+      ],
+      "children": [
+        {
+          "type": "UiInboxNotice",
+          "rect": [
+            0,
+            70,
+            282,
+            74
+          ],
+          "children": [
+            {
+              "type": "HBoxContainer",
+              "rect": [
+                10,
+                78,
+                263,
+                66
+              ],
+              "children": [
+                {
+                  "type": "MarginContainer",
+                  "rect": [
+                    10,
+                    78,
+                    24,
+                    28
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        10,
+                        82,
+                        24,
+                        24
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "VBoxContainer",
+                  "rect": [
+                    42,
+                    78,
+                    231,
+                    66
+                  ],
+                  "children": [
+                    {
+                      "type": "Control",
+                      "rect": [
+                        42,
+                        78,
+                        231,
+                        20
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            42,
+                            78,
+                            231,
+                            18
+                          ],
+                          "variation": "C12XB",
+                          "text": "Sent to Inbox"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Control",
+                      "rect": [
+                        42,
+                        98,
+                        231,
+                        21
+                      ],
+                      "children": [
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            42,
+                            98,
+                            231,
+                            18
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                42,
+                                98,
+                                211,
+                                16
+                              ],
+                              "variation": "C11B",
+                              "text": "Perch"
+                            },
+                            {
+                              "type": "MarginContainer",
+                              "rect": [
+                                253,
+                                98,
+                                20,
+                                18
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    253,
+                                    98,
+                                    15,
+                                    18
+                                  ],
+                                  "variation": "C12XB",
+                                  "text": "×7"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Control",
+                      "rect": [
+                        42,
+                        119,
+                        231,
+                        25
+                      ],
+                      "children": [
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            42,
+                            119,
+                            231,
+                            19
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                42,
+                                119,
+                                227,
+                                15
+                              ],
+                              "variation": "C10B",
+                              "text": "Expires in 24h"
+                            },
+                            {
+                              "type": "Label",
+                              "rect": [
+                                269,
+                                119,
+                                4,
+                                19
+                              ],
+                              "variation": "C13XB",
+                              "text": "›"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "UiInboxNotice",
+          "rect": [
+            0,
+            156,
+            282,
+            74
+          ],
+          "children": [
+            {
+              "type": "HBoxContainer",
+              "rect": [
+                10,
+                164,
+                263,
+                66
+              ],
+              "children": [
+                {
+                  "type": "MarginContainer",
+                  "rect": [
+                    10,
+                    164,
+                    24,
+                    28
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        10,
+                        168,
+                        24,
+                        24
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "VBoxContainer",
+                  "rect": [
+                    42,
+                    164,
+                    231,
+                    66
+                  ],
+                  "children": [
+                    {
+                      "type": "Control",
+                      "rect": [
+                        42,
+                        164,
+                        231,
+                        20
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            42,
+                            164,
+                            231,
+                            18
+                          ],
+                          "variation": "C12XB",
+                          "text": "Sent to Inbox"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Control",
+                      "rect": [
+                        42,
+                        184,
+                        231,
+                        21
+                      ],
+                      "children": [
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            42,
+                            184,
+                            231,
+                            18
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                42,
+                                184,
+                                211,
+                                16
+                              ],
+                              "variation": "C11B",
+                              "text": "Carrot Seeds"
+                            },
+                            {
+                              "type": "MarginContainer",
+                              "rect": [
+                                253,
+                                184,
+                                20,
+                                18
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    253,
+                                    184,
+                                    15,
+                                    18
+                                  ],
+                                  "variation": "C12XB",
+                                  "text": "×5"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Control",
+                      "rect": [
+                        42,
+                        205,
+                        231,
+                        25
+                      ],
+                      "children": [
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            42,
+                            205,
+                            231,
+                            19
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                42,
+                                205,
+                                227,
+                                15
+                              ],
+                              "variation": "C10B",
+                              "text": "+1 more · Expires in 24h"
+                            },
+                            {
+                              "type": "Label",
+                              "rect": [
+                                269,
+                                205,
+                                4,
+                                19
+                              ],
+                              "variation": "C13XB",
+                              "text": "›"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "UiInboxNotice",
+          "rect": [
+            0,
+            242,
+            282,
+            74
+          ],
+          "children": [
+            {
+              "type": "HBoxContainer",
+              "rect": [
+                10,
+                250,
+                263,
+                66
+              ],
+              "children": [
+                {
+                  "type": "MarginContainer",
+                  "rect": [
+                    10,
+                    250,
+                    24,
+                    28
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        10,
+                        254,
+                        24,
+                        24
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "VBoxContainer",
+                  "rect": [
+                    42,
+                    250,
+                    231,
+                    66
+                  ],
+                  "children": [
+                    {
+                      "type": "Control",
+                      "rect": [
+                        42,
+                        250,
+                        231,
+                        20
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            42,
+                            250,
+                            231,
+                            18
+                          ],
+                          "variation": "C12XB",
+                          "text": "Inbox full · waiting"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Control",
+                      "rect": [
+                        42,
+                        270,
+                        231,
+                        21
+                      ],
+                      "children": [
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            42,
+                            270,
+                            231,
+                            18
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                42,
+                                270,
+                                204,
+                                16
+                              ],
+                              "variation": "C11B",
+                              "text": "Herb Grilled Fish ★★"
+                            },
+                            {
+                              "type": "MarginContainer",
+                              "rect": [
+                                246,
+                                270,
+                                27,
+                                18
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    246,
+                                    270,
+                                    22,
+                                    18
+                                  ],
+                                  "variation": "C12XB",
+                                  "text": "×12"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Control",
+                      "rect": [
+                        42,
+                        291,
+                        231,
+                        25
+                      ],
+                      "children": [
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            42,
+                            291,
+                            231,
+                            19
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                42,
+                                291,
+                                227,
+                                15
+                              ],
+                              "variation": "C10B",
+                              "text": "+12 more · Claim a parcel first"
+                            },
+                            {
+                              "type": "Label",
+                              "rect": [
+                                269,
+                                291,
+                                4,
+                                19
+                              ],
+                              "variation": "C13XB",
+                              "text": "›"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

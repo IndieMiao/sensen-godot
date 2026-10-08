@@ -411,10 +411,10 @@ func _on_state(v: Dictionary, events: Array) -> void:
 					last_catch_extras["city_xp"] = int(ev.xp)
 	last_xp_lines = xp_lines
 	var parcels_said := false
-	# A level-up's banner speaks first (q(49): one thing at a time): the reply's `… sent to Inbox · 24h` waits until it
+	# A level-up's banner speaks first (q(49): one thing at a time): the reply's Sent to Inbox card waits until it
 	# closes, at the stove or away (不知火舞 on 226 / 233); the bell counts the parcels at once from the view.
 	var levelled := events.any(func(e): return str(e.get("kind", "")) == "level")
-	var parcel_line := ""
+	var parcel_notice := {}
 	var first_level := not before.is_empty() and ["farming", "fishing", "cooking"].all(func(k):
 		return int(before.get("skills", {}).get(k, {}).get("level", 1)) <= 1)
 	for ev in events:
@@ -447,12 +447,13 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				if ui.modal_kind == "counter" and events.any(func(e): return str(e.get("kind", "")) == "request" and str(e.get("status", "")) == "done"): continue
 				floats.append({kind = "coins", key = "coins", amount = int(ev.delta), fmt = "%s coins", tone = UiFloatText.Tone.COINS})
 			"parcel":
-				# LOCK-14: rewards that did not fit the bag wait in the Inbox; one float for the whole reply.
+				# LOCK-14: rewards that did not fit the bag wait in the Inbox; one InboxNotice card under the bell for the
+				# whole reply (BAG-5-2, q(87)).
 				if not parcels_said:
 					parcels_said = true
-					var line := P0Logic.parcel_toast(v, events.filter(func(e): return not hushed.call(e)))
-					if levelled: parcel_line = line
-					elif line != "": ui.toast(line, 2.0)
+					var notice := P0Logic.parcel_notice(v, events.filter(func(e): return not hushed.call(e)))
+					if levelled: parcel_notice = notice
+					else: ui.inbox_notice_when_clear(notice)
 			"catch":
 				# A world that shows the catch itself (the open fishing panel) returns true.
 				if not bool(_call("p0_event", [ev, v])): _on_catch(ev, xp_lines)
@@ -506,7 +507,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				var home := P0Logic.home_moment(v, ev)
 				ui.queue_card(func(): HomePanel.moment(ui, home))   # one moment at a time (q(49) ④)
 	# After the loop, so it is queued behind the level-up banner (itself deferred) even when the parcel came first.
-	if parcel_line != "": ui.toast_when_clear.call_deferred(parcel_line)
+	if not parcel_notice.is_empty(): ui.inbox_notice_when_clear.call_deferred(parcel_notice)
 	ui.queue_floats(floats, at)   # with the world's own lines of this reply, at the end of the frame
 	if ui.modal_kind == "counter" and events.size() > 0:
 		ui.set_view(session.current())   # the counter drawer follows the view; floats say what changed
@@ -968,6 +969,11 @@ func _dev_shot(dt: float) -> void:
 			"inboxdemo": _dev_inbox(step[1] if step.size() > 1 else "parcels")   # inboxdemo:parcels|full|updates|todo (234)
 			"workbench": ui.open_workbench(step[1] if step.size() > 1 else "")   # SGODOT-231 B2-06 drawer, tools / supplies
 			"toasterr": ui.toast_error(step[1] if step.size() > 1 else "Need 1 more Copper Ore")   # a refusal's Error toast (233)
+			"inboxnotice":   # inboxnotice[:more|:full] — the Sent to Inbox card under the bell (BAG-5-2, q(87); 234)
+				var kind := step[1] if step.size() > 1 else ""
+				var parcel := {"kind": "parcel", "id": "seed_carrot", "qty": 5, "waiting": kind == "full"}
+				var more := [{"kind": "parcel", "id": "bait_worm", "qty": 3, "waiting": kind == "full"}] if kind != "" else []
+				ui.inbox_notice_when_clear(P0Logic.parcel_notice(session.current(), [parcel] + more))
 			"netfail": _net_failed("dev", {"type": "dev"})   # netfail once: Didn't go through; twice: Offline (233)
 			"screen": _dev_screen(step[1] if step.size() > 1 else "launch")   # screen:launch|slow|fail|maint|update|scene|placefail
 			"wbtile":   # wbtile:craft_copper_pickaxe:0 taps that card's cost tile (NeedSource)

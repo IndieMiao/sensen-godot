@@ -109,16 +109,23 @@ func test_parcel_countdowns_run_between_responses() -> void:
 	assert_float(float(P0Logic.project(v, 90000).inbox.parcels[0].left)).is_equal(0.0)
 	assert_float(float(v.inbox.parcels[0].left)).is_equal(60000.0)
 
-func test_one_inbox_float_per_reply_and_none_for_gift_meals() -> void:
+## q(87): one InboxNotice per reply, speaking of the first parcel; the others are `+N more`; gift meals are the
+## resident bar's.
+func test_one_inbox_notice_per_reply_and_none_for_gift_meals() -> void:
 	var v := _view()
 	v["names"]["bait_worm"] = "Worm Bait"
 	var worm := {"kind": "parcel", "id": "bait_worm", "qty": 3, "waiting": false, "expires_in": 86400000}
 	var herb := {"kind": "parcel", "id": "wild_herb", "qty": 3, "waiting": false, "expires_in": 86400000}
 	var meal := {"kind": "parcel", "id": "dish_carrot_cake", "qty": 1, "waiting": false, "expires_in": 3600000, "gift": true}
-	assert_str(P0Logic.parcel_toast(v, [worm])).is_equal("Bag full · Worm Bait ×3 sent to Inbox · 24h")
-	assert_str(P0Logic.parcel_toast(v, [{"kind": "level"}, worm, herb])).is_equal("Bag full · 2 rewards sent to Inbox · 24h")
-	assert_str(P0Logic.parcel_toast(v, [meal])).is_equal("")
+	assert_dict(P0Logic.parcel_notice(v, [worm])).is_equal({title = "Sent to Inbox", item = "Worm Bait", quantity = "×3", line = "Expires in 24h"})
+	assert_dict(P0Logic.parcel_notice(v, [{"kind": "level"}, worm, herb, meal])).is_equal(
+		{title = "Sent to Inbox", item = "Worm Bait", quantity = "×3", line = "+1 more · Expires in 24h"})
+	assert_dict(P0Logic.parcel_notice(v, [meal])).is_empty()
+	# A full Inbox: the parcel waits for a place, its 24 h not started (§10.4.8); the card speaks of the first parcel.
 	var queued := worm.duplicate()
 	queued["waiting"] = true
 	queued.erase("expires_in")
-	assert_str(P0Logic.parcel_toast(v, [queued])).is_equal("Inbox full · Worm Bait ×3 saved for later")
+	assert_dict(P0Logic.parcel_notice(v, [queued])).is_equal({title = "Inbox full · waiting", item = "Worm Bait", quantity = "×3", line = "Claim a parcel first"})
+	assert_dict(P0Logic.parcel_notice(v, [queued, herb, herb.duplicate()])).is_equal(
+		{title = "Inbox full · waiting", item = "Worm Bait", quantity = "×3", line = "+2 more · Claim a parcel first"})
+	assert_str(str(P0Logic.parcel_notice(v, [herb, queued]).title)).is_equal("Sent to Inbox")

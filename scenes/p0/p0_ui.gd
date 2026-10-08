@@ -152,6 +152,9 @@ func _process(dt: float) -> void:
 	if _teach_left > 0.0:
 		_teach_left -= dt
 		if _teach_left <= 0.0: _hide_tip()
+	if _notice_left > 0.0:
+		_notice_left -= dt
+		if _notice_left <= 0.0: _hide_notice()
 	# q(49): a waiting TipCard comes up only when no RewardMoment / result card is on screen; one already up stays.
 	# show_moment / _drop_modal count Moments in the queue (tips.moment_opened / moment_closed); the modal kinds stay as
 	# a second guard for result cards opened another way (the farmhouse's COOK-4 is one).
@@ -159,6 +162,7 @@ func _process(dt: float) -> void:
 		var key := tips.next()
 		if key != "": _show_tip(str(P0Guide.TIPS[key]), key)
 	if _teach and _teach.visible: _place_tip()
+	if _notice and _notice.visible: _place_notice()   # the HUD lays out after the card first shows
 
 func _build_hud() -> void:
 	hud = UiHud.new()
@@ -353,6 +357,7 @@ func set_surface(name: String) -> void:
 	for m in _icons.values() + _name_bars.values() + _npc_tags.values(): (m as Control).visible = false
 	_flush_held_cards()
 	_flush_held_toast()
+	_flush_held_notice()
 
 ## Action spaces show the full bar. Rooms (farmhouse kitchen, outposts) and the map keep only Bag, with no action
 ## or switch key (MAP-1, §10.3.5, o(8)). Busy worlds hide it.
@@ -1353,6 +1358,7 @@ func close_modal() -> void:
 		next.call_deferred()
 	else:
 		_flush_held_toast()
+		_flush_held_notice()
 
 ## A toast that must not be lost under the fishing presentation (layer 30, over this layer) or a result card: the
 ## last bait goes at the reel's settlement, while the panel still shows the landing (int5b hand test 10). Shown at
@@ -1368,6 +1374,59 @@ func _flush_held_toast() -> void:
 	if surface == "busy" or _modal != null or not _card_queue.is_empty(): return
 	toast(_held_toast)
 	_held_toast = ""
+
+## InboxNotice (BAG-5-2 / FARM-LV2-2, LOCK-14, q(87); SGODOT-234): rewards that did not fit the bag went to the Inbox.
+## The card hangs under the bell, its right edge on the bell's and its top 12 under the HUD's two rows (y 110 of 800),
+## for MOTION_TOAST_BASE_MS (BAG-5: 2 s); a tap on it opens the Inbox on Parcels, as the bell does. One at a time: a new
+## one replaces it. Like toast_when_clear it waits while the world is busy or a card or drawer is up or queued (q(49),
+## one thing at a time: a level-up's banner speaks first, 不知火舞 on 233); the bell's badge counts at once.
+const _NOTICE_UNDER_HUD := 12.0
+var _notice: UiInboxNotice
+var _notice_left := 0.0
+var _held_notice := {}
+
+## spec: P0Logic.parcel_notice ({} says nothing).
+func inbox_notice_when_clear(spec: Dictionary) -> void:
+	if spec.is_empty(): return
+	_held_notice = spec
+	_flush_held_notice()
+
+func _flush_held_notice() -> void:
+	if _held_notice.is_empty() or not is_node_ready(): return
+	if surface == "busy" or _modal != null or not _card_queue.is_empty(): return
+	_show_notice(_held_notice)
+	_held_notice = {}
+
+func _show_notice(spec: Dictionary) -> void:
+	if _notice == null:
+		_notice = UiInboxNotice.new()
+		_notice.theme = UiKit.theme()
+		_notice.tapped.connect(func():
+			_hide_notice()
+			if _modal == null: open_inbox("parcels"))
+		root.add_child(_notice)
+	_notice.show_notice(spec, P0Logic.icon("parcel"))
+	_notice.show()
+	_place_notice()
+	_notice_left = UiTokens.MOTION_TOAST_BASE_MS / 1000.0
+
+func _hide_notice() -> void:
+	_notice_left = 0.0
+	if _notice: _notice.hide()
+
+func _place_notice() -> void:
+	var bell := hud.balances_rect()   # its right edge is the bell's
+	var right := (bell.end.x - root.global_position.x) if bell.size.x > 0.0 else root.size.x - UiTokens.SPACE_PAGE
+	_notice.position = Vector2(roundf(right - UiInboxNotice.WIDTH), UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H + _NOTICE_UNDER_HUD + safe_top())
+
+## The InboxNotice on screen, {} when none: its three lines (tests and the runtime read it).
+func inbox_notice_shown() -> Dictionary:
+	if _notice == null or not _notice.visible: return {}
+	return {title = _notice.title_text(), item = _notice.item_text(), quantity = _notice.quantity_text(), line = _notice.line_text()}
+
+## The card on screen (tests tap it), or null.
+func inbox_notice_card() -> UiInboxNotice:
+	return _notice if _notice != null and _notice.visible else null
 
 ## Result cards (catch, dish, level up) wait their turn instead of replacing each other.
 func queue_card(show: Callable) -> void:

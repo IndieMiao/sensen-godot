@@ -453,7 +453,7 @@ func test_a_pot_kept_away_from_the_kitchen_floats_and_toasts_nothing_but_the_com
 
 func test_a_level_up_gift_that_did_not_fit_is_said_after_its_banner_away_from_the_kitchen() -> void:
 	# 不知火舞 on 226: the gifts of a Cooking level-up a pot kept on its own brought are the level-up's, not the pot's.
-	# LOCK-14's `… sent to Inbox · 24h` still comes, behind the level-up banner; the pot's own floats stay quiet.
+	# LOCK-14's Sent to Inbox card (q(87)) still comes, behind the level-up banner; the pot's own floats stay quiet.
 	var w: Node3D = auto_free(Node3D.new())
 	add_child(w)
 	rt.attach(w)
@@ -466,17 +466,18 @@ func test_a_level_up_gift_that_did_not_fit_is_said_after_its_banner_away_from_th
 		{"kind": "queue", "id": 4, "dish": null, "started_at": 0, "ms": 60000}])
 	for i in 3: await get_tree().process_frame
 	assert_int(rt.ui.root.find_children("*", "UiMomentBanner", true, false).size()).is_equal(1)
-	assert_str(rt.ui.toast_text()).is_equal("")   # not over the banner
+	assert_dict(rt.ui.inbox_notice_shown()).is_empty()   # not over the banner
+	assert_str(rt.ui.toast_text()).is_equal("")
 	var floats: Array = rt.ui.root.find_children("*", "UiFloatText", true, false).map(func(f): return (f as UiFloatText).text)
 	assert_bool(floats.any(func(t): return str(t).contains("Cooking"))).override_failure_message(str(floats)).is_false()
 	rt.ui.close_modal()
 	for i in 2: await get_tree().process_frame
-	assert_str(rt.ui.toast_text()).is_equal("Bag full · spice_pepper ×2 sent to Inbox · 24h")
+	assert_dict(rt.ui.inbox_notice_shown()).is_equal({title = "Sent to Inbox", item = "spice_pepper", quantity = "×2", line = "Expires in 24h"})
 	rt.detach(w)
 
 func test_a_level_up_gift_that_did_not_fit_is_said_after_its_banner_where_the_player_is() -> void:
 	# 不知火舞 on 233 (q(49), one thing at a time): with the player there too, the banner speaks of the level-up first and
-	# `… sent to Inbox · 24h` comes once it closes, even when the reply's parcel comes before the level-up.
+	# the Sent to Inbox card comes once it closes, even when the reply's parcel comes before the level-up.
 	var w: Node3D = auto_free(Node3D.new())
 	add_child(w)
 	rt.attach(w)
@@ -487,10 +488,10 @@ func test_a_level_up_gift_that_did_not_fit_is_said_after_its_banner_where_the_pl
 		{"kind": "parcel", "id": "seed_lettuce", "qty": 4, "key": "level:farming:3:0", "waiting": false, "expires_in": 86400000}])
 	for i in 3: await get_tree().process_frame
 	assert_int(rt.ui.root.find_children("*", "UiMomentBanner", true, false).size()).is_equal(1)
-	assert_str(rt.ui.toast_text()).is_equal("")   # not over the banner
+	assert_dict(rt.ui.inbox_notice_shown()).is_empty()   # not over the banner
 	rt.ui.close_modal()
 	for i in 2: await get_tree().process_frame
-	assert_str(rt.ui.toast_text()).is_equal("Bag full · 2 rewards sent to Inbox · 24h")
+	assert_dict(rt.ui.inbox_notice_shown()).is_equal({title = "Sent to Inbox", item = "crop_radish", quantity = "×3", line = "+1 more · Expires in 24h"})
 	rt.detach(w)
 
 func test_parcels_without_a_level_up_are_said_at_once() -> void:
@@ -500,5 +501,6 @@ func test_parcels_without_a_level_up_are_said_at_once() -> void:
 	rt.ui.clear_toast()
 	rt.session.state_changed.emit(rt.session.view, [{"kind": "parcel", "id": "crop_radish", "qty": 3, "key": "harvest:1:0", "waiting": false, "expires_in": 86400000}])
 	await get_tree().process_frame
-	assert_str(rt.ui.toast_text()).is_equal("Bag full · crop_radish ×3 sent to Inbox · 24h")
+	assert_dict(rt.ui.inbox_notice_shown()).is_equal({title = "Sent to Inbox", item = "crop_radish", quantity = "×3", line = "Expires in 24h"})
+	assert_str(rt.ui.toast_text()).is_equal("")   # the card, not the old one-line toast
 	rt.detach(w)
