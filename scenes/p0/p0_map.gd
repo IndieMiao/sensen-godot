@@ -409,9 +409,9 @@ func _on_city_visit_requested(farm_id: String) -> void:
 	else: super._on_city_visit_requested(farm_id)
 
 # ---------------------------------------------------------------- the opening view (MAP-1, 不知火舞 on 234)
-## Opening the map frames the home set (MAP-1; 不知火舞 on 234 A2): a view in z13.5–16, labels and all inside the safe
-## frame — under the HUD's second row + 16, over Bag − 16, 16 from the sides. The avatar and every pin wearing a marker
-## (the first session's Reed Pond) always go in; then the home set — each role's outpost nearest home, and away from
+## Opening the map frames the home set (MAP-1; 不知火舞 on 234 A2): a view in z13.5–16, pins and their name rows inside
+## the safe frame (names slide in from the edges) — under the HUD's second row + 16, over Bag − 16, 16 from the sides.
+## The avatar and every pin wearing a marker (the first session's Reed Pond) always go in; then the home set — each role's outpost nearest home, and away from
 ## home the Homestead pin — nearest the avatar first, each while the view still holds them all at z13.5: the first that
 ## would not stays offscreen, and so do the farther ones. At z13.5 outposts of different roles (300 m apart at least)
 ## never cover each other whole. Not even the must-haves fit: z13.5 on the avatar. Recenter keeps the zoom; Show on
@@ -506,11 +506,19 @@ func _frame_box(items: Array) -> Rect2:
 	for it in items:
 		var p = geo_to_screen(float(it.lat), float(it.lng))
 		if p == null: continue
-		var fp: Rect2 = FarmMarkers.self_footprint(zoom) if it.get("self_pin", false) else city_map.pin_footprint(it)
+		var fp: Rect2 = FarmMarkers.self_footprint(zoom) if it.get("self_pin", false) else _frame_footprint(it)
 		var r := Rect2((p as Vector2) + fp.position + (it.get("shift", Vector2.ZERO) as Vector2), fp.size)
 		box = r if first else box.merge(r)
 		first = false
 	return box
+
+## What a pin needs in the opening view: a MapDestination its disc and the row its name takes under it — the name
+## slides in from the screen edge (CityMapView.LABEL_EDGE), so only its height counts; other pins their whole footprint.
+func _frame_footprint(it: Dictionary) -> Rect2:
+	if city_map._destination(it).is_empty(): return city_map.pin_footprint(it)
+	var name_h := UiMapDestination.label_size_for(city_map._label_text(it)).y
+	var d := UiMapDestination.DISC
+	return Rect2(-d * 0.5, -d, d, d + (UiMapDestination.LABEL_GAP + name_h if name_h > 0.0 else 0.0))
 
 ## One trial view: the Godot camera only (刘邦 on #92: a hundred full updates in a frame would push the native map's
 ## camera and the marker sync each time).
@@ -534,6 +542,16 @@ func p0_return(route: String) -> void:
 	if route.begins_with("pond:"): _on_city_pond_requested({"id": route.trim_prefix("pond:")})
 	elif route.begins_with("outpost:"): _open_outpost(route.trim_prefix("outpost:"))
 	else: _open_my_farm()
+
+## Without the native map (desktop, tests holding the map in a SubViewport) the map drawn is the viewport: the camera
+## follows its height as on a phone. map_poc takes the window's, which can be taller — the desktop's 1280 override, a
+## 1200 shot, the test runner's window — and drew the map further out than a phone does at the same zoom (苏烈: the
+## map tests passed or failed by the runner's window). With the native map: its own logical height, as before.
+func _map_logical_height() -> float:
+	if map == null and is_inside_tree():
+		var h := get_viewport().get_visible_rect().size.y
+		if h > 0.0: return h
+	return super._map_logical_height()
 
 func _switch_city(r: Dictionary) -> void:
 	if str(r.get("id", "")) == P0_REGION: super._switch_city(r)
