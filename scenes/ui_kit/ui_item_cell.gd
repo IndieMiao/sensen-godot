@@ -13,13 +13,16 @@ extends Control
 ## Hosts outside a scroll container (the quick bar) need a STOP backing control, or the touch also reaches
 ## _unhandled_input (the map's tap handling, for one).
 ## LIFTED, DROP_TARGET and ZERO exist on the QuickSlot main only; other densities draw them as DEFAULT.
+## GHOST (QuickSlot State=ghost 1415:94114, A-08) is an empty slot showing what the action can use: dashed like
+## EMPTY, the family icon at 35 %, a one-word family name in secondary ink (`title`), no count, never pinned.
+## Other densities draw it as EMPTY.
 
 signal tapped
 ## A GestureArbiter outcome other than tap, e.g. {kind = &"pin_toggle", pos}; `pos` is in global coordinates.
 signal gesture(outcome: Dictionary)
 
 enum Density { INVENTORY, QUICK, KITCHEN, GEAR }
-enum State { DEFAULT, SELECTED, EMPTY, LIFTED, DROP_TARGET, ZERO }
+enum State { DEFAULT, SELECTED, EMPTY, LIFTED, DROP_TARGET, ZERO, GHOST }
 
 const RARITY_COLORS := [UiTokens.COLOR_RARITY_COMMON, UiTokens.COLOR_RARITY_FINE, UiTokens.COLOR_RARITY_RARE,
 	UiTokens.COLOR_RARITY_LEGENDARY]
@@ -130,9 +133,10 @@ func _emit(outcomes: Array) -> void:
 		if g.has("pos"): g.pos = get_global_transform() * (g.pos as Vector2)
 		gesture.emit(g)
 
-## The state actually drawn: the extra QuickSlot states fall back to DEFAULT on the other mains.
+## The state actually drawn: the extra QuickSlot states fall back to DEFAULT (GHOST to EMPTY) on the other mains.
 func drawn_state() -> State:
 	if density != Density.QUICK and state in [State.LIFTED, State.DROP_TARGET, State.ZERO]: return State.DEFAULT
+	if density != Density.QUICK and state == State.GHOST: return State.EMPTY
 	return state
 
 # ------------------------------------------------------------------ build
@@ -309,7 +313,7 @@ func _refresh_quick(s: State) -> void:
 				box.shadow_color = UiTokens.COLOR_LIFT_SHADOW
 				box.shadow_size = UiTokens.SIZE_LIFT_SHADOW_RADIUS
 				box.shadow_offset = Vector2(0.0, UiTokens.SIZE_LIFT_SHADOW_OFFSET_Y)
-		State.EMPTY:
+		State.EMPTY, State.GHOST:
 			box = _dashed(UiStyleBox.make(UiTokens.COLOR_SURFACE, UiTokens.RADIUS_CELL, UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT), UiTokens.DASH_QUICK)
 		State.DROP_TARGET:
 			box = _dashed(UiStyleBox.make(UiTokens.COLOR_PRIMARY_TINT, UiTokens.RADIUS_CELL, UiTokens.COLOR_PRIMARY, UiTokens.STROKE_SELECTED), UiTokens.DASH_DROP_TARGET)
@@ -325,10 +329,13 @@ func _refresh_quick(s: State) -> void:
 	_name.text = title
 	_name.visible = title != "" and not empty
 	_qty.text = quantity
-	_qty.visible = quantity != "" and not empty
-	_icon.modulate.a = UiTokens.OPACITY_ZERO_ICON if s == State.ZERO else 1.0
+	var ghost := s == State.GHOST
+	_qty.visible = quantity != "" and not empty and not ghost
+	# The ghost's "Icon · dimmed" is the same 35 % as the ×0 icon (no separate token yet).
+	_icon.modulate.a = UiTokens.OPACITY_ZERO_ICON if s in [State.ZERO, State.GHOST] else 1.0
+	_name.add_theme_color_override(&"font_color", UiTokens.COLOR_SECONDARY if ghost else UiTokens.COLOR_TEXT)
 	_qty.add_theme_color_override(&"font_color", UiTokens.COLOR_SECONDARY if s == State.ZERO else UiTokens.COLOR_TEXT)
-	var show_pin := pinned and not empty
+	var show_pin := pinned and not empty and not ghost
 	_strip.visible = show_pin
 	_badge.visible = show_pin
 	# The amber strip sits inside the outline, so it moves down with the 2 px selected stroke (LOCK-05).
