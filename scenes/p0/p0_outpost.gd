@@ -103,6 +103,7 @@ func to_room(world: Vector3) -> Vector3:
 	return world - room.position
 
 func _room_frame(_view: Dictionary, dt: float) -> void:
+	if _talking != "" and (rt == null or not rt.ui.has_modal()): _talking = ""   # the greeting / dialogue closed
 	if not _glide.is_empty():
 		_glide.t = float(_glide.t) + dt
 		var p := _glide_point()
@@ -159,9 +160,13 @@ func p0_tap(screen: Vector2) -> void:
 	else: go.call()
 
 func _on_facility(n: String) -> void:
-	if COUNTERS.has(n): _open_keeper()
+	if COUNTERS.has(n):
+		_open_keeper()
+		_talking = "npc_keeper"
 	elif n.begins_with("seat_"): _claim(n)
-	elif npcs.has(n): _open_resident(str(npcs[n].id), str(npcs[n].name))
+	elif npcs.has(n):
+		_open_resident(str(npcs[n].id), str(npcs[n].name))
+		_talking = n
 	# Boards and shelves are facilities, not keepers: they open the market counter directly (LOCK-16 / 07).
 	elif n == "use_market_board": _open_entry("open_counter", ["market", counter_opts("board")], "Market Board")
 	elif n == "use_specialty_shelf": _open_entry("open_counter", ["market", counter_opts("specialty")], "City Specialty")
@@ -214,12 +219,16 @@ func _open_entry(method: String, args: Array, fallback: String) -> void:
 
 ## Where an NPC's name sits, in the NPC's own space (above the head; the rig's root carries the NPC's scale).
 const NAME_OVER_HEAD := Vector3(0, 2.0, 0)
+## The NPC anchor whose greeting card or dialogue bar this room opened; "" once that modal closes.
+var _talking := ""
 
 func _marker(n: String, view: Dictionary) -> Dictionary:
 	if _dev_no_marks: return {}
 	# World prompts (SGODOT-250, LOCK-07 / 16 / 30 v2, q(62)): names only, no "Tap to …"; the room opens one at a time.
 	if npcs.has(n):
-		var talking: bool = rt != null and rt.ui.modal_kind == "resident" and str(rt.ui.get("_resident")) == str(npcs[n].id)
+		# Talking while the greeting card or dialogue bar this room opened for them is up (不知火舞 on #57: that NPC's
+		# name stays lit over those two; P0Ui decides what shows under which modal).
+		var talking: bool = n == _talking and rt != null and rt.ui.has_modal()
 		return {kind = "npc", name = str(npcs[n].name), head = (npcs[n].root as Node3D).to_global(NAME_OVER_HEAD), talking = talking}
 	if SEAT_GROUPS.has(n):
 		return {kind = "seat", icon = P0Logic.icon("seat")} if seat == "" and not _free_seats(str(SEAT_GROUPS[n])).is_empty() else {}

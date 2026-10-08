@@ -255,3 +255,20 @@ func test_room_prompts_are_names_and_icons_only() -> void:
 			var m: Dictionary = r._marker(n, {})
 			assert_str(str(m.get("text", ""))).override_failure_message("%s %s" % [str(r.outpost.get("id", "")), n]).not_contains("Tap to")
 			assert_str(str(m.get("name", ""))).override_failure_message("%s %s" % [str(r.outpost.get("id", "")), n]).not_contains("Tap to")
+
+## 不知火舞 on #57: the NPC whose greeting card or dialogue bar this room opened is "talking" while that modal is up,
+## so its name stays lit there; no other NPC, and nobody once the modal closes. Through the real runtime and UI.
+func test_the_npc_the_room_opened_a_talk_for_is_talking_until_it_closes() -> void:
+	var rt: P0Runtime = auto_free(P0Runtime.new())
+	add_child(rt)
+	await get_tree().process_frame
+	rt.session.transport = func(_method: int, _path: String, _body: Dictionary, _cmd: Dictionary): pass   # nothing goes out
+	var r := _room("sh_tackle_1")
+	r.rt = rt
+	r._on_facility("npc_keeper")   # Finn greets first (the tackle shop's greeting card)
+	assert_bool(rt.ui.has_modal()).is_true()
+	assert_bool(bool(r._marker("npc_keeper", {}).talking)).is_true()
+	assert_bool(bool(r._marker("npc_kai", {}).talking)).is_false()
+	rt.ui.close_modal()
+	r._room_frame({}, 1.0 / 30.0)
+	assert_bool(bool(r._marker("npc_keeper", {}).talking)).is_false()
