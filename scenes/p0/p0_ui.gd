@@ -855,8 +855,9 @@ func _covers_marker(strip: Rect2, own: String) -> bool:
 	return false
 
 ## Facility / resident state mark (StatusBadge 1132:79554, STATE-ICONS): display only, the facility takes the tap.
-## A scene tap: on a shown icon button or name strip it is that facility's tap, on an NPC's name tag that NPC's, elsewhere the world's (also a double tap: a prompt
-## never recenters the camera by accident). Returns true for a card tap, which then can't start a double tap either.
+## A scene tap: on a shown icon button or name strip it is that facility's tap, on an NPC's name tag that NPC's,
+## elsewhere the world's (also a double tap: a prompt never recenters the camera by accident). Returns true for a card
+## tap, which then can't start a double tap either.
 func _tap_at(global_pos: Vector2, double: bool) -> bool:
 	# World prompts (SGODOT-250): an open name strip, then an icon button; a tap on either is its facility's tap.
 	for markers in [_name_bars, _icons]:
@@ -869,14 +870,22 @@ func _tap_at(global_pos: Vector2, double: bool) -> bool:
 					tapped_card = ""
 				return true
 	# An NPC's name tag (not one faded under an open strip, which the strip's own tap has had first): that NPC's tap.
+	# Where two tags' touch areas overlap, the tag whose centre is nearer.
+	var tag_id := ""
+	var tag_d := INF
 	for id in _npc_tags:
 		var t: UiNpcNameTag = _npc_tags[id]
-		if t.is_visible_in_tree() and not bool(t.get_meta("covered", false)) and t.hit_rect().has_point(global_pos):
-			if _modal == null:
-				tapped_card = str(id)
-				tapped.emit(_card_hits[id])
-				tapped_card = ""
-			return true
+		if not t.is_visible_in_tree() or bool(t.get_meta("covered", false)): continue
+		var r := t.hit_rect()
+		if r.has_point(global_pos) and r.get_center().distance_to(global_pos) < tag_d:
+			tag_id = str(id)
+			tag_d = r.get_center().distance_to(global_pos)
+	if tag_id != "":
+		if _modal == null:
+			tapped_card = tag_id
+			tapped.emit(_card_hits[tag_id])
+			tapped_card = ""
+		return true
 	if double: recenter.emit()
 	else: tapped.emit(global_pos - root.global_position)
 	return false

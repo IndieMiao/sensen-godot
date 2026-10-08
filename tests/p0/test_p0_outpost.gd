@@ -339,7 +339,7 @@ func test_a_resident_bar_reached_from_the_bag_lights_their_name() -> void:
 ## 李元芳 int10c: Pip's name tag over his head sits just below Sigrid behind the counter, and a tap on it went to the
 ## nearest pick point, Sigrid's: her greeting opened. A tap on any NPC's name tag is that NPC's tap, in every outpost
 ## (the tackle shop's Finn and Old Kai too), as a tap on a facility's icon button is that facility's. A tag faded under
-## an open name strip (the door's, at the spawn) takes no tap.
+## an open name strip takes no tap.
 func test_a_tap_on_an_npc_name_tag_is_that_npc() -> void:
 	var rt: P0Runtime = auto_free(P0Runtime.new())
 	add_child(rt)
@@ -364,18 +364,41 @@ func test_a_tap_on_an_npc_name_tag_is_that_npc() -> void:
 			tested += 1
 		for n in r.npcs: rt.ui.npc_tag("room:" + n, "", Vector2.ZERO, false)   # the next room's tags only
 	assert_int(tested).is_equal(6)   # four keepers, Pip and Old Kai
-	# At the tackle shop's door the Map strip is open and Old Kai's tag fades under it: that spot is not his tap.
+	# A tag faded under an open strip takes no tap: the tap is the world's (tapped_card stays ""). No stand point in the
+	# four outposts puts a strip over a tag (probed for #122; the earlier check only saw the previous room's door strip,
+	# 哪吒 on #122), so the tag is put in that state directly, as _yield_tag does under a strip.
 	var tackle := _room("sh_tackle_1")
 	tackle.rt = rt
 	tackle._markers({})
 	var kai: UiNpcNameTag = rt.ui._npc_tags.get("room:npc_kai")
-	if bool(kai.get_meta("covered", false)):
-		var asked := []
-		var on_tap := func(at: Vector2): asked.append(tackle.tap_target(at))
-		rt.ui.tapped.connect(on_tap)
-		rt.ui._tap_at(kai.hit_rect().get_center(), false)
-		rt.ui.tapped.disconnect(on_tap)
-		assert_array(asked).not_contains(["npc_kai"])
+	rt.ui._yield_tag(kai, true)
+	assert_bool(bool(kai.get_meta("covered", false))).is_true()
+	var cards := []
+	var on_tap := func(_at: Vector2): cards.append(rt.ui.tapped_card)
+	rt.ui.tapped.connect(on_tap)
+	assert_bool(rt.ui._tap_at(kai.hit_rect().get_center(), false)).is_false()
+	rt.ui.tapped.disconnect(on_tap)
+	assert_array(cards).is_equal([""])
+
+## 哪吒 on #122: where two name tags' touch areas overlap, the tap goes to the tag whose centre is nearer.
+func test_overlapping_name_tags_give_the_tap_to_the_nearer_one() -> void:
+	var rt: P0Runtime = auto_free(P0Runtime.new())
+	add_child(rt)
+	await get_tree().process_frame
+	var at := Vector2(180, 300)
+	rt.ui.npc_tag("room:npc_a", "Ama", at, true)
+	rt.ui.npc_tag("room:npc_b", "Pip", at + Vector2(20, 0), true)
+	var a: UiNpcNameTag = rt.ui._npc_tags.get("room:npc_a")
+	var b: UiNpcNameTag = rt.ui._npc_tags.get("room:npc_b")
+	assert_bool(a.hit_rect().has_point(b.hit_rect().get_center())).is_true()   # each centre lies in both areas
+	assert_bool(b.hit_rect().has_point(a.hit_rect().get_center())).is_true()
+	var asked := []
+	rt.ui.tapped.connect(func(_p: Vector2): asked.append(rt.ui.tapped_card))
+	for pair in [[a, "room:npc_a"], [b, "room:npc_b"]]:
+		var c: Vector2 = (pair[0] as UiNpcNameTag).hit_rect().get_center()
+		asked.clear()
+		rt.ui._tap_at(c, false)
+		assert_array(asked).is_equal([pair[1]])
 
 ## Scene integration (SGODOT-227, 不知火舞's walkthrough on 227): the tea house opens on the Coffee Shop kit with the
 ## background of its signed render and every anchor of its file, and the opening view holds the whole art, centred, with at least
