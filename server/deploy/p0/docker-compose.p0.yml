@@ -8,6 +8,7 @@ services:
     env_file: [.env.p0]          # P0_ACCESS_KEYS=…, P0_RATE_PER_MINUTE=… (chmod 600, never committed)
     environment:
       P0_DEV: "0"
+      P0_TRUST_PROXY: "1"   # behind Caddy: the client address comes from X-Forwarded-For (per-address request cap)
     volumes: [p0data:/data]
     mem_limit: 256m
     logging:

@@ -11,16 +11,17 @@ import { fileURLToPath } from 'node:url';
 import { loadP0Content } from '../src/p0/content.js';
 import { registerP0Routes } from '../src/p0/routes.js';
 import { P0Store } from '../src/p0/store.js';
-import { guardOptionsFromEnv, registerP0Guard, snapshotState } from '../src/p0/guard.js';
+import { guardOptionsFromEnv, registerP0Guard, snapshotState, trustProxyFromEnv } from '../src/p0/guard.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const stateFile = process.env.P0_STATE_FILE ?? path.join(root, 'output/p0/p0-state.json');
 mkdirSync(path.dirname(stateFile), { recursive: true });   // only the save's own folder (the image's /repo is read-only to it)
 const content = loadP0Content();
 const store = new P0Store(content, stateFile);
-// SGODOT-232 D1: a 32 KB body limit, the demo key and request limits (P0_ACCESS_KEYS, P0_RATE_PER_MINUTE) and hourly
-// save snapshots (P0_SNAPSHOT_DIR, 48 kept). A deployed server runs with P0_DEV=0 so no dev route is registered.
-const app = Fastify({ logger: false, bodyLimit: 32 * 1024 });
+// SGODOT-232 D1: a 32 KB body limit, the demo key and request limits (P0_ACCESS_KEYS, P0_RATE_PER_MINUTE, P0_RATE_PER_IP;
+// P0_TRUST_PROXY=1 behind Caddy) and hourly save snapshots (P0_SNAPSHOT_DIR, 48 kept). A deployed server runs with
+// P0_DEV=0 so no dev route is registered.
+const app = Fastify({ logger: false, bodyLimit: 32 * 1024, trustProxy: trustProxyFromEnv() });
 const guard = guardOptionsFromEnv();
 await registerP0Guard(app, guard);
 const dev = process.env.P0_DEV !== '0';

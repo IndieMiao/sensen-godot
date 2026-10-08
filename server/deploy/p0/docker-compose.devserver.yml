@@ -6,7 +6,7 @@ services:
     restart: unless-stopped
     env_file: [.env.p0]
     environment:
-      P0_DEV: "0"
+      P0_DEV: "0"   # published directly, no proxy: P0_TRUST_PROXY stays off so X-Forwarded-For is not believed
     ports: ["3150:3110"]
     volumes: [p0data:/data]
     mem_limit: 256m
