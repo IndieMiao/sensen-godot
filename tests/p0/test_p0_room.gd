@@ -200,6 +200,13 @@ func _farmhouse() -> P0Room:
 	auto_free(r)
 	return r
 
+## Show from inside the farmhouse (亚瑟 on #37): the stove is the room's own spot; farm targets are not, so the
+## runtime steps out to the farm and shows them there.
+func test_farmhouse_has_the_stove_spot_but_not_the_farms() -> void:
+	var r := _farmhouse()
+	assert_bool(r.p0_has_spot("stove")).is_true()
+	for where in ["plots", "stall", "bench", "home"]: assert_bool(r.p0_has_spot(where)).override_failure_message(where).is_false()
+
 func test_farmhouse_opens_on_the_stove_corner_with_a_door_back_to_the_farm() -> void:
 	var r := _farmhouse()
 	for n in ["use_stove_1", "drop_pot_1", "badge_stove_1", "stand_stove", "cam_stove", "spawn", "exit"]:

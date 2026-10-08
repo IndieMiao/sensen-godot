@@ -1,0 +1,1573 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    332
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiInventoryGrid"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        18
+      ],
+      "variation": "CaptionR12",
+      "text": "Bag layout five-column grid · LOCK-12 / 15"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        52,
+        328,
+        280
+      ],
+      "children": [
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            52,
+            328,
+            130
+          ],
+          "children": [
+            {
+              "type": "UiInventoryGrid",
+              "rect": [
+                26,
+                52,
+                276,
+                110
+              ],
+              "children": [
+                {
+                  "type": "GridContainer",
+                  "rect": [
+                    26,
+                    52,
+                    276,
+                    284
+                  ],
+                  "children": [
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        26,
+                        52,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            26,
+                            52,
+                            52,
+                            52
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                39,
+                                62,
+                                27,
+                                27
+                              ]
+                            },
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                51,
+                                88,
+                                24,
+                                13
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    51,
+                                    87,
+                                    24,
+                                    15
+                                  ],
+                                  "variation": "C10XB",
+                                  "text": "×24"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        82,
+                        52,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            82,
+                            52,
+                            52,
+                            52
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                95,
+                                62,
+                                27,
+                                27
+                              ]
+                            },
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                107,
+                                88,
+                                24,
+                                13
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    107,
+                                    87,
+                                    24,
+                                    15
+                                  ],
+                                  "variation": "C10XB",
+                                  "text": "×10"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        138,
+                        52,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            138,
+                            52,
+                            52,
+                            52
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                151,
+                                62,
+                                27,
+                                27
+                              ]
+                            },
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                143,
+                                57,
+                                6,
+                                6
+                              ]
+                            },
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                163,
+                                88,
+                                24,
+                                13
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    163,
+                                    87,
+                                    24,
+                                    15
+                                  ],
+                                  "variation": "C10XB",
+                                  "text": "×3"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        194,
+                        52,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            194,
+                            52,
+                            52,
+                            52
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                207,
+                                62,
+                                27,
+                                27
+                              ]
+                            },
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                199,
+                                57,
+                                6,
+                                6
+                              ]
+                            },
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                219,
+                                88,
+                                24,
+                                13
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    219,
+                                    87,
+                                    24,
+                                    15
+                                  ],
+                                  "variation": "C10XB",
+                                  "text": "×1"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        250,
+                        52,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            250,
+                            52,
+                            52,
+                            52
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                263,
+                                62,
+                                27,
+                                27
+                              ]
+                            },
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                255,
+                                57,
+                                6,
+                                6
+                              ]
+                            },
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                275,
+                                88,
+                                24,
+                                13
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    275,
+                                    87,
+                                    24,
+                                    15
+                                  ],
+                                  "variation": "C10XB",
+                                  "text": "×2"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        26,
+                        110,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            26,
+                            110,
+                            52,
+                            52
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                39,
+                                120,
+                                27,
+                                27
+                              ]
+                            },
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                51,
+                                146,
+                                24,
+                                13
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    51,
+                                    145,
+                                    24,
+                                    15
+                                  ],
+                                  "variation": "C10XB",
+                                  "text": "×12"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        82,
+                        110,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            82,
+                            110,
+                            52,
+                            52
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                95,
+                                120,
+                                27,
+                                27
+                              ]
+                            },
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                107,
+                                146,
+                                24,
+                                13
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    107,
+                                    145,
+                                    24,
+                                    15
+                                  ],
+                                  "variation": "C10XB",
+                                  "text": "×20"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        138,
+                        110,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            138,
+                            110,
+                            52,
+                            52
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                151,
+                                120,
+                                27,
+                                27
+                              ]
+                            },
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                163,
+                                146,
+                                24,
+                                13
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    163,
+                                    145,
+                                    24,
+                                    15
+                                  ],
+                                  "variation": "C10XB",
+                                  "text": "×64"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        194,
+                        110,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            194,
+                            110,
+                            52,
+                            52
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                207,
+                                120,
+                                27,
+                                27
+                              ]
+                            },
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                219,
+                                146,
+                                24,
+                                13
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    219,
+                                    145,
+                                    24,
+                                    15
+                                  ],
+                                  "variation": "C10XB",
+                                  "text": "×7"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        250,
+                        110,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            250,
+                            110,
+                            52,
+                            52
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        26,
+                        168,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            26,
+                            168,
+                            52,
+                            52
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        82,
+                        168,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            82,
+                            168,
+                            52,
+                            52
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        138,
+                        168,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            138,
+                            168,
+                            52,
+                            52
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        194,
+                        168,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            194,
+                            168,
+                            52,
+                            52
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        250,
+                        168,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            250,
+                            168,
+                            52,
+                            52
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        26,
+                        226,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            26,
+                            226,
+                            52,
+                            52
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        82,
+                        226,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            82,
+                            226,
+                            52,
+                            52
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        138,
+                        226,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            138,
+                            226,
+                            52,
+                            52
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        194,
+                        226,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            194,
+                            226,
+                            52,
+                            52
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        250,
+                        226,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            250,
+                            226,
+                            52,
+                            52
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        26,
+                        284,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            26,
+                            284,
+                            52,
+                            52
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        82,
+                        284,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            82,
+                            284,
+                            52,
+                            52
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        138,
+                        284,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            138,
+                            284,
+                            52,
+                            52
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        194,
+                        284,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            194,
+                            284,
+                            52,
+                            52
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        250,
+                        284,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            250,
+                            284,
+                            52,
+                            52
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                168,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "bag · Crucian selected · dashed empties to capacity 25"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            202,
+            328,
+            130
+          ],
+          "children": [
+            {
+              "type": "UiInventoryGrid",
+              "rect": [
+                26,
+                202,
+                276,
+                110
+              ],
+              "children": [
+                {
+                  "type": "GridContainer",
+                  "rect": [
+                    26,
+                    202,
+                    276,
+                    284
+                  ],
+                  "children": [
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        26,
+                        202,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            26,
+                            202,
+                            52,
+                            52
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                39,
+                                212,
+                                27,
+                                27
+                              ]
+                            },
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                31,
+                                207,
+                                6,
+                                6
+                              ]
+                            },
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                51,
+                                238,
+                                24,
+                                13
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    51,
+                                    237,
+                                    24,
+                                    15
+                                  ],
+                                  "variation": "C10XB",
+                                  "text": "×3"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        82,
+                        202,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            82,
+                            202,
+                            52,
+                            52
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                95,
+                                212,
+                                27,
+                                27
+                              ]
+                            },
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                87,
+                                207,
+                                6,
+                                6
+                              ]
+                            },
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                107,
+                                238,
+                                24,
+                                13
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    107,
+                                    237,
+                                    24,
+                                    15
+                                  ],
+                                  "variation": "C10XB",
+                                  "text": "×1"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        138,
+                        202,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            138,
+                            202,
+                            52,
+                            52
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                151,
+                                212,
+                                27,
+                                27
+                              ]
+                            },
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                163,
+                                238,
+                                24,
+                                13
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    163,
+                                    237,
+                                    24,
+                                    15
+                                  ],
+                                  "variation": "C10XB",
+                                  "text": "×12"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        194,
+                        202,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            194,
+                            202,
+                            52,
+                            52
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        250,
+                        202,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            250,
+                            202,
+                            52,
+                            52
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        26,
+                        260,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            26,
+                            260,
+                            52,
+                            52
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        82,
+                        260,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            82,
+                            260,
+                            52,
+                            52
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        138,
+                        260,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            138,
+                            260,
+                            52,
+                            52
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        194,
+                        260,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            194,
+                            260,
+                            52,
+                            52
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        250,
+                        260,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            250,
+                            260,
+                            52,
+                            52
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        26,
+                        318,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            26,
+                            318,
+                            52,
+                            52
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        82,
+                        318,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            82,
+                            318,
+                            52,
+                            52
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        138,
+                        318,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            138,
+                            318,
+                            52,
+                            52
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        194,
+                        318,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            194,
+                            318,
+                            52,
+                            52
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        250,
+                        318,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            250,
+                            318,
+                            52,
+                            52
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        26,
+                        376,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            26,
+                            376,
+                            52,
+                            52
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        82,
+                        376,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            82,
+                            376,
+                            52,
+                            52
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        138,
+                        376,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            138,
+                            376,
+                            52,
+                            52
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        194,
+                        376,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            194,
+                            376,
+                            52,
+                            52
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        250,
+                        376,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            250,
+                            376,
+                            52,
+                            52
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        26,
+                        434,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            26,
+                            434,
+                            52,
+                            52
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        82,
+                        434,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            82,
+                            434,
+                            52,
+                            52
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        138,
+                        434,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            138,
+                            434,
+                            52,
+                            52
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        194,
+                        434,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            194,
+                            434,
+                            52,
+                            52
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        250,
+                        434,
+                        52,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            250,
+                            434,
+                            52,
+                            52
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                318,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "sell_mode · this counter takes crops and fish only"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,359 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    324
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiFloatText"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        18
+      ],
+      "variation": "CaptionR12",
+      "text": "FloatText 1178:82191 · six tones, Hug / Wrap (static pills)"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        52,
+        328,
+        272
+      ],
+      "children": [
+        {
+          "type": "PanelContainer",
+          "rect": [
+            65,
+            52,
+            197,
+            252
+          ],
+          "children": [
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                77,
+                64,
+                173,
+                228
+              ],
+              "children": [
+                {
+                  "type": "HBoxContainer",
+                  "rect": [
+                    77,
+                    64,
+                    173,
+                    28
+                  ],
+                  "children": [
+                    {
+                      "type": "PanelContainer",
+                      "rect": [
+                        77,
+                        64,
+                        59,
+                        28
+                      ],
+                      "children": [
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            85,
+                            67,
+                            43,
+                            22
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                85,
+                                67,
+                                43,
+                                22
+                              ],
+                              "variation": "RowTitleXB15",
+                              "text": "+5 XP"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "HBoxContainer",
+                  "rect": [
+                    77,
+                    104,
+                    173,
+                    28
+                  ],
+                  "children": [
+                    {
+                      "type": "PanelContainer",
+                      "rect": [
+                        77,
+                        104,
+                        97,
+                        28
+                      ],
+                      "children": [
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            85,
+                            107,
+                            81,
+                            22
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                85,
+                                107,
+                                81,
+                                22
+                              ],
+                              "variation": "RowTitleXB15",
+                              "text": "+25 Energy"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "HBoxContainer",
+                  "rect": [
+                    77,
+                    144,
+                    173,
+                    28
+                  ],
+                  "children": [
+                    {
+                      "type": "PanelContainer",
+                      "rect": [
+                        77,
+                        144,
+                        88,
+                        28
+                      ],
+                      "children": [
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            85,
+                            147,
+                            72,
+                            22
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                85,
+                                147,
+                                72,
+                                22
+                              ],
+                              "variation": "RowTitleXB15",
+                              "text": "−2 Energy"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "HBoxContainer",
+                  "rect": [
+                    77,
+                    184,
+                    173,
+                    28
+                  ],
+                  "children": [
+                    {
+                      "type": "PanelContainer",
+                      "rect": [
+                        77,
+                        184,
+                        84,
+                        28
+                      ],
+                      "children": [
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            85,
+                            187,
+                            68,
+                            22
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                85,
+                                187,
+                                68,
+                                22
+                              ],
+                              "variation": "RowTitleXB15",
+                              "text": "+12 coins"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "HBoxContainer",
+                  "rect": [
+                    77,
+                    224,
+                    173,
+                    28
+                  ],
+                  "children": [
+                    {
+                      "type": "PanelContainer",
+                      "rect": [
+                        77,
+                        224,
+                        173,
+                        28
+                      ],
+                      "children": [
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            85,
+                            227,
+                            157,
+                            22
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                85,
+                                231,
+                                14,
+                                14
+                              ]
+                            },
+                            {
+                              "type": "Label",
+                              "rect": [
+                                103,
+                                227,
+                                139,
+                                22
+                              ],
+                              "variation": "RowTitleXB15",
+                              "text": "+2 · first chat today"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "HBoxContainer",
+                  "rect": [
+                    77,
+                    264,
+                    173,
+                    28
+                  ],
+                  "children": [
+                    {
+                      "type": "PanelContainer",
+                      "rect": [
+                        77,
+                        264,
+                        108,
+                        28
+                      ],
+                      "children": [
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            85,
+                            267,
+                            92,
+                            22
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                85,
+                                271,
+                                14,
+                                14
+                              ]
+                            },
+                            {
+                              "type": "Label",
+                              "rect": [
+                                103,
+                                267,
+                                74,
+                                22
+                              ],
+                              "variation": "RowTitleXB15",
+                              "text": "+6 Timber"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            310,
+            328,
+            14
+          ],
+          "variation": "C9B",
+          "text": "static look (×1.0) · play() pops, rises 48 and fades over 1100 ms"
+        }
+      ]
+    }
+  ]
+}

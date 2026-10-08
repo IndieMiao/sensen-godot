@@ -273,7 +273,7 @@ static func free_now(view: Dictionary) -> Array:
 		if int(r.get("have", 0)) >= int(r.get("qty", 1)):
 			rows.append(_row("Deliver %s" % str(r.get("title", "")), "board", "stall"))
 			break
-	if view.get("mine", {}).get("run", null) != null: rows.append(_row("Mine run · Continue · Free", "mine", "mine"))
+	if view.get("mine", {}).get("run", null) != null: rows.append(_row("Mine run · Continue · Free", "mine", ""))   # no camera target yet
 	rows = rows.slice(0, 3)
 	if rows.size() < 3: rows.append(_row("Browse the map", "map", "map"))   # the fallback, always possible
 	return rows
