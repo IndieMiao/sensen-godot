@@ -58,11 +58,15 @@ func _process(_dt: float) -> void:
 	if is_instance_valid(_entry) and rt and rt.world != farm: _entry.visible = false
 
 func near_mouth() -> bool:
-	return farm.actor.position.distance_to(mouth) < MOUTH_REACH
+	return flat(farm.actor.position, mouth) < MOUTH_REACH
 
 ## The key at the mouth (LOCK-21): Enter mine · 2 Energy / Continue run · Free / Enter mine · No runs left.
 func action(v: Dictionary) -> Dictionary:
 	return P0MaterialLogic.mine_entry_action(v)
+
+## Ground distance: the player's y follows the ground (beds, slopes), facilities sit at 0 (Arthur on 231, int5 #11).
+static func flat(a: Vector3, b: Vector3) -> float:
+	return Vector2(a.x - b.x, a.z - b.z).length()
 
 ## LOCK-07 (不知火舞 / Arthur on 231): one finger card at a time, for the nearest facility within its own reach.
 ## `cands` [[id, world position, reach m]] in a fixed order; the card already showing (`current`) keeps it unless
@@ -73,7 +77,7 @@ static func pick_card(cands: Array, at: Vector3, current: String) -> String:
 	var best_d := INF
 	var current_d := INF
 	for c in cands:
-		var d := at.distance_to(c[1] as Vector3)
+		var d := flat(at, c[1] as Vector3)
 		if d > float(c[2]): continue
 		if str(c[0]) == current: current_d = d
 		if d < best_d:
@@ -147,14 +151,14 @@ func tap(screen: Vector2) -> bool:
 	for m in P0MaterialLogic.gather_marks(v):
 		var at: Vector3 = _spots.get(m.id, Vector3.ZERO)
 		if cam.unproject_position(at + Vector3(0, 0.6, 0)).distance_to(screen) >= 64: continue
-		if farm.actor.position.distance_to(at) >= SPOT_REACH: return false   # far away: the tap walks / does nothing
+		if flat(farm.actor.position, at) >= SPOT_REACH: return false   # far away: the tap walks / does nothing
 		farm.actor.face(at)
 		match str(m.badge):
 			"ready": rt.session.send({"type": "gather", "spot": str(m.id)})
 			"locked": P0MaterialCards.open_locked_spot(rt.ui, v, str(m.id))
 			_: rt.ui.toast(str(m.caption))
 		return true
-	if cam.unproject_position(_bench + Vector3(0, 0.8, 0)).distance_to(screen) < 64 and farm.actor.position.distance_to(_bench) < SPOT_REACH:
+	if cam.unproject_position(_bench + Vector3(0, 0.8, 0)).distance_to(screen) < 64 and flat(farm.actor.position, _bench) < SPOT_REACH:
 		farm.actor.face(_bench)
 		_open_workbench()
 		return true

@@ -282,3 +282,7 @@ func test_one_finger_card_for_the_nearest_facility() -> void:
 	assert_str(P0FarmMaterials.pick_card(cands, Vector3(1.9, 0, 0), "stall")).is_equal("workbench")
 	# The showing facility left its reach: the nearest in reach takes over.
 	assert_str(P0FarmMaterials.pick_card(cands, Vector3(-3.5, 0, 0), "stall")).is_equal("home")
+	# Reach is measured on the ground: standing up a slope or on a bed does not push a facility out of reach.
+	# 2.95 m away on the ground but 0.6 m up: in reach (a straight 3D distance would be 3.01, out of reach).
+	assert_str(P0FarmMaterials.pick_card(cands, Vector3(5.95, 0.6, 0), "")).is_equal("workbench")
+	assert_float(P0FarmMaterials.flat(Vector3(0, 2, 0), Vector3(3, 0, 4))).is_equal_approx(5.0, 0.0001)
