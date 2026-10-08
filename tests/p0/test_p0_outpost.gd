@@ -288,8 +288,8 @@ func test_room_prompts_are_names_and_icons_only() -> void:
 			assert_str(str(m.get("text", ""))).override_failure_message("%s %s" % [str(r.outpost.get("id", "")), n]).not_contains("Tap to")
 			assert_str(str(m.get("name", ""))).override_failure_message("%s %s" % [str(r.outpost.get("id", "")), n]).not_contains("Tap to")
 
-## 不知火舞 on #57: the NPC whose greeting card or dialogue bar this room opened is "talking" while that modal is up,
-## so its name stays lit there; no other NPC, and nobody once the modal closes. Through the real runtime and UI.
+## 不知火舞 on #57: the NPC whose greeting card or dialogue bar is up is "talking" while that modal is up, so its name
+## stays lit there; no other NPC, and nobody once the modal closes. Through the real runtime and UI.
 func test_the_npc_the_room_opened_a_talk_for_is_talking_until_it_closes() -> void:
 	var rt: P0Runtime = auto_free(P0Runtime.new())
 	add_child(rt)
@@ -304,6 +304,37 @@ func test_the_npc_the_room_opened_a_talk_for_is_talking_until_it_closes() -> voi
 	rt.ui.close_modal()
 	r._room_frame({}, 1.0 / 30.0)
 	assert_bool(bool(r._marker("npc_keeper", {}).talking)).is_false()
+
+## 韩信 int9: a dish card's `Gift to Old Kai` opens his gift drawer from the bag, and its way back is his dialogue bar —
+## a bar the room never opened. His name tag still stands lit over it, as when he was tapped (and over the bar again
+## after a Gift → back from it); under the drawer itself it hides.
+func test_a_resident_bar_reached_from_the_bag_lights_their_name() -> void:
+	var rt: P0Runtime = auto_free(P0Runtime.new())
+	add_child(rt)
+	await get_tree().process_frame
+	rt.session.transport = func(_method: int, _path: String, _body: Dictionary, _cmd: Dictionary): pass   # nothing goes out
+	rt.ui.set_view({"residents": {"res_old_kai": {"stage": "Stranger"}},
+		"bag": {"slots": [{"key": "d1", "id": "dish_grilled_crucian", "qty": 1}]}})
+	var r := _room("sh_tackle_1")
+	r.rt = rt
+	var tag := func() -> UiNpcNameTag:
+		r._markers({})
+		return rt.ui._npc_tags.get("room:npc_kai")
+	rt.ui.open_bag("d1", "bag")
+	rt.ui.open_gift("res_old_kai", "d1")   # the dish card's Gift to Old Kai
+	assert_bool((tag.call() as UiNpcNameTag).visible).is_false()   # under the drawer, no tags
+	(rt.ui._bag as UiDrawer).close_requested.emit()
+	assert_str(rt.ui.modal_kind).is_equal("resident")
+	assert_bool(bool(r._marker("npc_kai", {}).talking)).is_true()
+	assert_bool(bool(r._marker("npc_keeper", {}).talking)).is_false()
+	var t: UiNpcNameTag = tag.call()
+	assert_bool(t.visible).is_true()
+	assert_bool(t.highlight).is_true()
+	rt.ui.open_gift("res_old_kai")   # the bar's own Gift, then Back
+	rt.ui.back_modal()
+	assert_bool((tag.call() as UiNpcNameTag).visible).is_true()
+	rt.ui.close_modal()
+	assert_bool(bool(r._marker("npc_kai", {}).talking)).is_false()
 
 ## Scene integration (SGODOT-227, 不知火舞's walkthrough on 227): the tea house opens on the Coffee Shop kit with the
 ## background of its signed render and every anchor of its file, and the opening view holds the whole art, centred, with at least
