@@ -941,6 +941,9 @@ func _dev_shot(dt: float) -> void:
 			"showmap":   # showmap:pond:pond_shanghai_05 — what Today's Show on map does (int9 S1)
 				ui.close_modal()
 				ui.show_on_map.emit(":".join(step.slice(1)))
+			"minesheet": P0MaterialCards.open_mine_sheet(ui, session.current())        # MINE-P0-1 / P0-8 (235 B3)
+			"newrun": P0MaterialCards.open_new_run(ui, session.current(), func(c: Dictionary): session.send(c))   # MINE-P0-7
+			"lockedspot": P0MaterialCards.open_locked_spot(ui, session.current(), step[1] if step.size() > 1 else "spot_clay_bank")   # MAT-3
 			"showspot":   # showspot:mine — what a NeedSource's Show does (closes the layer, camera only, LOCK-08)
 				ui.close_modal()
 				ui.show_spot.emit(step[1])
