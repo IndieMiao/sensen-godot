@@ -91,7 +91,7 @@ func _origin() -> Vector2:
 
 func _pond_info(entry: Dictionary) -> Dictionary:
 	if rt == null: return {}
-	var km := PondCard.km_between(_origin(), Vector2(float(entry.lat), float(entry.lng)))
+	var km := P0PlaceSheet.km_between(_origin(), Vector2(float(entry.lat), float(entry.lng)))
 	return PondCard.info(rt.session.current(), str(entry.id), km)
 
 ## "Reed Pond · Beginner pond · 0.8 km" (q(48)); outposts keep their "· N online" tag.
@@ -106,60 +106,27 @@ func _on_entry_selected(entry: Dictionary) -> void:
 	city_map.info.hide()
 	_open_pond_card(entry, info)
 
-## The pond card sheet (Figma TUT-3-04 482:193): header (name / Beginner or template), the beginner line, Distance
-## and Recommended, Details › (the pond's fish list), Go. Tapping outside closes it and clears the selection.
+## The pond card (P0PlaceSheet, Figma TUT-3-04 482:193): header (name / Beginner or template), the beginner line,
+## Distance and Recommended, Details › (the pond's fish list), Go. At the pond the player is at (q(80)): no Distance,
+## and Back to <pond> re-enters it through the loading cover. Tapping outside closes it and clears the selection.
 func _open_pond_card(entry: Dictionary, info: Dictionary) -> void:
-	var ui := rt.ui
-	var holder := Control.new()
-	holder.theme = UiKit.theme()
-	holder.set_anchors_preset(Control.PRESET_FULL_RECT)
-	holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var panel := PanelContainer.new()
-	panel.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-	panel.grow_vertical = Control.GROW_DIRECTION_BEGIN
-	panel.mouse_filter = Control.MOUSE_FILTER_STOP
-	var sheet := UiStyleBox.make(UiTokens.COLOR_SURFACE, UiTokens.RADIUS_SHEET, UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT)
-	panel.add_theme_stylebox_override(&"panel", sheet.with_margins(16, 18, 16, 16 + ui.safe_bottom()))
-	var col := VBoxContainer.new()
-	col.add_theme_constant_override(&"separation", 8)
-	panel.add_child(col)
-	col.add_child(UiObjectHeader.new({"title": str(info.title), "state": str(info.subtitle)}))
-	if str(info.line) != "": col.add_child(UiKit.label(str(info.line), UiTokens.STYLE_C14_B))
-	for f in info.facts: col.add_child(UiFactRow.new(str(f[0]), str(f[1])))
-	var details := Button.new()
-	details.flat = true
-	details.focus_mode = Control.FOCUS_NONE
-	details.custom_minimum_size = Vector2(0, UiTokens.SIZE_TOUCH)
-	var row := HBoxContainer.new()
-	row.set_anchors_preset(Control.PRESET_FULL_RECT)
-	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var dl := UiKit.label("Details", UiTokens.STYLE_C14_XB, UiTokens.COLOR_INFO)
-	dl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	row.add_child(dl)
-	row.add_child(UiKit.label("›", UiTokens.STYLE_C14_XB, UiTokens.COLOR_INFO))
-	details.add_child(row)
-	var to_fish := [false]
-	details.pressed.connect(func():
-		to_fish[0] = true
-		_open_pond_fish(entry))
-	col.add_child(details)
-	var go := UiCommandButton.new("Go")
-	go.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	go.activated.connect(func():
-		ui.close_modal()
-		_on_city_pond_requested(entry))
-	col.add_child(go)
-	holder.add_child(panel)
-	var close := UiCloseButton.new()   # floats 6 above the sheet's top-right corner
-	close.pressed.connect(ui.close_modal)
-	holder.add_child(close)
-	panel.resized.connect(func():
-		close.position = Vector2(panel.size.x - 16 - UiTokens.SIZE_CLOSE, panel.position.y - 6 - UiTokens.SIZE_CLOSE))
 	var id := str(entry.id)
-	holder.tree_exiting.connect(func():
-		if not to_fish[0] and city_map and str(city_map.selected.get("id", "")) == id: city_map.clear_selection())
-	ui._open_modal(holder, 0.0, false)
-	ui.modal_kind = "pond_card"
+	var to_fish := [false]
+	var spec := P0PlaceSheet.for_here(info, is_here("pond", id))
+	P0PlaceSheet.open(rt.ui, spec,
+		func():
+			rt.ui.close_modal()
+			_on_city_pond_requested(entry),
+		func():
+			to_fish[0] = true
+			_open_pond_fish(entry),
+		func():
+			if not to_fish[0] and city_map and str(city_map.selected.get("id", "")) == id: city_map.clear_selection(),
+		"pond_card")
+
+## Whether the player is at this place now (the place chip's place, P0Runtime.here): q(80)'s Back to <name>.
+func is_here(space: String, place: String) -> bool:
+	return rt != null and str(rt.here.get("space", "")) == space and str(rt.here.get("place", "")) == place
 
 ## Details ›: the pond's fish list (q(48) c): caught fish in colour with their name, the rest as a silhouette with
 ## the Fishing level they need. × goes back to the pond card; tapping outside closes both.

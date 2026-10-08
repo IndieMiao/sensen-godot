@@ -252,3 +252,38 @@ func test_the_beginner_pond_shows_at_the_city_level_until_pond_catch_is_handed_i
 		assert_bool(city._over_avatar(city.markers[NEAREST_POND].entry)).is_false()   # drawn like any pond when it shows again
 		assert_bool(city._whole_label(city.markers[NEAREST_POND].entry)).is_false()   # and its label cut like any pond's
 	rt.session.view = saved
+
+## Once the server sends map_markers (蒙恬, SGODOT-232 U6), the pins pack by them, not by the client's tutorial mark.
+func test_the_pin_markers_follow_the_servers_map_markers_once_it_sends_them() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved: Dictionary = rt.session.view
+	var v := _board(0)
+	v["map_markers"] = [{"place": "sh_market_1", "kind": "deliver"}, {"place": "sh_market_1", "kind": "new"}]
+	rt.session.view = v
+	assert_dict(m.city_pin_markers()).is_equal({"sh_market_1": "deliverable"})   # its first mark; no tutorial !
+	rt.session.view = saved
+
+## q(80): the card of the pond the player is at drops Distance and reads Back to <pond>; another pond's reads Go.
+func test_the_pond_card_reads_back_to_at_the_pond_the_player_is_at() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved: Dictionary = rt.here
+	rt.here = {"space": "pond", "place": NEAREST_POND}
+	m.p0_dev(PackedStringArray(["pondcard", NEAREST_POND]))
+	var card: Control = rt.ui._modal
+	assert_str(rt.ui.modal_kind).is_equal("pond_card")
+	assert_str((card.find_child("Primary", true, false) as UiCommandButton).label).is_equal("Back to Reed Pond")
+	assert_array(card.find_children("*", "UiFactRow", true, false).map(func(f): return str((f as UiFactRow).label))).not_contains(["Distance"])
+	rt.ui.close_modal()
+	rt.here = {"space": "home", "place": ""}
+	m.p0_dev(PackedStringArray(["pondcard", NEAREST_POND]))
+	card = rt.ui._modal
+	assert_str((card.find_child("Primary", true, false) as UiCommandButton).label).is_equal("Go")
+	assert_array(card.find_children("*", "UiFactRow", true, false).map(func(f): return str((f as UiFactRow).label))).contains(["Distance"])
+	rt.ui.close_modal()
+	rt.here = saved

@@ -64,8 +64,8 @@ func test_the_fish_list_is_easiest_first_with_caught_ones_marked() -> void:
 	assert_str(str(ids[-1])).is_equal("fish_koi")   # Golden Koi, the hardest, last: its silhouette tells Old Kai's quest
 	assert_bool(rows.filter(func(r): return r.id == "fish_crucian")[0].caught).is_true()
 	assert_bool(rows.filter(func(r): return r.id == "fish_koi")[0].caught).is_false()
-	assert_float(PondCard.km_between(Vector2(31.2, 121.4), Vector2(31.2, 121.4))).is_equal(0.0)
-	assert_str(PondCard.distance_text(0.0)).is_equal("0.1 km")
+	assert_float(P0PlaceSheet.km_between(Vector2(31.2, 121.4), Vector2(31.2, 121.4))).is_equal(0.0)
+	assert_str(P0PlaceSheet.distance_text(0.0)).is_equal("0.1 km")
 
 func test_the_homestead_mark_hangs_on_the_farm_pin() -> void:
 	assert_str(P0Map.home_mark({"map_markers": [{"place": "sh_market_1", "kind": "request"}, {"place": "home", "kind": "deliver"}]})).is_equal("deliverable")
@@ -79,3 +79,28 @@ func test_the_homestead_mark_hangs_on_the_farm_pin() -> void:
 	fm.set_mark("self", null)
 	await get_tree().process_frame
 	assert_object(target.get_node_or_null("MapMark")).is_null()
+
+# ---------------------------------------------------------------- one list for badges and packing (亚瑟 on 234)
+## The pins' marks badge them (set_marks) and pack them first (#83's city_pin_markers) from one list: the server's
+## map_markers whenever it sends them, else the client's own tutorial mark on Reed Pond.
+func test_pin_marks_take_the_server_list_else_the_tutorial_mark() -> void:
+	var board := {"stall": {"board": {"requests": [{"id": P0Guide.TUTORIAL, "have": 0, "qty": 2}]}}, "req_done": []}
+	assert_array(P0Map.pin_marks(board)).is_equal([{"id": P0Map.NEAREST_POND, "state": "request"}])
+	var server := board.duplicate(true)
+	server["map_markers"] = [{"place": "sh_tackle_1", "kind": "new"}]
+	assert_array(P0Map.pin_marks(server)).is_equal([{"id": "sh_tackle_1", "state": "new"}])   # the server decides
+	server["map_markers"] = []
+	assert_array(P0Map.pin_marks(server)).is_empty()
+
+# ---------------------------------------------------------------- the place sheet at the player's place (q(80))
+## At the place the player is at, the card has no Distance row and its primary is Back to <name> (re-entering it);
+## anywhere else Distance shows and the primary is Go.
+func test_the_place_card_reads_back_to_at_the_place_the_player_is_at() -> void:
+	var info := PondCard.info(_view(), "pond_shanghai_05", 0.84)
+	var away := P0PlaceSheet.for_here(info, false)
+	assert_str(str(away.primary)).is_equal("Go")
+	assert_array(away.facts.map(func(f): return str(f[0]))).is_equal(["Distance", "Recommended"])
+	var here := P0PlaceSheet.for_here(info, true)
+	assert_str(str(here.primary)).is_equal("Back to Reed Pond")
+	assert_array(here.facts.map(func(f): return str(f[0]))).is_equal(["Recommended"])
+	assert_array(info.facts.map(func(f): return str(f[0]))).is_equal(["Distance", "Recommended"])   # the spec is not changed

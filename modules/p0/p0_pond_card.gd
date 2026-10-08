@@ -16,7 +16,7 @@ static func info(view: Dictionary, pond_id: String, km: float) -> Dictionary:
 	var site: Dictionary = fishing.get("sites", {}).get(str(place.get("site", "pond")), {})
 	var template := str(site.get("template", "Pond"))
 	var beginner := bool(place.get("beginner", false))
-	var distance := distance_text(km)
+	var distance := P0PlaceSheet.distance_text(km)
 	return {
 		"title": str(place.get("name", "")),
 		"subtitle": "Beginner" if beginner else template,
@@ -38,19 +38,6 @@ static func outleveled(view: Dictionary, site: Dictionary) -> bool:
 		for f in content.get("fish", []):
 			if str(f.get("id", "")) == str(id) and level - int(f.get("level", 1)) <= widest: return false
 	return true
-
-static func distance_text(km: float) -> String:
-	return "%.1f km" % maxf(0.1, km)
-
-## Great-circle distance in km.
-static func km_between(a: Vector2, b: Vector2) -> float:
-	var r := 6371.0
-	var la1 := deg_to_rad(a.x)
-	var la2 := deg_to_rad(b.x)
-	var dla := la2 - la1
-	var dlo := deg_to_rad(b.y - a.y)
-	var h := sin(dla * 0.5) ** 2 + cos(la1) * cos(la2) * sin(dlo * 0.5) ** 2
-	return 2.0 * r * asin(minf(1.0, sqrt(h)))
 
 ## Details ›: the fish of this pond's template that P0 can catch (q(48) c), easiest first. caught = the player has
 ## landed one (view.fishing.dex); the card shows those with their icon and name, the rest as a silhouette with
