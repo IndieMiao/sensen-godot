@@ -672,6 +672,24 @@ static func back_at_text(iso: String, now := -1, bias_min := 100000) -> String:
 	const MONTHS := ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 	return "%s %d, %s" % [MONTHS[int(d.month) - 1], int(d.day), clock]
 
+## Desktop shots of the whole-screen states (233): the launch cover, its slow line and Can't connect; maintenance back in
+## 90 minutes; update; the scene cover over the farm (named Reed Pond) and its failure.
+func _dev_screen(which: String) -> void:
+	match which:
+		"launch", "slow", "fail":
+			cover_launch()
+			if which == "slow": ui.screen().taking_longer()
+			if which == "fail": _launch_failed()
+		"maint":
+			var at := Time.get_datetime_string_from_unix_time(int(Time.get_unix_time_from_system()) + 5400) + "Z"
+			_on_blocked("maintenance", {"back_at": at})
+		"update": _on_blocked("update_required", {"url": "https://example.test/p0demo.apk"})
+		"scene", "placefail":
+			var layer := _scene_overlay("res://scenes/p0/p0_pond.tscn", {"pond_id": "pond_shanghai_05"}) as P0LoadingLayer
+			add_child(layer)
+			layer.screen.modulate.a = 1.0
+			if which == "placefail": layer.failed()
+
 ## AppRouter.open_instance into a P0 world: SYS-LOADING-SCENE over the screen being left; anything else keeps
 ## AppRouter's own overlay.
 func _scene_overlay(path: String, args: Dictionary) -> CanvasLayer:
@@ -753,6 +771,7 @@ func _dev_shot(dt: float) -> void:
 			"workbench": ui.open_workbench(step[1] if step.size() > 1 else "")   # SGODOT-231 B2-06 drawer, tools / supplies
 			"toasterr": ui.toast_error(step[1] if step.size() > 1 else "Need 1 more Copper Ore")   # a refusal's Error toast (233)
 			"netfail": _net_failed("dev", {"type": "dev"})   # netfail once: Didn't go through; twice: Offline (233)
+			"screen": _dev_screen(step[1] if step.size() > 1 else "launch")   # screen:launch|slow|fail|maint|update|scene|placefail
 			"wbtile":   # wbtile:craft_copper_pickaxe:0 taps that card's cost tile (NeedSource)
 				var wb := ui.workbench()
 				if wb != null and wb.card(step[1]) != null: wb.card(step[1]).tiles()[int(step[2])].pressed.emit()
