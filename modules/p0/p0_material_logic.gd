@@ -230,14 +230,21 @@ static func mine_bar(view: Dictionary, previous: Array, pinned: Array = [], remo
 const ELEVATOR_TITLE := "Elevator · stops this run"   # MINE-P0-6 panel header
 
 ## Elevator card rows (§13.3.9, q(44); P0: Entrance, Floor 1, Floor 2, no Express). here: 0 = entrance, else a floor.
-## Each row {name, state, label, enabled, amber, cmd}: MINE-P0-6 draws name left and state right ("Floor 1" · "Free");
-## label is the joined line (≤ 26 characters). cmd type "mine_leave" (back to the farm) or "mine_floor" {floor}.
+## Each row {name, state, kind, label, enabled, amber, cmd}: MINE-P0-6 draws name left and state right ("Floor 1" ·
+## "Free"); label is the joined line (≤ 26 characters). kind is the ElevatorRow state (LOCK-21): "here", "free",
+## "cost" (an unpaid floor's fee), "locked" (Clear Floor N first / Bag full), "short" (Need 2 Energy).
+## cmd type "mine_leave" (back to the farm), "mine_floor" {floor} or "energy_card".
 static func elevator_rows(view: Dictionary, here: int) -> Array:
 	var rows: Array = []
 	for r in _elevator_rows(view, here):
 		var parts := str(r.label).split(" · ", true, 1)
 		r["name"] = parts[0]
 		r["state"] = parts[1] if parts.size() > 1 else ""
+		if r.state == "Here": r["kind"] = "here"
+		elif r.state == "Free": r["kind"] = "free"
+		elif r.amber: r["kind"] = "short"
+		elif r.enabled: r["kind"] = "cost"
+		else: r["kind"] = "locked"
 		rows.append(r)
 	return rows
 
