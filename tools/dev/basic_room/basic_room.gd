@@ -326,9 +326,6 @@ func _physics_process(delta: float) -> void:
 			if zoom > 8.5: target = reference_focus.lerp(target, .24)
 			focus = focus.lerp(target, clampf(delta / .6 * 4.0, 0, 1))
 	_update_camera_transform()
-	if fire:
-		fire.scale.y = 1.0 + .035*sin(time*4.4) + .018*sin(time*7.3)
-		fire_light.light_energy = .72 + .035*sin(time*4.4)
 	state_timer += delta
 	if state_timer > .20:
 		state_timer = 0

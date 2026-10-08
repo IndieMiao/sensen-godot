@@ -1,0 +1,156 @@
+{
+  "revision": "R2.1",
+  "atlas": {
+    "size": [
+      2048,
+      2048
+    ],
+    "file": "room_albedo_ao.png",
+    "purpose": "authored UV leaf veins, wicker weave, per-component safe colour; no baked direct light",
+    "guard_pixels": 12,
+    "tile_pixels": 128,
+    "bytes": 139578
+  },
+  "assets": [
+    {
+      "name": "monstera",
+      "vertices": 568,
+      "triangles": 910,
+      "surfaces": 1,
+      "bytes": 24892
+    },
+    {
+      "name": "monstera_woven",
+      "vertices": 690,
+      "triangles": 1210,
+      "surfaces": 1,
+      "bytes": 30608
+    },
+    {
+      "name": "peace_lily",
+      "vertices": 620,
+      "triangles": 946,
+      "surfaces": 1,
+      "bytes": 26780
+    },
+    {
+      "name": "pothos",
+      "vertices": 1670,
+      "triangles": 2048,
+      "surfaces": 1,
+      "bytes": 67012
+    },
+    {
+      "name": "ivy_short",
+      "vertices": 792,
+      "triangles": 692,
+      "surfaces": 1,
+      "bytes": 37696
+    },
+    {
+      "name": "ivy_medium",
+      "vertices": 1254,
+      "triangles": 1098,
+      "surfaces": 1,
+      "bytes": 58952
+    },
+    {
+      "name": "ivy_long",
+      "vertices": 1716,
+      "triangles": 1504,
+      "surfaces": 1,
+      "bytes": 80200
+    },
+    {
+      "name": "flower_shrub",
+      "vertices": 3114,
+      "triangles": 2402,
+      "surfaces": 1,
+      "bytes": 126300
+    },
+    {
+      "name": "olive_tree",
+      "vertices": 3268,
+      "triangles": 2868,
+      "surfaces": 1,
+      "bytes": 123052
+    },
+    {
+      "name": "fruit_tree",
+      "vertices": 2215,
+      "triangles": 2424,
+      "surfaces": 1,
+      "bytes": 86696
+    },
+    {
+      "name": "pot_terracotta",
+      "vertices": 248,
+      "triangles": 440,
+      "surfaces": 1,
+      "bytes": 11844
+    },
+    {
+      "name": "pot_woven",
+      "vertices": 426,
+      "triangles": 836,
+      "surfaces": 1,
+      "bytes": 19912
+    }
+  ],
+  "unique_triangles": 17378,
+  "unique_assets": 12,
+  "static_draw_surfaces": 12,
+  "glb_bytes": 693944,
+  "r1_comparison": {
+    "monstera": {
+      "before": 5344,
+      "after": 910
+    },
+    "monstera_woven": {
+      "before": 0,
+      "after": 1210
+    },
+    "peace_lily": {
+      "before": 3616,
+      "after": 946
+    },
+    "pothos": {
+      "before": 21092,
+      "after": 2048
+    },
+    "ivy_short": {
+      "before": 5784,
+      "after": 692
+    },
+    "ivy_medium": {
+      "before": 9312,
+      "after": 1098
+    },
+    "ivy_long": {
+      "before": 11956,
+      "after": 1504
+    },
+    "flower_shrub": {
+      "before": 14992,
+      "after": 2402
+    },
+    "olive_tree": {
+      "before": 13276,
+      "after": 2868
+    },
+    "fruit_tree": {
+      "before": 14248,
+      "after": 2424
+    },
+    "pot_terracotta": {
+      "before": 0,
+      "after": 440
+    },
+    "pot_woven": {
+      "before": 0,
+      "after": 836
+    }
+  },
+  "leaf_triangle_max": 8,
+  "leaf_count": 1482
+}

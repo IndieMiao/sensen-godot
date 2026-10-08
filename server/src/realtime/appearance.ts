@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
 export const DEFAULT_SLOTS = {
@@ -16,7 +16,10 @@ export class AppearanceCatalog {
     const root = path.resolve(path.dirname(regionsFile), '../../avatar');
     const manifest = JSON.parse(readFileSync(path.join(root, 'parts_manifest.json'), 'utf8'));
     const denied = new Set(JSON.parse(readFileSync(path.join(root, 'demo_denylist.json'), 'utf8')).hidden);
-    for (const part of manifest.parts) if (!denied.has(part.id)) this.parts.set(part.id, part.slot);
+    // NPC-only parts (SGODOT-229) dress the outpost NPCs on the client; no player may send them.
+    const npcFile = path.join(root, 'npc_only.json');
+    const npcOnly = new Set<string>(existsSync(npcFile) ? JSON.parse(readFileSync(npcFile, 'utf8')).npc_only ?? [] : []);
+    for (const part of manifest.parts) if (!denied.has(part.id) && !npcOnly.has(part.id)) this.parts.set(part.id, part.slot);
   }
   parse(raw: unknown): Appearance {
     if (!raw || typeof raw !== 'object' || Array.isArray(raw)) throw new Error('APPEARANCE_INVALID');

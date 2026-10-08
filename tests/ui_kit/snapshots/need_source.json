@@ -1,0 +1,156 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    154
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiNeedSource"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        18
+      ],
+      "variation": "CaptionR12",
+      "text": "NeedSource 1092:77266 · LOCK-10 / 08"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        52,
+        328,
+        102
+      ],
+      "children": [
+        {
+          "type": "UiNeedSource",
+          "rect": [
+            0,
+            52,
+            328,
+            45
+          ],
+          "children": [
+            {
+              "type": "HBoxContainer",
+              "rect": [
+                15,
+                59,
+                306,
+                31
+              ],
+              "children": [
+                {
+                  "type": "Label",
+                  "rect": [
+                    15,
+                    64,
+                    231,
+                    20
+                  ],
+                  "variation": "BodyB14",
+                  "text": "Copper Ore · The mine, floors 1–4"
+                },
+                {
+                  "type": "UiShowPill",
+                  "rect": [
+                    256,
+                    59,
+                    65,
+                    31
+                  ],
+                  "text": "",
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        270,
+                        66,
+                        40,
+                        18
+                      ],
+                      "variation": "CaptionXB12",
+                      "text": "Show ›"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "UiNeedSource",
+          "rect": [
+            0,
+            109,
+            328,
+            45
+          ],
+          "children": [
+            {
+              "type": "HBoxContainer",
+              "rect": [
+                15,
+                116,
+                306,
+                31
+              ],
+              "children": [
+                {
+                  "type": "Label",
+                  "rect": [
+                    15,
+                    121,
+                    231,
+                    20
+                  ],
+                  "variation": "BodyB14",
+                  "text": "Radish Seeds · Homestead Stall"
+                },
+                {
+                  "type": "UiShowPill",
+                  "rect": [
+                    256,
+                    116,
+                    65,
+                    31
+                  ],
+                  "text": "",
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        270,
+                        123,
+                        40,
+                        18
+                      ],
+                      "variation": "CaptionXB12",
+                      "text": "Show ›"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

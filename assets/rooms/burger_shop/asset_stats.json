@@ -1,0 +1,299 @@
+{
+  "atlas": {
+    "size": [
+      2048,
+      2048
+    ],
+    "file": "room_albedo_ao.png",
+    "purpose": "base colour + softened contact AO; padded palette swatches for subpixel detail; no baked direct light",
+    "bytes": 2911485
+  },
+  "assets": [
+    {
+      "name": "checker_floor",
+      "vertices": 7488,
+      "triangles": 14444,
+      "surfaces": 1,
+      "bytes": 498168
+    },
+    {
+      "name": "left_wall",
+      "vertices": 1792,
+      "triangles": 3456,
+      "surfaces": 1,
+      "bytes": 120420
+    },
+    {
+      "name": "pickup_wall",
+      "vertices": 1400,
+      "triangles": 2700,
+      "surfaces": 1,
+      "bytes": 94380
+    },
+    {
+      "name": "pickup_window",
+      "vertices": 224,
+      "triangles": 432,
+      "surfaces": 1,
+      "bytes": 16252
+    },
+    {
+      "name": "pickup_canopy",
+      "vertices": 1044,
+      "triangles": 2008,
+      "surfaces": 1,
+      "bytes": 71800
+    },
+    {
+      "name": "pickup_sign",
+      "vertices": 1792,
+      "triangles": 1880,
+      "surfaces": 1,
+      "bytes": 99956
+    },
+    {
+      "name": "pickup_paper_bags",
+      "vertices": 824,
+      "triangles": 1608,
+      "surfaces": 1,
+      "bytes": 52880
+    },
+    {
+      "name": "drinks_fridge",
+      "vertices": 3720,
+      "triangles": 6852,
+      "surfaces": 1,
+      "bytes": 255748
+    },
+    {
+      "name": "drinks_glass",
+      "vertices": 8,
+      "triangles": 12,
+      "surfaces": 1,
+      "bytes": 2192
+    },
+    {
+      "name": "grill_station",
+      "vertices": 1108,
+      "triangles": 2068,
+      "surfaces": 1,
+      "bytes": 75980
+    },
+    {
+      "name": "fryer_station",
+      "vertices": 2620,
+      "triangles": 4972,
+      "surfaces": 1,
+      "bytes": 186856
+    },
+    {
+      "name": "prep_station",
+      "vertices": 1504,
+      "triangles": 2852,
+      "surfaces": 1,
+      "bytes": 99628
+    },
+    {
+      "name": "burger_warming_shelf",
+      "vertices": 4664,
+      "triangles": 8856,
+      "surfaces": 1,
+      "bytes": 273164
+    },
+    {
+      "name": "menu_board",
+      "vertices": 29404,
+      "triangles": 30370,
+      "surfaces": 1,
+      "bytes": 1634524
+    },
+    {
+      "name": "red_order_counter",
+      "vertices": 4500,
+      "triangles": 8628,
+      "surfaces": 1,
+      "bytes": 282028
+    },
+    {
+      "name": "customer_bar",
+      "vertices": 568,
+      "triangles": 1104,
+      "surfaces": 1,
+      "bytes": 41028
+    },
+    {
+      "name": "red_diner_stool",
+      "vertices": 382,
+      "triangles": 752,
+      "surfaces": 1,
+      "bytes": 29364
+    },
+    {
+      "name": "wood_planter_barrier",
+      "vertices": 1008,
+      "triangles": 1944,
+      "surfaces": 1,
+      "bytes": 68360
+    },
+    {
+      "name": "good_burgers_poster",
+      "vertices": 5496,
+      "triangles": 6234,
+      "surfaces": 1,
+      "bytes": 296340
+    },
+    {
+      "name": "fresh_buns_poster",
+      "vertices": 4556,
+      "triangles": 5232,
+      "surfaces": 1,
+      "bytes": 242900
+    },
+    {
+      "name": "wall_lamp",
+      "vertices": 148,
+      "triangles": 284,
+      "surfaces": 1,
+      "bytes": 12100
+    },
+    {
+      "name": "left_counter_return",
+      "vertices": 640,
+      "triangles": 1240,
+      "surfaces": 1,
+      "bytes": 43008
+    },
+    {
+      "name": "counter_logo_glow",
+      "vertices": 1124,
+      "triangles": 2196,
+      "surfaces": 1,
+      "bytes": 70948
+    },
+    {
+      "name": "counter_napkins",
+      "vertices": 336,
+      "triangles": 648,
+      "surfaces": 1,
+      "bytes": 23684
+    },
+    {
+      "name": "lamp_bulb_glow",
+      "vertices": 62,
+      "triangles": 120,
+      "surfaces": 1,
+      "bytes": 5228
+    },
+    {
+      "name": "fridge_light_glow",
+      "vertices": 16,
+      "triangles": 24,
+      "surfaces": 1,
+      "bytes": 3048
+    },
+    {
+      "name": "grill_steam",
+      "vertices": 135,
+      "triangles": 258,
+      "surfaces": 1,
+      "bytes": 14820
+    },
+    {
+      "name": "planter_dense_leaves",
+      "vertices": 2240,
+      "triangles": 1680,
+      "surfaces": 1,
+      "bytes": 83156
+    }
+  ],
+  "unique_triangles": 112854,
+  "scene_triangles": 127574,
+  "static_draw_surfaces": 42,
+  "unique_assets": 28,
+  "placed_instances": 42,
+  "glb_bytes": 4697960,
+  "scene_budget": {
+    "after": {
+      "room_triangles": 127574,
+      "shared_plant_triangles": 946,
+      "room_botanical_triangles": 13440,
+      "plant_triangles": 14386,
+      "total_triangles": 128520,
+      "static_surfaces": 26
+    },
+    "limits": {
+      "total_triangles": 200000,
+      "plant_triangles": 100000,
+      "static_surfaces": 60
+    },
+    "render_batches": [
+      {
+        "name": "back_dressing",
+        "file": "res://assets/rooms/burger_shop/batches/review_back_dressing.glb",
+        "material": "room",
+        "sources": [
+          "pickup_window",
+          "pickup_canopy",
+          "pickup_sign",
+          "pickup_paper_bags",
+          "burger_warming_shelf",
+          "fresh_buns_poster",
+          "wall_lamp",
+          "wall_lamp_pickup"
+        ],
+        "triangles": 20584,
+        "cast_shadow": true
+      },
+      {
+        "name": "glass",
+        "file": "res://assets/rooms/burger_shop/batches/review_glass.glb",
+        "material": "glass",
+        "sources": [
+          "drinks_glass"
+        ],
+        "triangles": 12,
+        "cast_shadow": false
+      },
+      {
+        "name": "front_dressing",
+        "file": "res://assets/rooms/burger_shop/batches/review_front_dressing.glb",
+        "material": "room",
+        "sources": [
+          "good_burgers_poster",
+          "counter_napkins",
+          "wall_lamp_left",
+          "bar_napkins"
+        ],
+        "triangles": 7814,
+        "cast_shadow": true
+      },
+      {
+        "name": "botanical",
+        "file": "res://assets/rooms/burger_shop/batches/review_botanical.glb",
+        "material": "room",
+        "sources": [
+          "planter_dense_leaves",
+          "planter_crown_1",
+          "planter_crown_2",
+          "planter_crown_3",
+          "planter_crown_4",
+          "planter_crown_5",
+          "planter_crown_6",
+          "planter_crown_7"
+        ],
+        "triangles": 13440,
+        "cast_shadow": false
+      },
+      {
+        "name": "large_plants",
+        "file": "res://assets/rooms/burger_shop/batches/review_large_plants.glb",
+        "material": "plants",
+        "sources": [
+          "WhiteCornerPlant"
+        ],
+        "triangles": 946,
+        "cast_shadow": true
+      }
+    ]
+  }
+}

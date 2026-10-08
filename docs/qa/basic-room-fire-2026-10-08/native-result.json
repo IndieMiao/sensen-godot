@@ -1,0 +1,108 @@
+{
+  "checks": [
+    {
+      "details": null,
+      "name": "Existing avatar fixture assembles",
+      "passed": true
+    },
+    {
+      "details": null,
+      "name": "22 reusable room kits load",
+      "passed": true
+    },
+    {
+      "details": null,
+      "name": "Public fire points to particle root at retained anchor",
+      "passed": true
+    },
+    {
+      "details": null,
+      "name": "Existing HearthGlow is sole light and flicker owner",
+      "passed": true
+    },
+    {
+      "details": 20,
+      "name": "Fire budget and bounds, no collision/shadows",
+      "passed": true
+    },
+    {
+      "details": null,
+      "name": "Static fire GLB is absent from rendered replacement",
+      "passed": true
+    },
+    {
+      "details": 0.0850000008940697,
+      "name": "Player stands on floorboard height",
+      "passed": true
+    },
+    {
+      "details": 0.812514543533325,
+      "name": "Free floor movement changes position",
+      "passed": true
+    },
+    {
+      "details": null,
+      "name": "Input release stops movement",
+      "passed": true
+    },
+    {
+      "details": null,
+      "name": "Idle clip resumes after movement",
+      "passed": true
+    },
+    {
+      "details": "(-0.12, 0.089939, 1.425)",
+      "name": "Dining table blocks passage",
+      "passed": true
+    },
+    {
+      "details": "(2.9375, 0.072365, 1.5)",
+      "name": "Open diorama edge is bounded",
+      "passed": true
+    },
+    {
+      "details": "(-2.745463, 0.072365, -0.6)",
+      "name": "Window wall prevents walking outside",
+      "passed": true
+    },
+    {
+      "details": "(2.948608, 0.090135, 0.243845)",
+      "name": "Blocked diagonal preserves free sliding",
+      "passed": true
+    },
+    {
+      "details": [
+        0.133333333333333,
+        0.266780666666667
+      ],
+      "name": "Run animation advances at distant camera",
+      "passed": true
+    },
+    {
+      "details": null,
+      "name": "Focus loss cancels active input",
+      "passed": true
+    },
+    {
+      "details": null,
+      "name": "Reference view hides character",
+      "passed": true
+    },
+    {
+      "details": null,
+      "name": "Movement view restores character",
+      "passed": true
+    },
+    {
+      "details": 6.61538461538462,
+      "name": "Two-finger input reduces camera size",
+      "passed": true
+    },
+    {
+      "details": null,
+      "name": "Pinch release leaves movement stopped",
+      "passed": true
+    }
+  ],
+  "passed": true
+}

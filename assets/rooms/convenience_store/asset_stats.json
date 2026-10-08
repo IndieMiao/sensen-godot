@@ -1,0 +1,338 @@
+{
+  "atlas": {
+    "size": [
+      2048,
+      2048
+    ],
+    "file": "room_albedo_ao.png",
+    "purpose": "base colour + softened contact AO; padded palette swatches for subpixel detail; no baked direct light",
+    "bytes": 3689666
+  },
+  "assets": [
+    {
+      "name": "floor",
+      "vertices": 8368,
+      "triangles": 15764,
+      "surfaces": 1,
+      "bytes": 641372
+    },
+    {
+      "name": "back_wall",
+      "vertices": 3808,
+      "triangles": 7344,
+      "surfaces": 1,
+      "bytes": 254344
+    },
+    {
+      "name": "left_door_wall",
+      "vertices": 3080,
+      "triangles": 5940,
+      "surfaces": 1,
+      "bytes": 205992
+    },
+    {
+      "name": "front_wall_left",
+      "vertices": 616,
+      "triangles": 1188,
+      "surfaces": 1,
+      "bytes": 42260
+    },
+    {
+      "name": "front_wall_right",
+      "vertices": 504,
+      "triangles": 972,
+      "surfaces": 1,
+      "bytes": 34852
+    },
+    {
+      "name": "side_low_wall",
+      "vertices": 1288,
+      "triangles": 2484,
+      "surfaces": 1,
+      "bytes": 86928
+    },
+    {
+      "name": "corner_pier",
+      "vertices": 168,
+      "triangles": 324,
+      "surfaces": 1,
+      "bytes": 12532
+    },
+    {
+      "name": "entry_step",
+      "vertices": 240,
+      "triangles": 432,
+      "surfaces": 1,
+      "bytes": 20092
+    },
+    {
+      "name": "entrance_frame",
+      "vertices": 1043,
+      "triangles": 1394,
+      "surfaces": 1,
+      "bytes": 64600
+    },
+    {
+      "name": "entrance_glass",
+      "vertices": 8,
+      "triangles": 12,
+      "surfaces": 1,
+      "bytes": 2204
+    },
+    {
+      "name": "entrance_awning",
+      "vertices": 932,
+      "triangles": 1792,
+      "surfaces": 1,
+      "bytes": 64364
+    },
+    {
+      "name": "convenience_sign",
+      "vertices": 2046,
+      "triangles": 2178,
+      "surfaces": 1,
+      "bytes": 115264
+    },
+    {
+      "name": "drink_cabinet",
+      "vertices": 1064,
+      "triangles": 2052,
+      "surfaces": 1,
+      "bytes": 72068
+    },
+    {
+      "name": "chiller_glass",
+      "vertices": 8,
+      "triangles": 12,
+      "surfaces": 1,
+      "bytes": 2196
+    },
+    {
+      "name": "drinks_header",
+      "vertices": 1286,
+      "triangles": 1414,
+      "surfaces": 1,
+      "bytes": 74064
+    },
+    {
+      "name": "snacks_wall_rack",
+      "vertices": 2625,
+      "triangles": 3049,
+      "surfaces": 1,
+      "bytes": 139316
+    },
+    {
+      "name": "essentials_wall_rack",
+      "vertices": 3811,
+      "triangles": 4493,
+      "surfaces": 1,
+      "bytes": 203992
+    },
+    {
+      "name": "checkout",
+      "vertices": 1400,
+      "triangles": 2660,
+      "surfaces": 1,
+      "bytes": 93620
+    },
+    {
+      "name": "produce_aisle",
+      "vertices": 2696,
+      "triangles": 4498,
+      "surfaces": 1,
+      "bytes": 156312
+    },
+    {
+      "name": "essentials_aisle",
+      "vertices": 1508,
+      "triangles": 2294,
+      "surfaces": 1,
+      "bytes": 74932
+    },
+    {
+      "name": "ice_cream_freezer",
+      "vertices": 1491,
+      "triangles": 2851,
+      "surfaces": 1,
+      "bytes": 100112
+    },
+    {
+      "name": "freezer_glass",
+      "vertices": 8,
+      "triangles": 12,
+      "surfaces": 1,
+      "bytes": 2200
+    },
+    {
+      "name": "basket_stack",
+      "vertices": 4096,
+      "triangles": 7896,
+      "surfaces": 1,
+      "bytes": 275048
+    },
+    {
+      "name": "entrance_sconce",
+      "vertices": 200,
+      "triangles": 384,
+      "surfaces": 1,
+      "bytes": 15976
+    },
+    {
+      "name": "checkout_small_goods",
+      "vertices": 1867,
+      "triangles": 2085,
+      "surfaces": 1,
+      "bytes": 103036
+    },
+    {
+      "name": "microwave",
+      "vertices": 208,
+      "triangles": 396,
+      "surfaces": 1,
+      "bytes": 16016
+    },
+    {
+      "name": "checkout_flowers",
+      "vertices": 2480,
+      "triangles": 4596,
+      "surfaces": 1,
+      "bytes": 126948
+    },
+    {
+      "name": "entrance_sky",
+      "vertices": 190,
+      "triangles": 348,
+      "surfaces": 1,
+      "bytes": 11844
+    },
+    {
+      "name": "cold_light_strips",
+      "vertices": 16,
+      "triangles": 24,
+      "surfaces": 1,
+      "bytes": 3052
+    },
+    {
+      "name": "chilled_drinks_stock",
+      "vertices": 807,
+      "triangles": 1025,
+      "surfaces": 1,
+      "bytes": 33364
+    },
+    {
+      "name": "chilled_back_liner",
+      "vertices": 8,
+      "triangles": 12,
+      "surfaces": 1,
+      "bytes": 2212
+    }
+  ],
+  "unique_triangles": 79925,
+  "scene_triangles": 84406,
+  "static_draw_surfaces": 40,
+  "unique_assets": 31,
+  "placed_instances": 40,
+  "glb_bytes": 3051112,
+  "scene_budget": {
+    "after": {
+      "room_triangles": 84406,
+      "shared_plant_triangles": 24168,
+      "room_botanical_triangles": 4944,
+      "plant_triangles": 29112,
+      "total_triangles": 108574,
+      "static_surfaces": 36
+    },
+    "limits": {
+      "total_triangles": 200000,
+      "plant_triangles": 100000,
+      "static_surfaces": 60
+    },
+    "render_batches": [
+      {
+        "name": "front_dressing",
+        "file": "res://assets/rooms/convenience_store/batches/review_front_dressing.glb",
+        "material": "room",
+        "sources": [
+          "entrance_frame",
+          "entrance_awning",
+          "convenience_sign",
+          "entrance_sconce",
+          "entrance_sconce_2"
+        ],
+        "triangles": 6132,
+        "cast_shadow": true
+      },
+      {
+        "name": "glass",
+        "file": "res://assets/rooms/convenience_store/batches/review_glass.glb",
+        "material": "glass",
+        "sources": [
+          "entrance_glass",
+          "freezer_glass"
+        ],
+        "triangles": 24,
+        "cast_shadow": false
+      },
+      {
+        "name": "back_dressing",
+        "file": "res://assets/rooms/convenience_store/batches/review_back_dressing.glb",
+        "material": "room",
+        "sources": [
+          "drinks_header",
+          "checkout_small_goods",
+          "microwave"
+        ],
+        "triangles": 3895,
+        "cast_shadow": true
+      },
+      {
+        "name": "botanical",
+        "file": "res://assets/rooms/convenience_store/batches/review_botanical.glb",
+        "material": "room",
+        "sources": [
+          "checkout_flowers"
+        ],
+        "triangles": 4596,
+        "cast_shadow": false
+      },
+      {
+        "name": "large_plants",
+        "file": "res://assets/rooms/convenience_store/batches/review_large_plants.glb",
+        "material": "plants",
+        "sources": [
+          "EntranceMonstera"
+        ],
+        "triangles": 1210,
+        "cast_shadow": true
+      },
+      {
+        "name": "back_plants",
+        "file": "res://assets/rooms/convenience_store/batches/review_back_plants.glb",
+        "material": "plants",
+        "sources": [
+          "HighPothos"
+        ],
+        "triangles": 2048,
+        "cast_shadow": false
+      },
+      {
+        "name": "front_plants",
+        "file": "res://assets/rooms/convenience_store/batches/review_front_plants.glb",
+        "material": "plants",
+        "sources": [
+          "IslandPothos",
+          "IslandHangingPothos",
+          "FlowerBox00",
+          "FlowerBox01",
+          "FlowerBox02",
+          "FlowerBox03",
+          "FlowerBox04",
+          "FlowerBox05",
+          "FlowerBox06"
+        ],
+        "triangles": 20910,
+        "cast_shadow": false
+      }
+    ]
+  }
+}

@@ -1,0 +1,2170 @@
+{
+  "units": "metres",
+  "axes": "Godot Y-up, front +Z; Blender (x,-z,y)",
+  "reference": {
+    "file_key": "OMLTC3yw3u2WDjOZhLnhaR",
+    "node_id": "545:2966"
+  },
+  "assets": [
+    {
+      "name": "room_shell",
+      "file": "room_shell.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            -0.088,
+            0
+          ],
+          "size": [
+            7.800000000000001,
+            0.34,
+            7.2
+          ]
+        },
+        {
+          "at": [
+            -3.7,
+            1.8,
+            0
+          ],
+          "size": [
+            0.2,
+            3.8,
+            6.8
+          ]
+        },
+        {
+          "at": [
+            0,
+            1.8,
+            -3.4
+          ],
+          "size": [
+            7.4,
+            3.8,
+            0.2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "window_wall",
+      "file": "window_wall.glb",
+      "position": [
+        -3.7,
+        0,
+        0
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "back_wall",
+      "file": "back_wall.glb",
+      "position": [
+        0,
+        0,
+        -3.4
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "saloon_door",
+      "file": "saloon_door.glb",
+      "position": [
+        -3.59,
+        0.07,
+        -2.5
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "tavern_window",
+      "file": "tavern_window.glb",
+      "position": [
+        2.65,
+        0,
+        -3.295
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "tavern_window_garden",
+      "file": "tavern_window_garden.glb",
+      "position": [
+        2.65,
+        0,
+        -3.295
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "long_bar",
+      "file": "long_bar.glb",
+      "position": [
+        0.03,
+        0.082,
+        -1.54
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.594,
+            0
+          ],
+          "size": [
+            3.75,
+            1.188,
+            0.88
+          ]
+        }
+      ]
+    },
+    {
+      "name": "bar_return",
+      "file": "bar_return.glb",
+      "position": [
+        1.99,
+        0.082,
+        -1.98
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.594,
+            0
+          ],
+          "size": [
+            0.66,
+            1.188,
+            1.75
+          ]
+        }
+      ]
+    },
+    {
+      "name": "tavern_sign",
+      "file": "tavern_sign.glb",
+      "position": [
+        0.07,
+        3.07,
+        -3.21
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "bar_stool",
+      "file": "bar_stool.glb",
+      "position": [
+        -1.29,
+        0.082,
+        -0.66
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "beer_cask",
+      "file": "beer_cask.glb",
+      "position": [
+        1.3,
+        1.4366999999999999,
+        -1.78
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "barrel",
+      "file": "barrel.glb",
+      "position": [
+        -2.93,
+        0.082,
+        -1.58
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.42,
+            0
+          ],
+          "size": [
+            0.65,
+            0.84,
+            0.65
+          ]
+        }
+      ]
+    },
+    {
+      "name": "left_table_rug",
+      "file": "left_table_rug.glb",
+      "position": [
+        -2.14,
+        0.092,
+        0.94
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "square_table",
+      "file": "square_table.glb",
+      "position": [
+        -2.14,
+        0.082,
+        0.91
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.6,
+            0
+          ],
+          "size": [
+            1.88,
+            1.2,
+            1.18
+          ]
+        }
+      ]
+    },
+    {
+      "name": "round_table",
+      "file": "round_table.glb",
+      "position": [
+        0.07,
+        0.082,
+        1.9600000000000002
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.5074,
+            0
+          ],
+          "size": [
+            1.58,
+            1.0148,
+            1.58
+          ]
+        }
+      ]
+    },
+    {
+      "name": "dining_stool",
+      "file": "dining_stool.glb",
+      "position": [
+        -2.14,
+        0.082,
+        1.87
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "table_candle",
+      "file": "table_candle.glb",
+      "position": [
+        -2.12,
+        1.29,
+        0.95
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "candle_glow",
+      "file": "candle_glow.glb",
+      "position": [
+        -2.12,
+        1.57,
+        0.95
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "tavern_snacks",
+      "file": "tavern_snacks.glb",
+      "position": [
+        0.12,
+        1.177,
+        2.09
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "left_display_shelf",
+      "file": "left_display_shelf.glb",
+      "position": [
+        -3.47,
+        1.37,
+        0.27
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "landscape_frame",
+      "file": "landscape_frame.glb",
+      "position": [
+        -3.54,
+        1.62,
+        1.36
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "stag_banner",
+      "file": "stag_banner.glb",
+      "position": [
+        -3.51,
+        2.85,
+        1.22
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "wall_lantern",
+      "file": "wall_lantern.glb",
+      "position": [
+        -3.45,
+        2.06,
+        2.22
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "lantern_glow",
+      "file": "lantern_glow.glb",
+      "position": [
+        -3.45,
+        2.06,
+        2.22
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "hanging_chandelier",
+      "file": "hanging_chandelier.glb",
+      "position": [
+        -2.2,
+        2.99,
+        0.1
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "square_dining_stool",
+      "file": "square_dining_stool.glb",
+      "position": [
+        -3.02,
+        0.082,
+        0.85
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "backed_dining_stool",
+      "file": "backed_dining_stool.glb",
+      "position": [
+        1.34,
+        0.082,
+        0.94
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "back_bar",
+      "file": "back_bar.glb",
+      "position": [
+        0.07,
+        1.51,
+        -3.04
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "bottle_variant_0",
+      "file": "bottle_variant_0.glb",
+      "position": [
+        -1.2,
+        1.578,
+        -2.96
+      ],
+      "yaw_degrees": -7,
+      "colliders": []
+    },
+    {
+      "name": "bottle_variant_3",
+      "file": "bottle_variant_3.glb",
+      "position": [
+        -0.9179999999999999,
+        1.578,
+        -2.96
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "bottle_variant_1",
+      "file": "bottle_variant_1.glb",
+      "position": [
+        -0.636,
+        1.578,
+        -2.96
+      ],
+      "yaw_degrees": 7,
+      "colliders": []
+    },
+    {
+      "name": "bottle_variant_4",
+      "file": "bottle_variant_4.glb",
+      "position": [
+        -0.3540000000000001,
+        1.578,
+        -2.96
+      ],
+      "yaw_degrees": -7,
+      "colliders": []
+    },
+    {
+      "name": "bottle_variant_2",
+      "file": "bottle_variant_2.glb",
+      "position": [
+        -0.07200000000000006,
+        1.578,
+        -2.96
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "mug_variant_0",
+      "file": "mug_variant_0.glb",
+      "position": [
+        -0.92,
+        1.4046999999999998,
+        -1.22
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "mug_variant_1",
+      "file": "mug_variant_1.glb",
+      "position": [
+        -2.56,
+        1.297,
+        0.92
+      ],
+      "yaw_degrees": 26,
+      "colliders": []
+    },
+    {
+      "name": "mug_variant_2",
+      "file": "mug_variant_2.glb",
+      "position": [
+        0.39,
+        1.174,
+        2.0199999999999996
+      ],
+      "yaw_degrees": 52,
+      "colliders": []
+    },
+    {
+      "name": "beer_chalkboard",
+      "file": "beer_chalkboard.glb",
+      "position": [
+        2.64,
+        2.43,
+        -3.12
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "copper_cookware",
+      "file": "copper_cookware.glb",
+      "position": [
+        -3.48,
+        2.65,
+        -1.79
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "table_runner",
+      "file": "table_runner.glb",
+      "position": [
+        -2.14,
+        1.287,
+        0.91
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "bar_runner",
+      "file": "bar_runner.glb",
+      "position": [
+        0.93,
+        1.4046999999999998,
+        -1.45
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "ceramic_jug",
+      "file": "ceramic_jug.glb",
+      "position": [
+        0.73,
+        1.4137,
+        -1.68
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "horizontal_floor_barrel",
+      "file": "horizontal_floor_barrel.glb",
+      "position": [
+        3.1,
+        0.082,
+        -1.58
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.33,
+            0
+          ],
+          "size": [
+            0.67,
+            0.66,
+            0.84
+          ]
+        }
+      ]
+    },
+    {
+      "name": "right_plant_shelf",
+      "file": "right_plant_shelf.glb",
+      "position": [
+        2.24,
+        2.16,
+        -3.15
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "floor_clay_pitcher",
+      "file": "floor_clay_pitcher.glb",
+      "position": [
+        2.86,
+        0.082,
+        -0.76
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    }
+  ],
+  "instances": [
+    {
+      "name": "bar_stool_0",
+      "asset": "bar_stool",
+      "position": [
+        -0.41,
+        0.082,
+        -0.66
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "bar_stool_1",
+      "asset": "bar_stool",
+      "position": [
+        0.47,
+        0.082,
+        -0.66
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "bar_stool_2",
+      "asset": "bar_stool",
+      "position": [
+        1.35,
+        0.082,
+        -0.66
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "barrel_left",
+      "asset": "barrel",
+      "position": [
+        -2.42,
+        0.082,
+        -2.03
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "barrel_right_one",
+      "asset": "barrel",
+      "position": [
+        2.67,
+        0.082,
+        -2.09
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "round_table_right",
+      "asset": "round_table",
+      "position": [
+        2.24,
+        0.082,
+        0.94
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "seat_1",
+      "asset": "dining_stool",
+      "position": [
+        -1.26,
+        0.082,
+        0.85
+      ],
+      "yaw_degrees": -11
+    },
+    {
+      "name": "seat_2",
+      "asset": "dining_stool",
+      "position": [
+        -2.14,
+        0.082,
+        -0.04
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "seat_3",
+      "asset": "square_dining_stool",
+      "position": [
+        -0.83,
+        0.082,
+        1.9600000000000002
+      ],
+      "yaw_degrees": 11
+    },
+    {
+      "name": "seat_4",
+      "asset": "backed_dining_stool",
+      "position": [
+        0.04,
+        0.082,
+        2.87
+      ],
+      "yaw_degrees": 22
+    },
+    {
+      "name": "seat_5",
+      "asset": "dining_stool",
+      "position": [
+        0.94,
+        0.082,
+        1.97
+      ],
+      "yaw_degrees": -22
+    },
+    {
+      "name": "seat_6",
+      "asset": "square_dining_stool",
+      "position": [
+        0.05,
+        0.082,
+        1.05
+      ],
+      "yaw_degrees": -11
+    },
+    {
+      "name": "seat_8",
+      "asset": "backed_dining_stool",
+      "position": [
+        2.2199999999999998,
+        0.082,
+        1.84
+      ],
+      "yaw_degrees": 11
+    },
+    {
+      "name": "seat_9",
+      "asset": "square_dining_stool",
+      "position": [
+        3.1100000000000003,
+        0.082,
+        0.91
+      ],
+      "yaw_degrees": 22
+    },
+    {
+      "name": "seat_10",
+      "asset": "dining_stool",
+      "position": [
+        2.24,
+        0.082,
+        0.04
+      ],
+      "yaw_degrees": -22
+    },
+    {
+      "name": "table_candle_0",
+      "asset": "table_candle",
+      "position": [
+        0.1,
+        1.174,
+        1.9200000000000002
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "candle_glow_0",
+      "asset": "candle_glow",
+      "position": [
+        0.1,
+        1.454,
+        1.9200000000000002
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "table_candle_1",
+      "asset": "table_candle",
+      "position": [
+        2.2199999999999998,
+        1.174,
+        0.94
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "candle_glow_1",
+      "asset": "candle_glow",
+      "position": [
+        2.2199999999999998,
+        1.454,
+        0.94
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "bar_left_frame",
+      "asset": "wall_lantern",
+      "position": [
+        -1.31,
+        2.94,
+        -3.13
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "bar_left_glow",
+      "asset": "lantern_glow",
+      "position": [
+        -1.31,
+        2.94,
+        -3.13
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "bar_right_frame",
+      "asset": "wall_lantern",
+      "position": [
+        1.56,
+        2.94,
+        -3.13
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "bar_right_glow",
+      "asset": "lantern_glow",
+      "position": [
+        1.56,
+        2.94,
+        -3.13
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "window_right_frame",
+      "asset": "wall_lantern",
+      "position": [
+        3.28,
+        2.49,
+        -3.13
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "window_right_glow",
+      "asset": "lantern_glow",
+      "position": [
+        3.28,
+        2.49,
+        -3.13
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "chandelier_frame_0",
+      "asset": "wall_lantern",
+      "position": [
+        -1.6,
+        2.71,
+        0.1
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "chandelier_glow_0",
+      "asset": "lantern_glow",
+      "position": [
+        -1.6,
+        2.71,
+        0.1
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "chandelier_frame_1",
+      "asset": "wall_lantern",
+      "position": [
+        -2.2,
+        2.71,
+        0.7
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "chandelier_glow_1",
+      "asset": "lantern_glow",
+      "position": [
+        -2.2,
+        2.71,
+        0.7
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "chandelier_frame_2",
+      "asset": "wall_lantern",
+      "position": [
+        -2.8000000000000003,
+        2.71,
+        0.10000000000000007
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "chandelier_glow_2",
+      "asset": "lantern_glow",
+      "position": [
+        -2.8000000000000003,
+        2.71,
+        0.10000000000000007
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "chandelier_frame_3",
+      "asset": "wall_lantern",
+      "position": [
+        -2.2,
+        2.71,
+        -0.5
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "chandelier_glow_3",
+      "asset": "lantern_glow",
+      "position": [
+        -2.2,
+        2.71,
+        -0.5
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "shelf_bottle_5",
+      "asset": "bottle_variant_0",
+      "position": [
+        0.20999999999999996,
+        1.578,
+        -2.96
+      ],
+      "yaw_degrees": 7
+    },
+    {
+      "name": "shelf_bottle_6",
+      "asset": "bottle_variant_3",
+      "position": [
+        0.49199999999999977,
+        1.578,
+        -2.96
+      ],
+      "yaw_degrees": -7
+    },
+    {
+      "name": "shelf_bottle_7",
+      "asset": "bottle_variant_1",
+      "position": [
+        0.7739999999999998,
+        1.578,
+        -2.96
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "shelf_bottle_8",
+      "asset": "bottle_variant_4",
+      "position": [
+        1.0559999999999998,
+        1.578,
+        -2.96
+      ],
+      "yaw_degrees": 7
+    },
+    {
+      "name": "shelf_bottle_9",
+      "asset": "bottle_variant_2",
+      "position": [
+        1.3379999999999999,
+        1.578,
+        -2.96
+      ],
+      "yaw_degrees": -7
+    },
+    {
+      "name": "shelf_bottle_10",
+      "asset": "bottle_variant_2",
+      "position": [
+        -1.2,
+        2.238,
+        -2.96
+      ],
+      "yaw_degrees": -7
+    },
+    {
+      "name": "shelf_bottle_11",
+      "asset": "bottle_variant_0",
+      "position": [
+        -0.9179999999999999,
+        2.238,
+        -2.96
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "shelf_bottle_12",
+      "asset": "bottle_variant_3",
+      "position": [
+        -0.636,
+        2.238,
+        -2.96
+      ],
+      "yaw_degrees": 7
+    },
+    {
+      "name": "shelf_bottle_13",
+      "asset": "bottle_variant_1",
+      "position": [
+        -0.3540000000000001,
+        2.238,
+        -2.96
+      ],
+      "yaw_degrees": -7
+    },
+    {
+      "name": "shelf_bottle_14",
+      "asset": "bottle_variant_4",
+      "position": [
+        -0.07200000000000006,
+        2.238,
+        -2.96
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "shelf_bottle_15",
+      "asset": "bottle_variant_2",
+      "position": [
+        0.20999999999999996,
+        2.238,
+        -2.96
+      ],
+      "yaw_degrees": 7
+    },
+    {
+      "name": "shelf_bottle_16",
+      "asset": "bottle_variant_0",
+      "position": [
+        0.49199999999999977,
+        2.238,
+        -2.96
+      ],
+      "yaw_degrees": -7
+    },
+    {
+      "name": "shelf_bottle_17",
+      "asset": "bottle_variant_3",
+      "position": [
+        0.7739999999999998,
+        2.238,
+        -2.96
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "shelf_bottle_18",
+      "asset": "bottle_variant_1",
+      "position": [
+        1.0559999999999998,
+        2.238,
+        -2.96
+      ],
+      "yaw_degrees": 7
+    },
+    {
+      "name": "shelf_bottle_19",
+      "asset": "bottle_variant_4",
+      "position": [
+        1.3379999999999999,
+        2.238,
+        -2.96
+      ],
+      "yaw_degrees": -7
+    },
+    {
+      "name": "varied_mug_0",
+      "asset": "mug_variant_1",
+      "position": [
+        -0.24,
+        1.4046999999999998,
+        -1.13
+      ],
+      "yaw_degrees": -27
+    },
+    {
+      "name": "varied_mug_1",
+      "asset": "mug_variant_2",
+      "position": [
+        0.52,
+        1.4046999999999998,
+        -1.29
+      ],
+      "yaw_degrees": 12
+    },
+    {
+      "name": "varied_mug_2",
+      "asset": "mug_variant_0",
+      "position": [
+        -1.62,
+        1.297,
+        0.8
+      ],
+      "yaw_degrees": 66
+    },
+    {
+      "name": "varied_mug_3",
+      "asset": "mug_variant_1",
+      "position": [
+        -0.27,
+        1.174,
+        2.21
+      ],
+      "yaw_degrees": 81
+    },
+    {
+      "name": "varied_mug_4",
+      "asset": "mug_variant_2",
+      "position": [
+        1.9000000000000001,
+        1.174,
+        0.91
+      ],
+      "yaw_degrees": 10
+    },
+    {
+      "name": "varied_mug_5",
+      "asset": "mug_variant_0",
+      "position": [
+        2.6100000000000003,
+        1.174,
+        1.13
+      ],
+      "yaw_degrees": -35
+    },
+    {
+      "name": "varied_mug_6",
+      "asset": "mug_variant_1",
+      "position": [
+        -0.55,
+        1.578,
+        -2.68
+      ],
+      "yaw_degrees": 10
+    },
+    {
+      "name": "varied_mug_7",
+      "asset": "mug_variant_2",
+      "position": [
+        0.28,
+        2.238,
+        -2.68
+      ],
+      "yaw_degrees": 30
+    },
+    {
+      "name": "table_bottle_0",
+      "asset": "bottle_variant_2",
+      "position": [
+        -1.82,
+        1.29,
+        0.7
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "table_bottle_1",
+      "asset": "bottle_variant_0",
+      "position": [
+        0.33,
+        1.176,
+        1.76
+      ],
+      "yaw_degrees": 25
+    },
+    {
+      "name": "table_bottle_2",
+      "asset": "bottle_variant_3",
+      "position": [
+        2.3,
+        1.176,
+        0.65
+      ],
+      "yaw_degrees": 50
+    },
+    {
+      "name": "table_bottle_3",
+      "asset": "bottle_variant_4",
+      "position": [
+        2.54,
+        2.13,
+        -3.06
+      ],
+      "yaw_degrees": 75
+    },
+    {
+      "name": "saloon_sconce_0",
+      "asset": "wall_lantern",
+      "position": [
+        -3.45,
+        2.38,
+        -1.68
+      ],
+      "yaw_degrees": 90
+    },
+    {
+      "name": "saloon_sconce_glow_0",
+      "asset": "lantern_glow",
+      "position": [
+        -3.45,
+        2.38,
+        -1.68
+      ],
+      "yaw_degrees": 90
+    },
+    {
+      "name": "saloon_sconce_1",
+      "asset": "wall_lantern",
+      "position": [
+        -3.45,
+        2.38,
+        -3.16
+      ],
+      "yaw_degrees": 90
+    },
+    {
+      "name": "saloon_sconce_glow_1",
+      "asset": "lantern_glow",
+      "position": [
+        -3.45,
+        2.38,
+        -3.16
+      ],
+      "yaw_degrees": 90
+    },
+    {
+      "name": "bar_candle_left",
+      "asset": "table_candle",
+      "position": [
+        -0.7,
+        1.418,
+        -1.4
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "bar_candle_left_flame",
+      "asset": "candle_glow",
+      "position": [
+        -0.7,
+        1.698,
+        -1.4
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "bar_candle_right",
+      "asset": "table_candle",
+      "position": [
+        0.9,
+        1.418,
+        -1.2
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "bar_candle_right_flame",
+      "asset": "candle_glow",
+      "position": [
+        0.9,
+        1.698,
+        -1.2
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "shelf_candle",
+      "asset": "table_candle",
+      "position": [
+        -3.18,
+        1.67,
+        0.03
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "shelf_candle_flame",
+      "asset": "candle_glow",
+      "position": [
+        -3.18,
+        1.95,
+        0.03
+      ],
+      "yaw_degrees": 0
+    }
+  ],
+  "camera": {
+    "position": [
+      10.313184042019234,
+      10.783710000758665,
+      10.892153397193772
+    ],
+    "target": [
+      0.020194244654850757,
+      1.7279886484187863,
+      -0.019050066739652483
+    ],
+    "size": 11.095719182191868
+  },
+  "sun_direction": [
+    -6,
+    7,
+    1.5
+  ],
+  "review_lighting": {
+    "ambient": 0.32,
+    "ambient_color": "E2C3A0",
+    "sun": 0.77,
+    "sun_color": "FFD3A3",
+    "sun_position": [
+      5,
+      8,
+      4
+    ],
+    "sun_target": [
+      0,
+      0,
+      -1
+    ],
+    "points": []
+  },
+  "revision": "R2.1",
+  "shared_plants": [
+    {
+      "name": "FrontTerracottaMonstera",
+      "asset": "monstera",
+      "file": "res://assets/rooms/_shared/plants/monstera.glb",
+      "position": [
+        2.96,
+        0.082,
+        2.96
+      ],
+      "rotation_degrees": [
+        0,
+        25,
+        0
+      ],
+      "scale": [
+        0.94,
+        0.94,
+        0.94
+      ],
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.2,
+            0
+          ],
+          "size": [
+            0.39,
+            0.4,
+            0.39
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ShelfPothos",
+      "asset": "pothos",
+      "file": "res://assets/rooms/_shared/plants/pothos.glb",
+      "position": [
+        -3.3,
+        1.65,
+        0.65
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        0
+      ],
+      "scale": [
+        0.68,
+        0.68,
+        0.68
+      ],
+      "colliders": []
+    },
+    {
+      "name": "RightShelfPothos",
+      "asset": "pothos",
+      "file": "res://assets/rooms/_shared/plants/pothos.glb",
+      "position": [
+        2.25,
+        2.22,
+        -3.12
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.54,
+        0.54,
+        0.54
+      ],
+      "colliders": []
+    },
+    {
+      "name": "FrontTerracottaSleeve",
+      "asset": "pot_terracotta",
+      "file": "res://assets/rooms/_shared/plants/pot_terracotta.glb",
+      "position": [
+        2.96,
+        0.082,
+        2.96
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.3,
+        1.3,
+        1.3
+      ],
+      "colliders": []
+    }
+  ],
+  "botanical_assets": [
+    "tavern_window_garden"
+  ],
+  "material_overrides": {
+    "lantern_glow": {
+      "emission": "FF8E24",
+      "emission_use_atlas": true,
+      "emission_energy": 0.24,
+      "unshaded": true
+    },
+    "candle_glow": {
+      "emission": "FF9D32",
+      "emission_use_atlas": true,
+      "emission_energy": 0.3,
+      "unshaded": true
+    },
+    "tavern_window_garden": {
+      "unshaded": true
+    }
+  },
+  "local_lights": [
+    {
+      "name": "saloon_pair",
+      "position": [
+        -3.18,
+        2.38,
+        -2.43
+      ],
+      "energy": 2.1,
+      "range": 2.001,
+      "color": "FFBF76"
+    },
+    {
+      "name": "chandelier",
+      "position": [
+        -2.2,
+        2.68,
+        0.1
+      ],
+      "energy": 3.2,
+      "range": 2.484,
+      "color": "FFBF76"
+    },
+    {
+      "name": "left_wall",
+      "position": [
+        -3.23,
+        2.06,
+        2.22
+      ],
+      "energy": 2.3,
+      "range": 1.863,
+      "color": "FFBF76"
+    },
+    {
+      "name": "bar_left",
+      "position": [
+        -1.31,
+        2.9,
+        -2.87
+      ],
+      "energy": 1.375,
+      "range": 2.001,
+      "color": "FFBF76"
+    },
+    {
+      "name": "bar_right",
+      "position": [
+        1.56,
+        2.9,
+        -2.87
+      ],
+      "energy": 1.375,
+      "range": 2.001,
+      "color": "FFBF76"
+    },
+    {
+      "name": "right_wall",
+      "position": [
+        3.12,
+        2.49,
+        -2.87
+      ],
+      "energy": 1.9,
+      "range": 1.863,
+      "color": "FFBF76"
+    },
+    {
+      "name": "left_table",
+      "position": [
+        -2.12,
+        1.57,
+        0.95
+      ],
+      "energy": 1.05,
+      "range": 1.5,
+      "color": "FFAE50"
+    },
+    {
+      "name": "front_table",
+      "position": [
+        0.1,
+        1.45,
+        1.9200000000000002
+      ],
+      "energy": 1.05,
+      "range": 1.5,
+      "color": "FFAE50"
+    },
+    {
+      "name": "right_table",
+      "position": [
+        2.2199999999999998,
+        1.45,
+        0.94
+      ],
+      "energy": 1.05,
+      "range": 1.5,
+      "color": "FFAE50"
+    },
+    {
+      "name": "bar_left_candle",
+      "position": [
+        -0.7,
+        1.7,
+        -1.4
+      ],
+      "energy": 0.6,
+      "range": 1.5,
+      "color": "FFAE50"
+    },
+    {
+      "name": "bar_right_candle",
+      "position": [
+        0.9,
+        1.7,
+        -1.2
+      ],
+      "energy": 0.6,
+      "range": 1.5,
+      "color": "FFAE50"
+    },
+    {
+      "name": "shelf_candle",
+      "position": [
+        -3.18,
+        1.95,
+        0.03
+      ],
+      "energy": 1.05,
+      "range": 1.5,
+      "color": "FFAE50"
+    }
+  ],
+  "lighting": {
+    "background": "D9DDD1",
+    "ambient": "E2C3A0",
+    "ambient_energy": 0.32,
+    "sun_color": "FFD3A3",
+    "sun_energy": 0.77,
+    "sun_position": [
+      5,
+      8,
+      4
+    ],
+    "sun_target": [
+      0,
+      0,
+      -1
+    ],
+    "angular_distance": 6,
+    "lamps": []
+  },
+  "review_views": [
+    {
+      "name": "bar-stock-detail",
+      "position": [
+        3.5,
+        3.8,
+        5.5
+      ],
+      "target": [
+        0.1,
+        2,
+        -2.1
+      ],
+      "size": 4.8
+    },
+    {
+      "name": "wheel-table-detail",
+      "position": [
+        4.5,
+        4.5,
+        7
+      ],
+      "target": [
+        -2.0,
+        2,
+        0.65
+      ],
+      "size": 4.7
+    }
+  ],
+  "boundaries": [
+    {
+      "name": "right_edge",
+      "at": [
+        3.83,
+        0.7,
+        0
+      ],
+      "size": [
+        0.1,
+        1.5,
+        7.1
+      ]
+    },
+    {
+      "name": "front_left_edge",
+      "at": [
+        -2.6849999999999996,
+        0.7,
+        3.53
+      ],
+      "size": [
+        2.0300000000000002,
+        1.5,
+        0.1
+      ]
+    },
+    {
+      "name": "front_right_edge",
+      "at": [
+        1.5350000000000001,
+        0.7,
+        3.53
+      ],
+      "size": [
+        4.33,
+        1.5,
+        0.1
+      ]
+    },
+    {
+      "name": "entrance_end",
+      "at": [
+        -1.15,
+        0.7,
+        3.6799999999999997
+      ],
+      "size": [
+        1.1,
+        1.5,
+        0.1
+      ]
+    }
+  ],
+  "spawn": [
+    -1.15,
+    0.082,
+    3.12
+  ],
+  "bench": {
+    "floor_y": 0.082,
+    "route": [
+      {
+        "name": "entrance",
+        "position": [
+          -1.15,
+          0.082,
+          3.12
+        ],
+        "capture": "door"
+      },
+      {
+        "name": "left_front",
+        "position": [
+          -1.55,
+          0.082,
+          2.37
+        ]
+      },
+      {
+        "name": "left_table_side",
+        "position": [
+          -0.82,
+          0.082,
+          0.9
+        ]
+      },
+      {
+        "name": "bar_front",
+        "position": [
+          -0.42,
+          0.082,
+          -0.44
+        ],
+        "capture": "main"
+      },
+      {
+        "name": "right_back_corner",
+        "position": [
+          3.36,
+          0.082,
+          -0.35
+        ]
+      },
+      {
+        "name": "right_table_outer",
+        "position": [
+          3.36,
+          0.082,
+          2.25
+        ]
+      },
+      {
+        "name": "front_table_right",
+        "position": [
+          1.17,
+          0.082,
+          2.7
+        ]
+      },
+      {
+        "name": "front_table_corner",
+        "position": [
+          1.17,
+          0.082,
+          3.22
+        ]
+      },
+      {
+        "name": "front_table_front",
+        "position": [
+          -1.15,
+          0.082,
+          3.22
+        ]
+      },
+      {
+        "name": "entrance_return",
+        "position": [
+          -1.15,
+          0.082,
+          3.12
+        ]
+      }
+    ],
+    "blocked": [
+      {
+        "name": "bar",
+        "from": [
+          -0.4,
+          0.082,
+          -0.4
+        ],
+        "to": [
+          -0.4,
+          0.082,
+          -1.7
+        ],
+        "target": "/long_bar/"
+      },
+      {
+        "name": "left_table",
+        "from": [
+          -0.9,
+          0.082,
+          0.9
+        ],
+        "to": [
+          -2.14,
+          0.082,
+          0.9
+        ],
+        "target": "/square_table/"
+      },
+      {
+        "name": "round_table",
+        "from": [
+          1.26,
+          0.082,
+          0.94
+        ],
+        "to": [
+          2.5,
+          0.082,
+          0.94
+        ],
+        "target": "/round_table_right/"
+      },
+      {
+        "name": "barrel",
+        "from": [
+          2.62,
+          0.082,
+          -0.75
+        ],
+        "to": [
+          2.62,
+          0.082,
+          -2.13
+        ],
+        "target": "/barrel_right_one/"
+      },
+      {
+        "name": "wall",
+        "from": [
+          3.2,
+          0.082,
+          2.4
+        ],
+        "to": [
+          4.0,
+          0.082,
+          2.4
+        ],
+        "target": "right_edge"
+      }
+    ],
+    "gaps": [
+      {
+        "name": "bar_to_round_table",
+        "from": [
+          -0.6,
+          0.082,
+          -0.1
+        ],
+        "to": [
+          1.9,
+          0.082,
+          -0.1
+        ],
+        "measure": [
+          [
+            1.82,
+            0.6,
+            -1.1
+          ],
+          [
+            1.82,
+            0.6,
+            0.15
+          ]
+        ],
+        "width": 1.25,
+        "minimum": 0.7
+      }
+    ],
+    "entrance": {
+      "inside": [
+        -1.15,
+        0.082,
+        3.12
+      ],
+      "outside": [
+        -1.15,
+        0.082,
+        3.425
+      ]
+    },
+    "slide": {
+      "from": [
+        3.52,
+        0.082,
+        2.23
+      ],
+      "direction": [
+        1,
+        0,
+        -1
+      ],
+      "tangent": [
+        0,
+        0,
+        -1
+      ],
+      "seconds": 0.4
+    },
+    "input_start": [
+      -0.8,
+      0.082,
+      0.2
+    ],
+    "scale": {
+      "door": {
+        "height": 2.41,
+        "source": "Saloon arch .07 to 2.48 local"
+      },
+      "counter": {
+        "height": 1.3167,
+        "source": "Bar top (1.20+.055+.075)*.99; within Basic Room +15%"
+      },
+      "chair": {
+        "height": 0.65,
+        "source": "Dining stool .60+.05"
+      },
+      "table": {
+        "height": 1.0915,
+        "source": "Round table (.86+.065)*1.18"
+      }
+    }
+  },
+  "review_camera_fit": {
+    "method": "orthographic fit to plinth edge intersections; no model scaling or image warp",
+    "reference_size": [
+      1547,
+      1516
+    ],
+    "reference_corners_left_front_right": [
+      [
+        37,
+        993
+      ],
+      [
+        805,
+        1364
+      ],
+      [
+        1518,
+        971
+      ]
+    ],
+    "inferred_back": [
+      750,
+      600
+    ],
+    "footprint_m": [
+      7.8,
+      7.2
+    ],
+    "plinth_y": -0.15,
+    "render_size": [
+      1400,
+      1400
+    ],
+    "fitted_corners": [
+      [
+        26.85850240122818,
+        899.10497938018
+      ],
+      [
+        742.7522620857976,
+        1248.1384058484814
+      ],
+      [
+        1366.1358418478162,
+        906.6027686174929
+      ]
+    ],
+    "observed_letterboxed_corners": [
+      [
+        33.484162895927604,
+        912.6696832579186
+      ],
+      [
+        728.5067873303168,
+        1248.4162895927602
+      ],
+      [
+        1373.7556561085973,
+        892.7601809954751
+      ]
+    ],
+    "residual_px": [
+      15.096375998290329,
+      14.248184810156541,
+      15.801227846026466
+    ],
+    "pitch_degrees": 31.120000000000054,
+    "yaw_degrees": 43.330000000000005,
+    "camera": {
+      "position": [
+        10.313184042019234,
+        10.783710000758665,
+        10.892153397193772
+      ],
+      "target": [
+        0.020194244654850757,
+        1.7279886484187863,
+        -0.019050066739652483
+      ],
+      "size": 11.095719182191868
+    },
+    "limitation": "Rounded plinth endpoints are estimated edge intersections; concept is not a calibrated physical camera."
+  },
+  "render_batches": [
+    {
+      "name": "front_dressing",
+      "file": "res://assets/rooms/tavern/batches/review_front_dressing.glb",
+      "material": "room",
+      "sources": [
+        "window_wall",
+        "bar_stool",
+        "left_table_rug",
+        "dining_stool",
+        "table_candle",
+        "tavern_snacks",
+        "left_display_shelf",
+        "landscape_frame",
+        "stag_banner",
+        "wall_lantern",
+        "hanging_chandelier",
+        "square_dining_stool",
+        "backed_dining_stool",
+        "mug_variant_1",
+        "mug_variant_2",
+        "table_runner",
+        "floor_clay_pitcher",
+        "bar_stool_0",
+        "bar_stool_1",
+        "bar_stool_2",
+        "seat_1",
+        "seat_2",
+        "seat_3",
+        "seat_4",
+        "seat_5",
+        "seat_6",
+        "seat_8",
+        "seat_9",
+        "seat_10",
+        "table_candle_0",
+        "table_candle_1",
+        "chandelier_frame_0",
+        "chandelier_frame_1",
+        "chandelier_frame_2",
+        "chandelier_frame_3",
+        "varied_mug_2",
+        "varied_mug_3",
+        "varied_mug_4",
+        "varied_mug_5",
+        "table_bottle_0",
+        "table_bottle_1",
+        "table_bottle_2",
+        "shelf_candle"
+      ],
+      "triangles": 26330,
+      "cast_shadow": true
+    },
+    {
+      "name": "back_dressing",
+      "file": "res://assets/rooms/tavern/batches/review_back_dressing.glb",
+      "material": "room",
+      "sources": [
+        "back_wall",
+        "saloon_door",
+        "tavern_window",
+        "tavern_sign",
+        "beer_cask",
+        "back_bar",
+        "bottle_variant_0",
+        "bottle_variant_3",
+        "bottle_variant_1",
+        "bottle_variant_4",
+        "bottle_variant_2",
+        "mug_variant_0",
+        "beer_chalkboard",
+        "copper_cookware",
+        "bar_runner",
+        "ceramic_jug",
+        "right_plant_shelf",
+        "bar_left_frame",
+        "bar_right_frame",
+        "window_right_frame",
+        "shelf_bottle_5",
+        "shelf_bottle_6",
+        "shelf_bottle_7",
+        "shelf_bottle_8",
+        "shelf_bottle_9",
+        "shelf_bottle_10",
+        "shelf_bottle_11",
+        "shelf_bottle_12",
+        "shelf_bottle_13",
+        "shelf_bottle_14",
+        "shelf_bottle_15",
+        "shelf_bottle_16",
+        "shelf_bottle_17",
+        "shelf_bottle_18",
+        "shelf_bottle_19",
+        "varied_mug_0",
+        "varied_mug_1",
+        "varied_mug_6",
+        "varied_mug_7",
+        "table_bottle_3",
+        "saloon_sconce_0",
+        "saloon_sconce_1",
+        "bar_candle_left",
+        "bar_candle_right"
+      ],
+      "triangles": 32408,
+      "cast_shadow": true
+    },
+    {
+      "name": "large_plants",
+      "file": "res://assets/rooms/tavern/batches/review_large_plants.glb",
+      "material": "plants",
+      "sources": [
+        "FrontTerracottaMonstera"
+      ],
+      "triangles": 910,
+      "cast_shadow": false
+    },
+    {
+      "name": "front_plants",
+      "file": "res://assets/rooms/tavern/batches/review_front_plants.glb",
+      "material": "plants",
+      "sources": [
+        "ShelfPothos",
+        "FrontTerracottaSleeve"
+      ],
+      "triangles": 2488,
+      "cast_shadow": false
+    },
+    {
+      "name": "back_plants",
+      "file": "res://assets/rooms/tavern/batches/review_back_plants.glb",
+      "material": "plants",
+      "sources": [
+        "RightShelfPothos"
+      ],
+      "triangles": 2048,
+      "cast_shadow": false
+    }
+  ]
+}

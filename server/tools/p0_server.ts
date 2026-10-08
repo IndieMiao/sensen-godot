@@ -1,7 +1,8 @@
 /**
  * P0 server (no Postgres, no accounts): `node --import tsx tools/p0_server.ts`. Local playtests by default; the
  * deployed image (server/deploy/p0) runs the same file with P0_DEV=0 and P0_ACCESS_KEYS (SGODOT-232 D1).
- * Port P0_PORT (default 3110) on P0_HOST (default 0.0.0.0); state persisted to P0_STATE_FILE (default output/p0/p0-state.json).
+ * Port P0_PORT (default 3110) on P0_HOST (default 0.0.0.0); state persisted to P0_STATE_FILE (default output/p0/p0-state.json);
+ * observation log beside it in events/ (P0_EVENT_DIR, empty to turn it off).
  * Android emulator: `adb reverse tcp:3110 tcp:3110`, client base URL http://127.0.0.1:3110/v1.
  */
 import Fastify from 'fastify';
@@ -13,6 +14,7 @@ import { registerP0Routes } from '../src/p0/routes.js';
 import { P0Store } from '../src/p0/store.js';
 import { guardOptionsFromEnv, registerP0Guard, snapshotState, trustProxyFromEnv } from '../src/p0/guard.js';
 import { registerP0Admin } from '../src/p0/admin.js';
+import { P0EventLog } from '../src/p0/telemetry.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const stateFile = process.env.P0_STATE_FILE ?? path.join(root, 'output/p0/p0-state.json');
@@ -26,7 +28,10 @@ const app = Fastify({ logger: false, bodyLimit: 32 * 1024, ...trustProxyFromEnv(
 const guard = guardOptionsFromEnv();
 await registerP0Guard(app, guard);
 const dev = process.env.P0_DEV !== '0';
-registerP0Routes(app, { content, store, now: Date.now, dev });
+// S7: observation log, one JSON line per command and reported UI moment (P0_EVENT_DIR; empty = off).
+const eventDir = process.env.P0_EVENT_DIR ?? path.join(path.dirname(stateFile), 'events');
+const log = new P0EventLog(eventDir === '' ? undefined : eventDir);
+registerP0Routes(app, { content, store, now: Date.now, dev, log });
 const startedAt = Date.now();
 app.get('/v1/healthz', async () => ({ ok: true, p0: content.version, players: store.size(), up_s: Math.round((Date.now() - startedAt) / 1000) }));
 const snapshots = process.env.P0_SNAPSHOT_DIR ?? path.join(path.dirname(stateFile), 'snapshots');

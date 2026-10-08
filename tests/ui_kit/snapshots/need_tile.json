@@ -1,0 +1,1516 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    454
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiNeedTile"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        18
+      ],
+      "variation": "CaptionR12",
+      "text": "NeedTile 1090:78003 · LOCK-10"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        52,
+        328,
+        402
+      ],
+      "children": [
+        {
+          "type": "HFlowContainer",
+          "rect": [
+            0,
+            52,
+            328,
+            108
+          ],
+          "children": [
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                0,
+                52,
+                78,
+                108
+              ],
+              "children": [
+                {
+                  "type": "UiNeedTile",
+                  "rect": [
+                    0,
+                    52,
+                    78,
+                    88
+                  ],
+                  "children": [
+                    {
+                      "type": "VBoxContainer",
+                      "rect": [
+                        0,
+                        52,
+                        78,
+                        88
+                      ],
+                      "children": [
+                        {
+                          "type": "Control",
+                          "rect": [
+                            7,
+                            52,
+                            64,
+                            64
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                22,
+                                67,
+                                34,
+                                34
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            0,
+                            122,
+                            78,
+                            18
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                0,
+                                122,
+                                41,
+                                18
+                              ],
+                              "variation": "CaptionXB12",
+                              "text": "Timber"
+                            },
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                44,
+                                122,
+                                34,
+                                18
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    44,
+                                    122,
+                                    15,
+                                    18
+                                  ],
+                                  "variation": "CaptionXB12",
+                                  "text": "16"
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    59,
+                                    122,
+                                    19,
+                                    18
+                                  ],
+                                  "variation": "CaptionB12",
+                                  "text": "/16"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    0,
+                    146,
+                    78,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "met"
+                }
+              ]
+            },
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                88,
+                52,
+                78,
+                108
+              ],
+              "children": [
+                {
+                  "type": "UiNeedTile",
+                  "rect": [
+                    88,
+                    52,
+                    78,
+                    88
+                  ],
+                  "children": [
+                    {
+                      "type": "VBoxContainer",
+                      "rect": [
+                        88,
+                        52,
+                        78,
+                        88
+                      ],
+                      "children": [
+                        {
+                          "type": "Control",
+                          "rect": [
+                            95,
+                            52,
+                            64,
+                            64
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                110,
+                                67,
+                                34,
+                                34
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            88,
+                            122,
+                            78,
+                            18
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                88,
+                                122,
+                                41,
+                                18
+                              ],
+                              "variation": "CaptionXB12",
+                              "text": "Timber"
+                            },
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                132,
+                                122,
+                                34,
+                                18
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    132,
+                                    122,
+                                    15,
+                                    18
+                                  ],
+                                  "variation": "CaptionXB12",
+                                  "text": "10"
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    147,
+                                    122,
+                                    19,
+                                    18
+                                  ],
+                                  "variation": "CaptionB12",
+                                  "text": "/16"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    88,
+                    146,
+                    78,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "short"
+                }
+              ]
+            },
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                176,
+                52,
+                85,
+                108
+              ],
+              "children": [
+                {
+                  "type": "UiNeedTile",
+                  "rect": [
+                    176,
+                    52,
+                    85,
+                    88
+                  ],
+                  "children": [
+                    {
+                      "type": "VBoxContainer",
+                      "rect": [
+                        176,
+                        52,
+                        85,
+                        88
+                      ],
+                      "children": [
+                        {
+                          "type": "Control",
+                          "rect": [
+                            186,
+                            52,
+                            64,
+                            64
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                201,
+                                67,
+                                34,
+                                34
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            176,
+                            122,
+                            85,
+                            18
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                176,
+                                122,
+                                34,
+                                18
+                              ],
+                              "variation": "CaptionXB12",
+                              "text": "Meals"
+                            },
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                213,
+                                122,
+                                48,
+                                18
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    213,
+                                    122,
+                                    22,
+                                    18
+                                  ],
+                                  "variation": "CaptionXB12",
+                                  "text": "100"
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    235,
+                                    122,
+                                    26,
+                                    18
+                                  ],
+                                  "variation": "CaptionB12",
+                                  "text": "/300"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    176,
+                    146,
+                    85,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "count"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "HFlowContainer",
+          "rect": [
+            0,
+            172,
+            328,
+            91
+          ],
+          "children": [
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                0,
+                172,
+                78,
+                91
+              ],
+              "children": [
+                {
+                  "type": "UiNeedTile",
+                  "rect": [
+                    0,
+                    172,
+                    78,
+                    71
+                  ],
+                  "children": [
+                    {
+                      "type": "VBoxContainer",
+                      "rect": [
+                        0,
+                        172,
+                        78,
+                        71
+                      ],
+                      "children": [
+                        {
+                          "type": "Control",
+                          "rect": [
+                            15,
+                            172,
+                            48,
+                            48
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                26,
+                                183,
+                                26,
+                                26
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            0,
+                            225,
+                            78,
+                            18
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                0,
+                                225,
+                                41,
+                                18
+                              ],
+                              "variation": "CaptionXB12",
+                              "text": "Timber"
+                            },
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                44,
+                                225,
+                                34,
+                                18
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    44,
+                                    225,
+                                    15,
+                                    18
+                                  ],
+                                  "variation": "CaptionXB12",
+                                  "text": "16"
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    59,
+                                    225,
+                                    19,
+                                    18
+                                  ],
+                                  "variation": "CaptionB12",
+                                  "text": "/16"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    0,
+                    249,
+                    78,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "met"
+                }
+              ]
+            },
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                88,
+                172,
+                78,
+                91
+              ],
+              "children": [
+                {
+                  "type": "UiNeedTile",
+                  "rect": [
+                    88,
+                    172,
+                    78,
+                    71
+                  ],
+                  "children": [
+                    {
+                      "type": "VBoxContainer",
+                      "rect": [
+                        88,
+                        172,
+                        78,
+                        71
+                      ],
+                      "children": [
+                        {
+                          "type": "Control",
+                          "rect": [
+                            103,
+                            172,
+                            48,
+                            48
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                114,
+                                183,
+                                26,
+                                26
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            88,
+                            225,
+                            78,
+                            18
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                88,
+                                225,
+                                41,
+                                18
+                              ],
+                              "variation": "CaptionXB12",
+                              "text": "Timber"
+                            },
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                132,
+                                225,
+                                34,
+                                18
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    132,
+                                    225,
+                                    15,
+                                    18
+                                  ],
+                                  "variation": "CaptionXB12",
+                                  "text": "10"
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    147,
+                                    225,
+                                    19,
+                                    18
+                                  ],
+                                  "variation": "CaptionB12",
+                                  "text": "/16"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    88,
+                    249,
+                    78,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "short"
+                }
+              ]
+            },
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                176,
+                172,
+                85,
+                91
+              ],
+              "children": [
+                {
+                  "type": "UiNeedTile",
+                  "rect": [
+                    176,
+                    172,
+                    85,
+                    71
+                  ],
+                  "children": [
+                    {
+                      "type": "VBoxContainer",
+                      "rect": [
+                        176,
+                        172,
+                        85,
+                        71
+                      ],
+                      "children": [
+                        {
+                          "type": "Control",
+                          "rect": [
+                            194,
+                            172,
+                            48,
+                            48
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                205,
+                                183,
+                                26,
+                                26
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            176,
+                            225,
+                            85,
+                            18
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                176,
+                                225,
+                                34,
+                                18
+                              ],
+                              "variation": "CaptionXB12",
+                              "text": "Meals"
+                            },
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                213,
+                                225,
+                                48,
+                                18
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    213,
+                                    225,
+                                    22,
+                                    18
+                                  ],
+                                  "variation": "CaptionXB12",
+                                  "text": "100"
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    235,
+                                    225,
+                                    26,
+                                    18
+                                  ],
+                                  "variation": "CaptionB12",
+                                  "text": "/300"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    176,
+                    249,
+                    85,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "count"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "HFlowContainer",
+          "rect": [
+            0,
+            275,
+            328,
+            76
+          ],
+          "children": [
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                0,
+                275,
+                72,
+                76
+              ],
+              "children": [
+                {
+                  "type": "UiNeedTile",
+                  "rect": [
+                    0,
+                    275,
+                    72,
+                    56
+                  ],
+                  "children": [
+                    {
+                      "type": "VBoxContainer",
+                      "rect": [
+                        0,
+                        275,
+                        72,
+                        56
+                      ],
+                      "children": [
+                        {
+                          "type": "Control",
+                          "rect": [
+                            18,
+                            275,
+                            36,
+                            36
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                26,
+                                283,
+                                20,
+                                20
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            0,
+                            315,
+                            72,
+                            16
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                0,
+                                315,
+                                38,
+                                16
+                              ],
+                              "variation": "C11XB",
+                              "text": "Timber"
+                            },
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                41,
+                                315,
+                                31,
+                                16
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    41,
+                                    315,
+                                    14,
+                                    16
+                                  ],
+                                  "variation": "C11XB",
+                                  "text": "16"
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    55,
+                                    315,
+                                    17,
+                                    16
+                                  ],
+                                  "variation": "C11B",
+                                  "text": "/16"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    0,
+                    337,
+                    72,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "met"
+                }
+              ]
+            },
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                82,
+                275,
+                72,
+                76
+              ],
+              "children": [
+                {
+                  "type": "UiNeedTile",
+                  "rect": [
+                    82,
+                    275,
+                    72,
+                    56
+                  ],
+                  "children": [
+                    {
+                      "type": "VBoxContainer",
+                      "rect": [
+                        82,
+                        275,
+                        72,
+                        56
+                      ],
+                      "children": [
+                        {
+                          "type": "Control",
+                          "rect": [
+                            100,
+                            275,
+                            36,
+                            36
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                108,
+                                283,
+                                20,
+                                20
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            82,
+                            315,
+                            72,
+                            16
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                82,
+                                315,
+                                38,
+                                16
+                              ],
+                              "variation": "C11XB",
+                              "text": "Timber"
+                            },
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                123,
+                                315,
+                                31,
+                                16
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    123,
+                                    315,
+                                    14,
+                                    16
+                                  ],
+                                  "variation": "C11XB",
+                                  "text": "10"
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    137,
+                                    315,
+                                    17,
+                                    16
+                                  ],
+                                  "variation": "C11B",
+                                  "text": "/16"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    82,
+                    337,
+                    72,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "short"
+                }
+              ]
+            },
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                164,
+                275,
+                78,
+                76
+              ],
+              "children": [
+                {
+                  "type": "UiNeedTile",
+                  "rect": [
+                    164,
+                    275,
+                    78,
+                    56
+                  ],
+                  "children": [
+                    {
+                      "type": "VBoxContainer",
+                      "rect": [
+                        164,
+                        275,
+                        78,
+                        56
+                      ],
+                      "children": [
+                        {
+                          "type": "Control",
+                          "rect": [
+                            185,
+                            275,
+                            36,
+                            36
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                193,
+                                283,
+                                20,
+                                20
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            164,
+                            315,
+                            78,
+                            16
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                164,
+                                315,
+                                31,
+                                16
+                              ],
+                              "variation": "C11XB",
+                              "text": "Meals"
+                            },
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                198,
+                                315,
+                                44,
+                                16
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    198,
+                                    315,
+                                    20,
+                                    16
+                                  ],
+                                  "variation": "C11XB",
+                                  "text": "100"
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    218,
+                                    315,
+                                    24,
+                                    16
+                                  ],
+                                  "variation": "C11B",
+                                  "text": "/300"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    164,
+                    337,
+                    78,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "count"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "HFlowContainer",
+          "rect": [
+            0,
+            363,
+            328,
+            91
+          ],
+          "children": [
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                0,
+                363,
+                54,
+                91
+              ],
+              "children": [
+                {
+                  "type": "UiNeedTile",
+                  "rect": [
+                    0,
+                    363,
+                    54,
+                    71
+                  ],
+                  "children": [
+                    {
+                      "type": "VBoxContainer",
+                      "rect": [
+                        0,
+                        363,
+                        54,
+                        71
+                      ],
+                      "children": [
+                        {
+                          "type": "Control",
+                          "rect": [
+                            3,
+                            363,
+                            48,
+                            48
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                14,
+                                374,
+                                26,
+                                26
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            0,
+                            416,
+                            54,
+                            18
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                0,
+                                416,
+                                32,
+                                18
+                              ],
+                              "variation": "CaptionXB12",
+                              "text": "Coins"
+                            },
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                35,
+                                416,
+                                19,
+                                18
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    35,
+                                    416,
+                                    8,
+                                    18
+                                  ],
+                                  "variation": "CaptionXB12",
+                                  "text": "5"
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    43,
+                                    416,
+                                    11,
+                                    18
+                                  ],
+                                  "variation": "CaptionB12",
+                                  "text": "/4"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    0,
+                    440,
+                    54,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "surplus 5/4"
+                }
+              ]
+            },
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                64,
+                363,
+                63,
+                91
+              ],
+              "children": [
+                {
+                  "type": "UiNeedTile",
+                  "rect": [
+                    64,
+                    363,
+                    63,
+                    71
+                  ],
+                  "children": [
+                    {
+                      "type": "VBoxContainer",
+                      "rect": [
+                        64,
+                        363,
+                        63,
+                        71
+                      ],
+                      "children": [
+                        {
+                          "type": "Control",
+                          "rect": [
+                            71,
+                            363,
+                            48,
+                            48
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                82,
+                                374,
+                                26,
+                                26
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            64,
+                            416,
+                            63,
+                            18
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                64,
+                                416,
+                                41,
+                                18
+                              ],
+                              "variation": "CaptionXB12",
+                              "text": "Timber"
+                            },
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                108,
+                                416,
+                                19,
+                                18
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    108,
+                                    416,
+                                    8,
+                                    18
+                                  ],
+                                  "variation": "CaptionXB12",
+                                  "text": "0"
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    116,
+                                    416,
+                                    11,
+                                    18
+                                  ],
+                                  "variation": "CaptionB12",
+                                  "text": "/6"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    64,
+                    440,
+                    63,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "short 0"
+                }
+              ]
+            },
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                137,
+                363,
+                87,
+                91
+              ],
+              "children": [
+                {
+                  "type": "UiNeedTile",
+                  "rect": [
+                    137,
+                    363,
+                    87,
+                    71
+                  ],
+                  "children": [
+                    {
+                      "type": "VBoxContainer",
+                      "rect": [
+                        137,
+                        363,
+                        87,
+                        71
+                      ],
+                      "children": [
+                        {
+                          "type": "Control",
+                          "rect": [
+                            156,
+                            363,
+                            48,
+                            48
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                167,
+                                374,
+                                26,
+                                26
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            137,
+                            416,
+                            87,
+                            18
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                137,
+                                416,
+                                50,
+                                18
+                              ],
+                              "variation": "CaptionXB12",
+                              "text": "Fish-dex"
+                            },
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                190,
+                                416,
+                                34,
+                                18
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    190,
+                                    416,
+                                    15,
+                                    18
+                                  ],
+                                  "variation": "CaptionXB12",
+                                  "text": "12"
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    205,
+                                    416,
+                                    19,
+                                    18
+                                  ],
+                                  "variation": "CaptionB12",
+                                  "text": "/20"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    137,
+                    440,
+                    87,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "collection"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
