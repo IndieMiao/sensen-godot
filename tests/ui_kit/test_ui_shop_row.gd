@@ -79,3 +79,13 @@ func test_one_off_items_take_no_stepper() -> void:
 	r.show_spec(_spec([{id = &"buy", label = "Buy", kind = &"secondary", payload = {}}]), true)
 	assert_object(r.stepper).is_null()
 	assert_object(r.buy).is_not_null()
+
+## STALL-NEW-2 (SGODOT-233): Gate tone=New draws the gate line in newInk; any other row keeps it secondary.
+func test_a_new_row_draws_its_gate_line_in_new_ink() -> void:
+	var row := _host(UiShopRow.new()) as UiShopRow
+	row.show_spec({id = "seed_carrot", icon = SEED, title = "Carrot Seeds", facts = ["Ready in 12h", "◆ New for you"],
+		gate_tone = &"new", price = {text = "9 coins", line = ""}, buttons = []})
+	assert_object(row._gate.get_theme_color(&"font_color")).is_equal(UiTokens.COLOR_NEW_INK)
+	row.show_spec({id = "seed_radish", icon = SEED, title = "Radish Seeds", facts = ["Ready in 4h", "Bag ×2"],
+		price = {text = "4 coins", line = ""}, buttons = []})
+	assert_object(row._gate.get_theme_color(&"font_color")).is_equal(UiTokens.COLOR_SECONDARY)

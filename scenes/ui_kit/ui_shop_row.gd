@@ -91,6 +91,8 @@ func show_spec(spec: Dictionary, once := false, stock := 99) -> void:
 	var price: Dictionary = spec.get("price", {})
 	_effect.text = str(price.get("line", "")) if str(price.get("line", "")) != "" else (str(facts[0]) if not facts.is_empty() else "")
 	_gate.text = str(facts[1]) if facts.size() > 1 else ""
+	# ShopProduct Gate tone=New (1398:92870, E-04 STALL-NEW-2): `◆ New for you` in newInk; Default in secondary.
+	_gate.add_theme_color_override(&"font_color", UiTokens.COLOR_NEW_INK if StringName(spec.get("gate_tone", &"")) == &"new" else UiTokens.COLOR_SECONDARY)
 	_price.text = str(price.get("text", ""))
 	_chevron.visible = bool(spec.get("info", false))
 	var qty := stepper.value if stepper else 1

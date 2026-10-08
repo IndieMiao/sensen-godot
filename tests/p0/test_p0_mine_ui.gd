@@ -53,7 +53,7 @@ func test_mining_pins_and_refill_hint() -> void:
 	ui.set_view(_view(0))
 	assert_array(ui._bar_ids).is_equal(["torch"])   # pinned stays at 0 (LOCK-05)
 	ui._on_slot_tapped("torch")
-	assert_str(ui._toast.text).is_equal("Craft at Workbench")   # q(44): torches are made, not bought
+	assert_str(ui.toast_text()).is_equal("Craft at Workbench")   # q(44): torches are made, not bought
 	ui._on_slot_removed("torch")
 	ui.set_view(_view(3))
 	assert_array(ui._bar_ids).is_empty()   # flung off: stays off until pinned again
@@ -102,8 +102,8 @@ func test_an_unavailable_key_toasts_its_reason() -> void:
 		"toast": "Bag full · free a slot to mine"})
 	ui._fab_pressed()
 	assert_array(sent).is_empty()
-	assert_bool(ui._toast.visible).is_true()
-	assert_str(ui._toast.text).is_equal("Bag full · free a slot to mine")
+	assert_str(ui.toast_text()).is_not_empty()
+	assert_str(ui.toast_text()).is_equal("Bag full · free a slot to mine")
 
 func test_status_line_set_before_ready_is_kept() -> void:
 	var early := P0Ui.new()

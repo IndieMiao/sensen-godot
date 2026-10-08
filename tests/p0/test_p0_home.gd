@@ -211,9 +211,9 @@ func test_need_material_from_a_shop_or_the_workbench_names_its_own_gap() -> void
 	rt.session.view = _view()
 	rt.session.view["names"] = {"copper_ore": "Copper Ore"}
 	rt._on_refused("need_material", {"item": "copper_ore", "need": 4, "have": 2}, {"type": "craft", "recipe": "pick_copper"})
-	assert_str(rt.ui._toast.text).is_equal("Need 2 more Copper Ore")
+	assert_str(rt.ui.toast_text()).is_equal("Need 2 more Copper Ore")
 	rt._on_refused("need_material", {"item": "wood", "need": 16, "have": 10}, {"type": "homestead_upgrade"})
-	assert_str(rt.ui._toast.text).is_equal("Need 6 more Timber")   # HOME-1's gap, in tile order
+	assert_str(rt.ui.toast_text()).is_equal("Need 6 more Timber")   # HOME-1's gap, in tile order
 
 func test_the_sign_prompt_reads_its_level_and_lights_ready() -> void:
 	# WORLD-HINT-5 (228 64c75e54, SGODOT-250): the house mark, Ready once the Needs are met; open: `Homestead LvN`.

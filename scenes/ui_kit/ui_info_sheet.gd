@@ -18,6 +18,11 @@ extends PanelContainer
 ##   unavailable_requested(action, item_id, reason)  a greyed button was tapped (they stay tappable, LOCK-10); the
 ##                                       owner may say why or where, e.g. a Toast for `Gift to a resident` (225).
 ##   info_requested(item_id)             the › in the title row: open the item's page (Fish-dex / Cookbook / about).
+## Optional spec blocks (the gate card, SKILL-2 482:169 / §4.8.7, SGODOT-233), in this order under the state line:
+##   lead: String          one ExtraBold line in text ink ("Farming Lv2 unlocks Carrot and Herb")
+##   need: {name, have, need, icon, note}   a NeedTile M in its count state ("Farming XP 32/50") with the note
+##                         beside it ("18 XP to go · harvest 9 radishes")
+##   info_row: {title, qty, lines}          Compact/Information row ("Carrot Seeds ×5" / "Level-up gift" / "At Lv2")
 
 signal action_requested(action: StringName, item_id: String, payload: Dictionary)
 signal unavailable_requested(action: StringName, item_id: String, reason: String)
@@ -40,6 +45,10 @@ const _PILL_H := 18.0
 const _PILL_PAD := 4.0
 const _GLYPH := 14.0
 const _BUTTON_ROW_Y := 38.0   # the 44 touch row starts at y 38, over the end of the state line (y 42)
+# SKILL-2 sheet content (482:169): blocks 8 apart, the NeedTile and its note 10 apart, the info row's lines 3 apart.
+const _BLOCK_GAP := 8.0
+const _NEED_GAP := 10.0
+const _INFO_GAP := 3.0
 
 var rules: Callable
 
@@ -57,6 +66,9 @@ var _chevron: Label
 var _lift: MarginContainer
 var _state: Label
 var _facts: VBoxContainer
+var _blocks: VBoxContainer   # lead, need and info_row (gate card); empty for an item card
+var _medallion: Panel
+var _box: UiStyleBox
 var _effect: Label
 var _last_fact := ""      # goes beside the buttons when it fits there, otherwise on its own fact line
 var _overflow: Label      # that own line (last in _facts, hidden while the fact fits beside the buttons)
@@ -67,6 +79,7 @@ func _init() -> void:
 	var box := UiStyleBox.make(UiTokens.COLOR_SURFACE, UiTokens.RADIUS_CARD, UiTokens.COLOR_BORDER, UiTokens.STROKE_CELL_HAIRLINE)
 	box.with_margins(_PAD_L, _PAD_T, _PAD_R, 0.0)
 	add_theme_stylebox_override(&"panel", box)
+	_box = box
 	var row := HBoxContainer.new()
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	row.add_theme_constant_override(&"separation", int(_GAP))
@@ -75,6 +88,7 @@ func _init() -> void:
 	medallion.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	medallion.custom_minimum_size = Vector2(_MEDALLION, _MEDALLION)
 	medallion.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_medallion = medallion
 	medallion.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_PRIMARY_TINT, _MEDALLION * 0.5))
 	_icon = UiKit.icon(null, _MEDALLION_ICON)
 	_icon.position = Vector2.ONE * (_MEDALLION - _MEDALLION_ICON) * 0.5
@@ -88,6 +102,10 @@ func _init() -> void:
 	col.add_child(_title_row())
 	_state = UiKit.label("", UiTokens.STYLE_C10_B, UiTokens.COLOR_SECONDARY)
 	col.add_child(_state)
+	_blocks = VBoxContainer.new()
+	_blocks.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_blocks.add_theme_constant_override(&"separation", int(_BLOCK_GAP))
+	col.add_child(_blocks)
 	_facts = VBoxContainer.new()
 	_facts.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_facts.add_theme_constant_override(&"separation", 0)
@@ -200,6 +218,7 @@ func refresh() -> void:
 	var stars := " ★".repeat(int(_spec.get("quality", 0)))
 	_state.text = str(_spec.get("rarity_text", "")) + stars
 	_state.visible = _state.text != ""
+	_build_blocks()
 	var facts: Array = _spec.get("facts", [])
 	for c in _facts.get_children():
 		c.hide()
@@ -212,6 +231,9 @@ func refresh() -> void:
 		c.queue_free()
 	for b in _spec.get("buttons", []):
 		_buttons.add_child(_button(b))
+	# No button and no last fact (a Fishing gate card): no empty 44 touch row under the content.
+	_lift.visible = not _spec.get("buttons", []).is_empty() or _last_fact != ""
+	_box.content_margin_bottom = 0.0 if _lift.visible else _PAD_T   # the touch row pads the bottom when it is there
 	_place_last_fact()
 
 ## The last fact sits beside the buttons when it fits the room they leave ("+20 Energy", as in the main), otherwise
@@ -227,11 +249,57 @@ func _place_last_fact() -> void:
 	_effect.text = _last_fact if beside else ""
 	_overflow.text = "" if beside else _last_fact
 	_overflow.visible = _overflow.text != ""
-	var lines := _facts.get_children().filter(func(c): return (c as Control).visible).size()
+	var lines := _facts.get_children().filter(func(c): return (c as Control).visible).size() + _blocks.get_child_count()
 	var text_h: float = (_title.get_parent() as Control).get_combined_minimum_size().y + (_state.get_combined_minimum_size().y if _state.visible else 0.0)
 	var overlap := maxf(0.0, _PAD_T + text_h - _BUTTON_ROW_Y)
 	if lines > 0: overlap = (UiTokens.SIZE_TOUCH - UiTokens.SIZE_COMMAND_COMPACT) * 0.5
 	_lift.add_theme_constant_override(&"margin_top", -int(overlap))
+
+func _build_blocks() -> void:
+	for c in _blocks.get_children():
+		_blocks.remove_child(c)
+		c.queue_free()
+	if str(_spec.get("lead", "")) != "":
+		var lead := UiKit.label(str(_spec.lead), UiTokens.STYLE_C12_XB, UiTokens.COLOR_TEXT)
+		lead.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		_blocks.add_child(lead)
+	var need: Dictionary = _spec.get("need", {})
+	if not need.is_empty():
+		var row := HBoxContainer.new()
+		row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		row.add_theme_constant_override(&"separation", int(_NEED_GAP))
+		var tile := UiNeedTile.new(str(need.get("name", "")), int(need.get("have", 0)), maxi(1, int(need.get("need", 1))),
+			UiNeedTile.Size.M, need.get("icon", null), true)
+		tile.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		row.add_child(tile)
+		var note := UiKit.label(str(need.get("note", "")), UiTokens.STYLE_C12_B, UiTokens.COLOR_SECONDARY)
+		note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		note.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		note.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		note.visible = note.text != ""
+		row.add_child(note)
+		_blocks.add_child(row)
+	var info: Dictionary = _spec.get("info_row", {})
+	if not info.is_empty():
+		var box := VBoxContainer.new()
+		box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		box.add_theme_constant_override(&"separation", int(_INFO_GAP))
+		var head := HBoxContainer.new()
+		head.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		head.add_theme_constant_override(&"separation", int(_GAP))
+		var t := UiKit.label(str(info.get("title", "")), UiTokens.STYLE_C12_XB, UiTokens.COLOR_TEXT)
+		t.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		head.add_child(t)
+		var q := UiKit.label(str(info.get("qty", "")), UiTokens.STYLE_C12_XB, UiTokens.COLOR_TEXT)
+		q.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		head.add_child(q)
+		box.add_child(head)
+		for line in info.get("lines", []):
+			box.add_child(UiKit.label(str(line), UiTokens.STYLE_C10_B, UiTokens.COLOR_SECONDARY))
+		_blocks.add_child(box)
+	_blocks.visible = _blocks.get_child_count() > 0
+	# A gate card is taller than an item card: its medallion sits by the title, not halfway down.
+	_medallion.size_flags_vertical = Control.SIZE_SHRINK_BEGIN if _blocks.visible else Control.SIZE_SHRINK_CENTER
 
 func _add_fact_line(text: String) -> Label:
 	var line := UiKit.label(text, UiTokens.STYLE_C12_B, UiTokens.COLOR_SECONDARY)
@@ -291,6 +359,7 @@ func _button(b: Dictionary) -> Control:
 	var text := str(b.get("label", ""))
 	if kind == &"nav":
 		var nav := UiNavButton.new(text.trim_suffix(" ›").trim_suffix("›"), true)
+		nav.chevron = bool(b.get("chevron", true))   # the gate card's `Show my plots` has none (SKILL-2 482:169)
 		nav.pressed.connect(func(): action_requested.emit(id, _item, payload))
 		return nav
 	var cb := UiCommandButton.new(text, UiCommandButton.Kind.PRIMARY if kind == &"primary" else UiCommandButton.Kind.SECONDARY, true)

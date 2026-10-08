@@ -216,11 +216,11 @@ func test_bag_dish_gift_goes_to_the_resident_within_reach() -> void:
 	var bag: P0BagDrawer = ui.find_children("*", "P0BagDrawer", true, false)[0]
 	assert_bool(bag.sheet.spec().buttons.any(func(b): return str(b.label) == "Gift to a resident")).is_true()
 	bag.unavailable_requested.emit(&"gift", "dish_grilled_crucian", "Gift to a resident")
-	assert_str(ui._toast.text).is_equal("Find a resident at an outpost to gift this dish")
+	assert_str(ui.toast_text()).is_equal("Find a resident at an outpost to gift this dish")
 	assert_str(ui.modal_kind).is_equal("bag")
-	ui._toast.text = ""
+	ui._toasts.dismiss()
 	bag.unavailable_requested.emit(&"gift", "fish_crucian", "Gift · Mutual friends only")   # fish: no resident Toast
-	assert_str(ui._toast.text).is_equal("")
+	assert_str(ui.toast_text()).is_equal("")
 	ui.close_modal()
 	await get_tree().process_frame
 	near[0] = "res_pip"

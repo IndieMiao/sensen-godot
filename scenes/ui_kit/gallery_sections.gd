@@ -30,6 +30,7 @@ static func all() -> Array[Dictionary]:
 		# SGODOT-226 cooking results (shared with the catch card, SGODOT-233)
 		{id = "quality_badge", title = "UiQualityBadge", figma = "QualityBadge 1178:82154", build = _quality_badges},
 		{id = "reward_moment", title = "UiRewardMoment", figma = "RewardMoment 1179:82271 · COOK-4 / COOK-6 / COOK-P0-9", build = _reward_moments},
+		{id = "moment_banner", title = "UiMomentBanner", figma = "MomentBanner 1226:104630 · §4.8.3 / §4.8.6 (SGODOT-233)", build = _moment_banners},
 		# SGODOT-221 world controls · interaction
 		{id = "quick_bar", title = "UiQuickBar (drawn at 328 of 336)", figma = "Compact/QuickSlot 633:41279 · QuickEnd/Bag 907:72112 · BAR-1 / BAR-1-2 · LOCK-04 / 05", build = _quick_bars},
 		{id = "pin_menu", title = "UiPinMenu", figma = "PinMenu 1141:80291 · LOCK-05", build = _pin_menus},
@@ -65,6 +66,7 @@ static func all() -> Array[Dictionary]:
 		{id = "float_text", title = "UiFloatText", figma = "FloatText 1178:82191 · six tones, Hug / Wrap (static pills)", build = _float_texts},
 		# SGODOT-224 panels
 		{id = "info_sheet", title = "UiInfoSheet", figma = "Compact/SelectedItem 633:41257 · BAG-1 482:10 · F-07 (SGODOT-207 168a4cc3)", build = _info_sheets},
+		{id = "gate_card", title = "Gate card (UiInfoSheet)", figma = "SKILL-2 482:169 · §4.8.7 four things (SGODOT-233)", build = _gate_cards},
 		{id = "board_card", title = "UiBoardCard", figma = "BOARD-READY 1498:96193 · Compact/Information row · E-11 (312 wide)", build = _board_cards},
 		{id = "board_card_states", title = "UiBoardCard states", figma = "BOARD-SHORT 1498:96574 · BOARD-DONE 1498:96382", build = _board_card_states},
 		{id = "keeper_bar", title = "UiKeeperBar", figma = "KeeperBar 1143:102525 Layout=Titled · NPC-2-2 482:118 / NPC-7-P0 1507:97237 · LOCK-16 (336 at 328)", build = _keeper_bars},
@@ -192,10 +194,14 @@ static func _panels() -> Control:
 		panel.theme_type_variation = p[0]
 		panel.add_child(UiKit.label(p[1], UiTokens.STYLE_BODY_B14))
 		v.add_child(panel)
-	var toast := PanelContainer.new()
-	toast.theme_type_variation = UiTokens.PANEL_TOAST_PANEL
-	toast.add_child(UiKit.label("Bag full · free a slot first", UiTokens.STYLE_BODY_B14, UiTokens.COLOR_SURFACE_RAISED))
-	v.add_child(toast)
+	# Toast R1 tones (1178:82265; SGODOT-233): Success / Info / Error, an Error with its guiding action.
+	for t in [[ToastLayer.Severity.SUCCESS, "Floor 2 cleared · Elevator stop", ""],
+			[ToastLayer.Severity.INFO, "Room 1 is full · you're in Room 2", ""],
+			[ToastLayer.Severity.ERROR, "Creel full · 0 free slots · Sell or cook first", "Open bag"]]:
+		var toast := ToastLayer.card(t[0], t[1], t[2])
+		toast.custom_minimum_size = Vector2(ToastLayer.WIDTH, UiTokens.SIZE_TOAST_MIN_H)
+		toast.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		v.add_child(toast)
 	var badge := PanelContainer.new()
 	badge.theme_type_variation = UiTokens.PANEL_BADGE
 	badge.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
@@ -767,6 +773,29 @@ static func _info_sheets() -> Control:
 		v.add_child(_captioned(sheet, pair[0]))
 	return v
 
+## The four-things gate card (SKILL-2 482:169, §4.8.7; SGODOT-233): an InfoSheet with the lead line, a NeedTile with
+## how far beside it, the level-up gift row and one guiding button (none for Fishing).
+static func _gate_cards() -> Control:
+	var v := _column()
+	var specs := [
+		["gate card · seed (SKILL-2)", {title = "Carrot Seeds", icon = _tex("seed_carrot"), badge = &"locked", rarity_text = "Locked",
+			lead = "Farming Lv2 unlocks Carrot and Herb",
+			need = {name = "Farming XP", have = 32, need = 50, icon = _tex("hoe"), note = "18 XP to go · harvest 9 radishes"},
+			info_row = {title = "Carrot Seeds", qty = "×5", lines = ["Level-up gift", "At Lv2"]},
+			buttons = [{id = &"guide", label = "Show my plots", kind = &"nav", chevron = false}]}],
+		["gate card · Fish-dex silhouette, rod", {title = "Golden Koi", icon = _tex("fish_koi"), badge = &"locked", rarity_text = "Rare · Locked",
+			lead = "Reed Rod lands up to Rare fish",
+			need = {name = "Coins", have = 40, need = 80, icon = _tex("coin"), note = "80 coins at Tackle Shop"}}],
+	]
+	for pair in specs:
+		var sheet := UiInfoSheet.new()
+		var spec: Dictionary = pair[1]
+		sheet.rules = func(id, ctx, o): return spec
+		sheet.custom_minimum_size.x = 328
+		sheet.open("sample", &"gate")
+		v.add_child(_captioned(sheet, pair[0]))
+	return v
+
 ## The Market Board page as BOARD-READY draws it: the day's facts, a request ready to hand in, an open one taking
 ## three crops (short ones in amber on the tiles).
 static func _board_cards() -> Control:
@@ -832,6 +861,9 @@ static func _shop_rows() -> Control:
 			price = {text = "4 coins", line = "2 × 2 coins"}, buttons = buy}, false, 2],
 		[{id = "bait_worm", icon = _tex("bait_worm"), title = "Worm Bait", info = true, facts = ["Bites come faster", "Stock 0/30 · Bag ×5"],
 			price = {text = "2 coins", line = ""}, buttons = [{id = &"buy", label = "Sold out · 9h 12m", kind = &"unavailable", payload = {}}]}, false, 1],
+		# STALL-NEW-2 (E-04, SGODOT-233): Gate tone=New, the row's gate line in newInk.
+		[{id = "seed_carrot", icon = _tex("seed_carrot"), title = "Carrot Seeds", info = true, facts = ["Ready in 12h", "◆ New for you"],
+			gate_tone = &"new", price = {text = "9 coins", line = ""}, buttons = buy}, false, 1],
 		[{id = "seed_tomato", icon = _tex("seed_tomato"), title = "Tomato Seeds", info = true, facts = ["Ready in 6h", "210 XP to go"],
 			price = {text = "12 coins", line = ""}, buttons = [{id = &"buy", label = "Farming Lv4 needed", kind = &"unavailable", payload = {}}]}, false, 1],
 		[{id = "rod_reed", icon = _tex("rod"), title = "Reed Rod", info = true, facts = ["Lands up to Rare fish", "Fishing Lv3"],
@@ -1190,6 +1222,34 @@ static func _reward_moment(fields: Dictionary) -> UiRewardMoment:
 	var r := UiRewardMoment.new()
 	r.show_fields(fields)
 	return r
+
+## MomentBanner (1226:104630, SGODOT-233): the account's first level-up (rewards, recipe, tip, Use bait), a later level
+## (unlocks and what is next) and Kind=Complete (a crafted tool).
+static func _moment_banners() -> Control:
+	var v := _column()
+	var first := UiMomentBanner.new()
+	first.level = "2"
+	first.title = "Fishing Lv 2"
+	first.subtitle = "Fine fish now stay on the hook"
+	first.rewards = [UiFloatText.pill("+50 Energy", UiFloatText.Tone.ENERGY_GAIN), UiFloatText.pill("+3 Worm Bait", UiFloatText.Tone.ITEM, _tex("bait_worm")),
+		UiFloatText.pill("+3 Wild Herb", UiFloatText.Tone.ITEM, _tex("crop_herb"))]
+	first.detail = "New recipe: Herb Grilled Fish"
+	first.tip = "Levels unlock gear, fish and seeds. Basics never lock."
+	first.action = "Use bait"
+	v.add_child(_captioned(first, "LevelUp · SKILL-3, the account's first (≤ 3 s)"))
+	var later := UiMomentBanner.new()
+	later.level = "2"
+	later.title = "Farming Lv 2"
+	later.subtitle = "New for you · Carrot Seeds, Herb Seeds"
+	later.rewards = [UiFloatText.pill("+30 Energy", UiFloatText.Tone.ENERGY_GAIN), UiFloatText.pill("+5 Carrot Seeds", UiFloatText.Tone.ITEM, _tex("seed_carrot"))]
+	later.tip = "Next Lv3 · 150 XP"
+	v.add_child(_captioned(later, "LevelUp · FARM-LV2, a later level (1.5 s)"))
+	var done := UiMomentBanner.new()
+	done.kind = UiMomentBanner.Kind.COMPLETE
+	done.title = "Gather Gloves"
+	done.subtitle = "+1 at every gathering spot"
+	v.add_child(_captioned(done, "Complete"))
+	return v
 
 static func _reward_moments() -> Control:
 	var row := _row(UiTokens.SPACE_SECTION)

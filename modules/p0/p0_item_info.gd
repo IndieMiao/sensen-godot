@@ -112,6 +112,8 @@ static func spec(view: Dictionary, item_id: String, context: StringName, opts :=
 		if text != "": out.facts.append(text)
 	out.buttons = _buttons(rule, f, t)
 	if rule.get("price", false): out.price = _price(view, item_id, opts)
+	# STALL-NEW-2 (E-04): a buy row unlocked since the stall was last opened reads `◆ New for you` in newInk.
+	if context == &"counter_buy" and _new_offer(item_id, opts) and out.facts.has(NEW_FOR_YOU): out.gate_tone = &"new"
 	if rule.get("quota", false): out.quota = _quota(view, item_id, kind, opts)
 	return out
 
@@ -316,7 +318,7 @@ static func tokens(view: Dictionary, item_id: String, context: StringName, opts 
 		gift_near_label = ("Gift to %s" % str(opts.near.name)) if str(opts.get("near", {}).get("name", "")) != "" else "",
 		sell_all_label = _sell_all_label(count, sellable, here),
 		quota_resets_in = P0Logic.duration(float(quota.get("resets_in", 0))) if quota.has("resets_in") else "",
-		stock_line = _stock_line(offer, count),
+		stock_line = NEW_FOR_YOU if _new_offer(item_id, opts) else _stock_line(offer, count),
 		gate_text = ("%s Lv%d needed" % [str(offer.get("skill", "")).capitalize(), int(offer.get("gate", 0))]) if offer.has("gate") else "",
 		# Daily stock comes back at the day's rollover, the same moment as Rest (view.rest.resets_in).
 		restock_in = P0Logic.duration(float(view.get("rest", {}).get("resets_in", 0))) if view.get("rest", {}).has("resets_in") else "",
@@ -402,6 +404,13 @@ static func _sell_all_label(count: int, sellable: int, each: int) -> String:
 	if each < 0 or sellable <= 0: return ""
 	if sellable < count: return "Sell %d%s%d coins" % [sellable, SEP, sellable * each]   # quota can't take the whole stack
 	return "Sell All%s%d coins" % [SEP, count * each]
+
+## STALL-NEW-2 (E-04, 1378:93021): the gate line of a seed unlocked since the stall was last opened, until the next visit.
+const NEW_FOR_YOU := "◆ New for you"
+
+## opts.new_ids: the offers new to this visit (P0Ui.stall_new_ids, through the counter drawer's opts).
+static func _new_offer(item_id: String, opts: Dictionary) -> bool:
+	return (opts.get("new_ids", []) as Array).has(item_id)
 
 static func _stock_line(offer: Dictionary, count: int) -> String:
 	var bag := "Bag ×%d" % count

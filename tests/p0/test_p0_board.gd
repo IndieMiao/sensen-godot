@@ -223,3 +223,24 @@ func test_details_lay_the_items_card_over_the_request() -> void:
 	assert_array(ui._modal.find_children("*", "UiInfoSheet", true, false)).is_empty()
 	assert_bool(ui.close_top_layer()).is_true()
 	assert_str(ui.modal_kind).is_equal("counter")
+
+## The runtime's side of BOARD-DONE: a delivery from the counter drawer floats its coins once, from the row's button,
+## not again at the player (亚瑟 on #77: the coins float's skip must survive the float queue).
+func test_a_counter_delivery_floats_its_coins_once() -> void:
+	var rt: P0Runtime = auto_free(P0Runtime.new())
+	add_child(rt)
+	await get_tree().process_frame
+	rt.ui.quick_store = STORE
+	rt.session.view = _view()
+	rt.ui.set_view(_view())
+	rt.ui.open_counter("market", {"section": "board", "ctx": MEI})
+	await await_idle_frame()
+	var v := _view()
+	v.boards.market.slots[0] = {"empty": true, "refill_in": 14400000}
+	v.coins = 236
+	rt.session.view = v
+	rt._on_state(v, [{"kind": "request", "id": "m1", "status": "done", "coins": 36}, {"kind": "coins", "delta": 36}])
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var coins := rt.ui.root.get_children().filter(func(c): return c is UiFloatText and str(c.text).contains("+36 coins"))
+	assert_int(coins.size()).is_equal(1)
