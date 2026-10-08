@@ -128,6 +128,44 @@ func test_a_delivery_from_the_drawer_turns_its_row_done_and_floats_the_coins() -
 	ui.open_counter("market", {"section": "board", "ctx": MEI})
 	assert_array(_rows(ui).map(func(r): return (r as UiBoardCard).request_id)).is_equal(["m2"])   # gone once closed
 
+## 刘邦 on #73: the Homestead Stall has no keeper bar; a delivery from its Stall Board turns the row Done all the same.
+func test_a_delivery_at_the_unattended_stall_turns_its_row_done() -> void:
+	var v := _view()
+	v.boards.stall.slots[0].have = 2
+	v.boards.stall.slots[0].ready = true
+	var ui := _ui(v)
+	await await_idle_frame()
+	ui.open_counter("homestead", {"section": "board"})
+	assert_object(ui._counter.keeper_bar).is_null()
+	await await_idle_frame()
+	var after := _view()
+	after.boards.stall.slots[0] = {"empty": true, "refill_in": 14400000}
+	ui.set_view(after)
+	ui.counter_events([{"kind": "request", "id": "req_pond_catch", "status": "done", "coins": 14}])
+	var rows := _rows(ui)
+	assert_array(rows.map(func(r): return [(r as UiBoardCard).request_id, (r as UiBoardCard)._status.text])).is_equal([["req_pond_catch", "Done"]])
+	assert_array(ui.root.get_children().filter(func(c): return c is UiFloatText).map(func(f): return f.text)).contains(["+14 coins"])
+
+## 蒙恬 rc0: the runtime sets the view every frame; the board's buttons must survive an unchanged view, or a tap
+## pressed on one is released on its replacement and lost. A countdown fact still ticks in place.
+func test_an_unchanged_view_keeps_the_rows_and_ticks_the_facts() -> void:
+	var ui := _ui()
+	await await_idle_frame()
+	ui.open_counter("homestead", {"section": "board"})
+	var before: UiCommandButton = (_rows(ui)[0] as UiBoardCard).command_button()
+	var v := _view()
+	ui.set_view(v)
+	ui.set_view(v)
+	assert_object((_rows(ui)[0] as UiBoardCard).command_button()).is_same(before)
+	v.boards.stall.slots[1].refill_in = 3600000 * 5 + 60000 * 3
+	ui.set_view(v)
+	assert_object((_rows(ui)[0] as UiBoardCard).command_button()).is_same(before)
+	var facts := ui._counter.board.get_children().filter(func(c): return c is HBoxContainer and not c is UiBoardCard)
+	assert_str(((facts[1] as HBoxContainer).get_child(1) as Label).text).is_equal("5h 3m")
+	v.boards.stall.slots[0].status = "open"   # a row changed: rebuilt
+	ui.set_view(v)
+	assert_object((_rows(ui)[0] as UiBoardCard).command_button()).is_not_same(before)
+
 func test_the_request_sheet_drops_a_tracked_request() -> void:
 	var ui := _ui()
 	await await_idle_frame()

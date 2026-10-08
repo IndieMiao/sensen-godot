@@ -320,7 +320,7 @@ func set_view(v: Dictionary) -> void:
 	if _counter != null and is_instance_valid(_counter) and modal_kind == "counter":
 		var was: String = _counter.section
 		_counter.refresh(v)
-		if was == "board" or _counter.is_short(): _fill_board(_counter)   # board cards follow Accept / Deliver
+		if was == "board" or _counter.is_short(): _fill_board(_counter)   # board rows follow Accept / Deliver (only on change)
 	if _profile != null and is_instance_valid(_profile) and modal_kind == "profile": _profile.update(v)
 	if workbench() != null: _workbench.refresh(v)
 	_refresh_hud()
@@ -1391,16 +1391,18 @@ func _counter_action(role: String, action: StringName, id: String, payload: Dict
 ## A counter's events (P0Runtime): the keeper says what just happened (TEA-DONE `Enjoy. Next cup's 50 coins.`,
 ## the rod strung after buying it); the drawer itself follows the view.
 func counter_events(events: Array) -> void:
-	if _counter == null or not is_instance_valid(_counter) or _counter.keeper_bar == null: return
+	if _counter == null or not is_instance_valid(_counter): return
+	var bar := _counter.keeper_bar   # none at the unattended Homestead Stall (p(6)): its board rows still turn Done
 	for ev in events:
 		match str(ev.get("kind", "")):
 			"drink":
+				if bar == null: continue
 				var price := int(view.get("drinks", {}).get("price", 0))
-				_counter.keeper_bar.line = ("Enjoy. Next cup's %d coins." % price) if int(ev.get("left", 0)) > 0 \
+				bar.line = ("Enjoy. Next cup's %d coins." % price) if int(ev.get("left", 0)) > 0 \
 					else str(P0Logic.keeper_lines(view, _counter.role, _counter.ctx).get("counter", ""))
 			"item":
-				if str(ev.get("id", "")).begins_with("rod_") and int(ev.get("delta", 0)) > 0:
-					_counter.keeper_bar.line = "Strung and ready — it's on your belt. Swap rods in Bag › Gear."
+				if bar != null and str(ev.get("id", "")).begins_with("rod_") and int(ev.get("delta", 0)) > 0:
+					bar.line = "Strung and ready — it's on your belt. Swap rods in Bag › Gear."
 			"request":
 				if str(ev.get("status", "")) == "done": _board_done(_counter, str(ev.get("id", "")), int(ev.get("coins", 0)))
 
@@ -1437,12 +1439,16 @@ func _fill_board(d: P0CounterDrawer) -> void:
 	var board := P0Board.board_id(d.role)
 	var cards := P0Board.cards(view, board, d.get_meta("board_done", {}))
 	var facts := P0Board.facts(view, board)
-	# The P0 market fills its board while Buy shows too (its height is the taller page's); it rebuilds and re-measures
-	# only when the rows change, not on every refresh.
-	if d.is_short():
-		var key := [cards, facts].hash()
-		if d.get_meta("board_key", 0) == key: return
-		d.set_meta("board_key", key)
+	# The runtime sets the view every frame: the rows are rebuilt only when they change, or a tap pressed on one
+	# button would be released on its replacement and lost (蒙恬 rc0: the first Accept after switching to the board did
+	# nothing). The page facts (a countdown) update in place. The P0 market fills its board while Buy shows too (its
+	# height is the taller page's) and re-measures only then.
+	var key := [cards, facts.map(func(f): return f[0]), view.get("bag", {})].hash()
+	if d.get_meta("board_key", 0) == key:
+		var rows := d.board.get_children().filter(func(c): return c is HBoxContainer and not c is UiBoardCard and not c.is_queued_for_deletion())
+		for i in mini(rows.size(), facts.size()): ((rows[i] as HBoxContainer).get_child(1) as Label).text = str(facts[i][1])
+		return
+	d.set_meta("board_key", key)
 	# What each row was and where its button sat: a delivery empties the slot before counter_events runs, and the row
 	# then turns Done in place with the coins floating up from its button (不知火舞 on 224).
 	var seen: Dictionary = d.get_meta("board_seen", {})
