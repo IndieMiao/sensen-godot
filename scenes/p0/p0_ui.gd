@@ -701,6 +701,7 @@ func world_icon(id: String, icon: Texture2D, screen: Vector2, show: bool, near :
 	b.status = status
 	b.count = count
 	b.place_at(screen)
+	_keep_off_sides(b, b.drawn_rect())
 	# Covered by another facility's open strip (it had no clear side, 不知火舞 on 226 C21: off screen first, then other
 	# buttons): this button fades while the strip is open and comes back once it folds, as covered name tags do (#57).
 	_yield_tag(b, _modal == null and _strip_over(Rect2(b.position, b.size).grow(-8.0)))   # its 28 disc
@@ -819,6 +820,7 @@ func npc_tag(id: String, text: String, head_screen: Vector2, show: bool, highlig
 	t.text = text
 	t.highlight = highlight or talking
 	t.place_over(head_screen)
+	_keep_off_sides(t, Rect2(Vector2.ZERO, t.size))
 	_card_hits[id] = head_screen
 	_yield_tag(t, _modal == null and _strip_covers(Rect2(t.position, t.size)))
 
@@ -914,16 +916,33 @@ func badge_height(id: String) -> float:
 	var b: UiStatusBadge = _badges.get(id)
 	return b.get_combined_minimum_size().y + _BADGE_CARD_GAP if b and b.visible else 0.0
 
-## clamp_inside keeps a marker on screen; a badge over an off-screen facility hides.
+## clamp_inside keeps a marker on screen whatever its anchor; otherwise one whose anchor is in the band slides in
+## PROMPT_EDGE from its sides and one whose anchor is out of it hides (不知火舞 on #127: the map labels' rule).
 func _place_marker(m: Control, screen: Vector2, clamp_inside: bool) -> void:
 	var size := m.get_combined_minimum_size()
 	var area := _marker_area()
-	var r := WorldAnchor.place(size, screen - Vector2(0, UiTokens.SPACE_WITHIN), area, UiTokens.SPACE_WITHIN, clamp_inside)
+	var r := WorldAnchor.place(size, screen - Vector2(0, UiTokens.SPACE_WITHIN), area, PROMPT_EDGE, clamp_inside or area.has_point(screen))
 	m.visible = r.has_area()
 	if not m.visible: return
 	m.size = size
 	m.position = r.position
 	if m.has_method(&"point_at"): m.point_at(screen.x - r.position.x)
+
+## World prompts keep this far off the screen's sides (不知火舞 on #127, as the map's labels: CityMapView.LABEL_EDGE).
+const PROMPT_EDGE := 8.0
+
+## A prompt placed on its anchor slides in from a side it would come closer to than PROMPT_EDGE. `drawn`: its visible
+## part in its own coordinates (an icon button draws its 28 disc in a 44 touch box), its scale about its pivot taken
+## in; the touch area moves with it. Callers hide a prompt whose anchor is out of the band.
+func _keep_off_sides(c: Control, drawn: Rect2) -> void:
+	var area := _marker_area()
+	var left := c.position.x + c.pivot_offset.x + (drawn.position.x - c.pivot_offset.x) * c.scale.x
+	var right := left + drawn.size.x * c.scale.x
+	if left < area.position.x + PROMPT_EDGE: c.position.x += area.position.x + PROMPT_EDGE - left
+	elif right > area.end.x - PROMPT_EDGE: c.position.x -= right - (area.end.x - PROMPT_EDGE)
+
+## Only Bag at the bottom (a room: no quick bar slots, no main key; 不知火舞 on #127): the room frames lower.
+func bag_only() -> bool: return _bar != null and _bar.visible and _bar.bag_only and not _keys.visible
 
 ## Where world markers may sit (LOCK-07): below the two-row HUD and above the quick bar. A finger card is passive, so
 ## one lying under a HUD chip lost its tap to the chip (int5 hand test 8: the Homestead card slid under Energy and
@@ -934,6 +953,15 @@ func _marker_area() -> Rect2:
 	var bottom := _kit.size.y
 	if _bar.visible: bottom = minf(bottom, _bar.position.y)
 	return Rect2(0.0, top, _kit.size.x, maxf(0.0, bottom - top))
+
+## The band a world camera frames into (camera unification, 不知火舞 on 231): below the HUD's second row, above the
+## quick bar and the main key group, in this UI's coordinates. A scene that fits along an axis centres in this band,
+## so its front edge never sits under the bar or the key.
+func camera_band() -> Rect2:
+	var r := _marker_area()
+	if _keys != null and _keys.is_visible_in_tree():
+		r.end.y = minf(r.end.y, _keys.get_global_rect().position.y - root.global_position.y)
+	return r
 
 ## FloatText (1178:82191, UiFloatText from 2B; SGODOT-224): one line rising from `screen` (its bottom centre) in its
 ## tone; `stack` = the line's place in one reply (each starts 28 higher and 60 ms later, at most 3). Copy longer

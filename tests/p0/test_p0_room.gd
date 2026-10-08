@@ -1,4 +1,6 @@
 extends GdUnitTestSuite
+
+const FarmCamera = preload("res://modules/farm/farm_camera.gd")
 ## Indoor P0 spaces (SGODOT-226): anchors (WP7-B F-03 ③), the walkable grid from the art's colliders, and the
 ## room shell's tap → walk to the stand point → facility callback, run on the accepted Basic Room.
 
@@ -294,21 +296,101 @@ func test_farmhouse_stove_card_and_badge_follow_the_server_stove() -> void:
 	for n in r._tappable():   # no Tap to anywhere in the farmhouse
 		assert_bool(r._marker(n, {}).has("text")).override_failure_message(n).is_false()
 
-func test_a_room_that_fits_the_screen_holds_its_framing_while_walking() -> void:
+## One player scale (用户 2026-10-09): the farm's own camera at 43° gives the P0 farm's 6.72 m on 360 × 800, and a
+## flatter camera needs a wider view by cos(pitch) / cos(43°) for the player to stand as tall.
+func test_the_player_scale_size_is_the_farms_view_at_its_pitch() -> void:
+	var view := Vector2(360, 800)
+	assert_float(FarmCamera.player_scale_size(view, FarmCamera.PITCH_DEG)).is_equal_approx(6.72, 0.0001)
+	assert_float(FarmCamera.player_scale_size(view, 24.8)).is_equal_approx(6.72 * cos(deg_to_rad(24.8)) / cos(deg_to_rad(43.0)), 0.0001)
+	assert_float(FarmCamera.player_scale_size(view, 24.8)).is_greater(FarmCamera.player_scale_size(view, 37.0))
+
+## Camera unification (用户 2026-10-09; 不知火舞 on 226): the farmhouse shows the player at the farm's scale, which
+## supersedes the whole-room diorama opening; it pans across inside its art, follows the player as they walk, and its
+## push-ins keep framing from the whole room's width.
+func test_the_room_shows_the_player_at_the_farms_scale_and_pans_inside_its_art() -> void:
 	var r := _farmhouse()
-	assert_bool(r._fits).override_failure_message("the Basic Room fits a portrait screen").is_true()
+	_assert_player_scale_framing(r, "farmhouse")
+	assert_float(r.view_size()).is_greater(r.cam.size)   # push-ins still frame from the whole room
+	r.frame_all()   # straight onto the player at the door, the view stopped at the art's edge
+	assert_bool(r._fits).override_failure_message("wider than the band at the player's scale").is_false()
 	var before := r.cam.global_position
-	r.p0_joystick(Vector2(1, 0))
-	for i in 20: r.p0_frame({}, 1.0 / 30.0)
+	r.p0_joystick(Vector2(-1, 0))   # into the room, away from that edge
+	for i in 60: r.p0_frame({}, 1.0 / 30.0)
 	r.p0_joystick(Vector2.ZERO)
 	for i in 40: r.p0_frame({}, 1.0 / 30.0)
 	assert_float(P0Room._flat_distance(r.actor.position, r.anchor("spawn").global_position)).is_greater(0.3)
-	assert_vector(r.cam.global_position).is_equal_approx(before, Vector3.ONE * 0.001)
-	# Zoomed in, the safe box follows the player again.
-	r.p0_zoom(1.0 / 1.4)
-	r.p0_joystick(Vector2(-1, 0))
-	for i in 30: r.p0_frame({}, 1.0 / 30.0)
-	assert_bool(r.cam.global_position.is_equal_approx(before)).is_false()
+	assert_bool(r.cam.global_position.is_equal_approx(before)).override_failure_message("follows across").is_false()
+	var e := _art_edges_px(r)   # never more than SIDE_MARGIN of backdrop beside the art
+	assert_float(maxf(float(e.left), float(e.right))).override_failure_message(str(e)).is_less_equal(P0Room.SIDE_MARGIN + 0.5)
+
+## 不知火舞 on #127: with Bag alone at the bottom (a room) the room centres down to the safe bottom's 24 px — lower than
+## the quick bar's top — but its lowest point keeps 8 px above Bag's top.
+func test_with_bag_alone_the_room_frames_lower_and_clears_bag() -> void:
+	var rt: P0Runtime = auto_free(P0Runtime.new())
+	add_child(rt)
+	await get_tree().process_frame
+	rt.ui.set_surface("room")
+	await get_tree().process_frame
+	assert_bool(rt.ui.bag_only()).is_true()
+	var r := _farmhouse()
+	r.rt = rt
+	var e_full := _art_edges_px(r)   # framed before the room knew its UI: the quick bar's band
+	r.frame_all()
+	var e := _art_edges_px(r)
+	var view := r._view()
+	var bag_top := view.y - (UiTokens.SIZE_QUICK_BAR_BOTTOM + UiTokens.SIZE_QUICK_BAR_H)
+	var art_bottom := view.y - (UiTokens.SIZE_QUICK_BAR_BOTTOM + UiTokens.SIZE_QUICK_BAR_H) - float(e.bottom)   # px from the top
+	assert_float(art_bottom).override_failure_message(str(e)).is_less_equal(bag_top - P0Room.BAG_CLEAR + 0.5)
+	var art_top := float(P0Room.HUD_BOTTOM) + float(e.top)
+	var centred := absf((art_top - P0Room.HUD_BOTTOM) - (view.y - UiTokens.SIZE_QUICK_BAR_BOTTOM - art_bottom)) < 1.0
+	var on_guard := absf(art_bottom - (bag_top - P0Room.BAG_CLEAR)) < 0.5
+	assert_bool(centred or on_guard).override_failure_message("top %.1f bottom %.1f" % [art_top, art_bottom]).is_true()
+	assert_float(float(e.top)).override_failure_message("lower than with the quick bar").is_greater(float(e_full.top))
+
+## Camera unification (用户 2026-10-09): where the room's art edges sit on screen, in px — across from the screen's left
+## and right edges, down from the HUD's bottom and to the quick bar's top (the free band P0Room keeps the art in).
+func _art_edges_px(r: P0Room) -> Dictionary:
+	var forward := -r._cam_dir
+	var right := forward.cross(Vector3.UP).normalized()
+	var up := right.cross(forward).normalized()
+	var view := r._view()
+	var px := view.x / r.cam.size
+	var cx := r.cam.global_position.dot(right)
+	var cy := r.cam.global_position.dot(up)
+	var half_h := r.cam.size * 0.5 * view.y / view.x
+	var top_band := float(P0Room.HUD_BOTTOM)
+	var bottom_band := view.y - (UiTokens.SIZE_QUICK_BAR_BOTTOM + UiTokens.SIZE_QUICK_BAR_H)
+	return {left = (r._bounds_lo.x - (cx - r.cam.size * 0.5)) * px, right = (cx + r.cam.size * 0.5 - r._bounds_hi.x) * px,
+		top = (cy + half_h - r._bounds_hi.y) * px - top_band, bottom = bottom_band - (cy + half_h - r._bounds_lo.y) * px}
+
+## Pushes the camera's centre `by` along the screen axes (metres) and lets the room keep it inside its art.
+func _push_view(r: P0Room, by: Vector2) -> void:
+	var forward := -r._cam_dir
+	var right := forward.cross(Vector3.UP).normalized()
+	var up := right.cross(forward).normalized()
+	r._focus += right * by.x + up * by.y
+	r._update_camera()
+
+## The player stands as tall as on the farm; across, a room wider than the free band pans and stops with its art's
+## edge SIDE_MARGIN from the screen's; down, a room that fits the band holds centred in it (不知火舞 on 226).
+func _assert_player_scale_framing(r: P0Room, label: String) -> void:
+	var pitch := rad_to_deg(asin(r._cam_dir.y))
+	assert_float(r.cam.size).override_failure_message(label + " size").is_equal_approx(FarmCamera.player_scale_size(r._view(), pitch), 0.001)
+	for side in [-1.0, 1.0]:
+		_push_view(r, Vector2(side * 100.0, 0.0))
+		var e := _art_edges_px(r)
+		var edge: float = e.left if side < 0.0 else e.right
+		if edge > P0Room.SIDE_MARGIN + 0.5:   # narrower than the band: centred instead
+			assert_float(absf(float(e.left) - float(e.right))).override_failure_message("%s centred across %s" % [label, e]).is_less(1.0)
+		else:
+			assert_float(edge).override_failure_message("%s edge %s" % [label, e]).is_equal_approx(P0Room.SIDE_MARGIN, 0.5)
+	for side in [-1.0, 1.0]:
+		_push_view(r, Vector2(0.0, side * 100.0))
+		var e := _art_edges_px(r)
+		if float(e.top) >= -0.5 and float(e.bottom) >= -0.5:   # fits down: centred in the band, whichever way it was pushed
+			assert_float(absf(float(e.top) - float(e.bottom))).override_failure_message("%s centred down %s" % [label, e]).is_less(1.0)
+		else:   # taller than the band: the art's edge on the band's
+			assert_float(minf(absf(float(e.top)), absf(float(e.bottom)))).override_failure_message("%s down %s" % [label, e]).is_less(0.5)
 
 func test_back_is_always_handled_by_the_room_so_the_router_never_pops_twice() -> void:
 	var r := _room()
