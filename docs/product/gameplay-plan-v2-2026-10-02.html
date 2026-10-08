@@ -1972,8 +1972,8 @@ td { font-variant-numeric: tabular-nums; }
 <td>q(70)</td>
 <td>新号能不能一开局就 Rest（2026-10-08，蒙恬 demo rc0 发现长椅一开局显示 Cooling down 1h51m，奕星转达）</td>
 <td>§3.4.3 只写「距上次离开农场 ≥ 2 小时」，没写从没离开过的新号怎么算；长椅冷却中的名字条与文案没写</td>
-<td><strong>新号不能一开局 Rest</strong>：从没离开过农场就没有离开时刻（服务端 <code>restReadyIn</code> 返回 null），Rest 不可用、不显示倒计时，长椅名字条灰 <code>+60 Energy · after 2h away</code>，点了 <code>Rest · back after 2h away</code>；首会话的回复课是那一顿饭，开局能 Rest 会把它提前用掉，也削弱第一天的体力存在感。第一次离开后才计时，计时中灰 <code>+60 Energy · in 1h 12m</code>；可用 <code>+60 Energy</code>；用过 <code>Rested today</code>。<code>Cooling down</code> 不是方案文案</td>
-<td>第 3 章 3.4.3；第 16 章 FARM-7；附录 B.3</td>
+<td><strong>新号不能一开局 Rest</strong>：从没离开过农场就没有离开时刻（服务端 <code>restReadyIn</code> 返回 null），Rest 不可用、不显示倒计时，长椅名字条灰 <code>+60 Energy · after 2h away</code>，点了 <code>Rest · back after 2h away</code>；首会话的回复课是那一顿饭，开局能 Rest 会把它提前用掉，也削弱第一天的体力存在感。第一次离开后才计时，计时中灰 <code>+60 Energy · in 1h 12m</code>；可用 <code>+60 Energy</code>；用过 <code>Rested today</code>。<code>Cooling down</code> 不是方案文案。<strong>附</strong>：§4.8.7 技能页 SKILL-1（P0）的 Next 行样例改写还差多少 <code>Next: Lv5 · 88 XP to go</code>，与 §4.8.4 的 <code>210 to go</code> 一致，免得读成总阈值（不知火舞 233）</td>
+<td>第 3 章 3.4.3；第 4 章 4.8.7；第 16 章 FARM-7；附录 B.3</td>
 </tr>
 </tbody>
 </table></div>
@@ -6892,7 +6892,7 @@ td { font-variant-numeric: tabular-nums; }
 </tbody>
 </table></div>
 <p><strong>第一次变灰</strong>（每轨一次，P0 第二周可能出现）：沿用 §4.8.2 的解释卡——<code>You've outleveled Pond Crucian. It still sells and cooks, but gives no XP. Fish Fine or better for full XP.</code>（<code>Where to fish</code> 只移动地图相机到推荐鱼塘）；Farming 用小萝卜同式（<code>Grow Carrot or better for full XP.</code>，<code>Show my plots</code>）；Cooking 用 <code>You've outleveled Grilled Crucian. It still feeds you, but gives no XP. Cook Rare or better for full XP.</code>（<code>Cookbook</code> 筛到当前全额的页）。</p>
-<p><strong>技能页 SKILL-1（P0）</strong>：三张轨卡按 §4.8.4；<code>Next</code> 行只列当期有的内容，当期没有新内容时只写 <code>Next: Lv5 · 200 XP</code>；解锁列表只显示当期的行；首次类进度用当期分母：<code>Crops first-harvested n/8 · Fish first-caught n/7 · Dishes first-cooked n/14</code>，不显示 <code>Cities fished</code>（P0 没有旅行）。</p>
+<p><strong>技能页 SKILL-1（P0）</strong>：三张轨卡按 §4.8.4；<code>Next</code> 行只列当期有的内容，当期没有新内容时只写还差多少 <code>Next: Lv5 · 88 XP to go</code>（与 §4.8.4 的 <code>210 to go</code> 同一读法，不写总阈值，q(70)）；解锁列表只显示当期的行；首次类进度用当期分母：<code>Crops first-harvested n/8 · Fish first-caught n/7 · Dishes first-cooked n/14</code>，不显示 <code>Cities fished</code>（P0 没有旅行）。</p>
 <hr />
 <h2 id="s4-9">4.9 与原始方案的差异与理由</h2>
 <div class="tbl"><table>
