@@ -21,6 +21,44 @@ func drive_world(direction: Vector3, seconds: float) -> void:
 	room.test_input_until = room.time + seconds
 	await wait_seconds(seconds + .15)
 
+func sample_hearth_energy(seconds: float) -> Dictionary:
+	var low := INF
+	var high := -INF
+	var frames := 0
+	var start := Time.get_ticks_msec()
+	while Time.get_ticks_msec() - start < seconds * 1000:
+		await process_frame
+		low = minf(low, room.fire_light.light_energy)
+		high = maxf(high, room.fire_light.light_energy)
+		frames += 1
+	return {"low": low, "high": high, "frames": frames}
+
+func check_glow_boost() -> void:
+	var base: float = room.fire.light_energy
+	var strength: float = room.fire.flicker_strength
+	var normal := await sample_hearth_energy(1.2)
+	check("Default glow_boost retains the original brightness range", room.fire.glow_boost == 1.0 and normal.frames > 1 and normal.low >= base * (1.0 - strength) - .000001 and normal.high <= base * (1.0 + strength) + .000001 and normal.high - normal.low > .001, normal)
+	# Measure base brightness without flicker, then exercise the consumer's tween.
+	room.fire.flicker_strength = 0.0
+	for i in range(2): await process_frame
+	var normal_base: float = room.fire_light.light_energy
+	var boost_tween := create_tween()
+	boost_tween.tween_property(room.fire, "glow_boost", 2.2, .15)
+	await boost_tween.finished
+	for i in range(2): await process_frame
+	var boosted_base: float = room.fire_light.light_energy
+	room.fire.flicker_strength = strength
+	var boosted := await sample_hearth_energy(1.2)
+	# Cooling down uses the same public property and must restore the base.
+	room.fire.flicker_strength = 0.0
+	var reset_tween := create_tween()
+	reset_tween.tween_property(room.fire, "glow_boost", 1.0, .15)
+	await reset_tween.finished
+	for i in range(2): await process_frame
+	var reset_base: float = room.fire_light.light_energy
+	room.fire.flicker_strength = strength
+	check("Cooking glow_boost scales base by 2.2 with flicker within +/-10%", is_equal_approx(normal_base, base) and is_equal_approx(boosted_base, normal_base * 2.2) and boosted.frames > 1 and boosted.low >= boosted_base * .9 - .000001 and boosted.high <= boosted_base * 1.1 + .000001 and boosted.high - boosted.low > .001 and is_equal_approx(reset_base, normal_base), {"normal_base": normal_base, "boosted_base": boosted_base, "flicker": boosted, "reset_base": reset_base})
+
 func run() -> void:
 	room = load("res://tools/dev/basic_room/basic_room.tscn").instantiate()
 	root.add_child(room)
@@ -37,6 +75,7 @@ func run() -> void:
 			particle_contract = particle_contract and emitter.fixed_fps == 30 and emitter.visibility_aabb.size.length() > 0 and emitter.cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_OFF and emitter.process_material.collision_mode == ParticleProcessMaterial.COLLISION_DISABLED
 	check("Fire budget and bounds, no collision/shadows", particle_count > 0 and particle_count <= 20 and particle_contract, particle_count)
 	check("Static fire GLB is absent from rendered replacement", room.fire.find_children("*", "MeshInstance3D", true, false).is_empty())
+	await check_glow_boost()
 	check("Player stands on floorboard height", room.player.is_on_floor() and absf(room.player.position.y - .08) < .04, room.player.position.y)
 	var start: Vector3 = room.player.position
 	await drive_world(Vector3(0, 0, 1), .22)

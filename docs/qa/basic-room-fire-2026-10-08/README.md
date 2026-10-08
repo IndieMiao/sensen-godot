@@ -1,6 +1,6 @@
 # SGODOT-236 — Basic Room particle fire
 
-Based on origin/farm-dev e6520a3b. Basic Room-1 now renders the reviewed shared particle fire instead of fire.glb. The complete assets/rooms/_shared/fx/ directory is copied byte-for-byte from **d04ce72e** (178 R2.3 shared FX commit); its approved fire resources are unchanged from 5e5bf6af. No other wp-3d-scene files or runtime dependencies are required. The shared path remains identical for a later art-branch merge.
+Based on origin/farm-dev e6520a3b. Basic Room-1 now renders the reviewed shared particle fire instead of fire.glb. The complete assets/rooms/_shared/fx/ directory was initially copied byte-for-byte from **d04ce72e** (178 R2.3 shared FX commit). The interface follow-up below adds `glow_boost` to the fire script and updates its README; fire textures/helpers remain unchanged from 5e5bf6af. No other wp-3d-scene files or runtime dependencies are required. The shared path remains identical for a later art-branch merge.
 
 The public `basic_room_art.gd.fire: Node3D` still exists, named `fire`, at the unchanged layout.fire_position. The emitters use the existing fire asset pivot as their fuel-bed offset, keeping flames inside the original opening. Fire configuration: 16 flames + 4 sparks = **20**, half-extents (0.18, 0.005, 0.035), height 0.42 m; 30 Hz, no collision/shadows, explicit bounds inherited from the approved effect. Particle-local bounds move with their fuel offset.
 
@@ -35,3 +35,13 @@ PR targets farm-dev. Art-director review and user approval are required before m
 Cleanup: only owned emulator PID 1192577 (ADB 5067 / emulator-5584) was stopped after the runner stopped its app; the touch fixture was removed. Existing emulators 5560/5570 were left running. No pkill or global adb shutdown was used.
 
 Delivery: nine Plane attachments downloaded with matching hashes; three Lark messages with two byte-identical media downloads. PR #29 remains open. 奕星 received the notification in wt-p0-design-cd on the Mac mini and forwarded it to 哪吒/后裔 and the art reviewer; 后裔 acknowledged no 227 interface impact. See delivery-verification.json.
+
+## Cooking brightness interface follow-up
+
+`fx_hearth_fire.gd` now exports `glow_boost: float = 1.0` (editor range 0–4). External hosts tween it to 2.2 when cooking and back to 1.0 afterwards. The effect multiplies its existing base energy by this value before the unchanged flicker, and remains the sole writer of the borrowed `HearthGlow`. No particle/art defaults or textures change.
+
+Rendered `test_basic_room.gd`: **22/22 passed**, including the two new requested brightness checks. Base .72 becomes **1.584** at boost 2.2; sampled boosted range **1.54965–1.65989**, within ±10%, then returns to .72. A negative control retaining the property but omitting its multiplier fails exactly the cooking-brightness check (21 others pass). An independent old/new-script comparison, loaded from pre-change commit 4b53ed0b, produces **3,600 exactly equal default-output samples**: 1,800 variable-delta steps each for Basic Room and the shared 3.1/.08 defaults, maximum difference 0.
+
+`flame_strip.png`, `spark.png`, `particle_style.gd`, and every other FX resource except the fire script/README are byte-identical to each branch's baseline. `fx_hearth_fire.gd` only adds `glow_boost` and multiplies it into energy. The updated fire script and README are byte-identical on PR #29 and the art branches. The directory already differed in `fx_chimney_smoke.gd` / `smoke_strip.png` (PR R2.3 versus art R2.5); those differences are deliberately preserved under the instruction not to change art parameters or textures. The common README documents both versions.
+
+[Interface test and preservation evidence](glow-boost-verification.json). Original Android measurements above remain the original particle-replacement run; this API-only follow-up does not claim a new emulator performance run. 172/173/175/178 recordings need not be repeated because default output is identical. Art-director recheck and user merge approval remain pending.
