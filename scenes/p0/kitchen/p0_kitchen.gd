@@ -174,6 +174,7 @@ func _on_closed() -> void:
 		if st != null:
 			watch(st)
 			return
+		_hide_ring()   # no pot to go back to: the ring the drawer kept running goes too (刘邦 on #120)
 	room.release_focus()
 	_hide_player(false)
 
@@ -188,19 +189,21 @@ func open_queue() -> void:
 	_queue_mode = true
 	open("cookbook")
 	if phase != "compose": return
-	var band := _heat_band()
-	_wrap.add_child(band)
-	_wrap.move_child(band, 0)   # under the drawer, the slot bar and the preview: they keep their own taps
+	_band = _heat_band()
+	_wrap.add_child(_band)
+	_wrap.move_child(_band, 0)   # under the drawer, the slot bar and the preview: they keep their own taps
 	if _ring: rt.ui.root.move_child(_ring, -1)   # over the drawer's layer
 
-## The pot band's heat taps while the queue drawer is open: in a ring's window a tap judges it and the drawer stays;
-## anywhere else it is the scrim's tap, as before (back closes the drawer).
+## The pot band's heat taps while the queue drawer is open: in a ring's window a tap judges it; while a ring shows
+## (growing 1 s before its turn, the 350 ms it stays after) a tap outside the window does nothing, as tap() swallows it
+## while watching (不知火舞 on 226); with no ring showing it is the scrim's tap, as before (back closes the drawer).
+var _band: Control
 func _heat_band() -> Control:
 	var band := Control.new()
 	band.set_anchors_preset(Control.PRESET_FULL_RECT)
 	band.mouse_filter = Control.MOUSE_FILTER_STOP
-	band.gui_input.connect(func(e: InputEvent):
-		if P0Ui.is_tap(e) and not _judge_tap(): rt.ui.back_modal())   # STOP: the scrim under it never sees the tap
+	band.gui_input.connect(func(e: InputEvent):   # STOP: the scrim under it never sees the tap
+		if P0Ui.is_tap(e) and not _judge_tap() and not (_ring and _ring.visible): rt.ui.back_modal())
 	return band
 
 ## The heat rings run while watching and while the queue drawer is open over the pot (open_queue).
@@ -217,6 +220,22 @@ func at_gold(lead_ms := 0.0) -> bool:
 
 ## Shots: the heat tap a player's finger makes now (on the watched pot or the queue drawer's pot band).
 func dev_heat_tap() -> void: _judge_tap()
+
+## Shots: a press on the queue drawer's pot band, as a finger makes it.
+func dev_band_press() -> void:
+	if _band == null or not is_instance_valid(_band): return
+	var press := InputEventMouseButton.new()
+	press.button_index = MOUSE_BUTTON_LEFT
+	press.pressed = true
+	_band.gui_input.emit(press)
+
+## Shots (until:growsoon, then heatband): a ring not yet judged is growing, before its window, `lead_ms` from now.
+func ring_growing(lead_ms := 0.0) -> bool:
+	if not _heat_live(): return false
+	var e := elapsed() + lead_ms
+	for h in _stove.get("heats", []):
+		if e >= float(h.at) - RING_EARLY_MS + 100.0 and e < float(h.at) - 100.0: return true
+	return false
 
 ## `pot` event with queued (q(71)): the pot went in behind the one cooking. The ingredients are taken already; the
 ## drawer closes and the watch resumes, now saying Queued 1 with the next dish beside the pot.

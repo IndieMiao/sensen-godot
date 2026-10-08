@@ -235,6 +235,50 @@ func test_a_tap_on_the_pot_band_outside_a_ring_closes_the_queue_drawer_as_before
 	assert_bool(k.get("_judged").has(0)).is_false()   # nothing judged
 	k.stop_watching()
 
+## 不知火舞 on 226: while a ring shows (growing 1 s before its window, the 350 ms it stays after its turn) a tap on the
+## pot band outside the window does nothing, as tap() swallows it while watching; the drawer stays.
+func test_a_tap_on_the_pot_band_while_a_ring_shows_but_outside_its_window_keeps_the_drawer() -> void:
+	var v := _queue_view()
+	v.cooking.stove.heats = [{"at": 3000, "spin": 1600, "gold": 0.5, "width": 0.2}]
+	_set_view(v)
+	var r := await _farmhouse()
+	var k: P0Kitchen = r.get("kitchen")
+	k.watch(rt.session.view.cooking.stove)
+	k.open_queue()
+	for at in [2400, 3000 + 1600 + 200]:   # growing; then turned and still showing
+		k.set("_start_ms", Time.get_ticks_msec() - at)
+		k._process(0.0)
+		assert_bool((k.get("_ring") as UiHeatRing).visible).override_failure_message(str(at)).is_true()
+		_band_press(k)
+		await get_tree().process_frame
+		assert_str(k.phase).override_failure_message(str(at)).is_equal("compose")
+		assert_bool(rt.ui.has_modal()).is_true()
+	assert_bool(bool(k.get("_judged").get(0, true))).is_false()   # the turn went by: a miss, from the clock, not the taps
+	rt.ui.close_modal()
+	await get_tree().process_frame
+	k.stop_watching()
+
+## 刘邦 on #120: the queue drawer closing with no pot left on the stove does not leave its running ring on screen.
+func test_the_ring_goes_when_the_queue_drawer_closes_on_an_empty_stove() -> void:
+	var v := _queue_view()
+	v.cooking.stove.heats = [{"at": 3000, "spin": 1600, "gold": 0.5, "width": 0.2}]
+	_set_view(v)
+	var r := await _farmhouse()
+	var k: P0Kitchen = r.get("kitchen")
+	k.watch(rt.session.view.cooking.stove)
+	k.open_queue()
+	k.set("_start_ms", Time.get_ticks_msec() - 3500)
+	k._process(0.0)
+	var ring: UiHeatRing = k.get("_ring")
+	assert_bool(ring.visible).is_true()
+	var empty := _queue_view()
+	empty.cooking.stove = null   # kept and gone meanwhile (another device, a command's settle)
+	_set_view(empty)
+	rt.ui.close_modal()
+	await get_tree().process_frame
+	assert_str(k.phase).is_equal("idle")
+	assert_bool(ring.visible).is_false()
+
 func test_queue_next_is_offered_only_from_cooking_lv5_with_nothing_waiting() -> void:
 	var r := await _farmhouse()
 	var k: P0Kitchen = r.get("kitchen")
