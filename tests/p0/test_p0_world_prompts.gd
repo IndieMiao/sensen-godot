@@ -176,3 +176,16 @@ func test_a_strip_stays_on_screen_before_anything_else() -> void:
 	var r: Rect2 = ui._name_bars.long.full_rect()
 	assert_float(r.position.x).is_greater_equal(a.position.x + 12.0 - 0.5)
 	assert_float(r.end.x).is_less_equal(a.end.x - 12.0 + 0.5)
+
+## 周瑜 on 231: when the camera leaves the facility (a Show to the mine), its open strip folds instead of hanging at
+## the screen's edge; it opens again once the facility is back in view.
+func test_a_strip_folds_when_its_facility_leaves_the_screen() -> void:
+	var at := _mid()
+	ui.name_bar("workbench", HOME, "Workbench", "", at, true)
+	var bar: UiWorldNameBar = ui._name_bars.workbench
+	assert_bool(bar.visible).is_true()
+	ui.name_bar("workbench", HOME, "Workbench", "", Vector2(-80, at.y), true)
+	await get_tree().create_timer(0.3).timeout
+	assert_bool(bar.visible).is_false()
+	ui.name_bar("workbench", HOME, "Workbench", "", at, true)
+	assert_bool(bar.visible).is_true()

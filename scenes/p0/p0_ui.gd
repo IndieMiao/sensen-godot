@@ -780,7 +780,8 @@ func name_bar(id: String, icon: Texture2D, text: String, fact: String, screen: V
 		_kit.add_child(bar)
 		_kit.move_child(bar, 0)
 		_name_bars[id] = bar
-	if not (show and _modal == null):
+	# Its facility off screen (a Show moved the camera away, 周瑜 on 231): no strip hanging at the edge, like the buttons.
+	if not (show and _modal == null) or not _marker_area().has_point(screen):
 		if bar.visible: _fold_name_bar(bar)
 		return
 	_card_hits[id] = screen if hit == Vector2.INF else hit
