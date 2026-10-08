@@ -112,3 +112,27 @@ func test_npc_tag_is_the_name_only_and_highlights() -> void:
 	assert_object(box.border_color).is_equal(UiTokens.COLOR_PRIMARY)
 	assert_vector(t.scale).is_equal(Vector2(1.1, 1.1))
 	assert_str(t._label.text).is_equal("Ama")
+
+## 刘邦 on #55: hosts set every property every frame, so an unchanged value must not build a new style or re-sort.
+func test_an_unchanged_value_rebuilds_nothing() -> void:
+	var b := _host(UiWorldIconButton.new()) as UiWorldIconButton
+	b.icon = HOME
+	var box: StyleBox = b._disc.get_theme_stylebox(&"panel")
+	b.icon = HOME
+	b.near = false
+	b.status = -1
+	assert_object(b._disc.get_theme_stylebox(&"panel")).is_same(box)
+	var bar := _host(UiWorldNameBar.new()) as UiWorldNameBar
+	bar.text = "Farmhouse"
+	var bg: StyleBox = bar._bg.get_theme_stylebox(&"panel")
+	bar.text = "Farmhouse"
+	bar.fact = ""
+	bar.side = UiWorldNameBar.Dir.RIGHT
+	bar.dimmed = false
+	bar.status = -1
+	assert_object(bar._bg.get_theme_stylebox(&"panel")).is_same(bg)
+	var t := _host(UiNpcNameTag.new("Ama")) as UiNpcNameTag
+	var tb: StyleBox = t.get_theme_stylebox(&"panel")
+	t.highlight = false
+	t.text = "Ama"
+	assert_object(t.get_theme_stylebox(&"panel")).is_same(tb)

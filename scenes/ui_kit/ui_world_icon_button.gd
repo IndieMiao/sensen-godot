@@ -38,9 +38,16 @@ func _init() -> void:
 	_disc.add_child(_glyph)
 	_refresh()
 
-func set_icon(v: Texture2D) -> void: icon = v; _refresh()
-func set_near(v: bool) -> void: near = v; _refresh()
-func set_status(v: int) -> void: status = v; _refresh()
+# Hosts set these every frame (P0Ui.world_icon): an unchanged value does nothing.
+func set_icon(v: Texture2D) -> void:
+	if v == icon: return
+	icon = v; _refresh()
+func set_near(v: bool) -> void:
+	if v == near: return
+	near = v; _refresh()
+func set_status(v: int) -> void:
+	if v == status: return
+	status = v; _refresh()
 
 ## The 44 px touch area in global coordinates (the host's _tap_at tests it).
 func hit_rect() -> Rect2: return get_global_rect()

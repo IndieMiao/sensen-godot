@@ -22,11 +22,15 @@ func _init(name_ := "") -> void:
 	text = name_
 	_refresh()
 
+# Hosts set these every frame (P0Ui.npc_tag): an unchanged value does nothing.
 func set_text(v: String) -> void:
+	if v == text: return
 	text = v
 	if _label: _label.text = v
 
-func set_highlight(v: bool) -> void: highlight = v; _refresh()
+func set_highlight(v: bool) -> void:
+	if v == highlight: return
+	highlight = v; _refresh()
 
 ## Centre the tag horizontally over `head` (a screen point above the NPC), sitting on it.
 func place_over(head: Vector2) -> void:

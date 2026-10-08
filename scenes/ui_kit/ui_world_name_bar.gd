@@ -67,12 +67,25 @@ func _init() -> void:
 	_row.minimum_size_changed.connect(_layout)
 	_rebuild()
 
-func set_icon(v: Texture2D) -> void: icon = v; _rebuild()
-func set_text(v: String) -> void: text = v; _rebuild()
-func set_fact(v: String) -> void: fact = v; _rebuild()
-func set_side(v: Dir) -> void: side = v; _rebuild()
-func set_dimmed(v: bool) -> void: dimmed = v; _rebuild()
-func set_status(v: int) -> void: status = v; _rebuild()
+# Hosts set these every frame (P0Ui.name_bar): an unchanged value does nothing.
+func set_icon(v: Texture2D) -> void:
+	if v == icon: return
+	icon = v; _rebuild()
+func set_text(v: String) -> void:
+	if v == text: return
+	text = v; _rebuild()
+func set_fact(v: String) -> void:
+	if v == fact: return
+	fact = v; _rebuild()
+func set_side(v: Dir) -> void:
+	if v == side: return
+	side = v; _rebuild()
+func set_dimmed(v: bool) -> void:
+	if v == dimmed: return
+	dimmed = v; _rebuild()
+func set_status(v: int) -> void:
+	if v == status: return
+	status = v; _rebuild()
 
 func is_expanded() -> bool: return _open >= 1.0
 ## Opening progress, 0 (folded to the icon) … 1 (open).
