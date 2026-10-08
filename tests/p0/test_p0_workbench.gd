@@ -107,7 +107,7 @@ func test_drawer_sends_craft_and_toasts_reasons() -> void:
 	assert_that(sent).is_equal([{"type": "craft", "recipe": "craft_gather_gloves"}])
 	# LOCK-10: the grey button still takes the tap and says why.
 	d.card("craft_copper_pickaxe").button.unavailable_pressed.emit("Need 1 more Copper Ore")
-	assert_str(ui._toast.text).is_equal("Need 1 more Copper Ore")
+	assert_str(ui.toast_text()).is_equal("Need 1 more Copper Ore")
 	assert_int(sent.size()).is_equal(1)
 
 func test_a_cost_tile_shows_where_the_material_comes_from() -> void:

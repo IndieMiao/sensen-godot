@@ -850,13 +850,14 @@ func p0_show_spot(where: String) -> void:
 			_follow.hold()
 			return
 
-## Back = tapping the door. Whenever the room handles Back itself (walking out, or already leaving) it
+## Back = tapping the door, once the UI has nothing open. The UI's top layer goes first, one per press, as on the
+## farm (P0Ui.close_top_layer): a dragged quick slot flies back, the radial closes, an InfoSheet laid over a panel
+## closes, then the layer takes its own way back (a Fish-dex card back to the Fish-dex, a resident's Gift drawer back
+## to the bar; 李元芳 int7) or closes. Whenever the room handles Back itself (walking out, or already leaving) it
 ## returns true, so AppRouter never pops a second level (the room may have popped itself synchronously when
 ## the player stood at the door; SGODOT-227 found this sending the app to the old map).
 func is_back_navigation_locked() -> bool:
-	if rt and rt.ui.has_modal():
-		rt.ui.close_modal()
-		return true
+	if rt and rt.ui.close_top_layer(): return true
 	if _leaving: return true
 	if anchor("exit"):
 		if not _walk.is_empty() and str(_walk.name) == "exit": leave()   # Back again while walking out

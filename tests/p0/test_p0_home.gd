@@ -110,7 +110,8 @@ func test_home_2_banner_sits_under_the_hud_and_a_tap_skips_it() -> void:
 	var ui := _ui(_view())
 	var card := HomePanel.moment(ui, P0Logic.home_moment(_view(), {"level": 3, "energy": 78, "unlocks": ["warming_cabinet"]}))
 	await get_tree().process_frame
-	assert_float(card.position.y).is_equal(HomePanel.MOMENT_TOP)
+	assert_float(card.position.y).is_equal(HomePanel.MOMENT_TOP)   # the HOME-2 spec's y …
+	assert_float(card.position.y).is_equal(UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H + 10.0 + ui.safe_top())   # … as show_moment works it out
 	var tap := InputEventMouseButton.new()
 	tap.button_index = MOUSE_BUTTON_LEFT
 	tap.pressed = true
@@ -189,8 +190,13 @@ func test_plaque_read_is_a_read_only_sheet_with_only_close() -> void:
 	assert_str(ui.modal_kind).is_equal("plaque")
 	assert_array(ui.find_children("*", "UiFactRow", true, false).map(func(f): return (f as UiFactRow).label)).is_equal(["Lv2", "Lv3"])
 	assert_array(ui.find_children("*", "UiCommandButton", true, false)).is_empty()
+	# The × floats above the sheet's corner where the main key stands: the key and quick bar hide, as in the frame.
+	assert_bool(ui._keys.visible).is_false()
+	assert_bool(ui._bar.visible).is_false()
 	(ui.find_children("*", "UiCloseButton", true, false)[0] as Button).pressed.emit()
 	assert_bool(ui.has_modal()).is_false()
+	assert_bool(ui._keys.visible).is_true()
+	assert_bool(ui._bar.visible).is_true()
 
 func test_the_plaque_stands_left_of_the_door_apart_from_the_sign() -> void:
 	var bp := P0Garden.blueprint()
@@ -206,9 +212,9 @@ func test_need_material_from_a_shop_or_the_workbench_names_its_own_gap() -> void
 	rt.session.view = _view()
 	rt.session.view["names"] = {"copper_ore": "Copper Ore"}
 	rt._on_refused("need_material", {"item": "copper_ore", "need": 4, "have": 2}, {"type": "craft", "recipe": "pick_copper"})
-	assert_str(rt.ui._toast.text).is_equal("Need 2 more Copper Ore")
+	assert_str(rt.ui.toast_text()).is_equal("Need 2 more Copper Ore")
 	rt._on_refused("need_material", {"item": "wood", "need": 16, "have": 10}, {"type": "homestead_upgrade"})
-	assert_str(rt.ui._toast.text).is_equal("Need 6 more Timber")   # HOME-1's gap, in tile order
+	assert_str(rt.ui.toast_text()).is_equal("Need 6 more Timber")   # HOME-1's gap, in tile order
 
 func test_the_sign_prompt_reads_its_level_and_lights_ready() -> void:
 	# WORLD-HINT-5 (228 64c75e54, SGODOT-250): the house mark, Ready once the Needs are met; open: `Homestead LvN`.

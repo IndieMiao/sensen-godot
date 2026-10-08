@@ -218,7 +218,8 @@ func _build_bag_half() -> void:
 	grid.selection_cleared.connect(func(): sheet.close())
 	_bag_half.add_child(grid)
 
-func _opts(qty := 1) -> Dictionary: return {counter = role, place = place, qty = qty}
+## new_ids (STALL-NEW-2): the offers unlocked since this counter was last opened, from the host's ctx.
+func _opts(qty := 1) -> Dictionary: return {counter = role, place = place, qty = qty, new_ids = ctx.get("new", [])}
 
 ## New server view: the shelf, counts, the grid and the open card follow it; the selection, steppers and scroll
 ## stay. Called every frame by the P0 UI, so a view that changes nothing shown here is skipped.
@@ -360,6 +361,7 @@ func _fill_drinks() -> void:
 	var b := UiCommandButton.new("" if reason != "" else "%s · +%d Energy" % [name, energy])
 	if reason != "": b.reason = reason
 	else: b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	b.sends = true   # drink (§10.7.1 Offline)
 	var id := str(item.get("id", ""))
 	b.activated.connect(func(): action_requested.emit(&"drink", id, {}))
 	_drinks.add_child(b)

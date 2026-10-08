@@ -122,11 +122,13 @@ func _cabinet_actions(id: String) -> Control:
 	var eat: Dictionary = a.eat
 	var eat_b := UiCommandButton.new(str(eat.text))
 	eat_b.reason = str(eat.reason)
+	eat_b.sends = true   # eat (§10.7.1 Offline)
 	eat_b.activated.connect(func(): command.emit({"type": "eat", "item": id, "from": "cabinet"}))
 	eat_b.unavailable_pressed.connect(func(reason): command.emit({"_toast": reason}))
 	box.add_child(eat_b)
 	var take := UiCommandButton.new(str(a.take), UiCommandButton.Kind.SECONDARY)
 	take.reason = str(a.take_reason)
+	take.sends = true   # cabinet_take (§10.7.1 Offline)
 	take.activated.connect(func(): command.emit({"type": "cabinet_take", "item": id}))
 	take.unavailable_pressed.connect(func(reason): command.emit({"_toast": reason}))
 	box.add_child(take)

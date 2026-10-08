@@ -106,7 +106,7 @@
 |---|---|
 | HUD ★ | 两行 HUD 常驻，底部只有 `Bag`；没有旧底栏 `Map / Farm / Me`；P0 不显示 `Nearby Cities`（q(50)） |
 | pin 卡按钮 ★ | 农场 `Go home · Free`；据点与鱼塘 `Go` |
-| 据点 pin | `Lotus Tea House · 3 online` |
+| 据点 pin | `Lotus Tea House · 3 online`；没人在时只写名字 `Lotus Tea House`；P0 城市级不聚合，每处一枚 pin，不出 `×N`（q(72)） |
 | 标记 | P0 只有绿 ✓ / 金 ! / 青 ◆，没有 🔒 与 ★（q(48)） |
 
 ## 8. 背包、Gear、个人页、收件箱
@@ -137,7 +137,9 @@
 |---|---|
 | 横幅 | `Offline · Reconnecting…` + `Retry` / `Back online` / `Didn't go through · try again` |
 | 离线时按钮 | 命令按钮灰 `Offline`；主行动键如 `Sow · Offline` |
-| 世界动作回滚 | toast `3 plots not sown · Energy returned` |
+| 维护卡 SYS-MAINT | `Down for maintenance` / `We'll be back around 14:30.`（设备本地时间、24 小时制；★ 结束时刻不在今天写 `We'll be back around Oct 10, 14:30.`）/ `We'll be back soon.`（没有预计时间或已过时）/ `Check again`（q(74)） |
+| 强制更新卡 SYS-UPDATE | `Update to keep playing` / `This version is out of date.` / `Update`；两张卡都没有关闭按钮（q(74)） |
+| 世界动作失败 | P0 只出横幅 `Didn't go through · try again`，**不出** toast `3 plots not sown · Energy returned`（P0 世界动作没有本地投影，那句 toast 留给以后有投影的版本，q(75)） |
 | 去重与 stale_state | 不出任何提示 |
 | 启动与账号 | `When were you born?` / `Pick your birthday` / `Continue` / `Before you start` / `Agree to continue` / `Terms of Service ›` / `Privacy Policy ›` / `Continue with Apple` / `Continue with Google` / `Continue with Email` / `Taking longer than usual…` / `Can't connect` / `That name isn't allowed` / `Try another name`（WP6，SGODOT-206） |
 

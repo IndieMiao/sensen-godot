@@ -4,7 +4,7 @@
     0,
     0,
     328,
-    312
+    488
   ],
   "children": [
     {
@@ -35,7 +35,7 @@
         0,
         70,
         328,
-        242
+        418
       ],
       "children": [
         {
@@ -112,21 +112,51 @@
           "rect": [
             0,
             230,
-            328,
-            38
+            232,
+            56
           ],
-          "variation": "ToastPanel",
           "children": [
             {
-              "type": "Label",
+              "type": "VBoxContainer",
               "rect": [
                 10,
                 239,
-                306,
-                20
+                210,
+                38
               ],
-              "variation": "BodyB14",
-              "text": "Bag full · free a slot first"
+              "children": [
+                {
+                  "type": "HBoxContainer",
+                  "rect": [
+                    10,
+                    239,
+                    210,
+                    38
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        10,
+                        239,
+                        20,
+                        20
+                      ]
+                    },
+                    {
+                      "type": "Label",
+                      "rect": [
+                        38,
+                        239,
+                        182,
+                        38
+                      ],
+                      "variation": "C14XB",
+                      "text": "Floor 2 cleared · Elevator stop"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -134,7 +164,135 @@
           "type": "PanelContainer",
           "rect": [
             0,
-            280,
+            298,
+            232,
+            56
+          ],
+          "children": [
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                10,
+                307,
+                210,
+                38
+              ],
+              "children": [
+                {
+                  "type": "HBoxContainer",
+                  "rect": [
+                    10,
+                    307,
+                    210,
+                    38
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        10,
+                        307,
+                        20,
+                        20
+                      ]
+                    },
+                    {
+                      "type": "Label",
+                      "rect": [
+                        38,
+                        307,
+                        182,
+                        38
+                      ],
+                      "variation": "C14XB",
+                      "text": "Room 1 is full · you're in Room 2"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "PanelContainer",
+          "rect": [
+            0,
+            366,
+            232,
+            78
+          ],
+          "children": [
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                10,
+                375,
+                210,
+                60
+              ],
+              "children": [
+                {
+                  "type": "HBoxContainer",
+                  "rect": [
+                    10,
+                    375,
+                    210,
+                    38
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        10,
+                        375,
+                        20,
+                        20
+                      ]
+                    },
+                    {
+                      "type": "Label",
+                      "rect": [
+                        38,
+                        375,
+                        182,
+                        38
+                      ],
+                      "variation": "C14XB",
+                      "text": "Creel full · 0 free slots · Sell or cook first"
+                    }
+                  ]
+                },
+                {
+                  "type": "MarginContainer",
+                  "rect": [
+                    10,
+                    417,
+                    210,
+                    18
+                  ],
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        38,
+                        417,
+                        182,
+                        18
+                      ],
+                      "variation": "C12XB",
+                      "text": "Open bag ›"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "PanelContainer",
+          "rect": [
+            0,
+            456,
             51,
             32
           ],
@@ -144,7 +302,7 @@
               "type": "Label",
               "rect": [
                 8,
-                287,
+                463,
                 35,
                 18
               ],

@@ -60,6 +60,7 @@ static func confirm_drop(ui: P0Ui, role: String, id: String) -> void:
 	keep.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	col.add_child(keep)
 	var drop := UiCommandButton.new("Drop request", UiCommandButton.Kind.DESTRUCTIVE)
+	drop.sends = true   # drop (§10.7.1 Offline)
 	drop.activated.connect(func():
 		ui.pending_drop = {"role": role, "id": id, "title": str(d.title), "noun": str(d.noun), "item": str(d.item)}
 		ui.command.emit({"type": "drop", "request": id}))

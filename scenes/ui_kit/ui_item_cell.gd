@@ -25,7 +25,9 @@ signal tapped
 signal gesture(outcome: Dictionary)
 
 enum Density { INVENTORY, QUICK, KITCHEN, GEAR }
-enum State { DEFAULT, SELECTED, EMPTY, LIFTED, DROP_TARGET, ZERO, GHOST }
+## UNCOLLECTED (InventoryCell 1405:92952, Fish-dex): the default surface with the icon dimmed to 35 %, no quantity, no
+## rarity dot — a silhouette not caught yet. InventoryCell only (the other mains draw it as DEFAULT).
+enum State { DEFAULT, SELECTED, EMPTY, LIFTED, DROP_TARGET, ZERO, GHOST, UNCOLLECTED }
 ## Compact/Kitchen/Cell states beyond default / selected / empty (WP1b B1-02; inPot / notForCooking 223):
 ##   HIDDEN       unknown page: grey dish silhouette + ingredient family dots, never the real dish art
 ##   CLUED        unknown page with a known slot: the silhouette and the family row with that slot lit
@@ -242,7 +244,8 @@ func pop_pin() -> void:
 	t.tween_property(_badge, ^"scale", Vector2.ONE, UiKit.secs(_PIN_POP_MS * 0.5)).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 
 ## QuickSlot State=new (1663:101150, §10.3.3 ④): a first-time item's slot rings once in color/new, in then out over
-## MOTION_NEW_UNLOCK_FLASH_MS; size, place and icon stay, no badge, no buzz. QuickSlot only.
+## MOTION_NEW_UNLOCK_FLASH_MS; size, place and icon stay, no badge, no buzz. QuickSlot and InventoryCell (the Fish-dex's
+## newly caught fish, 1699:102396).
 func flash() -> void:
 	if _new_ring == null: return
 	var half := UiKit.secs(UiTokens.MOTION_NEW_UNLOCK_FLASH_MS * 0.5)
@@ -262,6 +265,7 @@ func drawn_state() -> State:
 	if density != Density.QUICK and state in [State.DROP_TARGET, State.ZERO]: return State.DEFAULT
 	if density not in [Density.QUICK, Density.INVENTORY] and state == State.LIFTED: return State.DEFAULT
 	if density != Density.QUICK and state == State.GHOST: return State.EMPTY
+	if density != Density.INVENTORY and state == State.UNCOLLECTED: return State.DEFAULT
 	return state
 
 # ------------------------------------------------------------------ build
@@ -331,6 +335,12 @@ func _build_cell() -> void:
 		_home.self_modulate = UiTokens.COLOR_SECONDARY
 		_place(_home, 0.0, _STORED_AT.x, _STORED_AT.y, _STORED_ICON, _STORED_ICON)
 		_surface.add_child(_home)
+		# InventoryCell State=new (1699:102396): 2 px color/new inside the cell, flashed once like the QuickSlot's.
+		_new_ring = _box(_surface)
+		_new_ring.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		_new_ring.add_theme_stylebox_override(&"panel", UiStyleBox.make(Color.TRANSPARENT, UiTokens.RADIUS_INVENTORY_CELL,
+			UiTokens.COLOR_NEW, UiTokens.STROKE_SELECTED))
+		_new_ring.modulate.a = 0.0
 		return
 	_status = _box(self)
 	_place(_status, 0.0, 0.0, _KITCHEN_LABEL_TOP, side, _KITCHEN_LABEL_H)
@@ -485,9 +495,11 @@ func _refresh() -> void:
 			_name.text = "Empty" if empty else title   # an empty slot says only Empty (WP1b, A-08)
 		_:
 			_surface.add_theme_stylebox_override(&"panel", _cell_box(s, UiTokens.RADIUS_INVENTORY_CELL))
-			_pill.visible = quantity != "" and not empty
+			var dim := s == State.UNCOLLECTED
+			_pill.visible = quantity != "" and not empty and not dim
 			_qty.text = quantity
-			_dot.visible = rarity > 0 and not empty and not (density == Density.KITCHEN and rack)
+			_dot.visible = rarity > 0 and not empty and not dim and not (density == Density.KITCHEN and rack)
+			_icon.modulate.a = UiTokens.OPACITY_ZERO_ICON if dim else 1.0   # "Icon · dimmed" 35 %, as the ghost slot
 			if _home != null: _home.visible = stored and not empty
 			if rarity > 0:
 				_dot.add_theme_stylebox_override(&"panel", UiStyleBox.make(RARITY_COLORS[clampi(rarity - 1, 0, 3)], UiTokens.SIZE_RARITY_DOT * 0.5))

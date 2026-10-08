@@ -60,6 +60,7 @@ func _ready() -> void:
 	list.add_child(info)
 	var go := UiCommandButton.new(str(facts.button))
 	go.reason = str(facts.reason)
+	go.sends = true   # cook again (§10.7.1 Offline)
 	go.activated.connect(func(): cook.emit(facts.command))
 	go.unavailable_pressed.connect(func(r): unavailable.emit(r))
 	col.add_child(go)

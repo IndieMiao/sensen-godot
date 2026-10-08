@@ -166,6 +166,7 @@ func _build_recipe() -> Control:
 	_recipe_maybe.visible = false
 	_recipe.add_child(_recipe_maybe)
 	_recipe_button = UiCommandButton.new("Cook", UiCommandButton.Kind.PRIMARY, true)
+	_recipe_button.sends = true   # cook (§10.7.1 Offline)
 	_recipe_button.position = _RECIPE_BUTTON_AT
 	_recipe_button.size = _RECIPE_BUTTON
 	_recipe_button.activated.connect(func():
@@ -298,6 +299,7 @@ func _build_experiment() -> VBoxContainer:
 	info.pressed.connect(func(): info_requested.emit())
 	foot.add_child(info)
 	_cook = UiCommandButton.new("Cook", UiCommandButton.Kind.PRIMARY, true)
+	_cook.sends = true   # cook (§10.7.1 Offline)
 	_cook.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_cook.activated.connect(func(): if not pot.is_empty(): cook_requested.emit({"type": "cook", "items": pot.duplicate()}))
 	var cook_box := MarginContainer.new()   # the button resets its own minimum size; the box holds the 164 width

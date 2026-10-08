@@ -19,6 +19,7 @@ import { P0Store } from '../src/p0/store.js';
 import { AppearanceCatalog } from '../src/realtime/appearance.js';
 import { guardOptionsFromEnv, registerP0Guard, snapshotState, trustProxyFromEnv } from '../src/p0/guard.js';
 import { registerP0Admin } from '../src/p0/admin.js';
+import { P0Gate } from '../src/p0/gate.js';
 import { P0EventLog } from '../src/p0/telemetry.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -31,7 +32,16 @@ const store = new P0Store(content, stateFile);
 // P0_DEV=0 so no dev route is registered.
 const app = Fastify({ logger: false, bodyLimit: 32 * 1024, ...trustProxyFromEnv() });
 const guard = guardOptionsFromEnv();
-await registerP0Guard(app, guard);
+// SYS-UPDATE / SYS-MAINT (gate.ts): P0_MIN_VERSION / P0_UPDATE_URL / P0_MAINT / P0_MAINT_UNTIL, changed at run time by
+// the admin routes and kept in the save's folder (the data volume), so a restart keeps maintenance on.
+const gate = new P0Gate(path.join(path.dirname(stateFile), 'gate.json'));
+if (gate.loadError) console.log(JSON.stringify({ warn: 'gate_json_unreadable', error: gate.loadError }));
+{
+  const g = gate.state();
+  // A minimum without a download url is not enforced (gate.ts): say so loudly at start rather than strand players.
+  if (g.min_version > 0 && !g.update_on) console.log(JSON.stringify({ warn: 'min_version_without_update_url', min_version: g.min_version }));
+}
+await registerP0Guard(app, guard, gate);
 const dev = process.env.P0_DEV !== '0';
 // S7: observation log, one JSON line per command and reported UI moment (P0_EVENT_DIR; empty = off).
 const eventDir = process.env.P0_EVENT_DIR ?? path.join(path.dirname(stateFile), 'events');
@@ -41,9 +51,13 @@ const log = new P0EventLog(eventDir === '' ? undefined : eventDir);
 const rooms = new OutpostRooms(loadOutposts());
 registerP0Routes(app, { content, store, now: Date.now, dev, log, presence: () => rooms.total() });
 // The WebSocket upgrade checks the guard's demo keys itself: the guard's onRequest hook does not see it (SGODOT-232 D1).
-registerP0Online(app, { rooms, keys: guard.keys, appearances: new AppearanceCatalog(path.join(root, 'assets/farm/data/regions.json')) });
+registerP0Online(app, { rooms, keys: guard.keys, gate, appearances: new AppearanceCatalog(path.join(root, 'assets/farm/data/regions.json')) });
 const startedAt = Date.now();
-app.get('/v1/healthz', async () => ({ ok: true, p0: content.version, players: store.size(), up_s: Math.round((Date.now() - startedAt) / 1000) }));
+app.get('/v1/healthz', async () => {
+  const g = gate.state();
+  return { ok: true, p0: content.version, players: store.size(), up_s: Math.round((Date.now() - startedAt) / 1000),
+    maintenance: g.maintenance, min_version: g.update_on ? g.min_version : 0 };
+});
 const snapshots = process.env.P0_SNAPSHOT_DIR ?? path.join(path.dirname(stateFile), 'snapshots');
 setInterval(() => snapshotState(stateFile, snapshots, 48), 3_600_000).unref();
 const port = Number(process.env.P0_PORT ?? 3110);
@@ -53,7 +67,7 @@ console.log(JSON.stringify({ ready: true, port, content: content.version, dev, k
 const adminPort = Number(process.env.P0_ADMIN_PORT ?? 0);
 const admin = adminPort && process.env.P0_ADMIN_KEY ? Fastify({ logger: false, bodyLimit: 4 * 1024 }) : null;
 if (admin) {
-  registerP0Admin(admin, { content, store, now: Date.now, key: process.env.P0_ADMIN_KEY! });
+  registerP0Admin(admin, { content, store, now: Date.now, key: process.env.P0_ADMIN_KEY!, gate });
   await admin.listen({ port: adminPort, host: '127.0.0.1' });
 }
 for (const signal of ['SIGINT', 'SIGTERM'] as const) process.on(signal, () => { void Promise.all([app.close(), admin?.close()]).then(() => process.exit(0)); });

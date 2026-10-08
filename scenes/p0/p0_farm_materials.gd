@@ -112,7 +112,7 @@ func frame(v: Dictionary, card := "") -> void:
 	var stored := P0MaterialLogic.stored_notice(v, _stored_shown)
 	if stored != "":
 		_stored_shown = float(v.storage.auto.at)
-		rt.ui.float_text(stored, rt.anchor() + Vector2(0, -36), P0Ui.GREEN_D)
+		rt.ui.toast(stored)   # §4.8.6 回家入库: Toast Info `Stored · 12 Stone · 3 Copper Ore`
 
 ## World prompts (SGODOT-250, LOCK-07 v2): each gathering spot and the workbench show their icon button within
 ## P0WorldPrompts.RANGE — a spot's state (Ready, or Locked for Clay Bank before Homestead Lv2) from anywhere, in the
@@ -190,7 +190,8 @@ func _on_craft(v: Dictionary, e: Dictionary) -> void:
 			var line := "+%d %s" % [int(e.get("qty", 1)), P0Logic.item_name(v, item)]
 			var drawer := rt.ui.workbench()
 			if drawer == null or drawer.float_on(str(e.get("recipe", "")), line, P0Logic.icon(item)) == null:
-				rt.ui.float_text(line, rt.anchor(), P0Ui.GREEN_D)
+				rt.ui.queue_floats([{kind = "item", key = item, amount = int(e.get("qty", 1)),
+					fmt = "%s " + P0Logic.item_name(v, item), tone = UiFloatText.Tone.ITEM, icon = P0Logic.icon(item)}], rt.anchor())
 		"gear":
 			if rt.ui.workbench() != null: rt.ui.close_modal()
 			rt.ui.queue_card(func(): P0MaterialCards.open_crafted(rt.ui, rt.session.current(), item,
@@ -217,11 +218,9 @@ func _on_state(v: Dictionary, events: Array) -> void:
 		if str(e.get("kind", "")) == "craft": _on_craft(v, e)
 	for e in events:
 		if str(e.get("kind", "")) == "gather":
-			# Stacked above the runtime's own item floats (what went to the bag) at the same anchor, never across them.
-			var dy := -20.0
-			for line in P0MaterialLogic.gather_floats(v, e):
-				rt.ui.float_text(line, rt.anchor() + Vector2(0, dy), P0Ui.GREEN_D)
-				dy -= 16.0
+			# One item line with the runtime's own (what went to the bag), in the reply's three lines (q(49) ①).
+			rt.ui.queue_floats(P0MaterialLogic.gather_floats(v, e).map(func(line: String) -> Dictionary:
+				return {kind = "item", key = line, text = line, tone = UiFloatText.Tone.ITEM}), rt.anchor())
 	for e in events:
 		if str(e.get("kind", "")) == "mine" and str(e.get("action", "")) in ["enter", "continue"]:
 			_opening = true

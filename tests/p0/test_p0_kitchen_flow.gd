@@ -54,14 +54,14 @@ func test_a_dish_away_from_the_farmhouse_pops_no_card() -> void:
 	kept.auto = true
 	rt.session.state_changed.emit(rt.session.view, [kept, {"kind": "cabinet", "id": "dish_grilled_crucian@good", "delta": 1}])
 	# Read the toast at once: this test has no server, and a "Can't reach" toast may replace it a few frames later.
-	assert_str(rt.ui._toast.text).is_equal("Kept")   # the view has no cabinet figures: the bare line
+	assert_str(rt.ui.toast_text()).is_equal("Kept")   # the view has no cabinet figures: the bare line
 	for i in 2: await get_tree().process_frame
 	assert_bool(rt.ui.has_modal()).is_false()
 	var none := _dish()
 	none.none = true
-	rt.ui.toast("")
+	rt.ui.clear_toast()
 	rt.session.state_changed.emit(rt.session.view, [none])
-	assert_str(rt.ui._toast.text).is_equal("")   # a pot that made no dish says nothing here
+	assert_str(rt.ui.toast_text()).is_equal("")   # a pot that made no dish says nothing here
 	for i in 2: await get_tree().process_frame
 	assert_bool(rt.ui.has_modal()).is_false()
 	rt.detach(w)
@@ -115,7 +115,7 @@ func test_a_level_up_in_the_same_reply_waits_behind_the_result_card() -> void:
 	rt.ui.close_modal()   # Keep
 	for i in 2: await get_tree().process_frame
 	assert_bool(rt.ui.has_modal()).is_true()
-	assert_bool(rt.ui.root.find_children("*", "Label", true, false).any(func(l): return (l as Label).text == "LEVEL UP")).is_true()
+	assert_int(rt.ui.root.find_children("*", "UiMomentBanner", true, false).size()).is_equal(1)   # the level-up banner (233)
 	assert_str(k.phase).is_equal("idle")
 
 func test_the_tab_asked_for_is_the_tab_that_opens() -> void:
@@ -146,8 +146,23 @@ func test_a_second_tap_on_a_bag_cell_puts_a_second_one_in() -> void:
 	assert_array(k.pot).is_equal(["fish_crucian", "fish_crucian"])
 	k._on_ingredient("fish_crucian", Vector2.INF)   # two slots: the pot is full, nothing more goes in
 	assert_array(k.pot).is_equal(["fish_crucian", "fish_crucian"])
-	assert_str(rt.ui._toast.text).is_equal("The pot is full · tap ✕ above to take one out")   # q(64)
+	assert_str(rt.ui.toast_text()).is_equal("The pot is full · tap ✕ above to take one out")   # q(64)
 	k._take_out(1, Vector2.INF)
 	assert_array(k.pot).is_equal(["fish_crucian"])
 	rt.ui.close_modal()
 	await get_tree().process_frame
+
+func test_back_in_a_room_takes_the_open_layers_own_way_back() -> void:
+	# 李元芳 int7: in the farmhouse, Back on a Fish-dex card closed the whole layer (close_modal) instead of going back to
+	# the Fish-dex, as it does on the farm; the next Back left the room. Rooms now use the UI's close_top_layer.
+	var r := await _farmhouse()
+	var back_to := []
+	rt.ui._open_modal(Control.new())   # a second-level card …
+	rt.ui._modal_back = func(): back_to.append("fish-dex")   # … whose way back is the Fish-dex (open_fish_card)
+	assert_bool(r.is_back_navigation_locked()).is_true()
+	assert_array(back_to).is_equal(["fish-dex"])
+	# With the layer gone, Back is the door's again: the room walks out and still handles Back itself.
+	rt.ui.close_modal()
+	await get_tree().process_frame
+	assert_bool(r.is_back_navigation_locked()).is_true()
+	assert_str(str(r.get("_walk").get("name", ""))).is_equal("exit")

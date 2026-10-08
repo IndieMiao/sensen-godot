@@ -80,6 +80,7 @@ func _init() -> void:
 	_needs.add_theme_constant_override(&"margin_bottom", _NEEDS_PAD)
 	add_child(_needs)
 	_command = UiCommandButton.new("", UiCommandButton.Kind.PRIMARY, true)
+	_command.sends = true   # Deliver / Track (§10.7.1 Offline)
 	_command.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	_command.activated.connect(func(): command_pressed.emit())
 	_command.unavailable_pressed.connect(func(r: String): unavailable_pressed.emit(r))
@@ -120,7 +121,7 @@ func show_request(d: Dictionary) -> void:
 	_command.visible = not done and label != ""
 	_command.label = label
 	_command.reason = str(d.get("reason", ""))
-	_command.custom_minimum_size.x = _COMMAND_W   # a compact command resets its size on each label; a longer gap grows it
+	_command.min_width = _COMMAND_W   # kept through PENDING and Offline; a longer gap grows it
 
 func command_button() -> UiCommandButton: return _command
 

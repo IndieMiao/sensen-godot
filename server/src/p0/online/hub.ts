@@ -10,6 +10,7 @@ import type { IncomingMessage } from 'node:http';
 import type { Duplex } from 'node:stream';
 import { WebSocket, WebSocketServer } from 'ws';
 import { defaultAppearance, type Appearance, type AppearanceCatalog } from '../../realtime/appearance.js';
+import { upgradeRefusal, type P0Gate } from '../gate.js';
 import { P0_ACTIONS, snapshotFrame } from './frame.js';
 import { OutpostRooms, type Occupant } from './rooms.js';
 
@@ -31,7 +32,7 @@ export const LIMITS = {
 interface Conn { ws: WebSocket; player: string; epoch: number; appearance: Appearance; tokens: number; tokenAt: number; lastSeen: number; dressedAt: number }
 /** keys: the demo access keys (P0_ACCESS_KEYS, SGODOT-232 D1). The upgrade is not a Fastify request, so the
  * guard's onRequest hook never sees it: the hub checks x-p0-key itself. Empty or absent = no key (local playtests). */
-export interface P0OnlineDeps { rooms: OutpostRooms; appearances?: AppearanceCatalog; now?: () => number; keys?: string[] }
+export interface P0OnlineDeps { rooms: OutpostRooms; appearances?: AppearanceCatalog; now?: () => number; keys?: string[]; gate?: P0Gate }
 
 export class P0OnlineHub {
   readonly conns = new Set<Conn>();
@@ -51,6 +52,9 @@ export class P0OnlineHub {
       socket.end('HTTP/1.1 401 Unauthorized\r\nConnection: close\r\n\r\n');
       return;
     }
+    // SYS-UPDATE / SYS-MAINT (gate.ts): the same 426 / 503 and JSON body as the routes, and no upgrade.
+    const refused = this.deps.gate?.check(req.headers);
+    if (refused) { socket.end(upgradeRefusal(refused)); return; }
     const player = String(req.headers['x-p0-player'] ?? '');
     if (!PLAYER_RE.test(player)) { socket.end('HTTP/1.1 400 Bad Request\r\nConnection: close\r\n\r\n'); return; }
     if (this.conns.size >= LIMITS.connections) { socket.end('HTTP/1.1 503 Service Unavailable\r\nConnection: close\r\n\r\n'); return; }

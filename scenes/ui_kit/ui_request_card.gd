@@ -81,6 +81,7 @@ func _init(data_: Dictionary = {}) -> void:
 		col.add_child(h)
 	_action = UiCommandButton.new(str(data.get("action", "Accept")))
 	_action.reason = str(data.get("reason", ""))
+	_action.sends = bool(data.get("sends", false))   # Accept / Deliver to the server (§10.7.1 Offline)
 	_action.fit_text = true
 	_action.activated.connect(func(): action_pressed.emit())
 	col.add_child(_action)

@@ -18,6 +18,9 @@ signal show_spot(where: String)
 ## A target in another space (TodayRow `Show on map`): leave for the map and point at its pin ("home",
 ## "pond:<id>", "tackle").
 signal show_on_map(target: String)
+## A panel this UI does not own was asked for (the gate card's Cookbook, the Fish-dex's Cookbook tab): the host
+## opens it if it can (LOCK-08: never by travelling).
+signal panel_requested(panel: String)
 signal home_choice(choice: String)
 signal recenter()
 signal place_pressed()
@@ -125,8 +128,7 @@ var _teach: PanelContainer
 var _teach_left := 0.0
 var tips: P0Guide.TipQueue   # the TipCard order and "shown before" (SGODOT-232 U6)
 var _taught := {}
-var _toast: Label
-var _toast_left := 0.0
+var _toasts: ToastLayer   # Toast R1 (SGODOT-233): one at a time, above the quick bar
 var _regular: FontVariation
 
 # ---------------------------------------------------------------- build
@@ -146,15 +148,13 @@ func _ready() -> void:
 	_build_hud()
 	_build_bar()
 	_build_fab()
-	_toast = _label("", 11, INK, true)
-	_toast.add_theme_stylebox_override("normal", _box(Color(1, 1, 1, 0.96), 14, EDGE, 1, Vector4(12, 8, 12, 8)))
-	_toast.set_anchors_preset(Control.PRESET_CENTER_TOP)
-	_toast.position = Vector2(-150, 150)
-	_toast.custom_minimum_size = Vector2(300, 0)
-	_toast.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_toast.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_toast.hide()
-	root.add_child(_toast)
+	_toasts = ToastLayer.new()
+	_toasts.theme = UiKit.theme()
+	root.add_child(_toasts)
+	# Over the quick bar's top edge, left of the main action key; inside the bag the bar is docked at the drawer's
+	# fixed bottom row, so the toast sits above that (WP2 D-01, q(16)). With no bar on screen: the bar's spot.
+	_toasts.anchor_above(_bar)
+	_toasts.action_pressed.connect(_on_toast_action)
 	if dev_tools_on(OS.is_debug_build(), P0Session.is_demo_build()): _build_dev()
 	if _pending.has("mode"): set_mode(_pending.mode)
 	if _pending.has("place"): set_place(_pending.place)
@@ -163,9 +163,6 @@ func _ready() -> void:
 	_pending.clear()
 
 func _process(dt: float) -> void:
-	if _toast_left > 0.0:
-		_toast_left -= dt
-		if _toast_left <= 0.0: _toast.hide()
 	if _teach_left > 0.0:
 		_teach_left -= dt
 		if _teach_left <= 0.0: _hide_tip()
@@ -327,7 +324,6 @@ func set_view(v: Dictionary) -> void:
 	_refresh_hud()
 	_refresh_bar()
 
-func _skill_pct(s: Dictionary) -> float: return P0Logic.skill_progress(s)
 
 ## HUD from the view, the next action's cost (Low = short of it) and where the player actually is: the
 ## kitchen is the farmhouse's stove corner, so the chip reads "Shanghai · Farmhouse" there (LOCK-06).
@@ -698,6 +694,15 @@ func _save_quick() -> void:
 ## TODO(SGODOT-221 → stage 3, F-08 command lifecycle): drive HOLDING (hold_progress) and PENDING from the command
 ## queue; P0 has no source for them yet.
 func set_action(a: Dictionary) -> void:
+	# SYS-OFFLINE (WP6, §10.7.1): offline every action key is Unavailable with `Offline` as its second line (`Sow ·
+	# Offline`, the verb follows the action); a tap says nothing more than the banner already does.
+	if offline:
+		a = a.duplicate()
+		a.sub = "Offline"
+		a.enabled = false
+		a.amber = false
+		a.need = 0
+		a.erase("toast")
 	_fab_state = a
 	var k := _keys.key()
 	k.verb = str(a.get("verb", ""))
@@ -1003,17 +1008,283 @@ func _marker_area() -> Rect2:
 ## than one line wraps (Layout=Wrap, two lines at most). `tone` also takes the older Color argument (callers in
 ## other PRs, e.g. SGODOT-231's material notices): any colour draws in the ITEM tone.
 func float_text(text: String, screen: Vector2, tone: Variant = UiFloatText.Tone.ITEM, icon: Texture2D = null, stack := 0) -> UiFloatText:
-	var t: UiFloatText.Tone = UiFloatText.Tone.ITEM if tone is Color else int(tone)
-	var f := UiFloatText.new(text, t, icon, UiFloatText.Layout.WRAP if text.length() > _FLOAT_HUG_CHARS else UiFloatText.Layout.HUG)
-	f.theme = UiKit.theme()
-	root.add_child(f)
-	f.play(screen, stack)
+	var f := _make_float(text, UiFloatText.Tone.ITEM if tone is Color else int(tone), icon)
+	f.play(_float_start(screen, [f], stack), stack)
 	return f
 
-func toast(text: String, seconds := 2.6) -> void:
-	_toast.text = text
-	_toast.show()
-	_toast_left = seconds
+func _make_float(text: String, tone: int, icon: Texture2D) -> UiFloatText:
+	var f := UiFloatText.new(text, tone, icon, UiFloatText.Layout.WRAP if text.length() > _FLOAT_HUG_CHARS else UiFloatText.Layout.HUG)
+	f.theme = UiKit.theme()
+	root.add_child(f)
+	return f
+
+## Floats never rise over the HUD (int6, 李元芳: `+5 Cooking XP ★` crossed the Today chip; 不知火舞 233): a group's start
+## is pushed down until its top line, at the top of its rise, still clears the HUD rows by FLOAT_HUD_GAP. `top_index`
+## = that line's stack index (the group's lines minus one).
+const FLOAT_HUD_GAP := 8.0
+func _float_start(screen: Vector2, lines: Array, top_index: int) -> Vector2:
+	var hud_bottom := _marker_area().position.y + _kit.global_position.y - root.global_position.y
+	var h := 0.0
+	for f in lines: h = maxf(h, (f as UiFloatText).shown_size().y)
+	var lowest := hud_bottom + FLOAT_HUD_GAP + h + UiFloatText._RISE \
+		+ UiFloatText._STACK_RISE * clampi(top_index, 0, UiFloatText._STACK_MAX - 1)
+	return Vector2(screen.x, maxf(screen.y, lowest))
+
+## The lowest a pushed-down group may start (its bottom): above the quick bar, an open drawer, and the main action key
+## when the group's width reaches over it (不知火舞 233), in this UI's root space.
+func _float_floor(x: float, half_w: float) -> float:
+	var y := root.size.y
+	for c in [_bar, _keys]:
+		if c == null or not (c as Control).is_visible_in_tree(): continue
+		var r := (c as Control).get_global_rect()
+		var gx := x + root.global_position.x
+		if c == _keys and (r.end.x < gx - half_w or r.position.x > gx + half_w): continue
+		y = minf(y, r.position.y)
+	if _modal != null and _modal.get_child_count() > 1:
+		var content := _modal.get_child(1) as Control
+		if content is UiDrawer: y = minf(y, content.get_global_rect().position.y)
+	return y - root.global_position.y
+
+# ---------------------------------------------------------------- one reply's floats (q(49) ①, §4.8.6)
+## The order of one reply's lines: Energy → XP → items → coins → affinity (q(49) ①).
+const FLOAT_ORDER := ["energy", "xp", "first", "item", "coins", "affinity"]
+## Kinds a later reply adds into while their line is up: XP (`+40 XP · 20 plants`, §4.8.3 XP 入账). Items, Energy and
+## coins float per reply (each plot's `+1 Radish`, each bed's `−2 Energy`).
+const FLOAT_MERGE_KINDS := ["xp"]
+const FLOAT_MAX_LINES := 3
+## A line of a kind still up — before its fade starts (UiFloatText 650 ms) — takes the next reply's amount in place;
+## while the action key is held (a held harvest, a labour beat apart) for as long as the line is still there.
+const _FLOAT_MERGE_MS := 650
+const _FLOAT_MERGE_PX := 32.0
+var float_clock := Callable(Time, &"get_ticks_msec")
+var _live_floats := {}   # kind -> {node, parts: {key: part}, at, ms}
+
+## One server reply's floats (q(49) ①; §4.8.6). parts: [{kind, key, amount, fmt, tone, icon}] in any order — `fmt`
+## takes the signed amount (`%s XP`, `%s Timber`); a part without fmt gives its `text` as it is (affinity). Parts of a
+## kind share one line: the same key adds up (`+15 XP`, `−4 Energy`), different keys join (`+6 Timber · +2 Stone`).
+## Lines go Energy → XP → items → coins → affinity, at most three; the rest join the third (`+6 Timber · +14 coins`),
+## nothing is dropped. A kind still up from the last reply at the same place takes the new amounts in place and
+## bumps (a held harvest: `+4 XP` → `+8 XP` …) instead of a new float. Returns the lines' floats.
+func float_lines(parts: Array, at: Vector2) -> Array:
+	var kinds := {}
+	for p in parts:
+		var k := str(p.get("kind", "item"))
+		if not kinds.has(k): kinds[k] = {}
+		_float_add(kinds[k], p)
+	var order: Array = FLOAT_ORDER.filter(func(k): return kinds.has(k))
+	for k in kinds:
+		if not order.has(k): order.append(k)
+	var shown: Array = []
+	var fresh: Array = []   # [{kind, text, tone, icon, merged, overflow}] lines that need a new float
+	var now := int(float_clock.call())
+	for i in mini(order.size(), FLOAT_MAX_LINES):
+		var k: String = order[i]
+		var merged: Dictionary = kinds[k]
+		var extra: Array = order.slice(FLOAT_MAX_LINES) if i == FLOAT_MAX_LINES - 1 else []
+		if extra.is_empty() and k in FLOAT_MERGE_KINDS:
+			var live: Dictionary = _live_floats.get(k, {})
+			var node: UiFloatText = live.get("node") if not live.is_empty() and is_instance_valid(live.get("node")) else null
+			# Held: the line stays where it rose while the player walks on (§4.8.3); otherwise the same place, briefly.
+			var near := fab_held or (not live.is_empty() and now - int(live.get("ms", 0)) < _FLOAT_MERGE_MS and (live.at as Vector2).distance_to(at) < _FLOAT_MERGE_PX)
+			if node != null and not node.is_queued_for_deletion() and near:
+				for p in merged.values(): _float_add(live.parts, p)
+				(live.node as UiFloatText).bump(_float_line_text(live.parts))
+				live.ms = now
+				shown.append(live.node)
+				continue
+		var text := _float_line_text(merged)
+		for e in extra: text += " · " + _float_line_text(kinds[e])   # the overflow joins the last line
+		var first: Dictionary = merged.values()[0]
+		var tone: int = first.get("tone", UiFloatText.Tone.ITEM)
+		# Energy is coloured by what it adds up to; a line of text parts only (a floor fee) keeps its own tone.
+		if k == "energy" and merged.values().any(func(p): return p.has("fmt")):
+			tone = UiFloatText.Tone.ENERGY_COST if _float_sum(merged) < 0 else UiFloatText.Tone.ENERGY_GAIN
+		fresh.append({kind = k, text = text, tone = tone, icon = first.get("icon", null), merged = merged, overflow = not extra.is_empty()})
+	if fresh.is_empty(): return shown
+	var base := shown.size()   # lines bumped in place keep the lower places
+	var nodes: Array = fresh.map(func(l): return _make_float(l.text, l.tone, l.icon))
+	var start := _float_start(at, nodes, base + nodes.size() - 1)
+	var half_w := 0.0
+	for n in nodes: half_w = maxf(half_w, (n as UiFloatText).shown_size().x * 0.5)
+	if nodes.size() > 1 and start.y > at.y and start.y > _float_floor(at.x, half_w):
+		# Pushed down under the HUD the group would sit on the bar, the key or a drawer: only the first line stays and
+		# the rest join it (不知火舞 233, same joining as q(49) ①).
+		for n in nodes: (n as UiFloatText).queue_free()
+		var one: Dictionary = fresh[0].duplicate()
+		one.text = " · ".join(fresh.map(func(l): return str(l.text)))
+		one.overflow = true
+		fresh = [one]
+		nodes = [_make_float(one.text, one.tone, one.icon)]
+		start = _float_start(at, nodes, base)
+	for j in nodes.size():
+		var f: UiFloatText = nodes[j]
+		f.play(start, base + j)
+		var l: Dictionary = fresh[j]
+		if not l.overflow: _live_floats[l.kind] = {node = f, parts = (l.merged as Dictionary).duplicate(true), at = at, ms = now}
+		shown.append(f)
+	return shown
+
+var _float_batch := {}   # Vector2i anchor -> {at, parts}, flushed once at the end of the frame
+
+## Adds parts to this frame's batch at `at` (see float_lines): everything one server reply says — the runtime's
+## Energy / XP / items / coins and a world's own lines (a gather's `+6 Timber · Stored`, a floor fee) — lands in one
+## float_lines call, so the three-line cap and the order hold across callers.
+func queue_floats(parts: Array, at: Vector2) -> void:
+	if parts.is_empty(): return
+	if _float_batch.is_empty(): _flush_floats.call_deferred()
+	var key := Vector2i(at.round())
+	if not _float_batch.has(key): _float_batch[key] = {at = at, parts = []}
+	(_float_batch[key].parts as Array).append_array(parts)
+
+func _flush_floats() -> void:
+	var batch := _float_batch
+	_float_batch = {}
+	for k in batch: float_lines(batch[k].parts, batch[k].at)
+
+static func _float_add(into: Dictionary, p: Dictionary) -> void:
+	var key := str(p.get("key", p.get("fmt", p.get("text", ""))))
+	if into.has(key) and p.has("fmt"):
+		into[key].amount = int(into[key].amount) + int(p.get("amount", 0))
+		into[key].count = int(into[key].get("count", 1)) + int(p.get("count", 1))
+	else: into[key] = p.duplicate()   # a new key, or a text part (the latest wins)
+
+static func _float_sum(parts: Dictionary) -> int:
+	var n := 0
+	for p in parts.values(): n += int(p.get("amount", 0))
+	return n
+
+static func _float_line_text(parts: Dictionary) -> String:
+	return " · ".join(parts.values().map(func(p: Dictionary) -> String:
+		if not p.has("fmt"): return str(p.get("text", ""))
+		var a := int(p.get("amount", 0))
+		var line := str(p.fmt) % (("+%d" % a) if a >= 0 else ("−%d" % -a))
+		# A held harvest's XP counts its plants once more than one went into it: `+40 XP · 20 plants`.
+		if str(p.get("unit", "")) != "" and int(p.get("count", 1)) > 1: line += " · %d %s" % [int(p.count), str(p.unit)]
+		return line))
+
+# ---------------------------------------------------------------- system states (SGODOT-233, WP6, §10.7.1)
+## The runtime's network state: offline the action keys read `Offline` (set_action) and the Offline banner stays up.
+var offline := false: set = set_offline
+## The Offline banner's Retry: the runtime checks the server now.
+signal sys_retry
+var _sys: UiSysBanner
+var _sys_id := 0
+const _SYS_UNDER_HUD := 2.0   # SysBanner y 100: 2 under the HUD's two rows (16 + 82)
+
+func set_offline(v: bool) -> void:
+	offline = v
+	# Every command button on screen reads `Offline` and does nothing; drawers stay open (§10.7.1).
+	UiCommandButton.set_offline(get_tree() if is_inside_tree() else null, v)
+	if is_node_ready() and not _fab_state.is_empty(): set_action(_fab_state)
+
+func _exit_tree() -> void:
+	if offline: UiCommandButton.set_offline(get_tree(), false)   # a static flag: it must not outlive this UI
+
+## Panel command lifecycle (WP7-B F-08, §10.7.1): the runtime watches the session with it. A command key that starts
+## in the same frame a sending button was pressed belongs to that button: it ignores repeat taps at once, dims after
+## MOTION_PENDING_DELAY_MS without a reply (label kept), and comes back when the command settles (8 s at most).
+var lifecycle := CommandLifecycle.new()
+
+func _init() -> void:
+	add_child(lifecycle)   # ticks SUBMITTING → PENDING; a child from the start, so a UI never added frees it too
+
+func track_pressed(key: String) -> void:
+	var b := UiCommandButton.take_pressed()
+	if b != null and is_instance_valid(b): b.track(lifecycle, key)
+
+## The system line under the HUD (SysBanner, x 16 y 100): over the scene and over an open drawer (SYS-OFFLINE-3).
+## `seconds` > 0 takes it down after that long (Back online 1.5 s, Didn't go through 3 s); 0 keeps it (Offline).
+## Offline outranks Didn't go through (WP6 priority): while offline, a failed command does not replace it.
+func show_sys(kind: UiSysBanner.Kind, message: String, seconds := 0.0) -> void:
+	if _sys != null and is_instance_valid(_sys) and _sys.visible and _sys.kind == UiSysBanner.Kind.OFFLINE and kind == UiSysBanner.Kind.CMD_FAIL:
+		return
+	if _sys == null or not is_instance_valid(_sys):
+		_sys = UiSysBanner.new()
+		_sys.theme = UiKit.theme()
+		_sys.set_anchors_preset(Control.PRESET_CENTER_TOP)
+		_sys.grow_horizontal = Control.GROW_DIRECTION_BOTH
+		_sys.retry_pressed.connect(func(): sys_retry.emit())
+		root.add_child(_sys)
+	_sys.kind = kind
+	_sys.message = message
+	_sys.offset_left = -UiSysBanner.WIDTH * 0.5
+	_sys.offset_right = UiSysBanner.WIDTH * 0.5
+	_sys.offset_top = UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H + _SYS_UNDER_HUD + safe_top()
+	_sys.visible = true
+	root.move_child(_sys, -1)
+	_sys_id += 1
+	_place_under_hud()
+	if seconds > 0.0:
+		var id := _sys_id
+		get_tree().create_timer(seconds).timeout.connect(func():
+			if id == _sys_id and is_instance_valid(_sys):
+				_sys.visible = false
+				_place_under_hud())
+
+func hide_sys() -> void:
+	_sys_id += 1
+	if _sys != null and is_instance_valid(_sys): _sys.visible = false
+	_place_under_hud()
+
+## The creel badge and the status line sit under the HUD; the system line takes that spot while it is up, so they move
+## down by SYS_SHIFT (WP6, 206 31317bce) and come back when it goes.
+const SYS_SHIFT := 48.0
+func _place_under_hud() -> void:
+	var y := UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H + UiTokens.SPACE_WITHIN + safe_top()
+	if _sys != null and is_instance_valid(_sys) and _sys.visible: y += SYS_SHIFT
+	for c in [_creel, _status]:
+		if c != null: (c as Control).position.y = y
+
+## What the system line shows now ("" when it is down): tests and the runtime read it.
+func sys_text() -> String: return _sys.message if _sys != null and is_instance_valid(_sys) and _sys.visible else ""
+
+## Toast (Toast R1, §4.8.6; q(49) ⑤): one at a time, a new one replaces the one showing and the same sentence again
+## within 2 s only stays up longer. Info; `seconds` > 0 overrides the length rule (2 s + 0.5 s per 20 characters,
+## at most 5 s). A tap closes it early. Feedback the player must confirm is a card, never a toast.
+func toast(text: String, seconds := 0.0) -> void:
+	if not _toasts: return
+	_aim_toast()
+	_toasts.show_toast(text, ToastLayer.Severity.INFO, "", seconds)
+
+## Where the toast sits (WP2 D-01, q(16)): over the quick bar's top edge, in the scene or docked in the bag; over a
+## drawer without the bar (the workbench, a counter), just above the drawer's top edge — clear of its rows and of the
+## Close key on the right — when there is room under the HUD; else the bar's spot.
+func _aim_toast() -> void:
+	if _bar != null and _bar.is_visible_in_tree():
+		_toasts.anchor_above(_bar)
+		return
+	var content: Control = _modal.get_child(1) if _modal != null and _modal.get_child_count() > 1 else null
+	if content != null and content.is_visible_in_tree():
+		var top := content.get_global_rect().position.y - root.global_position.y
+		var hud_bottom := _marker_area().position.y + _kit.global_position.y - root.global_position.y
+		if top - UiTokens.SPACE_OVERLAY_BODY - UiTokens.SIZE_TOAST_MIN_H >= hud_bottom:
+			_toasts.anchor_above(content)
+			return
+	_toasts.anchor_above(_bar)
+
+## A refused command (§4.8.6 `命令被拒（非体力）`, wording per appendix B) or FISH-4's full creel. `action` adds a
+## guiding line (`Open bag ›`) that acts in place and never travels (LOCK-08).
+func toast_error(text: String, action := "") -> void:
+	if not _toasts: return
+	_aim_toast()
+	_toasts.show_toast(text, ToastLayer.Severity.ERROR, action)
+
+## Done, worth saying once: a cleared mine floor, a resident's meal (§4.8.6 Toast Success).
+func toast_success(text: String) -> void:
+	if not _toasts: return
+	_aim_toast()
+	_toasts.show_toast(text, ToastLayer.Severity.SUCCESS)
+
+## What the toast says now ("" when none is up).
+func toast_text() -> String: return _toasts.current_text() if _toasts else ""
+
+## Takes the toast down now (tests, or a panel that replaces what it said).
+func clear_toast() -> void:
+	if _toasts: _toasts.dismiss()
+
+func _on_toast_action(action: String) -> void:
+	match action:
+		"Open bag": open_bag()
 
 # ---------------------------------------------------------------- modals
 ## Going to the background cancels a slot drag: the slot flies back, nothing changes (LOCK-04 v1.10).
@@ -1092,6 +1363,9 @@ func queue_card(show: Callable) -> void:
 
 func _drop_modal() -> void:
 	_modal_back = Callable()   # each layer sets its own way back after it opens
+	if _moment_open:   # a result moment went: a waiting TipCard may come up now (q(49) ⑥)
+		_moment_open = false
+		if tips: tips.moment_closed()
 	_bag_drag_end()   # a bag cell lifted toward the bar goes with its drawer
 	undock_bar()   # before the drawer holding it goes (SGODOT-225)
 	if _modal: _modal.queue_free()
@@ -1124,6 +1398,8 @@ func _open_modal(content: Control, dim := 0.32, hide_controls := false) -> void:
 			(sb as StyleBoxFlat).bg_color.a = 1.0
 			content.add_theme_stylebox_override("panel", sb)
 	root.add_child(holder)
+	root.move_child(_toasts, -1)   # a toast stays readable over a drawer or card
+	if _sys != null and is_instance_valid(_sys): root.move_child(_sys, -1)   # the system line too (SYS-OFFLINE-3)
 	_modal = holder
 	if hide_controls:
 		_keys.visible = false
@@ -1386,20 +1662,58 @@ func open_kai_greeting() -> void:
 ## The drawer follows the view while open (set_view); its buttons come back here as commands with the shop.
 var _counter: P0CounterDrawer
 var _counter_ctx := {}   # role -> the last keeper ctx an outpost gave
+## STALL-NEW for the visit in progress: worked out when the stall opens from the world and kept while its board sheets
+## (BOARD-1 / BOARD-3 / BOARD-DROPPED) go back to it, so `◆ New for you` stays for the whole visit (亚瑟 on #77).
+var _stall_visit_new: Variant = null
+const _COUNTER_FLOW := ["counter", "board_request", "board_drop", "board_dropped"]
 
 func open_counter(role: String, opts := {}) -> void:
 	if opts.has("ctx"): _counter_ctx[role] = opts.ctx
-	var d := P0CounterDrawer.new(view, role, _counter_ctx.get(role, {}), str(opts.get("section", "buy")))
+	var ctx: Dictionary = _counter_ctx.get(role, {}).duplicate()
+	# STALL-NEW-2 (E-04): this visit's rows say `◆ New for you` for what opened since the last one; they are seen once
+	# the Buy shelf has been in front (a visit that only read the board leaves the stall's New for next time).
+	if role == "homestead":
+		if _stall_visit_new == null or not (modal_kind in _COUNTER_FLOW): _stall_visit_new = stall_new_ids()
+		ctx["new"] = _stall_visit_new
+	var d := P0CounterDrawer.new(view, role, ctx, str(opts.get("section", "buy")))
 	d.theme = UiKit.theme()
 	d.safe_bottom = safe_bottom()
 	d.close_requested.connect(close_modal)
 	d.action_requested.connect(func(a: StringName, id: String, p: Dictionary): _counter_action(role, a, id, p))
-	d.section_changed.connect(func(sec: String): if sec == "board": _fill_board(d))
+	d.section_changed.connect(func(sec: String):
+		if sec == "board": _fill_board(d)
+		if sec == "buy" and role == "homestead": _mark_stall_seen())
 	_open_modal(d, UiTokens.OPACITY_SCRIM_COUNTER, true)
+	if role == "homestead" and d.section == "buy": _mark_stall_seen()
 	if d.section == "specialty": _close_above(d, _CLOSE_ABOVE_SPECIALTY, P0CounterDrawer.SPECIALTY_PAD)   # MARKET-SPECIALTY
 	_counter = d
 	modal_kind = "counter"
 	if d.section == "board" or d.is_short(): _fill_board(d)
+
+## STALL-NEW (E-04, 1378:92885 / §9.5.2): Homestead Stall goods unlocked since the stall was last opened — the stall's
+## world icon wears New until a visit, whose rows then read `◆ New for you`. What the player could already buy when this
+## build first saw them counts as seen (no New on day one); kept with the teaching tips on this device.
+func stall_new_ids() -> Array:
+	var open: Array = (view.get("stall", {}).get("buy", []) as Array).filter(func(o): return bool(o.get("unlocked", true))).map(func(o): return str(o.id))
+	if open.is_empty(): return []
+	_load_tips()
+	if not _taught.has("stall_seen"):
+		_taught["stall_seen"] = open
+		_save_tips()
+		return []
+	var seen: Array = _taught.stall_seen if _taught.stall_seen is Array else open
+	return open.filter(func(id): return not seen.has(id))
+
+func stall_has_new() -> bool: return not stall_new_ids().is_empty()
+
+func _mark_stall_seen() -> void:
+	var open: Array = (view.get("stall", {}).get("buy", []) as Array).filter(func(o): return bool(o.get("unlocked", true))).map(func(o): return str(o.id))
+	_load_tips()
+	var seen: Array = _taught.get("stall_seen", []) if _taught.get("stall_seen", []) is Array else []
+	for id in open:
+		if not seen.has(id): seen.append(id)
+	_taught["stall_seen"] = seen
+	_save_tips()
 
 func _counter_action(role: String, action: StringName, id: String, payload: Dictionary) -> void:
 	match action:
@@ -1576,6 +1890,7 @@ func open_rest_card() -> void:
 	if str(st.state) != "used":
 		var b := UiCommandButton.new(str(st.button) if st.can_rest else "", UiCommandButton.Kind.PRIMARY)
 		if not st.can_rest: b.reason = str(st.reason)
+		b.sends = true   # rest (§10.7.1 Offline)
 		b.activated.connect(func(): close_modal(); command.emit({"type": "rest"}))
 		v.add_child(b)
 	var bye := UiDismissButton.new(str(st.close))
@@ -1605,27 +1920,20 @@ func _kit_card() -> VBoxContainer:
 	_open_modal(center, UiTokens.OPACITY_SCRIM_MODAL)
 	return v
 
-func show_level_up(ev: Dictionary) -> void:
-	var card := _center_card(310)
-	card.add_child(_label("LEVEL UP", 10, GREEN_D, true))
-	var t := _label("%s Lv %d" % [str(ev.skill).capitalize(), int(ev.level)], 26, GREEN_D, true)
-	card.add_child(t)
-	if int(ev.get("energy", 0)) > 0: card.add_child(_label("+%d Energy" % int(ev.energy), 14, GREEN_D, true))
-	var unlock := P0Logic.unlock_line(view, str(ev.skill), int(ev.level))
-	if unlock != "":
-		var ul := _label(unlock, 10, INK, true)
-		ul.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		ul.custom_minimum_size = Vector2(280, 0)
-		card.add_child(ul)
-	for g in ev.get("gifts", []):
-		var gid := str(g[0])
-		if gid.begins_with("recipe:"):
-			card.add_child(_label("Recipe card: %s" % P0Logic.item_name(view, gid.substr(7)), 10, INK, true))
-		else:
-			card.add_child(_label("Level-up gift: %d %s" % [int(g[1]), P0Logic.item_name(view, gid)], 10, INK, true))
-	var ok := _pill_button("Got it", true)
-	ok.pressed.connect(close_modal)
-	card.add_child(ok)
+## A skill level-up (§4.8.3 / §4.8.6): the MomentBanner P0Logic.level_banner builds — the account's first one with the
+## teaching line and `Use bait` (≤ 3 s), later ones 1.5 s with what opened and what is next. `first`: no skill had
+## levelled before this one.
+func show_level_up(ev: Dictionary, first := false) -> void:
+	var spec := P0Logic.level_banner(view, ev, first)
+	show_banner(spec, func(): _banner_action(str(spec.get("action_id", ""))))
+
+func _banner_action(id: String) -> void:
+	match id:
+		"use_bait":   # puts the gift bait on the hook, in place (the quick bar's bait slot, q(44))
+			for s in _bag_slots():
+				if str(s.get("id", "")).begins_with("bait_"):
+					if bar_mode == "fish" and selected_bait != str(s.id): _on_slot_tapped(str(s.id))
+					break
 
 func _center_card(width: float) -> VBoxContainer:
 	var center := CenterContainer.new()
@@ -1923,7 +2231,9 @@ func open_resident_request(id: String) -> void:
 		close_modal()
 		command.emit(cmd)
 		return
-	var card := UiRequestCard.new(_request_card_data(view, id, d))
+	var data := _request_card_data(view, id, d)
+	data["sends"] = not cmd.is_empty()   # Accept sends; an empty one only closes
+	var card := UiRequestCard.new(data)
 	card.theme = UiKit.theme()
 	card.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
 	card.offset_left = UiTokens.SIZE_QUICK_BAR_X
@@ -2002,8 +2312,11 @@ func open_profile(look_saved := false) -> void:
 	var page := P0ProfilePage.new(view, safe_top(), look_saved)
 	page.theme = UiKit.theme()
 	page.back_pressed.connect(close_modal)
-	page.skill_pressed.connect(func(_skill: String): open_skills())
+	page.skill_pressed.connect(func(_skill: String): open_skills(func(): open_profile()))
 	page.edit_look_pressed.connect(edit_look)
+	page.collection_pressed.connect(func(key: String):
+		if key == "fish": open_fishdex(func(): open_profile())
+		elif can_request_panel(): request_panel("cookbook"))
 	_open_modal(page, 0.0, true)
 	_profile = page
 	modal_kind = "profile"
@@ -2025,62 +2338,22 @@ func edit_look() -> void:
 
 ## SKILL-1 (P0 cut): three track cards — level ring, XP and how far to go, what the next level opens —
 ## and the "First times" collection tiles. Opened from the avatar ring.
-func open_skills() -> void:
-	var v := _sheet(520, "Skills", "xp")
+## SKILL-1 (P0SkillsDrawer): from the profile's skill cards and the gate card's `Skills`; `back` reopens the panel it
+## came from on Back or a tap outside.
+func open_skills(back := Callable()) -> void:
+	var d := P0SkillsDrawer.new(view)
+	d.theme = UiKit.theme()
+	d.safe_bottom = safe_bottom()
+	d.close_requested.connect(close_modal)
+	d.close_pressed.connect(close_modal)
+	_open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
 	modal_kind = "skills"
-	var sk: Dictionary = view.get("skills", {})
-	for key in ["farming", "fishing", "cooking"]:
-		var s: Dictionary = sk.get(key, {})
-		var card := PanelContainer.new()
-		card.add_theme_stylebox_override("panel", _box(PAPER, 14, EDGE, 1, Vector4(10, 8, 10, 8)))
-		var h := HBoxContainer.new()
-		h.add_theme_constant_override("separation", 10)
-		var ring := _LevelRing.new()
-		ring.custom_minimum_size = Vector2(58, 58)
-		ring.set_meta("pct", _skill_pct(s))
-		ring.set_meta("text", "Lv %d" % int(s.get("level", 1)))
-		h.add_child(ring)
-		var mid := VBoxContainer.new()
-		mid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		mid.add_theme_constant_override("separation", 1)
-		var name_row := HBoxContainer.new()
-		name_row.add_child(_label(key.capitalize(), 13, INK, true))
-		if key == "cooking":
-			var slots := int(view.get("cooking", {}).get("slots", 2))
-			name_row.add_child(_label("  " + "●".repeat(slots) + "○".repeat(maxi(0, 3 - slots)), 11, GREEN_D, true))
-		mid.add_child(name_row)
-		var nxt = s.get("next", null)
-		if nxt == null:
-			mid.add_child(_label("%d XP · top level" % int(s.get("xp", 0)), 9, INK2))
-		else:
-			mid.add_child(_label("%d / %d XP · %d to go" % [int(s.xp), int(nxt), int(nxt) - int(s.xp)], 9, INK2))
-		var nl := _label(P0Logic.next_line(view, key, int(s.get("level", 1)) + 1), 9, AMBER_D, true)
-		nl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		nl.custom_minimum_size = Vector2(200, 0)
-		mid.add_child(nl)
-		h.add_child(mid)
-		card.add_child(h)
-		v.add_child(card)
-	v.add_child(_label("First times", 11, INK, true))
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 10)
-	row.alignment = BoxContainer.ALIGNMENT_CENTER
-	var firsts: Array = view.get("firsts", [])
-	var crops := firsts.filter(func(f): return str(f).begins_with("harvest:")).size()
-	var dex: Array = view.get("fishing", {}).get("dex", [])
-	var fish := dex.filter(func(d): return int(d.get("caught", 0)) > 0).size()
-	var pages: Array = view.get("cooking", {}).get("cookbook", [])
-	var dishes := pages.filter(func(p): return p.get("cooked", false)).size()
-	for t in [["crop_radish", "Crops", crops, (view.get("crops", []) as Array).size()], ["fish_crucian", "Fish", fish, dex.size()], ["dish_grilled_crucian", "Dishes", dishes, pages.size()]]:
-		# Collection counts: NEED-TILE count state (LOCK-10 q(7)), display only.
-		var tile := UiNeedTile.new(str(t[1]), int(t[2]), int(t[3]), UiNeedTile.Size.M, P0Logic.icon(str(t[0])), true)
-		tile.theme = UiKit.theme()
-		tile.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		row.add_child(tile)
-	v.add_child(row)
+	_modal_back = back
 
 # ---------------------------------------------------------------- one-line teaching cards (§14.3)
 const TIPS_PATH := "user://p0_tips.json"
+## Where the teaching tips and "shown before" keys live (tests point it at their own file).
+var tips_path := TIPS_PATH
 
 ## A one-sentence card above the quick bar, once per account on this device; tap or 7 s to dismiss.
 ## Never a hand animation, never moves the player (§14.3 "不画手指动画循环").
@@ -2101,7 +2374,8 @@ func _hide_tip(close_queue := true) -> void:
 	if close_queue and tips: tips.close()
 
 func _show_tip(text: String) -> void:
-	for k in tips.seen: _taught[k] = true
+	for k in tips.seen:
+		if P0Guide.TIPS.has(k): _taught[k] = true   # only the tips: the store also keeps stall_seen / dex_seen lists
 	_save_tips()
 	if _teach == null:
 		_teach = PanelContainer.new()
@@ -2312,153 +2586,130 @@ func _experiment_preview() -> String:
 	var t: Dictionary = view.get("cooking", {}).get("tiers", {}).get(str(r), {})
 	return "? · %s · %d s · Unknown dish" % [P0Logic.rarity_name(view, r), int(t.get("ms", 5000)) / 1000]
 
-## FISH-3: "Caught! Pond Crucian · Common", XP lines, Fish-dex count, first-catch line.
-func show_catch(fish_id: String, rarity: int, first_xp: int) -> void:
-	# FISH-3: small cream card under the leaping fish; the scene stays bright (the +XP float is in it).
-	var v := _scene_card(0.815, 0.54, 2.5)
-	modal_kind = "card"
-	var title := HBoxContainer.new()
-	title.add_theme_constant_override("separation", 4)
-	var dot := _RarityDot.new()
-	dot.color = P0Logic.rarity_color(rarity)
-	dot.custom_minimum_size = Vector2(10, 10)
-	dot.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	title.add_child(dot)
-	title.add_child(_label("Caught! %s" % P0Logic.item_name(view, fish_id), 13, INK, true))
-	title.add_child(_label("·", 13, INK2, true))
-	title.add_child(_label(P0Logic.rarity_name(view, rarity), 13, P0Logic.rarity_text_color(rarity), true))
-	v.add_child(title)
-	var dex: Array = view.get("fishing", {}).get("dex", [])
-	var got := dex.filter(func(d): return int(d.get("caught", 0)) > 0).size()
-	v.add_child(_label("Fish-dex %d/%d" % [got, dex.size()], 9, INK2, true))
-	if first_xp > 0:
-		# First catch of a species: a gold chip that shines for under three seconds.
-		var chip := PanelContainer.new()
-		var sb := _box(GOLD, 11, GOLD_D, 1, Vector4(8, 3, 9, 3))
-		sb.shadow_color = Color(0.89, 0.70, 0.25, 0.45)
-		sb.shadow_size = 8
-		chip.add_theme_stylebox_override("panel", sb)
-		chip.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-		var ch := HBoxContainer.new()
-		ch.add_theme_constant_override("separation", 4)
-		ch.add_child(_icon("star", 11))
-		ch.add_child(_label("First catch! +%d XP" % first_xp, 9, INK, true))
-		chip.add_child(ch)
-		v.add_child(chip)
-		var tw := chip.create_tween().set_loops(3)
-		tw.tween_property(sb, "shadow_size", 2, 0.5)
-		tw.tween_property(sb, "shadow_size", 8, 0.5)
-	var gap := Control.new()
-	gap.custom_minimum_size = Vector2(0, 5)
-	v.add_child(gap)
-	var keep := _pill_button("Keep fishing", true)
-	keep.custom_minimum_size = Vector2(0, 37)
-	keep.pressed.connect(close_modal)
-	v.add_child(keep)
+# ---------------------------------------------------------------- result moments (SGODOT-233, q(49) / §4.8.6)
+## A RewardMoment (哪吒's kit card) on its own: one at a time through queue_card (q(49) ④). Without buttons it folds
+## away after MOMENT_AUTO_S or on a tap anywhere and the scene stays bright (③); with buttons it waits for them and
+## a tap outside is the caller's back. The guide's TipCards wait while a moment is up (⑥, P0Guide.TipQueue).
+const MOMENT_AUTO_S := 1.5
+const _BANNER_UNDER_HUD := 10.0   # MomentBanner y108: 10 under the HUD's two rows (16 + 82)
+const _MOMENT_TOP := 0.54   # under the leaping fish / the plate (where FISH-3 sat)
+var _moment_open := false
 
-## FISH-5 / 5-2: four-line card — the fish that got away (glowing silhouette lighting up in a mini
-## Fish-dex), what it needs, what that unlocks, Energy back. Level gate, rod gate, first lock.
-func show_got_away(ev: Dictionary) -> void:
-	var v := _scene_card(0.907, 0.46, 3.0)
+func show_moment(card: Control, auto_close := true, seconds := MOMENT_AUTO_S) -> void:
+	card.theme = UiKit.theme()
+	_open_modal(card, 0.0)
 	modal_kind = "card"
+	_moment_open = true
+	if tips: tips.moment_opened()
+	# A RewardMoment sits centred low in the scene; a MomentBanner under the HUD (MomentBanner x16 y108 of 800).
+	var banner := card is UiMomentBanner
+	var place := func():
+		if is_instance_valid(card):
+			var y := (UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H + _BANNER_UNDER_HUD + safe_top()) if banner else root.size.y * _MOMENT_TOP
+			card.position = Vector2(roundf((root.size.x - card.size.x) * 0.5), roundf(y))
+	card.resized.connect(place)
+	place.call()
+	if not auto_close: return
+	var holder_id := _modal.get_instance_id()
+	card.gui_input.connect(func(e: InputEvent): if P0Ui.is_tap(e): close_modal())
+	get_tree().create_timer(seconds).timeout.connect(func():
+		if is_instance_valid(_modal) and _modal.get_instance_id() == holder_id: close_modal())
+
+## A MomentBanner (§4.8.3 / §4.8.6): queued like every moment (q(49) ④), gone after `seconds` or on a tap; its action
+## button (Use bait) closes it and does the next step in place.
+func show_banner(spec: Dictionary, on_action := Callable()) -> UiMomentBanner:
+	var b := UiMomentBanner.new()
+	b.kind = UiMomentBanner.Kind.COMPLETE if str(spec.get("kind", "")) == "complete" else UiMomentBanner.Kind.LEVEL_UP
+	b.level = str(spec.get("level", ""))
+	b.title = str(spec.get("title", ""))
+	b.subtitle = str(spec.get("subtitle", ""))
+	b.rewards = (spec.get("rewards", []) as Array).map(func(r): return UiFloatText.pill(str(r.text), int(r.tone), r.get("icon", null)))
+	b.detail = str(spec.get("detail", ""))
+	b.tip = str(spec.get("tip", ""))
+	b.action = str(spec.get("action", ""))
+	b.action_pressed.connect(func():
+		close_modal()
+		if on_action.is_valid(): on_action.call())
+	show_moment(b, true, float(spec.get("seconds", MOMENT_AUTO_S)))
+	return b
+
+## FISH-3 · the first catch of a species (§4.8.6): `Caught!` / the fish · rarity / `Fish-dex 3/N`; the one-time strip
+## `First catch! +15 XP` (and `New city! +10 XP`); a first Fine / Rare fish adds its Energy as a pill. No buttons.
+## extras: {city_xp, energy} from the same response (P0Runtime).
+func show_catch(fish_id: String, rarity: int, first_xp: int, extras := {}) -> void:
+	var m := UiRewardMoment.new()
+	m.tone = UiRewardMoment.Tone.REWARD
+	m.event = "Caught!"
+	m.icon = P0Logic.icon(fish_id)
+	m.item_name = P0Logic.item_name(view, fish_id)
+	m.rarity = rarity
+	m.rarity_word = P0Logic.rarity_name(view, rarity)
+	var once: Array = []
+	if first_xp > 0: once.append("First catch! +%d XP" % first_xp)
+	if int(extras.get("city_xp", 0)) > 0: once.append("New city! +%d XP" % int(extras.city_xp))
+	m.strip = " · ".join(PackedStringArray(once))
+	if m.strip != "": m.strip_icon = P0Logic.icon("star")
+	if int(extras.get("energy", 0)) > 0:
+		m.rewards = [UiFloatText.pill("+%d Energy" % int(extras.energy), UiFloatText.Tone.ENERGY_GAIN)]
+	var dex: Array = view.get("fishing", {}).get("dex", [])
+	m.note = "Fish-dex %d/%d" % [dex.filter(func(d): return int(d.get("caught", 0)) > 0).size(), dex.size()]
+	show_moment(m)
+
+## FISH-5 / 5-2 · a gate fish broke free, once per species (§4.8.6, q(55) / q(57)): `Too strong` (Fishing level) or
+## `Too heavy for your rod` / the fish · rarity / what it needs / the Energy back as it really came back (the
+## protection's `Energy refunded (8 left today)`, else `+3 Energy back`). No buttons: where to go next lives on the
+## Fish-dex silhouette's gate card (q(57)).
+func show_got_away(ev: Dictionary) -> void:
 	var rarity := int(ev.get("rarity", 2))
 	var fish := str(ev.get("fish", ""))
-	var h := HBoxContainer.new()
-	h.add_theme_constant_override("separation", 12)
-	var left := VBoxContainer.new()
-	left.custom_minimum_size = Vector2(73, 0)
-	left.add_theme_constant_override("separation", 5)
-	left.alignment = BoxContainer.ALIGNMENT_CENTER
-	var sil := _Glow.new()
-	sil.texture = P0Logic.icon("fish_glow")
-	sil.color = P0Logic.rarity_color(rarity)
-	sil.custom_minimum_size = Vector2(60, 60)
-	sil.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	left.add_child(sil)
-	left.add_child(_dex_mini(fish))
-	h.add_child(left)
-	var lines := VBoxContainer.new()
-	lines.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	lines.add_theme_constant_override("separation", 1)
-	var rod_gate := not ev.has("need_level")
-	var title := ""
-	var body: Array = []
-	if rod_gate:
-		title = "Too heavy for your rod"
-		var rod := P0Logic.rod_for(view, rarity)
-		if not rod.is_empty(): body.append("%s · Fishing Lv%d · %d coins" % [str(rod.name), int(rod.level), int(rod.price)])
-		body.append("Lands %s fish" % P0Logic.rarity_name(view, rarity))
-	else:
-		var need := int(ev.need_level)
-		var opens := P0Logic.fish_at_level(view, need)
-		var first_lock := first_time("first_lock")
-		title = "Too strong" if first_lock else "%s fish got away" % P0Logic.rarity_name(view, rarity)
-		body.append(P0Logic.level_gate_line(view, need))
-		if not opens.is_empty():
-			var names := ", ".join(opens.slice(0, 2))
-			body.append(("Unlocks %s fish (%s)" % [P0Logic.rarity_name(view, rarity), names]) if first_lock else "Unlocks %s" % names)
-	var t := _label(title, 13, INK, true)
-	t.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	lines.add_child(t)
-	for line in body:
-		var l := _label(str(line), 9, INK, true)
-		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		lines.add_child(l)
-	lines.add_child(_label("%d Energy back" % int(ev.get("refund", 3)), 9, GREEN_D, true))
-	h.add_child(lines)
-	v.add_child(h)
-	var gap := Control.new()
-	gap.custom_minimum_size = Vector2(0, 5)
-	v.add_child(gap)
-	var acts := HBoxContainer.new()
-	acts.add_theme_constant_override("separation", 5)
-	var side := _pill_button("Tackle Shop" if rod_gate else "Fish-dex", false)
-	side.pressed.connect(func():
-		_drop_modal()
-		if rod_gate: tackle_requested.emit()
-		else: open_fishdex())
-	var keep := _pill_button("Keep fishing", true)
-	for b in [side, keep]:
-		b.custom_minimum_size = Vector2(0, 37)
-		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		acts.add_child(b)
-	keep.pressed.connect(close_modal)
-	v.add_child(acts)
+	var m := UiRewardMoment.new()
+	m.tone = UiRewardMoment.Tone.NEUTRAL
+	m.icon = P0Logic.icon(fish)
+	m.item_name = P0Logic.item_name(view, fish)
+	m.rarity = rarity
+	m.rarity_word = P0Logic.rarity_name(view, rarity)
+	m.event = "Too strong" if ev.has("need_level") else "Too heavy for your rod"
+	m.note = P0Logic.break_free_need(view, ev)
+	m.rewards = [UiFloatText.pill(P0Logic.refund_line(view, ev), UiFloatText.Tone.ENERGY_GAIN)]
+	show_moment(m)
 
-## Six Fish-dex tiles around a fish (3 × 2, "Fish-dex" under them): caught ones in their rarity
-## colour, the one that just got away lit, the rest blank.
-func _dex_mini(fish: String) -> Control:
-	var dex: Array = view.get("fishing", {}).get("dex", []).filter(func(d):
-		var w = d.get("where", [])
-		return not (w is Array) or w.has("pond") or w.has("river"))
-	var at := maxi(0, dex.find_custom(func(d): return str(d.id) == fish))
-	var from := clampi(at - 2, 0, maxi(0, dex.size() - 6))
-	var box := PanelContainer.new()
-	box.add_theme_stylebox_override("panel", _box(Color("f1eada"), 7, EDGE, 1, Vector4(3, 3, 3, 2)))
-	box.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	var col := VBoxContainer.new()
-	col.add_theme_constant_override("separation", 2)
-	var grid := GridContainer.new()
-	grid.columns = 3
-	grid.add_theme_constant_override("h_separation", 3)
-	grid.add_theme_constant_override("v_separation", 3)
-	for d in dex.slice(from, from + 6):
-		var tile := _DexTile.new()
-		tile.texture = P0Logic.icon("fish_glow")
-		tile.custom_minimum_size = Vector2(19, 19)
-		if str(d.id) == fish:
-			tile.state = "lit"
-			tile.glow = P0Logic.rarity_color(int(d.rarity))
-		elif int(d.get("caught", 0)) > 0:
-			tile.state = "caught"
-			tile.glow = P0Logic.rarity_color(int(d.rarity))
-		grid.add_child(tile)
-	col.add_child(grid)
-	var cap := _label("Fish-dex", 7, INK2, true)
-	cap.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	col.add_child(cap)
-	box.add_child(col)
-	return box
+## The four-things gate card (§4.8.7, q(49); SKILL-2 482:169): the seed stall, counters, the Cookbook / Experiment
+## third slot, workbench recipes, locked gathering spots and the Fish-dex silhouettes share it. An InfoSheet built by
+## P0Logic.gate_spec (see there for `gate`). No Got it: a tap outside or Back closes it, one layer at a time —
+## `back` reopens the panel it was opened from. Its one guiding button closes the card first, then moves the camera
+## (Show my plots: Show here, the homestead pin elsewhere), opens Skills, or asks the host through panel_requested
+## (Cookbook); it never travels (LOCK-08).
+func open_gate_card(gate: Dictionary, back := Callable()) -> UiInfoSheet:
+	var spec := P0Logic.gate_spec(view, gate)
+	# A guide to a panel no host opens (the Cookbook before its read-only page exists) is left off.
+	var own := ["skills"] + HOME_TARGETS
+	spec.buttons = spec.buttons.filter(func(b): return str(b.get("payload", {}).get("go", "")) in own or can_request_panel())
+	var sheet := UiInfoSheet.new()
+	sheet.theme = UiKit.theme()
+	sheet.rules = func(_id, _ctx, _o): return spec
+	sheet.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+	sheet.offset_left = UiTokens.SPACE_PAGE
+	sheet.offset_right = -UiTokens.SPACE_PAGE
+	sheet.offset_bottom = -bottom_pad()
+	sheet.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	sheet.action_requested.connect(func(action: StringName, _id: String, payload: Dictionary):
+		if action == &"guide": _gate_guide(str(payload.get("go", ""))))
+	_open_modal(sheet, 0.32, true)   # the card sits where the quick bar was; bar and keys hide under it
+	modal_kind = "gate"
+	sheet.open("gate", &"gate")
+	_modal_back = back
+	return sheet
+
+func _gate_guide(go: String) -> void:
+	match go:
+		"skills":
+			_drop_modal()   # on to another panel: a queued card must not come up over it (亚瑟 on #77)
+			open_skills()
+		"plots", "stall", "stove", "board", "home", "bench":
+			close_modal()
+			if show_label(go, space_here(), spot_reachable()) == "Show": show_spot.emit(go)
+			else: show_on_map.emit(map_target(go))
+		_: request_panel(go)
 
 ## A result card placed like the design's .modal (centred, top at a share of the screen, width a share
 ## of it) over an undimmed scene. Tapping outside or the button closes it; it also closes after auto_s.
@@ -2489,89 +2740,66 @@ func first_time(key: String) -> bool:
 	return true
 
 func _load_tips() -> void:
-	if _taught.is_empty() and FileAccess.file_exists(TIPS_PATH):
-		var saved = JSON.parse_string(FileAccess.get_file_as_string(TIPS_PATH))
+	if _taught.is_empty() and FileAccess.file_exists(tips_path):
+		var saved = JSON.parse_string(FileAccess.get_file_as_string(tips_path))
 		if saved is Dictionary: _taught = saved
 
 func _save_tips() -> void:
-	var f := FileAccess.open(TIPS_PATH, FileAccess.WRITE)
+	var f := FileAccess.open(tips_path, FileAccess.WRITE)
 	if f: f.store_string(JSON.stringify(_taught))
 
-func _card_buttons() -> HBoxContainer:
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 8)
-	var dex := _pill_button("Fish-dex", false)
-	dex.custom_minimum_size = Vector2(90, 32)
-	dex.pressed.connect(func(): _drop_modal(); open_fishdex())
-	row.add_child(dex)
-	var ok := _pill_button("Keep fishing", true)
-	ok.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	ok.pressed.connect(close_modal)
-	row.add_child(ok)
-	return row
-
-## FISH-6 (P0 cut): rarity sections; caught = full colour + count, broke free = tinted silhouette with
-## the level it needs, never seen = grey silhouette with where it lives.
-func open_fishdex() -> void:
-	var dex: Array = view.get("fishing", {}).get("dex", [])
-	var got := dex.filter(func(d): return int(d.get("caught", 0)) > 0).size()
-	var v := _sheet(470, "Fish-dex", "fish_crucian")
+## FISH-6 Fish-dex (SGODOT-233, P0FishDex): from the creel badge, the profile's Fish tile and the catch cards. A cell
+## opens the gate card for a silhouette its level or rod holds back (q(57)), else the fish card; either comes back to
+## the dex on Back or a tap outside. Fish caught since the last visit ring once (kept with the teaching tips).
+func open_fishdex(back := Callable(), animate := true) -> void:
+	_load_tips()
+	var caught: Array = view.get("fishing", {}).get("dex", []).filter(func(f): return int(f.get("caught", 0)) > 0).map(func(f): return str(f.id))
+	var seen: Array = _taught.get("dex_seen", []) if _taught.get("dex_seen", []) is Array else []
+	var fresh := caught.filter(func(id): return not seen.has(id))
+	if not fresh.is_empty():
+		_taught["dex_seen"] = caught
+		_save_tips()
+	var d := P0FishDex.new(view, fresh)
+	d.theme = UiKit.theme()
+	d.animate = animate
+	d.safe_bottom = safe_bottom()
+	d.close_requested.connect(close_modal)
+	d.close_pressed.connect(close_modal)
+	var again := func(): open_fishdex(back, false)
+	d.cell_pressed.connect(func(id: String):
+		var gate := P0Logic.fish_gate(view, id)
+		if not gate.is_empty() and not P0Logic.dex_caught(view, id): open_gate_card(gate, again)
+		else: open_fish_card(id, again))
+	_open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
 	modal_kind = "fishdex"
-	var top := HBoxContainer.new()
-	top.add_theme_constant_override("separation", 8)
-	var kinds := UiNeedTile.new("Kinds", got, dex.size(), UiNeedTile.Size.M, P0Logic.icon("fish_crucian"), true)
-	kinds.theme = UiKit.theme()
-	kinds.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	top.add_child(kinds)
-	var tv := VBoxContainer.new()
-	tv.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	tv.add_child(_label("%s · %s" % [str(view.get("fishing", {}).get("rod", "Starter Rod")), "holds up to %s" % P0Logic.rarity_name(view, int(view.get("fishing", {}).get("rod_reach", 2)))], 9, INK2))
-	top.add_child(tv)
-	v.add_child(top)
-	for r in [1, 2, 3, 4]:
-		var group := dex.filter(func(d): return int(d.get("rarity", 1)) == r)
-		if group.is_empty(): continue
-		var have := group.filter(func(d): return int(d.get("caught", 0)) > 0).size()
-		var head := HBoxContainer.new()
-		var dot := ColorRect.new()
-		dot.custom_minimum_size = Vector2(8, 8)
-		dot.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		dot.color = P0Logic.rarity_color(r)
-		head.add_child(dot)
-		head.add_child(_label(" %s  %d/%d" % [P0Logic.rarity_name(view, r), have, group.size()], 10, INK, true))
-		v.add_child(head)
-		var grid := GridContainer.new()
-		grid.columns = 4
-		grid.add_theme_constant_override("h_separation", 6)
-		grid.add_theme_constant_override("v_separation", 6)
-		for d in group:
-			grid.add_child(_dex_cell(d))
-		v.add_child(grid)
+	_modal_back = back
 
-func _dex_cell(d: Dictionary) -> Control:
-	var id := str(d.id)
-	var n := int(d.get("caught", 0))
-	var cell := PanelContainer.new()
-	cell.custom_minimum_size = Vector2(78, 78)
-	cell.add_theme_stylebox_override("panel", _box(PAPER if n > 0 else Color(1, 1, 1, 0.45), 10, P0Logic.rarity_color(int(d.rarity)) if n > 0 else EDGE, 2 if n > 0 else 1, Vector4(4, 4, 4, 3)))
-	var box := VBoxContainer.new()
-	box.add_theme_constant_override("separation", 0)
-	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var ic := _icon(id if n > 0 else "fish_glow", 34)
-	ic.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	if n == 0: ic.modulate = P0Logic.rarity_color(int(d.rarity)) if d.get("seen", false) else Color("c9c4b6")
-	box.add_child(ic)
-	var name := _label(P0Logic.item_name(view, id) if n > 0 or d.get("seen", false) else "???", 8, INK if n > 0 else INK2, true)
-	name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	name.clip_text = true
-	box.add_child(name)
-	var where: Array = d.get("where", [])
-	var note := "×%d" % n if n > 0 else ("Fishing Lv%d" % int(d.level) if int(d.level) > int(view.get("skills", {}).get("fishing", {}).get("level", 1)) else " · ".join(where.map(func(w): return str(w).capitalize())))
-	var nl := _label(note, 7, INK2)
-	nl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	box.add_child(nl)
-	cell.add_child(box)
-	return cell
+## A Fish-dex cell's card (FISH-6 单格详情, P0): the fish, its rarity, `Caught ×3 · Pond · River` and the XP it
+## gives now (`Full XP` / `XP 50% · Reduced` / `No XP · outleveled`), or `Not caught yet · Pond · River`.
+func open_fish_card(id: String, back := Callable()) -> UiInfoSheet:
+	var spec := P0Logic.fish_card_spec(view, id)
+	var sheet := UiInfoSheet.new()
+	sheet.theme = UiKit.theme()
+	sheet.rules = func(_id, _ctx, _o): return spec
+	sheet.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+	sheet.offset_left = UiTokens.SPACE_PAGE
+	sheet.offset_right = -UiTokens.SPACE_PAGE
+	sheet.offset_bottom = -bottom_pad()
+	sheet.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	_open_modal(sheet, 0.32, true)
+	modal_kind = "fish"
+	sheet.open(id, &"dex")
+	_modal_back = back
+	return sheet
+
+## A panel this UI does not own, opened by the host that listens on panel_requested.
+func request_panel(panel: String) -> void:
+	_drop_modal()   # the host's panel comes next; a queued card waits for it to close, not over it
+	panel_requested.emit(panel)
+
+## Whether a host opens panels this UI does not own (a read-only Cookbook). Until one does, nothing offers them:
+## no dead-end placeholder (不知火舞 233 walkthrough).
+func can_request_panel() -> bool: return panel_requested.get_connections().size() > 0
 
 # ---------------------------------------------------------------- helpers
 ## One press = one action. Touch is emulated as a left mouse button (project default), so reacting to
@@ -2705,49 +2933,3 @@ class _RarityDot extends Control:   # FISH-3 title dot: rarity colour in a cream
 	func _draw() -> void:
 		draw_circle(size * 0.5, size.x * 0.5, P0Ui.PAPER)
 		draw_circle(size * 0.5, size.x * 0.5 - 1.0, color)
-
-class _Glow extends Control:   # FISH-5 silhouette with a soft rarity glow (kit-cook .four .sil .big)
-	var texture: Texture2D
-	var color := Color.WHITE
-	func _draw() -> void:
-		if texture == null: return
-		var r := Rect2(Vector2.ZERO, size)
-		for i in 3:
-			var g := 2.5 + i * 2.5
-			draw_texture_rect(texture, r.grow(g), false, Color(color, 0.16))
-		draw_texture_rect(texture, r, false, color)
-
-class _DexTile extends Control:   # FISH-5 mini Fish-dex tile: blank / caught (rarity colour) / lit (grey + glow ring)
-	var texture: Texture2D
-	var state := ""
-	var glow := Color.WHITE
-	func _draw() -> void:
-		var r := Rect2(Vector2.ZERO, size)
-		if state == "lit":
-			draw_rect(r.grow(2.0), Color(glow, 0.35), true)
-		var sb := StyleBoxFlat.new()
-		sb.bg_color = P0Ui.PAPER
-		sb.border_color = Color(glow, 0.8) if state == "lit" else P0Ui.EDGE
-		sb.set_border_width_all(1)
-		sb.set_corner_radius_all(3)
-		draw_style_box(sb, r)
-		if texture:
-			var tint := glow if state == "caught" else Color("8a918c") if state == "lit" else Color("cfc6b0")
-			draw_texture_rect(texture, r.grow(-size.x * 0.15), false, tint)
-
-## Skill level ring on the Skills sheet (progress within the level). Item have / need is UiNeedTile (LOCK-10).
-class _LevelRing extends Control:
-	func _draw() -> void:
-		var c := size * 0.5
-		var r := minf(size.x, size.y) * 0.5 - 3
-		draw_circle(c, r, Color("fbf8f1"))
-		draw_arc(c, r, 0, TAU, 64, Color(0.18, 0.23, 0.2, 0.12), 4.0, true)
-		draw_arc(c, r, -PI * 0.5, -PI * 0.5 + TAU * clampf(float(get_meta("pct", 0.0)), 0.0, 1.0), 64, Color("7fc66a"), 4.0, true)
-		var tex: Texture2D = get_meta("icon") if has_meta("icon") else null
-		if tex: draw_texture_rect(tex, Rect2(c - Vector2(r, r) * 0.62, Vector2(r, r) * 1.24), false)
-		var text := str(get_meta("text", ""))
-		if text != "":
-			var font := get_theme_default_font()
-			var w := font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x
-			draw_string(font, c + Vector2(-w * 0.5, 5), text, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color("2f3a33"))
-

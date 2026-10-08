@@ -209,13 +209,29 @@ func test_today_rows_before_the_first_sow_put_sowing_first() -> void:
 	var v := _view()
 	assert_that(_lines(P0Logic.today_rows(v))).is_equal(["Sow your first plot", "Catch 2 Pond Crucian · Reed Pond", "Cook it: Grilled Crucian"])
 
+## q(69): the level a harvest brings is its own info row (no button) right after its source row — never a tail on a
+## crop's row, which read as that crop's own level.
 func test_after_the_first_session_the_crop_timer_says_what_the_harvest_does() -> void:
 	var twenty: Array = []
 	for i in 20: twenty.append("growing")
 	var v := _view({"plots": _plots(twenty), "req_done": ["req_pond_catch"]})
 	v.stall.board.requests = []
 	v.cooking.cookbook[0].cooked = true
-	assert_str(str(P0Logic.today_rows(v)[0].line)).is_equal("Radishes ready in 3h 53m · Farming Lv 2 at first harvest")
+	var rows := P0Logic.today_rows(v)
+	assert_that(_lines(rows).slice(0, 2)).is_equal(["Radishes ready in 3h 53m", "Farming Lv 2 at your first harvest"])
+	assert_str(str(rows[1].go)).is_equal("")   # an info row: no Show
+
+## RETURN-SESSION (q(69)): ready plots that reach the level — `Harvest 20 Radishes` then `Farming Lv 2 with this harvest`.
+func test_a_ready_harvest_that_levels_is_followed_by_its_info_row() -> void:
+	var twenty: Array = []
+	for i in 20: twenty.append("ready")
+	var v := _view({"plots": _plots(twenty), "req_done": ["req_pond_catch"]})
+	v.stall.board.requests = []
+	v.cooking.cookbook[0].cooked = true
+	var lines := _lines(P0Logic.today_rows(v))
+	var at := lines.find("Harvest 20 Radishes")
+	assert_int(at).is_greater_equal(0)
+	assert_str(str(lines[at + 1])).is_equal("Farming Lv 2 with this harvest")
 
 func test_the_today_chip_names_the_first_row_still_to_do_not_a_ticked_one() -> void:
 	# rc0 on 232: after handing in the Pond Catch the chip still read "Deliver 2 Pond Crucian · Stall" (ticked).
