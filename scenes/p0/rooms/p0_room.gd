@@ -9,7 +9,8 @@ extends Node3D
 ## the door (exit anchor) or Back returns to the world below (farmhouse → farm, outpost → map).
 ##
 ## Subclasses fill art_scene / layout_path / anchors_path / place_name in setup(args) or _init(), and override
-## the hooks below: _room_ready, _tappable, _on_facility, _marker, _module_visible, _room_frame, _on_joystick.
+## the hooks below: _dress_art, _room_ready, _tappable, _on_facility, _marker, _module_visible, _room_frame,
+## _on_joystick.
 
 signal facility_tapped(name: String)
 signal left()
@@ -38,6 +39,8 @@ var city := "Shanghai"
 var place_name := ""
 ## Finger card over the door; per space (farmhouse "Door · Back to farm", market "Exit · Back to map").
 var exit_text := "Door · Back to map"
+## Where the door leads, for the world prompts (SGODOT-250: i-door + "Map" / "Farm"); "" keeps the old door card.
+var exit_to := ""
 ## Level the modules show for (module visibility: module_levels[module] <= level).
 var level := 1
 var module_levels := {}
@@ -96,6 +99,7 @@ func _ready() -> void:
 	_build_hearth_glow()   # before the art: the Basic Room's particle fire (SGODOT-236) takes ../HearthGlow
 	art = art_scene.instantiate()
 	room.add_child(art)
+	_dress_art()
 	_apply_module_visibility()
 	var nav := P0RoomNav.build(P0RoomNav.shapes_from(art))
 	bp = nav.bp
@@ -125,6 +129,50 @@ func _exit_tree() -> void:
 	if rt: rt.detach(self)
 
 # ---------------------------------------------------------------- hooks for subclasses
+## Adds props to the art before module visibility and the walkable grid are read. By default the anchors file's
+## placeholder props, named as modules and shown from their `level` (module_levels): `from` copies an art piece;
+## `scene` instances a model (with `atlas`, its shared albedo; `collider` {at, size} in model units). A prop
+## whose source is missing is skipped, so its module and anchors stay hidden.
+func _dress_art() -> void:
+	for p in P0RoomAnchors.props(P0RoomAnchors.read_json(anchors_path)):
+		var copy := _prop_node(p)
+		if copy == null: continue
+		copy.name = str(p.name)
+		copy.position = P0RoomAnchors.vec(p.position)
+		copy.rotation = Vector3(0.0, deg_to_rad(float(p.get("yaw_degrees", 0))), 0.0)
+		copy.scale = Vector3.ONE * float(p.get("scale", 1.0))
+		art.add_child(copy)
+		if p.has("level"): module_levels[str(p.name)] = int(p.level)
+
+func _prop_node(p: Dictionary) -> Node3D:
+	if p.has("from"):
+		var src := art.get_node_or_null(NodePath(str(p.from))) as Node3D
+		return src.duplicate() as Node3D if src else null
+	var path := str(p.get("scene", ""))
+	if path == "" or not ResourceLoader.exists(path): return null
+	var holder := Node3D.new()
+	var model := (load(path) as PackedScene).instantiate() as Node3D
+	holder.add_child(model)
+	var atlas := str(p.get("atlas", ""))
+	if atlas != "" and ResourceLoader.exists(atlas):
+		var mat := StandardMaterial3D.new()   # the Basic Room atlas look (BasicRoomArt._setup_room)
+		mat.albedo_texture = load(atlas)
+		mat.roughness = 0.8
+		mat.metallic_specular = 0.28
+		mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+		for m in model.find_children("*", "MeshInstance3D", true, false): (m as MeshInstance3D).material_override = mat
+	var c: Dictionary = p.get("collider", {})
+	if not c.is_empty():
+		var body := StaticBody3D.new()
+		body.position = P0RoomAnchors.vec(c.at)
+		var shape := BoxShape3D.new()
+		shape.size = P0RoomAnchors.vec(c.size)
+		var cs := CollisionShape3D.new()
+		cs.shape = shape
+		body.add_child(cs)
+		holder.add_child(body)
+	return holder
+
 func _room_ready() -> void: pass
 
 ## Anchor names the player can tap; default every visible use_ / npc_ anchor plus the door.
@@ -142,7 +190,8 @@ func _on_facility(_name: String) -> void: pass
 ## key ("available", "countdown", "ready", … = UiStatusBadge.State in lower case). Empty = nothing; the
 ## door's card comes from exit_text.
 func _marker(name: String, _view: Dictionary) -> Dictionary:
-	return {text = exit_text} if name == "exit" else {}
+	if name != "exit": return {}
+	return {kind = "facility", icon = P0Logic.icon("door"), name = exit_to} if exit_to != "" else {text = exit_text}
 
 func _module_visible(module: String) -> bool:
 	return level >= int(module_levels.get(module, 0))
@@ -344,6 +393,9 @@ func release_focus() -> void:
 
 func is_focused() -> bool: return not _shot.is_empty() and _shot_k > 0.0
 
+## Orthographic width of the room's opening view, in metres (push-in sizes are fractions of it).
+func view_size() -> float: return _cam_size
+
 ## Screen band from the HUD's bottom edge to `bottom` (fraction of the screen height).
 func band_below_hud(bottom: float) -> Rect2:
 	var view := _view()
@@ -474,11 +526,18 @@ func _door_check() -> void:
 func card_pick(marks: Dictionary) -> String:
 	var cands: Array = []
 	for n in marks:
-		if (marks[n] as Dictionary).has("text") and anchor(n): cands.append([n, anchor(n).global_position, CARD_NEAR_M])
+		var m: Dictionary = marks[n]
+		if (m.has("text") or m.has("kind")) and anchor(n): cands.append([n, anchor(n).global_position, CARD_NEAR_M])
 	_card = P0Garden.pick_card(cands, actor.position, _card)
 	return _card
 
 ## Finger cards and status badges over tappable anchors (221's rt.ui.tag / rt.ui.badge when present).
+## A marker with `kind` uses the world prompts instead of a finger card (SGODOT-250, LOCK-07 / 16 / 30 v2), with the
+## one in reach (`_card`) the only one opened:
+##   "npc"      {name, head}: the name over the head (NpcNameTag), highlighted while it is the one in reach or `talking`;
+##   "seat"     {icon}: an icon button that goes Near, never a strip;
+##   "facility" {icon, name, fact?}: an icon button that opens into a name strip.
+## `badge` on a seat or facility rides in the button / strip (StatusBadge World 28); an NPC's stays a badge.
 func _markers(v: Dictionary) -> void:
 	var now := {}
 	var marks := {}
@@ -489,20 +548,36 @@ func _markers(v: Dictionary) -> void:
 	for n in marks:
 		var m: Dictionary = marks[n]
 		var id: String = "room:" + n
-		now[id] = true
 		var at := anchor(n).global_position + _hit_lift(n) * 1.1
 		var badge_at := anchor("badge_" + P0RoomAnchors.object_of(n))
 		var screen := cam.unproject_position(badge_at.global_position if badge_at else at)
 		var lift := 0.0
 		var state := badge_state(str(m.get("badge", "")))
+		var kind := str(m.get("kind", ""))
+		now[id] = kind
+		if kind == "seat":
+			rt.ui.world_icon(id, m.icon, screen, true, n == _card, state)
+			continue
+		if kind == "facility":
+			if n == _card: rt.ui.name_bar(id, m.icon, str(m.name), str(m.get("fact", "")), screen, true, -1, false, state)
+			else: rt.ui.world_icon(id, m.icon, screen, true, false, state)
+			continue
 		if state >= 0 and rt.ui.has_method("badge"):
 			rt.ui.call("badge", id, state, screen, true, str(m.get("caption", "")), m.get("icon", null))
 			if rt.ui.has_method("badge_height"): lift = float(rt.ui.call("badge_height", id))
-		if m.has("text"):
+		if kind == "npc":
+			rt.ui.npc_tag(id, str(m.name), cam.unproject_position(m.head), true, n == _card or bool(m.get("talking", false)))
+		elif m.has("text"):
 			rt.ui.tag(id, str(m.text), screen - Vector2(0, lift), n == _card)
 	for id in _shown.keys():
 		if now.has(id): continue
-		rt.ui.tag(id, "", Vector2.ZERO, false)
+		match str(_shown[id]):
+			"seat": rt.ui.world_icon(id, null, Vector2.ZERO, false)
+			"facility":
+				rt.ui.name_bar(id, null, "", "", Vector2.ZERO, false)
+				rt.ui.world_icon(id, null, Vector2.ZERO, false)
+			"npc": rt.ui.npc_tag(id, "", Vector2.ZERO, false)
+			_: rt.ui.tag(id, "", Vector2.ZERO, false)
 		if rt.ui.has_method("badge"): rt.ui.call("badge", id, 0, Vector2.ZERO, false)
 	_shown = now
 

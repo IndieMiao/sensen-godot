@@ -94,12 +94,12 @@ func test_tapping_the_keeper_stops_in_front_of_them_not_inside() -> void:
 
 func test_tapping_the_tea_table_sits_on_the_nearest_free_seat_and_the_joystick_stands_up() -> void:
 	var r := _room("sh_tea_1")
-	assert_dict(r._marker("use_tea_table_1", {})).is_equal({text = "Sit"})
+	assert_str(str(r._marker("use_tea_table_1", {}).get("kind", ""))).is_equal("seat")   # the seat icon (LOCK-30 v2)
 	_tap(r, "use_tea_table_1")
 	_walk_until_idle(r)
 	assert_str(r.seat).is_equal("seat_table1_1")   # the chair on the door side is nearer
 	assert_str(r.actor.state).is_equal("locked")
-	assert_dict(r._marker("use_tea_table_1", {})).is_empty()   # no Sit card while seated
+	assert_dict(r._marker("use_tea_table_1", {})).is_empty()   # no seat icon while seated
 	for i in 12: r.p0_frame({}, 1.0 / 30.0)   # the root glides onto the seat within 0.3 s
 	assert_float(P0Room._flat_distance(r.actor.position, r.anchor("seat_table1_1").global_position)).is_less(0.02)
 	assert_float(r.actor.position.y).is_equal_approx(r.anchor("seat_table1_1").global_position.y - OutpostScript.SIT_ROOT_BELOW_SEAT, 0.02)
@@ -227,3 +227,48 @@ func test_only_the_nearest_card_shows_in_a_room() -> void:
 	# Out of every reach: no card.
 	r.actor.position = Vector3(20, r.actor.position.y, 20)
 	assert_str(r.card_pick(marks)).is_equal("")
+
+## SGODOT-250 (LOCK-07 / 16 / 30 v2, q(62)): no "Tap to …" anywhere in a room. NPCs carry their name only (as the UI's
+## NpcNameTag, no Label3D left on the rig), seats an i-seat icon, the door i-door + Map, the market counters their names
+## with the board's request mark riding in its button.
+func test_room_prompts_are_names_and_icons_only() -> void:
+	var tea := _room("sh_tea_1")
+	var ama: Dictionary = tea._marker("npc_keeper", {})
+	assert_str(str(ama.get("kind", ""))).is_equal("npc")
+	assert_str(str(ama.get("name", ""))).is_equal("Ama")
+	assert_bool(ama.has("text")).is_false()
+	assert_float((ama.head as Vector3).y).is_greater(tea.anchor("npc_keeper").global_position.y + 1.5)   # over the head
+	assert_array(tea.npcs.npc_keeper.root.find_children("*", "Label3D", true, false)).is_empty()
+	assert_dict(tea._marker("use_bench", {})).contains_keys(["icon"])
+	assert_str(str(tea._marker("use_bench", {}).kind)).is_equal("seat")
+	var door: Dictionary = tea._marker("exit", {})
+	assert_str(str(door.get("kind", ""))).is_equal("facility")
+	assert_str(str(door.get("name", ""))).is_equal("Map")
+	var market := _room("sh_market_1")
+	var board: Dictionary = market._marker("use_market_board", {"keepers": {"market": {"board_open": 2}}})
+	assert_str(str(board.name)).is_equal("Market Board")
+	assert_str(str(board.badge)).is_equal("request")
+	assert_str(str(market._marker("use_market_board", {"keepers": {"market": {"board_open": 0}}}).badge)).is_equal("")
+	assert_str(str(market._marker("use_specialty_shelf", {}).name)).is_equal("City Specialty")
+	for r in [tea, market, _room("sh_tackle_1"), _room("sh_post_1")]:
+		for n in r._tappable():
+			var m: Dictionary = r._marker(n, {})
+			assert_str(str(m.get("text", ""))).override_failure_message("%s %s" % [str(r.outpost.get("id", "")), n]).not_contains("Tap to")
+			assert_str(str(m.get("name", ""))).override_failure_message("%s %s" % [str(r.outpost.get("id", "")), n]).not_contains("Tap to")
+
+## 不知火舞 on #57: the NPC whose greeting card or dialogue bar this room opened is "talking" while that modal is up,
+## so its name stays lit there; no other NPC, and nobody once the modal closes. Through the real runtime and UI.
+func test_the_npc_the_room_opened_a_talk_for_is_talking_until_it_closes() -> void:
+	var rt: P0Runtime = auto_free(P0Runtime.new())
+	add_child(rt)
+	await get_tree().process_frame
+	rt.session.transport = func(_method: int, _path: String, _body: Dictionary, _cmd: Dictionary): pass   # nothing goes out
+	var r := _room("sh_tackle_1")
+	r.rt = rt
+	r._on_facility("npc_keeper")   # Finn greets first (the tackle shop's greeting card)
+	assert_bool(rt.ui.has_modal()).is_true()
+	assert_bool(bool(r._marker("npc_keeper", {}).talking)).is_true()
+	assert_bool(bool(r._marker("npc_kai", {}).talking)).is_false()
+	rt.ui.close_modal()
+	r._room_frame({}, 1.0 / 30.0)
+	assert_bool(bool(r._marker("npc_keeper", {}).talking)).is_false()

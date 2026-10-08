@@ -1,0 +1,12 @@
+<svg width="120" height="88" viewBox="0 0 30 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Dish silhouette" clip-path="url(#clip0_0_142)">
+<path id="Ellipse" d="M3 14C3 12.4241 3.31039 10.8637 3.91345 9.4078C4.5165 7.95189 5.40042 6.62902 6.51472 5.51472C7.62902 4.40041 8.95189 3.5165 10.4078 2.91345C11.8637 2.31039 13.4241 2 15 2C16.5759 2 18.1363 2.31039 19.5922 2.91345C21.0481 3.5165 22.371 4.40042 23.4853 5.51472C24.5996 6.62902 25.4835 7.95189 26.0866 9.4078C26.6896 10.8637 27 12.4241 27 14L15 14L3 14Z" fill="#FFFFFF"/>
+<rect id="Rectangle" y="15" width="30" height="4" rx="2" fill="#FFFFFF"/>
+<circle id="Ellipse_2" cx="15" cy="2.5" r="2.5" fill="#FFFFFF"/>
+</g>
+<defs>
+<clipPath id="clip0_0_142">
+<rect width="30" height="22" fill="white"/>
+</clipPath>
+</defs>
+</svg>

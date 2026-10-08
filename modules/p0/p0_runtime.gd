@@ -86,6 +86,7 @@ func _init() -> void:
 	if OS.get_environment("P0_AUTO") == "1" or FileAccess.file_exists("user://p0_auto"):
 		P0Fishing.auto_play = true
 		P0Cooking.auto_play = true
+		P0Kitchen.auto_play = true
 
 ## The active world takes over input and the HUD surface; the previous one is simply forgotten.
 func attach(w: Node) -> void:
@@ -233,17 +234,20 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	if not before.is_empty():
 		for id in P0Guide.new_items(before, v): ui.quick_bar_node().flash(str(id))
 	var at := anchor()
-	var dy := 0.0
+	var stack := 0   # floats of one reply stack upward (UiFloatText.play stack_index)
 	var xp_lines: Array = []
 	last_first_catch_xp = 0
 	last_catch_extras = {}
 	var settles_catch := events.any(func(e): return str(e.get("kind", "")) == "catch")
+	var first_cook_xp: Array = []   # the first-cook bonus is on the result card's strip, not a float (Li Bai, int6 C11)
+	var good_pot := events.any(func(e): return str(e.get("kind", "")) == "dish" and int(e.get("quality", 0)) >= 1)
 	for i in events.size():
 		var ev: Dictionary = events[i]
 		match str(ev.get("kind", "")):
 			"xp":
 				# The server emits a first-time bonus as `first` immediately followed by its `xp`.
 				var bonus: bool = i > 0 and str(events[i - 1].get("kind", "")) == "first" and int(events[i - 1].xp) == int(ev.amount)
+				if bonus and str(ev.skill) == "cooking": first_cook_xp.append(ev)
 				if int(ev.amount) > 0 and not bonus:
 					xp_lines.append("+%d %s XP" % [int(ev.amount), str(ev.skill).capitalize()] + ("" if int(ev.percent) >= 100 else " · %d%%" % int(ev.percent)))
 			"reward":
@@ -270,16 +274,24 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				if settles_catch and str(ev.get("reason", "")) in ["refund", "line_in"]: continue
 				# Inside the mine a floor fee is said by the mine's own float ("Floor 2 · −2 Energy", q(46)), not twice.
 				if str(ev.get("reason", "")) == "mine_floor" and str(_call("p0_surface", [])) == "mine": continue
-				ui.float_text(("%+d Energy" % dlt).replace("-", "−"), at + Vector2(0, dy), Color("d9772f") if dlt < 0 else Color("4f934b"))
+				ui.float_text(("%+d Energy" % dlt).replace("-", "−"), at, UiFloatText.Tone.ENERGY_COST if dlt < 0 else UiFloatText.Tone.ENERGY_GAIN, null, stack)
+				stack += 1
 			"xp":
-				if int(ev.amount) > 0:
-					ui.float_text("+%d XP" % int(ev.amount) + ("" if int(ev.percent) >= 100 else " · %d%%" % int(ev.percent)), at + Vector2(0, dy), Color("1e9bb0"))
+				if int(ev.amount) > 0 and not first_cook_xp.any(func(x): return is_same(x, ev)):
+					# A pot's own XP names its track and a Good / Perfect pot's star: +5 Cooking XP ★ (§4.8.6 / §7.2.2).
+					var cook := str(ev.skill) == "cooking"
+					var text := ("+%d Cooking XP" % int(ev.amount) + (" ★" if good_pot else "")) if cook else "+%d XP" % int(ev.amount)
+					ui.float_text(text + ("" if int(ev.percent) >= 100 else " · %d%%" % int(ev.percent)), at, UiFloatText.Tone.XP, null, stack)
+					stack += 1
 			"item":
 				var iid := str(ev.id)
+				if iid.begins_with("dish_"): _call("p0_event", [ev, v])   # where a collected dish went (the kitchen's Keep toast)
 				if int(ev.delta) > 0 and not iid.begins_with("seed_") and not iid.begins_with("dish_") and not iid.begins_with("fish_"):
-					ui.float_text("+%d %s" % [int(ev.delta), P0Logic.item_name(v, iid)], at + Vector2(0, dy), Color("4f934b"))
+					ui.float_text("+%d %s" % [int(ev.delta), P0Logic.item_name(v, iid)], at, UiFloatText.Tone.ITEM, P0Logic.icon(iid), stack)
+					stack += 1
 			"coins":
-				ui.float_text("%+d coins" % int(ev.delta), at + Vector2(0, dy), Color("c9962a"))
+				ui.float_text(("%+d coins" % int(ev.delta)).replace("-", "−"), at, UiFloatText.Tone.COINS, null, stack)
+				stack += 1
 			"parcel":
 				# LOCK-14: rewards that did not fit the bag wait in the Inbox; one float for the whole reply.
 				if not parcels_said:
@@ -289,12 +301,13 @@ func _on_state(v: Dictionary, events: Array) -> void:
 			"catch":
 				# A world that shows the catch itself (the open fishing panel) returns true.
 				if not bool(_call("p0_event", [ev, v])): _on_catch(ev, xp_lines)
-			"cast", "pot":
+			"cast", "pot", "cabinet", "plate", "first", "mishap", "queue":
 				_call("p0_event", [ev, v])
 			"dish":
 				var lines := xp_lines.duplicate()
-				_call("p0_event", [ev, v])
-				ui.queue_card(func(): ui.show_dish(ev, lines))
+				# The farmhouse stove shows its own result card (COOK-4 / 6 / P0-9); elsewhere the old one. A world
+				# without p0_event (farm, map, outpost) gives null, so compare instead of bool() (PR #54 review).
+				if _call("p0_event", [ev, v]) != true: ui.queue_card(func(): ui.show_dish(ev, lines))
 			"request":
 				if str(ev.status) == "accepted": ui.toast("Tracking · it shows in Today")
 				else: ui.toast("Request complete · +%d coins" % int(ev.coins))
@@ -305,14 +318,17 @@ func _on_state(v: Dictionary, events: Array) -> void:
 					ui.toast("+%d Energy · Meals today %d/%d" % [int(ev.gain), int(ev.meals), int(ev.cap)])
 			"level":
 				var lv: Dictionary = ev
-				ui.queue_card(func(): ui.show_level_up(lv))
+				# Deferred, so a result card the same reply opens (the kitchen's COOK-4, itself deferred until the
+				# whole reply is in) comes first and the level-up queues behind it (C16; PR #54 review).
+				ui.queue_card.call_deferred(func(): ui.show_level_up(lv))
 				session.report({"kind": "level_banner", "skill": str(lv.skill), "level": int(lv.level)})
 			"affinity":   # SGODOT-225 / 228: first chat of the day, gifts, requests
 				var reply := P0Logic.resident_reply(str(ev.get("resident", "")), str(ev.get("verdict", "")))
 				# On the resident's open bar: the Affinity pill over it and the answer in the bubble (RES-KAI-TALK).
 				if not ui.resident_affinity(ev, reply):
 					if int(ev.get("delta", 0)) != 0:
-						ui.float_text("♥ " + P0Ui.affinity_text(ev), at + Vector2(0, dy), UiTokens.COLOR_FLOAT_AFFINITY)
+						ui.float_text(P0Ui.affinity_text(ev), at, UiFloatText.Tone.AFFINITY, null, stack)   # the tone draws the heart
+						stack += 1
 					if reply != "": ui.toast(reply)
 			"gift_meal":
 				var who := str(P0Logic.content().get("residents", {}).get(str(ev.get("resident", "")), {}).get("name", ""))
@@ -323,15 +339,12 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				# HOME-2 (SGODOT-228): HOME-1 closes, the MomentBanner says what changed; the farm swaps the fence.
 				if ui.modal_kind == "homestead": ui.close_modal()
 				HomePanel.moment(ui, P0Logic.home_moment(v, ev))
-		dy -= 16.0
-	if ui.modal_kind == "stall" and events.size() > 0:
-		ui.set_view(session.current())
-		ui.open_stall()   # refresh after Buy / Sell / Deliver; floats say what changed
+	if ui.modal_kind == "counter" and events.size() > 0:
+		ui.set_view(session.current())   # the counter drawer follows the view; floats say what changed
+		ui.counter_events(events)
 	elif ui.modal_kind == "resident" and events.size() > 0:
 		ui.set_view(session.current())
 		ui.open_resident(ui._resident)   # affinity, gift and request states follow the reply
-	elif ui.modal_kind == "tackle" and events.size() > 0:
-		ui.open_tackle("Strung and ready — it's on your belt. Swap rods in Bag › Gear.")
 
 ## FISH-3 / FISH-5 (§6.6, 16 · FISH-2 → 3 / 5): the first catch of a species gets the catch card, later
 ## ones a float; a gate break-free gets the four-line card once per species, then "Got away · Lv4";
@@ -349,7 +362,7 @@ func _on_catch(ev: Dictionary, _xp_lines: Array, at := Vector2.INF) -> void:
 				var extras := last_catch_extras.duplicate()
 				ui.queue_card(func(): ui.show_catch(fid, r, first, extras))
 			else:   # a repeat species: no card, `Pond Crucian ×1` beside its +XP (§4.8.6)
-				ui.float_text("%s ×1" % P0Logic.item_name(v, fid), where + Vector2(0, -22), P0Logic.rarity_text_color(r))
+				ui.float_text("%s ×1" % P0Logic.item_name(v, fid), where, UiFloatText.Tone.ITEM, P0Logic.icon(fid))
 		"broke_free":
 			var gone: Dictionary = ev
 			if ui.first_time("gotaway:" + str(ev.fish)):
@@ -358,13 +371,15 @@ func _on_catch(ev: Dictionary, _xp_lines: Array, at := Vector2.INF) -> void:
 			else:   # second time on: `Got away · Lv4 · Energy refunded (8 left today)` / `Got away · Reed Rod · 3 Energy back` (q(50))
 				var rod := P0Logic.rod_for(v, int(ev.get("rarity", 2)))
 				var what := ("Lv%d" % int(ev.need_level)) if ev.has("need_level") else (str(rod.name) if not rod.is_empty() else "rod too light")
-				ui.float_text("Got away · %s · %s" % [what, P0Logic.refund_line(v, ev).trim_prefix("+")], where, P0Ui.INK2)
+				ui.float_text("Got away · %s · %s" % [what, P0Logic.refund_line(v, ev).trim_prefix("+")], where, UiFloatText.Tone.ENERGY_GAIN)
 		"escaped":
-			ui.float_text("It got away · " + P0Logic.refund_line(v, ev).trim_prefix("+"), where, P0Ui.GREEN_D)
+			ui.float_text("It got away · " + P0Logic.refund_line(v, ev).trim_prefix("+"), where, UiFloatText.Tone.ENERGY_GAIN)
 		"cancelled":
 			ui.toast("Line in · Energy back")
 
 func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
+	# The farmhouse kitchen waits on cook / collect (its Cook buttons, the plate being served): let it recover.
+	if str(cmd.get("type", "")) in ["cook", "collect"]: _call("p0_event", [{"kind": "refused", "code": code, "cmd": cmd}, session.view])
 	if str(cmd.get("type", "")) == "cast": _call("p0_event", [{"kind": "cast_refused", "code": code}, session.view])
 	if code == "bag_full" and str(cmd.get("type", "")) == "reel":
 		_call("p0_event", [{"kind": "fish_abort"}, session.view])
@@ -413,6 +428,8 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 			ui.toast_error("Fish from a pond · open one from the map")   # the server did not get which pond (q(36))
 		"too_early", "no_cast":
 			_call("p0_event", [{"kind": "fish_abort"}, session.view])
+		"stale_pot":
+			session.refresh()   # S5: the server already kept that pot (Queue ×2); the fresh view shows where it went
 		"stove_busy":
 			ui.toast_error("The stove is busy · %s left" % P0Logic.duration(float(detail.get("ready_in", 0))))
 		"needs_main":
@@ -429,6 +446,12 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 			pass   # a retry of something the server already applied; the returned state re-renders the screen
 		_:
 			ui.toast_error("Can't do that (%s)" % code)
+
+## P0_SHOT counters away from the outposts: the keeper ctx the outpost would pass (assets/p0/p0_outposts.json, SGODOT-227).
+static func _dev_ctx(role: String) -> Dictionary:
+	return {"tackle": {"keeper": "Finn", "place": "Xuhui Tackle Shop", "nearest": {"name": "Reed Pond", "site": "pond"}},
+		"tea": {"keeper": "Ama", "place": "Lotus Tea House"}, "post": {"keeper": "Sigrid", "place": "Huangpu Travel Post"},
+		"market": {"keeper": "Mei", "place": "Xuhui Market Square"}}.get(role, {})
 
 # ---------------------------------------------------------------- dev: scripted desktop screenshots
 ## P0_SHOT=/abs/path.png P0_SHOT_STEPS="walk:1:0:1.5,act,..." — run scripted inputs, save one frame, quit.
@@ -454,6 +477,8 @@ func _dev_shot(dt: float) -> void:
 				ui._fab_pressed()
 			"release": ui.fab_held = false
 			"stall": ui.open_stall(step[1] if step.size() > 1 else "")
+			"counter": ui.open_counter(step[1], {"section": step[2] if step.size() > 2 else "buy", "ctx": _dev_ctx(step[1])})
+			"greet": ui.open_keeper_greeting(step[1], _dev_ctx(step[1]))
 			"bag": ui.open_bag(step[1] if step.size() > 1 else "")
 			"bagcat":   # bag drawer on one category tab, e.g. bagcat:Materials (SGODOT-225 storage stacks)
 				if ui._bag != null and is_instance_valid(ui._bag):
@@ -467,7 +492,10 @@ func _dev_shot(dt: float) -> void:
 			"auto":
 				P0Fishing.auto_play = true
 				P0Cooking.auto_play = true
-			"manual": P0Cooking.auto_play = false
+				P0Kitchen.auto_play = true
+			"manual":
+				P0Cooking.auto_play = false
+				P0Kitchen.auto_play = false
 			"dex": ui.open_fishdex()
 			"dexcell":   # dexcell:fish_koi — a Fish-dex cell tap (gate card or fish card, SGODOT-233)
 				for d in ui.find_children("*", "P0FishDex", true, false): (d as P0FishDex).cell_pressed.emit(step[1])
@@ -491,10 +519,11 @@ func _dev_shot(dt: float) -> void:
 			"energypanel": ui.open_energy_panel()
 			"inbox": ui.open_inbox()
 			"radial": ui.open_radial()
-			"kitchen": ui.open_kitchen(step[1] if step.size() > 1 else "cookbook")
-			"put":
-				ui._exp_slots.append(step[1])
-				ui.open_kitchen("experiment")
+			"kitchen", "put":
+				# The farmhouse owns the cooking drawer; elsewhere the interim panel opens.
+				if not bool(_call("p0_dev", [step])):
+					if step[0] == "put": ui._exp_slots.append(step[1])
+					ui.open_kitchen(step[1] if step[0] == "kitchen" and step.size() > 1 else ("experiment" if step[0] == "put" else "cookbook"))
 			"cook": session.send({"type": "cook", "recipe": step[1]})
 			"send":
 				# send:type=reel|outcome=landed (commas separate steps, so no JSON here)
