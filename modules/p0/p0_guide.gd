@@ -119,7 +119,7 @@ static func lead_rows(view: Dictionary) -> Array:
 		var fish := P0Logic.item_name(view, str(t.item))   # fish names take no plural s
 		if int(t.get("have", 0)) >= qty: rows.append(_row("Deliver %d %s · Stall" % [qty, fish], str(t.item), "stall"))
 		else: rows.append(_row("Catch %d %s · %s" % [qty, fish, _place_name(view, BEGINNER_POND)], str(t.item),
-			"stall" if str(t.get("status", "")) == "open" else "map:" + BEGINNER_POND))
+			"map:" + BEGINNER_POND))   # the pond is elsewhere: Show on map (q(31)); the stall's "!" asks to take it
 	elif first:
 		var done := _row("Deliver 2 %s · Stall" % P0Logic.item_name(view, "fish_crucian"), "fish_crucian", "stall")
 		done.state = "done"
