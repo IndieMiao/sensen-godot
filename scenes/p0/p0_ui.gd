@@ -385,11 +385,12 @@ func _refresh_bar() -> void:
 	for i in ids.size():
 		var id := str(ids[i])
 		slots.append({id = id, icon = P0Logic.icon(id), title = P0Logic.item_name(view, id), quantity = counts[i], pinned = store.pins.has(id)})
-	# A-08 ghost: a bar holding nothing of the action's family shows it in the first empty slot; a tap opens the
-	# Bag (ghost_tapped). TODO(SGODOT-225 bag drawer): open on the family tab (Seeds → Seeds, Bait → Tackle) and
-	# flash the slot 600 ms when a real item lands.
+	# A-08 ghost (LOCK-04): a bar with nothing of this action in stock shows the action's family in the first empty
+	# slot; a slot pinned at 0 is not stock (int5b hand test 9), Compost alone is. Five pinned 0 slots leave no
+	# room, so no ghost. A tap opens the Bag (ghost_tapped). TODO(SGODOT-225 bag drawer): open on the family tab
+	# (Seeds → Seeds, Bait → Tackle) and flash the slot 600 ms when a real item lands.
 	var family: Array = ["bait_", "bait_worm", "Bait"] if bar_mode == "fish" else ["seed_", "seed_radish", "Seeds"]
-	if slots.size() < UiQuickBar.SLOTS and not ids.any(func(id): return str(id).begins_with(family[0])):
+	if slots.size() < UiQuickBar.SLOTS and not counts.any(func(n): return int(n) > 0):
 		slots.append({ghost = true, icon = P0Logic.icon(family[1]), title = family[2]})
 	_bar.slots = slots
 	_bar.selected = sig[4]
