@@ -234,7 +234,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	if not before.is_empty():
 		for id in P0Guide.new_items(before, v): ui.quick_bar_node().flash(str(id))
 	var at := anchor()
-	var stack := 0   # floats of one reply stack upward (UiFloatText.play stack_index)
+	var floats: Array = []   # this reply's float parts: one float_lines call orders, merges and caps them (q(49) ①)
 	var xp_lines: Array = []
 	last_first_catch_xp = 0
 	last_catch_extras = {}
@@ -274,24 +274,22 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				if settles_catch and str(ev.get("reason", "")) in ["refund", "line_in"]: continue
 				# Inside the mine a floor fee is said by the mine's own float ("Floor 2 · −2 Energy", q(46)), not twice.
 				if str(ev.get("reason", "")) == "mine_floor" and str(_call("p0_surface", [])) == "mine": continue
-				ui.float_text(("%+d Energy" % dlt).replace("-", "−"), at, UiFloatText.Tone.ENERGY_COST if dlt < 0 else UiFloatText.Tone.ENERGY_GAIN, null, stack)
-				stack += 1
+				floats.append({kind = "energy", key = "energy", amount = dlt, fmt = "%s Energy"})
 			"xp":
 				if int(ev.amount) > 0 and not first_cook_xp.any(func(x): return is_same(x, ev)):
 					# A pot's own XP names its track and a Good / Perfect pot's star: +5 Cooking XP ★ (§4.8.6 / §7.2.2).
 					var cook := str(ev.skill) == "cooking"
-					var text := ("+%d Cooking XP" % int(ev.amount) + (" ★" if good_pot else "")) if cook else "+%d XP" % int(ev.amount)
-					ui.float_text(text + ("" if int(ev.percent) >= 100 else " · %d%%" % int(ev.percent)), at, UiFloatText.Tone.XP, null, stack)
-					stack += 1
+					var fmt := ("%s Cooking XP" + (" ★" if good_pot else "")) if cook else "%s XP"
+					fmt += "" if int(ev.percent) >= 100 else " · %d%%%%" % int(ev.percent)
+					floats.append({kind = "xp", key = fmt, amount = int(ev.amount), fmt = fmt, tone = UiFloatText.Tone.XP})
 			"item":
 				var iid := str(ev.id)
 				if iid.begins_with("dish_"): _call("p0_event", [ev, v])   # where a collected dish went (the kitchen's Keep toast)
 				if int(ev.delta) > 0 and not iid.begins_with("seed_") and not iid.begins_with("dish_") and not iid.begins_with("fish_"):
-					ui.float_text("+%d %s" % [int(ev.delta), P0Logic.item_name(v, iid)], at, UiFloatText.Tone.ITEM, P0Logic.icon(iid), stack)
-					stack += 1
+					floats.append({kind = "item", key = iid, amount = int(ev.delta), fmt = "%s " + P0Logic.item_name(v, iid),
+						tone = UiFloatText.Tone.ITEM, icon = P0Logic.icon(iid)})
 			"coins":
-				ui.float_text(("%+d coins" % int(ev.delta)).replace("-", "−"), at, UiFloatText.Tone.COINS, null, stack)
-				stack += 1
+				floats.append({kind = "coins", key = "coins", amount = int(ev.delta), fmt = "%s coins", tone = UiFloatText.Tone.COINS})
 			"parcel":
 				# LOCK-14: rewards that did not fit the bag wait in the Inbox; one float for the whole reply.
 				if not parcels_said:
@@ -327,8 +325,8 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				# On the resident's open bar: the Affinity pill over it and the answer in the bubble (RES-KAI-TALK).
 				if not ui.resident_affinity(ev, reply):
 					if int(ev.get("delta", 0)) != 0:
-						ui.float_text(P0Ui.affinity_text(ev), at, UiFloatText.Tone.AFFINITY, null, stack)   # the tone draws the heart
-						stack += 1
+						floats.append({kind = "affinity", key = str(ev.get("resident", "")), text = P0Ui.affinity_text(ev),
+							tone = UiFloatText.Tone.AFFINITY})   # the tone draws the heart
 					if reply != "": ui.toast(reply)
 			"gift_meal":
 				var who := str(P0Logic.content().get("residents", {}).get(str(ev.get("resident", "")), {}).get("name", ""))
@@ -339,6 +337,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				# HOME-2 (SGODOT-228): HOME-1 closes, the MomentBanner says what changed; the farm swaps the fence.
 				if ui.modal_kind == "homestead": ui.close_modal()
 				HomePanel.moment(ui, P0Logic.home_moment(v, ev))
+	ui.queue_floats(floats, at)   # with the world's own lines of this reply, at the end of the frame
 	if ui.modal_kind == "counter" and events.size() > 0:
 		ui.set_view(session.current())   # the counter drawer follows the view; floats say what changed
 		ui.counter_events(events)

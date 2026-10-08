@@ -292,7 +292,8 @@ func _on_state(v: Dictionary, events: Array) -> void:
 		var text := P0MaterialLogic.mine_event_text(e)
 		if text != "":
 			if str(e.get("action", "")) == "cleared": rt.ui.toast_success(text)   # MINE-P0-3 banner, §4.8.6 Toast Success
-			else: rt.ui.float_text(text, p0_anchor() + Vector2(0, -28), Color("d9772f"))
+			else:   # the floor fee `Floor 2 · −2 Energy` (q(46)): the Energy line of the reply's three (q(49) ①)
+				rt.ui.queue_floats([{kind = "energy", key = text, text = text, tone = UiFloatText.Tone.ENERGY_COST}], rt.anchor())
 		match str(e.get("action", "")):
 			"rock": _break_rock(int(e.get("rock", -1)), v)
 			"floor":

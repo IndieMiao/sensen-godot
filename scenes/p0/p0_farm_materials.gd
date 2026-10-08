@@ -112,7 +112,7 @@ func frame(v: Dictionary, card := "") -> void:
 	var stored := P0MaterialLogic.stored_notice(v, _stored_shown)
 	if stored != "":
 		_stored_shown = float(v.storage.auto.at)
-		rt.ui.float_text(stored, rt.anchor() + Vector2(0, -36), P0Ui.GREEN_D)
+		rt.ui.toast(stored)   # §4.8.6 回家入库: Toast Info `Stored · 12 Stone · 3 Copper Ore`
 
 ## STATE-ICONS badge over a spot (READY, LOCKED for Clay Bank before Homestead Lv2; a countdown spot shows none) and,
 ## when it holds the farm's one finger card, the card (Timber Grove · Tap to gather / · Ready in 2h 10m / Clay Bank ·
@@ -195,11 +195,9 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	if rt.world != farm or _opening: return
 	for e in events:
 		if str(e.get("kind", "")) == "gather":
-			# Stacked above the runtime's own item floats (what went to the bag) at the same anchor, never across them.
-			var dy := -20.0
-			for line in P0MaterialLogic.gather_floats(v, e):
-				rt.ui.float_text(line, rt.anchor() + Vector2(0, dy), P0Ui.GREEN_D)
-				dy -= 16.0
+			# One item line with the runtime's own (what went to the bag), in the reply's three lines (q(49) ①).
+			rt.ui.queue_floats(P0MaterialLogic.gather_floats(v, e).map(func(line: String) -> Dictionary:
+				return {kind = "item", key = line, text = line, tone = UiFloatText.Tone.ITEM}), rt.anchor())
 	for e in events:
 		if str(e.get("kind", "")) == "mine" and str(e.get("action", "")) in ["enter", "continue"]:
 			_opening = true

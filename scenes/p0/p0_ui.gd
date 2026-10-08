@@ -947,8 +947,101 @@ func float_text(text: String, screen: Vector2, tone: Variant = UiFloatText.Tone.
 	var f := UiFloatText.new(text, t, icon, UiFloatText.Layout.WRAP if text.length() > _FLOAT_HUG_CHARS else UiFloatText.Layout.HUG)
 	f.theme = UiKit.theme()
 	root.add_child(f)
-	f.play(screen, stack)
+	f.play(_float_start(screen, f.shown_size().y, stack), stack)
 	return f
+
+## A float never rises over the HUD (int6, 李元芳: `+5 Cooking XP ★` crossed the Today chip): its start is pushed
+## down so that, at the top of its rise, the line still sits under the HUD rows.
+func _float_start(screen: Vector2, h: float, stack: int) -> Vector2:
+	var top := _marker_area().position.y + _kit.global_position.y - root.global_position.y
+	var lowest := top + h + UiFloatText._RISE + UiFloatText._STACK_RISE * clampi(stack, 0, UiFloatText._STACK_MAX - 1)
+	return Vector2(screen.x, maxf(screen.y, lowest))
+
+# ---------------------------------------------------------------- one reply's floats (q(49) ①, §4.8.6)
+## The order of one reply's lines: Energy → XP → items → coins → affinity (q(49) ①).
+const FLOAT_ORDER := ["energy", "xp", "item", "coins", "affinity"]
+const FLOAT_MAX_LINES := 3
+## A line of a kind still up — before its fade starts (UiFloatText 650 ms) — takes the next reply's amount in place.
+const _FLOAT_MERGE_MS := 650
+const _FLOAT_MERGE_PX := 32.0
+var float_clock := Callable(Time, &"get_ticks_msec")
+var _live_floats := {}   # kind -> {node, parts: {key: part}, at, ms}
+
+## One server reply's floats (q(49) ①; §4.8.6). parts: [{kind, key, amount, fmt, tone, icon}] in any order — `fmt`
+## takes the signed amount (`%s XP`, `%s Timber`); a part without fmt gives its `text` as it is (affinity). Parts of a
+## kind share one line: the same key adds up (`+15 XP`, `−4 Energy`), different keys join (`+6 Timber · +2 Stone`).
+## Lines go Energy → XP → items → coins → affinity, at most three; the rest join the third (`+6 Timber · +14 coins`),
+## nothing is dropped. A kind still up from the last reply at the same place takes the new amounts in place and
+## bumps (a held harvest: `+4 XP` → `+8 XP` …) instead of a new float. Returns the lines' floats.
+func float_lines(parts: Array, at: Vector2) -> Array:
+	var kinds := {}
+	for p in parts:
+		var k := str(p.get("kind", "item"))
+		if not kinds.has(k): kinds[k] = {}
+		_float_add(kinds[k], p)
+	var order: Array = FLOAT_ORDER.filter(func(k): return kinds.has(k))
+	for k in kinds:
+		if not order.has(k): order.append(k)
+	var shown: Array = []
+	var now := int(float_clock.call())
+	for i in order.size():
+		var k: String = order[i]
+		if i >= FLOAT_MAX_LINES: break
+		var merged: Dictionary = kinds[k]
+		var extra: Array = order.slice(FLOAT_MAX_LINES) if i == FLOAT_MAX_LINES - 1 else []
+		if extra.is_empty():
+			var live: Dictionary = _live_floats.get(k, {})
+			if not live.is_empty() and is_instance_valid(live.node) and now - int(live.ms) < _FLOAT_MERGE_MS \
+					and (live.at as Vector2).distance_to(at) < _FLOAT_MERGE_PX:
+				for p in merged.values(): _float_add(live.parts, p)
+				(live.node as UiFloatText).bump(_float_line_text(live.parts))
+				live.ms = now
+				shown.append(live.node)
+				continue
+		var text := _float_line_text(merged)
+		for e in extra: text += " · " + _float_line_text(kinds[e])   # the overflow joins the last line
+		var first: Dictionary = merged.values()[0]
+		var tone: int = first.get("tone", UiFloatText.Tone.ITEM)
+		# Energy is coloured by what it adds up to; a line of text parts only (a floor fee) keeps its own tone.
+		if k == "energy" and merged.values().any(func(p): return p.has("fmt")):
+			tone = UiFloatText.Tone.ENERGY_COST if _float_sum(merged) < 0 else UiFloatText.Tone.ENERGY_GAIN
+		var f := float_text(text, at, tone, first.get("icon", null), i)
+		if extra.is_empty(): _live_floats[k] = {node = f, parts = merged.duplicate(true), at = at, ms = now}
+		shown.append(f)
+	return shown
+
+var _float_batch := {}   # Vector2i anchor -> {at, parts}, flushed once at the end of the frame
+
+## Adds parts to this frame's batch at `at` (see float_lines): everything one server reply says — the runtime's
+## Energy / XP / items / coins and a world's own lines (a gather's `+6 Timber · Stored`, a floor fee) — lands in one
+## float_lines call, so the three-line cap and the order hold across callers.
+func queue_floats(parts: Array, at: Vector2) -> void:
+	if parts.is_empty(): return
+	if _float_batch.is_empty(): _flush_floats.call_deferred()
+	var key := Vector2i(at.round())
+	if not _float_batch.has(key): _float_batch[key] = {at = at, parts = []}
+	(_float_batch[key].parts as Array).append_array(parts)
+
+func _flush_floats() -> void:
+	var batch := _float_batch
+	_float_batch = {}
+	for k in batch: float_lines(batch[k].parts, batch[k].at)
+
+static func _float_add(into: Dictionary, p: Dictionary) -> void:
+	var key := str(p.get("key", p.get("fmt", p.get("text", ""))))
+	if into.has(key) and p.has("fmt"): into[key].amount = int(into[key].amount) + int(p.get("amount", 0))
+	else: into[key] = p.duplicate()   # a new key, or a text part (the latest wins)
+
+static func _float_sum(parts: Dictionary) -> int:
+	var n := 0
+	for p in parts.values(): n += int(p.get("amount", 0))
+	return n
+
+static func _float_line_text(parts: Dictionary) -> String:
+	return " · ".join(parts.values().map(func(p: Dictionary) -> String:
+		if not p.has("fmt"): return str(p.get("text", ""))
+		var a := int(p.get("amount", 0))
+		return str(p.fmt) % (("+%d" % a) if a >= 0 else ("−%d" % -a))))
 
 ## Toast (Toast R1, §4.8.6; q(49) ⑤): one at a time, a new one replaces the one showing and the same sentence again
 ## within 2 s only stays up longer. Info; `seconds` > 0 overrides the length rule (2 s + 0.5 s per 20 characters,
