@@ -74,6 +74,7 @@ def main():
                 else (_stage(m["albedo"], godot_root, sid, report, albedo_as) if m["albedo"] else None)
             m["ao"] = m["ao"] if str(m["ao"]).startswith("res://") \
                 else (_stage(m["ao"], godot_root, sid, report) if m["ao"] else None)
+        # 样例里写了 "id" 的 NPC 变体和原件共用同一个 unity_guid：以后按 guid 反查部件时要排除 npc_only 的 id。
         guid_rows.append((r["unity_guid"], sid))
 
     (out_dir / "recipes.json").write_text(

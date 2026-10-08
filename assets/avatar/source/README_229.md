@@ -32,6 +32,7 @@ godot --headless --path . --script res://tools/pipeline/extract_parts.gd -- res:
 #    期望输出："追加完成: 5 部件, 0 错误"
 #    自查：git diff assets/avatar/parts_manifest.json 只应在末尾多出 5 个条目
 #    改了美术要重提某一件：先从清单里删掉它的条目，再跑一次上面这条命令
+#    （删的若是最后一条，把前一条末尾的逗号也删掉，否则清单不是合法 JSON）
 
 # 3. 把 5 个 id 写进 NPC 专用名单，玩家换装列表和联机外观就看不到它们
 #    assets/avatar/npc_only.json:

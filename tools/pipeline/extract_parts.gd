@@ -86,7 +86,9 @@ static func pending(recipes: Array, manifest_parts: Array) -> Array:
 ## "" when the text has no parts array ending "\n\t]".
 static func append_entries(text: String, entries: Array) -> String:
 	if entries.is_empty(): return text
-	var close := text.rfind("\n\t]")
+	# The first top-level "]" after "parts": [ closes it; nested arrays sit deeper, other top-level arrays come later.
+	var open := text.find("\"parts\": [")
+	var close := text.find("\n\t]", open) if open >= 0 else -1
 	if close < 0: return ""
 	var block := ""
 	for e in entries:

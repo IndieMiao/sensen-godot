@@ -42,3 +42,12 @@ func test_only_ids_missing_from_the_manifest_are_extracted() -> void:
 	var manifest_parts := [_entry("hairhat51"), _entry("cloth11", "cloth"), _entry("glass1", "glass")]
 	assert_array(Extract.pending(recipes, manifest_parts).map(func(r): return r.id)).is_equal(["fixture_new_mask", "fixture_new_cloth"])
 	assert_array(Extract.pending(recipes.slice(0, 1) + recipes.slice(2, 3), manifest_parts)).is_empty()
+
+## The new entries go into "parts", even when another top-level array follows it in the sorted keys.
+func test_entries_land_in_parts_not_in_a_later_top_level_array() -> void:
+	var a := _entry("hairhat0")
+	var c := _entry("fixture_new_mask", "mask")
+	var before := JSON.stringify({"version": 1, "parts": [a], "tags": ["x"]}, "\t")
+	var full := JSON.stringify({"version": 1, "parts": [a, c], "tags": ["x"]}, "\t")
+	assert_str(Extract.append_entries(before, [c])).is_equal(full)
+	assert_str(Extract.append_entries(JSON.stringify({"version": 1, "parts": []}, "\t"), [c])).is_empty()
