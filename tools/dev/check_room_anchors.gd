@@ -21,8 +21,9 @@ func _init() -> void:
 	var modules: Array = []
 	for list in [layout.get("assets", []), layout.get("instances", [])]:
 		for a in list: modules.append(str(a.get("name", "")))
-	var anchors := P0RoomAnchors.merge(layout, external)
-	var errors := P0RoomAnchors.validate(anchors, modules)
+	for p in P0RoomAnchors.props(external): modules.append(str(p.name))   # placeholder props are modules too
+	var anchors: Array = P0RoomAnchors.merge(layout, external)
+	var errors: PackedStringArray = P0RoomAnchors.validate(anchors, modules)
 	for e in errors: print("  ✗ " + e)
 	print("%d anchors, %d problems" % [anchors.size(), errors.size()])
 	quit(0 if errors.is_empty() else 1)

@@ -9,7 +9,8 @@ extends Node3D
 ## the door (exit anchor) or Back returns to the world below (farmhouse → farm, outpost → map).
 ##
 ## Subclasses fill art_scene / layout_path / anchors_path / place_name in setup(args) or _init(), and override
-## the hooks below: _room_ready, _tappable, _on_facility, _marker, _module_visible, _room_frame, _on_joystick.
+## the hooks below: _dress_art, _room_ready, _tappable, _on_facility, _marker, _module_visible, _room_frame,
+## _on_joystick.
 
 signal facility_tapped(name: String)
 signal left()
@@ -98,6 +99,7 @@ func _ready() -> void:
 	_build_hearth_glow()   # before the art: the Basic Room's particle fire (SGODOT-236) takes ../HearthGlow
 	art = art_scene.instantiate()
 	room.add_child(art)
+	_dress_art()
 	_apply_module_visibility()
 	var nav := P0RoomNav.build(P0RoomNav.shapes_from(art))
 	bp = nav.bp
@@ -127,6 +129,50 @@ func _exit_tree() -> void:
 	if rt: rt.detach(self)
 
 # ---------------------------------------------------------------- hooks for subclasses
+## Adds props to the art before module visibility and the walkable grid are read. By default the anchors file's
+## placeholder props, named as modules and shown from their `level` (module_levels): `from` copies an art piece;
+## `scene` instances a model (with `atlas`, its shared albedo; `collider` {at, size} in model units). A prop
+## whose source is missing is skipped, so its module and anchors stay hidden.
+func _dress_art() -> void:
+	for p in P0RoomAnchors.props(P0RoomAnchors.read_json(anchors_path)):
+		var copy := _prop_node(p)
+		if copy == null: continue
+		copy.name = str(p.name)
+		copy.position = P0RoomAnchors.vec(p.position)
+		copy.rotation = Vector3(0.0, deg_to_rad(float(p.get("yaw_degrees", 0))), 0.0)
+		copy.scale = Vector3.ONE * float(p.get("scale", 1.0))
+		art.add_child(copy)
+		if p.has("level"): module_levels[str(p.name)] = int(p.level)
+
+func _prop_node(p: Dictionary) -> Node3D:
+	if p.has("from"):
+		var src := art.get_node_or_null(NodePath(str(p.from))) as Node3D
+		return src.duplicate() as Node3D if src else null
+	var path := str(p.get("scene", ""))
+	if path == "" or not ResourceLoader.exists(path): return null
+	var holder := Node3D.new()
+	var model := (load(path) as PackedScene).instantiate() as Node3D
+	holder.add_child(model)
+	var atlas := str(p.get("atlas", ""))
+	if atlas != "" and ResourceLoader.exists(atlas):
+		var mat := StandardMaterial3D.new()   # the Basic Room atlas look (BasicRoomArt._setup_room)
+		mat.albedo_texture = load(atlas)
+		mat.roughness = 0.8
+		mat.metallic_specular = 0.28
+		mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+		for m in model.find_children("*", "MeshInstance3D", true, false): (m as MeshInstance3D).material_override = mat
+	var c: Dictionary = p.get("collider", {})
+	if not c.is_empty():
+		var body := StaticBody3D.new()
+		body.position = P0RoomAnchors.vec(c.at)
+		var shape := BoxShape3D.new()
+		shape.size = P0RoomAnchors.vec(c.size)
+		var cs := CollisionShape3D.new()
+		cs.shape = shape
+		body.add_child(cs)
+		holder.add_child(body)
+	return holder
+
 func _room_ready() -> void: pass
 
 ## Anchor names the player can tap; default every visible use_ / npc_ anchor plus the door.
@@ -346,6 +392,9 @@ func release_focus() -> void:
 	_ease_shot(0.0)
 
 func is_focused() -> bool: return not _shot.is_empty() and _shot_k > 0.0
+
+## Orthographic width of the room's opening view, in metres (push-in sizes are fractions of it).
+func view_size() -> float: return _cam_size
 
 ## Screen band from the HUD's bottom edge to `bottom` (fraction of the screen height).
 func band_below_hud(bottom: float) -> Rect2:

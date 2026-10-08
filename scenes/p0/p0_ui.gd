@@ -171,7 +171,7 @@ func _process(dt: float) -> void:
 	# q(49): a waiting TipCard comes up only when no RewardMoment / result card is on screen; one already up stays.
 	# TODO(SGODOT-232 U6): call tips.moment_opened / moment_closed from UiRewardMoment / MomentBanner once #24 lands;
 	# until then the result cards (modal_kind "card") stand in for them.
-	if tips and modal_kind != "card":
+	if tips and not modal_kind in ["card", "kitchen_card"]:   # the farmhouse's COOK-4 is a result card too
 		var key := tips.next()
 		if key != "": _show_tip(str(P0Guide.TIPS[key]))
 
@@ -2112,6 +2112,11 @@ func _show_tip(text: String) -> void:
 ## and Experiment (free slots from the bag). Cooking costs no Energy.
 func open_kitchen(tab := "") -> void:
 	teach("cook")   # Tap Cook to grill your first fish (§14.2 minute 14–16)
+	# The farmhouse's stove corner owns the cooking drawer (SGODOT-226): walk there and open it.
+	var world = P0Runtime.ensure().world
+	if is_instance_valid(world) and world.has_method("p0_open_kitchen"):
+		world.call("p0_open_kitchen", tab if tab != "" else _kitchen_tab)
+		return
 	if tab != "": _kitchen_tab = tab
 	var ck: Dictionary = view.get("cooking", {})
 	var lvl := int(view.get("skills", {}).get("cooking", {}).get("level", 1))

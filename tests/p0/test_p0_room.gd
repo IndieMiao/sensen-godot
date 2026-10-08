@@ -80,7 +80,9 @@ func test_the_placeholder_anchor_files_pass_validation() -> void:
 	var layout := P0RoomAnchors.read_json(P0Room.BASIC_ROOM_LAYOUT)
 	var modules: Array = layout.assets.map(func(a): return str(a.name)) + layout.instances.map(func(a): return str(a.name))
 	for path in _anchor_files("res://assets/p0"):
-		var errors := P0RoomAnchors.validate(P0RoomAnchors.merge(layout, P0RoomAnchors.read_json(path)), modules)
+		var external := P0RoomAnchors.read_json(path)
+		var known: Array = modules + P0RoomAnchors.props(external).map(func(p): return str(p.name))
+		var errors := P0RoomAnchors.validate(P0RoomAnchors.merge(layout, external), known)
 		assert_array(errors).override_failure_message(path + "\n" + "\n".join(errors)).is_empty()
 
 func _anchor_files(dir: String) -> Array:
@@ -193,9 +195,10 @@ func test_push_in_puts_the_stove_in_the_band_above_the_drawer() -> void:
 # ---------------------------------------------------------------- farmhouse (placeholder Basic Room)
 const FARMHOUSE := preload("res://scenes/p0/rooms/p0_farmhouse.gd")
 
-func _farmhouse() -> P0Room:
+func _farmhouse(level := 1) -> P0Room:
 	var r: P0Room = FARMHOUSE.new()
 	r.use_runtime = false
+	r.level = level
 	add_child(r)
 	auto_free(r)
 	return r
@@ -231,6 +234,26 @@ func test_the_room_has_one_hearth_lamp_ahead_of_the_art() -> void:
 	# …and the fire drives that very lamp (its light_path is relative to the fire node, Hou Yi's review on #32).
 	var fire: Node = r.art.get("fire")
 	assert_object(fire.get_node_or_null(fire.get("light_path"))).is_same(r.room.get_node("HearthGlow"))
+
+func test_the_kitchen_corner_grows_with_the_homestead() -> void:
+	# Lv1: no Spice Rack, no Warming Cabinet (props hidden, their anchors absent, nothing to tap).
+	var lv1 := _farmhouse(1)
+	assert_bool(lv1.art.get_node("spice_rack").visible).is_false()
+	assert_bool(lv1.art.get_node("warming_cabinet").visible).is_false()
+	assert_object(lv1.anchor("use_warming_cabinet")).is_null()
+	assert_array(Array(lv1._tappable())).not_contains(["use_spice_rack", "use_warming_cabinet"])
+	# Lv2: the rack; Lv3: the cabinet too, with its glow, a collider in the walkable grid and a reachable stand.
+	var lv2 := _farmhouse(2)
+	assert_bool(lv2.art.get_node("spice_rack").visible).is_true()
+	assert_bool(lv2.art.get_node("warming_cabinet").visible).is_false()
+	var lv3 := _farmhouse(3)
+	assert_array(Array(lv3._tappable())).contains(["use_spice_rack", "use_warming_cabinet"])
+	assert_bool(lv3.art.get_node("warming_cabinet_glow").visible).is_true()
+	var cab := lv3.anchor("use_warming_cabinet").global_position
+	assert_bool(lv3.bp.is_walkable(lv3.bp.world_to_cell(Vector3(cab.x, 0, cab.z)))).override_failure_message("the cabinet blocks the floor").is_false()
+	assert_array(lv3.grid.point_path(lv3.actor.position, lv3.anchor("stand_warming_cabinet").global_position)).is_not_empty()
+	assert_str(lv3._marker("use_spice_rack", {}).text).is_equal("Spice Rack · Tap to open")
+	assert_str(lv3._marker("use_warming_cabinet", {"cooking": {"cabinet": {"cap": 6, "have": 6, "items": []}}}).text).is_equal("Warming Cabinet Full · Tap to open")
 
 func test_farmhouse_stove_card_and_badge_follow_the_server_stove() -> void:
 	var r := _farmhouse()
@@ -283,6 +306,30 @@ func test_back_at_the_door_leaves_at_once_and_is_still_handled() -> void:
 	assert_bool(r.is_back_navigation_locked()).is_true()
 	assert_int(left[0]).is_equal(1)
 	r.p0_frame({}, 0.1)   # a frame after leaving does nothing
+
+## Hard constraint (Arthur, SGODOT-226): with the cooking drawer up (480 of 800 at 360 wide), the whole stove stays
+## above the drawer's top edge, and the pot sits between the HUD and the slot bar.
+func test_pushed_in_stove_clears_the_cooking_drawer_on_a_360_by_800_screen() -> void:
+	var sv := SubViewport.new()
+	sv.size = Vector2i(360, 800)
+	sv.own_world_3d = true
+	add_child(auto_free(sv))
+	var r: P0Room = FARMHOUSE.new()
+	r.use_runtime = false
+	sv.add_child(r)
+	r.focus("cam_stove", {band = r.band_below_hud(P0Kitchen.BAND_TOP_DRAWER), size = r.view_size() * P0Kitchen.FOCUS_SIZE})
+	r._shot_k = 1.0
+	r._update_camera()
+	var drawer_top := 800.0 - P0KitchenDrawer.HEIGHT
+	var lowest := -INF
+	var hearth: Node3D = r.art.get_node("hearth")
+	for mi in hearth.find_children("*", "MeshInstance3D", true, false):
+		var box: AABB = (mi as MeshInstance3D).global_transform * (mi as MeshInstance3D).get_aabb()
+		for i in 8: lowest = maxf(lowest, r.cam.unproject_position(box.get_endpoint(i)).y)
+	assert_float(lowest).override_failure_message("stove bottom %.0f vs drawer top %.0f" % [lowest, drawer_top]).is_less(drawer_top)
+	var pot := r.cam.unproject_position(r.anchor("drop_pot_1").global_position).y
+	assert_float(pot).is_greater(P0Room.HUD_BOTTOM)
+	assert_float(pot).is_less(drawer_top - 80.0)   # slot bar (50) and preview (26) sit above the drawer
 
 # ---------------------------------------------------------------- environment and backdrop (SGODOT-248 / 249)
 ## The real farm scene and its suspend() / resume(), without the farm's _ready (runtime, session, world build).
