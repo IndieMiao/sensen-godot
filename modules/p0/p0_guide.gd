@@ -103,25 +103,43 @@ static func page(view: Dictionary, id: String) -> Dictionary:
 static func lead_rows(view: Dictionary) -> Array:
 	var rows: Array = []
 	var t := tutorial(view)
-	if not t.is_empty():   # first session: Catch 2 Pond Crucian · Reed Pond (ticked once caught; the stall's ✓ asks to hand them in)
-		var qty := int(t.get("qty", 2))
-		var r := _row("Catch %d %s · %s" % [qty, P0Logic.item_name(view, str(t.item)), _place_name(view, BEGINNER_POND)],   # fish: no plural s
-			str(t.item), "stall" if str(t.get("status", "")) == "open" else "map:" + BEGINNER_POND)
-		if int(t.get("have", 0)) >= qty: r.state = "done"
-		rows.append(r)
-	# Cook it: Grilled Crucian — through the first session (ticked once cooked), and after it until the first dish is made
 	var grill := page(view, "dish_grilled_crucian")
-	if not grill.is_empty() and (not t.is_empty() or not grill.get("cooked", false)):
+	var handed := (view.get("req_done", []) as Array).has(TUTORIAL)
+	var first: bool = not t.is_empty() or (handed and not grill.get("cooked", false))   # the first session lasts to the first dish
+	# Row 1 follows the request's state, never events (q(58)): Catch while short (eaten fish send it back), Deliver
+	# once the creel holds them (not ticked), ticked only when handed in. Show: Catch → Reed Pond's pin; Deliver → the
+	# stall in the farm, the home pin elsewhere (go "stall").
+	if not t.is_empty():
+		var qty := int(t.get("qty", 2))
+		var fish := P0Logic.item_name(view, str(t.item))   # fish names take no plural s
+		if int(t.get("have", 0)) >= qty: rows.append(_row("Deliver %d %s · Stall" % [qty, fish], str(t.item), "stall"))
+		else: rows.append(_row("Catch %d %s · %s" % [qty, fish, _place_name(view, BEGINNER_POND)], str(t.item),
+			"stall" if str(t.get("status", "")) == "open" else "map:" + BEGINNER_POND))
+	elif first:
+		var done := _row("Deliver 2 %s · Stall" % P0Logic.item_name(view, "fish_crucian"), "fish_crucian", "stall")
+		done.state = "done"
+		rows.append(done)
+	# Cook it: Grilled Crucian — through the first session (ticked once cooked), and after it until the first dish is made
+	if not grill.is_empty() and (first or not grill.get("cooked", false)):
 		var cook := _row("Cook it: %s" % str(grill.get("name", "Grilled Crucian")), "dish_grilled_crucian", "stove")
 		if grill.get("cooked", false): cook.state = "done"
 		rows.append(cook)
-	if not t.is_empty(): return rows   # the third row is the radishes' timer (P0Logic), not another goal
+	if first: return focus_first(rows)   # the third row is the radishes' timer (P0Logic), not another goal
 	var third := third_slot_row(view)
 	if not third.is_empty(): rows.append(third)
 	var fresh := new_recipe_row(view)
 	if not fresh.is_empty(): rows.append(fresh)
 	var sow := sow_row(view)
 	if not sow.is_empty(): rows.append(sow)
+	return focus_first(rows)
+
+## Today highlights only the first row still to do (q(58)): "focus" true on it, false on the rest. Call it again on
+## the full list once P0Logic has filled Today up to 3.
+static func focus_first(rows: Array) -> Array:
+	var found := false
+	for r in rows:
+		r.focus = not found and str(r.get("state", "")) != "done"
+		if r.focus: found = true
 	return rows
 
 ## `Cook: Herb Grilled Fish · new recipe` (§14.2 minute 22): a known page never cooked that the stove can make now.
@@ -164,10 +182,13 @@ static func sow_row(view: Dictionary) -> Dictionary:
 		return r
 	return {}
 
-## `10 Lettuce`, `5 Carrots`: lettuce and chamomile take no plural s.
+## Crop plurals for counts (q(58)): Lettuce, Chamomile and Corn stay as they are; Chili → Chilies; the rest by
+## P0Logic.plural (Radishes, Herbs, Carrots, Potatoes, Tomatoes, Cabbages, Cucumbers). Fish names never take an s.
+const CROP_PLURALS := {"Lettuce": "Lettuce", "Chamomile": "Chamomile", "Corn": "Corn", "Chili": "Chilies"}
 static func crop_count_name(view: Dictionary, crop_id: String, n: int) -> String:
 	var name := P0Logic.item_name(view, crop_id)
-	return name if n == 1 or name in ["Lettuce", "Chamomile"] else P0Logic.plural(name)
+	if n == 1: return name
+	return str(CROP_PLURALS.get(name, P0Logic.plural(name)))
 
 ## ` · +8 in 21m`: the Energy still missing and when natural recovery brings it.
 static func _gain_in(e: Dictionary, gap: int) -> String:
@@ -267,7 +288,7 @@ static func new_items(before: Dictionary, after: Dictionary) -> Array:
 # ---------------------------------------------------------------- helpers
 
 static func _row(line: String, icon_id: String, go: String) -> Dictionary:
-	return {"line": line, "icon": icon_id, "go": go, "state": "default", "tail": ""}
+	return {"line": line, "icon": icon_id, "go": go, "state": "default", "tail": "", "focus": false}
 
 static func _place_name(view: Dictionary, place: String) -> String:
 	var p = view.get("fishing", {}).get("places", {}).get(place, null)

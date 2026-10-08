@@ -157,6 +157,7 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
       ...Object.entries(c.specialty).map(([id, sp]) => [id, sp.name]), ...c.bag_upgrades.map(u => [u.id, u.name])]),
     crops: c.crops.map(crop => ({ id: crop.id, seed: crop.seed, energy: crop.energy, grow_h: crop.grow_h, level: crop.level })),
     firsts: s.firsts,
+    req_done: s.req_done,   // requests handed in (newest last, ≤ 20): the first session's Deliver row ticks on Pond Catch (q(58))
   };
 }
 

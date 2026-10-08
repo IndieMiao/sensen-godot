@@ -87,23 +87,46 @@ func test_first_session_rows_follow_the_director_table() -> void:
 	assert_str(Guide.lead_rows(v)[0].go).is_equal("stall")      # take the request first
 	v.stall.board.requests[0].status = "accepted"
 	assert_str(Guide.lead_rows(v)[0].go).is_equal("map:pond_shanghai_05")   # Show on map at Reed Pond
+	# q(58): two in the creel → Deliver at the stall, not ticked, and it has the focus
 	v.stall.board.requests[0].have = 2
-	assert_that(_lines(Guide.lead_rows(v))).is_equal(["Catch 2 Pond Crucian · Reed Pond ✓", "Cook it: Grilled Crucian"])
+	var rows := Guide.lead_rows(v)
+	assert_that(_lines(rows)).is_equal(["Deliver 2 Pond Crucian · Stall", "Cook it: Grilled Crucian"])
+	assert_str(rows[0].go).is_equal("stall")
+	assert_that(rows.map(func(r): return r.focus)).is_equal([true, false])
 	assert_str(Guide.stall_badge(v)).is_equal("deliver")
-	# handed in, the third crucian still to cook: the first dish stays the goal, no lettuce row yet
+	# a fish eaten: back to Catch (the request's state, not an event)
+	v.stall.board.requests[0].have = 1
+	assert_str(Guide.lead_rows(v)[0].line).is_equal("Catch 2 Pond Crucian · Reed Pond")
+	# handed in (Request complete · +14 coins): Deliver ticks, Cook it takes the focus; no lettuce row yet
 	v.stall.board.requests = []
+	v.req_done = ["req_pond_catch"]
 	v.cooking.cookbook[0].can_cook = true
 	v.bag.slots = [{"id": "fish_crucian", "qty": 1}, {"id": "seed_lettuce", "qty": 10}]
-	assert_that(_lines(Guide.lead_rows(v))).contains(["Cook it: Grilled Crucian"])
-	# cooked and eaten: Sow 10 Lettuce · 20 Energy (the 10 wild beds till for free)
+	rows = Guide.lead_rows(v)
+	assert_that(_lines(rows)).is_equal(["Deliver 2 Pond Crucian · Stall ✓", "Cook it: Grilled Crucian"])
+	assert_that(rows.map(func(r): return r.focus)).is_equal([false, true])
+	# cooked and eaten: the first session is over — Sow 10 Lettuce · 20 Energy (the 10 wild beds till for free)
 	v.cooking.cookbook[0].cooked = true
 	v.plots = _plots(["growing", "growing", "wild", "wild", "wild", "wild", "wild", "wild", "wild", "wild", "wild", "wild"])
 	assert_that(_lines(Guide.lead_rows(v))).is_equal(["Sow 10 Lettuce · 20 Energy"])
 
-func test_the_cook_row_is_ticked_while_the_first_session_lasts() -> void:
+func test_cooking_before_handing_in_is_not_blocked() -> void:
 	var v := _view({"plots": _plots(["growing"])})
+	v.stall.board.requests[0].status = "accepted"
+	v.stall.board.requests[0].have = 2
 	v.cooking.cookbook[0].cooked = true
-	assert_that(_lines(Guide.lead_rows(v))).is_equal(["Catch 2 Pond Crucian · Reed Pond", "Cook it: Grilled Crucian ✓"])
+	var rows := Guide.lead_rows(v)
+	assert_that(_lines(rows)).is_equal(["Deliver 2 Pond Crucian · Stall", "Cook it: Grilled Crucian ✓"])
+	assert_that(rows.map(func(r): return r.focus)).is_equal([true, false])
+
+func test_crop_plurals() -> void:
+	var v := {"names": {"crop_lettuce": "Lettuce", "crop_chili": "Chili", "crop_radish": "Radish", "crop_potato": "Potato", "crop_corn": "Corn"}}
+	assert_str(Guide.crop_count_name(v, "crop_lettuce", 10)).is_equal("Lettuce")
+	assert_str(Guide.crop_count_name(v, "crop_corn", 4)).is_equal("Corn")
+	assert_str(Guide.crop_count_name(v, "crop_chili", 5)).is_equal("Chilies")
+	assert_str(Guide.crop_count_name(v, "crop_radish", 20)).is_equal("Radishes")
+	assert_str(Guide.crop_count_name(v, "crop_potato", 2)).is_equal("Potatoes")
+	assert_str(Guide.crop_count_name(v, "crop_radish", 1)).is_equal("Radish")
 
 func test_short_of_energy_the_sow_row_says_when() -> void:
 	var v := _view({"stall": {"board": {"requests": []}}, "plots": _plots(["growing", "tilled", "tilled"]),
