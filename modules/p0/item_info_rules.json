@@ -1,7 +1,7 @@
 {
   "_doc": [
     "F-07 confirmed item detail rules (SGODOT-207 comment 168a4cc3, revisions 1-2; product wording 25f3cb4c; K-3 = A).",
-    "Keys are kind/context. Kinds: seed crop fish dish bait rod material. Contexts: bag gear counter_buy counter_sell gift.",
+    "Keys are kind/context. Kinds: seed crop fish dish bait rod material. Contexts: bag gear counter_buy counter_sell gift storage workbench (a recipe's item on the B2-06 workbench: what it does, no buttons; the card has Craft / Equip).",
     "A kind/context without an entry shows no card (cooking picks never show one).",
     "facts: lines in order (count and source, use, cost, XP hint); {token} values come from P0ItemInfo.tokens(); a line whose",
     "  tokens are empty is dropped. when: a predicate expression over P0ItemInfo.flags() (names, !, &), empty = always.",
@@ -568,6 +568,13 @@
       }
     ],
     "lock": true
+  },
+  "any/workbench": {
+    "facts": [
+      "{craft_effect}",
+      "{craft_note}"
+    ],
+    "buttons": []
   },
   "any/storage": {
     "facts": [

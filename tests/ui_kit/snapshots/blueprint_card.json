@@ -1,0 +1,2310 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    1663
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiBlueprintCard"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        18
+      ],
+      "variation": "CaptionR12",
+      "text": "BlueprintCard 1434:93844 · B2-06 · LOCK-10 / 29"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        52,
+        328,
+        1611
+      ],
+      "children": [
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            52,
+            328,
+            223
+          ],
+          "children": [
+            {
+              "type": "UiBlueprintCard",
+              "rect": [
+                0,
+                52,
+                328,
+                203
+              ],
+              "children": [
+                {
+                  "type": "VBoxContainer",
+                  "rect": [
+                    14,
+                    64,
+                    300,
+                    179
+                  ],
+                  "children": [
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        14,
+                        64,
+                        300,
+                        44
+                      ],
+                      "children": [
+                        {
+                          "type": "PanelContainer",
+                          "rect": [
+                            14,
+                            64,
+                            44,
+                            44
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                20,
+                                70,
+                                32,
+                                32
+                              ]
+                            },
+                            {
+                              "type": "Button",
+                              "rect": [
+                                14,
+                                64,
+                                44,
+                                44
+                              ],
+                              "text": ""
+                            }
+                          ]
+                        },
+                        {
+                          "type": "VBoxContainer",
+                          "rect": [
+                            68,
+                            64,
+                            246,
+                            44
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                68,
+                                64,
+                                246,
+                                23
+                              ],
+                              "variation": "RowTitleXB15",
+                              "text": "Copper Pickaxe"
+                            },
+                            {
+                              "type": "Label",
+                              "rect": [
+                                68,
+                                89,
+                                246,
+                                19
+                              ],
+                              "variation": "C13B",
+                              "text": "2 Stone per rock"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        14,
+                        118,
+                        300,
+                        71
+                      ],
+                      "children": [
+                        {
+                          "type": "UiNeedTile",
+                          "rect": [
+                            14,
+                            118,
+                            88,
+                            71
+                          ],
+                          "children": [
+                            {
+                              "type": "VBoxContainer",
+                              "rect": [
+                                14,
+                                118,
+                                88,
+                                71
+                              ],
+                              "children": [
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    34,
+                                    118,
+                                    48,
+                                    48
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "TextureRect",
+                                      "rect": [
+                                        45,
+                                        129,
+                                        26,
+                                        26
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "HBoxContainer",
+                                  "rect": [
+                                    14,
+                                    171,
+                                    88,
+                                    18
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        14,
+                                        171,
+                                        66,
+                                        18
+                                      ],
+                                      "variation": "CaptionXB12",
+                                      "text": "Copper Ore"
+                                    },
+                                    {
+                                      "type": "HBoxContainer",
+                                      "rect": [
+                                        83,
+                                        171,
+                                        19,
+                                        18
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "Label",
+                                          "rect": [
+                                            83,
+                                            171,
+                                            8,
+                                            18
+                                          ],
+                                          "variation": "CaptionXB12",
+                                          "text": "4"
+                                        },
+                                        {
+                                          "type": "Label",
+                                          "rect": [
+                                            91,
+                                            171,
+                                            11,
+                                            18
+                                          ],
+                                          "variation": "CaptionB12",
+                                          "text": "/5"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "UiNeedTile",
+                          "rect": [
+                            110,
+                            118,
+                            70,
+                            71
+                          ],
+                          "children": [
+                            {
+                              "type": "VBoxContainer",
+                              "rect": [
+                                110,
+                                118,
+                                70,
+                                71
+                              ],
+                              "children": [
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    121,
+                                    118,
+                                    48,
+                                    48
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "TextureRect",
+                                      "rect": [
+                                        132,
+                                        129,
+                                        26,
+                                        26
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "HBoxContainer",
+                                  "rect": [
+                                    110,
+                                    171,
+                                    70,
+                                    18
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        110,
+                                        171,
+                                        41,
+                                        18
+                                      ],
+                                      "variation": "CaptionXB12",
+                                      "text": "Timber"
+                                    },
+                                    {
+                                      "type": "HBoxContainer",
+                                      "rect": [
+                                        154,
+                                        171,
+                                        26,
+                                        18
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "Label",
+                                          "rect": [
+                                            154,
+                                            171,
+                                            15,
+                                            18
+                                          ],
+                                          "variation": "CaptionXB12",
+                                          "text": "17"
+                                        },
+                                        {
+                                          "type": "Label",
+                                          "rect": [
+                                            169,
+                                            171,
+                                            11,
+                                            18
+                                          ],
+                                          "variation": "CaptionB12",
+                                          "text": "/4"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        14,
+                        199,
+                        300,
+                        44
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            14,
+                            212,
+                            118,
+                            18
+                          ],
+                          "variation": "C12B",
+                          "text": ""
+                        },
+                        {
+                          "type": "UiCommandButton",
+                          "rect": [
+                            140,
+                            199,
+                            174,
+                            44
+                          ],
+                          "variation": "CmdBlockedCompact",
+                          "text": "Need 1 more Copper Ore"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                261,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "Tools · a gap on the button"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            285,
+            328,
+            223
+          ],
+          "children": [
+            {
+              "type": "UiBlueprintCard",
+              "rect": [
+                0,
+                285,
+                328,
+                203
+              ],
+              "children": [
+                {
+                  "type": "VBoxContainer",
+                  "rect": [
+                    14,
+                    297,
+                    300,
+                    179
+                  ],
+                  "children": [
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        14,
+                        297,
+                        300,
+                        44
+                      ],
+                      "children": [
+                        {
+                          "type": "PanelContainer",
+                          "rect": [
+                            14,
+                            297,
+                            44,
+                            44
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                20,
+                                303,
+                                32,
+                                32
+                              ]
+                            },
+                            {
+                              "type": "Button",
+                              "rect": [
+                                14,
+                                297,
+                                44,
+                                44
+                              ],
+                              "text": ""
+                            }
+                          ]
+                        },
+                        {
+                          "type": "VBoxContainer",
+                          "rect": [
+                            68,
+                            297,
+                            246,
+                            44
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                68,
+                                297,
+                                246,
+                                23
+                              ],
+                              "variation": "RowTitleXB15",
+                              "text": "Gather Gloves"
+                            },
+                            {
+                              "type": "Label",
+                              "rect": [
+                                68,
+                                322,
+                                246,
+                                19
+                              ],
+                              "variation": "C13B",
+                              "text": "+1 at every gathering spot"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        14,
+                        351,
+                        300,
+                        71
+                      ],
+                      "children": [
+                        {
+                          "type": "UiNeedTile",
+                          "rect": [
+                            14,
+                            351,
+                            57,
+                            71
+                          ],
+                          "children": [
+                            {
+                              "type": "VBoxContainer",
+                              "rect": [
+                                14,
+                                351,
+                                57,
+                                71
+                              ],
+                              "children": [
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    18,
+                                    351,
+                                    48,
+                                    48
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "TextureRect",
+                                      "rect": [
+                                        29,
+                                        362,
+                                        26,
+                                        26
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "HBoxContainer",
+                                  "rect": [
+                                    14,
+                                    404,
+                                    57,
+                                    18
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        14,
+                                        404,
+                                        35,
+                                        18
+                                      ],
+                                      "variation": "CaptionXB12",
+                                      "text": "Reeds"
+                                    },
+                                    {
+                                      "type": "HBoxContainer",
+                                      "rect": [
+                                        52,
+                                        404,
+                                        19,
+                                        18
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "Label",
+                                          "rect": [
+                                            52,
+                                            404,
+                                            8,
+                                            18
+                                          ],
+                                          "variation": "CaptionXB12",
+                                          "text": "8"
+                                        },
+                                        {
+                                          "type": "Label",
+                                          "rect": [
+                                            60,
+                                            404,
+                                            11,
+                                            18
+                                          ],
+                                          "variation": "CaptionB12",
+                                          "text": "/8"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "UiNeedTile",
+                          "rect": [
+                            79,
+                            351,
+                            70,
+                            71
+                          ],
+                          "children": [
+                            {
+                              "type": "VBoxContainer",
+                              "rect": [
+                                79,
+                                351,
+                                70,
+                                71
+                              ],
+                              "children": [
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    90,
+                                    351,
+                                    48,
+                                    48
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "TextureRect",
+                                      "rect": [
+                                        101,
+                                        362,
+                                        26,
+                                        26
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "HBoxContainer",
+                                  "rect": [
+                                    79,
+                                    404,
+                                    70,
+                                    18
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        79,
+                                        404,
+                                        41,
+                                        18
+                                      ],
+                                      "variation": "CaptionXB12",
+                                      "text": "Timber"
+                                    },
+                                    {
+                                      "type": "HBoxContainer",
+                                      "rect": [
+                                        123,
+                                        404,
+                                        26,
+                                        18
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "Label",
+                                          "rect": [
+                                            123,
+                                            404,
+                                            15,
+                                            18
+                                          ],
+                                          "variation": "CaptionXB12",
+                                          "text": "17"
+                                        },
+                                        {
+                                          "type": "Label",
+                                          "rect": [
+                                            138,
+                                            404,
+                                            11,
+                                            18
+                                          ],
+                                          "variation": "CaptionB12",
+                                          "text": "/4"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        14,
+                        432,
+                        300,
+                        44
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            14,
+                            445,
+                            231,
+                            18
+                          ],
+                          "variation": "C12B",
+                          "text": ""
+                        },
+                        {
+                          "type": "UiCommandButton",
+                          "rect": [
+                            253,
+                            432,
+                            61,
+                            44
+                          ],
+                          "variation": "CmdPrimaryCompact",
+                          "text": "Craft"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                494,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "Tools · craftable"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            518,
+            328,
+            142
+          ],
+          "children": [
+            {
+              "type": "UiBlueprintCard",
+              "rect": [
+                0,
+                518,
+                328,
+                122
+              ],
+              "children": [
+                {
+                  "type": "VBoxContainer",
+                  "rect": [
+                    14,
+                    530,
+                    300,
+                    98
+                  ],
+                  "children": [
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        14,
+                        530,
+                        300,
+                        44
+                      ],
+                      "children": [
+                        {
+                          "type": "PanelContainer",
+                          "rect": [
+                            14,
+                            530,
+                            44,
+                            44
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                20,
+                                536,
+                                32,
+                                32
+                              ]
+                            },
+                            {
+                              "type": "Button",
+                              "rect": [
+                                14,
+                                530,
+                                44,
+                                44
+                              ],
+                              "text": ""
+                            }
+                          ]
+                        },
+                        {
+                          "type": "VBoxContainer",
+                          "rect": [
+                            68,
+                            530,
+                            246,
+                            44
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                68,
+                                530,
+                                246,
+                                23
+                              ],
+                              "variation": "RowTitleXB15",
+                              "text": "Copper Pickaxe"
+                            },
+                            {
+                              "type": "Label",
+                              "rect": [
+                                68,
+                                555,
+                                246,
+                                19
+                              ],
+                              "variation": "C13B",
+                              "text": "2 Stone per rock"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        14,
+                        584,
+                        300,
+                        44
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            14,
+                            597,
+                            227,
+                            18
+                          ],
+                          "variation": "C12B",
+                          "text": ""
+                        },
+                        {
+                          "type": "UiCommandButton",
+                          "rect": [
+                            249,
+                            584,
+                            65,
+                            44
+                          ],
+                          "variation": "CmdSecondaryCompact",
+                          "text": "Equip"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                646,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "owned · Equip"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            670,
+            328,
+            142
+          ],
+          "children": [
+            {
+              "type": "UiBlueprintCard",
+              "rect": [
+                0,
+                670,
+                328,
+                122
+              ],
+              "children": [
+                {
+                  "type": "VBoxContainer",
+                  "rect": [
+                    14,
+                    682,
+                    300,
+                    98
+                  ],
+                  "children": [
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        14,
+                        682,
+                        300,
+                        44
+                      ],
+                      "children": [
+                        {
+                          "type": "PanelContainer",
+                          "rect": [
+                            14,
+                            682,
+                            44,
+                            44
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                20,
+                                688,
+                                32,
+                                32
+                              ]
+                            },
+                            {
+                              "type": "Button",
+                              "rect": [
+                                14,
+                                682,
+                                44,
+                                44
+                              ],
+                              "text": ""
+                            }
+                          ]
+                        },
+                        {
+                          "type": "VBoxContainer",
+                          "rect": [
+                            68,
+                            682,
+                            246,
+                            44
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                68,
+                                682,
+                                246,
+                                23
+                              ],
+                              "variation": "RowTitleXB15",
+                              "text": "Copper Pickaxe"
+                            },
+                            {
+                              "type": "Label",
+                              "rect": [
+                                68,
+                                707,
+                                246,
+                                19
+                              ],
+                              "variation": "C13B",
+                              "text": "2 Stone per rock"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        14,
+                        736,
+                        300,
+                        44
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            14,
+                            749,
+                            206,
+                            18
+                          ],
+                          "variation": "C12B",
+                          "text": ""
+                        },
+                        {
+                          "type": "UiCommandButton",
+                          "rect": [
+                            228,
+                            736,
+                            86,
+                            44
+                          ],
+                          "variation": "CmdBlockedCompact",
+                          "text": "Equipped"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                798,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "equipped"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            822,
+            328,
+            142
+          ],
+          "children": [
+            {
+              "type": "UiBlueprintCard",
+              "rect": [
+                0,
+                822,
+                328,
+                122
+              ],
+              "children": [
+                {
+                  "type": "VBoxContainer",
+                  "rect": [
+                    14,
+                    834,
+                    300,
+                    98
+                  ],
+                  "children": [
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        14,
+                        834,
+                        300,
+                        44
+                      ],
+                      "children": [
+                        {
+                          "type": "PanelContainer",
+                          "rect": [
+                            14,
+                            834,
+                            44,
+                            44
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                20,
+                                840,
+                                32,
+                                32
+                              ]
+                            },
+                            {
+                              "type": "Button",
+                              "rect": [
+                                14,
+                                834,
+                                44,
+                                44
+                              ],
+                              "text": ""
+                            }
+                          ]
+                        },
+                        {
+                          "type": "VBoxContainer",
+                          "rect": [
+                            68,
+                            834,
+                            246,
+                            44
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                68,
+                                834,
+                                246,
+                                23
+                              ],
+                              "variation": "RowTitleXB15",
+                              "text": "Gather Gloves"
+                            },
+                            {
+                              "type": "Label",
+                              "rect": [
+                                68,
+                                859,
+                                246,
+                                19
+                              ],
+                              "variation": "C13B",
+                              "text": "+1 at every gathering spot"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        14,
+                        888,
+                        300,
+                        44
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            14,
+                            901,
+                            152,
+                            18
+                          ],
+                          "variation": "C12B",
+                          "text": ""
+                        },
+                        {
+                          "type": "UiCommandButton",
+                          "rect": [
+                            174,
+                            888,
+                            140,
+                            44
+                          ],
+                          "variation": "CmdBlockedCompact",
+                          "text": "Owned · always on"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                950,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "passive · owned"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            974,
+            328,
+            223
+          ],
+          "children": [
+            {
+              "type": "UiBlueprintCard",
+              "rect": [
+                0,
+                974,
+                328,
+                203
+              ],
+              "children": [
+                {
+                  "type": "VBoxContainer",
+                  "rect": [
+                    14,
+                    986,
+                    300,
+                    179
+                  ],
+                  "children": [
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        14,
+                        986,
+                        300,
+                        44
+                      ],
+                      "children": [
+                        {
+                          "type": "PanelContainer",
+                          "rect": [
+                            14,
+                            986,
+                            44,
+                            44
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                20,
+                                992,
+                                32,
+                                32
+                              ]
+                            },
+                            {
+                              "type": "Button",
+                              "rect": [
+                                14,
+                                986,
+                                44,
+                                44
+                              ],
+                              "text": ""
+                            }
+                          ]
+                        },
+                        {
+                          "type": "VBoxContainer",
+                          "rect": [
+                            68,
+                            986,
+                            183,
+                            44
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                68,
+                                986,
+                                183,
+                                23
+                              ],
+                              "variation": "RowTitleXB15",
+                              "text": "Torch"
+                            },
+                            {
+                              "type": "Label",
+                              "rect": [
+                                68,
+                                1011,
+                                183,
+                                19
+                              ],
+                              "variation": "C13B",
+                              "text": "See what rocks hold"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            261,
+                            999,
+                            53,
+                            18
+                          ],
+                          "variation": "C12B",
+                          "text": "You get 2"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        14,
+                        1040,
+                        300,
+                        71
+                      ],
+                      "children": [
+                        {
+                          "type": "UiNeedTile",
+                          "rect": [
+                            14,
+                            1040,
+                            70,
+                            71
+                          ],
+                          "children": [
+                            {
+                              "type": "VBoxContainer",
+                              "rect": [
+                                14,
+                                1040,
+                                70,
+                                71
+                              ],
+                              "children": [
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    25,
+                                    1040,
+                                    48,
+                                    48
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "TextureRect",
+                                      "rect": [
+                                        36,
+                                        1051,
+                                        26,
+                                        26
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "HBoxContainer",
+                                  "rect": [
+                                    14,
+                                    1093,
+                                    70,
+                                    18
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        14,
+                                        1093,
+                                        41,
+                                        18
+                                      ],
+                                      "variation": "CaptionXB12",
+                                      "text": "Timber"
+                                    },
+                                    {
+                                      "type": "HBoxContainer",
+                                      "rect": [
+                                        58,
+                                        1093,
+                                        26,
+                                        18
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "Label",
+                                          "rect": [
+                                            58,
+                                            1093,
+                                            15,
+                                            18
+                                          ],
+                                          "variation": "CaptionXB12",
+                                          "text": "17"
+                                        },
+                                        {
+                                          "type": "Label",
+                                          "rect": [
+                                            73,
+                                            1093,
+                                            11,
+                                            18
+                                          ],
+                                          "variation": "CaptionB12",
+                                          "text": "/1"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "UiNeedTile",
+                          "rect": [
+                            92,
+                            1040,
+                            57,
+                            71
+                          ],
+                          "children": [
+                            {
+                              "type": "VBoxContainer",
+                              "rect": [
+                                92,
+                                1040,
+                                57,
+                                71
+                              ],
+                              "children": [
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    96,
+                                    1040,
+                                    48,
+                                    48
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "TextureRect",
+                                      "rect": [
+                                        107,
+                                        1051,
+                                        26,
+                                        26
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "HBoxContainer",
+                                  "rect": [
+                                    92,
+                                    1093,
+                                    57,
+                                    18
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        92,
+                                        1093,
+                                        35,
+                                        18
+                                      ],
+                                      "variation": "CaptionXB12",
+                                      "text": "Reeds"
+                                    },
+                                    {
+                                      "type": "HBoxContainer",
+                                      "rect": [
+                                        130,
+                                        1093,
+                                        19,
+                                        18
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "Label",
+                                          "rect": [
+                                            130,
+                                            1093,
+                                            8,
+                                            18
+                                          ],
+                                          "variation": "CaptionXB12",
+                                          "text": "8"
+                                        },
+                                        {
+                                          "type": "Label",
+                                          "rect": [
+                                            138,
+                                            1093,
+                                            11,
+                                            18
+                                          ],
+                                          "variation": "CaptionB12",
+                                          "text": "/1"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        14,
+                        1121,
+                        300,
+                        44
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            14,
+                            1134,
+                            231,
+                            18
+                          ],
+                          "variation": "C12B",
+                          "text": "You have 6"
+                        },
+                        {
+                          "type": "UiCommandButton",
+                          "rect": [
+                            253,
+                            1121,
+                            61,
+                            44
+                          ],
+                          "variation": "CmdPrimaryCompact",
+                          "text": "Craft"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                1183,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "Supplies · craftable"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            1207,
+            328,
+            223
+          ],
+          "children": [
+            {
+              "type": "UiBlueprintCard",
+              "rect": [
+                0,
+                1207,
+                328,
+                203
+              ],
+              "children": [
+                {
+                  "type": "VBoxContainer",
+                  "rect": [
+                    14,
+                    1219,
+                    300,
+                    179
+                  ],
+                  "children": [
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        14,
+                        1219,
+                        300,
+                        44
+                      ],
+                      "children": [
+                        {
+                          "type": "PanelContainer",
+                          "rect": [
+                            14,
+                            1219,
+                            44,
+                            44
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                20,
+                                1225,
+                                32,
+                                32
+                              ]
+                            },
+                            {
+                              "type": "Button",
+                              "rect": [
+                                14,
+                                1219,
+                                44,
+                                44
+                              ],
+                              "text": ""
+                            }
+                          ]
+                        },
+                        {
+                          "type": "VBoxContainer",
+                          "rect": [
+                            68,
+                            1219,
+                            183,
+                            44
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                68,
+                                1219,
+                                183,
+                                23
+                              ],
+                              "variation": "RowTitleXB15",
+                              "text": "Torch"
+                            },
+                            {
+                              "type": "Label",
+                              "rect": [
+                                68,
+                                1244,
+                                183,
+                                19
+                              ],
+                              "variation": "C13B",
+                              "text": "See what rocks hold"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            261,
+                            1232,
+                            53,
+                            18
+                          ],
+                          "variation": "C12B",
+                          "text": "You get 2"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        14,
+                        1273,
+                        300,
+                        71
+                      ],
+                      "children": [
+                        {
+                          "type": "UiNeedTile",
+                          "rect": [
+                            14,
+                            1273,
+                            70,
+                            71
+                          ],
+                          "children": [
+                            {
+                              "type": "VBoxContainer",
+                              "rect": [
+                                14,
+                                1273,
+                                70,
+                                71
+                              ],
+                              "children": [
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    25,
+                                    1273,
+                                    48,
+                                    48
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "TextureRect",
+                                      "rect": [
+                                        36,
+                                        1284,
+                                        26,
+                                        26
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "HBoxContainer",
+                                  "rect": [
+                                    14,
+                                    1326,
+                                    70,
+                                    18
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        14,
+                                        1326,
+                                        41,
+                                        18
+                                      ],
+                                      "variation": "CaptionXB12",
+                                      "text": "Timber"
+                                    },
+                                    {
+                                      "type": "HBoxContainer",
+                                      "rect": [
+                                        58,
+                                        1326,
+                                        26,
+                                        18
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "Label",
+                                          "rect": [
+                                            58,
+                                            1326,
+                                            15,
+                                            18
+                                          ],
+                                          "variation": "CaptionXB12",
+                                          "text": "17"
+                                        },
+                                        {
+                                          "type": "Label",
+                                          "rect": [
+                                            73,
+                                            1326,
+                                            11,
+                                            18
+                                          ],
+                                          "variation": "CaptionB12",
+                                          "text": "/1"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "UiNeedTile",
+                          "rect": [
+                            92,
+                            1273,
+                            57,
+                            71
+                          ],
+                          "children": [
+                            {
+                              "type": "VBoxContainer",
+                              "rect": [
+                                92,
+                                1273,
+                                57,
+                                71
+                              ],
+                              "children": [
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    96,
+                                    1273,
+                                    48,
+                                    48
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "TextureRect",
+                                      "rect": [
+                                        107,
+                                        1284,
+                                        26,
+                                        26
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "HBoxContainer",
+                                  "rect": [
+                                    92,
+                                    1326,
+                                    57,
+                                    18
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        92,
+                                        1326,
+                                        35,
+                                        18
+                                      ],
+                                      "variation": "CaptionXB12",
+                                      "text": "Reeds"
+                                    },
+                                    {
+                                      "type": "HBoxContainer",
+                                      "rect": [
+                                        130,
+                                        1326,
+                                        19,
+                                        18
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "Label",
+                                          "rect": [
+                                            130,
+                                            1326,
+                                            8,
+                                            18
+                                          ],
+                                          "variation": "CaptionXB12",
+                                          "text": "8"
+                                        },
+                                        {
+                                          "type": "Label",
+                                          "rect": [
+                                            138,
+                                            1326,
+                                            11,
+                                            18
+                                          ],
+                                          "variation": "CaptionB12",
+                                          "text": "/1"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        14,
+                        1354,
+                        300,
+                        44
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            14,
+                            1367,
+                            116,
+                            18
+                          ],
+                          "variation": "C12B",
+                          "text": "You have 6"
+                        },
+                        {
+                          "type": "UiCommandButton",
+                          "rect": [
+                            138,
+                            1354,
+                            176,
+                            44
+                          ],
+                          "variation": "CmdBlockedCompact",
+                          "text": "No room · free a slot first"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                1416,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "Supplies · bag full"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            1440,
+            328,
+            223
+          ],
+          "children": [
+            {
+              "type": "UiBlueprintCard",
+              "rect": [
+                0,
+                1440,
+                328,
+                203
+              ],
+              "children": [
+                {
+                  "type": "VBoxContainer",
+                  "rect": [
+                    14,
+                    1452,
+                    300,
+                    179
+                  ],
+                  "children": [
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        14,
+                        1452,
+                        300,
+                        44
+                      ],
+                      "children": [
+                        {
+                          "type": "PanelContainer",
+                          "rect": [
+                            14,
+                            1452,
+                            44,
+                            44
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                20,
+                                1458,
+                                32,
+                                32
+                              ]
+                            },
+                            {
+                              "type": "Button",
+                              "rect": [
+                                14,
+                                1452,
+                                44,
+                                44
+                              ],
+                              "text": ""
+                            }
+                          ]
+                        },
+                        {
+                          "type": "VBoxContainer",
+                          "rect": [
+                            68,
+                            1452,
+                            183,
+                            44
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                68,
+                                1452,
+                                183,
+                                23
+                              ],
+                              "variation": "RowTitleXB15",
+                              "text": "Compost"
+                            },
+                            {
+                              "type": "Label",
+                              "rect": [
+                                68,
+                                1477,
+                                183,
+                                19
+                              ],
+                              "variation": "C13B",
+                              "text": "Crops ready 20% sooner"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            261,
+                            1465,
+                            53,
+                            18
+                          ],
+                          "variation": "C12B",
+                          "text": "You get 2"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        14,
+                        1506,
+                        300,
+                        71
+                      ],
+                      "children": [
+                        {
+                          "type": "UiNeedTile",
+                          "rect": [
+                            14,
+                            1506,
+                            57,
+                            71
+                          ],
+                          "children": [
+                            {
+                              "type": "VBoxContainer",
+                              "rect": [
+                                14,
+                                1506,
+                                57,
+                                71
+                              ],
+                              "children": [
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    18,
+                                    1506,
+                                    48,
+                                    48
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "TextureRect",
+                                      "rect": [
+                                        29,
+                                        1517,
+                                        26,
+                                        26
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "HBoxContainer",
+                                  "rect": [
+                                    14,
+                                    1559,
+                                    57,
+                                    18
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        14,
+                                        1559,
+                                        35,
+                                        18
+                                      ],
+                                      "variation": "CaptionXB12",
+                                      "text": "Reeds"
+                                    },
+                                    {
+                                      "type": "HBoxContainer",
+                                      "rect": [
+                                        52,
+                                        1559,
+                                        19,
+                                        18
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "Label",
+                                          "rect": [
+                                            52,
+                                            1559,
+                                            8,
+                                            18
+                                          ],
+                                          "variation": "CaptionXB12",
+                                          "text": "8"
+                                        },
+                                        {
+                                          "type": "Label",
+                                          "rect": [
+                                            60,
+                                            1559,
+                                            11,
+                                            18
+                                          ],
+                                          "variation": "CaptionB12",
+                                          "text": "/2"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "UiNeedTile",
+                          "rect": [
+                            79,
+                            1506,
+                            70,
+                            71
+                          ],
+                          "children": [
+                            {
+                              "type": "VBoxContainer",
+                              "rect": [
+                                79,
+                                1506,
+                                70,
+                                71
+                              ],
+                              "children": [
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    90,
+                                    1506,
+                                    48,
+                                    48
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "TextureRect",
+                                      "rect": [
+                                        101,
+                                        1517,
+                                        26,
+                                        26
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "HBoxContainer",
+                                  "rect": [
+                                    79,
+                                    1559,
+                                    70,
+                                    18
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        79,
+                                        1559,
+                                        41,
+                                        18
+                                      ],
+                                      "variation": "CaptionXB12",
+                                      "text": "Timber"
+                                    },
+                                    {
+                                      "type": "HBoxContainer",
+                                      "rect": [
+                                        123,
+                                        1559,
+                                        26,
+                                        18
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "Label",
+                                          "rect": [
+                                            123,
+                                            1559,
+                                            15,
+                                            18
+                                          ],
+                                          "variation": "CaptionXB12",
+                                          "text": "17"
+                                        },
+                                        {
+                                          "type": "Label",
+                                          "rect": [
+                                            138,
+                                            1559,
+                                            11,
+                                            18
+                                          ],
+                                          "variation": "CaptionB12",
+                                          "text": "/1"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        14,
+                        1587,
+                        300,
+                        44
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            14,
+                            1600,
+                            190,
+                            18
+                          ],
+                          "variation": "C12B",
+                          "text": "You have 0"
+                        },
+                        {
+                          "type": "UiCommandButton",
+                          "rect": [
+                            212,
+                            1587,
+                            102,
+                            44
+                          ],
+                          "variation": "CmdBlockedCompact",
+                          "text": "Farming Lv3"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                1649,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "Supplies · skill gate"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

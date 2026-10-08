@@ -22,6 +22,7 @@ func _init() -> void:
 	anchors_path = "res://assets/p0/rooms/farmhouse.anchors.json"
 	place_name = "Farmhouse"
 	exit_text = "Door · Back to farm"
+	exit_to = "Farm"   # the door's world prompt: i-door + Farm (SGODOT-250)
 
 ## The space commands are sent from (SGODOT-228 PR #16, Rest needs ≥ 2 h away, q(41)): the farmhouse is home.
 func p0_space() -> String: return "home"
@@ -50,17 +51,19 @@ func _room_ready() -> void:
 func _marker(n: String, v: Dictionary) -> Dictionary:
 	if kitchen and kitchen.busy(): return {}   # the drawer or the pot owns the screen
 	if _sheet: return {}
-	if n == RACK: return {text = "Spice Rack · Tap to open"}
-	if n == CABINET: return {text = "Warming Cabinet %s · Tap to open" % P0KitchenLogic.cabinet_badge(v)}
+	# World prompts (SGODOT-250, LOCK-07 v2, q(62)): an icon button, the nearest opens into a name strip; no Tap to.
+	# The rack and the cabinet have no icon of their own yet: a seasoning and steam stand in (art director to confirm).
+	if n == RACK: return {kind = "facility", icon = P0Logic.icon("rock_salt"), name = "Spice Rack"}
+	if n == CABINET: return {kind = "facility", icon = P0Logic.icon("steam"), name = "Warming Cabinet", fact = P0KitchenLogic.cabinet_badge(v)}
 	if n != STOVE: return super(n, v)
+	var stove := {kind = "facility", icon = P0Logic.icon("pot"), name = "Stove 1/1"}   # i-pot (250 walkthrough)
 	var st = P0KitchenLogic.stove(v)
-	if st == null: return {text = "Stove 1/1 · Empty · Tap to cook", badge = "available", icon = P0Logic.icon("stove")}
+	if st == null: return stove.merged({fact = "Empty"})
 	var left := float(st.get("ready_in", 0))
-	if left <= 0.0:
+	if left <= 0.0:   # the ready mark takes the icon's place; the strip names the dish
 		var dish = st.get("dish", null)
-		return {text = "Stove · Ready · " + (P0Logic.item_name(v, str(dish)) if dish != null else "Unknown dish"), badge = "ready"}
-	var clock := P0Logic.duration(left)
-	return {text = "Stove 1/1 · Cooking " + clock, badge = "countdown", caption = clock}
+		return stove.merged({fact = P0Logic.item_name(v, str(dish)) if dish != null else "Unknown dish", badge = "ready"})
+	return stove.merged({fact = "Cooking " + P0Logic.duration(left), badge = "countdown"})
 
 func _on_facility(n: String) -> void:
 	if n == STOVE:

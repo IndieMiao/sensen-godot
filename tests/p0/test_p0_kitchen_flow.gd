@@ -134,6 +134,7 @@ func test_a_second_tap_on_a_bag_cell_puts_a_second_one_in() -> void:
 	assert_array(k.pot).is_equal(["fish_crucian", "fish_crucian"])
 	k._on_ingredient("fish_crucian", Vector2.INF)   # two slots: the pot is full, nothing more goes in
 	assert_array(k.pot).is_equal(["fish_crucian", "fish_crucian"])
+	assert_str(rt.ui.toast_text()).is_equal("The pot is full · tap ✕ above to take one out")   # q(64)
 	k._take_out(1, Vector2.INF)
 	assert_array(k.pot).is_equal(["fish_crucian"])
 	rt.ui.close_modal()

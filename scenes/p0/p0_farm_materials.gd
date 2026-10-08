@@ -66,7 +66,7 @@ func action(v: Dictionary) -> Dictionary:
 static func flat(a: Vector3, b: Vector3) -> float:
 	return Vector2(a.x - b.x, a.z - b.z).length()
 
-## This helper's finger-card candidates for the farm's P0Garden.pick_card (LOCK-07, one card at a time; the same
+## This helper's candidates for the farm's open name strip (P0Garden.pick_card, LOCK-07 v2: one at a time; the same
 ## rule SGODOT-231 and SGODOT-228 each wrote, kept once in P0Garden): the five spots and the workbench.
 func card_candidates() -> Array:
 	var out: Array = []
@@ -114,23 +114,16 @@ func frame(v: Dictionary, card := "") -> void:
 		_stored_shown = float(v.storage.auto.at)
 		rt.ui.toast(stored)   # §4.8.6 回家入库: Toast Info `Stored · 12 Stone · 3 Copper Ore`
 
-## STATE-ICONS badge over a spot (READY, LOCKED for Clay Bank before Homestead Lv2; a countdown spot shows none) and,
-## when it holds the farm's one finger card, the card (Timber Grove · Tap to gather / · Ready in 2h 10m / Clay Bank ·
-## Homestead Lv2) above the badge. Tapping the card is tapping the spot.
+## World prompts (SGODOT-250, LOCK-07 v2): each gathering spot and the workbench show their icon button within
+## P0WorldPrompts.RANGE — a spot's state (Ready, or Locked for Clay Bank before Homestead Lv2) from anywhere, in the
+## icon's place — and the one holding the farm's open strip (`card`) opens it: `Timber Grove`, `Clay Bank · Homestead
+## Lv2`, `Reed Bank · Ready in 2h 10m`, `Workbench`. A tap on either is the spot's (tap_card, by id).
 func _spot_marks(v: Dictionary, card: String) -> void:
-	var cam: Camera3D = farm.cam
-	var modal := rt.ui.has_modal()
 	for m in P0MaterialLogic.gather_marks(v):
 		var id := str(m.id)
 		var at: Vector3 = _spots.get(id, Vector3.ZERO)
-		var screen := cam.unproject_position(at + Vector3(0, 1.3, 0))
-		var state := UiStatusBadge.State.READY if str(m.badge) == "ready" else UiStatusBadge.State.LOCKED
-		rt.ui.badge(id, state, screen, not modal and str(m.badge) != "countdown")
-		rt.ui.tag(id, str(m.caption), screen - Vector2(0, rt.ui.badge_height(id)), not modal and card == id,
-			cam.unproject_position(at + Vector3(0, 0.6, 0)))
-	var bench_screen := cam.unproject_position(_bench + Vector3(0, 1.4, 0))
-	rt.ui.tag("workbench", "Workbench · Tap to craft", bench_screen,
-		not modal and card == "workbench", cam.unproject_position(_bench + Vector3(0, 0.8, 0)))
+		farm.world_prompt(id, P0WorldPrompts.spot(v, m), at, Vector3(0, 1.3, 0), Vector3(0, 0.6, 0))
+	farm.world_prompt("workbench", P0WorldPrompts.workbench(), _bench, Vector3(0, 1.4, 0), Vector3(0, 0.8, 0))
 
 ## A real tap on the EntryCard (it is passive, so the scene layer's tap arrives here first from p0_tap).
 func tap_entry(screen: Vector2) -> bool:
@@ -174,9 +167,37 @@ func tap_card(id: String) -> bool:
 		return true
 	return false
 
-## TODO(SGODOT-231): the B2-06 drawer extends 225's UiDrawer once feat/p0-panels-2b is in; a toast until then.
+## B2-06: the workbench drawer (P0Ui.open_workbench); what a craft shows afterwards is _on_craft's.
 func _open_workbench() -> void:
-	rt.ui.toast("Workbench · coming next")
+	rt.ui.open_workbench()
+
+## A NeedSource Show target this helper owns (a gathering spot, "mine", "workbench"), else null (LOCK-08: Show only
+## moves the camera there).
+func spot_at(where: String) -> Variant:
+	if _spots.has(where): return _spots[where]
+	if where == "mine": return mouth
+	if where == "workbench": return _bench
+	return null
+
+## What one craft shows (B2-06): a Supply stays in the drawer and floats `+2 Torch` on its card (TORCH-DONE; away from
+## the drawer, over the player); the Copper Pickaxe closes the drawer for its `Crafted!` Moment with Equip
+## (PICKAXE-DONE); the Gather Gloves keep the drawer and get the MomentBanner (GLOVES-DONE). The runtime leaves a
+## crafting reply's item floats to this.
+func _on_craft(v: Dictionary, e: Dictionary) -> void:
+	var item := str(e.get("item", ""))
+	match str(e.get("to", "")):
+		"bag":
+			var line := "+%d %s" % [int(e.get("qty", 1)), P0Logic.item_name(v, item)]
+			var drawer := rt.ui.workbench()
+			if drawer == null or drawer.float_on(str(e.get("recipe", "")), line, P0Logic.icon(item)) == null:
+				rt.ui.queue_floats([{kind = "item", key = item, amount = int(e.get("qty", 1)),
+					fmt = "%s " + P0Logic.item_name(v, item), tone = UiFloatText.Tone.ITEM, icon = P0Logic.icon(item)}], rt.anchor())
+		"gear":
+			if rt.ui.workbench() != null: rt.ui.close_modal()
+			rt.ui.queue_card(func(): P0MaterialCards.open_crafted(rt.ui, rt.session.current(), item,
+				func(cmd: Dictionary): rt.session.send(cmd)))
+		"owned":
+			P0MaterialCards.gloves_banner(rt.ui, v)
 
 ## Commands this helper owns; false lets the farm handle the rest.
 func act(cmd: Dictionary) -> bool:
@@ -193,6 +214,8 @@ func act(cmd: Dictionary) -> bool:
 ## A gather floats what went to storage at the spot (the runtime floats what went to the bag).
 func _on_state(v: Dictionary, events: Array) -> void:
 	if rt.world != farm or _opening: return
+	for e in events:
+		if str(e.get("kind", "")) == "craft": _on_craft(v, e)
 	for e in events:
 		if str(e.get("kind", "")) == "gather":
 			# One item line with the runtime's own (what went to the bag), in the reply's three lines (q(49) ①).

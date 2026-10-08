@@ -191,6 +191,12 @@ func _headers() -> PackedStringArray:
 	if access_key != "": headers.append("x-p0-key: " + access_key)
 	return headers
 
+## The internal demo APK (tools/p0/build_demo_apk.sh) carries DEMO_CONFIG; no other build does, the file is
+## written for that export only. The demo is exported as a debug build, so OS.is_debug_build() alone can't tell it
+## from a test build (SGODOT-232 D2).
+static func is_demo_build() -> bool:
+	return FileAccess.file_exists(DEMO_CONFIG)
+
 ## The demo build's baked server: {"url": "https://…/v1", "key": "…"}; {} when absent or malformed.
 static func demo_config(text: String) -> Dictionary:
 	var parsed = JSON.parse_string(text) if text != "" else null
