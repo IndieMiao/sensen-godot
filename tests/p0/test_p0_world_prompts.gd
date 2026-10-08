@@ -109,6 +109,10 @@ func test_a_strip_over_a_name_tag_opens_the_other_way() -> void:
 	assert_int(ui._name_bars.stall.side).is_equal(UiWorldNameBar.Dir.LEFT)
 	ui.name_bar("cabinet", HOME, "Warming Cabinet", "", at + Vector2(0, 120), true, UiWorldNameBar.Dir.RIGHT)
 	assert_int(ui._name_bars.cabinet.side).is_equal(UiWorldNameBar.Dir.RIGHT)   # nothing in the way
+	# 苏烈 on #59: another facility's button counts too (the plaque's strip over the sign's button).
+	ui.world_icon("sign", HOME, at + Vector2(80, 200), true)
+	ui.name_bar("plaque", HOME, "Upgrade Plaque", "", at + Vector2(0, 200), true, UiWorldNameBar.Dir.RIGHT)
+	assert_int(ui._name_bars.plaque.side).is_equal(UiWorldNameBar.Dir.LEFT)
 
 ## #57: covered on both sides, the tag under the strip fades while it is open and comes back once it folds.
 func test_a_name_tag_the_strip_covers_fades_until_it_folds() -> void:

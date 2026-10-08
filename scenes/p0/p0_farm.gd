@@ -459,9 +459,9 @@ func _tap_card(id: String) -> bool:
 	return true
 
 ## The sign itself (its icon button and strip arrive by id, _tap_card); small, so the door beside it stays the house.
+## Nothing above the board: with the button hidden (beyond 8 m) that spot is not the sign's (苏烈 on #59).
 func _sign_hit(screen: Vector2) -> bool:
-	return cam.unproject_position(_sign + Vector3(0, 0.45, 0)).distance_to(screen) < 34 \
-		or cam.unproject_position(_sign + SIGN_BADGE).distance_to(screen) < 30
+	return cam.unproject_position(_sign + Vector3(0, 0.45, 0)).distance_to(screen) < 34
 
 ## World prompts (SGODOT-250; LOCK-07 v2 / LOCK-11 / LOCK-17 v2; q(62); WORLD-HINT-1…5): every facility within
 ## P0WorldPrompts.RANGE shows its icon button (a state shows from anywhere and takes the icon's place); the one nearest

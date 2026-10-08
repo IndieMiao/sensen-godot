@@ -784,10 +784,10 @@ func name_bar(id: String, icon: Texture2D, text: String, fact: String, screen: V
 	bar.dimmed = dimmed
 	bar.status = status
 	bar.side = _name_bar_side(bar, screen, UiWorldNameBar.Dir.RIGHT if side < 0 else side)
-	# Over an NPC's name tag it opens the other way, if that side is clear and fits (#57, 不知火舞); covering tags on
-	# both sides fade while it is open (npc_tag).
+	# Over an NPC's name tag or another facility's button it opens the other way, if that side is clear and fits (#57,
+	# 不知火舞; 苏烈 on #59); covered tags on both sides fade while it is open (npc_tag), covered buttons sit under it.
 	var other := UiWorldNameBar.Dir.LEFT if bar.side == UiWorldNameBar.Dir.RIGHT else UiWorldNameBar.Dir.RIGHT
-	if _covers_npc_tag(bar.rect_for(screen, bar.side)) and not _covers_npc_tag(bar.rect_for(screen, other)) \
+	if _covers_marker(bar.rect_for(screen, bar.side), id) and not _covers_marker(bar.rect_for(screen, other), id) \
 			and _name_bar_side(bar, screen, other) == other:
 		bar.side = other
 	bar.anchor_at(screen)
@@ -880,10 +880,14 @@ func _open_strips() -> Array[Rect2]:
 func _strip_covers(r: Rect2) -> bool:
 	return _open_strips().any(func(s: Rect2): return s.grow(UiTokens.SPACE_ROW).intersects(r))
 
-func _covers_npc_tag(strip: Rect2) -> bool:
+## Whether a strip at `strip` would cover an NPC's name tag or another facility's icon button (not `own`'s).
+func _covers_marker(strip: Rect2, own: String) -> bool:
 	for t in _npc_tags.values():
 		var tag := t as UiNpcNameTag
 		if tag.visible and strip.grow(UiTokens.SPACE_ROW).intersects(Rect2(tag.position, tag.size)): return true
+	for id in _icons:
+		var b := _icons[id] as UiWorldIconButton
+		if str(id) != own and b.visible and strip.grow(UiTokens.SPACE_WITHIN).intersects(Rect2(b.position, b.size).grow(-8.0)): return true
 	return false
 
 ## Facility / resident state mark (StatusBadge 1132:79554, STATE-ICONS): display only, the facility takes the tap.

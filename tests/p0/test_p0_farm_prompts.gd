@@ -38,11 +38,21 @@ func test_the_stall_is_homestead_stall_with_its_board_state() -> void:
 	v.stall.board.requests[0].have = 2
 	assert_int(P0WorldPrompts.stall(v).status).is_equal(UiStatusBadge.State.DELIVERABLE)
 
-func test_the_farmhouse_is_its_name() -> void:
+func test_the_farmhouse_is_its_name_and_carries_the_guides_request() -> void:
 	var p := P0WorldPrompts.farmhouse(_view())
 	assert_str(p.text).is_equal("Farmhouse")
 	assert_str(p.fact).is_empty()
 	assert_int(p.status).is_equal(-1)
+	# A-03 (蒙恬, 232): a cookable fish in the bag and Today's Cook row still open → the house's mark is the ! (one mark
+	# per facility; P0Guide.door_badge is its only source).
+	var v := _view()
+	v.merge({"items": {"fish_crucian": {"kind": "fish", "sell": 2, "cook": true}}, "skills": {"cooking": {"level": 1}},
+		"cooking": {"slots": 2, "stove": null, "first_fire": true, "cookbook": [
+			{"id": "dish_grilled_crucian", "name": "Grilled Crucian", "slots": 1, "known": true, "cooked": false, "can_cook": false}]}}, true)
+	assert_int(P0WorldPrompts.farmhouse(v).status).is_equal(-1)   # no fish yet
+	v.bag.slots = [{"id": "fish_crucian", "qty": 1}]
+	assert_int(P0WorldPrompts.farmhouse(v).status).is_equal(UiStatusBadge.State.REQUEST)
+	assert_int(P0WorldPrompts.show("home", "", 30.0, P0WorldPrompts.farmhouse(v))).is_equal(P0WorldPrompts.Show.ICON)
 
 func test_the_bench_reads_what_resting_gives_and_dims_when_it_cannot() -> void:
 	var v := _view()
