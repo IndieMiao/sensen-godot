@@ -98,6 +98,8 @@ func _init() -> void:
 		# The world may be waiting on that command (a cast in flight): let it recover.
 		if not cmd.is_empty(): _call("p0_event", [{"kind": "send_failed", "cmd": cmd}, session.current()]))
 	ui.sys_retry.connect(_probe)
+	session.blocked.connect(_on_blocked)
+	ui.screen_action.connect(_on_screen_action)
 	ui.lifecycle.watch(session)
 	session.command_started.connect(ui.track_pressed)
 	if OS.get_environment("P0_AUTO") == "1" or FileAccess.file_exists("user://p0_auto"):
@@ -122,6 +124,7 @@ func attach(w: Node) -> void:
 	_first_frame.call_deferred(str(w.name))
 	ui.set_surface(str(w.call("p0_surface")) if w.has_method("p0_surface") else "farm")
 	if w.has_method("p0_surface") and str(w.call("p0_surface")) == "map": ui.teach("map")   # Browse the map for free…
+	_end_launch()   # the first answer may have come before the first world
 
 ## The space a world puts the player in, for the server (q(41)): its p0_space() when it has one (the farmhouse
 ## says home, outposts say outpost), else from its surface — farm is home, pond and map as named, anything else
@@ -222,8 +225,18 @@ func _call(method: String, args: Array):
 	if is_instance_valid(world) and world.has_method(method): return world.callv(method, args)
 	return null
 
+func _enter_tree() -> void:
+	AppRouter.loading_overlay_factory = _scene_overlay   # SYS-LOADING-SCENE for the P0 worlds AppRouter opens
+
+func _exit_tree() -> void:
+	if AppRouter.loading_overlay_factory == Callable(self, &"_scene_overlay"): AppRouter.loading_overlay_factory = Callable()
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_APPLICATION_RESUMED: _on_resumed()
+
 func _process(dt: float) -> void:
 	_dev_shot(dt)
+	_tick_screens(dt)
 	if ui.offline:
 		_probe_left -= dt
 		if _probe_left <= 0.0: _probe()
@@ -519,8 +532,12 @@ func _harvest_bag_full() -> void:
 
 ## A request that never got an answer (8 s, a 5xx or not JSON). The server URL goes to the log, not the screen.
 func _net_failed(msg: String, cmd := {}) -> void:
-	_net_fails += 1
 	push_warning("P0: %s · %s" % [msg, session.base_url])
+	_end_resume()
+	if _launch_s >= 0.0 and session.view.is_empty():
+		_launch_failed()   # nothing to browse yet: Can't connect takes the screen, no banner (SYS-LOADING-FAIL)
+		return
+	_net_fails += 1
 	if _net_fails >= 2:
 		if not ui.offline:
 			ui.offline = true
@@ -535,6 +552,9 @@ func _net_failed(msg: String, cmd := {}) -> void:
 ## nothing settled is replayed and no UI command is resent, §10.7.1).
 func _net_ok() -> void:
 	_net_fails = 0
+	_end_resume()
+	_unblock()
+	_end_launch()
 	if ui.offline:
 		ui.offline = false
 		ui.show_sys(UiSysBanner.Kind.BACK_ONLINE, "Back online", BACK_ONLINE_S)
@@ -543,6 +563,121 @@ func _net_ok() -> void:
 func _probe() -> void:
 	_probe_left = PROBE_S
 	if not session.busy: session.refresh()
+
+# ---------------------------------------------------------------- whole-screen system states (SGODOT-233)
+const LAUNCH_SLOW_S := 8.0    # SYS-LOADING-2: `Taking longer than usual…`
+const LAUNCH_FAIL_S := 20.0   # no answer by then: SYS-LOADING-FAIL `Can't connect` · Retry
+const MAINT_CHECK_S := 60.0   # SYS-MAINT checks again on its own (q(74))
+var _launch_s := -1.0         # how long the launch cover has been up; -1 when it is not
+var _blocked := ""            # "maintenance" / "update_required" while the server turns every request away
+var _block_url := ""
+var _maint_left := 0.0
+var _resume_ms := -1          # a state read on return to the foreground is in flight since then; -1 none
+
+## The first session's launch cover (SYS-LOADING, from p0_boot): the wordmark over the farm backdrop until the first
+## answer and a world are both there. 8 s on, the spinner and `Taking longer than usual…`; 20 s without an answer —
+## or a failed read with nothing yet to browse — `Can't connect` · Retry, checked again every PROBE_S.
+func cover_launch() -> void:
+	_launch_s = 0.0
+	ui.show_screen(P0SysScreen.Kind.LAUNCH)
+
+func _tick_screens(dt: float) -> void:
+	if _launch_s >= 0.0:
+		_launch_s += dt
+		match ui.screen_kind():
+			P0SysScreen.Kind.LAUNCH:
+				if _launch_s >= LAUNCH_SLOW_S and not ui.screen().slow: ui.screen().taking_longer()
+				if _launch_s >= LAUNCH_FAIL_S and session.view.is_empty(): _launch_failed()
+			P0SysScreen.Kind.FAIL:
+				_probe_left -= dt
+				if _probe_left <= 0.0: _probe()
+	if _blocked == "maintenance":
+		_maint_left -= dt
+		if _maint_left <= 0.0:
+			_maint_left = MAINT_CHECK_S
+			if not session.busy: session.refresh()
+	# Back from the background: the read is cheap when it is quick; past MOTION_PENDING_DELAY_MS it gets a cover.
+	if _resume_ms >= 0 and ui.screen_kind() == -1 and Time.get_ticks_msec() - _resume_ms >= UiTokens.MOTION_PENDING_DELAY_MS:
+		ui.show_screen(P0SysScreen.Kind.SCENE, {place = ui.place_text(), shot = P0SysScreen.blurred_screen(get_viewport())})
+
+func _launch_failed() -> void:
+	_probe_left = PROBE_S
+	ui.show_screen(P0SysScreen.Kind.FAIL)
+
+## The launch is over once the first answer and a world are both in: the cover (or Can't connect) goes.
+func _end_launch() -> void:
+	if _launch_s < 0.0 or session.view.is_empty() or not is_instance_valid(world): return
+	_launch_s = -1.0
+	ui.hide_screen([P0SysScreen.Kind.LAUNCH, P0SysScreen.Kind.FAIL])
+
+## Every return to the foreground reads the state (§10.7.1); a slow read gets SYS-LOADING over the place.
+func _on_resumed() -> void:
+	if session.view.is_empty() or _blocked != "" or _launch_s >= 0.0: return
+	_resume_ms = Time.get_ticks_msec()
+	if not session.busy: session.refresh()
+
+func _end_resume() -> void:
+	if _resume_ms < 0: return
+	_resume_ms = -1
+	ui.hide_screen([P0SysScreen.Kind.SCENE])
+
+## q(74): 426 update_required → SYS-UPDATE (Update opens the url; the card stays); 503 maintenance → SYS-MAINT,
+## checked every 60 s and on Check again. Neither has a close or counts toward Offline; the outpost room is left
+## while the card is up. Any answer afterwards takes it down and the player carries on where they were.
+func _on_blocked(code: String, detail: Dictionary) -> void:
+	_end_resume()
+	_blocked = code
+	_hold_rooms(true)
+	if code == "update_required":
+		_block_url = str(detail.get("url", ""))
+		ui.show_screen(P0SysScreen.Kind.UPDATE, {url = _block_url})
+	else:
+		_maint_left = MAINT_CHECK_S
+		ui.show_screen(P0SysScreen.Kind.MAINT, {back_at = back_at_text(str(detail.get("back_at", "")))})
+
+func _unblock() -> void:
+	if _blocked == "": return
+	_blocked = ""
+	ui.hide_screen([P0SysScreen.Kind.MAINT, P0SysScreen.Kind.UPDATE])
+	_hold_rooms(false)
+
+func _hold_rooms(on: bool) -> void:
+	if not is_inside_tree(): return
+	for o in get_tree().root.find_children("*", "P0Online", true, false):
+		if on: (o as P0Online).hold()
+		else: (o as P0Online).release()
+
+func _on_screen_action(kind: P0SysScreen.Kind) -> void:
+	match kind:
+		P0SysScreen.Kind.FAIL: _probe()
+		P0SysScreen.Kind.MAINT:
+			_maint_left = MAINT_CHECK_S
+			if not session.busy: session.refresh()
+		P0SysScreen.Kind.UPDATE:
+			if _block_url != "": OS.shell_open(_block_url)
+
+## SYS-MAINT's time (q(74)): the player's local clock, 24 h — `14:30` today, `Oct 10, 14:30` on another day; "" (We'll
+## be back soon.) when absent, unreadable or already past. `now` and `bias_min` (minutes east of UTC) are for tests.
+static func back_at_text(iso: String, now := -1, bias_min := 100000) -> String:
+	if iso.strip_edges() == "": return ""
+	var at := Time.get_unix_time_from_datetime_string(iso.strip_edges().trim_suffix("Z"))
+	if at <= 0: return ""
+	var t_now := now if now >= 0 else int(Time.get_unix_time_from_system())
+	if at <= t_now: return ""
+	var shift := (bias_min if bias_min != 100000 else int(Time.get_time_zone_from_system().get("bias", 0))) * 60
+	var d := Time.get_datetime_dict_from_unix_time(int(at) + shift)
+	var today := Time.get_datetime_dict_from_unix_time(t_now + shift)
+	var clock := "%02d:%02d" % [int(d.hour), int(d.minute)]
+	if [d.year, d.month, d.day] == [today.year, today.month, today.day]: return clock
+	const MONTHS := ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+	return "%s %d, %s" % [MONTHS[int(d.month) - 1], int(d.day), clock]
+
+## AppRouter.open_instance into a P0 world: SYS-LOADING-SCENE over the screen being left; anything else keeps
+## AppRouter's own overlay.
+func _scene_overlay(path: String, args: Dictionary) -> CanvasLayer:
+	var place := P0LoadingLayer.destination(path, args)
+	if place == "": return null
+	return P0LoadingLayer.new(place, P0SysScreen.blurred_screen(get_viewport()))
 
 # ---------------------------------------------------------------- dev: scripted desktop screenshots
 ## P0_SHOT=/abs/path.png P0_SHOT_STEPS="walk:1:0:1.5,act,..." — run scripted inputs, save one frame, quit.

@@ -1192,6 +1192,44 @@ func track_pressed(key: String) -> void:
 	var b := UiCommandButton.take_pressed()
 	if b != null and is_instance_valid(b): b.track(lifecycle, key)
 
+# ---------------------------------------------------------------- whole-screen system states (SGODOT-233)
+## One P0SysScreen at a time on its own layer over everything this UI draws (banners, toasts, drawers): §10.7.1's
+## order is SYS-UPDATE > SYS-MAINT > SYS-LOADING, so a lower one never replaces a higher one. `screen_action(kind)`
+## is its card's button (Retry, Check again, Update).
+signal screen_action(kind: P0SysScreen.Kind)
+const SCREEN_LAYER := 100   # over the fishing presentation (30), under AppRouter's loading layer (120)
+var _screen_layer: CanvasLayer
+var _screen: P0SysScreen
+
+static func _screen_rank(kind: int) -> int:
+	return {P0SysScreen.Kind.UPDATE: 3, P0SysScreen.Kind.MAINT: 2}.get(kind, 1)
+
+func show_screen(kind: P0SysScreen.Kind, detail := {}) -> void:
+	if _screen != null and _screen_rank(_screen.kind) > _screen_rank(kind): return
+	if _screen == null:
+		_screen_layer = CanvasLayer.new()
+		_screen_layer.layer = SCREEN_LAYER
+		add_child(_screen_layer)
+		_screen = P0SysScreen.new()
+		_screen.primary_pressed.connect(func(k: P0SysScreen.Kind): screen_action.emit(k))
+		_screen_layer.add_child(_screen)
+	_screen.show_kind(kind, detail)
+
+## Takes the screen down when it is one of `kinds` (any when empty).
+func hide_screen(kinds: Array = []) -> void:
+	if _screen == null or (not kinds.is_empty() and not kinds.has(_screen.kind)): return
+	_screen_layer.queue_free()
+	_screen_layer = null
+	_screen = null
+
+## The state on screen, -1 for none.
+func screen_kind() -> int: return _screen.kind if _screen != null else -1
+
+func screen() -> P0SysScreen: return _screen
+
+## The place chip's text (`Shanghai · Reed Pond`): the resume cover names where the player is.
+func place_text() -> String: return str(_pending.get("place", _place_text))
+
 ## The system line under the HUD (SysBanner, x 16 y 100): over the scene and over an open drawer (SYS-OFFLINE-3).
 ## `seconds` > 0 takes it down after that long (Back online 1.5 s, Didn't go through 3 s); 0 keeps it (Offline).
 ## Offline outranks Didn't go through (WP6 priority): while offline, a failed command does not replace it.
@@ -1295,6 +1333,7 @@ func _notification(what: int) -> void:
 ## a quick slot being dragged (it flies back, LOCK-04 v1.11; the PinMenu is gone), the radial, then a card or
 ## drawer. True when it closed something; the world only leaves on false.
 func close_top_layer() -> bool:
+	if _screen != null: return true   # SYS-LOADING / MAINT / UPDATE have no close: Back does nothing (q(74))
 	if _bar != null and (_bar.is_dragging() or _bar.is_lifted()):   # lifted and not moved yet counts too (刘邦 on #38)
 		_bar.cancel_drag()
 		return true

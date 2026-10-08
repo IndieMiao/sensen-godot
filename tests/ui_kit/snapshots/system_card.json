@@ -1,0 +1,225 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    516
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiSystemCard"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        36
+      ],
+      "variation": "CaptionR12",
+      "text": "SystemCard 1237:87229 Blocking / Error · SYS-LOADING-FAIL 1243:108638 (SGODOT-233)"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        70,
+        328,
+        446
+      ],
+      "children": [
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            70,
+            328,
+            269
+          ],
+          "children": [
+            {
+              "type": "UiSystemCard",
+              "rect": [
+                0,
+                70,
+                328,
+                249
+              ],
+              "children": [
+                {
+                  "type": "VBoxContainer",
+                  "rect": [
+                    21,
+                    98,
+                    286,
+                    201
+                  ],
+                  "children": [
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        132,
+                        98,
+                        64,
+                        64
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            148,
+                            114,
+                            32,
+                            32
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Label",
+                      "rect": [
+                        21,
+                        172,
+                        286,
+                        29
+                      ],
+                      "variation": "TitleXB20",
+                      "text": "Can't connect"
+                    },
+                    {
+                      "type": "Label",
+                      "rect": [
+                        21,
+                        211,
+                        286,
+                        20
+                      ],
+                      "variation": "BodyB14",
+                      "text": "Check your connection and try again."
+                    },
+                    {
+                      "type": "Control",
+                      "rect": [
+                        21,
+                        241,
+                        286,
+                        0
+                      ]
+                    },
+                    {
+                      "type": "UiCommandButton",
+                      "rect": [
+                        21,
+                        251,
+                        286,
+                        48
+                      ],
+                      "variation": "CmdPrimary",
+                      "text": "Retry"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                325,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "Kind=Blocking · SYS-LOADING-FAIL"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            351,
+            328,
+            165
+          ],
+          "children": [
+            {
+              "type": "UiSystemCard",
+              "rect": [
+                0,
+                351,
+                328,
+                145
+              ],
+              "children": [
+                {
+                  "type": "VBoxContainer",
+                  "rect": [
+                    21,
+                    379,
+                    286,
+                    97
+                  ],
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        21,
+                        379,
+                        286,
+                        29
+                      ],
+                      "variation": "TitleXB20",
+                      "text": "Couldn't open this place"
+                    },
+                    {
+                      "type": "Control",
+                      "rect": [
+                        21,
+                        418,
+                        286,
+                        0
+                      ]
+                    },
+                    {
+                      "type": "UiCommandButton",
+                      "rect": [
+                        21,
+                        428,
+                        286,
+                        48
+                      ],
+                      "variation": "CmdPrimary",
+                      "text": "Go back"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                502,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "Kind=Error · a place that would not load"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

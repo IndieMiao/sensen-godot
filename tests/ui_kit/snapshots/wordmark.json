@@ -1,0 +1,150 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    195
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiWordmark · UiSpinner"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        36
+      ],
+      "variation": "CaptionR12",
+      "text": "Wordmark (placeholder) 1187:82582 · Spinner 1237:87185 · SYS-LOADING-2 1243:108614"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        70,
+        328,
+        125
+      ],
+      "children": [
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            70,
+            328,
+            65
+          ],
+          "children": [
+            {
+              "type": "UiWordmark",
+              "rect": [
+                89,
+                70,
+                149,
+                45
+              ],
+              "children": [
+                {
+                  "type": "TextureRect",
+                  "rect": [
+                    89,
+                    77,
+                    30,
+                    30
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    125,
+                    70,
+                    113,
+                    45
+                  ],
+                  "variation": "TitleXB20",
+                  "text": "Gensen"
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                121,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "Wordmark (placeholder)"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            147,
+            328,
+            48
+          ],
+          "children": [
+            {
+              "type": "HBoxContainer",
+              "rect": [
+                64,
+                147,
+                200,
+                28
+              ],
+              "children": [
+                {
+                  "type": "UiSpinner",
+                  "rect": [
+                    64,
+                    147,
+                    28,
+                    28
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    104,
+                    151,
+                    160,
+                    19
+                  ],
+                  "variation": "C13B",
+                  "text": "Taking longer than usual…"
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                181,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "Spinner · SYS-LOADING-2"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

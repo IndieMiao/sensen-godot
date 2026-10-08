@@ -90,6 +90,20 @@ func stop() -> void:
 		socket.poll()   # flush now: a room that frees this node never polls again
 	_reset()
 
+## SYS-MAINT / SYS-UPDATE (q(74), SGODOT-233): while a whole-screen card is up the client leaves the room itself (the
+## server does not close it), and comes back into it when the card goes — where it joined, as a reconnect does.
+var _held := false
+
+func hold() -> void:
+	if _stopped: return
+	stop()
+	_held = true
+
+func release() -> void:
+	if not _held: return
+	_held = false
+	start(outpost, spawn_at)
+
 ## Claims a seat; `at` is its position in room metres (the server moves us onto it before seating us).
 func sit(seat: String, at := Vector2.INF) -> int:
 	_act_seq += 1
