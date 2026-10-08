@@ -216,3 +216,15 @@ func test_after_the_first_session_the_crop_timer_says_what_the_harvest_does() ->
 	v.stall.board.requests = []
 	v.cooking.cookbook[0].cooked = true
 	assert_str(str(P0Logic.today_rows(v)[0].line)).is_equal("Radishes ready in 3h 53m · Farming Lv 2 at first harvest")
+
+func test_the_today_chip_names_the_first_row_still_to_do_not_a_ticked_one() -> void:
+	# rc0 on 232: after handing in the Pond Catch the chip still read "Deliver 2 Pond Crucian · Stall" (ticked).
+	var v := _view({"plots": _plots(["growing"]), "req_done": ["req_pond_catch"]})
+	v.stall.board.requests = []
+	v.bag.slots = [{"id": "fish_crucian", "qty": 1}]
+	var rows := P0Logic.today_rows(v)
+	assert_str(str(rows[0].state)).is_equal("done")                     # the ticked Deliver row still leads the panel
+	assert_str(P0Logic.today_chip_line(rows)).is_equal("Cook it: Grilled Crucian")
+	for sk in v.skills.values(): sk.floor = 0   # hud_state's skill bars read it
+	assert_str(str(P0Logic.hud_state(v).today)).is_equal("Cook it: Grilled Crucian")
+	assert_str(P0Logic.today_chip_line([{"line": "Deliver 2 Pond Crucian · Stall", "state": "done"}])).is_equal("")

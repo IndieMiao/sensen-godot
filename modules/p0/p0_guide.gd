@@ -228,7 +228,8 @@ static func harvest_level_tail(view: Dictionary) -> String:
 
 # ---------------------------------------------------------------- world badges
 
-## The farmhouse door "!" (§14.3): a cookable fish in the bag while Today has a Cook row still to do.
+## The farmhouse marker's REQUEST state, the guide's "!" (§14.3; #59, 250 v2: one mark per facility): a cookable
+## fish in the bag while Today has a Cook row still to do.
 static func door_badge(view: Dictionary) -> bool:
 	var fish := false
 	for s in view.get("bag", {}).get("slots", []):

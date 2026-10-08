@@ -358,12 +358,12 @@ static func hud_state(view: Dictionary, ctx: Dictionary = {}) -> Dictionary:
 	if have > mx: regen = "Bonus +%d" % (have - mx)
 	elif nx != null: regen = "+1 in " + duration(float(nx))
 	var sk: Dictionary = view.get("skills", {})
-	var lines := today_lines(view)
+	var rows := today_rows(view)
 	var out := {
 		"energy": have, "energy_max": mx, "regen": regen, "next_cost": int(ctx.get("next_cost", 0)),
 		"skills": {"farming": skill_progress(sk.get("farming", {})), "fishing": skill_progress(sk.get("fishing", {}))},
 		"coins": int(view.get("coins", 0)), "unread": int(ctx.get("unread", (view.get("inbox", {}).get("parcels", []) as Array).size())), "buff": {},
-		"today": str(lines[0]) if not lines.is_empty() else "",
+		"today": today_chip_line(rows),
 	}
 	if ctx.has("place"): out["place"] = ctx.place
 	return out
@@ -612,6 +612,13 @@ static func next_line(view: Dictionary, skill: String, level: int) -> String:
 		"cooking":
 			if level == 4: return "Next: Lv4 · 3rd ingredient slot"
 	return "Next: Lv%d · more XP from every new page" % level if skill == "cooking" else "Next: Lv%d" % level
+
+## The Today chip names the row with the focus, the first still to do (q(58)): a ticked guide row (Deliver after the
+## Pond Catch is handed in) stays in the panel with its ✓ but no longer heads the chip. "" when nothing is left to do.
+static func today_chip_line(rows: Array) -> String:
+	for r in rows:
+		if str(r.get("state", "")) != "done": return str(r.line)
+	return ""
 
 ## Today panel (§14.5): up to 3 lines — doable now first, then the shortest countdown, then the skill
 ## closest to its next level. Facts only; never "spend your Energy".
