@@ -648,6 +648,21 @@ static func parcel_notice(view: Dictionary, events: Array) -> Dictionary:
 	return {title = "Inbox full · waiting" if waiting else "Sent to Inbox", item = item_name(view, str(first.get("id", ""))),
 		quantity = "×%d" % int(first.get("qty", 1)), line = more + ("Claim a parcel first" if waiting else "Expires in 24h")}
 
+## q(88): a resident's gift meal that did not fit the bag (`gift_meal` with to: parcel; §3.4.5) on the same card: the dish
+## ×1 and `From Pip · Expires in 9h 12m`, counting down to 04:00 as the Inbox's Parcels row does (the parcel's
+## expires_in), or `Inbox full · waiting` / `From Pip · Claim a parcel first` while it waits for a place. {} for a meal
+## that went into the bag.
+static func gift_meal_notice(view: Dictionary, ev: Dictionary, events: Array) -> Dictionary:
+	if str(ev.get("to", "")) != "parcel": return {}
+	var dish := str(ev.get("dish", ""))
+	var who := str(content().get("residents", {}).get(str(ev.get("resident", "")), {}).get("name", ""))
+	var found := events.filter(func(e): return str(e.get("kind", "")) == "parcel" and bool(e.get("gift", false)) and str(e.get("id", "")) == dish)
+	var parcel: Dictionary = found[0] if not found.is_empty() else {}
+	var waiting := bool(parcel.get("waiting", false))
+	var expiry := "Expires in " + P0Inbox.left_text(float(parcel.get("expires_in", 0))).trim_suffix(" left")
+	return {title = "Inbox full · waiting" if waiting else "Sent to Inbox", item = item_name(view, dish), quantity = "×1",
+		line = ("From %s · " % who if who != "" else "") + ("Claim a parcel first" if waiting else expiry)}
+
 # ---------------------------------------------------------------- M2: fishing, cooking, eating
 static func item(view: Dictionary, id: String) -> Dictionary:
 	return view.get("items", {}).get(id, {})

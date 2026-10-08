@@ -498,8 +498,12 @@ func _on_state(v: Dictionary, events: Array) -> void:
 					if reply != "": ui.toast(reply)
 			"gift_meal":
 				var who := str(P0Logic.content().get("residents", {}).get(str(ev.get("resident", "")), {}).get("name", ""))
-				# SGODOT-232: with the bag full the meal waits in the Inbox (to: parcel), gone at 04:00 like any gift meal.
-				if str(ev.get("to", "")) == "parcel": ui.toast("Bag full · %s's meal sent to Inbox" % who)
+				# SGODOT-232: with the bag full the meal waits in the Inbox (to: parcel), gone at 04:00 like any gift meal;
+				# it is said by the Sent to Inbox card, `From Pip · Expires in 9h 12m` (q(88)), after a level-up's banner.
+				if str(ev.get("to", "")) == "parcel":
+					var meal := P0Logic.gift_meal_notice(v, ev, events)
+					if levelled: parcel_notice = meal
+					else: ui.inbox_notice_when_clear(meal)
 				elif bool(ev.get("given", false)): ui.toast_success("%s gave you %s · in your bag" % [who, P0Logic.item_name(v, str(ev.get("dish", "")))])
 			"homestead":
 				# HOME-2 (SGODOT-228): HOME-1 closes, the MomentBanner says what changed; the farm swaps the fence.
@@ -969,11 +973,16 @@ func _dev_shot(dt: float) -> void:
 			"inboxdemo": _dev_inbox(step[1] if step.size() > 1 else "parcels")   # inboxdemo:parcels|full|updates|todo (234)
 			"workbench": ui.open_workbench(step[1] if step.size() > 1 else "")   # SGODOT-231 B2-06 drawer, tools / supplies
 			"toasterr": ui.toast_error(step[1] if step.size() > 1 else "Need 1 more Copper Ore")   # a refusal's Error toast (233)
-			"inboxnotice":   # inboxnotice[:more|:full] — the Sent to Inbox card under the bell (BAG-5-2, q(87); 234)
+			"inboxnotice":   # inboxnotice[:more|:full|:gift] — the Sent to Inbox card under the bell (BAG-5-2, q(87) / q(88); 234)
 				var kind := step[1] if step.size() > 1 else ""
-				var parcel := {"kind": "parcel", "id": "seed_carrot", "qty": 5, "waiting": kind == "full"}
-				var more := [{"kind": "parcel", "id": "bait_worm", "qty": 3, "waiting": kind == "full"}] if kind != "" else []
-				ui.inbox_notice_when_clear(P0Logic.parcel_notice(session.current(), [parcel] + more))
+				if kind == "gift":   # Pip's gift meal into a full bag (q(88)): 9h 12m to 04:00
+					var meal := {"kind": "gift_meal", "resident": "res_pip", "dish": "dish_grilled_crucian", "given": true, "to": "parcel"}
+					ui.inbox_notice_when_clear(P0Logic.gift_meal_notice(session.current(), meal, [{"kind": "parcel",
+						"id": "dish_grilled_crucian", "qty": 1, "waiting": false, "expires_in": 33120000, "gift": true}]))
+				else:
+					var parcel := {"kind": "parcel", "id": "seed_carrot", "qty": 5, "waiting": kind == "full"}
+					var more := [{"kind": "parcel", "id": "bait_worm", "qty": 3, "waiting": kind == "full"}] if kind != "" else []
+					ui.inbox_notice_when_clear(P0Logic.parcel_notice(session.current(), [parcel] + more))
 			"netfail": _net_failed("dev", {"type": "dev"})   # netfail once: Didn't go through; twice: Offline (233)
 			"screen": _dev_screen(step[1] if step.size() > 1 else "launch")   # screen:launch|slow|fail|maint|update|scene|placefail
 			"wbtile":   # wbtile:craft_copper_pickaxe:0 taps that card's cost tile (NeedSource)
