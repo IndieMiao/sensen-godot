@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none"><g>
+<path id="Vector" d="M23 23L2 42H44L23 23Z" fill="#D98C6B" />
+<path id="Vector_2" d="M7 42H39V55C39 57.21 37.21 59 35 59H11C8.79 59 7 57.21 7 55V42Z" fill="#F6ECD6" />
+<path id="Vector_3" d="M24 47H22C20.34 47 19 48.34 19 50V59H27V50C27 48.34 25.66 47 24 47Z" fill="#B98A5E" />
+<path id="Vector_4" d="M45 38C55.4934 38 64 29.4934 64 19C64 8.50659 55.4934 0 45 0C34.5066 0 26 8.50659 26 19C26 29.4934 34.5066 38 45 38Z" fill="#FBF8F1" />
+<path id="Vector_5" d="M45 35C53.8366 35 61 27.8366 61 19C61 10.1634 53.8366 3 45 3C36.1634 3 29 10.1634 29 19C29 27.8366 36.1634 35 45 35Z" fill="#7FA35A" />
+<path id="Vector_6" d="M45 7L56 19H49.5V30H40.5V19H34L45 7Z" fill="white" />
+</g>
+</svg>

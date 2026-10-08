@@ -43,7 +43,8 @@ var _stall := Vector3.ZERO   # the Homestead Stall (unattended, p(6)); the seed 
 var _mine := Vector3.ZERO
 var _bench := Vector3.ZERO   # the rest bench by the farmhouse (FARM-7, q(30)): Basic Room's bench.glb
 var _materials: P0FarmMaterials   # SGODOT-231: mine mouth, gathering spots and the workbench
-var _card := ""   # LOCK-07: the one facility whose finger card shows this frame (P0Garden.pick_card)
+var _card := ""   # LOCK-07 v2: the one facility whose name strip is open this frame (P0Garden.pick_card)
+var _strip_side := UiWorldNameBar.Dir.RIGHT   # the side the strip opens to: the way the character faces on screen
 var _focus := Vector3.ZERO
 var _cam_follow := P0Follow.new()
 var _zoom := 1.0
@@ -315,8 +316,7 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 	_card = P0Garden.pick_card(_card_candidates(), actor.position, _card)
 	_materials.frame(v, _card)
 	_hold_repeat()
-	_tags(v)
-	_bench_marker(v)
+	_prompts(v)
 	_teaching(v)
 
 func _sync_plots(v: Dictionary, dt: float) -> void:
@@ -459,72 +459,51 @@ func _tap_card(id: String) -> bool:
 			return _materials.tap_card(id)   # SGODOT-231: spot_* and workbench cards
 	return true
 
-## The sign or its mark (tapping a mark or its card = tapping the object); small, so the door beside it stays the house.
+## The sign itself (its icon button and strip arrive by id, _tap_card); small, so the door beside it stays the house.
+## Nothing above the board: with the button hidden (beyond 8 m) that spot is not the sign's (苏烈 on #59).
 func _sign_hit(screen: Vector2) -> bool:
-	return cam.unproject_position(_sign + Vector3(0, 0.45, 0)).distance_to(screen) < 34 \
-		or cam.unproject_position(_sign + SIGN_BADGE).distance_to(screen) < 30 or rt.ui.badge_hit("homestead", screen)
+	return cam.unproject_position(_sign + Vector3(0, 0.45, 0)).distance_to(screen) < 34
 
-## Facility marks (STATE-ICONS) show over the stall; finger cards appear when you walk up (LOCK-07 / LOCK-17).
-## Tapping the card is tapping the facility, so it reuses p0_tap's own hit points.
-func _tags(v: Dictionary) -> void:
-	var stall_top := cam.unproject_position(_stall + Vector3(0, 1.05, 0))
-	# ✓ when a Stall Board request can be handed in now (taken or not, q(48)), ! when one is open (P0Guide, q(44))
-	var board := P0Guide.stall_badge(v)
-	var request := UiStatusBadge.State.DELIVERABLE if board == "deliver" else UiStatusBadge.State.REQUEST
-	rt.ui.badge("stall", request, stall_top, board != "")
-	rt.ui.tag("stall", "Tap to shop", stall_top - Vector2(0, rt.ui.badge_height("stall")),
-		_card == "stall", cam.unproject_position(_stall + Vector3(0, 0.4, 0)))
-	# The farmhouse carries no state badge (不知火舞 on SGODOT-221): the stove's state belongs to the stove inside,
-	# and Today already names the dish and its time — except the guide's "!" (A-03, TUT-3-07A2): above the door while
-	# a cookable fish is in the bag and Today has a Cook row to do (P0Guide.door_badge; 不知火舞 on SGODOT-232).
-	# Tapping it goes in (the door card is gone; Rest is the bench, SGODOT-224).
-	rt.ui.badge("door", UiStatusBadge.State.REQUEST, cam.unproject_position(_house + Vector3(-0.45, 1.3, 0.95)), P0Guide.door_badge(v))
-	rt.ui.tag("home", "Farmhouse · Tap to go in", cam.unproject_position(_house + Vector3(0, 2.6, 0.4)),
-		_card == "home", cam.unproject_position(_house + Vector3(0, 1.0, 0.6)))
-	# Homestead sign (WorldBadges · Farm 1135:79267, LOCK-11; 不知火舞 on SGODOT-228): a home mark with the caption
-	# "Homestead LvN" always shows, Ready once the Needs are met; walking up folds the caption to the mark and the
-	# finger card "Homestead LvN · Tap to upgrade" sits above it (LOCK-07). Mark, card and sign all open HOME-1.
-	var h: Dictionary = v.get("homestead", {})
-	var nxt = h.get("next", null)
-	var lit: bool = nxt is Dictionary and bool(nxt.get("can_upgrade", false))
-	var lvl := int(h.get("level", 1))
-	var sign_top := cam.unproject_position(_sign + SIGN_BADGE)
-	var near_sign := _card == "sign"
-	rt.ui.badge("homestead", UiStatusBadge.State.READY if lit else UiStatusBadge.State.AVAILABLE, sign_top, true,
-		"" if near_sign else "Homestead Lv%d" % lvl, P0Logic.icon("home"))
-	rt.ui.tag("homestead", "Homestead Lv%d · Tap to upgrade" % lvl, sign_top - Vector2(0, rt.ui.badge_height("homestead")),
-		near_sign, cam.unproject_position(_sign + Vector3(0, 0.45, 0)))
-	# Upgrade Plaque: no mark; the finger card only near it, and its tap is the plaque's (PLAQUE-READ).
-	_plaque_node.visible = not h.get("plaque", []).is_empty()
-	rt.ui.tag("plaque", "Upgrade Plaque · Tap to read", cam.unproject_position(_plaque + Vector3(0, 0.85, 0)),
-		_card == "plaque", cam.unproject_position(_plaque + Vector3(0, 0.35, 0)))
-	# 不知火舞 on SGODOT-228 (293b4190): another facility's finger card over the sign's caption folds it to the mark
-	# while the card shows. TODO(亚瑟, world controls): the general rule for every CaptionPill replaces this.
-	if _card != "" and _card != "sign" and not near_sign:
-		var card := rt.ui.card_rect(_card)
-		if card.has_area() and card.grow(UiTokens.SPACE_ROW).intersects(rt.ui.badge_rect("homestead")):
-			rt.ui.badge("homestead", UiStatusBadge.State.READY if lit else UiStatusBadge.State.AVAILABLE, sign_top, true, "",
-				P0Logic.icon("home"))
-		rt.ui.slide_card_off(_card, rt.ui.badge_rect("homestead"))   # and the card never covers the mark itself
+## World prompts (SGODOT-250; LOCK-07 v2 / LOCK-11 / LOCK-17 v2; q(62); WORLD-HINT-1…5): every facility within
+## P0WorldPrompts.RANGE shows its icon button (a state shows from anywhere and takes the icon's place); the one nearest
+## in reach (_card) opens its name strip toward the way the character faces. No "Tap to …": tapping the button, the
+## strip or the object is tapping the facility (_tap_card by id). Anchors are the former finger cards' and marks'.
+func _prompts(v: Dictionary) -> void:
+	_strip_side = _facing_side()
+	world_prompt("stall", P0WorldPrompts.stall(v), _stall, Vector3(0, 1.05, 0), Vector3(0, 0.4, 0))
+	world_prompt("home", P0WorldPrompts.farmhouse(v), _house, Vector3(0, 2.6, 0.4), Vector3(0, 1.0, 0.6))
+	world_prompt("sign", P0WorldPrompts.sign(v), _sign, SIGN_BADGE, Vector3(0, 0.45, 0))
+	_plaque_node.visible = not v.get("homestead", {}).get("plaque", []).is_empty()
+	world_prompt("plaque", P0WorldPrompts.plaque(v), _plaque, Vector3(0, 0.85, 0), Vector3(0, 0.35, 0), _plaque_node.visible)
+	world_prompt("bench", P0WorldPrompts.bench(v), _bench, Vector3(0, 0.95, 0), Vector3(0, 0.35, 0))
 
-## Every facility with a finger card on the farm, [id, position, reach m] in a fixed order (LOCK-07: one card, the
-## nearest in reach): the rest bench, and SGODOT-231's five gathering spots and the workbench.
+## One facility's prompt at `at` + `mark` (the former finger card's / mark's anchor): its strip when it is the open
+## one, else its icon button (P0WorldPrompts.show). The button and strip forward their taps to `at` + `hit` by id.
+func world_prompt(id: String, prompt: Dictionary, at: Vector3, mark: Vector3, hit: Vector3, present := true) -> void:
+	var screen := cam.unproject_position(at + mark)
+	var tap := cam.unproject_position(at + hit)
+	var show := P0WorldPrompts.show(id, _card, P0FarmMaterials.flat(actor.position, at), prompt) \
+		if present and not rt.ui.has_modal() else P0WorldPrompts.Show.NONE
+	if show == P0WorldPrompts.Show.BAR:
+		rt.ui.name_bar(id, prompt.icon, str(prompt.text), str(prompt.fact), screen, true, _strip_side, bool(prompt.dimmed),
+			int(prompt.status), tap)
+	else:
+		rt.ui.world_icon(id, prompt.icon, screen, show == P0WorldPrompts.Show.ICON, false, int(prompt.status), tap)
+
+## The side a strip opens to: the character's facing on screen; facing the camera or away keeps the last side.
+func _facing_side() -> UiWorldNameBar.Dir:
+	var from := cam.unproject_position(actor.position)
+	var dx := cam.unproject_position(actor.position + actor.facing()).x - from.x
+	if absf(dx) < 6.0: return _strip_side
+	return UiWorldNameBar.Dir.LEFT if dx < 0.0 else UiWorldNameBar.Dir.RIGHT
+
+## Every facility that can open its name strip on the farm, [id, position, reach m] in a fixed order (LOCK-07 v2: one
+## strip, the nearest in reach): the rest bench, and SGODOT-231's five gathering spots and the workbench.
 func _card_candidates() -> Array:
 	var out: Array = [["stall", _stall, 3.2], ["home", _house, 4.2], ["sign", _sign, SIGN_NEAR], ["bench", _bench, BENCH_NEAR_M]]
 	if _plaque_node.visible: out.append(["plaque", _plaque, SIGN_NEAR])
 	out.append_array(_materials.card_candidates())   # SGODOT-231: the five gathering spots and the workbench
 	return out
-
-## The bench always shows its state (STATE-ICONS: Available / Countdown with the time left / Used today) and, when the
-## bench is the nearest facility in reach, its finger card (FARM-7) above the badge; a tap on it is the bench's (_tap_card).
-func _bench_marker(v: Dictionary) -> void:
-	var st := P0Logic.rest_state(v)
-	var top := cam.unproject_position(_bench + Vector3(0, 0.95, 0))
-	var state: UiStatusBadge.State = {"available": UiStatusBadge.State.AVAILABLE, "countdown": UiStatusBadge.State.COUNTDOWN,
-		"used_today": UiStatusBadge.State.USED_TODAY}.get(str(st.badge), UiStatusBadge.State.AVAILABLE)
-	rt.ui.badge("bench", state, top, true, str(st.caption), P0Logic.icon("rest"))
-	rt.ui.tag("bench", str(st.card), top - Vector2(0, rt.ui.badge_height("bench")),
-		_card == "bench", cam.unproject_position(_bench + Vector3(0, 0.35, 0)))   # one card, the nearest (LOCK-07)
 
 ## Basic Room's bench (648 tris; q(30)) with the room's shared atlas material.
 func _bench_prop(at: Vector3) -> Node3D:
@@ -583,34 +562,19 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"sign": p0_tap(cam.unproject_position(_sign + Vector3(0, 0.45, 0)))   # HOME-1 through the sign's own tap
 		"plaque": p0_tap(cam.unproject_position(_plaque + Vector3(0, 0.35, 0)))   # PLAQUE-READ
 		"zoomto": _zoom = clampf(float(step[1]), 0.8, 1.4)   # zoomto:0.8 (widest) … 1.4 (closest)
-		"markrects":   # print the Homestead mark's and the stall's badge rects (design check: ≥ 8 px apart)
-			var a := rt.ui.badge_rect("homestead")
-			var b := rt.ui.badge_rect("stall")
-			print("MARKRECTS zoom=%.2f homestead=%s stall=%s gap=%s" % [_zoom, a, b,
-				"n/a" if not (a.has_area() and b.has_area()) else str(_rect_gap(a, b))])
-			var cr := rt.ui.card_rect(_card)
-			if cr.has_area():
-				print("MARKRECTS card=%s rect=%s gap_to_homestead=%s" % [_card, cr, "n/a" if not a.has_area() else str(_rect_gap(a, cr))])
-		"tapcard":   # tapcard — a real tap on the finger card showing now (the PR #21 review repro)
-			var cr := rt.ui.card_rect(_card)
-			if cr.has_area(): rt.ui._tap_at(rt.ui.root.global_position + cr.get_center(), false)
-		"tapsign":   # tapsign:mark|caption|edge — a tap on the Homestead mark's disc, its caption, or the sign's rim
-			var r := rt.ui.badge_rect("homestead")
-			match step[1] if step.size() > 1 else "mark":
-				"mark": p0_tap(Vector2(r.get_center().x, r.position.y + 10))
-				"caption": p0_tap(Vector2(r.get_center().x, r.end.y - 6))
-				_: p0_tap(cam.unproject_position(_sign + Vector3(0, 0.45, 0)) + Vector2(30, 0))
+		"near":   # near:<id> — stand 1.2 m in front of a facility, so its name strip opens (250 review shots)
+			for c in _card_candidates():
+				if str(c[0]) == step[1]:
+					actor.teleport((c[1] as Vector3) + Vector3(0, 0, 1.2))
+					_focus = actor.position
+		"tapprompt":   # tapprompt[:id] — a real tap on a shown world prompt (default: the open strip)
+			var r := rt.ui.prompt_rect(step[1] if step.size() > 1 else _card)
+			if r.has_area(): rt.ui._tap_at(r.get_center(), false)
 		"moment":   # HOME-2 as after Lv2 → Lv3, without spending anything
 			HomePanel.moment(rt.ui, P0Logic.home_moment(rt.session.current(), {"level": 3, "unlocks": ["warming_cabinet", "bag_upgrade_1"]}))
 		"spot": p0_show_spot(step[1])
 		_: return false
 	return true
-
-## Smallest distance between two rects in px (0 when they touch or overlap).
-static func _rect_gap(a: Rect2, b: Rect2) -> float:
-	var dx := maxf(0.0, maxf(a.position.x - b.end.x, b.position.x - a.end.x))
-	var dy := maxf(0.0, maxf(a.position.y - b.end.y, b.position.y - a.end.y))
-	return Vector2(dx, dy).length()
 
 func p0_until(name: String) -> bool:
 	match name:

@@ -534,7 +534,8 @@ func card_pick(marks: Dictionary) -> String:
 ## Finger cards and status badges over tappable anchors (221's rt.ui.tag / rt.ui.badge when present).
 ## A marker with `kind` uses the world prompts instead of a finger card (SGODOT-250, LOCK-07 / 16 / 30 v2), with the
 ## one in reach (`_card`) the only one opened:
-##   "npc"      {name, head}: the name over the head (NpcNameTag), highlighted while it is the one in reach or `talking`;
+##   "npc"      {name, head}: the name over the head (NpcNameTag), highlighted while it is the one in reach; `talking`
+##              keeps it up and highlighted over the greeting card / dialogue bar (P0Ui.npc_tag, #57);
 ##   "seat"     {icon}: an icon button that goes Near, never a strip;
 ##   "facility" {icon, name, fact?}: an icon button that opens into a name strip.
 ## `badge` on a seat or facility rides in the button / strip (StatusBadge World 28); an NPC's stays a badge.
@@ -566,7 +567,7 @@ func _markers(v: Dictionary) -> void:
 			rt.ui.call("badge", id, state, screen, true, str(m.get("caption", "")), m.get("icon", null))
 			if rt.ui.has_method("badge_height"): lift = float(rt.ui.call("badge_height", id))
 		if kind == "npc":
-			rt.ui.npc_tag(id, str(m.name), cam.unproject_position(m.head), true, n == _card or bool(m.get("talking", false)))
+			rt.ui.npc_tag(id, str(m.name), cam.unproject_position(m.head), true, n == _card, bool(m.get("talking", false)))
 		elif m.has("text"):
 			rt.ui.tag(id, str(m.text), screen - Vector2(0, lift), n == _card)
 	for id in _shown.keys():
