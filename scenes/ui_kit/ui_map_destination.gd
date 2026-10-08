@@ -27,6 +27,9 @@ var name_shown := true: set = set_name_shown
 var focus := 1.0: set = set_focus
 ## The name's sideways shift from under the disc (px): the city map keeps a name near the screen edge on screen.
 var label_shift := 0.0: set = set_label_shift
+## The name over the disc instead of under it: the city map's second place when under it would touch another (不知火舞
+## on 234 A2). The disc keeps its place.
+var label_above := false: set = set_label_above
 
 var _pin: Control
 var _disc: Panel
@@ -111,6 +114,11 @@ func set_mark(v: String) -> void:
 	_badge.state = i
 	_badge.visible = true
 
+func set_label_above(v: bool) -> void:
+	if v == label_above: return
+	label_above = v
+	_layout()
+
 func set_label_shift(v: float) -> void:
 	if is_equal_approx(v, label_shift): return
 	label_shift = v
@@ -147,7 +155,8 @@ func anchor_offset() -> Vector2:
 ## What it covers around its geographic point: the disc over it, the name under it (for the map's packing).
 func footprint() -> Rect2:
 	var l := label_size()
-	return Rect2(-DISC * 0.5, -DISC, DISC, DISC).merge(Rect2(-l.x * 0.5 + label_shift, LABEL_GAP, l.x, l.y)) if l.x > 0.0 \
+	var name_y := -DISC - LABEL_GAP - l.y if label_above else LABEL_GAP
+	return Rect2(-DISC * 0.5, -DISC, DISC, DISC).merge(Rect2(-l.x * 0.5 + label_shift, name_y, l.x, l.y)) if l.x > 0.0 \
 		else Rect2(-DISC * 0.5, -DISC, DISC, DISC)
 
 func _layout() -> void:
@@ -157,5 +166,5 @@ func _layout() -> void:
 	custom_minimum_size = Vector2(w, DISC + (LABEL_GAP + l.y if l.y > 0.0 else 0.0))
 	size = custom_minimum_size
 	_pin.position = Vector2((w - DISC) * 0.5, 0.0)
-	_label_box.position = Vector2((w - l.x) * 0.5 + label_shift, DISC + LABEL_GAP)
+	_label_box.position = Vector2((w - l.x) * 0.5 + label_shift, -LABEL_GAP - l.y if label_above else DISC + LABEL_GAP)
 	_label_box.size = l

@@ -231,7 +231,7 @@ const PIN_ICONS := {"tea": "pot", "tackle": "rod", "market": "board", "post": "t
 ## Away from home the avatar stands left of the pin of the place it is at, level with its disc (Figma 1802:118849).
 const AVATAR_BESIDE := Vector2(-44, 0)
 var _here_sig := ""
-var _dest_styles := {}   # "kind:id" -> its style: the city map asks several times per pin per frame (刘邦 on #100)
+var _dest_styles := {}   # "kind:id" -> a pond's / place's style: asked several times per pin per frame (刘邦 on #100)
 
 ## Ponds P0 knows, outposts and the homestead open P0PlaceSheet, not the city view's info panel; landmarks and POIs
 ## keep that name card.
@@ -244,6 +244,7 @@ func _own_card(entry: Dictionary) -> bool:
 ## MapDestination 1795:103793 (LOCK-24): outposts by role, ponds, and the homestead's pin with its name on a plate.
 ## Landmarks and POIs keep the city view's own pins.
 func _destination_style(entry: Dictionary) -> Dictionary:
+	if not str(entry.get("kind", "")) in ["pond", "place"]: return {}   # landmarks and POIs: none, and not cached
 	var key := "%s:%s" % [entry.get("kind", ""), entry.get("id", "")]
 	if not _dest_styles.has(key): _dest_styles[key] = _destination_style_of(entry)
 	return _dest_styles[key]

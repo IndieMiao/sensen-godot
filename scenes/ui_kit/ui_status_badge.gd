@@ -23,10 +23,6 @@ const _RING := [UiTokens.COLOR_STATUS_AVAILABLE_RING, UiTokens.COLOR_STATUS_READ
 	UiTokens.COLOR_STATUS_NEW_RING, UiTokens.COLOR_STATUS_REQUEST_RING, UiTokens.COLOR_STATUS_DELIVERABLE_RING,
 	UiTokens.COLOR_STATUS_EVENT_RING, UiTokens.COLOR_STATUS_GIFT_RING, UiTokens.COLOR_STATUS_BLOCKED_RING,
 	UiTokens.COLOR_STATUS_SELL_RING]
-## The State for a STATE-ICONS key ("request", "deliverable", "new" …), -1 for none.
-static func state_of(key: String) -> int:
-	return _KEYS.find(key)
-
 ## States drawn with the 2 px accent ring in the main; the rest use the 1 px hairline.
 const _ACCENT := [State.AVAILABLE, State.NEW, State.REQUEST, State.DELIVERABLE, State.EVENT, State.GIFT, State.BLOCKED]
 const _CAPTION_GAP := 2.0          # caption pill 18 high, 2 px under the 28 / 36 px badge
@@ -43,6 +39,11 @@ var _badge: Panel
 var _glyph: TextureRect
 var _pill: PanelContainer
 var _caption: Label
+
+
+## The State for a STATE-ICONS key ("request", "deliverable", "new" …), -1 for none.
+static func state_of(key: String) -> int:
+	return _KEYS.find(key)
 
 func _init(state_: State = State.AVAILABLE, size_: Size = Size.WORLD) -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
