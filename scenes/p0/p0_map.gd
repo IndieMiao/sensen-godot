@@ -313,14 +313,17 @@ func p0_frame(view: Dictionary, _dt: float) -> void:
 	if city_map == null: return
 	var list := marks_from(view)
 	var sig := JSON.stringify(list)
+	var home := home_mark(view)
+	sig += home
 	if sig == _marks_sig: return
 	_marks_sig = sig
 	city_map.set_marks(list)
+	if farm_markers: farm_markers.set_mark("self", CityMapView.status_badge(home) if home != "" else null)
 
 const MARK_STATES := {"deliver": "deliverable", "request": "request", "new": "new"}
 
 ## [{id, state}] for CityMapView.set_marks: place ids are the pins' ids (catalog pond ids, outpost ids); "home" is
-## the homestead's farm pin, which the city view does not draw, so it carries no mark here yet.
+## the homestead's farm pin, which FarmMarkers draws (home_mark).
 static func marks_from(view: Dictionary) -> Array:
 	var out: Array = []
 	for m in view.get("map_markers", []):
@@ -329,6 +332,13 @@ static func marks_from(view: Dictionary) -> Array:
 		var place := str(m.get("place", ""))
 		if state != "" and place != "" and place != "home": out.append({"id": place, "state": state})
 	return out
+
+## The homestead's mark ("deliverable" when a Stall Board request can be handed in; 蒙恬's server only sends
+## deliver for home), drawn on the farm pin by FarmMarkers; "" for none.
+static func home_mark(view: Dictionary) -> String:
+	for m in view.get("map_markers", []):
+		if m is Dictionary and str(m.get("place", "")) == "home": return str(MARK_STATES.get(str(m.get("kind", "")), ""))
+	return ""
 
 ## Today's "Show on map" (SGODOT-232 U6): a short pulse on that place's pin.
 func pulse_place(place: String) -> void:

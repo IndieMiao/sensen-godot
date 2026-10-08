@@ -176,6 +176,21 @@ func put(id: String, bp: FarmBlueprint, owner_name: String, own := false, avatar
 	add_child(badge)
 	_badges[id] = badge
 
+## A map mark (plan §9.5.2) on a farm's pin, e.g. P0's ✓ on the homestead when a Stall Board request can be
+## handed in: hangs at the top-left of the farm's avatar target, follows its visibility; null clears it.
+func set_mark(id: String, mark: Control) -> void:
+	var target: Control = _avatar_targets.get(id)
+	if target == null:
+		if mark: mark.queue_free()
+		return
+	var old := target.get_node_or_null("MapMark")
+	if old: old.queue_free()
+	if mark == null: return
+	mark.name = "MapMark"
+	mark.mouse_filter = Control.MOUSE_FILTER_IGNORE   # the pin takes the tap (LOCK-11)
+	mark.position = Vector2(-6, -6)
+	target.add_child(mark)
+
 ## 国家/省级视野下自己不画 3D 全身，改用与其他玩家同款的 2D 头像（跟随换装保存）。
 func _add_self_portrait(target: Button) -> void:
 	var portrait := MapPortrait.new()

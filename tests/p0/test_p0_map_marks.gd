@@ -66,3 +66,16 @@ func test_the_fish_list_is_easiest_first_with_caught_ones_marked() -> void:
 	assert_bool(rows.filter(func(r): return r.id == "fish_koi")[0].caught).is_false()
 	assert_float(PondCard.km_between(Vector2(31.2, 121.4), Vector2(31.2, 121.4))).is_equal(0.0)
 	assert_str(PondCard.distance_text(0.0)).is_equal("0.1 km")
+
+func test_the_homestead_mark_hangs_on_the_farm_pin() -> void:
+	assert_str(P0Map.home_mark({"map_markers": [{"place": "sh_market_1", "kind": "request"}, {"place": "home", "kind": "deliver"}]})).is_equal("deliverable")
+	assert_str(P0Map.home_mark({"map_markers": [{"place": "sh_market_1", "kind": "request"}]})).is_empty()
+	var fm: FarmMarkers = auto_free(FarmMarkers.new())
+	var target := Button.new()
+	fm.add_child(target)
+	fm._avatar_targets["self"] = target
+	fm.set_mark("self", Control.new())
+	assert_object(target.get_node_or_null("MapMark")).is_not_null()
+	fm.set_mark("self", null)
+	await get_tree().process_frame
+	assert_object(target.get_node_or_null("MapMark")).is_null()

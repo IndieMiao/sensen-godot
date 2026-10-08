@@ -696,6 +696,10 @@ func _apply_marks(shown: Array) -> void:
 
 func _make_mark(state: String) -> Control:
 	if mark_factory.is_valid(): return mark_factory.call(state)
+	return status_badge(state)
+
+## A UiStatusBadge (SGODOT-221) in this state, or null when the build has no such component or state.
+static func status_badge(state: String) -> Control:
 	if not ResourceLoader.exists(MARK_BADGE): return null
 	var script := load(MARK_BADGE) as Script
 	var states: Dictionary = script.get_script_constant_map().get("State", {})
