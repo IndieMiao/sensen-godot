@@ -78,6 +78,7 @@ static func all() -> Array[Dictionary]:
 		{id = "shop_row", title = "UiShopRow · UiStepper", figma = "Compact/ShopProduct 702:80447 · Compact/Stepper 1245:108953 · FARM-6 482:46 · C1-01", build = _shop_rows},
 		# SGODOT-231 workbench
 		{id = "blueprint_card", title = "UiBlueprintCard", figma = "BlueprintCard 1434:93844 · B2-06 · LOCK-10 / 29", build = _blueprint_cards},
+		{id = "elevator_panel", title = "UiElevatorPanel", figma = "ElevatorPanel 1230:107860 · ElevatorRow 1230:107859 · MINE-P0-6 · LOCK-21", build = _elevator_panels},
 	]
 	return out
 
@@ -1218,6 +1219,19 @@ static func _blueprint_cards() -> Control:
 		var c := UiBlueprintCard.new(it[0])
 		c.custom_minimum_size.x = 328
 		v.add_child(_captioned(c, it[1]))
+	return v
+
+## MINE-P0-6 on floor 2 (Here / Free), the entrance of a fresh run (Cost / Locked), and the Short and Express rows.
+static func _elevator_panels() -> Control:
+	var v := _column(UiTokens.SPACE_SECTION)
+	var S := UiElevatorPanel.State
+	for it in [
+			[[["Entrance", "Free", S.FREE], ["Floor 1", "Free", S.FREE], ["Floor 2", "Here", S.HERE]], "floor 2 (MINE-P0-6)"],
+			[[["Entrance", "Here", S.HERE], ["Floor 1", "Free", S.FREE], ["Floor 2", "Clear Floor 1 first", S.LOCKED]], "entrance · floor 2 locked"],
+			[[["Entrance", "Free", S.FREE], ["Floor 1", "Here", S.HERE], ["Floor 2", "2 Energy", S.COST]], "floor 1 cleared · floor 2 unpaid"],
+			[[["Floor 1", "Here", S.HERE], ["Floor 2", "Need 2 Energy", S.SHORT], ["Floor 5", "Express · Free", S.EXPRESS]], "short · express (P1)"]]:
+		var rows: Array = (it[0] as Array).map(func(r): return {"floor": r[0], "value": r[1], "state": r[2]})
+		v.add_child(_captioned(UiElevatorPanel.new("Elevator · stops this run", rows), it[1]))
 	return v
 
 static func _quality_badges() -> Control:

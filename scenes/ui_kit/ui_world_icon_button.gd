@@ -6,7 +6,8 @@ extends Control
 ## open a name strip): 2 px color/primary edge and 1.1× scale. With a state (LOCK-11) the whole button becomes the
 ## StatusBadge World 28 instead: the state outranks the facility icon. Display only: a tap on it is a tap on the
 ## facility (the host checks hit_rect(), as for UiEntryCard). Count (Show count, 1749:0): a small tag at the disc's
-## bottom right, like a cell's quantity pill (the Warming Cabinet's 4/6 / Full, q(31); C21). At least the pill's 24;
+## bottom right, like a cell's quantity pill (the Warming Cabinet's 4/6 / Full, q(31); C21); it stays over a state
+## badge too (the cooking stove's +1 while a pot is queued, q(71)). At least the pill's 24;
 ## a wider word grows it to the left, its right edge kept (Count tag: right-anchored, padding 4 — the Mailbox's
 ## `Parcel`, WORLD-HINT-6a 1822:123663, 不知火舞 on 234).
 
@@ -101,11 +102,16 @@ func _refresh() -> void:
 	_fit_count()
 	scale = Vector2.ONE * (_NEAR_SCALE if near else 1.0)
 	var badged := status >= 0
-	_disc.visible = not badged
+	# A state takes the disc's place; a count stays on it (Queue ×2: the cooking stove's countdown with +1, q(71)), so
+	# the disc then stays in the tree drawing nothing itself and the badge goes under it.
+	_disc.visible = not badged or count != ""
+	_disc.self_modulate.a = 0.0 if badged else 1.0
+	_glyph.visible = not badged
 	if badged:
 		if _badge == null:
 			_badge = UiStatusBadge.new(status, UiStatusBadge.Size.WORLD)
 			add_child(_badge)
+			move_child(_badge, _disc.get_index())   # under the disc and its count tag
 		_badge.state = status
 		_badge.icon = icon
 		_badge.visible = true
