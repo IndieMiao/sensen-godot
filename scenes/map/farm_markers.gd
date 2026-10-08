@@ -412,6 +412,15 @@ func _sync_city(cam: Camera3D, lat: float, lng: float) -> void:
 ## they part.
 var self_label_yields := false
 
+## What the player's own full-body pin covers around its anchor at city zoom `zoom`: the 3D actor (wider and taller
+## than its 70 × 130 tap target, as blocker_rects counts it) and its name label scaled by the zoom boost (a host frames
+## a view by it, P0 MAP-1).
+static func self_footprint(zoom: float) -> Rect2:
+	var b := lerpf(1.3, 1.0, clampf((zoom - 11.0) / 4.0, 0.0, 1.0))   # _pin_zoom_boost at that zoom
+	var actor := Rect2(-35.0 - 26.0, -128.0 - 84.0, 70.0 + 52.0, 130.0 + 84.0)
+	var pivot := Vector2(33.0, -6.0)
+	return actor.merge(Rect2(Vector2(-33.0, 6.0) + pivot * (1.0 - b), Vector2(66.0, 20.0) * b))
+
 ## The player's own name label as drawn (local space) while their pin is shown in the city; an empty rect otherwise.
 ## The label is scaled about its pivot by the zoom boost (1.3 at z11): the whole drawn rect counts (不知火舞 on #83).
 func self_label_rect() -> Rect2:

@@ -881,18 +881,14 @@ func _update_markers() -> void:
 		if projected == null: continue
 		var point: Vector2 = (projected as Vector2) - global_position
 		if not area.has_point(point): continue
-		var width := 82.0 if entry.kind == "landmark" else 78.0 if entry.kind == "resident" else 48.0
 		var is_sel: bool = selected.get("id", null) == entry.get("id")
-		# 选中项名牌放宽到完整名称宽度（不再省略号截断）；占位一起变宽让邻居让位。
-		if is_sel: width = maxf(width, _label_width(entry))
-		# 视野最大（低 zoom）时 POI 也要有存在感：下限 42px（≈原 32 的 1.3 倍）。
-		var art_side: float = 88 if entry.kind == "landmark" else lerpf(42, 64, clampf((host.zoom - 13) / 3, 0, 1))
-		var top := 40.0 if entry.kind == "resident" else 54.0 if art_key in ["hollywood_sign", "griffith_observatory", "santa_monica_pier"] else 80.0 if entry.kind == "landmark" else 56.0
-		if entry.kind == "poi": top = maxf(36, art_side * 0.94)
-		var label_h := _label_height(entry, width) if is_sel and not _whole_label(entry) else 16.0
-		# An outpost's label and a marked pin's are never cut: the whole text on one line (不知火舞 on C30, q(72)).
-		var label_w := _whole_label_width(entry) if _whole_label(entry) else width
-		var art_w := 36.0 if entry.kind == "resident" else art_side
+		var pm := _pin_metrics(entry, is_sel)
+		var width: float = pm.width
+		var art_side: float = pm.art_side
+		var top: float = pm.top
+		var label_h: float = pm.label_h
+		var label_w: float = pm.label_w
+		var art_w: float = pm.art_w
 		var art_h := top
 		var side := maxf(width, art_side)
 		var below := 3.0 + label_h + 1.0
@@ -1095,6 +1091,31 @@ func _marker_of(entry: Dictionary) -> String:
 ## both pack before everything but the selected pin (不知火舞 / 蒙恬 on C30).
 func _over_avatar(entry: Dictionary) -> bool:
 	return entry.get("kind") == "place" or _marker_of(entry) != ""
+
+## A pin's sizes at the current zoom, as _update_markers lays it out: {width (its slot), art_side, top (art height
+## over the anchor), label_h, label_w, art_w}.
+func _pin_metrics(entry: Dictionary, is_sel := false) -> Dictionary:
+	var width := 82.0 if entry.kind == "landmark" else 78.0 if entry.kind == "resident" else 48.0
+	# 选中项名牌放宽到完整名称宽度（不再省略号截断）；占位一起变宽让邻居让位。
+	if is_sel: width = maxf(width, _label_width(entry))
+	# 视野最大（低 zoom）时 POI 也要有存在感：下限 42px（≈原 32 的 1.3 倍）。
+	var art_side: float = 88 if entry.kind == "landmark" else lerpf(42, 64, clampf((host.zoom - 13) / 3, 0, 1))
+	var art_key := CityMapData.art_key(entry)
+	var top := 40.0 if entry.kind == "resident" else 54.0 if art_key in ["hollywood_sign", "griffith_observatory", "santa_monica_pier"] else 80.0 if entry.kind == "landmark" else 56.0
+	if entry.kind == "poi": top = maxf(36, art_side * 0.94)
+	var label_h := _label_height(entry, width) if is_sel and not _whole_label(entry) else 16.0
+	# An outpost's label and a marked pin's are never cut: the whole text on one line (不知火舞 on C30, q(72)).
+	var label_w := _whole_label_width(entry) if _whole_label(entry) else width
+	return {width = width, art_side = art_side, top = top, label_h = label_h, label_w = label_w,
+		art_w = 36.0 if entry.kind == "resident" else art_side}
+
+## What a pin covers around its anchor at the current zoom, unselected: its art over the anchor and its label under
+## it (a host frames a view by it, P0 MAP-1).
+func pin_footprint(entry: Dictionary) -> Rect2:
+	var pm := _pin_metrics(entry)
+	var side := maxf(float(pm.width), float(pm.art_side))
+	return Rect2(-side * 0.5, -float(pm.top), side, float(pm.top)).merge(
+		Rect2(-float(pm.label_w) * 0.5, 3.0, float(pm.label_w), float(pm.label_h)))
 
 ## How far a place is from home (degrees, the latitude scaled to the longitude's length): only ever compared.
 func _home_distance(entry: Dictionary) -> float:

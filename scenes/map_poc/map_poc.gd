@@ -2172,6 +2172,11 @@ func _land_on_own_farm() -> void:
 	center_lng = farm_center.y
 	_set_zoom(home_zoom)
 	_camera_dirty = true
+	_frame_home()
+
+## After landing on the player's own farm: a host may frame its own opening view (P0 MAP-1).
+func _frame_home() -> void:
+	pass
 
 ## 城市面板/城市气泡：飞到该城总览。
 func fly_to_city(id: String) -> void:
