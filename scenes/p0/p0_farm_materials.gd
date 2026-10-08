@@ -157,6 +157,9 @@ func tap(screen: Vector2) -> bool:
 ## A finger card's tap by id (苏烈's #21 _tap_card dispatch): a gathering spot gathers / shows MAT-3 / says when it is
 ## ready; the workbench opens. False for ids this helper doesn't own.
 func tap_card(id: String) -> bool:
+	# A tap that reaches the world while a sheet or card is already up (a fast second tap on a spot's button before the
+	# frame hides it) opens nothing more (SGODOT-256 ①).
+	if rt.ui.has_modal() and (id in SPOTS or id in ["workbench", "mine"]): return true
 	if id == "mine":   # the mouth's strip or button (no unfinished run): "The mine" sheet; entering stays on the key
 		P0MaterialCards.open_mine_sheet(rt.ui, rt.session.current())
 		return true

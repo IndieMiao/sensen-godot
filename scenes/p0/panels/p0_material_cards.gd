@@ -116,14 +116,17 @@ static func _decision_gap(d: UiDrawer) -> void:
 	gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	d.body.add_child(gap)
 
-## Open the sheet with the drawer scrim and a Close 44 six above its top, 16 in (RES-PIP / B2-06), then fit its height
-## to the content once laid out (wrapped lines know their width a frame later).
+## Open the sheet with the drawer scrim and a Close 44 six above its top, 16 in (RES-PIP / B2-06), and keep its height
+## fitted to the content. Wrapped lines only know their width once the sheet is laid out, so the first fit is too tall
+## (taller than the screen); the content's minimum size changes when they wrap, and the sheet refits then. A fit timed
+## for "the next frame" was not enough: a second tap reopening the sheet in the next frame's input got its fit before
+## its layout and stayed full screen (SGODOT-256 ①, int10c).
 static func _show(ui: P0Ui, d: UiDrawer, kind: String) -> void:
 	ui._open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
 	ui._close_above(d, P0Ui._CLOSE_ABOVE_SHEET, UiTokens.SPACE_PAGE)
 	ui.modal_kind = kind
+	d.body.minimum_size_changed.connect(func(): fit(d))
 	fit(d)
-	d.get_tree().process_frame.connect(func(): if is_instance_valid(d): fit(d), CONNECT_ONE_SHOT)
 
 ## The sheet's height: its content plus the padding above and below (the safe inset is added by the drawer).
 static func fit(d: UiDrawer) -> void:
