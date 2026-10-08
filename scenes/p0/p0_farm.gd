@@ -455,9 +455,7 @@ func _tags(v: Dictionary) -> void:
 ## Every facility with a finger card on the farm, [id, position, reach m] in a fixed order (LOCK-07: one card, the
 ## nearest in reach). SGODOT-231's gathering spots and workbench, and 2A's rest bench, join this list when they land.
 func _card_candidates() -> Array:
-	# The farmhouse is measured from its door (the walkway cell in front of it), so the sign beside the door doesn't
-	# take the farmhouse's card from a player standing in front of the door.
-	var out: Array = [["stall", _stall, 3.2], ["home", _door, 4.2], ["sign", _sign, SIGN_NEAR]]
+	var out: Array = [["stall", _stall, 3.2], ["home", _house, 4.2], ["sign", _sign, SIGN_NEAR]]
 	if _plaque_node.visible: out.append(["plaque", _plaque, SIGN_NEAR])
 	return out
 
