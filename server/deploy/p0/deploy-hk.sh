@@ -84,7 +84,8 @@ case "$step" in
     dir="p0-build-$sha"
     say "build context of $ref ($sha) → $DEV:~/$dir"
     git -C "$repo" archive --format=tar "$ref" package.json pnpm-lock.yaml pnpm-workspace.yaml packages/blueprint-core server \
-      assets/p0/p0_content.json | gzip | dev "rm -rf ~/$dir && mkdir -p ~/$dir && tar -C ~/$dir -xzf -"
+      assets/p0/p0_content.json assets/p0/p0_outposts.json assets/farm/data/regions.json \
+      assets/avatar/parts_manifest.json assets/avatar/demo_denylist.json assets/avatar/npc_only.json | gzip | dev "rm -rf ~/$dir && mkdir -p ~/$dir && tar -C ~/$dir -xzf -"
     say "docker build p0-server:$sha on the devserver"
     dev "cd ~/$dir && docker build -f server/deploy/p0/Dockerfile -t p0-server:$sha ." 2>&1 | tail -5
     dev "docker images p0-server:$sha --format '{{.Repository}}:{{.Tag}} {{.Size}} {{.ID}}'" | tee "$out/image.txt"

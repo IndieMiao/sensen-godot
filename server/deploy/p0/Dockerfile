@@ -18,7 +18,13 @@ FROM node:22-alpine
 WORKDIR /repo
 RUN corepack enable && addgroup -S p0 && adduser -S p0 -G p0 && mkdir -p /data && chown p0:p0 /data
 COPY --from=build /repo /repo
+# Data the P0 server reads at start: content, the outpost table (rooms, SGODOT-227) and the cosmetic catalog the
+# outpost hub checks appearances against (regions.json locates ../../avatar). Keep in step with Dockerfile.dockerignore
+# and deploy-hk.sh build.
 COPY assets/p0/p0_content.json assets/p0/p0_content.json
+COPY assets/p0/p0_outposts.json assets/p0/p0_outposts.json
+COPY assets/farm/data/regions.json assets/farm/data/regions.json
+COPY assets/avatar/parts_manifest.json assets/avatar/demo_denylist.json assets/avatar/npc_only.json assets/avatar/
 USER p0
 ENV NODE_ENV=production P0_DEV=0 P0_PORT=3110 P0_HOST=0.0.0.0 \
     P0_STATE_FILE=/data/p0-state.json P0_SNAPSHOT_DIR=/data/snapshots P0_EVENT_DIR=/data/events
