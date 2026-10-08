@@ -78,6 +78,13 @@ func set_count(v: String) -> void:
 ## The 44 px touch area in global coordinates (the host's _tap_at tests it).
 func hit_rect() -> Rect2: return get_global_rect()
 
+## What it draws, in its own coordinates (before its near scale): the 28 disc (or the state badge in its place) and the
+## count tag when one hangs off it. The host keeps this off the screen's sides; the touch area is the whole button.
+func drawn_rect() -> Rect2:
+	var r := Rect2((size - Vector2(_VISUAL, _VISUAL)) * 0.5, Vector2(_VISUAL, _VISUAL))
+	if _count and _count.visible: r = r.merge(Rect2(_disc.position + _count.position, _count.size))
+	return r
+
 ## Where the facility is: the button centres on this point (its local parent's coordinates).
 func place_at(center: Vector2) -> void:
 	position = center - size * 0.5
