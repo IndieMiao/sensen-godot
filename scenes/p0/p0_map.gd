@@ -212,5 +212,9 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"zoom":
 			_set_zoom(float(step[1]))
 			_camera_dirty = true
+		"center":   # center:31.228:121.478 (the city overview) — where the camera looks, for shots
+			center_lat = float(step[1])
+			center_lng = float(step[2])
+			_camera_dirty = true
 		_: return false
 	return true

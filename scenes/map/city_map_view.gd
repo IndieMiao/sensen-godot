@@ -45,6 +45,9 @@ const POI_CACHE_LIMIT := 400
 ## overlap exceeds the margin; newcomers need clearance plus the margin), and a
 ## marker that lost its slot cannot re-enter within the cooldown.
 const PACK_MARGIN := 8.0
+## A pin wearing a map marker (q(48): Deliverable ✓ > Request ! > New ◆) is packed before the others, so the marker
+## above it is not packed away with it (蒙恬 on C30). Entries carry it as `marker`.
+const MARKER_ORDER := {"deliverable": 0, "request": 1, "new": 2}
 const REAPPEAR_COOLDOWN_MS := 400
 ## Display diversity: once this many dining markers are placed, remaining dining
 ## candidates wait until every non-dining candidate had its chance at the space.
@@ -904,12 +907,13 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int)
 	if not is_selected:
 		if not incumbent and now < int(_hidden_until.get(id, 0)): return false
 		var probe: Rect2 = c.bounds.grow(-PACK_MARGIN if incumbent else PACK_MARGIN)
-		# 地标相互之间也做遮挡剔除，但不给玩家 pin 让位；其余标记两者都让。
-		var blocked: bool = _hits(occupied, probe) or (entry.kind != "landmark" and _hits(blockers, probe))
+		# 地标相互之间也做遮挡剔除，但不给玩家 pin 让位；其余标记两者都让。宿主的地点（P0 据点）从不让位：
+		# 城市级也每处一枚（q(72)），只是名牌和已放下的标记相撞时先收起。
+		var blocked: bool = entry.kind != "place" and (_hits(occupied, probe) or (entry.kind != "landmark" and _hits(blockers, probe)))
 		if blocked:
 			if incumbent: _hidden_until[id] = now + REAPPEAR_COOLDOWN_MS
 			return false
-	if entry.kind == "landmark":
+	if entry.kind in ["landmark", "place"]:
 		label_fits = is_selected or not _hits(occupied, Rect2(c.point - Vector2(c.width * 0.5, -3), Vector2(c.width, 20)))
 	occupied.append(c.bounds)
 	if not markers.has(id): markers[id] = _make_marker(entry)
@@ -998,8 +1002,11 @@ func _animate_focus(id: String, to: float, duration: float) -> void:
 		_apply_marker_scale(marker), float(marker.get("focus", 1.0)), to, duration)
 
 func _pack_key(c: Dictionary) -> Array:
-	var kind_order := {"landmark": 0, "resident": 1, "pond": 2, "place": 2.5, "poi": 3}
+	# A host place (P0 outpost) goes before everything but the selected pin and a pin wearing a map marker (蒙恬 on
+	# C30): the city level shows every outpost (q(72)). Journey has no place pins, so its order is unchanged.
+	var kind_order := {"place": -1, "landmark": 0, "resident": 1, "pond": 2, "poi": 3}
 	return [0 if selected.get("id", null) == c.entry.get("id") else 1,
+		int(MARKER_ORDER.get(str(c.entry.get("marker", "")), MARKER_ORDER.size())),
 		kind_order.get(c.entry.kind, 3),
 		0 if _shown_last.has(c.id) else 1,
 		float(c.entry.get("rank", 5)),
@@ -1049,6 +1056,17 @@ func _free_marker(id: String) -> void:
 		marker.shadow.queue_free()
 	markers.erase(id)
 	_hidden_until.erase(id)
+
+## A tap on a shown host place (P0 outpost) pin selects it before anything drawn with it (the player's own avatar,
+## 蒙恬 on C30); false when the tap is not on one.
+func activate_place_at(screen: Vector2) -> bool:
+	if not host.city_detail_visible(): return false
+	var local := screen - global_position
+	for marker in displayed:
+		if marker.entry.kind == "place" and _hits_point(marker.get("hit", [marker.rect]), local):
+			select(marker.entry)
+			return true
+	return false
 
 func activate_at(screen: Vector2) -> bool:
 	var local := screen - global_position
