@@ -274,3 +274,17 @@ func test_a_card_tap_cannot_start_a_double_tap() -> void:
 		m.pressed = e[1]
 		ui.pad._gui_input(m)
 	assert_int(recentred[0]).is_equal(0)
+
+## §3.7.4 / SGODOT-232 U6: Free to do now closes the Energy card and Today lists what costs no Energy now.
+func test_free_to_do_now_opens_today_with_the_free_list() -> void:
+	var v := _view()
+	v.plots = [{"id": 0, "state": "ready", "crop": "crop_radish"}]
+	v.cooking = {"stove": null, "cookbook": []}
+	ui.set_view(v)
+	ui.open_energy_card(2, "Sow ×1")
+	var card: UiEnergyCard = ui._modal.find_children("*", "UiEnergyCard", true, false)[0]
+	card.free_pressed.emit()
+	assert_str(ui.modal_kind).is_equal("today")
+	var labels := ui._modal.find_children("*", "Label", true, false).map(func(l): return (l as Label).text)
+	assert_that(labels).contains(["Harvest 1 ready", "Browse the map"])
+	ui.close_modal()

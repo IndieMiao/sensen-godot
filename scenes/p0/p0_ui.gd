@@ -1204,7 +1204,9 @@ func open_energy_card(need: int, verb: String) -> void:
 	for t in f.tiles: t.icon = P0Logic.icon(str(t.icon))
 	var card := UiEnergyCard.card(f)
 	card.theme = UiKit.theme()
-	card.free_pressed.connect(close_modal)
+	card.free_pressed.connect(func():   # §3.7.4: closes the card, then Today lists what costs no Energy now
+		close_modal()
+		open_today(P0Guide.free_now(view)))
 	card.tile_pressed.connect(func(go: String):
 		close_modal()
 		if go == "bag": open_bag()
@@ -1347,19 +1349,23 @@ func open_radial() -> void:
 	_radial.open_at(player_screen - _kit.global_position)
 
 ## Today panel (§14.5, LOCK-06): at most three rows right under the HUD chips; Show only moves the camera.
-func open_today() -> void:
-	var rows := P0Logic.today_rows(view)
+## rows: Today's own (P0Logic.today_rows) unless given, e.g. P0Guide.free_now after the Energy card's Free to do now.
+## go "map" / "map:<place>" is a place on the map: `Show on map` leaves for it (the pin focus comes with MAP-1).
+func open_today(given: Array = []) -> void:
+	var rows := given if not given.is_empty() else P0Logic.today_rows(view)
 	var shown := rows.map(func(r):
 		var d: Dictionary = r.duplicate()
 		d.icon = P0Logic.icon(str(r.icon))
-		d.action = "Show" if str(r.go) != "" and spot_reachable() else ""   # TODO(SGODOT-225): Show on map for targets elsewhere
+		var go := str(r.go)
+		d.action = "Show on map" if go.begins_with("map") and surface != "map" else ("Show" if go != "" and not go.begins_with("map") and spot_reachable() else "")
 		return d)
 	var panel := UiTodayPanel.new(shown)
 	panel.theme = UiKit.theme()
 	panel.position = Vector2(UiTokens.SIZE_TODAY_PANEL_X, UiTokens.SIZE_TODAY_PANEL_Y + safe_top())
 	panel.show_pressed.connect(func(i: int):
 		close_modal()
-		show_spot.emit(str(rows[i].go)))
+		if str(rows[i].go).begins_with("map"): place_pressed.emit()
+		else: show_spot.emit(str(rows[i].go)))
 	_open_modal(panel, 0.0)
 	modal_kind = "today"
 
