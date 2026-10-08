@@ -27,6 +27,16 @@ func run() -> void:
 	await wait_seconds(2)
 	check("Existing avatar fixture assembles", room.ready_for_capture and not room.rig.is_busy())
 	check("22 reusable room kits load", room.assets.size() == 22)
+	check("Public fire points to particle root at retained anchor", room.fire is Node3D and room.fire.name == "fire" and room.fire.position.is_equal_approx(room._vec(room.layout.fire_position)))
+	check("Existing HearthGlow is sole light and flicker owner", room.fire.light == room.fire_light and room.fire.find_children("*", "OmniLight3D", true, false).is_empty())
+	var particle_count := 0
+	var particle_contract := true
+	for emitter in room.fire.get_children():
+		if emitter is GPUParticles3D:
+			particle_count += emitter.amount
+			particle_contract = particle_contract and emitter.fixed_fps == 30 and emitter.visibility_aabb.size.length() > 0 and emitter.cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_OFF and emitter.process_material.collision_mode == ParticleProcessMaterial.COLLISION_DISABLED
+	check("Fire budget and bounds, no collision/shadows", particle_count > 0 and particle_count <= 20 and particle_contract, particle_count)
+	check("Static fire GLB is absent from rendered replacement", room.fire.find_children("*", "MeshInstance3D", true, false).is_empty())
 	check("Player stands on floorboard height", room.player.is_on_floor() and absf(room.player.position.y - .08) < .04, room.player.position.y)
 	var start: Vector3 = room.player.position
 	await drive_world(Vector3(0, 0, 1), .22)
