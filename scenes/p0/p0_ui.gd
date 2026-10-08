@@ -746,10 +746,10 @@ func tag(id: String, text: String, screen: Vector2, show: bool, hit := Vector2.I
 # ---------------------------------------------------------------- world prompts (SGODOT-250, LOCK-07 v2 / LOCK-16 v2)
 ## A facility within view and about 8 m: its icon button (WorldIconButton 1674:101157) centred on `screen` (this UI's
 ## coordinates, like tag()). `near` grows a seat 1.1× with a primary edge; `status` (a UiStatusBadge.State, -1 none)
-## turns the whole button into the StatusBadge. A tap on it is a tap on `hit` (default `screen`), with tapped_card =
-## id. Call it every frame for each shown facility that is not the open one; it folds that facility's name strip if
+## turns the whole button into the StatusBadge; `count` hangs its small count tag ("" none). A tap on it is a tap on
+## `hit` (default `screen`), with tapped_card = id. Call it every frame for each shown facility that is not the open one; it folds that facility's name strip if
 ## it was open. Hidden under a card or drawer, and outside the band between the HUD and the quick bar.
-func world_icon(id: String, icon: Texture2D, screen: Vector2, show: bool, near := false, status := -1, hit := Vector2.INF) -> void:
+func world_icon(id: String, icon: Texture2D, screen: Vector2, show: bool, near := false, status := -1, hit := Vector2.INF, count := "") -> void:
 	var b: UiWorldIconButton = _icons.get(id)
 	if b == null:
 		b = UiWorldIconButton.new()
@@ -765,7 +765,11 @@ func world_icon(id: String, icon: Texture2D, screen: Vector2, show: bool, near :
 	b.icon = icon
 	b.near = near
 	b.status = status
+	b.count = count
 	b.place_at(screen)
+	# Covered by another facility's open strip (it had no clear side, 不知火舞 on 226 C21: off screen first, then other
+	# buttons): this button fades while the strip is open and comes back once it folds, as covered name tags do (#57).
+	_yield_tag(b, _modal == null and _strip_over(Rect2(b.position, b.size).grow(-8.0)))   # its 28 disc
 
 ## The one facility nearest and within reach: its name strip (WorldNameBar 1674:101190) opens from the icon button's
 ## spot in 160 ms — icon + `text` + at most one `fact` ("" for none). `side` UiWorldNameBar.Dir (the way the
@@ -883,8 +887,8 @@ func npc_tag(id: String, text: String, head_screen: Vector2, show: bool, highlig
 	t.place_over(head_screen)
 	_yield_tag(t, _modal == null and _strip_covers(Rect2(t.position, t.size)))
 
-## Fade a name tag out while an open strip covers it, back in once it folds (120 ms).
-func _yield_tag(t: UiNpcNameTag, covered: bool) -> void:
+## Fade a name tag or an icon button out while an open strip covers it, back in once it folds (120 ms).
+func _yield_tag(t: Control, covered: bool) -> void:
 	if bool(t.get_meta("covered", false)) == covered: return
 	t.set_meta("covered", covered)
 	var tw := t.create_tween()
@@ -896,6 +900,11 @@ func _open_strips() -> Array[Rect2]:
 	for bar in _name_bars.values():
 		if (bar as UiWorldNameBar).visible and not bar.get_meta("folding", false): out.append((bar as UiWorldNameBar).full_rect())
 	return out
+
+## Whether an open strip lies over `r` itself, with no margin: an icon button only fades when it is really under one
+## (a button just above a strip stays, C21).
+func _strip_over(r: Rect2) -> bool:
+	return _open_strips().any(func(s: Rect2): return s.intersects(r))
 
 func _strip_covers(r: Rect2) -> bool:
 	return _open_strips().any(func(s: Rect2): return s.grow(UiTokens.SPACE_ROW).intersects(r))

@@ -1022,15 +1022,16 @@ static func _world_prompts() -> Control:
 	var v := _column(UiTokens.SPACE_SECTION)
 	var icons := _scene_row(60)
 	var x := 30.0
-	for spec in [["home", false, -1], ["seat", true, -1], ["homestead_stall", false, UiStatusBadge.State.REQUEST], ["workbench", false, -1], ["door", false, -1]]:
+	for spec in [["home", false, -1, ""], ["seat", true, -1, ""], ["homestead_stall", false, UiStatusBadge.State.REQUEST, ""], ["workbench", false, -1, ""], ["cabinet", false, -1, "4/6"]]:
 		var b := UiWorldIconButton.new()
 		icons.add_child(b)
 		b.icon = _tex(spec[0])
 		b.near = spec[1]
 		b.status = spec[2]
+		b.count = spec[3]
 		b.place_at(Vector2(x, 30))
 		x += 66.0
-	v.add_child(_captioned(icons, "icons · default · Near · state"))
+	v.add_child(_captioned(icons, "icons · default · Near · state · count"))
 	var D := UiWorldNameBar.Dir
 	var bars := [
 		[_tex("home"), "Farmhouse", "", D.RIGHT, false, -1, 1.0],

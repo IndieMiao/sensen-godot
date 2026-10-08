@@ -257,6 +257,9 @@ func test_the_kitchen_corner_grows_with_the_homestead() -> void:
 	var cab_mark := lv3._marker("use_warming_cabinet", {"cooking": {"cabinet": {"cap": 6, "have": 6, "items": []}}})
 	assert_str(str(cab_mark.name)).is_equal("Warming Cabinet")
 	assert_str(str(cab_mark.fact)).is_equal("Full")
+	assert_str(str(cab_mark.count)).is_equal("Full")   # C21: its button hangs the count from afar
+	assert_str(str(lv3._marker("use_warming_cabinet", {"cooking": {"cabinet": {"cap": 6, "have": 4, "items": []}}}).count)).is_equal("4/6")
+	assert_str(str(lv3._marker("use_warming_cabinet", {"cooking": {"cabinet": {"cap": 6, "have": 0, "items": []}}}).count)).is_equal("")
 	assert_str((cab_mark.icon as Texture2D).resource_path).is_equal("res://assets/p0/icons/cabinet.svg")   # i-cabinet
 
 func test_farmhouse_stove_card_and_badge_follow_the_server_stove() -> void:
@@ -411,4 +414,5 @@ func test_the_spice_rack_takes_taps_beside_it_and_the_stove_keeps_to_its_body() 
 	var cab := lv3.hit_rect("use_warming_cabinet")
 	var rack3 := lv3.hit_rect("use_spice_rack")
 	var below := Vector2(cab.get_center().x, maxf(cab.get_center().y, rack3.end.y + 4))
-	if cab.has_point(below): assert_str(lv3.pick(below)).is_equal("use_warming_cabinet")
+	assert_bool(cab.has_point(below)).override_failure_message("%s not in the cabinet's box %s" % [below, cab]).is_true()
+	assert_str(lv3.pick(below)).is_equal("use_warming_cabinet")   # under the shelf, the cabinet's own

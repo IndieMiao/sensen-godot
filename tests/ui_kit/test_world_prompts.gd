@@ -30,6 +30,25 @@ func test_icon_button_is_28_inside_a_44_touch_area() -> void:
 	assert_float(box.border_width).is_equal(float(UiTokens.STROKE_DEFAULT))
 	assert_int(b.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)   # the facility takes the tap
 
+func test_count_hangs_a_quantity_tag_at_the_discs_bottom_right() -> void:
+	# Show count (1749:0, C21 / q(31)): the Warming Cabinet's 4/6 / Full, styled as a cell's quantity pill; "" none.
+	var b := _host(UiWorldIconButton.new()) as UiWorldIconButton
+	b.icon = HOME
+	b.place_at(Vector2(100, 200))
+	await await_idle_frame()
+	assert_bool(b._count.is_visible_in_tree()).is_false()
+	b.count = "4/6"
+	await await_idle_frame()
+	assert_bool(b._count.is_visible_in_tree()).is_true()
+	assert_str(b._count_label.text).is_equal("4/6")
+	assert_vector(b._count.size).is_equal(Vector2(UiTokens.SIZE_QTY_PILL_W, UiTokens.SIZE_QTY_PILL_H))
+	assert_vector(b._count.position).is_equal(Vector2(14, 20))   # in the 28 disc, overhanging its bottom right
+	var pill: UiStyleBox = b._count.get_theme_stylebox(&"panel")
+	assert_object(pill.bg_color).is_equal(UiTokens.COLOR_PRIMARY_TINT)
+	b.count = ""
+	await await_idle_frame()
+	assert_bool(b._count.is_visible_in_tree()).is_false()
+
 func test_near_grows_with_a_primary_edge_and_a_state_takes_the_whole_button() -> void:
 	var b := _host(UiWorldIconButton.new()) as UiWorldIconButton
 	b.icon = HOME

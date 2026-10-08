@@ -133,6 +133,30 @@ func test_a_name_tag_the_strip_covers_fades_until_it_folds() -> void:
 	await get_tree().create_timer(0.2).timeout
 	assert_float(ui._npc_tags.ama.modulate.a).is_equal_approx(1.0, 0.01)
 
+## C21 (不知火舞 on 226): the Warming Cabinet's strip can only open right (left is off screen) and lands on the stove's
+## button: the stove's button fades while the strip is open and comes back once it folds.
+func test_a_button_the_strip_covers_fades_until_it_folds() -> void:
+	var a := ui._marker_area()
+	var at := Vector2(a.position.x + 30, a.get_center().y)   # near the left edge: only the right side fits
+	var frame := func(open: bool):
+		ui.world_icon("stove", HOME, at + Vector2(40, -6), true)
+		ui.world_icon("door", HOME, at + Vector2(220, 120), true)
+		ui.world_icon("rack", HOME, at + Vector2(90, -16 - 14 - 4), true)   # its 28 disc ends 4 px above the strip
+		if open: ui.name_bar("cabinet", HOME, "Warming Cabinet", "4/6", at, true, UiWorldNameBar.Dir.LEFT)
+		else: ui.world_icon("cabinet", HOME, at, true)
+	frame.call(true)
+	assert_int(ui._name_bars.cabinet.side).is_equal(UiWorldNameBar.Dir.RIGHT)   # left would leave the screen
+	frame.call(true)
+	await get_tree().create_timer(0.2).timeout
+	assert_float(ui._icons.stove.modulate.a).is_equal_approx(0.0, 0.01)
+	assert_float(ui._icons.door.modulate.a).is_equal_approx(1.0, 0.01)   # not under the strip
+	assert_float(ui._icons.rack.modulate.a).is_equal_approx(1.0, 0.01)   # just above it: not covered, stays
+	frame.call(false)   # the cabinet is no longer the nearest: its strip folds
+	await get_tree().create_timer(0.3).timeout
+	frame.call(false)
+	await get_tree().create_timer(0.2).timeout
+	assert_float(ui._icons.stove.modulate.a).is_equal_approx(1.0, 0.01)
+
 ## #57 / NPC-G1: in the greeting card or the dialogue bar the speaker's tag stays, highlighted, over the veil; other
 ## tags and icon buttons hide; under any other card or drawer every tag hides.
 func test_the_speakers_tag_stays_over_the_conversation() -> void:
