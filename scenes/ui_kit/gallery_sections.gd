@@ -506,19 +506,24 @@ static func _bar_slots() -> Array:
 static func _bar_drop_zones() -> Control:
 	var v := _column(UiTokens.SPACE_SECTION)
 	var K := UiBarDropZone.Kind
-	for hover in [false, true]:
+	# Idle: the three looks side by side. Hover: the real pair at its real spacing (x 72 / 168, 96 apart), one
+	# zone hovered at a time as under a finger, so the label pills read as they do on screen.
+	var rows := [
+		[[K.PIN, false, 56.0], [K.UNPIN, false, 164.0], [K.REMOVE, false, 272.0], "idle · Pin · Unpin · Remove"],
+		[[K.PIN, true, 72.0], [K.REMOVE, false, 168.0], "hover Pin · Remove idle (x 72 / 168)"],
+		[[K.UNPIN, false, 72.0], [K.REMOVE, true, 168.0], "Unpin idle · hover Remove"],
+	]
+	for spec in rows:
 		var row := ColorRect.new()   # over a scene-grey backdrop: on the gallery's surface the zones' own surface vanishes
 		row.color = UiKit.alpha(UiTokens.COLOR_TEXT, UiTokens.OPACITY_SCRIM_MODAL)
 		row.custom_minimum_size = Vector2(328, 116)
-		var x := 56.0
-		for k in [K.PIN, K.UNPIN, K.REMOVE]:
-			var z := UiBarDropZone.new(k)
+		for z_spec in spec.slice(0, spec.size() - 1):
+			var z := UiBarDropZone.new(z_spec[0])
 			z.top_level = false   # drawn in the gallery row, not at its screen spot
-			z.hover = hover
+			z.hover = z_spec[1]
 			row.add_child(z)
-			z.center = Vector2(x, 42)
-			x += 108.0
-		v.add_child(_captioned(row, "hover · Release to pin / unpin / remove" if hover else "idle · Pin · Unpin · Remove"))
+			z.center = Vector2(z_spec[2], 42)
+		v.add_child(_captioned(row, spec[spec.size() - 1]))
 	var lifted := _row(UiTokens.SPACE_SECTION)
 	lifted.add_child(_captioned(_lifted_slot(false), "drag: 24 above finger"))
 	lifted.add_child(_captioned(_lifted_slot(true), "over a zone: 80 %"))
