@@ -391,6 +391,7 @@ func _sync_city(cam: Camera3D, lat: float, lng: float) -> void:
 		_set_pin_shown(id, placed)
 		# 国家级：自己只留头像，名牌会压在城市气泡上。
 		if low_detail and id == "self": label.visible = false
+		if id == "self" and self_label_yields: label.visible = false   # under an outpost label (C30)
 	for id in visible_farm_ids:
 		var entry: Dictionary = points[id]
 		var owner := str(entry.owner_name) if str(entry.avatar_ref).is_empty() else SeededOutfit.short_name(str(entry.avatar_ref))
@@ -406,6 +407,21 @@ func _sync_city(cam: Camera3D, lat: float, lng: float) -> void:
 		move_child(_avatar_targets[selected_id], -1)
 		move_child(_buttons[selected_id], -1)
 	queue_redraw()
+
+## The player's own label has given way to an outpost label (CityMapView._yield_own_label): it stays hidden until
+## they part.
+var self_label_yields := false
+
+## The player's own name label (local space) while their pin is shown in the city; an empty rect otherwise.
+func self_label_rect() -> Rect2:
+	if not city_mode or low_detail or not visible_farm_ids.has("self") or not _buttons.has("self"): return Rect2()
+	var label: Button = _buttons["self"]
+	return Rect2(label.position, label.size)
+
+func yield_self_label(on: bool) -> void:
+	self_label_yields = on
+	if _buttons.has("self") and _avatar_targets.has("self"):
+		(_buttons["self"] as Button).visible = (_avatar_targets["self"] as Control).visible and not low_detail and not on
 
 ## City-mode screen footprints of players (local space): the city POI layer
 ## packs its markers around people so artwork never buries an avatar's pin.
