@@ -383,3 +383,76 @@ static func cabinet_actions(view: Dictionary, id: String) -> Dictionary:
 	var limit := int(P0Logic.content().get("bag", {}).get("stack", {}).get("dish", 5))
 	var room: bool = int(bag.get("free", 0)) > 0 or bag.get("slots", []).any(func(b): return str(b.id) == id and not b.get("gifted", false) and int(b.qty) < limit)
 	return {eat = eat_state(view, id), take = "Take one", take_reason = "" if room else "Bag full"}
+
+# ---------------------------------------------------------------- Cook Again (COOK-P0-7 / P0-8, Cooking Lv2)
+const TAG_NAMES := {"W": "Fish", "F": "Vegetable", "O": "Fruit", "S": "Seasoning"}
+const ORDINALS := ["1st", "2nd", "3rd"]
+
+## Cooking Lv2's Cook Again is unlocked (S5 conveniences).
+static func cook_again_on(view: Dictionary) -> bool:
+	return cooking(view).get("conveniences", []).has("cook_again")
+
+## What the stove can draw from: plain bag stacks plus the Spice Rack's stored seasonings (q(46)).
+static func stock(view: Dictionary) -> Dictionary:
+	var out := {}
+	for s in view.get("bag", {}).get("slots", []):
+		if s.get("gifted", false): continue
+		out[str(s.id)] = int(out.get(str(s.id), 0)) + int(s.qty)
+	for r in rack_rows(view): out[r.id] = int(out.get(r.id, 0)) + int(r.quantity)
+	return out
+
+## A stocked item's name: the rack row's (stored seasonings are not in view.items) or the bag item's.
+static func _stock_name(view: Dictionary, id: String) -> String:
+	for r in rack_rows(view):
+		if r.id == id: return str(r.title)
+	return P0Logic.item_name(view, id)
+
+static func _matches(view: Dictionary, token: String, id: String) -> bool:
+	if token.length() == 2 and token[0] == "S" and rack_rows(view).any(func(r): return r.id == id): return true   # rack seasonings are Common
+	return P0Logic._token_matches(view, token, id)
+
+## COOK-P0-7 (can) / P0-8 (short) for one known page: header, facts, slots, NEED-TILEs and the button. A tag
+## slot shows its one matching item when only one is in stock ("Wild Herb"), else the family ("Fish").
+static func cook_again(view: Dictionary, page_id: String) -> Dictionary:
+	var p := _page(view, page_id)
+	if p.is_empty(): return {}
+	var have := stock(view)
+	var needs := {}   # key → {name, icon, have, need}
+	var order: Array = []
+	for token in p.get("in", []):
+		var t := str(token)
+		var key := t
+		var name := P0Logic.item_name(view, t)
+		var icon := P0Logic.icon(t)
+		var count := int(have.get(t, 0))
+		var gap := name   # the button names what the page asks for: a family for a tag, the item otherwise
+		if t.length() == 2 and "WFOS".contains(t[0]) and t[1].is_valid_int():
+			var ids := have.keys().filter(func(id): return int(have[id]) > 0 and _matches(view, t, str(id)))
+			count = ids.reduce(func(n, id): return n + int(have[id]), 0)
+			name = _stock_name(view, str(ids[0])) if ids.size() == 1 else str(TAG_NAMES[t[0]])
+			gap = str(TAG_NAMES[t[0]])
+			icon = P0Logic.icon(str(ids[0])) if ids.size() == 1 else P0Logic.icon("fish_crucian" if t[0] == "W" else ("rock_salt" if t[0] == "S" else "crop_radish"))
+		if not needs.has(key):
+			needs[key] = {name = name, gap = gap, icon = icon, have = count, need = 0}
+			order.append(key)
+		needs[key].need = int(needs[key].need) + 1
+	var tiles: Array = order.map(func(k): return needs[k])
+	var short: Array = tiles.filter(func(n): return int(n.have) < int(n.need))
+	var met := 0
+	for n in tiles: met += mini(int(n.have), int(n.need))
+	var today := int(p.get("today", 0))
+	var facts: Array = []
+	var rarity := int(p.get("rarity", 1))
+	var ms := int(cooking(view).get("tiers", {}).get(str(rarity), {}).get("ms", 5000))
+	if cooking(view).get("conveniences", []).has("quick_fire"): ms = int(ms * 0.8)   # Quick Fire (Lv6): ×0.8
+	if short.is_empty(): facts.append(["Cooking", "%d s" % (ms / 1000)])
+	facts.append(["Cooks today", ORDINALS[mini(today, 2)] if today < 3 else "%dth" % (today + 1)])
+	facts.append(["Cooking XP", "Full" if today == 0 else ("Half" if today == 1 else "None")])
+	var first: Dictionary = short[0] if not short.is_empty() else {}
+	return {title = str(p.get("name", "")), state = "Can cook again" if short.is_empty() else "Materials short",
+		effect = "Repeat this recipe with the shown ingredients." if short.is_empty() else "Add %s to cook this recipe again." % str(first.get("name", "")).to_lower(),
+		facts = facts, section = "Ingredients · %d/%d" % [met, p.get("in", []).size()],
+		slots = p.get("in", []).size(), locked = slots(view) < 3,
+		tiles = tiles, button = "Cook Again",
+		reason = "" if short.is_empty() else "Need %d more %s" % [int(first.need) - int(first.have), str(first.gap)],
+		command = {"type": "cook", "recipe": page_id}}

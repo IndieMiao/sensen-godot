@@ -191,6 +191,13 @@ func _select_page(id: String) -> void:
 	_show_page(id)
 	page_selected.emit(page(id))
 
+## Opens on a given Cookbook page (Cook Again's Choose recipe ›): select it in the grid and show its card.
+func select_page(id: String) -> void:
+	if page(id).is_empty(): return
+	selected_page = id
+	if _pages: _pages.selected_id = id
+	_show_page(id)
+
 func _show_page(id: String) -> void:
 	var p := page(id)
 	_recipe.visible = not p.is_empty()

@@ -25,6 +25,7 @@ const WATCH_SHEET_H := 196.0      # COOK-3 sheet: dish, Cooking, m:ss remaining,
 const CLOSE_GAP := 6.0            # × sits this far above the sheet's top edge (COOK-3: 554 → 604)
 const CARD_TOP := 0.425           # RewardMoment top at 340 of 800 (COOK-4)
 const PLATE := preload("res://assets/p0/kitchen/reveal/plate.svg")
+const CookAgainSheet := preload("res://scenes/p0/kitchen/p0_cook_again_sheet.gd")
 const SPARKLE := preload("res://assets/p0/kitchen/reveal/sparkle.svg")
 ## COOK-4 reveal over the card, in 360 × 800 design px: [x, y, side_x, side_y]. The glow is the blurred ellipse
 ## (200 × 140 + its blur), the plate keeps its shadow margin, the dish icon is 96.
@@ -44,7 +45,9 @@ var rt: P0Runtime:   # the room attaches to the runtime after its _room_ready, s
 var stage: P0KitchenStage
 var drawer: P0KitchenDrawer
 var pot: Array = []               # composing: ids in the pot, one per unit
-var phase := "idle"               # idle | compose | watch | serve | card
+var phase := "idle"               # idle | compose | again | watch | serve | card
+## The last pot's page when it was a known recipe ("" after a Mystery Dish): Cook Again (COOK-P0-7) offers it.
+var last_page := ""
 
 var _wrap: Control
 var _overlay: Control
@@ -84,8 +87,37 @@ func _ready() -> void:
 func busy() -> bool: return phase != "idle"
 
 # ---------------------------------------------------------------- compose
+## COOK-P0-7 / P0-8: the last known page again (Cooking Lv2 Cook Again). Choose recipe › and Details › go to its
+## Cookbook page; Cook Again sends the page's cook (nothing is taken before that, An Qi La on 226).
+func open_again(page_id: String) -> void:
+	if rt == null or busy(): return
+	var facts := P0KitchenLogic.cook_again(rt.session.current(), page_id)
+	if facts.is_empty():
+		open("cookbook")
+		return
+	var sheet := CookAgainSheet.new(facts)
+	sheet.safe_bottom = rt.ui.safe_bottom()
+	sheet.close_requested.connect(func(): rt.ui.close_modal())
+	sheet.unavailable.connect(func(r: String): rt.ui.toast(r))
+	sheet.cook.connect(func(cmd: Dictionary): rt.session.send(cmd, P0Session.ui_key(cmd)))
+	var to_page := func():
+		rt.ui.close_modal()
+		open("cookbook", page_id)
+	sheet.choose_recipe.connect(to_page)
+	sheet.details.connect(to_page)
+	rt.ui._open_modal(sheet, 0.0, true)
+	rt.ui.modal_kind = "cook_again"
+	phase = "again"
+	sheet.tree_exited.connect(func():
+		if phase != "again": return
+		phase = "idle"
+		room.release_focus()
+		_hide_player(false))
+	_hide_player(true)
+	room.focus("cam_stove", {band = room.band_below_hud(1.0 - CookAgainSheet.HEIGHT / 800.0 - 0.02), size = room.view_size() * FOCUS_SIZE, release_on_move = false})
+
 ## Opens the cooking drawer on `tab` (Cookbook / Experiment) with the camera on the stove.
-func open(tab := "cookbook") -> void:
+func open(tab := "cookbook", page_id := "") -> void:
 	if rt == null or phase in ["watch", "serve"]: return
 	pot.clear()
 	stage.clear_ingredients()
@@ -112,6 +144,7 @@ func open(tab := "cookbook") -> void:
 	phase = "compose"
 	_hide_player(true)
 	room.focus("cam_stove", {band = room.band_below_hud(BAND_TOP_DRAWER), size = room.view_size() * FOCUS_SIZE, release_on_move = false})
+	if page_id != "" and not drawer.page(page_id).is_empty(): drawer.select_page(page_id)
 	if tab == "cookbook" and drawer.selected_page != "": _on_page(drawer.page(drawer.selected_page))
 	_refresh_overlay()
 
@@ -244,8 +277,9 @@ func _on_cook(cmd: Dictionary) -> void:
 # ---------------------------------------------------------------- server: the fire is lit
 ## `pot` event: the stove started. Close the drawer and watch the pot.
 func on_pot(stove: Dictionary) -> void:
-	var keep := pot.duplicate()
-	var page := drawer.page(drawer.selected_page) if drawer else {}
+	if phase == "again":
+		phase = "idle"   # closing the Cook Again sheet must not release the camera before watching
+		rt.ui.close_modal()
 	if phase == "compose":
 		phase = "idle"   # closing must not clear what is in the pot
 		rt.ui.close_modal()
@@ -406,6 +440,8 @@ func serve(taps: Array, from_stove := false) -> void:
 func on_event(ev: Dictionary) -> bool:
 	match str(ev.get("kind", "")):
 		"dish":
+			var known := not bool(ev.get("mystery", false)) and not bool(ev.get("none", false))
+			last_page = str(ev.get("dish", "")) if known else ""
 			if bool(ev.get("auto", false)):   # S5 Queue ×2 kept it on its own: the toast only, no card
 				_toast_keep.call_deferred(ev, P0KitchenLogic.routes(_events + [ev]))
 				return true

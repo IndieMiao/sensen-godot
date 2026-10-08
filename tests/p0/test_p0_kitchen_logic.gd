@@ -270,3 +270,45 @@ func test_the_cook_row_shows_the_energy_of_a_known_pot_only() -> void:
 	assert_str(P0KitchenLogic.pot_energy(v, ["fish_crucian"])).is_equal("+20 Energy")   # Grilled Crucian (COOK-P0-2)
 	assert_str(P0KitchenLogic.pot_energy(v, ["fish_crucian", "crop_radish"])).is_equal("")   # unknown mix (COOK-2b)
 
+
+# ---------------------------------------------------------------- Cook Again (COOK-P0-7 / P0-8)
+func _again_view() -> Dictionary:
+	var v := _view()
+	v.cooking["conveniences"] = ["cook_again"]
+	v.cooking.cookbook.append({"id": "dish_herb_grilled_fish", "name": "Herb Grilled Fish", "rarity": 2, "slots": 2,
+		"in": ["W1", "S1"], "known": true, "cooked": true, "can_cook": true, "today": 1})
+	v.items["fish_perch"] = {"name": "River Perch", "kind": "fish", "family": "W", "rarity": 1, "cook": true}
+	v.bag.slots = [{"id": "fish_crucian", "qty": 1}, {"id": "fish_perch", "qty": 1}]
+	v.cooking["rack"] = {"on": true, "items": [{"id": "wild_herb", "name": "Wild Herb", "qty": 2}]}
+	v.items["wild_herb"] = {"name": "Wild Herb", "kind": "material"}
+	return v
+
+func test_cook_again_lists_facts_tiles_and_the_command() -> void:
+	var v := _again_view()
+	assert_bool(P0KitchenLogic.cook_again_on(v)).is_true()
+	var a := P0KitchenLogic.cook_again(v, "dish_herb_grilled_fish")
+	assert_str(a.state).is_equal("Can cook again")
+	assert_array(a.facts).is_equal([["Cooking", "15 s"], ["Cooks today", "2nd"], ["Cooking XP", "Half"]])
+	assert_str(a.section).is_equal("Ingredients · 2/2")
+	assert_array(a.tiles.map(func(t): return [t.name, t.have, t.need])).is_equal([["Fish", 2, 1], ["Wild Herb", 2, 1]])
+	# A specific ingredient names itself on the button (An Qi La on 226): Need 1 more Pond Crucian.
+	var crucian := P0KitchenLogic.cook_again(_again_view_without_crucian(), "dish_grilled_crucian")
+	assert_str(crucian.reason).is_equal("Need 1 more Pond Crucian")
+	assert_str(a.reason).is_equal("")
+	assert_dict(a.command).is_equal({"type": "cook", "recipe": "dish_herb_grilled_fish"})
+
+func test_cook_again_short_names_the_gap_and_drops_the_time() -> void:
+	var v := _again_view()
+	v.bag.slots = []
+	var a := P0KitchenLogic.cook_again(v, "dish_herb_grilled_fish")
+	assert_str(a.state).is_equal("Materials short")
+	assert_str(a.effect).is_equal("Add fish to cook this recipe again.")
+	assert_array(a.facts).is_equal([["Cooks today", "2nd"], ["Cooking XP", "Half"]])
+	assert_str(a.reason).is_equal("Need 1 more Fish")
+	assert_str(a.section).is_equal("Ingredients · 1/2")
+
+func _again_view_without_crucian() -> Dictionary:
+	var v := _again_view()
+	v.bag.slots = [{"id": "fish_perch", "qty": 1}]
+	return v
+

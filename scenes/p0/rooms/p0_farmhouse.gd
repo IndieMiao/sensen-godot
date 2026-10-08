@@ -62,7 +62,7 @@ func _marker(n: String, v: Dictionary) -> Dictionary:
 	return {text = "Stove 1/1 · Cooking " + clock, badge = "countdown", caption = clock}
 
 func _on_facility(n: String) -> void:
-	if n == STOVE: open_stove()
+	if n == STOVE: open_stove("cookbook", true)
 	elif n == RACK: open_sheet("rack")
 	elif n == CABINET: open_sheet("cabinet")
 
@@ -91,12 +91,14 @@ func open_sheet(kind: String) -> void:
 
 ## Empty → the cooking drawer; cooking → watch the pot; ready → the dish comes out and COOK-P0-9 asks Eat or Keep
 ## (unwatched rings are misses: Plain); portions left on the stove (no room earlier) → the same card for them.
-func open_stove(tab := "cookbook") -> void:
+## A tap on the free stove after a known pot offers Cook Again first (COOK-P0-7, Cooking Lv2; An Qi La on 226).
+func open_stove(tab := "cookbook", tapped := false) -> void:
 	if rt == null or kitchen == null or kitchen.busy(): return
 	var v := rt.session.current()
 	var st = P0KitchenLogic.stove(v)
 	var left := P0KitchenLogic.stove_left(v)
-	if st == null: kitchen.open(tab)
+	if st == null and tapped and kitchen.last_page != "" and P0KitchenLogic.cook_again_on(v): kitchen.open_again(kitchen.last_page)
+	elif st == null: kitchen.open(tab)
 	elif not left.is_empty(): kitchen.show_left(str(left[0]))
 	elif float(st.get("ready_in", 0)) <= 0.0: kitchen.serve([], true)
 	else: kitchen.watch(st)
