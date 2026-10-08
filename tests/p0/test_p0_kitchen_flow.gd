@@ -368,3 +368,32 @@ func test_a_turn_over_collect_that_fails_recovers_like_a_failed_serve() -> void:
 		for i in 20: await get_tree().process_frame   # no watch, so no automatic resend
 		assert_int(sent.size()).override_failure_message(failure + ": nothing resent").is_equal(before)
 		_set_view(v)
+
+func test_a_first_time_dish_on_a_turn_over_floats_its_first_cook_xp_from_the_pot() -> void:
+	# 不知火舞 on 226: the turn-over has no result card to carry the first-cook strip, so that XP floats with the pot's
+	# own, from the pot; the toast marks the new recipe. A normal serve keeps the bonus on its card (int6 C11).
+	var v := _queue_view()
+	v.cooking.queued = {"id": 4, "dish": "dish_grilled_crucian", "rarity": 1, "ms": 5000, "starts_in": 0}
+	_set_view(v)
+	var r := await _farmhouse()
+	var k: P0Kitchen = r.get("kitchen")
+	k.watch(v.cooking.stove)
+	k.serve([])
+	assert_str(k.phase).is_equal("rotate")
+	var after := _view()
+	after.seq = 8
+	after.cooking.conveniences = ["cook_again", "queue_two"]
+	after.cooking.stove = {"id": 4, "dish": "dish_grilled_crucian", "ms": 5000, "elapsed": 0, "ready_in": 5000, "heats": []}
+	_set_view(after)
+	rt.ui.clear_toast()
+	var dish := _dish(true)
+	dish.pot = 3
+	rt.session.state_changed.emit(after, [dish, {"kind": "first", "what": "cook:dish_grilled_crucian", "xp": 10},
+		{"kind": "xp", "skill": "cooking", "amount": 10, "percent": 100}, {"kind": "xp", "skill": "cooking", "amount": 5, "percent": 100},
+		{"kind": "queue", "id": 4, "dish": "dish_grilled_crucian", "started_at": 0, "ms": 5000}])
+	for i in 2: await get_tree().process_frame
+	assert_bool(rt.ui.has_modal()).is_false()
+	assert_str(rt.ui.toast_text()).is_equal("New recipe! Grilled Crucian kept · Grilled Crucian cooking")
+	var xp: Array = rt.ui.root.find_children("*", "UiFloatText", true, false).filter(func(f): return (f as UiFloatText).text.contains("Cooking XP"))
+	assert_array(xp.map(func(f): return (f as UiFloatText).text)).is_equal(["+15 Cooking XP ★"])   # bonus 10 + pot 5, one line
+	k.stop_watching()

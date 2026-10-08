@@ -416,3 +416,14 @@ func test_queue_mode_reads_ready_to_queue_and_never_stove_busy() -> void:
 	assert_str(P0KitchenLogic.experiment_reason(v, ["fish_crucian"])).is_equal("Stove busy")
 	assert_str(P0KitchenLogic.experiment_reason(v, ["fish_crucian"], true)).is_equal("")
 	assert_str(P0KitchenLogic.experiment_reason(v, [], true)).is_equal("Add an ingredient")
+
+func test_a_new_recipe_kept_by_a_turn_over_is_marked() -> void:
+	# 不知火舞 on 226 (option ②): no COOK-4 on a turn-over, so a first-time dish is marked in the toast.
+	var v := _view()
+	v.names["dish_herb_grilled_fish"] = "Herb Grilled Fish"
+	v.names["dish_grilled_crucian"] = "Grilled Crucian"
+	var first := {"kind": "dish", "dish": "dish_herb_grilled_fish", "quality": 1, "first": true, "mystery": false}
+	assert_str(P0KitchenLogic.rotation_line(v, first, "dish_grilled_crucian")).is_equal("New recipe! Herb Grilled Fish kept · Grilled Crucian cooking")
+	assert_str(P0KitchenLogic.rotation_line(v, first, null)).is_equal("New recipe! Herb Grilled Fish kept · Unknown dish cooking")
+	first.first = false
+	assert_str(P0KitchenLogic.rotation_line(v, first, null)).is_equal("Herb Grilled Fish kept · Unknown dish cooking")

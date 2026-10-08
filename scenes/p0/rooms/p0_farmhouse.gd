@@ -129,7 +129,12 @@ func p0_open_kitchen(tab := "cookbook") -> void:
 ## the player as in any room.
 func p0_anchor() -> Vector2:
 	if kitchen and kitchen.phase in ["serve", "card"]: return get_viewport().get_visible_rect().size * Vector2(0.5, P0Kitchen.FLOAT_AT)
+	if kitchen and kitchen.phase in ["rotate", "watch"]: return kitchen.ring_center()   # the turn-over's floats rise from the pot
 	return super()
+
+## Whether this reply's result card is coming (a normal serve): its strip carries the first-cook XP, so the runtime keeps
+## that bonus off the floats. A turn-over or a pot kept on its own has no card: the bonus floats (不知火舞 on 226).
+func p0_cook_card_coming() -> bool: return kitchen != null and kitchen.phase == "serve"
 
 func p0_event(ev: Dictionary, v: Dictionary) -> bool:
 	if kitchen == null: return false

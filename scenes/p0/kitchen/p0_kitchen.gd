@@ -456,6 +456,9 @@ static func _with_pot(cmd: Dictionary, pot: Dictionary) -> Dictionary:
 	if pot.get("id", null) != null: cmd["pot"] = pot.id
 	return cmd
 
+## Where the stove's floats rise from while the pot is watched or turns over (a first-cook XP float, 不知火舞 on 226).
+func ring_center() -> Vector2: return _ring_center()
+
 ## The ring sits on the pot (COOK-3: the whole pot is the target, §7.2.4).
 func _ring_center() -> Vector2:
 	var mouth := room.anchor("drop_pot_1")

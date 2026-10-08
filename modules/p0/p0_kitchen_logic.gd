@@ -50,10 +50,13 @@ static func watch_state(view: Dictionary) -> String:
 
 ## The toast when the stove turns over to the waiting pot while the player is in the kitchen (q(71)):
 ## "Grilled Crucian kept · Herb Grilled Fish cooking". dish_ev = the kept pot's `dish` event; next_dish = the pot now
-## cooking (null when the server does not name it: an unknown mix).
+## cooking (null when the server does not name it: an unknown mix). A first-time dish kept this way gets no COOK-4
+## (it would cover the next pot's rings), so the toast marks it (不知火舞 on 226: option ②; wording 李白).
+const NEW_RECIPE_MARK := "New recipe! "
 static func rotation_line(view: Dictionary, dish_ev: Dictionary, next_dish) -> String:
 	var kept := "Ingredients back" if bool(dish_ev.get("none", false)) else \
 		"%s kept" % P0Logic.item_name(view, "dish_mystery" if bool(dish_ev.get("mystery", false)) else str(dish_ev.get("dish", "")))
+	if bool(dish_ev.get("first", false)) and not bool(dish_ev.get("mystery", false)): kept = NEW_RECIPE_MARK + kept
 	var next := P0Logic.item_name(view, str(next_dish)) if next_dish != null and str(next_dish) != "" else "Unknown dish"
 	return "%s · %s cooking" % [kept, next]
 
