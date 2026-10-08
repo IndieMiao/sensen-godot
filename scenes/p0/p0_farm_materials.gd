@@ -34,7 +34,7 @@ func setup(farm_node: Node3D, mouth_at: Vector3) -> P0FarmMaterials:
 func _ready() -> void:
 	rt = P0Runtime.ensure()
 	rt.session.state_changed.connect(_on_state)
-	_build_entry_card()
+	_ensure_entry()   # may not be possible yet: see _ensure_entry
 	_build_spots()
 	# Floats for a past auto-store are not news: only arrivals after entering the farm float.
 	var auto = rt.session.current().get("storage", {}).get("auto", null)
@@ -86,8 +86,8 @@ func frame(v: Dictionary, card := "") -> void:
 		P0Logic.icon("pickaxe"))
 	top.y -= rt.ui.badge_height("mine")
 	var entry := P0MaterialLogic.mine_entry_card(v)
-	_entry.visible = near and bool(entry.get("show", false)) and not rt.ui.has_modal()
-	if _entry.visible:
+	if _ensure_entry(): _entry.visible = near and bool(entry.get("show", false)) and not rt.ui.has_modal()
+	if is_instance_valid(_entry) and _entry.visible:
 		_entry_button.text = str(entry.label)
 		# LOCK-10: a greyed EntryCard still takes the press and says why (苏烈, #39), so it is never `disabled`.
 		_entry_button.add_theme_color_override("font_color", P0Ui.GREEN_D if bool(entry.enabled) else UiTokens.COLOR_DISABLED_INK)
@@ -193,6 +193,15 @@ func _on_state(v: Dictionary, events: Array) -> void:
 			AppRouter.open_instance(P0_MINE, {"floor": int(e.get("floor", 1))})
 			get_tree().create_timer(1.0).timeout.connect(func(): _opening = false)
 			return
+
+## The EntryCard hangs on the P0 UI's root, which only exists once the UI is in the tree. With the farm as the root
+## scene (the first session, desktop P0_SHOT) this helper is ready before the runtime is — P0Runtime.ensure() adds it
+## deferred — so the card is built on the first call that can carry it (刘邦 / 奕星 on #39). True once it exists.
+func _ensure_entry() -> bool:
+	if is_instance_valid(_entry): return true
+	if rt == null or rt.ui == null or not rt.ui.is_node_ready() or rt.ui.root == null: return false
+	_build_entry_card()
+	return true
 
 ## EntryCard (1468:94344, MINE-P0-5): over the mouth, only near it, only with an unfinished run; one secondary text
 ## button (New run · 2 Energy, green; grey with the reason when it can't) and its small line.

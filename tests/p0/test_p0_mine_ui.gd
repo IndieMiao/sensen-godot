@@ -113,3 +113,19 @@ func test_status_line_set_before_ready_is_kept() -> void:
 	early.layer = 128
 	await await_idle_frame()
 	assert_str(early._status_text.text).is_equal("Rocks 0/6")   # applied from _pending in _ready
+
+## Farm as the root scene (first session, desktop P0_SHOT): P0FarmMaterials is ready before P0Runtime.ensure()'s
+## deferred add, so the UI has no root yet. The mine's EntryCard must wait for it, not add_child on null (刘邦 on #39).
+func test_entry_card_waits_for_the_ui_root() -> void:
+	var runtime := P0Runtime.new()   # not in the tree: its P0Ui has not built its root
+	var m := P0FarmMaterials.new()
+	m.rt = runtime
+	assert_bool(m._ensure_entry()).is_false()
+	assert_bool(is_instance_valid(m._entry)).is_false()
+	runtime.ui = ui                  # the suite's P0Ui, in the tree and ready
+	assert_bool(m._ensure_entry()).is_true()
+	assert_object(m._entry.get_parent()).is_same(ui.root)
+	assert_bool(m._ensure_entry()).is_true()   # built once
+	m.free()
+	runtime.free()
+
