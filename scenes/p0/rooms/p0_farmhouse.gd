@@ -52,9 +52,8 @@ func _marker(n: String, v: Dictionary) -> Dictionary:
 	if kitchen and kitchen.busy(): return {}   # the drawer or the pot owns the screen
 	if _sheet: return {}
 	# World prompts (SGODOT-250, LOCK-07 v2, q(62)): an icon button, the nearest opens into a name strip; no Tap to.
-	# The rack and the cabinet have no icon of their own yet: a seasoning and steam stand in (art director to confirm).
-	if n == RACK: return {kind = "facility", icon = P0Logic.icon("rock_salt"), name = "Spice Rack"}
-	if n == CABINET: return {kind = "facility", icon = P0Logic.icon("steam"), name = "Warming Cabinet", fact = P0KitchenLogic.cabinet_badge(v)}
+	if n == RACK: return {kind = "facility", icon = P0Logic.icon("spice_rack"), name = "Spice Rack"}   # i-spice-rack 1714:102645
+	if n == CABINET: return {kind = "facility", icon = P0Logic.icon("cabinet"), name = "Warming Cabinet", fact = P0KitchenLogic.cabinet_badge(v)}   # i-cabinet 1265:89122
 	if n != STOVE: return super(n, v)
 	var stove := {kind = "facility", icon = P0Logic.icon("pot"), name = "Stove 1/1"}   # i-pot (250 walkthrough)
 	var st = P0KitchenLogic.stove(v)
