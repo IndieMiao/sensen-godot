@@ -388,13 +388,14 @@ static func _bar_remove_zone() -> Control:
 	var v := _column(UiTokens.SPACE_SECTION)
 	var row := _row(UiTokens.SPACE_ROW)
 	for hover in [false, true]:
-		var host := Control.new()
-		host.custom_minimum_size = Vector2(140, 110)
+		var host := ColorRect.new()   # over a scene-grey backdrop: on the gallery's surface the zone's own surface vanishes
+		host.color = UiKit.alpha(UiTokens.COLOR_TEXT, UiTokens.OPACITY_SCRIM_MODAL)
+		host.custom_minimum_size = Vector2(150, 120)
 		var z := UiBarRemoveZone.new()
 		z.top_level = false   # drawn in the gallery cell, not at its screen spot
 		z.hover = hover
 		host.add_child(z)
-		z.center = Vector2(70, 40)
+		z.center = Vector2(75, 46)
 		row.add_child(_captioned(host, "hover · Release to remove" if hover else "idle · Remove from bar"))
 	v.add_child(row)
 	v.add_child(_captioned(UiUndoToast.new("Radish Seeds off the bar"), "removed: Info toast with Undo (5 s)"))
