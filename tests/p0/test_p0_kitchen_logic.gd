@@ -344,3 +344,10 @@ func test_a_mix_that_failed_before_says_tried_before() -> void:
 	assert_bool(P0KitchenLogic.tried(v, ["crop_radish"])).is_false()
 	assert_str(P0KitchenLogic.preview(v, ["crop_radish", "fish_koi"]).title).is_equal("Unknown dish")
 
+
+func test_every_p0_dish_has_its_own_icon() -> void:
+	# int6 C7: four P0 dishes had no file, so P0Logic.icon fell back to the field sprout (a plate that looks like
+	# seeds) on the page cell, the detail card, COOK-4 and the plate in the scene. 安其拉 drew them (226 d4d629f7).
+	for r in P0Logic.content().get("cooking", {}).get("recipes", []):
+		var id := str(r.id)
+		assert_bool(ResourceLoader.exists(P0Logic.ICON_DIR % id)).override_failure_message(id + " has no icon").is_true()
