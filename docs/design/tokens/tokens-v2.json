@@ -9,7 +9,8 @@
     "pending": {
       "wp1b": "container mains (Sheet / drawers, SegmentTab, InventoryCell, GearSlot, Kitchen/*, counter, NPC) await WP1b (SGODOT-201)",
       "segmentTab": "selected style must not use command green (LOCK-13), WP1b",
-      "toast": "sizes read Toast R1 (1178:82265); ToastLayer draws its tone look (light fills, tone icon, optional action; SGODOT-233); the ToastPanel variation still holds the old dark panel for pre-P0 screens"
+      "toast": "sizes read Toast R1 (1178:82265); ToastLayer draws its tone look (light fills, tone icon, optional action; SGODOT-233); the ToastPanel variation still holds the old dark panel for pre-P0 screens",
+      "entryCard": "EntryCard 1468:94344 (SGODOT-231): radius 16 and padding 8 / 14 / 9 / 14, gap 2, Pointer=Right inset 21 are constants in UiEntryCard until the next token export adds them"
     }
   },
   "font": {
@@ -450,8 +451,12 @@
     "actionKeyH": 148,
     "holdRing": 4.4,
     "pendingRing": 3.5,
-    "radialPetal": 52,
-    "radialIcon": 28,
+    "radialPetal": 64,
+    "radialPetalCurrent": 72,
+    "radialHit": 72,
+    "radialRing": 88,
+    "radialIcon": 34,
+    "radialIconCurrent": 38,
     "radialLockBadge": 18,
     "radialLockIcon": 12,
     "tapCardH": 32,
@@ -535,6 +540,13 @@
     "recenterMs": 600,
     "doubleTapRecenterMs": 400,
     "radialFadeMs": 200,
+    "radialScrimMs": 120,
+    "radialPetalInMs": 180,
+    "radialStaggerMs": 40,
+    "radialRetractMs": 120,
+    "radialTapMs": 150,
+    "radialShakeMs": 200,
+    "radialReasonMs": 1500,
     "quickBarRefillMs": 300,
     "newUnlockFlashMs": 600,
     "drawerMs": 250,

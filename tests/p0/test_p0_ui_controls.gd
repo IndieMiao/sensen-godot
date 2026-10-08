@@ -163,16 +163,18 @@ func test_map_keeps_only_bag_and_hides_the_keys() -> void:
 	assert_bool(ui._bar.bag_only).is_false()
 	assert_bool(ui._keys.visible).is_true()
 
-func test_switch_key_fans_the_radial_out_from_the_character() -> void:
-	ui.player_screen = Vector2(100, 300)
+func test_switch_key_opens_the_radial_around_the_screen_centre() -> void:
+	ui.player_screen = Vector2(100, 300)   # the character no longer matters (247, LOCK-03 v2)
 	ui.open_radial()
-	assert_bool(ui._radial.visible).is_true()
+	assert_bool(ui._radial.is_open()).is_true()
 	assert_bool(ui.has_modal()).is_true()
 	assert_array(ui._radial.options.map(func(o): return o.available)).is_equal([true, false, false, false])
 	assert_str(ui._radial.selected).is_equal("farm")
 	ui.open_radial()   # the switch key again closes it
-	assert_bool(ui._radial.visible).is_false()
+	assert_bool(ui._radial.is_open()).is_false()
 	assert_bool(ui.has_modal()).is_false()
+	ui._radial.advance(UiTokens.MOTION_RADIAL_RETRACT_MS + 1)
+	assert_bool(ui._radial.visible).is_false()
 
 func test_finger_card_forwards_its_tap_to_the_facility() -> void:
 	var taps := []

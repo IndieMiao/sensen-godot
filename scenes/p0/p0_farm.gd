@@ -416,6 +416,7 @@ func _hold_repeat() -> void:
 func p0_tap(screen: Vector2) -> void:
 	if rt.ui.has_modal(): return
 	if _tap_card(rt.ui.tapped_card): return
+	if _materials.tap_entry(screen): return   # the mine's EntryCard sits over the scene (passive, SGODOT-231)
 	if _sign_hit(screen):
 		actor.face(_sign)
 		HomePanel.open(rt.ui)

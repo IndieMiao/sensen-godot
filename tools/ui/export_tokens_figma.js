@@ -300,6 +300,7 @@ const tokens = {
       wp1b: 'container mains (Sheet / drawers, SegmentTab, InventoryCell, GearSlot, Kitchen/*, counter, NPC) await WP1b (SGODOT-201)',
       segmentTab: 'selected style must not use command green (LOCK-13), WP1b',
       toast: 'sizes read Toast R1 (1178:82265); ToastLayer draws its tone look (light fills, tone icon, optional action; SGODOT-233); the ToastPanel variation still holds the old dark panel for pre-P0 screens',
+      entryCard: 'EntryCard 1468:94344 (SGODOT-231): radius 16 and padding 8 / 14 / 9 / 14, gap 2, Pointer=Right inset 21 are constants in UiEntryCard until the next token export adds them',
     },
   },
   font: { file: 'res://assets/ui/fonts/Nunito.ttf', naturalLineHeight: CONST.naturalLineHeight,

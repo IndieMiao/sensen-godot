@@ -245,8 +245,12 @@ const SIZE_ACTION_KEY_W := 95
 const SIZE_ACTION_KEY_H := 148
 const SIZE_HOLD_RING := 4.4
 const SIZE_PENDING_RING := 3.5
-const SIZE_RADIAL_PETAL := 52
-const SIZE_RADIAL_ICON := 28
+const SIZE_RADIAL_PETAL := 64
+const SIZE_RADIAL_PETAL_CURRENT := 72
+const SIZE_RADIAL_HIT := 72
+const SIZE_RADIAL_RING := 88
+const SIZE_RADIAL_ICON := 34
+const SIZE_RADIAL_ICON_CURRENT := 38
 const SIZE_RADIAL_LOCK_BADGE := 18
 const SIZE_RADIAL_LOCK_ICON := 12
 const SIZE_TAP_CARD_H := 32
@@ -318,6 +322,13 @@ const MOTION_FLOAT_TEXT_MS := 800
 const MOTION_RECENTER_MS := 600
 const MOTION_DOUBLE_TAP_RECENTER_MS := 400
 const MOTION_RADIAL_FADE_MS := 200
+const MOTION_RADIAL_SCRIM_MS := 120
+const MOTION_RADIAL_PETAL_IN_MS := 180
+const MOTION_RADIAL_STAGGER_MS := 40
+const MOTION_RADIAL_RETRACT_MS := 120
+const MOTION_RADIAL_TAP_MS := 150
+const MOTION_RADIAL_SHAKE_MS := 200
+const MOTION_RADIAL_REASON_MS := 1500
 const MOTION_QUICK_BAR_REFILL_MS := 300
 const MOTION_NEW_UNLOCK_FLASH_MS := 600
 const MOTION_DRAWER_MS := 250
@@ -387,4 +398,5 @@ const PENDING := {
 	"wp1b": "container mains (Sheet / drawers, SegmentTab, InventoryCell, GearSlot, Kitchen/*, counter, NPC) await WP1b (SGODOT-201)",
 	"segmentTab": "selected style must not use command green (LOCK-13), WP1b",
 	"toast": "sizes read Toast R1 (1178:82265); ToastLayer draws its tone look (light fills, tone icon, optional action; SGODOT-233); the ToastPanel variation still holds the old dark panel for pre-P0 screens",
+	"entryCard": "EntryCard 1468:94344 (SGODOT-231): radius 16 and padding 8 / 14 / 9 / 14, gap 2, Pointer=Right inset 21 are constants in UiEntryCard until the next token export adds them",
 }

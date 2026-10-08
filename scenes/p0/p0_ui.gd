@@ -74,6 +74,9 @@ var _undo_toast: UiUndoToast
 var _cards := {}          # id -> UiTapCard
 var _card_hits := {}      # id -> screen point a tap on the card forwards to the world (the facility's own tap point)
 var _badges := {}         # id -> UiStatusBadge
+var _icons := {}          # id -> UiWorldIconButton (SGODOT-250)
+var _name_bars := {}      # id -> UiWorldNameBar
+var _npc_tags := {}       # id -> UiNpcNameTag
 ## The finger card a `tapped` comes from, only while that signal is being handled ("" for a scene tap).
 var tapped_card := ""
 var _quick := {}          # per action: {pins: [], removed: []}, saved in quick_store (LOCK-05: 每个行动各记各的)
@@ -238,7 +241,9 @@ func _build_fab() -> void:
 	_keys.tool_icon = _mode_tool
 	_radial = UiActionRadial.new()
 	_kit.add_child(_radial)
-	_radial.picked.connect(func(id: String): if id != bar_mode: set_mode(id))
+	_radial.picked.connect(func(id: String):
+		if id != bar_mode: set_mode(id)
+		_keys.pop_tool())   # the key's tool badge pops with the pick, the current action's too (247)
 	# FISH-4: two pills above the switch key while the creel is full.
 	_fab_pills = HBoxContainer.new()
 	_fab_pills.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
@@ -368,13 +373,14 @@ func set_surface(name: String) -> void:
 	_bar.visible = _bar_shown() and (_modal == null or is_bar_docked())   # docked in the bag drawer it stays
 	_bar.bag_only = not action
 	_bar_sig = []
-	if _radial.visible: _radial.close()
+	if _radial.is_open(): _radial.close()
 	_bar.cancel_drag()   # no lifted slot or drop zones left over when fishing starts or the map opens
 	_creel.visible = action and bar_mode == "fish"
 	_status.visible = action and _status_text.text != ""
 	if _dev_box: _dev_box.visible = world
 	for c in _cards.values(): (c as Control).visible = false
 	for b in _badges.values(): (b as Control).visible = false
+	for m in _icons.values() + _name_bars.values() + _npc_tags.values(): (m as Control).visible = false
 	_flush_held_toast()
 
 ## Action spaces show the full bar. Rooms (farmhouse kitchen, outposts) and the map keep only Bag, with no action
@@ -721,10 +727,120 @@ func tag(id: String, text: String, screen: Vector2, show: bool, hit := Vector2.I
 	c.text = text
 	_place_marker(c, screen, true)
 
+# ---------------------------------------------------------------- world prompts (SGODOT-250, LOCK-07 v2 / LOCK-16 v2)
+## A facility within view and about 8 m: its icon button (WorldIconButton 1674:101157) centred on `screen` (this UI's
+## coordinates, like tag()). `near` grows a seat 1.1× with a primary edge; `status` (a UiStatusBadge.State, -1 none)
+## turns the whole button into the StatusBadge. A tap on it is a tap on `hit` (default `screen`), with tapped_card =
+## id. Call it every frame for each shown facility that is not the open one; it folds that facility's name strip if
+## it was open. Hidden under a card or drawer, and outside the band between the HUD and the quick bar.
+func world_icon(id: String, icon: Texture2D, screen: Vector2, show: bool, near := false, status := -1, hit := Vector2.INF) -> void:
+	var b: UiWorldIconButton = _icons.get(id)
+	if b == null:
+		b = UiWorldIconButton.new()
+		_kit.add_child(b)
+		_kit.move_child(b, 0)
+		_icons[id] = b
+	var on := show and _modal == null
+	var bar: UiWorldNameBar = _name_bars.get(id)
+	if bar != null and bar.visible: _fold_name_bar(bar)
+	b.visible = on and (bar == null or not bar.visible) and _marker_area().has_point(screen)
+	if not on: return
+	_card_hits[id] = screen if hit == Vector2.INF else hit
+	b.icon = icon
+	b.near = near
+	b.status = status
+	b.place_at(screen)
+
+## The one facility nearest and within reach: its name strip (WorldNameBar 1674:101190) opens from the icon button's
+## spot in 160 ms — icon + `text` + at most one `fact` ("" for none). `side` UiWorldNameBar.Dir (the way the
+## character faces), -1 = right; either way it flips at a screen edge. `dimmed`: used today (Rested today). With
+## show false (or a world_icon call for the same id) it folds back, then the icon button returns.
+func name_bar(id: String, icon: Texture2D, text: String, fact: String, screen: Vector2, show: bool, side := -1, dimmed := false, status := -1, hit := Vector2.INF) -> void:
+	var bar: UiWorldNameBar = _name_bars.get(id)
+	if bar == null:
+		bar = UiWorldNameBar.new()
+		bar.theme = UiKit.theme()
+		bar.visible = false   # opens below
+		_kit.add_child(bar)
+		_kit.move_child(bar, 0)
+		_name_bars[id] = bar
+	if not (show and _modal == null):
+		if bar.visible: _fold_name_bar(bar)
+		return
+	_card_hits[id] = screen if hit == Vector2.INF else hit
+	bar.icon = icon
+	bar.text = text
+	bar.fact = fact
+	bar.dimmed = dimmed
+	bar.status = status
+	bar.side = _name_bar_side(bar, screen, UiWorldNameBar.Dir.RIGHT if side < 0 else side)
+	bar.anchor_at(screen)
+	var b: UiWorldIconButton = _icons.get(id)
+	if b: b.visible = false   # the strip stands in for its button
+	_raise_marker(bar)   # the open strip draws over every icon button and badge (哪吒: a stove badge sat on a card)
+	if not bar.visible or bar.get_meta("folding", false):
+		if not bar.visible: bar.set_openness(0.0)
+		bar.visible = true
+		bar.set_meta("folding", false)
+		bar.expand()
+
+## World markers (cards, badges, icon buttons, strips, NPC tags) sit at the bottom of the UI, under the HUD and the
+## bar; this one goes to the top of that group.
+func _raise_marker(m: Control) -> void:
+	var top := m.get_index()
+	for group in [_cards, _badges, _icons, _name_bars, _npc_tags]:
+		for other in group.values(): top = maxi(top, (other as Node).get_index())
+	if top > m.get_index(): _kit.move_child(m, top)
+
+func _fold_name_bar(bar: UiWorldNameBar) -> void:
+	if bar.get_meta("folding", false): return
+	bar.set_meta("folding", true)
+	bar.collapse()
+	var done := func():
+		if is_instance_valid(bar) and bar.get_meta("folding", false):
+			bar.visible = false
+			bar.set_meta("folding", false)
+	if bar.openness() <= 0.0 or not bar.is_inside_tree(): done.call()
+	else: get_tree().create_timer(UiKit.secs(170.0)).timeout.connect(done)
+
+## The wanted side unless the strip would leave the marker band there; then the other one (贴边翻转).
+func _name_bar_side(bar: UiWorldNameBar, screen: Vector2, want: int) -> int:
+	var area := _marker_area()
+	var reach := bar.full_width() - bar.folded_width() * 0.5
+	if want == UiWorldNameBar.Dir.RIGHT and screen.x + reach > area.end.x - UiTokens.SPACE_WITHIN: return UiWorldNameBar.Dir.LEFT
+	if want == UiWorldNameBar.Dir.LEFT and screen.x - reach < area.position.x + UiTokens.SPACE_WITHIN: return UiWorldNameBar.Dir.RIGHT
+	return want
+
+## An interactable NPC's name over its head (NpcNameTag 1674:101195): the name only; `highlight` when nearest within
+## reach or in a conversation. Display only — the NPC itself takes the tap.
+func npc_tag(id: String, text: String, head_screen: Vector2, show: bool, highlight := false) -> void:
+	var t: UiNpcNameTag = _npc_tags.get(id)
+	if t == null:
+		t = UiNpcNameTag.new()
+		t.theme = UiKit.theme()
+		_kit.add_child(t)
+		_kit.move_child(t, 0)
+		_npc_tags[id] = t
+	t.visible = show and _modal == null and _marker_area().has_point(head_screen)
+	if not t.visible: return
+	t.text = text
+	t.highlight = highlight
+	t.place_over(head_screen)
+
 ## Facility / resident state mark (StatusBadge 1132:79554, STATE-ICONS): display only, the facility takes the tap.
 ## A scene tap: on a shown finger card it is that facility's tap, elsewhere the world's (also a double tap: a card
 ## never recenters the camera by accident). Returns true for a card tap, which then can't start a double tap either.
 func _tap_at(global_pos: Vector2, double: bool) -> bool:
+	# World prompts (SGODOT-250): an open name strip, then an icon button; a tap on either is its facility's tap.
+	for markers in [_name_bars, _icons]:
+		for id in markers:
+			var m: Control = markers[id]
+			if m.is_visible_in_tree() and m.hit_rect().has_point(global_pos):
+				if _modal == null:
+					tapped_card = str(id)
+					tapped.emit(_card_hits[id])
+					tapped_card = ""
+				return true
 	for id in _cards:
 		var c: UiTapCard = _cards[id]
 		if c.is_visible_in_tree() and c.hit_rect().has_point(global_pos):
@@ -862,7 +978,7 @@ func close_top_layer() -> bool:
 	if _bar != null and (_bar.is_dragging() or _bar.is_lifted()):   # lifted and not moved yet counts too (刘邦 on #38)
 		_bar.cancel_drag()
 		return true
-	if _radial.visible:
+	if _radial.is_open():
 		_radial.close()
 		return true
 	if _modal != null:
@@ -890,7 +1006,7 @@ func end_stick() -> void:
 	if pad != null: (pad as _TouchPad).end_stick()
 	joystick.emit(Vector2.ZERO)
 
-func has_modal() -> bool: return _modal != null or (_radial != null and _radial.visible)
+func has_modal() -> bool: return _modal != null or (_radial != null and _radial.is_open())
 
 func close_modal() -> void:
 	_drop_modal()
@@ -1077,7 +1193,9 @@ func _bag_lift(it: Dictionary, at: Vector2) -> void:
 	_modal.add_child(zone)
 	zone.center = GestureArbiter.drop_zone_centers(_bar.get_global_rect(), true)[0]
 	zone.appear()
-	if _bag: _bag.grid.modulate.a = UiTokens.OPACITY_PENDING   # the grid dims and takes no drop (不知火舞 on 225)
+	if _bag:
+		_bag.grid.modulate.a = UiTokens.OPACITY_PENDING   # the grid dims and takes no drop (不知火舞 on 225)
+		_bag.grid.lifted_id = id                          # its own cell turns into a dashed gap (BAR-DRAG-9)
 	if _bar.haptics and OS.has_feature("mobile"): Input.vibrate_handheld(20)
 	_bag_drag = {id = id, ghost = ghost, zone = zone}
 	_bag_drag_to(at)
@@ -1107,7 +1225,9 @@ func _bag_drag_end() -> void:
 	if _bag_drag.is_empty(): return
 	if is_instance_valid(_bag_drag.ghost): (_bag_drag.ghost as Node).queue_free()
 	if is_instance_valid(_bag_drag.zone): (_bag_drag.zone as UiBarDropZone).vanish()
-	if _bag and is_instance_valid(_bag): _bag.grid.modulate.a = 1.0
+	if _bag and is_instance_valid(_bag):
+		_bag.grid.modulate.a = 1.0
+		_bag.grid.lifted_id = ""
 	_bar.set_drop_target(-1)
 	_bag_drag = {}
 
@@ -1572,7 +1692,7 @@ func _tile(icon_id: String, text: String, note: String, cb := Callable()) -> Con
 ## §10.2.3: the switch key fans the four actions out from the character (ActionRadial, LOCK-04); what this
 ## spot can't do is greyed with the reason. P0 preselects by where you stand (plots → Farming, water → Fishing).
 func open_radial() -> void:
-	if _radial.visible:
+	if _radial.is_open():
 		_radial.close()
 		return
 	if _modal != null:
@@ -1585,7 +1705,7 @@ func open_radial() -> void:
 		options.append({id = it[0], name = it[2], icon = P0Logic.icon(it[1]), available = it[0] == bar_mode, reason = it[3]})
 	_radial.options = options
 	_radial.selected = bar_mode
-	_radial.open_at(player_screen - _kit.global_position)
+	_radial.open()   # around the screen centre (247, LOCK-03 v2)
 
 ## Today panel (§14.5, LOCK-06): at most three rows right under the HUD chips; Show only moves the camera.
 ## rows: Today's own (P0Logic.today_rows) unless given, e.g. P0Guide.free_now after the Energy card's Free to do now.
@@ -1618,6 +1738,9 @@ static func show_label(go: String, here: String, camera_here: bool) -> String:
 	# The homestead is one space: on the farm or in the farmhouse a farm target is Show (the runtime steps out of the
 	# farmhouse first); anywhere else it is Show on map (亚瑟 on #37: the farmhouse used to send it to the map).
 	if go in HOME_TARGETS and here in ["home", "farm"]: return "Show" if camera_here else ""
+	# On the map every target is a pin: Show flies there (p0_map.p0_show_spot); Browse the map has nothing to do
+	# (蒙恬 on #44: Show on map used to close Today and do nothing there).
+	if here == "map": return "" if go == "map" else "Show"
 	return "Show on map"
 
 ## Where the player is for Show and the bag: the runtime's space; without one (tests, the gallery) the surface says
