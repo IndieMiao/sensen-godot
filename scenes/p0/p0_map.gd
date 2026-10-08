@@ -73,6 +73,7 @@ func _install_city_map() -> void:
 		city_map.bottom_inset = UiTokens.SIZE_QUICK_BAR_BOTTOM + UiTokens.SIZE_QUICK_BAR_H
 		city_map.pond_action = "Go"
 		city_map.destination_style = _destination_style
+		city_map.host_card = _own_card
 		_style_locate(city_map.recenter)
 	if city_map and not city_map.bundled_ponds:
 		city_map.preload_ponds(SystemPonds.data().locations.filter(func(e): return str(e.region_id) == P0_REGION))
@@ -106,7 +107,10 @@ func _pond_info(entry: Dictionary) -> Dictionary:
 ## "Reed Pond · Beginner pond · 0.8 km" (q(48)); outposts keep their "· N online" tag.
 func _pin_tag(entry: Dictionary) -> String:
 	if str(entry.get("kind", "")) != "pond": return ""
-	return str(_pond_info(entry).get("tag", ""))
+	var tag := str(_pond_info(entry).get("tag", ""))
+	# The pond the player is at says no distance, as its card shows no Distance there (q(80)).
+	if is_here("pond", str(entry.get("id", ""))) and tag.contains(" · "): tag = tag.substr(0, tag.rfind(" · "))
+	return tag
 
 func _on_entry_selected(entry: Dictionary) -> void:
 	if rt == null: return
@@ -225,8 +229,16 @@ const HOME_PIN := "home"
 ## The outposts' MapDestination icons by role (不知火舞 on 234): tea pot, tackle rod, market board, post travel.
 const PIN_ICONS := {"tea": "pot", "tackle": "rod", "market": "board", "post": "travel"}
 ## Away from home the avatar stands left of the pin of the place it is at, level with its disc (Figma 1802:118849).
-const AVATAR_BESIDE := Vector2(-36, 0)
+const AVATAR_BESIDE := Vector2(-44, 0)
 var _here_sig := ""
+
+## Ponds P0 knows, outposts and the homestead open P0PlaceSheet, not the city view's info panel; landmarks and POIs
+## keep that name card.
+func _own_card(entry: Dictionary) -> bool:
+	match str(entry.get("kind", "")):
+		"pond": return not _pond_info(entry).is_empty()
+		"place": return not place_card(entry).is_empty()
+	return false
 
 ## MapDestination 1795:103793 (LOCK-24): outposts by role, ponds, and the homestead's pin with its name on a plate.
 ## Landmarks and POIs keep the city view's own pins.
@@ -644,6 +656,11 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"online":   # online:sh_tea_1:3 — the presence count an outpost pin says, for shots
 			_online[step[1]] = int(step[2])
 			_set_outpost_places()
+		"pin":   # pin:home / pin:sh_tea_1 — a tap on that pin (its card), the Homestead pin only while away
+			var hit: Array = city_map.entries.filter(func(e): return str(e.get("id", "")) == step[1]) if city_map else []
+			if not hit.is_empty(): city_map.select(hit[0])
+		"tapself": _own_pin_pressed()   # a tap on the player's own avatar: the card of where the player is
+		"recenter": _city_action("recenter")   # the MapLocateButton: back to the player, the zoom kept
 		"center":   # center:31.228:121.478 (the city overview) — where the camera looks, for shots
 			center_lat = float(step[1])
 			center_lng = float(step[2])

@@ -76,6 +76,7 @@ func test_place_cards_follow_q80() -> void:
 	var home: Array = city.entries.filter(func(e): return str(e.get("id", "")) == "home")
 	assert_int(home.size()).is_equal(1)
 	city.select(home[0])
+	assert_bool(city.info.visible).is_false()   # the sheet is the card: no city info panel under it
 	assert_str(_primary(rt)).is_equal("Go home · Free")
 	assert_array(_facts(rt)).is_equal(["Distance"])
 	await _close(rt)
@@ -117,6 +118,10 @@ func test_the_avatar_stands_where_the_player_is() -> void:
 	m._city_action("recenter")
 	assert_float(m.center_lat).is_equal_approx(float(tea.lat), 1e-6)
 	assert_float(m.center_lng).is_equal_approx(float(tea.lng), 1e-6)
+	rt.here = {"space": "pond", "place": "pond_shanghai_05"}
+	m._sync_here()
+	var reed := SystemPonds.location("pond_shanghai_05").merged({"kind": "pond"})
+	assert_str(m._pin_tag(reed)).is_equal("Beginner pond")   # no distance at the pond the player is at (q(80))
 	rt.here = {"space": "mine", "place": ""}   # the mine is the homestead
 	m._sync_here()
 	assert_that(fm.anchor_of("self")).is_equal(fm.points.self.center)

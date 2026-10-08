@@ -351,3 +351,39 @@ func test_destination_pins_wear_their_icons() -> void:
 	assert_bool(bool(home.plate)).is_true()
 	assert_dict(m._destination_style({"kind": "landmark", "id": "x"})).is_empty()
 	assert_dict(m._destination_style({"kind": "poi", "id": "x"})).is_empty()
+
+## Figma 1802:118612: a selected MapDestination keeps its size (no jelly); Today's Show pulse scales only its disc.
+func test_a_selected_destination_keeps_its_size_and_a_pulse_scales_its_disc() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	_look(m, Vector2(m.home_lat, m.home_lng), 14.0, 0.0)
+	var city: CityMapView = m.city_map
+	var tea: Dictionary = city.markers["sh_tea_1"]
+	if tea.get("pop_tween") is Tween: (tea.pop_tween as Tween).kill()
+	tea.pop = 1.0   # settled in (it may still be popping in)
+	tea.focus = CityMapView.FOCUS_SCALE
+	city.selected = tea.entry
+	city._apply_marker_scale(tea)
+	assert_float((tea.node as Control).scale.x).is_equal_approx(1.0, 1e-6)
+	assert_float((tea.dest as UiMapDestination).focus).is_equal_approx(1.0, 1e-6)
+	city.selected = {}
+	tea.focus = 1.18
+	city._apply_marker_scale(tea)
+	assert_float((tea.dest as UiMapDestination).focus).is_equal_approx(1.18, 1e-6)
+	assert_float((tea.node as Control).scale.x).is_equal_approx(1.0, 1e-6)   # the name keeps its size
+	tea.focus = 1.0
+	city._apply_marker_scale(tea)
+
+## A selected pin's name stays over its neighbours' discs, pins packed after it was selected included.
+func test_the_selected_pin_draws_over_pins_made_after_it() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var city: CityMapView = m.city_map
+	city.selected = city.entries.filter(func(e): return str(e.get("id", "")) == "sh_market_1")[0]
+	_look(m, Vector2(m.home_lat, m.home_lng), 15.5, 0.0)   # closer: more pins come in, after the selection
+	var top := 0
+	for mk in city.markers.values(): top = maxi(top, (mk.node as Node).get_index())
+	assert_int((city.markers["sh_market_1"].node as Node).get_index()).is_equal(top)
+	city.selected = {}
