@@ -1979,7 +1979,7 @@ td { font-variant-numeric: tabular-nums; }
 <td>q(71)</td>
 <td>Cooking Lv5 Queue ×2 的客户端入口与文案（2026-10-08，int6 C33 失败：服务端已支持、客户端没入口；不知火舞 SGODOT-226 662b98af 与李白对齐、采纳哪吒的入口方式，哪吒实现、后裔审）</td>
 <td>方案只写了规则与顶栏 <code>Queued 1</code>，没写怎么排、按钮写什么、下一锅怎么显示、轮转时说什么；§7.2.2 第 2 步写灶在烧时不能再投料</td>
-<td><strong>入口</strong>：灶在烧时点灶台仍是看锅；Lv5 起、队列空时，看锅的底部计时卡多一个次按钮 <code>Queue next ›</code>，点了才开抽屉（顶栏 <code>Stove 1/1 · Cooking Lv5 · Cooking 0:42</code>），主按钮写 <code>Queue</code>，按下当场扣料、排进队列、回到看锅；Lv1–4 与队列已满时不出这个按钮、不放灰按钮。<strong>排队中</strong>：顶栏追加 <code>Queued 1</code>；锅旁一枚小菜图标；世界灶台图标钮挂 Count <code>+1</code>。<strong>轮转</strong>：人在厨房时 toast <code>Grilled Crucian kept · Herb Grilled Fish cooking</code>，不弹出锅卡，第二锅火候环照常；柜和包都满时第二锅不开火、前一锅留在灶上（q(46)）。P0 不做取消排队（每锅 5–30 秒）。P0 演示能走到：目标玩家约第 6.7 天到 Cooking Lv5（V2）；排期在 int7 之后</td>
+<td><strong>入口</strong>：灶在烧时点灶台仍是看锅；Lv5 起、队列空时，看锅的底部计时卡多一个次按钮 <code>Queue next ›</code>，点了才开抽屉（顶栏 <code>Stove 1/1 · Cooking Lv5 · Cooking 0:42</code>），主按钮写 <code>Queue</code>，按下当场扣料、排进队列、回到看锅；Lv1–4 与队列已满时不出这个按钮、不放灰按钮。<strong>排队中</strong>：看锅计时卡写 <code>Cooking · Queued 1</code>（抽屉已收起；q(71) 补充）；锅旁一枚小菜图标；世界灶台图标钮挂 Count <code>+1</code>。<strong>轮转</strong>：人在厨房时 toast <code>Grilled Crucian kept · Herb Grilled Fish cooking</code>，不弹出锅卡，第二锅火候环照常；柜和包都满时第二锅不开火、前一锅留在灶上（q(46)）。P0 不做取消排队（每锅 5–30 秒）。P0 演示能走到：目标玩家约第 6.7 天到 Cooking Lv5（V2）；排期在 int7 之后</td>
 <td>第 7 章 7.2.2、7.2.3；附录 B.7</td>
 </tr>
 </tbody>
@@ -10732,7 +10732,7 @@ td { font-variant-numeric: tabular-nums; }
 </tr>
 <tr>
 <td>排队与批量</td>
-<td>Cooking Lv5 <code>queue_two</code> Queue ×2：每口灶可排第二锅（<strong>入口</strong>：灶在烧时点灶台仍是看锅；Lv5 起、队列空时，底部计时卡多一个次按钮 <code>Queue next ›</code>，点了才打开烹饪抽屉，顶栏 <code>Stove 1/1 · Cooking Lv5 · Cooking 0:42</code>，Cookbook 详情卡与 Experiment 底部的主按钮写 <code>Queue</code>，按下当场扣料、排进队列，抽屉收起回到看锅；Lv1–4 和队列已满时不出这个按钮，也不放灰按钮。<strong>排队中</strong>：顶栏追加 <code>Queued 1</code>，舞台锅旁一枚小菜图标表示下一锅，世界里灶台图标钮挂 Count 签 <code>+1</code>；P0 不做取消排队，q(71)）：前一锅到点时自动走 Keep 链（保温柜 → 背包），第二锅随即开火、火候照常；柜和背包都满时第二锅不开火、前一锅留在灶上待领——一口灶同时最多一份菜；人不在厨房时不出 Toast（q(46)）；人在厨房时前一锅按 Keep 链放好出一条 toast <code>Grilled Crucian kept · Herb Grilled Fish cooking</code>，不弹出锅卡，第二锅的火候环照常（q(71)）；Cooking Lv8 <code>cook_all</code> Cook All：Cookbook 页一键把料够的已知菜按稀有度高 → 低（Rare → Fine → Common）排满所有空闲灶与队列；<strong>不含 Legendary</strong>（Legendary 只能单页 <code>Cook</code>，不替玩家用掉传说鱼与旅行带回的地区作物），<strong>同一页最多排 2 锅</strong>（同页当天第 3 锅起 XP 0、第 3 份进食回复 0）（2026-10-07 q(4)）；两者都不省原料、不省火候、不改 XP 规则</td>
+<td>Cooking Lv5 <code>queue_two</code> Queue ×2：每口灶可排第二锅（<strong>入口</strong>：灶在烧时点灶台仍是看锅；Lv5 起、队列空时，底部计时卡多一个次按钮 <code>Queue next ›</code>，点了才打开烹饪抽屉，顶栏 <code>Stove 1/1 · Cooking Lv5 · Cooking 0:42</code>，Cookbook 详情卡与 Experiment 底部的主按钮写 <code>Queue</code>，按下当场扣料、排进队列，抽屉收起回到看锅；Lv1–4 和队列已满时不出这个按钮，也不放灰按钮。<strong>排队中</strong>：抽屉已收起，看锅的计时卡写 <code>Cooking · Queued 1</code>（安其拉 COOK-QUEUE-1c），舞台锅旁一枚小菜图标表示下一锅，世界里灶台图标钮挂 Count 签 <code>+1</code>；P0 不做取消排队，q(71)）：前一锅到点时自动走 Keep 链（保温柜 → 背包），第二锅随即开火、火候照常；柜和背包都满时第二锅不开火、前一锅留在灶上待领——一口灶同时最多一份菜；人不在厨房时不出 Toast（q(46)）；人在厨房时前一锅按 Keep 链放好出一条 toast <code>Grilled Crucian kept · Herb Grilled Fish cooking</code>，不弹出锅卡，第二锅的火候环照常（q(71)）；Cooking Lv8 <code>cook_all</code> Cook All：Cookbook 页一键把料够的已知菜按稀有度高 → 低（Rare → Fine → Common）排满所有空闲灶与队列；<strong>不含 Legendary</strong>（Legendary 只能单页 <code>Cook</code>，不替玩家用掉传说鱼与旅行带回的地区作物），<strong>同一页最多排 2 锅</strong>（同页当天第 3 锅起 XP 0、第 3 份进食回复 0）（2026-10-07 q(4)）；两者都不省原料、不省火候、不改 XP 规则</td>
 </tr>
 <tr>
 <td>取消</td>
@@ -10929,7 +10929,7 @@ td { font-variant-numeric: tabular-nums; }
 </tr>
 <tr>
 <td>抽屉（下 60%）</td>
-<td>顶栏 <code>Stove 1/1 · Cooking Lv3 · Empty</code> + ✕：当前灶口序号 / 总数 · <strong>Cooking 等级</strong>（点它直达技能页第三张卡；升级当刻闪一次）· 状态（<code>Empty</code> / <code>Cooking 12 s</code> / <code>Ready</code> / Lv5 起 <code>Queued 1</code>），顺序与 §16.1.4、COOK-2a 一致（q(31)）；两 Tab <code>Cookbook 12/48</code> / <code>Experiment</code>；点空白处或 ✕ 关闭；开火后自动收起</td>
+<td>顶栏 <code>Stove 1/1 · Cooking Lv3 · Empty</code> + ✕：当前灶口序号 / 总数 · <strong>Cooking 等级</strong>（点它直达技能页第三张卡；升级当刻闪一次）· 状态（<code>Empty</code> / <code>Cooking 12 s</code> / <code>Ready</code>；Lv5 起排队后抽屉收起，<code>Queued 1</code> 写在看锅计时卡上：<code>Cooking · Queued 1</code>，q(71)），顺序与 §16.1.4、COOK-2a 一致（q(31)）；两 Tab <code>Cookbook 12/48</code> / <code>Experiment</code>；点空白处或 ✕ 关闭；开火后自动收起</td>
 <td>多灶时左右滑或点序号切换灶口；Homestead Lv6 起右侧一个 <code>Double</code> 开关（大锅，§7.2.3）；点灶台打开落在那口灶；这是玩家最常看见 Cooking 等级的地方（头像环维持 Farming / Fishing 双色）</td>
 </tr>
 <tr>
@@ -11890,7 +11890,7 @@ td { font-variant-numeric: tabular-nums; }
 <tr>
 <td>5</td>
 <td>400</td>
-<td>金区 +5；每口灶可排第二锅（顶栏 <code>Queued 1</code>）</td>
+<td>金区 +5；每口灶可排第二锅（看锅计时卡 <code>Cooking · Queued 1</code>，q(71)）</td>
 <td><code>steady_hand_1</code>、<code>queue_two</code></td>
 </tr>
 <tr>
@@ -38524,7 +38524,7 @@ td { font-variant-numeric: tabular-nums; }
 <tbody>
 <tr>
 <td>厨房</td>
-<td>Kitchen / Stove 1/1 · Empty / Stove 1/1 · Cooking Lv1 · Empty / Stove 1/3 · Cooking Lv2 · Empty / Stove 2/3 · Cooking Lv2 · Cooking 12 s / Stove 2/3 · Ready / Queued 1 / All stoves busy</td>
+<td>Kitchen / Stove 1/1 · Empty / Stove 1/1 · Cooking Lv1 · Empty / Stove 1/3 · Cooking Lv2 · Empty / Stove 2/3 · Cooking Lv2 · Cooking 12 s / Stove 2/3 · Ready / Cooking · Queued 1（看锅计时卡，q(71)）/ All stoves busy</td>
 <td>点灶台打开面板（主行动键不显示设施动词）；<code>Stove 1/1 · Empty</code> 是灶口名字条（q(62)）；面板顶栏常驻 Cooking 等级，1 秒节拍倒计时；厨房无快捷栏</td>
 </tr>
 <tr>
