@@ -39,7 +39,7 @@ extends RefCounted
 
 const CONTEXTS: Array[StringName] = [&"bag", &"gear", &"counter_buy", &"counter_sell", &"gift", &"storage"]
 const RULES_PATH := "res://modules/p0/item_info_rules.json"
-const KINDS := ["seed", "crop", "fish", "dish", "bait", "rod", "pick"]
+const KINDS := ["seed", "crop", "fish", "dish", "bait", "rod", "pick", "tool"]
 const SEP := " · "
 const _MYSTERY := "dish_mystery"
 const _TAKE_SOME := 10   # F-07 storage: Take 10 + Take all
@@ -80,6 +80,8 @@ static func spec(view: Dictionary, item_id: String, context: StringName, opts :=
 	var f := flags(view, item_id, context, opts)
 	var t := tokens(view, item_id, context, opts)
 	var rule: Dictionary = rules().get("%s/%s" % [kind, context], rules().get("any/%s" % context, {}))
+	# The generic buy row (postcards, Bag Upgrade I) only stands for goods this counter actually sells.
+	if context == &"counter_buy" and not rules().has("%s/%s" % [kind, context]) and _offer(view, item_id, opts).is_empty(): rule = {}
 	var badge: StringName = &"locked" if f.locked else (&"pinned" if f.pinned else &"")
 	var out := {
 		card = not rule.is_empty(),
@@ -251,6 +253,7 @@ static func flags(view: Dictionary, item_id: String, context: StringName, opts :
 		can_afford = int(view.get("coins", 0)) >= (wallet if qty == 1 else wallet + int(offer.get("price", 0)) * (qty - 1)),
 		take_some = _stored(view, item_id) > _TAKE_SOME,
 		owned = bool(rod.get("owned", offer.get("owned", false))),
+		materials_ok = (offer.get("materials", []) as Array).all(func(m): return int(m.get("have", 0)) >= int(m.get("need", 0))),
 		equipped = bool(rod.get("equipped", false)),
 		has_friends = int(view.get("social", {}).get("mutual", 0)) > 0,
 		has_target = not target.is_empty() and target.has("kind"),
@@ -296,7 +299,7 @@ static func tokens(view: Dictionary, item_id: String, context: StringName, opts 
 		xp_hint = "",
 		# A buy row's line 2 (FARM-6 482:46): what the item does, in a few words.
 		use = {"seed": ("Ready in " + hours(float(crop.grow_h))) if crop.has("grow_h") else "", "bait": "Bites come faster",
-			"fert": "Grows faster"}.get(kind, ""),
+			"fert": "Grows faster"}.get(kind, _offer_use(view, offer)),
 		region_line = "",
 		pin_verb = "Unpin" if opts.get("pinned", false) else "Pin",
 		dex = _dex(view),
@@ -317,6 +320,11 @@ static func tokens(view: Dictionary, item_id: String, context: StringName, opts 
 		rod_effect = _rod_effect(view, rod),
 		rod_gate = "" if rod.get("owned", false) or rod.is_empty() else "Fishing Lv%d · Tackle Shop" % int(rod.get("level", 1)),
 		owned_line = "In Gear" if rod.get("owned", false) else "",
+		# Row Hoe (market, LOCK-15 / 李白 q(46)): what it does, from view.gear.hoes.
+		tool_effect = ("Sows %d plots at once" % int(rod.sow)) if rod.has("sow") else "",
+		# A buy row's line 3 for goods made from materials (Bag Upgrade I): "Reeds 4/10 · Timber 6/6", else the stock.
+		need_line = SEP.join(PackedStringArray((offer.get("materials", []) as Array).map(func(m): return "%s %d/%d" % [str(m.get("name", "")), int(m.get("have", 0)), int(m.get("need", 0))]))) if not (offer.get("materials", []) as Array).is_empty() else _stock_line(offer, count),
+		materials_short = _materials_short(offer),
 		# LOCK-29: "1 Stone per rock"; where a pickaxe comes from while it isn't owned (Copper Pickaxe: Workbench).
 		pick_effect = ("%d Stone per rock" % int(rod.stone)) if rod.has("stone") else "",
 		pick_source = str({"start": "Starter", "workbench": "Workbench"}.get(str(rod.get("source", "")), "")) if not rod.get("owned", false) else "",
@@ -337,9 +345,9 @@ static func _dex(view: Dictionary) -> String:
 	if dex.is_empty(): return ""
 	return "%d/%d" % [dex.filter(func(d): return int(d.get("caught", 0)) > 0).size(), dex.size()]
 
-## A tool's Gear row: view.gear.rods / view.gear.picks ({id, name, owned, equipped, ...}).
+## A tool's Gear row: view.gear.rods / picks / hoes ({id, name, owned, equipped, ...}).
 static func _rod(view: Dictionary, item_id: String) -> Dictionary:
-	for list in ["rods", "picks"]:
+	for list in ["rods", "picks", "hoes"]:
 		for r in view.get("gear", {}).get(list, []):
 			if str(r.get("id", "")) == item_id: return r
 	return {}
@@ -352,6 +360,24 @@ static func _rod_effect(view: Dictionary, rod: Dictionary) -> String:
 	var window := int(P0Logic.content().get("fishing", {}).get("hook_window_ms", 0))
 	if window > 0: line += SEP + "Bite window %.1f s" % (float(window + int(rod.get("hook_bonus_ms", 0))) / 1000.0)
 	return line
+
+## Line 2 of a buy row for goods that aren't seeds / bait / fertilizer: where they go (view.shops[role].buy `to`).
+static func _offer_use(view: Dictionary, offer: Dictionary) -> String:
+	match str(offer.get("to", "")):
+		"storage": return "Goes to Farm Storage"
+		"bag_cap":
+			for up in P0Logic.content().get("bag_upgrades", []):
+				if str(up.get("id", "")) != str(offer.get("id", "")): continue
+				var more := int(up.get("capacity", 0)) - int(view.get("bag", {}).get("capacity", 25))
+				return ("+%d bag slots" % more) if more > 0 else ""
+	return ""
+
+## "10 Reeds" — the first material still short for a buy row, "" when all are in.
+static func _materials_short(offer: Dictionary) -> String:
+	for m in offer.get("materials", []):
+		var short := int(m.get("need", 0)) - int(m.get("have", 0))
+		if short > 0: return "%d %s" % [short, str(m.get("name", ""))]
+	return ""
 
 static func _sell_all_label(count: int, sellable: int, each: int) -> String:
 	if each < 0 or sellable <= 0: return ""
