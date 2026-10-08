@@ -38,6 +38,8 @@ var city := "Shanghai"
 var place_name := ""
 ## Finger card over the door; per space (farmhouse "Door · Back to farm", market "Exit · Back to map").
 var exit_text := "Door · Back to map"
+## Where the door leads, for the world prompts (SGODOT-250: i-door + "Map" / "Farm"); "" keeps the old door card.
+var exit_to := ""
 ## Level the modules show for (module visibility: module_levels[module] <= level).
 var level := 1
 var module_levels := {}
@@ -142,7 +144,8 @@ func _on_facility(_name: String) -> void: pass
 ## key ("available", "countdown", "ready", … = UiStatusBadge.State in lower case). Empty = nothing; the
 ## door's card comes from exit_text.
 func _marker(name: String, _view: Dictionary) -> Dictionary:
-	return {text = exit_text} if name == "exit" else {}
+	if name != "exit": return {}
+	return {kind = "facility", icon = P0Logic.icon("door"), name = exit_to} if exit_to != "" else {text = exit_text}
 
 func _module_visible(module: String) -> bool:
 	return level >= int(module_levels.get(module, 0))
@@ -474,11 +477,18 @@ func _door_check() -> void:
 func card_pick(marks: Dictionary) -> String:
 	var cands: Array = []
 	for n in marks:
-		if (marks[n] as Dictionary).has("text") and anchor(n): cands.append([n, anchor(n).global_position, CARD_NEAR_M])
+		var m: Dictionary = marks[n]
+		if (m.has("text") or m.has("kind")) and anchor(n): cands.append([n, anchor(n).global_position, CARD_NEAR_M])
 	_card = P0Garden.pick_card(cands, actor.position, _card)
 	return _card
 
 ## Finger cards and status badges over tappable anchors (221's rt.ui.tag / rt.ui.badge when present).
+## A marker with `kind` uses the world prompts instead of a finger card (SGODOT-250, LOCK-07 / 16 / 30 v2), with the
+## one in reach (`_card`) the only one opened:
+##   "npc"      {name, head}: the name over the head (NpcNameTag), highlighted while it is the one in reach or `talking`;
+##   "seat"     {icon}: an icon button that goes Near, never a strip;
+##   "facility" {icon, name, fact?}: an icon button that opens into a name strip.
+## `badge` on a seat or facility rides in the button / strip (StatusBadge World 28); an NPC's stays a badge.
 func _markers(v: Dictionary) -> void:
 	var now := {}
 	var marks := {}
@@ -489,20 +499,36 @@ func _markers(v: Dictionary) -> void:
 	for n in marks:
 		var m: Dictionary = marks[n]
 		var id: String = "room:" + n
-		now[id] = true
 		var at := anchor(n).global_position + _hit_lift(n) * 1.1
 		var badge_at := anchor("badge_" + P0RoomAnchors.object_of(n))
 		var screen := cam.unproject_position(badge_at.global_position if badge_at else at)
 		var lift := 0.0
 		var state := badge_state(str(m.get("badge", "")))
+		var kind := str(m.get("kind", ""))
+		now[id] = kind
+		if kind == "seat":
+			rt.ui.world_icon(id, m.icon, screen, true, n == _card, state)
+			continue
+		if kind == "facility":
+			if n == _card: rt.ui.name_bar(id, m.icon, str(m.name), str(m.get("fact", "")), screen, true, -1, false, state)
+			else: rt.ui.world_icon(id, m.icon, screen, true, false, state)
+			continue
 		if state >= 0 and rt.ui.has_method("badge"):
 			rt.ui.call("badge", id, state, screen, true, str(m.get("caption", "")), m.get("icon", null))
 			if rt.ui.has_method("badge_height"): lift = float(rt.ui.call("badge_height", id))
-		if m.has("text"):
+		if kind == "npc":
+			rt.ui.npc_tag(id, str(m.name), cam.unproject_position(m.head), true, n == _card or bool(m.get("talking", false)))
+		elif m.has("text"):
 			rt.ui.tag(id, str(m.text), screen - Vector2(0, lift), n == _card)
 	for id in _shown.keys():
 		if now.has(id): continue
-		rt.ui.tag(id, "", Vector2.ZERO, false)
+		match str(_shown[id]):
+			"seat": rt.ui.world_icon(id, null, Vector2.ZERO, false)
+			"facility":
+				rt.ui.name_bar(id, null, "", "", Vector2.ZERO, false)
+				rt.ui.world_icon(id, null, Vector2.ZERO, false)
+			"npc": rt.ui.npc_tag(id, "", Vector2.ZERO, false)
+			_: rt.ui.tag(id, "", Vector2.ZERO, false)
 		if rt.ui.has_method("badge"): rt.ui.call("badge", id, 0, Vector2.ZERO, false)
 	_shown = now
 
