@@ -21,7 +21,6 @@ var _pending_tab := ""   # the drawer tab p0_open_kitchen walked to the stove fo
 func _init() -> void:
 	anchors_path = "res://assets/p0/rooms/farmhouse.anchors.json"
 	place_name = "Farmhouse"
-	exit_text = "Door · Back to farm"
 	exit_to = "Farm"   # the door's world prompt: i-door + Farm (SGODOT-250)
 	# The stove is its body and pot only; the shelf on the wall beside it and the cabinet under that are their own,
 	# and where they overlap the smaller takes the tap (int6 C8). The final farmhouse_lv1 art renames these nodes.
@@ -71,7 +70,7 @@ func _marker(n: String, v: Dictionary) -> Dictionary:
 
 func _on_facility(n: String) -> void:
 	if n == STOVE:
-		# Sent here with a tab (the rack's Open Experiment ›, the Energy card's Cook, ui.open_kitchen): open on it,
+		# Sent here with a tab (the rack's Open Experiment ›, the Energy card's Cook): open on it,
 		# not on Cookbook or Cook Again (PR #54 review). A plain tap on the stove has none.
 		var tab := _pending_tab
 		_pending_tab = ""

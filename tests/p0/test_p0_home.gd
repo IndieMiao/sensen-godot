@@ -274,16 +274,16 @@ func test_one_finger_card_the_nearest_in_reach_and_it_does_not_flicker() -> void
 	assert_str(P0Garden.pick_card(cands, Vector3(9.3, 0, -9.9), "sign")).is_equal("stall")   # clearly nearer: switch
 	assert_str(P0Garden.pick_card(cands, Vector3(20, 0, 0), "stall")).is_equal("")           # out of every reach
 
-func test_a_card_tap_names_its_card_while_the_world_handles_it() -> void:
-	# PR #21 review: the farmhouse card's point can sit under the sign's caption, so the world dispatches card taps by
-	# id (P0Ui.tapped_card), not by re-testing the point.
+func test_a_prompt_tap_names_its_facility_while_the_world_handles_it() -> void:
+	# PR #21 review: the farmhouse's point can sit under the sign's caption, so the world dispatches prompt taps by
+	# id (P0Ui.tapped_card), not by re-testing the point (then the finger card, now the world prompt, SGODOT-250).
 	var ui := _ui(_view())
 	await get_tree().process_frame
-	ui.tag("home", "Farmhouse · Tap to go in", Vector2(180, 300), true, Vector2(180, 330))
+	ui.world_icon("home", P0Logic.icon("home"), Vector2(180, 300), true, false, -1, Vector2(180, 330))
 	var seen := []
 	ui.tapped.connect(func(p): seen.append([ui.tapped_card, p]))
-	var c: UiTapCard = ui._cards["home"]
-	assert_bool(ui._tap_at(ui.root.global_position + Rect2(c.position, c.size).get_center(), false)).is_true()
+	var c: UiWorldIconButton = ui._icons["home"]
+	assert_bool(ui._tap_at(c.hit_rect().get_center(), false)).is_true()
 	assert_array(seen).is_equal([["home", Vector2(180, 330)]])
 	assert_str(ui.tapped_card).is_equal("")                       # only while the tap is handled
 	ui._tap_at(ui.root.global_position + Vector2(20, 700), false)  # a scene tap carries no card

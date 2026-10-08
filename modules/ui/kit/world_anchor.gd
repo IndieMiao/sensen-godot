@@ -58,7 +58,7 @@ func update_now() -> void:
 		var m: Control = placed[i].marker
 		m.visible = true
 		m.position = (solved[i] as Rect2).position - global_position
-		# Markers with a pointer (UiTapCard) keep it on the anchor after clamping or de-overlap moved them.
+		# Markers with a pointer (UiEntryCard) keep it on the anchor after clamping or de-overlap moved them.
 		if m.has_method(&"point_at"): m.point_at((placed[i].point as Vector2).x - (solved[i] as Rect2).position.x)
 
 func _covered(pos: Vector2) -> bool:

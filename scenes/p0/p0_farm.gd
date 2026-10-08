@@ -388,9 +388,6 @@ func p0_action(cmd: Dictionary) -> void:
 		_hold_until = Time.get_ticks_msec() + P0Actor.LABOUR_S * 1000.0
 	rt.session.send(cmd)
 
-func p0_home(choice: String) -> void:
-	if choice == "kitchen": enter_farmhouse()
-
 ## Into the farmhouse (its stove corner is the kitchen); the farm waits suspended underneath.
 func enter_farmhouse() -> void:
 	if AppRouter._navigation_pending or (AppRouter.top_instance() != null and AppRouter.top_instance() != self): return
@@ -592,7 +589,6 @@ func p0_dev(step: PackedStringArray) -> bool:
 			crops.sync(fake, now)
 			_plot_sig = "frozen"
 			_sync_t = 9999.0
-		"home": rt.ui.open_home_card()
 		"sign": p0_tap(cam.unproject_position(_sign + Vector3(0, 0.45, 0)))   # HOME-1 through the sign's own tap
 		"plaque": p0_tap(cam.unproject_position(_plaque + Vector3(0, 0.35, 0)))   # PLAQUE-READ
 		"mailbox": p0_tap(cam.unproject_position(_mailbox + MAILBOX_HIT))   # the Inbox through the Mailbox's own tap (234 C)

@@ -44,7 +44,6 @@ func setup(args: Dictionary) -> void:
 	anchors_path = str(outpost.get("anchors", ""))
 	use_art(str(outpost.get("art", "")))   # the outpost's room kit; the anchors file is written for that kit
 	backdrop = outpost.get("backdrop", {})   # screen colours sampled from the kit's signed render
-	if role == "market": exit_text = "Exit · Back to map"
 	exit_to = "Map"   # the door's world prompt: i-door + Map (SGODOT-250)
 
 func _room_ready() -> void:
