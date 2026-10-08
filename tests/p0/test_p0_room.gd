@@ -221,6 +221,9 @@ func test_the_room_has_one_hearth_lamp_ahead_of_the_art() -> void:
 	assert_int(lamps.size()).is_equal(1)
 	assert_int(lamps[0].get_index()).is_less(r.art.get_index())
 	assert_object(r.room.get_node_or_null("HearthGlow")).is_not_null()
+	# …and the fire drives that very lamp (its light_path is relative to the fire node, Hou Yi's review on #32).
+	var fire: Node = r.art.get("fire")
+	assert_object(fire.get_node_or_null(fire.get("light_path"))).is_same(r.room.get_node("HearthGlow"))
 
 func test_farmhouse_stove_card_and_badge_follow_the_server_stove() -> void:
 	var r := _farmhouse()
