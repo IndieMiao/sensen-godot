@@ -9,7 +9,7 @@
     {"name": "use_spice_rack", "position": [-2.76, 1.8, -1.575], "module": "spice_rack"},
     {"name": "stand_spice_rack", "position": [-1.95, 0.085, -1.45], "yaw_degrees": 90},
     {"name": "use_warming_cabinet", "position": [-2.565, 1.36, -1.69], "module": "warming_cabinet"},
-    {"name": "badge_warming_cabinet", "position": [-2.565, 1.65, -1.69], "module": "warming_cabinet"},
+    {"name": "badge_warming_cabinet", "position": [-2.565, 1.0, -1.69], "module": "warming_cabinet"},
     {"name": "stand_warming_cabinet", "position": [-1.95, 0.085, -1.45], "yaw_degrees": 90},
     {"name": "cam_kitchen_corner", "position": [-2.45, 1.0, -1.7]},
     {"name": "spawn", "position": [2.03, 0.085, -1.85], "yaw_degrees": 180},

@@ -70,7 +70,8 @@ static func rod_for(view: Dictionary, rarity: int) -> Dictionary:
 
 # ---------------------------------------------------------------- gate card (§4.8.7, q(49), SKILL-2 482:169)
 ## Fishing XP a cast brings at the pond recommended for a level (§4.4.2 grid, fails and break-frees included):
-## Pond to Lv3, River from Lv4 (the pond card's recommendation; P0 has no coast).
+## Pond to Lv3, River from Lv4 (the pond card's recommendation; P0 has no coast). Copied from the plan, not read from
+## content: it only sizes the gate card's "about N casts" hint — move it into content when the fishing table changes.
 const CAST_XP := [2.7, 3.8, 4.9, 5.1, 6.7, 6.7, 5.2, 3.8, 3.2, 2.1]
 const GATE_SKILL_ICONS := {"farming": "hoe", "fishing": "rod", "cooking": "pot"}
 ## Crop names that read the same in the plural ("harvest 30 corn").
@@ -577,12 +578,13 @@ static func hud_state(view: Dictionary, ctx: Dictionary = {}) -> Dictionary:
 	if have > mx: regen = "Bonus +%d" % (have - mx)
 	elif nx != null: regen = "+1 in " + duration(float(nx))
 	var sk: Dictionary = view.get("skills", {})
-	var lines := today_lines(view)
+	var rows := today_rows(view)
 	var out := {
 		"energy": have, "energy_max": mx, "regen": regen, "next_cost": int(ctx.get("next_cost", 0)),
 		"skills": {"farming": skill_progress(sk.get("farming", {})), "fishing": skill_progress(sk.get("fishing", {}))},
 		"coins": int(view.get("coins", 0)), "unread": int(ctx.get("unread", (view.get("inbox", {}).get("parcels", []) as Array).size())), "buff": {},
-		"today": str(lines[0]) if not lines.is_empty() else "",
+		"today": today_chip_line(rows),
+		"today_key": today_chip_key(rows),
 	}
 	if ctx.has("place"): out["place"] = ctx.place
 	return out
@@ -925,6 +927,20 @@ static func next_line(view: Dictionary, skill: String, level: int) -> String:
 			if level == 4: return "Next: Lv4 · 3rd ingredient slot"
 	return "Next: Lv%d · more XP from every new page" % level if skill == "cooking" else "Next: Lv%d" % level
 
+## The Today chip names the row with the focus, the first still to do (q(58)): a ticked guide row (Deliver after the
+## Pond Catch is handed in) stays in the panel with its ✓ but no longer heads the chip. "" when nothing is left to do.
+static func today_chip_line(rows: Array) -> String:
+	for r in rows:
+		if str(r.get("state", "")) != "done": return str(r.line)
+	return ""
+
+## Which row the chip names, independent of its countdown text: the chip pulses when this changes (不知火舞 on 232),
+## not when "Radishes ready in 3h 48m" ticks to 3h 47m.
+static func today_chip_key(rows: Array) -> String:
+	for r in rows:
+		if str(r.get("state", "")) != "done": return "%s|%s" % [str(r.get("go", "")), str(r.get("icon", ""))]
+	return ""
+
 ## Today panel (§14.5): up to 3 lines — doable now first, then the shortest countdown, then the skill
 ## closest to its next level. Facts only; never "spend your Energy".
 static func today_lines(view: Dictionary) -> Array:
@@ -1187,7 +1203,8 @@ static func _rod_offer(view: Dictionary, id: String) -> Dictionary:
 	return {}
 
 # ---------------------------------------------------------------- rest bench (FARM-7, q(30) / q(41), SGODOT-224)
-## The bench's state from view.rest {used, limit, resets_in, amount, away_h, away_ready_in} and Energy (FARM-7-2 482:52):
+## The bench's state from view.rest {used, limit, resets_in, amount, away_h, away_ready_in} and Energy (FARM-7-2 482:52;
+## q(70): `wait` is the strip's fact while it can't be used yet, "in 1h 12m" or "after 2h away"):
 ## state "ready" / "away" (2 h away from home first, q(41)) / "used" / "full"; the badge (STATE-ICONS: Available,
 ## Countdown with the time left, Used today); the near card copy; the sheet's lines and its one button.
 ## Near-full Rest says the real gain (WP4-D10 ②: "Rest · +25 Energy"). away_ready_in null = never left home.
@@ -1211,11 +1228,14 @@ static func rest_state(view: Dictionary) -> Dictionary:
 			"fact": "Uses", "fact_value": "%d/%d" % [int(r.get("used", 0)), int(r.get("limit", 1))], "button": "", "can_rest": false,
 			"close": "Close", "note": "Available again at the next home-day reset."}, true)
 	elif away == null or float(away) > 0.0:
+		# q(41) / q(70): Rest opens 2 h after leaving the homestead. A new account that never left has no leave time
+		# (away_ready_in null): no countdown at all, just "after 2h away"; after the first leave the time to go.
 		var left := "" if away == null else duration(float(away))
-		out.merge({"state": "away", "badge": "countdown", "caption": left, "sheet_state": "Cooling down", "effect": "",
-			"fact": "Available in" if away != null else "Away from home", "fact_value": left if away != null else "%dh first" % int(r.get("away_h", 2)),
-			"reason": ("Ready in " + left) if away != null else "After %dh away" % int(r.get("away_h", 2)), "can_rest": false,
-			"close": "Close"}, true)
+		var back := "Rest · back after %dh away" % int(r.get("away_h", 2))
+		out.merge({"state": "away", "badge": "countdown", "caption": left, "effect": "",
+			"sheet_state": back if away == null else "%s · %s to go" % [back, left],
+			"wait": "after %dh away" % int(r.get("away_h", 2)) if away == null else "in " + left,
+			"reason": "Not yet", "can_rest": false, "close": "Close"}, true)
 	elif gain <= 0:
 		out.merge({"state": "full", "reason": "Energy full", "can_rest": false}, true)
 	return out

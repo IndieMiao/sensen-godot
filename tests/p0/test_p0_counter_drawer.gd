@@ -169,13 +169,13 @@ func test_the_market_drawer_is_as_tall_as_its_taller_page_and_keeps_it_across_ta
 	await d.fitted
 	assert_bool(d.is_short()).is_true()
 	var h := d.height
-	assert_float(h).is_less(P0CounterDrawer.HEIGHT_NO_BAG)   # no empty lower half
+	assert_float(h).is_less(P0CounterDrawer.HEIGHT)   # no bag half
 	assert_float(h).is_greater_equal(d.get_combined_minimum_size().y - 0.5)   # the Buy page fits
 	d.set_section("board")
 	await _settle()
 	assert_float(d.height).is_equal_approx(h, 0.5)   # no jump on the tab switch
 	assert_float(h).is_greater_equal(d.get_combined_minimum_size().y - 0.5)   # the board page fits too
-	assert_int(d.board.get_children().filter(func(c): return c.visible).size()).is_equal(2)
+	assert_int(d.board.get_children().filter(func(c): return c is UiBoardCard and c.visible).size()).is_equal(2)
 	ui.close_modal()
 	ui.open_counter("tackle", {"ctx": TACKLE_CTX})   # a counter with a bag half keeps the full height
 	assert_bool(ui._counter.is_short()).is_false()

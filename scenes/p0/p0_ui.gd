@@ -108,6 +108,7 @@ var near_resident := Callable()
 var space := ""
 var _hud_world := true   # set_surface: the map has no HUD
 var _hud_hash := 0       # last state given to hud.apply
+var _today_key = null    # the Today chip's focus row (P0Logic.today_chip_key); null before the first view
 var _hud_need := -1      # main action's Energy need last seen by the HUD
 var _pending := {}   # surface / place / mode set before the HUD exists (the runtime attaches early)
 var _dev_box: Control
@@ -317,7 +318,7 @@ func set_view(v: Dictionary) -> void:
 	if _counter != null and is_instance_valid(_counter) and modal_kind == "counter":
 		var was: String = _counter.section
 		_counter.refresh(v)
-		if was == "board" or _counter.is_short(): _fill_board(_counter)   # board cards follow Accept / Deliver
+		if was == "board" or _counter.is_short(): _fill_board(_counter)   # board rows follow Accept / Deliver (only on change)
 	if _profile != null and is_instance_valid(_profile) and modal_kind == "profile": _profile.update(v)
 	if workbench() != null: _workbench.refresh(v)
 	_refresh_hud()
@@ -338,6 +339,11 @@ func _refresh_hud() -> void:
 	if h == _hud_hash: return   # set_view runs every frame: apply only what changed (the countdown, once a second)
 	_hud_hash = h
 	hud.apply(state)
+	# A new next step pulses the chip once (不知火舞 on 232): only when the focus row changes, never on the first view
+	# or a countdown tick; nothing left to do ("All caught up") doesn't pulse.
+	var key := str(state.get("today_key", ""))
+	if _today_key != null and key != _today_key and key != "": hud.pulse_today()
+	_today_key = key
 
 ## Top system inset (status bar, notch) in UI units; 0 on desktop.
 func safe_top() -> float:
@@ -751,10 +757,10 @@ func tag(id: String, text: String, screen: Vector2, show: bool, hit := Vector2.I
 # ---------------------------------------------------------------- world prompts (SGODOT-250, LOCK-07 v2 / LOCK-16 v2)
 ## A facility within view and about 8 m: its icon button (WorldIconButton 1674:101157) centred on `screen` (this UI's
 ## coordinates, like tag()). `near` grows a seat 1.1× with a primary edge; `status` (a UiStatusBadge.State, -1 none)
-## turns the whole button into the StatusBadge. A tap on it is a tap on `hit` (default `screen`), with tapped_card =
-## id. Call it every frame for each shown facility that is not the open one; it folds that facility's name strip if
+## turns the whole button into the StatusBadge; `count` hangs its small count tag ("" none). A tap on it is a tap on
+## `hit` (default `screen`), with tapped_card = id. Call it every frame for each shown facility that is not the open one; it folds that facility's name strip if
 ## it was open. Hidden under a card or drawer, and outside the band between the HUD and the quick bar.
-func world_icon(id: String, icon: Texture2D, screen: Vector2, show: bool, near := false, status := -1, hit := Vector2.INF) -> void:
+func world_icon(id: String, icon: Texture2D, screen: Vector2, show: bool, near := false, status := -1, hit := Vector2.INF, count := "") -> void:
 	var b: UiWorldIconButton = _icons.get(id)
 	if b == null:
 		b = UiWorldIconButton.new()
@@ -770,7 +776,11 @@ func world_icon(id: String, icon: Texture2D, screen: Vector2, show: bool, near :
 	b.icon = icon
 	b.near = near
 	b.status = status
+	b.count = count
 	b.place_at(screen)
+	# Covered by another facility's open strip (it had no clear side, 不知火舞 on 226 C21: off screen first, then other
+	# buttons): this button fades while the strip is open and comes back once it folds, as covered name tags do (#57).
+	_yield_tag(b, _modal == null and _strip_over(Rect2(b.position, b.size).grow(-8.0)))   # its 28 disc
 
 ## The one facility nearest and within reach: its name strip (WorldNameBar 1674:101190) opens from the icon button's
 ## spot in 160 ms — icon + `text` + at most one `fact` ("" for none). `side` UiWorldNameBar.Dir (the way the
@@ -888,8 +898,8 @@ func npc_tag(id: String, text: String, head_screen: Vector2, show: bool, highlig
 	t.place_over(head_screen)
 	_yield_tag(t, _modal == null and _strip_covers(Rect2(t.position, t.size)))
 
-## Fade a name tag out while an open strip covers it, back in once it folds (120 ms).
-func _yield_tag(t: UiNpcNameTag, covered: bool) -> void:
+## Fade a name tag or an icon button out while an open strip covers it, back in once it folds (120 ms).
+func _yield_tag(t: Control, covered: bool) -> void:
 	if bool(t.get_meta("covered", false)) == covered: return
 	t.set_meta("covered", covered)
 	var tw := t.create_tween()
@@ -901,6 +911,11 @@ func _open_strips() -> Array[Rect2]:
 	for bar in _name_bars.values():
 		if (bar as UiWorldNameBar).visible and not bar.get_meta("folding", false): out.append((bar as UiWorldNameBar).full_rect())
 	return out
+
+## Whether an open strip lies over `r` itself, with no margin: an icon button only fades when it is really under one
+## (a button just above a strip stays, C21).
+func _strip_over(r: Rect2) -> bool:
+	return _open_strips().any(func(s: Rect2): return s.intersects(r))
 
 func _strip_covers(r: Rect2) -> bool:
 	return _open_strips().any(func(s: Rect2): return s.grow(UiTokens.SPACE_ROW).intersects(r))
@@ -1070,7 +1085,7 @@ func float_lines(parts: Array, at: Vector2) -> Array:
 			var live: Dictionary = _live_floats.get(k, {})
 			var node: UiFloatText = live.get("node") if not live.is_empty() and is_instance_valid(live.get("node")) else null
 			# Held: the line stays where it rose while the player walks on (§4.8.3); otherwise the same place, briefly.
-			var near := fab_held or (now - int(live.get("ms", 0)) < _FLOAT_MERGE_MS and (live.at as Vector2).distance_to(at) < _FLOAT_MERGE_PX)
+			var near := fab_held or (not live.is_empty() and now - int(live.get("ms", 0)) < _FLOAT_MERGE_MS and (live.at as Vector2).distance_to(at) < _FLOAT_MERGE_PX)
 			if node != null and not node.is_queued_for_deletion() and near:
 				for p in merged.values(): _float_add(live.parts, p)
 				(live.node as UiFloatText).bump(_float_line_text(live.parts))
@@ -1270,6 +1285,11 @@ func close_top_layer() -> bool:
 		_radial.close()
 		return true
 	if _modal != null:
+		# An InfoSheet laid over the open panel (UiInfoSheet.layered) goes first: one layer per press (§4.8.7, 刘邦 on #73).
+		var layers := _modal.find_children("InfoSheetLayer", "Control", true, false).filter(func(l): return not l.is_queued_for_deletion())
+		if not layers.is_empty():
+			((layers.back() as Control).find_children("*", "UiInfoSheet", true, false)[0] as UiInfoSheet).close()
+			return true
 		back_modal()
 		return true
 	return false
@@ -1625,21 +1645,29 @@ func open_kai_greeting() -> void:
 ## The drawer follows the view while open (set_view); its buttons come back here as commands with the shop.
 var _counter: P0CounterDrawer
 var _counter_ctx := {}   # role -> the last keeper ctx an outpost gave
+## STALL-NEW for the visit in progress: worked out when the stall opens from the world and kept while its board sheets
+## (BOARD-1 / BOARD-3 / BOARD-DROPPED) go back to it, so `◆ New for you` stays for the whole visit (亚瑟 on #77).
+var _stall_visit_new: Variant = null
+const _COUNTER_FLOW := ["counter", "board_request", "board_drop", "board_dropped"]
 
 func open_counter(role: String, opts := {}) -> void:
 	if opts.has("ctx"): _counter_ctx[role] = opts.ctx
 	var ctx: Dictionary = _counter_ctx.get(role, {}).duplicate()
-	# STALL-NEW-2 (E-04): this visit's rows say `◆ New for you` for what opened since the last one; then it is seen.
+	# STALL-NEW-2 (E-04): this visit's rows say `◆ New for you` for what opened since the last one; they are seen once
+	# the Buy shelf has been in front (a visit that only read the board leaves the stall's New for next time).
 	if role == "homestead":
-		ctx["new"] = stall_new_ids()
-		_mark_stall_seen()
+		if _stall_visit_new == null or not (modal_kind in _COUNTER_FLOW): _stall_visit_new = stall_new_ids()
+		ctx["new"] = _stall_visit_new
 	var d := P0CounterDrawer.new(view, role, ctx, str(opts.get("section", "buy")))
 	d.theme = UiKit.theme()
 	d.safe_bottom = safe_bottom()
 	d.close_requested.connect(close_modal)
 	d.action_requested.connect(func(a: StringName, id: String, p: Dictionary): _counter_action(role, a, id, p))
-	d.section_changed.connect(func(sec: String): if sec == "board": _fill_board(d))
+	d.section_changed.connect(func(sec: String):
+		if sec == "board": _fill_board(d)
+		if sec == "buy" and role == "homestead": _mark_stall_seen())
 	_open_modal(d, UiTokens.OPACITY_SCRIM_COUNTER, true)
+	if role == "homestead" and d.section == "buy": _mark_stall_seen()
 	if d.section == "specialty": _close_above(d, _CLOSE_ABOVE_SPECIALTY, P0CounterDrawer.SPECIALTY_PAD)   # MARKET-SPECIALTY
 	_counter = d
 	modal_kind = "counter"
@@ -1681,47 +1709,79 @@ func _counter_action(role: String, action: StringName, id: String, payload: Dict
 ## A counter's events (P0Runtime): the keeper says what just happened (TEA-DONE `Enjoy. Next cup's 50 coins.`,
 ## the rod strung after buying it); the drawer itself follows the view.
 func counter_events(events: Array) -> void:
-	if _counter == null or not is_instance_valid(_counter) or _counter.keeper_bar == null: return
+	if _counter == null or not is_instance_valid(_counter): return
+	var bar := _counter.keeper_bar   # none at the unattended Homestead Stall (p(6)): its board rows still turn Done
 	for ev in events:
 		match str(ev.get("kind", "")):
 			"drink":
+				if bar == null: continue
 				var price := int(view.get("drinks", {}).get("price", 0))
-				_counter.keeper_bar.line = ("Enjoy. Next cup's %d coins." % price) if int(ev.get("left", 0)) > 0 \
+				bar.line = ("Enjoy. Next cup's %d coins." % price) if int(ev.get("left", 0)) > 0 \
 					else str(P0Logic.keeper_lines(view, _counter.role, _counter.ctx).get("counter", ""))
 			"item":
-				if str(ev.get("id", "")).begins_with("rod_") and int(ev.get("delta", 0)) > 0:
-					_counter.keeper_bar.line = "Strung and ready — it's on your belt. Swap rods in Bag › Gear."
+				if bar != null and str(ev.get("id", "")).begins_with("rod_") and int(ev.get("delta", 0)) > 0:
+					bar.line = "Strung and ready — it's on your belt. Swap rods in Bag › Gear."
+			"request":
+				if str(ev.get("status", "")) == "done": _board_done(_counter, str(ev.get("id", "")), int(ev.get("coins", 0)))
 
-## The board page of a counter: the Stall Board (legacy view.stall.board) or the Market Board (view.boards.market).
+## A board request's own sheet (BOARD-1), from its row's title ›.
+func open_board_request(role: String, id: String) -> void:
+	P0BoardRequest.open(self, role, id)
+
+## The request BOARD-3 asked the server to drop: {role, id, title, noun, item} until its dropped event arrives.
+var pending_drop := {}
+
+## The server dropped a request: BOARD-DROPPED when it was the one confirmed here.
+func board_dropped(id: String) -> void:
+	if pending_drop.is_empty() or str(pending_drop.get("id", "")) != id: return
+	var gone := pending_drop
+	pending_drop = {}
+	P0BoardRequest.dropped(self, gone)
+
+## A request delivered from this drawer: its row stays, Done, until the drawer closes, and the coins float up from
+## where its button was (BOARD-DONE; 不知火舞 on 224: no result card, the page facts follow the view).
+func _board_done(d: P0CounterDrawer, id: String, coins: int) -> void:
+	var row: Dictionary = d.get_meta("board_seen", {}).get(id, {})
+	if row.is_empty(): return
+	var done: Dictionary = d.get_meta("board_done", {})
+	done[int(row.slot)] = row
+	d.set_meta("board_done", done)
+	d.set_meta("board_key", 0)
+	_fill_board(d)
+	var at: Vector2 = d.get_meta("board_spots", {}).get(id, Vector2.INF)
+	if at != Vector2.INF and coins > 0:
+		float_text("+%d coins" % coins, at - root.global_position, UiFloatText.Tone.COINS, P0Logic.icon("coin"))
+
+## The board page of a counter: the Stall Board or the Market Board (view.boards[stall | market]).
 func _fill_board(d: P0CounterDrawer) -> void:
-	var b: Dictionary = view.get("stall", {}).get("board", {}) if d.role == "homestead" else market_board(view)
-	# The P0 market fills its board while Buy shows too (its height is the taller page's); it rebuilds and re-measures
-	# only when the cards change, not on every refresh.
-	if d.is_short():
-		var key := [b, view.get("bag", {})].hash()
-		if d.get_meta("board_key", 0) == key: return
-		d.set_meta("board_key", key)
+	var board := P0Board.board_id(d.role)
+	var cards := P0Board.cards(view, board, d.get_meta("board_done", {}))
+	var facts := P0Board.facts(view, board)
+	# The runtime sets the view every frame: the rows are rebuilt only when they change, or a tap pressed on one
+	# button would be released on its replacement and lost (蒙恬 rc0: the first Accept after switching to the board did
+	# nothing). The page facts (a countdown) update in place. The P0 market fills its board while Buy shows too (its
+	# height is the taller page's) and re-measures only then.
+	var key := [cards, facts.map(func(f): return f[0]), view.get("bag", {})].hash()
+	if d.get_meta("board_key", 0) == key:
+		var rows := d.board.get_children().filter(func(c): return c is HBoxContainer and not c is UiBoardCard and not c.is_queued_for_deletion())
+		for i in mini(rows.size(), facts.size()): ((rows[i] as HBoxContainer).get_child(1) as Label).text = str(facts[i][1])
+		return
+	d.set_meta("board_key", key)
+	# What each row was and where its button sat: a delivery empties the slot before counter_events runs, and the row
+	# then turns Done in place with the coins floating up from its button (不知火舞 on 224).
+	var seen: Dictionary = d.get_meta("board_seen", {})
+	var spots: Dictionary = d.get_meta("board_spots", {})
 	for c in d.board.get_children():
+		if c is UiBoardCard and c.is_visible_in_tree():
+			spots[(c as UiBoardCard).request_id] = (c as UiBoardCard).command_button().get_global_rect().get_center()
 		c.hide()
 		c.queue_free()
-	_board(d.board, b)
+	for c in cards:
+		if not bool(c.done): seen[str(c.id)] = c
+	d.set_meta("board_seen", seen)
+	d.set_meta("board_spots", spots)
+	_board(d, facts, cards)
 	if d.is_short(): d.fit_height()
-
-## view.boards.market in the Stall Board's shape ({slots, requests [{id, title, item, qty, have, coins, where,
-## status}], refill_in}) so one renderer draws both boards.
-static func market_board(v: Dictionary) -> Dictionary:
-	var b: Dictionary = v.get("boards", {}).get("market", {})
-	var reqs := []
-	var refill := -1.0
-	for sl in b.get("slots", []):
-		if sl.get("empty", false):
-			if sl.has("refill_in"): refill = float(sl.refill_in) if refill < 0.0 else minf(refill, float(sl.refill_in))
-			continue
-		var any := ("any %s %s" % [P0Logic.rarity_name(v, int(sl.rarity)), str(sl.kind)]) if sl.get("rarity", null) != null else "any " + str(sl.get("kind", ""))
-		reqs.append({"id": str(sl.id), "title": str(sl.get("title", "")), "item": str(sl.get("icon", "")), "qty": int(sl.get("qty", 1)),
-			"have": int(sl.get("have", 0)), "coins": int(sl.get("coins", 0)), "status": str(sl.get("status", "open")),
-			"where": any if (sl.get("items", []) as Array).is_empty() else ("any pond" if str(sl.get("kind", "")) == "fish" else "from your farm")})
-	return {"slots": (b.get("slots", []) as Array).size(), "requests": reqs, "refill_in": maxf(refill, 0.0)}
 
 ## Gear lives in the bag drawer now (p(8)); callers that opened Tools & Gear land on the Gear side.
 func open_gear() -> void:
@@ -1734,56 +1794,21 @@ func open_stall(tab := "") -> void:
 func open_tackle(_bubble := "") -> void:
 	open_counter("tackle")
 
-## Stall Board (FARM-6 tab): request cards with a need tile; Accept tracks it, Deliver pays coins (no XP).
-func _board(v: VBoxContainer, board: Dictionary) -> void:
-	# A delivered request leaves the board and frees its slot (§14.5 "完成打勾并补位").
-	var reqs: Array = board.get("requests", []).filter(func(r): return str(r.status) != "done")
-	for r in reqs:
-		var card := PanelContainer.new()
-		var done := str(r.status) == "done"
-		card.add_theme_stylebox_override("panel", _box(PAPER if not done else Color(1, 1, 1, 0.5), 14, AMBER if str(r.status) == "accepted" else EDGE, 2 if str(r.status) == "accepted" else 1, Vector4(10, 8, 10, 8)))
-		var h := HBoxContainer.new()
-		h.add_theme_constant_override("separation", 10)
-		var item_id := str(r.item)
-		var tile := UiNeedTile.new(P0Logic.item_name(view, item_id), int(r.have), int(r.qty), UiNeedTile.Size.M, P0Logic.icon(item_id))
-		tile.theme = UiKit.theme()
-		tile.pressed.connect(func(): _show_need_source(tile, item_id))
-		h.add_child(tile)
-		var mid := VBoxContainer.new()
-		mid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		mid.add_theme_constant_override("separation", 1)
-		mid.add_child(_label(str(r.title) + (" · done" if done else ""), 12, INK if not done else INK2, true))
-		var what := P0Logic.item_name(view, str(r.item))   # fish plurals stay as they are ("2 Pond Crucian")
-		if int(r.qty) > 1 and not str(r.item).begins_with("fish_"): what = P0Logic.plural(what)
-		var line := _label("%d %s · %s · %d coins · Deliver here" % [int(r.qty), what, str(r.get("where", "")), int(r.coins)], 8, INK2)
-		line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		line.custom_minimum_size = Vector2(1, 0)   # wraps in what the NEED-TILE and the button leave
-		mid.add_child(line)
-		h.add_child(mid)
-		if not done:
-			var id := str(r.id)
-			var b: Button
-			if str(r.status) == "open":
-				b = _pill_button("Accept", true)
-				b.pressed.connect(func(): command.emit({"type": "accept", "request": id}))
-			elif int(r.have) >= int(r.qty):
-				b = _pill_button("Deliver", true)
-				b.pressed.connect(func(): command.emit({"type": "deliver", "request": id}))
-			else:
-				b = _pill_button("Tracking", false)
-				b.disabled = true
-			b.custom_minimum_size = Vector2(78, 34)
-			b.size_flags_vertical = Control.SIZE_SHRINK_CENTER   # the NEED-TILE makes the card taller
-			h.add_child(b)
-		card.add_child(h)
-		v.add_child(card)
-	for i in maxi(0, int(board.get("slots", 2)) - reqs.size()):
-		var empty := _label("New request in %s" % P0Logic.duration(float(board.get("refill_in", 0))), 10, INK2, true)
-		empty.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		empty.custom_minimum_size = Vector2(0, 56)
-		empty.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		empty.add_theme_stylebox_override("normal", _box(Color(1, 1, 1, 0.3), 14, Color("d9c7a6"), 1, Vector4(8, 6, 8, 6)))
-		v.add_child(empty)
+## A counter's board page (FARM-6 Stall Board tab, NPC-2-2 Market Board; BOARD-READY / SHORT / DONE): the page facts,
+## then one UiBoardCard per request — Track sends accept, Deliver pays coins (no XP), a gap on the button says what is
+## missing, a NeedTile shows where it comes from, the title opens the request (BOARD-1).
+func _board(d: P0CounterDrawer, facts: Array, cards: Array) -> void:
+	for f in facts: d.board.add_child(UiBoardCard.fact_row(str(f[0]), str(f[1])))
+	for c in cards:
+		var card := UiBoardCard.new()
+		card.show_request(c)
+		var cmd: Dictionary = c.cmd
+		var id := str(c.id)
+		card.command_pressed.connect(func(): if not cmd.is_empty(): command.emit(cmd))
+		card.unavailable_pressed.connect(func(r: String): toast(r))
+		card.need_pressed.connect(func(item: String, tile: UiNeedTile): _show_need_source(tile, item))
+		card.info_pressed.connect(func(): open_board_request(d.role, id))
+		d.board.add_child(card)
 
 ## Energy Card (§3.7.2 / HUD-3): facts, a Wait line, RECOVER tiles that only guide, one button that closes.
 ## The ONE Energy interface (LOCK-09): a centred card over the modal scrim. Its only button is
@@ -2656,10 +2681,12 @@ func open_gate_card(gate: Dictionary, back := Callable()) -> UiInfoSheet:
 	return sheet
 
 func _gate_guide(go: String) -> void:
-	close_modal()
 	match go:
-		"skills": open_skills()
+		"skills":
+			_drop_modal()   # on to another panel: a queued card must not come up over it (亚瑟 on #77)
+			open_skills()
 		"plots", "stall", "stove", "board", "home", "bench":
+			close_modal()
 			if show_label(go, space_here(), spot_reachable()) == "Show": show_spot.emit(go)
 			else: show_on_map.emit(map_target(go))
 		_: request_panel(go)
@@ -2747,7 +2774,7 @@ func open_fish_card(id: String, back := Callable()) -> UiInfoSheet:
 
 ## A panel this UI does not own, opened by the host that listens on panel_requested.
 func request_panel(panel: String) -> void:
-	close_modal()
+	_drop_modal()   # the host's panel comes next; a queued card waits for it to close, not over it
 	panel_requested.emit(panel)
 
 ## Whether a host opens panels this UI does not own (a read-only Cookbook). Until one does, nothing offers them:

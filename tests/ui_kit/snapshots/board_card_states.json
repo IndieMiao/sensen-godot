@@ -1,0 +1,423 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    342
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiBoardCard states"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        18
+      ],
+      "variation": "CaptionR12",
+      "text": "BOARD-SHORT 1498:96574 · BOARD-DONE 1498:96382"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        52,
+        328,
+        290
+      ],
+      "children": [
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            8,
+            52,
+            312,
+            270
+          ],
+          "children": [
+            {
+              "type": "UiBoardCard",
+              "rect": [
+                8,
+                52,
+                312,
+                188
+              ],
+              "children": [
+                {
+                  "type": "HBoxContainer",
+                  "rect": [
+                    8,
+                    52,
+                    312,
+                    18
+                  ],
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        8,
+                        52,
+                        60,
+                        18
+                      ],
+                      "variation": "C12XB",
+                      "text": "Dusk Haul"
+                    },
+                    {
+                      "type": "Label",
+                      "rect": [
+                        72,
+                        52,
+                        4,
+                        18
+                      ],
+                      "variation": "C12B",
+                      "text": "›"
+                    },
+                    {
+                      "type": "Control",
+                      "rect": [
+                        80,
+                        52,
+                        240,
+                        18
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    8,
+                    73,
+                    312,
+                    15
+                  ],
+                  "variation": "C10B",
+                  "text": "Tracked"
+                },
+                {
+                  "type": "VBoxContainer",
+                  "rect": [
+                    8,
+                    91,
+                    312,
+                    16
+                  ],
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        8,
+                        91,
+                        312,
+                        16
+                      ],
+                      "variation": "C11B",
+                      "text": "4 Fine fish · any kind"
+                    }
+                  ]
+                },
+                {
+                  "type": "HBoxContainer",
+                  "rect": [
+                    8,
+                    110,
+                    312,
+                    16
+                  ],
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        8,
+                        110,
+                        70,
+                        15
+                      ],
+                      "variation": "C10B",
+                      "text": "Reward"
+                    },
+                    {
+                      "type": "Label",
+                      "rect": [
+                        82,
+                        110,
+                        78,
+                        16
+                      ],
+                      "variation": "C11XB",
+                      "text": "36 coins"
+                    }
+                  ]
+                },
+                {
+                  "type": "MarginContainer",
+                  "rect": [
+                    8,
+                    129,
+                    312,
+                    64
+                  ],
+                  "children": [
+                    {
+                      "type": "HFlowContainer",
+                      "rect": [
+                        8,
+                        133,
+                        312,
+                        56
+                      ],
+                      "children": [
+                        {
+                          "type": "UiNeedTile",
+                          "rect": [
+                            8,
+                            133,
+                            66,
+                            56
+                          ],
+                          "children": [
+                            {
+                              "type": "VBoxContainer",
+                              "rect": [
+                                8,
+                                133,
+                                66,
+                                56
+                              ],
+                              "children": [
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    23,
+                                    133,
+                                    36,
+                                    36
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "TextureRect",
+                                      "rect": [
+                                        31,
+                                        141,
+                                        20,
+                                        20
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "HBoxContainer",
+                                  "rect": [
+                                    8,
+                                    173,
+                                    66,
+                                    16
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        8,
+                                        173,
+                                        45,
+                                        16
+                                      ],
+                                      "variation": "C11XB",
+                                      "text": "Fine fish"
+                                    },
+                                    {
+                                      "type": "HBoxContainer",
+                                      "rect": [
+                                        56,
+                                        173,
+                                        18,
+                                        16
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "Label",
+                                          "rect": [
+                                            56,
+                                            173,
+                                            7,
+                                            16
+                                          ],
+                                          "variation": "C11XB",
+                                          "text": "3"
+                                        },
+                                        {
+                                          "type": "Label",
+                                          "rect": [
+                                            63,
+                                            173,
+                                            11,
+                                            16
+                                          ],
+                                          "variation": "C11B",
+                                          "text": "/4"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "UiCommandButton",
+                  "rect": [
+                    8,
+                    196,
+                    157,
+                    44
+                  ],
+                  "variation": "CmdBlockedCompact",
+                  "text": "Need 1 more Fine fish"
+                }
+              ]
+            },
+            {
+              "type": "UiBoardCard",
+              "rect": [
+                8,
+                248,
+                312,
+                74
+              ],
+              "children": [
+                {
+                  "type": "HBoxContainer",
+                  "rect": [
+                    8,
+                    248,
+                    312,
+                    18
+                  ],
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        8,
+                        248,
+                        60,
+                        18
+                      ],
+                      "variation": "C12XB",
+                      "text": "Dusk Haul"
+                    },
+                    {
+                      "type": "Control",
+                      "rect": [
+                        72,
+                        248,
+                        248,
+                        18
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    8,
+                    269,
+                    312,
+                    15
+                  ],
+                  "variation": "C10B",
+                  "text": "Done"
+                },
+                {
+                  "type": "VBoxContainer",
+                  "rect": [
+                    8,
+                    287,
+                    312,
+                    16
+                  ],
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        8,
+                        287,
+                        312,
+                        16
+                      ],
+                      "variation": "C11B",
+                      "text": "4 Fine fish · any kind"
+                    }
+                  ]
+                },
+                {
+                  "type": "HBoxContainer",
+                  "rect": [
+                    8,
+                    306,
+                    312,
+                    16
+                  ],
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        8,
+                        306,
+                        70,
+                        15
+                      ],
+                      "variation": "C10B",
+                      "text": "Reward"
+                    },
+                    {
+                      "type": "Label",
+                      "rect": [
+                        82,
+                        306,
+                        78,
+                        16
+                      ],
+                      "variation": "C11XB",
+                      "text": "36 coins"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            328,
+            328,
+            14
+          ],
+          "variation": "C9B",
+          "text": "Tracked · short · Done"
+        }
+      ]
+    }
+  ]
+}

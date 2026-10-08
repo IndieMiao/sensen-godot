@@ -71,9 +71,11 @@ func test_the_bench_reads_what_resting_gives_and_dims_when_it_cannot() -> void:
 	v.rest.used = 0
 	v.rest.away_ready_in = 4320000
 	p = P0WorldPrompts.bench(v)
-	assert_array([p.text, p.fact, p.status, p.dimmed]).is_equal(["+60 Energy", "Ready in 1h 12m", UiStatusBadge.State.COUNTDOWN, true])
+	assert_array([p.text, p.fact, p.status, p.dimmed]).is_equal(["+60 Energy", "in 1h 12m", UiStatusBadge.State.COUNTDOWN, true])   # q(70)
 	v.rest.away_ready_in = null   # never been away yet
-	assert_array([P0WorldPrompts.bench(v).fact, P0WorldPrompts.bench(v).dimmed]).is_equal(["After 2h away", true])
+	assert_array([P0WorldPrompts.bench(v).fact, P0WorldPrompts.bench(v).dimmed]).is_equal(["after 2h away", true])   # no countdown
+	assert_int(P0WorldPrompts.bench(v).status).is_equal(-1)   # and no clock: no timer is running yet (不知火舞 on #76)
+	assert_int(P0WorldPrompts.show("bench", "", 5.0, P0WorldPrompts.bench(v))).is_equal(P0WorldPrompts.Show.ICON)   # the plain bench
 
 func test_a_spot_names_itself_with_at_most_one_fact() -> void:
 	var v := _view()
