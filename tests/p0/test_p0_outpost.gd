@@ -402,6 +402,49 @@ func test_overlapping_name_tags_give_the_tap_to_the_nearer_one() -> void:
 		rt.ui._tap_at(c, false)
 		assert_array(asked).is_equal([pair[1]])
 
+## Counter push-in (room camera unification, UI rule on 227): with a counter drawer open the camera eases onto the
+## keeper, name tag to counter top inside the band between the HUD and the drawer; the tackle shop's counter + bag
+## leaves no such band, so it holds still. Closing the drawer lets the camera go back.
+func test_an_open_counter_pushes_in_on_the_keeper_above_the_drawer() -> void:
+	var rt: P0Runtime = auto_free(P0Runtime.new())
+	add_child(rt)
+	await get_tree().process_frame
+	rt.session.transport = func(_method: int, _path: String, _body: Dictionary, _cmd: Dictionary): pass   # nothing goes out
+	rt.ui.set_view(JSON.parse_string(FileAccess.get_file_as_string("res://tests/p0/fixtures/counter_view.json")))
+	for id in ["sh_tea_1", "sh_post_1", "sh_market_1", "sh_tackle_1"]:
+		var r := _room(id)
+		r.rt = rt
+		r._on_facility("npc_keeper")   # the greeting, then Trade
+		r._room_frame({}, 1.0 / 30.0)
+		assert_bool(r.is_focused()).override_failure_message(id + ": the greeting holds still").is_false()
+		rt.ui.open_counter(str(r.role), {"ctx": r.keeper_ctx()})
+		var d: P0CounterDrawer = rt.ui._counter
+		if d.is_short(): await d.fitted
+		r._room_frame({}, 1.0 / 30.0)
+		var shot := r.counter_shot(rt.ui.root.size.y - d.height)
+		if id == "sh_tackle_1":
+			assert_bool(shot.is_empty()).override_failure_message("the tackle shop's counter + bag").is_true()
+			assert_bool(r.is_focused()).is_false()
+		else:
+			assert_bool(shot.is_empty()).override_failure_message(id).is_false()
+			assert_str(str(r._shot.get("anchor", ""))).override_failure_message(id).is_equal("cam_counter")
+			# Eased all the way in: the keeper's tag and the counter top sit in the band above the drawer.
+			r._shot_k = 1.0
+			r._update_camera()
+			var band: Rect2 = shot.band
+			var view := r._view()
+			var lo := band.position.y * view.y
+			var hi := band.end.y * view.y
+			var tag_y := r.cam.unproject_position((r.npcs.npc_keeper.root as Node3D).to_global(r.NAME_OVER_HEAD)).y - r.COUNTER_TAG_PX
+			var counter_y := r.cam.unproject_position(r.anchor("use_stall_1" if id == "sh_market_1" else "use_counter").global_position).y
+			assert_float(tag_y).override_failure_message("%s tag %.0f in %.0f..%.0f" % [id, tag_y, lo, hi]).is_greater_equal(lo - 1.0)
+			assert_float(counter_y).override_failure_message("%s counter %.0f in %.0f..%.0f" % [id, counter_y, lo, hi]).is_less_equal(hi + 1.0)
+			assert_float(hi - lo).is_greater_equal(r.COUNTER_BAND_MIN)
+		rt.ui.close_modal()
+		r._room_frame({}, 1.0 / 30.0)
+		await get_tree().create_timer(r.FOCUS_S + 0.1).timeout   # eased back out
+		assert_bool(r._shot.is_empty()).override_failure_message(id + ": released").is_true()
+
 ## Scene integration (SGODOT-227, 不知火舞's walkthrough on 227): the tea house opens on the Coffee Shop kit with the
 ## background of its signed render and every anchor of its file. Its view is the player's scale now (用户 2026-10-09),
 ## which supersedes 227's "whole art centred, ≥ 16 px clear": test_every_outpost_opens_on_its_kit checks the framing.
