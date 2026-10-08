@@ -816,7 +816,7 @@ func _notification(what: int) -> void:
 ## a quick slot being dragged (it flies back, LOCK-04 v1.11; the PinMenu is gone), the radial, then a card or
 ## drawer. True when it closed something; the world only leaves on false.
 func close_top_layer() -> bool:
-	if _bar != null and _bar.is_dragging():
+	if _bar != null and (_bar.is_dragging() or _bar.is_lifted()):   # lifted and not moved yet counts too (刘邦 on #38)
 		_bar.cancel_drag()
 		return true
 	if _radial.visible:
@@ -2335,6 +2335,9 @@ class _TouchPad extends Control:
 					queue_redraw()
 				&"tap":
 					if ui._tap_at(get_global_transform() * o.pos, bool(o.double)): _arb.consume_tap()
+				# Screen point for the camera: the canvas transform includes this UI layer's offset. Taps above go to
+				# _tap_at in the UI's own global space (its markers live there); with P0Ui's layer at the origin the
+				# two agree, so keep this pair in step if the layer ever moves (刘邦 on #47).
 				&"pinch": ui.zoom.emit(o.factor, get_global_transform_with_canvas() * o.center)
 				&"pinch_end": ui.zoom_end.emit()
 	func _draw() -> void:

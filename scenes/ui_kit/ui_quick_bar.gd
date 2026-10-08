@@ -111,6 +111,8 @@ func cells() -> Array[UiItemCell]: return _cells
 func end_button() -> Button: return _end
 func handle_button() -> Button: return _handle
 func is_dragging() -> bool: return _dragging >= 0
+## A slot floated by a long press and not moved yet (it drags as soon as the finger moves).
+func is_lifted() -> bool: return _lifted >= 0
 
 func slot(i: int) -> Dictionary:
 	return slots[i] if i < slots.size() and slots[i] is Dictionary else {}
