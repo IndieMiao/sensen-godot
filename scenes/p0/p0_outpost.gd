@@ -109,6 +109,7 @@ func to_room(world: Vector3) -> Vector3:
 	return world - room.position
 
 func _room_frame(_view: Dictionary, dt: float) -> void:
+	_counter_shot()
 	if not _glide.is_empty():
 		_glide.t = float(_glide.t) + dt
 		var p := _glide_point()
@@ -217,6 +218,55 @@ func _open_entry(method: String, args: Array, fallback: String) -> void:
 	if rt == null: return
 	if rt.ui.has_method(method): rt.ui.callv(method, args)
 	else: rt.ui.toast(fallback)
+
+## Counter push-in (room camera unification; 不知火舞 via 奕星, UI rule on 227): while a counter drawer is open (its
+## board sheets too) the camera eases onto the keeper, the name tag over their head down to the counter top, centred in
+## the band from the HUD's second row + 8 to the drawer's top - 8. A band under COUNTER_BAND_MIN px, or one that span
+## does not fit at the push-in width, holds no shot: the camera stays and the KeeperBar's portrait and name stand for
+## the keeper (LOCK-16). So the tea house, post office and market push in; the tackle shop's counter + bag (its top at
+## y 104) does not. The HUD stays (two-row HUD, 197). The shot follows the drawer's height (the market settles shorter).
+const COUNTER_BAND_MIN := 120.0
+const COUNTER_BAND_PAD := 8.0
+const COUNTER_SHOT_M := 4.2        # orthographic width of the push-in (fixed)
+const COUNTER_TAG_PX := 28.0       # the keeper's name tag, highlighted, over NAME_OVER_HEAD
+var _counter_top := -1.0           # the drawer top (UI px) the shot is framed for; -1 none
+
+func _counter_shot() -> void:
+	var drawer: Control = null
+	if rt and rt.ui.modal_kind in P0Ui._COUNTER_FLOW and is_instance_valid(rt.ui._counter): drawer = rt.ui._counter
+	var top := rt.ui.root.size.y - float(drawer.get("height")) if drawer != null else -1.0
+	if is_equal_approx(top, _counter_top): return
+	_counter_top = top
+	var shot := counter_shot(top) if top >= 0.0 else {}
+	if shot.is_empty():
+		if str(_shot.get("anchor", "")) == "cam_counter": release_focus()
+		return
+	focus("cam_counter", shot)
+
+## The push-in for a counter drawer whose top is at `top` (UI px): focus() options, with the cam_counter mark placed
+## at the middle of the keeper's span (name tag top to counter top); {} when there is no room for it (see above).
+func counter_shot(top: float) -> Dictionary:
+	var counter: Marker3D = null
+	for n in COUNTERS:
+		if n != "npc_keeper" and anchor(n): counter = anchor(n)
+	if counter == null or not npcs.has("npc_keeper"): return {}
+	var view := _view()
+	var band_top := _safe_top() + HUD_BOTTOM + COUNTER_BAND_PAD
+	var band_h := top - COUNTER_BAND_PAD - band_top
+	if band_h < COUNTER_BAND_MIN: return {}
+	var forward := -_cam_dir
+	var up := (Vector3.UP - forward * forward.dot(Vector3.UP)).normalized()
+	var m_per_px := COUNTER_SHOT_M / maxf(view.x, 1.0)
+	var head := (npcs.npc_keeper.root as Node3D).to_global(NAME_OVER_HEAD) + up * COUNTER_TAG_PX * m_per_px
+	if (head - counter.global_position).dot(up) / m_per_px > band_h: return {}
+	if not _anchors.has("cam_counter"):
+		var mark := Marker3D.new()
+		mark.name = "cam_counter"
+		room.add_child(mark)
+		_anchors["cam_counter"] = mark
+	(_anchors.cam_counter as Marker3D).global_position = (head + counter.global_position) * 0.5
+	return {band = Rect2(0.0, band_top / maxf(view.y, 1.0), 1.0, band_h / maxf(view.y, 1.0)), size = COUNTER_SHOT_M,
+		release_on_move = false}
 
 ## Where an NPC's name sits, in the NPC's own space (above the head; the rig's root carries the NPC's scale).
 const NAME_OVER_HEAD := Vector3(0, 2.0, 0)
