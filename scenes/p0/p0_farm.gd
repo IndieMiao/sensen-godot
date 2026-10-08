@@ -313,11 +313,10 @@ func p0_tap(screen: Vector2) -> void:
 ## Tapping the card is tapping the facility, so it reuses p0_tap's own hit points.
 func _tags(v: Dictionary) -> void:
 	var stall_top := cam.unproject_position(_stall + Vector3(0, 1.05, 0))
-	var request := -1
-	for r in v.get("stall", {}).get("board", {}).get("requests", []):
-		if str(r.status) == "accepted" and int(r.have) >= int(r.qty): request = UiStatusBadge.State.DELIVERABLE
-		elif str(r.status) == "open" and request < 0: request = UiStatusBadge.State.REQUEST
-	rt.ui.badge("stall", maxi(request, 0), stall_top, request >= 0)
+	# ✓ when a Stall Board request can be handed in now (taken or not, q(48)), ! when one is open (P0Guide, q(44))
+	var board := P0Guide.stall_badge(v)
+	var request := UiStatusBadge.State.DELIVERABLE if board == "deliver" else UiStatusBadge.State.REQUEST
+	rt.ui.badge("stall", request, stall_top, board != "")
 	rt.ui.tag("stall", "Tap to shop", stall_top - Vector2(0, rt.ui.badge_height("stall")),
 		actor.position.distance_to(_stall) < 3.2, cam.unproject_position(_stall + Vector3(0, 0.4, 0)))
 	# The farmhouse carries no state badge (不知火舞 on SGODOT-221): the stove's state belongs to the stove inside,
