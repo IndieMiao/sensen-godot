@@ -151,3 +151,18 @@ func test_a_second_tap_on_a_bag_cell_puts_a_second_one_in() -> void:
 	assert_array(k.pot).is_equal(["fish_crucian"])
 	rt.ui.close_modal()
 	await get_tree().process_frame
+
+func test_back_in_a_room_takes_the_open_layers_own_way_back() -> void:
+	# 李元芳 int7: in the farmhouse, Back on a Fish-dex card closed the whole layer (close_modal) instead of going back to
+	# the Fish-dex, as it does on the farm; the next Back left the room. Rooms now use the UI's close_top_layer.
+	var r := await _farmhouse()
+	var back_to := []
+	rt.ui._open_modal(Control.new())   # a second-level card …
+	rt.ui._modal_back = func(): back_to.append("fish-dex")   # … whose way back is the Fish-dex (open_fish_card)
+	assert_bool(r.is_back_navigation_locked()).is_true()
+	assert_array(back_to).is_equal(["fish-dex"])
+	# With the layer gone, Back is the door's again: the room walks out and still handles Back itself.
+	rt.ui.close_modal()
+	await get_tree().process_frame
+	assert_bool(r.is_back_navigation_locked()).is_true()
+	assert_str(str(r.get("_walk").get("name", ""))).is_equal("exit")
