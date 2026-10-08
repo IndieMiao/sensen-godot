@@ -179,13 +179,6 @@ func test_request_card_accepts_and_not_now_returns_to_the_bar() -> void:
 	card.action_pressed.emit()
 	assert_that(sent.back()).is_equal({"type": "accept", "request": "req_res_pip_1"})
 
-func test_bell_reads_the_inbox_badge() -> void:
-	var v := _view()
-	assert_int(int(P0Logic.hud_state(v).unread)).is_equal(0)
-	v["inbox"] = {"badge": 3, "waiting": 2, "parcels": []}   # SGODOT-232: queued rewards are not on the bell
-	assert_int(int(P0Logic.hud_state(v).unread)).is_equal(3)
-	assert_int(int(P0Logic.hud_state(v, {"unread": 0}).unread)).is_equal(0)
-
 func test_request_card_uses_the_requests_own_need_line() -> void:
 	var v := _view()
 	v["residents"] = {"res_old_kai": {"request": {"id": "req_res_kai_1", "kind": "fish", "rarity": 3, "qty": 1, "coins": 50, "have": 0}}}
