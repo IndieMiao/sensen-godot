@@ -296,8 +296,11 @@ func frame_home_set() -> void:
 			var shift := safe.get_center() - box.get_center()
 			if shift.length() < 1.0: break
 			_pan_by(shift)
-		if safe.encloses(_frame_box(items)): return
+		if safe.encloses(_frame_box(items)):
+			_update_cameras()   # the trials moved only the Godot camera: now the map, pawns and markers follow
+			return
 	_look(Vector2(home_lat, home_lng), FRAME_ZOOM_MIN)
+	_update_cameras()
 
 ## What the opening view must hold: {lat, lng, rect} — the own avatar, the home set's outposts, the marked pins.
 func home_set_items() -> Array:
@@ -333,11 +336,13 @@ func _frame_box(items: Array) -> Rect2:
 		first = false
 	return box
 
+## One trial view: the Godot camera only (刘邦 on #92: a hundred full updates in a frame would push the native map's
+## camera and the marker sync each time).
 func _look(at: Vector2, z: float) -> void:
 	center_lat = at.x
 	center_lng = at.y
 	_set_zoom(z)
-	_update_cameras()
+	_place_camera()
 
 ## Moves the view so what is on screen moves by `shift` (screen px).
 func _pan_by(shift: Vector2) -> void:

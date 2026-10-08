@@ -94,7 +94,7 @@ class SpaceWorld extends Object:
 func test_the_route_back_from_each_world() -> void:
 	var w := SpaceWorld.new()
 	for c in [["home", "", {}, "farm"], ["mine", "", {}, "farm"], ["pond", "pond_shanghai_05", {}, "pond:pond_shanghai_05"],
-			["outpost", "", {"id": "sh_tea_1"}, "outpost:sh_tea_1"]]:
+			["outpost", "", {"id": "sh_tea_1"}, "outpost:sh_tea_1"], ["pond", "", {}, "farm"], ["outpost", "", {}, "farm"]]:
 		w.space = c[0]
 		w.place = c[1]
 		w.outpost = c[2]
