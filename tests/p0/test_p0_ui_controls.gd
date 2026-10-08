@@ -245,7 +245,7 @@ func test_a_second_tip_waits_for_the_first_card_and_is_not_learned_meanwhile() -
 	ui.teach("creel")
 	await await_idle_frame()
 	assert_str(ui._teach.tip).is_equal(str(P0Guide.TIPS.cast))
-	assert_object(ui._teach.icon_texture()).is_same(UiTipCard.ICONS.cast)   # TUT-2: Casting uses 5 Energy → i-energy
+	assert_object(ui._teach.icon_texture()).is_same(P0Logic.icon("energy"))   # TUT-2: Casting uses 5 Energy → i-energy (shared icon)
 	assert_bool(ui._taught.has("cast")).is_true()
 	assert_bool(ui._taught.has("creel")).is_false()
 	ui._hide_tip()   # tapped away (or its time ran out)
@@ -253,7 +253,7 @@ func test_a_second_tip_waits_for_the_first_card_and_is_not_learned_meanwhile() -
 	await await_idle_frame()
 	assert_bool(ui._teach.visible).is_true()
 	assert_str(ui._teach.tip).is_equal(str(P0Guide.TIPS.creel))
-	assert_object(ui._teach.icon_texture()).is_same(UiTipCard.ICONS.creel)
+	assert_object(ui._teach.icon_texture()).is_same(P0Logic.icon("fish"))
 	assert_bool(ui._taught.has("creel")).is_true()
 	if had_tips:
 		var f := FileAccess.open(P0Ui.TIPS_PATH, FileAccess.WRITE)
@@ -283,6 +283,14 @@ func test_teaching_card_stays_clear_of_the_bar_and_the_keys() -> void:
 		f.store_string(saved)
 	else:
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(P0Ui.TIPS_PATH))
+
+## One copy of each icon in the app (不知火舞 on 235-B2): every tip with its own icon names a P0Guide tip and a shared
+## P0 icon; the rest keep the card's default sprout.
+func test_each_tip_icon_names_a_tip_and_a_shared_icon() -> void:
+	for key in P0Ui.TIP_ICONS:
+		assert_bool(P0Guide.TIPS.has(key)).override_failure_message("TIP_ICONS key %s is not a tip" % key).is_true()
+		assert_object(P0Logic.icon(str(P0Ui.TIP_ICONS[key]))).override_failure_message("no icon for %s" % key) \
+			.is_not_same(load(P0Logic.ICON_DIR % "field"))   # P0Logic.icon's fallback for a missing icon
 
 func test_a_seed_sown_to_zero_is_deselected_and_a_zero_slot_cannot_be_picked() -> void:
 	# 李白 q(44) ③ / PR #12 review fix 2: the pinned slot stays at 0, the key goes back to Sow · Pick a seed.

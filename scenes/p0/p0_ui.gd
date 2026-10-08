@@ -2430,6 +2430,10 @@ func _hide_tip(close_queue := true) -> void:
 	if _teach: _teach.hide()
 	if close_queue and tips: tips.close()
 
+## Each tip's icon (P0Guide.TIPS keys) from the shared P0 icons, as the TUT-2 specimens (不知火舞 on 232 / 235-B2);
+## "level" keeps the card's default sprout.
+const TIP_ICONS := {"sow": "seed_radish", "creel": "fish", "cast": "energy", "meal": "energy", "cook": "pot", "heat": "pot", "map": "map"}
+
 ## TipCard (TUT-2, 235-B2): the kit card with the tip's icon; a tap on it closes it (A-03).
 func _show_tip(text: String, key := "") -> void:
 	for k in tips.seen:
@@ -2440,7 +2444,7 @@ func _show_tip(text: String, key := "") -> void:
 		_teach.theme = UiKit.theme()
 		_teach.tapped.connect(func(): _hide_tip())
 		root.add_child(_teach)
-	_teach.show_tip(text, key if key != "" else null)
+	_teach.show_tip(text, P0Logic.icon(str(TIP_ICONS[key])) if TIP_ICONS.has(key) else null)
 	_teach.show()
 	_place_tip()
 	_teach_left = P0Guide.tip_seconds(text)

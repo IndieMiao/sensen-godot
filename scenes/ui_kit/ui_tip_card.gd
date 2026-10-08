@@ -5,7 +5,8 @@ extends PanelContainer
 ## tall as its text (48 for one line, 64 for two). No buttons and no Got it; a tap on it emits `tapped` (its owner closes
 ## it), and it never plays for the player. Where it sits and how long it stays are its owner's (P0Ui: centred, the top
 ## 120 under HUD row 2, above the kitchen drawer; the Toast's duration; it closes when the player does what it teaches).
-## The shadow (0 / 10, blur 14, 20 %) is not a token yet (PENDING "tipCard"): constants here until the next export.
+## The shadow is lighter than the main's literal 20 % so Godot's spread reads like Figma's (不知火舞 on 235-B2); it and the
+## sizes are not tokens yet (PENDING "tipCard"): constants here until the next export.
 
 signal tapped
 
@@ -16,23 +17,13 @@ const _GAP := 10
 const _RADIUS := 16.0
 const _ICON := 22.0
 const _MIN_H := 48.0   # one line is 48 in the main (Nunito 14 lays out 2 px shorter here)
-const _SHADOW := Color(0x2E / 255.0, 0x3B / 255.0, 0x33 / 255.0, 0.2)   # rgba(46, 59, 51, 0.2)
-const _SHADOW_BLUR := 14.0
-const _SHADOW_OFFSET := Vector2(0, 10)
+const _SHADOW := Color(0x2E / 255.0, 0x3A / 255.0, 0x33 / 255.0, 0.08)   # #2E3A33 · 8 % (the main: 20 %, see above)
+const _SHADOW_BLUR := 28.0   # the main's blur 28
+const _SHADOW_OFFSET := Vector2(0, 6)
 
-## Each P0 tip's icon, as the TUT-2 specimens (不知火舞 on 232): Levels has no card of its own (it is inside the level-up
-## banner) but keeps the main's default sprout.
-const ICONS := {
-	"sow": preload("res://assets/ui/kit_icons/tip/i-radish-seeds.svg"),
-	"creel": preload("res://assets/ui/kit_icons/tip/i-fish.svg"),
-	"cast": preload("res://assets/ui/kit_icons/tip/i-energy.svg"),
-	"cook": preload("res://assets/ui/kit_icons/tip/i-pot.svg"),
-	"heat": preload("res://assets/ui/kit_icons/tip/i-pot.svg"),
-	"eat": preload("res://assets/ui/kit_icons/tip/i-energy.svg"),
-	"map": preload("res://assets/ui/kit_icons/tip/i-map.svg"),
-	"levels": preload("res://assets/ui/kit_icons/tip/i-sprout.svg"),
-}
-const DEFAULT_ICON := preload("res://assets/ui/kit_icons/tip/i-sprout.svg")
+## The main's default icon (i-sprout, the kit's own sprout); a tip's icon comes from its owner (P0Ui.TIP_ICONS through
+## the shared P0 icons: one copy of each icon in the app, 不知火舞 on 235-B2).
+const DEFAULT_ICON := preload("res://assets/ui/kit_icons/sprout.svg")
 
 var tip := "": set = set_tip
 var _icon: TextureRect
@@ -64,11 +55,10 @@ func _init() -> void:
 	_text.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	row.add_child(_text)
 
-## The sentence and its icon (a tip key from P0Guide.TIPS, or a texture).
-func show_tip(text: String, icon: Variant = null) -> void:
+## The sentence and its icon (null = the main's default sprout).
+func show_tip(text: String, icon: Texture2D = null) -> void:
 	set_tip(text)
-	var tex: Texture2D = icon if icon is Texture2D else ICONS.get(str(icon), DEFAULT_ICON) if icon != null else DEFAULT_ICON
-	_icon.texture = tex
+	_icon.texture = icon if icon != null else DEFAULT_ICON
 
 func set_tip(v: String) -> void:
 	tip = v

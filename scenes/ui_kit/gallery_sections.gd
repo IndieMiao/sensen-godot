@@ -1322,17 +1322,20 @@ static func _reward_moments() -> Control:
 	return row
 
 ## TUT-2 specimens (482:72): the P0 first-session sentences with their icons, 10 apart.
+## Spaced and centred so each card's halo shows on its own, as at run time (one card at a time, 不知火舞 on 235-B2).
 static func _tip_cards() -> Control:
 	var v := VBoxContainer.new()
-	v.add_theme_constant_override(&"separation", 10)
+	v.add_theme_constant_override(&"separation", 28)
 	for t in [["sow", "Pick a seed, walk up to a plot and press Sow. Hold to keep sowing."],
 			["creel", "Your creel is your bag: 10 fish per free slot."], ["cast", "Casting uses 5 Energy"],
 			["cook", "Tap Cook to grill your first fish"], ["heat", "Tap when the needle hits gold!"],
-			["eat", "Energy comes back over time. A meal brings it back now."],
-			["levels", "Levels unlock gear, fish and seeds. Basics never lock."],
+			["meal", "Energy comes back over time. A meal brings it back now."],
+			["level", "Levels unlock gear, fish and seeds. Basics never lock."],
 			["map", "Browse the map for free. Travel costs Energy and coins."]]:
 		var card := UiTipCard.new()
-		card.show_tip(str(t[1]), str(t[0]))
-		card.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		# The shared P0 icons each tip passes at run time (P0Ui.TIP_ICONS); Levels keeps the card's default sprout.
+		var icon: String = {"sow": "seed_radish", "creel": "fish", "cast": "energy", "meal": "energy", "cook": "pot", "heat": "pot", "map": "map"}.get(str(t[0]), "")
+		card.show_tip(str(t[1]), _tex(icon) if icon != "" else null)
+		card.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		v.add_child(card)
 	return v
