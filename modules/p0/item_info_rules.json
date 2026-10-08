@@ -622,5 +622,77 @@
         ]
       }
     ]
+  },
+  "tool/counter_buy": {
+    "facts": [
+      "{tool_effect}",
+      "{owned_line}"
+    ],
+    "price": true,
+    "buttons": [
+      {
+        "id": "buy",
+        "label": "Buy",
+        "kind": "secondary",
+        "unless": [
+          {
+            "when": "owned",
+            "label": "Owned"
+          },
+          {
+            "when": "!unlocked",
+            "label": "{gate_text}"
+          },
+          {
+            "when": "!homestead_ok",
+            "label": "{homestead_gate}"
+          },
+          {
+            "when": "!can_afford",
+            "label": "Need {coins_short} more coins"
+          }
+        ]
+      }
+    ]
+  },
+  "any/counter_buy": {
+    "facts": [
+      "{use}",
+      "{need_line}"
+    ],
+    "price": true,
+    "buttons": [
+      {
+        "id": "buy",
+        "label": "Buy",
+        "kind": "secondary",
+        "unless": [
+          {
+            "when": "owned",
+            "label": "Owned"
+          },
+          {
+            "when": "!unlocked",
+            "label": "{gate_text}"
+          },
+          {
+            "when": "!homestead_ok",
+            "label": "{homestead_gate}"
+          },
+          {
+            "when": "sold_out",
+            "label": "Sold out · {restock_in}"
+          },
+          {
+            "when": "!materials_ok",
+            "label": "Need {materials_short}"
+          },
+          {
+            "when": "!can_afford",
+            "label": "Need {coins_short} more coins"
+          }
+        ]
+      }
+    ]
   }
 }

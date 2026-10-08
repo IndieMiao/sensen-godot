@@ -174,6 +174,25 @@ func test_buy_rows_say_why_they_cannot_be_bought() -> void:
 	assert_dict(s.price).is_equal({each = 2, total = 6, text = "6 coins", line = "3 × 2 coins"})
 	assert_bool(s.facts.has("Stock 7/30 · Bag ×5")).is_true()
 
+func test_row_hoe_and_bag_upgrade_buy_rows() -> void:
+	var v := _view()
+	v.coins = 500
+	v.gear["hoes"] = [{"id": "tool_row_hoe", "name": "Row Hoe", "owned": false, "equipped": false, "sow": 3, "price": 240, "gate": 4}]
+	v.shops["market"] = {"buy": [{"id": "tool_row_hoe", "name": "Row Hoe", "price": 240, "need": 280, "to": "gear", "skill": "farming",
+		"gate": 4, "unlocked": false, "xp_to_go": 300, "homestead_ok": true, "owned": false, "left": null, "materials": []}], "sell": []}
+	v.shops.homestead["buy"] = [{"id": "bag_upgrade_1", "name": "Bag Upgrade I", "price": 150, "need": 190, "to": "bag_cap", "skill": null,
+		"gate": 0, "unlocked": true, "homestead": 3, "homestead_ok": true, "owned": false, "left": null,
+		"materials": [{"id": "fiber", "name": "Reeds", "need": 10, "have": 4}, {"id": "wood", "name": "Timber", "need": 6, "have": 6}]}]
+	var hoe := P0ItemInfo.spec(v, "tool_row_hoe", &"counter_buy", {counter = "market"})
+	assert_array(hoe.facts).is_equal(["Sows 3 plots at once"])
+	assert_array(_labels(hoe)).is_equal(["unavailable:Farming Lv4 needed"])
+	assert_str(str(hoe.price.text)).is_equal("240 coins")
+	var up := P0ItemInfo.spec(v, "bag_upgrade_1", &"counter_buy", {counter = "homestead"})
+	assert_array(up.facts).is_equal(["+5 bag slots", "Reeds 4/10 · Timber 6/6"])
+	assert_array(_labels(up)).is_equal(["unavailable:Need 6 Reeds"])
+	v.shops.homestead.buy[0].materials[0].have = 10
+	assert_array(_labels(P0ItemInfo.spec(v, "bag_upgrade_1", &"counter_buy", {counter = "homestead"}))).is_equal(["secondary:Buy"])
+
 func test_rods_in_gear_equip_or_show_equipped() -> void:
 	var starter := P0ItemInfo.spec(_view(), "rod_starter", &"gear")
 	assert_array(_labels(starter)).is_equal(["unavailable:✓ Equipped"])
