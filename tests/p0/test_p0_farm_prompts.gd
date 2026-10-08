@@ -88,3 +88,16 @@ func test_a_spot_names_itself_with_at_most_one_fact() -> void:
 	assert_array([clay.text, clay.fact, clay.status]).is_equal(["Clay Bank", "Homestead Lv2", UiStatusBadge.State.LOCKED])
 	for p in [grove, reeds, clay, P0WorldPrompts.workbench(), P0WorldPrompts.stall(v), P0WorldPrompts.bench(v)]:
 		assert_bool(str(p.text).contains("Tap")).is_false()
+
+## The mine mouth without an unfinished run (231, 不知火舞 on 235): the plain pickaxe button within 8 m, open `The mine` ·
+## `Runs today 0/2` (2/2 once used up); no state, so nothing from afar.
+func test_the_mine_names_itself_with_todays_runs() -> void:
+	var v := {"mine": {"run": null, "runs": {"used": 0, "limit": 2}}}
+	var mine := P0WorldPrompts.mine(v)
+	assert_array([mine.text, mine.fact, mine.status]).is_equal(["The mine", "Runs today 0/2", -1])
+	assert_object(mine.icon).is_same(P0Logic.icon("pickaxe"))
+	assert_int(P0WorldPrompts.show("mine", "", 7.5, mine)).is_equal(P0WorldPrompts.Show.ICON)
+	assert_int(P0WorldPrompts.show("mine", "", 12.0, mine)).is_equal(P0WorldPrompts.Show.NONE)
+	assert_int(P0WorldPrompts.show("mine", "mine", 2.0, mine)).is_equal(P0WorldPrompts.Show.BAR)
+	v.mine.runs.used = 2
+	assert_str(P0WorldPrompts.mine(v).fact).is_equal("Runs today 2/2")
