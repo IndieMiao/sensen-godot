@@ -329,6 +329,7 @@ func set_surface(name: String) -> void:
 	if _dev_box: _dev_box.visible = world
 	for c in _cards.values(): (c as Control).visible = false
 	for b in _badges.values(): (b as Control).visible = false
+	_flush_held_toast()
 
 ## Action spaces show the full bar. Rooms (farmhouse kitchen, outposts) and the map keep only Bag, with no action
 ## or switch key (MAP-1, §10.3.5, o(8)); the map waits for map_bag. Busy worlds hide it.
@@ -356,7 +357,7 @@ func _refresh_bar() -> void:
 		if selected_bait != "" and not ids.has(selected_bait): selected_bait = ""
 		# The last bait went on a hook: the slot stays pinned at 0, the hook goes empty (李白 q(44) ④).
 		if selected_bait != "" and P0Logic.bag_count(view, selected_bait) <= 0:
-			toast("Out of %s · no bait on the hook" % P0Logic.item_name(view, selected_bait))
+			toast_when_clear("Out of %s · no bait on the hook" % P0Logic.item_name(view, selected_bait))
 			selected_bait = ""
 		var free := int(view.get("bag", {}).get("free", 0))
 		_creel_count.text = P0Logic.creel_line(view).get_slice(" · ", 0)
@@ -389,11 +390,12 @@ func _refresh_bar() -> void:
 	for i in ids.size():
 		var id := str(ids[i])
 		slots.append({id = id, icon = P0Logic.icon(id), title = P0Logic.item_name(view, id), quantity = counts[i], pinned = store.pins.has(id)})
-	# A-08 ghost: a bar holding nothing of the action's family shows it in the first empty slot; a tap opens the
-	# Bag (ghost_tapped). TODO(SGODOT-225 bag drawer): open on the family tab (Seeds → Seeds, Bait → Tackle) and
-	# flash the slot 600 ms when a real item lands.
+	# A-08 ghost (LOCK-04): a bar with nothing of this action in stock shows the action's family in the first empty
+	# slot; a slot pinned at 0 is not stock (int5b hand test 9), Compost alone is. Five pinned 0 slots leave no
+	# room, so no ghost. A tap opens the Bag (ghost_tapped). TODO(SGODOT-225 bag drawer): open on the family tab
+	# (Seeds → Seeds, Bait → Tackle) and flash the slot 600 ms when a real item lands.
 	var family: Array = ["bait_", "bait_worm", "Bait"] if bar_mode == "fish" else ["seed_", "seed_radish", "Seeds"]
-	if slots.size() < UiQuickBar.SLOTS and not ids.any(func(id): return str(id).begins_with(family[0])):
+	if slots.size() < UiQuickBar.SLOTS and not counts.any(func(n): return int(n) > 0):
 		slots.append({ghost = true, icon = P0Logic.icon(family[1]), title = family[2]})
 	_bar.slots = slots
 	_bar.selected = sig[4]
@@ -575,13 +577,23 @@ func badge_height(id: String) -> float:
 ## Finger cards stay on screen (their facility is near, so on screen); a badge over an off-screen facility hides.
 func _place_marker(m: Control, screen: Vector2, clamp_inside: bool) -> void:
 	var size := m.get_combined_minimum_size()
-	var area := Rect2(Vector2.ZERO, _kit.size)
+	var area := _marker_area()
 	var r := WorldAnchor.place(size, screen - Vector2(0, UiTokens.SPACE_WITHIN), area, UiTokens.SPACE_WITHIN, clamp_inside)
 	m.visible = r.has_area()
 	if not m.visible: return
 	m.size = size
 	m.position = r.position
 	if m.has_method(&"point_at"): m.point_at(screen.x - r.position.x)
+
+## Where world markers may sit (LOCK-07): below the two-row HUD and above the quick bar. A finger card is passive, so
+## one lying under a HUD chip lost its tap to the chip (int5 hand test 8: the Homestead card slid under Energy and
+## opened the Energy panel); a card clamps into this band instead, a badge outside it hides.
+func _marker_area() -> Rect2:
+	var top := 0.0
+	if hud and hud.visible: top = UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H + safe_top()
+	var bottom := _kit.size.y
+	if _bar.visible: bottom = minf(bottom, _bar.position.y)
+	return Rect2(0.0, top, _kit.size.x, maxf(0.0, bottom - top))
 
 func float_text(text: String, screen: Vector2, color: Color) -> void:
 	var l := _label(text, 12, color, true)
@@ -602,6 +614,26 @@ func toast(text: String, seconds := 2.6) -> void:
 	_toast_left = seconds
 
 # ---------------------------------------------------------------- modals
+## Android Back closes what is on top first, one layer per press (LOCK-06, int5 hand test 012–013 / 023–024): the
+## PinMenu, the radial, then a card or drawer. True when it closed something; the world only leaves on false.
+func close_top_layer() -> bool:
+	if _pin_menu:
+		_close_pin_menu()
+		return true
+	if _radial.visible:
+		_radial.close()
+		return true
+	if _modal != null:
+		close_modal()
+		return true
+	return false
+
+## A world change ends the stick: a finger still down when the farmhouse door took the player in never sends its
+## release to this pad (int5 hand test 029–030), so its ring would stay and the old world keep walking.
+func end_stick() -> void:
+	(pad as _TouchPad).end_stick()
+	joystick.emit(Vector2.ZERO)
+
 func has_modal() -> bool: return _modal != null or (_radial != null and _radial.visible)
 
 func close_modal() -> void:
@@ -609,6 +641,23 @@ func close_modal() -> void:
 	if not _card_queue.is_empty():
 		var next: Callable = _card_queue.pop_front()
 		next.call_deferred()
+	else:
+		_flush_held_toast()
+
+## A toast that must not be lost under the fishing presentation (layer 30, over this layer) or a result card: the
+## last bait goes at the reel's settlement, while the panel still shows the landing (int5b hand test 10). Shown at
+## once when nothing covers the UI, else held until the world is back from "busy" and no card is open or queued.
+var _held_toast := ""
+
+func toast_when_clear(text: String) -> void:
+	_held_toast = text
+	_flush_held_toast()
+
+func _flush_held_toast() -> void:
+	if _held_toast == "" or not is_node_ready(): return
+	if surface == "busy" or _modal != null or not _card_queue.is_empty(): return
+	toast(_held_toast)
+	_held_toast = ""
 
 ## Result cards (catch, dish, level up) wait their turn instead of replacing each other.
 func queue_card(show: Callable) -> void:
@@ -2079,6 +2128,9 @@ class _TouchPad extends Control:
 	var ui: P0Ui
 	var _arb := GestureArbiter.new(GestureArbiter.Mode.SCENE)
 	func _ready() -> void: mouse_filter = Control.MOUSE_FILTER_STOP
+	func end_stick() -> void:
+		_arb.reset()
+		queue_redraw()
 	func _gui_input(e: InputEvent) -> void:
 		if e is InputEventMouseButton and e.pressed and e.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
 			ui.zoom.emit(0.9 if e.button_index == MOUSE_BUTTON_WHEEL_UP else 1.1)

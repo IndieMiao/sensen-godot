@@ -9,6 +9,7 @@ const FarmCamera = preload("res://modules/farm/farm_camera.gd")
 ## Pond shapes → P0 fishing sites, kept only for the cast command's old `site` field. The server ignores it and
 ## takes the template from its own table for the pond the player is at (p0_place, q(36): Reed Pond is a Pond).
 const SITE_FOR_TEMPLATE := {"meander": "river"}
+const ARRIVE_M := 0.35   # how close (flat) to a cast origin counts as standing on it
 
 var rt: P0Runtime
 var entry: Dictionary = {}
@@ -133,7 +134,7 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 	if not _plan.is_empty() and not actor.mover.is_moving():
 		var plan := _plan
 		_plan = {}
-		if actor.position.distance_to(plan.origin) < 0.35: _open_panel(plan)
+		if _at(plan.origin): _open_panel(plan)
 	_follow(dt)
 	rt.ui.player_screen = cam.unproject_position(actor.position + Vector3(0, 0.9, 0))   # the radial fans out from here
 	if _blend_t < 1.0:
@@ -162,12 +163,17 @@ func _go_cast(point: Vector3) -> void:
 	if plan.is_empty():
 		rt.ui.toast("Can't reach the water from here")
 		return
-	if actor.position.distance_to(plan.origin) < 0.35:
+	if _at(plan.origin):
 		_open_panel(plan)
 	elif actor.mover.set_target_position(plan.origin):
 		_plan = plan
 	else:
 		rt.ui.toast("Can't reach that spot")
+
+## Standing on a cast origin: measured flat, because the actor's height follows the ground (a raised bank) while a
+## planned origin sits at y 0 — in 3D the walk-to-the-bank arrival missed and the first Cast never cast (int5 test 11).
+func _at(origin: Vector3) -> bool:
+	return Vector2(actor.position.x - origin.x, actor.position.z - origin.z).length() < ARRIVE_M
 
 func p0_energy_verb() -> String: return "Cast"
 
@@ -247,10 +253,11 @@ func p0_anchor() -> Vector2:
 	return cam.unproject_position(actor.position + Vector3(0, 2.0, 0))
 
 func is_back_navigation_locked() -> bool:
+	if rt != null and rt.ui.close_top_layer(): return true   # Inbox, radial, PinMenu over the pond first
 	if panel and panel.visible:
 		panel.close()
 		return true
-	return false
+	return rt != null and rt.root_back()   # the pond as the root scene (dev entry pond:<id>) leaves for the map itself
 
 func suspend() -> void:
 	_end_fishing()
