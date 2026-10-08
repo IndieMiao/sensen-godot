@@ -232,6 +232,12 @@ func test_the_opening_view_frames_the_home_set() -> void:
 				m._pan_by(safe.get_center() - b.get_center())
 			fits_closer = safe.encloses(m._frame_box(framed))
 		assert_bool(fits_closer).append_failure_message(phase[1]).is_false()
+	# A MapDestination is framed with a name row under it and over it (刘邦 on #111): either side stays in the frame.
+	var tea := P0Outposts.place_entry(P0Outposts.by_role("tea"))
+	var fp: Rect2 = m._frame_footprint(tea)
+	var name_h := UiMapDestination.label_size_for(m.city_map._label_text(tea)).y
+	assert_float(fp.position.y).is_equal_approx(-UiMapDestination.DISC - UiMapDestination.above_gap_for(false) - name_h, 0.01)
+	assert_float(fp.end.y).is_equal_approx(UiMapDestination.LABEL_GAP + name_h, 0.01)
 	rt.session.view = saved
 
 ## The P0Runtime singleton the map brought up goes with the suite (P0Runtime.free_instance_for_tests).

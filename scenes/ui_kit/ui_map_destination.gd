@@ -13,6 +13,8 @@ const _LABEL_PAD_X := 6.0
 const _LABEL_PAD_Y := 2.0
 const _PLATE_RADIUS := 10.0
 const _MARK_AT := Vector2(-8.0, -8.0)    # StatusBadge World 28 over the disc's top-left corner
+## How far a mark's badge pokes over the disc's top: a name over a marked disc clears it (刘邦 on #111).
+const MARK_OVERHANG := 8.0
 const _COUNT_AT := Vector2(26.0, -4.0)   # ×N, top-right (P1)
 
 var icon: Texture2D: set = set_icon
@@ -30,6 +32,8 @@ var label_shift := 0.0: set = set_label_shift
 ## The name over the disc instead of under it: the city map's second place when under it would touch another (不知火舞
 ## on 234 A2). The disc keeps its place.
 var label_above := false: set = set_label_above
+## The gap between the disc's top and a name over it (above_gap_for).
+var above_gap := LABEL_GAP: set = set_above_gap
 
 var _pin: Control
 var _disc: Panel
@@ -114,6 +118,15 @@ func set_mark(v: String) -> void:
 	_badge.state = i
 	_badge.visible = true
 
+## The gap over the disc for a name above it: LABEL_GAP, plus the mark's overhang on a marked pin.
+static func above_gap_for(marked: bool) -> float:
+	return LABEL_GAP + (MARK_OVERHANG if marked else 0.0)
+
+func set_above_gap(v: float) -> void:
+	if is_equal_approx(v, above_gap): return
+	above_gap = v
+	_layout()
+
 func set_label_above(v: bool) -> void:
 	if v == label_above: return
 	label_above = v
@@ -155,7 +168,7 @@ func anchor_offset() -> Vector2:
 ## What it covers around its geographic point: the disc over it, the name under it (for the map's packing).
 func footprint() -> Rect2:
 	var l := label_size()
-	var name_y := -DISC - LABEL_GAP - l.y if label_above else LABEL_GAP
+	var name_y := -DISC - above_gap - l.y if label_above else LABEL_GAP
 	return Rect2(-DISC * 0.5, -DISC, DISC, DISC).merge(Rect2(-l.x * 0.5 + label_shift, name_y, l.x, l.y)) if l.x > 0.0 \
 		else Rect2(-DISC * 0.5, -DISC, DISC, DISC)
 
@@ -166,5 +179,5 @@ func _layout() -> void:
 	custom_minimum_size = Vector2(w, DISC + (LABEL_GAP + l.y if l.y > 0.0 else 0.0))
 	size = custom_minimum_size
 	_pin.position = Vector2((w - DISC) * 0.5, 0.0)
-	_label_box.position = Vector2((w - l.x) * 0.5 + label_shift, -LABEL_GAP - l.y if label_above else DISC + LABEL_GAP)
+	_label_box.position = Vector2((w - l.x) * 0.5 + label_shift, -above_gap - l.y if label_above else DISC + LABEL_GAP)
 	_label_box.size = l
