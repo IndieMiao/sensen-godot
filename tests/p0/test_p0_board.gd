@@ -214,6 +214,8 @@ func test_details_lay_the_items_card_over_the_request() -> void:
 	assert_str(sheet._title.text).is_equal("Pond Crucian")
 	assert_bool(sheet._qty_pill.visible).is_true()
 	assert_str(sheet._qty.text).is_equal("×0")
+	assert_object(sheet.scrim()).is_not_null()   # the request below is dimmed: the card is its own layer
+	assert_object(sheet.scrim().color).is_equal(UiTokens.COLOR_SCRIM_MODAL)
 	assert_str(ui.modal_kind).is_equal("board_request")
 	ui.back_modal()   # closes the card, not the request
 	await await_idle_frame()
