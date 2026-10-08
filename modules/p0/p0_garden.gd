@@ -143,6 +143,26 @@ const PLAQUE_CELL := Vector2i(7, 14)
 static func plaque_point(bp: FarmBlueprint) -> Vector3:
 	return bp.cell_to_world(PLAQUE_CELL)
 
+## LOCK-07 (亚瑟 / 不知火舞 / 周瑜 on SGODOT-231): one finger card on the farm at a time — the nearest facility within
+## its reach; the card showing keeps it unless another is CARD_KEEP nearer, so standing between two never flickers.
+## cands = [[id, position, reach m], ...]; an exact tie goes to the earlier entry. Same rule as SGODOT-231's
+## P0FarmMaterials.pick_card; whichever lands second keeps one copy.
+const CARD_KEEP := 0.2
+
+static func pick_card(cands: Array, at: Vector3, current: String) -> String:
+	var best := ""
+	var best_d := INF
+	var current_d := INF
+	for c in cands:
+		var p: Vector3 = c[1]
+		var d := Vector2(at.x - p.x, at.z - p.z).length()
+		if d > float(c[2]): continue
+		if str(c[0]) == current: current_d = d
+		if d < best_d:
+			best = str(c[0])
+			best_d = d
+	return current if current_d < INF and current_d <= best_d + CARD_KEEP else best
+
 ## Mark scenery rocks solid: each rock blocks the cell it stands in (trees already stand outside the yard).
 static func block_points(bp: FarmBlueprint, points: Array) -> void:
 	for p in points:

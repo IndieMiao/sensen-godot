@@ -46,6 +46,7 @@ var _fence: Node3D   # p0_fence.gd: front stretch always, the ring from Homestea
 var _sign := Vector3.ZERO   # Homestead sign right of the farmhouse door (WorldBadges · Farm 1135:79267): HOME-1
 var _plaque := Vector3.ZERO   # Upgrade Plaque left of the door (1510:97492), shown from the first upgrade: PLAQUE-READ
 var _plaque_node: Node3D
+var _card := ""   # LOCK-07: the one facility whose finger card shows this frame (P0Garden.pick_card)
 
 func _ready() -> void:
 	P0Runtime.mark("%s _ready start" % name)
@@ -240,6 +241,7 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 	_fence.sync(v)
 	_pick_front(v)
 	rt.ui.set_action(P0Logic.main_action(v, _front, rt.ui.selected_seed, _row))
+	_card = P0Garden.pick_card(_card_candidates(), actor.position, _card)
 	_hold_repeat()
 	_tags(v)
 	_teaching(v)
@@ -352,12 +354,12 @@ func _tags(v: Dictionary) -> void:
 		elif str(r.status) == "open" and request < 0: request = UiStatusBadge.State.REQUEST
 	rt.ui.badge("stall", maxi(request, 0), stall_top, request >= 0)
 	rt.ui.tag("stall", "Tap to shop", stall_top - Vector2(0, rt.ui.badge_height("stall")),
-		actor.position.distance_to(_stall) < 3.2, cam.unproject_position(_stall + Vector3(0, 0.4, 0)))
+		_card == "stall", cam.unproject_position(_stall + Vector3(0, 0.4, 0)))
 	# The farmhouse carries no state badge (不知火舞 on SGODOT-221): the stove's state belongs to the stove inside,
 	# and Today already names the dish and its time. The card's copy becomes "Farmhouse · Tap to go in" once the
 	# door card goes (bench SGODOT-224, room SGODOT-226).
 	rt.ui.tag("home", "Home · Kitchen · Rest", cam.unproject_position(_house + Vector3(0, 2.6, 0.4)),
-		actor.position.distance_to(_house) < 4.2, cam.unproject_position(_house + Vector3(0, 1.0, 0.6)))
+		_card == "home", cam.unproject_position(_house + Vector3(0, 1.0, 0.6)))
 	# Homestead sign (WorldBadges · Farm 1135:79267, LOCK-11; 不知火舞 on SGODOT-228): a home mark with the caption
 	# "Homestead LvN" always shows, Ready once the Needs are met; walking up folds the caption to the mark and the
 	# finger card "Homestead LvN · Tap to upgrade" sits above it (LOCK-07). Mark, card and sign all open HOME-1.
@@ -366,7 +368,7 @@ func _tags(v: Dictionary) -> void:
 	var lit: bool = nxt is Dictionary and bool(nxt.get("can_upgrade", false))
 	var lvl := int(h.get("level", 1))
 	var sign_top := cam.unproject_position(_sign + SIGN_BADGE)
-	var near_sign := actor.position.distance_to(_sign) < SIGN_NEAR
+	var near_sign := _card == "sign"
 	rt.ui.badge("homestead", UiStatusBadge.State.READY if lit else UiStatusBadge.State.AVAILABLE, sign_top, true,
 		"" if near_sign else "Homestead Lv%d" % lvl, P0Logic.icon("home"))
 	rt.ui.tag("homestead", "Homestead Lv%d · Tap to upgrade" % lvl, sign_top - Vector2(0, rt.ui.badge_height("homestead")),
@@ -374,7 +376,22 @@ func _tags(v: Dictionary) -> void:
 	# Upgrade Plaque: no mark; the finger card only near it, and its tap is the plaque's (PLAQUE-READ).
 	_plaque_node.visible = not h.get("plaque", []).is_empty()
 	rt.ui.tag("plaque", "Upgrade Plaque · Tap to read", cam.unproject_position(_plaque + Vector3(0, 0.85, 0)),
-		_plaque_node.visible and actor.position.distance_to(_plaque) < SIGN_NEAR, cam.unproject_position(_plaque + Vector3(0, 0.35, 0)))
+		_card == "plaque", cam.unproject_position(_plaque + Vector3(0, 0.35, 0)))
+	# 不知火舞 on SGODOT-228 (293b4190): another facility's finger card over the sign's caption folds it to the mark
+	# while the card shows. TODO(亚瑟, world controls): the general rule for every CaptionPill replaces this.
+	if _card != "" and _card != "sign" and not near_sign:
+		var card := rt.ui.card_rect(_card)
+		if card.has_area() and card.grow(UiTokens.SPACE_ROW).intersects(rt.ui.badge_rect("homestead")):
+			rt.ui.badge("homestead", UiStatusBadge.State.READY if lit else UiStatusBadge.State.AVAILABLE, sign_top, true, "",
+				P0Logic.icon("home"))
+		rt.ui.slide_card_off(_card, rt.ui.badge_rect("homestead"))   # and the card never covers the mark itself
+
+## Every facility with a finger card on the farm, [id, position, reach m] in a fixed order (LOCK-07: one card, the
+## nearest in reach). SGODOT-231's gathering spots and workbench, and 2A's rest bench, join this list when they land.
+func _card_candidates() -> Array:
+	var out: Array = [["stall", _stall, 3.2], ["home", _house, 4.2], ["sign", _sign, SIGN_NEAR]]
+	if _plaque_node.visible: out.append(["plaque", _plaque, SIGN_NEAR])
+	return out
 
 func _teaching(v: Dictionary) -> void:
 	if rt.ui.has_modal(): return
@@ -445,11 +462,32 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"home": rt.ui.open_home_card()
 		"sign": p0_tap(cam.unproject_position(_sign + Vector3(0, 0.45, 0)))   # HOME-1 through the sign's own tap
 		"plaque": p0_tap(cam.unproject_position(_plaque + Vector3(0, 0.35, 0)))   # PLAQUE-READ
+		"zoomto": _zoom = clampf(float(step[1]), 0.8, 1.4)   # zoomto:0.8 (widest) … 1.4 (closest)
+		"markrects":   # print the Homestead mark's and the stall's badge rects (design check: ≥ 8 px apart)
+			var a := rt.ui.badge_rect("homestead")
+			var b := rt.ui.badge_rect("stall")
+			print("MARKRECTS zoom=%.2f homestead=%s stall=%s gap=%s" % [_zoom, a, b,
+				"n/a" if not (a.has_area() and b.has_area()) else str(_rect_gap(a, b))])
+			var cr := rt.ui.card_rect(_card)
+			if cr.has_area():
+				print("MARKRECTS card=%s rect=%s gap_to_homestead=%s" % [_card, cr, "n/a" if not a.has_area() else str(_rect_gap(a, cr))])
+		"tapsign":   # tapsign:mark|caption|edge — a tap on the Homestead mark's disc, its caption, or the sign's rim
+			var r := rt.ui.badge_rect("homestead")
+			match step[1] if step.size() > 1 else "mark":
+				"mark": p0_tap(Vector2(r.get_center().x, r.position.y + 10))
+				"caption": p0_tap(Vector2(r.get_center().x, r.end.y - 6))
+				_: p0_tap(cam.unproject_position(_sign + Vector3(0, 0.45, 0)) + Vector2(30, 0))
 		"moment":   # HOME-2 as after Lv2 → Lv3, without spending anything
 			HomePanel.moment(rt.ui, P0Logic.home_moment(rt.session.current(), {"level": 3, "unlocks": ["warming_cabinet", "bag_upgrade_1"]}))
 		"spot": p0_show_spot(step[1])
 		_: return false
 	return true
+
+## Smallest distance between two rects in px (0 when they touch or overlap).
+static func _rect_gap(a: Rect2, b: Rect2) -> float:
+	var dx := maxf(0.0, maxf(a.position.x - b.end.x, b.position.x - a.end.x))
+	var dy := maxf(0.0, maxf(a.position.y - b.end.y, b.position.y - a.end.y))
+	return Vector2(dx, dy).length()
 
 func p0_until(name: String) -> bool:
 	match name:

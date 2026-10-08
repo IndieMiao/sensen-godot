@@ -218,3 +218,25 @@ func test_a_tap_on_the_sign_mark_or_its_caption_is_the_sign() -> void:
 	assert_bool(ui.badge_hit("homestead", r.position + Vector2(r.size.x * 0.5, 6))).is_true()        # the round mark
 	assert_bool(ui.badge_hit("homestead", r.end - Vector2(r.size.x * 0.5, 4))).is_true()               # the caption
 	assert_bool(ui.badge_hit("homestead", r.position - Vector2(0, 30))).is_false()
+
+func test_one_finger_card_the_nearest_in_reach_and_it_does_not_flicker() -> void:
+	# LOCK-07: near both the sign and the stall only one card shows; the showing card keeps it inside CARD_KEEP.
+	var cands := [["stall", Vector3(9.4, 0, -10.1), 3.2], ["home", Vector3(6.2, 0, -10.7), 4.2], ["sign", Vector3(7.5, 0, -9.4), 2.6]]
+	assert_str(P0Garden.pick_card(cands, Vector3(7.6, 0, -8.6), "")).is_equal("sign")
+	assert_str(P0Garden.pick_card(cands, Vector3(8.5, 0, -9.7), "sign")).is_equal("sign")    # stall barely nearer: keep
+	assert_str(P0Garden.pick_card(cands, Vector3(9.3, 0, -9.9), "sign")).is_equal("stall")   # clearly nearer: switch
+	assert_str(P0Garden.pick_card(cands, Vector3(20, 0, 0), "stall")).is_equal("")           # out of every reach
+
+func test_a_card_slides_off_another_mark_and_keeps_pointing_at_its_facility() -> void:
+	# 不知火舞 on SGODOT-228 (293b4190): the plaque's card never covers the sign's mark; it moves sideways, ≥ 8 px clear,
+	# and its pointer stays on the plaque.
+	var ui := _ui(_view())
+	await get_tree().process_frame
+	var plaque := Vector2(160, 330)
+	ui.tag("plaque", "Upgrade Plaque · Tap to read", plaque - Vector2(0, 30), true, plaque)
+	var c: UiTapCard = ui._cards["plaque"]
+	var mark := Rect2(Vector2(c.position.x + c.size.x - 30, c.position.y + 10), Vector2(28, 28))   # under the card's right end
+	assert_bool(ui.slide_card_off("plaque", mark)).is_true()
+	assert_float(mark.position.x - (c.position.x + c.size.x)).is_greater_equal(8.0 - 0.01)
+	assert_float(c.position.x + c.pointer_tip_x()).is_equal_approx(plaque.x, 1.0)
+	assert_bool(ui.slide_card_off("plaque", Rect2(Vector2(340, 700), Vector2(10, 10)))).is_false()   # nothing to clear

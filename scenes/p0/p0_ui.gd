@@ -570,8 +570,37 @@ func badge_height(id: String) -> float:
 ## True when a scene tap lands on a shown badge (with its caption): badges ignore the mouse, so the facility that
 ## owns one tests this to treat a tap on its mark as its own (StatusBadge: tapping the badge = tapping the object).
 func badge_hit(id: String, screen: Vector2) -> bool:
+	var r := badge_rect(id)
+	return r.has_area() and r.grow(4).has_point(screen)
+
+## Slide a shown finger card sideways off `avoid` (another facility's mark), keeping `gap` px between them; the
+## pointer stays on its facility (TapCard Pointer=Left / Right), and the card stays on screen. Returns whether it moved.
+## TODO(亚瑟, world controls): 不知火舞's general rule for marks under cards (SGODOT-228 293b4190) replaces this.
+func slide_card_off(id: String, avoid: Rect2, gap := 8.0) -> bool:
+	var c: UiTapCard = _cards.get(id)
+	if c == null or not c.is_visible_in_tree() or not avoid.has_area(): return false
+	var r := Rect2(c.position, c.size)
+	if not r.grow(gap).intersects(avoid): return false
+	var left := avoid.position.x - gap - r.end.x     # move this much (negative) to clear on the left
+	var right := avoid.end.x + gap - r.position.x    # or this much to clear on the right
+	var dx := left if absf(left) <= absf(right) else right
+	var inner := Rect2(Vector2.ZERO, _kit.size).grow(-UiTokens.SPACE_WITHIN)
+	var x := clampf(r.position.x + dx, inner.position.x, inner.end.x - r.size.x)
+	if is_equal_approx(x, r.position.x): return false
+	var aim: float = (_card_hits.get(id, r.get_center()) as Vector2).x
+	c.position.x = x
+	c.point_at(aim - x)
+	return true
+
+## A shown finger card's rect in root coordinates; empty when hidden.
+func card_rect(id: String) -> Rect2:
+	var c: UiTapCard = _cards.get(id)
+	return Rect2(c.global_position - root.global_position, c.size) if c != null and c.is_visible_in_tree() else Rect2()
+
+## A shown badge's rect (with its caption) in root coordinates; empty when hidden.
+func badge_rect(id: String) -> Rect2:
 	var b: UiStatusBadge = _badges.get(id)
-	return b != null and b.is_visible_in_tree() and Rect2(b.global_position - root.global_position, b.size).grow(4).has_point(screen)
+	return Rect2(b.global_position - root.global_position, b.size) if b != null and b.is_visible_in_tree() else Rect2()
 
 ## Finger cards stay on screen (their facility is near, so on screen); a badge over an off-screen facility hides.
 func _place_marker(m: Control, screen: Vector2, clamp_inside: bool) -> void:
