@@ -119,3 +119,26 @@ describe('P0 snapshot frame v1 fixture (shared with tests/p0/test_p0_online.gd)'
     expect(frame.toString('hex')).toBe(readFileSync(new URL('../../../tests/fixtures/p0/frame_v1.hex', import.meta.url), 'utf8').trim());
   });
 });
+
+describe('the tea house on the Coffee Shop kit (SGODOT-227 scene integration)', () => {
+  // A client still on the Basic Room build keeps sending its old room metres and seat names after the server
+  // redeploy: positions are clamped onto the new floor and the old bench seats are refused, never trusted.
+  it('clamps old Basic Room coordinates into the new floor and refuses the old bench seats', async () => {
+    const { loadOutposts } = await import('../../src/p0/online/outposts.js');
+    const tea = loadOutposts().find(o => o.id === 'sh_tea_1')!;
+    expect(tea.art).toBe('coffee_shop');
+    expect(tea.seats).toEqual(['seat_table1_1', 'seat_table1_2', 'seat_table2_1', 'seat_table2_2']);
+    const clock = { t: 1_000_000 };
+    const r = new OutpostRooms(loadOutposts(), () => clock.t);
+    r.join('old-client-001', 'sh_tea_1', [0.0, 3.1]);   // the old room's front edge, past the Coffee Shop floor
+    const [, x1, , z1] = tea.bounds;
+    expect(r.occupant('old-client-001')).toMatchObject({ x: 0, z: z1 });
+    clock.t += 1000;
+    r.move('old-client-001', 3.0, 3.2, 0, 'walk');
+    expect(r.occupant('old-client-001')!.x).toBeLessThanOrEqual(x1);
+    expect(r.occupant('old-client-001')!.z).toBeLessThanOrEqual(z1);
+    expect(r.sit('old-client-001', 'seat_bench_1')).toBe('NO_SEAT');
+    expect(r.occupant('old-client-001')).toMatchObject({ seat: '', action: 'walk' });
+    expect(r.sit('old-client-001', 'seat_table2_1')).toBe('ok');
+  });
+});

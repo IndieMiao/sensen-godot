@@ -86,3 +86,30 @@ func test_a_visit_that_only_reads_the_board_keeps_the_stalls_new() -> void:
 	ui._counter.set_section("buy")
 	assert_bool(ui.stall_has_new()).is_false()
 	ui.close_modal()
+
+## q(44) (奕星 / 不知火舞): a stall wearing ! (a request open) or ✓ (one ready to hand in) opens on its Stall Board; with
+## no badge, or only New, it opens on Buy, where `◆ New for you` is.
+func test_the_stall_opens_where_its_badge_points() -> void:
+	var v := _view(1)
+	v.stall["board"] = {"requests": [{"id": "req_pond_catch", "status": "open", "item": "fish_crucian", "qty": 2, "have": 0}]}
+	ui.set_view(v)
+	ui.open_stall()
+	await await_idle_frame()
+	assert_str(ui._counter.section).is_equal("board")
+	ui.close_modal()
+	v.stall.board.requests[0].have = 2   # ready to hand in: ✓
+	ui.set_view(v)
+	ui.open_stall()
+	await await_idle_frame()
+	assert_str(ui._counter.section).is_equal("board")
+	ui.close_modal()
+	v.stall.board.requests = []
+	ui.set_view(v)
+	ui.open_stall()
+	await await_idle_frame()
+	assert_str(ui._counter.section).is_equal("buy")
+	ui.close_modal()
+	ui.open_stall("buy")   # a caller naming the page gets it
+	await await_idle_frame()
+	assert_str(ui._counter.section).is_equal("buy")
+	ui.close_modal()

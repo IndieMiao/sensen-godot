@@ -39,7 +39,7 @@
 |---|---|
 | 主行动键 · Farming | `Sow ×1 · 2 Energy`（档 2–4：3 / 4 / 6）/ Row Hoe `Sow ×3 · 6 Energy` / 灰 `Sow · Pick a seed`（种子用完自动回到这一态，q(44)）/ `Till · Free` / `Water · Free` / `Harvest · Free` / `Fertilize · Free` / 灰 `Fertilize · Nothing to feed` |
 | 快捷栏幽灵格 ★ | `Seeds` / `Bait` / `Torch`（只写名词，q(44)）；钉住格归零写 `0` + `Buy at Homestead Stall` |
-| 驿站棚（无人值守，LOCK-17） | 名字条 `Homestead Stall`（q(62)）；抽屉标题 `Homestead Stall`；Tab `Buy / Stall Board`；挂委托板的 `!` 时点棚停在 Stall Board 页（q(44)） |
+| 驿站棚（无人值守，LOCK-17） | 名字条 `Homestead Stall`（q(62)）；抽屉标题 `Homestead Stall`；Tab `Buy / Stall Board`；挂委托板的 `!` 时点棚停在 Stall Board 页（q(44)）；Buy 页新上架的行写 `◆ New for you`，棚上同时只挂一枚徽标，委托在时不挂 ◆（q(76)） |
 | 驿站委托板 | `Pond Catch · 2 Pond Crucian · 14 coins` / `Track` / `Tracked` / `Ready to deliver` / `Deliver` / `Requests today 4/6`（q(55)） |
 | 长椅 | 名字条 `+60 Energy` / 用过灰 `Rested today`（q(62)）；按钮 `Rest · +60 Energy` / 快满 `Rest · +25 Energy` / 冷却 `Rest · back after 2h away · 1h 12m to go` / 已用 `Rested today · tomorrow 4:00` |
 | 工作台 ★ | 名字条 `Workbench`（q(62)）；只有 `Tools / Supplies` 两个 Tab（q(31)）；按钮在卡片右下（q(45)）；缺料 `Need 6 more Timber`；门禁 `Farming Lv3`（堆肥配方，q(44)）；放不下 `No room · free a slot first`；铜镐 `Equip` / `Equipped`；手套 `Owned · always on`（q(46)） |
@@ -137,7 +137,9 @@
 |---|---|
 | 横幅 | `Offline · Reconnecting…` + `Retry` / `Back online` / `Didn't go through · try again` |
 | 离线时按钮 | 命令按钮灰 `Offline`；主行动键如 `Sow · Offline` |
-| 世界动作回滚 | toast `3 plots not sown · Energy returned` |
+| 维护卡 SYS-MAINT | `Down for maintenance` / `We'll be back around 14:30.`（设备本地时间、24 小时制；★ 结束时刻不在今天写 `We'll be back around Oct 10, 14:30.`）/ `We'll be back soon.`（没有预计时间或已过时）/ `Check again`（q(74)） |
+| 强制更新卡 SYS-UPDATE | `Update to keep playing` / `This version is out of date.` / `Update`；两张卡都没有关闭按钮（q(74)） |
+| 世界动作失败 | P0 只出横幅 `Didn't go through · try again`，**不出** toast `3 plots not sown · Energy returned`（P0 世界动作没有本地投影，那句 toast 留给以后有投影的版本，q(75)） |
 | 去重与 stale_state | 不出任何提示 |
 | 启动与账号 | `When were you born?` / `Pick your birthday` / `Continue` / `Before you start` / `Agree to continue` / `Terms of Service ›` / `Privacy Policy ›` / `Continue with Apple` / `Continue with Google` / `Continue with Email` / `Taking longer than usual…` / `Can't connect` / `That name isn't allowed` / `Try another name`（WP6，SGODOT-206） |
 

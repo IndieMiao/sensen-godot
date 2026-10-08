@@ -734,6 +734,9 @@ func _dev_shot(dt: float) -> void:
 				if ui._bag != null and is_instance_valid(ui._bag):
 					var i := P0BagDrawer.CATEGORIES.find(step[1])
 					if i >= 0: (ui._bag._chips.get_child(i) as Button).button_pressed = true
+			"counterpick":  # counterpick[:id] selects a stack in the counter's bag half: its Sell card shows (q(16) shots)
+				if ui._counter != null and is_instance_valid(ui._counter) and ui._counter.grid != null and not ui._counter.grid.shown_items().is_empty():
+					ui._counter.grid.select(step[1] if step.size() > 1 else str(ui._counter.grid.shown_items().front().id))
 			"bagpick":  # tap the first listed item of the open bag drawer
 				if ui._bag != null and is_instance_valid(ui._bag) and not ui._bag.grid.shown_items().is_empty():
 					ui._bag.grid.select(str(ui._bag.grid.shown_items().back().id))

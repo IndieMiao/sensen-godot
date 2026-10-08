@@ -23,6 +23,9 @@ enum Severity { SUCCESS, INFO, REFUSED, ERROR }
 const REPEAT_MS := 2000
 ## Toast · R1 width (Figma 1178:82265, WP2 accepted; both placement demos 1182:82260 use it).
 const WIDTH := UiTokens.SIZE_TOAST_W
+## At the foot of a drawer with no decision area (q(16); GUESTBOOK-DELETED, 不知火舞 a414d0da): 232 wide. A constant
+## until the next token export adds it.
+const NARROW_WIDTH := 232.0
 const _GLYPHS := {
 	Severity.SUCCESS: preload("res://assets/ui/kit_icons/success.svg"),
 	Severity.INFO: preload("res://assets/ui/kit_icons/info.svg"),
@@ -33,6 +36,8 @@ const _ICON_GAP := 8.0   # glyph 20, then the text (R1: text at x 39 of the card
 const _LINE_GAP := 4.0
 
 var _anchor: WeakRef
+var _bottom_y := -1.0   # anchor_bottom: the toast's bottom edge, layer-local; -1 when it sits above an anchor
+var _width := WIDTH
 
 var _current := {}
 var _left := 0.0
@@ -121,6 +126,15 @@ static func glyph(severity: Severity) -> Texture2D: return _GLYPHS[severity]
 ## Sit above `c` (a drawer's fixed decision area, or a collapsed quick bar handle); null = the quick bar.
 func anchor_above(c: Control) -> void:
 	_anchor = weakref(c) if c != null else null
+	_bottom_y = -1.0
+	_width = WIDTH
+	_place()
+
+## Sit with the bottom edge at layer-local `y`, `width` wide: the foot of a drawer with no decision area (q(16)).
+func anchor_bottom(y: float, width := WIDTH) -> void:
+	_anchor = null
+	_bottom_y = y
+	_width = width
 	_place()
 
 ## Layer-local y of the edge the toast sits above.
@@ -177,11 +191,12 @@ func _render() -> void:
 
 func _place() -> void:
 	if _panel == null or not _panel.visible: return
-	var w := minf(WIDTH, size.x - UiTokens.SPACE_PAGE * 2.0)
+	var w := minf(_width, size.x - UiTokens.SPACE_PAGE * 2.0)
 	_panel.custom_minimum_size = Vector2(w, UiTokens.SIZE_TOAST_MIN_H)
 	var h := _panel.get_combined_minimum_size().y
 	_panel.size = Vector2(w, h)
-	_panel.position = Vector2(UiTokens.SPACE_PAGE, anchor_top() - UiTokens.SPACE_OVERLAY_BODY - h)
+	var bottom := _bottom_y if _bottom_y >= 0.0 else anchor_top() - UiTokens.SPACE_OVERLAY_BODY
+	_panel.position = Vector2(UiTokens.SPACE_PAGE, bottom - h)
 
 func _on_panel_input(e: InputEvent) -> void:
 	if e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT and not e.pressed:

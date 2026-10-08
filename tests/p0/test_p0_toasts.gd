@@ -79,17 +79,57 @@ func test_a_full_creel_says_so_and_its_action_opens_the_bag() -> void:
 
 ## 周瑜 (int, a05-reason): over a drawer without the quick bar (the workbench), the reason toast is whole, over the
 ## drawer, just above its top edge — not on its rows or its Close key; and every toast keeps Toast R1's 232 width.
-func test_over_a_drawer_without_the_bar_it_sits_above_the_drawer() -> void:
-	var wb := UiDrawer.new(300.0)   # the workbench's way: a drawer opened without the bar (hide_controls)
-	wb.animate = false
-	ui._open_modal(wb, UiTokens.OPACITY_SCRIM_DRAWER, true)
+## q(16) (不知火舞 on #86): a drawer with no decision area (the Workbench) puts the toast at its foot — bottom edge 16
+## over the drawer's bottom and the safe inset, 232 wide — never above the drawer, never at the bar's spot over it.
+func test_in_a_drawer_with_no_decision_area_it_sits_at_the_foot() -> void:
+	for h in [300.0, ui.root.size.y - 60.0]:   # a short drawer and one reaching up to the HUD (李元芳 int7)
+		var wb := UiDrawer.new(h)   # the workbench's way: a drawer opened without the bar (hide_controls)
+		wb.animate = false
+		ui._open_modal(wb, UiTokens.OPACITY_SCRIM_DRAWER, true)
+		await await_idle_frame()
+		ui.toast_error("Need 5 more Copper Ore")
+		await await_idle_frame()
+		var r := _panel().get_global_rect()
+		assert_float(r.size.x).is_equal(ToastLayer.NARROW_WIDTH)
+		assert_float(r.position.x).is_equal(float(UiTokens.SPACE_PAGE))
+		assert_float(r.end.y).is_equal_approx(ui.root.size.y - 16.0 - ui.safe_bottom(), 0.5)
+		assert_int(ui._toasts.get_index()).is_equal(ui.root.get_child_count() - 1)
+		ui.close_modal()
+		ui.clear_toast()
+
+## q(16): a drawer with a fixed decision area (the counter's Sell card, the kitchen's Cook row) has the toast 8 above it.
+class _Decided extends UiDrawer:
+	var area := Control.new()
+	func _init() -> void:
+		super(500.0)
+		area.custom_minimum_size = Vector2(300, 48)
+		body.add_child(Control.new())
+		body.add_child(area)
+	func action_area() -> Control: return area
+
+func test_in_a_drawer_with_a_decision_area_it_sits_above_it() -> void:
+	var d := _Decided.new()
+	d.animate = false
+	ui._open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
 	await await_idle_frame()
-	ui.toast_error("Need 1 more Copper Ore")
+	ui.toast_error("Need 12 more coins")
 	await await_idle_frame()
 	var r := _panel().get_global_rect()
 	assert_float(r.size.x).is_equal(float(ToastLayer.WIDTH))
-	assert_int(ui._toasts.get_index()).is_equal(ui.root.get_child_count() - 1)
-	assert_float(r.end.y).is_equal_approx(wb.get_global_rect().position.y - UiTokens.SPACE_OVERLAY_BODY, 0.5)
+	assert_float(r.end.y).is_equal_approx(d.area.get_global_rect().position.y - UiTokens.SPACE_OVERLAY_BODY, 0.5)
+	ui.close_modal()
+	ui.toast("Back on the farm")   # with no drawer it sits on the bar again, full width
+	await await_idle_frame()
+	assert_float(_panel().get_global_rect().size.x).is_equal(float(ToastLayer.WIDTH))
+	assert_float(_panel().get_global_rect().end.y).is_greater(ui.root.size.y * 0.6)
+
+func test_the_counter_and_kitchen_name_their_decision_areas() -> void:
+	var k := P0KitchenDrawer.new()
+	assert_object(k.action_area()).is_null()   # not in the tree yet: nothing shows
+	k.free()
+	var c := P0CounterDrawer.new({}, "homestead")
+	assert_object(c.action_area()).is_null()
+	c.free()
 
 ## E-04 FARM-3-RESULT-2: the bag fills mid-harvest — the run's count floats, the Error toast points at the stall with
 ## Open bag, and the hold stops.

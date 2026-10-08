@@ -62,3 +62,10 @@ textures/vram_compression/import_etc2_astc=true
 
 network/base_url="https://farm.sensenjoy.cn/v1"
 network/mobile_base_url="https://farm.sensenjoy.cn/preview/journey/v1"
+
+[threading]
+
+; SGODOT-227 scene integration: on a 2-core Android device the default pool (one thread per core) starves while
+; the Coffee Shop kit loads its shared plants on the main thread, and the room never opens (emulator, 0 % CPU,
+; every thread in futex wait). Eight threads open it. Desktop keeps its default.
+worker_pool/max_threads.mobile=8

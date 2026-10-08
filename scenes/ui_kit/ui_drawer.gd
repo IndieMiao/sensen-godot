@@ -28,6 +28,10 @@ var height := 0.0: set = set_height
 var safe_bottom := 0.0: set = set_safe_bottom
 ## Content inset at the sides, top and bottom: 12 for the Bag layout, 16 for profile sheets (RES-PIP).
 var pad := _PAD: set = set_pad
+
+## The drawer's fixed decision area, which a toast sits above (q(16): the counter's sell card, the kitchen's Cook row);
+## null for a drawer without one, where the toast sits at the drawer's foot. Drawers that have one override it.
+func action_area() -> Control: return null
 ## Slide up over MOTION_DRAWER_MS when entering the tree.
 var animate := true
 ## Content column; separation 0, the caller adds its own gaps (the Bag layout uses explicit spacers).
