@@ -409,4 +409,5 @@ func test_the_spice_rack_takes_taps_beside_it_and_the_stove_keeps_to_its_body() 
 	var cab := lv3.hit_rect("use_warming_cabinet")
 	var rack3 := lv3.hit_rect("use_spice_rack")
 	var below := Vector2(cab.get_center().x, maxf(cab.get_center().y, rack3.end.y + 4))
-	if cab.has_point(below): assert_str(lv3.pick(below)).is_equal("use_warming_cabinet")
+	assert_bool(cab.has_point(below)).override_failure_message("%s not in the cabinet's box %s" % [below, cab]).is_true()
+	assert_str(lv3.pick(below)).is_equal("use_warming_cabinet")   # under the shelf, the cabinet's own
