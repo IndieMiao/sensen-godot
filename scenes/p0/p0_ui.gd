@@ -324,6 +324,7 @@ func set_surface(name: String) -> void:
 	if _dev_box: _dev_box.visible = world
 	for c in _cards.values(): (c as Control).visible = false
 	for b in _badges.values(): (b as Control).visible = false
+	_flush_held_toast()
 
 ## Action spaces show the full bar. Rooms (farmhouse kitchen, outposts) and the map keep only Bag, with no action
 ## or switch key (MAP-1, §10.3.5, o(8)); the map waits for map_bag. Busy worlds hide it.
@@ -351,7 +352,7 @@ func _refresh_bar() -> void:
 		if selected_bait != "" and not ids.has(selected_bait): selected_bait = ""
 		# The last bait went on a hook: the slot stays pinned at 0, the hook goes empty (李白 q(44) ④).
 		if selected_bait != "" and P0Logic.bag_count(view, selected_bait) <= 0:
-			toast("Out of %s · no bait on the hook" % P0Logic.item_name(view, selected_bait))
+			toast_when_clear("Out of %s · no bait on the hook" % P0Logic.item_name(view, selected_bait))
 			selected_bait = ""
 		var free := int(view.get("bag", {}).get("free", 0))
 		_creel_count.text = P0Logic.creel_line(view).get_slice(" · ", 0)
@@ -634,6 +635,23 @@ func close_modal() -> void:
 	if not _card_queue.is_empty():
 		var next: Callable = _card_queue.pop_front()
 		next.call_deferred()
+	else:
+		_flush_held_toast()
+
+## A toast that must not be lost under the fishing presentation (layer 30, over this layer) or a result card: the
+## last bait goes at the reel's settlement, while the panel still shows the landing (int5b hand test 10). Shown at
+## once when nothing covers the UI, else held until the world is back from "busy" and no card is open or queued.
+var _held_toast := ""
+
+func toast_when_clear(text: String) -> void:
+	_held_toast = text
+	_flush_held_toast()
+
+func _flush_held_toast() -> void:
+	if _held_toast == "" or not is_node_ready(): return
+	if surface == "busy" or _modal != null or not _card_queue.is_empty(): return
+	toast(_held_toast)
+	_held_toast = ""
 
 ## Result cards (catch, dish, level up) wait their turn instead of replacing each other.
 func queue_card(show: Callable) -> void:
