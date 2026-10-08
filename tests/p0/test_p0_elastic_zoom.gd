@@ -3,6 +3,13 @@ extends GdUnitTestSuite
 
 const ElasticZoom := preload("res://modules/p0/p0_elastic_zoom.gd")
 
+class ZoomWorld extends Node:
+	var zooms: Array = []
+	var ends := 0
+	func p0_surface() -> String: return "farm"
+	func p0_zoom(f: float) -> void: zooms.append(f)
+	func p0_zoom_end() -> void: ends += 1
+
 func _settle(z, seconds := 1.0) -> void:
 	var t := 0.0
 	while t < seconds:
@@ -65,3 +72,38 @@ func test_the_farm_springs_back_after_the_fingers_lift() -> void:
 		if farm._pinch.step(1.0 / 60.0): farm._zoom = farm._pinch.value
 	assert_float(farm._zoom).is_equal_approx(1.4, 0.005)
 	farm.free()
+
+func _touch(pad: Control, index: int, at: Vector2, down: bool) -> void:
+	var e := InputEventScreenTouch.new()
+	e.index = index
+	e.position = at
+	e.pressed = down
+	pad._gui_input(e)
+
+func _drag(pad: Control, index: int, at: Vector2) -> void:
+	var e := InputEventScreenDrag.new()
+	e.index = index
+	e.position = at
+	pad._gui_input(e)
+
+func test_two_fingers_on_the_scene_pad_reach_the_world_as_zoom_then_zoom_end() -> void:
+	# The real path: P0Ui's scene pad (GestureArbiter SCENE mode) → zoom / zoom_end → P0Runtime → the world.
+	var rt: P0Runtime = auto_free(P0Runtime.new())
+	add_child(rt)
+	await get_tree().process_frame
+	var world: ZoomWorld = auto_free(ZoomWorld.new())
+	rt.attach(world)
+	var pad: Control = rt.ui.pad
+	_touch(pad, 0, Vector2(100, 300), true)
+	_touch(pad, 1, Vector2(140, 300), true)
+	_drag(pad, 1, Vector2(180, 300))   # spread 40 → 80: factor 0.5, closer
+	_drag(pad, 0, Vector2(60, 300))    # 80 → 120
+	assert_int(world.zooms.size()).is_equal(2)
+	assert_float(world.zooms[0]).is_equal_approx(0.5, 0.0001)
+	assert_int(world.ends).is_equal(0)
+	_touch(pad, 1, Vector2(180, 300), false)
+	assert_int(world.ends).is_equal(0)   # one finger still down: still pinching
+	_touch(pad, 0, Vector2(60, 300), false)
+	assert_int(world.ends).is_equal(1)
+	rt.detach(world)
+
