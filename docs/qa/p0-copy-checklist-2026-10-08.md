@@ -69,7 +69,7 @@
 | Cookbook 按钮四态 | `Cook` / 灰 `Need Wild Herb ×1` / 灰 `Cooking Lv4 · 3rd slot` / `Try in Experiment ›` |
 | Experiment | `From your bag · 2 of 2 slots used`；调味料格带 `Rack` 角标、写仓库实数（如 `Rock Salt 12`，不写 /30，q(46)）；`Not for cooking`（金锦鲤）；`In the pot` |
 | 火候 | `Tap when the needle hits gold!` / `Nice heat! ★` / `Missed · still cooking` / `Perfect! ★★ · Extra portion` |
-| 出锅卡 COOK-4 ★ | 首做 `New recipe!` + 奖励条 `First cooked · +10 Cooking XP · Cookbook 1/48`（只放首做 XP；本锅 XP 照常飘 `+5 Cooking XP ★`，q(55)）/ 重复 `Cooked!` / 失败 `Mystery Dish` + `Hmm… not a dish` + `A clue was added to your Cookbook` + 灰字 `Can't be sold or delivered`（q(55)）/ 退料 `No dish this time` + `Ingredients back (9 left today)` + `OK`；按钮只有 `Eat · +45 Energy` / `Keep`，Gift 在 P0 灰；没有 Cook Again 按钮（q(46)、q(48)、q(49)） |
+| 出锅卡 COOK-4 ★ | 首做 `New recipe!` + 奖励条 `First cooked · +10 Cooking XP · Cookbook 1/48`（只放首做 XP；本锅 XP 照常飘 `+5 Cooking XP ★`，q(55)）/ 重复 `Cooked!` / 失败 `Mystery Dish` + `Hmm… not a dish` + `A clue was added to your Cookbook` + 灰字 `Can't be sold or delivered`（q(55)）/ 退料 `No dish this time` + 名字行 `Ingredients back` + 第二行 `9 left today` + `OK`（q(66)）；按钮只有 `Eat · +45 Energy` / `Keep`，Gift 在 P0 灰；没有 Cook Again 按钮（q(46)、q(48)、q(49)） |
 | Cook Again ★ | 收走后点灶台：`Cook Again` / `Choose recipe ›`，第 2 锅 `Cooks today 2nd` / `Cooking XP Half`（q(48)） |
 | 保温柜 | 名字条 `Warming Cabinet 4/6`（q(62)）/ `Take one` / `Kept · Warming Cabinet 5/6` / `Cabinet full · Herb Grilled Fish sent to bag` / `Cabinet and bag full · dish left on the stove` / `Bag full · dish left on the stove` |
 | Cooking Lv4 之后 Today ★ | `3rd slot open · try Fine fish + Potato + Rock Salt`（q(46)） |

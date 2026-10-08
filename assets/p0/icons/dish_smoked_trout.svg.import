@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://blkjocm68u8vp"
-path="res://.godot/imported/family_dots_clued.svg-06b618ef94504bbad72a0844ca865731.ctex"
+uid="uid://dkdc5j7t4hhg"
+path="res://.godot/imported/dish_smoked_trout.svg-270ed3bf5792f63e54b826f13cb625b1.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ui/kit_icons/kitchen/family_dots_clued.svg"
-dest_files=["res://.godot/imported/family_dots_clued.svg-06b618ef94504bbad72a0844ca865731.ctex"]
+source_file="res://assets/p0/icons/dish_smoked_trout.svg"
+dest_files=["res://.godot/imported/dish_smoked_trout.svg-270ed3bf5792f63e54b826f13cb625b1.ctex"]
 
 [params]
 

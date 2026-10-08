@@ -469,7 +469,7 @@ func on_event(ev: Dictionary) -> bool:
 			var known := not bool(ev.get("mystery", false)) and not bool(ev.get("none", false))
 			last_page = str(ev.get("dish", "")) if known else ""
 			if bool(ev.get("auto", false)):   # S5 Queue ×2 kept it on its own: the toast only, no card
-				_toast_keep.call_deferred(ev, P0KitchenLogic.routes(_events + [ev]))
+				_toast_keep.call_deferred(ev, _events + [ev])
 				return true
 			_events.append(ev)
 			# Once the whole reply is in, and through the card queue: a card already open (an Energy card, a level-up
@@ -665,11 +665,9 @@ func _on_card_closed() -> void:
 	stage.clear_ingredients()
 	stage.set_cooking(false)
 
-func _toast_keep(ev: Dictionary, routes: Dictionary) -> void:
-	var base := str(ev.get("dish", ""))
-	var q := int(ev.get("quality", 0))
-	var id := base if q == 0 else "%s@%s" % [base, ["plain", "good", "perfect"][q]]
-	rt.ui.toast(str(P0KitchenLogic.keep_line(rt.session.current(), id, str(routes.get(id, "bag"))).text))
+func _toast_keep(ev: Dictionary, events: Array) -> void:
+	var line := P0KitchenLogic.kept_line(rt.session.current(), ev, events)
+	if not line.is_empty(): rt.ui.toast(str(line.text))
 
 func _exit_tree() -> void:
 	if _ring and is_instance_valid(_ring): _ring.queue_free()

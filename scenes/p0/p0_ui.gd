@@ -780,7 +780,8 @@ func name_bar(id: String, icon: Texture2D, text: String, fact: String, screen: V
 		_kit.add_child(bar)
 		_kit.move_child(bar, 0)
 		_name_bars[id] = bar
-	if not (show and _modal == null):
+	# Its facility off screen (a Show moved the camera away, 周瑜 on 231): no strip hanging at the edge, like the buttons.
+	if not (show and _modal == null) or not _marker_area().has_point(screen):
 		if bar.visible: _fold_name_bar(bar)
 		return
 	_card_hits[id] = screen if hit == Vector2.INF else hit
@@ -2551,60 +2552,6 @@ func _dex_cell(d: Dictionary) -> Control:
 	box.add_child(nl)
 	cell.add_child(box)
 	return cell
-
-## COOK-4 / COOK-6: the dish slides out; Eat now or Keep (bag).
-func show_dish(ev: Dictionary, xp_lines: Array) -> void:
-	var card := _center_card(290)
-	modal_kind = "card"
-	var dish := str(ev.get("dish", ""))
-	var q := int(ev.get("quality", 0))
-	var id := dish if q == 0 else "%s@%s" % [dish, ["plain", "good", "perfect"][q]]
-	var info := P0Logic.item(view, id)
-	var ic := _icon(dish, 72)
-	ic.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	card.add_child(ic)
-	var mystery := bool(ev.get("mystery", false))
-	var mc := P0Logic.mystery_card(ev)
-	var title := str(mc.title) if mystery else P0Logic.dish_label(view, id)
-	var t := _label(title, 15, INK, true)
-	t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	card.add_child(t)
-	var sub := str(mc.sub) if mystery else "%s%s · +%d Energy" % [["", "Good · ", "Perfect · "][q], P0Logic.rarity_name(view, int(info.get("rarity", 1))), int(info.get("full", 20))]
-	var s2 := _label(sub, 10, INK2, true)
-	s2.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	card.add_child(s2)
-	if int(ev.get("qty", 1)) > 1:
-		var extra := _label("Perfect pot · a second portion", 9, AMBER_D, true)
-		extra.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		card.add_child(extra)
-	for line in xp_lines:
-		var l := _label(str(line), 11, Color("1e9bb0"), true)
-		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		card.add_child(l)
-	var eb := P0Logic.eat_button(view, id)
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 8)
-	var eat := _pill_button(str(eb.text), true)
-	eat.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	eat.disabled = not eb.get("enabled", false)
-	eat.add_theme_font_size_override("font_size", 10)
-	var confirm := str(eb.get("confirm", ""))
-	eat.pressed.connect(func():
-		if confirm != "" and eat.text != confirm:
-			eat.text = confirm
-			return
-		close_modal()
-		command.emit({"type": "eat", "item": id}))
-	if mc.eat or not mystery: row.add_child(eat)
-	else: eat.free()
-	var keep := _pill_button("Keep" if mc.eat or not mystery else "OK", false)
-	keep.custom_minimum_size = Vector2(70, 32)
-	keep.pressed.connect(close_modal)
-	row.add_child(keep)
-	card.add_child(row)
-	var ml := _label(P0Logic.meal_line(view), 8, INK2)
-	ml.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	card.add_child(ml)
 
 # ---------------------------------------------------------------- helpers
 ## One press = one action. Touch is emulated as a left mouse button (project default), so reacting to

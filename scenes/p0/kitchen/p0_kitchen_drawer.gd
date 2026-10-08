@@ -24,6 +24,9 @@ const _GRID_GAP := 8.0
 const _RECIPE := Vector2(336, 72)
 const _RECIPE_BUTTON := Vector2(90, 44)
 const _RECIPE_BUTTON_AT := Vector2(238, 28)   # Cook at (250, 470) in a card at (12, 442)
+const _RECIPE_PAD := 8.0          # the button's right edge at 328; also its gap to the text column (C3)
+const _RECIPE_ROW_GAP := 4.0      # a button too long for the corner: its own row under the facts (44 hit, 34 drawn)
+const _RECIPE_MAYBE_TOP := 43.4   # "You might have what it takes" under the fact line (226 33725b5e)
 const _COOK_W := 164.0
 const _MEDALLION := Rect2(9.4, 15.4, 38, 38)
 const _DISH_ICON := 27.0
@@ -42,7 +45,9 @@ var _state: Label
 var _modes: UiSegmentTab
 var _cookbook: VBoxContainer
 var _experiment: VBoxContainer
+var _recipe_wrap: Control
 var _recipe: Panel
+var _recipe_maybe: Label
 var _recipe_icon: TextureRect
 var _recipe_title: Label
 var _recipe_state: Label
@@ -137,6 +142,7 @@ func _build_cookbook() -> VBoxContainer:
 func _build_recipe() -> Control:
 	var wrap := Control.new()
 	wrap.custom_minimum_size = _RECIPE
+	_recipe_wrap = wrap
 	_recipe = Panel.new()
 	_recipe.size = _RECIPE
 	_recipe.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -155,6 +161,10 @@ func _build_recipe() -> Control:
 	_recipe_title = _text(_recipe, UiTokens.STYLE_C14_XB, UiTokens.COLOR_TEXT, Rect2(57.4, 8.4, 180, 18))
 	_recipe_state = _text(_recipe, UiTokens.STYLE_C10_B, UiTokens.COLOR_SECONDARY, Rect2(57.4, 28.4, 150, 13))
 	_recipe_effect = _text(_recipe, UiTokens.STYLE_C12_XB, UiTokens.COLOR_TEXT, Rect2(57.4, 48.4, 142, 15))
+	_recipe_maybe = UiKit.label("", UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_NEW_INK)
+	_recipe_maybe.position = Vector2(57.4, _RECIPE_MAYBE_TOP)
+	_recipe_maybe.visible = false
+	_recipe.add_child(_recipe_maybe)
 	_recipe_button = UiCommandButton.new("Cook", UiCommandButton.Kind.PRIMARY, true)
 	_recipe_button.position = _RECIPE_BUTTON_AT
 	_recipe_button.size = _RECIPE_BUTTON
@@ -211,12 +221,42 @@ func _show_page(id: String) -> void:
 	_recipe_title.text = card.title
 	_recipe_state.text = card.state
 	_recipe_effect.text = card.effect
+	_recipe_maybe.text = card.maybe
+	_recipe_maybe.visible = card.maybe != ""
 	if card.nav != "":
 		_recipe_nav.visible = true
 	else:
 		_recipe_button.visible = true
 		_recipe_button.reason = card.reason
 		_recipe_button.label = "Cook"
+	_layout_recipe()
+
+## The card grows with what it says (int6 C3 / C41, 不知火舞 on 226): the might-have line pushes the effect line
+## down; the button keeps the bottom-right corner, right-aligned at 328 and as wide as its text, and when that
+## text would run into the facts it takes a full-width row of its own under them. Text never shrinks or wraps.
+func _layout_recipe() -> void:
+	var extra := _recipe_maybe.get_combined_minimum_size().y + 2.0 if _recipe_maybe.visible else 0.0
+	_recipe_effect.position.y = 48.4 + extra
+	var h := _RECIPE.y + extra
+	_recipe_nav.position = Vector2(_RECIPE.x - 150, _RECIPE_BUTTON_AT.y + extra)
+	var b := _recipe_button
+	var w := maxf(_RECIPE_BUTTON.x, b.get_combined_minimum_size().x)
+	var right := _RECIPE.x - _RECIPE_PAD
+	var facts := 57.4 + maxf(_text_width(_recipe_state), _text_width(_recipe_effect)) + _RECIPE_PAD
+	if right - w >= facts:
+		b.position = Vector2(right - w, _RECIPE_BUTTON_AT.y + extra)
+		b.size = Vector2(w, _RECIPE_BUTTON.y)
+	else:
+		var top := _recipe_effect.position.y + _recipe_effect.size.y + _RECIPE_ROW_GAP
+		b.position = Vector2(_RECIPE_PAD, top)
+		b.size = Vector2(_RECIPE.x - _RECIPE_PAD * 2.0, _RECIPE_BUTTON.y)
+		if b.visible: h = top + _RECIPE_BUTTON.y + _RECIPE_ROW_GAP
+	_recipe.size = Vector2(_RECIPE.x, h)
+	_recipe_wrap.custom_minimum_size = Vector2(_RECIPE.x, h)
+
+## How wide a clipped label's text really is (clip_text makes its minimum width 0).
+static func _text_width(l: Label) -> float:
+	return l.get_theme_font(&"font").get_string_size(l.text, HORIZONTAL_ALIGNMENT_LEFT, -1, l.get_theme_font_size(&"font_size")).x
 
 # ---------------------------------------------------------------- Experiment
 func _build_experiment() -> VBoxContainer:
