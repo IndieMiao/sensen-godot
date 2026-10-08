@@ -233,22 +233,25 @@ func test_a_drag_from_a_finger_card_starts_the_joystick() -> void:
 	assert_array(taps).is_empty()
 
 func test_a_second_tip_waits_for_the_first_card_and_is_not_learned_meanwhile() -> void:
-	# 李元芳 first-session test 12: the pond asked for Cast then Bait in one frame; Bait covered Cast at once and Cast
-	# was counted as learned unseen. Now Bait waits (the pond asks every frame) and shows once Cast is gone.
+	# 李元芳 first-session test 12: two tips asked for in one frame must not cover each other, and the waiting one is
+	# not counted as learned unseen. With P0Guide.TipQueue (SGODOT-232 U6) the second waits for the first to go.
 	var had_tips := FileAccess.file_exists(P0Ui.TIPS_PATH)
 	var saved := FileAccess.get_file_as_string(P0Ui.TIPS_PATH) if had_tips else ""
 	ui._taught = {"_": true}   # non-empty: teach() won't load saved tips over it
-	ui.teach("probe_cast", "Casting uses 5 Energy.")
-	ui.teach("probe_bait", "Tap Worm Bait to put it on the hook.")
+	ui.tips = null
+	ui.teach("cast")
+	ui.teach("creel")
+	await await_idle_frame()
 	var text := ui._teach.get_node("Text") as Label
-	assert_str(text.text).is_equal("Casting uses 5 Energy.")
-	assert_bool(ui._taught.has("probe_bait")).is_false()
-	ui._teach.hide()   # tapped away (or its 7 s ran out)
-	ui.teach("probe_cast", "Casting uses 5 Energy.")   # already learned: nothing
-	ui.teach("probe_bait", "Tap Worm Bait to put it on the hook.")
+	assert_str(text.text).is_equal(str(P0Guide.TIPS.cast))
+	assert_bool(ui._taught.has("cast")).is_true()
+	assert_bool(ui._taught.has("creel")).is_false()
+	ui._hide_tip()   # tapped away (or its time ran out)
+	ui.teach("cast")   # already learned: nothing
+	await await_idle_frame()
 	assert_bool(ui._teach.visible).is_true()
-	assert_str(text.text).is_equal("Tap Worm Bait to put it on the hook.")
-	assert_bool(ui._taught.has("probe_bait")).is_true()
+	assert_str(text.text).is_equal(str(P0Guide.TIPS.creel))
+	assert_bool(ui._taught.has("creel")).is_true()
 	if had_tips:
 		var f := FileAccess.open(P0Ui.TIPS_PATH, FileAccess.WRITE)
 		f.store_string(saved)
@@ -260,7 +263,8 @@ func test_teaching_card_stays_clear_of_the_bar_and_the_keys() -> void:
 	var had_tips := FileAccess.file_exists(P0Ui.TIPS_PATH)
 	var saved := FileAccess.get_file_as_string(P0Ui.TIPS_PATH) if had_tips else ""
 	ui._taught = {"_": true}   # non-empty: teach() won't load saved tips over it
-	ui.teach("probe_tip", "Pick a seed, walk up to a bed and press Sow. Hold to keep sowing.")
+	ui.tips = null             # a fresh TipQueue (SGODOT-232 U6): the longest P0 tip comes up on the next frame
+	ui.teach("sow")
 	await await_idle_frame()
 	await await_idle_frame()
 	var tip := ui._teach.get_global_rect()
@@ -385,3 +389,17 @@ func test_a_card_tap_cannot_start_a_double_tap() -> void:
 		m.pressed = e[1]
 		ui.pad._gui_input(m)
 	assert_int(recentred[0]).is_equal(0)
+
+## §3.7.4 / SGODOT-232 U6: Free to do now closes the Energy card and Today lists what costs no Energy now.
+func test_free_to_do_now_opens_today_with_the_free_list() -> void:
+	var v := _view()
+	v.plots = [{"id": 0, "state": "ready", "crop": "crop_radish"}]
+	v.cooking = {"stove": null, "cookbook": []}
+	ui.set_view(v)
+	ui.open_energy_card(2, "Sow ×1")
+	var card: UiEnergyCard = ui._modal.find_children("*", "UiEnergyCard", true, false)[0]
+	card.free_pressed.emit()
+	assert_str(ui.modal_kind).is_equal("today")
+	var labels := ui._modal.find_children("*", "Label", true, false).map(func(l): return (l as Label).text)
+	assert_that(labels).contains(["Harvest 1 ready", "Browse the map"])
+	ui.close_modal()

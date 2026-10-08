@@ -466,16 +466,17 @@ func _sign_hit(screen: Vector2) -> bool:
 ## Tapping the card is tapping the facility, so it reuses p0_tap's own hit points.
 func _tags(v: Dictionary) -> void:
 	var stall_top := cam.unproject_position(_stall + Vector3(0, 1.05, 0))
-	var request := -1
-	for r in v.get("stall", {}).get("board", {}).get("requests", []):
-		if str(r.status) == "accepted" and int(r.have) >= int(r.qty): request = UiStatusBadge.State.DELIVERABLE
-		elif str(r.status) == "open" and request < 0: request = UiStatusBadge.State.REQUEST
-	rt.ui.badge("stall", maxi(request, 0), stall_top, request >= 0)
+	# ✓ when a Stall Board request can be handed in now (taken or not, q(48)), ! when one is open (P0Guide, q(44))
+	var board := P0Guide.stall_badge(v)
+	var request := UiStatusBadge.State.DELIVERABLE if board == "deliver" else UiStatusBadge.State.REQUEST
+	rt.ui.badge("stall", request, stall_top, board != "")
 	rt.ui.tag("stall", "Tap to shop", stall_top - Vector2(0, rt.ui.badge_height("stall")),
 		_card == "stall", cam.unproject_position(_stall + Vector3(0, 0.4, 0)))
 	# The farmhouse carries no state badge (不知火舞 on SGODOT-221): the stove's state belongs to the stove inside,
-	# and Today already names the dish and its time. Tapping it goes in (the door card is gone; Rest is the bench,
-	# SGODOT-224).
+	# and Today already names the dish and its time — except the guide's "!" (A-03, TUT-3-07A2): above the door while
+	# a cookable fish is in the bag and Today has a Cook row to do (P0Guide.door_badge; 不知火舞 on SGODOT-232).
+	# Tapping it goes in (the door card is gone; Rest is the bench, SGODOT-224).
+	rt.ui.badge("door", UiStatusBadge.State.REQUEST, cam.unproject_position(_house + Vector3(-0.45, 1.3, 0.95)), P0Guide.door_badge(v))
 	rt.ui.tag("home", "Farmhouse · Tap to go in", cam.unproject_position(_house + Vector3(0, 2.6, 0.4)),
 		_card == "home", cam.unproject_position(_house + Vector3(0, 1.0, 0.6)))
 	# Homestead sign (WorldBadges · Farm 1135:79267, LOCK-11; 不知火舞 on SGODOT-228): a home mark with the caption
@@ -541,7 +542,7 @@ func _teaching(v: Dictionary) -> void:
 	if rt.ui.has_modal(): return
 	var firsts: Array = v.get("firsts", [])
 	if not firsts.any(func(f): return str(f).begins_with("harvest:")) and not v.get("plots", []).any(func(p): return str(p.state) in ["sown", "growing", "ready"]):
-		rt.ui.teach("sow", "Pick a seed, walk up to a bed and press Sow. Hold to keep sowing.")
+		rt.ui.teach("sow")   # copy in P0Guide.TIPS (q(44))
 
 func p0_anchor() -> Vector2:
 	if not _front.is_empty():
