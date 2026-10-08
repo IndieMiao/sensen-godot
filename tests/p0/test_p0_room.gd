@@ -323,6 +323,30 @@ func test_the_room_shows_the_player_at_the_farms_scale_and_pans_inside_its_art()
 	var e := _art_edges_px(r)   # never more than SIDE_MARGIN of backdrop beside the art
 	assert_float(maxf(float(e.left), float(e.right))).override_failure_message(str(e)).is_less_equal(P0Room.SIDE_MARGIN + 0.5)
 
+## 不知火舞 on #127: with Bag alone at the bottom (a room) the room centres down to the safe bottom's 24 px — lower than
+## the quick bar's top — but its lowest point keeps 8 px above Bag's top.
+func test_with_bag_alone_the_room_frames_lower_and_clears_bag() -> void:
+	var rt: P0Runtime = auto_free(P0Runtime.new())
+	add_child(rt)
+	await get_tree().process_frame
+	rt.ui.set_surface("room")
+	await get_tree().process_frame
+	assert_bool(rt.ui.bag_only()).is_true()
+	var r := _farmhouse()
+	r.rt = rt
+	var e_full := _art_edges_px(r)   # framed before the room knew its UI: the quick bar's band
+	r.frame_all()
+	var e := _art_edges_px(r)
+	var view := r._view()
+	var bag_top := view.y - (UiTokens.SIZE_QUICK_BAR_BOTTOM + UiTokens.SIZE_QUICK_BAR_H)
+	var art_bottom := view.y - (UiTokens.SIZE_QUICK_BAR_BOTTOM + UiTokens.SIZE_QUICK_BAR_H) - float(e.bottom)   # px from the top
+	assert_float(art_bottom).override_failure_message(str(e)).is_less_equal(bag_top - P0Room.BAG_CLEAR + 0.5)
+	var art_top := float(P0Room.HUD_BOTTOM) + float(e.top)
+	var centred := absf((art_top - P0Room.HUD_BOTTOM) - (view.y - UiTokens.SIZE_QUICK_BAR_BOTTOM - art_bottom)) < 1.0
+	var on_guard := absf(art_bottom - (bag_top - P0Room.BAG_CLEAR)) < 0.5
+	assert_bool(centred or on_guard).override_failure_message("top %.1f bottom %.1f" % [art_top, art_bottom]).is_true()
+	assert_float(float(e.top)).override_failure_message("lower than with the quick bar").is_greater(float(e_full.top))
+
 ## Camera unification (用户 2026-10-09): where the room's art edges sit on screen, in px — across from the screen's left
 ## and right edges, down from the HUD's bottom and to the quick bar's top (the free band P0Room keeps the art in).
 func _art_edges_px(r: P0Room) -> Dictionary:

@@ -533,10 +533,11 @@ func _on_floor(right: Vector3, up: Vector3, forward: Vector3, q: Vector2) -> Vec
 	var t := (floor_y - up.y * q.y) / forward.y
 	return right * q.x + up * q.y + forward * t
 
-## The camera's centre per screen axis (不知火舞 on 226): an axis where the room's art fits the free band — across,
-## SIDE_MARGIN in from both edges; down, from the HUD's bottom to the quick bar's top — holds it centred in that band;
-## an axis where it does not follows (the safe box) but stops where the art's edge meets the band's, so no backdrop
-## shows past the walls. The outposts mostly fit down and pan across, which keeps the small-room look.
+## The camera's centre per screen axis (不知火舞 on 226 / #127): an axis where the room's art fits between its limit
+## lines — across, SIDE_MARGIN in from both edges; down, the HUD's bottom and the bottom controls' (_bottom_px) — holds
+## it centred (down, in the band _bottom_px gives), never past those lines; an axis where it does not follows (the
+## safe box) but stops where the art's edge meets a limit line, so no backdrop shows past the walls. The outposts
+## mostly fit down and pan across, which keeps the small-room look.
 func _clamp_focus(f: Vector3) -> Vector3:
 	if _bounds_lo.x == -INF: return f
 	var forward := -_cam_dir
@@ -544,20 +545,30 @@ func _clamp_focus(f: Vector3) -> Vector3:
 	var up := right.cross(forward).normalized()
 	var view := _view()
 	var m := cam.size / maxf(view.x, 1.0)   # metres per px
-	# The free band in px from the screen's centre, along each axis's positive direction (right; up = screen up).
-	var band_lo := Vector2(-(view.x * 0.5 - SIDE_MARGIN), -(view.y * 0.5 - _bar_top_px())) * m
-	var band_hi := Vector2(view.x * 0.5 - SIDE_MARGIN, view.y * 0.5 - (_safe_top() + HUD_BOTTOM)) * m
+	var bottom := _bottom_px()
+	# The limit lines and the centring band, in metres from the screen's centre along each axis (right; up).
+	var limit_lo := Vector2(-(view.x * 0.5 - SIDE_MARGIN), -(view.y * 0.5 - bottom.x)) * m
+	var limit_hi := Vector2(view.x * 0.5 - SIDE_MARGIN, view.y * 0.5 - (_safe_top() + HUD_BOTTOM)) * m
+	var centre_lo := Vector2(limit_lo.x, -(view.y * 0.5 - bottom.y) * m)
 	var q := Vector2(f.dot(right), f.dot(up))
 	for i in 2:
-		var lo := _bounds_lo[i] - band_lo[i]   # the art's low edge on the band's low line
-		var hi := _bounds_hi[i] - band_hi[i]   # the art's high edge on the band's high line
-		q[i] = ((_bounds_lo[i] + _bounds_hi[i]) - (band_lo[i] + band_hi[i])) * 0.5 if lo > hi else clampf(q[i], lo, hi)
+		var lo := _bounds_lo[i] - limit_lo[i]   # q from here up: no backdrop between the art's low edge and the low line
+		var hi := _bounds_hi[i] - limit_hi[i]   # q up to here: none between its high edge and the high line
+		if lo > hi:   # it fits: centred in the band, kept inside the limit lines
+			q[i] = clampf(((_bounds_lo[i] + _bounds_hi[i]) - (centre_lo[i] + limit_hi[i])) * 0.5, hi, lo)
+		else:
+			q[i] = clampf(q[i], lo, hi)
 	return _on_floor(right, up, forward, q)
 
-## The quick bar's top edge from the bottom of the screen, in px (the bar's own spot, plus the gesture inset).
-func _bar_top_px() -> float:
-	var bottom := rt.ui.safe_bottom() if rt else 0.0
-	return UiTokens.SIZE_QUICK_BAR_BOTTOM + UiTokens.SIZE_QUICK_BAR_H + bottom
+## The bottom controls, in px from the screen's bottom: (the art's lowest line, the centring band's bottom). With the
+## quick bar (or the main key) both are its top. With Bag alone (a room, 不知火舞 on #127) the room centres down to the
+## safe bottom's 24 px but its lowest point keeps 8 px above Bag's top.
+func _bottom_px() -> Vector2:
+	var inset := rt.ui.safe_bottom() if rt else 0.0
+	var bar := UiTokens.SIZE_QUICK_BAR_BOTTOM + UiTokens.SIZE_QUICK_BAR_H + inset
+	if rt and rt.ui.bag_only(): return Vector2(bar + BAG_CLEAR, UiTokens.SIZE_QUICK_BAR_BOTTOM + inset)
+	return Vector2(bar, bar)
+const BAG_CLEAR := 8.0
 
 ## The visible art's extent along the screen's right axis (world metres), as (min, max); (0, 0) without meshes.
 func art_span(right: Vector3) -> Vector2:

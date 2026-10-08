@@ -93,6 +93,41 @@ func test_world_prompts_show_only_between_the_hud_and_the_bar() -> void:
 	ui.world_icon("stall", icon, Vector2(200, ui._bar.position.y - 60), true)
 	assert_bool(ui._icons["stall"].visible).is_true()                        # between them
 
+## 不知火舞 on #127 (the map labels' rule): a prompt whose anchor is on screen slides in to PROMPT_EDGE from the side
+## it would cross — what it draws (an icon button's disc and count, a name tag's pill), its touch area with it; one
+## whose anchor is off screen hides. Ama's tag at the tea house door and the farmhouse's Farm button were cut.
+func test_world_prompts_keep_off_the_screens_sides() -> void:
+	var ui := _ui()
+	await await_idle_frame()
+	ui.set_mode("farm")
+	ui.set_surface("farm")
+	ui.set_view(_view())
+	await await_idle_frame()
+	var w := ui._kit.size.x
+	var y := ui._bar.position.y - 120
+	var icon := P0Logic.icon("home")
+	for at in [Vector2(4, y), Vector2(w - 4, y)]:
+		ui.world_icon("door", icon, at, true, false, -1, Vector2.INF, "Parcel")
+		var b: UiWorldIconButton = ui._icons["door"]
+		var drawn := b.drawn_rect()
+		var left := b.position.x + drawn.position.x
+		assert_float(minf(left - 0.0, w - (left + drawn.size.x))).override_failure_message(str(at)).is_equal_approx(P0Ui.PROMPT_EDGE, 0.01)
+		var disc := Rect2(b.get_global_rect().position + (b.size - Vector2(28, 28)) * 0.5, Vector2(28, 28))
+		assert_bool(b.hit_rect().encloses(disc)).is_true()   # the tap moves with it (the count tag overhangs, as designed)
+		assert_vector(b.hit_rect().size).is_equal(Vector2(44, 44))
+	ui.world_icon("door", icon, Vector2(-30, y), true)   # its anchor off screen: hidden, not slid in
+	assert_bool(ui._icons["door"].visible).is_false()
+	for at in [Vector2(6, y), Vector2(w - 6, y)]:
+		ui.npc_tag("room:npc_ama", "Ama", at, true)
+		var t: UiNpcNameTag = ui._npc_tags["room:npc_ama"]
+		assert_float(minf(t.position.x, w - (t.position.x + t.size.x))).override_failure_message(str(at)).is_equal_approx(P0Ui.PROMPT_EDGE, 0.01)
+		assert_bool(t.hit_rect().has_point(t.get_global_rect().get_center())).is_true()
+	ui.npc_tag("room:npc_ama", "Ama", Vector2(w + 20, y), true)
+	assert_bool(ui._npc_tags["room:npc_ama"].visible).is_false()
+	ui.npc_tag("room:npc_ama", "Ama", Vector2(w * 0.5, y), true)   # in the middle: on its anchor, not moved
+	var mid: UiNpcNameTag = ui._npc_tags["room:npc_ama"]
+	assert_float(mid.position.x + mid.size.x * 0.5).is_equal_approx(w * 0.5, 0.01)
+
 func test_a_root_world_leaves_for_the_map_once_nothing_is_left_to_close() -> void:
 	# int5b hand test 2: booted into the farm (no map under it), Back closed the Inbox and then did nothing,
 	# because AppRouter ignores Back on a P0 world that is the root scene.
