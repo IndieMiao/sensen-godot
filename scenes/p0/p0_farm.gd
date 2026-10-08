@@ -58,7 +58,6 @@ var _fence: Node3D   # p0_fence.gd: front stretch always, the ring from Homestea
 var _sign := Vector3.ZERO   # Homestead sign right of the farmhouse door (WorldBadges · Farm 1135:79267): HOME-1
 var _plaque := Vector3.ZERO   # Upgrade Plaque left of the door (1510:97492), shown from the first upgrade: PLAQUE-READ
 var _plaque_node: Node3D
-var _card := ""   # LOCK-07: the one facility whose finger card shows this frame (P0Garden.pick_card)
 var _door := Vector3.ZERO     # the walkway cell in front of the farmhouse door
 var _door_armed := false
 var _inside := false          # the farmhouse is open above this farm
