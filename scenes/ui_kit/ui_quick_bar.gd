@@ -76,7 +76,7 @@ var _target := -1
 
 const _RIDE_ABOVE := 24.0       # the dragged slot rides this far above the finger (LOCK-04 v1.11)
 const _HOVER_SCALE := 0.8       # …and shrinks to this over a drop zone
-const _FLY_BACK_MS := 200       # cancel: back to its place, ease-out
+const FLY_BACK_MS := 200        # cancel: back to its place, ease-out (a lifted bag cell too, P0Ui._bag_cancel)
 const _FLY_HOME_MS := 150       # pin toggle: back to its place
 const _FLY_IN_MS := 150         # remove: into the zone's centre
 
@@ -352,7 +352,7 @@ func _slot_rects() -> Array:
 	return _cells.map(func(c: UiItemCell) -> Rect2: return c.get_global_rect())
 
 ## Back to its place (200 ms ease-out on a cancel, 150 ms after a pin toggle), then the bar is as it was.
-func _fly_back(ms := _FLY_BACK_MS) -> void:
+func _fly_back(ms := FLY_BACK_MS) -> void:
 	var ghost := _ghost
 	var home := _cells[_dragging].global_position if _dragging >= 0 else Vector2.ZERO
 	_ghost = null

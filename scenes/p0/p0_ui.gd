@@ -1339,17 +1339,23 @@ func _on_toast_action(action: String) -> void:
 # ---------------------------------------------------------------- modals
 ## Going to the background cancels a slot drag: the slot flies back, nothing changes (LOCK-04 v1.10).
 func _notification(what: int) -> void:
-	if what in [NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_APPLICATION_FOCUS_OUT] and _bar != null: _bar.cancel_drag()
+	if what in [NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_APPLICATION_FOCUS_OUT] and _bar != null:
+		_bar.cancel_drag()
+		_bag_cancel()   # a bag cell lifted for the bar too (int9 F2)
 
 ## Android Back closes what is on top first, one layer per press (LOCK-06, int5 hand test 012–013 / 023–024): the
-## a quick slot being dragged (it flies back, LOCK-04 v1.11; the PinMenu is gone), the radial, then a card or
-## drawer. True when it closed something; the world only leaves on false.
+## a quick slot being dragged (it flies back, LOCK-04 v1.11; the PinMenu is gone), a bag cell lifted for the bar (it
+## flies back into the grid, the drawer stays: int9 F2), the radial, then a card or drawer. True when it closed
+## something; the world only leaves on false.
 func close_top_layer() -> bool:
 	if _screen != null:   # SYS-LOADING / MAINT / UPDATE have no close: Back does nothing (q(74)) …
 		if _screen.kind == P0SysScreen.Kind.PLACE_FAIL: screen_back.emit(_screen.kind)   # … but Couldn't get there's is Go back (q(78))
 		return true
 	if _bar != null and (_bar.is_dragging() or _bar.is_lifted()):   # lifted and not moved yet counts too (刘邦 on #38)
 		_bar.cancel_drag()
+		return true
+	if not _bag_drag.is_empty():
+		_bag_cancel()
 		return true
 	if _radial.is_open():
 		_radial.close()
@@ -1618,6 +1624,27 @@ func _bag_drop(at: Vector2) -> void:
 	elif slot >= 0: place_at(slot, id)
 	else: return
 	if _bag and _bag.grid.selected_id == id: _bag.grid.select(id)   # its card again: Pin ↔ Unpin
+
+## A lifted bag cell let go of without a drop (Back, the app paused): it flies back into its grid cell, as a quick
+## slot does (UiQuickBar._fly_back); the gap stays until it lands. The finger's later release changes nothing.
+func _bag_cancel() -> void:
+	if _bag_drag.is_empty(): return
+	var ghost: UiItemCell = _bag_drag.ghost
+	var id := str(_bag_drag.id)
+	_bag_drag.ghost = null   # _bag_drag_end leaves it to the flight
+	_bag_drag_end()
+	if not is_instance_valid(ghost): return
+	var cell: UiItemCell = _bag.grid.cell_for(id) if _bag and is_instance_valid(_bag) else null
+	if cell == null:
+		ghost.queue_free()
+		return
+	if _bag: _bag.grid.lifted_id = id   # the dashed gap waits for the cell
+	ghost.scale = Vector2.ONE
+	var t := ghost.create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	t.tween_property(ghost, ^"global_position", cell.global_position, UiKit.secs(UiQuickBar.FLY_BACK_MS))
+	t.tween_callback(func():
+		ghost.queue_free()
+		if _bag and is_instance_valid(_bag) and _bag.grid.lifted_id == id: _bag.grid.lifted_id = "")
 
 func _bag_drag_end() -> void:
 	if _bag_drag.is_empty(): return

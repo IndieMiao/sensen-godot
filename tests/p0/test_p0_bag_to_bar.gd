@@ -135,6 +135,40 @@ func test_closing_the_drawer_mid_drag_drops_the_lifted_cell() -> void:
 	ui.close_modal()
 	assert_bool(ui._bag_drag.is_empty()).is_true()
 
+## int9 F2: Back with a bag cell lifted for the bar sends the cell back into the grid and keeps the drawer, as Back
+## does for a lifted quick slot (LOCK-06: one layer per press); the next Back closes the drawer. The finger's later
+## release there changes nothing.
+func test_back_with_a_lifted_bag_cell_sends_it_back_and_keeps_the_drawer() -> void:
+	ui.open_bag()
+	await get_tree().create_timer(UiKit.secs(UiTokens.MOTION_DRAWER_MS) + 0.1).timeout
+	var before := _ids()
+	var it := {id = "seed_herb", qty = 5}
+	ui._on_bag_cell(it, {kind = &"lift", pos = Vector2(100, 600)})
+	ui._on_bag_cell(it, {kind = &"drag_move", pos = Vector2(150, 500)})
+	var ghost: UiItemCell = ui._bag_drag.ghost
+	var home := _bag().grid.cell_for("seed_herb").global_position
+	assert_bool(ui.close_top_layer()).is_true()
+	assert_bool(ui._bag_drag.is_empty()).is_true()
+	assert_str(ui.modal_kind).is_equal("bag")                      # the drawer stays
+	assert_str(_bag().grid.lifted_id).is_equal("seed_herb")       # its gap waits for the cell …
+	await get_tree().create_timer(UiKit.secs(UiQuickBar.FLY_BACK_MS) + 0.1).timeout
+	assert_bool(is_instance_valid(ghost)).is_false()               # … which flew home and is gone
+	assert_vector(home).is_equal(_bag().grid.cell_for("seed_herb").global_position)
+	assert_str(_bag().grid.lifted_id).is_equal("")
+	assert_float(_bag().grid.modulate.a).is_equal(1.0)
+	ui._on_bag_cell(it, {kind = &"drop", pos = ui._bar.get_global_rect().get_center()})   # the finger lifts later
+	assert_array(_ids()).is_equal(before)
+	assert_bool(ui.close_top_layer()).is_true()                    # the next Back closes the drawer
+	assert_bool(ui.has_modal()).is_false()
+
+func test_going_to_the_background_drops_a_lifted_bag_cell() -> void:
+	ui.open_bag()
+	await await_idle_frame()
+	ui._on_bag_cell({id = "seed_herb", qty = 5}, {kind = &"lift", pos = Vector2(100, 600)})
+	ui._notification(Node.NOTIFICATION_APPLICATION_FOCUS_OUT)
+	assert_bool(ui._bag_drag.is_empty()).is_true()
+	assert_str(ui.modal_kind).is_equal("bag")
+
 func test_undo_shows_over_the_docked_bar_on_the_drawer_layer() -> void:
 	ui.open_bag()
 	await get_tree().create_timer(UiKit.secs(UiTokens.MOTION_DRAWER_MS) + 0.1).timeout   # the drawer has risen
