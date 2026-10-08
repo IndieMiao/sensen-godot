@@ -216,6 +216,8 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				var dlt := int(ev.delta)
 				# A catch's refund is said by its own float or card ("3 Energy back"), not twice.
 				if settles_catch and str(ev.get("reason", "")) in ["refund", "line_in"]: continue
+				# Inside the mine a floor fee is said by the mine's own float ("Floor 2 · −2 Energy", q(46)), not twice.
+				if str(ev.get("reason", "")) == "mine_floor" and str(_call("p0_surface", [])) == "mine": continue
 				ui.float_text(("%+d Energy" % dlt).replace("-", "−"), at + Vector2(0, dy), Color("d9772f") if dlt < 0 else Color("4f934b"))
 			"xp":
 				if int(ev.amount) > 0:
@@ -305,9 +307,14 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 		session.send({"type": "reel", "outcome": "escaped"})
 		ui.toast("Creel full · the fish slipped away")
 		return
+	# Mine and gathering refusals (SGODOT-231): races stay quiet, the rest say why in their own words.
+	var said = P0MaterialLogic.refusal_text(code, detail, cmd)
+	if said != null:
+		if str(said) != "": ui.toast(str(said))
+		return
 	match code:
 		"need_energy":
-			ui.open_energy_card(int(detail.get("need", 0)), "Cast" if str(cmd.get("type", "")) == "cast" else "Sow ×1")
+			ui.open_energy_card(int(detail.get("need", 0)), "Cast" if str(cmd.get("type", "")) == "cast" else P0MaterialLogic.energy_verb(cmd, "Sow ×1"))
 			session.report({"kind": "energy_card", "need": int(detail.get("need", 0)), "refused": str(cmd.get("type", ""))})
 		"locked":
 			ui.toast("%s Lv%d · %d XP to go" % [str(detail.get("skill", "farming")).capitalize(), int(detail.get("level", 2)), int(detail.get("xp_to_go", 0))])

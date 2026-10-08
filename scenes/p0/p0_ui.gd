@@ -41,6 +41,13 @@ const XP := Color("1f8c88")          # --xp-deep (floating XP)
 var quick_store := "user://p0_quickbar.json"   # per-action pins / removals (tests point it elsewhere)
 const _KEY_ABOVE_BAR := 40.0        # BAR-1 482:18: ActionKey bottom at y 668, quick bar top at 708
 const _BADGE_CARD_GAP := 4.0        # a finger card over a facility that also shows a badge sits this far above it
+const ACTION_SURFACES := ["farm", "pond", "mine"]   # spaces with the action key group (SGODOT-231: the mine, Mining)
+## A-08 ghost slot per action: [id prefix of the family, ghost icon, noun] (q(44): Seeds / Bait / Torch in P0).
+const GHOST_FAMILY := {
+	"farm": ["seed_", "seed_radish", "Seeds"],
+	"fish": ["bait_", "bait_worm", "Bait"],
+	"mine": ["torch", "torch", "Torch"],
+}
 
 var view: Dictionary = {}
 var root: Control
@@ -64,6 +71,7 @@ var tapped_card := ""
 var _quick := {}          # per action: {pins: [], removed: []}, saved in quick_store (LOCK-05: 每个行动各记各的)
 var _bar_sig := []        # last state pushed to the bar, so the per-frame refresh only rebuilds on change
 var _auto_pick := true    # pick the first slot once when an action is entered (§10.3.3 ①), not after a deselect
+var _mode_tool: Texture2D  # the current action's own tool icon for the key badge (set_action `tool` overrides per key)
 ## MAP-1 keeps only Bag at the bottom of the map. The P0 map still carries the old Map / Farm / Me dock and its
 ## zoom column where Bag would sit, so the map turns this on when that dock leaves (with the new HUD, SGODOT-222).
 ## TODO(MAP-1, follow-up PR after #11 and #12, reviewed by 刘邦): p0_map drops the old dock and sets map_bag = true.
@@ -88,6 +96,8 @@ var _creel: PanelContainer
 var _creel_count: Label
 var _creel_free: Label
 var _fab_pills: HBoxContainer
+var _status: PanelContainer     # SGODOT-231 mine status line (Rocks 2/6), where the creel sits while fishing
+var _status_text: Label
 var player_screen := Vector2(180, 320)   # set by the farm / pond each frame (mid-body): the radial fans out from it
 var _modal: Control
 var modal_kind := ""            # "stall", "bag", "kitchen", "card", ... — which drawer is open
@@ -131,6 +141,7 @@ func _ready() -> void:
 	if _pending.has("mode"): set_mode(_pending.mode)
 	if _pending.has("place"): set_place(_pending.place)
 	set_surface(_pending.get("surface", surface))
+	if _pending.has("status"): set_status_line(_pending.status)
 	_pending.clear()
 
 func _process(dt: float) -> void:
@@ -190,6 +201,15 @@ func _build_bar() -> void:
 	_bar.bag_requested.connect(func(): open_bag())
 	_bar.close_requested.connect(close_modal)
 	_bar.handle_tapped.connect(open_radial)
+	_status = PanelContainer.new()
+	_status.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_SURFACE, UiTokens.RADIUS_CHIP,
+		UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT).with_margins(8, 3, 8, 3))
+	_status.position = _creel.position
+	_status.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_status_text = UiKit.label("", UiTokens.STYLE_C11_XB)
+	_status.add_child(_status_text)
+	_status.hide()
+	_kit.add_child(_status)   # kit theme for the C11XB type style
 
 func _build_fab() -> void:
 	_keys = UiActionKey.new()
@@ -201,7 +221,8 @@ func _build_fab() -> void:
 		_fab_pressed())
 	_keys.key().released.connect(func(): fab_held = false)
 	_keys.switch_pressed.connect(open_radial)
-	_keys.tool_icon = P0Logic.icon("rod" if bar_mode == "fish" else "hoe")   # set_mode skips the mode it starts in
+	_mode_tool = P0Logic.icon("rod" if bar_mode == "fish" else "hoe")   # set_mode skips the mode it starts in
+	_keys.tool_icon = _mode_tool
 	_radial = UiActionRadial.new()
 	_kit.add_child(_radial)
 	_radial.picked.connect(func(id: String): if id != bar_mode: set_mode(id))
@@ -305,6 +326,15 @@ func set_place(text: String) -> void:
 	_place_text = text
 	_refresh_hud()
 
+## One status line under the HUD where the creel sits while fishing (SGODOT-231: the mine's "Rocks 2/6", "Run 1/2
+## today" for its first 3 s). "" hides it; changing action clears it.
+func set_status_line(text: String) -> void:
+	if not is_node_ready():
+		_pending["status"] = text   # the mine sets it on its first frame, maybe before the HUD exists (苏烈, #39)
+		return
+	if _status_text.text != text: _status_text.text = text
+	_status.visible = text != "" and surface in ACTION_SURFACES
+
 ## Which world the HUD sits on (§10.2.4): action spaces show everything; rooms are facility spaces
 ## (no quick bar, main action or switch key); the map shows only toasts and cards.
 func set_surface(name: String) -> void:
@@ -312,7 +342,7 @@ func set_surface(name: String) -> void:
 	if not is_node_ready():
 		_pending["surface"] = name
 		return
-	var action := name in ["farm", "pond"]
+	var action := name in ACTION_SURFACES
 	var world := name != "map"
 	_hud_world = world
 	hud.visible = world and not view.is_empty()
@@ -326,6 +356,7 @@ func set_surface(name: String) -> void:
 	if _radial.visible: _radial.close()
 	_bar.cancel_drag()   # no lifted slot or drop zones left over when fishing starts or the map opens
 	_creel.visible = action and bar_mode == "fish"
+	_status.visible = action and _status_text.text != ""
 	if _dev_box: _dev_box.visible = world
 	for c in _cards.values(): (c as Control).visible = false
 	for b in _badges.values(): (b as Control).visible = false
@@ -334,7 +365,7 @@ func set_surface(name: String) -> void:
 ## Action spaces show the full bar. Rooms (farmhouse kitchen, outposts) and the map keep only Bag, with no action
 ## or switch key (MAP-1, §10.3.5, o(8)); the map waits for map_bag. Busy worlds hide it.
 func _bar_shown() -> bool:
-	return surface in ["farm", "pond", "room"] or (surface == "map" and map_bag)
+	return surface in ACTION_SURFACES or surface == "room" or (surface == "map" and map_bag)
 
 func set_mode(mode: String, place := "") -> void:
 	if place != "": set_place(place)
@@ -346,13 +377,18 @@ func set_mode(mode: String, place := "") -> void:
 	_bar_ids = []
 	_bar_sig = []
 	_auto_pick = true
-	_keys.tool_icon = P0Logic.icon("rod" if mode == "fish" else "hoe")
+	# SGODOT-231: the mine shows the pickaxe; set_action's `tool` swaps in the equipped one.
+	_mode_tool = P0Logic.icon("rod" if mode == "fish" else "pickaxe" if mode == "mine" else "hoe")
+	_keys.tool_icon = _mode_tool
 	_creel.visible = mode == "fish"
+	set_status_line("")
 	_refresh_bar()
 
 func _refresh_bar() -> void:
 	var store := _quick_for(bar_mode)
-	var ids := P0Logic.quick_bar(view, _bar_ids, bar_mode, store.pins, store.removed)
+	# SGODOT-231: Mining's bar holds only what helps underground (a torch); seeds and bait never show there.
+	var ids := P0MaterialLogic.mine_bar(view, _bar_ids, store.pins, store.removed) if bar_mode == "mine" \
+		else P0Logic.quick_bar(view, _bar_ids, bar_mode, store.pins, store.removed)
 	if bar_mode == "fish":
 		if selected_bait != "" and not ids.has(selected_bait): selected_bait = ""
 		# The last bait went on a hook: the slot stays pinned at 0, the hook goes empty (李白 q(44) ④).
@@ -372,9 +408,10 @@ func _refresh_bar() -> void:
 		if selected_seed != "" and P0Logic.bag_count(view, selected_seed) <= 0:
 			selected_seed = ""
 			seed_selected.emit("")
-		# First slot on entering the action (§10.3.3 ①); a deliberate deselect stays deselected.
+		# First slot on entering the action (§10.3.3 ①); a deliberate deselect stays deselected. Farming only: a
+		# torch is chosen on purpose, like bait (§13.3.8: the key stays Mine).
 		var stocked := ids.filter(func(id): return str(id) != "" and P0Logic.bag_count(view, str(id)) > 0)
-		if _auto_pick and selected_seed == "" and not stocked.is_empty():
+		if _auto_pick and bar_mode == "farm" and selected_seed == "" and not stocked.is_empty():
 			selected_seed = str(stocked[0])
 			seed_selected.emit(selected_seed)
 		if ids.any(func(id): return str(id) != ""): _auto_pick = false
@@ -395,7 +432,7 @@ func _refresh_bar() -> void:
 	# slot; a slot pinned at 0 is not stock (int5b hand test 9), Compost alone is. The first gap a drag-remove left
 	# takes it (LOCK-05 v1.10), else the free end; five occupied slots leave no room, so no ghost. A tap opens the Bag
 	# (ghost_tapped). TODO(SGODOT-225 bag drawer): open on the family tab (Seeds → Seeds, Bait → Tackle).
-	var family: Array = ["bait_", "bait_worm", "Bait"] if bar_mode == "fish" else ["seed_", "seed_radish", "Seeds"]
+	var family: Array = GHOST_FAMILY.get(bar_mode, GHOST_FAMILY.farm)   # q(44): Seeds / Bait / Torch
 	if not counts.any(func(n): return int(n) > 0):
 		var ghost := {ghost = true, icon = P0Logic.icon(family[1]), title = family[2]}
 		var gap := slots.find({})
@@ -411,7 +448,7 @@ func _on_slot_tapped(id: String) -> void:
 	# has no vibrate permission (PR #12 re-review). The copy is the slot's refill hint (§10.3.3).
 	if P0Logic.bag_count(view, id) <= 0 and id != selected_seed and id != selected_bait:
 		if _bar.haptics and OS.has_feature("mobile"): Input.vibrate_handheld(10)
-		toast("Buy at Homestead Stall")
+		toast("Craft at Workbench" if bar_mode == "mine" else "Buy at Homestead Stall")   # q(44) refill hints
 		return
 	if bar_mode == "fish":
 		# Tapping bait only sets the current bait (0 Energy, nothing consumed); tap again to fish without bait.
@@ -612,10 +649,14 @@ func set_action(a: Dictionary) -> void:
 	k.verb = str(a.get("verb", ""))
 	var sub := str(a.get("sub", ""))
 	# Zero-Energy actions carry no price (LOCK-02 "0 体力的动作不写价"); reasons and costs stay.
-	k.cost = "" if int(a.get("need", 0)) == 0 and sub == "Free" else sub
+	# Mining's free moves keep it (show_free: LOCK-21 `Elevator · Free`, SGODOT-231).
+	k.cost = "" if int(a.get("need", 0)) == 0 and sub == "Free" and not a.get("show_free", false) else sub
 	if a.get("amber", false): k.state = UiSceneAction.State.INSUFFICIENT
 	elif not a.get("enabled", false): k.state = UiSceneAction.State.UNAVAILABLE
 	else: k.state = UiSceneAction.State.DEFAULT
+	# The equipped tool in the key's badge (SGODOT-231: Starter / Copper Pickaxe at the mine mouth and inside); a key
+	# without one shows the action's own tool, so the farm's Sow after the mouth is a hoe again (walkthrough fix).
+	_keys.tool_icon = P0Logic.icon(str(a.tool)) if a.has("tool") else _mode_tool
 	_fab_pills.visible = bool(a.get("creel_full", false)) and _keys.visible
 	var need := int(a.get("need", 0))
 	if need != _hud_need:   # the worlds call set_action every frame
@@ -624,7 +665,10 @@ func set_action(a: Dictionary) -> void:
 
 func _fab_pressed() -> void:
 	fab_verb = ""
-	if not _fab_state.get("enabled", false) or _modal != null: return
+	if _modal != null: return
+	if not _fab_state.get("enabled", false):
+		if _fab_state.has("toast"): toast(str(_fab_state.toast))   # SGODOT-231: unavailable keys say why (LOCK-10)
+		return
 	fab_verb = str(_fab_state.get("verb", ""))
 	action_pressed.emit(_fab_state.get("cmd", {}))
 
@@ -828,7 +872,7 @@ func _drop_modal() -> void:
 	var was_kitchen := modal_kind == "kitchen"
 	modal_kind = ""
 	if was_kitchen: _refresh_hud()   # back out of the farmhouse
-	_keys.visible = surface in ["farm", "pond"]
+	_keys.visible = surface in ACTION_SURFACES
 	_bar.visible = _bar_shown()
 	_fab_pills.visible = _keys.visible and bool(_fab_state.get("creel_full", false))
 
