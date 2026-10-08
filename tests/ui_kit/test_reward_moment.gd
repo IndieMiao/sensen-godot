@@ -109,3 +109,13 @@ func test_a_freely_placed_card_shrinks_to_its_content() -> void:
 	print("RM_SIZE ", r.size, " min ", r.get_combined_minimum_size())
 	assert_float(r.size.y).is_equal_approx(r.get_combined_minimum_size().y, 0.5)
 	assert_float(r.size.y).is_less(400.0)
+
+func test_a_fact_line_without_rarity_shows_under_the_name_without_a_dot() -> void:
+	# The No dish card (int6 C14): "Ingredients back" on the name line, "9 left today" on its own line, whole.
+	var r := _card({tone = UiRewardMoment.Tone.NEUTRAL, event = "No dish this time", item_name = "Ingredients back",
+		rarity_word = "9 left today", primary = "OK"})
+	await _settle()
+	assert_array(_texts(r)).contains(["Ingredients back", "9 left today"])
+	assert_bool(r._dot.visible).is_false()
+	var rarity: Label = r.find_children("*", "Label", true, false).filter(func(l): return (l as Label).text == "9 left today")[0]
+	assert_float(rarity.size.x).is_greater_equal(rarity.get_minimum_size().x)   # not cut

@@ -152,3 +152,58 @@ func test_counter_commands_carry_the_shop_and_a_drink_changes_the_line() -> void
 	ui.set_view(v)
 	ui.counter_events([{"kind": "drink", "item": "drink_hot_tea", "gain": 30, "price": 40, "left": 2}])
 	assert_str(ui._counter.keeper_bar.line).is_equal("Enjoy. Next cup's 50 coins.")   # TEA-DONE
+
+## q(48): the P0 market has no bag half, so its drawer is as tall as its taller page (the Buy rows or the Market
+## Board's cards) and keeps that height across the tabs (不知火舞 on #56, like City Specialty).
+func test_the_market_drawer_is_as_tall_as_its_taller_page_and_keeps_it_across_tabs() -> void:
+	var ui := _ui()
+	await await_idle_frame()
+	var v := _view()
+	v["boards"]["market"]["slots"] = [{"id": "req_m1", "title": "Market Basket", "kind": "crop", "items": ["crop_radish"],
+		"icon": "crop_radish", "qty": 6, "have": 2, "coins": 30, "status": "open"},
+		{"id": "req_m2", "title": "Dusk Haul", "kind": "fish", "items": [], "rarity": 2, "icon": "fish_crucian", "qty": 3,
+		"have": 0, "coins": 45, "status": "open"}]
+	ui.set_view(v)
+	ui.open_counter("market", {"ctx": {"keeper": "Mei", "place": "Xuhui Market Square"}})
+	var d := ui._counter
+	await d.fitted
+	assert_bool(d.is_short()).is_true()
+	var h := d.height
+	assert_float(h).is_less(P0CounterDrawer.HEIGHT_NO_BAG)   # no empty lower half
+	assert_float(h).is_greater_equal(d.get_combined_minimum_size().y - 0.5)   # the Buy page fits
+	d.set_section("board")
+	await _settle()
+	assert_float(d.height).is_equal_approx(h, 0.5)   # no jump on the tab switch
+	assert_float(h).is_greater_equal(d.get_combined_minimum_size().y - 0.5)   # the board page fits too
+	assert_int(d.board.get_children().filter(func(c): return c.visible).size()).is_equal(2)
+	ui.close_modal()
+	ui.open_counter("tackle", {"ctx": TACKLE_CTX})   # a counter with a bag half keeps the full height
+	assert_bool(ui._counter.is_short()).is_false()
+	assert_float(ui._counter.height).is_equal(P0CounterDrawer.HEIGHT)
+
+## The market drawer measures itself while it is still sliding in: it ends at its new height, not the first one.
+func test_a_drawer_resized_while_sliding_in_lands_at_the_new_height() -> void:
+	var d := _drawer("tackle", TACKLE_CTX)
+	d.queue_free()
+	var host: Control = d.get_parent()
+	var e := P0CounterDrawer.new(_view(), "tackle", TACKLE_CTX)
+	host.add_child(e)   # animate on
+	await get_tree().process_frame
+	e.height = 300.0
+	await get_tree().create_timer(UiKit.secs(UiTokens.MOTION_DRAWER_MS) + 0.15).timeout
+	assert_float(e.offset_top).is_equal_approx(-300.0, 0.5)
+	assert_float(e.offset_bottom).is_equal_approx(0.0, 0.5)
+
+## 刘邦 on #62: a market drawer closed while it is measuring itself just stops (no resume on a freed drawer), and the
+## page not shown is see-through while both are laid out.
+func test_a_market_drawer_closed_mid_measure_stops_quietly() -> void:
+	var ui := _ui()
+	await await_idle_frame()
+	ui.set_view(_view())
+	ui.open_counter("market", {"ctx": {"keeper": "Mei", "place": "Xuhui Market Square"}})
+	var d := ui._counter
+	assert_float(d.board.modulate.a).is_equal(0.0)   # Buy in front, the board measured behind it
+	assert_bool(d._shelf_box.visible and d.board.visible).is_true()
+	ui.close_modal()
+	for i in 4: await get_tree().process_frame
+	assert_bool(is_instance_valid(d)).is_false()

@@ -189,7 +189,8 @@ func test_dish_cards_say_new_recipe_mystery_or_ready() -> void:
 	assert_str(mystery.note).is_equal("Can't be sold or delivered")
 	var none := P0KitchenLogic.dish_card(v, {"dish": "dish_mystery", "mystery": true, "qty": 0, "none": true, "trial_left": 7}, 0, false)
 	assert_str(none.event).is_equal("No dish this time")
-	assert_str(none.item_name).is_equal("Ingredients back (7 left today)")
+	assert_str(none.item_name).is_equal("Ingredients back")
+	assert_str(none.rarity_word).is_equal("7 left today")   # its own line under the name (int6 C14: the count was cut off)
 	assert_bool(none.none).is_true()
 
 func test_keep_room_spares_a_retry_that_would_be_refused() -> void:
@@ -263,6 +264,28 @@ func test_s5_page_states_drive_the_cells_order_and_counts() -> void:
 	assert_str(P0KitchenLogic.page_card(v, P0KitchenLogic.pages(v)[0]).state).is_equal("Common · Cooked ×10")
 	assert_str(P0KitchenLogic.page_card(v, P0KitchenLogic.pages(v)[4]).reason).is_equal("Cooking Lv4 · 3rd slot")
 	assert_str(P0KitchenLogic.page_card(v, P0KitchenLogic.pages(v)[3]).nav).is_equal("Try in Experiment")
+
+func test_unknown_pages_carry_their_families_clues_and_might_have() -> void:
+	# int6 C29 / C41: the cell's family row comes from the page (one dot per slot, a clue lights its slot) and the
+	# server's `maybe` is the might-have ring and the card's own line.
+	var v := _s5_view()
+	var pages := P0KitchenLogic.pages(v)
+	pages[1].merge({"families": ["W"], "maybe": true}, true)          # Grilled Fish: any Common fish, the bag has one
+	pages[3].merge({"families": ["F"], "maybe": false}, true)         # Veggie Plate: its one slot lit by an F1 clue
+	pages[4].merge({"families": ["W", "F", "S"], "in": ["?", "crop_potato", "?"]}, true)   # a clue under the Lv4 lock
+	var hidden := P0KitchenLogic.page_cell(v, pages[1])
+	assert_array(hidden.families).is_equal(["W"])
+	assert_array(hidden.clues).is_equal([null])
+	assert_bool(hidden.might_have).is_true()
+	var clued := P0KitchenLogic.page_cell(v, pages[3])
+	assert_array(clued.clues).is_equal([UiItemCell.family_icon("F")])   # a family clue: the family icon, never a fish
+	assert_bool(clued.might_have).is_false()
+	var locked := P0KitchenLogic.page_cell(v, pages[4])
+	assert_int(locked.kitchen_state).is_equal(UiItemCell.KitchenState.LOCKED)
+	assert_array(locked.clues).is_equal([null, P0Logic.icon("crop_potato"), null])
+	assert_str(P0KitchenLogic.page_card(v, pages[1]).maybe).is_equal("You might have what it takes")
+	assert_str(P0KitchenLogic.page_card(v, pages[3]).maybe).is_equal("")
+	assert_str(P0KitchenLogic.page_card(v, pages[0]).maybe).is_equal("")   # known pages never say it
 
 func test_the_cook_row_shows_the_energy_of_a_known_pot_only() -> void:
 	var v := _view()
@@ -343,3 +366,10 @@ func test_a_mix_that_failed_before_says_tried_before() -> void:
 	assert_bool(P0KitchenLogic.tried(v, ["crop_radish"])).is_false()
 	assert_str(P0KitchenLogic.preview(v, ["crop_radish", "fish_koi"]).title).is_equal("Unknown dish")
 
+
+func test_every_p0_dish_has_its_own_icon() -> void:
+	# int6 C7: four P0 dishes had no file, so P0Logic.icon fell back to the field sprout (a plate that looks like
+	# seeds) on the page cell, the detail card, COOK-4 and the plate in the scene. 安其拉 drew them (226 d4d629f7).
+	for r in P0Logic.content().get("cooking", {}).get("recipes", []):
+		var id := str(r.id)
+		assert_bool(ResourceLoader.exists(P0Logic.ICON_DIR % id)).override_failure_message(id + " has no icon").is_true()

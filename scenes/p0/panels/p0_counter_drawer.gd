@@ -23,10 +23,13 @@ extends UiDrawer
 signal action_requested(action: StringName, item_id: String, payload: Dictionary)
 signal info_requested(item_id: String)
 signal section_changed(section: String)
+## fit_height() has settled the short market drawer's height.
+signal fitted
 
 const HEIGHT := 696.0           # drawer top at y 104 of 800 (FARM-6, NPC-2-2)
 const HEIGHT_DRINKS := 266.0    # NPC-6 / NPC-7-P0: keeper bar at y 540
-## A counter that buys nothing back (the P0 market, sell []): keeper bar, tabs and the four-row shelf only.
+## A counter that buys nothing back (the P0 market, sell []): keeper bar, tabs and its rows only, until fit_height()
+## shortens it to its content (q(48): the P0 market has no bag half; 不知火舞 on #56).
 const HEIGHT_NO_BAG := 420.0
 ## MARKET-SPECIALTY: sheet top at y 663 with one row (16 + title 27 + 8 + rows + 28).
 const SPECIALTY_PAD := 16.0
@@ -78,6 +81,7 @@ var _quota: Label
 var _drinks: VBoxContainer
 var _rows := {}   # item id -> UiShopRow
 var _qty := {}    # item id -> stepper count
+var _fit_frames := 0   # frames left before fit_height() measures (both pages laid out)
 var _key := 0
 
 func _init(view_: Dictionary = {}, role_ := "homestead", ctx_ := {}, section_ := "buy") -> void:
@@ -109,7 +113,7 @@ func _init(view_: Dictionary = {}, role_ := "homestead", ctx_ := {}, section_ :=
 		return
 	_shelf_box = TouchScrollContainer.new()
 	_shelf_box.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	_shelf_box.custom_minimum_size.y = (offers().size() if section == "specialty" else SHELF_ROWS) * _ROW_H
+	_shelf_box.custom_minimum_size.y = (offers().size() if section == "specialty" or is_short() else SHELF_ROWS) * _ROW_H
 	body.add_child(_shelf_box)
 	shelf = VBoxContainer.new()
 	shelf.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -283,10 +287,51 @@ func _show_row(id: String) -> void:
 	var once := bool(o.get("once", false)) or str(o.get("to", "")) in ["gear", "bag_cap"]
 	(_rows[id] as UiShopRow).show_spec(spec, once, int(o.left) if o.get("left", null) != null else 99)
 
+## The P0 market's drawer (no bag half, q(48)): as tall as its content, not the fixed 420.
+func is_short() -> bool:
+	return role == "market" and section != "specialty" and _drinks == null and not has_bag_half(view, role)
+
+## Shorten a short drawer to its taller page — the Buy rows or the Market Board's cards (the host fills the board
+## even while Buy shows) — so switching tabs never changes its height (不知火舞 on #56, like City Specialty). Both
+## pages are laid out together for two frames (the board's wrapping lines need their width), the other page see-through
+## (刘邦 on #62), then it goes back; the host calls this on opening and when the board's cards change, not on every
+## refresh. Counted in _process, so a drawer freed meanwhile simply stops (no awaited resume on a freed instance).
+func fit_height() -> void:
+	if not is_short() or not is_inside_tree(): return
+	_shelf_box.custom_minimum_size.y = maxi(1, offers().size()) * _ROW_H
+	var shelf_page := section != "board"
+	_shelf_box.visible = true
+	board.visible = true
+	(board if shelf_page else _shelf_box).modulate.a = 0.0
+	_fit_frames = 2
+	set_process(true)
+
+func _process(_dt: float) -> void:
+	if _fit_frames <= 0:
+		set_process(false)
+		return
+	_fit_frames -= 1
+	if _fit_frames > 0: return
+	set_process(false)
+	var both := get_combined_minimum_size().y
+	var shelf_h := _shelf_box.get_combined_minimum_size().y
+	var board_h := board.get_combined_minimum_size().y
+	var shelf_page := section != "board"
+	_shelf_box.visible = shelf_page
+	board.visible = not shelf_page
+	_shelf_box.modulate.a = 1.0
+	board.modulate.a = 1.0
+	var sep := float(body.get_theme_constant(&"separation"))
+	# Both pages minus the shorter one (and the gap between them) leaves the taller page's drawer; plus the sheet's
+	# inset under the last card, so it never sits on the screen's edge.
+	height = both - minf(shelf_h, board_h) - sep + pad
+	fitted.emit()
+
 func set_section(v: String) -> void:
 	if v == section: return
 	section = v
 	refresh(view, true)
+	if _fit_frames > 0: fit_height()   # mid-measure: start over with the new page in front
 	section_changed.emit(v)
 
 ## The drink page from view.drinks ({used, limit, left, price, need, energy, gain, full, items}).

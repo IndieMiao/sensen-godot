@@ -43,15 +43,27 @@ func _farmhouse() -> P0Room:
 func _dish(first := false) -> Dictionary:
 	return {"kind": "dish", "pot": 3, "dish": "dish_grilled_crucian", "quality": 1, "qty": 1, "first": first, "mystery": false, "hits": 1}
 
-func test_a_dish_at_a_world_without_p0_event_still_gets_the_old_card() -> void:
-	# The farm, the map and the outposts have no p0_event; _call gives null there (bool(null) used to abort the reply).
+func test_a_dish_away_from_the_farmhouse_pops_no_card() -> void:
+	# §7.2.7 step 7 (q(46), 不知火舞 on 251): away from the stove the dish waits there and Today / the stove's sign say
+	# so; a pot kept on its own (Queue ×2) or a collect answered after leaving only says where it went. The farm, the map
+	# and the outposts have no p0_event; _call gives null there (bool(null) used to abort the reply).
 	var w: Node3D = auto_free(Node3D.new())
 	add_child(w)
 	rt.attach(w)
-	rt.session.state_changed.emit(rt.session.view, [_dish()])
-	await get_tree().process_frame
-	assert_bool(rt.ui.has_modal()).is_true()
-	assert_str(rt.ui.modal_kind).is_equal("card")
+	var kept := _dish()
+	kept.auto = true
+	rt.session.state_changed.emit(rt.session.view, [kept, {"kind": "cabinet", "id": "dish_grilled_crucian@good", "delta": 1}])
+	# Read the toast at once: this test has no server, and a "Can't reach" toast may replace it a few frames later.
+	assert_str(rt.ui.toast_text()).is_equal("Kept")   # the view has no cabinet figures: the bare line
+	for i in 2: await get_tree().process_frame
+	assert_bool(rt.ui.has_modal()).is_false()
+	var none := _dish()
+	none.none = true
+	rt.ui.clear_toast()
+	rt.session.state_changed.emit(rt.session.view, [none])
+	assert_str(rt.ui.toast_text()).is_equal("")   # a pot that made no dish says nothing here
+	for i in 2: await get_tree().process_frame
+	assert_bool(rt.ui.has_modal()).is_false()
 	rt.detach(w)
 
 func test_a_refused_or_failed_cook_gives_the_cook_buttons_back() -> void:

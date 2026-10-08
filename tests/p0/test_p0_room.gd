@@ -253,9 +253,11 @@ func test_the_kitchen_corner_grows_with_the_homestead() -> void:
 	assert_bool(lv3.bp.is_walkable(lv3.bp.world_to_cell(Vector3(cab.x, 0, cab.z)))).override_failure_message("the cabinet blocks the floor").is_false()
 	assert_array(lv3.grid.point_path(lv3.actor.position, lv3.anchor("stand_warming_cabinet").global_position)).is_not_empty()
 	assert_str(str(lv3._marker("use_spice_rack", {}).name)).is_equal("Spice Rack")
+	assert_str((lv3._marker("use_spice_rack", {}).icon as Texture2D).resource_path).is_equal("res://assets/p0/icons/spice_rack.svg")   # i-spice-rack
 	var cab_mark := lv3._marker("use_warming_cabinet", {"cooking": {"cabinet": {"cap": 6, "have": 6, "items": []}}})
 	assert_str(str(cab_mark.name)).is_equal("Warming Cabinet")
 	assert_str(str(cab_mark.fact)).is_equal("Full")
+	assert_str((cab_mark.icon as Texture2D).resource_path).is_equal("res://assets/p0/icons/cabinet.svg")   # i-cabinet
 
 func test_farmhouse_stove_card_and_badge_follow_the_server_stove() -> void:
 	var r := _farmhouse()
@@ -384,3 +386,29 @@ func test_a_room_is_opaque_over_the_map() -> void:
 	r.resume()
 	assert_bool(r.get_viewport().transparent_bg).is_false()
 	get_viewport().transparent_bg = was
+
+func test_the_spice_rack_takes_taps_beside_it_and_the_stove_keeps_to_its_body() -> void:
+	# int6 C8: the rack is a small shelf on the wall beside the stove; picking by the nearest anchor gave taps just
+	# beside the shelf to the stove. Now each of the three is tapped by its art: the rack's box is at least 44 × 44,
+	# overlaps go to the smaller (small things first), and the stove never reaches past its body and pot.
+	for lv in [2, 3]:
+		var r := _farmhouse(lv)
+		await get_tree().process_frame
+		var rack := r.hit_rect("use_spice_rack")
+		var stove := r.hit_rect("use_stove_1")
+		assert_bool(rack.size.x >= P0Room.MIN_HIT and rack.size.y >= P0Room.MIN_HIT).override_failure_message(str(rack)).is_true()
+		assert_str(r.pick(rack.get_center())).is_equal("use_spice_rack")
+		# Every corner of the rack's box (including the edge towards the stove) opens the rack.
+		for corner in [rack.position, rack.end - Vector2.ONE, Vector2(rack.end.x - 1, rack.position.y), Vector2(rack.position.x, rack.end.y - 1)]:
+			assert_str(r.pick(corner)).override_failure_message("Lv%d %s" % [lv, corner]).is_equal("use_spice_rack")
+		# The stove's body still opens the stove; a point on the wall left of its box is no longer the stove's.
+		var pot := r.cam.unproject_position(r.anchor("use_stove_1").global_position)
+		assert_bool(stove.has_point(pot)).is_true()
+		assert_str(r.pick(pot)).is_equal("use_stove_1")
+		assert_str(r.pick(Vector2(stove.position.x - 4, pot.y))).is_not_equal("use_stove_1")
+	var lv3 := _farmhouse(3)
+	await get_tree().process_frame
+	var cab := lv3.hit_rect("use_warming_cabinet")
+	var rack3 := lv3.hit_rect("use_spice_rack")
+	var below := Vector2(cab.get_center().x, maxf(cab.get_center().y, rack3.end.y + 4))
+	if cab.has_point(below): assert_str(lv3.pick(below)).is_equal("use_warming_cabinet")

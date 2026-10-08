@@ -330,11 +330,13 @@ static func _cells_kitchen() -> Control:
 	row.add_child(_captioned(_cell(D, {icon = _tex("dish_radish_salad"), marked = true}), "cooked"))
 	row.add_child(_captioned(_cell(D, {state = S.EMPTY}), "empty"))
 	var K := UiItemCell.KitchenState
-	row.add_child(_captioned(_cell(D, {kitchen_state = K.HIDDEN}), "hidden"))
-	row.add_child(_captioned(_cell(D, {kitchen_state = K.CLUED}), "clued"))
+	row.add_child(_captioned(_cell(D, {kitchen_state = K.HIDDEN, families = ["W", "F", "S"]}), "hidden"))
+	row.add_child(_captioned(_cell(D, {kitchen_state = K.CLUED, families = ["W", "F", "S"], clues = [_tex("fish_crucian"), null, null]}), "clued"))
+	row.add_child(_captioned(_cell(D, {kitchen_state = K.CLUED, families = ["F"], clues = [UiItemCell.family_icon("F")]}), "clued · family"))
+	row.add_child(_captioned(_cell(D, {kitchen_state = K.HIDDEN, families = ["W", "O"], might_have = true}), "might have"))
 	row.add_child(_captioned(_cell(D, {icon = _tex("dish_fish_soup"), kitchen_state = K.TASTED}), "tasted"))
 	row.add_child(_captioned(_cell(D, {icon = _tex("dish_grilled_fish"), kitchen_state = K.MASTERED}), "mastered"))
-	row.add_child(_captioned(_cell(D, {kitchen_state = K.LOCKED}), "locked"))
+	row.add_child(_captioned(_cell(D, {kitchen_state = K.LOCKED, families = ["W", "F", "S"], clues = [null, _tex("crop_potato"), null]}), "locked"))
 	row.add_child(_captioned(_cell(D, {icon = _tex("fish_crucian"), quantity = "×2", rarity = 1, kitchen_state = K.IN_POT}), "in pot"))
 	row.add_child(_captioned(_cell(D, {icon = _tex("fish_crucian"), rarity = 1, kitchen_state = K.IN_POT}), "in pot · last one"))
 	row.add_child(_captioned(_cell(D, {icon = _tex("crop_herb"), quantity = "×12", rarity = 1, rack = true}), "rack"))
@@ -1226,6 +1228,8 @@ static func _reward_moments() -> Control:
 	row.add_child(_captioned(_reward_moment({tone = UiRewardMoment.Tone.NEUTRAL, event = "Mystery Dish", icon = _tex("dish_mystery"),
 		item_name = "Hmm… not a dish", strip = "A clue was added to your Cookbook", strip_icon = _tex("cookbook"),
 		primary = "Eat · +5 Energy", secondary = "Keep", note = "Can't be sold or delivered"}), "Neutral · Mystery Dish (COOK-6)"))
+	row.add_child(_captioned(_reward_moment({tone = UiRewardMoment.Tone.NEUTRAL, event = "No dish this time", icon = _tex("dish_mystery"),
+		item_name = "Ingredients back", rarity_word = "9 left today", primary = "OK"}), "Neutral · No dish, blessing refund"))
 	row.add_child(_captioned(_reward_moment({tone = UiRewardMoment.Tone.MILESTONE, event = "Home Cook", icon = _tex("cookbook"),
 		item_name = "Cookbook 8/48", strip = "Title · +50 Energy"}), "Milestone · no buttons"))
 	return row

@@ -290,3 +290,52 @@ describe('Queue ×2 (Cooking Lv5; 李白 2026-10-08)', () => {
     expect(applyP0(c, plated, { type: 'cook', items: ['fish_crucian'] }, T0)).toMatchObject({ ok: false, code: 'stove_busy', detail: { left: true } });
   });
 });
+
+describe('Cooking a chosen page (q(67): Cookbook Cook and Cook Again cook that page)', () => {
+  const knowing = (...bag: { id: string; qty: number }[]) => {
+    const s = veteran(); s.fires = 1; s.cookbook.push('dish_grilled_fish'); s.bag.push(...bag); return s;
+  };
+  const cookPage = (s: P0State, recipe: string, at = T0) => {
+    const started = step(s, { type: 'cook', recipe }, at);
+    const pot = started.ev.find(e => e.kind === 'pot')!;
+    const done = step(started.s, { type: 'collect' }, at + started.s.stove!.ms + S);
+    return { s: done.s, pot, items: started.s.stove!.items, dish: done.ev.find(e => e.kind === 'dish')! };
+  };
+
+  it('Grilled Fish with only crucians is still Grilled Fish, and its counts go to Grilled Fish', () => {
+    let s = knowing({ id: 'fish_crucian', qty: 2 });
+    expect(page(s, 'dish_grilled_fish').can_cook).toBe(true);
+    const first = cookPage(s, 'dish_grilled_fish');
+    expect(first.items).toEqual(['fish_crucian']);
+    expect(first.pot).toMatchObject({ dish: 'dish_grilled_fish' });
+    expect(first.dish).toMatchObject({ dish: 'dish_grilled_fish' });
+    s = first.s;
+    expect(s.book.cooked).toMatchObject({ dish_grilled_fish: 1 });
+    expect(s.book.cooked.dish_grilled_crucian ?? 0).toBe(0);
+    expect(s.day.cooked).toMatchObject({ dish_grilled_fish: 1 });
+    const again = cookPage(s, 'dish_grilled_fish', T0 + 60 * S);   // the same page again today: its own diminishing
+    expect(again.dish).toMatchObject({ dish: 'dish_grilled_fish' });
+    expect(again.s.day.cooked).toMatchObject({ dish_grilled_fish: 2 });
+    expect(again.s.day.cooked.dish_grilled_crucian ?? 0).toBe(0);
+  });
+
+  it('prefers fish that make the chosen page if laid out freely: a carp before the cheaper crucian', () => {
+    const r = cookPage(knowing({ id: 'fish_crucian', qty: 1 }, { id: 'fish_carp', qty: 1 }), 'dish_grilled_fish');
+    expect(r.items).toEqual(['fish_carp']);
+    expect(count(r.s.bag, 'fish_crucian')).toBe(1);
+    expect(count(r.s.bag, 'fish_carp')).toBe(0);
+  });
+
+  it('free slots still match by priority: a crucian laid in alone is Grilled Crucian', () => {
+    const r = cookOnce(knowing({ id: 'fish_crucian', qty: 1 }), ['fish_crucian']);
+    expect(r.pot).toMatchObject({ dish: 'dish_grilled_crucian' });
+  });
+
+  it('a chosen page without fitting items is refused, never cooked as another page', () => {
+    const s = knowing({ id: 'fish_perch', qty: 1 });   // a Fine fish is not "Any Common fish"
+    expect(page(s, 'dish_grilled_fish').can_cook).toBe(false);
+    const r = applyP0(c, s, { type: 'cook', recipe: 'dish_grilled_fish' }, T0);
+    expect(r.ok).toBe(false);
+    if (!r.ok) expect(r).toMatchObject({ code: 'missing_ingredients', detail: { recipe: 'dish_grilled_fish' } });
+  });
+});

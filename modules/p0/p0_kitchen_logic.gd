@@ -102,6 +102,9 @@ static func _page_cell_s5(_view: Dictionary, p: Dictionary, cell: Dictionary) ->
 			if lock is Dictionary:
 				cell.kitchen_state = K.LOCKED
 				cell.status = "Lv%d" % int(lock.get("level", LOCKED_SLOT_LEVEL))
+			cell.families = p.get("families", [])
+			cell.clues = page_clues(p)
+			cell.might_have = bool(p.get("maybe", false))   # §7.5.1 "You might have what it takes" (int6 C41)
 			return cell
 		"tasted": cell.kitchen_state = K.TASTED
 		"mastered": cell.kitchen_state = K.MASTERED
@@ -109,13 +112,26 @@ static func _page_cell_s5(_view: Dictionary, p: Dictionary, cell: Dictionary) ->
 	cell.marked = bool(p.get("can_cook", false))
 	return cell
 
-## The detail card and its button (Compact/Kitchen/Recipe): {title, state, effect, icon, button, reason, nav}.
+const MAYBE_LINE := "You might have what it takes"
+
+## Per slot of an unknown page, the clue that lit it (int6 C29): a named ingredient shows its own icon, a family clue
+## ("W1", Any Common fish) its family icon, an unlit slot ("?") null. A lit slot stays lit under the Lv4 lock.
+static func page_clues(p: Dictionary) -> Array:
+	var out: Array = []
+	for token in p.get("in", []):
+		var t := str(token)
+		if t == "?": out.append(null)
+		elif t.length() == 2 and t[1].is_valid_int(): out.append(UiItemCell.family_icon(t[0]))
+		else: out.append(P0Logic.icon(t))
+	return out
+
+## The detail card and its button (Compact/Kitchen/Recipe): {title, state, effect, icon, button, reason, nav, maybe}.
 ## button "Cook" when it can cook; otherwise `reason` says the first gap (LOCK-10: the gap on the button);
-## unknown pages only guide to Experiment (`nav`, never puts anything in the pot).
+## unknown pages only guide to Experiment (`nav`, never puts anything in the pot); `maybe` is their might-have line.
 static func page_card(view: Dictionary, p: Dictionary) -> Dictionary:
 	var rarity := int(p.get("rarity", 1))
 	var tier: Dictionary = cooking(view).get("tiers", {}).get(str(rarity), {})
-	var card := {icon = null, effect = "+%d Energy" % int(tier.get("energy", 0)), button = "", reason = "", nav = ""}
+	var card := {icon = null, effect = "+%d Energy" % int(tier.get("energy", 0)), button = "", reason = "", nav = "", maybe = ""}
 	var locked: bool = p.get("lock", null) is Dictionary or (not p.has("state") and int(p.get("slots", 1)) > slots(view))
 	if not p.get("known", false):
 		card.title = "Unknown dish"
@@ -123,6 +139,7 @@ static func page_card(view: Dictionary, p: Dictionary) -> Dictionary:
 		card.state = "%s · %d %s" % [P0Logic.rarity_name(view, rarity), n, "ingredient" if n == 1 else "ingredients"]
 		if locked: card.reason = "Cooking Lv%d · 3rd slot" % LOCKED_SLOT_LEVEL
 		else: card.nav = "Try in Experiment"
+		if bool(p.get("maybe", false)): card.maybe = MAYBE_LINE   # its own line under the facts (§7.5.1, int6 C41)
 		return card
 	card.title = str(p.get("name", ""))
 	card.icon = P0Logic.icon(str(p.id))
@@ -339,6 +356,16 @@ static func keep_line(view: Dictionary, id: String, where: String) -> Dictionary
 	if cab is Dictionary: return {text = "Cabinet full · %s sent to bag" % name, tone = "warn"}
 	return {text = "%s · saved to your bag" % name, tone = "info"}
 
+## The Keep toast for a dish that gets no result card: a pot kept on its own (S5 Queue ×2), or a collect answered after
+## the player left the farmhouse. Away from the stove nothing pops up (§7.2.7 step 7, q(46); 不知火舞 on 251): Today
+## and the stove's sign say a dish is ready, this line says where a kept one went. {} for a pot that made no dish.
+static func kept_line(view: Dictionary, ev: Dictionary, events: Array) -> Dictionary:
+	if bool(ev.get("none", false)): return {}
+	var base := str(ev.get("dish", ""))
+	var q := int(ev.get("quality", 0))
+	var id := base if q == 0 else "%s@%s" % [base, ["plain", "good", "perfect"][q]]
+	return keep_line(view, id, str(routes(events).get(id, "bag")))
+
 ## RewardMoment fields for a collected pot (COOK-4 New recipe! / COOK-6 Mystery Dish / COOK-P0-9 Dish ready).
 ## ev = the `dish` event; first_xp = the first-cook XP of the same reply (0 when not first); from_stove = the
 ## player came back to a Ready stove instead of watching the pot.
@@ -349,7 +376,8 @@ static func dish_card(view: Dictionary, ev: Dictionary, first_xp: int, from_stov
 	# Newcomer Blessing: a failed pot gives its ingredients back and no dish (q(48) A; S5 none: true).
 	if bool(ev.get("none", false)):
 		return {tone = UiRewardMoment.Tone.NEUTRAL, event = "No dish this time", icon = P0Logic.icon("dish_mystery"),
-			item_name = "Ingredients back (%d left today)" % int(ev.get("trial_left", 0)), rarity = 0, rarity_word = "", quality = 0,
+			# "Ingredients back (9 left today)" on two lines: the name line ellipsizes, and the count is the point (int6 C14).
+			item_name = "Ingredients back", rarity = 0, rarity_word = "%d left today" % int(ev.get("trial_left", 0)), quality = 0,
 			strip = "", note = "", none = true, dish_id = ""}
 	if bool(ev.get("mystery", false)):
 		return {tone = UiRewardMoment.Tone.NEUTRAL, event = "Mystery Dish", icon = P0Logic.icon("dish_mystery"),

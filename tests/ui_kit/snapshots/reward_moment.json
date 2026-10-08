@@ -4,7 +4,7 @@
     0,
     0,
     328,
-    1298
+    1515
   ],
   "children": [
     {
@@ -35,7 +35,7 @@
         0,
         70,
         328,
-        1228
+        1445
       ],
       "children": [
         {
@@ -732,7 +732,7 @@
             0,
             1117,
             280,
-            181
+            197
           ],
           "children": [
             {
@@ -741,7 +741,7 @@
                 0,
                 1117,
                 280,
-                161
+                177
               ],
               "children": [
                 {
@@ -750,7 +750,7 @@
                     16,
                     1131,
                     248,
-                    133
+                    149
                   ],
                   "children": [
                     {
@@ -762,7 +762,7 @@
                         29
                       ],
                       "variation": "TitleXB20",
-                      "text": "Home Cook"
+                      "text": "No dish this time"
                     },
                     {
                       "type": "HBoxContainer",
@@ -776,7 +776,7 @@
                         {
                           "type": "PanelContainer",
                           "rect": [
-                            52,
+                            47,
                             1170,
                             52,
                             52
@@ -785,7 +785,7 @@
                             {
                               "type": "TextureRect",
                               "rect": [
-                                60,
+                                55,
                                 1178,
                                 36,
                                 36
@@ -796,8 +796,160 @@
                         {
                           "type": "VBoxContainer",
                           "rect": [
-                            114,
+                            109,
                             1170,
+                            124,
+                            52
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                109,
+                                1175,
+                                124,
+                                22
+                              ],
+                              "variation": "RowTitleXB15",
+                              "text": "Ingredients back"
+                            },
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                109,
+                                1199,
+                                124,
+                                18
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    109,
+                                    1199,
+                                    65,
+                                    18
+                                  ],
+                                  "variation": "CaptionB12",
+                                  "text": "9 left today"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "VBoxContainer",
+                      "rect": [
+                        16,
+                        1232,
+                        248,
+                        48
+                      ],
+                      "children": [
+                        {
+                          "type": "UiCommandButton",
+                          "rect": [
+                            16,
+                            1232,
+                            248,
+                            48
+                          ],
+                          "variation": "CmdPrimary",
+                          "text": "OK"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                1300,
+                280,
+                14
+              ],
+              "variation": "C9B",
+              "text": "Neutral · No dish, blessing refund"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            1334,
+            280,
+            181
+          ],
+          "children": [
+            {
+              "type": "UiRewardMoment",
+              "rect": [
+                0,
+                1334,
+                280,
+                161
+              ],
+              "children": [
+                {
+                  "type": "VBoxContainer",
+                  "rect": [
+                    16,
+                    1348,
+                    248,
+                    133
+                  ],
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        16,
+                        1348,
+                        248,
+                        29
+                      ],
+                      "variation": "TitleXB20",
+                      "text": "Home Cook"
+                    },
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        16,
+                        1387,
+                        248,
+                        52
+                      ],
+                      "children": [
+                        {
+                          "type": "PanelContainer",
+                          "rect": [
+                            52,
+                            1387,
+                            52,
+                            52
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                60,
+                                1395,
+                                36,
+                                36
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "VBoxContainer",
+                          "rect": [
+                            114,
+                            1387,
                             114,
                             52
                           ],
@@ -806,7 +958,7 @@
                               "type": "Label",
                               "rect": [
                                 114,
-                                1185,
+                                1402,
                                 114,
                                 22
                               ],
@@ -821,7 +973,7 @@
                       "type": "PanelContainer",
                       "rect": [
                         16,
-                        1232,
+                        1449,
                         248,
                         32
                       ],
@@ -830,7 +982,7 @@
                           "type": "HBoxContainer",
                           "rect": [
                             26,
-                            1239,
+                            1456,
                             226,
                             18
                           ],
@@ -839,7 +991,7 @@
                               "type": "Label",
                               "rect": [
                                 26,
-                                1239,
+                                1456,
                                 226,
                                 18
                               ],
@@ -858,7 +1010,7 @@
               "type": "Label",
               "rect": [
                 0,
-                1284,
+                1501,
                 280,
                 14
               ],
