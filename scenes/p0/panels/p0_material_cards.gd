@@ -1,7 +1,8 @@
 class_name P0MaterialCards
 extends RefCounted
 ## SGODOT-231 cards for the mine and the gathering spots, built on P0Ui's card layer (its _center_card / _sheet until
-## the stage-3 ModalStack, per Arthur) from kit parts: the elevator panel (MINE-P0-6), "The mine" sheet from tapping
+## the stage-3 ModalStack, per Arthur) from kit parts, themed with UiKit.theme() (the card layer still carries GameUi's,
+## which drew the primary Start new run white on the Android walkthrough): the elevator panel (MINE-P0-6), "The mine" sheet from tapping
 ## the mouth (MINE-P0-1 / P0-8), the New run confirmation (MINE-P0-7) and a locked spot (MAT-3). Copy and states come
 ## from P0MaterialLogic; these functions only lay them out and route taps back to the caller.
 
@@ -11,6 +12,7 @@ const HERE_BG := Color("e6f0de")
 ## row's cmd (mine_leave, mine_floor, energy_card); an unavailable row toasts its reason.
 static func open_elevator(ui: P0Ui, view: Dictionary, here: int, pick: Callable) -> void:
 	var v := ui._center_card(260)
+	v.theme = UiKit.theme()   # kit parts (CommandButton, FactRow) keep their styles inside the P0 card layer
 	v.add_child(UiKit.label(P0MaterialLogic.ELEVATOR_TITLE, UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_SECONDARY))
 	for r in P0MaterialLogic.elevator_rows(view, here):
 		var row := Button.new()
@@ -37,6 +39,7 @@ static func open_elevator(ui: P0Ui, view: Dictionary, here: int, pick: Callable)
 static func open_mine_sheet(ui: P0Ui, view: Dictionary) -> void:
 	var sheet := P0MaterialLogic.mine_sheet(view)
 	var v := ui._sheet(300, "")
+	v.theme = UiKit.theme()   # kit parts (CommandButton, FactRow) keep their styles inside the P0 card layer
 	v.add_child(UiObjectHeader.new({"title": sheet.title, "state": sheet.subtitle, "effect": sheet.line}))
 	for f in sheet.facts: v.add_child(UiFactRow.new(str(f[0]), str(f[1])))
 	var button: Dictionary = sheet.button
@@ -50,6 +53,7 @@ static func open_mine_sheet(ui: P0Ui, view: Dictionary) -> void:
 static func open_new_run(ui: P0Ui, view: Dictionary, send: Callable) -> void:
 	var sheet := P0MaterialLogic.new_run_sheet(view)
 	var v := ui._sheet(340, "")
+	v.theme = UiKit.theme()   # kit parts (CommandButton, FactRow) keep their styles inside the P0 card layer
 	v.add_child(UiObjectHeader.new({"title": sheet.title, "state": sheet.subtitle}))
 	for f in sheet.facts: v.add_child(UiFactRow.new(str(f[0]), str(f[1])))
 	v.add_child(UiFactRow.new(str(sheet.cost[0]), str(sheet.cost[1]), UiFactRow.Kind.COST))
@@ -69,5 +73,6 @@ static func open_locked_spot(ui: P0Ui, view: Dictionary, spot_id: String) -> voi
 	var sheet := P0MaterialLogic.locked_spot_sheet(view, spot_id)
 	if sheet.is_empty(): return
 	var v := ui._sheet(260, "")
+	v.theme = UiKit.theme()   # kit parts (CommandButton, FactRow) keep their styles inside the P0 card layer
 	v.add_child(UiObjectHeader.new({"title": sheet.title, "state": sheet.subtitle, "effect": sheet.line}))
 	for f in sheet.facts: v.add_child(UiFactRow.new(str(f[0]), str(f[1])))
