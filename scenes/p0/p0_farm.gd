@@ -369,6 +369,7 @@ func _hold_repeat() -> void:
 ## takes the player in (its kitchen is inside since SGODOT-226; the door card is gone, int5 hand test 37), the mine.
 func p0_tap(screen: Vector2) -> void:
 	if rt.ui.has_modal(): return
+	if _tap_card(rt.ui.tapped_card): return
 	if _sign_hit(screen):
 		actor.face(_sign)
 		HomePanel.open(rt.ui)
@@ -383,6 +384,26 @@ func p0_tap(screen: Vector2) -> void:
 		enter_farmhouse()
 	elif cam.unproject_position(_mine + Vector3(0, 0.8, 0)).distance_to(screen) < 60:
 		rt.ui.toast("The mine opens soon")
+
+## A finger card's tap goes to its own facility by id, never through the point test: the point of one facility can
+## sit under another's mark (the farmhouse card's point under the sign's caption, PR #21 review).
+func _tap_card(id: String) -> bool:
+	match id:
+		"sign":
+			actor.face(_sign)
+			HomePanel.open(rt.ui)
+		"plaque":
+			actor.face(_plaque)
+			HomePanel.plaque(rt.ui)
+		"stall":
+			actor.face(_stall)
+			rt.ui.open_stall()
+		"home":
+			actor.face(_door)
+			enter_farmhouse()
+		_:
+			return false
+	return true
 
 ## The sign or its mark (tapping a mark or its card = tapping the object); small, so the door beside it stays the house.
 func _sign_hit(screen: Vector2) -> bool:
@@ -434,7 +455,9 @@ func _tags(v: Dictionary) -> void:
 ## Every facility with a finger card on the farm, [id, position, reach m] in a fixed order (LOCK-07: one card, the
 ## nearest in reach). SGODOT-231's gathering spots and workbench, and 2A's rest bench, join this list when they land.
 func _card_candidates() -> Array:
-	var out: Array = [["stall", _stall, 3.2], ["home", _house, 4.2], ["sign", _sign, SIGN_NEAR]]
+	# The farmhouse is measured from its door (the walkway cell in front of it), so the sign beside the door doesn't
+	# take the farmhouse's card from a player standing in front of the door.
+	var out: Array = [["stall", _stall, 3.2], ["home", _door, 4.2], ["sign", _sign, SIGN_NEAR]]
 	if _plaque_node.visible: out.append(["plaque", _plaque, SIGN_NEAR])
 	return out
 
@@ -489,6 +512,9 @@ func p0_dev(step: PackedStringArray) -> bool:
 			var cr := rt.ui.card_rect(_card)
 			if cr.has_area():
 				print("MARKRECTS card=%s rect=%s gap_to_homestead=%s" % [_card, cr, "n/a" if not a.has_area() else str(_rect_gap(a, cr))])
+		"tapcard":   # tapcard — a real tap on the finger card showing now (the PR #21 review repro)
+			var cr := rt.ui.card_rect(_card)
+			if cr.has_area(): rt.ui._tap_at(rt.ui.root.global_position + cr.get_center(), false)
 		"tapsign":   # tapsign:mark|caption|edge — a tap on the Homestead mark's disc, its caption, or the sign's rim
 			var r := rt.ui.badge_rect("homestead")
 			match step[1] if step.size() > 1 else "mark":

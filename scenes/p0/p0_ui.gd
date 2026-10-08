@@ -56,6 +56,8 @@ var _pin_menu: UiPinMenu
 var _cards := {}          # id -> UiTapCard
 var _card_hits := {}      # id -> screen point a tap on the card forwards to the world (the facility's own tap point)
 var _badges := {}         # id -> UiStatusBadge
+## The finger card a `tapped` comes from, only while that signal is being handled ("" for a scene tap).
+var tapped_card := ""
 var _quick := {}          # per action: {pins: [], removed: []}, saved in quick_store (LOCK-05: 每个行动各记各的)
 var _bar_sig := []        # last state pushed to the bar, so the per-frame refresh only rebuilds on change
 var _auto_pick := true    # pick the first slot once when an action is entered (§10.3.3 ①), not after a deselect
@@ -543,7 +545,12 @@ func _tap_at(global_pos: Vector2, double: bool) -> bool:
 	for id in _cards:
 		var c: UiTapCard = _cards[id]
 		if c.is_visible_in_tree() and c.hit_rect().has_point(global_pos):
-			if _modal == null: tapped.emit(_card_hits[id])
+			if _modal == null:
+				# The world sees which card it was (tapped_card) as well as the facility's point, so another facility's
+				# mark over that point can't take the tap (PR #21 review: the farmhouse card under the sign's caption).
+				tapped_card = str(id)
+				tapped.emit(_card_hits[id])
+				tapped_card = ""
 			return true
 	if double: recenter.emit()
 	else: tapped.emit(global_pos - root.global_position)

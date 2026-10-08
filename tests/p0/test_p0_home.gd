@@ -240,3 +240,18 @@ func test_a_card_slides_off_another_mark_and_keeps_pointing_at_its_facility() ->
 	assert_float(mark.position.x - (c.position.x + c.size.x)).is_greater_equal(8.0 - 0.01)
 	assert_float(c.position.x + c.pointer_tip_x()).is_equal_approx(plaque.x, 1.0)
 	assert_bool(ui.slide_card_off("plaque", Rect2(Vector2(340, 700), Vector2(10, 10)))).is_false()   # nothing to clear
+
+func test_a_card_tap_names_its_card_while_the_world_handles_it() -> void:
+	# PR #21 review: the farmhouse card's point can sit under the sign's caption, so the world dispatches card taps by
+	# id (P0Ui.tapped_card), not by re-testing the point.
+	var ui := _ui(_view())
+	await get_tree().process_frame
+	ui.tag("home", "Farmhouse · Tap to go in", Vector2(180, 300), true, Vector2(180, 330))
+	var seen := []
+	ui.tapped.connect(func(p): seen.append([ui.tapped_card, p]))
+	var c: UiTapCard = ui._cards["home"]
+	assert_bool(ui._tap_at(ui.root.global_position + Rect2(c.position, c.size).get_center(), false)).is_true()
+	assert_array(seen).is_equal([["home", Vector2(180, 330)]])
+	assert_str(ui.tapped_card).is_equal("")                       # only while the tap is handled
+	ui._tap_at(ui.root.global_position + Vector2(20, 700), false)  # a scene tap carries no card
+	assert_str(str(seen[-1][0])).is_equal("")
