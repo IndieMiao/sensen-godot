@@ -4,8 +4,9 @@ extends PanelContainer
 ## (LOCK-13), `Cookbook 4/48 | Experiment` (LOCK-20), `To do | Parcels | Updates` (LOCK-14). A border-coloured track
 ## 34 high (padding 3, gap 2, radius 17); the selected segment is white with a primary outline and an ExtraBold 12
 ## primary label, the others Bold 12 secondary on the track — never the command green (LOCK-13). Segments draw 28
-## high and take touches 44 high (安其拉's design check on 225). Options are {label, count?}; `changed(index)` fires
-## when the player picks another option.
+## high and take touches 44 high (安其拉's design check on 225). Options are {label, count?, badge?, dot?}; `changed(index)`
+## fires when the player picks another option. `badge` (> 0) is the red unread count and `dot` the unread dot after the
+## label (INBOX-PARCELS 1312:90181: `To do 2`, `Parcels 3`, `Updates ●`, LOCK-14); set_marks() changes them in place.
 
 signal changed(index: int)
 
@@ -14,6 +15,7 @@ const _TRACK_H := 34.0
 const _TRACK_PAD := 3.0
 const _TRACK_GAP := 2
 const _TRACK_RADIUS := 17.0
+const _DOT := 8.0   # the unread dot after a label (InboxRow's dot size)
 
 var selected := 0: set = set_selected
 
@@ -62,6 +64,25 @@ func _add_option(o: Dictionary) -> void:
 		count.name = "Count"
 		count.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		row.add_child(count)
+	var badge := PanelContainer.new()
+	badge.name = "Badge"
+	badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	badge.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	badge.custom_minimum_size = Vector2(UiTokens.SIZE_UNREAD_BADGE_W, UiTokens.SIZE_UNREAD_BADGE_H)
+	badge.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_UNREAD_BADGE, UiTokens.SIZE_UNREAD_BADGE_H * 0.5))
+	var n := UiKit.label("", UiTokens.STYLE_C10_XB, UiTokens.COLOR_SURFACE_RAISED)
+	n.name = "Number"
+	n.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	n.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	badge.add_child(n)
+	row.add_child(badge)
+	var dot := Panel.new()
+	dot.name = "Dot"
+	dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	dot.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	dot.custom_minimum_size = Vector2(_DOT, _DOT)
+	dot.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_UNREAD_BADGE, _DOT * 0.5))
+	row.add_child(dot)
 	tab.add_child(row)
 	var index := _tabs.size()
 	tab.toggled.connect(func(on: bool):
@@ -70,12 +91,23 @@ func _add_option(o: Dictionary) -> void:
 		changed.emit(index))
 	_tabs.append(tab)
 	_row.add_child(tab)
+	set_marks(index, int(o.get("badge", 0)), bool(o.get("dot", false)))
+
+## The red count (0 hides it) and the unread dot after option `index`'s label.
+func set_marks(index: int, badge: int, dot: bool) -> void:
+	if index < 0 or index >= _tabs.size(): return
+	var row := _tabs[index].get_child(0)
+	var b := row.get_node("Badge") as PanelContainer
+	b.visible = badge > 0
+	(b.get_node("Number") as Label).text = str(badge)
+	(row.get_node("Dot") as Control).visible = dot and badge <= 0
 
 func _recolor() -> void:
 	for i in _tabs.size():
 		var on := i == selected
 		var ink := UiTokens.COLOR_PRIMARY if on else UiTokens.COLOR_SECONDARY
 		for l in _tabs[i].get_child(0).get_children():
+			if not (l is Label): continue   # the badge and the dot keep their own colours
 			(l as Label).add_theme_color_override(&"font_color", ink)
 			if l.name == "Title": l.theme_type_variation = UiTokens.STYLE_C12_XB if on else UiTokens.STYLE_C12_B
 

@@ -582,7 +582,7 @@ static func hud_state(view: Dictionary, ctx: Dictionary = {}) -> Dictionary:
 	var out := {
 		"energy": have, "energy_max": mx, "regen": regen, "next_cost": int(ctx.get("next_cost", 0)),
 		"skills": {"farming": skill_progress(sk.get("farming", {})), "fishing": skill_progress(sk.get("fishing", {}))},
-		"coins": int(view.get("coins", 0)), "unread": int(ctx.get("unread", (view.get("inbox", {}).get("parcels", []) as Array).size())), "buff": {},
+		"coins": int(view.get("coins", 0)), "unread": int(ctx.get("unread", P0Inbox.badge(view))), "buff": {},
 		"today": today_chip_line(rows),
 		"today_key": today_chip_key(rows),
 	}

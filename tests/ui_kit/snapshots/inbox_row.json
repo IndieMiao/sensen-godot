@@ -1,0 +1,410 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    407
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiInboxRow"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        36
+      ],
+      "variation": "CaptionR12",
+      "text": "InboxRow 1309:89969 Kind=Item / System · C2-01 · LOCK-14 (SGODOT-234)"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        70,
+        328,
+        337
+      ],
+      "children": [
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            70,
+            328,
+            106
+          ],
+          "children": [
+            {
+              "type": "UiInboxRow",
+              "rect": [
+                0,
+                70,
+                328,
+                86
+              ],
+              "children": [
+                {
+                  "type": "HBoxContainer",
+                  "rect": [
+                    14,
+                    82,
+                    300,
+                    62
+                  ],
+                  "children": [
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        14,
+                        91,
+                        44,
+                        44
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            22,
+                            99,
+                            28,
+                            28
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "VBoxContainer",
+                      "rect": [
+                        68,
+                        82,
+                        171,
+                        62
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            68,
+                            82,
+                            171,
+                            22
+                          ],
+                          "variation": "RowTitleXB15",
+                          "text": "Perch ×7"
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            68,
+                            106,
+                            171,
+                            18
+                          ],
+                          "variation": "C12B",
+                          "text": "Request reward · Stall Board"
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            68,
+                            126,
+                            171,
+                            18
+                          ],
+                          "variation": "C12B",
+                          "text": "23h 40m left"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiCommandButton",
+                      "rect": [
+                        249,
+                        91,
+                        65,
+                        44
+                      ],
+                      "variation": "CmdSecondaryCompact",
+                      "text": "Claim"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                162,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "Kind=Item · Claim"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            188,
+            328,
+            106
+          ],
+          "children": [
+            {
+              "type": "UiInboxRow",
+              "rect": [
+                0,
+                188,
+                328,
+                86
+              ],
+              "children": [
+                {
+                  "type": "HBoxContainer",
+                  "rect": [
+                    14,
+                    200,
+                    300,
+                    62
+                  ],
+                  "children": [
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        14,
+                        209,
+                        44,
+                        44
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            22,
+                            217,
+                            28,
+                            28
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "VBoxContainer",
+                      "rect": [
+                        68,
+                        200,
+                        171,
+                        62
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            68,
+                            200,
+                            171,
+                            22
+                          ],
+                          "variation": "RowTitleXB15",
+                          "text": "Worm Bait ×3"
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            68,
+                            224,
+                            171,
+                            18
+                          ],
+                          "variation": "C12B",
+                          "text": "Fishing Lv2 reward"
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            68,
+                            244,
+                            171,
+                            18
+                          ],
+                          "variation": "C12B",
+                          "text": "12h left"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiCommandButton",
+                      "rect": [
+                        249,
+                        209,
+                        65,
+                        44
+                      ],
+                      "variation": "CmdBlockedCompact",
+                      "text": "Claim"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                280,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "Kind=Item · bag full"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            306,
+            328,
+            101
+          ],
+          "children": [
+            {
+              "type": "UiInboxRow",
+              "rect": [
+                0,
+                306,
+                328,
+                81
+              ],
+              "children": [
+                {
+                  "type": "HBoxContainer",
+                  "rect": [
+                    14,
+                    318,
+                    300,
+                    57
+                  ],
+                  "children": [
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        14,
+                        324,
+                        44,
+                        44
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            24,
+                            334,
+                            24,
+                            24
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "VBoxContainer",
+                      "rect": [
+                        68,
+                        318,
+                        177,
+                        57
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            68,
+                            318,
+                            177,
+                            20
+                          ],
+                          "variation": "C14XB",
+                          "text": "Parcel expired · +18 coins"
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            68,
+                            340,
+                            177,
+                            35
+                          ],
+                          "variation": "C12B",
+                          "text": "Perch ×7 · turned into coins at 80%"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        255,
+                        338,
+                        59,
+                        16
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            255,
+                            338,
+                            45,
+                            16
+                          ],
+                          "variation": "C11B",
+                          "text": "Just now"
+                        },
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            306,
+                            342,
+                            8,
+                            8
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                393,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "Kind=System · unread"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

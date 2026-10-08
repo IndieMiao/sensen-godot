@@ -315,6 +315,7 @@ func set_view(v: Dictionary) -> void:
 		if was == "board" or _counter.is_short(): _fill_board(_counter)   # board rows follow Accept / Deliver (only on change)
 	if _profile != null and is_instance_valid(_profile) and modal_kind == "profile": _profile.update(v)
 	if workbench() != null: _workbench.refresh(v)
+	if inbox() != null: _inbox.refresh(v)
 	_refresh_hud()
 	_refresh_bar()
 
@@ -2121,21 +2122,41 @@ func spot_reachable() -> bool:
 ## The bell (parcels / letters). TODO(stage 4, SGODOT-234 Inbox): the Inbox drawer with its tabs and Claim. Until
 ## then the parcels waiting for a free slot (SGODOT-232) are listed read-only, one line each, soonest to expire first
 ## (奕星 on #11); `No parcels` only when there are none (LOCK-14).
-func open_inbox() -> void:
-	var v := _sheet(220, "Inbox", "bell")
+## The Inbox drawer (LOCK-14, §12.5.2; SGODOT-234): the bell and the farmhouse Mailbox open this same drawer, on the
+## page q(22) picks unless `tab` names one. Claims and reads go to the server from here; a claim's items float from the
+## button pressed (the Bag slot is under the drawer: no ItemFly, q(49)).
+var _inbox: P0InboxDrawer
+var _claim_at := Vector2.INF   # the pressed Claim's centre, kept from the press: the reply rebuilds the page first
+
+func open_inbox(tab := "") -> P0InboxDrawer:
+	var d := P0InboxDrawer.new(view, tab)
+	d.theme = UiKit.theme()
+	d.safe_bottom = safe_bottom()
+	d.close_requested.connect(close_modal)
+	d.claim_requested.connect(func(cmd: Dictionary, from: Control):
+		_claim_at = from.get_global_rect().get_center()
+		command.emit(cmd))
+	d.read_requested.connect(func(keys: Array): command.emit({"type": "read_inbox", "keys": keys}))
+	d.refused.connect(func(text: String): toast(text))
+	_claim_at = Vector2.INF
+	_open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
+	_close_above(d, _CLOSE_ABOVE_SHEET, UiTokens.SPACE_PAGE)
+	_inbox = d
 	modal_kind = "inbox"
-	var lines := P0Logic.parcel_lines(view)
-	if lines.is_empty():
-		var empty := UiEmptyState.new("No parcels", P0Logic.icon("bell"))
-		empty.theme = UiKit.theme()
-		empty.size_flags_vertical = Control.SIZE_EXPAND_FILL
-		v.add_child(empty)
-		return
-	var list := VBoxContainer.new()
-	list.theme = UiKit.theme()
-	list.add_theme_constant_override(&"separation", int(UiTokens.SPACE_WITHIN))
-	for line in lines: list.add_child(UiKit.label(str(line), UiTokens.STYLE_BODY_B14))
-	v.add_child(list)
+	return d
+
+## The open Inbox drawer, or null.
+func inbox() -> P0InboxDrawer:
+	return _inbox if is_instance_valid(_inbox) and modal_kind == "inbox" else null
+
+## Where a claim's floats start: the Claim (or Claim all) pressed, where it was when pressed (亚瑟 on #93: the reply
+## rebuilds the rows before the floats are placed); INF with no claim waiting or the Inbox closed.
+func inbox_float_at() -> Vector2:
+	return _claim_at if inbox() != null else Vector2.INF
+
+## The claim's reply has come: its floats took the spot, later items float from the player again.
+func inbox_claim_done() -> void:
+	_claim_at = Vector2.INF
 
 ## Resident dialogue bar (SGODOT-225, LOCK-18): greet first, then choose. Called by the outpost rooms (SGODOT-227)
 ## for res_pip / res_old_kai. Sends the day's `talk` (first-chat affinity, gift meal: the server decides) and
