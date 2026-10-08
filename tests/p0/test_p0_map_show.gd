@@ -102,4 +102,12 @@ func test_a_fresh_map_takes_a_waiting_show() -> void:
 	assert_str(rt.after_leave).is_equal("")
 	_settle_prewarm()
 	fresh.free()
+	# Browse the map points nowhere: the fresh map frames its opening view, not the homestead close-up (亚瑟 on #96).
+	rt.after_leave = "show:map"
+	var browse: Node = (load(P0_MAP) as PackedScene).instantiate()
+	add_child(browse)
+	for i in 5: await get_tree().process_frame
+	assert_str(rt.after_leave).is_equal("")
+	assert_float(browse.get("zoom")).is_less(16.0)
+	browse.free()
 	rt.attach(map)

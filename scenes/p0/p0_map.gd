@@ -282,7 +282,8 @@ func _take_after_leave() -> bool:
 		"tackle": show_place.call_deferred("outpost:tackle")   # FISH-5 Tackle Shop: the camera goes to Old Kai's pin
 		_:
 			# Show on map (SGODOT-225): P0Runtime._leave_then("show:<target>") from Today, NeedSource, the Energy card.
-			if not next.begins_with("show:"): return false
+			# Browse the map (show:map) and unknown targets point nowhere: a fresh map frames its opening view (亚瑟 on #96).
+			if not next.begins_with("show:") or place_for(next.trim_prefix("show:")).is_empty(): return false
 			show_place.call_deferred(next.trim_prefix("show:"))
 	return true
 
