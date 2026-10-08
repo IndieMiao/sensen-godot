@@ -320,7 +320,8 @@ static func tokens(view: Dictionary, item_id: String, context: StringName, opts 
 		# Row Hoe (market, LOCK-15 / 李白 q(46)): what it does, from view.gear.hoes.
 		tool_effect = ("Sows %d plots at once" % int(rod.sow)) if rod.has("sow") else "",
 		# A buy row's line 3 for goods made from materials (Bag Upgrade I): "Reeds 4/10 · Timber 6/6", else the stock.
-		need_line = SEP.join(PackedStringArray((offer.get("materials", []) as Array).map(func(m): return "%s %d/%d" % [str(m.get("name", "")), int(m.get("have", 0)), int(m.get("need", 0))]))) if not (offer.get("materials", []) as Array).is_empty() else _stock_line(offer, count),
+		need_line = SEP.join(PackedStringArray((offer.get("materials", []) as Array).map(func(m): return "%s %d/%d" % [str(m.get("name", "")), int(m.get("have", 0)), int(m.get("need", 0))]))) if not (offer.get("materials", []) as Array).is_empty() \
+			else (("Stock %d/1" % (0 if offer.get("owned", false) else 1)) if offer.get("once", false) else _stock_line(offer, count)),   # MARKET-SPECIALTY `Stock 1/1`
 		materials_short = _materials_short(offer),
 		# LOCK-29: "1 Stone per rock"; where a pickaxe comes from while it isn't owned (Copper Pickaxe: Workbench).
 		pick_effect = ("%d Stone per rock" % int(rod.stone)) if rod.has("stone") else "",
@@ -361,7 +362,7 @@ static func _rod_effect(view: Dictionary, rod: Dictionary) -> String:
 ## Line 2 of a buy row for goods that aren't seeds / bait / fertilizer: where they go (view.shops[role].buy `to`).
 static func _offer_use(view: Dictionary, offer: Dictionary) -> String:
 	match str(offer.get("to", "")):
-		"storage": return "Goes to Farm Storage"
+		"storage": return "Goes to your Farm Storage"
 		"bag_cap":
 			for up in P0Logic.content().get("bag_upgrades", []):
 				if str(up.get("id", "")) != str(offer.get("id", "")): continue
