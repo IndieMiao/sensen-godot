@@ -30,11 +30,14 @@ static func stove_state(view: Dictionary) -> String:
 	var st = stove(view)
 	if st == null: return "Empty"
 	var left := float(st.get("ready_in", 0))
-	return "Ready" if left <= 0.0 else "Cooking " + P0Logic.duration(left)
+	var queued := " · Queued 1" if cooking(view).get("queued", null) is Dictionary else ""   # S5 Queue ×2 (Lv5)
+	return ("Ready" if left <= 0.0 else "Cooking " + P0Logic.duration(left)) + queued
 
 ## "Lv4 · 60 XP to go" for the locked 3rd slot (SGODOT-203: the 90 px label holds the short form); "Lv4" when
 ## the cooking thresholds are unknown.
 static func locked_slot_label(view: Dictionary) -> String:
+	var third = cooking(view).get("third_slot", null)   # S5: {level, xp_to_go} from the server
+	if third is Dictionary: return "Lv%d · %d XP to go" % [int(third.get("level", LOCKED_SLOT_LEVEL)), int(third.get("xp_to_go", 0))]
 	var thresholds: Array = P0Logic.content().get("skills", {}).get("cooking", [])
 	var xp := int(view.get("skills", {}).get("cooking", {}).get("xp", 0))
 	if thresholds.size() < LOCKED_SLOT_LEVEL: return "Lv%d" % LOCKED_SLOT_LEVEL
@@ -44,10 +47,11 @@ static func locked_slot_label(view: Dictionary) -> String:
 static func pages(view: Dictionary) -> Array: return cooking(view).get("cookbook", [])
 
 static func cookbook_count(view: Dictionary) -> String:
+	if cooking(view).has("pages_total"): return "%d/%d" % [int(cooking(view).get("discovered", 0)), int(cooking(view).pages_total)]   # S5
 	var all := pages(view)
 	return "%d/%d" % [all.filter(func(p): return p.get("known", false)).size(), all.size()]
 
-## Pages in the grid order of §7.2.7: can cook (rarity high → low) → known but short → unknown.
+## Pages in the grid order of §7.2.7: can cook (rarity high → low) → discovered but short → Tasted → clued → unknown.
 static func cookbook_order(view: Dictionary, chip := "All") -> Array:
 	var out := pages(view).filter(func(p): return _chip_keeps(view, p, chip))
 	out.sort_custom(func(a, b):
@@ -60,8 +64,12 @@ static func cookbook_order(view: Dictionary, chip := "All") -> Array:
 
 static func _rank(p: Dictionary) -> int:
 	if p.get("can_cook", false): return 0
-	if p.get("known", false): return 1
-	return 2
+	match str(p.get("state", "")):   # S5 page states; without them, known / unknown
+		"discovered", "mastered": return 1
+		"tasted": return 2
+		"clued": return 3
+		"hidden": return 4
+	return 1 if p.get("known", false) else 4
 
 static func _chip_keeps(view: Dictionary, p: Dictionary, chip: String) -> bool:
 	match chip:
@@ -74,12 +82,30 @@ static func _chip_keeps(view: Dictionary, p: Dictionary, chip: String) -> bool:
 static func page_cell(view: Dictionary, p: Dictionary) -> Dictionary:
 	var K := UiItemCell.KitchenState
 	var cell := {id = str(p.id), rarity = int(p.get("rarity", 1)), kitchen_state = K.DEFAULT, marked = false, status = ""}
+	if p.has("state"): return _page_cell_s5(view, p, cell)
 	if not p.get("known", false):
 		cell.kitchen_state = K.LOCKED if int(p.get("slots", 1)) > slots(view) else K.HIDDEN
 		if cell.kitchen_state == K.LOCKED: cell.status = "Lv%d" % LOCKED_SLOT_LEVEL
 		return cell
 	cell.icon = P0Logic.icon(str(p.id))
 	if not p.get("cooked", false): cell.kitchen_state = K.TASTED
+	cell.marked = bool(p.get("can_cook", false))
+	return cell
+
+## S5 pages carry their state (hidden / clued / tasted / discovered / mastered) and the 3rd-slot lock.
+static func _page_cell_s5(_view: Dictionary, p: Dictionary, cell: Dictionary) -> Dictionary:
+	var K := UiItemCell.KitchenState
+	var lock = p.get("lock", null)
+	match str(p.state):
+		"hidden", "clued":
+			cell.kitchen_state = K.CLUED if str(p.state) == "clued" else K.HIDDEN
+			if lock is Dictionary:
+				cell.kitchen_state = K.LOCKED
+				cell.status = "Lv%d" % int(lock.get("level", LOCKED_SLOT_LEVEL))
+			return cell
+		"tasted": cell.kitchen_state = K.TASTED
+		"mastered": cell.kitchen_state = K.MASTERED
+	cell.icon = P0Logic.icon(str(p.id))
 	cell.marked = bool(p.get("can_cook", false))
 	return cell
 
@@ -90,18 +116,20 @@ static func page_card(view: Dictionary, p: Dictionary) -> Dictionary:
 	var rarity := int(p.get("rarity", 1))
 	var tier: Dictionary = cooking(view).get("tiers", {}).get(str(rarity), {})
 	var card := {icon = null, effect = "+%d Energy" % int(tier.get("energy", 0)), button = "", reason = "", nav = ""}
+	var locked: bool = p.get("lock", null) is Dictionary or (not p.has("state") and int(p.get("slots", 1)) > slots(view))
 	if not p.get("known", false):
 		card.title = "Unknown dish"
 		var n := int(p.get("slots", 1))
 		card.state = "%s · %d %s" % [P0Logic.rarity_name(view, rarity), n, "ingredient" if n == 1 else "ingredients"]
-		if n > slots(view): card.reason = "Cooking Lv%d · 3rd slot" % LOCKED_SLOT_LEVEL
+		if locked: card.reason = "Cooking Lv%d · 3rd slot" % LOCKED_SLOT_LEVEL
 		else: card.nav = "Try in Experiment"
 		return card
 	card.title = str(p.get("name", ""))
 	card.icon = P0Logic.icon(str(p.id))
-	card.state = "%s · %s" % [P0Logic.rarity_name(view, rarity), "Cooked" if p.get("cooked", false) else "Discovered"]
+	var made := int(p.get("cooked_total", 0))
+	card.state = "%s · %s" % [P0Logic.rarity_name(view, rarity), ("Cooked ×%d" % made if made > 1 else "Cooked") if p.get("cooked", false) else ("Tasted" if str(p.get("state", "")) == "tasted" else "Discovered")]
 	if p.get("can_cook", false): card.button = "Cook"
-	elif int(p.get("slots", 1)) > slots(view): card.reason = "Cooking Lv%d · 3rd slot" % LOCKED_SLOT_LEVEL
+	elif locked: card.reason = "Cooking Lv%d · 3rd slot" % LOCKED_SLOT_LEVEL
 	else: card.reason = missing_reason(view, p)
 	return card
 

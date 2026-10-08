@@ -229,3 +229,33 @@ func test_the_warming_cabinet_sheet_badge_and_buttons() -> void:
 	assert_str(a.take_reason).is_equal("")
 	v.bag.free = 0
 	assert_str(P0KitchenLogic.cabinet_actions(v, "dish_perch@good").take_reason).is_equal("Bag full")
+
+# ---------------------------------------------------------------- S5 Cookbook fields (SGODOT-232, PR #22 sample)
+func _s5_view() -> Dictionary:
+	var v := _view()
+	v.cooking.merge({"slots": 2, "pages_total": 48, "discovered": 2, "third_slot": {"level": 4, "xp_to_go": 85},
+		"queued": {"dish": null, "rarity": 2, "ms": 15000, "starts_in": 3000}}, true)
+	v.cooking.stove = {"dish": "dish_grilled_crucian", "rarity": 1, "ms": 5000, "elapsed": 2000, "ready_in": 3000, "heats": [], "left": null}
+	v.cooking.cookbook = [
+		{"id": "dish_grilled_crucian", "name": "Grilled Crucian", "rarity": 1, "slots": 1, "state": "mastered", "known": true, "in": ["fish_crucian"], "cooked": true, "cooked_total": 10, "can_cook": true, "lock": null},
+		{"id": "dish_grilled_fish", "name": null, "rarity": 1, "slots": 1, "state": "hidden", "known": false, "in": ["?"], "cooked": false, "can_cook": false, "lock": null},
+		{"id": "dish_radish_salad", "name": "Radish Salad", "rarity": 1, "slots": 2, "state": "tasted", "known": true, "in": ["crop_radish", "crop_lettuce"], "cooked": false, "can_cook": false, "lock": null},
+		{"id": "dish_veggie_plate", "name": null, "rarity": 1, "slots": 1, "state": "clued", "known": false, "in": ["F1"], "cooked": false, "can_cook": false, "lock": null},
+		{"id": "dish_fisher_stew", "name": null, "rarity": 3, "slots": 3, "state": "hidden", "known": false, "in": ["?", "?", "?"], "cooked": false, "can_cook": false, "lock": {"level": 4, "xp_to_go": 85}},
+	]
+	return v
+
+func test_s5_page_states_drive_the_cells_order_and_counts() -> void:
+	var v := _s5_view()
+	var K := UiItemCell.KitchenState
+	var states := P0KitchenLogic.pages(v).map(func(p): return P0KitchenLogic.page_cell(v, p).kitchen_state)
+	assert_array(states).is_equal([K.MASTERED, K.HIDDEN, K.TASTED, K.CLUED, K.LOCKED])
+	assert_bool(P0KitchenLogic.page_cell(v, P0KitchenLogic.pages(v)[0]).marked).is_true()   # mastered and can cook
+	assert_array(P0KitchenLogic.cookbook_order(v).map(func(p): return p.id)).is_equal(
+		["dish_grilled_crucian", "dish_radish_salad", "dish_veggie_plate", "dish_grilled_fish", "dish_fisher_stew"])
+	assert_str(P0KitchenLogic.cookbook_count(v)).is_equal("2/48")
+	assert_str(P0KitchenLogic.locked_slot_label(v)).is_equal("Lv4 · 85 XP to go")
+	assert_str(P0KitchenLogic.header(v).state).is_equal("Cooking 0:03 · Queued 1")
+	assert_str(P0KitchenLogic.page_card(v, P0KitchenLogic.pages(v)[0]).state).is_equal("Common · Cooked ×10")
+	assert_str(P0KitchenLogic.page_card(v, P0KitchenLogic.pages(v)[4]).reason).is_equal("Cooking Lv4 · 3rd slot")
+	assert_str(P0KitchenLogic.page_card(v, P0KitchenLogic.pages(v)[3]).nav).is_equal("Try in Experiment")
