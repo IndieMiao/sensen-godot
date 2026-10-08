@@ -1147,7 +1147,7 @@ static func keeper_lines(view: Dictionary, role: String, ctx := {}) -> Dictionar
 			answer = "Quiet day."
 			if k.get("online", null) != null: answer += " %d %s around Shanghai right now." % [int(k.online), "person" if int(k.online) == 1 else "people"]
 		"post":
-			var pip := _resident_name(str(k.get("request_by", ""))) if k.get("request_by", null) != null else ""
+			var pip := resident_name(str(k.get("request_by", ""))) if k.get("request_by", null) != null else ""
 			match str(k.get("greet", "")):
 				"cups_out": greet = _CUPS_OUT
 				"request": greet = "Coffee's fresh. %s's been asking for a hand." % pip
@@ -1195,7 +1195,8 @@ static func _count_word(n: int) -> String:
 static func _board_count(n: int) -> String:
 	return "The Market Board has %d %s today." % [n, "request" if n == 1 else "requests"]
 
-static func _resident_name(id: String) -> String:
+## A resident's name from its id (`res_pip` → Pip); "" for an unknown id.
+static func resident_name(id: String) -> String:
 	return str(content().get("residents", {}).get(id, {}).get("name", ""))
 
 static func _shop_price(view: Dictionary, role: String, id: String, fallback: int) -> int:

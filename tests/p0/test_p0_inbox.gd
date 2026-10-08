@@ -63,7 +63,7 @@ func test_claim_all_takes_what_fits_and_with_the_bag_full_says_make_room() -> vo
 
 ## q(79): only what happened while the player was away; claims stay on the server and are not listed.
 func test_updates_list_expired_and_returned_parcels_only() -> void:
-	var v := _view(6, 0, [_upd("u3", "returned", 0, false, NOW - 86_400_000.0 * 1.5, "dish_herb_grilled_fish", 1, {"from": "Pip"}),
+	var v := _view(6, 0, [_upd("u3", "returned", 0, false, NOW - 86_400_000.0 * 1.5, "dish_herb_grilled_fish", 1, {"from": "res_pip"}),
 		_upd("u2", "expired", 0, true, NOW - 3_600_000.0 * 5, "bait_worm", 3), _upd("u1", "expired", 18, false, NOW - 30_000.0),
 		_upd("c1", "claimed", 0, true)])
 	var rows := P0Inbox.update_rows(v, NOW)
@@ -72,6 +72,16 @@ func test_updates_list_expired_and_returned_parcels_only() -> void:
 	assert_that(rows.map(func(r): return r.time)).is_equal(["1d ago", "5h ago", "Just now"])
 	assert_that([rows[2].sub, rows[1].sub, rows[0].sub]).is_equal(["Perch ×7 · turned into coins at 80%", "Fishing Lv2 reward", "Herb Grilled Fish ×1"])
 	assert_that(rows.map(func(r): return r.unread)).is_equal([true, false, true])
+
+## 李元芳 int10c: the server keeps the resident's id in gift.from; the line names the resident, never `res_pip's`.
+func test_a_returned_gift_meal_names_the_resident_not_its_id() -> void:
+	var pip := P0Logic.resident_name("res_pip")
+	assert_str(pip).is_not_empty()
+	for from in ["res_pip", pip]:   # an id from the server; a name kept as it is
+		var v := _view(6, 0, [_upd("u3", "returned", 0, false, NOW, "dish_herb_grilled_fish", 1, {"from": from})])
+		assert_str(str(P0Inbox.update_rows(v, NOW)[0].title)).is_equal("%s's gift meal went back · unclaimed" % pip)
+	var none := _view(6, 0, [_upd("u3", "returned", 0, false, NOW, "dish_herb_grilled_fish", 1, {})])
+	assert_str(str(P0Inbox.update_rows(none, NOW)[0].title)).is_equal("A gift meal went back · unclaimed")
 
 func test_the_bell_reads_the_servers_badge() -> void:
 	var v := _view(0, 2, [_upd("u1", "expired", 18)])

@@ -105,8 +105,11 @@ static func update_rows(view: Dictionary, now_ms: float) -> Array:
 		var title := ""
 		var sub := ""
 		if str(u.status) == "returned":
+			# The server keeps the resident's id (gift.from `res_pip`): the line names the resident (李元芳 int10c).
 			var from := str((u.get("gift", {}) if u.get("gift", null) is Dictionary else {}).get("from", "")).strip_edges()
-			title = "%s gift meal went back · unclaimed" % (("%s's" % from) if from != "" else "A")
+			var who := P0Logic.resident_name(from)
+			if who == "": who = from
+			title = "%s gift meal went back · unclaimed" % (("%s's" % who) if who != "" else "A")
 			sub = thing
 		elif int(u.get("coins", 0)) > 0:
 			title = "Parcel expired · +%d coins" % int(u.coins)
