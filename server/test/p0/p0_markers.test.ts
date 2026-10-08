@@ -16,6 +16,12 @@ function step(s: P0State, cmd: P0Command, now = T0): P0State {
 }
 // a first command rolls the player day in, as any real save has (resident requests wait on it)
 const fresh = () => step(freshState(c, 'markers-player-01', T0), { type: 'read_inbox', keys: [] });
+/** Pond Catch handed in: the first session is over. */
+function afterTutorial(): P0State {
+  const s = step(fresh(), { type: 'accept', request: 'req_pond_catch' });
+  s.bag.push({ id: 'fish_crucian', qty: 2 });
+  return step(s, { type: 'deliver', request: 'req_pond_catch' });
+}
 
 describe('map pin markers (§9.5.2, q(48); SGODOT-232)', () => {
   it('loads the outposts and pond points the markers need', () => {
@@ -35,15 +41,37 @@ describe('map pin markers (§9.5.2, q(48); SGODOT-232)', () => {
     expect(viewOf(c, s, T0).map_markers[0]).toEqual({ place: 'home', kind: 'deliver', why: { request: 'req_pond_catch', tracked: true } });
   });
 
+  it('first session: until Pond Catch is handed in only the tracked marker shows (q(48))', () => {
+    let s = fresh();
+    expect(at(s)).toEqual([]);   // Pip's and Old Kai's requests are open, but minutes 5–9 have one goal
+    s = step(s, { type: 'accept', request: 'req_pond_catch' });
+    expect(at(s)).toEqual(['request:pond_shanghai_05:tracked']);
+    s.bag.push({ id: 'fish_crucian', qty: 3 });
+    expect(at(s)).toEqual(['deliver:home:tracked']);   // Pip could take a crucian too: not yet
+    s = step(s, { type: 'deliver', request: 'req_pond_catch' });
+    expect(at(s)).toContain('deliver:sh_post_1');      // handed in: Pip's request shows, and the bag holds his fish
+  });
+
   it('residents with an open request light their outpost; ready without taking it shows ✓ there', () => {
-    const s = fresh();
-    expect(at(s)).toEqual(expect.arrayContaining(['request:sh_post_1', 'request:sh_tackle_1']));
-    s.bag.push({ id: 'fish_crucian', qty: 3 });   // Pip ①: a Common fish
+    const s = afterTutorial();
+    expect(at(s)).toContain('request:sh_post_1');
+    s.bag.push({ id: 'fish_crucian', qty: 1 });   // Pip ①: a Common fish
     expect(at(s)).toContain('deliver:sh_post_1');
   });
 
+  it('Old Kai\'s Rare fish request lights the tackle shop only from Fishing Lv4 (Golden Koi)', () => {
+    const s = afterTutorial();
+    s.residents.res_pip = { affinity: 0, chat_day: '', gift_day: '', next: 99, req: null, done_day: '' };
+    s.skills.fishing = 220;   // Lv3: no Rare fish yet; the Reed Rod's ◆ shows instead
+    expect(mapMarkers(c, s).find(m => m.place === 'sh_tackle_1')?.kind).toBe('new');
+    s.seen = ['item:rod_reed', 'item:bait_worm'];
+    expect(mapMarkers(c, s).find(m => m.place === 'sh_tackle_1')).toBeUndefined();
+    s.skills.fishing = 480;   // Lv4
+    expect(mapMarkers(c, s).find(m => m.place === 'sh_tackle_1')).toMatchObject({ kind: 'request', why: { resident: 'res_old_kai' } });
+  });
+
   it('a new level-gated good lights its outpost once; walking in marks it seen', () => {
-    let s = fresh();
+    let s = afterTutorial();
     s.residents.res_old_kai = { ...(s.residents.res_old_kai ?? {}), next: 99 } as never;   // Old Kai out of requests: only ◆ can show there
     s.skills.fishing = 70;   // Fishing Lv2: Worm Bait on the tackle counter
     expect(mapMarkers(c, s).find(m => m.place === 'sh_tackle_1')).toEqual({ place: 'sh_tackle_1', kind: 'new', why: { item: 'bait_worm' } });
@@ -64,6 +92,7 @@ describe('map pin markers (§9.5.2, q(48); SGODOT-232)', () => {
     registerP0Routes(app, { content: c, store, now: () => T0, dev: false });
     try {
       const s = store.get('markers-player-02', T0);
+      s.boards.stall = [];   // past the first session (Pond Catch gone from the board)
       s.skills.fishing = 70;
       s.residents.res_old_kai = { ...(s.residents.res_old_kai ?? {}), next: 99 } as never;
       store.put(s);
@@ -75,7 +104,7 @@ describe('map pin markers (§9.5.2, q(48); SGODOT-232)', () => {
   });
 
   it('a resident at Acquainted opens a second page of talk: ◆ at their outpost', () => {
-    const s = fresh();
+    const s = afterTutorial();
     s.residents.res_pip = { ...(s.residents.res_pip ?? {}), affinity: 15, next: 99 } as never;
     expect(mapMarkers(c, s).find(m => m.place === 'sh_post_1')).toEqual({ place: 'sh_post_1', kind: 'new', why: { resident: 'res_pip' } });
   });

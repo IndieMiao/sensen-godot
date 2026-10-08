@@ -11,6 +11,9 @@
  * - new ◆: what a level opened at an outpost that the player has not walked in to see since (Worm Bait and the Reed Rod
  *   at the tackle shop, the Row Hoe at the market square) and a resident's second page of talk at Acquainted. Entering
  *   the outpost marks them seen (noteSeenAt, from presence). No locked or star pins in P0.
+ * First session (q(48)): until Pond Catch is handed in, only tracked markers show (Reed Pond's !, then home's ✓), so
+ * minutes 5–9 have one goal. A resident's open fish request lights their outpost only once the player can land such a
+ * fish (Old Kai's Rare fish: Golden Koi, Fishing Lv4); it can still be taken in the shop before that.
  */
 import { BOARDS, handIn } from './boards.js';
 import type { Need, OutpostDef, P0Content, ShopId } from './content.js';
@@ -75,6 +78,18 @@ export function pondFor(c: P0Content, fish: string[]): string | null {
   return fits.sort((a, b) => dist(a[1].at) - dist(b[1].at))[0]?.[0] ?? null;
 }
 
+/** A fish of the request's rarity the player can land now somewhere in P0 (its level reached, a pond or river has it). */
+function catchable(c: P0Content, s: P0State, need: Pick<Need, 'kind' | 'rarity'>, items: string[]): boolean {
+  const sites = Object.values(c.fishing.sites);
+  return fishFor(c, items, need).some(id => {
+    const f = c.fish.find(x => x.id === id);
+    return !!f && f.level <= skillLevel(c, s, 'fishing') && sites.some(site => site.fish.includes(id));
+  });
+}
+
+/** The tutorial request is still on the Stall Board: the first session, one goal on the map. */
+const firstSession = (c: P0Content, s: P0State) => (s.boards.stall ?? []).some(sl => sl.req?.id === c.requests.tutorial.id);
+
 export function mapMarkers(c: P0Content, s: P0State): MapMarker[] {
   const all: MapMarker[] = [];
   for (const board of BOARDS) {
@@ -100,7 +115,9 @@ export function mapMarkers(c: P0Content, s: P0State): MapMarker[] {
     else if (tracked && q.need.kind === 'fish') {
       const pond = pondFor(c, fishFor(c, q.need.id ? [q.need.id] : [], q.need));
       if (pond) all.push({ place: pond, kind: 'request', why: { request: q.id, resident: id, tracked: true } });
-    } else if (!tracked) all.push({ place, kind: 'request', why: { request: q.id, resident: id } });
+    } else if (!tracked && (q.need.kind !== 'fish' || catchable(c, s, q.need, q.need.id ? [q.need.id] : []))) {
+      all.push({ place, kind: 'request', why: { request: q.id, resident: id } });
+    }
   }
   for (const o of c.outposts ?? []) {
     for (const k of newKeysAt(c, s, o)) {
@@ -112,5 +129,6 @@ export function mapMarkers(c: P0Content, s: P0State): MapMarker[] {
   const order = (m: MapMarker) => RANK[m.kind] * 2 + (m.why.tracked ? 0 : 1);
   const best = new Map<string, MapMarker>();
   for (const m of all.sort((a, b) => order(a) - order(b))) if (!best.has(m.place)) best.set(m.place, m);
-  return [...best.values()];
+  const shown = [...best.values()];
+  return firstSession(c, s) ? shown.filter(m => m.why.tracked) : shown;
 }
