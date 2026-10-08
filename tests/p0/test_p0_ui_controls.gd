@@ -232,6 +232,29 @@ func test_a_drag_from_a_finger_card_starts_the_joystick() -> void:
 	assert_bool(sticks.any(func(v): return v != Vector2.ZERO)).is_true()
 	assert_array(taps).is_empty()
 
+func test_a_second_tip_waits_for_the_first_card_and_is_not_learned_meanwhile() -> void:
+	# 李元芳 first-session test 12: the pond asked for Cast then Bait in one frame; Bait covered Cast at once and Cast
+	# was counted as learned unseen. Now Bait waits (the pond asks every frame) and shows once Cast is gone.
+	var had_tips := FileAccess.file_exists(P0Ui.TIPS_PATH)
+	var saved := FileAccess.get_file_as_string(P0Ui.TIPS_PATH) if had_tips else ""
+	ui._taught = {"_": true}   # non-empty: teach() won't load saved tips over it
+	ui.teach("probe_cast", "Casting uses 5 Energy.")
+	ui.teach("probe_bait", "Tap Worm Bait to put it on the hook.")
+	var text := ui._teach.get_node("Text") as Label
+	assert_str(text.text).is_equal("Casting uses 5 Energy.")
+	assert_bool(ui._taught.has("probe_bait")).is_false()
+	ui._teach.hide()   # tapped away (or its 7 s ran out)
+	ui.teach("probe_cast", "Casting uses 5 Energy.")   # already learned: nothing
+	ui.teach("probe_bait", "Tap Worm Bait to put it on the hook.")
+	assert_bool(ui._teach.visible).is_true()
+	assert_str(text.text).is_equal("Tap Worm Bait to put it on the hook.")
+	assert_bool(ui._taught.has("probe_bait")).is_true()
+	if had_tips:
+		var f := FileAccess.open(P0Ui.TIPS_PATH, FileAccess.WRITE)
+		f.store_string(saved)
+	else:
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(P0Ui.TIPS_PATH))
+
 func test_teaching_card_stays_clear_of_the_bar_and_the_keys() -> void:
 	# PR #12 review fix 5: the tip sits above the quick bar and left of the action key group.
 	var had_tips := FileAccess.file_exists(P0Ui.TIPS_PATH)
