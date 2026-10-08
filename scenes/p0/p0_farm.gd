@@ -27,7 +27,8 @@ var _hi: MeshInstance3D
 var _house := Vector3.ZERO
 var _stall := Vector3.ZERO   # the Homestead Stall (unattended, p(6)); the seed box stands in until its model
 var _mine := Vector3.ZERO
-var _materials: P0FarmMaterials   # SGODOT-231: mine mouth (gathering spots and the workbench next)
+var _materials: P0FarmMaterials   # SGODOT-231: mine mouth, gathering spots and the workbench
+var _card := ""   # LOCK-07: the one facility whose finger card shows this frame (P0FarmMaterials.pick_card)
 var _focus := Vector3.ZERO
 var _cam_follow := P0Follow.new()
 var _zoom := 1.0
@@ -220,7 +221,8 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 	_sync_plots(v, dt)
 	_pick_front(v)
 	rt.ui.set_action(_materials.action(v) if _materials.near_mouth() else P0Logic.main_action(v, _front, rt.ui.selected_seed, _row))
-	_materials.frame(v)
+	_card = P0FarmMaterials.pick_card(_card_candidates(), actor.position, _card)
+	_materials.frame(v, _card)
 	_hold_repeat()
 	_tags(v)
 	_teaching(v)
@@ -316,12 +318,20 @@ func _tags(v: Dictionary) -> void:
 		elif str(r.status) == "open" and request < 0: request = UiStatusBadge.State.REQUEST
 	rt.ui.badge("stall", maxi(request, 0), stall_top, request >= 0)
 	rt.ui.tag("stall", "Tap to shop", stall_top - Vector2(0, rt.ui.badge_height("stall")),
-		actor.position.distance_to(_stall) < 3.2, cam.unproject_position(_stall + Vector3(0, 0.4, 0)))
+		_card == "stall", cam.unproject_position(_stall + Vector3(0, 0.4, 0)))
 	# The farmhouse carries no state badge (不知火舞 on SGODOT-221): the stove's state belongs to the stove inside,
 	# and Today already names the dish and its time. The card's copy becomes "Farmhouse · Tap to go in" once the
 	# door card goes (bench SGODOT-224, room SGODOT-226).
 	rt.ui.tag("home", "Home · Kitchen · Rest", cam.unproject_position(_house + Vector3(0, 2.6, 0.4)),
-		actor.position.distance_to(_house) < 4.2, cam.unproject_position(_house + Vector3(0, 1.0, 0.6)))
+		_card == "home", cam.unproject_position(_house + Vector3(0, 1.0, 0.6)))
+
+## Every facility with a finger card on the farm, [id, position, reach m] in a fixed order (LOCK-07: one card, the
+## nearest in reach). 2A's rest bench ("bench", BENCH_NEAR_M) and SGODOT-228's Homestead sign / Upgrade Plaque
+## (2.6 m) join this list when they land.
+func _card_candidates() -> Array:
+	var out: Array = [["stall", _stall, 3.2], ["home", _house, 4.2]]
+	out.append_array(_materials.card_candidates())
+	return out
 
 func _teaching(v: Dictionary) -> void:
 	if rt.ui.has_modal(): return

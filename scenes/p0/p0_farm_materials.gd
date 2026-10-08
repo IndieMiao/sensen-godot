@@ -9,6 +9,7 @@ const P0_MINE := "res://scenes/p0/p0_mine.tscn"
 const MOUTH_REACH := 2.4        # m: the key turns into Enter mine / Continue run, the EntryCard shows
 const NOTICE_S := 2.0           # "Run ended at daily reset" float (q(44))
 const SPOT_REACH := 3.0         # m: finger cards show and taps gather only this close (Arthur, 231)
+const CARD_KEEP := 0.2          # m: another facility must be this much nearer to take the finger card over
 const SPOTS := ["spot_grove", "spot_rock_pile", "spot_reed_bank", "spot_clay_bank", "spot_herb_patch"]
 
 var farm: Node3D                # p0_farm.gd: actor, cam
@@ -63,8 +64,32 @@ func near_mouth() -> bool:
 func action(v: Dictionary) -> Dictionary:
 	return P0MaterialLogic.mine_entry_action(v)
 
-## Every frame on the farm: badge, EntryCard and the reset notice.
-func frame(v: Dictionary) -> void:
+## LOCK-07 (不知火舞 / Arthur on 231): one finger card at a time, for the nearest facility within its own reach.
+## `cands` [[id, world position, reach m]] in a fixed order; the card already showing (`current`) keeps it unless
+## another is CARD_KEEP nearer, so standing between two never flickers; an exact tie goes to the earlier entry.
+## "" when none is in reach. Badges are not part of this.
+static func pick_card(cands: Array, at: Vector3, current: String) -> String:
+	var best := ""
+	var best_d := INF
+	var current_d := INF
+	for c in cands:
+		var d := at.distance_to(c[1] as Vector3)
+		if d > float(c[2]): continue
+		if str(c[0]) == current: current_d = d
+		if d < best_d:
+			best = str(c[0])
+			best_d = d
+	return current if current_d <= best_d + CARD_KEEP else best
+
+## This helper's finger-card candidates for the farm's pick_card: the five spots and the workbench.
+func card_candidates() -> Array:
+	var out: Array = []
+	for id in SPOTS: out.append([id, _spots.get(id, Vector3.ZERO), SPOT_REACH])
+	out.append(["workbench", _bench, SPOT_REACH])
+	return out
+
+## Every frame on the farm: badge, EntryCard and the reset notice. `card` is the farm's one finger card this frame.
+func frame(v: Dictionary, card := "") -> void:
 	var cam: Camera3D = farm.cam
 	var near := near_mouth()
 	var top := cam.unproject_position(mouth + Vector3(0, 1.9, 0))
@@ -87,30 +112,29 @@ func frame(v: Dictionary) -> void:
 		if notice != "":
 			_reset_shown = float(v.mine.ended.at)
 			rt.ui.float_text(notice, top + Vector2(0, -8), P0Ui.INK)
-	_spot_marks(v)
+	_spot_marks(v, card)
 	var stored := P0MaterialLogic.stored_notice(v, _stored_shown)
 	if stored != "":
 		_stored_shown = float(v.storage.auto.at)
 		rt.ui.float_text(stored, rt.anchor() + Vector2(0, -36), P0Ui.GREEN_D)
 
-## STATE-ICONS badge over a spot (READY, LOCKED for Clay Bank before Homestead Lv2; a countdown spot shows none until
-## near) and, near it, the finger card (Timber Grove · Tap to gather / · Ready in 2h 10m / Clay Bank · Homestead Lv2)
-## above the badge. Tapping the card is tapping the spot.
-func _spot_marks(v: Dictionary) -> void:
+## STATE-ICONS badge over a spot (READY, LOCKED for Clay Bank before Homestead Lv2; a countdown spot shows none) and,
+## when it holds the farm's one finger card, the card (Timber Grove · Tap to gather / · Ready in 2h 10m / Clay Bank ·
+## Homestead Lv2) above the badge. Tapping the card is tapping the spot.
+func _spot_marks(v: Dictionary, card: String) -> void:
 	var cam: Camera3D = farm.cam
 	var modal := rt.ui.has_modal()
 	for m in P0MaterialLogic.gather_marks(v):
 		var id := str(m.id)
 		var at: Vector3 = _spots.get(id, Vector3.ZERO)
 		var screen := cam.unproject_position(at + Vector3(0, 1.3, 0))
-		var near: bool = farm.actor.position.distance_to(at) < SPOT_REACH
 		var state := UiStatusBadge.State.READY if str(m.badge) == "ready" else UiStatusBadge.State.LOCKED
 		rt.ui.badge(id, state, screen, not modal and str(m.badge) != "countdown")
-		rt.ui.tag(id, str(m.caption), screen - Vector2(0, rt.ui.badge_height(id)), not modal and near,
+		rt.ui.tag(id, str(m.caption), screen - Vector2(0, rt.ui.badge_height(id)), not modal and card == id,
 			cam.unproject_position(at + Vector3(0, 0.6, 0)))
 	var bench_screen := cam.unproject_position(_bench + Vector3(0, 1.4, 0))
 	rt.ui.tag("workbench", "Workbench · Tap to craft", bench_screen,
-		not modal and farm.actor.position.distance_to(_bench) < SPOT_REACH, cam.unproject_position(_bench + Vector3(0, 0.8, 0)))
+		not modal and card == "workbench", cam.unproject_position(_bench + Vector3(0, 0.8, 0)))
 
 ## Taps on the farm's material facilities (LOCK-07): the mouth shows "The mine" (MINE-P0-1 / P0-8; entering stays on the
 ## key); a spot gathers when the player stands near it, a locked one shows MAT-3; the workbench opens its drawer.

@@ -267,3 +267,18 @@ func test_grove_trunks_block_and_the_way_to_the_workbench_stays_open() -> void:
 			seen[n] = true
 			queue.append(n)
 	assert_bool(seen.has(goal)).is_true()
+
+## LOCK-07: one finger card, the nearest facility in its own reach; the showing card keeps it on a near-tie.
+func test_one_finger_card_for_the_nearest_facility() -> void:
+	var cands := [["stall", Vector3(0, 0, 0), 3.2], ["home", Vector3(-4, 0, 0), 4.2], ["workbench", Vector3(3, 0, 0), 3.0]]
+	assert_str(P0FarmMaterials.pick_card(cands, Vector3(0.5, 0, 0), "")).is_equal("stall")
+	assert_str(P0FarmMaterials.pick_card(cands, Vector3(2.4, 0, 0), "")).is_equal("workbench")
+	assert_str(P0FarmMaterials.pick_card(cands, Vector3(9, 0, 0), "stall")).is_equal("")   # none in reach
+	# Midway (1.5 m from both): whichever was showing stays; an exact tie with nothing showing goes to the first.
+	assert_str(P0FarmMaterials.pick_card(cands, Vector3(1.5, 0, 0), "workbench")).is_equal("workbench")
+	assert_str(P0FarmMaterials.pick_card(cands, Vector3(1.5, 0, 0), "stall")).is_equal("stall")
+	assert_str(P0FarmMaterials.pick_card(cands, Vector3(1.5, 0, 0), "")).is_equal("stall")
+	# Clearly nearer to the other: it takes over.
+	assert_str(P0FarmMaterials.pick_card(cands, Vector3(1.9, 0, 0), "stall")).is_equal("workbench")
+	# The showing facility left its reach: the nearest in reach takes over.
+	assert_str(P0FarmMaterials.pick_card(cands, Vector3(-3.5, 0, 0), "stall")).is_equal("home")
