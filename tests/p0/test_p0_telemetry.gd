@@ -64,3 +64,14 @@ func test_a_scene_load_reports_its_timings_and_the_device() -> void:
 	session._flush_ui()
 	assert_str(str(sent[0].path)).is_equal("/p0/telemetry")
 	assert_str(str((sent[0].body.events as Array)[0].kind)).is_equal("scene_load")
+
+## 亚瑟 on #94: only a navigation (or the first world after launch) reports a scene_load; a world attaching again when
+## a layer above it closes has no navigation behind it and reports nothing.
+func test_only_a_navigation_or_the_cold_start_reports_a_scene_load() -> void:
+	P0Runtime._nav_pending = false
+	P0Runtime._cold_done = false
+	assert_that(P0Runtime.take_load_report()).is_equal({"report": true, "cold": true})     # the first world after launch
+	assert_that(P0Runtime.take_load_report()).is_equal({"report": false, "cold": false})   # back from the farmhouse: no navigation
+	P0Runtime.nav_started()
+	assert_that(P0Runtime.take_load_report()).is_equal({"report": true, "cold": false})    # map → pond
+	assert_that(P0Runtime.take_load_report()).is_equal({"report": false, "cold": false})   # taken once only
