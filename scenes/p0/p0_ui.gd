@@ -26,6 +26,8 @@ signal tackle_requested()      # FISH-5 rod variant "Tackle Shop"
 
 const _RESIDENT_SHEET_H := 443.0   # RES-PIP: Sheet 443 of 800
 const _CLOSE_ABOVE_SHEET := 6.0    # RES-PIP: Close · 44 px sits 6 above the sheet, 16 in from the right
+const _CLOSE_ABOVE_SPECIALTY := 2.0   # MARKET-SPECIALTY: Close 44 at (300, 617), the sheet at y 663
+const _FLOAT_HUG_CHARS := 32         # longer float copy wraps to two lines (FloatText Layout=Wrap)
 const _CLOSE_ABOVE_CARD := 8.0     # RES-KAI-TALK: 8 above the dialogue bar, flush with its right edge
 const _AFFINITY_INSET := 8.0       # RES-KAI-TALK: the affinity float sits 8 in from the bar's left edge …
 const _AFFINITY_ABOVE := 6.0       # … and 6 above its top
@@ -40,8 +42,6 @@ const AMBER := Color("e3b341")
 const AMBER_D := Color("b8831c")
 const BLUE := Color("6fa8dc")
 const DIS := Color("d6d5ce")
-const SEA := Color("cfe3ee")        # Old Kai's role colour (tackle · sea blue)
-const SEA_LIGHT := Color("e3eff5")
 const GOLD := Color("e9c35e")        # kit-cook --gold-light → --gold
 const GOLD_D := Color("c9962a")
 const RED := Color("e07a5f")         # --energy-red
@@ -74,6 +74,9 @@ var _undo_toast: UiUndoToast
 var _cards := {}          # id -> UiTapCard
 var _card_hits := {}      # id -> screen point a tap on the card forwards to the world (the facility's own tap point)
 var _badges := {}         # id -> UiStatusBadge
+var _icons := {}          # id -> UiWorldIconButton (SGODOT-250)
+var _name_bars := {}      # id -> UiWorldNameBar
+var _npc_tags := {}       # id -> UiNpcNameTag
 ## The finger card a `tapped` comes from, only while that signal is being handled ("" for a scene tap).
 var tapped_card := ""
 var _quick := {}          # per action: {pins: [], removed: []}, saved in quick_store (LOCK-05: 每个行动各记各的)
@@ -88,7 +91,7 @@ var map_bag := false
 var _bar_ids: Array = []
 var selected_seed := ""
 var selected_bait := ""
-## Where Old Kai keeps shop (a fixed map place since ponds moved to the map).
+## The pond the tackle keeper names when no outpost ctx says which (the map's tackle pin before SGODOT-227).
 var tackle_place := "Reed Pond"
 var bar_mode := "farm"          # "farm" (seeds) or "fish" (bait) — the quick bar holds the current action's consumables
 var surface := "farm"
@@ -168,7 +171,7 @@ func _process(dt: float) -> void:
 	# q(49): a waiting TipCard comes up only when no RewardMoment / result card is on screen; one already up stays.
 	# TODO(SGODOT-232 U6): call tips.moment_opened / moment_closed from UiRewardMoment / MomentBanner once #24 lands;
 	# until then the result cards (modal_kind "card") stand in for them.
-	if tips and modal_kind != "card":
+	if tips and not modal_kind in ["card", "kitchen_card"]:   # the farmhouse's COOK-4 is a result card too
 		var key := tips.next()
 		if key != "": _show_tip(str(P0Guide.TIPS[key]))
 
@@ -309,6 +312,10 @@ func _build_dev() -> void:
 func set_view(v: Dictionary) -> void:
 	view = v
 	if _bag != null and is_instance_valid(_bag) and modal_kind in ["bag", "gear", "gift"]: _bag.refresh(v)
+	if _counter != null and is_instance_valid(_counter) and modal_kind == "counter":
+		var was: String = _counter.section
+		_counter.refresh(v)
+		if was == "board": _fill_board(_counter)   # board cards follow Accept / Deliver
 	if _profile != null and is_instance_valid(_profile) and modal_kind == "profile": _profile.update(v)
 	if workbench() != null: _workbench.refresh(v)
 	_refresh_hud()
@@ -384,6 +391,7 @@ func set_surface(name: String) -> void:
 	if _dev_box: _dev_box.visible = world
 	for c in _cards.values(): (c as Control).visible = false
 	for b in _badges.values(): (b as Control).visible = false
+	for m in _icons.values() + _name_bars.values() + _npc_tags.values(): (m as Control).visible = false
 	_flush_held_toast()
 
 ## Action spaces show the full bar. Rooms (farmhouse kitchen, outposts) and the map keep only Bag, with no action
@@ -730,10 +738,120 @@ func tag(id: String, text: String, screen: Vector2, show: bool, hit := Vector2.I
 	c.text = text
 	_place_marker(c, screen, true)
 
+# ---------------------------------------------------------------- world prompts (SGODOT-250, LOCK-07 v2 / LOCK-16 v2)
+## A facility within view and about 8 m: its icon button (WorldIconButton 1674:101157) centred on `screen` (this UI's
+## coordinates, like tag()). `near` grows a seat 1.1× with a primary edge; `status` (a UiStatusBadge.State, -1 none)
+## turns the whole button into the StatusBadge. A tap on it is a tap on `hit` (default `screen`), with tapped_card =
+## id. Call it every frame for each shown facility that is not the open one; it folds that facility's name strip if
+## it was open. Hidden under a card or drawer, and outside the band between the HUD and the quick bar.
+func world_icon(id: String, icon: Texture2D, screen: Vector2, show: bool, near := false, status := -1, hit := Vector2.INF) -> void:
+	var b: UiWorldIconButton = _icons.get(id)
+	if b == null:
+		b = UiWorldIconButton.new()
+		_kit.add_child(b)
+		_kit.move_child(b, 0)
+		_icons[id] = b
+	var on := show and _modal == null
+	var bar: UiWorldNameBar = _name_bars.get(id)
+	if bar != null and bar.visible: _fold_name_bar(bar)
+	b.visible = on and (bar == null or not bar.visible) and _marker_area().has_point(screen)
+	if not on: return
+	_card_hits[id] = screen if hit == Vector2.INF else hit
+	b.icon = icon
+	b.near = near
+	b.status = status
+	b.place_at(screen)
+
+## The one facility nearest and within reach: its name strip (WorldNameBar 1674:101190) opens from the icon button's
+## spot in 160 ms — icon + `text` + at most one `fact` ("" for none). `side` UiWorldNameBar.Dir (the way the
+## character faces), -1 = right; either way it flips at a screen edge. `dimmed`: used today (Rested today). With
+## show false (or a world_icon call for the same id) it folds back, then the icon button returns.
+func name_bar(id: String, icon: Texture2D, text: String, fact: String, screen: Vector2, show: bool, side := -1, dimmed := false, status := -1, hit := Vector2.INF) -> void:
+	var bar: UiWorldNameBar = _name_bars.get(id)
+	if bar == null:
+		bar = UiWorldNameBar.new()
+		bar.theme = UiKit.theme()
+		bar.visible = false   # opens below
+		_kit.add_child(bar)
+		_kit.move_child(bar, 0)
+		_name_bars[id] = bar
+	if not (show and _modal == null):
+		if bar.visible: _fold_name_bar(bar)
+		return
+	_card_hits[id] = screen if hit == Vector2.INF else hit
+	bar.icon = icon
+	bar.text = text
+	bar.fact = fact
+	bar.dimmed = dimmed
+	bar.status = status
+	bar.side = _name_bar_side(bar, screen, UiWorldNameBar.Dir.RIGHT if side < 0 else side)
+	bar.anchor_at(screen)
+	var b: UiWorldIconButton = _icons.get(id)
+	if b: b.visible = false   # the strip stands in for its button
+	_raise_marker(bar)   # the open strip draws over every icon button and badge (哪吒: a stove badge sat on a card)
+	if not bar.visible or bar.get_meta("folding", false):
+		if not bar.visible: bar.set_openness(0.0)
+		bar.visible = true
+		bar.set_meta("folding", false)
+		bar.expand()
+
+## World markers (cards, badges, icon buttons, strips, NPC tags) sit at the bottom of the UI, under the HUD and the
+## bar; this one goes to the top of that group.
+func _raise_marker(m: Control) -> void:
+	var top := m.get_index()
+	for group in [_cards, _badges, _icons, _name_bars, _npc_tags]:
+		for other in group.values(): top = maxi(top, (other as Node).get_index())
+	if top > m.get_index(): _kit.move_child(m, top)
+
+func _fold_name_bar(bar: UiWorldNameBar) -> void:
+	if bar.get_meta("folding", false): return
+	bar.set_meta("folding", true)
+	bar.collapse()
+	var done := func():
+		if is_instance_valid(bar) and bar.get_meta("folding", false):
+			bar.visible = false
+			bar.set_meta("folding", false)
+	if bar.openness() <= 0.0 or not bar.is_inside_tree(): done.call()
+	else: get_tree().create_timer(UiKit.secs(170.0)).timeout.connect(done)
+
+## The wanted side unless the strip would leave the marker band there; then the other one (贴边翻转).
+func _name_bar_side(bar: UiWorldNameBar, screen: Vector2, want: int) -> int:
+	var area := _marker_area()
+	var reach := bar.full_width() - bar.folded_width() * 0.5
+	if want == UiWorldNameBar.Dir.RIGHT and screen.x + reach > area.end.x - UiTokens.SPACE_WITHIN: return UiWorldNameBar.Dir.LEFT
+	if want == UiWorldNameBar.Dir.LEFT and screen.x - reach < area.position.x + UiTokens.SPACE_WITHIN: return UiWorldNameBar.Dir.RIGHT
+	return want
+
+## An interactable NPC's name over its head (NpcNameTag 1674:101195): the name only; `highlight` when nearest within
+## reach or in a conversation. Display only — the NPC itself takes the tap.
+func npc_tag(id: String, text: String, head_screen: Vector2, show: bool, highlight := false) -> void:
+	var t: UiNpcNameTag = _npc_tags.get(id)
+	if t == null:
+		t = UiNpcNameTag.new()
+		t.theme = UiKit.theme()
+		_kit.add_child(t)
+		_kit.move_child(t, 0)
+		_npc_tags[id] = t
+	t.visible = show and _modal == null and _marker_area().has_point(head_screen)
+	if not t.visible: return
+	t.text = text
+	t.highlight = highlight
+	t.place_over(head_screen)
+
 ## Facility / resident state mark (StatusBadge 1132:79554, STATE-ICONS): display only, the facility takes the tap.
 ## A scene tap: on a shown finger card it is that facility's tap, elsewhere the world's (also a double tap: a card
 ## never recenters the camera by accident). Returns true for a card tap, which then can't start a double tap either.
 func _tap_at(global_pos: Vector2, double: bool) -> bool:
+	# World prompts (SGODOT-250): an open name strip, then an icon button; a tap on either is its facility's tap.
+	for markers in [_name_bars, _icons]:
+		for id in markers:
+			var m: Control = markers[id]
+			if m.is_visible_in_tree() and m.hit_rect().has_point(global_pos):
+				if _modal == null:
+					tapped_card = str(id)
+					tapped.emit(_card_hits[id])
+					tapped_card = ""
+				return true
 	for id in _cards:
 		var c: UiTapCard = _cards[id]
 		if c.is_visible_in_tree() and c.hit_rect().has_point(global_pos):
@@ -824,18 +942,17 @@ func _marker_area() -> Rect2:
 	if _bar.visible: bottom = minf(bottom, _bar.position.y)
 	return Rect2(0.0, top, _kit.size.x, maxf(0.0, bottom - top))
 
-func float_text(text: String, screen: Vector2, color: Color) -> void:
-	var l := _label(text, 12, color, true)
-	l.add_theme_color_override("font_outline_color", PAPER)
-	l.add_theme_constant_override("outline_size", 5)
-	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	root.add_child(l)
-	l.reset_size()
-	l.position = screen - Vector2(l.size.x * 0.5, l.size.y)
-	var tw := create_tween()
-	tw.tween_property(l, "position:y", l.position.y - 34, 1.1)
-	tw.parallel().tween_property(l, "modulate:a", 0.0, 1.1).set_delay(0.5)
-	tw.tween_callback(l.queue_free)
+## FloatText (1178:82191, UiFloatText from 2B; SGODOT-224): one line rising from `screen` (its bottom centre) in its
+## tone; `stack` = the line's place in one reply (each starts 28 higher and 60 ms later, at most 3). Copy longer
+## than one line wraps (Layout=Wrap, two lines at most). `tone` also takes the older Color argument (callers in
+## other PRs, e.g. SGODOT-231's material notices): any colour draws in the ITEM tone.
+func float_text(text: String, screen: Vector2, tone: Variant = UiFloatText.Tone.ITEM, icon: Texture2D = null, stack := 0) -> UiFloatText:
+	var t: UiFloatText.Tone = UiFloatText.Tone.ITEM if tone is Color else int(tone)
+	var f := UiFloatText.new(text, t, icon, UiFloatText.Layout.WRAP if text.length() > _FLOAT_HUG_CHARS else UiFloatText.Layout.HUG)
+	f.theme = UiKit.theme()
+	root.add_child(f)
+	f.play(screen, stack)
+	return f
 
 func toast(text: String, seconds := 2.6) -> void:
 	_toast.text = text
@@ -1065,7 +1182,9 @@ func _bag_lift(it: Dictionary, at: Vector2) -> void:
 	_modal.add_child(zone)
 	zone.center = GestureArbiter.drop_zone_centers(_bar.get_global_rect(), true)[0]
 	zone.appear()
-	if _bag: _bag.grid.modulate.a = UiTokens.OPACITY_PENDING   # the grid dims and takes no drop (不知火舞 on 225)
+	if _bag:
+		_bag.grid.modulate.a = UiTokens.OPACITY_PENDING   # the grid dims and takes no drop (不知火舞 on 225)
+		_bag.grid.lifted_id = id                          # its own cell turns into a dashed gap (BAR-DRAG-9)
 	if _bar.haptics and OS.has_feature("mobile"): Input.vibrate_handheld(20)
 	_bag_drag = {id = id, ghost = ghost, zone = zone}
 	_bag_drag_to(at)
@@ -1095,7 +1214,9 @@ func _bag_drag_end() -> void:
 	if _bag_drag.is_empty(): return
 	if is_instance_valid(_bag_drag.ghost): (_bag_drag.ghost as Node).queue_free()
 	if is_instance_valid(_bag_drag.zone): (_bag_drag.zone as UiBarDropZone).vanish()
-	if _bag and is_instance_valid(_bag): _bag.grid.modulate.a = 1.0
+	if _bag and is_instance_valid(_bag):
+		_bag.grid.modulate.a = 1.0
+		_bag.grid.lifted_id = ""
 	_bar.set_drop_target(-1)
 	_bag_drag = {}
 
@@ -1160,153 +1281,120 @@ func _show_need_source(tile: Control, id: String) -> void:
 	var layer := UiNeedSource.popup(root, tile.get_global_rect(), str(src.text), on_show)
 	layer.theme = UiKit.theme()
 
-## Old Kai's greeting (p(4)): same card, his own line and options; Trade opens the tackle counter.
-func open_kai_greeting() -> void:
-	var card := PanelContainer.new()
-	card.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-	card.offset_bottom = -bottom_pad()
-	card.offset_top = card.offset_bottom - 184
-	card.grow_vertical = Control.GROW_DIRECTION_BEGIN   # taller content grows up, never past the bottom pad
-	card.offset_left = 10
-	card.offset_right = -10
-	card.add_theme_stylebox_override("panel", _box(CARD, 16, EDGE, 1, Vector4(8, 8, 10, 8)))
-	var h := HBoxContainer.new()
-	h.add_theme_constant_override("separation", 10)
-	var face := TextureRect.new()   # Old Kai mending a net in his shop (NPC-1b look)
-	face.texture = load("res://assets/p0/art/kai-portrait.jpg")
-	face.custom_minimum_size = Vector2(100, 171)
-	face.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	face.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-	h.add_child(face)
-	var v := VBoxContainer.new()
-	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	v.add_theme_constant_override("separation", 4)
-	v.add_child(_label("Tackle Keeper · Old Kai", 13, INK, true))
-	v.add_child(_label("Rods and bait · " + tackle_place, 8, INK2))
-	var line := _label("“%s”" % _kai_line(), 10, INK)
-	line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	line.custom_minimum_size = Vector2(200, 0)
-	v.add_child(line)
-	var trade := _pill_button("Trade · see the rods", true)
-	trade.pressed.connect(open_tackle)
-	v.add_child(trade)
-	var ask := _pill_button("What's biting?", false)
-	ask.pressed.connect(func(): line.text = "“Round ponds keep crucian, carp, perch and bass — koi too, if your rod can hold her. The winding ones add mullet and trout.”")
-	v.add_child(ask)
-	var bye := _flat_button("Just passing by")
+## Keeper greeting (KeeperGreeting 1205:83238, LOCK-16; NPC-G1 / G1-2 / G1-3 / G1-4): every keeper greets first.
+## `Role · Name`, `Does it · Place`, the line (P0Logic.keeper_lines, facts from view.keepers), then Trade (the counter),
+## the question (its answer replaces the line) and Just passing by. role = the counter id ("tackle", "tea", "post",
+## "market"); ctx = the outpost's keeper ctx {keeper, place, nearest} (SGODOT-227), passed through untouched and kept
+## for the counter's keeper bar.
+func open_keeper_greeting(role: String, ctx := {}) -> void:
+	if not ctx.is_empty(): _counter_ctx[role] = ctx
+	var c: Dictionary = _counter_ctx.get(role, {})
+	var lines := P0Logic.keeper_lines(view, role, c)
+	var who: Array = P0CounterDrawer.KEEPERS.get(role, ["", ""])
+	var name := str(c.get("keeper", who[1]))
+	var card := UiDialogueCard.new(P0CounterDrawer.keeper_portrait(name, true), "%s · %s" % [str(c.get("role", who[0])), name], "",
+		str(lines.greet))
+	card.theme = UiKit.theme()
+	card.portrait_size = UiDialogueCard.KEEPER_PORTRAIT
+	card.place = str(lines.line)
+	var trade := UiCommandButton.new(str(lines.trade))
+	trade.activated.connect(func(): open_counter(role))
+	card.content.add_child(trade)
+	if str(lines.question) != "" and str(lines.answer) != "":
+		var ask := UiCommandButton.new(str(lines.question), UiCommandButton.Kind.SECONDARY)
+		ask.activated.connect(func(): card.line = str(lines.answer))
+		card.content.add_child(ask)
+	var bye := UiDismissButton.new(str(lines.leave))
 	bye.pressed.connect(close_modal)
-	v.add_child(bye)
-	h.add_child(v)
-	card.add_child(h)
-	_open_modal(card, 0.22, true)
+	card.content.add_child(bye)
+	card.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+	card.offset_left = UiTokens.SIZE_QUICK_BAR_X
+	card.offset_right = -UiTokens.SIZE_QUICK_BAR_X
+	card.offset_bottom = -bottom_pad()
+	card.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	_open_modal(card, 0.0, true)
 	modal_kind = "greeting"
 
-func _kai_line() -> String:
-	var lv := int(view.get("skills", {}).get("fishing", {}).get("level", 1))
-	for g in view.get("gear", {}).get("rods", []):
-		if str(g.id) == "rod_reed" and g.get("owned", false): return "That Reed Rod suits you. Golden Koi won't snap it — at Fishing Lv4 she's yours."
-	if lv >= 3: return "Fishing Lv3 already? The Reed Rod holds Rare fish. 80 coins and she's yours."
-	return "A Starter Rod lands Common and Fine fish. The Reed Rod holds Rare ones — come back at Fishing Lv3."
+## The tackle shop before the outposts open it with their ctx (the map's tackle pin, P0_SHOT "kai").
+func open_kai_greeting() -> void:
+	open_keeper_greeting("tackle", {"keeper": "Finn", "place": "Xuhui Tackle Shop", "nearest": {"name": tackle_place, "site": "pond"}})
 
-## Tackle counter (sea-blue keeper bar, §9.11): rods go to Bag › Gear, bait to the bag; nothing is sold here.
-func open_tackle(bubble := "") -> void:
-	var v := _sheet(420, "Old Kai's Tackle · " + tackle_place, "rod")
-	modal_kind = "tackle"
-	var kp := PanelContainer.new()
-	kp.add_theme_stylebox_override("panel", _box(SEA_LIGHT, 12, SEA_LIGHT, 0, Vector4(8, 6, 8, 6)))
-	var kv := VBoxContainer.new()
-	kv.add_child(_label("Tackle Keeper · Old Kai", 9, INK, true))
-	var say := _label("“%s”" % (bubble if bubble != "" else "Pick a rod, I'll string it. Fish sell best at your own stall."), 9, INK)
-	say.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	say.custom_minimum_size = Vector2(280, 0)
-	kv.add_child(say)
-	kp.add_child(kv)
-	v.add_child(kp)
-	v.add_child(_label("Buy", 11, INK, true))
-	for row in view.get("tackle", {}).get("buy", []):
-		var id := str(row.id)
-		var h := HBoxContainer.new()
-		h.add_theme_constant_override("separation", 6)
-		h.custom_minimum_size = Vector2(0, 46)
-		var ic := _icon(id, 30)
-		if not row.get("unlocked", false): ic.modulate = Color(1, 1, 1, 0.45)
-		h.add_child(ic)
-		var mid := VBoxContainer.new()
-		mid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		mid.add_theme_constant_override("separation", 0)
-		mid.add_child(_label(str(row.name), 10, INK if row.get("unlocked", false) else INK2, true))
-		var sub := "%d coins · holds up to %s · goes to Gear" % [int(row.price), P0Logic.rarity_name(view, int(row.reach))] if row.get("reach", null) != null else "%d coins · %d left today · Bag ×%d" % [int(row.price), int(row.get("left", 0)), P0Logic.bag_count(view, id)]
-		mid.add_child(_label(sub, 8, INK2))
-		h.add_child(mid)
-		if not row.get("unlocked", false):
-			var lk := _label("Fishing Lv%d · %d XP to go" % [int(row.gate), int(row.xp_to_go)], 8, INK2, true)
-			lk.add_theme_stylebox_override("normal", _box(DIS, 10, DIS, 0, Vector4(8, 4, 8, 4)))
-			h.add_child(lk)
-		elif row.get("owned", false):
-			var ow := _label("Owned", 9, GREEN_D, true)
-			h.add_child(ow)
-		else:
-			var q := 1
-			var b := _pill_button("Buy · %d" % int(row.price), true)
-			b.custom_minimum_size = Vector2(76, 30)
-			b.pressed.connect(func(): command.emit({"type": "buy", "item": id, "qty": q, "shop": "tackle"}))
-			h.add_child(b)
-		v.add_child(h)
-	var gear := _pill_button("Bag › Gear", false)
-	gear.pressed.connect(open_gear)
-	v.add_child(gear)
+## Counters (SGODOT-224; LOCK-15 / 16; FARM-6, NPC-2, NPC-2-2, NPC-6, NPC-7-P0): one drawer for every counter,
+## P0CounterDrawer. role = the shop id ("homestead", "tackle", "market", "tea", "post"); opts: section ("buy" |
+## "board" | "specialty": #14 opens the Market Board and City Specialty directly) and ctx (the outpost's keeper ctx).
+## The drawer follows the view while open (set_view); its buttons come back here as commands with the shop.
+var _counter: P0CounterDrawer
+var _counter_ctx := {}   # role -> the last keeper ctx an outpost gave
+
+func open_counter(role: String, opts := {}) -> void:
+	if opts.has("ctx"): _counter_ctx[role] = opts.ctx
+	var d := P0CounterDrawer.new(view, role, _counter_ctx.get(role, {}), str(opts.get("section", "buy")))
+	d.theme = UiKit.theme()
+	d.safe_bottom = safe_bottom()
+	d.close_requested.connect(close_modal)
+	d.action_requested.connect(func(a: StringName, id: String, p: Dictionary): _counter_action(role, a, id, p))
+	d.section_changed.connect(func(sec: String): if sec == "board": _fill_board(d))
+	_open_modal(d, UiTokens.OPACITY_SCRIM_COUNTER, true)
+	if d.section == "specialty": _close_above(d, _CLOSE_ABOVE_SPECIALTY, P0CounterDrawer.SPECIALTY_PAD)   # MARKET-SPECIALTY
+	_counter = d
+	modal_kind = "counter"
+	if d.section == "board": _fill_board(d)
+
+func _counter_action(role: String, action: StringName, id: String, payload: Dictionary) -> void:
+	match action:
+		&"buy": command.emit({"type": "buy", "item": id, "qty": int(payload.get("qty", 1)), "shop": role})
+		&"sell": command.emit({"type": "sell", "item": id, "qty": payload.get("qty", 1), "shop": role})
+		&"drink": command.emit({"type": "drink", "item": id, "shop": role})
+		&"lock", &"unlock": command.emit({"type": String(action), "item": id})
+		_: push_warning("P0 counter: no command for %s" % action)
+
+## A counter's events (P0Runtime): the keeper says what just happened (TEA-DONE `Enjoy. Next cup's 50 coins.`,
+## the rod strung after buying it); the drawer itself follows the view.
+func counter_events(events: Array) -> void:
+	if _counter == null or not is_instance_valid(_counter) or _counter.keeper_bar == null: return
+	for ev in events:
+		match str(ev.get("kind", "")):
+			"drink":
+				var price := int(view.get("drinks", {}).get("price", 0))
+				_counter.keeper_bar.line = ("Enjoy. Next cup's %d coins." % price) if int(ev.get("left", 0)) > 0 \
+					else str(P0Logic.keeper_lines(view, _counter.role, _counter.ctx).get("counter", ""))
+			"item":
+				if str(ev.get("id", "")).begins_with("rod_") and int(ev.get("delta", 0)) > 0:
+					_counter.keeper_bar.line = "Strung and ready — it's on your belt. Swap rods in Bag › Gear."
+
+## The board page of a counter: the Stall Board (legacy view.stall.board) or the Market Board (view.boards.market).
+func _fill_board(d: P0CounterDrawer) -> void:
+	for c in d.board.get_children():
+		c.hide()
+		c.queue_free()
+	_board(d.board, view.get("stall", {}).get("board", {}) if d.role == "homestead" else market_board(view))
+
+## view.boards.market in the Stall Board's shape ({slots, requests [{id, title, item, qty, have, coins, where,
+## status}], refill_in}) so one renderer draws both boards.
+static func market_board(v: Dictionary) -> Dictionary:
+	var b: Dictionary = v.get("boards", {}).get("market", {})
+	var reqs := []
+	var refill := -1.0
+	for sl in b.get("slots", []):
+		if sl.get("empty", false):
+			if sl.has("refill_in"): refill = float(sl.refill_in) if refill < 0.0 else minf(refill, float(sl.refill_in))
+			continue
+		var any := ("any %s %s" % [P0Logic.rarity_name(v, int(sl.rarity)), str(sl.kind)]) if sl.get("rarity", null) != null else "any " + str(sl.get("kind", ""))
+		reqs.append({"id": str(sl.id), "title": str(sl.get("title", "")), "item": str(sl.get("icon", "")), "qty": int(sl.get("qty", 1)),
+			"have": int(sl.get("have", 0)), "coins": int(sl.get("coins", 0)), "status": str(sl.get("status", "open")),
+			"where": any if (sl.get("items", []) as Array).is_empty() else ("any pond" if str(sl.get("kind", "")) == "fish" else "from your farm")})
+	return {"slots": (b.get("slots", []) as Array).size(), "requests": reqs, "refill_in": maxf(refill, 0.0)}
 
 ## Gear lives in the bag drawer now (p(8)); callers that opened Tools & Gear land on the Gear side.
 func open_gear() -> void:
 	open_bag("", "gear")
 
-## Homestead Stall (FARM-6, p(6)): unattended — no keeper bar, no greeting; Buy rows with level gates,
-## Sell your produce (no Sell Tab; produce, no quota) and the Stall Board.
-var stall_tab := "buy"
-
+## The older entries now open the counter drawer (SGODOT-224).
 func open_stall(tab := "") -> void:
-	if tab != "": stall_tab = tab
-	var keep_scroll := 0
-	if modal_kind == "stall" and _modal:
-		var old := _modal.find_child("StallScroll", true, false) as ScrollContainer
-		if old: keep_scroll = old.scroll_vertical   # a rebuild after Buy / Sell stays where the player was
-	var v := _sheet(470 if stall_tab == "buy" else 320, "Homestead Stall", "stall")
-	modal_kind = "stall"
-	var tabs := HBoxContainer.new()
-	tabs.add_theme_constant_override("separation", 6)
-	var board: Dictionary = view.get("stall", {}).get("board", {})
-	var open_reqs: Array = board.get("requests", []).filter(func(r): return str(r.status) != "done")
-	for t in [["buy", "Buy"], ["board", "Stall Board" + (" · %d" % open_reqs.size() if not open_reqs.is_empty() else "")]]:
-		var tb := _pill_button(str(t[1]), t[0] == stall_tab)
-		tb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		var key := str(t[0])
-		tb.pressed.connect(func(): open_stall(key))
-		tabs.add_child(tb)
-	v.add_child(tabs)
-	if stall_tab == "board":
-		_board(v, board)
-		return
-	var scroll := TouchScrollContainer.new()   # drags that start on a row or cell still scroll (WP7-B F-04 §4)
-	scroll.name = "StallScroll"
-	scroll.custom_minimum_size = Vector2(0, 370)
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	var list := VBoxContainer.new()
-	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	list.add_theme_constant_override("separation", 4)
-	scroll.add_child(list)
-	v.add_child(scroll)
-	if keep_scroll > 0: scroll.set_deferred("scroll_vertical", keep_scroll)
-	list.add_child(_label("Buy", 11, INK, true))
-	for row in view.get("stall", {}).get("buy", []):
-		list.add_child(_buy_row(row))
-	var produce: Array = []
-	for st in _bag_slots():
-		var id := str(st.id)
-		if (id.begins_with("crop_") or id.begins_with("fish_")) and not produce.has(id): produce.append(id)
-	list.add_child(_label("Sell here · produce and fish, no daily limit", 11, INK, true))
-	if produce.is_empty():
-		list.add_child(_label("Nothing to sell yet — harvest or fish first.", 9, INK2))
-	for id in produce: list.add_child(_sell_row(id))
+	open_counter("homestead", {"section": tab if tab != "" else "buy"})
+
+func open_tackle(_bubble := "") -> void:
+	open_counter("tackle")
 
 ## Stall Board (FARM-6 tab): request cards with a need tile; Accept tracks it, Deliver pays coins (no XP).
 func _board(v: VBoxContainer, board: Dictionary) -> void:
@@ -1358,58 +1446,6 @@ func _board(v: VBoxContainer, board: Dictionary) -> void:
 		empty.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		empty.add_theme_stylebox_override("normal", _box(Color(1, 1, 1, 0.3), 14, Color("d9c7a6"), 1, Vector4(8, 6, 8, 6)))
 		v.add_child(empty)
-
-func _buy_row(row: Dictionary) -> Control:
-	var id := str(row.id)
-	var h := HBoxContainer.new()
-	h.add_theme_constant_override("separation", 6)
-	h.custom_minimum_size = Vector2(0, 40)
-	var ic := _icon(id, 26)
-	if not row.get("unlocked", false): ic.modulate = Color(1, 1, 1, 0.45)
-	h.add_child(ic)
-	var mid := VBoxContainer.new()
-	mid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	mid.add_theme_constant_override("separation", 0)
-	mid.add_child(_label(str(row.name), 10, INK if row.get("unlocked", false) else INK2, true))
-	if id.begins_with("seed_"):
-		mid.add_child(_label("%d coins · %d Energy a plot · Bag ×%d" % [int(row.price), int(row.energy), P0Logic.bag_count(view, id)], 8, INK2))
-	else:
-		mid.add_child(_label("%d coins · %d left today · Bag ×%d" % [int(row.price), int(row.get("left", 0)), P0Logic.bag_count(view, id)], 8, INK2))
-	h.add_child(mid)
-	if not row.get("unlocked", false):
-		var lk := _label("%s Lv%d · %d XP to go" % [str(row.get("skill", "farming")).capitalize(), int(row.gate), int(row.xp_to_go)], 8, INK2, true)
-		lk.add_theme_stylebox_override("normal", _box(DIS, 10, DIS, 0, Vector4(8, 4, 8, 4)))
-		h.add_child(lk)
-		return h
-	for q in [1, 10]:
-		var b := _pill_button("Buy %d · %d" % [q, int(row.price) * q], q == 10)
-		b.custom_minimum_size = Vector2(62, 28)
-		b.add_theme_font_size_override("font_size", 8)
-		b.pressed.connect(func(): command.emit({"type": "buy", "item": id, "qty": q}))
-		h.add_child(b)
-	return h
-
-func _sell_row(id: String) -> Control:
-	var h := HBoxContainer.new()
-	h.add_theme_constant_override("separation", 6)
-	h.custom_minimum_size = Vector2(0, 40)
-	h.add_child(_icon(id, 26))
-	var n := P0Logic.bag_count(view, id)
-	var price := int(P0Logic.item(view, id).get("sell", view.get("prices", {}).get(id, 0)))
-	var mid := VBoxContainer.new()
-	mid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	mid.add_child(_label("%s ×%d" % [P0Logic.item_name(view, id), n], 10, INK, true))
-	mid.add_child(_label("%d each · Sell All = %d coins" % [price, price * n], 8, INK2))
-	h.add_child(mid)
-	var one := _pill_button("Sell", false)
-	one.custom_minimum_size = Vector2(48, 28)
-	one.pressed.connect(func(): command.emit({"type": "sell", "item": id, "qty": 1}))
-	h.add_child(one)
-	var all := _pill_button("Sell All", true)
-	all.custom_minimum_size = Vector2(60, 28)
-	all.pressed.connect(func(): command.emit({"type": "sell", "item": id, "qty": n}))
-	h.add_child(all)
-	return h
 
 ## Energy Card (§3.7.2 / HUD-3): facts, a Wait line, RECOVER tiles that only guide, one button that closes.
 ## The ONE Energy interface (LOCK-09): a centred card over the modal scrim. Its only button is
@@ -1606,6 +1642,9 @@ static func show_label(go: String, here: String, camera_here: bool) -> String:
 	# The homestead is one space: on the farm or in the farmhouse a farm target is Show (the runtime steps out of the
 	# farmhouse first); anywhere else it is Show on map (亚瑟 on #37: the farmhouse used to send it to the map).
 	if go in HOME_TARGETS and here in ["home", "farm"]: return "Show" if camera_here else ""
+	# On the map every target is a pin: Show flies there (p0_map.p0_show_spot); Browse the map has nothing to do
+	# (蒙恬 on #44: Show on map used to close Today and do nothing there).
+	if here == "map": return "" if go == "map" else "Show"
 	return "Show on map"
 
 ## Where the player is for Show and the bag: the runtime's space; without one (tests, the gallery) the surface says
@@ -2021,6 +2060,11 @@ func _show_tip(text: String) -> void:
 ## and Experiment (free slots from the bag). Cooking costs no Energy.
 func open_kitchen(tab := "") -> void:
 	teach("cook")   # Tap Cook to grill your first fish (§14.2 minute 14–16)
+	# The farmhouse's stove corner owns the cooking drawer (SGODOT-226): walk there and open it.
+	var world = P0Runtime.ensure().world
+	if is_instance_valid(world) and world.has_method("p0_open_kitchen"):
+		world.call("p0_open_kitchen", tab if tab != "" else _kitchen_tab)
+		return
 	if tab != "": _kitchen_tab = tab
 	var ck: Dictionary = view.get("cooking", {})
 	var lvl := int(view.get("skills", {}).get("cooking", {}).get("level", 1))

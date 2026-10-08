@@ -10,6 +10,7 @@ extends TouchScrollContainer
 ##   sell_mode  the counter's "Sell here" view: only items `can_sell` accepts are listed (LOCK-15); the rest
 ##              of the bag is not shown, so there is no Sell tab and no greyed cell to explain.
 ## Items are dictionaries: {id, icon (Texture2D), qty, rarity (0–4), ...}; extra keys pass through to the hooks.
+## KITCHEN cells also take status, marked and kitchen_state (UiItemCell.KitchenState).
 ## `density` KITCHEN draws Compact/Kitchen/Cell (52×58) for the cooking drawer's Experiment page (LOCK-20,
 ## SGODOT-226); items may then carry `status` ("In pot", "Not for cooking") and `marked` (cooked tick).
 
@@ -34,6 +35,13 @@ var can_sell := Callable(): set = set_can_sell
 ## Called with the item when a filled cell is tapped (after the selection is drawn).
 var on_select := Callable()
 var selected_id := ""
+## The item in the air (a cell lifted toward the quick bar): its cell draws as an empty dashed cell until the drag
+## ends; "" puts it back (BAR-DRAG-9, as the quick bar's own dragged slot; 不知火舞 on 225).
+var lifted_id := "": set = set_lifted_id
+
+func set_lifted_id(v: String) -> void:
+	lifted_id = v
+	_paint_selection()
 
 var _grid: GridContainer
 var _cells: Array[UiItemCell] = []
@@ -110,6 +118,8 @@ func refresh() -> void:
 			c.rarity = int(it.get("rarity", 0))
 			c.status = str(it.get("status", ""))
 			c.marked = bool(it.get("marked", false))
+			c.kitchen_state = int(it.get("kitchen_state", UiItemCell.KitchenState.DEFAULT))
+			c.rack = bool(it.get("rack", false))
 			c.stored = bool(it.get("stored", false))
 		else:
 			c.icon = null
@@ -117,6 +127,8 @@ func refresh() -> void:
 			c.rarity = 0
 			c.status = ""
 			c.marked = false
+			c.kitchen_state = UiItemCell.KitchenState.DEFAULT
+			c.rack = false
 			c.stored = false
 	if selected_id != "" and _item(selected_id).is_empty():
 		clear_selection()
@@ -136,8 +148,10 @@ func _item(id: String) -> Dictionary:
 func _paint_selection() -> void:
 	for i in _cells.size():
 		var filled := i < _shown.size()
-		var on := filled and str(_shown[i].get("id", "")) == selected_id
-		_cells[i].state = UiItemCell.State.SELECTED if on else (UiItemCell.State.DEFAULT if filled else UiItemCell.State.EMPTY)
+		var id := str(_shown[i].get("id", "")) if filled else ""
+		var on := filled and id == selected_id
+		var out := filled and lifted_id != "" and id == lifted_id
+		_cells[i].state = UiItemCell.State.EMPTY if out or not filled else (UiItemCell.State.SELECTED if on else UiItemCell.State.DEFAULT)
 
 func _on_tap(i: int) -> void:
 	if i < _shown.size(): select(str(_shown[i].get("id", "")))

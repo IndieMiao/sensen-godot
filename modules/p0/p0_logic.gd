@@ -49,7 +49,7 @@ static func rod_for(view: Dictionary, rarity: int) -> Dictionary:
 	return {}
 
 ## Items that share an existing icon until they get their own (SGODOT-228 content).
-const ICON_ALIAS := {"fert_compost": "compost", "tool_row_hoe": "hoe", "wild_herb": "crop_herb", "drink_hot_tea": "dish_fruit_tea", "drink_coffee": "dish_fruit_tea"}
+const ICON_ALIAS := {"fert_compost": "compost", "tool_row_hoe": "hoe", "bag_upgrade_1": "bag", "postcard_shanghai": "postcard", "wild_herb": "crop_herb", "drink_hot_tea": "dish_fruit_tea", "drink_coffee": "dish_fruit_tea"}
 
 static func icon(id: String) -> Texture2D:
 	var path := ICON_DIR % str(ICON_ALIAS.get(id, id))
@@ -775,7 +775,9 @@ static func _request_gap(req: Dictionary) -> String:
 ## Keeper greeting card copy (李白 SGODOT-228 b7d8b665 D, P0 version) from the server's facts in view.keepers[role]
 ## (SGODOT-228: state codes and numbers, no names). Names and places are data (后裔's p0_outposts.json): the caller
 ## passes them in ctx {keeper, place}; the tackle answer also takes ctx.nearest {name, site} (the closest pond).
-## Returns {line, greet, trade, question, answer} — line is "Pours the tea · Lotus Tea House" when ctx.place is given.
+## Returns {line, greet, counter, trade, question, answer} — line is "Pours the tea · Lotus Tea House" when ctx.place is
+## given; `greet` is the greeting card's line, `counter` the keeper bar's over the counter drawer (附录 B 掌柜问候 · P0's
+## counter lines: the greeting card's question never sits on the counter, 不知火舞 #56).
 const _KEEPER_COPY := {
 	"tea": {"does": "Pours the tea", "trade": "order tea", "question": "Any news in town?"},
 	"post": {"does": "Runs the post", "trade": "get a coffee", "question": "Who needs help today?"},
@@ -788,13 +790,14 @@ static func keeper_lines(view: Dictionary, role: String, ctx := {}) -> Dictionar
 	var copy: Dictionary = _KEEPER_COPY.get(role, {})
 	var k: Dictionary = view.get("keepers", {}).get(role, {})
 	var greet := ""
+	var counter := ""
 	var answer := ""
 	match role:
 		"tea":
 			match str(k.get("greet", "")):
 				"cups_out": greet = _CUPS_OUT
 				"full": greet = "You look rested. Tea's here when you need it."
-				_: greet = "Sit a minute. Hot tea, %d Energy back." % int(view.get("drinks", {}).get("energy", 30))
+				_: greet = "Sit a minute. Hot tea, %d Energy a cup." % int(view.get("drinks", {}).get("energy", 30))
 			answer = "Quiet day."
 			if k.get("online", null) != null: answer += " %d %s around Shanghai right now." % [int(k.online), "person" if int(k.online) == 1 else "people"]
 		"post":
@@ -819,8 +822,12 @@ static func keeper_lines(view: Dictionary, role: String, ctx := {}) -> Dictionar
 				answer += ("%s need Fishing Lv%d." % [item_name(view, str(nxt.id)), int(nxt.level)]) if nxt is Dictionary else "You can land everything there."
 		"market":
 			if str(k.get("greet", "")) == "row_hoe":
+				# 李白 q(46): Mei's P0 greeting is the Row Hoe (the stall's only gear), not the sweet-potato line.
 				var hoe: Dictionary = content().get("tools", {}).get("row_hoe", {})
-				greet = "Row Hoe's %d coins. Farming Lv%d to use." % [int(_shop_price(view, "market", str(hoe.get("id", "tool_row_hoe")), int(hoe.get("price", 240)))), int(hoe.get("gate", 4))]
+				greet = "Morning! Row Hoes just came in — sows %s plots at once, Farming Lv%d. Anything I can get you?" % [
+					_count_word(int(hoe.get("sow", 3))), int(hoe.get("gate", 4))]
+				counter = "Row Hoe's %d coins. Farming Lv%d to use." % [_shop_price(view, "market", "tool_row_hoe", int(hoe.get("price", 240))),
+					int(hoe.get("gate", 4))]
 			else:
 				greet = _board_count(int(k.get("board_open", 0)))
 			var titles: Array = k.get("board_templates", []).map(func(t): return str(content().get("requests", {}).get("templates", {}).get(str(t), {}).get("title", "")))
@@ -830,9 +837,14 @@ static func keeper_lines(view: Dictionary, role: String, ctx := {}) -> Dictionar
 	var place := str(ctx.get("place", ""))
 	return {
 		"line": ("%s · %s" % [str(copy.get("does", "")), place]) if place != "" else str(copy.get("does", "")),
-		"greet": greet, "trade": "Trade · " + str(copy.get("trade", "")),
+		"greet": greet, "counter": counter if counter != "" else greet, "trade": "Trade · " + str(copy.get("trade", "")),
 		"question": str(copy.get("question", "")), "answer": answer, "leave": "Just passing by",
 	}
+
+## Small counts in keeper speech ("sows three plots"), digits from ten up.
+static func _count_word(n: int) -> String:
+	var words := ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
+	return words[n] if n >= 0 and n < words.size() else str(n)
 
 static func _board_count(n: int) -> String:
 	return "The Market Board has %d %s today." % [n, "request" if n == 1 else "requests"]

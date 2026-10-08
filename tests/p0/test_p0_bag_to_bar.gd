@@ -89,6 +89,9 @@ func test_a_lifted_bag_cell_dropped_on_the_pin_zone_is_pinned_on_its_bar() -> vo
 	assert_int(zone.kind).is_equal(UiBarDropZone.Kind.PIN)
 	assert_float(zone.center.y).is_equal_approx(ui._bar.get_global_rect().end.y + GestureArbiter.DROP_ZONE_ABOVE, 0.01)
 	assert_float(_bag().grid.modulate.a).is_less(1.0)   # the grid dims while one of its cells is in the air
+	var grid := _bag().grid
+	var at := grid.shown_items().map(func(x): return str(x.id)).find("seed_herb")
+	assert_int(grid.cells()[at].state).is_equal(UiItemCell.State.EMPTY)   # its own cell is a dashed gap
 	ui._on_bag_cell(it, {kind = &"drag_move", pos = zone.center})
 	assert_bool(zone.hover).is_true()
 	ui._on_bag_cell(it, {kind = &"drop", pos = zone.center})
@@ -96,6 +99,7 @@ func test_a_lifted_bag_cell_dropped_on_the_pin_zone_is_pinned_on_its_bar() -> vo
 	assert_bool(_ids().has("seed_herb")).is_true()
 	assert_bool(ui._bag_drag.is_empty()).is_true()
 	assert_float(_bag().grid.modulate.a).is_equal(1.0)
+	assert_int(grid.cells()[at].state).is_not_equal(UiItemCell.State.EMPTY)   # back in place
 
 func test_a_bag_cell_dropped_on_a_slot_is_placed_there_without_a_pin() -> void:
 	ui.open_bag()

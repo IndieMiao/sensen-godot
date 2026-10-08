@@ -59,6 +59,11 @@ static func stand_for(name: String, names: Array) -> String:
 	return ""
 
 ## Naming-table checks (WP7-B §7): format, prefix, duplicates, unknown modules, missing yaw / size.
+## Placeholder props an anchors file adds to the art (names are modules too): [{name, from, position, yaw_degrees,
+## scale, level}].
+static func props(external: Dictionary) -> Array:
+	return external.get("props", [])
+
 static func validate(anchors: Array, modules: Array) -> PackedStringArray:
 	var errors := PackedStringArray()
 	var seen := {}

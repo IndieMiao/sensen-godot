@@ -40,6 +40,7 @@ static func all() -> Array[Dictionary]:
 		{id = "action_radial", title = "UiActionRadial", figma = "RadialPetal 1122:79385 v2 · RadialReason 1655:101164 · row 50 · LOCK-03 v2", build = _action_radial},
 		{id = "action_radial_motion", title = "UiActionRadial · opening", figma = "Motion 1651:100816 · 0 / 80 / 160 / 300 ms", build = _action_radial_motion},
 		{id = "status_badge", title = "UiStatusBadge", figma = "StatusBadge 1132:79554 · LOCK-11", build = _status_badges},
+		{id = "world_prompts", title = "World prompts", figma = "UiWorldIconButton · UiWorldNameBar · UiNpcNameTag · WorldIconButton 1674:101157 · WorldNameBar 1674:101190 · NpcNameTag 1674:101195 · row 51 · LOCK-07 / 16 v2", build = _world_prompts},
 		{id = "tap_card", title = "UiTapCard", figma = "TapCard 1135:101133 · LOCK-07", build = _tap_cards},
 		{id = "entry_card", title = "UiEntryCard", figma = "EntryCard 1468:94344 · LOCK-21 / LOCK-10", build = _entry_cards},
 		# SGODOT-222 world display
@@ -64,6 +65,7 @@ static func all() -> Array[Dictionary]:
 		{id = "float_text", title = "UiFloatText", figma = "FloatText 1178:82191 · six tones, Hug / Wrap (static pills)", build = _float_texts},
 		# SGODOT-224 panels
 		{id = "info_sheet", title = "UiInfoSheet", figma = "Compact/SelectedItem 633:41257 · BAG-1 482:10 · F-07 (SGODOT-207 168a4cc3)", build = _info_sheets},
+		{id = "keeper_bar", title = "UiKeeperBar", figma = "KeeperBar 1143:102525 Layout=Titled · NPC-2-2 482:118 / NPC-7-P0 1507:97237 · LOCK-16 (336 at 328)", build = _keeper_bars},
 		{id = "shop_row", title = "UiShopRow · UiStepper", figma = "Compact/ShopProduct 702:80447 · Compact/Stepper 1245:108953 · FARM-6 482:46 · C1-01", build = _shop_rows},
 		# SGODOT-231 workbench
 		{id = "blueprint_card", title = "UiBlueprintCard", figma = "BlueprintCard 1434:93844 · B2-06 · LOCK-10 / 29", build = _blueprint_cards},
@@ -321,6 +323,17 @@ static func _cells_kitchen() -> Control:
 	row.add_child(_captioned(_cell(D, {icon = _tex("dish_carp_cakes"), state = S.SELECTED}), "selected"))
 	row.add_child(_captioned(_cell(D, {icon = _tex("dish_radish_salad"), marked = true}), "cooked"))
 	row.add_child(_captioned(_cell(D, {state = S.EMPTY}), "empty"))
+	var K := UiItemCell.KitchenState
+	row.add_child(_captioned(_cell(D, {kitchen_state = K.HIDDEN}), "hidden"))
+	row.add_child(_captioned(_cell(D, {kitchen_state = K.CLUED}), "clued"))
+	row.add_child(_captioned(_cell(D, {icon = _tex("dish_fish_soup"), kitchen_state = K.TASTED}), "tasted"))
+	row.add_child(_captioned(_cell(D, {icon = _tex("dish_grilled_fish"), kitchen_state = K.MASTERED}), "mastered"))
+	row.add_child(_captioned(_cell(D, {kitchen_state = K.LOCKED}), "locked"))
+	row.add_child(_captioned(_cell(D, {icon = _tex("fish_crucian"), quantity = "×2", rarity = 1, kitchen_state = K.IN_POT}), "in pot"))
+	row.add_child(_captioned(_cell(D, {icon = _tex("fish_crucian"), rarity = 1, kitchen_state = K.IN_POT}), "in pot · last one"))
+	row.add_child(_captioned(_cell(D, {icon = _tex("crop_herb"), quantity = "×12", rarity = 1, rack = true}), "rack"))
+	row.add_child(_captioned(_cell(D, {icon = _tex("crop_herb"), rarity = 1, rack = true, kitchen_state = K.IN_POT}), "in pot · rack"))
+	row.add_child(_captioned(_cell(D, {icon = _tex("fish_koi"), rarity = 3, kitchen_state = K.NOT_FOR_COOKING}), "not for cooking"))
 	return row
 
 static func _cells_gear() -> Control:
@@ -751,6 +764,29 @@ static func _info_sheets() -> Control:
 	return v
 
 ## Counter buy rows as FARM-6 draws them: available (stepper + Buy), more than one, sold out, gated, a one-off rod.
+static func _keeper_bars() -> Control:
+	var v := _column(UiTokens.SPACE_SECTION)
+	var samples := [
+		[UiKeeperBar.Role.TACKLE, "finn", "Finn's Tackle", "Xuhui Tackle Shop", "Tackle Keeper · Finn",
+			"Reed rods are in. Fishing Lv3 and Fine fish stop slipping the hook.", "", "tackle · the line wraps"],
+		[UiKeeperBar.Role.MARKET, "mei", "Mei's Stall", "Xuhui Market Square", "Market Keeper · Mei",
+			"Row Hoe's 240 coins. Farming Lv4 to use.", "", "market"],
+		[UiKeeperBar.Role.TEA, "ama", "Ama's Tea", "Lotus Tea House", "Tea Host · Ama",
+			"Sit a minute. Hot tea, 30 Energy a cup.", "Counts across all tea houses · 3 cups a day", "tea · with a note"],
+		[UiKeeperBar.Role.POST, "sigrid", "Sigrid's Desk", "Huangpu Travel Post", "Post Clerk · Sigrid",
+			"Coffee's fresh. Pip's been asking for a hand.", "Shares the 3 cups a day with tea", "post · with a note"],
+	]
+	for s in samples:
+		var b := UiKeeperBar.new(s[0])
+		b.portrait = load("res://assets/p0/art/keepers/%s_head.jpg" % s[1])
+		b.title = s[2]
+		b.place = s[3]
+		b.keeper = s[4]
+		b.line = s[5]
+		b.note = s[6]
+		v.add_child(_captioned(_at_336(b), s[7]))
+	return v
+
 static func _shop_rows() -> Control:
 	var v := _column(0)
 	var buy := [{id = &"buy", label = "Buy", kind = &"secondary", payload = {}}]
@@ -970,6 +1006,71 @@ static func _action_radial_motion() -> Control:
 	for ms in [0.0, 80.0, 160.0, 300.0]:
 		grid.add_child(_captioned(_radial_frame(Vector2(220, 220), ms, -1, 0.72), "%d ms" % int(ms)))
 	return grid
+
+## A scene-grey strip so the surface-coloured prompts read as they do over the world.
+static func _scene_row(h: float) -> ColorRect:
+	var r := ColorRect.new()
+	r.color = UiKit.alpha(UiTokens.COLOR_TEXT, UiTokens.OPACITY_SCRIM_MODAL)
+	r.custom_minimum_size = Vector2(328, h)
+	return r
+
+## SGODOT-250 (row 51 1674:101146): the icon buttons a facility shows within view, the one name strip of the nearest,
+## and NPC name tags.
+static func _world_prompts() -> Control:
+	var v := _column(UiTokens.SPACE_SECTION)
+	var icons := _scene_row(60)
+	var x := 30.0
+	for spec in [["home", false, -1], ["seat", true, -1], ["homestead_stall", false, UiStatusBadge.State.REQUEST], ["workbench", false, -1], ["door", false, -1]]:
+		var b := UiWorldIconButton.new()
+		icons.add_child(b)
+		b.icon = _tex(spec[0])
+		b.near = spec[1]
+		b.status = spec[2]
+		b.place_at(Vector2(x, 30))
+		x += 66.0
+	v.add_child(_captioned(icons, "icons · default · Near · state"))
+	var D := UiWorldNameBar.Dir
+	var bars := [
+		[_tex("home"), "Farmhouse", "", D.RIGHT, false, -1, 1.0],
+		[_tex("home"), "Farmhouse", "", D.LEFT, false, -1, 1.0],
+		[_tex("pot"), "Stove 1/1", "Empty", D.RIGHT, false, -1, 1.0],
+		[_tex("homestead_stall"), "Homestead Stall", "", D.RIGHT, false, UiStatusBadge.State.REQUEST, 1.0],
+		[_tex("rest"), "+60 Energy", "", D.RIGHT, false, -1, 1.0],
+		[_tex("rest"), "Rested today", "", D.RIGHT, true, -1, 1.0],
+		[_tex("door"), "Map", "", D.RIGHT, false, -1, 1.0],
+		[_tex("workbench"), "Workbench", "", D.RIGHT, false, -1, 0.5],
+	]
+	var captions := ["Right", "Left · edge", "one fact", "state", "bench", "Dimmed", "door", "opening 50 %"]
+	var grid := GridContainer.new()
+	grid.columns = 2
+	grid.add_theme_constant_override(&"h_separation", int(UiTokens.SPACE_WITHIN))
+	grid.add_theme_constant_override(&"v_separation", int(UiTokens.SPACE_WITHIN))
+	for i in bars.size():
+		var spec: Array = bars[i]
+		var row := _scene_row(48)
+		row.custom_minimum_size = Vector2(160, 48)
+		var bar := UiWorldNameBar.new()
+		row.add_child(bar)
+		bar.icon = spec[0]
+		bar.text = spec[1]
+		bar.fact = spec[2]
+		bar.side = spec[3]
+		bar.dimmed = spec[4]
+		bar.status = spec[5]
+		bar.anchor_at(Vector2(134 if spec[3] == D.LEFT else 26, 24))
+		bar.set_openness(spec[6])
+		grid.add_child(_captioned(row, captions[i]))
+	v.add_child(grid)
+	var tags := _scene_row(60)
+	var ama := UiNpcNameTag.new("Ama")
+	tags.add_child(ama)
+	ama.place_over(Vector2(100, 44))
+	var pip := UiNpcNameTag.new("Pip")
+	tags.add_child(pip)
+	pip.highlight = true
+	pip.place_over(Vector2(220, 44))
+	v.add_child(_captioned(tags, "NPC · Default · Highlight"))
+	return v
 
 static func _status_badges() -> Control:
 	var v := _column()
