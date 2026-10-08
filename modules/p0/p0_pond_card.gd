@@ -54,7 +54,8 @@ static func km_between(a: Vector2, b: Vector2) -> float:
 
 ## Details ›: the fish of this pond's template that P0 can catch (q(48) c), easiest first. caught = the player has
 ## landed one (view.fishing.dex); the card shows those with their icon and name, the rest as a silhouette with
-## the Fishing level they need (Old Kai's Golden Koi shows up in the Pond list this way).
+## their name and the Fishing level they need (Old Kai's Golden Koi shows up in the Pond list this way). That is
+## for global fish, which all P0 fish are; regional fish (P1) show only a silhouette and "?" until caught (q(48)).
 static func fish_rows(view: Dictionary, pond_id: String) -> Array:
 	var content := P0Logic.content()
 	var fishing: Dictionary = content.get("fishing", {})
