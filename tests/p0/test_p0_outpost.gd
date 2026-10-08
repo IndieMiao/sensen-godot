@@ -336,6 +336,47 @@ func test_a_resident_bar_reached_from_the_bag_lights_their_name() -> void:
 	rt.ui.close_modal()
 	assert_bool(bool(r._marker("npc_kai", {}).talking)).is_false()
 
+## 李元芳 int10c: Pip's name tag over his head sits just below Sigrid behind the counter, and a tap on it went to the
+## nearest pick point, Sigrid's: her greeting opened. A tap on any NPC's name tag is that NPC's tap, in every outpost
+## (the tackle shop's Finn and Old Kai too), as a tap on a facility's icon button is that facility's. A tag faded under
+## an open name strip (the door's, at the spawn) takes no tap.
+func test_a_tap_on_an_npc_name_tag_is_that_npc() -> void:
+	var rt: P0Runtime = auto_free(P0Runtime.new())
+	add_child(rt)
+	await get_tree().process_frame
+	rt.session.transport = func(_method: int, _path: String, _body: Dictionary, _cmd: Dictionary): pass   # nothing goes out
+	var tested := 0
+	for id in ["sh_post_1", "sh_tackle_1", "sh_tea_1", "sh_market_1"]:
+		var r := _room(id)
+		r.rt = rt
+		for n in r.npcs:
+			r.actor.position = r.anchor(n).global_position + Vector3(0.6, 0, 0.6)   # beside them: no strip open over the tags
+			r._markers({})
+			var tag: UiNpcNameTag = rt.ui._npc_tags.get("room:" + n)
+			assert_bool(tag != null and tag.visible and not bool(tag.get_meta("covered", false))) \
+				.override_failure_message("%s %s tag" % [id, n]).is_true()
+			var asked := []
+			var on_tap := func(at: Vector2): asked.append(r.tap_target(at))   # read while tapped_card is set, as p0_tap does
+			rt.ui.tapped.connect(on_tap)
+			assert_bool(rt.ui._tap_at(tag.hit_rect().get_center(), false)).override_failure_message("%s %s" % [id, n]).is_true()
+			rt.ui.tapped.disconnect(on_tap)
+			assert_array(asked).override_failure_message("%s: a tap on %s's name" % [id, n]).is_equal([n])
+			tested += 1
+		for n in r.npcs: rt.ui.npc_tag("room:" + n, "", Vector2.ZERO, false)   # the next room's tags only
+	assert_int(tested).is_equal(6)   # four keepers, Pip and Old Kai
+	# At the tackle shop's door the Map strip is open and Old Kai's tag fades under it: that spot is not his tap.
+	var tackle := _room("sh_tackle_1")
+	tackle.rt = rt
+	tackle._markers({})
+	var kai: UiNpcNameTag = rt.ui._npc_tags.get("room:npc_kai")
+	if bool(kai.get_meta("covered", false)):
+		var asked := []
+		var on_tap := func(at: Vector2): asked.append(tackle.tap_target(at))
+		rt.ui.tapped.connect(on_tap)
+		rt.ui._tap_at(kai.hit_rect().get_center(), false)
+		rt.ui.tapped.disconnect(on_tap)
+		assert_array(asked).not_contains(["npc_kai"])
+
 ## Scene integration (SGODOT-227, 不知火舞's walkthrough on 227): the tea house opens on the Coffee Shop kit with the
 ## background of its signed render and every anchor of its file, and the opening view holds the whole art, centred, with at least
 ## 16 px clear on both sides (the kit's own camera left about 14 px on the right).
