@@ -76,10 +76,10 @@ func set_height(v: float) -> void:
 	if not is_inside_tree(): return
 	if _slide != null and _slide.is_running():
 		var drop := offset_bottom   # how far below its place it still is
-		var left := maxf(0.0, _slide.get_total_elapsed_time())
+		var elapsed := maxf(0.0, _slide.get_total_elapsed_time())
 		_slide.kill()
 		_place()
-		_slide_in(drop, maxf(0.05, UiKit.secs(UiTokens.MOTION_DRAWER_MS) - left))
+		_slide_in(drop, maxf(0.05, UiKit.secs(UiTokens.MOTION_DRAWER_MS) - elapsed))
 	else:
 		_place()
 

@@ -193,3 +193,17 @@ func test_a_drawer_resized_while_sliding_in_lands_at_the_new_height() -> void:
 	await get_tree().create_timer(UiKit.secs(UiTokens.MOTION_DRAWER_MS) + 0.15).timeout
 	assert_float(e.offset_top).is_equal_approx(-300.0, 0.5)
 	assert_float(e.offset_bottom).is_equal_approx(0.0, 0.5)
+
+## 刘邦 on #62: a market drawer closed while it is measuring itself just stops (no resume on a freed drawer), and the
+## page not shown is see-through while both are laid out.
+func test_a_market_drawer_closed_mid_measure_stops_quietly() -> void:
+	var ui := _ui()
+	await await_idle_frame()
+	ui.set_view(_view())
+	ui.open_counter("market", {"ctx": {"keeper": "Mei", "place": "Xuhui Market Square"}})
+	var d := ui._counter
+	assert_float(d.board.modulate.a).is_equal(0.0)   # Buy in front, the board measured behind it
+	assert_bool(d._shelf_box.visible and d.board.visible).is_true()
+	ui.close_modal()
+	for i in 4: await get_tree().process_frame
+	assert_bool(is_instance_valid(d)).is_false()

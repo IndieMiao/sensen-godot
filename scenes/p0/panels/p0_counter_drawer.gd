@@ -81,7 +81,7 @@ var _quota: Label
 var _drinks: VBoxContainer
 var _rows := {}   # item id -> UiShopRow
 var _qty := {}    # item id -> stepper count
-var _fit_serial := 0   # the latest fit_height(); an older one still waiting for its frames gives up
+var _fit_frames := 0   # frames left before fit_height() measures (both pages laid out)
 var _key := 0
 
 func _init(view_: Dictionary = {}, role_ := "homestead", ctx_ := {}, section_ := "buy") -> void:
@@ -292,23 +292,34 @@ func is_short() -> bool:
 
 ## Shorten a short drawer to its taller page — the Buy rows or the Market Board's cards (the host fills the board
 ## even while Buy shows) — so switching tabs never changes its height (不知火舞 on #56, like City Specialty). Both
-## pages are laid out together for two frames (the board's wrapping lines need their width), then the hidden one goes
-## back; the host calls this on opening and when the board's cards change, not on every refresh.
+## pages are laid out together for two frames (the board's wrapping lines need their width), the other page see-through
+## (刘邦 on #62), then it goes back; the host calls this on opening and when the board's cards change, not on every
+## refresh. Counted in _process, so a drawer freed meanwhile simply stops (no awaited resume on a freed instance).
 func fit_height() -> void:
 	if not is_short() or not is_inside_tree(): return
-	_fit_serial += 1
-	var serial := _fit_serial
 	_shelf_box.custom_minimum_size.y = maxi(1, offers().size()) * _ROW_H
+	var shelf_page := section != "board"
 	_shelf_box.visible = true
 	board.visible = true
-	for i in 2: await get_tree().process_frame
-	if serial != _fit_serial or not is_inside_tree(): return
+	(board if shelf_page else _shelf_box).modulate.a = 0.0
+	_fit_frames = 2
+	set_process(true)
+
+func _process(_dt: float) -> void:
+	if _fit_frames <= 0:
+		set_process(false)
+		return
+	_fit_frames -= 1
+	if _fit_frames > 0: return
+	set_process(false)
 	var both := get_combined_minimum_size().y
 	var shelf_h := _shelf_box.get_combined_minimum_size().y
 	var board_h := board.get_combined_minimum_size().y
 	var shelf_page := section != "board"
 	_shelf_box.visible = shelf_page
 	board.visible = not shelf_page
+	_shelf_box.modulate.a = 1.0
+	board.modulate.a = 1.0
 	var sep := float(body.get_theme_constant(&"separation"))
 	# Both pages minus the shorter one (and the gap between them) leaves the taller page's drawer; plus the sheet's
 	# inset under the last card, so it never sits on the screen's edge.
@@ -319,6 +330,7 @@ func set_section(v: String) -> void:
 	if v == section: return
 	section = v
 	refresh(view, true)
+	if _fit_frames > 0: fit_height()   # mid-measure: start over with the new page in front
 	section_changed.emit(v)
 
 ## The drink page from view.drinks ({used, limit, left, price, need, energy, gain, full, items}).
