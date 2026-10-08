@@ -106,3 +106,52 @@ func test_a_banner_is_as_tall_as_its_content() -> void:
 	var b: UiMomentBanner = ui.find_children("*", "UiMomentBanner", true, false)[0]
 	assert_float(b.size.y).is_equal_approx(b.get_combined_minimum_size().y, 0.5)
 	assert_float(b.size.y).is_less(ui.root.size.y * 0.4)
+
+## 李元芳 int7: the first level-up came while the fishing panel was up; its input shield (layer 30) took the tap on
+## Use bait. A banner with a button waits until the world is back from "busy"; what queues behind it still comes.
+func test_use_bait_waits_out_the_fishing_panel_and_then_works() -> void:
+	var ui := P0Ui.new()
+	ui.quick_store = STORE
+	ui.tips_path = TIPS
+	add_child(auto_free(ui))
+	await await_idle_frame()
+	ui.set_view(_view())
+	ui.set_mode("fish")
+	ui.set_surface("busy")   # the fishing presentation
+	ui.queue_card(func(): ui.show_level_up({"skill": "fishing", "level": 2, "energy": 50, "gifts": [["bait_worm", 3]]}, true))
+	ui.queue_card(func(): ui.show_catch("fish_crucian", 1, 15))   # behind it in the queue
+	await await_idle_frame()
+	await await_idle_frame()
+	assert_int(ui.find_children("*", "UiMomentBanner", true, false).size()).is_equal(0)   # held
+	assert_str(ui.modal_kind).is_equal("card")   # the catch card did not wait behind it
+	ui.close_modal()
+	ui.set_surface("pond")   # the panel closed
+	await await_idle_frame()
+	var banners := ui.find_children("*", "UiMomentBanner", true, false)
+	assert_int(banners.size()).is_equal(1)
+	(banners[0] as UiMomentBanner).action_pressed.emit()
+	assert_str(ui.selected_bait).is_equal("bait_worm")
+
+func test_use_bait_away_from_the_water_puts_it_on_the_hook_for_the_next_cast() -> void:
+	var ui := P0Ui.new()
+	ui.quick_store = STORE
+	ui.tips_path = TIPS
+	add_child(auto_free(ui))
+	await await_idle_frame()
+	ui.set_view(_view())
+	ui.set_mode("farm")
+	ui._banner_action("use_bait")
+	assert_str(ui.selected_bait).is_equal("bait_worm")
+
+## 李元芳 int7: `+5 XP` rose across the banner's `+3 Wild Herb`. While a moment is up, floats rise under its card.
+func test_floats_rise_under_a_moment_card() -> void:
+	var ui := P0Ui.new()
+	ui.quick_store = STORE
+	ui.tips_path = TIPS
+	add_child(auto_free(ui))
+	await await_idle_frame()
+	ui.set_view(_view())
+	ui.show_level_up({"skill": "fishing", "level": 3, "energy": 0, "gifts": []})
+	ui.float_text("+5 XP", Vector2(180, 200), UiFloatText.Tone.XP)
+	var f: Node = ui.root.get_children().filter(func(c): return c is UiFloatText).back()
+	assert_int(f.get_index()).is_less(ui._modal.get_index())

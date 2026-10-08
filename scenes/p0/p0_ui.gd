@@ -399,6 +399,7 @@ func set_surface(name: String) -> void:
 	for c in _cards.values(): (c as Control).visible = false
 	for b in _badges.values(): (b as Control).visible = false
 	for m in _icons.values() + _name_bars.values() + _npc_tags.values(): (m as Control).visible = false
+	_flush_held_cards()
 	_flush_held_toast()
 
 ## Action spaces show the full bar. Rooms (farmhouse kitchen, outposts) and the map keep only Bag, with no action
@@ -1016,6 +1017,9 @@ func _make_float(text: String, tone: int, icon: Texture2D) -> UiFloatText:
 	var f := UiFloatText.new(text, tone, icon, UiFloatText.Layout.WRAP if text.length() > _FLOAT_HUG_CHARS else UiFloatText.Layout.HUG)
 	f.theme = UiKit.theme()
 	root.add_child(f)
+	# A result moment on screen stays readable: the floats rise under its card, not over its rewards (李元芳 int7:
+	# `+5 XP` across the level banner's `+3 Wild Herb`). In a drawer they stay on top (BOARD-DONE floats from a row).
+	if _moment_open and _modal != null: root.move_child(f, _modal.get_index())
 	return f
 
 ## Floats never rise over the HUD (int6, 李元芳: `+5 Cooking XP ★` crossed the Today chip; 不知火舞 233): a group's start
@@ -1369,6 +1373,25 @@ func _flush_held_toast() -> void:
 func queue_card(show: Callable) -> void:
 	if _modal == null and _card_queue.is_empty(): show.call()
 	else: _card_queue.append(show)
+
+## A card with a button must not open under the fishing presentation, whose input shield over this layer takes every
+## touch (李元芳 int7: the first level-up's Use bait could not be pressed). It waits until the world is back from
+## "busy", then queues like any card.
+var _held_cards: Array[Callable] = []
+
+func queue_card_when_clear(show: Callable) -> void:
+	_held_cards.append(show)
+	_flush_held_cards()
+
+func _flush_held_cards() -> void:
+	if _held_cards.is_empty() or not is_node_ready() or surface == "busy": return
+	var cards := _held_cards.duplicate()
+	_held_cards.clear()
+	for c in cards: queue_card(c)
+
+## The card queue's turn opened nothing (a held card): let the next one come.
+func _next_card() -> void:
+	if _modal == null and not _card_queue.is_empty(): (_card_queue.pop_front() as Callable).call_deferred()
 
 func _drop_modal() -> void:
 	_modal_back = Callable()   # each layer sets its own way back after it opens
@@ -1813,9 +1836,12 @@ func _fill_board(d: P0CounterDrawer) -> void:
 func open_gear() -> void:
 	open_bag("", "gear")
 
-## The older entries now open the counter drawer (SGODOT-224).
+## The older entries now open the counter drawer (SGODOT-224). With no tab named, the stall opens where its badge points
+## (q(44)): a request to hand in (✓) or one open (!) lands on the Stall Board, otherwise on Buy (a New badge's
+## `◆ New for you` is on Buy).
 func open_stall(tab := "") -> void:
-	open_counter("homestead", {"section": tab if tab != "" else "buy"})
+	if tab == "": tab = "board" if P0Guide.stall_badge(view) != "" else "buy"
+	open_counter("homestead", {"section": tab})
 
 func open_tackle(_bubble := "") -> void:
 	open_counter("tackle")
@@ -1934,15 +1960,24 @@ func _kit_card() -> VBoxContainer:
 ## levelled before this one.
 func show_level_up(ev: Dictionary, first := false) -> void:
 	var spec := P0Logic.level_banner(view, ev, first)
+	if str(spec.get("action", "")) != "" and surface == "busy":
+		queue_card_when_clear(func(): show_level_up(ev, first))   # Use bait waits out the fishing panel's shield
+		_next_card()
+		return
 	show_banner(spec, func(): _banner_action(str(spec.get("action_id", ""))))
 
 func _banner_action(id: String) -> void:
 	match id:
 		"use_bait":   # puts the gift bait on the hook, in place (the quick bar's bait slot, q(44))
 			for s in _bag_slots():
-				if str(s.get("id", "")).begins_with("bait_"):
-					if bar_mode == "fish" and selected_bait != str(s.id): _on_slot_tapped(str(s.id))
-					break
+				var bait := str(s.get("id", ""))
+				if not bait.begins_with("bait_"): continue
+				if selected_bait != bait:
+					if bar_mode == "fish": _on_slot_tapped(bait)
+					else:   # away from the water: it is on the hook for the next cast (the pond's bar shows it)
+						selected_bait = bait
+						toast("%s on the hook · used at the bite" % P0Logic.item_name(view, bait))
+				break
 
 func _center_card(width: float) -> VBoxContainer:
 	var center := CenterContainer.new()
