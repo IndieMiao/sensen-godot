@@ -85,6 +85,8 @@ export function bagFitsFloor(c: P0Content, s: P0State, floor: number): boolean {
 function startRun(c: P0Content, s: P0State, now: number, events: P0Event[]): Refusal | null {
   if (s.day.mine_runs >= c.mine.runs_per_day)
     return { code: 'no_runs', detail: { used: s.day.mine_runs, limit: c.mine.runs_per_day, resets_in: untilRollover(c, now) } };
+  // q(48): a floor fee is never paid into a floor whose first rock wouldn't fit (Enter mine · Bag full).
+  if (!bagFitsFloor(c, s, 1)) return { code: 'bag_full', detail: { floor: 1 } };
   if (s.energy.value < c.mine.floor_energy) return { code: 'need_energy', detail: energyDetail(c, s, now, c.mine.floor_energy) };
   spendEnergy(c, s, now, c.mine.floor_energy, events, 'mine_floor');
   const id = ++s.mine.count;
@@ -120,6 +122,7 @@ export function mineCommand(c: P0Content, s: P0State, cmd: MineCommand & { space
       if (cmd.type === 'mine_floor') {
         if (!floor.paid) {
           if (!floorCleared(c, run, n - 1)) return { code: 'clear_floor_first', detail: { floor: n - 1 } };
+          if (!bagFitsFloor(c, s, n)) return { code: 'bag_full', detail: { floor: n } };   // q(48): Floor 2 · Bag full
           if (s.energy.value < c.mine.floor_energy) return { code: 'need_energy', detail: energyDetail(c, s, now, c.mine.floor_energy) };
           spendEnergy(c, s, now, c.mine.floor_energy, events, 'mine_floor');
           floor.paid = true;
@@ -163,6 +166,7 @@ export function mineView(c: P0Content, s: P0State, now: number) {
     runs: { used: s.day.mine_runs, limit: c.mine.runs_per_day, resets_in: untilRollover(c, now) },
     ended: s.mine.ended,
     floor_energy: c.mine.floor_energy, rock_energy: c.mine.rock_energy, rocks: c.mine.rocks,
+    entry_bag_ok: bagFitsFloor(c, s, 1),   // q(48): Enter mine / New run gate (floor 1's worst case)
     stone_per_rock: stonePerRock(c, s),
     run: run && {
       id: run.id, deepest: deepestPaid(run),

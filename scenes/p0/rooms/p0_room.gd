@@ -1,0 +1,544 @@
+class_name P0Room
+extends Node3D
+## Shell for indoor P0 spaces (SGODOT-226): the farmhouse kitchen corner and the four outposts of SGODOT-227.
+## A room = one art instance (the Basic Room placeholder now, the final model later) + world anchors from its
+## layout.json and an optional `<space>.anchors.json` (WP7-B F-03 ③), the shared P0Actor walking a grid built
+## from the art's collision shapes, the room's own accepted camera with the safe-box follow, and tap-triggered
+## facilities (LOCK-07): tap a use_ / npc_ anchor → walk to its stand_ anchor → _on_facility(name). The HUD is
+## the facility surface "room" (Bag only, LOCK-04). Rooms open with AppRouter.open_instance like the ponds;
+## the door (exit anchor) or Back returns to the world below (farmhouse → farm, outpost → map).
+##
+## Subclasses fill art_scene / layout_path / anchors_path / place_name in setup(args) or _init(), and override
+## the hooks below: _room_ready, _tappable, _on_facility, _marker, _module_visible, _room_frame, _on_joystick.
+
+signal facility_tapped(name: String)
+signal left()
+
+const FarmCamera = preload("res://modules/farm/farm_camera.gd")
+const BASIC_ROOM_ART := "res://scenes/basic_room/basic_room_art.tscn"
+const BASIC_ROOM_LAYOUT := "res://assets/rooms/basic_room/layout.json"
+## Engineering defaults (SGODOT-226); WP7 v2 finalises the camera numbers from Figma.
+const TAP_RADIUS := 64.0          # F-04 screen pick radius (P0 uses 56–80 px)
+const CARD_NEAR_M := 3.0          # finger cards float up this close (LOCK-07)
+const EXIT_RADIUS_M := 0.6        # walking onto the door leaves, no confirmation
+const EXIT_ARM_M := 1.0           # … once the player has been this far from it (spawn is one step inside)
+const REACH_M := 0.35             # close enough to a stand_ point to use the facility
+const FOCUS_S := 0.4              # push-in ease
+const HUD_BOTTOM := UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H   # below the safe-area top
+const ZOOM_RANGE := Vector2(0.8, 1.6)
+const FRAME_W := 0.84             # opening shot: player + facilities within 84 % of the width …
+const FRAME_H := 0.60             # … and the middle 60 % of the height (§10.1)
+const MIN_VIEW_K := 0.8           # … but never closer than 80 % of the room's accepted view
+const BADGE_SCRIPT := "res://scenes/ui_kit/ui_status_badge.gd"   # UiStatusBadge (SGODOT-221)
+
+var art_scene: PackedScene
+var layout_path := BASIC_ROOM_LAYOUT
+var anchors_path := ""
+var city := "Shanghai"
+var place_name := ""
+## Finger card over the door; per space (farmhouse "Door · Back to farm", market "Exit · Back to map").
+var exit_text := "Door · Back to map"
+## Level the modules show for (module visibility: module_levels[module] <= level).
+var level := 1
+var module_levels := {}
+## Tests and previews run without the P0 runtime (no session, HUD or AppRouter).
+var use_runtime := true
+
+var rt: P0Runtime
+var actor: P0Actor
+var cam: Camera3D
+var bp: FarmBlueprint
+var grid: BlueprintGrid
+var layout: Dictionary = {}
+var art: Node3D
+var room: Node3D          ## layout space: art and anchors live here, placed at the blueprint offset
+var floor_y := 0.0
+var floor_rect := Rect2()  ## walkable floor footprint in layout space (x, z)
+var environment: Environment
+var world_env: WorldEnvironment
+
+var _anchors := {}        # name -> Marker3D
+var _data := {}           # name -> anchor dictionary
+var _cam_dir := Vector3(9.5, 6.8, 11.2).normalized()
+var _cam_dist := 16.0
+var _cam_size := 10.75
+var _focus := Vector3.ZERO
+var _follow := P0Follow.new()
+var _zoom := 1.0
+var _pinch = preload("res://modules/p0/p0_elastic_zoom.gd").new(ZOOM_RANGE.x, ZOOM_RANGE.y)   # rubber band past the range
+var _framed := Vector3.ZERO   # the opening shot's centre
+var _fits := false            # the whole floor fits the opening shot: hold it instead of following
+var _shot := {}           # push-in: {center: Vector3, size: float, release_on_move: bool}
+var _shot_k := 0.0
+var _shot_tween: Tween
+var _walk := {}           # {name, point: Vector3, done: Callable}
+var _shown := {}          # marker ids currently on screen
+var _exit_armed := false
+var _leaving := false
+var _perf_left := -1.0    # debug builds with user://p0_perf: log fps / draw calls every 5 s (logcat tag godot)
+
+func setup(_args: Dictionary) -> void: pass
+
+func _ready() -> void:
+	if use_runtime: P0Runtime.mark("%s _ready start" % name)
+	if art_scene == null: art_scene = load(BASIC_ROOM_ART)
+	layout = P0RoomAnchors.read_json(layout_path)
+	_build_environment()
+	room = Node3D.new()
+	room.name = "Room"
+	add_child(room)
+	_build_hearth_glow()   # before the art: the Basic Room's particle fire (SGODOT-236) takes ../HearthGlow
+	art = art_scene.instantiate()
+	room.add_child(art)
+	_apply_module_visibility()
+	var nav := P0RoomNav.build(P0RoomNav.shapes_from(art))
+	bp = nav.bp
+	grid = BlueprintGrid.new(bp)
+	floor_y = float(nav.floor_y)
+	floor_rect = nav.bounds
+	room.position = nav.offset
+	_build_lights()
+	_build_anchors()
+	_build_camera()
+	actor = P0Actor.new()
+	add_child(actor)
+	var spawn := anchor("spawn")
+	var at := P0RoomNav.nearest_walkable(bp, spawn.global_position if spawn else bp.cell_to_world(Vector2i(bp.grid.x / 2, bp.grid.y / 2)))
+	actor.setup(bp, grid, cam, Vector3(at.x, floor_y, at.z))
+	actor.ground_height = func(_p: Vector3) -> float: return floor_y
+	if spawn: actor.face(actor.position + yaw_dir(float(_data.spawn.get("yaw_degrees", 180))))
+	_room_ready()
+	frame_all()   # after the subclass spawned what can be tapped (keepers, residents)
+	if OS.is_debug_build() and FileAccess.file_exists("user://p0_perf"): _perf_left = 5.0
+	if use_runtime:
+		rt = P0Runtime.ensure()
+		rt.attach(self)
+		rt.ui.set_place(city + " · " + place_name)
+
+func _exit_tree() -> void:
+	if rt: rt.detach(self)
+
+# ---------------------------------------------------------------- hooks for subclasses
+func _room_ready() -> void: pass
+
+## Anchor names the player can tap; default every visible use_ / npc_ anchor plus the door.
+func _tappable() -> PackedStringArray:
+	var out := PackedStringArray()
+	for n in _anchors.keys():
+		var p := P0RoomAnchors.prefix_of(n)
+		if (p == "use" or p == "npc" or n == "exit") and anchor(n) != null: out.append(n)
+	return out
+
+## Called once the player stands at the facility (after facility_tapped).
+func _on_facility(_name: String) -> void: pass
+
+## Finger card and status badge over a tappable anchor: {text, badge, caption, icon}; badge is a STATE-ICONS
+## key ("available", "countdown", "ready", … = UiStatusBadge.State in lower case). Empty = nothing; the
+## door's card comes from exit_text.
+func _marker(name: String, _view: Dictionary) -> Dictionary:
+	return {text = exit_text} if name == "exit" else {}
+
+func _module_visible(module: String) -> bool:
+	return level >= int(module_levels.get(module, 0))
+
+func _room_frame(_view: Dictionary, _dt: float) -> void: pass
+
+## Joystick input before it moves the player (sitting players stand up here, SGODOT-227).
+func _on_joystick(_v: Vector2) -> void: pass
+
+# ---------------------------------------------------------------- anchors
+## The anchor node, or null when it does not exist or its module is hidden.
+func anchor(n: String) -> Marker3D:
+	var m: Marker3D = _anchors.get(n)
+	return m if m != null and m.visible else null
+
+func anchors(prefix: String) -> Array[Marker3D]:
+	var out: Array[Marker3D] = []
+	for n in _anchors.keys():
+		if str(n).begins_with(prefix) and anchor(n) != null: out.append(_anchors[n])
+	return out
+
+func anchor_data(n: String) -> Dictionary: return _data.get(n, {})
+
+## Re-applies module visibility to the art and its anchors (call after `level` or module_levels change; the
+## walkable grid keeps the modules shown when the room opened).
+func refresh_modules() -> void:
+	_apply_module_visibility()
+	for n in _anchors.keys():
+		var m: Marker3D = _anchors[n]
+		var mod := str(_data[n].get("module", ""))
+		m.visible = mod == "" or (art.has_node(NodePath(mod)) and (art.get_node(NodePath(mod)) as Node3D).visible)
+
+func _apply_module_visibility() -> void:
+	for c in art.get_children():
+		if c is Node3D: (c as Node3D).visible = _module_visible(str(c.name))
+
+func _build_anchors() -> void:
+	var holder := Node3D.new()
+	holder.name = "Anchors"
+	room.add_child(holder)
+	for a in P0RoomAnchors.merge(layout, P0RoomAnchors.read_json(anchors_path)):
+		var m := Marker3D.new()
+		m.name = str(a.name)
+		m.position = P0RoomAnchors.vec(a.get("position"))
+		if a.has("yaw_degrees"): m.rotation.y = deg_to_rad(float(a.yaw_degrees))
+		holder.add_child(m)
+		_anchors[str(a.name)] = m
+		_data[str(a.name)] = a
+	refresh_modules()
+
+## yaw_degrees → facing (WP7-B §4): 0 = −Z (back wall), 90 = −X, 180 = +Z (camera side), −90 = +X.
+static func yaw_dir(yaw_degrees: float) -> Vector3:
+	var r := deg_to_rad(yaw_degrees)
+	return Vector3(-sin(r), 0.0, -cos(r))
+
+# ---------------------------------------------------------------- world (lighting from the Basic Room benchmark)
+func _build_environment() -> void:
+	environment = Environment.new()
+	environment.background_mode = Environment.BG_COLOR
+	environment.background_color = Color("e8e4c8")
+	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	environment.ambient_light_color = Color("fff0dc")
+	environment.ambient_light_energy = 0.70
+	environment.tonemap_mode = Environment.TONE_MAPPER_ACES
+	world_env = WorldEnvironment.new()
+	world_env.environment = environment
+	add_child(world_env)
+
+func _build_lights() -> void:
+	var sun := DirectionalLight3D.new()
+	sun.name = "RoomSun"
+	sun.light_color = Color("ffe6c2")
+	sun.light_energy = 1.05
+	sun.shadow_enabled = true
+	sun.directional_shadow_mode = DirectionalLight3D.SHADOW_ORTHOGONAL
+	sun.directional_shadow_max_distance = 30
+	sun.shadow_bias = 0.045
+	sun.shadow_normal_bias = 0.4
+	sun.light_angular_distance = 1.4
+	room.add_child(sun)
+	sun.position = P0RoomAnchors.vec(layout.get("sun_direction", [-6, 7, 1.5]))
+	sun.look_at(room.global_position)
+
+## The one hearth lamp at layout.fire_position. It exists before the art enters the tree, so the art's fire effect
+## drives this lamp instead of adding a second one (PR #29, SGODOT-236).
+func _build_hearth_glow() -> void:
+	if not (layout.get("fire_position", null) is Array): return
+	var glow := OmniLight3D.new()
+	glow.name = "HearthGlow"
+	glow.position = P0RoomAnchors.vec(layout.fire_position)
+	glow.light_color = Color("ff9b35")
+	glow.light_energy = 0.75
+	glow.omni_range = 1.25
+	glow.omni_attenuation = 1.6
+	room.add_child(glow)
+
+# ---------------------------------------------------------------- camera: the room's accepted view + safe box
+func _build_camera() -> void:
+	var spec: Dictionary = layout.get("camera", {})
+	if spec.has("position") and spec.has("target"):
+		var off := P0RoomAnchors.vec(spec.position) - P0RoomAnchors.vec(spec.target)
+		_cam_dir = off.normalized()
+		_cam_dist = off.length()
+	_cam_size = float(spec.get("size", _cam_size))
+	cam = Camera3D.new()
+	cam.name = "RoomCamera"
+	cam.projection = Camera3D.PROJECTION_ORTHOGONAL
+	cam.keep_aspect = Camera3D.KEEP_WIDTH
+	cam.near = 0.1
+	cam.far = 70.0
+	add_child(cam)
+	cam.make_current()
+
+## Opening shot (§10.1): the player, every tappable anchor and the room's floor (a cut-away diorama reads
+## wrong cropped) in the middle of the screen; held until the player first moves. Re-run when a room changes
+## what can be tapped.
+func frame_all() -> void:
+	var pts: Array[Vector3] = [actor.position, actor.position + Vector3(0, 1.75, 0)]
+	for n in _tappable(): pts.append(anchor(n).global_position)
+	for c in [floor_rect.position, floor_rect.end, Vector2(floor_rect.position.x, floor_rect.end.y), Vector2(floor_rect.end.x, floor_rect.position.y)]:
+		pts.append(room.position + Vector3(c.x, floor_y, c.y))
+	var forward := -_cam_dir
+	var right := forward.cross(Vector3.UP).normalized()
+	var up := right.cross(forward).normalized()
+	var lo := Vector2(INF, INF)
+	var hi := Vector2(-INF, -INF)
+	for p in pts:
+		var q := Vector2(p.dot(right), p.dot(up))
+		lo = lo.min(q)
+		hi = hi.max(q)
+	var view := _view()
+	var tall := view.y / maxf(view.x, 1.0)
+	var base := float(layout.get("camera", {}).get("size", _cam_size))
+	var need := maxf((hi.x - lo.x) / FRAME_W, (hi.y - lo.y) / (FRAME_H * tall))
+	# Fits: everything is on screen at the room's accepted view, even if tighter than the opening margins.
+	_fits = hi.x - lo.x <= base and hi.y - lo.y <= base * tall * 0.85
+	_cam_size = clampf(need, base * MIN_VIEW_K, base)
+	var mid := (lo + hi) * 0.5
+	# The screen centre on the floor plane: move along the view axis until y = floor.
+	var t := (floor_y - up.y * mid.y) / forward.y
+	_focus = right * mid.x + up * mid.y + forward * t
+	_framed = _focus
+	_follow.hold()
+	_update_camera()
+
+func _view() -> Vector2:
+	return get_viewport().get_visible_rect().size if is_inside_tree() else Vector2(360, 800)
+
+func _update_camera() -> void:
+	var follow_size := _cam_size / _zoom
+	var center := _focus
+	var size := follow_size
+	if not _shot.is_empty():
+		center = _focus.lerp(_shot.center, _shot_k)
+		size = lerpf(follow_size, float(_shot.size), _shot_k)
+	cam.size = size
+	cam.position = center + _cam_dir * _cam_dist
+	cam.look_at(center, Vector3.UP)
+
+## Push-in preset (kitchen stage): ease the camera onto a cam_ anchor so that it sits at the centre of the
+## screen band `opts.band` (Rect2 in 0..1 screen fractions; default the strip from the HUD's bottom to 40 %).
+## opts.size: orthographic width in metres (default 45 % of the room view); opts.release_on_move (default true).
+func focus(cam_anchor: String, opts := {}) -> void:
+	var m := anchor(cam_anchor)
+	if m == null: return
+	var view := _view()
+	var band: Rect2 = opts.get("band", band_below_hud(0.40))
+	var size := float(opts.get("size", _cam_size * 0.45))
+	var visible_h := size * view.y / maxf(view.x, 1.0)
+	var forward := -_cam_dir
+	var up := (Vector3.UP - forward * forward.dot(Vector3.UP)).normalized()
+	_shot = {center = m.global_position + up * (band.get_center().y - 0.5) * visible_h, size = size,
+		release_on_move = bool(opts.get("release_on_move", true)), anchor = cam_anchor}
+	_ease_shot(1.0)
+
+func release_focus() -> void:
+	if _shot.is_empty(): return
+	_ease_shot(0.0)
+
+func is_focused() -> bool: return not _shot.is_empty() and _shot_k > 0.0
+
+## Screen band from the HUD's bottom edge to `bottom` (fraction of the screen height).
+func band_below_hud(bottom: float) -> Rect2:
+	var view := _view()
+	var top := (_safe_top() + HUD_BOTTOM) / maxf(view.y, 1.0)
+	return Rect2(0.0, top, 1.0, maxf(0.01, bottom - top))
+
+func _safe_top() -> float:
+	if not (OS.has_feature("android") or OS.has_feature("ios")) or not is_inside_tree(): return 0.0
+	return UIMetrics.safe_margins(DisplayServer.get_display_safe_area(), DisplayServer.window_get_size(), _view(), 0.0).y
+
+func _ease_shot(to: float) -> void:
+	if _shot_tween and _shot_tween.is_valid(): _shot_tween.kill()
+	if not is_inside_tree():
+		_shot_k = to
+		if to == 0.0: _shot = {}
+		return
+	_shot_tween = create_tween()
+	_shot_tween.tween_property(self, "_shot_k", to, FOCUS_S).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	if to == 0.0: _shot_tween.tween_callback(func(): _shot = {})
+
+# ---------------------------------------------------------------- walking to facilities and the door
+## Walk to where `n` is used (its stand_ anchor, else the walkable cell nearest to it), face it, then `done`.
+func walk_to(n: String, done := Callable()) -> void:
+	var target := anchor(n)
+	if target == null: return
+	var stand := P0RoomAnchors.stand_for(n, _anchors.keys())
+	var point := anchor(stand).global_position if stand != "" and anchor(stand) else P0RoomNav.nearest_walkable(bp, target.global_position)
+	if point == Vector3.INF: return
+	point.y = 0.0
+	_walk = {name = n, point = point, done = done}
+	if _flat_distance(actor.position, point) <= REACH_M or not actor.mover.set_target_position(point):
+		_arrive()
+
+func _arrive() -> void:
+	var w := _walk
+	_walk = {}
+	var target := anchor(str(w.name))
+	if target: actor.face(target.global_position)
+	if str(w.name) == "exit":
+		leave()
+		return
+	facility_tapped.emit(str(w.name))
+	_on_facility(str(w.name))
+	if (w.done as Callable).is_valid(): (w.done as Callable).call()
+
+## Back to the world below. The runtime pops this instance (AppRouter); standalone rooms just free.
+func leave() -> void:
+	if _leaving: return
+	_leaving = true
+	left.emit()
+	if rt and rt.has_method("leave_room"): rt.leave_room()
+	elif use_runtime and AppRouter.top_instance() == self: AppRouter.pop_instance()
+
+static func _flat_distance(a: Vector3, b: Vector3) -> float:
+	return Vector2(a.x - b.x, a.z - b.z).length()
+
+## The facility under a screen point: the tappable anchor nearest to it within TAP_RADIUS, or "".
+func pick(screen: Vector2) -> String:
+	var best := ""
+	var best_d := TAP_RADIUS
+	for n in _tappable():
+		var m := anchor(n)
+		if m == null or cam.is_position_behind(m.global_position): continue
+		var d := cam.unproject_position(m.global_position + _hit_lift(n)).distance_to(screen)
+		if d < best_d:
+			best_d = d
+			best = n
+	return best
+
+## NPCs and the door are picked at body / door height; use_ anchors already sit on the object's top.
+static func _hit_lift(n: String) -> Vector3:
+	var p := P0RoomAnchors.prefix_of(n)
+	return Vector3(0, 1.0, 0) if p == "npc" or n == "exit" else Vector3.ZERO
+
+# ---------------------------------------------------------------- P0Runtime world protocol
+func p0_surface() -> String: return "room"
+
+func p0_joystick(v: Vector2) -> void:
+	_on_joystick(v)
+	if actor: actor.set_input(v)
+	if v != Vector2.ZERO:
+		_walk = {}
+		if not _shot.is_empty() and bool(_shot.release_on_move): release_focus()
+
+func p0_tap(screen: Vector2) -> void:
+	if rt and rt.ui.has_modal(): return
+	var n := pick(screen)
+	if n != "": walk_to(n)
+
+func p0_frame(v: Dictionary, dt: float) -> void:
+	if _leaving or not is_inside_tree(): return
+	actor.step(dt)
+	if not _walk.is_empty() and not actor.mover.is_moving():
+		if _flat_distance(actor.position, _walk.point) <= REACH_M: _arrive()
+		else: _walk = {}
+	_door_check()
+	if _leaving or not is_inside_tree(): return   # the door popped this room mid-frame
+	# A room that fits the screen holds its diorama framing (following would crop it); zoomed in, or in
+	# a space larger than the screen (the market square), the safe box follows the player (§10.1).
+	if _pinch.step(dt): _zoom = _pinch.value   # springing back from past a zoom limit
+	if _fits and _zoom <= 1.0: _focus = _framed
+	else: _focus = _follow.step(cam, _focus, actor.position, actor.mover.is_moving(), dt)
+	_update_camera()
+	if rt: _markers(v)
+	_room_frame(v, dt)
+	if _perf_left >= 0.0:
+		_perf_left -= dt
+		if _perf_left < 0.0:
+			_perf_left = 5.0
+			print("P0_PERF %s fps=%d draws=%d prims=%d" % [name, Performance.get_monitor(Performance.TIME_FPS),
+				Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME),
+				Performance.get_monitor(Performance.RENDER_TOTAL_PRIMITIVES_IN_FRAME)])
+
+## Walking onto the door leaves (no confirmation); it arms once the player has stepped away from it.
+func _door_check() -> void:
+	var door := anchor("exit")
+	if door == null or _leaving: return
+	var d := _flat_distance(actor.position, door.global_position)
+	if d > EXIT_ARM_M: _exit_armed = true
+	elif _exit_armed and d <= EXIT_RADIUS_M: leave()
+
+## Finger cards and status badges over tappable anchors (221's rt.ui.tag / rt.ui.badge when present).
+func _markers(v: Dictionary) -> void:
+	var now := {}
+	for n in _tappable():
+		var m := _marker(n, v)
+		var id := "room:" + n
+		if m.is_empty(): continue
+		now[id] = true
+		var at := anchor(n).global_position + _hit_lift(n) * 1.1
+		var badge_at := anchor("badge_" + P0RoomAnchors.object_of(n))
+		var screen := cam.unproject_position(badge_at.global_position if badge_at else at)
+		var lift := 0.0
+		var state := badge_state(str(m.get("badge", "")))
+		if state >= 0 and rt.ui.has_method("badge"):
+			rt.ui.call("badge", id, state, screen, true, str(m.get("caption", "")), m.get("icon", null))
+			if rt.ui.has_method("badge_height"): lift = float(rt.ui.call("badge_height", id))
+		if m.has("text"):
+			var near := _flat_distance(actor.position, anchor(n).global_position) < CARD_NEAR_M
+			rt.ui.tag(id, str(m.text), screen - Vector2(0, lift), near)
+	for id in _shown.keys():
+		if now.has(id): continue
+		rt.ui.tag(id, "", Vector2.ZERO, false)
+		if rt.ui.has_method("badge"): rt.ui.call("badge", id, 0, Vector2.ZERO, false)
+	_shown = now
+
+## UiStatusBadge.State for a STATE-ICONS key, or -1 (unknown key, or the badge component is not in this build).
+static func badge_state(key: String) -> int:
+	if key == "" or not ResourceLoader.exists(BADGE_SCRIPT): return -1
+	var states: Dictionary = (load(BADGE_SCRIPT) as Script).get_script_constant_map().get("State", {})
+	return int(states.get(key.to_upper(), -1))
+
+func p0_anchor() -> Vector2:
+	return cam.unproject_position(actor.position + Vector3(0, 2.0, 0))
+
+func p0_zoom(f: float) -> void:
+	_pinch.pinch(f)
+	_zoom = _pinch.value
+	if _zoom > 1.0 and _fits: _follow.held = false
+
+func p0_zoom_end() -> void: _pinch.release()
+
+func p0_recenter() -> void:
+	if _fits and _zoom <= 1.0: return   # the whole room is already in view
+	_focus = actor.position
+	_follow.held = false
+
+## Energy card guidance (LOCK-08: only moves the camera): show cam_<where>, else use_<where>[_1].
+func p0_show_spot(where: String) -> void:
+	for n in ["cam_" + where, "use_" + where, "use_" + where + "_1"]:
+		var m := anchor(n)
+		if m:
+			_focus = Vector3(m.global_position.x, floor_y, m.global_position.z)
+			_follow.hold()
+			return
+
+## Back = tapping the door. Whenever the room handles Back itself (walking out, or already leaving) it
+## returns true, so AppRouter never pops a second level (the room may have popped itself synchronously when
+## the player stood at the door; SGODOT-227 found this sending the app to the old map).
+func is_back_navigation_locked() -> bool:
+	if rt and rt.ui.has_modal():
+		rt.ui.close_modal()
+		return true
+	if _leaving: return true
+	if anchor("exit"):
+		if not _walk.is_empty() and str(_walk.name) == "exit": leave()   # Back again while walking out
+		else: walk_to("exit")
+		return true
+	return false
+
+func suspend() -> void:
+	process_mode = Node.PROCESS_MODE_DISABLED
+	hide()
+	cam.current = false
+	world_env.environment = null
+
+func resume() -> void:
+	process_mode = Node.PROCESS_MODE_INHERIT
+	show()
+	world_env.environment = environment
+	cam.make_current()
+	if rt:
+		rt.attach(self)
+		rt.ui.set_place(city + " · " + place_name)
+
+# ---------------------------------------------------------------- dev steps for P0_SHOT
+func p0_dev(step: PackedStringArray) -> bool:
+	match step[0]:
+		"goto":
+			actor.teleport(Vector3(float(step[1]), floor_y, float(step[2])))
+			_focus = actor.position
+		"at":
+			var m := anchor(step[1])
+			if m: actor.teleport(Vector3(m.global_position.x, floor_y, m.global_position.z))
+		"tap": walk_to(step[1])
+		"focus": focus(step[1])
+		"exit": leave()
+		_: return false
+	return true
+
+func p0_until(n: String) -> bool:
+	match n:
+		"idle": return _walk.is_empty() and not actor.mover.is_moving()
+	return false

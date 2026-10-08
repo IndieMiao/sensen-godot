@@ -1,10 +1,11 @@
 @tool
 extends Node3D
-## Reusable static room assembly. No player, UI, account, network or save dependencies.
+## Reusable room assembly. No player, UI, account, network or save dependencies.
 ## The benchmark supplies lighting and the existing avatar controller separately.
 const KIT := "res://assets/rooms/basic_room/"
 var layout: Dictionary
 var assets: Dictionary = {}
+@export var hearth_light_path: NodePath
 var fire: Node3D
 
 func _ready() -> void:
@@ -24,9 +25,10 @@ func _setup_room() -> void:
 	material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	for asset in layout.assets:
 		assets[asset.name] = asset
-		_add_asset(asset, asset, material)
+		if asset.name != "fire": _add_asset(asset, asset, material)
 	for instance in layout.instances:
-		_add_asset(assets[instance.asset], instance, material)
+		if instance.asset != "fire": _add_asset(assets[instance.asset], instance, material)
+	_add_fire()
 
 func _add_asset(asset: Dictionary, placement: Dictionary, material: StandardMaterial3D) -> void:
 	var container := Node3D.new()
@@ -45,12 +47,6 @@ func _add_asset(asset: Dictionary, placement: Dictionary, material: StandardMate
 		applied = material.duplicate()
 		applied.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		applied.cull_mode = BaseMaterial3D.CULL_DISABLED
-	if asset.name == "fire":
-		applied = material.duplicate()
-		applied.emission_enabled = true
-		applied.emission = Color("ffb041")
-		applied.emission_energy_multiplier = 1.3
-		fire = container
 	_set_material(model, applied)
 	if asset.name == "window_garden": _disable_shadows(model)
 	for c in asset.colliders:
@@ -84,3 +80,36 @@ func _set_material(node: Node, mat: Material) -> void:
 func _disable_shadows(node: Node) -> void:
 	if node is GeometryInstance3D: node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	for child in node.get_children(): _disable_shadows(child)
+
+func _add_fire() -> void:
+	fire = preload("res://assets/rooms/_shared/fx/fx_hearth_fire.tscn").instantiate()
+	fire.name = "fire"
+	fire.position = _vec(layout.fire_position)
+	fire.emission_box = Vector3(.18, .005, .035)
+	fire.flame_height = .42
+	fire.flame_count = 16
+	fire.spark_count = 4
+	fire.light_energy = .72
+	fire.flicker_strength = .0486
+	# The benchmark creates HearthGlow first. Other hosts can supply their lamp path.
+	var lamp := get_node_or_null(hearth_light_path) as OmniLight3D if not hearth_light_path.is_empty() else get_node_or_null("../HearthGlow") as OmniLight3D
+	if lamp:
+		# Resolve from the not-yet-parented effect through this room root.
+		fire.light_path = NodePath("../" + str(get_path_to(lamp)))
+	else:
+		# Standalone art retains the same single Basic Room lamp at fire_position.
+		lamp = OmniLight3D.new()
+		lamp.name = "HearthGlow"
+		lamp.position = _vec(layout.fire_position)
+		lamp.light_color = Color("ff9b35")
+		lamp.omni_range = 1.25
+		lamp.omni_attenuation = 1.6
+		lamp.shadow_enabled = false
+		add_child(lamp)
+		fire.light_path = NodePath("../HearthGlow")
+	add_child(fire)
+	# fire_position is the retained light anchor. Seat emitter geometry at the
+	# original fire.glb pivot (fuel bed) without moving that public FX root/lamp.
+	var fuel_offset := _vec(assets.fire.position) - fire.position
+	for emitter in fire.get_children():
+		if emitter is GPUParticles3D: emitter.position += fuel_offset

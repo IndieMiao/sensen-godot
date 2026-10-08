@@ -1,0 +1,18 @@
+{
+  "_note": "Placeholder anchors on the Basic Room (SGODOT-227): names follow the WP7-B F-03 table; positions sit on Basic Room furniture (counter = sink cabinet, tea table = dining table, bench = window bench) and the green door, same as the farmhouse. Replaced by the final model's layout.json anchors (SGODOT-214..217).",
+  "anchors": [
+    {"name": "use_counter", "position": [-0.47, 1.25, -2.62], "module": "sink_cabinet"},
+    {"name": "stand_counter", "position": [-0.47, 0.085, -1.75], "yaw_degrees": 0},
+    {"name": "npc_keeper", "position": [0.2, 0.085, -2.05], "yaw_degrees": 180},
+    {"name": "badge_keeper", "position": [0.0, 2.35, -2.05]},
+    {"name": "stand_keeper", "position": [-0.47, 0.085, -1.75], "yaw_degrees": 0},
+    {"name": "use_tea_table_1", "position": [-0.12, 0.85, 0.62], "module": "dining_table"},
+    {"name": "seat_table1_1", "position": [1.15, 0.74, 0.62], "yaw_degrees": 90, "module": "chair"},
+    {"name": "seat_table1_2", "position": [-1.39, 0.74, 0.62], "yaw_degrees": -90, "module": "chair"},
+    {"name": "use_bench", "position": [-2.66, 0.75, 1.18], "module": "bench"},
+    {"name": "seat_bench_1", "position": [-2.6, 0.745, 0.93], "yaw_degrees": -90, "module": "bench"},
+    {"name": "seat_bench_2", "position": [-2.6, 0.745, 1.43], "yaw_degrees": -90, "module": "bench"},
+    {"name": "spawn", "position": [2.03, 0.085, -1.9], "yaw_degrees": 180},
+    {"name": "exit", "position": [2.03, 0.085, -2.55]}
+  ]
+}

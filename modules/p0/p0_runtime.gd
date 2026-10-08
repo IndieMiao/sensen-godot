@@ -5,12 +5,14 @@ extends Node
 ## routes UI input to the active world and turns server events into floats, cards and toasts, so the
 ## new UI flow is identical everywhere.
 ##
-## A world implements (all optional): p0_surface() -> String, p0_space() -> String (where the player is for
-## the server: home / pond / outpost / mine; see space_of), p0_place() -> String (the catalog pond id inside a
-## pond space), p0_frame(view, dt), p0_joystick(v),
-## p0_tap(screen), p0_action(cmd), p0_event(ev, view), p0_anchor() -> Vector2, p0_zoom(f),
+## A world implements (all optional; interiors extend P0Room): p0_surface() -> String, p0_space() -> String
+## (where the player is for the server: home / pond / outpost / mine; see space_of), p0_place() -> String (the
+## catalog pond id inside a pond space), p0_frame(view, dt), p0_joystick(v),
+## p0_tap(screen), p0_action(cmd), p0_event(ev, view), p0_anchor() -> Vector2, p0_zoom(f), p0_zoom_end(),
 ## p0_recenter(), p0_show_spot(where), p0_energy_verb() -> String, p0_dev(step) -> bool,
 ## p0_until(name) -> bool.
+
+const MAP_SCENE := "res://scenes/p0/p0_map.tscn"
 
 static var _instance: P0Runtime
 
@@ -25,6 +27,9 @@ var last_xp_lines: Array = []
 var last_first_catch_xp := 0
 ## What to do once the map is back on top (FISH-4 Go home, FISH-5 Tackle Shop): "farm" / "tackle".
 var after_leave := ""
+## True only while the farm's hold-to-repeat sends its next command (§14.2): the observation log's "hold" (S7).
+## The press itself, even with the key still down, is a tap (刘邦, PR #23 review).
+var holding_repeat := false
 
 ## Load timing (logcat tag godot, "P0_TIMING"): navigation start → world _ready → first drawn frame.
 static var _nav_ms := 0
@@ -40,6 +45,8 @@ static func ensure() -> P0Runtime:
 	(Engine.get_main_loop() as SceneTree).root.add_child.call_deferred(_instance)
 	return _instance
 
+func src_of_press() -> String: return "hold" if holding_repeat else "tap"
+
 func _init() -> void:
 	# App copy is English-only (user rule 2026-09-04); reused old panels translate through L10n, so pin the locale.
 	TranslationServer.set_locale("en")
@@ -51,10 +58,14 @@ func _init() -> void:
 	ui.tapped.connect(func(p): _call("p0_tap", [p]))
 	ui.action_pressed.connect(_on_action)
 	ui.command.connect(func(cmd): session.send(cmd, P0Session.ui_key(cmd)))   # panel buttons: one submit per result
+	# Observation log (S7): only the commands the farm's hold-to-repeat sends are holds; every press is a tap.
+	session.src_of = src_of_press
 	ui.dev_skip.connect(func(m): session.dev_skip(m); ui.toast("Clock +%dh (dev)" % (m / 60)))
 	ui.zoom.connect(func(f: float): _call("p0_zoom", [f]))
+	ui.zoom_end.connect(func(): _call("p0_zoom_end", []))
 	ui.recenter.connect(func(): _call("p0_recenter", []))
 	ui.show_spot.connect(func(where: String): _call("p0_show_spot", [where]))
+	ui.can_show_spot = func() -> bool: return is_instance_valid(world) and world.has_method("p0_show_spot")
 	ui.home_choice.connect(func(choice: String): _call("p0_home", [choice]))
 	ui.place_pressed.connect(leave_world)
 	ui.home_requested.connect(func(): _leave_then("farm"))
@@ -71,6 +82,9 @@ func _init() -> void:
 
 ## The active world takes over input and the HUD surface; the previous one is simply forgotten.
 func attach(w: Node) -> void:
+	# The world being left stops where it is, and the stick ends: no walking on underneath (int5 hand test 035–039).
+	if is_instance_valid(world) and world != w: _call("p0_joystick", [Vector2.ZERO])
+	ui.end_stick()
 	world = w
 	session.space = space_of(w)   # before the read below, which tells the server where the player is
 	session.place = str(w.call("p0_place")) if w.has_method("p0_place") else ""   # which pond (q(36))
@@ -95,16 +109,47 @@ func _first_frame(tag: String) -> void:
 
 func detach(w: Node) -> void:
 	if world == w:
+		_call("p0_joystick", [Vector2.ZERO])
+		ui.end_stick()
 		world = null
 		ui.close_modal()
 		ui.set_surface("map")
 		session.space = "map"
 		session.place = ""
 
-## Back to the map: the active world is an AppRouter instance above it (back locks still apply,
-## e.g. a line in the water is reeled in first).
+## Back to the map (the place chip, LOCK-06): every P0 world stacked above it closes, the farm under the
+## farmhouse included. Back locks still apply (a line in the water is reeled in first); a room's own Back
+## (walking out through the door) is not one of them.
 func leave_world() -> void:
-	if is_instance_valid(world) and AppRouter.top_instance() == world: AppRouter.handle_back()
+	if not is_instance_valid(world): return
+	if AppRouter.instance_depth() > 0 and AppRouter.top_instance() != world: return
+	if not (world is P0Room) and AppRouter.scene_locks_back_navigation(world): return
+	leave_to_map()
+
+## Pop every P0 layer down to the map; a world booted as the root scene (the first session lands on the farm,
+## p0_boot q(44)) has no map under it, so the root is swapped for the map. No back locks are asked here.
+func leave_to_map() -> void:
+	while AppRouter.instance_depth() > 0:
+		var depth := AppRouter.instance_depth()
+		AppRouter.pop_instance()
+		if AppRouter.instance_depth() >= depth: return   # a locked layer (a committed relocation map) stays
+	var root := get_tree().current_scene
+	if root == null or root.scene_file_path != MAP_SCENE: swap_root.call()
+
+## The scene change behind leave_to_map (tests replace it).
+var swap_root := func(): get_tree().change_scene_to_file(MAP_SCENE)
+
+## Android Back for a world with its own back lock (farm, pond), after its own layers: AppRouter ignores Back on a
+## P0 world that is the root scene, so with nothing left to close such a world leaves for the map itself (int5b
+## hand test 2: Inbox closed on the first Back, the second did nothing). True when it handled Back.
+func root_back() -> bool:
+	if AppRouter.instance_depth() > 0: return false   # stacked on the map: AppRouter pops it
+	leave_to_map()
+	return true
+
+## One level back, for a room's door: the farm under the farmhouse, the map under an outpost.
+func leave_room() -> void:
+	if is_instance_valid(world) and AppRouter.top_instance() == world: AppRouter.pop_instance()
 
 ## Back to the map, then on to the homestead or Old Kai's pin (the map reads after_leave on resume).
 func _leave_then(next: String) -> void:
@@ -126,6 +171,7 @@ func _on_action(cmd: Dictionary) -> void:
 	if str(cmd.get("type", "")) == "energy_card":
 		var verb = _call("p0_energy_verb", [])
 		ui.open_energy_card(int(ui.fab_state().get("need", 0)), str(verb) if verb != null else str(ui.fab_state().get("verb", "")))
+		session.report({"kind": "energy_card", "need": int(ui.fab_state().get("need", 0))})
 		return
 	if not cmd.is_empty(): _call("p0_action", [cmd])
 
@@ -206,6 +252,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 			"level":
 				var lv: Dictionary = ev
 				ui.queue_card(func(): ui.show_level_up(lv))
+				session.report({"kind": "level_banner", "skill": str(lv.skill), "level": int(lv.level)})
 		dy -= 16.0
 	if ui.modal_kind == "stall" and events.size() > 0:
 		ui.set_view(session.current())
@@ -235,6 +282,7 @@ func _on_catch(ev: Dictionary, _xp_lines: Array, at := Vector2.INF) -> void:
 			var gone: Dictionary = ev
 			if ui.first_time("gotaway:" + str(ev.fish)):
 				ui.queue_card(func(): ui.show_got_away(gone))
+				session.report({"kind": "card_shown", "card": "got_away", "fish": str(gone.get("fish", ""))})
 			else:
 				ui.float_text(("Got away · Lv%d" % int(ev.need_level)) if ev.has("need_level") else "Got away · rod too light", where, P0Ui.INK2)
 		"escaped":
@@ -255,6 +303,7 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 	match code:
 		"need_energy":
 			ui.open_energy_card(int(detail.get("need", 0)), "Cast" if str(cmd.get("type", "")) == "cast" else "Sow ×1")
+			session.report({"kind": "energy_card", "need": int(detail.get("need", 0)), "refused": str(cmd.get("type", ""))})
 		"locked":
 			ui.toast("%s Lv%d · %d XP to go" % [str(detail.get("skill", "farming")).capitalize(), int(detail.get("level", 2)), int(detail.get("xp_to_go", 0))])
 		"no_coins":
@@ -333,6 +382,8 @@ func _dev_shot(dt: float) -> void:
 			"gear": ui.open_gear()
 			"skills": ui.open_skills()
 			"today": ui.open_today()
+			"energypanel": ui.open_energy_panel()
+			"inbox": ui.open_inbox()
 			"radial": ui.open_radial()
 			"kitchen": ui.open_kitchen(step[1] if step.size() > 1 else "cookbook")
 			"put":

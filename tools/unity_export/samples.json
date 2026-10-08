@@ -23,6 +23,11 @@
     { "asset": "ap_hairHat43",     "tier": 0 },
     { "asset": "ap_hairHat51",     "tier": 0 },
     { "asset": "ap_hairHat70",     "tier": 0 },
-    { "asset": "ap_glass8",        "tier": 0 }
+    { "asset": "ap_glass8",        "tier": 0 },
+    { "asset": "ap_mask16_2",      "tier": 0, "id": "mask16_npc_kai" },
+    { "asset": "ap_hairHat71",     "tier": 0, "id": "hairhat71_npc_kai" },
+    { "asset": "ap_hairHat12_2",   "tier": 0, "id": "hairhat12_npc_mei" },
+    { "asset": "ap_cloth11",       "tier": 0, "id": "cloth11_npc_mei" },
+    { "asset": "ap_hairHat80",     "tier": 0, "id": "hairhat80_npc_ama" }
   ]
 }

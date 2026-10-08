@@ -2,13 +2,19 @@ extends Node3D
 ## P0 homestead: the old polished farm presentation (cottage, well, seed box, garden dressing, thick
 ## soil beds, procedural crops, rig and labour clips, 43° ortho camera) driven by the P0 server view
 ## and the new UI flow (joystick, main action, quick bar, cards) from P0Runtime.
-## Ponds are on the map; the kitchen is inside the farmhouse; nothing here is greybox.
+## Ponds are on the map; the kitchen is inside the farmhouse (P0Room, SGODOT-226); nothing here is greybox.
 
 const FarmProps = preload("res://modules/farm/farm_props.gd")
 const FarmCamera = preload("res://modules/farm/farm_camera.gd")
 const FarmArt = preload("res://modules/farm/farm_art.gd")
 const MineArt = preload("res://modules/mining/mine_art.gd")
 const GardenScenery = preload("res://scenes/p0/p0_garden_scenery.gd")
+const FARMHOUSE := "res://scenes/p0/rooms/p0_farmhouse.tscn"
+## Walking into the doorway goes in (mirror of a room's door): inside the walkway cell in front of the door
+## (DOOR_HALF either side; the camera-relative joystick drifts sideways), pushing towards the house, after
+## having been DOOR_ARM_M away (so stepping out of the farmhouse does not walk straight back in).
+const DOOR_HALF := Vector2(0.6, 0.4)
+const DOOR_ARM_M := 1.5
 
 const STYLE := "cottage"          # the orange-roof cottage of the polished farm
 const PLACE := "Shanghai · Homestead"
@@ -30,6 +36,7 @@ var _mine := Vector3.ZERO
 var _focus := Vector3.ZERO
 var _cam_follow := P0Follow.new()
 var _zoom := 1.0
+var _pinch = preload("res://modules/p0/p0_elastic_zoom.gd").new(0.8, 1.4)   # rubber band past 0.8 / 1.4
 var _dev_yaw := -1.0
 var _hold_until := 0.0
 var _front: Dictionary = {}
@@ -37,7 +44,9 @@ var _row: Array = []   # plots a Row Hoe sows from _front (P0Logic.row_plots)
 var _front_cell := Vector2i(-1, -1)
 var _plot_sig := ""
 var _sync_t := 0.0
-var _cooking: P0Cooking
+var _door := Vector3.ZERO     # the walkway cell in front of the farmhouse door
+var _door_armed := false
+var _inside := false          # the farmhouse is open above this farm
 
 func _ready() -> void:
 	P0Runtime.mark("%s _ready start" % name)
@@ -54,6 +63,12 @@ func _ready() -> void:
 func _exit_tree() -> void:
 	if rt: rt.detach(self)
 
+## Android Back: the UI's top layer (PinMenu, radial, a card or drawer) closes first, one per press; with nothing
+## open, back to the map: AppRouter pops a farm stacked on the map, a farm that is the root scene leaves by itself
+## (int5 hand test 012–013 / 023–024, int5b test 2; rooms do the same, p0_room).
+func is_back_navigation_locked() -> bool:
+	return rt != null and (rt.ui.close_top_layer() or rt.root_back())
+
 ## AppRouter stacking: the map below us hands back its camera and environment on resume.
 func suspend() -> void:
 	set_process(false)
@@ -64,7 +79,18 @@ func resume() -> void:
 	visible = true
 	set_process(true)
 	cam.make_current()
-	if rt: rt.attach(self)
+	if rt:
+		rt.attach(self)
+		rt.ui.set_place(PLACE)   # back from the farmhouse
+	if _inside:
+		# Out through the farmhouse door: stand on the doorstep facing the field.
+		_inside = false
+		actor.teleport(_door)
+		actor.face(_door + Vector3(0, 0, 1))
+		_focus = _door
+		_cam_follow.hold()
+		_place_camera()
+	_door_armed = false
 
 func p0_surface() -> String: return "farm"
 
@@ -75,6 +101,7 @@ func _build_world() -> void:
 	ground.mesh = lawn
 	ground.position = Vector3(bp.play_area_m * 0.5, -0.008, -bp.play_area_m * 0.5)
 	_house = bp.cell_to_world(bp.anchor("house"))
+	_door = bp.cell_to_world(bp.anchor("house") + Vector2i(0, -2))
 	var grass := ShaderMaterial.new()
 	grass.shader = preload("res://modules/farm/shaders/meadow.gdshader")
 	grass.set_shader_parameter("meadow_texture", preload("res://assets/farm/art/meadow.png"))
@@ -176,15 +203,21 @@ func _place_camera() -> void:
 
 func _follow(dt: float) -> void:
 	_focus = _cam_follow.step(cam, _focus, actor.position, actor.mover.is_moving(), dt)
+	if _pinch.step(dt): _zoom = _pinch.value   # springing back from past a limit
 	_place_camera()
 
-func p0_zoom(f: float) -> void: _zoom = clampf(_zoom / f, 0.8, 1.4)
+func p0_zoom(f: float) -> void:
+	_pinch.pinch(f)
+	_zoom = _pinch.value
+func p0_zoom_end() -> void: _pinch.release()
 func p0_recenter() -> void:
 	_focus = actor.position
 	_cam_follow.held = false
 
 func p0_show_spot(where: String) -> void:
 	var at := _house if where in ["stove", "bench", "home"] else actor.position
+	if where == "stall": at = _stall
+	elif where == "plots": at = _plots_center()
 	_focus = at
 	_cam_follow.hold()
 	var ring := MeshInstance3D.new()
@@ -209,7 +242,9 @@ func p0_joystick(v: Vector2) -> void:
 
 func p0_frame(v: Dictionary, dt: float) -> void:
 	actor.step(dt)
+	_door_check()
 	_follow(dt)
+	rt.ui.player_screen = cam.unproject_position(actor.position + Vector3(0, 0.9, 0))   # the radial fans out from here
 	_sync_plots(v, dt)
 	_pick_front(v)
 	rt.ui.set_action(P0Logic.main_action(v, _front, rt.ui.selected_seed, _row))
@@ -230,6 +265,12 @@ func _sync_plots(v: Dictionary, dt: float) -> void:
 	for p in v.get("plots", []):
 		var id := int(p.get("id", -1))
 		if id >= 0 and id < P0Garden.plot_count(): beds.multimesh.set_instance_color(id, P0Garden.bed_tint(str(p.get("state", ""))))
+
+## Middle of the plot beds, for camera-only "Show" from the Today panel and NeedSource (LOCK-08).
+func _plots_center() -> Vector3:
+	var sum := Vector3.ZERO
+	for id in P0Garden.plot_count(): sum += bp.cell_to_world(P0Garden.cell_of(id))
+	return sum / maxf(1.0, float(P0Garden.plot_count()))
 
 ## The bed the player faces from the walkway: nearest bed ahead within reach.
 func _pick_front(v: Dictionary) -> void:
@@ -271,7 +312,22 @@ func p0_action(cmd: Dictionary) -> void:
 	rt.session.send(cmd)
 
 func p0_home(choice: String) -> void:
-	if choice == "kitchen": open_stove()
+	if choice == "kitchen": enter_farmhouse()
+
+## Into the farmhouse (its stove corner is the kitchen); the farm waits suspended underneath.
+func enter_farmhouse() -> void:
+	if AppRouter._navigation_pending or (AppRouter.top_instance() != null and AppRouter.top_instance() != self): return
+	P0Runtime.nav_started()
+	_inside = true
+	AppRouter.open_instance(FARMHOUSE, {})
+
+func _door_check() -> void:
+	var off := Vector2(actor.position.x - _door.x, actor.position.z - _door.z)
+	if off.length() > DOOR_ARM_M: _door_armed = true
+	elif _door_armed and absf(off.x) < DOOR_HALF.x and absf(off.y) < DOOR_HALF.y and actor.mover.is_moving() \
+			and actor.facing().z < -0.5 and not rt.ui.has_modal():
+		_door_armed = false
+		enter_farmhouse()
 
 func p0_energy_verb() -> String: return str(rt.ui.fab_state().get("verb", "Sow ×1"))
 
@@ -284,30 +340,39 @@ func _hold_repeat() -> void:
 	if not a.get("enabled", false) or cmd.is_empty() or str(cmd.get("type", "")) == "energy_card": return
 	if rt.ui.fab_verb == "": rt.ui.fab_verb = str(a.get("verb", ""))
 	if str(a.get("verb", "")) != rt.ui.fab_verb: return
+	rt.holding_repeat = true   # the observation log's "hold" (S7); the first press went out as a tap
 	p0_action(cmd)
+	rt.holding_repeat = false
 
-## Facilities respond to taps only (§10.2.2): the stall opens its drawer directly (unattended, p(6)),
-## the farmhouse (Kitchen / Rest), the mine.
+## Facilities respond to taps only (§10.2.2): the stall opens its drawer directly (unattended, p(6)), the farmhouse
+## takes the player in (its kitchen is inside since SGODOT-226; the door card is gone, int5 hand test 37), the mine.
 func p0_tap(screen: Vector2) -> void:
-	if rt.ui.has_modal() or _cooking != null: return
+	if rt.ui.has_modal(): return
 	if cam.unproject_position(_stall + Vector3(0, 0.4, 0)).distance_to(screen) < 56:
 		actor.face(_stall)
 		rt.ui.open_stall()
 	elif cam.unproject_position(_house + Vector3(0, 1.0, 0.6)).distance_to(screen) < 80:
-		rt.ui.open_home_card()
+		actor.face(_door)
+		enter_farmhouse()
 	elif cam.unproject_position(_mine + Vector3(0, 0.8, 0)).distance_to(screen) < 60:
 		rt.ui.toast("The mine opens soon")
 
+## Facility marks (STATE-ICONS) show over the stall; finger cards appear when you walk up (LOCK-07 / LOCK-17).
+## Tapping the card is tapping the facility, so it reuses p0_tap's own hit points.
 func _tags(v: Dictionary) -> void:
-	var near_stall := actor.position.distance_to(_stall) < 3.2
-	var note := ""
+	var stall_top := cam.unproject_position(_stall + Vector3(0, 1.05, 0))
+	var request := -1
 	for r in v.get("stall", {}).get("board", {}).get("requests", []):
-		if str(r.status) == "open" or (str(r.status) == "accepted" and int(r.have) >= int(r.qty)): note = " · !"
-	rt.ui.tag("stall", "Homestead Stall · Tap to shop" + note, cam.unproject_position(_stall + Vector3(0, 1.05, 0)), near_stall or note != "", true)
-	var st = v.get("cooking", {}).get("stove", null)
-	var home := "Home · Kitchen · Rest"
-	if st != null: home = "Home · Dish ready" if float(st.get("ready_in", 0)) <= 0.0 else "Home · Cooking " + P0Logic.duration(float(st.get("ready_in", 0)))
-	rt.ui.tag("home", home, cam.unproject_position(_house + Vector3(0, 2.6, 0.4)), actor.position.distance_to(_house) < 4.2 or st != null, st != null)
+		if str(r.status) == "accepted" and int(r.have) >= int(r.qty): request = UiStatusBadge.State.DELIVERABLE
+		elif str(r.status) == "open" and request < 0: request = UiStatusBadge.State.REQUEST
+	rt.ui.badge("stall", maxi(request, 0), stall_top, request >= 0)
+	rt.ui.tag("stall", "Tap to shop", stall_top - Vector2(0, rt.ui.badge_height("stall")),
+		actor.position.distance_to(_stall) < 3.2, cam.unproject_position(_stall + Vector3(0, 0.4, 0)))
+	# The farmhouse carries no state badge (不知火舞 on SGODOT-221): the stove's state belongs to the stove inside,
+	# and Today already names the dish and its time. Tapping it goes in (the door card is gone; Rest is the bench,
+	# SGODOT-224).
+	rt.ui.tag("home", "Farmhouse · Tap to go in", cam.unproject_position(_house + Vector3(0, 2.6, 0.4)),
+		actor.position.distance_to(_house) < 4.2, cam.unproject_position(_house + Vector3(0, 1.0, 0.6)))
 
 func _teaching(v: Dictionary) -> void:
 	if rt.ui.has_modal(): return
@@ -319,33 +384,6 @@ func p0_anchor() -> Vector2:
 	if not _front.is_empty():
 		return cam.unproject_position(bp.cell_to_world(_front_cell) + Vector3(0, 0.7, 0))
 	return cam.unproject_position(actor.position + Vector3(0, 2.0, 0))
-
-# ---------------------------------------------------------------- cooking (interim 2D pot until the kitchen room lands)
-func p0_event(ev: Dictionary, v: Dictionary) -> void:
-	if str(ev.get("kind", "")) == "pot":
-		var st = v.get("cooking", {}).get("stove", null)
-		if st is Dictionary: _watch_pot(st)
-
-func open_stove() -> void:
-	var st = rt.session.current().get("cooking", {}).get("stove", null)
-	if st == null: rt.ui.open_kitchen()
-	elif float(st.get("ready_in", 0)) <= 0.0: rt.session.send({"type": "collect", "taps": []})
-	else: _watch_pot(st)
-
-func _watch_pot(st: Dictionary) -> void:
-	if _cooking != null: return
-	var v := rt.session.current()
-	var dish = st.get("dish", null)
-	var heats: Array = st.get("heats", [])
-	var teach := not heats.is_empty() and float(heats[0].get("width", 0)) >= 0.5
-	_cooking = P0Cooking.new(rt.ui, st, P0Logic.item_name(v, str(dish)) if dish != null else "Unknown dish", teach)
-	_cooking.finished.connect(func(taps: Array):
-		_cooking = null
-		rt.session.send({"type": "collect", "taps": taps}))
-	_cooking.left.connect(func():
-		_cooking = null
-		rt.ui.toast("The pot keeps cooking · tap your home to collect"))
-	rt.ui.root.add_child(_cooking)
 
 # ---------------------------------------------------------------- dev steps for P0_SHOT
 func p0_dev(step: PackedStringArray) -> bool:
@@ -359,7 +397,7 @@ func p0_dev(step: PackedStringArray) -> bool:
 			_focus = actor.position
 		"face":
 			actor.face(actor.position + Vector3(float(step[1]), 0, float(step[2])))
-		"stove": open_stove()
+		"farmhouse": enter_farmhouse()
 		"democrops":
 			# Visual check only: every P0 crop at every stage across the first rows (no server state).
 			var fake := {}
@@ -382,6 +420,5 @@ func p0_dev(step: PackedStringArray) -> bool:
 
 func p0_until(name: String) -> bool:
 	match name:
-		"cooking": return _cooking != null
-		"idle": return _cooking == null and not actor.busy()
+		"idle": return not actor.busy()
 	return false
