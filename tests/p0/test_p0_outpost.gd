@@ -199,3 +199,31 @@ func test_npc_outfits_name_real_parts_and_stay_distinct() -> void:
 		var pair := "%s|%s" % [slots.get("hairHat", ""), slots.get("cloth", "")]
 		assert_bool(pairs.has(pair)).override_failure_message("%s shares %s with %s" % [id, pair, pairs.get(pair, "")]).is_false()
 		pairs[pair] = id
+
+## SGODOT-250 (spec 370794d2 item 5): one finger card at a time in a room. Hand test 246 pictures 06 / 07 showed the
+## keeper's, the seat's and the door's cards together; now only the nearest within reach shows, and it keeps the
+## card until another is clearly nearer.
+func test_only_the_nearest_card_shows_in_a_room() -> void:
+	var r := _room("sh_tea_1")
+	var marks := {}
+	for n in r._tappable():
+		var m: Dictionary = r._marker(n, {})
+		if not m.is_empty(): marks[n] = m
+	var keeper := r.anchor("npc_keeper").global_position
+	var door := r.anchor("exit").global_position
+	r.actor.position = Vector3(keeper.x + 0.3, r.actor.position.y, keeper.z + 0.6)   # by Ama, the tea table and the door in reach
+	var in_reach := marks.keys().filter(func(n): return Vector2(r.actor.position.x - r.anchor(n).global_position.x,
+		r.actor.position.z - r.anchor(n).global_position.z).length() < P0Room.CARD_NEAR_M)
+	assert_int(in_reach.size()).override_failure_message(str(in_reach)).is_greater_equal(3)   # the 246 / 07 situation
+	assert_str(r.card_pick(marks)).is_equal("npc_keeper")
+	# Ama's card stays while the door is only a little nearer …
+	var mid := (keeper + door) * 0.5
+	var along := (door - keeper).normalized()
+	r.actor.position = Vector3(mid.x, r.actor.position.y, mid.z) + Vector3(along.x, 0, along.z) * 0.05
+	assert_str(r.card_pick(marks)).is_equal("npc_keeper")
+	# … and goes to the door once it is clearly nearer.
+	r.actor.position = Vector3(door.x, r.actor.position.y, door.z) - Vector3(along.x, 0, along.z) * 0.3
+	assert_str(r.card_pick(marks)).is_equal("exit")
+	# Out of every reach: no card.
+	r.actor.position = Vector3(20, r.actor.position.y, 20)
+	assert_str(r.card_pick(marks)).is_equal("")
