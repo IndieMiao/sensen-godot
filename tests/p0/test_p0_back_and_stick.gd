@@ -89,3 +89,20 @@ func test_finger_cards_stay_below_the_hud_and_above_the_bar() -> void:
 	ui.tag("stall", "Tap to shop", Vector2(200, ui._kit.size.y - 10), true)
 	var s: UiTapCard = ui._cards["stall"]
 	assert_float(s.position.y + s.size.y).is_less_equal(ui._bar.position.y)
+
+func test_a_root_world_leaves_for_the_map_once_nothing_is_left_to_close() -> void:
+	# int5b hand test 2: booted into the farm (no map under it), Back closed the Inbox and then did nothing,
+	# because AppRouter ignores Back on a P0 world that is the root scene.
+	var rt: P0Runtime = auto_free(P0Runtime.new())
+	add_child(rt)
+	await get_tree().process_frame
+	var swaps := [0]
+	rt.swap_root = func(): swaps[0] += 1
+	var farm: FakeWorld = auto_free(FakeWorld.new())
+	rt.attach(farm)
+	rt.ui.set_view(_view())
+	rt.ui.open_inbox()
+	assert_bool(rt.ui.close_top_layer() or rt.root_back()).is_true()   # first Back: the Inbox
+	assert_int(swaps[0]).is_equal(0)
+	assert_bool(rt.ui.close_top_layer() or rt.root_back()).is_true()   # second Back: to the map
+	assert_int(swaps[0]).is_equal(1)

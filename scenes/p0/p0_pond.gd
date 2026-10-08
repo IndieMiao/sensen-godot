@@ -258,7 +258,7 @@ func is_back_navigation_locked() -> bool:
 	if panel and panel.visible:
 		panel.close()
 		return true
-	return false
+	return rt != null and rt.root_back()   # the pond as the root scene (dev entry pond:<id>) leaves for the map itself
 
 func suspend() -> void:
 	_end_fishing()
