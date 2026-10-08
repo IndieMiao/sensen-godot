@@ -27,6 +27,9 @@ static func all() -> Array[Dictionary]:
 		{id = "segment_tab", title = "UiSegmentTab", figma = "Tab 483:322 · Compact/Kitchen/Mode 655:58504 · LOCK-13 / 20", build = _segment_tabs},
 		{id = "badge", title = "UiBadge", figma = "StateBadge 483:324", build = _badges},
 		{id = "empty_state", title = "UiEmptyState", figma = "EmptyState 1234:87237 Kind=Panel / Row · WP6", build = _empty_states},
+		# SGODOT-226 cooking results (shared with the catch card, SGODOT-233)
+		{id = "quality_badge", title = "UiQualityBadge", figma = "QualityBadge 1178:82154", build = _quality_badges},
+		{id = "reward_moment", title = "UiRewardMoment", figma = "RewardMoment 1179:82271 · COOK-4 / COOK-6 / COOK-P0-9", build = _reward_moments},
 		# SGODOT-221 world controls · interaction
 		{id = "quick_bar", title = "UiQuickBar (drawn at 328 of 336)", figma = "Compact/QuickSlot 633:41279 · QuickEnd/Bag 907:72112 · BAR-1 / BAR-1-2 · LOCK-04 / 05", build = _quick_bars},
 		{id = "pin_menu", title = "UiPinMenu", figma = "PinMenu 1141:80291 · LOCK-05", build = _pin_menus},
@@ -612,3 +615,30 @@ static func _tap_cards() -> Control:
 	right.point_at(1000.0)
 	v.add_child(_captioned(right, "facility near the right edge"))
 	return v
+
+static func _quality_badges() -> Control:
+	var row := _row(UiTokens.SPACE_ROW)
+	row.add_child(_captioned(UiQualityBadge.new(1), "Good"))
+	row.add_child(_captioned(UiQualityBadge.new(2), "Perfect"))
+	return row
+
+static func _reward_moment(fields: Dictionary) -> UiRewardMoment:
+	var r := UiRewardMoment.new()
+	r.show_fields(fields)
+	return r
+
+static func _reward_moments() -> Control:
+	var row := _row(UiTokens.SPACE_SECTION)
+	row.add_child(_captioned(_reward_moment({event = "New recipe!", icon = _tex("dish_herb_grilled_fish"), item_name = "Herb Grilled Fish",
+		rarity = 2, rarity_word = "Fine", quality = 1, strip = "First cooked · +20 Cooking XP · Cookbook 2/48", strip_icon = _tex("cookbook"),
+		primary = "Eat · +45 Energy", secondary = "Keep", note = "Gift later from your bag"}), "Reward · first cook (COOK-4)"))
+	row.add_child(_captioned(_reward_moment({event = "Dish ready", icon = _tex("dish_herb_grilled_fish"), item_name = "Herb Grilled Fish",
+		rarity = 2, rarity_word = "Fine", quality = 1, strip = "Collected from Stove 1", strip_icon = _tex("cookbook"),
+		primary = "Energy full", primary_reason = "Energy full", secondary = "Keep", note = "Gift later from your bag"}), "Reward · ready, Energy full (COOK-P0-9)"))
+	row.add_child(_captioned(_reward_moment({tone = UiRewardMoment.Tone.NEUTRAL, event = "Mystery Dish", icon = _tex("dish_mystery"),
+		item_name = "Hmm… not a dish", strip = "A clue was added to your Cookbook", strip_icon = _tex("cookbook"),
+		primary = "Eat · +5 Energy", secondary = "Keep", note = "Can't be sold or delivered"}), "Neutral · Mystery Dish (COOK-6)"))
+	row.add_child(_captioned(_reward_moment({tone = UiRewardMoment.Tone.MILESTONE, event = "Home Cook", icon = _tex("cookbook"),
+		item_name = "Cookbook 8/48", strip = "Title · +50 Energy"}), "Milestone · no buttons"))
+	return row
+

@@ -1,0 +1,132 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    94
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiQualityBadge"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        18
+      ],
+      "variation": "CaptionR12",
+      "text": "QualityBadge 1178:82154"
+    },
+    {
+      "type": "HFlowContainer",
+      "rect": [
+        0,
+        52,
+        328,
+        42
+      ],
+      "children": [
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            52,
+            62,
+            42
+          ],
+          "children": [
+            {
+              "type": "UiQualityBadge",
+              "rect": [
+                0,
+                52,
+                62,
+                22
+              ],
+              "children": [
+                {
+                  "type": "Label",
+                  "rect": [
+                    8,
+                    54,
+                    46,
+                    18
+                  ],
+                  "variation": "CaptionXB12",
+                  "text": "★ Good"
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                80,
+                62,
+                14
+              ],
+              "variation": "C9B",
+              "text": "Good"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            74,
+            52,
+            85,
+            42
+          ],
+          "children": [
+            {
+              "type": "UiQualityBadge",
+              "rect": [
+                74,
+                52,
+                85,
+                22
+              ],
+              "children": [
+                {
+                  "type": "Label",
+                  "rect": [
+                    82,
+                    54,
+                    69,
+                    18
+                  ],
+                  "variation": "CaptionXB12",
+                  "text": "★★ Perfect"
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                74,
+                80,
+                85,
+                14
+              ],
+              "variation": "C9B",
+              "text": "Perfect"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
