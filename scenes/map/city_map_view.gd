@@ -40,6 +40,7 @@ const INK := Color("232b30")
 const MUTED := Color("69716e")
 const LIME := Color("cafa91")
 const CONTENT_TOP := 108.0
+const RECENTER_GAP := 12.0   # host_chrome: the recenter key's margin from the edge and over the host's bottom row
 const POI_CACHE_LIMIT := 400
 ## Anti-flicker: packing tests use a dead zone (incumbents keep their slot until
 ## overlap exceeds the margin; newcomers need clearance plus the margin), and a
@@ -82,6 +83,13 @@ var info_address: Label
 var info_art: TextureRect
 var info_action: Button
 var dock: PanelContainer
+## The host draws its own HUD and bottom controls (P0 MAP-1, §10.6.1): the city title, filters, place list and compass,
+## the Map / Farm / Me dock and the zoom buttons give way. The pin card and the recenter key sit above `bottom_inset`
+## (the host's bottom row). Journey leaves it off.
+var host_chrome := false: set = set_host_chrome
+## The pond card's action (Journey "Enter pond"; P0 "Go", §10.6.1 MAP-1).
+var pond_action := "Enter pond"
+var bottom_inset := 0.0: set = set_bottom_inset
 var list_panel: PanelContainer
 var list_rows: VBoxContainer
 var filters: Dictionary = {}
@@ -370,20 +378,41 @@ func _build_list() -> void:
 	scroll.add_child(list_rows)
 	list_panel.hide()
 
+func set_host_chrome(v: bool) -> void:
+	host_chrome = v
+	if dock == null: return
+	for n in [city_button, subtitle, _underline, dock, get_node("MapLandmarkList"), get_node("MapFilters"), get_node("MapNorth"),
+			get_node("MapZoom_plus"), get_node("MapZoom_minus")]:
+		(n as CanvasItem).visible = not v
+	status.position.y = CONTENT_TOP if v else 94.0   # under the host's HUD
+	_layout()
+
+## The lowest y the map's own content uses: the dock's top, or the host's bottom row with host_chrome.
+func content_bottom() -> float:
+	return size.y - bottom_inset if host_chrome else dock.position.y
+
+func set_bottom_inset(v: float) -> void:
+	bottom_inset = v
+	if dock != null: _layout()
+
 func _layout() -> void:
 	if dock == null: return
 	var dock_width := minf(300, size.x)
 	dock.position = Vector2((size.x - dock_width) * 0.5, size.y - 54)
 	dock.size = Vector2(dock_width, 48)
+	# With the host's chrome the bottom edge is the host's row (P0's Bag), not the dock.
+	var floor_y := content_bottom()
 	get_node("MapCredits").position = Vector2(0, size.y - 4)
 	get_node("MapCredits").size = Vector2(size.x, 12)
 	var info_height := maxf(72, info.get_combined_minimum_size().y)
-	info.position = Vector2(0, dock.position.y - 8 - info_height)
+	info.position = Vector2(0, floor_y - 8 - info_height)
 	info.size = Vector2(size.x, info_height)
 	info.clip_contents = true
 	list_panel.position = Vector2(maxf(0, size.x - 212), 44)
 	list_panel.size = Vector2(minf(212, size.x), minf(340, size.y - 180))
-	recenter.position = Vector2(size.x - 44, (info.position.y if info.visible else dock.position.y) - 52)
+	# With the host's chrome: right-aligned over its Bag, 12 apart (不知火舞 on 234: 12 from the edge, 12 above Bag).
+	var edge := RECENTER_GAP if host_chrome else 0.0
+	recenter.position = Vector2(size.x - 44 - edge, (info.position.y if info.visible else floor_y) - 44 - (RECENTER_GAP if host_chrome else 8.0))
 	recenter.size = Vector2(44, 44)
 	for index in 2:
 		var b := get_node("MapZoom_" + ("plus" if index == 0 else "minus")) as Button
@@ -547,7 +576,7 @@ func select(entry: Dictionary) -> void:
 		info_action.icon = GameUi.icon("message-circle")
 	elif entry.kind == "pond":
 		info_category.text = L10n.text(str(SystemPonds.TITLES.get(entry.template_id, "Fishing pond")))
-		info_action.text = L10n.text("Enter pond")
+		info_action.text = L10n.text(pond_action)
 		info_action.icon = GameUi.icon("fish")
 	elif entry.kind == "place":
 		info_category.text = L10n.text(str(entry.get("category", "Place")))
@@ -566,7 +595,7 @@ func select(entry: Dictionary) -> void:
 
 ## 选中其他玩家：底部详情卡与 POI 同款，行动按钮“拜访农场”跳到对方的空间。
 ## 不发 sheet_opened——那个信号会让宿主清空玩家选中，与本卡互斥。
-func select_player(entry: Dictionary, portrait: Texture2D) -> void:
+func select_player(entry: Dictionary, portrait: Texture2D, action := "Visit Farm") -> void:
 	list_panel.hide()
 	if not selected.is_empty() and str(selected.get("id", "")) != str(entry.get("id", "")):
 		_animate_focus(str(selected.get("id", "")), 1.0, 0.14)
@@ -577,7 +606,7 @@ func select_player(entry: Dictionary, portrait: Texture2D) -> void:
 	info_address.text = ""
 	info_address.visible = false
 	info_action.visible = true
-	info_action.text = L10n.text("Visit Farm")
+	info_action.text = L10n.text(action)
 	info_action.icon = GameUi.icon("footprints")
 	info_art.texture = portrait if portrait != null else GameUi.icon("user-round")
 	info_art.modulate = Color.WHITE

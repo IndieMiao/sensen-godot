@@ -27,6 +27,7 @@ func _initial_region_id() -> String:
 
 func _ready() -> void:
 	rt = P0Runtime.ensure()
+	own_farm_name = "Homestead"   # the player's own pin (不知火舞 on 234: My Farm → Homestead)
 	super._ready()
 	rt.attach(self)
 	for child in $HUD/SafeArea/Root.get_children():
@@ -63,6 +64,12 @@ func _enter_farm_home(r: Dictionary) -> void:
 
 func _install_city_map() -> void:
 	super._install_city_map()
+	if city_map:
+		# MAP-1 (§10.6.1; 不知火舞 on 234): P0's two-row HUD and Bag take the map's own chrome — no city title, filters,
+		# place list or compass, no Map / Farm / Me dock, no + / −; the recenter key stays over Bag. Ponds say Go.
+		city_map.host_chrome = true
+		city_map.bottom_inset = UiTokens.SIZE_QUICK_BAR_BOTTOM + UiTokens.SIZE_QUICK_BAR_H
+		city_map.pond_action = "Go"
 	if city_map and not city_map.bundled_ponds:
 		city_map.preload_ponds(SystemPonds.data().locations.filter(func(e): return str(e.region_id) == P0_REGION))
 		_set_outpost_places()
@@ -126,12 +133,37 @@ func _on_presence(result: int, code: int, _h: PackedStringArray, body: PackedByt
 	_online = online
 	_set_outpost_places()
 
-## The city view's bottom bar: Farm opens the homestead; outfit and city switching are not in P0.
+## The city view's own controls: the recenter key brings the camera back to the player without changing the zoom
+## (不知火舞 on 234); outfit and city switching are not in P0 (their buttons are gone with the old chrome).
 func _city_action(action: String) -> void:
 	match action:
+		"recenter": fly_to(home_lat, home_lng)
 		"outfit": rt.ui.toast("Outfits come later")
 		"city": rt.ui.toast("P0 is set in Shanghai")
 		_: super._city_action(action)
+
+## The player's own pin: its card says Go home · Free (MAP-1 §10.6.1); a second tap closes it.
+func _own_pin_pressed() -> void:
+	if city_map == null or farm_markers == null or not farm_markers.points.has("self"): return
+	var open := str(city_map.selected.get("id", "")) == "player:self"
+	_clear_farm_selection()
+	city_map.dismiss_overlays()
+	if open: return
+	var at: Vector2 = farm_markers.points.self.center
+	city_map.select_player({"id": "player:self", "farm_id": "self", "kind": "player", "name": own_farm_name,
+		"lat": at.x, "lng": at.y}, farm_markers.portrait_texture("self"), "Go home · Free")
+
+func _on_city_visit_requested(farm_id: String) -> void:
+	if farm_id == "self":
+		city_map.dismiss_overlays()
+		_open_my_farm()
+	else: super._on_city_visit_requested(farm_id)
+
+## The place chip on the map (MAP-1): back to where the player is (P0Runtime.return_to).
+func p0_return(route: String) -> void:
+	if route.begins_with("pond:"): _on_city_pond_requested({"id": route.trim_prefix("pond:")})
+	elif route.begins_with("outpost:"): _open_outpost(route.trim_prefix("outpost:"))
+	else: _open_my_farm()
 
 func _switch_city(r: Dictionary) -> void:
 	if str(r.get("id", "")) == P0_REGION: super._switch_city(r)

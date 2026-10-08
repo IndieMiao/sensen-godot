@@ -116,6 +116,10 @@ var _header_locked := false
 ## home：定位成功则为真实位置，超时/无定位则回落 START_LAT/LNG。
 ## 自己、近处路人、全部 marker 都相对它摆放——绝不写死经纬度。
 var home_lat := START_LAT
+## The player's own pin label (P0 says Homestead, MAP-1) and the zoom the map lands on at home; hosts may set them
+## before _ready.
+var own_farm_name := "My Farm"
+var home_zoom := 16.0
 var home_lng := START_LNG
 var _home_resolved := false
 ## 当前 home 是否来自超时回落（而非真实定位）。为真时允许下一手真实定位
@@ -768,7 +772,7 @@ func refresh_owned_farm_after_relocation(choice: Dictionary) -> void:
 	_snapshots.clear()
 	_anchor_self_to_farm(bp.overlay.center)
 	if farm_markers:
-		farm_markers.put("self", bp, "My Farm", true)
+		farm_markers.put("self", bp, own_farm_name, true)
 		farm_markers.selected_id = ""
 		if is_instance_valid(farm_markers.miniature):
 			farm_markers.miniature.hide()
@@ -1086,6 +1090,10 @@ func _clamp_to_bounds() -> void:
 		return
 	center_lat = clampf(center_lat, pan_bounds.position.x, pan_bounds.position.x + pan_bounds.size.x)
 	center_lng = clampf(center_lng, pan_bounds.position.y, pan_bounds.position.y + pan_bounds.size.y)
+
+## The player's own pin tapped on the city map: Journey clears the selection; hosts may open a card instead.
+func _own_pin_pressed() -> void:
+	_clear_farm_selection()
 
 func fly_to(lat: float, lng: float) -> void:
 	_teleport(lat, lng)
@@ -1475,14 +1483,14 @@ func _enter_farm_home(r: Dictionary) -> void:
 	$HUD/SafeArea/Root.move_child(farm_markers, 0)
 	farm_markers.focused.connect(func(id):
 		if city_map:
-			if id == "self": _clear_farm_selection()
+			if id == "self": _own_pin_pressed()
 			else: _select_city_player(id)
 		elif id == "self": _focus_own_farm()
 		elif nearby_panel:
 			_set_nearby_open(true)
 			nearby_panel.focus(id))
 	farm_markers.cluster_focused.connect(func(_ids): _camera_dirty = true)
-	if bp: farm_markers.put("self", bp, "My Farm", true)
+	if bp: farm_markers.put("self", bp, own_farm_name, true)
 	farm_overlay = CandidateOverlay.new()
 	farm_overlay.name = "FarmOverlay"
 	farm_overlay.outline_only = true
@@ -1769,7 +1777,7 @@ func _focus_blueprint(bp: FarmBlueprint) -> void:
 	var from_lat := center_lat
 	var from_lng := center_lng
 	# Browsing bounds are independent of placement / relocation bounds.
-	if city_map: _city_bounds(); _set_zoom(16.0)
+	if city_map: _city_bounds(); _set_zoom(home_zoom)
 	else: set_pan_bounds(center.x, center.y, 450)
 	center_lat = from_lat
 	center_lng = from_lng
@@ -1793,7 +1801,7 @@ func _sync_farm_markers() -> void:
 		farm_markers.city_zoom = zoom
 		farm_markers.low_detail = not city_detail_visible()
 		if not farm_markers.projector.is_valid(): farm_markers.projector = geo_to_screen
-		bottom = city_map.info.position.y - 8 if city_map.info.visible else city_map.dock.position.y - 8
+		bottom = city_map.info.position.y - 8 if city_map.info.visible else city_map.content_bottom() - 8
 		if nearby_panel and nearby_panel.visible: bottom = minf(bottom, nearby_panel.position.y - 8)
 	var marker_top := CityMapView.CONTENT_TOP if city_map else 110.0
 	farm_markers.sync(cam, anchor_lat, anchor_lng, Rect2(0, marker_top, root.size.x, maxf(0, bottom - marker_top)))
@@ -2162,7 +2170,7 @@ func _land_on_own_farm() -> void:
 	var farm_center: Vector2 = bp.overlay.center
 	center_lat = farm_center.x
 	center_lng = farm_center.y
-	_set_zoom(16.0)
+	_set_zoom(home_zoom)
 	_camera_dirty = true
 
 ## 城市面板/城市气泡：飞到该城总览。
