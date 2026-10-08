@@ -256,6 +256,15 @@ func set_drop_target(index: int) -> void:
 	_target = t
 	_refresh()
 
+## A first-time item just reached the bar (§10.3.3 ④, §14.2): its slot rings once in color/new (UiItemCell.flash).
+## Call after `slots` is set; an id not on the bar, or a folded bar, is ignored.
+func flash(id: String) -> void:
+	if collapsed or bag_only or id == "": return
+	for i in mini(slots.size(), SLOTS):
+		if str(slot(i).get("id", "")) == id:
+			_cells[i].flash()
+			return
+
 ## The drop zones while a slot is lifted: [Pin / Unpin, Remove], or [] otherwise.
 func drop_zones() -> Array[UiBarDropZone]:
 	var out: Array[UiBarDropZone] = []

@@ -413,3 +413,19 @@ func test_set_drop_target_lights_a_slot_even_an_empty_one() -> void:
 	bar.set_drop_target(-1)
 	assert_int(cells[1].state).is_equal(UiItemCell.State.DEFAULT)
 
+func test_flash_rings_the_slot_of_a_new_item_once() -> void:
+	# QuickSlot State=new 1663:101150 (§10.3.3 ④): color/new ring in then out over 600 ms; unknown ids are ignored.
+	var cells := bar.cells()
+	bar.flash("seed_none")
+	bar.flash("seed_carrot")
+	await get_tree().create_timer(0.2).timeout
+	assert_bool(cells[1].is_flashing()).is_true()
+	assert_bool(cells[0].is_flashing()).is_false()
+	await get_tree().create_timer(0.6).timeout
+	assert_bool(cells[1].is_flashing()).is_false()
+	assert_vector(cells[1].size).is_equal(Vector2(UiTokens.SIZE_QUICK_SLOT_W, UiTokens.SIZE_QUICK_SLOT_H))   # no size change
+	bar.collapsed = true
+	bar.flash("seed_carrot")
+	await get_tree().create_timer(0.2).timeout
+	assert_bool(cells[1].is_flashing()).is_false()
+

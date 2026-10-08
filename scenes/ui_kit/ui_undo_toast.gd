@@ -43,7 +43,10 @@ func _init(text_ := "") -> void:
 	var actions := MarginContainer.new()
 	actions.add_theme_constant_override(&"margin_left", int(UiTokens.SIZE_TOAST_ICON + _ICON_GAP))
 	col.add_child(actions)
-	_undo = UiKit.label("Undo", UiTokens.STYLE_C12_XB, UiTokens.COLOR_INFO)
+	_undo = _HitLabel.new()   # UiKit.label's styling, with a 44 px touch target
+	_undo.text = "Undo"
+	_undo.theme_type_variation = UiTokens.STYLE_C12_XB
+	_undo.add_theme_color_override(&"font_color", UiTokens.COLOR_INFO)
 	_undo.mouse_filter = Control.MOUSE_FILTER_STOP
 	_undo.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	_undo.gui_input.connect(func(e: InputEvent):
@@ -64,3 +67,11 @@ func _process(delta: float) -> void:
 	if not visible: return
 	_left -= delta
 	if _left <= 0.0: hide()
+
+## The Undo text is about 30 × 16; its touch target grows to SIZE_TOUCH (44) around it without moving the layout
+## (刘邦 on #38).
+class _HitLabel extends Label:
+	func _has_point(point: Vector2) -> bool:
+		var grow := Vector2(maxf(0.0, (UiTokens.SIZE_TOUCH - size.x) * 0.5), maxf(0.0, (UiTokens.SIZE_TOUCH - size.y) * 0.5))
+		return Rect2(-grow, size + grow * 2.0).has_point(point)
+

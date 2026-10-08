@@ -32,7 +32,8 @@ static func all() -> Array[Dictionary]:
 		{id = "pin_menu", title = "UiPinMenu", figma = "PinMenu 1141:80291 · LOCK-05", build = _pin_menus},
 		{id = "scene_action", title = "UiSceneAction", figma = "SceneAction 1116:78934 · LOCK-02", build = _scene_actions},
 		{id = "action_key", title = "UiActionKey", figma = "ActionKey 1117:78924 · LOCK-02 / 03", build = _action_keys},
-		{id = "bar_drop_zone", title = "UiBarDropZone · UiUndoToast", figma = "BarDropZone 1588:97952 · Toast Tone=Info 1178:82247 · LOCK-04 / 05 v1.11 (221 b0a83924)", build = _bar_drop_zones},
+		{id = "bar_drop_zone", title = "UiBarDropZone", figma = "BarDropZone 1588:97952 · LOCK-04 / 05 v1.11 (221 b0a83924)", build = _bar_drop_zones},
+		{id = "bar_drag", title = "Quick slot drag · UiUndoToast", figma = "QuickSlot State=lifted · Toast Tone=Info 1178:82247 · LOCK-04 v1.11", build = _bar_drags},
 		{id = "action_radial", title = "UiActionRadial", figma = "RadialPetal 1122:79385 · BAR-2 482:23 · LOCK-03", build = _action_radial},
 		{id = "status_badge", title = "UiStatusBadge", figma = "StatusBadge 1132:79554 · LOCK-11", build = _status_badges},
 		{id = "tap_card", title = "UiTapCard", figma = "TapCard 1135:101133 · LOCK-07", build = _tap_cards},
@@ -279,6 +280,12 @@ static func _cells_quick() -> Control:
 		fields.merge(sample[1], true)
 		row.add_child(_captioned(_cell(D, fields), sample[0]))
 	row.add_child(_captioned(_cell(D, {icon = _tex("compost"), title = "Compost", quantity = "×6"}), "one-line name"))
+	for sample in [["new (ring at peak)", {}], ["new + selected", {state = S.SELECTED}]]:
+		var fields: Dictionary = {icon = _tex("seed_lettuce"), title = "Lettuce Seeds", quantity = "×10"}
+		fields.merge(sample[1], true)
+		var c: UiItemCell = _cell(D, fields)
+		c.show_new_ring()   # State=new 1663:101150: the 600 ms ring, held at its peak for the shot
+		row.add_child(_captioned(c, sample[0]))
 	return row
 
 static func _cells_kitchen() -> Control:
@@ -524,6 +531,11 @@ static func _bar_drop_zones() -> Control:
 			row.add_child(z)
 			z.center = Vector2(z_spec[2], 42)
 		v.add_child(_captioned(row, spec[spec.size() - 1]))
+	return v
+
+## The drag itself, in its own section so each shot fits the 1280 px gallery screen (不知火舞 on #38).
+static func _bar_drags() -> Control:
+	var v := _column(UiTokens.SPACE_SECTION)
 	var lifted := _row(UiTokens.SPACE_SECTION)
 	lifted.add_child(_captioned(_lifted_slot(false), "drag: 24 above finger"))
 	lifted.add_child(_captioned(_lifted_slot(true), "over a zone: 80 %"))

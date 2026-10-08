@@ -105,6 +105,16 @@ func test_pins_and_removals_persist_per_action() -> void:
 	assert_bool(again._bar.slots[0].pinned).is_true()
 	assert_array(again._quick_for("fish").pins).is_empty()   # each action keeps its own (LOCK-05)
 
+func test_the_undo_action_takes_a_44_px_touch() -> void:
+	# 刘邦 on #38: the Undo text is about 30 × 16; its touch target is SIZE_TOUCH tall around it.
+	var t := UiUndoToast.new("Radish Seeds off the bar")
+	add_child(auto_free(t))
+	await await_idle_frame()
+	var u := t.undo_label()
+	assert_float(u.size.y).is_less(UiTokens.SIZE_TOUCH)
+	assert_bool(u._has_point(Vector2(u.size.x * 0.5, u.size.y * 0.5 + UiTokens.SIZE_TOUCH * 0.5 - 2))).is_true()
+	assert_bool(u._has_point(Vector2(u.size.x * 0.5, -UiTokens.SIZE_TOUCH * 0.5))).is_false()
+
 func test_removing_a_slot_offers_undo_which_restores_place_and_pin() -> void:
 	ui.set_view(_view())
 	ui._on_pin_toggled("seed_radish", true)
