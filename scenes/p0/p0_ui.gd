@@ -1596,6 +1596,9 @@ static func show_label(go: String, here: String, camera_here: bool) -> String:
 	# The homestead is one space: on the farm or in the farmhouse a farm target is Show (the runtime steps out of the
 	# farmhouse first); anywhere else it is Show on map (亚瑟 on #37: the farmhouse used to send it to the map).
 	if go in HOME_TARGETS and here in ["home", "farm"]: return "Show" if camera_here else ""
+	# On the map every target is a pin: Show flies there (p0_map.p0_show_spot); Browse the map has nothing to do
+	# (蒙恬 on #44: Show on map used to close Today and do nothing there).
+	if here == "map": return "" if go == "map" else "Show"
 	return "Show on map"
 
 ## Where the player is for Show and the bag: the runtime's space; without one (tests, the gallery) the surface says

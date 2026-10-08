@@ -69,3 +69,20 @@ func test_the_tackle_shop_keeps_its_own_entry() -> void:
 	var shop := P0Outposts.by_role("tackle")
 	_at(float(shop.lat), float(shop.lng))
 	assert_str(str(map.get("city_map").selected.get("id", ""))).is_equal(str(shop.id))
+
+## On the map itself (蒙恬 on #44): a panel's Show flies to the pin at once; a homestead target is the homestead.
+func test_show_from_a_panel_on_the_map_flies_at_once() -> void:
+	assert_str(P0Ui.show_label("pond:pond_shanghai_05", "map", false)).is_equal("Show")
+	assert_str(P0Ui.show_label("stove", "map", false)).is_equal("Show")
+	assert_str(P0Ui.show_label("map", "map", false)).is_equal("")
+	map.call("p0_show_spot", "outpost:post")
+	var post := P0Outposts.by_role("post")
+	_at(float(post.lat), float(post.lng))
+	map.call("p0_show_spot", "stove")
+	_at(float(map.get("home_lat")), float(map.get("home_lng")))
+	var rt: P0Runtime = map.get("rt")
+	rt.attach(map)
+	rt.ui.show_on_map.emit("outpost:tea")   # a NeedSource / Energy tile on the map: no trip through after_leave
+	var tea := P0Outposts.by_role("tea")
+	_at(float(tea.lat), float(tea.lng))
+	assert_str(rt.after_leave).is_equal("")

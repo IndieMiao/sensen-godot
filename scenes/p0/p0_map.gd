@@ -178,6 +178,11 @@ func show_place(target: String) -> void:
 	_camera_dirty = true
 	if target != "home": city_map.select(entry)
 
+## Show from a panel opened on the map (Today, the Energy card, a NeedSource): every target is a pin here; a homestead
+## target (plots, stall, stove …) is the homestead's.
+func p0_show_spot(where: String) -> void:
+	show_place(P0Ui.map_target(where))
+
 ## The pin a Show on map target points at ({lat, lng} plus the city-map entry for outposts and ponds), or {}.
 func place_for(target: String) -> Dictionary:
 	if target == "home": return {"lat": home_lat, "lng": home_lng}
