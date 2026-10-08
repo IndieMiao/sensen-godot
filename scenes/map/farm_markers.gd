@@ -259,7 +259,7 @@ func sync(cam: Camera3D, lat: float, lng: float, visible_area: Rect2) -> void:
 			ids.push_front(priority)
 	var projected := {}
 	for id in ids:
-		var ll: Vector2 = points[id].center
+		var ll: Vector2 = anchor_of(id)
 		var world := MapGeoMath.geo_to_world(ll.x, ll.y, lat, lng)
 		var p := cam.unproject_position(world) - global_position
 		if not cam.is_position_behind(world) and visible_area.has_point(p):
@@ -353,10 +353,15 @@ func _sync_city(cam: Camera3D, lat: float, lng: float) -> void:
 	var shown_now: Dictionary = {}
 	var anchors: Dictionary = {}
 	for id in ids:
-		var ll: Vector2 = points[id].center
+		var ll: Vector2 = anchor_of(id)
 		var world := MapGeoMath.geo_to_world(ll.x, ll.y, lat, lng)
 		var projected = projector.call(ll.x, ll.y) if projector.is_valid() else (null if cam.is_position_behind(world) else cam.unproject_position(world))
 		var anchor: Vector2 = (projected as Vector2) - global_position if projected != null else Vector2(-1e6, -1e6)
+		if projected != null and anchor_shift.has(id):
+			anchor += anchor_shift[id]
+			var ground = Plane(Vector3.UP, 0).intersects_ray(cam.project_ray_origin(anchor + global_position),
+				cam.project_ray_normal(anchor + global_position))
+			if ground is Vector3: world = ground
 		world_positions[id] = world
 		anchors[id] = anchor
 		var target: Button = _avatar_targets[id]
@@ -406,7 +411,7 @@ func _sync_city(cam: Camera3D, lat: float, lng: float) -> void:
 		_set_pin_shown(id, placed)
 		# 国家级：自己只留头像，名牌会压在城市气泡上。
 		if low_detail and id == "self": label.visible = false
-		if id == "self" and self_label_yields: label.visible = false   # under an outpost label (C30)
+		if id == "self" and (self_label_yields or self_label_off): label.visible = false   # under an outpost label (C30)
 	for id in visible_farm_ids:
 		var entry: Dictionary = points[id]
 		var owner := str(entry.owner_name) if str(entry.avatar_ref).is_empty() else SeededOutfit.short_name(str(entry.avatar_ref))
@@ -422,6 +427,18 @@ func _sync_city(cam: Camera3D, lat: float, lng: float) -> void:
 		move_child(_avatar_targets[selected_id], -1)
 		move_child(_buttons[selected_id], -1)
 	queue_redraw()
+
+## Where a pin stands when not on its farm (P0 MAP-1: the player's own avatar stands where the player is): id →
+## Vector2(lat, lng). Hosts set it; Journey leaves it empty.
+var anchor_override := {}
+## A screen shift (px) of a pin's anchor after projection: id → Vector2 (P0 MAP-1: away from home the avatar stands
+## beside the pin of the place it is at, not over it). world_positions follow it, and so does the 3D actor.
+var anchor_shift := {}
+## The player's own name label is off (P0: away from home the avatar is not the homestead's mark, its pin is).
+var self_label_off := false
+
+func anchor_of(id: String) -> Vector2:
+	return anchor_override.get(id, points[id].center)
 
 ## The player's own label has given way to an outpost label (CityMapView._yield_own_label): it stays hidden until
 ## they part.
@@ -439,15 +456,20 @@ static func self_footprint(zoom: float) -> Rect2:
 ## The player's own name label as drawn (local space) while their pin is shown in the city; an empty rect otherwise.
 ## The label is scaled about its pivot by the zoom boost (1.3 at z11): the whole drawn rect counts (不知火舞 on #83).
 func self_label_rect() -> Rect2:
-	if not city_mode or low_detail or not visible_farm_ids.has("self") or not _buttons.has("self"): return Rect2()
+	if not city_mode or low_detail or self_label_off or not visible_farm_ids.has("self") or not _buttons.has("self"): return Rect2()
 	var label: Button = _buttons["self"]
-	var s := maxf(label.scale.x, _pin_zoom_boost())   # never less than the steady boost, even mid-pop
-	return Rect2(label.position + label.pivot_offset * (1.0 - s), label.size * s)
+	# As drawn and never less than at rest, even mid-pop: the pivot sits 6 px over the label, so an overshooting pop
+	# draws it lower than the steady boost does — the union of both.
+	var b := _pin_zoom_boost()
+	var s := label.scale.x
+	return Rect2(label.position + label.pivot_offset * (1.0 - b), label.size * b).merge(
+		Rect2(label.position + label.pivot_offset * (1.0 - s), label.size * s))
 
 func yield_self_label(on: bool) -> void:
 	self_label_yields = on
 	if _buttons.has("self") and _avatar_targets.has("self"):
-		(_buttons["self"] as Button).visible = (_avatar_targets["self"] as Control).visible and not low_detail and not on
+		(_buttons["self"] as Button).visible = (_avatar_targets["self"] as Control).visible and not low_detail and not on \
+			and not self_label_off
 
 ## City-mode screen footprints of players (local space): the city POI layer
 ## packs its markers around people so artwork never buries an avatar's pin.

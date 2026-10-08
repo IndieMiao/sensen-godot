@@ -2,12 +2,12 @@ class_name UiEntryCard
 extends Control
 ## EntryCard 1468:94344 (SGODOT-231, LOCK-21 / §13.3.1): the small card over the mine gate while the player is near
 ## it, beside the main action key. It carries only the choice the key can't: `New run · 2 Energy` with its consequence
-## under it (`Current run will end · Runs today 1/2`). The whole card is the button (`pressed`, a real tap only, as
-## TapCard: TAP_SLOP / TAP_MAX_MS). Unavailable = the reason on the action line in secondary, no caption, and it still
-## takes the tap so its owner can toast the reason (LOCK-10, 不知火舞 on 231). Placement as TapCard: WorldAnchor puts
-## the pointer tip on the gate; point_at() keeps the pointer on it near the screen edges (the main's Pointer=Right).
-## `passive` cards take no touches, as TapCard on the P0 scene (苏烈 on #45): the scene layer under them sees the
-## press, so the joystick can start on the card, and the owner resolves a real tap on hit_rect() itself.
+## under it (`Current run will end · Runs today 1/2`). The whole card is the button (`pressed`, a real tap only:
+## GestureArbiter TAP_SLOP / TAP_MAX_MS). Unavailable = the reason on the action line in secondary, no caption, and it
+## still takes the tap so its owner can toast the reason (LOCK-10, 不知火舞 on 231). Placement: WorldAnchor puts the
+## pointer tip on the gate; point_at() keeps the pointer on it near the screen edges (the main's Pointer=Right).
+## `passive` cards take no touches on the P0 scene (苏烈 on #45): the scene layer under them sees the press, so the
+## joystick can start on the card, and the owner resolves a real tap on hit_rect() itself.
 
 signal pressed
 
@@ -122,7 +122,7 @@ func _layout() -> void:
 	_aim_pointer()
 	update_minimum_size()
 
-## One event family only, as TapCard (mouse buttons; raw touches only without touchscreen emulation).
+## One event family only (mouse buttons; raw touches only without touchscreen emulation).
 func _on_input(e: InputEvent) -> void:
 	var is_mouse: bool = e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT
 	var is_touch: bool = e is InputEventScreenTouch and not DisplayServer.is_touchscreen_available()

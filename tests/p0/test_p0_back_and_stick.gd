@@ -75,8 +75,9 @@ func test_switching_worlds_stops_the_one_left_behind() -> void:
 	rt.detach(house)
 	assert_vector(house.sticks.back()).is_equal(Vector2.ZERO)
 
-func test_finger_cards_stay_below_the_hud_and_above_the_bar() -> void:
-	# int5 hand test 8: a card dragged under the HUD lost its tap to the Energy chip.
+func test_world_prompts_show_only_between_the_hud_and_the_bar() -> void:
+	# int5 hand test 8: a finger card dragged under the HUD lost its tap to the Energy chip. The world prompts that
+	# replaced it (SGODOT-250) hide outside the band instead, so neither the HUD nor the bar loses a tap to them.
 	var ui := _ui()
 	await await_idle_frame()
 	ui.set_mode("farm")
@@ -84,12 +85,13 @@ func test_finger_cards_stay_below_the_hud_and_above_the_bar() -> void:
 	ui.set_view(_view())
 	await await_idle_frame()
 	assert_bool(ui.hud.visible).is_true()
-	ui.tag("homestead", "Homestead Lv1 · Tap to upgrade", Vector2(60, 30), true, Vector2(60, 40))
-	var c: UiTapCard = ui._cards["homestead"]
-	assert_float(c.position.y).is_greater_equal(float(UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H))
-	ui.tag("stall", "Tap to shop", Vector2(200, ui._kit.size.y - 10), true)
-	var s: UiTapCard = ui._cards["stall"]
-	assert_float(s.position.y + s.size.y).is_less_equal(ui._bar.position.y)
+	var icon := P0Logic.icon("level_up")
+	ui.world_icon("sign", icon, Vector2(60, 30), true)
+	assert_bool(ui._icons["sign"].visible).is_false()                        # under the HUD
+	ui.world_icon("stall", icon, Vector2(200, ui._kit.size.y - 10), true)
+	assert_bool(ui._icons["stall"].visible).is_false()                       # over the bar
+	ui.world_icon("stall", icon, Vector2(200, ui._bar.position.y - 60), true)
+	assert_bool(ui._icons["stall"].visible).is_true()                        # between them
 
 func test_a_root_world_leaves_for_the_map_once_nothing_is_left_to_close() -> void:
 	# int5b hand test 2: booted into the farm (no map under it), Back closed the Inbox and then did nothing,

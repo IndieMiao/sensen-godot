@@ -11,6 +11,9 @@ const OVERVIEW := Vector2(31.228, 121.478)   # assets/map/cities/shanghai.json o
 
 func before_test() -> void:
 	Net.use_transport(FakeTransport.new([]).callable())
+	# The player starts at home: a pond or outpost world attached by another suite leaves P0Runtime.here there, and
+	# away from home the avatar stands at that place (SGODOT-234 A2).
+	P0Runtime.ensure().here = {"space": "home", "place": ""}
 
 func _map() -> Node:
 	var viewport := SubViewport.new()
@@ -98,11 +101,19 @@ func test_a_tap_on_an_outpost_over_the_avatar_opens_the_outpost() -> void:
 	assert_str(str(city.selected.get("id", ""))).is_equal("sh_tea_1")
 	assert_bool(city.activate_place_at(Vector2(4, 4))).is_false()   # nowhere near an outpost
 
-func _labels(m: Node) -> Dictionary:   # outpost id -> its label, for the outposts on screen
+func _labels(m: Node) -> Dictionary:   # outpost id -> its pin (MapDestination: its name under the disc), on screen
 	var out := {}
 	for mk in (m.city_map as CityMapView).displayed:
-		if mk.entry.kind == "place": out[str(mk.entry.id)] = mk.label
+		if mk.entry.kind == "place": out[str(mk.entry.id)] = mk.get("dest", mk.label)
 	return out
+
+static func _dest_label_rect(marker: Dictionary) -> Rect2:   # a MapDestination's name, in the city view
+	var pin: UiMapDestination = marker.dest
+	var box: Control = pin._label_box
+	return Rect2((marker.anchor as Vector2) + pin.position + box.position, box.size)
+
+static func _shown(pin: Control) -> bool:   # whether the pin says its name
+	return (pin as UiMapDestination).name_shown if pin is UiMapDestination else pin.visible
 
 ## 不知火舞 on C30: outpost labels never overlap; the one nearest home keeps its label, the others fold only their
 ## label (the pin stays) and come back once zooming in parts them.
@@ -128,9 +139,9 @@ func test_outpost_labels_never_overlap_and_the_nearest_home_keeps_its_label() ->
 		for i in rects.size():
 			for j in range(i + 1, rects.size()):
 				assert_bool((rects[i] as Rect2).intersects(rects[j])).append_failure_message("zoom %s" % zoom).is_false()
-		assert_int(rects.size()).is_equal(labels.values().filter(func(l): return (l as Label).visible).size())
-		assert_bool((labels[str(by_home[0].id)] as Label).visible).append_failure_message("zoom %s" % zoom).is_true()
-		shown_at[zoom] = ["sh_tea_1", "sh_market_1", "sh_tackle_1"].filter(func(id): return (labels[id] as Label).visible).size()
+		assert_int(rects.size()).is_equal(labels.values().filter(func(l): return _shown(l)).size())
+		assert_bool(_shown(labels[str(by_home[0].id)])).append_failure_message("zoom %s" % zoom).is_true()
+		shown_at[zoom] = ["sh_tea_1", "sh_market_1", "sh_tackle_1"].filter(func(id): return _shown(labels[id])).size()
 	# Zooming in parts them: the three by home get their names back.
 	assert_int(int(shown_at[15.0])).is_greater(int(shown_at[12.2]))
 	rt.session.view = saved
@@ -143,35 +154,36 @@ func test_an_outpost_label_is_whole_and_shows_when_selected() -> void:
 	var city: CityMapView = m.city_map
 	city.set_places(P0Outposts.all().map(func(o): return P0Outposts.place_entry(o, 3 if str(o.role) == "tea" else 0)))
 	_look(m, Vector2(m.home_lat, m.home_lng), 14.0, 0.0)
-	var tea: Label = _labels(m)["sh_tea_1"]
+	var tea: UiMapDestination = _labels(m)["sh_tea_1"]
 	assert_str(tea.text).is_equal("Lotus Tea House · 3 online")
-	assert_int(tea.text_overrun_behavior).is_equal(TextServer.OVERRUN_NO_TRIMMING)
-	var font := tea.get_theme_font("font")
-	assert_float(tea.size.x).is_greater_equal(font.get_string_size(tea.text, HORIZONTAL_ALIGNMENT_LEFT, -1, 9).x)
+	assert_float(tea.label_size().x).is_greater_equal(UiMapDestination.label_size_for(tea.text).x)   # the whole name
 	assert_str(_labels(m)["sh_market_1"].text).is_equal("Xuhui Market Square")
 	# Selected, a folded label comes back (the city overview folds all but one by home).
 	_look(m, Vector2(m.home_lat, m.home_lng), 12.2, 0.0)
-	var folded: Array = _labels(m).keys().filter(func(id): return not (_labels(m)[id] as Label).visible)
+	var folded: Array = _labels(m).keys().filter(func(id): return not _shown(_labels(m)[id]))
 	assert_bool(folded.is_empty()).is_false()
 	city.selected = city.entries.filter(func(e): return str(e.id) == str(folded[0]))[0]
 	_look(m, Vector2(m.home_lat, m.home_lng), 12.2, 0.0)
-	assert_bool((_labels(m)[str(folded[0])] as Label).visible).is_true()
+	assert_bool(_shown(_labels(m)[str(folded[0])])).is_true()
 	city.selected = {}
 
-## 不知火舞 on C30: outpost pins draw in front of the player's own 3D avatar (no depth test), under a selected pin.
+## 不知火舞 on C30 / 234: outpost and pond pins draw in front of the player's own 3D avatar — MapDestination is 2D over
+## the map — with a selected pin in front of the others.
 func test_outpost_pins_draw_over_the_avatar() -> void:
 	var m := _map()
 	for i in 3: await get_tree().process_frame
 	m.set_process(false)
 	_look(m, Vector2(m.home_lat, m.home_lng), 12.2, 0.0)
 	var city: CityMapView = m.city_map
-	var tea: Sprite3D = city.markers["sh_tea_1"].sprite
-	assert_bool(tea.no_depth_test).is_true()
-	assert_int(tea.render_priority).is_equal(CityMapView.PLACE_PRIORITY)
+	var tea: Dictionary = city.markers["sh_tea_1"]
+	assert_bool(tea.has("sprite")).is_false()
+	assert_object(tea.dest).is_instanceof(UiMapDestination)
+	assert_bool((tea.node as Node).is_ancestor_of(tea.dest)).is_true()
 	city._set_marker_front("sh_tea_1", true)
-	assert_int(tea.render_priority).is_equal(2)
+	var top := 0
+	for mk in city.markers.values(): top = maxi(top, (mk.node as Node).get_index())
+	assert_int((tea.node as Node).get_index()).is_equal(top)   # in front of the other pins
 	city._set_marker_front("sh_tea_1", false)
-	assert_int(tea.render_priority).is_equal(CityMapView.PLACE_PRIORITY)
 
 ## 不知火舞 on C30: My Farm's label gives way to an outpost label it touches; it is back when they part.
 func test_my_farm_label_gives_way_to_an_outpost_label() -> void:
@@ -187,7 +199,7 @@ func test_my_farm_label_gives_way_to_an_outpost_label() -> void:
 	here.merge({"id": "test_here", "lat": home.x, "lng": home.y}, true)
 	city.set_places(outposts + [here])
 	_look(m, home, 15.0, 0.0)
-	assert_bool((_labels(m)["test_here"] as Label).visible).is_true()
+	assert_bool(_shown(_labels(m)["test_here"])).is_true()
 	assert_bool(fm.self_label_yields).is_true()
 	assert_bool(fm._buttons["self"].visible).is_false()
 	fm.sync(m.cam, m.anchor_lat, m.anchor_lng, Rect2(0, 0, 360, 800))   # the next frame's sync keeps it down
@@ -222,15 +234,12 @@ func test_the_beginner_pond_shows_at_the_city_level_until_pond_catch_is_handed_i
 	for at in [OVERVIEW, Vector2(m.home_lat, m.home_lng)]:
 		assert_array(_look(m, at, 12.2, 18.0 if at == OVERVIEW else 0.0)).append_failure_message(str(at)) \
 			.contains([NEAREST_POND, "sh_tackle_1"])
-	var reed: Sprite3D = city.markers[NEAREST_POND].sprite
-	assert_bool(reed.no_depth_test).is_true()
-	assert_int(reed.render_priority).is_equal(CityMapView.PLACE_PRIORITY)
-	# Its label is written whole while it wears the marker: the first session finds its way by it.
-	var name: Label = city.markers[NEAREST_POND].label
-	assert_bool(name.visible).is_true()
-	assert_str(name.text).is_equal(city._label_text(city.markers[NEAREST_POND].entry))
-	assert_int(name.text_overrun_behavior).is_equal(TextServer.OVERRUN_NO_TRIMMING)
-	assert_float(name.size.x).is_greater_equal(name.get_theme_font("font").get_string_size(name.text, HORIZONTAL_ALIGNMENT_LEFT, -1, 9).x)
+	# A MapDestination (SGODOT-234 A2): 2D over the map, so over the player's avatar.
+	var reed: UiMapDestination = city.markers[NEAREST_POND].dest
+	# Its name is written whole: the first session finds its way by it.
+	assert_bool(reed.name_shown).is_true()
+	assert_str(reed.text).is_equal(city._label_text(city.markers[NEAREST_POND].entry))
+	assert_float(reed.label_size().x).is_greater_equal(UiMapDestination.label_size_for(reed.text).x)
 	# My Farm's label never sits on it, measured as drawn — scaled about its pivot by the zoom boost (1.21 at z12.2), the
 	# 5 px 不知火舞 saw past its unscaled rect on the overview. Both shots: the overview and home at z12.2.
 	for at in [OVERVIEW, Vector2(m.home_lat, m.home_lng)]:
@@ -242,15 +251,16 @@ func test_the_beginner_pond_shows_at_the_city_level_until_pond_catch_is_handed_i
 		var own: Rect2 = fm.self_label_rect()
 		assert_bool(own.encloses(steady)).is_true()
 		own.position += fm.global_position - city.global_position
-		var reed_label := Rect2(name.position + city.markers[NEAREST_POND].anchor, name.size)
+		var reed_label := _dest_label_rect(city.markers[NEAREST_POND])
 		assert_bool(label.visible and own.intersects(reed_label)).append_failure_message(str(at)).is_false()
 	# Both fish in the bag (the target is now the stall), or handed in: no marker, a pond like any other.
 	for gone in [_board(2), _board(-1)]:
 		rt.session.view = gone
 		assert_dict(m.city_pin_markers()).is_empty()
 		assert_array(_look(m, OVERVIEW, 12.2)).not_contains([NEAREST_POND])   # 200 m from the Tackle Shop: it gives way
-		assert_bool(city._over_avatar(city.markers[NEAREST_POND].entry)).is_false()   # drawn like any pond when it shows again
-		assert_bool(city._whole_label(city.markers[NEAREST_POND].entry)).is_false()   # and its label cut like any pond's
+		# Drawn like any pond when it shows again: a MapDestination over the avatar, its name whole (LOCK-24).
+		assert_bool(city._over_avatar(city.markers[NEAREST_POND].entry)).is_true()
+		assert_bool(city._whole_label(city.markers[NEAREST_POND].entry)).is_true()
 	rt.session.view = saved
 
 ## Once the server sends map_markers (蒙恬, SGODOT-232 U6), the pins pack by them, not by the client's tutorial mark.
@@ -325,3 +335,87 @@ func test_back_on_the_fish_list_goes_back_to_the_pond_card() -> void:
 static func _drain_shore() -> void:
 	for key in WaterShore._pending.keys(): WorkerThreadPool.wait_for_task_completion(WaterShore._pending[key])
 	WaterShore._pending.clear()
+
+## MapDestination 1795:103793 (不知火舞 on 234): outposts by role — tea pot, tackle rod, market board, post travel —,
+## ponds, and the Homestead pin with its name on a plate; landmarks and POIs keep the city view's own pins.
+func test_destination_pins_wear_their_icons() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var icons := {"tea": "pot", "tackle": "rod", "market": "board", "post": "travel"}
+	for role in icons:
+		var style: Dictionary = m._destination_style(P0Outposts.place_entry(P0Outposts.by_role(role)))
+		assert_object(style.icon).append_failure_message(role).is_same(P0Logic.icon(icons[role]))
+		assert_bool(bool(style.get("plate", false))).is_false()
+	assert_object(m._destination_style({"kind": "pond", "id": NEAREST_POND}).icon).is_same(P0Logic.icon("pond"))
+	var home: Dictionary = m._destination_style(m.home_entry())
+	assert_object(home.icon).is_same(P0Logic.icon("home"))
+	assert_bool(bool(home.plate)).is_true()
+	assert_dict(m._destination_style({"kind": "landmark", "id": "x"})).is_empty()
+	assert_dict(m._destination_style({"kind": "poi", "id": "x"})).is_empty()
+
+## Figma 1802:118612: a selected MapDestination keeps its size (no jelly); Today's Show pulse scales only its disc.
+func test_a_selected_destination_keeps_its_size_and_a_pulse_scales_its_disc() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	_look(m, Vector2(m.home_lat, m.home_lng), 14.0, 0.0)
+	var city: CityMapView = m.city_map
+	var tea: Dictionary = city.markers["sh_tea_1"]
+	if tea.get("pop_tween") is Tween: (tea.pop_tween as Tween).kill()
+	tea.pop = 1.0   # settled in (it may still be popping in)
+	tea.focus = CityMapView.FOCUS_SCALE
+	city.selected = tea.entry
+	city._apply_marker_scale(tea)
+	assert_float((tea.node as Control).scale.x).is_equal_approx(1.0, 1e-6)
+	assert_float((tea.dest as UiMapDestination).focus).is_equal_approx(1.0, 1e-6)
+	city.selected = {}
+	tea.focus = 1.18
+	city._apply_marker_scale(tea)
+	assert_float((tea.dest as UiMapDestination).focus).is_equal_approx(1.18, 1e-6)
+	assert_float((tea.node as Control).scale.x).is_equal_approx(1.0, 1e-6)   # the name keeps its size
+	tea.focus = 1.0
+	city._apply_marker_scale(tea)
+
+## A selected pin's name stays over its neighbours' discs, pins packed after it was selected included.
+func test_the_selected_pin_draws_over_pins_made_after_it() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var city: CityMapView = m.city_map
+	city.selected = city.entries.filter(func(e): return str(e.get("id", "")) == "sh_market_1")[0]
+	_look(m, Vector2(m.home_lat, m.home_lng), 15.5, 0.0)   # closer: more pins come in, after the selection
+	var top := 0
+	for mk in city.markers.values(): top = maxi(top, (mk.node as Node).get_index())
+	assert_int((city.markers["sh_market_1"].node as Node).get_index()).is_equal(top)
+	city.selected = {}
+
+## 不知火舞 on 234 A2: the selected pin's name always shows and the names it touches fold — a marked pin's too — until
+## the card closes; every pin stays.
+func test_a_selected_name_folds_the_names_it_touches() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved: Dictionary = rt.session.view
+	rt.session.view = _board(0)   # Reed Pond wears the !
+	var city: CityMapView = m.city_map
+	var reed := SystemPonds.location(NEAREST_POND)
+	var at := Vector2(float(reed.lat), float(reed.lng))
+	var home: Dictionary = m.home_entry().merged({"lat": at.x - 0.0002, "lng": at.y}, true)   # 22 m south of it
+	city.set_places(P0Outposts.all().map(func(o): return P0Outposts.place_entry(o)) + [home])
+	_look(m, at, 15.0, 0.0)
+	var reed_pin: UiMapDestination = city.markers[NEAREST_POND].dest
+	var home_pin: UiMapDestination = city.markers["home"].dest
+	assert_bool(reed_pin.name_shown).is_true()    # nothing selected: the marked pin packs first
+	assert_bool(home_pin.name_shown).is_false()
+	city.selected = city.entries.filter(func(e): return str(e.get("id", "")) == "home")[0]
+	_look(m, at, 15.0, 0.0)
+	assert_bool(home_pin.name_shown).is_true()
+	assert_bool(reed_pin.name_shown).is_false()
+	assert_array(city.displayed.map(func(mk): return str(mk.entry.id))).contains([NEAREST_POND, "home"])
+	city.selected = {}
+	_look(m, at, 15.0, 0.0)
+	assert_bool(reed_pin.name_shown).is_true()
+	m._set_outpost_places()
+	rt.session.view = saved

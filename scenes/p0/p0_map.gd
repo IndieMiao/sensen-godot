@@ -72,6 +72,9 @@ func _install_city_map() -> void:
 		city_map.host_chrome = true
 		city_map.bottom_inset = UiTokens.SIZE_QUICK_BAR_BOTTOM + UiTokens.SIZE_QUICK_BAR_H
 		city_map.pond_action = "Go"
+		city_map.destination_style = _destination_style
+		city_map.host_card = _own_card
+		_style_locate(city_map.recenter)
 	if city_map and not city_map.bundled_ponds:
 		city_map.preload_ponds(SystemPonds.data().locations.filter(func(e): return str(e.region_id) == P0_REGION))
 		_set_outpost_places()
@@ -104,10 +107,20 @@ func _pond_info(entry: Dictionary) -> Dictionary:
 ## "Reed Pond · Beginner pond · 0.8 km" (q(48)); outposts keep their "· N online" tag.
 func _pin_tag(entry: Dictionary) -> String:
 	if str(entry.get("kind", "")) != "pond": return ""
-	return str(_pond_info(entry).get("tag", ""))
+	var tag := str(_pond_info(entry).get("tag", ""))
+	# The pond the player is at says no distance, as its card shows no Distance there (q(80)).
+	if is_here("pond", str(entry.get("id", ""))) and tag.contains(" · "): tag = tag.substr(0, tag.rfind(" · "))
+	return tag
 
 func _on_entry_selected(entry: Dictionary) -> void:
-	if str(entry.get("kind", "")) != "pond" or rt == null: return
+	if rt == null: return
+	if str(entry.get("kind", "")) == "place":
+		var spec := place_card(entry)
+		if spec.is_empty(): return
+		city_map.info.hide()
+		_open_place_card(entry, spec)
+		return
+	if str(entry.get("kind", "")) != "pond": return
 	var info := _pond_info(entry)
 	if info.is_empty(): return   # a pond P0 does not know keeps the city view's own card
 	city_map.info.hide()
@@ -191,7 +204,9 @@ func _prewarm_pond(id: String) -> void:
 	if not pond.is_empty(): WaterShore.prewarm(id, SystemPonds.site(pond))
 
 func _set_outpost_places() -> void:
-	city_map.set_places(P0Outposts.all().map(func(o): return P0Outposts.place_entry(o, int(_online.get(str(o.id), 0)))))
+	var places: Array = P0Outposts.all().map(func(o): return P0Outposts.place_entry(o, int(_online.get(str(o.id), 0))))
+	if away(): places.append(home_entry())   # away from home the farm wears its Homestead pin (不知火舞 on 234)
+	city_map.set_places(places)
 
 func _on_place_requested(entry: Dictionary) -> void:
 	var outpost := P0Outposts.find(str(entry.get("id", "")))
@@ -208,6 +223,95 @@ func _open_outpost(id: String) -> void:
 	_reset_gesture()
 	P0Runtime.nav_started()
 	AppRouter.open_instance(P0_OUTPOST, {"outpost_id": id})
+
+# ---------------------------------------------------------------- destination pins and place cards (SGODOT-234 A2)
+const HOME_PIN := "home"
+## The outposts' MapDestination icons by role (不知火舞 on 234): tea pot, tackle rod, market board, post travel.
+const PIN_ICONS := {"tea": "pot", "tackle": "rod", "market": "board", "post": "travel"}
+## Away from home the avatar stands left of the pin of the place it is at, level with its disc (Figma 1802:118849).
+const AVATAR_BESIDE := Vector2(-44, 0)
+var _here_sig := ""
+
+## Ponds P0 knows, outposts and the homestead open P0PlaceSheet, not the city view's info panel; landmarks and POIs
+## keep that name card.
+func _own_card(entry: Dictionary) -> bool:
+	match str(entry.get("kind", "")):
+		"pond": return not _pond_info(entry).is_empty()
+		"place": return not place_card(entry).is_empty()
+	return false
+
+## MapDestination 1795:103793 (LOCK-24): outposts by role, ponds, and the homestead's pin with its name on a plate.
+## Landmarks and POIs keep the city view's own pins.
+func _destination_style(entry: Dictionary) -> Dictionary:
+	match str(entry.get("kind", "")):
+		"pond": return {"icon": P0Logic.icon("pond")}
+		"place":
+			if str(entry.get("id", "")) == HOME_PIN: return {"icon": P0Logic.icon("home"), "plate": true}
+			var o := P0Outposts.find(str(entry.get("id", "")))
+			if not o.is_empty(): return {"icon": P0Logic.icon(str(PIN_ICONS.get(str(o.role), "travel")))}
+	return {}
+
+## Whether the player is away from the homestead — at a pond or an outpost (the place chip's place). At home, in the
+## farmhouse or the mine, the avatar is the homestead's mark and no Homestead pin is drawn (不知火舞 on 234).
+func away() -> bool:
+	return rt != null and str(rt.here.get("space", "home")) in ["pond", "outpost"]
+
+func avatar_shift() -> Vector2:
+	return AVATAR_BESIDE if away() else Vector2.ZERO
+
+## The homestead's pin, drawn only while the player is away (its avatar stands at the place it is at).
+func home_entry() -> Dictionary:
+	return {"id": HOME_PIN, "kind": "place", "name": "Homestead", "category": "Your farm", "lat": home_lat,
+		"lng": home_lng, "art_path": str(P0Outposts.PIN_ART.tackle), "action": "Go home · Free",
+		"action_icon": "footprints", "filter": "pond", "tag": ""}
+
+## The avatar stands where the player is (the place chip, P0Runtime.here) and the farm wears its pin while away.
+## Cheap to call every frame: it acts when the place or the homestead's point changes.
+func _sync_here() -> void:
+	if rt == null or city_map == null: return
+	var at := _origin()
+	var sig := "%s|%s|%.7f|%.7f" % [rt.here.get("space", ""), rt.here.get("place", ""), home_lat, home_lng]
+	if sig == _here_sig: return
+	_here_sig = sig
+	set_self_at(at.x, at.y)
+	if farm_markers:
+		farm_markers.self_label_off = away()   # the avatar is not the homestead's mark there
+		if away(): farm_markers.anchor_shift["self"] = AVATAR_BESIDE
+		else: farm_markers.anchor_shift.erase("self")
+	_set_outpost_places()
+	_marks_sig = ""   # the homestead's mark moves between the avatar and its pin
+
+## The place card spec (q(80), P0PlaceSheet): an outpost — its name, data category, Distance, Online now (no row at
+## 0), Go; the homestead — Homestead, Your farm, Distance, Go home · Free. At the place the player is at: no Distance,
+## Back to <name>. {} for a place P0 does not know.
+func place_card(entry: Dictionary) -> Dictionary:
+	var id := str(entry.get("id", ""))
+	var to := Vector2(float(entry.get("lat", 0.0)), float(entry.get("lng", 0.0)))
+	var distance := ["Distance", P0PlaceSheet.distance_text(P0PlaceSheet.km_between(_origin(), to))]
+	if id == HOME_PIN:
+		return P0PlaceSheet.for_here({"title": "Homestead", "subtitle": "Your farm", "facts": [distance],
+			"primary": "Go home · Free"}, not away())
+	var o := P0Outposts.find(id)
+	if o.is_empty(): return {}
+	var facts: Array = [distance]
+	var online := int(_online.get(id, 0))
+	if online > 0: facts.append(["Online now", str(online)])
+	return P0PlaceSheet.for_here({"title": str(o.name), "subtitle": str(o.category), "facts": facts, "primary": "Go"},
+		is_here("outpost", id))
+
+## Go / Back to: the homestead's opens the farm, an outpost's its room (re-entered through the loading cover when the
+## player was there, q(80)). Tapping outside closes the card and clears the selection.
+func _open_place_card(entry: Dictionary, spec: Dictionary) -> void:
+	var id := str(entry.get("id", ""))
+	P0PlaceSheet.open(rt.ui, spec,
+		func():
+			rt.ui.close_modal()
+			if id == HOME_PIN: _open_my_farm()
+			else: _open_outpost(id),
+		Callable(),
+		func():
+			if city_map and str(city_map.selected.get("id", "")) == id: city_map.clear_selection(),
+		"place_card")
 
 # ---------------------------------------------------------------- outpost online counts
 func _start_presence() -> void:
@@ -244,21 +348,52 @@ func _on_presence(result: int, code: int, _h: PackedStringArray, body: PackedByt
 ## (不知火舞 on 234); outfit and city switching are not in P0 (their buttons are gone with the old chrome).
 func _city_action(action: String) -> void:
 	match action:
-		"recenter": fly_to(home_lat, home_lng)
+		"recenter":
+			var at := _origin()
+			fly_to(at.x, at.y)
 		"outfit": rt.ui.toast("Outfits come later")
 		"city": rt.ui.toast("P0 is set in Shanghai")
 		_: super._city_action(action)
 
-## The player's own pin: its card says Go home · Free (MAP-1 §10.6.1); a second tap closes it.
+## MapLocateButton 1793:103795 (LOCK-24): the recenter key as a 44 round button styled like Close (color/surface,
+## 1 px color/border) with a light shadow, the 22 i-locate in its own colours.
+func _style_locate(b: Button) -> void:
+	b.theme = UiKit.theme()
+	b.theme_type_variation = UiTokens.BUTTON_CLOSE_ROUND
+	for state in [&"normal", &"hover", &"focus", &"disabled", &"pressed", &"hover_pressed"]:
+		b.remove_theme_stylebox_override(state)   # the map's own 32 disc
+		var sb := b.get_theme_stylebox(state).duplicate() as StyleBoxFlat
+		if sb != null:
+			sb.shadow_color = UiTokens.COLOR_SHADOW_FLOAT
+			sb.shadow_size = UiTokens.SIZE_SHADOW_FLOAT_RADIUS
+			sb.shadow_offset = Vector2(0, UiTokens.SIZE_SHADOW_FLOAT_OFFSET_Y)
+			b.add_theme_stylebox_override(state, sb)
+		b.add_theme_color_override(StringName("icon_%s_color" % state), Color.WHITE)   # the glyph's own ink and green
+	b.icon = P0Logic.icon("locate")
+	b.expand_icon = true
+	b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	b.add_theme_constant_override(&"icon_max_width", 22)
+	b.custom_minimum_size = Vector2(UiTokens.SIZE_CLOSE, UiTokens.SIZE_CLOSE)
+
+## The player's own avatar: the card of the place the player is at (q(80): Back to <name>) — the homestead's at home,
+## the pond's or the outpost's when it stands beside their pin.
 func _own_pin_pressed() -> void:
-	if city_map == null or farm_markers == null or not farm_markers.points.has("self"): return
-	var open := str(city_map.selected.get("id", "")) == "player:self"
+	if city_map == null or rt == null: return
 	_clear_farm_selection()
 	city_map.dismiss_overlays()
-	if open: return
-	var at: Vector2 = farm_markers.points.self.center
-	city_map.select_player({"id": "player:self", "farm_id": "self", "kind": "player", "name": own_farm_name,
-		"lat": at.x, "lng": at.y}, farm_markers.portrait_texture("self"), "Go home · Free")
+	var place := str(rt.here.get("place", ""))
+	match str(rt.here.get("space", "home")):
+		"pond":
+			var p := SystemPonds.location(place)
+			if not p.is_empty():
+				city_map.select((p as Dictionary).merged({"kind": "pond"}))
+				return
+		"outpost":
+			var o := P0Outposts.find(place)
+			if not o.is_empty():
+				city_map.select(P0Outposts.place_entry(o, int(_online.get(place, 0))))
+				return
+	_open_place_card(home_entry(), place_card(home_entry()))
 
 func _on_city_visit_requested(farm_id: String) -> void:
 	if farm_id == "self":
@@ -267,13 +402,18 @@ func _on_city_visit_requested(farm_id: String) -> void:
 	else: super._on_city_visit_requested(farm_id)
 
 # ---------------------------------------------------------------- the opening view (MAP-1, 不知火舞 on 234)
-## Opening the map frames the home set: the smallest view in z12–16 holding the player's own avatar, each role's
-## outpost nearest home and every pin wearing a marker (the first session's Reed Pond), labels and all, inside the
-## safe frame — under the HUD's second row + 16, over Bag − 16, 16 from the sides. Not even z12 holds them: z12 on the
-## avatar. Recenter keeps the zoom; Show on map and the camera kept on return are unchanged.
+## Opening the map frames the home set (MAP-1; 不知火舞 on 234 A2): a view in z13.5–16, labels and all inside the safe
+## frame — under the HUD's second row + 16, over Bag − 16, 16 from the sides. The avatar and every pin wearing a marker
+## (the first session's Reed Pond) always go in; then the home set — each role's outpost nearest home, and away from
+## home the Homestead pin — nearest the avatar first, each while the view still holds them all at z13.5: the first that
+## would not stays offscreen, and so do the farther ones. At z13.5 outposts of different roles (300 m apart at least)
+## never cover each other whole. Not even the must-haves fit: z13.5 on the avatar. Recenter keeps the zoom; Show on
+## map and the camera kept on return are unchanged.
 const FRAME_ZOOM_MAX := 16.0
-const FRAME_ZOOM_MIN := 12.0
+const FRAME_ZOOM_MIN := 13.5
 const FRAME_PAD := 16.0
+## What the last opening view holds (frame_home_set).
+var framed: Array = []
 
 func _frame_home() -> void:
 	# A farm booted as the root scene (the first session lands on the farm, q(44)) leaves by swapping the root for a
@@ -283,36 +423,68 @@ func _frame_home() -> void:
 
 func frame_home_set() -> void:
 	if city_map == null or city_map.size.y <= 0.0 or not is_inside_tree(): return
-	var items := home_set_items()
 	var safe := frame_safe_rect()
+	var chosen := frame_must()
+	var view := _fit(chosen, safe)
+	if not view.is_empty():
+		for it in frame_optional():
+			var more := _fit(chosen + [it], safe)
+			if more.is_empty(): break   # the nearest that does not fit: it and the farther ones stay offscreen
+			chosen.append(it)
+			view = more
+	framed = chosen
+	if view.is_empty(): _look(_origin(), FRAME_ZOOM_MIN)
+	else: _look(view.at, float(view.z))
+	_update_cameras()   # the trials moved only the Godot camera: now the map, pawns and markers follow
+
+## The smallest view in z13.5–16 holding `items` inside `safe`, centred on them: {at, z}; {} when z13.5 does not hold
+## them. Trials move the Godot camera only (刘邦 on #92).
+func _fit(items: Array, safe: Rect2) -> Dictionary:
 	var mid := Vector2.ZERO
 	for it in items: mid += Vector2(float(it.lat), float(it.lng))
 	mid /= maxf(1.0, items.size())
 	var steps := int(round((FRAME_ZOOM_MAX - FRAME_ZOOM_MIN) * 10.0))
+	var at := mid
 	for i in steps + 1:
-		_look(mid, FRAME_ZOOM_MAX - i * 0.1)
-		for k in 3:   # centre the set in the frame: with the map's pitch its middle is not the screen's
+		_look(at, FRAME_ZOOM_MAX - i * 0.1)
+		for k in 4:   # centre the set in the frame: with the map's pitch its middle is not the screen's
 			var box := _frame_box(items)
 			var shift := safe.get_center() - box.get_center()
 			if shift.length() < 1.0: break
 			_pan_by(shift)
-		if safe.encloses(_frame_box(items)): return
-	_look(Vector2(home_lat, home_lng), FRAME_ZOOM_MIN)
+		if safe.encloses(_frame_box(items)): return {"at": Vector2(center_lat, center_lng), "z": zoom}
+		at = Vector2(center_lat, center_lng)   # the next tenth starts centred where this one ended
+	return {}
 
-## What the opening view must hold: {lat, lng, rect} — the own avatar, the home set's outposts, the marked pins.
-func home_set_items() -> Array:
-	var out: Array = [{lat = home_lat, lng = home_lng, self_pin = true}]
+## What the opening view always holds: the own avatar (where the player is) and every pin wearing a marker.
+func frame_must() -> Array:
+	var at := _origin()
+	var out: Array = [{lat = at.x, lng = at.y, self_pin = true, shift = avatar_shift()}]
+	var marked := city_pin_markers()
+	for e in city_map.entries:
+		if marked.has(str(e.get("id", ""))): out.append((e as Dictionary).merged({marker = marked[str(e.id)]}, true))
+	return out
+
+## The home set it adds while they fit, nearest the avatar first: each role's outpost nearest home, and away from home
+## the Homestead pin; pins already in frame_must are not repeated.
+func frame_optional() -> Array:
 	var nearest := {}   # role -> outpost
 	for o in P0Outposts.all():
 		var e := P0Outposts.place_entry(o, int(_online.get(str(o.id), 0)))
 		var r := str(o.role)
 		if not nearest.has(r) or city_map._home_distance(e) < city_map._home_distance(nearest[r]): nearest[r] = e
-	out.append_array(nearest.values())
-	var marked := city_pin_markers()
-	for e in city_map.entries:
-		if marked.has(str(e.get("id", ""))) and not out.any(func(x): return str(x.get("id", "")) == str(e.id)):
-			out.append((e as Dictionary).merged({marker = marked[str(e.id)]}, true))
+	var out: Array = nearest.values()
+	if away(): out.append(home_entry())
+	var must := frame_must().map(func(x): return str(x.get("id", "")))
+	out = out.filter(func(x): return not must.has(str(x.get("id", ""))))
+	var at := _origin()
+	out.sort_custom(func(a, b): return P0PlaceSheet.km_between(at, Vector2(float(a.lat), float(a.lng))) \
+		< P0PlaceSheet.km_between(at, Vector2(float(b.lat), float(b.lng))))
 	return out
+
+## Every pin the opening view may hold: frame_must, then frame_optional in the order they are tried.
+func home_set_items() -> Array:
+	return frame_must() + frame_optional()
 
 ## The safe frame in screen space: under the HUD's second row + 16, over Bag − 16, 16 from the sides.
 func frame_safe_rect() -> Rect2:
@@ -328,16 +500,18 @@ func _frame_box(items: Array) -> Rect2:
 		var p = geo_to_screen(float(it.lat), float(it.lng))
 		if p == null: continue
 		var fp: Rect2 = FarmMarkers.self_footprint(zoom) if it.get("self_pin", false) else city_map.pin_footprint(it)
-		var r := Rect2((p as Vector2) + fp.position, fp.size)
+		var r := Rect2((p as Vector2) + fp.position + (it.get("shift", Vector2.ZERO) as Vector2), fp.size)
 		box = r if first else box.merge(r)
 		first = false
 	return box
 
+## One trial view: the Godot camera only (刘邦 on #92: a hundred full updates in a frame would push the native map's
+## camera and the marker sync each time).
 func _look(at: Vector2, z: float) -> void:
 	center_lat = at.x
 	center_lng = at.y
 	_set_zoom(z)
-	_update_cameras()
+	_place_camera()
 
 ## Moves the view so what is on screen moves by `shift` (screen px).
 func _pan_by(shift: Vector2) -> void:
@@ -429,14 +603,19 @@ func p0_surface() -> String: return "map"
 ## city_pin_markers), so a badge and its pin never disagree (亚瑟 on 234).
 func p0_frame(view: Dictionary, _dt: float) -> void:
 	if city_map == null: return
+	_sync_here()
+	# The recenter key gives way to an open sheet (不知火舞 on 234 A2: it showed under the card's ×).
+	var key_shown := not rt.ui.has_modal()
+	if city_map.recenter.visible != key_shown: city_map.recenter.visible = key_shown
 	var list := pin_marks(view)
-	var sig := JSON.stringify(list)
 	var home := home_mark(view)
-	sig += home
+	# Away, the homestead's ✓ hangs on its pin (deliverable, the highest mark, so first); at home on the avatar.
+	if away() and home != "": list.push_front({"id": HOME_PIN, "state": home})
+	var sig := JSON.stringify(list) + home
 	if sig == _marks_sig: return
 	_marks_sig = sig
 	city_map.set_marks(list)
-	if farm_markers: farm_markers.set_mark("self", CityMapView.status_badge(home) if home != "" else null)
+	if farm_markers: farm_markers.set_mark("self", CityMapView.status_badge(home) if home != "" and not away() else null)
 
 const MARK_STATES := {"deliver": "deliverable", "request": "request", "new": "new"}
 
@@ -469,7 +648,9 @@ static func tutorial_marks(view: Dictionary) -> Array:
 func city_pin_markers() -> Dictionary:
 	var v: Dictionary = rt.session.current() if rt != null and rt.session != null else {}
 	var out := {}
-	for m in pin_marks(v):
+	var list := pin_marks(v)
+	if away() and home_mark(v) != "": list.push_front({"id": HOME_PIN, "state": home_mark(v)})
+	for m in list:
 		if not out.has(str(m.id)): out[str(m.id)] = str(m.state)
 	return out
 
@@ -510,6 +691,11 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"online":   # online:sh_tea_1:3 — the presence count an outpost pin says, for shots
 			_online[step[1]] = int(step[2])
 			_set_outpost_places()
+		"pin":   # pin:home / pin:sh_tea_1 — a tap on that pin (its card), the Homestead pin only while away
+			var hit: Array = city_map.entries.filter(func(e): return str(e.get("id", "")) == step[1]) if city_map else []
+			if not hit.is_empty(): city_map.select(hit[0])
+		"tapself": _own_pin_pressed()   # a tap on the player's own avatar: the card of where the player is
+		"recenter": _city_action("recenter")   # the MapLocateButton: back to the player, the zoom kept
 		"center":   # center:31.228:121.478 (the city overview) — where the camera looks, for shots
 			center_lat = float(step[1])
 			center_lng = float(step[2])

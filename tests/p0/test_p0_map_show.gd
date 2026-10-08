@@ -8,6 +8,7 @@ var map: Node
 
 # One map for the suite (it is a heavy scene; each test starts from where the last one left the camera).
 func before() -> void:
+	P0Runtime.ensure().here = {"space": "home", "place": ""}   # at home (another suite may have left a pond attached)
 	map = (load(P0_MAP) as PackedScene).instantiate()
 	add_child(map)
 	for i in 5: await get_tree().process_frame

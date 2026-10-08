@@ -7,6 +7,8 @@ extends FishingPanel
 ## FishingPresentation (pose, rod, line, float, landing arc, close camera) reads the same fields.
 
 const BREAK_MS := {2: 1500.0, 3: 2000.0, 4: 3000.0}   # §6.5.2: a gated fish breaks free this far in
+## Dev playtests (P0_AUTO=1 / scripted shots): hook on the bite and keep the band on the fish.
+static var auto_play := false
 
 var rt: P0Runtime
 var site_key := "pond"        # P0 site (pond / river) for the cast command
@@ -131,7 +133,7 @@ func _process(dt: float) -> void:
 			_show_notice("A bite! Tap to hook the fish!")
 			Input.vibrate_handheld(80)
 			_refresh_button()
-		elif phase == "hook" and P0Fishing.auto_play and now > _bite_at + 400:
+		elif phase == "hook" and auto_play and now > _bite_at + 400:
 			_p0_hook()
 	elif phase == "playing":
 		if dt > 0.5:
@@ -143,7 +145,7 @@ func _process(dt: float) -> void:
 		var step_s := float(FishingModel.data().step_ms) / 1000.0
 		while _accumulator >= step_s and model.outcome == "playing":
 			_accumulator -= step_s
-			if P0Fishing.auto_play: held = float(model.fish) > float(model.bar)
+			if auto_play: held = float(model.fish) > float(model.bar)
 			inputs += "1" if held else "0"
 			FishingModel.step(model, held, tier)
 		_gauge.model = model
