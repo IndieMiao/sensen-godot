@@ -174,9 +174,7 @@ func _on_facility(n: String) -> void:
 ## LOCK-16: keepers greet first, Trade opens the counter (SGODOT-224's open_keeper_greeting(role, ctx)).
 func _open_keeper() -> void:
 	if rt == null: return
-	if rt.ui.has_method("open_keeper_greeting"): rt.ui.call("open_keeper_greeting", role, keeper_ctx())
-	elif role == "tackle": rt.ui.open_kai_greeting()   # the existing tackle greeting until 224 lands
-	else: rt.ui.toast("%s · %s" % [str(keeper.get("role", "")), str(keeper.get("name", ""))])
+	rt.ui.open_keeper_greeting(role, keeper_ctx())
 
 ## What P0Logic.keeper_lines takes from the outpost data (names and places are data, not UI copy): the keeper's
 ## name, the place ("Keeps the stall · Xuhui Market Square") and, for the tackle shop, the pond it names.
