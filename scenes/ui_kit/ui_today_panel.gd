@@ -63,6 +63,10 @@ func _row(r: Dictionary, index: int) -> HBoxContainer:
 	text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	text.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	var line := UiKit.label(str(r.get("line", "")), UiTokens.STYLE_BODY_XB14, UiTokens.COLOR_SECONDARY if done else UiTokens.COLOR_TEXT)
+	# TUT-3-03B (1410:104474; 不知火舞 on SGODOT-232): the sentence wraps to two lines next to a wide pill such as
+	# Show on map and the row grows with it; only a third line is cut with an ellipsis. The pill stays centred.
+	line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	line.max_lines_visible = 2
 	line.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	text.add_child(line)
 	if state == "short" and str(r.get("tail", "")) != "":

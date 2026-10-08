@@ -618,13 +618,19 @@ static func today_lines(view: Dictionary) -> Array:
 
 ## Today rows (§14.5, LOCK-06 TodayRow): {line, icon, go, state, tail}. Now-lines first, then countdowns, then
 ## the nearest skill level; at most 3. `go` is a camera-only Show target ("" hides Show, LOCK-08).
+## The first-session guide's rows lead (P0Guide.lead_rows, §14.2 / q(58)): the tutorial request and the first dish replace
+## their generic rows; only the first row still to do has the focus.
 static func today_rows(view: Dictionary) -> Array:
 	var now_rows: Array = []
 	var timed: Array = []    # [ms, row]
+	var lead := P0Guide.lead_rows(view)
+	var guided_stove := lead.any(func(r): return str(r.go) == "stove" and str(r.state) != "done")
 	var farmed := (view.get("firsts", []) as Array).any(func(f): return str(f).begins_with("harvest:")) \
 		or (view.get("plots", []) as Array).any(func(p): return str(p.get("state", "")) in ["sown", "growing", "ready"])
 	if not farmed: now_rows.append(_first_sow_row(view))
+	now_rows.append_array(lead)
 	for r in view.get("stall", {}).get("board", {}).get("requests", []):
+		if str(r.get("id", "")) == P0Guide.TUTORIAL: continue   # the guide's Catch / Deliver row
 		if str(r.get("status", "")) == "open":
 			now_rows.append(_row("%s · %d %s · Stall Board" % [str(r.title), int(r.qty), item_name(view, str(r.item))], "board", "stall"))
 			continue
@@ -650,8 +656,15 @@ static func today_rows(view: Dictionary) -> Array:
 		var fish := 0
 		for st in view.get("bag", {}).get("slots", []):
 			if str(st.get("id", "")).begins_with("fish_") and item(view, str(st.id)).get("cook", true): fish += int(st.get("qty", 0))
-		if fish > 0: now_rows.append(_row("%d fish · the stove is free" % fish, "pot", "stove"))
+		if fish > 0 and not guided_stove: now_rows.append(_row("%d fish · the stove is free" % fish, "pot", "stove"))
 	timed.sort_custom(func(a, b): return float(a[0]) < float(b[0]))
+	# after the first session the soonest crop says what its harvest does: · Farming Lv 2 at first harvest (§14.2 end)
+	if not P0Guide.first_phase(view):
+		var tail := P0Guide.harvest_level_tail(view)
+		for t in timed:
+			if tail != "" and str(t[1].go) == "plots":
+				t[1].line += tail
+				break
 	var rows: Array = now_rows.duplicate()
 	for t in timed:
 		if rows.size() < 3 and not rows.any(func(r): return r.line == t[1].line): rows.append(t[1])
@@ -666,10 +679,10 @@ static func today_rows(view: Dictionary) -> Array:
 			best = "%s Lv%d in %d XP" % [key.capitalize(), int(sk.get("level", 1)) + 1, gap]
 	if rows.size() < 3 and best != "": rows.append(_row(best, "xp", ""))
 	if rows.is_empty(): rows.append(_first_sow_row(view))
-	return rows.slice(0, 3)
+	return P0Guide.focus_first(rows.slice(0, 3))
 
 static func _row(line: String, icon_id: String, go: String) -> Dictionary:
-	return {"line": line, "icon": icon_id, "go": go, "state": "default", "tail": ""}
+	return {"line": line, "icon": icon_id, "go": go, "state": "default", "tail": "", "focus": false}
 
 ## "Sow your first plot", short of Energy when sowing a radish costs more than the player has (TodayRow Short).
 static func _first_sow_row(view: Dictionary) -> Dictionary:

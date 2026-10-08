@@ -14,9 +14,7 @@ const SPOTS := ["spot_grove", "spot_rock_pile", "spot_reed_bank", "spot_clay_ban
 var farm: Node3D                # p0_farm.gd: actor, cam
 var rt: P0Runtime
 var mouth := Vector3.ZERO
-var _entry: PanelContainer
-var _entry_button: Button
-var _entry_line: Label
+var _entry: UiEntryCard
 var _entry_cmd := {}
 var _entry_card := {}
 var _reset_shown := 0.0
@@ -34,7 +32,7 @@ func setup(farm_node: Node3D, mouth_at: Vector3) -> P0FarmMaterials:
 func _ready() -> void:
 	rt = P0Runtime.ensure()
 	rt.session.state_changed.connect(_on_state)
-	_build_entry_card()
+	_ensure_entry()   # may not be possible yet: see _ensure_entry
 	_build_spots()
 	# Floats for a past auto-store are not news: only arrivals after entering the farm float.
 	var auto = rt.session.current().get("storage", {}).get("auto", null)
@@ -74,6 +72,9 @@ func card_candidates() -> Array:
 	var out: Array = []
 	for id in SPOTS: out.append([id, _spots.get(id, Vector3.ZERO), SPOT_REACH])
 	out.append(["workbench", _bench, SPOT_REACH])
+	# The mouth takes the farm's one card when it is nearest: no finger card then, its EntryCard shows instead, so
+	# the Herb Patch's card never sits on it (LOCK-07; desktop check of the root-scene fix, #39 follow-up).
+	out.append(["mine", mouth, MOUTH_REACH])
 	return out
 
 ## Every frame on the farm: badge, EntryCard and the reset notice. `card` is the farm's one finger card this frame.
@@ -86,17 +87,22 @@ func frame(v: Dictionary, card := "") -> void:
 		P0Logic.icon("pickaxe"))
 	top.y -= rt.ui.badge_height("mine")
 	var entry := P0MaterialLogic.mine_entry_card(v)
-	_entry.visible = near and bool(entry.get("show", false)) and not rt.ui.has_modal()
-	if _entry.visible:
-		_entry_button.text = str(entry.label)
-		# LOCK-10: a greyed EntryCard still takes the press and says why (苏烈, #39), so it is never `disabled`.
-		_entry_button.add_theme_color_override("font_color", P0Ui.GREEN_D if bool(entry.enabled) else UiTokens.COLOR_DISABLED_INK)
+	if _ensure_entry(): _entry.visible = card == "mine" and bool(entry.get("show", false)) and not rt.ui.has_modal()
+	if is_instance_valid(_entry) and _entry.visible:
+		# LOCK-10: a greyed EntryCard still takes the press and says why (苏烈, #39), so it is never disabled.
+		_entry.state = UiEntryCard.State.AVAILABLE if bool(entry.enabled) else UiEntryCard.State.UNAVAILABLE
+		_entry.amber = bool(entry.get("amber", false))
+		_entry.action = str(entry.label)
+		_entry.caption = str(entry.line2)
 		_entry_card = entry
-		_entry_line.text = str(entry.line2)
-		_entry_line.visible = _entry_line.text != ""
 		_entry_cmd = entry.cmd
-		_entry.reset_size()
-		_entry.position = top - Vector2(_entry.size.x * 0.5, _entry.size.y + 30)
+		# Placed as TapCard: the pointer tip on the gate, kept inside the screen, the pointer still on the gate.
+		var size := _entry.get_combined_minimum_size()
+		var area := Rect2(Vector2.ZERO, rt.ui.root.size)
+		var r := WorldAnchor.place(size, top - Vector2(0, UiTokens.SPACE_WITHIN), area, UiTokens.SPACE_WITHIN, true)
+		_entry.size = size
+		_entry.position = r.position
+		_entry.point_at(top.x - r.position.x)
 	if near:
 		var notice := P0MaterialLogic.reset_notice(v, _reset_shown)
 		if notice != "":
@@ -125,6 +131,13 @@ func _spot_marks(v: Dictionary, card: String) -> void:
 	var bench_screen := cam.unproject_position(_bench + Vector3(0, 1.4, 0))
 	rt.ui.tag("workbench", "Workbench · Tap to craft", bench_screen,
 		not modal and card == "workbench", cam.unproject_position(_bench + Vector3(0, 0.8, 0)))
+
+## A real tap on the EntryCard (it is passive, so the scene layer's tap arrives here first from p0_tap).
+func tap_entry(screen: Vector2) -> bool:
+	if not is_instance_valid(_entry) or not _entry.visible: return false
+	if not _entry.hit_rect().has_point(screen + rt.ui.root.global_position): return false
+	_on_entry()
+	return true
 
 ## Taps on the farm's material facilities (LOCK-07): the mouth shows "The mine" (MINE-P0-1 / P0-8; entering stays on the
 ## key); a spot gathers when the player stands near it, a locked one shows MAT-3; the workbench opens its drawer.
@@ -194,26 +207,23 @@ func _on_state(v: Dictionary, events: Array) -> void:
 			get_tree().create_timer(1.0).timeout.connect(func(): _opening = false)
 			return
 
-## EntryCard (1468:94344, MINE-P0-5): over the mouth, only near it, only with an unfinished run; one secondary text
-## button (New run · 2 Energy, green; grey with the reason when it can't) and its small line.
+## The EntryCard hangs on the P0 UI's root, which only exists once the UI is in the tree. With the farm as the root
+## scene (the first session, desktop P0_SHOT) this helper is ready before the runtime is — P0Runtime.ensure() adds it
+## deferred — so the card is built on the first call that can carry it (刘邦 / 奕星 on #39). True once it exists.
+func _ensure_entry() -> bool:
+	if is_instance_valid(_entry): return true
+	if rt == null or rt.ui == null or not rt.ui.is_node_ready() or rt.ui.root == null: return false
+	_build_entry_card()
+	return true
+
+## EntryCard (UiEntryCard, 1468:94344, MINE-P0-5): over the mouth, only while the mouth holds the farm's one card,
+## only with an unfinished run; the whole card is the button (New run · 2 Energy + its consequence; grey with the
+## reason when it can't).
 func _build_entry_card() -> void:
-	_entry = PanelContainer.new()
-	_entry.mouse_filter = Control.MOUSE_FILTER_STOP
-	_entry.add_theme_stylebox_override("panel", rt.ui._box(P0Ui.CARD, 12, P0Ui.EDGE, 1, Vector4(10, 6, 10, 6)))
-	var v := VBoxContainer.new()
-	v.add_theme_constant_override("separation", 2)
-	_entry.add_child(v)
-	_entry_button = Button.new()
-	_entry_button.flat = true
-	_entry_button.focus_mode = Control.FOCUS_NONE
-	_entry_button.add_theme_font_size_override("font_size", 12)
-	_entry_button.add_theme_color_override("font_color", P0Ui.GREEN_D)
-	_entry_button.add_theme_color_override("font_disabled_color", UiTokens.COLOR_DISABLED_INK)
-	_entry_button.pressed.connect(_on_entry)
-	v.add_child(_entry_button)
-	_entry_line = rt.ui._label("", 9, UiTokens.COLOR_SECONDARY)
-	_entry_line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	v.add_child(_entry_line)
+	_entry = UiEntryCard.new()
+	_entry.theme = UiKit.theme()   # the P0 root still carries GameUi's theme
+	_entry.passive = true          # a drag starting on it is the joystick; tap_entry() takes the real tap
+	_entry.pressed.connect(_on_entry)
 	_entry.visible = false
 	rt.ui.root.add_child(_entry)
 

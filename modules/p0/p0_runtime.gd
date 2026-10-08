@@ -75,6 +75,8 @@ func _init() -> void:
 	ui.home_requested.connect(func(): _leave_then("farm"))
 	ui.tackle_requested.connect(func(): _leave_then("tackle"))
 	session.state_changed.connect(_on_state)
+	# U6: doing what the TipCard on screen teaches closes it (sow / cast / cook / heat are command types).
+	session.sent.connect(func(cmd: Dictionary): ui.tip_did(str(cmd.get("type", ""))))
 	session.refused.connect(_on_refused)
 	session.connection_failed.connect(func(msg: String, cmd: Dictionary):
 		ui.toast(msg + " · " + session.base_url, 4.0)
@@ -101,6 +103,7 @@ func attach(w: Node) -> void:
 		_spot_after_room = ""
 	_first_frame.call_deferred(str(w.name))
 	ui.set_surface(str(w.call("p0_surface")) if w.has_method("p0_surface") else "farm")
+	if w.has_method("p0_surface") and str(w.call("p0_surface")) == "map": ui.teach("map")   # Browse the map for free…
 
 ## The space a world puts the player in, for the server (q(41)): its p0_space() when it has one (the farmhouse
 ## says home, outposts say outpost), else from its surface — farm is home, pond and map as named, anything else
@@ -212,7 +215,13 @@ func anchor() -> Vector2:
 
 # ---------------------------------------------------------------- server results
 func _on_state(v: Dictionary, events: Array) -> void:
+	var before: Dictionary = ui.view
 	ui.set_view(v)   # cards built below read the fresh view (Fish-dex, creel, meals)
+	for ev in events: ui.teach(P0Guide.tip_for_event(ev, before, v))   # first cast / fire / meal / level (TUT-2)
+	# §14.2 minutes 16 / 22: an item new to the bag (lettuce seeds in reach, a level gift's Worm Bait) flashes its
+	# quick-bar slot once (UiQuickBar.flash: QuickSlot State=new, 600 ms). Not on the first view after starting.
+	if not before.is_empty():
+		for id in P0Guide.new_items(before, v): ui.quick_bar_node().flash(str(id))
 	var at := anchor()
 	var dy := 0.0
 	var xp_lines: Array = []
@@ -284,7 +293,6 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				if str(ev.status) == "accepted": ui.toast("Tracking · it shows in Today")
 				else: ui.toast("Request complete · +%d coins" % int(ev.coins))
 			"meal":
-				ui.teach("meal", "Energy comes back over time. A meal brings it back now.")
 				if int(ev.gain) <= 0:
 					ui.toast("Full belly · Meals reset in " + P0Logic.duration(float(v.get("meals", {}).get("resets_in", 0))) if int(ev.counted) <= 0 and int(ev.nominal) > 0 else "Same dish · no Energy today")
 				else:
