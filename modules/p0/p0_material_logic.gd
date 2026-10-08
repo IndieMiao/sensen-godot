@@ -98,8 +98,8 @@ static func refusal_text(code: String, detail: Dictionary, cmd: Dictionary) -> V
 			return BAG_FULL if type.begins_with("mine_") else "Bag full · free a slot first"
 		"no_runs":
 			return "Enter mine · No runs left"
-		"clear_floor_first":
-			return "Clear Floor %d first" % maxi(1, int(detail.get("floor", 2)) - 1)
+		"clear_floor_first":   # detail.floor is the floor to clear (going to Floor 2 → 1; a new run → restart_floor 2)
+			return "Clear Floor %d first" % int(detail.get("floor", 1))
 		"homestead_level":
 			return "Homestead Lv%d" % int(detail.get("need", 2))
 		"not_ready":

@@ -303,6 +303,9 @@ func test_material_refusals_are_quiet_or_say_why() -> void:
 		assert_str(str(P0MaterialLogic.refusal_text(code, {}, rock))).override_failure_message(code).is_empty()
 	assert_str(str(P0MaterialLogic.refusal_text("bag_full", {"floor": 2}, {"type": "mine_floor", "floor": 2}))).is_equal(P0MaterialLogic.BAG_FULL)
 	assert_str(str(P0MaterialLogic.refusal_text("no_runs", {}, {"type": "mine_enter"}))).is_equal("Enter mine · No runs left")
+	# The server names the floor to clear (苏烈 on #39): Floor 1 before going down, Floor 2 before a new run.
+	assert_str(str(P0MaterialLogic.refusal_text("clear_floor_first", {"floor": 1}, {"type": "mine_floor", "floor": 2}))).is_equal("Clear Floor 1 first")
+	assert_str(str(P0MaterialLogic.refusal_text("clear_floor_first", {"floor": 2}, {"type": "mine_new_run"}))).is_equal("Clear Floor 2 first")
 	assert_str(str(P0MaterialLogic.refusal_text("homestead_level", {"need": 2}, {"type": "gather", "spot": "spot_clay_bank"}))).is_equal("Homestead Lv2")
 	assert_str(str(P0MaterialLogic.refusal_text("tempo", {}, {"type": "gather"}))).is_empty()
 	# need_energy and other commands keep the runtime's own handling.
