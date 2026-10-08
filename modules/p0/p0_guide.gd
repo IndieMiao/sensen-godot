@@ -91,6 +91,12 @@ static func tutorial(view: Dictionary) -> Dictionary:
 
 static func first_session(view: Dictionary) -> bool: return not tutorial(view).is_empty()
 
+## The first session in the guide's sense: until Pond Catch is handed in and the first dish is cooked (q(58)).
+static func first_phase(view: Dictionary) -> bool:
+	if first_session(view): return true
+	return (view.get("req_done", []) as Array).has(TUTORIAL) and not page(view, "dish_grilled_crucian").get("cooked", false) \
+		and not page(view, "dish_grilled_crucian").is_empty()
+
 static func page(view: Dictionary, id: String) -> Dictionary:
 	for p in view.get("cooking", {}).get("cookbook", []):
 		if str(p.get("id", "")) == id: return p
@@ -104,8 +110,7 @@ static func lead_rows(view: Dictionary) -> Array:
 	var rows: Array = []
 	var t := tutorial(view)
 	var grill := page(view, "dish_grilled_crucian")
-	var handed := (view.get("req_done", []) as Array).has(TUTORIAL)
-	var first: bool = not t.is_empty() or (handed and not grill.get("cooked", false))   # the first session lasts to the first dish
+	var first := first_phase(view)   # the first session lasts to the first dish
 	# Row 1 follows the request's state, never events (q(58)): Catch while short (eaten fish send it back), Deliver
 	# once the creel holds them (not ticked), ticked only when handed in. Show: Catch → Reed Pond's pin; Deliver → the
 	# stall in the farm, the home pin elsewhere (go "stall").

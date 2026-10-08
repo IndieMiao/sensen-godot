@@ -193,3 +193,26 @@ func test_new_bag_items_flash_once() -> void:
 	var after := {"bag": {"slots": [{"id": "seed_radish", "qty": 19}, {"id": "bait_worm", "qty": 3}, {"id": "wild_herb", "qty": 3}]}}
 	assert_that(Guide.new_items(before, after)).is_equal(["bait_worm", "wild_herb"])
 	assert_that(Guide.new_items(after, after)).is_empty()
+
+# ---------------------------------------------------------------- Today integration (P0Logic.today_rows)
+
+func test_today_rows_lead_with_the_guide_and_drop_their_generic_twins() -> void:
+	var v := _view({"plots": _plots(["growing"])})
+	v.stall.board.requests[0].status = "accepted"
+	v.bag.slots = [{"id": "fish_crucian", "qty": 1}]
+	var rows := P0Logic.today_rows(v)
+	# Catch (not "Pond Catch · Pond Crucian 0/2"), Cook it (not "1 fish · the stove is free"), then the radishes' timer
+	assert_that(_lines(rows)).is_equal(["Catch 2 Pond Crucian · Reed Pond", "Cook it: Grilled Crucian", "Radishes ready in 3h 53m"])
+	assert_that(rows.map(func(r): return r.focus)).is_equal([true, false, false])
+
+func test_today_rows_before_the_first_sow_put_sowing_first() -> void:
+	var v := _view()
+	assert_that(_lines(P0Logic.today_rows(v))).is_equal(["Sow your first plot", "Catch 2 Pond Crucian · Reed Pond", "Cook it: Grilled Crucian"])
+
+func test_after_the_first_session_the_crop_timer_says_what_the_harvest_does() -> void:
+	var twenty: Array = []
+	for i in 20: twenty.append("growing")
+	var v := _view({"plots": _plots(twenty), "req_done": ["req_pond_catch"]})
+	v.stall.board.requests = []
+	v.cooking.cookbook[0].cooked = true
+	assert_str(str(P0Logic.today_rows(v)[0].line)).is_equal("Radishes ready in 3h 53m · Farming Lv 2 at first harvest")
