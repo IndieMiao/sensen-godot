@@ -217,6 +217,28 @@
                             22,
                             22
                           ]
+                        },
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            294,
+                            142,
+                            24,
+                            13
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                294,
+                                141,
+                                24,
+                                15
+                              ],
+                              "variation": "C10XB",
+                              "text": "4/6"
+                            }
+                          ]
                         }
                       ]
                     }
@@ -233,7 +255,7 @@
                 14
               ],
               "variation": "C9B",
-              "text": "icons · default · Near · state"
+              "text": "icons · default · Near · state · count"
             }
           ]
         },

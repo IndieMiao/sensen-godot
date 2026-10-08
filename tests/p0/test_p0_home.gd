@@ -189,8 +189,13 @@ func test_plaque_read_is_a_read_only_sheet_with_only_close() -> void:
 	assert_str(ui.modal_kind).is_equal("plaque")
 	assert_array(ui.find_children("*", "UiFactRow", true, false).map(func(f): return (f as UiFactRow).label)).is_equal(["Lv2", "Lv3"])
 	assert_array(ui.find_children("*", "UiCommandButton", true, false)).is_empty()
+	# The × floats above the sheet's corner where the main key stands: the key and quick bar hide, as in the frame.
+	assert_bool(ui._keys.visible).is_false()
+	assert_bool(ui._bar.visible).is_false()
 	(ui.find_children("*", "UiCloseButton", true, false)[0] as Button).pressed.emit()
 	assert_bool(ui.has_modal()).is_false()
+	assert_bool(ui._keys.visible).is_true()
+	assert_bool(ui._bar.visible).is_true()
 
 func test_the_plaque_stands_left_of_the_door_apart_from_the_sign() -> void:
 	var bp := P0Garden.blueprint()

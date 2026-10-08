@@ -443,6 +443,11 @@ static func cabinet_badge(view: Dictionary) -> String:
 	if not (cab is Dictionary): return ""
 	return "Full" if int(cab.get("have", 0)) >= int(cab.get("cap", 6)) else "%d/%d" % [int(cab.get("have", 0)), int(cab.get("cap", 6))]
 
+## The cabinet's icon button count tag (C21, q(31)): 4/6 or Full, "" when it holds nothing (or there is no cabinet).
+static func cabinet_count(view: Dictionary) -> String:
+	var cab = cooking(view).get("cabinet", null)
+	return cabinet_badge(view) if cab is Dictionary and int(cab.get("have", 0)) > 0 else ""
+
 ## The selected cabinet row's buttons: Eat (COOK-7-2 states) and Take one (unavailable "Bag full", LOCK-10).
 static func cabinet_actions(view: Dictionary, id: String) -> Dictionary:
 	var bag: Dictionary = view.get("bag", {})

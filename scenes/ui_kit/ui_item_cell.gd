@@ -33,7 +33,7 @@ enum State { DEFAULT, SELECTED, EMPTY, LIFTED, DROP_TARGET, ZERO, GHOST, UNCOLLE
 ##   CLUED        unknown page with a known slot: the silhouette and the family row with that slot lit
 ##   (both draw one dot per slot from `families`, a lit slot from `clues`; `might_have` adds State=mightHave's ring)
 ##   TASTED       half-colour icon + `Tasted` chip inside the cell
-##   MASTERED     gold star at the top right (Cooked ×10)
+##   MASTERED     gold star at the bottom right (Cooked ×10); the can-cook check keeps the top right; no quantity
 ##   LOCKED       3-slot page before Cooking Lv4: silhouette + `Lv4` lock tag (text from `status`, else Lv4)
 ##   IN_POT       Experiment: in the pot (selected stroke, icon raised); `In pot` only once none is left (no quantity),
 ##                otherwise the remaining quantity (COOK-2b / P0-2 instances: Show state off while ×N shows)
@@ -75,8 +75,8 @@ const _KITCHEN_FAMILY_ICON := 10.0
 const _KITCHEN_GLOW_SPREAD := 2.0    # State=mightHave 1726:32864: ring outside the cell, 0 offset, blur 4, spread 2,
 const _KITCHEN_GLOW_BLUR := 4.0      # color/new at 50 %, still
 const _KITCHEN_GLOW_ALPHA := 0.5
-const _KITCHEN_STAR := Rect2(35.4, 1.4, 14, 14)
-const _KITCHEN_STAR_GLYPH := 9.0
+const _KITCHEN_STAR := Rect2(36.4, 36.4, 12, 12)       # State=mastered 1228:105954 (C28, 226 f5523358): bottom right,
+const _KITCHEN_STAR_GLYPH := 7.7                        # clear of the can-cook check at the top right
 const _KITCHEN_TAG := Vector2(1.4, 1.4)                 # Lv4 lock tag: 3 px side padding, radius 5
 const _KITCHEN_TAG_PAD := 3.0
 const _KITCHEN_TAG_RADIUS := 5.0
@@ -382,7 +382,7 @@ func _build_kitchen_extras() -> void:
 	_glow.add_theme_stylebox_override(&"panel", ring)
 	_star = _box(_surface)
 	_place(_star, 0.0, _KITCHEN_STAR.position.x, _KITCHEN_STAR.position.y, _KITCHEN_STAR.size.x, _KITCHEN_STAR.size.y)
-	_star.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_GOLD, _KITCHEN_STAR.size.x * 0.5))
+	_star.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_GOLD_DEEP, _KITCHEN_STAR.size.x * 0.5))   # the white star needs the deep gold
 	var star := UiKit.icon(STAR_GLYPH, _KITCHEN_STAR_GLYPH)
 	star.self_modulate = UiTokens.COLOR_SURFACE_RAISED
 	var inset := (_KITCHEN_STAR.size.x - _KITCHEN_STAR_GLYPH) * 0.5
@@ -527,8 +527,8 @@ func _refresh_kitchen(s: State, empty: bool) -> void:
 	_rack_tag.visible = rack and not empty and k in [KitchenState.DEFAULT, KitchenState.IN_POT]
 	_tag_label.text = status if status != "" else "Lv4"
 	_chip.visible = k == KitchenState.TASTED
-	_pill.visible = _pill.visible and k in [KitchenState.DEFAULT, KitchenState.HIDDEN, KitchenState.CLUED, KitchenState.MASTERED,
-		KitchenState.LOCKED, KitchenState.TASTED, KitchenState.IN_POT]
+	_pill.visible = _pill.visible and k in [KitchenState.DEFAULT, KitchenState.HIDDEN, KitchenState.CLUED,
+		KitchenState.LOCKED, KitchenState.TASTED, KitchenState.IN_POT]   # the star has the bottom right on a mastered page
 	match k:
 		KitchenState.IN_POT, KitchenState.NOT_FOR_COOKING:
 			var band := _KITCHEN_IN_POT_LABEL if in_pot else _KITCHEN_NFC_LABEL

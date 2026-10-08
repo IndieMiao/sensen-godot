@@ -160,6 +160,16 @@ func set_show_balances(v: bool) -> void:
 func energy_chip_rect() -> Rect2: return _energy_chip.visual_rect()
 func balances_rect() -> Rect2: return _balances.get_global_rect()
 func today_chip_rect() -> Rect2: return _today_chip.visual_rect()
+
+## Pulses played on the Today chip (tests read it).
+var today_pulses := 0
+
+## The Today chip's GuidePulse, once (its focus row changed; the caller decides, P0Ui): Shape=Pill around the chip's
+## visible pill, not its 44 px touch area.
+func pulse_today() -> void:
+	today_pulses += 1
+	var visual := _today_chip.visual_rect()
+	UiGuidePulse.play(_today_chip, Rect2(visual.position - _today_chip.global_position, visual.size), UiGuidePulse.Shape.PILL)
 func place_chip_rect() -> Rect2: return _place_chip.visual_rect()
 
 # ------------------------------------------------------------------ build

@@ -52,8 +52,8 @@ static func plaque(_view: Dictionary) -> Dictionary:
 
 ## Rest bench (FARM-7, q(62)): what resting gives now — `+60 Energy`, or less near full (REST-NEARFULL `+25 Energy`).
 ## Only when it can be used is it the normal strip; otherwise Dimmed with the reason as its one fact (不知火舞 on #59):
-## used today `Rested today`; not yet (q(41): 2 h away from home first) the Countdown state with `Ready in 1h 12m` /
-## `After 2h away`; Energy full `Energy full`.
+## used today `Rested today`; not yet (q(41): 2 h away from home first) the Countdown state with `in 1h 12m`, or
+## `after 2h away` for an account that never left — no countdown then (q(70)); Energy full `Energy full`.
 static func bench(view: Dictionary) -> Dictionary:
 	var st := P0Logic.rest_state(view)
 	var amount := int(view.get("rest", {}).get("amount", 60))
@@ -62,7 +62,9 @@ static func bench(view: Dictionary) -> Dictionary:
 	var text := "+%d Energy" % (gain if gain > 0 else amount)
 	match str(st.state):
 		"used": return _p("rest", "Rested today", "", UiStatusBadge.State.USED_TODAY, true)
-		"away": return _p("rest", text, str(st.reason), UiStatusBadge.State.COUNTDOWN, true)
+		# The clock means a timer is running (FARM-7): an account that never left has none, so no state at all — the
+		# button is the plain bench, the strip Dimmed like Rested today (不知火舞 on #76, q(70)).
+		"away": return _p("rest", text, str(st.wait), UiStatusBadge.State.COUNTDOWN if str(st.caption) != "" else -1, true)
 		"full": return _p("rest", text, str(st.reason), -1, true)
 	return _p("rest", text)
 

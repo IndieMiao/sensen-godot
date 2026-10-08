@@ -56,7 +56,9 @@ func _marker(n: String, v: Dictionary) -> Dictionary:
 	if _sheet: return {}
 	# World prompts (SGODOT-250, LOCK-07 v2, q(62)): an icon button, the nearest opens into a name strip; no Tap to.
 	if n == RACK: return {kind = "facility", icon = P0Logic.icon("spice_rack"), name = "Spice Rack"}   # i-spice-rack 1714:102645
-	if n == CABINET: return {kind = "facility", icon = P0Logic.icon("cabinet"), name = "Warming Cabinet", fact = P0KitchenLogic.cabinet_badge(v)}   # i-cabinet 1265:89122
+	if n == CABINET:   # i-cabinet 1265:89122; from afar its button hangs the count, 4/6 or Full, none when empty (C21, q(31))
+		return {kind = "facility", icon = P0Logic.icon("cabinet"), name = "Warming Cabinet", fact = P0KitchenLogic.cabinet_badge(v),
+			count = P0KitchenLogic.cabinet_count(v)}
 	if n != STOVE: return super(n, v)
 	var stove := {kind = "facility", icon = P0Logic.icon("pot"), name = "Stove 1/1"}   # i-pot (250 walkthrough)
 	var st = P0KitchenLogic.stove(v)
