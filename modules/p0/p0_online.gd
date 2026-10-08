@@ -156,6 +156,8 @@ func _process(dt: float) -> void:
 			_tick(dt)
 		WebSocketPeer.STATE_CLOSED:
 			var code := socket.get_close_code()
+			if not connected and _attempt == 0:   # the handshake failed: a wrong demo key (401) looks like this too
+				push_warning("P0Online: %s refused the connection or is unreachable (a demo server needs the right x-p0-key)" % url)
 			socket = null
 			if code == 4001: failed.emit("SESSION_REPLACED")   # another device took over: no reconnect
 			if code == 4001 or code == 4002:
