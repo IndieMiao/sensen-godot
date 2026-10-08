@@ -28,7 +28,7 @@ func _ready() -> void:
 	# (the first tap reels in and closes, like the system back key, the next one leaves).
 	var shield: Control = get_node("FishingInputShield")
 	shield.gui_input.connect(func(e: InputEvent):
-		if rt and P0Ui.is_tap(e) and rt.ui._place_chip.get_global_rect().has_point((e as InputEventMouseButton).global_position):
+		if rt and P0Ui.is_tap(e) and rt.ui.place_chip_rect().has_point((e as InputEventMouseButton).global_position):
 			rt.leave_world())
 
 func last_result() -> Dictionary:
@@ -38,9 +38,8 @@ func last_result() -> Dictionary:
 ## corner instead (hidden while fishing), so it never lands on the place chip on notched screens.
 func _fit() -> void:
 	super._fit()
-	if rt == null or rt.ui._right == null: return
-	var corner: Control = rt.ui._right
-	var r := corner.get_global_rect()
+	if rt == null or rt.ui.hud == null: return
+	var r: Rect2 = rt.ui.hud_corner_rect()
 	_close_button.global_position = Vector2(r.end.x - _close_button.size.x, r.position.y + (r.size.y - _close_button.size.y) * 0.5)
 
 ## Open at the shore and cast right away (the world's main action was the Cast press).
