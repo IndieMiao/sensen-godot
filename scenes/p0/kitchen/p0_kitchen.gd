@@ -63,6 +63,7 @@ var _stove: Dictionary = {}
 var _start_ms := 0
 var _taps: Array = []
 var _judged := {}
+var _judged_turn := {}   # ring index → the needle's turn (0–1) when it was judged: where its result dot sits (⑩)
 var _cook_sent := false
 var _sheet: UiDrawer
 var _sheet_header: UiObjectHeader
@@ -390,11 +391,14 @@ func watch(stove: Dictionary) -> void:
 	if stove.get("id", null) == null or stove.get("id", null) != _stove.get("id", null):
 		_taps.clear()
 		_judged.clear()
+		_judged_turn.clear()
 	_stove = stove
 	_start_ms = Time.get_ticks_msec() - int(float(stove.get("elapsed", 0)))
 	var heats: Array = stove.get("heats", [])
 	for i in heats.size():
-		if not _judged.has(i) and elapsed() > float(heats[i].at) + float(heats[i].spin): _judged[i] = false
+		if not _judged.has(i) and elapsed() > float(heats[i].at) + float(heats[i].spin):
+			_judged[i] = false
+			_judged_turn[i] = 1.0
 	phase = "watch"
 	_hide_player(true)
 	stage.set_cooking(true)
@@ -498,9 +502,12 @@ func _judge_tap() -> bool:
 		_taps.append(roundi(e))
 		var hit := P0Logic.heat_hit(h, e)
 		_judged[i] = hit
+		_judged_turn[i] = clampf((e - float(h.at)) / float(h.spin), 0.0, 1.0)
 		# S5 (SGODOT-232): the server keeps each ring's first tap, so an automatic Keep judges it too.
 		if P0KitchenLogic.cooking(rt.session.current()).has("conveniences"): rt.session.send(_with_pot({"type": "heat", "taps": [roundi(e)]}, _stove))
-		if _ring: _ring.result = 1 if hit else 0
+		if _ring:
+			_ring.result = 1 if hit else 0
+			_ring.mark_turn = _judged_turn[i]
 		rt.ui.float_text("Nice heat! ★" if hit else "Missed · still cooking", _ring_center(), UiTokens.COLOR_GOLD_INK if hit else UiTokens.COLOR_SECONDARY)
 		if hit: Input.vibrate_handheld(40)
 		return true
@@ -532,6 +539,7 @@ func _process(_dt: float) -> void:
 		if auto_play and not _judged.has(i) and e >= float(h.at) + (float(h.gold) + float(h.width) * 0.5) * float(h.spin): _judge_tap()
 		if not _judged.has(i) and e > float(h.at) + float(h.spin):
 			_judged[i] = false
+			_judged_turn[i] = 1.0   # the needle went round untouched: its dot where it stopped
 			rt.ui.float_text("Missed · still cooking", _ring_center(), UiTokens.COLOR_SECONDARY)
 		if e >= float(h.at) - RING_EARLY_MS and e <= float(h.at) + float(h.spin) + 350.0: active = i
 	if _ring:
@@ -543,6 +551,7 @@ func _process(_dt: float) -> void:
 			_ring.grow = clampf(1.0 - (float(h.at) - e) / RING_EARLY_MS, 0.0, 1.0)
 			_ring.turn = clampf((e - float(h.at)) / float(h.spin), 0.0, 1.0)
 			_ring.result = (1 if _judged[active] else 0) if _judged.has(active) else -1
+			_ring.mark_turn = float(_judged_turn.get(active, -1.0))
 			_ring.position = _ring_center() - _ring.size * 0.5
 	if phase != "watch": return   # the queue drawer: no sheet; a pot done meanwhile is served when the watch resumes
 	if _queue_badge and _queue_badge.visible: _queue_badge.place_at(_ring_center() + QUEUE_BADGE_AT)

@@ -210,6 +210,7 @@ func test_the_heat_ring_goes_on_under_the_queue_drawer_and_a_hit_there_stands() 
 	assert_str(k.drawer.tab).is_equal(tab)
 	assert_bool(rt.ui.has_modal()).is_true()
 	assert_bool(bool(k.get("_judged").get(0, false))).is_true()
+	assert_float(ring.mark_turn).is_equal_approx(0.5, 0.02)   # its dot where the needle was (SGODOT-256 ⑩)
 	var floats: Array = rt.ui.root.find_children("*", "UiFloatText", true, false).map(func(f): return (f as UiFloatText).text)
 	assert_array(floats).contains(["Nice heat! ★"])
 	rt.ui.close_modal()   # back to the watch: the ring stands as hit, not judged again
@@ -254,6 +255,7 @@ func test_a_tap_on_the_pot_band_while_a_ring_shows_but_outside_its_window_keeps_
 		assert_str(k.phase).override_failure_message(str(at)).is_equal("compose")
 		assert_bool(rt.ui.has_modal()).is_true()
 	assert_bool(bool(k.get("_judged").get(0, true))).is_false()   # the turn went by: a miss, from the clock, not the taps
+	assert_float((k.get("_ring") as UiHeatRing).mark_turn).is_equal(1.0)   # its dot where the untouched needle stopped
 	rt.ui.close_modal()
 	await get_tree().process_frame
 	k.stop_watching()
