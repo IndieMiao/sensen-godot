@@ -597,6 +597,26 @@ func toast(text: String, seconds := 2.6) -> void:
 	_toast_left = seconds
 
 # ---------------------------------------------------------------- modals
+## Android Back closes what is on top first, one layer per press (LOCK-06, int5 hand test 012–013 / 023–024): the
+## PinMenu, the radial, then a card or drawer. True when it closed something; the world only leaves on false.
+func close_top_layer() -> bool:
+	if _pin_menu:
+		_close_pin_menu()
+		return true
+	if _radial.visible:
+		_radial.close()
+		return true
+	if _modal != null:
+		close_modal()
+		return true
+	return false
+
+## A world change ends the stick: a finger still down when the farmhouse door took the player in never sends its
+## release to this pad (int5 hand test 029–030), so its ring would stay and the old world keep walking.
+func end_stick() -> void:
+	(pad as _TouchPad).end_stick()
+	joystick.emit(Vector2.ZERO)
+
 func has_modal() -> bool: return _modal != null or (_radial != null and _radial.visible)
 
 func close_modal() -> void:
@@ -2053,6 +2073,9 @@ class _TouchPad extends Control:
 	var ui: P0Ui
 	var _arb := GestureArbiter.new(GestureArbiter.Mode.SCENE)
 	func _ready() -> void: mouse_filter = Control.MOUSE_FILTER_STOP
+	func end_stick() -> void:
+		_arb.reset()
+		queue_redraw()
 	func _gui_input(e: InputEvent) -> void:
 		if e is InputEventMouseButton and e.pressed and e.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
 			ui.zoom.emit(0.9 if e.button_index == MOUSE_BUTTON_WHEEL_UP else 1.1)
