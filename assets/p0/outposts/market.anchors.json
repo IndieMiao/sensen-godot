@@ -1,16 +1,17 @@
 {
-  "_note": "Placeholder anchors on the Basic Room (SGODOT-227): names follow the WP7-B F-03 table; positions sit on Basic Room furniture (counter = sink cabinet, tea table = dining table, bench = window bench) and the green door, same as the farmhouse. Replaced by the final model's layout.json anchors (SGODOT-214..217).",
+  "_note": "Xuhui Market Square on the Fruit Shop kit (SGODOT-227 scene integration; placeholder until SGODOT-218). Room metres of assets/rooms/fruit_shop/layout.json, floor top y 0.05. The produce table backs onto the display hutch, so Mei keeps the stall from its right end by the scale (the spot behind the table's middle is hidden from the room camera). Tapping the stall is tapping her. The Market Board is the orchard sign on the left wall; City Specialty is the fig crate by the door. Spawn and exit at the front steps; the door's prompt sits on the steps (badge_exit).",
   "anchors": [
-    {"name": "use_stall_1", "position": [-0.47, 1.25, -2.62], "module": "sink_cabinet"},
-    {"name": "stand_stall_1", "position": [-0.47, 0.085, -1.75], "yaw_degrees": 0},
-    {"name": "npc_keeper", "position": [0.2, 0.085, -2.05], "yaw_degrees": 180},
-    {"name": "badge_keeper", "position": [0.0, 2.35, -2.05]},
-    {"name": "stand_keeper", "position": [-0.47, 0.085, -1.75], "yaw_degrees": 0},
-    {"name": "use_market_board", "position": [-3.0, 1.4, -1.5]},
-    {"name": "stand_market_board", "position": [-2.25, 0.085, -1.5], "yaw_degrees": 90},
-    {"name": "use_specialty_shelf", "position": [-0.12, 0.85, 0.62], "module": "dining_table"},
-    {"name": "stand_specialty_shelf", "position": [-0.12, 0.085, 1.65], "yaw_degrees": 0},
-    {"name": "spawn", "position": [2.03, 0.085, -1.9], "yaw_degrees": 180},
-    {"name": "exit", "position": [2.03, 0.085, -2.55]}
+    {"name": "use_stall_1", "position": [2.0, 1.1, -1.27], "module": "produce_display_table"},
+    {"name": "stand_stall_1", "position": [2.2, 0.05, -0.5], "yaw_degrees": 0},
+    {"name": "npc_keeper", "position": [2.5, 0.05, -1.9], "yaw_degrees": 180},
+    {"name": "badge_keeper", "position": [2.5, 2.4, -1.9]},
+    {"name": "stand_keeper", "position": [2.2, 0.05, -0.5], "yaw_degrees": 0},
+    {"name": "use_market_board", "position": [-2.75, 1.83, 1.75], "module": "orchard_market_sign"},
+    {"name": "stand_market_board", "position": [-2.2, 0.05, 1.75], "yaw_degrees": 90},
+    {"name": "use_specialty_shelf", "position": [0.85, 0.7, 1.3], "module": "floor_fig_crate"},
+    {"name": "stand_specialty_shelf", "position": [0.1, 0.05, 1.3], "yaw_degrees": -90},
+    {"name": "spawn", "position": [0.15, 0.05, 2.05], "yaw_degrees": 0},
+    {"name": "exit", "position": [0.15, 0.05, 2.65]},
+    {"name": "badge_exit", "position": [0.15, 0.0, 3.4]}
   ]
 }

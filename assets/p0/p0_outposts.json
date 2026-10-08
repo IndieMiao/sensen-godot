@@ -13,9 +13,10 @@
       "keeper": {"role": "Tackle Keeper", "name": "Finn"},
       "residents": ["res_old_kai"],
       "nearest": {"name": "Reed Pond", "site": "pond"},
-      "art": "basic_room",
+      "art": "farm_tools_store",
+      "backdrop": {"top": "EFF7F4", "bottom": "FDFCF4", "blend": [0.5, 0.95]},
       "anchors": "res://assets/p0/outposts/tackle.anchors.json",
-      "bounds": [-3.0, 3.0, -3.0, 3.2],
+      "bounds": [-3.35, 3.35, -3.05, 3.05],
       "seats": []
     },
     {
@@ -44,9 +45,10 @@
       "capacity": 12,
       "keeper": {"role": "Post Clerk", "name": "Sigrid"},
       "residents": ["res_pip"],
-      "art": "basic_room",
+      "art": "post_office",
+      "backdrop": {"top": "EFF7F4", "bottom": "FDFCF4", "blend": [0.5, 0.95]},
       "anchors": "res://assets/p0/outposts/post.anchors.json",
-      "bounds": [-3.0, 3.0, -3.0, 3.2],
+      "bounds": [-3.45, 3.45, -3.15, 3.15],
       "seats": []
     },
     {
@@ -59,9 +61,10 @@
       "capacity": 30,
       "keeper": {"role": "Market Keeper", "name": "Mei"},
       "residents": [],
-      "art": "basic_room",
+      "art": "fruit_shop",
+      "backdrop": {"top": "D5EFF3"},
       "anchors": "res://assets/p0/outposts/market.anchors.json",
-      "bounds": [-3.0, 3.0, -3.0, 3.2],
+      "bounds": [-3.05, 3.05, -2.8, 2.8],
       "seats": []
     }
   ]
