@@ -87,9 +87,10 @@ func show_spec(spec: Dictionary, once := false, stock := 99) -> void:
 	_title.text = str(spec.get("title", ""))
 	var facts: Array = spec.get("facts", [])
 	# F-07 buy row: line 2 the use, line 3 the stock / gate; with the stepper above 1, line 2 says "2 × 15 coins".
+	# A single fact is the use (Row Hoe `Sows 3 plots at once`, an unowned rod's reach) and sits on line 2.
 	var price: Dictionary = spec.get("price", {})
-	_effect.text = str(price.get("line", "")) if str(price.get("line", "")) != "" else (str(facts[0]) if facts.size() > 1 else "")
-	_gate.text = str(facts[-1]) if not facts.is_empty() else ""
+	_effect.text = str(price.get("line", "")) if str(price.get("line", "")) != "" else (str(facts[0]) if not facts.is_empty() else "")
+	_gate.text = str(facts[1]) if facts.size() > 1 else ""
 	_price.text = str(price.get("text", ""))
 	_chevron.visible = bool(spec.get("info", false))
 	var qty := stepper.value if stepper else 1
