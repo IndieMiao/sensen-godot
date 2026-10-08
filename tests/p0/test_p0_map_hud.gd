@@ -243,3 +243,54 @@ func test_the_opening_view_frames_the_home_set() -> void:
 ## The P0Runtime singleton the map brought up goes with the suite (P0Runtime.free_instance_for_tests).
 func after() -> void:
 	P0Runtime.free_instance_for_tests()
+
+## 李元芳 int10: Android Back on the map closes P0's layers one per press — Bag, Today, the Inbox, a pond card under its
+## fish list, an outpost's card — and only with none left is it the map's own (LOCK-06). #92 brought P0's HUD and Bag
+## to the map without this; int9's map had neither.
+func test_back_on_the_map_closes_p0_layers_one_at_a_time() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var ui: P0Ui = rt.ui
+	var saved: Dictionary = rt.session.view
+	var v := _bag_view()
+	rt.session.view = v
+	ui.set_view(v)
+	assert_str(ui.space).is_equal("map")
+	assert_bool(m.is_back_navigation_locked()).is_false()   # nothing open: the map's own Back
+	for layer in ["bag", "today", "inbox"]:
+		match layer:
+			"bag": ui.open_bag()
+			"today": ui.open_today()
+			"inbox": ui.open_inbox()
+		assert_bool(ui.has_modal()).append_failure_message(layer).is_true()
+		assert_bool(m.is_back_navigation_locked()).append_failure_message(layer).is_true()
+		assert_bool(ui.has_modal()).append_failure_message(layer).is_false()
+		await get_tree().process_frame
+	# Two layers on the map: a pond card and its Details › fish list (#95). Back: the list, then the card, then the
+	# map's own. (The map's quick bar is Bag alone, so no slot can be lifted or dragged here.)
+	m.p0_dev(PackedStringArray(["pondfish", "pond_shanghai_05"]))
+	await get_tree().process_frame
+	assert_str(ui.modal_kind).is_equal("pond_fish")
+	assert_bool(m.is_back_navigation_locked()).is_true()
+	await get_tree().process_frame
+	assert_str(ui.modal_kind).is_equal("pond_card")
+	assert_bool(m.is_back_navigation_locked()).is_true()
+	await get_tree().process_frame
+	assert_bool(ui.has_modal()).is_false()
+	assert_bool(m.is_back_navigation_locked()).is_false()
+	# An outpost's card (#100): one Back.
+	m.city_map.select(P0Outposts.place_entry(P0Outposts.by_role("tea")))
+	assert_str(ui.modal_kind).is_equal("place_card")
+	assert_bool(m.is_back_navigation_locked()).is_true()
+	assert_bool(ui.has_modal()).is_false()
+	for key in WaterShore._pending.keys(): WorkerThreadPool.wait_for_task_completion(WaterShore._pending[key])
+	WaterShore._pending.clear()
+	rt.session.view = saved
+
+func _bag_view() -> Dictionary:
+	return {"energy": {"value": 200, "max": 200, "next_in": null, "regen_ms": 240000}, "coins": 40, "skills": {},
+		"items": {"seed_herb": {"kind": "seed"}}, "names": {"seed_herb": "Herb Seeds"},
+		"bag": {"capacity": 25, "free": 24, "slots": [{"id": "seed_herb", "qty": 5}]}, "plots": [],
+		"inbox": {"limit": 8, "badge": 0, "waiting": 0, "claim_slots": 0, "parcels": [], "updates": []}}

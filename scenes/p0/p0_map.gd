@@ -627,6 +627,14 @@ func place_for(target: String) -> Dictionary:
 
 func p0_surface() -> String: return "map"
 
+## Android Back on the map (李元芳 int10): P0's own layers first, one per press — a dragged or lifted slot flies back,
+## then the radial, then a card, then a drawer (P0Ui.close_top_layer, LOCK-06) — and only with none left the map's own
+## (its city card, relocation, a farm selection). #92 brought P0's HUD and Bag to the map without this, so Bag, Today,
+## the Inbox and the place cards could not be closed with Back there.
+func is_back_navigation_locked() -> bool:
+	if rt != null and rt.ui.close_top_layer(): return true
+	return super.is_back_navigation_locked()
+
 ## Map marks (plan §9.5.2, q(48)): ✓ deliverable, ! request, ◆ new, in priority order. One list badges the pins
 ## (CityMapView.set_marks: the first five on screen) and packs them first with whole labels (#83's _marker_of, through
 ## city_pin_markers), so a badge and its pin never disagree (亚瑟 on 234).
