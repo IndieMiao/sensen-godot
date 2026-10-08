@@ -15,6 +15,8 @@ const P0_OUTPOST := "res://scenes/p0/p0_outpost.tscn"
 const NEAREST_POND := "pond_shanghai_05"   # Reed Pond, the closest to home
 ## Online counts on the outpost pins (GET /p0/presence), refreshed while the map is on top.
 const PRESENCE_S := 15.0
+## Show on map lands this close (the outpost / pond pins and the homestead read at this zoom).
+const SHOW_ZOOM := 15.5
 
 var rt: P0Runtime
 var _presence: HTTPRequest
@@ -157,17 +159,33 @@ func resume() -> void:
 	rt.after_leave = ""
 	match next:
 		"farm": _open_my_farm.call_deferred()      # FISH-4 Go home · Free
-		"tackle": _show_tackle_shop.call_deferred()  # FISH-5 Tackle Shop: the camera goes to Old Kai's pin
+		"tackle": show_place.call_deferred("outpost:tackle")   # FISH-5 Tackle Shop: the camera goes to Old Kai's pin
+		_:
+			# Show on map (SGODOT-225): P0Runtime._leave_then("show:<target>") from Today, NeedSource, the Energy card.
+			if next.begins_with("show:"): show_place.call_deferred(next.trim_prefix("show:"))
 
-func _show_tackle_shop() -> void:
+## Show on map (SGODOT-225; LOCK-08, guidance only, nothing is entered): the camera flies to the target's pin and
+## selects it — "outpost:<role>" an outpost, "pond:<id>" a catalog pond, "home" the homestead (fly only: its pin
+## would offer Enter). "map" (Browse the map) and unknown targets leave the camera where the player left it.
+func show_place(target: String) -> void:
 	if city_map == null: return
+	var entry := place_for(target)
+	if entry.is_empty(): return
 	_reset_gesture()
 	_city_bounds()   # city-wide pan bounds, else the homestead's 450 m box pulls the camera back
-	var shop := P0Outposts.place_entry(P0Outposts.by_role("tackle"), int(_online.get(str(P0Outposts.by_role("tackle").id), 0)))
-	fly_to(float(shop.lat), float(shop.lng))
-	_set_zoom(15.5)
+	fly_to(float(entry.lat), float(entry.lng))
+	_set_zoom(SHOW_ZOOM)
 	_camera_dirty = true
-	city_map.select(shop)
+	if target != "home": city_map.select(entry)
+
+## The pin a Show on map target points at ({lat, lng} plus the city-map entry for outposts and ponds), or {}.
+func place_for(target: String) -> Dictionary:
+	if target == "home": return {"lat": home_lat, "lng": home_lng}
+	if target.begins_with("outpost:"):
+		var o := P0Outposts.by_role(target.trim_prefix("outpost:"))
+		return {} if o.is_empty() else P0Outposts.place_entry(o, int(_online.get(str(o.id), 0)))
+	if target.begins_with("pond:"): return SystemPonds.location(target.trim_prefix("pond:"))
+	return {}
 
 func p0_surface() -> String: return "map"
 

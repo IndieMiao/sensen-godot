@@ -172,6 +172,8 @@ var _spot_after_room := ""
 
 func _show_spot(where: String) -> void:
 	if world is P0Room and session.space == "home" and not bool(_call("p0_has_spot", [where])):
+		# Only when the farmhouse really steps out (it is on top); else nothing waits to jump the camera later (亚瑟 on #37).
+		if AppRouter.top_instance() != world: return
 		_spot_after_room = where
 		leave_room()
 		return

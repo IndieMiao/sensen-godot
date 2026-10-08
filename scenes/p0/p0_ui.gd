@@ -1055,7 +1055,9 @@ func _bag_lift(it: Dictionary, at: Vector2) -> void:
 	_modal.add_child(zone)
 	zone.center = GestureArbiter.drop_zone_centers(_bar.get_global_rect(), true)[0]
 	zone.appear()
-	if _bag: _bag.grid.modulate.a = UiTokens.OPACITY_PENDING   # the grid dims and takes no drop (不知火舞 on 225)
+	if _bag:
+		_bag.grid.modulate.a = UiTokens.OPACITY_PENDING   # the grid dims and takes no drop (不知火舞 on 225)
+		_bag.grid.lifted_id = id                          # its own cell turns into a dashed gap (BAR-DRAG-9)
 	if _bar.haptics and OS.has_feature("mobile"): Input.vibrate_handheld(20)
 	_bag_drag = {id = id, ghost = ghost, zone = zone}
 	_bag_drag_to(at)
@@ -1085,7 +1087,9 @@ func _bag_drag_end() -> void:
 	if _bag_drag.is_empty(): return
 	if is_instance_valid(_bag_drag.ghost): (_bag_drag.ghost as Node).queue_free()
 	if is_instance_valid(_bag_drag.zone): (_bag_drag.zone as UiBarDropZone).vanish()
-	if _bag and is_instance_valid(_bag): _bag.grid.modulate.a = 1.0
+	if _bag and is_instance_valid(_bag):
+		_bag.grid.modulate.a = 1.0
+		_bag.grid.lifted_id = ""
 	_bar.set_drop_target(-1)
 	_bag_drag = {}
 
