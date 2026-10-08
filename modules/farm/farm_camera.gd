@@ -4,11 +4,20 @@ const PITCH_DEG := 43.0
 const YAW_DEG := 14.5
 const DISTANCE := 11.0
 const VIEW_M := 6.0
+## The P0 farm's view at zoom 1 is this much wider than the old farm's close view (P0Farm._place_camera).
+const P0_VIEW_K := 1.12
 
 static func close_view_size(viewport_size: Vector2) -> float:
 	var aspect := viewport_size.x / maxf(viewport_size.y, 1)
 	var width := VIEW_M * 1.2 if viewport_size.y < 700 and viewport_size.x < 600 else VIEW_M
 	return maxf(width, 7.2 * aspect)
+
+## One player scale everywhere (用户, 2026-10-09: rooms and the mine match the farm). The orthographic width a camera
+## pitched `pitch_deg` needs for the player to stand as tall on screen as on the P0 farm at zoom 1: a standing figure's
+## height projects by cos(pitch), so the width scales with cos(pitch) / cos(farm pitch). On 360 × 800 the player
+## (feet to the top of the head) is 65.8 px tall, 18.3 % of the screen width, at 6.72 m and 43°.
+static func player_scale_size(viewport_size: Vector2, pitch_deg: float) -> float:
+	return close_view_size(viewport_size) * P0_VIEW_K * cos(deg_to_rad(pitch_deg)) / cos(deg_to_rad(PITCH_DEG))
 
 static func place(camera: Camera3D, center: Vector3) -> void:
 	var pitch := deg_to_rad(PITCH_DEG)

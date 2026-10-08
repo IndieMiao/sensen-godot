@@ -250,7 +250,7 @@ func _place_camera() -> void:
 	var vp := get_viewport().get_visible_rect().size
 	cam.projection = Camera3D.PROJECTION_ORTHOGONAL
 	cam.keep_aspect = Camera3D.KEEP_WIDTH   # the old farm frames by width (portrait phones)
-	cam.size = FarmCamera.close_view_size(vp) * 1.12 / _zoom
+	cam.size = FarmCamera.close_view_size(vp) * FarmCamera.P0_VIEW_K / _zoom
 	FarmCamera.place(cam, _focus + Vector3.UP * 0.7)
 	if _dev_yaw >= 0.0:   # P0_SHOT yaw comparison only (style doc asks 35–45°, the old farm uses 14.5°)
 		var c := _focus + Vector3.UP * 0.7
