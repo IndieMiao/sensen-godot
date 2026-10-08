@@ -29,7 +29,9 @@ export const LIMITS = {
 };
 
 interface Conn { ws: WebSocket; player: string; epoch: number; appearance: Appearance; tokens: number; tokenAt: number; lastSeen: number; dressedAt: number }
-export interface P0OnlineDeps { rooms: OutpostRooms; appearances?: AppearanceCatalog; now?: () => number }
+/** keys: the demo access keys (P0_ACCESS_KEYS, SGODOT-232 D1). The upgrade is not a Fastify request, so the
+ * guard's onRequest hook never sees it: the hub checks x-p0-key itself. Empty or absent = no key (local playtests). */
+export interface P0OnlineDeps { rooms: OutpostRooms; appearances?: AppearanceCatalog; now?: () => number; keys?: string[] }
 
 export class P0OnlineHub {
   readonly conns = new Set<Conn>();
@@ -44,6 +46,11 @@ export class P0OnlineHub {
   }
 
   upgrade(req: IncomingMessage, socket: Duplex, head: Buffer): void {
+    const keys = this.deps.keys ?? [];
+    if (keys.length > 0 && !keys.includes(String(req.headers['x-p0-key'] ?? ''))) {
+      socket.end('HTTP/1.1 401 Unauthorized\r\nConnection: close\r\n\r\n');
+      return;
+    }
     const player = String(req.headers['x-p0-player'] ?? '');
     if (!PLAYER_RE.test(player)) { socket.end('HTTP/1.1 400 Bad Request\r\nConnection: close\r\n\r\n'); return; }
     if (this.conns.size >= LIMITS.connections) { socket.end('HTTP/1.1 503 Service Unavailable\r\nConnection: close\r\n\r\n'); return; }

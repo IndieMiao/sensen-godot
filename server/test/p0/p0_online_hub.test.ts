@@ -17,10 +17,10 @@ afterEach(async () => {
   app = undefined;
 });
 
-async function server() {
+async function server(keys?: string[]) {
   app = Fastify({ logger: false });
   const rooms = new OutpostRooms(loadOutposts());
-  registerP0Online(app, { rooms });
+  registerP0Online(app, { rooms, keys });
   await app.listen({ port: 0, host: '127.0.0.1' });
   const address = app.server.address();
   const port = typeof address === 'object' && address ? address.port : 0;
@@ -28,8 +28,8 @@ async function server() {
 }
 
 interface Client { ws: WebSocket; json: Record<string, any>[]; frames: Buffer[]; closed?: { code: number; reason: string } }
-function connect(port: number, player: string): Promise<Client> {
-  const ws = new WebSocket(`ws://127.0.0.1:${port}${PATH}`, { headers: { 'x-p0-player': player } });
+function connect(port: number, player: string, key?: string): Promise<Client> {
+  const ws = new WebSocket(`ws://127.0.0.1:${port}${PATH}`, { headers: { 'x-p0-player': player, ...(key ? { 'x-p0-key': key } : {}) } });
   sockets.push(ws);
   const client: Client = { ws, json: [], frames: [] };
   ws.on('message', (data, binary) => binary ? client.frames.push(data as Buffer) : client.json.push(JSON.parse(String(data))));
@@ -210,5 +210,12 @@ describe('P0 online hub (/v1/p0/online, SGODOT-227)', () => {
     const b = await connect(port, 'tackle-guest-02');
     await join(b, 'sh_tackle_1');
     expect(await online()).toBe(2);   // every outpost room, like GET /v1/p0/presence
+  });
+  it('with demo keys set the upgrade needs x-p0-key, which the HTTP guard hook never sees (SGODOT-232 D1)', async () => {
+    const { port } = await server(['demo-key-1']);
+    await expect(connect(port, 'keyless-player-1')).rejects.toThrow('HTTP 401');
+    await expect(connect(port, 'wrong-key-player', 'nope')).rejects.toThrow('HTTP 401');
+    const c = await connect(port, 'keyed-player-001', 'demo-key-1');
+    expect((await join(c, 'sh_tea_1')).room).toBe(1);
   });
 });

@@ -91,3 +91,15 @@ func test_inputs_are_sent_only_when_something_changed() -> void:
 	assert_int(inputs.size()).is_equal(2)
 	assert_dict(inputs[1]).contains_key_value("x", 1.5)
 	assert_int(int(inputs[1].epoch)).is_equal(3)
+
+func test_the_handshake_carries_the_demo_key_only_when_there_is_one() -> void:
+	var o: P0Online = auto_free(P0Online.new())
+	o.url = "ws://127.0.0.1:9/v1/p0/online"
+	o.player_id = "key-test-player"
+	o.start("sh_tea_1", Vector2.ZERO)
+	assert_array(o.socket.handshake_headers).is_equal(PackedStringArray(["x-p0-player: key-test-player"]))
+	o.stop()
+	o.access_key = "demo-key-1"
+	o.start("sh_tea_1", Vector2.ZERO)
+	assert_array(o.socket.handshake_headers).contains(["x-p0-key: demo-key-1"])
+	o.stop()

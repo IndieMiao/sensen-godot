@@ -23,6 +23,7 @@ const ACTIONS := ["idle", "run", "walk", "labour_sow", "labour_water", "labour_h
 
 var url := ""
 var player_id := ""
+var access_key := ""   # the demo server's key (P0Session.access_key, SGODOT-232 D1); "" for local playtests
 var outpost := ""
 var spawn_at := Vector2.ZERO
 var appearance: Dictionary = {}
@@ -108,7 +109,9 @@ func seat_of(id: int) -> String:
 func _connect() -> void:
 	_reset()
 	socket = WebSocketPeer.new()
-	socket.handshake_headers = PackedStringArray(["x-p0-player: " + player_id])
+	var headers := PackedStringArray(["x-p0-player: " + player_id])
+	if access_key != "": headers.append("x-p0-key: " + access_key)
+	socket.handshake_headers = headers
 	if socket.connect_to_url(url) != OK: _retry()
 
 func _reset() -> void:

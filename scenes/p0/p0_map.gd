@@ -110,7 +110,9 @@ func _start_presence() -> void:
 func _poll_presence() -> void:
 	if not is_instance_valid(_presence) or not is_visible_in_tree() or rt == null: return
 	if _presence.get_http_client_status() != HTTPClient.STATUS_DISCONNECTED: return
-	_presence.request(rt.session.base_url + "/p0/presence", PackedStringArray(["x-p0-player: " + rt.session.player_id]))
+	var headers := PackedStringArray(["x-p0-player: " + rt.session.player_id])
+	if rt.session.access_key != "": headers.append("x-p0-key: " + rt.session.access_key)   # the demo server's key
+	_presence.request(rt.session.base_url + "/p0/presence", headers)
 
 func _on_presence(result: int, code: int, _h: PackedStringArray, body: PackedByteArray) -> void:
 	if result != HTTPRequest.RESULT_SUCCESS or code != 200 or city_map == null: return

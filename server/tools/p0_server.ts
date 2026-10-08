@@ -26,7 +26,9 @@ const app = Fastify({ logger: false });
 // give the Tea Host's "N online" in the state view (SGODOT-228).
 const rooms = new OutpostRooms(loadOutposts());
 registerP0Routes(app, { content, store, now: Date.now, dev: process.env.P0_DEV !== '0', presence: () => rooms.total() });
-registerP0Online(app, { rooms, appearances: new AppearanceCatalog(path.join(root, 'assets/farm/data/regions.json')) });
+// The demo key (P0_ACCESS_KEYS) for the WebSocket upgrade, which the HTTP guard's hook does not see (SGODOT-232 D1).
+const keys = (process.env.P0_ACCESS_KEYS ?? '').split(',').map(k => k.trim()).filter(Boolean);
+registerP0Online(app, { rooms, keys, appearances: new AppearanceCatalog(path.join(root, 'assets/farm/data/regions.json')) });
 app.get('/v1/healthz', async () => ({ ok: true, p0: content.version }));
 const port = Number(process.env.P0_PORT ?? 3110);
 await app.listen({ port, host: process.env.P0_HOST ?? '0.0.0.0' });
