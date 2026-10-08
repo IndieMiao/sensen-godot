@@ -40,10 +40,12 @@ if (mode === 'fill') {
   const [outpost = 'sh_tackle_1', n = '12'] = rest;
   for (let i = 0; i < Number(n); i++) bot(`fill-bot-${String(i).padStart(4, '0')}`, { outpost, at: [-2 + (i % 4), -1 + Math.floor(i / 4)] });
 } else if (mode === 'tea') {
-  bot('tea-walker-001', { outpost: 'sh_tea_1', at: [1.5, 1.8], slots: { hairHat: 'hairhat43', cloth: 'cloth11' },
-    move: t => [0.6 + Math.cos(t * 0.6) * 1.0, 1.9 + Math.sin(t * 0.6) * 0.5] });
-  bot('tea-sitter-002', { outpost: 'sh_tea_1', at: [-2.0, 1.1], slots: { hairHat: 'hairhat51', cloth: 'cloth1_1' },
-    seat: { node: 'seat_bench_2', at: [-2.6, 1.43] } });
+  // Coffee Shop kit (SGODOT-227 scene integration): the walker loops the open floor between the tables and the
+  // counter; the sitter takes the far chair of the second table (chair_4).
+  bot('tea-walker-001', { outpost: 'sh_tea_1', at: [0.2, -0.6], slots: { hairHat: 'hairhat43', cloth: 'cloth11' },
+    move: t => [0.2 + Math.cos(t * 0.6) * 1.4, -0.6 + Math.sin(t * 0.6) * 0.3] });
+  bot('tea-sitter-002', { outpost: 'sh_tea_1', at: [2.3, 1.8], slots: { hairHat: 'hairhat51', cloth: 'cloth1_1' },
+    seat: { node: 'seat_table2_2', at: [2.24, 1.0] } });
 } else {
   console.error('usage: p0_outpost_bots.ts fill [outpost] [n] | tea');
   process.exit(2);

@@ -1,9 +1,10 @@
 extends P0Room
-## A home-set outpost room (SGODOT-227) on the indoor shell (P0Room, SGODOT-226): the outpost's placeholder art
-## and anchors, its keeper and residents at their npc_ anchors, tap-triggered counters and seats (LOCK-07), and
-## the outpost's realtime room: P0Online + OnlineCrowd show the other players, and the server picks Room 1,
-## Room 2 … (indoor 12, Market Square 30). Counters and residents open the panel entries of SGODOT-224 / 225
-## when present; until then the tackle counter keeps the existing greeting.
+## A home-set outpost room (SGODOT-227) on the indoor shell (P0Room, SGODOT-226): the outpost's room kit (its
+## `art` in p0_outposts.json, a Scene_design scene standing in until SGODOT-218) and anchors, its keeper and
+## residents at their npc_ anchors, tap-triggered counters and seats (LOCK-07), and the outpost's realtime room:
+## P0Online + OnlineCrowd show the other players, and the server picks Room 1, Room 2 … (indoor 12, Market
+## Square 30). Counters and residents open the panel entries of SGODOT-224 / 225 when present; until then the
+## tackle counter keeps the existing greeting.
 
 const OnlineCrowd = preload("res://modules/net/online_crowd.gd")
 const NPCS_PATH := "res://assets/p0/outpost_npcs.json"
@@ -12,7 +13,7 @@ const DECOR := ["use_fish_board", "use_fee_board", "use_stamp_desk", "use_coffee
 ## Tapping the counter is tapping the keeper (LOCK-15 / 16).
 const COUNTERS := ["use_counter", "use_stall_1", "npc_keeper"]
 ## Furniture that seats: its seat_ anchors are seat_<group>_<n>.
-const SEAT_GROUPS := {"use_tea_table_1": "seat_table1_", "use_bench": "seat_bench_"}
+const SEAT_GROUPS := {"use_tea_table_1": "seat_table1_", "use_tea_table_2": "seat_table2_", "use_bench": "seat_bench_"}
 ## sit_idle puts the hip joint 0.426 m above the rig root and the thighs rest about 0.086 m below the joint
 ## (measured on the base rig, SGODOT-227), so a seated root sits this far below the seat surface.
 const SIT_ROOT_BELOW_SEAT := 0.34
@@ -41,6 +42,7 @@ func setup(args: Dictionary) -> void:
 	keeper = outpost.get("keeper", {})
 	place_name = str(outpost.get("name", "Outpost"))
 	anchors_path = str(outpost.get("anchors", ""))
+	use_art(str(outpost.get("art", "")))   # the outpost's room kit; the anchors file is written for that kit
 	if role == "market": exit_text = "Exit · Back to map"
 	exit_to = "Map"   # the door's world prompt: i-door + Map (SGODOT-250)
 
@@ -150,7 +152,7 @@ func _tappable() -> PackedStringArray:
 
 func p0_tap(screen: Vector2) -> void:
 	if rt and rt.ui.has_modal(): return
-	var n := pick(screen)
+	var n := tap_target(screen)   # a world prompt's tap goes to its own anchor, wherever its badge_ point puts it
 	if n == "": return
 	if not _standing.is_empty(): return
 	var go := func():

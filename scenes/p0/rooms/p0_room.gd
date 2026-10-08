@@ -31,6 +31,7 @@ const ZOOM_RANGE := Vector2(0.8, 1.6)
 const FRAME_W := 0.84             # opening shot: player + facilities within 84 % of the width …
 const FRAME_H := 0.60             # … and the middle 60 % of the height (§10.1)
 const MIN_VIEW_K := 0.8           # … but never closer than 80 % of the room's accepted view
+const SIDE_MARGIN := 18.0         # … and at least this many px clear beside the art on both sides (227: ≥ 16)
 const BADGE_SCRIPT := "res://scenes/ui_kit/ui_status_badge.gd"   # UiStatusBadge (SGODOT-221)
 
 var art_scene: PackedScene
@@ -90,6 +91,19 @@ var _leaving := false
 var _perf_left := -1.0    # debug builds with user://p0_perf: log fps / draw calls every 5 s (logcat tag godot)
 
 func setup(_args: Dictionary) -> void: pass
+
+## Room kit art by id (SGODOT-227 scene integration): "basic_room" (the default) or a Scene_design kit such as
+## "coffee_shop", read from scenes/<id>/<id>_art.tscn and assets/rooms/<id>/layout.json. A kit that is missing
+## keeps the Basic Room, so a space never opens empty.
+func use_art(id: String) -> void:
+	if id == "" or id == "basic_room": return
+	var scene := "res://scenes/%s/%s_art.tscn" % [id, id]
+	var kit_layout := "res://assets/rooms/%s/layout.json" % id
+	if not (ResourceLoader.exists(scene) and FileAccess.file_exists(kit_layout)):
+		push_warning("P0Room: no room kit '%s', keeping the Basic Room" % id)
+		return
+	art_scene = load(scene)
+	layout_path = kit_layout
 
 func _ready() -> void:
 	if use_runtime: P0Runtime.mark("%s _ready start" % name)
@@ -257,7 +271,7 @@ static func yaw_dir(yaw_degrees: float) -> Vector3:
 func _build_environment() -> void:
 	environment = Environment.new()
 	environment.background_mode = Environment.BG_COLOR
-	environment.background_color = BACKDROP   # also the Backdrop plate's colour, see _backdrop()
+	environment.background_color = backdrop_color()   # also the Backdrop plate's colour, see _backdrop()
 	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	environment.ambient_light_color = Color("fff0dc")
 	environment.ambient_light_energy = 0.70
@@ -278,8 +292,17 @@ func _build_lights() -> void:
 	sun.shadow_normal_bias = 0.4
 	sun.light_angular_distance = 1.4
 	room.add_child(sun)
-	sun.position = P0RoomAnchors.vec(layout.get("sun_direction", [-6, 7, 1.5]))
+	sun.position = sun_direction()
 	sun.look_at(room.global_position)
+
+## Where the room's sun shines from (room metres, towards the room origin): layout.sun_direction, else the kit's
+## review sun (review_lighting.sun_position − sun_target), else the Basic Room benchmark.
+func sun_direction() -> Vector3:
+	if layout.get("sun_direction", null) is Array: return P0RoomAnchors.vec(layout.sun_direction)
+	var review: Dictionary = layout.get("review_lighting", {})
+	if review.get("sun_position", null) is Array:
+		return P0RoomAnchors.vec(review.sun_position) - P0RoomAnchors.vec(review.get("sun_target", [0, 0, 0]))
+	return Vector3(-6, 7, 1.5)
 
 ## The one hearth lamp at layout.fire_position. It exists before the art enters the tree, so the art's fire effect
 ## drives this lamp instead of adding a second one (PR #29, SGODOT-236).
@@ -312,6 +335,11 @@ func _build_camera() -> void:
 	cam.make_current()
 	cam.add_child(_backdrop())
 
+## The kit's own review background (layout.review_lighting.background, as 248 agreed), else the Basic Room's.
+func backdrop_color() -> Color:
+	var hex := str((layout.get("review_lighting", {}) as Dictionary).get("background", ""))
+	return Color.from_string(hex, BACKDROP) if hex != "" else BACKDROP
+
 ## The colour around the room (SGODOT-248 R1.1): an unshaded plate just inside the far plane, so it is tone-mapped the
 ## same way as the room on every renderer. The environment's clear colour alone came out #F7F6EA through ACES on Metal
 ## but pure white on Android Vulkan; the plate keeps both at #F7F6EA. It belongs to the room, so it hides with it.
@@ -324,7 +352,7 @@ func _backdrop() -> MeshInstance3D:
 	plate.mesh = quad
 	var mat := StandardMaterial3D.new()
 	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	mat.albedo_color = BACKDROP
+	mat.albedo_color = backdrop_color()
 	mat.disable_fog = true
 	plate.material_override = mat
 	plate.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
@@ -351,6 +379,13 @@ func frame_all() -> void:
 	var view := _view()
 	var tall := view.y / maxf(view.x, 1.0)
 	var base := float(layout.get("camera", {}).get("size", _cam_size))
+	# The art's own width (flowers, signs, pillars past the floor) sets the opening view's sides: centred on it,
+	# with SIDE_MARGIN px clear on both sides, wider than the kit's camera when that is tighter (不知火舞 on 227).
+	var span := art_span(right)
+	if span.y > span.x:
+		lo.x = minf(lo.x, span.x)
+		hi.x = maxf(hi.x, span.y)
+		base = maxf(base, (span.y - span.x) / maxf(1.0 - 2.0 * SIDE_MARGIN / maxf(view.x, 1.0), 0.5))
 	var need := maxf((hi.x - lo.x) / FRAME_W, (hi.y - lo.y) / (FRAME_H * tall))
 	# Fits: everything is on screen at the room's accepted view, even if tighter than the opening margins.
 	_fits = hi.x - lo.x <= base and hi.y - lo.y <= base * tall * 0.85
@@ -362,6 +397,19 @@ func frame_all() -> void:
 	_framed = _focus
 	_follow.hold()
 	_update_camera()
+
+## The visible art's extent along the screen's right axis (world metres), as (min, max); (0, 0) without meshes.
+func art_span(right: Vector3) -> Vector2:
+	var lo := INF
+	var hi := -INF
+	for mi: MeshInstance3D in art.find_children("*", "MeshInstance3D", true, false):
+		if not mi.is_visible_in_tree() or mi.mesh == null: continue
+		var b := mi.global_transform * mi.get_aabb()
+		for i in 8:
+			var x := b.get_endpoint(i).dot(right)
+			lo = minf(lo, x)
+			hi = maxf(hi, x)
+	return Vector2(lo, hi) if hi > lo else Vector2.ZERO
 
 func _view() -> Vector2:
 	return get_viewport().get_visible_rect().size if is_inside_tree() else Vector2(360, 800)
@@ -478,7 +526,7 @@ func pick(screen: Vector2) -> String:
 		if boxed.has(n): continue   # tapped by its art only
 		var m := anchor(n)
 		if m == null or cam.is_position_behind(m.global_position): continue
-		var d := cam.unproject_position(m.global_position + _hit_lift(n)).distance_to(screen)
+		var d := cam.unproject_position(pick_point(n)).distance_to(screen)
 		if d < best_d:
 			best_d = d
 			best = n
@@ -514,6 +562,13 @@ func hit_rect(n: String) -> Rect2:
 		r.size.y = MIN_HIT
 	return r
 
+## Where a tappable is picked on screen: its anchor, lifted for NPCs and the door. A door with its own badge_exit
+## point is picked there, where its prompt shows: a front door's prompt sits on the steps, below the player who
+## comes in (Coffee Shop, SGODOT-227), instead of 1.1 m over the threshold.
+func pick_point(n: String) -> Vector3:
+	if n == "exit" and anchor("badge_exit"): return anchor("badge_exit").global_position
+	return anchor(n).global_position + _hit_lift(n)
+
 ## NPCs and the door are picked at body / door height; use_ anchors already sit on the object's top.
 static func _hit_lift(n: String) -> Vector3:
 	var p := P0RoomAnchors.prefix_of(n)
@@ -531,10 +586,14 @@ func p0_joystick(v: Vector2) -> void:
 
 func p0_tap(screen: Vector2) -> void:
 	if rt and rt.ui.has_modal(): return
-	# A finger card's tap goes to its own anchor by id, not through the point test (PR #21's rule for the farm).
-	var card := str(rt.ui.tapped_card) if rt else ""
-	var n := card.trim_prefix("room:") if card.begins_with("room:") and anchor(card.trim_prefix("room:")) else pick(screen)
+	var n := tap_target(screen)
 	if n != "": walk_to(n)
+
+## What a tap at `screen` asks for: a finger card's or world prompt's own anchor by id, not through the point test
+## (PR #21's rule for the farm), else pick(screen); "" for nothing.
+func tap_target(screen: Vector2) -> String:
+	var card := str(rt.ui.tapped_card) if rt else ""
+	return card.trim_prefix("room:") if card.begins_with("room:") and anchor(card.trim_prefix("room:")) else pick(screen)
 
 func p0_frame(v: Dictionary, dt: float) -> void:
 	if _leaving or not is_inside_tree(): return
@@ -599,7 +658,7 @@ func _markers(v: Dictionary) -> void:
 		var m: Dictionary = marks[n]
 		var id: String = "room:" + n
 		var at := anchor(n).global_position + _hit_lift(n) * 1.1
-		var badge_at := anchor("badge_" + P0RoomAnchors.object_of(n))
+		var badge_at := anchor("badge_" + (P0RoomAnchors.object_of(n) if P0RoomAnchors.object_of(n) != "" else n))   # badge_exit for the door
 		var screen := cam.unproject_position(badge_at.global_position if badge_at else at)
 		var lift := 0.0
 		var state := badge_state(str(m.get("badge", "")))

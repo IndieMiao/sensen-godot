@@ -77,9 +77,12 @@ func test_validation_reports_each_naming_rule() -> void:
 	assert_int(errors.size()).is_equal(7)
 
 func test_the_placeholder_anchor_files_pass_validation() -> void:
-	var layout := P0RoomAnchors.read_json(P0Room.BASIC_ROOM_LAYOUT)
-	var modules: Array = layout.assets.map(func(a): return str(a.name)) + layout.instances.map(func(a): return str(a.name))
+	# Each file against its own room kit: an outpost's art (p0_outposts.json), else the Basic Room (SGODOT-227).
+	var kit_of := {}
+	for o in P0Outposts.all(): kit_of[str(o.anchors)] = str(o.get("art", "basic_room"))
 	for path in _anchor_files("res://assets/p0"):
+		var layout := P0RoomAnchors.read_json("res://assets/rooms/%s/layout.json" % kit_of.get(path, "basic_room"))
+		var modules: Array = layout.get("assets", []).map(func(a): return str(a.name)) + layout.get("instances", []).map(func(a): return str(a.name))
 		var external := P0RoomAnchors.read_json(path)
 		var known: Array = modules + P0RoomAnchors.props(external).map(func(p): return str(p.name))
 		var errors := P0RoomAnchors.validate(P0RoomAnchors.merge(layout, external), known)

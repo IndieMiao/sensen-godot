@@ -28,10 +28,10 @@
       "capacity": 12,
       "keeper": {"role": "Tea Host", "name": "Ama"},
       "residents": [],
-      "art": "basic_room",
+      "art": "coffee_shop",
       "anchors": "res://assets/p0/outposts/tea.anchors.json",
-      "bounds": [-3.0, 3.0, -3.0, 3.2],
-      "seats": ["seat_table1_1", "seat_table1_2", "seat_bench_1", "seat_bench_2"]
+      "bounds": [-3.1, 3.1, -2.85, 2.85],
+      "seats": ["seat_table1_1", "seat_table1_2", "seat_table2_1", "seat_table2_2"]
     },
     {
       "id": "sh_post_1",
