@@ -84,6 +84,10 @@ var _qty := {}    # item id -> stepper count
 var _fit_frames := 0   # frames left before fit_height() measures (both pages laid out)
 var _key := 0
 
+
+## q(16): the toast sits above the selected stack's Sell card (the counter's decision area) while it shows.
+func action_area() -> Control: return sheet if sheet != null and sheet.is_visible_in_tree() else null
+
 func _init(view_: Dictionary = {}, role_ := "homestead", ctx_ := {}, section_ := "buy") -> void:
 	role = role_
 	ctx = ctx_

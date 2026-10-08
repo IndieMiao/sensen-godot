@@ -1249,22 +1249,25 @@ func toast(text: String, seconds := 0.0) -> void:
 ## Where the toast sits (WP2 D-01, q(16)): over the quick bar's top edge, in the scene or docked in the bag; over a
 ## drawer without the bar (the workbench, a counter), just above the drawer's top edge — clear of its rows and of the
 ## Close key on the right — when there is room under the HUD; else the bar's spot.
+const _TOAST_DRAWER_FOOT := 16.0   # q(16): a toast's bottom edge over a drawer's bottom (GUESTBOOK-DELETED)
+
 func _aim_toast() -> void:
-	if _bar != null and _bar.is_visible_in_tree():
+	if _bar != null and _bar.is_visible_in_tree():   # the scene's quick bar, or the bar docked in the bag (q(16))
 		_toasts.anchor_above(_bar)
 		return
 	var content: Control = _modal.get_child(1) if _modal != null and _modal.get_child_count() > 1 else null
+	if content is UiDrawer and content.is_visible_in_tree():
+		# q(16), 不知火舞 on #86: in a drawer, above its fixed decision area; without one, at the drawer's foot (16 over
+		# its bottom and the safe inset, 232 wide). Never above the drawer, never back at the bar's spot over it.
+		var area := (content as UiDrawer).action_area()
+		if area != null: _toasts.anchor_above(area)
+		else: _toasts.anchor_bottom(root.size.y - _TOAST_DRAWER_FOOT - safe_bottom(), ToastLayer.NARROW_WIDTH)
+		return
 	if content != null and content.is_visible_in_tree():
 		var top := content.get_global_rect().position.y - root.global_position.y
 		var hud_bottom := _marker_area().position.y + _kit.global_position.y - root.global_position.y
 		if top - UiTokens.SPACE_OVERLAY_BODY - UiTokens.SIZE_TOAST_MIN_H >= hud_bottom:
-			_toasts.anchor_above(content)
-			return
-		# A tall drawer (the Workbench on a tall phone): no room above it, and the bar's spot is on its commands —
-		# the toast hangs just inside its top edge, over the title (李元芳 int7).
-		var bar_spot := root.size.y - UiTokens.SIZE_QUICK_BAR_BOTTOM - UiTokens.SIZE_QUICK_BAR_H   # where the fallback would sit
-		if top < bar_spot:
-			_toasts.anchor_below(maxf(top, hud_bottom) + UiTokens.SPACE_OVERLAY_BODY)
+			_toasts.anchor_above(content)   # a card or sheet that leaves room above it
 			return
 	_toasts.anchor_above(_bar)
 

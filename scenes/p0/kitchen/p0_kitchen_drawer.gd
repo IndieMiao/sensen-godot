@@ -58,8 +58,16 @@ var _pages: UiInventoryGrid
 var _bag: UiInventoryGrid
 var _slots_used: Label
 var _cook: UiCommandButton
+var _foot: HBoxContainer   # Experiment's Cook row
 var _pot_energy: Label
 var _tried: Label
+
+
+## q(16): the toast sits above the Cook row in Experiment, above the recipe's Cook on a Cookbook page.
+func action_area() -> Control:
+	for c in [_foot, _recipe_button]:
+		if c != null and (c as Control).is_visible_in_tree(): return c
+	return null
 
 func _init(view_: Dictionary = {}, tab_ := "cookbook") -> void:
 	super(HEIGHT)
@@ -289,6 +297,7 @@ func _build_experiment() -> VBoxContainer:
 	_tried.visible = false
 	v.add_child(_tried)
 	var foot := HBoxContainer.new()
+	_foot = foot
 	foot.alignment = BoxContainer.ALIGNMENT_END
 	foot.add_theme_constant_override(&"separation", int(UiTokens.SPACE_ROW))
 	_pot_energy = UiKit.label("", UiTokens.STYLE_C12_B)   # Compact/Kitchen Cook decision: "+20 Energy" for a known page
