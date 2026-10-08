@@ -269,6 +269,9 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	if not before.is_empty():
 		for id in P0Guide.new_items(before, v): ui.quick_bar_node().flash(str(id))
 	var at := anchor()
+	# A claim in the Inbox (SGODOT-234): what came out floats from the button pressed; the Bag slot is under the drawer.
+	var in_inbox := ui.modal_kind == "inbox"
+	if in_inbox and ui.inbox_float_at().is_finite(): at = ui.inbox_float_at()
 	var floats: Array = []   # this reply's float parts: one float_lines call orders, merges and caps them (q(49) ①)
 	var xp_lines: Array = []
 	last_first_catch_xp = 0
@@ -338,7 +341,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 			"item":
 				var iid := str(ev.id)
 				if iid.begins_with("dish_"): _call("p0_event", [ev, v])   # where a collected dish went (the kitchen's Keep toast)
-				if int(ev.delta) > 0 and not crafted and not iid.begins_with("seed_") and not iid.begins_with("dish_") and not iid.begins_with("fish_"):
+				if int(ev.delta) > 0 and (in_inbox or (not crafted and not iid.begins_with("seed_") and not iid.begins_with("dish_") and not iid.begins_with("fish_"))):
 					floats.append({kind = "item", key = iid, amount = int(ev.delta), fmt = "%s " + P0Logic.item_name(v, iid),
 						tone = UiFloatText.Tone.ITEM, icon = P0Logic.icon(iid)})
 			"coins":
@@ -727,6 +730,29 @@ static func back_at_text(iso: String, now := -1, bias_min := 100000) -> String:
 	const MONTHS := ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 	return "%s %d, %s" % [MONTHS[int(d.month) - 1], int(d.day), clock]
 
+## Desktop shots of the Inbox (234): a made-up inbox over the current view, as the INBOX-PARCELS / PARCEL-3 /
+## PARCEL-5 frames show it (the next server answer replaces it).
+func _dev_inbox(which: String) -> void:
+	var v: Dictionary = session.view.duplicate(true)
+	var at := Time.get_unix_time_from_system() * 1000.0
+	var parcels := [{"key": "d1", "id": "seed_carrot", "qty": 2, "source": "Welcome gift", "left": 3_900_000.0},
+		{"key": "d2", "id": "dish_grilled_crucian", "qty": 1, "source": "Pip's gift meal", "left": 18_720_000.0, "gift": {"from": "Pip"}},
+		{"key": "d3", "id": "fish_perch", "qty": 7, "source": "Request reward · Stall Board", "left": 85_200_000.0}]
+	var updates := [{"key": "u1", "id": "fish_perch", "qty": 7, "source": "Request reward · Stall Board", "at": at - 20_000.0, "status": "expired", "coins": 18, "read": false},
+		{"key": "u2", "id": "bait_worm", "qty": 3, "source": "Fishing Lv2 reward", "at": at - 18_000_000.0, "status": "expired", "coins": 0, "read": true},
+		{"key": "u3", "id": "dish_grilled_crucian", "qty": 1, "source": "Pip's gift meal", "at": at - 129_600_000.0, "status": "returned", "coins": 0, "read": true, "gift": {"from": "Pip"}}]
+	var free := 0 if which == "full" else 6
+	if which == "full": parcels = parcels.slice(1)
+	if which in ["updates", "todo"]: parcels = []
+	v["bag"] = v.get("bag", {}).duplicate()
+	v.bag["free"] = free
+	v["inbox"] = {"limit": 8, "waiting": 0, "claim_slots": mini(free, parcels.size()), "parcels": parcels,
+		"updates": updates if which == "updates" else [], "badge": parcels.size() + (1 if which == "updates" else 0)}
+	session.view = v
+	session.busy = true   # dev only: Updates' read and the 30 s refresh wait, so no answer replaces the made-up inbox
+	ui.set_view(session.current())
+	ui.open_inbox("" if which == "full" else which)
+
 ## Desktop shots of the whole-screen states (233): the launch cover, its slow line and Can't connect; maintenance back in
 ## 90 minutes; update; the scene cover over the farm (named Reed Pond) and its failure.
 func _dev_screen(which: String) -> void:
@@ -828,6 +854,7 @@ func _dev_shot(dt: float) -> void:
 			"today": ui.open_today()
 			"energypanel": ui.open_energy_panel()
 			"inbox": ui.open_inbox()
+			"inboxdemo": _dev_inbox(step[1] if step.size() > 1 else "parcels")   # inboxdemo:parcels|full|updates|todo (234)
 			"workbench": ui.open_workbench(step[1] if step.size() > 1 else "")   # SGODOT-231 B2-06 drawer, tools / supplies
 			"toasterr": ui.toast_error(step[1] if step.size() > 1 else "Need 1 more Copper Ore")   # a refusal's Error toast (233)
 			"netfail": _net_failed("dev", {"type": "dev"})   # netfail once: Didn't go through; twice: Offline (233)

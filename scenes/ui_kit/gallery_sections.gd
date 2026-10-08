@@ -25,6 +25,7 @@ static func all() -> Array[Dictionary]:
 		{id = "nav_buttons", title = "UiNavButton · Dismiss · Close", figma = "NavigationRow 483:217 · Compact/Navigation 633:41276 · Dismiss 483:220 · Close 483:336", build = _navigation},
 		{id = "filter_chip", title = "UiFilterChip", figma = "Compact/Filter 633:41280", build = _filter_chips},
 		{id = "segment_tab", title = "UiSegmentTab", figma = "Tab 483:322 · Compact/Kitchen/Mode 655:58504 · LOCK-13 / 20", build = _segment_tabs},
+		{id = "inbox_row", title = "UiInboxRow", figma = "InboxRow 1309:89969 Kind=Item / System · C2-01 · LOCK-14 (SGODOT-234)", build = _inbox_rows},
 		{id = "badge", title = "UiBadge", figma = "StateBadge 483:324", build = _badges},
 		{id = "empty_state", title = "UiEmptyState", figma = "EmptyState 1234:87237 Kind=Panel / Row · WP6", build = _empty_states},
 		# SGODOT-226 cooking results (shared with the catch card, SGODOT-233)
@@ -414,7 +415,7 @@ static func _segment_tabs() -> Control:
 	var v := _column()
 	v.add_child(UiSegmentTab.new(["Bag", "Gear"], 0))
 	v.add_child(UiSegmentTab.new([{label = "Cookbook", count = "4/48"}, {label = "Experiment"}], 1))
-	v.add_child(UiSegmentTab.new(["To do", "Parcels", "Updates"], 1))
+	v.add_child(UiSegmentTab.new([{label = "To do", badge = 2}, {label = "Parcels", badge = 3}, {label = "Updates", dot = true}], 1))   # INBOX-PARCELS
 	return v
 
 static func _badges() -> Control:
@@ -1236,6 +1237,21 @@ static func _sys_banners() -> Control:
 		b.kind = t[0]
 		b.message = t[1]
 		v.add_child(_captioned(b, t[2]))
+	return v
+
+## InboxRow (1309:89969, SGODOT-234): a parcel with Claim, the same with the bag full (grey Claim), an expired parcel
+## (Kind=System, unread).
+static func _inbox_rows() -> Control:
+	var v := _column()
+	var specs := [
+		[UiInboxRow.Kind.ITEM, {key = "a", icon = _tex("fish_perch"), title = "Perch ×7", sub = "Request reward · Stall Board", left = "23h 40m left", can_claim = true}, "Kind=Item · Claim"],
+		[UiInboxRow.Kind.ITEM, {key = "b", icon = _tex("bait_worm"), title = "Worm Bait ×3", sub = "Fishing Lv2 reward", left = "12h left", can_claim = false}, "Kind=Item · bag full"],
+		[UiInboxRow.Kind.SYSTEM, {key = "c", icon = _tex("parcel"), title = "Parcel expired · +18 coins", sub = "Perch ×7 · turned into coins at 80%", time = "Just now", unread = true}, "Kind=System · unread"],
+	]
+	for s in specs:
+		var row := UiInboxRow.new(s[0])
+		row.show_row(s[1])
+		v.add_child(_captioned(row, s[2]))
 	return v
 
 ## SystemCard (1237:87229, SGODOT-233): Blocking as SYS-LOADING-FAIL draws it (Can't connect · Retry, the wifi-off glyph

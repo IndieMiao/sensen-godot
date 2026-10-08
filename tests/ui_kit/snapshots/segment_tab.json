@@ -276,13 +276,35 @@
                         {
                           "type": "Label",
                           "rect": [
-                            40,
+                            28,
                             170,
                             31,
                             18
                           ],
                           "variation": "C12B",
                           "text": "To do"
+                        },
+                        {
+                          "type": "PanelContainer",
+                          "rect": [
+                            65,
+                            171,
+                            18,
+                            15
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                65,
+                                171,
+                                18,
+                                15
+                              ],
+                              "variation": "C10XB",
+                              "text": "2"
+                            }
+                          ]
                         }
                       ]
                     }
@@ -312,13 +334,35 @@
                         {
                           "type": "Label",
                           "rect": [
-                            143,
+                            131,
                             170,
                             42,
                             18
                           ],
                           "variation": "C12XB",
                           "text": "Parcels"
+                        },
+                        {
+                          "type": "PanelContainer",
+                          "rect": [
+                            179,
+                            171,
+                            18,
+                            15
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                179,
+                                171,
+                                18,
+                                15
+                              ],
+                              "variation": "C10XB",
+                              "text": "3"
+                            }
+                          ]
                         }
                       ]
                     }
@@ -347,13 +391,22 @@
                         {
                           "type": "Label",
                           "rect": [
-                            248,
+                            241,
                             170,
                             47,
                             18
                           ],
                           "variation": "C12B",
                           "text": "Updates"
+                        },
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            294,
+                            175,
+                            8,
+                            8
+                          ]
                         }
                       ]
                     }

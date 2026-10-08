@@ -404,14 +404,15 @@ func test_bell_reads_the_inbox_badge_and_lists_parcels_read_only() -> void:
 	assert_that(P0Logic.parcel_lines(v)).is_equal(["Radish Seeds ×5 · 25m left", "Radish ×3 · 22h left"])
 	var ui := _ui(true)
 	ui.set_view(v)
-	ui.open_inbox()
-	var texts := ui.find_children("*", "Label", true, false).map(func(l): return (l as Label).text)
-	assert_bool("Radish ×3 · 22h left" in texts).is_true()
-	assert_bool("No parcels" in texts).is_false()
+	ui.open_inbox()   # SGODOT-234: the Inbox drawer, on Parcels, one InboxRow per parcel (soonest first)
+	await get_tree().process_frame
+	assert_that(ui.inbox().rows.map(func(r): return [r.title.text, r.left_label.text])).is_equal(
+		[["Radish Seeds ×5", "25m left"], ["Radish ×3", "22h left"]])
 	ui.close_modal()
 	v.inbox.parcels = []
+	v.inbox.waiting = 0
 	ui.set_view(v)
-	ui.open_inbox()
+	ui.open_inbox("parcels")
 	await get_tree().process_frame
 	assert_int(ui.find_children("*", "UiEmptyState", true, false).size()).is_equal(1)
 
@@ -428,14 +429,15 @@ func test_rest_tile_follows_the_away_rule() -> void:
 	v.rest.used = 1
 	assert_str(str(P0Logic.energy_card(v, 2, "Sow ×1").tiles[3].fact)).is_equal("Rested today")
 
-func test_an_expired_parcel_leaves_the_bell_and_the_sheet_empty() -> void:
-	# The server keeps an unread expiry record (badge 1) once a parcel runs out; until SGODOT-234 shows records, the
-	# bell counts parcels only, so it reads 0 and the sheet says No parcels (奕星 on #11, option B).
+func test_an_expired_parcel_rings_the_bell_and_opens_updates() -> void:
+	# The server keeps an unread expiry record (badge 1) once a parcel runs out. SGODOT-234 shows records (q(79)): the
+	# bell reads the server's badge and the Inbox opens on Updates with the record (replaces #11's interim option B).
 	var v := _view()
-	v["inbox"] = {"badge": 1, "waiting": 0, "parcels": [], "updates": [{"key": "a", "id": "crop_radish", "qty": 3, "status": "expired", "read": false}]}
-	assert_int(int(P0Logic.hud_state(v).unread)).is_equal(0)
+	v["inbox"] = {"badge": 1, "waiting": 0, "parcels": [], "updates": [{"key": "a", "id": "crop_radish", "qty": 3, "status": "expired", "coins": 0, "read": false}]}
+	assert_int(int(P0Logic.hud_state(v).unread)).is_equal(1)
 	var ui := _ui(true)
 	ui.set_view(v)
 	ui.open_inbox()
 	await get_tree().process_frame
-	assert_int(ui.find_children("*", "UiEmptyState", true, false).size()).is_equal(1)
+	assert_str(ui.inbox().tab).is_equal("updates")
+	assert_that(ui.inbox().rows.map(func(r): return r.title.text)).is_equal(["Parcel expired · Radish ×3 lost"])
