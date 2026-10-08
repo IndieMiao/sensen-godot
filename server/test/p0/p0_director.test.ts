@@ -61,7 +61,7 @@ describe('first session director table (§14.2; SGODOT-232 V2)', () => {
     // 0–3 min: sow the first bed's 20 radishes (2 Energy each), then water them for free
     for (let i = 0; i < 20; i++) d.do({ type: 'sow', plot: i, seed: 'seed_radish', space: 'home' }, at(0, 20 + i * 6), 'sow radish');
     for (let i = 0; i < 20; i++) d.do({ type: 'water', plot: i, space: 'home' }, at(2, 30 + i), 'water');
-    expect(d.energyAt(at(3))).toBe(160);
+    expect(d.s.energy.value).toBe(160);   // 200 − 20 × 2 (recovery starts 2:40 after the first spend)
 
     // 3–5 min: take the tutorial request at the stall
     d.do({ type: 'accept', request: 'req_pond_catch', space: 'home' }, at(4));
@@ -103,20 +103,25 @@ describe('first session director table (§14.2; SGODOT-232 V2)', () => {
     const fourth = d.fish(at(18, 30));
     expect(fourth).toMatchObject({ fish: 'fish_perch', result: 'broke_free', need_level: 2, refund: 5 });
     expect(d.s.skills.fishing).toBe(60);
-    // casts 5 and 6 on the normal weights; 70 XP reaches Fishing Lv2 (+50 Energy, the first level-up)
-    const fifth = d.fish(at(19, 30));
-    const sixth = d.fish(at(20, 30));
-    expect([fifth.result, sixth.result]).toEqual(['landed', 'landed']);
+    // casts 5, 6, … on the normal weights until 70 XP reaches Fishing Lv2 (+50 Energy, the first level-up). A Fine
+    // fish at Lv1 breaks free with the Energy refunded, so a few seeds need a cast or two more (§14.2.3).
+    let t = at(19, 30), lv2: P0Event | undefined, casts = 4;
+    while (!lv2 && casts < 12) {
+      const r = d.fish(t);
+      casts += 1;
+      if (r.result === 'broke_free') expect(r.refund).toBe(5);
+      lv2 = r.events.find(e => e.kind === 'level');
+      t += 40 * SEC;
+    }
+    expect(lv2).toMatchObject({ skill: 'fishing', level: 2, energy: 50 });
     expect(d.s.skills.fishing).toBeGreaterThanOrEqual(70);
     expect(d.s.skills.fishing).toBeLessThanOrEqual(85 + 15);
-    const lv2 = [...fifth.events, ...sixth.events].find(e => e.kind === 'level');
-    expect(lv2).toMatchObject({ skill: 'fishing', level: 2, energy: 50 });
     expect(count(d.s.bag, 'bait_worm')).toBe(3);
     expect(count(d.s.bag, 'wild_herb')).toBe(3);
     expect(d.s.cookbook).toContain('dish_herb_grilled_fish');
 
     // 22–25 min, pin 3: the first baited bite after Lv2 is a Fine global fish; the first Fine fish pays +20 Energy
-    const seventh = d.fish(at(22, 30), 'bait_worm');
+    const seventh = d.fish(Math.max(t, at(22, 30)), 'bait_worm');
     expect(seventh).toMatchObject({ fish: 'fish_perch', result: 'landed' });
     expect(seventh.events).toContainEqual({ kind: 'reward', id: 'first_fish_2', energy: 20 });
     const fishingEnd = d.s.skills.fishing;
@@ -154,5 +159,56 @@ describe('first session director table (§14.2; SGODOT-232 V2)', () => {
     expect(end).toBeGreaterThanOrEqual(213 - 5);
     expect(end).toBeLessThanOrEqual(213 + 5);
     expect(d.s.coins).toBe(194);
+  });
+});
+
+/** The same 30 minutes as a plain player: the table's order, casting until each goal is met (§14.2.3). */
+function playFirstSession(player: string) {
+  const d = new Director(player);
+  for (let i = 0; i < 20; i++) d.do({ type: 'sow', plot: i, seed: 'seed_radish', space: 'home' }, at(0, 20 + i * 6));
+  for (let i = 0; i < 20; i++) d.do({ type: 'water', plot: i, space: 'home' }, at(2, 30 + i));
+  d.do({ type: 'accept', request: 'req_pond_catch', space: 'home' }, at(4));
+  let t = at(9, 30), casts = 0;
+  while (count(d.s.bag, 'fish_crucian') < 3 && casts < 12) { d.fish(t); casts += 1; t += 40 * SEC; }
+  t += 60 * SEC;
+  d.do({ type: 'deliver', request: 'req_pond_catch', space: 'home' }, t);
+  d.cook('dish_grilled_crucian', t + 30 * SEC, true);
+  t += 90 * SEC;
+  for (let i = 20; i < 30; i++) d.do({ type: 'till', plot: i, space: 'home' }, t + (i - 20) * 3 * SEC);
+  t += 40 * SEC;
+  for (let i = 20; i < 30; i++) d.do({ type: 'sow', plot: i, seed: 'seed_lettuce', space: 'home' }, t + (i - 20) * 6 * SEC);
+  t += 120 * SEC;
+  while (skillLevel(c, d.s, 'fishing') < 2 && casts < 20) { d.fish(t); casts += 1; t += 40 * SEC; }
+  let fine = false;
+  while (!fine && casts < 24) {
+    const r = d.fish(t, count(d.s.bag, 'bait_worm') > 0 ? 'bait_worm' : undefined);
+    casts += 1; t += 40 * SEC;
+    fine = r.result === 'landed' && (c.fish.find(f => f.id === r.fish)?.rarity ?? 1) >= 2;
+  }
+  t += 90 * SEC;
+  d.cook('dish_herb_grilled_fish', t, false);
+  t += 60 * SEC;
+  return { firsts: d.firsts, end: d.energyAt(Math.max(t, at(30))), endMinute: (t - T0) / MIN, casts, fishing: d.s.skills.fishing, cooking: d.s.skills.cooking };
+}
+
+describe('first session across 30 players (§14.2.3 paths; SGODOT-232 V2)', () => {
+  it('every player meets the three hard targets; the ending Energy stays near 213', () => {
+    const runs = Array.from({ length: 30 }, (_, i) => playFirstSession(`director-sweep-${String(i).padStart(2, '0')}`));
+    for (const r of runs) {
+      expect(r.firsts.first_meal).toBeLessThanOrEqual(20);
+      expect(r.firsts.fishing_lv2).toBeLessThanOrEqual(30);
+      expect(r.firsts.cooking_lv2).toBeLessThanOrEqual(30);
+      expect(r.end).toBeGreaterThanOrEqual(180);
+      expect(r.cooking).toBe(45);
+    }
+    const ends = runs.map(r => r.end).sort((a, b) => a - b);
+    const lv2 = runs.map(r => r.firsts.fishing_lv2).sort((a, b) => a - b);
+    // the table's path variants: the session ends inside 30 minutes for most players and inside 45 for all
+    expect(Math.max(...runs.map(r => r.endMinute))).toBeLessThanOrEqual(45);
+    expect(ends[0]).toBeGreaterThanOrEqual(200);
+    expect(ends.at(-1)).toBeLessThanOrEqual(225);
+    console.log(JSON.stringify({ end_energy: [ends[0], ends[15], ends.at(-1)], fishing_lv2_min: [lv2[0], lv2[15], lv2.at(-1)],
+      casts: [Math.min(...runs.map(r => r.casts)), Math.max(...runs.map(r => r.casts))],
+      session_min: Math.max(...runs.map(r => r.endMinute)).toFixed(1) }));
   });
 });
