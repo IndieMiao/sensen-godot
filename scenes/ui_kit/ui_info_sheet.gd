@@ -245,6 +245,40 @@ func close() -> void:
 	_item = ""
 	closed.emit()
 
+## The card laid over another panel (a request's Details, a gate card over a drawer; 不知火舞 on 224, §4.8.7): a
+## color/scrimModal veil dims the panel below so the card reads as its own layer, the card sits at the bottom inside
+## `inset` (sides, bottom), a tap on the veil closes it, and closing removes the whole layer. The caller sets `rules`
+## (and connects the signals) before open().
+static func layered(host: Control, inset: Vector2 = Vector2(12, 16)) -> UiInfoSheet:
+	var layer := Control.new()
+	layer.name = "InfoSheetLayer"
+	layer.set_anchors_preset(Control.PRESET_FULL_RECT)
+	layer.mouse_filter = Control.MOUSE_FILTER_STOP
+	var veil := ColorRect.new()
+	veil.name = "Scrim"
+	veil.color = UiTokens.COLOR_SCRIM_MODAL
+	veil.set_anchors_preset(Control.PRESET_FULL_RECT)
+	veil.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	layer.add_child(veil)
+	var foot := MarginContainer.new()
+	foot.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+	foot.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	for side in [&"margin_left", &"margin_right"]: foot.add_theme_constant_override(side, int(inset.x))
+	foot.add_theme_constant_override(&"margin_bottom", int(inset.y))
+	foot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	layer.add_child(foot)
+	var sheet := UiInfoSheet.new()
+	foot.add_child(sheet)
+	host.add_child(layer)
+	layer.gui_input.connect(func(e: InputEvent): if _tapped(e): sheet.close())
+	sheet.closed.connect(func(): if is_instance_valid(layer): layer.queue_free())
+	return sheet
+
+## The veil under a layered() card, or null when the card is docked in a drawer.
+func scrim() -> ColorRect:
+	var layer := get_parent().get_parent() if get_parent() != null else null
+	return layer.get_node_or_null("Scrim") as ColorRect if layer != null and layer.name == "InfoSheetLayer" else null
+
 func is_open() -> bool: return visible
 func item_id() -> String: return _item
 func context() -> StringName: return _context
