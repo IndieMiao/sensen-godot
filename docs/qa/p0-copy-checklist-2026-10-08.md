@@ -18,7 +18,7 @@
 | 不做跳转 | `Show my plots` / `Show on map` / `Where to fish` 只移动相机或打开面板（LOCK-08） |
 | 世界提示只写名字 | 设施挂图标钮，交互半径内最近的一个展开名字条（图标 + 名字 + 至多一条事实）；门 = 门图标 + 目的地（`Farm` / `Map`）；NPC 头顶只写名字（`Mei`），对话中只保持高亮；座位只有 `i-seat` 图标；任何地方都不出现点按引导语（Tap to …）与手指（LOCK-07 / 16 / 17 / 30 v2，q(62)） |
 | 径向菜单无字 | 四瓣环在屏幕中央，瓣上只有图标，不写行动名与原因；点灰瓣才在环心出单行气泡 `No water nearby` / `Enter the mine` / `Mine floors 3–5`（LOCK-03 v2，q(62)） |
-| 快满写实得 | `Eat · +12 Energy`、`Hot Tea · +12 Energy · 40 coins`、`Rest · +25 Energy`（q(26)） |
+| 快满写实得 | `Eat · +12 Energy`、`Hot Tea · +12 Energy · 40 coins`、`Rest · +25 Energy`（q(26)）。热茶（茶馆）与咖啡（驿站）同价同效：标称都是 +30，当天第 1 / 2 / 3 杯 40 / 50 / 60 coins、两种共用 3 杯；柜台快满时写实得，如差 3 满时 `Coffee · +3 Energy · 40 coins`，不是数值错（§3.4.4） |
 
 ## 1. HUD 与体力卡（LOCK-06、LOCK-09）
 
@@ -54,7 +54,7 @@
 | 位置 | 应出现 |
 |---|---|
 | 主行动键 · Fishing ★ | `Cast · 5 Energy`（离岸远也是这句，q(44)）/ 途中 `Cast · On the way`（不灰显）/ 灰 `Cast · Creel full` / 灰 `Fishing · No water nearby` |
-| 鱼篓角标 | `Creel 7 · 6 free` / 满 `Creel full · 0 free slots · Sell or cook first`（只在角标与 toast） |
+| 鱼篓角标 | `Creel 7 · 6 free` / 满 `Creel full · 0 free slots · Sell or cook first`（只在角标与 toast）；满时点角标出 toast + `Open bag ›`，不满时点角标直接开背包 Fish 页；满篓**没有** `Open Bag` / `Go home · Free` 次按钮，回家用位置芯片（q(83)） |
 | 鱼饵用完 ★ | toast `Out of Worm Bait · no bait on the hook`（q(44)） |
 | 挂上 / 取下鱼饵 ★ | 点快捷栏饵格 toast `Worm Bait on the hook · used at the bite`，再点取下 `No bait`；首次升级横幅按 `Use bait` 也出挂上那句（在水边选中饵格并闪一次，不在水边只挂上留到下一竿），不跳转（q(77)） |
 | 钓获卡（首次） | `Caught!` / `Pond Crucian · Common` / `Fish-dex 3/N` / `First catch! +15 XP` / `New city! +10 XP` |
@@ -71,7 +71,7 @@
 | Experiment | `From your bag · 2 of 2 slots used`；调味料格带 `Rack` 角标、写仓库实数（如 `Rock Salt 12`，不写 /30，q(46)）；`Not for cooking`（金锦鲤）；`In the pot` |
 | 火候 | `Tap when the needle hits gold!` / `Nice heat! ★` / `Missed · still cooking` / `Perfect! ★★ · Extra portion` |
 | 出锅卡 COOK-4 ★ | 首做 `New recipe!` + 奖励条 `First cooked · +10 Cooking XP · Cookbook 1/48`（只放首做 XP；本锅 XP 照常飘 `+5 Cooking XP ★`，q(55)）/ 重复 `Cooked!` / 失败 `Mystery Dish` + `Hmm… not a dish` + `A clue was added to your Cookbook` + 灰字 `Can't be sold or delivered`（q(55)）/ 退料 `No dish this time` + 名字行 `Ingredients back` + 第二行 `9 left today` + `OK`（q(66)）；按钮只有 `Eat · +45 Energy` / `Keep`，Gift 在 P0 灰；没有 Cook Again 按钮（q(46)、q(48)、q(49)） |
-| Queue ×2 ★ | Cooking Lv5 起、灶在烧且队列空时计时卡次按钮 `Queue next ›`；抽屉主按钮 `Queue`；排队中 `Cooking · Queued 1`，灶台图标钮挂 `+1`（q(71)）。人在厨房时轮转 toast `Grilled Crucian kept · Herb Grilled Fish cooking`；下一锅未知 `Grilled Crucian kept · Unknown dish cooking`；前一锅黑暗料理 `Mystery Dish kept · Herb Grilled Fish cooking`；前一锅新手期退料 `Ingredients back · Herb Grilled Fish cooking`；可叠加如 `Ingredients back · Unknown dish cooking`；人不在厨房不出（q(82)） |
+| Queue ×2 ★ | Cooking Lv5 起、灶在烧且队列空时计时卡次按钮 `Queue next ›`；抽屉主按钮 `Queue`，锅上胶囊同时由 `Ready to cook` 改写 `Ready to queue`（q(84)）；排队中 `Cooking · Queued 1`，灶台图标钮挂 `+1`（q(71)）。人在厨房时轮转 toast `Grilled Crucian kept · Herb Grilled Fish cooking`；下一锅未知 `Grilled Crucian kept · Unknown dish cooking`；前一锅黑暗料理 `Mystery Dish kept · Herb Grilled Fish cooking`；前一锅新手期退料 `Ingredients back · Herb Grilled Fish cooking`；可叠加如 `Ingredients back · Unknown dish cooking`；人不在厨房不出（q(82)）；轮转时出锅的是新菜：Success toast `New recipe! Herb Grilled Fish kept`（不带下一锅后半句），灶台飘字 `First cooked · +20 Cooking XP`，不弹出锅卡（q(85)） |
 | Cook Again ★ | 收走后点灶台：`Cook Again` / `Choose recipe ›`，第 2 锅 `Cooks today 2nd` / `Cooking XP Half`（q(48)） |
 | 保温柜 | 名字条 `Warming Cabinet 4/6`（q(62)）/ `Take one` / `Kept · Warming Cabinet 5/6` / `Cabinet full · Herb Grilled Fish sent to bag` / `Cabinet and bag full · dish left on the stove` / `Bag full · dish left on the stove` |
 | Cooking Lv4 之后 Today ★ | `3rd slot open · try Fine fish + Potato + Rock Salt`（q(46)） |

@@ -80,6 +80,14 @@ static func ensure() -> P0Runtime:
 	(Engine.get_main_loop() as SceneTree).root.add_child.call_deferred(_instance)
 	return _instance
 
+## Tests: a P0 world (p0_map, the farm, a pond …) brings up the singleton through ensure() and nothing frees it; with
+## no server it goes offline and the static UiCommandButton.offline stays set for every later suite (the kit
+## gallery's sending buttons read `Offline`). A suite that opened one ends with this; the next ensure() builds anew.
+static func free_instance_for_tests() -> void:
+	if is_instance_valid(_instance): _instance.queue_free()
+	_instance = null
+	UiCommandButton.offline = false
+
 func src_of_press() -> String: return "hold" if holding_repeat else "tap"
 
 func _init() -> void:
@@ -433,11 +441,12 @@ func _on_state(v: Dictionary, events: Array) -> void:
 			"cast", "pot", "cabinet", "plate", "first", "mishap", "queue":
 				_call("p0_event", [ev, v])
 			"dish":
-				# The farmhouse stove shows its own result card (COOK-4 / 6 / P0-9). Anywhere else no card pops up
-				# (§7.2.7 step 7, q(46)): a pot kept on its own (Queue ×2) or a collect answered after leaving only
-				# says where the dish went. A world without p0_event (farm, map, outpost) gives null, so compare
+				# The farmhouse stove shows its own result card (COOK-4 / 6 / P0-9) or toast. Anywhere else no card pops
+				# up (§7.2.7 step 7, q(46)). A pot Queue ×2 kept on its own says nothing away from the kitchen (§7.2.7,
+				# q(46) / q(71); 不知火舞 on 226): Today and the stove's sign show it. A collect answered after the player
+				# left says where the dish went. A world without p0_event (farm, map, outpost) gives null, so compare
 				# instead of bool() (PR #54 review).
-				if _call("p0_event", [ev, v]) != true:
+				if _call("p0_event", [ev, v]) != true and not bool(ev.get("auto", false)):
 					var kept := P0KitchenLogic.kept_line(v, ev, events)
 					if not kept.is_empty(): ui.toast(str(kept.text))
 			"request":
@@ -941,6 +950,9 @@ func _dev_shot(dt: float) -> void:
 			"showmap":   # showmap:pond:pond_shanghai_05 — what Today's Show on map does (int9 S1)
 				ui.close_modal()
 				ui.show_on_map.emit(":".join(step.slice(1)))
+			"minesheet": P0MaterialCards.open_mine_sheet(ui, session.current())        # MINE-P0-1 / P0-8 (235 B3)
+			"newrun": P0MaterialCards.open_new_run(ui, session.current(), func(c: Dictionary): session.send(c))   # MINE-P0-7
+			"lockedspot": P0MaterialCards.open_locked_spot(ui, session.current(), step[1] if step.size() > 1 else "spot_clay_bank")   # MAT-3
 			"showspot":   # showspot:mine — what a NeedSource's Show does (closes the layer, camera only, LOCK-08)
 				ui.close_modal()
 				ui.show_spot.emit(step[1])

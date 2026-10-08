@@ -33,6 +33,30 @@ static func stove_state(view: Dictionary) -> String:
 	var queued := " · Queued 1" if cooking(view).get("queued", null) is Dictionary else ""   # S5 Queue ×2 (Lv5)
 	return ("Ready" if left <= 0.0 else "Cooking " + P0Logic.duration(left)) + queued
 
+# ---------------------------------------------------------------- Queue ×2 (Cooking Lv5, q(71))
+## The pot waiting behind the one on the stove ({id, dish, rarity, ms, starts_in}), or null.
+static func queued(view: Dictionary):
+	var q = cooking(view).get("queued", null)
+	return q if q is Dictionary else null
+
+## Whether the watch sheet offers `Queue next ›`: Queue ×2 is open (Cooking Lv5), a pot is cooking and none waits.
+## Lv1–4 and a full queue show nothing, not a grey button (q(71)).
+static func can_queue(view: Dictionary) -> bool:
+	return cooking(view).get("conveniences", []).has("queue_two") and stove(view) != null and queued(view) == null
+
+## The watch sheet's state line: `Cooking`, or `Cooking · Queued 1` with a pot waiting (q(71) supplement).
+static func watch_state(view: Dictionary) -> String:
+	return "Cooking · Queued 1" if queued(view) != null else "Cooking"
+
+## The toast when the stove turns over to the waiting pot while the player is in the kitchen (q(71)):
+## "Grilled Crucian kept · Herb Grilled Fish cooking". dish_ev = the kept pot's `dish` event; next_dish = the pot now
+## cooking (null when the server does not name it: an unknown mix).
+static func rotation_line(view: Dictionary, dish_ev: Dictionary, next_dish) -> String:
+	var kept := "Ingredients back" if bool(dish_ev.get("none", false)) else \
+		"%s kept" % P0Logic.item_name(view, "dish_mystery" if bool(dish_ev.get("mystery", false)) else str(dish_ev.get("dish", "")))
+	var next := P0Logic.item_name(view, str(next_dish)) if next_dish != null and str(next_dish) != "" else "Unknown dish"
+	return "%s · %s cooking" % [kept, next]
+
 ## "Lv4 · 60 XP to go" for the locked 3rd slot (SGODOT-203: the 90 px label holds the short form); "Lv4" when
 ## the cooking thresholds are unknown.
 static func locked_slot_label(view: Dictionary) -> String:
@@ -265,19 +289,21 @@ static func pot_energy(view_: Dictionary, pot: Array) -> String:
 	var t: Dictionary = cooking(view).get("tiers", {}).get(str(int(known.rarity)), {})
 	return "+%d Energy" % int(t.get("energy", 0))
 
-## Preview for a Cookbook page: COOK-2a writes `Ready to cook` when the page can cook now.
-static func page_preview(view: Dictionary, p: Dictionary) -> Dictionary:
+## Preview for a Cookbook page: COOK-2a writes `Ready to cook` when the page can cook now; `Ready to queue` in the drawer
+## opened from Queue next › (q(84): only that word changes).
+static func page_preview(view: Dictionary, p: Dictionary, queue := false) -> Dictionary:
 	var rarity := int(p.get("rarity", 1))
 	var t: Dictionary = cooking(view).get("tiers", {}).get(str(rarity), {})
 	var title := "Unknown dish"
-	if p.get("known", false): title = "Ready to cook" if p.get("can_cook", false) else str(p.get("name", ""))
+	if p.get("known", false): title = ("Ready to queue" if queue else "Ready to cook") if p.get("can_cook", false) else str(p.get("name", ""))
 	return {title = title, state = P0Logic.rarity_name(view, rarity), time = "%d s" % (int(t.get("ms", 5000)) / 1000)}
 
-## Experiment's Cook button: the gap when it cannot cook (LOCK-10), else "Cook" (never "Free", §7.2.7).
-static func experiment_reason(view: Dictionary, pot: Array) -> String:
+## Experiment's Cook button: the gap when it cannot cook (LOCK-10), else "Cook" (never "Free", §7.2.7). In the drawer
+## opened from Queue next › the pot on the stove is the point: the button reads Queue, never Stove busy (q(71)).
+static func experiment_reason(view: Dictionary, pot: Array, queue := false) -> String:
 	if pot.is_empty(): return "Add an ingredient"
 	if preview(view, pot).title == "Needs a main ingredient": return "Needs a main ingredient"
-	if stove(view) != null: return "Stove busy"
+	if stove(view) != null and not queue: return "Stove busy"
 	return ""
 
 # ---------------------------------------------------------------- the dish comes out (COOK-4 / 6 / P0-9, COOK-7-2)

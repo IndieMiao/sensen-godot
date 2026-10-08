@@ -1252,7 +1252,18 @@ func toast(text: String, seconds := 0.0) -> void:
 ## Close key on the right — when there is room under the HUD; else the bar's spot.
 const _TOAST_DRAWER_FOOT := 16.0   # q(16): a toast's bottom edge over a drawer's bottom (GUESTBOOK-DELETED)
 
+## A sheet a world lays over the scene without a modal (the stove's watch sheet and its ×, COOK-3): while it shows, toasts sit
+## above it and draw over it (the Queue ×2 turn-over toast, q(71)); null clears it.
+var _toast_over: Control
+func set_toast_over(c: Control) -> void:
+	_toast_over = c
+	if c != null and _toasts and _toasts.get_parent() == root: root.move_child(_toasts, -1)
+
 func _aim_toast() -> void:
+	if _toast_over != null and is_instance_valid(_toast_over) and _toast_over.is_visible_in_tree() and _modal == null:
+		_toasts.anchor_above(_toast_over)
+		if _toasts.get_parent() == root: root.move_child(_toasts, -1)
+		return
 	if _bar != null and _bar.is_visible_in_tree():   # the scene's quick bar, or the bar docked in the bag (q(16))
 		_toasts.anchor_above(_bar)
 		return
@@ -1351,6 +1362,16 @@ func end_stick() -> void:
 	joystick.emit(Vector2.ZERO)
 
 func has_modal() -> bool: return _modal != null or (_radial != null and _radial.is_open())
+
+## Who speaks in the open modal (NPC-G1, #57): "keeper" under a keeper's greeting card, the resident's id under their
+## dialogue bar, "" under anything else. Read from the modal itself, so a bar reached any way counts — a dish card's
+## `Gift to <Name>` drawer goes back to that resident's bar without the room ever having been tapped (韩信 int9).
+func speaker() -> String:
+	if _modal == null: return ""
+	match modal_kind:
+		"greeting": return "keeper"
+		"resident": return _resident
+	return ""
 
 func close_modal() -> void:
 	_drop_modal()

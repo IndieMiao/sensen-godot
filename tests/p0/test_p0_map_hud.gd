@@ -233,3 +233,7 @@ func test_the_opening_view_frames_the_home_set() -> void:
 			fits_closer = safe.encloses(m._frame_box(framed))
 		assert_bool(fits_closer).append_failure_message(phase[1]).is_false()
 	rt.session.view = saved
+
+## The P0Runtime singleton the map brought up goes with the suite (P0Runtime.free_instance_for_tests).
+func after() -> void:
+	P0Runtime.free_instance_for_tests()

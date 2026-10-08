@@ -21,3 +21,7 @@ func test_resume_keeps_the_camera_where_the_player_left_it() -> void:
 	for i in 3: await get_tree().process_frame
 	assert_float(map.get("center_lat")).is_equal_approx(lat, 1e-6)
 	assert_float(map.get("center_lng")).is_equal_approx(lng, 1e-6)
+
+## The P0Runtime singleton the map brought up goes with the suite (P0Runtime.free_instance_for_tests).
+func after() -> void:
+	P0Runtime.free_instance_for_tests()
