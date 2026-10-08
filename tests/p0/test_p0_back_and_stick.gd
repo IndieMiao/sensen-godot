@@ -73,3 +73,19 @@ func test_switching_worlds_stops_the_one_left_behind() -> void:
 	assert_vector(farm.sticks.back()).is_equal(Vector2.ZERO)
 	rt.detach(house)
 	assert_vector(house.sticks.back()).is_equal(Vector2.ZERO)
+
+func test_finger_cards_stay_below_the_hud_and_above_the_bar() -> void:
+	# int5 hand test 8: a card dragged under the HUD lost its tap to the Energy chip.
+	var ui := _ui()
+	await await_idle_frame()
+	ui.set_mode("farm")
+	ui.set_surface("farm")
+	ui.set_view(_view())
+	await await_idle_frame()
+	assert_bool(ui.hud.visible).is_true()
+	ui.tag("homestead", "Homestead Lv1 · Tap to upgrade", Vector2(60, 30), true, Vector2(60, 40))
+	var c: UiTapCard = ui._cards["homestead"]
+	assert_float(c.position.y).is_greater_equal(float(UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H))
+	ui.tag("stall", "Tap to shop", Vector2(200, ui._kit.size.y - 10), true)
+	var s: UiTapCard = ui._cards["stall"]
+	assert_float(s.position.y + s.size.y).is_less_equal(ui._bar.position.y)
