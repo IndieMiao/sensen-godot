@@ -419,3 +419,7 @@ func test_a_selected_name_folds_the_names_it_touches() -> void:
 	assert_bool(reed_pin.name_shown).is_true()
 	m._set_outpost_places()
 	rt.session.view = saved
+
+## The P0Runtime singleton the map brought up goes with the suite (P0Runtime.free_instance_for_tests).
+func after() -> void:
+	P0Runtime.free_instance_for_tests()

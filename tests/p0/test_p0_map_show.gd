@@ -16,6 +16,7 @@ func before() -> void:
 func after() -> void:
 	_settle_prewarm()
 	if is_instance_valid(map): map.free()
+	P0Runtime.free_instance_for_tests()   # the singleton the map brought up goes with the suite
 
 ## Selecting a pond pin pre-generates its banks on a worker (p0_map._prewarm_pond → WaterShore.prewarm). A task still
 ## running at the end crashed the headless runner at exit (signal 11) and its detached bank counted as an orphan.
