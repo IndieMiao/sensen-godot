@@ -1909,8 +1909,8 @@ td { font-variant-numeric: tabular-nums; }
 <td>q(61)</td>
 <td>快捷栏 v1.11 与方案的口径对齐（2026-10-08，刘邦核出，不知火舞 SGODOT-221 b0a83924 / 225 9f72803f，奕星转达）</td>
 <td>v1.11（197 LOCK-04 / 05，用户已确认）定的是长按只浮起、拖进 Pin / Remove 放置区钉住或移除、从背包拖入不自动钉住；方案 §10.3.3 第 2 条、§10.3.4、§10.4.5、BAG-4、BAR-1 与 §16.1 快捷栏行还写长按钉住、拖入自动钉住、互换并都钉住；详情卡 Pin、栏满、抽屉里放置区位置没写</td>
-<td><strong>以 v1.11 为准</strong>：长按 450 ms 只浮起，淡入 Pin / Unpin（琥珀）与 Remove（垃圾桶）两个放置区；松在 Pin 区切换钉住、Remove 区移除（Toast <code>Radish Seeds off the bar · Undo</code>）、另一格只互换（钉子跟着物品走）、本格或别处取消；PinMenu 弃用。<strong>从背包拖入 = 放入落点格、不自动钉住</strong>，栏满时替换落点格，被替换的不算「已移除」。<strong>「已移除」只由 Remove 区产生</strong>，按行动保存，自动填充不补回，从背包拖回时清掉。<strong>详情卡 <code>Pin</code> 保留</strong>：钉到物品所属行动的栏（第一个空格，没有就顶掉最后一个未钉住格），已钉住写 <code>Unpin</code>，5 格都钉住灰显 <code>Bar full · Unpin one first</code>。<strong>抽屉里</strong>放置区翻到快捷栏行下方（x 72 / 168，y = 行下沿 + 96）。背包格长按的新形态（LOCK-12）待用户确认，§10.4.5 那半句暂留原文并注明</td>
-<td>第 10 章 10.3.3、10.3.4、10.4.4、10.4.5；第 16 章 §16.1 快捷栏行、BAG-4、BAR-1；附录 B.10</td>
+<td><strong>以 v1.11 为准</strong>：长按 450 ms 只浮起，淡入 Pin / Unpin（琥珀）与 Remove（垃圾桶）两个放置区；松在 Pin 区切换钉住、Remove 区移除（Toast <code>Radish Seeds off the bar · Undo</code>）、另一格只互换（钉子跟着物品走）、本格或别处取消；PinMenu 弃用。<strong>从背包拖入 = 放入落点格、不自动钉住</strong>，落在有物品的格时替换该格，被替换的不算「已移除」。<strong>「已移除」只由 Remove 区产生</strong>，按行动保存，自动填充不补回，从背包拖回时清掉。<strong>详情卡 <code>Pin</code> 保留</strong>：钉到物品所属行动的栏（第一个空格，没有就顶掉最后一个未钉住格），已钉住写 <code>Unpin</code>，5 格都钉住灰显 <code>Bar full · Unpin one first</code>。<strong>抽屉里</strong>放置区翻到快捷栏行下方（x 72 / 168，y = 行下沿 + 96）。<strong>背包格长按</strong>（LOCK-12，用户 2026-10-08 同意）：450 ms 浮起并出 Pin 区、不出 Remove；拖到 Pin 区 = 放进所属行动的快捷栏并钉住，拖到快捷栏格 = 放入不钉住（落在有物品的格 = 替换），松在原地或别处 = 取消；详情卡 <code>Pin</code> 一步钉住保留</td>
+<td>第 10 章 10.3.3、10.3.4、10.4.4、10.4.5；第 16 章 §16.1 快捷栏行、BAG-4、BAR-1；第 17 章 17.2.1；附录 B.10</td>
 </tr>
 </tbody>
 </table></div>
@@ -20292,7 +20292,7 @@ td { font-variant-numeric: tabular-nums; }
 <h3 id="s10-3-3">10.3.3 自动填充、钉住与归零</h3>
 <ol>
 <li><strong>填充顺序</strong>：进入行动时每个未钉住的格按 ① 已选中 → ② 上次用过 → ③ 数量最多 → ④ 最近获得 填入；同一 id 最多出现一次，多堆显示合计、从最少的堆扣起。</li>
-<li><strong>钉住与移除（v1.11，SGODOT-197 LOCK-04 / 05，用户 2026-10-08 确认；q(61)）</strong>：长按 450 ms 只让格子浮起（轻震），浮起即可拖；同时在快捷栏上沿上方、主行动键左边淡入两个放置区——左 Pin / Unpin（琥珀，随物品当前状态），右 Remove（垃圾桶）。松在 Pin / Unpin 区 = 切换这一格的钉住（钉子角标弹一下 + 轻震，不出气泡、不出 Toast）；松在 Remove 区 = 从栏上移除（物品仍在背包，这一格留空、不补位，Toast <code>Radish Seeds off the bar · Undo</code> 5 秒）；松在另一格 = 只互换位置，钉子跟着物品走、不自动钉住；松在本格或别处 = 取消。PinMenu 弃用。<strong>从背包网格拖进快捷栏 = 放入，不自动钉住</strong>（栏满时替换落点那一格：被替换的物品离开快捷栏、钉子随它去掉，不算「已移除」，下次照常补位）。<strong>每个行动各记各的</strong>：钉住与「已移除」都按行动保存；「已移除」记录只由 Remove 区产生：移除过的物品不会被自动填充补回，直到玩家从背包把它拖回快捷栏——拖回时清掉它的「已移除」记录。背包详情卡的 <code>Pin</code> 见 10.4.4。钉住态的视觉见 10.3.1 格内行（图钉徽标 + 顶条）。</li>
+<li><strong>钉住与移除（v1.11，SGODOT-197 LOCK-04 / 05，用户 2026-10-08 确认；q(61)）</strong>：长按 450 ms 只让格子浮起（轻震），浮起即可拖；同时在快捷栏上沿上方、主行动键左边淡入两个放置区——左 Pin / Unpin（琥珀，随物品当前状态），右 Remove（垃圾桶）。松在 Pin / Unpin 区 = 切换这一格的钉住（钉子角标弹一下 + 轻震，不出气泡、不出 Toast）；松在 Remove 区 = 从栏上移除（物品仍在背包，这一格留空、不补位，Toast <code>Radish Seeds off the bar · Undo</code> 5 秒）；松在另一格 = 只互换位置，钉子跟着物品走、不自动钉住；松在本格或别处 = 取消。PinMenu 弃用。<strong>从背包网格拖进快捷栏 = 放入，不自动钉住</strong>（落在有物品的格时替换该格：被替换的物品离开快捷栏、钉子随它去掉，不算「已移除」，下次照常补位）。<strong>每个行动各记各的</strong>：钉住与「已移除」都按行动保存；「已移除」记录只由 Remove 区产生：移除过的物品不会被自动填充补回，直到玩家从背包把它拖回快捷栏——拖回时清掉它的「已移除」记录。背包详情卡的 <code>Pin</code> 见 10.4.4。钉住态的视觉见 10.3.1 格内行（图钉徽标 + 顶条）。</li>
 <li><strong>归零</strong>：钉住的格到 0 不消失，灰图标 + <code>0</code> + 补货提示（<code>Buy at Homestead Stall</code> / <code>Craft at Workbench</code>）；未钉住的格到 0 下次进入时被替换。选中的格到 0 时自动取消选中（种子回到 <code>Sow · Pick a seed</code>；鱼饵摘掉、空钩照钓）；0 格不能被选中，点了只轻震（q(44)）。</li>
 <li><strong>解锁即上栏</strong>：新解锁的种子 / 鱼饵首次进对应行动占最后一个未钉住格并闪 0.6 s。</li>
 <li><strong>标记格自动选种</strong>（Plot Marks，q(23)；P0 不含，q(44)）：站上带种子标记的已翻空格时，Farming 快捷栏自动选中该格标记的种子，仍由玩家按主行动键播，不替玩家执行。</li>
@@ -20591,7 +20591,7 @@ td { font-variant-numeric: tabular-nums; }
 <p>详情卡 ≤ 6 行：名字 + 稀有度；数量 + 来源（<code>3 / 10 · Caught at Willow Pond</code>）；用途（<code>Sells for 10 · Fish-dex 9/20</code>）；成本（<code>Radish Seeds · 2 Energy per plot</code>）；按钮；经验提示（<code>XP: 75% · Reduced</code>）。</p>
 <p><strong>卖只在柜台抽屉里做</strong>（LOCK-15，q(29)）：背包详情卡不出 Sell，只写事实 <code>Sells for N</code>。永不可卖的物品（种子、鱼饵、肥料、鱼笼、树苗、门禁物品、Stone / Quartz / Hardwood、Mystery Dish、Travel Biscuits、Gifted 物品）不出 Sell、也不写灰字；灰字只用于「别处能做、此处不行」或「现在不行、以后能做」。柜台一次买多件时价格栏写总价，第 2 行写单价（<code>2 × 15 coins</code>）。居民赠餐的事实行写倒计时 <code>Expires in 9h 12m</code>，不写时刻。各物品类型 × 场景的完整按钮表以 SGODOT-207 的 F-07 确认版为准。</p>
 <h3 id="s10-4-5">10.4.5 手势</h3>
-<p>点格 = 浮出详情卡，点空白处关闭；长按格 = 快速钉住到当前行动快捷栏（仅消耗品；新形态待用户确认，LOCK-12，见 q(61)）；拖格到第 1 行快捷栏 = 放入落点那一格、不自动钉住；栏满时替换落点格，被替换的物品离开快捷栏、钉子随它去掉，不算「已移除」（v1.11，q(61)）；抽屉里拖第一行快捷栏格时，Pin / Unpin 与 Remove 两个放置区翻到快捷栏行下方（x 与主界面相同 72 / 168，y = 快捷栏行下沿 + 96，360 × 800 基准）；点 Tab / Sort = 过滤 / 循环排序，容量数字不变；下滑把手或点 ✕ = 关闭。</p>
+<p>点格 = 浮出详情卡，点空白处关闭；长按格（仅消耗品）= 450 ms 浮起 + 轻震，同时出 Pin 区（不出 Remove 区）；拖到 Pin 区 = 放进物品所属行动的快捷栏并钉住（放法同 10.4.4 的 <code>Pin</code>），拖到第 1 行快捷栏格 = 放入、不钉住（落在有物品的格 = 替换该格），松在原地或别处 = 取消；详情卡 <code>Pin</code> 仍是一步钉住（LOCK-12，用户 2026-10-08 同意，q(61)）；拖格到第 1 行快捷栏 = 放入落点那一格、不自动钉住；落在有物品的格时替换该格，被替换的物品离开快捷栏、钉子随它去掉，不算「已移除」（v1.11，q(61)）；抽屉里拖第一行快捷栏格时，Pin / Unpin 与 Remove 两个放置区翻到快捷栏行下方（x 与主界面相同 72 / 168，y = 快捷栏行下沿 + 96，360 × 800 基准）；点 Tab / Sort = 过滤 / 循环排序，容量数字不变；下滑把手或点 ✕ = 关闭。</p>
 <h3 id="s10-4-6">10.4.6 鱼篓 Creel</h3>
 <div class="tbl"><table>
 <thead>
@@ -34493,7 +34493,7 @@ td { font-variant-numeric: tabular-nums; }
 </tr>
 <tr>
 <td>背包（第 10 章）</td>
-<td>25 格 + 7 Tab（Tackle 页显示工具不计容量，Equip 跳 Tools &amp; Gear）；堆叠；鱼篓；农场仓库；抽屉第一行即快捷栏；点格详情卡 / 长按钉住；满包提示与裁剪；扩容 I 开售（Homestead Lv3）；收件箱包裹区（只收成就 / 委托回包）</td>
+<td>25 格 + 7 Tab（Tackle 页显示工具不计容量，Equip 跳 Tools &amp; Gear）；堆叠；鱼篓；农场仓库；抽屉第一行即快捷栏；点格详情卡 / 长按浮起拖进 Pin 区钉住（q(61)）；满包提示与裁剪；扩容 I 开售（Homestead Lv3）；收件箱包裹区（只收成就 / 委托回包）</td>
 <td>扩容 II / III</td>
 </tr>
 <tr>
