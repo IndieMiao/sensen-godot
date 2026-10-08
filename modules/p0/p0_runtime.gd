@@ -361,6 +361,16 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	# A first's bonus XP is said by its own line, not added into the XP float: the first cook's and catch's on their
 	# card's strip (Li Bai, int6 C11), the first harvest's as `First harvest! +10 XP · Radish` (§4.8.6).
 	var first_cook_xp: Array = []
+	# …the first cook's only when that card comes (a normal serve at the stove); a Queue ×2 turn-over or a pot kept on its
+	# own has none, so it floats a line of its own, `First cooked · +20 Cooking XP` (q(85)). A world without the hook
+	# gives null.
+	var cook_card: bool = _call("p0_cook_card_coming", [events]) == true
+	# Away from the kitchen a pot Queue ×2 kept on its own floats and toasts nothing, its first-cook line, Energy rewards
+	# and XP included (不知火舞 on 226): it is silent there (q(46) / q(71)) and floats rise from their object (q(34)),
+	# which is not on screen. The XP still counts, the Cookbook still marks the page, a level-up keeps its banner.
+	var at_stove: bool = world != null and world.has_method("p0_cook_card_coming")
+	var quiet: Array = [] if at_stove else P0KitchenLogic.auto_kept_events(events)
+	var hushed := func(e: Dictionary) -> bool: return quiet.any(func(q): return is_same(q, e))
 	# A harvest reply's XP counts its plants, so a held harvest reads `+40 XP · 20 plants` (§4.8.3).
 	var plants := events.filter(func(e): return str(e.get("kind", "")) == "item" and str(e.get("id", "")).begins_with("crop_") \
 		and int(e.get("delta", 0)) > 0).size()
@@ -370,6 +380,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	var crafted := events.any(func(e): return str(e.get("kind", "")) == "craft")
 	for i in events.size():
 		var ev: Dictionary = events[i]
+		if hushed.call(ev): continue
 		match str(ev.get("kind", "")):
 			"xp":
 				# The server emits a first-time bonus as `first` immediately followed by its `xp`.
@@ -377,6 +388,8 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				var what := str(events[i - 1].get("what", "")) if bonus else ""
 				if bonus and (str(ev.skill) == "cooking" or what.begins_with("catch:") or what.begins_with("harvest:")):
 					first_cook_xp.append(ev)
+				if what.begins_with("cook:") and not cook_card:
+					floats.append({kind = "first", key = what, text = "First cooked · +%d Cooking XP" % int(ev.amount), tone = UiFloatText.Tone.XP})
 				if what.begins_with("harvest:"):
 					var crop := what.trim_prefix("harvest:")
 					floats.append({kind = "first", key = what, text = "First harvest! +%d XP · %s" % [int(ev.amount),
@@ -402,6 +415,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	var first_level := not before.is_empty() and ["farming", "fishing", "cooking"].all(func(k):
 		return int(before.get("skills", {}).get(k, {}).get("level", 1)) <= 1)
 	for ev in events:
+		if hushed.call(ev) and str(ev.get("kind", "")) not in ["level", "first", "mishap", "queue", "pot", "cabinet", "plate"]: continue
 		match str(ev.get("kind", "")):
 			"energy":
 				var dlt := int(ev.delta)

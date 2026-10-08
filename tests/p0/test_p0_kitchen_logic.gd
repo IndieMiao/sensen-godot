@@ -416,3 +416,46 @@ func test_queue_mode_reads_ready_to_queue_and_never_stove_busy() -> void:
 	assert_str(P0KitchenLogic.experiment_reason(v, ["fish_crucian"])).is_equal("Stove busy")
 	assert_str(P0KitchenLogic.experiment_reason(v, ["fish_crucian"], true)).is_equal("")
 	assert_str(P0KitchenLogic.experiment_reason(v, [], true)).is_equal("Add an ingredient")
+
+func test_a_new_recipe_kept_by_a_turn_over_has_its_own_line() -> void:
+	# q(85) (不知火舞 on 226, option ②): no COOK-4 on a turn-over, so a first-time dish says `New recipe! <dish> kept`,
+	# without the next pot (it would wrap to three lines); anything else keeps the turn-over line.
+	var v := _view()
+	v.names["dish_herb_grilled_fish"] = "Herb Grilled Fish"
+	v.names["dish_grilled_crucian"] = "Grilled Crucian"
+	var first := {"kind": "dish", "dish": "dish_herb_grilled_fish", "quality": 1, "first": true, "mystery": false}
+	assert_str(P0KitchenLogic.new_recipe_line(v, first)).is_equal("New recipe! Herb Grilled Fish kept")
+	assert_str(P0KitchenLogic.rotation_line(v, first, "dish_grilled_crucian")).is_equal("Herb Grilled Fish kept · Grilled Crucian cooking")
+	first.first = false
+	assert_str(P0KitchenLogic.new_recipe_line(v, first)).is_equal("")
+	assert_str(P0KitchenLogic.new_recipe_line(v, {"kind": "dish", "dish": "dish_mystery", "mystery": true, "first": true})).is_equal("")
+
+func test_the_events_of_a_pot_kept_on_its_own_are_told_from_the_commands() -> void:
+	# The server settles the stove before a command and again after it (reducer settleStove), so a pot Queue ×2 kept on
+	# its own sits among the command's events; away from the kitchen exactly its events go quiet (不知火舞 on 226).
+	var bagged := {"kind": "item", "id": "dish_grilled_crucian", "delta": 1}
+	var dish := {"kind": "dish", "pot": 3, "dish": "dish_grilled_crucian", "quality": 0, "first": false, "mystery": false, "auto": true}
+	var xp := {"kind": "xp", "skill": "cooking", "amount": 5, "percent": 100}
+	var level := {"kind": "level", "skill": "cooking", "level": 3, "energy": 0, "gifts": [["spice_pepper", 2]]}
+	var gift := {"kind": "parcel", "id": "spice_pepper", "qty": 2, "key": "level:cooking:3:0"}
+	var fired := {"kind": "queue", "id": 4, "dish": null, "started_at": 0, "ms": 60000}
+	var crop := {"kind": "item", "id": "crop_radish", "delta": 2}
+	var farm_xp := {"kind": "xp", "skill": "farming", "amount": 4, "percent": 100}
+	var spent := {"kind": "energy", "delta": -2, "reason": "harvest"}
+	# Before the command: the harvest's items and XP stay.
+	var events := [bagged, dish, xp, level, gift, fired, spent, crop, farm_xp]
+	assert_array(P0KitchenLogic.auto_kept_events(events)).is_equal([bagged, dish, xp, level, gift, fired])
+	# After it, and a pot with plates left on the stove (no `queue`): the next command's XP is not the pot's.
+	var plate := {"kind": "plate", "ids": ["dish_grilled_crucian"], "cabinet": false}
+	assert_array(P0KitchenLogic.auto_kept_events([crop, farm_xp, plate, dish, xp])).is_equal([plate, dish, xp])
+	assert_array(P0KitchenLogic.auto_kept_events([plate, dish, xp, crop, farm_xp])).is_equal([plate, dish, xp])
+	# A Mystery Dish: the ingredients it gives back, then its Mishap, then the waiting pot.
+	var odd := dish.duplicate()
+	odd.mystery = true
+	var back := {"kind": "item", "id": "fish_crucian", "delta": 1}
+	var mishap := {"kind": "mishap", "items": ["fish_crucian"], "tried": false, "refund": ["fish_crucian"]}
+	assert_array(P0KitchenLogic.auto_kept_events([odd, back, mishap, fired, crop])).is_equal([odd, back, mishap, fired])
+	# A pot collected at the stove (no `auto`) is not one.
+	var served := dish.duplicate()
+	served.erase("auto")
+	assert_array(P0KitchenLogic.auto_kept_events([bagged, served, xp])).is_empty()
