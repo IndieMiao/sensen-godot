@@ -7,7 +7,7 @@ extends Control
 ##   GEAR       Compact/GearSlot 663:61299       52×88  role above, equipment name below           (LOCK-13)
 ## Data in (the fields below), signals out. Each cell runs its own GestureArbiter (QUICK: SLOT mode, others:
 ## CELL mode, WP7-B F-04 §3 / §4), so a touch is exactly one outcome: `tapped` only for the arbiter's tap;
-## everything else (lift, pin_toggle / long_press, drag_start / drag_move / drop, swipe_up, cancel) goes out
+## everything else (lift, long_press, drag_start / drag_move / drop, swipe_up, cancel) goes out
 ## through `gesture` for the quick bar / bag drawer, which then sets `state` / `pinned`. mouse_filter is
 ## PASS, so a TouchScrollContainer still takes vertical drags (CELL mode answers them with cancel).
 ## Hosts outside a scroll container (the quick bar) need a STOP backing control, or the touch also reaches
@@ -18,7 +18,8 @@ extends Control
 ## Other densities draw it as EMPTY.
 
 signal tapped
-## A GestureArbiter outcome other than tap, e.g. {kind = &"pin_toggle", pos}; `pos` is in global coordinates.
+## A GestureArbiter outcome other than tap, e.g. {kind = &"lift", pos}; `pos` is in global coordinates. Pinning is the
+## quick bar's drop on its Pin zone (LOCK-05 v1.11), never a cell outcome.
 signal gesture(outcome: Dictionary)
 
 enum Density { INVENTORY, QUICK, KITCHEN, GEAR }
