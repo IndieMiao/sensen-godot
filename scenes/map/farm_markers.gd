@@ -412,11 +412,13 @@ func _sync_city(cam: Camera3D, lat: float, lng: float) -> void:
 ## they part.
 var self_label_yields := false
 
-## The player's own name label (local space) while their pin is shown in the city; an empty rect otherwise.
+## The player's own name label as drawn (local space) while their pin is shown in the city; an empty rect otherwise.
+## The label is scaled about its pivot by the zoom boost (1.3 at z11): the whole drawn rect counts (不知火舞 on #83).
 func self_label_rect() -> Rect2:
 	if not city_mode or low_detail or not visible_farm_ids.has("self") or not _buttons.has("self"): return Rect2()
 	var label: Button = _buttons["self"]
-	return Rect2(label.position, label.size)
+	var s := maxf(label.scale.x, _pin_zoom_boost())   # never less than the steady boost, even mid-pop
+	return Rect2(label.position + label.pivot_offset * (1.0 - s), label.size * s)
 
 func yield_self_label(on: bool) -> void:
 	self_label_yields = on

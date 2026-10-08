@@ -231,11 +231,19 @@ func test_the_beginner_pond_shows_at_the_city_level_until_pond_catch_is_handed_i
 	assert_str(name.text).is_equal(city._label_text(city.markers[NEAREST_POND].entry))
 	assert_int(name.text_overrun_behavior).is_equal(TextServer.OVERRUN_NO_TRIMMING)
 	assert_float(name.size.x).is_greater_equal(name.get_theme_font("font").get_string_size(name.text, HORIZONTAL_ALIGNMENT_LEFT, -1, 9).x)
-	# My Farm's label never sits on it (home z12.2: they touch, so My Farm's gives way).
-	var own: Rect2 = fm.self_label_rect()
-	own.position += fm.global_position - city.global_position
-	var reed_label := Rect2(name.position + city.markers[NEAREST_POND].anchor, name.size)
-	assert_bool(fm._buttons["self"].visible and own.intersects(reed_label)).is_false()
+	# My Farm's label never sits on it, measured as drawn — scaled about its pivot by the zoom boost (1.21 at z12.2), the
+	# 5 px 不知火舞 saw past its unscaled rect on the overview. Both shots: the overview and home at z12.2.
+	for at in [OVERVIEW, Vector2(m.home_lat, m.home_lng)]:
+		_look(m, at, 12.2, 18.0 if at == OVERVIEW else 0.0)
+		var label: Button = fm._buttons["self"]
+		var b := fm._pin_zoom_boost()
+		assert_float(b).is_greater(1.0)
+		var steady := Rect2(label.position + label.pivot_offset * (1.0 - b), label.size * b)   # how it draws at rest
+		var own: Rect2 = fm.self_label_rect()
+		assert_bool(own.encloses(steady)).is_true()
+		own.position += fm.global_position - city.global_position
+		var reed_label := Rect2(name.position + city.markers[NEAREST_POND].anchor, name.size)
+		assert_bool(label.visible and own.intersects(reed_label)).append_failure_message(str(at)).is_false()
 	# Both fish in the bag (the target is now the stall), or handed in: no marker, a pond like any other.
 	for gone in [_board(2), _board(-1)]:
 		rt.session.view = gone
