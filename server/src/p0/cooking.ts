@@ -67,20 +67,36 @@ export function matchRecipe(c: P0Content, items: string[]): Recipe | null {
   return c.cooking.recipes.filter(r => fits(c, r, items)).sort((a, b) => wild(a) - wild(b))[0] ?? null;
 }
 
-/** Concrete items for a known page: tag slots take the cheapest matching item the stove can reach. */
+/**
+ * Concrete items for a known page: tag slots take the cheapest matching items the stove can reach, preferring a set
+ * that would make this same page if laid out freely (q(67): Grilled Fish takes a carp before a crucian, which alone
+ * is Grilled Crucian's). Without such a set, the cheapest set that fits still cooks this page (startPot cooks the
+ * chosen page); null when nothing fits.
+ */
 export function ingredientsFor(c: P0Content, s: P0State, recipe: Recipe): string[] | null {
   const left = ingredientStock(c, s);
-  const out: string[] = [];
   const priceOf = (id: string) => fishById(c, id)?.price ?? c.crops.find(cr => cr.id === id)?.price ?? 0;
   // Specific tokens first so a tag never eats the item a named slot needs.
   const order = [...recipe.in].sort((a, b) => Number(TAG.test(a)) - Number(TAG.test(b)));
-  for (const token of order) {
-    const options = [...left.entries()].filter(([id, n]) => n > 0 && tokenMatches(c, token, id)).sort((a, b) => priceOf(a[0]) - priceOf(b[0]));
-    if (!options.length) return null;
-    out.push(options[0][0]);
-    left.set(options[0][0], options[0][1] - 1);
-  }
-  return out;
+  const out: string[] = [];
+  let fallback: string[] | null = null;
+  let tries = 0;
+  const pick = (i: number): string[] | null => {
+    if (i === order.length) {
+      if (!fallback) fallback = [...out];
+      return matchRecipe(c, out)?.id === recipe.id ? [...out] : null;
+    }
+    const options = [...left.entries()].filter(([id, n]) => n > 0 && tokenMatches(c, order[i], id)).sort((a, b) => priceOf(a[0]) - priceOf(b[0]));
+    for (const [id, n] of options) {
+      if (++tries > 200) break;   // pages have at most three slots; this only bounds a pathological stock
+      left.set(id, n - 1); out.push(id);
+      const found = pick(i + 1);
+      out.pop(); left.set(id, n);
+      if (found) return found;
+    }
+    return null;
+  };
+  return pick(0) ?? fallback;
 }
 
 export function startPot(c: P0Content, s: P0State, cmd: { items?: unknown; recipe?: unknown }, now: number, events: P0Event[]): Refusal | null {
@@ -90,12 +106,16 @@ export function startPot(c: P0Content, s: P0State, cmd: { items?: unknown; recip
     return { code: 'stove_busy', detail: { ready_in: Math.max(0, s.stove.started_at + s.stove.ms - now), queued: !!s.queue, left: !!s.stove.left } };
   }
   let items: string[];
+  // A page the player chose (Cookbook Cook, Cook Again) cooks that page; only free slots go through matchRecipe (q(67)).
+  let chosen: Recipe | null = null;
   if (cmd.recipe !== undefined) {
     const recipe = recipeById(c, String(cmd.recipe));
     if (!recipe || !s.cookbook.includes(recipe.id)) return { code: 'unknown_recipe' };
     const picked = ingredientsFor(c, s, recipe);
-    if (!picked) return { code: 'missing_ingredients', detail: { recipe: recipe.id } };
+    // Never falls back to another page: what was picked must fit the chosen one.
+    if (!picked || !fits(c, recipe, picked)) return { code: 'missing_ingredients', detail: { recipe: recipe.id } };
     items = picked;
+    chosen = recipe;
   } else {
     if (!Array.isArray(cmd.items)) return { code: 'bad_items' };
     items = cmd.items.map(String);
@@ -118,7 +138,7 @@ export function startPot(c: P0Content, s: P0State, cmd: { items?: unknown; recip
     const need = items.filter(x => x === id).length;
     takeIngredient(c, s, id, need, events);
   }
-  const recipe = matchRecipe(c, items);
+  const recipe = chosen ?? matchRecipe(c, items);
   const rarity = deriveRarity(c, parts);
   const tier: CookTier = c.cooking.tiers[String(rarity)];
   const teach = s.fires === 0;
