@@ -24,6 +24,7 @@ const ACTIONS := ["idle", "run", "walk", "labour_sow", "labour_water", "labour_h
 var url := ""
 var player_id := ""
 var access_key := ""   # the demo server's key (P0Session.access_key, SGODOT-232 D1); "" for local playtests
+var version := 0       # P0Session.version, sent as x-p0-version: an old build's handshake gets 426 like its requests (q(74))
 var outpost := ""
 var spawn_at := Vector2.ZERO
 var appearance: Dictionary = {}
@@ -90,6 +91,20 @@ func stop() -> void:
 		socket.poll()   # flush now: a room that frees this node never polls again
 	_reset()
 
+## SYS-MAINT / SYS-UPDATE (q(74), SGODOT-233): while a whole-screen card is up the client leaves the room itself (the
+## server does not close it), and comes back into it when the card goes — where it joined, as a reconnect does.
+var _held := false
+
+func hold() -> void:
+	if _stopped: return
+	stop()
+	_held = true
+
+func release() -> void:
+	if not _held: return
+	_held = false
+	start(outpost, spawn_at)
+
 ## Claims a seat; `at` is its position in room metres (the server moves us onto it before seating us).
 func sit(seat: String, at := Vector2.INF) -> int:
 	_act_seq += 1
@@ -111,6 +126,7 @@ func _connect() -> void:
 	socket = WebSocketPeer.new()
 	var headers := PackedStringArray(["x-p0-player: " + player_id])
 	if access_key != "": headers.append("x-p0-key: " + access_key)
+	if version > 0: headers.append("x-p0-version: %d" % version)
 	socket.handshake_headers = headers
 	if socket.connect_to_url(url) != OK: _retry()
 

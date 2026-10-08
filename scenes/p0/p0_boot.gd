@@ -18,7 +18,7 @@ func _ready() -> void:
 	_go.call_deferred(wanted())
 
 func _go(target: String) -> void:
-	P0Runtime.ensure()
+	P0Runtime.ensure().cover_launch()   # SYS-LOADING until the first answer and the first world (SGODOT-233)
 	if target.begins_with("pond:"):
 		AppRouter.push_instance(POND, {"pond_id": target.trim_prefix("pond:")})
 	elif target.begins_with("outpost:"):

@@ -15,6 +15,9 @@ signal command_started(key: String)
 signal command_settled(key: String, ok: bool, code: String)
 ## Every command as it is handed to send(), before it goes out (the guide closes a TipCard the player just acted on).
 signal sent(cmd: Dictionary)
+## The server turned every request away (q(74), SGODOT-233): "update_required" (HTTP 426, {url}) or "maintenance"
+## (HTTP 503, {back_at}: UTC ISO, absent when unknown). Not a network failure: no Didn't go through, no Offline.
+signal blocked(code: String, detail: Dictionary)
 
 const DEFAULT_URL := "http://127.0.0.1:3110/v1"
 const DEMO_CONFIG := "res://assets/p0/demo_server.json"
@@ -22,6 +25,9 @@ const REFRESH_S := 30.0
 
 var base_url := DEFAULT_URL
 var access_key := ""
+## The build's versionCode, sent as x-p0-version (q(74)): from the demo build's config; 0 sends none (desktop and
+## test builds are never turned away for their version).
+var version := 0
 var player_id := ""
 var view: Dictionary = {}
 ## Where the player is (P0Runtime sets it on attach / detach): home, pond, outpost, mine, map or "" when unknown.
@@ -51,6 +57,7 @@ func _ready() -> void:
 	if base_url == "": base_url = str(demo.get("url", ""))
 	if base_url == "": base_url = DEFAULT_URL
 	access_key = str(demo.get("key", ""))
+	version = int(demo.get("version", 0))
 	player_id = _read_line("user://p0_player.txt", "")
 	if player_id == "":
 		var bytes := Crypto.new().generate_random_bytes(10)
@@ -165,6 +172,10 @@ func _finish(result: int, code: int, raw: PackedByteArray, cmd: Dictionary) -> v
 	if not busy and not _queue.is_empty(): _post(_queue.pop_front())
 
 func _handle(result: int, code: int, raw: PackedByteArray, cmd: Dictionary) -> Dictionary:
+	var block := blocked_reply(result, code, raw)
+	if not block.is_empty():
+		blocked.emit(str(block.code), block)
+		return {ok = false, code = str(block.code), network = true}   # what waits behind it is dropped, like a failure
 	if result != HTTPRequest.RESULT_SUCCESS or code >= 500 or code == 0:
 		connection_failed.emit("Can't reach the farm server", cmd)
 		return {ok = false, code = "network", network = true}
@@ -182,6 +193,15 @@ func _handle(result: int, code: int, raw: PackedByteArray, cmd: Dictionary) -> D
 	if data.has("state"): state_changed.emit(view, [])
 	return {ok = false, code = str(data.get("code", "")), network = false}
 
+## The server's whole-screen refusals (q(74)): 426 {code: "update_required", url} and 503 {code: "maintenance",
+## back_at}. Both the status and the body's code must match, so a proxy's plain 503 stays a network failure.
+static func blocked_reply(result: int, code: int, raw: PackedByteArray) -> Dictionary:
+	if result != HTTPRequest.RESULT_SUCCESS or not code in [426, 503]: return {}
+	var data = JSON.parse_string(raw.get_string_from_utf8())
+	if typeof(data) != TYPE_DICTIONARY: return {}
+	var want := "update_required" if code == 426 else "maintenance"
+	return data if str(data.get("code", "")) == want else {}
+
 ## P0 prototype entry: a user://p0_boot marker (adb run-as touch files/p0_boot) or SENSEN_P0=1 on desktop.
 static func boot_wanted() -> bool:
 	return FileAccess.file_exists("user://p0_boot") or OS.get_environment("SENSEN_P0") == "1" or OS.has_feature("p0")
@@ -189,6 +209,7 @@ static func boot_wanted() -> bool:
 func _headers() -> PackedStringArray:
 	var headers := PackedStringArray(["x-p0-player: " + player_id, "content-type: application/json"])
 	if access_key != "": headers.append("x-p0-key: " + access_key)
+	if version > 0: headers.append("x-p0-version: %d" % version)
 	return headers
 
 ## The internal demo APK (tools/p0/build_demo_apk.sh) carries DEMO_CONFIG; no other build does, the file is
@@ -203,7 +224,7 @@ static func demo_config(text: String) -> Dictionary:
 	if not parsed is Dictionary: return {}
 	var url := str(parsed.get("url", "")).strip_edges().trim_suffix("/")
 	if not (url.begins_with("http://") or url.begins_with("https://")): url = ""
-	return {"url": url, "key": str(parsed.get("key", "")).strip_edges()}
+	return {"url": url, "key": str(parsed.get("key", "")).strip_edges(), "version": int(parsed.get("version", 0))}
 
 static func _read_line(path: String, fallback: String) -> String:
 	if FileAccess.file_exists(path):

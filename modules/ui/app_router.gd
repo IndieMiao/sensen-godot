@@ -18,6 +18,9 @@ const BACK_LEAVE_APP := 2
 
 var _navigation_pending := false
 var _loading: CanvasLayer
+## A host's own loading layer for open_instance (P0: SYS-LOADING-SCENE, SGODOT-233): factory(scene_path, args)
+## returns a CanvasLayer with failed() and close_button like loading_overlay.gd, or null to keep that overlay.
+var loading_overlay_factory := Callable()
 ## 实例栈（PRD §3.2 第二层空间）：地图常驻为底，农场/地点/换装房压在上面。
 var _stack: Array[Node] = []
 var _relocation_source: Node
@@ -203,15 +206,16 @@ func open_instance(scene_path: String, args := {}) -> void:
 		scene_path = FARM
 		args = _farm_destination_args(args)
 	if scene_path == FARM and _reuse_farm(args): return
-	var packed := await _load_with_feedback(scene_path)
+	var packed := await _load_with_feedback(scene_path, args)
 	if packed == null: return
 	_push_packed(packed, args)
 	await _end_transition()
 
 
-func _load_with_feedback(scene_path: String) -> PackedScene:
+func _load_with_feedback(scene_path: String, args := {}) -> PackedScene:
 	_navigation_pending = true
-	_loading = preload("res://modules/ui/loading_overlay.gd").new()
+	_loading = loading_overlay_factory.call(scene_path, args) if loading_overlay_factory.is_valid() else null
+	if _loading == null: _loading = preload("res://modules/ui/loading_overlay.gd").new()
 	add_child(_loading)
 	await _render_frame()
 	var error := ResourceLoader.load_threaded_request(scene_path, "PackedScene")
