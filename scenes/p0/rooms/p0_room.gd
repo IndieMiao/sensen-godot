@@ -27,7 +27,7 @@ const EXIT_ARM_M := 1.0           # … once the player has been this far from i
 const REACH_M := 0.35             # close enough to a stand_ point to use the facility
 const FOCUS_S := 0.4              # push-in ease
 const HUD_BOTTOM := UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H   # below the safe-area top
-const ZOOM_RANGE := Vector2(0.8, 1.6)
+const ZOOM_RANGE := Vector2(0.8, 1.4)   # the farm's (P0Farm._pinch), one player scale everywhere (不知火舞 on 226)
 const FRAME_W := 0.84             # opening shot: player + facilities within 84 % of the width …
 const FRAME_H := 0.60             # … and the middle 60 % of the height (§10.1)
 const MIN_VIEW_K := 0.8           # … but never closer than 80 % of the room's accepted view
@@ -75,6 +75,9 @@ var _data := {}           # name -> anchor dictionary
 var _cam_dir := Vector3(9.5, 6.8, 11.2).normalized()
 var _cam_dist := 16.0
 var _cam_size := 10.75
+var _diorama_size := 10.75   # the whole room's opening width: what push-in presets are fractions of (view_size)
+var _bounds_lo := Vector2(-INF, -INF)   # the room's art on the screen plane (right, up), the camera kept inside it
+var _bounds_hi := Vector2(INF, INF)
 var _focus := Vector3.ZERO
 var _follow := P0Follow.new()
 var _zoom := 1.0
@@ -480,9 +483,12 @@ func _backdrop_gradient() -> ShaderMaterial:
 	mat.set_shader_parameter("blend", Vector2(float(blend[0]), float(blend[1])))
 	return mat
 
-## Opening shot (§10.1): the player, every tappable anchor and the room's floor (a cut-away diorama reads
-## wrong cropped) in the middle of the screen; held until the player first moves. Re-run when a room changes
-## what can be tapped.
+## Opening shot. One player scale everywhere (用户, 2026-10-09; FarmCamera.player_scale_size): the room's camera
+## shows the player as tall as the farm does at zoom 1, which supersedes the whole-room diorama opening (§10.1;
+## 不知火舞's "whole art centred, ≥ 16 px clear" on 227). A room that still fits at that scale holds its framing; any
+## other follows the player with the safe box, kept inside the room's art (no backdrop past the walls). The whole
+## room's width is still worked out: push-ins (the kitchen stage) are fractions of it, so they frame as before.
+## Re-run when a room changes what can be tapped.
 func frame_all() -> void:
 	var pts: Array[Vector3] = [actor.position, actor.position + Vector3(0, 1.75, 0)]
 	for n in _tappable(): pts.append(anchor(n).global_position)
@@ -508,16 +514,50 @@ func frame_all() -> void:
 		hi.x = maxf(hi.x, span.y)
 		base = maxf(base, (span.y - span.x) / maxf(1.0 - 2.0 * SIDE_MARGIN / maxf(view.x, 1.0), 0.5))
 	var need := maxf((hi.x - lo.x) / FRAME_W, (hi.y - lo.y) / (FRAME_H * tall))
-	# Fits: everything is on screen at the room's accepted view, even if tighter than the opening margins.
-	_fits = hi.x - lo.x <= base and hi.y - lo.y <= base * tall * 0.85
-	_cam_size = clampf(need, base * MIN_VIEW_K, base)
-	var mid := (lo + hi) * 0.5
-	# The screen centre on the floor plane: move along the view axis until y = floor.
-	var t := (floor_y - up.y * mid.y) / forward.y
-	_focus = right * mid.x + up * mid.y + forward * t
-	_framed = _focus
+	_diorama_size = clampf(need, base * MIN_VIEW_K, base)
+	_cam_size = FarmCamera.player_scale_size(view, rad_to_deg(asin(_cam_dir.y)))
+	var art_up := art_span(up)
+	_bounds_lo = Vector2(lo.x, minf(lo.y, art_up.x) if art_up.y > art_up.x else lo.y)
+	_bounds_hi = Vector2(hi.x, maxf(hi.y, art_up.y) if art_up.y > art_up.x else hi.y)
+	cam.size = _cam_size / _zoom
+	# Fits: the art fits the free band both ways at the player's scale, so the room holds still, centred in it.
+	_framed = _clamp_focus(_on_floor(right, up, forward, (_bounds_lo + _bounds_hi) * 0.5))
+	_fits = _clamp_focus(_on_floor(right, up, forward, _bounds_lo)).is_equal_approx(_framed)
+	# Otherwise straight onto the player (no slide in), kept inside the art (_update_camera).
+	_focus = _framed if _fits else actor.position
 	_follow.hold()
 	_update_camera()
+
+## The point on the floor under the screen-plane point q = (along right, along up): moved along the view axis.
+func _on_floor(right: Vector3, up: Vector3, forward: Vector3, q: Vector2) -> Vector3:
+	var t := (floor_y - up.y * q.y) / forward.y
+	return right * q.x + up * q.y + forward * t
+
+## The camera's centre per screen axis (不知火舞 on 226): an axis where the room's art fits the free band — across,
+## SIDE_MARGIN in from both edges; down, from the HUD's bottom to the quick bar's top — holds it centred in that band;
+## an axis where it does not follows (the safe box) but stops where the art's edge meets the band's, so no backdrop
+## shows past the walls. The outposts mostly fit down and pan across, which keeps the small-room look.
+func _clamp_focus(f: Vector3) -> Vector3:
+	if _bounds_lo.x == -INF: return f
+	var forward := -_cam_dir
+	var right := forward.cross(Vector3.UP).normalized()
+	var up := right.cross(forward).normalized()
+	var view := _view()
+	var m := cam.size / maxf(view.x, 1.0)   # metres per px
+	# The free band in px from the screen's centre, along each axis's positive direction (right; up = screen up).
+	var band_lo := Vector2(-(view.x * 0.5 - SIDE_MARGIN), -(view.y * 0.5 - _bar_top_px())) * m
+	var band_hi := Vector2(view.x * 0.5 - SIDE_MARGIN, view.y * 0.5 - (_safe_top() + HUD_BOTTOM)) * m
+	var q := Vector2(f.dot(right), f.dot(up))
+	for i in 2:
+		var lo := _bounds_lo[i] - band_lo[i]   # the art's low edge on the band's low line
+		var hi := _bounds_hi[i] - band_hi[i]   # the art's high edge on the band's high line
+		q[i] = ((_bounds_lo[i] + _bounds_hi[i]) - (band_lo[i] + band_hi[i])) * 0.5 if lo > hi else clampf(q[i], lo, hi)
+	return _on_floor(right, up, forward, q)
+
+## The quick bar's top edge from the bottom of the screen, in px (the bar's own spot, plus the gesture inset).
+func _bar_top_px() -> float:
+	var bottom := rt.ui.safe_bottom() if rt else 0.0
+	return UiTokens.SIZE_QUICK_BAR_BOTTOM + UiTokens.SIZE_QUICK_BAR_H + bottom
 
 ## The visible art's extent along the screen's right axis (world metres), as (min, max); (0, 0) without meshes.
 func art_span(right: Vector3) -> Vector2:
@@ -538,6 +578,8 @@ func _view() -> Vector2:
 func _update_camera() -> void:
 	if _review_view: return   # P0_SHOT "reviewcam": held on the kit's review camera
 	var follow_size := _cam_size / _zoom
+	cam.size = follow_size
+	if not (_fits and _zoom <= 1.0): _focus = _clamp_focus(_focus)   # following: kept inside the room's art
 	var center := _focus
 	var size := follow_size
 	if not _shot.is_empty():
@@ -555,7 +597,7 @@ func focus(cam_anchor: String, opts := {}) -> void:
 	if m == null: return
 	var view := _view()
 	var band: Rect2 = opts.get("band", band_below_hud(0.40))
-	var size := float(opts.get("size", _cam_size * 0.45))
+	var size := float(opts.get("size", _diorama_size * 0.45))
 	var visible_h := size * view.y / maxf(view.x, 1.0)
 	var forward := -_cam_dir
 	var up := (Vector3.UP - forward * forward.dot(Vector3.UP)).normalized()
@@ -569,8 +611,9 @@ func release_focus() -> void:
 
 func is_focused() -> bool: return not _shot.is_empty() and _shot_k > 0.0
 
-## Orthographic width of the room's opening view, in metres (push-in sizes are fractions of it).
-func view_size() -> float: return _cam_size
+## Orthographic width of the whole room's view, in metres: push-in sizes are fractions of it, so the kitchen stage
+## and the corner shots frame as they did before the player scale (frame_all).
+func view_size() -> float: return _diorama_size
 
 ## Screen band from the HUD's bottom edge to `bottom` (fraction of the screen height).
 func band_below_hud(bottom: float) -> Rect2:

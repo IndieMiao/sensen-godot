@@ -1,4 +1,6 @@
 extends GdUnitTestSuite
+
+const FarmCamera = preload("res://modules/farm/farm_camera.gd")
 ## Outpost rooms (SGODOT-227) on their room kits (Farm Tools Store, Coffee Shop, Post Office, Fruit Shop; placeholders
 ## until SGODOT-218): each of the four outposts opens from the shared outpost table with its anchors, keeper and residents; counters and residents are tappable, decor is not;
 ## seats walk to the nearest free one, sit, skip seats other players hold, and the joystick stands up.
@@ -401,8 +403,8 @@ func test_overlapping_name_tags_give_the_tap_to_the_nearer_one() -> void:
 		assert_array(asked).is_equal([pair[1]])
 
 ## Scene integration (SGODOT-227, 不知火舞's walkthrough on 227): the tea house opens on the Coffee Shop kit with the
-## background of its signed render and every anchor of its file, and the opening view holds the whole art, centred, with at least
-## 16 px clear on both sides (the kit's own camera left about 14 px on the right).
+## background of its signed render and every anchor of its file. Its view is the player's scale now (用户 2026-10-09),
+## which supersedes 227's "whole art centred, ≥ 16 px clear": test_every_outpost_opens_on_its_kit checks the framing.
 func test_the_tea_house_opens_on_the_coffee_shop_kit() -> void:
 	var r := _room("sh_tea_1")
 	assert_str(r.layout_path).is_equal("res://assets/rooms/coffee_shop/layout.json")
@@ -411,16 +413,6 @@ func test_the_tea_house_opens_on_the_coffee_shop_kit() -> void:
 	assert_str(P0Room.aces_screen(Vector3(clear.r, clear.g, clear.b)).to_html(false)).is_equal("e6f5f1")
 	for a in P0RoomAnchors.read_json(str(P0Outposts.find("sh_tea_1").anchors)).anchors:
 		assert_object(r.anchor(str(a.name))).override_failure_message(str(a.name)).is_not_null()
-	assert_bool(r._fits).override_failure_message("the opening view holds still").is_true()
-	var right := (-r._cam_dir).cross(Vector3.UP).normalized()
-	var span := r.art_span(right)
-	var centre := r.cam.global_position.dot(right)   # the view axis is square to `right`
-	var px := r._view().x / r.cam.size
-	var left_px := (span.x - (centre - r.cam.size * 0.5)) * px
-	var right_px := (centre + r.cam.size * 0.5 - span.y) * px
-	assert_float(left_px).override_failure_message("left %.1f px" % left_px).is_greater_equal(16.0)
-	assert_float(right_px).override_failure_message("right %.1f px" % right_px).is_greater_equal(16.0)
-	assert_float(absf(left_px - right_px)).override_failure_message("%.1f / %.1f px" % [left_px, right_px]).is_less(2.0)
 
 ## Every chair of both tea tables can be walked to from the door: the player arrives on the floor beside it (not
 ## sat there by a failed path) and sits on it.
@@ -507,9 +499,10 @@ func test_the_tea_house_lights_as_the_coffee_shop_was_signed() -> void:
 	assert_str(P0Room.aces_screen(mat.get_shader_parameter("bottom_input")).to_html(false)).is_equal("fffbee")
 	assert_vector(mat.get_shader_parameter("blend")).is_equal(Vector2(0.5, 0.85))
 
-## Scene integration (SGODOT-227): every outpost opens on its own kit with every anchor of its file, the background
-## sampled from its signed render, and an opening view that holds the whole art, centred, with at least 16 px clear on
-## both sides; the door's prompt is clear of the player who comes in.
+## Scene integration (SGODOT-227): every outpost opens on its own kit with every anchor of its file and the background
+## sampled from its signed render; its view shows the player at the farm's scale, pans across inside its art and holds
+## down in the free band (用户 2026-10-09, 不知火舞 on 226; superseding 227's whole-art opening); the door's prompt is
+## clear of the player who comes in.
 func test_every_outpost_opens_on_its_kit() -> void:
 	var kits := {"sh_tackle_1": "farm_tools_store", "sh_tea_1": "coffee_shop", "sh_post_1": "post_office", "sh_market_1": "fruit_shop"}
 	for id in kits:
@@ -521,15 +514,8 @@ func test_every_outpost_opens_on_its_kit() -> void:
 			assert_object(r.anchor(str(a.name))).override_failure_message("%s %s" % [id, a.name]).is_not_null()
 		var clear := r.environment.background_color.srgb_to_linear()
 		assert_str(P0Room.aces_screen(Vector3(clear.r, clear.g, clear.b)).to_html(false)).override_failure_message(id).is_equal(str(o.backdrop.top).to_lower())
-		assert_bool(r._fits).override_failure_message(id + " holds still").is_true()
-		var right := (-r._cam_dir).cross(Vector3.UP).normalized()
-		var span := r.art_span(right)
-		var centre := r.cam.global_position.dot(right)
-		var px := r._view().x / r.cam.size
-		var left_px := (span.x - (centre - r.cam.size * 0.5)) * px
-		var right_px := (centre + r.cam.size * 0.5 - span.y) * px
-		assert_float(minf(left_px, right_px)).override_failure_message("%s %.1f / %.1f px" % [id, left_px, right_px]).is_greater_equal(16.0)
-		assert_float(absf(left_px - right_px)).override_failure_message("%s %.1f / %.1f px" % [id, left_px, right_px]).is_less(2.0)
+		_assert_player_scale_framing(r, id)
+		r.frame_all()   # back to the opening view for the door check
 		# The door's prompt keeps off the player at spawn: below the feet at a front door, above the head at a back one.
 		var feet := r.cam.unproject_position(r.actor.position)
 		var head := r.cam.unproject_position(r.actor.position + Vector3(0, 1.75, 0))
@@ -567,3 +553,48 @@ func test_every_outpost_marker_is_a_world_prompt() -> void:
 			assert_str(str(m.get("kind", ""))).override_failure_message("%s %s" % [o.id, n]).is_not_empty()
 			assert_bool(m.has("text")).override_failure_message("%s %s" % [o.id, n]).is_false()
 		assert_str(str(r._marker("exit", {}).get("name", ""))).is_equal("Map")
+
+## Camera unification (用户 2026-10-09): where the room's art edges sit on screen, in px — across from the screen's left
+## and right edges, down from the HUD's bottom and to the quick bar's top (the free band P0Room keeps the art in).
+func _art_edges_px(r: P0Room) -> Dictionary:
+	var forward := -r._cam_dir
+	var right := forward.cross(Vector3.UP).normalized()
+	var up := right.cross(forward).normalized()
+	var view := r._view()
+	var px := view.x / r.cam.size
+	var cx := r.cam.global_position.dot(right)
+	var cy := r.cam.global_position.dot(up)
+	var half_h := r.cam.size * 0.5 * view.y / view.x
+	var top_band := float(P0Room.HUD_BOTTOM)
+	var bottom_band := view.y - (UiTokens.SIZE_QUICK_BAR_BOTTOM + UiTokens.SIZE_QUICK_BAR_H)
+	return {left = (r._bounds_lo.x - (cx - r.cam.size * 0.5)) * px, right = (cx + r.cam.size * 0.5 - r._bounds_hi.x) * px,
+		top = (cy + half_h - r._bounds_hi.y) * px - top_band, bottom = bottom_band - (cy + half_h - r._bounds_lo.y) * px}
+
+## Pushes the camera's centre `by` along the screen axes (metres) and lets the room keep it inside its art.
+func _push_view(r: P0Room, by: Vector2) -> void:
+	var forward := -r._cam_dir
+	var right := forward.cross(Vector3.UP).normalized()
+	var up := right.cross(forward).normalized()
+	r._focus += right * by.x + up * by.y
+	r._update_camera()
+
+## The player stands as tall as on the farm; across, a room wider than the free band pans and stops with its art's
+## edge SIDE_MARGIN from the screen's; down, a room that fits the band holds centred in it (不知火舞 on 226).
+func _assert_player_scale_framing(r: P0Room, label: String) -> void:
+	var pitch := rad_to_deg(asin(r._cam_dir.y))
+	assert_float(r.cam.size).override_failure_message(label + " size").is_equal_approx(FarmCamera.player_scale_size(r._view(), pitch), 0.001)
+	for side in [-1.0, 1.0]:
+		_push_view(r, Vector2(side * 100.0, 0.0))
+		var e := _art_edges_px(r)
+		var edge: float = e.left if side < 0.0 else e.right
+		if edge > P0Room.SIDE_MARGIN + 0.5:   # narrower than the band: centred instead
+			assert_float(absf(float(e.left) - float(e.right))).override_failure_message("%s centred across %s" % [label, e]).is_less(1.0)
+		else:
+			assert_float(edge).override_failure_message("%s edge %s" % [label, e]).is_equal_approx(P0Room.SIDE_MARGIN, 0.5)
+	for side in [-1.0, 1.0]:
+		_push_view(r, Vector2(0.0, side * 100.0))
+		var e := _art_edges_px(r)
+		if float(e.top) >= -0.5 and float(e.bottom) >= -0.5:   # fits down: centred in the band, whichever way it was pushed
+			assert_float(absf(float(e.top) - float(e.bottom))).override_failure_message("%s centred down %s" % [label, e]).is_less(1.0)
+		else:   # taller than the band: the art's edge on the band's
+			assert_float(minf(absf(float(e.top)), absf(float(e.bottom)))).override_failure_message("%s down %s" % [label, e]).is_less(0.5)
