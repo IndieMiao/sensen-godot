@@ -1,0 +1,103 @@
+{
+  "background_median_rgb": [
+    239.0,
+    241.0,
+    238.0
+  ],
+  "patches": [
+    {
+      "name": "Upper shadow",
+      "box_xyxy": [
+        970,
+        415,
+        990,
+        435
+      ],
+      "median_rgb": [
+        199.0,
+        202.0,
+        210.0
+      ],
+      "srgb_luma_deficit": 0.15983810829004386,
+      "linear_luminance_deficit": 0.32479273845322354
+    },
+    {
+      "name": "Middle shadow",
+      "box_xyxy": [
+        870,
+        750,
+        890,
+        770
+      ],
+      "median_rgb": [
+        199.0,
+        202.0,
+        207.0
+      ],
+      "srgb_luma_deficit": 0.1607392633161674,
+      "linear_luminance_deficit": 0.3264871440755134
+    },
+    {
+      "name": "Lower shadow",
+      "box_xyxy": [
+        480,
+        929,
+        500,
+        949
+      ],
+      "median_rgb": [
+        193.0,
+        197.0,
+        206.0
+      ],
+      "srgb_luma_deficit": 0.1812245224003176,
+      "linear_luminance_deficit": 0.36265112933854693
+    }
+  ],
+  "alpha_feather": [
+    {
+      "frame": 0,
+      "equivalent_radius_px": 79.87219002190645,
+      "alpha10_90_equivalent_feather_px": 3.082119199897349,
+      "fraction_of_radius": 0.038588139364302144,
+      "method": "Equivalent-area radii at alpha 10/90%; average silhouette feather, not a maximum per-edge bound."
+    },
+    {
+      "frame": 1,
+      "equivalent_radius_px": 73.81186904503747,
+      "alpha10_90_equivalent_feather_px": 3.1316338621647333,
+      "fraction_of_radius": 0.04242723972013116,
+      "method": "Equivalent-area radii at alpha 10/90%; average silhouette feather, not a maximum per-edge bound."
+    },
+    {
+      "frame": 2,
+      "equivalent_radius_px": 68.50432579047565,
+      "alpha10_90_equivalent_feather_px": 3.176836012858246,
+      "fraction_of_radius": 0.046374239527220196,
+      "method": "Equivalent-area radii at alpha 10/90%; average silhouette feather, not a maximum per-edge bound."
+    },
+    {
+      "frame": 3,
+      "equivalent_radius_px": 62.54875547191144,
+      "alpha10_90_equivalent_feather_px": 3.295257803361835,
+      "fraction_of_radius": 0.052683027479925246,
+      "method": "Equivalent-area radii at alpha 10/90%; average silhouette feather, not a maximum per-edge bound."
+    }
+  ],
+  "rendered_sample_scope": "Three marked fully visible shadow patches in the actual unchanged review camera/background. Late fading puffs are naturally lighter.",
+  "thumbnail_px": [
+    350,
+    350
+  ],
+  "texture_authoring_shadow_rgb": [
+    150,
+    154,
+    163
+  ],
+  "texture_authoring_highlight_rgb": [
+    229,
+    225,
+    215
+  ],
+  "tone_mapping": "Existing ACES; input RGB compensates its lift. No material or lighting edits."
+}

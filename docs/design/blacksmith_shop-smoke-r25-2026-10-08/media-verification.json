@@ -1,0 +1,30 @@
+{
+  "clip": "smoke-motion.mp4",
+  "sha256": "2fabbe84eaf0c918734a31efaaf8f9086c3b7fe1f14889ed4a32c2084f772bad",
+  "ffprobe": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 960,
+        "height": 960,
+        "nb_frames": "240"
+      }
+    ],
+    "format": {
+      "duration": "8.000000"
+    }
+  },
+  "accelerated": false,
+  "sample_times": [
+    0.25,
+    4,
+    7.5
+  ],
+  "sampled_black_frames": 0,
+  "pixel_motion": [
+    5.824988425925926,
+    3.2843305121527777
+  ]
+}

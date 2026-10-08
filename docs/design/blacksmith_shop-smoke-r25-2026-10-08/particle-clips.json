@@ -1,0 +1,13 @@
+[
+  {
+    "draw_calls": 5.0,
+    "light_energy_max": 3.3445246219635,
+    "light_energy_min": 2.87408971786499,
+    "clip": "smoke-motion.mp4",
+    "frames": 127,
+    "duration_seconds": 8,
+    "accelerated": false,
+    "renderer": "Godot Mobile/Vulkan",
+    "capture": "Wall-clock viewport samples at up to 20 Hz, resampled to 30fps; not a GPU timing benchmark."
+  }
+]
