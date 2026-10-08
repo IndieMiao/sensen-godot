@@ -65,6 +65,7 @@ var _cam_size := 10.75
 var _focus := Vector3.ZERO
 var _follow := P0Follow.new()
 var _zoom := 1.0
+var _pinch = preload("res://modules/p0/p0_elastic_zoom.gd").new(ZOOM_RANGE.x, ZOOM_RANGE.y)   # rubber band past the range
 var _framed := Vector3.ZERO   # the opening shot's centre
 var _fits := false            # the whole floor fits the opening shot: hold it instead of following
 var _shot := {}           # push-in: {center: Vector3, size: float, release_on_move: bool}
@@ -416,6 +417,7 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 	if _leaving or not is_inside_tree(): return   # the door popped this room mid-frame
 	# A room that fits the screen holds its diorama framing (following would crop it); zoomed in, or in
 	# a space larger than the screen (the market square), the safe box follows the player (§10.1).
+	if _pinch.step(dt): _zoom = _pinch.value   # springing back from past a zoom limit
 	if _fits and _zoom <= 1.0: _focus = _framed
 	else: _focus = _follow.step(cam, _focus, actor.position, actor.mover.is_moving(), dt)
 	_update_camera()
@@ -472,8 +474,11 @@ func p0_anchor() -> Vector2:
 	return cam.unproject_position(actor.position + Vector3(0, 2.0, 0))
 
 func p0_zoom(f: float) -> void:
-	_zoom = clampf(_zoom / f, ZOOM_RANGE.x, ZOOM_RANGE.y)
+	_pinch.pinch(f)
+	_zoom = _pinch.value
 	if _zoom > 1.0 and _fits: _follow.held = false
+
+func p0_zoom_end() -> void: _pinch.release()
 
 func p0_recenter() -> void:
 	if _fits and _zoom <= 1.0: return   # the whole room is already in view

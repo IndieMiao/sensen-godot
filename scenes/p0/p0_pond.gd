@@ -26,6 +26,7 @@ var view: FishingPresentation
 var _focus := Vector3(6, 0, -6)
 var _cam_follow := P0Follow.new()
 var _zoom := 1.0
+var _pinch = preload("res://modules/p0/p0_elastic_zoom.gd").new(0.5, 1.4)   # rubber band past 0.5 / 1.4
 var _plan: Dictionary = {}
 # Camera blend from the fishing close-up back to the pond framing when the panel closes.
 var _blend_from := Transform3D.IDENTITY
@@ -232,6 +233,7 @@ func _settle(ev: Dictionary, delay: float, first_xp: int) -> void:
 # ---------------------------------------------------------------- camera (old pond framing + safe box)
 func _follow(_dt: float) -> void:
 	_focus = _cam_follow.step(cam, _focus, actor.position, actor.mover.is_moving(), _dt)
+	if _pinch.step(_dt): _zoom = _pinch.value   # springing back from past a limit
 	_update_camera()
 
 ## The opening shot leans toward the nearest water so the pond is in the frame (held until the first step).
@@ -245,7 +247,10 @@ func _update_camera() -> void:
 	cam.position = _focus + Vector3(0, 1, 1).normalized() * 40
 	cam.look_at(_focus, Vector3.UP)
 
-func p0_zoom(f: float) -> void: _zoom = clampf(_zoom / f, 0.5, 1.4)
+func p0_zoom(f: float) -> void:
+	_pinch.pinch(f)
+	_zoom = _pinch.value
+func p0_zoom_end() -> void: _pinch.release()
 func p0_recenter() -> void:
 	_focus = actor.position
 	_cam_follow.held = false

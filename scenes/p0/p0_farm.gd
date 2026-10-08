@@ -36,6 +36,7 @@ var _mine := Vector3.ZERO
 var _focus := Vector3.ZERO
 var _cam_follow := P0Follow.new()
 var _zoom := 1.0
+var _pinch = preload("res://modules/p0/p0_elastic_zoom.gd").new(0.8, 1.4)   # rubber band past 0.8 / 1.4
 var _dev_yaw := -1.0
 var _hold_until := 0.0
 var _front: Dictionary = {}
@@ -202,9 +203,13 @@ func _place_camera() -> void:
 
 func _follow(dt: float) -> void:
 	_focus = _cam_follow.step(cam, _focus, actor.position, actor.mover.is_moving(), dt)
+	if _pinch.step(dt): _zoom = _pinch.value   # springing back from past a limit
 	_place_camera()
 
-func p0_zoom(f: float) -> void: _zoom = clampf(_zoom / f, 0.8, 1.4)
+func p0_zoom(f: float) -> void:
+	_pinch.pinch(f)
+	_zoom = _pinch.value
+func p0_zoom_end() -> void: _pinch.release()
 func p0_recenter() -> void:
 	_focus = actor.position
 	_cam_follow.held = false
