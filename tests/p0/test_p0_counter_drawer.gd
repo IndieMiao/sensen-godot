@@ -153,6 +153,19 @@ func test_counter_commands_carry_the_shop_and_a_drink_changes_the_line() -> void
 	ui.counter_events([{"kind": "drink", "item": "drink_hot_tea", "gain": 30, "price": 40, "left": 2}])
 	assert_str(ui._counter.keeper_bar.line).is_equal("Enjoy. Next cup's 50 coins.")   # TEA-DONE
 
+## counter_drawer(): the open counter drawer, its board sheets over it included; null once it closes (#128 review).
+func test_counter_drawer_is_the_open_counter_only() -> void:
+	var ui := _ui()
+	await await_idle_frame()
+	ui.set_view(_view())
+	assert_object(ui.counter_drawer()).is_null()
+	ui.open_counter("tea", {"ctx": {"keeper": "Ama", "place": "Lotus Tea House"}})
+	assert_object(ui.counter_drawer()).is_same(ui._counter)
+	ui.modal_kind = "board_request"   # a Market Board sheet over the drawer keeps it
+	assert_object(ui.counter_drawer()).is_same(ui._counter)
+	ui.close_modal()
+	assert_object(ui.counter_drawer()).is_null()
+
 ## q(48): the P0 market has no bag half, so its drawer is as tall as its taller page (the Buy rows or the Market
 ## Board's cards) and keeps that height across the tabs (不知火舞 on #56, like City Specialty).
 func test_the_market_drawer_is_as_tall_as_its_taller_page_and_keeps_it_across_tabs() -> void:
