@@ -40,7 +40,10 @@ const INK := Color("232b30")
 const MUTED := Color("69716e")
 const LIME := Color("cafa91")
 const CONTENT_TOP := 108.0
-const RECENTER_GAP := 12.0   # host_chrome: the recenter key's margin from the edge and over the host's bottom row
+const RECENTER_GAP := 12.0
+## A MapDestination's name stays this far inside the view's sides; its disc stays on its point (int9: a selected
+## outpost's name ran off the left edge).
+const LABEL_EDGE := 8.0   # host_chrome: the recenter key's margin from the edge and over the host's bottom row
 const POI_CACHE_LIMIT := 400
 ## Anti-flicker: packing tests use a dead zone (incumbents keep their slot until
 ## overlap exceeds the margin; newcomers need clearance plus the margin), and a
@@ -1066,6 +1069,9 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int)
 			if incumbent: _hidden_until[id] = now + REAPPEAR_COOLDOWN_MS
 			return false
 	var label_rect := Rect2(c.point + Vector2(-c.label_w * 0.5, 3), Vector2(c.label_w, c.label_h))
+	if not _destination(entry).is_empty():   # the whole name on screen: it slides in from the edge, the disc stays
+		label_rect.position.x = clampf(label_rect.position.x, LABEL_EDGE, maxf(LABEL_EDGE, size.x - LABEL_EDGE - c.label_w))
+		label_rect.position.y = c.point.y + UiMapDestination.LABEL_GAP   # where the pin draws it
 	if entry.kind == "landmark":
 		label_fits = is_selected or not _hits(occupied, Rect2(c.point - Vector2(c.width * 0.5, -3), Vector2(c.width, 20)))
 	elif entry.kind == "place" or not _destination(entry).is_empty():
@@ -1106,6 +1112,7 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int)
 		pin.plate = bool(dest.get("plate", false))
 		pin.text = _label_text(entry)
 		pin.name_shown = label_fits
+		pin.label_shift = label_rect.position.x - (c.point.x - c.label_w * 0.5)
 		pin.position = -pin.anchor_offset()
 	elif entry.kind == "resident":
 		marker.portrait.position = Vector2(-18, -38)
@@ -1127,7 +1134,8 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int)
 	# 否则长名选中后旁边的空地也算点中自己，点空白取消不了选择。
 	var k: float = c.k
 	marker.hit = [Rect2(c.point - Vector2(c.art_w * 0.5, c.art_h) * k, Vector2(c.art_w, c.art_h) * k)]
-	if marker.label.visible or (marker.has("dest") and label_fits):
+	if marker.has("dest") and label_fits: marker.hit.append(label_rect)   # where the name is drawn (k is 1)
+	elif marker.label.visible:
 		marker.hit.append(Rect2(c.point + Vector2(-c.label_w * 0.5, 3) * k, Vector2(c.label_w, c.label_h) * k))
 	displayed.append(marker)
 	return true

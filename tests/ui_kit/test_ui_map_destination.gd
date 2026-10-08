@@ -44,3 +44,30 @@ func test_a_mark_hangs_a_status_badge_on_the_top_left() -> void:
 	d.count = "×6"   # P1 clusters
 	assert_bool(d._count.visible).is_true()
 	assert_that(d._count.position).is_equal(Vector2(26, -4))
+
+## The city map packs pins by label_size_for before any pin exists: it measures what a built pin draws, in its own
+## style token (STYLE_C10_B) and plate padding (刘邦 on #100).
+func test_the_static_name_size_is_the_built_one() -> void:
+	var names := ["Homestead", "Lotus Tea House · 3 online", "Reed Pond · Beginner pond · 1.2 km", "Xuhui Tackle Shop"]
+	var pins: Array = names.map(func(n): return _pin(n, n == "Homestead"))
+	await get_tree().process_frame
+	for i in names.size():
+		assert_that((pins[i] as UiMapDestination).label_size()).append_failure_message(names[i]) \
+			.is_equal(UiMapDestination.label_size_for(names[i]))
+	assert_that(UiMapDestination.label_size_for("")).is_equal(Vector2.ZERO)
+
+## int9: a name near the screen edge slides in; the disc keeps its place over the point.
+func test_a_shifted_name_moves_only_the_name() -> void:
+	var d := _pin("Xuhui Tackle Shop · 3 online")
+	await get_tree().process_frame
+	var disc_at := d._pin.position
+	var name_at := d._label_box.position
+	d.label_shift = 30.0
+	assert_that(d._pin.position).is_equal(disc_at)
+	assert_float(d._label_box.position.x).is_equal_approx(name_at.x + 30.0, 0.01)
+	assert_float(d.footprint().end.x).is_equal_approx(d.label_size().x * 0.5 + 30.0, 0.01)
+
+func test_status_badge_state_of_a_key() -> void:
+	assert_int(UiStatusBadge.state_of("request")).is_equal(UiStatusBadge.State.REQUEST)
+	assert_int(UiStatusBadge.state_of("deliverable")).is_equal(UiStatusBadge.State.DELIVERABLE)
+	assert_int(UiStatusBadge.state_of("")).is_equal(-1)
