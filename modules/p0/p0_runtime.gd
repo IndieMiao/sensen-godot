@@ -26,6 +26,7 @@ var _shot_script: Array = []
 var last_xp_lines: Array = []
 ## First-catch bonus of the last state change (FISH-3 gold chip); 0 when the species was caught before.
 var last_first_catch_xp := 0
+var last_catch_extras := {}   # the same response's New city XP and first-fish Energy, for the Caught! card
 ## What to do once the map is back on top (FISH-4 Go home, FISH-5 Tackle Shop): "farm" / "tackle".
 var after_leave := ""
 ## True only while the farm's hold-to-repeat sends its next command (§14.2): the observation log's "hold" (S7).
@@ -225,6 +226,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	var dy := 0.0
 	var xp_lines: Array = []
 	last_first_catch_xp = 0
+	last_catch_extras = {}
 	var settles_catch := events.any(func(e): return str(e.get("kind", "")) == "catch")
 	for i in events.size():
 		var ev: Dictionary = events[i]
@@ -236,6 +238,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 					xp_lines.append("+%d %s XP" % [int(ev.amount), str(ev.skill).capitalize()] + ("" if int(ev.percent) >= 100 else " · %d%%" % int(ev.percent)))
 			"reward":
 				if int(ev.energy) > 0: xp_lines.append(P0Logic.reward_line(str(ev.id), int(ev.energy)))
+				if str(ev.id).begins_with("first_fish_"): last_catch_extras["energy"] = int(ev.energy)
 			"first":
 				var what := str(ev.what)
 				if what.begins_with("catch:"):
@@ -246,6 +249,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				elif what == "cast": xp_lines.append("First cast · +%d XP" % int(ev.xp))
 				elif what.begins_with("fishing_city:"):
 					xp_lines.append("First catch in %s · +%d XP" % [what.trim_prefix("fishing_city:").capitalize(), int(ev.xp)])
+					last_catch_extras["city_xp"] = int(ev.xp)
 	last_xp_lines = xp_lines
 	var parcels_said := false
 	for ev in events:
@@ -332,21 +336,21 @@ func _on_catch(ev: Dictionary, _xp_lines: Array, at := Vector2.INF) -> void:
 			var r := int(ev.rarity)
 			if last_first_catch_xp > 0:
 				var first := last_first_catch_xp
-				ui.queue_card(func(): ui.show_catch(fid, r, first))
-			else:
-				ui.float_text("%s · %s" % [P0Logic.item_name(v, fid), P0Logic.rarity_name(v, r)], where + Vector2(0, -22), P0Logic.rarity_text_color(r))
+				var extras := last_catch_extras.duplicate()
+				ui.queue_card(func(): ui.show_catch(fid, r, first, extras))
+			else:   # a repeat species: no card, `Pond Crucian ×1` beside its +XP (§4.8.6)
+				ui.float_text("%s ×1" % P0Logic.item_name(v, fid), where + Vector2(0, -22), P0Logic.rarity_text_color(r))
 		"broke_free":
 			var gone: Dictionary = ev
 			if ui.first_time("gotaway:" + str(ev.fish)):
 				ui.queue_card(func(): ui.show_got_away(gone))
 				session.report({"kind": "card_shown", "card": "got_away", "fish": str(gone.get("fish", ""))})
-			else:
-				ui.float_text(("Got away · Lv%d" % int(ev.need_level)) if ev.has("need_level") else "Got away · rod too light", where, P0Ui.INK2)
+			else:   # second time on: `Got away · Lv4 · Energy refunded (8 left today)` / `Got away · Reed Rod · 3 Energy back` (q(50))
+				var rod := P0Logic.rod_for(v, int(ev.get("rarity", 2)))
+				var what := ("Lv%d" % int(ev.need_level)) if ev.has("need_level") else (str(rod.name) if not rod.is_empty() else "rod too light")
+				ui.float_text("Got away · %s · %s" % [what, P0Logic.refund_line(v, ev).trim_prefix("+")], where, P0Ui.INK2)
 		"escaped":
-			var refund := int(ev.refund)
-			var protected: bool = ev.has("protected_left") and refund >= int(v.get("fishing", {}).get("cast_energy", 5))
-			ui.float_text(("It got away · Energy refunded (%d left today)" % int(ev.protected_left)) if protected
-				else "It got away · %d Energy back" % refund, where, P0Ui.GREEN_D)
+			ui.float_text("It got away · " + P0Logic.refund_line(v, ev).trim_prefix("+"), where, P0Ui.GREEN_D)
 		"cancelled":
 			ui.toast("Line in · Energy back")
 
@@ -462,6 +466,12 @@ func _dev_shot(dt: float) -> void:
 			"profile": ui.open_profile()
 			"resident": ui.open_resident(step[1] if step.size() > 1 else "res_pip")   # SGODOT-225 dialogue bar
 			"resprofile": ui.open_resident_profile(ui._resident)                     # its name → profile sheet
+			# SGODOT-233 result moments, shown directly: catchcard:<fish>, gotaway:<fish>:level|rod
+			"catchcard": ui.show_catch(step[1], int(P0Logic.item(session.current(), step[1]).get("rarity", 1)), 15, {"energy": 20})
+			"gotaway":
+				var gone := {"fish": step[1], "rarity": int(P0Logic.item(session.current(), step[1]).get("rarity", 3)), "refund": 5, "protected_left": 8}
+				if step.size() < 3 or step[2] == "level": gone["need_level"] = 4
+				ui.show_got_away(gone)
 			"today": ui.open_today()
 			"energypanel": ui.open_energy_panel()
 			"inbox": ui.open_inbox()

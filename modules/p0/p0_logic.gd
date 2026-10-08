@@ -43,6 +43,26 @@ static func fish_at_level(view: Dictionary, level: int) -> Array:
 	return out
 
 ## The cheapest rod that holds a rarity, for the "Too heavy for your rod" card.
+## What a gate fish that broke free needs (§4.8.6): `Fishing Lv4 needed · You: Lv3 · 30 XP to go` for a level gate,
+## `Reed Rod · Fishing Lv3 · 80 coins` for a rod gate (the next rod that lands it).
+static func break_free_need(view: Dictionary, ev: Dictionary) -> String:
+	if ev.has("need_level"):
+		var need := int(ev.need_level)
+		var sk: Dictionary = view.get("skills", {}).get("fishing", {})
+		var th: Array = content().get("skills", {}).get("fishing", [])
+		var need_xp := int(th[need - 1]) if need - 1 < th.size() and need >= 1 else int(sk.get("next", 0))
+		return "Fishing Lv%d needed · You: Lv%d · %d XP to go" % [need, int(sk.get("level", 1)), maxi(0, need_xp - int(sk.get("xp", 0)))]
+	var rod := rod_for(view, int(ev.get("rarity", 2)))
+	return "" if rod.is_empty() else "%s · Fishing Lv%d · %d coins" % [str(rod.name), int(rod.level), int(rod.price)]
+
+## The Energy a failed catch gave back, as it really came back (q(55)): inside the daily protection
+## `Energy refunded (8 left today)`, else `+3 Energy back`.
+static func refund_line(view: Dictionary, ev: Dictionary) -> String:
+	var refund := int(ev.get("refund", 3))
+	if ev.has("protected_left") and refund >= int(view.get("fishing", {}).get("cast_energy", 5)):
+		return "Energy refunded (%d left today)" % int(ev.protected_left)
+	return "+%d Energy back" % refund
+
 static func rod_for(view: Dictionary, rarity: int) -> Dictionary:
 	for r in view.get("gear", {}).get("rods", []):
 		if int(r.get("reach", 0)) >= rarity and not r.get("owned", false): return r
