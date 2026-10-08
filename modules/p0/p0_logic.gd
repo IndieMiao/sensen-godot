@@ -233,7 +233,18 @@ static func energy_card(view: Dictionary, need: int, verb: String, at_home := tr
 	var subtitle := "Recover or do something free" if have <= 0 else "%s needs %d Energy · you have %d" % [verb, need, have]
 	var cook := {"icon": "pot", "label": "Cook", "fact": "%d fish in creel" % fish if fish > 0 else "No fish to cook", "guide": "Show kitchen", "go": "stove", "on": fish > 0}
 	# TODO(SGODOT-224, bench): LOCK-09 guides Rest with "Show bench"; P0 has no bench, rest is at the farmhouse (197 60c82ad2).
-	var rest_tile := {"icon": "rest", "label": "Rest", "fact": "Available" if rest_left > 0 else "Rested today · %s" % duration(float(rest.get("resets_in", 0))), "guide": "Show home", "go": "home", "on": rest_left > 0}
+	var rest_tile := {"icon": "rest", "label": "Rest", "fact": "Available", "guide": "Show home", "go": "home", "on": true}
+	if rest_left <= 0:
+		rest_tile.fact = "Rested today"   # the reset time is on the bench card (李白, 225)
+		rest_tile.on = false
+	elif rest.has("away_ready_in"):   # q(41): Rest opens after 2 h away from the farm (SGODOT-228 / PR #16)
+		var away = rest.get("away_ready_in")
+		if away == null:
+			rest_tile.fact = "After %dh away" % int(rest.get("away_h", 2))
+			rest_tile.on = false
+		elif float(away) > 0.0:
+			rest_tile.fact = "Ready in %s" % duration(float(away))
+			rest_tile.on = false
 	if not at_home:
 		for t in [cook, rest_tile]:
 			t.fact = "At home"
@@ -247,10 +258,44 @@ static func energy_card(view: Dictionary, need: int, verb: String, at_home := tr
 		"tiles": [
 			{"icon": "dish_grilled_fish", "label": "Eat", "fact": "%d dish%s in bag" % [dishes, "" if dishes == 1 else "es"] if dishes > 0 else "No dishes in bag", "guide": "Open bag", "go": "bag", "on": dishes > 0},
 			cook,
-			{"icon": "dish_fruit_tea", "label": "Tea", "fact": "Tea House opens later", "guide": "", "go": "", "on": false},
+			_tea_tile(view),
 			rest_tile,
 		],
 	}
+
+## Tea on the Energy card (BAR-3 / E-11, §3.4.4): three cups a day shared by tea and coffee, from view.drinks
+## (SGODOT-228); copy 李白 (225). Facts only: the tile guides to the Tea House on the map. Without the server's
+## drinks the tile stays greyed with no line (安其拉 on #11: no placeholder state).
+static func _tea_tile(view: Dictionary) -> Dictionary:
+	var tea := {"icon": "dish_fruit_tea", "label": "Tea", "fact": "", "guide": "", "go": "", "on": false}
+	var drinks: Dictionary = view.get("drinks", {})
+	if drinks.is_empty(): return tea
+	tea.guide = "Show on map"
+	tea.go = "outpost:tea"
+	tea.on = true
+	if int(drinks.get("left", 0)) <= 0:
+		tea.fact = "%d/%d today" % [int(drinks.get("used", 0)), int(drinks.get("limit", 3))]
+		tea.on = false
+	elif bool(drinks.get("full", false)):
+		tea.fact = "Energy full"
+		tea.on = false
+	elif drinks.get("need", null) != null and int(drinks.need) > int(view.get("coins", 0)):
+		# drinks.need is the whole sum a cup asks (price + the 40-coin floor), so the gap is need − coins
+		tea.fact = "Need %d more coins" % (int(drinks.need) - int(view.get("coins", 0)))
+		tea.on = false
+	else:
+		tea.fact = "%d/%d today · %d coins" % [int(drinks.get("used", 0)), int(drinks.get("limit", 3)), int(drinks.get("price", 0))]
+	return tea
+
+## Inbox parcels as read-only lines until the stage 4 Inbox (SGODOT-234): `Radish ×3 · 22h left`, soonest to expire
+## first (奕星 on #11, LOCK-14). The view already sorts them by expiry; left is projected between replies.
+static func parcel_lines(view: Dictionary) -> Array:
+	var parcels: Array = view.get("inbox", {}).get("parcels", []).duplicate()
+	parcels.sort_custom(func(a, b) -> bool: return float(a.get("left", 0)) < float(b.get("left", 0)))
+	return parcels.map(func(p) -> String:
+		var left := float(p.get("left", 0))
+		var when := ("%dh left" % ceili(left / 3600000.0)) if left >= 3600000.0 else ("%dm left" % maxi(1, ceili(left / 60000.0)))
+		return "%s ×%d · %s" % [item_name(view, str(p.get("id", ""))), int(p.get("qty", 1)), when])
 
 ## Energy panel under the HUD chip (LOCK-09 Kind=Panel): max, today's use as count tiles, the blessing.
 static func energy_panel(view: Dictionary) -> Dictionary:
@@ -278,7 +323,8 @@ static func skill_progress(s: Dictionary) -> float:
 	return clampf(float(int(s.xp) - int(s.floor)) / maxf(1.0, float(int(s.next) - int(s.floor))), 0.0, 1.0)
 
 ## HUD data for UiHud.apply (SGODOT-222, LOCK-06). ctx: next_cost (Energy the next action needs),
-## place (UiHud place dictionary), unread (Inbox count).
+## place (UiHud place dictionary), unread (overrides the Inbox count). Until the stage 4 Inbox (SGODOT-234) can show
+## expiry records, the bell counts the waiting parcels only (奕星 on #11, option B): what the bell's sheet lists.
 static func hud_state(view: Dictionary, ctx: Dictionary = {}) -> Dictionary:
 	var e: Dictionary = view.get("energy", {})
 	var have := int(e.get("value", 0))
@@ -292,7 +338,7 @@ static func hud_state(view: Dictionary, ctx: Dictionary = {}) -> Dictionary:
 	var out := {
 		"energy": have, "energy_max": mx, "regen": regen, "next_cost": int(ctx.get("next_cost", 0)),
 		"skills": {"farming": skill_progress(sk.get("farming", {})), "fishing": skill_progress(sk.get("fishing", {}))},
-		"coins": int(view.get("coins", 0)), "unread": int(ctx.get("unread", 0)), "buff": {},
+		"coins": int(view.get("coins", 0)), "unread": int(ctx.get("unread", (view.get("inbox", {}).get("parcels", []) as Array).size())), "buff": {},
 		"today": str(lines[0]) if not lines.is_empty() else "",
 	}
 	if ctx.has("place"): out["place"] = ctx.place
@@ -341,7 +387,19 @@ static func project(view: Dictionary, elapsed_ms: float) -> Dictionary:
 		stove["ready_in"] = maxf(0.0, float(stove.get("ready_in", 0)) - elapsed_ms)
 	var cast = v.get("fishing", {}).get("cast", null)
 	if cast is Dictionary: cast["bite_in"] = maxf(0.0, float(cast.get("bite_in", 0)) - elapsed_ms)
+	for parcel in v.get("inbox", {}).get("parcels", []):
+		parcel["left"] = maxf(0.0, float(parcel.get("left", 0)) - elapsed_ms)
 	return v
+
+## LOCK-14: one float for the rewards of one server reply that did not fit the bag ("" when there is nothing to say).
+## A resident's gift meal is said by the resident bar instead (SGODOT-225), so gift parcels are left out here.
+static func parcel_toast(view: Dictionary, events: Array) -> String:
+	var parcels := events.filter(func(e): return str(e.get("kind", "")) == "parcel" and not bool(e.get("gift", false)))
+	if parcels.is_empty(): return ""
+	var waiting := parcels.all(func(e): return bool(e.get("waiting", false)))
+	var what := "%s ×%d" % [item_name(view, str(parcels[0].id)), int(parcels[0].qty)] if parcels.size() == 1 \
+		else "%d rewards" % parcels.size()
+	return ("Inbox full · %s saved for later" if waiting else "Bag full · %s sent to Inbox · 24h") % what
 
 # ---------------------------------------------------------------- M2: fishing, cooking, eating
 static func item(view: Dictionary, id: String) -> Dictionary:
@@ -358,6 +416,13 @@ static func rarity_text_color(rarity: int) -> Color:
 	return RARITY_TEXT[clampi(rarity - 1, 0, 3)]
 
 ## Dish label with its quality star: "Grilled Crucian ★" (Good) / "★★" (Perfect).
+## COOK-4 for a pot that came out a Mystery Dish (SGODOT-232 S5): with the Newcomer Blessing's refund there is no
+## dish at all (李白 2026-10-08), so the card says so and offers no Eat.
+static func mystery_card(ev: Dictionary) -> Dictionary:
+	if bool(ev.get("none", false)):
+		return {title = "No dish this time", sub = "Ingredients back (%d left today)" % int(ev.get("trial_left", 0)), eat = false}
+	return {title = "Mystery Dish", sub = "Hmm… not a dish. Try another mix.", eat = true}
+
 static func dish_label(view: Dictionary, id: String) -> String:
 	var info := item(view, id)
 	var q := int(info.get("quality", 0))
@@ -624,7 +689,6 @@ static func resident_bar(view: Dictionary, id: String) -> Dictionary:
 			reason = "No more requests"
 	var meal := str(r.get("meal", "none"))
 	var note := ""
-	if meal == "bag_full": note = "Bag full · free a slot for %s's meal" % str(def.get("name", ""))
 	return {
 		"id": id, "portrait": str(def.get("portrait", "")), "name": str(def.get("name", "")), "role": str(def.get("role", "")),
 		"stage": stage, "have": int(r.get("affinity", 0)),

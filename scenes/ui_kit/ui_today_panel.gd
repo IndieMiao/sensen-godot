@@ -83,8 +83,7 @@ func _row(r: Dictionary, index: int) -> HBoxContainer:
 		tick.add_child(glyph)
 		row.add_child(tick)
 	elif str(r.get("action", "")) != "":
-		var pill := UiCommandButton.new(str(r.action), UiCommandButton.Kind.SECONDARY, true)
-		pill.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		pill.activated.connect(func(): show_pressed.emit(index))
+		var pill := UiShowPill.new(str(r.action), UiShowPill.Kind.TODAY)   # 55 × 28 like the main, 44 to the touch
+		pill.pressed.connect(func(): show_pressed.emit(index))
 		row.add_child(pill)
 	return row

@@ -1238,6 +1238,7 @@ func open_energy_card(need: int, verb: String) -> void:
 	card.tile_pressed.connect(func(go: String):
 		close_modal()
 		if go == "bag": open_bag()
+		elif go.begins_with("outpost:"): place_pressed.emit()   # Show on map: the Tea House is a map place (pin focus: MAP-1)
 		else: show_spot.emit(go))
 	var center := CenterContainer.new()
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -1396,15 +1397,24 @@ func open_today() -> void:
 func spot_reachable() -> bool:
 	return can_show_spot.is_valid() and bool(can_show_spot.call())
 
-## The bell (parcels / letters). TODO(stage 4, Inbox): replace this empty state with the Inbox drawer and its
-## tabs; P0 has no parcels yet, so it only shows the agreed EmptyState line.
+## The bell (parcels / letters). TODO(stage 4, SGODOT-234 Inbox): the Inbox drawer with its tabs and Claim. Until
+## then the parcels waiting for a free slot (SGODOT-232) are listed read-only, one line each, soonest to expire first
+## (奕星 on #11); `No parcels` only when there are none (LOCK-14).
 func open_inbox() -> void:
 	var v := _sheet(220, "Inbox", "bell")
 	modal_kind = "inbox"
-	var empty := UiEmptyState.new("No parcels", P0Logic.icon("bell"))
-	empty.theme = UiKit.theme()
-	empty.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	v.add_child(empty)
+	var lines := P0Logic.parcel_lines(view)
+	if lines.is_empty():
+		var empty := UiEmptyState.new("No parcels", P0Logic.icon("bell"))
+		empty.theme = UiKit.theme()
+		empty.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		v.add_child(empty)
+		return
+	var list := VBoxContainer.new()
+	list.theme = UiKit.theme()
+	list.add_theme_constant_override(&"separation", int(UiTokens.SPACE_WITHIN))
+	for line in lines: list.add_child(UiKit.label(str(line), UiTokens.STYLE_BODY_B14))
+	v.add_child(list)
 
 ## SKILL-1 (P0 cut): three track cards — level ring, XP and how far to go, what the next level opens —
 ## and the "First times" collection tiles. Opened from the avatar ring.
@@ -1948,11 +1958,12 @@ func show_dish(ev: Dictionary, xp_lines: Array) -> void:
 	ic.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	card.add_child(ic)
 	var mystery := bool(ev.get("mystery", false))
-	var title := "Mystery Dish" if mystery else P0Logic.dish_label(view, id)
+	var mc := P0Logic.mystery_card(ev)
+	var title := str(mc.title) if mystery else P0Logic.dish_label(view, id)
 	var t := _label(title, 15, INK, true)
 	t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	card.add_child(t)
-	var sub := "Hmm… not a dish. Try another mix." if mystery else "%s%s · +%d Energy" % [["", "Good · ", "Perfect · "][q], P0Logic.rarity_name(view, int(info.get("rarity", 1))), int(info.get("full", 20))]
+	var sub := str(mc.sub) if mystery else "%s%s · +%d Energy" % [["", "Good · ", "Perfect · "][q], P0Logic.rarity_name(view, int(info.get("rarity", 1))), int(info.get("full", 20))]
 	var s2 := _label(sub, 10, INK2, true)
 	s2.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	card.add_child(s2)
@@ -1978,8 +1989,9 @@ func show_dish(ev: Dictionary, xp_lines: Array) -> void:
 			return
 		close_modal()
 		command.emit({"type": "eat", "item": id}))
-	row.add_child(eat)
-	var keep := _pill_button("Keep", false)
+	if mc.eat or not mystery: row.add_child(eat)
+	else: eat.free()
+	var keep := _pill_button("Keep" if mc.eat or not mystery else "OK", false)
 	keep.custom_minimum_size = Vector2(70, 32)
 	keep.pressed.connect(close_modal)
 	row.add_child(keep)

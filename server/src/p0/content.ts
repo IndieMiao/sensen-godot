@@ -19,12 +19,22 @@ export interface Crop {
 export interface Fish { id: string; name: string; rarity: number; level: number; price: number; cook?: boolean; where: string[] }
 export interface Rod { id: string; name: string; reach: number; level: number; price: number; hook_bonus_ms: number; band_bonus: number }
 export interface FishSite { name: string; template: string; weights: number[]; fish: string[] }
+/** A catalog pond on the map (assets/ponds/catalog.json id): its fishing template follows the point, not its shape (q(36)). */
+export interface FishPlace { name: string; site: string; city: string; beginner?: boolean }
 
 export interface CookTier {
   energy: number; ms: number; heats: number[]; gold: number; spin_ms: number;
   first_xp: number; xp: number; level: number; bonus: number[];
 }
-export interface Recipe { id: string; name: string; in: string[]; known?: boolean; style?: string }
+/** How a page can be learned, for the Hidden page's corner (§7.5.1): start = known from the start, gift = a level-up
+ * recipe card, experiment, card = a stall recipe card, market = a Market card, taught = a resident, buy = bought. */
+export type Learn = 'start' | 'gift' | 'experiment' | 'card' | 'market' | 'taught' | 'buy';
+/** Cooking conveniences in P0 (§4.6.3, q(38)). */
+export type Convenience = 'cook_again' | 'clue_double' | 'hearty_mishap' | 'steady_hand_1' | 'queue_two' | 'quick_fire';
+/** A P0 Cookbook page that can be cooked (§7.14.0); n = its page number in the 48-page Cookbook. */
+export interface Recipe { n?: number; id: string; name: string; in: string[]; known?: boolean; style?: string; learn?: Learn[] }
+/** A page outside P0 (§7.14.1–7.14.4): only its silhouette shows, slots = the family of each slot. */
+export interface SilhouettePage { n: number; id: string; name: string; rarity: number; slots: string[]; style: string; learn: Learn[] }
 
 export type ShopId = 'homestead' | 'tackle' | 'market' | 'tea' | 'post';
 export const SHOPS: readonly ShopId[] = ['homestead', 'tackle', 'market', 'tea', 'post'];
@@ -64,6 +74,7 @@ export interface P0Content {
   level_up_energy: { first: number; later: number };
   level_gifts: Record<string, [string, number][]>;
   xp_multiplier: [number, number][];
+  skill_daily_cap: number;                    // §4.3.4: XP per skill per player day, an anti-script limit only
   crops: Crop[];
   stall: { keeper: { role: string; name: string }; buy: string[] };
   rarity_names: string[];
@@ -71,9 +82,10 @@ export interface P0Content {
   fishing: {
     cast_energy: number; refund_fail: number; protect_max_level: number; protect_fails: number;
     bite_min_ms: number; bite_spread_ms: number; hook_window_ms: number; stale_ms: number;
-    catch_xp: number[]; first_xp: number[]; first_cast_xp: number; first_landed_xp: number;
+    catch_xp: number[]; first_xp: number[]; first_cast_xp: number; first_landed_xp: number; first_city_xp: number;
     rods: Rod[];
-    sites: Record<string, FishSite>;
+    sites: Record<string, FishSite>;      // templates: pond (Pond) / river (River)
+    places: Record<string, FishPlace>;
     baits: Record<string, { shift: number[]; wait: number }>;
   };
   goods: Record<string, { name: string; price: number; skill: Skill; gate: number; daily: number; grow_mult?: number }>;
@@ -87,6 +99,7 @@ export interface P0Content {
   wallet_floor: number;                       // §8.1.1 / q(32): every coin spend except seeds keeps this much
   homestead: {
     max_level: number;
+    warming_cabinet: number;                  // portions once unlocked (Lv3; 12 from Lv8 is P1, §7.7)
     per_level: { energy: number; meals: number };
     board_slots: [number, number][];          // [from Homestead level, Stall Board slots]
     levels: { level: number; coins: number; skills: number; materials: [string, number][]; unlocks: string[] }[];
@@ -124,9 +137,15 @@ export interface P0Content {
     tolerance_ms: number;
     quality_xp: number[];
     derive: number[][];
-    mystery: { id: string; name: string; energy: number };
+    mystery: { id: string; name: string; energy: number; hearty: number };   // hearty: from Cooking Lv3 (Hearty Mishap)
     food_cap: number;
+    conveniences: Record<Convenience, number>;   // the Cooking level each P0 convenience comes at (q(38))
+    gold_cap: number; steady_hand_gold: number;  // gold arc share: bonuses stop at gold_cap; Steady Hand I adds steady_hand_gold
+    mastered: { cooked: number; gold: number };  // a page cooked this often is Mastered and its gold arc is wider (§7.5.1)
+    quick_fire: number;                          // Quick Fire: cooking time and heat times × this (§4.6.3 Lv6)
+    trial_refunds: number;                       // failed pots a day that refund their ingredients in the blessing (§7.5.2)
     recipes: Recipe[];
+    pages: SilhouettePage[];   // the other 34 of the 48 pages, not cookable in P0 (q(39))
   };
   /** Consumables made at the workbench, with no shop row (Torch). */
   supplies: Record<string, { name: string }>;

@@ -167,7 +167,8 @@ func test_badges_show_state_and_lift_the_finger_card() -> void:
 	assert_float(ui.badge_height("home")).is_greater(float(UiTokens.SIZE_STATUS_BADGE_WORLD))
 	ui.badge("home", UiStatusBadge.State.READY, Vector2(200, 260), false)
 	assert_float(ui.badge_height("home")).is_equal(0.0)
-	ui.badge("home", UiStatusBadge.State.READY, Vector2(500, 260), true)   # facility off screen
+	# Off screen past the UI's own width: a fixed x passed or failed with the headless root size other suites left.
+	ui.badge("home", UiStatusBadge.State.READY, Vector2(ui._kit.size.x + 100, 260), true)   # facility off screen
 	assert_bool(b.visible).is_false()
 
 func test_a_drag_from_a_finger_card_starts_the_joystick() -> void:

@@ -4,7 +4,7 @@
     0,
     0,
     328,
-    176
+    154
   ],
   "children": [
     {
@@ -35,7 +35,7 @@
         0,
         52,
         328,
-        124
+        102
       ],
       "children": [
         {
@@ -44,39 +44,51 @@
             0,
             52,
             328,
-            56
+            45
           ],
           "children": [
             {
               "type": "HBoxContainer",
               "rect": [
-                14,
-                58,
-                308,
-                44
+                15,
+                59,
+                306,
+                31
               ],
               "children": [
                 {
                   "type": "Label",
                   "rect": [
-                    14,
-                    70,
-                    226,
+                    15,
+                    64,
+                    231,
                     20
                   ],
                   "variation": "BodyB14",
                   "text": "Copper Ore · The mine, floors 1–4"
                 },
                 {
-                  "type": "UiCommandButton",
+                  "type": "UiShowPill",
                   "rect": [
-                    250,
-                    58,
-                    72,
-                    44
+                    256,
+                    59,
+                    65,
+                    31
                   ],
-                  "variation": "CmdSecondaryCompact",
-                  "text": "Show ›"
+                  "text": "",
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        270,
+                        66,
+                        40,
+                        18
+                      ],
+                      "variation": "CaptionXB12",
+                      "text": "Show ›"
+                    }
+                  ]
                 }
               ]
             }
@@ -86,41 +98,53 @@
           "type": "UiNeedSource",
           "rect": [
             0,
-            120,
+            109,
             328,
-            56
+            45
           ],
           "children": [
             {
               "type": "HBoxContainer",
               "rect": [
-                14,
-                126,
-                308,
-                44
+                15,
+                116,
+                306,
+                31
               ],
               "children": [
                 {
                   "type": "Label",
                   "rect": [
-                    14,
-                    138,
-                    226,
+                    15,
+                    121,
+                    231,
                     20
                   ],
                   "variation": "BodyB14",
                   "text": "Radish Seeds · Homestead Stall"
                 },
                 {
-                  "type": "UiCommandButton",
+                  "type": "UiShowPill",
                   "rect": [
-                    250,
-                    126,
-                    72,
-                    44
+                    256,
+                    116,
+                    65,
+                    31
                   ],
-                  "variation": "CmdSecondaryCompact",
-                  "text": "Show ›"
+                  "text": "",
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        270,
+                        123,
+                        40,
+                        18
+                      ],
+                      "variation": "CaptionXB12",
+                      "text": "Show ›"
+                    }
+                  ]
                 }
               ]
             }

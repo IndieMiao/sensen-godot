@@ -32,10 +32,13 @@ def _resolve_override_path(val, unity_root: Path):
 
 def build_recipe(unity_root: Path, asset_name: str, tier: int,
                  overrides: dict, registry: naming.SlugRegistry, report: Report,
-                 forced: dict = None):
+                 forced: dict = None, part_id: str = None):
     """forced：调用方强制注入的 per-part override，不依赖 part_id 匹配任何 key——直接并入
     overrides.json 里该 part_id 的条目之下。用于 base_parts 这类"文件名 slug 与 partName
     解析出的 part_id 不一致"的场景（不能靠 overrides 字典的 key 命中），提供一个通用兜底值。
+    part_id：samples.json 条目里可选的 "id"，给同一个 Unity 资产另起一个新部件 id（如 SGODOT-229 的
+    NPC 专用变体 hairhat71_npc_kai，原件 hairhat71 不动）；overrides 按这个新 id 取。不给时照旧用
+    partName 的 slug。
     但 overrides.json 里针对具体 part_id 的人工定点修正优先级更高——同一个 key（如 fbx）两边
     都给时，以 overrides.json 为准，因为那是人工核实过具体这个部件的正确资产之后写的，而
     forced 只是给一整类 part 的笼统兜底（例如所有 base_parts 都指向同一个 SK_DtBase.fbx，
@@ -50,7 +53,9 @@ def build_recipe(unity_root: Path, asset_name: str, tier: int,
         return None
     part_name = str(mb.get("partName", ""))
     try:
-        part_id = registry.claim(naming.slug(part_name))
+        if part_id is not None and naming.slug(part_id) != part_id:
+            raise ValueError(f"新 id {part_id!r} 不是规范 slug（小写字母、数字、下划线）")
+        part_id = registry.claim(part_id if part_id is not None else naming.slug(part_name))
         slot = naming.slot_name(int(mb.get("partType", -1)))
     except ValueError as e:
         report.error(f"{asset_name}: {e}")
