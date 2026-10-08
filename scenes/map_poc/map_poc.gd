@@ -502,6 +502,9 @@ func _update_pawns(d: float) -> void:
 		var vis: bool = p.ready and n.position.distance_to(center_world) <= cull_r and city_detail_visible()
 		if city_map and str(p.cohort).begins_with("farm:"):
 			vis = vis and farm_markers.selected_id == str(p.cohort).trim_prefix("farm:")
+		if city_map and p.cohort == "self" and farm_markers and farm_markers.anchor_shift.has("self") \
+				and farm_markers.world_positions.has("self"):
+			n.position = farm_markers.world_positions.self   # beside the pin of the place it stands at (P0 MAP-1)
 		if street_mode and farm_markers and city_map == null:
 			var id := str(p.cohort).trim_prefix("farm:")
 			if farm_markers.selected_id == id: character_scale = 1.0
@@ -1647,6 +1650,19 @@ func _open_place(id: String) -> void:
 	if AppRouter.top_instance() != null or not Net or not Net.session: return
 	if not PlaceCatalog.available(id, Net.session.state): return
 	AppRouter.open_instance(AppRouter.PLACE, {"place_id": id, "session": Net.session})
+
+## The player's own avatar somewhere other than home (P0 MAP-1: where the player is); home itself stays put.
+func set_self_at(lat: float, lng: float) -> void:
+	for list in [_pawns, _spawn_queue]:
+		for p in list:
+			if p.cohort == "self":
+				p.lat = lat
+				p.lng = lng
+	if farm_markers:
+		if is_equal_approx(lat, home_lat) and is_equal_approx(lng, home_lng): farm_markers.anchor_override.erase("self")
+		else: farm_markers.anchor_override["self"] = Vector2(lat, lng)
+	_reposition_pawns()
+	_camera_dirty = true
 
 func _anchor_self_to_farm(center: Vector2) -> void:
 	home_lat = center.x

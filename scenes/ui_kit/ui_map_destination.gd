@@ -21,6 +21,8 @@ var plate := false: set = set_plate
 ## A UiStatusBadge state key ("request", "deliverable", "new" …); "" for none.
 var mark := "": set = set_mark
 var count := "": set = set_count
+## The name under the disc; the city map folds it when it would overlap another (C30 / q(72)) — the pin stays.
+var name_shown := true: set = set_name_shown
 
 var _pin: Control
 var _disc: Panel
@@ -75,7 +77,14 @@ func set_text(v: String) -> void:
 	if v == text and _label.text == v: return
 	text = v
 	_label.text = v
-	_label_box.visible = v != ""
+	_label_box.visible = v != "" and name_shown
+	_layout()
+
+func set_name_shown(v: bool) -> void:
+	if v == name_shown: return
+	name_shown = v
+	if _label_box == null: return
+	_label_box.visible = text != "" and v
 	_layout()
 
 func set_plate(v: bool) -> void:
@@ -102,6 +111,14 @@ func set_count(v: String) -> void:
 	count = v
 	_count_label.text = v
 	_count.visible = v != ""
+
+## The name plate's size for `text` before any pin exists (the city map packs pins by it): Compact/10 Bold, 6 / 2
+## padding, never cut. Matches label_size() of a built pin.
+static func label_size_for(text: String) -> Vector2:
+	if text == "": return Vector2.ZERO
+	var f := UiKit.font(&"bold")
+	return Vector2(ceilf(f.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, 10).x) + _LABEL_PAD_X * 2.0,
+		ceilf(f.get_height(10) * 1.25 / 1.25) + _LABEL_PAD_Y * 2.0)
 
 ## The name's plate size (0 when there is no name).
 func label_size() -> Vector2:
