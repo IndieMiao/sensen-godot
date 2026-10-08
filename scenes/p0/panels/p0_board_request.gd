@@ -75,41 +75,24 @@ static func dropped(ui: P0Ui, gone: Dictionary) -> void:
 	col.add_child(UiFactRow.new("Next request", P0Board.drop_wait()))
 	_details(ui, col, str(gone.get("item", "")))
 
-## Details ›: the item's InfoSheet laid over this sheet (不知火舞 on 224) — read only, ×0 when the bag has none; a tap
-## outside it or Back goes back to the sheet under it. None for a request with no single item.
+## Details ›: the item's InfoSheet laid over this sheet on a scrim (不知火舞 on 224) — read only, ×0 when the bag has
+## none; a tap outside it or Back goes back to the sheet under it. None for a request with no single item.
 static func _details(ui: P0Ui, col: Control, item: String) -> void:
 	if item == "": return
 	_nav(col, "Details", func(): info(ui, item))
 
-## The InfoSheet over the open request sheet (P0ItemInfo's bag card without its buttons: nothing to do from here).
+## The InfoSheet over the open request sheet (P0ItemInfo's bag card without its buttons: nothing to do from here), on
+## its scrim (UiInfoSheet.layered); Back (P0Ui.close_top_layer) or a tap on the scrim closes the card, back to the
+## sheet under it.
 static func info(ui: P0Ui, item: String) -> UiInfoSheet:
-	var layer := Control.new()
-	layer.name = "RequestItemInfo"
-	layer.set_anchors_preset(Control.PRESET_FULL_RECT)
-	layer.mouse_filter = Control.MOUSE_FILTER_STOP   # a tap outside the card closes it
-	var foot := MarginContainer.new()
-	foot.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-	foot.grow_vertical = Control.GROW_DIRECTION_BEGIN
-	for side in [&"margin_left", &"margin_right"]: foot.add_theme_constant_override(side, int(UiTokens.SIZE_QUICK_BAR_X))
-	foot.add_theme_constant_override(&"margin_bottom", int(_PAD + ui.safe_bottom()))
-	foot.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	layer.add_child(foot)
-	var sheet := UiInfoSheet.new()
+	var sheet := UiInfoSheet.layered(ui._modal, Vector2(UiTokens.SIZE_QUICK_BAR_X, _PAD + ui.safe_bottom()))
 	sheet.rules = func(id: String, _c: StringName, o: Dictionary) -> Dictionary:
 		var spec := P0ItemInfo.spec(ui.view, id, &"bag", o)
 		spec.buttons = []
 		spec.info = false
 		spec.quantity_shown = true
 		return spec
-	foot.add_child(sheet)
-	ui._modal.add_child(layer)
-	var under := ui._modal_back
-	var close := func():
-		if is_instance_valid(layer): layer.queue_free()
-		ui._modal_back = under
-	layer.gui_input.connect(func(e: InputEvent): if P0Ui.is_tap(e): close.call())
-	ui._modal_back = close
-	sheet.open(item, &"bag")
+	sheet.open(item, &"bag")   # Back closes it first: P0Ui.close_top_layer looks for a layered card
 	return sheet
 
 static func _nav(col: Control, label: String, on_press: Callable) -> void:
