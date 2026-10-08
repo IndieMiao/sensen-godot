@@ -132,9 +132,13 @@ func p0_anchor() -> Vector2:
 	if kitchen and kitchen.phase in ["rotate", "watch"]: return kitchen.ring_center()   # the turn-over's floats rise from the pot
 	return super()
 
-## Whether this reply's result card is coming (a normal serve): its strip carries the first-cook XP, so the runtime keeps
-## that bonus off the floats. A turn-over or a pot kept on its own has no card: the bonus floats (不知火舞 on 226).
-func p0_cook_card_coming() -> bool: return kitchen != null and kitchen.phase == "serve"
+## Whether this reply's result card is coming: its strip carries the first-cook XP, so the runtime keeps that bonus off
+## the floats. A normal serve, or a turn-over whose next pot did not fire (no `queue` event: no room, q(46)) and so
+## falls back to the card (后裔 on #108). A turn-over or a pot kept on its own has no card: the bonus floats (q(85)).
+func p0_cook_card_coming(events: Array) -> bool:
+	if kitchen == null: return false
+	if kitchen.phase == "serve": return true
+	return kitchen.phase == "rotate" and not events.any(func(e): return str(e.get("kind", "")) == "queue")
 
 func p0_event(ev: Dictionary, v: Dictionary) -> bool:
 	if kitchen == null: return false

@@ -548,7 +548,10 @@ func on_event(ev: Dictionary) -> bool:
 			last_page = str(ev.get("dish", "")) if known else ""
 			# Kept without a card: S5 Queue ×2 kept it on its own, or the stove turned over under the watch (q(71)).
 			if bool(ev.get("auto", false)) or phase == "rotate":
-				_after_kept.call_deferred(ev, _events + [ev])
+				# A turn-over keeps the whole reply in _events (cleared when it started): the server sends the dish before
+				# its `first`, and a turn-over that falls back to the card needs both (后裔 on #108).
+				if phase == "rotate": _events.append(ev)
+				_after_kept.call_deferred(ev, _events + ([] if phase == "rotate" else [ev]))
 				return true
 			_events.append(ev)
 			# Once the whole reply is in, and through the card queue: a card already open (an Energy card, a level-up
@@ -768,8 +771,7 @@ func _after_kept(ev: Dictionary, events: Array) -> void:
 	var next = _queue_ev.get("dish", null)
 	_queue_ev = {}
 	if not turned and phase == "rotate":
-		phase = "serve"
-		_events = events
+		phase = "serve"   # _events holds the whole reply by now: the dish, its first and its mishap
 		_from_stove = false
 		rt.ui.queue_card(_show_card)
 		return
