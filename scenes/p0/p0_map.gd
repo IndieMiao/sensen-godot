@@ -277,7 +277,10 @@ func fly_to_city(id: String) -> void:
 func _on_net_booted(_ok: bool) -> void: pass
 func _on_net_booted_guest(_ok: bool) -> void: pass
 func _on_account_changed(_signed_in: bool) -> void: pass
-func _refresh_nearby() -> void: pass
+## P0 has no nearby list, but the region must count as set up: map_poc's resume rebuilds the region UI when
+## _nearby_region differs, which flies the camera back to the homestead (int5 hand test 31: back from an outpost
+## the map must stay where it was).
+func _refresh_nearby() -> void: _nearby_region = str(region.get("id", ""))
 func _refresh_city_counts() -> void: pass
 func _open_account() -> void: pass
 
