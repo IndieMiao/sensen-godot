@@ -444,7 +444,7 @@ func test_the_events_of_a_pot_kept_on_its_own_are_told_from_the_commands() -> vo
 	var spent := {"kind": "energy", "delta": -2, "reason": "harvest"}
 	# Before the command: the harvest's items and XP stay.
 	var events := [bagged, dish, xp, level, gift, fired, spent, crop, farm_xp]
-	assert_array(P0KitchenLogic.auto_kept_events(events)).is_equal([bagged, dish, xp, level, gift, fired])
+	assert_array(P0KitchenLogic.auto_kept_events(events)).is_equal([bagged, dish, xp, level, fired])   # the gift is the level-up's
 	# After it, and a pot with plates left on the stove (no `queue`): the next command's XP is not the pot's.
 	var plate := {"kind": "plate", "ids": ["dish_grilled_crucian"], "cabinet": false}
 	assert_array(P0KitchenLogic.auto_kept_events([crop, farm_xp, plate, dish, xp])).is_equal([plate, dish, xp])
