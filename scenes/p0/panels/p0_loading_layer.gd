@@ -9,17 +9,34 @@ const SLOW_S := 8.0
 
 var screen: P0SysScreen
 var close_button: Button
+## Opens the place again after a failure (AppRouter.open_instance; tests replace it).
+var reopen := func(path: String, args: Dictionary): AppRouter.open_instance(path, args)
 var _age := 0.0
+var _shot: Texture2D
+var _path := ""
+var _args := {}
 
-func _init(place: String, shot: Texture2D = null) -> void:
+func _init(place: String, shot: Texture2D = null, path := "", args := {}) -> void:
 	layer = 120   # over every world and P0Ui, like AppRouter's own loading overlay
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	_shot = shot
+	_path = path
+	_args = args
 	screen = P0SysScreen.new()
 	screen.show_kind(P0SysScreen.Kind.SCENE, {place = place, shot = shot})
 	screen.modulate.a = 0.0
+	screen.primary_pressed.connect(func(k: P0SysScreen.Kind): if k == P0SysScreen.Kind.PLACE_FAIL: _retry())
 	add_child(screen)
-	close_button = screen.card.primary
+	close_button = screen.card.secondary
 	close_button.visible = false   # AppRouter's Back reads it: only a failed load can be backed out of
+
+func _ready() -> void:
+	GameUi.register_modal(self)   # like AppRouter's own overlay
+
+## Retry: AppRouter's Go back clears this transition (close_button), then the same place opens again.
+func _retry() -> void:
+	close_button.pressed.emit()
+	if _path != "": reopen.call_deferred(_path, _args)
 
 func _process(dt: float) -> void:
 	_age += dt
@@ -28,7 +45,7 @@ func _process(dt: float) -> void:
 
 ## The place would not load: a card with Go back (AppRouter clears the transition on it).
 func failed() -> void:
-	screen.show_kind(P0SysScreen.Kind.PLACE_FAIL)
+	screen.show_kind(P0SysScreen.Kind.PLACE_FAIL, {shot = _shot})
 	screen.modulate.a = 1.0
 
 ## Where an AppRouter.open_instance into a P0 world goes, as the place chip will read there (`Shanghai · Reed Pond`);

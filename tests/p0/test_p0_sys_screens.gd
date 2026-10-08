@@ -187,3 +187,77 @@ func test_the_outpost_handshake_carries_the_version() -> void:
 	o._connect()
 	assert_bool(Array(o.socket.handshake_headers).any(func(h): return str(h).begins_with("x-p0-version"))).is_false()
 	o.stop()
+
+## 不知火舞 233 walkthrough: a place that would not open stays on the blurred screen being left (no launch backdrop,
+## no wordmark); Can't connect's card plus Go back. Retry opens the same place again; Go back (and Back) stays put.
+func test_a_failed_place_offers_retry_and_the_way_back() -> void:
+	var shot := ImageTexture.create_from_image(Image.create(4, 4, false, Image.FORMAT_RGB8))
+	var layer := P0LoadingLayer.new("Shanghai · Reed Pond", shot, "res://scenes/p0/p0_pond.tscn", {"pond_id": "pond_shanghai_05"})
+	var opened := []
+	layer.reopen = func(p, a): opened.append([p, a])
+	add_child(auto_free(layer))
+	layer.failed()
+	var s := layer.screen
+	assert_that([s._shot.visible, s._shot.texture == shot, s._mark.visible, s._art.visible, s._place.visible, s.spinner.visible]).is_equal(
+		[true, true, false, false, false, false])
+	assert_that([s.card.title.text, s.card.body.text, s.card.primary.text, s.card.secondary.text]).is_equal(
+		["Couldn't get there", "Check your connection and try again.", "Retry", "Go back"])
+	assert_object(layer.close_button).is_same(s.card.secondary)
+	var cleared := [0]
+	layer.close_button.pressed.connect(func(): cleared[0] += 1)
+	s.card.primary.pressed.emit()   # Retry
+	await get_tree().process_frame
+	assert_int(cleared[0]).is_equal(1)   # AppRouter's transition is cleared first …
+	assert_that(opened).is_equal([["res://scenes/p0/p0_pond.tscn", {"pond_id": "pond_shanghai_05"}]])   # … then the same place
+
+# ---------------------------------------------------------------- getting there (q(78))
+func _arrive_at_pond() -> Node:
+	rt.session.view = _view()
+	rt._scene_overlay("res://scenes/p0/p0_pond.tscn", {"pond_id": "pond_shanghai_05"}).free()
+	var w := auto_free(Node.new()) as Node
+	w.scene_file_path = "res://scenes/p0/p0_pond.tscn"
+	add_child(w)
+	rt.attach(w)
+	return w
+
+func test_the_scene_cover_stays_until_the_places_first_read_answers() -> void:
+	_arrive_at_pond()
+	assert_bool(asked.any(func(p): return str(p).begins_with("/p0/state"))).is_true()   # the arrival read
+	rt._tick_screens(0.0)
+	assert_int(rt.ui.screen_kind()).is_equal(-1)   # a quick trip never flashes it
+	rt._arrive.t0 -= UiTokens.MOTION_PENDING_DELAY_MS
+	rt._tick_screens(0.0)
+	assert_int(rt.ui.screen_kind()).is_equal(K.SCENE)
+	rt._tick_screens(P0Runtime.LAUNCH_SLOW_S)
+	assert_bool(rt.ui.screen().slow).is_true()
+	_state()
+	assert_int(rt.ui.screen_kind()).is_equal(-1)
+
+func test_a_failed_arrival_says_couldnt_get_there_and_retry_goes_again() -> void:
+	_arrive_at_pond()
+	rt.session.connection_failed.emit("Can't reach the farm server", {})
+	assert_int(rt.ui.screen_kind()).is_equal(K.PLACE_FAIL)
+	assert_str(rt.ui.screen().card.title.text).is_equal("Couldn't get there")
+	assert_str(rt.ui.sys_text()).is_empty()   # over the Offline banner's place: no banner, no count
+	assert_int(rt._net_fails).is_equal(0)
+	asked.clear()
+	rt.session.busy = false
+	rt.ui.screen().card.primary.pressed.emit()   # Retry
+	assert_int(rt.ui.screen_kind()).is_equal(K.SCENE)
+	assert_bool(asked.any(func(p): return str(p).begins_with("/p0/state"))).is_true()
+	rt._tick_screens(P0Runtime.ARRIVE_FAIL_S + 0.1)   # 20 s without an answer
+	assert_int(rt.ui.screen_kind()).is_equal(K.PLACE_FAIL)
+
+func test_go_back_and_back_leave_for_where_the_player_came_from() -> void:
+	var left := [0]
+	rt.swap_root = func(): left[0] += 1   # not pushed on AppRouter here: Go back takes the map way
+	_arrive_at_pond()
+	rt.session.connection_failed.emit("Can't reach the farm server", {})
+	rt.ui.screen().card.secondary.pressed.emit()   # Go back
+	assert_int(rt.ui.screen_kind()).is_equal(-1)
+	assert_int(left[0]).is_equal(1)
+	_arrive_at_pond()
+	rt.session.connection_failed.emit("Can't reach the farm server", {})
+	assert_bool(rt.ui.close_top_layer()).is_true()   # Back is Go back
+	assert_int(rt.ui.screen_kind()).is_equal(-1)
+	assert_int(left[0]).is_equal(2)

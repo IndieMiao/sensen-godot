@@ -1201,6 +1201,8 @@ func track_pressed(key: String) -> void:
 ## order is SYS-UPDATE > SYS-MAINT > SYS-LOADING, so a lower one never replaces a higher one. `screen_action(kind)`
 ## is its card's button (Retry, Check again, Update).
 signal screen_action(kind: P0SysScreen.Kind)
+## The card's way back (PLACE_FAIL's Go back, and Back while it shows).
+signal screen_back(kind: P0SysScreen.Kind)
 const SCREEN_LAYER := 100   # over the fishing presentation (30), under AppRouter's loading layer (120)
 var _screen_layer: CanvasLayer
 var _screen: P0SysScreen
@@ -1216,6 +1218,7 @@ func show_screen(kind: P0SysScreen.Kind, detail := {}) -> void:
 		add_child(_screen_layer)
 		_screen = P0SysScreen.new()
 		_screen.primary_pressed.connect(func(k: P0SysScreen.Kind): screen_action.emit(k))
+		_screen.secondary_pressed.connect(func(k: P0SysScreen.Kind): screen_back.emit(k))
 		_screen_layer.add_child(_screen)
 	_screen.show_kind(kind, detail)
 
@@ -1346,7 +1349,9 @@ func _notification(what: int) -> void:
 ## a quick slot being dragged (it flies back, LOCK-04 v1.11; the PinMenu is gone), the radial, then a card or
 ## drawer. True when it closed something; the world only leaves on false.
 func close_top_layer() -> bool:
-	if _screen != null: return true   # SYS-LOADING / MAINT / UPDATE have no close: Back does nothing (q(74))
+	if _screen != null:   # SYS-LOADING / MAINT / UPDATE have no close: Back does nothing (q(74)) …
+		if _screen.kind == P0SysScreen.Kind.PLACE_FAIL: screen_back.emit(_screen.kind)   # … but Couldn't get there's is Go back (q(78))
+		return true
 	if _bar != null and (_bar.is_dragging() or _bar.is_lifted()):   # lifted and not moved yet counts too (刘邦 on #38)
 		_bar.cancel_drag()
 		return true

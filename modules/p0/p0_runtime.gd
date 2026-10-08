@@ -100,6 +100,7 @@ func _init() -> void:
 	ui.sys_retry.connect(_probe)
 	session.blocked.connect(_on_blocked)
 	ui.screen_action.connect(_on_screen_action)
+	ui.screen_back.connect(_on_screen_back)
 	ui.lifecycle.watch(session)
 	session.command_started.connect(ui.track_pressed)
 	if OS.get_environment("P0_AUTO") == "1" or FileAccess.file_exists("user://p0_auto"):
@@ -125,6 +126,7 @@ func attach(w: Node) -> void:
 	ui.set_surface(str(w.call("p0_surface")) if w.has_method("p0_surface") else "farm")
 	if w.has_method("p0_surface") and str(w.call("p0_surface")) == "map": ui.teach("map")   # Browse the map for free…
 	_end_launch()   # the first answer may have come before the first world
+	_begin_arrival(w)
 
 ## The space a world puts the player in, for the server (q(41)): its p0_space() when it has one (the farmhouse
 ## says home, outposts say outpost), else from its surface — farm is home, pond and map as named, anything else
@@ -537,6 +539,9 @@ func _net_failed(msg: String, cmd := {}) -> void:
 	if _launch_s >= 0.0 and session.view.is_empty():
 		_launch_failed()   # nothing to browse yet: Can't connect takes the screen, no banner (SYS-LOADING-FAIL)
 		return
+	if _arrive_s >= 0.0:
+		_arrival_failed()   # getting there failed: Couldn't get there, over the Offline banner (q(78))
+		return
 	_net_fails += 1
 	if _net_fails >= 2:
 		if not ui.offline:
@@ -553,6 +558,7 @@ func _net_failed(msg: String, cmd := {}) -> void:
 func _net_ok() -> void:
 	_net_fails = 0
 	_end_resume()
+	_end_arrival()
 	_unblock()
 	_end_launch()
 	if ui.offline:
@@ -573,6 +579,11 @@ var _blocked := ""            # "maintenance" / "update_required" while the serv
 var _block_url := ""
 var _maint_left := 0.0
 var _resume_ms := -1          # a state read on return to the foreground is in flight since then; -1 none
+## Getting to a place (q(78)): the scene cover AppRouter showed for a P0 world stays until that world's first read
+## answers. {path, place, shot, t0} of the cover; `_arrive_s` counts while its read is out (-1 none).
+const ARRIVE_FAIL_S := 20.0
+var _arrive := {}
+var _arrive_s := -1.0
 
 ## The first session's launch cover (SYS-LOADING, from p0_boot): the wordmark over the farm backdrop until the first
 ## answer and a world are both there. 8 s on, the spinner and `Taking longer than usual…`; 20 s without an answer —
@@ -596,6 +607,14 @@ func _tick_screens(dt: float) -> void:
 		if _maint_left <= 0.0:
 			_maint_left = MAINT_CHECK_S
 			if not session.busy: session.refresh()
+	if _arrive_s >= 0.0:
+		_arrive_s += dt
+		# Shown once the trip has taken MOTION_PENDING_DELAY_MS since it started: right away when AppRouter's cover
+		# was already up, never for a quick one.
+		if ui.screen_kind() == -1 and Time.get_ticks_msec() - int(_arrive.t0) >= UiTokens.MOTION_PENDING_DELAY_MS:
+			ui.show_screen(P0SysScreen.Kind.SCENE, _arrive)
+		if ui.screen_kind() == P0SysScreen.Kind.SCENE and _arrive_s >= LAUNCH_SLOW_S and not ui.screen().slow: ui.screen().taking_longer()
+		if _arrive_s >= ARRIVE_FAIL_S: _arrival_failed()
 	# Back from the background: the read is cheap when it is quick; past MOTION_PENDING_DELAY_MS it gets a cover.
 	if _resume_ms >= 0 and ui.screen_kind() == -1 and Time.get_ticks_msec() - _resume_ms >= UiTokens.MOTION_PENDING_DELAY_MS:
 		ui.show_screen(P0SysScreen.Kind.SCENE, {place = ui.place_text(), shot = P0SysScreen.blurred_screen(get_viewport())})
@@ -626,6 +645,8 @@ func _end_resume() -> void:
 ## while the card is up. Any answer afterwards takes it down and the player carries on where they were.
 func _on_blocked(code: String, detail: Dictionary) -> void:
 	_end_resume()
+	_arrive = {}   # SYS-MAINT / SYS-UPDATE take over from getting there (q(78))
+	_arrive_s = -1.0
 	_blocked = code
 	_hold_rooms(true)
 	if code == "update_required":
@@ -650,11 +671,45 @@ func _hold_rooms(on: bool) -> void:
 func _on_screen_action(kind: P0SysScreen.Kind) -> void:
 	match kind:
 		P0SysScreen.Kind.FAIL: _probe()
+		P0SysScreen.Kind.PLACE_FAIL:   # Retry: the same place again, as many times as the player likes (q(78))
+			if _arrive.is_empty(): return
+			_arrive_s = 0.0
+			ui.show_screen(P0SysScreen.Kind.SCENE, _arrive)
+			if not session.busy: session.refresh()
 		P0SysScreen.Kind.MAINT:
 			_maint_left = MAINT_CHECK_S
 			if not session.busy: session.refresh()
 		P0SysScreen.Kind.UPDATE:
 			if _block_url != "": OS.shell_open(_block_url)
+
+## A P0 world AppRouter opened under the scene cover: the cover stays until its first read answers (q(78)). The
+## launch cover has the very first world; a world that is not the one the cover was for leaves it alone.
+func _begin_arrival(w: Node) -> void:
+	if _arrive.is_empty(): return
+	# AppRouter gives a load 30 s; a cover older than that belonged to a trip that never arrived.
+	if _launch_s >= 0.0 or session.view.is_empty() or w.scene_file_path != str(_arrive.path) \
+			or Time.get_ticks_msec() - int(_arrive.t0) > 35000:
+		_arrive = {}
+		return
+	_arrive_s = 0.0
+
+func _end_arrival() -> void:
+	if _arrive.is_empty(): return
+	_arrive = {}
+	_arrive_s = -1.0
+	ui.hide_screen([P0SysScreen.Kind.SCENE, P0SysScreen.Kind.PLACE_FAIL])
+
+## Couldn't get there (q(78)): an error, a 5xx without the maintenance code, or 20 s without an answer.
+func _arrival_failed() -> void:
+	_arrive_s = -1.0
+	ui.show_screen(P0SysScreen.Kind.PLACE_FAIL, {shot = _arrive.get("shot", null)})
+
+## Go back (and Back) on Couldn't get there: to where the player came from.
+func _on_screen_back(kind: P0SysScreen.Kind) -> void:
+	if kind != P0SysScreen.Kind.PLACE_FAIL: return
+	_end_arrival()
+	if is_instance_valid(world) and AppRouter.top_instance() == world: AppRouter.pop_instance()
+	else: leave_to_map()
 
 ## SYS-MAINT's time (q(74)): the player's local clock, 24 h — `14:30` today, `Oct 10, 14:30` on another day; "" (We'll
 ## be back soon.) when absent, unreadable or already past. `now` and `bias_min` (minutes east of UTC) are for tests.
@@ -695,7 +750,9 @@ func _dev_screen(which: String) -> void:
 func _scene_overlay(path: String, args: Dictionary) -> CanvasLayer:
 	var place := P0LoadingLayer.destination(path, args)
 	if place == "": return null
-	return P0LoadingLayer.new(place, P0SysScreen.blurred_screen(get_viewport()))
+	var shot := P0SysScreen.blurred_screen(get_viewport())
+	_arrive = {path = path, place = place, shot = shot, t0 = Time.get_ticks_msec()}
+	return P0LoadingLayer.new(place, shot, path, args)
 
 # ---------------------------------------------------------------- dev: scripted desktop screenshots
 ## P0_SHOT=/abs/path.png P0_SHOT_STEPS="walk:1:0:1.5,act,..." — run scripted inputs, save one frame, quit.

@@ -9,10 +9,13 @@ extends Control
 ##   UPDATE      SYS-UPDATE 1245:87698 — `Update to keep playing` · `This version is out of date.` · Update
 ##   SCENE       SYS-LOADING-SCENE 1245:87648 — the screen behind, blurred, under the modal scrim; the spinner and
 ##               the destination (`Shanghai · Reed Pond`) in white; after 8 s `Taking longer than usual…`
-##   PLACE_FAIL  a place that would not open (the loading layer's failure): SystemCard Error · Go back
+##   PLACE_FAIL  SYS-LOADING-SCENE-FAIL 1780:103778 (q(78)): getting to a place failed, over the same blurred screen;
+##               `Couldn't get there` · Retry (the same place again) · Go back (where the player came from; Back too)
 ## show_kind(kind, detail) draws one; `primary_pressed(kind)` is its card's button.
 
 signal primary_pressed(kind: Kind)
+## The card's secondary (PLACE_FAIL's Go back).
+signal secondary_pressed(kind: Kind)
 
 enum Kind { LAUNCH, FAIL, MAINT, UPDATE, SCENE, PLACE_FAIL }
 
@@ -105,6 +108,7 @@ func _init() -> void:
 	add_child(_place)
 	card = UiSystemCard.new()
 	card.primary_pressed.connect(func(): primary_pressed.emit(kind))
+	card.secondary_pressed.connect(func(): secondary_pressed.emit(kind))
 	card.minimum_size_changed.connect(_layout)   # a card outside a container never shrinks on its own
 	add_child(card)
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -130,16 +134,18 @@ func show_kind(k: Kind, d := {}) -> void:
 	kind = k
 	detail = d
 	slow = false
-	var scene := k == Kind.SCENE
+	# The scene cover and its failure stay on the blurred screen being left: the player is still in the game, so no
+	# launch backdrop or wordmark (不知火舞 233 walkthrough).
+	var scene := k in [Kind.SCENE, Kind.PLACE_FAIL]
 	_art.visible = not scene
 	_fade.visible = not scene
 	_shot.visible = scene
 	_scrim.visible = scene
 	_mark.visible = not scene
-	_place.visible = scene
+	_place.visible = k == Kind.SCENE
 	_place.text = str(d.get("place", ""))
 	_shot.texture = d.get("shot", null)
-	spinner.visible = scene
+	spinner.visible = k == Kind.SCENE
 	_caption.visible = false
 	card.visible = k in [Kind.FAIL, Kind.MAINT, Kind.UPDATE, Kind.PLACE_FAIL]
 	if card.visible: card.show_card(card_spec(k, d))
@@ -158,8 +164,9 @@ static func card_spec(k: Kind, d := {}) -> Dictionary:
 		Kind.UPDATE:
 			return {icon = UiWordmark.SPROUT, title = "Update to keep playing", body = "This version is out of date.",
 				primary = "Update" if str(d.get("url", "")) != "" else ""}
-		Kind.PLACE_FAIL:
-			return d.get("card", {title = "Couldn't open this place", primary = "Go back"})
+		Kind.PLACE_FAIL:   # SYS-LOADING-SCENE-FAIL 1780:103778, q(78): like Can't connect, plus the way back
+			return {icon = WIFI_OFF, icon_tint = UiTokens.COLOR_TEXT, title = "Couldn't get there",
+				body = "Check your connection and try again.", primary = "Retry", secondary = "Go back"}
 	return {}
 
 ## 8 s in: the spinner and `Taking longer than usual…` (LOADING-2); white on the scene's scrim.
