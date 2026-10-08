@@ -9,6 +9,7 @@ import rateLimit from '@fastify/rate-limit';
 import type { FastifyInstance, FastifyRequest } from 'fastify';
 import { copyFileSync, existsSync, mkdirSync, readdirSync, rmSync } from 'node:fs';
 import path from 'node:path';
+import type { P0Gate } from './gate.js';
 
 export interface P0GuardOptions {
   keys: string[];            // P0_ACCESS_KEYS; empty = no key needed (local playtests)
@@ -48,13 +49,23 @@ export function isP0Request(req: FastifyRequest): boolean {
   return decoded.toLowerCase().startsWith('/v1/p0/') || raw.toLowerCase().startsWith('/v1/p0/');
 }
 
-/** Register before the P0 routes. /v1/healthz stays open for the container health check. */
-export async function registerP0Guard(app: FastifyInstance, opts: P0GuardOptions): Promise<void> {
+/**
+ * Register before the P0 routes. /v1/healthz stays open for the container health check. With a gate, Update (426) and
+ * Maintenance (503) answer right after the key check and before the rate limits (gate.ts).
+ */
+export async function registerP0Guard(app: FastifyInstance, opts: P0GuardOptions, gate?: P0Gate): Promise<void> {
   const keys = new Set(opts.keys);
   app.addHook('onRequest', async (req, reply) => {
     if (keys.size === 0 || !isP0Request(req)) return;
     if (!keys.has(String(req.headers['x-p0-key'] ?? ''))) return reply.code(401).send({ ok: false, code: 'bad_key' });
   });
+  if (gate) {
+    app.addHook('onRequest', async (req, reply) => {
+      if (!isP0Request(req)) return;
+      const refused = gate.check(req.headers);
+      if (refused) return reply.code(refused.status).send(refused.body);
+    });
+  }
   // A total per address first: a player id is the client's own word, so changing it every request must not help.
   const perAddress = new Map<string, number>();
   let minute = -1;

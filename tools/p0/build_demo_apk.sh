@@ -37,12 +37,15 @@ mkdir -p "$(dirname "$OUT")" "$LOGS"
 python3 - "$SERVER" "$KEY" "$CODE" "$NAME" <<'PY'
 import json, re, sys
 url, key, code, name = sys.argv[1:5]
-json.dump({"url": url.rstrip("/"), "key": key}, open("assets/p0/demo_server.json", "w"))
 p = "export_presets.cfg"; s = open(p).read()
 i = s.index('name="Android P0"'); head, seg = s[:i], s[i:]
 if code: seg = re.sub(r"version/code=\d+", f"version/code={int(code)}", seg, count=1)
 if name: seg = re.sub(r'version/name="[^"]*"', f'version/name="{name}"', seg, count=1)
 open(p, "w").write(head + seg)
+# SYS-UPDATE (SGODOT-232): the client sends this as x-p0-version, the APK's own versionCode, so the server can ask an
+# old build to update (426). Always the code this export really uses: --code, else the preset's.
+version = int(re.search(r"version/code=(\d+)", seg).group(1))
+json.dump({"url": url.rstrip("/"), "key": key, "version": version}, open("assets/p0/demo_server.json", "w"))
 PY
 
 TEMPLATE=()
@@ -72,9 +75,10 @@ result = {
     "signer_sha256": signer.group(1) if signer else None,
     "server": baked.get("url") if baked else None, "server_matches": bool(baked) and baked.get("url") == server.rstrip("/"),
     "key_baked": bool(baked) and baked.get("key") == key and key != "",
+    "version_baked": baked.get("version") if baked else None,
 }
 json.dump(result, open(f"{logs}/build.json", "w"), indent=2)
 print(json.dumps(result, indent=2))
-ok = result["package"] == "com.sensen.p0demo" and result["server_matches"]
+ok = result["package"] == "com.sensen.p0demo" and result["server_matches"] and result["version_baked"] == result["version_code"]
 sys.exit(0 if ok else 1)
 PY
