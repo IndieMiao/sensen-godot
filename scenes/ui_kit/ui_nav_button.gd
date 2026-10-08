@@ -8,6 +8,8 @@ const CHEVRON := "›"
 
 var compact := false: set = set_compact
 var label := "": set = set_label
+## Compact only: false drops the ` ›` (BagHeader's `Sort · Type`, a toggle rather than a way somewhere).
+var chevron := true: set = set_chevron
 
 var _chevron: Label
 
@@ -27,6 +29,7 @@ func set_compact(v: bool) -> void:
 	size_flags_horizontal = Control.SIZE_SHRINK_BEGIN if compact else Control.SIZE_EXPAND_FILL
 	_apply()
 func set_label(v: String) -> void: label = v; _apply()
+func set_chevron(v: bool) -> void: chevron = v; _apply()
 
 func _apply() -> void:
 	if _chevron == null: return
@@ -34,7 +37,7 @@ func _apply() -> void:
 	if compact:
 		theme_type_variation = UiTokens.BUTTON_NAV_COMPACT
 		alignment = HORIZONTAL_ALIGNMENT_CENTER
-		text = "%s %s" % [label, CHEVRON]
+		text = "%s %s" % [label, CHEVRON] if chevron else label
 		custom_minimum_size = Vector2.ZERO
 		UiKit.ensure_hit_area(self)
 	else:

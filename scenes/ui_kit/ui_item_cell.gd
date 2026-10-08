@@ -12,7 +12,8 @@ extends Control
 ## PASS, so a TouchScrollContainer still takes vertical drags (CELL mode answers them with cancel).
 ## Hosts outside a scroll container (the quick bar) need a STOP backing control, or the touch also reaches
 ## _unhandled_input (the map's tap handling, for one).
-## LIFTED, DROP_TARGET and ZERO exist on the QuickSlot main only; other densities draw them as DEFAULT.
+## DROP_TARGET and ZERO exist on the QuickSlot main only, LIFTED on QuickSlot and InventoryCell (State=lifted 1641:34159:
+## the default look with the QuickSlot lift shadow); other densities draw them as DEFAULT.
 ## GHOST (QuickSlot State=ghost 1415:94114, A-08) is an empty slot showing what the action can use: dashed like
 ## EMPTY, the family icon at 35 %, a one-word family name in secondary ink (`title`), no count, never pinned.
 ## Other densities draw it as EMPTY.
@@ -29,6 +30,7 @@ const RARITY_COLORS := [UiTokens.COLOR_RARITY_COMMON, UiTokens.COLOR_RARITY_FINE
 	UiTokens.COLOR_RARITY_LEGENDARY]
 const PIN_GLYPH := preload("res://assets/ui/kit_icons/pin.svg")
 const CHECK_GLYPH := preload("res://assets/ui/kit_icons/check.svg")
+const HOME_GLYPH := preload("res://assets/ui/kit_icons/home.svg")
 
 # Positions inside the fixed-size mains (layout of one main, not shared tokens):
 const _CELL_ICON_TOP := 10.0      # InventoryCell: 27 px icon at y 10 of 52
@@ -40,13 +42,15 @@ const _KITCHEN_LABEL_TOP := 31.0  # "Cell state label" 52×25 at y 31, radius 5,
 const _KITCHEN_LABEL_H := 25.0
 const _KITCHEN_LABEL_RADIUS := 5.0
 const _KITCHEN_MARK_OUT := 2.0    # mark 13×13 at (41, -2): overhangs the top-right corner by 2
+const _STORED_AT := Vector2(4, 38)   # InventoryCell: Icon/i-home 11×11 at (4, 38) on storage stacks (BAG-2-2)
+const _STORED_ICON := 11.0
 const _QUICK_PAD := 4.0           # QuickSlot "Slot surface" padding
 const _QUICK_NAME_H := 22.0       # two-line name block, then the 12 px quantity line
 const _QUICK_QTY_H := 12.0
 const _GEAR_ROLE_H := 11.0        # GearSlot: role 11 high, slot at y 16, name at y 71 (16 high)
 const _GEAR_SLOT_TOP := 16.0
 const _GEAR_NAME_TOP := 71.0
-const _GEAR_NAME_H := 16.0
+const _GEAR_NAME_H := 23.0       # two lines of 9 / 125 % (WP1b: names wrap, never truncate; they may hang below 88)
 
 var density: Density
 var state: State = State.DEFAULT: set = set_state
@@ -65,6 +69,8 @@ var role := "": set = set_role
 var status := "": set = set_status
 ## Kitchen check mark for a cooked dish; SELECTED shows it too ("Selected or cooked mark").
 var marked := false: set = set_marked
+## INVENTORY: the stack is in Farm Storage, not the bag — a small house at the bottom left (BAG-2-2).
+var stored := false: set = set_stored
 
 ## Milliseconds for the arbiter; tests inject a fake clock.
 var clock := Callable(Time, &"get_ticks_msec")
@@ -82,6 +88,7 @@ var _mark: Panel
 var _strip: Panel
 var _new_ring: Panel   # QuickSlot State=new (1663:101150): the color/new ring of a first-time item
 var _badge: Panel
+var _home: TextureRect
 
 func _init(d: Density = Density.INVENTORY) -> void:
 	density = d
@@ -109,10 +116,14 @@ func set_pinned(v: bool) -> void: pinned = v; _refresh()
 func set_role(v: String) -> void: role = v; _refresh()
 func set_status(v: String) -> void: status = v; _refresh()
 func set_marked(v: bool) -> void: marked = v; _refresh()
+func set_stored(v: bool) -> void: stored = v; _refresh()
 
 func _gui_input(event: InputEvent) -> void:
 	_emit(_arbiter.feed(event, clock.call()))
 	set_process(_arbiter.is_active())
+	# A lifted or dragged cell keeps its touch: the scroll container behind it must not take the drag (the bag's
+	# way onto the quick bar, SGODOT-225 / BAR-DRAG-9). Before the lift a vertical drag still scrolls the grid.
+	if _arbiter.is_lifted() or _arbiter.is_dragging(): accept_event()
 
 ## Long presses fire on time alone, so tick while a finger is down.
 func _process(_delta: float) -> void:
@@ -163,7 +174,8 @@ func show_new_ring() -> void:
 
 ## The state actually drawn: the extra QuickSlot states fall back to DEFAULT (GHOST to EMPTY) on the other mains.
 func drawn_state() -> State:
-	if density != Density.QUICK and state in [State.LIFTED, State.DROP_TARGET, State.ZERO]: return State.DEFAULT
+	if density != Density.QUICK and state in [State.DROP_TARGET, State.ZERO]: return State.DEFAULT
+	if density not in [Density.QUICK, Density.INVENTORY] and state == State.LIFTED: return State.DEFAULT
 	if density != Density.QUICK and state == State.GHOST: return State.EMPTY
 	return state
 
@@ -229,7 +241,12 @@ func _build_cell() -> void:
 	_add_icon(_surface, UiTokens.SIZE_INVENTORY_ICON, _KITCHEN_ICON_TOP if kitchen else _CELL_ICON_TOP)
 	_add_dot(_surface, _KITCHEN_DOT_INSET if kitchen else _DOT_INSET)
 	_add_pill(_surface)
-	if not kitchen: return
+	if not kitchen:
+		_home = UiKit.icon(HOME_GLYPH, _STORED_ICON)   # Farm Storage stack: 11 px house at (4, 38)
+		_home.self_modulate = UiTokens.COLOR_SECONDARY
+		_place(_home, 0.0, _STORED_AT.x, _STORED_AT.y, _STORED_ICON, _STORED_ICON)
+		_surface.add_child(_home)
+		return
 	_status = _box(self)
 	_place(_status, 0.0, 0.0, _KITCHEN_LABEL_TOP, side, _KITCHEN_LABEL_H)
 	_status.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_SURFACE, _KITCHEN_LABEL_RADIUS))
@@ -283,7 +300,10 @@ func _build_gear() -> void:
 	var side := UiTokens.SIZE_INVENTORY_ICON
 	_add_icon(_surface, side, (UiTokens.SIZE_INVENTORY_CELL - side) * 0.5)
 	_name = _band_label(self, UiTokens.STYLE_C9_B, _GEAR_NAME_TOP, _GEAR_NAME_H)
-	_name.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	_name.vertical_alignment = VERTICAL_ALIGNMENT_TOP
+	_name.grow_vertical = Control.GROW_DIRECTION_END
+	_name.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_name.max_lines_visible = 2
 
 # ------------------------------------------------------------------ refresh
 
@@ -298,12 +318,13 @@ func _refresh() -> void:
 		Density.GEAR:
 			_surface.add_theme_stylebox_override(&"panel", _cell_box(s, UiTokens.RADIUS_INVENTORY_CELL))
 			_role.text = role
-			_name.text = title
+			_name.text = "Empty" if empty else title   # an empty slot says only Empty (WP1b, A-08)
 		_:
 			_surface.add_theme_stylebox_override(&"panel", _cell_box(s, UiTokens.RADIUS_INVENTORY_CELL))
 			_pill.visible = quantity != "" and not empty
 			_qty.text = quantity
 			_dot.visible = rarity > 0 and not empty
+			if _home != null: _home.visible = stored and not empty
 			if rarity > 0:
 				_dot.add_theme_stylebox_override(&"panel", UiStyleBox.make(RARITY_COLORS[clampi(rarity - 1, 0, 3)], UiTokens.SIZE_RARITY_DOT * 0.5))
 			if density == Density.KITCHEN:
@@ -312,8 +333,15 @@ func _refresh() -> void:
 				_name.text = status
 				_mark.visible = (marked or s == State.SELECTED) and not empty
 
-## InventoryCell / Kitchen Cell / GearSlot surface: hairline border, 1.5 primary when selected, dashed when empty.
+## InventoryCell / Kitchen Cell / GearSlot surface: hairline border, 1.5 primary when selected, dashed when empty;
+## a lifted InventoryCell keeps the default look under the QuickSlot lift shadow (1641:34159).
 func _cell_box(s: State, radius: float) -> UiStyleBox:
+	if s == State.LIFTED:
+		var lifted := UiStyleBox.make(UiTokens.COLOR_SURFACE, radius, UiTokens.COLOR_BORDER, UiTokens.STROKE_CELL_HAIRLINE)
+		lifted.shadow_color = UiTokens.COLOR_LIFT_SHADOW
+		lifted.shadow_size = UiTokens.SIZE_LIFT_SHADOW_RADIUS
+		lifted.shadow_offset = Vector2(0.0, UiTokens.SIZE_LIFT_SHADOW_OFFSET_Y)
+		return lifted
 	if s == State.SELECTED:
 		return UiStyleBox.make(UiTokens.COLOR_SURFACE, radius, UiTokens.COLOR_PRIMARY, UiTokens.STROKE_SELECTED_CELL)
 	if s == State.EMPTY:

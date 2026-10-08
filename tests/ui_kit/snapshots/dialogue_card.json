@@ -1,0 +1,251 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    388
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiDialogueCard"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        36
+      ],
+      "variation": "CaptionR12",
+      "text": "Head of KeeperGreeting 1205:83238 / ResidentDialogue 1213:83392 (336 at 328)"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        70,
+        328,
+        318
+      ],
+      "children": [
+        {
+          "type": "Container",
+          "rect": [
+            0,
+            70,
+            328,
+            298
+          ],
+          "children": [
+            {
+              "type": "UiDialogueCard",
+              "rect": [
+                0,
+                70,
+                328,
+                298
+              ],
+              "children": [
+                {
+                  "type": "HBoxContainer",
+                  "rect": [
+                    12,
+                    82,
+                    305,
+                    274
+                  ],
+                  "children": [
+                    {
+                      "type": "MarginContainer",
+                      "rect": [
+                        12,
+                        82,
+                        98,
+                        215
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            12,
+                            82,
+                            98,
+                            215
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                12,
+                                82,
+                                98,
+                                215
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "VBoxContainer",
+                      "rect": [
+                        121,
+                        82,
+                        195,
+                        274
+                      ],
+                      "children": [
+                        {
+                          "type": "MarginContainer",
+                          "rect": [
+                            121,
+                            82,
+                            195,
+                            35
+                          ],
+                          "children": [
+                            {
+                              "type": "VBoxContainer",
+                              "rect": [
+                                121,
+                                82,
+                                195,
+                                35
+                              ],
+                              "children": [
+                                {
+                                  "type": "HBoxContainer",
+                                  "rect": [
+                                    121,
+                                    82,
+                                    195,
+                                    20
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        121,
+                                        82,
+                                        130,
+                                        20
+                                      ],
+                                      "variation": "C14XB",
+                                      "text": "Market Keeper · Mei"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    121,
+                                    102,
+                                    195,
+                                    15
+                                  ],
+                                  "variation": "C10B",
+                                  "text": "Keeps the stall · Xuhui Market Square"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "PanelContainer",
+                          "rect": [
+                            121,
+                            123,
+                            195,
+                            79
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                131,
+                                129,
+                                176,
+                                67
+                              ],
+                              "variation": "C12B",
+                              "text": "Morning! Row Hoes just came in — sows three plots at once, Farming Lv4. Anything I can get you?"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "VBoxContainer",
+                          "rect": [
+                            121,
+                            208,
+                            195,
+                            148
+                          ],
+                          "children": [
+                            {
+                              "type": "UiCommandButton",
+                              "rect": [
+                                121,
+                                208,
+                                195,
+                                47
+                              ],
+                              "variation": "CmdPrimary",
+                              "text": "Trade · open the stall"
+                            },
+                            {
+                              "type": "UiCommandButton",
+                              "rect": [
+                                121,
+                                260,
+                                195,
+                                47
+                              ],
+                              "variation": "CmdSecondary",
+                              "text": "What's fresh today?"
+                            },
+                            {
+                              "type": "UiDismissButton",
+                              "rect": [
+                                121,
+                                313,
+                                195,
+                                43
+                              ],
+                              "variation": "Dismiss",
+                              "text": "Just passing by"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            374,
+            328,
+            14
+          ],
+          "variation": "C9B",
+          "text": "keeper layout: Role · Name, place line, no profile link"
+        }
+      ]
+    }
+  ]
+}

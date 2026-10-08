@@ -89,6 +89,15 @@ func _build_switch() -> Button:
 	b.pressed.connect(func(): switch_pressed.emit())
 	return b
 
+## The tool badge pops 1 → 1.15 → 1 (150 ms) when an action is picked on the radial (SGODOT-247).
+func pop_tool() -> void:
+	if _badge == null or not _badge.visible: return
+	_badge.pivot_offset = _badge.size * 0.5
+	var half := UiKit.secs(UiTokens.MOTION_RADIAL_TAP_MS * 0.5)
+	var t := _badge.create_tween()
+	t.tween_property(_badge, ^"scale", Vector2.ONE * 1.15, half).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	t.tween_property(_badge, ^"scale", Vector2.ONE, half).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+
 func _build_badge() -> Panel:
 	var p := Panel.new()
 	p.mouse_filter = Control.MOUSE_FILTER_IGNORE   # display only (LOCK-02 工具徽标只显示)

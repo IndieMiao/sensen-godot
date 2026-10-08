@@ -33,9 +33,9 @@ func test_back_closes_one_layer_at_a_time() -> void:
 	ui.set_view(_view())
 	assert_bool(ui.close_top_layer()).is_false()   # nothing open: the world may leave
 	ui.open_radial()
-	assert_bool(ui._radial.visible).is_true()
+	assert_bool(ui._radial.is_open()).is_true()
 	assert_bool(ui.close_top_layer()).is_true()
-	assert_bool(ui._radial.visible).is_false()
+	assert_bool(ui._radial.is_open()).is_false()   # shrinking back (120 ms): Back already counts it closed
 	ui.open_inbox()
 	assert_bool(ui.has_modal()).is_true()
 	assert_bool(ui.close_top_layer()).is_true()   # the Inbox, not the farm
@@ -116,4 +116,23 @@ func test_end_stick_before_the_pad_exists_is_harmless() -> void:
 	u.joystick.connect(func(v): sticks.append(v))
 	u.end_stick()
 	assert_array(sticks).is_equal([Vector2.ZERO])
+
+func test_back_leaves_for_the_map_itself_only_without_a_map_under_it() -> void:
+	assert_bool(P0Runtime.leaves_itself(0, false)).is_true()   # the farm booted as the root scene
+	assert_bool(P0Runtime.leaves_itself(1, true)).is_false()   # a pond or farm pushed on the map: AppRouter pops it
+	assert_bool(P0Runtime.leaves_itself(1, false)).is_true()   # dev entry pond:<id> on the empty p0_boot (刘邦 on #40)
+	assert_bool(P0Runtime.leaves_itself(2, false)).is_false()  # the farmhouse over the farm: its own door goes back
+
+func test_back_cancels_a_slot_lifted_but_not_moved() -> void:
+	# 刘邦 on #38: a long press floats the slot; Back before the finger moves cancels it first.
+	var ui := _ui()
+	await await_idle_frame()
+	ui.set_mode("farm")
+	ui.set_surface("farm")
+	ui.set_view(_view())
+	ui._bar._lifted = 0
+	assert_bool(ui._bar.is_lifted()).is_true()
+	assert_bool(ui.close_top_layer()).is_true()
+	assert_bool(ui._bar.is_lifted()).is_false()
+	assert_bool(ui.close_top_layer()).is_false()
 

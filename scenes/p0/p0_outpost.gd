@@ -197,6 +197,22 @@ func _open_resident(id: String, resident_name: String) -> void:
 	if rt == null: return
 	if not (rt.ui.has_method("open_resident") and rt.ui.call("open_resident", id)): rt.ui.toast(resident_name)
 
+## The resident within reach: a finger card's distance (CARD_NEAR_M), the nearest of several; "" when none.
+## The bag's dish card offers `Gift to <Name>` for them (SGODOT-225, 不知火舞 / 李白 on 225).
+func p0_near_resident() -> String:
+	var best := ""
+	var best_d := CARD_NEAR_M
+	var residents: Dictionary = P0Logic.content().get("residents", {})
+	for n in npcs:
+		if not residents.has(str(npcs[n].id)): continue   # the keeper stands here too, but takes no gifts
+		var a := anchor(n)
+		if a == null: continue
+		var d := _flat_distance(actor.position, a.global_position)
+		if d < best_d:
+			best_d = d
+			best = str(npcs[n].id)
+	return best
+
 func _open_entry(method: String, args: Array, fallback: String) -> void:
 	if rt == null: return
 	if rt.ui.has_method(method): rt.ui.callv(method, args)
