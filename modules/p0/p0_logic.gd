@@ -250,12 +250,15 @@ static func energy_card(view: Dictionary, need: int, verb: String, at_home := tr
 	var rest_left := int(rest.get("limit", 1)) - int(rest.get("used", 0))
 	var subtitle := "Recover or do something free" if have <= 0 else "%s needs %d Energy · you have %d" % [verb, need, have]
 	var cook := {"icon": "pot", "label": "Cook", "fact": "%d fish in creel" % fish if fish > 0 else "No fish to cook", "guide": "Show kitchen", "go": "stove", "on": fish > 0}
-	# TODO(SGODOT-224, bench): LOCK-09 guides Rest with "Show bench"; P0 has no bench, rest is at the farmhouse (197 60c82ad2).
-	var rest_tile := {"icon": "rest", "label": "Rest", "fact": "Available", "guide": "Show home", "go": "home", "on": true}
+	# LOCK-09: Rest guides to the bench by the farmhouse (SGODOT-224 3fb574b0, q(30)). Near full it says the real
+	# gain, like the bench card (rest_state.button `Rest · +25 Energy`).
+	var rest_tile := {"icon": "rest", "label": "Rest", "fact": "Available", "guide": "Show bench", "go": "bench", "on": true}
+	var rs := rest_state(view)
+	if str(rs.button).begins_with("Rest · "): rest_tile.fact = str(rs.button).trim_prefix("Rest · ")
 	if rest_left <= 0:
 		rest_tile.fact = "Rested today"   # the reset time is on the bench card (李白, 225)
 		rest_tile.on = false
-	elif rest.has("away_ready_in"):   # q(41): Rest opens after 2 h away from the farm (SGODOT-228 / PR #16)
+	elif rest.has("away_ready_in"):   # q(41): Rest opens after 2 h away from the farm (SGODOT-228)
 		var away = rest.get("away_ready_in")
 		if away == null:
 			rest_tile.fact = "After %dh away" % int(rest.get("away_h", 2))
@@ -263,6 +266,9 @@ static func energy_card(view: Dictionary, need: int, verb: String, at_home := tr
 		elif float(away) > 0.0:
 			rest_tile.fact = "Ready in %s" % duration(float(away))
 			rest_tile.on = false
+	if rest_tile.on and str(rs.get("state", "")) == "full":   # nothing to gain: no "+0 Energy" tile (亚瑟 on #37)
+		rest_tile.fact = "Energy full"
+		rest_tile.on = false
 	if not at_home:
 		for t in [cook, rest_tile]:
 			t.fact = "At home"
@@ -714,8 +720,17 @@ static func resident_bar(view: Dictionary, id: String) -> Dictionary:
 		"next": str(r.get("next_stage", "")) if r.get("next_stage", null) != null else "",
 		"line": line, "gift_reason": gift_reason,
 		"request_label": label, "request_reason": reason, "request_cmd": cmd,
-		"meal": meal == "given", "meal_note": note, "lesson": false,
+		"meal": meal == "given" and not gift_meal(view, id).is_empty(), "meal_note": note, "lesson": false,
 	}
+
+## Where today's gift meal from resident `id` is (§3.4.5): {at: "bag", item} for the stack they gave (it carries
+## `from`), {at: "inbox", item} for the parcel it became with the bag full; {} once it is eaten, passed on or gone.
+static func gift_meal(view: Dictionary, id: String) -> Dictionary:
+	for s in view.get("bag", {}).get("slots", []):
+		if str(s.get("from", "")) == id: return {"at": "bag", "item": str(s.get("id", ""))}
+	for p in view.get("inbox", {}).get("parcels", []):
+		if str(p.get("key", "")).begins_with("gift_meal:%s:" % id): return {"at": "inbox", "item": str(p.get("id", ""))}
+	return {}
 
 ## A resident's line after a gift (Mystery Dish only so far, q(33)); "" keeps the stage line.
 static func resident_reply(id: String, verdict: String) -> String:
@@ -740,6 +755,119 @@ static func _request_gap(req: Dictionary) -> String:
 			var what := (str(names[rarity - 1]) + " fish") if rarity > 0 and rarity <= names.size() else "fish"
 			return "Need %d more %s" % [left, what]
 	return "Need %d more" % left
+
+# ---------------------------------------------------------------- outpost keepers (SGODOT-224, LOCK-15 / 16)
+## Keeper greeting card copy (李白 SGODOT-228 b7d8b665 D, P0 version) from the server's facts in view.keepers[role]
+## (SGODOT-228: state codes and numbers, no names). Names and places are data (后裔's p0_outposts.json): the caller
+## passes them in ctx {keeper, place}; the tackle answer also takes ctx.nearest {name, site} (the closest pond).
+## Returns {line, greet, trade, question, answer} — line is "Pours the tea · Lotus Tea House" when ctx.place is given.
+const _KEEPER_COPY := {
+	"tea": {"does": "Pours the tea", "trade": "order tea", "question": "Any news in town?"},
+	"post": {"does": "Runs the post", "trade": "get a coffee", "question": "Who needs help today?"},
+	"tackle": {"does": "Minds the tackle", "trade": "see the rods", "question": "Where are they biting?"},
+	"market": {"does": "Keeps the stall", "trade": "open the stall", "question": "What's fresh today?"},
+}
+const _CUPS_OUT := "That's three cups today. Come back tomorrow."
+
+static func keeper_lines(view: Dictionary, role: String, ctx := {}) -> Dictionary:
+	var copy: Dictionary = _KEEPER_COPY.get(role, {})
+	var k: Dictionary = view.get("keepers", {}).get(role, {})
+	var greet := ""
+	var answer := ""
+	match role:
+		"tea":
+			match str(k.get("greet", "")):
+				"cups_out": greet = _CUPS_OUT
+				"full": greet = "You look rested. Tea's here when you need it."
+				_: greet = "Sit a minute. Hot tea, %d Energy back." % int(view.get("drinks", {}).get("energy", 30))
+			answer = "Quiet day."
+			if k.get("online", null) != null: answer += " %d %s around Shanghai right now." % [int(k.online), "person" if int(k.online) == 1 else "people"]
+		"post":
+			var pip := _resident_name(str(k.get("request_by", ""))) if k.get("request_by", null) != null else ""
+			match str(k.get("greet", "")):
+				"cups_out": greet = _CUPS_OUT
+				"request": greet = "Coffee's fresh. %s's been asking for a hand." % pip
+				_: greet = "Coffee's fresh. %d %s left today." % [int(k.get("cups_left", 0)), "cup" if int(k.get("cups_left", 0)) == 1 else "cups"]
+			if pip != "": answer = "%s has a request for you." % pip
+			elif int(k.get("board_open", 0)) > 0: answer = _board_count(int(k.board_open))
+			else: answer = "All quiet." + ("" if k.get("refill_in", null) == null else " The Market Board refills in %s." % duration(float(k.refill_in)))
+		"tackle":
+			if str(k.get("greet", "")) == "reed_rod":
+				var rod := _rod_offer(view, "rod_reed")
+				greet = "Reed Rod's in. %d coins, lands up to %s." % [int(rod.get("price", 80)), rarity_name(view, int(rod.get("reach", 3)))]
+			else:
+				greet = "Worms are %d coins. %d left today." % [int(_shop_price(view, "tackle", "bait_worm", 2)), int(k.get("worms_left", 0))]
+			var near: Dictionary = ctx.get("nearest", {})
+			if not near.is_empty():
+				var nxt = k.get("next_fish", {}).get(str(near.get("site", "pond")), null)
+				answer = "%s is closest. " % str(near.name)
+				answer += ("%s need Fishing Lv%d." % [item_name(view, str(nxt.id)), int(nxt.level)]) if nxt is Dictionary else "You can land everything there."
+		"market":
+			if str(k.get("greet", "")) == "row_hoe":
+				var hoe: Dictionary = content().get("tools", {}).get("row_hoe", {})
+				greet = "Row Hoe's %d coins. Farming Lv%d to use." % [int(_shop_price(view, "market", str(hoe.get("id", "tool_row_hoe")), int(hoe.get("price", 240)))), int(hoe.get("gate", 4))]
+			else:
+				greet = _board_count(int(k.get("board_open", 0)))
+			var titles: Array = k.get("board_templates", []).map(func(t): return str(content().get("requests", {}).get("templates", {}).get(str(t), {}).get("title", "")))
+			titles = titles.filter(func(t): return t != "")
+			if not titles.is_empty(): answer = "Fresh off the board: %s." % " and ".join(PackedStringArray(titles))
+			else: answer = "Board's empty." + ("" if k.get("refill_in", null) == null else " Next request in %s." % duration(float(k.refill_in)))
+	var place := str(ctx.get("place", ""))
+	return {
+		"line": ("%s · %s" % [str(copy.get("does", "")), place]) if place != "" else str(copy.get("does", "")),
+		"greet": greet, "trade": "Trade · " + str(copy.get("trade", "")),
+		"question": str(copy.get("question", "")), "answer": answer, "leave": "Just passing by",
+	}
+
+static func _board_count(n: int) -> String:
+	return "The Market Board has %d %s today." % [n, "request" if n == 1 else "requests"]
+
+static func _resident_name(id: String) -> String:
+	return str(content().get("residents", {}).get(id, {}).get("name", ""))
+
+static func _shop_price(view: Dictionary, role: String, id: String, fallback: int) -> int:
+	for o in view.get("shops", {}).get(role, {}).get("buy", []):
+		if str(o.get("id", "")) == id: return int(o.get("price", fallback))
+	return fallback
+
+static func _rod_offer(view: Dictionary, id: String) -> Dictionary:
+	for r in view.get("gear", {}).get("rods", []):
+		if str(r.get("id", "")) == id: return r.merged({"price": _shop_price(view, "tackle", id, int(r.get("price", 0)))})
+	return {}
+
+# ---------------------------------------------------------------- rest bench (FARM-7, q(30) / q(41), SGODOT-224)
+## The bench's state from view.rest {used, limit, resets_in, amount, away_h, away_ready_in} and Energy (FARM-7-2 482:52):
+## state "ready" / "away" (2 h away from home first, q(41)) / "used" / "full"; the badge (STATE-ICONS: Available,
+## Countdown with the time left, Used today); the near card copy; the sheet's lines and its one button.
+## Near-full Rest says the real gain (WP4-D10 ②: "Rest · +25 Energy"). away_ready_in null = never left home.
+static func rest_state(view: Dictionary) -> Dictionary:
+	var r: Dictionary = view.get("rest", {})
+	var e: Dictionary = view.get("energy", {})
+	var amount := int(r.get("amount", 60))
+	var gain := mini(amount, maxi(0, int(e.get("max", 200)) - int(e.get("value", 0))))
+	var used := int(r.get("used", 0)) >= int(r.get("limit", 1))
+	var away = r.get("away_ready_in", 0)
+	var out := {
+		"state": "ready", "badge": "available", "caption": "",
+		"card": "Rest · +%d Energy · once a day" % amount,
+		"sheet_state": "Available", "effect": "Restores up to %d Energy" % amount,
+		"fact": "Uses left", "fact_value": "%d today" % maxi(0, int(r.get("limit", 1)) - int(r.get("used", 0))),
+		"button": ("Rest · +%d Energy" % gain) if gain < amount else "Rest", "reason": "", "can_rest": true,
+		"close": "Not now", "note": "",
+	}
+	if used:
+		out.merge({"state": "used", "badge": "used_today", "sheet_state": "Used today", "effect": "",
+			"fact": "Uses", "fact_value": "%d/%d" % [int(r.get("used", 0)), int(r.get("limit", 1))], "button": "", "can_rest": false,
+			"close": "Close", "note": "Available again at the next home-day reset."}, true)
+	elif away == null or float(away) > 0.0:
+		var left := "" if away == null else duration(float(away))
+		out.merge({"state": "away", "badge": "countdown", "caption": left, "sheet_state": "Cooling down", "effect": "",
+			"fact": "Available in" if away != null else "Away from home", "fact_value": left if away != null else "%dh first" % int(r.get("away_h", 2)),
+			"reason": ("Back in " + left) if away != null else "After %dh away" % int(r.get("away_h", 2)), "can_rest": false,
+			"close": "Close"}, true)
+	elif gain <= 0:
+		out.merge({"state": "full", "reason": "Energy full", "can_rest": false}, true)
+	return out
 
 ## HOME-1 (Figma 482:152, §8.6.1, LOCK-10) from view.homestead facts: title, the look line, NEED-TILEs in order
 ## materials → coins → skills, what changes, and the button (the first gap is written on it). P0 stops at Lv3.

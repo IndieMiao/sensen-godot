@@ -12,16 +12,23 @@ const ROWS := 5
 const PLOT_ORIGIN := Vector2i(4, 3)   # plot 0 sits nearest the camera, on the left
 const BED_H := 0.15                   # soil bed thickness (plot.glb top), crops grow from here
 
-## Point anchors (cells). The house faces the field; the stall (seed box for now) stands on its right.
+## Point anchors (cells). The house faces the field; the stall (seed box for now) stands on its right and the
+## rest bench (FARM-7, q(30)) on its left, two cells wide, clear of the beds, the stall and the mine.
 const ANCHORS := {
 	"spawn": Vector2i(9, 1), "exit": Vector2i(9, 0),
 	"house": Vector2i(9, 16), "storage": Vector2i(14, 15),
-	"well": Vector2i(17, 8), "mine": Vector2i(2, 14),
+	"well": Vector2i(17, 8), "mine": Vector2i(2, 14), "bench": Vector2i(5, 16),
+	# SGODOT-231 / q(45): five gathering spots on the farm edge (no Old Tree in P0) and the workbench on the house's
+	# right past the stall (SGODOT-224's rest bench takes the left, Vector2i(5, 16)).
+	"spot_grove": Vector2i(17, 12), "spot_rock_pile": Vector2i(18, 4), "spot_reed_bank": Vector2i(2, 4),
+	"spot_clay_bank": Vector2i(2, 7), "spot_herb_patch": Vector2i(3, 17), "workbench": Vector2i(17, 16),
 }
 ## Solid footprints beyond the plots (inclusive rects: x, y, w, h).
 const FOOTPRINTS := {
 	"house": Rect2i(8, 15, 4, 3), "storage": Rect2i(14, 15, 1, 1),
-	"well": Rect2i(17, 8, 1, 1), "mine": Rect2i(1, 13, 2, 2),
+	"well": Rect2i(17, 8, 1, 1), "mine": Rect2i(1, 13, 2, 2), "bench": Rect2i(5, 16, 2, 1),
+	"spot_grove": Rect2i(17, 12, 1, 1), "spot_rock_pile": Rect2i(18, 4, 1, 1), "spot_reed_bank": Rect2i(2, 4, 1, 1),
+	"spot_clay_bank": Rect2i(2, 7, 1, 1), "spot_herb_patch": Rect2i(3, 17, 1, 1), "workbench": Rect2i(16, 16, 3, 1),
 }
 ## Scenery trees stand outside the walkable yard, so they are not footprints.
 const WALK_RECT := Rect2i(1, 0, 19, 20)
@@ -145,8 +152,8 @@ static func plaque_point(bp: FarmBlueprint) -> Vector3:
 
 ## LOCK-07 (亚瑟 / 不知火舞 / 周瑜 on SGODOT-231): one finger card on the farm at a time — the nearest facility within
 ## its reach; the card showing keeps it unless another is CARD_KEEP nearer, so standing between two never flickers.
-## cands = [[id, position, reach m], ...]; an exact tie goes to the earlier entry. Same rule as SGODOT-231's
-## P0FarmMaterials.pick_card; whichever lands second keeps one copy.
+## cands = [[id, position, reach m], ...]; an exact tie goes to the earlier entry. Distance on the ground (a bed or a
+## slope never pushes a facility out of reach). The one copy: SGODOT-231 folded its own P0FarmMaterials.pick_card in.
 const CARD_KEEP := 0.2
 
 static func pick_card(cands: Array, at: Vector3, current: String) -> String:

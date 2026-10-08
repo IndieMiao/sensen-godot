@@ -22,6 +22,8 @@ const DOOR_ARM_M := 1.5
 
 const STYLE := "cottage"          # the orange-roof cottage of the polished farm
 const PLACE := "Shanghai · Homestead"
+const BENCH_TAP_PX := 44.0   # a 44 px touch target around the bench seat (engineering default)
+const BENCH_NEAR_M := 2.6    # the bench's finger card shows within this distance (stall 3.2, house 4.2)
 const LABOUR_CLIP := {"till": "till", "sow": "sow", "water": "water", "harvest": "harvest"}
 
 @onready var cam: Camera3D = $Camera3D
@@ -39,6 +41,9 @@ var _hi: MeshInstance3D
 var _house := Vector3.ZERO
 var _stall := Vector3.ZERO   # the Homestead Stall (unattended, p(6)); the seed box stands in until its model
 var _mine := Vector3.ZERO
+var _bench := Vector3.ZERO   # the rest bench by the farmhouse (FARM-7, q(30)): Basic Room's bench.glb
+var _materials: P0FarmMaterials   # SGODOT-231: mine mouth, gathering spots and the workbench
+var _card := ""   # LOCK-07: the one facility whose finger card shows this frame (P0Garden.pick_card)
 var _focus := Vector3.ZERO
 var _cam_follow := P0Follow.new()
 var _zoom := 1.0
@@ -56,7 +61,6 @@ var _fence: Node3D   # p0_fence.gd: front stretch always, the ring from Homestea
 var _sign := Vector3.ZERO   # Homestead sign right of the farmhouse door (WorldBadges · Farm 1135:79267): HOME-1
 var _plaque := Vector3.ZERO   # Upgrade Plaque left of the door (1510:97492), shown from the first upgrade: PLAQUE-READ
 var _plaque_node: Node3D
-var _card := ""   # LOCK-07: the one facility whose finger card shows this frame (P0Garden.pick_card)
 var _door := Vector3.ZERO     # the walkway cell in front of the farmhouse door
 var _door_armed := false
 var _inside := false          # the farmhouse is open above this farm
@@ -105,7 +109,8 @@ func resume() -> void:
 	cam.make_current()
 	if rt:
 		rt.attach(self)
-		rt.ui.set_place(PLACE)   # back from the farmhouse
+		rt.ui.set_mode("farm")   # back from the mine (SGODOT-231): seeds on the bar, the farm's chip
+		rt.ui.set_place(PLACE)   # back from the farmhouse or the mine
 	if _inside:
 		# Out through the farmhouse door: stand on the doorstep facing the field.
 		_inside = false
@@ -137,11 +142,16 @@ func _build_world() -> void:
 	props.add_child(FarmProps.build("house", _house, 1.0, STYLE))
 	props.add_child(FarmProps.build("storage", bp.cell_to_world(bp.anchor("storage")), 1.0, STYLE))
 	props.add_child(FarmProps.build("well", bp.cell_to_world(bp.anchor("well")), 1.0, STYLE))
+	# The bench is two cells wide: its centre sits half a cell right of its anchor cell, facing the field (+z).
+	_bench = bp.cell_to_world(bp.anchor("bench")) + Vector3(bp.cell_m * 0.5, 0, 0)
+	props.add_child(_bench_prop(_bench))
 	_mine = bp.cell_to_world(bp.anchor("mine")) + Vector3(-0.3, 0, 0.3)
 	var mine := MineArt.entrance()
 	mine.position = _mine
 	mine.rotation.y = PI * 0.15
 	props.add_child(mine)
+	_materials = P0FarmMaterials.new().setup(self, _mine)
+	add_child(_materials)
 	var scenery := GardenScenery.new()
 	add_child(scenery)
 	scenery.build(bp, STYLE)
@@ -267,7 +277,7 @@ func p0_recenter() -> void:
 	_cam_follow.held = false
 
 func p0_show_spot(where: String) -> void:
-	var at := _house if where in ["stove", "bench", "home"] else actor.position
+	var at := _bench if where == "bench" else (_house if where in ["stove", "home"] else actor.position)
 	if where == "stall": at = _stall
 	elif where == "plots": at = _plots_center()
 	_focus = at
@@ -300,10 +310,12 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 	_sync_plots(v, dt)
 	_fence.sync(v)
 	_pick_front(v)
-	rt.ui.set_action(P0Logic.main_action(v, _front, rt.ui.selected_seed, _row))
+	rt.ui.set_action(_materials.action(v) if _materials.near_mouth() else P0Logic.main_action(v, _front, rt.ui.selected_seed, _row))
 	_card = P0Garden.pick_card(_card_candidates(), actor.position, _card)
+	_materials.frame(v, _card)
 	_hold_repeat()
 	_tags(v)
+	_bench_marker(v)
 	_teaching(v)
 
 func _sync_plots(v: Dictionary, dt: float) -> void:
@@ -358,6 +370,7 @@ func _pick_front(v: Dictionary) -> void:
 
 # ---------------------------------------------------------------- actions
 func p0_action(cmd: Dictionary) -> void:
+	if _materials.act(cmd): return
 	var type := str(cmd.get("type", ""))
 	var target := int(cmd.get("plot", (cmd.get("plots", [-1]) as Array)[0] if cmd.has("plots") else -1))
 	if LABOUR_CLIP.has(type) and target >= 0:
@@ -409,14 +422,17 @@ func p0_tap(screen: Vector2) -> void:
 	elif _plaque_node.visible and cam.unproject_position(_plaque + Vector3(0, 0.35, 0)).distance_to(screen) < 34:
 		actor.face(_plaque)
 		HomePanel.plaque(rt.ui)
+	# The bench stands beside the house: before the stall and the house, so the house's wider radius doesn't take it.
+	elif cam.unproject_position(_bench + Vector3(0, 0.35, 0)).distance_to(screen) < BENCH_TAP_PX:
+		actor.face(_bench)
+		rt.ui.open_rest_card()
 	elif cam.unproject_position(_stall + Vector3(0, 0.4, 0)).distance_to(screen) < 56:
 		actor.face(_stall)
 		rt.ui.open_stall()
 	elif cam.unproject_position(_house + Vector3(0, 1.0, 0.6)).distance_to(screen) < 80:
 		actor.face(_door)
 		enter_farmhouse()
-	elif cam.unproject_position(_mine + Vector3(0, 0.8, 0)).distance_to(screen) < 60:
-		rt.ui.toast("The mine opens soon")
+	elif _materials.tap(screen): pass   # SGODOT-231: mine mouth sheet, gathering spots, workbench (last: smallest targets)
 
 ## A finger card's tap goes to its own facility by id, never through the point test: the point of one facility can
 ## sit under another's mark (the farmhouse card's point under the sign's caption, PR #21 review).
@@ -434,8 +450,11 @@ func _tap_card(id: String) -> bool:
 		"home":
 			actor.face(_door)
 			enter_farmhouse()
+		"bench":
+			actor.face(_bench)
+			rt.ui.open_rest_card()
 		_:
-			return false
+			return _materials.tap_card(id)   # SGODOT-231: spot_* and workbench cards
 	return true
 
 ## The sign or its mark (tapping a mark or its card = tapping the object); small, so the door beside it stays the house.
@@ -486,11 +505,37 @@ func _tags(v: Dictionary) -> void:
 		rt.ui.slide_card_off(_card, rt.ui.badge_rect("homestead"))   # and the card never covers the mark itself
 
 ## Every facility with a finger card on the farm, [id, position, reach m] in a fixed order (LOCK-07: one card, the
-## nearest in reach). SGODOT-231's gathering spots and workbench, and 2A's rest bench, join this list when they land.
+## nearest in reach): the rest bench, and SGODOT-231's five gathering spots and the workbench.
 func _card_candidates() -> Array:
-	var out: Array = [["stall", _stall, 3.2], ["home", _house, 4.2], ["sign", _sign, SIGN_NEAR]]
+	var out: Array = [["stall", _stall, 3.2], ["home", _house, 4.2], ["sign", _sign, SIGN_NEAR], ["bench", _bench, BENCH_NEAR_M]]
 	if _plaque_node.visible: out.append(["plaque", _plaque, SIGN_NEAR])
+	out.append_array(_materials.card_candidates())   # SGODOT-231: the five gathering spots and the workbench
 	return out
+
+## The bench always shows its state (STATE-ICONS: Available / Countdown with the time left / Used today) and, when the
+## bench is the nearest facility in reach, its finger card (FARM-7) above the badge; a tap on it is the bench's (_tap_card).
+func _bench_marker(v: Dictionary) -> void:
+	var st := P0Logic.rest_state(v)
+	var top := cam.unproject_position(_bench + Vector3(0, 0.95, 0))
+	var state: UiStatusBadge.State = {"available": UiStatusBadge.State.AVAILABLE, "countdown": UiStatusBadge.State.COUNTDOWN,
+		"used_today": UiStatusBadge.State.USED_TODAY}.get(str(st.badge), UiStatusBadge.State.AVAILABLE)
+	rt.ui.badge("bench", state, top, true, str(st.caption), P0Logic.icon("rest"))
+	rt.ui.tag("bench", str(st.card), top - Vector2(0, rt.ui.badge_height("bench")),
+		_card == "bench", cam.unproject_position(_bench + Vector3(0, 0.35, 0)))   # one card, the nearest (LOCK-07)
+
+## Basic Room's bench (648 tris; q(30)) with the room's shared atlas material.
+func _bench_prop(at: Vector3) -> Node3D:
+	var root := Node3D.new()
+	root.name = "Bench"
+	root.position = at
+	var model := (load("res://assets/rooms/basic_room/bench.glb") as PackedScene).instantiate() as Node3D
+	var mat := StandardMaterial3D.new()
+	mat.albedo_texture = load("res://assets/rooms/basic_room/room_albedo_ao.png")
+	mat.roughness = 0.8
+	mat.metallic_specular = 0.28
+	for m in model.find_children("*", "MeshInstance3D", true, false): (m as MeshInstance3D).material_override = mat
+	root.add_child(model)
+	return root
 
 func _teaching(v: Dictionary) -> void:
 	if rt.ui.has_modal(): return

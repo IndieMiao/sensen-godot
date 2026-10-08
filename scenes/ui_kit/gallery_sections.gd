@@ -44,10 +44,26 @@ static func all() -> Array[Dictionary]:
 		# SGODOT-222 world display
 		{id = "need_tile", title = "UiNeedTile", figma = "NeedTile 1090:78003 · LOCK-10", build = _need_tiles},
 		{id = "need_source", title = "UiNeedSource", figma = "NeedSource 1092:77266 · LOCK-10 / 08", build = _need_sources},
+		{id = "show_pill", title = "UiShowPill", figma = "Show pill of TodayRow 1145:81714 / NeedSource 1092:77266 · LOCK-08", build = _show_pills},
 		{id = "hud", title = "UiHud", figma = "HUD 1143:103373 · LOCK-06 (shown at 328/360)", build = _huds},
 		{id = "today_panel", title = "UiTodayPanel", figma = "TodayPanel 1145:81715 · TodayRow 1145:81714 · LOCK-06 (328/360)", build = _today_panels},
 		{id = "energy_card", title = "UiEnergyCard · card", figma = "Energy 1094:77504 Kind=Card · EnergyTile 1093:77292 · LOCK-09", build = _energy_cards},
 		{id = "energy_panel", title = "UiEnergyCard · panel", figma = "Energy 1094:77504 Kind=Panel · LOCK-09", build = _energy_panels},
+		# SGODOT-225 shared panel parts
+		{id = "drawer", title = "UiDrawer", figma = "Sheet 483:190 · bag drawer of BAG-2-2 · LOCK-12 / 15 (328/360)", build = _drawers},
+		{id = "inventory_grid", title = "UiInventoryGrid", figma = "Bag layout five-column grid · LOCK-12 / 15", build = _inventory_grids},
+		{id = "dialogue_card", title = "UiDialogueCard", figma = "Head of KeeperGreeting 1205:83238 / ResidentDialogue 1213:83392 (336 at 328)", build = _dialogue_cards},
+		{id = "bag_header", title = "UiBagHeader", figma = "BagHeader 1225:83885 · LOCK-12 / 13", build = _bag_headers},
+		{id = "gear_row", title = "UiGearRow", figma = "Gear candidate rows of BAG-2 · Gear · LOCK-13", build = _gear_rows},
+		{id = "profile_parts", title = "Profile parts", figma = "ProfileTopBar 1233:107734 · ProfileMoreMenu 1233:107735 · SkillRing 1251:109246 · LOCK-22 (336 at 328)", build = _profile_parts},
+		{id = "request_card", title = "UiRequestCard", figma = "ResidentRequestCard 1211:83296 · LOCK-18 (336 at 328)", build = _request_cards},
+		{id = "resident_bar", title = "UiResidentBar", figma = "ResidentDialogue 1213:83392 Row / Stacked · LOCK-18 (336 at 328)", build = _resident_bars},
+		{id = "resident_profile", title = "UiResidentProfile", figma = "RES-PIP 482:586 / RES-KAI 482:592 · sheet content (328/360)", build = _resident_profiles},
+		{id = "notice_row", title = "UiNoticeRow", figma = "Bag capacity recovery of BAG-5 482:144 (336 at 328)", build = _notice_rows},
+		{id = "float_text", title = "UiFloatText", figma = "FloatText 1178:82191 · six tones, Hug / Wrap (static pills)", build = _float_texts},
+		# SGODOT-224 panels
+		{id = "info_sheet", title = "UiInfoSheet", figma = "Compact/SelectedItem 633:41257 · BAG-1 482:10 · F-07 (SGODOT-207 168a4cc3)", build = _info_sheets},
+		{id = "shop_row", title = "UiShopRow · UiStepper", figma = "Compact/ShopProduct 702:80447 · Compact/Stepper 1245:108953 · FARM-6 482:46 · C1-01", build = _shop_rows},
 	]
 	return out
 
@@ -310,6 +326,7 @@ static func _cells_gear() -> Control:
 	var S := UiItemCell.State
 	row.add_child(_captioned(_cell(D, {role = "Fishing", icon = _tex("rod_starter"), title = "Starter Rod"}), "default"))
 	row.add_child(_captioned(_cell(D, {role = "Farming", icon = _tex("hoe_starter"), title = "Starter Hoe", state = S.SELECTED}), "selected"))
+	row.add_child(_captioned(_cell(D, {role = "Mining", icon = _tex("pick_starter"), title = "Starter Pickaxe"}), "two-line name"))
 	row.add_child(_captioned(_cell(D, {role = "Ring", state = S.EMPTY}), "empty"))
 	return row
 
@@ -493,6 +510,265 @@ static func _energy_panels() -> Control:
 	holder.add_theme_constant_override(&"margin_top", int(UiTokens.SPACE_ROW))
 	holder.add_child(p)
 	v.add_child(holder)
+	return v
+
+# ---------------------------------------------------------------- SGODOT-225 shared panel parts
+
+static func _bag_items() -> Array:
+	var out := []
+	for e in [["seed_radish", 24, 0], ["seed_carrot", 10, 0], ["fish_crucian", 3, 1], ["fish_perch", 1, 2],
+			["dish_grilled_fish", 2, 2], ["crop_radish", 12, 0], ["wood", 20, 0], ["stone", 64, 0], ["bait_worm", 7, 0]]:
+		out.append({id = e[0], icon = _tex(e[0]), qty = e[1], rarity = e[2], kind = String(e[0]).get_slice("_", 0)})
+	return out
+
+static func _sample_grid(sell := false) -> UiInventoryGrid:
+	var g := UiInventoryGrid.new()
+	g.custom_minimum_size.y = UiTokens.SIZE_INVENTORY_CELL * 2.0 + UiTokens.SPACE_WITHIN
+	g.capacity = 25
+	g.items = _bag_items()
+	if sell:
+		g.can_sell = func(it: Dictionary) -> bool: return it.kind in ["crop", "fish"]
+		g.sell_mode = true
+	g.select("fish_crucian")
+	return g
+
+static func _drawers() -> Control:
+	var screen := Control.new()
+	screen.size = Vector2(360, 546)
+	var scene := ColorRect.new()   # the world behind, under the drawer scrim (color/scrimDrawer)
+	scene.color = UiKit.alpha(UiTokens.COLOR_SCRIM, UiTokens.OPACITY_SCRIM_DRAWER)
+	scene.size = screen.size
+	screen.add_child(scene)
+	var d := UiDrawer.new(546.0)   # BAG-2-2: the Bag drawer is 546 of 800
+	d.animate = false
+	d.safe_bottom = UiTokens.SPACE_ROW
+	screen.add_child(d)
+	# BAG-2-2 rows: the quick bar (the P0 UI puts PR #12's UiQuickBar there; its last cell turns into Close), the
+	# BagHeader (Bag | Gear, Sort · Type, capacity bar), the Tabs and the grid.
+	var quick := HBoxContainer.new()
+	quick.add_theme_constant_override(&"separation", int(UiTokens.SPACE_QUICK_BAR_GAP))
+	for f in [{icon = _tex("seed_radish"), title = "Radish Seeds", quantity = "×24", state = UiItemCell.State.SELECTED},
+			{icon = _tex("seed_carrot"), title = "Carrot Seeds", quantity = "×10"}, {icon = _tex("compost"), title = "Compost", quantity = "×6"},
+			{icon = _tex("seed_radish"), title = "Orchard Feed", quantity = "×2"}, {state = UiItemCell.State.EMPTY}]:
+		quick.add_child(_cell(UiItemCell.Density.QUICK, f))
+	quick.add_child(_QuickEndClose.new())   # stand-in for Compact/QuickEnd · Close (PR #12's UiQuickBar draws the real one)
+	d.body.add_child(quick)
+	var gap := Control.new()
+	gap.custom_minimum_size.y = UiTokens.SPACE_OVERLAY_BODY
+	d.body.add_child(gap)
+	var header := UiBagHeader.new(9, 25)
+	header.sort_label = "Type"
+	d.body.add_child(header)
+	d.body.add_child(UiFilterChip.row(PackedStringArray(["All", "Seeds", "Fish", "Produce", "Dishes"]), 0))
+	var grid := _sample_grid()
+	grid.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	d.body.add_child(grid)
+	return _phone(screen, 546.0)
+
+static func _inventory_grids() -> Control:
+	var v := _column(UiTokens.SPACE_SECTION)
+	v.add_child(_captioned(_sample_grid(), "bag · Crucian selected · dashed empties to capacity 25"))
+	v.add_child(_captioned(_sample_grid(true), "sell_mode · this counter takes crops and fish only"))
+	return v
+
+## Compact/QuickEnd · Close (52 × 68, the Bag end cell's shape: cross above, label below) for the drawer sample;
+## the game draws PR #12's UiQuickBar end cell.
+class _QuickEndClose extends PanelContainer:
+	func _init() -> void:
+		custom_minimum_size = Vector2(52, 68)   # Compact/QuickEnd main
+		add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_SURFACE_RAISED, UiTokens.RADIUS_CELL,
+			UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT))
+		var v := VBoxContainer.new()
+		v.alignment = BoxContainer.ALIGNMENT_CENTER
+		v.add_theme_constant_override(&"separation", int(UiTokens.SPACE_QUICK_BAR_GAP))
+		add_child(v)
+		var x := UiKit.icon(preload("res://assets/ui/kit_icons/close.svg"), UiTokens.SIZE_CLOSE_ICON)
+		x.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		x.self_modulate = UiTokens.COLOR_TEXT
+		v.add_child(x)
+		var l := UiKit.label("Close", UiTokens.STYLE_C10_B)
+		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		v.add_child(l)
+
+## Bottom cards are 336 wide on the 360 screen (12 at each side); laid out at 336 and drawn at 328/336.
+class _At336 extends Container:
+	const W := 336.0
+
+	func _k() -> float: return (360.0 - UiTokens.SPACE_PAGE * 2.0) / W
+
+	func _get_minimum_size() -> Vector2:
+		if get_child_count() == 0: return Vector2.ZERO
+		return Vector2(W, (get_child(0) as Control).get_combined_minimum_size().y) * _k()
+
+	func _notification(what: int) -> void:
+		if what == NOTIFICATION_SORT_CHILDREN and get_child_count() > 0:
+			var c := get_child(0) as Control
+			fit_child_in_rect(c, Rect2(Vector2.ZERO, Vector2(W, c.get_combined_minimum_size().y)))
+			c.scale = Vector2(_k(), _k())
+
+static func _at_336(c: Control) -> Control:
+	var box := _At336.new()
+	box.add_child(c)
+	return box
+
+static func _dialogue_cards() -> Control:
+	# The KeeperGreeting main's own sample (Mei); the greeting itself, with its Trade sub-copy, is 2A.
+	var c := UiDialogueCard.new(load("res://assets/ui/kit_images/keeper_mei.jpg"), "Market Keeper · Mei", "",
+		"Morning! Row Hoes just came in — sows three plots at once, Farming Lv4. Anything I can get you?")
+	c.portrait_size = UiDialogueCard.KEEPER_PORTRAIT
+	c.place = "Keeps the stall · Xuhui Market Square"
+	c.content.add_child(UiCommandButton.new("Trade · open the stall"))
+	c.content.add_child(UiCommandButton.new("What's fresh today?", UiCommandButton.Kind.SECONDARY))
+	c.content.add_child(UiDismissButton.new("Just passing by"))
+	return _captioned(_at_336(c), "keeper layout: Role · Name, place line, no profile link")
+
+static func _resident_bars() -> Control:
+	var v := _column(UiTokens.SPACE_SECTION)
+	var pip := {portrait = load("res://assets/p0/art/pip-portrait.jpg"), name = "Pip", role = "Courier Kid", stage = "Acquainted",
+		have = 28, need = 45, next = "Familiar", line = "Could you catch me a fish? Any kind is fine.", meal = true, lesson = true}
+	v.add_child(_captioned(_at_336(UiResidentBar.new(pip)), "Choices=Row · Today’s meal and Recipe lesson available"))
+	var busy := pip.duplicate()
+	busy.merge({gift_reason = "Gift already given today", meal = false, lesson = false}, true)
+	v.add_child(_captioned(_at_336(UiResidentBar.new(busy)), "Choices=Stacked · Gift unavailable with its reason (NPC-5 layout)"))
+	return v
+
+static func _bag_headers() -> Control:
+	var v := _column(UiTokens.SPACE_SECTION)
+	v.add_child(_captioned(UiBagHeader.new(19, 25), "Bag side · Sort · Type · capacity bar"))
+	v.add_child(_captioned(UiBagHeader.new(23, 25), "92 % full · amber bar"))
+	v.add_child(_captioned(UiBagHeader.new(19, 25, UiBagHeader.Pane.GEAR), "Gear side · no Sort, no bar"))
+	var gift := UiBagHeader.new(19, 25)
+	gift.show_tabs = false
+	v.add_child(_captioned(gift, "gift drawer · count only"))
+	return v
+
+static func _gear_rows() -> Control:
+	var v := _column(0)
+	var rod := _tex("rod_starter")
+	v.add_child(UiGearRow.equipped_badge())
+	v.add_child(UiGearRow.new({icon = rod, title = "Starter Rod", state = &"equipped", effect = "Lands up to Fine fish · Bite window 2.2 s"}))
+	v.add_child(UiGearRow.new({icon = _tex("rod_reed"), title = "Reed Rod", state = &"owned", effect = "Lands up to Rare fish · Bite window 2.6 s",
+		action = {id = &"equip", label = "Equip", kind = &"primary"}}))
+	# A locked candidate: P0 lists no Carbon Rod (no source); from P1 it reads like this (李白 q(46)).
+	v.add_child(UiGearRow.new({icon = _tex("rod"), title = "Carbon Rod", state = &"Fishing Lv6 · 350 coins at the Tackle Shop", effect = "Lands up to Legendary fish"}))
+	var note := UiKit.label("locked · P1 only (BAG-2 lists Starter and Reed in P0)", UiTokens.STYLE_C9_B, UiTokens.COLOR_SECONDARY)
+	note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	v.add_child(note)
+	return v
+
+static func _profile_parts() -> Control:
+	var v := _column(UiTokens.SPACE_SECTION)
+	v.add_child(_captioned(_at_336(UiProfileTopBar.new(UiProfileTopBar.Kind.SELF, "Profile")), "Kind=Self · back, Profile, gear (hidden in P0)"))
+	v.add_child(_captioned(_at_336(UiProfileTopBar.new(UiProfileTopBar.Kind.OTHER, "Ann")), "Kind=Other · ··· opens the more menu"))
+	var menus := _row(UiTokens.SPACE_ROW)
+	menus.add_child(_captioned(UiProfileMoreMenu.new(&"close_friend"), "close friend (P2)"))
+	menus.add_child(_captioned(UiProfileMoreMenu.new(&"blocked"), "blocked (P2)"))
+	v.add_child(menus)
+	var skills := HBoxContainer.new()
+	skills.add_theme_constant_override(&"separation", 8)
+	skills.add_child(UiSkillCard.new("Farming", 1, 0.6, _tex("hoe")))
+	skills.add_child(UiSkillCard.new("Fishing", 2, 0.2, _tex("rod")))
+	skills.add_child(UiSkillCard.new("Cooking", 2, 0.1, _tex("pot")))
+	v.add_child(_captioned(_at_336(skills), "SkillRing · ring floored to 10 %"))
+	var farm := UiFarmCard.new("Farmer's Homestead", "Level 1", "Radishes ready 3h 32m", load("res://assets/p0/art/homestead-thumb.jpg"))
+	v.add_child(_captioned(_at_336(farm), "farm overview"))
+	return v
+
+static func _request_cards() -> Control:
+	var d := {portrait = load("res://assets/p0/art/pip-portrait.jpg"), title = "Pip's request", who = "Pip · Courier Kid · personal request",
+		line = "Could you catch me a fish? Any kind is fine.", needs = [{name = "Common fish", have = 0, need = 1, icon = _tex("fish_crucian")}],
+		reward = "+5 Friendship · 20 coins", deliver_to = "Pip · Travel Post"}
+	return _captioned(_at_336(UiRequestCard.new(d)), "open · Accept")
+static func _show_pills() -> Control:
+	var row := _row(UiTokens.SPACE_SECTION)
+	row.add_child(_captioned(UiShowPill.new("Show", UiShowPill.Kind.TODAY), "TODAY · 28 high"))
+	row.add_child(_captioned(UiShowPill.new("Show on map", UiShowPill.Kind.TODAY), "TODAY · elsewhere"))
+	row.add_child(_captioned(UiShowPill.new("Show ›", UiShowPill.Kind.SOURCE), "SOURCE · 31 high"))
+	var note := UiKit.label("Drawn at the main's size; touches reach 44 × 44 around it (_has_point).", UiTokens.STYLE_C9_B, UiTokens.COLOR_SECONDARY)
+	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var v := _column(UiTokens.SPACE_WITHIN)
+	v.add_child(row)
+	v.add_child(note)
+	return v
+
+static func _resident_profiles() -> Control:
+	var d := {face = load("res://assets/p0/art/residents/res_pip.svg"), name = "Pip", role = "Courier Kid", stage = "Familiar",
+		friendship = "52/90", likes = "Dessert", likes_icon = _tex("dish_carrot_cake")}
+	var page := UiResidentProfile.new(d)
+	page.custom_minimum_size = Vector2(296, 411)   # Profile content + fixed decision area of the 443 sheet
+	var sheet := PanelContainer.new()
+	var box := UiStyleBox.make(UiTokens.COLOR_SURFACE, 0.0)
+	box.corner_radius = Vector4(UiTokens.RADIUS_SHEET, UiTokens.RADIUS_SHEET, 0.0, 0.0)
+	sheet.add_theme_stylebox_override(&"panel", box.with_margins(UiTokens.SPACE_PAGE, UiTokens.SPACE_PAGE, UiTokens.SPACE_PAGE, UiTokens.SPACE_PAGE))
+	sheet.add_child(page)
+	return _captioned(sheet, "Details hidden in P0 (no page behind it) · Back returns to the bar")
+
+static func _notice_rows() -> Control:
+	return _captioned(_at_336(UiNoticeRow.new("Bag full · +5 slots at Homestead Lv3")), "Bag full · navigation only (LOCK-08)")
+
+static func _float_texts() -> Control:
+	var v := _column(UiTokens.SPACE_ROW)
+	var tones := [["+5 XP", UiFloatText.Tone.XP, null], ["+25 Energy", UiFloatText.Tone.ENERGY_GAIN, null],
+		["−2 Energy", UiFloatText.Tone.ENERGY_COST, null], ["+12 coins", UiFloatText.Tone.COINS, null],
+		["+2 · first chat today", UiFloatText.Tone.AFFINITY, null], ["+6 Timber", UiFloatText.Tone.ITEM, _tex("wood")]]
+	for t in tones:
+		var row := HBoxContainer.new()   # hugs the pill
+		row.add_child(UiFloatText.pill(t[0], t[1], t[2]))
+		v.add_child(row)
+	var scene := PanelContainer.new()   # a scene-dark ground so the 82 % cream backing shows
+	scene.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_BORDER, UiTokens.RADIUS_CARD)
+		.with_margins(UiTokens.SPACE_ROW, UiTokens.SPACE_ROW, UiTokens.SPACE_ROW, UiTokens.SPACE_ROW))
+	scene.add_child(v)
+	return _captioned(scene, "static look (×1.0) · play() pops, rises 48 and fades over 1100 ms")
+
+## Specs as P0ItemInfo returns them for the F-07 states the card has to draw.
+static func _info_sheets() -> Control:
+	var v := _column(UiTokens.SPACE_SECTION)
+	var specs := [
+		["bag · dish", {title = "Grilled Crucian", icon = _tex("dish_grilled_crucian"), quantity = 3, info = true, rarity_text = "Common", quality = 1,
+			facts = ["+20 Energy"], buttons = [{id = &"gift", label = "Gift ›", kind = &"nav"}, {id = &"eat", label = "Eat · +20 Energy", kind = &"primary"}],
+			lock = {shown = true, locked = false}}],
+		["counter sell · quota short", {title = "Radish", icon = _tex("crop_radish"), quantity = 12, info = true, rarity_text = "Common",
+			facts = ["12 · Harvested at home", "4 each"], buttons = [{id = &"sell", label = "Sell", kind = &"secondary"},
+			{id = &"sell_all", label = "Sell 5 · 20 coins", kind = &"primary"}], lock = {shown = true, locked = false}}],
+		["locked stack", {title = "Radish", icon = _tex("crop_radish"), quantity = 12, info = true, badge = &"locked",
+			facts = ["5 each"], buttons = [{id = &"locked", label = "Locked", kind = &"unavailable"}, {id = &"unlock", label = "Unlock", kind = &"secondary"}],
+			lock = {shown = true, locked = true}}],
+		["bag · seed away from home", {title = "Radish Seeds", icon = _tex("seed_radish"), quantity = 20, info = true, badge = &"pinned",
+			facts = ["2 Energy per plot · Ready in 4h 0m"], buttons = [{id = &"pin", label = "Unpin", kind = &"secondary"},
+			{id = &"store", label = "At home only", kind = &"unavailable"}], lock = {shown = true, locked = false}}],
+	]
+	for pair in specs:
+		var sheet := UiInfoSheet.new()
+		var spec: Dictionary = pair[1]
+		sheet.rules = func(id, ctx, o): return spec
+		sheet.custom_minimum_size.x = 328   # the gallery column (the main is 336 inside the 360 drawer)
+		sheet.open("sample", &"bag")
+		v.add_child(_captioned(sheet, pair[0]))
+	return v
+
+## Counter buy rows as FARM-6 draws them: available (stepper + Buy), more than one, sold out, gated, a one-off rod.
+static func _shop_rows() -> Control:
+	var v := _column(0)
+	var buy := [{id = &"buy", label = "Buy", kind = &"secondary", payload = {}}]
+	var rows := [
+		[{id = "seed_radish", icon = _tex("seed_radish"), title = "Radish Seeds", info = true, facts = ["Ready in 4h", "Bag ×24"],
+			price = {text = "4 coins", line = ""}, buttons = buy}, false, 1],
+		[{id = "fert_compost", icon = _tex("compost"), title = "Compost", info = true, facts = ["Grows faster", "Bag ×6"],
+			price = {text = "4 coins", line = "2 × 2 coins"}, buttons = buy}, false, 2],
+		[{id = "bait_worm", icon = _tex("bait_worm"), title = "Worm Bait", info = true, facts = ["Bites come faster", "Stock 0/30 · Bag ×5"],
+			price = {text = "2 coins", line = ""}, buttons = [{id = &"buy", label = "Sold out · 9h 12m", kind = &"unavailable", payload = {}}]}, false, 1],
+		[{id = "seed_tomato", icon = _tex("seed_tomato"), title = "Tomato Seeds", info = true, facts = ["Ready in 6h", "210 XP to go"],
+			price = {text = "12 coins", line = ""}, buttons = [{id = &"buy", label = "Farming Lv4 needed", kind = &"unavailable", payload = {}}]}, false, 1],
+		[{id = "rod_reed", icon = _tex("rod"), title = "Reed Rod", info = true, facts = ["Lands up to Rare fish", "Fishing Lv3"],
+			price = {text = "80 coins", line = ""}, buttons = buy}, true, 1],
+	]
+	for r in rows:
+		var row := UiShopRow.new()
+		row.custom_minimum_size.x = 328   # the gallery column (336 in the 360 drawer)
+		row.show_spec(r[0], r[1], 9)
+		if row.stepper: row.stepper.value = r[2]
+		v.add_child(row)
 	return v
 
 ## The real bar is 336 wide (12 px screen margins); the gallery column is 328, so it is drawn scaled.

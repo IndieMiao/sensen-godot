@@ -59,6 +59,8 @@ func build(bp: FarmBlueprint, style: String) -> void:
 		Rect2(Vector2(spawn.x - 0.7, spawn.z - 1.4), Vector2(1.4, 2.2))]
 	var spots := [house, bp.cell_to_world(bp.anchor("storage")),
 		bp.cell_to_world(bp.anchor("well")), bp.cell_to_world(bp.anchor("mine"))]
+	for key in P0Garden.ANCHORS:   # SGODOT-231: gathering spots and the workbench stay clear of scatter
+		if str(key).begins_with("spot_") or key == "workbench": spots.append(bp.cell_to_world(bp.anchor(key)))
 	for i in 420:
 		var point := Vector3(rng.randf_range(-3.0, 16.0), 0.01, rng.randf_range(-16.0, -11.5) if i < 220 else rng.randf_range(-11.5, 2.5))
 		var flat := Vector2(point.x, point.z)

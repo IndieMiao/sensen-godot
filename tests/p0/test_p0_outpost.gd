@@ -57,6 +57,19 @@ func test_each_outpost_opens_with_its_keeper_and_residents() -> void:
 		assert_str(r.exit_text).is_equal("Exit · Back to map" if id == "sh_market_1" else "Door · Back to map")
 	assert_str(str(_room("sh_tackle_1").npcs.npc_keeper.name)).is_equal("Finn")
 
+## The bag's dish card asks for the resident within a finger card's reach (SGODOT-225 Gift to <Name>): Old Kai at
+## the tackle shop once the player stands by him; never the keeper, and nobody from across the room.
+func test_near_resident_is_a_resident_within_card_reach_never_the_keeper() -> void:
+	var r := _room("sh_tackle_1")
+	r.actor.position = r.anchor("npc_keeper").global_position
+	assert_str(r.p0_near_resident()).is_equal("")   # Finn keeps the shop: not a gift target
+	var kai := r.anchor("npc_kai").global_position
+	r.actor.position = kai + Vector3(1.0, 0, 0)
+	assert_str(r.p0_near_resident()).is_equal(str(r.npcs.npc_kai.id))
+	r.actor.position = kai + Vector3(P0Room.CARD_NEAR_M + 0.5, 0, 0)
+	assert_str(r.p0_near_resident()).is_equal("")
+	assert_str(_room("sh_tea_1").p0_near_resident()).is_equal("")   # no resident at the tea house
+
 func test_decor_is_not_tappable_and_counters_are() -> void:
 	var post := _room("sh_post_1")
 	var taps := post._tappable()
@@ -161,3 +174,56 @@ func test_the_keeper_greeting_gets_names_and_places_from_the_outpost_data() -> v
 		"ctx": {"keeper": "Mei", "place": "Xuhui Market Square"}})
 	for o in P0Outposts.all():   # nearest.site keys view.keepers.tackle.next_fish (fishing.sites)
 		if o.has("nearest"): assert_array(["pond", "river"]).contains([str(o.nearest.site)])
+
+## SGODOT-229: the NPC-only parts reach the NPCs. OnlineAppearance.config drops them unless asked (they are kept out of
+## player outfits and the online appearances), so the spawn has to pass allow_npc.
+func test_npcs_wear_their_npc_only_parts() -> void:
+	var kai: Node = _room("sh_tackle_1").npcs.npc_kai.root
+	var rig: AvatarRig = kai.find_children("*", "AvatarRig", true, false)[0]
+	var worn: Dictionary = rig.get("_desired")
+	assert_str(str(worn.get(&"hairHat", ""))).is_equal("hairhat71_npc_kai")
+	assert_str(str(worn.get(&"mask", ""))).is_equal("mask16_npc_kai")
+	assert_str(str(worn.get(&"cloth", ""))).is_equal("cloth11_npc_mei")
+	assert_bool(Avatar.catalog.is_npc_only("hairhat71_npc_kai")).is_true()
+
+## Every outfit part exists in its slot; no two NPCs share both hairHat and cloth (the outfit rules in the file's note).
+func test_npc_outfits_name_real_parts_and_stay_distinct() -> void:
+	var npcs: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/p0/outpost_npcs.json")).npcs
+	var pairs := {}
+	for id in npcs:
+		var slots: Dictionary = npcs[id].slots
+		for slot in slots:
+			var part = Avatar.catalog.part(str(slots[slot]))
+			assert_object(part).override_failure_message("%s: %s" % [id, slots[slot]]).is_not_null()
+			if part: assert_str(String(part.slot)).override_failure_message("%s: %s" % [id, slots[slot]]).is_equal(str(slot))
+		var pair := "%s|%s" % [slots.get("hairHat", ""), slots.get("cloth", "")]
+		assert_bool(pairs.has(pair)).override_failure_message("%s shares %s with %s" % [id, pair, pairs.get(pair, "")]).is_false()
+		pairs[pair] = id
+
+## SGODOT-250 (spec 370794d2 item 5): one finger card at a time in a room. Hand test 246 pictures 06 / 07 showed the
+## keeper's, the seat's and the door's cards together; now only the nearest within reach shows, and it keeps the
+## card until another is clearly nearer.
+func test_only_the_nearest_card_shows_in_a_room() -> void:
+	var r := _room("sh_tea_1")
+	var marks := {}
+	for n in r._tappable():
+		var m: Dictionary = r._marker(n, {})
+		if not m.is_empty(): marks[n] = m
+	var keeper := r.anchor("npc_keeper").global_position
+	var door := r.anchor("exit").global_position
+	r.actor.position = Vector3(keeper.x + 0.3, r.actor.position.y, keeper.z + 0.6)   # by Ama, the tea table and the door in reach
+	var in_reach := marks.keys().filter(func(n): return Vector2(r.actor.position.x - r.anchor(n).global_position.x,
+		r.actor.position.z - r.anchor(n).global_position.z).length() < P0Room.CARD_NEAR_M)
+	assert_int(in_reach.size()).override_failure_message(str(in_reach)).is_greater_equal(3)   # the 246 / 07 situation
+	assert_str(r.card_pick(marks)).is_equal("npc_keeper")
+	# Ama's card stays while the door is only a little nearer …
+	var mid := (keeper + door) * 0.5
+	var along := (door - keeper).normalized()
+	r.actor.position = Vector3(mid.x, r.actor.position.y, mid.z) + Vector3(along.x, 0, along.z) * 0.05
+	assert_str(r.card_pick(marks)).is_equal("npc_keeper")
+	# … and goes to the door once it is clearly nearer.
+	r.actor.position = Vector3(door.x, r.actor.position.y, door.z) - Vector3(along.x, 0, along.z) * 0.3
+	assert_str(r.card_pick(marks)).is_equal("exit")
+	# Out of every reach: no card.
+	r.actor.position = Vector3(20, r.actor.position.y, 20)
+	assert_str(r.card_pick(marks)).is_equal("")

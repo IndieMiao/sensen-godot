@@ -149,7 +149,8 @@ func _buttons(th: Theme) -> void:
 	var flat_pressed := func(pad_v: float) -> StyleBox: return _margins(_box(tint, r("card")), 0.0, pad_v)
 	var nav_pad := (s("navigationRow") - float(t.font.styles.ButtonB15.size) * float(t.font.styles.ButtonB15.lineHeight)) * 0.5
 	_button(th, "NavRow", flat.call(nav_pad), flat_pressed.call(nav_pad), flat.call(nav_pad), "ButtonB15", c("info"), c("info"), c("disabledInk"))
-	_button(th, "NavCompact", flat.call(0.0), flat_pressed.call(0.0), flat.call(0.0), "C12B", c("primary"), c("primary"), c("disabledInk"))
+	# Compact/Navigation 633:41276: Bold 12 in color/info (`Gift ›`, `Sort · Type`, `Today's meal ›`).
+	_button(th, "NavCompact", flat.call(0.0), flat_pressed.call(0.0), flat.call(0.0), "C12B", c("info"), c("info"), c("disabledInk"))
 	_button(th, "Dismiss", flat.call(0.0), flat_pressed.call(0.0), flat.call(0.0), "ButtonB15", c("secondary"), c("secondary"), c("disabledInk"))
 	var icon_pad := (s("close") - s("closeIcon")) * 0.5
 	var close_box := func(fill: Color, line: Color) -> StyleBox:
@@ -160,13 +161,20 @@ func _buttons(th: Theme) -> void:
 		var b := _margins(_box(fill, r("chip")), float(t.space.row), 0.0)
 		b.visual_height = s("filterChip")
 		return b
-	# Toggle buttons: "pressed" is the selected look.
-	_button(th, "FilterChip", chip.call(c("surface")), chip.call(c("primary")), chip.call(c("disabled")),
-		"C11B", c("secondary"), c("surface"), c("disabledInk"))
-	# SegmentTab selected style is provisional: LOCK-13 forbids the command green for mode switches (WP1b).
-	var seg := func(fill: Color, line: Color) -> StyleBox: return _margins(_box(fill, pill, line, stroke), float(t.space.row), 0.0)
-	_button(th, "SegmentTab", seg.call(c("surface"), c("border")), seg.call(c("primaryTint"), c("primary")),
-		seg.call(c("disabled"), Color.TRANSPARENT), "BodyB14", c("secondary"), c("primary"), c("disabledInk"))
+	# Toggle buttons: "pressed" is the selected look. Compact/Filter selected (2026-10-08, 安其拉 on 225): primary
+	# tint with a primary outline and primary ink, never the command green.
+	var chip_on := func() -> StyleBox:
+		var b := _margins(_box(c("primaryTint"), r("chip"), c("primary"), stroke), float(t.space.row), 0.0)
+		b.visual_height = s("filterChip")
+		return b
+	_button(th, "FilterChip", chip.call(c("surface")), chip_on.call(), chip.call(c("disabled")),
+		"C11B", c("secondary"), c("primary"), c("disabledInk"))
+	# SegmentedTabs 1225:83884 (LOCK-13): segments sit on a border-coloured track (UiSegmentTab draws it); the
+	# selected one is white with a primary outline (radius 14), never the command green. Labels are UiSegmentTab's.
+	var seg_r := 14.0   # SegmentedTabs segment radius (WP1b, not exported yet)
+	_button(th, "SegmentTab", _margins(_box(Color.TRANSPARENT, seg_r), float(t.space.within), 0.0),
+		_margins(_box(c("surfaceRaised"), seg_r, c("primary"), stroke), float(t.space.within), 0.0),
+		_margins(_box(Color.TRANSPARENT, seg_r), float(t.space.within), 0.0), "C12B", c("secondary"), c("primary"), c("disabledInk"))
 
 func _panel(th: Theme, name: String, box: StyleBox) -> void:
 	th.set_type_variation(name, "PanelContainer")

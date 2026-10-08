@@ -75,6 +75,7 @@ var _shot_k := 0.0
 var _shot_tween: Tween
 var _walk := {}           # {name, point: Vector3, done: Callable}
 var _shown := {}          # marker ids currently on screen
+var _card := ""           # the one tappable whose finger card shows (SGODOT-250: one card at a time)
 var _exit_armed := false
 var _leaving := false
 var _perf_left := -1.0    # debug builds with user://p0_perf: log fps / draw calls every 5 s (logcat tag godot)
@@ -429,7 +430,9 @@ func p0_joystick(v: Vector2) -> void:
 
 func p0_tap(screen: Vector2) -> void:
 	if rt and rt.ui.has_modal(): return
-	var n := pick(screen)
+	# A finger card's tap goes to its own anchor by id, not through the point test (PR #21's rule for the farm).
+	var card := str(rt.ui.tapped_card) if rt else ""
+	var n := card.trim_prefix("room:") if card.begins_with("room:") and anchor(card.trim_prefix("room:")) else pick(screen)
 	if n != "": walk_to(n)
 
 func p0_frame(v: Dictionary, dt: float) -> void:
@@ -464,13 +467,28 @@ func _door_check() -> void:
 	if d > EXIT_ARM_M: _exit_armed = true
 	elif _exit_armed and d <= EXIT_RADIUS_M: leave()
 
+## SGODOT-250 (spec 370794d2 item 5, LOCK-07 v2): one finger card at a time in a room as on the farm — the nearest
+## anchor with a card within CARD_NEAR_M; the one showing keeps it unless another is clearly nearer, so standing
+## between the keeper, a seat and the door never shows two or three cards (hand test 246 pictures 06 / 07).
+## `marks` maps anchor names to their _marker(); returns the anchor whose card shows, or "".
+func card_pick(marks: Dictionary) -> String:
+	var cands: Array = []
+	for n in marks:
+		if (marks[n] as Dictionary).has("text") and anchor(n): cands.append([n, anchor(n).global_position, CARD_NEAR_M])
+	_card = P0Garden.pick_card(cands, actor.position, _card)
+	return _card
+
 ## Finger cards and status badges over tappable anchors (221's rt.ui.tag / rt.ui.badge when present).
 func _markers(v: Dictionary) -> void:
 	var now := {}
+	var marks := {}
 	for n in _tappable():
 		var m := _marker(n, v)
-		var id := "room:" + n
-		if m.is_empty(): continue
+		if not m.is_empty(): marks[n] = m
+	card_pick(marks)
+	for n in marks:
+		var m: Dictionary = marks[n]
+		var id: String = "room:" + n
 		now[id] = true
 		var at := anchor(n).global_position + _hit_lift(n) * 1.1
 		var badge_at := anchor("badge_" + P0RoomAnchors.object_of(n))
@@ -481,8 +499,7 @@ func _markers(v: Dictionary) -> void:
 			rt.ui.call("badge", id, state, screen, true, str(m.get("caption", "")), m.get("icon", null))
 			if rt.ui.has_method("badge_height"): lift = float(rt.ui.call("badge_height", id))
 		if m.has("text"):
-			var near := _flat_distance(actor.position, anchor(n).global_position) < CARD_NEAR_M
-			rt.ui.tag(id, str(m.text), screen - Vector2(0, lift), near)
+			rt.ui.tag(id, str(m.text), screen - Vector2(0, lift), n == _card)
 	for id in _shown.keys():
 		if now.has(id): continue
 		rt.ui.tag(id, "", Vector2.ZERO, false)
@@ -522,6 +539,10 @@ func p0_recenter() -> void:
 	if _fits and _zoom <= 1.0: return   # the whole room is already in view
 	_focus = actor.position
 	_follow.held = false
+
+## Whether p0_show_spot has something to show here (the runtime steps out of the farmhouse for farm targets).
+func p0_has_spot(where: String) -> bool:
+	return ["cam_" + where, "use_" + where, "use_" + where + "_1"].any(func(n): return anchor(n) != null)
 
 ## Energy card guidance (LOCK-08: only moves the camera): show cam_<where>, else use_<where>[_1].
 func p0_show_spot(where: String) -> void:

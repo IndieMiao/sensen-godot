@@ -48,7 +48,7 @@ must not change structure, role, entry point or key copy. Engineering specs: SGO
 | `UiFactRow` | Fact 483:222 · Cost 483:225 | `Kind.FACT` / `Kind.COST`; have / need counts are NEED-TILEs (LOCK-10), not fact rows |
 | `UiItemRow` | ItemRow 483:228 | icon, title / state / effect, quantity column; display only |
 | `UiItemCell` | Compact/InventoryCell 633:41278 · QuickSlot 633:41279 · Kitchen/Cell 655:58506 · GearSlot 663:61299 | one class, `Density` picks the main; `State` DEFAULT / SELECTED / EMPTY, plus LIFTED / DROP_TARGET / ZERO on QUICK; `pinned` draws LOCK-05. Own GestureArbiter (QUICK: SLOT, others: CELL): `tapped` only for its tap, every other outcome via `gesture(outcome)` (global `pos`) |
-| `UiCommandButton` | CommandButton 483:216 · Compact/Command 633:41273 | connect `activated`; `reason` = unavailable look with the reason as label, still tappable (`unavailable_pressed`, LOCK-10); `phase` / `track()` follow `CommandLifecycle` (submitting ignores taps, pending dims) |
+| `UiCommandButton` | CommandButton 483:216 · Compact/Command 633:41273 | connect `activated`; `reason` = unavailable look with the reason as label, still tappable (`unavailable_pressed`, LOCK-10); `phase` / `track()` follow `CommandLifecycle` (submitting ignores taps, pending dims); `fit_text` narrows the side padding so a long reason fills a full-width row |
 | `UiNavButton` | NavigationRow 483:217 · Compact/Navigation 633:41276 | row with right chevron, or compact `Label ›`; never jumps the player (LOCK-08) |
 | `UiDismissButton` | Dismiss 483:220 | quiet close text; not on the Energy card (LOCK-09) |
 | `UiCloseButton` | Close 483:336 | 44 round, 20 px glyph |
@@ -68,6 +68,25 @@ must not change structure, role, entry point or key copy. Engineering specs: SGO
 | `UiTodayPanel` | TodayPanel 1145:81715 · TodayRow 1145:81714 | LOCK-06: ≤ 3 rows under the chips; Show only moves the camera; done / short rows |
 | `UiEnergyCard` | Energy 1094:77504 | LOCK-09: `card()` (one button `Free to do now`, 2×2 guide-only tiles, At home away from home) and `panel()` (under the HUD chip) |
 | `UiEnergyTile` | EnergyTile 1093:77292 | guide-only RECOVER tile; unavailable shows the reason, no link |
+
+## Panel parts (SGODOT-225)
+
+| Class | Figma main | Notes |
+|---|---|---|
+| `UiDrawer` | Sheet 483:190 as the bag / counter drawer (BAG-2-2, FARM-6) | bottom-pinned, 24 top corners, content in `body` inset 12 like the Bag layout, `height` in logical px, `safe_bottom`; slides up over `MOTION_DRAWER_MS`; a 48 px swipe down or a quick flick on the drawer itself emits `close_requested`. The scrim, Back and scrim taps stay with `ModalStack` / the P0 modal host |
+| `UiDialogueCard` | head of KeeperGreeting 1205:83238 / ResidentDialogue 1213:83392 | the shared "portrait + name strip": rounded portrait (`RESIDENT_PORTRAIT` 92×178, `KEEPER_PORTRAIT` 100×220), `Name · Role ›` or `Role · Name` + `place` line, `extra` row, speech bubble (`line`), `content` slot for options. `profile_link` makes the portrait and name tappable (`identity_pressed`, 44 hit area). 2A builds the keeper greeting on it |
+| `UiRequestCard` | ResidentRequestCard 1211:83296 (LOCK-18) | requester head, the line, `Bring` NEED-TILEs, Reward / Deliver to rows, one primary (Accept / Deliver; `reason` = unavailable) and `Not now`; `action_pressed`, `dismissed`. Full lifecycle is WP4 |
+| `UiResidentBar` | ResidentDialogue 1213:83392 (LOCK-18) | UiDialogueCard + affinity row (stage pill, 10 % meter, `have/need · next Stage`) + Gift (primary) / Request (secondary, `request_label`), Today’s meal / Recipe lesson only when available. A reason on either button makes it unavailable with the reason as label and stacks both (Choices=Stacked, `fit_text`). Data from `P0Logic.resident_bar` (SGODOT-228) |
+| `UiResidentProfile` | RES-PIP 482:586 / RES-KAI 482:592 | the resident's profile sheet content: 80 face, name, role, StateBadge, Fact `Friendship 52/90`, ItemRow `Favourite dishes`, NavigationRow `Details` (only when there is a page behind it), then the fixed `Back`. Put it in a `UiDrawer` (`pad` 16, height 443) with a Close 6 above; `details_pressed`, `back_pressed` |
+| `UiNoticeRow` | "Bag capacity recovery" of BAG-5 482:144 | 44 raised bordered row, one Compact 11 line and `›`, e.g. `Bag full · +5 slots at Homestead Lv3`. Navigation only (LOCK-08) |
+| `UiFloatText` | FloatText 1178:82191 (§16.1.2) | float feedback, tones XP / ENERGY_GAIN / ENERGY_COST / COINS / AFFINITY (heart) / ITEM (item icon), Layout HUG / WRAP (≤ 320, 2 lines). `play(at, stack_index)` = pop ×0.5 → ×1.3 → ×1.0, rise 48, fade, 1100 ms, pivot bottom centre, peak ≤ 336 wide, extra lines 28 higher / 60 ms later (max 3); `bump(text)` for merged lines; frees itself after `finished`. Laid out at the ×1.3 peak and scaled down so the peak stays sharp. `UiFloatText.pill(text, tone, icon)` = the same look at ×1.0 without motion (RewardMoment reward pills) |
+| `UiBagHeader` | BagHeader 1225:83885 (LOCK-12 / 13) | Bag N/cap \| Gear switch (`side_changed`), `Sort · …` on the Bag side only (`sort_pressed`, `sort_label`), capacity bar under the Bag segment, amber from 90 %; `show_tabs = false` for the gift drawer (count only) |
+| `UiGearRow` | Gear candidate rows of BAG-2 · Gear (LOCK-13) | icon · name · state (`✓ Equipped` badge / `Owned` / greyed gate and source) · effect, one action from the item-info spec (`action_pressed(id)`); `UiGearRow.equipped_badge()` |
+| `UiProfileTopBar` | ProfileTopBar 1233:107734 (LOCK-22) | `Kind.SELF` back + Profile + gear (`show_settings`; hidden in P0), `Kind.OTHER` back + name + ··· (`more_pressed(anchor)`) |
+| `UiProfileMoreMenu` | ProfileMoreMenu 1233:107735 (LOCK-22) | rows by relation: default Unfollow / Block / Report, `close_friend` adds Remove Close Friend, `blocked` only Report (P2; `picked(id)`) |
+| `UiSkillCard` | SkillRing 1251:109246 (LOCK-22) | 107×56 raised card, 40 ring floored to 10 %, icon on the cream core, skill + `Lv3`; `pressed` |
+| `UiFarmCard` | Farm overview of PROFILE-1 (LOCK-22) | 62 thumbnail, farm name, `Level N`, one status line (empty lines hide) |
+| `UiInventoryGrid` | Bag layout five-column grid (LOCK-12 / 15) | `TouchScrollContainer` of INVENTORY cells on the quick bar pitch (52 + 4, rows 58 apart), filled cells then dashed empties to `capacity`. Hooks for the counter (2A): `on_select` (Callable, or `item_selected`) on tapping a filled cell, tapping an empty cell clears; `sell_mode` + `can_sell` list only what that counter takes ("Sell here"). `filter` for category chips; other cell gestures come out of `cell_gesture(item, outcome)`. `density` KITCHEN for the Experiment page (items may carry `status`, `marked`) |
 
 Positions inside a fixed-size main (e.g. the InventoryCell icon at y 10, the 3 px pill inset) are private
 constants in the component script, each citing its main; everything shared comes from `UiTokens`.

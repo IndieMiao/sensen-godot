@@ -16,6 +16,8 @@
 | 不写 Got it | Toast、TipCard、四件事卡都不写 `Got it`；点卡外 / 返回键关闭（q(26)、q(49)） |
 | 缺口写在按钮上 | 中性灰不可用态，如 `Need 6 more Timber`、`Farming Lv3`、`No room · free a slot first`（LOCK-10） |
 | 不做跳转 | `Show my plots` / `Show on map` / `Where to fish` 只移动相机或打开面板（LOCK-08） |
+| 世界提示只写名字 | 设施挂图标钮，交互半径内最近的一个展开名字条（图标 + 名字 + 至多一条事实）；门 = 门图标 + 目的地（`Farm` / `Map`）；NPC 头顶只写名字（`Mei`），对话中只保持高亮；座位只有 `i-seat` 图标；任何地方都不出现点按引导语（Tap to …）与手指（LOCK-07 / 16 / 17 / 30 v2，q(62)） |
+| 径向菜单无字 | 四瓣环在屏幕中央，瓣上只有图标，不写行动名与原因；点灰瓣才在环心出单行气泡 `No water nearby` / `Enter the mine` / `Mine floors 3–5`（LOCK-03 v2，q(62)） |
 | 快满写实得 | `Eat · +12 Energy`、`Hot Tea · +12 Energy · 40 coins`、`Rest · +25 Energy`（q(26)） |
 
 ## 1. HUD 与体力卡（LOCK-06、LOCK-09）
@@ -37,15 +39,15 @@
 |---|---|
 | 主行动键 · Farming | `Sow ×1 · 2 Energy`（档 2–4：3 / 4 / 6）/ Row Hoe `Sow ×3 · 6 Energy` / 灰 `Sow · Pick a seed`（种子用完自动回到这一态，q(44)）/ `Till · Free` / `Water · Free` / `Harvest · Free` / `Fertilize · Free` / 灰 `Fertilize · Nothing to feed` |
 | 快捷栏幽灵格 ★ | `Seeds` / `Bait` / `Torch`（只写名词，q(44)）；钉住格归零写 `0` + `Buy at Homestead Stall` |
-| 驿站棚（无人值守，LOCK-17） | 指尖卡 `Tap to shop`；抽屉标题 `Homestead Stall`；Tab `Buy / Stall Board`；挂委托板的 `!` 时点棚停在 Stall Board 页（q(44)） |
+| 驿站棚（无人值守，LOCK-17） | 名字条 `Homestead Stall`（q(62)）；抽屉标题 `Homestead Stall`；Tab `Buy / Stall Board`；挂委托板的 `!` 时点棚停在 Stall Board 页（q(44)） |
 | 驿站委托板 | `Pond Catch · 2 Pond Crucian · 14 coins` / `Track` / `Tracked` / `Ready to deliver` / `Deliver` / `Requests today 4/6`（q(55)） |
-| 长椅 | 指尖卡 `Rest · +60 Energy · once a day`；按钮 `Rest · +60 Energy` / 快满 `Rest · +25 Energy` / 冷却 `Rest · back after 2h away · 1h 12m to go` / 已用 `Rested today · tomorrow 4:00` |
-| 工作台 ★ | 指尖卡 `Workbench · Tap to craft`；只有 `Tools / Supplies` 两个 Tab（q(31)）；按钮在卡片右下（q(45)）；缺料 `Need 6 more Timber`；门禁 `Farming Lv3`（堆肥配方，q(44)）；放不下 `No room · free a slot first`；铜镐 `Equip` / `Equipped`；手套 `Owned · always on`（q(46)） |
+| 长椅 | 名字条 `+60 Energy` / 用过灰 `Rested today`（q(62)）；按钮 `Rest · +60 Energy` / 快满 `Rest · +25 Energy` / 冷却 `Rest · back after 2h away · 1h 12m to go` / 已用 `Rested today · tomorrow 4:00` |
+| 工作台 ★ | 名字条 `Workbench`（q(62)）；只有 `Tools / Supplies` 两个 Tab（q(31)）；按钮在卡片右下（q(45)）；缺料 `Need 6 more Timber`；门禁 `Farming Lv3`（堆肥配方，q(44)）；放不下 `No room · free a slot first`；铜镐 `Equip` / `Equipped`；手套 `Owned · always on`（q(46)） |
 | 工作台效果句 ★ | `Copper Pickaxe · 2 Stone per rock`（LOCK-29）/ `Gather Gloves · +1 at every gathering spot`（q(45)）/ 堆肥 `Crops ready 20% sooner`（q(46)） |
-| 采集点 ★ | `Timber Grove · Tap to gather` / `Timber Grove · Ready in 2h 10m` / 未开 `Clay Bank · Homestead Lv2`（q(46)）；P0 共 5 处，没有 Old Tree（q(43)） |
+| 采集点 ★ | 名字条 `Timber Grove`（其他写名字，如 `Reed Bank`）/ 没好 `Timber Grove · Ready in 2h 10m` / 未开 `Clay Bank · Homestead Lv2`（q(46)、q(62)）；P0 共 5 处，没有 Old Tree（q(43)） |
 | 采集与入库飘字 ★ | 进仓库 `+6 Timber · Stored` / 进背包 `+2 Worm Bait` / 回家入库 `Stored · 12 Stone · 3 Copper Ore`（数字在前、不带 ×，q(46)） |
-| 农舍门牌 / 升级面板 ★ | 标题 `Homestead Lv1 → Lv2`；What changes `Max Energy 210 · Meals 210 a day` / `Spice Rack · seasonings off your bag` / `Clay Bank · Clay next to the Reed Bank`；满级 `Highest level for now`（q(46)）；横幅 `Homestead Lv 2` / `Clay Bank opened` |
-| 信箱 ★ | 指尖卡 `Mailbox · Tap to open`；可领时小牌 `Parcel`（q(50)） |
+| 农舍门牌 / 升级面板 ★ | 名字条：农舍 `Farmhouse`、门牌 `Homestead Lv1`、木牌 `Upgrade Plaque`（q(62)）；标题 `Homestead Lv1 → Lv2`；What changes `Max Energy 210 · Meals 210 a day` / `Spice Rack · seasonings off your bag` / `Clay Bank · Clay next to the Reed Bank`；满级 `Highest level for now`（q(46)）；横幅 `Homestead Lv 2` / `Clay Bank opened` |
+| 信箱 ★ | 名字条 `Mailbox`；可领时小牌 `Parcel`（q(50)、q(62)） |
 
 ## 3. 鱼塘与钓鱼
 
@@ -63,13 +65,13 @@
 
 | 位置 | 应出现 |
 |---|---|
-| 灶台 | 指尖卡 `Stove 1/1 · Empty · Tap to cook`；顶栏 `Stove 1/1 · Cooking Lv2 · Empty`；待收 `Stove · Ready · Grilled Crucian` |
+| 灶台 | 名字条 `Stove 1/1 · Empty`（q(62)）；顶栏 `Stove 1/1 · Cooking Lv2 · Empty`；待收 `Stove · Ready · Grilled Crucian` |
 | Cookbook 按钮四态 | `Cook` / 灰 `Need Wild Herb ×1` / 灰 `Cooking Lv4 · 3rd slot` / `Try in Experiment ›` |
 | Experiment | `From your bag · 2 of 2 slots used`；调味料格带 `Rack` 角标、写仓库实数（如 `Rock Salt 12`，不写 /30，q(46)）；`Not for cooking`（金锦鲤）；`In the pot` |
 | 火候 | `Tap when the needle hits gold!` / `Nice heat! ★` / `Missed · still cooking` / `Perfect! ★★ · Extra portion` |
 | 出锅卡 COOK-4 ★ | 首做 `New recipe!` + 奖励条 `First cooked · +10 Cooking XP · Cookbook 1/48`（只放首做 XP；本锅 XP 照常飘 `+5 Cooking XP ★`，q(55)）/ 重复 `Cooked!` / 失败 `Mystery Dish` + `Hmm… not a dish` + `A clue was added to your Cookbook` + 灰字 `Can't be sold or delivered`（q(55)）/ 退料 `No dish this time` + `Ingredients back (9 left today)` + `OK`；按钮只有 `Eat · +45 Energy` / `Keep`，Gift 在 P0 灰；没有 Cook Again 按钮（q(46)、q(48)、q(49)） |
 | Cook Again ★ | 收走后点灶台：`Cook Again` / `Choose recipe ›`，第 2 锅 `Cooks today 2nd` / `Cooking XP Half`（q(48)） |
-| 保温柜 | `Warming Cabinet 4/6` / `Tap to open` / `Take one` / `Kept · Warming Cabinet 5/6` / `Cabinet full · Herb Grilled Fish sent to bag` / `Cabinet and bag full · dish left on the stove` / `Bag full · dish left on the stove` |
+| 保温柜 | 名字条 `Warming Cabinet 4/6`（q(62)）/ `Take one` / `Kept · Warming Cabinet 5/6` / `Cabinet full · Herb Grilled Fish sent to bag` / `Cabinet and bag full · dish left on the stove` / `Bag full · dish left on the stove` |
 | Cooking Lv4 之后 Today ★ | `3rd slot open · try Fine fish + Potato + Rock Salt`（q(46)） |
 
 ## 5. 矿洞
@@ -88,14 +90,14 @@
 | 位置 | 应出现 |
 |---|---|
 | 名字 ★ | `Xuhui Tackle Shop` / `Lotus Tea House` / `Xuhui Market Square` / `Huangpu Travel Post`（q(32)、q(46)） |
-| 掌柜指尖卡 | `Finn · Tap to talk` / `Ama · Tap to talk` / `Mei · Tap to talk` / `Sigrid · Tap to talk`；问候选项 `Trade` / 信息问句 / `Just passing by` |
+| 掌柜名字条 | `Finn` / `Ama` / `Mei` / `Sigrid`（只写名字；最近的一个主色描边、放大 1.1 倍，对话中保持高亮，q(62)）；问候选项 `Trade` / 信息问句 / `Just passing by` |
 | Mei 问候 ★ | `Morning! Row Hoes just came in — sows three plots at once, Farming Lv4. Anything I can get you?`（q(46)） |
 | Ama 问候 ★ | `Sit a minute. Hot tea, 30 Energy a cup — first one's 40 coins today.`（不写 back，q(46)）；喝后 `Enjoy. Next cup's 50 coins.` |
-| 渔具铺柜台 ★ | 只有 Buy 一页、不显示 Tab 条；`Reed Rod · 80 coins`（`Fishing Lv3` / `Owned`）/ `Worm Bait · 2 coins` · `30 left today` / `Sold out · 9h 12m`；收鱼 × 0.8；渔情板只作摆设，没有 `Bite Board · Tap to read`（q(46)） |
-| 集市柜台 ★ | `Buy | Market Board`，只有 Row Hoe 一行，不贴背包（q(48)）；特产货架 `City Specialty · Tap to look` / `Shanghai Postcard · 100 coins` / `Owned` |
+| 渔具铺柜台 ★ | 只有 Buy 一页、不显示 Tab 条；`Reed Rod · 80 coins`（`Fishing Lv3` / `Owned`）/ `Worm Bait · 2 coins` · `30 left today` / `Sold out · 9h 12m`；收鱼 × 0.8；渔情板只作摆设，不挂图标钮与名字条（q(46)、q(62)） |
+| 集市柜台 ★ | `Buy | Market Board`，只有 Row Hoe 一行，不贴背包（q(48)）；特产货架名字条 `City Specialty`、委托板名字条 `Market Board`（有可接委托时换 `!` 徽标）（q(62)）/ `Shanghai Postcard · 100 coins` / `Owned` |
 | 驿站柜台 | 只卖咖啡 `Trade · get a coffee`；盖章台只作摆设 |
 | 集市委托板 ★ | `Dusk Haul · Market Board` / `4 Fine fish · any kind` / `36 coins`（P0 不写 `+1 city stamp`）；`Market Basket` / `3 crops · 6 each`（q(46)） |
-| 居民 ★ | Pip `Could you catch me a fish? Any kind is fine.`（对话条与委托卡同句）；Old Kai 需求行 `Rare fish · Golden Koi · Pond 0/1`；奖励行 `+5 Friendship · 20 coins` / `+5 Friendship · 50 coins`（q(46)）；赠餐 `Pip shared a meal with you · +20 Energy` |
+| 居民 ★ | 头顶名字条只写名字 `Pip` / `Old Kai`（q(62)）；Pip `Could you catch me a fish? Any kind is fine.`（对话条与委托卡同句）；Old Kai 需求行 `Rare fish · Golden Koi · Pond 0/1`；奖励行 `+5 Friendship · 20 coins` / `+5 Friendship · 50 coins`（q(46)）；赠餐 `Pip shared a meal with you · +20 Energy` |
 | 饮品满体力 ★ | 灰 `Energy full`（q(48)） |
 
 ## 7. 地图
@@ -112,6 +114,7 @@
 | 位置 | 应出现 |
 |---|---|
 | 背包 | `Bag 19/25 · 6 slots free` / 7 个 Tab `All / Seeds / Fish / Produce / Dishes / Materials / Tackle` / 仓库堆 `Take 10 / Take all` / 不在家 `At home` |
+| 料理详情卡 Gift ★ | 身边有居民 `Gift to Pip` / `Gift to Old Kai`；其他地方灰 `Gift to a resident`，点了 toast `Find a resident at an outpost to gift this dish`；今天已送过 `Gift already given today`（q(63)） |
 | Gear ★ | `Bag | Gear`；Fishing 槽只有 Starter Rod / Reed Rod，P0 不列 Carbon Rod（q(46)） |
 | 个人页 | `Edit look` / `Edit` / `Following` / `Followers` / `Mutual` / `Close Friends` / `All skills ›` |
 | 技能页 ★ | `Crops first-harvested n/8 · Fish first-caught n/7 · Dishes first-cooked n/14`；不显示 `Cities fished`（q(49)） |
@@ -151,3 +154,6 @@
 | `Shanghai Market Square` / `Pudong Market Square` | `Xuhui Market Square` |
 | `Compost · −20% time` | `Crops ready 20% sooner` |
 | `1/3 today · 40 coins`（茶的第一杯） | `0/3 today · 40 coins` |
+| `Stove 1/1 · Empty · Tap to cook` / `Workbench · Tap to craft` / `Mailbox · Tap to open` / `Tap to shop` / `Rest · +60 Energy · once a day`（世界里的指尖卡） | 名字条 `Stove 1/1 · Empty` / `Workbench` / `Mailbox` / `Homestead Stall` / `+60 Energy`（q(62)） |
+| `Mei · Tap to talk` / `Mei · Talking` / 茶桌 `Sit` | 名字条 `Mei`（对话中只保持高亮）；座位只有 `i-seat` 图标（q(62)） |
+| 径向菜单瓣旁 `Fishing · No water nearby` | 瓣上无字；点灰瓣气泡 `No water nearby`；主行动键仍写 `Fishing · No water nearby`（q(62)） |

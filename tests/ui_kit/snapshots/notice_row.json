@@ -1,0 +1,111 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    115
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiNoticeRow"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        18
+      ],
+      "variation": "CaptionR12",
+      "text": "Bag capacity recovery of BAG-5 482:144 (336 at 328)"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        52,
+        328,
+        63
+      ],
+      "children": [
+        {
+          "type": "Container",
+          "rect": [
+            0,
+            52,
+            328,
+            43
+          ],
+          "children": [
+            {
+              "type": "UiNoticeRow",
+              "rect": [
+                0,
+                52,
+                328,
+                43
+              ],
+              "text": "",
+              "children": [
+                {
+                  "type": "HBoxContainer",
+                  "rect": [
+                    9,
+                    52,
+                    309,
+                    43
+                  ],
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        9,
+                        66,
+                        292,
+                        16
+                      ],
+                      "variation": "C11B",
+                      "text": "Bag full · +5 slots at Homestead Lv3"
+                    },
+                    {
+                      "type": "Label",
+                      "rect": [
+                        308,
+                        64,
+                        10,
+                        19
+                      ],
+                      "variation": "C13XB",
+                      "text": "›"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            101,
+            328,
+            14
+          ],
+          "variation": "C9B",
+          "text": "Bag full · navigation only (LOCK-08)"
+        }
+      ]
+    }
+  ]
+}
