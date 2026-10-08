@@ -317,6 +317,10 @@ const DASH_DROP_TARGET := [4, 3]
 
 # Motion
 const MOTION_DISSOLVE_MS := 150
+## A guide pulse, once (A-03 Today's first row after accepting, the Today chip when its focus row changes; 不知火舞 on 232):
+## scale 1 → 1 + GUIDE_PULSE_SCALE → 1 on a half sine, the same arrival pulse as the action radial's current petal.
+const MOTION_GUIDE_PULSE_MS := 160
+const GUIDE_PULSE_SCALE := 0.08
 const MOTION_FLOAT_TEXT_RISE := 40
 const MOTION_FLOAT_TEXT_MS := 800
 const MOTION_RECENTER_MS := 600

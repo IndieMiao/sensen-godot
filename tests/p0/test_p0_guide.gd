@@ -228,3 +228,16 @@ func test_the_today_chip_names_the_first_row_still_to_do_not_a_ticked_one() -> v
 	for sk in v.skills.values(): sk.floor = 0   # hud_state's skill bars read it
 	assert_str(str(P0Logic.hud_state(v).today)).is_equal("Cook it: Grilled Crucian")
 	assert_str(P0Logic.today_chip_line([{"line": "Deliver 2 Pond Crucian · Stall", "state": "done"}])).is_equal("")
+
+func test_the_today_chip_key_follows_the_focus_row_not_its_countdown() -> void:
+	var v := _view({"plots": _plots(["growing"]), "req_done": ["req_pond_catch"]})
+	v.stall.board.requests = []
+	v.bag.slots = [{"id": "fish_crucian", "qty": 1}]
+	var cook := P0Logic.today_chip_key(P0Logic.today_rows(v))
+	assert_str(cook).is_equal("stove|dish_grilled_crucian")
+	v.bag.slots = []
+	v.cooking.cookbook[0].cooked = true                                 # the first dish is done: the radish timer leads
+	var timer := P0Logic.today_chip_key(P0Logic.today_rows(v))
+	assert_str(timer).is_not_equal(cook)
+	v.plots[0].ready_in = 9000000                                       # the countdown ticks: same row, same key
+	assert_str(P0Logic.today_chip_key(P0Logic.today_rows(v))).is_equal(timer)

@@ -364,6 +364,7 @@ static func hud_state(view: Dictionary, ctx: Dictionary = {}) -> Dictionary:
 		"skills": {"farming": skill_progress(sk.get("farming", {})), "fishing": skill_progress(sk.get("fishing", {}))},
 		"coins": int(view.get("coins", 0)), "unread": int(ctx.get("unread", (view.get("inbox", {}).get("parcels", []) as Array).size())), "buff": {},
 		"today": today_chip_line(rows),
+		"today_key": today_chip_key(rows),
 	}
 	if ctx.has("place"): out["place"] = ctx.place
 	return out
@@ -618,6 +619,13 @@ static func next_line(view: Dictionary, skill: String, level: int) -> String:
 static func today_chip_line(rows: Array) -> String:
 	for r in rows:
 		if str(r.get("state", "")) != "done": return str(r.line)
+	return ""
+
+## Which row the chip names, independent of its countdown text: the chip pulses when this changes (不知火舞 on 232),
+## not when "Radishes ready in 3h 48m" ticks to 3h 47m.
+static func today_chip_key(rows: Array) -> String:
+	for r in rows:
+		if str(r.get("state", "")) != "done": return "%s|%s" % [str(r.get("go", "")), str(r.get("icon", ""))]
 	return ""
 
 ## Today panel (§14.5): up to 3 lines — doable now first, then the shortest countdown, then the skill

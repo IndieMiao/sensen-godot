@@ -160,6 +160,19 @@ func set_show_balances(v: bool) -> void:
 func energy_chip_rect() -> Rect2: return _energy_chip.visual_rect()
 func balances_rect() -> Rect2: return _balances.get_global_rect()
 func today_chip_rect() -> Rect2: return _today_chip.visual_rect()
+
+## Pulses played on the Today chip (tests read it).
+var today_pulses := 0
+var _today_pulse: Tween
+
+## The Today chip pulses once (its focus row changed; the caller decides, P0Ui).
+func pulse_today() -> void:
+	today_pulses += 1
+	if _today_pulse != null and _today_pulse.is_valid(): _today_pulse.kill()
+	_today_chip.pivot_offset = _today_chip.size * 0.5
+	_today_pulse = create_tween()
+	_today_pulse.tween_method(func(t: float): _today_chip.scale = Vector2.ONE * (1.0 + UiTokens.GUIDE_PULSE_SCALE * sin(PI * t)),
+		0.0, 1.0, UiTokens.MOTION_GUIDE_PULSE_MS / 1000.0)
 func place_chip_rect() -> Rect2: return _place_chip.visual_rect()
 
 # ------------------------------------------------------------------ build
