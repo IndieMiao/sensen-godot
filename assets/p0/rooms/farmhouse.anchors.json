@@ -1,0 +1,12 @@
+{
+  "_comment": "SGODOT-226 placeholder anchors on the accepted Basic Room (layout metres, Y up). The final farmhouse_lv1 (SGODOT-213) carries its own anchors in layout.json; delete this file then. Names follow WP7-B F-03 ③.",
+  "anchors": [
+    {"name": "use_stove_1", "position": [-2.05, 1.45, -2.36], "module": "hearth"},
+    {"name": "drop_pot_1", "position": [-2.05, 1.62, -2.36], "module": "hearth"},
+    {"name": "badge_stove_1", "position": [-2.05, 2.05, -2.36], "module": "hearth"},
+    {"name": "stand_stove", "position": [-1.15, 0.085, -1.7], "yaw_degrees": 45},
+    {"name": "cam_stove", "position": [-2.05, 1.3, -2.3]},
+    {"name": "spawn", "position": [2.03, 0.085, -1.85], "yaw_degrees": 180},
+    {"name": "exit", "position": [2.03, 0.085, -2.6]}
+  ]
+}
