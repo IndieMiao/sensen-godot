@@ -763,7 +763,7 @@ static func _gate_cards() -> Control:
 			lead = "Farming Lv2 unlocks Carrot and Herb",
 			need = {name = "Farming XP", have = 32, need = 50, icon = _tex("hoe"), note = "18 XP to go · harvest 9 radishes"},
 			info_row = {title = "Carrot Seeds", qty = "×5", lines = ["Level-up gift", "At Lv2"]},
-			buttons = [{id = &"guide", label = "Show my plots", kind = &"nav"}]}],
+			buttons = [{id = &"guide", label = "Show my plots", kind = &"nav", chevron = false}]}],
 		["gate card · Fish-dex silhouette, rod", {title = "Golden Koi", icon = _tex("fish_koi"), badge = &"locked", rarity_text = "Rare · Locked",
 			lead = "Reed Rod lands up to Rare fish",
 			need = {name = "Coins", have = 40, need = 80, icon = _tex("coin"), note = "80 coins at Tackle Shop"}}],

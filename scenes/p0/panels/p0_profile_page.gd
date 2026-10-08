@@ -15,6 +15,8 @@ signal back_pressed
 signal edit_look_pressed
 signal skill_pressed(skill: String)
 signal settings_pressed
+## A Collections tile was tapped: "fish" (the Fish-dex, FISH-6) or "pages" (the Cookbook).
+signal collection_pressed(key: String)
 
 const SKILLS := ["farming", "fishing", "cooking"]
 const _SKILL_ICONS := {"farming": "hoe", "fishing": "rod", "cooking": "pot"}
@@ -114,7 +116,10 @@ func refresh(view_: Dictionary) -> void:
 	col.add_child(UiKit.label("Collections", UiTokens.STYLE_C11_XB))
 	var tiles := []
 	for c in d.collections:
-		tiles.append(UiNeedTile.new(str(c.name), int(c.have), int(c.need), UiNeedTile.Size.M, P0Logic.icon(str(c.icon)), true))
+		var tile := UiNeedTile.new(str(c.name), int(c.have), int(c.need), UiNeedTile.Size.M, P0Logic.icon(str(c.icon)), true)
+		var key := str(c.get("key", ""))
+		tile.pressed.connect(func(): collection_pressed.emit(key))
+		tiles.append(tile)
 	col.add_child(UiNeedTile.group(tiles))
 
 ## Everything the page shows, from the server view (pure; tested).
@@ -140,8 +145,8 @@ static func profile_data(view: Dictionary) -> Dictionary:
 			level_line = "Level %d" % int(farm.level) if farm.has("level") else "",
 			status = _farm_status(view)},
 		collections = [
-			{name = "Fish", have = dex.filter(func(f): return int(f.get("caught", 0)) > 0).size(), need = dex.size(), icon = "fish_crucian"},
-			{name = "Pages", have = pages.filter(func(r): return r.get("name", null) != null).size(), need = pages.size(), icon = "recipe_card"},
+			{key = "fish", name = "Fish", have = dex.filter(func(f): return int(f.get("caught", 0)) > 0).size(), need = dex.size(), icon = "fish_crucian"},
+			{key = "pages", name = "Pages", have = pages.filter(func(r): return r.get("name", null) != null).size(), need = pages.size(), icon = "recipe_card"},
 		],
 	}
 

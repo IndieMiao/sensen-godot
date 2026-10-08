@@ -18,8 +18,9 @@ signal show_spot(where: String)
 ## A target in another space (TodayRow `Show on map`): leave for the map and point at its pin ("home",
 ## "pond:<id>", "tackle").
 signal show_on_map(target: String)
-## The gate card's guiding button for a panel this UI does not own (Cookbook): the host opens it (LOCK-08).
-signal gate_guide(go: String)
+## A panel this UI does not own was asked for (the gate card's Cookbook, the Fish-dex's Cookbook tab): the host
+## opens it if it can (LOCK-08: never by travelling).
+signal panel_requested(panel: String)
 signal home_choice(choice: String)
 signal recenter()
 signal place_pressed()
@@ -2007,6 +2008,9 @@ func open_profile(look_saved := false) -> void:
 	page.back_pressed.connect(close_modal)
 	page.skill_pressed.connect(func(_skill: String): open_skills())
 	page.edit_look_pressed.connect(edit_look)
+	page.collection_pressed.connect(func(key: String):
+		if key == "fish": open_fishdex(func(): open_profile())
+		else: request_panel("cookbook"))
 	_open_modal(page, 0.0, true)
 	_profile = page
 	modal_kind = "profile"
@@ -2084,6 +2088,8 @@ func open_skills() -> void:
 
 # ---------------------------------------------------------------- one-line teaching cards (§14.3)
 const TIPS_PATH := "user://p0_tips.json"
+## Where the teaching tips and "shown before" keys live (tests point it at their own file).
+var tips_path := TIPS_PATH
 
 ## A one-sentence card above the quick bar, once per account on this device; tap or 7 s to dismiss.
 ## Never a hand animation, never moves the player (§14.3 "不画手指动画循环").
@@ -2379,8 +2385,8 @@ func show_got_away(ev: Dictionary) -> void:
 ## third slot, workbench recipes, locked gathering spots and the Fish-dex silhouettes share it. An InfoSheet built by
 ## P0Logic.gate_spec (see there for `gate`). No Got it: a tap outside or Back closes it, one layer at a time —
 ## `back` reopens the panel it was opened from. Its one guiding button closes the card first, then moves the camera
-## (Show my plots: Show here, the homestead pin elsewhere), opens Skills, or hands the target to the host through
-## gate_guide (Cookbook); it never travels (LOCK-08).
+## (Show my plots: Show here, the homestead pin elsewhere), opens Skills, or asks the host through panel_requested
+## (Cookbook); it never travels (LOCK-08).
 func open_gate_card(gate: Dictionary, back := Callable()) -> UiInfoSheet:
 	var spec := P0Logic.gate_spec(view, gate)
 	var sheet := UiInfoSheet.new()
@@ -2393,7 +2399,7 @@ func open_gate_card(gate: Dictionary, back := Callable()) -> UiInfoSheet:
 	sheet.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	sheet.action_requested.connect(func(action: StringName, _id: String, payload: Dictionary):
 		if action == &"guide": _gate_guide(str(payload.get("go", ""))))
-	_open_modal(sheet)
+	_open_modal(sheet, 0.32, true)   # the card sits where the quick bar was; bar and keys hide under it
 	modal_kind = "gate"
 	sheet.open("gate", &"gate")
 	_modal_back = back
@@ -2406,7 +2412,7 @@ func _gate_guide(go: String) -> void:
 		"plots", "stall", "stove", "board", "home", "bench":
 			if show_label(go, space_here(), spot_reachable()) == "Show": show_spot.emit(go)
 			else: show_on_map.emit(map_target(go))
-		_: gate_guide.emit(go)
+		_: request_panel(go)
 
 ## A result card placed like the design's .modal (centred, top at a share of the screen, width a share
 ## of it) over an undimmed scene. Tapping outside or the button closes it; it also closes after auto_s.
@@ -2437,89 +2443,67 @@ func first_time(key: String) -> bool:
 	return true
 
 func _load_tips() -> void:
-	if _taught.is_empty() and FileAccess.file_exists(TIPS_PATH):
-		var saved = JSON.parse_string(FileAccess.get_file_as_string(TIPS_PATH))
+	if _taught.is_empty() and FileAccess.file_exists(tips_path):
+		var saved = JSON.parse_string(FileAccess.get_file_as_string(tips_path))
 		if saved is Dictionary: _taught = saved
 
 func _save_tips() -> void:
-	var f := FileAccess.open(TIPS_PATH, FileAccess.WRITE)
+	var f := FileAccess.open(tips_path, FileAccess.WRITE)
 	if f: f.store_string(JSON.stringify(_taught))
 
-func _card_buttons() -> HBoxContainer:
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 8)
-	var dex := _pill_button("Fish-dex", false)
-	dex.custom_minimum_size = Vector2(90, 32)
-	dex.pressed.connect(func(): _drop_modal(); open_fishdex())
-	row.add_child(dex)
-	var ok := _pill_button("Keep fishing", true)
-	ok.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	ok.pressed.connect(close_modal)
-	row.add_child(ok)
-	return row
-
-## FISH-6 (P0 cut): rarity sections; caught = full colour + count, broke free = tinted silhouette with
-## the level it needs, never seen = grey silhouette with where it lives.
-func open_fishdex() -> void:
-	var dex: Array = view.get("fishing", {}).get("dex", [])
-	var got := dex.filter(func(d): return int(d.get("caught", 0)) > 0).size()
-	var v := _sheet(470, "Fish-dex", "fish_crucian")
+## FISH-6 Fish-dex (SGODOT-233, P0FishDex): from the creel badge, the profile's Fish tile and the catch cards. A cell
+## opens the gate card for a silhouette its level or rod holds back (q(57)), else the fish card; either comes back to
+## the dex on Back or a tap outside. Fish caught since the last visit ring once (kept with the teaching tips).
+func open_fishdex(back := Callable(), animate := true) -> void:
+	_load_tips()
+	var caught: Array = view.get("fishing", {}).get("dex", []).filter(func(f): return int(f.get("caught", 0)) > 0).map(func(f): return str(f.id))
+	var seen: Array = _taught.get("dex_seen", [])
+	var fresh := caught.filter(func(id): return not seen.has(id))
+	if not fresh.is_empty():
+		_taught["dex_seen"] = caught
+		_save_tips()
+	var d := P0FishDex.new(view, fresh)
+	d.theme = UiKit.theme()
+	d.animate = animate
+	d.safe_bottom = safe_bottom()
+	d.close_requested.connect(close_modal)
+	d.close_pressed.connect(close_modal)
+	var again := func(): open_fishdex(back, false)
+	d.cell_pressed.connect(func(id: String):
+		var gate := P0Logic.fish_gate(view, id)
+		if not gate.is_empty() and not P0Logic.dex_caught(view, id): open_gate_card(gate, again)
+		else: open_fish_card(id, again))
+	d.tab_pressed.connect(func(tab: String): request_panel(tab))
+	_open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
 	modal_kind = "fishdex"
-	var top := HBoxContainer.new()
-	top.add_theme_constant_override("separation", 8)
-	var kinds := UiNeedTile.new("Kinds", got, dex.size(), UiNeedTile.Size.M, P0Logic.icon("fish_crucian"), true)
-	kinds.theme = UiKit.theme()
-	kinds.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	top.add_child(kinds)
-	var tv := VBoxContainer.new()
-	tv.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	tv.add_child(_label("%s · %s" % [str(view.get("fishing", {}).get("rod", "Starter Rod")), "holds up to %s" % P0Logic.rarity_name(view, int(view.get("fishing", {}).get("rod_reach", 2)))], 9, INK2))
-	top.add_child(tv)
-	v.add_child(top)
-	for r in [1, 2, 3, 4]:
-		var group := dex.filter(func(d): return int(d.get("rarity", 1)) == r)
-		if group.is_empty(): continue
-		var have := group.filter(func(d): return int(d.get("caught", 0)) > 0).size()
-		var head := HBoxContainer.new()
-		var dot := ColorRect.new()
-		dot.custom_minimum_size = Vector2(8, 8)
-		dot.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		dot.color = P0Logic.rarity_color(r)
-		head.add_child(dot)
-		head.add_child(_label(" %s  %d/%d" % [P0Logic.rarity_name(view, r), have, group.size()], 10, INK, true))
-		v.add_child(head)
-		var grid := GridContainer.new()
-		grid.columns = 4
-		grid.add_theme_constant_override("h_separation", 6)
-		grid.add_theme_constant_override("v_separation", 6)
-		for d in group:
-			grid.add_child(_dex_cell(d))
-		v.add_child(grid)
+	_modal_back = back
 
-func _dex_cell(d: Dictionary) -> Control:
-	var id := str(d.id)
-	var n := int(d.get("caught", 0))
-	var cell := PanelContainer.new()
-	cell.custom_minimum_size = Vector2(78, 78)
-	cell.add_theme_stylebox_override("panel", _box(PAPER if n > 0 else Color(1, 1, 1, 0.45), 10, P0Logic.rarity_color(int(d.rarity)) if n > 0 else EDGE, 2 if n > 0 else 1, Vector4(4, 4, 4, 3)))
-	var box := VBoxContainer.new()
-	box.add_theme_constant_override("separation", 0)
-	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var ic := _icon(id if n > 0 else "fish_glow", 34)
-	ic.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	if n == 0: ic.modulate = P0Logic.rarity_color(int(d.rarity)) if d.get("seen", false) else Color("c9c4b6")
-	box.add_child(ic)
-	var name := _label(P0Logic.item_name(view, id) if n > 0 or d.get("seen", false) else "???", 8, INK if n > 0 else INK2, true)
-	name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	name.clip_text = true
-	box.add_child(name)
-	var where: Array = d.get("where", [])
-	var note := "×%d" % n if n > 0 else ("Fishing Lv%d" % int(d.level) if int(d.level) > int(view.get("skills", {}).get("fishing", {}).get("level", 1)) else " · ".join(where.map(func(w): return str(w).capitalize())))
-	var nl := _label(note, 7, INK2)
-	nl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	box.add_child(nl)
-	cell.add_child(box)
-	return cell
+## A Fish-dex cell's card (FISH-6 单格详情, P0): the fish, its rarity, `Caught ×3 · Pond · River` and the XP it
+## gives now (`Full XP` / `XP 50% · Reduced` / `No XP · outleveled`), or `Not caught yet · Pond · River`.
+func open_fish_card(id: String, back := Callable()) -> UiInfoSheet:
+	var spec := P0Logic.fish_card_spec(view, id)
+	var sheet := UiInfoSheet.new()
+	sheet.theme = UiKit.theme()
+	sheet.rules = func(_id, _ctx, _o): return spec
+	sheet.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+	sheet.offset_left = UiTokens.SPACE_PAGE
+	sheet.offset_right = -UiTokens.SPACE_PAGE
+	sheet.offset_bottom = -bottom_pad()
+	sheet.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	_open_modal(sheet, 0.32, true)
+	modal_kind = "fish"
+	sheet.open(id, &"dex")
+	_modal_back = back
+	return sheet
+
+## A panel this UI does not own: the host's, if one listens (panel_requested); else where it lives (P0: the
+## Cookbook is at the stove in the farmhouse, COOK-2a).
+func request_panel(panel: String) -> void:
+	close_modal()
+	if panel_requested.get_connections().size() > 0:
+		panel_requested.emit(panel)
+	elif panel == "cookbook":
+		toast("Cookbook · at the stove in the farmhouse")
 
 ## COOK-4 / COOK-6: the dish slides out; Eat now or Keep (bag).
 func show_dish(ev: Dictionary, xp_lines: Array) -> void:
@@ -2707,24 +2691,6 @@ class _RarityDot extends Control:   # FISH-3 title dot: rarity colour in a cream
 	func _draw() -> void:
 		draw_circle(size * 0.5, size.x * 0.5, P0Ui.PAPER)
 		draw_circle(size * 0.5, size.x * 0.5 - 1.0, color)
-
-class _DexTile extends Control:   # FISH-5 mini Fish-dex tile: blank / caught (rarity colour) / lit (grey + glow ring)
-	var texture: Texture2D
-	var state := ""
-	var glow := Color.WHITE
-	func _draw() -> void:
-		var r := Rect2(Vector2.ZERO, size)
-		if state == "lit":
-			draw_rect(r.grow(2.0), Color(glow, 0.35), true)
-		var sb := StyleBoxFlat.new()
-		sb.bg_color = P0Ui.PAPER
-		sb.border_color = Color(glow, 0.8) if state == "lit" else P0Ui.EDGE
-		sb.set_border_width_all(1)
-		sb.set_corner_radius_all(3)
-		draw_style_box(sb, r)
-		if texture:
-			var tint := glow if state == "caught" else Color("8a918c") if state == "lit" else Color("cfc6b0")
-			draw_texture_rect(texture, r.grow(-size.x * 0.15), false, tint)
 
 ## Skill level ring on the Skills sheet (progress within the level). Item have / need is UiNeedTile (LOCK-10).
 class _LevelRing extends Control:

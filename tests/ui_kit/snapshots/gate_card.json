@@ -395,7 +395,7 @@
                                   "rect": [
                                     58,
                                     264,
-                                    164,
+                                    170,
                                     18
                                   ],
                                   "variation": "C12XB",
@@ -404,22 +404,22 @@
                                 {
                                   "type": "HBoxContainer",
                                   "rect": [
-                                    230,
+                                    236,
                                     251,
-                                    90,
+                                    84,
                                     44
                                   ],
                                   "children": [
                                     {
                                       "type": "UiNavButton",
                                       "rect": [
-                                        230,
+                                        236,
                                         251,
-                                        90,
+                                        84,
                                         44
                                       ],
                                       "variation": "NavCompact",
-                                      "text": "Show my plots ›"
+                                      "text": "Show my plots"
                                     }
                                   ]
                                 }

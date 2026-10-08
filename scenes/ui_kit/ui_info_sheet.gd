@@ -325,6 +325,7 @@ func _button(b: Dictionary) -> Control:
 	var text := str(b.get("label", ""))
 	if kind == &"nav":
 		var nav := UiNavButton.new(text.trim_suffix(" ›").trim_suffix("›"), true)
+		nav.chevron = bool(b.get("chevron", true))   # the gate card's `Show my plots` has none (SKILL-2 482:169)
 		nav.pressed.connect(func(): action_requested.emit(id, _item, payload))
 		return nav
 	var cb := UiCommandButton.new(text, UiCommandButton.Kind.PRIMARY if kind == &"primary" else UiCommandButton.Kind.SECONDARY, true)

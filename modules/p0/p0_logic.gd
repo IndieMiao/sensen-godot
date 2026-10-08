@@ -127,7 +127,7 @@ static func gate_spec(view: Dictionary, gate: Dictionary) -> Dictionary:
 		spec.info_row = level_gift_row(view, skill, lv)
 		guide = {"farming": {label = "Show my plots", go = "plots"}, "cooking": {label = "Cookbook", go = "cookbook"}}.get(skill, {})
 	if gate.has("guide"): guide = gate.guide
-	if not guide.is_empty(): spec.buttons = [{id = &"guide", label = str(guide.label), kind = &"nav", payload = {go = str(guide.go)}}]
+	if not guide.is_empty(): spec.buttons = [{id = &"guide", label = str(guide.label), kind = &"nav", chevron = false, payload = {go = str(guide.go)}}]
 	return spec
 
 ## The gate on a Fish-dex silhouette (q(57)): the Fishing level first, then the rod; {} when nothing holds the fish
@@ -146,6 +146,38 @@ static func fish_gate(view: Dictionary, fish_id: String) -> Dictionary:
 		var rod := rod_for(view, r)
 		if not rod.is_empty(): return base.merged({rod = rod})
 	return {}
+
+static func dex_caught(view: Dictionary, fish_id: String) -> bool:
+	for f in view.get("fishing", {}).get("dex", []):
+		if str(f.get("id", "")) == fish_id: return int(f.get("caught", 0)) > 0
+	return false
+
+## XP share for a skill level against a content level (§4.2.1, server rules.ts xpPercent): 100 within one level,
+## then xp_multiplier (75 / 50 / 25), -1 once outleveled.
+static func xp_percent(player_level: int, content_level: int) -> int:
+	var d := player_level - content_level
+	if d <= 1: return 100
+	for row in content().get("xp_multiplier", []):
+		if int(row[0]) == d: return int(row[1])
+	return -1
+
+## A Fish-dex cell's card (FISH-6, P0): name, rarity, `Caught ×3 · Pond · River` and what it gives now (`Full XP`,
+## `XP 50% · Reduced`, `No XP · outleveled`), or `Not caught yet · Pond · River`. No buttons.
+static func fish_card_spec(view: Dictionary, fish_id: String) -> Dictionary:
+	var d: Dictionary = {}
+	for f in view.get("fishing", {}).get("dex", []):
+		if str(f.get("id", "")) == fish_id: d = f
+	var where := " · ".join((d.get("where", []) as Array).map(func(w): return str(w).capitalize()))
+	var n := int(d.get("caught", 0))
+	var spec := {id = fish_id, title = item_name(view, fish_id), icon = icon(fish_id if n > 0 else "fish_unknown"),
+		rarity_text = rarity_name(view, int(d.get("rarity", 1))), buttons = []}
+	if n == 0:
+		spec.facts = ["Not caught yet" + ((" · " + where) if where != "" else "")]
+		return spec
+	var pct := xp_percent(int(view.get("skills", {}).get("fishing", {}).get("level", 1)), int(d.get("level", 1)))
+	var xp := "Full XP" if pct >= 100 else ("No XP · outleveled" if pct < 0 else "XP %d%% · Reduced" % pct)
+	spec.facts = ["Caught ×%d" % n + ((" · " + where) if where != "" else ""), xp]
+	return spec
 
 ## XP still needed for a skill level (0 once reached).
 static func skill_xp_to_go(view: Dictionary, skill: String, level: int) -> int:

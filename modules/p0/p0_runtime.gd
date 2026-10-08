@@ -469,6 +469,11 @@ func _dev_shot(dt: float) -> void:
 				P0Cooking.auto_play = true
 			"manual": P0Cooking.auto_play = false
 			"dex": ui.open_fishdex()
+			"dexcell":   # dexcell:fish_koi — a Fish-dex cell tap (gate card or fish card, SGODOT-233)
+				for d in ui.find_children("*", "P0FishDex", true, false): (d as P0FishDex).cell_pressed.emit(step[1])
+			"gate":   # gate:farming:2:Carrot Seeds:seed_carrot — the four-things gate card (§4.8.7)
+				ui.open_gate_card({"skill": step[1], "level": int(step[2]), "what": step[3] if step.size() > 3 else "",
+					"icon": step[4] if step.size() > 4 else ""})
 			"kai": ui.open_kai_greeting()
 			"tackle": ui.open_tackle()
 			"gear": ui.open_gear()
