@@ -2290,7 +2290,7 @@ static func resident_profile_data(view_: Dictionary, id: String) -> Dictionary:
 			dish = str(r.get("id", ""))
 			break
 	return {"face": resident_face(str(def.get("portrait", ""))),
-		"name": str(bar.name), "role": str(bar.role), "stage": str(bar.stage),
+		"name": str(bar.name), "role": str(bar.role), "stage": str(bar.stage), "stage_index": int(bar.get("stage_index", 0)),
 		"friendship": ("%d/%d" % [int(bar.have), int(bar.need)]) if str(bar.get("next", "")) != "" else str(int(bar.have)),
 		"likes": likes, "likes_icon": P0Logic.icon(dish) if dish != "" else null, "details": false}
 

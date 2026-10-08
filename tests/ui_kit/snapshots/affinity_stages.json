@@ -1,0 +1,324 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    278
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "Affinity stage tones"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        36
+      ],
+      "variation": "CaptionR12",
+      "text": "StateBadge on RES-PIP / RES-KAI · AffinityMeter stage pill · 225 验收 (197)"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        70,
+        328,
+        208
+      ],
+      "children": [
+        {
+          "type": "HBoxContainer",
+          "rect": [
+            0,
+            70,
+            328,
+            32
+          ],
+          "children": [
+            {
+              "type": "UiBadge",
+              "rect": [
+                0,
+                70,
+                65,
+                32
+              ],
+              "variation": "Badge",
+              "children": [
+                {
+                  "type": "Label",
+                  "rect": [
+                    8,
+                    77,
+                    49,
+                    18
+                  ],
+                  "variation": "CaptionB12",
+                  "text": "Stranger"
+                }
+              ]
+            },
+            {
+              "type": "PanelContainer",
+              "rect": [
+                77,
+                76,
+                58,
+                19
+              ],
+              "children": [
+                {
+                  "type": "Label",
+                  "rect": [
+                    85,
+                    78,
+                    42,
+                    15
+                  ],
+                  "variation": "C10XB",
+                  "text": "Stranger"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "HBoxContainer",
+          "rect": [
+            0,
+            114,
+            328,
+            32
+          ],
+          "children": [
+            {
+              "type": "UiBadge",
+              "rect": [
+                0,
+                114,
+                80,
+                32
+              ],
+              "variation": "Badge",
+              "children": [
+                {
+                  "type": "Label",
+                  "rect": [
+                    8,
+                    121,
+                    64,
+                    18
+                  ],
+                  "variation": "CaptionB12",
+                  "text": "Acquainted"
+                }
+              ]
+            },
+            {
+              "type": "PanelContainer",
+              "rect": [
+                92,
+                120,
+                70,
+                19
+              ],
+              "children": [
+                {
+                  "type": "Label",
+                  "rect": [
+                    100,
+                    122,
+                    54,
+                    15
+                  ],
+                  "variation": "C10XB",
+                  "text": "Acquainted"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "HBoxContainer",
+          "rect": [
+            0,
+            158,
+            328,
+            32
+          ],
+          "children": [
+            {
+              "type": "UiBadge",
+              "rect": [
+                0,
+                158,
+                61,
+                32
+              ],
+              "variation": "Badge",
+              "children": [
+                {
+                  "type": "Label",
+                  "rect": [
+                    8,
+                    165,
+                    45,
+                    18
+                  ],
+                  "variation": "CaptionB12",
+                  "text": "Familiar"
+                }
+              ]
+            },
+            {
+              "type": "PanelContainer",
+              "rect": [
+                73,
+                164,
+                55,
+                19
+              ],
+              "children": [
+                {
+                  "type": "Label",
+                  "rect": [
+                    81,
+                    166,
+                    39,
+                    15
+                  ],
+                  "variation": "C10XB",
+                  "text": "Familiar"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "HBoxContainer",
+          "rect": [
+            0,
+            202,
+            328,
+            32
+          ],
+          "children": [
+            {
+              "type": "UiBadge",
+              "rect": [
+                0,
+                202,
+                59,
+                32
+              ],
+              "variation": "Badge",
+              "children": [
+                {
+                  "type": "Label",
+                  "rect": [
+                    8,
+                    209,
+                    43,
+                    18
+                  ],
+                  "variation": "CaptionB12",
+                  "text": "Trusted"
+                }
+              ]
+            },
+            {
+              "type": "PanelContainer",
+              "rect": [
+                71,
+                208,
+                53,
+                19
+              ],
+              "children": [
+                {
+                  "type": "Label",
+                  "rect": [
+                    79,
+                    210,
+                    37,
+                    15
+                  ],
+                  "variation": "C10XB",
+                  "text": "Trusted"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "HBoxContainer",
+          "rect": [
+            0,
+            246,
+            328,
+            32
+          ],
+          "children": [
+            {
+              "type": "UiBadge",
+              "rect": [
+                0,
+                246,
+                60,
+                32
+              ],
+              "variation": "Badge",
+              "children": [
+                {
+                  "type": "Label",
+                  "rect": [
+                    8,
+                    253,
+                    44,
+                    18
+                  ],
+                  "variation": "CaptionB12",
+                  "text": "Kindred"
+                }
+              ]
+            },
+            {
+              "type": "PanelContainer",
+              "rect": [
+                72,
+                252,
+                54,
+                19
+              ],
+              "children": [
+                {
+                  "type": "Label",
+                  "rect": [
+                    80,
+                    254,
+                    38,
+                    15
+                  ],
+                  "variation": "C10XB",
+                  "text": "Kindred"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

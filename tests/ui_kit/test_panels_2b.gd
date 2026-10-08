@@ -579,6 +579,46 @@ func test_resident_profile_lists_identity_stage_friendship_and_likes() -> void:
 	dismiss.pressed.emit()
 	assert_bool(back[0]).is_true()
 
+## 225 验收 / 不知火舞: each stage has its tone, shared by the profile's StateBadge and the bar's stage pill; out of range
+## reads as Stranger; the bar's meter fill and UiBadge's own default (Ready etc.) stay as they were.
+const _TONES := [
+	[UiTokens.COLOR_TILE_CORE, UiTokens.COLOR_SECONDARY],
+	[UiTokens.COLOR_PRIMARY_TINT, UiTokens.COLOR_PRIMARY],
+	[UiTokens.COLOR_ROLE_TACKLE_TINT, UiTokens.COLOR_ROLE_TACKLE],
+	[UiTokens.COLOR_ROLE_MARKET_TINT, UiTokens.COLOR_ROLE_MARKET],
+	[UiTokens.COLOR_GOLD, UiTokens.COLOR_TEXT],
+]
+
+func _fill(c: Control) -> Color:
+	return (c.get_theme_stylebox(&"panel") as UiStyleBox).bg_color
+
+func _ink(c: Node, text: String) -> Color:
+	var l := c.find_children("*", "Label", true, false).filter(func(x): return x.text == text)[0] as Label
+	return l.get_theme_color(&"font_color")
+
+func test_each_affinity_stage_has_its_tone_on_the_profile_and_the_bar() -> void:
+	var names := ["Stranger", "Acquainted", "Familiar", "Trusted", "Kindred"]
+	for i in names.size():
+		var p: UiResidentProfile = _host(UiResidentProfile.new({name = "Pip", stage = names[i], stage_index = i}))
+		var b: UiResidentBar = _host(UiResidentBar.new(_pip({stage = names[i], stage_index = i})))
+		await _settle()
+		var badge := p.find_children("*", "UiBadge", true, false)[0] as UiBadge
+		assert_object(_fill(badge)).is_equal(_TONES[i][0])
+		assert_object(_ink(badge, names[i])).is_equal(_TONES[i][1])
+		var label := b.find_children("*", "Label", true, false).filter(func(x): return x.text == names[i])[0] as Label
+		assert_object(_fill(label.get_parent() as Control)).is_equal(_TONES[i][0])
+		assert_object(label.get_theme_color(&"font_color")).is_equal(_TONES[i][1])
+		assert_float(badge.size.y).is_equal(float(UiTokens.SIZE_STATE_BADGE_H))   # size as it was
+		assert_float((badge.get_theme_stylebox(&"panel") as UiStyleBox).border_width).is_equal(0.0)   # no edge
+	assert_array(UiResidentBar.stage_tone(-1)).is_equal(_TONES[0])
+	assert_array(UiResidentBar.stage_tone(9)).is_equal(_TONES[0])
+
+func test_a_plain_state_badge_keeps_its_own_tone() -> void:
+	var ready: UiBadge = _host(UiBadge.new("Ready"))
+	await _settle()
+	assert_object(_fill(ready)).is_equal(UiTokens.COLOR_PRIMARY_TINT)
+	assert_object(_ink(ready, "Ready")).is_equal(UiTokens.COLOR_PRIMARY)
+
 func test_notice_row_reads_one_line_with_a_chevron() -> void:
 	var r: UiNoticeRow = _host(UiNoticeRow.new("Bag full · +5 slots at Homestead Lv3"))
 	r.size = Vector2(336, 44)
