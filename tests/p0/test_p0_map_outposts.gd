@@ -438,7 +438,7 @@ func after() -> void:
 	P0Runtime.free_instance_for_tests()
 
 ## int9 (韩信): a selected outpost by the left edge kept its name partly off screen. A MapDestination's name now slides
-## in to LABEL_EDGE from either side, its disc staying over the point; the hit rect follows the name.
+## in to LABEL_EDGE from the screen's sides, its disc staying over the point; the hit rect follows the name.
 func test_a_name_by_the_edge_stays_on_screen() -> void:
 	var m := _map()
 	for i in 3: await get_tree().process_frame
@@ -455,18 +455,19 @@ func test_a_name_by_the_edge_stays_on_screen() -> void:
 	city._update_markers()
 	var mk: Dictionary = city.markers["sh_tackle_1"]
 	var name_rect := _dest_label_rect(mk)
-	assert_float(name_rect.position.x).is_greater_equal(CityMapView.LABEL_EDGE - 0.5)
-	assert_float(name_rect.end.x).is_less_equal(city.size.x - CityMapView.LABEL_EDGE + 0.5)
+	var on_screen := Rect2(name_rect.position + city.global_position, name_rect.size)   # in the screen's coordinates
+	assert_float(on_screen.position.x).is_greater_equal(CityMapView.LABEL_EDGE - 0.5)
+	assert_float(on_screen.end.x).is_less_equal(360.0 - CityMapView.LABEL_EDGE + 0.5)
 	var pin: UiMapDestination = mk.dest
 	var disc_centre: Vector2 = (mk.anchor as Vector2) + pin.position + pin._pin.position + Vector2(20, 20)
 	assert_float(disc_centre.x).is_equal_approx((mk.anchor as Vector2).x, 0.5)   # the disc stays on its point
 	assert_bool((mk.hit as Array).any(func(r): return (r as Rect2).is_equal_approx(name_rect))).is_true()
 	# Its disc packed in the margin off the screen: the name stays with it, no name without its pin.
 	var q: Vector2 = m.geo_to_screen(at.x, at.y)
-	m._pan_by(Vector2(-20.0 - (q.x - city.global_position.x), 0.0))   # its point 20 px left of the city view
+	m._pan_by(Vector2(-20.0 - q.x, 0.0))   # its point 20 px left of the screen
 	m._update_cameras()
 	m._sync_farm_markers()
 	city._update_markers()
-	assert_float((city.markers["sh_tackle_1"].anchor as Vector2).x).is_less(0.0)
+	assert_float((city.markers["sh_tackle_1"].anchor as Vector2).x + city.global_position.x).is_less(0.0)
 	assert_float((city.markers["sh_tackle_1"].dest as UiMapDestination).label_shift).is_equal_approx(0.0, 0.01)
 	city.selected = {}
