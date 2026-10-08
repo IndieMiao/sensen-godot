@@ -44,20 +44,26 @@ func test_the_farmhouse_is_its_name() -> void:
 	assert_str(p.fact).is_empty()
 	assert_int(p.status).is_equal(-1)
 
-func test_the_bench_reads_its_energy_then_rested_today() -> void:
+func test_the_bench_reads_what_resting_gives_and_dims_when_it_cannot() -> void:
 	var v := _view()
 	var p := P0WorldPrompts.bench(v)
 	assert_array([p.text, p.fact, p.status, p.dimmed]).is_equal(["+60 Energy", "", -1, false])
 	assert_object(p.icon).is_same(P0Logic.icon("rest"))
+	v.energy.value = 175   # REST-NEARFULL: what it really gives
+	assert_array([P0WorldPrompts.bench(v).text, P0WorldPrompts.bench(v).dimmed]).is_equal(["+25 Energy", false])
+	v.energy.value = 200
+	p = P0WorldPrompts.bench(v)
+	assert_array([p.text, p.fact, p.dimmed]).is_equal(["+60 Energy", "Energy full", true])
+	v.energy.value = 120
 	v.rest.used = 1
 	p = P0WorldPrompts.bench(v)
 	assert_array([p.text, p.status, p.dimmed]).is_equal(["Rested today", UiStatusBadge.State.USED_TODAY, true])
 	v.rest.used = 0
-	v.rest.away_ready_in = 4800000
+	v.rest.away_ready_in = 4320000
 	p = P0WorldPrompts.bench(v)
-	assert_array([p.text, p.fact, p.status]).is_equal(["+60 Energy", "Back in 1h 20m", UiStatusBadge.State.COUNTDOWN])
+	assert_array([p.text, p.fact, p.status, p.dimmed]).is_equal(["+60 Energy", "Back in 1h 12m", UiStatusBadge.State.COUNTDOWN, true])
 	v.rest.away_ready_in = null   # never been away yet
-	assert_str(P0WorldPrompts.bench(v).fact).is_equal("After 2h away")
+	assert_array([P0WorldPrompts.bench(v).fact, P0WorldPrompts.bench(v).dimmed]).is_equal(["After 2h away", true])
 
 func test_a_spot_names_itself_with_at_most_one_fact() -> void:
 	var v := _view()

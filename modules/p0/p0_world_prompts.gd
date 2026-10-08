@@ -47,16 +47,21 @@ static func sign(view: Dictionary) -> Dictionary:
 static func plaque(_view: Dictionary) -> Dictionary:
 	return _p("board", "Upgrade Plaque", "", -1, false, false)
 
-## Rest bench (FARM-7, q(62)): `+60 Energy`; used today: Dimmed `Rested today`; not yet (q(41): 2 h away from home
-## first): the Countdown state with when as its one fact, `Back in 1h 20m` / `After 2h away`. Full Energy still reads
-## +60 (its card says Energy full).
+## Rest bench (FARM-7, q(62)): what resting gives now — `+60 Energy`, or less near full (REST-NEARFULL `+25 Energy`).
+## Only when it can be used is it the normal strip; otherwise Dimmed with the reason as its one fact (不知火舞 on #59):
+## used today `Rested today`; not yet (q(41): 2 h away from home first) the Countdown state with `Back in 1h 12m` /
+## `After 2h away`; Energy full `Energy full`.
 static func bench(view: Dictionary) -> Dictionary:
 	var st := P0Logic.rest_state(view)
-	var gain := "+%d Energy" % int(view.get("rest", {}).get("amount", 60))
-	match str(st.badge):
-		"used_today": return _p("rest", "Rested today", "", UiStatusBadge.State.USED_TODAY, true)
-		"countdown": return _p("rest", gain, str(st.reason), UiStatusBadge.State.COUNTDOWN)
-	return _p("rest", gain)
+	var amount := int(view.get("rest", {}).get("amount", 60))
+	var e: Dictionary = view.get("energy", {})
+	var gain := mini(amount, maxi(0, int(e.get("max", 200)) - int(e.get("value", 0))))
+	var text := "+%d Energy" % (gain if gain > 0 else amount)
+	match str(st.state):
+		"used": return _p("rest", "Rested today", "", UiStatusBadge.State.USED_TODAY, true)
+		"away": return _p("rest", text, str(st.reason), UiStatusBadge.State.COUNTDOWN, true)
+		"full": return _p("rest", text, str(st.reason), -1, true)
+	return _p("rest", text)
 
 ## Workbench (231): name only.
 static func workbench() -> Dictionary:
