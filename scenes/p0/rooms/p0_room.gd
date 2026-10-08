@@ -65,7 +65,9 @@ var _cam_size := 10.75
 var _focus := Vector3.ZERO
 var _follow := P0Follow.new()
 var _zoom := 1.0
-var _pinch = preload("res://modules/p0/p0_elastic_zoom.gd").new(ZOOM_RANGE.x, ZOOM_RANGE.y)   # rubber band past the range
+const ElasticZoom = preload("res://modules/p0/p0_elastic_zoom.gd")
+var _pinch = ElasticZoom.new(ZOOM_RANGE.x, ZOOM_RANGE.y)   # rubber band past the range
+var _zoom_at := Vector2.INF                              # the last pinch centre (screen)
 var _framed := Vector3.ZERO   # the opening shot's centre
 var _fits := false            # the whole floor fits the opening shot: hold it instead of following
 var _shot := {}           # push-in: {center: Vector3, size: float, release_on_move: bool}
@@ -440,10 +442,10 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 	if _leaving or not is_inside_tree(): return   # the door popped this room mid-frame
 	# A room that fits the screen holds its diorama framing (following would crop it); zoomed in, or in
 	# a space larger than the screen (the market square), the safe box follows the player (§10.1).
-	if _pinch.step(dt): _zoom = _pinch.value   # springing back from past a zoom limit
 	if _fits and _zoom <= 1.0: _focus = _framed
 	else: _focus = _follow.step(cam, _focus, actor.position, actor.mover.is_moving(), dt)
-	_update_camera()
+	if _pinch.step(dt): _set_zoom(_pinch.value)   # springing back from past a zoom limit, about the same point
+	else: _update_camera()
 	if rt: _markers(v)
 	_room_frame(v, dt)
 	if _perf_left >= 0.0:
@@ -496,10 +498,23 @@ static func badge_state(key: String) -> int:
 func p0_anchor() -> Vector2:
 	return cam.unproject_position(actor.position + Vector3(0, 2.0, 0))
 
-func p0_zoom(f: float) -> void:
+## Zoom about the last pinch centre (ScenePan's focal pinch). A room that fits the screen keeps its diorama framing
+## at zoom ≤ 1, so the shift only holds once zoomed in.
+func _set_zoom(value: float) -> void:
+	_zoom = value
+	if cam == null or not is_inside_tree(): return   # not placed yet: the next frame frames it
+	var before = ElasticZoom.ground_at(cam, _zoom_at, _focus.y)
+	_update_camera()
+	var d := ElasticZoom.shift(before, ElasticZoom.ground_at(cam, _zoom_at, _focus.y))
+	if d != Vector3.ZERO and not (_fits and _zoom <= 1.0):
+		_focus += d
+		_update_camera()
+
+func p0_zoom(f: float, at := Vector2.INF) -> void:
+	_zoom_at = at
 	_pinch.pinch(f)
-	_zoom = _pinch.value
-	if _zoom > 1.0 and _fits: _follow.held = false
+	_follow.hold()   # the pinched framing stays until the player walks
+	_set_zoom(_pinch.value)
 
 func p0_zoom_end() -> void: _pinch.release()
 

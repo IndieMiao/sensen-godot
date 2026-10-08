@@ -40,10 +40,11 @@ func test_back_closes_one_layer_at_a_time() -> void:
 	assert_bool(ui.has_modal()).is_true()
 	assert_bool(ui.close_top_layer()).is_true()   # the Inbox, not the farm
 	assert_bool(ui.has_modal()).is_false()
-	ui._on_pin_toggled("seed_radish", true)
-	assert_object(ui._pin_menu).is_not_null()
-	assert_bool(ui.close_top_layer()).is_true()
-	assert_object(ui._pin_menu).is_null()
+	await await_idle_frame()
+	ui._bar._start_drag(0, ui._bar.cells()[0].get_global_rect().get_center())   # a slot lifted and dragging (v1.11)
+	assert_bool(ui._bar.is_dragging()).is_true()
+	assert_bool(ui.close_top_layer()).is_true()   # Back cancels the drag: the slot flies back
+	assert_bool(ui._bar.is_dragging()).is_false()
 	assert_bool(ui.close_top_layer()).is_false()
 
 func test_end_stick_resets_the_pad_and_stops_the_world() -> void:

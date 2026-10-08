@@ -35,6 +35,8 @@ static func all() -> Array[Dictionary]:
 		{id = "pin_menu", title = "UiPinMenu", figma = "PinMenu 1141:80291 · LOCK-05", build = _pin_menus},
 		{id = "scene_action", title = "UiSceneAction", figma = "SceneAction 1116:78934 · LOCK-02", build = _scene_actions},
 		{id = "action_key", title = "UiActionKey", figma = "ActionKey 1117:78924 · LOCK-02 / 03", build = _action_keys},
+		{id = "bar_drop_zone", title = "UiBarDropZone", figma = "BarDropZone 1588:97952 · LOCK-04 / 05 v1.11 (221 b0a83924)", build = _bar_drop_zones},
+		{id = "bar_drag", title = "Quick slot drag · UiUndoToast", figma = "QuickSlot State=lifted · Toast Tone=Info 1178:82247 · LOCK-04 v1.11", build = _bar_drags},
 		{id = "action_radial", title = "UiActionRadial", figma = "RadialPetal 1122:79385 · BAR-2 482:23 · LOCK-03", build = _action_radial},
 		{id = "status_badge", title = "UiStatusBadge", figma = "StatusBadge 1132:79554 · LOCK-11", build = _status_badges},
 		{id = "tap_card", title = "UiTapCard", figma = "TapCard 1135:101133 · LOCK-07", build = _tap_cards},
@@ -297,6 +299,12 @@ static func _cells_quick() -> Control:
 		fields.merge(sample[1], true)
 		row.add_child(_captioned(_cell(D, fields), sample[0]))
 	row.add_child(_captioned(_cell(D, {icon = _tex("compost"), title = "Compost", quantity = "×6"}), "one-line name"))
+	for sample in [["new (ring at peak)", {}], ["new + selected", {state = S.SELECTED}]]:
+		var fields: Dictionary = {icon = _tex("seed_lettuce"), title = "Lettuce Seeds", quantity = "×10"}
+		fields.merge(sample[1], true)
+		var c: UiItemCell = _cell(D, fields)
+		c.show_new_ring()   # State=new 1663:101150: the 600 ms ring, held at its peak for the shot
+		row.add_child(_captioned(c, sample[0]))
 	return row
 
 static func _cells_kitchen() -> Control:
@@ -781,6 +789,70 @@ static func _bar_slots() -> Array:
 		{id = "seed_potato", icon = _tex("seed_potato"), title = "Potato Seeds", quantity = 3},
 	]
 
+static func _bar_drop_zones() -> Control:
+	var v := _column(UiTokens.SPACE_SECTION)
+	var K := UiBarDropZone.Kind
+	# Idle: the three looks side by side. Hover: the real pair at its real spacing (x 72 / 168, 96 apart), one
+	# zone hovered at a time as under a finger, so the label pills read as they do on screen.
+	var rows := [
+		[[K.PIN, false, 56.0], [K.UNPIN, false, 164.0], [K.REMOVE, false, 272.0], "idle · Pin · Unpin · Remove"],
+		[[K.PIN, true, 72.0], [K.REMOVE, false, 168.0], "hover Pin · Remove idle (x 72 / 168)"],
+		[[K.UNPIN, false, 72.0], [K.REMOVE, true, 168.0], "Unpin idle · hover Remove"],
+	]
+	for spec in rows:
+		var row := ColorRect.new()   # over a scene-grey backdrop: on the gallery's surface the zones' own surface vanishes
+		row.color = UiKit.alpha(UiTokens.COLOR_TEXT, UiTokens.OPACITY_SCRIM_MODAL)
+		row.custom_minimum_size = Vector2(328, 116)
+		for z_spec in spec.slice(0, spec.size() - 1):
+			var z := UiBarDropZone.new(z_spec[0])
+			z.top_level = false   # drawn in the gallery row, not at its screen spot
+			z.hover = z_spec[1]
+			row.add_child(z)
+			z.center = Vector2(z_spec[2], 42)
+		v.add_child(_captioned(row, spec[spec.size() - 1]))
+	return v
+
+## The drag itself, in its own section so each shot fits the 1280 px gallery screen (不知火舞 on #38).
+static func _bar_drags() -> Control:
+	var v := _column(UiTokens.SPACE_SECTION)
+	var lifted := _row(UiTokens.SPACE_SECTION)
+	lifted.add_child(_captioned(_lifted_slot(false), "drag: 24 above finger"))
+	lifted.add_child(_captioned(_lifted_slot(true), "over a zone: 80 %"))
+	v.add_child(lifted)
+	v.add_child(_captioned(UiUndoToast.new("Radish Seeds off the bar"), "removed: Info toast with Undo (5 s)"))
+	return v
+
+## A lifted quick slot placed the way UiQuickBar._move_drag places it over the finger (white dot), optionally over
+## a hovered Pin zone (centred on the finger) at the hover scale.
+static func _lifted_slot(over_zone: bool) -> Control:
+	var frame := ColorRect.new()
+	frame.color = UiKit.alpha(UiTokens.COLOR_TEXT, UiTokens.OPACITY_SCRIM_MODAL)
+	frame.custom_minimum_size = Vector2(150, 220)
+	var finger := Vector2(75, 150)
+	if over_zone:
+		var z := UiBarDropZone.new(UiBarDropZone.Kind.PIN)
+		z.top_level = false
+		z.hover = true
+		frame.add_child(z)
+		z.center = finger
+	var cell := UiItemCell.new(UiItemCell.Density.QUICK)
+	cell.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	cell.icon = _tex("seed_radish")
+	cell.title = "Radish Seeds"
+	cell.quantity = "×12"
+	cell.state = UiItemCell.State.LIFTED
+	cell.pivot_offset = cell.custom_minimum_size * 0.5
+	frame.add_child(cell)
+	cell.position = finger - Vector2(cell.custom_minimum_size.x * 0.5, cell.custom_minimum_size.y + UiQuickBar._RIDE_ABOVE)
+	if over_zone: cell.scale = Vector2.ONE * UiQuickBar._HOVER_SCALE
+	var dot := Panel.new()
+	dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	dot.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_SURFACE, 7))
+	dot.size = Vector2(14, 14)
+	dot.position = finger - Vector2(7, 7)
+	frame.add_child(dot)
+	return frame
+
 static func _quick_bars() -> Control:
 	var v := _column()
 	var a := UiQuickBar.new()
@@ -788,9 +860,9 @@ static func _quick_bars() -> Control:
 	a.selected = "seed_carrot"
 	v.add_child(_fit_bar(a, "selected · pinned · zero (pinned, 0 left) · empty"))
 	var g := UiQuickBar.new()
-	g.slots = [{id = "compost", icon = _tex("compost"), title = "Compost", quantity = 6},
+	g.slots = [{id = "seed_lettuce", icon = _tex("seed_lettuce"), title = "Lettuce Seeds", quantity = 0, pinned = true},
 		{ghost = true, icon = _tex("seed_radish"), title = "Seeds"}]
-	v.add_child(_fit_bar(g, "no seeds on the bar: the first empty slot is the Seeds ghost"))
+	v.add_child(_fit_bar(g, "nothing in stock (pinned 0): first empty slot is the ghost"))
 	var b := UiQuickBar.new()
 	b.slots = _bar_slots()
 	b.capacity_warning = true

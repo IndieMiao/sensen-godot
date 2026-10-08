@@ -66,14 +66,24 @@ func test_tap_selects_and_a_ghost_opens_the_bag_tab() -> void:
 	bar.cells()[4].tapped.emit()
 	assert_array(events).contains_exactly([["slot_tapped", "seed_carrot", null], ["ghost_tapped", 4, null]])
 
-func test_long_press_floats_then_release_toggles_the_pin() -> void:
+func test_long_press_lifts_and_fades_in_both_drop_zones() -> void:
+	# LOCK-04 / 05 v1.11: the lift shows Pin (or Unpin for a pinned slot) and Remove; releasing it there does nothing.
 	bar.cells()[1].gesture.emit({kind = &"lift", pos = _center(1)})
 	assert_int(bar.cells()[1].state).is_equal(UiItemCell.State.LIFTED)
-	bar.cells()[1].gesture.emit({kind = &"pin_toggle", pos = _center(1)})
-	bar.cells()[0].gesture.emit({kind = &"lift", pos = _center(0)})
-	bar.cells()[0].gesture.emit({kind = &"pin_toggle", pos = _center(0)})
-	assert_array(events).contains_exactly([["pin_toggled", "seed_carrot", true], ["pin_toggled", "seed_radish", false]])
+	var zones := bar.drop_zones()
+	assert_int(zones.size()).is_equal(2)
+	assert_int(zones[0].kind).is_equal(UiBarDropZone.Kind.PIN)
+	assert_int(zones[1].kind).is_equal(UiBarDropZone.Kind.REMOVE)
+	var top := bar.get_global_rect().position.y
+	var left := bar.get_global_rect().position.x
+	assert_vector(zones[0].center).is_equal(Vector2(left + 60.0, top - 96.0))
+	assert_vector(zones[1].center).is_equal(Vector2(left + 156.0, top - 96.0))
+	bar.cells()[1].gesture.emit({kind = &"cancel", pos = _center(1)})
+	assert_array(bar.drop_zones()).is_empty()
 	assert_int(bar.cells()[1].state).is_equal(UiItemCell.State.DEFAULT)
+	bar.cells()[0].gesture.emit({kind = &"lift", pos = _center(0)})   # radish is pinned
+	assert_int(bar.drop_zones()[0].kind).is_equal(UiBarDropZone.Kind.UNPIN)
+	assert_array(events).is_empty()
 
 func test_drag_onto_another_slot_swaps_them() -> void:
 	var c := bar.cells()[0]
@@ -88,14 +98,68 @@ func test_drag_onto_another_slot_swaps_them() -> void:
 	assert_bool(bar.is_dragging()).is_false()
 	assert_int(bar.cells()[2].state).is_equal(UiItemCell.State.ZERO)
 
-func test_fling_above_the_bar_removes_the_slot() -> void:
+func test_dropping_on_the_remove_zone_removes() -> void:
 	var c := bar.cells()[1]
+	c.gesture.emit({kind = &"lift", pos = _center(1)})
+	c.gesture.emit({kind = &"drag_start", pos = _center(1)})
+	var zone := bar.drop_zones()[1]
+	assert_bool(zone.hover).is_false()
+	c.gesture.emit({kind = &"drag_move", pos = zone.center + Vector2(30, 20)})   # within 44
+	assert_bool(zone.hover).is_true()
+	assert_bool(bar.drop_zones()[0].hover).is_false()
+	assert_vector(bar._ghost.scale).is_equal(Vector2(0.8, 0.8))
+	c.gesture.emit({kind = &"drop", pos = zone.center + Vector2(30, 20)})
+	assert_array(events).contains_exactly([["slot_removed", "seed_carrot", null]])
+	assert_bool(bar.is_dragging()).is_false()
+
+func test_dragged_slot_rides_above_the_finger() -> void:
+	var c := bar.cells()[0]
+	c.gesture.emit({kind = &"lift", pos = _center(0)})
+	c.gesture.emit({kind = &"drag_start", pos = Vector2(150, 600)})
+	var g: UiItemCell = bar._ghost
+	assert_float(g.global_position.y + g.custom_minimum_size.y).is_equal(600.0 - 24.0)
+	assert_float(g.global_position.x + g.custom_minimum_size.x * 0.5).is_equal(150.0)
+
+func test_release_anywhere_else_flies_back_and_changes_nothing() -> void:
+	var c := bar.cells()[1]
+	c.gesture.emit({kind = &"lift", pos = _center(1)})
 	c.gesture.emit({kind = &"drag_start", pos = _center(1)})
 	var top := bar.get_global_rect().position.y
-	c.gesture.emit({kind = &"drop", pos = Vector2(_center(1).x, top - GestureArbiter.FLING_REMOVE + 1)})   # not far enough
+	c.gesture.emit({kind = &"drop", pos = Vector2(_center(1).x, top - 41.0)})   # the old "40 above removes" is gone
+	assert_array(events).is_empty()
+	assert_bool(bar.is_dragging()).is_false()
+	assert_int(c.state).is_equal(UiItemCell.State.DEFAULT)
+
+func test_the_pin_zone_toggles_and_its_own_slot_cancels() -> void:
+	var c := bar.cells()[1]
+	c.gesture.emit({kind = &"lift", pos = _center(1)})
 	c.gesture.emit({kind = &"drag_start", pos = _center(1)})
-	c.gesture.emit({kind = &"drop", pos = Vector2(_center(1).x, top - GestureArbiter.FLING_REMOVE - 1)})
-	assert_array(events).contains_exactly([["slot_removed", "seed_carrot", null]])
+	c.gesture.emit({kind = &"drop", pos = _center(1)})   # back on its own slot: nothing (v1.11)
+	assert_array(events).is_empty()
+	c.gesture.emit({kind = &"lift", pos = _center(1)})
+	c.gesture.emit({kind = &"drag_start", pos = _center(1)})
+	var pin := bar.drop_zones()[0]
+	c.gesture.emit({kind = &"drag_move", pos = pin.center})
+	assert_bool(pin.hover).is_true()
+	c.gesture.emit({kind = &"drop", pos = pin.center})
+	assert_array(events).contains_exactly([["pin_toggled", "seed_carrot", true]])
+	assert_array(bar.drop_zones()).is_empty()
+
+func test_a_cancel_or_cancel_drag_flies_back() -> void:
+	var c := bar.cells()[1]
+	c.gesture.emit({kind = &"lift", pos = _center(1)})
+	c.gesture.emit({kind = &"drag_start", pos = _center(1)})
+	c.gesture.emit({kind = &"cancel"})   # a second finger
+	assert_bool(bar.is_dragging()).is_false()
+	c.gesture.emit({kind = &"lift", pos = _center(1)})
+	c.gesture.emit({kind = &"drag_start", pos = _center(1)})
+	bar.cancel_drag()   # app paused / a drawer opening
+	assert_bool(bar.is_dragging()).is_false()
+	assert_array(bar.drop_zones()).is_empty()
+	c.gesture.emit({kind = &"lift", pos = _center(1)})
+	bar.cancel_drag()   # lifted, not yet dragging
+	assert_array(bar.drop_zones()).is_empty()
+	assert_array(events).is_empty()
 
 func test_swipe_up_bag_and_close() -> void:
 	bar.cells()[3].gesture.emit({kind = &"swipe_up"})
@@ -160,7 +224,8 @@ func test_real_tap_selects_and_never_reaches_unhandled_input() -> void:
 	assert_array(events).contains_exactly([["slot_tapped", "seed_carrot", null]])
 	assert_int(sink.n).is_equal(0)
 
-func test_real_long_press_pins_through_the_cell_arbiter() -> void:
+func test_real_long_press_only_lifts() -> void:
+	# LOCK-04 / 05 v1.11: a press held and released in place lifts, shows the zones and changes nothing.
 	var now := [0]
 	for c in bar.cells(): c.clock = func() -> int: return now[0]
 	await _into_view()
@@ -170,9 +235,11 @@ func test_real_long_press_pins_through_the_cell_arbiter() -> void:
 	now[0] = GestureArbiter.LONG_PRESS_MS + 10
 	bar.cells()[1]._process(0.0)
 	assert_int(bar.cells()[1].state).is_equal(UiItemCell.State.LIFTED)
+	assert_int(bar.drop_zones().size()).is_equal(2)
 	_push(_press(at, false))
 	await await_idle_frame()
-	assert_array(events).contains_exactly([["pin_toggled", "seed_carrot", true]])
+	assert_array(events).is_empty()
+	assert_array(bar.drop_zones()).is_empty()
 
 ## The headless test viewport is small; routed presses must land inside it.
 func _into_view() -> void:
@@ -262,7 +329,8 @@ func test_pin_badge_sits_at_the_buttons_left_like_the_main() -> void:
 	assert_float(b.get_center().y).is_equal(menu.button().size.y * 0.5)
 	assert_float(menu._verb.get_rect().get_center().x).is_equal(menu.button().size.x * 0.5)   # verb stays centred
 
-func test_long_press_that_turns_into_a_drag_does_not_pin() -> void:
+func test_a_drag_released_back_on_its_own_slot_changes_nothing() -> void:
+	# LOCK-04 / 05 v1.11: the release point decides; its own slot is a cancel.
 	var now := [0]
 	for c in bar.cells(): c.clock = func() -> int: return now[0]
 	await _into_view()
@@ -323,3 +391,41 @@ class _World extends Control:
 	func _ready() -> void: mouse_filter = Control.MOUSE_FILTER_STOP
 	func _gui_input(e: InputEvent) -> void:
 		if e is InputEventMouseButton or e is InputEventScreenTouch: n += 1
+
+func test_slot_at_finds_the_slot_under_a_finger_filled_or_empty() -> void:
+	# SGODOT-225: a bag item dragged over the bar lands on the slot under the finger, a gap included.
+	await await_idle_frame()
+	var cells := bar.cells()
+	assert_int(bar.slot_at(cells[1].get_global_rect().get_center())).is_equal(1)
+	assert_int(bar.slot_at(cells[4].get_global_rect().get_center())).is_equal(4)   # empty
+	assert_int(bar.slot_at(cells[2].get_global_rect().position + Vector2(1, 1 - GestureArbiter.DROP_SLOT_GROW))).is_equal(2)   # in the grown edge, nearer slot 2 than slot 1
+	assert_int(bar.slot_at(Vector2(-200, -200))).is_equal(-1)
+	bar.collapsed = true
+	assert_int(bar.slot_at(cells[1].get_global_rect().get_center())).is_equal(-1)
+
+func test_set_drop_target_lights_a_slot_even_an_empty_one() -> void:
+	var cells := bar.cells()
+	bar.set_drop_target(4)
+	assert_int(cells[4].state).is_equal(UiItemCell.State.DROP_TARGET)
+	bar.set_drop_target(1)
+	assert_int(cells[1].state).is_equal(UiItemCell.State.DROP_TARGET)
+	assert_int(cells[4].state).is_equal(UiItemCell.State.EMPTY)
+	bar.set_drop_target(-1)
+	assert_int(cells[1].state).is_equal(UiItemCell.State.DEFAULT)
+
+func test_flash_rings_the_slot_of_a_new_item_once() -> void:
+	# QuickSlot State=new 1663:101150 (§10.3.3 ④): color/new ring in then out over 600 ms; unknown ids are ignored.
+	var cells := bar.cells()
+	bar.flash("seed_none")
+	bar.flash("seed_carrot")
+	await get_tree().create_timer(0.2).timeout
+	assert_bool(cells[1].is_flashing()).is_true()
+	assert_bool(cells[0].is_flashing()).is_false()
+	await get_tree().create_timer(0.6).timeout
+	assert_bool(cells[1].is_flashing()).is_false()
+	assert_vector(cells[1].size).is_equal(Vector2(UiTokens.SIZE_QUICK_SLOT_W, UiTokens.SIZE_QUICK_SLOT_H))   # no size change
+	bar.collapsed = true
+	bar.flash("seed_carrot")
+	await get_tree().create_timer(0.2).timeout
+	assert_bool(cells[1].is_flashing()).is_false()
+

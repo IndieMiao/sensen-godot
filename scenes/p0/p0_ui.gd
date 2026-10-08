@@ -10,7 +10,8 @@ signal action_pressed(cmd: Dictionary)
 signal seed_selected(seed_id: String)
 signal command(cmd: Dictionary)
 signal dev_skip(minutes: int)
-signal zoom(factor: float)
+## A pinch step about a screen point (the two-finger centre, or the mouse for a wheel tick).
+signal zoom(factor: float, at: Vector2)
 ## The fingers lifted after a pinch (or a wheel tick ended): the scene springs back if past a zoom limit.
 signal zoom_end
 signal show_spot(where: String)
@@ -62,7 +63,7 @@ var _kit: Control
 var _bar: UiQuickBar
 var _keys: UiActionKey
 var _radial: UiActionRadial
-var _pin_menu: UiPinMenu
+var _undo_toast: UiUndoToast
 var _cards := {}          # id -> UiTapCard
 var _card_hits := {}      # id -> screen point a tap on the card forwards to the world (the facility's own tap point)
 var _badges := {}         # id -> UiStatusBadge
@@ -334,7 +335,7 @@ func set_surface(name: String) -> void:
 	_bar.bag_only = not action
 	_bar_sig = []
 	if _radial.visible: _radial.close()
-	_close_pin_menu()   # no PinMenu left over when fishing starts or the map opens (PR #12 review)
+	_bar.cancel_drag()   # no lifted slot or drop zones left over when fishing starts or the map opens
 	_creel.visible = action and bar_mode == "fish"
 	if _dev_box: _dev_box.visible = world
 	for c in _cards.values(): (c as Control).visible = false
@@ -383,14 +384,14 @@ func _refresh_bar() -> void:
 			selected_seed = ""
 			seed_selected.emit("")
 		# First slot on entering the action (§10.3.3 ①); a deliberate deselect stays deselected.
-		var stocked := ids.filter(func(id): return P0Logic.bag_count(view, str(id)) > 0)
+		var stocked := ids.filter(func(id): return str(id) != "" and P0Logic.bag_count(view, str(id)) > 0)
 		if _auto_pick and selected_seed == "" and not stocked.is_empty():
 			selected_seed = str(stocked[0])
 			seed_selected.emit(selected_seed)
-		if not ids.is_empty(): _auto_pick = false
+		if ids.any(func(id): return str(id) != ""): _auto_pick = false
 	_bar_ids = ids
 	var bag: Dictionary = view.get("bag", {})
-	var counts := ids.map(func(id): return P0Logic.bag_count(view, str(id)))
+	var counts := ids.map(func(id): return P0Logic.bag_count(view, str(id)) if str(id) != "" else 0)
 	var used := _bag_slots().size()
 	var sig := [bar_mode, ids, counts, store.pins.duplicate(), selected_bait if bar_mode == "fish" else selected_seed,
 		used * 10 >= int(bag.get("capacity", 25)) * 9, modal_kind in ["bag", "gear"]]
@@ -399,14 +400,18 @@ func _refresh_bar() -> void:
 	var slots := []
 	for i in ids.size():
 		var id := str(ids[i])
-		slots.append({id = id, icon = P0Logic.icon(id), title = P0Logic.item_name(view, id), quantity = counts[i], pinned = store.pins.has(id)})
+		if id == "": slots.append({})   # a gap left by a drag-remove (LOCK-05 v1.10): no item, no pin
+		else: slots.append({id = id, icon = P0Logic.icon(id), title = P0Logic.item_name(view, id), quantity = counts[i], pinned = store.pins.has(id)})
 	# A-08 ghost (LOCK-04): a bar with nothing of this action in stock shows the action's family in the first empty
-	# slot; a slot pinned at 0 is not stock (int5b hand test 9), Compost alone is. Five pinned 0 slots leave no
-	# room, so no ghost. A tap opens the Bag (ghost_tapped). TODO(SGODOT-225 bag drawer): open on the family tab
-	# (Seeds → Seeds, Bait → Tackle) and flash the slot 600 ms when a real item lands.
+	# slot; a slot pinned at 0 is not stock (int5b hand test 9), Compost alone is. The first gap a drag-remove left
+	# takes it (LOCK-05 v1.10), else the free end; five occupied slots leave no room, so no ghost. A tap opens the Bag
+	# (ghost_tapped). TODO(SGODOT-225 bag drawer): open on the family tab (Seeds → Seeds, Bait → Tackle).
 	var family: Array = ["bait_", "bait_worm", "Bait"] if bar_mode == "fish" else ["seed_", "seed_radish", "Seeds"]
-	if slots.size() < UiQuickBar.SLOTS and not counts.any(func(n): return int(n) > 0):
-		slots.append({ghost = true, icon = P0Logic.icon(family[1]), title = family[2]})
+	if not counts.any(func(n): return int(n) > 0):
+		var ghost := {ghost = true, icon = P0Logic.icon(family[1]), title = family[2]}
+		var gap := slots.find({})
+		if gap >= 0: slots[gap] = ghost
+		elif slots.size() < UiQuickBar.SLOTS: slots.append(ghost)
 	_bar.slots = slots
 	_bar.selected = sig[4]
 	_bar.capacity_warning = sig[5]
@@ -429,9 +434,9 @@ func _on_slot_tapped(id: String) -> void:
 		seed_selected.emit(selected_seed)
 	_refresh_bar()
 
+## Dropped on the Pin / Unpin zone (LOCK-05 v1.11): the pin flips; the bar pops the badge, no PinMenu, no toast.
 func _on_pin_toggled(id: String, pinned: bool) -> void:
 	_set_pin(id, pinned)
-	_show_pin_menu(id, pinned)
 
 func _set_pin(id: String, pinned: bool) -> void:
 	var store := _quick_for(bar_mode)
@@ -442,50 +447,156 @@ func _set_pin(id: String, pinned: bool) -> void:
 	_save_quick()
 	_refresh_bar()
 
-## Drag onto another slot: the two swap places and both become pinned (§10.3.4).
+## Drag onto another slot: the two swap places only; pins follow their items, nothing is pinned by it and no menu
+## shows (LOCK-05 v1.11, 221 b0a83924). Onto a gap it simply moves there.
 func _on_slots_swapped(a: int, b: int) -> void:
 	while _bar_ids.size() <= maxi(a, b): _bar_ids.append("")
 	var t = _bar_ids[a]
 	_bar_ids[a] = _bar_ids[b]
 	_bar_ids[b] = t
-	var store := _quick_for(bar_mode)
-	for id in [_bar_ids[a], _bar_ids[b]]:
-		if str(id) != "" and not store.pins.has(id): store.pins.append(id)
-	_bar_ids = _bar_ids.filter(func(id): return str(id) != "")
 	_save_quick()
 	_refresh_bar()
 
-## Fling off the bar: gone from the bar, still in the bag (§10.3.4); not refilled until pinned again.
+## Dropped on the remove zone: off the bar, still in the Bag (§10.3.4); its slot stays a gap, nothing refills it
+## (LOCK-05 v1.10 BAR-DRAG-4), and an Info toast `<Item> off the bar · Undo` (5 s) puts it back, pin and place.
 func _on_slot_removed(id: String) -> void:
 	var store := _quick_for(bar_mode)
+	var was := {id = id, index = _bar_ids.find(id), pinned = store.pins.has(id), mode = bar_mode}
 	store.pins.erase(id)
 	if not store.removed.has(id): store.removed.append(id)
-	_bar_ids.erase(id)
+	if was.index >= 0: _bar_ids[was.index] = ""
 	if selected_seed == id: selected_seed = ""
 	if selected_bait == id: selected_bait = ""
 	_save_quick()
 	_refresh_bar()
+	_show_undo_toast(was)
 
-## PinMenu over the slot a long press just toggled (LOCK-05): the new state and the reverse in one tap.
-func _show_pin_menu(id: String, pinned: bool) -> void:
-	if _pin_menu: _pin_menu.queue_free()
-	_pin_menu = UiPinMenu.new(pinned)
-	_kit.add_child(_pin_menu)
-	var i := _bar_ids.find(id)
-	var cell := _bar.cells()[clampi(i, 0, UiQuickBar.SLOTS - 1)]
-	var tip := cell.get_global_rect().get_center().x - _kit.global_position.x
-	var size := _pin_menu.get_combined_minimum_size()
-	var x := clampf(tip - UiPinMenu.POINTER_TIP_X, UiTokens.SPACE_PAGE, _kit.size.x - UiTokens.SPACE_PAGE - size.x)
-	_pin_menu.position = Vector2(x, _bar.position.y - size.y - UiTokens.SPACE_WITHIN)
-	_pin_menu.pointer_x = tip - x - UiTokens.SIZE_POINTER_W * 0.5
-	_pin_menu.toggled.connect(func():
-		_set_pin(id, not pinned)
-		_close_pin_menu())
-	_pin_menu.dismissed.connect(_close_pin_menu)
+func _show_undo_toast(was: Dictionary) -> void:
+	if _undo_toast: _undo_toast.queue_free()
+	_undo_toast = UiUndoToast.new("%s off the bar" % P0Logic.item_name(view, str(was.id)))
+	_undo_toast.theme = UiKit.theme()
+	_kit.add_child(_undo_toast)
+	var size := _undo_toast.get_combined_minimum_size()
+	_undo_toast.size = size
+	_undo_toast.position = Vector2(UiTokens.SPACE_PAGE, _bar.position.y - UiTokens.SPACE_WITHIN - size.y)   # BAR-DRAG-4
+	_undo_toast.undo_pressed.connect(func(): _undo_remove(was))
 
-func _close_pin_menu() -> void:
-	if _pin_menu: _pin_menu.queue_free()
-	_pin_menu = null
+func _undo_remove(was: Dictionary) -> void:
+	var store := _quick_for(str(was.mode))
+	var id := str(was.id)
+	store.removed.erase(id)
+	if bool(was.pinned) and not store.pins.has(id): store.pins.append(id)
+	if str(was.mode) == bar_mode:
+		var i := int(was.index)
+		if i >= 0 and i < _bar_ids.size() and str(_bar_ids[i]) == "": _bar_ids[i] = id
+		elif not _bar_ids.has(id): _bar_ids.insert(clampi(i, 0, _bar_ids.size()), id)
+	_save_quick()
+	_bar_sig = []
+	_refresh_bar()
+
+# ---------------------------------------------------------------- the bag drawer's way onto the bar (SGODOT-225, q(61))
+## The action whose bar takes this item ("farm": seeds and fertiliser, "fish": bait), or "" when none does.
+func bar_action_of(id: String) -> String: return P0Logic.bar_action_of(id)
+
+## The bar on screen takes this item (a seed never goes on the Fishing bar).
+func accepts(id: String) -> bool: return bar_action_of(id) != "" and bar_action_of(id) == bar_mode
+
+## Pinned on its own action's bar.
+func is_pinned(id: String) -> bool:
+	var mode := bar_action_of(id)
+	return mode != "" and _quick_for(mode).pins.has(id)
+
+## False when its action already has every slot pinned and it is not one of them (the detail card then greys Pin
+## out: `Bar full · Unpin one first`), or when no bar takes it.
+func can_pin(id: String) -> bool:
+	var mode := bar_action_of(id)
+	if mode == "": return false
+	var pins: Array = _quick_for(mode).pins
+	return pins.has(id) or pins.size() < UiQuickBar.SLOTS
+
+## Detail card Pin / a bag item dropped on the Pin zone: pinned on its own action's bar. On the bar now showing it
+## takes the first gap, else the free end, else the last unpinned slot (that item leaves the bar, not "removed");
+## on another action's bar it is only recorded and leads that bar next time. Clears it from "removed".
+func pin_to(id: String) -> bool:
+	if not can_pin(id): return false
+	var mode := bar_action_of(id)
+	var store := _quick_for(mode)
+	store.removed.erase(id)
+	if not store.pins.has(id): store.pins.append(id)
+	if mode == bar_mode and not _bar_ids.has(id):
+		var hole := _bar_ids.find("")
+		if hole >= 0: _bar_ids[hole] = id
+		elif _bar_ids.size() < UiQuickBar.SLOTS: _bar_ids.append(id)
+		else:
+			for k in range(_bar_ids.size() - 1, -1, -1):
+				if not store.pins.has(_bar_ids[k]):
+					_bar_ids[k] = id
+					break
+	_save_quick()
+	if mode == bar_mode: _refresh_bar()
+	return true
+
+## Detail card Unpin: stays where it is until the bar refills.
+func unpin(id: String) -> void:
+	var mode := bar_action_of(id)
+	if mode == "": return
+	_quick_for(mode).pins.erase(id)
+	_save_quick()
+	if mode == bar_mode: _refresh_bar()
+
+## A bag item dropped on slot `index` of the bar on screen: placed there, not pinned (q(61)). A gap or the free end
+## just takes it; an occupied slot's item leaves the bar with its pin and is not "removed"; an item already on the
+## bar swaps places with that slot. Clears it from this action's "removed". False when this bar does not take it.
+func place_at(index: int, id: String) -> bool:
+	if not accepts(id) or index < 0 or index >= UiQuickBar.SLOTS: return false
+	var store := _quick_for(bar_mode)
+	store.removed.erase(id)
+	while _bar_ids.size() <= index: _bar_ids.append("")
+	var there := str(_bar_ids[index])
+	var from := _bar_ids.find(id)
+	if from >= 0:
+		_bar_ids[from] = there
+	elif there != "":
+		store.pins.erase(there)
+	_bar_ids[index] = id
+	_save_quick()
+	_refresh_bar()
+	return true
+
+func quick_bar_node() -> UiQuickBar: return _bar
+
+var _bar_dock: Control = null
+var _bar_home_index := 0
+
+## The bag drawer's top row is this same bar, pushed up by the drawer (LOCK-04; plan §10.4): moved into `container`
+## at its 336 × 68, drop zones opening below it. Any drag in progress is cancelled.
+func dock_bar_into(container: Control) -> void:
+	if container == null or _bar_dock == container: return
+	_bar.cancel_drag()
+	_bar.set_drop_target(-1)
+	_bar_home_index = _bar.get_index()
+	_bar.get_parent().remove_child(_bar)
+	container.add_child(_bar)
+	_bar.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	_bar.custom_minimum_size = Vector2(UiTokens.SIZE_QUICK_BAR_W, UiTokens.SIZE_QUICK_BAR_H)
+	_bar.zones_below = true
+	_bar_dock = container
+
+## Back to its own place over the scene; a no-op when not docked. Every modal close comes through _drop_modal.
+func undock_bar() -> void:
+	if _bar_dock == null: return
+	_bar.cancel_drag()
+	_bar.set_drop_target(-1)
+	if is_instance_valid(_bar.get_parent()): _bar.get_parent().remove_child(_bar)
+	_kit.add_child(_bar)
+	_kit.move_child(_bar, mini(_bar_home_index, _kit.get_child_count() - 1))
+	_bar.custom_minimum_size = Vector2.ZERO
+	_bar.zones_below = false
+	_bar.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+	_bar_dock = null
+	_place_controls()
+
+func is_bar_docked() -> bool: return _bar_dock != null
 
 func _quick_for(mode: String) -> Dictionary:
 	if not _quick.has(mode): _quick[mode] = {pins = [], removed = []}
@@ -664,11 +775,16 @@ func toast(text: String, seconds := 2.6) -> void:
 	_toast_left = seconds
 
 # ---------------------------------------------------------------- modals
+## Going to the background cancels a slot drag: the slot flies back, nothing changes (LOCK-04 v1.10).
+func _notification(what: int) -> void:
+	if what in [NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_APPLICATION_FOCUS_OUT] and _bar != null: _bar.cancel_drag()
+
 ## Android Back closes what is on top first, one layer per press (LOCK-06, int5 hand test 012–013 / 023–024): the
-## PinMenu, the radial, then a card or drawer. True when it closed something; the world only leaves on false.
+## a quick slot being dragged (it flies back, LOCK-04 v1.11; the PinMenu is gone), the radial, then a card or
+## drawer. True when it closed something; the world only leaves on false.
 func close_top_layer() -> bool:
-	if _pin_menu:
-		_close_pin_menu()
+	if _bar != null and _bar.is_dragging():
+		_bar.cancel_drag()
 		return true
 	if _radial.visible:
 		_radial.close()
@@ -717,6 +833,7 @@ func queue_card(show: Callable) -> void:
 	else: _card_queue.append(show)
 
 func _drop_modal() -> void:
+	undock_bar()   # before the drawer holding it goes (SGODOT-225)
 	if _modal: _modal.queue_free()
 	_modal = null
 	var was_kitchen := modal_kind == "kitchen"
@@ -727,6 +844,7 @@ func _drop_modal() -> void:
 	_fab_pills.visible = _keys.visible and bool(_fab_state.get("creel_full", false))
 
 func _open_modal(content: Control, dim := 0.32, hide_controls := false) -> void:
+	_bar.cancel_drag()   # a drawer or card opening cancels a slot drag (LOCK-04 v1.10)
 	_drop_modal()
 	var veil := ColorRect.new()
 	veil.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -751,7 +869,6 @@ func _open_modal(content: Control, dim := 0.32, hide_controls := false) -> void:
 		_keys.visible = false
 		_fab_pills.visible = false
 		_bar.visible = false
-	_close_pin_menu()
 
 ## Bottom system inset (gesture bar, rounded corners) in UI units; 0 on desktop.
 func safe_bottom() -> float:
@@ -1280,7 +1397,7 @@ func open_radial() -> void:
 	if _modal != null:
 		close_modal()
 		return
-	_close_pin_menu()
+	_bar.cancel_drag()
 	var options := []
 	for it in [["farm", "hoe", "Farming", "No plots here"], ["fish", "fish", "Fishing", "No water nearby"],
 			["mine", "pickaxe", "Mining", "Enter the mine"], ["combat", "sword", "Combat", "Mine floors 3–5"]]:
@@ -2254,11 +2371,16 @@ class _TouchPad extends Control:
 	var _arb := GestureArbiter.new(GestureArbiter.Mode.SCENE)
 	func _ready() -> void: mouse_filter = Control.MOUSE_FILTER_STOP
 	func end_stick() -> void:
+		# A pinch cut short (a world change, the app going to the background) still ends: its zoom springs back.
+		var pinching := _arb.is_pinching()
 		_arb.reset()
 		queue_redraw()
+		if pinching and ui != null: ui.zoom_end.emit()
+	func _notification(what: int) -> void:
+		if what in [NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_APPLICATION_FOCUS_OUT] and _arb.is_pinching(): end_stick()
 	func _gui_input(e: InputEvent) -> void:
 		if e is InputEventMouseButton and e.pressed and e.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
-			ui.zoom.emit(0.9 if e.button_index == MOUSE_BUTTON_WHEEL_UP else 1.1)
+			ui.zoom.emit(0.9 if e.button_index == MOUSE_BUTTON_WHEEL_UP else 1.1, get_global_transform_with_canvas() * e.position)
 			ui.zoom_end.emit()
 			return
 		for o in _arb.feed(e, Time.get_ticks_msec()):
@@ -2271,7 +2393,7 @@ class _TouchPad extends Control:
 					queue_redraw()
 				&"tap":
 					if ui._tap_at(get_global_transform() * o.pos, bool(o.double)): _arb.consume_tap()
-				&"pinch": ui.zoom.emit(o.factor)
+				&"pinch": ui.zoom.emit(o.factor, get_global_transform_with_canvas() * o.center)
 				&"pinch_end": ui.zoom_end.emit()
 	func _draw() -> void:
 		var start := _arb.origin()

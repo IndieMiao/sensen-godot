@@ -7,7 +7,7 @@ extends Control
 ##   GEAR       Compact/GearSlot 663:61299       52×88  role above, equipment name below           (LOCK-13)
 ## Data in (the fields below), signals out. Each cell runs its own GestureArbiter (QUICK: SLOT mode, others:
 ## CELL mode, WP7-B F-04 §3 / §4), so a touch is exactly one outcome: `tapped` only for the arbiter's tap;
-## everything else (lift, pin_toggle / long_press, drag_start / drag_move / drop, swipe_up, cancel) goes out
+## everything else (lift, long_press, drag_start / drag_move / drop, swipe_up, cancel) goes out
 ## through `gesture` for the quick bar / bag drawer, which then sets `state` / `pinned`. mouse_filter is
 ## PASS, so a TouchScrollContainer still takes vertical drags (CELL mode answers them with cancel).
 ## Hosts outside a scroll container (the quick bar) need a STOP backing control, or the touch also reaches
@@ -18,7 +18,8 @@ extends Control
 ## Other densities draw it as EMPTY.
 
 signal tapped
-## A GestureArbiter outcome other than tap, e.g. {kind = &"pin_toggle", pos}; `pos` is in global coordinates.
+## A GestureArbiter outcome other than tap, e.g. {kind = &"lift", pos}; `pos` is in global coordinates. Pinning is the
+## quick bar's drop on its Pin zone (LOCK-05 v1.11), never a cell outcome.
 signal gesture(outcome: Dictionary)
 
 enum Density { INVENTORY, QUICK, KITCHEN, GEAR }
@@ -84,6 +85,7 @@ var _role: Label
 var _status: Panel
 var _mark: Panel
 var _strip: Panel
+var _new_ring: Panel   # QuickSlot State=new (1663:101150): the color/new ring of a first-time item
 var _badge: Panel
 var _home: TextureRect
 
@@ -139,6 +141,32 @@ func _emit(outcomes: Array) -> void:
 		var g := o.duplicate()
 		if g.has("pos"): g.pos = get_global_transform() * (g.pos as Vector2)
 		gesture.emit(g)
+
+## QuickSlot pin badge pop after a pin toggle on the Pin zone (LOCK-05 v1.11): 1 → 1.3 → 1 over 300 ms.
+const _PIN_POP := 1.3
+const _PIN_POP_MS := 300.0
+func pop_pin() -> void:
+	if _badge == null or not _badge.visible: return
+	_badge.pivot_offset = _badge.size * 0.5
+	var t := _badge.create_tween()
+	t.tween_property(_badge, ^"scale", Vector2.ONE * _PIN_POP, UiKit.secs(_PIN_POP_MS * 0.5)).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	t.tween_property(_badge, ^"scale", Vector2.ONE, UiKit.secs(_PIN_POP_MS * 0.5)).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+
+## QuickSlot State=new (1663:101150, §10.3.3 ④): a first-time item's slot rings once in color/new, in then out over
+## MOTION_NEW_UNLOCK_FLASH_MS; size, place and icon stay, no badge, no buzz. QuickSlot only.
+func flash() -> void:
+	if _new_ring == null: return
+	var half := UiKit.secs(UiTokens.MOTION_NEW_UNLOCK_FLASH_MS * 0.5)
+	var t := _new_ring.create_tween()
+	_new_ring.modulate.a = 0.0
+	t.tween_property(_new_ring, ^"modulate:a", 1.0, half).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	t.tween_property(_new_ring, ^"modulate:a", 0.0, half).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+
+func is_flashing() -> bool: return _new_ring != null and _new_ring.modulate.a > 0.0
+
+## The ring at its peak, held: the gallery and snapshots only (a still of State=new).
+func show_new_ring() -> void:
+	if _new_ring: _new_ring.modulate.a = 1.0
 
 ## The state actually drawn: the extra QuickSlot states fall back to DEFAULT (GHOST to EMPTY) on the other mains.
 func drawn_state() -> State:
@@ -244,6 +272,10 @@ func _build_quick() -> void:
 	_name.max_lines_visible = 2
 	_name.custom_minimum_size.x = w
 	_qty = _band_label(body, UiTokens.STYLE_C10_XB, 0.0, _QUICK_QTY_H, HORIZONTAL_ALIGNMENT_RIGHT)
+	_new_ring = _box(_surface)
+	_new_ring.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_new_ring.add_theme_stylebox_override(&"panel", UiStyleBox.make(Color.TRANSPARENT, UiTokens.RADIUS_CELL, UiTokens.COLOR_NEW, UiTokens.STROKE_SELECTED))
+	_new_ring.modulate.a = 0.0
 	_strip = _box(_surface)
 	_strip.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_PIN_AMBER, UiTokens.SIZE_PIN_STRIP_H * 0.5))
 	var b := UiTokens.SIZE_PIN_BADGE
@@ -354,6 +386,10 @@ func _refresh_quick(s: State) -> void:
 	var show_pin := pinned and not empty and not ghost
 	_strip.visible = show_pin
 	_badge.visible = show_pin
+	# The new ring sits inside the outline too: green outside, cyan inside when both show (1663:101150).
+	var inset := 0.0 if box.border_color == UiTokens.COLOR_BORDER else float(box.border_width)
+	for side in [&"offset_left", &"offset_top"]: _new_ring.set(side, inset)
+	for side in [&"offset_right", &"offset_bottom"]: _new_ring.set(side, -inset)
 	# The amber strip sits inside the outline, so it moves down with the 2 px selected stroke (LOCK-05).
 	var w := UiTokens.SIZE_PIN_STRIP_W
 	_place(_strip, 0.5, -w * 0.5, box.border_width, w, UiTokens.SIZE_PIN_STRIP_H)
