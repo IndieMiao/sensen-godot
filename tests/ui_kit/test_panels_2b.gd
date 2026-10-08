@@ -98,6 +98,132 @@ func test_drawer_quick_flick_closes() -> void:
 	d._gui_input(r)
 	assert_int(closes[0]).is_equal(1)
 
+# Real viewport input: header content passes the swipe on, the grid and KEEP_INPUT subtrees keep theirs.
+
+func _mouse(at: Vector2, down: bool) -> void:
+	var e := InputEventMouseButton.new()
+	e.position = at
+	e.global_position = at
+	e.button_index = MOUSE_BUTTON_LEFT
+	e.pressed = down
+	get_viewport().push_input(e, true)
+
+func _swipe(from: Vector2, by: Vector2, steps := 8) -> void:
+	_mouse(from, true)
+	for i in steps:
+		var m := InputEventMouseMotion.new()
+		m.position = from + by * float(i + 1) / steps
+		m.global_position = m.position
+		m.relative = by / steps
+		m.button_mask = MOUSE_BUTTON_MASK_LEFT
+		get_viewport().push_input(m, true)
+		await get_tree().process_frame
+	_mouse(from + by, false)
+	await get_tree().process_frame
+
+## A drawer like the Bag: a tab row on top, a scrolling grid, a kept row (the docked quick bar) at the bottom.
+func _bag_like() -> Dictionary:
+	var d := UiDrawer.new(500.0)
+	d.animate = false
+	var early := Button.new()   # built before the drawer enters the tree, as P0BagDrawer does
+	early.custom_minimum_size = Vector2(120, 34)
+	d.body.add_child(early)
+	_host(d)
+	var tab := Button.new()     # added later, on a refresh
+	tab.custom_minimum_size = Vector2(120, 34)
+	var row := HBoxContainer.new()
+	row.add_child(tab)
+	d.body.add_child(row)
+	var grid := TouchScrollContainer.new()
+	grid.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	grid.custom_minimum_size.y = 200
+	d.body.add_child(grid)
+	var cell := Button.new()
+	cell.custom_minimum_size = Vector2(100, 400)
+	grid.add_child(cell)
+	var kept := PanelContainer.new()
+	kept.set_meta(UiDrawer.KEEP_INPUT, true)
+	var slot := Button.new()
+	slot.custom_minimum_size = Vector2(60, 44)
+	kept.add_child(slot)
+	d.body.add_child(kept)
+	return {drawer = d, early = early, tab = tab, cell = cell, slot = slot}
+
+func _count(sig: Signal) -> Array:
+	var n := [0]
+	sig.connect(func(): n[0] += 1)
+	return n
+
+func test_drawer_swipe_from_a_header_tab_closes_without_firing_the_tab() -> void:
+	if DisplayServer.is_touchscreen_available(): return
+	var p := _bag_like()
+	await _settle()
+	var d: UiDrawer = p.drawer
+	assert_int(p.early.mouse_filter).is_equal(Control.MOUSE_FILTER_PASS)
+	assert_int(p.tab.mouse_filter).is_equal(Control.MOUSE_FILTER_PASS)
+	var closes := _count(d.close_requested)
+	var taps := _count(p.tab.pressed)
+	await _swipe(p.tab.get_global_rect().get_center(), Vector2(0, 60))
+	assert_int(closes[0]).is_equal(1)
+	assert_int(taps[0]).is_zero()
+
+func test_drawer_tap_on_a_header_tab_still_taps_and_does_not_close() -> void:
+	if DisplayServer.is_touchscreen_available(): return
+	var p := _bag_like()
+	await _settle()
+	var closes := _count(p.drawer.close_requested)
+	var taps := _count(p.tab.pressed)
+	var at: Vector2 = p.tab.get_global_rect().get_center()
+	_mouse(at, true)
+	await get_tree().process_frame
+	_mouse(at, false)
+	await get_tree().process_frame
+	assert_int(taps[0]).is_equal(1)
+	assert_int(closes[0]).is_zero()
+
+func test_drawer_flick_from_a_tab_closes_and_eats_the_release() -> void:
+	if DisplayServer.is_touchscreen_available(): return
+	var p := _bag_like()
+	await _settle()
+	var d: UiDrawer = p.drawer
+	var now := [0]
+	d.clock = func() -> int: return now[0]
+	var closes := _count(d.close_requested)
+	var taps := _count(p.tab.pressed)
+	var at: Vector2 = p.tab.get_global_rect().get_center()
+	_mouse(at, true)
+	await get_tree().process_frame
+	now[0] = 100
+	_mouse(at + Vector2(0, 20), false)   # 20 px within 100 ms: the release still lands on the tab
+	await get_tree().process_frame
+	assert_int(closes[0]).is_equal(1)
+	assert_int(taps[0]).is_zero()
+
+func test_drawer_swipe_that_ends_on_the_same_tall_row_does_not_fire_it() -> void:
+	if DisplayServer.is_touchscreen_available(): return
+	var d := _drawer(500.0)
+	var row := Button.new()   # a gear row or notice taller than the swipe
+	row.custom_minimum_size = Vector2(300, 120)
+	d.body.add_child(row)
+	await _settle()
+	var closes := _count(d.close_requested)
+	var taps := _count(row.pressed)
+	var top := row.get_global_rect().position + Vector2(150, 10)
+	await _swipe(top, Vector2(0, 60))   # closes on the way; the release is still inside the row
+	assert_bool(row.get_global_rect().has_point(top + Vector2(0, 60))).is_true()
+	assert_int(closes[0]).is_equal(1)
+	assert_int(taps[0]).is_zero()
+
+func test_drawer_grid_and_kept_rows_keep_their_drags() -> void:
+	if DisplayServer.is_touchscreen_available(): return
+	var p := _bag_like()
+	await _settle()
+	var closes := _count(p.drawer.close_requested)
+	await _swipe(p.cell.get_global_rect().get_center(), Vector2(0, 60))
+	assert_int(p.slot.mouse_filter).is_equal(Control.MOUSE_FILTER_STOP)   # untouched
+	await _swipe(p.slot.get_global_rect().get_center(), Vector2(0, 60))
+	assert_int(closes[0]).is_zero()
+
 # ---------------------------------------------------------------- UiInventoryGrid
 
 func _items(n: int) -> Array:

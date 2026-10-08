@@ -5,10 +5,16 @@ extends PanelContainer
 ## cream surface; content goes in `body`, inset 12 at the sides and top like the Bag layout, and clears the
 ## bottom safe inset. Put it in ModalStack.open_drawer (or the P0 modal host): the scrim, Back and scrim taps
 ## belong to the stack. The drawer itself only adds the swipe-down close (WP7-B F-04 §4): a downward drag of
-## 48 px, or a quick flick, that starts on the drawer and is not taken by a child (a grid scroll keeps its own
-## drags) emits `close_requested`.
+## 48 px, or a quick flick, that starts on the drawer and is not taken by a child emits `close_requested`.
+## Like TouchScrollContainer, the drawer lets its plain content (header tabs, Sort, rows, buttons) pass presses
+## on, so the swipe also starts on them; a button under a swipe that closed the drawer never fires. A vertical
+## scroll (the bag grid, a profile column) keeps its own drags, a sideways-only strip passes vertical ones on,
+## and a subtree marked with the meta KEEP_INPUT (the docked quick bar with its own slot drags) is left alone.
 
 signal close_requested
+
+## Meta on a content node whose subtree keeps its own input: the drawer neither swipes from it nor changes it.
+const KEEP_INPUT := &"ui_drawer_keep_input"
 
 const _PAD := 12.0            # Bag layout inset in the drawer: x 12, y 12 (BAG-2-2)
 const _SWIPE_CLOSE := 48.0    # WP7-B F-04 §4: swipe down ≥ 48 px from the handle area
@@ -34,17 +40,21 @@ var _press_at := Vector2.ZERO
 var _press_ms := 0
 var _pressing := false
 var _sent := false
+var _swallow := false   # after a swipe-close: eat the gesture's release so the button under it stays quiet
 
 func _init(height_: float = 0.0) -> void:
 	clip_contents = true
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	body = VBoxContainer.new()
 	body.add_theme_constant_override(&"separation", 0)
+	body.child_entered_tree.connect(_watch_content)
 	add_child(body)
 	height = height_
 	_restyle()
 
 func _ready() -> void:
+	set_process_input(false)
+	for child in body.get_children(): _watch_content(child)
 	set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
 	_place()
 	if animate:
@@ -87,6 +97,22 @@ func _restyle() -> void:
 
 # ------------------------------------------------------------------ swipe-down close
 
+## Plain content passes presses and drags on to the drawer (as in TouchScrollContainer); scrolls, ranges, text
+## fields and KEEP_INPUT subtrees keep theirs. Buttons act on release, so a drag can still be told from a tap.
+func _watch_content(node: Node) -> void:
+	if not body.is_ancestor_of(node) or node.has_meta(KEEP_INPUT): return
+	if node is ScrollContainer:
+		# A strip that only scrolls sideways passes vertical drags on; its own content is its business.
+		if node.vertical_scroll_mode == ScrollContainer.SCROLL_MODE_DISABLED: node.mouse_filter = Control.MOUSE_FILTER_PASS
+		return
+	if node is Range or node is LineEdit or node is TextEdit: return
+	if node is Control and node.mouse_filter == Control.MOUSE_FILTER_STOP:
+		node.mouse_filter = Control.MOUSE_FILTER_PASS
+	if node is BaseButton: node.action_mode = BaseButton.ACTION_MODE_BUTTON_RELEASE
+	if not node.child_entered_tree.is_connected(_watch_content):
+		node.child_entered_tree.connect(_watch_content)
+	for child in node.get_children(): _watch_content(child)
+
 func _gui_input(e: InputEvent) -> void:
 	var down := _is_press(e)
 	if down == 1:
@@ -94,13 +120,33 @@ func _gui_input(e: InputEvent) -> void:
 		_press_ms = int(clock.call())
 		_pressing = true
 		_sent = false
-	elif down == 0 and _pressing:
+		_swallow = false
+		if is_inside_tree(): set_process_input(true)   # follow the rest before the child under the finger does
+	else:
+		_track(e, down, false)
+
+## While a press that started on the drawer is down, its motion and release are read here first: the finger may
+## leave the drawer's own controls (a touch drag goes to whatever is under it), and a flick must close before
+## the button it started on sees the release.
+func _input(e: InputEvent) -> void:
+	var down := _is_press(e)
+	if _swallow:
+		# Both the touch and its emulated mouse twin: a new press ends the gesture, any release of it is eaten.
+		var touch: bool = e is InputEventScreenTouch or (e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT)
+		if touch and e.pressed: _swallow = false
+		elif touch: get_viewport().set_input_as_handled()
+	if _pressing and down != 1: _track(make_input_local(e), down, true)
+	if not _pressing and not _swallow: set_process_input(false)
+
+func _track(e: InputEvent, down: int, from_input: bool) -> void:
+	if not _pressing: return
+	if down == 0:
 		_pressing = false
 		var d: Vector2 = e.position - _press_at
-		if _downward(d) and d.y >= _FLICK_MIN and int(clock.call()) - _press_ms <= _FLICK_MS: _close()
-	elif _pressing and (e is InputEventMouseMotion or e is InputEventScreenDrag):
+		if _downward(d) and d.y >= _FLICK_MIN and int(clock.call()) - _press_ms <= _FLICK_MS: _close(from_input)
+	elif e is InputEventMouseMotion or e is InputEventScreenDrag:
 		var d: Vector2 = e.position - _press_at
-		if _downward(d) and d.y >= _SWIPE_CLOSE: _close()
+		if _downward(d) and d.y >= _SWIPE_CLOSE: _close(from_input)
 
 ## 1 press, 0 release, -1 anything else. Touch is used on touch screens; elsewhere the mouse (Godot emulates
 ## one from the other), so a single physical touch is never counted twice.
@@ -113,9 +159,13 @@ static func _is_press(e: InputEvent) -> int:
 static func _downward(d: Vector2) -> bool:
 	return d.y > 0.0 and d.y > absf(d.x) * 2.0
 
-func _close() -> void:
+func _close(from_input := false) -> void:
 	if _sent: return
 	_sent = true
 	_pressing = false
-	accept_event()
+	if is_inside_tree():
+		_swallow = true   # the rest of this gesture (its release) is eaten in _input
+		set_process_input(true)
+		if from_input: get_viewport().set_input_as_handled()
+		else: accept_event()
 	close_requested.emit()

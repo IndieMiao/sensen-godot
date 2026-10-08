@@ -75,6 +75,7 @@ func _init(view_: Dictionary = {}, side_ := "bag", focus := "", gift_to_ := {}) 
 	# The quick bar goes here (P0Ui.bind_quick_bar, SGODOT-221); the row and its gap stay folded until it does.
 	quick_row = MarginContainer.new()
 	quick_row.visible = false
+	quick_row.set_meta(UiDrawer.KEEP_INPUT, true)   # its slots drag to Pin / Remove; no swipe-close from them
 	body.add_child(quick_row)
 	var quick_gap := _gap(body, _ROW_GAP)
 	quick_gap.visible = false
