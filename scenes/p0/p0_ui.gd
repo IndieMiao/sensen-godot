@@ -1358,6 +1358,16 @@ func end_stick() -> void:
 
 func has_modal() -> bool: return _modal != null or (_radial != null and _radial.is_open())
 
+## Who speaks in the open modal (NPC-G1, #57): "keeper" under a keeper's greeting card, the resident's id under their
+## dialogue bar, "" under anything else. Read from the modal itself, so a bar reached any way counts — a dish card's
+## `Gift to <Name>` drawer goes back to that resident's bar without the room ever having been tapped (韩信 int9).
+func speaker() -> String:
+	if _modal == null: return ""
+	match modal_kind:
+		"greeting": return "keeper"
+		"resident": return _resident
+	return ""
+
 func close_modal() -> void:
 	_drop_modal()
 	if not _card_queue.is_empty():
