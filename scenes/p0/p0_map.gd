@@ -9,16 +9,16 @@ const P0_POND := "res://scenes/p0/p0_pond.tscn"
 const P0_REGION := "shanghai"
 ## The homestead's map footprint: the Hengshan Road layout, between Pebble Pond and Reed Pond.
 const P0_FARM_CHOICE := {"layout_patch_id": "sh_a", "revision": 2}
-## Old Kai's shop: a fixed place about a kilometre north of Reed Pond (the winding pond nearest home),
-## far enough apart that both pins survive the declutter at district zoom.
-## Entering opens his greeting card for now; the interior room follows once its design is approved.
+## The home-set outposts (tackle shop, tea house, travel post, market square) come from the shared
+## outpost table; Go opens the outpost room above the map like a pond (SGODOT-227).
+const P0_OUTPOST := "res://scenes/p0/p0_outpost.tscn"
 const NEAREST_POND := "pond_shanghai_05"   # Reed Pond, the closest to home
-const TACKLE_SHOP := {"id": "p0_tackle_shop", "kind": "place", "name": "Old Kai's Tackle",
-	"category": "Tackle shop · Rods and bait", "lat": 31.2168, "lng": 121.4398,
-	"art_path": "res://assets/p0/art/map/tackle_shop.webp", "action": "Enter shop",
-	"action_icon": "store", "filter": "pond"}
+## Online counts on the outpost pins (GET /p0/presence), refreshed while the map is on top.
+const PRESENCE_S := 15.0
 
 var rt: P0Runtime
+var _presence: HTTPRequest
+var _online := {}   # outpost id → players online across its rooms
 
 func _initial_region_id() -> String:
 	return P0_REGION
@@ -63,8 +63,9 @@ func _install_city_map() -> void:
 	super._install_city_map()
 	if city_map and not city_map.bundled_ponds:
 		city_map.preload_ponds(SystemPonds.data().locations.filter(func(e): return str(e.region_id) == P0_REGION))
-		city_map.set_places([TACKLE_SHOP])
+		_set_outpost_places()
 		city_map.place_requested.connect(_on_place_requested)
+		_start_presence()
 		# A pond's bank is generated off the main thread while its info card is read, so Enter is quick.
 		city_map.entry_selected.connect(func(e: Dictionary): if str(e.get("kind", "")) == "pond": _prewarm_pond(str(e.id)))
 		get_tree().create_timer(2.0).timeout.connect(_prewarm_pond.bind(NEAREST_POND))
@@ -73,10 +74,55 @@ func _prewarm_pond(id: String) -> void:
 	var pond := SystemPonds.location(id)
 	if not pond.is_empty(): WaterShore.prewarm(id, SystemPonds.site(pond))
 
+func _set_outpost_places() -> void:
+	city_map.set_places(P0Outposts.all().map(func(o): return P0Outposts.place_entry(o, int(_online.get(str(o.id), 0)))))
+
 func _on_place_requested(entry: Dictionary) -> void:
-	if str(entry.get("id", "")) != TACKLE_SHOP.id: return
+	var outpost := P0Outposts.find(str(entry.get("id", "")))
+	if outpost.is_empty(): return
 	city_map.dismiss_overlays()
-	rt.ui.open_kai_greeting()
+	_open_outpost(str(outpost.id))
+
+## Go: the outpost room opens above the map (the player walks in at the door); leaving it returns here.
+func _open_outpost(id: String) -> void:
+	if AppRouter.top_instance() != null or AppRouter._navigation_pending: return
+	if not ResourceLoader.exists(P0_OUTPOST):
+		if str(P0Outposts.find(id).get("role", "")) == "tackle": rt.ui.open_kai_greeting()   # until the room scene lands
+		return
+	_reset_gesture()
+	P0Runtime.nav_started()
+	AppRouter.open_instance(P0_OUTPOST, {"outpost_id": id})
+
+# ---------------------------------------------------------------- outpost online counts
+func _start_presence() -> void:
+	if is_instance_valid(_presence): return
+	_presence = HTTPRequest.new()
+	_presence.timeout = 8.0
+	add_child(_presence)
+	_presence.request_completed.connect(_on_presence)
+	var timer := Timer.new()
+	timer.wait_time = PRESENCE_S
+	timer.autostart = true
+	add_child(timer)
+	timer.timeout.connect(_poll_presence)
+	_poll_presence()
+
+func _poll_presence() -> void:
+	if not is_instance_valid(_presence) or not is_visible_in_tree() or rt == null: return
+	if _presence.get_http_client_status() != HTTPClient.STATUS_DISCONNECTED: return
+	var headers := PackedStringArray(["x-p0-player: " + rt.session.player_id])
+	if rt.session.access_key != "": headers.append("x-p0-key: " + rt.session.access_key)   # the demo server's key
+	_presence.request(rt.session.base_url + "/p0/presence", headers)
+
+func _on_presence(result: int, code: int, _h: PackedStringArray, body: PackedByteArray) -> void:
+	if result != HTTPRequest.RESULT_SUCCESS or code != 200 or city_map == null: return
+	var data = JSON.parse_string(body.get_string_from_utf8())
+	if not (data is Dictionary) or not (data.get("outposts") is Dictionary): return
+	var online := {}
+	for id in data.outposts: online[str(id)] = int(data.outposts[id].get("online", 0))
+	if online == _online: return
+	_online = online
+	_set_outpost_places()
 
 ## The city view's bottom bar: Farm opens the homestead; outfit and city switching are not in P0.
 func _city_action(action: String) -> void:
@@ -95,7 +141,10 @@ func fly_to_city(id: String) -> void:
 func _on_net_booted(_ok: bool) -> void: pass
 func _on_net_booted_guest(_ok: bool) -> void: pass
 func _on_account_changed(_signed_in: bool) -> void: pass
-func _refresh_nearby() -> void: pass
+## P0 has no nearby list, but the region must count as set up: map_poc's resume rebuilds the region UI when
+## _nearby_region differs, which flies the camera back to the homestead (int5 hand test 31: back from an outpost
+## the map must stay where it was).
+func _refresh_nearby() -> void: _nearby_region = str(region.get("id", ""))
 func _refresh_city_counts() -> void: pass
 func _open_account() -> void: pass
 
@@ -103,6 +152,7 @@ func _open_account() -> void: pass
 func resume() -> void:
 	super.resume()
 	rt.attach(self)
+	_poll_presence.call_deferred()   # back from a room: refresh the outpost online counts
 	var next := rt.after_leave
 	rt.after_leave = ""
 	match next:
@@ -113,10 +163,11 @@ func _show_tackle_shop() -> void:
 	if city_map == null: return
 	_reset_gesture()
 	_city_bounds()   # city-wide pan bounds, else the homestead's 450 m box pulls the camera back
-	fly_to(float(TACKLE_SHOP.lat), float(TACKLE_SHOP.lng))
+	var shop := P0Outposts.place_entry(P0Outposts.by_role("tackle"), int(_online.get(str(P0Outposts.by_role("tackle").id), 0)))
+	fly_to(float(shop.lat), float(shop.lng))
 	_set_zoom(15.5)
 	_camera_dirty = true
-	city_map.select(TACKLE_SHOP)
+	city_map.select(shop)
 
 func p0_surface() -> String: return "map"
 
@@ -126,7 +177,13 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"farm": _open_my_farm()
 		"pond": _on_city_pond_requested({"id": step[1]})
 		"shop":
-			if city_map: city_map.select(TACKLE_SHOP)
+			if city_map: city_map.select(P0Outposts.place_entry(P0Outposts.by_role(step[1] if step.size() > 1 else "tackle")))
+		"listpick":   # as a tap on the place list: select the outpost and fly the camera to it
+			var e := P0Outposts.place_entry(P0Outposts.by_role(step[1] if step.size() > 1 else "post"))
+			if city_map:
+				city_map.select(e)
+				city_map.focus_requested.emit(e)
+		"outpost": _open_outpost(step[1])
 		"enter":
 			if city_map: city_map._on_info_action()
 		"zoom":

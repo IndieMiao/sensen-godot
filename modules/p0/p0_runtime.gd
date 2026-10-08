@@ -8,10 +8,11 @@ extends Node
 ## A world implements (all optional; interiors extend P0Room): p0_surface() -> String, p0_space() -> String
 ## (where the player is for the server: home / pond / outpost / mine; see space_of), p0_place() -> String (the
 ## catalog pond id inside a pond space), p0_frame(view, dt), p0_joystick(v),
-## p0_tap(screen), p0_action(cmd), p0_event(ev, view), p0_anchor() -> Vector2, p0_zoom(f),
+## p0_tap(screen), p0_action(cmd), p0_event(ev, view), p0_anchor() -> Vector2, p0_zoom(f, at), p0_zoom_end(),
 ## p0_recenter(), p0_show_spot(where), p0_energy_verb() -> String, p0_dev(step) -> bool,
 ## p0_until(name) -> bool.
 
+const HomePanel = preload("res://scenes/p0/home/p0_home_panel.gd")
 const MAP_SCENE := "res://scenes/p0/p0_map.tscn"
 
 static var _instance: P0Runtime
@@ -61,7 +62,8 @@ func _init() -> void:
 	# Observation log (S7): only the commands the farm's hold-to-repeat sends are holds; every press is a tap.
 	session.src_of = src_of_press
 	ui.dev_skip.connect(func(m): session.dev_skip(m); ui.toast("Clock +%dh (dev)" % (m / 60)))
-	ui.zoom.connect(func(f: float): _call("p0_zoom", [f]))
+	ui.zoom.connect(func(f: float, at: Vector2): _call("p0_zoom", [f, at]))
+	ui.zoom_end.connect(func(): _call("p0_zoom_end", []))
 	ui.recenter.connect(func(): _call("p0_recenter", []))
 	ui.show_spot.connect(func(where: String): _call("p0_show_spot", [where]))
 	ui.can_show_spot = func() -> bool: return is_instance_valid(world) and world.has_method("p0_show_spot")
@@ -256,6 +258,10 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				var lv: Dictionary = ev
 				ui.queue_card(func(): ui.show_level_up(lv))
 				session.report({"kind": "level_banner", "skill": str(lv.skill), "level": int(lv.level)})
+			"homestead":
+				# HOME-2 (SGODOT-228): HOME-1 closes, the MomentBanner says what changed; the farm swaps the fence.
+				if ui.modal_kind == "homestead": ui.close_modal()
+				HomePanel.moment(ui, P0Logic.home_moment(v, ev))
 		dy -= 16.0
 	if ui.modal_kind == "stall" and events.size() > 0:
 		ui.set_view(session.current())
@@ -317,6 +323,15 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 			ui.toast("This parcel is no longer waiting")
 		"rest_used":
 			ui.toast("Rest used today")
+		"not_home":
+			ui.toast("At home only")
+		"need_material", "skills_short", "max_level":
+			# The shops and the workbench refuse with need_material too: only the upgrade reads HOME-1's gap.
+			if str(cmd.get("type", "")) == "homestead_upgrade": ui.toast(P0Logic.home_panel(session.current()).reason)
+			elif code == "need_material":
+				ui.toast("Need %d more %s" % [int(detail.get("need", 0)) - int(detail.get("have", 0)),
+					P0Logic.item_name(session.current(), str(detail.get("item", "")))])
+			else: ui.toast("Can't do that (%s)" % code)
 		"energy_full":
 			ui.toast("Energy full · eat later" if str(cmd.get("type", "")) == "eat" else "Energy full")
 		"not_ready":

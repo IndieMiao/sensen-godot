@@ -40,10 +40,11 @@ func test_back_closes_one_layer_at_a_time() -> void:
 	assert_bool(ui.has_modal()).is_true()
 	assert_bool(ui.close_top_layer()).is_true()   # the Inbox, not the farm
 	assert_bool(ui.has_modal()).is_false()
-	ui._on_pin_toggled("seed_radish", true)
-	assert_object(ui._pin_menu).is_not_null()
-	assert_bool(ui.close_top_layer()).is_true()
-	assert_object(ui._pin_menu).is_null()
+	await await_idle_frame()
+	ui._bar._start_drag(0, ui._bar.cells()[0].get_global_rect().get_center())   # a slot lifted and dragging (v1.11)
+	assert_bool(ui._bar.is_dragging()).is_true()
+	assert_bool(ui.close_top_layer()).is_true()   # Back cancels the drag: the slot flies back
+	assert_bool(ui._bar.is_dragging()).is_false()
 	assert_bool(ui.close_top_layer()).is_false()
 
 func test_end_stick_resets_the_pad_and_stops_the_world() -> void:
@@ -106,3 +107,13 @@ func test_a_root_world_leaves_for_the_map_once_nothing_is_left_to_close() -> voi
 	assert_int(swaps[0]).is_equal(0)
 	assert_bool(rt.ui.close_top_layer() or rt.root_back()).is_true()   # second Back: to the map
 	assert_int(swaps[0]).is_equal(1)
+
+func test_end_stick_before_the_pad_exists_is_harmless() -> void:
+	# farm-dev after #40: a farm started as the root scene attaches before P0Ui._ready built the pad.
+	var u: P0Ui = auto_free(P0Ui.new())   # not in the tree: no _ready, no pad
+	assert_object(u.pad).is_null()
+	var sticks := []
+	u.joystick.connect(func(v): sticks.append(v))
+	u.end_stick()
+	assert_array(sticks).is_equal([Vector2.ZERO])
+

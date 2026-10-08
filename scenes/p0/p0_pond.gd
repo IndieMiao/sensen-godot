@@ -26,6 +26,9 @@ var view: FishingPresentation
 var _focus := Vector3(6, 0, -6)
 var _cam_follow := P0Follow.new()
 var _zoom := 1.0
+const ElasticZoom = preload("res://modules/p0/p0_elastic_zoom.gd")
+var _pinch = ElasticZoom.new(0.5, 1.4)   # rubber band past 0.5 / 1.4
+var _zoom_at := Vector2.INF            # the last pinch centre (screen)
 var _plan: Dictionary = {}
 # Camera blend from the fishing close-up back to the pond framing when the panel closes.
 var _blend_from := Transform3D.IDENTITY
@@ -231,7 +234,8 @@ func _settle(ev: Dictionary, delay: float, first_xp: int) -> void:
 # ---------------------------------------------------------------- camera (old pond framing + safe box)
 func _follow(_dt: float) -> void:
 	_focus = _cam_follow.step(cam, _focus, actor.position, actor.mover.is_moving(), _dt)
-	_update_camera()
+	if _pinch.step(_dt): _set_zoom(_pinch.value)   # springing back from past a limit, about the same point
+	else: _update_camera()
 
 ## The opening shot leans toward the nearest water so the pond is in the frame (held until the first step).
 func _rest_focus() -> Vector3:
@@ -244,7 +248,23 @@ func _update_camera() -> void:
 	cam.position = _focus + Vector3(0, 1, 1).normalized() * 40
 	cam.look_at(_focus, Vector3.UP)
 
-func p0_zoom(f: float) -> void: _zoom = clampf(_zoom / f, 0.5, 1.4)
+## Zoom about the last pinch centre: the ground point under the fingers stays put (ScenePan's focal pinch).
+func _set_zoom(value: float) -> void:
+	_zoom = value
+	if cam == null or not is_inside_tree(): return   # not placed yet: the next frame frames it
+	var before = ElasticZoom.ground_at(cam, _zoom_at, _focus.y)
+	_update_camera()
+	var d := ElasticZoom.shift(before, ElasticZoom.ground_at(cam, _zoom_at, _focus.y))
+	if d != Vector3.ZERO:
+		_focus += d
+		_update_camera()
+
+func p0_zoom(f: float, at := Vector2.INF) -> void:
+	_zoom_at = at
+	_pinch.pinch(f)
+	_cam_follow.hold()   # the pinched framing stays until the player walks
+	_set_zoom(_pinch.value)
+func p0_zoom_end() -> void: _pinch.release()
 func p0_recenter() -> void:
 	_focus = actor.position
 	_cam_follow.held = false
@@ -253,7 +273,7 @@ func p0_anchor() -> Vector2:
 	return cam.unproject_position(actor.position + Vector3(0, 2.0, 0))
 
 func is_back_navigation_locked() -> bool:
-	if rt != null and rt.ui.close_top_layer(): return true   # Inbox, radial, PinMenu over the pond first
+	if rt != null and rt.ui.close_top_layer(): return true   # Inbox, radial, a dragged slot over the pond first
 	if panel and panel.visible:
 		panel.close()
 		return true

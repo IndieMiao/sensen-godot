@@ -1,0 +1,424 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    410
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "Quick slot drag · UiUndoToast"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        36
+      ],
+      "variation": "CaptionR12",
+      "text": "QuickSlot State=lifted · Toast Tone=Info 1178:82247 · LOCK-04 v1.11"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        70,
+        328,
+        340
+      ],
+      "children": [
+        {
+          "type": "HFlowContainer",
+          "rect": [
+            0,
+            70,
+            328,
+            240
+          ],
+          "children": [
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                0,
+                70,
+                150,
+                240
+              ],
+              "children": [
+                {
+                  "type": "ColorRect",
+                  "rect": [
+                    0,
+                    70,
+                    150,
+                    220
+                  ],
+                  "children": [
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        49,
+                        128,
+                        52,
+                        68
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            49,
+                            122,
+                            52,
+                            64
+                          ],
+                          "children": [
+                            {
+                              "type": "Control",
+                              "rect": [
+                                53,
+                                126,
+                                44,
+                                56
+                              ],
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    64,
+                                    126,
+                                    22,
+                                    22
+                                  ]
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    53,
+                                    145,
+                                    44,
+                                    29
+                                  ],
+                                  "variation": "C10B",
+                                  "text": "Radish Seeds"
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    53,
+                                    169,
+                                    44,
+                                    15
+                                  ],
+                                  "variation": "C10XB",
+                                  "text": "×12"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                51,
+                                124,
+                                48,
+                                60
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        68,
+                        213,
+                        14,
+                        14
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    0,
+                    296,
+                    150,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "drag: 24 above finger"
+                }
+              ]
+            },
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                170,
+                70,
+                150,
+                240
+              ],
+              "children": [
+                {
+                  "type": "ColorRect",
+                  "rect": [
+                    170,
+                    70,
+                    150,
+                    220
+                  ],
+                  "children": [
+                    {
+                      "type": "UiBarDropZone",
+                      "rect": [
+                        195,
+                        184,
+                        101,
+                        102
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            231,
+                            206,
+                            28,
+                            28
+                          ]
+                        },
+                        {
+                          "type": "PanelContainer",
+                          "rect": [
+                            195,
+                            262,
+                            101,
+                            24
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                205,
+                                262,
+                                81,
+                                24
+                              ],
+                              "variation": "C12XB",
+                              "text": "Release to pin"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        224,
+                        135,
+                        42,
+                        54
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            224,
+                            130,
+                            42,
+                            51
+                          ],
+                          "children": [
+                            {
+                              "type": "Control",
+                              "rect": [
+                                227,
+                                133,
+                                35,
+                                45
+                              ],
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    236,
+                                    133,
+                                    18,
+                                    18
+                                  ]
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    227,
+                                    148,
+                                    35,
+                                    23
+                                  ],
+                                  "variation": "C10B",
+                                  "text": "Radish Seeds"
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    227,
+                                    167,
+                                    35,
+                                    12
+                                  ],
+                                  "variation": "C10XB",
+                                  "text": "×12"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                226,
+                                132,
+                                38,
+                                48
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        238,
+                        213,
+                        14,
+                        14
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    170,
+                    296,
+                    150,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "over a zone: 80 %"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            330,
+            328,
+            80
+          ],
+          "children": [
+            {
+              "type": "UiUndoToast",
+              "rect": [
+                48,
+                330,
+                232,
+                60
+              ],
+              "children": [
+                {
+                  "type": "VBoxContainer",
+                  "rect": [
+                    58,
+                    339,
+                    210,
+                    42
+                  ],
+                  "children": [
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        58,
+                        339,
+                        210,
+                        20
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            58,
+                            339,
+                            20,
+                            20
+                          ]
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            86,
+                            339,
+                            182,
+                            20
+                          ],
+                          "variation": "C14XB",
+                          "text": "Radish Seeds off the bar"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "MarginContainer",
+                      "rect": [
+                        58,
+                        363,
+                        210,
+                        18
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            86,
+                            363,
+                            31,
+                            18
+                          ],
+                          "variation": "C12XB",
+                          "text": "Undo"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                396,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "removed: Info toast with Undo (5 s)"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
