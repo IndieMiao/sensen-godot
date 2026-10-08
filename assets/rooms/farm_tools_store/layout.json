@@ -1,0 +1,1212 @@
+{
+  "units": "metres",
+  "axes": "Godot Y-up, front +Z; Blender (x,-z,y)",
+  "reference": {
+    "file_key": "OMLTC3yw3u2WDjOZhLnhaR",
+    "node_id": "545:2961"
+  },
+  "assets": [
+    {
+      "name": "room_shell",
+      "file": "room_shell.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            -0.07,
+            0
+          ],
+          "size": [
+            6.7,
+            0.3,
+            6.1
+          ]
+        },
+        {
+          "at": [
+            -3.2,
+            1.8,
+            0
+          ],
+          "size": [
+            0.22,
+            3.6,
+            6.1
+          ]
+        },
+        {
+          "at": [
+            -0.75,
+            1.8,
+            -2.9
+          ],
+          "size": [
+            4.9,
+            3.6,
+            0.22
+          ]
+        },
+        {
+          "at": [
+            3.04,
+            1.8,
+            -2.9
+          ],
+          "size": [
+            0.3200000000000002,
+            3.6,
+            0.22
+          ]
+        },
+        {
+          "at": [
+            2.29,
+            3.0300000000000002,
+            -2.9
+          ],
+          "size": [
+            1.18,
+            1.1400000000000001,
+            0.22
+          ]
+        },
+        {
+          "at": [
+            3.3000000000000003,
+            0.75,
+            0
+          ],
+          "size": [
+            0.1,
+            1.5,
+            6.1
+          ]
+        },
+        {
+          "at": [
+            0,
+            0.75,
+            3.0
+          ],
+          "size": [
+            6.7,
+            1.5,
+            0.1
+          ]
+        },
+        {
+          "at": [
+            2.29,
+            -0.07,
+            -3.26
+          ],
+          "size": [
+            1.18,
+            0.3,
+            0.92
+          ]
+        },
+        {
+          "at": [
+            1.69,
+            0.7,
+            -3.3
+          ],
+          "size": [
+            0.08,
+            1.4,
+            0.9
+          ]
+        },
+        {
+          "at": [
+            2.89,
+            0.7,
+            -3.3
+          ],
+          "size": [
+            0.08,
+            1.4,
+            0.9
+          ]
+        },
+        {
+          "at": [
+            2.29,
+            0.7,
+            -3.78
+          ],
+          "size": [
+            1.24,
+            1.4,
+            0.08
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "window_wall",
+      "file": "window_wall.glb",
+      "position": [
+        -3.2,
+        0,
+        0
+      ],
+      "yaw_degrees": 90,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "back_wall",
+      "file": "back_wall.glb",
+      "position": [
+        0,
+        0,
+        -2.9
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "arched_window",
+      "file": "arched_window.glb",
+      "position": [
+        -3.1,
+        0,
+        0.23
+      ],
+      "yaw_degrees": 90,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "window_garden",
+      "file": "window_garden.glb",
+      "position": [
+        -3.3600000000000003,
+        0,
+        0.23
+      ],
+      "yaw_degrees": 90,
+      "colliders": [],
+      "material": "garden",
+      "cast_shadow": true
+    },
+    {
+      "name": "green_door",
+      "file": "green_door.glb",
+      "position": [
+        1.77,
+        0.05,
+        -2.7849999999999997
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "entry_mat",
+      "file": "entry_mat.glb",
+      "position": [
+        2.29,
+        0.092,
+        -2.1799999999999997
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "farm_tools_sign",
+      "file": "farm_tools_sign.glb",
+      "position": [
+        -1.1,
+        2.77,
+        -2.73
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "sales_counter",
+      "file": "sales_counter.glb",
+      "position": [
+        -0.55,
+        0.082,
+        -1.94
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0.0,
+            0.5251,
+            0
+          ],
+          "size": [
+            2.09,
+            1.0502,
+            0.77
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "seed_wall_shelf",
+      "file": "seed_wall_shelf.glb",
+      "position": [
+        -3.02,
+        0.63,
+        1.87
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.74,
+            0
+          ],
+          "size": [
+            1.63,
+            1.6,
+            0.39
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "pot_wall_shelf",
+      "file": "pot_wall_shelf.glb",
+      "position": [
+        1.0,
+        2.44,
+        -2.7
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "hand_tools_board",
+      "file": "hand_tools_board.glb",
+      "position": [
+        1.06,
+        1.04,
+        -2.6799999999999997
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "front_display",
+      "file": "front_display.glb",
+      "position": [
+        0.19999999999999996,
+        0.082,
+        1.78
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0.0,
+            0.47,
+            0
+          ],
+          "size": [
+            2.3023,
+            0.94,
+            1.12
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "entry_crate",
+      "file": "entry_crate.glb",
+      "position": [
+        1.4,
+        0.082,
+        -2.25
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.24,
+            0
+          ],
+          "size": [
+            0.69,
+            0.48,
+            0.63
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "door_lantern",
+      "file": "door_lantern.glb",
+      "position": [
+        1.79,
+        2.46,
+        -2.58
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "door_frame",
+      "file": "door_frame.glb",
+      "position": [
+        2.29,
+        0.05,
+        -2.7849999999999997
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "seed_crop_0",
+      "file": "seed_crop_0.glb",
+      "position": [
+        -0.16000000000000003,
+        1.2,
+        1.63
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "seed_crop_1",
+      "file": "seed_crop_1.glb",
+      "position": [
+        0.18999999999999995,
+        1.2,
+        1.63
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "seed_crop_2",
+      "file": "seed_crop_2.glb",
+      "position": [
+        0.5399999999999999,
+        1.2,
+        1.63
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "seed_crop_3",
+      "file": "seed_crop_3.glb",
+      "position": [
+        -0.16000000000000003,
+        1.3499999999999999,
+        1.43
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "tool_barrel",
+      "file": "tool_barrel.glb",
+      "position": [
+        -2.35,
+        0.082,
+        1.8
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.4,
+            0
+          ],
+          "size": [
+            0.66,
+            0.8,
+            0.66
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "long_tools_wall",
+      "file": "long_tools_wall.glb",
+      "position": [
+        -3.03,
+        0.87,
+        -1.95
+      ],
+      "yaw_degrees": 90,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "left_sack_crate",
+      "file": "left_sack_crate.glb",
+      "position": [
+        -2.87,
+        0.082,
+        2.31
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.29,
+            0
+          ],
+          "size": [
+            1.22,
+            0.58,
+            0.52
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "counter_side_stock",
+      "file": "counter_side_stock.glb",
+      "position": [
+        0.75,
+        0.082,
+        -2.38
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.34,
+            0
+          ],
+          "size": [
+            0.48,
+            0.68,
+            0.5
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "counter_dressing",
+      "file": "counter_dressing.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": false
+    },
+    {
+      "name": "display_dressing",
+      "file": "display_dressing.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": false
+    },
+    {
+      "name": "wall_dressing",
+      "file": "wall_dressing.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "front_sack_crate",
+      "file": "front_sack_crate.glb",
+      "position": [
+        -2.12,
+        0.082,
+        2.63
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.29,
+            0
+          ],
+          "size": [
+            0.68,
+            0.58,
+            0.49
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "counter_extra_pots",
+      "file": "counter_extra_pots.glb",
+      "position": [
+        0.99,
+        0.082,
+        -1.75
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.28,
+            0
+          ],
+          "size": [
+            0.47,
+            0.56,
+            0.47
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "metal_fittings",
+      "file": "metal_fittings.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "metal",
+      "cast_shadow": true
+    }
+  ],
+  "instances": [
+    {
+      "name": "rack_packet_0",
+      "asset": "seed_crop_2",
+      "position": [
+        0.18999999999999995,
+        1.35,
+        1.43
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "rack_packet_1",
+      "asset": "seed_crop_0",
+      "position": [
+        0.5399999999999999,
+        1.35,
+        1.43
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "wall_seed_0_0",
+      "asset": "seed_crop_0",
+      "position": [
+        -2.81,
+        0.71,
+        2.34
+      ],
+      "yaw_degrees": 90
+    },
+    {
+      "name": "wall_seed_0_1",
+      "asset": "seed_crop_1",
+      "position": [
+        -2.81,
+        0.71,
+        1.91
+      ],
+      "yaw_degrees": 90
+    },
+    {
+      "name": "wall_seed_0_2",
+      "asset": "seed_crop_2",
+      "position": [
+        -2.81,
+        0.71,
+        1.48
+      ],
+      "yaw_degrees": 90
+    },
+    {
+      "name": "wall_seed_1_0",
+      "asset": "seed_crop_3",
+      "position": [
+        -2.81,
+        1.44,
+        2.34
+      ],
+      "yaw_degrees": 90
+    },
+    {
+      "name": "wall_seed_1_1",
+      "asset": "seed_crop_0",
+      "position": [
+        -2.81,
+        1.44,
+        1.91
+      ],
+      "yaw_degrees": 90
+    },
+    {
+      "name": "wall_seed_1_2",
+      "asset": "seed_crop_1",
+      "position": [
+        -2.81,
+        1.44,
+        1.48
+      ],
+      "yaw_degrees": 90
+    }
+  ],
+  "camera": {
+    "position": [
+      10.58604251266429,
+      10.010750012057159,
+      10.62712114921366
+    ],
+    "target": [
+      0,
+      1.698125282011132,
+      0
+    ],
+    "size": 12.317351160224227
+  },
+  "sun_direction": [
+    -6,
+    7,
+    1.5
+  ],
+  "review_lighting": {
+    "ambient": 0.53,
+    "ambient_color": "FFE8CA",
+    "sun": 1.28,
+    "sun_color": "FFE4B5",
+    "sun_position": [
+      -7,
+      5.3,
+      -1.4
+    ],
+    "sun_target": [
+      0,
+      0,
+      0
+    ],
+    "shadow_bias": 0.07,
+    "shadow_normal_bias": 0.7,
+    "shadow_distance": 25,
+    "background": "D4E8D8",
+    "background_gradient": true,
+    "points": [
+      {
+        "position": [
+          1.8,
+          2.36,
+          -2.4
+        ],
+        "energy": 0.45,
+        "color": "FFE0A4",
+        "range": 1.8
+      }
+    ]
+  },
+  "door": {
+    "module": "green_door",
+    "open_yaw_degrees": 100
+  },
+  "shared_plants": [
+    {
+      "name": "entry_terracotta_plant",
+      "file": "monstera_woven.glb",
+      "position": [
+        2.88,
+        0.083,
+        -1.65
+      ],
+      "rotation_degrees": [
+        0,
+        -25,
+        0
+      ],
+      "scale": [
+        0.96,
+        0.96,
+        0.96
+      ],
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.3,
+            0
+          ],
+          "size": [
+            0.76,
+            0.6,
+            0.76
+          ]
+        }
+      ]
+    },
+    {
+      "name": "shelf_trailing_plant",
+      "file": "pothos.glb",
+      "position": [
+        -2.97,
+        2.16,
+        1.33
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        0
+      ],
+      "scale": [
+        0.83,
+        0.83,
+        0.83
+      ],
+      "colliders": []
+    },
+    {
+      "name": "window_trailing_plant",
+      "file": "pothos.glb",
+      "position": [
+        -2.98,
+        1.4,
+        0.73
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        0
+      ],
+      "scale": [
+        1.06,
+        1.06,
+        1.06
+      ],
+      "colliders": []
+    },
+    {
+      "name": "pot_shelf_trailing_plant",
+      "file": "pothos.glb",
+      "position": [
+        1.38,
+        2.56,
+        -2.61
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.91,
+        0.91,
+        0.91
+      ],
+      "colliders": []
+    },
+    {
+      "name": "entry_terracotta_pot",
+      "file": "pot_terracotta.glb",
+      "position": [
+        2.88,
+        0.083,
+        -1.65
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.18,
+        1.18,
+        1.18
+      ],
+      "colliders": []
+    }
+  ],
+  "review_views": [
+    {
+      "name": "detail-display",
+      "position": [
+        5,
+        3.8,
+        6
+      ],
+      "target": [
+        -0.65,
+        1.0,
+        1.2
+      ],
+      "size": 4.5
+    },
+    {
+      "name": "detail-tools",
+      "position": [
+        6,
+        3.7,
+        6
+      ],
+      "target": [
+        0.15,
+        1.8,
+        -2.3
+      ],
+      "size": 5.4
+    }
+  ],
+  "spawn": [
+    2.29,
+    0.09,
+    -2.1
+  ],
+  "bench": {
+    "floor_y": 0.08,
+    "route": [
+      {
+        "name": "entry",
+        "position": [
+          2.05,
+          0.08,
+          -1.4
+        ],
+        "capture": "door"
+      },
+      {
+        "name": "counter front",
+        "position": [
+          -0.45,
+          0.08,
+          -0.98
+        ],
+        "capture": "main"
+      },
+      {
+        "name": "display east",
+        "position": [
+          1.8,
+          0.08,
+          1.05
+        ]
+      },
+      {
+        "name": "front right",
+        "position": [
+          1.8,
+          0.08,
+          2.67
+        ]
+      },
+      {
+        "name": "front display",
+        "position": [
+          -0.35,
+          0.08,
+          2.67
+        ]
+      },
+      {
+        "name": "display west",
+        "position": [
+          -1.52,
+          0.08,
+          2.65
+        ]
+      },
+      {
+        "name": "wall seed rack",
+        "position": [
+          -1.52,
+          0.08,
+          1.12
+        ]
+      },
+      {
+        "name": "window approach",
+        "position": [
+          -2.73,
+          0.08,
+          0.7
+        ]
+      },
+      {
+        "name": "window",
+        "position": [
+          -2.73,
+          0.08,
+          -0.45
+        ]
+      }
+    ],
+    "blocked": [
+      {
+        "name": "counter",
+        "from": [
+          -0.55,
+          0.09,
+          -0.98
+        ],
+        "to": [
+          -0.55,
+          0.09,
+          -1.94
+        ],
+        "target": "sales_counter"
+      },
+      {
+        "name": "display",
+        "from": [
+          1.93,
+          0.09,
+          1.78
+        ],
+        "to": [
+          0.2,
+          0.09,
+          1.78
+        ],
+        "target": "front_display"
+      },
+      {
+        "name": "barrel",
+        "from": [
+          -2.35,
+          0.09,
+          0.85
+        ],
+        "to": [
+          -2.35,
+          0.09,
+          1.8
+        ],
+        "target": "tool_barrel"
+      },
+      {
+        "name": "crate",
+        "from": [
+          1.4,
+          0.09,
+          -1.3
+        ],
+        "to": [
+          1.4,
+          0.09,
+          -2.25
+        ],
+        "target": "entry_crate"
+      },
+      {
+        "name": "wall shelf",
+        "from": [
+          -2.1,
+          0.09,
+          1.15
+        ],
+        "to": [
+          -3.03,
+          0.09,
+          1.15
+        ],
+        "target": "seed_wall_shelf"
+      },
+      {
+        "name": "west wall",
+        "from": [
+          -2.65,
+          0.09,
+          -0.4
+        ],
+        "to": [
+          -3.8,
+          0.09,
+          -0.4
+        ],
+        "target": "room_shell"
+      },
+      {
+        "name": "east edge",
+        "from": [
+          2.5,
+          0.09,
+          1.5
+        ],
+        "to": [
+          3.8,
+          0.09,
+          1.5
+        ],
+        "target": "room_shell"
+      },
+      {
+        "name": "front edge",
+        "from": [
+          1.6,
+          0.09,
+          2.4
+        ],
+        "to": [
+          1.6,
+          0.09,
+          3.5
+        ],
+        "target": "room_shell"
+      }
+    ],
+    "gaps": [
+      {
+        "name": "counter display main aisle",
+        "from": [
+          1.3,
+          0.09,
+          -0.38
+        ],
+        "to": [
+          -1.5,
+          0.09,
+          -0.38
+        ],
+        "measure": [
+          [
+            -0.55,
+            0.7,
+            -1.555
+          ],
+          [
+            -0.55,
+            0.7,
+            1.22
+          ]
+        ],
+        "minimum": 0.8,
+        "width": 2.775
+      }
+    ],
+    "entrance": {
+      "inside": [
+        2.29,
+        0.09,
+        -2.2
+      ],
+      "outside": [
+        2.29,
+        0.09,
+        -3.27
+      ]
+    },
+    "slide": {
+      "from": [
+        2.78,
+        0.09,
+        1.8
+      ],
+      "direction": [
+        1,
+        0,
+        -1
+      ],
+      "tangent": [
+        0,
+        0,
+        -1
+      ],
+      "seconds": 0.65
+    },
+    "input_start": [
+      1.7,
+      0.09,
+      0.05
+    ],
+    "scale": {
+      "door": {
+        "height": 2.33,
+        "source": "Sage arched doorway"
+      },
+      "counter": {
+        "height": 1.1659,
+        "source": "Shortened sales counter oak top"
+      },
+      "chair": {
+        "applicable": false,
+        "reason": "No seating in farm tools store"
+      },
+      "table": {
+        "height": 1.015,
+        "source": "Front display worktable top"
+      }
+    }
+  }
+}

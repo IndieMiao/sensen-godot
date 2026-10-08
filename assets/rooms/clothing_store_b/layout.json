@@ -1,0 +1,1984 @@
+{
+  "units": "metres",
+  "coordinates": "Godot Y up, front +Z; pivots local floor or mounting point",
+  "reference": {
+    "file_key": "OMLTC3yw3u2WDjOZhLnhaR",
+    "node_id": "545:2963"
+  },
+  "assets": [
+    {
+      "name": "boutique_floor",
+      "file": "boutique_floor.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            -0.08,
+            0
+          ],
+          "size": [
+            6.1,
+            0.276,
+            5.68
+          ]
+        }
+      ]
+    },
+    {
+      "name": "boutique_left_wall",
+      "file": "boutique_left_wall.glb",
+      "position": [
+        -3,
+        0.06,
+        0
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            -2.64,
+            1.5,
+            0
+          ],
+          "size": [
+            0.27,
+            3,
+            0.2
+          ]
+        },
+        {
+          "at": [
+            0.8,
+            1.5,
+            0
+          ],
+          "size": [
+            3.99,
+            3,
+            0.2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "boutique_back_wall",
+      "file": "boutique_back_wall.glb",
+      "position": [
+        0,
+        0.06,
+        -2.75
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            1.57,
+            0
+          ],
+          "size": [
+            6,
+            3.14,
+            0.2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "entrance_frame",
+      "file": "entrance_frame.glb",
+      "position": [
+        -2.87,
+        0.06,
+        1.96
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "entrance_glass",
+      "file": "entrance_glass.glb",
+      "position": [
+        -2.87,
+        0.06,
+        1.96
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "left_gold_rack",
+      "file": "left_gold_rack.glb",
+      "position": [
+        -2.69,
+        0.07,
+        -1.29
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            0,
+            1.28,
+            0
+          ],
+          "size": [
+            2.28,
+            2.56,
+            0.53
+          ]
+        }
+      ]
+    },
+    {
+      "name": "right_gold_rack",
+      "file": "right_gold_rack.glb",
+      "position": [
+        1.61,
+        0.07,
+        -2.39
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            1.28,
+            0
+          ],
+          "size": [
+            2.28,
+            2.56,
+            0.53
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hanging_dress_ivory",
+      "file": "hanging_dress_ivory.glb",
+      "position": [
+        -2.57,
+        2.23,
+        -0.35
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "hanging_dress_rose",
+      "file": "hanging_dress_rose.glb",
+      "position": [
+        -2.57,
+        2.23,
+        -0.625
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "hanging_dress_cream",
+      "file": "hanging_dress_cream.glb",
+      "position": [
+        -2.57,
+        2.23,
+        -0.9
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "hanging_dress_blue",
+      "file": "hanging_dress_blue.glb",
+      "position": [
+        -2.57,
+        2.23,
+        -1.175
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "hanging_dress_mint",
+      "file": "hanging_dress_mint.glb",
+      "position": [
+        -2.57,
+        2.23,
+        -1.4500000000000002
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "hanging_blouse_blue",
+      "file": "hanging_blouse_blue.glb",
+      "position": [
+        0.62,
+        2.23,
+        -2.25
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "hanging_blouse_ivory",
+      "file": "hanging_blouse_ivory.glb",
+      "position": [
+        0.9450000000000001,
+        2.23,
+        -2.25
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "hanging_blouse_mint",
+      "file": "hanging_blouse_mint.glb",
+      "position": [
+        1.27,
+        2.23,
+        -2.25
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "scarf_rail",
+      "file": "scarf_rail.glb",
+      "position": [
+        1.61,
+        0.07,
+        -2.29
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "handbag_pink",
+      "file": "handbag_pink.glb",
+      "position": [
+        -2.65,
+        2.475,
+        -0.53
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "handbag_cream",
+      "file": "handbag_cream.glb",
+      "position": [
+        -2.65,
+        2.475,
+        -1.02
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "handbag_green",
+      "file": "handbag_green.glb",
+      "position": [
+        -2.65,
+        2.475,
+        -1.51
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "handbag_blue",
+      "file": "handbag_blue.glb",
+      "position": [
+        -2.65,
+        2.475,
+        -2.0
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "changing_room_arch",
+      "file": "changing_room_arch.glb",
+      "position": [
+        -1.62,
+        0.06,
+        -2.56
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "changing_curtain",
+      "file": "changing_curtain.glb",
+      "position": [
+        -1.62,
+        0.06,
+        -2.8
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "standing_mirror",
+      "file": "standing_mirror.glb",
+      "position": [
+        -0.55,
+        0.07,
+        -2.23
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            1.06,
+            0
+          ],
+          "size": [
+            0.77,
+            2.12,
+            0.25
+          ]
+        }
+      ]
+    },
+    {
+      "name": "pink_round_rug",
+      "file": "pink_round_rug.glb",
+      "position": [
+        -0.27,
+        0.07,
+        -0.15
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "round_display_island",
+      "file": "round_display_island.glb",
+      "position": [
+        -0.27,
+        0.09,
+        -0.15
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0,
+            0
+          ],
+          "points": [
+            [
+              1.17,
+              0,
+              0.0
+            ],
+            [
+              1.1301332167582099,
+              0,
+              0.30281828276994927
+            ],
+            [
+              1.0132497224277932,
+              0,
+              0.5849999999999999
+            ],
+            [
+              0.8273149339882606,
+              0,
+              0.8273149339882605
+            ],
+            [
+              0.5850000000000001,
+              0,
+              1.013249722427793
+            ],
+            [
+              0.30281828276994927,
+              0,
+              1.1301332167582099
+            ],
+            [
+              7.164183775012016e-17,
+              0,
+              1.17
+            ],
+            [
+              -0.3028182827699491,
+              0,
+              1.1301332167582099
+            ],
+            [
+              -0.5849999999999997,
+              0,
+              1.0132497224277932
+            ],
+            [
+              -0.8273149339882605,
+              0,
+              0.8273149339882606
+            ],
+            [
+              -1.0132497224277932,
+              0,
+              0.5849999999999999
+            ],
+            [
+              -1.1301332167582097,
+              0,
+              0.3028182827699496
+            ],
+            [
+              -1.17,
+              0,
+              1.4328367550024033e-16
+            ],
+            [
+              -1.1301332167582099,
+              0,
+              -0.3028182827699493
+            ],
+            [
+              -1.0132497224277934,
+              0,
+              -0.5849999999999996
+            ],
+            [
+              -0.827314933988261,
+              0,
+              -0.8273149339882601
+            ],
+            [
+              -0.5850000000000005,
+              0,
+              -1.0132497224277928
+            ],
+            [
+              -0.3028182827699491,
+              0,
+              -1.1301332167582099
+            ],
+            [
+              -2.1492551325036047e-16,
+              0,
+              -1.17
+            ],
+            [
+              0.3028182827699487,
+              0,
+              -1.1301332167582099
+            ],
+            [
+              0.5850000000000001,
+              0,
+              -1.013249722427793
+            ],
+            [
+              0.8273149339882604,
+              0,
+              -0.8273149339882607
+            ],
+            [
+              1.0132497224277928,
+              0,
+              -0.5850000000000005
+            ],
+            [
+              1.1301332167582097,
+              0,
+              -0.3028182827699502
+            ],
+            [
+              1.17,
+              1.001,
+              0.0
+            ],
+            [
+              1.1301332167582099,
+              1.001,
+              0.30281828276994927
+            ],
+            [
+              1.0132497224277932,
+              1.001,
+              0.5849999999999999
+            ],
+            [
+              0.8273149339882606,
+              1.001,
+              0.8273149339882605
+            ],
+            [
+              0.5850000000000001,
+              1.001,
+              1.013249722427793
+            ],
+            [
+              0.30281828276994927,
+              1.001,
+              1.1301332167582099
+            ],
+            [
+              7.164183775012016e-17,
+              1.001,
+              1.17
+            ],
+            [
+              -0.3028182827699491,
+              1.001,
+              1.1301332167582099
+            ],
+            [
+              -0.5849999999999997,
+              1.001,
+              1.0132497224277932
+            ],
+            [
+              -0.8273149339882605,
+              1.001,
+              0.8273149339882606
+            ],
+            [
+              -1.0132497224277932,
+              1.001,
+              0.5849999999999999
+            ],
+            [
+              -1.1301332167582097,
+              1.001,
+              0.3028182827699496
+            ],
+            [
+              -1.17,
+              1.001,
+              1.4328367550024033e-16
+            ],
+            [
+              -1.1301332167582099,
+              1.001,
+              -0.3028182827699493
+            ],
+            [
+              -1.0132497224277934,
+              1.001,
+              -0.5849999999999996
+            ],
+            [
+              -0.827314933988261,
+              1.001,
+              -0.8273149339882601
+            ],
+            [
+              -0.5850000000000005,
+              1.001,
+              -1.0132497224277928
+            ],
+            [
+              -0.3028182827699491,
+              1.001,
+              -1.1301332167582099
+            ],
+            [
+              -2.1492551325036047e-16,
+              1.001,
+              -1.17
+            ],
+            [
+              0.3028182827699487,
+              1.001,
+              -1.1301332167582099
+            ],
+            [
+              0.5850000000000001,
+              1.001,
+              -1.013249722427793
+            ],
+            [
+              0.8273149339882604,
+              1.001,
+              -0.8273149339882607
+            ],
+            [
+              1.0132497224277928,
+              1.001,
+              -0.5850000000000005
+            ],
+            [
+              1.1301332167582097,
+              1.001,
+              -0.3028182827699502
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "pink_pumps",
+      "file": "pink_pumps.glb",
+      "position": [
+        -0.66,
+        0.68,
+        0.65
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "black_pumps",
+      "file": "black_pumps.glb",
+      "position": [
+        0.13,
+        0.68,
+        0.66
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "folded_ivory_knit",
+      "file": "folded_ivory_knit.glb",
+      "position": [
+        -0.25,
+        0.68,
+        -1.06
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "folded_blue_knit",
+      "file": "folded_blue_knit.glb",
+      "position": [
+        0.72,
+        0.68,
+        -0.18000000000000002
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "island_bouquet",
+      "file": "island_bouquet.glb",
+      "position": [
+        -0.27,
+        1.103,
+        -0.21
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "pink_tufted_bench",
+      "file": "pink_tufted_bench.glb",
+      "position": [
+        -1.24,
+        0.07,
+        2.12
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.34,
+            0
+          ],
+          "size": [
+            1.9,
+            0.68,
+            0.56
+          ]
+        }
+      ]
+    },
+    {
+      "name": "jewelry_display",
+      "file": "jewelry_display.glb",
+      "position": [
+        2.43,
+        0.07,
+        1.13
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.528,
+            0
+          ],
+          "size": [
+            2.43,
+            1.056,
+            0.68
+          ]
+        }
+      ]
+    },
+    {
+      "name": "jewelry_glass",
+      "file": "jewelry_glass.glb",
+      "position": [
+        2.43,
+        0.07,
+        1.13
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "window_display_frame",
+      "file": "window_display_frame.glb",
+      "position": [
+        -2.85,
+        0.06,
+        0.5
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "display_mannequin_dress",
+      "file": "display_mannequin_dress.glb",
+      "position": [
+        -2.71,
+        2.28,
+        0.5
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "gift_boxes",
+      "file": "gift_boxes.glb",
+      "position": [
+        -2.62,
+        0.68,
+        0.5
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "petal_pendant",
+      "file": "petal_pendant.glb",
+      "position": [
+        -1.63,
+        3.66,
+        -1.94
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "wall_sconce",
+      "file": "wall_sconce.glb",
+      "position": [
+        -0.88,
+        2.0,
+        -2.56
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "pink_entry_mat",
+      "file": "pink_entry_mat.glb",
+      "position": [
+        -2.52,
+        0.079,
+        1.5
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "ivory_sneakers",
+      "file": "ivory_sneakers.glb",
+      "position": [
+        0.6,
+        0.68,
+        0.25
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "mint_mary_janes",
+      "file": "mint_mary_janes.glb",
+      "position": [
+        0.57,
+        0.68,
+        -0.57
+      ],
+      "yaw_degrees": 60,
+      "colliders": []
+    },
+    {
+      "name": "entrance_sky",
+      "file": "entrance_sky.glb",
+      "position": [
+        -3.18,
+        0.06,
+        1.96
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "flower_pendant_glow",
+      "file": "flower_pendant_glow.glb",
+      "position": [
+        -1.63,
+        3.66,
+        -1.94
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "hanging_blouse_rose",
+      "file": "hanging_blouse_rose.glb",
+      "position": [
+        1.5950000000000002,
+        2.23,
+        -2.25
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    }
+  ],
+  "instances": [
+    {
+      "name": "right_pink_bag",
+      "asset": "handbag_pink",
+      "position": [
+        0.9,
+        2.475,
+        -2.37
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "right_blue_bag",
+      "asset": "handbag_blue",
+      "position": [
+        1.75,
+        2.475,
+        -2.37
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "island_bag_pink",
+      "asset": "handbag_pink",
+      "position": [
+        -0.66,
+        1.103,
+        0.0
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "island_bag_green",
+      "asset": "handbag_green",
+      "position": [
+        0.09,
+        1.103,
+        0.02999999999999997
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "island_bag_cream",
+      "asset": "handbag_cream",
+      "position": [
+        -0.27,
+        1.103,
+        -0.5
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "stacked_knit",
+      "asset": "folded_ivory_knit",
+      "position": [
+        -0.25,
+        0.81,
+        -1.06
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "sconce_left",
+      "asset": "wall_sconce",
+      "position": [
+        -2.84,
+        1.68,
+        2.74
+      ],
+      "yaw_degrees": 90
+    },
+    {
+      "name": "sconce_fitting",
+      "asset": "wall_sconce",
+      "position": [
+        -2.35,
+        2.05,
+        -2.56
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "sconce_right",
+      "asset": "wall_sconce",
+      "position": [
+        2.87,
+        1.92,
+        -2.56
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "left_extra_dress_0",
+      "asset": "hanging_dress_ivory",
+      "position": [
+        -2.57,
+        2.23,
+        -1.725
+      ],
+      "yaw_degrees": 90
+    },
+    {
+      "name": "left_extra_dress_1",
+      "asset": "hanging_dress_rose",
+      "position": [
+        -2.57,
+        2.23,
+        -2.0
+      ],
+      "yaw_degrees": 90
+    },
+    {
+      "name": "left_extra_dress_2",
+      "asset": "hanging_dress_cream",
+      "position": [
+        -2.57,
+        2.23,
+        -2.2750000000000004
+      ],
+      "yaw_degrees": 90
+    },
+    {
+      "name": "right_upper_4",
+      "asset": "hanging_blouse_blue",
+      "position": [
+        1.92,
+        2.23,
+        -2.25
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "right_upper_5",
+      "asset": "hanging_blouse_ivory",
+      "position": [
+        2.245,
+        2.23,
+        -2.25
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "right_upper_6",
+      "asset": "hanging_blouse_mint",
+      "position": [
+        2.5700000000000003,
+        2.23,
+        -2.25
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "right_lower_0",
+      "asset": "hanging_blouse_ivory",
+      "position": [
+        0.72,
+        1.25,
+        -2.17
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "right_lower_1",
+      "asset": "hanging_blouse_mint",
+      "position": [
+        1.075,
+        1.25,
+        -2.17
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "right_lower_2",
+      "asset": "hanging_blouse_rose",
+      "position": [
+        1.43,
+        1.25,
+        -2.17
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "right_lower_3",
+      "asset": "hanging_blouse_blue",
+      "position": [
+        1.785,
+        1.25,
+        -2.17
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "right_lower_4",
+      "asset": "hanging_blouse_ivory",
+      "position": [
+        2.1399999999999997,
+        1.25,
+        -2.17
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "right_lower_5",
+      "asset": "hanging_blouse_mint",
+      "position": [
+        2.495,
+        1.25,
+        -2.17
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "island_bag_blue",
+      "asset": "handbag_blue",
+      "position": [
+        0.12,
+        1.103,
+        -0.66
+      ],
+      "yaw_degrees": -22
+    },
+    {
+      "name": "island_bag_coral",
+      "asset": "handbag_pink",
+      "position": [
+        -0.72,
+        1.103,
+        -0.54
+      ],
+      "yaw_degrees": 20
+    },
+    {
+      "name": "cream_shoe_pair",
+      "asset": "pink_pumps",
+      "position": [
+        -0.53,
+        0.68,
+        -1.1
+      ],
+      "yaw_degrees": 160
+    },
+    {
+      "name": "stacked_blue_knit",
+      "asset": "folded_blue_knit",
+      "position": [
+        0.72,
+        0.79,
+        -0.18
+      ],
+      "yaw_degrees": 90
+    }
+  ],
+  "camera": {
+    "position": [
+      11.019102461482488,
+      14.518119182093892,
+      10.177535185813127
+    ],
+    "target": [
+      0.03630685486111318,
+      1.186444479186516,
+      -0.03902982710477448
+    ],
+    "size": 8.940178633538647
+  },
+  "revision": "R2",
+  "botanical_assets": [
+    "entrance_sky"
+  ],
+  "shared_plants": [
+    {
+      "name": "EntrancePlant",
+      "asset": "peace_lily",
+      "file": "res://assets/rooms/_shared/plants/peace_lily.glb",
+      "position": [
+        -2.65,
+        0.07,
+        2.53
+      ],
+      "rotation_degrees": [
+        0,
+        30,
+        0
+      ],
+      "scale": [
+        0.95,
+        0.95,
+        0.95
+      ],
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.23,
+            0
+          ],
+          "size": [
+            0.44,
+            0.46,
+            0.44
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FittingPlant",
+      "asset": "monstera_woven",
+      "file": "res://assets/rooms/_shared/plants/monstera_woven.glb",
+      "position": [
+        -2.39,
+        0.07,
+        -2.21
+      ],
+      "rotation_degrees": [
+        0,
+        60,
+        0
+      ],
+      "scale": [
+        0.78,
+        0.78,
+        0.78
+      ],
+      "colliders": []
+    },
+    {
+      "name": "LeftTrailing",
+      "asset": "pothos",
+      "file": "res://assets/rooms/_shared/plants/pothos.glb",
+      "position": [
+        -2.65,
+        2.49,
+        -0.26
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        0
+      ],
+      "scale": [
+        0.6,
+        0.6,
+        0.6
+      ],
+      "colliders": []
+    },
+    {
+      "name": "RightTrailing",
+      "asset": "pothos",
+      "file": "res://assets/rooms/_shared/plants/pothos.glb",
+      "position": [
+        2.55,
+        2.49,
+        -2.29
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.6,
+        0.6,
+        0.6
+      ],
+      "colliders": []
+    }
+  ],
+  "material_overrides": {
+    "entrance_sky": {
+      "unshaded": true
+    },
+    "petal_pendant": {
+      "emission": "FFE4B2",
+      "emission_energy": 0.1,
+      "emission_use_atlas": true
+    },
+    "boutique_floor": {
+      "roughness": 0.48
+    },
+    "jewelry_glass": {
+      "alpha": 0.035
+    },
+    "entrance_glass": {
+      "alpha": 0.08
+    },
+    "flower_pendant_glow": {
+      "emission": "FFE6B4",
+      "emission_energy": 0.6
+    }
+  },
+  "boundaries": [
+    {
+      "name": "front_edge",
+      "at": [
+        0,
+        0.6,
+        2.94
+      ],
+      "size": [
+        6.2,
+        1.8,
+        0.12
+      ]
+    },
+    {
+      "name": "right_edge",
+      "at": [
+        3.06,
+        0.6,
+        0
+      ],
+      "size": [
+        0.12,
+        1.8,
+        5.9
+      ]
+    },
+    {
+      "name": "left_door_limit",
+      "at": [
+        -3.12,
+        1.4,
+        1.96
+      ],
+      "size": [
+        0.1,
+        2.8,
+        1.4
+      ]
+    }
+  ],
+  "lighting": {
+    "background": "DFA571",
+    "ambient": "C6B4BB",
+    "ambient_energy": 0.72,
+    "sun_color": "FFE2C9",
+    "sun_energy": 1.1,
+    "sun_position": [
+      6,
+      9,
+      4
+    ],
+    "sun_target": [
+      0,
+      0,
+      -0.8
+    ],
+    "angular_distance": 6,
+    "lamps": [
+      {
+        "position": [
+          -1.63,
+          2.9,
+          -1.94
+        ],
+        "color": "FFE3B6",
+        "energy": 0.7,
+        "range": 2.1
+      },
+      {
+        "position": [
+          -0.88,
+          2,
+          -2.3
+        ],
+        "color": "FFE6BF",
+        "energy": 0.42,
+        "range": 1.25
+      },
+      {
+        "position": [
+          -2.6,
+          1.68,
+          2.64
+        ],
+        "color": "FFE6BF",
+        "energy": 0.42,
+        "range": 1.25
+      },
+      {
+        "position": [
+          -2.35,
+          2.05,
+          -2.3
+        ],
+        "color": "FFE6BF",
+        "energy": 0.42,
+        "range": 1.25
+      },
+      {
+        "position": [
+          2.7,
+          1.92,
+          -2.3
+        ],
+        "color": "FFE6BF",
+        "energy": 0.42,
+        "range": 1.25
+      }
+    ]
+  },
+  "review_lighting": {
+    "background": "DFA571",
+    "ambient_color": "C6B4BB",
+    "ambient": 0.72,
+    "sun_color": "FFE2C9",
+    "sun": 1.1,
+    "sun_position": [
+      6,
+      9,
+      4
+    ],
+    "sun_target": [
+      0,
+      0,
+      -0.8
+    ],
+    "points": [
+      {
+        "position": [
+          -1.63,
+          2.9,
+          -1.94
+        ],
+        "color": "FFE3B6",
+        "energy": 0.7,
+        "range": 2.1
+      },
+      {
+        "position": [
+          -0.88,
+          2,
+          -2.3
+        ],
+        "color": "FFE6BF",
+        "energy": 0.42,
+        "range": 1.25
+      },
+      {
+        "position": [
+          -2.6,
+          1.68,
+          2.64
+        ],
+        "color": "FFE6BF",
+        "energy": 0.42,
+        "range": 1.25
+      },
+      {
+        "position": [
+          -2.35,
+          2.05,
+          -2.3
+        ],
+        "color": "FFE6BF",
+        "energy": 0.42,
+        "range": 1.25
+      },
+      {
+        "position": [
+          2.7,
+          1.92,
+          -2.3
+        ],
+        "color": "FFE6BF",
+        "energy": 0.42,
+        "range": 1.25
+      }
+    ]
+  },
+  "spawn": [
+    -2.42,
+    0.065,
+    1.43
+  ],
+  "bench": {
+    "floor_y": 0.058,
+    "route": [
+      {
+        "name": "entry",
+        "position": [
+          -2.4,
+          0.065,
+          1.4
+        ],
+        "capture": "door"
+      },
+      {
+        "name": "circle_start",
+        "position": [
+          -1.366,
+          0.065,
+          0.946
+        ]
+      },
+      {
+        "name": "left_rack",
+        "position": [
+          -1.82,
+          0.065,
+          -0.15
+        ]
+      },
+      {
+        "name": "fitting_room",
+        "position": [
+          -1.366,
+          0.065,
+          -1.5
+        ]
+      },
+      {
+        "name": "mirror",
+        "position": [
+          -0.27,
+          0.065,
+          -1.7
+        ]
+      },
+      {
+        "name": "rear_rack",
+        "position": [
+          0.826,
+          0.065,
+          -1.246
+        ]
+      },
+      {
+        "name": "jewelry",
+        "position": [
+          1.43,
+          0.065,
+          0.28
+        ],
+        "capture": "main"
+      },
+      {
+        "name": "circle_southeast",
+        "position": [
+          0.826,
+          0.065,
+          0.946
+        ]
+      },
+      {
+        "name": "circle_front",
+        "position": [
+          -0.27,
+          0.065,
+          1.4
+        ]
+      },
+      {
+        "name": "circle_complete",
+        "position": [
+          -1.366,
+          0.065,
+          0.946
+        ]
+      }
+    ],
+    "blocked": [
+      {
+        "name": "round_island",
+        "from": [
+          -0.27,
+          0.065,
+          1.4
+        ],
+        "to": [
+          -0.27,
+          0.065,
+          0.3
+        ],
+        "target": "/round_display_island/"
+      },
+      {
+        "name": "left_clothing_rack",
+        "from": [
+          -1.82,
+          0.065,
+          -1.0
+        ],
+        "to": [
+          -2.8,
+          0.065,
+          -1.0
+        ],
+        "target": "/left_gold_rack/"
+      },
+      {
+        "name": "jewelry",
+        "from": [
+          1.43,
+          0.065,
+          0.65
+        ],
+        "to": [
+          2.6,
+          0.065,
+          0.65
+        ],
+        "target": "/jewelry_display/"
+      },
+      {
+        "name": "tufted_bench",
+        "from": [
+          -1.24,
+          0.065,
+          1.43
+        ],
+        "to": [
+          -1.24,
+          0.065,
+          2.3
+        ],
+        "target": "/pink_tufted_bench/"
+      }
+    ],
+    "gaps": [
+      {
+        "name": "island_to_left_rack",
+        "from": [
+          -1.84,
+          0.065,
+          0.5
+        ],
+        "to": [
+          -1.84,
+          0.065,
+          -1.25
+        ],
+        "measure": [
+          [
+            -2.425,
+            0.7,
+            -0.15
+          ],
+          [
+            -1.44,
+            0.7,
+            -0.15
+          ]
+        ],
+        "width": 0.985,
+        "minimum": 0.8
+      },
+      {
+        "name": "island_to_rear_rack",
+        "from": [
+          -0.27,
+          0.065,
+          -1.7
+        ],
+        "to": [
+          1.38,
+          0.065,
+          -1.7
+        ],
+        "measure": [
+          [
+            0.7,
+            0.7,
+            -2.125
+          ],
+          [
+            0.7,
+            0.7,
+            -0.804
+          ]
+        ],
+        "width": 1.321,
+        "minimum": 0.8
+      },
+      {
+        "name": "island_to_bench",
+        "from": [
+          -1.34,
+          0.065,
+          1.4
+        ],
+        "to": [
+          -0.2,
+          0.065,
+          1.4
+        ],
+        "measure": [
+          [
+            -0.55,
+            0.5,
+            0.983
+          ],
+          [
+            -0.55,
+            0.5,
+            1.84
+          ]
+        ],
+        "width": 0.857,
+        "minimum": 0.8
+      }
+    ],
+    "entrance": {
+      "inside": [
+        -2.4,
+        0.065,
+        1.4
+      ],
+      "outside": [
+        -2.81,
+        0.065,
+        1.7
+      ]
+    },
+    "slide": {
+      "from": [
+        1.8,
+        0.065,
+        0.5
+      ],
+      "direction": [
+        1,
+        0,
+        1
+      ],
+      "tangent": [
+        0,
+        0,
+        1
+      ],
+      "seconds": 0.32
+    },
+    "input_start": [
+      -1.82,
+      0.065,
+      -0.15
+    ],
+    "scale": {
+      "door": {
+        "height": 2.46,
+        "source": "Entrance arch 2.13+.33"
+      },
+      "counter": {
+        "height": 1.07625,
+        "source": "Jewelry top (.95+.0175)*1.1+.07-.058"
+      },
+      "table": {
+        "height": 1.033,
+        "source": "Island top (.7425+.0275)*1.3+.09-.058"
+      },
+      "chair": {
+        "height": 0.68,
+        "source": "Bench maximum puff ~.668+.07-.058"
+      }
+    }
+  },
+  "review_camera_fit": {
+    "method": "orthographic fit to plinth edge intersections; no model scaling or image warp",
+    "reference_size": [
+      1489,
+      1544
+    ],
+    "reference_corners_left_front_right": [
+      [
+        0,
+        912
+      ],
+      [
+        751,
+        1440
+      ],
+      [
+        1453,
+        1006
+      ]
+    ],
+    "inferred_back": [
+      702,
+      478
+    ],
+    "footprint_m": [
+      6.16,
+      5.76
+    ],
+    "plinth_y": -0.255,
+    "render_size": [
+      1400,
+      1400
+    ],
+    "fitted_corners": [
+      [
+        32.929933297833145,
+        838.1799609510564
+      ],
+      [
+        689.9463105834234,
+        1307.3821141114206
+      ],
+      [
+        1350.3750514555313,
+        899.2565777872638
+      ]
+    ],
+    "observed_letterboxed_corners": [
+      [
+        24.935233160621806,
+        826.9430051813472
+      ],
+      [
+        705.8937823834198,
+        1305.699481865285
+      ],
+      [
+        1342.422279792746,
+        912.1761658031088
+      ]
+    ],
+    "residual_px": [
+      13.790736211469198,
+      16.035994140913598,
+      15.171101859112508
+    ],
+    "pitch_degrees": 41.62999999999998,
+    "yaw_degrees": 47.07,
+    "camera": {
+      "position": [
+        11.019102461482488,
+        14.518119182093892,
+        10.177535185813127
+      ],
+      "target": [
+        0.03630685486111318,
+        1.186444479186516,
+        -0.03902982710477448
+      ],
+      "size": 8.940178633538647
+    },
+    "limitation": "Rounded plinth endpoints are estimated edge intersections; concept is not a calibrated physical camera."
+  },
+  "review_views": [
+    {
+      "name": "petal-lamp-detail",
+      "position": [
+        -0.1,
+        3.7,
+        1.4
+      ],
+      "target": [
+        -1.63,
+        3.03,
+        -1.94
+      ],
+      "size": 1.55
+    },
+    {
+      "name": "jewelry-detail",
+      "position": [
+        5.5,
+        2.6,
+        3.4
+      ],
+      "target": [
+        2.43,
+        0.77,
+        1.13
+      ],
+      "size": 2.9
+    },
+    {
+      "name": "footwear-detail",
+      "position": [
+        0.3,
+        2.3,
+        3.2
+      ],
+      "target": [
+        -0.26,
+        0.84,
+        0.25
+      ],
+      "size": 2.45
+    },
+    {
+      "name": "blouse-detail",
+      "position": [
+        3.9,
+        2.8,
+        2.8
+      ],
+      "target": [
+        1.65,
+        1.5,
+        -2.25
+      ],
+      "size": 2.9
+    }
+  ],
+  "render_batches": [
+    {
+      "name": "front_dressing",
+      "file": "res://assets/rooms/clothing_store_b/batches/review_front_dressing.glb",
+      "material": "room",
+      "sources": [
+        "entrance_frame",
+        "hanging_dress_ivory",
+        "hanging_dress_rose",
+        "hanging_dress_cream",
+        "handbag_pink",
+        "pink_round_rug",
+        "pink_pumps",
+        "black_pumps",
+        "folded_blue_knit",
+        "window_display_frame",
+        "display_mannequin_dress",
+        "gift_boxes",
+        "pink_entry_mat",
+        "ivory_sneakers",
+        "mint_mary_janes",
+        "island_bag_pink",
+        "island_bag_green",
+        "island_bag_cream",
+        "sconce_left",
+        "island_bag_blue",
+        "island_bag_coral",
+        "stacked_blue_knit"
+      ],
+      "triangles": 32626,
+      "cast_shadow": true
+    },
+    {
+      "name": "glass",
+      "file": "res://assets/rooms/clothing_store_b/batches/review_glass.glb",
+      "material": "glass",
+      "sources": [
+        "entrance_glass",
+        "jewelry_glass"
+      ],
+      "triangles": 148,
+      "cast_shadow": false
+    },
+    {
+      "name": "back_dressing",
+      "file": "res://assets/rooms/clothing_store_b/batches/review_back_dressing.glb",
+      "material": "room",
+      "sources": [
+        "hanging_dress_blue",
+        "hanging_dress_mint",
+        "hanging_blouse_blue",
+        "hanging_blouse_ivory",
+        "hanging_blouse_mint",
+        "scarf_rail",
+        "handbag_cream",
+        "handbag_green",
+        "handbag_blue",
+        "changing_room_arch",
+        "changing_curtain",
+        "folded_ivory_knit",
+        "wall_sconce",
+        "hanging_blouse_rose",
+        "right_pink_bag",
+        "right_blue_bag",
+        "stacked_knit",
+        "sconce_fitting",
+        "sconce_right",
+        "left_extra_dress_0",
+        "left_extra_dress_1",
+        "left_extra_dress_2",
+        "right_upper_4",
+        "right_upper_5",
+        "right_upper_6",
+        "right_lower_0",
+        "right_lower_1",
+        "right_lower_2",
+        "right_lower_3",
+        "right_lower_4",
+        "right_lower_5",
+        "cream_shoe_pair"
+      ],
+      "triangles": 41358,
+      "cast_shadow": true
+    },
+    {
+      "name": "botanical",
+      "file": "res://assets/rooms/clothing_store_b/batches/review_botanical.glb",
+      "material": "room",
+      "sources": [
+        "island_bouquet"
+      ],
+      "triangles": 4596,
+      "cast_shadow": false
+    },
+    {
+      "name": "large_plants",
+      "file": "res://assets/rooms/clothing_store_b/batches/review_large_plants.glb",
+      "material": "plants",
+      "sources": [
+        "EntrancePlant"
+      ],
+      "triangles": 946,
+      "cast_shadow": true
+    },
+    {
+      "name": "back_plants",
+      "file": "res://assets/rooms/clothing_store_b/batches/review_back_plants.glb",
+      "material": "plants",
+      "sources": [
+        "FittingPlant",
+        "RightTrailing"
+      ],
+      "triangles": 3258,
+      "cast_shadow": false
+    },
+    {
+      "name": "front_plants",
+      "file": "res://assets/rooms/clothing_store_b/batches/review_front_plants.glb",
+      "material": "plants",
+      "sources": [
+        "LeftTrailing"
+      ],
+      "triangles": 2048,
+      "cast_shadow": false
+    }
+  ]
+}

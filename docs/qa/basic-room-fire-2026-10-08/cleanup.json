@@ -1,0 +1,14 @@
+{
+  "owned_emulator_pid": 1192577,
+  "serial": "emulator-5584",
+  "avd": "Liubei_BasicFire_API37",
+  "adb_port": 5067,
+  "test_app_stopped_by_runner": true,
+  "temporary_touch_fixture_removed": true,
+  "stop_method": "adb -P 5067 -s emulator-5584 emu kill",
+  "other_emulators_untouched": [
+    "emulator-5560",
+    "emulator-5570"
+  ],
+  "desktop_godot": "Only owned capture/test processes; exited or stopped by exact PID. No pkill."
+}

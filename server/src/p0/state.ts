@@ -37,8 +37,22 @@ export interface Heat { at: number; spin: number; gold: number; width: number }
 export interface Pot {
   dish: string; rarity: number; started_at: number; ms: number; heats: Heat[];
   xp_pct: number; mystery: boolean;
+  items?: string[];                     // what went in (a failed pot's refund and its Kitchen Mishaps entry, §7.5.2)
+  taps?: number[];                      // heat taps sent while it cooked (heat command), judged with collect's own
   left?: string[];   // collected (judged, XP paid) but no place to keep: these portions wait on the stove (§7.2.6)
+  id?: number;       // which pot this is (s.fires when it was put on), so heat / collect name the pot they mean (Queue ×2)
+  no_room?: boolean; // done but found no place to keep it: the waiting pot fires when it is taken, not when it was done
 }
+
+/** The Cookbook beyond the known pages (§7.5, SGODOT-232 S5). */
+export interface CookbookBook {
+  cooked: Record<string, number>;       // pots cooked per page, ever (Mastered at 10, §7.5.1)
+  best: Record<string, number>;         // best quality per page (0 Plain, 1 Good, 2 Perfect)
+  first_at: Record<string, number>;     // when the page was first cooked (Discovered)
+  clues: Record<string, number[]>;      // Hidden pages: slot indexes shown as their ingredient (Clued)
+  mishaps: { items: string[]; n: number; at: number }[];   // Kitchen Mishaps: each failed combination once, with a count
+}
+export const emptyBook = (): CookbookBook => ({ cooked: {}, best: {}, first_at: {}, clues: {}, mishaps: [] });
 
 /** A request on the stall board: open → accepted (tracked) → done. Requests never pay skill XP (§6.7.1). */
 export interface Request { id: string; title: string; item: string; qty: number; coins: number; where: string; status: 'open' | 'accepted' | 'done' }
@@ -93,6 +107,7 @@ export interface P0Day {
   gift_meal: string | null;             // resident who gave today's gift meal (§3.4.5)
   mine_runs: number;                    // mine runs started today (§13.3.1, ≤ 2)
   xp: Partial<Record<Skill, number>>;   // XP earned today per skill, for the anti-script cap (§4.3.4)
+  mishaps: number;                      // failed pots today (the blessing's first 10 refund their ingredients, §7.5.2)
 }
 
 export interface P0State {
@@ -121,8 +136,10 @@ export interface P0State {
   fishing: { casts: number; bites: number; caught: Record<string, number>; seen: string[] };
   cast: Cast | null;
   stove: Pot | null;
+  queue: Pot | null;             // Queue ×2 (Cooking Lv5): the pot waiting behind the one on the stove
   cabinet: { id: string; qty: number }[];   // Warming Cabinet portions (Homestead Lv3, §7.7); stacks by dish id
-  cookbook: string[];            // known recipe pages
+  cookbook: string[];            // known recipe pages (Tasted or Discovered)
+  book: CookbookBook;
   requests: Request[];
   gear: { rods: string[]; rod: string; hoes: string[]; hoe: string; picks: string[]; pick: string };   // Tools & Gear: owned and equipped rod / hoe / pickaxe (no bag slots)
   gather: { ready_at: Record<string, number>; last_at: number };   // §13.2: when each spot can be gathered again; last tap (tempo)
@@ -134,7 +151,7 @@ export interface P0State {
 }
 
 export const emptyDay = (key = ''): P0Day => ({
-  key, rest: 0, fails: 0, meals: 0, eaten: {}, cooked: {}, bought: {}, drinks: 0, quota: {}, bonus: 0, sys_done: 0, gift_meal: null, mine_runs: 0, xp: {},
+  key, rest: 0, fails: 0, meals: 0, eaten: {}, cooked: {}, bought: {}, drinks: 0, quota: {}, bonus: 0, sys_done: 0, gift_meal: null, mine_runs: 0, xp: {}, mishaps: 0,
 });
 
 export function freshState(c: P0Content, player: string, now: number, seed = hashSeed(player)): P0State {
@@ -156,8 +173,8 @@ export function freshState(c: P0Content, player: string, now: number, seed = has
     firsts: [], rewards: [],
     day: emptyDay(),
     fishing: { casts: 0, bites: 0, caught: {}, seen: [] },
-    cast: null, stove: null, cabinet: [],
-    cookbook: c.cooking.recipes.filter(r => r.known).map(r => r.id),
+    cast: null, stove: null, queue: null, cabinet: [],
+    cookbook: c.cooking.recipes.filter(r => r.known).map(r => r.id), book: emptyBook(),
     requests: [{ ...c.requests.tutorial, status: 'open' }],
     gear: { rods: [c.tools.fishing], rod: c.tools.fishing, hoes: [c.tools.farming], hoe: c.tools.farming, picks: [c.tools.mining], pick: c.tools.mining },
     gather: { ready_at: {}, last_at: 0 },
@@ -218,6 +235,11 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
   }
   s.req_done ??= [];
   s.cabinet ??= [];
+  s.queue ??= null;
+  if (!s.book) {   // SGODOT-232 S5: pages already cooked count once, with no date (no version of their own)
+    s.book = emptyBook();
+    for (const f of s.firsts) if (f.startsWith('cook:') && f !== `cook:${c.cooking.mystery.id}`) s.book.cooked[f.slice(5)] = 1;
+  }
   s.presence ??= { left_at: null, last_at: 0, space: null };
   s.presence.place ??= null;
   s.inbox ??= emptyInbox();   // SGODOT-232: filled for v3 and v4 saves alike, without a version of its own

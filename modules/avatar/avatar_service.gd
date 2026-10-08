@@ -7,6 +7,9 @@ const MANIFEST_PATH := "res://assets/avatar/parts_manifest.json"
 const BASE_RIG_SCENE := "res://assets/avatar/base/base_rig.tscn"
 ## demo 部件剔除名单。独立文件而非 manifest 字段——manifest 是管线产物会被覆写。
 const DENYLIST_PATH := "res://assets/avatar/demo_denylist.json"
+## NPC-only parts (SGODOT-229): in the catalogue for the outpost NPCs, out of every player pool. Separate file for
+## the same reason as the denylist.
+const NPC_ONLY_PATH := "res://assets/avatar/npc_only.json"
 
 var slot_table: AvatarSlotTable = preload("res://modules/avatar/data/slot_table.tres")
 var catalog: PartCatalog
@@ -23,6 +26,9 @@ func _ready() -> void:
 	var denied := catalog.apply_denylist(PartCatalog.load_denylist(DENYLIST_PATH))
 	if denied > 0:
 		print("AvatarService: demo denylist 剔除 %d 个部件" % denied)
+	var npc := catalog.apply_npc_only(PartCatalog.load_npc_only(NPC_ONLY_PATH))
+	if npc > 0:
+		print("AvatarService: %d NPC-only parts kept out of the player pools" % npc)
 	loader = PartLoader.new()
 	loader.name = "PartLoader"
 	loader.catalog = catalog
@@ -50,11 +56,11 @@ func load_outfit() -> AvatarConfig:
 ## kept."——2026-09-02 真机上就是这样：旧存档写着 cloth87/hairhat101，一进换装房就报错。
 ##
 ## 注意 catalog 此时已经过 denylist 过滤，所以被剔除的部件同样会在这里被换掉——
-## 这是想要的：剔除名单上的东西不该还穿在身上。
+## 这是想要的：剔除名单上的东西不该还穿在身上。NPC-only parts (SGODOT-229) are swapped out the same way.
 func _drop_missing_parts(cfg: AvatarConfig) -> void:
 	for slot_def in slot_table.slots:
 		var id := String(cfg.slots.get(slot_def.slot_name, ""))
-		if id.is_empty() or catalog.has_part(id):
+		if id.is_empty() or (catalog.has_part(id) and not catalog.is_npc_only(id)):
 			continue
 		var replacement := slot_def.default_part if slot_def.required else ""
 		cfg.slots[slot_def.slot_name] = replacement
