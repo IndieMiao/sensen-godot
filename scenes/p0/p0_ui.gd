@@ -244,7 +244,9 @@ func _build_fab() -> void:
 	_keys.tool_icon = _mode_tool
 	_radial = UiActionRadial.new()
 	_kit.add_child(_radial)
-	_radial.picked.connect(func(id: String): if id != bar_mode: set_mode(id))
+	_radial.picked.connect(func(id: String):
+		if id != bar_mode: set_mode(id)
+		_keys.pop_tool())   # the key's tool badge pops with the pick, the current action's too (247)
 	# FISH-4: two pills above the switch key while the creel is full.
 	_fab_pills = HBoxContainer.new()
 	_fab_pills.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
@@ -374,7 +376,7 @@ func set_surface(name: String) -> void:
 	_bar.visible = _bar_shown() and (_modal == null or is_bar_docked())   # docked in the bag drawer it stays
 	_bar.bag_only = not action
 	_bar_sig = []
-	if _radial.visible: _radial.close()
+	if _radial.is_open(): _radial.close()
 	_bar.cancel_drag()   # no lifted slot or drop zones left over when fishing starts or the map opens
 	_creel.visible = action and bar_mode == "fish"
 	_status.visible = action and _status_text.text != ""
@@ -851,7 +853,7 @@ func close_top_layer() -> bool:
 	if _bar != null and (_bar.is_dragging() or _bar.is_lifted()):   # lifted and not moved yet counts too (刘邦 on #38)
 		_bar.cancel_drag()
 		return true
-	if _radial.visible:
+	if _radial.is_open():
 		_radial.close()
 		return true
 	if _modal != null:
@@ -879,7 +881,7 @@ func end_stick() -> void:
 	if pad != null: (pad as _TouchPad).end_stick()
 	joystick.emit(Vector2.ZERO)
 
-func has_modal() -> bool: return _modal != null or (_radial != null and _radial.visible)
+func has_modal() -> bool: return _modal != null or (_radial != null and _radial.is_open())
 
 func close_modal() -> void:
 	_drop_modal()
@@ -1557,7 +1559,7 @@ func _tile(icon_id: String, text: String, note: String, cb := Callable()) -> Con
 ## §10.2.3: the switch key fans the four actions out from the character (ActionRadial, LOCK-04); what this
 ## spot can't do is greyed with the reason. P0 preselects by where you stand (plots → Farming, water → Fishing).
 func open_radial() -> void:
-	if _radial.visible:
+	if _radial.is_open():
 		_radial.close()
 		return
 	if _modal != null:
@@ -1570,7 +1572,7 @@ func open_radial() -> void:
 		options.append({id = it[0], name = it[2], icon = P0Logic.icon(it[1]), available = it[0] == bar_mode, reason = it[3]})
 	_radial.options = options
 	_radial.selected = bar_mode
-	_radial.open_at(player_screen - _kit.global_position)
+	_radial.open()   # around the screen centre (247, LOCK-03 v2)
 
 ## Today panel (§14.5, LOCK-06): at most three rows right under the HUD chips; Show only moves the camera.
 ## rows: Today's own (P0Logic.today_rows) unless given, e.g. P0Guide.free_now after the Energy card's Free to do now.
