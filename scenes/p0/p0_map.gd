@@ -231,6 +231,7 @@ const PIN_ICONS := {"tea": "pot", "tackle": "rod", "market": "board", "post": "t
 ## Away from home the avatar stands left of the pin of the place it is at, level with its disc (Figma 1802:118849).
 const AVATAR_BESIDE := Vector2(-44, 0)
 var _here_sig := ""
+var _dest_styles := {}   # "kind:id" -> its style: the city map asks several times per pin per frame (刘邦 on #100)
 
 ## Ponds P0 knows, outposts and the homestead open P0PlaceSheet, not the city view's info panel; landmarks and POIs
 ## keep that name card.
@@ -243,6 +244,11 @@ func _own_card(entry: Dictionary) -> bool:
 ## MapDestination 1795:103793 (LOCK-24): outposts by role, ponds, and the homestead's pin with its name on a plate.
 ## Landmarks and POIs keep the city view's own pins.
 func _destination_style(entry: Dictionary) -> Dictionary:
+	var key := "%s:%s" % [entry.get("kind", ""), entry.get("id", "")]
+	if not _dest_styles.has(key): _dest_styles[key] = _destination_style_of(entry)
+	return _dest_styles[key]
+
+func _destination_style_of(entry: Dictionary) -> Dictionary:
 	match str(entry.get("kind", "")):
 		"pond": return {"icon": P0Logic.icon("pond")}
 		"place":
@@ -259,11 +265,12 @@ func away() -> bool:
 func avatar_shift() -> Vector2:
 	return AVATAR_BESIDE if away() else Vector2.ZERO
 
-## The homestead's pin, drawn only while the player is away (its avatar stands at the place it is at).
+## The homestead's pin, drawn only while the player is away (its avatar stands at the place it is at). A MapDestination
+## with its own card (host_card), so no art or action of the city view's: `filter` "pond" only keeps it with the
+## outposts if the map's filter were ever Ponds (P0 shows no filters).
 func home_entry() -> Dictionary:
 	return {"id": HOME_PIN, "kind": "place", "name": "Homestead", "category": "Your farm", "lat": home_lat,
-		"lng": home_lng, "art_path": str(P0Outposts.PIN_ART.tackle), "action": "Go home · Free",
-		"action_icon": "footprints", "filter": "pond", "tag": ""}
+		"lng": home_lng, "filter": "pond", "tag": ""}
 
 ## The avatar stands where the player is (the place chip, P0Runtime.here) and the farm wears its pin while away.
 ## Cheap to call every frame: it acts when the place or the homestead's point changes.
