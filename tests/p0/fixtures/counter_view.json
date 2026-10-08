@@ -1,0 +1,2160 @@
+{
+ "now": 1791450000000,
+ "content_version": "p0-m3b-s6-2026-10-08",
+ "seq": 0,
+ "energy": {
+  "value": 150,
+  "max": 200,
+  "next_in": 160000,
+  "regen_ms": 160000
+ },
+ "blessing": {
+  "left": 604800000,
+  "regen_mult": 1.5,
+  "food_bonus": 100
+ },
+ "coins": 300,
+ "inbox": {
+  "limit": 8,
+  "badge": 0,
+  "waiting": 0,
+  "claim_slots": 0,
+  "parcels": [],
+  "updates": []
+ },
+ "skills": {
+  "farming": {
+   "level": 1,
+   "xp": 0,
+   "floor": 0,
+   "next": 50
+  },
+  "fishing": {
+   "level": 1,
+   "xp": 0,
+   "floor": 0,
+   "next": 70
+  },
+  "cooking": {
+   "level": 1,
+   "xp": 0,
+   "floor": 0,
+   "next": 30
+  }
+ },
+ "plots": [
+  {
+   "id": 0,
+   "state": "tilled",
+   "crop": null,
+   "ready_in": null,
+   "xp_pct": null,
+   "fert": false
+  },
+  {
+   "id": 1,
+   "state": "tilled",
+   "crop": null,
+   "ready_in": null,
+   "xp_pct": null,
+   "fert": false
+  },
+  {
+   "id": 2,
+   "state": "tilled",
+   "crop": null,
+   "ready_in": null,
+   "xp_pct": null,
+   "fert": false
+  },
+  {
+   "id": 3,
+   "state": "tilled",
+   "crop": null,
+   "ready_in": null,
+   "xp_pct": null,
+   "fert": false
+  },
+  {
+   "id": 4,
+   "state": "tilled",
+   "crop": null,
+   "ready_in": null,
+   "xp_pct": null,
+   "fert": false
+  },
+  {
+   "id": 5,
+   "state": "tilled",
+   "crop": null,
+   "ready_in": null,
+   "xp_pct": null,
+   "fert": false
+  },
+  {
+   "id": 6,
+   "state": "tilled",
+   "crop": null,
+   "ready_in": null,
+   "xp_pct": null,
+   "fert": false
+  },
+  {
+   "id": 7,
+   "state": "tilled",
+   "crop": null,
+   "ready_in": null,
+   "xp_pct": null,
+   "fert": false
+  },
+  {
+   "id": 8,
+   "state": "tilled",
+   "crop": null,
+   "ready_in": null,
+   "xp_pct": null,
+   "fert": false
+  },
+  {
+   "id": 9,
+   "state": "tilled",
+   "crop": null,
+   "ready_in": null,
+   "xp_pct": null,
+   "fert": false
+  },
+  {
+   "id": 10,
+   "state": "tilled",
+   "crop": null,
+   "ready_in": null,
+   "xp_pct": null,
+   "fert": false
+  },
+  {
+   "id": 11,
+   "state": "tilled",
+   "crop": null,
+   "ready_in": null,
+   "xp_pct": null,
+   "fert": false
+  },
+  {
+   "id": 12,
+   "state": "tilled",
+   "crop": null,
+   "ready_in": null,
+   "xp_pct": null,
+   "fert": false
+  },
+  {
+   "id": 13,
+   "state": "tilled",
+   "crop": null,
+   "ready_in": null,
+   "xp_pct": null,
+   "fert": false
+  },
+  {
+   "id": 14,
+   "state": "tilled",
+   "crop": null,
+   "ready_in": null,
+   "xp_pct": null,
+   "fert": false
+  },
+  {
+   "id": 15,
+   "state": "tilled",
+   "crop": null,
+   "ready_in": null,
+   "xp_pct": null,
+   "fert": false
+  },
+  {
+   "id": 16,
+   "state": "tilled",
+   "crop": null,
+   "ready_in": null,
+   "xp_pct": null,
+   "fert": false
+  },
+  {
+   "id": 17,
+   "state": "tilled",
+   "crop": null,
+   "ready_in": null,
+   "xp_pct": null,
+   "fert": false
+  },
+  {
+   "id": 18,
+   "state": "tilled",
+   "crop": null,
+   "ready_in": null,
+   "xp_pct": null,
+   "fert": false
+  },
+  {
+   "id": 19,
+   "state": "tilled",
+   "crop": null,
+   "ready_in": null,
+   "xp_pct": null,
+   "fert": false
+  },
+  {
+   "id": 20,
+   "state": "wild",
+   "crop": null,
+   "ready_in": null,
+   "xp_pct": null,
+   "fert": false
+  },
+  {
+   "id": 21,
+   "state": "wild",
+   "crop": null,
+   "ready_in": null,
+   "xp_pct": null,
+   "fert": false
+  },
+  {
+   "id": 22,
+   "state": "wild",
+   "crop": null,
+   "ready_in": null,
+   "xp_pct": null,
+   "fert": false
+  },
+  {
+   "id": 23,
+   "state": "wild",
+   "crop": null,
+   "ready_in": null,
+   "xp_pct": null,
+   "fert": false
+  },
+  {
+   "id": 24,
+   "state": "wild",
+   "crop": null,
+   "ready_in": null,
+   "xp_pct": null,
+   "fert": false
+  },
+  {
+   "id": 25,
+   "state": "wild",
+   "crop": null,
+   "ready_in": null,
+   "xp_pct": null,
+   "fert": false
+  },
+  {
+   "id": 26,
+   "state": "wild",
+   "crop": null,
+   "ready_in": null,
+   "xp_pct": null,
+   "fert": false
+  },
+  {
+   "id": 27,
+   "state": "wild",
+   "crop": null,
+   "ready_in": null,
+   "xp_pct": null,
+   "fert": false
+  },
+  {
+   "id": 28,
+   "state": "wild",
+   "crop": null,
+   "ready_in": null,
+   "xp_pct": null,
+   "fert": false
+  },
+  {
+   "id": 29,
+   "state": "wild",
+   "crop": null,
+   "ready_in": null,
+   "xp_pct": null,
+   "fert": false
+  }
+ ],
+ "bag": {
+  "capacity": 25,
+  "free": 20,
+  "slots": [
+   {
+    "id": "seed_radish",
+    "qty": 20,
+    "locked": false,
+    "gifted": false
+   },
+   {
+    "id": "crop_radish",
+    "qty": 12,
+    "locked": false,
+    "gifted": false
+   },
+   {
+    "id": "fish_crucian",
+    "qty": 3,
+    "locked": false,
+    "gifted": false
+   },
+   {
+    "id": "fish_carp",
+    "qty": 2,
+    "locked": false,
+    "gifted": false
+   },
+   {
+    "id": "wood",
+    "qty": 6,
+    "locked": false,
+    "gifted": false
+   }
+  ]
+ },
+ "drinks": {
+  "used": 0,
+  "limit": 3,
+  "left": 3,
+  "resets_in": 39600000,
+  "price": 40,
+  "need": 80,
+  "energy": 30,
+  "gain": 30,
+  "full": false,
+  "items": [
+   {
+    "id": "drink_hot_tea",
+    "name": "Hot Tea",
+    "shop": "tea"
+   },
+   {
+    "id": "drink_coffee",
+    "name": "Coffee",
+    "shop": "post"
+   }
+  ]
+ },
+ "shops": {
+  "homestead": {
+   "buy": [
+    {
+     "id": "seed_radish",
+     "name": "Radish Seeds",
+     "price": 4,
+     "need": 4,
+     "to": "bag",
+     "skill": "farming",
+     "gate": 1,
+     "unlocked": true,
+     "xp_to_go": 0,
+     "homestead": null,
+     "homestead_ok": true,
+     "once": false,
+     "owned": false,
+     "left": null,
+     "materials": [],
+     "in_bag": 20
+    },
+    {
+     "id": "seed_lettuce",
+     "name": "Lettuce Seeds",
+     "price": 6,
+     "need": 6,
+     "to": "bag",
+     "skill": "farming",
+     "gate": 1,
+     "unlocked": true,
+     "xp_to_go": 0,
+     "homestead": null,
+     "homestead_ok": true,
+     "once": false,
+     "owned": false,
+     "left": null,
+     "materials": [],
+     "in_bag": 0
+    },
+    {
+     "id": "seed_herb",
+     "name": "Herb Seeds",
+     "price": 2,
+     "need": 2,
+     "to": "bag",
+     "skill": "farming",
+     "gate": 2,
+     "unlocked": false,
+     "xp_to_go": 50,
+     "homestead": null,
+     "homestead_ok": true,
+     "once": false,
+     "owned": false,
+     "left": null,
+     "materials": [],
+     "in_bag": 0
+    },
+    {
+     "id": "seed_carrot",
+     "name": "Carrot Seeds",
+     "price": 9,
+     "need": 9,
+     "to": "bag",
+     "skill": "farming",
+     "gate": 2,
+     "unlocked": false,
+     "xp_to_go": 50,
+     "homestead": null,
+     "homestead_ok": true,
+     "once": false,
+     "owned": false,
+     "left": null,
+     "materials": [],
+     "in_bag": 0
+    },
+    {
+     "id": "seed_potato",
+     "name": "Potato Seeds",
+     "price": 9,
+     "need": 9,
+     "to": "bag",
+     "skill": "farming",
+     "gate": 3,
+     "unlocked": false,
+     "xp_to_go": 150,
+     "homestead": null,
+     "homestead_ok": true,
+     "once": false,
+     "owned": false,
+     "left": null,
+     "materials": [],
+     "in_bag": 0
+    },
+    {
+     "id": "seed_chamomile",
+     "name": "Chamomile Seeds",
+     "price": 12,
+     "need": 12,
+     "to": "bag",
+     "skill": "farming",
+     "gate": 3,
+     "unlocked": false,
+     "xp_to_go": 150,
+     "homestead": null,
+     "homestead_ok": true,
+     "once": false,
+     "owned": false,
+     "left": null,
+     "materials": [],
+     "in_bag": 0
+    },
+    {
+     "id": "seed_chili",
+     "name": "Chili Seeds",
+     "price": 3,
+     "need": 3,
+     "to": "bag",
+     "skill": "farming",
+     "gate": 4,
+     "unlocked": false,
+     "xp_to_go": 300,
+     "homestead": null,
+     "homestead_ok": true,
+     "once": false,
+     "owned": false,
+     "left": null,
+     "materials": [],
+     "in_bag": 0
+    },
+    {
+     "id": "seed_tomato",
+     "name": "Tomato Seeds",
+     "price": 12,
+     "need": 12,
+     "to": "bag",
+     "skill": "farming",
+     "gate": 4,
+     "unlocked": false,
+     "xp_to_go": 300,
+     "homestead": null,
+     "homestead_ok": true,
+     "once": false,
+     "owned": false,
+     "left": null,
+     "materials": [],
+     "in_bag": 0
+    },
+    {
+     "id": "bait_worm",
+     "name": "Worm Bait",
+     "price": 2,
+     "need": 42,
+     "to": "bag",
+     "skill": "fishing",
+     "gate": 2,
+     "unlocked": false,
+     "xp_to_go": 70,
+     "homestead": null,
+     "homestead_ok": true,
+     "once": false,
+     "owned": false,
+     "left": 30,
+     "materials": [],
+     "in_bag": 0
+    },
+    {
+     "id": "fert_compost",
+     "name": "Compost",
+     "price": 2,
+     "need": 42,
+     "to": "bag",
+     "skill": "farming",
+     "gate": 3,
+     "unlocked": false,
+     "xp_to_go": 150,
+     "homestead": null,
+     "homestead_ok": true,
+     "once": false,
+     "owned": false,
+     "left": 40,
+     "materials": [],
+     "in_bag": 0
+    },
+    {
+     "id": "bag_upgrade_1",
+     "name": "Bag Upgrade I",
+     "price": 150,
+     "need": 190,
+     "to": "bag_cap",
+     "skill": null,
+     "gate": 0,
+     "unlocked": true,
+     "xp_to_go": 0,
+     "homestead": 3,
+     "homestead_ok": false,
+     "once": true,
+     "owned": false,
+     "left": null,
+     "materials": [
+      {
+       "id": "fiber",
+       "name": "Reeds",
+       "need": 10,
+       "have": 0
+      },
+      {
+       "id": "wood",
+       "name": "Timber",
+       "need": 6,
+       "have": 6
+      }
+     ],
+     "in_bag": 0
+    }
+   ],
+   "sell": [
+    {
+     "kind": "crop",
+     "rate": 1,
+     "quota": null
+    },
+    {
+     "kind": "fish",
+     "rate": 1,
+     "quota": null
+    },
+    {
+     "kind": "dish",
+     "rate": 1,
+     "quota": "dish"
+    },
+    {
+     "kind": "material",
+     "rate": 1,
+     "quota": "material"
+    }
+   ]
+  },
+  "tackle": {
+   "buy": [
+    {
+     "id": "rod_reed",
+     "name": "Reed Rod",
+     "price": 80,
+     "need": 120,
+     "to": "gear",
+     "skill": "fishing",
+     "gate": 3,
+     "unlocked": false,
+     "xp_to_go": 220,
+     "homestead": null,
+     "homestead_ok": true,
+     "once": true,
+     "owned": false,
+     "left": null,
+     "materials": [],
+     "in_bag": 0
+    },
+    {
+     "id": "bait_worm",
+     "name": "Worm Bait",
+     "price": 2,
+     "need": 42,
+     "to": "bag",
+     "skill": "fishing",
+     "gate": 2,
+     "unlocked": false,
+     "xp_to_go": 70,
+     "homestead": null,
+     "homestead_ok": true,
+     "once": false,
+     "owned": false,
+     "left": 30,
+     "materials": [],
+     "in_bag": 0
+    }
+   ],
+   "sell": [
+    {
+     "kind": "fish",
+     "rate": 0.8,
+     "quota": "fish_tackle"
+    }
+   ]
+  },
+  "market": {
+   "buy": [
+    {
+     "id": "tool_row_hoe",
+     "name": "Row Hoe",
+     "price": 240,
+     "need": 280,
+     "to": "gear",
+     "skill": "farming",
+     "gate": 4,
+     "unlocked": false,
+     "xp_to_go": 300,
+     "homestead": null,
+     "homestead_ok": true,
+     "once": true,
+     "owned": false,
+     "left": null,
+     "materials": [],
+     "in_bag": 0
+    },
+    {
+     "id": "postcard_shanghai",
+     "name": "Shanghai Postcard",
+     "price": 100,
+     "need": 140,
+     "to": "storage",
+     "skill": null,
+     "gate": 0,
+     "unlocked": true,
+     "xp_to_go": 0,
+     "homestead": null,
+     "homestead_ok": true,
+     "once": true,
+     "owned": false,
+     "left": null,
+     "materials": [],
+     "in_bag": 0
+    }
+   ],
+   "sell": []
+  },
+  "tea": {
+   "buy": [],
+   "sell": []
+  },
+  "post": {
+   "buy": [],
+   "sell": []
+  }
+ },
+ "quotas": {
+  "fish_tackle": {
+   "used": 0,
+   "cap": 80,
+   "resets_in": 39600000,
+   "scope": "any Tackle Shop"
+  },
+  "dish": {
+   "used": 0,
+   "cap": 120,
+   "resets_in": 39600000,
+   "scope": "Homestead Stall"
+  },
+  "material": {
+   "used": 0,
+   "cap": 30,
+   "resets_in": 39600000,
+   "scope": "Homestead Stall"
+  },
+  "request_bonus": {
+   "used": 0,
+   "cap": 100,
+   "resets_in": 39600000,
+   "scope": "all requests"
+  },
+  "sys_requests": {
+   "used": 0,
+   "cap": 6,
+   "resets_in": 39600000,
+   "scope": "Stall Board and Market Board"
+  }
+ },
+ "storage": {
+  "items": [],
+  "auto": null
+ },
+ "mine": {
+  "runs": {
+   "used": 0,
+   "limit": 2,
+   "resets_in": 39600000
+  },
+  "ended": null,
+  "floor_energy": 2,
+  "rock_energy": 2,
+  "rocks": 6,
+  "stone_per_rock": 1,
+  "run": null
+ },
+ "gather": {
+  "gloves": false,
+  "spots": [
+   {
+    "id": "spot_grove",
+    "name": "Timber Grove",
+    "open": true,
+    "homestead": 1,
+    "ready": true,
+    "ready_in": 0,
+    "yield": [
+     [
+      "wood",
+      6
+     ]
+    ]
+   },
+   {
+    "id": "spot_rock_pile",
+    "name": "Rock Pile",
+    "open": true,
+    "homestead": 1,
+    "ready": true,
+    "ready_in": 0,
+    "yield": [
+     [
+      "stone",
+      4
+     ]
+    ]
+   },
+   {
+    "id": "spot_reed_bank",
+    "name": "Reed Bank",
+    "open": true,
+    "homestead": 1,
+    "ready": true,
+    "ready_in": 0,
+    "yield": [
+     [
+      "fiber",
+      3
+     ],
+     [
+      "bait_worm",
+      2
+     ]
+    ]
+   },
+   {
+    "id": "spot_herb_patch",
+    "name": "Herb Patch",
+    "open": true,
+    "homestead": 1,
+    "ready": true,
+    "ready_in": 0,
+    "yield": [
+     [
+      "wild_herb",
+      2
+     ]
+    ]
+   },
+   {
+    "id": "spot_clay_bank",
+    "name": "Clay Bank",
+    "open": false,
+    "homestead": 2,
+    "ready": false,
+    "ready_in": 0,
+    "yield": [
+     [
+      "clay",
+      2
+     ]
+    ]
+   }
+  ]
+ },
+ "workbench": {
+  "tabs": [
+   "tools",
+   "supplies"
+  ],
+  "recipes": [
+   {
+    "id": "craft_copper_pickaxe",
+    "tab": "tools",
+    "item": "pick_copper",
+    "name": "Copper Pickaxe",
+    "qty": 1,
+    "to": "gear",
+    "have": null,
+    "cost": [
+     {
+      "id": "copper_ore",
+      "name": "Copper Ore",
+      "need": 5,
+      "have": 0,
+      "storage": 0,
+      "bag": 0
+     },
+     {
+      "id": "wood",
+      "name": "Timber",
+      "need": 4,
+      "have": 6,
+      "storage": 0,
+      "bag": 6
+     }
+    ],
+    "gate": null,
+    "owned": false,
+    "equipped": false,
+    "can_craft": false,
+    "block": {
+     "code": "need_material",
+     "detail": {
+      "item": "copper_ore",
+      "need": 5,
+      "have": 0
+     }
+    }
+   },
+   {
+    "id": "craft_gather_gloves",
+    "tab": "tools",
+    "item": "gather_gloves",
+    "name": "Gather Gloves",
+    "qty": 1,
+    "to": "owned",
+    "have": null,
+    "cost": [
+     {
+      "id": "fiber",
+      "name": "Reeds",
+      "need": 8,
+      "have": 0,
+      "storage": 0,
+      "bag": 0
+     },
+     {
+      "id": "wood",
+      "name": "Timber",
+      "need": 4,
+      "have": 6,
+      "storage": 0,
+      "bag": 6
+     }
+    ],
+    "gate": null,
+    "owned": false,
+    "equipped": false,
+    "can_craft": false,
+    "block": {
+     "code": "need_material",
+     "detail": {
+      "item": "fiber",
+      "need": 8,
+      "have": 0
+     }
+    }
+   },
+   {
+    "id": "craft_torch",
+    "tab": "supplies",
+    "item": "torch",
+    "name": "Torch",
+    "qty": 2,
+    "to": "bag",
+    "have": 0,
+    "cost": [
+     {
+      "id": "wood",
+      "name": "Timber",
+      "need": 1,
+      "have": 6,
+      "storage": 0,
+      "bag": 6
+     },
+     {
+      "id": "fiber",
+      "name": "Reeds",
+      "need": 1,
+      "have": 0,
+      "storage": 0,
+      "bag": 0
+     }
+    ],
+    "gate": null,
+    "owned": false,
+    "equipped": false,
+    "can_craft": false,
+    "block": {
+     "code": "need_material",
+     "detail": {
+      "item": "fiber",
+      "need": 1,
+      "have": 0
+     }
+    }
+   },
+   {
+    "id": "craft_compost",
+    "tab": "supplies",
+    "item": "fert_compost",
+    "name": "Compost",
+    "qty": 2,
+    "to": "bag",
+    "have": 0,
+    "cost": [
+     {
+      "id": "fiber",
+      "name": "Reeds",
+      "need": 2,
+      "have": 0,
+      "storage": 0,
+      "bag": 0
+     },
+     {
+      "id": "wood",
+      "name": "Timber",
+      "need": 1,
+      "have": 6,
+      "storage": 0,
+      "bag": 6
+     }
+    ],
+    "gate": {
+     "skill": "farming",
+     "level": 3,
+     "ok": false,
+     "xp_to_go": 150
+    },
+    "owned": false,
+    "equipped": false,
+    "can_craft": false,
+    "block": {
+     "code": "locked",
+     "detail": {
+      "skill": "farming",
+      "level": 3,
+      "xp_to_go": 150
+     }
+    }
+   }
+  ]
+ },
+ "homestead": {
+  "level": 1,
+  "max": 3,
+  "plaque": [],
+  "next": {
+   "level": 2,
+   "coins": {
+    "need": 290,
+    "have": 300
+   },
+   "skills": {
+    "need": 3,
+    "have": 2,
+    "farming": 1,
+    "fishing": 1
+   },
+   "materials": [
+    {
+     "id": "wood",
+     "name": "Timber",
+     "need": 12,
+     "have": 6,
+     "storage": 0,
+     "bag": 6
+    },
+    {
+     "id": "stone",
+     "name": "Stone",
+     "need": 8,
+     "have": 0,
+     "storage": 0,
+     "bag": 0
+    },
+    {
+     "id": "fiber",
+     "name": "Reeds",
+     "need": 6,
+     "have": 0,
+     "storage": 0,
+     "bag": 0
+    },
+    {
+     "id": "rock_salt",
+     "name": "Rock Salt",
+     "need": 3,
+     "have": 0,
+     "storage": 0,
+     "bag": 0
+    }
+   ],
+   "energy": 210,
+   "meals": 210,
+   "unlocks": [
+    "spice_rack",
+    "clay_bank"
+   ],
+   "can_upgrade": false,
+   "block": {
+    "code": "skills_short",
+    "detail": {
+     "need": 3,
+     "have": 2
+    }
+   }
+  },
+  "unlocks": {
+   "spice_rack": false,
+   "warming_cabinet": false,
+   "bag_upgrade_1": "locked",
+   "board_slots": 2,
+   "fence": false,
+   "clay_bank": false
+  }
+ },
+ "profile": {
+  "name": "Farmer",
+  "city": "Shanghai",
+  "climate": "Subtropical",
+  "since_ms": 1791450000000,
+  "farm": {
+   "name": "Farmer's Homestead",
+   "level": 1
+  }
+ },
+ "boards": {
+  "stall": {
+   "title": "Stall Board",
+   "deliver_at": "homestead",
+   "slots": [
+    {
+     "id": "req_pond_catch",
+     "template": "req_sys_fish_common",
+     "title": "Pond Catch",
+     "kind": "fish",
+     "items": [
+      "fish_crucian"
+     ],
+     "rarity": null,
+     "icon": "fish_crucian",
+     "qty": 2,
+     "have": 2,
+     "ready": true,
+     "coins": 14,
+     "base": 4,
+     "bonus": 10,
+     "status": "open",
+     "expires_in": null
+    },
+    {
+     "empty": true,
+     "refill_in": 259200000
+    }
+   ]
+  },
+  "market": {
+   "title": "Market Board",
+   "deliver_at": "market",
+   "slots": [
+    {
+     "empty": true,
+     "locked": {
+      "template": "req_sys_fish_fine",
+      "title": "Dusk Haul",
+      "gate": [
+       [
+        "fishing",
+        3
+       ]
+      ]
+     }
+    },
+    {
+     "empty": true,
+     "locked": {
+      "template": "req_sys_fish_fine",
+      "title": "Dusk Haul",
+      "gate": [
+       [
+        "fishing",
+        3
+       ]
+      ]
+     }
+    }
+   ]
+  }
+ },
+ "residents": {
+  "res_pip": {
+   "affinity": 0,
+   "stage": "Stranger",
+   "stage_from": 0,
+   "next_stage": "Acquainted",
+   "next_at": 15,
+   "chatted_today": false,
+   "gift_today": false,
+   "meal": "none",
+   "request": {
+    "id": "req_res_pip_1",
+    "kind": "fish",
+    "rarity": 1,
+    "qty": 1,
+    "coins": 20,
+    "have": 1,
+    "ready": false
+   },
+   "request_state": "open",
+   "need_stage": null,
+   "next_in": null
+  },
+  "res_old_kai": {
+   "affinity": 0,
+   "stage": "Stranger",
+   "stage_from": 0,
+   "next_stage": "Acquainted",
+   "next_at": 15,
+   "chatted_today": false,
+   "gift_today": false,
+   "meal": "none",
+   "request": {
+    "id": "req_res_kai_1",
+    "kind": "fish",
+    "rarity": 3,
+    "qty": 1,
+    "coins": 50,
+    "have": 0,
+    "ready": false
+   },
+   "request_state": "open",
+   "need_stage": null,
+   "next_in": null
+  }
+ },
+ "keepers": {
+  "tea": {
+   "cups_left": 3,
+   "full": false,
+   "greet": "cups_left",
+   "online": null
+  },
+  "post": {
+   "cups_left": 3,
+   "full": false,
+   "greet": "request",
+   "request_by": "res_pip",
+   "board_open": 0,
+   "refill_in": 0
+  },
+  "tackle": {
+   "greet": "worms",
+   "worms_left": 30,
+   "next_fish": {
+    "pond": {
+     "id": "fish_perch",
+     "level": 2
+    },
+    "river": {
+     "id": "fish_perch",
+     "level": 2
+    }
+   }
+  },
+  "market": {
+   "greet": "row_hoe",
+   "board_open": 0,
+   "board_templates": [],
+   "refill_in": 0
+  }
+ },
+ "rest": {
+  "used": 0,
+  "limit": 1,
+  "resets_in": 39600000,
+  "amount": 60,
+  "away_h": 2,
+  "away_ready_in": null
+ },
+ "stall": {
+  "keeper": {
+   "role": "Stallhand",
+   "name": "Bao"
+  },
+  "board": {
+   "slots": 2,
+   "requests": [
+    {
+     "id": "req_pond_catch",
+     "title": "Pond Catch",
+     "item": "fish_crucian",
+     "qty": 2,
+     "coins": 14,
+     "where": "any pond",
+     "status": "open",
+     "have": 2
+    }
+   ],
+   "refill_in": 259200000
+  },
+  "buy": [
+   {
+    "id": "seed_radish",
+    "name": "Radish Seeds",
+    "price": 4,
+    "energy": 2,
+    "gate": 1,
+    "skill": "farming",
+    "unlocked": true,
+    "xp_to_go": 0,
+    "left": null
+   },
+   {
+    "id": "seed_lettuce",
+    "name": "Lettuce Seeds",
+    "price": 6,
+    "energy": 2,
+    "gate": 1,
+    "skill": "farming",
+    "unlocked": true,
+    "xp_to_go": 0,
+    "left": null
+   },
+   {
+    "id": "seed_herb",
+    "name": "Herb Seeds",
+    "price": 2,
+    "energy": 2,
+    "gate": 2,
+    "skill": "farming",
+    "unlocked": false,
+    "xp_to_go": 50,
+    "left": null
+   },
+   {
+    "id": "seed_carrot",
+    "name": "Carrot Seeds",
+    "price": 9,
+    "energy": 3,
+    "gate": 2,
+    "skill": "farming",
+    "unlocked": false,
+    "xp_to_go": 50,
+    "left": null
+   },
+   {
+    "id": "seed_potato",
+    "name": "Potato Seeds",
+    "price": 9,
+    "energy": 3,
+    "gate": 3,
+    "skill": "farming",
+    "unlocked": false,
+    "xp_to_go": 150,
+    "left": null
+   },
+   {
+    "id": "seed_chamomile",
+    "name": "Chamomile Seeds",
+    "price": 12,
+    "energy": 4,
+    "gate": 3,
+    "skill": "farming",
+    "unlocked": false,
+    "xp_to_go": 150,
+    "left": null
+   },
+   {
+    "id": "seed_chili",
+    "name": "Chili Seeds",
+    "price": 3,
+    "energy": 2,
+    "gate": 4,
+    "skill": "farming",
+    "unlocked": false,
+    "xp_to_go": 300,
+    "left": null
+   },
+   {
+    "id": "seed_tomato",
+    "name": "Tomato Seeds",
+    "price": 12,
+    "energy": 4,
+    "gate": 4,
+    "skill": "farming",
+    "unlocked": false,
+    "xp_to_go": 300,
+    "left": null
+   },
+   {
+    "id": "bait_worm",
+    "name": "Worm Bait",
+    "price": 2,
+    "energy": 0,
+    "gate": 2,
+    "skill": "fishing",
+    "unlocked": false,
+    "xp_to_go": 70,
+    "left": 30
+   },
+   {
+    "id": "fert_compost",
+    "name": "Compost",
+    "price": 2,
+    "energy": 0,
+    "gate": 3,
+    "skill": "farming",
+    "unlocked": false,
+    "xp_to_go": 150,
+    "left": 40
+   }
+  ]
+ },
+ "fishing": {
+  "sites": {
+   "pond": {
+    "name": "Willow Pond",
+    "template": "Pond"
+   },
+   "river": {
+    "name": "Willow Creek",
+    "template": "River"
+   }
+  },
+  "places": {
+   "pond_shanghai_05": {
+    "name": "Reed Pond",
+    "site": "pond",
+    "template": "Pond",
+    "beginner": true
+   },
+   "pond_shanghai_01": {
+    "name": "Willow Pond",
+    "site": "pond",
+    "template": "Pond",
+    "beginner": false
+   },
+   "pond_shanghai_03": {
+    "name": "Fern Pond",
+    "site": "pond",
+    "template": "Pond",
+    "beginner": false
+   },
+   "pond_shanghai_04": {
+    "name": "Pebble Pond",
+    "site": "river",
+    "template": "River",
+    "beginner": false
+   },
+   "pond_shanghai_06": {
+    "name": "Blossom Pond",
+    "site": "river",
+    "template": "River",
+    "beginner": false
+   },
+   "pond_shanghai_02": {
+    "name": "Clover Pond",
+    "site": "river",
+    "template": "River",
+    "beginner": false
+   }
+  },
+  "place": null,
+  "rod": "Starter Rod",
+  "rod_reach": 2,
+  "hook_bonus_ms": 0,
+  "band_bonus": 0,
+  "cast_energy": 5,
+  "cast": null,
+  "protection_left": 10,
+  "caught": {},
+  "seen": [],
+  "dex": [
+   {
+    "id": "fish_crucian",
+    "rarity": 1,
+    "level": 1,
+    "where": [
+     "pond",
+     "river"
+    ],
+    "caught": 0,
+    "seen": false,
+    "cook": true
+   },
+   {
+    "id": "fish_carp",
+    "rarity": 1,
+    "level": 1,
+    "where": [
+     "pond",
+     "river"
+    ],
+    "caught": 0,
+    "seen": false,
+    "cook": true
+   },
+   {
+    "id": "fish_mullet",
+    "rarity": 1,
+    "level": 1,
+    "where": [
+     "coast",
+     "river"
+    ],
+    "caught": 0,
+    "seen": false,
+    "cook": true
+   },
+   {
+    "id": "fish_perch",
+    "rarity": 2,
+    "level": 2,
+    "where": [
+     "river",
+     "pond"
+    ],
+    "caught": 0,
+    "seen": false,
+    "cook": true
+   },
+   {
+    "id": "fish_bass",
+    "rarity": 2,
+    "level": 2,
+    "where": [
+     "pond",
+     "river"
+    ],
+    "caught": 0,
+    "seen": false,
+    "cook": true
+   },
+   {
+    "id": "fish_trout",
+    "rarity": 2,
+    "level": 2,
+    "where": [
+     "river"
+    ],
+    "caught": 0,
+    "seen": false,
+    "cook": true
+   },
+   {
+    "id": "fish_mackerel",
+    "rarity": 2,
+    "level": 2,
+    "where": [
+     "coast"
+    ],
+    "caught": 0,
+    "seen": false,
+    "cook": true
+   },
+   {
+    "id": "fish_koi",
+    "rarity": 3,
+    "level": 4,
+    "where": [
+     "pond"
+    ],
+    "caught": 0,
+    "seen": false,
+    "cook": false
+   }
+  ],
+  "baits": [
+   {
+    "id": "bait_worm",
+    "have": 0
+   }
+  ]
+ },
+ "cooking": {
+  "slots": 2,
+  "stove": null,
+  "first_fire": true,
+  "rack": {
+   "on": false,
+   "items": []
+  },
+  "cabinet": null,
+  "cookbook": [
+   {
+    "id": "dish_grilled_crucian",
+    "name": "Grilled Crucian",
+    "rarity": 1,
+    "in": [
+     "fish_crucian"
+    ],
+    "known": true,
+    "cooked": false,
+    "slots": 1,
+    "can_cook": true,
+    "today": 0
+   },
+   {
+    "id": "dish_herb_grilled_fish",
+    "name": null,
+    "rarity": 2,
+    "in": [
+     "?",
+     "?"
+    ],
+    "known": false,
+    "cooked": false,
+    "slots": 2,
+    "can_cook": false,
+    "today": 0
+   },
+   {
+    "id": "dish_grilled_fish",
+    "name": null,
+    "rarity": 1,
+    "in": [
+     "?"
+    ],
+    "known": false,
+    "cooked": false,
+    "slots": 1,
+    "can_cook": false,
+    "today": 0
+   },
+   {
+    "id": "dish_carp_cakes",
+    "name": null,
+    "rarity": 1,
+    "in": [
+     "?",
+     "?"
+    ],
+    "known": false,
+    "cooked": false,
+    "slots": 2,
+    "can_cook": false,
+    "today": 0
+   },
+   {
+    "id": "dish_mullet_skewers",
+    "name": null,
+    "rarity": 1,
+    "in": [
+     "?",
+     "?"
+    ],
+    "known": false,
+    "cooked": false,
+    "slots": 2,
+    "can_cook": false,
+    "today": 0
+   },
+   {
+    "id": "dish_radish_salad",
+    "name": "Radish Salad",
+    "rarity": 1,
+    "in": [
+     "crop_radish",
+     "crop_lettuce"
+    ],
+    "known": true,
+    "cooked": false,
+    "slots": 2,
+    "can_cook": false,
+    "today": 0
+   },
+   {
+    "id": "dish_veggie_plate",
+    "name": null,
+    "rarity": 1,
+    "in": [
+     "?"
+    ],
+    "known": false,
+    "cooked": false,
+    "slots": 1,
+    "can_cook": false,
+    "today": 0
+   },
+   {
+    "id": "dish_carrot_cake",
+    "name": null,
+    "rarity": 1,
+    "in": [
+     "?",
+     "?"
+    ],
+    "known": false,
+    "cooked": false,
+    "slots": 2,
+    "can_cook": false,
+    "today": 0
+   },
+   {
+    "id": "dish_fish_soup",
+    "name": null,
+    "rarity": 2,
+    "in": [
+     "?",
+     "?"
+    ],
+    "known": false,
+    "cooked": false,
+    "slots": 2,
+    "can_cook": false,
+    "today": 0
+   },
+   {
+    "id": "dish_pan_fried_fish",
+    "name": null,
+    "rarity": 2,
+    "in": [
+     "?"
+    ],
+    "known": false,
+    "cooked": false,
+    "slots": 1,
+    "can_cook": false,
+    "today": 0
+   },
+   {
+    "id": "dish_fruit_tea",
+    "name": null,
+    "rarity": 2,
+    "in": [
+     "?"
+    ],
+    "known": false,
+    "cooked": false,
+    "slots": 1,
+    "can_cook": false,
+    "today": 0
+   },
+   {
+    "id": "dish_roast_veggies",
+    "name": null,
+    "rarity": 2,
+    "in": [
+     "?"
+    ],
+    "known": false,
+    "cooked": false,
+    "slots": 1,
+    "can_cook": false,
+    "today": 0
+   },
+   {
+    "id": "dish_herb_baked_perch",
+    "name": null,
+    "rarity": 3,
+    "in": [
+     "?",
+     "?"
+    ],
+    "known": false,
+    "cooked": false,
+    "slots": 2,
+    "can_cook": false,
+    "today": 0
+   },
+   {
+    "id": "dish_bass_tomato_stew",
+    "name": null,
+    "rarity": 3,
+    "in": [
+     "?",
+     "?"
+    ],
+    "known": false,
+    "cooked": false,
+    "slots": 2,
+    "can_cook": false,
+    "today": 0
+   }
+  ],
+  "derive": [
+   [
+    1,
+    2,
+    3
+   ],
+   [
+    2,
+    3,
+    3
+   ],
+   [
+    3,
+    3,
+    4
+   ],
+   [
+    4,
+    4,
+    4
+   ]
+  ],
+  "tiers": {
+   "1": {
+    "energy": 20,
+    "ms": 5000,
+    "bonus": [
+     0,
+     5
+    ]
+   },
+   "2": {
+    "energy": 40,
+    "ms": 15000,
+    "bonus": [
+     0,
+     5
+    ]
+   },
+   "3": {
+    "energy": 70,
+    "ms": 30000,
+    "bonus": [
+     0,
+     10,
+     20
+    ]
+   },
+   "4": {
+    "energy": 70,
+    "ms": 60000,
+    "bonus": [
+     0,
+     10,
+     20
+    ]
+   }
+  }
+ },
+ "gear": {
+  "slots": {
+   "farming": "hoe_starter",
+   "fishing": "rod_starter",
+   "mining": "pick_starter",
+   "combat": "sword_wooden"
+  },
+  "hoes": [
+   {
+    "id": "hoe_starter",
+    "name": "Starter Hoe",
+    "owned": true,
+    "equipped": true,
+    "sow": 1,
+    "price": 0,
+    "gate": 1
+   },
+   {
+    "id": "tool_row_hoe",
+    "name": "Row Hoe",
+    "owned": false,
+    "equipped": false,
+    "sow": 3,
+    "price": 240,
+    "gate": 4
+   }
+  ],
+  "rods": [
+   {
+    "id": "rod_starter",
+    "name": "Starter Rod",
+    "reach": 2,
+    "level": 1,
+    "price": 0,
+    "hook_bonus_ms": 0,
+    "band_bonus": 0,
+    "owned": true,
+    "equipped": true
+   },
+   {
+    "id": "rod_reed",
+    "name": "Reed Rod",
+    "reach": 3,
+    "level": 3,
+    "price": 80,
+    "hook_bonus_ms": 400,
+    "band_bonus": 0.03,
+    "owned": false,
+    "equipped": false
+   }
+  ],
+  "picks": [
+   {
+    "id": "pick_starter",
+    "name": "Starter Pickaxe",
+    "owned": true,
+    "equipped": true,
+    "stone": 1,
+    "level": 0,
+    "price": 0,
+    "source": "start"
+   },
+   {
+    "id": "pick_copper",
+    "name": "Copper Pickaxe",
+    "owned": false,
+    "equipped": false,
+    "stone": 2,
+    "level": 0,
+    "price": 0,
+    "source": "workbench"
+   }
+  ]
+ },
+ "tackle": {
+  "keeper": {
+   "role": "Tackle Keeper",
+   "name": "Finn"
+  },
+  "buy": [
+   {
+    "id": "rod_reed",
+    "name": "Reed Rod",
+    "price": 80,
+    "gate": 3,
+    "skill": "fishing",
+    "unlocked": false,
+    "xp_to_go": 220,
+    "owned": false,
+    "left": null,
+    "reach": 3
+   },
+   {
+    "id": "bait_worm",
+    "name": "Worm Bait",
+    "price": 2,
+    "gate": 2,
+    "skill": "fishing",
+    "unlocked": false,
+    "xp_to_go": 70,
+    "owned": false,
+    "left": 30,
+    "reach": null
+   }
+  ]
+ },
+ "meals": {
+  "used": 0,
+  "cap": 300,
+  "resets_in": 39600000,
+  "eaten": {}
+ },
+ "items": {
+  "seed_radish": {
+   "name": "Radish Seeds",
+   "kind": "seed",
+   "sell": null,
+   "cook": false
+  },
+  "crop_radish": {
+   "name": "Radish",
+   "kind": "crop",
+   "sell": 5,
+   "cook": true,
+   "family": "F",
+   "rarity": 1
+  },
+  "fish_crucian": {
+   "name": "Pond Crucian",
+   "kind": "fish",
+   "sell": 3,
+   "cook": true,
+   "family": "W",
+   "rarity": 1
+  },
+  "fish_carp": {
+   "name": "Common Carp",
+   "kind": "fish",
+   "sell": 4,
+   "cook": true,
+   "family": "W",
+   "rarity": 1
+  },
+  "wood": {
+   "name": "Timber",
+   "kind": "material",
+   "sell": 2,
+   "cook": false
+  },
+  "crop_lettuce": {
+   "name": "Lettuce",
+   "kind": "crop",
+   "sell": 8,
+   "cook": true,
+   "family": "F",
+   "rarity": 1
+  },
+  "crop_herb": {
+   "name": "Herb",
+   "kind": "crop",
+   "sell": 1,
+   "cook": true,
+   "family": "S",
+   "rarity": 1
+  },
+  "crop_carrot": {
+   "name": "Carrot",
+   "kind": "crop",
+   "sell": 12,
+   "cook": true,
+   "family": "F",
+   "rarity": 1
+  },
+  "crop_potato": {
+   "name": "Potato",
+   "kind": "crop",
+   "sell": 6,
+   "cook": true,
+   "family": "F",
+   "rarity": 1
+  },
+  "crop_chamomile": {
+   "name": "Chamomile",
+   "kind": "crop",
+   "sell": 16,
+   "cook": true,
+   "family": "O",
+   "rarity": 2
+  },
+  "crop_chili": {
+   "name": "Chili",
+   "kind": "crop",
+   "sell": 2,
+   "cook": true,
+   "family": "S",
+   "rarity": 1
+  },
+  "crop_tomato": {
+   "name": "Tomato",
+   "kind": "crop",
+   "sell": 8,
+   "cook": true,
+   "family": "F",
+   "rarity": 2
+  },
+  "fish_mullet": {
+   "name": "Grey Mullet",
+   "kind": "fish",
+   "sell": 4,
+   "cook": true,
+   "family": "W",
+   "rarity": 1
+  },
+  "fish_perch": {
+   "name": "River Perch",
+   "kind": "fish",
+   "sell": 7,
+   "cook": true,
+   "family": "W",
+   "rarity": 2
+  },
+  "fish_bass": {
+   "name": "Largemouth Bass",
+   "kind": "fish",
+   "sell": 7,
+   "cook": true,
+   "family": "W",
+   "rarity": 2
+  },
+  "fish_trout": {
+   "name": "Rainbow Trout",
+   "kind": "fish",
+   "sell": 8,
+   "cook": true,
+   "family": "W",
+   "rarity": 2
+  },
+  "fish_mackerel": {
+   "name": "Mackerel",
+   "kind": "fish",
+   "sell": 8,
+   "cook": true,
+   "family": "W",
+   "rarity": 2
+  },
+  "fish_koi": {
+   "name": "Golden Koi",
+   "kind": "fish",
+   "sell": 13,
+   "cook": false,
+   "rarity": 3
+  }
+ },
+ "rarity_names": [
+  "Common",
+  "Fine",
+  "Rare",
+  "Legendary"
+ ],
+ "prices": {
+  "crop_radish": 5,
+  "crop_lettuce": 8,
+  "crop_herb": 1,
+  "crop_carrot": 12,
+  "crop_potato": 6,
+  "crop_chamomile": 16,
+  "crop_chili": 2,
+  "crop_tomato": 8
+ },
+ "names": {
+  "crop_radish": "Radish",
+  "seed_radish": "Radish Seeds",
+  "crop_lettuce": "Lettuce",
+  "seed_lettuce": "Lettuce Seeds",
+  "crop_herb": "Herb",
+  "seed_herb": "Herb Seeds",
+  "crop_carrot": "Carrot",
+  "seed_carrot": "Carrot Seeds",
+  "crop_potato": "Potato",
+  "seed_potato": "Potato Seeds",
+  "crop_chamomile": "Chamomile",
+  "seed_chamomile": "Chamomile Seeds",
+  "crop_chili": "Chili",
+  "seed_chili": "Chili Seeds",
+  "crop_tomato": "Tomato",
+  "seed_tomato": "Tomato Seeds",
+  "fish_crucian": "Pond Crucian",
+  "fish_carp": "Common Carp",
+  "fish_mullet": "Grey Mullet",
+  "fish_perch": "River Perch",
+  "fish_bass": "Largemouth Bass",
+  "fish_trout": "Rainbow Trout",
+  "fish_mackerel": "Mackerel",
+  "fish_koi": "Golden Koi",
+  "dish_grilled_crucian": "Grilled Crucian",
+  "dish_herb_grilled_fish": "Herb Grilled Fish",
+  "dish_grilled_fish": "Grilled Fish",
+  "dish_carp_cakes": "Carp Fish Cakes",
+  "dish_mullet_skewers": "Mullet Skewers",
+  "dish_radish_salad": "Radish Salad",
+  "dish_veggie_plate": "Veggie Plate",
+  "dish_carrot_cake": "Carrot Cake",
+  "dish_fish_soup": "Fresh Fish Soup",
+  "dish_pan_fried_fish": "Pan-Fried Fish",
+  "dish_fruit_tea": "Fruit Tea",
+  "dish_roast_veggies": "Roast Veggies",
+  "dish_herb_baked_perch": "Herb Baked Perch",
+  "dish_bass_tomato_stew": "Bass Tomato Stew",
+  "bait_worm": "Worm Bait",
+  "fert_compost": "Compost",
+  "rod_starter": "Starter Rod",
+  "rod_reed": "Reed Rod",
+  "hoe_starter": "Starter Hoe",
+  "pick_starter": "Starter Pickaxe",
+  "sword_wooden": "Wooden Sword",
+  "tool_row_hoe": "Row Hoe",
+  "pick_copper": "Copper Pickaxe",
+  "gather_gloves": "Gather Gloves",
+  "dish_mystery": "Mystery Dish",
+  "wood": "Timber",
+  "stone": "Stone",
+  "fiber": "Reeds",
+  "copper_ore": "Copper Ore",
+  "rock_salt": "Rock Salt",
+  "clay": "Clay",
+  "wild_herb": "Wild Herb",
+  "drink_hot_tea": "Hot Tea",
+  "drink_coffee": "Coffee",
+  "postcard_shanghai": "Shanghai Postcard",
+  "bag_upgrade_1": "Bag Upgrade I"
+ },
+ "crops": [
+  {
+   "id": "crop_radish",
+   "seed": "seed_radish",
+   "energy": 2,
+   "grow_h": 4,
+   "level": 1
+  },
+  {
+   "id": "crop_lettuce",
+   "seed": "seed_lettuce",
+   "energy": 2,
+   "grow_h": 8,
+   "level": 1
+  },
+  {
+   "id": "crop_herb",
+   "seed": "seed_herb",
+   "energy": 2,
+   "grow_h": 3,
+   "level": 2
+  },
+  {
+   "id": "crop_carrot",
+   "seed": "seed_carrot",
+   "energy": 3,
+   "grow_h": 12,
+   "level": 2
+  },
+  {
+   "id": "crop_potato",
+   "seed": "seed_potato",
+   "energy": 3,
+   "grow_h": 10,
+   "level": 3
+  },
+  {
+   "id": "crop_chamomile",
+   "seed": "seed_chamomile",
+   "energy": 4,
+   "grow_h": 18,
+   "level": 3
+  },
+  {
+   "id": "crop_chili",
+   "seed": "seed_chili",
+   "energy": 2,
+   "grow_h": 6,
+   "level": 4
+  },
+  {
+   "id": "crop_tomato",
+   "seed": "seed_tomato",
+   "energy": 4,
+   "grow_h": 14,
+   "level": 4
+  }
+ ],
+ "firsts": []
+}
