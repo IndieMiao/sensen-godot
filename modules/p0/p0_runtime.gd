@@ -5,12 +5,15 @@ extends Node
 ## routes UI input to the active world and turns server events into floats, cards and toasts, so the
 ## new UI flow is identical everywhere.
 ##
-## A world implements (all optional): p0_surface() -> String, p0_space() -> String (where the player is for
-## the server: home / pond / outpost / mine; see space_of), p0_place() -> String (the catalog pond id inside a
-## pond space), p0_frame(view, dt), p0_joystick(v),
-## p0_tap(screen), p0_action(cmd), p0_event(ev, view), p0_anchor() -> Vector2, p0_zoom(f),
+## A world implements (all optional; interiors extend P0Room): p0_surface() -> String, p0_space() -> String
+## (where the player is for the server: home / pond / outpost / mine; see space_of), p0_place() -> String (the
+## catalog pond id inside a pond space), p0_frame(view, dt), p0_joystick(v),
+## p0_tap(screen), p0_action(cmd), p0_event(ev, view), p0_anchor() -> Vector2, p0_zoom(f, at), p0_zoom_end(),
 ## p0_recenter(), p0_show_spot(where), p0_energy_verb() -> String, p0_dev(step) -> bool,
 ## p0_until(name) -> bool.
+
+const HomePanel = preload("res://scenes/p0/home/p0_home_panel.gd")
+const MAP_SCENE := "res://scenes/p0/p0_map.tscn"
 
 static var _instance: P0Runtime
 
@@ -59,7 +62,8 @@ func _init() -> void:
 	# Observation log (S7): only the commands the farm's hold-to-repeat sends are holds; every press is a tap.
 	session.src_of = src_of_press
 	ui.dev_skip.connect(func(m): session.dev_skip(m); ui.toast("Clock +%dh (dev)" % (m / 60)))
-	ui.zoom.connect(func(f: float): _call("p0_zoom", [f]))
+	ui.zoom.connect(func(f: float, at: Vector2): _call("p0_zoom", [f, at]))
+	ui.zoom_end.connect(func(): _call("p0_zoom_end", []))
 	ui.recenter.connect(func(): _call("p0_recenter", []))
 	ui.show_spot.connect(func(where: String): _call("p0_show_spot", [where]))
 	ui.can_show_spot = func() -> bool: return is_instance_valid(world) and world.has_method("p0_show_spot")
@@ -79,6 +83,9 @@ func _init() -> void:
 
 ## The active world takes over input and the HUD surface; the previous one is simply forgotten.
 func attach(w: Node) -> void:
+	# The world being left stops where it is, and the stick ends: no walking on underneath (int5 hand test 035–039).
+	if is_instance_valid(world) and world != w: _call("p0_joystick", [Vector2.ZERO])
+	ui.end_stick()
 	world = w
 	session.space = space_of(w)   # before the read below, which tells the server where the player is
 	session.place = str(w.call("p0_place")) if w.has_method("p0_place") else ""   # which pond (q(36))
@@ -103,16 +110,47 @@ func _first_frame(tag: String) -> void:
 
 func detach(w: Node) -> void:
 	if world == w:
+		_call("p0_joystick", [Vector2.ZERO])
+		ui.end_stick()
 		world = null
 		ui.close_modal()
 		ui.set_surface("map")
 		session.space = "map"
 		session.place = ""
 
-## Back to the map: the active world is an AppRouter instance above it (back locks still apply,
-## e.g. a line in the water is reeled in first).
+## Back to the map (the place chip, LOCK-06): every P0 world stacked above it closes, the farm under the
+## farmhouse included. Back locks still apply (a line in the water is reeled in first); a room's own Back
+## (walking out through the door) is not one of them.
 func leave_world() -> void:
-	if is_instance_valid(world) and AppRouter.top_instance() == world: AppRouter.handle_back()
+	if not is_instance_valid(world): return
+	if AppRouter.instance_depth() > 0 and AppRouter.top_instance() != world: return
+	if not (world is P0Room) and AppRouter.scene_locks_back_navigation(world): return
+	leave_to_map()
+
+## Pop every P0 layer down to the map; a world booted as the root scene (the first session lands on the farm,
+## p0_boot q(44)) has no map under it, so the root is swapped for the map. No back locks are asked here.
+func leave_to_map() -> void:
+	while AppRouter.instance_depth() > 0:
+		var depth := AppRouter.instance_depth()
+		AppRouter.pop_instance()
+		if AppRouter.instance_depth() >= depth: return   # a locked layer (a committed relocation map) stays
+	var root := get_tree().current_scene
+	if root == null or root.scene_file_path != MAP_SCENE: swap_root.call()
+
+## The scene change behind leave_to_map (tests replace it).
+var swap_root := func(): get_tree().change_scene_to_file(MAP_SCENE)
+
+## Android Back for a world with its own back lock (farm, pond), after its own layers: AppRouter ignores Back on a
+## P0 world that is the root scene, so with nothing left to close such a world leaves for the map itself (int5b
+## hand test 2: Inbox closed on the first Back, the second did nothing). True when it handled Back.
+func root_back() -> bool:
+	if AppRouter.instance_depth() > 0: return false   # stacked on the map: AppRouter pops it
+	leave_to_map()
+	return true
+
+## One level back, for a room's door: the farm under the farmhouse, the map under an outpost.
+func leave_room() -> void:
+	if is_instance_valid(world) and AppRouter.top_instance() == world: AppRouter.pop_instance()
 
 ## Back to the map, then on to the homestead or Old Kai's pin (the map reads after_leave on resume).
 func _leave_then(next: String) -> void:
@@ -218,6 +256,10 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				var lv: Dictionary = ev
 				ui.queue_card(func(): ui.show_level_up(lv))
 				session.report({"kind": "level_banner", "skill": str(lv.skill), "level": int(lv.level)})
+			"homestead":
+				# HOME-2 (SGODOT-228): HOME-1 closes, the MomentBanner says what changed; the farm swaps the fence.
+				if ui.modal_kind == "homestead": ui.close_modal()
+				HomePanel.moment(ui, P0Logic.home_moment(v, ev))
 		dy -= 16.0
 	if ui.modal_kind == "stall" and events.size() > 0:
 		ui.set_view(session.current())
@@ -284,6 +326,15 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 			ui.toast("This parcel is no longer waiting")
 		"rest_used":
 			ui.toast("Rest used today")
+		"not_home":
+			ui.toast("At home only")
+		"need_material", "skills_short", "max_level":
+			# The shops and the workbench refuse with need_material too: only the upgrade reads HOME-1's gap.
+			if str(cmd.get("type", "")) == "homestead_upgrade": ui.toast(P0Logic.home_panel(session.current()).reason)
+			elif code == "need_material":
+				ui.toast("Need %d more %s" % [int(detail.get("need", 0)) - int(detail.get("have", 0)),
+					P0Logic.item_name(session.current(), str(detail.get("item", "")))])
+			else: ui.toast("Can't do that (%s)" % code)
 		"energy_full":
 			ui.toast("Energy full · eat later" if str(cmd.get("type", "")) == "eat" else "Energy full")
 		"not_ready":

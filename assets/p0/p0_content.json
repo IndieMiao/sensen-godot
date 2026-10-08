@@ -1991,6 +1991,7 @@
           "id": "req_res_kai_1",
           "title": "An Old Man's Catch",
           "text": "Bring me a Rare fish. Haven't seen one in weeks.",
+          "need_line": "1 Rare fish · Golden Koi · Pond",
           "stage": "Stranger",
           "need": {
             "kind": "fish",

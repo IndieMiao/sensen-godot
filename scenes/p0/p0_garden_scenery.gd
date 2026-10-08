@@ -43,14 +43,7 @@ func build(bp: FarmBlueprint, style: String) -> void:
 		trees.append(_xf(p, i * 1.7, 0.92 + float(i % 3) * 0.08))
 		tints.append(Color.WHITE.lerp(Color(0.58, 0.75, 0.80), smoothstep(10.0, 14.0, -p.z)))
 	add_child(Art.batch("tree_0", trees, true, tints))
-	# Fence around the back of the yard, with short side runs.
-	var fences: Array = []
-	for i in 10:
-		fences.append(_xf(Vector3(1.0 + i * 1.24, 0, -12.35), 0, 1))
-	for i in 3:
-		fences.append(_xf(Vector3(0.38, 0, -8.7 - i * 1.24), PI * 0.5, 1))
-		fences.append(_xf(Vector3(12.95, 0, -8.7 - i * 1.24), PI * 0.5, 1))
-	add_child(Art.batch("fence", fences))
+	# The fence depends on the Homestead level: p0_fence.gd (SGODOT-228).
 	add_child(Art.instance("sign", Vector3(spawn.x - 1.35, 0, spawn.z + 0.25), 0.93))
 	var shrubs: Array = []
 	for p in [Vector3(house.x - 1.75, 0, house.z - 0.9), Vector3(house.x + 1.85, 0, house.z - 1.0), Vector3(12.2, 0, -6.3),

@@ -271,20 +271,20 @@ func test_grove_trunks_block_and_the_way_to_the_workbench_stays_open() -> void:
 ## LOCK-07: one finger card, the nearest facility in its own reach; the showing card keeps it on a near-tie.
 func test_one_finger_card_for_the_nearest_facility() -> void:
 	var cands := [["stall", Vector3(0, 0, 0), 3.2], ["home", Vector3(-4, 0, 0), 4.2], ["workbench", Vector3(3, 0, 0), 3.0]]
-	assert_str(P0FarmMaterials.pick_card(cands, Vector3(0.5, 0, 0), "")).is_equal("stall")
-	assert_str(P0FarmMaterials.pick_card(cands, Vector3(2.4, 0, 0), "")).is_equal("workbench")
-	assert_str(P0FarmMaterials.pick_card(cands, Vector3(9, 0, 0), "stall")).is_equal("")   # none in reach
+	assert_str(P0Garden.pick_card(cands, Vector3(0.5, 0, 0), "")).is_equal("stall")
+	assert_str(P0Garden.pick_card(cands, Vector3(2.4, 0, 0), "")).is_equal("workbench")
+	assert_str(P0Garden.pick_card(cands, Vector3(9, 0, 0), "stall")).is_equal("")   # none in reach
 	# Midway (1.5 m from both): whichever was showing stays; an exact tie with nothing showing goes to the first.
-	assert_str(P0FarmMaterials.pick_card(cands, Vector3(1.5, 0, 0), "workbench")).is_equal("workbench")
-	assert_str(P0FarmMaterials.pick_card(cands, Vector3(1.5, 0, 0), "stall")).is_equal("stall")
-	assert_str(P0FarmMaterials.pick_card(cands, Vector3(1.5, 0, 0), "")).is_equal("stall")
+	assert_str(P0Garden.pick_card(cands, Vector3(1.5, 0, 0), "workbench")).is_equal("workbench")
+	assert_str(P0Garden.pick_card(cands, Vector3(1.5, 0, 0), "stall")).is_equal("stall")
+	assert_str(P0Garden.pick_card(cands, Vector3(1.5, 0, 0), "")).is_equal("stall")
 	# Clearly nearer to the other: it takes over.
-	assert_str(P0FarmMaterials.pick_card(cands, Vector3(1.9, 0, 0), "stall")).is_equal("workbench")
+	assert_str(P0Garden.pick_card(cands, Vector3(1.9, 0, 0), "stall")).is_equal("workbench")
 	# The showing facility left its reach: the nearest in reach takes over.
-	assert_str(P0FarmMaterials.pick_card(cands, Vector3(-3.5, 0, 0), "stall")).is_equal("home")
+	assert_str(P0Garden.pick_card(cands, Vector3(-3.5, 0, 0), "stall")).is_equal("home")
 	# Reach is measured on the ground: standing up a slope or on a bed does not push a facility out of reach.
 	# 2.95 m away on the ground but 0.6 m up: in reach (a straight 3D distance would be 3.01, out of reach).
-	assert_str(P0FarmMaterials.pick_card(cands, Vector3(5.95, 0.6, 0), "")).is_equal("workbench")
+	assert_str(P0Garden.pick_card(cands, Vector3(5.95, 0.6, 0), "")).is_equal("workbench")
 	assert_float(P0FarmMaterials.flat(Vector3(0, 2, 0), Vector3(3, 0, 4))).is_equal_approx(5.0, 0.0001)
 
 func test_mine_bar_follows_pins_and_removals() -> void:

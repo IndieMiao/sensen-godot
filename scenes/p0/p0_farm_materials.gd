@@ -9,7 +9,6 @@ const P0_MINE := "res://scenes/p0/p0_mine.tscn"
 const MOUTH_REACH := 2.4        # m: the key turns into Enter mine / Continue run, the EntryCard shows
 const NOTICE_S := 2.0           # "Run ended at daily reset" float (q(44))
 const SPOT_REACH := 3.0         # m: finger cards show and taps gather only this close (Arthur, 231)
-const CARD_KEEP := 0.2          # m: another facility must be this much nearer to take the finger card over
 const SPOTS := ["spot_grove", "spot_rock_pile", "spot_reed_bank", "spot_clay_bank", "spot_herb_patch"]
 
 var farm: Node3D                # p0_farm.gd: actor, cam
@@ -69,24 +68,8 @@ func action(v: Dictionary) -> Dictionary:
 static func flat(a: Vector3, b: Vector3) -> float:
 	return Vector2(a.x - b.x, a.z - b.z).length()
 
-## LOCK-07 (不知火舞 / Arthur on 231): one finger card at a time, for the nearest facility within its own reach.
-## `cands` [[id, world position, reach m]] in a fixed order; the card already showing (`current`) keeps it unless
-## another is CARD_KEEP nearer, so standing between two never flickers; an exact tie goes to the earlier entry.
-## "" when none is in reach. Badges are not part of this.
-static func pick_card(cands: Array, at: Vector3, current: String) -> String:
-	var best := ""
-	var best_d := INF
-	var current_d := INF
-	for c in cands:
-		var d := flat(at, c[1] as Vector3)
-		if d > float(c[2]): continue
-		if str(c[0]) == current: current_d = d
-		if d < best_d:
-			best = str(c[0])
-			best_d = d
-	return current if current_d < INF and current_d <= best_d + CARD_KEEP else best
-
-## This helper's finger-card candidates for the farm's pick_card: the five spots and the workbench.
+## This helper's finger-card candidates for the farm's P0Garden.pick_card (LOCK-07, one card at a time; the same
+## rule SGODOT-231 and SGODOT-228 each wrote, kept once in P0Garden): the five spots and the workbench.
 func card_candidates() -> Array:
 	var out: Array = []
 	for id in SPOTS: out.append([id, _spots.get(id, Vector3.ZERO), SPOT_REACH])
@@ -150,20 +133,31 @@ func tap(screen: Vector2) -> bool:
 	if cam.unproject_position(mouth + Vector3(0, 0.8, 0)).distance_to(screen) < 60:
 		P0MaterialCards.open_mine_sheet(rt.ui, rt.session.current())
 		return true
-	var v := rt.session.current()
-	for m in P0MaterialLogic.gather_marks(v):
-		var at: Vector3 = _spots.get(m.id, Vector3.ZERO)
+	for id in SPOTS:
+		var at: Vector3 = _spots.get(id, Vector3.ZERO)
 		if cam.unproject_position(at + Vector3(0, 0.6, 0)).distance_to(screen) >= 64: continue
 		if flat(farm.actor.position, at) >= SPOT_REACH: return false   # far away: the tap walks / does nothing
-		farm.actor.face(at)
-		match str(m.badge):
-			"ready": rt.session.send({"type": "gather", "spot": str(m.id)})
-			"locked": P0MaterialCards.open_locked_spot(rt.ui, v, str(m.id))
-			_: rt.ui.toast(str(m.caption))
-		return true
+		return tap_card(id)
 	if cam.unproject_position(_bench + Vector3(0, 0.8, 0)).distance_to(screen) < 64 and flat(farm.actor.position, _bench) < SPOT_REACH:
+		return tap_card("workbench")
+	return false
+
+## A finger card's tap by id (苏烈's #21 _tap_card dispatch): a gathering spot gathers / shows MAT-3 / says when it is
+## ready; the workbench opens. False for ids this helper doesn't own.
+func tap_card(id: String) -> bool:
+	if id == "workbench":
 		farm.actor.face(_bench)
 		_open_workbench()
+		return true
+	if not _spots.has(id): return false
+	var v := rt.session.current()
+	for m in P0MaterialLogic.gather_marks(v):
+		if str(m.id) != id: continue
+		farm.actor.face(_spots[id])
+		match str(m.badge):
+			"ready": rt.session.send({"type": "gather", "spot": id})
+			"locked": P0MaterialCards.open_locked_spot(rt.ui, v, id)
+			_: rt.ui.toast(str(m.caption))
 		return true
 	return false
 
