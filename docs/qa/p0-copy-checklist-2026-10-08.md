@@ -38,7 +38,7 @@
 | 主行动键 · Farming | `Sow ×1 · 2 Energy`（档 2–4：3 / 4 / 6）/ Row Hoe `Sow ×3 · 6 Energy` / 灰 `Sow · Pick a seed`（种子用完自动回到这一态，q(44)）/ `Till · Free` / `Water · Free` / `Harvest · Free` / `Fertilize · Free` / 灰 `Fertilize · Nothing to feed` |
 | 快捷栏幽灵格 ★ | `Seeds` / `Bait` / `Torch`（只写名词，q(44)）；钉住格归零写 `0` + `Buy at Homestead Stall` |
 | 驿站棚（无人值守，LOCK-17） | 指尖卡 `Tap to shop`；抽屉标题 `Homestead Stall`；Tab `Buy / Stall Board`；挂委托板的 `!` 时点棚停在 Stall Board 页（q(44)） |
-| 驿站委托板 | `Pond Catch · 2 Pond Crucian · 14 coins` / `Track` / `Tracked` / `Ready to deliver` / `Deliver` / `Requests today 4 of 6` |
+| 驿站委托板 | `Pond Catch · 2 Pond Crucian · 14 coins` / `Track` / `Tracked` / `Ready to deliver` / `Deliver` / `Requests today 4/6`（q(55)） |
 | 长椅 | 指尖卡 `Rest · +60 Energy · once a day`；按钮 `Rest · +60 Energy` / 快满 `Rest · +25 Energy` / 冷却 `Rest · back after 2h away · 1h 12m to go` / 已用 `Rested today · tomorrow 4:00` |
 | 工作台 ★ | 指尖卡 `Workbench · Tap to craft`；只有 `Tools / Supplies` 两个 Tab（q(31)）；按钮在卡片右下（q(45)）；缺料 `Need 6 more Timber`；门禁 `Farming Lv3`（堆肥配方，q(44)）；放不下 `No room · free a slot first`；铜镐 `Equip` / `Equipped`；手套 `Owned · always on`（q(46)） |
 | 工作台效果句 ★ | `Copper Pickaxe · 2 Stone per rock`（LOCK-29）/ `Gather Gloves · +1 at every gathering spot`（q(45)）/ 堆肥 `Crops ready 20% sooner`（q(46)） |
@@ -56,7 +56,7 @@
 | 鱼饵用完 ★ | toast `Out of Worm Bait · no bait on the hook`（q(44)） |
 | 钓获卡（首次） | `Caught!` / `Pond Crucian · Common` / `Fish-dex 3/N` / `First catch! +15 XP` / `New city! +10 XP` |
 | 逃走 ★ | 保护期内 `It got away · Energy refunded (9 left today)` / 保护期外 `It got away · 3 Energy back`（q(49)，不写 `protected left`） |
-| 挣脱 ★ | 卡 `Too strong` / `Fishing Lv4 needed · You: Lv3 · 30 XP to go` / `+3 Energy back`；第二次起飘字 `Got away · Lv4 · Energy refunded (8 left today)` / `Got away · Lv4 · 3 Energy back`（q(50)）；鱼竿不够 `Too heavy for your rod` / `Reed Rod · Fishing Lv3 · 80 coins` |
+| 挣脱 ★ | 卡 `Too strong` / `Fishing Lv4 needed · You: Lv3 · 30 XP to go` / `+3 Energy back`，无按钮；末行写实退：保护期内 `Energy refunded (8 left today)`，保护期外 `+3 Energy back`（q(55)）；第二次起飘字 `Got away · Lv4 · Energy refunded (8 left today)` / `Got away · Lv4 · 3 Energy back`（q(50)）；鱼竿不够 `Too heavy for your rod` / `Reed Rod · Fishing Lv3 · 80 coins` |
 | 鱼塘 pin 与卡 ★ | `Reed Pond · Beginner pond · 0.8 km` / 其他 `Pebble Pond · River · 2.3 km`；卡 `Beginner pond` + `A nearby pond for your first catch.`（仅 Reed Pond）/ `Distance 0.8 km` / `Recommended Lv1–3`（River `Lv4–5`）/ `Details ›` / `Go`；鱼表剪影写名字 + `Fishing Lv N`（q(48)） |
 
 ## 4. 厨房与烹饪
@@ -67,7 +67,7 @@
 | Cookbook 按钮四态 | `Cook` / 灰 `Need Wild Herb ×1` / 灰 `Cooking Lv4 · 3rd slot` / `Try in Experiment ›` |
 | Experiment | `From your bag · 2 of 2 slots used`；调味料格带 `Rack` 角标、写仓库实数（如 `Rock Salt 12`，不写 /30，q(46)）；`Not for cooking`（金锦鲤）；`In the pot` |
 | 火候 | `Tap when the needle hits gold!` / `Nice heat! ★` / `Missed · still cooking` / `Perfect! ★★ · Extra portion` |
-| 出锅卡 COOK-4 ★ | 首做 `New recipe!` / 重复 `Cooked!` / 失败 `Mystery Dish` / 退料 `No dish this time` + `Ingredients back (9 left today)` + `OK`；按钮只有 `Eat · +45 Energy` / `Keep`，Gift 在 P0 灰；没有 Cook Again 按钮（q(46)、q(48)、q(49)） |
+| 出锅卡 COOK-4 ★ | 首做 `New recipe!` + 奖励条 `First cooked · +10 Cooking XP · Cookbook 1/48`（只放首做 XP；本锅 XP 照常飘 `+5 Cooking XP ★`，q(55)）/ 重复 `Cooked!` / 失败 `Mystery Dish` + `Hmm… not a dish` + `A clue was added to your Cookbook` + 灰字 `Can't be sold or delivered`（q(55)）/ 退料 `No dish this time` + `Ingredients back (9 left today)` + `OK`；按钮只有 `Eat · +45 Energy` / `Keep`，Gift 在 P0 灰；没有 Cook Again 按钮（q(46)、q(48)、q(49)） |
 | Cook Again ★ | 收走后点灶台：`Cook Again` / `Choose recipe ›`，第 2 锅 `Cooks today 2nd` / `Cooking XP Half`（q(48)） |
 | 保温柜 | `Warming Cabinet 4/6` / `Tap to open` / `Take one` / `Kept · Warming Cabinet 5/6` / `Cabinet full · Herb Grilled Fish sent to bag` / `Cabinet and bag full · dish left on the stove` / `Bag full · dish left on the stove` |
 | Cooking Lv4 之后 Today ★ | `3rd slot open · try Fine fish + Potato + Rock Salt`（q(46)） |
@@ -143,7 +143,7 @@
 | 旧写法（方案或稿中残留） | 统一为 |
 |---|---|
 | `Creel full · Sell or cook first` | `Creel full · 0 free slots · Sell or cook first`（toast / 角标）；键面 `Cast · Creel full` |
-| `Too strong · Fishing Lv 4 · 3 Energy back`（一行） | 卡片三行：`Too strong` / `Fishing Lv4 needed · You: Lv3 · 30 XP to go` / `+3 Energy back` |
+| `Too strong · Fishing Lv 4 · 3 Energy back`（一行） | 卡片三行：`Too strong` / `Fishing Lv4 needed · You: Lv3 · 30 XP to go` / `+3 Energy back`（保护期内末行 `Energy refunded (8 left today)`，q(55)） |
 | `Energy full · eat later` | `Energy full`（按钮灰显） |
 | `Guest pass · 10 Energy · Host is online` | P2 内容；P0 不出现 |
 | `It got away · +5 Energy · 9 protected left` | `It got away · Energy refunded (9 left today)` |
