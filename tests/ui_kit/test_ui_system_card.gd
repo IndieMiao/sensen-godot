@@ -47,3 +47,17 @@ func test_a_spinner_held_still_keeps_its_angle_and_a_running_one_turns() -> void
 	assert_float(held.angle).is_equal(-PI * 0.5)
 	assert_float(running.angle).is_not_equal(start)
 	assert_that(held.custom_minimum_size).is_equal(Vector2(UiSpinner.SIDE, UiSpinner.SIDE))
+
+## SYS-LOADING-SCENE-FAIL 1780:103778 (不知火舞 on #88): Go back is a CommandButton Kind=secondary, as wide and tall as Retry.
+func test_the_secondary_is_a_secondary_command_as_wide_as_the_primary() -> void:
+	var c := _card()
+	c.show_card({icon = UiWordmark.SPROUT, title = "Couldn't get there", body = "Check your connection and try again.",
+		primary = "Retry", secondary = "Go back"})
+	await get_tree().process_frame
+	assert_object(c.secondary).is_instanceof(UiCommandButton)
+	assert_int(c.secondary.kind).is_equal(UiCommandButton.Kind.SECONDARY)
+	assert_that([c.secondary.text, c.secondary.size]).is_equal(["Go back", c.primary.size])
+	var hit := [0]
+	c.secondary_pressed.connect(func(): hit[0] += 1)
+	c.secondary.pressed.emit()
+	assert_int(hit[0]).is_equal(1)

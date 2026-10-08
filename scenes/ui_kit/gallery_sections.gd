@@ -33,7 +33,8 @@ static func all() -> Array[Dictionary]:
 		{id = "reward_moment", title = "UiRewardMoment", figma = "RewardMoment 1179:82271 · COOK-4 / COOK-6 / COOK-P0-9", build = _reward_moments},
 		{id = "moment_banner", title = "UiMomentBanner", figma = "MomentBanner 1226:104630 · §4.8.3 / §4.8.6 (SGODOT-233)", build = _moment_banners},
 		{id = "sys_banner", title = "UiSysBanner", figma = "SysBanner 1187:82581 · SYS-OFFLINE / -2 / SYS-CMD-FAIL (WP6, SGODOT-233)", build = _sys_banners},
-		{id = "system_card", title = "UiSystemCard", figma = "SystemCard 1237:87229 Blocking / Error · SYS-LOADING-FAIL 1243:108638 (SGODOT-233)", build = _system_cards},
+		{id = "system_card", title = "UiSystemCard", figma = "SystemCard 1237:87229 Kind=Blocking · SYS-LOADING-FAIL 1243:108638 (SGODOT-233)", build = _system_cards},
+		{id = "system_card_trip", title = "UiSystemCard · secondary", figma = "SYS-LOADING-SCENE-FAIL 1780:103778 · q(78) (SGODOT-233)", build = _system_card_trip},
 		{id = "wordmark", title = "UiWordmark · UiSpinner", figma = "Wordmark (placeholder) 1187:82582 · Spinner 1237:87185 · SYS-LOADING-2 1243:108614", build = _wordmark_spinner},
 		# SGODOT-221 world controls · interaction
 		{id = "quick_bar", title = "UiQuickBar (drawn at 328 of 336)", figma = "Compact/QuickSlot 633:41279 · QuickEnd/Bag 907:72112 · BAR-1 / BAR-1-2 · LOCK-04 / 05", build = _quick_bars},
@@ -1255,16 +1256,22 @@ static func _inbox_rows() -> Control:
 	return v
 
 ## SystemCard (1237:87229, SGODOT-233): Blocking as SYS-LOADING-FAIL draws it (Can't connect · Retry, the wifi-off glyph
-## in ink on the primaryTint disc) and Error for a place that would not open (no icon, Go back).
+## in ink on the primaryTint disc).
 static func _system_cards() -> Control:
 	var v := _column()
 	var fail := UiSystemCard.new()
 	fail.show_card({icon = preload("res://assets/ui/kit_icons/wifi_off.svg"), icon_tint = UiTokens.COLOR_TEXT, title = "Can't connect",
 		body = "Check your connection and try again.", primary = "Retry"})
 	v.add_child(_captioned(fail, "Kind=Blocking · SYS-LOADING-FAIL"))
-	var err := UiSystemCard.new(UiSystemCard.Kind.ERROR)
-	err.show_card({title = "Couldn't open this place", primary = "Go back"})
-	v.add_child(_captioned(err, "Kind=Error · a place that would not load"))
+	return v
+
+## SYS-LOADING-SCENE-FAIL (1780:103778, q(78)): the same card with its secondary Go back, a CommandButton Kind=secondary.
+static func _system_card_trip() -> Control:
+	var v := _column()
+	var trip := UiSystemCard.new()
+	trip.show_card({icon = preload("res://assets/ui/kit_icons/wifi_off.svg"), icon_tint = UiTokens.COLOR_TEXT, title = "Couldn't get there",
+		body = "Check your connection and try again.", primary = "Retry", secondary = "Go back"})
+	v.add_child(_captioned(trip, "Kind=Blocking + secondary · SYS-LOADING-SCENE-FAIL"))
 	return v
 
 ## The placeholder wordmark (sprout + Gensen, 148 × 44) and the 28 px spinner (held still) with SYS-LOADING-2's caption.
