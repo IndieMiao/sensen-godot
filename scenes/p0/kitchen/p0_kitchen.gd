@@ -64,7 +64,6 @@ var _from_stove := false
 var _card_dish := ""
 var _card_where := ""
 var _card_done := false
-var _confirming := false
 var _left_card := false            # the card is for a portion waiting on the stove (COOK-P0-9 from leftovers)
 var _retrying := false             # Keep sent a collect for leftovers: its reply says where they went
 var _card: UiRewardMoment
@@ -478,8 +477,7 @@ func _open_card(fields: Dictionary) -> void:
 	var eat := P0KitchenLogic.eat_state(v, _card_dish)
 	card.primary = str(eat.text)
 	card.primary_reason = str(eat.reason)
-	_confirming = false
-	card.primary_pressed.connect(func(): _on_eat(card, str(eat.confirm)))
+	card.primary_pressed.connect(_on_eat)
 	card.unavailable_pressed.connect(func(reason: String): rt.ui.toast(reason))
 	card.secondary_pressed.connect(func(): rt.ui.close_modal())
 	var wrap := Control.new()
@@ -550,12 +548,8 @@ static func _reveal_rect(tex: Texture2D) -> TextureRect:
 	t.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return t
 
-## Eat: the first tap asks when Energy can't take it all (COOK-7-2 state 5), then eats from where it went.
-func _on_eat(card: UiRewardMoment, confirm: String) -> void:
-	if confirm != "" and not _confirming:
-		_confirming = true
-		card.primary = confirm
-		return
+## Eat: one portion from where the server kept it (the button already says what it gives, q(10)).
+func _on_eat() -> void:
 	_card_done = true
 	var cmd := P0KitchenLogic.eat_command(_card_dish, _card_where)
 	rt.session.send(cmd, P0Session.ui_key(cmd))

@@ -12,7 +12,7 @@ const STOVE := "use_stove_1"
 const RACK := "use_spice_rack"
 const CABINET := "use_warming_cabinet"
 const CABINET_GLOW := Color("ffb87a")   # the cabinet's warm inner light (placeholder; the art brings its own)
-const CABINET_GLOW_AT := Vector3(-2.3, 0.55, -1.575)
+const CABINET_GLOW_AT := Vector3(-2.13, 0.75, -1.69)   # in front of the cabinet door
 
 var kitchen: P0Kitchen
 var _sheet: P0StorageSheet

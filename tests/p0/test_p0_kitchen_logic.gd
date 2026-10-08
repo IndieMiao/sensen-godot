@@ -124,18 +124,18 @@ func _eat_view(energy: int, used: int, meal: int) -> Dictionary:
 func test_eating_states_follow_cook_7_2_first_match_wins() -> void:
 	var id := "dish_perch@good"
 	# 1 Energy full (bonus counts as full): unavailable with the reason on the button.
-	assert_dict(P0KitchenLogic.eat_state(_eat_view(210, 100, 45), id)).is_equal({text = "Energy full", reason = "Energy full", confirm = ""})
+	assert_dict(P0KitchenLogic.eat_state(_eat_view(210, 100, 45), id)).is_equal({text = "Energy full", reason = "Energy full"})
 	# 2 food limit used up, 3 the third serving today: eats for nothing.
 	assert_str(P0KitchenLogic.eat_state(_eat_view(142, 210, 45), id).text).is_equal("Eat · no Energy today")
 	assert_str(P0KitchenLogic.eat_state(_eat_view(142, 100, 0), id).text).is_equal("Eat · no Energy today")
 	# 4 the second serving is half (the server's meal value).
 	assert_str(P0KitchenLogic.eat_state(_eat_view(142, 100, 23), id).text).is_equal("Eat · +23 Energy")
-	# 5 Energy room smaller than the meal: the smaller value, and the first tap asks.
-	assert_dict(P0KitchenLogic.eat_state(_eat_view(198, 100, 45), id)).is_equal({text = "Eat · +12 Energy", reason = "", confirm = "Only +12 of 45 · Eat anyway?"})
-	# 6 food-limit room smaller than the meal: the smaller value, no question.
-	assert_dict(P0KitchenLogic.eat_state(_eat_view(142, 190, 45), id)).is_equal({text = "Eat · +20 Energy", reason = "", confirm = ""})
+	# 5 Energy room smaller than the meal: what it really gives, one tap (q(10), no "Eat anyway?").
+	assert_dict(P0KitchenLogic.eat_state(_eat_view(198, 100, 45), id)).is_equal({text = "Eat · +12 Energy", reason = ""})
+	# 6 food-limit room smaller than the meal: the smaller value.
+	assert_dict(P0KitchenLogic.eat_state(_eat_view(142, 190, 45), id)).is_equal({text = "Eat · +20 Energy", reason = ""})
 	# 7 plain.
-	assert_dict(P0KitchenLogic.eat_state(_eat_view(142, 100, 45), id)).is_equal({text = "Eat · +45 Energy", reason = "", confirm = ""})
+	assert_dict(P0KitchenLogic.eat_state(_eat_view(142, 100, 45), id)).is_equal({text = "Eat · +45 Energy", reason = ""})
 
 func test_a_portion_left_on_the_stove_is_worth_its_tier_halved_for_a_second_serving() -> void:
 	var v := _view()

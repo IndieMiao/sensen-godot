@@ -120,18 +120,48 @@ func _exit_tree() -> void:
 
 # ---------------------------------------------------------------- hooks for subclasses
 ## Adds props to the art before module visibility and the walkable grid are read. By default the anchors file's
-## placeholder props: copies of art pieces, named as modules, shown from their `level` (module_levels).
+## placeholder props, named as modules and shown from their `level` (module_levels): `from` copies an art piece;
+## `scene` instances a model (with `atlas`, its shared albedo; `collider` {at, size} in model units). A prop
+## whose source is missing is skipped, so its module and anchors stay hidden.
 func _dress_art() -> void:
 	for p in P0RoomAnchors.props(P0RoomAnchors.read_json(anchors_path)):
-		var src := art.get_node_or_null(NodePath(str(p.get("from", "")))) as Node3D
-		if src == null: continue
-		var copy := src.duplicate() as Node3D
+		var copy := _prop_node(p)
+		if copy == null: continue
 		copy.name = str(p.name)
 		copy.position = P0RoomAnchors.vec(p.position)
 		copy.rotation = Vector3(0.0, deg_to_rad(float(p.get("yaw_degrees", 0))), 0.0)
 		copy.scale = Vector3.ONE * float(p.get("scale", 1.0))
 		art.add_child(copy)
 		if p.has("level"): module_levels[str(p.name)] = int(p.level)
+
+func _prop_node(p: Dictionary) -> Node3D:
+	if p.has("from"):
+		var src := art.get_node_or_null(NodePath(str(p.from))) as Node3D
+		return src.duplicate() as Node3D if src else null
+	var path := str(p.get("scene", ""))
+	if path == "" or not ResourceLoader.exists(path): return null
+	var holder := Node3D.new()
+	var model := (load(path) as PackedScene).instantiate() as Node3D
+	holder.add_child(model)
+	var atlas := str(p.get("atlas", ""))
+	if atlas != "" and ResourceLoader.exists(atlas):
+		var mat := StandardMaterial3D.new()   # the Basic Room atlas look (BasicRoomArt._setup_room)
+		mat.albedo_texture = load(atlas)
+		mat.roughness = 0.8
+		mat.metallic_specular = 0.28
+		mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+		for m in model.find_children("*", "MeshInstance3D", true, false): (m as MeshInstance3D).material_override = mat
+	var c: Dictionary = p.get("collider", {})
+	if not c.is_empty():
+		var body := StaticBody3D.new()
+		body.position = P0RoomAnchors.vec(c.at)
+		var shape := BoxShape3D.new()
+		shape.size = P0RoomAnchors.vec(c.size)
+		var cs := CollisionShape3D.new()
+		cs.shape = shape
+		body.add_child(cs)
+		holder.add_child(body)
+	return holder
 
 func _room_ready() -> void: pass
 

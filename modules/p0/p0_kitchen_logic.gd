@@ -231,21 +231,19 @@ static func _page(view: Dictionary, id: String) -> Dictionary:
 		if str(p.id) == id: return p
 	return {}
 
-## COOK-7-2 eating states, first match wins: {text, reason, confirm}. `reason` makes Eat unavailable (LOCK-10,
-## Energy full, Bonus counts as full); `confirm` is the first tap's question when Energy can't take it all. The
-## button shows the smaller of the energy room and the food-limit room.
+## COOK-7-2 eating states, first match wins: {text, reason}. `reason` makes Eat unavailable (LOCK-10, Energy
+## full, Bonus counts as full). The button says what the player really gets, the smaller of the energy room and
+## the food-limit room, in one tap (q(10); no "Eat anyway?" question, An Qi La's review b7b0c99c).
 static func eat_state(view: Dictionary, id: String) -> Dictionary:
 	var e: Dictionary = view.get("energy", {})
 	var have := int(e.get("value", 0))
 	var mx := int(e.get("max", 200))
-	if have >= mx: return {text = "Energy full", reason = "Energy full", confirm = ""}
+	if have >= mx: return {text = "Energy full", reason = "Energy full"}
 	var value := meal_value(view, id)
 	var m: Dictionary = view.get("meals", {})
 	var left := maxi(0, int(m.get("cap", 200)) - int(m.get("used", 0)))
-	if left <= 0 or value <= 0: return {text = "Eat · no Energy today", reason = "", confirm = ""}
-	var counted := mini(value, left)
-	var gain := mini(counted, mx - have)
-	return {text = "Eat · +%d Energy" % gain, reason = "", confirm = ("Only +%d of %d · Eat anyway?" % [gain, value]) if gain < counted else ""}
+	if left <= 0 or value <= 0: return {text = "Eat · no Energy today", reason = ""}
+	return {text = "Eat · +%d Energy" % mini(mini(value, left), mx - have), reason = ""}
 
 ## Where each portion of a collect went, from its events: id → "cabinet" / "bag" / "stove" (PR #20 events).
 static func routes(events: Array) -> Dictionary:

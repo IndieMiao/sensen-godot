@@ -122,13 +122,7 @@ func _cabinet_actions(id: String) -> Control:
 	var eat: Dictionary = a.eat
 	var eat_b := UiCommandButton.new(str(eat.text))
 	eat_b.reason = str(eat.reason)
-	var asked := [false]
-	eat_b.activated.connect(func():
-		if str(eat.confirm) != "" and not asked[0]:
-			asked[0] = true
-			eat_b.label = str(eat.confirm)
-			return
-		command.emit({"type": "eat", "item": id, "from": "cabinet"}))
+	eat_b.activated.connect(func(): command.emit({"type": "eat", "item": id, "from": "cabinet"}))
 	eat_b.unavailable_pressed.connect(func(reason): command.emit({"_toast": reason}))
 	box.add_child(eat_b)
 	var take := UiCommandButton.new(str(a.take), UiCommandButton.Kind.SECONDARY)
