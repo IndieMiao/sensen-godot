@@ -1,0 +1,1840 @@
+{
+  "units": "metres",
+  "coordinates": "Godot Y up, front +Z; pivots local floor or mounting point",
+  "reference": {
+    "file_key": "OMLTC3yw3u2WDjOZhLnhaR",
+    "node_id": "545:2957"
+  },
+  "assets": [
+    {
+      "name": "floor",
+      "file": "floor.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            -0.08,
+            0
+          ],
+          "size": [
+            6.1,
+            0.26,
+            5.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "back_wall",
+      "file": "back_wall.glb",
+      "position": [
+        0,
+        0.06,
+        -2.75
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            1.5,
+            0
+          ],
+          "size": [
+            6,
+            3,
+            0.22
+          ]
+        }
+      ]
+    },
+    {
+      "name": "left_door_wall",
+      "file": "left_door_wall.glb",
+      "position": [
+        -3,
+        0.06,
+        0.15
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            -1.5250000000000001,
+            1.5,
+            0
+          ],
+          "size": [
+            2.35,
+            3,
+            0.23
+          ]
+        },
+        {
+          "at": [
+            2.025,
+            1.5,
+            0
+          ],
+          "size": [
+            1.75,
+            3,
+            0.23
+          ]
+        }
+      ]
+    },
+    {
+      "name": "front_wall_left",
+      "file": "front_wall_left.glb",
+      "position": [
+        -1.99,
+        0.06,
+        2.68
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.32,
+            0
+          ],
+          "size": [
+            1.95,
+            0.64,
+            0.3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "front_wall_right",
+      "file": "front_wall_right.glb",
+      "position": [
+        2.17,
+        0.06,
+        2.68
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.32,
+            0
+          ],
+          "size": [
+            1.65,
+            0.64,
+            0.3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "side_low_wall",
+      "file": "side_low_wall.glb",
+      "position": [
+        3,
+        0.06,
+        0
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.38,
+            0
+          ],
+          "size": [
+            5.28,
+            0.76,
+            0.3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "corner_pier",
+      "file": "corner_pier.glb",
+      "position": [
+        3,
+        0.06,
+        2.68
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.43,
+            0
+          ],
+          "size": [
+            0.4,
+            0.86,
+            0.4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "entry_step",
+      "file": "entry_step.glb",
+      "position": [
+        0.15,
+        -0.16,
+        2.82
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0,
+            0
+          ],
+          "points": [
+            [
+              -1.03,
+              -0.19,
+              -0.4
+            ],
+            [
+              -1.03,
+              0.211,
+              -0.4
+            ],
+            [
+              -1.03,
+              0.211,
+              0.21
+            ],
+            [
+              -1.03,
+              -0.02,
+              0.7
+            ],
+            [
+              -1.03,
+              -0.19,
+              0.7
+            ],
+            [
+              1.03,
+              -0.19,
+              -0.4
+            ],
+            [
+              1.03,
+              0.211,
+              -0.4
+            ],
+            [
+              1.03,
+              0.211,
+              0.21
+            ],
+            [
+              1.03,
+              -0.02,
+              0.7
+            ],
+            [
+              1.03,
+              -0.19,
+              0.7
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "wood_display_hutch",
+      "file": "wood_display_hutch.glb",
+      "position": [
+        0.34,
+        0.06,
+        -2.42
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            1.25,
+            0
+          ],
+          "size": [
+            3.85,
+            2.5,
+            0.5
+          ]
+        }
+      ]
+    },
+    {
+      "name": "striped_awning",
+      "file": "striped_awning.glb",
+      "position": [
+        0.34,
+        2.91,
+        -2.42
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "blue_shutter",
+      "file": "blue_shutter.glb",
+      "position": [
+        -1.82,
+        1.7,
+        -2.11
+      ],
+      "yaw_degrees": -17,
+      "colliders": []
+    },
+    {
+      "name": "produce_display_table",
+      "file": "produce_display_table.glb",
+      "position": [
+        0.18,
+        0.06,
+        -1.27
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.49,
+            0
+          ],
+          "size": [
+            4.8,
+            0.98,
+            0.83
+          ]
+        }
+      ]
+    },
+    {
+      "name": "crate_orange",
+      "file": "crate_orange.glb",
+      "position": [
+        -1.73,
+        1.08,
+        -1.27
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "crate_lemon",
+      "file": "crate_lemon.glb",
+      "position": [
+        -0.78,
+        1.08,
+        -1.27
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "crate_fig",
+      "file": "crate_fig.glb",
+      "position": [
+        0.16999999999999993,
+        1.08,
+        -1.27
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "crate_peach",
+      "file": "crate_peach.glb",
+      "position": [
+        1.1199999999999997,
+        1.08,
+        -1.27
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "crate_grape",
+      "file": "crate_grape.glb",
+      "position": [
+        2.07,
+        1.08,
+        -1.27
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "analog_scale",
+      "file": "analog_scale.glb",
+      "position": [
+        1.84,
+        1.37,
+        -2.0
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "striped_table_towel",
+      "file": "striped_table_towel.glb",
+      "position": [
+        -1.36,
+        1.15,
+        -1.12
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "orchard_market_sign",
+      "file": "orchard_market_sign.glb",
+      "position": [
+        -2.82,
+        1.83,
+        1.75
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "fruit_orange",
+      "file": "fruit_orange.glb",
+      "position": [
+        -1.78,
+        1.09,
+        -0.77
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "fruit_lemon",
+      "file": "fruit_lemon.glb",
+      "position": [
+        -0.8300000000000001,
+        1.09,
+        -0.77
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "fruit_fig",
+      "file": "fruit_fig.glb",
+      "position": [
+        0.11999999999999988,
+        1.09,
+        -0.77
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "fruit_peach",
+      "file": "fruit_peach.glb",
+      "position": [
+        1.0699999999999996,
+        1.09,
+        -0.77
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "fruit_grape",
+      "file": "fruit_grape.glb",
+      "position": [
+        2.0199999999999996,
+        1.09,
+        -0.77
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "floor_orange_crate",
+      "file": "floor_orange_crate.glb",
+      "position": [
+        -1.36,
+        0.064,
+        1.1
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.27,
+            0
+          ],
+          "size": [
+            0.9,
+            0.54,
+            0.7
+          ]
+        }
+      ]
+    },
+    {
+      "name": "floor_fig_crate",
+      "file": "floor_fig_crate.glb",
+      "position": [
+        0.85,
+        0.064,
+        1.3
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.27,
+            0
+          ],
+          "size": [
+            0.9,
+            0.54,
+            0.7
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hanging_herbs_leaves",
+      "file": "hanging_herbs_leaves.glb",
+      "position": [
+        2.71,
+        2.23,
+        -2.57
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "olive_crown_leaves",
+      "file": "olive_crown_leaves.glb",
+      "position": [
+        -2.43,
+        0.07,
+        0.78
+      ],
+      "yaw_degrees": 65,
+      "colliders": []
+    },
+    {
+      "name": "arch_vine_leaves",
+      "file": "arch_vine_leaves.glb",
+      "position": [
+        -2.76,
+        2.95,
+        -1.29
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    }
+  ],
+  "instances": [
+    {
+      "name": "corner_pier_0",
+      "asset": "corner_pier",
+      "position": [
+        -3,
+        0.06,
+        2.68
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "corner_pier_1",
+      "asset": "corner_pier",
+      "position": [
+        -0.97,
+        0.06,
+        2.68
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "corner_pier_2",
+      "asset": "corner_pier",
+      "position": [
+        1.28,
+        0.06,
+        2.68
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "blue_shutter_2",
+      "asset": "blue_shutter",
+      "position": [
+        0.79,
+        1.7,
+        -2.11
+      ],
+      "yaw_degrees": 21,
+      "rotation_degrees": [
+        0,
+        21,
+        0
+      ]
+    },
+    {
+      "name": "blue_shutter_3",
+      "asset": "blue_shutter",
+      "position": [
+        2.54,
+        1.7,
+        -2.1
+      ],
+      "yaw_degrees": -8
+    },
+    {
+      "name": "shelf_orange_crate",
+      "asset": "crate_orange",
+      "position": [
+        -0.32,
+        1.94,
+        -2.17
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "shelf_lemon_crate",
+      "asset": "crate_lemon",
+      "position": [
+        -0.32,
+        1.37,
+        -2.17
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "striped_table_towel_2",
+      "asset": "striped_table_towel",
+      "position": [
+        1.99,
+        1.15,
+        -1.12
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "right_olive_crown_leaves",
+      "asset": "olive_crown_leaves",
+      "position": [
+        2.32,
+        0.07,
+        2.03
+      ],
+      "yaw_degrees": 150,
+      "scale": [
+        1.12,
+        1.12,
+        1.12
+      ]
+    },
+    {
+      "name": "arch_foliage_01",
+      "asset": "arch_vine_leaves",
+      "position": [
+        -2.76,
+        1.76,
+        -1.29
+      ],
+      "yaw_degrees": 90
+    },
+    {
+      "name": "arch_foliage_10",
+      "asset": "arch_vine_leaves",
+      "position": [
+        -2.76,
+        2.95,
+        -1.09
+      ],
+      "yaw_degrees": 90
+    },
+    {
+      "name": "arch_foliage_11",
+      "asset": "arch_vine_leaves",
+      "position": [
+        -2.76,
+        1.76,
+        -1.09
+      ],
+      "yaw_degrees": 90
+    },
+    {
+      "name": "arch_foliage_20",
+      "asset": "arch_vine_leaves",
+      "position": [
+        -2.76,
+        2.95,
+        -0.89
+      ],
+      "yaw_degrees": 90
+    },
+    {
+      "name": "arch_foliage_21",
+      "asset": "arch_vine_leaves",
+      "position": [
+        -2.76,
+        1.76,
+        -0.89
+      ],
+      "yaw_degrees": 90
+    }
+  ],
+  "camera": {
+    "position": [
+      10.30107384280216,
+      12.869589477489207,
+      10.903611465414878
+    ],
+    "target": [
+      0.021422273715398357,
+      1.582688516651345,
+      -0.02015911155038907
+    ],
+    "size": 9.518447343421212
+  },
+  "revision": "R2.1",
+  "shared_plants": [
+    {
+      "name": "LeftOlive",
+      "asset": "olive_tree",
+      "file": "res://assets/rooms/_shared/plants/olive_tree.glb",
+      "position": [
+        -2.43,
+        0.07,
+        0.78
+      ],
+      "rotation_degrees": [
+        0,
+        35,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.3,
+            0
+          ],
+          "size": [
+            0.66,
+            0.6,
+            0.66
+          ]
+        }
+      ]
+    },
+    {
+      "name": "RightOlive",
+      "asset": "olive_tree",
+      "file": "res://assets/rooms/_shared/plants/olive_tree.glb",
+      "position": [
+        2.32,
+        0.07,
+        2.03
+      ],
+      "rotation_degrees": [
+        0,
+        120,
+        0
+      ],
+      "scale": [
+        1.12,
+        1.12,
+        1.12
+      ],
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.3,
+            0
+          ],
+          "size": [
+            0.66,
+            0.6,
+            0.66
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ShelfPothos",
+      "asset": "pothos",
+      "file": "res://assets/rooms/_shared/plants/pothos.glb",
+      "position": [
+        -1.3,
+        1.93,
+        -2.08
+      ],
+      "rotation_degrees": [
+        0,
+        30,
+        0
+      ],
+      "scale": [
+        0.65,
+        0.65,
+        0.65
+      ],
+      "colliders": []
+    },
+    {
+      "name": "ShelfHerb",
+      "asset": "pothos",
+      "file": "res://assets/rooms/_shared/plants/pothos.glb",
+      "position": [
+        0.78,
+        1.37,
+        -2.05
+      ],
+      "rotation_degrees": [
+        0,
+        10,
+        0
+      ],
+      "scale": [
+        0.75,
+        0.75,
+        0.75
+      ],
+      "colliders": []
+    },
+    {
+      "name": "WallFlower00",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        -2.55,
+        0.74,
+        2.68
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.86,
+        0.86,
+        0.86
+      ],
+      "colliders": []
+    },
+    {
+      "name": "WallFlower01",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        -1.92,
+        0.74,
+        2.68
+      ],
+      "rotation_degrees": [
+        0,
+        31,
+        0
+      ],
+      "scale": [
+        0.86,
+        0.86,
+        0.86
+      ],
+      "colliders": []
+    },
+    {
+      "name": "WallFlower02",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        -1.32,
+        0.74,
+        2.68
+      ],
+      "rotation_degrees": [
+        0,
+        62,
+        0
+      ],
+      "scale": [
+        0.86,
+        0.86,
+        0.86
+      ],
+      "colliders": []
+    },
+    {
+      "name": "WallFlower03",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        1.64,
+        0.74,
+        2.68
+      ],
+      "rotation_degrees": [
+        0,
+        93,
+        0
+      ],
+      "scale": [
+        0.86,
+        0.86,
+        0.86
+      ],
+      "colliders": []
+    },
+    {
+      "name": "WallFlower04",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        2.3,
+        0.74,
+        2.68
+      ],
+      "rotation_degrees": [
+        0,
+        124,
+        0
+      ],
+      "scale": [
+        0.86,
+        0.86,
+        0.86
+      ],
+      "colliders": []
+    },
+    {
+      "name": "WallFlower05",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        3.0,
+        0.74,
+        -1.38
+      ],
+      "rotation_degrees": [
+        0,
+        155,
+        0
+      ],
+      "scale": [
+        0.86,
+        0.86,
+        0.86
+      ],
+      "colliders": []
+    },
+    {
+      "name": "WallFlower06",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        3.0,
+        0.74,
+        -0.63
+      ],
+      "rotation_degrees": [
+        0,
+        186,
+        0
+      ],
+      "scale": [
+        0.86,
+        0.86,
+        0.86
+      ],
+      "colliders": []
+    },
+    {
+      "name": "WallFlower07",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        3.0,
+        0.74,
+        0.12
+      ],
+      "rotation_degrees": [
+        0,
+        217,
+        0
+      ],
+      "scale": [
+        0.86,
+        0.86,
+        0.86
+      ],
+      "colliders": []
+    },
+    {
+      "name": "WallFlower08",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        3.0,
+        0.74,
+        0.87
+      ],
+      "rotation_degrees": [
+        0,
+        248,
+        0
+      ],
+      "scale": [
+        0.86,
+        0.86,
+        0.86
+      ],
+      "colliders": []
+    },
+    {
+      "name": "WallFlower09",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        3.0,
+        0.74,
+        1.62
+      ],
+      "rotation_degrees": [
+        0,
+        279,
+        0
+      ],
+      "scale": [
+        0.86,
+        0.86,
+        0.86
+      ],
+      "colliders": []
+    },
+    {
+      "name": "WallFlower10",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        3.0,
+        0.74,
+        2.33
+      ],
+      "rotation_degrees": [
+        0,
+        310,
+        0
+      ],
+      "scale": [
+        0.86,
+        0.86,
+        0.86
+      ],
+      "colliders": []
+    },
+    {
+      "name": "DoorWhiteVine0",
+      "asset": "ivy_long",
+      "file": "res://assets/rooms/_shared/plants/ivy_long.glb",
+      "position": [
+        -2.84,
+        2.98,
+        -1.15
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        0
+      ],
+      "scale": [
+        1.1,
+        1.1,
+        1.1
+      ],
+      "colliders": []
+    },
+    {
+      "name": "DoorWhiteVine1",
+      "asset": "ivy_long",
+      "file": "res://assets/rooms/_shared/plants/ivy_long.glb",
+      "position": [
+        -2.84,
+        2.98,
+        -1.32
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        0
+      ],
+      "scale": [
+        1.1,
+        1.1,
+        1.1
+      ],
+      "colliders": []
+    },
+    {
+      "name": "BackWhiteVine0",
+      "asset": "ivy_medium",
+      "file": "res://assets/rooms/_shared/plants/ivy_medium.glb",
+      "position": [
+        -2.4,
+        2.99,
+        -2.56
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.06,
+        1.06,
+        1.06
+      ],
+      "colliders": []
+    },
+    {
+      "name": "BackWhiteVine1",
+      "asset": "ivy_medium",
+      "file": "res://assets/rooms/_shared/plants/ivy_medium.glb",
+      "position": [
+        -1.71,
+        2.99,
+        -2.56
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.06,
+        1.06,
+        1.06
+      ],
+      "colliders": []
+    },
+    {
+      "name": "LeftWallCrown0",
+      "asset": "ivy_medium",
+      "file": "res://assets/rooms/_shared/plants/ivy_medium.glb",
+      "position": [
+        -2.78,
+        3.0,
+        -2.18
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        0
+      ],
+      "scale": [
+        0.9,
+        0.9,
+        0.9
+      ],
+      "colliders": []
+    },
+    {
+      "name": "LeftWallCrown1",
+      "asset": "ivy_medium",
+      "file": "res://assets/rooms/_shared/plants/ivy_medium.glb",
+      "position": [
+        -2.78,
+        3.0,
+        -1.52
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        0
+      ],
+      "scale": [
+        0.9,
+        0.9,
+        0.9
+      ],
+      "colliders": []
+    },
+    {
+      "name": "BackCornerFlowering",
+      "asset": "ivy_long",
+      "file": "res://assets/rooms/_shared/plants/ivy_long.glb",
+      "position": [
+        -2.35,
+        2.99,
+        -2.52
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.95,
+        0.95,
+        0.95
+      ],
+      "colliders": []
+    }
+  ],
+  "boundaries": [
+    {
+      "name": "side_arch_limit",
+      "at": [
+        -3.13,
+        1.4,
+        0
+      ],
+      "size": [
+        0.1,
+        3,
+        5.6
+      ]
+    },
+    {
+      "name": "landing_floor",
+      "at": [
+        0.15,
+        -0.245,
+        3.2
+      ],
+      "size": [
+        2.06,
+        0.1,
+        0.8
+      ]
+    },
+    {
+      "name": "landing_front_edge",
+      "at": [
+        0.15,
+        0.5,
+        3.63
+      ],
+      "size": [
+        2.16,
+        1.6,
+        0.1
+      ]
+    },
+    {
+      "name": "landing_left_edge",
+      "at": [
+        -0.93,
+        0.5,
+        3.17
+      ],
+      "size": [
+        0.1,
+        1.6,
+        0.9
+      ]
+    },
+    {
+      "name": "landing_right_edge",
+      "at": [
+        1.23,
+        0.5,
+        3.17
+      ],
+      "size": [
+        0.1,
+        1.6,
+        0.9
+      ]
+    }
+  ],
+  "lighting": {
+    "background": "A3D5DF",
+    "ambient": "AABDD2",
+    "ambient_energy": 0.72,
+    "sun_color": "FFE1BD",
+    "sun_energy": 1.42,
+    "sun_position": [
+      6,
+      9,
+      4
+    ],
+    "sun_target": [
+      0,
+      0,
+      -0.8
+    ],
+    "angular_distance": 6,
+    "lamps": []
+  },
+  "review_lighting": {
+    "background": "A3D5DF",
+    "ambient_color": "AABDD2",
+    "ambient": 0.72,
+    "sun_color": "FFE1BD",
+    "sun": 1.42,
+    "sun_position": [
+      6,
+      9,
+      4
+    ],
+    "sun_target": [
+      0,
+      0,
+      -0.8
+    ],
+    "points": []
+  },
+  "spawn": [
+    0.15,
+    0.06,
+    2.15
+  ],
+  "bench": {
+    "floor_y": 0.05,
+    "route": [
+      {
+        "name": "entrance",
+        "position": [
+          0.15,
+          0.06,
+          2.14
+        ],
+        "capture": "door"
+      },
+      {
+        "name": "left_crate_front",
+        "position": [
+          -0.48,
+          0.06,
+          1.74
+        ]
+      },
+      {
+        "name": "left_crate_side",
+        "position": [
+          -0.48,
+          0.06,
+          0.5
+        ]
+      },
+      {
+        "name": "produce_table",
+        "position": [
+          0,
+          0.06,
+          -0.22
+        ],
+        "capture": "main"
+      },
+      {
+        "name": "left_olive",
+        "position": [
+          -2.1,
+          0.06,
+          -0.22
+        ]
+      },
+      {
+        "name": "display_return",
+        "position": [
+          0,
+          0.06,
+          -0.22
+        ]
+      },
+      {
+        "name": "right_olive",
+        "position": [
+          1.7,
+          0.06,
+          -0.22
+        ]
+      },
+      {
+        "name": "right_crate",
+        "position": [
+          1.65,
+          0.06,
+          0.35
+        ]
+      },
+      {
+        "name": "front_return",
+        "position": [
+          0.15,
+          0.06,
+          0.35
+        ]
+      },
+      {
+        "name": "entrance_return",
+        "position": [
+          0.15,
+          0.06,
+          2.18
+        ]
+      }
+    ],
+    "blocked": [
+      {
+        "name": "produce_counter",
+        "from": [
+          0,
+          0.06,
+          -0.18
+        ],
+        "to": [
+          0,
+          0.06,
+          -1.3
+        ],
+        "target": "/produce_display_table/"
+      },
+      {
+        "name": "floor_crate",
+        "from": [
+          -1.36,
+          0.06,
+          0.21
+        ],
+        "to": [
+          -1.36,
+          0.06,
+          1.2
+        ],
+        "target": "/floor_orange_crate/"
+      },
+      {
+        "name": "olive_pot",
+        "from": [
+          -1.7,
+          0.06,
+          1.13
+        ],
+        "to": [
+          -2.6,
+          0.06,
+          1.13
+        ],
+        "target": "LeftOlive"
+      },
+      {
+        "name": "side_wall",
+        "from": [
+          2.5,
+          0.06,
+          0.4
+        ],
+        "to": [
+          3.6,
+          0.06,
+          0.4
+        ],
+        "target": "/side_low_wall/"
+      }
+    ],
+    "gaps": [
+      {
+        "name": "crate_to_counter",
+        "from": [
+          -2.0,
+          0.06,
+          -0.04
+        ],
+        "to": [
+          1.7,
+          0.06,
+          -0.04
+        ],
+        "measure": [
+          [
+            -1.36,
+            0.32,
+            -0.855
+          ],
+          [
+            -1.36,
+            0.32,
+            0.75
+          ]
+        ],
+        "width": 1.605,
+        "minimum": 0.8
+      },
+      {
+        "name": "entrance",
+        "from": [
+          0.15,
+          0.06,
+          2.18
+        ],
+        "to": [
+          0.15,
+          -0.17,
+          3.26
+        ],
+        "measure": [
+          [
+            -0.77,
+            0.6,
+            2.68
+          ],
+          [
+            1.08,
+            0.6,
+            2.68
+          ]
+        ],
+        "width": 1.85,
+        "minimum": 0.7
+      },
+      {
+        "name": "entry_to_produce",
+        "from": [
+          0.1,
+          0.06,
+          1.7
+        ],
+        "to": [
+          0.1,
+          0.06,
+          0.25
+        ],
+        "measure": [
+          [
+            -0.91,
+            0.32,
+            1.1
+          ],
+          [
+            0.4,
+            0.32,
+            1.1
+          ]
+        ],
+        "width": 1.31,
+        "minimum": 0.8
+      }
+    ],
+    "entrance": {
+      "inside": [
+        0.15,
+        0.06,
+        2.15
+      ],
+      "outside": [
+        0.15,
+        -0.19,
+        3.32
+      ]
+    },
+    "slide": {
+      "from": [
+        -2.6,
+        0.06,
+        -1.24
+      ],
+      "direction": [
+        -1,
+        0,
+        -1
+      ],
+      "tangent": [
+        0,
+        0,
+        -1
+      ],
+      "seconds": 0.35
+    },
+    "input_start": [
+      0,
+      0.06,
+      0.25
+    ],
+    "scale": {
+      "door": {
+        "height": 2.63,
+        "source": "Side arch 1.96+.67"
+      },
+      "counter": {
+        "height": 1.01,
+        "source": "Produce worktop .94+.06+.06-.05"
+      },
+      "chair": {
+        "applicable": false,
+        "reason": "N/A: no chair in the reference or delivered scene; no placeholder measurement."
+      },
+      "table": {
+        "height": 1.01,
+        "source": "Produce display table is the only table in this shop."
+      }
+    }
+  },
+  "botanical_assets": [
+    "olive_crown_leaves",
+    "hanging_herbs_leaves",
+    "arch_vine_leaves"
+  ],
+  "review_camera_fit": {
+    "method": "orthographic fit to plinth edge intersections; no model scaling or image warp",
+    "reference_size": [
+      1544,
+      1544
+    ],
+    "reference_corners_left_front_right": [
+      [
+        90,
+        998
+      ],
+      [
+        809,
+        1405
+      ],
+      [
+        1452,
+        995
+      ]
+    ],
+    "inferred_back": [
+      733,
+      588
+    ],
+    "footprint_m": [
+      6.18,
+      5.68
+    ],
+    "plinth_y": -0.15,
+    "render_size": [
+      1400,
+      1400
+    ],
+    "fitted_corners": [
+      [
+        78.42899612294082,
+        899.2718451455208
+      ],
+      [
+        740.3889399522734,
+        1273.8115930737088
+      ],
+      [
+        1312.9178152201227,
+        908.004644682325
+      ]
+    ],
+    "observed_letterboxed_corners": [
+      [
+        81.60621761658031,
+        904.9222797927462
+      ],
+      [
+        733.5492227979274,
+        1273.9637305699482
+      ],
+      [
+        1316.580310880829,
+        902.2020725388601
+      ]
+    ],
+    "residual_px": [
+      6.482449237919966,
+      6.841408960822078,
+      6.861757642529161
+    ],
+    "pitch_degrees": 36.96,
+    "yaw_degrees": 43.26000000000001,
+    "camera": {
+      "position": [
+        10.30107384280216,
+        12.869589477489207,
+        10.903611465414878
+      ],
+      "target": [
+        0.021422273715398357,
+        1.582688516651345,
+        -0.02015911155038907
+      ],
+      "size": 9.518447343421212
+    },
+    "limitation": "Rounded plinth endpoints are estimated edge intersections; concept is not a calibrated physical camera."
+  },
+  "review_views": [
+    {
+      "name": "olive-sign-detail",
+      "position": [
+        3.8,
+        3.9,
+        6.2
+      ],
+      "target": [
+        -2.3,
+        1.45,
+        1.1
+      ],
+      "size": 3.35
+    },
+    {
+      "name": "vine-detail",
+      "position": [
+        3.4,
+        4.0,
+        5.2
+      ],
+      "target": [
+        -2.57,
+        2.1,
+        -1.0
+      ],
+      "size": 3.6
+    },
+    {
+      "name": "clear-produce-detail",
+      "position": [
+        5,
+        4.6,
+        7
+      ],
+      "target": [
+        0.15,
+        1.25,
+        -1.1
+      ],
+      "size": 5.8
+    }
+  ],
+  "render_batches": [
+    {
+      "name": "back_dressing",
+      "file": "res://assets/rooms/fruit_shop/batches/review_back_dressing.glb",
+      "material": "room",
+      "sources": [
+        "striped_awning",
+        "blue_shutter",
+        "crate_orange",
+        "crate_lemon",
+        "crate_fig",
+        "crate_peach",
+        "crate_grape",
+        "analog_scale",
+        "striped_table_towel",
+        "blue_shutter_2",
+        "blue_shutter_3",
+        "shelf_orange_crate",
+        "shelf_lemon_crate",
+        "striped_table_towel_2"
+      ],
+      "triangles": 30716,
+      "cast_shadow": true
+    },
+    {
+      "name": "front_dressing",
+      "file": "res://assets/rooms/fruit_shop/batches/review_front_dressing.glb",
+      "material": "room",
+      "sources": [
+        "orchard_market_sign",
+        "fruit_orange",
+        "fruit_lemon",
+        "fruit_fig",
+        "fruit_peach",
+        "fruit_grape"
+      ],
+      "triangles": 3788,
+      "cast_shadow": true
+    },
+    {
+      "name": "botanical",
+      "file": "res://assets/rooms/fruit_shop/batches/review_botanical.glb",
+      "material": "room",
+      "sources": [
+        "hanging_herbs_leaves",
+        "olive_crown_leaves",
+        "arch_vine_leaves",
+        "right_olive_crown_leaves",
+        "arch_foliage_01",
+        "arch_foliage_10",
+        "arch_foliage_11",
+        "arch_foliage_20",
+        "arch_foliage_21"
+      ],
+      "triangles": 10136,
+      "cast_shadow": false
+    },
+    {
+      "name": "large_plants",
+      "file": "res://assets/rooms/fruit_shop/batches/review_large_plants.glb",
+      "material": "plants",
+      "sources": [
+        "LeftOlive",
+        "RightOlive"
+      ],
+      "triangles": 5736,
+      "cast_shadow": true
+    },
+    {
+      "name": "back_plants",
+      "file": "res://assets/rooms/fruit_shop/batches/review_back_plants.glb",
+      "material": "plants",
+      "sources": [
+        "ShelfPothos",
+        "ShelfHerb",
+        "WallFlower05",
+        "DoorWhiteVine0",
+        "DoorWhiteVine1",
+        "BackWhiteVine0",
+        "BackWhiteVine1",
+        "LeftWallCrown0",
+        "LeftWallCrown1",
+        "BackCornerFlowering"
+      ],
+      "triangles": 15402,
+      "cast_shadow": false
+    },
+    {
+      "name": "front_plants",
+      "file": "res://assets/rooms/fruit_shop/batches/review_front_plants.glb",
+      "material": "plants",
+      "sources": [
+        "WallFlower00",
+        "WallFlower01",
+        "WallFlower02",
+        "WallFlower03",
+        "WallFlower04",
+        "WallFlower06",
+        "WallFlower07",
+        "WallFlower08",
+        "WallFlower09",
+        "WallFlower10"
+      ],
+      "triangles": 24020,
+      "cast_shadow": false
+    }
+  ]
+}

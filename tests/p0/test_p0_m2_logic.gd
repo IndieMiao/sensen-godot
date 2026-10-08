@@ -133,3 +133,13 @@ func test_rarity_colours_follow_the_design_kit() -> void:
 	assert_str(P0Logic.rarity_color(2).to_html(false)).is_equal("6fa8dc")   # Fine blue
 	assert_str(P0Logic.rarity_color(3).to_html(false)).is_equal("a98bd6")   # Rare violet
 	assert_str(P0Logic.rarity_text_color(1).to_html(false)).is_equal("7fa37b")
+
+## 李白 2026-10-08 (PR #22): a refunded failed pot makes no dish, so COOK-4 says so and offers no Eat.
+func test_a_refunded_mystery_pot_says_no_dish() -> void:
+	var none := P0Logic.mystery_card({"kind": "dish", "mystery": true, "qty": 0, "none": true, "trial_left": 9})
+	assert_str(str(none.title)).is_equal("No dish this time")
+	assert_str(str(none.sub)).is_equal("Ingredients back (9 left today)")
+	assert_bool(bool(none.eat)).is_false()
+	var dish := P0Logic.mystery_card({"kind": "dish", "mystery": true, "qty": 1})
+	assert_str(str(dish.title)).is_equal("Mystery Dish")
+	assert_bool(bool(dish.eat)).is_true()

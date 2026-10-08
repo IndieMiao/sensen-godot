@@ -1,0 +1,377 @@
+{
+  "atlas": {
+    "size": [
+      2048,
+      2048
+    ],
+    "file": "room_albedo_ao.png",
+    "purpose": "base colour + softened contact AO; padded palette swatches for subpixel detail; no baked direct light",
+    "bytes": 3018619
+  },
+  "assets": [
+    {
+      "name": "floor",
+      "vertices": 13704,
+      "triangles": 26432,
+      "surfaces": 1,
+      "bytes": 915556
+    },
+    {
+      "name": "back_wall",
+      "vertices": 4368,
+      "triangles": 8424,
+      "surfaces": 1,
+      "bytes": 294040
+    },
+    {
+      "name": "left_door_wall",
+      "vertices": 3848,
+      "triangles": 7452,
+      "surfaces": 1,
+      "bytes": 255128
+    },
+    {
+      "name": "front_wall_left",
+      "vertices": 616,
+      "triangles": 1188,
+      "surfaces": 1,
+      "bytes": 44032
+    },
+    {
+      "name": "front_wall_right",
+      "vertices": 504,
+      "triangles": 972,
+      "surfaces": 1,
+      "bytes": 35140
+    },
+    {
+      "name": "side_low_wall",
+      "vertices": 1288,
+      "triangles": 2484,
+      "surfaces": 1,
+      "bytes": 87664
+    },
+    {
+      "name": "corner_pier",
+      "vertices": 168,
+      "triangles": 324,
+      "surfaces": 1,
+      "bytes": 12628
+    },
+    {
+      "name": "entry_step",
+      "vertices": 168,
+      "triangles": 324,
+      "surfaces": 1,
+      "bytes": 12624
+    },
+    {
+      "name": "drinks_fridge",
+      "vertices": 5020,
+      "triangles": 7948,
+      "surfaces": 1,
+      "bytes": 325368
+    },
+    {
+      "name": "service_counter",
+      "vertices": 1592,
+      "triangles": 3076,
+      "surfaces": 1,
+      "bytes": 107092
+    },
+    {
+      "name": "main_menu",
+      "vertices": 16914,
+      "triangles": 17318,
+      "surfaces": 1,
+      "bytes": 954384
+    },
+    {
+      "name": "toppings_menu",
+      "vertices": 13950,
+      "triangles": 14360,
+      "surfaces": 1,
+      "bytes": 786080
+    },
+    {
+      "name": "freshly_made",
+      "vertices": 2074,
+      "triangles": 2194,
+      "surfaces": 1,
+      "bytes": 116308
+    },
+    {
+      "name": "wall_tea_symbol",
+      "vertices": 530,
+      "triangles": 988,
+      "surfaces": 1,
+      "bytes": 28496
+    },
+    {
+      "name": "syrup_shelf",
+      "vertices": 1004,
+      "triangles": 1908,
+      "surfaces": 1,
+      "bytes": 75260
+    },
+    {
+      "name": "tea_urns",
+      "vertices": 752,
+      "triangles": 1440,
+      "surfaces": 1,
+      "bytes": 59292
+    },
+    {
+      "name": "cup_sealer",
+      "vertices": 866,
+      "triangles": 1628,
+      "surfaces": 1,
+      "bytes": 55288
+    },
+    {
+      "name": "ingredient_jars",
+      "vertices": 1592,
+      "triangles": 2956,
+      "surfaces": 1,
+      "bytes": 82648
+    },
+    {
+      "name": "shakers",
+      "vertices": 312,
+      "triangles": 600,
+      "surfaces": 1,
+      "bytes": 23384
+    },
+    {
+      "name": "topping_case",
+      "vertices": 1604,
+      "triangles": 2908,
+      "surfaces": 1,
+      "bytes": 89052
+    },
+    {
+      "name": "topping_glass",
+      "vertices": 4,
+      "triangles": 2,
+      "surfaces": 1,
+      "bytes": 1488
+    },
+    {
+      "name": "checkout_register",
+      "vertices": 184,
+      "triangles": 352,
+      "surfaces": 1,
+      "bytes": 14072
+    },
+    {
+      "name": "pickup_counter",
+      "vertices": 2712,
+      "triangles": 4230,
+      "surfaces": 1,
+      "bytes": 145396
+    },
+    {
+      "name": "straw_box",
+      "vertices": 236,
+      "triangles": 408,
+      "surfaces": 1,
+      "bytes": 22264
+    },
+    {
+      "name": "cup_stacks",
+      "vertices": 240,
+      "triangles": 456,
+      "surfaces": 1,
+      "bytes": 21004
+    },
+    {
+      "name": "cafe_table",
+      "vertices": 3304,
+      "triangles": 6380,
+      "surfaces": 1,
+      "bytes": 152536
+    },
+    {
+      "name": "chair",
+      "vertices": 418,
+      "triangles": 800,
+      "surfaces": 1,
+      "bytes": 29780
+    },
+    {
+      "name": "table_flower_vase",
+      "vertices": 2480,
+      "triangles": 4596,
+      "surfaces": 1,
+      "bytes": 125976
+    },
+    {
+      "name": "pastel_bench",
+      "vertices": 712,
+      "triangles": 1360,
+      "surfaces": 1,
+      "bytes": 48132
+    },
+    {
+      "name": "street_signboard",
+      "vertices": 2816,
+      "triangles": 3038,
+      "surfaces": 1,
+      "bytes": 160260
+    },
+    {
+      "name": "good_tea_wall_sign",
+      "vertices": 3668,
+      "triangles": 3812,
+      "surfaces": 1,
+      "bytes": 206832
+    },
+    {
+      "name": "fridge_glass",
+      "vertices": 8,
+      "triangles": 12,
+      "surfaces": 1,
+      "bytes": 2196
+    },
+    {
+      "name": "urn_glass",
+      "vertices": 120,
+      "triangles": 228,
+      "surfaces": 1,
+      "bytes": 11180
+    },
+    {
+      "name": "left_tea_logo",
+      "vertices": 438,
+      "triangles": 824,
+      "surfaces": 1,
+      "bytes": 31120
+    }
+  ],
+  "unique_triangles": 131422,
+  "scene_triangles": 150366,
+  "static_draw_surfaces": 43,
+  "unique_assets": 34,
+  "placed_instances": 43,
+  "glb_bytes": 5331700,
+  "scene_budget": {
+    "after": {
+      "room_triangles": 150366,
+      "shared_plant_triangles": 26664,
+      "room_botanical_triangles": 13788,
+      "plant_triangles": 40452,
+      "total_triangles": 177030,
+      "static_surfaces": 27
+    },
+    "limits": {
+      "total_triangles": 200000,
+      "plant_triangles": 100000,
+      "static_surfaces": 60
+    },
+    "render_batches": [
+      {
+        "name": "back_dressing",
+        "file": "res://assets/rooms/milk_tea_shop/batches/review_back_dressing.glb",
+        "material": "room",
+        "sources": [
+          "main_menu",
+          "toppings_menu",
+          "freshly_made",
+          "wall_tea_symbol",
+          "syrup_shelf",
+          "tea_urns",
+          "cup_sealer",
+          "ingredient_jars",
+          "shakers",
+          "topping_case",
+          "checkout_register",
+          "pickup_counter",
+          "straw_box",
+          "cup_stacks"
+        ],
+        "triangles": 51746,
+        "cast_shadow": true
+      },
+      {
+        "name": "glass",
+        "file": "res://assets/rooms/milk_tea_shop/batches/review_glass.glb",
+        "material": "glass",
+        "sources": [
+          "topping_glass",
+          "fridge_glass",
+          "urn_glass"
+        ],
+        "triangles": 242,
+        "cast_shadow": false
+      },
+      {
+        "name": "botanical",
+        "file": "res://assets/rooms/milk_tea_shop/batches/review_botanical.glb",
+        "material": "room",
+        "sources": [
+          "table_flower_vase",
+          "table_flower_vase_2",
+          "counter_flower_vase"
+        ],
+        "triangles": 13788,
+        "cast_shadow": false
+      },
+      {
+        "name": "front_dressing",
+        "file": "res://assets/rooms/milk_tea_shop/batches/review_front_dressing.glb",
+        "material": "room",
+        "sources": [
+          "street_signboard",
+          "good_tea_wall_sign",
+          "left_tea_logo"
+        ],
+        "triangles": 7674,
+        "cast_shadow": true
+      },
+      {
+        "name": "large_plants",
+        "file": "res://assets/rooms/milk_tea_shop/batches/review_large_plants.glb",
+        "material": "plants",
+        "sources": [
+          "MonsteraCorner"
+        ],
+        "triangles": 910,
+        "cast_shadow": true
+      },
+      {
+        "name": "back_plants",
+        "file": "res://assets/rooms/milk_tea_shop/batches/review_back_plants.glb",
+        "material": "plants",
+        "sources": [
+          "WallPothos0",
+          "WallPothos1"
+        ],
+        "triangles": 4096,
+        "cast_shadow": false
+      },
+      {
+        "name": "front_plants",
+        "file": "res://assets/rooms/milk_tea_shop/batches/review_front_plants.glb",
+        "material": "plants",
+        "sources": [
+          "FlowerBox0",
+          "FlowerDrape0",
+          "FlowerBox1",
+          "FlowerDrape1",
+          "FlowerBox2",
+          "FlowerDrape2",
+          "FlowerBox3",
+          "FlowerDrape3",
+          "FlowerBox4",
+          "FlowerDrape4",
+          "FlowerBox5",
+          "FlowerDrape5",
+          "FlowerBox6",
+          "FlowerDrape6"
+        ],
+        "triangles": 21658,
+        "cast_shadow": false
+      }
+    ]
+  }
+}
