@@ -747,7 +747,7 @@
     ],
     "points": []
   },
-  "revision": "R2.2",
+  "revision": "R2.3",
   "shared_plants": [
     {
       "name": "LeftPothos",
@@ -883,15 +883,15 @@
       "name": "smoke-detail",
       "position": [
         4.4,
-        6.9,
+        7.6,
         6.0
       ],
       "target": [
-        -1.15,
-        5.12,
+        -0.35,
+        5.95,
         -2.29
       ],
-      "size": 3.5
+      "size": 5.1
     },
     {
       "name": "tools-bench-detail",
@@ -1393,15 +1393,15 @@
         -2.29
       ],
       "parameters": {
-        "smoke_count": 12,
-        "lifetime": 3.5,
+        "smoke_count": 8,
+        "lifetime": 4.0,
         "drift": [
-          0.19,
-          0.44,
-          -0.015
+          0.28,
+          0.72,
+          -0.04
         ],
         "start_size": 0.3,
-        "end_size": 1.15
+        "end_size": 1.9
       }
     }
   ]

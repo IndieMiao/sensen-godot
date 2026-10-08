@@ -1,14 +1,16 @@
 """Three actual 8s Godot viewport clips with monotonic PTS; no time acceleration."""
 from pathlib import Path
 import sys,json,subprocess,shutil
-ROOT=Path(__file__).resolve().parents[4];out=ROOT/'output/blacksmith_shop/r22';stage=out/'godot-project'
+ROOT=Path(__file__).resolve().parents[4];revision=sys.argv[1] if len(sys.argv)>1 else 'r22';out=ROOT/'output/blacksmith_shop'/revision;stage=out/'godot-project'
 s=(ROOT/'tools/art/source/coffee_shop/render_r1.gd').read_text()
 a=s.index('\tvar views := [');b=s.index('\tfor view in views:',a)
 s=s[:a]+'''\tvar views := [
  ["whole-motion",_vec(layout.camera.position),_vec(layout.camera.target),float(layout.camera.size)],
  ["fire-motion",Vector3(3.7,3.7,5.5),Vector3(-1.48,1.6,-2.03),3.1],
- ["smoke-motion",Vector3(4.4,6.9,6.0),Vector3(-1.15,5.12,-2.29),3.5]]
+ ["smoke-motion",Vector3(4.4,7.6,6.0),Vector3(-.35,5.95,-2.29),5.1]]
 '''+s[b:]
+if revision=='r23':
+ a=s.index(' ["whole-motion"');b=s.index(' ["smoke-motion"',a);s=s[:a]+s[b:]
 s=s.replace('viewport.size = Vector2i(1400,1400)','viewport.size = Vector2i(960,960)')
 a=s.index('\t\tfor i in range(8):');b=s.index('\tvar result :=',a)
 s=s[:a]+'''\t\tfor i in range(8): await process_frame
@@ -34,7 +36,7 @@ s=s.replace('godot-verification.json','particle-record-verification.json').repla
 with (out/'particle-record.log').open('w') as log:
  subprocess.run(['godot','--path',str(stage),'--disable-vsync','--max-fps','60','--rendering-method','mobile','--rendering-driver','vulkan','--script','res://record_particles.gd','--','blacksmith_shop',str(out)],stdout=log,stderr=subprocess.STDOUT,check=True,timeout=90)
 records=[]
-for name in ['whole-motion','fire-motion','smoke-motion']:
+for name in (['smoke-motion'] if revision=='r23' else ['whole-motion','fire-motion','smoke-motion']):
  d=json.loads((out/(name+'-frames.json')).read_text());fs=d.pop('frames');seq=['ffconcat version 1.0'];assert len(fs)>50
  for i,f in enumerate(fs):
   nxt=fs[i+1]['seconds'] if i+1<len(fs) else 8.0

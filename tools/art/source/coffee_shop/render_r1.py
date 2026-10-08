@@ -9,7 +9,7 @@ ROOT=Path(__file__).resolve().parents[4]
 slug=sys.argv[2] if len(sys.argv)>2 else 'coffee_shop'
 assert slug.replace('_','').isalnum()
 revision=sys.argv[1] if len(sys.argv)>1 else 'r1'
-assert revision in ('r1','r2','r21','r22','r2plants')
+assert revision in ('r1','r2','r21','r22','r23','r2plants')
 out=ROOT/'output'/slug/revision
 stage=out/'godot-project'
 out.mkdir(parents=True,exist_ok=True)

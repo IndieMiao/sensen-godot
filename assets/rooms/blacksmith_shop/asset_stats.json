@@ -427,8 +427,8 @@
   "effects": {
     "flames": 16,
     "sparks": 4,
-    "smoke": 12,
-    "total_particles": 32,
+    "smoke": 8,
+    "total_particles": 28,
     "particle_surfaces": 3,
     "fixed_fps": 30,
     "collision": false,

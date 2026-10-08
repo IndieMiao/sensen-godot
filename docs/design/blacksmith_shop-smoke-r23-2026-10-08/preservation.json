@@ -1,0 +1,36 @@
+{
+  "baseline_commit": "cfd775fb",
+  "before": {
+    "assets/rooms/_shared/fx/spark.png": "c5b2a521157c111e818b19eb0a388c9f570d5fcbc753b2da73151b04cbbf5900",
+    "assets/rooms/_shared/fx/flame_strip.png.import": "128d638301342ad8965633e063d6d0b953b2ffde5f56a19ffac6daf0176addef",
+    "assets/rooms/_shared/fx/fx_hearth_fire.tscn": "31efd4d0180d6f5068c4489375262663a39dc2416daff2f8e000329ac4839840",
+    "assets/rooms/_shared/fx/fx_hearth_fire.gd.uid": "66855b81853ed0905f3a63d3463972883efd6bcd18ce93332c6bf2433b1f7e59",
+    "assets/rooms/_shared/fx/validation.json": "9162337b974dddc2d9854b7e02c09a3e87c4f1283950535d1d188fc52408c3d1",
+    "assets/rooms/_shared/fx/flame_strip.png": "58e86c18c95b957259ea68e8bf8847aa34ced94819fe88241539b5f30d57ff58",
+    "assets/rooms/_shared/fx/spark.png.import": "7243f2b6e0ebf0eb1f44030c943575d8400972ead432c07a9112251ee513519e",
+    "assets/rooms/_shared/fx/particle_style.gd": "ed7bc15a18bf39e1333cdf928276948ce4d48c7b9005c9e5cc1ee29b47ab09ff",
+    "assets/rooms/_shared/fx/fx_hearth_fire.gd": "419877833642c91d5496c674d228d2a1d35029e3c218240308bcc45385568259",
+    "assets/rooms/_shared/fx/particle_style.gd.uid": "3c8474b312f720e198166e70a1751d3509a0a3421fd813869d9e89ceaf48222d",
+    "assets/rooms/blacksmith_shop/back_tool_bench.glb": "090105921f1727c359d0fdd4d3b15d20ce38ed9a81316968bc7f42bb3e2a2466",
+    "assets/rooms/blacksmith_shop/bench_vise.glb": "53ca83afc2295272ed499f45b7cd36643518f01404799c3cf807acfc4e4a5867",
+    "assets/rooms/blacksmith_shop/room_albedo_ao.png": "bbcf3f147ec30df8fbd8f4e47ea732479fdc9f5642c9cae47ab2e06cbb06f701"
+  },
+  "after": {
+    "assets/rooms/_shared/fx/spark.png": "c5b2a521157c111e818b19eb0a388c9f570d5fcbc753b2da73151b04cbbf5900",
+    "assets/rooms/_shared/fx/flame_strip.png.import": "128d638301342ad8965633e063d6d0b953b2ffde5f56a19ffac6daf0176addef",
+    "assets/rooms/_shared/fx/fx_hearth_fire.tscn": "31efd4d0180d6f5068c4489375262663a39dc2416daff2f8e000329ac4839840",
+    "assets/rooms/_shared/fx/fx_hearth_fire.gd.uid": "66855b81853ed0905f3a63d3463972883efd6bcd18ce93332c6bf2433b1f7e59",
+    "assets/rooms/_shared/fx/validation.json": "9162337b974dddc2d9854b7e02c09a3e87c4f1283950535d1d188fc52408c3d1",
+    "assets/rooms/_shared/fx/flame_strip.png": "58e86c18c95b957259ea68e8bf8847aa34ced94819fe88241539b5f30d57ff58",
+    "assets/rooms/_shared/fx/spark.png.import": "7243f2b6e0ebf0eb1f44030c943575d8400972ead432c07a9112251ee513519e",
+    "assets/rooms/_shared/fx/particle_style.gd": "ed7bc15a18bf39e1333cdf928276948ce4d48c7b9005c9e5cc1ee29b47ab09ff",
+    "assets/rooms/_shared/fx/fx_hearth_fire.gd": "419877833642c91d5496c674d228d2a1d35029e3c218240308bcc45385568259",
+    "assets/rooms/_shared/fx/particle_style.gd.uid": "3c8474b312f720e198166e70a1751d3509a0a3421fd813869d9e89ceaf48222d",
+    "assets/rooms/blacksmith_shop/back_tool_bench.glb": "090105921f1727c359d0fdd4d3b15d20ce38ed9a81316968bc7f42bb3e2a2466",
+    "assets/rooms/blacksmith_shop/bench_vise.glb": "53ca83afc2295272ed499f45b7cd36643518f01404799c3cf807acfc4e4a5867",
+    "assets/rooms/blacksmith_shop/room_albedo_ao.png": "bbcf3f147ec30df8fbd8f4e47ea732479fdc9f5642c9cae47ab2e06cbb06f701"
+  },
+  "all_byte_identical": true,
+  "workbench": "工作台未改动",
+  "fire": "Approved fire script, scene, textures and shared helper byte-identical."
+}
