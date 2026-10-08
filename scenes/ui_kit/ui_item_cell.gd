@@ -61,6 +61,7 @@ const _KITCHEN_TAG := Vector2(1.4, 1.4)                 # Lv4 lock tag: 3 px sid
 const _KITCHEN_TAG_PAD := 3.0
 const _KITCHEN_TAG_RADIUS := 5.0
 const _KITCHEN_TAG_GLYPH := 8.0
+const _KITCHEN_RACK_STROKE := 0.6                        # Rack tag (Show rack, 226 e8e5617a): surface, 0.6 border
 const _KITCHEN_CHIP := Vector2(6.4, 35.4)               # Tasted chip: 4 px side padding, radius 6
 const _KITCHEN_CHIP_PAD := 4.0
 const _KITCHEN_CHIP_RADIUS := 6.0
@@ -96,6 +97,9 @@ var status := "": set = set_status
 var marked := false: set = set_marked
 ## KITCHEN only; DEFAULT keeps the plain behaviour above (status label, mark when selected or marked).
 var kitchen_state: KitchenState = KitchenState.DEFAULT: set = set_kitchen_state
+## KITCHEN only: a seasoning held on the Spice Rack (Show rack): a `Rack` tag top-left where the Lv4 lock sits, and
+## no rarity dot (q(46); An Qi La, 226 e8e5617a). The quantity is the stored count.
+var rack := false: set = set_rack
 
 ## Milliseconds for the arbiter; tests inject a fake clock.
 var clock := Callable(Time, &"get_ticks_msec")
@@ -116,6 +120,7 @@ var _silhouette: TextureRect
 var _dots: TextureRect
 var _star: Panel
 var _tag: PanelContainer
+var _rack_tag: PanelContainer
 var _tag_label: Label
 var _chip: PanelContainer
 var _chip_label: Label
@@ -147,6 +152,7 @@ func set_role(v: String) -> void: role = v; _refresh()
 func set_status(v: String) -> void: status = v; _refresh()
 func set_marked(v: bool) -> void: marked = v; _refresh()
 func set_kitchen_state(v: KitchenState) -> void: kitchen_state = v; _refresh()
+func set_rack(v: bool) -> void: rack = v; _refresh()
 
 func _gui_input(event: InputEvent) -> void:
 	_emit(_arbiter.feed(event, clock.call()))
@@ -286,6 +292,13 @@ func _build_kitchen_extras() -> void:
 	row.add_child(_tag_label)
 	_tag.add_child(row)
 	_surface.add_child(_tag)
+	_rack_tag = PanelContainer.new()
+	_rack_tag.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_rack_tag.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_SURFACE, _KITCHEN_TAG_RADIUS, UiTokens.COLOR_BORDER,
+		_KITCHEN_RACK_STROKE).with_margins(_KITCHEN_TAG_PAD, 0.0, _KITCHEN_TAG_PAD, 0.0))
+	_rack_tag.position = _KITCHEN_TAG
+	_rack_tag.add_child(UiKit.label("Rack", UiTokens.STYLE_C9_B, UiTokens.COLOR_SECONDARY))
+	_surface.add_child(_rack_tag)
 	_chip = _pill_tag(UiTokens.COLOR_SURFACE_RAISED, UiTokens.COLOR_BORDER, _KITCHEN_CHIP_RADIUS, _KITCHEN_CHIP_PAD)
 	_chip.position = _KITCHEN_CHIP
 	_chip_label = UiKit.label("Tasted", UiTokens.STYLE_C9_B, UiTokens.COLOR_SECONDARY)
@@ -356,7 +369,7 @@ func _refresh() -> void:
 			_surface.add_theme_stylebox_override(&"panel", _cell_box(s, UiTokens.RADIUS_INVENTORY_CELL))
 			_pill.visible = quantity != "" and not empty
 			_qty.text = quantity
-			_dot.visible = rarity > 0 and not empty
+			_dot.visible = rarity > 0 and not empty and not (density == Density.KITCHEN and rack)
 			if rarity > 0:
 				_dot.add_theme_stylebox_override(&"panel", UiStyleBox.make(RARITY_COLORS[clampi(rarity - 1, 0, 3)], UiTokens.SIZE_RARITY_DOT * 0.5))
 			if density == Density.KITCHEN: _refresh_kitchen(s, empty)
@@ -382,6 +395,7 @@ func _refresh_kitchen(s: State, empty: bool) -> void:
 	_place(_dots, 0.0, dots.position.x, dots.position.y, dots.size.x, dots.size.y)
 	_star.visible = k == KitchenState.MASTERED
 	_tag.visible = k == KitchenState.LOCKED
+	_rack_tag.visible = rack and not empty and k in [KitchenState.DEFAULT, KitchenState.IN_POT]
 	_tag_label.text = status if status != "" else "Lv4"
 	_chip.visible = k == KitchenState.TASTED
 	_pill.visible = _pill.visible and k in [KitchenState.DEFAULT, KitchenState.HIDDEN, KitchenState.CLUED, KitchenState.MASTERED,

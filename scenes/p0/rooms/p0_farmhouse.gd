@@ -108,6 +108,12 @@ func p0_open_kitchen(tab := "cookbook") -> void:
 	walk_to(STOVE, func(): open_stove(tab))
 
 ## Returns true when the kitchen shows the result itself (the runtime then skips its old dish card).
+## Floats rise over the plate while the pot's result is on screen (COOK-4: the XP chip above the plate), else over
+## the player as in any room.
+func p0_anchor() -> Vector2:
+	if kitchen and kitchen.phase in ["serve", "card"]: return get_viewport().get_visible_rect().size * Vector2(0.5, P0Kitchen.FLOAT_AT)
+	return super()
+
 func p0_event(ev: Dictionary, v: Dictionary) -> bool:
 	if kitchen == null: return false
 	match str(ev.get("kind", "")):

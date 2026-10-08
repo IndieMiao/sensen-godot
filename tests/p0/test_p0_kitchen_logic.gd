@@ -318,7 +318,7 @@ func test_experiment_lists_the_spice_racks_stored_seasonings() -> void:
 	var salt: Array = P0KitchenLogic.experiment_items(v, []).filter(func(i): return i.id == "rock_salt")
 	assert_int(salt.size()).is_equal(1)
 	assert_int(salt[0].qty).is_equal(12)
-	assert_str(salt[0].status).is_equal("Rack")   # q(46): real count, a Rack tag
+	assert_bool(salt[0].rack).is_true()   # q(46): real count, a Rack tag (Show rack)
 	assert_bool(P0KitchenLogic.can_add(v, ["fish_crucian"], "rock_salt")).is_true()
 	assert_array(P0KitchenLogic.experiment_items(v, [], "Fish").map(func(i): return i.id)).not_contains(["rock_salt"])
 	assert_array(P0KitchenLogic.experiment_items(v, [], "Seasoning").map(func(i): return i.id)).contains(["rock_salt"])
@@ -335,7 +335,7 @@ func test_a_mix_that_failed_before_says_tried_before() -> void:
 	var v := _view()
 	v.cooking["mishaps"] = [{"items": ["crop_radish", "crop_radish"], "n": 1, "at": 0}]
 	assert_bool(P0KitchenLogic.tried(v, ["crop_radish", "crop_radish"])).is_true()
-	assert_str(P0KitchenLogic.preview(v, ["crop_radish", "crop_radish"]).title).is_equal("Unknown dish")   # the note is beside it
+	assert_str(P0KitchenLogic.preview(v, ["crop_radish", "crop_radish"]).title).is_equal("Tried before")
 	assert_bool(P0KitchenLogic.tried(v, ["crop_radish"])).is_false()
 	assert_str(P0KitchenLogic.preview(v, ["crop_radish", "fish_koi"]).title).is_equal("Unknown dish")
 

@@ -24,6 +24,7 @@ const SLOT_GAP := 8.0
 const WATCH_SHEET_H := 196.0      # COOK-3 sheet: dish, Cooking, m:ss remaining, the heat hint
 const CLOSE_GAP := 6.0            # × sits this far above the sheet's top edge (COOK-3: 554 → 604)
 const CARD_TOP := 0.425           # RewardMoment top at 340 of 800 (COOK-4)
+const FLOAT_AT := 0.205           # result floats (XP) rise from just above the plate: COOK-4 chip at y 150–176 of 800
 const PLATE := preload("res://assets/p0/kitchen/reveal/plate.svg")
 const CookAgainSheet := preload("res://scenes/p0/kitchen/p0_cook_again_sheet.gd")
 const SPARKLE := preload("res://assets/p0/kitchen/reveal/sparkle.svg")
@@ -269,7 +270,6 @@ func _after_pot_change() -> void:
 	drawer.pot = pot
 	drawer.refresh()
 	_refresh_overlay()
-	if P0KitchenLogic.tried(rt.session.current(), pot): rt.ui.toast("Tried before · still a Mystery Dish")
 
 func _on_cook(cmd: Dictionary) -> void:
 	if _cook_sent: return

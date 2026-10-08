@@ -300,6 +300,7 @@ static func _cells_kitchen() -> Control:
 	row.add_child(_captioned(_cell(D, {kitchen_state = K.LOCKED}), "locked"))
 	row.add_child(_captioned(_cell(D, {icon = _tex("fish_crucian"), quantity = "×2", rarity = 1, kitchen_state = K.IN_POT}), "in pot"))
 	row.add_child(_captioned(_cell(D, {icon = _tex("fish_crucian"), rarity = 1, kitchen_state = K.IN_POT}), "in pot · last one"))
+	row.add_child(_captioned(_cell(D, {icon = _tex("crop_herb"), quantity = "×12", rarity = 1, rack = true}), "rack"))
 	row.add_child(_captioned(_cell(D, {icon = _tex("fish_koi"), rarity = 3, kitchen_state = K.NOT_FOR_COOKING}), "not for cooking"))
 	return row
 

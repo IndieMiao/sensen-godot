@@ -153,12 +153,15 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	var xp_lines: Array = []
 	last_first_catch_xp = 0
 	var settles_catch := events.any(func(e): return str(e.get("kind", "")) == "catch")
+	var first_cook_xp: Array = []   # the first-cook bonus is on the result card's strip, not a float (Li Bai, int6 C11)
+	var good_pot := events.any(func(e): return str(e.get("kind", "")) == "dish" and int(e.get("quality", 0)) >= 1)
 	for i in events.size():
 		var ev: Dictionary = events[i]
 		match str(ev.get("kind", "")):
 			"xp":
 				# The server emits a first-time bonus as `first` immediately followed by its `xp`.
 				var bonus: bool = i > 0 and str(events[i - 1].get("kind", "")) == "first" and int(events[i - 1].xp) == int(ev.amount)
+				if bonus and str(ev.skill) == "cooking": first_cook_xp.append(ev)
 				if int(ev.amount) > 0 and not bonus:
 					xp_lines.append("+%d %s XP" % [int(ev.amount), str(ev.skill).capitalize()] + ("" if int(ev.percent) >= 100 else " · %d%%" % int(ev.percent)))
 			"reward":
@@ -183,8 +186,11 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				if settles_catch and str(ev.get("reason", "")) in ["refund", "line_in"]: continue
 				ui.float_text(("%+d Energy" % dlt).replace("-", "−"), at + Vector2(0, dy), Color("d9772f") if dlt < 0 else Color("4f934b"))
 			"xp":
-				if int(ev.amount) > 0:
-					ui.float_text("+%d XP" % int(ev.amount) + ("" if int(ev.percent) >= 100 else " · %d%%" % int(ev.percent)), at + Vector2(0, dy), Color("1e9bb0"))
+				if int(ev.amount) > 0 and not first_cook_xp.any(func(x): return is_same(x, ev)):
+					# A pot's own XP names its track and a Good / Perfect pot's star: +5 Cooking XP ★ (§4.8.6 / §7.2.2).
+					var cook := str(ev.skill) == "cooking"
+					var text := ("+%d Cooking XP" % int(ev.amount) + (" ★" if good_pot else "")) if cook else "+%d XP" % int(ev.amount)
+					ui.float_text(text + ("" if int(ev.percent) >= 100 else " · %d%%" % int(ev.percent)), at + Vector2(0, dy), Color("1e9bb0"))
 			"item":
 				var iid := str(ev.id)
 				if iid.begins_with("dish_"): _call("p0_event", [ev, v])   # where a collected dish went (the kitchen's Keep toast)

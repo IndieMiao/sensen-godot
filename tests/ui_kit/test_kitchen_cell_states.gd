@@ -98,3 +98,14 @@ func test_in_pot_names_itself_only_once_none_is_left() -> void:
 	await _settle()
 	assert_bool(_texts(none).has("In pot")).is_true()
 
+func test_a_rack_seasoning_shows_the_rack_tag_and_no_rarity_dot() -> void:
+	var salt := load("res://assets/p0/icons/fish_crucian.svg")
+	var c := _cell({icon = salt, quantity = "×12", rarity = 1, rack = true})
+	await _settle()
+	assert_array(_texts(c)).contains(["Rack", "×12"])
+	var dots := c.find_children("*", "Panel", true, false).filter(func(p): return p.is_visible_in_tree() and p.size == Vector2(UiTokens.SIZE_RARITY_DOT, UiTokens.SIZE_RARITY_DOT))
+	assert_array(dots).is_empty()
+	var plain := _cell({icon = salt, quantity = "×12", rarity = 1})
+	await _settle()
+	assert_array(_texts(plain)).not_contains(["Rack"])
+

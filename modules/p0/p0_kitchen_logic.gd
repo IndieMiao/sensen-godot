@@ -189,7 +189,7 @@ static func experiment_items(view_: Dictionary, pot: Array, chip := "All") -> Ar
 		var in_pot := pot.count(id)
 		out.append({id = id, icon = P0Logic.icon(id), qty = int(totals[id]) - in_pot, rarity = int(info.get("rarity", 1)),
 			kitchen_state = K.NOT_FOR_COOKING if ornamental else (K.IN_POT if in_pot > 0 else K.DEFAULT),
-			marked = in_pot > 0, cookable = cookable, status = "Rack" if racked.has(id) and in_pot == 0 else ""})
+			marked = in_pot > 0, cookable = cookable, rack = racked.has(id)})
 	return out
 
 ## Whether one more `id` can go in the pot: a free slot and one left in the bag.
@@ -223,11 +223,11 @@ static func preview(view_: Dictionary, pot: Array) -> Dictionary:
 		var derive: Array = cooking(view).get("derive", [[1, 2, 3], [2, 3, 3], [3, 3, 4], [4, 4, 4]])
 		rarity = int(derive[clampi(top - 1, 0, derive.size() - 1)][clampi(fams.size(), 1, 3) - 1])
 	var t: Dictionary = cooking(view).get("tiers", {}).get(str(rarity), {})
-	return {title = str(known.name) if not known.is_empty() else "Unknown dish", state = P0Logic.rarity_name(view, rarity),
-		time = "%d s" % (int(t.get("ms", 5000)) / 1000)}
+	var title := str(known.name) if not known.is_empty() else ("Tried before" if tried(view, pot) else "Unknown dish")
+	return {title = title, state = P0Logic.rarity_name(view, rarity), time = "%d s" % (int(t.get("ms", 5000)) / 1000)}
 
-## This exact mix already failed (S5 Kitchen Mishaps): §7.2.7 notes "Tried before · still a Mystery Dish" beside the
-## capsule, which stays as it is (Li Bai on the int6 list); the pot may still cook it.
+## This exact mix already failed (S5 Kitchen Mishaps, §7.2.7): the capsule's title reads Tried before and a line above
+## the Cook row says "Tried before · still a Mystery Dish" (An Qi La, 226 e8e5617a); the pot may still cook it.
 static func tried(view: Dictionary, pot: Array) -> bool:
 	if pot.is_empty(): return false
 	var mine := pot.map(func(i): return str(i))
