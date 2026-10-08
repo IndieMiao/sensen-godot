@@ -274,3 +274,22 @@ func test_energy_panel_shows_use_as_count_tiles_and_the_blessing() -> void:
 	assert_array(_labels(p)).contains(["Max 200", "Newcomer Blessing · 5 days left"])
 	assert_int(p.find_children("*", "Button", true, false).size()).is_equal(0)
 	assert_float(p.size.x).is_equal(float(UiTokens.SIZE_ENERGY_PANEL_W))
+
+## TUT-3-03B (1410:104474): next to Show on map a long sentence wraps to two lines and the row grows; only a third
+## line would be cut; the row grows when the text needs it. A short row keeps the 40 px main height.
+func test_today_row_wraps_to_two_lines_beside_a_wide_pill() -> void:
+	var p: UiTodayPanel = _host(UiTodayPanel.new([
+		{line = "Catch 2 Pond Crucian · Reed Pond", action = "Show on map"},
+		{line = "Cook it: Grilled Crucian", action = "Show"},
+	]))
+	await _settle()
+	var lines := p.find_children("*", "Label", true, false).filter(func(l): return (l as Label).text.begins_with("Catch") or (l as Label).text.begins_with("Cook it"))
+	var long: Label = lines[0]
+	var short: Label = lines[1]
+	assert_int(long.get_line_count()).is_equal(2)
+	assert_int(long.get_visible_line_count()).is_equal(2)
+	assert_int(short.get_line_count()).is_equal(1)
+	assert_float((short.get_parent().get_parent() as Control).size.y).is_equal(float(UiTokens.SIZE_TODAY_ROW_H))
+	# both lines fit: the row is at least as tall as the two-line text (two BodyXB14 lines fit the 40 px row)
+	assert_float((long.get_parent().get_parent() as Control).size.y).is_greater_equal(long.size.y)
+	assert_float(long.size.y).is_greater(short.size.y)

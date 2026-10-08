@@ -137,6 +137,8 @@ func _process(dt: float) -> void:
 		_teach_left -= dt
 		if _teach_left <= 0.0: _hide_tip()
 	# q(49): a waiting TipCard comes up only when no RewardMoment / result card is on screen; one already up stays.
+	# TODO(SGODOT-232 U6): call tips.moment_opened / moment_closed from UiRewardMoment / MomentBanner once #24 lands;
+	# until then the result cards (modal_kind "card") stand in for them.
 	if tips and modal_kind != "card":
 		var key := tips.next()
 		if key != "": _show_tip(str(P0Guide.TIPS[key]))
@@ -1399,24 +1401,29 @@ func open_radial() -> void:
 
 ## Today panel (§14.5, LOCK-06): at most three rows right under the HUD chips; Show only moves the camera.
 ## rows: Today's own (P0Logic.today_rows) unless given, e.g. P0Guide.free_now after the Energy card's Free to do now.
-## go "map" / "map:<place>" is a place on the map: `Show on map` leaves for it (the pin focus comes with MAP-1).
+## go "map" / "pond:<id>" / "outpost:<role>" is a place on the map: `Show on map` leaves for it (pin focus with MAP-1;
+## SGODOT-225 #37 brings show_on_map(target), which this switches to once merged).
 func open_today(given: Array = []) -> void:
 	var rows := given if not given.is_empty() else P0Logic.today_rows(view)
 	var shown := rows.map(func(r):
 		var d: Dictionary = r.duplicate()
 		d.icon = P0Logic.icon(str(r.icon))
 		var go := str(r.go)
-		d.action = "Show on map" if go.begins_with("map") and surface != "map" else ("Show" if go != "" and not go.begins_with("map") and spot_reachable() else "")
+		var on_map := _map_target(go)
+		d.action = "Show on map" if on_map and surface != "map" else ("Show" if go != "" and not on_map and spot_reachable() else "")
 		return d)
 	var panel := UiTodayPanel.new(shown)
 	panel.theme = UiKit.theme()
 	panel.position = Vector2(UiTokens.SIZE_TODAY_PANEL_X, UiTokens.SIZE_TODAY_PANEL_Y + safe_top())
 	panel.show_pressed.connect(func(i: int):
 		close_modal()
-		if str(rows[i].go).begins_with("map"): place_pressed.emit()
+		if _map_target(str(rows[i].go)): place_pressed.emit()
 		else: show_spot.emit(str(rows[i].go)))
 	_open_modal(panel, 0.0)
 	modal_kind = "today"
+
+static func _map_target(go: String) -> bool:
+	return go == "map" or go.begins_with("pond:") or go.begins_with("outpost:")
 
 ## Whether a Show can move the camera in the current world (the pond has no camera targets yet).
 func spot_reachable() -> bool:

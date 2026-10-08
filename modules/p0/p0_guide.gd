@@ -105,7 +105,8 @@ static func page(view: Dictionary, id: String) -> Dictionary:
 # ---------------------------------------------------------------- Today rows
 
 ## Rows that lead Today (§14.2, §14.3, q(46)); P0Logic.today_rows puts them first and fills up to 3 from its own.
-## A row is {line, icon, go, state, tail} like P0Logic._row; go "map:<place>" asks for Show on map at that pin.
+## A row is {line, icon, go, state, tail, focus} like P0Logic._row; go "pond:<id>" (and "outpost:<role>", "map") is a
+## place on the map: Show on map there (the map's targets, SGODOT-225 #37).
 static func lead_rows(view: Dictionary) -> Array:
 	var rows: Array = []
 	var t := tutorial(view)
@@ -119,7 +120,7 @@ static func lead_rows(view: Dictionary) -> Array:
 		var fish := P0Logic.item_name(view, str(t.item))   # fish names take no plural s
 		if int(t.get("have", 0)) >= qty: rows.append(_row("Deliver %d %s · Stall" % [qty, fish], str(t.item), "stall"))
 		else: rows.append(_row("Catch %d %s · %s" % [qty, fish, _place_name(view, BEGINNER_POND)], str(t.item),
-			"map:" + BEGINNER_POND))   # the pond is elsewhere: Show on map (q(31)); the stall's "!" asks to take it
+			"pond:" + BEGINNER_POND))   # the pond is elsewhere: Show on map (q(31)); the stall's "!" asks to take it
 	elif first:
 		var done := _row("Deliver 2 %s · Stall" % P0Logic.item_name(view, "fish_crucian"), "fish_crucian", "stall")
 		done.state = "done"

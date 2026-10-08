@@ -84,9 +84,9 @@ func test_tip_queue_waits_for_moments_and_shows_each_tip_once() -> void:
 func test_first_session_rows_follow_the_director_table() -> void:
 	var v := _view({"plots": _plots(["growing"])})
 	assert_that(_lines(Guide.lead_rows(v))).is_equal(["Catch 2 Pond Crucian · Reed Pond", "Cook it: Grilled Crucian"])
-	assert_str(Guide.lead_rows(v)[0].go).is_equal("map:pond_shanghai_05")   # Show on map (q(31)); the stall's "!" takes it
+	assert_str(Guide.lead_rows(v)[0].go).is_equal("pond:pond_shanghai_05")   # Show on map (q(31)); the stall's "!" takes it
 	v.stall.board.requests[0].status = "accepted"
-	assert_str(Guide.lead_rows(v)[0].go).is_equal("map:pond_shanghai_05")   # Show on map at Reed Pond
+	assert_str(Guide.lead_rows(v)[0].go).is_equal("pond:pond_shanghai_05")   # Show on map at Reed Pond
 	# q(58): two in the creel → Deliver at the stall, not ticked, and it has the focus
 	v.stall.board.requests[0].have = 2
 	var rows := Guide.lead_rows(v)
