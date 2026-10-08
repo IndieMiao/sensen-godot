@@ -28,7 +28,8 @@ var online_available := false
 func _ready() -> void:
 	client = ApiClient.new(base_url(), ApiClient.make_http_transport(self))
 	session = FarmSession.new(client)
-	if not is_test_process():
+	# The P0 demo build (feature p0, SGODOT-232 D2) is a separate game on the P0 server: never sign in to Journey.
+	if not is_test_process() and not OS.has_feature("p0"):
 		call_deferred("boot")
 
 static func is_test_process() -> bool:
