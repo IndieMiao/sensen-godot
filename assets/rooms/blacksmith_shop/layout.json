@@ -747,7 +747,7 @@
     ],
     "points": []
   },
-  "revision": "R2.3",
+  "revision": "R2.4",
   "shared_plants": [
     {
       "name": "LeftPothos",
@@ -1400,8 +1400,8 @@
           0.72,
           -0.04
         ],
-        "start_size": 0.3,
-        "end_size": 1.9
+        "start_size": 1.2,
+        "end_size": 2.6
       }
     }
   ]

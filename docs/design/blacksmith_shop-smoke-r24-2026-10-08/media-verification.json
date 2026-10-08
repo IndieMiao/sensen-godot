@@ -1,0 +1,16 @@
+{
+  "clip": "smoke-motion.mp4",
+  "sha256": "61400eddf019383cd5fd0c7d8d0e5146d6addd366796b2723224d468884348b6",
+  "duration_seconds": 8,
+  "accelerated": false,
+  "sample_times": [
+    0.25,
+    4,
+    7.5
+  ],
+  "sampled_black_frames": 0,
+  "pixel_motion": [
+    2.022294921875,
+    1.3314409722222222
+  ]
+}

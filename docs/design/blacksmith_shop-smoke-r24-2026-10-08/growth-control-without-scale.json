@@ -1,0 +1,17 @@
+{
+  "billboard_keep_scale": false,
+  "control": "One stationary puff; fixed frame/angle/size randomness; same production material and scale/alpha curves",
+  "early_bbox_px": [
+    94,
+    82
+  ],
+  "early_seconds": 0.24,
+  "nominal_final_start_ratio": 2.16666666666667,
+  "passed": false,
+  "upper_bbox_px": [
+    94,
+    82
+  ],
+  "upper_seconds": 2.6,
+  "width_ratio": 1.0
+}

@@ -1,0 +1,19 @@
+{
+  "texture_opaque_median_rgb": [
+    231.0,
+    228.0,
+    221.0
+  ],
+  "texture_opaque_90th_rgb": [
+    245.0,
+    243.0,
+    238.0
+  ],
+  "rendered_bright_puff_median_rgb": [
+    246.0,
+    244.0,
+    242.0
+  ],
+  "scope": "Texture interior and one-puff control highlights; not registered concept pixel-fidelity measurement.",
+  "material_albedo": "white, no HDR gain; removes R2.3 cool-grey multiplication"
+}

@@ -1,0 +1,60 @@
+{
+  "device": "AMD Custom GPU 0405 (RADV VANGOGH)",
+  "draw_calls": 19.0,
+  "instances": 52,
+  "renderer": "mobile",
+  "resolution": [
+    1400,
+    1400
+  ],
+  "scope": "offline art render; no mobile/gameplay/performance acceptance",
+  "slug": "blacksmith_shop",
+  "static_surfaces": 18,
+  "views": [
+    {
+      "draw_calls": 23.0,
+      "rendered_objects": 23.0,
+      "view": "godot-whole"
+    },
+    {
+      "draw_calls": 23.0,
+      "rendered_objects": 23.0,
+      "view": "model-front"
+    },
+    {
+      "draw_calls": 23.0,
+      "rendered_objects": 23.0,
+      "view": "model-side"
+    },
+    {
+      "draw_calls": 23.0,
+      "rendered_objects": 23.0,
+      "view": "model-top"
+    },
+    {
+      "draw_calls": 17.0,
+      "rendered_objects": 17.0,
+      "view": "godot-detail"
+    },
+    {
+      "draw_calls": 17.0,
+      "rendered_objects": 17.0,
+      "view": "godot-detail-plants"
+    },
+    {
+      "draw_calls": 16.0,
+      "rendered_objects": 16.0,
+      "view": "forge-fire-detail"
+    },
+    {
+      "draw_calls": 5.0,
+      "rendered_objects": 5.0,
+      "view": "smoke-detail"
+    },
+    {
+      "draw_calls": 19.0,
+      "rendered_objects": 19.0,
+      "view": "tools-bench-detail"
+    }
+  ]
+}
