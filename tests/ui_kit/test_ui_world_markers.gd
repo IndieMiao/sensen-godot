@@ -139,3 +139,44 @@ func test_new_copy_keeps_the_pointer_on_the_facility() -> void:
 	t.text = "Tap to cook · Stove 1/3"
 	await _settle()
 	assert_float(t.pointer_tip_x()).is_equal(30.0)
+
+# ---------------------------------------------------------------- entry card (SGODOT-231, EntryCard 1468:94344)
+
+func test_entry_card_matches_the_main() -> void:
+	var c := _host(UiEntryCard.new("New run · 2 Energy", "Current run will end · Runs today 1/2")) as UiEntryCard
+	await _settle()
+	assert_float(c._card.size.y).is_between(50.0, 58.0)     # main 54 high: 8 + 13 × 1.35 + 2 + 11 + 9
+	assert_float(c._card.size.x).is_between(200.0, 240.0)    # hugs the copy, 220 in the main
+	assert_bool(c._caption.visible).is_true()
+	assert_object(c._action.get_theme_color(&"font_color")).is_equal(UiTokens.COLOR_PRIMARY)
+	assert_float(c.pointer_tip_x()).is_equal_approx(c._card.size.x * 0.5, 0.5)
+	assert_float(c.get_combined_minimum_size().y).is_equal(c._card.size.y + UiTokens.SIZE_POINTER_H)
+
+func test_unavailable_entry_card_writes_the_reason_and_drops_the_caption() -> void:
+	var c := _host(UiEntryCard.new("New run · Clear Floor 2 first", "Current run will end", UiEntryCard.State.UNAVAILABLE)) as UiEntryCard
+	await _settle()
+	assert_bool(c._caption.visible).is_false()
+	assert_object(c._action.get_theme_color(&"font_color")).is_equal(UiTokens.COLOR_SECONDARY)
+	c.state = UiEntryCard.State.AVAILABLE
+	c.amber = true
+	assert_object(c._action.get_theme_color(&"font_color")).is_equal(UiTokens.COLOR_WARNING)
+
+func test_entry_card_pointer_right_sits_21_px_in() -> void:
+	var c := _host(UiEntryCard.new("New run · 2 Energy", "Current run will end · Runs today 1/2")) as UiEntryCard
+	await _settle()
+	var w := c._card.size.x
+	c.point_at(w + 80.0)
+	assert_float(c.pointer_tip_x()).is_equal(w - 21.0 - 7.0)   # Pointer=Right: box 21 px in from the right
+	c.point_at(-80.0)
+	assert_float(c.pointer_tip_x()).is_equal(21.0 + 7.0)
+
+func test_entry_card_is_one_button_that_ignores_drags() -> void:
+	var c := _host(UiEntryCard.new("New run · 2 Energy")) as UiEntryCard
+	var hits := [0]
+	c.pressed.connect(func(): hits[0] += 1)
+	c._on_input(_mouse(Vector2(30, 12), true))
+	c._on_input(_mouse(Vector2(32, 14), false))
+	assert_int(hits[0]).is_equal(1)
+	c._on_input(_mouse(Vector2(30, 12), true))
+	c._on_input(_mouse(Vector2(30 + GestureArbiter.TAP_SLOP + 1, 12), false))
+	assert_int(hits[0]).is_equal(1)

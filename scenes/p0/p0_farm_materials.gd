@@ -15,9 +15,7 @@ const SPOTS := ["spot_grove", "spot_rock_pile", "spot_reed_bank", "spot_clay_ban
 var farm: Node3D                # p0_farm.gd: actor, cam
 var rt: P0Runtime
 var mouth := Vector3.ZERO
-var _entry: PanelContainer
-var _entry_button: Button
-var _entry_line: Label
+var _entry: UiEntryCard
 var _entry_cmd := {}
 var _entry_card := {}
 var _reset_shown := 0.0
@@ -105,15 +103,20 @@ func frame(v: Dictionary, card := "") -> void:
 	var entry := P0MaterialLogic.mine_entry_card(v)
 	_entry.visible = near and bool(entry.get("show", false)) and not rt.ui.has_modal()
 	if _entry.visible:
-		_entry_button.text = str(entry.label)
-		# LOCK-10: a greyed EntryCard still takes the press and says why (苏烈, #39), so it is never `disabled`.
-		_entry_button.add_theme_color_override("font_color", P0Ui.GREEN_D if bool(entry.enabled) else UiTokens.COLOR_DISABLED_INK)
+		# LOCK-10: a greyed EntryCard still takes the press and says why (苏烈, #39), so it is never disabled.
+		_entry.state = UiEntryCard.State.AVAILABLE if bool(entry.enabled) else UiEntryCard.State.UNAVAILABLE
+		_entry.amber = bool(entry.get("amber", false))
+		_entry.action = str(entry.label)
+		_entry.caption = str(entry.line2)
 		_entry_card = entry
-		_entry_line.text = str(entry.line2)
-		_entry_line.visible = _entry_line.text != ""
 		_entry_cmd = entry.cmd
-		_entry.reset_size()
-		_entry.position = top - Vector2(_entry.size.x * 0.5, _entry.size.y + 30)
+		# Placed as TapCard: the pointer tip on the gate, kept inside the screen, the pointer still on the gate.
+		var size := _entry.get_combined_minimum_size()
+		var area := Rect2(Vector2.ZERO, rt.ui.root.size)
+		var r := WorldAnchor.place(size, top - Vector2(0, UiTokens.SPACE_WITHIN), area, UiTokens.SPACE_WITHIN, true)
+		_entry.size = size
+		_entry.position = r.position
+		_entry.point_at(top.x - r.position.x)
 	if near:
 		var notice := P0MaterialLogic.reset_notice(v, _reset_shown)
 		if notice != "":
@@ -200,26 +203,12 @@ func _on_state(v: Dictionary, events: Array) -> void:
 			get_tree().create_timer(1.0).timeout.connect(func(): _opening = false)
 			return
 
-## EntryCard (1468:94344, MINE-P0-5): over the mouth, only near it, only with an unfinished run; one secondary text
-## button (New run · 2 Energy, green; grey with the reason when it can't) and its small line.
+## EntryCard (UiEntryCard, 1468:94344, MINE-P0-5): over the mouth, only near it, only with an unfinished run; the
+## whole card is the button (New run · 2 Energy + its consequence; grey with the reason when it can't).
 func _build_entry_card() -> void:
-	_entry = PanelContainer.new()
-	_entry.mouse_filter = Control.MOUSE_FILTER_STOP
-	_entry.add_theme_stylebox_override("panel", rt.ui._box(P0Ui.CARD, 12, P0Ui.EDGE, 1, Vector4(10, 6, 10, 6)))
-	var v := VBoxContainer.new()
-	v.add_theme_constant_override("separation", 2)
-	_entry.add_child(v)
-	_entry_button = Button.new()
-	_entry_button.flat = true
-	_entry_button.focus_mode = Control.FOCUS_NONE
-	_entry_button.add_theme_font_size_override("font_size", 12)
-	_entry_button.add_theme_color_override("font_color", P0Ui.GREEN_D)
-	_entry_button.add_theme_color_override("font_disabled_color", UiTokens.COLOR_DISABLED_INK)
-	_entry_button.pressed.connect(_on_entry)
-	v.add_child(_entry_button)
-	_entry_line = rt.ui._label("", 9, UiTokens.COLOR_SECONDARY)
-	_entry_line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	v.add_child(_entry_line)
+	_entry = UiEntryCard.new()
+	_entry.theme = UiKit.theme()   # the P0 root still carries GameUi's theme
+	_entry.pressed.connect(_on_entry)
 	_entry.visible = false
 	rt.ui.root.add_child(_entry)
 
