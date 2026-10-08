@@ -244,6 +244,30 @@ func test_a_bar_without_the_action_family_shows_its_ghost_in_the_first_empty_slo
 	ui.set_view(_view())   # seeds back in the bag: the ghost goes
 	assert_bool(ui._bar.slots.any(func(s): return s.get("ghost", false))).is_false()
 
+func test_the_last_bait_toast_waits_for_the_fishing_panel_and_the_catch_card() -> void:
+	# int5b hand test 10: the bait goes at the reel's settlement, under the fishing panel (layer 30 over this UI);
+	# the toast waits until the pond is back from "busy" and no result card is open.
+	var v := _view()
+	v.bag.slots.append({"id": "bait_worm", "qty": 1})
+	v.names["bait_worm"] = "Worm Bait"
+	ui.set_mode("fish")
+	ui.set_surface("pond")
+	ui.set_view(v)
+	ui._on_slot_tapped("bait_worm")
+	ui._on_pin_toggled("bait_worm", true)
+	ui._toast.hide()   # the hook toast from picking the bait
+	ui.set_surface("busy")   # the fishing presentation
+	v.bag.slots = v.bag.slots.filter(func(s): return s.id != "bait_worm")
+	ui.set_view(v)
+	assert_str(ui.selected_bait).is_empty()
+	assert_bool(ui._toast.visible).is_false()
+	ui.open_inbox()   # stands in for the first-catch card
+	ui.set_surface("pond")
+	assert_bool(ui._toast.visible).is_false()   # the card is still open
+	ui.close_modal()
+	assert_bool(ui._toast.visible).is_true()
+	assert_str(ui._toast.text).is_equal("Out of Worm Bait · no bait on the hook")
+
 func test_the_last_bait_on_a_hook_empties_the_hook_with_a_toast() -> void:
 	# 李白 q(44) ④: casting goes on without bait.
 	var v := _view()
