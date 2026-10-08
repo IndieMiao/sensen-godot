@@ -1,7 +1,7 @@
 class_name UiResidentProfile
 extends VBoxContainer
 ## A resident's profile sheet content (SGODOT-225; RES-PIP 482:586 / RES-KAI 482:592, opened from the name on the
-## dialogue bar, LOCK-18). Scrollable column: ProfileIdentity (80 face centred, name, role) · StateBadge (stage) ·
+## dialogue bar, LOCK-18). Scrollable column: ProfileIdentity (80 round face centred, name, role) · StateBadge (stage) ·
 ## Fact `Friendship 52/90` · ItemRow `Favourite dishes` / style · NavigationRow `Details` (hidden when the host has
 ## no page behind it: nothing dead-ends) — then the fixed decision area with the Dismiss `Back`.
 ## data: {face (Texture2D), name, role, stage, friendship, likes, likes_icon (Texture2D), details (bool)}.
@@ -33,8 +33,21 @@ func _init(data_: Dictionary = {}) -> void:
 	scroll.add_child(col)
 	var identity := VBoxContainer.new()
 	identity.add_theme_constant_override(&"separation", int(_IDENTITY_GAP))
-	var face := UiKit.icon(data.get("face", null), _FACE)
+	# The face cropped round (不知火舞 on 235 B1): the same portrait as the dialogue bar, so one resident looks the same
+	# in both places; the host passes the face square of it.
+	var face := Panel.new()
+	face.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	face.custom_minimum_size = Vector2(_FACE, _FACE)
 	face.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	face.clip_children = CanvasItem.CLIP_CHILDREN_ONLY
+	face.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_TILE_CORE, _FACE * 0.5))
+	var img := TextureRect.new()
+	img.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	img.texture = data.get("face", null)
+	img.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	img.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	img.set_anchors_preset(Control.PRESET_FULL_RECT)
+	face.add_child(img)
 	identity.add_child(face)
 	identity.add_child(UiKit.label(str(data.get("name", "")), UiTokens.STYLE_TITLE_XB20))
 	var role := UiKit.label(str(data.get("role", "")), UiTokens.STYLE_BODY_R14, UiTokens.COLOR_SECONDARY)

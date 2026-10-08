@@ -113,7 +113,6 @@ func _init() -> void:
 	ui.near_resident = func() -> String:   # an outpost's resident within reach (Gift to <Name>, SGODOT-225)
 		return str(world.call("p0_near_resident")) if is_instance_valid(world) and world.has_method("p0_near_resident") else ""
 	ui.place_pressed.connect(_on_place_pressed)
-	ui.home_requested.connect(func(): _leave_then("farm"))
 	ui.tackle_requested.connect(func(): _leave_then("tackle"))
 	session.state_changed.connect(func(_v, _e): _net_ok())   # any answer ends a run of failures (and offline)
 	session.state_changed.connect(_on_state)
@@ -361,6 +360,16 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	# A first's bonus XP is said by its own line, not added into the XP float: the first cook's and catch's on their
 	# card's strip (Li Bai, int6 C11), the first harvest's as `First harvest! +10 XP · Radish` (§4.8.6).
 	var first_cook_xp: Array = []
+	# …the first cook's only when that card comes (a normal serve at the stove); a Queue ×2 turn-over or a pot kept on its
+	# own has none, so it floats a line of its own, `First cooked · +20 Cooking XP` (q(85)). A world without the hook
+	# gives null.
+	var cook_card: bool = _call("p0_cook_card_coming", [events]) == true
+	# Away from the kitchen a pot Queue ×2 kept on its own floats and toasts nothing, its first-cook line, Energy rewards
+	# and XP included (不知火舞 on 226): it is silent there (q(46) / q(71)) and floats rise from their object (q(34)),
+	# which is not on screen. The XP still counts, the Cookbook still marks the page, a level-up keeps its banner.
+	var at_stove: bool = world != null and world.has_method("p0_cook_card_coming")
+	var quiet: Array = [] if at_stove else P0KitchenLogic.auto_kept_events(events)
+	var hushed := func(e: Dictionary) -> bool: return quiet.any(func(q): return is_same(q, e))
 	# A harvest reply's XP counts its plants, so a held harvest reads `+40 XP · 20 plants` (§4.8.3).
 	var plants := events.filter(func(e): return str(e.get("kind", "")) == "item" and str(e.get("id", "")).begins_with("crop_") \
 		and int(e.get("delta", 0)) > 0).size()
@@ -370,6 +379,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	var crafted := events.any(func(e): return str(e.get("kind", "")) == "craft")
 	for i in events.size():
 		var ev: Dictionary = events[i]
+		if hushed.call(ev): continue
 		match str(ev.get("kind", "")):
 			"xp":
 				# The server emits a first-time bonus as `first` immediately followed by its `xp`.
@@ -377,6 +387,8 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				var what := str(events[i - 1].get("what", "")) if bonus else ""
 				if bonus and (str(ev.skill) == "cooking" or what.begins_with("catch:") or what.begins_with("harvest:")):
 					first_cook_xp.append(ev)
+				if what.begins_with("cook:") and not cook_card:
+					floats.append({kind = "first", key = what, text = "First cooked · +%d Cooking XP" % int(ev.amount), tone = UiFloatText.Tone.XP})
 				if what.begins_with("harvest:"):
 					var crop := what.trim_prefix("harvest:")
 					floats.append({kind = "first", key = what, text = "First harvest! +%d XP · %s" % [int(ev.amount),
@@ -402,6 +414,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	var first_level := not before.is_empty() and ["farming", "fishing", "cooking"].all(func(k):
 		return int(before.get("skills", {}).get(k, {}).get("level", 1)) <= 1)
 	for ev in events:
+		if hushed.call(ev) and str(ev.get("kind", "")) not in ["level", "first", "mishap", "queue", "pot", "cabinet", "plate"]: continue
 		match str(ev.get("kind", "")):
 			"energy":
 				var dlt := int(ev.delta)
@@ -570,7 +583,7 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 		"not_ready":
 			ui.toast_error("Not ready yet")
 		"creel_full":
-			ui.toast_error("Creel full · 0 free slots · Sell or cook first", "Open bag")   # FISH-4, §4.8.6
+			ui.toast_creel_full()   # FISH-4, §4.8.6, q(83)
 		"already_casting":
 			ui.toast_error("Your line is already in the water")
 		"no_bait":
@@ -926,7 +939,16 @@ func _dev_shot(dt: float) -> void:
 			"skills": ui.open_skills()
 			"profile": ui.open_profile()
 			"resident": ui.open_resident(step[1] if step.size() > 1 else "res_pip")   # SGODOT-225 dialogue bar
-			"resprofile": ui.open_resident_profile(ui._resident)                     # its name → profile sheet
+			"creel":   # creel:0 — the creel badge's states for shots: the bag's free slots set locally (235 B1)
+				var cv: Dictionary = session.view.duplicate(true)
+				cv["bag"] = cv.get("bag", {}).duplicate()
+				cv.bag["free"] = int(step[1])
+				session.view = cv
+				session.busy = true   # dev only: no answer replaces the made-up bag
+				ui.set_view(session.current())
+				ui.set_action(P0Logic.fish_action(session.current(), ""))
+			"creeltap": ui._creel.pressed.emit()   # a tap on the creel badge
+			"resprofile": ui.open_resident_profile(step[1] if step.size() > 1 else ui._resident)   # resprofile[:res_old_kai]
 			# SGODOT-233 result moments, shown directly: catchcard:<fish>, gotaway:<fish>:level|rod
 			"catchcard": ui.show_catch(step[1], int(P0Logic.item(session.current(), step[1]).get("rarity", 1)), 15, {"energy": 20})
 			"gotaway":
@@ -974,7 +996,6 @@ func _dev_shot(dt: float) -> void:
 				if not ready and _shot_t < 40.0: return
 			"skip": session.dev_skip(int(step[1]))
 			"back": leave_world()
-			"gohome": ui.home_requested.emit()
 			"tackleshop": ui.tackle_requested.emit()
 			_:
 				if not bool(_call("p0_dev", [step])): push_warning("P0_SHOT: unknown step " + step[0])

@@ -54,6 +54,7 @@ static func all() -> Array[Dictionary]:
 		{id = "need_source", title = "UiNeedSource", figma = "NeedSource 1092:77266 · LOCK-10 / 08", build = _need_sources},
 		{id = "show_pill", title = "UiShowPill", figma = "Show pill of TodayRow 1145:81714 / NeedSource 1092:77266 · LOCK-08", build = _show_pills},
 		{id = "hud", title = "UiHud", figma = "HUD 1143:103373 · LOCK-06 (shown at 328/360)", build = _huds},
+		{id = "creel_badge", title = "UiCreelBadge", figma = "CreelBadge 1126:79349 · FISH-1 / FISH-4 · q(83)", build = _creel_badges},
 		{id = "today_panel", title = "UiTodayPanel", figma = "TodayPanel 1145:81715 · TodayRow 1145:81714 · LOCK-06 (328/360)", build = _today_panels},
 		{id = "energy_card", title = "UiEnergyCard · card", figma = "Energy 1094:77504 Kind=Card · EnergyTile 1093:77292 · LOCK-09", build = _energy_cards},
 		{id = "energy_panel", title = "UiEnergyCard · panel", figma = "Energy 1094:77504 Kind=Panel · LOCK-09", build = _energy_panels},
@@ -723,8 +724,22 @@ static func _show_pills() -> Control:
 	v.add_child(note)
 	return v
 
+## Normal / Low (one slot left) / Full (no slot: warning tint and the alert dot), as FISH-1 / FISH-4 hang them.
+static func _creel_badges() -> Control:
+	var v := _column()
+	for spec in [[UiCreelBadge.State.NORMAL, "Creel 7 · 6 free", "Normal"], [UiCreelBadge.State.LOW, "Creel 9 · 1 free", "Low"],
+			[UiCreelBadge.State.FULL, "Creel 12 · 0 free", "Full"]]:
+		var b := UiCreelBadge.new(_tex("fish"))
+		b.text = str(spec[1])
+		b.state = spec[0]
+		v.add_child(_captioned(b, str(spec[2])))
+	return v
+
 static func _resident_profiles() -> Control:
-	var d := {face = load("res://assets/p0/art/residents/res_pip.svg"), name = "Pip", role = "Courier Kid", stage = "Familiar",
+	var face := AtlasTexture.new()   # the face square of Pip's portrait, as the P0 UI crops it (P0Ui.FACE_CROPS)
+	face.atlas = load("res://assets/p0/art/pip-portrait.jpg")
+	face.region = Rect2(30, 163, 232, 232)
+	var d := {face = face, name = "Pip", role = "Courier Kid", stage = "Familiar",
 		friendship = "52/90", likes = "Dessert", likes_icon = _tex("dish_carrot_cake")}
 	var page := UiResidentProfile.new(d)
 	page.custom_minimum_size = Vector2(296, 411)   # Profile content + fixed decision area of the 443 sheet

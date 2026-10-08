@@ -368,3 +368,85 @@ func test_a_turn_over_collect_that_fails_recovers_like_a_failed_serve() -> void:
 		for i in 20: await get_tree().process_frame   # no watch, so no automatic resend
 		assert_int(sent.size()).override_failure_message(failure + ": nothing resent").is_equal(before)
 		_set_view(v)
+
+func test_a_first_time_dish_on_a_turn_over_floats_its_first_cook_xp_from_the_pot() -> void:
+	# q(85) (不知火舞 on 226): the turn-over has no result card to carry the first-cook strip, so `First cooked · +N
+	# Cooking XP` floats from the pot beside the pot's own XP, and a Success toast says `New recipe! <dish> kept`.
+	# A normal serve keeps the bonus on its card (int6 C11).
+	var v := _queue_view()
+	v.cooking.queued = {"id": 4, "dish": "dish_grilled_crucian", "rarity": 1, "ms": 5000, "starts_in": 0}
+	_set_view(v)
+	var r := await _farmhouse()
+	var k: P0Kitchen = r.get("kitchen")
+	k.watch(v.cooking.stove)
+	k.serve([])
+	assert_str(k.phase).is_equal("rotate")
+	var after := _view()
+	after.seq = 8
+	after.cooking.conveniences = ["cook_again", "queue_two"]
+	after.cooking.stove = {"id": 4, "dish": "dish_grilled_crucian", "ms": 5000, "elapsed": 0, "ready_in": 5000, "heats": []}
+	_set_view(after)
+	rt.ui.clear_toast()
+	var shown: Array = []
+	rt.ui._toasts.shown.connect(func(text: String, severity): shown.append([text, severity]))
+	var dish := _dish(true)
+	dish.pot = 3
+	rt.session.state_changed.emit(after, [dish, {"kind": "first", "what": "cook:dish_grilled_crucian", "xp": 10},
+		{"kind": "xp", "skill": "cooking", "amount": 10, "percent": 100}, {"kind": "xp", "skill": "cooking", "amount": 5, "percent": 100},
+		{"kind": "queue", "id": 4, "dish": "dish_grilled_crucian", "started_at": 0, "ms": 5000}])
+	for i in 2: await get_tree().process_frame
+	assert_bool(rt.ui.has_modal()).is_false()
+	assert_array(shown).is_equal([["New recipe! Grilled Crucian kept", ToastLayer.Severity.SUCCESS]])
+	var xp: Array = rt.ui.root.find_children("*", "UiFloatText", true, false).filter(func(f): return (f as UiFloatText).text.contains("Cooking XP"))
+	assert_array(xp.map(func(f): return (f as UiFloatText).text)).contains_exactly_in_any_order(["First cooked · +10 Cooking XP", "+5 Cooking XP ★"])
+	k.stop_watching()
+
+func test_a_new_recipe_turn_over_with_no_room_falls_back_to_the_card_with_its_first_cook_xp() -> void:
+	# 后裔 on #108: cabinet and bag full, the next pot does not fire (no `queue` event) and the card comes back. It used to
+	# read `First cooked · +0 Cooking XP` (the dish's snapshot predates its `first`) and float the bonus as well.
+	var v := _queue_view()
+	v.cooking.queued = {"id": 4, "dish": "dish_grilled_crucian", "rarity": 1, "ms": 5000, "starts_in": 0}
+	_set_view(v)
+	var r := await _farmhouse()
+	var k: P0Kitchen = r.get("kitchen")
+	k.watch(v.cooking.stove)
+	k.serve([])
+	var dish := _dish(true)
+	dish.pot = 3
+	rt.session.state_changed.emit(v, [{"kind": "plate", "ids": ["dish_grilled_crucian@good"]}, dish,
+		{"kind": "first", "what": "cook:dish_grilled_crucian", "xp": 10}, {"kind": "xp", "skill": "cooking", "amount": 10, "percent": 100},
+		{"kind": "xp", "skill": "cooking", "amount": 5, "percent": 100}])
+	for i in 3: await get_tree().process_frame
+	assert_str(rt.ui.modal_kind).is_equal("kitchen_card")
+	var texts: Array = rt.ui.root.find_children("*", "Label", true, false).map(func(l): return (l as Label).text)
+	assert_bool(texts.any(func(t): return str(t).contains("+10 Cooking XP") and str(t).contains("First cooked"))).override_failure_message(str(texts.filter(func(t): return str(t).contains("First")))).is_true()
+	var floats: Array = rt.ui.root.find_children("*", "UiFloatText", true, false).map(func(f): return (f as UiFloatText).text)
+	assert_bool(floats.any(func(t): return str(t).begins_with("First cooked"))).is_false()   # on the card's strip only
+	rt.ui.close_modal()
+	await get_tree().process_frame
+
+func test_a_pot_kept_away_from_the_kitchen_floats_and_toasts_nothing_but_the_command_still_does() -> void:
+	# 不知火舞 on 226: away from the kitchen a pot Queue ×2 kept on its own is silent, its floats and toasts included (the
+	# stove is not on screen to float from); the XP still counts (the server has added it) and a Cooking level-up still
+	# shows its banner. The server settles the stove before the command, so the reply carries the harvest that sent it.
+	var w: Node3D = auto_free(Node3D.new())
+	add_child(w)
+	rt.attach(w)
+	var kept := _dish(true)
+	kept.auto = true
+	rt.ui.clear_toast()
+	rt.session.state_changed.emit(rt.session.view, [{"kind": "item", "id": "dish_grilled_crucian_good", "delta": 1}, kept,
+		{"kind": "energy", "delta": 10, "reason": "reward"}, {"kind": "reward", "id": "first_dish_1", "energy": 10},
+		{"kind": "first", "what": "cook:dish_grilled_crucian", "xp": 10}, {"kind": "xp", "skill": "cooking", "amount": 10, "percent": 100},
+		{"kind": "xp", "skill": "cooking", "amount": 5, "percent": 100}, {"kind": "level", "skill": "cooking", "level": 2, "energy": 0, "gifts": []},
+		{"kind": "queue", "id": 4, "dish": "dish_herb_grilled_fish", "started_at": 0, "ms": 60000},
+		{"kind": "item", "id": "crop_radish", "delta": 2}, {"kind": "xp", "skill": "farming", "amount": 4, "percent": 100}])
+	for i in 3: await get_tree().process_frame
+	var floats: Array = rt.ui.root.find_children("*", "UiFloatText", true, false).map(func(f): return (f as UiFloatText).text)
+	assert_array(floats).contains_exactly_in_any_order(["+2 crop_radish", "+4 XP"])   # the harvest's own (no names in this view)
+	for word in ["First cooked", "Cooking", "Energy"]:
+		assert_bool(floats.any(func(t): return str(t).contains(word))).override_failure_message(str(floats)).is_false()
+	assert_str(rt.ui.toast_text()).is_equal("")
+	assert_int(rt.ui.root.find_children("*", "UiMomentBanner", true, false).size()).is_equal(1)   # the Cooking Lv2 banner
+	rt.ui.close_modal()
+	rt.detach(w)

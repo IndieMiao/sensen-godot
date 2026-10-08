@@ -456,6 +456,9 @@ static func _with_pot(cmd: Dictionary, pot: Dictionary) -> Dictionary:
 	if pot.get("id", null) != null: cmd["pot"] = pot.id
 	return cmd
 
+## Where the stove's floats rise from while the pot is watched or turns over (a first-cook XP float, 不知火舞 on 226).
+func ring_center() -> Vector2: return _ring_center()
+
 ## The ring sits on the pot (COOK-3: the whole pot is the target, §7.2.4).
 func _ring_center() -> Vector2:
 	var mouth := room.anchor("drop_pot_1")
@@ -545,7 +548,10 @@ func on_event(ev: Dictionary) -> bool:
 			last_page = str(ev.get("dish", "")) if known else ""
 			# Kept without a card: S5 Queue ×2 kept it on its own, or the stove turned over under the watch (q(71)).
 			if bool(ev.get("auto", false)) or phase == "rotate":
-				_after_kept.call_deferred(ev, _events + [ev])
+				# A turn-over keeps the whole reply in _events (cleared when it started): the server sends the dish before
+				# its `first`, and a turn-over that falls back to the card needs both (后裔 on #108).
+				if phase == "rotate": _events.append(ev)
+				_after_kept.call_deferred(ev, _events + ([] if phase == "rotate" else [ev]))
 				return true
 			_events.append(ev)
 			# Once the whole reply is in, and through the card queue: a card already open (an Energy card, a level-up
@@ -765,12 +771,13 @@ func _after_kept(ev: Dictionary, events: Array) -> void:
 	var next = _queue_ev.get("dish", null)
 	_queue_ev = {}
 	if not turned and phase == "rotate":
-		phase = "serve"
-		_events = events
+		phase = "serve"   # _events holds the whole reply by now: the dish, its first and its mishap
 		_from_stove = false
 		rt.ui.queue_card(_show_card)
 		return
-	if turned: rt.ui.toast(P0KitchenLogic.rotation_line(v, ev, next))
+	var fresh := P0KitchenLogic.new_recipe_line(v, ev)
+	if turned and fresh != "": rt.ui.toast_success(fresh)   # q(85): a new recipe, its first-cook XP floats from the pot
+	elif turned: rt.ui.toast(P0KitchenLogic.rotation_line(v, ev, next))
 	else:
 		var line := P0KitchenLogic.kept_line(v, ev, events)
 		if not line.is_empty(): rt.ui.toast(str(line.text))

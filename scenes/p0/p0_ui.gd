@@ -23,7 +23,6 @@ signal show_on_map(target: String)
 signal panel_requested(panel: String)
 signal recenter()
 signal place_pressed()
-signal home_requested()        # FISH-4 "Go home · Free"
 signal tackle_requested()      # FISH-5 rod variant "Tackle Shop"
 
 const _RESIDENT_SHEET_H := 443.0   # RES-PIP: Sheet 443 of 800
@@ -104,10 +103,7 @@ var _today_key = null    # the Today chip's focus row (P0Logic.today_chip_key); 
 var _hud_need := -1      # main action's Energy need last seen by the HUD
 var _pending := {}   # surface / place / mode set before the HUD exists (the runtime attaches early)
 var _dev_box: Control
-var _creel: PanelContainer
-var _creel_count: Label
-var _creel_free: Label
-var _fab_pills: HBoxContainer
+var _creel: UiCreelBadge
 var _status: PanelContainer     # SGODOT-231 mine status line (Rocks 2/6), where the creel sits while fishing
 var _status_text: Label
 var player_screen := Vector2(180, 320)   # set by the farm / pond each frame (mid-body): the radial fans out from it
@@ -174,22 +170,15 @@ func _build_hud() -> void:
 	hud.today_pressed.connect(open_today)
 	hud.place_pressed.connect(func(): place_pressed.emit())   # the location chip is the way back to the map
 	root.add_child(hud)
-	_creel = PanelContainer.new()
-	_creel.add_theme_stylebox_override("panel", _box(CARD, 11, EDGE, 1, Vector4(6, 3, 8, 3)))
-	_creel.position = Vector2(UiTokens.SIZE_TODAY_PANEL_X, UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H + UiTokens.SPACE_WITHIN + safe_top())   # under the two-row HUD
-	var crh := HBoxContainer.new()
-	crh.add_theme_constant_override("separation", 4)
-	crh.add_child(_icon("creel", 11))
-	_creel_count = _label("Creel 0", 9, INK, true)
-	crh.add_child(_creel_count)
-	crh.add_child(_label("·", 9, INK2, true))
-	_creel_free = _label("0 free", 9, GREEN_D, true)
-	crh.add_child(_creel_free)
-	_creel.add_child(crh)
+	# CreelBadge 1126:79349 (FISH-1 / FISH-4; 不知火舞 on 235 B1, q(83)): under the two-row HUD, left; full, its tap says
+	# why with Open bag ›, otherwise it opens the bag on its Fish page (the creel is the bag).
+	_creel = UiCreelBadge.new(P0Logic.icon("fish"))
+	_creel.theme = UiKit.theme()
+	_creel.position = Vector2(UiTokens.SIZE_TODAY_PANEL_X, UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H + UiTokens.SPACE_WITHIN + safe_top())
 	_creel.hide()
-	_creel.mouse_filter = Control.MOUSE_FILTER_STOP
-	_creel.gui_input.connect(func(e: InputEvent):
-		if P0Ui.is_tap(e): open_fishdex())
+	_creel.pressed.connect(func():
+		if _creel.state == UiCreelBadge.State.FULL: toast_creel_full()
+		else: open_bag("", "bag", "Fish"))
 	root.add_child(_creel)
 
 func _build_bar() -> void:
@@ -239,26 +228,10 @@ func _build_fab() -> void:
 	_radial.picked.connect(func(id: String):
 		if id != bar_mode: set_mode(id)
 		_keys.pop_tool())   # the key's tool badge pops with the pick, the current action's too (247)
-	# FISH-4: two pills above the switch key while the creel is full.
-	_fab_pills = HBoxContainer.new()
-	_fab_pills.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
-	_fab_pills.grow_horizontal = Control.GROW_DIRECTION_BEGIN
-	_fab_pills.add_theme_constant_override("separation", 5)
-	var open_bag_pill := _pill_button("Open Bag", false)
-	open_bag_pill.pressed.connect(func(): open_bag())
-	var home_pill := _pill_button("Go home · Free", false)
-	_style_button(home_pill, PAPER, EDGE, 16)
-	home_pill.pressed.connect(func(): home_requested.emit())
-	for b in [open_bag_pill, home_pill]:
-		b.add_theme_font_size_override("font_size", 10)
-		b.custom_minimum_size = Vector2(0, 32)
-		_fab_pills.add_child(b)
-	_fab_pills.hide()
-	root.add_child(_fab_pills)
 	_place_controls()
 
 ## Bottom controls per BAR-1: bar at x 12, 24 above the safe bottom; the action group 16 from the right edge,
-## 40 above the bar; the creel pills 8 above the group.
+## 40 above the bar.
 func _place_controls() -> void:
 	var bottom := UiTokens.SIZE_QUICK_BAR_BOTTOM + safe_bottom()
 	_bar.offset_left = UiTokens.SIZE_QUICK_BAR_X
@@ -270,11 +243,6 @@ func _place_controls() -> void:
 	_keys.offset_left = -UiTokens.SPACE_PAGE - UiTokens.SIZE_ACTION_KEY_W
 	_keys.offset_bottom = -key_bottom
 	_keys.offset_top = -key_bottom - UiTokens.SIZE_ACTION_KEY_H
-	var pills_bottom := key_bottom + UiTokens.SIZE_ACTION_KEY_H + UiTokens.SPACE_OVERLAY_BODY
-	_fab_pills.offset_right = -UiTokens.SPACE_PAGE
-	_fab_pills.offset_left = -UiTokens.SPACE_PAGE - 1
-	_fab_pills.offset_bottom = -pills_bottom
-	_fab_pills.offset_top = -pills_bottom - 32
 
 ## The +1h / +4h clock buttons: test builds only. The demo APK is a debug export too, but its server has no dev
 ## routes (P0_DEV=0, dev/skip is 404) and the buttons covered the Toast's end (李元芳, int6), so it has none.
@@ -373,7 +341,6 @@ func set_surface(name: String) -> void:
 	hud.show_balances = name != "busy"   # a busy world's own close button sits in the coins / bell corner
 	pad.visible = world
 	_keys.visible = action and _modal == null
-	_fab_pills.visible = _keys.visible and bool(_fab_state.get("creel_full", false))
 	_bar.visible = _bar_shown() and (_modal == null or is_bar_docked())   # docked in the bag drawer it stays
 	_bar.bag_only = not action
 	_bar_sig = []
@@ -420,12 +387,8 @@ func _refresh_bar() -> void:
 		if selected_bait != "" and P0Logic.bag_count(view, selected_bait) <= 0:
 			toast_when_clear("Out of %s · no bait on the hook" % P0Logic.item_name(view, selected_bait))
 			selected_bait = ""
-		var free := int(view.get("bag", {}).get("free", 0))
-		_creel_count.text = P0Logic.creel_line(view).get_slice(" · ", 0)
-		_creel_free.text = "%d free" % free
-		var full := free < 1
-		_creel_free.add_theme_color_override("font_color", RED if full else GREEN_D)
-		_creel.add_theme_stylebox_override("panel", _box(GOLD if full else CARD, 11, GOLD_D if full else EDGE, 1, Vector4(6, 3, 8, 3)))
+		_creel.text = P0Logic.creel_line(view)
+		_creel.state = UiCreelBadge.state_for(int(view.get("bag", {}).get("free", 0)))
 	else:
 		if selected_seed != "" and not ids.has(selected_seed): selected_seed = ""
 		# A pinned seed sown to 0 stays on the bar but is deselected: the key reads Sow · Pick a seed and a held
@@ -702,7 +665,6 @@ func set_action(a: Dictionary) -> void:
 	# The equipped tool in the key's badge (SGODOT-231: Starter / Copper Pickaxe at the mine mouth and inside); a key
 	# without one shows the action's own tool, so the farm's Sow after the mouth is a hoe again (walkthrough fix).
 	_keys.tool_icon = P0Logic.icon(str(a.tool)) if a.has("tool") else _mode_tool
-	_fab_pills.visible = bool(a.get("creel_full", false)) and _keys.visible
 	var need := int(a.get("need", 0))
 	if need != _hud_need:   # the worlds call set_action every frame
 		_hud_need = need
@@ -712,7 +674,8 @@ func _fab_pressed() -> void:
 	fab_verb = ""
 	if _modal != null: return
 	if not _fab_state.get("enabled", false):
-		if _fab_state.has("toast"): toast(str(_fab_state.toast))   # SGODOT-231: unavailable keys say why (LOCK-10)
+		if bool(_fab_state.get("creel_full", false)): toast_creel_full()   # FISH-4 / q(83): the greyed Cast · Creel full
+		elif _fab_state.has("toast"): toast(str(_fab_state.toast))   # SGODOT-231: unavailable keys say why (LOCK-10)
 		return
 	fab_verb = str(_fab_state.get("verb", ""))
 	action_pressed.emit(_fab_state.get("cmd", {}))
@@ -1287,8 +1250,18 @@ func _aim_toast() -> void:
 ## guiding line (`Open bag ›`) that acts in place and never travels (LOCK-08).
 func toast_error(text: String, action := "") -> void:
 	if not _toasts: return
+	_toast_bag_tab = ""
 	_aim_toast()
 	_toasts.show_toast(text, ToastLayer.Severity.ERROR, action)
+
+## FISH-4 / q(83): a full creel says one sentence — the badge's tap, the greyed Cast · Creel full and the server's
+## creel_full alike — and its Open bag › opens the bag on its Fish page.
+const CREEL_FULL := "Creel full · 0 free slots · Sell or cook first"
+var _toast_bag_tab := ""   # the bag page the showing toast's Open bag › opens ("" = where the bag was)
+
+func toast_creel_full() -> void:
+	toast_error(CREEL_FULL, "Open bag")
+	_toast_bag_tab = "Fish"
 
 ## Done, worth saying once: a cleared mine floor, a resident's meal (§4.8.6 Toast Success).
 func toast_success(text: String) -> void:
@@ -1305,7 +1278,7 @@ func clear_toast() -> void:
 
 func _on_toast_action(action: String) -> void:
 	match action:
-		"Open bag": open_bag()
+		"Open bag": open_bag("", "bag" if _toast_bag_tab != "" else "", _toast_bag_tab)
 
 # ---------------------------------------------------------------- modals
 ## Going to the background cancels a slot drag: the slot flies back, nothing changes (LOCK-04 v1.10).
@@ -1434,7 +1407,6 @@ func _drop_modal() -> void:
 	if was_kitchen: _refresh_hud()   # back out of the farmhouse
 	_keys.visible = surface in ACTION_SURFACES
 	_bar.visible = _bar_shown()
-	_fab_pills.visible = _keys.visible and bool(_fab_state.get("creel_full", false))
 
 func _open_modal(content: Control, dim := 0.32, hide_controls := false) -> void:
 	_bar.cancel_drag()   # a drawer or card opening cancels a slot drag (LOCK-04 v1.10)
@@ -1462,7 +1434,6 @@ func _open_modal(content: Control, dim := 0.32, hide_controls := false) -> void:
 	_modal = holder
 	if hide_controls:
 		_keys.visible = false
-		_fab_pills.visible = false
 		_bar.visible = false
 
 ## Bottom system inset (gesture bar, rounded corners) in UI units; 0 on desktop.
@@ -1508,9 +1479,10 @@ var gear_slot := "fishing"
 var _bag: P0BagDrawer
 var _eat_armed := ""   # dish whose partial-gain warning was shown; a second Eat eats (§7.17.1)
 
-func open_bag(focus := "", side := "") -> void:
+func open_bag(focus := "", side := "", category := "") -> void:
 	if side != "": bag_side = side
 	var d := P0BagDrawer.new(view, bag_side, focus)
+	if category != "": d.show_category(category)   # the creel badge and a full creel's Open bag ›: the Fish page
 	d.theme = UiKit.theme()
 	d.safe_bottom = safe_bottom()
 	d.place = space_here()   # home only at the homestead: an outpost room is a room, not home (亚瑟 on #37)
@@ -2274,8 +2246,7 @@ static func resident_profile_data(view_: Dictionary, id: String) -> Dictionary:
 		if str(r.get("style", "")) == likes:
 			dish = str(r.get("id", ""))
 			break
-	var face_path := "res://assets/p0/art/residents/%s.svg" % id
-	return {"face": load(face_path) if ResourceLoader.exists(face_path) else _portrait(str(def.get("portrait", ""))),
+	return {"face": resident_face(str(def.get("portrait", ""))),
 		"name": str(bar.name), "role": str(bar.role), "stage": str(bar.stage),
 		"friendship": ("%d/%d" % [int(bar.have), int(bar.need)]) if str(bar.get("next", "")) != "" else str(int(bar.have)),
 		"likes": likes, "likes_icon": P0Logic.icon(dish) if dish != "" else null, "details": false}
@@ -2298,6 +2269,18 @@ func _close_above(content: Control, gap: float, inset := 0.0) -> void:
 static func _portrait(key: String) -> Texture2D:
 	var path := "res://assets/p0/art/%s-portrait.jpg" % key
 	return load(path) if key != "" and ResourceLoader.exists(path) else null
+
+## The face square of a resident's portrait for the round profile face (不知火舞 on 235 B1): centred on the face, its
+## top at the hat's top, in the portrait's own pixels; a portrait without a crop is used whole.
+const FACE_CROPS := {"kai": Rect2(37, 56, 340, 340), "pip": Rect2(30, 163, 232, 232)}
+
+static func resident_face(key: String) -> Texture2D:
+	var art := _portrait(key)
+	if art == null or not FACE_CROPS.has(key): return art
+	var face := AtlasTexture.new()
+	face.atlas = art
+	face.region = FACE_CROPS[key]
+	return face
 
 ## Request on the bar: an open request shows the card (Accept / Not now); an accepted one that is ready
 ## delivers. The bar's button carries the gap or the wait, so it never dead-ends (LOCK-10 / 18).
