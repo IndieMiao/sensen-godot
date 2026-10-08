@@ -1,6 +1,6 @@
 /**
  * SGODOT-232 V2: seven days of the §14.6 target player against the real P0 rules (tools/p0_week.ts), held to the
- * §14.6.2 P0 rerun: Energy 1,389 over the week, Farming 567, Fishing 989, Cooking 426, Homestead Lv2 about day 5,
+ * §14.6.2 P0 rerun: Energy 1,389 over the week, Farming 567, Fishing 989, Cooking 426, Homestead Lv2 on day 3–5 (q(48)),
  * Cooking Lv4 by day 4–5, no Energy wall. Cooking Lv6 (Quick Fire) and the pre-dinner pool are recorded, never failed
  * (user's knobs C and D, 2026-10-08). Coins are recorded too: the rerun counts no fish or dish sales.
  */
@@ -22,9 +22,11 @@ describe('seven days of the target player (§14.6.2; SGODOT-232 V2)', () => {
     expect(within(day7('farming'), RERUN.farming, 0.25)).toBe(true);
     expect(within(day7('fishing'), RERUN.fishing, 0.25)).toBe(true);
     expect(within(day7('cooking'), RERUN.cooking, 0.25)).toBe(true);
-    // Homestead Lv2 waits on 3 Rock Salt from the mine (≈ 2.7 a run, drawn per player), so one unlucky player may miss
-    // the week; the mean day holds (rerun 4.8)
-    expect(mean(r => r.reached.homestead_lv2 ?? 8)).toBeLessThanOrEqual(6);
+    // Homestead Lv2 between day 3 and day 5 passes (李白 q(48)): the real-rules replay lands on day 3.3 (rerun 4.8) with
+    // fish sales and knob A's salt; a later Lv2 would leave days 3–5 without their upgrade, an earlier one skips the mine
+    const hs2 = mean(r => r.reached.homestead_lv2 ?? 8);
+    expect(hs2).toBeGreaterThanOrEqual(3);
+    expect(hs2).toBeLessThanOrEqual(5);
     for (const r of runs) {
       expect(r.walls).toBe(0);
       expect(r.reached.cooking_lv4 ?? 8).toBeLessThanOrEqual(5);
