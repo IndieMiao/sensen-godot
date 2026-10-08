@@ -102,9 +102,14 @@ static func auto_kept_events(events: Array) -> Array:
 			level = k == "level" or (k == "parcel" and level)
 	return out
 
+## What the Keep way of a pot pushes before its dish: a dish into the bag, into the Warming Cabinet (or past a full one,
+## to_bag), plates left. A dish taken out (eaten, sold) is the command's, not the pot's (后裔 on #108).
 static func _kept_way(e: Dictionary) -> bool:
-	var k := str(e.get("kind", ""))
-	return k in ["cabinet", "plate"] or (k == "item" and str(e.get("id", "")).begins_with("dish_"))
+	match str(e.get("kind", "")):
+		"plate": return true
+		"cabinet": return int(e.get("delta", 0)) > 0 or (int(e.get("delta", 0)) == 0 and int(e.get("to_bag", 0)) > 0)
+		"item": return str(e.get("id", "")).begins_with("dish_") and int(e.get("delta", 0)) > 0
+	return false
 
 ## "Lv4 · 60 XP to go" for the locked 3rd slot (SGODOT-203: the 90 px label holds the short form); "Lv4" when
 ## the cooking thresholds are unknown.
