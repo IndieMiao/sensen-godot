@@ -171,7 +171,7 @@ func _refresh_overlay() -> void:
 				s.tapped.connect(func(): _take_out(index, s.ring_center()))
 			elif i < open:
 				s.state = UiKitchenSlot.State.EMPTY
-				s.title = "Add from bag"
+				s.title = "Add ingredient"
 			else:
 				s.state = UiKitchenSlot.State.LOCKED
 				s.title = P0KitchenLogic.locked_slot_label(v)
@@ -471,26 +471,33 @@ func _open_card(fields: Dictionary) -> void:
 	var card := UiRewardMoment.new()
 	_card = card
 	card.theme = UiKit.theme()
+	var none := bool(fields.get("none", false))   # nothing came out (a refunded trial pot): OK only, no Keep
 	fields.erase("dish_id")
+	fields.erase("none")
 	card.show_fields(fields)
-	card.secondary = "Keep"
-	var eat := P0KitchenLogic.eat_state(v, _card_dish)
-	card.primary = str(eat.text)
-	card.primary_reason = str(eat.reason)
-	card.primary_pressed.connect(_on_eat)
+	if none:
+		_card_done = true
+		card.primary = "OK"
+		card.primary_pressed.connect(func(): rt.ui.close_modal())
+	else:
+		card.secondary = "Keep"
+		var eat := P0KitchenLogic.eat_state(v, _card_dish)
+		card.primary = str(eat.text)
+		card.primary_reason = str(eat.reason)
+		card.primary_pressed.connect(_on_eat)
 	card.unavailable_pressed.connect(func(reason: String): rt.ui.toast(reason))
 	card.secondary_pressed.connect(func(): rt.ui.close_modal())
 	var wrap := Control.new()
 	wrap.set_anchors_preset(Control.PRESET_FULL_RECT)
 	wrap.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	wrap.add_child(_reveal(card.icon, card.rarity, card.tone == UiRewardMoment.Tone.NEUTRAL))
+	if not none: wrap.add_child(_reveal(card.icon, card.rarity, card.tone == UiRewardMoment.Tone.NEUTRAL))
 	wrap.add_child(card)
 	stage.clear_plate()   # the 3D plate hands over to the reveal
 	var place := func(): card.position = Vector2((wrap.size.x - card.size.x) * 0.5, wrap.size.y * CARD_TOP)
 	card.resized.connect(place)
 	wrap.resized.connect(place)
 	phase = "card"
-	_card_done = false
+	_card_done = none
 	rt.ui._open_modal(wrap, UiTokens.OPACITY_SCRIM_MODAL, true)
 	rt.ui.modal_kind = "kitchen_card"
 	wrap.tree_exited.connect(_on_card_closed)

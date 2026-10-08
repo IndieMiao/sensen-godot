@@ -187,6 +187,10 @@ func test_dish_cards_say_new_recipe_mystery_or_ready() -> void:
 	assert_int(mystery.tone).is_equal(UiRewardMoment.Tone.NEUTRAL)
 	assert_str(mystery.strip).is_equal("A clue was added to your Cookbook")
 	assert_str(mystery.note).is_equal("Can't be sold or delivered")
+	var none := P0KitchenLogic.dish_card(v, {"dish": "dish_mystery", "mystery": true, "qty": 0, "none": true, "trial_left": 7}, 0, false)
+	assert_str(none.event).is_equal("No dish this time")
+	assert_str(none.item_name).is_equal("Ingredients back (7 left today)")
+	assert_bool(none.none).is_true()
 
 func test_keep_room_spares_a_retry_that_would_be_refused() -> void:
 	var v := _view()
@@ -259,3 +263,10 @@ func test_s5_page_states_drive_the_cells_order_and_counts() -> void:
 	assert_str(P0KitchenLogic.page_card(v, P0KitchenLogic.pages(v)[0]).state).is_equal("Common · Cooked ×10")
 	assert_str(P0KitchenLogic.page_card(v, P0KitchenLogic.pages(v)[4]).reason).is_equal("Cooking Lv4 · 3rd slot")
 	assert_str(P0KitchenLogic.page_card(v, P0KitchenLogic.pages(v)[3]).nav).is_equal("Try in Experiment")
+
+func test_the_cook_row_shows_the_energy_of_a_known_pot_only() -> void:
+	var v := _view()
+	assert_str(P0KitchenLogic.pot_energy(v, [])).is_equal("")
+	assert_str(P0KitchenLogic.pot_energy(v, ["fish_crucian"])).is_equal("+20 Energy")   # Grilled Crucian (COOK-P0-2)
+	assert_str(P0KitchenLogic.pot_energy(v, ["fish_crucian", "crop_radish"])).is_equal("")   # unknown mix (COOK-2b)
+

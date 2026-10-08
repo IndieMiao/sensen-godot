@@ -53,6 +53,7 @@ var _pages: UiInventoryGrid
 var _bag: UiInventoryGrid
 var _slots_used: Label
 var _cook: UiCommandButton
+var _pot_energy: Label
 
 func _init(view_: Dictionary = {}, tab_ := "cookbook") -> void:
 	super(HEIGHT)
@@ -237,6 +238,10 @@ func _build_experiment() -> VBoxContainer:
 	var foot := HBoxContainer.new()
 	foot.alignment = BoxContainer.ALIGNMENT_END
 	foot.add_theme_constant_override(&"separation", int(UiTokens.SPACE_ROW))
+	_pot_energy = UiKit.label("", UiTokens.STYLE_C12_B)   # Compact/Kitchen Cook decision: "+20 Energy" for a known page
+	_pot_energy.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_pot_energy.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	foot.add_child(_pot_energy)
 	var info := UiNavButton.new("Info", true)
 	info.pressed.connect(func(): info_requested.emit())
 	foot.add_child(info)
@@ -256,6 +261,7 @@ func _refresh_experiment() -> void:
 	_bag.capacity = maxi(10, ceili(items.size() / 5.0) * 5)
 	_bag.items = items
 	_cook.reason = P0KitchenLogic.experiment_reason(view, pot)
+	_pot_energy.text = P0KitchenLogic.pot_energy(view, pot)
 
 func _chips(labels: Array, picked: Callable) -> Control:
 	var scroll := TouchScrollContainer.new()

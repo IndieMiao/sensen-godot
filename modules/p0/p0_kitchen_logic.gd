@@ -214,6 +214,14 @@ static func preview(view: Dictionary, pot: Array) -> Dictionary:
 	return {title = str(known.name) if not known.is_empty() else "Unknown dish", state = P0Logic.rarity_name(view, rarity),
 		time = "%d s" % (int(t.get("ms", 5000)) / 1000)}
 
+## Experiment's cook row (COOK-P0-2 / 2b): "+20 Energy" when the pot is a known page, "" for an unknown mix.
+static func pot_energy(view: Dictionary, pot: Array) -> String:
+	if pot.is_empty(): return ""
+	var known := P0Logic.match_known(view, pot)
+	if known.is_empty(): return ""
+	var t: Dictionary = cooking(view).get("tiers", {}).get(str(int(known.rarity)), {})
+	return "+%d Energy" % int(t.get("energy", 0))
+
 ## Preview for a Cookbook page: COOK-2a writes `Ready to cook` when the page can cook now.
 static func page_preview(view: Dictionary, p: Dictionary) -> Dictionary:
 	var rarity := int(p.get("rarity", 1))
@@ -312,6 +320,11 @@ static func dish_card(view: Dictionary, ev: Dictionary, first_xp: int, from_stov
 	var base := str(ev.get("dish", ""))
 	var quality := int(ev.get("quality", 0))
 	var id := base if quality == 0 else "%s@%s" % [base, ["plain", "good", "perfect"][quality]]
+	# Newcomer Blessing: a failed pot gives its ingredients back and no dish (q(48) A; S5 none: true).
+	if bool(ev.get("none", false)):
+		return {tone = UiRewardMoment.Tone.NEUTRAL, event = "No dish this time", icon = P0Logic.icon("dish_mystery"),
+			item_name = "Ingredients back (%d left today)" % int(ev.get("trial_left", 0)), rarity = 0, rarity_word = "", quality = 0,
+			strip = "", note = "", none = true, dish_id = ""}
 	if bool(ev.get("mystery", false)):
 		return {tone = UiRewardMoment.Tone.NEUTRAL, event = "Mystery Dish", icon = P0Logic.icon("dish_mystery"),
 			item_name = "Hmm… not a dish", rarity = 0, rarity_word = "", quality = 0,
