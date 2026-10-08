@@ -90,3 +90,19 @@ func test_home_2_is_the_same_banner() -> void:
 	var card: Control = HomePanel.moment(ui, P0Logic.home_moment({"energy": {"max": 220}}, {"kind": "homestead", "level": 3, "unlocks": ["warming_cabinet"]}))
 	assert_bool(card is UiMomentBanner).is_true()
 	assert_str(ui.modal_kind).is_equal("card")
+
+## 李元芳 int7: in the farmhouse the Cooking Lv2 banner reached the bottom of the screen with its content in the top
+## fifth — its wrapped tip was first measured at zero width. The banner is as tall as its content, under the HUD.
+func test_a_banner_is_as_tall_as_its_content() -> void:
+	var ui := P0Ui.new()
+	ui.quick_store = STORE
+	ui.tips_path = TIPS
+	add_child(auto_free(ui))
+	await await_idle_frame()
+	ui.set_view(_view())
+	ui.set_surface("room")
+	ui.show_level_up({"skill": "cooking", "level": 2, "energy": 0, "gifts": []}, true)
+	for i in 3: await await_idle_frame()
+	var b: UiMomentBanner = ui.find_children("*", "UiMomentBanner", true, false)[0]
+	assert_float(b.size.y).is_equal_approx(b.get_combined_minimum_size().y, 0.5)
+	assert_float(b.size.y).is_less(ui.root.size.y * 0.4)

@@ -91,6 +91,26 @@ func test_over_a_drawer_without_the_bar_it_sits_above_the_drawer() -> void:
 	assert_int(ui._toasts.get_index()).is_equal(ui.root.get_child_count() - 1)
 	assert_float(r.end.y).is_equal_approx(wb.get_global_rect().position.y - UiTokens.SPACE_OVERLAY_BODY, 0.5)
 
+## 李元芳 int7 (1280 × 2856): a drawer reaching up to the HUD leaves no room above it, and the bar's spot is on its
+## commands — the toast hangs just inside its top edge instead, over the title, and below the HUD.
+func test_over_a_drawer_up_to_the_hud_it_hangs_inside_the_top_edge() -> void:
+	var hud_bottom := ui._marker_area().position.y + ui._kit.global_position.y - ui.root.global_position.y
+	var wb := UiDrawer.new(ui.root.size.y - hud_bottom - 10.0)   # its top 10 under the HUD
+	wb.animate = false
+	ui._open_modal(wb, UiTokens.OPACITY_SCRIM_DRAWER, true)
+	await await_idle_frame()
+	ui.toast_error("Need 5 more Copper Ore")
+	await await_idle_frame()
+	var top := wb.get_global_rect().position.y
+	var r := _panel().get_global_rect()
+	assert_float(r.position.y).is_equal_approx(maxf(top, hud_bottom) + UiTokens.SPACE_OVERLAY_BODY, 0.5)
+	assert_float(r.position.y).is_greater_equal(hud_bottom)
+	assert_float(r.end.y).is_less(top + 80.0)   # on the title, not on the cards' buttons
+	ui.close_modal()
+	ui.toast("Back on the farm")   # the next one with no drawer sits on the bar again
+	await await_idle_frame()
+	assert_float(_panel().get_global_rect().end.y).is_greater(ui.root.size.y * 0.6)
+
 ## E-04 FARM-3-RESULT-2: the bag fills mid-harvest — the run's count floats, the Error toast points at the stall with
 ## Open bag, and the hold stops.
 func test_a_harvest_that_fills_the_bag_says_how_far_it_got() -> void:

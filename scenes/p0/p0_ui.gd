@@ -1260,6 +1260,12 @@ func _aim_toast() -> void:
 		if top - UiTokens.SPACE_OVERLAY_BODY - UiTokens.SIZE_TOAST_MIN_H >= hud_bottom:
 			_toasts.anchor_above(content)
 			return
+		# A tall drawer (the Workbench on a tall phone): no room above it, and the bar's spot is on its commands —
+		# the toast hangs just inside its top edge, over the title (李元芳 int7).
+		var bar_spot := root.size.y - UiTokens.SIZE_QUICK_BAR_BOTTOM - UiTokens.SIZE_QUICK_BAR_H   # where the fallback would sit
+		if top < bar_spot:
+			_toasts.anchor_below(maxf(top, hud_bottom) + UiTokens.SPACE_OVERLAY_BODY)
+			return
 	_toasts.anchor_above(_bar)
 
 ## A refused command (§4.8.6 `命令被拒（非体力）`, wording per appendix B) or FISH-4's full creel. `action` adds a
@@ -2605,9 +2611,14 @@ func show_moment(card: Control, auto_close := true, seconds := MOMENT_AUTO_S) ->
 	var banner := card is UiMomentBanner
 	var place := func():
 		if is_instance_valid(card):
+			# Back to its content's size: a wrapped line first measured at zero width makes the card tall, and a card
+			# outside a container never shrinks again on its own (李元芳 int7: the level banner reaching the bottom).
+			var fit := card.get_combined_minimum_size()
+			if not card.size.is_equal_approx(fit): card.size = fit
 			var y := (UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H + _BANNER_UNDER_HUD + safe_top()) if banner else root.size.y * _MOMENT_TOP
 			card.position = Vector2(roundf((root.size.x - card.size.x) * 0.5), roundf(y))
 	card.resized.connect(place)
+	card.minimum_size_changed.connect(place)   # shrinking content never resizes the card by itself
 	place.call()
 	if not auto_close: return
 	var holder_id := _modal.get_instance_id()

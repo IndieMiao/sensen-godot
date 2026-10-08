@@ -33,6 +33,7 @@ const _ICON_GAP := 8.0   # glyph 20, then the text (R1: text at x 39 of the card
 const _LINE_GAP := 4.0
 
 var _anchor: WeakRef
+var _hang_y := -1.0   # anchor_below: the toast's top edge, layer-local; -1 when it sits above an anchor
 
 var _current := {}
 var _left := 0.0
@@ -121,6 +122,14 @@ static func glyph(severity: Severity) -> Texture2D: return _GLYPHS[severity]
 ## Sit above `c` (a drawer's fixed decision area, or a collapsed quick bar handle); null = the quick bar.
 func anchor_above(c: Control) -> void:
 	_anchor = weakref(c) if c != null else null
+	_hang_y = -1.0
+	_place()
+
+## Hang the toast from layer-local `y` (its top edge there): over a drawer that leaves no room above it, the toast sits
+## just inside the drawer's top edge, on its title, instead of on the commands lower down (李元芳 int7 on #77).
+func anchor_below(y: float) -> void:
+	_anchor = null
+	_hang_y = y
 	_place()
 
 ## Layer-local y of the edge the toast sits above.
@@ -181,7 +190,7 @@ func _place() -> void:
 	_panel.custom_minimum_size = Vector2(w, UiTokens.SIZE_TOAST_MIN_H)
 	var h := _panel.get_combined_minimum_size().y
 	_panel.size = Vector2(w, h)
-	_panel.position = Vector2(UiTokens.SPACE_PAGE, anchor_top() - UiTokens.SPACE_OVERLAY_BODY - h)
+	_panel.position = Vector2(UiTokens.SPACE_PAGE, _hang_y if _hang_y >= 0.0 else anchor_top() - UiTokens.SPACE_OVERLAY_BODY - h)
 
 func _on_panel_input(e: InputEvent) -> void:
 	if e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT and not e.pressed:
