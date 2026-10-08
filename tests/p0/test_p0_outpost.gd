@@ -287,13 +287,14 @@ func test_the_npc_the_room_opened_a_talk_for_is_talking_until_it_closes() -> voi
 	assert_bool(bool(r._marker("npc_keeper", {}).talking)).is_false()
 
 ## Scene integration (SGODOT-227, 不知火舞's walkthrough on 227): the tea house opens on the Coffee Shop kit with the
-## kit's background and every anchor of its file, and the opening view holds the whole art, centred, with at least
+## background of its signed render and every anchor of its file, and the opening view holds the whole art, centred, with at least
 ## 16 px clear on both sides (the kit's own camera left about 14 px on the right).
 func test_the_tea_house_opens_on_the_coffee_shop_kit() -> void:
 	var r := _room("sh_tea_1")
 	assert_str(r.layout_path).is_equal("res://assets/rooms/coffee_shop/layout.json")
 	assert_str((r.art.get_script() as Script).resource_path).is_equal("res://scenes/coffee_shop/coffee_shop_art.gd")
-	assert_str(r.environment.background_color.to_html(false)).is_equal("d3e7d8")   # review_lighting.background
+	var clear := r.environment.background_color.srgb_to_linear()   # the plate's top colour, as it shows on screen
+	assert_str(P0Room.aces_screen(Vector3(clear.r, clear.g, clear.b)).to_html(false)).is_equal("e6f5f1")
 	for a in P0RoomAnchors.read_json(str(P0Outposts.find("sh_tea_1").anchors)).anchors:
 		assert_object(r.anchor(str(a.name))).override_failure_message(str(a.name)).is_not_null()
 	assert_bool(r._fits).override_failure_message("the opening view holds still").is_true()
@@ -371,3 +372,26 @@ func test_a_tapped_prompt_goes_to_its_own_anchor() -> void:
 	assert_str(str(r._walk.get("name", ""))).is_equal("exit")
 	rt.ui.tapped_card = ""
 	assert_str(r.tap_target(table)).is_equal("use_tea_table_2")
+
+## The tea house lights as the Coffee Shop was signed off (SGODOT-227 美术决定 2b53b84d): review ambient, sun and its
+## three lamps in scene metres, the kit's angular distance, and the screen-calibrated two-colour backdrop.
+func test_the_tea_house_lights_as_the_coffee_shop_was_signed() -> void:
+	var r := _room("sh_tea_1")
+	var review: Dictionary = r.layout.review_lighting
+	assert_str(r.environment.ambient_light_color.to_html(false)).is_equal(str(review.ambient_color).to_lower())
+	assert_float(r.environment.ambient_light_energy).is_equal_approx(float(review.ambient), 0.001)
+	var sun := r.room.get_node("RoomSun") as DirectionalLight3D
+	assert_str(sun.light_color.to_html(false)).is_equal(str(review.sun_color).to_lower())
+	assert_float(sun.light_energy).is_equal_approx(float(review.sun), 0.001)
+	assert_float(sun.light_angular_distance).is_equal_approx(4.5, 0.001)
+	var lamps := r.room.find_children("ReviewLamp*", "OmniLight3D", false, false)
+	assert_int(lamps.size()).is_equal((review.points as Array).size())
+	for i in lamps.size():
+		var p: Array = review.points[i].position
+		assert_vector((lamps[i] as OmniLight3D).global_position).is_equal_approx(r.room.position + Vector3(p[0], p[1], p[2]), Vector3.ONE * 0.001)
+	assert_array(r.room.find_children("HearthGlow", "OmniLight3D", false, false)).is_empty()   # no hearth here
+	var mat := (r.cam.get_node("Backdrop") as MeshInstance3D).material_override as ShaderMaterial
+	assert_object(mat).is_not_null()
+	assert_str(P0Room.aces_screen(mat.get_shader_parameter("top_input")).to_html(false)).is_equal("e6f5f1")
+	assert_str(P0Room.aces_screen(mat.get_shader_parameter("bottom_input")).to_html(false)).is_equal("fffbee")
+	assert_vector(mat.get_shader_parameter("blend")).is_equal(Vector2(0.5, 0.85))

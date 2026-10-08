@@ -43,6 +43,11 @@ var place_name := ""
 var exit_text := "Door · Back to map"
 ## Where the door leads, for the world prompts (SGODOT-250: i-door + "Map" / "Farm"); "" keeps the old door card.
 var exit_to := ""
+## The colours around the room as they must appear on screen (SGODOT-227 美术决定 2b53b84d, sampled from the scene's
+## signed render): {top, bottom, blend: [from, to]} in hex; top and bottom flat, a smooth change between those screen
+## heights (0 = top, 1 = bottom); `top` alone is one colour. Empty: the kit's review background, else the Basic Room
+## plate (#F7F6EA on screen, 248).
+var backdrop := {}
 ## Level the modules show for (module visibility: module_levels[module] <= level).
 var level := 1
 ## Facilities tapped by their art instead of a radius round the anchor (int6 C8, 不知火舞 on 226): anchor name →
@@ -273,27 +278,49 @@ func _build_environment() -> void:
 	environment.background_mode = Environment.BG_COLOR
 	environment.background_color = backdrop_color()   # also the Backdrop plate's colour, see _backdrop()
 	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	environment.ambient_light_color = Color("fff0dc")
-	environment.ambient_light_energy = 0.70
+	var review := review_lighting()   # empty for the Basic Room: the benchmark values below (249)
+	environment.ambient_light_color = Color(str(review.get("ambient_color", "fff0dc")))
+	environment.ambient_light_energy = float(review.get("ambient", 0.70))
 	environment.tonemap_mode = Environment.TONE_MAPPER_ACES
 	world_env = WorldEnvironment.new()
 	world_env.environment = environment
 	add_child(world_env)
 
+## A scene kit's lighting as it was signed off (layout.review_lighting, SGODOT-227 美术决定 2b53b84d); empty for the
+## Basic Room, which keeps the P0Room benchmark (249).
+func review_lighting() -> Dictionary:
+	return layout.get("review_lighting", {}) as Dictionary
+
+## A review lamp this close to layout.fire_position is the hearth's own: HearthGlow already lights it, and the fire
+## effect brightens only that one lamp (PR #29 / #32), so the review lamp is not added twice.
+const HEARTH_LAMP_M := 0.5
+
 func _build_lights() -> void:
+	var review := review_lighting()
 	var sun := DirectionalLight3D.new()
 	sun.name = "RoomSun"
-	sun.light_color = Color("ffe6c2")
-	sun.light_energy = 1.05
+	sun.light_color = Color(str(review.get("sun_color", "ffe6c2")))
+	sun.light_energy = float(review.get("sun", 1.05))
 	sun.shadow_enabled = true
-	sun.directional_shadow_mode = DirectionalLight3D.SHADOW_ORTHOGONAL
-	sun.directional_shadow_max_distance = 30
-	sun.shadow_bias = 0.045
-	sun.shadow_normal_bias = 0.4
-	sun.light_angular_distance = 1.4
+	_set_sun_shadow(sun, review)
+	sun.light_angular_distance = float((layout.get("lighting", {}) as Dictionary).get("angular_distance", 1.4))
 	room.add_child(sun)
 	sun.position = sun_direction()
 	sun.look_at(room.global_position)
+	var fire = layout.get("fire_position", null)
+	var i := 0
+	for lamp in review.get("points", []):
+		var at := P0RoomAnchors.vec(lamp.position)   # scene metres, like the art: the lamp moves with the room
+		if fire is Array and at.distance_to(P0RoomAnchors.vec(fire)) < HEARTH_LAMP_M: continue
+		var light := OmniLight3D.new()
+		light.name = "ReviewLamp%d" % i
+		light.position = at
+		light.light_color = Color(str(lamp.get("color", "ffb85e")))
+		light.light_energy = float(lamp.get("energy", 1.0))
+		light.omni_range = float(lamp.get("range", 2.4))
+		light.shadow_enabled = false
+		room.add_child(light)
+		i += 1
 
 ## Where the room's sun shines from (room metres, towards the room origin): layout.sun_direction, else the kit's
 ## review sun (review_lighting.sun_position − sun_target), else the Basic Room benchmark.
@@ -303,6 +330,28 @@ func sun_direction() -> Vector3:
 	if review.get("sun_position", null) is Array:
 		return P0RoomAnchors.vec(review.sun_position) - P0RoomAnchors.vec(review.get("sun_target", [0, 0, 0]))
 	return Vector3(-6, 7, 1.5)
+
+## The sun's shadow as each kit's signed render cast it (SGODOT-227): the Basic Room keeps the P0Room benchmark; a review
+## with shadow values was signed through review_room.gd (orthogonal, its values, defaults 35 m / 0.025 / 0.18:
+## Farm Tools Store, Post Office); a review without them through render_r1 with Godot's own shadow (four splits, 40 m,
+## bias 0.1 / 2.0: Coffee Shop, Fruit Shop). The single orthogonal map lost the Coffee Shop's window and vine shadows.
+const SHADOW_KEYS := ["shadow_distance", "shadow_bias", "shadow_normal_bias"]
+static func _set_sun_shadow(sun: DirectionalLight3D, review: Dictionary) -> void:
+	if review.is_empty():
+		sun.directional_shadow_mode = DirectionalLight3D.SHADOW_ORTHOGONAL
+		sun.directional_shadow_max_distance = 30.0
+		sun.shadow_bias = 0.045
+		sun.shadow_normal_bias = 0.4
+	elif SHADOW_KEYS.any(func(k): return review.has(k)):
+		sun.directional_shadow_mode = DirectionalLight3D.SHADOW_ORTHOGONAL
+		sun.directional_shadow_max_distance = float(review.get("shadow_distance", 35.0))
+		sun.shadow_bias = float(review.get("shadow_bias", 0.025))
+		sun.shadow_normal_bias = float(review.get("shadow_normal_bias", 0.18))
+	else:
+		sun.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS
+		sun.directional_shadow_max_distance = 40.0
+		sun.shadow_bias = 0.1
+		sun.shadow_normal_bias = 2.0
 
 ## The one hearth lamp at layout.fire_position. It exists before the art enters the tree, so the art's fire effect
 ## drives this lamp instead of adding a second one (PR #29, SGODOT-236).
@@ -335,10 +384,47 @@ func _build_camera() -> void:
 	cam.make_current()
 	cam.add_child(_backdrop())
 
-## The kit's own review background (layout.review_lighting.background, as 248 agreed), else the Basic Room's.
+## The plate's input colour at the top of the screen (sRGB): from `backdrop` (screen colours, reversed through the
+## tonemapper), else the kit's review background, else the Basic Room's.
 func backdrop_color() -> Color:
-	var hex := str((layout.get("review_lighting", {}) as Dictionary).get("background", ""))
+	if backdrop.has("top"):
+		var v := aces_input(Color(str(backdrop.top)))
+		return Color(v.x, v.y, v.z).linear_to_srgb()
+	var hex := str(review_lighting().get("background", ""))
 	return Color.from_string(hex, BACKDROP) if hex != "" else BACKDROP
+
+## Godot's ACES tonemapper (BakingLab fit, exposure bias 1.8, white 1, exposure 1), reversed: the linear colour an
+## unshaded surface needs so that `screen` (sRGB) shows. The model gives exactly what 248 and 227 measured on screen:
+## e8e4c8 → #F7F6EA and D3E7D8 → #EFF7F1.
+const ACES_A := 0.0245786
+const ACES_B := 0.000090537
+const ACES_C := 0.983729
+const ACES_D := 0.432951
+const ACES_E := 0.238081
+static func _aces_rows(r0: Vector3, r1: Vector3, r2: Vector3) -> Basis:
+	return Basis(r0, r1, r2).transposed()   # Basis * v = (r0·v, r1·v, r2·v)
+static func _rrt(x: float) -> float:
+	return (x * (x + ACES_A) - ACES_B) / (x * (ACES_C * x + ACES_D) + ACES_E)
+static func _rrt_inv(t: float) -> float:
+	var a := 1.0 - t * ACES_C
+	var b := ACES_A - t * ACES_D
+	var c := -(ACES_B + t * ACES_E)
+	return (-b + sqrt(b * b - 4.0 * a * c)) / (2.0 * a)
+static func _aces_in() -> Basis:
+	return _aces_rows(Vector3(0.59719, 0.35458, 0.04823), Vector3(0.07600, 0.90834, 0.01566), Vector3(0.02840, 0.13383, 0.83777))
+static func _aces_out() -> Basis:
+	return _aces_rows(Vector3(1.60475, -0.53108, -0.07367), Vector3(-0.10208, 1.10813, -0.00605), Vector3(-0.00327, -0.07276, 1.07602))
+static func aces_input(screen: Color) -> Vector3:
+	var lin := screen.srgb_to_linear()
+	var o := Vector3(lin.r, lin.g, lin.b) * _rrt(1.8)
+	var t := _aces_out().inverse() * o
+	var c := Vector3(_rrt_inv(t.x), _rrt_inv(t.y), _rrt_inv(t.z))
+	return (_aces_in().inverse() * c) / 1.8
+## The forward model (linear input → sRGB on screen), for tests and the calibration notes.
+static func aces_screen(input: Vector3) -> Color:
+	var c := _aces_in() * (input * 1.8)
+	var o := _aces_out() * Vector3(_rrt(c.x), _rrt(c.y), _rrt(c.z)) / _rrt(1.8)
+	return Color(clampf(o.x, 0, 1), clampf(o.y, 0, 1), clampf(o.z, 0, 1)).linear_to_srgb()
 
 ## The colour around the room (SGODOT-248 R1.1): an unshaded plate just inside the far plane, so it is tone-mapped the
 ## same way as the room on every renderer. The environment's clear colour alone came out #F7F6EA through ACES on Metal
@@ -350,14 +436,40 @@ func _backdrop() -> MeshInstance3D:
 	var quad := QuadMesh.new()
 	quad.size = Vector2(400, 400)   # well past any room's orthographic view
 	plate.mesh = quad
+	plate.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	if backdrop.has("top"):
+		plate.material_override = _backdrop_gradient()
+		plate.position = Vector3(0, 0, -(cam.far - 1.0))
+		return plate
 	var mat := StandardMaterial3D.new()
 	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	mat.albedo_color = backdrop_color()
 	mat.disable_fog = true
 	plate.material_override = mat
-	plate.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	plate.position = Vector3(0, 0, -(cam.far - 1.0))
 	return plate
+
+## Screen-space vertical two-colour plate (SGODOT-227 美术决定 2b53b84d): linear inputs reversed from the screen colours.
+const BACKDROP_SHADER := """shader_type spatial;
+render_mode unshaded, fog_disabled, shadows_disabled, cull_disabled;
+uniform vec3 top_input;
+uniform vec3 bottom_input;
+uniform vec2 blend = vec2(0.5, 0.85);
+void fragment() {
+	ALBEDO = mix(top_input, bottom_input, smoothstep(blend.x, blend.y, SCREEN_UV.y));
+}
+"""
+func _backdrop_gradient() -> ShaderMaterial:
+	var shader := Shader.new()
+	shader.code = BACKDROP_SHADER
+	var mat := ShaderMaterial.new()
+	mat.shader = shader
+	var top := aces_input(Color(str(backdrop.top)))
+	mat.set_shader_parameter("top_input", top)
+	mat.set_shader_parameter("bottom_input", aces_input(Color(str(backdrop.bottom))) if backdrop.has("bottom") else top)
+	var blend: Array = backdrop.get("blend", [0.5, 0.85])
+	mat.set_shader_parameter("blend", Vector2(float(blend[0]), float(blend[1])))
+	return mat
 
 ## Opening shot (§10.1): the player, every tappable anchor and the room's floor (a cut-away diorama reads
 ## wrong cropped) in the middle of the screen; held until the player first moves. Re-run when a room changes
@@ -415,6 +527,7 @@ func _view() -> Vector2:
 	return get_viewport().get_visible_rect().size if is_inside_tree() else Vector2(360, 800)
 
 func _update_camera() -> void:
+	if _review_view: return   # P0_SHOT "reviewcam": held on the kit's review camera
 	var follow_size := _cam_size / _zoom
 	var center := _focus
 	var size := follow_size
@@ -768,8 +881,17 @@ func resume() -> void:
 		rt.ui.set_place(city + " · " + place_name)
 
 # ---------------------------------------------------------------- dev steps for P0_SHOT
+var _review_view := false
 func p0_dev(step: PackedStringArray) -> bool:
 	match step[0]:
+		"reviewcam":   # the kit's layout.camera, as its signed render framed it (art comparisons, SGODOT-227)
+			var spec: Dictionary = layout.get("camera", {})
+			_review_view = true
+			cam.keep_aspect = Camera3D.KEEP_HEIGHT
+			cam.size = float(spec.get("size", cam.size)) * (float(step[1]) if step.size() > 1 else 1.0)
+			cam.position = room.global_position + P0RoomAnchors.vec(spec.position)
+			cam.look_at(room.global_position + P0RoomAnchors.vec(spec.target), Vector3.UP)
+		"noui": if rt: rt.ui.visible = false
 		"goto":
 			actor.teleport(Vector3(float(step[1]), floor_y, float(step[2])))
 			_focus = actor.position

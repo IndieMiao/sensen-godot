@@ -419,3 +419,71 @@ func test_the_spice_rack_takes_taps_beside_it_and_the_stove_keeps_to_its_body() 
 	var below := Vector2(cab.get_center().x, maxf(cab.get_center().y, rack3.end.y + 4))
 	assert_bool(cab.has_point(below)).override_failure_message("%s not in the cabinet's box %s" % [below, cab]).is_true()
 	assert_str(lv3.pick(below)).is_equal("use_warming_cabinet")   # under the shelf, the cabinet's own
+
+## Godot's ACES as P0Room models it gives exactly the screen colours 248 and 227 measured, and reverses the art
+## director's backdrop colours (SGODOT-227 美术决定 2b53b84d) to inputs that show them.
+func test_the_aces_model_matches_the_measured_screen_colours_and_reverses() -> void:
+	var lin := func(hex: String) -> Vector3:
+		var c := Color(hex).srgb_to_linear()
+		return Vector3(c.r, c.g, c.b)
+	assert_str(P0Room.aces_screen(lin.call("e8e4c8")).to_html(false)).is_equal("f7f6ea")   # 248, Metal and Vulkan
+	assert_str(P0Room.aces_screen(lin.call("d3e7d8")).to_html(false)).is_equal("eff7f1")   # 227, the tea house
+	for hex in ["e6f5f1", "fffbee", "eff7f4", "fdfcf4", "d5eff3", "f7f6ea"]:
+		assert_str(P0Room.aces_screen(P0Room.aces_input(Color(hex))).to_html(false)).override_failure_message(hex).is_equal(hex)
+
+## The Basic Room has no review_lighting: the farmhouse keeps the P0Room benchmark light (249) and the plain plate.
+func test_the_basic_room_keeps_the_benchmark_light() -> void:
+	var r := _room()
+	assert_str(r.environment.ambient_light_color.to_html(false)).is_equal("fff0dc")
+	assert_float(r.environment.ambient_light_energy).is_equal_approx(0.70, 0.001)
+	var sun := r.room.get_node("RoomSun") as DirectionalLight3D
+	assert_str(sun.light_color.to_html(false)).is_equal("ffe6c2")
+	assert_float(sun.light_energy).is_equal_approx(1.05, 0.001)
+	assert_float(sun.shadow_bias).is_equal_approx(0.045, 0.001)
+	assert_float(sun.shadow_normal_bias).is_equal_approx(0.4, 0.001)
+	assert_float(sun.directional_shadow_max_distance).is_equal_approx(30.0, 0.001)
+	assert_int(sun.directional_shadow_mode).is_equal(DirectionalLight3D.SHADOW_ORTHOGONAL)
+	assert_float(sun.light_angular_distance).is_equal_approx(1.4, 0.001)
+	assert_array(r.room.find_children("ReviewLamp*", "OmniLight3D", false, false)).is_empty()
+	var plate := r.cam.get_node("Backdrop") as MeshInstance3D
+	assert_str((plate.material_override as StandardMaterial3D).albedo_color.to_html(false)).is_equal("e8e4c8")
+
+## A kit whose review lamp sits on the hearth keeps one hearth lamp: HearthGlow, the one the fire brightens (#29 / #32).
+func test_a_review_lamp_on_the_hearth_is_not_added_twice() -> void:
+	var layout := P0RoomAnchors.read_json(P0Room.BASIC_ROOM_LAYOUT)
+	var fire: Array = layout.fire_position
+	layout["review_lighting"] = {"ambient_color": "c0ada9", "ambient": 0.67, "sun_color": "ffe0ae", "sun": 1.55,
+		"points": [{"position": fire, "color": "ffb85e", "energy": 1.0}, {"position": [1.0, 2.2, 0.5], "color": "ffe0a3", "energy": 1.2, "range": 1.45}]}
+	layout["lighting"] = {"angular_distance": 4.5}
+	var path := "user://test_review_room.layout.json"
+	var f := FileAccess.open(path, FileAccess.WRITE)
+	f.store_string(JSON.stringify(layout))
+	f.close()
+	var r := Sample.new()
+	r.setup({})
+	r.layout_path = path
+	add_child(r)
+	auto_free(r)
+	assert_int(r.room.find_children("HearthGlow", "OmniLight3D", false, false).size()).is_equal(1)
+	var lamps := r.room.find_children("ReviewLamp*", "OmniLight3D", false, false)
+	assert_int(lamps.size()).is_equal(1)
+	assert_vector((lamps[0] as OmniLight3D).position).is_equal(Vector3(1.0, 2.2, 0.5))
+	assert_float((lamps[0] as OmniLight3D).omni_range).is_equal_approx(1.45, 0.001)
+	var sun := r.room.get_node("RoomSun") as DirectionalLight3D
+	assert_float(sun.light_angular_distance).is_equal_approx(4.5, 0.001)
+	# No shadow values in the review: Godot's own shadow, as render_r1 signed the Coffee Shop and Fruit Shop.
+	assert_int(sun.directional_shadow_mode).is_equal(DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS)
+	assert_float(sun.directional_shadow_max_distance).is_equal_approx(40.0, 0.001)
+	assert_float(sun.shadow_bias).is_equal_approx(0.1, 0.001)
+	assert_float(sun.shadow_normal_bias).is_equal_approx(2.0, 0.001)
+
+## A review with shadow values was signed through review_room.gd: one orthogonal map with those values (Farm Tools
+## Store, Post Office); the ones it leaves out take that tool's defaults.
+func test_review_shadow_values_cast_the_review_tools_shadow() -> void:
+	var sun := DirectionalLight3D.new()
+	P0Room._set_sun_shadow(sun, {"sun": 1.2, "shadow_bias": 0.03})
+	assert_int(sun.directional_shadow_mode).is_equal(DirectionalLight3D.SHADOW_ORTHOGONAL)
+	assert_float(sun.shadow_bias).is_equal_approx(0.03, 0.001)
+	assert_float(sun.shadow_normal_bias).is_equal_approx(0.18, 0.001)
+	assert_float(sun.directional_shadow_max_distance).is_equal_approx(35.0, 0.001)
+	sun.free()
