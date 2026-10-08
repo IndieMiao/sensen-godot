@@ -41,6 +41,7 @@ static func all() -> Array[Dictionary]:
 		{id = "action_radial_motion", title = "UiActionRadial · opening", figma = "Motion 1651:100816 · 0 / 80 / 160 / 300 ms", build = _action_radial_motion},
 		{id = "status_badge", title = "UiStatusBadge", figma = "StatusBadge 1132:79554 · LOCK-11", build = _status_badges},
 		{id = "tap_card", title = "UiTapCard", figma = "TapCard 1135:101133 · LOCK-07", build = _tap_cards},
+		{id = "entry_card", title = "UiEntryCard", figma = "EntryCard 1468:94344 · LOCK-21 / LOCK-10", build = _entry_cards},
 		# SGODOT-222 world display
 		{id = "need_tile", title = "UiNeedTile", figma = "NeedTile 1090:78003 · LOCK-10", build = _need_tiles},
 		{id = "need_source", title = "UiNeedSource", figma = "NeedSource 1092:77266 · LOCK-10 / 08", build = _need_sources},
@@ -994,6 +995,20 @@ static func _tap_cards() -> Control:
 	var right := UiTapCard.new("Mei · Tap to talk")
 	right.point_at(1000.0)
 	v.add_child(_captioned(right, "facility near the right edge"))
+	return v
+
+## The main's four variants: State=Available / Unavailable × Pointer=Center / Right (gate near the right edge).
+static func _entry_cards() -> Control:
+	var v := _column()
+	var A := UiEntryCard.State.AVAILABLE
+	var U := UiEntryCard.State.UNAVAILABLE
+	for it in [["New run · 2 Energy", "Current run will end · Runs today 1/2", A, false, "available"],
+			["New run · Clear Floor 2 first", "", U, false, "unavailable: the reason on the action line"],
+			["New run · 2 Energy", "Current run will end · Runs today 1/2", A, true, "available, gate near the right edge"],
+			["Mine runs today 2/2 · Resets in 9h 12m", "", U, true, "unavailable, gate near the right edge"]]:
+		var c := UiEntryCard.new(it[0], it[1], it[2])
+		if it[3]: c.point_at(1000.0)
+		v.add_child(_captioned(c, it[4]))
 	return v
 
 static func _quality_badges() -> Control:

@@ -324,3 +324,12 @@ func test_greyed_entry_card_carries_its_reason() -> void:
 	assert_str(str(card.toast)).is_equal(P0MaterialLogic.BAG_FULL)
 	v.mine.run.new_run_block = "clear_floor_2"
 	assert_str(str(P0MaterialLogic.mine_entry_card(v).toast)).is_equal("New run · Clear Floor 2 first")
+
+## 不知火舞 on #45: short of Energy, the EntryCard keeps its consequence line under the warning action line.
+func test_entry_card_short_of_energy_keeps_the_consequence() -> void:
+	var v := {"energy": {"value": 1}, "mine": {"floor_energy": 2, "runs": {"used": 1, "limit": 2}, "entry_bag_ok": true,
+		"run": {"id": "r1", "deepest": 2, "can_new_run": true, "new_run_block": "", "floors": []}}}
+	var card := P0MaterialLogic.mine_entry_card(v)
+	assert_str(str(card.label)).is_equal("New run · Need 2 Energy")
+	assert_bool(bool(card.amber)).is_true()
+	assert_str(str(card.line2)).is_equal("Current run will end · Runs today 1/2")
