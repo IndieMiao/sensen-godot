@@ -94,7 +94,7 @@
 | Mei 问候 ★ | `Morning! Row Hoes just came in — sows three plots at once, Farming Lv4. Anything I can get you?`（q(46)） |
 | Ama 问候 ★ | `Sit a minute. Hot tea, 30 Energy a cup — first one's 40 coins today.`（不写 back，q(46)）；喝后 `Enjoy. Next cup's 50 coins.` |
 | 渔具铺柜台 ★ | 只有 Buy 一页、不显示 Tab 条；`Reed Rod · 80 coins`（`Fishing Lv3` / `Owned`）/ `Worm Bait · 2 coins` · `30 left today` / `Sold out · 9h 12m`；收鱼 × 0.8；渔情板只作摆设，不挂图标钮与名字条（q(46)、q(62)） |
-| 集市柜台 ★ | `Buy | Market Board`，只有 Row Hoe 一行，不贴背包（q(48)）；特产货架名字条 `City Specialty`（q(62)）/ `Shanghai Postcard · 100 coins` / `Owned` |
+| 集市柜台 ★ | `Buy | Market Board`，只有 Row Hoe 一行，不贴背包（q(48)）；特产货架名字条 `City Specialty`、委托板名字条 `Market Board`（有可接委托时换 `!` 徽标）（q(62)）/ `Shanghai Postcard · 100 coins` / `Owned` |
 | 驿站柜台 | 只卖咖啡 `Trade · get a coffee`；盖章台只作摆设 |
 | 集市委托板 ★ | `Dusk Haul · Market Board` / `4 Fine fish · any kind` / `36 coins`（P0 不写 `+1 city stamp`）；`Market Basket` / `3 crops · 6 each`（q(46)） |
 | 居民 ★ | 头顶名字条只写名字 `Pip` / `Old Kai`（q(62)）；Pip `Could you catch me a fish? Any kind is fine.`（对话条与委托卡同句）；Old Kai 需求行 `Rare fish · Golden Koi · Pond 0/1`；奖励行 `+5 Friendship · 20 coins` / `+5 Friendship · 50 coins`（q(46)）；赠餐 `Pip shared a meal with you · +20 Energy` |
