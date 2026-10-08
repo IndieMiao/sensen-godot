@@ -1,6 +1,8 @@
-# Add inside the farm.sensenjoy.cn site block, before `reverse_proxy app:3000` (SGODOT-232 D1).
-# handle_path strips /preview/p0, so the client's https://farm.sensenjoy.cn/preview/p0/v1/… reaches p0 as /v1/….
+# Add inside the farm.sensenjoy.cn site block of the live /opt/farm/Caddyfile, right after the
+# `handle_path /preview/journey/*` block and before the catch-all `handle { reverse_proxy farm-app-1:3000 }`
+# (SGODOT-232 D1; the live file is not the repo's server/deploy/Caddyfile, see the deploy plan).
+# handle_path strips /preview/p0, so the client's https://farm.sensenjoy.cn/preview/p0/v1/… reaches P0 as /v1/….
 # Caddy passes WebSocket upgrades through reverse_proxy as is (SGODOT-227's /v1/p0/online).
-handle_path /preview/p0/* {
-	reverse_proxy p0:3110
-}
+    handle_path /preview/p0/* {
+        reverse_proxy p0-demo:3110
+    }

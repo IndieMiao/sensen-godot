@@ -26,11 +26,14 @@
 | `Dockerfile.dockerignore` | 这个镜像专用的放行清单（BuildKit 优先读它，不读根目录给 farm 用的 `.dockerignore`，那份没放行 `assets/p0`）。不会打进演示包的 `demo_server.json` |
 | `docker-compose.p0.yml` | 香港 ECS：加入 farm 项目的网络 `farm_default`，由 farm 的 Caddy 转发；内存上限 256 MB |
 | `docker-compose.devserver.yml` | 局域网 devserver：同一个镜像直接发布到 3150 端口，不经 Caddy |
-| `Caddyfile.p0.snippet` | 要并入线上 Caddyfile 的一段：`/preview/p0/*` 去掉前缀后转给 `p0:3110` |
+| `Caddyfile.p0.snippet` | 要并入线上 Caddyfile 的一段：`/preview/p0/*` 去掉前缀后转给 `p0-demo:3110`（容器在 farm_default 上的别名） |
 | `smoke.sh` | 冒烟：healthz、无口令 401、带口令读状态、一条命令往返、dev 路由 404、UI 上报。用一次性玩家 id `smoke-<时间戳>`，不碰真实玩家 |
 | `backup-p0.sh` | 每晚把 `/data` 卷打包，保留 14 份；按 compose 标签找卷（项目名 `P0_PROJECT`，默认 p0），不写死卷名 |
 
 ## 目标 A：香港 ECS（首选）
+
+> 2026-10-08 用户决定部署到这台机器。只读检查的结果和逐步部署方案见 `docs/qa/p0-hk-deploy-plan-2026-10-08.md`，以那份为准；下面是准备阶段的通用步骤。
+
 
 地址 `https://farm.sensenjoy.cn/preview/p0/v1`，客户端 base URL 就填它。和 farm、Journey 共用一台 2C4G、一个 Caddy，P0 是独立的 compose 项目 `p0`，不改 farm 的 compose。
 
