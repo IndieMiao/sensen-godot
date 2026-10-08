@@ -27,6 +27,9 @@ var last_xp_lines: Array = []
 var last_first_catch_xp := 0
 ## What to do once the map is back on top (FISH-4 Go home, FISH-5 Tackle Shop): "farm" / "tackle".
 var after_leave := ""
+## True only while the farm's hold-to-repeat sends its next command (§14.2): the observation log's "hold" (S7).
+## The press itself, even with the key still down, is a tap (刘邦, PR #23 review).
+var holding_repeat := false
 
 ## Load timing (logcat tag godot, "P0_TIMING"): navigation start → world _ready → first drawn frame.
 static var _nav_ms := 0
@@ -42,6 +45,8 @@ static func ensure() -> P0Runtime:
 	(Engine.get_main_loop() as SceneTree).root.add_child.call_deferred(_instance)
 	return _instance
 
+func src_of_press() -> String: return "hold" if holding_repeat else "tap"
+
 func _init() -> void:
 	# App copy is English-only (user rule 2026-09-04); reused old panels translate through L10n, so pin the locale.
 	TranslationServer.set_locale("en")
@@ -53,6 +58,8 @@ func _init() -> void:
 	ui.tapped.connect(func(p): _call("p0_tap", [p]))
 	ui.action_pressed.connect(_on_action)
 	ui.command.connect(func(cmd): session.send(cmd, P0Session.ui_key(cmd)))   # panel buttons: one submit per result
+	# Observation log (S7): only the commands the farm's hold-to-repeat sends are holds; every press is a tap.
+	session.src_of = src_of_press
 	ui.dev_skip.connect(func(m): session.dev_skip(m); ui.toast("Clock +%dh (dev)" % (m / 60)))
 	ui.zoom.connect(func(f: float): _call("p0_zoom", [f]))
 	ui.recenter.connect(func(): _call("p0_recenter", []))
@@ -129,6 +136,7 @@ func _on_action(cmd: Dictionary) -> void:
 	if str(cmd.get("type", "")) == "energy_card":
 		var verb = _call("p0_energy_verb", [])
 		ui.open_energy_card(int(ui.fab_state().get("need", 0)), str(verb) if verb != null else str(ui.fab_state().get("verb", "")))
+		session.report({"kind": "energy_card", "need": int(ui.fab_state().get("need", 0))})
 		return
 	if not cmd.is_empty(): _call("p0_action", [cmd])
 
@@ -209,6 +217,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 			"level":
 				var lv: Dictionary = ev
 				ui.queue_card(func(): ui.show_level_up(lv))
+				session.report({"kind": "level_banner", "skill": str(lv.skill), "level": int(lv.level)})
 			"homestead":
 				# HOME-2 (SGODOT-228): HOME-1 closes, the MomentBanner says what changed; the farm swaps the fence.
 				if ui.modal_kind == "homestead": ui.close_modal()
@@ -242,6 +251,7 @@ func _on_catch(ev: Dictionary, _xp_lines: Array, at := Vector2.INF) -> void:
 			var gone: Dictionary = ev
 			if ui.first_time("gotaway:" + str(ev.fish)):
 				ui.queue_card(func(): ui.show_got_away(gone))
+				session.report({"kind": "card_shown", "card": "got_away", "fish": str(gone.get("fish", ""))})
 			else:
 				ui.float_text(("Got away · Lv%d" % int(ev.need_level)) if ev.has("need_level") else "Got away · rod too light", where, P0Ui.INK2)
 		"escaped":
@@ -262,6 +272,7 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 	match code:
 		"need_energy":
 			ui.open_energy_card(int(detail.get("need", 0)), "Cast" if str(cmd.get("type", "")) == "cast" else "Sow ×1")
+			session.report({"kind": "energy_card", "need": int(detail.get("need", 0)), "refused": str(cmd.get("type", ""))})
 		"locked":
 			ui.toast("%s Lv%d · %d XP to go" % [str(detail.get("skill", "farming")).capitalize(), int(detail.get("level", 2)), int(detail.get("xp_to_go", 0))])
 		"no_coins":

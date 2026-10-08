@@ -1,0 +1,2700 @@
+{
+  "units": "metres",
+  "coordinates": "Godot Y up, front +Z; pivots local floor or mounting point",
+  "reference": {
+    "file_key": "OMLTC3yw3u2WDjOZhLnhaR",
+    "node_id": "545:2956"
+  },
+  "assets": [
+    {
+      "name": "floor",
+      "file": "floor.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            -0.08,
+            0
+          ],
+          "size": [
+            6.2,
+            0.259,
+            5.7
+          ]
+        }
+      ]
+    },
+    {
+      "name": "entry_steps",
+      "file": "entry_steps.glb",
+      "position": [
+        0.15,
+        0,
+        2.82
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0,
+            0
+          ],
+          "points": [
+            [
+              -0.85,
+              -0.34,
+              -0.22
+            ],
+            [
+              -0.85,
+              0.05,
+              -0.22
+            ],
+            [
+              -0.85,
+              0.05,
+              0.21
+            ],
+            [
+              -0.85,
+              -0.31,
+              0.88
+            ],
+            [
+              -0.85,
+              -0.34,
+              0.88
+            ],
+            [
+              0.85,
+              -0.34,
+              -0.22
+            ],
+            [
+              0.85,
+              0.05,
+              -0.22
+            ],
+            [
+              0.85,
+              0.05,
+              0.21
+            ],
+            [
+              0.85,
+              -0.31,
+              0.88
+            ],
+            [
+              0.85,
+              -0.34,
+              0.88
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "low_wall_long",
+      "file": "low_wall_long.glb",
+      "position": [
+        3,
+        0.04,
+        0
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.37,
+            0
+          ],
+          "size": [
+            5.4,
+            0.74,
+            0.23
+          ]
+        }
+      ]
+    },
+    {
+      "name": "low_wall_front_left",
+      "file": "low_wall_front_left.glb",
+      "position": [
+        -1.85,
+        0.04,
+        2.72
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.37,
+            0
+          ],
+          "size": [
+            2.0,
+            0.74,
+            0.23
+          ]
+        }
+      ]
+    },
+    {
+      "name": "low_wall_front_right",
+      "file": "low_wall_front_right.glb",
+      "position": [
+        1.94,
+        0.04,
+        2.72
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.37,
+            0
+          ],
+          "size": [
+            1.86,
+            0.74,
+            0.23
+          ]
+        }
+      ]
+    },
+    {
+      "name": "low_pillar",
+      "file": "low_pillar.glb",
+      "position": [
+        3,
+        0.03,
+        2.72
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.44,
+            0
+          ],
+          "size": [
+            0.36,
+            0.88,
+            0.36
+          ]
+        }
+      ]
+    },
+    {
+      "name": "tall_pillar",
+      "file": "tall_pillar.glb",
+      "position": [
+        -3,
+        0.04,
+        -2.72
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            1.52,
+            0
+          ],
+          "size": [
+            0.3,
+            3.04,
+            0.3
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ivy_arch_door",
+      "file": "ivy_arch_door.glb",
+      "position": [
+        -3,
+        0.04,
+        0.65
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            -0.91,
+            1.4,
+            0
+          ],
+          "size": [
+            0.26,
+            2.8,
+            0.26
+          ]
+        },
+        {
+          "at": [
+            0.91,
+            1.4,
+            0
+          ],
+          "size": [
+            0.26,
+            2.8,
+            0.26
+          ]
+        }
+      ]
+    },
+    {
+      "name": "left_window",
+      "file": "left_window.glb",
+      "position": [
+        -3,
+        0.04,
+        -1.83
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            0,
+            1.4,
+            0
+          ],
+          "size": [
+            1.66,
+            2.8,
+            0.16
+          ]
+        }
+      ]
+    },
+    {
+      "name": "back_counter_wall",
+      "file": "back_counter_wall.glb",
+      "position": [
+        -0.81,
+        0.04,
+        -2.72
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            1.45,
+            0
+          ],
+          "size": [
+            4.16,
+            2.9,
+            0.19
+          ]
+        }
+      ]
+    },
+    {
+      "name": "right_arch_window",
+      "file": "right_arch_window.glb",
+      "position": [
+        2.24,
+        0.04,
+        -2.72
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            1.4,
+            0
+          ],
+          "size": [
+            1.5,
+            2.8,
+            0.16
+          ]
+        }
+      ]
+    },
+    {
+      "name": "counter",
+      "file": "counter.glb",
+      "position": [
+        -0.2,
+        0.06,
+        -1.8
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.58,
+            0
+          ],
+          "size": [
+            3.4,
+            1.16,
+            0.98
+          ]
+        }
+      ]
+    },
+    {
+      "name": "espresso_machine",
+      "file": "espresso_machine.glb",
+      "position": [
+        0.45,
+        1.26,
+        -1.76
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "coffee_grinder",
+      "file": "coffee_grinder.glb",
+      "position": [
+        1.05,
+        1.26,
+        -1.86
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "pastry_case",
+      "file": "pastry_case.glb",
+      "position": [
+        -0.92,
+        1.26,
+        -1.8
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "display_glass",
+      "file": "display_glass.glb",
+      "position": [
+        -0.92,
+        1.26,
+        -1.8
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "cups_and_saucers",
+      "file": "cups_and_saucers.glb",
+      "position": [
+        1.17,
+        1.26,
+        -1.53
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "counter_daisies",
+      "file": "counter_daisies.glb",
+      "position": [
+        -1.49,
+        1.26,
+        -1.83
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "small_planter",
+      "file": "small_planter.glb",
+      "position": [
+        1.36,
+        1.26,
+        -2.01
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "pendant",
+      "file": "pendant.glb",
+      "position": [
+        -1.2,
+        3.12,
+        -1.32
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "botanical_picture",
+      "file": "botanical_picture.glb",
+      "position": [
+        0.93,
+        1.54,
+        -2.56
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "table",
+      "file": "table.glb",
+      "position": [
+        -1.34,
+        0.065,
+        0.55
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.504,
+            0
+          ],
+          "size": [
+            1.12,
+            1.008,
+            1.12
+          ]
+        }
+      ]
+    },
+    {
+      "name": "chair",
+      "file": "chair.glb",
+      "position": [
+        -2.13,
+        0.065,
+        0.55
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.5537,
+            0
+          ],
+          "size": [
+            0.67,
+            1.1074,
+            0.64
+          ]
+        }
+      ]
+    },
+    {
+      "name": "jute_rug",
+      "file": "jute_rug.glb",
+      "position": [
+        -1.34,
+        0.058,
+        0.55
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "table_bouquet",
+      "file": "table_bouquet.glb",
+      "position": [
+        -1.41,
+        1.07,
+        0.4
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "table_coffee",
+      "file": "table_coffee.glb",
+      "position": [
+        -1.08,
+        1.07,
+        0.7
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "hanging_cafe_sign",
+      "file": "hanging_cafe_sign.glb",
+      "position": [
+        -3.22,
+        1.9,
+        2.41
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "window_glass_left",
+      "file": "window_glass_left.glb",
+      "position": [
+        -3,
+        0.04,
+        -1.83
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "window_glass_back",
+      "file": "window_glass_back.glb",
+      "position": [
+        -0.81,
+        0.04,
+        -2.72
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "window_glass_arch",
+      "file": "window_glass_arch.glb",
+      "position": [
+        2.24,
+        0.04,
+        -2.72
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "window_garden_backdrop",
+      "file": "window_garden_backdrop.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "wall_shelf",
+      "file": "wall_shelf.glb",
+      "position": [
+        -0.75,
+        1.68,
+        -2.45
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    }
+  ],
+  "instances": [
+    {
+      "name": "low_pillar_0",
+      "asset": "low_pillar",
+      "position": [
+        -3,
+        0.03,
+        2.72
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "low_pillar_1",
+      "asset": "low_pillar",
+      "position": [
+        -0.69,
+        0.03,
+        2.72
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "low_pillar_2",
+      "asset": "low_pillar",
+      "position": [
+        0.99,
+        0.03,
+        2.72
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "low_pillar_3",
+      "asset": "low_pillar",
+      "position": [
+        3,
+        0.03,
+        -2.72
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "tall_pillar_0",
+      "asset": "tall_pillar",
+      "position": [
+        -3,
+        0.04,
+        -0.87
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "tall_pillar_1",
+      "asset": "tall_pillar",
+      "position": [
+        -3,
+        0.04,
+        2.1
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "tall_pillar_2",
+      "asset": "tall_pillar",
+      "position": [
+        1.46,
+        0.04,
+        -2.72
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "tall_pillar_3",
+      "asset": "tall_pillar",
+      "position": [
+        3,
+        0.04,
+        -2.72
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "pendant_2",
+      "asset": "pendant",
+      "position": [
+        0.3,
+        3.12,
+        -1.32
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "table_2",
+      "asset": "table",
+      "position": [
+        1.45,
+        0.065,
+        1.0
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "chair_2",
+      "asset": "chair",
+      "position": [
+        -0.62,
+        0.065,
+        0.35
+      ],
+      "yaw_degrees": -90
+    },
+    {
+      "name": "chair_3",
+      "asset": "chair",
+      "position": [
+        0.84,
+        0.065,
+        1.2
+      ],
+      "yaw_degrees": 90
+    },
+    {
+      "name": "chair_4",
+      "asset": "chair",
+      "position": [
+        2.24,
+        0.065,
+        1.0
+      ],
+      "yaw_degrees": -90
+    },
+    {
+      "name": "jute_rug_2",
+      "asset": "jute_rug",
+      "position": [
+        1.45,
+        0.058,
+        1.0
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "table_bouquet_2",
+      "asset": "table_bouquet",
+      "position": [
+        1.4,
+        1.07,
+        0.83
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "table_coffee_2",
+      "asset": "table_coffee",
+      "position": [
+        1.67,
+        1.07,
+        1.16
+      ],
+      "yaw_degrees": 0
+    }
+  ],
+  "camera": {
+    "position": [
+      10.85,
+      11.0,
+      11.15
+    ],
+    "target": [
+      -0.15,
+      1.27,
+      0.15
+    ],
+    "size": 9.6
+  },
+  "shared_plants": [
+    {
+      "name": "LargeMonsteraLeft",
+      "asset": "monstera",
+      "file": "res://assets/rooms/_shared/plants/monstera.glb",
+      "position": [
+        -2.47,
+        0.065,
+        -1.51
+      ],
+      "rotation_degrees": [
+        0,
+        -15,
+        0
+      ],
+      "scale": [
+        1.05,
+        1.05,
+        1.05
+      ],
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.3,
+            0
+          ],
+          "size": [
+            0.6,
+            0.6,
+            0.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "WhitePeaceLily",
+      "asset": "peace_lily",
+      "file": "res://assets/rooms/_shared/plants/peace_lily.glb",
+      "position": [
+        -2.58,
+        0.065,
+        -0.68
+      ],
+      "rotation_degrees": [
+        0,
+        22,
+        0
+      ],
+      "scale": [
+        0.95,
+        0.95,
+        0.95
+      ],
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.21,
+            0
+          ],
+          "size": [
+            0.46,
+            0.42,
+            0.46
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SmallCornerPlant",
+      "asset": "pothos",
+      "file": "res://assets/rooms/_shared/plants/pothos.glb",
+      "position": [
+        -2.88,
+        0.065,
+        1.98
+      ],
+      "rotation_degrees": [
+        0,
+        35,
+        0
+      ],
+      "scale": [
+        0.9,
+        0.9,
+        0.9
+      ],
+      "colliders": []
+    },
+    {
+      "name": "MonsteraWovenCorner",
+      "asset": "monstera_woven",
+      "file": "res://assets/rooms/_shared/plants/monstera_woven.glb",
+      "position": [
+        2.55,
+        0.065,
+        -1.7
+      ],
+      "rotation_degrees": [
+        0,
+        -28,
+        0
+      ],
+      "scale": [
+        0.94,
+        0.94,
+        0.94
+      ],
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.3,
+            0
+          ],
+          "size": [
+            0.6,
+            0.6,
+            0.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "TallOliveCorner",
+      "asset": "olive_tree",
+      "file": "res://assets/rooms/_shared/plants/olive_tree.glb",
+      "position": [
+        1.97,
+        0.065,
+        -2.26
+      ],
+      "rotation_degrees": [
+        0,
+        45,
+        0
+      ],
+      "scale": [
+        0.66,
+        0.66,
+        0.66
+      ],
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.22,
+            0
+          ],
+          "size": [
+            0.4,
+            0.44,
+            0.4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SmallWhiteLilyRight",
+      "asset": "peace_lily",
+      "file": "res://assets/rooms/_shared/plants/peace_lily.glb",
+      "position": [
+        2.14,
+        0.065,
+        -1.76
+      ],
+      "rotation_degrees": [
+        0,
+        -20,
+        0
+      ],
+      "scale": [
+        0.52,
+        0.52,
+        0.52
+      ],
+      "colliders": []
+    },
+    {
+      "name": "ArchCrown00",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        -2.8,
+        1.9600000000000002,
+        1.58
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        180.0
+      ],
+      "scale": [
+        0.75,
+        0.75,
+        0.75
+      ],
+      "colliders": []
+    },
+    {
+      "name": "ArchCrown01",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        -2.8,
+        2.363511877379329,
+        1.4879010471492498
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        154.28571428571428
+      ],
+      "scale": [
+        0.75,
+        0.75,
+        0.75
+      ],
+      "colliders": []
+    },
+    {
+      "name": "ArchCrown02",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        -2.8,
+        2.6871032786952678,
+        1.229845515728622
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        128.57142857142858
+      ],
+      "scale": [
+        0.75,
+        0.75,
+        0.75
+      ],
+      "colliders": []
+    },
+    {
+      "name": "ArchCrown03",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        -2.8,
+        2.866682958329096,
+        0.8569444685793723
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        102.85714285714286
+      ],
+      "scale": [
+        0.75,
+        0.75,
+        0.75
+      ],
+      "colliders": []
+    },
+    {
+      "name": "ArchCrown04",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        -2.8,
+        2.866682958329096,
+        0.4430555314206276
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        77.14285714285714
+      ],
+      "scale": [
+        0.75,
+        0.75,
+        0.75
+      ],
+      "colliders": []
+    },
+    {
+      "name": "ArchCrown05",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        -2.8,
+        2.6871032786952678,
+        0.07015448427137772
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        51.42857142857143
+      ],
+      "scale": [
+        0.75,
+        0.75,
+        0.75
+      ],
+      "colliders": []
+    },
+    {
+      "name": "ArchCrown06",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        -2.8,
+        2.363511877379329,
+        -0.18790104714924982
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        25.714285714285715
+      ],
+      "scale": [
+        0.75,
+        0.75,
+        0.75
+      ],
+      "colliders": []
+    },
+    {
+      "name": "ArchCrown07",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        -2.8,
+        1.96,
+        -0.28
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        0.0
+      ],
+      "scale": [
+        0.75,
+        0.75,
+        0.75
+      ],
+      "colliders": []
+    },
+    {
+      "name": "ArchSide_front0",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        -2.8,
+        2.02,
+        1.65
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        8
+      ],
+      "scale": [
+        0.78,
+        0.78,
+        0.78
+      ],
+      "colliders": []
+    },
+    {
+      "name": "ArchSide_front1",
+      "asset": "ivy_medium",
+      "file": "res://assets/rooms/_shared/plants/ivy_medium.glb",
+      "position": [
+        -2.8,
+        1.5,
+        1.65
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        -7
+      ],
+      "scale": [
+        0.78,
+        0.78,
+        0.78
+      ],
+      "colliders": []
+    },
+    {
+      "name": "ArchSide_front2",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        -2.8,
+        0.94,
+        1.65
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        8
+      ],
+      "scale": [
+        0.78,
+        0.78,
+        0.78
+      ],
+      "colliders": []
+    },
+    {
+      "name": "ArchSide_back0",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        -2.8,
+        2.02,
+        -0.35
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        8
+      ],
+      "scale": [
+        0.78,
+        0.78,
+        0.78
+      ],
+      "colliders": []
+    },
+    {
+      "name": "ArchSide_back1",
+      "asset": "ivy_medium",
+      "file": "res://assets/rooms/_shared/plants/ivy_medium.glb",
+      "position": [
+        -2.8,
+        1.5,
+        -0.35
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        -7
+      ],
+      "scale": [
+        0.78,
+        0.78,
+        0.78
+      ],
+      "colliders": []
+    },
+    {
+      "name": "ArchSide_back2",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        -2.8,
+        0.94,
+        -0.35
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        8
+      ],
+      "scale": [
+        0.78,
+        0.78,
+        0.78
+      ],
+      "colliders": []
+    },
+    {
+      "name": "TransomTrailing00",
+      "asset": "ivy_long",
+      "file": "res://assets/rooms/_shared/plants/ivy_long.glb",
+      "position": [
+        -2.71,
+        2.93,
+        -2.59
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        -6
+      ],
+      "scale": [
+        0.76,
+        0.76,
+        0.76
+      ],
+      "colliders": []
+    },
+    {
+      "name": "TransomTrailing01",
+      "asset": "ivy_medium",
+      "file": "res://assets/rooms/_shared/plants/ivy_medium.glb",
+      "position": [
+        -1.55,
+        2.93,
+        -2.59
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        -2
+      ],
+      "scale": [
+        0.88,
+        0.88,
+        0.88
+      ],
+      "colliders": []
+    },
+    {
+      "name": "TransomTrailing02",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        -0.3,
+        2.93,
+        -2.59
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        2
+      ],
+      "scale": [
+        0.76,
+        0.76,
+        0.76
+      ],
+      "colliders": []
+    },
+    {
+      "name": "TransomTrailing03",
+      "asset": "ivy_long",
+      "file": "res://assets/rooms/_shared/plants/ivy_long.glb",
+      "position": [
+        1.2,
+        2.93,
+        -2.59
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        6
+      ],
+      "scale": [
+        0.88,
+        0.88,
+        0.88
+      ],
+      "colliders": []
+    },
+    {
+      "name": "WindowArchCrown00",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        1.4900000000000002,
+        2.14,
+        -2.48
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        180.0
+      ],
+      "scale": [
+        0.75,
+        0.75,
+        0.75
+      ],
+      "colliders": []
+    },
+    {
+      "name": "WindowArchCrown01",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        1.6332372542187898,
+        2.5867167917422798,
+        -2.48
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        144.0
+      ],
+      "scale": [
+        0.75,
+        0.75,
+        0.75
+      ],
+      "colliders": []
+    },
+    {
+      "name": "WindowArchCrown02",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        2.00823725421879,
+        2.862802952384317,
+        -2.48
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        108.0
+      ],
+      "scale": [
+        0.75,
+        0.75,
+        0.75
+      ],
+      "colliders": []
+    },
+    {
+      "name": "WindowArchCrown03",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        2.471762745781211,
+        2.8628029523843166,
+        -2.48
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        72.0
+      ],
+      "scale": [
+        0.75,
+        0.75,
+        0.75
+      ],
+      "colliders": []
+    },
+    {
+      "name": "WindowArchCrown04",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        2.846762745781211,
+        2.5867167917422798,
+        -2.48
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        36.0
+      ],
+      "scale": [
+        0.75,
+        0.75,
+        0.75
+      ],
+      "colliders": []
+    },
+    {
+      "name": "WindowArchCrown05",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        2.99,
+        2.14,
+        -2.48
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0.0
+      ],
+      "scale": [
+        0.75,
+        0.75,
+        0.75
+      ],
+      "colliders": []
+    },
+    {
+      "name": "RightPillarVine00",
+      "asset": "ivy_medium",
+      "file": "res://assets/rooms/_shared/plants/ivy_medium.glb",
+      "position": [
+        2.94,
+        2.14,
+        -2.57
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        4
+      ],
+      "scale": [
+        0.9,
+        0.9,
+        0.9
+      ],
+      "colliders": []
+    },
+    {
+      "name": "RightPillarVine01",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        2.94,
+        1.57,
+        -2.57
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        4
+      ],
+      "scale": [
+        0.9,
+        0.9,
+        0.9
+      ],
+      "colliders": []
+    },
+    {
+      "name": "RightPillarVine02",
+      "asset": "ivy_medium",
+      "file": "res://assets/rooms/_shared/plants/ivy_medium.glb",
+      "position": [
+        2.94,
+        1.0,
+        -2.57
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        4
+      ],
+      "scale": [
+        0.9,
+        0.9,
+        0.9
+      ],
+      "colliders": []
+    },
+    {
+      "name": "FrontFlowerCluster00",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        1.25,
+        0.82,
+        2.66
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.86,
+        0.86,
+        0.86
+      ],
+      "colliders": []
+    },
+    {
+      "name": "FrontFlowerDrape00",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        1.25,
+        0.94,
+        2.91
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        -8
+      ],
+      "scale": [
+        0.83,
+        0.83,
+        0.83
+      ],
+      "colliders": []
+    },
+    {
+      "name": "FrontFlowerCluster01",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        1.65,
+        0.82,
+        2.66
+      ],
+      "rotation_degrees": [
+        0,
+        37,
+        0
+      ],
+      "scale": [
+        0.86,
+        0.86,
+        0.86
+      ],
+      "colliders": []
+    },
+    {
+      "name": "FrontFlowerDrape01",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        1.65,
+        0.94,
+        2.91
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.83,
+        0.83,
+        0.83
+      ],
+      "colliders": []
+    },
+    {
+      "name": "FrontFlowerCluster02",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        2.08,
+        0.82,
+        2.66
+      ],
+      "rotation_degrees": [
+        0,
+        74,
+        0
+      ],
+      "scale": [
+        0.86,
+        0.86,
+        0.86
+      ],
+      "colliders": []
+    },
+    {
+      "name": "FrontFlowerDrape02",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        2.08,
+        0.94,
+        2.91
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        8
+      ],
+      "scale": [
+        0.83,
+        0.83,
+        0.83
+      ],
+      "colliders": []
+    },
+    {
+      "name": "LeftPierFlowers",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        -2.93,
+        0.9,
+        2.58
+      ],
+      "rotation_degrees": [
+        0,
+        40,
+        0
+      ],
+      "scale": [
+        0.9,
+        0.9,
+        0.9
+      ],
+      "colliders": []
+    },
+    {
+      "name": "LeftPierDrape",
+      "asset": "ivy_medium",
+      "file": "res://assets/rooms/_shared/plants/ivy_medium.glb",
+      "position": [
+        -3.03,
+        1.16,
+        2.53
+      ],
+      "rotation_degrees": [
+        0,
+        -90,
+        -8
+      ],
+      "scale": [
+        0.72,
+        0.72,
+        0.72
+      ],
+      "colliders": []
+    },
+    {
+      "name": "ArchWoven00",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        -2.68,
+        1.9600000000000002,
+        1.6600000000000001
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        192.0
+      ],
+      "scale": [
+        0.7,
+        0.7,
+        0.7
+      ],
+      "colliders": []
+    },
+    {
+      "name": "ArchWoven01",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        -2.68,
+        2.465,
+        1.5246856578222832
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        162.0
+      ],
+      "scale": [
+        0.7,
+        0.7,
+        0.7
+      ],
+      "colliders": []
+    },
+    {
+      "name": "ArchWoven02",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        -2.68,
+        2.8346856578222828,
+        1.1550000000000002
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        132.0
+      ],
+      "scale": [
+        0.7,
+        0.7,
+        0.7
+      ],
+      "colliders": []
+    },
+    {
+      "name": "ArchWoven03",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        -2.68,
+        2.9699999999999998,
+        0.6499999999999999
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        102.0
+      ],
+      "scale": [
+        0.7,
+        0.7,
+        0.7
+      ],
+      "colliders": []
+    },
+    {
+      "name": "ArchWoven04",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        -2.68,
+        2.834685657822283,
+        0.14500000000000013
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        72.0
+      ],
+      "scale": [
+        0.7,
+        0.7,
+        0.7
+      ],
+      "colliders": []
+    },
+    {
+      "name": "ArchWoven05",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        -2.68,
+        2.465,
+        -0.2246856578222831
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        41.99999999999999
+      ],
+      "scale": [
+        0.7,
+        0.7,
+        0.7
+      ],
+      "colliders": []
+    },
+    {
+      "name": "ArchWoven06",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        -2.68,
+        1.96,
+        -0.36
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        12.0
+      ],
+      "scale": [
+        0.7,
+        0.7,
+        0.7
+      ],
+      "colliders": []
+    },
+    {
+      "name": "TransomGarland00",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        -2.6,
+        2.89,
+        -2.47
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        98
+      ],
+      "scale": [
+        0.76,
+        0.76,
+        0.76
+      ],
+      "colliders": []
+    },
+    {
+      "name": "TransomGarland01",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        -1.78,
+        2.94,
+        -2.47
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        82
+      ],
+      "scale": [
+        0.76,
+        0.76,
+        0.76
+      ],
+      "colliders": []
+    },
+    {
+      "name": "TransomGarland02",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        -0.94,
+        2.89,
+        -2.47
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        98
+      ],
+      "scale": [
+        0.76,
+        0.76,
+        0.76
+      ],
+      "colliders": []
+    },
+    {
+      "name": "TransomGarland03",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        -0.1,
+        2.94,
+        -2.47
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        82
+      ],
+      "scale": [
+        0.76,
+        0.76,
+        0.76
+      ],
+      "colliders": []
+    },
+    {
+      "name": "TransomGarland04",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        0.74,
+        2.89,
+        -2.47
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        98
+      ],
+      "scale": [
+        0.76,
+        0.76,
+        0.76
+      ],
+      "colliders": []
+    },
+    {
+      "name": "TransomGarland05",
+      "asset": "ivy_short",
+      "file": "res://assets/rooms/_shared/plants/ivy_short.glb",
+      "position": [
+        1.5,
+        2.94,
+        -2.47
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        82
+      ],
+      "scale": [
+        0.76,
+        0.76,
+        0.76
+      ],
+      "colliders": []
+    },
+    {
+      "name": "ArchShoulder00",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        -2.79,
+        2.08,
+        1.6
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        0
+      ],
+      "scale": [
+        0.45,
+        0.45,
+        0.45
+      ],
+      "colliders": []
+    },
+    {
+      "name": "ArchShoulder01",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        -2.79,
+        2.05,
+        -0.34
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        0
+      ],
+      "scale": [
+        0.45,
+        0.45,
+        0.45
+      ],
+      "colliders": []
+    },
+    {
+      "name": "ArchShoulder02",
+      "asset": "flower_shrub",
+      "file": "res://assets/rooms/_shared/plants/flower_shrub.glb",
+      "position": [
+        -2.79,
+        0.47,
+        1.57
+      ],
+      "rotation_degrees": [
+        0,
+        90,
+        0
+      ],
+      "scale": [
+        0.45,
+        0.45,
+        0.45
+      ],
+      "colliders": []
+    }
+  ],
+  "material_overrides": {
+    "window_garden_backdrop": {
+      "unshaded": true
+    },
+    "espresso_machine": {
+      "roughness": 0.4,
+      "metallic": 0.12
+    },
+    "table": {
+      "roughness": 0.54
+    },
+    "window_glass_left": {
+      "alpha": 0.08
+    },
+    "window_glass_back": {
+      "alpha": 0.08
+    },
+    "window_glass_arch": {
+      "alpha": 0.08
+    }
+  },
+  "lighting": {
+    "background": "D3E7D8",
+    "ambient": "C0ADA9",
+    "ambient_energy": 0.67,
+    "sun_color": "FFE0AE",
+    "sun_energy": 1.55,
+    "sun_position": [
+      6,
+      9,
+      -4
+    ],
+    "sun_target": [
+      0,
+      0,
+      0.8
+    ],
+    "angular_distance": 4.5,
+    "lamps": [
+      {
+        "position": [
+          -3.5,
+          2.0,
+          5.0
+        ],
+        "color": "FFF0D6",
+        "energy": 1.3,
+        "range": 7.0
+      },
+      {
+        "position": [
+          -1.2,
+          2.25,
+          -1.32
+        ],
+        "color": "FFE0A3",
+        "energy": 1.2,
+        "range": 1.45
+      },
+      {
+        "position": [
+          0.3,
+          2.25,
+          -1.32
+        ],
+        "color": "FFE0A3",
+        "energy": 1.2,
+        "range": 1.45
+      }
+    ]
+  },
+  "spawn": [
+    0.15,
+    -0.12,
+    3.25
+  ],
+  "boundaries": [
+    {
+      "name": "left_open_arch_boundary",
+      "at": [
+        -3.11,
+        1.2,
+        0
+      ],
+      "size": [
+        0.1,
+        2.7,
+        5.8
+      ]
+    },
+    {
+      "name": "entry_landing_floor",
+      "at": [
+        0.15,
+        -0.36,
+        3.34
+      ],
+      "size": [
+        1.74,
+        0.1,
+        0.9
+      ]
+    },
+    {
+      "name": "landing_front_edge",
+      "at": [
+        0.15,
+        0.45,
+        3.79
+      ],
+      "size": [
+        1.9,
+        1.7,
+        0.08
+      ]
+    },
+    {
+      "name": "landing_left_edge",
+      "at": [
+        -0.76,
+        0.4,
+        3.25
+      ],
+      "size": [
+        0.08,
+        1.7,
+        1.15
+      ]
+    },
+    {
+      "name": "landing_right_edge",
+      "at": [
+        1.06,
+        0.4,
+        3.25
+      ],
+      "size": [
+        0.08,
+        1.7,
+        1.15
+      ]
+    }
+  ],
+  "bench": {
+    "route": [
+      {
+        "name": "entry_step",
+        "position": [
+          0.15,
+          -0.18,
+          3.2
+        ]
+      },
+      {
+        "name": "entry_inside",
+        "position": [
+          0.15,
+          0.07,
+          2.2
+        ],
+        "capture": "door"
+      },
+      {
+        "name": "between_tables",
+        "position": [
+          0.05,
+          0.07,
+          0.6
+        ]
+      },
+      {
+        "name": "counter_front",
+        "position": [
+          0.05,
+          0.07,
+          -0.7
+        ],
+        "capture": "main"
+      },
+      {
+        "name": "plant_corner_left",
+        "position": [
+          -2.0,
+          0.07,
+          -0.7
+        ]
+      },
+      {
+        "name": "center_return",
+        "position": [
+          0.05,
+          0.07,
+          -0.7
+        ]
+      },
+      {
+        "name": "plant_corner_right",
+        "position": [
+          2.2,
+          0.07,
+          -0.7
+        ]
+      },
+      {
+        "name": "center_return_right",
+        "position": [
+          0.05,
+          0.07,
+          -0.7
+        ]
+      },
+      {
+        "name": "between_tables_return",
+        "position": [
+          0.05,
+          0.07,
+          0.6
+        ]
+      },
+      {
+        "name": "door_return",
+        "position": [
+          0.15,
+          0.07,
+          2.2
+        ]
+      }
+    ],
+    "blocked": [
+      {
+        "name": "counter",
+        "from": [
+          0,
+          0.07,
+          -0.65
+        ],
+        "to": [
+          0,
+          0.07,
+          -1.8
+        ],
+        "target": "/counter/"
+      },
+      {
+        "name": "table_left",
+        "from": [
+          -1.34,
+          0.07,
+          1.9
+        ],
+        "to": [
+          -1.34,
+          0.07,
+          0.5
+        ],
+        "target": "/table/"
+      },
+      {
+        "name": "large_pot",
+        "from": [
+          -2.0,
+          0.07,
+          -0.95
+        ],
+        "to": [
+          -2.47,
+          0.07,
+          -1.51
+        ],
+        "target": "/LargeMonsteraLeft/"
+      },
+      {
+        "name": "front_low_wall",
+        "from": [
+          -1.6,
+          0.07,
+          2.05
+        ],
+        "to": [
+          -1.6,
+          0.07,
+          3.35
+        ],
+        "target": "/low_wall_front_left/"
+      },
+      {
+        "name": "side_low_wall",
+        "from": [
+          2.35,
+          0.07,
+          0.0
+        ],
+        "to": [
+          3.5,
+          0.07,
+          0
+        ],
+        "target": "/low_wall_long/"
+      },
+      {
+        "name": "left_arch_boundary",
+        "from": [
+          -2.3,
+          0.07,
+          1.2
+        ],
+        "to": [
+          -3.5,
+          0.07,
+          1.2
+        ],
+        "target": "left_open_arch_boundary"
+      },
+      {
+        "name": "landing_front_boundary",
+        "from": [
+          0.15,
+          -0.2,
+          3.35
+        ],
+        "to": [
+          0.15,
+          -0.2,
+          4.2
+        ],
+        "target": "landing_front_edge"
+      },
+      {
+        "name": "landing_side_boundary",
+        "from": [
+          0.15,
+          -0.2,
+          3.35
+        ],
+        "to": [
+          1.5,
+          -0.2,
+          3.35
+        ],
+        "target": "landing_right_edge"
+      }
+    ],
+    "gaps": [
+      {
+        "name": "tables_center",
+        "from": [
+          0.1,
+          0.07,
+          1.3
+        ],
+        "to": [
+          0.1,
+          0.07,
+          -0.25
+        ],
+        "width": 1.19,
+        "measure": [
+          [
+            -0.3,
+            0.72,
+            0.65
+          ],
+          [
+            0.89,
+            0.72,
+            0.65
+          ]
+        ],
+        "minimum": 0.7
+      },
+      {
+        "name": "tables_counter",
+        "from": [
+          -1.7,
+          0.07,
+          -0.5
+        ],
+        "to": [
+          2.1,
+          0.07,
+          -0.5
+        ],
+        "width": 1.3,
+        "measure": [
+          [
+            -1.34,
+            0.72,
+            -1.31
+          ],
+          [
+            -1.34,
+            0.72,
+            -0.01
+          ]
+        ],
+        "minimum": 0.7
+      },
+      {
+        "name": "entry",
+        "from": [
+          0.15,
+          -0.2,
+          3.2
+        ],
+        "to": [
+          0.15,
+          0.07,
+          2.1
+        ],
+        "width": 1.32,
+        "measure": [
+          [
+            -0.51,
+            0.6,
+            2.72
+          ],
+          [
+            0.81,
+            0.6,
+            2.72
+          ]
+        ],
+        "minimum": 0.7
+      }
+    ],
+    "scale_reference": "Basic Room unchanged Avatar fixture; capsule r=.21 h=1.25; speed=3.75",
+    "harness_status": "Adapted to tools/dev/scene_bench at 39f50fb; execution evidence separate",
+    "floor_y": -0.07,
+    "entrance": {
+      "inside": [
+        0.15,
+        0.07,
+        2.25
+      ],
+      "outside": [
+        0.15,
+        -0.2,
+        3.35
+      ]
+    },
+    "slide": {
+      "from": [
+        2.62,
+        0.07,
+        0.05
+      ],
+      "direction": [
+        1,
+        0,
+        -1
+      ],
+      "tangent": [
+        0,
+        0,
+        -1
+      ],
+      "seconds": 0.65
+    },
+    "input_start": [
+      0.05,
+      0.07,
+      -0.65
+    ],
+    "scale": {
+      "door": {
+        "height": 2.69,
+        "source": "Open limestone arch, clear apex 1.93 + 0.76m",
+        "reason": "Greenhouse architectural arch is 15.45% taller than Basic Room 2.33m door; preserve reference transom/arch alignment. It is a decorative side arch; usable entrance is the front low-wall gap."
+      },
+      "counter": {
+        "height": 1.2005,
+        "source": "Stone worktop top: local 1.12 + 0.07 + pivot .06 - floor .0495"
+      },
+      "chair": {
+        "height": 0.71045,
+        "source": "Seat cushion top (.545 + .070) \u00d7 1.13 + pivot .065 - floor .0495"
+      },
+      "table": {
+        "height": 1.0175,
+        "source": "Tabletop (.79 + .045) \u00d7 1.20 + pivot .065 - floor .0495"
+      }
+    }
+  },
+  "review_lighting": {
+    "background": "D3E7D8",
+    "ambient_color": "C0ADA9",
+    "ambient": 0.67,
+    "sun_color": "FFE0AE",
+    "sun": 1.55,
+    "sun_position": [
+      6,
+      9,
+      -4
+    ],
+    "sun_target": [
+      0,
+      0,
+      0.8
+    ],
+    "points": [
+      {
+        "position": [
+          -3.5,
+          2.0,
+          5.0
+        ],
+        "color": "FFF0D6",
+        "energy": 1.3,
+        "range": 7.0
+      },
+      {
+        "position": [
+          -1.2,
+          2.25,
+          -1.32
+        ],
+        "color": "FFE0A3",
+        "energy": 1.2,
+        "range": 1.45
+      },
+      {
+        "position": [
+          0.3,
+          2.25,
+          -1.32
+        ],
+        "color": "FFE0A3",
+        "energy": 1.2,
+        "range": 1.45
+      }
+    ]
+  },
+  "render_batches": [
+    {
+      "name": "ivy_left_arch",
+      "file": "res://assets/rooms/coffee_shop/batches/r2_ivy_left_arch.glb",
+      "material": "plants",
+      "sources": [
+        "ArchCrown00",
+        "ArchCrown01",
+        "ArchCrown02",
+        "ArchCrown03",
+        "ArchCrown04",
+        "ArchCrown05",
+        "ArchCrown06",
+        "ArchCrown07",
+        "ArchSide_front0",
+        "ArchSide_front1",
+        "ArchSide_front2",
+        "ArchSide_back0",
+        "ArchSide_back1",
+        "ArchSide_back2",
+        "ArchWoven00",
+        "ArchWoven01",
+        "ArchWoven02",
+        "ArchWoven03",
+        "ArchWoven04",
+        "ArchWoven05",
+        "ArchWoven06",
+        "ArchShoulder00",
+        "ArchShoulder01",
+        "ArchShoulder02"
+      ],
+      "triangles": 22550,
+      "cast_shadow": false
+    },
+    {
+      "name": "ivy_back_transom",
+      "file": "res://assets/rooms/coffee_shop/batches/r2_ivy_back_transom.glb",
+      "material": "plants",
+      "sources": [
+        "TransomTrailing00",
+        "TransomTrailing01",
+        "TransomTrailing02",
+        "TransomTrailing03",
+        "TransomGarland00",
+        "TransomGarland01",
+        "TransomGarland02",
+        "TransomGarland03",
+        "TransomGarland04",
+        "TransomGarland05"
+      ],
+      "triangles": 8950,
+      "cast_shadow": false
+    },
+    {
+      "name": "ivy_right_arch",
+      "file": "res://assets/rooms/coffee_shop/batches/r2_ivy_right_arch.glb",
+      "material": "plants",
+      "sources": [
+        "WindowArchCrown00",
+        "WindowArchCrown01",
+        "WindowArchCrown02",
+        "WindowArchCrown03",
+        "WindowArchCrown04",
+        "WindowArchCrown05",
+        "RightPillarVine00",
+        "RightPillarVine01",
+        "RightPillarVine02"
+      ],
+      "triangles": 7040,
+      "cast_shadow": false
+    },
+    {
+      "name": "front_flowers",
+      "file": "res://assets/rooms/coffee_shop/batches/r2_front_flowers.glb",
+      "material": "plants",
+      "sources": [
+        "FrontFlowerCluster00",
+        "FrontFlowerDrape00",
+        "FrontFlowerCluster01",
+        "FrontFlowerDrape01",
+        "FrontFlowerCluster02",
+        "FrontFlowerDrape02",
+        "LeftPierFlowers",
+        "LeftPierDrape"
+      ],
+      "triangles": 12782,
+      "cast_shadow": false
+    },
+    {
+      "name": "counter_dressing",
+      "file": "res://assets/rooms/coffee_shop/batches/r2_counter_dressing.glb",
+      "material": "room",
+      "sources": [
+        "coffee_grinder",
+        "cups_and_saucers",
+        "botanical_picture",
+        "wall_shelf"
+      ],
+      "triangles": 4654,
+      "cast_shadow": true
+    },
+    {
+      "name": "counter_botanical",
+      "file": "res://assets/rooms/coffee_shop/batches/r2_counter_botanical.glb",
+      "material": "room",
+      "sources": [
+        "counter_daisies",
+        "small_planter"
+      ],
+      "triangles": 5674,
+      "cast_shadow": false
+    },
+    {
+      "name": "table_settings",
+      "file": "res://assets/rooms/coffee_shop/batches/r2_table_settings.glb",
+      "material": "room",
+      "sources": [
+        "table_bouquet",
+        "table_coffee",
+        "table_bouquet_2",
+        "table_coffee_2"
+      ],
+      "triangles": 10836,
+      "cast_shadow": false
+    },
+    {
+      "name": "window_glazing",
+      "file": "res://assets/rooms/coffee_shop/batches/r2_window_glazing.glb",
+      "material": "glass",
+      "sources": [
+        "window_glass_left",
+        "window_glass_back",
+        "window_glass_arch"
+      ],
+      "triangles": 112,
+      "cast_shadow": false
+    }
+  ],
+  "revision": "R2.1"
+}
