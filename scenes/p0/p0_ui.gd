@@ -1698,9 +1698,12 @@ const TIPS_PATH := "user://p0_tips.json"
 
 ## A one-sentence card above the quick bar, once per account on this device; tap or 7 s to dismiss.
 ## Never a hand animation, never moves the player (§14.3 "不画手指动画循环").
+## One card at a time: while another tip is up, this one is neither shown nor counted as learned, so a caller that
+## asks every frame (the pond's Cast, then Bait) gets it once the first card goes (李元芳 first-session test 12).
 func teach(key: String, text: String) -> void:
 	_load_tips()
 	if _taught.has(key): return
+	if _teach != null and _teach.visible: return
 	_taught[key] = true
 	_save_tips()
 	if _teach == null:
