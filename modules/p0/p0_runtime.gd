@@ -80,6 +80,14 @@ static func ensure() -> P0Runtime:
 	(Engine.get_main_loop() as SceneTree).root.add_child.call_deferred(_instance)
 	return _instance
 
+## Tests: a P0 world (p0_map, the farm, a pond …) brings up the singleton through ensure() and nothing frees it; with
+## no server it goes offline and the static UiCommandButton.offline stays set for every later suite (the kit
+## gallery's sending buttons read `Offline`). A suite that opened one ends with this; the next ensure() builds anew.
+static func free_instance_for_tests() -> void:
+	if is_instance_valid(_instance): _instance.queue_free()
+	_instance = null
+	UiCommandButton.offline = false
+
 func src_of_press() -> String: return "hold" if holding_repeat else "tap"
 
 func _init() -> void:

@@ -7,7 +7,12 @@ extends GdUnitTestSuite
 
 const SNAP_DIR := "res://tests/ui_kit/snapshots"
 
+## Sections are snapshotted online: a P0 world an earlier suite opened keeps P0Runtime's singleton alive, and with no
+## server it goes offline, which leaves the static UiCommandButton.offline set and every sending button reading
+## `Offline` (inbox_row, gear_row, board_card, shop_row, blueprint_card failed only after tests/p0).
 func test_every_section_matches_its_layout_snapshot() -> void:
+	var was_offline := UiCommandButton.offline
+	UiCommandButton.offline = false
 	var host := Control.new()
 	host.size = Vector2(360, 800)
 	add_child(auto_free(host))
@@ -26,6 +31,7 @@ func test_every_section_matches_its_layout_snapshot() -> void:
 			f.close()
 			continue
 		if FileAccess.get_file_as_string(path).strip_edges() != dump.strip_edges(): mismatched.append(id)
+	UiCommandButton.offline = was_offline
 	assert_array(mismatched).override_failure_message("layout changed: %s (rerun with UPDATE_UI_SNAPSHOTS=1 if intended)" % [mismatched]).is_empty()
 
 func _dump(node: Control, origin: Control) -> Dictionary:
