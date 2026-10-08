@@ -357,9 +357,11 @@ static func gloves_moment(view: Dictionary) -> Dictionary:
 ## by HOME-1 and the workbench. Li Bai q(65), plan §8.6.1 / §8.6.2: sources joined by ` · or `; a spot that is not open
 ## yet comes last with its gate, `Clay · Mine floor 1 · or Clay Bank from Homestead Lv2`, and loses only the gate once
 ## open, `Clay · Mine floor 1 · or Clay Bank`. Order: spots open from the start, then the mine floors that yield it
-## (every rock gives Stone, so Stone names both floors), then spots a Homestead level opens; still-locked ones last.
+## (every rock gives Stone: `Stone · Rock Pile · or the mine`), then spots a Homestead level opens; still-locked ones last.
 ## `go` (Show, 不知火舞 on 228): the first open source ("spot_grove", "mine"); with none open, the first source (its
 ## name strip says the gate). {} for anything that is not a material (content.materials) or that nothing yields.
+## Two lines at most (不知火舞 on 228): the label may break only before ` · or `, so every other space is a no-break
+## space and the floor range's en dash is followed by U+2060 — `Clay · Mine floor 1` / `· or Clay Bank from Homestead Lv2`.
 static func material_source(view: Dictionary, id: String) -> Dictionary:
 	var c := P0Logic.content()
 	if not c.get("materials", {}).has(id): return {}   # bait also comes from the tackle shop: only materials here
@@ -384,14 +386,21 @@ static func material_source(view: Dictionary, id: String) -> Dictionary:
 			if d[0] != null and str(d[0]) == id: yields = true
 		if yields: floors.append(int(f.get("floor", 0)))
 	if not floors.is_empty():
-		# U+2060 after the en dash: the NeedSource label wraps, and "Mine floors 1–" / "2" must never split.
 		var where := "Mine floor %d" % floors[0] if floors.size() == 1 else "Mine floors %d–\u2060%d" % [floors.min(), floors.max()]
+		if id == "stone": where = "the mine"   # every rock gives Stone: no floors to name (Li Bai on 228)
 		first.append({"name": where, "go": "mine", "gate": 1, "open": true})
 	var all: Array = first + gated
 	if all.is_empty(): return {}
 	var ordered: Array = all.filter(func(s): return s.open) + all.filter(func(s): return not s.open)
 	var parts: Array = ordered.map(func(s): return s.name if s.open else "%s from Homestead Lv%d" % [s.name, s.gate])
-	return {"text": "%s · %s" % [P0Logic.item_name(view, id), " · or ".join(parts)], "go": str(ordered[0].go)}
+	var text := _nowrap("%s · %s" % [P0Logic.item_name(view, id), parts[0]])
+	for i in range(1, parts.size()): text += " " + _nowrap("· or %s" % parts[i])   # the only breakable space
+	return {"text": text, "go": str(ordered[0].go)}
+
+const _NBSP := "\u00a0"
+
+static func _nowrap(s: String) -> String:
+	return s.replace(" ", _NBSP)
 
 # --- Workbench (B2-06) ---
 
