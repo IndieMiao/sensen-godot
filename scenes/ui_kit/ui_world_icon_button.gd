@@ -54,8 +54,8 @@ func _refresh() -> void:
 	var box := UiStyleBox.make(UiTokens.COLOR_SURFACE, _VISUAL * 0.5,
 		UiTokens.COLOR_PRIMARY if near else UiTokens.COLOR_BORDER, UiTokens.STROKE_SELECTED if near else UiTokens.STROKE_DEFAULT)
 	box.shadow_color = UiTokens.COLOR_SHADOW_FLOAT
-	box.shadow_size = 4
-	box.shadow_offset = Vector2(0, 3)
+	box.shadow_size = UiTokens.SIZE_SHADOW_FLOAT_RADIUS
+	box.shadow_offset = Vector2(0, UiTokens.SIZE_SHADOW_FLOAT_OFFSET_Y)
 	_disc.add_theme_stylebox_override(&"panel", box)
 	_glyph.texture = icon
 	scale = Vector2.ONE * (_NEAR_SCALE if near else 1.0)

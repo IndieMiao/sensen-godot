@@ -6,7 +6,8 @@ extends Control
 ## Bold 12, secondary). Side Right keeps the icon at the button's spot and opens to the right (padding 5 / 12); Left is
 ## the mirror, for a screen edge. Dimmed (used today, e.g. Rested today): icon 45 %, name in secondary ink. With a
 ## state the StatusBadge, scaled to 22, takes the icon's place (LOCK-11). No Tap to …, no finger. Opening and closing
-## animate the width over 160 ms with the icon held still. Display only: a tap on it is a tap on the facility.
+## animate the width over 160 ms with the icon held still: the pill and its shadow are drawn at the current width,
+## only the icon and text inside are clipped. Display only: a tap on it is a tap on the facility.
 
 enum Dir { RIGHT, LEFT }   # not "Side": that is a global Godot enum
 
@@ -27,7 +28,8 @@ var dimmed := false: set = set_dimmed
 ## A UiStatusBadge.State in the icon's place, or -1.
 var status := -1: set = set_status
 
-var _panel: PanelContainer
+var _bg: Panel        # the pill: fill, edge and shadow at the current width, never clipped
+var _clip: Control    # clips the icon and text while the strip opens or folds
 var _row: HBoxContainer
 var _glyph: TextureRect
 var _badge_holder: Control
@@ -41,15 +43,18 @@ var _tween: Tween
 
 func _init() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	clip_contents = true
-	_panel = PanelContainer.new()
-	_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(_panel)
+	_bg = Panel.new()
+	_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_bg)
+	_clip = Control.new()
+	_clip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_clip.clip_contents = true
+	add_child(_clip)
 	_row = HBoxContainer.new()
 	_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_row.add_theme_constant_override(&"separation", int(_GAP))
 	_row.alignment = BoxContainer.ALIGNMENT_CENTER
-	_panel.add_child(_row)
+	_clip.add_child(_row)
 	_glyph = UiKit.icon(null, _ICON)
 	_glyph.custom_minimum_size = Vector2(_ICON, _ICON)
 	_badge_holder = Control.new()
@@ -59,7 +64,7 @@ func _init() -> void:
 	_dot = UiKit.label("·", UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_SECONDARY)
 	_fact = UiKit.label("", UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_SECONDARY)
 	for c in [_glyph, _badge_holder, _name, _dot, _fact]: _row.add_child(c)   # all stay in the row; _rebuild shows and orders
-	_panel.minimum_size_changed.connect(_layout)
+	_row.minimum_size_changed.connect(_layout)
 	_rebuild()
 
 func set_icon(v: Texture2D) -> void: icon = v; _rebuild()
@@ -79,7 +84,7 @@ func anchor_at(icon_center: Vector2) -> void:
 	_layout()
 
 ## Fully open width (the pill's natural size).
-func full_width() -> float: return _panel.get_combined_minimum_size().x
+func full_width() -> float: return _PAD_ICON + _row.get_combined_minimum_size().x + _PAD_TEXT
 
 ## Width when folded: just the icon with its padding.
 func folded_width() -> float: return _PAD_ICON * 2.0 + _ICON
@@ -112,12 +117,10 @@ func _rebuild() -> void:
 	if _row == null: return
 	var box := UiStyleBox.make(UiTokens.COLOR_SURFACE, _H * 0.5, UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT)
 	box.shadow_color = UiTokens.COLOR_SHADOW_FLOAT
-	box.shadow_size = 4
-	box.shadow_offset = Vector2(0, 3)
+	box.shadow_size = UiTokens.SIZE_SHADOW_FLOAT_RADIUS
+	box.shadow_offset = Vector2(0, UiTokens.SIZE_SHADOW_FLOAT_OFFSET_Y)
+	_bg.add_theme_stylebox_override(&"panel", box)
 	var right := side == Dir.RIGHT
-	box.with_margins(_PAD_ICON if right else _PAD_TEXT, 0, _PAD_TEXT if right else _PAD_ICON, 0)
-	_panel.add_theme_stylebox_override(&"panel", box)
-	_panel.custom_minimum_size.y = _H
 	_glyph.texture = icon
 	_glyph.modulate.a = _DIM_ICON if dimmed else 1.0
 	_name.text = text
@@ -141,16 +144,24 @@ func _rebuild() -> void:
 	_layout()
 
 func _layout() -> void:
-	if _panel == null: return
-	var full := full_width()
-	var w := lerpf(folded_width(), full, _open)
+	if _row == null: return
+	var w := lerpf(folded_width(), full_width(), _open)
 	size = Vector2(w, _H)
-	_panel.size = Vector2(full, _H)
-	# The icon stays on the anchor: Right grows to the right of it, Left to the left.
+	_bg.position = Vector2.ZERO
+	_bg.size = size
+	# The icon stays on the anchor: Right grows to the right of it, Left to the left. Inside, the content ends at the
+	# text side's padding when open and at the icon's when folded, so nothing is cut against the rounded end.
 	var icon_off := _PAD_ICON + _ICON * 0.5
+	var inset := lerpf(_PAD_ICON, _PAD_TEXT, _open)
+	var rs := _row.get_combined_minimum_size()
+	_row.size = rs
 	if side == Dir.RIGHT:
 		position = Vector2(_anchor.x - icon_off, _anchor.y - _H * 0.5)
-		_panel.position = Vector2.ZERO
+		_clip.position = Vector2.ZERO
+		_clip.size = Vector2(w - inset, _H)
+		_row.position = Vector2(_PAD_ICON, (_H - rs.y) * 0.5)
 	else:
 		position = Vector2(_anchor.x + icon_off - w, _anchor.y - _H * 0.5)
-		_panel.position = Vector2(w - full, 0)
+		_clip.position = Vector2(inset, 0)
+		_clip.size = Vector2(w - inset, _H)
+		_row.position = Vector2(w - _PAD_ICON - rs.x - inset, (_H - rs.y) * 0.5)

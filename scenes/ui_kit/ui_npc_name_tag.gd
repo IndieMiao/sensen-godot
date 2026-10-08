@@ -43,8 +43,8 @@ func _refresh() -> void:
 	var box := UiStyleBox.make(UiTokens.COLOR_SURFACE, 12.0,
 		UiTokens.COLOR_PRIMARY if highlight else UiTokens.COLOR_BORDER, UiTokens.STROKE_SELECTED if highlight else UiTokens.STROKE_DEFAULT)
 	box.shadow_color = UiTokens.COLOR_SHADOW_FLOAT
-	box.shadow_size = 4
-	box.shadow_offset = Vector2(0, 3)
+	box.shadow_size = UiTokens.SIZE_SHADOW_FLOAT_RADIUS
+	box.shadow_offset = Vector2(0, UiTokens.SIZE_SHADOW_FLOAT_OFFSET_Y)
 	# Padding 10 / 4 outside the text, inside the edge (49 × 26; the 2 px Highlight edge makes it 51 × 28). Godot's line
 	# box for Caption 12 is 18 against Figma's 16, so the vertical padding gives back 1 px a side.
 	var edge := float(UiTokens.STROKE_SELECTED if highlight else UiTokens.STROKE_DEFAULT)

@@ -995,7 +995,7 @@ static func _world_prompts() -> Control:
 	var bars := [
 		[_tex("home"), "Farmhouse", "", D.RIGHT, false, -1, 1.0],
 		[_tex("home"), "Farmhouse", "", D.LEFT, false, -1, 1.0],
-		[_tex("stove"), "Stove 1/1", "Empty", D.RIGHT, false, -1, 1.0],
+		[_tex("pot"), "Stove 1/1", "Empty", D.RIGHT, false, -1, 1.0],
 		[_tex("homestead_stall"), "Homestead Stall", "", D.RIGHT, false, UiStatusBadge.State.REQUEST, 1.0],
 		[_tex("rest"), "+60 Energy", "", D.RIGHT, false, -1, 1.0],
 		[_tex("rest"), "Rested today", "", D.RIGHT, true, -1, 1.0],

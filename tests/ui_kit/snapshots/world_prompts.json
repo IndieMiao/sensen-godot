@@ -274,11 +274,20 @@
                       ],
                       "children": [
                         {
-                          "type": "PanelContainer",
+                          "type": "Panel",
                           "rect": [
                             10,
                             214,
                             108,
+                            32
+                          ]
+                        },
+                        {
+                          "type": "Control",
+                          "rect": [
+                            10,
+                            214,
+                            96,
                             32
                           ],
                           "children": [
@@ -286,18 +295,18 @@
                               "type": "HBoxContainer",
                               "rect": [
                                 15,
-                                214,
+                                219,
                                 91,
-                                32
+                                22
                               ],
                               "children": [
                                 {
                                   "type": "TextureRect",
                                   "rect": [
                                     15,
-                                    214,
+                                    219,
                                     22,
-                                    32
+                                    22
                                   ]
                                 },
                                 {
@@ -360,11 +369,20 @@
                       ],
                       "children": [
                         {
-                          "type": "PanelContainer",
+                          "type": "Panel",
                           "rect": [
                             208,
                             214,
                             108,
+                            32
+                          ]
+                        },
+                        {
+                          "type": "Control",
+                          "rect": [
+                            220,
+                            214,
+                            96,
                             32
                           ],
                           "children": [
@@ -372,9 +390,9 @@
                               "type": "HBoxContainer",
                               "rect": [
                                 220,
-                                214,
+                                219,
                                 91,
-                                32
+                                22
                               ],
                               "children": [
                                 {
@@ -392,9 +410,9 @@
                                   "type": "TextureRect",
                                   "rect": [
                                     289,
-                                    214,
+                                    219,
                                     22,
-                                    32
+                                    22
                                   ]
                                 }
                               ]
@@ -446,11 +464,20 @@
                       ],
                       "children": [
                         {
-                          "type": "PanelContainer",
+                          "type": "Panel",
                           "rect": [
                             10,
                             288,
                             150,
+                            32
+                          ]
+                        },
+                        {
+                          "type": "Control",
+                          "rect": [
+                            10,
+                            288,
+                            138,
                             32
                           ],
                           "children": [
@@ -458,18 +485,18 @@
                               "type": "HBoxContainer",
                               "rect": [
                                 15,
-                                288,
+                                293,
                                 133,
-                                32
+                                22
                               ],
                               "children": [
                                 {
                                   "type": "TextureRect",
                                   "rect": [
                                     15,
-                                    288,
+                                    293,
                                     22,
-                                    32
+                                    22
                                   ]
                                 },
                                 {
@@ -554,11 +581,20 @@
                       ],
                       "children": [
                         {
-                          "type": "PanelContainer",
+                          "type": "Panel",
                           "rect": [
                             176,
                             288,
                             141,
+                            32
+                          ]
+                        },
+                        {
+                          "type": "Control",
+                          "rect": [
+                            176,
+                            288,
+                            129,
                             32
                           ],
                           "children": [
@@ -566,25 +602,25 @@
                               "type": "HBoxContainer",
                               "rect": [
                                 181,
-                                288,
+                                293,
                                 124,
-                                32
+                                22
                               ],
                               "children": [
                                 {
                                   "type": "Control",
                                   "rect": [
                                     181,
-                                    288,
+                                    293,
                                     22,
-                                    32
+                                    22
                                   ],
                                   "children": [
                                     {
                                       "type": "UiStatusBadge",
                                       "rect": [
                                         181,
-                                        288,
+                                        293,
                                         22,
                                         22
                                       ],
@@ -593,7 +629,7 @@
                                           "type": "Panel",
                                           "rect": [
                                             181,
-                                            288,
+                                            293,
                                             22,
                                             22
                                           ],
@@ -602,7 +638,7 @@
                                               "type": "TextureRect",
                                               "rect": [
                                                 185,
-                                                292,
+                                                297,
                                                 13,
                                                 13
                                               ]
@@ -673,11 +709,20 @@
                       ],
                       "children": [
                         {
-                          "type": "PanelContainer",
+                          "type": "Panel",
                           "rect": [
                             10,
                             362,
                             110,
+                            32
+                          ]
+                        },
+                        {
+                          "type": "Control",
+                          "rect": [
+                            10,
+                            362,
+                            98,
                             32
                           ],
                           "children": [
@@ -685,18 +730,18 @@
                               "type": "HBoxContainer",
                               "rect": [
                                 15,
-                                362,
+                                367,
                                 93,
-                                32
+                                22
                               ],
                               "children": [
                                 {
                                   "type": "TextureRect",
                                   "rect": [
                                     15,
-                                    362,
+                                    367,
                                     22,
-                                    32
+                                    22
                                   ]
                                 },
                                 {
@@ -759,11 +804,20 @@
                       ],
                       "children": [
                         {
-                          "type": "PanelContainer",
+                          "type": "Panel",
                           "rect": [
                             176,
                             362,
                             120,
+                            32
+                          ]
+                        },
+                        {
+                          "type": "Control",
+                          "rect": [
+                            176,
+                            362,
+                            108,
                             32
                           ],
                           "children": [
@@ -771,18 +825,18 @@
                               "type": "HBoxContainer",
                               "rect": [
                                 181,
-                                362,
+                                367,
                                 103,
-                                32
+                                22
                               ],
                               "children": [
                                 {
                                   "type": "TextureRect",
                                   "rect": [
                                     181,
-                                    362,
+                                    367,
                                     22,
-                                    32
+                                    22
                                   ]
                                 },
                                 {
@@ -845,11 +899,20 @@
                       ],
                       "children": [
                         {
-                          "type": "PanelContainer",
+                          "type": "Panel",
                           "rect": [
                             10,
                             436,
                             70,
+                            32
+                          ]
+                        },
+                        {
+                          "type": "Control",
+                          "rect": [
+                            10,
+                            436,
+                            58,
                             32
                           ],
                           "children": [
@@ -857,18 +920,18 @@
                               "type": "HBoxContainer",
                               "rect": [
                                 15,
-                                436,
+                                441,
                                 53,
-                                32
+                                22
                               ],
                               "children": [
                                 {
                                   "type": "TextureRect",
                                   "rect": [
                                     15,
-                                    436,
+                                    441,
                                     22,
-                                    32
+                                    22
                                   ]
                                 },
                                 {
@@ -931,11 +994,20 @@
                       ],
                       "children": [
                         {
-                          "type": "PanelContainer",
+                          "type": "Panel",
                           "rect": [
                             176,
                             436,
-                            111,
+                            72,
+                            32
+                          ]
+                        },
+                        {
+                          "type": "Control",
+                          "rect": [
+                            176,
+                            436,
+                            63,
                             32
                           ],
                           "children": [
@@ -943,18 +1015,18 @@
                               "type": "HBoxContainer",
                               "rect": [
                                 181,
-                                436,
+                                441,
                                 94,
-                                32
+                                22
                               ],
                               "children": [
                                 {
                                   "type": "TextureRect",
                                   "rect": [
                                     181,
-                                    436,
+                                    441,
                                     22,
-                                    32
+                                    22
                                   ]
                                 },
                                 {
