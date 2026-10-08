@@ -30,9 +30,9 @@ func test_unknown_pages_show_the_silhouette_and_never_the_dish() -> void:
 		await _settle()
 		assert_bool(_shows(c, UiItemCell.SILHOUETTE)).override_failure_message(str(st)).is_true()
 		assert_bool(_shows(c, dish)).override_failure_message(str(st)).is_false()
-	var clued := _cell({kitchen_state = K.CLUED})
+	var clued := _cell({kitchen_state = K.CLUED, families = ["F"], clues = [UiItemCell.family_icon("F")]})
 	await _settle()
-	assert_bool(_shows(clued, UiItemCell.FAMILY_DOTS_CLUED)).is_true()
+	assert_bool(_shows(clued, UiItemCell.family_icon("F"))).is_true()
 	var locked := _cell({kitchen_state = K.LOCKED})
 	await _settle()
 	assert_array(_texts(locked)).contains(["Lv4"])
@@ -44,9 +44,19 @@ func test_tasted_mastered_in_pot_and_not_for_cooking() -> void:
 	await _settle()
 	assert_array(_texts(tasted)).contains(["Tasted"])
 	assert_bool(_shows(tasted, UiItemCell.STAR_GLYPH)).is_false()
-	var mastered := _cell({icon = fish, kitchen_state = K.MASTERED})
+	var mastered := _cell({icon = fish, quantity = "×3", marked = true, kitchen_state = K.MASTERED})
 	await _settle()
 	assert_bool(_shows(mastered, UiItemCell.STAR_GLYPH)).is_true()
+	# C28 (1228:105954): the star sits at the bottom right, the can-cook check keeps the top right; no quantity.
+	var star: Panel = mastered.get("_star")
+	var mark: Panel = mastered.get("_mark")
+	assert_float(star.position.x).is_greater(26.0)
+	assert_float(star.position.y).is_greater(26.0)
+	assert_vector(star.size).is_equal(Vector2(12, 12))
+	assert_object((star.get_theme_stylebox(&"panel") as UiStyleBox).bg_color).is_equal(UiTokens.COLOR_GOLD_DEEP)   # color/goldDeep
+	assert_bool(mark.is_visible_in_tree()).is_true()
+	assert_bool(star.get_global_rect().intersects(mark.get_global_rect())).is_false()
+	assert_array(_texts(mastered)).not_contains(["×3"])
 	var in_pot := _cell({icon = fish, quantity = "×2", kitchen_state = K.IN_POT})
 	await _settle()
 	assert_array(_texts(in_pot)).contains(["×2"])   # some left: the count, no label (COOK-2b / P0-2)
@@ -116,3 +126,46 @@ func test_a_rack_seasoning_shows_the_rack_tag_and_no_rarity_dot() -> void:
 func _rarity_dots(c: Control) -> Array:
 	var dot := Vector2(UiTokens.SIZE_RARITY_DOT, UiTokens.SIZE_RARITY_DOT)
 	return c.find_children("*", "Panel", true, false).filter(func(p): return p.is_visible_in_tree() and p.size.is_equal_approx(dot))
+
+func _dots(c: UiItemCell) -> Array:
+	var row: HBoxContainer = c.get("_family")
+	return row.get_children().filter(func(n): return n is Panel).map(func(n): return ((n as Panel).get_theme_stylebox(&"panel") as UiStyleBox).bg_color)
+
+func test_the_family_row_has_one_dot_per_slot_in_its_family_colour() -> void:
+	# int6 C29: the row used to be one fixed picture (blue, green, tan) on every unknown page, and every clued page
+	# lit a fish. Now: one 5 px dot per slot, coloured by its family; a clue lights its slot as a 10 px icon.
+	var F := UiItemCell.FAMILY_COLORS
+	var one := _cell({kitchen_state = K.HIDDEN, families = ["F"]})
+	var three := _cell({kitchen_state = K.HIDDEN, families = ["W", "O", "S"]})
+	await _settle()
+	assert_array(_dots(one)).is_equal([F.F])
+	assert_array(_dots(three)).is_equal([F.W, F.O, F.S])
+	assert_bool(_shows(one, UiItemCell.family_icon("W"))).is_false()
+	# A clue on slot 0: that slot is its icon (a named ingredient's own), the rest stay dots; the row stays centred.
+	var radish := load("res://assets/p0/icons/crop_radish.svg")
+	var clued := _cell({kitchen_state = K.CLUED, families = ["F", "S"], clues = [radish, null]})
+	await _settle()
+	assert_bool(_shows(clued, radish)).is_true()
+	assert_array(_dots(clued)).is_equal([F.S])
+	var row: HBoxContainer = clued.get("_family")
+	var mid := row.get_global_rect().get_center().x - clued.get_global_rect().position.x
+	assert_float(mid).is_equal_approx(UiTokens.SIZE_KITCHEN_CELL_W * 0.5, 0.6)
+	# Known pages draw no row.
+	clued.kitchen_state = K.TASTED
+	await _settle()
+	assert_bool(row.is_visible_in_tree()).is_false()
+
+func test_might_have_rings_the_cell_in_color_new() -> void:
+	# State=mightHave 1726:32864: the hidden look with a still ring outside the cell (blur 4, spread 2, new at 50 %).
+	var c := _cell({kitchen_state = K.HIDDEN, families = ["W"], might_have = true})
+	await _settle()
+	var glow: Panel = c.get("_glow")
+	assert_bool(glow.is_visible_in_tree()).is_true()
+	assert_vector(glow.size).is_equal(Vector2.ONE * (UiTokens.SIZE_KITCHEN_CELL_W + 4))
+	var ring := glow.get_theme_stylebox(&"panel") as UiStyleBox
+	assert_object(ring.shadow_color).is_equal(UiKit.alpha(UiTokens.COLOR_NEW, 0.5))
+	assert_float(ring.shadow_size).is_equal(4.0)
+	assert_int(glow.get_index()).is_less(c.get("_surface").get_index())   # under the cell: only the ring shows
+	c.might_have = false
+	await _settle()
+	assert_bool(glow.is_visible_in_tree()).is_false()

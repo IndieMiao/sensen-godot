@@ -23,6 +23,9 @@ func _init() -> void:
 	place_name = "Farmhouse"
 	exit_text = "Door · Back to farm"
 	exit_to = "Farm"   # the door's world prompt: i-door + Farm (SGODOT-250)
+	# The stove is its body and pot only; the shelf on the wall beside it and the cabinet under that are their own,
+	# and where they overlap the smaller takes the tap (int6 C8). The final farmhouse_lv1 art renames these nodes.
+	hit_nodes = {STOVE: "hearth", RACK: "spice_rack", CABINET: "warming_cabinet"}
 
 ## The space commands are sent from (SGODOT-228 PR #16, Rest needs ≥ 2 h away, q(41)): the farmhouse is home.
 func p0_space() -> String: return "home"
@@ -53,7 +56,9 @@ func _marker(n: String, v: Dictionary) -> Dictionary:
 	if _sheet: return {}
 	# World prompts (SGODOT-250, LOCK-07 v2, q(62)): an icon button, the nearest opens into a name strip; no Tap to.
 	if n == RACK: return {kind = "facility", icon = P0Logic.icon("spice_rack"), name = "Spice Rack"}   # i-spice-rack 1714:102645
-	if n == CABINET: return {kind = "facility", icon = P0Logic.icon("cabinet"), name = "Warming Cabinet", fact = P0KitchenLogic.cabinet_badge(v)}   # i-cabinet 1265:89122
+	if n == CABINET:   # i-cabinet 1265:89122; from afar its button hangs the count, 4/6 or Full, none when empty (C21, q(31))
+		return {kind = "facility", icon = P0Logic.icon("cabinet"), name = "Warming Cabinet", fact = P0KitchenLogic.cabinet_badge(v),
+			count = P0KitchenLogic.cabinet_count(v)}
 	if n != STOVE: return super(n, v)
 	var stove := {kind = "facility", icon = P0Logic.icon("pot"), name = "Stove 1/1"}   # i-pot (250 walkthrough)
 	var st = P0KitchenLogic.stove(v)
@@ -164,6 +169,7 @@ func p0_dev(step: PackedStringArray) -> bool:
 	match step[0]:
 		"stove": open_stove(step[1] if step.size() > 1 else "cookbook")
 		"kitchen": p0_open_kitchen(step[1] if step.size() > 1 else "cookbook")
+		"page": if kitchen.drawer: kitchen.drawer.select_page(step[1])   # a Cookbook page's card (shots)
 		"put":
 			if kitchen.phase != "compose": kitchen.open("experiment")
 			if kitchen.drawer and kitchen.drawer.tab != "experiment": kitchen.drawer.tab = "experiment"

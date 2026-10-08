@@ -20,6 +20,7 @@ const BASIC_ROOM_ART := "res://scenes/basic_room/basic_room_art.tscn"
 const BASIC_ROOM_LAYOUT := "res://assets/rooms/basic_room/layout.json"
 ## Engineering defaults (SGODOT-226); WP7 v2 finalises the camera numbers from Figma.
 const TAP_RADIUS := 64.0          # F-04 screen pick radius (P0 uses 56–80 px)
+const MIN_HIT := 44.0             # a facility tapped by its art: at least this box on screen (touch target)
 const CARD_NEAR_M := 3.0          # finger cards float up this close (LOCK-07)
 const EXIT_RADIUS_M := 0.6        # walking onto the door leaves, no confirmation
 const EXIT_ARM_M := 1.0           # … once the player has been this far from it (spawn is one step inside)
@@ -43,6 +44,11 @@ var exit_text := "Door · Back to map"
 var exit_to := ""
 ## Level the modules show for (module visibility: module_levels[module] <= level).
 var level := 1
+## Facilities tapped by their art instead of a radius round the anchor (int6 C8, 不知火舞 on 226): anchor name →
+## node under `art`. Its screen box (grown up and sideways to MIN_HIT) takes the tap; where boxes overlap the smaller
+## one wins (small things first); these anchors never take the radius fallback, so a stove does not reach over the
+## shelf beside it.
+var hit_nodes := {}
 var module_levels := {}
 ## Tests and previews run without the P0 runtime (no session, HUD or AppRouter).
 var use_runtime := true
@@ -452,11 +458,24 @@ func leave() -> void:
 static func _flat_distance(a: Vector3, b: Vector3) -> float:
 	return Vector2(a.x - b.x, a.z - b.z).length()
 
-## The facility under a screen point: the tappable anchor nearest to it within TAP_RADIUS, or "".
+## The facility under a screen point: the smallest art box (hit_nodes) holding it, else the tappable anchor nearest
+## to it within TAP_RADIUS among the others, or "".
 func pick(screen: Vector2) -> String:
 	var best := ""
+	var best_area := INF
+	var boxed := {}
+	for n in _tappable():
+		if not hit_nodes.has(n): continue
+		var r := hit_rect(n)
+		if not r.has_area(): continue
+		boxed[n] = true
+		if r.has_point(screen) and r.get_area() < best_area:
+			best = n
+			best_area = r.get_area()
+	if best != "": return best
 	var best_d := TAP_RADIUS
 	for n in _tappable():
+		if boxed.has(n): continue   # tapped by its art only
 		var m := anchor(n)
 		if m == null or cam.is_position_behind(m.global_position): continue
 		var d := cam.unproject_position(m.global_position + _hit_lift(n)).distance_to(screen)
@@ -464,6 +483,36 @@ func pick(screen: Vector2) -> String:
 			best_d = d
 			best = n
 	return best
+
+## The screen box of a hit_nodes facility: its meshes' bounds projected, grown to MIN_HIT (upwards, and evenly to
+## the sides); an empty Rect2 when the node is missing or hidden.
+func hit_rect(n: String) -> Rect2:
+	var node := art.get_node_or_null(NodePath(str(hit_nodes.get(n, "")))) as Node3D if art and hit_nodes.has(n) else null
+	if node == null or not node.is_visible_in_tree(): return Rect2()
+	var box := AABB()
+	var first := true
+	for mi: MeshInstance3D in node.find_children("*", "MeshInstance3D", true, false):
+		if not mi.is_visible_in_tree(): continue
+		var b := mi.global_transform * mi.get_aabb()
+		box = b if first else box.merge(b)
+		first = false
+	if first: return Rect2()
+	var r := Rect2()
+	var seen := false
+	for i in 8:
+		var c := box.get_endpoint(i)
+		if cam.is_position_behind(c): continue
+		var at := cam.unproject_position(c)
+		r = r.expand(at) if seen else Rect2(at, Vector2.ZERO)
+		seen = true
+	if not seen: return Rect2()
+	if r.size.x < MIN_HIT:
+		r.position.x -= (MIN_HIT - r.size.x) * 0.5
+		r.size.x = MIN_HIT
+	if r.size.y < MIN_HIT:
+		r.position.y -= MIN_HIT - r.size.y
+		r.size.y = MIN_HIT
+	return r
 
 ## NPCs and the door are picked at body / door height; use_ anchors already sit on the object's top.
 static func _hit_lift(n: String) -> Vector3:
@@ -537,7 +586,7 @@ func card_pick(marks: Dictionary) -> String:
 ##   "npc"      {name, head}: the name over the head (NpcNameTag), highlighted while it is the one in reach; `talking`
 ##              keeps it up and highlighted over the greeting card / dialogue bar (P0Ui.npc_tag, #57);
 ##   "seat"     {icon}: an icon button that goes Near, never a strip;
-##   "facility" {icon, name, fact?}: an icon button that opens into a name strip.
+##   "facility" {icon, name, fact?, count?}: an icon button (count: its small count tag) that opens into a name strip.
 ## `badge` on a seat or facility rides in the button / strip (StatusBadge World 28); an NPC's stays a badge.
 func _markers(v: Dictionary) -> void:
 	var now := {}
@@ -561,7 +610,7 @@ func _markers(v: Dictionary) -> void:
 			continue
 		if kind == "facility":
 			if n == _card: rt.ui.name_bar(id, m.icon, str(m.name), str(m.get("fact", "")), screen, true, -1, false, state)
-			else: rt.ui.world_icon(id, m.icon, screen, true, false, state)
+			else: rt.ui.world_icon(id, m.icon, screen, true, false, state, Vector2.INF, str(m.get("count", "")))
 			continue
 		if state >= 0 and rt.ui.has_method("badge"):
 			rt.ui.call("badge", id, state, screen, true, str(m.get("caption", "")), m.get("icon", null))

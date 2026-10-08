@@ -97,8 +97,8 @@
 
 | 场景 | 呈现 | 文案 |
 |---|---|---|
-| Farming Lv5 | MomentBanner LevelUp 1.5 秒（§4.8.6） | `Farming Lv 5` / `Cabbage, Corn` / `+30 Energy` / Detail `Next Lv6 · Cucumber, Sprinkler · 250 XP` |
-| Farming Lv6（改变日常） | 全幅 ≤ 3 秒 | `Farming Lv 6` / `Cucumber, Sprinkler` / `+30 Energy` / `Today changes: no more watering` / 动作 `Show Workbench`（只移动相机到工作台，不打开、不跳转，LOCK-08） |
+| Farming Lv5 | MomentBanner LevelUp 1.5 秒（§4.8.6，字段分工同 SKILL-3，q(69)） | 标题 `Farming Lv 5` / 副标题 `New for you · Cabbage, Corn` / 奖励行 `+30 Energy` / Tip `Next Lv6 · Cucumber, Sprinkler · 250 XP` |
+| Farming Lv6（改变日常） | 全幅 ≤ 3 秒 | 标题 `Farming Lv 6` / 副标题 `New for you · Cucumber, Sprinkler` / 奖励行 `+30 Energy` / Tip `Today changes: no more watering`（改变日常，不写下一级，q(69)）/ 动作 `Show Workbench`（只移动相机到工作台，不打开、不跳转，LOCK-08） |
 | 技能页 Next 行 | 只列当期内容（§4.8.6 技能页规则） | Lv4：`Next: Lv5 · Cabbage, Corn · 200 XP`；Lv5：`Next: Lv6 · Cucumber, Sprinkler · 250 XP`；Lv6 起：`Next: Lv7 · 300 XP`（第一步没有 Lv7 内容） |
 | 门禁卡（§4.8.7 新增 3 行） | InfoSheet 四行 + `Show my plots` | 驿站种子 `Cabbage Seeds / Corn Seeds` · `Farming Lv5` · `120 XP to go · harvest 30 tomatoes` · `Unlocks Cabbage, Corn`；驿站种子 `Cucumber Seeds` · `Farming Lv6` · … · `Unlocks Cucumber`；工作台 `Sprinkler` · `Farming Lv6` · … · `Waters 8 plots for you` |
 
@@ -202,11 +202,11 @@
 | # | 怎么操作 | 期望 |
 |---|---|---|
 | T1 | 前置 F4。打开驿站 | 三种新种子可见：卷心菜、玉米灰显 `Farming Lv5 · 10 XP to go`，黄瓜 `Farming Lv6 · …`；点选弹门禁卡四行（1.6） |
-| T2 | 前置 F4。收番茄跨过 Lv5 | 横幅 `Farming Lv 5` / `Cabbage, Corn` / `+30 Energy` / `Next Lv6 · Cucumber, Sprinkler · 250 XP`；驿站卷心菜、玉米变可买 |
+| T2 | 前置 F4。收番茄跨过 Lv5 | 横幅 `Farming Lv 5` / `New for you · Cabbage, Corn` / `+30 Energy` / Tip `Next Lv6 · Cucumber, Sprinkler · 250 XP`；驿站卷心菜、玉米变可买 |
 | T3 | 前置 F5。买卷心菜种子 5、玉米 5，播种，等成熟收获 | 播种每格 −3 / −4 体力；收获卷心菜每株 +3 XP、首收 +15；玉米每株产 3 根、+4 XP、首收 +20；图鉴 `Crops first-harvested n/11` |
 | T4 | 前置 F5。Experiment 放卷心菜 + 土豆；玉米 ×2；只放 1 个番茄；只放 1 根玉米 | 依次做出 Cabbage Stew（Common）、Corn Cake（Fine）、Roast Veggies（Fine）、Roast Veggies；没有 Mystery Dish；Cookbook 4 页点亮，技能页 `Dishes first-cooked n/18` |
 | T5 | 前置 H2→3。升 Homestead Lv3 | 后果飘字含 `Plots +10`；新 10 格荒地随篱笆落位，位置连着原来的田；能翻地（0 体力），能播种；原 0–29 格的作物不动 |
-| T6 | 前置 F6（差 0 到 Lv6）。收任意作物跨过 Lv6 | 全幅横幅 ≤ 3 秒 `Farming Lv 6` / `Cucumber, Sprinkler` / `Today changes: no more watering`；点 `Show Workbench` 只移动相机到工作台，不打开抽屉 |
+| T6 | 前置 F6（差 0 到 Lv6）。收任意作物跨过 Lv6 | 全幅横幅 ≤ 3 秒 `Farming Lv 6` / `New for you · Cucumber, Sprinkler` / `+30 Energy` / `Today changes: no more watering`；点 `Show Workbench` 只移动相机到工作台，不打开抽屉 |
 | T7 | 前置 F6。点工作台 → Facilities | Sprinkler 蓝图卡：`Waters 8 plots for you`、材料格 `Timber 20/8 · Stone 20/6 · Copper Ore 7/3`、按钮 `Build` |
 | T8 | P7 后按 `Build` | 进放置模式：摇杆不出、快捷栏与主行动键隐藏；预览落在最近的空田，3 × 3 浅蓝 + `Coverage preview · 8 plots`；拖到有作物的格 → 中心格红、按钮 `Plot occupied`；拖到田外 → `Outside your fields`；按 `Cancel` → 材料没扣 |
 | T9 | 再进放置模式，放在一格空田、覆盖里有 2 格已播未浇，按 `Build` | 扣 Timber 8 / Stone 6 / Copper Ore 3；2 格立即开始长（倒计时出现）；覆盖内新播的格不再出 `Water · Free`，播下即长；成熟时长是基础的 85%（施过堆肥的 65%） |
