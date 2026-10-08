@@ -64,7 +64,7 @@ func test_each_outpost_opens_with_its_keeper_and_residents() -> void:
 func test_near_resident_is_a_resident_within_card_reach_never_the_keeper() -> void:
 	var r := _room("sh_tackle_1")
 	r.actor.position = r.anchor("npc_keeper").global_position
-	assert_str(r.p0_near_resident()).is_equal("")   # Finn keeps the shop: not a gift target
+	assert_str(r.p0_near_resident()).is_not_equal(str(r.npcs.npc_keeper.id))   # Finn keeps the shop: never a gift target (Kai may be in reach)
 	var kai := r.anchor("npc_kai").global_position
 	r.actor.position = kai + Vector3(1.0, 0, 0)
 	assert_str(r.p0_near_resident()).is_equal(str(r.npcs.npc_kai.id))
