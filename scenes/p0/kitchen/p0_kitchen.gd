@@ -249,9 +249,8 @@ func _on_ingredient(id: String, from_screen: Vector2) -> void:
 	if not P0Logic.item(P0KitchenLogic.with_rack(v), id).get("cook", false):
 		rt.ui.toast("Not for cooking")
 		return
-	if pot.has(id):
-		_take_out(pot.rfind(id), from_screen)
-		return
+	# §7.2.7: a tap on a bag cell always puts one more in (Carrot Cake, Salted Potatoes and the two-radish trials need
+	# the same ingredient twice); taking one back is the slot bar's tap / ✕ (李元芳, int6).
 	if pot.size() >= P0KitchenLogic.slots(v):
 		rt.ui.toast("The pot is full · tap an ingredient to take it out")
 		return
