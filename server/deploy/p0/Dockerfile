@@ -1,7 +1,8 @@
 # P0 server image (SGODOT-232 D1). Build context = repo root:
 #   docker build -f server/deploy/p0/Dockerfile -t p0-server:<sha> .
-# Same base as server/Dockerfile; the P0 content table goes into the image (one source of truth, never mounted; the
-# server reads nothing else from assets/). Saves, snapshots and the observation log live in the /data volume.
+# Same base as server/Dockerfile; the data the server reads at start goes into the image (one source of truth, never
+# mounted): the P0 content table, the outpost table and the cosmetic catalog (see the COPY lines below). Saves,
+# snapshots and the observation log live in the /data volume.
 # The build context's ignore list is Dockerfile.dockerignore beside this file (BuildKit), not the farm image's root
 # .dockerignore, which leaves assets/p0 out.
 FROM node:22-alpine AS build
