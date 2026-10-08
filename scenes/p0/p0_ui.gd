@@ -935,6 +935,15 @@ func _marker_area() -> Rect2:
 	if _bar.visible: bottom = minf(bottom, _bar.position.y)
 	return Rect2(0.0, top, _kit.size.x, maxf(0.0, bottom - top))
 
+## The band a world camera frames into (camera unification, 不知火舞 on 231): below the HUD's second row, above the
+## quick bar and the main key group, in this UI's coordinates. A scene that fits along an axis centres in this band,
+## so its front edge never sits under the bar or the key.
+func camera_band() -> Rect2:
+	var r := _marker_area()
+	if _keys != null and _keys.is_visible_in_tree():
+		r.end.y = minf(r.end.y, _keys.get_global_rect().position.y - root.global_position.y)
+	return r
+
 ## FloatText (1178:82191, UiFloatText from 2B; SGODOT-224): one line rising from `screen` (its bottom centre) in its
 ## tone; `stack` = the line's place in one reply (each starts 28 higher and 60 ms later, at most 3). Copy longer
 ## than one line wraps (Layout=Wrap, two lines at most). `tone` also takes the older Color argument (callers in

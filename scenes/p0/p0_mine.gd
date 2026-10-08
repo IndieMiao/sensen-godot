@@ -6,6 +6,7 @@ extends Node3D
 
 const Art = preload("res://modules/mining/mine_art.gd")
 const Layout = preload("res://modules/mining/mine_layout.gd")
+const ElasticZoom = preload("res://modules/p0/p0_elastic_zoom.gd")
 const FarmCamera = preload("res://modules/farm/farm_camera.gd")
 const PLACE := "Shanghai · Mine · Floor %d"
 const REACH := 1.7          # m: a rock, ladder or the elevator in front of the player within this distance
@@ -27,7 +28,12 @@ var _previews := {}         # rock index → Sprite3D torch preview
 var _breaking := {}         # rock index → true while its break plays (the view may already say broken)
 var _focus := Vector3.ZERO
 var _cam_follow := P0Follow.new()
-var _zoom := 0.8            # the mine opens at its widest view (mine-max-view 2026-09-25), pinch 0.8–1.4
+# Camera unification (用户 via 奕星, 2026-10-09; target 哪吒, 65.8 px at 360 × 800): the farm's size and pinch — zoom 1 is
+# FarmCamera.player_scale_size at the farm's 43° pitch, rubber-banded 0.8–1.4 about the pinch centre (ElasticZoom).
+var _zoom := 1.0
+var _room := AABB()          # this floor's walls (the camera's edges, _frame_chamber); empty until a floor is built
+var _pinch = ElasticZoom.new(0.8, 1.4)
+var _zoom_at := Vector2.INF
 var _target := {}           # {kind, rock, at}
 var _entered_ms := 0
 var _hold_until := 0
@@ -107,6 +113,7 @@ func _build_floor(n: int) -> void:
 	_breaking.clear()
 	scenery = Art.floor_scenery(n, true)   # adds the up ladder, and the elevator on floor 1
 	add_child(scenery)
+	_room = _walls_box(scenery)
 	objects = Node3D.new()
 	objects.name = "MineObjects"
 	add_child(objects)
@@ -359,14 +366,82 @@ func _kick_out() -> void:
 # ---------------------------------------------------------------- camera (old mine framing + safe box)
 func _follow(dt: float) -> void:
 	_focus = _cam_follow.step(cam, _focus, actor.position, actor.mover.is_moving(), dt)
-	_update_camera()
+	if _pinch.step(dt): _set_zoom(_pinch.value)   # springing back from past a limit, about the same point
+	else: _update_camera()
 
 func _update_camera() -> void:
-	cam.size = FarmCamera.close_view_size(get_viewport().get_visible_rect().size) / _zoom
+	cam.size = FarmCamera.player_scale_size(get_viewport().get_visible_rect().size, FarmCamera.PITCH_DEG) / _zoom
 	FarmCamera.place(cam, _focus + Vector3.UP * 0.7)
+	_frame_chamber()
 	FarmCamera.fit_ground_depth(cam)
 
-func p0_zoom(f: float) -> void: _zoom = clampf(_zoom / f, 0.8, 1.4)
+## The view stays inside the room's art (不知火舞 on 231): the four corners of the band between the HUD and the quick bar /
+## main key (P0Ui.camera_band) must land in the room — the top corners at the wall tops within the back wall, the bottom
+## corners at the floor within the front edge, all four between the side walls (the walls run aslant on screen at
+## the 14.5° yaw, so a box around the room's picture would still show the void beside them). That gives the focus one
+## allowed range per ground axis; where the band is wider than the room the focus stays at the range's middle (fixed),
+## elsewhere the safe box follows inside it. Moves `_focus` itself, so the follow and the pinch carry on from there.
+func _frame_chamber() -> void:
+	if _room.size == Vector3.ZERO: return
+	var vp := get_viewport().get_visible_rect().size
+	var band := Rect2(Vector2.ZERO, vp)
+	if rt != null and rt.ui != null and rt.ui.is_node_ready(): band = rt.ui.camera_band()
+	if band.size.x <= 0.0 or band.size.y <= 0.0: return
+	var lo := Vector2(-INF, -INF)   # allowed focus x / z
+	var hi := Vector2(INF, INF)
+	var top := _room.end.y
+	var floor_y := _room.position.y
+	for c in [band.position, Vector2(band.end.x, band.position.y), Vector2(band.position.x, band.end.y), band.end]:
+		# Each corner on the surface it shows: the band's top meets the walls' tops, its bottom the floor.
+		var far: bool = c.y == band.position.y
+		var off := _ray_at(c, top if far else floor_y) - _focus
+		lo.x = maxf(lo.x, _room.position.x - off.x)
+		hi.x = minf(hi.x, _room.end.x - off.x)
+		if far: lo.y = maxf(lo.y, _room.position.z - off.z)
+		else: hi.y = minf(hi.y, _room.end.z - off.z)
+	var x := clamp_or_centre(_focus.x, lo.x, hi.x)
+	var z := clamp_or_centre(_focus.z, lo.y, hi.y)
+	if is_equal_approx(x, _focus.x) and is_equal_approx(z, _focus.z): return
+	_focus = Vector3(x, _focus.y, z)
+	FarmCamera.place(cam, _focus + Vector3.UP * 0.7)
+
+## Where the camera ray through a screen point (this UI's coordinates) crosses the plane at height y.
+func _ray_at(screen: Vector2, y: float) -> Vector3:
+	var o := cam.project_ray_origin(screen)
+	var n := cam.project_ray_normal(screen)
+	return o + n * ((y - o.y) / n.y) if absf(n.y) > 0.0001 else o
+
+## The allowed range's middle when it is empty (the band is wider than the room: that axis stays fixed), else v clamped.
+static func clamp_or_centre(v: float, lo: float, hi: float) -> float:
+	return (lo + hi) * 0.5 if lo > hi else clampf(v, lo, hi)
+
+## The floor's walls: of the art's meshes (lights and flat decals left out), the one standing taller than half a metre
+## with the widest footprint — the carved walls; Art.VIEW_BOUNDS if none is found.
+static func _walls_box(root: Node3D) -> AABB:
+	var best := AABB()
+	for vi in root.find_children("*", "VisualInstance3D", true, false):
+		if vi is Light3D: continue
+		var b: AABB = (vi as VisualInstance3D).global_transform * (vi as VisualInstance3D).get_aabb()
+		if b.size.y > 0.5 and b.size.x * b.size.z > best.size.x * best.size.z: best = b
+	return best if best.size != Vector3.ZERO else Art.VIEW_BOUNDS
+
+## Zoom about the last pinch centre: the ground point under the fingers stays put (the farm's _set_zoom).
+func _set_zoom(value: float) -> void:
+	_zoom = value
+	if cam == null or not is_inside_tree(): return
+	var before = ElasticZoom.ground_at(cam, _zoom_at, _focus.y)
+	_update_camera()
+	var d := ElasticZoom.shift(before, ElasticZoom.ground_at(cam, _zoom_at, _focus.y))
+	if d != Vector3.ZERO:
+		_focus += d
+		_update_camera()
+
+func p0_zoom(f: float, at := Vector2.INF) -> void:
+	_zoom_at = at
+	_pinch.pinch(f)
+	_cam_follow.hold()   # the pinched framing stays until the player walks (the safe box takes over then)
+	_set_zoom(_pinch.value)
+func p0_zoom_end() -> void: _pinch.release()
 func p0_recenter() -> void:
 	_focus = actor.position
 	_cam_follow.held = false
