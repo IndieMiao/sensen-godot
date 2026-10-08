@@ -68,4 +68,6 @@ network/mobile_base_url="https://farm.sensenjoy.cn/preview/journey/v1"
 ; SGODOT-227 scene integration: on a 2-core Android device the default pool (one thread per core) starves while
 ; the Coffee Shop kit loads its shared plants on the main thread, and the room never opens (emulator, 0 % CPU,
 ; every thread in futex wait). Eight threads open it. Desktop keeps its default.
+; SGODOT-252 measured it on a 1-core emulator: 1 thread hangs every time; 3 or 8 open, whatever the low-priority
+; ratio. Nested waits each hold a worker; too few and they wait on each other. Guarded by test_p0_project_settings.
 worker_pool/max_threads.mobile=8
