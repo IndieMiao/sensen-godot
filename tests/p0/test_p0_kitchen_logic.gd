@@ -200,3 +200,32 @@ func test_keep_room_spares_a_retry_that_would_be_refused() -> void:
 	assert_array(P0KitchenLogic.stove_left(v)).is_empty()
 	v.cooking.stove = {"ready_in": 0, "left": ["dish_perch"]}
 	assert_array(P0KitchenLogic.stove_left(v)).contains_exactly(["dish_perch"])
+
+# ---------------------------------------------------------------- Spice Rack / Warming Cabinet (COOK-P0-5 / P0-6)
+func test_the_spice_rack_lists_stored_seasonings_with_their_real_count() -> void:
+	var v := _view()
+	assert_array(P0KitchenLogic.rack_rows(v)).is_empty()   # no rack in the view (before Lv2)
+	v.cooking["rack"] = {"on": true, "items": [{"id": "rock_salt", "name": "Rock Salt", "qty": 42}, {"id": "wild_herb", "name": "Wild Herb", "qty": 3}]}
+	assert_array(P0KitchenLogic.rack_rows(v)).is_equal([
+		{id = "rock_salt", title = "Rock Salt", quantity = "42", unit = "items"},   # q(46): no 30 cap
+		{id = "wild_herb", title = "Wild Herb", quantity = "3", unit = "items"}])
+
+func test_the_warming_cabinet_sheet_badge_and_buttons() -> void:
+	var v := _eat_view(142, 100, 45)
+	assert_dict(P0KitchenLogic.cabinet_sheet(v)).is_empty()   # before Lv3
+	assert_str(P0KitchenLogic.cabinet_badge(v)).is_equal("")
+	v.cooking["cabinet"] = {"cap": 6, "have": 4, "items": [
+		{"id": "dish_perch@good", "name": "Herb Baked Perch", "qty": 1, "energy": 45},
+		{"id": "dish_grilled_crucian", "name": "Grilled Crucian", "qty": 3, "energy": 20}]}
+	var sheet := P0KitchenLogic.cabinet_sheet(v)
+	assert_str(sheet.title).is_equal("Warming Cabinet 4/6")
+	assert_dict(sheet.rows[0]).is_equal({id = "dish_perch@good", title = "Herb Baked Perch", state = "★ Good", effect = "+45 Energy", quantity = "×1"})
+	assert_str(sheet.rows[1].state).is_equal("")   # Plain: no badge
+	assert_str(P0KitchenLogic.cabinet_badge(v)).is_equal("4/6")
+	v.cooking.cabinet.have = 6
+	assert_str(P0KitchenLogic.cabinet_badge(v)).is_equal("Full")
+	var a := P0KitchenLogic.cabinet_actions(v, "dish_perch@good")
+	assert_str(a.eat.text).is_equal("Eat · +45 Energy")
+	assert_str(a.take_reason).is_equal("")
+	v.bag.free = 0
+	assert_str(P0KitchenLogic.cabinet_actions(v, "dish_perch@good").take_reason).is_equal("Bag full")

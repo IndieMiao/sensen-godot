@@ -310,3 +310,37 @@ static func keep_room(view: Dictionary, id: String) -> bool:
 	if int(bag.get("free", 0)) > 0: return true
 	var limit := int(P0Logic.content().get("bag", {}).get("stack", {}).get("dish", 5))
 	return bag.get("slots", []).any(func(b): return str(b.id) == id and not b.get("gifted", false) and int(b.qty) < limit)
+
+# ---------------------------------------------------------------- Spice Rack / Warming Cabinet (COOK-P0-5 / P0-6)
+## Spice Rack rows: the stored seasonings the stove reaches, with their real count (q(46): no cap).
+static func rack_rows(view: Dictionary) -> Array:
+	var rack = cooking(view).get("rack", null)
+	if not (rack is Dictionary): return []
+	return rack.get("items", []).map(func(i): return {id = str(i.id), title = str(i.get("name", P0Logic.item_name(view, str(i.id)))), quantity = str(int(i.qty)), unit = "items"})
+
+## Warming Cabinet: the card title and one row per stack (★ quality, what a portion restores today, ×qty); rows
+## is empty for "No dishes yet". null cabinet (before Lv3) = {}.
+static func cabinet_sheet(view: Dictionary) -> Dictionary:
+	var cab = cooking(view).get("cabinet", null)
+	if not (cab is Dictionary): return {}
+	var rows: Array = []
+	for i in cab.get("items", []):
+		var id := str(i.id)
+		var q := ["plain", "good", "perfect"].find(id.get_slice("@", 1)) if id.contains("@") else 0
+		rows.append({id = id, title = str(i.get("name", P0Logic.item_name(view, id.get_slice("@", 0)))),
+			state = UiQualityBadge.LABELS[maxi(q, 0)], effect = "+%d Energy" % int(i.get("energy", 0)), quantity = "×%d" % int(i.qty)})
+	return {title = "Warming Cabinet %d/%d" % [int(cab.get("have", 0)), int(cab.get("cap", 6))], rows = rows,
+		empty = "No dishes yet"}
+
+## The world badge on the cabinet (appendix B.7): "4/6", or "Full".
+static func cabinet_badge(view: Dictionary) -> String:
+	var cab = cooking(view).get("cabinet", null)
+	if not (cab is Dictionary): return ""
+	return "Full" if int(cab.get("have", 0)) >= int(cab.get("cap", 6)) else "%d/%d" % [int(cab.get("have", 0)), int(cab.get("cap", 6))]
+
+## The selected cabinet row's buttons: Eat (COOK-7-2 states) and Take one (unavailable "Bag full", LOCK-10).
+static func cabinet_actions(view: Dictionary, id: String) -> Dictionary:
+	var bag: Dictionary = view.get("bag", {})
+	var limit := int(P0Logic.content().get("bag", {}).get("stack", {}).get("dish", 5))
+	var room: bool = int(bag.get("free", 0)) > 0 or bag.get("slots", []).any(func(b): return str(b.id) == id and not b.get("gifted", false) and int(b.qty) < limit)
+	return {eat = eat_state(view, id), take = "Take one", take_reason = "" if room else "Bag full"}

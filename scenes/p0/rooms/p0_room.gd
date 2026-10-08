@@ -9,7 +9,8 @@ extends Node3D
 ## the door (exit anchor) or Back returns to the world below (farmhouse → farm, outpost → map).
 ##
 ## Subclasses fill art_scene / layout_path / anchors_path / place_name in setup(args) or _init(), and override
-## the hooks below: _room_ready, _tappable, _on_facility, _marker, _module_visible, _room_frame, _on_joystick.
+## the hooks below: _dress_art, _room_ready, _tappable, _on_facility, _marker, _module_visible, _room_frame,
+## _on_joystick.
 
 signal facility_tapped(name: String)
 signal left()
@@ -88,6 +89,7 @@ func _ready() -> void:
 	add_child(room)
 	art = art_scene.instantiate()
 	room.add_child(art)
+	_dress_art()
 	_apply_module_visibility()
 	var nav := P0RoomNav.build(P0RoomNav.shapes_from(art))
 	bp = nav.bp
@@ -117,6 +119,20 @@ func _exit_tree() -> void:
 	if rt: rt.detach(self)
 
 # ---------------------------------------------------------------- hooks for subclasses
+## Adds props to the art before module visibility and the walkable grid are read. By default the anchors file's
+## placeholder props: copies of art pieces, named as modules, shown from their `level` (module_levels).
+func _dress_art() -> void:
+	for p in P0RoomAnchors.props(P0RoomAnchors.read_json(anchors_path)):
+		var src := art.get_node_or_null(NodePath(str(p.get("from", "")))) as Node3D
+		if src == null: continue
+		var copy := src.duplicate() as Node3D
+		copy.name = str(p.name)
+		copy.position = P0RoomAnchors.vec(p.position)
+		copy.rotation = Vector3(0.0, deg_to_rad(float(p.get("yaw_degrees", 0))), 0.0)
+		copy.scale = Vector3.ONE * float(p.get("scale", 1.0))
+		art.add_child(copy)
+		if p.has("level"): module_levels[str(p.name)] = int(p.level)
+
 func _room_ready() -> void: pass
 
 ## Anchor names the player can tap; default every visible use_ / npc_ anchor plus the door.

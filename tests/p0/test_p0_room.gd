@@ -80,7 +80,9 @@ func test_the_placeholder_anchor_files_pass_validation() -> void:
 	var layout := P0RoomAnchors.read_json(P0Room.BASIC_ROOM_LAYOUT)
 	var modules: Array = layout.assets.map(func(a): return str(a.name)) + layout.instances.map(func(a): return str(a.name))
 	for path in _anchor_files("res://assets/p0"):
-		var errors := P0RoomAnchors.validate(P0RoomAnchors.merge(layout, P0RoomAnchors.read_json(path)), modules)
+		var external := P0RoomAnchors.read_json(path)
+		var known: Array = modules + P0RoomAnchors.props(external).map(func(p): return str(p.name))
+		var errors := P0RoomAnchors.validate(P0RoomAnchors.merge(layout, external), known)
 		assert_array(errors).override_failure_message(path + "\n" + "\n".join(errors)).is_empty()
 
 func _anchor_files(dir: String) -> Array:
@@ -193,9 +195,10 @@ func test_push_in_puts_the_stove_in_the_band_above_the_drawer() -> void:
 # ---------------------------------------------------------------- farmhouse (placeholder Basic Room)
 const FARMHOUSE := preload("res://scenes/p0/rooms/p0_farmhouse.gd")
 
-func _farmhouse() -> P0Room:
+func _farmhouse(level := 1) -> P0Room:
 	var r: P0Room = FARMHOUSE.new()
 	r.use_runtime = false
+	r.level = level
 	add_child(r)
 	auto_free(r)
 	return r
@@ -212,6 +215,26 @@ func test_farmhouse_opens_on_the_stove_corner_with_a_door_back_to_the_farm() -> 
 	var view := r.get_viewport().get_visible_rect()
 	for n in ["use_stove_1", "exit"]:
 		assert_bool(view.has_point(r.cam.unproject_position(r.anchor(n).global_position))).override_failure_message(n).is_true()
+
+func test_the_kitchen_corner_grows_with_the_homestead() -> void:
+	# Lv1: no Spice Rack, no Warming Cabinet (props hidden, their anchors absent, nothing to tap).
+	var lv1 := _farmhouse(1)
+	assert_bool(lv1.art.get_node("spice_rack").visible).is_false()
+	assert_bool(lv1.art.get_node("warming_cabinet").visible).is_false()
+	assert_object(lv1.anchor("use_warming_cabinet")).is_null()
+	assert_array(Array(lv1._tappable())).not_contains(["use_spice_rack", "use_warming_cabinet"])
+	# Lv2: the rack; Lv3: the cabinet too, with its glow, a collider in the walkable grid and a reachable stand.
+	var lv2 := _farmhouse(2)
+	assert_bool(lv2.art.get_node("spice_rack").visible).is_true()
+	assert_bool(lv2.art.get_node("warming_cabinet").visible).is_false()
+	var lv3 := _farmhouse(3)
+	assert_array(Array(lv3._tappable())).contains(["use_spice_rack", "use_warming_cabinet"])
+	assert_bool(lv3.art.get_node("warming_cabinet_glow").visible).is_true()
+	var cab := lv3.anchor("use_warming_cabinet").global_position
+	assert_bool(lv3.bp.is_walkable(lv3.bp.world_to_cell(Vector3(cab.x, 0, cab.z)))).override_failure_message("the cabinet blocks the floor").is_false()
+	assert_array(lv3.grid.point_path(lv3.actor.position, lv3.anchor("stand_warming_cabinet").global_position)).is_not_empty()
+	assert_str(lv3._marker("use_spice_rack", {}).text).is_equal("Spice Rack · Tap to open")
+	assert_str(lv3._marker("use_warming_cabinet", {"cooking": {"cabinet": {"cap": 6, "have": 6, "items": []}}}).text).is_equal("Warming Cabinet Full · Tap to open")
 
 func test_farmhouse_stove_card_and_badge_follow_the_server_stove() -> void:
 	var r := _farmhouse()
