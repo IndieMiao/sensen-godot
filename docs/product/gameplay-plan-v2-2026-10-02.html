@@ -1937,7 +1937,7 @@ td { font-variant-numeric: tabular-nums; }
 <td>q(65)</td>
 <td>材料来源一句里没开放的来源怎么写（2026-10-08，不知火舞 SGODOT-228，苏烈 / 周瑜实现）</td>
 <td>材料进度格点开的来源一句要列出还没开放的采集点；§8.6.2 样例 <code>Clay · Clay Bank · opens at Lv2</code> 漏了已开放的矿洞 1 层，且 <code>·</code> 太多</td>
-<td><strong>已开放的在前、未开放的在后</strong>，用 <code>· or</code> 连接；未开放的用 <code>from</code> 接门槛：<code>Clay · Mine floor 1 · or Clay Bank from Homestead Lv2</code>；开放后去掉门槛（<code>Clay · Mine floor 1 · or Clay Bank</code>）。名字条那边照旧写 <code>Clay Bank · Homestead Lv2</code>（q(62)）</td>
+<td><strong>已开放的在前、未开放的在后</strong>，用 <code>· or</code> 连接；未开放的用 <code>from</code> 接门槛：<code>Clay · Mine floor 1 · or Clay Bank from Homestead Lv2</code>；开放后去掉门槛（<code>Clay · Mine floor 1 · or Clay Bank</code>）；每块岩石都给的 Stone 写 <code>Stone · Rock Pile · or the mine</code>，保持一行（苏烈 #69 截图：一行约 34 个字符）。名字条那边照旧写 <code>Clay Bank · Homestead Lv2</code>（q(62)）</td>
 <td>第 8 章 8.6.1、8.6.2</td>
 </tr>
 <tr>
@@ -15832,7 +15832,7 @@ td { font-variant-numeric: tabular-nums; }
 </tr>
 <tr>
 <td>需要 · 材料</td>
-<td>每种一格（材料进度格，16.1.3）：图标 + 环形进度 + 「名字 已有/需要」；差的格琥珀环；点格弹来源一句（矿物另带换料一句）+ Show；来源一句把已开放的来源写在前、用 <code>· or</code> 连接，还没开放的写在后面并用 <code>from</code> 接门槛：<code>Clay · Mine floor 1 · or Clay Bank from Homestead Lv2</code>（q(65)）</td>
+<td>每种一格（材料进度格，16.1.3）：图标 + 环形进度 + 「名字 已有/需要」；差的格琥珀环；点格弹来源一句（矿物另带换料一句）+ Show；来源一句把已开放的来源写在前、用 <code>· or</code> 连接，还没开放的写在后面并用 <code>from</code> 接门槛：<code>Clay · Mine floor 1 · or Clay Bank from Homestead Lv2</code>（q(65)）；只在特定层出的矿物写层数，每块岩石都给的 Stone 不列层数：<code>Stone · Rock Pile · or the mine</code>、<code>Rock Salt · Mine floors 1–2</code>；保持一行（LOCK-10），万一溢出最多折两行，只在 <code>· or</code> 前断、名字内部不断（不知火舞）；带门槛的那种 P0 实际不出现（黏土只在 Lv2 → Lv3 才要，那时 Clay Bank 已开放）（q(65)）</td>
 <td>Timber 10/16（琥珀环）· 点开「Timber Grove · 6 per round · ready in 2h 14m · Show」；Copper Ore 4/6 点开「Mine · floor 1 · or Barter 2 Sweet Potato → 1」</td>
 </tr>
 <tr>
