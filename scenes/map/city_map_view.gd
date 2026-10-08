@@ -40,7 +40,10 @@ const INK := Color("232b30")
 const MUTED := Color("69716e")
 const LIME := Color("cafa91")
 const CONTENT_TOP := 108.0
-const RECENTER_GAP := 12.0   # host_chrome: the recenter key's margin from the edge and over the host's bottom row
+const RECENTER_GAP := 12.0
+## A MapDestination's name stays this far inside the screen's sides; its disc stays on its point (int9: a selected
+## outpost's name ran off the left edge).
+const LABEL_EDGE := 8.0   # host_chrome: the recenter key's margin from the edge and over the host's bottom row
 const POI_CACHE_LIMIT := 400
 ## Anti-flicker: packing tests use a dead zone (incumbents keep their slot until
 ## overlap exceeds the margin; newcomers need clearance plus the margin), and a
@@ -1066,6 +1069,18 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int)
 			if incumbent: _hidden_until[id] = now + REAPPEAR_COOLDOWN_MS
 			return false
 	var label_rect := Rect2(c.point + Vector2(-c.label_w * 0.5, 3), Vector2(c.label_w, c.label_h))
+	var disc_off_screen := false
+	if not _destination(entry).is_empty():
+		label_rect.position.y = c.point.y + UiMapDestination.LABEL_GAP   # where the pin draws it
+		# The whole name on screen: while any of its disc is on screen it slides in from the edge, the disc stays. A disc
+		# packed in the margin off screen shows no name (no name without its pin).
+		var screen_x0 := -global_position.x   # the screen's left edge here (the view may be inset by a safe area)
+		var screen_w := get_viewport_rect().size.x
+		var half := UiMapDestination.DISC * 0.5   # any of the disc on screen
+		if c.point.x + half >= screen_x0 and c.point.x - half <= screen_x0 + screen_w:
+			var lo := screen_x0 + LABEL_EDGE
+			label_rect.position.x = clampf(label_rect.position.x, lo, maxf(lo, screen_x0 + screen_w - LABEL_EDGE - c.label_w))
+		else: disc_off_screen = true
 	if entry.kind == "landmark":
 		label_fits = is_selected or not _hits(occupied, Rect2(c.point - Vector2(c.width * 0.5, -3), Vector2(c.width, 20)))
 	elif entry.kind == "place" or not _destination(entry).is_empty():
@@ -1074,6 +1089,7 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int)
 		# likewise, marked or not: the selected pin packs first, so its name always shows and the names it touches fold
 		# until the card closes (不知火舞 on 234 A2).
 		label_fits = is_selected or not _hits(occupied, label_rect)
+	if disc_off_screen: label_fits = false   # no name without its pin on screen
 	if entry.kind == "place":
 		occupied.append(Rect2(c.point - Vector2(c.art_w * 0.5, c.art_h), Vector2(c.art_w, c.art_h)))
 		if label_fits:
@@ -1106,6 +1122,7 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int)
 		pin.plate = bool(dest.get("plate", false))
 		pin.text = _label_text(entry)
 		pin.name_shown = label_fits
+		pin.label_shift = label_rect.position.x - (c.point.x - c.label_w * 0.5)
 		pin.position = -pin.anchor_offset()
 	elif entry.kind == "resident":
 		marker.portrait.position = Vector2(-18, -38)
@@ -1127,7 +1144,8 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int)
 	# 否则长名选中后旁边的空地也算点中自己，点空白取消不了选择。
 	var k: float = c.k
 	marker.hit = [Rect2(c.point - Vector2(c.art_w * 0.5, c.art_h) * k, Vector2(c.art_w, c.art_h) * k)]
-	if marker.label.visible or (marker.has("dest") and label_fits):
+	if marker.has("dest") and label_fits: marker.hit.append(label_rect)   # where the name is drawn (k is 1)
+	elif marker.label.visible:
 		marker.hit.append(Rect2(c.point + Vector2(-c.label_w * 0.5, 3) * k, Vector2(c.label_w, c.label_h) * k))
 	displayed.append(marker)
 	return true

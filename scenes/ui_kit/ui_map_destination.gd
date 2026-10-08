@@ -25,6 +25,8 @@ var count := "": set = set_count
 var name_shown := true: set = set_name_shown
 ## The disc's own scale about its geographic point (a Show on map pulse); the name keeps its size.
 var focus := 1.0: set = set_focus
+## The name's sideways shift from under the disc (px): the city map keeps a name near the screen edge on screen.
+var label_shift := 0.0: set = set_label_shift
 
 var _pin: Control
 var _disc: Panel
@@ -98,7 +100,7 @@ func set_plate(v: bool) -> void:
 func set_mark(v: String) -> void:
 	if v == mark: return
 	mark = v
-	var i := UiStatusBadge._KEYS.find(v)
+	var i := UiStatusBadge.state_of(v)
 	if i < 0:
 		if _badge: _badge.visible = false
 		return
@@ -108,6 +110,11 @@ func set_mark(v: String) -> void:
 		_pin.add_child(_badge)
 	_badge.state = i
 	_badge.visible = true
+
+func set_label_shift(v: float) -> void:
+	if is_equal_approx(v, label_shift): return
+	label_shift = v
+	_layout()
 
 func set_focus(v: float) -> void:
 	focus = v
@@ -123,9 +130,11 @@ func set_count(v: String) -> void:
 ## padding, never cut. Matches label_size() of a built pin.
 static func label_size_for(text: String) -> Vector2:
 	if text == "": return Vector2.ZERO
-	var f := UiKit.font(&"bold")
-	return Vector2(ceilf(f.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, 10).x) + _LABEL_PAD_X * 2.0,
-		ceilf(f.get_height(10) * 1.25 / 1.25) + _LABEL_PAD_Y * 2.0)
+	var th := UiKit.theme()   # the name's own style, STYLE_C10_B (the city map gives the pin this theme)
+	var f := th.get_font(&"font", UiTokens.STYLE_C10_B)
+	var fs := th.get_font_size(&"font_size", UiTokens.STYLE_C10_B)
+	return Vector2(ceilf(f.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x) + _LABEL_PAD_X * 2.0,
+		ceilf(f.get_height(fs)) + _LABEL_PAD_Y * 2.0)
 
 ## The name's plate size (0 when there is no name).
 func label_size() -> Vector2:
@@ -138,7 +147,7 @@ func anchor_offset() -> Vector2:
 ## What it covers around its geographic point: the disc over it, the name under it (for the map's packing).
 func footprint() -> Rect2:
 	var l := label_size()
-	return Rect2(-DISC * 0.5, -DISC, DISC, DISC).merge(Rect2(-l.x * 0.5, LABEL_GAP, l.x, l.y)) if l.x > 0.0 \
+	return Rect2(-DISC * 0.5, -DISC, DISC, DISC).merge(Rect2(-l.x * 0.5 + label_shift, LABEL_GAP, l.x, l.y)) if l.x > 0.0 \
 		else Rect2(-DISC * 0.5, -DISC, DISC, DISC)
 
 func _layout() -> void:
@@ -148,5 +157,5 @@ func _layout() -> void:
 	custom_minimum_size = Vector2(w, DISC + (LABEL_GAP + l.y if l.y > 0.0 else 0.0))
 	size = custom_minimum_size
 	_pin.position = Vector2((w - DISC) * 0.5, 0.0)
-	_label_box.position = Vector2((w - l.x) * 0.5, DISC + LABEL_GAP)
+	_label_box.position = Vector2((w - l.x) * 0.5 + label_shift, DISC + LABEL_GAP)
 	_label_box.size = l
