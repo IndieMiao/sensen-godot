@@ -430,7 +430,9 @@ func test_a_selected_name_folds_the_names_it_touches() -> void:
 	city.selected = city.entries.filter(func(e): return str(e.get("id", "")) == "home")[0]
 	_look(m, at, 15.0, 0.0)
 	assert_bool(home_pin.name_shown).is_true()
-	assert_bool(reed_pin.name_shown).is_false()
+	# The marked one's name, touched under its disc, goes over it (不知火舞 on 234 A2: under, then over, then folded).
+	assert_bool(reed_pin.name_shown and reed_pin.label_above).is_true()
+	assert_bool(_dest_label_rect(city.markers[NEAREST_POND]).intersects(_dest_label_rect(city.markers["home"]))).is_false()
 	assert_array(city.displayed.map(func(mk): return str(mk.entry.id))).contains([NEAREST_POND, "home"])
 	city.selected = {}
 	_look(m, at, 15.0, 0.0)
@@ -478,3 +480,25 @@ func test_a_name_by_the_edge_stays_on_screen() -> void:
 	city._update_markers()
 	assert_bool((city.markers["sh_tackle_1"].dest as UiMapDestination).name_shown).is_false()   # no name without its disc
 	city.selected = {}
+
+## 不知火舞 on 234 A2: a name touching another tries over its disc before folding, in C30's order (no outpost has a
+## privilege). In the first session's opening view the market's name, under its disc against the tea house's, goes over.
+func test_a_name_goes_over_its_disc_before_it_folds() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved: Dictionary = rt.session.view
+	rt.session.view = _board(0)
+	m.frame_home_set()
+	m._sync_farm_markers()
+	var city: CityMapView = m.city_map
+	city._update_markers()
+	var market: UiMapDestination = city.markers["sh_market_1"].dest
+	assert_bool(market.name_shown).is_true()
+	assert_bool(market.label_above).is_true()
+	var rects: Array = city._place_labels
+	for i in rects.size():
+		for j in range(i + 1, rects.size()):
+			assert_bool((rects[i] as Rect2).intersects(rects[j])).is_false()   # still no two names on each other
+	rt.session.view = saved
