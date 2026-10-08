@@ -13,6 +13,8 @@ signal connection_failed(message: String, cmd: Dictionary)
 ## A keyed UI command was accepted for sending / has its result (ok, refusal code or "network").
 signal command_started(key: String)
 signal command_settled(key: String, ok: bool, code: String)
+## Every command as it is handed to send(), before it goes out (the guide closes a TipCard the player just acted on).
+signal sent(cmd: Dictionary)
 
 const DEFAULT_URL := "http://127.0.0.1:3110/v1"
 const DEMO_CONFIG := "res://assets/p0/demo_server.json"
@@ -82,6 +84,7 @@ func refresh() -> void:
 func send(cmd: Dictionary, key := "") -> bool:
 	if key != "" and (str(_inflight.get("key", "")) == key or _queue.any(func(q): return q.key == key)):
 		return false
+	sent.emit(cmd)
 	var src := str(src_of.call()) if src_of.is_valid() else ""
 	var entry := {cmd = cmd, key = key, space = space, place = place, src = src}   # where and how it was issued, even if it waits
 	if key != "": command_started.emit(key)

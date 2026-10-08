@@ -333,6 +333,8 @@ describe('P0 stall board (§14.1.2 tutorial request)', () => {
     expect(count(r.s.bag, 'fish_crucian')).toBe(1);
     expect(r.s.skills).toEqual(xp);
     expect(applyP0(c, r.s, { type: 'deliver', request: 'req_pond_catch' }, T0)).toMatchObject({ ok: false, code: 'request_done' });
+    // q(58): the view lists requests handed in, so the first session's Deliver row can tick
+    expect(viewOf(c, r.s, T0).req_done).toContain('req_pond_catch');
   });
 });
 
