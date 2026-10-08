@@ -11,6 +11,8 @@ extends UiDrawer
 ##              Locked + Unlock) · the five-column grid (at an outpost only what this counter buys, LOCK-15).
 ##              A counter that buys nothing (the P0 market) has no bag half.
 ##   board      the Stall Board / Market Board page: `board` is left empty for the P0 UI to fill.
+##   specialty  the market's City Specialty shelf (MARKET-SPECIALTY 1394:92801, 李白 q(48)): its own short sheet,
+##              `City Specialty` and the postcard row, no keeper bar, no tabs, no bag; the P0 UI floats Close above it.
 ##   drinks     the tea house and the post desk (NPC-6 482:133, NPC-7-P0 1507:97237, TEA-DONE / NEARFULL / BLOCKED):
 ##              keeper bar with the shared-cups note, `Drinks left today · 3 of 3`, the next cup's line and one
 ##              command (`Hot Tea · +30 Energy`, or the grey reason). A shorter drawer (top at y 534), no bag.
@@ -26,6 +28,9 @@ const HEIGHT := 696.0           # drawer top at y 104 of 800 (FARM-6, NPC-2-2)
 const HEIGHT_DRINKS := 266.0    # NPC-6 / NPC-7-P0: keeper bar at y 540
 ## A counter that buys nothing back (the P0 market, sell []): keeper bar, tabs and the four-row shelf only.
 const HEIGHT_NO_BAG := 420.0
+## MARKET-SPECIALTY: sheet top at y 663 with one row (16 + title 27 + 8 + rows + 28).
+const SPECIALTY_PAD := 16.0
+static func specialty_height(rows: int) -> float: return 79.0 + 58.0 * maxi(1, rows)
 const DRINK_ROLES := ["tea", "post"]
 ## KeeperBar notes on the drink counters (NPC-6, NPC-7-P0): one daily cup count across both.
 const DRINK_NOTES := {"tea": "Counts across all tea houses · %d cups a day", "post": "Shares the %d cups a day with tea"}
@@ -79,11 +84,19 @@ func _init(view_: Dictionary = {}, role_ := "homestead", ctx_ := {}, section_ :=
 	role = role_
 	ctx = ctx_
 	_top_pad = _TOP_STALL if role == "homestead" else _TOP_KEEPER
-	super(HEIGHT_DRINKS if role in DRINK_ROLES else (HEIGHT if has_bag_half(view_, role) else HEIGHT_NO_BAG))
+	var specialty := role == "market" and section_ == "specialty"
+	if specialty: _top_pad = SPECIALTY_PAD
 	view = view_
+	section = "specialty" if specialty else (section_ if _sections().any(func(s): return s[0] == section_) else "buy")
+	super(HEIGHT_DRINKS if role in DRINK_ROLES else (specialty_height(offers().size()) if specialty
+		else (HEIGHT if has_bag_half(view_, role) else HEIGHT_NO_BAG)))
+	if specialty: pad = SPECIALTY_PAD
 	place = "home" if role == "homestead" else "outpost"
-	section = section_ if _sections().any(func(s): return s[0] == section_) or section_ == "specialty" else "buy"
-	_build_head()
+	if specialty:
+		body.add_child(UiKit.label("City Specialty", UiTokens.STYLE_TITLE_XB20))
+		_gap(body, _GAP - 2.0)   # Figma's title box is 27, Nunito XB 20 is 29 here: the row stays at y 714
+	else:
+		_build_head()
 	if role in DRINK_ROLES:
 		_drinks = VBoxContainer.new()
 		_drinks.add_theme_constant_override(&"separation", 0)
@@ -96,7 +109,7 @@ func _init(view_: Dictionary = {}, role_ := "homestead", ctx_ := {}, section_ :=
 		return
 	_shelf_box = TouchScrollContainer.new()
 	_shelf_box.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	_shelf_box.custom_minimum_size.y = SHELF_ROWS * _ROW_H
+	_shelf_box.custom_minimum_size.y = (offers().size() if section == "specialty" else SHELF_ROWS) * _ROW_H
 	body.add_child(_shelf_box)
 	shelf = VBoxContainer.new()
 	shelf.size_flags_horizontal = Control.SIZE_EXPAND_FILL

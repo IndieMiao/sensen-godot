@@ -26,6 +26,7 @@ signal tackle_requested()      # FISH-5 rod variant "Tackle Shop"
 
 const _RESIDENT_SHEET_H := 443.0   # RES-PIP: Sheet 443 of 800
 const _CLOSE_ABOVE_SHEET := 6.0    # RES-PIP: Close · 44 px sits 6 above the sheet, 16 in from the right
+const _CLOSE_ABOVE_SPECIALTY := 2.0   # MARKET-SPECIALTY: Close 44 at (300, 617), the sheet at y 663
 const _CLOSE_ABOVE_CARD := 8.0     # RES-KAI-TALK: 8 above the dialogue bar, flush with its right edge
 const _AFFINITY_INSET := 8.0       # RES-KAI-TALK: the affinity float sits 8 in from the bar's left edge …
 const _AFFINITY_ABOVE := 6.0       # … and 6 above its top
@@ -1331,6 +1332,7 @@ func open_counter(role: String, opts := {}) -> void:
 	d.action_requested.connect(func(a: StringName, id: String, p: Dictionary): _counter_action(role, a, id, p))
 	d.section_changed.connect(func(sec: String): if sec == "board": _fill_board(d))
 	_open_modal(d, UiTokens.OPACITY_SCRIM_COUNTER, true)
+	if d.section == "specialty": _close_above(d, _CLOSE_ABOVE_SPECIALTY, P0CounterDrawer.SPECIALTY_PAD)   # MARKET-SPECIALTY
 	_counter = d
 	modal_kind = "counter"
 	if d.section == "board": _fill_board(d)

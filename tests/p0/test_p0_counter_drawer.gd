@@ -65,12 +65,21 @@ func test_market_buys_nothing_so_it_has_no_bag_half_and_specialty_is_its_own_she
 	await _settle()
 	assert_bool(d._bag_half.visible).is_false()
 	assert_array(_row_ids(d)).is_equal(["tool_row_hoe"])
-	d.set_section("specialty")
-	await _settle()
-	assert_array(_row_ids(d)).is_equal(["postcard_shanghai"])
 	d.set_section("board")
 	assert_bool(d.board.visible).is_true()
 	assert_bool(d._shelf_box.visible).is_false()
+
+func test_city_specialty_is_its_own_short_sheet() -> void:
+	# MARKET-SPECIALTY 1394:92801 (李白 q(48)): no keeper bar, no tabs, no bag; the postcard row only.
+	var d := _drawer("market", {"keeper": "Mei", "place": "Xuhui Market Square"}, "specialty")
+	await _settle()
+	assert_object(d.keeper_bar).is_null()
+	assert_array(_row_ids(d)).is_equal(["postcard_shanghai"])
+	assert_float(d.height).is_equal(137.0)
+	var row: UiShopRow = d._rows["postcard_shanghai"]
+	assert_str(row._effect.text).is_equal("Goes to your Farm Storage")
+	assert_str(row._gate.text).is_equal("Stock 1/1")
+	assert_float(row.get_global_rect().position.y).is_equal(714.0)
 
 func test_buy_reports_the_item_and_stepper_count() -> void:
 	var d := _drawer("homestead")
