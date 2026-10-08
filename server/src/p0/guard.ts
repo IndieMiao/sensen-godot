@@ -24,8 +24,15 @@ export function guardOptionsFromEnv(env: NodeJS.ProcessEnv = process.env): P0Gua
   };
 }
 
-/** Behind Caddy the client address comes from X-Forwarded-For: P0_TRUST_PROXY=1 (never on a directly published port). */
-export const trustProxyFromEnv = (env: NodeJS.ProcessEnv = process.env): boolean => env.P0_TRUST_PROXY === '1';
+/**
+ * Behind Caddy the client address comes from X-Forwarded-For: P0_TRUST_PROXY=1 trusts only proxies on loopback and
+ * private networks (Caddy reaches P0 over the Docker network), so the address taken is the first public one counting
+ * back from the socket — the one Caddy appended — and anything a client wrote into the header in front of it is
+ * ignored (PR #26 review). Fastify 5's numeric hop count left req.ip on the socket address, so it is not used.
+ * Off (no option) on a directly published port.
+ */
+export const trustProxyFromEnv = (env: NodeJS.ProcessEnv = process.env): { trustProxy?: string } =>
+  (env.P0_TRUST_PROXY === '1' ? { trustProxy: 'loopback, uniquelocal' } : {});
 
 /**
  * Whether a request is for the P0 game routes. It reads the route Fastify matched (routeOptions.url), not the raw

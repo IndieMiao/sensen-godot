@@ -13,7 +13,7 @@ const c = loadP0Content();
 const player = { 'x-p0-player': 'guard-test-player' };
 
 async function server(env: NodeJS.ProcessEnv, dev = false) {
-  const app = Fastify({ bodyLimit: 32 * 1024, trustProxy: trustProxyFromEnv(env) });
+  const app = Fastify({ bodyLimit: 32 * 1024, ...trustProxyFromEnv(env) });
   await registerP0Guard(app, guardOptionsFromEnv(env));
   registerP0Routes(app, { content: c, store: new P0Store(c), now: () => Date.UTC(2026, 9, 8, 2), dev });
   app.get('/v1/healthz', async () => ({ ok: true }));
@@ -59,6 +59,8 @@ describe('P0 server guard (SGODOT-232 D1)', () => {
       }
       expect(codes).toEqual([200, 200, 200, 200, 200, 429, 429]);
       expect((await app.inject({ method: 'GET', url: '/v1/p0/state', headers: { 'x-p0-player': 'guard-rotating-9', 'x-forwarded-for': '203.0.113.8' } })).statusCode).toBe(200);
+      // only the proxy's own entry counts: an address the client wrote in front of it is ignored
+      expect((await app.inject({ method: 'GET', url: '/v1/p0/state', headers: { 'x-p0-player': 'guard-rotating-10', 'x-forwarded-for': '198.51.100.1, 203.0.113.7' } })).statusCode).toBe(429);
       expect((await app.inject({ method: 'GET', url: '/v1/healthz', headers: { 'x-forwarded-for': '203.0.113.7' } })).statusCode).toBe(200);
     } finally { await app.close(); }
   });

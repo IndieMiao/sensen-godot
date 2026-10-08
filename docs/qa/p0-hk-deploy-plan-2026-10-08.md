@@ -37,22 +37,22 @@
 | 位置 | `/opt/farm/p0/`（farm 用户可写，与 journey-preview 并列）：`docker-compose.p0.yml`、`.env.p0`（口令，chmod 600）、`backup-p0.sh`、`backups/`、`src/<sha>/`（构建上下文） |
 | 容器 | compose 项目 `p0`，服务 `p0`，镜像 `p0-server:<sha>`，网络 `farm_default`，别名 **`p0-demo`**，端口 3110 **只在容器网络内**；`mem_limit 256m`、`cpus 0.5`、日志轮转 20 MB × 5 |
 | 数据 | Docker 卷 `p0_p0data` 挂到 `/data`：存档 `p0-state.json`（每条命令写一次，先写临时文件再改名）、`snapshots/`（每小时一份，留 48 份）、`events/`（观察日志，#23）。**没有数据库**，不碰 farm 和 Journey 的 Postgres |
-| 运行配置 | `P0_DEV=0`（不注册 dev 路由）、`P0_TRUST_PROXY=1`（在 Caddy 后面）、`P0_ACCESS_KEYS`（演示口令，本机 `openssl rand -hex 8` 生成，只放 .env.p0 和演示包） |
+| 运行配置 | `P0_DEV=0`（不注册 dev 路由）、`P0_TRUST_PROXY=1`（在 Caddy 后面，只信任回环和私网上的代理，取 Caddy 写入的那个地址）、`P0_ACCESS_KEYS`（演示口令，本机 `openssl rand -hex 8` 生成，只放 .env.p0 和演示包） |
 | 备份 | 每小时快照在卷里；另在 farm 用户的 crontab 加一行（目前 farm 没有 crontab）：`40 3 * * * /opt/farm/p0/backup-p0.sh`，每晚打包到 `/opt/farm/p0/backups/`，留 14 份 |
 
 ### 步骤（用户确认、#23 / #26 合入之后执行）
 
 1. **部署前检查**：`docker ps`、`free -m`，`curl -fsS https://farm.sensenjoy.cn/preview/journey/v1/healthz` 和 `/v1/healthz`，结果记下来，部署后对比。
 2. **备份 Caddyfile**：`mkdir -p /opt/farm/p0/backups && cp /opt/farm/Caddyfile /opt/farm/p0/backups/Caddyfile.before-p0-<时间>`。
-3. **传构建上下文**（farm-dev 合入后的那个提交）：`package.json`、`pnpm-lock.yaml`、`pnpm-workspace.yaml`、`packages/blueprint-core`、`server`、`assets/p0/p0_content.json`，用 tar 经 ssh 传到 `/opt/farm/p0/src/<sha>/`。
-4. **构建**：`cd /opt/farm/p0/src/<sha> && docker build -f server/deploy/p0/Dockerfile -t p0-server:<sha> .`。和 farm、Journey 一样在服务器上构建；会占用 CPU 几分钟，选非高峰时段。也可以在局域网 devserver（同为 x86_64）构建，再用 `docker save | ssh docker load` 传上去，服务器 CPU 就不受影响。
+3. **准备构建上下文**（farm-dev 合入后的那个提交）：`package.json`、`pnpm-lock.yaml`、`pnpm-workspace.yaml`、`packages/blueprint-core`、`server`、`assets/p0/p0_content.json`，用 tar 传到 devserver（默认）或服务器的 `/opt/farm/p0/src/<sha>/`。
+4. **构建（默认在 devserver 上）**：服务器只有 2 核、没有 swap，pnpm install 的内存峰值可能波及 Journey（刘邦审核建议），所以默认在局域网 devserver（192.168.124.53，同为 x86_64）上构建：`docker build -f server/deploy/p0/Dockerfile -t p0-server:<sha> .`，再用 `docker save p0-server:<sha> | gzip | ssh farm@47.76.226.41 'gunzip | docker load'` 传到服务器。服务器上只 load，不构建。只有 devserver 不可用时，才在非高峰时段直接在服务器上构建。
 5. **配置并启动**：拷入 `docker-compose.p0.yml`、`.env.p0`；`P0_IMAGE=p0-server:<sha> docker compose -p p0 -f docker-compose.p0.yml up -d`，等健康检查变成 healthy。
 6. **改 Caddy 之前先在内网验证**：`docker exec farm-caddy-1 wget -qO- http://p0-demo:3110/v1/healthz`，确认 Caddy 所在的网络能通。
 7. **改 Caddy**：把 `Caddyfile.p0.snippet` 插到 `/preview/journey/*` 那一块后面。
    - 必须**原地写回同一个文件**（`cp 新文件 /opt/farm/Caddyfile` 或 `cat > /opt/farm/Caddyfile`），不能用 `mv`，也不能用会换文件的编辑器保存：单文件 bind mount 认的是 inode，换了文件容器里看到的还是旧文件。
    - 先校验 `docker exec farm-caddy-1 caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile`，通过后再 `caddy reload`。reload 不重启容器、不动证书；新配置有错时 reload 会失败，旧配置继续生效。
 8. **冒烟**：`P0_BASE=https://farm.sensenjoy.cn/preview/p0 P0_KEY=<口令> server/deploy/p0/smoke.sh`（health、无口令 401、编码路径 401、读状态、一条命令往返、dev 路由 404、UI 上报）。再测一遍第 1 步的 Journey 和 farm healthz，确认和部署前一致。
-9. **装 crontab**，最后看一眼 `docker stats`。
+9. **装 crontab**，最后看 `docker stats`：记下 P0 容器的内存，确认离 256 MB 上限有足够余量（tsx 运行时预计 100–150 MB；如果超过 200 MB，就把上限调到 384 MB 再部署一次），同时确认 Journey 容器的内存和部署前一致。
 
 ### 回滚
 
@@ -67,7 +67,7 @@
 3. **资源有上限**：P0 限 256 MB 内存、半个核。服务器可用内存 1.67 GB，Journey app 上限 1 GB、实际约 226 MB。P0 占满也不会挤到 Journey。
 4. **没有宿主端口、没有共享数据库**：只通过 Caddy 进来，存档在自己的卷里。
 5. **前后对比**：部署前后各测一次 Journey 和 farm 的 healthz；有异常先停 P0。
-6. **构建的 CPU 峰值**：在服务器上构建会占几分钟 CPU（farm 和 Journey 一直也是这样构建的）。不想占用服务器 CPU 就走第 4 步的 devserver 构建方案。
+6. **构建不在服务器上做**：默认在 devserver 上构建，服务器只 `docker load`，没有构建时的 CPU 和内存峰值。
 
 ## 4. 部署后不会立刻有的东西
 
@@ -76,6 +76,6 @@
 
 ## 5. 要用户确认的事
 
-1. 按上面的方案部署到香港 ECS（构建放服务器上，还是放 devserver 上）。
+1. 按上面的方案部署到香港 ECS（镜像默认在 devserver 上构建，再传到服务器）。
 2. 给 farm 用户新建一个 crontab，只装 P0 的每晚备份这一行。
 3. 部署时间：#23 和 #26 合入后，选非高峰时段。

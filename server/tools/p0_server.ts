@@ -21,7 +21,7 @@ const store = new P0Store(content, stateFile);
 // SGODOT-232 D1: a 32 KB body limit, the demo key and request limits (P0_ACCESS_KEYS, P0_RATE_PER_MINUTE, P0_RATE_PER_IP;
 // P0_TRUST_PROXY=1 behind Caddy) and hourly save snapshots (P0_SNAPSHOT_DIR, 48 kept). A deployed server runs with
 // P0_DEV=0 so no dev route is registered.
-const app = Fastify({ logger: false, bodyLimit: 32 * 1024, trustProxy: trustProxyFromEnv() });
+const app = Fastify({ logger: false, bodyLimit: 32 * 1024, ...trustProxyFromEnv() });
 const guard = guardOptionsFromEnv();
 await registerP0Guard(app, guard);
 const dev = process.env.P0_DEV !== '0';

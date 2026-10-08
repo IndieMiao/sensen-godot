@@ -9,7 +9,7 @@
 | 项 | 做法 | 环境变量 |
 |---|---|---|
 | 演示口令 | `/v1/p0/*` 的每个 HTTP 请求都要带 `x-p0-key`，不在名单里返回 401 `bad_key`。按 Fastify 实际匹配到的路由判断，`/v1/%70%30/state` 这类编码路径同样要口令（刘邦审核 #26）。`/v1/healthz` 不需要口令，给容器健康检查用。据点房间的 WebSocket（`/v1/p0/online`，#14）在原始 upgrade 事件上建立，不经过这些钩子，由它自己按同一份口令校验（后裔 641905fd） | `P0_ACCESS_KEYS=k1,k2`（不设 = 不校验，本地试玩） |
-| 限流 | 两道：每个地址每分钟总数（不管它报什么玩家 id），再按「地址 + 玩家 id」每分钟计数；超出返回 429 `rate_limited`。只作用于 `/v1/p0/*`。在 Caddy 后面要打开 `P0_TRUST_PROXY=1`，否则所有请求的地址都是 Caddy；直接发布端口时不要打开（客户端能伪造 X-Forwarded-For） | `P0_RATE_PER_IP`（默认 2000）、`P0_RATE_PER_MINUTE`（默认 600）、`P0_TRUST_PROXY` |
+| 限流 | 两道：每个地址每分钟总数（不管它报什么玩家 id），再按「地址 + 玩家 id」每分钟计数；超出返回 429 `rate_limited`。只作用于 `/v1/p0/*`。在 Caddy 后面要打开 `P0_TRUST_PROXY=1`（只信任回环和私网上的代理，取 Caddy 写入的那个地址），否则所有请求的地址都是 Caddy；直接发布端口时不要打开（客户端能伪造 X-Forwarded-For） | `P0_RATE_PER_IP`（默认 2000）、`P0_RATE_PER_MINUTE`（默认 600）、`P0_TRUST_PROXY` |
 | 请求体上限 | 32 KB，超出返回 413 | — |
 | dev 路由 | `P0_DEV=0` 时不注册（时钟快进、重置存档等） | 镜像里固定 `P0_DEV=0` |
 | 存档快照 | 每小时把存档复制成 `snapshots/p0-state-YYYYMMDDHH.json`，保留最近 48 份 | `P0_SNAPSHOT_DIR`（默认存档旁的 `snapshots/`） |
