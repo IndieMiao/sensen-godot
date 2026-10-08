@@ -1555,7 +1555,12 @@ var _counter_ctx := {}   # role -> the last keeper ctx an outpost gave
 
 func open_counter(role: String, opts := {}) -> void:
 	if opts.has("ctx"): _counter_ctx[role] = opts.ctx
-	var d := P0CounterDrawer.new(view, role, _counter_ctx.get(role, {}), str(opts.get("section", "buy")))
+	var ctx: Dictionary = _counter_ctx.get(role, {}).duplicate()
+	# STALL-NEW-2 (E-04): this visit's rows say `◆ New for you` for what opened since the last one; then it is seen.
+	if role == "homestead":
+		ctx["new"] = stall_new_ids()
+		_mark_stall_seen()
+	var d := P0CounterDrawer.new(view, role, ctx, str(opts.get("section", "buy")))
 	d.theme = UiKit.theme()
 	d.safe_bottom = safe_bottom()
 	d.close_requested.connect(close_modal)
@@ -1566,6 +1571,31 @@ func open_counter(role: String, opts := {}) -> void:
 	_counter = d
 	modal_kind = "counter"
 	if d.section == "board": _fill_board(d)
+
+## STALL-NEW (E-04, 1378:92885 / §9.5.2): Homestead Stall goods unlocked since the stall was last opened — the stall's
+## world icon wears New until a visit, whose rows then read `◆ New for you`. What the player could already buy when this
+## build first saw them counts as seen (no New on day one); kept with the teaching tips on this device.
+func stall_new_ids() -> Array:
+	var open: Array = (view.get("stall", {}).get("buy", []) as Array).filter(func(o): return bool(o.get("unlocked", true))).map(func(o): return str(o.id))
+	if open.is_empty(): return []
+	_load_tips()
+	if not _taught.has("stall_seen"):
+		_taught["stall_seen"] = open
+		_save_tips()
+		return []
+	var seen: Array = _taught.stall_seen
+	return open.filter(func(id): return not seen.has(id))
+
+func stall_has_new() -> bool: return not stall_new_ids().is_empty()
+
+func _mark_stall_seen() -> void:
+	var open: Array = (view.get("stall", {}).get("buy", []) as Array).filter(func(o): return bool(o.get("unlocked", true))).map(func(o): return str(o.id))
+	_load_tips()
+	var seen: Array = _taught.get("stall_seen", [])
+	for id in open:
+		if not seen.has(id): seen.append(id)
+	_taught["stall_seen"] = seen
+	_save_tips()
 
 func _counter_action(role: String, action: StringName, id: String, payload: Dictionary) -> void:
 	match action:

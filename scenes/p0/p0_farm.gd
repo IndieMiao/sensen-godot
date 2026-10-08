@@ -470,7 +470,7 @@ func _sign_hit(screen: Vector2) -> bool:
 ## strip or the object is tapping the facility (_tap_card by id). Anchors are the former finger cards' and marks'.
 func _prompts(v: Dictionary) -> void:
 	_strip_side = _facing_side()
-	world_prompt("stall", P0WorldPrompts.stall(v), _stall, Vector3(0, 1.05, 0), Vector3(0, 0.4, 0))
+	world_prompt("stall", P0WorldPrompts.stall(v, rt.ui.stall_has_new()), _stall, Vector3(0, 1.05, 0), Vector3(0, 0.4, 0))
 	world_prompt("home", P0WorldPrompts.farmhouse(v), _house, Vector3(0, 2.6, 0.4), Vector3(0, 1.0, 0.6))
 	world_prompt("sign", P0WorldPrompts.sign(v), _sign, SIGN_BADGE, Vector3(0, 0.45, 0))
 	_plaque_node.visible = not v.get("homestead", {}).get("plaque", []).is_empty()

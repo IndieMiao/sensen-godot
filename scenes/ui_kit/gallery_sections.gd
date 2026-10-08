@@ -826,6 +826,9 @@ static func _shop_rows() -> Control:
 			price = {text = "4 coins", line = "2 × 2 coins"}, buttons = buy}, false, 2],
 		[{id = "bait_worm", icon = _tex("bait_worm"), title = "Worm Bait", info = true, facts = ["Bites come faster", "Stock 0/30 · Bag ×5"],
 			price = {text = "2 coins", line = ""}, buttons = [{id = &"buy", label = "Sold out · 9h 12m", kind = &"unavailable", payload = {}}]}, false, 1],
+		# STALL-NEW-2 (E-04, SGODOT-233): Gate tone=New, the row's gate line in newInk.
+		[{id = "seed_carrot", icon = _tex("seed_carrot"), title = "Carrot Seeds", info = true, facts = ["Ready in 12h", "◆ New for you"],
+			gate_tone = &"new", price = {text = "9 coins", line = ""}, buttons = buy}, false, 1],
 		[{id = "seed_tomato", icon = _tex("seed_tomato"), title = "Tomato Seeds", info = true, facts = ["Ready in 6h", "210 XP to go"],
 			price = {text = "12 coins", line = ""}, buttons = [{id = &"buy", label = "Farming Lv4 needed", kind = &"unavailable", payload = {}}]}, false, 1],
 		[{id = "rod_reed", icon = _tex("rod"), title = "Reed Rod", info = true, facts = ["Lands up to Rare fish", "Fishing Lv3"],

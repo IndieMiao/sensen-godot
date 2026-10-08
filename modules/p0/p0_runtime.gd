@@ -32,6 +32,7 @@ var after_leave := ""
 ## True only while the farm's hold-to-repeat sends its next command (§14.2): the observation log's "hold" (S7).
 ## The press itself, even with the key still down, is a tap (刘邦, PR #23 review).
 var holding_repeat := false
+var _held_plants := 0   # plants harvested in the current hold (E-04's `Harvest 12 of 30 · bag full`)
 
 ## Load timing (logcat tag godot, "P0_TIMING"): navigation start → world _ready → first drawn frame.
 static var _nav_ms := 0
@@ -245,6 +246,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	# A harvest reply's XP counts its plants, so a held harvest reads `+40 XP · 20 plants` (§4.8.3).
 	var plants := events.filter(func(e): return str(e.get("kind", "")) == "item" and str(e.get("id", "")).begins_with("crop_") \
 		and int(e.get("delta", 0)) > 0).size()
+	if plants > 0: _held_plants = (_held_plants if ui.fab_held else 0) + plants
 	var good_pot := events.any(func(e): return str(e.get("kind", "")) == "dish" and int(e.get("quality", 0)) >= 1)
 	# A craft's output is said by the workbench (`+2 Torch` on its card, the pickaxe's Moment; SGODOT-231 B2-06).
 	var crafted := events.any(func(e): return str(e.get("kind", "")) == "craft")
@@ -420,7 +422,8 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 		"no_coins":
 			ui.toast_error("Need %d more coins" % int(detail.get("need", 0)))
 		"bag_full":
-			ui.toast_error("Make room · 1 slot" if str(cmd.get("type", "")).begins_with("claim_parcel") else "Bag full · free a slot first")
+			if str(cmd.get("type", "")) == "harvest": _harvest_bag_full()
+			else: ui.toast_error("Make room · 1 slot" if str(cmd.get("type", "")).begins_with("claim_parcel") else "Bag full · free a slot first")
 		"parcel_expired", "bad_parcel":
 			ui.toast_error("This parcel is no longer waiting")
 		"rest_used":
@@ -472,6 +475,20 @@ static func _dev_ctx(role: String) -> Dictionary:
 	return {"tackle": {"keeper": "Finn", "place": "Xuhui Tackle Shop", "nearest": {"name": "Reed Pond", "site": "pond"}},
 		"tea": {"keeper": "Ama", "place": "Lotus Tea House"}, "post": {"keeper": "Sigrid", "place": "Huangpu Travel Post"},
 		"market": {"keeper": "Mei", "place": "Xuhui Market Square"}}.get(role, {})
+
+## FARM-3-RESULT-2 (E-04): the bag filled during a harvest. What went in stays in, the rest stays ready on the field;
+## the run says how far it got (`Harvest 12 of 30 · bag full`, of the plants ready when it started) and the Error toast
+## points at the stall with `Open bag ›`; the hold stops (a refusal ends the run).
+func _harvest_bag_full() -> void:
+	var v := session.current()
+	var ready := (v.get("plots", []) as Array).filter(func(p): return str(p.get("state", "")) == "ready").size()
+	if _held_plants > 0:
+		ui.queue_floats([{kind = "item", key = "bag_full", text = "Harvest %d of %d · bag full" % [_held_plants, _held_plants + ready],
+			tone = UiFloatText.Tone.ITEM}], anchor())
+	var bag: Dictionary = v.get("bag", {})
+	ui.toast_error("Bag %d/%d · Sell at Homestead Stall" % [(bag.get("slots", []) as Array).size(), int(bag.get("capacity", 25))], "Open bag")
+	ui.fab_held = false
+	_held_plants = 0
 
 # ---------------------------------------------------------------- dev: scripted desktop screenshots
 ## P0_SHOT=/abs/path.png P0_SHOT_STEPS="walk:1:0:1.5,act,..." — run scripted inputs, save one frame, quit.

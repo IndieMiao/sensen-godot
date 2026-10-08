@@ -90,3 +90,30 @@ func test_over_a_drawer_without_the_bar_it_sits_above_the_drawer() -> void:
 	assert_float(r.size.x).is_equal(float(ToastLayer.WIDTH))
 	assert_int(ui._toasts.get_index()).is_equal(ui.root.get_child_count() - 1)
 	assert_float(r.end.y).is_equal_approx(wb.get_global_rect().position.y - UiTokens.SPACE_OVERLAY_BODY, 0.5)
+
+## E-04 FARM-3-RESULT-2: the bag fills mid-harvest — the run's count floats, the Error toast points at the stall with
+## Open bag, and the hold stops.
+func test_a_harvest_that_fills_the_bag_says_how_far_it_got() -> void:
+	var rt: P0Runtime = auto_free(P0Runtime.new())
+	rt.ui.quick_store = STORE
+	add_child(rt)
+	await get_tree().process_frame
+	var slots := []
+	for i in 25: slots.append({"id": "crop_radish", "qty": 50})
+	var v := {"energy": {"value": 140, "max": 200}, "coins": 52, "bag": {"capacity": 25, "slots": slots},
+		"skills": {"farming": {"level": 1, "xp": 20}}, "names": {"crop_radish": "Radish"},
+		"plots": [{"id": 1, "state": "ready", "crop": "crop_radish"}, {"id": 2, "state": "ready", "crop": "crop_radish"}, {"id": 3, "state": "tilled"}]}
+	for c in rt.session.connection_failed.get_connections(): rt.session.connection_failed.disconnect(c.callable)   # no server here
+	rt.session.view = v
+	rt.ui.set_view(v)
+	rt.ui.fab_held = true
+	for i in 12:   # one reply a labour beat apart
+		rt._on_state(v, [{"kind": "xp", "skill": "farming", "amount": 2, "percent": 100}, {"kind": "item", "id": "crop_radish", "delta": 1}])
+		await get_tree().process_frame
+	rt._on_refused("bag_full", {"need": 1}, {"type": "harvest", "plot": 1})
+	await get_tree().process_frame
+	var texts := rt.ui.root.get_children().filter(func(c): return c is UiFloatText and not c.is_queued_for_deletion()).map(func(f): return f.text)
+	assert_array(texts).contains(["Harvest 12 of 14 · bag full"])
+	assert_str(rt.ui.toast_text()).is_equal("Bag 25/25 · Sell at Homestead Stall")
+	assert_str(rt.ui._toasts.current_action()).is_equal("Open bag")
+	assert_bool(rt.ui.fab_held).is_false()
