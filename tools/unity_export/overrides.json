@@ -50,5 +50,21 @@
   "hairhat80_npc_ama": {
     "fbx": "Assets/_Gensen/Characters/AvatarPaks/skin68/skin68/SM_hairHat80.fbx",
     "albedo": "Assets/_Gensen/Characters/AvatarPaks/skin68/skin68/T_skin68_hairHat_D.png"
+  },
+  "cloth12_npc_finn": {
+    "fbx": "Assets/_Gensen/Characters/AvatarPaks/skin12/skin12/SK_dt_skin12.fbx",
+    "albedo": "Assets/_Gensen/Characters/AvatarPaks/skin12/skin12/T_skin12_cloth_D.png"
+  },
+  "hairhat36_npc_sigrid": {
+    "fbx": "Assets/_Gensen/Characters/AvatarPaks/skin28/skin28/SM_hairHat36.fbx",
+    "albedo": "Assets/_Gensen/Characters/AvatarPaks/skin28/skin28/T_skin28_hairHat_D.png"
+  },
+  "cloth36_npc_sigrid": {
+    "fbx": "Assets/_Gensen/Characters/AvatarPaks/skin36/skin36/SK_dt_skin36.fbx",
+    "albedo": "Assets/_Gensen/Characters/AvatarPaks/skin36/skin36/T_skin36_cloth_D.png"
+  },
+  "hairhat36_npc_pip": {
+    "fbx": "Assets/_Gensen/Characters/AvatarPaks/skin28/skin28/SM_hairHat36.fbx",
+    "albedo": "Assets/_Gensen/Characters/AvatarPaks/skin28/skin28/T_skin28_hairHat_D.png"
   }
 }
