@@ -13,6 +13,8 @@ extends UiDrawer
 ## (`action_requested`), the P0 UI sends the command.
 
 signal action_requested(action: StringName, item_id: String, payload: Dictionary)
+## A greyed card button was tapped (UiInfoSheet.unavailable_requested): the P0 UI may say why, e.g. Gift (225).
+signal unavailable_requested(action: StringName, item_id: String, reason: String)
 signal side_changed(side: String)
 signal gear_slot_changed(key: String)
 
@@ -41,6 +43,8 @@ var persist := true
 var gear_slot := "fishing"
 ## `place` for the item-info rules ("home", "pond", "outpost").
 var place := "home"
+## The resident within reach for the bag card's Gift ({id, name, gifted_today}; {} when none, SGODOT-225).
+var near := {}
 ## Pins of the current action's quick bar, for the info card's Pin / Unpin (kept by the P0 UI).
 var pinned := func(_id: String) -> bool: return false
 ## Gift drawer (RESIDENT-GIFT): {kind: "resident", id, name, likes}. The header becomes `Gift to <name>` and the
@@ -295,13 +299,14 @@ func _build_bag() -> void:
 	sheet = UiInfoSheet.new()
 	sheet.rules = func(id: String, ctx: StringName, o: Dictionary) -> Dictionary: return P0ItemInfo.spec(view, id, ctx, o)
 	sheet.action_requested.connect(func(a: StringName, id: String, p: Dictionary): action_requested.emit(a, id, p))
+	sheet.unavailable_requested.connect(func(a: StringName, id: String, r: String): unavailable_requested.emit(a, id, r))
 	_bag_box.add_child(sheet)
 	_gap(_bag_box, _ROW_GAP)
 	grid = UiInventoryGrid.new()
 	grid.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	grid.on_select = func(it: Dictionary):
 		if bool(it.get("stored", false)): sheet.open(str(it.item), &"storage", {place = place})
-		elif gift_to.is_empty(): sheet.open(str(it.id), &"bag", {place = place, pinned = bool(pinned.call(str(it.id)))})
+		elif gift_to.is_empty(): sheet.open(str(it.id), &"bag", {place = place, pinned = bool(pinned.call(str(it.id))), near = near})
 		else: sheet.open(str(it.id), &"gift", {place = place, target = gift_to})
 		_hint.visible = false
 	grid.selection_cleared.connect(func():

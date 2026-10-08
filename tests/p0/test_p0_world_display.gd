@@ -204,6 +204,35 @@ func test_gift_drawer_shows_dishes_and_sends_gift() -> void:
 	d.action_requested.emit(&"gift", "dish_grilled_crucian", {})
 	assert_that(sent.back()).is_equal({"type": "gift", "resident": "res_pip", "item": "dish_grilled_crucian"})
 
+## The bag's dish card (225): Gift to <Name> opens that resident's gift drawer with the dish selected; with no resident
+## within reach the grey button only says where (a Toast), and the bag stays open.
+func test_bag_dish_gift_goes_to_the_resident_within_reach() -> void:
+	var ui := _ui(true)
+	ui.set_view(_resident_view())
+	var near := [""]
+	ui.near_resident = func() -> String: return near[0]
+	await get_tree().process_frame
+	ui.open_bag("dish_grilled_crucian")
+	var bag: P0BagDrawer = ui.find_children("*", "P0BagDrawer", true, false)[0]
+	assert_bool(bag.sheet.spec().buttons.any(func(b): return str(b.label) == "Gift to a resident")).is_true()
+	bag.unavailable_requested.emit(&"gift", "dish_grilled_crucian", "Gift to a resident")
+	assert_str(ui._toast.text).is_equal("Find a resident at an outpost to gift this dish")
+	assert_str(ui.modal_kind).is_equal("bag")
+	bag.unavailable_requested.emit(&"gift", "fish_crucian", "Gift · Mutual friends only")   # fish: no resident Toast
+	assert_str(ui._toast.text).is_equal("Find a resident at an outpost to gift this dish")
+	ui.close_modal()
+	await get_tree().process_frame
+	near[0] = "res_pip"
+	ui.open_bag("dish_grilled_crucian")
+	bag = ui.find_children("*", "P0BagDrawer", true, false).filter(func(d): return not d.is_queued_for_deletion())[0]
+	assert_bool(bag.sheet.spec().buttons.any(func(b): return str(b.label) == "Gift to Pip")).is_true()
+	bag.action_requested.emit(&"gift", "dish_grilled_crucian", {})
+	await get_tree().process_frame
+	assert_str(ui.modal_kind).is_equal("gift")
+	var gift: P0BagDrawer = ui.find_children("*", "P0BagDrawer", true, false).filter(func(d): return not d.is_queued_for_deletion())[0]
+	assert_str(str(gift.gift_to.id)).is_equal("res_pip")
+	assert_str(gift.grid.selected_id).is_equal("dish_grilled_crucian")
+
 func test_energy_card_tea_and_rest_read_the_drinks_and_away_facts() -> void:
 	var v := _view()
 	v.energy = {"value": 1, "max": 200, "next_in": 161000, "regen_ms": 240000}

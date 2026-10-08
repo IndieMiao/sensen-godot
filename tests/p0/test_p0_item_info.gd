@@ -154,13 +154,30 @@ func test_fish_gift_is_grey_without_mutual_friends() -> void:
 
 func test_dish_eats_and_deliver_takes_the_primary_slot() -> void:
 	var s := P0ItemInfo.spec(_full(), "dish_grilled_crucian", &"bag")
-	assert_array(_labels(s)).is_equal(["primary:Eat · +45 Energy", "nav:Gift ›"])
+	assert_array(_labels(s)).is_equal(["primary:Eat · +45 Energy", "unavailable:Gift to a resident"])
 	assert_str(s.rarity_text).is_equal("Common")
 	assert_int(s.quality).is_equal(1)
 	assert_array(s.facts).is_equal(["+45 Energy"])
 	var v := _full()
 	v.energy.value = 200
-	assert_array(_labels(P0ItemInfo.spec(v, "dish_grilled_crucian", &"bag"))).is_equal(["unavailable:Energy full", "nav:Gift ›"])
+	assert_array(_labels(P0ItemInfo.spec(v, "dish_grilled_crucian", &"bag"))).is_equal(["unavailable:Energy full", "unavailable:Gift to a resident"])
+
+## A dish's Gift on the bag card (不知火舞 / 李白 on 225): `Gift to <Name>` for the resident within reach, else grey
+## `Gift to a resident`; grey `Gift already given today` once that resident has had today's gift. Mystery Dish too.
+func test_dish_gift_names_the_resident_within_reach() -> void:
+	var near := {id = "res_pip", name = "Pip", gifted_today = false}
+	assert_array(_labels(P0ItemInfo.spec(_full(), "dish_grilled_crucian", &"bag", {near = near}))) \
+		.is_equal(["primary:Eat · +45 Energy", "secondary:Gift to Pip"])
+	near.gifted_today = true
+	assert_array(_labels(P0ItemInfo.spec(_full(), "dish_grilled_crucian", &"bag", {near = near}))) \
+		.is_equal(["primary:Eat · +45 Energy", "unavailable:Gift already given today"])
+	var v := _full()
+	v.bag.slots.append({"id": "dish_mystery", "qty": 1})
+	v.items["dish_mystery"] = {"name": "Mystery Dish", "kind": "dish", "sell": null, "meal": 10, "full": 10}
+	var gifts := _labels(P0ItemInfo.spec(v, "dish_mystery", &"bag", {near = {id = "res_pip", name = "Pip"}}))
+	assert_bool(gifts.has("secondary:Gift to Pip")).is_true()   # residents take it, not a fan (q(33))
+	var drawer := _labels(P0ItemInfo.spec(v, "dish_mystery", &"gift", {target = {kind = "resident", id = "res_pip"}}))
+	assert_bool(drawer.has("primary:Gift")).is_true()
 
 func test_buy_rows_say_why_they_cannot_be_bought() -> void:
 	var s := P0ItemInfo.spec(_view(), "rod_reed", &"counter_buy", {counter = "tackle"})

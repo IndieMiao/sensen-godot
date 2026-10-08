@@ -256,6 +256,9 @@ static func flags(view: Dictionary, item_id: String, context: StringName, opts :
 		player_target = str(target.get("kind", "")) == "player",
 		resident_target = str(target.get("kind", "")) == "resident",
 		gifted_today = bool(target.get("gifted_today", false)),
+		# The bag card's Gift (SGODOT-225): opts.near = {id, name, gifted_today} for the resident within reach, else {}.
+		resident_near = str(opts.get("near", {}).get("id", "")) != "",
+		near_gifted_today = bool(opts.get("near", {}).get("gifted_today", false)),
 		deliverable = _deliverable(view, item_id, target),
 		recyclable = it.get("sell", null) != null,
 		gate_item = bool(it.get("gate", false)),
@@ -302,6 +305,7 @@ static func tokens(view: Dictionary, item_id: String, context: StringName, opts 
 		expires_line = ("Expires in " + P0Logic.duration(float(stack.expires_in))) if stack.has("expires_in") else "",
 		affinity_line = "",
 		gift_label = ("Gift · +%d" % int(opts.target.preview)) if opts.get("target", {}).has("preview") else "Gift",
+		gift_near_label = ("Gift to %s" % str(opts.near.name)) if str(opts.get("near", {}).get("name", "")) != "" else "",
 		sell_all_label = _sell_all_label(count, sellable, here),
 		quota_resets_in = P0Logic.duration(float(quota.get("resets_in", 0))) if quota.has("resets_in") else "",
 		stock_line = _stock_line(offer, count),

@@ -84,6 +84,8 @@ var surface := "farm"
 ## Set by the runtime: true when the current world can move its camera to a spot (p0_show_spot). Show
 ## buttons (Today, NeedSource) only appear then, so a Show never closes a panel and does nothing (LOCK-08).
 var can_show_spot := Callable()
+## The resident id within reach in an outpost, "" elsewhere (the runtime asks the world's p0_near_resident).
+var near_resident := Callable()
 var _hud_world := true   # set_surface: the map has no HUD
 var _hud_hash := 0       # last state given to hud.apply
 var _hud_need := -1      # main action's Energy need last seen by the HUD
@@ -765,10 +767,26 @@ func open_bag(focus := "", side := "") -> void:
 		modal_kind = "bag" if s == "bag" else "gear")
 	d.gear_slot_changed.connect(func(k: String): gear_slot = k)
 	d.action_requested.connect(_bag_action)
+	d.unavailable_requested.connect(_bag_unavailable)
+	d.near = near_resident_info()
+	if focus != "" and d.grid.selected_id == focus: d.grid.select(focus)   # the card again, with place and near set
 	_eat_armed = ""
 	_open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
 	_bag = d
 	modal_kind = "bag" if bag_side == "bag" else "gear"
+
+## The resident within reach (near_resident): {id, name, gifted_today}, or {} when there is none.
+func near_resident_info() -> Dictionary:
+	var id := str(near_resident.call()) if near_resident.is_valid() else ""
+	if id == "": return {}
+	var def: Dictionary = P0Logic.content().get("residents", {}).get(id, {})
+	var r: Dictionary = view.get("residents", {}).get(id, {})
+	return {id = id, name = str(def.get("name", r.get("name", ""))), gifted_today = bool(r.get("gift_today", false))}
+
+## A greyed button on the bag card. A dish's `Gift to a resident` says where (李白 on 225); it never leaves the bag.
+func _bag_unavailable(action: StringName, id: String, _reason: String) -> void:
+	if action == &"gift" and P0ItemInfo.kind_of(view, id) == "dish" and near_resident_info().is_empty():
+		toast("Find a resident at an outpost to gift this dish")
 
 ## A button on the bag card or a Gear row. The drawer only reports; commands go to the server from here.
 func _bag_action(action: StringName, id: String, payload: Dictionary) -> void:
@@ -794,6 +812,11 @@ func _bag_action(action: StringName, id: String, payload: Dictionary) -> void:
 			command.emit({"type": "store", "item": id, "qty": payload.get("qty", "all")})
 		&"take_out":          # a Farm Storage stack's card: Take 10 / Take all (payload qty 10 or "all")
 			command.emit({"type": "take_out", "item": id, "qty": payload.get("qty", "all")})
+		&"gift":   # a dish's `Gift to <Name>` (不知火舞 on 225): that resident's gift drawer with this dish selected
+			var near := near_resident_info()
+			if P0ItemInfo.kind_of(view, id) != "dish" or near.is_empty() or bool(near.gifted_today): return
+			close_modal()
+			open_gift(str(near.id), id)
 		&"pin", &"unpin":
 			pass   # TODO(SGODOT-225 after #12): pin through the quick bar's pin record (P0Ui.bind_quick_bar)
 		_:
@@ -1469,11 +1492,12 @@ static func _request_card_data(view_: Dictionary, id: String, bar: Dictionary) -
 		"deliver_to": str(def.get("name", "")), "action": "Accept",
 		"reason": str(bar.get("request_reason", ""))}
 
-## Gift on the bar: the gift drawer (Bag side only, Dishes first); the card's Gift sends `gift`.
-func open_gift(id: String) -> void:
+## Gift on the bar, or a dish card's `Gift to <Name>` (item: that dish, selected): the gift drawer (Bag side only,
+## Dishes first); the card's Gift sends `gift`.
+func open_gift(id: String, item := "") -> void:
 	var def: Dictionary = P0Logic.content().get("residents", {}).get(id, {})
 	var likes := str(def.get("likes", ""))
-	var d := P0BagDrawer.new(view, "bag", "", {"kind": "resident", "id": id, "name": str(def.get("name", "")),
+	var d := P0BagDrawer.new(view, "bag", item, {"kind": "resident", "id": id, "name": str(def.get("name", "")),
 		"likes": ("Likes %s · 1 gift a day" % likes) if likes != "" else "1 gift a day"})
 	d.theme = UiKit.theme()
 	d.safe_bottom = safe_bottom()

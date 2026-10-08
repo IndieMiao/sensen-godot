@@ -14,10 +14,13 @@ extends PanelContainer
 ##   close()                             hides it; `closed` fires once per open. No own close button (F-07 关闭):
 ##                                       the owner closes on a tap on blank space or when its drawer closes.
 ##   action_requested(action, item_id, payload)  a button or the lock icon (&"lock" / &"unlock") was tapped;
-##                                       the owner sends the command. Unavailable buttons emit nothing.
+##                                       the owner sends the command. Unavailable buttons don't emit it.
+##   unavailable_requested(action, item_id, reason)  a greyed button was tapped (they stay tappable, LOCK-10); the
+##                                       owner may say why or where, e.g. a Toast for `Gift to a resident` (225).
 ##   info_requested(item_id)             the › in the title row: open the item's page (Fish-dex / Cookbook / about).
 
 signal action_requested(action: StringName, item_id: String, payload: Dictionary)
+signal unavailable_requested(action: StringName, item_id: String, reason: String)
 signal info_requested(item_id: String)
 signal closed
 
@@ -259,4 +262,5 @@ func _button(b: Dictionary) -> Control:
 	var cb := UiCommandButton.new(text, UiCommandButton.Kind.PRIMARY if kind == &"primary" else UiCommandButton.Kind.SECONDARY, true)
 	if kind == &"unavailable": cb.reason = text
 	cb.activated.connect(func(): action_requested.emit(id, _item, payload))
+	cb.unavailable_pressed.connect(func(reason: String): unavailable_requested.emit(id, _item, reason))
 	return cb

@@ -266,9 +266,19 @@
       },
       {
         "id": "gift",
-        "label": "Gift ›",
-        "kind": "nav",
-        "when": "!mystery & can_gift"
+        "label": "{gift_near_label}",
+        "kind": "secondary",
+        "when": "can_gift",
+        "unless": [
+          {
+            "when": "!resident_near",
+            "label": "Gift to a resident"
+          },
+          {
+            "when": "near_gifted_today",
+            "label": "Gift already given today"
+          }
+        ]
       }
     ],
     "lock": true
@@ -339,7 +349,7 @@
         "id": "gift",
         "label": "{gift_label}",
         "kind": "primary",
-        "when": "!deliverable & !mystery & has_target",
+        "when": "!deliverable & has_target",
         "unless": [
           {
             "when": "resident_target & gifted_today",

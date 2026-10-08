@@ -9,7 +9,7 @@ extends Node
 ## (where the player is for the server: home / pond / outpost / mine; see space_of), p0_place() -> String (the
 ## catalog pond id inside a pond space), p0_frame(view, dt), p0_joystick(v),
 ## p0_tap(screen), p0_action(cmd), p0_event(ev, view), p0_anchor() -> Vector2, p0_zoom(f), p0_zoom_end(),
-## p0_recenter(), p0_show_spot(where), p0_energy_verb() -> String, p0_dev(step) -> bool,
+## p0_recenter(), p0_show_spot(where), p0_energy_verb() -> String, p0_near_resident() -> String, p0_dev(step) -> bool,
 ## p0_until(name) -> bool.
 
 const MAP_SCENE := "res://scenes/p0/p0_map.tscn"
@@ -67,6 +67,8 @@ func _init() -> void:
 	ui.show_spot.connect(func(where: String): _call("p0_show_spot", [where]))
 	ui.show_on_map.connect(func(target: String): _leave_then("show:" + target))   # the map points at the pin (p0_map resume)
 	ui.can_show_spot = func() -> bool: return is_instance_valid(world) and world.has_method("p0_show_spot")
+	ui.near_resident = func() -> String:   # an outpost's resident within reach (Gift to <Name>, SGODOT-225)
+		return str(world.call("p0_near_resident")) if is_instance_valid(world) and world.has_method("p0_near_resident") else ""
 	ui.home_choice.connect(func(choice: String): _call("p0_home", [choice]))
 	ui.place_pressed.connect(leave_world)
 	ui.home_requested.connect(func(): _leave_then("farm"))
