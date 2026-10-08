@@ -89,6 +89,15 @@ describe('the gate rules', () => {
     expect(new P0Gate(file, { P0_MAINT: '1' }).state().maintenance.on).toBe(true);   // P0_MAINT=1 keeps it on
     expect(new P0Gate(file, {}).state().maintenance).toEqual({ on: false });
   });
+
+  it('an empty url clears the run-time one: the environment's url and minimum apply again (苏烈 on #85)', () => {
+    const g = new P0Gate(undefined, { P0_MIN_VERSION: '4', P0_UPDATE_URL: 'https://example.test/env.apk' });
+    g.setMinVersion(6, 'https://example.test/run.apk');
+    expect(g.state()).toMatchObject({ min_version: 6, update_url: 'https://example.test/run.apk', update_on: true });
+    g.setMinVersion(0, '');
+    expect(g.state()).toMatchObject({ min_version: 4, update_url: 'https://example.test/env.apk', update_on: true });
+    expect(g.check({ 'x-p0-version': '3' })?.status).toBe(426);
+  });
 });
 
 describe('the gated server', () => {

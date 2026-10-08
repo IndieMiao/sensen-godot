@@ -71,7 +71,10 @@ export class P0Gate {
 
   setMinVersion(version: number, url?: string): GateState {
     this.file.min_version = version;
-    if (url !== undefined) this.file.update_url = url;
+    // An empty url clears the run-time one, so the environment's (P0_UPDATE_URL) applies again instead of being
+    // overwritten with "" (苏烈 on #85).
+    if (url === '') delete this.file.update_url;
+    else if (url !== undefined) this.file.update_url = url;
     this.save();
     return this.state();
   }
