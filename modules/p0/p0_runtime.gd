@@ -239,6 +239,8 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	var settles_catch := events.any(func(e): return str(e.get("kind", "")) == "catch")
 	var first_cook_xp: Array = []   # the first-cook bonus is on the result card's strip, not a float (Li Bai, int6 C11)
 	var good_pot := events.any(func(e): return str(e.get("kind", "")) == "dish" and int(e.get("quality", 0)) >= 1)
+	# A craft's output is said by the workbench (`+2 Torch` on its card, the pickaxe's Moment; SGODOT-231 B2-06).
+	var crafted := events.any(func(e): return str(e.get("kind", "")) == "craft")
 	for i in events.size():
 		var ev: Dictionary = events[i]
 		match str(ev.get("kind", "")):
@@ -282,7 +284,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 			"item":
 				var iid := str(ev.id)
 				if iid.begins_with("dish_"): _call("p0_event", [ev, v])   # where a collected dish went (the kitchen's Keep toast)
-				if int(ev.delta) > 0 and not iid.begins_with("seed_") and not iid.begins_with("dish_") and not iid.begins_with("fish_"):
+				if int(ev.delta) > 0 and not crafted and not iid.begins_with("seed_") and not iid.begins_with("dish_") and not iid.begins_with("fish_"):
 					ui.float_text("+%d %s" % [int(ev.delta), P0Logic.item_name(v, iid)], at, UiFloatText.Tone.ITEM, P0Logic.icon(iid), stack)
 					stack += 1
 			"coins":
@@ -503,6 +505,16 @@ func _dev_shot(dt: float) -> void:
 			"today": ui.open_today()
 			"energypanel": ui.open_energy_panel()
 			"inbox": ui.open_inbox()
+			"workbench": ui.open_workbench(step[1] if step.size() > 1 else "")   # SGODOT-231 B2-06 drawer, tools / supplies
+			"wbtile":   # wbtile:craft_copper_pickaxe:0 taps that card's cost tile (NeedSource)
+				var wb := ui.workbench()
+				if wb != null and wb.card(step[1]) != null: wb.card(step[1]).tiles()[int(step[2])].pressed.emit()
+			"wbicon":   # wbicon:craft_copper_pickaxe taps that card's item icon (its InfoSheet)
+				var wbi := ui.workbench()
+				if wbi != null and wbi.card(step[1]) != null: wbi.card(step[1]).icon_pressed.emit()
+			"showspot":   # showspot:mine — what a NeedSource's Show does (closes the layer, camera only, LOCK-08)
+				ui.close_modal()
+				ui.show_spot.emit(step[1])
 			"radial": ui.open_radial()
 			"kitchen", "put":
 				# The farmhouse owns the cooking drawer; elsewhere the interim panel opens.

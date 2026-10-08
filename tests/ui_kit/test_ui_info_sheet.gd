@@ -36,7 +36,7 @@ func test_spec_contract_fills_the_title_area_from_the_view() -> void:
 	assert_str(s.title).is_equal("Radish")
 	assert_int(s.quantity).is_equal(12)
 	assert_str(s.rarity_text).is_equal("Common")
-	assert_array(P0ItemInfo.CONTEXTS).contains_exactly([&"bag", &"gear", &"counter_buy", &"counter_sell", &"gift", &"storage"])
+	assert_array(P0ItemInfo.CONTEXTS).contains_exactly([&"bag", &"gear", &"counter_buy", &"counter_sell", &"gift", &"storage", &"workbench"])
 
 func test_open_asks_the_rules_and_draws_the_spec() -> void:
 	assert_bool(sheet.visible).is_false()

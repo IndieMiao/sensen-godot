@@ -122,3 +122,20 @@ func test_the_tab_asked_for_is_the_tab_that_opens() -> void:
 	rt.ui.close_modal()
 	# A plain tap on the stove afterwards is not sent to Experiment by a tab left over.
 	assert_str(str(r.get("_pending_tab"))).is_equal("")
+
+func test_a_second_tap_on_a_bag_cell_puts_a_second_one_in() -> void:
+	# §7.2.7: tapping a cell adds one (the cell counts down), the slot bar takes one back. Two of the same is a real
+	# combination (Carrot Cake, Salted Potatoes; the two-radish trials of the int6 list).
+	var r := await _farmhouse()
+	var k: P0Kitchen = r.get("kitchen")
+	k.open("experiment")
+	k._on_ingredient("fish_crucian", Vector2.INF)
+	k._on_ingredient("fish_crucian", Vector2.INF)
+	assert_array(k.pot).is_equal(["fish_crucian", "fish_crucian"])
+	k._on_ingredient("fish_crucian", Vector2.INF)   # two slots: the pot is full, nothing more goes in
+	assert_array(k.pot).is_equal(["fish_crucian", "fish_crucian"])
+	assert_str(rt.ui._toast.text).is_equal("The pot is full · tap ✕ above to take one out")   # q(64)
+	k._take_out(1, Vector2.INF)
+	assert_array(k.pot).is_equal(["fish_crucian"])
+	rt.ui.close_modal()
+	await get_tree().process_frame

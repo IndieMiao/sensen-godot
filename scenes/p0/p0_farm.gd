@@ -281,6 +281,7 @@ func p0_show_spot(where: String) -> void:
 	var at := _bench if where == "bench" else (_house if where in ["stove", "home"] else actor.position)
 	if where == "stall": at = _stall
 	elif where == "plots": at = _plots_center()
+	elif _materials.spot_at(where) != null: at = _materials.spot_at(where)   # SGODOT-231: spot_*, mine, workbench
 	_focus = at
 	_cam_follow.hold()
 	var ring := MeshInstance3D.new()
