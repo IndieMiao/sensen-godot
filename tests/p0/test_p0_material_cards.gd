@@ -94,4 +94,8 @@ func test_locked_spot_says_the_gate_and_opens_the_homestead_sheet() -> void:
 	assert_array(navs).has_size(1)   # View homestead only: no Details page in P0
 	(navs[0] as UiNavButton).pressed.emit()
 	assert_str(ui.modal_kind).is_equal("homestead")   # HOME-1 (a panel, no jump)
+	ui.back_modal()                                   # Android Back: one layer back, to MAT-3 (苏烈 on #102)
+	assert_str(ui.modal_kind).is_equal("locked_spot")
+	ui.back_modal()
+	assert_bool(ui.has_modal()).is_false()
 	assert_object(P0MaterialCards.open_locked_spot(ui, ui.view, "spot_unknown")).is_null()
