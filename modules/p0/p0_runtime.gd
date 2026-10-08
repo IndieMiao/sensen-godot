@@ -5,7 +5,9 @@ extends Node
 ## routes UI input to the active world and turns server events into floats, cards and toasts, so the
 ## new UI flow is identical everywhere.
 ##
-## A world implements (all optional): p0_surface() -> String, p0_frame(view, dt), p0_joystick(v),
+## A world implements (all optional): p0_surface() -> String, p0_space() -> String (where the player is for
+## the server: home / pond / outpost / mine; see space_of), p0_place() -> String (the catalog pond id inside a
+## pond space), p0_frame(view, dt), p0_joystick(v),
 ## p0_tap(screen), p0_action(cmd), p0_event(ev, view), p0_anchor() -> Vector2, p0_zoom(f),
 ## p0_recenter(), p0_show_spot(where), p0_energy_verb() -> String, p0_dev(step) -> bool,
 ## p0_until(name) -> bool.
@@ -53,6 +55,7 @@ func _init() -> void:
 	ui.zoom.connect(func(f: float): _call("p0_zoom", [f]))
 	ui.recenter.connect(func(): _call("p0_recenter", []))
 	ui.show_spot.connect(func(where: String): _call("p0_show_spot", [where]))
+	ui.can_show_spot = func() -> bool: return is_instance_valid(world) and world.has_method("p0_show_spot")
 	ui.home_choice.connect(func(choice: String): _call("p0_home", [choice]))
 	ui.place_pressed.connect(leave_world)
 	ui.home_requested.connect(func(): _leave_then("farm"))
@@ -70,10 +73,20 @@ func _init() -> void:
 ## The active world takes over input and the HUD surface; the previous one is simply forgotten.
 func attach(w: Node) -> void:
 	world = w
+	session.space = space_of(w)   # before the read below, which tells the server where the player is
+	session.place = str(w.call("p0_place")) if w.has_method("p0_place") else ""   # which pond (q(36))
 	if not session.busy and not session.view.is_empty(): session.refresh()   # entering a space reads fresh state
 	mark("attach " + str(w.name))
 	_first_frame.call_deferred(str(w.name))
 	ui.set_surface(str(w.call("p0_surface")) if w.has_method("p0_surface") else "farm")
+
+## The space a world puts the player in, for the server (q(41)): its p0_space() when it has one (the farmhouse
+## says home, outposts say outpost), else from its surface — farm is home, pond and map as named, anything else
+## unknown (""), which the server ignores. Read once on attach, never from the per-frame surface ("busy").
+static func space_of(w: Object) -> String:
+	if w.has_method("p0_space"): return str(w.call("p0_space"))
+	var surface := str(w.call("p0_surface")) if w.has_method("p0_surface") else "farm"
+	return str({"farm": "home", "pond": "pond", "map": "map"}.get(surface, ""))
 
 func _first_frame(tag: String) -> void:
 	await RenderingServer.frame_post_draw
@@ -86,6 +99,8 @@ func detach(w: Node) -> void:
 		world = null
 		ui.close_modal()
 		ui.set_surface("map")
+		session.space = "map"
+		session.place = ""
 
 ## Back to the map: the active world is an AppRouter instance above it (back locks still apply,
 ## e.g. a line in the water is reeled in first).
@@ -144,7 +159,11 @@ func _on_state(v: Dictionary, events: Array) -> void:
 					last_first_catch_xp = int(ev.xp)
 				elif what.begins_with("cook:"): xp_lines.append("New recipe! · First cooked · +%d Cooking XP" % int(ev.xp))
 				elif what == "landed": xp_lines.append("First fish landed · +%d XP" % int(ev.xp))
+				elif what == "cast": xp_lines.append("First cast · +%d XP" % int(ev.xp))
+				elif what.begins_with("fishing_city:"):
+					xp_lines.append("First catch in %s · +%d XP" % [what.trim_prefix("fishing_city:").capitalize(), int(ev.xp)])
 	last_xp_lines = xp_lines
+	var parcels_said := false
 	for ev in events:
 		match str(ev.get("kind", "")):
 			"energy":
@@ -161,6 +180,12 @@ func _on_state(v: Dictionary, events: Array) -> void:
 					ui.float_text("+%d %s" % [int(ev.delta), P0Logic.item_name(v, iid)], at + Vector2(0, dy), Color("4f934b"))
 			"coins":
 				ui.float_text("%+d coins" % int(ev.delta), at + Vector2(0, dy), Color("c9962a"))
+			"parcel":
+				# LOCK-14: rewards that did not fit the bag wait in the Inbox; one float for the whole reply.
+				if not parcels_said:
+					parcels_said = true
+					var line := P0Logic.parcel_toast(v, events)
+					if line != "": ui.toast(line, 2.0)
 			"catch":
 				# A world that shows the catch itself (the open fishing panel) returns true.
 				if not bool(_call("p0_event", [ev, v])): _on_catch(ev, xp_lines)
@@ -236,7 +261,9 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 		"no_coins":
 			ui.toast("Need %d more coins" % int(detail.get("need", 0)))
 		"bag_full":
-			ui.toast("Bag full · free a slot first")
+			ui.toast("Make room · 1 slot" if str(cmd.get("type", "")).begins_with("claim_parcel") else "Bag full · free a slot first")
+		"parcel_expired", "bad_parcel":
+			ui.toast("This parcel is no longer waiting")
 		"rest_used":
 			ui.toast("Rest used today")
 		"energy_full":
@@ -249,6 +276,8 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 			ui.toast("Your line is already in the water")
 		"no_bait":
 			ui.toast("No bait left")
+		"not_at_pond":
+			ui.toast("Fish from a pond · open one from the map")   # the server did not get which pond (q(36))
 		"too_early", "no_cast":
 			_call("p0_event", [{"kind": "fish_abort"}, session.view])
 		"stove_busy":
@@ -305,6 +334,8 @@ func _dev_shot(dt: float) -> void:
 			"gear": ui.open_gear()
 			"skills": ui.open_skills()
 			"today": ui.open_today()
+			"energypanel": ui.open_energy_panel()
+			"inbox": ui.open_inbox()
 			"radial": ui.open_radial()
 			"kitchen": ui.open_kitchen(step[1] if step.size() > 1 else "cookbook")
 			"put":

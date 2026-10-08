@@ -1,33 +1,59 @@
 /** P0 command reducer: one command → new state + events, or a typed refusal. Never mutates the input. */
-import { cropById, cropBySeed, fishById, itemKind, rodById, type P0Content } from './content.js';
+import { cropById, cropBySeed, rodById, type P0Content } from './content.js';
 import { add, count, room, take } from './bag.js';
-import { collectPot, eatDish, startPot } from './cooking.js';
+import { collectPot, eatDish, startPot, recordHeat, settleStove } from './cooking.js';
+import { boardCommand, settleBoards, tracked } from './boards.js';
+import { expireGiftMeals, giftResident, noteSown, residentRequestCommand, talk } from './residents.js';
 import { castLine, reelLine, type FishCommand } from './fishing.js';
-import { energyDetail, gainXp, spendEnergy, type P0Event } from './progress.js';
+import { upgradeHomestead } from './homestead.js';
+import { takeFromCabinet } from './kitchen_storage.js';
+import { firstXp, energyDetail, gainXp, spendEnergy, type P0Event } from './progress.js';
+import { notePresence, restReadyIn } from './presence.js';
+import { isMineCommand, mineCommand, settleMine, type MineCommand } from './mine.js';
+import { gather, storeMaterials } from './gathering.js';
+import { craft } from './workbench.js';
+import { claimParcel, PARCEL_LIMIT, settleParcels } from './parcels.js';
 import { dayKey, maxEnergy, scaledXp, settleEnergy, skillLevel, xpPercent } from './rules.js';
-import { emptyDay, type P0State } from './state.js';
+import { buyback, buyItem, drink, moveStorage, offerOf, sellItem, setLock } from './shops.js';
+import { emptyDay, type P0State, type Plot } from './state.js';
 
 export type { P0Event } from './progress.js';
 
 /** Every command may carry `expect_seq`: the state version the client saw. A mismatch is refused as
  * `stale_state` without applying, so a retry after a lost response can never apply twice (SGODOT-211). */
-export type P0Command = P0CommandBody & { expect_seq?: number };
+export type P0Command = P0CommandBody & { expect_seq?: number; space?: string; place?: string };
 
 type P0CommandBody =
   | { type: 'till'; plot: number }
-  | { type: 'sow'; plot: number; seed: string }
+  | { type: 'sow'; plot?: number; plots?: number[]; seed: string }   // plots: up to 3 with the Row Hoe (§9.11.2)
+  | { type: 'fertilize'; plot: number; item?: string }
   | { type: 'water'; plot: number }
   | { type: 'harvest'; plot: number }
-  | { type: 'buy'; item: string; qty: number; shop?: 'stall' | 'tackle' }
+  | { type: 'buy'; item: string; qty: number; shop?: string }
   | { type: 'equip'; item: string }
-  | { type: 'sell'; item: string; qty: number }
+  | { type: 'sell'; item: string; qty: number | 'all'; shop?: string }
+  | { type: 'drink'; item: string; shop?: string }
+  | { type: 'lock' | 'unlock'; item: string }
+  | { type: 'store' | 'take_out'; item: string; qty: number | 'all' }
   | { type: 'rest' }
   | FishCommand
   | { type: 'cook'; items?: string[]; recipe?: string }
-  | { type: 'collect'; taps?: number[] }
-  | { type: 'eat'; item: string }
-  | { type: 'accept'; request: string }
-  | { type: 'deliver'; request: string };
+  | { type: 'collect'; taps?: number[]; eat?: boolean; pot?: number }   // eat: COOK-4 Eat, the main portion straight from the pot
+  | { type: 'heat'; taps: number[]; pot?: number }   // heat taps as they happen, kept on the pot (Queue ×2 keeps a pot on its own)
+  // pot: the pot's id (pot / queue events, view.cooking.stove.id). With Queue ×2 send it on every heat and collect:
+  // a different pot is refused as stale_pot instead of taking taps meant for another one.
+  | { type: 'eat'; item: string; from?: 'bag' | 'cabinet' }
+  | { type: 'cabinet_take'; item: string }   // Warming Cabinet `Take one` (§7.7)
+  | { type: 'accept' | 'deliver' | 'drop'; request: string }
+  | { type: 'homestead_upgrade' }
+  | { type: 'talk'; resident: string }
+  | { type: 'gift'; resident: string; item: string }
+  | MineCommand
+  | { type: 'gather'; spot: string }
+  | { type: 'craft'; recipe: string }
+  | { type: 'claim_parcel'; key: string }
+  | { type: 'claim_parcels'; keys: string[] }   // Claim all: the keys on screen, so a retry never takes a newer parcel
+  | { type: 'read_inbox'; keys: string[] };
 
 export type P0Result =
   | { ok: true; state: P0State; events: P0Event[] }
@@ -43,6 +69,14 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
   const events: P0Event[] = [];
   settleEnergy(c, s, now);
   rollDay(c, s, now);
+  settleBoards(c, s, now);
+  // Queue ×2: a done pot makes way for the waiting one, as the view shows; heat / collect naming the pot on the stove
+  // bring its taps first, and the settle after the command keeps it if it is done.
+  const aimed = (cmd.type === 'heat' || cmd.type === 'collect') && cmd.pot !== undefined && s.stove !== null && cmd.pot === (s.stove.id ?? null);
+  if (!aimed) settleStove(c, s, now, events);
+  settleMine(c, s, now);
+  settleParcels(c, s, now);
+  notePresence(c, s, cmd.space, now, events, cmd.place);   // before the command: a session gap of ≥ 2 h already counts as having left
   const plotOf = (id: unknown) => (Number.isInteger(id) ? s.plots.find(p => p.id === id) : undefined);
 
   switch (cmd.type) {
@@ -54,21 +88,50 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       break;
     }
     case 'sow': {
-      const plot = plotOf(cmd.plot);
-      if (!plot) return fail('bad_plot');
-      if (plot.state !== 'tilled') return fail('wrong_state', { state: plot.state });
+      // One plot, or up to the equipped hoe's count (Row Hoe: Sow ×3 · 6 Energy, still 2 per plot, §9.11.2).
+      const ids: unknown[] = Array.isArray(cmd.plots) ? cmd.plots : [cmd.plot];
+      const most = s.gear.hoe === c.tools.row_hoe.id ? c.tools.row_hoe.sow : 1;
+      if (ids.length < 1 || ids.length > most || new Set(ids).size !== ids.length) return fail('bad_plot', { most });
+      const plots = ids.map(plotOf);
+      if (plots.some(p => !p)) return fail('bad_plot');
+      const wrong = plots.find(p => p!.state !== 'tilled');
+      if (wrong) return fail('wrong_state', { plot: wrong.id, state: wrong.state });
       const crop = cropBySeed(c, String(cmd.seed));
       if (!crop) return fail('bad_item');
-      if (count(s.bag, crop.seed) < 1) return fail('no_seed', { seed: crop.seed });
-      if (s.energy.value < crop.energy) return fail('need_energy', energyDetail(c, s, now, crop.energy));
-      spendEnergy(c, s, now, crop.energy, events, 'sow');
-      take(s.bag, crop.seed, 1);
-      events.push({ kind: 'item', id: crop.seed, delta: -1 });
-      plot.state = 'sown';
-      plot.crop = crop.id;
+      const n = plots.length, seeds = count(s.bag, crop.seed);
+      if (seeds < n) return fail('no_seed', { seed: crop.seed, need: n, have: seeds });
+      if (s.energy.value < crop.energy * n) return fail('need_energy', energyDetail(c, s, now, crop.energy * n));
+      spendEnergy(c, s, now, crop.energy * n, events, 'sow');
+      take(s.bag, crop.seed, n);
+      events.push({ kind: 'item', id: crop.seed, delta: -n });
       // §4.2.1: the level difference is locked at the moment the player pays.
-      plot.xp_pct = xpPercent(c, skillLevel(c, s, 'farming'), crop.level);
-      delete plot.ready_at;
+      const pct = xpPercent(c, skillLevel(c, s, 'farming'), crop.level);
+      noteSown(c, s, n);
+      for (const plot of plots as Plot[]) {
+        plot.state = 'sown';
+        plot.crop = crop.id;
+        plot.xp_pct = pct;
+        delete plot.ready_at; delete plot.fert;
+      }
+      break;
+    }
+    case 'fertilize': {
+      // §5.5: one Compost per plot, any time after sowing and before it is ripe; 0 Energy; never stacks.
+      const plot = plotOf(cmd.plot);
+      if (!plot) return fail('bad_plot');
+      const ripe = plot.state === 'growing' && (plot.ready_at ?? Infinity) <= now;
+      if ((plot.state !== 'sown' && plot.state !== 'growing') || ripe || !plot.crop) return fail('wrong_state', { state: ripe ? 'ready' : plot.state });
+      if (plot.fert) return fail('fertilized');
+      const item = String(cmd.item ?? 'fert_compost'), fert = c.goods[item];
+      if (!fert?.grow_mult) return fail('bad_item');
+      if (count(s.bag, item) < 1) return fail('no_item', { item });
+      take(s.bag, item, 1);
+      events.push({ kind: 'item', id: item, delta: -1 });
+      plot.fert = true;
+      if (plot.state === 'growing') {
+        const grow = cropById(c, plot.crop)!.grow_h * 3_600_000;
+        plot.ready_at = Math.max(now, plot.ready_at! - Math.round(grow * (1 - fert.grow_mult)));
+      }
       break;
     }
     case 'water': {
@@ -77,7 +140,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       if (plot.state !== 'sown' || !plot.crop) return fail('wrong_state', { state: plot.state });
       const crop = cropById(c, plot.crop)!;
       plot.state = 'growing';
-      plot.ready_at = now + crop.grow_h * 3_600_000;
+      plot.ready_at = now + Math.round(crop.grow_h * 3_600_000 * (plot.fert ? c.goods.fert_compost.grow_mult ?? 1 : 1));
       break;
     }
     case 'harvest': {
@@ -86,62 +149,36 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       if (plot.state !== 'growing' || !plot.crop || (plot.ready_at ?? Infinity) > now)
         return fail('not_ready', { ready_in: plot.ready_at ? plot.ready_at - now : null });
       const crop = cropById(c, plot.crop)!;
-      if (room(c, s.bag, crop.id) < crop.yield) return fail('bag_full', { need: crop.yield });
-      add(c, s.bag, crop.id, crop.yield);
+      if (room(c, s, crop.id) < crop.yield) return fail('bag_full', { need: crop.yield });
+      add(c, s, crop.id, crop.yield);
       events.push({ kind: 'item', id: crop.id, delta: crop.yield });
       gainXp(c, s, now, 'farming', scaledXp(s, crop.xp, plot.xp_pct ?? 100), plot.xp_pct ?? 100, events);
       const first = `harvest:${crop.id}`;
       if (!s.firsts.includes(first)) {
         s.firsts.push(first);
-        events.push({ kind: 'first', what: first, xp: crop.first_xp });
-        gainXp(c, s, now, 'farming', crop.first_xp, 100, events);
+        firstXp(c, s, now, 'farming', first, crop.first_xp, events);
       }
       plot.state = 'tilled';
-      delete plot.crop; delete plot.xp_pct; delete plot.ready_at;
+      delete plot.crop; delete plot.xp_pct; delete plot.ready_at; delete plot.fert;
       break;
     }
-    case 'buy': {
-      const qty = Number(cmd.qty);
-      if (!Number.isInteger(qty) || qty < 1 || qty > 99) return fail('bad_qty');
-      const list = cmd.shop === 'tackle' ? c.tackle.buy : c.stall.buy;
-      if (!list.includes(cmd.item)) return fail('bad_item');
-      const offer = stallOffer(c, cmd.item);
-      const level = skillLevel(c, s, offer.skill);
-      if (level < offer.gate) return fail('locked', { skill: offer.skill, level: offer.gate, xp_to_go: c.skills[offer.skill][offer.gate - 1] - s.skills[offer.skill] });
-      if (offer.daily && (s.day.bought[cmd.item] ?? 0) + qty > offer.daily)
-        return fail('sold_out', { left: Math.max(0, offer.daily - (s.day.bought[cmd.item] ?? 0)) });
-      const cost = offer.price * qty;
-      if (s.coins < cost) return fail('no_coins', { need: cost - s.coins });
-      if (itemKind(cmd.item) === 'rod') {
-        // Rods go to Tools & Gear, not the bag; a new rod is equipped right away (switch back any time).
-        if (qty !== 1) return fail('bad_qty');
-        if (s.gear.rods.includes(cmd.item)) return fail('owned');
-        s.coins -= cost;
-        s.gear.rods.push(cmd.item);
-        s.gear.rod = cmd.item;
-        events.push({ kind: 'coins', delta: -cost }, { kind: 'item', id: cmd.item, delta: 1 });
-        break;
-      }
-      if (room(c, s.bag, cmd.item) < qty) return fail('bag_full', { room: room(c, s.bag, cmd.item) });
-      s.coins -= cost;
-      if (offer.daily) s.day.bought[cmd.item] = (s.day.bought[cmd.item] ?? 0) + qty;
-      add(c, s.bag, cmd.item, qty);
-      events.push({ kind: 'coins', delta: -cost }, { kind: 'item', id: cmd.item, delta: qty });
-      break;
-    }
-    case 'sell': {
-      const qty = Number(cmd.qty);
-      if (!Number.isInteger(qty) || qty < 1) return fail('bad_qty');
-      const price = sellPrice(c, cmd.item); // §9.13.1 / §6.6.3: produce and fish full price at home, no quota
-      if (price === null) return fail('not_sellable');
-      if (count(s.bag, cmd.item) < qty) return fail('not_enough', { have: count(s.bag, cmd.item) });
-      take(s.bag, cmd.item, qty);
-      s.coins += price * qty;
-      events.push({ kind: 'item', id: cmd.item, delta: -qty }, { kind: 'coins', delta: price * qty });
+    case 'buy': case 'sell': case 'drink': case 'lock': case 'unlock': case 'store': case 'take_out': {
+      const refusal = cmd.type === 'buy' ? buyItem(c, s, cmd, events)
+        : cmd.type === 'sell' ? sellItem(c, s, cmd, now, events)
+        : cmd.type === 'drink' ? drink(c, s, cmd, now, events)
+        : cmd.type === 'lock' || cmd.type === 'unlock' ? setLock(c, s, cmd, cmd.type === 'lock')
+        : moveStorage(c, s, cmd, cmd.type === 'store', events);
+      if (refusal) return fail(refusal.code, refusal.detail);
       break;
     }
     case 'rest': {
       if (s.day.rest >= 1) return fail('rest_used');
+      // q(41): at home, 2 h after last leaving it. Older clients send no space; they keep the old rule.
+      if (cmd.space !== undefined) {
+        if (cmd.space !== 'home') return fail('not_home');
+        const wait = restReadyIn(c, s, now);
+        if (wait === null || wait > 0) return fail('away_short', { ready_in: wait, away_h: c.energy.rest_away_h });
+      }
       const max = maxEnergy(c, s);
       if (s.energy.value >= max) return fail('energy_full');
       const gain = Math.min(c.energy.rest_amount, max - s.energy.value);
@@ -152,64 +189,105 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       break;
     }
     case 'equip': {
-      if (!rodById(c, String(cmd.item)) || !s.gear.rods.includes(String(cmd.item))) return fail('not_owned');
-      s.gear.rod = String(cmd.item);
+      const id = String(cmd.item);
+      if (s.gear.rods.includes(id) && rodById(c, id)) s.gear.rod = id;
+      else if (s.gear.hoes.includes(id)) s.gear.hoe = id;
+      else if (s.gear.picks.includes(id)) s.gear.pick = id;
+      else return fail('not_owned');
       break;
     }
-    case 'accept': case 'deliver': {
-      const req = s.requests.find(r => r.id === String(cmd.request));
-      if (!req) return fail('bad_request');
-      if (req.status === 'done') return fail('request_done');
-      if (cmd.type === 'accept') {
-        if (req.status === 'accepted') return fail('already_accepted');
-        req.status = 'accepted';
-        events.push({ kind: 'request', id: req.id, status: 'accepted', coins: 0 });
-        break;
-      }
-      const have = count(s.bag, req.item);
-      if (have < req.qty) return fail('not_enough', { item: req.item, need: req.qty, have });
-      take(s.bag, req.item, req.qty);
-      s.coins += req.coins;
-      req.status = 'done';
-      events.push({ kind: 'item', id: req.item, delta: -req.qty }, { kind: 'coins', delta: req.coins },
-        { kind: 'request', id: req.id, status: 'done', coins: req.coins });
+    case 'accept': case 'deliver': case 'drop': {
+      const id = String(cmd.request ?? '');
+      const refusal = id.startsWith('req_res_') ? residentRequestCommand(c, s, cmd.type, id, now, events, tracked(s))
+        : boardCommand(c, s, cmd.type, id, now, events);
+      if (refusal) return fail(refusal.code, refusal.detail);
+      break;
+    }
+    case 'talk': case 'gift': {
+      const refusal = cmd.type === 'talk' ? talk(c, s, cmd, now, events) : giftResident(c, s, cmd, events);
+      if (refusal) return fail(refusal.code, refusal.detail);
+      break;
+    }
+    case 'cabinet_take': {
+      if (cmd.space !== undefined && cmd.space !== 'home') return fail('not_home');   // the cabinet is in the farmhouse
+      const refusal = takeFromCabinet(c, s, cmd, events);
+      if (refusal) return fail(refusal.code, refusal.detail);
+      break;
+    }
+    case 'homestead_upgrade': {
+      const refusal = upgradeHomestead(c, s, now, events);
+      if (refusal) return fail(refusal.code, refusal.detail);
+      // q(46): the Spice Rack takes the bag's seasonings (Spice Rack · seasonings off your bag); from now on they are stored.
+      if (c.homestead.levels.find(l => l.level === s.homestead.level)?.unlocks.includes('spice_rack')) storeMaterials(c, s, now, events, 'spice_rack');
+      break;
+    }
+    case 'gather': case 'craft': {
+      const refusal = cmd.type === 'gather' ? gather(c, s, cmd, now, events) : craft(c, s, cmd, events);
+      if (refusal) return fail(refusal.code, refusal.detail);
+      break;
+    }
+    case 'heat': {
+      const refusal = recordHeat(s, cmd);
+      if (refusal) return fail(refusal.code, refusal.detail);
       break;
     }
     case 'cast': case 'reel': case 'cook': case 'collect': case 'eat': {
+      if (cmd.type === 'eat' && cmd.from === 'cabinet' && cmd.space !== undefined && cmd.space !== 'home') return fail('not_home');
       const refusal = cmd.type === 'cast' ? castLine(c, s, cmd, now, events)
         : cmd.type === 'reel' ? reelLine(c, s, cmd, now, events)
         : cmd.type === 'cook' ? startPot(c, s, cmd, now, events)
-        : cmd.type === 'collect' ? collectPot(c, s, cmd, now, events)
+        : cmd.type === 'collect' ? collectPot(c, s, cmd, now, events, maxEnergy(c, s))
         : eatDish(c, s, cmd, now, events, maxEnergy(c, s));
       if (refusal) return fail(refusal.code, refusal.detail);
       break;
     }
-    default:
-      return fail('unknown_command');
+    case 'claim_parcel': {
+      const refusal = claimParcel(c, s, now, String(cmd.key), events);
+      if (refusal) return fail(refusal.code, refusal.detail);
+      break;
+    }
+    case 'claim_parcels': {
+      if (!Array.isArray(cmd.keys) || cmd.keys.length > PARCEL_LIMIT || cmd.keys.some(k => typeof k !== 'string')) return fail('bad_parcel');
+      // Claim all takes what the free slots hold, in the order shown; the rest stays for later.
+      let took = 0;
+      for (const key of new Set(cmd.keys)) {
+        if (s.inbox.parcels.some(p => p.key === key) && !claimParcel(c, s, now, key, events)) took += 1;
+      }
+      if (took === 0 && s.inbox.parcels.some(p => cmd.keys.includes(p.key))) return fail('bag_full', { slots: 1 });
+      break;
+    }
+    case 'read_inbox': {
+      if (!Array.isArray(cmd.keys) || cmd.keys.length > 100 || cmd.keys.some(k => typeof k !== 'string')) return fail('bad_parcel');
+      for (const u of s.inbox.updates) if (cmd.keys.includes(u.key)) u.read = true;
+      break;
+    }
+    default: {
+      if (!isMineCommand(cmd)) return fail('unknown_command');
+      const refusal = mineCommand(c, s, cmd, now, events);
+      if (refusal) return fail(refusal.code, refusal.detail);
+    }
   }
+  settleStove(c, s, now, events);   // a pot queued behind a done one, room just made, or heat taps just in
   s.seq += 1;
   return { ok: true, state: s, events };
 }
 
-/** What the stall sells: seeds priced by their crop, goods (bait) by the goods table. */
+/** What the Homestead Stall / Tackle Shop list shows for one item (view). */
 export function stallOffer(c: P0Content, id: string): { price: number; skill: 'farming' | 'fishing' | 'cooking'; gate: number; daily: number } {
-  const crop = cropBySeed(c, id);
-  if (crop) return { price: crop.seed_price, skill: 'farming', gate: crop.gate, daily: 0 };
-  const rod = rodById(c, id);
-  if (rod) return { price: rod.price, skill: 'fishing', gate: rod.level, daily: 0 };
-  const g = c.goods[id];
-  return { price: g.price, skill: g.skill, gate: g.gate, daily: g.daily };
+  const o = offerOf(c, id)!;
+  return { price: o.price, skill: o.skill ?? 'farming', gate: o.gate, daily: o.daily };
 }
 
+/** Full price at the Homestead Stall (crops, fish; dishes and materials at their buyback), or null when it can't be sold there. */
 export function sellPrice(c: P0Content, id: string): number | null {
-  if (itemKind(id) === 'crop') return cropById(c, id)?.price ?? null;
-  if (itemKind(id) === 'fish') return fishById(c, id)?.price ?? null;
-  return null;
+  const b = buyback(c, 'homestead', id);
+  return 'code' in b ? null : b.unit;
 }
 
 function rollDay(c: P0Content, s: P0State, now: number): void {
   const key = dayKey(c, now);
   if (s.day.key !== key) s.day = emptyDay(key);
+  expireGiftMeals(s);
 }
 
 export { count, room };

@@ -7,6 +7,7 @@ import argparse
 
 parser=argparse.ArgumentParser()
 parser.add_argument("--output", default="output/basic-room-2026-10-06/qa-project")
+parser.add_argument("--frame-probe", action="store_true", help="Enable isolated frame interval sampling")
 args=parser.parse_args()
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -24,7 +25,7 @@ def copy(relative):
 
 deps=json.loads((OUT/"avatar-dependencies.json").read_text())
 for path in deps:copy(path.removeprefix("res://"))
-for path in ["modules/avatar","scenes/basic_room","tools/dev/basic_room","assets/rooms/basic_room","assets/avatar/demo_denylist.json"]:copy(path)
+for path in ["modules/avatar","scenes/basic_room","tools/dev/basic_room","assets/rooms/basic_room","assets/rooms/_shared/fx","assets/avatar/demo_denylist.json"]:copy(path)
 manifest=json.loads((ROOT/"assets/avatar/parts_manifest.json").read_text())
 manifest["parts"]=[p for p in manifest["parts"] if p["id"] in ["body00","eyes00","hairhat0","cloth0","shoes0"]]
 (PROJECT/"assets/avatar/parts_manifest.json").write_text(json.dumps(manifest,indent=2))
@@ -104,4 +105,7 @@ screen/support_xlarge=true
 permissions/internet=false
 permissions/access_network_state=false
 ''')
+if args.frame_probe:
+    p=PROJECT/"project.godot"
+    p.write_text(p.read_text().replace('[autoload]\n','[autoload]\nFrameProbe="*res://tools/dev/basic_room/frame_probe.gd"\n'))
 print(PROJECT)

@@ -5,12 +5,29 @@ export type PlotState = 'wild' | 'tilled' | 'sown' | 'growing';
 export interface Plot {
   id: number; state: PlotState;
   crop?: string; xp_pct?: number; ready_at?: number;
+  fert?: boolean;                 // compost this round (§5.5): −20% of the ripening time, once, gone at harvest
 }
-export interface BagStack { id: string; qty: number }
+/** One bag slot. A resident's gift meal is its own stack (gift), never merged with bought or cooked ones (§3.4.5). */
+export interface BagStack { id: string; qty: number; gift?: { from: string; day: string } }
+
+/** A passive reward that did not fit the bag (§10.4.8, q(45)): kept 24 h from when it enters the Inbox. */
+export interface Parcel extends BagStack { key: string; source: string; created_at: number; expires_at: number }
+/** What became of a parcel: claimed, expired (sellable items paid out as coins) or, for a gift, returned to its sender. */
+export interface ParcelUpdate extends BagStack {
+  key: string; source: string; at: number; status: 'claimed' | 'expired' | 'returned'; coins: number; read: boolean;
+}
+export interface P0Inbox {
+  granted: string[];                          // reward sources already granted, one key each
+  parcels: Parcel[];                          // at most 8 (§10.4.8)
+  waiting: Omit<Parcel, 'expires_at'>[];      // queued while 8 parcels wait; their 24 h starts on admission (q(45))
+  updates: ParcelUpdate[];                    // the last 100 claims and expiries
+}
+export const emptyInbox = (): P0Inbox => ({ granted: [], parcels: [], waiting: [], updates: [] });
 
 /** A line in the water: the fish is drawn when it is cast (§6.1.2), the client only sees its rarity. */
 export interface Cast {
   fish: string; site: string; at: number; bite_ms: number; bait: string | null;
+  place?: string;                       // the catalog pond it was cast at (q(36)); site is that pond's template
   xp_pct: number;                       // level difference locked at the bite (§6.7.1)
   breaks: 'level' | 'rod' | null;       // gate failure decided up front, shown after the reel starts
   pin?: string;                         // a teaching pin this cast used (handed back if the line comes in before the bite)
@@ -20,10 +37,61 @@ export interface Heat { at: number; spin: number; gold: number; width: number }
 export interface Pot {
   dish: string; rarity: number; started_at: number; ms: number; heats: Heat[];
   xp_pct: number; mystery: boolean;
+  items?: string[];                     // what went in (a failed pot's refund and its Kitchen Mishaps entry, §7.5.2)
+  taps?: number[];                      // heat taps sent while it cooked (heat command), judged with collect's own
+  left?: string[];   // collected (judged, XP paid) but no place to keep: these portions wait on the stove (§7.2.6)
+  id?: number;       // which pot this is (s.fires when it was put on), so heat / collect name the pot they mean (Queue ×2)
+  no_room?: boolean; // done but found no place to keep it: the waiting pot fires when it is taken, not when it was done
 }
+
+/** The Cookbook beyond the known pages (§7.5, SGODOT-232 S5). */
+export interface CookbookBook {
+  cooked: Record<string, number>;       // pots cooked per page, ever (Mastered at 10, §7.5.1)
+  best: Record<string, number>;         // best quality per page (0 Plain, 1 Good, 2 Perfect)
+  first_at: Record<string, number>;     // when the page was first cooked (Discovered)
+  clues: Record<string, number[]>;      // Hidden pages: slot indexes shown as their ingredient (Clued)
+  mishaps: { items: string[]; n: number; at: number }[];   // Kitchen Mishaps: each failed combination once, with a count
+}
+export const emptyBook = (): CookbookBook => ({ cooked: {}, best: {}, first_at: {}, clues: {}, mishaps: [] });
 
 /** A request on the stall board: open → accepted (tracked) → done. Requests never pay skill XP (§6.7.1). */
 export interface Request { id: string; title: string; item: string; qty: number; coins: number; where: string; status: 'open' | 'accepted' | 'done' }
+
+/** A drawn system request (§9.6): items are fixed when drawn; coins are paid from what is handed in. */
+export interface BoardRequest {
+  id: string; template: string; items: string[]; rarity?: number; kind: 'crop' | 'fish' | 'dish' | 'material';
+  qty: number; bonus: number; drawn_at: number; status: 'open' | 'accepted';
+}
+/** A board slot: a request, or empty until refill_at. */
+export interface BoardSlot { req: BoardRequest | null; refill_at: number }
+
+/** Per resident (§9.4.4): affinity points and where their request line is. */
+export interface ResidentState {
+  affinity: number;
+  chat_day: string;              // player day of the last first chat (+2 once a day)
+  gift_day: string;              // player day of the last gift received (once a day)
+  next: number;                  // index of the next request in the resident's list
+  req: { id: string; at: number; progress: number } | null;   // accepted request; progress counts sow for sow requests
+  done_day: string;              // player day the last request was completed (one a day)
+}
+
+export interface Homestead { level: number; plaque: { level: number; at: number }[] }
+
+/** One mine run on floors 1–2 (§13.3, SGODOT-231): floors[i] is floor i + 1; drops derive from the run seed. */
+export interface MineRun {
+  id: number; seed: number; day: string;    // day = the player day it started; 04:00 ends it
+  floors: { paid: boolean; broken: number[]; lit: boolean }[];
+}
+export interface MineState {
+  run: MineRun | null;
+  count: number;                            // runs ever started (run ids)
+  ended: { reason: 'reset'; at: number } | null;   // an unfinished run the 04:00 rollover ended (shown once at the mine mouth)
+  swing_at: number;                         // last rock, for the 0.9 s anti-script tempo
+}
+
+/** Where the player's commands come from (q(41)): when they last left the homestead, for Rest's 2 h rule. */
+/** place: the catalog pond the player is at, only while in a pond space (cast reads its template from it, q(36)). */
+export interface Presence { left_at: number | null; last_at: number; space: string | null; place?: string | null }
 
 export interface P0Day {
   key: string; rest: number;
@@ -32,10 +100,18 @@ export interface P0Day {
   eaten: Record<string, number>;        // per recipe page
   cooked: Record<string, number>;       // per recipe page (same-page XP decay)
   bought: Record<string, number>;       // daily-stock goods
+  drinks: number;                       // hot tea + coffee, shared (§3.4.4)
+  quota: Record<string, number>;        // coins paid today per buyback quota (§9.13.1)
+  bonus: number;                        // request completion bonus paid today (§9.13.2)
+  sys_done: number;                     // system requests completed today (§9.6.4)
+  gift_meal: string | null;             // resident who gave today's gift meal (§3.4.5)
+  mine_runs: number;                    // mine runs started today (§13.3.1, ≤ 2)
+  xp: Partial<Record<Skill, number>>;   // XP earned today per skill, for the anti-script cap (§4.3.4)
+  mishaps: number;                      // failed pots today (the blessing's first 10 refund their ingredients, §7.5.2)
 }
 
 export interface P0State {
-  v: 2;
+  v: 4;
   player: string;
   created_at: number;
   clock_ms: number;              // dev-only clock offset (time skip)
@@ -43,63 +119,136 @@ export interface P0State {
   coins: number;
   skills: Record<Skill, number>; // cumulative XP
   plots: Plot[];
-  bag: BagStack[];               // one entry per slot; capacity from content
+  bag: BagStack[];               // one entry per slot
+  bag_cap: number;               // 25, 30 after Bag Upgrade I (§10.4.3)
+  storage: Record<string, number>;   // farm storage: no slot limit, upgrades take from it first (§10.4.8)
+  locked: string[];              // item ids locked against Sell All (F-07)
+  owned: string[];               // one-time purchases: bag upgrades, specialty items
+  homestead: Homestead;
+  residents: Record<string, ResidentState>;
+  boards: { stall: BoardSlot[]; market: BoardSlot[] };
+  req_done: string[];            // last completed request ids (a repeated deliver says request_done)
+  presence: Presence;
+  inbox: P0Inbox;                // passive rewards that did not fit the bag (§10.4.8)
   firsts: string[];              // e.g. harvest:crop_radish, catch:fish_crucian, cook:dish_grilled_crucian
   rewards: string[];             // one-time rewards already granted
   day: P0Day;
   fishing: { casts: number; bites: number; caught: Record<string, number>; seen: string[] };
   cast: Cast | null;
   stove: Pot | null;
-  cookbook: string[];            // known recipe pages
+  queue: Pot | null;             // Queue ×2 (Cooking Lv5): the pot waiting behind the one on the stove
+  cabinet: { id: string; qty: number }[];   // Warming Cabinet portions (Homestead Lv3, §7.7); stacks by dish id
+  cookbook: string[];            // known recipe pages (Tasted or Discovered)
+  book: CookbookBook;
   requests: Request[];
-  gear: { rods: string[]; rod: string };   // Tools & Gear: owned rods and the equipped one (tools don't take bag slots)
+  gear: { rods: string[]; rod: string; hoes: string[]; hoe: string; picks: string[]; pick: string };   // Tools & Gear: owned and equipped rod / hoe / pickaxe (no bag slots)
+  gather: { ready_at: Record<string, number>; last_at: number };   // §13.2: when each spot can be gathered again; last tap (tempo)
+  mine: MineState;
+  storage_auto: { at: number; items: [string, number][] } | null;   // last auto-store on coming home (q(40)), floated once by the client
   fires: number;                 // pots ever started (first fire is the tutorial ring)
   rng: number;
   seq: number;
 }
 
-export const emptyDay = (key = ''): P0Day => ({ key, rest: 0, fails: 0, meals: 0, eaten: {}, cooked: {}, bought: {} });
+export const emptyDay = (key = ''): P0Day => ({
+  key, rest: 0, fails: 0, meals: 0, eaten: {}, cooked: {}, bought: {}, drinks: 0, quota: {}, bonus: 0, sys_done: 0, gift_meal: null, mine_runs: 0, xp: {}, mishaps: 0,
+});
 
 export function freshState(c: P0Content, player: string, now: number, seed = hashSeed(player)): P0State {
   const plots: Plot[] = [];
   for (let i = 0; i < c.start.tilled_plots; i++) plots.push({ id: i, state: 'tilled' });
   for (let i = 0; i < c.start.wild_plots; i++) plots.push({ id: c.start.tilled_plots + i, state: 'wild' });
   return {
-    v: 2, player, created_at: now, clock_ms: 0,
+    v: 4, player, created_at: now, clock_ms: 0,
     energy: { value: c.energy.max_base, tick_ms: now },
     coins: c.start.coins,
     skills: { farming: 0, fishing: 0, cooking: 0 },
     plots,
     bag: c.start.bag.map(([id, qty]) => ({ id, qty })),
+    bag_cap: c.bag.capacity, storage: {}, locked: [], owned: [], inbox: emptyInbox(),
+    homestead: { level: 1, plaque: [] },
+    residents: {},
+    boards: { stall: [{ req: tutorialRequest(c, now), refill_at: 0 }], market: [] }, req_done: [],
+    presence: { left_at: null, last_at: 0, space: null, place: null },
     firsts: [], rewards: [],
     day: emptyDay(),
     fishing: { casts: 0, bites: 0, caught: {}, seen: [] },
-    cast: null, stove: null,
-    cookbook: c.cooking.recipes.filter(r => r.known).map(r => r.id),
+    cast: null, stove: null, queue: null, cabinet: [],
+    cookbook: c.cooking.recipes.filter(r => r.known).map(r => r.id), book: emptyBook(),
     requests: [{ ...c.requests.tutorial, status: 'open' }],
-    gear: { rods: [c.tools.fishing], rod: c.tools.fishing },
+    gear: { rods: [c.tools.fishing], rod: c.tools.fishing, hoes: [c.tools.farming], hoe: c.tools.farming, picks: [c.tools.mining], pick: c.tools.mining },
+    gather: { ready_at: {}, last_at: 0 },
+    mine: freshMine(),
+    storage_auto: null,
     fires: 0,
     rng: seed, seq: 0,
   };
 }
 
-/** Bring a stored M1 state (v1) up to the current shape; the prototype keeps playtest saves alive. */
-export function upgradeState(c: P0Content, raw: P0State): P0State {
+/** The first-session request in Stall Board slot 1 (§14.2): Pond Catch, 2 Pond Crucian. */
+export function tutorialRequest(c: P0Content, now: number): BoardRequest {
+  const t = c.requests.tutorial;
+  return { id: t.id, template: 'req_sys_fish_common', items: [t.item], kind: 'fish', qty: t.qty, bonus: c.requests.templates.req_sys_fish_common.bonus,
+    drawn_at: now, status: 'open' };
+}
+
+/**
+ * Bring a stored playtest save up to the current shape (v1 M1 → v2 M2 → v3 SGODOT-228 → v4 SGODOT-231). The prototype promises no
+ * compatibility, but filling defaults keeps local saves playable: v3 adds Homestead Lv1, an empty farm storage and
+ * the boards, moving the old tutorial request into Stall Board slot 1 with its status.
+ */
+export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0State {
   const s = raw as P0State & { v: number };
   s.requests ??= [{ ...c.requests.tutorial, status: 'open' }];
-  s.gear ??= { rods: [c.tools.fishing], rod: c.tools.fishing };
-  if (s.v === 2) return s;
+  s.gear ??= { rods: [c.tools.fishing], rod: c.tools.fishing, hoes: [c.tools.farming], hoe: c.tools.farming, picks: [c.tools.mining], pick: c.tools.mining };
+  if (s.v < 2) {
+    s.fishing ??= { casts: 0, bites: 0, caught: {}, seen: [] };
+    s.cast ??= null;
+    s.stove ??= null;
+    s.cookbook ??= c.cooking.recipes.filter(r => r.known).map(r => r.id);
+    s.fires ??= 0;
+    if (s.cast && !s.cast.site) s.cast.site = 'pond';
+  }
+  if (s.v < 3) {
+    s.gear.hoes ??= [c.tools.farming];
+    s.gear.hoe ??= c.tools.farming;
+    s.bag_cap ??= c.bag.capacity;
+    s.storage ??= {};
+    s.locked ??= [];
+    s.owned ??= [];
+    s.homestead ??= { level: 1, plaque: [] };
+    s.residents ??= {};
+    const old = s.requests.find(r => r.id === c.requests.tutorial.id);
+    s.req_done ??= old?.status === 'done' ? [old.id] : [];
+    const first = tutorialRequest(c, s.created_at ?? now);   // keep the request's age: it dates from the account (PR #15 review)
+    s.boards ??= {
+      stall: [old?.status === 'done' ? { req: null, refill_at: now } : { req: { ...first, status: old?.status === 'accepted' ? 'accepted' : 'open' }, refill_at: 0 }],
+      market: [],
+    };
+  }
+  if (s.v < 4) {   // SGODOT-231: pickaxes, gathering spots, the mine run, the last auto-store
+    s.gear.picks ??= [c.tools.mining];
+    s.gear.pick ??= c.tools.mining;
+    s.gather ??= { ready_at: {}, last_at: 0 };
+    s.mine ??= freshMine();
+    s.storage_auto ??= null;
+  }
+  s.req_done ??= [];
+  s.cabinet ??= [];
+  s.queue ??= null;
+  if (!s.book) {   // SGODOT-232 S5: pages already cooked count once, with no date (no version of their own)
+    s.book = emptyBook();
+    for (const f of s.firsts) if (f.startsWith('cook:') && f !== `cook:${c.cooking.mystery.id}`) s.book.cooked[f.slice(5)] = 1;
+  }
+  s.presence ??= { left_at: null, last_at: 0, space: null };
+  s.presence.place ??= null;
+  s.inbox ??= emptyInbox();   // SGODOT-232: filled for v3 and v4 saves alike, without a version of its own
   s.day = { ...emptyDay(s.day?.key ?? ''), ...s.day };
-  s.fishing ??= { casts: 0, bites: 0, caught: {}, seen: [] };
-  s.cast ??= null;
-  s.stove ??= null;
-  s.cookbook ??= c.cooking.recipes.filter(r => r.known).map(r => r.id);
-  s.fires ??= 0;
-  if (s.cast && !s.cast.site) s.cast.site = 'pond';
-  s.requests ??= [{ ...c.requests.tutorial, status: 'open' }];
-  s.v = 2;
+  s.v = 4;
   return s;
 }
+
+const freshMine = (): MineState => ({ run: null, count: 0, ended: null, swing_at: 0 });
 
 function hashSeed(text: string): number {
   let h = 2166136261;

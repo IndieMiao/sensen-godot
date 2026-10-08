@@ -1,0 +1,84 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "name": "Android Vulkan Mobile scene loads",
+      "passed": true,
+      "details": "Goldfish GFXStream (llvmpipe (LLVM 21.0.0, 256 bits))"
+    },
+    {
+      "name": "Skinned body is visible below the head",
+      "passed": true,
+      "details": 1803
+    },
+    {
+      "name": "Android floating joystick moves character",
+      "passed": true,
+      "details": [
+        [
+          1.39999997615814,
+          0.0850000008940697,
+          1.64999997615814
+        ],
+        [
+          2.9418773651123,
+          0.0897980257868767,
+          -0.0488895438611507
+        ]
+      ]
+    },
+    {
+      "name": "Touch release returns to idle",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "Real touch cannot cross dining table",
+      "passed": true,
+      "details": [
+        -0.117148384451866,
+        0.0800977647304535,
+        1.44228482246399
+      ]
+    },
+    {
+      "name": "Real touch cannot leave open room edge",
+      "passed": true,
+      "details": [
+        2.94195485115051,
+        0.0727877616882324,
+        1.49996995925903
+      ]
+    },
+    {
+      "name": "Two-finger pinch changes camera scale",
+      "passed": true,
+      "details": [
+        10.75,
+        5.58810516400233
+      ]
+    },
+    {
+      "name": "Two-finger zoom keeps avatar still",
+      "passed": true,
+      "details": [
+        [
+          1.39999997615814,
+          0.0850000008940697,
+          1.64999997615814
+        ],
+        [
+          1.39999997615814,
+          0.0850000008940697,
+          1.64999997615814
+        ]
+      ]
+    },
+    {
+      "name": "View button restores whole-room scale",
+      "passed": true,
+      "details": null
+    }
+  ],
+  "touch_operations": 5
+}

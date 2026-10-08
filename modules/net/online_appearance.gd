@@ -7,7 +7,8 @@ static func payload(config: AvatarConfig) -> Dictionary:
 
 ## Old clients and unavailable parts have a complete, safe fallback. Never load
 ## paths from the wire or persist another player's appearance to our wardrobe.
-static func config(raw: Variant) -> AvatarConfig:
+## allow_npc: an outpost NPC's own outfit data may use NPC-only parts (SGODOT-229); anything from the wire may not.
+static func config(raw: Variant, allow_npc := false) -> AvatarConfig:
 	var result := Avatar.slot_table.default_config()
 	if not raw is Dictionary or raw.get("version") != 1 or not raw.get("slots") is Dictionary: return result
 	for definition in Avatar.slot_table.slots:
@@ -18,5 +19,5 @@ static func config(raw: Variant) -> AvatarConfig:
 			if not definition.required: result.slots[slot] = ""
 			continue
 		var part = Avatar.catalog.part(id)
-		if part != null and part.slot == slot: result.slots[slot] = id
+		if part != null and part.slot == slot and (allow_npc or not part.npc_only): result.slots[slot] = id
 	return result

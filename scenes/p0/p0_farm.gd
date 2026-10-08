@@ -33,6 +33,7 @@ var _zoom := 1.0
 var _dev_yaw := -1.0
 var _hold_until := 0.0
 var _front: Dictionary = {}
+var _row: Array = []   # plots a Row Hoe sows from _front (P0Logic.row_plots)
 var _front_cell := Vector2i(-1, -1)
 var _plot_sig := ""
 var _sync_t := 0.0
@@ -184,6 +185,8 @@ func p0_recenter() -> void:
 
 func p0_show_spot(where: String) -> void:
 	var at := _house if where in ["stove", "bench", "home"] else actor.position
+	if where == "stall": at = _stall
+	elif where == "plots": at = _plots_center()
 	_focus = at
 	_cam_follow.hold()
 	var ring := MeshInstance3D.new()
@@ -212,7 +215,7 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 	rt.ui.player_screen = cam.unproject_position(actor.position + Vector3(0, 0.9, 0))   # the radial fans out from here
 	_sync_plots(v, dt)
 	_pick_front(v)
-	rt.ui.set_action(P0Logic.main_action(v, _front, rt.ui.selected_seed))
+	rt.ui.set_action(P0Logic.main_action(v, _front, rt.ui.selected_seed, _row))
 	_hold_repeat()
 	_tags(v)
 	_teaching(v)
@@ -230,6 +233,12 @@ func _sync_plots(v: Dictionary, dt: float) -> void:
 	for p in v.get("plots", []):
 		var id := int(p.get("id", -1))
 		if id >= 0 and id < P0Garden.plot_count(): beds.multimesh.set_instance_color(id, P0Garden.bed_tint(str(p.get("state", ""))))
+
+## Middle of the plot beds, for camera-only "Show" from the Today panel and NeedSource (LOCK-08).
+func _plots_center() -> Vector3:
+	var sum := Vector3.ZERO
+	for id in P0Garden.plot_count(): sum += bp.cell_to_world(P0Garden.cell_of(id))
+	return sum / maxf(1.0, float(P0Garden.plot_count()))
 
 ## The bed the player faces from the walkway: nearest bed ahead within reach.
 func _pick_front(v: Dictionary) -> void:
@@ -254,6 +263,8 @@ func _pick_front(v: Dictionary) -> void:
 	if best >= 0:
 		for p in v.get("plots", []):
 			if int(p.get("id", -1)) == best: _front = p
+	# Row Hoe: the bed in front and its tilled neighbours in the row, the way the player faces first (plot ids grow along +x).
+	_row = P0Logic.row_plots(v, _front, P0Garden.COLUMNS, 1 if f.x >= 0.0 else -1)
 	_hi.visible = not _front.is_empty() and not rt.ui.has_modal()
 	if _hi.visible:
 		_front_cell = P0Garden.cell_of(best)
@@ -262,8 +273,9 @@ func _pick_front(v: Dictionary) -> void:
 # ---------------------------------------------------------------- actions
 func p0_action(cmd: Dictionary) -> void:
 	var type := str(cmd.get("type", ""))
-	if LABOUR_CLIP.has(type) and cmd.has("plot"):
-		actor.labour(LABOUR_CLIP[type], bp.cell_to_world(P0Garden.cell_of(int(cmd.plot))))
+	var target := int(cmd.get("plot", (cmd.get("plots", [-1]) as Array)[0] if cmd.has("plots") else -1))
+	if LABOUR_CLIP.has(type) and target >= 0:
+		actor.labour(LABOUR_CLIP[type], bp.cell_to_world(P0Garden.cell_of(target)))
 		_hold_until = Time.get_ticks_msec() + P0Actor.LABOUR_S * 1000.0
 	rt.session.send(cmd)
 

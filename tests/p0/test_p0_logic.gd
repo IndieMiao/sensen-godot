@@ -100,3 +100,25 @@ func test_today_panel_orders_now_then_countdown_then_skill() -> void:
 	v["skills"] = {"farming": {"level": 1, "xp": 20, "next": 50}, "fishing": {"level": 1, "xp": 60, "next": 70}}
 	v.plots = [{"state": "growing", "crop": "crop_radish", "ready_in": 4320000}, {"state": "sown", "crop": "crop_carrot"}]
 	assert_that(P0Logic.today_lines(v)).is_equal(["Water 1 sown plot · Free", "Radishes ready in 1h 12m", "Fishing Lv2 in 10 XP"])
+
+func test_parcel_countdowns_run_between_responses() -> void:
+	var v := _view()
+	v["inbox"] = {"badge": 1, "parcels": [{"key": "level:fishing:2:0", "id": "bait_worm", "qty": 3, "left": 60000}]}
+	var later := P0Logic.project(v, 45000)
+	assert_float(float(later.inbox.parcels[0].left)).is_equal(15000.0)
+	assert_float(float(P0Logic.project(v, 90000).inbox.parcels[0].left)).is_equal(0.0)
+	assert_float(float(v.inbox.parcels[0].left)).is_equal(60000.0)
+
+func test_one_inbox_float_per_reply_and_none_for_gift_meals() -> void:
+	var v := _view()
+	v["names"]["bait_worm"] = "Worm Bait"
+	var worm := {"kind": "parcel", "id": "bait_worm", "qty": 3, "waiting": false, "expires_in": 86400000}
+	var herb := {"kind": "parcel", "id": "wild_herb", "qty": 3, "waiting": false, "expires_in": 86400000}
+	var meal := {"kind": "parcel", "id": "dish_carrot_cake", "qty": 1, "waiting": false, "expires_in": 3600000, "gift": true}
+	assert_str(P0Logic.parcel_toast(v, [worm])).is_equal("Bag full · Worm Bait ×3 sent to Inbox · 24h")
+	assert_str(P0Logic.parcel_toast(v, [{"kind": "level"}, worm, herb])).is_equal("Bag full · 2 rewards sent to Inbox · 24h")
+	assert_str(P0Logic.parcel_toast(v, [meal])).is_equal("")
+	var queued := worm.duplicate()
+	queued["waiting"] = true
+	queued.erase("expires_in")
+	assert_str(P0Logic.parcel_toast(v, [queued])).is_equal("Inbox full · Worm Bait ×3 saved for later")
