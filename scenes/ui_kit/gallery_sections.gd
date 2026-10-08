@@ -465,7 +465,7 @@ static func _energy_facts(zero: bool, home: bool) -> Dictionary:
 		tiles = [
 			{icon = _tex("dish_grilled_fish"), label = "Eat", fact = "3 dishes in bag", guide = "Open bag", go = "bag", on = true},
 			{icon = _tex("pot"), label = "Cook", fact = "4 fish in creel" if home else "At home", guide = "Show kitchen", go = "stove", on = home},
-			{icon = _tex("dish_fruit_tea"), label = "Tea", fact = "1/3 today · 40 coins", guide = "Show on map", go = "outpost:tea", on = true},
+			{icon = _tex("dish_fruit_tea"), label = "Tea", fact = "0/3 today · 40 coins", guide = "Show on map", go = "outpost:tea", on = true},
 			{icon = _tex("rest"), label = "Rest", fact = "Available" if home else "At home", guide = "Show bench", go = "home", on = home},
 		],
 	}

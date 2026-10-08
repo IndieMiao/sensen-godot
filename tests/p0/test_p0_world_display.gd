@@ -288,9 +288,10 @@ func test_energy_card_tea_tile_reads_the_drinks_without_a_placeholder() -> void:
 	var tea: Dictionary = P0Logic.energy_card(v, 2, "Sow ×1").tiles[2]
 	assert_that([tea.label, tea.fact, tea.guide, tea.on]).is_equal(["Tea", "", "", false])   # no server drinks: no line
 	# the server's drinksView: need = price + the 40-coin floor (coinsNeeded), not the gap
-	v["drinks"] = {"used": 1, "limit": 3, "left": 2, "price": 40, "need": 80, "energy": 25, "gain": 25, "full": false, "resets_in": 3600000}
+	# N/3 is cups drunk today, then the next cup's price (李白: 0/3 · 40, 1/3 · 50, 2/3 · 60, 3/3)
+	v["drinks"] = {"used": 0, "limit": 3, "left": 3, "price": 40, "need": 80, "energy": 25, "gain": 25, "full": false, "resets_in": 3600000}
 	tea = P0Logic.energy_card(v, 2, "Sow ×1").tiles[2]   # 230 coins ≥ 80
-	assert_that([tea.fact, tea.guide, tea.go, tea.on]).is_equal(["1/3 today · 40 coins", "Show on map", "outpost:tea", true])
+	assert_that([tea.fact, tea.guide, tea.go, tea.on]).is_equal(["0/3 today · 40 coins", "Show on map", "outpost:tea", true])
 	v.coins = 50
 	tea = P0Logic.energy_card(v, 2, "Sow ×1").tiles[2]
 	assert_that([tea.fact, tea.on]).is_equal(["Need 30 more coins", false])
@@ -313,7 +314,7 @@ func test_bell_reads_the_inbox_badge_and_lists_parcels_read_only() -> void:
 	v["inbox"] = {"badge": 2, "waiting": 1, "parcels": [
 		{"key": "a", "id": "crop_radish", "qty": 3, "left": 79200000.0},
 		{"key": "b", "id": "seed_radish", "qty": 5, "left": 1500000.0}]}
-	assert_int(int(P0Logic.hud_state(v).unread)).is_equal(2)   # queued rewards stay off the bell
+	assert_int(int(P0Logic.hud_state(v).unread)).is_equal(2)   # the two parcels the sheet lists; queued rewards stay off
 	assert_that(P0Logic.parcel_lines(v)).is_equal(["Radish Seeds ×5 · 25m left", "Radish ×3 · 22h left"])
 	var ui := _ui(true)
 	ui.set_view(v)
@@ -340,3 +341,15 @@ func test_rest_tile_follows_the_away_rule() -> void:
 	assert_that([P0Logic.energy_card(v, 2, "Sow ×1").tiles[3].fact, P0Logic.energy_card(v, 2, "Sow ×1").tiles[3].on]).is_equal(["+58 Energy", true])
 	v.rest.used = 1
 	assert_str(str(P0Logic.energy_card(v, 2, "Sow ×1").tiles[3].fact)).is_equal("Rested today")
+
+func test_an_expired_parcel_leaves_the_bell_and_the_sheet_empty() -> void:
+	# The server keeps an unread expiry record (badge 1) once a parcel runs out; until SGODOT-234 shows records, the
+	# bell counts parcels only, so it reads 0 and the sheet says No parcels (奕星 on #11, option B).
+	var v := _view()
+	v["inbox"] = {"badge": 1, "waiting": 0, "parcels": [], "updates": [{"key": "a", "id": "crop_radish", "qty": 3, "status": "expired", "read": false}]}
+	assert_int(int(P0Logic.hud_state(v).unread)).is_equal(0)
+	var ui := _ui(true)
+	ui.set_view(v)
+	ui.open_inbox()
+	await get_tree().process_frame
+	assert_int(ui.find_children("*", "UiEmptyState", true, false).size()).is_equal(1)

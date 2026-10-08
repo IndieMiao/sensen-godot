@@ -225,7 +225,7 @@ func _facts(home := true) -> Dictionary:
 		wait = "Wait · Full in 13h 20m", tiles = [
 			{label = "Eat", fact = "3 dishes in bag", guide = "Open bag", go = "bag", on = true},
 			{label = "Cook", fact = "At home" if not home else "4 fish in creel", guide = "Show kitchen", go = "stove", on = home},
-			{label = "Tea", fact = "1/3 today · 40 coins", guide = "Show on map", go = "outpost:tea", on = true},
+			{label = "Tea", fact = "0/3 today · 40 coins", guide = "Show on map", go = "outpost:tea", on = true},
 			{label = "Rest", fact = "At home" if not home else "Available", guide = "Show home", go = "home", on = home},
 		]}
 
