@@ -87,7 +87,8 @@ static func stage_pill(stage: String, index: int) -> PanelContainer:
 	pill.add_child(UiKit.label(stage, UiTokens.STYLE_C10_XB, tone[1]))
 	return pill
 
-## Stage pill · meter · `52/90 · next Trusted`.
+## Stage pill · meter · `52/90 · next Trusted`; at the top stage (no next) only the points, `157`, the meter full
+## (李白 q(91)).
 func _affinity() -> HBoxContainer:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override(&"separation", int(UiTokens.SPACE_QUICK_BAR_GAP))
@@ -97,15 +98,15 @@ func _affinity() -> HBoxContainer:
 	meter.custom_minimum_size = _METER
 	meter.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(meter)
-	var tail := "%d/%d" % [int(data.get("have", 0)), int(data.get("need", 0))]
-	if str(data.get("next", "")) != "": tail += " · next " + str(data.next)
+	var tail := str(int(data.get("have", 0)))
+	if str(data.get("next", "")) != "": tail = "%s/%d · next %s" % [tail, int(data.get("need", 0)), str(data.next)]
 	row.add_child(UiKit.label(tail, UiTokens.STYLE_C10_B, UiTokens.COLOR_SECONDARY))
 	return row
 
-## Affinity toward the next stage, floored to 10 % like the AffinityMeter main.
+## Affinity toward the next stage, floored to 10 % like the AffinityMeter main; full at the top stage.
 func progress() -> float:
 	var need := int(data.get("need", 0))
-	if need <= 0: return 1.0
+	if need <= 0 or str(data.get("next", "")) == "": return 1.0
 	return clampf(floorf(float(data.get("have", 0)) * 10.0 / float(need)) / 10.0, 0.0, 1.0)
 
 func gift_button() -> UiCommandButton: return _gift
