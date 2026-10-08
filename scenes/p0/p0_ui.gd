@@ -1928,7 +1928,7 @@ func open_profile(look_saved := false) -> void:
 	page.edit_look_pressed.connect(edit_look)
 	page.collection_pressed.connect(func(key: String):
 		if key == "fish": open_fishdex(func(): open_profile())
-		else: request_panel("cookbook"))
+		elif can_request_panel(): request_panel("cookbook"))
 	_open_modal(page, 0.0, true)
 	_profile = page
 	modal_kind = "profile"
@@ -2312,6 +2312,9 @@ func show_got_away(ev: Dictionary) -> void:
 ## (Cookbook); it never travels (LOCK-08).
 func open_gate_card(gate: Dictionary, back := Callable()) -> UiInfoSheet:
 	var spec := P0Logic.gate_spec(view, gate)
+	# A guide to a panel no host opens (the Cookbook before its read-only page exists) is left off.
+	var own := ["skills"] + HOME_TARGETS
+	spec.buttons = spec.buttons.filter(func(b): return str(b.get("payload", {}).get("go", "")) in own or can_request_panel())
 	var sheet := UiInfoSheet.new()
 	sheet.theme = UiKit.theme()
 	sheet.rules = func(_id, _ctx, _o): return spec
@@ -2396,7 +2399,6 @@ func open_fishdex(back := Callable(), animate := true) -> void:
 		var gate := P0Logic.fish_gate(view, id)
 		if not gate.is_empty() and not P0Logic.dex_caught(view, id): open_gate_card(gate, again)
 		else: open_fish_card(id, again))
-	d.tab_pressed.connect(func(tab: String): request_panel(tab))
 	_open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
 	modal_kind = "fishdex"
 	_modal_back = back
@@ -2419,14 +2421,14 @@ func open_fish_card(id: String, back := Callable()) -> UiInfoSheet:
 	_modal_back = back
 	return sheet
 
-## A panel this UI does not own: the host's, if one listens (panel_requested); else where it lives (P0: the
-## Cookbook is at the stove in the farmhouse, COOK-2a).
+## A panel this UI does not own, opened by the host that listens on panel_requested.
 func request_panel(panel: String) -> void:
 	close_modal()
-	if panel_requested.get_connections().size() > 0:
-		panel_requested.emit(panel)
-	elif panel == "cookbook":
-		toast("Cookbook · at the stove in the farmhouse")
+	panel_requested.emit(panel)
+
+## Whether a host opens panels this UI does not own (a read-only Cookbook). Until one does, nothing offers them:
+## no dead-end placeholder (不知火舞 233 walkthrough).
+func can_request_panel() -> bool: return panel_requested.get_connections().size() > 0
 
 ## COOK-4 / COOK-6: the dish slides out; Eat now or Keep (bag).
 func show_dish(ev: Dictionary, xp_lines: Array) -> void:

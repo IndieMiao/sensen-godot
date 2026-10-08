@@ -2,9 +2,10 @@ class_name P0FishDex
 extends UiDrawer
 ## FISH-6 Fish-dex (SGODOT-233; 482:171 R1, 不知火舞 / 安其拉 2026-10-08). In the drawer, top to bottom:
 ##   heading     `Fish-dex` and Close (Compact/Navigation)
-##   tabs        Compact/Filter: Fish-dex | Cookbook (P0 has no Crop-dex); Cookbook asks the host (tab_pressed)
-##   milestone   on surfaceRaised: NeedTile M count `Kinds 3/8` (LOCK-10) and the next Fish-dex reward
-##               (`Next at 10 kinds` / `+30 Energy`), or the rod's reach when no reward is reachable this season
+##   (no tab row in P0: Fish-dex is the only page until a read-only Cookbook exists; Crop-dex is not P0 —
+##   不知火舞 233 walkthrough)
+##   milestone   on surfaceRaised: NeedTile M count `Kinds 3/8` (LOCK-10) beside the next Fish-dex reward
+##               (`Next at 10 kinds` / `+30 Energy`) when this season can reach it, else the rod's reach only
 ##   sections    one per rarity: its name, then rows of six fish cells — InventoryCell 52 over the name (9 Bold,
 ##               secondary). Caught: the fish and `×N`; not caught: UNCOLLECTED (1405:92952, the silhouette at
 ##               35 %). A fish caught since the dex was last opened rings once in color/new (1699:102396).
@@ -12,7 +13,6 @@ extends UiDrawer
 ## else the fish card. Everything comes from the server view (dex_data is pure and tested).
 
 signal cell_pressed(fish_id: String)
-signal tab_pressed(tab: String)
 signal close_pressed
 
 const HEIGHT := 532.0        # 482:171: the drawer from y 268 of 800
@@ -50,9 +50,6 @@ func _init(view: Dictionary = {}, fresh: Array = []) -> void:
 	close.offset_bottom = -close.offset_top
 	close.grow_horizontal = Control.GROW_DIRECTION_BEGIN
 	body.add_child(heading)
-	body.add_child(_spacer(_GAP))
-	body.add_child(UiFilterChip.row(PackedStringArray(["Fish-dex", "Cookbook"]), 0, func(i: int):
-		if i == 1: tab_pressed.emit("cookbook")))
 	body.add_child(_spacer(_GAP))
 	body.add_child(_milestone(d))
 	var scroll := TouchScrollContainer.new()
@@ -98,14 +95,13 @@ static func dex_data(view: Dictionary) -> Dictionary:
 	return {got = got, total = dex.size(), next = _next_line(view, got, dex.size()), sections = sections}
 
 ## The next Fish-dex reward (content rewards.fishdex [[kinds, Energy]]) when this season's fish can reach it;
-## otherwise the rod's reach, which is what holds the rest back.
+## otherwise only the rod's reach, which is what holds the rest back (P0's eight fish never reach 10 kinds; no
+## "N more to find", the NeedTile already says it — 不知火舞 233 walkthrough).
 static func _next_line(view: Dictionary, got: int, total: int) -> Array:
 	for m in P0Logic.content().get("rewards", {}).get("fishdex", []):
 		if int(m[0]) > got and int(m[0]) <= total: return ["Next at %d kinds" % int(m[0]), "+%d Energy" % int(m[1])]
 	var f: Dictionary = view.get("fishing", {})
-	if got >= total and total > 0: return ["All %d kinds caught" % total, ""]
-	return ["%d more to find" % (total - got),
-		"%s lands up to %s fish" % [str(f.get("rod", "Starter Rod")), P0Logic.rarity_name(view, int(f.get("rod_reach", 2)))]]
+	return ["%s lands up to %s fish" % [str(f.get("rod", "Starter Rod")), P0Logic.rarity_name(view, int(f.get("rod_reach", 2)))], ""]
 
 func _milestone(d: Dictionary) -> Control:
 	var card := PanelContainer.new()

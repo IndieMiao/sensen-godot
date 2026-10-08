@@ -47,8 +47,8 @@ func test_the_dex_reads_sections_kinds_and_what_is_next() -> void:
 	assert_array(d.sections.map(func(s): return s.name)).is_equal(["Common", "Fine", "Rare"])
 	assert_array(d.sections[0].fish.map(func(f): return [f.id, f.caught, f.icon])).is_equal(
 		[["fish_crucian", 23, "fish_crucian"], ["fish_carp", 0, "fish_unknown"]])
-	# This season's four fish can't reach the 10-kinds reward: the rod's reach says what holds the rest back.
-	assert_array(d.next).is_equal(["2 more to find", "Starter Rod lands up to Fine fish"])
+	# This season's four fish can't reach the 10-kinds reward: only the rod's reach, what holds the rest back.
+	assert_array(d.next).is_equal(["Starter Rod lands up to Fine fish", ""])
 	var v := _view()
 	for i in 16: v.fishing.dex.append({"id": "fish_x%d" % i, "rarity": 1, "level": 1, "caught": 1 if i < 7 else 0})
 	assert_array(P0FishDex.dex_data(v).next).is_equal(["Next at 10 kinds", "+%d Energy" % int(P0Logic.content().rewards.fishdex[0][1])])
@@ -98,12 +98,11 @@ func test_other_cells_open_the_fish_card() -> void:
 	assert_array(P0Logic.fish_card_spec(_view(), "fish_carp").facts).is_equal(["Not caught yet · Pond · River"])
 	assert_that([P0Logic.xp_percent(3, 1), P0Logic.xp_percent(4, 1), P0Logic.xp_percent(9, 1)]).is_equal([75, 50, -1])
 
-func test_the_cookbook_tab_says_where_it_lives_and_the_profile_tile_opens_the_dex() -> void:
+func test_no_tab_row_and_the_profile_tile_opens_the_dex() -> void:
 	ui.open_fishdex()
 	await await_idle_frame()
-	_dex().tab_pressed.emit("cookbook")
-	assert_str(ui.modal_kind).is_equal("")
-	assert_str(ui.toast_text()).is_equal("Cookbook · at the stove in the farmhouse")
+	assert_int(_dex().find_children("*", "UiFilterChip", true, false).size()).is_equal(0)   # Fish-dex only in P0
+	ui.close_modal()
 	ui.open_profile()
 	await await_idle_frame()
 	ui._profile.collection_pressed.emit("fish")
@@ -112,3 +111,17 @@ func test_the_cookbook_tab_says_where_it_lives_and_the_profile_tile_opens_the_de
 	ui.close_top_layer()
 	await await_idle_frame()
 	assert_str(ui.modal_kind).is_equal("profile")
+	ui._profile.collection_pressed.emit("pages")   # no read-only Cookbook yet: nothing opens, no placeholder
+	assert_str(ui.modal_kind).is_equal("profile")
+	assert_str(ui.toast_text()).is_empty()
+
+func test_a_cookbook_guide_shows_only_when_a_host_opens_it() -> void:
+	var gate := {"skill": "cooking", "level": 4, "what": "3rd slot"}
+	ui.open_gate_card(gate)
+	assert_bool(ui.find_children("*", "UiInfoSheet", true, false)[0].spec().buttons.is_empty()).is_true()
+	var asked := []
+	ui.panel_requested.connect(func(p): asked.append(p))
+	var sheet := ui.open_gate_card(gate)
+	assert_array(sheet.spec().buttons.map(func(b): return b.label)).is_equal(["Cookbook"])
+	sheet.action_requested.emit(&"guide", "gate", {"go": "cookbook"})
+	assert_array(asked).is_equal(["cookbook"])
