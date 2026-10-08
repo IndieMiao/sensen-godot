@@ -1166,6 +1166,8 @@ static func _reward_moments() -> Control:
 	row.add_child(_captioned(_reward_moment({tone = UiRewardMoment.Tone.NEUTRAL, event = "Mystery Dish", icon = _tex("dish_mystery"),
 		item_name = "Hmm… not a dish", strip = "A clue was added to your Cookbook", strip_icon = _tex("cookbook"),
 		primary = "Eat · +5 Energy", secondary = "Keep", note = "Can't be sold or delivered"}), "Neutral · Mystery Dish (COOK-6)"))
+	row.add_child(_captioned(_reward_moment({tone = UiRewardMoment.Tone.NEUTRAL, event = "No dish this time", icon = _tex("dish_mystery"),
+		item_name = "Ingredients back", rarity_word = "9 left today", primary = "OK"}), "Neutral · No dish, blessing refund"))
 	row.add_child(_captioned(_reward_moment({tone = UiRewardMoment.Tone.MILESTONE, event = "Home Cook", icon = _tex("cookbook"),
 		item_name = "Cookbook 8/48", strip = "Title · +50 Energy"}), "Milestone · no buttons"))
 	return row
