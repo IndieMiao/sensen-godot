@@ -162,7 +162,7 @@ func _process(dt: float) -> void:
 		var key := tips.next()
 		if key != "": _show_tip(str(P0Guide.TIPS[key]), key)
 	if _teach and _teach.visible: _place_tip()
-	if _notice and _notice.visible: _place_notice()   # the HUD lays out after the card first shows
+	if _notice and _notice.visible: _place_notice()
 
 func _build_hud() -> void:
 	hud = UiHud.new()
@@ -1414,10 +1414,14 @@ func _hide_notice() -> void:
 	_notice_left = 0.0
 	if _notice: _notice.hide()
 
+## Placed every frame while it shows: the HUD lays out after it first shows, and the system line (Offline, WP6) takes
+## the spot under the HUD while it is up, so the card moves down by SYS_SHIFT as the creel badge does (刘邦 on #116).
 func _place_notice() -> void:
 	var bell := hud.balances_rect()   # its right edge is the bell's
 	var right := (bell.end.x - root.global_position.x) if bell.size.x > 0.0 else root.size.x - UiTokens.SPACE_PAGE
-	_notice.position = Vector2(roundf(right - UiInboxNotice.WIDTH), UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H + _NOTICE_UNDER_HUD + safe_top())
+	var y := UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H + _NOTICE_UNDER_HUD + safe_top()
+	if _sys != null and is_instance_valid(_sys) and _sys.visible: y += SYS_SHIFT
+	_notice.position = Vector2(roundf(right - UiInboxNotice.WIDTH), y)
 
 ## The InboxNotice on screen, {} when none: its three lines (tests and the runtime read it).
 func inbox_notice_shown() -> Dictionary:

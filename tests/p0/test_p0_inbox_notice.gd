@@ -61,3 +61,19 @@ func test_it_waits_for_a_card_or_drawer_and_a_new_one_replaces_it() -> void:
 	assert_int(ui.root.find_children("*", "UiInboxNotice", true, false).size()).is_equal(1)
 	ui.inbox_notice_when_clear({})   # nothing to say
 	assert_dict(ui.inbox_notice_shown()).is_equal(next)
+
+## 刘邦 on #116: the system line (Offline, WP6) takes the spot under the HUD; the card moves down by SYS_SHIFT while it
+## is up, as the creel badge does, and comes back when it goes.
+func test_it_moves_down_under_the_system_line() -> void:
+	var ui: P0Ui = await _ui()
+	ui.inbox_notice_when_clear(SPEC)
+	await await_idle_frame()
+	var base := float(UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H) + 12.0 + ui.safe_top()
+	ui.show_sys(UiSysBanner.Kind.OFFLINE, "Offline")
+	ui._process(0.0)
+	var card := ui.inbox_notice_card()
+	assert_float(card.position.y).is_equal(base + P0Ui.SYS_SHIFT)
+	assert_bool(card.get_global_rect().intersects(ui._sys.get_global_rect())).is_false()
+	ui.hide_sys()
+	ui._process(0.0)
+	assert_float(card.position.y).is_equal(base)
