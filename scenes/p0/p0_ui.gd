@@ -1829,11 +1829,12 @@ func show_dish(ev: Dictionary, xp_lines: Array) -> void:
 	ic.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	card.add_child(ic)
 	var mystery := bool(ev.get("mystery", false))
-	var title := "Mystery Dish" if mystery else P0Logic.dish_label(view, id)
+	var mc := P0Logic.mystery_card(ev)
+	var title := str(mc.title) if mystery else P0Logic.dish_label(view, id)
 	var t := _label(title, 15, INK, true)
 	t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	card.add_child(t)
-	var sub := "Hmm… not a dish. Try another mix." if mystery else "%s%s · +%d Energy" % [["", "Good · ", "Perfect · "][q], P0Logic.rarity_name(view, int(info.get("rarity", 1))), int(info.get("full", 20))]
+	var sub := str(mc.sub) if mystery else "%s%s · +%d Energy" % [["", "Good · ", "Perfect · "][q], P0Logic.rarity_name(view, int(info.get("rarity", 1))), int(info.get("full", 20))]
 	var s2 := _label(sub, 10, INK2, true)
 	s2.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	card.add_child(s2)
@@ -1859,8 +1860,9 @@ func show_dish(ev: Dictionary, xp_lines: Array) -> void:
 			return
 		close_modal()
 		command.emit({"type": "eat", "item": id}))
-	row.add_child(eat)
-	var keep := _pill_button("Keep", false)
+	if mc.eat or not mystery: row.add_child(eat)
+	else: eat.free()
+	var keep := _pill_button("Keep" if mc.eat or not mystery else "OK", false)
 	keep.custom_minimum_size = Vector2(70, 32)
 	keep.pressed.connect(close_modal)
 	row.add_child(keep)

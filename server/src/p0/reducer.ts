@@ -1,13 +1,13 @@
 /** P0 command reducer: one command → new state + events, or a typed refusal. Never mutates the input. */
 import { cropById, cropBySeed, rodById, type P0Content } from './content.js';
 import { add, count, room, take } from './bag.js';
-import { collectPot, eatDish, startPot } from './cooking.js';
+import { collectPot, eatDish, startPot, recordHeat, settleStove } from './cooking.js';
 import { boardCommand, settleBoards, tracked } from './boards.js';
 import { expireGiftMeals, giftResident, noteSown, residentRequestCommand, talk } from './residents.js';
 import { castLine, reelLine, type FishCommand } from './fishing.js';
 import { upgradeHomestead } from './homestead.js';
 import { takeFromCabinet } from './kitchen_storage.js';
-import { energyDetail, gainXp, spendEnergy, type P0Event } from './progress.js';
+import { firstXp, energyDetail, gainXp, spendEnergy, type P0Event } from './progress.js';
 import { notePresence, restReadyIn } from './presence.js';
 import { isMineCommand, mineCommand, settleMine, type MineCommand } from './mine.js';
 import { gather, storeMaterials } from './gathering.js';
@@ -38,7 +38,10 @@ type P0CommandBody =
   | { type: 'rest' }
   | FishCommand
   | { type: 'cook'; items?: string[]; recipe?: string }
-  | { type: 'collect'; taps?: number[]; eat?: boolean }   // eat: COOK-4 Eat, the main portion straight from the pot
+  | { type: 'collect'; taps?: number[]; eat?: boolean; pot?: number }   // eat: COOK-4 Eat, the main portion straight from the pot
+  | { type: 'heat'; taps: number[]; pot?: number }   // heat taps as they happen, kept on the pot (Queue ×2 keeps a pot on its own)
+  // pot: the pot's id (pot / queue events, view.cooking.stove.id). With Queue ×2 send it on every heat and collect:
+  // a different pot is refused as stale_pot instead of taking taps meant for another one.
   | { type: 'eat'; item: string; from?: 'bag' | 'cabinet' }
   | { type: 'cabinet_take'; item: string }   // Warming Cabinet `Take one` (§7.7)
   | { type: 'accept' | 'deliver' | 'drop'; request: string }
@@ -67,6 +70,10 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
   settleEnergy(c, s, now);
   rollDay(c, s, now);
   settleBoards(c, s, now);
+  // Queue ×2: a done pot makes way for the waiting one, as the view shows; heat / collect naming the pot on the stove
+  // bring its taps first, and the settle after the command keeps it if it is done.
+  const aimed = (cmd.type === 'heat' || cmd.type === 'collect') && cmd.pot !== undefined && s.stove !== null && cmd.pot === (s.stove.id ?? null);
+  if (!aimed) settleStove(c, s, now, events);
   settleMine(c, s, now);
   settleParcels(c, s, now);
   notePresence(c, s, cmd.space, now, events, cmd.place);   // before the command: a session gap of ≥ 2 h already counts as having left
@@ -149,8 +156,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       const first = `harvest:${crop.id}`;
       if (!s.firsts.includes(first)) {
         s.firsts.push(first);
-        events.push({ kind: 'first', what: first, xp: crop.first_xp });
-        gainXp(c, s, now, 'farming', crop.first_xp, 100, events);
+        firstXp(c, s, now, 'farming', first, crop.first_xp, events);
       }
       plot.state = 'tilled';
       delete plot.crop; delete plot.xp_pct; delete plot.ready_at; delete plot.fert;
@@ -220,6 +226,11 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       if (refusal) return fail(refusal.code, refusal.detail);
       break;
     }
+    case 'heat': {
+      const refusal = recordHeat(s, cmd);
+      if (refusal) return fail(refusal.code, refusal.detail);
+      break;
+    }
     case 'cast': case 'reel': case 'cook': case 'collect': case 'eat': {
       if (cmd.type === 'eat' && cmd.from === 'cabinet' && cmd.space !== undefined && cmd.space !== 'home') return fail('not_home');
       const refusal = cmd.type === 'cast' ? castLine(c, s, cmd, now, events)
@@ -256,6 +267,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       if (refusal) return fail(refusal.code, refusal.detail);
     }
   }
+  settleStove(c, s, now, events);   // a pot queued behind a done one, room just made, or heat taps just in
   s.seq += 1;
   return { ok: true, state: s, events };
 }
