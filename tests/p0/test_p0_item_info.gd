@@ -152,7 +152,7 @@ func test_fish_gift_is_grey_without_mutual_friends() -> void:
 	v["social"] = {"mutual": 2}
 	assert_array(_labels(P0ItemInfo.spec(v, "fish_crucian", &"bag"))).is_equal(["nav:Gift ›"])
 
-func test_dish_eats_and_deliver_takes_the_primary_slot() -> void:
+func test_dish_eats_and_greys_eat_when_energy_is_full() -> void:
 	var s := P0ItemInfo.spec(_full(), "dish_grilled_crucian", &"bag")
 	assert_array(_labels(s)).is_equal(["primary:Eat · +45 Energy", "unavailable:Gift to a resident"])
 	assert_str(s.rarity_text).is_equal("Common")
@@ -161,6 +161,21 @@ func test_dish_eats_and_deliver_takes_the_primary_slot() -> void:
 	var v := _full()
 	v.energy.value = 200
 	assert_array(_labels(P0ItemInfo.spec(v, "dish_grilled_crucian", &"bag"))).is_equal(["unavailable:Energy full", "unavailable:Gift to a resident"])
+
+## Deliver answers one accepted board request (opts.target {request}); it takes the primary slot and Eat steps down.
+## Nothing opens a bag card for a request yet (the Stall Board card and the resident bar deliver themselves), so
+## without a target there is no Deliver.
+func test_deliver_takes_the_primary_slot_for_its_accepted_request() -> void:
+	var v := _full()
+	v.stall.board.requests.append({"id": "req_2", "item": "dish_grilled_crucian", "qty": 1, "have": 1, "status": "accepted"})
+	assert_array(_labels(P0ItemInfo.spec(v, "dish_grilled_crucian", &"bag", {target = {request = "req_2"}}))) \
+		.is_equal(["secondary:Eat · +45 Energy", "primary:Deliver", "unavailable:Gift to a resident"])
+	assert_array(_labels(P0ItemInfo.spec(v, "dish_grilled_crucian", &"bag"))) \
+		.is_equal(["primary:Eat · +45 Energy", "unavailable:Gift to a resident"])
+	assert_array(_labels(P0ItemInfo.spec(v, "fish_crucian", &"gift", {target = {request = "req_1"}}))).is_equal(["primary:Deliver"])
+	v.stall.board.requests[1].status = "open"   # not accepted yet: the board's Accept comes first
+	assert_array(_labels(P0ItemInfo.spec(v, "dish_grilled_crucian", &"bag", {target = {request = "req_2"}}))) \
+		.is_equal(["primary:Eat · +45 Energy", "unavailable:Gift to a resident"])
 
 ## A dish's Gift on the bag card (不知火舞 / 李白 on 225): `Gift to <Name>` for the resident within reach, else grey
 ## `Gift to a resident`; grey `Gift already given today` once that resident has had today's gift. Mystery Dish too.
