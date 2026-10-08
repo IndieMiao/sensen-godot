@@ -103,8 +103,10 @@ facing the room; standing behind a counter waits for the final scenes:
 
 ## Open
 
-- Keeper and door finger cards overlap near the spawn (placeholder anchors near the door); marker
-  avoidance comes with SGODOT-221's tag layer.
+- Keeper and door finger cards no longer overlap: each room has a `badge_keeper` point that lifts the
+  keeper's card clear above the door's (安其拉's design review of #14). Desktop render at the spawn:
+
+  ![Keeper and door cards apart](p0-outpost-rooms-2026-10-08/keeper-door-cards.jpg)
 - Seated pose not yet accepted by the art director; sitting while drinking is not done (see SGODOT-227).
 - NPC outfits are accepted as the P0 placeholder (art director, 2026-10-08). Shared hairstyles (Ama / Mei on
   41, Finn / Sigrid on 43), Old Kai not reading old enough and Pip's bag not being a mail satchel wait for the

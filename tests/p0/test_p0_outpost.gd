@@ -40,6 +40,11 @@ func test_the_outpost_table_and_anchor_files_agree() -> void:
 		assert_array(names).override_failure_message(str(o.id) + " spawn / exit").contains(["spawn", "exit"])
 		assert_array(names.filter(func(n): return n.begins_with("seat_"))).override_failure_message(str(o.id) + " seats").is_equal(o.seats)
 		assert_int(int(o.capacity)).is_equal(30 if str(o.role) == "market" else 12)
+		# The keeper's finger card has its own badge_ point, clear above the door's card (安其拉's review of #14).
+		var at := {}
+		for a in anchors: at[str(a.name)] = Vector3(a.position[0], a.position[1], a.position[2])
+		assert_bool(at.has("badge_keeper")).override_failure_message(str(o.id) + " badge_keeper").is_true()
+		assert_float(at.badge_keeper.y - (at.exit.y + 1.1)).override_failure_message(str(o.id) + " cards apart").is_greater(0.9)
 	assert_str(str(P0Outposts.by_role("tea").name)).is_equal("Lotus Tea House")
 
 func test_each_outpost_opens_with_its_keeper_and_residents() -> void:

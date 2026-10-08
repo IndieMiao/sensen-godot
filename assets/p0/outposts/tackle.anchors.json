@@ -4,6 +4,7 @@
     {"name": "use_counter", "position": [-0.47, 1.25, -2.62], "module": "sink_cabinet"},
     {"name": "stand_counter", "position": [-0.47, 0.085, -1.75], "yaw_degrees": 0},
     {"name": "npc_keeper", "position": [0.75, 0.085, -2.45], "yaw_degrees": 180},
+    {"name": "badge_keeper", "position": [0.35, 2.35, -2.45]},
     {"name": "npc_kai", "position": [-2.15, 0.085, 1.18], "yaw_degrees": -90},
     {"name": "stand_kai", "position": [-1.55, 0.085, 1.5], "yaw_degrees": 90},
     {"name": "use_fish_board", "position": [-0.48, 2.29, -2.87], "module": "wall_shelf"},
