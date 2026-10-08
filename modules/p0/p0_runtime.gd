@@ -9,7 +9,7 @@ extends Node
 ## (where the player is for the server: home / pond / outpost / mine; see space_of), p0_place() -> String (the
 ## catalog pond id inside a pond space), p0_frame(view, dt), p0_joystick(v),
 ## p0_tap(screen), p0_action(cmd), p0_event(ev, view), p0_anchor() -> Vector2, p0_zoom(f, at), p0_zoom_end(),
-## p0_recenter(), p0_show_spot(where), p0_energy_verb() -> String, p0_dev(step) -> bool,
+## p0_recenter(), p0_show_spot(where), p0_energy_verb() -> String, p0_near_resident() -> String, p0_dev(step) -> bool,
 ## p0_until(name) -> bool.
 
 const HomePanel = preload("res://scenes/p0/home/p0_home_panel.gd")
@@ -65,8 +65,11 @@ func _init() -> void:
 	ui.zoom.connect(func(f: float, at: Vector2): _call("p0_zoom", [f, at]))
 	ui.zoom_end.connect(func(): _call("p0_zoom_end", []))
 	ui.recenter.connect(func(): _call("p0_recenter", []))
-	ui.show_spot.connect(func(where: String): _call("p0_show_spot", [where]))
+	ui.show_spot.connect(_show_spot)
+	ui.show_on_map.connect(func(target: String): _leave_then("show:" + target))   # the map points at the pin (p0_map resume)
 	ui.can_show_spot = func() -> bool: return is_instance_valid(world) and world.has_method("p0_show_spot")
+	ui.near_resident = func() -> String:   # an outpost's resident within reach (Gift to <Name>, SGODOT-225)
+		return str(world.call("p0_near_resident")) if is_instance_valid(world) and world.has_method("p0_near_resident") else ""
 	ui.home_choice.connect(func(choice: String): _call("p0_home", [choice]))
 	ui.place_pressed.connect(leave_world)
 	ui.home_requested.connect(func(): _leave_then("farm"))
@@ -88,9 +91,13 @@ func attach(w: Node) -> void:
 	ui.end_stick()
 	world = w
 	session.space = space_of(w)   # before the read below, which tells the server where the player is
+	ui.space = session.space
 	session.place = str(w.call("p0_place")) if w.has_method("p0_place") else ""   # which pond (q(36))
 	if not session.busy and not session.view.is_empty(): session.refresh()   # entering a space reads fresh state
 	mark("attach " + str(w.name))
+	if _spot_after_room != "" and w.has_method("p0_show_spot"):   # stepped out of the farmhouse to show a farm spot
+		w.call_deferred("p0_show_spot", _spot_after_room)
+		_spot_after_room = ""
 	_first_frame.call_deferred(str(w.name))
 	ui.set_surface(str(w.call("p0_surface")) if w.has_method("p0_surface") else "farm")
 
@@ -116,6 +123,7 @@ func detach(w: Node) -> void:
 		ui.close_modal()
 		ui.set_surface("map")
 		session.space = "map"
+		ui.space = "map"
 		session.place = ""
 
 ## Back to the map (the place chip, LOCK-06): every P0 world stacked above it closes, the farm under the
@@ -157,6 +165,17 @@ static func leaves_itself(depth: int, root_is_map: bool) -> bool:
 func _root_is_map() -> bool:
 	var root := get_tree().current_scene if is_inside_tree() else null
 	return root != null and root.scene_file_path == MAP_SCENE
+
+## Show (LOCK-08, the camera only). In the farmhouse a farm target (plots, stall, bench …) steps out to the farm first,
+## which shows it once it is back (attach); the stove and the room's own spots show in the room (亚瑟 on #37).
+var _spot_after_room := ""
+
+func _show_spot(where: String) -> void:
+	if world is P0Room and session.space == "home" and not bool(_call("p0_has_spot", [where])):
+		_spot_after_room = where
+		leave_room()
+		return
+	_call("p0_show_spot", [where])
 
 ## One level back, for a room's door: the farm under the farmhouse, the map under an outpost.
 func leave_room() -> void:
@@ -266,6 +285,18 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				var lv: Dictionary = ev
 				ui.queue_card(func(): ui.show_level_up(lv))
 				session.report({"kind": "level_banner", "skill": str(lv.skill), "level": int(lv.level)})
+			"affinity":   # SGODOT-225 / 228: first chat of the day, gifts, requests
+				var reply := P0Logic.resident_reply(str(ev.get("resident", "")), str(ev.get("verdict", "")))
+				# On the resident's open bar: the Affinity pill over it and the answer in the bubble (RES-KAI-TALK).
+				if not ui.resident_affinity(ev, reply):
+					if int(ev.get("delta", 0)) != 0:
+						ui.float_text("♥ " + P0Ui.affinity_text(ev), at + Vector2(0, dy), UiTokens.COLOR_FLOAT_AFFINITY)
+					if reply != "": ui.toast(reply)
+			"gift_meal":
+				var who := str(P0Logic.content().get("residents", {}).get(str(ev.get("resident", "")), {}).get("name", ""))
+				# SGODOT-232: with the bag full the meal waits in the Inbox (to: parcel), gone at 04:00 like any gift meal.
+				if str(ev.get("to", "")) == "parcel": ui.toast("Bag full · %s's meal sent to Inbox" % who)
+				elif bool(ev.get("given", false)): ui.toast("%s gave you %s · in your bag" % [who, P0Logic.item_name(v, str(ev.get("dish", "")))])
 			"homestead":
 				# HOME-2 (SGODOT-228): HOME-1 closes, the MomentBanner says what changed; the farm swaps the fence.
 				if ui.modal_kind == "homestead": ui.close_modal()
@@ -274,10 +305,11 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	if ui.modal_kind == "stall" and events.size() > 0:
 		ui.set_view(session.current())
 		ui.open_stall()   # refresh after Buy / Sell / Deliver; floats say what changed
+	elif ui.modal_kind == "resident" and events.size() > 0:
+		ui.set_view(session.current())
+		ui.open_resident(ui._resident)   # affinity, gift and request states follow the reply
 	elif ui.modal_kind == "tackle" and events.size() > 0:
 		ui.open_tackle("Strung and ready — it's on your belt. Swap rods in Bag › Gear.")
-	elif ui.modal_kind == "gear" and events.size() == 0:
-		ui.open_gear()
 
 ## FISH-3 / FISH-5 (§6.6, 16 · FISH-2 → 3 / 5): the first catch of a species gets the catch card, later
 ## ones a float; a gate break-free gets the four-line card once per species, then "Got away · Lv4";
@@ -401,6 +433,13 @@ func _dev_shot(dt: float) -> void:
 			"release": ui.fab_held = false
 			"stall": ui.open_stall(step[1] if step.size() > 1 else "")
 			"bag": ui.open_bag(step[1] if step.size() > 1 else "")
+			"bagcat":   # bag drawer on one category tab, e.g. bagcat:Materials (SGODOT-225 storage stacks)
+				if ui._bag != null and is_instance_valid(ui._bag):
+					var i := P0BagDrawer.CATEGORIES.find(step[1])
+					if i >= 0: (ui._bag._chips.get_child(i) as Button).button_pressed = true
+			"bagpick":  # tap the first listed item of the open bag drawer
+				if ui._bag != null and is_instance_valid(ui._bag) and not ui._bag.grid.shown_items().is_empty():
+					ui._bag.grid.select(str(ui._bag.grid.shown_items().back().id))
 			"energy": ui.open_energy_card(3, "Sow ×1")
 			"close": ui.close_modal()
 			"auto":
@@ -412,6 +451,9 @@ func _dev_shot(dt: float) -> void:
 			"tackle": ui.open_tackle()
 			"gear": ui.open_gear()
 			"skills": ui.open_skills()
+			"profile": ui.open_profile()
+			"resident": ui.open_resident(step[1] if step.size() > 1 else "res_pip")   # SGODOT-225 dialogue bar
+			"resprofile": ui.open_resident_profile(ui._resident)                     # its name → profile sheet
 			"today": ui.open_today()
 			"energypanel": ui.open_energy_panel()
 			"inbox": ui.open_inbox()

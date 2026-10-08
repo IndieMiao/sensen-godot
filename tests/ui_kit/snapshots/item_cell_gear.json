@@ -93,7 +93,7 @@
                     0,
                     123,
                     52,
-                    16
+                    23
                   ],
                   "variation": "C9B",
                   "text": "Starter Rod"
@@ -168,7 +168,7 @@
                     64,
                     123,
                     52,
-                    16
+                    23
                   ],
                   "variation": "C9B",
                   "text": "Starter Hoe"
@@ -193,14 +193,14 @@
           "rect": [
             128,
             52,
-            52,
+            62,
             108
           ],
           "children": [
             {
               "type": "UiItemCell",
               "rect": [
-                128,
+                133,
                 52,
                 52,
                 88
@@ -209,7 +209,82 @@
                 {
                   "type": "Panel",
                   "rect": [
-                    128,
+                    133,
+                    68,
+                    52,
+                    52
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        146,
+                        81,
+                        27,
+                        27
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    133,
+                    51,
+                    52,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "Mining"
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    133,
+                    123,
+                    52,
+                    27
+                  ],
+                  "variation": "C9B",
+                  "text": "Starter Pickaxe"
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                128,
+                146,
+                62,
+                14
+              ],
+              "variation": "C9B",
+              "text": "two-line name"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            202,
+            52,
+            52,
+            108
+          ],
+          "children": [
+            {
+              "type": "UiItemCell",
+              "rect": [
+                202,
+                52,
+                52,
+                88
+              ],
+              "children": [
+                {
+                  "type": "Panel",
+                  "rect": [
+                    202,
                     68,
                     52,
                     52
@@ -218,7 +293,7 @@
                 {
                   "type": "Label",
                   "rect": [
-                    128,
+                    202,
                     51,
                     52,
                     14
@@ -229,20 +304,20 @@
                 {
                   "type": "Label",
                   "rect": [
-                    128,
+                    202,
                     123,
                     52,
-                    16
+                    23
                   ],
                   "variation": "C9B",
-                  "text": ""
+                  "text": "Empty"
                 }
               ]
             },
             {
               "type": "Label",
               "rect": [
-                128,
+                202,
                 146,
                 52,
                 14

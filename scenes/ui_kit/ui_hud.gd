@@ -55,7 +55,7 @@ var data := {
 	energy = 0, energy_max = 200, regen = "Full", next_cost = 0,
 	skills = {farming = 0.0, fishing = 0.0},
 	coins = 0, unread = 0, buff = {}, today = "",
-	place = {city = "", space = "", kind = PlaceKind.HOME, day_pass = ""},
+	place = {city = "", space = "", kind = PlaceKind.HOME, day_pass = "", helping = false},
 }
 var safe_top := 0.0: set = set_safe_top
 ## Hide the coins / bell corner while a world docks its own close button there (P0 fishing).
@@ -135,11 +135,20 @@ static func skill_arcs(farming: float, fishing: float) -> Dictionary:
 		fishing = Vector2(-90.0 - _SKILL_GAP, -90.0 - _SKILL_GAP - span * g),
 	}
 
+## The chip's third segment (LOCK-06 v1.9): `Helping` while helping on someone's farm (it wins over a pass),
+## else `Day Pass 23h` while a pass runs; none once the pass has run out (its end is told by a D8 banner).
+## Helping and the pass are P2 social; P0 never sets them, but the chip keeps room for either.
+static func place_tail(place: Dictionary) -> String:
+	if bool(place.get("helping", false)): return "Helping"
+	if str(place.get("day_pass", "")) != "": return "Day Pass " + str(place.day_pass)
+	return ""
+
 ## `City · Space`, plus `· Day Pass 23h` when one is running. Arrived-but-not-in-a-space reads
 ## `Tokyo · Arrived` (the caller passes space "Arrived").
 static func place_text(place: Dictionary) -> String:
 	var parts := [str(place.get("city", "")), str(place.get("space", ""))]
-	if str(place.get("day_pass", "")) != "": parts.append("Day Pass " + str(place.day_pass))
+	var tail := place_tail(place)
+	if tail != "": parts.append(tail)
 	return " · ".join(parts.filter(func(p): return p != ""))
 
 func set_show_balances(v: bool) -> void:
@@ -355,7 +364,8 @@ func _refresh() -> void:
 	var space := str(place.get("space", ""))
 	_place_city.text = city + (" · " if city != "" and space != "" else "")
 	_place_space.text = space
-	_place_suffix.text = " · Day Pass " + str(place.day_pass) if str(place.get("day_pass", "")) != "" else ""
+	var tail := place_tail(place)
+	_place_suffix.text = " · " + tail if tail != "" else ""
 	_fit_space()
 
 ## Truncates the space first (`Tokyo · Arr… · Day Pass 23h`). Done by hand: Godot's TRIM_ELLIPSIS only adds

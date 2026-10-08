@@ -4,7 +4,7 @@
     0,
     0,
     328,
-    226
+    196
   ],
   "children": [
     {
@@ -35,7 +35,7 @@
         0,
         70,
         328,
-        156
+        126
       ],
       "children": [
         {
@@ -44,75 +44,86 @@
             0,
             70,
             328,
-            44
+            34
           ],
           "children": [
             {
-              "type": "Button",
+              "type": "HBoxContainer",
               "rect": [
-                0,
-                70,
-                161,
-                44
+                3,
+                73,
+                322,
+                28
               ],
-              "variation": "SegmentTab",
-              "text": "",
-              "pressed": true,
               "children": [
                 {
-                  "type": "HBoxContainer",
+                  "type": "Button",
                   "rect": [
-                    0,
-                    70,
-                    161,
-                    44
+                    3,
+                    73,
+                    160,
+                    28
                   ],
+                  "variation": "SegmentTab",
+                  "text": "",
+                  "pressed": true,
                   "children": [
                     {
-                      "type": "Label",
+                      "type": "HBoxContainer",
                       "rect": [
-                        67,
-                        82,
-                        26,
-                        20
+                        3,
+                        73,
+                        160,
+                        28
                       ],
-                      "variation": "BodyB14",
-                      "text": "Bag"
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            71,
+                            78,
+                            23,
+                            18
+                          ],
+                          "variation": "C12XB",
+                          "text": "Bag"
+                        }
+                      ]
                     }
                   ]
-                }
-              ]
-            },
-            {
-              "type": "Button",
-              "rect": [
-                167,
-                70,
-                161,
-                44
-              ],
-              "variation": "SegmentTab",
-              "text": "",
-              "children": [
+                },
                 {
-                  "type": "HBoxContainer",
+                  "type": "Button",
                   "rect": [
-                    167,
-                    70,
-                    161,
-                    44
+                    165,
+                    73,
+                    160,
+                    28
                   ],
+                  "variation": "SegmentTab",
+                  "text": "",
                   "children": [
                     {
-                      "type": "Label",
+                      "type": "HBoxContainer",
                       "rect": [
-                        231,
-                        82,
-                        32,
-                        20
+                        165,
+                        73,
+                        160,
+                        28
                       ],
-                      "variation": "BodyB14",
-                      "text": "Gear"
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            231,
+                            78,
+                            27,
+                            18
+                          ],
+                          "variation": "C12B",
+                          "text": "Gear"
+                        }
+                      ]
                     }
                   ]
                 }
@@ -124,88 +135,99 @@
           "type": "UiSegmentTab",
           "rect": [
             0,
-            126,
+            116,
             328,
-            44
+            34
           ],
           "children": [
             {
-              "type": "Button",
+              "type": "HBoxContainer",
               "rect": [
-                0,
-                126,
-                161,
-                44
+                3,
+                119,
+                322,
+                28
               ],
-              "variation": "SegmentTab",
-              "text": "",
               "children": [
                 {
-                  "type": "HBoxContainer",
+                  "type": "Button",
                   "rect": [
-                    0,
-                    126,
-                    161,
-                    44
+                    3,
+                    119,
+                    160,
+                    28
                   ],
+                  "variation": "SegmentTab",
+                  "text": "",
                   "children": [
                     {
-                      "type": "Label",
+                      "type": "HBoxContainer",
                       "rect": [
-                        34,
-                        138,
-                        65,
-                        20
+                        3,
+                        119,
+                        160,
+                        28
                       ],
-                      "variation": "BodyB14",
-                      "text": "Cookbook"
-                    },
-                    {
-                      "type": "Label",
-                      "rect": [
-                        105,
-                        140,
-                        22,
-                        15
-                      ],
-                      "variation": "C10B",
-                      "text": "4/48"
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            41,
+                            124,
+                            56,
+                            18
+                          ],
+                          "variation": "C12B",
+                          "text": "Cookbook"
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            103,
+                            125,
+                            22,
+                            15
+                          ],
+                          "variation": "C10B",
+                          "text": "4/48"
+                        }
+                      ]
                     }
                   ]
-                }
-              ]
-            },
-            {
-              "type": "Button",
-              "rect": [
-                167,
-                126,
-                161,
-                44
-              ],
-              "variation": "SegmentTab",
-              "text": "",
-              "pressed": true,
-              "children": [
+                },
                 {
-                  "type": "HBoxContainer",
+                  "type": "Button",
                   "rect": [
-                    167,
-                    126,
-                    161,
-                    44
+                    165,
+                    119,
+                    160,
+                    28
                   ],
+                  "variation": "SegmentTab",
+                  "text": "",
+                  "pressed": true,
                   "children": [
                     {
-                      "type": "Label",
+                      "type": "HBoxContainer",
                       "rect": [
-                        210,
-                        138,
-                        75,
-                        20
+                        165,
+                        119,
+                        160,
+                        28
                       ],
-                      "variation": "BodyB14",
-                      "text": "Experiment"
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            212,
+                            124,
+                            66,
+                            18
+                          ],
+                          "variation": "C12XB",
+                          "text": "Experiment"
+                        }
+                      ]
                     }
                   ]
                 }
@@ -217,112 +239,123 @@
           "type": "UiSegmentTab",
           "rect": [
             0,
-            182,
+            162,
             328,
-            44
+            34
           ],
           "children": [
             {
-              "type": "Button",
+              "type": "HBoxContainer",
               "rect": [
-                0,
-                182,
-                105,
-                44
+                3,
+                165,
+                322,
+                28
               ],
-              "variation": "SegmentTab",
-              "text": "",
               "children": [
                 {
-                  "type": "HBoxContainer",
+                  "type": "Button",
                   "rect": [
-                    0,
-                    182,
-                    105,
-                    44
+                    3,
+                    165,
+                    106,
+                    28
                   ],
+                  "variation": "SegmentTab",
+                  "text": "",
                   "children": [
                     {
-                      "type": "Label",
+                      "type": "HBoxContainer",
                       "rect": [
-                        34,
-                        194,
-                        36,
-                        20
+                        3,
+                        165,
+                        106,
+                        28
                       ],
-                      "variation": "BodyB14",
-                      "text": "To do"
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            40,
+                            170,
+                            31,
+                            18
+                          ],
+                          "variation": "C12B",
+                          "text": "To do"
+                        }
+                      ]
                     }
                   ]
-                }
-              ]
-            },
-            {
-              "type": "Button",
-              "rect": [
-                111,
-                182,
-                105,
-                44
-              ],
-              "variation": "SegmentTab",
-              "text": "",
-              "pressed": true,
-              "children": [
+                },
                 {
-                  "type": "HBoxContainer",
+                  "type": "Button",
                   "rect": [
                     111,
-                    182,
-                    105,
-                    44
+                    165,
+                    106,
+                    28
                   ],
+                  "variation": "SegmentTab",
+                  "text": "",
+                  "pressed": true,
                   "children": [
                     {
-                      "type": "Label",
+                      "type": "HBoxContainer",
                       "rect": [
-                        139,
-                        194,
-                        48,
-                        20
+                        111,
+                        165,
+                        106,
+                        28
                       ],
-                      "variation": "BodyB14",
-                      "text": "Parcels"
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            143,
+                            170,
+                            42,
+                            18
+                          ],
+                          "variation": "C12XB",
+                          "text": "Parcels"
+                        }
+                      ]
                     }
                   ]
-                }
-              ]
-            },
-            {
-              "type": "Button",
-              "rect": [
-                222,
-                182,
-                106,
-                44
-              ],
-              "variation": "SegmentTab",
-              "text": "",
-              "children": [
+                },
                 {
-                  "type": "HBoxContainer",
+                  "type": "Button",
                   "rect": [
-                    222,
-                    182,
+                    219,
+                    165,
                     106,
-                    44
+                    28
                   ],
+                  "variation": "SegmentTab",
+                  "text": "",
                   "children": [
                     {
-                      "type": "Label",
+                      "type": "HBoxContainer",
                       "rect": [
-                        247,
-                        194,
-                        55,
-                        20
+                        219,
+                        165,
+                        106,
+                        28
                       ],
-                      "variation": "BodyB14",
-                      "text": "Updates"
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            248,
+                            170,
+                            47,
+                            18
+                          ],
+                          "variation": "C12B",
+                          "text": "Updates"
+                        }
+                      ]
                     }
                   ]
                 }

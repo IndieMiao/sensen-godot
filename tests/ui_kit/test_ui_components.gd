@@ -117,7 +117,9 @@ func test_quick_only_states_fall_back_to_default_on_other_mains() -> void:
 		var c: UiItemCell = auto_free(UiItemCell.new(d))
 		for s in [UiItemCell.State.LIFTED, UiItemCell.State.DROP_TARGET, UiItemCell.State.ZERO]:
 			c.state = s
-			assert_int(c.drawn_state()).is_equal(UiItemCell.State.DEFAULT)
+			# InventoryCell has its own lifted look (1641:34159, the bag's way onto the quick bar, SGODOT-225)
+			var lifted_here: bool = d == UiItemCell.Density.INVENTORY and s == UiItemCell.State.LIFTED
+			assert_int(c.drawn_state()).is_equal(UiItemCell.State.LIFTED if lifted_here else UiItemCell.State.DEFAULT)
 		c.state = UiItemCell.State.GHOST
 		assert_int(c.drawn_state()).is_equal(UiItemCell.State.EMPTY)
 
@@ -378,8 +380,12 @@ func test_interactive_components_keep_a_44_hit_area() -> void:
 	await _settle()
 	for b in box.find_children("*", "BaseButton", true, false):
 		var size: Vector2 = (b as Control).size
-		assert_bool(size.x >= UiTokens.SIZE_TOUCH and size.y >= UiTokens.SIZE_TOUCH) \
-			.override_failure_message("%s is %s" % [b.get_class(), size]).is_true()
+		# A control drawn smaller than 44 (SegmentedTabs 28, Show pills) grows its touch area through _has_point.
+		var c := size * 0.5
+		var h := UiTokens.SIZE_TOUCH * 0.5 - 0.5
+		var touch := (size.x >= UiTokens.SIZE_TOUCH and size.y >= UiTokens.SIZE_TOUCH) or \
+			[c + Vector2(-h, -h), c + Vector2(h, -h), c + Vector2(-h, h), c + Vector2(h, h)].all(func(p): return (b as Control)._has_point(p))
+		assert_bool(touch).override_failure_message("%s is %s" % [b.get_class(), size]).is_true()
 
 func test_segment_tab_keeps_exactly_one_selected() -> void:
 	var seg: UiSegmentTab = _host(UiSegmentTab.new([{label = "Cookbook", count = "4/48"}, "Experiment"], 0))

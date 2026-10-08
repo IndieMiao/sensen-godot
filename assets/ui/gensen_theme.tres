@@ -525,7 +525,9 @@ content_margin_top = 0.0
 content_margin_right = 12.0
 content_margin_bottom = 0.0
 script = ExtResource("1_ntiah")
-bg_color = Color(0.24313726, 0.49019608, 0.2627451, 1)
+bg_color = Color(0.9254902, 0.95686275, 0.90588236, 1)
+border_color = Color(0.24313726, 0.49019608, 0.2627451, 1)
+border_width = 1.0
 corner_radius = Vector4(13, 13, 13, 13)
 visual_height = 26.0
 
@@ -618,42 +620,37 @@ corner_radius = Vector4(14, 14, 14, 14)
 [sub_resource type="StyleBox" id="StyleBox_eofoj"]
 resource_local_to_scene = false
 resource_name = ""
-content_margin_left = 12.0
+content_margin_left = 6.0
 content_margin_top = 0.0
-content_margin_right = 12.0
+content_margin_right = 6.0
 content_margin_bottom = 0.0
 script = ExtResource("1_ntiah")
-bg_color = Color(0.8392157, 0.8352941, 0.80784315, 1)
-border_width = 1.0
-corner_radius = Vector4(22, 22, 22, 22)
+corner_radius = Vector4(14, 14, 14, 14)
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_jm0ar"]
 
 [sub_resource type="StyleBox" id="StyleBox_kses3"]
 resource_local_to_scene = false
 resource_name = ""
-content_margin_left = 12.0
+content_margin_left = 6.0
 content_margin_top = 0.0
-content_margin_right = 12.0
+content_margin_right = 6.0
 content_margin_bottom = 0.0
 script = ExtResource("1_ntiah")
-bg_color = Color(0.9843137, 0.972549, 0.94509804, 1)
-border_color = Color(0.88235295, 0.85490197, 0.78431374, 1)
-border_width = 1.0
-corner_radius = Vector4(22, 22, 22, 22)
+corner_radius = Vector4(14, 14, 14, 14)
 
 [sub_resource type="StyleBox" id="StyleBox_dtwim"]
 resource_local_to_scene = false
 resource_name = ""
-content_margin_left = 12.0
+content_margin_left = 6.0
 content_margin_top = 0.0
-content_margin_right = 12.0
+content_margin_right = 6.0
 content_margin_bottom = 0.0
 script = ExtResource("1_ntiah")
-bg_color = Color(0.9254902, 0.95686275, 0.90588236, 1)
+bg_color = Color(1, 1, 1, 1)
 border_color = Color(0.24313726, 0.49019608, 0.2627451, 1)
 border_width = 1.0
-corner_radius = Vector4(22, 22, 22, 22)
+corner_radius = Vector4(14, 14, 14, 14)
 
 [sub_resource type="StyleBox" id="StyleBox_m10n5"]
 resource_local_to_scene = false
@@ -998,8 +995,8 @@ FilterChip/colors/font_color = Color(0.3647059, 0.41568628, 0.38431373, 1)
 FilterChip/colors/font_disabled_color = Color(0.5411765, 0.5686275, 0.54901963, 1)
 FilterChip/colors/font_focus_color = Color(0.3647059, 0.41568628, 0.38431373, 1)
 FilterChip/colors/font_hover_color = Color(0.3647059, 0.41568628, 0.38431373, 1)
-FilterChip/colors/font_hover_pressed_color = Color(0.9843137, 0.972549, 0.94509804, 1)
-FilterChip/colors/font_pressed_color = Color(0.9843137, 0.972549, 0.94509804, 1)
+FilterChip/colors/font_hover_pressed_color = Color(0.24313726, 0.49019608, 0.2627451, 1)
+FilterChip/colors/font_pressed_color = Color(0.24313726, 0.49019608, 0.2627451, 1)
 FilterChip/constants/h_separation = 6
 FilterChip/font_sizes/font_size = 11
 FilterChip/fonts/font = ExtResource("2_wkic2")
@@ -1016,12 +1013,12 @@ InfoSheet/styles/panel = SubResource("StyleBox_5u0iy")
 Label/colors/font_color = Color(0.18431373, 0.22745098, 0.2, 1)
 Label/constants/line_spacing = 0
 NavCompact/base_type = &"Button"
-NavCompact/colors/font_color = Color(0.24313726, 0.49019608, 0.2627451, 1)
+NavCompact/colors/font_color = Color(0.25882354, 0.41568628, 0.53333336, 1)
 NavCompact/colors/font_disabled_color = Color(0.5411765, 0.5686275, 0.54901963, 1)
-NavCompact/colors/font_focus_color = Color(0.24313726, 0.49019608, 0.2627451, 1)
-NavCompact/colors/font_hover_color = Color(0.24313726, 0.49019608, 0.2627451, 1)
-NavCompact/colors/font_hover_pressed_color = Color(0.24313726, 0.49019608, 0.2627451, 1)
-NavCompact/colors/font_pressed_color = Color(0.24313726, 0.49019608, 0.2627451, 1)
+NavCompact/colors/font_focus_color = Color(0.25882354, 0.41568628, 0.53333336, 1)
+NavCompact/colors/font_hover_color = Color(0.25882354, 0.41568628, 0.53333336, 1)
+NavCompact/colors/font_hover_pressed_color = Color(0.25882354, 0.41568628, 0.53333336, 1)
+NavCompact/colors/font_pressed_color = Color(0.25882354, 0.41568628, 0.53333336, 1)
 NavCompact/constants/h_separation = 6
 NavCompact/font_sizes/font_size = 12
 NavCompact/fonts/font = ExtResource("2_wkic2")
@@ -1085,7 +1082,7 @@ SegmentTab/colors/font_hover_color = Color(0.3647059, 0.41568628, 0.38431373, 1)
 SegmentTab/colors/font_hover_pressed_color = Color(0.24313726, 0.49019608, 0.2627451, 1)
 SegmentTab/colors/font_pressed_color = Color(0.24313726, 0.49019608, 0.2627451, 1)
 SegmentTab/constants/h_separation = 6
-SegmentTab/font_sizes/font_size = 14
+SegmentTab/font_sizes/font_size = 12
 SegmentTab/fonts/font = ExtResource("2_wkic2")
 SegmentTab/styles/disabled = SubResource("StyleBox_eofoj")
 SegmentTab/styles/focus = SubResource("StyleBoxEmpty_jm0ar")

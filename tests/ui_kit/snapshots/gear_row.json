@@ -1,0 +1,357 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    281
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiGearRow"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        18
+      ],
+      "variation": "CaptionR12",
+      "text": "Gear candidate rows of BAG-2 · Gear · LOCK-13"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        52,
+        328,
+        229
+      ],
+      "children": [
+        {
+          "type": "PanelContainer",
+          "rect": [
+            0,
+            52,
+            77,
+            20
+          ],
+          "children": [
+            {
+              "type": "Label",
+              "rect": [
+                8,
+                54,
+                61,
+                16
+              ],
+              "variation": "C11XB",
+              "text": "✓ Equipped"
+            }
+          ]
+        },
+        {
+          "type": "UiGearRow",
+          "rect": [
+            0,
+            72,
+            328,
+            65
+          ],
+          "children": [
+            {
+              "type": "HBoxContainer",
+              "rect": [
+                0,
+                72,
+                328,
+                65
+              ],
+              "children": [
+                {
+                  "type": "MarginContainer",
+                  "rect": [
+                    0,
+                    72,
+                    29,
+                    65
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        5,
+                        72,
+                        24,
+                        24
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "VBoxContainer",
+                  "rect": [
+                    38,
+                    76,
+                    290,
+                    57
+                  ],
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        38,
+                        76,
+                        290,
+                        18
+                      ],
+                      "variation": "C12XB",
+                      "text": "Starter Rod"
+                    },
+                    {
+                      "type": "PanelContainer",
+                      "rect": [
+                        38,
+                        96,
+                        77,
+                        20
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            46,
+                            98,
+                            61,
+                            16
+                          ],
+                          "variation": "C11XB",
+                          "text": "✓ Equipped"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Label",
+                      "rect": [
+                        38,
+                        118,
+                        290,
+                        15
+                      ],
+                      "variation": "C10B",
+                      "text": "Lands up to Fine fish · Bite window 2.2 s"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "UiGearRow",
+          "rect": [
+            0,
+            137,
+            328,
+            65
+          ],
+          "children": [
+            {
+              "type": "HBoxContainer",
+              "rect": [
+                0,
+                137,
+                328,
+                65
+              ],
+              "children": [
+                {
+                  "type": "MarginContainer",
+                  "rect": [
+                    0,
+                    137,
+                    29,
+                    65
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        5,
+                        137,
+                        24,
+                        24
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "VBoxContainer",
+                  "rect": [
+                    38,
+                    143,
+                    216,
+                    52
+                  ],
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        38,
+                        143,
+                        216,
+                        18
+                      ],
+                      "variation": "C12XB",
+                      "text": "Reed Rod"
+                    },
+                    {
+                      "type": "Label",
+                      "rect": [
+                        38,
+                        163,
+                        216,
+                        15
+                      ],
+                      "variation": "C10B",
+                      "text": "Owned"
+                    },
+                    {
+                      "type": "Label",
+                      "rect": [
+                        38,
+                        180,
+                        216,
+                        15
+                      ],
+                      "variation": "C10B",
+                      "text": "Lands up to Rare fish · Bite window 2.6 s"
+                    }
+                  ]
+                },
+                {
+                  "type": "UiCommandButton",
+                  "rect": [
+                    263,
+                    147,
+                    65,
+                    44
+                  ],
+                  "variation": "CmdPrimaryCompact",
+                  "text": "Equip"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "UiGearRow",
+          "rect": [
+            0,
+            202,
+            328,
+            65
+          ],
+          "children": [
+            {
+              "type": "HBoxContainer",
+              "rect": [
+                0,
+                202,
+                328,
+                65
+              ],
+              "children": [
+                {
+                  "type": "MarginContainer",
+                  "rect": [
+                    0,
+                    202,
+                    29,
+                    65
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        5,
+                        202,
+                        24,
+                        24
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "VBoxContainer",
+                  "rect": [
+                    38,
+                    208,
+                    290,
+                    52
+                  ],
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        38,
+                        208,
+                        290,
+                        18
+                      ],
+                      "variation": "C12XB",
+                      "text": "Carbon Rod"
+                    },
+                    {
+                      "type": "Label",
+                      "rect": [
+                        38,
+                        228,
+                        290,
+                        15
+                      ],
+                      "variation": "C10B",
+                      "text": "Fishing Lv6 · 350 coins at the Tackle Shop"
+                    },
+                    {
+                      "type": "Label",
+                      "rect": [
+                        38,
+                        245,
+                        290,
+                        15
+                      ],
+                      "variation": "C10B",
+                      "text": "Lands up to Legendary fish"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            267,
+            328,
+            14
+          ],
+          "variation": "C9B",
+          "text": "locked · P1 only (BAG-2 lists Starter and Reed in P0)"
+        }
+      ]
+    }
+  ]
+}

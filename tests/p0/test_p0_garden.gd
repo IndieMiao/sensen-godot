@@ -25,7 +25,7 @@ func test_beds_can_be_walked_on_but_facilities_and_rocks_block() -> void:
 		assert_bool(grid.path(spawn, c).is_empty()).is_false()
 		assert_bool(P0Garden.on_bed(bp, bp.cell_to_world(c))).is_true()
 		assert_bool(P0Garden.on_bed(bp, bp.cell_to_world(c + Vector2i(1, 0)))).is_false()
-	for key in ["house", "storage", "well", "mine"]:
+	for key in ["house", "storage", "well", "mine", "bench"]:
 		assert_bool(bp.is_walkable(bp.anchor(key))).is_false()
 	var rock := bp.cell_to_world(Vector2i(18, 5))
 	P0Garden.block_points(bp, [rock])
