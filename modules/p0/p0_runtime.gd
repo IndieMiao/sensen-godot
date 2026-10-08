@@ -960,6 +960,17 @@ func _dev_shot(dt: float) -> void:
 				ui.set_view(session.current())
 				ui.set_action(P0Logic.fish_action(session.current(), ""))
 			"creeltap": ui._creel.pressed.emit()   # a tap on the creel badge
+			"stage":   # stage:res_pip:Trusted — a resident's affinity stage set locally from the content table (225 tone shots)
+				var sv: Dictionary = session.view.duplicate(true)
+				var stages: Array = P0Logic.content().get("affinity", {}).get("stages", [])
+				var i := P0Logic.affinity_stage_index(step[2])
+				var nxt: Variant = stages[i + 1] if i + 1 < stages.size() else null
+				var r: Dictionary = sv.get("residents", {}).get(step[1], {})
+				r.merge({"stage": str(stages[i][0]), "stage_from": int(stages[i][1]), "affinity": int(stages[i][1]) + 7,
+					"next_stage": str(nxt[0]) if nxt != null else null, "next_at": int(nxt[1]) if nxt != null else null}, true)
+				session.view = sv
+				session.busy = true   # dev only: no answer replaces the made-up stage
+				ui.set_view(session.current())
 			"resprofile": ui.open_resident_profile(step[1] if step.size() > 1 else ui._resident)   # resprofile[:res_old_kai]
 			# SGODOT-233 result moments, shown directly: catchcard:<fish>, gotaway:<fish>:level|rod
 			"catchcard": ui.show_catch(step[1], int(P0Logic.item(session.current(), step[1]).get("rarity", 1)), 15, {"energy": 20})

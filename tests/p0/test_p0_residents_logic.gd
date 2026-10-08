@@ -86,6 +86,14 @@ func test_resident_bar_reads_facts_and_the_content_table() -> void:
 	assert_bool(bool(b.lesson)).is_false()
 	assert_dict(P0Logic.resident_bar(_res({}), "res_nobody")).is_empty()
 
+func test_the_stage_index_follows_the_content_table_and_reads_unknown_as_stranger() -> void:
+	assert_int(int(P0Logic.resident_bar(_res({}), "res_pip").stage_index)).is_equal(1)   # Acquainted
+	for i in 5:
+		var name := str(["Stranger", "Acquainted", "Familiar", "Trusted", "Kindred"][i])
+		assert_int(P0Logic.affinity_stage_index(name)).is_equal(i)
+	assert_int(P0Logic.affinity_stage_index("")).is_equal(0)
+	assert_int(P0Logic.affinity_stage_index("Soulmate")).is_equal(0)
+
 func test_resident_bar_request_states() -> void:
 	var req := {"id": "req_res_pip_1", "kind": "fish", "rarity": 1, "qty": 1, "coins": 20, "have": 0, "ready": false}
 	var open := P0Logic.resident_bar(_res({"request": req, "request_state": "open"}), "res_pip")

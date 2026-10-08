@@ -1076,13 +1076,21 @@ static func resident_bar(view: Dictionary, id: String) -> Dictionary:
 	var note := ""
 	return {
 		"id": id, "portrait": str(def.get("portrait", "")), "name": str(def.get("name", "")), "role": str(def.get("role", "")),
-		"stage": stage, "have": int(r.get("affinity", 0)),
+		"stage": stage, "stage_index": affinity_stage_index(stage), "have": int(r.get("affinity", 0)),
 		"need": int(r.get("next_at", r.get("affinity", 0))) if r.get("next_at", null) != null else int(r.get("affinity", 0)),
 		"next": str(r.get("next_stage", "")) if r.get("next_stage", null) != null else "",
 		"line": line, "gift_reason": gift_reason,
 		"request_label": label, "request_reason": reason, "request_cmd": cmd,
 		"meal": meal == "given" and not gift_meal(view, id).is_empty(), "meal_note": note, "lesson": false,
 	}
+
+## The affinity stage's place in content affinity.stages (Stranger 0 … Kindred 4; 0 for a name it does not know): the
+## stage label's tone follows it (用户 on 225 验收, 不知火舞's palette).
+static func affinity_stage_index(stage: String) -> int:
+	var stages: Array = content().get("affinity", {}).get("stages", [])
+	for i in stages.size():
+		if str((stages[i] as Array)[0]) == stage: return i
+	return 0
 
 ## Where today's gift meal from resident `id` is (§3.4.5): {at: "bag", item} for the stack they gave (it carries
 ## `from`), {at: "inbox", item} for the parcel it became with the bag full; {} once it is eaten, passed on or gone.
