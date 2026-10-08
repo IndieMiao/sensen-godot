@@ -106,7 +106,9 @@
 | 位置 | 应出现 |
 |---|---|
 | HUD ★ | 两行 HUD 常驻，底部只有 `Bag`；没有旧底栏 `Map / Farm / Me`；P0 不显示 `Nearby Cities`（q(50)） |
-| pin 卡按钮 ★ | 农场 `Go home · Free`；据点与鱼塘 `Go` |
+| pin 卡按钮 ★ | 农场 `Go home · Free`；据点与鱼塘 `Go`；玩家就在这里时改 `Back to Homestead` / `Back to Lotus Tea House` / `Back to Reed Pond`，并且不显示 Distance 行（q(80)） |
+| 家的 pin 与卡 ★ | 名牌 `Homestead`（不再写 `My Farm`）；卡 `Homestead` / `Your farm` / `Distance 0.8 km`（q(80)） |
+| 据点卡 ★ | `Lotus Tea House` / `Tea house · Hot tea`（其他：`Tackle shop · Rods and bait` / `Market square · Requests` / `Travel post · Coffee`）/ `Distance 0.8 km` / `Online now 3`（0 人整行不显示）/ `Go`（q(80)） |
 | 据点 pin | `Lotus Tea House · 3 online`；没人在时只写名字 `Lotus Tea House`；P0 城市级不聚合，每处一枚 pin，不出 `×N`（q(72)） |
 | 标记 | P0 只有绿 ✓ / 金 ! / 青 ◆，没有 🔒 与 ★（q(48)） |
 
