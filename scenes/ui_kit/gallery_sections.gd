@@ -65,6 +65,8 @@ static func all() -> Array[Dictionary]:
 		# SGODOT-224 panels
 		{id = "info_sheet", title = "UiInfoSheet", figma = "Compact/SelectedItem 633:41257 · BAG-1 482:10 · F-07 (SGODOT-207 168a4cc3)", build = _info_sheets},
 		{id = "shop_row", title = "UiShopRow · UiStepper", figma = "Compact/ShopProduct 702:80447 · Compact/Stepper 1245:108953 · FARM-6 482:46 · C1-01", build = _shop_rows},
+		# SGODOT-231 workbench
+		{id = "blueprint_card", title = "UiBlueprintCard", figma = "BlueprintCard 1434:93844 · B2-06 · LOCK-10 / 29", build = _blueprint_cards},
 	]
 	return out
 
@@ -1009,6 +1011,36 @@ static func _entry_cards() -> Control:
 		var c := UiEntryCard.new(it[0], it[1], it[2])
 		if it[3]: c.point_at(1000.0)
 		v.add_child(_captioned(c, it[4]))
+	return v
+
+## B2-06's cards: Tools (a gap on the button, craftable, Equip, Equipped, Owned · always on) and Supplies (Craft with
+## You get / You have, No room, the Farming Lv3 gate).
+static func _blueprint_cards() -> Control:
+	var v := _column(10)
+	var P := UiBlueprintCard.Kind.PRIMARY
+	var S := UiBlueprintCard.Kind.SECONDARY
+	var U := UiBlueprintCard.Kind.UNAVAILABLE
+	var ore := func(have: int) -> Dictionary: return {"icon": _tex("copper_ore"), "name": "Copper Ore", "have": have, "need": 5}
+	var wood := func(need: int) -> Dictionary: return {"icon": _tex("wood"), "name": "Timber", "have": 17, "need": need}
+	var reeds := func(need: int) -> Dictionary: return {"icon": _tex("fiber"), "name": "Reeds", "have": 8, "need": need}
+	for it in [
+			[{"icon": _tex("pick_copper"), "name": "Copper Pickaxe", "effect": "2 Stone per rock", "materials": [ore.call(4), wood.call(4)],
+				"button": {"label": "Need 1 more Copper Ore", "kind": U}}, "Tools · a gap on the button"],
+			[{"icon": _tex("gather_gloves"), "name": "Gather Gloves", "effect": "+1 at every gathering spot", "materials": [reeds.call(8), wood.call(4)],
+				"button": {"label": "Craft", "kind": P}}, "Tools · craftable"],
+			[{"icon": _tex("pick_copper"), "name": "Copper Pickaxe", "effect": "2 Stone per rock", "button": {"label": "Equip", "kind": S}}, "owned · Equip"],
+			[{"icon": _tex("pick_copper"), "name": "Copper Pickaxe", "effect": "2 Stone per rock", "button": {"label": "Equipped", "kind": U}}, "equipped"],
+			[{"icon": _tex("gather_gloves"), "name": "Gather Gloves", "effect": "+1 at every gathering spot",
+				"button": {"label": "Owned · always on", "kind": U}}, "passive · owned"],
+			[{"icon": _tex("torch"), "name": "Torch", "effect": "See what rocks hold", "yield": "You get 2", "have": "You have 6",
+				"materials": [wood.call(1), reeds.call(1)], "button": {"label": "Craft", "kind": P}}, "Supplies · craftable"],
+			[{"icon": _tex("torch"), "name": "Torch", "effect": "See what rocks hold", "yield": "You get 2", "have": "You have 6",
+				"materials": [wood.call(1), reeds.call(1)], "button": {"label": "No room · free a slot first", "kind": U}}, "Supplies · bag full"],
+			[{"icon": _tex("compost"), "name": "Compost", "effect": "Crops ready 20% sooner", "yield": "You get 2", "have": "You have 0",
+				"materials": [reeds.call(2), wood.call(1)], "button": {"label": "Farming Lv3", "kind": U}}, "Supplies · skill gate"]]:
+		var c := UiBlueprintCard.new(it[0])
+		c.custom_minimum_size.x = 328
+		v.add_child(_captioned(c, it[1]))
 	return v
 
 static func _quality_badges() -> Control:
