@@ -8,9 +8,11 @@ extends Node
 ## A world implements (all optional; interiors extend P0Room): p0_surface() -> String, p0_space() -> String
 ## (where the player is for the server: home / pond / outpost / mine; see space_of), p0_place() -> String (the
 ## catalog pond id inside a pond space), p0_frame(view, dt), p0_joystick(v),
-## p0_tap(screen), p0_action(cmd), p0_event(ev, view), p0_anchor() -> Vector2, p0_zoom(f),
+## p0_tap(screen), p0_action(cmd), p0_event(ev, view), p0_anchor() -> Vector2, p0_zoom(f), p0_zoom_end(),
 ## p0_recenter(), p0_show_spot(where), p0_energy_verb() -> String, p0_dev(step) -> bool,
 ## p0_until(name) -> bool.
+
+const MAP_SCENE := "res://scenes/p0/p0_map.tscn"
 
 static var _instance: P0Runtime
 
@@ -60,6 +62,7 @@ func _init() -> void:
 	session.src_of = src_of_press
 	ui.dev_skip.connect(func(m): session.dev_skip(m); ui.toast("Clock +%dh (dev)" % (m / 60)))
 	ui.zoom.connect(func(f: float): _call("p0_zoom", [f]))
+	ui.zoom_end.connect(func(): _call("p0_zoom_end", []))
 	ui.recenter.connect(func(): _call("p0_recenter", []))
 	ui.show_spot.connect(func(where: String): _call("p0_show_spot", [where]))
 	ui.show_on_map.connect(func(target: String): _leave_then("show:" + target))   # the map points at the pin (p0_map resume)
@@ -80,6 +83,9 @@ func _init() -> void:
 
 ## The active world takes over input and the HUD surface; the previous one is simply forgotten.
 func attach(w: Node) -> void:
+	# The world being left stops where it is, and the stick ends: no walking on underneath (int5 hand test 035–039).
+	if is_instance_valid(world) and world != w: _call("p0_joystick", [Vector2.ZERO])
+	ui.end_stick()
 	world = w
 	session.space = space_of(w)   # before the read below, which tells the server where the player is
 	session.place = str(w.call("p0_place")) if w.has_method("p0_place") else ""   # which pond (q(36))
@@ -104,6 +110,8 @@ func _first_frame(tag: String) -> void:
 
 func detach(w: Node) -> void:
 	if world == w:
+		_call("p0_joystick", [Vector2.ZERO])
+		ui.end_stick()
 		world = null
 		ui.close_modal()
 		ui.set_surface("map")
@@ -114,12 +122,31 @@ func detach(w: Node) -> void:
 ## farmhouse included. Back locks still apply (a line in the water is reeled in first); a room's own Back
 ## (walking out through the door) is not one of them.
 func leave_world() -> void:
-	if not is_instance_valid(world) or AppRouter.top_instance() != world: return
+	if not is_instance_valid(world): return
+	if AppRouter.instance_depth() > 0 and AppRouter.top_instance() != world: return
 	if not (world is P0Room) and AppRouter.scene_locks_back_navigation(world): return
+	leave_to_map()
+
+## Pop every P0 layer down to the map; a world booted as the root scene (the first session lands on the farm,
+## p0_boot q(44)) has no map under it, so the root is swapped for the map. No back locks are asked here.
+func leave_to_map() -> void:
 	while AppRouter.instance_depth() > 0:
 		var depth := AppRouter.instance_depth()
 		AppRouter.pop_instance()
-		if AppRouter.instance_depth() >= depth: break   # a locked layer (a committed relocation map) stays
+		if AppRouter.instance_depth() >= depth: return   # a locked layer (a committed relocation map) stays
+	var root := get_tree().current_scene
+	if root == null or root.scene_file_path != MAP_SCENE: swap_root.call()
+
+## The scene change behind leave_to_map (tests replace it).
+var swap_root := func(): get_tree().change_scene_to_file(MAP_SCENE)
+
+## Android Back for a world with its own back lock (farm, pond), after its own layers: AppRouter ignores Back on a
+## P0 world that is the root scene, so with nothing left to close such a world leaves for the map itself (int5b
+## hand test 2: Inbox closed on the first Back, the second did nothing). True when it handled Back.
+func root_back() -> bool:
+	if AppRouter.instance_depth() > 0: return false   # stacked on the map: AppRouter pops it
+	leave_to_map()
+	return true
 
 ## One level back, for a room's door: the farm under the farmhouse, the map under an outpost.
 func leave_room() -> void:
