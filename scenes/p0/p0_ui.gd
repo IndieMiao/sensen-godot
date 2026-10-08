@@ -105,6 +105,7 @@ var near_resident := Callable()
 var space := ""
 var _hud_world := true   # set_surface: the map has no HUD
 var _hud_hash := 0       # last state given to hud.apply
+var _today_key = null    # the Today chip's focus row (P0Logic.today_chip_key); null before the first view
 var _hud_need := -1      # main action's Energy need last seen by the HUD
 var _pending := {}   # surface / place / mode set before the HUD exists (the runtime attaches early)
 var _dev_box: Control
@@ -342,6 +343,11 @@ func _refresh_hud() -> void:
 	if h == _hud_hash: return   # set_view runs every frame: apply only what changed (the countdown, once a second)
 	_hud_hash = h
 	hud.apply(state)
+	# A new next step pulses the chip once (不知火舞 on 232): only when the focus row changes, never on the first view
+	# or a countdown tick; nothing left to do ("All caught up") doesn't pulse.
+	var key := str(state.get("today_key", ""))
+	if _today_key != null and key != _today_key and key != "": hud.pulse_today()
+	_today_key = key
 
 ## Top system inset (status bar, notch) in UI units; 0 on desktop.
 func safe_top() -> float:

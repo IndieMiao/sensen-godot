@@ -406,5 +406,6 @@ const PENDING := {
 	"toast": "sizes read Toast R1 (1178:82265); its tone look (light fills, tone icon, optional action) is not generated yet: ToastPanel and ToastLayer still draw the old dark panel",
 	"entryCard": "EntryCard 1468:94344 (SGODOT-231): radius 16 and padding 8 / 14 / 9 / 14, gap 2, Pointer=Right inset 21 are constants in UiEntryCard until the next token export adds them",
 	"blueprintCard": "BlueprintCard 1434:93844 and the B2-06 Workbench drawer (SGODOT-231): card radius 16, padding 12 / 14, gap 10, icon tile 44 with a 32 icon, material gap 8, the recipe name 16 ExtraBold and the drawer title 22 ExtraBold are constants in UiBlueprintCard / P0WorkbenchDrawer until the next token export adds them",
-	"family": "color/family/* (1726:32854–32857), color/newInk (1398:92869) and color/goldDeep (the Mastered star, C28) were added by hand under the names the exporter gives (SGODOT-226, 2026-10-08); the next full export replaces this note",
+	"family": "color/family/* (1726:32854–32857), color/newInk (1398:92869) and color/goldDeep (1755:33005, the Mastered star, C28) were added by hand under the names the exporter gives (SGODOT-226, 2026-10-08); the next full export replaces this note",
+	"guidePulse": "GuidePulse 1407:113987 (SGODOT-232 U6, A-03): ring stroke 2, growth to +10 and frame inset 4 are constants in UiGuidePulse until the next token export adds them; color/primary and MOTION_NEW_UNLOCK_FLASH_MS (600 ms, ease-out) are tokens",
 }

@@ -412,3 +412,20 @@ func test_the_clock_buttons_are_for_test_builds_only() -> void:
 	assert_bool(P0Ui.dev_tools_on(true, false)).is_true()     # a test build (android_p0.sh, the editor)
 	assert_bool(P0Ui.dev_tools_on(true, true)).is_false()     # the demo APK (build_demo_apk.sh)
 	assert_bool(P0Ui.dev_tools_on(false, false)).is_false()   # a release export
+
+## 不知火舞 on 232: the Today chip pulses once when its focus row changes; not on the first view or a countdown tick.
+func test_the_today_chip_pulses_once_when_its_focus_row_changes() -> void:
+	ui.set_view(_view())                                                # "Sow your first plot"
+	assert_int(ui.hud.today_pulses).is_equal(0)
+	var sown := _view()
+	sown.plots = [{"id": 0, "state": "growing", "crop": "crop_radish", "ready_in": 14000000, "xp_pct": 100}]
+	ui.set_view(sown)                                                   # the radish timer leads now
+	assert_int(ui.hud.today_pulses).is_equal(1)
+	var later := sown.duplicate(true)
+	later.plots[0].ready_in = 13000000
+	ui.set_view(later)                                                  # the countdown ticks: no pulse
+	assert_int(ui.hud.today_pulses).is_equal(1)
+	var pulses := ui.hud.find_children("*", "UiGuidePulse", true, false)
+	assert_int(pulses.size()).is_equal(1)                                # GuidePulse Shape=Pill on the chip
+	await await_millis(UiTokens.MOTION_NEW_UNLOCK_FLASH_MS + 120)
+	assert_int(ui.hud.find_children("*", "UiGuidePulse", true, false).size()).is_equal(0)   # once, then gone
