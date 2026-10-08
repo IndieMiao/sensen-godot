@@ -23,7 +23,8 @@
 #   server/deploy/p0/deploy-hk.sh maint-on [back at]             # every /v1/p0 request answers 503 maintenance; back at =
 #                                                                #   any time, e.g. 2026-10-09T23:30+08:00 (sent as UTC ISO)
 #   server/deploy/p0/deploy-hk.sh maint-off                      # back to normal (then run smoke)
-#   server/deploy/p0/deploy-hk.sh min-version <versionCode> [url] # older clients (x-p0-version) get 426 update_required
+#   server/deploy/p0/deploy-hk.sh min-version <versionCode> [url] # older clients (x-p0-version) get 426 update_required;
+#                                                                #   a minimum needs a download url (set once, then kept)
 #   server/deploy/p0/deploy-hk.sh gate                           # what is in force
 #
 # The access key: P0_KEY=… in the environment, else output/p0-deploy/key; the admin key likewise P0_ADMIN_KEY or

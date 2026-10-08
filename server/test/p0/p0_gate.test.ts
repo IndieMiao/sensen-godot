@@ -41,7 +41,7 @@ async function server(gate: P0Gate) {
 describe('the gate rules', () => {
   it('lets everything through by default', () => {
     const g = new P0Gate(undefined, {});
-    expect(g.state()).toEqual({ maintenance: { on: false }, min_version: 0, update_url: '' });
+    expect(g.state()).toEqual({ maintenance: { on: false }, min_version: 0, update_url: '', update_on: false });
     expect(g.check({ 'x-p0-version': '1' })).toBeNull();
   });
 
@@ -55,6 +55,12 @@ describe('the gate rules', () => {
     expect(g.check({ 'x-p0-version': 'p0-0.1.1' })?.status).toBe(426);
   });
 
+  it('no download url, no minimum (李白 / 苏烈 on #85): an Update card with nowhere to go would strand the player', () => {
+    const g = new P0Gate(undefined, { P0_MIN_VERSION: '9' });
+    expect(g.state()).toMatchObject({ min_version: 9, update_url: '', update_on: false });
+    expect(g.check({ 'x-p0-version': '1' })).toBeNull();
+  });
+
   it('503 while in maintenance, back_at in UTC ISO to the second, absent when unknown', () => {
     expect(new P0Gate(undefined, { P0_MAINT: '1' }).check({})).toEqual({ status: 503, body: { ok: false, code: 'maintenance' } });
     const g = new P0Gate(undefined, { P0_MAINT: '1', P0_MAINT_UNTIL: '2026-10-09T14:30:00+08:00' });
@@ -63,7 +69,7 @@ describe('the gate rules', () => {
   });
 
   it('Update wins over Maintenance (§10.7.1): an old client sees Update once', () => {
-    const g = new P0Gate(undefined, { P0_MAINT: '1', P0_MIN_VERSION: '5' });
+    const g = new P0Gate(undefined, { P0_MAINT: '1', P0_MIN_VERSION: '5', P0_UPDATE_URL: 'https://example.test/p0.apk' });
     expect(g.check({ 'x-p0-version': '4' })?.status).toBe(426);
     expect(g.check({ 'x-p0-version': '5' })?.status).toBe(503);
     expect(g.check({})?.status).toBe(503);
@@ -71,12 +77,12 @@ describe('the gate rules', () => {
 
   it('run-time changes persist and survive a restart; the environment can only make it stricter', () => {
     const file = path.join(tmp(), 'gate.json');
-    const g = new P0Gate(file, { P0_MIN_VERSION: '3' });
+    const g = new P0Gate(file, { P0_MIN_VERSION: '3', P0_UPDATE_URL: 'https://example.test/p0.apk' });
     g.setMaintenance(true, '2026-10-09T06:30:00Z');
     g.setMinVersion(7, 'https://example.test/new.apk');
     expect(JSON.parse(readFileSync(file, 'utf8'))).toMatchObject({ maintenance: { on: true, back_at: '2026-10-09T06:30:00Z' }, min_version: 7 });
     const again = new P0Gate(file, { P0_MIN_VERSION: '3' });
-    expect(again.state()).toEqual({ maintenance: { on: true, back_at: '2026-10-09T06:30:00Z' }, min_version: 7, update_url: 'https://example.test/new.apk' });
+    expect(again.state()).toEqual({ maintenance: { on: true, back_at: '2026-10-09T06:30:00Z' }, min_version: 7, update_url: 'https://example.test/new.apk', update_on: true });
     again.setMinVersion(1);
     expect(again.state().min_version).toBe(3);                                // the environment's floor stays
     again.setMaintenance(false);
@@ -158,7 +164,8 @@ describe('the admin routes', () => {
     expect((await admin.inject({ method: 'POST', url: '/admin/maintenance', headers: A, payload: { on: false } })).json().maintenance).toEqual({ on: false });
     expect((await admin.inject({ method: 'POST', url: '/admin/min-version', headers: A, payload: { version: 2026100901, url: 'https://example.test/p0.apk' } })).json())
       .toMatchObject({ ok: true, min_version: 2026100901, update_url: 'https://example.test/p0.apk' });
-    expect((await admin.inject({ method: 'GET', url: '/admin/gate', headers: A })).json()).toEqual({ ok: true, maintenance: { on: false }, min_version: 2026100901, update_url: 'https://example.test/p0.apk' });
+    expect((await admin.inject({ method: 'GET', url: '/admin/gate', headers: A })).json()).toEqual({ ok: true, maintenance: { on: false }, min_version: 2026100901,
+      update_url: 'https://example.test/p0.apk', update_on: true, env: { min_version: 0, maintenance: false } });
     expect(lines.map(l => JSON.parse(l).admin)).toEqual(['maintenance', 'maintenance', 'min_version']);
   });
 
@@ -168,5 +175,10 @@ describe('the admin routes', () => {
     expect((await admin.inject({ method: 'POST', url: '/admin/maintenance', headers: A, payload: { on: true, back_at: 'soon' } })).json().code).toBe('bad_back_at');
     expect((await admin.inject({ method: 'POST', url: '/admin/min-version', headers: A, payload: { version: -1 } })).statusCode).toBe(400);
     expect((await admin.inject({ method: 'POST', url: '/admin/min-version', headers: A, payload: { version: 3, url: 7 } })).json().code).toBe('bad_url');
+    // A minimum needs somewhere to update from: refused, nothing saved (李白 / 苏烈 on #85).
+    expect((await admin.inject({ method: 'POST', url: '/admin/min-version', headers: A, payload: { version: 3 } })).json().code).toBe('need_url');
+    expect((await admin.inject({ method: 'POST', url: '/admin/min-version', headers: A, payload: { version: 3, url: '' } })).json().code).toBe('need_url');
+    expect((await admin.inject({ method: 'GET', url: '/admin/gate', headers: A })).json()).toMatchObject({ min_version: 0, update_on: false });
+    expect((await admin.inject({ method: 'POST', url: '/admin/min-version', headers: A, payload: { version: 0 } })).statusCode).toBe(200);   // turning it off needs none
   });
 });

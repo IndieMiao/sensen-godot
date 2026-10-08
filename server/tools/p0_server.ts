@@ -35,6 +35,12 @@ const guard = guardOptionsFromEnv();
 // SYS-UPDATE / SYS-MAINT (gate.ts): P0_MIN_VERSION / P0_UPDATE_URL / P0_MAINT / P0_MAINT_UNTIL, changed at run time by
 // the admin routes and kept in the save's folder (the data volume), so a restart keeps maintenance on.
 const gate = new P0Gate(path.join(path.dirname(stateFile), 'gate.json'));
+if (gate.loadError) console.log(JSON.stringify({ warn: 'gate_json_unreadable', error: gate.loadError }));
+{
+  const g = gate.state();
+  // A minimum without a download url is not enforced (gate.ts): say so loudly at start rather than strand players.
+  if (g.min_version > 0 && !g.update_on) console.log(JSON.stringify({ warn: 'min_version_without_update_url', min_version: g.min_version }));
+}
 await registerP0Guard(app, guard, gate);
 const dev = process.env.P0_DEV !== '0';
 // S7: observation log, one JSON line per command and reported UI moment (P0_EVENT_DIR; empty = off).
@@ -50,7 +56,7 @@ const startedAt = Date.now();
 app.get('/v1/healthz', async () => {
   const g = gate.state();
   return { ok: true, p0: content.version, players: store.size(), up_s: Math.round((Date.now() - startedAt) / 1000),
-    maintenance: g.maintenance, min_version: g.min_version };
+    maintenance: g.maintenance, min_version: g.update_on ? g.min_version : 0 };
 });
 const snapshots = process.env.P0_SNAPSHOT_DIR ?? path.join(path.dirname(stateFile), 'snapshots');
 setInterval(() => snapshotState(stateFile, snapshots, 48), 3_600_000).unref();

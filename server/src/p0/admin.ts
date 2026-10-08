@@ -51,7 +51,7 @@ export function registerP0Admin(app: FastifyInstance, deps: P0AdminDeps): void {
   const gate = deps.gate;
   if (!gate) return;
   /** SYS-UPDATE / SYS-MAINT settings now in force (gate.ts). */
-  app.get('/admin/gate', async () => ({ ok: true, ...gate.state() }));
+  app.get('/admin/gate', async () => ({ ok: true, ...gate.state(), env: gate.envFloor() }));
 
   /** Maintenance on ({on:true, back_at?: ISO}) or off ({on:false}); persists across restarts (deploy-hk.sh maint-on / maint-off). */
   app.post('/admin/maintenance', async (req, reply) => {
@@ -62,7 +62,7 @@ export function registerP0Admin(app: FastifyInstance, deps: P0AdminDeps): void {
     }
     const st = gate.setMaintenance(body.on, typeof body.back_at === 'string' ? body.back_at : undefined);
     log(JSON.stringify({ admin: 'maintenance', ...st.maintenance, at: deps.now() }));
-    return { ok: true, ...st };
+    return { ok: true, ...st, env: gate.envFloor() };
   });
 
   /** The lowest client versionCode served ({version: 0 = no minimum, url?: download page}). */
@@ -71,8 +71,11 @@ export function registerP0Admin(app: FastifyInstance, deps: P0AdminDeps): void {
     const version = Number(body.version);
     if (!Number.isInteger(version) || version < 0) return reply.code(400).send({ ok: false, code: 'bad_value' });
     if (body.url !== undefined && typeof body.url !== 'string') return reply.code(400).send({ ok: false, code: 'bad_url' });
+    // No minimum without somewhere to update from (李白 / 苏烈 on #85): the Update card's button would do nothing.
+    const url = body.url !== undefined ? String(body.url) : gate.state().update_url;
+    if (version > 0 && url === '') return reply.code(400).send({ ok: false, code: 'need_url' });
     const st = gate.setMinVersion(version, body.url as string | undefined);
-    log(JSON.stringify({ admin: 'min_version', min_version: st.min_version, update_url: st.update_url, at: deps.now() }));
-    return { ok: true, ...st };
+    log(JSON.stringify({ admin: 'min_version', min_version: st.min_version, update_url: st.update_url, update_on: st.update_on, at: deps.now() }));
+    return { ok: true, ...st, env: gate.envFloor() };
   });
 }
