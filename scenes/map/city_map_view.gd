@@ -1069,9 +1069,12 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int)
 			if incumbent: _hidden_until[id] = now + REAPPEAR_COOLDOWN_MS
 			return false
 	var label_rect := Rect2(c.point + Vector2(-c.label_w * 0.5, 3), Vector2(c.label_w, c.label_h))
-	if not _destination(entry).is_empty():   # the whole name on screen: it slides in from the edge, the disc stays
-		label_rect.position.x = clampf(label_rect.position.x, LABEL_EDGE, maxf(LABEL_EDGE, size.x - LABEL_EDGE - c.label_w))
+	if not _destination(entry).is_empty():
 		label_rect.position.y = c.point.y + UiMapDestination.LABEL_GAP   # where the pin draws it
+		# The whole name on screen: with its disc in the view it slides in from the edge, the disc stays. A disc packed
+		# in the margin off screen keeps its name with it (no name without its pin).
+		if c.point.x >= 0.0 and c.point.x <= size.x:
+			label_rect.position.x = clampf(label_rect.position.x, LABEL_EDGE, maxf(LABEL_EDGE, size.x - LABEL_EDGE - c.label_w))
 	if entry.kind == "landmark":
 		label_fits = is_selected or not _hits(occupied, Rect2(c.point - Vector2(c.width * 0.5, -3), Vector2(c.width, 20)))
 	elif entry.kind == "place" or not _destination(entry).is_empty():
