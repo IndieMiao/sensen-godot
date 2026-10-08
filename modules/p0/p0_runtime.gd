@@ -188,6 +188,10 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	var before: Dictionary = ui.view
 	ui.set_view(v)   # cards built below read the fresh view (Fish-dex, creel, meals)
 	for ev in events: ui.teach(P0Guide.tip_for_event(ev, before, v))   # first cast / fire / meal / level (TUT-2)
+	# §14.2 minutes 16 / 22: an item new to the bag (lettuce seeds in reach, a level gift's Worm Bait) flashes its
+	# quick-bar slot once (UiQuickBar.flash: QuickSlot State=new, 600 ms). Not on the first view after starting.
+	if not before.is_empty():
+		for id in P0Guide.new_items(before, v): ui.quick_bar_node().flash(str(id))
 	var at := anchor()
 	var dy := 0.0
 	var xp_lines: Array = []
