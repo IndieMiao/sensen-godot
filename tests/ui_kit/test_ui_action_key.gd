@@ -136,80 +136,108 @@ func _options() -> Array:
 func _radial() -> UiActionRadial:
 	var r := UiActionRadial.new()
 	_host(r)
-	r.size = Vector2(360, 640)
+	r.size = Vector2(360, 800)
+	r.haptics = false
 	r.options = _options()
 	r.selected = "farming"
 	return r
 
-func test_fan_follows_bar_2_and_mirrors_on_the_right() -> void:
-	var r := _radial()
-	r.open_at(Vector2(82.5, 425))
-	await _settle()
-	assert_bool(r.is_mirrored()).is_false()
-	# BAR-2 482:23 petal centres: Farming (123, 334), Fishing (175, 388), Mining (175, 462), Combat (123, 516).
-	var expected := [Vector2(123, 334), Vector2(175, 388), Vector2(175, 462), Vector2(123, 516)]
-	for i in 4: assert_vector(r.petal_center(i)).is_equal_approx(expected[i], Vector2(1.5, 1.5))
-	assert_float(r._labels[0].position.x).is_greater(r.petal_center(0).x)
-	r.open_at(Vector2(300, 425))
-	await _settle()
-	assert_bool(r.is_mirrored()).is_true()
-	assert_float(r._labels[0].position.x + r._labels[0].size.x).is_less(r.petal_center(0).x)
+func _open(r: UiActionRadial) -> void:
+	r.open()
+	r.advance(1000.0)   # past the whole opening
 
-func test_fan_and_labels_stay_on_screen_near_any_edge() -> void:
+func test_four_petals_ring_the_screen_centre_icon_only() -> void:
+	# 247 / LOCK-03 v2 (P1 1651:100657): centre (180, 400), radius 88, -135 / -45 / 45 / 135°; no labels, no connector.
 	var r := _radial()
-	for at in [Vector2(125, 520), Vector2(180, 320), Vector2(20, 300), Vector2(345, 300), Vector2(180, 40), Vector2(180, 630)]:
-		r.open_at(at)
-		await _settle()
-		for i in 4:
-			var p := r.petals()[i].get_rect()
-			var l := r._labels[i].get_rect()
-			for rect in [p, l]:
-				assert_bool(Rect2(Vector2.ZERO, r.size).encloses(rect)).override_failure_message("%s off screen at %s" % [rect, at]).is_true()
-		r.close()
+	_open(r)
+	assert_vector(r.ring_center()).is_equal(Vector2(180, 400))
+	var expected := [Vector2(117.78, 337.78), Vector2(242.22, 337.78), Vector2(242.22, 462.22), Vector2(117.78, 462.22)]
+	for i in 4:
+		assert_vector(r.petal_center(i)).is_equal_approx(expected[i], Vector2(0.05, 0.05))
+		assert_vector(r.petals()[i].get_rect().get_center()).is_equal_approx(expected[i], Vector2(0.05, 0.05))
+		assert_vector(r.petals()[i].size).is_equal_approx(Vector2(72, 72), Vector2(0.01, 0.01))   # every petal takes a 72 px tap
+	for b in r.petals():
+		for c in b.get_children(): assert_bool(c is Label).is_false()
+	# Current: solid primary 72 with a white icon 38; others 64 with a 34 icon; unavailable ones carry the lock.
+	var cur: UiStyleBox = r.petals()[0].get_theme_stylebox(&"normal")
+	assert_object(cur.bg_color).is_equal(UiTokens.COLOR_PRIMARY)
+	assert_float(cur.border_width).is_equal(float(UiTokens.STROKE_RADIAL_SELECTED))
+	assert_vector(r.petals()[0].get_node("Icon").size).is_equal(Vector2(38, 38))
+	assert_object(r.petals()[0].get_node("Icon").material).is_not_null()
+	var other: UiStyleBox = r.petals()[1].get_theme_stylebox(&"normal")
+	assert_object(other.bg_color).is_equal(UiTokens.COLOR_SURFACE)
+	assert_float(other.inset.x).is_equal(4.0)   # 64 drawn inside the 72 hit
+	assert_vector(r.petals()[1].get_node("Icon").size).is_equal(Vector2(34, 34))
+	assert_object(r.petals()[1].get_node_or_null("Lock")).is_not_null()
+	assert_object(r.petals()[0].get_node_or_null("Lock")).is_null()
 
-func test_available_petal_picks_and_closes_unavailable_does_nothing() -> void:
+func test_petals_fly_out_clockwise_40_ms_apart() -> void:
+	# P3 1651:100816: at 80 ms Farming 44 %, Fishing 22 %, the others not out yet, the scrim 67 %.
 	var r := _radial()
-	r.open_at(Vector2(82.5, 425))
+	r.pose_opening(80.0)
+	assert_float(r.progress(0)).is_equal_approx(0.444, 0.005)
+	assert_float(r.progress(1)).is_equal_approx(0.222, 0.005)
+	assert_float(r.progress(2)).is_equal(0.0)
+	assert_float(r.progress(3)).is_equal(0.0)
+	assert_float(r.scrim_alpha()).is_equal_approx(0.667, 0.005)
+	assert_float(r.petals()[2].modulate.a).is_equal(0.0)
+	assert_vector(r.petals()[2].get_rect().get_center()).is_equal_approx(r.ring_center(), Vector2(0.01, 0.01))
+	assert_float(r.petals()[0].scale.x).is_greater(0.3)
+	r.advance(220.0)   # 300 ms: every petal is out
+	for i in 4: assert_float(r.progress(i)).is_equal(1.0)
+
+func test_an_available_petal_picks_pops_and_closes() -> void:
+	var r := _radial()
+	_open(r)
 	var log := []
 	r.picked.connect(func(id): log.append(id))
 	r.closed.connect(func(): log.append("closed"))
-	r.petals()[1].pressed.emit()   # Fishing · No water nearby
-	assert_bool(r.visible).is_true()
-	r.petals()[0].pressed.emit()
-	assert_array(log).contains_exactly(["farming", "closed"])
+	r.petals()[0].pressed.emit()   # Farming, the current action: same feedback, it just closes
+	assert_array(log).is_equal(["farming"])
+	assert_bool(r.is_open()).is_false()
+	r.advance(75.0)
+	assert_float(r.petals()[0].scale.x).is_greater(1.1)   # mid-pop
+	assert_float(r.petals()[1].scale.x).is_less(1.0)      # the others shrink back
+	r.advance(100.0)
+	assert_array(log).is_equal(["farming", "closed"])
 	assert_bool(r.visible).is_false()
+
+func test_an_unavailable_petal_shakes_and_says_why_at_the_centre() -> void:
+	# P2 1651:100787: ±6 px twice, RadialReason at the ring centre for 1.5 s, tail towards that petal; stays open.
+	var r := _radial()
+	_open(r)
+	var log := []
+	r.picked.connect(func(id): log.append(id))
+	r.petals()[3].pressed.emit()   # Combat · Mine floors 3–5
+	assert_array(log).is_empty()
+	assert_bool(r.is_open()).is_true()
+	assert_bool(r.reason_visible()).is_true()
+	assert_str(r.reason_text()).is_equal("Mine floors 3–5")
+	assert_int(r.reason_tail()).is_equal(UiActionRadial.Tail.DOWN_LEFT)
+	await await_idle_frame()
+	assert_vector(r._reason.get_rect().get_center()).is_equal_approx(r.ring_center(), Vector2(1, 1))
+	r.advance(25.0)
+	assert_float(absf(r.petals()[3].get_rect().get_center().x - r.petal_center(3).x)).is_greater(3.0)   # shaking
+	r.advance(200.0)
+	assert_vector(r.petals()[3].get_rect().get_center()).is_equal_approx(r.petal_center(3), Vector2(0.01, 0.01))
+	r.petals()[1].pressed.emit()   # Fishing: the bubble moves on, its tail now up-right
+	assert_int(r.reason_tail()).is_equal(UiActionRadial.Tail.UP_RIGHT)
+	r.advance(UiTokens.MOTION_RADIAL_REASON_MS + 250.0)
+	assert_bool(r.reason_visible()).is_false()
+	assert_bool(r.is_open()).is_true()
 
 func test_tapping_the_scrim_closes_without_picking() -> void:
 	var r := _radial()
-	r.open_at(Vector2(82.5, 425))
+	_open(r)
 	var log := []
 	r.picked.connect(func(id): log.append(id))
 	r.closed.connect(func(): log.append("closed"))
 	r._on_scrim_input(_mouse(Vector2(300, 100), false))
-	assert_array(log).contains_exactly(["closed"])
-
-func test_unavailable_petal_shows_lock_and_reason() -> void:
-	var r := _radial()
-	r.open_at(Vector2(82.5, 425))
-	await _settle()
-	assert_int(r.petals()[1].get_child_count()).is_equal(2)   # icon + lock badge
-	assert_int(r.petals()[0].get_child_count()).is_equal(1)
-	var texts := []
-	for l in r._labels[1].get_child(0).get_children(): texts.append((l as Label).text)
-	assert_array(texts).contains_exactly(["Fishing", "No water nearby"])
-
-func test_labels_match_the_petal_main_once_themed() -> void:
-	# RadialPetal 1122:79385: label 77 × 31 (name only) and 116 × 47 (name + reason).
-	var r := UiActionRadial.new()
-	r.options = _options()   # built before entering the tree: labels must re-measure with the theme
-	r.selected = "farming"
-	r.open_at(Vector2(82.5, 425))
-	_host(r)
-	r.size = Vector2(360, 640)
-	await _settle()
-	assert_vector(r._labels[0].size).is_equal_approx(Vector2(77, 31), Vector2(4, 3))
-	assert_vector(r._labels[1].size).is_equal_approx(Vector2(116, 47), Vector2(6, 3))
-	assert_float(r._labels[0].position.x).is_equal_approx(r.petal_center(0).x + 26 + 6, 0.5)
+	assert_bool(r.is_open()).is_false()
+	assert_int(r._scrim.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)   # the scene is live again at once
+	r.advance(UiTokens.MOTION_RADIAL_RETRACT_MS + 1.0)
+	assert_array(log).is_equal(["closed"])
+	for i in 4: assert_vector(r.petals()[i].get_rect().get_center()).is_equal_approx(r.ring_center(), Vector2(0.01, 0.01))
 
 func test_caption_counts_in_the_group_height() -> void:
 	var g := _host(UiActionKey.new()) as UiActionKey

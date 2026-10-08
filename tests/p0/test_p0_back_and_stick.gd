@@ -33,9 +33,9 @@ func test_back_closes_one_layer_at_a_time() -> void:
 	ui.set_view(_view())
 	assert_bool(ui.close_top_layer()).is_false()   # nothing open: the world may leave
 	ui.open_radial()
-	assert_bool(ui._radial.visible).is_true()
+	assert_bool(ui._radial.is_open()).is_true()
 	assert_bool(ui.close_top_layer()).is_true()
-	assert_bool(ui._radial.visible).is_false()
+	assert_bool(ui._radial.is_open()).is_false()   # shrinking back (120 ms): Back already counts it closed
 	ui.open_inbox()
 	assert_bool(ui.has_modal()).is_true()
 	assert_bool(ui.close_top_layer()).is_true()   # the Inbox, not the farm

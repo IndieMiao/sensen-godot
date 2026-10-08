@@ -37,7 +37,8 @@ static func all() -> Array[Dictionary]:
 		{id = "action_key", title = "UiActionKey", figma = "ActionKey 1117:78924 · LOCK-02 / 03", build = _action_keys},
 		{id = "bar_drop_zone", title = "UiBarDropZone", figma = "BarDropZone 1588:97952 · LOCK-04 / 05 v1.11 (221 b0a83924)", build = _bar_drop_zones},
 		{id = "bar_drag", title = "Quick slot drag · UiUndoToast", figma = "QuickSlot State=lifted · Toast Tone=Info 1178:82247 · LOCK-04 v1.11", build = _bar_drags},
-		{id = "action_radial", title = "UiActionRadial", figma = "RadialPetal 1122:79385 · BAR-2 482:23 · LOCK-03", build = _action_radial},
+		{id = "action_radial", title = "UiActionRadial", figma = "RadialPetal 1122:79385 v2 · RadialReason 1655:101164 · row 50 · LOCK-03 v2", build = _action_radial},
+		{id = "action_radial_motion", title = "UiActionRadial · opening", figma = "Motion 1651:100816 · 0 / 80 / 160 / 300 ms", build = _action_radial_motion},
 		{id = "status_badge", title = "UiStatusBadge", figma = "StatusBadge 1132:79554 · LOCK-11", build = _status_badges},
 		{id = "tap_card", title = "UiTapCard", figma = "TapCard 1135:101133 · LOCK-07", build = _tap_cards},
 		# SGODOT-222 world display
@@ -645,20 +646,51 @@ static func _action_keys() -> Control:
 	row.add_child(_captioned(b, "fishing · not enough Energy"))
 	return row
 
-static func _action_radial() -> Control:
-	var host := Control.new()
-	host.custom_minimum_size = Vector2(328, 250)
-	var r := UiActionRadial.new()
-	host.add_child(r)   # full-rect inside the host; no explicit size (it would add to the anchors)
-	r.options = [
-		{id = "farming", name = "Farming", icon = _tex("hoe"), available = true},
-		{id = "fishing", name = "Fishing", icon = _tex("fish"), available = false, reason = "No water nearby"},
+static func _radial_options() -> Array:
+	return [
+		{id = "farming", name = "Farming", icon = _tex("hoe"), available = false, reason = "No plots here"},
+		{id = "fishing", name = "Fishing", icon = _tex("fish"), available = true},
 		{id = "mining", name = "Mining", icon = _tex("pickaxe"), available = false, reason = "Enter the mine"},
 		{id = "combat", name = "Combat", icon = _tex("sword"), available = false, reason = "Mine floors 3–5"},
 	]
-	r.selected = "farming"
-	r.open_at(Vector2(36, 125))
-	return _captioned(host, "fanned from the character · Farming selected")
+
+## A radial in a fixed host, posed: `ms` of opening (-1 = fully open), optionally a locked petal tapped.
+static func _radial_frame(host_size: Vector2, ms: float, tap := -1, k := 1.0) -> Control:
+	var host := Control.new()
+	host.custom_minimum_size = host_size * k
+	host.clip_contents = true
+	var holder := Control.new()
+	holder.size = host_size
+	holder.scale = Vector2(k, k)
+	host.add_child(holder)
+	var r := UiActionRadial.new()
+	r.haptics = false
+	holder.add_child(r)    # full-rect inside the holder
+	r.options = _radial_options()
+	r.selected = "fishing"
+	r.pose_opening(ms if ms >= 0.0 else 1000.0)
+	if tap >= 0:
+		r.petals()[tap].pressed.emit()
+		r.advance(100.0)   # the shake has settled; the reason shows
+	r.frozen = true   # a still: frame steps leave the pose alone
+	return host
+
+## LOCK-03 v2 (247): P1 open 1651:100657 and P2 a locked petal tapped 1651:100787.
+static func _action_radial() -> Control:
+	var v := _column(UiTokens.SPACE_SECTION)
+	v.add_child(_captioned(_radial_frame(Vector2(328, 226), -1.0), "open · ring around the screen centre · Fishing current"))
+	v.add_child(_captioned(_radial_frame(Vector2(328, 226), -1.0, 3), "tap a locked petal · it shakes, the reason shows at the centre"))
+	return v
+
+## P3 motion 1651:100816: 0 / 80 / 160 / 300 ms of the opening (petals 40 ms apart, 180 ms ease-out-back each).
+static func _action_radial_motion() -> Control:
+	var grid := GridContainer.new()
+	grid.columns = 2
+	grid.add_theme_constant_override(&"h_separation", int(UiTokens.SPACE_WITHIN))
+	grid.add_theme_constant_override(&"v_separation", int(UiTokens.SPACE_WITHIN))
+	for ms in [0.0, 80.0, 160.0, 300.0]:
+		grid.add_child(_captioned(_radial_frame(Vector2(220, 220), ms, -1, 0.72), "%d ms" % int(ms)))
+	return grid
 
 static func _status_badges() -> Control:
 	var v := _column()
