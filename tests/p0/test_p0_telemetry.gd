@@ -46,3 +46,9 @@ func test_a_press_is_a_tap_and_only_hold_repeats_are_holds() -> void:
 	session.send({"type": "sow", "plot": 1, "seed": "seed_radish"})
 	rt.holding_repeat = false
 	assert_str(str(sent[1].body.src)).is_equal("hold")
+
+## UI reports go out with the same headers as commands, the demo key included (a deployed server asks for it).
+func test_ui_reports_carry_the_demo_key() -> void:
+	session.player_id = "p0-telemetry-key"
+	session.access_key = "demo-key"
+	assert_that(Array(session._headers())).contains(["x-p0-player: p0-telemetry-key", "x-p0-key: demo-key"])

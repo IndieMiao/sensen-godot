@@ -1,7 +1,9 @@
 class_name P0Session
 extends Node
-## P0 connection to the local P0 server (server/tools/p0_server.ts, /v1/p0/*).
-## Server URL: user://p0_server.txt (one line) → else http://127.0.0.1:3110/v1 (Android: adb reverse tcp:3110 tcp:3110).
+## P0 connection to the P0 server (server/tools/p0_server.ts, /v1/p0/*).
+## Server URL: user://p0_server.txt (one line) → P0_SERVER_URL → the demo build's res://assets/p0/demo_server.json
+## (written by tools/p0/build_demo_apk.sh, never committed) → http://127.0.0.1:3110/v1 (adb reverse tcp:3110 tcp:3110).
+## The demo file may also carry the demo access key, sent as x-p0-key (SGODOT-232 D1 / D2).
 ## Player id: user://p0_player.txt, created once. Between responses the view is projected locally (energy ticks, crop timers).
 
 signal state_changed(view: Dictionary, events: Array)
@@ -13,9 +15,11 @@ signal command_started(key: String)
 signal command_settled(key: String, ok: bool, code: String)
 
 const DEFAULT_URL := "http://127.0.0.1:3110/v1"
+const DEMO_CONFIG := "res://assets/p0/demo_server.json"
 const REFRESH_S := 30.0
 
 var base_url := DEFAULT_URL
+var access_key := ""
 var player_id := ""
 var view: Dictionary = {}
 ## Where the player is (P0Runtime sets it on attach / detach): home, pond, outpost, mine, map or "" when unknown.
@@ -40,8 +44,11 @@ var _ui_events: Array = []
 var _ui_flush_left := UI_FLUSH_S
 
 func _ready() -> void:
+	var demo := demo_config(FileAccess.get_file_as_string(DEMO_CONFIG) if FileAccess.file_exists(DEMO_CONFIG) else "")
 	base_url = _read_line("user://p0_server.txt", OS.get_environment("P0_SERVER_URL"))
+	if base_url == "": base_url = str(demo.get("url", ""))
 	if base_url == "": base_url = DEFAULT_URL
+	access_key = str(demo.get("key", ""))
 	player_id = _read_line("user://p0_player.txt", "")
 	if player_id == "":
 		var bytes := Crypto.new().generate_random_bytes(10)
@@ -49,7 +56,8 @@ func _ready() -> void:
 		var f := FileAccess.open("user://p0_player.txt", FileAccess.WRITE)
 		if f: f.store_line(player_id)
 	report({"kind": "session_start"})
-	refresh()
+	# Deferred: P0Runtime adds the session before P0Ui, and an immediate failure would toast on a UI not built yet.
+	refresh.call_deferred()
 
 func _process(dt: float) -> void:
 	_ui_flush_left -= dt
@@ -115,8 +123,8 @@ func _flush_ui() -> void:
 	http.timeout = 8.0
 	add_child(http)
 	http.request_completed.connect(func(_r, _c, _h, _b): http.queue_free())
-	var headers := PackedStringArray(["x-p0-player: " + player_id, "content-type: application/json"])
-	if http.request(base_url + "/p0/telemetry", headers, HTTPClient.METHOD_POST, JSON.stringify(body)) != OK: http.queue_free()
+	# _headers(): the demo key too, or a deployed server (P0_ACCESS_KEYS) would refuse every report with 401
+	if http.request(base_url + "/p0/telemetry", _headers(), HTTPClient.METHOD_POST, JSON.stringify(body)) != OK: http.queue_free()
 
 func dev_skip(minutes: int) -> void:
 	_request(HTTPClient.METHOD_POST, "/p0/dev/skip", {"minutes": minutes}, {})
@@ -130,8 +138,7 @@ func _request(method: int, path: String, body: Dictionary, cmd: Dictionary) -> v
 	http.timeout = 8.0
 	add_child(http)
 	http.request_completed.connect(_on_done.bind(http, cmd))
-	var headers := PackedStringArray(["x-p0-player: " + player_id, "content-type: application/json"])
-	var err := http.request(base_url + path, headers, method, "" if method == HTTPClient.METHOD_GET else JSON.stringify(body))
+	var err := http.request(base_url + path, _headers(), method, "" if method == HTTPClient.METHOD_GET else JSON.stringify(body))
 	if err != OK:
 		http.queue_free()
 		_finish(HTTPRequest.RESULT_CANT_CONNECT, 0, PackedByteArray(), cmd)
@@ -175,6 +182,19 @@ func _handle(result: int, code: int, raw: PackedByteArray, cmd: Dictionary) -> D
 ## P0 prototype entry: a user://p0_boot marker (adb run-as touch files/p0_boot) or SENSEN_P0=1 on desktop.
 static func boot_wanted() -> bool:
 	return FileAccess.file_exists("user://p0_boot") or OS.get_environment("SENSEN_P0") == "1" or OS.has_feature("p0")
+
+func _headers() -> PackedStringArray:
+	var headers := PackedStringArray(["x-p0-player: " + player_id, "content-type: application/json"])
+	if access_key != "": headers.append("x-p0-key: " + access_key)
+	return headers
+
+## The demo build's baked server: {"url": "https://…/v1", "key": "…"}; {} when absent or malformed.
+static func demo_config(text: String) -> Dictionary:
+	var parsed = JSON.parse_string(text) if text != "" else null
+	if not parsed is Dictionary: return {}
+	var url := str(parsed.get("url", "")).strip_edges().trim_suffix("/")
+	if not (url.begins_with("http://") or url.begins_with("https://")): url = ""
+	return {"url": url, "key": str(parsed.get("key", "")).strip_edges()}
 
 static func _read_line(path: String, fallback: String) -> String:
 	if FileAccess.file_exists(path):

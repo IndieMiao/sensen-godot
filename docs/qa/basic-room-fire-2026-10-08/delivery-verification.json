@@ -1,0 +1,71 @@
+{
+  "plane_card": "SGODOT-236",
+  "plane_attachments": 9,
+  "plane_download_hashes_match": true,
+  "plane_media": [
+    {
+      "name": "SGODOT-236_FIRE_whole.png",
+      "sha256": "d81e6be1901e468624f236f594126dc36f5ffc3e73c05dca7acab211018f4b16"
+    },
+    {
+      "name": "SGODOT-236_FIRE_fire-close.mp4",
+      "sha256": "e8c031c10de9cef40cde490ef40e8a9e542fe3b9240a9c2b23b46d2a684083a2"
+    },
+    {
+      "name": "SGODOT-236_FIRE_fire-timeline.jpg",
+      "sha256": "84986ba423cc1bea8be9759bb468d74cda9aa6edc472330622606f16c3f69a64"
+    },
+    {
+      "name": "SGODOT-236_FIRE_performance-comparison.json",
+      "sha256": "018204b48b79884ba2b5adc8c47e585efd5e638dd0a1f09b368bd37d7f962a67"
+    },
+    {
+      "name": "SGODOT-236_FIRE_native-result.json",
+      "sha256": "d5acac72341e732664b03dad7b00660f7eac0fc6a82335a11c016402e703a452"
+    },
+    {
+      "name": "SGODOT-236_FIRE_android-smoke-result.json",
+      "sha256": "3b17f2cf87567e91669de75fcc4d6292b69eff0ac2f126d662c8774a7ac472d5"
+    },
+    {
+      "name": "SGODOT-236_FIRE_preservation.json",
+      "sha256": "543db33059a597502bf95283ce811f267702f94dfd722c2d21042c832e219a49"
+    },
+    {
+      "name": "SGODOT-236_FIRE_README.md",
+      "sha256": "34675c467d1fc766ffc69716e279344844658b6130f27df36a52dde9659e2b37"
+    },
+    {
+      "name": "SGODOT-236_FIRE_android-with-player.png",
+      "sha256": "76dea8f94e0e226f753ae8d94f7f2e33b40b7a552bb15f1d9d91e3cf5d1199e0"
+    }
+  ],
+  "lark_messages": 3,
+  "lark_media": [
+    {
+      "name": "whole",
+      "sha256": "d81e6be1901e468624f236f594126dc36f5ffc3e73c05dca7acab211018f4b16",
+      "byte_identical": true
+    },
+    {
+      "name": "fire-close",
+      "sha256": "e8c031c10de9cef40cde490ef40e8a9e542fe3b9240a9c2b23b46d2a684083a2",
+      "byte_identical": true
+    }
+  ],
+  "pr": "https://github.com/IndieMiao/sensen-godot/pull/29",
+  "pr_state": "OPEN",
+  "merged": false,
+  "coordination": {
+    "host": "100.82.205.49",
+    "session": "wt-p0-design-cd",
+    "herdr_pane": "w55:p4",
+    "notification_submitted_and_read_back": true,
+    "yixing_forwarded_to": [
+      "哪吒 SGODOT-226",
+      "后裔 SGODOT-227",
+      "不知火舞复审"
+    ],
+    "houyi_acknowledged_no_227_interface_impact": true
+  }
+}
