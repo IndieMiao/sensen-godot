@@ -83,6 +83,9 @@ func _ready() -> void:
 	if use_runtime: P0Runtime.mark("%s _ready start" % name)
 	if art_scene == null: art_scene = load(BASIC_ROOM_ART)
 	layout = P0RoomAnchors.read_json(layout_path)
+	# Pushed above the map, whose tiles show through a transparent root (SGODOT-248); the map makes it transparent
+	# again on its own resume. Same as p0_farm / p0_pond.
+	get_viewport().transparent_bg = false
 	_build_environment()
 	room = Node3D.new()
 	room.name = "Room"
@@ -196,7 +199,7 @@ static func yaw_dir(yaw_degrees: float) -> Vector3:
 func _build_environment() -> void:
 	environment = Environment.new()
 	environment.background_mode = Environment.BG_COLOR
-	environment.background_color = Color("e8e4c8")
+	environment.background_color = BACKDROP   # also the Backdrop plate's colour, see _backdrop()
 	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	environment.ambient_light_color = Color("fff0dc")
 	environment.ambient_light_energy = 0.70
@@ -249,6 +252,26 @@ func _build_camera() -> void:
 	cam.far = 70.0
 	add_child(cam)
 	cam.make_current()
+	cam.add_child(_backdrop())
+
+## The colour around the room (SGODOT-248 R1.1): an unshaded plate just inside the far plane, so it is tone-mapped the
+## same way as the room on every renderer. The environment's clear colour alone came out #F7F6EA through ACES on Metal
+## but pure white on Android Vulkan; the plate keeps both at #F7F6EA. It belongs to the room, so it hides with it.
+const BACKDROP := Color("e8e4c8")
+func _backdrop() -> MeshInstance3D:
+	var plate := MeshInstance3D.new()
+	plate.name = "Backdrop"
+	var quad := QuadMesh.new()
+	quad.size = Vector2(400, 400)   # well past any room's orthographic view
+	plate.mesh = quad
+	var mat := StandardMaterial3D.new()
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.albedo_color = BACKDROP
+	mat.disable_fog = true
+	plate.material_override = mat
+	plate.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	plate.position = Vector3(0, 0, -(cam.far - 1.0))
+	return plate
 
 ## Opening shot (§10.1): the player, every tappable anchor and the room's floor (a cut-away diorama reads
 ## wrong cropped) in the middle of the screen; held until the player first moves. Re-run when a room changes
@@ -517,6 +540,7 @@ func suspend() -> void:
 func resume() -> void:
 	process_mode = Node.PROCESS_MODE_INHERIT
 	show()
+	get_viewport().transparent_bg = false
 	world_env.environment = environment
 	cam.make_current()
 	if rt:

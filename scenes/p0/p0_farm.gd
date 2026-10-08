@@ -22,12 +22,14 @@ const LABOUR_CLIP := {"till": "till", "sow": "sow", "water": "water", "harvest":
 
 @onready var cam: Camera3D = $Camera3D
 @onready var ground: MeshInstance3D = $Ground
+@onready var world_env: WorldEnvironment = $WorldEnvironment
 
 var rt: P0Runtime
 var bp: FarmBlueprint
 var grid: BlueprintGrid
 var actor: P0Actor
 var crops: CropField
+var _saved_env: Environment   # handed over while a room (the farmhouse) is on top, see suspend()
 var beds: MultiMeshInstance3D
 var _hi: MeshInstance3D
 var _house := Vector3.ZERO
@@ -69,13 +71,24 @@ func _exit_tree() -> void:
 func is_back_navigation_locked() -> bool:
 	return rt != null and (rt.ui.close_top_layer() or rt.root_back())
 
-## AppRouter stacking: the map below us hands back its camera and environment on resume.
+## AppRouter stacking: the map below us hands back its camera and environment on resume. Going under a room we hand
+## ours over as well: the viewport uses the first WorldEnvironment in the tree, so the farmhouse otherwise lit with the
+## farm's cool ambient and green backdrop (SGODOT-249; farm.gd and P0Room.suspend() do the same). The canvas layers
+## go too: FarmBackground (layer −1) is the farm's backdrop only under its BG_CANVAS environment; under the room's
+## colour background it would cover the room, and hiding the farm does not hide a CanvasLayer.
 func suspend() -> void:
 	set_process(false)
 	visible = false
+	if world_env.environment: _saved_env = world_env.environment
+	world_env.environment = null
+	for c in get_children():
+		if c is CanvasLayer: c.visible = false
 
 func resume() -> void:
 	get_viewport().transparent_bg = false
+	if _saved_env: world_env.environment = _saved_env
+	for c in get_children():
+		if c is CanvasLayer: c.visible = true
 	visible = true
 	set_process(true)
 	cam.make_current()
