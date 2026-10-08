@@ -113,7 +113,7 @@ func frame(v: Dictionary, card := "") -> void:
 		var notice := P0MaterialLogic.reset_notice(v, _reset_shown)
 		if notice != "":
 			_reset_shown = float(v.mine.ended.at)
-			rt.ui.float_text(notice, top + Vector2(0, -8), P0Ui.INK)
+			rt.ui.float_text(notice, top + Vector2(0, -8), UiFloatText.Tone.ITEM)
 	_spot_marks(v, card)
 	var stored := P0MaterialLogic.stored_notice(v, _stored_shown)
 	if stored != "":

@@ -32,21 +32,6 @@ const _FLOAT_HUG_CHARS := 32         # longer float copy wraps to two lines (Flo
 const _CLOSE_ABOVE_CARD := 8.0     # RES-KAI-TALK: 8 above the dialogue bar, flush with its right edge
 const _AFFINITY_INSET := 8.0       # RES-KAI-TALK: the affinity float sits 8 in from the bar's left edge …
 const _AFFINITY_ABOVE := 6.0       # … and 6 above its top
-const PAPER := Color("fbf8f1")
-const CARD := Color(0.984, 0.973, 0.945, 0.94)
-const EDGE := Color("e1dac8")
-const INK := Color("2f3a33")
-const INK2 := Color("6e7b74")
-const GREEN := Color("7fc66a")
-const GREEN_D := Color("5fa85a")
-const AMBER := Color("e3b341")
-const AMBER_D := Color("b8831c")
-const BLUE := Color("6fa8dc")
-const DIS := Color("d6d5ce")
-const GOLD := Color("e9c35e")        # kit-cook --gold-light → --gold
-const GOLD_D := Color("c9962a")
-const RED := Color("e07a5f")         # --energy-red
-const XP := Color("1f8c88")          # --xp-deep (floating XP)
 var quick_store := "user://p0_quickbar.json"   # per-action pins / removals (tests point it elsewhere)
 const _KEY_ABOVE_BAR := 40.0        # BAR-1 482:18: ActionKey bottom at y 668, quick bar top at 708
 const _BADGE_CARD_GAP := 4.0        # a card over a facility that also shows a badge sits this far above it (the mine's EntryCard)
@@ -115,7 +100,6 @@ var _teach_left := 0.0
 var tips: P0Guide.TipQueue   # the TipCard order and "shown before" (SGODOT-232 U6)
 var _taught := {}
 var _toasts: ToastLayer   # Toast R1 (SGODOT-233): one at a time, above the quick bar
-var _regular: FontVariation
 
 # ---------------------------------------------------------------- build
 func _ready() -> void:
@@ -182,8 +166,8 @@ func _build_hud() -> void:
 	root.add_child(_creel)
 
 func _build_bar() -> void:
-	# Phase 1A world controls (SGODOT-221) sit in their own layer with the UI kit theme; the other P0 panels
-	# keep the old GameUi theme until phase 2 rebuilds them.
+	# Phase 1A world controls (SGODOT-221) sit in their own layer with the UI kit theme; the panels and cards set the
+	# kit theme on themselves (the hand-built P0 look went with SGODOT-235).
 	_kit = Control.new()
 	_kit.theme = UiKit.theme()
 	_kit.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -252,12 +236,16 @@ static func dev_tools_on(debug_build: bool, demo_build: bool) -> bool:
 func _build_dev() -> void:
 	var box := HBoxContainer.new()
 	box.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	box.position = Vector2(-96, 118 + safe_top())   # debug time skips, kept under the HUD on notched screens
+	box.grow_horizontal = Control.GROW_DIRECTION_BEGIN   # right-aligned, as wide as its buttons
+	box.offset_right = -UiTokens.SPACE_PAGE
+	box.offset_left = box.offset_right
+	box.offset_top = 118 + safe_top()   # debug time skips, kept under the HUD on notched screens
 	box.add_theme_constant_override("separation", 4)
-	for m in [60, 240]:
-		var b := _pill_button("+%dh" % (m / 60), false)
-		b.custom_minimum_size = Vector2(42, 22)
-		b.add_theme_font_size_override("font_size", 9)
+	box.theme = UiKit.theme()
+	for m in [60, 240]:   # a plain button in the compact secondary look: a dev tool, not a game command
+		var b := Button.new()
+		b.text = "+%dh" % (m / 60)
+		b.theme_type_variation = UiTokens.BUTTON_CMD_SECONDARY_COMPACT
 		b.pressed.connect(func(): dev_skip.emit(m))
 		box.add_child(b)
 	root.add_child(box)
@@ -1447,30 +1435,6 @@ func safe_bottom() -> float:
 func bottom_pad() -> float:
 	return maxf(41.0, safe_bottom() + 16.0)
 
-func _sheet(height: float, title: String, icon_id := "") -> VBoxContainer:
-	var panel := PanelContainer.new()
-	panel.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-	panel.offset_top = -height
-	panel.add_theme_stylebox_override("panel", _box(CARD, 16, EDGE, 1, Vector4(10, 8, 10, 12 + safe_bottom()), true))
-	panel.mouse_filter = Control.MOUSE_FILTER_STOP
-	var v := VBoxContainer.new()
-	v.add_theme_constant_override("separation", 6)
-	panel.add_child(v)
-	var head := HBoxContainer.new()
-	if icon_id != "": head.add_child(_icon(icon_id, 14))
-	var t := _label(title, 12, INK, true)
-	t.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	head.add_child(t)
-	var x := Button.new()
-	x.text = "✕"
-	x.custom_minimum_size = Vector2(30, 30)
-	_style_button(x, PAPER, EDGE, 15)
-	x.pressed.connect(close_modal)
-	head.add_child(x)
-	v.add_child(head)
-	_open_modal(panel, 0.3, true)
-	return v
-
 ## Bag | Gear drawer (SGODOT-225; LOCK-12 / 13, BAG-2-2 / BAG-2 · Gear): P0BagDrawer from the kit. Tapping a
 ## cell opens the F-07 bag card (UiInfoSheet, no Sell in the bag); the Gear side lists the tapped slot's
 ## candidates. No separate Tools & Gear panel and no Outfit tab (p(8)). The drawer follows the view while open.
@@ -1941,7 +1905,7 @@ func open_rest_card() -> void:
 		v.add_child(note)
 
 ## A centred card in the UI kit's look (InformationSheet 932:71686: surface, card radius, 16 inset, 12 gap) for the
-## phase-2 panels; the older P0 cards keep _center_card until they are rebuilt.
+## phase-2 panels (the Rest bench card).
 func _kit_card() -> VBoxContainer:
 	var center := CenterContainer.new()
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -1982,20 +1946,6 @@ func _banner_action(id: String) -> void:
 						selected_bait = bait
 						toast("%s on the hook · used at the bite" % P0Logic.item_name(view, bait))
 				break
-
-func _center_card(width: float) -> VBoxContainer:
-	var center := CenterContainer.new()
-	center.set_anchors_preset(Control.PRESET_FULL_RECT)
-	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var panel := PanelContainer.new()
-	panel.custom_minimum_size = Vector2(width, 0)
-	panel.add_theme_stylebox_override("panel", _box(CARD, 16, EDGE, 1, Vector4(14, 12, 14, 12)))
-	var v := VBoxContainer.new()
-	v.add_theme_constant_override("separation", 7)
-	panel.add_child(v)
-	center.add_child(panel)
-	_open_modal(center, 0.3)
-	return v
 
 ## §10.2.3: the switch key fans the four actions out from the character (ActionRadial, LOCK-04); what this
 ## spot can't do is greyed with the reason. P0 preselects by where you stand (plots → Farming, water → Fishing).
@@ -2672,72 +2622,6 @@ func can_request_panel() -> bool: return panel_requested.get_connections().size(
 ## both InputEventScreenTouch and InputEventMouseButton would fire toggles and commands twice.
 static func is_tap(e: InputEvent) -> bool:
 	return e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT
-
-func _label(text: String, size: int, color: Color, bold := false) -> Label:
-	var l := Label.new()
-	l.text = text
-	l.add_theme_font_size_override("font_size", size)
-	l.add_theme_color_override("font_color", color)
-	if not bold:
-		if _regular == null:
-			_regular = FontVariation.new()
-			_regular.base_font = load("res://assets/ui/fonts/Nunito.ttf")
-			_regular.variation_opentype = {TextServerManager.get_primary_interface().name_to_tag("wght"): 600}
-		l.add_theme_font_override("font", _regular)
-	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	return l
-
-func _icon(id: String, side: float) -> TextureRect:
-	var t := TextureRect.new()
-	t.texture = P0Logic.icon(id)
-	t.custom_minimum_size = Vector2(side, side)
-	t.size = Vector2(side, side)
-	t.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	t.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	t.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	return t
-
-func _box(bg: Color, radius: int, edge: Color, edge_w: int, pad4: Vector4, top_only := false) -> StyleBoxFlat:
-	var s := StyleBoxFlat.new()
-	s.bg_color = bg
-	s.border_color = edge
-	s.set_border_width_all(edge_w)
-	if top_only:
-		s.corner_radius_top_left = radius
-		s.corner_radius_top_right = radius
-	else:
-		s.set_corner_radius_all(radius)
-	s.content_margin_left = pad4.x
-	s.content_margin_top = pad4.y
-	s.content_margin_right = pad4.z
-	s.content_margin_bottom = pad4.w
-	return s
-
-func _style_button(b: Button, bg: Color, edge: Color, radius: int) -> void:
-	b.add_theme_stylebox_override("normal", _box(bg, radius, edge, 1, Vector4(8, 4, 8, 4)))
-	b.add_theme_stylebox_override("hover", _box(bg.lightened(0.04), radius, edge, 1, Vector4(8, 4, 8, 4)))
-	b.add_theme_stylebox_override("pressed", _box(bg.darkened(0.08), radius, edge, 1, Vector4(8, 4, 8, 4)))
-	b.add_theme_stylebox_override("disabled", _box(DIS, radius, DIS, 1, Vector4(8, 4, 8, 4)))
-	b.add_theme_color_override("font_color", INK)
-	b.add_theme_color_override("font_disabled_color", INK2)
-	# Icons keep their own colours (the shared theme tints button icons dark).
-	for k in ["icon_normal_color", "icon_hover_color", "icon_pressed_color", "icon_focus_color", "icon_hover_pressed_color"]:
-		b.add_theme_color_override(k, Color.WHITE)
-	b.add_theme_color_override("icon_disabled_color", Color(1, 1, 1, 0.45))
-
-func _pill_button(text: String, primary: bool) -> Button:
-	var b := Button.new()
-	b.text = text
-	b.custom_minimum_size = Vector2(0, 32)
-	b.add_theme_font_size_override("font_size", 11)
-	if primary:
-		_style_button(b, GREEN, GREEN_D, 16)
-		b.add_theme_color_override("font_color", Color.WHITE)
-		b.add_theme_color_override("font_pressed_color", Color.WHITE)
-		b.add_theme_color_override("font_hover_color", Color.WHITE)
-	else:
-		_style_button(b, PAPER, GREEN_D, 16)
-	return b
 
 # ---------------------------------------------------------------- small drawn widgets
 class _TouchPad extends Control:
