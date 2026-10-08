@@ -74,6 +74,9 @@ func card_candidates() -> Array:
 	var out: Array = []
 	for id in SPOTS: out.append([id, _spots.get(id, Vector3.ZERO), SPOT_REACH])
 	out.append(["workbench", _bench, SPOT_REACH])
+	# The mouth takes the farm's one card when it is nearest: no finger card then, its EntryCard shows instead, so
+	# the Herb Patch's card never sits on it (LOCK-07; desktop check of the root-scene fix, #39 follow-up).
+	out.append(["mine", mouth, MOUTH_REACH])
 	return out
 
 ## Every frame on the farm: badge, EntryCard and the reset notice. `card` is the farm's one finger card this frame.
@@ -86,7 +89,7 @@ func frame(v: Dictionary, card := "") -> void:
 		P0Logic.icon("pickaxe"))
 	top.y -= rt.ui.badge_height("mine")
 	var entry := P0MaterialLogic.mine_entry_card(v)
-	if _ensure_entry(): _entry.visible = near and bool(entry.get("show", false)) and not rt.ui.has_modal()
+	if _ensure_entry(): _entry.visible = card == "mine" and bool(entry.get("show", false)) and not rt.ui.has_modal()
 	if is_instance_valid(_entry) and _entry.visible:
 		_entry_button.text = str(entry.label)
 		# LOCK-10: a greyed EntryCard still takes the press and says why (苏烈, #39), so it is never `disabled`.
