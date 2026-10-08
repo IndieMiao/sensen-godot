@@ -5,7 +5,8 @@ extends Control
 ## track(marker, anchor_node, opts) for each marker. Every frame each marker is projected, hidden when
 ## behind the camera or covered by an occluder (an open drawer), optionally clamped inside the screen
 ## edge, and lower-priority markers are nudged upward when they overlap higher-priority ones.
-## 3D artists name the anchor nodes in the models; the naming list is part of WP7-B v2.
+## Anchor names follow the WP7-B F-03 ③ naming table (layout.json `anchors`, 2026-10-07). A marker with
+## point_at(local_x) is told where its anchor lies inside it after placement, so a pointer can follow it.
 
 var camera: Camera3D   ## defaults to the viewport's current 3D camera
 ## Screen rects that hide markers inside them (e.g. the open drawer from ModalStack).
@@ -49,7 +50,7 @@ func update_now() -> void:
 		if not rect.has_area() or _covered(p.pos):
 			m.visible = false
 			continue
-		placed.append({marker = m, rect = rect, priority = t.priority})
+		placed.append({marker = m, rect = rect, priority = t.priority, point = p.pos + t.offset})
 	var rects := placed.map(func(e): return e.rect)
 	var prio := placed.map(func(e): return e.priority)
 	var solved := resolve_overlaps(rects, prio, edge_margin)
@@ -57,6 +58,8 @@ func update_now() -> void:
 		var m: Control = placed[i].marker
 		m.visible = true
 		m.position = (solved[i] as Rect2).position - global_position
+		# Markers with a pointer (UiTapCard) keep it on the anchor after clamping or de-overlap moved them.
+		if m.has_method(&"point_at"): m.point_at((placed[i].point as Vector2).x - (solved[i] as Rect2).position.x)
 
 func _covered(pos: Vector2) -> bool:
 	for r in occluders:

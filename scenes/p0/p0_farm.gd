@@ -218,6 +218,7 @@ func p0_joystick(v: Vector2) -> void:
 func p0_frame(v: Dictionary, dt: float) -> void:
 	actor.step(dt)
 	_follow(dt)
+	rt.ui.player_screen = cam.unproject_position(actor.position + Vector3(0, 0.9, 0))   # the radial fans out from here
 	_sync_plots(v, dt)
 	_pick_front(v)
 	rt.ui.set_action(P0Logic.main_action(v, _front, rt.ui.selected_seed, _row))
@@ -319,28 +320,33 @@ func p0_tap(screen: Vector2) -> void:
 	elif cam.unproject_position(_mine + Vector3(0, 0.8, 0)).distance_to(screen) < 60:
 		rt.ui.toast("The mine opens soon")
 
+## Facility marks (STATE-ICONS) show over the stall; finger cards appear when you walk up (LOCK-07 / LOCK-17).
+## Tapping the card is tapping the facility, so it reuses p0_tap's own hit points.
 func _tags(v: Dictionary) -> void:
-	var near_stall := actor.position.distance_to(_stall) < 3.2
-	var note := ""
+	var stall_top := cam.unproject_position(_stall + Vector3(0, 1.05, 0))
+	var request := -1
 	for r in v.get("stall", {}).get("board", {}).get("requests", []):
-		if str(r.status) == "open" or (str(r.status) == "accepted" and int(r.have) >= int(r.qty)): note = " · !"
-	rt.ui.tag("stall", "Homestead Stall · Tap to shop" + note, cam.unproject_position(_stall + Vector3(0, 1.05, 0)), near_stall or note != "", true)
-	var st = v.get("cooking", {}).get("stove", null)
-	var home := "Home · Kitchen · Rest"
-	if st != null: home = "Home · Dish ready" if float(st.get("ready_in", 0)) <= 0.0 else "Home · Cooking " + P0Logic.duration(float(st.get("ready_in", 0)))
-	rt.ui.tag("home", home, cam.unproject_position(_house + Vector3(0, 2.6, 0.4)), actor.position.distance_to(_house) < 4.2 or st != null, st != null)
+		if str(r.status) == "accepted" and int(r.have) >= int(r.qty): request = UiStatusBadge.State.DELIVERABLE
+		elif str(r.status) == "open" and request < 0: request = UiStatusBadge.State.REQUEST
+	rt.ui.badge("stall", maxi(request, 0), stall_top, request >= 0)
+	rt.ui.tag("stall", "Tap to shop", stall_top - Vector2(0, rt.ui.badge_height("stall")),
+		actor.position.distance_to(_stall) < 3.2, cam.unproject_position(_stall + Vector3(0, 0.4, 0)))
+	# The farmhouse carries no state badge (不知火舞 on SGODOT-221): the stove's state belongs to the stove inside,
+	# and Today already names the dish and its time. The card's copy becomes "Farmhouse · Tap to go in" once the
+	# door card goes (bench SGODOT-224, room SGODOT-226).
+	rt.ui.tag("home", "Home · Kitchen · Rest", cam.unproject_position(_house + Vector3(0, 2.6, 0.4)),
+		actor.position.distance_to(_house) < 4.2, cam.unproject_position(_house + Vector3(0, 1.0, 0.6)))
 
 ## The bench always shows its state (STATE-ICONS: Available / Countdown with the time left / Used today) and, when the
-## player is near, its finger card (FARM-7). The badge needs SGODOT-221's rt.ui.badge (PR #12); until then only the card.
+## player is near, its finger card (FARM-7) above the badge. Tapping the card is tapping the seat, p0_tap's bench point.
 func _bench_marker(v: Dictionary) -> void:
 	var st := P0Logic.rest_state(v)
 	var top := cam.unproject_position(_bench + Vector3(0, 0.95, 0))
-	var lift := 0.0
-	if rt.ui.has_method("badge"):
-		var state: int = {"available": 0, "countdown": 2, "used_today": 4}.get(str(st.badge), 0)   # UiStatusBadge.State
-		rt.ui.call("badge", "bench", state, top, true, str(st.caption), P0Logic.icon("rest"))
-		if rt.ui.has_method("badge_height"): lift = float(rt.ui.call("badge_height", "bench"))
-	rt.ui.tag("bench", str(st.card), top - Vector2(0, lift), actor.position.distance_to(_bench) < BENCH_NEAR_M)
+	var state: UiStatusBadge.State = {"available": UiStatusBadge.State.AVAILABLE, "countdown": UiStatusBadge.State.COUNTDOWN,
+		"used_today": UiStatusBadge.State.USED_TODAY}.get(str(st.badge), UiStatusBadge.State.AVAILABLE)
+	rt.ui.badge("bench", state, top, true, str(st.caption), P0Logic.icon("rest"))
+	rt.ui.tag("bench", str(st.card), top - Vector2(0, rt.ui.badge_height("bench")),
+		actor.position.distance_to(_bench) < BENCH_NEAR_M, cam.unproject_position(_bench + Vector3(0, 0.35, 0)))
 
 ## Basic Room's bench (648 tris; q(30)) with the room's shared atlas material.
 func _bench_prop(at: Vector3) -> Node3D:
