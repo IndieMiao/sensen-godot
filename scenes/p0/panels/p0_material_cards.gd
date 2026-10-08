@@ -1,82 +1,131 @@
 class_name P0MaterialCards
 extends RefCounted
-## SGODOT-231 cards for the mine and the gathering spots, built on P0Ui's card layer (its _center_card / _sheet until
-## the stage-3 ModalStack, per Arthur) from kit parts, themed with UiKit.theme() (the card layer still carries GameUi's,
-## which drew the primary Start new run white on the Android walkthrough): the elevator panel (MINE-P0-6), "The mine" sheet from tapping
-## the mouth (MINE-P0-1 / P0-8), the New run confirmation (MINE-P0-7) and a locked spot (MAT-3). Copy and states come
-## from P0MaterialLogic; these functions only lay them out and route taps back to the caller.
+## SGODOT-231 cards for the mine and the gathering spots, on the new shells (SGODOT-235 B3): the ElevatorPanel above the
+## elevator key (MINE-P0-6, LOCK-21), and bottom Sheets with a Close 44 above them (UiDrawer, as the workbench and the
+## resident profile) for "The mine" from tapping the mouth (MINE-P0-1 / P0-8), the New run confirmation (MINE-P0-7)
+## and a spot that opens later (MAT-3). Sheet content follows the frames: ObjectHeader, Fact rows, then the fixed
+## decision area (Cost, a note, one command, Dismiss). Copy and states come from P0MaterialLogic; these functions only
+## lay them out and route taps back to the caller.
 
-const HERE_BG := Color("e6f0de")
+const ELEVATOR_RIGHT := 12.0     # MINE-P0-6: the panel at x 68, w 280 (right edge 12 in from the screen) …
+const ELEVATOR_BOTTOM := 347.0   # … its bottom at y 453 of 800, above the elevator key
+const SHEET_GAP := 8             # Sheet content: ObjectHeader / Fact / rows 8 apart
+const VIEW_HOMESTEAD := "View homestead"   # MAT-3 NavigationRow (the row draws its own ›)
+const HomePanel := preload("res://scenes/p0/home/p0_home_panel.gd")
+const DECISION_GAP := 12         # the fixed decision area starts 12 below the content (Cost at y 12)
+const ELEVATOR_KINDS := {"here": UiElevatorPanel.State.HERE, "free": UiElevatorPanel.State.FREE,
+	"cost": UiElevatorPanel.State.COST, "locked": UiElevatorPanel.State.LOCKED, "short": UiElevatorPanel.State.SHORT}
 
-## MINE-P0-6: "Elevator · stops this run", one row per stop, name left and Free / Here / reason right. `pick` gets the
-## row's cmd (mine_leave, mine_floor, energy_card); an unavailable row toasts its reason.
-static func open_elevator(ui: P0Ui, view: Dictionary, here: int, pick: Callable) -> void:
-	var v := ui._center_card(260)
-	v.theme = UiKit.theme()   # kit parts (CommandButton, FactRow) keep their styles inside the P0 card layer
-	v.add_child(UiKit.label(P0MaterialLogic.ELEVATOR_TITLE, UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_SECONDARY))
-	for r in P0MaterialLogic.elevator_rows(view, here):
-		var row := Button.new()
-		row.focus_mode = Control.FOCUS_NONE
-		row.custom_minimum_size = Vector2(0, 44)
-		var is_here := str(r.state) == "Here"
-		ui._style_button(row, HERE_BG if is_here else P0Ui.PAPER, P0Ui.EDGE, 10)
-		var fact := UiFactRow.new(str(r.name), str(r.state))
-		fact.set_anchors_preset(Control.PRESET_FULL_RECT)
-		fact.offset_left = 12
-		fact.offset_right = -12
-		fact.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		row.add_child(fact)
-		var cmd: Dictionary = r.cmd
-		var enabled: bool = r.enabled
-		var reason := str(r.label)
-		row.pressed.connect(func():
-			if enabled and not cmd.is_empty(): pick.call(cmd)
-			elif not is_here: ui.toast(reason))
-		v.add_child(row)
+## MINE-P0-6: ElevatorPanel `Elevator · stops this run`, one row per stop (Here / Free / 2 Energy / Clear Floor 1 first /
+## Need 2 Energy). No scrim (the frame keeps the scene, key and bar in view); a tap outside or Back closes it. `pick`
+## gets the row's cmd (mine_leave, mine_floor, energy_card); a locked row toasts its reason (LOCK-10).
+static func open_elevator(ui: P0Ui, view: Dictionary, here: int, pick: Callable) -> UiElevatorPanel:
+	var rows := P0MaterialLogic.elevator_rows(view, here)
+	var panel := UiElevatorPanel.new(P0MaterialLogic.ELEVATOR_TITLE, rows.map(func(r: Dictionary) -> Dictionary:
+		return {"floor": r.name, "value": r.state, "state": ELEVATOR_KINDS.get(str(r.kind), UiElevatorPanel.State.LOCKED)}))
+	panel.theme = UiKit.theme()
+	panel.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
+	panel.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	panel.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	panel.offset_right = -ELEVATOR_RIGHT
+	panel.offset_bottom = -ELEVATOR_BOTTOM
+	panel.offset_left = panel.offset_right - UiElevatorPanel.WIDTH
+	panel.offset_top = panel.offset_bottom
+	panel.row_pressed.connect(func(i: int):
+		var cmd: Dictionary = rows[i].cmd
+		if not cmd.is_empty(): pick.call(cmd))
+	panel.unavailable_pressed.connect(func(i: int): ui.toast(str(rows[i].label)))
+	ui._open_modal(panel, 0.0, false)
+	ui.modal_kind = "elevator"
+	return panel
 
 ## MINE-P0-1 / P0-8: tapping the mouth shows what the mine is and today's runs; when no run is possible today the
-## only button is the grey reason. Entering stays on the main action key (LOCK-21).
-static func open_mine_sheet(ui: P0Ui, view: Dictionary) -> void:
+## only button is the grey reason (LOCK-10). Entering stays on the main action key (LOCK-21).
+static func open_mine_sheet(ui: P0Ui, view: Dictionary) -> UiDrawer:
 	var sheet := P0MaterialLogic.mine_sheet(view)
-	var v := ui._sheet(300, "")
-	v.theme = UiKit.theme()   # kit parts (CommandButton, FactRow) keep their styles inside the P0 card layer
-	v.add_child(UiObjectHeader.new({"title": sheet.title, "state": sheet.subtitle, "effect": sheet.line}))
-	for f in sheet.facts: v.add_child(UiFactRow.new(str(f[0]), str(f[1])))
+	var d := _sheet(ui)
+	d.body.add_child(UiObjectHeader.new({"title": sheet.title, "state": sheet.subtitle, "effect": sheet.line}))
+	for f in sheet.facts: d.body.add_child(UiFactRow.new(str(f[0]), str(f[1])))
 	var button: Dictionary = sheet.button
 	if not button.is_empty():
+		_decision_gap(d)
 		var b := UiCommandButton.new("", UiCommandButton.Kind.PRIMARY)
 		b.reason = str(button.label)
 		b.unavailable_pressed.connect(func(text: String): ui.toast(text))
-		v.add_child(b)
+		d.body.add_child(b)
+	_show(ui, d, "mine_sheet")
+	return d
 
-## MINE-P0-7: from the EntryCard's New run · 2 Energy. Start new run sends mine_new_run; Keep current run closes.
-static func open_new_run(ui: P0Ui, view: Dictionary, send: Callable) -> void:
+## MINE-P0-7: from the EntryCard's New run · 2 Energy. ObjectHeader `The mine` / `New run`, the runs fact, then Cost
+## `New run · 2 Energy`, `Your stored materials stay yours.`, Command/destructive `Start new run` (sends mine_new_run)
+## and Dismiss `Keep current run` (closes).
+static func open_new_run(ui: P0Ui, view: Dictionary, send: Callable) -> UiDrawer:
 	var sheet := P0MaterialLogic.new_run_sheet(view)
-	var v := ui._sheet(340, "")
-	v.theme = UiKit.theme()   # kit parts (CommandButton, FactRow) keep their styles inside the P0 card layer
-	v.add_child(UiObjectHeader.new({"title": sheet.title, "state": sheet.subtitle}))
-	for f in sheet.facts: v.add_child(UiFactRow.new(str(f[0]), str(f[1])))
-	v.add_child(UiFactRow.new(str(sheet.cost[0]), str(sheet.cost[1]), UiFactRow.Kind.COST))
-	v.add_child(UiKit.label(str(sheet.note), UiTokens.STYLE_BODY_R14))
-	var go := UiCommandButton.new(str(sheet.confirm.label), UiCommandButton.Kind.PRIMARY)
-	go.sends = true   # mine_new_run (§10.7.1 Offline)
+	var d := _sheet(ui)
+	d.body.add_child(UiObjectHeader.new({"title": sheet.title, "state": sheet.subtitle}))
+	for f in sheet.facts: d.body.add_child(UiFactRow.new(str(f[0]), str(f[1])))
+	_decision_gap(d)
+	d.body.add_child(UiFactRow.new(str(sheet.cost[0]), str(sheet.cost[1]), UiFactRow.Kind.COST))
+	var note := UiKit.label(str(sheet.note), UiTokens.STYLE_BODY_B14)   # body/Bold 14 (MINE-P0-7)
+	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	d.body.add_child(note)
+	var go := UiCommandButton.new(str(sheet.confirm.label), UiCommandButton.Kind.DESTRUCTIVE)
 	var cmd: Dictionary = sheet.confirm.cmd
 	go.activated.connect(func():
 		ui.close_modal()
 		send.call(cmd))
-	v.add_child(go)
-	var keep := UiCommandButton.new(str(sheet.keep), UiCommandButton.Kind.SECONDARY)
-	keep.activated.connect(ui.close_modal)
-	v.add_child(keep)
+	d.body.add_child(go)
+	var keep := UiDismissButton.new(str(sheet.keep))
+	keep.pressed.connect(ui.close_modal)
+	d.body.add_child(keep)
+	_show(ui, d, "new_run")
+	return d
 
-## MAT-3: a spot that opens later (Clay Bank before Homestead Lv2).
-static func open_locked_spot(ui: P0Ui, view: Dictionary, spot_id: String) -> void:
+## MAT-3: a spot that opens later (Clay Bank before Homestead Lv2): ObjectHeader `Clay Bank` / `Locked` / what it
+## gives, the `Unlock · Homestead Lv2` fact and NavigationRow `View homestead ›`, which opens the HOME-1 upgrade sheet
+## (a panel only: no jump, the camera stays, LOCK-08). The frame's `Details ›` row is left out: P0 has no details page
+## (不知火舞 on 235).
+static func open_locked_spot(ui: P0Ui, view: Dictionary, spot_id: String) -> UiDrawer:
 	var sheet := P0MaterialLogic.locked_spot_sheet(view, spot_id)
-	if sheet.is_empty(): return
-	var v := ui._sheet(260, "")
-	v.theme = UiKit.theme()   # kit parts (CommandButton, FactRow) keep their styles inside the P0 card layer
-	v.add_child(UiObjectHeader.new({"title": sheet.title, "state": sheet.subtitle, "effect": sheet.line}))
-	for f in sheet.facts: v.add_child(UiFactRow.new(str(f[0]), str(f[1])))
+	if sheet.is_empty(): return null
+	var d := _sheet(ui)
+	d.body.add_child(UiObjectHeader.new({"title": sheet.title, "state": sheet.subtitle, "effect": sheet.line}))
+	for f in sheet.facts: d.body.add_child(UiFactRow.new(str(f[0]), str(f[1])))
+	var home := UiNavButton.new(VIEW_HOMESTEAD)
+	home.pressed.connect(func(): HomePanel.open(ui))
+	d.body.add_child(home)
+	_show(ui, d, "locked_spot")
+	return d
+
+## A bottom Sheet like the workbench's: page padding 16, the UI kit theme, the bottom safe inset, swipe-down closes.
+static func _sheet(ui: P0Ui) -> UiDrawer:
+	var d := UiDrawer.new(0.0)
+	d.pad = UiTokens.SPACE_PAGE
+	d.theme = UiKit.theme()
+	d.safe_bottom = ui.safe_bottom()
+	d.body.add_theme_constant_override(&"separation", SHEET_GAP)
+	d.close_requested.connect(ui.close_modal)
+	return d
+
+## The fixed decision area sits 12 below the content (SHEET_GAP + 4).
+static func _decision_gap(d: UiDrawer) -> void:
+	var gap := Control.new()
+	gap.custom_minimum_size.y = DECISION_GAP - SHEET_GAP
+	gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	d.body.add_child(gap)
+
+## Open the sheet with the drawer scrim and a Close 44 six above its top, 16 in (RES-PIP / B2-06), then fit its height
+## to the content once laid out (wrapped lines know their width a frame later).
+static func _show(ui: P0Ui, d: UiDrawer, kind: String) -> void:
+	ui._open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
+	ui._close_above(d, P0Ui._CLOSE_ABOVE_SHEET, UiTokens.SPACE_PAGE)
+	ui.modal_kind = kind
+	fit(d)
+	d.get_tree().process_frame.connect(func(): if is_instance_valid(d): fit(d), CONNECT_ONE_SHOT)
+
+## The sheet's height: its content plus the padding above and below (the safe inset is added by the drawer).
+static func fit(d: UiDrawer) -> void:
+	d.height = d.body.get_combined_minimum_size().y + d.pad * 2.0
 
 # --- Workbench (B2-06) ---
 
