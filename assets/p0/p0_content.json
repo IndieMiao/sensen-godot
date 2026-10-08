@@ -1452,7 +1452,7 @@
     }
   },
   "mine": {
-    "_note": "SGODOT-231 §13.3 / LOCK-21, floors 1–2: 2 Energy the first time a run reaches a floor, 2 per rock, ≤ 2 runs a player day, a new run needs floor 2 cleared, 04:00 ends an unfinished run. Each rock: Stone by the pickaxe, plus one weighted extra drop derived from the run, floor and rock. Floor 2 quartz (15) is folded into Rock Salt for P0 (copper 30 / salt 35 / none 35; user, knob A, q(47)); P1 restores quartz.",
+    "_note": "SGODOT-231 §13.3 / LOCK-21, floors 1–2: 2 Energy the first time a run reaches a floor, 2 per rock, ≤ 2 runs a player day, a new run needs floor 2 cleared, 04:00 ends an unfinished run. Each rock: Stone by the pickaxe, plus one weighted extra drop derived from the run, floor and rock. Floor 2 quartz (15) is folded into Rock Salt for P0 (copper 30 / salt 35 / none 35; user, knob A, q(47)); P1 restores quartz. Fee-paying entrances (a new run, an unpaid floor) refuse when the floor's worst case doesn't fit (q(48)).",
     "runs_per_day": 2,
     "floor_energy": 2,
     "rock_energy": 2,
