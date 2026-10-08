@@ -70,8 +70,9 @@ func test_one_kind_one_line_in_order_and_a_repeat_bumps_in_place() -> void:
 	var again := ui.float_lines([{kind = "xp", key = "%s XP", amount = 4, fmt = "%s XP", tone = UiFloatText.Tone.XP},
 		{kind = "item", key = "wood", amount = 6, fmt = "%s Timber", tone = UiFloatText.Tone.ITEM}], at)
 	assert_bool(again[0] == shown[0]).is_true()   # the same XP line, bumped
-	assert_array(again.map(func(f): return f.text)).is_equal(["+12 XP", "+12 Timber · +2 Stone"])
-	assert_int(_floats(ui).size()).is_equal(3)
+	# Items float per reply (each plot's own), only XP adds up across replies.
+	assert_array(again.map(func(f): return f.text)).is_equal(["+12 XP", "+6 Timber"])
+	assert_int(_floats(ui).size()).is_equal(4)
 	t[0] += 700   # past the fade: a new line
 	var later := ui.float_lines([{kind = "xp", key = "%s XP", amount = 4, fmt = "%s XP", tone = UiFloatText.Tone.XP}], at)
 	assert_bool(later[0] == shown[0]).is_false()
@@ -137,3 +138,31 @@ func test_a_worlds_lines_join_the_replys_batch() -> void:
 	var fl := _floats(ui)
 	assert_array(fl.map(func(f): return f.text)).is_equal(["Floor 2 · −2 Energy", "+4 XP", "+2 Worm Bait · +6 Timber · Stored"])
 	assert_int(fl[0].tone).is_equal(UiFloatText.Tone.ENERGY_COST)
+
+## E-04 / §4.8.3 (SGODOT-233): a held harvest's XP stays one line that counts its plants, wherever the player walks;
+## each plot's item still floats on its own, and the first harvest of a crop says so on its own line.
+func test_a_held_harvest_counts_its_plants_in_one_xp_line() -> void:
+	var rt: P0Runtime = auto_free(P0Runtime.new())
+	add_child(rt)
+	await get_tree().process_frame
+	var v := {"energy": {"value": 140, "max": 200}, "coins": 52, "bag": {"capacity": 25, "slots": []},
+		"skills": {"farming": {"level": 1, "xp": 20}}, "names": {"crop_radish": "Radish"}}
+	rt.session.view = v
+	var t := [5000]
+	rt.ui.float_clock = func(): return t[0]
+	rt.ui.fab_held = true
+	rt._on_state(v, [{"kind": "first", "what": "harvest:crop_radish", "xp": 10},
+		{"kind": "xp", "skill": "farming", "amount": 10, "percent": 100},
+		{"kind": "xp", "skill": "farming", "amount": 2, "percent": 100},
+		{"kind": "item", "id": "crop_radish", "delta": 1}])
+	await get_tree().process_frame
+	var first := _floats(rt.ui).map(func(f): return f.text)
+	assert_array(first).is_equal(["+2 XP", "First harvest! +10 XP · Radish", "+1 Radish"])
+	for i in 19:   # nineteen more plots, a labour beat apart, the player moving on
+		t[0] += 700
+		rt._on_state(v, [{"kind": "xp", "skill": "farming", "amount": 2, "percent": 100}, {"kind": "item", "id": "crop_radish", "delta": 1}])
+		await get_tree().process_frame
+	var xp: Array = _floats(rt.ui).filter(func(f): return f.text.ends_with("plants"))
+	assert_int(xp.size()).is_equal(1)
+	assert_str(xp[0].text).is_equal("+40 XP · 20 plants")
+	rt.ui.fab_held = false

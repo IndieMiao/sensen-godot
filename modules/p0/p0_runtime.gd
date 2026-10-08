@@ -239,7 +239,12 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	last_first_catch_xp = 0
 	last_catch_extras = {}
 	var settles_catch := events.any(func(e): return str(e.get("kind", "")) == "catch")
-	var first_cook_xp: Array = []   # the first-cook bonus is on the result card's strip, not a float (Li Bai, int6 C11)
+	# A first's bonus XP is said by its own line, not added into the XP float: the first cook's and catch's on their
+	# card's strip (Li Bai, int6 C11), the first harvest's as `First harvest! +10 XP · Radish` (§4.8.6).
+	var first_cook_xp: Array = []
+	# A harvest reply's XP counts its plants, so a held harvest reads `+40 XP · 20 plants` (§4.8.3).
+	var plants := events.filter(func(e): return str(e.get("kind", "")) == "item" and str(e.get("id", "")).begins_with("crop_") \
+		and int(e.get("delta", 0)) > 0).size()
 	var good_pot := events.any(func(e): return str(e.get("kind", "")) == "dish" and int(e.get("quality", 0)) >= 1)
 	# A craft's output is said by the workbench (`+2 Torch` on its card, the pickaxe's Moment; SGODOT-231 B2-06).
 	var crafted := events.any(func(e): return str(e.get("kind", "")) == "craft")
@@ -249,7 +254,13 @@ func _on_state(v: Dictionary, events: Array) -> void:
 			"xp":
 				# The server emits a first-time bonus as `first` immediately followed by its `xp`.
 				var bonus: bool = i > 0 and str(events[i - 1].get("kind", "")) == "first" and int(events[i - 1].xp) == int(ev.amount)
-				if bonus and str(ev.skill) == "cooking": first_cook_xp.append(ev)
+				var what := str(events[i - 1].get("what", "")) if bonus else ""
+				if bonus and (str(ev.skill) == "cooking" or what.begins_with("catch:") or what.begins_with("harvest:")):
+					first_cook_xp.append(ev)
+				if what.begins_with("harvest:"):
+					var crop := what.trim_prefix("harvest:")
+					floats.append({kind = "first", key = what, text = "First harvest! +%d XP · %s" % [int(ev.amount),
+						P0Logic.item_name(v, crop)], tone = UiFloatText.Tone.XP})
 				if int(ev.amount) > 0 and not bonus:
 					xp_lines.append("+%d %s XP" % [int(ev.amount), str(ev.skill).capitalize()] + ("" if int(ev.percent) >= 100 else " · %d%%" % int(ev.percent)))
 			"reward":
@@ -285,7 +296,9 @@ func _on_state(v: Dictionary, events: Array) -> void:
 					var cook := str(ev.skill) == "cooking"
 					var fmt := ("%s Cooking XP" + (" ★" if good_pot else "")) if cook else "%s XP"
 					fmt += "" if int(ev.percent) >= 100 else " · %d%%%%" % int(ev.percent)
-					floats.append({kind = "xp", key = fmt, amount = int(ev.amount), fmt = fmt, tone = UiFloatText.Tone.XP})
+					var part := {kind = "xp", key = fmt, amount = int(ev.amount), fmt = fmt, tone = UiFloatText.Tone.XP}
+					if plants > 0 and str(ev.skill) == "farming": part.merge({unit = "plants", count = plants})
+					floats.append(part)
 			"item":
 				var iid := str(ev.id)
 				if iid.begins_with("dish_"): _call("p0_event", [ev, v])   # where a collected dish went (the kitchen's Keep toast)
@@ -526,6 +539,7 @@ func _dev_shot(dt: float) -> void:
 			"energypanel": ui.open_energy_panel()
 			"inbox": ui.open_inbox()
 			"workbench": ui.open_workbench(step[1] if step.size() > 1 else "")   # SGODOT-231 B2-06 drawer, tools / supplies
+			"toasterr": ui.toast_error(step[1] if step.size() > 1 else "Need 1 more Copper Ore")   # a refusal's Error toast (233)
 			"wbtile":   # wbtile:craft_copper_pickaxe:0 taps that card's cost tile (NeedSource)
 				var wb := ui.workbench()
 				if wb != null and wb.card(step[1]) != null: wb.card(step[1]).tiles()[int(step[2])].pressed.emit()

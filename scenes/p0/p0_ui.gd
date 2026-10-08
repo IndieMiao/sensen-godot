@@ -1023,9 +1023,13 @@ func _float_floor(x: float, half_w: float) -> float:
 
 # ---------------------------------------------------------------- one reply's floats (q(49) ①, §4.8.6)
 ## The order of one reply's lines: Energy → XP → items → coins → affinity (q(49) ①).
-const FLOAT_ORDER := ["energy", "xp", "item", "coins", "affinity"]
+const FLOAT_ORDER := ["energy", "xp", "first", "item", "coins", "affinity"]
+## Kinds a later reply adds into while their line is up: XP (`+40 XP · 20 plants`, §4.8.3 XP 入账). Items, Energy and
+## coins float per reply (each plot's `+1 Radish`, each bed's `−2 Energy`).
+const FLOAT_MERGE_KINDS := ["xp"]
 const FLOAT_MAX_LINES := 3
-## A line of a kind still up — before its fade starts (UiFloatText 650 ms) — takes the next reply's amount in place.
+## A line of a kind still up — before its fade starts (UiFloatText 650 ms) — takes the next reply's amount in place;
+## while the action key is held (a held harvest, a labour beat apart) for as long as the line is still there.
 const _FLOAT_MERGE_MS := 650
 const _FLOAT_MERGE_PX := 32.0
 var float_clock := Callable(Time, &"get_ticks_msec")
@@ -1053,10 +1057,12 @@ func float_lines(parts: Array, at: Vector2) -> Array:
 		var k: String = order[i]
 		var merged: Dictionary = kinds[k]
 		var extra: Array = order.slice(FLOAT_MAX_LINES) if i == FLOAT_MAX_LINES - 1 else []
-		if extra.is_empty():
+		if extra.is_empty() and k in FLOAT_MERGE_KINDS:
 			var live: Dictionary = _live_floats.get(k, {})
-			if not live.is_empty() and is_instance_valid(live.node) and now - int(live.ms) < _FLOAT_MERGE_MS \
-					and (live.at as Vector2).distance_to(at) < _FLOAT_MERGE_PX:
+			var node: UiFloatText = live.get("node") if not live.is_empty() and is_instance_valid(live.get("node")) else null
+			# Held: the line stays where it rose while the player walks on (§4.8.3); otherwise the same place, briefly.
+			var near := fab_held or (now - int(live.get("ms", 0)) < _FLOAT_MERGE_MS and (live.at as Vector2).distance_to(at) < _FLOAT_MERGE_PX)
+			if node != null and not node.is_queued_for_deletion() and near:
 				for p in merged.values(): _float_add(live.parts, p)
 				(live.node as UiFloatText).bump(_float_line_text(live.parts))
 				live.ms = now
@@ -1113,7 +1119,9 @@ func _flush_floats() -> void:
 
 static func _float_add(into: Dictionary, p: Dictionary) -> void:
 	var key := str(p.get("key", p.get("fmt", p.get("text", ""))))
-	if into.has(key) and p.has("fmt"): into[key].amount = int(into[key].amount) + int(p.get("amount", 0))
+	if into.has(key) and p.has("fmt"):
+		into[key].amount = int(into[key].amount) + int(p.get("amount", 0))
+		into[key].count = int(into[key].get("count", 1)) + int(p.get("count", 1))
 	else: into[key] = p.duplicate()   # a new key, or a text part (the latest wins)
 
 static func _float_sum(parts: Dictionary) -> int:
@@ -1125,22 +1133,47 @@ static func _float_line_text(parts: Dictionary) -> String:
 	return " · ".join(parts.values().map(func(p: Dictionary) -> String:
 		if not p.has("fmt"): return str(p.get("text", ""))
 		var a := int(p.get("amount", 0))
-		return str(p.fmt) % (("+%d" % a) if a >= 0 else ("−%d" % -a))))
+		var line := str(p.fmt) % (("+%d" % a) if a >= 0 else ("−%d" % -a))
+		# A held harvest's XP counts its plants once more than one went into it: `+40 XP · 20 plants`.
+		if str(p.get("unit", "")) != "" and int(p.get("count", 1)) > 1: line += " · %d %s" % [int(p.count), str(p.unit)]
+		return line))
 
 ## Toast (Toast R1, §4.8.6; q(49) ⑤): one at a time, a new one replaces the one showing and the same sentence again
 ## within 2 s only stays up longer. Info; `seconds` > 0 overrides the length rule (2 s + 0.5 s per 20 characters,
 ## at most 5 s). A tap closes it early. Feedback the player must confirm is a card, never a toast.
 func toast(text: String, seconds := 0.0) -> void:
-	if _toasts: _toasts.show_toast(text, ToastLayer.Severity.INFO, "", seconds)
+	if not _toasts: return
+	_aim_toast()
+	_toasts.show_toast(text, ToastLayer.Severity.INFO, "", seconds)
+
+## Where the toast sits (WP2 D-01, q(16)): over the quick bar's top edge, in the scene or docked in the bag; over a
+## drawer without the bar (the workbench, a counter), just above the drawer's top edge — clear of its rows and of the
+## Close key on the right — when there is room under the HUD; else the bar's spot.
+func _aim_toast() -> void:
+	if _bar != null and _bar.is_visible_in_tree():
+		_toasts.anchor_above(_bar)
+		return
+	var content: Control = _modal.get_child(1) if _modal != null and _modal.get_child_count() > 1 else null
+	if content != null and content.is_visible_in_tree():
+		var top := content.get_global_rect().position.y - root.global_position.y
+		var hud_bottom := _marker_area().position.y + _kit.global_position.y - root.global_position.y
+		if top - UiTokens.SPACE_OVERLAY_BODY - UiTokens.SIZE_TOAST_MIN_H >= hud_bottom:
+			_toasts.anchor_above(content)
+			return
+	_toasts.anchor_above(_bar)
 
 ## A refused command (§4.8.6 `命令被拒（非体力）`, wording per appendix B) or FISH-4's full creel. `action` adds a
 ## guiding line (`Open bag ›`) that acts in place and never travels (LOCK-08).
 func toast_error(text: String, action := "") -> void:
-	if _toasts: _toasts.show_toast(text, ToastLayer.Severity.ERROR, action)
+	if not _toasts: return
+	_aim_toast()
+	_toasts.show_toast(text, ToastLayer.Severity.ERROR, action)
 
 ## Done, worth saying once: a cleared mine floor, a resident's meal (§4.8.6 Toast Success).
 func toast_success(text: String) -> void:
-	if _toasts: _toasts.show_toast(text, ToastLayer.Severity.SUCCESS)
+	if not _toasts: return
+	_aim_toast()
+	_toasts.show_toast(text, ToastLayer.Severity.SUCCESS)
 
 ## What the toast says now ("" when none is up).
 func toast_text() -> String: return _toasts.current_text() if _toasts else ""

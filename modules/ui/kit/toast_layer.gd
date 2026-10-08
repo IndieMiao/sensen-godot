@@ -43,7 +43,7 @@ var _label: Label
 var _action: Label
 
 func _ready() -> void:
-	set_anchors_preset(Control.PRESET_FULL_RECT)
+	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)   # fill the parent whatever size it had when added
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_panel = card(Severity.INFO, "")
 	_panel.visible = false

@@ -76,3 +76,17 @@ func test_a_full_creel_says_so_and_its_action_opens_the_bag() -> void:
 	rt.ui._toasts._action.gui_input.emit(tap)
 	assert_str(rt.ui.modal_kind).is_equal("bag")
 	assert_str(rt.ui.toast_text()).is_empty()
+
+## 周瑜 (int, a05-reason): over a drawer without the quick bar (the workbench), the reason toast is whole, over the
+## drawer, just above its top edge — not on its rows or its Close key; and every toast keeps Toast R1's 232 width.
+func test_over_a_drawer_without_the_bar_it_sits_above_the_drawer() -> void:
+	var wb := UiDrawer.new(300.0)   # the workbench's way: a drawer opened without the bar (hide_controls)
+	wb.animate = false
+	ui._open_modal(wb, UiTokens.OPACITY_SCRIM_DRAWER, true)
+	await await_idle_frame()
+	ui.toast_error("Need 1 more Copper Ore")
+	await await_idle_frame()
+	var r := _panel().get_global_rect()
+	assert_float(r.size.x).is_equal(float(ToastLayer.WIDTH))
+	assert_int(ui._toasts.get_index()).is_equal(ui.root.get_child_count() - 1)
+	assert_float(r.end.y).is_equal_approx(wb.get_global_rect().position.y - UiTokens.SPACE_OVERLAY_BODY, 0.5)
