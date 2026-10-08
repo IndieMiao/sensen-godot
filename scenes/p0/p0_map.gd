@@ -195,11 +195,13 @@ func place_for(target: String) -> Dictionary:
 func p0_surface() -> String: return "map"
 
 ## Map markers the client knows before the server's map_markers come (蒙恬 on #83, q(48)): while the tutorial Pond
-## Catch is not handed in, the beginner pond Today points at wears the Request ! — so the first session's map shows it
-## at the city level beside the Tackle Shop, 200 m away (CityMapView packs marker pins first).
+## Catch is on the stall's board and still short of its fish, the beginner pond Today points at wears the Request ! —
+## so the first session's map shows it at the city level beside the Tackle Shop, 200 m away (CityMapView packs marker
+## pins first). Read off the board like the guide (P0Guide.tutorial), not req_done: that keeps only the last 20.
 func city_pin_markers() -> Dictionary:
 	var v: Dictionary = rt.session.current() if rt != null and rt.session != null else {}
-	if (v.get("req_done", []) as Array).has(P0Guide.TUTORIAL): return {}
+	var t := P0Guide.tutorial(v)
+	if t.is_empty() or int(t.get("have", 0)) >= int(t.get("qty", 1)): return {}   # handed in, or off to the stall
 	return {NEAREST_POND: "request"}
 
 # ---------------------------------------------------------------- dev steps for P0_SHOT

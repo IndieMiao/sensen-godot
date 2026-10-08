@@ -68,7 +68,7 @@ var entries: Array = []
 var live_pois: Array = []
 var markers: Dictionary = {}
 var displayed: Array = []
-## The outpost labels shown this update (local rects): the player's own My Farm label gives way to them.
+## The outpost and marked-pin labels shown this update (local rects): the player's own My Farm label gives way to them.
 var _place_labels: Array = []
 ## Map markers the host gives by pin id (q(48)), asked once per update through its `city_pin_markers()`; an entry's
 ## own `marker` wins.
@@ -505,9 +505,14 @@ func _label_width(entry: Dictionary) -> float:
 	if font == null: return 48.0
 	return minf(LABEL_MAX_W, font.get_string_size(_label_text(entry), HORIZONTAL_ALIGNMENT_LEFT, -1, LABEL_FONT).x + LABEL_PAD)
 
-## An outpost label's width: its whole text on one line at the pins' 9 pt, with no cap (不知火舞 on C30), plus the
-## marker style's 4 + 4 and 2 to spare.
-func _place_label_width(entry: Dictionary) -> float:
+## Labels written whole, never cut: an outpost's and any pin's wearing a marker (不知火舞 on C30 / #83); unmarked ponds
+## and landmarks keep their cut labels.
+func _whole_label(entry: Dictionary) -> bool:
+	return entry.get("kind") == "place" or _marker_of(entry) != ""
+
+## A whole label's width: its text on one line at the pins' 9 pt, with no cap (不知火舞 on C30), plus the marker
+## style's 4 + 4 and 2 to spare.
+func _whole_label_width(entry: Dictionary) -> float:
 	var font := get_theme_font("font", "Label")
 	if font == null: return 48.0
 	return ceilf(font.get_string_size(_label_text(entry), HORIZONTAL_ALIGNMENT_LEFT, -1, 9).x) + 10.0
@@ -855,9 +860,9 @@ func _update_markers() -> void:
 		var art_side: float = 88 if entry.kind == "landmark" else lerpf(42, 64, clampf((host.zoom - 13) / 3, 0, 1))
 		var top := 40.0 if entry.kind == "resident" else 54.0 if art_key in ["hollywood_sign", "griffith_observatory", "santa_monica_pier"] else 80.0 if entry.kind == "landmark" else 56.0
 		if entry.kind == "poi": top = maxf(36, art_side * 0.94)
-		var label_h := _label_height(entry, width) if is_sel and entry.kind != "place" else 16.0
-		# An outpost's label is never cut: the whole name and who is in, on one line (不知火舞 on C30, q(72)).
-		var label_w := _place_label_width(entry) if entry.kind == "place" else width
+		var label_h := _label_height(entry, width) if is_sel and not _whole_label(entry) else 16.0
+		# An outpost's label and a marked pin's are never cut: the whole text on one line (不知火舞 on C30, q(72)).
+		var label_w := _whole_label_width(entry) if _whole_label(entry) else width
 		var art_w := 36.0 if entry.kind == "resident" else art_side
 		var art_h := top
 		var side := maxf(width, art_side)
@@ -946,6 +951,11 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int)
 			_place_labels.append(label_rect)
 	else:
 		occupied.append(c.bounds)
+		# A marked pin's whole label reaches past its bounds: what comes after keeps clear of it too, and My Farm's label
+		# gives way to it as to an outpost's (不知火舞 on #83).
+		if _marker_of(entry) != "":
+			occupied.append(label_rect)
+			if entry.kind != "poi" or is_selected or host.zoom >= 16: _place_labels.append(label_rect)
 	if not markers.has(id): markers[id] = _make_marker(entry)
 	var marker: Dictionary = markers[id]
 	marker.entry = entry
@@ -961,7 +971,7 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int)
 		if not is_selected: marker.sprite.render_priority = PLACE_PRIORITY if _over_avatar(entry) else 0
 	marker.label.text = _label_text(entry)
 	# 名牌永远跟随图标居中（出屏也不挪）；选中项长名按词折行，不再省略号截断。
-	var whole: bool = entry.kind == "place"   # one line, never cut
+	var whole := _whole_label(entry)   # one line, never cut
 	marker.label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART if is_selected and not whole else TextServer.AUTOWRAP_OFF
 	marker.label.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING if is_selected or whole else TextServer.OVERRUN_TRIM_ELLIPSIS
 	marker.label.position = Vector2(-c.label_w * 0.5, 3)
@@ -1074,8 +1084,8 @@ static func _hits(rects: Array, rect: Rect2) -> bool:
 	return false
 
 ## Screen footprints of the player and other players, in this view's space.
-## My Farm's label gives way to an outpost label it would touch: at the city level the avatar itself says where home
-## is (不知火舞 on C30).
+## My Farm's label gives way to an outpost or marked-pin label it would touch: at the city level the avatar itself
+## says where home is (不知火舞 on C30 / #83).
 func _yield_own_label() -> void:
 	var fm = host.get("farm_markers")
 	if fm == null or not fm.has_method("yield_self_label"): return
