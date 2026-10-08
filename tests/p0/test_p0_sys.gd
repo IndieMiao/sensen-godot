@@ -21,7 +21,8 @@ func before_test() -> void:
 func after_test() -> void:
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(STORE))
 
-func _fail() -> void: rt.session.connection_failed.emit("Can't reach the farm server", {})
+func _fail() -> void: rt.session.connection_failed.emit("Can't reach the farm server", {"type": "buy", "item": "seed_radish"})
+func _read_fail() -> void: rt.session.connection_failed.emit("Can't reach the farm server", {})   # a state read (refresh)
 func _answer() -> void: rt.session.state_changed.emit(rt.session.view, [])
 
 func test_one_failure_says_it_did_not_go_through() -> void:
@@ -151,3 +152,23 @@ func test_card_buttons_that_send_commands() -> void:
 		[{id = &"equipped", kind = &"unavailable"}, &"gear", false],
 	]
 	for c in cases: assert_bool(P0ItemInfo.sends(c[0], c[1])).override_failure_message(str(c)).is_equal(c[2])
+
+## 亚瑟 on #84: a background read (the 30 s refresh, the deferred first read) that fails once is nothing the player did —
+## no `Didn't go through`; it still counts, so two failures in a row of any kind go Offline.
+func test_one_failed_read_shows_nothing_but_counts() -> void:
+	_read_fail()
+	assert_str(rt.ui.sys_text()).is_empty()
+	assert_bool(rt.ui.offline).is_false()
+	_read_fail()
+	assert_bool(rt.ui.offline).is_true()
+	assert_str(rt.ui.sys_text()).is_equal("Offline · Reconnecting…")
+
+func test_a_read_and_a_command_failing_in_a_row_go_offline() -> void:
+	_read_fail()
+	_fail()
+	assert_bool(rt.ui.offline).is_true()
+	_answer()
+	_fail()
+	assert_str(rt.ui.sys_text()).is_equal("Didn't go through · try again")
+	_read_fail()
+	assert_bool(rt.ui.offline).is_true()

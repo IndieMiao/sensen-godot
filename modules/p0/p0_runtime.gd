@@ -91,7 +91,7 @@ func _init() -> void:
 	session.refused.connect(func(_c, _d, _cmd): _net_ok())
 	session.refused.connect(_on_refused)
 	session.connection_failed.connect(func(msg: String, cmd: Dictionary):
-		_net_failed(msg)
+		_net_failed(msg, cmd)
 		# A world action that did not go through ends the hold: no more sowing along the row on a dead line; the
 		# player presses again (§10.7.1). Nothing was taken locally — the server's state is what the scene shows.
 		if not cmd.is_empty(): ui.fab_held = false
@@ -518,7 +518,7 @@ func _harvest_bag_full() -> void:
 	_held_plants = 0
 
 ## A request that never got an answer (8 s, a 5xx or not JSON). The server URL goes to the log, not the screen.
-func _net_failed(msg: String) -> void:
+func _net_failed(msg: String, cmd := {}) -> void:
 	_net_fails += 1
 	push_warning("P0: %s · %s" % [msg, session.base_url])
 	if _net_fails >= 2:
@@ -526,7 +526,9 @@ func _net_failed(msg: String) -> void:
 			ui.offline = true
 			ui.show_sys(UiSysBanner.Kind.OFFLINE, "Offline · Reconnecting…")
 		_probe_left = PROBE_S
-	else:
+	elif not cmd.is_empty():
+		# Only a command says it did not go through; a background read (the 30 s refresh) that fails once is not
+		# something the player did — it counts toward Offline but shows nothing (亚瑟 on #84).
 		ui.show_sys(UiSysBanner.Kind.CMD_FAIL, "Didn't go through · try again", CMD_FAIL_S)
 
 ## Any answer from the server: the count clears; offline ends with `Back online` (the fresh state redraws everything;
@@ -615,7 +617,7 @@ func _dev_shot(dt: float) -> void:
 			"inbox": ui.open_inbox()
 			"workbench": ui.open_workbench(step[1] if step.size() > 1 else "")   # SGODOT-231 B2-06 drawer, tools / supplies
 			"toasterr": ui.toast_error(step[1] if step.size() > 1 else "Need 1 more Copper Ore")   # a refusal's Error toast (233)
-			"netfail": _net_failed("dev")   # netfail once: Didn't go through; twice: Offline (233)
+			"netfail": _net_failed("dev", {"type": "dev"})   # netfail once: Didn't go through; twice: Offline (233)
 			"wbtile":   # wbtile:craft_copper_pickaxe:0 taps that card's cost tile (NeedSource)
 				var wb := ui.workbench()
 				if wb != null and wb.card(step[1]) != null: wb.card(step[1]).tiles()[int(step[2])].pressed.emit()

@@ -121,7 +121,7 @@ func show_request(d: Dictionary) -> void:
 	_command.visible = not done and label != ""
 	_command.label = label
 	_command.reason = str(d.get("reason", ""))
-	_command.custom_minimum_size.x = _COMMAND_W   # a compact command resets its size on each label; a longer gap grows it
+	_command.min_width = _COMMAND_W   # kept through PENDING and Offline; a longer gap grows it
 
 func command_button() -> UiCommandButton: return _command
 

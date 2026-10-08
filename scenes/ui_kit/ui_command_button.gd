@@ -35,6 +35,9 @@ var phase: CommandLifecycle.State = CommandLifecycle.State.IDLE: set = set_phase
 ## Full-width rows with a long reason (ResidentDialogue Choices=Stacked): the label may use the side padding,
 ## as the main draws it (a 200 px reason in a 208 button on NPC-5).
 var fit_text := false: set = set_fit_text
+## The caller's width (a board row's 152, a shop row's 76): kept through every redraw — a label change, PENDING and
+## back, Offline on and off — instead of being set on custom_minimum_size, which each redraw resets (亚瑟 on #84).
+var min_width := 0.0: set = set_min_width
 
 ## Sends a server command when activated: greys to `Offline` while offline, and the command it sends is tracked
 ## (P0Ui.track_pressed: SUBMITTING / PENDING, F-08).
@@ -67,6 +70,7 @@ func set_reason(v: String) -> void: reason = v; _apply()
 func set_phase(v: CommandLifecycle.State) -> void: phase = v; _apply()
 func set_fit_text(v: bool) -> void: fit_text = v; _fit()
 func set_sends(v: bool) -> void: sends = v; _apply()
+func set_min_width(v: float) -> void: min_width = v; _apply()
 
 ## Offline on or off for every command button on screen (and the ones built while it lasts).
 static func set_offline(tree: SceneTree, v: bool) -> void:
@@ -138,9 +142,9 @@ func _apply() -> void:
 		theme_type_variation = _VARIATIONS[kind][i]
 		text = label
 	if compact:
-		custom_minimum_size = Vector2.ZERO
+		custom_minimum_size = Vector2(min_width, 0.0)
 		UiKit.ensure_hit_area(self)
 	else:
-		custom_minimum_size = Vector2(UiTokens.SIZE_TOUCH, UiTokens.SIZE_COMMAND)
+		custom_minimum_size = Vector2(maxf(UiTokens.SIZE_TOUCH, min_width), UiTokens.SIZE_COMMAND)
 	modulate.a = UiTokens.OPACITY_PENDING if phase == CommandLifecycle.State.PENDING else 1.0
 	if fit_text: _fit()

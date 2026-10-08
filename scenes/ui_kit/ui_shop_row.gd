@@ -111,7 +111,7 @@ func show_spec(spec: Dictionary, once := false, stock := 99) -> void:
 	buy = UiCommandButton.new(str(b.get("label", "Buy")) if available else "", UiCommandButton.Kind.SECONDARY, true)
 	if not available: buy.reason = str(b.get("label", ""))
 	buy.sends = true   # Buy is a server command: Offline while offline (§10.7.1)
-	buy.custom_minimum_size.x = _PRICE_W if available else 0.0
+	buy.min_width = _PRICE_W if available else 0.0
 	buy.activated.connect(func(): bought.emit(item_id, stepper.value if stepper else 1))
 	_actions.add_child(buy)
 	_layout()
