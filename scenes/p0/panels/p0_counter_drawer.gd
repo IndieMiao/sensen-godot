@@ -73,7 +73,7 @@ var _top_pad := _TOP_STALL
 var _shelf_box: TouchScrollContainer
 var _bag_half: VBoxContainer
 var _count: Label
-var _track: _Track
+var _cap_track: _Track
 var _quota: Label
 var _drinks: VBoxContainer
 var _rows := {}   # item id -> UiShopRow
@@ -179,10 +179,10 @@ func _build_bag_half() -> void:
 	_count = UiKit.label("", UiTokens.STYLE_C12_XB)
 	_count.custom_minimum_size.x = 50.0
 	cap.add_child(_count)
-	_track = _Track.new()
-	_track.custom_minimum_size = _TRACK
-	_track.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	cap.add_child(_track)
+	_cap_track = _Track.new()
+	_cap_track.custom_minimum_size = _TRACK
+	_cap_track.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	cap.add_child(_cap_track)
 	_bag_half.add_child(cap)
 	_gap(_bag_half, 2.0)
 	var scope := HBoxContainer.new()
@@ -239,8 +239,8 @@ func refresh(view_: Dictionary, force := false) -> void:
 	var used := (bag.get("slots", []) as Array).size()
 	var capacity := int(bag.get("capacity", 25))
 	_count.text = "%d/%d" % [used, capacity]
-	_track.fill = clampf(float(used) / maxf(1.0, float(capacity)), 0.0, 1.0)
-	_track.queue_redraw()
+	_cap_track.fill = clampf(float(used) / maxf(1.0, float(capacity)), 0.0, 1.0)
+	_cap_track.queue_redraw()
 	grid.capacity = capacity
 	grid.items = P0BagDrawer.bag_items(view)
 	if sheet.is_open(): sheet.refresh()
