@@ -94,9 +94,9 @@ func test_pins_and_removals_persist_per_action() -> void:
 	ui.set_view(_view())
 	ui._on_pin_toggled("seed_lettuce", true)
 	assert_bool(ui._bar.slots[1].pinned).is_true()
-	assert_object(ui._pin_menu).is_not_null()
 	ui._on_slot_removed("seed_radish")
-	assert_array(ui._bar.slots.map(func(s): return s.id)).is_equal(["seed_lettuce"])
+	# LOCK-05 v1.10 (BAR-DRAG-4): the slot stays a gap in place, nothing refills it.
+	assert_array(ui._bar.slots.map(func(s): return s.get("id", ""))).is_equal(["", "seed_lettuce"])
 	var again := _make()
 	await await_idle_frame()
 	again.set_mode("farm")
@@ -104,6 +104,45 @@ func test_pins_and_removals_persist_per_action() -> void:
 	assert_array(again._bar.slots.map(func(s): return s.id)).is_equal(["seed_lettuce"])
 	assert_bool(again._bar.slots[0].pinned).is_true()
 	assert_array(again._quick_for("fish").pins).is_empty()   # each action keeps its own (LOCK-05)
+
+func test_the_undo_action_takes_a_44_px_touch() -> void:
+	# 刘邦 on #38: the Undo text is about 30 × 16; its touch target is SIZE_TOUCH tall around it.
+	var t := UiUndoToast.new("Radish Seeds off the bar")
+	add_child(auto_free(t))
+	await await_idle_frame()
+	var u := t.undo_label()
+	assert_float(u.size.y).is_less(UiTokens.SIZE_TOUCH)
+	assert_bool(u._has_point(Vector2(u.size.x * 0.5, u.size.y * 0.5 + UiTokens.SIZE_TOUCH * 0.5 - 2))).is_true()
+	assert_bool(u._has_point(Vector2(u.size.x * 0.5, -UiTokens.SIZE_TOUCH * 0.5))).is_false()
+
+func test_removing_a_slot_offers_undo_which_restores_place_and_pin() -> void:
+	ui.set_view(_view())
+	ui._on_pin_toggled("seed_radish", true)
+	ui._on_slot_removed("seed_radish")
+	assert_object(ui._undo_toast).is_not_null()
+	assert_str(ui._undo_toast.text).is_equal("Radish Seeds off the bar")
+	assert_float(ui._undo_toast.get_rect().end.y).is_equal(ui._bar.position.y - UiTokens.SPACE_WITHIN)   # 8 above the bar
+	ui._undo_toast.undo_pressed.emit()
+	assert_array(ui._bar.slots.map(func(s): return s.get("id", ""))).is_equal(["seed_radish", "seed_lettuce"])
+	assert_bool(ui._bar.slots[0].pinned).is_true()
+
+func test_a_swap_moves_places_only_and_pins_follow_their_items() -> void:
+	# LOCK-05 v1.11 (221 b0a83924): no auto-pin, no PinMenu.
+	ui.set_view(_view())
+	ui._on_pin_toggled("seed_radish", true)
+	ui._on_slots_swapped(0, 1)
+	assert_array(ui._bar.slots.map(func(s): return s.id)).is_equal(["seed_lettuce", "seed_radish"])
+	assert_bool(ui._bar.slots[0].pinned).is_false()
+	assert_bool(ui._bar.slots[1].pinned).is_true()
+
+func test_opening_a_drawer_cancels_a_slot_drag() -> void:
+	ui.set_view(_view())
+	var c: UiItemCell = ui._bar.cells()[0]
+	c.gesture.emit({kind = &"lift", pos = c.get_global_rect().get_center()})
+	c.gesture.emit({kind = &"drag_start", pos = c.get_global_rect().get_center()})
+	assert_bool(ui._bar.is_dragging()).is_true()
+	ui.open_bag()
+	assert_bool(ui._bar.is_dragging()).is_false()
 
 func test_map_keeps_only_bag_and_hides_the_keys() -> void:
 	ui.set_surface("map")

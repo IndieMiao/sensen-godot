@@ -74,7 +74,7 @@ func _ready() -> void:
 func _exit_tree() -> void:
 	if rt: rt.detach(self)
 
-## Android Back: the UI's top layer (PinMenu, radial, a card or drawer) closes first, one per press; with nothing
+## Android Back: the UI's top layer (a dragged slot, radial, a card or drawer) closes first, one per press; with nothing
 ## open, back to the map: AppRouter pops a farm stacked on the map, a farm that is the root scene leaves by itself
 ## (int5 hand test 012–013 / 023–024, int5b test 2; rooms do the same, p0_room).
 func is_back_navigation_locked() -> bool:

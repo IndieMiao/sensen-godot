@@ -156,21 +156,39 @@ static func main_action(view: Dictionary, plot: Dictionary, seed_id: String, row
 ## Five candidates for the current action — Farming: seeds, Fishing: bait — kept order: previously shown → most plentiful (§10.3.3).
 ## Pinned ids always stay on the bar, also at 0 left (LOCK-05, §10.3.3 归零); ids the player dragged off the bar
 ## (`removed`) are not refilled until pinned again (§10.3.4 "从栏上移除，物品仍在背包").
+## What each action's quick bar holds (§10.3.2): Farming seeds and fertiliser, Fishing bait. Anything in the pool
+## stays where it was put or pinned; the bar fills its free end only with the first family (seeds / bait).
+const BAR_POOL := {"farm": ["seed_", "fert_"], "fish": ["bait_"]}
+
+## The action whose bar takes this item ("farm" / "fish"), or "" when no bar does.
+static func bar_action_of(id: String) -> String:
+	for mode in BAR_POOL:
+		for prefix in BAR_POOL[mode]:
+			if id.begins_with(prefix): return mode
+	return ""
+
 static func quick_bar(view: Dictionary, previous: Array, mode := "farm", pinned: Array = [], removed: Array = []) -> Array:
 	var prefix := "bait_" if mode == "fish" else "seed_"
 	var counts := {}
 	for s in view.get("bag", {}).get("slots", []):
 		var id := str(s.get("id", ""))
-		if id.begins_with(prefix): counts[id] = int(counts.get(id, 0)) + int(s.get("qty", 0))
+		if bar_action_of(id) == mode: counts[id] = int(counts.get(id, 0)) + int(s.get("qty", 0))
 	var bar: Array = []
 	for id in previous:
-		if bar.size() < 5 and not bar.has(id) and (pinned.has(id) or (counts.has(id) and not removed.has(id))): bar.append(id)
+		if bar.size() >= 5: break
+		# A slot emptied by dragging its item off stays empty in place, not refilled (LOCK-05 v1.10, BAR-DRAG-4).
+		if str(id) == "": bar.append("")
+		elif not bar.has(id) and (pinned.has(id) or (counts.has(id) and not removed.has(id))): bar.append(id)
 	for id in pinned:
-		if bar.size() < 5 and not bar.has(id): bar.append(id)
-	var rest: Array = counts.keys().filter(func(id): return not bar.has(id) and not removed.has(id))
+		if bar.has(id): continue
+		var hole := bar.find("")   # pinning again (Undo, a drop from the Bag) takes the first gap
+		if hole >= 0: bar[hole] = id
+		elif bar.size() < 5: bar.append(id)
+	var rest: Array = counts.keys().filter(func(id): return str(id).begins_with(prefix) and not bar.has(id) and not removed.has(id))
 	rest.sort_custom(func(a, b): return counts[a] > counts[b] if counts[a] != counts[b] else str(a) < str(b))
 	for id in rest:
 		if bar.size() < 5: bar.append(id)
+	while not bar.is_empty() and str(bar.back()) == "": bar.pop_back()   # a gap at the end is just the end
 	return bar
 
 ## Today chip: the nearest ready crop, else what to do first (§9.5.3; facts only).
