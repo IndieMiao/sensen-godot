@@ -429,7 +429,7 @@ func set_mode(mode: String, place := "") -> void:
 func _refresh_bar() -> void:
 	var store := _quick_for(bar_mode)
 	# SGODOT-231: Mining's bar holds only what helps underground (a torch); seeds and bait never show there.
-	var ids := P0MaterialLogic.mine_candidates(view) if bar_mode == "mine" \
+	var ids := P0MaterialLogic.mine_bar(view, _bar_ids, store.pins, store.removed) if bar_mode == "mine" \
 		else P0Logic.quick_bar(view, _bar_ids, bar_mode, store.pins, store.removed)
 	if bar_mode == "fish":
 		if selected_bait != "" and not ids.has(selected_bait): selected_bait = ""
@@ -472,9 +472,9 @@ func _refresh_bar() -> void:
 	# A-08 ghost: a bar holding nothing of the action's family shows it in the first empty slot; a tap opens the
 	# Bag (ghost_tapped). TODO(SGODOT-225 bag drawer): open on the family tab (Seeds → Seeds, Bait → Tackle) and
 	# flash the slot 600 ms when a real item lands.
-	# Mining has no ghost: a torch is optional and is made at the Workbench, not bought (SGODOT-231).
-	var family: Array = ["bait_", "bait_worm", "Bait"] if bar_mode == "fish" else ["seed_", "seed_radish", "Seeds"]
-	if bar_mode != "mine" and slots.size() < UiQuickBar.SLOTS and not ids.any(func(id): return str(id).begins_with(family[0])):
+	var family: Array = ["bait_", "bait_worm", "Bait"] if bar_mode == "fish" \
+		else ["torch", "torch", "Torch"] if bar_mode == "mine" else ["seed_", "seed_radish", "Seeds"]   # q(44) ghost words
+	if slots.size() < UiQuickBar.SLOTS and not ids.any(func(id): return str(id).begins_with(family[0])):
 		slots.append({ghost = true, icon = P0Logic.icon(family[1]), title = family[2]})
 	_bar.slots = slots
 	_bar.selected = sig[4]
@@ -486,7 +486,7 @@ func _on_slot_tapped(id: String) -> void:
 	# has no vibrate permission (PR #12 re-review). The copy is the slot's refill hint (§10.3.3).
 	if P0Logic.bag_count(view, id) <= 0 and id != selected_seed and id != selected_bait:
 		if _bar.haptics and OS.has_feature("mobile"): Input.vibrate_handheld(10)
-		toast("Buy at Homestead Stall")
+		toast("Craft at Workbench" if bar_mode == "mine" else "Buy at Homestead Stall")   # q(44) refill hints
 		return
 	if bar_mode == "fish":
 		# Tapping bait only sets the current bait (0 Energy, nothing consumed); tap again to fish without bait.

@@ -43,6 +43,20 @@ func test_mining_bar_holds_torches_and_picks_none() -> void:
 	assert_bool(ui._bar.slots.any(func(s): return s.get("ghost", false))).is_false()
 	ui.set_view(_view(0))
 	assert_array(ui._bar_ids).is_empty()
+	# q(44): an empty Mining bar shows the "Torch" ghost (a noun only), which opens the bag.
+	var ghost: Array = ui._bar.slots.filter(func(s): return s.get("ghost", false))
+	assert_int(ghost.size()).is_equal(1)
+	assert_str(str(ghost[0].title)).is_equal("Torch")
+
+func test_mining_pins_and_refill_hint() -> void:
+	ui._set_pin("torch", true)
+	ui.set_view(_view(0))
+	assert_array(ui._bar_ids).is_equal(["torch"])   # pinned stays at 0 (LOCK-05)
+	ui._on_slot_tapped("torch")
+	assert_str(ui._toast.text).is_equal("Craft at Workbench")   # q(44): torches are made, not bought
+	ui._on_slot_removed("torch")
+	ui.set_view(_view(3))
+	assert_array(ui._bar_ids).is_empty()   # flung off: stays off until pinned again
 
 func test_farming_still_picks_its_first_seed() -> void:
 	ui.set_mode("farm")

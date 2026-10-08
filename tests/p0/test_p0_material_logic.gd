@@ -286,3 +286,12 @@ func test_one_finger_card_for_the_nearest_facility() -> void:
 	# 2.95 m away on the ground but 0.6 m up: in reach (a straight 3D distance would be 3.01, out of reach).
 	assert_str(P0FarmMaterials.pick_card(cands, Vector3(5.95, 0.6, 0), "")).is_equal("workbench")
 	assert_float(P0FarmMaterials.flat(Vector3(0, 2, 0), Vector3(3, 0, 4))).is_equal_approx(5.0, 0.0001)
+
+func test_mine_bar_follows_pins_and_removals() -> void:
+	var v := {"bag": {"slots": [{"id": "torch", "qty": 3}, {"id": "seed_radish", "qty": 5}]}}
+	var none := {"bag": {"slots": []}}
+	assert_array(P0MaterialLogic.mine_bar(v, [])).is_equal(["torch"])
+	assert_array(P0MaterialLogic.mine_bar(none, [])).is_empty()
+	assert_array(P0MaterialLogic.mine_bar(none, [], ["torch"])).is_equal(["torch"])          # pinned at 0
+	assert_array(P0MaterialLogic.mine_bar(v, [], [], ["torch"])).is_empty()                  # flung off
+	assert_array(P0MaterialLogic.mine_bar(v, [], ["seed_radish", "torch"])).is_equal(["torch"])   # only Mining's family

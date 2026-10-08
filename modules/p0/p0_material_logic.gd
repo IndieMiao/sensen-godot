@@ -176,8 +176,23 @@ static func _mine_action(view: Dictionary, ctx: Dictionary) -> Dictionary:
 	return _key("pickaxe", "Mine", "Walk to a rock", {}, false)
 
 ## Mining quick bar: torches only (§13.3.8; P0 has no dynamite). Ghost word when empty: "Torch" (q(44)).
+const MINE_FAMILY := ["torch"]
+
 static func mine_candidates(view: Dictionary) -> Array:
-	return ["torch"] if P0Logic.bag_count(view, "torch") > 0 else []
+	return MINE_FAMILY.filter(func(id): return P0Logic.bag_count(view, str(id)) > 0)
+
+## The Mining bar with LOCK-05 pins like Farming / Fishing: kept order first, pinned stay at 0, flung-off ones
+## stay off until pinned again.
+static func mine_bar(view: Dictionary, previous: Array, pinned: Array = [], removed: Array = []) -> Array:
+	var have := mine_candidates(view)
+	var bar: Array = []
+	for id in previous:
+		if MINE_FAMILY.has(id) and not bar.has(id) and (pinned.has(id) or (have.has(id) and not removed.has(id))): bar.append(id)
+	for id in pinned:
+		if MINE_FAMILY.has(id) and not bar.has(id): bar.append(id)
+	for id in have:
+		if not bar.has(id) and not removed.has(id): bar.append(id)
+	return bar
 
 const ELEVATOR_TITLE := "Elevator · stops this run"   # MINE-P0-6 panel header
 
