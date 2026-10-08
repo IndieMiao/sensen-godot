@@ -757,7 +757,7 @@ static func _keeper_bars() -> Control:
 		[UiKeeperBar.Role.TACKLE, "finn", "Finn's Tackle", "Xuhui Tackle Shop", "Tackle Keeper · Finn",
 			"Reed rods are in. Fishing Lv3 and Fine fish stop slipping the hook.", "", "tackle · the line wraps"],
 		[UiKeeperBar.Role.MARKET, "mei", "Mei's Stall", "Xuhui Market Square", "Market Keeper · Mei",
-			"Row Hoes just came in.", "", "market"],
+			"Row Hoe's 240 coins. Farming Lv4 to use.", "", "market"],
 		[UiKeeperBar.Role.TEA, "ama", "Ama's Tea", "Lotus Tea House", "Tea Host · Ama",
 			"Sit a minute. Hot tea, 30 Energy a cup.", "Counts across all tea houses · 3 cups a day", "tea · with a note"],
 		[UiKeeperBar.Role.POST, "sigrid", "Sigrid's Desk", "Huangpu Travel Post", "Post Clerk · Sigrid",

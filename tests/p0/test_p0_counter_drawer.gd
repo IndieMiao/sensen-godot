@@ -64,6 +64,7 @@ func test_market_buys_nothing_so_it_has_no_bag_half_and_specialty_is_its_own_she
 	var d := _drawer("market", {"keeper": "Mei", "place": "Xuhui Market Square"})
 	await _settle()
 	assert_bool(d._bag_half.visible).is_false()
+	assert_str(d.keeper_bar.line).is_equal("Row Hoe's 240 coins. Farming Lv4 to use.")   # a counter line, not the card's question (#56)
 	assert_array(_row_ids(d)).is_equal(["tool_row_hoe"])
 	d.set_section("board")
 	assert_bool(d.board.visible).is_true()

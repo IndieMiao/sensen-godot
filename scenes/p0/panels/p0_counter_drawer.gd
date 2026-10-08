@@ -224,7 +224,7 @@ func refresh(view_: Dictionary, force := false) -> void:
 	view = view_
 	if key == _key and not force: return
 	_key = key
-	if keeper_bar: keeper_bar.line = str(P0Logic.keeper_lines(view, role, ctx).get("greet", ""))
+	if keeper_bar: keeper_bar.line = str(P0Logic.keeper_lines(view, role, ctx).get("counter", ""))
 	if _drinks != null:
 		_fill_drinks()
 		return

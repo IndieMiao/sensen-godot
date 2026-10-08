@@ -66,9 +66,11 @@ func test_market_square() -> void:
 	var l := P0Logic.keeper_lines(v, "market", {place = "Xuhui Market Square"})
 	assert_str(l.line).is_equal("Keeps the stall · Xuhui Market Square")
 	assert_str(l.greet).is_equal("Morning! Row Hoes just came in — sows three plots at once, Farming Lv4. Anything I can get you?")
+	assert_str(l.counter).is_equal("Row Hoe's 240 coins. Farming Lv4 to use.")   # the counter's bar never asks the card's question
 	assert_str(l.trade).is_equal("Trade · open the stall")
 	assert_str(l.answer).is_equal("Fresh off the board: Market Basket and Dusk Haul.")
 	v.keepers.market = {"greet": "board", "board_open": 0, "board_templates": [], "refill_in": 14280000}
 	l = P0Logic.keeper_lines(v, "market")
 	assert_str(l.greet).is_equal("The Market Board has 0 requests today.")
+	assert_str(l.counter).is_equal(l.greet)
 	assert_str(l.answer).is_equal("Board's empty. Next request in 3h 58m.")

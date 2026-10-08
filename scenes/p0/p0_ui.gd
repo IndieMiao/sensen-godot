@@ -1352,7 +1352,7 @@ func counter_events(events: Array) -> void:
 			"drink":
 				var price := int(view.get("drinks", {}).get("price", 0))
 				_counter.keeper_bar.line = ("Enjoy. Next cup's %d coins." % price) if int(ev.get("left", 0)) > 0 \
-					else str(P0Logic.keeper_lines(view, _counter.role, _counter.ctx).get("greet", ""))
+					else str(P0Logic.keeper_lines(view, _counter.role, _counter.ctx).get("counter", ""))
 			"item":
 				if str(ev.get("id", "")).begins_with("rod_") and int(ev.get("delta", 0)) > 0:
 					_counter.keeper_bar.line = "Strung and ready — it's on your belt. Swap rods in Bag › Gear."

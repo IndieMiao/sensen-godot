@@ -773,7 +773,9 @@ static func _request_gap(req: Dictionary) -> String:
 ## Keeper greeting card copy (李白 SGODOT-228 b7d8b665 D, P0 version) from the server's facts in view.keepers[role]
 ## (SGODOT-228: state codes and numbers, no names). Names and places are data (后裔's p0_outposts.json): the caller
 ## passes them in ctx {keeper, place}; the tackle answer also takes ctx.nearest {name, site} (the closest pond).
-## Returns {line, greet, trade, question, answer} — line is "Pours the tea · Lotus Tea House" when ctx.place is given.
+## Returns {line, greet, counter, trade, question, answer} — line is "Pours the tea · Lotus Tea House" when ctx.place is
+## given; `greet` is the greeting card's line, `counter` the keeper bar's over the counter drawer (附录 B 掌柜问候 · P0's
+## counter lines: the greeting card's question never sits on the counter, 不知火舞 #56).
 const _KEEPER_COPY := {
 	"tea": {"does": "Pours the tea", "trade": "order tea", "question": "Any news in town?"},
 	"post": {"does": "Runs the post", "trade": "get a coffee", "question": "Who needs help today?"},
@@ -786,6 +788,7 @@ static func keeper_lines(view: Dictionary, role: String, ctx := {}) -> Dictionar
 	var copy: Dictionary = _KEEPER_COPY.get(role, {})
 	var k: Dictionary = view.get("keepers", {}).get(role, {})
 	var greet := ""
+	var counter := ""
 	var answer := ""
 	match role:
 		"tea":
@@ -821,6 +824,8 @@ static func keeper_lines(view: Dictionary, role: String, ctx := {}) -> Dictionar
 				var hoe: Dictionary = content().get("tools", {}).get("row_hoe", {})
 				greet = "Morning! Row Hoes just came in — sows %s plots at once, Farming Lv%d. Anything I can get you?" % [
 					_count_word(int(hoe.get("sow", 3))), int(hoe.get("gate", 4))]
+				counter = "Row Hoe's %d coins. Farming Lv%d to use." % [_shop_price(view, "market", "tool_row_hoe", int(hoe.get("price", 240))),
+					int(hoe.get("gate", 4))]
 			else:
 				greet = _board_count(int(k.get("board_open", 0)))
 			var titles: Array = k.get("board_templates", []).map(func(t): return str(content().get("requests", {}).get("templates", {}).get(str(t), {}).get("title", "")))
@@ -830,7 +835,7 @@ static func keeper_lines(view: Dictionary, role: String, ctx := {}) -> Dictionar
 	var place := str(ctx.get("place", ""))
 	return {
 		"line": ("%s · %s" % [str(copy.get("does", "")), place]) if place != "" else str(copy.get("does", "")),
-		"greet": greet, "trade": "Trade · " + str(copy.get("trade", "")),
+		"greet": greet, "counter": counter if counter != "" else greet, "trade": "Trade · " + str(copy.get("trade", "")),
 		"question": str(copy.get("question", "")), "answer": answer, "leave": "Just passing by",
 	}
 
