@@ -161,7 +161,8 @@ static func page_ingredients(view: Dictionary, p: Dictionary) -> Array:
 # ---------------------------------------------------------------- Experiment
 ## Bag items for the Experiment grid: everything that can go in a pot, plus ornamental fish greyed
 ## (`Not for cooking`, F-07); `pot` units are taken off the count and their cells read `In pot`.
-static func experiment_items(view: Dictionary, pot: Array, chip := "All") -> Array:
+static func experiment_items(view_: Dictionary, pot: Array, chip := "All") -> Array:
+	var view := with_rack(view_)
 	var K := UiItemCell.KitchenState
 	var out: Array = []
 	var totals := {}   # one cell per ingredient, however many stacks it fills
@@ -170,9 +171,16 @@ static func experiment_items(view: Dictionary, pot: Array, chip := "All") -> Arr
 		var sid := str(s.get("id", ""))
 		if not totals.has(sid): order.append(sid)
 		totals[sid] = int(totals.get(sid, 0)) + int(s.get("qty", 0))
+	# The Spice Rack's stored seasonings are on hand too (q(46): real count, a Rack tag; the stove takes them first).
+	var racked := {}
+	for r in rack_rows(view):
+		if not totals.has(r.id): order.append(r.id)
+		totals[r.id] = int(totals.get(r.id, 0)) + int(r.quantity)
+		racked[r.id] = true
 	for raw in order:
 		var id := str(raw)
 		var info := P0Logic.item(view, id)
+		if racked.has(id) and info.is_empty(): info = {cook = true, family = "S", rarity = 1}   # stored only: a Common seasoning
 		var cookable := bool(info.get("cook", false))
 		var ornamental := not cookable and id.begins_with("fish_")
 		if not cookable and not ornamental: continue
@@ -181,19 +189,23 @@ static func experiment_items(view: Dictionary, pot: Array, chip := "All") -> Arr
 		var in_pot := pot.count(id)
 		out.append({id = id, icon = P0Logic.icon(id), qty = int(totals[id]) - in_pot, rarity = int(info.get("rarity", 1)),
 			kitchen_state = K.NOT_FOR_COOKING if ornamental else (K.IN_POT if in_pot > 0 else K.DEFAULT),
-			marked = in_pot > 0, cookable = cookable})
+			marked = in_pot > 0, cookable = cookable, status = "Rack" if racked.has(id) and in_pot == 0 else ""})
 	return out
 
 ## Whether one more `id` can go in the pot: a free slot and one left in the bag.
-static func can_add(view: Dictionary, pot: Array, id: String) -> bool:
-	if pot.size() >= slots(view) or not P0Logic.item(view, id).get("cook", false): return false
-	return P0Logic.bag_count(view, id) - pot.count(id) > 0
+static func can_add(view_: Dictionary, pot: Array, id: String) -> bool:
+	var view := with_rack(view_)
+	if pot.size() >= slots(view): return false
+	var on_rack := int(stock(view).get(id, 0)) - P0Logic.bag_count(view, id)
+	if not P0Logic.item(view, id).get("cook", on_rack > 0): return false
+	return int(stock(view).get(id, 0)) - pot.count(id) > 0
 
 static func slots_used_line(view: Dictionary, pot: Array) -> String:
 	return "%d / %d slots used" % [pot.size(), slots(view)]
 
 ## Preview capsule facts (Compact/Kitchen/Preview: title · rarity · time; §7.2.7 facts only).
-static func preview(view: Dictionary, pot: Array) -> Dictionary:
+static func preview(view_: Dictionary, pot: Array) -> Dictionary:
+	var view := with_rack(view_)
 	if pot.is_empty(): return {title = "Add up to %d ingredients" % slots(view), state = "", time = ""}
 	var fams := {}
 	var top := 1
@@ -215,7 +227,8 @@ static func preview(view: Dictionary, pot: Array) -> Dictionary:
 		time = "%d s" % (int(t.get("ms", 5000)) / 1000)}
 
 ## Experiment's cook row (COOK-P0-2 / 2b): "+20 Energy" when the pot is a known page, "" for an unknown mix.
-static func pot_energy(view: Dictionary, pot: Array) -> String:
+static func pot_energy(view_: Dictionary, pot: Array) -> String:
+	var view := with_rack(view_)
 	if pot.is_empty(): return ""
 	var known := P0Logic.match_known(view, pot)
 	if known.is_empty(): return ""
@@ -356,6 +369,18 @@ static func rack_rows(view: Dictionary) -> Array:
 	var rack = cooking(view).get("rack", null)
 	if not (rack is Dictionary): return []
 	return rack.get("items", []).map(func(i): return {id = str(i.id), title = str(i.get("name", P0Logic.item_name(view, str(i.id)))), quantity = str(int(i.qty)), unit = "items"})
+
+## The view with the Spice Rack's stored seasonings in `items` (view.items lists bag ids only): Common, family S,
+## cookable, so the Experiment grid, the pot preview and recipe matching see what the stove can reach (q(46)).
+static func with_rack(view: Dictionary) -> Dictionary:
+	var rows := rack_rows(view)
+	if rows.is_empty(): return view
+	var items: Dictionary = view.get("items", {}).duplicate()
+	for r in rows:
+		if not items.has(r.id): items[r.id] = {name = r.title, kind = "material", family = "S", rarity = 1, cook = true}
+	var out := view.duplicate()
+	out["items"] = items
+	return out
 
 ## Warming Cabinet: the card title and one row per stack (★ quality, what a portion restores today, ×qty); rows
 ## is empty for "No dishes yet". null cabinet (before Lv3) = {}.

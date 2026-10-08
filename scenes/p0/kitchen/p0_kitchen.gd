@@ -244,7 +244,7 @@ func _on_page(page: Dictionary) -> void:
 ## Experiment: a tap moves one unit into the pot; tapping an item already in the pot takes it back (F-07).
 func _on_ingredient(id: String, from_screen: Vector2) -> void:
 	var v := rt.session.current()
-	if not P0Logic.item(v, id).get("cook", false):
+	if not P0Logic.item(P0KitchenLogic.with_rack(v), id).get("cook", false):
 		rt.ui.toast("Not for cooking")
 		return
 	if pot.has(id):

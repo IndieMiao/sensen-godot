@@ -312,3 +312,21 @@ func _again_view_without_crucian() -> Dictionary:
 	v.bag.slots = [{"id": "fish_perch", "qty": 1}]
 	return v
 
+func test_experiment_lists_the_spice_racks_stored_seasonings() -> void:
+	var v := _view()
+	v.cooking["rack"] = {"on": true, "items": [{"id": "rock_salt", "name": "Rock Salt", "qty": 12}]}
+	var salt: Array = P0KitchenLogic.experiment_items(v, []).filter(func(i): return i.id == "rock_salt")
+	assert_int(salt.size()).is_equal(1)
+	assert_int(salt[0].qty).is_equal(12)
+	assert_str(salt[0].status).is_equal("Rack")   # q(46): real count, a Rack tag
+	assert_bool(P0KitchenLogic.can_add(v, ["fish_crucian"], "rock_salt")).is_true()
+	assert_array(P0KitchenLogic.experiment_items(v, [], "Fish").map(func(i): return i.id)).not_contains(["rock_salt"])
+	assert_array(P0KitchenLogic.experiment_items(v, [], "Seasoning").map(func(i): return i.id)).contains(["rock_salt"])
+
+
+func test_a_stored_seasoning_counts_as_a_seasoning_in_the_preview() -> void:
+	var v := _view()
+	v.cooking["rack"] = {"on": true, "items": [{"id": "rock_salt", "name": "Rock Salt", "qty": 12}]}
+	assert_str(P0KitchenLogic.preview(v, ["rock_salt"]).title).is_equal("Needs a main ingredient")   # not a main
+	assert_str(P0KitchenLogic.experiment_reason(v, ["rock_salt"])).is_equal("Needs a main ingredient")
+	assert_str(P0KitchenLogic.pot_energy(v, ["fish_perch", "rock_salt"])).is_equal("+40 Energy")   # Herb Baked Perch [fish_perch, S1]
