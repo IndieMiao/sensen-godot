@@ -146,6 +146,13 @@ func _spot_marks(v: Dictionary, card: String) -> void:
 	rt.ui.tag("workbench", "Workbench · Tap to craft", bench_screen,
 		not modal and card == "workbench", cam.unproject_position(_bench + Vector3(0, 0.8, 0)))
 
+## A real tap on the EntryCard (it is passive, so the scene layer's tap arrives here first from p0_tap).
+func tap_entry(screen: Vector2) -> bool:
+	if not is_instance_valid(_entry) or not _entry.visible: return false
+	if not _entry.hit_rect().has_point(screen + rt.ui.root.global_position): return false
+	_on_entry()
+	return true
+
 ## Taps on the farm's material facilities (LOCK-07): the mouth shows "The mine" (MINE-P0-1 / P0-8; entering stays on the
 ## key); a spot gathers when the player stands near it, a locked one shows MAT-3; the workbench opens its drawer.
 func tap(screen: Vector2) -> bool:
@@ -208,6 +215,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 func _build_entry_card() -> void:
 	_entry = UiEntryCard.new()
 	_entry.theme = UiKit.theme()   # the P0 root still carries GameUi's theme
+	_entry.passive = true          # a drag starting on it is the joystick; tap_entry() takes the real tap
 	_entry.pressed.connect(_on_entry)
 	_entry.visible = false
 	rt.ui.root.add_child(_entry)

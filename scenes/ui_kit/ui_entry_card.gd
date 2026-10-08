@@ -6,6 +6,8 @@ extends Control
 ## TapCard: TAP_SLOP / TAP_MAX_MS). Unavailable = the reason on the action line in secondary, no caption, and it still
 ## takes the tap so its owner can toast the reason (LOCK-10, 不知火舞 on 231). Placement as TapCard: WorldAnchor puts
 ## the pointer tip on the gate; point_at() keeps the pointer on it near the screen edges (the main's Pointer=Right).
+## `passive` cards take no touches, as TapCard on the P0 scene (苏烈 on #45): the scene layer under them sees the
+## press, so the joystick can start on the card, and the owner resolves a real tap on hit_rect() itself.
 
 signal pressed
 
@@ -21,9 +23,10 @@ const _POINTER_INSET := 21.0      # Pointer=Right: the pointer box sits 21 px in
 var action := "": set = set_action
 var caption := "": set = set_caption
 var state: State = State.AVAILABLE: set = set_state
-## Available but short of Energy (`New run · Need 2 Energy`, LOCK-09): the action line in the warning colour; the
-## tap opens the Energy card. Not a separate state of the main.
+## Available but short of Energy (`New run · Need 2 Energy`, LOCK-09): the action line in the warning colour, the
+## consequence kept; the tap opens the Energy card (不知火舞 on #45; 安其拉 adds it to the main).
 var amber := false: set = set_amber
+var passive := false: set = set_passive
 
 var _card: PanelContainer
 var _action: Label
@@ -62,11 +65,21 @@ func _init(action_ := "", caption_ := "", state_: State = State.AVAILABLE) -> vo
 	action = action_
 	caption = caption_
 	state = state_
+	_refresh()   # the setters skip values equal to the defaults
 
-func set_action(v: String) -> void: action = v; _refresh()
-func set_caption(v: String) -> void: caption = v; _refresh()
-func set_state(v: State) -> void: state = v; _refresh()
-func set_amber(v: bool) -> void: amber = v; _refresh()
+# The owner sets these every frame: only a change restyles and relayouts (苏烈 on #45).
+func set_action(v: String) -> void:
+	if v != action: action = v; _refresh()
+func set_caption(v: String) -> void:
+	if v != caption: caption = v; _refresh()
+func set_state(v: State) -> void:
+	if v != state: state = v; _refresh()
+func set_amber(v: bool) -> void:
+	if v != amber: amber = v; _refresh()
+
+func set_passive(v: bool) -> void:
+	passive = v
+	if _card: _card.mouse_filter = Control.MOUSE_FILTER_IGNORE if v else Control.MOUSE_FILTER_STOP
 
 func _refresh() -> void:
 	if _action == null: return

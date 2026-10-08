@@ -160,6 +160,7 @@ func test_unavailable_entry_card_writes_the_reason_and_drops_the_caption() -> vo
 	c.state = UiEntryCard.State.AVAILABLE
 	c.amber = true
 	assert_object(c._action.get_theme_color(&"font_color")).is_equal(UiTokens.COLOR_WARNING)
+	assert_bool(c._caption.visible).is_true()   # short of Energy keeps the consequence (不知火舞 on #45)
 
 func test_entry_card_pointer_right_sits_21_px_in() -> void:
 	var c := _host(UiEntryCard.new("New run · 2 Energy", "Current run will end · Runs today 1/2")) as UiEntryCard
@@ -180,3 +181,20 @@ func test_entry_card_is_one_button_that_ignores_drags() -> void:
 	c._on_input(_mouse(Vector2(30, 12), true))
 	c._on_input(_mouse(Vector2(30 + GestureArbiter.TAP_SLOP + 1, 12), false))
 	assert_int(hits[0]).is_equal(1)
+
+func test_passive_entry_card_lets_the_scene_take_the_press() -> void:
+	var c := _host(UiEntryCard.new("New run · 2 Energy")) as UiEntryCard
+	c.passive = true
+	assert_int(c._card.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
+	await _settle()
+	assert_float(c.hit_rect().size.y).is_greater_equal(float(UiTokens.SIZE_TOUCH))
+
+func test_entry_card_setters_skip_unchanged_values() -> void:
+	var c := _host(UiEntryCard.new("New run · 2 Energy", "Current run will end")) as UiEntryCard
+	await _settle()
+	c._action.remove_theme_color_override(&"font_color")   # a restyle would put it back
+	c.action = "New run · 2 Energy"
+	c.state = UiEntryCard.State.AVAILABLE
+	assert_bool(c._action.has_theme_color_override(&"font_color")).is_false()
+	c.state = UiEntryCard.State.UNAVAILABLE
+	assert_object(c._action.get_theme_color(&"font_color")).is_equal(UiTokens.COLOR_SECONDARY)

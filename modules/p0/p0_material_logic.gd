@@ -79,11 +79,10 @@ static func mine_entry_card(view: Dictionary) -> Dictionary:
 			return {"show": true, "label": _runs_line(mine), "line2": "", "enabled": false, "amber": false, "cmd": {}, "toast": _runs_line(mine)}
 	if not mine.get("entry_bag_ok", true):   # q(48): no fee into a floor whose first rock wouldn't fit
 		return {"show": true, "label": "New run · Bag full", "line2": "", "enabled": false, "amber": false, "cmd": {}, "toast": BAG_FULL}
-	if _energy(view) < fee:
-		return {"show": true, "label": "New run · Need %d Energy" % fee, "line2": "", "enabled": true, "amber": true, "cmd": {"type": "energy_card"}}
-	return {"show": true, "label": "New run · %d Energy" % fee,
-		"line2": "Current run will end · Runs today %d/%d" % [int(runs.get("used", 0)), int(runs.get("limit", 2))],
-		"enabled": true, "amber": false, "cmd": {"type": "mine_new_run"}}
+	var consequence := "Current run will end · Runs today %d/%d" % [int(runs.get("used", 0)), int(runs.get("limit", 2))]
+	if _energy(view) < fee:   # warning action line, the consequence kept, the tap opens the Energy card (不知火舞 on #45)
+		return {"show": true, "label": "New run · Need %d Energy" % fee, "line2": consequence, "enabled": true, "amber": true, "cmd": {"type": "energy_card"}}
+	return {"show": true, "label": "New run · %d Energy" % fee, "line2": consequence, "enabled": true, "amber": false, "cmd": {"type": "mine_new_run"}}
 
 ## What a server refusal of a material command says (苏烈's #39 review). null: not ours, the runtime's own wording
 ## applies (need_energy opens the Energy card). "": quiet — a race the next frame shows anyway (a held repeat hitting

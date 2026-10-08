@@ -311,6 +311,7 @@ func _hold_repeat() -> void:
 ## the farmhouse (Kitchen / Rest), the mine.
 func p0_tap(screen: Vector2) -> void:
 	if rt.ui.has_modal() or _cooking != null: return
+	if _materials.tap_entry(screen): return   # the mine's EntryCard sits over the scene (passive, SGODOT-231)
 	if cam.unproject_position(_stall + Vector3(0, 0.4, 0)).distance_to(screen) < 56:
 		actor.face(_stall)
 		rt.ui.open_stall()
