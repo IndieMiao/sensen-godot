@@ -1,0 +1,246 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    274
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiSysBanner"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        36
+      ],
+      "variation": "CaptionR12",
+      "text": "SysBanner 1187:82581 · SYS-OFFLINE / -2 / SYS-CMD-FAIL (WP6, SGODOT-233)"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        70,
+        328,
+        204
+      ],
+      "children": [
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            70,
+            328,
+            60
+          ],
+          "children": [
+            {
+              "type": "UiSysBanner",
+              "rect": [
+                0,
+                70,
+                328,
+                40
+              ],
+              "children": [
+                {
+                  "type": "HBoxContainer",
+                  "rect": [
+                    12,
+                    75,
+                    310,
+                    30
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        12,
+                        80,
+                        20,
+                        20
+                      ]
+                    },
+                    {
+                      "type": "Label",
+                      "rect": [
+                        40,
+                        80,
+                        214,
+                        20
+                      ],
+                      "variation": "C14XB",
+                      "text": "Offline · Reconnecting…"
+                    },
+                    {
+                      "type": "Button",
+                      "rect": [
+                        262,
+                        75,
+                        60,
+                        30
+                      ],
+                      "text": "Retry"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                116,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "Offline (SYS-OFFLINE)"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            142,
+            328,
+            60
+          ],
+          "children": [
+            {
+              "type": "UiSysBanner",
+              "rect": [
+                0,
+                142,
+                328,
+                40
+              ],
+              "children": [
+                {
+                  "type": "HBoxContainer",
+                  "rect": [
+                    12,
+                    147,
+                    310,
+                    30
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        12,
+                        152,
+                        20,
+                        20
+                      ]
+                    },
+                    {
+                      "type": "Label",
+                      "rect": [
+                        40,
+                        152,
+                        282,
+                        20
+                      ],
+                      "variation": "C14XB",
+                      "text": "Back online"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                188,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "BackOnline (SYS-OFFLINE-2)"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            214,
+            328,
+            60
+          ],
+          "children": [
+            {
+              "type": "UiSysBanner",
+              "rect": [
+                0,
+                214,
+                328,
+                40
+              ],
+              "children": [
+                {
+                  "type": "HBoxContainer",
+                  "rect": [
+                    12,
+                    219,
+                    310,
+                    30
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        12,
+                        224,
+                        20,
+                        20
+                      ]
+                    },
+                    {
+                      "type": "Label",
+                      "rect": [
+                        40,
+                        224,
+                        282,
+                        20
+                      ],
+                      "variation": "C14XB",
+                      "text": "Didn't go through · try again"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                260,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "CmdFail (SYS-CMD-FAIL)"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

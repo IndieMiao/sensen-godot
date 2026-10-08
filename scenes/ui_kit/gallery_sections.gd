@@ -31,6 +31,7 @@ static func all() -> Array[Dictionary]:
 		{id = "quality_badge", title = "UiQualityBadge", figma = "QualityBadge 1178:82154", build = _quality_badges},
 		{id = "reward_moment", title = "UiRewardMoment", figma = "RewardMoment 1179:82271 · COOK-4 / COOK-6 / COOK-P0-9", build = _reward_moments},
 		{id = "moment_banner", title = "UiMomentBanner", figma = "MomentBanner 1226:104630 · §4.8.3 / §4.8.6 (SGODOT-233)", build = _moment_banners},
+		{id = "sys_banner", title = "UiSysBanner", figma = "SysBanner 1187:82581 · SYS-OFFLINE / -2 / SYS-CMD-FAIL (WP6, SGODOT-233)", build = _sys_banners},
 		# SGODOT-221 world controls · interaction
 		{id = "quick_bar", title = "UiQuickBar (drawn at 328 of 336)", figma = "Compact/QuickSlot 633:41279 · QuickEnd/Bag 907:72112 · BAR-1 / BAR-1-2 · LOCK-04 / 05", build = _quick_bars},
 		{id = "pin_menu", title = "UiPinMenu", figma = "PinMenu 1141:80291 · LOCK-05", build = _pin_menus},
@@ -1188,6 +1189,18 @@ static func _reward_moment(fields: Dictionary) -> UiRewardMoment:
 	var r := UiRewardMoment.new()
 	r.show_fields(fields)
 	return r
+
+## SysBanner (1187:82581, WP6): Offline with Retry, Back online, a command that didn't go through.
+static func _sys_banners() -> Control:
+	var v := _column()
+	for t in [[UiSysBanner.Kind.OFFLINE, "Offline · Reconnecting…", "Offline (SYS-OFFLINE)"],
+			[UiSysBanner.Kind.BACK_ONLINE, "Back online", "BackOnline (SYS-OFFLINE-2)"],
+			[UiSysBanner.Kind.CMD_FAIL, "Didn't go through · try again", "CmdFail (SYS-CMD-FAIL)"]]:
+		var b := UiSysBanner.new()
+		b.kind = t[0]
+		b.message = t[1]
+		v.add_child(_captioned(b, t[2]))
+	return v
 
 ## MomentBanner (1226:104630, SGODOT-233): the account's first level-up (rewards, recipe, tip, Use bait), a later level
 ## (unlocks and what is next) and Kind=Complete (a crafted tool).
