@@ -2,12 +2,15 @@ extends GdUnitTestSuite
 ## MAP-1 (§10.6.1, SGODOT-234 A1; 不知火舞 on 234): on the map P0's two-row HUD and Bag replace the map's own chrome —
 ## no city title, filters, place list, compass, Map / Farm / Me dock or + / −; the recenter key sits right over Bag,
 ## 12 apart, and keeps the zoom. The place chip names where the player is and takes them back there. Pin cards: the
-## player's own pin says Go home · Free, ponds and outposts Go. The own pin reads Homestead.
+## homestead's says Go home · Free, ponds and outposts Go, the place the player is at Back to <name> (q(80)).
 
 const P0_MAP := "res://scenes/p0/p0_map.tscn"
 
 func before_test() -> void:
 	Net.use_transport(FakeTransport.new([]).callable())
+	# The player starts at home: a pond or outpost world attached by another suite leaves P0Runtime.here there, and
+	# away from home the avatar stands at that place (SGODOT-234 A2).
+	P0Runtime.ensure().here = {"space": "home", "place": ""}
 
 func _map() -> Node:
 	var viewport := SubViewport.new()
@@ -49,25 +52,88 @@ func test_recenter_brings_the_camera_home_and_keeps_the_zoom() -> void:
 	assert_float(m.center_lng).is_equal_approx(m.home_lng, 1e-6)
 	assert_float(m.zoom).is_equal_approx(13.3, 1e-6)
 
-func test_pin_cards_say_go_home_and_go() -> void:
+## q(80): the homestead's and the outposts' cards are P0PlaceSheet. At home the avatar is the homestead's mark: its card
+## reads Back to Homestead, no Distance. Away, the farm wears a Homestead pin whose card says Go home · Free with
+## Distance, and the avatar's card is the place the player is at. Online now shows only with someone in (q(72)).
+func test_place_cards_follow_q80() -> void:
 	var m := _map()
 	for i in 3: await get_tree().process_frame
 	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved: Dictionary = rt.here
 	var city: CityMapView = m.city_map
+	rt.here = {"space": "home", "place": ""}
+	m._sync_here()
+	assert_bool(city.entries.any(func(e): return str(e.get("id", "")) == "home")).is_false()   # no Homestead pin
 	m._own_pin_pressed()
-	assert_str(str(city.selected.get("id", ""))).is_equal("player:self")
-	assert_str(city.info_action.text).is_equal("Go home · Free")
-	assert_str(city.info_title.text).is_equal("Homestead")
-	m._own_pin_pressed()   # a second tap closes it
-	assert_dict(city.selected).is_empty()
-	# A pond's card (an id outside the catalog, so selecting it prewarms no pond scene).
-	var pond: Dictionary = (city.entries.filter(func(e): return str(e.get("kind", "")) == "pond")[0] as Dictionary).duplicate()
-	pond.id = "test_pond"
-	city.select(pond)
-	assert_str(city.info_action.text).is_equal("Go")
-	city.select(P0Outposts.place_entry(P0Outposts.by_role("tea")))
-	assert_str(city.info_action.text).is_equal("Go")
-	city.clear_selection()
+	assert_str(rt.ui.modal_kind).is_equal("place_card")
+	assert_str(_primary(rt)).is_equal("Back to Homestead")
+	assert_array(_facts(rt)).is_empty()
+	await _close(rt)
+	var tea := P0Outposts.by_role("tea")
+	rt.here = {"space": "outpost", "place": str(tea.id)}
+	m._sync_here()
+	var home: Array = city.entries.filter(func(e): return str(e.get("id", "")) == "home")
+	assert_int(home.size()).is_equal(1)
+	city.select(home[0])
+	assert_str(_primary(rt)).is_equal("Go home · Free")
+	assert_array(_facts(rt)).is_equal(["Distance"])
+	await _close(rt)
+	assert_dict(city.selected).is_empty()   # closing the card clears the pin
+	m._own_pin_pressed()
+	assert_str(_primary(rt)).is_equal("Back to Lotus Tea House")
+	await _close(rt)
+	var tackle := P0Outposts.by_role("tackle")
+	city.select(P0Outposts.place_entry(tackle))
+	assert_str(_primary(rt)).is_equal("Go")
+	assert_array(_facts(rt)).is_equal(["Distance"])   # nobody in: no Online now row
+	await _close(rt)
+	m._online = {str(tackle.id): 3}
+	var spec: Dictionary = m.place_card(P0Outposts.place_entry(tackle, 3))
+	assert_str(str(spec.title)).is_equal("Xuhui Tackle Shop")
+	assert_str(str(spec.subtitle)).is_equal("Tackle shop · Rods and bait")
+	assert_array(spec.facts[1]).is_equal(["Online now", "3"])
+	m._online = {}
+	rt.here = saved
+	m._sync_here()
+
+## 不知火舞 on 234: the avatar stands where the player is (the place chip): at home on the homestead, at an outpost left
+## of its pin with no name of its own; recenter and the opening view go to it.
+func test_the_avatar_stands_where_the_player_is() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved: Dictionary = rt.here
+	var fm: FarmMarkers = m.farm_markers
+	var tea := P0Outposts.by_role("tea")
+	rt.here = {"space": "outpost", "place": str(tea.id)}
+	m._sync_here()
+	assert_that(fm.anchor_of("self")).is_equal(Vector2(float(tea.lat), float(tea.lng)))
+	assert_that(fm.anchor_shift.get("self")).is_equal(m.AVATAR_BESIDE)
+	assert_bool(fm.self_label_off).is_true()
+	var item: Dictionary = m.home_set_items()[0]
+	assert_float(float(item.lat)).is_equal_approx(float(tea.lat), 1e-5)   # a Vector2 point
+	m._city_action("recenter")
+	assert_float(m.center_lat).is_equal_approx(float(tea.lat), 1e-6)
+	assert_float(m.center_lng).is_equal_approx(float(tea.lng), 1e-6)
+	rt.here = {"space": "mine", "place": ""}   # the mine is the homestead
+	m._sync_here()
+	assert_that(fm.anchor_of("self")).is_equal(fm.points.self.center)
+	assert_bool(fm.anchor_shift.has("self")).is_false()
+	assert_bool(fm.self_label_off).is_false()
+	rt.here = saved
+	m._sync_here()
+
+static func _primary(rt: P0Runtime) -> String:
+	return str((rt.ui._modal.find_child("Primary", true, false) as UiCommandButton).label)
+
+static func _facts(rt: P0Runtime) -> Array:
+	return rt.ui._modal.find_children("*", "UiFactRow", true, false).map(func(f): return str((f as UiFactRow).label))
+
+func _close(rt: P0Runtime) -> void:
+	rt.ui.close_modal()
+	await get_tree().process_frame
 
 ## The place chip on the map goes back to where the player is; from a world it goes to the map.
 class FakeWorld extends Node:
