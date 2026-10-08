@@ -120,6 +120,8 @@ export function inboxView(s: P0State, now: number) {
     claim_slots: Math.min(free, s.inbox.parcels.length),
     parcels: [...s.inbox.parcels].sort((a, b) => a.expires_at - b.expires_at)
       .map(p => ({ ...p, left: Math.max(0, p.expires_at - now), can_claim: free > 0 })),
-    updates: [...s.inbox.updates].reverse(),
+    // Updates only records what happened while the player was away (q(79)): claims stay in the save for the
+    // repeated-claim check but are not listed (Parcel expired · +18 coins / … lost / Pip's gift meal went back).
+    updates: s.inbox.updates.filter(u => u.status !== 'claimed').reverse(),
   };
 }

@@ -93,6 +93,9 @@ describe('P0 passive rewards (§10.4.8, q(45); SGODOT-232 S1, rescued from SGODO
     s = step(s, { type: 'claim_parcel', key });
     expect(count(s.bag, 'crop_herb')).toBe(4);
     expect(s.inbox.updates).toHaveLength(1);
+    // Updates lists only what happened while away (q(79)): the claim is kept for the repeated-claim check, not shown.
+    expect(viewOf(c, s, T).inbox.updates).toEqual([]);
+    expect(viewOf(c, s, T).inbox.badge).toBe(0);
   });
 
   it('Claim all stops at free slots and never claims parcels promoted after its captured IDs', () => {
@@ -180,7 +183,7 @@ describe('P0 passive rewards (§10.4.8, q(45); SGODOT-232 S1, rescued from SGODO
       app = Fastify();
       registerP0Routes(app, { content: c, store: new P0Store(c, file), now: () => now, dev: false });
       const expired = await app.inject({ method: 'GET', url: '/v1/p0/state', headers });
-      expect(expired.json().state.inbox.updates).toHaveLength(2);
+      expect(expired.json().state.inbox.updates).toHaveLength(1);   // the claim is kept in the save, not listed (q(79))
       const restarted = new P0Store(c, file).get(player, now + 1);
       expect(restarted.inbox.parcels).toEqual([]);
       expect(restarted.inbox.updates).toHaveLength(2);
