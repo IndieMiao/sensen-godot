@@ -253,9 +253,11 @@ func test_the_kitchen_corner_grows_with_the_homestead() -> void:
 	assert_bool(lv3.bp.is_walkable(lv3.bp.world_to_cell(Vector3(cab.x, 0, cab.z)))).override_failure_message("the cabinet blocks the floor").is_false()
 	assert_array(lv3.grid.point_path(lv3.actor.position, lv3.anchor("stand_warming_cabinet").global_position)).is_not_empty()
 	assert_str(str(lv3._marker("use_spice_rack", {}).name)).is_equal("Spice Rack")
+	assert_str((lv3._marker("use_spice_rack", {}).icon as Texture2D).resource_path).is_equal("res://assets/p0/icons/spice_rack.svg")   # i-spice-rack
 	var cab_mark := lv3._marker("use_warming_cabinet", {"cooking": {"cabinet": {"cap": 6, "have": 6, "items": []}}})
 	assert_str(str(cab_mark.name)).is_equal("Warming Cabinet")
 	assert_str(str(cab_mark.fact)).is_equal("Full")
+	assert_str((cab_mark.icon as Texture2D).resource_path).is_equal("res://assets/p0/icons/cabinet.svg")   # i-cabinet
 
 func test_farmhouse_stove_card_and_badge_follow_the_server_stove() -> void:
 	var r := _farmhouse()
