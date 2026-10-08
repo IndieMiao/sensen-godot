@@ -31,7 +31,11 @@ var _cam_follow := P0Follow.new()
 # Camera unification (用户 via 奕星, 2026-10-09; target 哪吒, 65.8 px at 360 × 800): the farm's size and pinch — zoom 1 is
 # FarmCamera.player_scale_size at the farm's 43° pitch, rubber-banded 0.8–1.4 about the pinch centre (ElasticZoom).
 var _zoom := 1.0
-var _room := AABB()          # this floor's walls (the camera's edges, _frame_chamber); empty until a floor is built
+var _room := AABB()          # this floor's walls (the camera's vertical framing, _frame_chamber); empty until built
+var _art_points := PackedVector3Array()   # this floor's art vertices incl. the ladders and the elevator (side stops)
+var _art_sides := PackedVector3Array()    # of those, the leftmost and rightmost for the camera's right (_side_points)
+var _art_right := Vector3.ZERO            # the camera right _art_sides were found for
+var _band := Rect2()         # the last camera band seen with no panel up (_camera_band)
 var _pinch = ElasticZoom.new(0.8, 1.4)
 var _zoom_at := Vector2.INF
 var _target := {}           # {kind, rock, at}
@@ -126,6 +130,10 @@ func _build_floor(n: int) -> void:
 		rock.name = "Rock%d" % i
 		objects.add_child(rock)
 		_rocks[i] = rock
+	_art_points = _art_vertices(scenery)
+	for node in objects.get_children():   # the elevator and the down ladder stand against the walls; rocks are inside
+		if not str(node.name).begins_with("Rock"): _art_points.append_array(_art_vertices(node))
+	_art_right = Vector3.ZERO
 	_rebuild_nav(broken)
 
 func _rebuild_nav(broken: Array) -> void:
@@ -375,35 +383,54 @@ func _update_camera() -> void:
 	_frame_chamber()
 	FarmCamera.fit_ground_depth(cam)
 
-## The view stays inside the room's art (不知火舞 on 231): the four corners of the band between the HUD and the quick bar /
-## main key (P0Ui.camera_band) must land in the room — the top corners at the wall tops within the back wall, the bottom
-## corners at the floor within the front edge, all four between the side walls (the walls run aslant on screen at
-## the 14.5° yaw, so a box around the room's picture would still show the void beside them). That gives the focus one
-## allowed range per ground axis; where the band is wider than the room the focus stays at the range's middle (fixed),
-## elsewhere the safe box follows inside it. Moves `_focus` itself, so the follow and the pinch carry on from there.
+## Framing (不知火舞 on 231, the rooms' rule of #127). Down: the four corners of the band between the HUD and the quick
+## bar / main key (_camera_band) land in the room — the top corners at the wall tops within the back wall, the bottom
+## corners on the floor within the front edge; the room is wider than that band, so the focus stays at the middle of
+## the range this gives (fixed). Across: the room is wider than the screen, so the safe box follows, but stops where the
+## art's outer edge — the walls, the ladders and the elevator on them — comes P0Room.SIDE_MARGIN (18 px) from the
+## screen's side, the mine's dark backdrop showing past it. Moves `_focus` itself, so the follow and the pinch carry on.
 func _frame_chamber() -> void:
 	if _room.size == Vector3.ZERO: return
 	var vp := get_viewport().get_visible_rect().size
-	var band := Rect2(Vector2.ZERO, vp)
-	if rt != null and rt.ui != null and rt.ui.is_node_ready(): band = rt.ui.camera_band()
+	var band := _camera_band(rt.ui if rt != null else null, vp)
 	if band.size.x <= 0.0 or band.size.y <= 0.0: return
-	var lo := Vector2(-INF, -INF)   # allowed focus x / z
-	var hi := Vector2(INF, INF)
-	var top := _room.end.y
-	var floor_y := _room.position.y
+	var lo := -INF
+	var hi := INF
 	for c in [band.position, Vector2(band.end.x, band.position.y), Vector2(band.position.x, band.end.y), band.end]:
-		# Each corner on the surface it shows: the band's top meets the walls' tops, its bottom the floor.
 		var far: bool = c.y == band.position.y
-		var off := _ray_at(c, top if far else floor_y) - _focus
-		lo.x = maxf(lo.x, _room.position.x - off.x)
-		hi.x = minf(hi.x, _room.end.x - off.x)
-		if far: lo.y = maxf(lo.y, _room.position.z - off.z)
-		else: hi.y = minf(hi.y, _room.end.z - off.z)
-	var x := clamp_or_centre(_focus.x, lo.x, hi.x)
-	var z := clamp_or_centre(_focus.z, lo.y, hi.y)
-	if is_equal_approx(x, _focus.x) and is_equal_approx(z, _focus.z): return
-	_focus = Vector3(x, _focus.y, z)
+		var off := _ray_at(c, _room.end.y if far else _room.position.y) - _focus
+		if far: lo = maxf(lo, _room.position.z - off.z)
+		else: hi = minf(hi, _room.end.z - off.z)
+	var z := clamp_or_centre(_focus.z, lo, hi)
+	if not is_equal_approx(z, _focus.z):
+		_focus.z = z
+		FarmCamera.place(cam, _focus + Vector3.UP * 0.7)
+	# Across, on screen: the art's outermost points against the side margins. Moving the focus along the ground's x
+	# moves the picture across by cos(yaw) of it (orthographic: the same everywhere), so one step lands it.
+	var sides := _side_points()
+	if sides.is_empty(): return
+	var dx := side_shift(cam.unproject_position(sides[0]).x, cam.unproject_position(sides[1]).x, vp.x, P0Room.SIDE_MARGIN)
+	if is_zero_approx(dx): return
+	var px_per_x := cam.global_basis.x.x * vp.x / cam.size   # screen px per metre of ground x
+	if absf(px_per_x) < 0.0001: return
+	_focus.x -= dx / px_per_x
 	FarmCamera.place(cam, _focus + Vector3.UP * 0.7)
+
+## How far (px) the art spanning left..right must move across a screen `width` wide: into the middle when it fits
+## inside the margins, else only so far that neither side shows more than `margin` of backdrop.
+static func side_shift(left: float, right: float, width: float, margin: float) -> float:
+	if right - left <= width - 2.0 * margin: return (width - left - right) * 0.5
+	if left > margin: return margin - left
+	if right < width - margin: return width - margin - right
+	return 0.0
+
+## The band to frame into: P0Ui.camera_band while no panel is up, else the last one seen then (苏烈 on #129). A panel
+## that hides the quick bar and the key (the inbox, the profile, the skills) would stretch the band to the screen's
+## foot and the fixed middle would move — the room jumping behind the panel and back. The whole viewport until a band
+## has been seen.
+func _camera_band(ui: P0Ui, viewport: Vector2) -> Rect2:
+	if ui != null and ui.is_node_ready() and not ui.has_modal(): _band = ui.camera_band()
+	return _band if _band.has_area() else Rect2(Vector2.ZERO, viewport)
 
 ## Where the camera ray through a screen point (this UI's coordinates) crosses the plane at height y.
 func _ray_at(screen: Vector2, y: float) -> Vector3:
@@ -415,15 +442,62 @@ func _ray_at(screen: Vector2, y: float) -> Vector3:
 static func clamp_or_centre(v: float, lo: float, hi: float) -> float:
 	return (lo + hi) * 0.5 if lo > hi else clampf(v, lo, hi)
 
-## The floor's walls: of the art's meshes (lights and flat decals left out), the one standing taller than half a metre
-## with the widest footprint — the carved walls; Art.VIEW_BOUNDS if none is found.
+## The floor's walls: of the art's meshes, the one standing taller than half a metre with the widest footprint — the
+## carved walls; Art.VIEW_BOUNDS if none is found.
 static func _walls_box(root: Node3D) -> AABB:
 	var best := AABB()
+	for b in _art_boxes(root):
+		if b.size.y > 0.5 and b.size.x * b.size.z > best.size.x * best.size.z: best = b
+	return best if best.size != Vector3.ZERO else Art.VIEW_BOUNDS
+
+## The art's leftmost and rightmost vertex on screen. The camera only turns with the yaw, which is fixed, so they are
+## found once per floor (and again only if the camera's right changes) and projected each frame — the real outer edge,
+## not a box corner standing out past a rounded wall end.
+func _side_points() -> PackedVector3Array:
+	var r := cam.global_basis.x
+	if _art_points.is_empty(): return PackedVector3Array()
+	if r.is_equal_approx(_art_right) and _art_sides.size() == 2: return _art_sides
+	var lo := _art_points[0]
+	var hi := _art_points[0]
+	for p in _art_points:
+		if p.dot(r) < lo.dot(r): lo = p
+		if p.dot(r) > hi.dot(r): hi = p
+	_art_right = r
+	_art_sides = PackedVector3Array([lo, hi])
+	return _art_sides
+
+## Every mesh vertex under `root` in world space (MeshInstance3D and MultiMeshInstance3D); lights and decals have none
+## that matter here, the wall contact shade lies flat inside the walls' reach.
+static func _art_vertices(root: Node) -> PackedVector3Array:
+	var out := PackedVector3Array()
+	if root == null: return out
+	var nodes: Array = root.find_children("*", "GeometryInstance3D", true, false)
+	if root is GeometryInstance3D: nodes.append(root)
+	for g in nodes:
+		if g is MeshInstance3D and (g as MeshInstance3D).mesh != null:
+			var xf: Transform3D = (g as Node3D).global_transform
+			if (g as MeshInstance3D).get_aabb().size.y <= 0.01: continue   # flat decals
+			for v in (g as MeshInstance3D).mesh.get_faces(): out.append(xf * v)
+		elif g is MultiMeshInstance3D and (g as MultiMeshInstance3D).multimesh != null:
+			var mm := (g as MultiMeshInstance3D).multimesh
+			if mm.mesh == null: continue
+			var faces := mm.mesh.get_faces()
+			var base: Transform3D = (g as Node3D).global_transform
+			for i in mm.instance_count:
+				var xf := base * mm.get_instance_transform(i)
+				for v in faces: out.append(xf * v)
+	return out
+
+## One world box per mesh under `root` — lights and flat decals left out (the wall contact shade reaches past the
+## walls); not merged, so a tall piece inside (the elevator) does not raise the walls' corners.
+static func _art_boxes(root: Node3D) -> Array[AABB]:
+	var out: Array[AABB] = []
+	if root == null: return out
 	for vi in root.find_children("*", "VisualInstance3D", true, false):
 		if vi is Light3D: continue
 		var b: AABB = (vi as VisualInstance3D).global_transform * (vi as VisualInstance3D).get_aabb()
-		if b.size.y > 0.5 and b.size.x * b.size.z > best.size.x * best.size.z: best = b
-	return best if best.size != Vector3.ZERO else Art.VIEW_BOUNDS
+		if b.size.y > 0.01: out.append(b)
+	return out
 
 ## Zoom about the last pinch centre: the ground point under the fingers stays put (the farm's _set_zoom).
 func _set_zoom(value: float) -> void:
