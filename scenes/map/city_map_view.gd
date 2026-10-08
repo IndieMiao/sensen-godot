@@ -1069,15 +1069,18 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int)
 			if incumbent: _hidden_until[id] = now + REAPPEAR_COOLDOWN_MS
 			return false
 	var label_rect := Rect2(c.point + Vector2(-c.label_w * 0.5, 3), Vector2(c.label_w, c.label_h))
+	var disc_off_screen := false
 	if not _destination(entry).is_empty():
 		label_rect.position.y = c.point.y + UiMapDestination.LABEL_GAP   # where the pin draws it
-		# The whole name on screen: with its disc in the view it slides in from the edge, the disc stays. A disc packed
-		# in the margin off screen keeps its name with it (no name without its pin).
+		# The whole name on screen: while any of its disc is on screen it slides in from the edge, the disc stays. A disc
+		# packed in the margin off screen shows no name (no name without its pin).
 		var screen_x0 := -global_position.x   # the screen's left edge here (the view may be inset by a safe area)
 		var screen_w := get_viewport_rect().size.x
-		if c.point.x >= screen_x0 and c.point.x <= screen_x0 + screen_w:
+		var half := UiMapDestination.DISC * 0.5   # any of the disc on screen
+		if c.point.x + half >= screen_x0 and c.point.x - half <= screen_x0 + screen_w:
 			var lo := screen_x0 + LABEL_EDGE
 			label_rect.position.x = clampf(label_rect.position.x, lo, maxf(lo, screen_x0 + screen_w - LABEL_EDGE - c.label_w))
+		else: disc_off_screen = true
 	if entry.kind == "landmark":
 		label_fits = is_selected or not _hits(occupied, Rect2(c.point - Vector2(c.width * 0.5, -3), Vector2(c.width, 20)))
 	elif entry.kind == "place" or not _destination(entry).is_empty():
@@ -1086,6 +1089,7 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int)
 		# likewise, marked or not: the selected pin packs first, so its name always shows and the names it touches fold
 		# until the card closes (不知火舞 on 234 A2).
 		label_fits = is_selected or not _hits(occupied, label_rect)
+	if disc_off_screen: label_fits = false   # no name without its pin on screen
 	if entry.kind == "place":
 		occupied.append(Rect2(c.point - Vector2(c.art_w * 0.5, c.art_h), Vector2(c.art_w, c.art_h)))
 		if label_fits:
