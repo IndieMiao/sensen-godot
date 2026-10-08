@@ -330,3 +330,12 @@ func test_a_stored_seasoning_counts_as_a_seasoning_in_the_preview() -> void:
 	assert_str(P0KitchenLogic.preview(v, ["rock_salt"]).title).is_equal("Needs a main ingredient")   # not a main
 	assert_str(P0KitchenLogic.experiment_reason(v, ["rock_salt"])).is_equal("Needs a main ingredient")
 	assert_str(P0KitchenLogic.pot_energy(v, ["fish_perch", "rock_salt"])).is_equal("+40 Energy")   # Herb Baked Perch [fish_perch, S1]
+
+func test_a_mix_that_failed_before_says_tried_before() -> void:
+	var v := _view()
+	v.cooking["mishaps"] = [{"items": ["crop_radish", "crop_radish"], "n": 1, "at": 0}]
+	assert_bool(P0KitchenLogic.tried(v, ["crop_radish", "crop_radish"])).is_true()
+	assert_str(P0KitchenLogic.preview(v, ["crop_radish", "crop_radish"]).title).is_equal("Tried before")
+	assert_bool(P0KitchenLogic.tried(v, ["crop_radish"])).is_false()
+	assert_str(P0KitchenLogic.preview(v, ["crop_radish", "fish_koi"]).title).is_equal("Unknown dish")
+

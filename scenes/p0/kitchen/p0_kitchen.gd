@@ -269,6 +269,7 @@ func _after_pot_change() -> void:
 	drawer.pot = pot
 	drawer.refresh()
 	_refresh_overlay()
+	if P0KitchenLogic.tried(rt.session.current(), pot): rt.ui.toast("Tried before · still a Mystery Dish")
 
 func _on_cook(cmd: Dictionary) -> void:
 	if _cook_sent: return

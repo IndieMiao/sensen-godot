@@ -223,8 +223,20 @@ static func preview(view_: Dictionary, pot: Array) -> Dictionary:
 		var derive: Array = cooking(view).get("derive", [[1, 2, 3], [2, 3, 3], [3, 3, 4], [4, 4, 4]])
 		rarity = int(derive[clampi(top - 1, 0, derive.size() - 1)][clampi(fams.size(), 1, 3) - 1])
 	var t: Dictionary = cooking(view).get("tiers", {}).get(str(rarity), {})
-	return {title = str(known.name) if not known.is_empty() else "Unknown dish", state = P0Logic.rarity_name(view, rarity),
-		time = "%d s" % (int(t.get("ms", 5000)) / 1000)}
+	var title := str(known.name) if not known.is_empty() else ("Tried before" if tried(view, pot) else "Unknown dish")
+	return {title = title, state = P0Logic.rarity_name(view, rarity), time = "%d s" % (int(t.get("ms", 5000)) / 1000)}
+
+## This exact mix already failed (S5 Kitchen Mishaps): §7.2.7 notes "Tried before · still a Mystery Dish"; the pot
+## may still cook it.
+static func tried(view: Dictionary, pot: Array) -> bool:
+	if pot.is_empty(): return false
+	var mine := pot.map(func(i): return str(i))
+	mine.sort()
+	for m in cooking(view).get("mishaps", []):
+		var theirs: Array = (m.get("items", []) as Array).map(func(i): return str(i))
+		theirs.sort()
+		if theirs == mine: return true
+	return false
 
 ## Experiment's cook row (COOK-P0-2 / 2b): "+20 Energy" when the pot is a known page, "" for an unknown mix.
 static func pot_energy(view_: Dictionary, pot: Array) -> String:
