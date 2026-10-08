@@ -31,7 +31,7 @@ func test_two_hours_away_first() -> void:
 	assert_str(s.caption).is_equal("1h 12m")
 	assert_str(s.sheet_state).is_equal("Cooling down")
 	assert_array([s.fact, s.fact_value]).is_equal(["Available in", "1h 12m"])
-	assert_str(s.reason).is_equal("Back in 1h 12m")
+	assert_str(s.reason).is_equal("Ready in 1h 12m")
 	assert_str(s.close).is_equal("Close")
 	s = P0Logic.rest_state(_view({"away_ready_in": null}))   # never left home
 	assert_str(s.state).is_equal("away")

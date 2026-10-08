@@ -888,7 +888,7 @@ static func rest_state(view: Dictionary) -> Dictionary:
 		var left := "" if away == null else duration(float(away))
 		out.merge({"state": "away", "badge": "countdown", "caption": left, "sheet_state": "Cooling down", "effect": "",
 			"fact": "Available in" if away != null else "Away from home", "fact_value": left if away != null else "%dh first" % int(r.get("away_h", 2)),
-			"reason": ("Back in " + left) if away != null else "After %dh away" % int(r.get("away_h", 2)), "can_rest": false,
+			"reason": ("Ready in " + left) if away != null else "After %dh away" % int(r.get("away_h", 2)), "can_rest": false,
 			"close": "Close"}, true)
 	elif gain <= 0:
 		out.merge({"state": "full", "reason": "Energy full", "can_rest": false}, true)

@@ -71,7 +71,7 @@ func test_the_bench_reads_what_resting_gives_and_dims_when_it_cannot() -> void:
 	v.rest.used = 0
 	v.rest.away_ready_in = 4320000
 	p = P0WorldPrompts.bench(v)
-	assert_array([p.text, p.fact, p.status, p.dimmed]).is_equal(["+60 Energy", "Back in 1h 12m", UiStatusBadge.State.COUNTDOWN, true])
+	assert_array([p.text, p.fact, p.status, p.dimmed]).is_equal(["+60 Energy", "Ready in 1h 12m", UiStatusBadge.State.COUNTDOWN, true])
 	v.rest.away_ready_in = null   # never been away yet
 	assert_array([P0WorldPrompts.bench(v).fact, P0WorldPrompts.bench(v).dimmed]).is_equal(["After 2h away", true])
 

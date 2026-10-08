@@ -185,7 +185,7 @@ func test_the_sign_prompt_reads_its_level_and_lights_ready() -> void:
 	assert_str(p.text).is_equal("Homestead Lv2")
 	assert_str(p.fact).is_empty()
 	assert_int(p.status).is_equal(-1)
-	assert_object(p.icon).is_same(P0Logic.icon("home"))
+	assert_object(p.icon).is_same(P0Logic.icon("level_up"))   # its own mark; the farmhouse keeps i-home
 	var lit := _view()
 	lit.homestead.next.can_upgrade = true
 	assert_int(P0WorldPrompts.sign(lit).status).is_equal(UiStatusBadge.State.READY)

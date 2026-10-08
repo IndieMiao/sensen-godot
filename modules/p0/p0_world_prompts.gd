@@ -36,12 +36,13 @@ static func stall(view: Dictionary) -> Dictionary:
 static func farmhouse(view: Dictionary) -> Dictionary:
 	return _p("home", "Farmhouse", "", UiStatusBadge.State.REQUEST if P0Guide.door_badge(view) else -1)
 
-## Homestead sign (WORLD-HINT-5, 228 64c75e54): the house mark, Ready once the Needs are met; open: `Homestead LvN`.
+## Homestead sign (WORLD-HINT-5, 228 64c75e54): its own mark i-level-up (a house with an up arrow, 1705:102404 —
+## the farmhouse keeps i-home, 不知火舞 on #59), Ready once the Needs are met; open: `Homestead LvN`.
 static func sign(view: Dictionary) -> Dictionary:
 	var h: Dictionary = view.get("homestead", {})
 	var nxt = h.get("next", null)
 	var lit: bool = nxt is Dictionary and bool(nxt.get("can_upgrade", false))
-	return _p("home", "Homestead Lv%d" % int(h.get("level", 1)), "", UiStatusBadge.State.READY if lit else -1)
+	return _p("level_up", "Homestead Lv%d" % int(h.get("level", 1)), "", UiStatusBadge.State.READY if lit else -1)
 
 ## Upgrade Plaque: no mark; only the strip when it is the nearest (PLAQUE-READ).
 static func plaque(_view: Dictionary) -> Dictionary:
@@ -49,7 +50,7 @@ static func plaque(_view: Dictionary) -> Dictionary:
 
 ## Rest bench (FARM-7, q(62)): what resting gives now — `+60 Energy`, or less near full (REST-NEARFULL `+25 Energy`).
 ## Only when it can be used is it the normal strip; otherwise Dimmed with the reason as its one fact (不知火舞 on #59):
-## used today `Rested today`; not yet (q(41): 2 h away from home first) the Countdown state with `Back in 1h 12m` /
+## used today `Rested today`; not yet (q(41): 2 h away from home first) the Countdown state with `Ready in 1h 12m` /
 ## `After 2h away`; Energy full `Energy full`.
 static func bench(view: Dictionary) -> Dictionary:
 	var st := P0Logic.rest_state(view)

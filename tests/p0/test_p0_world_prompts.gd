@@ -161,3 +161,18 @@ func test_the_speakers_tag_stays_over_the_conversation() -> void:
 	assert_bool(ama.visible).is_true()
 	assert_bool(ama.highlight).is_false()
 	assert_object(ama.get_parent()).is_same(ui._kit)
+
+## 不知火舞 on #59: the strip never leaves the screen — fits first, then not over other buttons, then facing; with no
+## side wide enough it slides back on screen, 12 px from the edge.
+func test_a_strip_stays_on_screen_before_anything_else() -> void:
+	var a := ui._marker_area()
+	var at := Vector2(a.end.x - 60, a.get_center().y)
+	ui.world_icon("sign", HOME, at + Vector2(-70, 0), true)   # a button on the only side that fits
+	ui.name_bar("bench", HOME, "+57 Energy", "Ready in 1h 38m", at, true, UiWorldNameBar.Dir.RIGHT)
+	var bar: UiWorldNameBar = ui._name_bars.bench
+	assert_int(bar.side).is_equal(UiWorldNameBar.Dir.LEFT)   # covers the button rather than leave the screen
+	var mid := Vector2(a.get_center().x, a.get_center().y + 80)
+	ui.name_bar("long", HOME, "A very long facility name here", "Ready in 12h 59m", mid, true, UiWorldNameBar.Dir.LEFT)
+	var r: Rect2 = ui._name_bars.long.full_rect()
+	assert_float(r.position.x).is_greater_equal(a.position.x + 12.0 - 0.5)
+	assert_float(r.end.x).is_less_equal(a.end.x - 12.0 + 0.5)

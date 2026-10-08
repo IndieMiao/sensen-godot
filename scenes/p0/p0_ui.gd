@@ -783,14 +783,8 @@ func name_bar(id: String, icon: Texture2D, text: String, fact: String, screen: V
 	bar.fact = fact
 	bar.dimmed = dimmed
 	bar.status = status
-	bar.side = _name_bar_side(bar, screen, UiWorldNameBar.Dir.RIGHT if side < 0 else side)
-	# Over an NPC's name tag or another facility's button it opens the other way, if that side is clear and fits (#57,
-	# 不知火舞; 苏烈 on #59); covered tags on both sides fade while it is open (npc_tag), covered buttons sit under it.
-	var other := UiWorldNameBar.Dir.LEFT if bar.side == UiWorldNameBar.Dir.RIGHT else UiWorldNameBar.Dir.RIGHT
-	if _covers_marker(bar.rect_for(screen, bar.side), id) and not _covers_marker(bar.rect_for(screen, other), id) \
-			and _name_bar_side(bar, screen, other) == other:
-		bar.side = other
-	bar.anchor_at(screen)
+	bar.side = _name_bar_side(bar, screen, UiWorldNameBar.Dir.RIGHT if side < 0 else side, id)
+	bar.anchor_at(screen + Vector2(_name_bar_shift(bar.rect_for(screen, bar.side)), 0.0))
 	var b: UiWorldIconButton = _icons.get(id)
 	if b: b.visible = false   # the strip stands in for its button
 	_raise_marker(bar)   # the open strip draws over every icon button and badge (哪吒: a stove badge sat on a card)
@@ -827,13 +821,32 @@ func prompt_rect(id: String) -> Rect2:
 		if m != null and m.is_visible_in_tree() and not m.get_meta("folding", false): return m.hit_rect()
 	return Rect2()
 
-## The wanted side unless the strip would leave the marker band there; then the other one (贴边翻转).
-func _name_bar_side(bar: UiWorldNameBar, screen: Vector2, want: int) -> int:
+## Which way a strip opens (不知火舞 on #59), in this order: ① the whole strip on screen with 12 px to spare (贴边翻转);
+## ② not over an NPC's name tag or another facility's button (#57; 苏烈 on #59) — covered tags fade while it is open,
+## covered buttons sit under it; ③ the way the character faces (`want`). If neither side fits, the roomier one: a
+## strip may cover a button, never leave the screen.
+func _name_bar_side(bar: UiWorldNameBar, screen: Vector2, want: int, id := "") -> int:
+	var other := UiWorldNameBar.Dir.LEFT if want == UiWorldNameBar.Dir.RIGHT else UiWorldNameBar.Dir.RIGHT
 	var area := _marker_area()
-	var reach := bar.full_width() - bar.folded_width() * 0.5
-	if want == UiWorldNameBar.Dir.RIGHT and screen.x + reach > area.end.x - UiTokens.SPACE_WITHIN: return UiWorldNameBar.Dir.LEFT
-	if want == UiWorldNameBar.Dir.LEFT and screen.x - reach < area.position.x + UiTokens.SPACE_WITHIN: return UiWorldNameBar.Dir.RIGHT
+	var room := func(d: int) -> float:   # px to spare at the tighter edge (negative: off screen)
+		var r := bar.rect_for(screen, d)
+		return minf(r.position.x - area.position.x, area.end.x - r.end.x) - UiTokens.SPACE_ROW
+	var fits_want: bool = room.call(want) >= 0.0
+	var fits_other: bool = room.call(other) >= 0.0
+	if fits_want != fits_other: return want if fits_want else other
+	if not fits_want: return want if room.call(want) >= room.call(other) else other
+	if _covers_marker(bar.rect_for(screen, want), id) and not _covers_marker(bar.rect_for(screen, other), id): return other
 	return want
+
+## Last resort when neither side fits (a long fact near the middle of a narrow screen): slide the strip back on
+## screen, 12 px from the edge, off its button's spot — never off screen (不知火舞 on #59). The tap still goes to `hit`.
+func _name_bar_shift(r: Rect2) -> float:
+	var area := _marker_area()
+	var lo := area.position.x + UiTokens.SPACE_ROW
+	var hi := area.end.x - UiTokens.SPACE_ROW
+	if r.position.x < lo: return minf(lo - r.position.x, maxf(0.0, hi - r.end.x))
+	if r.end.x > hi: return -minf(r.end.x - hi, maxf(0.0, r.position.x - lo))
+	return 0.0
 
 ## An interactable NPC's name over its head (NpcNameTag 1674:101195): the name only; `highlight` when nearest within
 ## reach. `talking`: this NPC is the one speaking in the keeper greeting card or the resident dialogue bar — its tag
