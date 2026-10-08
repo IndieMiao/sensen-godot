@@ -1,5 +1,7 @@
 ## Headless 提取器：recipes.json → AvatarPartDef .res / socket .tscn / thumbs / parts_manifest.json
-## 用法: godot --headless --path . --script res://tools/pipeline/extract_parts.gd -- <recipes.json路径>
+## 用法: godot --headless --path . --script res://tools/pipeline/extract_parts.gd -- <recipes.json路径> [--append]
+## 默认整份重写 parts_manifest.json。--append（SGODOT-229）只提取清单里还没有的 id，新条目按文本插到
+## parts 数组的 ] 之前：已有条目逐字节不变，它们的 .res / 场景 / 缩略图也不会重写。
 extends SceneTree
 
 const PARTS_DIR := "res://assets/avatar/parts"
@@ -9,7 +11,9 @@ const MANIFEST_PATH := "res://assets/avatar/parts_manifest.json"
 var _errors: PackedStringArray = []
 
 func _initialize() -> void:
-	var args := OS.get_cmdline_user_args()
+	var raw := OS.get_cmdline_user_args()
+	var append := raw.has("--append")
+	var args := PackedStringArray(Array(raw).filter(func(a): return a != "--append"))
 	if args.is_empty():
 		push_error("缺少参数: recipes.json 路径")
 		quit(2)
@@ -22,6 +26,9 @@ func _initialize() -> void:
 		return
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(PARTS_DIR))
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(THUMBS_DIR))
+	if append:
+		_append(recipes)
+		return
 	var manifest_parts: Array = []
 	for recipe in recipes.parts:
 		var entry = _process_part(recipe)
@@ -35,6 +42,56 @@ func _initialize() -> void:
 		printerr("ERROR: " + e)
 	print("提取完成: %d 部件, %d 错误" % [manifest_parts.size(), _errors.size()])
 	quit(1 if _errors.size() > 0 else 0)
+
+## --append: extract only the new ids and insert their entries into the manifest text.
+func _append(recipes: Dictionary) -> void:
+	var text := FileAccess.get_file_as_string(MANIFEST_PATH)
+	var current = JSON.parse_string(text)
+	if typeof(current) != TYPE_DICTIONARY or typeof(current.get("parts")) != TYPE_ARRAY:
+		push_error("parts_manifest.json 解析失败，--append 需要一份现有清单")
+		quit(2)
+		return
+	var todo := pending(recipes.parts, current.parts)
+	var added: Array = []
+	for recipe in recipes.parts:
+		if not todo.has(recipe):
+			print("跳过已在清单里的 %s（条目与 .res 不动）" % recipe.id)
+			continue
+		var entry = _process_part(recipe)
+		if entry != null:
+			added.append(entry)
+	var out := append_entries(text, added)
+	if out == "":
+		push_error("parts_manifest.json 找不到 parts 数组的结尾")
+		quit(2)
+		return
+	if not added.is_empty():
+		var f := FileAccess.open(MANIFEST_PATH, FileAccess.WRITE)
+		f.store_string(out)
+		f.close()
+	for e in _errors:
+		printerr("ERROR: " + e)
+	print("追加完成: %d 部件, %d 错误" % [added.size(), _errors.size()])
+	quit(1 if _errors.size() > 0 else 0)
+
+## The recipes whose id the manifest does not have yet, in recipe order.
+static func pending(recipes: Array, manifest_parts: Array) -> Array:
+	var have := {}
+	for p in manifest_parts:
+		have[str(p.get("id", ""))] = true
+	return recipes.filter(func(r): return not have.has(str(r.get("id", ""))))
+
+## The manifest text with these entries inserted before the parts array's closing bracket, each serialised as the
+## default mode does (JSON.stringify with tabs, two levels in). The text before them is kept byte for byte.
+## "" when the text has no parts array ending "\n\t]".
+static func append_entries(text: String, entries: Array) -> String:
+	if entries.is_empty(): return text
+	var close := text.rfind("\n\t]")
+	if close < 0: return ""
+	var block := ""
+	for e in entries:
+		block += ",\n" + "\n".join(Array(JSON.stringify(e, "\t").split("\n")).map(func(l): return "\t\t" + l))
+	return text.substr(0, close) + block + text.substr(close)
 
 func _process_part(recipe: Dictionary):
 	var id: String = recipe.id

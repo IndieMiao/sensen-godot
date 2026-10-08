@@ -29,5 +29,26 @@
   },
   "messengerbag3": {
     "fbx": "Assets/_Gensen/Characters/AvatarPaks/skin40/skin40/SK_dt_skin40.fbx"
+  },
+  "mask16_npc_kai": {
+    "fbx": "Assets/_Gensen/Characters/AvatarPaks/skin34/skin34/SM_mask16.fbx",
+    "albedo": "Assets/_Gensen/Characters/AvatarPaks/skin34/skin34_2/T_skin34_mask_2_D.png"
+  },
+  "hairhat71_npc_kai": {
+    "fbx": "Assets/_Gensen/Characters/AvatarPaks/skin59/skin59/SM_hairHat71.fbx",
+    "albedo": "Assets/_Gensen/Characters/AvatarPaks/skin59/skin59/T_skin59_hairHat_D.png"
+  },
+  "hairhat12_npc_mei": {
+    "fbx": "Assets/_Gensen/Characters/AvatarPaks/skin11/skin11/SM_hairHat12.fbx",
+    "albedo": "Assets/_Gensen/Characters/AvatarPaks/skin11/skin11/T_skin11_hairHat_2_D 2.png",
+    "albedo_as": "T_skin11_hairHat_2_D.png"
+  },
+  "cloth11_npc_mei": {
+    "fbx": "Assets/_Gensen/Characters/AvatarPaks/skin11/skin11/SK_dt_skin11.fbx",
+    "albedo": "Assets/_Gensen/Characters/AvatarPaks/skin11/skin11/T_skin11_cloth_D.png"
+  },
+  "hairhat80_npc_ama": {
+    "fbx": "Assets/_Gensen/Characters/AvatarPaks/skin68/skin68/SM_hairHat80.fbx",
+    "albedo": "Assets/_Gensen/Characters/AvatarPaks/skin68/skin68/T_skin68_hairHat_D.png"
   }
 }
