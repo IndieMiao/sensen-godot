@@ -51,11 +51,14 @@ describe('pond templates by point and the cast check (q(36), SGODOT-232 S6)', ()
     expect(applyP0(c, s, { type: 'cast', space: 'pond' }, T + 30)).toMatchObject({ ok: false, code: 'not_at_pond' });
   });
 
-  it('ignores ponds the server does not know or that are not in the home city', () => {
+  it('ignores ponds the server does not know or that are not in the home city, and forgets the last pond for them', () => {
     const s = fresh();
     for (const place of ['pond_los_angeles_05', 'pond_shanghai_99', '']) {
       expect(applyP0(c, s, { type: 'cast', space: 'pond', place }, T)).toMatchObject({ ok: false, code: 'not_at_pond' });
     }
+    s.presence.place = REED;
+    expect(applyP0(c, s, { type: 'cast', space: 'pond', place: 'pond_shanghai_99' }, T)).toMatchObject({ ok: false, code: 'not_at_pond' });
+    expect(applyP0(c, s, { type: 'cast', space: 'pond' }, T).ok).toBe(true);   // no place: the last pond stays
   });
 
   it('the entry read records the pond, so the first cast needs no place', async () => {
@@ -88,6 +91,20 @@ describe('the daily XP cap per skill (§4.3.4, SGODOT-232 S6)', () => {
     // another skill has its own cap
     gainXp(c, s, T, 'cooking', 40, 100, ev);
     expect(s.skills.cooking).toBe(40);
+    // a first-time bonus the cap took says nothing (no "First cast · +10 XP" for 0)
+    const capped = fresh();
+    capped.day = { ...capped.day, key: '2026-10-08', xp: { fishing: 3_000 } };
+    const cast = applyP0(c, capped, { type: 'cast', space: 'pond', place: REED }, T);
+    if (!cast.ok) throw new Error(cast.code);
+    expect(cast.events.some(e => e.kind === 'first')).toBe(false);
+    expect(cast.events).toContainEqual({ kind: 'xp', skill: 'fishing', amount: 0, percent: 100, capped: true });
+    // part of it: 2,995 already today, so the first cast's 10 says +5
+    const part = fresh();
+    part.day = { ...part.day, key: '2026-10-08', xp: { fishing: 2_995 } };
+    const cast5 = applyP0(c, part, { type: 'cast', space: 'pond', place: REED }, T);
+    if (!cast5.ok) throw new Error(cast5.code);
+    expect(cast5.events.find(e => e.kind === 'first')).toMatchObject({ xp: 5 });
+    expect(cast5.events).toContainEqual({ kind: 'xp', skill: 'fishing', amount: 5, percent: 100, capped: true });
     // the next player day (after the 04:00 rollover) starts from 0
     const next = step(s, { type: 'cast', space: 'pond', place: REED }, T + 24 * 3_600_000);
     expect(next.day.xp).toEqual({ fishing: 10 });   // first cast +10

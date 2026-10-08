@@ -1,0 +1,2116 @@
+{
+  "units": "metres",
+  "axes": "Godot Y-up, front +Z; Blender (x,-z,y)",
+  "reference": {
+    "file_key": "OMLTC3yw3u2WDjOZhLnhaR",
+    "node_id": "545:2970"
+  },
+  "assets": [
+    {
+      "name": "room_shell",
+      "file": "room_shell.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            -0.07,
+            0
+          ],
+          "size": [
+            9.5,
+            0.3,
+            7.7
+          ]
+        },
+        {
+          "at": [
+            -4.6,
+            2.125,
+            0
+          ],
+          "size": [
+            0.22,
+            4.25,
+            7.7
+          ]
+        },
+        {
+          "at": [
+            -0.6299999999999997,
+            2.125,
+            -3.7
+          ],
+          "size": [
+            7.9399999999999995,
+            4.25,
+            0.22
+          ]
+        },
+        {
+          "at": [
+            4.5600000000000005,
+            2.125,
+            -3.7
+          ],
+          "size": [
+            0.07999999999999952,
+            4.25,
+            0.22
+          ]
+        },
+        {
+          "at": [
+            3.93,
+            3.355,
+            -3.7
+          ],
+          "size": [
+            1.18,
+            1.79,
+            0.22
+          ]
+        },
+        {
+          "at": [
+            4.699999999999999,
+            0.75,
+            0
+          ],
+          "size": [
+            0.1,
+            1.5,
+            7.7
+          ]
+        },
+        {
+          "at": [
+            0,
+            0.75,
+            3.8000000000000003
+          ],
+          "size": [
+            9.5,
+            1.5,
+            0.1
+          ]
+        },
+        {
+          "at": [
+            3.93,
+            -0.07,
+            -4.0600000000000005
+          ],
+          "size": [
+            1.18,
+            0.3,
+            0.92
+          ]
+        },
+        {
+          "at": [
+            3.33,
+            0.7,
+            -4.1000000000000005
+          ],
+          "size": [
+            0.08,
+            1.4,
+            0.9
+          ]
+        },
+        {
+          "at": [
+            4.53,
+            0.7,
+            -4.1000000000000005
+          ],
+          "size": [
+            0.08,
+            1.4,
+            0.9
+          ]
+        },
+        {
+          "at": [
+            3.93,
+            0.7,
+            -4.58
+          ],
+          "size": [
+            1.24,
+            1.4,
+            0.08
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "window_wall",
+      "file": "window_wall.glb",
+      "position": [
+        -4.6,
+        0,
+        0
+      ],
+      "yaw_degrees": 90,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "back_wall",
+      "file": "back_wall.glb",
+      "position": [
+        0,
+        0,
+        -3.7
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "arched_window",
+      "file": "arched_window.glb",
+      "position": [
+        -4.5,
+        0,
+        1.36
+      ],
+      "yaw_degrees": 90,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "window_garden",
+      "file": "window_garden.glb",
+      "position": [
+        -4.76,
+        0,
+        1.36
+      ],
+      "yaw_degrees": 90,
+      "colliders": [],
+      "material": "garden",
+      "cast_shadow": true
+    },
+    {
+      "name": "green_door",
+      "file": "green_door.glb",
+      "position": [
+        3.41,
+        0.05,
+        -3.585
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "entry_mat",
+      "file": "entry_mat.glb",
+      "position": [
+        3.93,
+        0.092,
+        -2.9800000000000004
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "door_frame",
+      "file": "door_frame.glb",
+      "position": [
+        3.93,
+        0.05,
+        -3.585
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "sink_cabinet",
+      "file": "sink_cabinet.glb",
+      "position": [
+        -4.08,
+        0.082,
+        1.35
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.6,
+            0
+          ],
+          "size": [
+            1.8,
+            1.2,
+            0.86
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "range_cooker",
+      "file": "range_cooker.glb",
+      "position": [
+        -4.08,
+        0.082,
+        -0.62
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            0.0,
+            0.5720000000000001,
+            0
+          ],
+          "size": [
+            1.1055,
+            1.1440000000000001,
+            0.84
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "kitchen_pantry",
+      "file": "kitchen_pantry.glb",
+      "position": [
+        -4.12,
+        0.082,
+        -2.52
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            0,
+            1.1,
+            0
+          ],
+          "size": [
+            0.82,
+            2.2,
+            0.76
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "range_hood",
+      "file": "range_hood.glb",
+      "position": [
+        -4.35,
+        1.55,
+        -0.62
+      ],
+      "yaw_degrees": 90,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "island",
+      "file": "island.glb",
+      "position": [
+        -2.0,
+        0.082,
+        -0.3
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.52,
+            0
+          ],
+          "size": [
+            2.0,
+            1.04,
+            0.77
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "bar_stool",
+      "file": "bar_stool.glb",
+      "position": [
+        -2.66,
+        0.082,
+        0.31
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.36,
+            0
+          ],
+          "size": [
+            0.44,
+            0.72,
+            0.44
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "green_pendant",
+      "file": "green_pendant.glb",
+      "position": [
+        -2.2,
+        4.15,
+        0.35
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "kitchen_fittings",
+      "file": "kitchen_fittings.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            -4.079999923706055,
+            0.6220000386238098,
+            2.4800000190734863
+          ],
+          "size": [
+            0.56,
+            1.08,
+            0.77
+          ],
+          "rotation": [
+            0,
+            90,
+            0
+          ]
+        },
+        {
+          "at": [
+            -4.079999923706055,
+            0.6220000386238098,
+            0.25
+          ],
+          "size": [
+            0.58,
+            1.08,
+            0.77
+          ],
+          "rotation": [
+            0,
+            90,
+            0
+          ]
+        },
+        {
+          "at": [
+            -4.079999923706055,
+            0.6220000386238098,
+            -1.690000057220459
+          ],
+          "size": [
+            0.96,
+            1.08,
+            0.77
+          ],
+          "rotation": [
+            0,
+            90,
+            0
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "loft_structure",
+      "file": "loft_structure.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            2.45,
+            2.3400000000000003,
+            -2.5
+          ],
+          "size": [
+            4.3,
+            0.225,
+            2.32
+          ]
+        },
+        {
+          "at": [
+            0.39,
+            1.215,
+            -1.35
+          ],
+          "size": [
+            0.24,
+            2.295,
+            0.24
+          ]
+        },
+        {
+          "at": [
+            4.4,
+            1.215,
+            -1.35
+          ],
+          "size": [
+            0.24,
+            2.295,
+            0.24
+          ]
+        },
+        {
+          "at": [
+            2.46,
+            2.898,
+            -1.32
+          ],
+          "size": [
+            4.22,
+            0.936,
+            0.15
+          ]
+        },
+        {
+          "at": [
+            0.32,
+            2.898,
+            -1.99
+          ],
+          "size": [
+            0.15,
+            0.936,
+            1.17
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "back_wall_stairs",
+      "file": "back_wall_stairs.glb",
+      "position": [
+        2.7,
+        0,
+        -2.98
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "points": [
+            [
+              -2.88,
+              0.07200000000000001,
+              -3.54
+            ],
+            [
+              -2.88,
+              0.07200000000000001,
+              -2.39
+            ],
+            [
+              0.31,
+              0.07200000000000001,
+              -3.54
+            ],
+            [
+              0.31,
+              0.07200000000000001,
+              -2.39
+            ],
+            [
+              0.31,
+              2.457,
+              -3.54
+            ],
+            [
+              0.31,
+              2.457,
+              -2.39
+            ],
+            [
+              0.63,
+              0.07200000000000001,
+              -3.54
+            ],
+            [
+              0.63,
+              0.07200000000000001,
+              -2.39
+            ],
+            [
+              0.63,
+              2.457,
+              -3.54
+            ],
+            [
+              0.63,
+              2.457,
+              -2.39
+            ]
+          ]
+        },
+        {
+          "points": [
+            [
+              -2.88,
+              0.09000000000000001,
+              -2.43
+            ],
+            [
+              -2.88,
+              0.9720000000000001,
+              -2.43
+            ],
+            [
+              -0.22166666666666668,
+              2.9572499999999997,
+              -2.43
+            ],
+            [
+              -0.22166666666666668,
+              2.07525,
+              -2.43
+            ],
+            [
+              -2.88,
+              0.09000000000000001,
+              -2.31
+            ],
+            [
+              -2.88,
+              0.9720000000000001,
+              -2.31
+            ],
+            [
+              -0.22166666666666668,
+              2.9572499999999997,
+              -2.31
+            ],
+            [
+              -0.22166666666666668,
+              2.07525,
+              -2.31
+            ]
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "loft_bed",
+      "file": "loft_bed.glb",
+      "position": [
+        2.49,
+        2.493,
+        -2.9
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.32,
+            0
+          ],
+          "size": [
+            1.82,
+            0.64,
+            1.63
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "bedside_table",
+      "file": "bedside_table.glb",
+      "position": [
+        3.88,
+        2.493,
+        -2.9
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.27,
+            0
+          ],
+          "size": [
+            0.54,
+            0.54,
+            0.5
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "loft_window",
+      "file": "loft_window.glb",
+      "position": [
+        1.45,
+        0,
+        -3.57
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "loft_garden",
+      "file": "loft_garden.glb",
+      "position": [
+        1.45,
+        0,
+        -3.78
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "garden",
+      "cast_shadow": true
+    },
+    {
+      "name": "loft_soft_furnishings",
+      "file": "loft_soft_furnishings.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "bookshelf",
+      "file": "bookshelf.glb",
+      "position": [
+        0.94,
+        0.082,
+        -2.3
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0.0,
+            0.9588,
+            0
+          ],
+          "size": [
+            1.0738,
+            1.9176,
+            0.52
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "hearth",
+      "file": "hearth.glb",
+      "position": [
+        2.14,
+        0.082,
+        -1.77
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.7,
+            0
+          ],
+          "size": [
+            1.03,
+            1.4,
+            0.94
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "firewood_alcove",
+      "file": "firewood_alcove.glb",
+      "position": [
+        3.05,
+        0.082,
+        -1.84
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.54,
+            0
+          ],
+          "size": [
+            0.69,
+            1.08,
+            0.82
+          ]
+        }
+      ],
+      "material": "matte",
+      "cast_shadow": true
+    },
+    {
+      "name": "hearth_mantel_details",
+      "file": "hearth_mantel_details.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "sofa",
+      "file": "sofa.glb",
+      "position": [
+        2.04,
+        0.082,
+        -0.03
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0.0,
+            0.55,
+            0
+          ],
+          "size": [
+            2.5376,
+            1.1,
+            0.9
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "coffee_table",
+      "file": "coffee_table.glb",
+      "position": [
+        2.13,
+        0.082,
+        1.72
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0.0,
+            0.324,
+            0.0
+          ],
+          "size": [
+            1.6167999999999998,
+            0.648,
+            0.7315999999999999
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "tv_console",
+      "file": "tv_console.glb",
+      "position": [
+        3.73,
+        0.082,
+        2.25
+      ],
+      "yaw_degrees": 55,
+      "colliders": [
+        {
+          "at": [
+            0.0,
+            0.279,
+            0.0
+          ],
+          "size": [
+            1.776,
+            0.558,
+            0.432
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "television",
+      "file": "television.glb",
+      "position": [
+        3.73,
+        0.75,
+        2.25
+      ],
+      "yaw_degrees": 235,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "dining_table",
+      "file": "dining_table.glb",
+      "position": [
+        -1.99,
+        0.082,
+        2.43
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0.0,
+            0.6,
+            0.0
+          ],
+          "size": [
+            2.7447999999999997,
+            1.2,
+            0.9911999999999999
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "checked_runner",
+      "file": "checked_runner.glb",
+      "position": [
+        -1.99,
+        1.233,
+        2.43
+      ],
+      "yaw_degrees": 90,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "dining_chair",
+      "file": "dining_chair.glb",
+      "position": [
+        -2.7,
+        0.082,
+        3.24
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            -4.7683715642676816e-08,
+            0.6600000433921814,
+            9.53674295089968e-09
+          ],
+          "size": [
+            0.63,
+            1.32,
+            0.63
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "living_dressing",
+      "file": "living_dressing.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0.5400000214576721,
+            0.31299999356269836,
+            0.029999999329447746
+          ],
+          "size": [
+            0.43,
+            0.46,
+            0.46
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "natural_woven_rugs",
+      "file": "natural_woven_rugs.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "stair_wall_dressing",
+      "file": "stair_wall_dressing.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": true
+    },
+    {
+      "name": "dining_island_flowers",
+      "file": "dining_island_flowers.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "plain",
+      "cast_shadow": false
+    },
+    {
+      "name": "warm_lamps_glow",
+      "file": "warm_lamps_glow.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "glow",
+      "cast_shadow": true
+    }
+  ],
+  "instances": [
+    {
+      "name": "bar_stool_middle",
+      "asset": "bar_stool",
+      "position": [
+        -2,
+        0.082,
+        0.31
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "bar_stool_right",
+      "asset": "bar_stool",
+      "position": [
+        -1.34,
+        0.082,
+        0.31
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "chair_front_middle",
+      "asset": "dining_chair",
+      "position": [
+        -1.91,
+        0.082,
+        3.24
+      ],
+      "yaw_degrees": 0
+    },
+    {
+      "name": "chair_back_left",
+      "asset": "dining_chair",
+      "position": [
+        -2.7,
+        0.082,
+        1.6
+      ],
+      "yaw_degrees": 180
+    },
+    {
+      "name": "chair_back_middle",
+      "asset": "dining_chair",
+      "position": [
+        -1.91,
+        0.082,
+        1.6
+      ],
+      "yaw_degrees": 180
+    },
+    {
+      "name": "chair_end_left",
+      "asset": "dining_chair",
+      "position": [
+        -3.63,
+        0.082,
+        2.43
+      ],
+      "yaw_degrees": -90
+    },
+    {
+      "name": "chair_end_right",
+      "asset": "dining_chair",
+      "position": [
+        -0.36,
+        0.082,
+        2.43
+      ],
+      "yaw_degrees": 90
+    }
+  ],
+  "camera": {
+    "position": [
+      11.619959578114093,
+      13.051212664418355,
+      12.4087283555969
+    ],
+    "target": [
+      0,
+      2.0624332279651845,
+      0
+    ],
+    "size": 15.460905247503812
+  },
+  "sun_direction": [
+    -6,
+    7,
+    1.5
+  ],
+  "review_lighting": {
+    "ambient": 0.48,
+    "ambient_color": "FFE5C4",
+    "sun": 1.33,
+    "sun_color": "FFE2AE",
+    "sun_position": [
+      -7,
+      5,
+      -2.0
+    ],
+    "sun_target": [
+      0,
+      0,
+      0
+    ],
+    "shadow_bias": 0.065,
+    "shadow_normal_bias": 0.65,
+    "shadow_distance": 30,
+    "background": "D5EAE0",
+    "background_gradient": true,
+    "points": [
+      {
+        "position": [
+          -2.2,
+          2.67,
+          0.35
+        ],
+        "energy": 0.75,
+        "color": "FFDD8C",
+        "range": 2.7
+      },
+      {
+        "position": [
+          3.9,
+          3.4,
+          -2.8
+        ],
+        "energy": 0.65,
+        "color": "FFE0A1",
+        "range": 2.1
+      },
+      {
+        "position": [
+          3.92,
+          2.56,
+          -3.0
+        ],
+        "energy": 0.5,
+        "color": "FFDC90",
+        "range": 1.8
+      },
+      {
+        "position": [
+          -1.72,
+          2.74,
+          -3.02
+        ],
+        "energy": 0.6,
+        "color": "FFE0A0",
+        "range": 1.85
+      }
+    ]
+  },
+  "door": {
+    "module": "green_door",
+    "open_yaw_degrees": 100
+  },
+  "shared_plants": [
+    {
+      "name": "kitchen_floor_plant",
+      "file": "peace_lily.glb",
+      "position": [
+        -4.04,
+        0.083,
+        3.05
+      ],
+      "rotation_degrees": [
+        0,
+        20,
+        0
+      ],
+      "scale": [
+        1.12,
+        1.12,
+        1.12
+      ],
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.24,
+            0
+          ],
+          "size": [
+            0.48,
+            0.48,
+            0.48
+          ]
+        }
+      ]
+    },
+    {
+      "name": "door_right_plant",
+      "file": "monstera.glb",
+      "position": [
+        4.3,
+        0.083,
+        -2.58
+      ],
+      "rotation_degrees": [
+        0,
+        -30,
+        0
+      ],
+      "scale": [
+        1.08,
+        1.08,
+        1.08
+      ],
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.24,
+            0
+          ],
+          "size": [
+            0.48,
+            0.48,
+            0.48
+          ]
+        }
+      ]
+    },
+    {
+      "name": "door_left_plant",
+      "file": "peace_lily.glb",
+      "position": [
+        3.1,
+        0.083,
+        -2.84
+      ],
+      "rotation_degrees": [
+        0,
+        55,
+        0
+      ],
+      "scale": [
+        0.88,
+        0.88,
+        0.88
+      ],
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.24,
+            0
+          ],
+          "size": [
+            0.48,
+            0.48,
+            0.48
+          ]
+        }
+      ]
+    },
+    {
+      "name": "loft_trailing_plant",
+      "file": "pothos.glb",
+      "position": [
+        4.13,
+        2.493,
+        -1.73
+      ],
+      "rotation_degrees": [
+        0,
+        20,
+        0
+      ],
+      "scale": [
+        1.52,
+        1.52,
+        1.52
+      ],
+      "colliders": []
+    },
+    {
+      "name": "loft_extra_trail",
+      "file": "ivy_long.glb",
+      "position": [
+        4.21,
+        2.823,
+        -1.45
+      ],
+      "rotation_degrees": [
+        0,
+        15,
+        0
+      ],
+      "scale": [
+        0.85,
+        0.85,
+        0.85
+      ],
+      "colliders": []
+    },
+    {
+      "name": "window_plant",
+      "file": "pothos.glb",
+      "position": [
+        -4.21,
+        1.4,
+        2.05
+      ],
+      "rotation_degrees": [
+        0,
+        80,
+        0
+      ],
+      "scale": [
+        1.25,
+        1.25,
+        1.25
+      ],
+      "colliders": []
+    },
+    {
+      "name": "pantry_plant",
+      "file": "pothos.glb",
+      "position": [
+        -4.1,
+        2.32,
+        -2.42
+      ],
+      "rotation_degrees": [
+        0,
+        70,
+        0
+      ],
+      "scale": [
+        1.06,
+        1.06,
+        1.06
+      ],
+      "colliders": []
+    },
+    {
+      "name": "shelf_plant",
+      "file": "pothos.glb",
+      "position": [
+        -4.19,
+        2.69,
+        0.5
+      ],
+      "rotation_degrees": [
+        0,
+        92,
+        0
+      ],
+      "scale": [
+        1.02,
+        1.02,
+        1.02
+      ],
+      "colliders": []
+    },
+    {
+      "name": "bookcase_plant",
+      "file": "pothos.glb",
+      "position": [
+        1.11,
+        2.22,
+        -2.27
+      ],
+      "rotation_degrees": [
+        0,
+        -5,
+        0
+      ],
+      "scale": [
+        0.88,
+        0.88,
+        0.88
+      ],
+      "colliders": []
+    },
+    {
+      "name": "coffee_plant",
+      "file": "peace_lily.glb",
+      "position": [
+        2.73,
+        0.723,
+        1.72
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.34,
+        0.34,
+        0.34
+      ],
+      "colliders": []
+    },
+    {
+      "name": "stairs_floor_greenery",
+      "file": "peace_lily.glb",
+      "position": [
+        -1.65,
+        0.083,
+        -1.58
+      ],
+      "rotation_degrees": [
+        0,
+        35,
+        0
+      ],
+      "scale": [
+        0.81,
+        0.81,
+        0.81
+      ],
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.2,
+            0
+          ],
+          "size": [
+            0.42,
+            0.4,
+            0.42
+          ]
+        }
+      ]
+    },
+    {
+      "name": "stairs_wall_pothos",
+      "file": "pothos.glb",
+      "position": [
+        -2.43,
+        2.55,
+        -3.34
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.08,
+        1.08,
+        1.08
+      ],
+      "colliders": []
+    },
+    {
+      "name": "loft_entry_greenery",
+      "file": "peace_lily.glb",
+      "position": [
+        1.35,
+        2.49,
+        -3.48
+      ],
+      "rotation_degrees": [
+        0,
+        20,
+        0
+      ],
+      "scale": [
+        0.43,
+        0.43,
+        0.43
+      ],
+      "colliders": []
+    }
+  ],
+  "kitchen_clearance": {
+    "pendant_shade_bottom_y": 2.67,
+    "avatar_head_H": 1.7455,
+    "clearance_metres": 0.9245,
+    "prep_clear_width_metres": 0.55,
+    "visual_check": "Main and kitchen detail supplied; pendant hangs over island, prep sits against left wall."
+  },
+  "review_views": [
+    {
+      "name": "detail-kitchen",
+      "position": [
+        4,
+        5,
+        5
+      ],
+      "target": [
+        -2.7,
+        1.6,
+        -0.3
+      ],
+      "size": 7.1
+    },
+    {
+      "name": "detail-loft",
+      "position": [
+        7,
+        5,
+        7
+      ],
+      "target": [
+        1.15,
+        2.45,
+        -2.72
+      ],
+      "size": 7.4
+    },
+    {
+      "name": "detail-living",
+      "position": [
+        8,
+        5,
+        9
+      ],
+      "target": [
+        1.7,
+        0.85,
+        1.7
+      ],
+      "size": 6.4
+    }
+  ],
+  "bench": {
+    "floor_y": 0.08,
+    "route": [
+      {
+        "name": "door",
+        "position": [
+          3.73,
+          0.08,
+          -1.1
+        ],
+        "capture": "door"
+      },
+      {
+        "name": "living coffee table",
+        "position": [
+          3.68,
+          0.08,
+          1.0
+        ],
+        "capture": "main"
+      },
+      {
+        "name": "dining beside long table",
+        "position": [
+          -0.9,
+          0.08,
+          0.97
+        ]
+      },
+      {
+        "name": "island front",
+        "position": [
+          -2.25,
+          0.08,
+          1.03
+        ]
+      },
+      {
+        "name": "kitchen sink",
+        "position": [
+          -3.45,
+          0.08,
+          0.96
+        ]
+      },
+      {
+        "name": "stair approach",
+        "position": [
+          -0.55,
+          0.08,
+          1.03
+        ]
+      },
+      {
+        "name": "stair foot",
+        "position": [
+          -0.27,
+          0.08,
+          0.23
+        ]
+      },
+      {
+        "name": "stair top",
+        "position": [
+          -0.27,
+          2.49,
+          -3.34
+        ]
+      },
+      {
+        "name": "loft entry",
+        "position": [
+          0.85,
+          2.49,
+          -3.34
+        ]
+      },
+      {
+        "name": "bedside",
+        "position": [
+          0.92,
+          2.49,
+          -1.9
+        ]
+      }
+    ],
+    "blocked": [
+      {
+        "name": "island",
+        "from": [
+          -2,
+          0.09,
+          -1.4
+        ],
+        "to": [
+          -2,
+          0.09,
+          -0.3
+        ],
+        "target": "island"
+      },
+      {
+        "name": "dining table",
+        "from": [
+          -1.05,
+          0.09,
+          0.9
+        ],
+        "to": [
+          -1.05,
+          0.09,
+          2.43
+        ],
+        "target": "dining_table"
+      },
+      {
+        "name": "sofa",
+        "from": [
+          2.04,
+          0.09,
+          -1.35
+        ],
+        "to": [
+          2.04,
+          0.09,
+          -0.03
+        ],
+        "target": "sofa"
+      },
+      {
+        "name": "hearth",
+        "from": [
+          2.14,
+          0.09,
+          -0.95
+        ],
+        "to": [
+          2.14,
+          0.09,
+          -1.77
+        ],
+        "target": "hearth"
+      },
+      {
+        "name": "kitchen cabinet",
+        "from": [
+          -3.35,
+          0.09,
+          1.35
+        ],
+        "to": [
+          -4.1,
+          0.09,
+          1.35
+        ],
+        "target": "sink_cabinet"
+      },
+      {
+        "name": "loft guard",
+        "from": [
+          1.25,
+          2.49,
+          -1.75
+        ],
+        "to": [
+          1.25,
+          2.49,
+          -0.7
+        ],
+        "target": "loft_structure"
+      },
+      {
+        "name": "under stair headroom",
+        "from": [
+          -1.5,
+          0.09,
+          -1.5
+        ],
+        "to": [
+          -0.27,
+          0.09,
+          -1.5
+        ],
+        "target": "back_wall_stairs"
+      },
+      {
+        "name": "front edge",
+        "from": [
+          0.05,
+          0.09,
+          3.35
+        ],
+        "to": [
+          0.05,
+          0.09,
+          4.2
+        ],
+        "target": "room_shell"
+      },
+      {
+        "name": "east edge",
+        "from": [
+          4,
+          0.09,
+          0.1
+        ],
+        "to": [
+          5,
+          0.09,
+          0.1
+        ],
+        "target": "room_shell"
+      }
+    ],
+    "gaps": [
+      {
+        "name": "island to dining chairs",
+        "from": [
+          -0.9,
+          0.09,
+          1.02
+        ],
+        "to": [
+          -2.7,
+          0.09,
+          1.02
+        ],
+        "measure": [
+          [
+            -1.91,
+            0.7,
+            0.53
+          ],
+          [
+            -1.91,
+            0.7,
+            1.285
+          ]
+        ],
+        "minimum": 0.7,
+        "width": 0.755
+      },
+      {
+        "name": "sofa to coffee table",
+        "from": [
+          3.65,
+          0.09,
+          1.0
+        ],
+        "to": [
+          1.1,
+          0.09,
+          1.0
+        ],
+        "measure": [
+          [
+            2.13,
+            0.6,
+            0.42
+          ],
+          [
+            2.13,
+            0.6,
+            1.3542
+          ]
+        ],
+        "minimum": 0.7,
+        "width": 0.9342
+      }
+    ],
+    "entrance": {
+      "inside": [
+        3.85,
+        0.09,
+        -2.91
+      ],
+      "outside": [
+        3.93,
+        0.09,
+        -4.06
+      ]
+    },
+    "slide": {
+      "from": [
+        4.3,
+        0.09,
+        0.6
+      ],
+      "direction": [
+        1,
+        0,
+        -1
+      ],
+      "tangent": [
+        0,
+        0,
+        -1
+      ],
+      "seconds": 0.8
+    },
+    "input_start": [
+      0.05,
+      0.09,
+      0.85
+    ],
+    "scale": {
+      "door": {
+        "height": 2.33,
+        "source": "Sage arched doorway"
+      },
+      "counter": {
+        "height": 1.17,
+        "source": "Island oak worktop; stools .78m top"
+      },
+      "chair": {
+        "height": 0.7825,
+        "source": "Solid chair plus tied cushion"
+      },
+      "table": {
+        "height": 1.135,
+        "source": "Long dining table top; low coffee table .613m is a distinct category"
+      }
+    },
+    "spawn": [
+      3.85,
+      0.09,
+      -2.84
+    ]
+  },
+  "anchors": [
+    {
+      "name": "use_stove_1",
+      "position": [
+        -3.915,
+        1.291,
+        -0.381
+      ],
+      "module": "range_cooker"
+    },
+    {
+      "name": "use_stove_2",
+      "position": [
+        -4.245,
+        1.291,
+        -0.381
+      ],
+      "module": "range_cooker"
+    },
+    {
+      "name": "use_stove_3",
+      "position": [
+        -3.915,
+        1.291,
+        -0.859
+      ],
+      "module": "range_cooker"
+    },
+    {
+      "name": "drop_pot_1",
+      "position": [
+        -3.915,
+        1.615,
+        -0.381
+      ],
+      "module": "range_cooker"
+    },
+    {
+      "name": "drop_pot_2",
+      "position": [
+        -4.245,
+        1.615,
+        -0.381
+      ],
+      "module": "range_cooker"
+    },
+    {
+      "name": "drop_pot_3",
+      "position": [
+        -3.915,
+        1.615,
+        -0.859
+      ],
+      "module": "range_cooker"
+    },
+    {
+      "name": "use_spice_rack",
+      "position": [
+        -4.22,
+        2.62,
+        0.38
+      ],
+      "module": "kitchen_fittings"
+    },
+    {
+      "name": "use_warming_cabinet",
+      "position": [
+        -4.08,
+        0.082,
+        -1.69
+      ],
+      "module": "kitchen_fittings"
+    },
+    {
+      "name": "stand_stove",
+      "position": [
+        -3.33,
+        0.083,
+        -0.62
+      ],
+      "yaw_degrees": 90,
+      "module": "range_cooker"
+    },
+    {
+      "name": "cam_stove",
+      "position": [
+        -4.03,
+        1.55,
+        -0.45
+      ],
+      "module": "range_cooker"
+    },
+    {
+      "name": "spawn",
+      "position": [
+        3.85,
+        0.083,
+        -2.84
+      ],
+      "yaw_degrees": 180
+    },
+    {
+      "name": "exit",
+      "position": [
+        3.93,
+        0.083,
+        -3.56
+      ]
+    }
+  ],
+  "archived_assets": [
+    {
+      "name": "fire",
+      "file": "fire.glb",
+      "position": [
+        2.14,
+        0.3,
+        -1.45
+      ],
+      "yaw_degrees": 0,
+      "colliders": [],
+      "material": "fire",
+      "cast_shadow": true
+    }
+  ],
+  "effects": [
+    {
+      "name": "fx_hearth_fire",
+      "scene": "res://assets/rooms/_shared/fx/fx_hearth_fire.tscn",
+      "position": [
+        2.14,
+        0.3,
+        -1.45
+      ],
+      "emission_box": [
+        0.17,
+        0.006,
+        0.035
+      ],
+      "flame_height": 0.42,
+      "flame_count": 14,
+      "spark_count": 2,
+      "flame_lifetime": 0.72,
+      "flicker_strength": 0.08,
+      "light": {
+        "position": [
+          2.14,
+          0.7,
+          -1.24
+        ],
+        "color": "FF943D",
+        "range": 2.4,
+        "energy": 1.0
+      }
+    }
+  ],
+  "ember_surfaces": [
+    {
+      "asset": "hearth",
+      "min": [
+        -0.31,
+        0.155,
+        -0.12
+      ],
+      "max": [
+        0.31,
+        0.26,
+        0.35
+      ],
+      "energy": 0.38
+    }
+  ],
+  "fx_review_camera": {
+    "position": [
+      2.14,
+      1.15,
+      -0.72
+    ],
+    "target": [
+      2.14,
+      0.57,
+      -1.5
+    ],
+    "size": 1.8
+  }
+}

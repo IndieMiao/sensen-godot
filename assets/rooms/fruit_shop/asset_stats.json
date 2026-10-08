@@ -1,0 +1,351 @@
+{
+  "atlas": {
+    "size": [
+      2048,
+      2048
+    ],
+    "file": "room_albedo_ao.png",
+    "purpose": "base colour + softened contact AO; padded palette swatches for subpixel detail; no baked direct light",
+    "bytes": 3671629
+  },
+  "assets": [
+    {
+      "name": "floor",
+      "vertices": 3792,
+      "triangles": 7316,
+      "surfaces": 1,
+      "bytes": 252820
+    },
+    {
+      "name": "back_wall",
+      "vertices": 1344,
+      "triangles": 2592,
+      "surfaces": 1,
+      "bytes": 90656
+    },
+    {
+      "name": "left_door_wall",
+      "vertices": 1608,
+      "triangles": 3132,
+      "surfaces": 1,
+      "bytes": 104020
+    },
+    {
+      "name": "front_wall_left",
+      "vertices": 560,
+      "triangles": 1080,
+      "surfaces": 1,
+      "bytes": 38536
+    },
+    {
+      "name": "front_wall_right",
+      "vertices": 448,
+      "triangles": 864,
+      "surfaces": 1,
+      "bytes": 31132
+    },
+    {
+      "name": "side_low_wall",
+      "vertices": 1344,
+      "triangles": 2592,
+      "surfaces": 1,
+      "bytes": 90652
+    },
+    {
+      "name": "corner_pier",
+      "vertices": 168,
+      "triangles": 324,
+      "surfaces": 1,
+      "bytes": 12532
+    },
+    {
+      "name": "entry_step",
+      "vertices": 304,
+      "triangles": 528,
+      "surfaces": 1,
+      "bytes": 26812
+    },
+    {
+      "name": "wood_display_hutch",
+      "vertices": 1512,
+      "triangles": 2916,
+      "surfaces": 1,
+      "bytes": 101836
+    },
+    {
+      "name": "striped_awning",
+      "vertices": 2052,
+      "triangles": 3952,
+      "surfaces": 1,
+      "bytes": 138768
+    },
+    {
+      "name": "blue_shutter",
+      "vertices": 896,
+      "triangles": 1728,
+      "surfaces": 1,
+      "bytes": 60904
+    },
+    {
+      "name": "produce_display_table",
+      "vertices": 504,
+      "triangles": 972,
+      "surfaces": 1,
+      "bytes": 34876
+    },
+    {
+      "name": "crate_orange",
+      "vertices": 1433,
+      "triangles": 2616,
+      "surfaces": 1,
+      "bytes": 104600
+    },
+    {
+      "name": "crate_lemon",
+      "vertices": 1433,
+      "triangles": 2616,
+      "surfaces": 1,
+      "bytes": 105012
+    },
+    {
+      "name": "crate_fig",
+      "vertices": 1433,
+      "triangles": 2616,
+      "surfaces": 1,
+      "bytes": 104560
+    },
+    {
+      "name": "crate_peach",
+      "vertices": 1433,
+      "triangles": 2616,
+      "surfaces": 1,
+      "bytes": 104532
+    },
+    {
+      "name": "crate_grape",
+      "vertices": 1719,
+      "triangles": 2824,
+      "surfaces": 1,
+      "bytes": 146520
+    },
+    {
+      "name": "analog_scale",
+      "vertices": 484,
+      "triangles": 900,
+      "surfaces": 1,
+      "bytes": 31236
+    },
+    {
+      "name": "striped_table_towel",
+      "vertices": 560,
+      "triangles": 1080,
+      "surfaces": 1,
+      "bytes": 38596
+    },
+    {
+      "name": "orchard_market_sign",
+      "vertices": 3002,
+      "triangles": 3472,
+      "surfaces": 1,
+      "bytes": 165976
+    },
+    {
+      "name": "fruit_orange",
+      "vertices": 37,
+      "triangles": 60,
+      "surfaces": 1,
+      "bytes": 4416
+    },
+    {
+      "name": "fruit_lemon",
+      "vertices": 37,
+      "triangles": 60,
+      "surfaces": 1,
+      "bytes": 4416
+    },
+    {
+      "name": "fruit_fig",
+      "vertices": 37,
+      "triangles": 60,
+      "surfaces": 1,
+      "bytes": 4412
+    },
+    {
+      "name": "fruit_peach",
+      "vertices": 37,
+      "triangles": 60,
+      "surfaces": 1,
+      "bytes": 4416
+    },
+    {
+      "name": "fruit_grape",
+      "vertices": 59,
+      "triangles": 76,
+      "surfaces": 1,
+      "bytes": 6884
+    },
+    {
+      "name": "floor_orange_crate",
+      "vertices": 1433,
+      "triangles": 2616,
+      "surfaces": 1,
+      "bytes": 104264
+    },
+    {
+      "name": "floor_fig_crate",
+      "vertices": 1433,
+      "triangles": 2616,
+      "surfaces": 1,
+      "bytes": 104384
+    },
+    {
+      "name": "hanging_herbs_leaves",
+      "vertices": 1496,
+      "triangles": 2816,
+      "surfaces": 1,
+      "bytes": 124252
+    },
+    {
+      "name": "olive_crown_leaves",
+      "vertices": 2816,
+      "triangles": 2112,
+      "surfaces": 1,
+      "bytes": 104176
+    },
+    {
+      "name": "arch_vine_leaves",
+      "vertices": 520,
+      "triangles": 516,
+      "surfaces": 1,
+      "bytes": 21120
+    }
+  ],
+  "unique_triangles": 57728,
+  "scene_triangles": 73160,
+  "static_draw_surfaces": 44,
+  "unique_assets": 30,
+  "placed_instances": 44,
+  "glb_bytes": 2267316,
+  "scene_budget": {
+    "after": {
+      "room_triangles": 73160,
+      "shared_plant_triangles": 45158,
+      "room_botanical_triangles": 10136,
+      "plant_triangles": 55294,
+      "total_triangles": 118318,
+      "static_surfaces": 21
+    },
+    "limits": {
+      "total_triangles": 200000,
+      "plant_triangles": 100000,
+      "static_surfaces": 60
+    },
+    "render_batches": [
+      {
+        "name": "back_dressing",
+        "file": "res://assets/rooms/fruit_shop/batches/review_back_dressing.glb",
+        "material": "room",
+        "sources": [
+          "striped_awning",
+          "blue_shutter",
+          "crate_orange",
+          "crate_lemon",
+          "crate_fig",
+          "crate_peach",
+          "crate_grape",
+          "analog_scale",
+          "striped_table_towel",
+          "blue_shutter_2",
+          "blue_shutter_3",
+          "shelf_orange_crate",
+          "shelf_lemon_crate",
+          "striped_table_towel_2"
+        ],
+        "triangles": 30716,
+        "cast_shadow": true
+      },
+      {
+        "name": "front_dressing",
+        "file": "res://assets/rooms/fruit_shop/batches/review_front_dressing.glb",
+        "material": "room",
+        "sources": [
+          "orchard_market_sign",
+          "fruit_orange",
+          "fruit_lemon",
+          "fruit_fig",
+          "fruit_peach",
+          "fruit_grape"
+        ],
+        "triangles": 3788,
+        "cast_shadow": true
+      },
+      {
+        "name": "botanical",
+        "file": "res://assets/rooms/fruit_shop/batches/review_botanical.glb",
+        "material": "room",
+        "sources": [
+          "hanging_herbs_leaves",
+          "olive_crown_leaves",
+          "arch_vine_leaves",
+          "right_olive_crown_leaves",
+          "arch_foliage_01",
+          "arch_foliage_10",
+          "arch_foliage_11",
+          "arch_foliage_20",
+          "arch_foliage_21"
+        ],
+        "triangles": 10136,
+        "cast_shadow": false
+      },
+      {
+        "name": "large_plants",
+        "file": "res://assets/rooms/fruit_shop/batches/review_large_plants.glb",
+        "material": "plants",
+        "sources": [
+          "LeftOlive",
+          "RightOlive"
+        ],
+        "triangles": 5736,
+        "cast_shadow": true
+      },
+      {
+        "name": "back_plants",
+        "file": "res://assets/rooms/fruit_shop/batches/review_back_plants.glb",
+        "material": "plants",
+        "sources": [
+          "ShelfPothos",
+          "ShelfHerb",
+          "WallFlower05",
+          "DoorWhiteVine0",
+          "DoorWhiteVine1",
+          "BackWhiteVine0",
+          "BackWhiteVine1",
+          "LeftWallCrown0",
+          "LeftWallCrown1",
+          "BackCornerFlowering"
+        ],
+        "triangles": 15402,
+        "cast_shadow": false
+      },
+      {
+        "name": "front_plants",
+        "file": "res://assets/rooms/fruit_shop/batches/review_front_plants.glb",
+        "material": "plants",
+        "sources": [
+          "WallFlower00",
+          "WallFlower01",
+          "WallFlower02",
+          "WallFlower03",
+          "WallFlower04",
+          "WallFlower06",
+          "WallFlower07",
+          "WallFlower08",
+          "WallFlower09",
+          "WallFlower10"
+        ],
+        "triangles": 24020,
+        "cast_shadow": false
+      }
+    ]
+  }
+}

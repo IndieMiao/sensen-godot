@@ -1,0 +1,15 @@
+# LAN alternative (devserver 192.168.124.53, Docker without Caddy): the same image published on port 3150, for a
+# same-Wi-Fi demo only. Client base URL http://192.168.124.53:3150/v1. Prepared only; nothing is started.
+services:
+  p0:
+    image: ${P0_IMAGE:?需要 P0 镜像}
+    restart: unless-stopped
+    env_file: [.env.p0]
+    environment:
+      P0_DEV: "0"   # published directly, no proxy: P0_TRUST_PROXY stays off so X-Forwarded-For is not believed
+    ports: ["3150:3110"]
+    volumes: [p0data:/data]
+    mem_limit: 256m
+
+volumes:
+  p0data:

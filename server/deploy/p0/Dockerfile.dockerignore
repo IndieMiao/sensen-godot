@@ -1,0 +1,14 @@
+# P0 image build context (server/deploy/p0/Dockerfile, BuildKit reads this file instead of the root .dockerignore).
+# Only what the P0 server needs; never the demo APK's assets/p0/demo_server.json (it holds a demo key).
+*
+!package.json
+!pnpm-lock.yaml
+!pnpm-workspace.yaml
+!packages/blueprint-core/**
+!server/**
+!assets/p0/p0_content.json
+server/node_modules
+server/.env
+server/.env.*
+server/output
+packages/blueprint-core/node_modules

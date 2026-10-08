@@ -4,7 +4,7 @@
     0,
     0,
     328,
-    256
+    445
   ],
   "children": [
     {
@@ -24,59 +24,70 @@
         0,
         28,
         328,
-        36
+        18
       ],
       "variation": "CaptionR12",
-      "text": "Main pending: WP6 SGODOT-206 · provisional look per WP7-B F-08 §5"
+      "text": "EmptyState 1234:87237 Kind=Panel / Row · WP6"
     },
     {
       "type": "VBoxContainer",
       "rect": [
         0,
-        70,
+        52,
         328,
-        186
+        393
       ],
       "children": [
         {
           "type": "UiEmptyState",
           "rect": [
             0,
-            70,
+            52,
             328,
-            108
+            126
           ],
           "children": [
             {
-              "type": "TextureRect",
+              "type": "VBoxContainer",
               "rect": [
-                148,
-                70,
-                32,
-                32
+                8,
+                76,
+                312,
+                86
+              ],
+              "children": [
+                {
+                  "type": "Panel",
+                  "rect": [
+                    136,
+                    76,
+                    56,
+                    56
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        150,
+                        90,
+                        28,
+                        28
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    8,
+                    142,
+                    312,
+                    20
+                  ],
+                  "variation": "BodyB14",
+                  "text": "Your bag is empty"
+                }
               ]
-            },
-            {
-              "type": "Label",
-              "rect": [
-                0,
-                108,
-                328,
-                20
-              ],
-              "variation": "BodyB14",
-              "text": "No fish yet"
-            },
-            {
-              "type": "UiNavButton",
-              "rect": [
-                122,
-                134,
-                84,
-                44
-              ],
-              "variation": "NavCompact",
-              "text": "Show on map ›"
             }
           ]
         },
@@ -86,28 +97,116 @@
             0,
             198,
             328,
-            58
+            187
           ],
           "children": [
             {
-              "type": "TextureRect",
+              "type": "VBoxContainer",
               "rect": [
-                148,
-                198,
-                32,
-                32
+                8,
+                222,
+                312,
+                147
+              ],
+              "children": [
+                {
+                  "type": "Panel",
+                  "rect": [
+                    136,
+                    222,
+                    56,
+                    56
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        150,
+                        236,
+                        28,
+                        28
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    8,
+                    288,
+                    312,
+                    20
+                  ],
+                  "variation": "BodyB14",
+                  "text": "No seeds yet"
+                },
+                {
+                  "type": "UiNavButton",
+                  "rect": [
+                    8,
+                    318,
+                    312,
+                    51
+                  ],
+                  "variation": "NavRow",
+                  "text": "Show stall",
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        314,
+                        318,
+                        6,
+                        51
+                      ],
+                      "variation": "TitleB20",
+                      "text": "›"
+                    }
+                  ]
+                }
               ]
-            },
+            }
+          ]
+        },
+        {
+          "type": "UiEmptyState",
+          "rect": [
+            0,
+            405,
+            328,
+            40
+          ],
+          "children": [
             {
-              "type": "Label",
+              "type": "HBoxContainer",
               "rect": [
-                0,
-                236,
-                328,
+                12,
+                415,
+                304,
                 20
               ],
-              "variation": "BodyB14",
-              "text": "Nothing to sell here"
+              "children": [
+                {
+                  "type": "TextureRect",
+                  "rect": [
+                    12,
+                    415,
+                    20,
+                    20
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    42,
+                    415,
+                    274,
+                    19
+                  ],
+                  "variation": "C13B",
+                  "text": "No open requests · next in 3h 12m"
+                }
+              ]
             }
           ]
         }

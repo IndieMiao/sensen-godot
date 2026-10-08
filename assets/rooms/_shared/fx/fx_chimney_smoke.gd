@@ -5,8 +5,8 @@ const Style = preload("res://assets/rooms/_shared/fx/particle_style.gd")
 @export_range(3.0,4.0) var lifetime: float = 4.0
 @export var drift := Vector3(.28,.72,-.04)
 @export var emission_box := Vector3(.055,.01,.035)
-@export_range(.1,.6) var start_size: float = .30
-@export_range(.6,2.0) var end_size: float = 1.9
+@export_range(.1,1.5) var start_size: float = 1.2
+@export_range(.6,3.5) var end_size: float = 2.6
 @export_range(12.0,15.0) var spread_degrees: float = 15.0
 @export var wind_acceleration := Vector3(.18,.04,0)
 
@@ -28,9 +28,10 @@ func _ready() -> void:
  process.gravity = wind_acceleration
  process.initial_velocity_min = drift.length()*.88
  process.initial_velocity_max = drift.length()*1.12
- process.scale_curve = Style.curve([Vector2(0,start_size),Vector2(.55,end_size*.72),Vector2(1,end_size)])
- process.scale_min = .75
- process.scale_max = 1.25
+ # Keep the scale ramp normalised; the particle scale range carries metres.
+ process.scale_curve = Style.curve([Vector2(0,start_size/end_size),Vector2(.65,.94),Vector2(1,1)])
+ process.scale_min = end_size*.75
+ process.scale_max = end_size*1.25
  process.angle_min = -180
  process.angle_max = 180
  process.angular_velocity_min = -8
@@ -39,8 +40,11 @@ func _ready() -> void:
  process.anim_offset_max = .999
  process.anim_speed_min = 0.0
  process.anim_speed_max = 0.0
- process.color_ramp = Style.ramp(PackedColorArray([Color(.80,.82,.83,0),Color(.90,.91,.92,.90),Color(.94,.95,.96,.90),Color(.98,.98,.98,.68),Color(1,1,1,0)]),PackedFloat32Array([0,.06,.40,.75,1]))
+ process.color_ramp = Style.ramp(PackedColorArray([Color(1,1,1,0),Color(1,1,1,.98),Color(1,1,1,.98),Color(1,1,1,.86),Color(1,1,1,0)]),PackedFloat32Array([0,.02,.62,.88,1]))
  process.collision_mode = ParticleProcessMaterial.COLLISION_DISABLED
  smoke.process_material = process
  smoke.draw_pass_1 = Style.sprite(preload("res://assets/rooms/_shared/fx/smoke_strip.png"),Vector2.ONE,4,false)
+ # Smoke-only bright albedo: keep the shared fire/material helper untouched.
+ smoke.draw_pass_1.material.albedo_color = Color.WHITE
+ smoke.draw_pass_1.material.billboard_keep_scale = true
  add_child(smoke)

@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/standard_room_5/standard_room_5_art.gd" id="1"]
+
+[node name="StandardRoom5Art" type="Node3D"]
+script = ExtResource("1")
