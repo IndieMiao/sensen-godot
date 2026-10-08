@@ -129,3 +129,25 @@ func test_one_inbox_notice_per_reply_and_none_for_gift_meals() -> void:
 	assert_dict(P0Logic.parcel_notice(v, [queued, herb, herb.duplicate()])).is_equal(
 		{title = "Inbox full · waiting", item = "Worm Bait", quantity = "×3", line = "+2 more · Claim a parcel first"})
 	assert_str(str(P0Logic.parcel_notice(v, [herb, queued]).title)).is_equal("Sent to Inbox")
+
+## q(88): a resident's gift meal into a full bag says who sent it and its countdown to 04:00, as the Parcels row does.
+func test_a_gift_meal_sent_to_the_inbox_says_who_and_when_it_goes_back() -> void:
+	var v := _view()
+	v["names"]["dish_grilled_crucian"] = "Grilled Crucian"
+	var meal := {"kind": "gift_meal", "resident": "res_pip", "dish": "dish_grilled_crucian", "given": true, "to": "parcel"}
+	var parcel := {"kind": "parcel", "id": "dish_grilled_crucian", "qty": 1, "waiting": false, "expires_in": 33120000, "gift": true}
+	var pip := str(P0Logic.content().get("residents", {}).get("res_pip", {}).get("name", ""))
+	assert_str(pip).is_not_empty()
+	assert_dict(P0Logic.gift_meal_notice(v, meal, [parcel])).is_equal({title = "Sent to Inbox", item = "Grilled Crucian",
+		quantity = "×1", line = "From %s · Expires in 9h 12m" % pip})
+	parcel.expires_in = 59 * 60000
+	assert_str(str(P0Logic.gift_meal_notice(v, meal, [parcel]).line)).is_equal("From %s · Expires in 59m" % pip)
+	var queued := parcel.duplicate()
+	queued.waiting = true
+	queued.erase("expires_in")
+	assert_dict(P0Logic.gift_meal_notice(v, meal, [queued])).is_equal({title = "Inbox full · waiting", item = "Grilled Crucian",
+		quantity = "×1", line = "From %s · Claim a parcel first" % pip})
+	var bagged := meal.duplicate()
+	bagged.erase("to")
+	assert_dict(P0Logic.gift_meal_notice(v, bagged, [])).is_empty()   # into the bag: the resident bar says it
+	assert_dict(P0Logic.parcel_notice(v, [parcel])).is_empty()   # and the reward card leaves it out

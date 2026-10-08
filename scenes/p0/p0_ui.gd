@@ -1363,12 +1363,13 @@ func _flush_held_toast() -> void:
 	toast(_held_toast)
 	_held_toast = ""
 
-## InboxNotice (BAG-5-2 / FARM-LV2-2, LOCK-14, q(87); SGODOT-234): rewards that did not fit the bag went to the Inbox.
-## The card hangs under the bell, its right edge on the bell's and its top 12 under the HUD's two rows (y 110 of 800),
-## for MOTION_TOAST_BASE_MS (BAG-5: 2 s); a tap on it opens the Inbox on Parcels, as the bell does. One at a time: a new
-## one replaces it. Like toast_when_clear it waits while the world is busy or a card or drawer is up or queued (q(49),
-## one thing at a time: a level-up's banner speaks first, 不知火舞 on 233); the bell's badge counts at once.
-const _NOTICE_UNDER_HUD := 12.0
+## InboxNotice (BAG-5-2 / FARM-LV2-2, LOCK-14, q(87) / q(88); SGODOT-234): rewards that did not fit the bag went to the
+## Inbox. The card hangs under the bell, its right edge on the bell's (top: _notice_top), for MOTION_TOAST_BASE_MS
+## (BAG-5: 2 s); a tap on it opens the Inbox on Parcels, as the bell does. One at a time: a new one replaces it. Like
+## toast_when_clear it waits while the world is busy or a card or drawer is up or queued (q(49), one thing at a time: a
+## level-up's banner speaks first, 不知火舞 on 233); the bell's badge counts at once.
+const _NOTICE_UNDER_HUD := UiTokens.SPACE_OVERLAY_BLOCK   # 12 under the HUD's two rows: y 110 of 800
+const _NOTICE_UNDER_ITEM := UiTokens.SPACE_OVERLAY_BODY   # 8 under the lowest thing under the HUD
 var _notice: UiInboxNotice
 var _notice_left := 0.0
 var _held_notice := {}
@@ -1395,21 +1396,31 @@ func _show_notice(spec: Dictionary) -> void:
 		root.add_child(_notice)
 	_notice.show_notice(spec, P0Logic.icon("parcel"))
 	_notice.show()
-	_place_notice()
+	_place_notice(true)
 	_notice_left = UiTokens.MOTION_TOAST_BASE_MS / 1000.0
 
 func _hide_notice() -> void:
 	_notice_left = 0.0
 	if _notice: _notice.hide()
 
-## Placed every frame while it shows: the HUD lays out after it first shows, and the system line (Offline, WP6) takes
-## the spot under the HUD while it is up, so the card moves down by SYS_SHIFT as the creel badge does (刘邦 on #116).
-func _place_notice() -> void:
+## Placed every frame while it shows (the HUD lays out after it first shows). `fresh`: it has just come up, so it takes
+## its top as it is now; afterwards it only moves down, so a system line coming pushes it and one going does not make
+## it jump back (不知火舞 on 234).
+func _place_notice(fresh := false) -> void:
 	var bell := hud.balances_rect()   # its right edge is the bell's
 	var right := (bell.end.x - root.global_position.x) if bell.size.x > 0.0 else root.size.x - UiTokens.SPACE_PAGE
+	var y := _notice_top()
+	_notice.position = Vector2(roundf(right - UiInboxNotice.WIDTH), y if fresh else maxf(y, _notice.position.y))
+
+## The card's top (不知火舞 on 234, after 刘邦 on #116): 8 under the lowest thing showing under the HUD, top to bottom
+## the system line (SYS-OFFLINE / SYS-CMD-FAIL), the creel badge at the pond (full, it is the fact the player needs) and
+## the mine's status line; with none of them, 12 under the HUD's two rows.
+func _notice_top() -> float:
 	var y := UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H + _NOTICE_UNDER_HUD + safe_top()
-	if _sys != null and is_instance_valid(_sys) and _sys.visible: y += SYS_SHIFT
-	_notice.position = Vector2(roundf(right - UiInboxNotice.WIDTH), y)
+	for c in [_sys, _creel, _status]:
+		if c != null and is_instance_valid(c) and (c as Control).is_visible_in_tree():
+			y = maxf(y, (c as Control).get_global_rect().end.y - root.global_position.y + _NOTICE_UNDER_ITEM)
+	return roundf(y)
 
 ## The InboxNotice on screen, {} when none: its three lines (tests and the runtime read it).
 func inbox_notice_shown() -> Dictionary:

@@ -504,3 +504,19 @@ func test_parcels_without_a_level_up_are_said_at_once() -> void:
 	assert_dict(rt.ui.inbox_notice_shown()).is_equal({title = "Sent to Inbox", item = "crop_radish", quantity = "×3", line = "Expires in 24h"})
 	assert_str(rt.ui.toast_text()).is_equal("")   # the card, not the old one-line toast
 	rt.detach(w)
+
+func test_a_gift_meal_sent_to_the_inbox_is_the_card_not_a_toast() -> void:
+	# q(88): Pip's meal with the bag full; the old `Bag full · Pip's meal sent to Inbox` toast is gone.
+	var w: Node3D = auto_free(Node3D.new())
+	add_child(w)
+	rt.attach(w)
+	rt.ui.clear_toast()
+	rt.session.state_changed.emit(rt.session.view, [{"kind": "parcel", "id": "dish_grilled_crucian", "qty": 1, "key": "gift_meal:res_pip:d",
+		"waiting": false, "expires_in": 33120000, "gift": true},
+		{"kind": "gift_meal", "resident": "res_pip", "dish": "dish_grilled_crucian", "given": true, "to": "parcel"}])
+	await get_tree().process_frame
+	var pip := str(P0Logic.content().get("residents", {}).get("res_pip", {}).get("name", ""))
+	assert_dict(rt.ui.inbox_notice_shown()).is_equal({title = "Sent to Inbox", item = "Grilled Crucian", quantity = "×1",
+		line = "From %s · Expires in 9h 12m" % pip})
+	assert_str(rt.ui.toast_text()).is_equal("")
+	rt.detach(w)

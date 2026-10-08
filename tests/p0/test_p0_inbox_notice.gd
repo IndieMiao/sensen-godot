@@ -62,18 +62,48 @@ func test_it_waits_for_a_card_or_drawer_and_a_new_one_replaces_it() -> void:
 	ui.inbox_notice_when_clear({})   # nothing to say
 	assert_dict(ui.inbox_notice_shown()).is_equal(next)
 
-## 刘邦 on #116: the system line (Offline, WP6) takes the spot under the HUD; the card moves down by SYS_SHIFT while it
-## is up, as the creel badge does, and comes back when it goes.
-func test_it_moves_down_under_the_system_line() -> void:
+## 不知火舞 on 234 (after 刘邦 on #116): the card's top is 8 under the lowest thing showing under the HUD — the system line,
+## then the creel badge at the pond —, else 12 under the HUD; it moves down when one comes and never jumps back up.
+func _bottom(ui: P0Ui, c: Control) -> float: return c.get_global_rect().end.y - ui.root.global_position.y
+
+func test_it_sits_under_the_system_line_and_does_not_jump_back() -> void:
 	var ui: P0Ui = await _ui()
 	ui.inbox_notice_when_clear(SPEC)
 	await await_idle_frame()
-	var base := float(UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H) + 12.0 + ui.safe_top()
-	ui.show_sys(UiSysBanner.Kind.OFFLINE, "Offline")
-	ui._process(0.0)
 	var card := ui.inbox_notice_card()
-	assert_float(card.position.y).is_equal(base + P0Ui.SYS_SHIFT)
-	assert_bool(card.get_global_rect().intersects(ui._sys.get_global_rect())).is_false()
-	ui.hide_sys()
-	ui._process(0.0)
+	var base := float(UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H) + 12.0 + ui.safe_top()
 	assert_float(card.position.y).is_equal(base)
+	ui.show_sys(UiSysBanner.Kind.OFFLINE, "Offline")   # comes while the card shows: the card moves down
+	await await_idle_frame()
+	ui._process(0.0)
+	var under := roundf(_bottom(ui, ui._sys) + 8.0)
+	assert_float(card.position.y).is_equal(under)
+	assert_bool(card.get_global_rect().intersects(ui._sys.get_global_rect())).is_false()
+	ui.hide_sys()   # goes: the card stays put for the rest of its 2 s
+	ui._process(0.0)
+	assert_float(card.position.y).is_equal(under)
+	# The next card comes up at the spot of the moment.
+	ui.inbox_notice_when_clear({title = "Sent to Inbox", item = "Worm Bait", quantity = "×3", line = "Expires in 24h"})
+	assert_float(card.position.y).is_equal(base)
+
+func test_at_the_pond_it_sits_under_the_creel_badge_and_under_both_with_a_system_line() -> void:
+	var ui: P0Ui = await _ui()
+	var v := ui.view.duplicate(true)
+	v.bag["free"] = 0
+	ui.set_surface("pond")
+	ui.set_mode("fish")
+	ui.set_view(v)
+	ui.set_action(P0Logic.fish_action(v, ""))
+	await await_idle_frame()
+	assert_bool(ui._creel.visible).is_true()
+	ui.inbox_notice_when_clear(SPEC)
+	await await_idle_frame()
+	var card := ui.inbox_notice_card()
+	assert_float(card.position.y).is_equal(roundf(_bottom(ui, ui._creel) + 8.0))   # Creel full is not covered
+	assert_bool(card.get_global_rect().intersects(ui._creel.get_global_rect())).is_false()
+	ui._hide_notice()
+	ui.show_sys(UiSysBanner.Kind.CMD_FAIL, "Didn't go through")   # the badge moves under the line, the card under both
+	ui.inbox_notice_when_clear(SPEC)
+	await await_idle_frame()
+	assert_float(_bottom(ui, ui._creel)).is_greater(_bottom(ui, ui._sys))
+	assert_float(card.position.y).is_equal(roundf(_bottom(ui, ui._creel) + 8.0))
