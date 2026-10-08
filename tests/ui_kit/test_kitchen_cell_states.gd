@@ -108,4 +108,7 @@ func test_a_rack_seasoning_shows_the_rack_tag_and_no_rarity_dot() -> void:
 	var plain := _cell({icon = salt, quantity = "×12", rarity = 1})
 	await _settle()
 	assert_array(_texts(plain)).not_contains(["Rack"])
+	var in_pot := _cell({icon = salt, rarity = 1, rack = true, kitchen_state = UiItemCell.KitchenState.IN_POT})   # COOK-2b-RACK
+	await _settle()
+	assert_array(_texts(in_pot)).contains(["Rack", "In pot"])
 

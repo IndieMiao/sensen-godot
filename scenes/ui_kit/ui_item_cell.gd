@@ -98,7 +98,8 @@ var marked := false: set = set_marked
 ## KITCHEN only; DEFAULT keeps the plain behaviour above (status label, mark when selected or marked).
 var kitchen_state: KitchenState = KitchenState.DEFAULT: set = set_kitchen_state
 ## KITCHEN only: a seasoning held on the Spice Rack (Show rack): a `Rack` tag top-left where the Lv4 lock sits, and
-## no rarity dot (q(46); An Qi La, 226 e8e5617a). The quantity is the stored count.
+## no rarity dot (q(46); An Qi La, 226 e8e5617a). The quantity is the stored count. In the pot it keeps the tag
+## (COOK-2b-RACK): taking it out returns it to the rack.
 var rack := false: set = set_rack
 
 ## Milliseconds for the arbiter; tests inject a fake clock.

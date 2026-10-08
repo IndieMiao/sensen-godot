@@ -1122,6 +1122,123 @@
         {
           "type": "VBoxContainer",
           "rect": [
+            269,
+            232,
+            52,
+            78
+          ],
+          "children": [
+            {
+              "type": "UiItemCell",
+              "rect": [
+                269,
+                232,
+                52,
+                58
+              ],
+              "children": [
+                {
+                  "type": "Panel",
+                  "rect": [
+                    269,
+                    232,
+                    52,
+                    52
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        282,
+                        234,
+                        27,
+                        27
+                      ]
+                    },
+                    {
+                      "type": "PanelContainer",
+                      "rect": [
+                        270,
+                        233,
+                        27,
+                        14
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            273,
+                            233,
+                            21,
+                            14
+                          ],
+                          "variation": "C9B",
+                          "text": "Rack"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Panel",
+                  "rect": [
+                    269,
+                    252,
+                    52,
+                    16
+                  ],
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        269,
+                        251,
+                        52,
+                        15
+                      ],
+                      "variation": "C10B",
+                      "text": "In pot"
+                    }
+                  ]
+                },
+                {
+                  "type": "Panel",
+                  "rect": [
+                    310,
+                    230,
+                    13,
+                    13
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        312,
+                        232,
+                        9,
+                        9
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                269,
+                296,
+                52,
+                14
+              ],
+              "variation": "C9B",
+              "text": "in pot · rack"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
             0,
             322,
             63,

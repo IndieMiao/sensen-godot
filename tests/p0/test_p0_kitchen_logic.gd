@@ -322,6 +322,10 @@ func test_experiment_lists_the_spice_racks_stored_seasonings() -> void:
 	assert_bool(P0KitchenLogic.can_add(v, ["fish_crucian"], "rock_salt")).is_true()
 	assert_array(P0KitchenLogic.experiment_items(v, [], "Fish").map(func(i): return i.id)).not_contains(["rock_salt"])
 	assert_array(P0KitchenLogic.experiment_items(v, [], "Seasoning").map(func(i): return i.id)).contains(["rock_salt"])
+	# In the pot it keeps the tag (COOK-2b-RACK): ✕ sends it back to the rack.
+	var in_pot: Array = P0KitchenLogic.experiment_items(v, ["fish_crucian", "rock_salt"]).filter(func(i): return i.id == "rock_salt")
+	assert_int(in_pot[0].kitchen_state).is_equal(UiItemCell.KitchenState.IN_POT)
+	assert_bool(in_pot[0].rack).is_true()
 
 
 func test_a_stored_seasoning_counts_as_a_seasoning_in_the_preview() -> void:

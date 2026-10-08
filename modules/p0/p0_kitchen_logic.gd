@@ -227,7 +227,8 @@ static func preview(view_: Dictionary, pot: Array) -> Dictionary:
 	return {title = title, state = P0Logic.rarity_name(view, rarity), time = "%d s" % (int(t.get("ms", 5000)) / 1000)}
 
 ## This exact mix already failed (S5 Kitchen Mishaps, §7.2.7): the capsule's title reads Tried before and a line above
-## the Cook row says "Tried before · still a Mystery Dish" (An Qi La, 226 e8e5617a); the pot may still cook it.
+## the Cook row says "Tried before · not a recipe" (q(56): while the blessing still refunds, a failed pot gives no
+## Mystery Dish, so the line never names the result; An Qi La, 226 e8e5617a); the pot may still cook it.
 static func tried(view: Dictionary, pot: Array) -> bool:
 	if pot.is_empty(): return false
 	var mine := pot.map(func(i): return str(i))

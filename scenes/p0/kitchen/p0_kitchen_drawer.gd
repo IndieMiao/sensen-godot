@@ -244,7 +244,7 @@ func _build_experiment() -> VBoxContainer:
 		ingredient_tapped.emit(str(item.id), at)
 	v.add_child(_bag)
 	# A mix that failed before (§7.2.7; An Qi La, 226 e8e5617a): one line right above the Cook row, Cook stays live.
-	_tried = UiKit.label("Tried before · still a Mystery Dish", UiTokens.STYLE_C12_B, UiTokens.COLOR_SECONDARY)
+	_tried = UiKit.label("Tried before · not a recipe", UiTokens.STYLE_C12_B, UiTokens.COLOR_SECONDARY)
 	_tried.visible = false
 	v.add_child(_tried)
 	var foot := HBoxContainer.new()
