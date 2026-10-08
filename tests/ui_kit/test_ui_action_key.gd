@@ -216,6 +216,10 @@ func test_an_unavailable_petal_shakes_and_says_why_at_the_centre() -> void:
 	assert_int(r.reason_tail()).is_equal(UiActionRadial.Tail.DOWN_LEFT)
 	await await_idle_frame()
 	assert_vector(r._reason.get_rect().get_center()).is_equal_approx(r.ring_center(), Vector2(1, 1))
+	# RadialReason 1655:101164: 109 × 28 for "Mine floors 3–5" (Caption 12, padding 11 / 6), clear of the petals.
+	assert_vector(r._reason.size).is_equal_approx(Vector2(109, 28), Vector2(6, 2))
+	var lower := r.petals()[3].get_rect().get_center().y - UiTokens.SIZE_RADIAL_PETAL * 0.5
+	assert_float(r._reason.get_rect().end.y + 7.0).is_less(lower)   # bubble plus its tail stay above the lower petals
 	r.advance(25.0)
 	assert_float(absf(r.petals()[3].get_rect().get_center().x - r.petal_center(3).x)).is_greater(3.0)   # shaking
 	r.advance(200.0)

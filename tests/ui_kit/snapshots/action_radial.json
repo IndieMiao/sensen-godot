@@ -460,8 +460,8 @@
                         {
                           "type": "Control",
                           "rect": [
-                            108,
-                            476,
+                            126,
+                            462,
                             12,
                             7
                           ]
@@ -469,18 +469,18 @@
                         {
                           "type": "PanelContainer",
                           "rect": [
-                            92,
-                            421,
-                            145,
-                            56
+                            110,
+                            435,
+                            109,
+                            28
                           ],
                           "children": [
                             {
                               "type": "Label",
                               "rect": [
-                                103,
+                                121,
                                 440,
-                                123,
+                                87,
                                 18
                               ],
                               "variation": "CaptionB12",

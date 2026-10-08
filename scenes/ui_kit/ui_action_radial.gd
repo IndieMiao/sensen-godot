@@ -144,7 +144,8 @@ func _process(delta: float) -> void:
 	if not frozen: advance(delta * 1000.0)
 
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_RESIZED: _apply()   # the ring follows the overlay's size (opened before its first layout)
+	# The ring follows the overlay's size (opened before its first layout); the bubble re-measures with the theme.
+	if what in [NOTIFICATION_RESIZED, NOTIFICATION_THEME_CHANGED, NOTIFICATION_ENTER_TREE]: _apply()
 
 func _open_ms() -> float:
 	return float(UiTokens.MOTION_RADIAL_STAGGER_MS * maxi(0, _petals.size() - 1) + UiTokens.MOTION_RADIAL_PETAL_IN_MS) + _PULSE_MS
@@ -286,9 +287,10 @@ func _build_reason() -> void:
 	box.shadow_color = UiTokens.COLOR_SHADOW_PETAL
 	box.shadow_size = UiTokens.SIZE_SHADOW_PETAL_RADIUS
 	box.shadow_offset = Vector2(0, UiTokens.SIZE_SHADOW_PETAL_OFFSET_Y)
-	box.with_margins(11, 6, 11, 6)   # RadialReason 1655:101164: 109 × 28, text at (11, 6)
+	box.with_margins(11, 5, 11, 5)   # RadialReason 1655:101164: 109 × 28, text at (11, 6) in a 16 px box; Godot's line box for Caption 12 is 18
 	_reason.add_theme_stylebox_override(&"panel", box)
 	_reason_text = UiKit.label("", UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_TEXT)
+	_reason_text.minimum_size_changed.connect(func(): if _reason_ms >= 0.0: _place_reason())
 	_reason.add_child(_reason_text)
 	_reason_tail = Control.new()
 	_reason_tail.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -314,6 +316,7 @@ func _hide_reason() -> void:
 		_reason_tail.visible = false
 
 func _place_reason() -> void:
+	_reason.reset_size()   # back to its minimum: a size set before the theme arrived never shrinks on its own
 	var s := _reason.get_combined_minimum_size()
 	_reason.size = s
 	_reason.position = ring_center() - s * 0.5
