@@ -18,6 +18,8 @@ signal show_spot(where: String)
 ## A target in another space (TodayRow `Show on map`): leave for the map and point at its pin ("home",
 ## "pond:<id>", "tackle").
 signal show_on_map(target: String)
+## The gate card's guiding button for a panel this UI does not own (Cookbook): the host opens it (LOCK-08).
+signal gate_guide(go: String)
 signal home_choice(choice: String)
 signal recenter()
 signal place_pressed()
@@ -2372,6 +2374,39 @@ func show_got_away(ev: Dictionary) -> void:
 	m.note = P0Logic.break_free_need(view, ev)
 	m.rewards = [UiFloatText.pill(P0Logic.refund_line(view, ev), UiFloatText.Tone.ENERGY_GAIN)]
 	show_moment(m)
+
+## The four-things gate card (§4.8.7, q(49); SKILL-2 482:169): the seed stall, counters, the Cookbook / Experiment
+## third slot, workbench recipes, locked gathering spots and the Fish-dex silhouettes share it. An InfoSheet built by
+## P0Logic.gate_spec (see there for `gate`). No Got it: a tap outside or Back closes it, one layer at a time —
+## `back` reopens the panel it was opened from. Its one guiding button closes the card first, then moves the camera
+## (Show my plots: Show here, the homestead pin elsewhere), opens Skills, or hands the target to the host through
+## gate_guide (Cookbook); it never travels (LOCK-08).
+func open_gate_card(gate: Dictionary, back := Callable()) -> UiInfoSheet:
+	var spec := P0Logic.gate_spec(view, gate)
+	var sheet := UiInfoSheet.new()
+	sheet.theme = UiKit.theme()
+	sheet.rules = func(_id, _ctx, _o): return spec
+	sheet.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+	sheet.offset_left = UiTokens.SPACE_PAGE
+	sheet.offset_right = -UiTokens.SPACE_PAGE
+	sheet.offset_bottom = -bottom_pad()
+	sheet.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	sheet.action_requested.connect(func(action: StringName, _id: String, payload: Dictionary):
+		if action == &"guide": _gate_guide(str(payload.get("go", ""))))
+	_open_modal(sheet)
+	modal_kind = "gate"
+	sheet.open("gate", &"gate")
+	_modal_back = back
+	return sheet
+
+func _gate_guide(go: String) -> void:
+	close_modal()
+	match go:
+		"skills": open_skills()
+		"plots", "stall", "stove", "board", "home", "bench":
+			if show_label(go, space_here(), spot_reachable()) == "Show": show_spot.emit(go)
+			else: show_on_map.emit(map_target(go))
+		_: gate_guide.emit(go)
 
 ## A result card placed like the design's .modal (centred, top at a share of the screen, width a share
 ## of it) over an undimmed scene. Tapping outside or the button closes it; it also closes after auto_s.

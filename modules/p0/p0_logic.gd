@@ -42,7 +42,6 @@ static func fish_at_level(view: Dictionary, level: int) -> Array:
 		if int(d.get("level", 1)) == level and inland: out.append(item_name(view, str(d.id)))
 	return out
 
-## The cheapest rod that holds a rarity, for the "Too heavy for your rod" card.
 ## What a gate fish that broke free needs (§4.8.6): `Fishing Lv4 needed · You: Lv3 · 30 XP to go` for a level gate,
 ## `Reed Rod · Fishing Lv3 · 80 coins` for a rod gate (the next rod that lands it).
 static func break_free_need(view: Dictionary, ev: Dictionary) -> String:
@@ -63,10 +62,177 @@ static func refund_line(view: Dictionary, ev: Dictionary) -> String:
 		return "Energy refunded (%d left today)" % int(ev.protected_left)
 	return "+%d Energy back" % refund
 
+## The cheapest rod that holds a rarity, for the "Too heavy for your rod" card.
 static func rod_for(view: Dictionary, rarity: int) -> Dictionary:
 	for r in view.get("gear", {}).get("rods", []):
 		if int(r.get("reach", 0)) >= rarity and not r.get("owned", false): return r
 	return {}
+
+# ---------------------------------------------------------------- gate card (§4.8.7, q(49), SKILL-2 482:169)
+## Fishing XP a cast brings at the pond recommended for a level (§4.4.2 grid, fails and break-frees included):
+## Pond to Lv3, River from Lv4 (the pond card's recommendation; P0 has no coast).
+const CAST_XP := [2.7, 3.8, 4.9, 5.1, 6.7, 6.7, 5.2, 3.8, 3.2, 2.1]
+const GATE_SKILL_ICONS := {"farming": "hoe", "fishing": "rod", "cooking": "pot"}
+## Crop names that read the same in the plural ("harvest 30 corn").
+const _SAME_PLURAL := ["chamomile", "corn", "lettuce", "chili"]
+
+## The four things on the gate card (§4.8.7): what is locked, which level, how far, what crossing it does. One sheet
+## spec for UiInfoSheet (SKILL-2 482:169): the title with the lock, `Locked` (or the rarity), the lead line
+## `Farming Lv2 unlocks Carrot and Herb`, a NeedTile `Farming XP 32/50` with `18 XP to go · harvest 9 radishes`
+## beside it, the level-up gift row, and at most one guiding button (Show my plots / Cookbook / Skills; none for
+## Fishing). gate:
+##   {skill, level}           a skill gate; `unlocks` (names) or `after` (a verb phrase, "keeps Golden Koi on the
+##                            hook") finish the lead line; unlocks default to the crops / fish of that level
+##   {rod: <gear.rods row>}   a rod gate (Fish-dex silhouette, q(57)): coins at the Tackle Shop
+##   {homestead: level}       a Homestead gate (Bag Upgrade I, Clay Bank)
+## plus what (title), icon (item id), sub (state line, e.g. "Rare"), guide ({label, go} or {} for none).
+static func gate_spec(view: Dictionary, gate: Dictionary) -> Dictionary:
+	var spec := {id = "gate", title = str(gate.get("what", "")), badge = &"locked",
+		rarity_text = str(gate.get("sub", "Locked")), icon = icon(str(gate.get("icon", ""))) if str(gate.get("icon", "")) != "" else null,
+		facts = [], buttons = []}
+	var guide: Dictionary = {}
+	if gate.has("rod"):
+		var rod: Dictionary = gate.rod
+		var price := int(rod.get("price", 0))
+		var rod_lv := int(rod.get("level", 1))
+		var short := skill_xp_to_go(view, "fishing", rod_lv)
+		spec.lead = "%s lands up to %s fish" % [str(rod.get("name", "")), rarity_name(view, int(rod.get("reach", 1)))]
+		var note := "%d coins at Tackle Shop" % price
+		if short > 0: note += " · Fishing Lv%d first" % rod_lv
+		spec.need = {name = "Coins", have = mini(int(view.get("coins", 0)), price), need = price, icon = icon("coin"), note = note}
+	elif gate.has("homestead"):
+		var lv := int(gate.homestead)
+		var have := int(view.get("homestead", {}).get("level", 1))
+		spec.lead = ("Homestead Lv%d %s" % [lv, str(gate.get("after", ""))]).strip_edges()
+		var left := maxi(0, lv - have)
+		spec.need = {name = "Homestead", have = have, need = lv, icon = icon("home"),
+			note = "%d level%s to go" % [left, "" if left == 1 else "s"]}
+		guide = {label = "Skills", go = "skills"}
+	else:
+		var skill := str(gate.get("skill", "farming"))
+		var lv := int(gate.get("level", 2))
+		var after := str(gate.get("after", ""))
+		if after == "":
+			var names: Array = gate.get("unlocks", skill_unlocks(view, skill, lv))
+			after = ("unlocks " + and_list(names)) if not names.is_empty() else ""
+		spec.lead = ("%s Lv%d %s" % [skill.capitalize(), lv, after]).strip_edges()
+		var th: Array = content().get("skills", {}).get(skill, [])
+		var need_xp := int(th[lv - 1]) if lv >= 1 and lv - 1 < th.size() else 0
+		var xp := int(view.get("skills", {}).get(skill, {}).get("xp", 0))
+		var to_go := int(gate.get("xp_to_go", maxi(0, need_xp - xp)))
+		var act := gate_action(view, skill, to_go)
+		spec.need = {name = "%s XP" % skill.capitalize(), have = maxi(0, need_xp - to_go), need = need_xp,
+			icon = icon(str(GATE_SKILL_ICONS.get(skill, "field"))),
+			note = ("%d XP to go" % to_go) + ((" · " + act) if act != "" else "")}
+		spec.info_row = level_gift_row(view, skill, lv)
+		guide = {"farming": {label = "Show my plots", go = "plots"}, "cooking": {label = "Cookbook", go = "cookbook"}}.get(skill, {})
+	if gate.has("guide"): guide = gate.guide
+	if not guide.is_empty(): spec.buttons = [{id = &"guide", label = str(guide.label), kind = &"nav", payload = {go = str(guide.go)}}]
+	return spec
+
+## The gate on a Fish-dex silhouette (q(57)): the Fishing level first, then the rod; {} when nothing holds the fish
+## back (it just hasn't bitten yet).
+static func fish_gate(view: Dictionary, fish_id: String) -> Dictionary:
+	var d: Dictionary = {}
+	for f in content().get("fish", []):
+		if str(f.get("id", "")) == fish_id: d = f
+	if d.is_empty(): return {}
+	var r := int(d.get("rarity", 1))
+	var name := item_name(view, fish_id)
+	var base := {what = name, icon = fish_id, sub = "%s · Locked" % rarity_name(view, r)}
+	if int(d.get("level", 1)) > int(view.get("skills", {}).get("fishing", {}).get("level", 1)):
+		return base.merged({skill = "fishing", level = int(d.level), after = "keeps %s on the hook" % name})
+	if r > int(view.get("fishing", {}).get("rod_reach", 4)):
+		var rod := rod_for(view, r)
+		if not rod.is_empty(): return base.merged({rod = rod})
+	return {}
+
+## XP still needed for a skill level (0 once reached).
+static func skill_xp_to_go(view: Dictionary, skill: String, level: int) -> int:
+	var th: Array = content().get("skills", {}).get(skill, [])
+	if level < 1 or level - 1 >= th.size(): return 0
+	return maxi(0, int(th[level - 1]) - int(view.get("skills", {}).get(skill, {}).get("xp", 0)))
+
+## The action amount beside the XP (§4.8.7 "还差多少"): Farming `harvest N <crop>` with the highest-XP crop the
+## player can sow at full XP; Fishing `about N casts` at the recommended pond; Cooking `about N new dishes` (first
+## cooks, biggest first) or `about N Fine dishes` once no new page is cookable. "" when it can't be worked out.
+static func gate_action(view: Dictionary, skill: String, xp_to_go: int) -> String:
+	if xp_to_go <= 0: return ""
+	var lv := int(view.get("skills", {}).get(skill, {}).get("level", 1))
+	match skill:
+		"farming":
+			var best := {}
+			for c in content().get("crops", []):
+				if int(c.get("gate", 1)) > lv or lv - int(c.get("level", 1)) > 1: continue   # can't sow / not full XP
+				if best.is_empty() or int(c.get("xp", 0)) > int(best.get("xp", 0)): best = c   # ties: the first (Radish)
+			if best.is_empty() or int(best.get("xp", 0)) <= 0: return ""
+			var n := ceili(float(xp_to_go) / float(best.xp))
+			return "harvest %d %s" % [n, crop_plural(str(best.name), n)]
+		"fishing":
+			var per: float = CAST_XP[clampi(lv, 1, CAST_XP.size()) - 1]
+			var n := ceili(float(xp_to_go) / per)
+			return "about %d cast%s" % [n, "" if n == 1 else "s"]
+		"cooking":
+			var tiers: Dictionary = content().get("cooking", {}).get("tiers", {})
+			var firsts: Array = []
+			for p in view.get("cooking", {}).get("cookbook", []):
+				var t: Dictionary = tiers.get(str(int(p.get("rarity", 1))), {})
+				if bool(p.get("p0", false)) and not bool(p.get("cooked", false)) and p.get("lock") == null and int(t.get("level", 1)) <= lv:
+					firsts.append(int(t.get("first_xp", 0)))
+			firsts.sort()
+			firsts.reverse()
+			var left := xp_to_go
+			var n := 0
+			for x in firsts:
+				if left <= 0: break
+				left -= x
+				n += 1
+			if n > 0 and left <= 0: return "about %d new dish%s" % [n, "" if n == 1 else "es"]
+			var fine := int(tiers.get("2", {}).get("xp", 0))
+			if n == 0 and fine > 0:
+				var m := ceili(float(xp_to_go) / float(fine))
+				return "about %d Fine dish%s" % [m, "" if m == 1 else "es"]
+			return ""
+	return ""
+
+## What a skill level brings, for the gate card's lead line: the crops sown from that Farming level, the fish
+## landed from that Fishing level. Cooking unlocks are the caller's words.
+static func skill_unlocks(view: Dictionary, skill: String, level: int) -> Array:
+	var out: Array = []
+	match skill:
+		"farming":
+			# Main ingredients before seasonings, as §4.8.7 reads them (Carrot and Herb, Potato and Chamomile).
+			var crops: Array = content().get("crops", []).filter(func(c): return int(c.get("gate", 1)) == level)
+			for main in [true, false]:
+				for c in crops:
+					if (str(c.get("ingr", ["F"])[0]) == "F") == main: out.append(str(c.name))
+		"fishing":
+			for f in content().get("fish", []):
+				if int(f.get("level", 1)) == level: out.append(item_name(view, str(f.id)))
+	return out
+
+## The level-up gift of a skill level as the gate card's info row ("Carrot Seeds ×5" / "Level-up gift" / "At Lv2"),
+## or {} when that level brings none. Recipes are not counted items: the first other item names the row.
+static func level_gift_row(view: Dictionary, skill: String, level: int) -> Dictionary:
+	var gifts: Array = content().get("level_gifts", {}).get("%s:%d" % [skill, level], [])
+	var items := gifts.filter(func(g): return not str(g[0]).begins_with("recipe:"))
+	if items.is_empty(): return {}
+	var more := gifts.size() - 1
+	return {title = item_name(view, str(items[0][0])), qty = "×%d" % int(items[0][1]),
+		lines = ["Level-up gift" + ((" · +%d more" % more) if more > 0 else ""), "At Lv%d" % level]}
+
+## "Carrot", "Carrot and Herb", "Potato, Chamomile and Compost".
+static func and_list(names: Array) -> String:
+	if names.size() <= 1: return "" if names.is_empty() else str(names[0])
+	return ", ".join(names.slice(0, names.size() - 1).map(func(n): return str(n))) + " and " + str(names[-1])
+
+## A crop name in an action amount: "1 radish", "9 radishes", "14 carrots", "30 tomatoes", "12 chamomile".
+static func crop_plural(name: String, n: int) -> String:
+	var w := name.to_lower()
+	if n == 1 or w in _SAME_PLURAL: return w
+	if w.ends_with("sh") or w.ends_with("ch") or w.ends_with("s") or w.ends_with("x") or w.ends_with("o"): return w + "es"
+	if w.ends_with("y") and not (w.length() > 1 and w[-2] in "aeiou"): return w.substr(0, w.length() - 1) + "ies"
+	return w + "s"
 
 ## Items that share an existing icon until they get their own (SGODOT-228 content).
 const ICON_ALIAS := {"fert_compost": "compost", "tool_row_hoe": "hoe", "wild_herb": "crop_herb", "drink_hot_tea": "dish_fruit_tea", "drink_coffee": "dish_fruit_tea"}

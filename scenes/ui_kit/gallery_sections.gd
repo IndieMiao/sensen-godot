@@ -65,6 +65,7 @@ static func all() -> Array[Dictionary]:
 		{id = "float_text", title = "UiFloatText", figma = "FloatText 1178:82191 · six tones, Hug / Wrap (static pills)", build = _float_texts},
 		# SGODOT-224 panels
 		{id = "info_sheet", title = "UiInfoSheet", figma = "Compact/SelectedItem 633:41257 · BAG-1 482:10 · F-07 (SGODOT-207 168a4cc3)", build = _info_sheets},
+		{id = "gate_card", title = "Gate card (UiInfoSheet)", figma = "SKILL-2 482:169 · §4.8.7 four things (SGODOT-233)", build = _gate_cards},
 		{id = "shop_row", title = "UiShopRow · UiStepper", figma = "Compact/ShopProduct 702:80447 · Compact/Stepper 1245:108953 · FARM-6 482:46 · C1-01", build = _shop_rows},
 	]
 	return out
@@ -750,6 +751,29 @@ static func _info_sheets() -> Control:
 		sheet.rules = func(id, ctx, o): return spec
 		sheet.custom_minimum_size.x = 328   # the gallery column (the main is 336 inside the 360 drawer)
 		sheet.open("sample", &"bag")
+		v.add_child(_captioned(sheet, pair[0]))
+	return v
+
+## The four-things gate card (SKILL-2 482:169, §4.8.7; SGODOT-233): an InfoSheet with the lead line, a NeedTile with
+## how far beside it, the level-up gift row and one guiding button (none for Fishing).
+static func _gate_cards() -> Control:
+	var v := _column()
+	var specs := [
+		["gate card · seed (SKILL-2)", {title = "Carrot Seeds", icon = _tex("seed_carrot"), badge = &"locked", rarity_text = "Locked",
+			lead = "Farming Lv2 unlocks Carrot and Herb",
+			need = {name = "Farming XP", have = 32, need = 50, icon = _tex("hoe"), note = "18 XP to go · harvest 9 radishes"},
+			info_row = {title = "Carrot Seeds", qty = "×5", lines = ["Level-up gift", "At Lv2"]},
+			buttons = [{id = &"guide", label = "Show my plots", kind = &"nav"}]}],
+		["gate card · Fish-dex silhouette, rod", {title = "Golden Koi", icon = _tex("fish_koi"), badge = &"locked", rarity_text = "Rare · Locked",
+			lead = "Reed Rod lands up to Rare fish",
+			need = {name = "Coins", have = 40, need = 80, icon = _tex("coin"), note = "80 coins at Tackle Shop"}}],
+	]
+	for pair in specs:
+		var sheet := UiInfoSheet.new()
+		var spec: Dictionary = pair[1]
+		sheet.rules = func(id, ctx, o): return spec
+		sheet.custom_minimum_size.x = 328
+		sheet.open("sample", &"gate")
 		v.add_child(_captioned(sheet, pair[0]))
 	return v
 
