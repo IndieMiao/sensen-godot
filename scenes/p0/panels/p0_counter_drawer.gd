@@ -361,6 +361,7 @@ func _fill_drinks() -> void:
 	var b := UiCommandButton.new("" if reason != "" else "%s · +%d Energy" % [name, energy])
 	if reason != "": b.reason = reason
 	else: b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	b.sends = true   # drink (§10.7.1 Offline)
 	var id := str(item.get("id", ""))
 	b.activated.connect(func(): action_requested.emit(&"drink", id, {}))
 	_drinks.add_child(b)

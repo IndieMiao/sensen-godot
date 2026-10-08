@@ -4,7 +4,9 @@ extends RefCounted
 ## only lays them out with the kit (UiNeedTile, UiNeedSource, UiCommandButton) on P0Ui's modal base.
 
 const SHEET_TOP := 194.0        # sheet edge on the 360 × 800 frame; scrolling content above the fixed actions
-const MOMENT_TOP := 108.0       # MomentBanner sits under the HUD (x16 y108 w328)
+## MomentBanner sits under the HUD (x16 y108 w328). P0Ui.show_moment places it — SIZE_HUD_TOP + SIZE_HUD_H + 10 plus the
+## safe top — so this is the spec's number at safe top 0, which the test holds it to.
+const MOMENT_TOP := 108.0
 const MOMENT_S := 3.0           # the first Homestead upgrade: 3 s; later ones MOMENT_LATER_S (§8.1.2 ②); tap to skip
 const MOMENT_LATER_S := 1.5
 
@@ -63,6 +65,7 @@ static func open(ui: P0Ui, at_home := true) -> void:
 		body.add_child(changes)
 	var button := UiCommandButton.new(str(model.label))
 	button.reason = str(model.reason)
+	button.sends = true   # homestead_upgrade: Offline while offline (§10.7.1)
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	button.activated.connect(func(): ui.command.emit({"type": "homestead_upgrade"}))
 	button.unavailable_pressed.connect(func(reason: String): ui.toast(reason))

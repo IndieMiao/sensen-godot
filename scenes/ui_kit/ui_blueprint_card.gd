@@ -85,6 +85,7 @@ func _init(data := {}) -> void:
 	_have.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	foot.add_child(_have)
 	button = UiCommandButton.new("", UiCommandButton.Kind.PRIMARY, true)
+	button.sends = true   # Craft (§10.7.1 Offline)
 	button.size_flags_horizontal = Control.SIZE_SHRINK_END
 	button.activated.connect(func(): pressed.emit())
 	button.unavailable_pressed.connect(func(r: String): unavailable_pressed.emit(r))

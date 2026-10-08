@@ -110,7 +110,8 @@ func test_home_2_banner_sits_under_the_hud_and_a_tap_skips_it() -> void:
 	var ui := _ui(_view())
 	var card := HomePanel.moment(ui, P0Logic.home_moment(_view(), {"level": 3, "energy": 78, "unlocks": ["warming_cabinet"]}))
 	await get_tree().process_frame
-	assert_float(card.position.y).is_equal(HomePanel.MOMENT_TOP)
+	assert_float(card.position.y).is_equal(HomePanel.MOMENT_TOP)   # the HOME-2 spec's y …
+	assert_float(card.position.y).is_equal(UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H + 10.0 + ui.safe_top())   # … as show_moment works it out
 	var tap := InputEventMouseButton.new()
 	tap.button_index = MOUSE_BUTTON_LEFT
 	tap.pressed = true

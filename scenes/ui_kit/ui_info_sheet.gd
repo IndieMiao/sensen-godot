@@ -364,6 +364,7 @@ func _button(b: Dictionary) -> Control:
 		return nav
 	var cb := UiCommandButton.new(text, UiCommandButton.Kind.PRIMARY if kind == &"primary" else UiCommandButton.Kind.SECONDARY, true)
 	if kind == &"unavailable": cb.reason = text
+	cb.sends = bool(b.get("sends", false))   # a server command: Offline while offline (§10.7.1)
 	cb.activated.connect(func(): action_requested.emit(id, _item, payload))
 	cb.unavailable_pressed.connect(func(reason: String): unavailable_requested.emit(id, _item, reason))
 	return cb
