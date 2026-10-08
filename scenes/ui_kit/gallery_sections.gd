@@ -69,6 +69,7 @@ static func all() -> Array[Dictionary]:
 		{id = "request_card", title = "UiRequestCard", figma = "ResidentRequestCard 1211:83296 · LOCK-18 (336 at 328)", build = _request_cards},
 		{id = "resident_bar", title = "UiResidentBar", figma = "ResidentDialogue 1213:83392 Row / Stacked · LOCK-18 (336 at 328)", build = _resident_bars},
 		{id = "resident_profile", title = "UiResidentProfile", figma = "RES-PIP 482:586 / RES-KAI 482:592 · sheet content (328/360)", build = _resident_profiles},
+		{id = "affinity_stages", title = "Affinity stage tones", figma = "StateBadge on RES-PIP / RES-KAI · AffinityMeter stage pill · 225 验收 (197)", build = _affinity_stages},
 		{id = "notice_row", title = "UiNoticeRow", figma = "Bag capacity recovery of BAG-5 482:144 (336 at 328)", build = _notice_rows},
 		{id = "float_text", title = "UiFloatText", figma = "FloatText 1178:82191 · six tones, Hug / Wrap (static pills)", build = _float_texts},
 		# SGODOT-224 panels
@@ -658,7 +659,7 @@ static func _dialogue_cards() -> Control:
 
 static func _resident_bars() -> Control:
 	var v := _column(UiTokens.SPACE_SECTION)
-	var pip := {portrait = load("res://assets/p0/art/pip-portrait.jpg"), name = "Pip", role = "Courier Kid", stage = "Acquainted",
+	var pip := {portrait = load("res://assets/p0/art/pip-portrait.jpg"), name = "Pip", role = "Courier Kid", stage = "Acquainted", stage_index = 1,
 		have = 28, need = 45, next = "Familiar", line = "Could you catch me a fish? Any kind is fine.", meal = true, lesson = true}
 	v.add_child(_captioned(_at_336(UiResidentBar.new(pip)), "Choices=Row · Today’s meal and Recipe lesson available"))
 	var busy := pip.duplicate()
@@ -736,11 +737,29 @@ static func _creel_badges() -> Control:
 		v.add_child(_captioned(b, str(spec[2])))
 	return v
 
+## The five affinity stages (225 验收, 不知火舞's palette): the profile's StateBadge and the bar's stage pill in one row
+## each, the same tone from UiResidentBar.stage_tone.
+static func _affinity_stages() -> Control:
+	var v := _column()
+	var stages := ["Stranger", "Acquainted", "Familiar", "Trusted", "Kindred"]
+	for i in stages.size():
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override(&"separation", int(UiTokens.SPACE_ROW))
+		var badge := UiBadge.new(str(stages[i]))
+		var tone := UiResidentBar.stage_tone(i)
+		badge.set_tone(tone[0], tone[1])
+		row.add_child(badge)
+		var pill := UiResidentBar.stage_pill(str(stages[i]), i)
+		pill.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		row.add_child(pill)
+		v.add_child(row)
+	return v
+
 static func _resident_profiles() -> Control:
 	var face := AtlasTexture.new()   # the face square of Pip's portrait, as the P0 UI crops it (P0Ui.FACE_CROPS)
 	face.atlas = load("res://assets/p0/art/pip-portrait.jpg")
 	face.region = Rect2(30, 163, 232, 232)
-	var d := {face = face, name = "Pip", role = "Courier Kid", stage = "Familiar",
+	var d := {face = face, name = "Pip", role = "Courier Kid", stage = "Familiar", stage_index = 2,
 		friendship = "52/90", likes = "Dessert", likes_icon = _tex("dish_carrot_cake")}
 	var page := UiResidentProfile.new(d)
 	page.custom_minimum_size = Vector2(296, 411)   # Profile content + fixed decision area of the 443 sheet

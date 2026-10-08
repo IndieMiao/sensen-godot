@@ -4,7 +4,7 @@ extends VBoxContainer
 ## dialogue bar, LOCK-18). Scrollable column: ProfileIdentity (80 round face centred, name, role) · StateBadge (stage) ·
 ## Fact `Friendship 52/90` · ItemRow `Favourite dishes` / style · NavigationRow `Details` (hidden when the host has
 ## no page behind it: nothing dead-ends) — then the fixed decision area with the Dismiss `Back`.
-## data: {face (Texture2D), name, role, stage, friendship, likes, likes_icon (Texture2D), details (bool)}.
+## data: {face (Texture2D), name, role, stage, stage_index, friendship, likes, likes_icon (Texture2D), details (bool)}.
 ## Put it in a UiDrawer (pad 16, height 443) with a Close above it. Emits details_pressed / back_pressed.
 
 signal details_pressed
@@ -55,6 +55,8 @@ func _init(data_: Dictionary = {}) -> void:
 	identity.add_child(role)
 	col.add_child(identity)
 	var badge := UiBadge.new(str(data.get("stage", "")))
+	var tone := UiResidentBar.stage_tone(int(data.get("stage_index", 0)))   # the bar's stage tone (225)
+	badge.set_tone(tone[0], tone[1])
 	badge.custom_minimum_size.x = _BADGE_W
 	badge.visible = badge.text != ""
 	col.add_child(badge)

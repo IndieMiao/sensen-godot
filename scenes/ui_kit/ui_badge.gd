@@ -20,3 +20,13 @@ func _init(text_: String = "") -> void:
 func set_text(v: String) -> void:
 	text = v
 	if _label != null: _label.text = v
+
+## Another tone than the main's primaryTint / primary (a resident's affinity stage, UiResidentBar.stage_tone): the
+## pill keeps the Badge style's shape and padding, only its fill and ink change.
+func set_tone(fill: Color, ink: Color) -> void:
+	# The theme's own Badge style in this fill: read from the kit theme resource, so it works before the badge is in
+	# the tree and cannot drift from gen_theme (亚瑟 on #124).
+	var box := UiKit.theme().get_stylebox(&"panel", UiTokens.PANEL_BADGE).duplicate() as UiStyleBox
+	box.bg_color = fill
+	add_theme_stylebox_override(&"panel", box)
+	_label.add_theme_color_override(&"font_color", ink)
