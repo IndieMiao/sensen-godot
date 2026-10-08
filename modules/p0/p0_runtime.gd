@@ -433,11 +433,12 @@ func _on_state(v: Dictionary, events: Array) -> void:
 			"cast", "pot", "cabinet", "plate", "first", "mishap", "queue":
 				_call("p0_event", [ev, v])
 			"dish":
-				# The farmhouse stove shows its own result card (COOK-4 / 6 / P0-9). Anywhere else no card pops up
-				# (§7.2.7 step 7, q(46)): a pot kept on its own (Queue ×2) or a collect answered after leaving only
-				# says where the dish went. A world without p0_event (farm, map, outpost) gives null, so compare
+				# The farmhouse stove shows its own result card (COOK-4 / 6 / P0-9) or toast. Anywhere else no card pops
+				# up (§7.2.7 step 7, q(46)). A pot Queue ×2 kept on its own says nothing away from the kitchen (§7.2.7,
+				# q(46) / q(71); 不知火舞 on 226): Today and the stove's sign show it. A collect answered after the player
+				# left says where the dish went. A world without p0_event (farm, map, outpost) gives null, so compare
 				# instead of bool() (PR #54 review).
-				if _call("p0_event", [ev, v]) != true:
+				if _call("p0_event", [ev, v]) != true and not bool(ev.get("auto", false)):
 					var kept := P0KitchenLogic.kept_line(v, ev, events)
 					if not kept.is_empty(): ui.toast(str(kept.text))
 			"request":

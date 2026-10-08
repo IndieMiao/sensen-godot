@@ -59,7 +59,10 @@ func _marker(n: String, v: Dictionary) -> Dictionary:
 		return {kind = "facility", icon = P0Logic.icon("cabinet"), name = "Warming Cabinet", fact = P0KitchenLogic.cabinet_badge(v),
 			count = P0KitchenLogic.cabinet_count(v)}
 	if n != STOVE: return super(n, v)
-	var stove := {kind = "facility", icon = P0Logic.icon("pot"), name = "Stove 1/1"}   # i-pot (250 walkthrough)
+	# i-pot (250 walkthrough). Up close the strip keeps the pot: the state is the far button's badge and the fact
+	# (Cooking 0:22 / the dish), as on the bench (不知火舞 on #104, 1760:103708).
+	var stove := {kind = "facility", icon = P0Logic.icon("pot"), name = "Stove 1/1", strip_badge = false}
+	if P0KitchenLogic.queued(v) != null: stove.count = "+1"   # Queue ×2: a pot waits behind this one (q(71), 1760:103578)
 	var st = P0KitchenLogic.stove(v)
 	if st == null: return stove.merged({fact = "Empty"})
 	var left := float(st.get("ready_in", 0))
@@ -133,7 +136,8 @@ func p0_event(ev: Dictionary, v: Dictionary) -> bool:
 	match str(ev.get("kind", "")):
 		"pot":
 			var st = P0KitchenLogic.stove(v)
-			if st is Dictionary and not bool(ev.get("queued", false)): kitchen.on_pot(st)
+			if bool(ev.get("queued", false)): kitchen.on_queued()   # Queue ×2: in behind the pot cooking (q(71))
+			elif st is Dictionary: kitchen.on_pot(st)
 			return false
 	return kitchen.on_event(ev)
 
@@ -168,6 +172,7 @@ func p0_dev(step: PackedStringArray) -> bool:
 	match step[0]:
 		"stove": open_stove(step[1] if step.size() > 1 else "cookbook")
 		"kitchen": p0_open_kitchen(step[1] if step.size() > 1 else "cookbook")
+		"queue": kitchen.open_queue()   # Queue next › on the watch sheet (shots)
 		"page": if kitchen.drawer: kitchen.drawer.select_page(step[1])   # a Cookbook page's card (shots)
 		"put":
 			if kitchen.phase != "compose": kitchen.open("experiment")
@@ -186,6 +191,7 @@ func p0_dev(step: PackedStringArray) -> bool:
 func p0_until(n: String) -> bool:
 	match n:
 		"cooking": return kitchen != null and kitchen.phase == "watch"
+		"turned": return kitchen != null and kitchen.phase == "watch" and P0KitchenLogic.queued(rt.session.current()) == null   # Queue ×2 turned over
 		"card": return kitchen != null and kitchen.phase == "card"
 		"compose": return kitchen != null and kitchen.phase == "compose"
 		"idle": return (kitchen == null or not kitchen.busy()) and super(n)
