@@ -447,12 +447,16 @@ func test_the_basic_room_keeps_the_benchmark_light() -> void:
 	assert_array(r.room.find_children("ReviewLamp*", "OmniLight3D", false, false)).is_empty()
 	var plate := r.cam.get_node("Backdrop") as MeshInstance3D
 	assert_str((plate.material_override as StandardMaterial3D).albedo_color.to_html(false)).is_equal("e8e4c8")
+	assert_float(r.cam.near).is_equal_approx(0.1, 0.0001)
+	assert_float(r.cam.far).is_equal_approx(70.0, 0.0001)
+	assert_vector(r.sun_direction()).is_equal(Vector3(-6, 7, 1.5))   # layout.sun_direction
 
 ## A kit whose review lamp sits on the hearth keeps one hearth lamp: HearthGlow, the one the fire brightens (#29 / #32).
 func test_a_review_lamp_on_the_hearth_is_not_added_twice() -> void:
 	var layout := P0RoomAnchors.read_json(P0Room.BASIC_ROOM_LAYOUT)
 	var fire: Array = layout.fire_position
 	layout["review_lighting"] = {"ambient_color": "c0ada9", "ambient": 0.67, "sun_color": "ffe0ae", "sun": 1.55,
+		"sun_position": [6, 9, -4], "sun_target": [0, 0, 0.8],
 		"points": [{"position": fire, "color": "ffb85e", "energy": 1.0}, {"position": [1.0, 2.2, 0.5], "color": "ffe0a3", "energy": 1.2, "range": 1.45}]}
 	layout["lighting"] = {"angular_distance": 4.5}
 	var path := "user://test_review_room.layout.json"
@@ -476,6 +480,10 @@ func test_a_review_lamp_on_the_hearth_is_not_added_twice() -> void:
 	assert_float(sun.directional_shadow_max_distance).is_equal_approx(40.0, 0.001)
 	assert_float(sun.shadow_bias).is_equal_approx(0.1, 0.001)
 	assert_float(sun.shadow_normal_bias).is_equal_approx(2.0, 0.001)
+	# The signed sun wins over the Basic Room's layout.sun_direction, and the camera clips as render_r1's did.
+	assert_vector(r.sun_direction()).is_equal(Vector3(6, 9, -4.8))
+	assert_float(r.cam.near).is_equal_approx(0.05, 0.0001)
+	assert_float(r.cam.far).is_equal_approx(150.0, 0.0001)
 
 ## A review with shadow values was signed through review_room.gd: one orthogonal map with those values (Farm Tools
 ## Store, Post Office); the ones it leaves out take that tool's defaults.
@@ -487,3 +495,14 @@ func test_review_shadow_values_cast_the_review_tools_shadow() -> void:
 	assert_float(sun.shadow_normal_bias).is_equal_approx(0.18, 0.001)
 	assert_float(sun.directional_shadow_max_distance).is_equal_approx(35.0, 0.001)
 	sun.free()
+	# … and its camera clipped at Godot's defaults: at the old 70 m the Post Office's west wall shaded the floor by
+	# the door, which the signed render does not show.
+	assert_vector(P0Room.review_clip({"shadow_bias": 0.065})).is_equal(Vector2(0.05, 4000.0))
+	assert_vector(P0Room.review_clip({"sun": 1.55})).is_equal(Vector2(0.05, 150.0))
+	assert_vector(P0Room.review_clip({})).is_equal(Vector2(0.1, 70.0))
+
+## A door without its own badge_exit point keeps its prompt and pick point over the threshold (the Basic Room's door).
+func test_a_door_without_a_badge_point_is_picked_over_the_threshold() -> void:
+	var r := _room()
+	assert_object(r.anchor("badge_exit")).is_null()
+	assert_vector(r.pick_point("exit")).is_equal(r.anchor("exit").global_position + Vector3(0, 1.0, 0))

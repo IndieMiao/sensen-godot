@@ -322,13 +322,14 @@ func _build_lights() -> void:
 		room.add_child(light)
 		i += 1
 
-## Where the room's sun shines from (room metres, towards the room origin): layout.sun_direction, else the kit's
-## review sun (review_lighting.sun_position − sun_target), else the Basic Room benchmark.
+## Where the room's sun shines from (room metres, towards the room origin): the kit's review sun (review_lighting.
+## sun_position − sun_target, as signed), else layout.sun_direction (the Basic Room's), else the benchmark. Farm Tools
+## Store and Post Office also carry the Basic Room's sun_direction; their signed sun is the review one.
 func sun_direction() -> Vector3:
-	if layout.get("sun_direction", null) is Array: return P0RoomAnchors.vec(layout.sun_direction)
 	var review: Dictionary = layout.get("review_lighting", {})
 	if review.get("sun_position", null) is Array:
 		return P0RoomAnchors.vec(review.sun_position) - P0RoomAnchors.vec(review.get("sun_target", [0, 0, 0]))
+	if layout.get("sun_direction", null) is Array: return P0RoomAnchors.vec(layout.sun_direction)
 	return Vector3(-6, 7, 1.5)
 
 ## The sun's shadow as each kit's signed render cast it (SGODOT-227): the Basic Room keeps the P0Room benchmark; a review
@@ -352,6 +353,15 @@ static func _set_sun_shadow(sun: DirectionalLight3D, review: Dictionary) -> void
 		sun.directional_shadow_max_distance = 40.0
 		sun.shadow_bias = 0.1
 		sun.shadow_normal_bias = 2.0
+
+## The camera's clip planes as each kit's signed render had them (near, far): Godot fits the sun's shadow to the camera
+## range, so the far plane decides whether the Post Office's west wall shades the floor by its door (signed: it does
+## not, with review_room.gd's default camera; with this room's old 70 m it did). Basic Room: 0.1 / 70 as before;
+## review_room.gd (review shadow values): Godot's defaults 0.05 / 4000; render_r1: 0.05 / 150.
+static func review_clip(review: Dictionary) -> Vector2:
+	if review.is_empty(): return Vector2(0.1, 70.0)
+	if SHADOW_KEYS.any(func(k): return review.has(k)): return Vector2(0.05, 4000.0)
+	return Vector2(0.05, 150.0)
 
 ## The one hearth lamp at layout.fire_position. It exists before the art enters the tree, so the art's fire effect
 ## drives this lamp instead of adding a second one (PR #29, SGODOT-236).
@@ -378,8 +388,9 @@ func _build_camera() -> void:
 	cam.name = "RoomCamera"
 	cam.projection = Camera3D.PROJECTION_ORTHOGONAL
 	cam.keep_aspect = Camera3D.KEEP_WIDTH
-	cam.near = 0.1
-	cam.far = 70.0
+	var clip := review_clip(review_lighting())
+	cam.near = clip.x
+	cam.far = clip.y
 	add_child(cam)
 	cam.make_current()
 	cam.add_child(_backdrop())
