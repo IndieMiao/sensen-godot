@@ -19,6 +19,9 @@ const HOME_PLACE := "Shanghai · Homestead"   # the farm's place chip (p0_farm P
 static var _instance: P0Runtime
 
 var session: P0Session
+## Where the player last was (the place chip's place, LOCK-06): browsing the map keeps it. {space, place};
+## the map's pond card measures Distance from here (q(48)).
+var here := {"space": "home", "place": ""}
 var ui: P0Ui
 var world: Node
 var _shot_t := 0.0
@@ -141,6 +144,7 @@ func attach(w: Node) -> void:
 	elif return_to == "farm": ui.set_place(HOME_PLACE)
 	ui.space = session.space
 	session.place = str(w.call("p0_place")) if w.has_method("p0_place") else ""   # which pond (q(36))
+	if session.space not in ["", "map"]: here = {"space": session.space, "place": session.place}
 	if not session.busy and not session.view.is_empty(): session.refresh()   # entering a space reads fresh state
 	var attach_ms := mark("attach " + str(w.name))
 	if _spot_after_room != "" and w.has_method("p0_show_spot"):   # stepped out of the farmhouse to show a farm spot

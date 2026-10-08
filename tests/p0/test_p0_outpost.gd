@@ -58,6 +58,8 @@ func test_each_outpost_opens_with_its_keeper_and_residents() -> void:
 		assert_float(P0Room._flat_distance(r.actor.position, r.anchor("spawn").global_position)).is_less(0.2)
 		assert_str(r.exit_text).is_equal("Exit · Back to map" if id == "sh_market_1" else "Door · Back to map")
 	assert_str(str(_room("sh_tackle_1").npcs.npc_keeper.name)).is_equal("Finn")
+	assert_str(_room("sh_tea_1").p0_place()).is_equal("sh_tea_1")   # space "outpost", place = the outpost id
+	assert_str(P0Runtime.space_of(_room("sh_tea_1"))).is_equal("outpost")
 
 ## The bag's dish card asks for the resident within a finger card's reach (SGODOT-225 Gift to <Name>): Old Kai at
 ## the tackle shop once the player stands by him; never the keeper, and nobody from across the room.
@@ -180,6 +182,20 @@ func test_the_keeper_greeting_gets_names_and_places_from_the_outpost_data() -> v
 		"ctx": {"keeper": "Mei", "place": "Xuhui Market Square"}})
 	for o in P0Outposts.all():   # nearest.site keys view.keepers.tackle.next_fish (fishing.sites)
 		if o.has("nearest"): assert_array(["pond", "river"]).contains([str(o.nearest.site)])
+
+func test_back_while_standing_up_from_the_joystick_walks_out_once_standing() -> void:
+	var r := _room("sh_tea_1")
+	var left := [0]
+	r.left.connect(func(): left[0] += 1)
+	_tap(r, "use_tea_table_1")
+	_walk_until_idle(r)
+	r.p0_joystick(Vector2(0, 1))   # stands up, no walk out
+	r.p0_joystick(Vector2.ZERO)
+	assert_bool(r.is_back_navigation_locked()).override_failure_message("Back during sit_up is the room's").is_true()
+	assert_int(left[0]).is_equal(0)
+	for i in 30: r.p0_frame({}, 1.0 / 30.0)   # sit_up ends, then the walk to the door
+	_walk_until_idle(r, 8.0)
+	assert_int(left[0]).is_equal(1)
 
 ## SGODOT-229: the NPC-only parts reach the NPCs. OnlineAppearance.config drops them unless asked (they are kept out of
 ## player outfits and the online appearances), so the spawn has to pass allow_npc.

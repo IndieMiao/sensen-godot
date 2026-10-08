@@ -13,6 +13,7 @@ const P0_FARM_CHOICE := {"layout_patch_id": "sh_a", "revision": 2}
 ## outpost table; Go opens the outpost room above the map like a pond (SGODOT-227).
 const P0_OUTPOST := "res://scenes/p0/p0_outpost.tscn"
 const NEAREST_POND := "pond_shanghai_05"   # Reed Pond, the closest to home
+const PondCard := preload("res://modules/p0/p0_pond_card.gd")
 ## Online counts on the outpost pins (GET /p0/presence), refreshed while the map is on top.
 const PRESENCE_S := 15.0
 ## Show on map lands this close (the outpost / pond pins and the homestead read at this zoom).
@@ -21,6 +22,7 @@ const SHOW_ZOOM := 15.5
 var rt: P0Runtime
 var _presence: HTTPRequest
 var _online := {}   # outpost id → players online across its rooms
+var _marks_sig := ""
 
 func _initial_region_id() -> String:
 	return P0_REGION
@@ -75,9 +77,114 @@ func _install_city_map() -> void:
 		_set_outpost_places()
 		city_map.place_requested.connect(_on_place_requested)
 		_start_presence()
-		# A pond's bank is generated off the main thread while its info card is read, so Enter is quick.
+		# A pond's bank is generated off the main thread while its card is read, so Go is quick.
 		city_map.entry_selected.connect(func(e: Dictionary): if str(e.get("kind", "")) == "pond": _prewarm_pond(str(e.id)))
+		city_map.entry_selected.connect(_on_entry_selected)
+		city_map.pin_tag = _pin_tag
 		get_tree().create_timer(2.0).timeout.connect(_prewarm_pond.bind(NEAREST_POND))
+
+# ---------------------------------------------------------------- pond card (TUT-3-04, q(48))
+## Where Distance is measured from: the place the player last was (the place chip), home by default.
+func _origin() -> Vector2:
+	var here: Dictionary = rt.here if rt else {}
+	match str(here.get("space", "home")):
+		"outpost":
+			var o := P0Outposts.find(str(here.get("place", "")))
+			if not o.is_empty(): return Vector2(float(o.lat), float(o.lng))
+		"pond":
+			var p := SystemPonds.location(str(here.get("place", "")))
+			if not p.is_empty(): return Vector2(float(p.lat), float(p.lng))
+	return Vector2(home_lat, home_lng)
+
+func _pond_info(entry: Dictionary) -> Dictionary:
+	if rt == null: return {}
+	var km := P0PlaceSheet.km_between(_origin(), Vector2(float(entry.lat), float(entry.lng)))
+	return PondCard.info(rt.session.current(), str(entry.id), km)
+
+## "Reed Pond · Beginner pond · 0.8 km" (q(48)); outposts keep their "· N online" tag.
+func _pin_tag(entry: Dictionary) -> String:
+	if str(entry.get("kind", "")) != "pond": return ""
+	return str(_pond_info(entry).get("tag", ""))
+
+func _on_entry_selected(entry: Dictionary) -> void:
+	if str(entry.get("kind", "")) != "pond" or rt == null: return
+	var info := _pond_info(entry)
+	if info.is_empty(): return   # a pond P0 does not know keeps the city view's own card
+	city_map.info.hide()
+	_open_pond_card(entry, info)
+
+## The pond card (P0PlaceSheet, Figma TUT-3-04 482:193): header (name / Beginner or template), the beginner line,
+## Distance and Recommended, Details › (the pond's fish list), Go. At the pond the player is at (q(80)): no Distance,
+## and Back to <pond> re-enters it through the loading cover. Tapping outside closes it and clears the selection.
+func _open_pond_card(entry: Dictionary, info: Dictionary) -> void:
+	var id := str(entry.id)
+	var to_fish := [false]
+	var spec := P0PlaceSheet.for_here(info, is_here("pond", id))
+	P0PlaceSheet.open(rt.ui, spec,
+		func():
+			rt.ui.close_modal()
+			_on_city_pond_requested(entry),
+		func():
+			to_fish[0] = true
+			_open_pond_fish(entry),
+		func():
+			if not to_fish[0] and city_map and str(city_map.selected.get("id", "")) == id: city_map.clear_selection(),
+		"pond_card")
+
+## Whether the player is at this place now (the place chip's place, P0Runtime.here): q(80)'s Back to <name>.
+func is_here(space: String, place: String) -> bool:
+	return rt != null and str(rt.here.get("space", "")) == space and str(rt.here.get("place", "")) == place
+
+## Details ›: the pond's fish list (q(48) c): caught fish in colour with their name, the rest as a silhouette with
+## the Fishing level they need. ×, Back and a tap outside all go back to the pond card (P0Ui.back_modal, the layered
+## way back of 亚瑟 on #37; 哪吒 on #95); from the card they close it.
+func _open_pond_fish(entry: Dictionary) -> void:
+	var ui := rt.ui
+	var info := _pond_info(entry)
+	var holder := Control.new()
+	holder.theme = UiKit.theme()
+	holder.set_anchors_preset(Control.PRESET_FULL_RECT)
+	holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var panel := PanelContainer.new()
+	panel.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+	panel.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	panel.mouse_filter = Control.MOUSE_FILTER_STOP
+	var sheet := UiStyleBox.make(UiTokens.COLOR_SURFACE, UiTokens.RADIUS_SHEET, UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT)
+	panel.add_theme_stylebox_override(&"panel", sheet.with_margins(16, 18, 16, 20 + ui.safe_bottom()))
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override(&"separation", 12)
+	panel.add_child(col)
+	col.add_child(UiObjectHeader.new({"title": str(info.get("title", "")), "state": "%s fish" % ("Pond" if str(info.get("subtitle", "")) == "Beginner" else str(info.get("subtitle", "")))}))
+	for f in PondCard.fish_rows(ui.view, str(entry.id)):
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override(&"separation", 12)
+		var icon := UiKit.icon(P0Logic.icon(str(f.id)), 32)
+		icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		if not f.caught: icon.modulate = Color(0.13, 0.15, 0.14)   # silhouette
+		row.add_child(icon)
+		var text := VBoxContainer.new()
+		text.add_theme_constant_override(&"separation", 2)
+		text.add_child(UiKit.label(str(f.name), UiTokens.STYLE_C14_XB))
+		if not f.caught: text.add_child(UiKit.label("Fishing Lv%d" % int(f.level), UiTokens.STYLE_C12_XB, UiTokens.COLOR_SECONDARY))
+		row.add_child(text)
+		col.add_child(row)
+	holder.add_child(panel)
+	var back := [false]   # lambdas capture locals by value: share the flag through an array
+	var close := UiCloseButton.new()
+	close.pressed.connect(func():
+		back[0] = true
+		_open_pond_card(entry, info))
+	holder.add_child(close)
+	panel.resized.connect(func():
+		close.position = Vector2(panel.size.x - 16 - UiTokens.SIZE_CLOSE, panel.position.y - 6 - UiTokens.SIZE_CLOSE))
+	var id := str(entry.id)
+	holder.tree_exiting.connect(func():
+		if not back[0] and city_map and str(city_map.selected.get("id", "")) == id: city_map.clear_selection())
+	ui._open_modal(holder, 0.0, false)
+	ui.modal_kind = "pond_fish"
+	ui._modal_back = func():   # set after _open_modal, which clears it
+		back[0] = true
+		_open_pond_card(entry, info)
 
 func _prewarm_pond(id: String) -> void:
 	var pond := SystemPonds.location(id)
@@ -317,21 +424,76 @@ func place_for(target: String) -> Dictionary:
 
 func p0_surface() -> String: return "map"
 
+## Map marks (plan §9.5.2, q(48)): ✓ deliverable, ! request, ◆ new, in priority order. One list badges the pins
+## (CityMapView.set_marks: the first five on screen) and packs them first with whole labels (#83's _marker_of, through
+## city_pin_markers), so a badge and its pin never disagree (亚瑟 on 234).
+func p0_frame(view: Dictionary, _dt: float) -> void:
+	if city_map == null: return
+	var list := pin_marks(view)
+	var sig := JSON.stringify(list)
+	var home := home_mark(view)
+	sig += home
+	if sig == _marks_sig: return
+	_marks_sig = sig
+	city_map.set_marks(list)
+	if farm_markers: farm_markers.set_mark("self", CityMapView.status_badge(home) if home != "" else null)
+
+const MARK_STATES := {"deliver": "deliverable", "request": "request", "new": "new"}
+
+## The pins' marks [{id, state}]: the server's view.map_markers whenever it sends them (蒙恬, SGODOT-232 U6), else
+## the ones the client knows before then (tutorial_marks).
+static func pin_marks(view: Dictionary) -> Array:
+	return marks_from(view) if view.has("map_markers") else tutorial_marks(view)
+
+## [{id, state}] from view.map_markers: place ids are the pins' ids (catalog pond ids, outpost ids); "home" is the
+## homestead's farm pin, which FarmMarkers draws (home_mark).
+static func marks_from(view: Dictionary) -> Array:
+	var out: Array = []
+	for m in view.get("map_markers", []):
+		if not (m is Dictionary): continue
+		var state := str(MARK_STATES.get(str(m.get("kind", "")), ""))
+		var place := str(m.get("place", ""))
+		if state != "" and place != "" and place != "home": out.append({"id": place, "state": state})
+	return out
+
 ## Map markers the client knows before the server's map_markers come (蒙恬 on #83, q(48)): while the tutorial Pond
 ## Catch is on the stall's board and still short of its fish, the beginner pond Today points at wears the Request ! —
 ## so the first session's map shows it at the city level beside the Tackle Shop, 200 m away (CityMapView packs marker
 ## pins first). Read off the board like the guide (P0Guide.tutorial), not req_done: that keeps only the last 20.
+static func tutorial_marks(view: Dictionary) -> Array:
+	var t := P0Guide.tutorial(view)
+	if t.is_empty() or int(t.get("have", 0)) >= int(t.get("qty", 1)): return []   # handed in, or off to the stall
+	return [{"id": NEAREST_POND, "state": "request"}]
+
+## CityMapView asks once per update (#83): the same marks by pin id, the first (highest) mark per pin.
 func city_pin_markers() -> Dictionary:
 	var v: Dictionary = rt.session.current() if rt != null and rt.session != null else {}
-	var t := P0Guide.tutorial(v)
-	if t.is_empty() or int(t.get("have", 0)) >= int(t.get("qty", 1)): return {}   # handed in, or off to the stall
-	return {NEAREST_POND: "request"}
+	var out := {}
+	for m in pin_marks(v):
+		if not out.has(str(m.id)): out[str(m.id)] = str(m.state)
+	return out
+
+## The homestead's mark ("deliverable" when a Stall Board request can be handed in; 蒙恬's server only sends
+## deliver for home), drawn on the farm pin by FarmMarkers; "" for none.
+static func home_mark(view: Dictionary) -> String:
+	for m in view.get("map_markers", []):
+		if m is Dictionary and str(m.get("place", "")) == "home": return str(MARK_STATES.get(str(m.get("kind", "")), ""))
+	return ""
+
+## Today's "Show on map" (SGODOT-232 U6): a short pulse on that place's pin.
+func pulse_place(place: String) -> void:
+	if city_map: city_map.pulse_pin(place)
 
 # ---------------------------------------------------------------- dev steps for P0_SHOT
 func p0_dev(step: PackedStringArray) -> bool:
 	match step[0]:
 		"farm": _open_my_farm()
 		"pond": _on_city_pond_requested({"id": step[1]})
+		"pondcard", "pondfish":   # the pond card as after tapping the pin; pondfish then opens Details ›
+			var e := SystemPonds.location(step[1]).duplicate(true)
+			e["kind"] = "pond"
+			if city_map: city_map.select(e)
+			if step[0] == "pondfish": _open_pond_fish(e)
 		"shop":
 			if city_map: city_map.select(P0Outposts.place_entry(P0Outposts.by_role(step[1] if step.size() > 1 else "tackle")))
 		"listpick":   # as a tap on the place list: select the outpost and fly the camera to it

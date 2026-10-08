@@ -68,6 +68,13 @@ var selected: Dictionary = {}
 var entries: Array = []
 var live_pois: Array = []
 var markers: Dictionary = {}
+## Map marks on pins (plan §9.5.2; SGODOT-227, data from SGODOT-232 U6): [{id, state}] in priority order, state a
+## UiStatusBadge key ("deliverable", "request", "new" …). Only the first MARK_LIMIT whose pins are on screen show.
+const MARK_LIMIT := 5
+const MARK_BADGE := "res://scenes/ui_kit/ui_status_badge.gd"   # UiStatusBadge (SGODOT-221); none in older builds
+var marks: Array = []
+## state key → Control for one mark; tests swap it. Default: a UiStatusBadge when the build has one.
+var mark_factory := Callable()
 var displayed: Array = []
 ## The outpost and marked-pin labels shown this update (local rects): the player's own My Farm label gives way to them.
 var _place_labels: Array = []
@@ -517,9 +524,15 @@ func _name(entry: Dictionary) -> String:
 	if entry.get("kind") == "pond": return L10n.text(str(entry.name))
 	return str(entry.get("zh", entry.name)) if TranslationServer.get_locale().begins_with("zh") else str(entry.name)
 
+## (entry) -> String: a host's tag after a pin's name ("" = none), e.g. P0's "Pond · 1.6 km"; wins over entry.tag.
+var pin_tag := Callable()
+
 func _label_text(entry: Dictionary) -> String:
 	if entry.kind == "resident" and str(entry.get("status", "")) == "Ready to deliver":
 		return _name(entry) + " · " + L10n.text("Ready to deliver")
+	if pin_tag.is_valid():
+		var t := str(pin_tag.call(entry))
+		if t != "": return _name(entry) + " · " + t
 	if not str(entry.get("tag", "")).is_empty(): return _name(entry) + " · " + str(entry.tag)
 	return _name(entry)
 
@@ -697,6 +710,68 @@ func preload_ponds(locations: Array) -> void:
 		(_pond_cells[key].entries as Array).append(entry.duplicate(true))
 	_pond_view = ""
 	_refresh_pond_directory()
+
+func set_marks(list: Array) -> void:
+	marks = list
+	_apply_marks(markers.keys().filter(func(id): return bool(markers[id].get("on", false))))
+
+## The marks that show: the first `limit` in priority order whose pins are on screen (§9.5.2: at most 5).
+static func pick_marks(list: Array, shown: Array, limit := MARK_LIMIT) -> Dictionary:
+	var out := {}
+	for m in list:
+		if out.size() >= limit: break
+		var id := str(m.get("id", ""))
+		if shown.has(id) and not out.has(id): out[id] = str(m.get("state", ""))
+	return out
+
+func _apply_marks(shown: Array) -> void:
+	var on := pick_marks(marks, shown)
+	for id in markers:
+		var marker: Dictionary = markers[id]
+		var want := str(on.get(id, ""))
+		var badge = marker.get("mark")
+		if want == "":
+			if badge is Control: (badge as Control).visible = false
+			continue
+		if not (badge is Control) or str(marker.get("mark_state", "")) != want:
+			if badge is Control: (badge as Control).queue_free()
+			badge = _make_mark(want)
+			marker.mark = badge
+			marker.mark_state = want
+			if badge == null: continue
+			(badge as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE   # the pin takes the tap (LOCK-11)
+			marker.node.add_child(badge)
+		# Top-left of the pin art, overlapping its corner (MAP-1 482:95).
+		(badge as Control).position = Vector2(-float(marker.get("art_w", 48.0)) * 0.5 - 8.0, -float(marker.get("art_h", 56.0)) - 6.0)
+		(badge as Control).visible = true
+
+func _make_mark(state: String) -> Control:
+	if mark_factory.is_valid(): return mark_factory.call(state)
+	return status_badge(state)
+
+## A UiStatusBadge (SGODOT-221) in this state, or null when the build has no such component or state.
+static func status_badge(state: String) -> Control:
+	if not ResourceLoader.exists(MARK_BADGE): return null
+	var script := load(MARK_BADGE) as Script
+	var states: Dictionary = script.get_script_constant_map().get("State", {})
+	if not states.has(state.to_upper()): return null
+	var badge: Control = script.new()
+	badge.set("state", int(states[state.to_upper()]))
+	return badge
+
+## A short attention pulse on one pin (Today's "Show on map", SGODOT-232 U6); no camera move, no selection.
+func pulse_pin(id: String, seconds := 0.6) -> void:
+	if not markers.has(id) or str(selected.get("id", "")) == id: return
+	var marker: Dictionary = markers[id]
+	if marker.get("focus_tween") is Tween: (marker.focus_tween as Tween).kill()
+	var tween := create_tween()
+	marker.focus_tween = tween
+	tween.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	var step := func(v: float):
+		marker.focus = v
+		_apply_marker_scale(marker)
+	tween.tween_method(step, 1.0, 1.18, seconds * 0.5)
+	tween.tween_method(step, 1.18, 1.0, seconds * 0.5)
 
 func set_places(places: Array) -> void:
 	extra_places = places.duplicate(true)
@@ -927,6 +1002,7 @@ func _update_markers() -> void:
 	for id in markers.keys():
 		_set_marker_shown(markers[id], shown.has(id))
 		if not keep.has(id): _free_marker(id)
+	_apply_marks(shown)
 	if _hidden_until.size() > 256:
 		for id in _hidden_until.keys():
 			if now >= int(_hidden_until[id]): _hidden_until.erase(id)
@@ -987,6 +1063,8 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int)
 	marker.node.position = c.point
 	marker.rect = c.bounds
 	marker.anchor = c.point
+	marker.art_w = float(c.art_w)
+	marker.art_h = float(c.art_h)
 	if entry.kind == "resident":
 		marker.portrait.position = Vector2(-18, -38)
 	else:
