@@ -1,0 +1,681 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    668
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiMomentBanner"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        36
+      ],
+      "variation": "CaptionR12",
+      "text": "MomentBanner 1226:104630 · §4.8.3 / §4.8.6 (SGODOT-233)"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        70,
+        328,
+        598
+      ],
+      "children": [
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            70,
+            328,
+            295
+          ],
+          "children": [
+            {
+              "type": "UiMomentBanner",
+              "rect": [
+                0,
+                70,
+                328,
+                275
+              ],
+              "children": [
+                {
+                  "type": "VBoxContainer",
+                  "rect": [
+                    0,
+                    70,
+                    328,
+                    261
+                  ],
+                  "children": [
+                    {
+                      "type": "ColorRect",
+                      "rect": [
+                        0,
+                        70,
+                        328,
+                        6
+                      ]
+                    },
+                    {
+                      "type": "MarginContainer",
+                      "rect": [
+                        0,
+                        86,
+                        328,
+                        56
+                      ],
+                      "children": [
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            16,
+                            90,
+                            296,
+                            52
+                          ],
+                          "children": [
+                            {
+                              "type": "PanelContainer",
+                              "rect": [
+                                16,
+                                92,
+                                48,
+                                48
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    16,
+                                    100,
+                                    48,
+                                    31
+                                  ],
+                                  "variation": "TitleXB20",
+                                  "text": "2"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "VBoxContainer",
+                              "rect": [
+                                76,
+                                90,
+                                236,
+                                52
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    76,
+                                    90,
+                                    236,
+                                    31
+                                  ],
+                                  "variation": "TitleXB20",
+                                  "text": "Fishing Lv 2"
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    76,
+                                    123,
+                                    236,
+                                    19
+                                  ],
+                                  "variation": "C13B",
+                                  "text": "Fine fish now stay on the hook"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "MarginContainer",
+                      "rect": [
+                        0,
+                        152,
+                        328,
+                        64
+                      ],
+                      "children": [
+                        {
+                          "type": "HFlowContainer",
+                          "rect": [
+                            16,
+                            152,
+                            296,
+                            64
+                          ],
+                          "children": [
+                            {
+                              "type": "PanelContainer",
+                              "rect": [
+                                49,
+                                152,
+                                97,
+                                28
+                              ],
+                              "children": [
+                                {
+                                  "type": "HBoxContainer",
+                                  "rect": [
+                                    57,
+                                    155,
+                                    81,
+                                    22
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        57,
+                                        155,
+                                        81,
+                                        22
+                                      ],
+                                      "variation": "RowTitleXB15",
+                                      "text": "+50 Energy"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "PanelContainer",
+                              "rect": [
+                                154,
+                                152,
+                                125,
+                                28
+                              ],
+                              "children": [
+                                {
+                                  "type": "HBoxContainer",
+                                  "rect": [
+                                    162,
+                                    155,
+                                    109,
+                                    22
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "TextureRect",
+                                      "rect": [
+                                        162,
+                                        159,
+                                        14,
+                                        14
+                                      ]
+                                    },
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        180,
+                                        155,
+                                        91,
+                                        22
+                                      ],
+                                      "variation": "RowTitleXB15",
+                                      "text": "3 Worm Bait"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "PanelContainer",
+                              "rect": [
+                                102,
+                                188,
+                                123,
+                                28
+                              ],
+                              "children": [
+                                {
+                                  "type": "HBoxContainer",
+                                  "rect": [
+                                    110,
+                                    191,
+                                    107,
+                                    22
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "TextureRect",
+                                      "rect": [
+                                        110,
+                                        195,
+                                        14,
+                                        14
+                                      ]
+                                    },
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        128,
+                                        191,
+                                        89,
+                                        22
+                                      ],
+                                      "variation": "RowTitleXB15",
+                                      "text": "3 Wild Herb"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Label",
+                      "rect": [
+                        0,
+                        226,
+                        328,
+                        19
+                      ],
+                      "variation": "C13B",
+                      "text": "Recipe: Herb Grilled Fish"
+                    },
+                    {
+                      "type": "Label",
+                      "rect": [
+                        0,
+                        255,
+                        328,
+                        18
+                      ],
+                      "variation": "C12B",
+                      "text": "Levels unlock gear, fish and seeds. Basics never lock."
+                    },
+                    {
+                      "type": "MarginContainer",
+                      "rect": [
+                        0,
+                        283,
+                        328,
+                        48
+                      ],
+                      "children": [
+                        {
+                          "type": "UiCommandButton",
+                          "rect": [
+                            16,
+                            283,
+                            296,
+                            48
+                          ],
+                          "variation": "CmdPrimary",
+                          "text": "Use bait"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                351,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "LevelUp · the account's first (≤ 3 s)"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            377,
+            328,
+            173
+          ],
+          "children": [
+            {
+              "type": "UiMomentBanner",
+              "rect": [
+                0,
+                377,
+                328,
+                153
+              ],
+              "children": [
+                {
+                  "type": "VBoxContainer",
+                  "rect": [
+                    0,
+                    377,
+                    328,
+                    139
+                  ],
+                  "children": [
+                    {
+                      "type": "ColorRect",
+                      "rect": [
+                        0,
+                        377,
+                        328,
+                        6
+                      ]
+                    },
+                    {
+                      "type": "MarginContainer",
+                      "rect": [
+                        0,
+                        393,
+                        328,
+                        56
+                      ],
+                      "children": [
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            16,
+                            397,
+                            296,
+                            52
+                          ],
+                          "children": [
+                            {
+                              "type": "PanelContainer",
+                              "rect": [
+                                16,
+                                399,
+                                48,
+                                48
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    16,
+                                    407,
+                                    48,
+                                    31
+                                  ],
+                                  "variation": "TitleXB20",
+                                  "text": "3"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "VBoxContainer",
+                              "rect": [
+                                76,
+                                397,
+                                236,
+                                52
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    76,
+                                    397,
+                                    236,
+                                    31
+                                  ],
+                                  "variation": "TitleXB20",
+                                  "text": "Farming Lv 3"
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    76,
+                                    430,
+                                    236,
+                                    19
+                                  ],
+                                  "variation": "C13B",
+                                  "text": "Potato, Chamomile, Compost"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "MarginContainer",
+                      "rect": [
+                        0,
+                        459,
+                        328,
+                        28
+                      ],
+                      "children": [
+                        {
+                          "type": "HFlowContainer",
+                          "rect": [
+                            16,
+                            459,
+                            296,
+                            28
+                          ],
+                          "children": [
+                            {
+                              "type": "PanelContainer",
+                              "rect": [
+                                115,
+                                459,
+                                97,
+                                28
+                              ],
+                              "children": [
+                                {
+                                  "type": "HBoxContainer",
+                                  "rect": [
+                                    123,
+                                    462,
+                                    81,
+                                    22
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        123,
+                                        462,
+                                        81,
+                                        22
+                                      ],
+                                      "variation": "RowTitleXB15",
+                                      "text": "+30 Energy"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Label",
+                      "rect": [
+                        0,
+                        497,
+                        328,
+                        19
+                      ],
+                      "variation": "C13B",
+                      "text": "Next Lv4 · Tomato, Chili, Row Hoe · 150 XP"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                536,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "LevelUp · a later level (1.5 s)"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            562,
+            328,
+            106
+          ],
+          "children": [
+            {
+              "type": "UiMomentBanner",
+              "rect": [
+                0,
+                562,
+                328,
+                86
+              ],
+              "children": [
+                {
+                  "type": "VBoxContainer",
+                  "rect": [
+                    0,
+                    562,
+                    328,
+                    72
+                  ],
+                  "children": [
+                    {
+                      "type": "ColorRect",
+                      "rect": [
+                        0,
+                        562,
+                        328,
+                        6
+                      ]
+                    },
+                    {
+                      "type": "MarginContainer",
+                      "rect": [
+                        0,
+                        578,
+                        328,
+                        56
+                      ],
+                      "children": [
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            16,
+                            582,
+                            296,
+                            52
+                          ],
+                          "children": [
+                            {
+                              "type": "PanelContainer",
+                              "rect": [
+                                16,
+                                584,
+                                48,
+                                48
+                              ],
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    27,
+                                    595,
+                                    26,
+                                    26
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "VBoxContainer",
+                              "rect": [
+                                76,
+                                582,
+                                236,
+                                52
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    76,
+                                    582,
+                                    236,
+                                    31
+                                  ],
+                                  "variation": "TitleXB20",
+                                  "text": "Gather Gloves"
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    76,
+                                    615,
+                                    236,
+                                    19
+                                  ],
+                                  "variation": "C13B",
+                                  "text": "+1 at every gathering spot"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                654,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "Complete"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

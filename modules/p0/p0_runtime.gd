@@ -268,6 +268,8 @@ func _on_state(v: Dictionary, events: Array) -> void:
 					last_catch_extras["city_xp"] = int(ev.xp)
 	last_xp_lines = xp_lines
 	var parcels_said := false
+	var first_level := not before.is_empty() and ["farming", "fishing", "cooking"].all(func(k):
+		return int(before.get("skills", {}).get(k, {}).get("level", 1)) <= 1)
 	for ev in events:
 		match str(ev.get("kind", "")):
 			"energy":
@@ -320,7 +322,10 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				var lv: Dictionary = ev
 				# Deferred, so a result card the same reply opens (the kitchen's COOK-4, itself deferred until the
 				# whole reply is in) comes first and the level-up queues behind it (C16; PR #54 review).
-				ui.queue_card.call_deferred(func(): ui.show_level_up(lv))
+				# The account's first level-up (no track above Lv1 before this reply) gets the teaching banner (§4.8.3).
+				var first := first_level
+				first_level = false
+				ui.queue_card.call_deferred(func(): ui.show_level_up(lv, first))
 				session.report({"kind": "level_banner", "skill": str(lv.skill), "level": int(lv.level)})
 			"affinity":   # SGODOT-225 / 228: first chat of the day, gifts, requests
 				var reply := P0Logic.resident_reply(str(ev.get("resident", "")), str(ev.get("verdict", "")))
@@ -338,7 +343,8 @@ func _on_state(v: Dictionary, events: Array) -> void:
 			"homestead":
 				# HOME-2 (SGODOT-228): HOME-1 closes, the MomentBanner says what changed; the farm swaps the fence.
 				if ui.modal_kind == "homestead": ui.close_modal()
-				HomePanel.moment(ui, P0Logic.home_moment(v, ev))
+				var home := P0Logic.home_moment(v, ev)
+				ui.queue_card(func(): HomePanel.moment(ui, home))   # one moment at a time (q(49) ④)
 	ui.queue_floats(floats, at)   # with the world's own lines of this reply, at the end of the frame
 	if ui.modal_kind == "counter" and events.size() > 0:
 		ui.set_view(session.current())   # the counter drawer follows the view; floats say what changed

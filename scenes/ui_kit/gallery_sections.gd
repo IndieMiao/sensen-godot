@@ -30,6 +30,7 @@ static func all() -> Array[Dictionary]:
 		# SGODOT-226 cooking results (shared with the catch card, SGODOT-233)
 		{id = "quality_badge", title = "UiQualityBadge", figma = "QualityBadge 1178:82154", build = _quality_badges},
 		{id = "reward_moment", title = "UiRewardMoment", figma = "RewardMoment 1179:82271 · COOK-4 / COOK-6 / COOK-P0-9", build = _reward_moments},
+		{id = "moment_banner", title = "UiMomentBanner", figma = "MomentBanner 1226:104630 · §4.8.3 / §4.8.6 (SGODOT-233)", build = _moment_banners},
 		# SGODOT-221 world controls · interaction
 		{id = "quick_bar", title = "UiQuickBar (drawn at 328 of 336)", figma = "Compact/QuickSlot 633:41279 · QuickEnd/Bag 907:72112 · BAR-1 / BAR-1-2 · LOCK-04 / 05", build = _quick_bars},
 		{id = "pin_menu", title = "UiPinMenu", figma = "PinMenu 1141:80291 · LOCK-05", build = _pin_menus},
@@ -1182,6 +1183,34 @@ static func _reward_moment(fields: Dictionary) -> UiRewardMoment:
 	var r := UiRewardMoment.new()
 	r.show_fields(fields)
 	return r
+
+## MomentBanner (1226:104630, SGODOT-233): the account's first level-up (rewards, recipe, tip, Use bait), a later level
+## (unlocks and what is next) and Kind=Complete (a crafted tool).
+static func _moment_banners() -> Control:
+	var v := _column()
+	var first := UiMomentBanner.new()
+	first.level = "2"
+	first.title = "Fishing Lv 2"
+	first.subtitle = "Fine fish now stay on the hook"
+	first.rewards = [UiFloatText.pill("+50 Energy", UiFloatText.Tone.ENERGY_GAIN), UiFloatText.pill("3 Worm Bait", UiFloatText.Tone.ITEM, _tex("bait_worm")),
+		UiFloatText.pill("3 Wild Herb", UiFloatText.Tone.ITEM, _tex("crop_herb"))]
+	first.detail = "Recipe: Herb Grilled Fish"
+	first.tip = "Levels unlock gear, fish and seeds. Basics never lock."
+	first.action = "Use bait"
+	v.add_child(_captioned(first, "LevelUp · the account's first (≤ 3 s)"))
+	var later := UiMomentBanner.new()
+	later.level = "3"
+	later.title = "Farming Lv 3"
+	later.subtitle = "Potato, Chamomile, Compost"
+	later.rewards = [UiFloatText.pill("+30 Energy", UiFloatText.Tone.ENERGY_GAIN)]
+	later.detail = "Next Lv4 · Tomato, Chili, Row Hoe · 150 XP"
+	v.add_child(_captioned(later, "LevelUp · a later level (1.5 s)"))
+	var done := UiMomentBanner.new()
+	done.kind = UiMomentBanner.Kind.COMPLETE
+	done.title = "Gather Gloves"
+	done.subtitle = "+1 at every gathering spot"
+	v.add_child(_captioned(done, "Complete"))
+	return v
 
 static func _reward_moments() -> Control:
 	var row := _row(UiTokens.SPACE_SECTION)

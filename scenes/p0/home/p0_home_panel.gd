@@ -134,75 +134,11 @@ static func plaque(ui: P0Ui) -> void:
 	ui._open_modal(holder, 0.0, false)
 	ui.modal_kind = "plaque"
 
-## HOME-2: the MomentBanner (Kind=LevelUp: gold accent and level disc) under the HUD for MOMENT_S, gone on a
-## tap; never covers the main key or quick bar.
+## HOME-2: the kit MomentBanner (Kind=LevelUp: gold accent and level disc) under the HUD for MOMENT_S (later levels
+## MOMENT_LATER_S), gone on a tap; one moment at a time with the others (q(49) ④, SGODOT-233). Never covers the main
+## key or quick bar.
 static func moment(ui: P0Ui, m: Dictionary) -> Control:
-	var card := PanelContainer.new()
-	card.name = "HomesteadMoment"
-	card.theme = UiKit.theme()
-	card.set_anchors_preset(Control.PRESET_TOP_WIDE)
-	card.offset_left = 16
-	card.offset_right = -16
-	card.offset_top = MOMENT_TOP
-	card.mouse_filter = Control.MOUSE_FILTER_STOP
-	var box := UiStyleBox.make(UiTokens.COLOR_SURFACE, 20, UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT)
-	box.shadow_color = Color("2E3B3333")   # 0 10 28 rgba(46,59,51,0.2)
-	box.shadow_size = 14
-	box.shadow_offset = Vector2(0, 10)
-	card.add_theme_stylebox_override(&"panel", box.with_margins(0, 0, 0, 14))
-	var col := VBoxContainer.new()
-	col.add_theme_constant_override(&"separation", 10)
-	card.add_child(col)
-	card.clip_children = CanvasItem.CLIP_CHILDREN_AND_DRAW   # the accent follows the card's rounded top
-	var accent := ColorRect.new()
-	accent.custom_minimum_size = Vector2(0, 6)
-	accent.color = UiTokens.COLOR_QUALITY_GOLD
-	col.add_child(accent)
-	var pad := MarginContainer.new()
-	pad.add_theme_constant_override(&"margin_left", 16)
-	pad.add_theme_constant_override(&"margin_right", 16)
-	pad.add_theme_constant_override(&"margin_top", 4)
-	col.add_child(pad)
-	var head := HBoxContainer.new()
-	head.add_theme_constant_override(&"separation", 12)
-	pad.add_child(head)
-	var disc := PanelContainer.new()
-	disc.custom_minimum_size = Vector2(48, 48)
-	disc.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	disc.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_QUALITY_GOLD, 24))
-	var num := _big(str(m.level))
-	num.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	num.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	disc.add_child(num)
-	head.add_child(disc)
-	var titles := VBoxContainer.new()
-	titles.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	titles.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	titles.add_theme_constant_override(&"separation", 2)
-	titles.add_child(_big(str(m.title)))
-	titles.add_child(UiKit.label(str(m.subtitle), UiTokens.STYLE_C13_B, UiTokens.COLOR_SECONDARY))
-	head.add_child(titles)
-	if str(m.detail) != "":
-		var detail := UiKit.label(str(m.detail), UiTokens.STYLE_C13_B)
-		detail.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		detail.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		col.add_child(detail)
-	_pass_taps(col)
-	card.gui_input.connect(func(e: InputEvent):
-		if P0Ui.is_tap(e) and is_instance_valid(card): card.queue_free())
-	ui.root.add_child(card)
-	var seconds := MOMENT_S if int(str(m.level)) <= 2 else MOMENT_LATER_S
-	ui.root.get_tree().create_timer(seconds).timeout.connect(func():
-		if is_instance_valid(card): card.queue_free())
-	return card
-
-## 22 ExtraBold (MomentBanner disc number and title): the Title XB20 style one step up.
-static func _big(text: String) -> Label:
-	var l := UiKit.label(text, UiTokens.STYLE_TITLE_XB20)
-	l.add_theme_font_size_override(&"font_size", 22)
-	return l
-
-## Children ignore the mouse so a tap anywhere on the banner reaches the card and skips it.
-static func _pass_taps(n: Node) -> void:
-	if n is Control: (n as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
-	for c in n.get_children(): _pass_taps(c)
+	var spec := m.duplicate()
+	spec["kind"] = "level_up"
+	spec["seconds"] = MOMENT_S if int(str(m.get("level", 2))) <= 2 else MOMENT_LATER_S
+	return ui.show_banner(spec)

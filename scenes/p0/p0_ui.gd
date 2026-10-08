@@ -1733,27 +1733,20 @@ func _kit_card() -> VBoxContainer:
 	_open_modal(center, UiTokens.OPACITY_SCRIM_MODAL)
 	return v
 
-func show_level_up(ev: Dictionary) -> void:
-	var card := _center_card(310)
-	card.add_child(_label("LEVEL UP", 10, GREEN_D, true))
-	var t := _label("%s Lv %d" % [str(ev.skill).capitalize(), int(ev.level)], 26, GREEN_D, true)
-	card.add_child(t)
-	if int(ev.get("energy", 0)) > 0: card.add_child(_label("+%d Energy" % int(ev.energy), 14, GREEN_D, true))
-	var unlock := P0Logic.unlock_line(view, str(ev.skill), int(ev.level))
-	if unlock != "":
-		var ul := _label(unlock, 10, INK, true)
-		ul.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		ul.custom_minimum_size = Vector2(280, 0)
-		card.add_child(ul)
-	for g in ev.get("gifts", []):
-		var gid := str(g[0])
-		if gid.begins_with("recipe:"):
-			card.add_child(_label("Recipe card: %s" % P0Logic.item_name(view, gid.substr(7)), 10, INK, true))
-		else:
-			card.add_child(_label("Level-up gift: %d %s" % [int(g[1]), P0Logic.item_name(view, gid)], 10, INK, true))
-	var ok := _pill_button("Got it", true)
-	ok.pressed.connect(close_modal)
-	card.add_child(ok)
+## A skill level-up (§4.8.3 / §4.8.6): the MomentBanner P0Logic.level_banner builds — the account's first one with the
+## teaching line and `Use bait` (≤ 3 s), later ones 1.5 s with what opened and what is next. `first`: no skill had
+## levelled before this one.
+func show_level_up(ev: Dictionary, first := false) -> void:
+	var spec := P0Logic.level_banner(view, ev, first)
+	show_banner(spec, func(): _banner_action(str(spec.get("action_id", ""))))
+
+func _banner_action(id: String) -> void:
+	match id:
+		"use_bait":   # puts the gift bait on the hook, in place (the quick bar's bait slot, q(44))
+			for s in _bag_slots():
+				if str(s.get("id", "")).begins_with("bait_"):
+					if bar_mode == "fish" and selected_bait != str(s.id): _on_slot_tapped(str(s.id))
+					break
 
 func _center_card(width: float) -> VBoxContainer:
 	var center := CenterContainer.new()
@@ -2450,25 +2443,47 @@ func _experiment_preview() -> String:
 ## away after MOMENT_AUTO_S or on a tap anywhere and the scene stays bright (③); with buttons it waits for them and
 ## a tap outside is the caller's back. The guide's TipCards wait while a moment is up (⑥, P0Guide.TipQueue).
 const MOMENT_AUTO_S := 1.5
+const _BANNER_UNDER_HUD := 10.0   # MomentBanner y108: 10 under the HUD's two rows (16 + 82)
 const _MOMENT_TOP := 0.54   # under the leaping fish / the plate (where FISH-3 sat)
 var _moment_open := false
 
-func show_moment(card: UiRewardMoment, auto_close := true) -> void:
+func show_moment(card: Control, auto_close := true, seconds := MOMENT_AUTO_S) -> void:
 	card.theme = UiKit.theme()
 	_open_modal(card, 0.0)
 	modal_kind = "card"
 	_moment_open = true
 	if tips: tips.moment_opened()
+	# A RewardMoment sits centred low in the scene; a MomentBanner under the HUD (MomentBanner x16 y108 of 800).
+	var banner := card is UiMomentBanner
 	var place := func():
 		if is_instance_valid(card):
-			card.position = Vector2(roundf((root.size.x - card.size.x) * 0.5), roundf(root.size.y * _MOMENT_TOP))
+			var y := (UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H + _BANNER_UNDER_HUD + safe_top()) if banner else root.size.y * _MOMENT_TOP
+			card.position = Vector2(roundf((root.size.x - card.size.x) * 0.5), roundf(y))
 	card.resized.connect(place)
 	place.call()
 	if not auto_close: return
 	var holder_id := _modal.get_instance_id()
 	card.gui_input.connect(func(e: InputEvent): if P0Ui.is_tap(e): close_modal())
-	get_tree().create_timer(MOMENT_AUTO_S).timeout.connect(func():
+	get_tree().create_timer(seconds).timeout.connect(func():
 		if is_instance_valid(_modal) and _modal.get_instance_id() == holder_id: close_modal())
+
+## A MomentBanner (§4.8.3 / §4.8.6): queued like every moment (q(49) ④), gone after `seconds` or on a tap; its action
+## button (Use bait) closes it and does the next step in place.
+func show_banner(spec: Dictionary, on_action := Callable()) -> UiMomentBanner:
+	var b := UiMomentBanner.new()
+	b.kind = UiMomentBanner.Kind.COMPLETE if str(spec.get("kind", "")) == "complete" else UiMomentBanner.Kind.LEVEL_UP
+	b.level = str(spec.get("level", ""))
+	b.title = str(spec.get("title", ""))
+	b.subtitle = str(spec.get("subtitle", ""))
+	b.rewards = (spec.get("rewards", []) as Array).map(func(r): return UiFloatText.pill(str(r.text), int(r.tone), r.get("icon", null)))
+	b.detail = str(spec.get("detail", ""))
+	b.tip = str(spec.get("tip", ""))
+	b.action = str(spec.get("action", ""))
+	b.action_pressed.connect(func():
+		close_modal()
+		if on_action.is_valid(): on_action.call())
+	show_moment(b, true, float(spec.get("seconds", MOMENT_AUTO_S)))
+	return b
 
 ## FISH-3 · the first catch of a species (§4.8.6): `Caught!` / the fish · rarity / `Fish-dex 3/N`; the one-time strip
 ## `First catch! +15 XP` (and `New city! +10 XP`); a first Fine / Rare fish adds its Energy as a pill. No buttons.

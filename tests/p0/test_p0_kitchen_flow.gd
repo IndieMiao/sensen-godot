@@ -103,7 +103,7 @@ func test_a_level_up_in_the_same_reply_waits_behind_the_result_card() -> void:
 	rt.ui.close_modal()   # Keep
 	for i in 2: await get_tree().process_frame
 	assert_bool(rt.ui.has_modal()).is_true()
-	assert_bool(rt.ui.root.find_children("*", "Label", true, false).any(func(l): return (l as Label).text == "LEVEL UP")).is_true()
+	assert_int(rt.ui.root.find_children("*", "UiMomentBanner", true, false).size()).is_equal(1)   # the level-up banner (233)
 	assert_str(k.phase).is_equal("idle")
 
 func test_the_tab_asked_for_is_the_tab_that_opens() -> void:

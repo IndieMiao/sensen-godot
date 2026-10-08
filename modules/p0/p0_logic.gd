@@ -796,6 +796,98 @@ static func unlock_line(view: Dictionary, skill: String, level: int) -> String:
 			if level == 4: return "A 3rd pot slot · three-family dishes"
 	return ""
 
+## Cooking conveniences by key (§7.2.2 / §4.6.3): the names the level banner and SKILL-1 use.
+const CONVENIENCE_NAMES := {"cook_again": "Cook Again", "clue_double": "Double Clue", "hearty_mishap": "Hearty Mishap",
+	"steady_hand_1": "Steady Hand I", "queue_two": "Queue ×2", "quick_fire": "Quick Fire"}
+const LEVEL_TIP := "Levels unlock gear, fish and seeds. Basics never lock."
+
+## The MomentBanner for a skill level-up (§4.8.3 / §4.8.6; ev = the server's {skill, level, energy, gifts}):
+##   the account's first: `Fishing Lv 2` / `Fine fish now stay on the hook` / +50 Energy · 3 Worm Bait · 3 Wild Herb /
+##     `Recipe: Herb Grilled Fish` / the teaching tip / `Use bait` when a bait came — ≤ 3 s
+##   later Farming / Fishing: `Farming Lv 3` / `Potato, Chamomile, Compost` / +30 Energy / `Next Lv4 · Tomato, Chili,
+##     Row Hoe · 150 XP` (only `Next Lv5 · 200 XP` when the next level brings nothing this season) — 1.5 s
+##   Cooking: no Energy; `Cooking Lv 2 · Recipe: Fresh Fish Soup`, `Cooking Lv 4 · 3rd slot` with `Today changes:
+##     3-ingredient dishes` (≤ 3 s), conveniences as the subtitle (`Steady Hand I · Queue ×2`).
+static func level_banner(view: Dictionary, ev: Dictionary, first := false) -> Dictionary:
+	var skill := str(ev.get("skill", "farming"))
+	var lv := int(ev.get("level", 2))
+	var title := "%s Lv %d" % [skill.capitalize(), lv]
+	var recipes: Array = []
+	var rewards: Array = []
+	if int(ev.get("energy", 0)) > 0:
+		rewards.append({text = "+%d Energy" % int(ev.energy), tone = UiFloatText.Tone.ENERGY_GAIN})
+	var bait := ""
+	for g in ev.get("gifts", []):
+		var id := str(g[0])
+		if id.begins_with("recipe:"): recipes.append(item_name(view, id.substr(7)))
+		else:
+			rewards.append({text = "%d %s" % [int(g[1]), item_name(view, id)], tone = UiFloatText.Tone.ITEM, icon = icon(id)})
+			if id.begins_with("bait_") and bait == "": bait = id
+	var unlocks := level_unlocks(view, skill, lv)
+	var subtitle := ", ".join(unlocks)
+	var detail := ""
+	var seconds := 1.5
+	if skill == "fishing": subtitle = fishing_unlock_line(view, lv)
+	if skill == "cooking":
+		if lv == 4:
+			title += " · 3rd slot"
+			subtitle = "Three-ingredient dishes now possible"
+			detail = "Today changes: 3-ingredient dishes"
+			seconds = 3.0   # a level that changes the day (§4.8.3)
+		else: subtitle = " · ".join(unlocks)
+		if not recipes.is_empty(): title += " · Recipe: " + str(recipes[0])
+	if first:
+		seconds = 3.0
+		if detail == "" and not recipes.is_empty() and skill != "cooking": detail = "Recipe: " + ", ".join(recipes)
+	elif detail == "":
+		detail = next_level_line(view, skill, lv)
+	return {kind = "level_up", level = str(lv), title = title, subtitle = subtitle, rewards = rewards, detail = detail,
+		tip = LEVEL_TIP if first else "", action = "Use bait" if first and bait != "" else "",
+		action_id = "use_bait" if first and bait != "" else "", seconds = seconds}
+
+## What a skill level opens this season: Farming — the crops of that gate (main ingredients first), then other stall
+## goods and tools (Compost, Row Hoe); Fishing — the fish of that level; Cooking — the conveniences of that level.
+static func level_unlocks(view: Dictionary, skill: String, level: int) -> Array:
+	var out: Array = []
+	match skill:
+		"farming":
+			out = skill_unlocks(view, "farming", level)
+			for o in view.get("stall", {}).get("buy", []):
+				var id := str(o.get("id", ""))
+				if id.begins_with("seed_") or str(o.get("skill", "farming")) != "farming" or int(o.get("gate", 1)) != level: continue
+				out.append(item_name(view, id))
+			var hoe: Dictionary = content().get("tools", {}).get("row_hoe", {})
+			if int(hoe.get("gate", 0)) == level: out.append(item_name(view, str(hoe.get("id", ""))))
+		"fishing":
+			out = skill_unlocks(view, "fishing", level)
+		"cooking":
+			var conv: Dictionary = content().get("cooking", {}).get("conveniences", {})
+			for k in conv:
+				if int(conv[k]) == level: out.append(str(CONVENIENCE_NAMES.get(k, k)))
+			if level == 4: out.push_front("3rd slot")
+	return out
+
+## `Fine fish now stay on the hook` when a level opens a whole rarity, else the fish by name (`Golden Koi now stays
+## on the hook`); "" when no fish opens at that level.
+static func fishing_unlock_line(view: Dictionary, level: int) -> String:
+	var fish: Array = content().get("fish", []).filter(func(f): return int(f.get("level", 1)) == level)
+	if fish.is_empty(): return ""
+	var rarities := {}
+	for f in fish: rarities[int(f.get("rarity", 1))] = true
+	if fish.size() >= 3 and rarities.size() == 1:
+		return "%s fish now stay on the hook" % rarity_name(view, int(rarities.keys()[0]))
+	var names: Array = fish.map(func(f): return item_name(view, str(f.id)))
+	return "%s now %s on the hook" % [and_list(names), "stays" if names.size() == 1 else "stay"]
+
+## `Next Lv4 · Tomato, Chili, Row Hoe · 150 XP`, or `Next Lv5 · 200 XP` when that level brings nothing this season.
+static func next_level_line(view: Dictionary, skill: String, level: int) -> String:
+	var th: Array = content().get("skills", {}).get(skill, [])
+	if level >= th.size(): return ""
+	var to_go := maxi(0, int(th[level]) - int(view.get("skills", {}).get(skill, {}).get("xp", th[level - 1])))
+	var opens := level_unlocks(view, skill, level + 1)
+	if skill == "fishing": opens = skill_unlocks(view, "fishing", level + 1)
+	return "Next Lv%d%s · %d XP" % [level + 1, (" · " + ", ".join(opens)) if not opens.is_empty() else "", to_go]
+
 ## §3.4.8 one-time rewards, said at the moment that earned them.
 static func reward_line(id: String, energy: int) -> String:
 	var rarity := ["", "Common", "Fine", "Rare", "Legendary"]
