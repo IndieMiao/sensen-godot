@@ -23,6 +23,8 @@ var mark := "": set = set_mark
 var count := "": set = set_count
 ## The name under the disc; the city map folds it when it would overlap another (C30 / q(72)) — the pin stays.
 var name_shown := true: set = set_name_shown
+## The disc's own scale about its geographic point (a Show on map pulse); the name keeps its size.
+var focus := 1.0: set = set_focus
 
 var _pin: Control
 var _disc: Panel
@@ -106,6 +108,11 @@ func set_mark(v: String) -> void:
 		_pin.add_child(_badge)
 	_badge.state = i
 	_badge.visible = true
+
+func set_focus(v: float) -> void:
+	focus = v
+	_pin.pivot_offset = Vector2(DISC * 0.5, DISC)
+	_pin.scale = Vector2.ONE * maxf(0.001, v)
 
 func set_count(v: String) -> void:
 	count = v

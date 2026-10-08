@@ -97,6 +97,8 @@ var host_chrome := false: set = set_host_chrome
 ## Pins the host draws as MapDestination (P0 MAP-1, LOCK-24): (entry) -> {icon: Texture2D, plate: bool}, {} to keep
 ## the art pin. The disc sits over the geographic point, the whole name under it; a map mark goes on the pin itself.
 var destination_style := Callable()
+## func(entry) -> bool: the host shows its own card for this pin (P0PlaceSheet), so selecting it opens no info panel.
+var host_card := Callable()
 
 func _destination(entry: Dictionary) -> Dictionary:
 	return destination_style.call(entry) if destination_style.is_valid() else {}
@@ -584,6 +586,11 @@ func select(entry: Dictionary) -> void:
 	entry_selected.emit(entry)
 	_animate_focus(str(entry.get("id", "")), FOCUS_SCALE, 0.28)
 	_set_marker_front(str(entry.get("id", "")), true)
+	if host_card.is_valid() and bool(host_card.call(entry)):
+		info.hide()
+		_layout()
+		if host: host._reset_gesture()
+		return
 	info_title.text = _name(entry)
 	info_category.text = _category_text(str(entry.get("category", "Place")), _place_city(entry))
 	info_address.text = str(entry.get("address", ""))
@@ -1019,6 +1026,7 @@ func _update_markers() -> void:
 		_set_marker_shown(markers[id], shown.has(id))
 		if not keep.has(id): _free_marker(id)
 	_apply_marks(shown)
+	_raise_selected()
 	if _hidden_until.size() > 256:
 		for id in _hidden_until.keys():
 			if now >= int(_hidden_until[id]): _hidden_until.erase(id)
@@ -1119,6 +1127,12 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int)
 ## the geographic point: the 2D node scales around its origin, the billboard and
 ## shadow scale in world space so camera motion never drags a mid-animation art.
 func _apply_marker_scale(marker: Dictionary) -> void:
+	if marker.has("dest"):
+		# MapDestination keeps its size when selected (Figma 1802:118612); a pulse scales only its disc.
+		marker.node.scale = Vector2.ONE * maxf(0.001, float(marker.get("pop", 1.0)))
+		var selected_here := str(selected.get("id", "")) == str((marker.get("entry", {}) as Dictionary).get("id", ""))
+		(marker.dest as UiMapDestination).focus = 1.0 if selected_here else float(marker.get("focus", 1.0))
+		return
 	var s := maxf(0.001, float(marker.get("pop", 1.0)) * float(marker.get("focus", 1.0)))
 	marker.node.scale = Vector2.ONE * s
 	if marker.has("sprite"):
@@ -1154,6 +1168,16 @@ func _set_marker_shown(marker: Dictionary, on: bool) -> void:
 				marker.shadow.visible = false)
 
 ## 选中项压在其他标记之上：贴图/剪影提升渲染优先级，名牌移到标记层顶。
+## The selected pin's 2D node over every other pin's, pins made after it was selected included: a MapDestination's
+## name is 2D, and a neighbour's disc must not cover it.
+func _raise_selected() -> void:
+	var id := str(selected.get("id", ""))
+	if not markers.has(id): return
+	var top := 0
+	for m in markers.values(): top = maxi(top, (m.node as Node).get_index())
+	var node: Node = markers[id].node
+	if node.get_index() < top: move_child(node, top)
+
 func _set_marker_front(id: String, front: bool) -> void:
 	if not markers.has(id): return
 	var marker: Dictionary = markers[id]
