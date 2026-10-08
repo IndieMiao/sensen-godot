@@ -13,10 +13,12 @@ extends UiDrawer
 ## Everything comes from P0Inbox over the server view; the drawer only reports back:
 ##   claim_requested(cmd, from)   claim_parcel {key} or claim_parcels {keys}; `from` is the pressed button (floats)
 ##   read_requested(keys)         Updates opened with unread rows: read_inbox
+##   refused(text)                a grey Claim pressed with the bag full: `Make room · 1 slot` (§10.4.8)
 ##   tab_changed(tab)
 
 signal claim_requested(cmd: Dictionary, from: Control)
 signal read_requested(keys: Array)
+signal refused(text: String)
 signal tab_changed(tab: String)
 
 const HEIGHT := 630.0     # INBOX-*: the Sheet's top at y 170 of 800
@@ -34,6 +36,7 @@ var _sub: Label
 var _scroll: TouchScrollContainer
 var _page: VBoxContainer
 var _key := 0
+var _shape := 0   # the page's rows and lines without their times: a change rebuilds it
 var _fresh := {}   # update keys unread when this visit opened Updates: their dots stay until the drawer closes
 
 func _init(view_: Dictionary = {}, tab_ := "") -> void:
@@ -80,6 +83,7 @@ func set_tab(t: String) -> void:
 	tab = t
 	tabs.selected = P0Inbox.TABS.find(t)
 	_key = 0
+	_shape = 0
 	refresh(view)
 	_scroll.scroll_vertical = 0
 	tab_changed.emit(tab)
@@ -93,8 +97,8 @@ func _read_if_updates() -> void:
 	for k in keys: _fresh[k] = true
 	if not keys.is_empty(): read_requested.emit(keys)
 
-## Follows the view (the P0 UI calls it every frame while the drawer is open); the page is rebuilt only when what it
-## shows changes (the parcels' minutes, a claim, a new update).
+## Follows the view (the P0 UI calls it every frame while the drawer is open). The page is rebuilt only when its rows
+## or lines change (a claim, a new update); a minute passing only rewrites the rows' times in place.
 func refresh(v: Dictionary) -> void:
 	view = v
 	_sub.text = P0Inbox.new_line(view)
@@ -105,6 +109,12 @@ func refresh(v: Dictionary) -> void:
 	var key := hash([tab, model])
 	if key == _key: return
 	_key = key
+	var shape := hash([tab, (model.get("rows", []) as Array).map(func(r): return r.key), model.get("head"), model.get("rule"),
+		model.get("note"), model.get("claim")])
+	if shape == _shape and rows.size() == (model.get("rows", []) as Array).size():
+		for i in rows.size(): rows[i].show_row(model.rows[i])
+		return
+	_shape = shape
 	_build(model)
 
 func _page_model() -> Dictionary:
@@ -138,6 +148,7 @@ func _build(model: Dictionary) -> void:
 				var row := UiInboxRow.new(UiInboxRow.Kind.ITEM)
 				row.show_row(r)
 				row.claim_pressed.connect(func(k: String): claim_requested.emit({"type": "claim_parcel", "key": k}, row.claim))
+				row.claim_unavailable.connect(func(_k: String): refused.emit("Make room · 1 slot"))
 				_page.add_child(row)
 				rows.append(row)
 			if not (model.rows as Array).is_empty(): _page.add_child(_wrapped(str(model.note), UiTokens.STYLE_C11_B))   # q(81): with parcels only

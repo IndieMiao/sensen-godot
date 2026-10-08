@@ -269,9 +269,12 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	if not before.is_empty():
 		for id in P0Guide.new_items(before, v): ui.quick_bar_node().flash(str(id))
 	var at := anchor()
-	# A claim in the Inbox (SGODOT-234): what came out floats from the button pressed; the Bag slot is under the drawer.
-	var in_inbox := ui.modal_kind == "inbox"
-	if in_inbox and ui.inbox_float_at().is_finite(): at = ui.inbox_float_at()
+	# A claim in the Inbox (SGODOT-234): what came out floats from the button pressed, even seeds, dishes and fish (the
+	# Bag slot is under the drawer). Only the reply that brings items: a state push before it leaves the spot waiting.
+	var claimed := ui.inbox_float_at().is_finite() and events.any(func(e): return str(e.get("kind", "")) == "item" and int(e.get("delta", 0)) > 0)
+	if claimed:
+		at = ui.inbox_float_at()
+		ui.inbox_claim_done()
 	var floats: Array = []   # this reply's float parts: one float_lines call orders, merges and caps them (q(49) ①)
 	var xp_lines: Array = []
 	last_first_catch_xp = 0
@@ -341,7 +344,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 			"item":
 				var iid := str(ev.id)
 				if iid.begins_with("dish_"): _call("p0_event", [ev, v])   # where a collected dish went (the kitchen's Keep toast)
-				if int(ev.delta) > 0 and (in_inbox or (not crafted and not iid.begins_with("seed_") and not iid.begins_with("dish_") and not iid.begins_with("fish_"))):
+				if int(ev.delta) > 0 and (claimed or (not crafted and not iid.begins_with("seed_") and not iid.begins_with("dish_") and not iid.begins_with("fish_"))):
 					floats.append({kind = "item", key = iid, amount = int(ev.delta), fmt = "%s " + P0Logic.item_name(v, iid),
 						tone = UiFloatText.Tone.ITEM, icon = P0Logic.icon(iid)})
 			"coins":

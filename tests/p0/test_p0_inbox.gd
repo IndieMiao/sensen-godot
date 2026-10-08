@@ -161,12 +161,43 @@ func test_a_claimed_parcel_floats_from_its_button_even_for_fish() -> void:
 	rt.ui.set_view(_view(6, 3))
 	rt.ui.open_inbox()
 	await get_tree().process_frame
+	var button := rt.ui.inbox().rows[2].claim.get_global_rect().get_center()
 	rt.ui.inbox().rows[2].claim.pressed.emit()
-	var at := rt.ui.inbox_float_at()
+	rt._on_state(_view(6, 3), [])   # a state push before the reply: the spot waits
+	# 亚瑟 on #93: the reply rebuilds the rows (the pressed button goes) before the floats are placed.
 	rt._on_state(_view(5, 2), [{"kind": "item", "id": "fish_perch", "delta": 7}])
 	await get_tree().process_frame
 	await get_tree().process_frame
 	var f := rt.ui.root.get_children().filter(func(c): return c is UiFloatText and str(c.text).contains("Perch"))
 	assert_int(f.size()).is_equal(1)
-	assert_float((f[0] as Control).position.x).is_less(at.x + 200.0)
+	var c := (f[0] as Control).get_global_rect().get_center()
+	assert_float(c.distance_to(button)).is_less(80.0)
+	assert_bool(rt.ui.inbox_float_at().is_finite()).is_false()   # the next items float from the player again
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(STORE))
+
+func test_a_grey_claim_says_make_room() -> void:
+	var ui := P0Ui.new()
+	ui.quick_store = STORE
+	add_child(auto_free(ui))
+	await get_tree().process_frame
+	ui.set_view(_view(0, 2))
+	ui.open_inbox()
+	await get_tree().process_frame
+	ui.inbox().rows[0].claim.pressed.emit()
+	assert_str(ui.toast_text()).is_equal("Make room · 1 slot")
+	ui.close_modal()
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(STORE))
+
+func test_a_minute_passing_rewrites_the_times_without_rebuilding() -> void:
+	var v := _view(6, 3)
+	var d := _drawer(v)
+	await get_tree().process_frame
+	var first := d.rows[0]
+	v.inbox.parcels[0].left = 3_840_000.0
+	d.refresh(v)
+	assert_object(d.rows[0]).is_same(first)
+	assert_str(d.rows[0].left_label.text).is_equal("1h 4m left")
+	v.inbox.parcels.remove_at(0)   # a claim: the page is rebuilt
+	d.refresh(v)
+	assert_int(d.rows.size()).is_equal(2)
+	assert_object(d.rows[0]).is_not_same(first)

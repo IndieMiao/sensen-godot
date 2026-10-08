@@ -2131,7 +2131,7 @@ func spot_reachable() -> bool:
 ## page q(22) picks unless `tab` names one. Claims and reads go to the server from here; a claim's items float from the
 ## button pressed (the Bag slot is under the drawer: no ItemFly, q(49)).
 var _inbox: P0InboxDrawer
-var _inbox_from: WeakRef
+var _claim_at := Vector2.INF   # the pressed Claim's centre, kept from the press: the reply rebuilds the page first
 
 func open_inbox(tab := "") -> P0InboxDrawer:
 	var d := P0InboxDrawer.new(view, tab)
@@ -2139,9 +2139,11 @@ func open_inbox(tab := "") -> P0InboxDrawer:
 	d.safe_bottom = safe_bottom()
 	d.close_requested.connect(close_modal)
 	d.claim_requested.connect(func(cmd: Dictionary, from: Control):
-		_inbox_from = weakref(from)
+		_claim_at = from.get_global_rect().get_center()
 		command.emit(cmd))
 	d.read_requested.connect(func(keys: Array): command.emit({"type": "read_inbox", "keys": keys}))
+	d.refused.connect(func(text: String): toast(text))
+	_claim_at = Vector2.INF
 	_open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
 	_close_above(d, _CLOSE_ABOVE_SHEET, UiTokens.SPACE_PAGE)
 	_inbox = d
@@ -2152,10 +2154,14 @@ func open_inbox(tab := "") -> P0InboxDrawer:
 func inbox() -> P0InboxDrawer:
 	return _inbox if is_instance_valid(_inbox) and modal_kind == "inbox" else null
 
-## Where a claim's floats start: the Claim (or Claim all) just pressed; INF when there is none.
+## Where a claim's floats start: the Claim (or Claim all) pressed, where it was when pressed (亚瑟 on #93: the reply
+## rebuilds the rows before the floats are placed); INF with no claim waiting or the Inbox closed.
 func inbox_float_at() -> Vector2:
-	var b: Control = _inbox_from.get_ref() if _inbox_from != null else null
-	return b.get_global_rect().get_center() if b != null and b.is_visible_in_tree() else Vector2.INF
+	return _claim_at if inbox() != null else Vector2.INF
+
+## The claim's reply has come: its floats took the spot, later items float from the player again.
+func inbox_claim_done() -> void:
+	_claim_at = Vector2.INF
 
 ## Resident dialogue bar (SGODOT-225, LOCK-18): greet first, then choose. Called by the outpost rooms (SGODOT-227)
 ## for res_pip / res_old_kai. Sends the day's `talk` (first-chat affinity, gift meal: the server decides) and
