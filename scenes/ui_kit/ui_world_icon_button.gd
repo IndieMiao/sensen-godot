@@ -6,12 +6,15 @@ extends Control
 ## open a name strip): 2 px color/primary edge and 1.1× scale. With a state (LOCK-11) the whole button becomes the
 ## StatusBadge World 28 instead: the state outranks the facility icon. Display only: a tap on it is a tap on the
 ## facility (the host checks hit_rect(), as for UiTapCard). Count (Show count, 1749:0): a small tag at the disc's
-## bottom right, like a cell's quantity pill (the Warming Cabinet's 4/6 / Full, q(31); C21).
+## bottom right, like a cell's quantity pill (the Warming Cabinet's 4/6 / Full, q(31); C21). At least the pill's 24;
+## a wider word grows it to the left, its right edge kept (Count tag: right-anchored, padding 4 — the Mailbox's
+## `Parcel`, WORLD-HINT-6a 1822:123663, 不知火舞 on 234).
 
 const _VISUAL := 28.0
 const _ICON := 22.0
 const _NEAR_SCALE := 1.1
 const _COUNT_AT := Vector2(14, 20)   # the count tag in the 28 disc, overhanging its bottom right
+const _COUNT_PAD := 4.0              # the tag's text inset either side once it is wider than the pill
 
 ## The facility icon (i-home, i-stall, i-seat …).
 var icon: Texture2D: set = set_icon
@@ -53,6 +56,7 @@ func _init() -> void:
 	_count_label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_count_label.grow_vertical = Control.GROW_DIRECTION_BOTH
 	_count.add_child(_count_label)
+	_count_label.minimum_size_changed.connect(_fit_count)
 	_disc.add_child(_count)
 	_refresh()
 
@@ -77,6 +81,12 @@ func hit_rect() -> Rect2: return get_global_rect()
 func place_at(center: Vector2) -> void:
 	position = center - size * 0.5
 
+## The tag's width from its text, measured again once the theme's 10 px font reaches the label (a count set before the
+## button is in the tree measures in the default font).
+func _fit_count() -> void:
+	_count.size.x = maxf(UiTokens.SIZE_QTY_PILL_W, ceilf(_count_label.get_minimum_size().x) + _COUNT_PAD * 2.0)
+	_count.position.x = _COUNT_AT.x + UiTokens.SIZE_QTY_PILL_W - _count.size.x
+
 func _refresh() -> void:
 	if _disc == null: return
 	var box := UiStyleBox.make(UiTokens.COLOR_SURFACE, _VISUAL * 0.5,
@@ -88,6 +98,7 @@ func _refresh() -> void:
 	_glyph.texture = icon
 	_count.visible = count != ""
 	_count_label.text = count
+	_fit_count()
 	scale = Vector2.ONE * (_NEAR_SCALE if near else 1.0)
 	var badged := status >= 0
 	_disc.visible = not badged

@@ -150,6 +150,13 @@ const PLAQUE_CELL := Vector2i(7, 14)
 static func plaque_point(bp: FarmBlueprint) -> Vector3:
 	return bp.cell_to_world(PLAQUE_CELL)
 
+## The farmhouse Mailbox (§12.5.2, q(24); SGODOT-234 C): by the house's right wall, between the Homestead sign and the
+## stall (about 1.45 m from each), clear of the door path, the fence and the field. Solid, one cell.
+const MAILBOX_CELL := Vector2i(12, 16)
+
+static func mailbox_point(bp: FarmBlueprint) -> Vector3:
+	return bp.cell_to_world(MAILBOX_CELL)
+
 ## LOCK-07 (亚瑟 / 不知火舞 / 周瑜 on SGODOT-231): one finger card on the farm at a time — the nearest facility within
 ## its reach; the card showing keeps it unless another is CARD_KEEP nearer, so standing between two never flickers.
 ## cands = [[id, position, reach m], ...]; an exact tie goes to the earlier entry. Distance on the ground (a bed or a

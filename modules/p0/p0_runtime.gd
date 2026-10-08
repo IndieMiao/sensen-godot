@@ -116,6 +116,7 @@ func _init() -> void:
 	session.refused.connect(_on_refused)
 	session.connection_failed.connect(func(msg: String, cmd: Dictionary):
 		_net_failed(msg, cmd)
+		if str(cmd.get("type", "")).begins_with("claim_parcel"): ui.inbox_claim_done()
 		# A world action that did not go through ends the hold: no more sowing along the row on a dead line; the
 		# player presses again (§10.7.1). Nothing was taken locally — the server's state is what the scene shows.
 		if not cmd.is_empty(): ui.fab_held = false
@@ -517,6 +518,7 @@ func _on_catch(ev: Dictionary, _xp_lines: Array, at := Vector2.INF) -> void:
 			ui.toast("Line in · Energy back")
 
 func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
+	if str(cmd.get("type", "")).begins_with("claim_parcel"): ui.inbox_claim_done()   # no items come: none float from it (亚瑟 on #93)
 	# The farmhouse kitchen waits on cook / collect (its Cook buttons, the plate being served): let it recover.
 	if str(cmd.get("type", "")) in ["cook", "collect"]: _call("p0_event", [{"kind": "refused", "code": code, "cmd": cmd}, session.view])
 	if str(cmd.get("type", "")) == "cast": _call("p0_event", [{"kind": "cast_refused", "code": code}, session.view])
