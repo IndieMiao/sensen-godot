@@ -570,13 +570,23 @@ func badge_height(id: String) -> float:
 ## Finger cards stay on screen (their facility is near, so on screen); a badge over an off-screen facility hides.
 func _place_marker(m: Control, screen: Vector2, clamp_inside: bool) -> void:
 	var size := m.get_combined_minimum_size()
-	var area := Rect2(Vector2.ZERO, _kit.size)
+	var area := _marker_area()
 	var r := WorldAnchor.place(size, screen - Vector2(0, UiTokens.SPACE_WITHIN), area, UiTokens.SPACE_WITHIN, clamp_inside)
 	m.visible = r.has_area()
 	if not m.visible: return
 	m.size = size
 	m.position = r.position
 	if m.has_method(&"point_at"): m.point_at(screen.x - r.position.x)
+
+## Where world markers may sit (LOCK-07): below the two-row HUD and above the quick bar. A finger card is passive, so
+## one lying under a HUD chip lost its tap to the chip (int5 hand test 8: the Homestead card slid under Energy and
+## opened the Energy panel); a card clamps into this band instead, a badge outside it hides.
+func _marker_area() -> Rect2:
+	var top := 0.0
+	if hud and hud.visible: top = UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H + safe_top()
+	var bottom := _kit.size.y
+	if _bar.visible: bottom = minf(bottom, _bar.position.y)
+	return Rect2(0.0, top, _kit.size.x, maxf(0.0, bottom - top))
 
 func float_text(text: String, screen: Vector2, color: Color) -> void:
 	var l := _label(text, 12, color, true)
