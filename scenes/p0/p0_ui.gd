@@ -11,6 +11,8 @@ signal seed_selected(seed_id: String)
 signal command(cmd: Dictionary)
 signal dev_skip(minutes: int)
 signal zoom(factor: float)
+## The fingers lifted after a pinch (or a wheel tick ended): the scene springs back if past a zoom limit.
+signal zoom_end
 signal show_spot(where: String)
 signal home_choice(choice: String)
 signal recenter()
@@ -2108,6 +2110,7 @@ class _TouchPad extends Control:
 	func _gui_input(e: InputEvent) -> void:
 		if e is InputEventMouseButton and e.pressed and e.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
 			ui.zoom.emit(0.9 if e.button_index == MOUSE_BUTTON_WHEEL_UP else 1.1)
+			ui.zoom_end.emit()
 			return
 		for o in _arb.feed(e, Time.get_ticks_msec()):
 			match o.kind:
@@ -2120,6 +2123,7 @@ class _TouchPad extends Control:
 				&"tap":
 					if ui._tap_at(get_global_transform() * o.pos, bool(o.double)): _arb.consume_tap()
 				&"pinch": ui.zoom.emit(o.factor)
+				&"pinch_end": ui.zoom_end.emit()
 	func _draw() -> void:
 		var start := _arb.origin()
 		var now := _arb.position()

@@ -8,7 +8,7 @@ extends Node
 ## A world implements (all optional; interiors extend P0Room): p0_surface() -> String, p0_space() -> String
 ## (where the player is for the server: home / pond / outpost / mine; see space_of), p0_place() -> String (the
 ## catalog pond id inside a pond space), p0_frame(view, dt), p0_joystick(v),
-## p0_tap(screen), p0_action(cmd), p0_event(ev, view), p0_anchor() -> Vector2, p0_zoom(f),
+## p0_tap(screen), p0_action(cmd), p0_event(ev, view), p0_anchor() -> Vector2, p0_zoom(f), p0_zoom_end(),
 ## p0_recenter(), p0_show_spot(where), p0_energy_verb() -> String, p0_dev(step) -> bool,
 ## p0_until(name) -> bool.
 
@@ -62,6 +62,7 @@ func _init() -> void:
 	session.src_of = src_of_press
 	ui.dev_skip.connect(func(m): session.dev_skip(m); ui.toast("Clock +%dh (dev)" % (m / 60)))
 	ui.zoom.connect(func(f: float): _call("p0_zoom", [f]))
+	ui.zoom_end.connect(func(): _call("p0_zoom_end", []))
 	ui.recenter.connect(func(): _call("p0_recenter", []))
 	ui.show_spot.connect(func(where: String): _call("p0_show_spot", [where]))
 	ui.can_show_spot = func() -> bool: return is_instance_valid(world) and world.has_method("p0_show_spot")
