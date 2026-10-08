@@ -74,6 +74,9 @@ var _undo_toast: UiUndoToast
 var _cards := {}          # id -> UiTapCard
 var _card_hits := {}      # id -> screen point a tap on the card forwards to the world (the facility's own tap point)
 var _badges := {}         # id -> UiStatusBadge
+var _icons := {}          # id -> UiWorldIconButton (SGODOT-250)
+var _name_bars := {}      # id -> UiWorldNameBar
+var _npc_tags := {}       # id -> UiNpcNameTag
 ## The finger card a `tapped` comes from, only while that signal is being handled ("" for a scene tap).
 var tapped_card := ""
 var _quick := {}          # per action: {pins: [], removed: []}, saved in quick_store (LOCK-05: 每个行动各记各的)
@@ -383,6 +386,7 @@ func set_surface(name: String) -> void:
 	if _dev_box: _dev_box.visible = world
 	for c in _cards.values(): (c as Control).visible = false
 	for b in _badges.values(): (b as Control).visible = false
+	for m in _icons.values() + _name_bars.values() + _npc_tags.values(): (m as Control).visible = false
 	_flush_held_toast()
 
 ## Action spaces show the full bar. Rooms (farmhouse kitchen, outposts) and the map keep only Bag, with no action
@@ -729,10 +733,120 @@ func tag(id: String, text: String, screen: Vector2, show: bool, hit := Vector2.I
 	c.text = text
 	_place_marker(c, screen, true)
 
+# ---------------------------------------------------------------- world prompts (SGODOT-250, LOCK-07 v2 / LOCK-16 v2)
+## A facility within view and about 8 m: its icon button (WorldIconButton 1674:101157) centred on `screen` (this UI's
+## coordinates, like tag()). `near` grows a seat 1.1× with a primary edge; `status` (a UiStatusBadge.State, -1 none)
+## turns the whole button into the StatusBadge. A tap on it is a tap on `hit` (default `screen`), with tapped_card =
+## id. Call it every frame for each shown facility that is not the open one; it folds that facility's name strip if
+## it was open. Hidden under a card or drawer, and outside the band between the HUD and the quick bar.
+func world_icon(id: String, icon: Texture2D, screen: Vector2, show: bool, near := false, status := -1, hit := Vector2.INF) -> void:
+	var b: UiWorldIconButton = _icons.get(id)
+	if b == null:
+		b = UiWorldIconButton.new()
+		_kit.add_child(b)
+		_kit.move_child(b, 0)
+		_icons[id] = b
+	var on := show and _modal == null
+	var bar: UiWorldNameBar = _name_bars.get(id)
+	if bar != null and bar.visible: _fold_name_bar(bar)
+	b.visible = on and (bar == null or not bar.visible) and _marker_area().has_point(screen)
+	if not on: return
+	_card_hits[id] = screen if hit == Vector2.INF else hit
+	b.icon = icon
+	b.near = near
+	b.status = status
+	b.place_at(screen)
+
+## The one facility nearest and within reach: its name strip (WorldNameBar 1674:101190) opens from the icon button's
+## spot in 160 ms — icon + `text` + at most one `fact` ("" for none). `side` UiWorldNameBar.Dir (the way the
+## character faces), -1 = right; either way it flips at a screen edge. `dimmed`: used today (Rested today). With
+## show false (or a world_icon call for the same id) it folds back, then the icon button returns.
+func name_bar(id: String, icon: Texture2D, text: String, fact: String, screen: Vector2, show: bool, side := -1, dimmed := false, status := -1, hit := Vector2.INF) -> void:
+	var bar: UiWorldNameBar = _name_bars.get(id)
+	if bar == null:
+		bar = UiWorldNameBar.new()
+		bar.theme = UiKit.theme()
+		bar.visible = false   # opens below
+		_kit.add_child(bar)
+		_kit.move_child(bar, 0)
+		_name_bars[id] = bar
+	if not (show and _modal == null):
+		if bar.visible: _fold_name_bar(bar)
+		return
+	_card_hits[id] = screen if hit == Vector2.INF else hit
+	bar.icon = icon
+	bar.text = text
+	bar.fact = fact
+	bar.dimmed = dimmed
+	bar.status = status
+	bar.side = _name_bar_side(bar, screen, UiWorldNameBar.Dir.RIGHT if side < 0 else side)
+	bar.anchor_at(screen)
+	var b: UiWorldIconButton = _icons.get(id)
+	if b: b.visible = false   # the strip stands in for its button
+	_raise_marker(bar)   # the open strip draws over every icon button and badge (哪吒: a stove badge sat on a card)
+	if not bar.visible or bar.get_meta("folding", false):
+		if not bar.visible: bar.set_openness(0.0)
+		bar.visible = true
+		bar.set_meta("folding", false)
+		bar.expand()
+
+## World markers (cards, badges, icon buttons, strips, NPC tags) sit at the bottom of the UI, under the HUD and the
+## bar; this one goes to the top of that group.
+func _raise_marker(m: Control) -> void:
+	var top := m.get_index()
+	for group in [_cards, _badges, _icons, _name_bars, _npc_tags]:
+		for other in group.values(): top = maxi(top, (other as Node).get_index())
+	if top > m.get_index(): _kit.move_child(m, top)
+
+func _fold_name_bar(bar: UiWorldNameBar) -> void:
+	if bar.get_meta("folding", false): return
+	bar.set_meta("folding", true)
+	bar.collapse()
+	var done := func():
+		if is_instance_valid(bar) and bar.get_meta("folding", false):
+			bar.visible = false
+			bar.set_meta("folding", false)
+	if bar.openness() <= 0.0 or not bar.is_inside_tree(): done.call()
+	else: get_tree().create_timer(UiKit.secs(170.0)).timeout.connect(done)
+
+## The wanted side unless the strip would leave the marker band there; then the other one (贴边翻转).
+func _name_bar_side(bar: UiWorldNameBar, screen: Vector2, want: int) -> int:
+	var area := _marker_area()
+	var reach := bar.full_width() - bar.folded_width() * 0.5
+	if want == UiWorldNameBar.Dir.RIGHT and screen.x + reach > area.end.x - UiTokens.SPACE_WITHIN: return UiWorldNameBar.Dir.LEFT
+	if want == UiWorldNameBar.Dir.LEFT and screen.x - reach < area.position.x + UiTokens.SPACE_WITHIN: return UiWorldNameBar.Dir.RIGHT
+	return want
+
+## An interactable NPC's name over its head (NpcNameTag 1674:101195): the name only; `highlight` when nearest within
+## reach or in a conversation. Display only — the NPC itself takes the tap.
+func npc_tag(id: String, text: String, head_screen: Vector2, show: bool, highlight := false) -> void:
+	var t: UiNpcNameTag = _npc_tags.get(id)
+	if t == null:
+		t = UiNpcNameTag.new()
+		t.theme = UiKit.theme()
+		_kit.add_child(t)
+		_kit.move_child(t, 0)
+		_npc_tags[id] = t
+	t.visible = show and _modal == null and _marker_area().has_point(head_screen)
+	if not t.visible: return
+	t.text = text
+	t.highlight = highlight
+	t.place_over(head_screen)
+
 ## Facility / resident state mark (StatusBadge 1132:79554, STATE-ICONS): display only, the facility takes the tap.
 ## A scene tap: on a shown finger card it is that facility's tap, elsewhere the world's (also a double tap: a card
 ## never recenters the camera by accident). Returns true for a card tap, which then can't start a double tap either.
 func _tap_at(global_pos: Vector2, double: bool) -> bool:
+	# World prompts (SGODOT-250): an open name strip, then an icon button; a tap on either is its facility's tap.
+	for markers in [_name_bars, _icons]:
+		for id in markers:
+			var m: Control = markers[id]
+			if m.is_visible_in_tree() and m.hit_rect().has_point(global_pos):
+				if _modal == null:
+					tapped_card = str(id)
+					tapped.emit(_card_hits[id])
+					tapped_card = ""
+				return true
 	for id in _cards:
 		var c: UiTapCard = _cards[id]
 		if c.is_visible_in_tree() and c.hit_rect().has_point(global_pos):

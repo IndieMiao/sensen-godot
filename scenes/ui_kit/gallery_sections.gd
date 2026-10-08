@@ -40,6 +40,7 @@ static func all() -> Array[Dictionary]:
 		{id = "action_radial", title = "UiActionRadial", figma = "RadialPetal 1122:79385 v2 · RadialReason 1655:101164 · row 50 · LOCK-03 v2", build = _action_radial},
 		{id = "action_radial_motion", title = "UiActionRadial · opening", figma = "Motion 1651:100816 · 0 / 80 / 160 / 300 ms", build = _action_radial_motion},
 		{id = "status_badge", title = "UiStatusBadge", figma = "StatusBadge 1132:79554 · LOCK-11", build = _status_badges},
+		{id = "world_prompts", title = "World prompts", figma = "UiWorldIconButton · UiWorldNameBar · UiNpcNameTag · WorldIconButton 1674:101157 · WorldNameBar 1674:101190 · NpcNameTag 1674:101195 · row 51 · LOCK-07 / 16 v2", build = _world_prompts},
 		{id = "tap_card", title = "UiTapCard", figma = "TapCard 1135:101133 · LOCK-07", build = _tap_cards},
 		# SGODOT-222 world display
 		{id = "need_tile", title = "UiNeedTile", figma = "NeedTile 1090:78003 · LOCK-10", build = _need_tiles},
@@ -967,6 +968,71 @@ static func _action_radial_motion() -> Control:
 	for ms in [0.0, 80.0, 160.0, 300.0]:
 		grid.add_child(_captioned(_radial_frame(Vector2(220, 220), ms, -1, 0.72), "%d ms" % int(ms)))
 	return grid
+
+## A scene-grey strip so the surface-coloured prompts read as they do over the world.
+static func _scene_row(h: float) -> ColorRect:
+	var r := ColorRect.new()
+	r.color = UiKit.alpha(UiTokens.COLOR_TEXT, UiTokens.OPACITY_SCRIM_MODAL)
+	r.custom_minimum_size = Vector2(328, h)
+	return r
+
+## SGODOT-250 (row 51 1674:101146): the icon buttons a facility shows within view, the one name strip of the nearest,
+## and NPC name tags.
+static func _world_prompts() -> Control:
+	var v := _column(UiTokens.SPACE_SECTION)
+	var icons := _scene_row(60)
+	var x := 30.0
+	for spec in [["home", false, -1], ["seat", true, -1], ["homestead_stall", false, UiStatusBadge.State.REQUEST], ["workbench", false, -1], ["door", false, -1]]:
+		var b := UiWorldIconButton.new()
+		icons.add_child(b)
+		b.icon = _tex(spec[0])
+		b.near = spec[1]
+		b.status = spec[2]
+		b.place_at(Vector2(x, 30))
+		x += 66.0
+	v.add_child(_captioned(icons, "icons · default · Near · state"))
+	var D := UiWorldNameBar.Dir
+	var bars := [
+		[_tex("home"), "Farmhouse", "", D.RIGHT, false, -1, 1.0],
+		[_tex("home"), "Farmhouse", "", D.LEFT, false, -1, 1.0],
+		[_tex("stove"), "Stove 1/1", "Empty", D.RIGHT, false, -1, 1.0],
+		[_tex("homestead_stall"), "Homestead Stall", "", D.RIGHT, false, UiStatusBadge.State.REQUEST, 1.0],
+		[_tex("rest"), "+60 Energy", "", D.RIGHT, false, -1, 1.0],
+		[_tex("rest"), "Rested today", "", D.RIGHT, true, -1, 1.0],
+		[_tex("door"), "Map", "", D.RIGHT, false, -1, 1.0],
+		[_tex("workbench"), "Workbench", "", D.RIGHT, false, -1, 0.5],
+	]
+	var captions := ["Right", "Left · edge", "one fact", "state", "bench", "Dimmed", "door", "opening 50 %"]
+	var grid := GridContainer.new()
+	grid.columns = 2
+	grid.add_theme_constant_override(&"h_separation", int(UiTokens.SPACE_WITHIN))
+	grid.add_theme_constant_override(&"v_separation", int(UiTokens.SPACE_WITHIN))
+	for i in bars.size():
+		var spec: Array = bars[i]
+		var row := _scene_row(48)
+		row.custom_minimum_size = Vector2(160, 48)
+		var bar := UiWorldNameBar.new()
+		row.add_child(bar)
+		bar.icon = spec[0]
+		bar.text = spec[1]
+		bar.fact = spec[2]
+		bar.side = spec[3]
+		bar.dimmed = spec[4]
+		bar.status = spec[5]
+		bar.anchor_at(Vector2(134 if spec[3] == D.LEFT else 26, 24))
+		bar.set_openness(spec[6])
+		grid.add_child(_captioned(row, captions[i]))
+	v.add_child(grid)
+	var tags := _scene_row(60)
+	var ama := UiNpcNameTag.new("Ama")
+	tags.add_child(ama)
+	ama.place_over(Vector2(100, 44))
+	var pip := UiNpcNameTag.new("Pip")
+	tags.add_child(pip)
+	pip.highlight = true
+	pip.place_over(Vector2(220, 44))
+	v.add_child(_captioned(tags, "NPC · Default · Highlight"))
+	return v
 
 static func _status_badges() -> Control:
 	var v := _column()
