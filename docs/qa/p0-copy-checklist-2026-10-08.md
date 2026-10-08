@@ -123,7 +123,7 @@
 | 个人页 | `Edit look` / `Edit` / `Following` / `Followers` / `Mutual` / `Close Friends` / `All skills ›` |
 | 技能页 ★ | `Crops first-harvested n/8 · Fish first-caught n/7 · Dishes first-cooked n/14`；不显示 `Cities fished`（q(49)） |
 | 收件箱 ★ | Tab `To do / Parcels / Updates`；To do 空态 `No invites right now`；Parcels 空态 `No parcels`；Updates 空态 `No updates yet`；规则行 `Parcels 3/8 · Kept 24h · Claim needs a free slot` / 满 `Parcels 8/8 · 2 more waiting · …`；`Claim all · 2 slots` / `Make room · 1 slot`；列表下方固定一行 `If not claimed: sellable items turn into coins at 80% · gifts go back · the rest is lost`（有包裹时显示，不随内容变，不写 regional seeds，q(81)）；Updates 只有三种：`Parcel expired · +18 coins` / `Parcel expired · Worm Bait ×3 lost` / `Pip's gift meal went back · unclaimed`，不出 Homestead 升级与领取记录（q(50)、q(79)）；铃铛数字 = 在列包裹（背包满也计）+ 未读 Updates，待发不计（q(79)） |
-| 满包的被动获得 ★ | 铃铛下方 InboxNotice 卡三行：`Sent to Inbox` / 图标 + `Perch` + `×7` / `Expires in 24h ›`（BAG-5-2 定稿，替代原 toast `Bag full · Perch ×7 sent to Inbox · 24h`，LOCK-14）；同一回包多件：物品行写第一件，第三行 `+1 more · Expires in 24h ›`；Inbox 已满排队：`Inbox full · waiting` / 物品行照旧 / `Claim a parcel first ›`（多件 `+1 more · Claim a parcel first ›`）；不写 `2 rewards`、`saved for later`（q(87)） |
+| 满包的被动获得 ★ | 铃铛下方 InboxNotice 卡三行：`Sent to Inbox` / 图标 + `Perch` + `×7` / `Expires in 24h ›`（BAG-5-2 定稿，替代原 toast `Bag full · Perch ×7 sent to Inbox · 24h`，LOCK-14）；同一回包多件：物品行写第一件，第三行 `+1 more · Expires in 24h ›`；Inbox 已满排队：`Inbox full · waiting` / 物品行照旧 / `Claim a parcel first ›`（多件 `+1 more · Claim a parcel first ›`）；不写 `2 rewards`、`saved for later`（q(87)）；居民赠餐：第三行 `From Pip · Expires in 9h 12m ›`（到 04:00 的倒计时），排队 `From Pip · Claim a parcel first ›`，不再出 toast `Bag full · Pip's meal sent to Inbox`（q(88)） |
 
 ## 9. 首会话与引导
 
