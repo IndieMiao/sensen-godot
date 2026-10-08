@@ -1,6 +1,6 @@
 extends GdUnitTestSuite
-## Outpost rooms (SGODOT-227) on their room kits (the tea house on the Coffee Shop, the others still on the Basic
-## Room): each of the four outposts opens from the shared outpost table with its anchors, keeper and residents; counters and residents are tappable, decor is not;
+## Outpost rooms (SGODOT-227) on their room kits (Farm Tools Store, Coffee Shop, Post Office, Fruit Shop; placeholders
+## until SGODOT-218): each of the four outposts opens from the shared outpost table with its anchors, keeper and residents; counters and residents are tappable, decor is not;
 ## seats walk to the nearest free one, sit, skip seats other players hold, and the joystick stands up.
 
 const OutpostScript := preload("res://scenes/p0/p0_outpost.gd")
@@ -351,9 +351,6 @@ func test_the_front_door_prompt_sits_on_the_steps_clear_of_the_player() -> void:
 	assert_str(r.pick((feet + head) * 0.5)).is_not_equal("exit")
 	assert_object(r.anchor("badge_exit")).is_not_null()
 	if r.anchor("badge_exit"): assert_vector(r.pick_point("exit")).is_equal(r.anchor("badge_exit").global_position)
-	# The Basic Room's back door keeps its prompt over the threshold.
-	var tackle := _room("sh_tackle_1")
-	assert_vector(tackle.pick_point("exit")).is_equal(tackle.anchor("exit").global_position + Vector3(0, 1.0, 0))
 
 ## A tapped world prompt goes to its own anchor by id, as in every other room (PR #21's rule): the door's prompt on
 ## the steps leads out even where the tap point is nearer another facility.
@@ -395,3 +392,52 @@ func test_the_tea_house_lights_as_the_coffee_shop_was_signed() -> void:
 	assert_str(P0Room.aces_screen(mat.get_shader_parameter("top_input")).to_html(false)).is_equal("e6f5f1")
 	assert_str(P0Room.aces_screen(mat.get_shader_parameter("bottom_input")).to_html(false)).is_equal("fffbee")
 	assert_vector(mat.get_shader_parameter("blend")).is_equal(Vector2(0.5, 0.85))
+
+## Scene integration (SGODOT-227): every outpost opens on its own kit with every anchor of its file, the background
+## sampled from its signed render, and an opening view that holds the whole art, centred, with at least 16 px clear on
+## both sides; the door's prompt is clear of the player who comes in.
+func test_every_outpost_opens_on_its_kit() -> void:
+	var kits := {"sh_tackle_1": "farm_tools_store", "sh_tea_1": "coffee_shop", "sh_post_1": "post_office", "sh_market_1": "fruit_shop"}
+	for id in kits:
+		var o := P0Outposts.find(id)
+		var r := _room(id)
+		assert_str(str(o.art)).is_equal(kits[id])
+		assert_str(r.layout_path).override_failure_message(id).is_equal("res://assets/rooms/%s/layout.json" % kits[id])
+		for a in P0RoomAnchors.read_json(str(o.anchors)).anchors:
+			assert_object(r.anchor(str(a.name))).override_failure_message("%s %s" % [id, a.name]).is_not_null()
+		var clear := r.environment.background_color.srgb_to_linear()
+		assert_str(P0Room.aces_screen(Vector3(clear.r, clear.g, clear.b)).to_html(false)).override_failure_message(id).is_equal(str(o.backdrop.top).to_lower())
+		assert_bool(r._fits).override_failure_message(id + " holds still").is_true()
+		var right := (-r._cam_dir).cross(Vector3.UP).normalized()
+		var span := r.art_span(right)
+		var centre := r.cam.global_position.dot(right)
+		var px := r._view().x / r.cam.size
+		var left_px := (span.x - (centre - r.cam.size * 0.5)) * px
+		var right_px := (centre + r.cam.size * 0.5 - span.y) * px
+		assert_float(minf(left_px, right_px)).override_failure_message("%s %.1f / %.1f px" % [id, left_px, right_px]).is_greater_equal(16.0)
+		assert_float(absf(left_px - right_px)).override_failure_message("%s %.1f / %.1f px" % [id, left_px, right_px]).is_less(2.0)
+		# The door's prompt keeps off the player at spawn: below the feet at a front door, above the head at a back one.
+		var feet := r.cam.unproject_position(r.actor.position)
+		var head := r.cam.unproject_position(r.actor.position + Vector3(0, 1.75, 0))
+		var prompt := r.cam.unproject_position(r.pick_point("exit"))
+		var on_body := absf(prompt.x - feet.x) < 25.0 and prompt.y > head.y - 12.0 and prompt.y < feet.y + 10.0
+		assert_bool(on_body).override_failure_message("%s prompt %s, head %s, feet %s" % [id, prompt, head, feet]).is_false()
+
+## The residents and the market's facilities stand where the player can walk up to them, and every door leads out.
+func test_residents_facilities_and_doors_are_walked_to() -> void:
+	for job in [["sh_tackle_1", "npc_kai"], ["sh_post_1", "npc_pip"], ["sh_market_1", "use_market_board"], ["sh_market_1", "use_specialty_shelf"]]:
+		var r := _room(str(job[0]))
+		_tap(r, str(job[1]))
+		_walk_until_idle(r, 10.0)
+		assert_array(r.used).override_failure_message(str(job)).is_equal([job[1]])
+		var stand := P0RoomAnchors.stand_for(str(job[1]), r._anchors.keys())
+		assert_float(P0Room._flat_distance(r.arrived[job[1]], r.anchor(stand).global_position)).override_failure_message(str(job)).is_less(P0Room.REACH_M + 0.05)
+	for id in ["sh_tackle_1", "sh_tea_1", "sh_post_1", "sh_market_1"]:
+		var r := _room(id)
+		var left := [0]
+		r.left.connect(func(): left[0] += 1)
+		r.actor.teleport(r.anchor("stand_keeper").global_position)
+		r.p0_frame({}, 0.1)
+		r.walk_to("exit")
+		_walk_until_idle(r, 10.0)
+		assert_int(left[0]).override_failure_message(id).is_equal(1)
