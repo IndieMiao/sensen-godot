@@ -1,0 +1,73 @@
+{
+  "revision": "R2.4",
+  "plane_attachments": 12,
+  "plane_all_download_hashes_match": true,
+  "plane_files": [
+    {
+      "name": "SGODOT-178_R24_godot-whole.png",
+      "sha256": "80e058400640cb84a44e24daa1be1f07d13a2fee22be3f282de370b23dd53db6"
+    },
+    {
+      "name": "SGODOT-178_R24_comparison.png",
+      "sha256": "57ac1ff05c19474cf944fb1081c5c7ebfe4d55ca228da2fa251e55709d23dcbf"
+    },
+    {
+      "name": "SGODOT-178_R24_smoke-detail.png",
+      "sha256": "3b9c38030c5fc1eee703fb98f20371ff2f2be94a6a20987364f4ff83bba1d51c"
+    },
+    {
+      "name": "SGODOT-178_R24_smoke-before-after.jpg",
+      "sha256": "02d931c5338f254adc2a6c239ac7349b4b8d273a37f4bed61a3f39d1aa850234"
+    },
+    {
+      "name": "SGODOT-178_R24_smoke-timeline.jpg",
+      "sha256": "77b7046df4367f15683e8a46dc9a6e24528728c777b9113bf60c3058b1ce65ca"
+    },
+    {
+      "name": "SGODOT-178_R24_preservation.json",
+      "sha256": "af6ed0a109309058b630448b0ea7db3acb37da64925bce830a188252fbc84bd2"
+    },
+    {
+      "name": "SGODOT-178_R24_smoke-growth-verification.json",
+      "sha256": "3540eb86e24f77d7b02ede4c24026c1a10b4811587e7af732584f787fa7014f1"
+    },
+    {
+      "name": "SGODOT-178_R24_growth-control-without-scale.json",
+      "sha256": "44ea26438959a368c8d78cb505680dfcccb6fd14b4c7e0015cf05996a447460c"
+    },
+    {
+      "name": "SGODOT-178_R24_colour-verification.json",
+      "sha256": "4296f73748708174c05ceb26b1b13f8b722c427832e69d09fe78ea50d1b3cf9c"
+    },
+    {
+      "name": "SGODOT-178_R24_standalone-validation.json",
+      "sha256": "8c941ee5a4e3d124f858c40bea09d3c3e9ed0b759186e4c7a2fb4f82d4f1cf6c"
+    },
+    {
+      "name": "SGODOT-178_R24_README.md",
+      "sha256": "6112b9ff57f3586d63dd127d4d841aafeab680a8b6ad75eaa8f2e6df992fba8c"
+    },
+    {
+      "name": "SGODOT-178_R24_smoke-motion.mp4",
+      "sha256": "61400eddf019383cd5fd0c7d8d0e5146d6addd366796b2723224d468884348b6"
+    }
+  ],
+  "lark_messages": 4,
+  "lark_media": [
+    {
+      "name": "whole",
+      "sha256": "80e058400640cb84a44e24daa1be1f07d13a2fee22be3f282de370b23dd53db6",
+      "byte_identical": true
+    },
+    {
+      "name": "comparison",
+      "sha256": "57ac1ff05c19474cf944fb1081c5c7ebfe4d55ca228da2fa251e55709d23dcbf",
+      "byte_identical": true
+    },
+    {
+      "name": "smoke-motion",
+      "sha256": "61400eddf019383cd5fd0c7d8d0e5146d6addd366796b2723224d468884348b6",
+      "byte_identical": true
+    }
+  ]
+}
