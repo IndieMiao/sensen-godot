@@ -3,7 +3,8 @@ extends PanelContainer
 ## NPC name tag (SGODOT-250; NpcNameTag 1674:101195, LOCK-16 v2): an interactable NPC carries only its name over the
 ## head (Sigrid / Ama / Pip / Mei / Finn) — no Talking, no Tap to talk. Surface pill, 1 px color/border edge, soft
 ## shadow, padding 10 / 4, Caption ExtraBold 12. Highlight (nearest within reach, or in a conversation): 2 px
-## color/primary edge and 1.1× around its centre. NPCs you cannot talk to carry no tag. Display only.
+## color/primary edge and 1.1× around its centre. NPCs you cannot talk to carry no tag. It takes no input itself: the
+## host checks hit_rect() and a tap on it is a tap on its NPC (P0Ui._tap_at, like the facility icon buttons).
 
 const _HIGHLIGHT_SCALE := 1.1
 
@@ -36,6 +37,14 @@ func set_highlight(v: bool) -> void:
 func place_over(head: Vector2) -> void:
 	_head = head
 	_resit()
+
+## The tag's touch area (global): the pill grown to the 44 px touch size around its centre (26 px tall as drawn). Players
+## tap a name to talk to that NPC (李元芳 int10c: Pip's name, just below Sigrid behind the counter, opened Sigrid).
+func hit_rect() -> Rect2:
+	var r := get_global_rect()
+	var gx := maxf(0.0, (UiTokens.SIZE_TOUCH - r.size.x) * 0.5)
+	var gy := maxf(0.0, (UiTokens.SIZE_TOUCH - r.size.y) * 0.5)
+	return r.grow_individual(gx, gy, gx, gy)
 
 func _resit() -> void:
 	reset_size()

@@ -796,8 +796,8 @@ func _name_bar_shift(r: Rect2) -> float:
 ## An interactable NPC's name over its head (NpcNameTag 1674:101195): the name only; `highlight` when nearest within
 ## reach. `talking`: this NPC is the one speaking in the keeper greeting card or the resident dialogue bar — its tag
 ## stays up and highlighted over that card while every other tag and icon button hides (NPC-G1, #57); under any other
-## card or drawer all tags hide. A tag an open name strip covers fades out until the strip folds (#57). Display only —
-## the NPC itself takes the tap.
+## card or drawer all tags hide. A tag an open name strip covers fades out until the strip folds (#57). A tap on a
+## shown tag is a tap on its NPC (tapped_card = id, as for icon buttons): the name is where players tap to talk.
 func npc_tag(id: String, text: String, head_screen: Vector2, show: bool, highlight := false, talking := false) -> void:
 	var t: UiNpcNameTag = _npc_tags.get(id)
 	if t == null:
@@ -819,6 +819,7 @@ func npc_tag(id: String, text: String, head_screen: Vector2, show: bool, highlig
 	t.text = text
 	t.highlight = highlight or talking
 	t.place_over(head_screen)
+	_card_hits[id] = head_screen
 	_yield_tag(t, _modal == null and _strip_covers(Rect2(t.position, t.size)))
 
 ## Fade a name tag or an icon button out while an open strip covers it, back in once it folds (120 ms).
@@ -854,8 +855,9 @@ func _covers_marker(strip: Rect2, own: String) -> bool:
 	return false
 
 ## Facility / resident state mark (StatusBadge 1132:79554, STATE-ICONS): display only, the facility takes the tap.
-## A scene tap: on a shown icon button or name strip it is that facility's tap, elsewhere the world's (also a double tap: a prompt
-## never recenters the camera by accident). Returns true for a card tap, which then can't start a double tap either.
+## A scene tap: on a shown icon button or name strip it is that facility's tap, on an NPC's name tag that NPC's,
+## elsewhere the world's (also a double tap: a prompt never recenters the camera by accident). Returns true for a card
+## tap, which then can't start a double tap either.
 func _tap_at(global_pos: Vector2, double: bool) -> bool:
 	# World prompts (SGODOT-250): an open name strip, then an icon button; a tap on either is its facility's tap.
 	for markers in [_name_bars, _icons]:
@@ -867,6 +869,23 @@ func _tap_at(global_pos: Vector2, double: bool) -> bool:
 					tapped.emit(_card_hits[id])
 					tapped_card = ""
 				return true
+	# An NPC's name tag (not one faded under an open strip, which the strip's own tap has had first): that NPC's tap.
+	# Where two tags' touch areas overlap, the tag whose centre is nearer.
+	var tag_id := ""
+	var tag_d := INF
+	for id in _npc_tags:
+		var t: UiNpcNameTag = _npc_tags[id]
+		if not t.is_visible_in_tree() or bool(t.get_meta("covered", false)): continue
+		var r := t.hit_rect()
+		if r.has_point(global_pos) and r.get_center().distance_to(global_pos) < tag_d:
+			tag_id = str(id)
+			tag_d = r.get_center().distance_to(global_pos)
+	if tag_id != "":
+		if _modal == null:
+			tapped_card = tag_id
+			tapped.emit(_card_hits[tag_id])
+			tapped_card = ""
+		return true
 	if double: recenter.emit()
 	else: tapped.emit(global_pos - root.global_position)
 	return false

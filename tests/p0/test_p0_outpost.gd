@@ -336,6 +336,70 @@ func test_a_resident_bar_reached_from_the_bag_lights_their_name() -> void:
 	rt.ui.close_modal()
 	assert_bool(bool(r._marker("npc_kai", {}).talking)).is_false()
 
+## 李元芳 int10c: Pip's name tag over his head sits just below Sigrid behind the counter, and a tap on it went to the
+## nearest pick point, Sigrid's: her greeting opened. A tap on any NPC's name tag is that NPC's tap, in every outpost
+## (the tackle shop's Finn and Old Kai too), as a tap on a facility's icon button is that facility's. A tag faded under
+## an open name strip takes no tap.
+func test_a_tap_on_an_npc_name_tag_is_that_npc() -> void:
+	var rt: P0Runtime = auto_free(P0Runtime.new())
+	add_child(rt)
+	await get_tree().process_frame
+	rt.session.transport = func(_method: int, _path: String, _body: Dictionary, _cmd: Dictionary): pass   # nothing goes out
+	var tested := 0
+	for id in ["sh_post_1", "sh_tackle_1", "sh_tea_1", "sh_market_1"]:
+		var r := _room(id)
+		r.rt = rt
+		for n in r.npcs:
+			r.actor.position = r.anchor(n).global_position + Vector3(0.6, 0, 0.6)   # beside them: no strip open over the tags
+			r._markers({})
+			var tag: UiNpcNameTag = rt.ui._npc_tags.get("room:" + n)
+			assert_bool(tag != null and tag.visible and not bool(tag.get_meta("covered", false))) \
+				.override_failure_message("%s %s tag" % [id, n]).is_true()
+			var asked := []
+			var on_tap := func(at: Vector2): asked.append(r.tap_target(at))   # read while tapped_card is set, as p0_tap does
+			rt.ui.tapped.connect(on_tap)
+			assert_bool(rt.ui._tap_at(tag.hit_rect().get_center(), false)).override_failure_message("%s %s" % [id, n]).is_true()
+			rt.ui.tapped.disconnect(on_tap)
+			assert_array(asked).override_failure_message("%s: a tap on %s's name" % [id, n]).is_equal([n])
+			tested += 1
+		for n in r.npcs: rt.ui.npc_tag("room:" + n, "", Vector2.ZERO, false)   # the next room's tags only
+	assert_int(tested).is_equal(6)   # four keepers, Pip and Old Kai
+	# A tag faded under an open strip takes no tap: the tap is the world's (tapped_card stays ""). No stand point in the
+	# four outposts puts a strip over a tag (probed for #122; the earlier check only saw the previous room's door strip,
+	# 哪吒 on #122), so the tag is put in that state directly, as _yield_tag does under a strip.
+	var tackle := _room("sh_tackle_1")
+	tackle.rt = rt
+	tackle._markers({})
+	var kai: UiNpcNameTag = rt.ui._npc_tags.get("room:npc_kai")
+	rt.ui._yield_tag(kai, true)
+	assert_bool(bool(kai.get_meta("covered", false))).is_true()
+	var cards := []
+	var on_tap := func(_at: Vector2): cards.append(rt.ui.tapped_card)
+	rt.ui.tapped.connect(on_tap)
+	assert_bool(rt.ui._tap_at(kai.hit_rect().get_center(), false)).is_false()
+	rt.ui.tapped.disconnect(on_tap)
+	assert_array(cards).is_equal([""])
+
+## 哪吒 on #122: where two name tags' touch areas overlap, the tap goes to the tag whose centre is nearer.
+func test_overlapping_name_tags_give_the_tap_to_the_nearer_one() -> void:
+	var rt: P0Runtime = auto_free(P0Runtime.new())
+	add_child(rt)
+	await get_tree().process_frame
+	var at := Vector2(180, 300)
+	rt.ui.npc_tag("room:npc_a", "Ama", at, true)
+	rt.ui.npc_tag("room:npc_b", "Pip", at + Vector2(20, 0), true)
+	var a: UiNpcNameTag = rt.ui._npc_tags.get("room:npc_a")
+	var b: UiNpcNameTag = rt.ui._npc_tags.get("room:npc_b")
+	assert_bool(a.hit_rect().has_point(b.hit_rect().get_center())).is_true()   # each centre lies in both areas
+	assert_bool(b.hit_rect().has_point(a.hit_rect().get_center())).is_true()
+	var asked := []
+	rt.ui.tapped.connect(func(_p: Vector2): asked.append(rt.ui.tapped_card))
+	for pair in [[a, "room:npc_a"], [b, "room:npc_b"]]:
+		var c: Vector2 = (pair[0] as UiNpcNameTag).hit_rect().get_center()
+		asked.clear()
+		rt.ui._tap_at(c, false)
+		assert_array(asked).is_equal([pair[1]])
+
 ## Scene integration (SGODOT-227, 不知火舞's walkthrough on 227): the tea house opens on the Coffee Shop kit with the
 ## background of its signed render and every anchor of its file, and the opening view holds the whole art, centred, with at least
 ## 16 px clear on both sides (the kit's own camera left about 14 px on the right).
