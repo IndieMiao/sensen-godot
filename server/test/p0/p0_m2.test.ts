@@ -129,20 +129,28 @@ describe('P0 fishing (§6.1–6.7)', () => {
 
 describe('P0 recipes (§7.2.3 / §7.4.1)', () => {
   it('derives page rarity from ingredient rarity × families', () => {
-    expect(c.cooking.recipes.map(r => [r.id, recipeRarity(c, r)])).toEqual([
-      ['dish_grilled_crucian', 1], ['dish_herb_grilled_fish', 2], ['dish_grilled_fish', 1], ['dish_carp_cakes', 1],
-      ['dish_mullet_skewers', 1], ['dish_radish_salad', 1], ['dish_veggie_plate', 1], ['dish_carrot_cake', 1],
-      ['dish_fish_soup', 2], ['dish_pan_fried_fish', 2], ['dish_fruit_tea', 2], ['dish_roast_veggies', 2],
-      ['dish_herb_baked_perch', 3], ['dish_bass_tomato_stew', 3]]);
+    // §7.14.0 (q(39)): the 14 P0 pages, Common 5 / Fine 6 / Rare 3, in Cookbook order.
+    expect(c.cooking.recipes.map(r => [r.n, r.id, recipeRarity(c, r)])).toEqual([
+      [1, 'dish_grilled_crucian', 1], [2, 'dish_grilled_fish', 1], [5, 'dish_radish_salad', 1], [6, 'dish_veggie_plate', 1],
+      [7, 'dish_carrot_cake', 1], [10, 'dish_herb_grilled_fish', 2], [11, 'dish_salt_grilled_fish', 2], [12, 'dish_fish_soup', 2],
+      [15, 'dish_pan_fried_fish', 2], [17, 'dish_salted_potatoes', 2], [19, 'dish_fruit_tea', 2], [27, 'dish_bass_tomato_stew', 3],
+      [28, 'dish_smoked_trout', 3], [37, 'dish_fisher_stew', 3]]);
+    expect(c.cooking.recipes.filter(r => r.in.length === 3).every(r => r.in.includes('rock_salt'))).toBe(true);
+    expect([...c.cooking.recipes.map(r => r.n), ...c.cooking.pages.map(p => p.n)].sort((a, b) => a! - b!)).toEqual(
+      Array.from({ length: 48 }, (_, i) => i + 1));
     expect(deriveRarity(c, [{ family: 'W', rarity: 1 }, { family: 'F', rarity: 1 }, { family: 'S', rarity: 1 }])).toBe(3);
   });
   it('specific pages beat tag pages, fewest wildcards win, otherwise a Mystery Dish', () => {
     expect(matchRecipe(c, ['fish_crucian'])?.id).toBe('dish_grilled_crucian');
     expect(matchRecipe(c, ['fish_carp'])?.id).toBe('dish_grilled_fish');
-    expect(matchRecipe(c, ['fish_carp', 'fish_carp'])?.id).toBe('dish_carp_cakes');
     expect(matchRecipe(c, ['crop_lettuce', 'crop_radish'])?.id).toBe('dish_radish_salad');
-    expect(matchRecipe(c, ['crop_herb', 'fish_perch'])?.id).toBe('dish_herb_baked_perch');
     expect(matchRecipe(c, ['fish_crucian', 'crop_chili'])?.id).toBe('dish_herb_grilled_fish');
+    expect(matchRecipe(c, ['fish_crucian', 'rock_salt'])?.id).toBe('dish_salt_grilled_fish');      // a named slot beats "any seasoning"
+    expect(matchRecipe(c, ['fish_trout', 'crop_potato', 'rock_salt'])?.id).toBe('dish_fisher_stew');
+    expect(matchRecipe(c, ['fish_trout', 'wild_herb', 'rock_salt'])?.id).toBe('dish_smoked_trout');
+    expect(matchRecipe(c, ['fish_trout', 'crop_herb', 'rock_salt'])).toBeNull();                   // Smoked Trout takes Wild Herb only
+    expect(matchRecipe(c, ['fish_carp', 'fish_carp'])).toBeNull();                                  // Carp Fish Cakes is P1
+    expect(matchRecipe(c, ['crop_tomato'])).toBeNull();                                             // so is Roast Veggies
     expect(matchRecipe(c, ['crop_radish', 'crop_carrot'])).toBeNull();
   });
 });
@@ -186,10 +194,10 @@ describe('P0 cooking (§7.2.4–7.2.5 / §7.6.2)', () => {
   });
   it('experiment discovers a page; unmatched sets become a Mystery Dish with no XP', () => {
     let s = fresh();
-    s.bag.push({ id: 'fish_carp', qty: 2 });
-    s = step(s, { type: 'cook', items: ['fish_carp', 'fish_carp'] }).s;
+    s.bag.push({ id: 'crop_carrot', qty: 2 });
+    s = step(s, { type: 'cook', items: ['crop_carrot', 'crop_carrot'] }).s;
     s = step(s, { type: 'collect' }, T0 + 6 * S).s;
-    expect(s.cookbook).toContain('dish_carp_cakes');
+    expect(s.cookbook).toContain('dish_carrot_cake');
     s.bag.push({ id: 'crop_radish', qty: 1 }, { id: 'crop_carrot', qty: 1 });
     s = step(s, { type: 'cook', items: ['crop_radish', 'crop_carrot'] }, T0 + 10 * S).s;
     const before = s.skills.cooking;
@@ -210,13 +218,13 @@ describe('P0 cooking (§7.2.4–7.2.5 / §7.6.2)', () => {
   });
   it('Perfect on a two-heat Rare page gives a second Plain portion', () => {
     let s = fresh();
-    s.bag.push({ id: 'fish_perch', qty: 1 }, { id: 'crop_herb', qty: 1 });
+    s.bag.push({ id: 'fish_bass', qty: 1 }, { id: 'crop_tomato', qty: 1 });
     s.fires = 1;
-    s = step(s, { type: 'cook', items: ['fish_perch', 'crop_herb'] }).s;
+    s = step(s, { type: 'cook', items: ['fish_bass', 'crop_tomato'] }).s;
     const taps = s.stove!.heats.map(h => h.at + (h.gold + h.width / 2) * h.spin);
     s = step(s, { type: 'collect', taps }, T0 + 31 * S).s;
-    expect(count(s.bag, 'dish_herb_baked_perch@perfect')).toBe(1);
-    expect(count(s.bag, 'dish_herb_baked_perch')).toBe(1);
+    expect(count(s.bag, 'dish_bass_tomato_stew@perfect')).toBe(1);
+    expect(count(s.bag, 'dish_bass_tomato_stew')).toBe(1);
     expect(s.skills.cooking).toBe(64); // first Rare 40 + Perfect base 16 × 1.5
   });
 });
@@ -302,11 +310,11 @@ describe('P0 Newcomer Blessing (§3.4.6) and one-time rewards (§3.4.8)', () => 
   it('first Rare dish +30 Energy; Common and Fine firsts give none', () => {
     let s = fresh();
     s.energy = { value: 150, tick_ms: T0 };
-    s.bag.push({ id: 'fish_perch', qty: 1 }, { id: 'crop_herb', qty: 1 }, { id: 'fish_crucian', qty: 1 });
+    s.bag.push({ id: 'fish_bass', qty: 1 }, { id: 'crop_tomato', qty: 1 }, { id: 'fish_crucian', qty: 1 });
     s = step(s, { type: 'cook', items: ['fish_crucian'] }).s;
     let r = step(s, { type: 'collect' }, T0 + 6 * S);
     expect(r.ev.some(e => e.kind === 'reward')).toBe(false);
-    r = step(r.s, { type: 'cook', items: ['fish_perch', 'crop_herb'] }, T0 + 10 * S);
+    r = step(r.s, { type: 'cook', items: ['fish_bass', 'crop_tomato'] }, T0 + 10 * S);
     r = step(r.s, { type: 'collect' }, T0 + 41 * S);
     expect(r.ev.find(e => e.kind === 'reward')).toMatchObject({ id: 'first_dish_3', energy: 30 });
   });

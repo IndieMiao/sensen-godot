@@ -58,19 +58,23 @@ def main():
     for item in samples.get("parts", []):
         if "tier" not in item:
             report.warn(f"{item['asset']}: tier 未声明，默认 0")
-        r = parts_mod.build_recipe(unity_root, item["asset"], int(item.get("tier", 0)), overrides, registry, report)
+        r = parts_mod.build_recipe(unity_root, item["asset"], int(item.get("tier", 0)), overrides, registry, report,
+                                   part_id=item.get("id"))
         if r:
             recipes.append(r)
 
     for r in recipes:
         sid = r["id"]
+        # albedo_as：贴图落进 source/<id>/ 时用的文件名（如去掉 Unity 重名后缀里的空格 "…_D 2.png"）。
+        albedo_as = (overrides.get(sid) or {}).get("albedo_as")
         r["fbx"] = _stage(Path(r["fbx"]), godot_root, sid, report)
         for m in r["materials"]:
             # res:// 直通值（overrides 指向仓库内资产）不拷贝、原样进 recipe
             m["albedo"] = m["albedo"] if str(m["albedo"]).startswith("res://") \
-                else (_stage(m["albedo"], godot_root, sid, report) if m["albedo"] else None)
+                else (_stage(m["albedo"], godot_root, sid, report, albedo_as) if m["albedo"] else None)
             m["ao"] = m["ao"] if str(m["ao"]).startswith("res://") \
                 else (_stage(m["ao"], godot_root, sid, report) if m["ao"] else None)
+        # 样例里写了 "id" 的 NPC 变体和原件共用同一个 unity_guid：以后按 guid 反查部件时要排除 npc_only 的 id。
         guid_rows.append((r["unity_guid"], sid))
 
     (out_dir / "recipes.json").write_text(
@@ -83,7 +87,7 @@ def main():
     if report.errors:
         sys.exit(1)
 
-def _stage(src, godot_root: Path, part_id: str, report) -> str:
+def _stage(src, godot_root: Path, part_id: str, report, name: str = None) -> str:
     """拷贝到 assets/avatar/source/<part_id>/，返回 res:// 路径。同名文件真正幂等覆盖：用
     copyfile（不像 copy2 那样拷贝源文件的元数据/系统标志——Unity 源文件本身可能带只读/
     uchg 等不可变标志，copy2 会把它们连带复制到目标文件上，导致下一次运行覆盖同名文件时
@@ -94,7 +98,7 @@ def _stage(src, godot_root: Path, part_id: str, report) -> str:
         return ""
     dst_dir = godot_root / "assets/avatar/source" / part_id
     dst_dir.mkdir(parents=True, exist_ok=True)
-    dst = dst_dir / src.name
+    dst = dst_dir / (name or src.name)
     if dst.exists():
         try:
             os.chflags(dst, 0)  # 清 uchg 等标志（macOS；非 macOS 平台没有 chflags）

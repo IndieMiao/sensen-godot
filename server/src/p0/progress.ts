@@ -20,8 +20,12 @@ export type P0Event =
   | { kind: 'cast'; bite_in: number; rarity: number; breaks: 'level' | 'rod' | null; bait: string | null }
   | { kind: 'catch'; fish: string; rarity: number; result: 'landed' | 'escaped' | 'broke_free' | 'cancelled'; refund: number;
       need_level?: number; protected_left?: number }
-  | { kind: 'pot'; dish: string | null; rarity: number; ms: number }
-  | { kind: 'dish'; dish: string; quality: number; qty: number; first: boolean; mystery: boolean; hits: number }
+  | { kind: 'pot'; id?: number; dish: string | null; rarity: number; ms: number; tried?: boolean; queued?: boolean }   // tried: this combination failed before; queued: waits (Queue ×2)
+  | { kind: 'queue'; id?: number; dish: string | null; started_at: number; ms: number }   // the waiting pot fired (Queue ×2)
+  // A Mystery Dish (§7.5.2): tried = not new (no clue); refund = ingredients given back; clue = slots turned on a Hidden page.
+  | { kind: 'mishap'; items: string[]; tried: boolean; refund: string[]; trial_left: number | null; clue: { page: string; slots: number[] } | null }
+  // auto: kept by Queue ×2; none: a failed pot with its ingredients back (Newcomer Blessing) made no Mystery Dish (qty 0)
+  | { kind: 'dish'; pot?: number; dish: string; quality: number; qty: number; first: boolean; mystery: boolean; hits: number; auto?: true; none?: true; trial_left?: number }
   | { kind: 'meal'; dish: string; nominal: number; counted: number; gain: number; meals: number; cap: number }
   | { kind: 'reward'; id: string; energy: number }
   | { kind: 'request'; id: string; status: 'accepted' | 'done' | 'dropped'; coins: number; bonus?: number }
@@ -90,6 +94,16 @@ export function gainXp(c: P0Content, s: P0State, now: number, skill: Skill, amou
     events.push({ kind: 'level', skill, level, energy: granted, gifts });
     grantItems(c, s, now, `level:${skill}:${level}`, `${skill[0].toUpperCase()}${skill.slice(1)} Lv${level} reward`, gifts, events);
   }
+}
+
+/**
+ * A first-time XP bonus (first cast, first catch of a species, first harvest, first pot of a page): the `first` event
+ * says what it paid after the daily cap, and is left out when the cap took it all.
+ */
+export function firstXp(c: P0Content, s: P0State, now: number, skill: Skill, what: string, xp: number, events: P0Event[]): void {
+  const paid = Math.max(0, Math.min(xp, c.skill_daily_cap - (s.day.xp[skill] ?? 0)));
+  if (paid > 0) events.push({ kind: 'first', what, xp: paid });
+  gainXp(c, s, now, skill, xp, 100, events);
 }
 
 /** §3.4.8: a one-time energy reward, shown with the moment that earned it; may pass max by ≤ max_over. */

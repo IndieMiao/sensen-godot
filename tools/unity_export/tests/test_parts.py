@@ -100,3 +100,36 @@ def test_resolve_override_path_res_passthrough(tmp_path):
     v = parts._resolve_override_path("res://assets/avatar/common/T_black.png", tmp_path)
     assert v == "res://assets/avatar/common/T_black.png"
     assert isinstance(v, str)
+
+def test_sample_id_names_a_new_part_from_the_same_asset(tmp_path):
+    """samples.json 的 "id" 给同一个 Unity 资产另起新部件（SGODOT-229 NPC 专用变体）：原件与变体
+    各自登记、互不冲突，overrides 按各自的 id 取。"""
+    unity_root = _make_unity_root(tmp_path)
+    plain_fbx = tmp_path / "SK_Plain.fbx"
+    plain_fbx.touch()
+    npc_fbx = tmp_path / "SK_Npc.fbx"
+    npc_fbx.touch()
+    report = parts.Report()
+    registry = naming.SlugRegistry()
+    overrides = {"fakepart": {"fbx": str(plain_fbx)}, "fakepart_npc_kai": {"fbx": str(npc_fbx)}}
+
+    plain = parts.build_recipe(unity_root, "ap_fakepart", 0, overrides, registry, report)
+    npc = parts.build_recipe(unity_root, "ap_fakepart", 0, overrides, registry, report, part_id="fakepart_npc_kai")
+
+    assert not report.errors
+    assert plain["id"] == "fakepart" and plain["fbx"] == plain_fbx
+    assert npc["id"] == "fakepart_npc_kai" and npc["fbx"] == npc_fbx
+    assert npc["slot"] == plain["slot"] and npc["unity_guid"] == plain["unity_guid"]
+
+def test_sample_id_must_be_a_clean_slug_and_unique(tmp_path):
+    unity_root = _make_unity_root(tmp_path)
+    (tmp_path / "SK.fbx").touch()
+    overrides = {"x": {"fbx": str(tmp_path / "SK.fbx")}}
+    report = parts.Report()
+    registry = naming.SlugRegistry()
+    assert parts.build_recipe(unity_root, "ap_fakepart", 0, {}, registry, report, part_id="Bad Id") is None
+    assert report.errors
+    report = parts.Report()
+    assert parts.build_recipe(unity_root, "ap_fakepart", 0, overrides, registry, report, part_id="x") is not None
+    assert parts.build_recipe(unity_root, "ap_fakepart", 0, overrides, registry, report, part_id="x") is None   # 冲突
+    assert any("冲突" in e for e in report.errors)

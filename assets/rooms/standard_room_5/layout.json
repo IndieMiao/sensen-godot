@@ -1,0 +1,1456 @@
+{
+  "units": "metres",
+  "axes": "Godot Y-up, front +Z; Blender (x,-z,y)",
+  "reference": {
+    "file_key": "OMLTC3yw3u2WDjOZhLnhaR",
+    "node_id": "545:2969"
+  },
+  "assets": [
+    {
+      "name": "room_shell",
+      "file": "room_shell.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            -0.07,
+            0
+          ],
+          "size": [
+            6.48,
+            0.3,
+            6.48
+          ]
+        },
+        {
+          "at": [
+            -3.1,
+            1.65,
+            0
+          ],
+          "size": [
+            0.22,
+            3.3,
+            6.45
+          ]
+        },
+        {
+          "at": [
+            -0.66,
+            1.65,
+            -3.1
+          ],
+          "size": [
+            4.66,
+            3.3,
+            0.22
+          ]
+        },
+        {
+          "at": [
+            3.02,
+            1.65,
+            -3.1
+          ],
+          "size": [
+            0.14,
+            3.3,
+            0.22
+          ]
+        },
+        {
+          "at": [
+            2.36,
+            2.94,
+            -3.1
+          ],
+          "size": [
+            1.06,
+            0.82,
+            0.22
+          ]
+        },
+        {
+          "at": [
+            3.19,
+            0.75,
+            0
+          ],
+          "size": [
+            0.1,
+            1.5,
+            6.48
+          ]
+        },
+        {
+          "at": [
+            0,
+            0.75,
+            3.19
+          ],
+          "size": [
+            6.48,
+            1.5,
+            0.1
+          ]
+        },
+        {
+          "at": [
+            2.36,
+            -0.07,
+            -3.42
+          ],
+          "size": [
+            1.1,
+            0.3,
+            0.84
+          ]
+        },
+        {
+          "at": [
+            1.77,
+            0.7,
+            -3.45
+          ],
+          "size": [
+            0.08,
+            1.4,
+            0.85
+          ]
+        },
+        {
+          "at": [
+            2.95,
+            0.7,
+            -3.45
+          ],
+          "size": [
+            0.08,
+            1.4,
+            0.85
+          ]
+        },
+        {
+          "at": [
+            2.36,
+            0.7,
+            -3.85
+          ],
+          "size": [
+            1.2,
+            1.4,
+            0.08
+          ]
+        }
+      ]
+    },
+    {
+      "name": "window_wall",
+      "file": "window_wall.glb",
+      "position": [
+        -3.1,
+        0,
+        0
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "back_wall",
+      "file": "back_wall.glb",
+      "position": [
+        0,
+        0,
+        -3.1
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "arched_window",
+      "file": "arched_window.glb",
+      "position": [
+        -3.0,
+        0,
+        0.2
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "window_garden",
+      "file": "window_garden.glb",
+      "position": [
+        -3.03,
+        0,
+        0.2
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "green_door",
+      "file": "green_door.glb",
+      "position": [
+        1.84,
+        0.05,
+        -2.985
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "entry_mat",
+      "file": "entry_mat.glb",
+      "position": [
+        2.36,
+        0.092,
+        -2.38
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "door_frame",
+      "file": "door_frame.glb",
+      "position": [
+        2.36,
+        0.05,
+        -2.985
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "hearth",
+      "file": "hearth.glb",
+      "position": [
+        -1.59,
+        0.082,
+        -2.61
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.7,
+            0
+          ],
+          "size": [
+            1.03,
+            1.4,
+            0.94
+          ]
+        }
+      ]
+    },
+    {
+      "name": "kettle",
+      "file": "kettle.glb",
+      "position": [
+        -1.59,
+        1.4,
+        -2.42
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "firewood_alcove",
+      "file": "firewood_alcove.glb",
+      "position": [
+        -0.66,
+        0.082,
+        -2.68
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.54,
+            0
+          ],
+          "size": [
+            0.69,
+            1.08,
+            0.82
+          ]
+        }
+      ]
+    },
+    {
+      "name": "range_cooker",
+      "file": "range_cooker.glb",
+      "position": [
+        1.43,
+        0.082,
+        -2.72
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.65,
+            0
+          ],
+          "size": [
+            0.67,
+            1.3,
+            0.84
+          ]
+        }
+      ]
+    },
+    {
+      "name": "bookshelf",
+      "file": "bookshelf.glb",
+      "position": [
+        -2.59,
+        0.082,
+        -2.59
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            1.02,
+            0
+          ],
+          "size": [
+            0.91,
+            2.04,
+            0.52
+          ]
+        }
+      ]
+    },
+    {
+      "name": "sink_cabinet",
+      "file": "sink_cabinet.glb",
+      "position": [
+        0.36,
+        0.082,
+        -2.71
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0.0,
+            0.6,
+            0
+          ],
+          "size": [
+            1.35,
+            1.2,
+            0.86
+          ]
+        }
+      ]
+    },
+    {
+      "name": "wall_shelf",
+      "file": "wall_shelf.glb",
+      "position": [
+        0.39,
+        2.33,
+        -2.88
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "hanging_cookware",
+      "file": "hanging_cookware.glb",
+      "position": [
+        0.3,
+        1.66,
+        -2.92
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "hanging_towel",
+      "file": "hanging_towel.glb",
+      "position": [
+        0.96,
+        1.75,
+        -2.89
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "utensil_crock",
+      "file": "utensil_crock.glb",
+      "position": [
+        -0.83,
+        1.27,
+        -2.78
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "counter_board",
+      "file": "counter_board.glb",
+      "position": [
+        -0.73,
+        1.27,
+        -2.54
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "straw_hat",
+      "file": "straw_hat.glb",
+      "position": [
+        2.99,
+        1.96,
+        -2.79
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "door_garden_fork",
+      "file": "door_garden_fork.glb",
+      "position": [
+        2.99,
+        0.083,
+        -2.77
+      ],
+      "yaw_degrees": -4,
+      "colliders": []
+    },
+    {
+      "name": "entry_basket",
+      "file": "entry_basket.glb",
+      "position": [
+        2.79,
+        0.083,
+        -2.39
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "garden_boots",
+      "file": "garden_boots.glb",
+      "position": [
+        2.56,
+        0.083,
+        -1.93
+      ],
+      "yaw_degrees": -7,
+      "colliders": []
+    },
+    {
+      "name": "botanical_picture",
+      "file": "botanical_picture.glb",
+      "position": [
+        -2.96,
+        1.9,
+        1.73
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "bookcase_picture",
+      "file": "bookcase_picture.glb",
+      "position": [
+        -2.77,
+        2.47,
+        -2.73
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "window_daisies",
+      "file": "window_daisies.glb",
+      "position": [
+        -2.82,
+        1.4,
+        0.73
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "window_hanging_basket",
+      "file": "window_hanging_basket.glb",
+      "position": [
+        -2.84,
+        2.57,
+        -1.18
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "sofa",
+      "file": "sofa.glb",
+      "position": [
+        -2.57,
+        0.082,
+        0.82
+      ],
+      "yaw_degrees": 90,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.55,
+            0
+          ],
+          "size": [
+            2.08,
+            1.1,
+            0.9
+          ]
+        }
+      ]
+    },
+    {
+      "name": "round_rope_rug",
+      "file": "round_rope_rug.glb",
+      "position": [
+        -1.7,
+        0.096,
+        1.16
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "dining_rug",
+      "file": "dining_rug.glb",
+      "position": [
+        0.42,
+        0.093,
+        1.28
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "reading_stool",
+      "file": "reading_stool.glb",
+      "position": [
+        -2.15,
+        0.083,
+        2.02
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.23,
+            0
+          ],
+          "size": [
+            0.58,
+            0.46,
+            0.58
+          ]
+        }
+      ]
+    },
+    {
+      "name": "reading_cup",
+      "file": "reading_cup.glb",
+      "position": [
+        -2.15,
+        0.615,
+        2.02
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "bookcase_stool",
+      "file": "bookcase_stool.glb",
+      "position": [
+        -2.3,
+        0.083,
+        -1.77
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.285,
+            0
+          ],
+          "size": [
+            0.48,
+            0.57,
+            0.48
+          ]
+        }
+      ]
+    },
+    {
+      "name": "dining_table",
+      "file": "dining_table.glb",
+      "position": [
+        0.43,
+        0.082,
+        1.23
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0.0,
+            0.6,
+            0
+          ],
+          "size": [
+            1.7859999999999998,
+            1.2,
+            1.18
+          ]
+        }
+      ]
+    },
+    {
+      "name": "checked_runner",
+      "file": "checked_runner.glb",
+      "position": [
+        0.43,
+        1.233,
+        1.23
+      ],
+      "yaw_degrees": 90,
+      "colliders": []
+    },
+    {
+      "name": "chair",
+      "file": "chair.glb",
+      "position": [
+        0.22,
+        0.082,
+        2.02
+      ],
+      "yaw_degrees": 0,
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.66,
+            0
+          ],
+          "size": [
+            0.63,
+            1.32,
+            0.63
+          ]
+        }
+      ]
+    },
+    {
+      "name": "chair_cushion",
+      "file": "chair_cushion.glb",
+      "position": [
+        0.22,
+        0.082,
+        2.02
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "rug_fringe",
+      "file": "rug_fringe.glb",
+      "position": [
+        0.42,
+        0.097,
+        1.28
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "daisy_jug",
+      "file": "daisy_jug.glb",
+      "position": [
+        0.05,
+        1.262,
+        1.15
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    },
+    {
+      "name": "tabletop_still_life",
+      "file": "tabletop_still_life.glb",
+      "position": [
+        0.54,
+        1.262,
+        1.23
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    }
+  ],
+  "instances": [
+    {
+      "name": "chair_far",
+      "asset": "chair",
+      "position": [
+        0.64,
+        0.082,
+        0.44
+      ],
+      "yaw_degrees": 180
+    },
+    {
+      "name": "far_chair_cushion",
+      "asset": "chair_cushion",
+      "position": [
+        0.64,
+        0.082,
+        0.44
+      ],
+      "yaw_degrees": 180
+    }
+  ],
+  "camera": {
+    "position": [
+      10.234048815405814,
+      9.775054585992919,
+      10.966505589470644
+    ],
+    "target": [
+      0,
+      1.3982961427291736,
+      0
+    ],
+    "size": 12.891239223541001
+  },
+  "sun_direction": [
+    -6,
+    7,
+    1.5
+  ],
+  "review_lighting": {
+    "ambient": 0.52,
+    "ambient_color": "FFE6BD",
+    "sun": 1.35,
+    "sun_color": "FFE6AC",
+    "shadow_bias": 0.08,
+    "shadow_normal_bias": 1.0,
+    "shadow_distance": 25,
+    "sun_position": [
+      -7,
+      4.5,
+      -2.8
+    ],
+    "sun_target": [
+      0,
+      0,
+      0
+    ],
+    "background": "DBE5CD",
+    "background_gradient": true,
+    "points": []
+  },
+  "door": {
+    "module": "green_door",
+    "open_yaw_degrees": 100,
+    "hinge": [
+      1.84,
+      0.05,
+      -2.985
+    ]
+  },
+  "shared_plants": [
+    {
+      "name": "floor_monstera",
+      "file": "monstera.glb",
+      "position": [
+        -2.78,
+        0.083,
+        2.22
+      ],
+      "rotation_degrees": [
+        0,
+        35,
+        0
+      ],
+      "scale": [
+        1.31,
+        1.31,
+        1.31
+      ],
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.3,
+            0
+          ],
+          "size": [
+            0.64,
+            0.6,
+            0.64
+          ]
+        }
+      ]
+    },
+    {
+      "name": "entry_peace_lily",
+      "file": "peace_lily.glb",
+      "position": [
+        2.92,
+        0.083,
+        -2.13
+      ],
+      "rotation_degrees": [
+        0,
+        -28,
+        0
+      ],
+      "scale": [
+        0.69,
+        0.69,
+        0.69
+      ],
+      "colliders": [
+        {
+          "at": [
+            0,
+            0.2,
+            0
+          ],
+          "size": [
+            0.46,
+            0.4,
+            0.46
+          ]
+        }
+      ]
+    },
+    {
+      "name": "window_pothos",
+      "file": "pothos.glb",
+      "position": [
+        -2.7,
+        1.4,
+        -0.47
+      ],
+      "rotation_degrees": [
+        0,
+        98,
+        0
+      ],
+      "scale": [
+        1.31,
+        1.31,
+        1.31
+      ],
+      "colliders": []
+    },
+    {
+      "name": "bookcase_pothos",
+      "file": "pothos.glb",
+      "position": [
+        -2.26,
+        2.3,
+        -2.38
+      ],
+      "rotation_degrees": [
+        0,
+        -18,
+        0
+      ],
+      "scale": [
+        1.19,
+        1.19,
+        1.19
+      ],
+      "colliders": []
+    },
+    {
+      "name": "pantry_pothos",
+      "file": "pothos.glb",
+      "position": [
+        1.08,
+        2.42,
+        -2.65
+      ],
+      "rotation_degrees": [
+        0,
+        9,
+        0
+      ],
+      "scale": [
+        0.95,
+        0.95,
+        0.95
+      ],
+      "colliders": []
+    },
+    {
+      "name": "hanging_pothos",
+      "file": "pothos.glb",
+      "position": [
+        -2.84,
+        2.57,
+        -1.18
+      ],
+      "rotation_degrees": [
+        0,
+        102,
+        0
+      ],
+      "scale": [
+        0.78,
+        0.78,
+        0.78
+      ],
+      "colliders": []
+    },
+    {
+      "name": "window_extra_vine",
+      "file": "ivy_medium.glb",
+      "position": [
+        -2.47,
+        1.63,
+        -0.48
+      ],
+      "rotation_degrees": [
+        0,
+        75,
+        0
+      ],
+      "scale": [
+        0.75,
+        0.75,
+        0.75
+      ],
+      "colliders": []
+    },
+    {
+      "name": "bookcase_extra_vine",
+      "file": "ivy_long.glb",
+      "position": [
+        -2.03,
+        2.64,
+        -2.22
+      ],
+      "rotation_degrees": [
+        0,
+        -15,
+        0
+      ],
+      "scale": [
+        0.76,
+        0.76,
+        0.76
+      ],
+      "colliders": []
+    }
+  ],
+  "spawn": [
+    2.36,
+    0.09,
+    -2.0
+  ],
+  "bench": {
+    "floor_y": 0.08,
+    "route": [
+      {
+        "name": "door",
+        "position": [
+          2.31,
+          0.08,
+          -1.6
+        ],
+        "capture": "door"
+      },
+      {
+        "name": "southeast aisle",
+        "position": [
+          2.0,
+          0.08,
+          2.7
+        ]
+      },
+      {
+        "name": "table south",
+        "position": [
+          0.37,
+          0.08,
+          2.87
+        ]
+      },
+      {
+        "name": "southwest aisle",
+        "position": [
+          -1.2,
+          0.08,
+          2.68
+        ]
+      },
+      {
+        "name": "sofa front",
+        "position": [
+          -1.38,
+          0.08,
+          0.65
+        ]
+      },
+      {
+        "name": "bookcase front",
+        "position": [
+          -2.28,
+          0.08,
+          -1.18
+        ]
+      },
+      {
+        "name": "hearth front",
+        "position": [
+          -1.54,
+          0.08,
+          -1.51
+        ],
+        "capture": "main"
+      },
+      {
+        "name": "kitchen counter",
+        "position": [
+          0.35,
+          0.08,
+          -1.51
+        ]
+      },
+      {
+        "name": "window",
+        "position": [
+          -2.54,
+          0.08,
+          -0.55
+        ]
+      }
+    ],
+    "blocked": [
+      {
+        "name": "table",
+        "from": [
+          2,
+          0.09,
+          1.23
+        ],
+        "to": [
+          0.43,
+          0.09,
+          1.23
+        ],
+        "target": "dining_table"
+      },
+      {
+        "name": "sofa",
+        "from": [
+          -1.1,
+          0.09,
+          0.9
+        ],
+        "to": [
+          -2.57,
+          0.09,
+          0.9
+        ],
+        "target": "sofa"
+      },
+      {
+        "name": "hearth",
+        "from": [
+          -1.59,
+          0.09,
+          -1.35
+        ],
+        "to": [
+          -1.59,
+          0.09,
+          -2.61
+        ],
+        "target": "hearth"
+      },
+      {
+        "name": "counter",
+        "from": [
+          0.3,
+          0.09,
+          -1.5
+        ],
+        "to": [
+          0.3,
+          0.09,
+          -2.71
+        ],
+        "target": "sink_cabinet"
+      },
+      {
+        "name": "bookcase",
+        "from": [
+          -2.85,
+          0.09,
+          -1.48
+        ],
+        "to": [
+          -2.85,
+          0.09,
+          -2.59
+        ],
+        "target": "bookshelf"
+      },
+      {
+        "name": "west wall",
+        "from": [
+          -2.55,
+          0.09,
+          -0.55
+        ],
+        "to": [
+          -3.65,
+          0.09,
+          -0.55
+        ],
+        "target": "room_shell"
+      },
+      {
+        "name": "east edge",
+        "from": [
+          2.45,
+          0.09,
+          1.65
+        ],
+        "to": [
+          3.8,
+          0.09,
+          1.65
+        ],
+        "target": "room_shell"
+      },
+      {
+        "name": "south edge",
+        "from": [
+          1.7,
+          0.09,
+          2.45
+        ],
+        "to": [
+          1.7,
+          0.09,
+          3.8
+        ],
+        "target": "room_shell"
+      },
+      {
+        "name": "back wall",
+        "from": [
+          1.65,
+          0.09,
+          -1.65
+        ],
+        "to": [
+          1.65,
+          0.09,
+          -3.55
+        ],
+        "target": "range_cooker"
+      }
+    ],
+    "gaps": [
+      {
+        "name": "table-sofa aisle",
+        "from": [
+          -1.38,
+          0.09,
+          2.0
+        ],
+        "to": [
+          -1.38,
+          0.09,
+          0.2
+        ],
+        "measure": [
+          [
+            -2.12,
+            0.7,
+            1.22
+          ],
+          [
+            -0.463,
+            0.7,
+            1.22
+          ]
+        ],
+        "minimum": 0.7,
+        "width": 1.657
+      },
+      {
+        "name": "table-kitchen aisle",
+        "from": [
+          1.51,
+          0.09,
+          -1.35
+        ],
+        "to": [
+          -1.76,
+          0.09,
+          -1.35
+        ],
+        "measure": [
+          [
+            0.4,
+            0.7,
+            -2.28
+          ],
+          [
+            0.4,
+            0.7,
+            0.125
+          ]
+        ],
+        "minimum": 0.7,
+        "width": 2.405
+      }
+    ],
+    "entrance": {
+      "inside": [
+        2.36,
+        0.09,
+        -2.4
+      ],
+      "outside": [
+        2.36,
+        0.09,
+        -3.47
+      ]
+    },
+    "slide": {
+      "from": [
+        2.62,
+        0.09,
+        1.8
+      ],
+      "direction": [
+        1,
+        0,
+        -1
+      ],
+      "tangent": [
+        0,
+        0,
+        -1
+      ],
+      "seconds": 0.6
+    },
+    "input_start": [
+      1.8,
+      0.09,
+      2.2
+    ],
+    "scale": {
+      "door": {
+        "height": 2.33,
+        "source": "Sage arched door"
+      },
+      "counter": {
+        "height": 1.1525,
+        "source": "Oak countertop"
+      },
+      "chair": {
+        "height": 0.7825,
+        "source": "R2 thicker pad on lowered solid seat; sitting top .7825m"
+      },
+      "table": {
+        "height": 1.135,
+        "source": "Individual tabletop board"
+      }
+    }
+  },
+  "review_views": [
+    {
+      "name": "detail-kitchen",
+      "position": [
+        5.4,
+        4.2,
+        5.1
+      ],
+      "target": [
+        -0.6,
+        1.72,
+        -2.44
+      ],
+      "size": 5.6
+    },
+    {
+      "name": "detail-living",
+      "position": [
+        5.5,
+        4.8,
+        7.4
+      ],
+      "target": [
+        -1.74,
+        0.91,
+        0.9
+      ],
+      "size": 5.5
+    },
+    {
+      "name": "detail-fire",
+      "position": [
+        -1.59,
+        1.6,
+        -0.55
+      ],
+      "target": [
+        -1.59,
+        0.57,
+        -2.47
+      ],
+      "size": 2.6
+    }
+  ],
+  "reference_camera_fit": {
+    "method": "Three visible rounded plinth edge intersections; rectangular ground-plane constraint. No image warp.",
+    "reference_canvas": [
+      1440,
+      1080
+    ],
+    "reference_source_size": [
+      3402,
+      2561
+    ],
+    "anchors": {
+      "left": [
+        198.0,
+        683.0
+      ],
+      "front": [
+        737.0,
+        945.0
+      ],
+      "right": [
+        1240.0,
+        699.0
+      ],
+      "back_inferred": [
+        701.0,
+        437.0
+      ]
+    },
+    "back_corner_visibility": "Occluded by room; inferred by parallelogram, not measured from visible pixels.",
+    "pitch_degrees": 29.18119932295211,
+    "yaw_degrees": 43.021278339258195,
+    "camera": {
+      "position": [
+        10.234048815405814,
+        9.775054585992919,
+        10.966505589470644
+      ],
+      "target": [
+        0,
+        1.3982961427291736,
+        0
+      ],
+      "size": 12.891239223541001
+    },
+    "limits": "Hand-selected intersections on a stylized perspective reference. Wall caps and furniture are independent visual checks, not claimed pixel-perfect."
+  },
+  "archived_assets": [
+    {
+      "name": "fire",
+      "file": "fire.glb",
+      "position": [
+        -1.59,
+        0.3,
+        -2.29
+      ],
+      "yaw_degrees": 0,
+      "colliders": []
+    }
+  ],
+  "effects": [
+    {
+      "name": "fx_hearth_fire",
+      "scene": "res://assets/rooms/_shared/fx/fx_hearth_fire.tscn",
+      "position": [
+        -1.59,
+        0.3,
+        -2.29
+      ],
+      "emission_box": [
+        0.17,
+        0.006,
+        0.035
+      ],
+      "flame_height": 0.42,
+      "flame_count": 14,
+      "spark_count": 2,
+      "flame_lifetime": 0.72,
+      "flicker_strength": 0.08,
+      "light": {
+        "position": [
+          -1.59,
+          0.56,
+          -1.98
+        ],
+        "color": "FF8B35",
+        "range": 2.0,
+        "energy": 0.95
+      }
+    }
+  ],
+  "ember_surfaces": [
+    {
+      "asset": "hearth",
+      "min": [
+        -0.31,
+        0.155,
+        -0.12
+      ],
+      "max": [
+        0.31,
+        0.26,
+        0.35
+      ],
+      "energy": 0.38
+    }
+  ],
+  "fx_review_camera": {
+    "position": [
+      -1.59,
+      1.35,
+      -0.45
+    ],
+    "target": [
+      -1.59,
+      0.59,
+      -2.31
+    ],
+    "size": 2.3
+  }
+}
