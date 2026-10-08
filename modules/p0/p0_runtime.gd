@@ -54,6 +54,11 @@ static func nav_started() -> void:
 	_nav_ms = Time.get_ticks_msec()
 	_nav_pending = true
 
+## A navigation that never arrived (Couldn't get there → Go back) reports nothing: the world it falls back to attaches
+## again without a navigation of its own (亚瑟 on #94).
+static func cancel_nav() -> void:
+	_nav_pending = false
+
 ## Whether this attach reports a scene_load, and whether it is the cold first one; takes the armed navigation.
 static func take_load_report() -> Dictionary:
 	var out := {"report": _nav_pending or not _cold_done, "cold": not _nav_pending and not _cold_done}
@@ -767,6 +772,7 @@ func _arrival_failed() -> void:
 ## Go back (and Back) on Couldn't get there: to where the player came from.
 func _on_screen_back(kind: P0SysScreen.Kind) -> void:
 	if kind != P0SysScreen.Kind.PLACE_FAIL: return
+	cancel_nav()   # the failed navigation's timing must not land on the world we fall back to
 	_end_arrival()
 	if is_instance_valid(world) and AppRouter.top_instance() == world: AppRouter.pop_instance()
 	else: leave_to_map()

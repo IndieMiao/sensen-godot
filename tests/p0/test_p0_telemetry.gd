@@ -75,3 +75,6 @@ func test_only_a_navigation_or_the_cold_start_reports_a_scene_load() -> void:
 	P0Runtime.nav_started()
 	assert_that(P0Runtime.take_load_report()).is_equal({"report": true, "cold": false})    # map → pond
 	assert_that(P0Runtime.take_load_report()).is_equal({"report": false, "cold": false})   # taken once only
+	P0Runtime.nav_started()
+	P0Runtime.cancel_nav()                                                                  # Couldn't get there → Go back
+	assert_that(P0Runtime.take_load_report()).is_equal({"report": false, "cold": false})   # the map it falls back to: nothing
