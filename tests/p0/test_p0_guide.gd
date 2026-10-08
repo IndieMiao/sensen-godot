@@ -36,8 +36,8 @@ func _lines(rows: Array) -> Array:
 
 # ---------------------------------------------------------------- TipCards
 
-func test_eight_tips_with_toast_timing() -> void:
-	assert_int(Guide.TIPS.size()).is_equal(8)
+func test_seven_tips_with_toast_timing() -> void:
+	assert_int(Guide.TIPS.size()).is_equal(7)   # Levels unlock… is the first level-up banner's line, not a card
 	assert_str(Guide.TIPS.heat).is_equal("Tap when the needle hits gold!")
 	assert_float(Guide.tip_seconds("Casting uses 5 Energy")).is_equal(2.5)        # 21 characters
 	assert_float(Guide.tip_seconds(Guide.TIPS.sow)).is_equal(3.5)               # 67 characters
@@ -56,7 +56,8 @@ func test_tips_come_from_first_surfaces_and_events() -> void:
 	assert_str(Guide.tip_for_event({"kind": "meal", "gain": 0}, {}, {})).is_equal("")
 	assert_str(Guide.tip_for_event({"kind": "energy", "delta": -5}, {}, {"energy": {"value": 0}})).is_equal("meal")
 	assert_str(Guide.tip_for_event({"kind": "energy", "delta": -5}, {}, {"energy": {"value": 40}})).is_equal("")
-	assert_str(Guide.tip_for_event({"kind": "level"}, {}, {})).is_equal("level")
+	assert_str(Guide.tip_for_event({"kind": "level"}, {}, {})).is_equal("")   # the banner's Tip line teaches it
+	assert_bool(Guide.TipQueue.new().request("level")).is_false()   # q(86): no Levels card ever, the banner taught it
 
 ## q(49): while a RewardMoment / MomentBanner is up, a new tip waits; the one already showing stays.
 func test_tip_queue_waits_for_moments_and_shows_each_tip_once() -> void:

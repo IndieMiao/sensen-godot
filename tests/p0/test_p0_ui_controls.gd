@@ -244,15 +244,16 @@ func test_a_second_tip_waits_for_the_first_card_and_is_not_learned_meanwhile() -
 	ui.teach("cast")
 	ui.teach("creel")
 	await await_idle_frame()
-	var text := ui._teach.get_node("Text") as Label
-	assert_str(text.text).is_equal(str(P0Guide.TIPS.cast))
+	assert_str(ui._teach.tip).is_equal(str(P0Guide.TIPS.cast))
+	assert_object(ui._teach.icon_texture()).is_same(P0Logic.icon("energy"))   # TUT-2: Casting uses 5 Energy → i-energy (shared icon)
 	assert_bool(ui._taught.has("cast")).is_true()
 	assert_bool(ui._taught.has("creel")).is_false()
 	ui._hide_tip()   # tapped away (or its time ran out)
 	ui.teach("cast")   # already learned: nothing
 	await await_idle_frame()
 	assert_bool(ui._teach.visible).is_true()
-	assert_str(text.text).is_equal(str(P0Guide.TIPS.creel))
+	assert_str(ui._teach.tip).is_equal(str(P0Guide.TIPS.creel))
+	assert_object(ui._teach.icon_texture()).is_same(P0Logic.icon("fish"))
 	assert_bool(ui._taught.has("creel")).is_true()
 	if had_tips:
 		var f := FileAccess.open(P0Ui.TIPS_PATH, FileAccess.WRITE)
@@ -261,7 +262,8 @@ func test_a_second_tip_waits_for_the_first_card_and_is_not_learned_meanwhile() -
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(P0Ui.TIPS_PATH))
 
 func test_teaching_card_stays_clear_of_the_bar_and_the_keys() -> void:
-	# PR #12 review fix 5: the tip sits above the quick bar and left of the action key group.
+	# TipCard (TUT-2, 235-B2; 不知火舞 on 232): centred, 296 wide, its top 120 under HUD row 2 — clear of the quick bar
+	# and the action key group (PR #12 review fix 5 still holds).
 	var had_tips := FileAccess.file_exists(P0Ui.TIPS_PATH)
 	var saved := FileAccess.get_file_as_string(P0Ui.TIPS_PATH) if had_tips else ""
 	ui._taught = {"_": true}   # non-empty: teach() won't load saved tips over it
@@ -271,13 +273,24 @@ func test_teaching_card_stays_clear_of_the_bar_and_the_keys() -> void:
 	await await_idle_frame()
 	var tip := ui._teach.get_global_rect()
 	assert_float(tip.end.y).is_less_equal(ui._bar.get_global_rect().position.y)
-	assert_float(tip.end.x).is_less_equal(ui._keys.get_global_rect().position.x)
 	assert_bool(tip.intersects(ui._keys.get_global_rect())).is_false()
+	assert_float(tip.size.x).is_equal(UiTipCard.WIDTH)
+	assert_float(tip.get_center().x).is_equal_approx(ui.root.get_global_rect().get_center().x, 1.0)
+	assert_float(tip.position.y - ui.hud.today_chip_rect().end.y).is_equal_approx(ui.TIP_BELOW_HUD, 1.0)
+	assert_float(tip.size.y).is_equal_approx(64.0, 4.0)   # the sow sentence is two lines: 64 in the main
 	if had_tips:
 		var f := FileAccess.open(P0Ui.TIPS_PATH, FileAccess.WRITE)
 		f.store_string(saved)
 	else:
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(P0Ui.TIPS_PATH))
+
+## One copy of each icon in the app (不知火舞 on 235-B2): every tip with its own icon names a P0Guide tip and a shared
+## P0 icon; the rest keep the card's default sprout.
+func test_each_tip_icon_names_a_tip_and_a_shared_icon() -> void:
+	for key in P0Ui.TIP_ICONS:
+		assert_bool(P0Guide.TIPS.has(key)).override_failure_message("TIP_ICONS key %s is not a tip" % key).is_true()
+		assert_object(P0Logic.icon(str(P0Ui.TIP_ICONS[key]))).override_failure_message("no icon for %s" % key) \
+			.is_not_same(load(P0Logic.ICON_DIR % "field"))   # P0Logic.icon's fallback for a missing icon
 
 func test_a_seed_sown_to_zero_is_deselected_and_a_zero_slot_cannot_be_picked() -> void:
 	# 李白 q(44) ③ / PR #12 review fix 2: the pinned slot stays at 0, the key goes back to Sow · Pick a seed.

@@ -110,7 +110,7 @@ var player_screen := Vector2(180, 320)   # set by the farm / pond each frame (mi
 var _modal: Control
 var modal_kind := ""            # "stall", "bag", "inbox", "card", ... — which drawer is open
 var _card_queue: Array = []
-var _teach: PanelContainer
+var _teach: UiTipCard
 var _teach_left := 0.0
 var tips: P0Guide.TipQueue   # the TipCard order and "shown before" (SGODOT-232 U6)
 var _taught := {}
@@ -153,11 +153,12 @@ func _process(dt: float) -> void:
 		_teach_left -= dt
 		if _teach_left <= 0.0: _hide_tip()
 	# q(49): a waiting TipCard comes up only when no RewardMoment / result card is on screen; one already up stays.
-	# TODO(SGODOT-232 U6): call tips.moment_opened / moment_closed from UiRewardMoment / MomentBanner once #24 lands;
-	# until then the result cards (modal_kind "card") stand in for them.
-	if tips and not modal_kind in ["card", "kitchen_card"]:   # the farmhouse's COOK-4 is a result card too
+	# show_moment / _drop_modal count Moments in the queue (tips.moment_opened / moment_closed); the modal kinds stay as
+	# a second guard for result cards opened another way (the farmhouse's COOK-4 is one).
+	if tips and not modal_kind in ["card", "kitchen_card"]:
 		var key := tips.next()
-		if key != "": _show_tip(str(P0Guide.TIPS[key]))
+		if key != "": _show_tip(str(P0Guide.TIPS[key]), key)
+	if _teach and _teach.visible: _place_tip()
 
 func _build_hud() -> void:
 	hud = UiHud.new()
@@ -242,13 +243,6 @@ func _place_controls() -> void:
 	_keys.offset_left = -UiTokens.SPACE_PAGE - UiTokens.SIZE_ACTION_KEY_W
 	_keys.offset_bottom = -key_bottom
 	_keys.offset_top = -key_bottom - UiTokens.SIZE_ACTION_KEY_H
-	if _teach:
-		# The one-line teaching card sits above the quick bar and left of the action key group, clear of both
-		# (PR #12 review fix 5), with the safe area already in `bottom`.
-		_teach.offset_left = UiTokens.SPACE_PAGE
-		_teach.offset_right = -(UiTokens.SPACE_PAGE + UiTokens.SIZE_ACTION_KEY_W + UiTokens.SPACE_OVERLAY_BODY)
-		_teach.offset_bottom = -(bottom + UiTokens.SIZE_QUICK_BAR_H + UiTokens.SPACE_OVERLAY_BODY)
-		_teach.offset_top = _teach.offset_bottom
 
 ## The +1h / +4h clock buttons: test builds only. The demo APK is a debug export too, but its server has no dev
 ## routes (P0_DEV=0, dev/skip is 404) and the buttons covered the Toast's end (李元芳, int6), so it has none.
@@ -2440,27 +2434,38 @@ func _hide_tip(close_queue := true) -> void:
 	if _teach: _teach.hide()
 	if close_queue and tips: tips.close()
 
-func _show_tip(text: String) -> void:
+## Each tip's icon (P0Guide.TIPS keys) from the shared P0 icons, as the TUT-2 specimens (不知火舞 on 232 / 235-B2).
+const TIP_ICONS := {"sow": "seed_radish", "creel": "fish", "cast": "energy", "meal": "energy", "cook": "pot", "heat": "pot", "map": "map"}
+
+## TipCard (TUT-2, 235-B2): the kit card with the tip's icon; a tap on it closes it (A-03).
+func _show_tip(text: String, key := "") -> void:
 	for k in tips.seen:
 		if P0Guide.TIPS.has(k): _taught[k] = true   # only the tips: the store also keeps stall_seen / dex_seen lists
 	_save_tips()
 	if _teach == null:
-		_teach = PanelContainer.new()
-		_teach.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-		_teach.grow_vertical = Control.GROW_DIRECTION_BEGIN
-		_teach.add_theme_stylebox_override("panel", _box(Color("2f3a33"), 14, Color("2f3a33"), 0, Vector4(12, 8, 12, 8)))
-		var l := _label("", 11, PAPER, true)
-		l.name = "Text"
-		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		_teach.add_child(l)
-		_teach.gui_input.connect(func(e: InputEvent):
-			if P0Ui.is_tap(e) or (e is InputEventScreenTouch and e.pressed): _hide_tip())
+		_teach = UiTipCard.new()
+		_teach.theme = UiKit.theme()
+		_teach.tapped.connect(func(): _hide_tip())
 		root.add_child(_teach)
-		_place_controls()
-	(_teach.get_node("Text") as Label).text = text
+	_teach.show_tip(text, P0Logic.icon(str(TIP_ICONS[key])) if TIP_ICONS.has(key) else null)
 	_teach.show()
+	_place_tip()
 	_teach_left = P0Guide.tip_seconds(text)
+
+## Where the TipCard sits (不知火舞 on 232, TUT-1-2 / TUT-3-04B / TUT-3-07B): centred; its top 120 under HUD row 2,
+## clear of the joystick's centre, the main action key and the quick bar; with the kitchen open, just above its drawer
+## (the stage stays visible). The Toast (bottom left) and the TipCard can show together and never move for each other.
+const TIP_BELOW_HUD := 120.0
+func _place_tip() -> void:
+	if _teach == null: return
+	var h := _teach.get_combined_minimum_size().y
+	var x := (root.size.x - UiTipCard.WIDTH) * 0.5
+	var y := hud.today_chip_rect().end.y - root.global_position.y + TIP_BELOW_HUD
+	var content: Control = _modal.get_child(1) if _modal != null and _modal.get_child_count() > 1 else null
+	if modal_kind == "kitchen" and content != null and content.is_visible_in_tree():
+		y = content.get_global_rect().position.y - root.global_position.y - UiTokens.SPACE_OVERLAY_BODY - h
+	_teach.position = Vector2(x, y)
+	_teach.size = Vector2(UiTipCard.WIDTH, h)
 
 # ---------------------------------------------------------------- result moments (SGODOT-233, q(49) / §4.8.6)
 ## A RewardMoment (哪吒's kit card) on its own: one at a time through queue_card (q(49) ④). Without buttons it folds
