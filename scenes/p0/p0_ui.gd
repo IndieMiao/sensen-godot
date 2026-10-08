@@ -493,7 +493,10 @@ func set_action(a: Dictionary) -> void:
 
 func _fab_pressed() -> void:
 	fab_verb = ""
-	if not _fab_state.get("enabled", false) or _modal != null: return
+	if _modal != null: return
+	if not _fab_state.get("enabled", false):
+		if _fab_state.has("toast"): toast(str(_fab_state.toast))   # SGODOT-231: unavailable keys say why (LOCK-10)
+		return
 	fab_verb = str(_fab_state.get("verb", ""))
 	action_pressed.emit(_fab_state.get("cmd", {}))
 

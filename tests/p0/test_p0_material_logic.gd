@@ -31,7 +31,13 @@ func test_mine_mouth_key_follows_lock_21() -> void:
 	assert_that(short.cmd).is_equal({"type": "energy_card"})
 	var none := P0MaterialLogic.mine_entry_action(_view(null, 200, 2))
 	assert_str("%s · %s" % [none.verb, none.sub]).is_equal("Enter mine · No runs left")
-	assert_that(none.cmd).is_equal({"type": "toast", "text": "Mine runs today 2/2 · Resets in 9h 12m"})
+	assert_bool(bool(none.enabled)).is_false()
+	assert_str(str(none.toast)).is_equal("Mine runs today 2/2 · Resets in 9h 12m")
+	var full := _view()
+	full.mine["entry_bag_ok"] = false
+	var gated := P0MaterialLogic.mine_entry_action(full)
+	assert_str("%s · %s" % [gated.verb, gated.sub]).is_equal("Enter mine · Bag full")
+	assert_bool(bool(gated.enabled)).is_false()
 
 func test_entry_card_offers_new_run_only_after_floor_2() -> void:
 	assert_bool(bool(P0MaterialLogic.mine_entry_card(_view()).show)).is_false()
@@ -44,6 +50,9 @@ func test_entry_card_offers_new_run_only_after_floor_2() -> void:
 	assert_that(open.cmd).is_equal({"type": "mine_new_run"})
 	var spent := P0MaterialLogic.mine_entry_card(_view(_run([_floor(1, true, CLEARED), _floor(2, true, CLEARED)], "no_runs"), 200, 2))
 	assert_str(str(spent.label)).is_equal("Mine runs today 2/2 · Resets in 9h 12m")
+	var full := _view(_run([_floor(1, true, CLEARED), _floor(2, true, CLEARED)], null), 200, 1)
+	full.mine["entry_bag_ok"] = false
+	assert_str(str(P0MaterialLogic.mine_entry_card(full).label)).is_equal("New run · Bag full")
 
 func test_rock_key_costs_two_and_greys_on_a_full_bag() -> void:
 	var v := _view(_run([_floor(1), _floor(2, false)]))
@@ -53,6 +62,8 @@ func test_rock_key_costs_two_and_greys_on_a_full_bag() -> void:
 	var full := P0MaterialLogic.mine_action(_view(_run([_floor(1, true, [false, false, false, false, false, false], false, false), _floor(2, false)])),
 		{"floor": 1, "target": "rock", "rock": 2})
 	assert_str("%s · %s" % [full.verb, full.sub]).is_equal("Mine · Bag full")
+	assert_bool(bool(full.enabled)).is_false()
+	assert_str(str(full.toast)).is_equal("Bag full · free a slot to mine")
 	var low := P0MaterialLogic.mine_action(_view(_run([_floor(1), _floor(2, false)]), 1), {"floor": 1, "target": "rock", "rock": 0})
 	assert_bool(bool(low.amber)).is_true()
 	assert_str(str(low.sub)).is_equal("Need 2 Energy")
@@ -68,6 +79,10 @@ func test_stairs_need_the_floor_cleared_then_cost_two() -> void:
 	var open := P0MaterialLogic.mine_action(_view(_run([_floor(1, true, CLEARED), _floor(2, false)])), {"floor": 1, "target": "stairs"})
 	assert_str("%s · %s" % [open.verb, open.sub]).is_equal("Floor 2 · 2 Energy")
 	assert_that(open.cmd).is_equal({"type": "mine_floor", "floor": 2})
+	var gated := P0MaterialLogic.mine_action(_view(_run([_floor(1, true, CLEARED), _floor(2, false, [false, false, false, false, false, false], false, false)])), {"floor": 1, "target": "stairs"})
+	assert_str("%s · %s" % [gated.verb, gated.sub]).is_equal("Floor 2 · Bag full")
+	var gate_rows := P0MaterialLogic.elevator_rows(_view(_run([_floor(1, true, CLEARED), _floor(2, false, [false, false, false, false, false, false], false, false)])), 1)
+	assert_str(str(gate_rows[2].label)).is_equal("Floor 2 · Bag full")
 	var paid := P0MaterialLogic.mine_action(_view(_run([_floor(1, true, CLEARED), _floor(2)])), {"floor": 1, "target": "stairs"})
 	assert_str(str(paid.sub)).is_equal("Free")
 	var elevator := P0MaterialLogic.mine_action(v, {"floor": 1, "target": "elevator"})

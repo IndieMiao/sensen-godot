@@ -5,7 +5,8 @@ extends RefCounted
 ## rows in the bag drawer follow P0ItemInfo.kind_of (225), not this file. Every user-visible string is written here, so
 ## scenes only render. Pure and static: tested headless.
 ## Key dicts have the P0Logic.main_action shape {icon, verb, sub, enabled, amber, cmd, need}; line 2 (sub) stays
-## within ~16 characters (q(44)), longer reasons go to a toast through cmd {type: "toast", text}.
+## within ~16 characters (q(44)). An unavailable key is grey (enabled false) and may carry `toast`, the long reason a
+## press shows (LOCK-10: unavailable stays tappable and says why).
 
 const ENTRANCE := 0
 
@@ -14,6 +15,14 @@ static func _energy(view: Dictionary) -> int:
 
 static func _key(icon: String, verb: String, sub: String, cmd := {}, enabled := true, amber := false, need := 0) -> Dictionary:
 	return {"icon": icon, "verb": verb, "sub": sub, "enabled": enabled, "amber": amber, "cmd": cmd, "need": need}
+
+## A grey key whose press toasts `reason`.
+static func _unavailable(icon: String, verb: String, sub: String, reason: String) -> Dictionary:
+	var k := _key(icon, verb, sub, {}, false)
+	k["toast"] = reason
+	return k
+
+const BAG_FULL := "Bag full · free a slot to mine"
 
 ## The key's tool badge in the mine and at its mouth (LOCK-02, LOCK-29): the equipped pickaxe (P0Ui.set_action `tool`).
 static func _with_pick(view: Dictionary, key: Dictionary) -> Dictionary:
@@ -44,7 +53,8 @@ static func _mine_entry_action(view: Dictionary) -> Dictionary:
 		return _key("pickaxe", "Continue run", "Free", {"type": "mine_enter"})
 	var runs: Dictionary = mine.get("runs", {})
 	if int(runs.get("used", 0)) >= int(runs.get("limit", 2)):
-		return _key("pickaxe", "Enter mine", "No runs left", {"type": "toast", "text": _runs_line(mine)})
+		return _unavailable("pickaxe", "Enter mine", "No runs left", _runs_line(mine))
+	if not mine.get("entry_bag_ok", true): return _unavailable("pickaxe", "Enter mine", "Bag full", BAG_FULL)   # q(48)
 	if _energy(view) < fee:
 		return _key("pickaxe", "Enter mine", "Need %d Energy" % fee, {"type": "energy_card"}, true, true, fee)
 	return _key("pickaxe", "Enter mine", "%d Energy" % fee, {"type": "mine_enter"}, true, false, fee)
@@ -62,6 +72,8 @@ static func mine_entry_card(view: Dictionary) -> Dictionary:
 			return {"show": true, "label": "New run · Clear Floor 2 first", "line2": "", "enabled": false, "amber": false, "cmd": {}}
 		"no_runs":
 			return {"show": true, "label": _runs_line(mine), "line2": "", "enabled": false, "amber": false, "cmd": {}}
+	if not mine.get("entry_bag_ok", true):   # q(48): no fee into a floor whose first rock wouldn't fit
+		return {"show": true, "label": "New run · Bag full", "line2": "", "enabled": false, "amber": false, "cmd": {}}
 	if _energy(view) < fee:
 		return {"show": true, "label": "New run · Need %d Energy" % fee, "line2": "", "enabled": true, "amber": true, "cmd": {"type": "energy_card"}}
 	return {"show": true, "label": "New run · %d Energy" % fee,
@@ -148,7 +160,8 @@ static func _mine_action(view: Dictionary, ctx: Dictionary) -> Dictionary:
 			if next.is_empty(): return _key("stairs", "Stairs", "Deepest floor", {}, false)
 			var verb := "Floor %d" % (n + 1)
 			if next.get("paid", false): return _key("stairs", verb, "Free", {"type": "mine_floor", "floor": n + 1})
-			if not floor.get("cleared", false): return _key("stairs", verb, "Clear Floor %d" % n, {}, false)
+			if not floor.get("cleared", false): return _unavailable("stairs", verb, "Clear Floor %d" % n, "%s · Clear this floor first" % verb)
+			if not next.get("bag_ok", true): return _unavailable("stairs", verb, "Bag full", BAG_FULL)   # q(48)
 			if _energy(view) < fee: return _key("stairs", verb, "Need %d Energy" % fee, {"type": "energy_card"}, true, true, fee)
 			return _key("stairs", verb, "%d Energy" % fee, {"type": "mine_floor", "floor": n + 1}, true, false, fee)
 		"rock":
@@ -156,7 +169,7 @@ static func _mine_action(view: Dictionary, ctx: Dictionary) -> Dictionary:
 			var broken: Array = floor.get("broken", [])
 			var cost := int(mine.get("rock_energy", 2))
 			if rock < 0 or rock >= broken.size() or bool(broken[rock]): return _key("pickaxe", "Mine", "Walk to a rock", {}, false)
-			if not floor.get("bag_ok", true): return _key("pickaxe", "Mine", "Bag full", {"type": "toast", "text": "Bag full · free a slot to mine"})
+			if not floor.get("bag_ok", true): return _unavailable("pickaxe", "Mine", "Bag full", BAG_FULL)
 			if _energy(view) < cost: return _key("pickaxe", "Mine", "Need %d Energy" % cost, {"type": "energy_card"}, true, true, cost)
 			return _key("pickaxe", "Mine", "%d Energy" % cost, {"type": "mine_rock", "floor": n, "rock": rock}, true, false, cost)
 	if int(floor.get("left", 0)) == 0: return _key("pickaxe", "Mine", "Floor cleared", {}, false)
@@ -196,6 +209,7 @@ static func _elevator_rows(view: Dictionary, here: int) -> Array:
 		if n == here: row.label = "Floor %d · Here" % n
 		elif f.get("paid", false): row = {"label": "Floor %d · Free" % n, "enabled": true, "amber": false, "cmd": {"type": "mine_floor", "floor": n}}
 		elif i > 0 and not floors[i - 1].get("cleared", false): row.label = "Floor %d · Clear Floor %d first" % [n, n - 1]
+		elif not f.get("bag_ok", true): row.label = "Floor %d · Bag full" % n   # q(48)
 		elif _energy(view) < fee: row = {"label": "Floor %d · Need %d Energy" % [n, fee], "enabled": true, "amber": true, "cmd": {"type": "energy_card"}}
 		else: row = {"label": "Floor %d · %d Energy" % [n, fee], "enabled": true, "amber": false, "cmd": {"type": "mine_floor", "floor": n}}
 		rows.append(row)
