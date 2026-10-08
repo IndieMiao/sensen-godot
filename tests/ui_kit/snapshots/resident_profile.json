@@ -84,12 +84,23 @@
                           ],
                           "children": [
                             {
-                              "type": "TextureRect",
+                              "type": "Panel",
                               "rect": [
                                 124,
                                 86,
                                 80,
                                 80
+                              ],
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    124,
+                                    86,
+                                    80,
+                                    80
+                                  ]
+                                }
                               ]
                             },
                             {

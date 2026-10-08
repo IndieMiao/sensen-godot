@@ -1,0 +1,278 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    214
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiCreelBadge"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        18
+      ],
+      "variation": "CaptionR12",
+      "text": "CreelBadge 1126:79349 · FISH-1 / FISH-4 · q(83)"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        52,
+        328,
+        162
+      ],
+      "children": [
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            52,
+            328,
+            46
+          ],
+          "children": [
+            {
+              "type": "UiCreelBadge",
+              "rect": [
+                102,
+                52,
+                124,
+                26
+              ],
+              "children": [
+                {
+                  "type": "PanelContainer",
+                  "rect": [
+                    102,
+                    52,
+                    124,
+                    26
+                  ],
+                  "children": [
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        110,
+                        56,
+                        106,
+                        18
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            110,
+                            57,
+                            16,
+                            16
+                          ]
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            132,
+                            56,
+                            84,
+                            18
+                          ],
+                          "variation": "CaptionXB12",
+                          "text": "Creel 7 · 6 free"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                84,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "Normal"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            110,
+            328,
+            46
+          ],
+          "children": [
+            {
+              "type": "UiCreelBadge",
+              "rect": [
+                102,
+                110,
+                124,
+                26
+              ],
+              "children": [
+                {
+                  "type": "PanelContainer",
+                  "rect": [
+                    102,
+                    110,
+                    124,
+                    26
+                  ],
+                  "children": [
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        110,
+                        114,
+                        106,
+                        18
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            110,
+                            115,
+                            16,
+                            16
+                          ]
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            132,
+                            114,
+                            84,
+                            18
+                          ],
+                          "variation": "CaptionXB12",
+                          "text": "Creel 9 · 1 free"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                142,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "Low"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            168,
+            328,
+            46
+          ],
+          "children": [
+            {
+              "type": "UiCreelBadge",
+              "rect": [
+                98,
+                168,
+                131,
+                26
+              ],
+              "children": [
+                {
+                  "type": "PanelContainer",
+                  "rect": [
+                    98,
+                    168,
+                    131,
+                    26
+                  ],
+                  "children": [
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        106,
+                        172,
+                        113,
+                        18
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            106,
+                            173,
+                            16,
+                            16
+                          ]
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            128,
+                            172,
+                            91,
+                            18
+                          ],
+                          "variation": "CaptionXB12",
+                          "text": "Creel 12 · 0 free"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Panel",
+                  "rect": [
+                    223,
+                    166,
+                    8,
+                    8
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                200,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "Full"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

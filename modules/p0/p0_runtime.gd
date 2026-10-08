@@ -105,7 +105,6 @@ func _init() -> void:
 	ui.near_resident = func() -> String:   # an outpost's resident within reach (Gift to <Name>, SGODOT-225)
 		return str(world.call("p0_near_resident")) if is_instance_valid(world) and world.has_method("p0_near_resident") else ""
 	ui.place_pressed.connect(_on_place_pressed)
-	ui.home_requested.connect(func(): _leave_then("farm"))
 	ui.tackle_requested.connect(func(): _leave_then("tackle"))
 	session.state_changed.connect(func(_v, _e): _net_ok())   # any answer ends a run of failures (and offline)
 	session.state_changed.connect(_on_state)
@@ -561,7 +560,7 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 		"not_ready":
 			ui.toast_error("Not ready yet")
 		"creel_full":
-			ui.toast_error("Creel full · 0 free slots · Sell or cook first", "Open bag")   # FISH-4, §4.8.6
+			ui.toast_creel_full()   # FISH-4, §4.8.6, q(83)
 		"already_casting":
 			ui.toast_error("Your line is already in the water")
 		"no_bait":
@@ -917,6 +916,16 @@ func _dev_shot(dt: float) -> void:
 			"skills": ui.open_skills()
 			"profile": ui.open_profile()
 			"resident": ui.open_resident(step[1] if step.size() > 1 else "res_pip")   # SGODOT-225 dialogue bar
+			"resprofile": ui.open_resident_profile(step[1] if step.size() > 1 else "res_pip")   # RES-PIP / RES-KAI sheet
+			"creel":   # creel:0 — the creel badge's states for shots: the bag's free slots set locally (235 B1)
+				var cv: Dictionary = session.view.duplicate(true)
+				cv["bag"] = cv.get("bag", {}).duplicate()
+				cv.bag["free"] = int(step[1])
+				session.view = cv
+				session.busy = true   # dev only: no answer replaces the made-up bag
+				ui.set_view(session.current())
+				ui.set_action(P0Logic.fish_action(session.current(), ""))
+			"creeltap": ui._creel.pressed.emit()   # a tap on the creel badge
 			"resprofile": ui.open_resident_profile(ui._resident)                     # its name → profile sheet
 			# SGODOT-233 result moments, shown directly: catchcard:<fish>, gotaway:<fish>:level|rod
 			"catchcard": ui.show_catch(step[1], int(P0Logic.item(session.current(), step[1]).get("rarity", 1)), 15, {"energy": 20})
@@ -962,7 +971,6 @@ func _dev_shot(dt: float) -> void:
 				if not ready and _shot_t < 40.0: return
 			"skip": session.dev_skip(int(step[1]))
 			"back": leave_world()
-			"gohome": ui.home_requested.emit()
 			"tackleshop": ui.tackle_requested.emit()
 			_:
 				if not bool(_call("p0_dev", [step])): push_warning("P0_SHOT: unknown step " + step[0])
