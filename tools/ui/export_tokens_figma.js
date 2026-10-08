@@ -300,6 +300,7 @@ const tokens = {
       wp1b: 'container mains (Sheet / drawers, SegmentTab, InventoryCell, GearSlot, Kitchen/*, counter, NPC) await WP1b (SGODOT-201)',
       segmentTab: 'selected style must not use command green (LOCK-13), WP1b',
       toast: 'sizes read Toast R1 (1178:82265); its tone look (light fills, tone icon, optional action) is not generated yet: ToastPanel and ToastLayer still draw the old dark panel',
+      guidePulse: 'GuidePulse 1407:113987 (SGODOT-232 U6, A-03): ring stroke 2, growth to +10 and frame inset 4 are constants in UiGuidePulse until the next token export adds them; color/primary and MOTION_NEW_UNLOCK_FLASH_MS (600 ms, ease-out) are tokens',
     },
   },
   font: { file: 'res://assets/ui/fonts/Nunito.ttf', naturalLineHeight: CONST.naturalLineHeight,

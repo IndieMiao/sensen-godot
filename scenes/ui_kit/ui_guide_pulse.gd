@@ -34,7 +34,7 @@ static func play(parent: Control, rect := Rect2(), pulse_shape: Shape = Shape.PI
 	p.size = r.size + Vector2.ONE * 2.0 * (_GROW + _STROKE)
 	parent.add_child(p)
 	var tw := p.create_tween()
-	tw.tween_property(p, "progress", 1.0, UiTokens.MOTION_NEW_UNLOCK_FLASH_MS / 1000.0) \
+	tw.tween_property(p, "progress", 1.0, UiKit.secs(UiTokens.MOTION_NEW_UNLOCK_FLASH_MS)) \
 		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	tw.tween_callback(p.queue_free)
 	return p
