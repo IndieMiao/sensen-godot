@@ -473,3 +473,32 @@ func test_a_level_up_gift_that_did_not_fit_is_said_after_its_banner_away_from_th
 	for i in 2: await get_tree().process_frame
 	assert_str(rt.ui.toast_text()).is_equal("Bag full · spice_pepper ×2 sent to Inbox · 24h")
 	rt.detach(w)
+
+func test_a_level_up_gift_that_did_not_fit_is_said_after_its_banner_where_the_player_is() -> void:
+	# 不知火舞 on 233 (q(49), one thing at a time): with the player there too, the banner speaks of the level-up first and
+	# `… sent to Inbox · 24h` comes once it closes, even when the reply's parcel comes before the level-up.
+	var w: Node3D = auto_free(Node3D.new())
+	add_child(w)
+	rt.attach(w)
+	rt.ui.clear_toast()
+	rt.session.state_changed.emit(rt.session.view, [{"kind": "parcel", "id": "crop_radish", "qty": 3, "key": "harvest:1:0", "waiting": false, "expires_in": 86400000},
+		{"kind": "xp", "skill": "farming", "amount": 40, "percent": 100},
+		{"kind": "level", "skill": "farming", "level": 3, "energy": 30, "gifts": [["seed_lettuce", 4]]},
+		{"kind": "parcel", "id": "seed_lettuce", "qty": 4, "key": "level:farming:3:0", "waiting": false, "expires_in": 86400000}])
+	for i in 3: await get_tree().process_frame
+	assert_int(rt.ui.root.find_children("*", "UiMomentBanner", true, false).size()).is_equal(1)
+	assert_str(rt.ui.toast_text()).is_equal("")   # not over the banner
+	rt.ui.close_modal()
+	for i in 2: await get_tree().process_frame
+	assert_str(rt.ui.toast_text()).is_equal("Bag full · 2 rewards sent to Inbox · 24h")
+	rt.detach(w)
+
+func test_parcels_without_a_level_up_are_said_at_once() -> void:
+	var w: Node3D = auto_free(Node3D.new())
+	add_child(w)
+	rt.attach(w)
+	rt.ui.clear_toast()
+	rt.session.state_changed.emit(rt.session.view, [{"kind": "parcel", "id": "crop_radish", "qty": 3, "key": "harvest:1:0", "waiting": false, "expires_in": 86400000}])
+	await get_tree().process_frame
+	assert_str(rt.ui.toast_text()).is_equal("Bag full · crop_radish ×3 sent to Inbox · 24h")
+	rt.detach(w)
