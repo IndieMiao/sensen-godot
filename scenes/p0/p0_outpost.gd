@@ -93,6 +93,9 @@ func _on_joined(info: Dictionary) -> void:
 ## The space every P0 command carries (SGODOT-228 Rest "away from the farm"): outposts are "outpost".
 func p0_space() -> String: return "outpost"
 
+## Which outpost, for the server (蒙恬's map markers, SGODOT-232 U6): entering it marks its ◆ new goods as seen.
+func p0_place() -> String: return str(outpost.get("id", ""))
+
 ## Other players stand on the floor, or on their seat (room metres; the crowd lives in the room node).
 func _crowd_height(id: int) -> float:
 	var s := online.seat_of(id) if online else ""

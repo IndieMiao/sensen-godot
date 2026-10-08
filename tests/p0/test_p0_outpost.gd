@@ -56,6 +56,8 @@ func test_each_outpost_opens_with_its_keeper_and_residents() -> void:
 		assert_float(P0Room._flat_distance(r.actor.position, r.anchor("spawn").global_position)).is_less(0.2)
 		assert_str(r.exit_text).is_equal("Exit · Back to map" if id == "sh_market_1" else "Door · Back to map")
 	assert_str(str(_room("sh_tackle_1").npcs.npc_keeper.name)).is_equal("Finn")
+	assert_str(_room("sh_tea_1").p0_place()).is_equal("sh_tea_1")   # space "outpost", place = the outpost id
+	assert_str(P0Runtime.space_of(_room("sh_tea_1"))).is_equal("outpost")
 
 func test_decor_is_not_tappable_and_counters_are() -> void:
 	var post := _room("sh_post_1")
