@@ -164,13 +164,20 @@ static func quick_bar(view: Dictionary, previous: Array, mode := "farm", pinned:
 		if id.begins_with(prefix): counts[id] = int(counts.get(id, 0)) + int(s.get("qty", 0))
 	var bar: Array = []
 	for id in previous:
-		if bar.size() < 5 and not bar.has(id) and (pinned.has(id) or (counts.has(id) and not removed.has(id))): bar.append(id)
+		if bar.size() >= 5: break
+		# A slot emptied by dragging its item off stays empty in place, not refilled (LOCK-05 v1.10, BAR-DRAG-4).
+		if str(id) == "": bar.append("")
+		elif not bar.has(id) and (pinned.has(id) or (counts.has(id) and not removed.has(id))): bar.append(id)
 	for id in pinned:
-		if bar.size() < 5 and not bar.has(id): bar.append(id)
+		if bar.has(id): continue
+		var hole := bar.find("")   # pinning again (Undo, a drop from the Bag) takes the first gap
+		if hole >= 0: bar[hole] = id
+		elif bar.size() < 5: bar.append(id)
 	var rest: Array = counts.keys().filter(func(id): return not bar.has(id) and not removed.has(id))
 	rest.sort_custom(func(a, b): return counts[a] > counts[b] if counts[a] != counts[b] else str(a) < str(b))
 	for id in rest:
 		if bar.size() < 5: bar.append(id)
+	while not bar.is_empty() and str(bar.back()) == "": bar.pop_back()   # a gap at the end is just the end
 	return bar
 
 ## Today chip: the nearest ready crop, else what to do first (§9.5.3; facts only).

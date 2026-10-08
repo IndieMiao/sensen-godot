@@ -4,9 +4,14 @@ extends Control
 ## end (Compact/QuickEnd/Bag 907:72112), or the collapsed handle (page-14 frames 676:63515–7) with the Bag end
 ## when no action is chosen. Data in, intents out; the caller owns selection, pins and the bag.
 ##   tap a slot → slot_tapped(id) (select, tap again to clear); tap an empty ghost → ghost_tapped(index)
-##   hold 450 ms → the slot floats (LIFTED) with a light vibration; release in place → pin_toggled(id, pinned)
-##   move after floating → the slot under the finger shows DROP_TARGET; drop on it → slots_swapped(a, b)
-##   (both become pinned, §10.3.4); drop more than FLING_REMOVE above the bar → slot_removed(id); else nothing
+##   hold 450 ms → the slot floats (LIFTED) with a light vibration. Where the finger lets go decides, never how far
+##   it moved (LOCK-04 / 05 v1.10, BAR-DRAG-1…5; GestureArbiter.drop_on_bar):
+##     its own slot (+8 px; dragged out and back too) → pin_toggled(id, pinned)
+##     past 16 px it drags: the slot rides 24 px above the finger, its place shows a gap, the BarRemoveZone fades
+##     in 96 px over the bar; another slot (+6 px) shows DROP_TARGET → slots_swapped(a, b) (both pinned)
+##     the remove zone (within 48 px; it darkens, one light tick, the slot shrinks to 80 %) → the slot flies into it
+##     and slot_removed(id)
+##     anywhere else, a second finger or cancel_drag() (app paused, a drawer opening) → it flies back, nothing changes
 ##   swipe up before floating → bag_requested; Bag → bag_requested, Close → close_requested
 ##   collapsed handle → handle_tapped (same as the switch key, §10.3.4)
 ## Each cell arbitrates its own touch (GestureArbiter SLOT mode, SGODOT-212); this bar turns the outcomes into
@@ -60,8 +65,14 @@ var _end_label: Label
 var _end_dot: Panel
 var _handle: Button
 var _ghost: UiItemCell
+var _zone: UiBarRemoveZone
 var _dragging := -1
 var _target := -1
+
+const _RIDE_ABOVE := 24.0       # the dragged slot rides this far above the finger (LOCK-04 v1.10)
+const _HOVER_SCALE := 0.8       # …and shrinks to this over the remove zone
+const _FLY_BACK_MS := 200       # cancel: back to its place, ease-out
+const _FLY_IN_MS := 150         # remove: into the zone's centre
 
 func _init() -> void:
 	custom_minimum_size = Vector2(UiTokens.SIZE_QUICK_BAR_W, UiTokens.SIZE_QUICK_BAR_H)
@@ -194,7 +205,7 @@ func _on_gesture(o: Dictionary, i: int) -> void:
 		&"lift":
 			if id == "": return
 			_cells[i].state = UiItemCell.State.LIFTED
-			if haptics and OS.has_feature("mobile"): Input.vibrate_handheld(20)
+			_tick()
 		&"pin_toggle":
 			if id != "": pin_toggled.emit(id, not bool(slot(i).get("pinned", false)))
 			_end_drag()
@@ -209,7 +220,18 @@ func _on_gesture(o: Dictionary, i: int) -> void:
 		&"swipe_up":
 			bag_requested.emit()
 		&"cancel":
-			_end_drag()
+			if _dragging == i: _fly_back()
+			else: _end_drag()
+
+## Drop a drag in progress as if released nowhere: the slot flies back (app paused, a drawer opening).
+func cancel_drag() -> void:
+	if _dragging >= 0: _fly_back()
+
+## The remove zone while a slot is dragged (null otherwise).
+func remove_zone() -> UiBarRemoveZone: return _zone
+
+func _tick() -> void:
+	if haptics and OS.has_feature("mobile"): Input.vibrate_handheld(20)
 
 func _start_drag(i: int, global_pos: Vector2) -> void:
 	_dragging = i
@@ -222,26 +244,82 @@ func _start_drag(i: int, global_pos: Vector2) -> void:
 	_ghost.pinned = bool(d.get("pinned", false))
 	_ghost.state = UiItemCell.State.LIFTED
 	_ghost.top_level = true
+	_ghost.pivot_offset = _ghost.custom_minimum_size * 0.5
 	add_child(_ghost)
 	_cells[i].state = UiItemCell.State.EMPTY
+	_zone = UiBarRemoveZone.new()
+	_zone.theme = theme
+	add_child(_zone)
+	_zone.center = zone_center()
+	_zone.appear()
 	_move_drag(global_pos)
 
+## Where the remove zone sits: screen x-centre, 96 px above the bar (scene y 612 on 360 × 800).
+func zone_center() -> Vector2:
+	var vp := get_viewport_rect().size.x if is_inside_tree() else 360.0
+	return GestureArbiter.remove_zone_center(get_global_rect(), vp)
+
 func _move_drag(global_pos: Vector2) -> void:
-	if _ghost: _ghost.global_position = global_pos - _ghost.custom_minimum_size * 0.5
-	var t := _slot_at(global_pos)
-	if t == _dragging: t = -1
+	if _ghost: _ghost.global_position = global_pos - Vector2(_ghost.custom_minimum_size.x * 0.5, _ghost.custom_minimum_size.y + _RIDE_ABOVE)
+	var over := _zone != null and global_pos.distance_to(_zone.center) <= GestureArbiter.REMOVE_ZONE_HIT
+	if _zone and over != _zone.hover:
+		_zone.hover = over
+		if over: _tick()
+		if _ghost: _ghost.scale = Vector2.ONE * (_HOVER_SCALE if over else 1.0)
+	var rects := _slot_rects()
+	var t := -1
+	for k in rects.size():
+		if k != _dragging and (rects[k] as Rect2).grow(GestureArbiter.DROP_SLOT_GROW).has_point(global_pos): t = k
 	if t != _target:
 		_target = t
 		_refresh()
 
 func _drop(global_pos: Vector2) -> void:
 	var from := _dragging
-	var to := _slot_at(global_pos)
-	var removed := global_pos.y < get_global_rect().position.y - GestureArbiter.FLING_REMOVE
 	var id := str(slot(from).get("id", ""))
+	var where := GestureArbiter.drop_on_bar(global_pos, from, _slot_rects(), zone_center())
+	match where.kind:
+		&"pin_toggle":
+			_end_drag()
+			pin_toggled.emit(id, not bool(slot(from).get("pinned", false)))
+		&"swap":
+			_end_drag()
+			slots_swapped.emit(from, int(where.index))
+		&"remove":
+			_fly_into_zone()
+			slot_removed.emit(id)
+		_:
+			_fly_back()
+
+func _slot_rects() -> Array:
+	return _cells.map(func(c: UiItemCell) -> Rect2: return c.get_global_rect())
+
+## Cancel: the dragged slot flies back to its place (200 ms ease-out), then the bar is as it was.
+func _fly_back() -> void:
+	var ghost := _ghost
+	var home := _cells[_dragging].global_position if _dragging >= 0 else Vector2.ZERO
+	_ghost = null
 	_end_drag()
-	if removed: slot_removed.emit(id)
-	elif to >= 0 and to != from: slots_swapped.emit(from, to)
+	if ghost == null: return
+	ghost.scale = Vector2.ONE
+	var t := ghost.create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	t.tween_property(ghost, ^"global_position", home, UiKit.secs(_FLY_BACK_MS))
+	t.tween_callback(ghost.queue_free)
+
+## Remove: the slot flies into the zone's centre (150 ms) while the zone fades out (200 ms).
+func _fly_into_zone() -> void:
+	var ghost := _ghost
+	var zone := _zone
+	_ghost = null
+	_zone = null
+	_end_drag()
+	if zone: zone.vanish()
+	if ghost == null: return
+	var target := (zone.center if zone else zone_center()) - ghost.custom_minimum_size * 0.5
+	var t := ghost.create_tween().set_parallel(true)
+	t.tween_property(ghost, ^"global_position", target, UiKit.secs(_FLY_IN_MS))
+	t.tween_property(ghost, ^"scale", Vector2.ONE * 0.4, UiKit.secs(_FLY_IN_MS))
+	t.chain().tween_callback(ghost.queue_free)
 
 func _end_drag() -> void:
 	_dragging = -1
@@ -249,13 +327,8 @@ func _end_drag() -> void:
 	if _ghost:
 		_ghost.queue_free()
 		_ghost = null
+	if _zone:
+		_zone.vanish()
+		_zone = null
 	_refresh()
 
-## Slot index whose column the point is in, while the point is over the bar's row; -1 otherwise.
-func _slot_at(global_pos: Vector2) -> int:
-	var bar := get_global_rect()
-	if global_pos.y < bar.position.y or global_pos.y > bar.end.y: return -1
-	for i in SLOTS:
-		var r := _cells[i].get_global_rect()
-		if global_pos.x >= r.position.x and global_pos.x <= r.end.x: return i
-	return -1

@@ -136,18 +136,40 @@ func test_slot_lift_then_move_drags_and_drops() -> void:
 	var a := GestureArbiter.new(GestureArbiter.Mode.SLOT)
 	a.feed(_touch(0, Vector2(40, 740), true), 0)
 	a.tick(500)
+	assert_array(a.feed(_drag(0, Vector2(54, 740)), 520)).is_empty()   # 14 px: still lifted (drags from 16)
 	assert_array(_kinds(a.feed(_drag(0, Vector2(100, 742)), 550))).contains_exactly(["drag_start", "drag_move"])
 	assert_array(_kinds(a.feed(_drag(0, Vector2(150, 742)), 600))).contains_exactly(["drag_move"])
 	var out := a.feed(_touch(0, Vector2(150, 742), false), 650)
 	assert_array(_kinds(out)).contains_exactly(["drop"])
-	var bar := Rect2(12, 708, 336, 68)
 	var slots := [Rect2(12, 708, 52, 68), Rect2(68, 708, 52, 68), Rect2(124, 708, 52, 68)]
-	assert_dict(GestureArbiter.drop_on_bar(out[0].pos, bar, slots)).is_equal({kind = &"swap", index = 2})
+	assert_dict(GestureArbiter.drop_on_bar(out[0].pos, 0, slots, Vector2(180, 612))).is_equal({kind = &"swap", index = 2})
 
-func test_slot_drop_far_above_the_bar_removes_and_near_it_cancels() -> void:
-	var bar := Rect2(12, 708, 336, 68)
-	assert_str(String(GestureArbiter.drop_on_bar(Vector2(100, 708 - 41), bar, []).kind)).is_equal("remove")
-	assert_str(String(GestureArbiter.drop_on_bar(Vector2(100, 708 - 20), bar, []).kind)).is_equal("cancel")
+func test_lifted_release_before_dragging_toggles_even_past_the_tap_slop() -> void:
+	var a := GestureArbiter.new(GestureArbiter.Mode.SLOT)
+	a.feed(_touch(0, Vector2(40, 740), true), 0)
+	a.tick(500)
+	a.feed(_drag(0, Vector2(54, 740)), 520)
+	assert_array(_kinds(a.feed(_touch(0, Vector2(54, 740), false), 600))).contains_exactly(["pin_toggle"])
+
+func test_drop_is_decided_by_the_release_point() -> void:
+	# LOCK-04 / 05 v1.10: own slot (+8) toggles, another slot (+6) swaps, the remove zone (48) removes, else cancel.
+	var slots := [Rect2(12, 708, 52, 68), Rect2(68, 708, 52, 68)]
+	var zone := GestureArbiter.remove_zone_center(Rect2(12, 708, 336, 68), 360)
+	assert_vector(zone).is_equal(Vector2(180, 612))
+	assert_str(String(GestureArbiter.drop_on_bar(Vector2(30, 703), 0, slots, zone).kind)).is_equal("pin_toggle")   # out and back
+	assert_str(String(GestureArbiter.drop_on_bar(Vector2(66, 740), 0, slots, zone).kind)).is_equal("pin_toggle")   # own +8 first
+	assert_dict(GestureArbiter.drop_on_bar(Vector2(124, 740), 0, slots, zone)).is_equal({kind = &"swap", index = 1})
+	assert_str(String(GestureArbiter.drop_on_bar(Vector2(200, 640), 0, slots, zone).kind)).is_equal("remove")
+	assert_str(String(GestureArbiter.drop_on_bar(Vector2(180, 690), 0, slots, zone).kind)).is_equal("cancel")
+	assert_str(String(GestureArbiter.drop_on_bar(Vector2(100, 667), 0, slots, zone).kind)).is_equal("cancel")   # no more "40 above"
+
+func test_a_second_finger_cancels_a_lifted_slot() -> void:
+	var a := GestureArbiter.new(GestureArbiter.Mode.SLOT)
+	a.feed(_touch(0, Vector2(40, 740), true), 0)
+	a.tick(500)
+	a.feed(_drag(0, Vector2(100, 742)), 550)
+	assert_array(_kinds(a.feed(_touch(1, Vector2(200, 400), true), 560))).contains_exactly(["cancel"])
+	assert_array(a.feed(_touch(0, Vector2(100, 742), false), 600)).is_empty()
 
 func test_slot_upward_swipe_before_lift_opens_the_bag() -> void:
 	var a := GestureArbiter.new(GestureArbiter.Mode.SLOT)
