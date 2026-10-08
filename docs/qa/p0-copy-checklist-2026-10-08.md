@@ -56,6 +56,7 @@
 | 主行动键 · Fishing ★ | `Cast · 5 Energy`（离岸远也是这句，q(44)）/ 途中 `Cast · On the way`（不灰显）/ 灰 `Cast · Creel full` / 灰 `Fishing · No water nearby` |
 | 鱼篓角标 | `Creel 7 · 6 free` / 满 `Creel full · 0 free slots · Sell or cook first`（只在角标与 toast） |
 | 鱼饵用完 ★ | toast `Out of Worm Bait · no bait on the hook`（q(44)） |
+| 挂上 / 取下鱼饵 ★ | 点快捷栏饵格 toast `Worm Bait on the hook · used at the bite`，再点取下 `No bait`；首次升级横幅按 `Use bait` 也出挂上那句（在水边选中饵格并闪一次，不在水边只挂上留到下一竿），不跳转（q(77)） |
 | 钓获卡（首次） | `Caught!` / `Pond Crucian · Common` / `Fish-dex 3/N` / `First catch! +15 XP` / `New city! +10 XP` |
 | 逃走 ★ | 保护期内 `It got away · Energy refunded (9 left today)` / 保护期外 `It got away · 3 Energy back`（q(49)，不写 `protected left`） |
 | 挣脱 ★ | 卡 `Too strong` / `Fishing Lv4 needed · You: Lv3 · 30 XP to go` / `+3 Energy back`，无按钮；末行写实退：保护期内 `Energy refunded (8 left today)`，保护期外 `+3 Energy back`（q(55)）；第二次起飘字 `Got away · Lv4 · Energy refunded (8 left today)` / `Got away · Lv4 · 3 Energy back`（q(50)）；鱼竿不够 `Too heavy for your rod` / `Reed Rod · Fishing Lv3 · 80 coins` |
