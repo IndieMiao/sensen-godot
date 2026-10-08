@@ -52,3 +52,15 @@ func test_ui_reports_carry_the_demo_key() -> void:
 	session.player_id = "p0-telemetry-key"
 	session.access_key = "demo-key"
 	assert_that(Array(session._headers())).contains(["x-p0-player: p0-telemetry-key", "x-p0-key: demo-key"])
+
+## int9: the vivo shows no app logcat, so each world's load timings (P0_TIMING) also go to the observation log.
+func test_a_scene_load_reports_its_timings_and_the_device() -> void:
+	var e := P0Runtime.scene_load_event("P0Outpost", "sh_tea_1", 912, 2036, 2287, false)
+	assert_str(str(e.kind)).is_equal("scene_load")
+	assert_that([e.scene, e.place, e.attach_ms, e.first_ms, e.second_ms, e.cold]).is_equal(["P0Outpost", "sh_tea_1", 912, 2036, 2287, false])
+	assert_int(int(e.cores)).is_greater(0)
+	assert_bool(e.has("model") and e.has("gpu")).is_true()
+	session.report(e)
+	session._flush_ui()
+	assert_str(str(sent[0].path)).is_equal("/p0/telemetry")
+	assert_str(str((sent[0].body.events as Array)[0].kind)).is_equal("scene_load")

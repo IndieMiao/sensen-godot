@@ -47,8 +47,10 @@ var _probe_left := 0.0
 static var _nav_ms := 0
 static func nav_started() -> void:
 	_nav_ms = Time.get_ticks_msec()
-static func mark(tag: String) -> void:
-	print("P0_TIMING %s +%d ms" % [tag, Time.get_ticks_msec() - _nav_ms])
+static func mark(tag: String) -> int:
+	var ms := Time.get_ticks_msec() - _nav_ms
+	print("P0_TIMING %s +%d ms" % [tag, ms])
+	return ms
 
 static func ensure() -> P0Runtime:
 	if is_instance_valid(_instance): return _instance
@@ -122,11 +124,11 @@ func attach(w: Node) -> void:
 	ui.space = session.space
 	session.place = str(w.call("p0_place")) if w.has_method("p0_place") else ""   # which pond (q(36))
 	if not session.busy and not session.view.is_empty(): session.refresh()   # entering a space reads fresh state
-	mark("attach " + str(w.name))
+	var attach_ms := mark("attach " + str(w.name))
 	if _spot_after_room != "" and w.has_method("p0_show_spot"):   # stepped out of the farmhouse to show a farm spot
 		w.call_deferred("p0_show_spot", _spot_after_room)
 		_spot_after_room = ""
-	_first_frame.call_deferred(str(w.name))
+	_first_frame.call_deferred(str(w.name), attach_ms, session.place if session.place != "" else session.space)
 	ui.set_surface(str(w.call("p0_surface")) if w.has_method("p0_surface") else "farm")
 	if w.has_method("p0_surface") and str(w.call("p0_surface")) == "map": ui.teach("map")   # Browse the map for free…
 	_end_launch()   # the first answer may have come before the first world
@@ -140,11 +142,20 @@ static func space_of(w: Object) -> String:
 	var surface := str(w.call("p0_surface")) if w.has_method("p0_surface") else "farm"
 	return str({"farm": "home", "pond": "pond", "map": "map"}.get(surface, ""))
 
-func _first_frame(tag: String) -> void:
+## The same timings go to the observation log as `scene_load` (int9: the vivo shows no app logcat): which world and
+## place, navigation start → attach / first / second drawn frame, and the device. `cold` = no navigation started it
+## (the first world after launch), so the times count from engine start.
+func _first_frame(tag: String, attach_ms := -1, place := "") -> void:
 	await RenderingServer.frame_post_draw
-	mark("first frame " + tag)
+	var first := mark("first frame " + tag)
 	await RenderingServer.frame_post_draw
-	mark("second frame " + tag)
+	var second := mark("second frame " + tag)
+	session.report(scene_load_event(tag, place, attach_ms, first, second, _nav_ms == 0))
+
+static func scene_load_event(scene: String, place: String, attach_ms: int, first_ms: int, second_ms: int, cold: bool) -> Dictionary:
+	return {"kind": "scene_load", "scene": scene, "place": place, "attach_ms": attach_ms, "first_ms": first_ms,
+		"second_ms": second_ms, "cold": cold, "cores": OS.get_processor_count(), "model": OS.get_model_name(),
+		"gpu": RenderingServer.get_video_adapter_name()}
 
 func detach(w: Node) -> void:
 	if world == w:

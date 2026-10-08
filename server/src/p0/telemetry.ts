@@ -19,6 +19,9 @@ export const UI_FIELDS: Record<string, readonly string[]> = {
   tip_shown: ['key'], tip_hidden: ['key', 'ms', 'why'], card_shown: ['card', 'fish', 'dish', 'item'], today_done: ['row', 'key'],
   energy_card: ['need', 'refused'], gate_card: ['gate', 'need', 'level'], screen: ['name'], level_banner: ['skill', 'level'],
   session_start: [], session_end: ['ms'],
+  // How long a world took to come up on this device (int9: the vivo shows no app logcat, so P0_TIMING goes here too):
+  // navigation start → attach → first and second drawn frame, in ms, with the device's cores, model and GPU.
+  scene_load: ['scene', 'place', 'attach_ms', 'first_ms', 'second_ms', 'cold', 'cores', 'model', 'gpu'],
 };
 export const UI_KINDS = new Set(Object.keys(UI_FIELDS));
 
