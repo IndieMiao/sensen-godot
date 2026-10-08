@@ -21185,8 +21185,8 @@ td { font-variant-numeric: tabular-nums; }
 </tr>
 <tr>
 <td>快捷栏</td>
-<td>Seeds / Bait / Torch / Potion（幽灵格，q(44)）/ Buy at Homestead Stall / Craft at Workbench / Pin / Unpin</td>
-<td>幽灵提示与补货</td>
+<td>Seeds / Bait / Torch / Potion（幽灵格，q(44)）/ Buy at Homestead Stall / Craft at Workbench / Pin / Unpin / Release to pin / Release to unpin / Release to remove / Radish Seeds off the bar · Undo / Bar full · Unpin one first（q(61)）</td>
+<td>幽灵提示与补货；放置区与移除（v1.11）</td>
 </tr>
 <tr>
 <td>背包</td>
@@ -33032,10 +33032,10 @@ td { font-variant-numeric: tabular-nums; }
 <td>Drag to Bar</td>
 <td>拖入快捷栏</td>
 <td>背包 · 快捷栏</td>
-<td>抽屉第一行的快捷栏：手指正把 Compost 从网格拖向第 3 格，目标格放大描亮，原格半透明；格落入后显示该物品，不自动钉住（v1.11，q(61)）</td>
+<td>抽屉第一行的快捷栏：手指正把长按浮起的 Compost 从网格拖向第 3 格：原位留虚线空格、网格压暗、Pin 区淡入（LOCK-12，画面以 BAR-DRAG-9 为准），目标格放大描亮；格落入后显示该物品，不自动钉住（v1.11，q(61)）</td>
 <td>浮起后拖进 Pin 区钉住（钉子角标弹一下、轻震）与拖进 Unpin 区取消的两帧并排（v1.11，q(61)）；取消后该格回到自动填充，无候选时留空；整条栏都空时第 1 格是幽灵格 "Seeds"（q(44)）</td>
 <td>"Pin" / "Unpin" / 幽灵提示</td>
-<td>拖入 = 替换该格并钉住（"咚"一下）；栏内拖格互换；长按切换钉住 / 取消；上滑整条打开背包（不再有上甩移除）</td>
+<td>背包格长按浮起后：拖到快捷栏格 = 放入、不钉住（落在有物品的格 = 替换该格）；拖到 Pin 区 = 放进所属行动的栏并钉住（也可用详情卡 <code>Pin</code> 一步钉住）；松在原地或别处 = 取消（LOCK-12）。快捷栏格长按浮起后：松在另一格只互换、松在 Pin / Unpin 或 Remove 区钉住、取消或移除（v1.11）；上滑整条打开背包（q(61)）</td>
 <td>常驻 BAG-1 + BAR-1</td>
 </tr>
 <tr>
@@ -33954,8 +33954,8 @@ td { font-variant-numeric: tabular-nums; }
 </tr>
 <tr>
 <td>BAG-4</td>
-<td>从网格拖堆肥到抽屉首行快捷栏第 3 格，目标格放大描亮，落入后图钉</td>
-<td>Scene: a finger dragging a compost bag icon from the drawer grid up to the third slot of the quick bar row at the top of the drawer, the target slot enlarged and glowing, a tiny pin icon appearing on the slot</td>
+<td>从网格拖长按浮起的堆肥到抽屉首行快捷栏第 3 格，原位留虚线空格、网格压暗，目标格放大描亮，落入后不出图钉（q(61)）</td>
+<td>Scene: a finger dragging a lifted compost bag icon from the drawer grid up to the third slot of the quick bar row at the top of the drawer; the grid is dimmed and the item's original cell shows a dashed empty outline; the target slot is enlarged and glowing; no pin appears on the slot</td>
 </tr>
 <tr>
 <td>BAG-5</td>
