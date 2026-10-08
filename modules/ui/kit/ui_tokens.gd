@@ -399,5 +399,5 @@ const PENDING := {
 	"segmentTab": "selected style must not use command green (LOCK-13), WP1b",
 	"toast": "sizes read Toast R1 (1178:82265); its tone look (light fills, tone icon, optional action) is not generated yet: ToastPanel and ToastLayer still draw the old dark panel",
 	"entryCard": "EntryCard 1468:94344 (SGODOT-231): radius 16 and padding 8 / 14 / 9 / 14, gap 2, Pointer=Right inset 21 are constants in UiEntryCard until the next token export adds them",
-	"blueprintCard": "BlueprintCard 1434:93844 and the B2-06 Workbench drawer (SGODOT-231): card radius 16, padding 12 / 14, gap 10, icon tile 44 with a 32 icon, material gap 8, and the drawer title 22 ExtraBold are constants in UiBlueprintCard / P0WorkbenchDrawer until the next token export adds them",
+	"blueprintCard": "BlueprintCard 1434:93844 and the B2-06 Workbench drawer (SGODOT-231): card radius 16, padding 12 / 14, gap 10, icon tile 44 with a 32 icon, material gap 8, the recipe name 16 ExtraBold and the drawer title 22 ExtraBold are constants in UiBlueprintCard / P0WorkbenchDrawer until the next token export adds them",
 }

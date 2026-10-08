@@ -23,6 +23,7 @@ const _TILE := 44.0           # icon tile 44, icon 32
 const _ICON := 32
 const _TEXT_GAP := 2
 const _MATERIAL_GAP := 8
+const _NAME_SIZE := 16        # name 16 ExtraBold: Row Title XB15 one step up (no type token yet)
 
 var _icon: TextureRect
 var _name: Label
@@ -58,6 +59,7 @@ func _init(data := {}) -> void:
 	text.add_theme_constant_override(&"separation", _TEXT_GAP)
 	head.add_child(text)
 	_name = UiKit.label("", UiTokens.STYLE_ROW_TITLE_XB15)
+	_name.add_theme_font_size_override(&"font_size", _NAME_SIZE)
 	text.add_child(_name)
 	_effect = UiKit.label("", UiTokens.STYLE_C13_B, UiTokens.COLOR_SECONDARY)
 	_effect.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
