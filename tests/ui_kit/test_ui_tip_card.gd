@@ -23,11 +23,21 @@ func test_the_icon_is_the_owners_or_the_mains_default_sprout() -> void:
 	assert_object(_card("x").icon_texture()).is_same(UiTipCard.DEFAULT_ICON)
 	assert_object(UiTipCard.DEFAULT_ICON).is_same(load("res://assets/ui/kit_icons/sprout.svg"))
 
-func test_a_tap_emits_tapped() -> void:
+func _touch(c: UiTipCard, pressed: bool, at: Vector2) -> void:
+	var t := InputEventScreenTouch.new()
+	t.pressed = pressed
+	t.position = at
+	c._gui_input(t)
+
+## On release within the slop (刘邦 on #110): a press that drags on, toward the joystick, leaves the card up.
+func test_a_tap_emits_tapped_on_release_and_a_drag_does_not() -> void:
 	var c := _card("Casting uses 5 Energy")
 	var hits := [0]
 	c.tapped.connect(func(): hits[0] += 1)
-	var tap := InputEventScreenTouch.new()
-	tap.pressed = true
-	c._gui_input(tap)
+	_touch(c, true, Vector2(40, 20))
+	assert_int(hits[0]).is_equal(0)   # not on press
+	_touch(c, false, Vector2(44, 22))
+	assert_int(hits[0]).is_equal(1)
+	_touch(c, true, Vector2(40, 20))
+	_touch(c, false, Vector2(40, 20 + GestureArbiter.TAP_SLOP + 30))
 	assert_int(hits[0]).is_equal(1)

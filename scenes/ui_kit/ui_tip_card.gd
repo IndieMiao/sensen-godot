@@ -17,7 +17,7 @@ const _GAP := 10
 const _RADIUS := 16.0
 const _ICON := 22.0
 const _MIN_H := 48.0   # one line is 48 in the main (Nunito 14 lays out 2 px shorter here)
-const _SHADOW := Color(0x2E / 255.0, 0x3A / 255.0, 0x33 / 255.0, 0.08)   # #2E3A33 · 8 % (the main: 20 %, see above)
+const _SHADOW := Color(UiTokens.COLOR_TEXT, 0.08)   # the main's #2E3A33 is COLOR_TEXT; 8 % (the main: 20 %, see above)
 const _SHADOW_BLUR := 28.0   # the main's blur 28
 const _SHADOW_OFFSET := Vector2(0, 6)
 
@@ -28,12 +28,14 @@ const DEFAULT_ICON := preload("res://assets/ui/kit_icons/sprout.svg")
 var tip := "": set = set_tip
 var _icon: TextureRect
 var _text: Label
+var _down_at := Vector2.INF
+var _down_ms := 0
 
 func _init() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	custom_minimum_size = Vector2(WIDTH, _MIN_H)
 	size = Vector2(WIDTH, _MIN_H)
-	var box := UiStyleBox.make(UiTokens.COLOR_SURFACE, _RADIUS, UiTokens.COLOR_BORDER, 1.0).with_margins(_PAD_X, _PAD_Y, _PAD_X, _PAD_Y)
+	var box := UiStyleBox.make(UiTokens.COLOR_SURFACE, _RADIUS, UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT).with_margins(_PAD_X, _PAD_Y, _PAD_X, _PAD_Y)
 	box.shadow_color = _SHADOW
 	box.shadow_size = _SHADOW_BLUR
 	box.shadow_offset = _SHADOW_OFFSET
@@ -67,7 +69,19 @@ func set_tip(v: String) -> void:
 
 func icon_texture() -> Texture2D: return _icon.texture
 
+## A tap closes the card on release, within GestureArbiter's slop and time, as UiEntryCard: a press that drags on
+## (a thumb heading for the joystick) leaves it up (刘邦 on #110). One event family only (mouse buttons; raw touches
+## only without touchscreen emulation).
 func _gui_input(e: InputEvent) -> void:
-	if (e is InputEventScreenTouch and e.pressed) or (e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT):
-		tapped.emit()
-		accept_event()
+	var is_mouse: bool = e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT
+	var is_touch: bool = e is InputEventScreenTouch and not DisplayServer.is_touchscreen_available()
+	if not (is_mouse or is_touch): return
+	accept_event()
+	if e.pressed:
+		_down_at = e.position
+		_down_ms = Time.get_ticks_msec()
+		return
+	var tap: bool = _down_at != Vector2.INF and e.position.distance_to(_down_at) <= GestureArbiter.TAP_SLOP \
+		and Time.get_ticks_msec() - _down_ms <= GestureArbiter.TAP_MAX_MS
+	_down_at = Vector2.INF
+	if tap: tapped.emit()
