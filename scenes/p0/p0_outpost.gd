@@ -42,6 +42,7 @@ func setup(args: Dictionary) -> void:
 	place_name = str(outpost.get("name", "Outpost"))
 	anchors_path = str(outpost.get("anchors", ""))
 	if role == "market": exit_text = "Exit · Back to map"
+	exit_to = "Map"   # the door's world prompt: i-door + Map (SGODOT-250)
 
 func _room_ready() -> void:
 	_spawn_npcs()
@@ -134,14 +135,7 @@ func _spawn_npcs() -> void:
 		root.add_child(rig)
 		rig.config_applied.connect(func(_c): rig.play_motion("idle"))
 		rig.apply_config(OnlineAppearance.config({"version": 1, "slots": def.get("slots", {})}, true))   # NPC-only parts (SGODOT-229) too
-		var tag := Label3D.new()   # every NPC carries a name tag (art director, SGODOT-227)
-		tag.text = str(def.get("name", ""))
-		tag.font = UiKit.font(&"bold")
-		tag.font_size = 28
-		tag.pixel_size = 0.006
-		tag.position.y = 2.0
-		tag.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-		root.add_child(tag)
+		# The name rides over the head as the UI's NpcNameTag (SGODOT-250, LOCK-16 v2), not a Label3D: see _marker.
 		npcs[n] = {"id": str(cast[n]), "name": str(def.get("name", "")), "root": root}
 
 # ---------------------------------------------------------------- taps
@@ -218,12 +212,21 @@ func _open_entry(method: String, args: Array, fallback: String) -> void:
 	if rt.ui.has_method(method): rt.ui.callv(method, args)
 	else: rt.ui.toast(fallback)
 
+## Where an NPC's name sits, in the NPC's own space (above the head; the rig's root carries the NPC's scale).
+const NAME_OVER_HEAD := Vector3(0, 2.0, 0)
+
 func _marker(n: String, view: Dictionary) -> Dictionary:
 	if _dev_no_marks: return {}
-	if npcs.has(n): return {text = "%s · Tap to talk" % str(npcs[n].name)}
-	if SEAT_GROUPS.has(n): return {text = "Sit"} if seat == "" and not _free_seats(str(SEAT_GROUPS[n])).is_empty() else {}
-	if n == "use_market_board": return {text = "Market Board"}
-	if n == "use_specialty_shelf": return {text = "City Specialty"}
+	# World prompts (SGODOT-250, LOCK-07 / 16 / 30 v2, q(62)): names only, no "Tap to …"; the room opens one at a time.
+	if npcs.has(n):
+		var talking: bool = rt != null and rt.ui.modal_kind == "resident" and str(rt.ui.get("_resident")) == str(npcs[n].id)
+		return {kind = "npc", name = str(npcs[n].name), head = (npcs[n].root as Node3D).to_global(NAME_OVER_HEAD), talking = talking}
+	if SEAT_GROUPS.has(n):
+		return {kind = "seat", icon = P0Logic.icon("seat")} if seat == "" and not _free_seats(str(SEAT_GROUPS[n])).is_empty() else {}
+	if n == "use_market_board":
+		var open := int(view.get("keepers", {}).get("market", {}).get("board_open", 0))
+		return {kind = "facility", icon = P0Logic.icon("board"), name = "Market Board", badge = "request" if open > 0 else ""}
+	if n == "use_specialty_shelf": return {kind = "facility", icon = P0Logic.icon("postcard"), name = "City Specialty"}
 	return super._marker(n, view)
 
 # ---------------------------------------------------------------- seats (茶桌 / 长椅, LOCK-30: the card says Sit)
