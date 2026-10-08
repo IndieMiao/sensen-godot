@@ -42,7 +42,9 @@ var _mine := Vector3.ZERO
 var _focus := Vector3.ZERO
 var _cam_follow := P0Follow.new()
 var _zoom := 1.0
-var _pinch = preload("res://modules/p0/p0_elastic_zoom.gd").new(0.8, 1.4)   # rubber band past 0.8 / 1.4
+const ElasticZoom = preload("res://modules/p0/p0_elastic_zoom.gd")
+var _pinch = ElasticZoom.new(0.8, 1.4)   # rubber band past 0.8 / 1.4
+var _zoom_at := Vector2.INF            # the last pinch centre (screen)
 var _dev_yaw := -1.0
 var _hold_until := 0.0
 var _front: Dictionary = {}
@@ -240,12 +242,25 @@ func _place_camera() -> void:
 
 func _follow(dt: float) -> void:
 	_focus = _cam_follow.step(cam, _focus, actor.position, actor.mover.is_moving(), dt)
-	if _pinch.step(dt): _zoom = _pinch.value   # springing back from past a limit
-	_place_camera()
+	if _pinch.step(dt): _set_zoom(_pinch.value)   # springing back from past a limit, about the same point
+	else: _place_camera()
 
-func p0_zoom(f: float) -> void:
+## Zoom about the last pinch centre: the ground point under the fingers stays put (ScenePan's focal pinch).
+func _set_zoom(value: float) -> void:
+	_zoom = value
+	if cam == null or not is_inside_tree(): return   # not placed yet: the next frame frames it
+	var before = ElasticZoom.ground_at(cam, _zoom_at, _focus.y)
+	_place_camera()
+	var d := ElasticZoom.shift(before, ElasticZoom.ground_at(cam, _zoom_at, _focus.y))
+	if d != Vector3.ZERO:
+		_focus += d
+		_place_camera()
+
+func p0_zoom(f: float, at := Vector2.INF) -> void:
+	_zoom_at = at
 	_pinch.pinch(f)
-	_zoom = _pinch.value
+	_cam_follow.hold()   # the pinched framing stays until the player walks (the safe box takes over then)
+	_set_zoom(_pinch.value)
 func p0_zoom_end() -> void: _pinch.release()
 func p0_recenter() -> void:
 	_focus = actor.position
