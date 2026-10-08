@@ -244,6 +244,56 @@ func test_a_bar_without_the_action_family_shows_its_ghost_in_the_first_empty_slo
 	ui.set_view(_view())   # seeds back in the bag: the ghost goes
 	assert_bool(ui._bar.slots.any(func(s): return s.get("ghost", false))).is_false()
 
+func test_a_slot_pinned_at_zero_does_not_hide_the_ghost() -> void:
+	# int5b hand test 9: every seed sown, Lettuce stays pinned at 0 — the bar has nothing to sow, so the Seeds
+	# ghost takes the first empty slot after it; seeds back in stock and the ghost goes.
+	ui.set_view(_view())
+	ui._on_pin_toggled("seed_radish", true)
+	var v := _view()
+	v.bag.slots = v.bag.slots.filter(func(s): return not str(s.id).begins_with("seed_"))
+	ui.set_view(v)
+	assert_str(ui._bar.slots[0].id).is_equal("seed_radish")
+	assert_bool(ui._bar.slots[1].get("ghost", false)).is_true()
+	assert_str(ui._bar.slots[1].title).is_equal("Seeds")
+	assert_int(ui._bar.cells()[1].state).is_equal(UiItemCell.State.GHOST)
+	ui.set_view(_view())
+	assert_bool(ui._bar.slots.any(func(s): return s.get("ghost", false))).is_false()
+
+func test_compost_in_stock_keeps_the_seeds_ghost_away() -> void:
+	# LOCK-04 recommendation: the ghost shows only when nothing of this action is in stock — Compost counts.
+	var v := _view()
+	v.bag.slots = [{"id": "fert_compost", "qty": 2}]
+	ui.set_view(v)
+	ui._on_pin_toggled("fert_compost", true)
+	assert_array(ui._bar.slots.map(func(s): return s.get("id", ""))).is_equal(["fert_compost"])
+	v.bag.slots = [{"id": "fert_compost", "qty": 0}]
+	ui.set_view(v)   # sown out of Compost too: a pinned 0 is not stock, the ghost takes the next slot
+	assert_bool(ui._bar.slots[1].get("ghost", false)).is_true()
+
+func test_the_last_bait_toast_waits_for_the_fishing_panel_and_the_catch_card() -> void:
+	# int5b hand test 10: the bait goes at the reel's settlement, under the fishing panel (layer 30 over this UI);
+	# the toast waits until the pond is back from "busy" and no result card is open.
+	var v := _view()
+	v.bag.slots.append({"id": "bait_worm", "qty": 1})
+	v.names["bait_worm"] = "Worm Bait"
+	ui.set_mode("fish")
+	ui.set_surface("pond")
+	ui.set_view(v)
+	ui._on_slot_tapped("bait_worm")
+	ui._on_pin_toggled("bait_worm", true)
+	ui._toast.hide()   # the hook toast from picking the bait
+	ui.set_surface("busy")   # the fishing presentation
+	v.bag.slots = v.bag.slots.filter(func(s): return s.id != "bait_worm")
+	ui.set_view(v)
+	assert_str(ui.selected_bait).is_empty()
+	assert_bool(ui._toast.visible).is_false()
+	ui.open_inbox()   # stands in for the first-catch card
+	ui.set_surface("pond")
+	assert_bool(ui._toast.visible).is_false()   # the card is still open
+	ui.close_modal()
+	assert_bool(ui._toast.visible).is_true()
+	assert_str(ui._toast.text).is_equal("Out of Worm Bait · no bait on the hook")
+
 func test_the_last_bait_on_a_hook_empties_the_hook_with_a_toast() -> void:
 	# 李白 q(44) ④: casting goes on without bait.
 	var v := _view()
