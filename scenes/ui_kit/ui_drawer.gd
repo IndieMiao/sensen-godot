@@ -57,18 +57,31 @@ func _ready() -> void:
 	for child in body.get_children(): _watch_content(child)
 	set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
 	_place()
-	if animate:
-		var h := _shown_height()
-		offset_top += h
-		offset_bottom += h
-		var t := create_tween().set_parallel(true).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-		var secs := UiKit.secs(UiTokens.MOTION_DRAWER_MS)
-		t.tween_property(self, ^"offset_top", offset_top - h, secs)
-		t.tween_property(self, ^"offset_bottom", offset_bottom - h, secs)
+	if animate: _slide_in(_shown_height(), UiKit.secs(UiTokens.MOTION_DRAWER_MS))
 
+var _slide: Tween
+
+## Start `drop` px below its place and slide up into it.
+func _slide_in(drop: float, secs: float) -> void:
+	offset_top += drop
+	offset_bottom += drop
+	_slide = create_tween().set_parallel(true).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	_slide.tween_property(self, ^"offset_top", offset_top - drop, secs)
+	_slide.tween_property(self, ^"offset_bottom", offset_bottom - drop, secs)
+
+## A new height while sliding in keeps sliding, toward the new place (a drawer that fits itself to its content a
+## couple of frames after opening, P0CounterDrawer.fit_height).
 func set_height(v: float) -> void:
 	height = v
-	if is_inside_tree(): _place()
+	if not is_inside_tree(): return
+	if _slide != null and _slide.is_running():
+		var drop := offset_bottom   # how far below its place it still is
+		var left := maxf(0.0, _slide.get_total_elapsed_time())
+		_slide.kill()
+		_place()
+		_slide_in(drop, maxf(0.05, UiKit.secs(UiTokens.MOTION_DRAWER_MS) - left))
+	else:
+		_place()
 
 func set_safe_bottom(v: float) -> void:
 	safe_bottom = v

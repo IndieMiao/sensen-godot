@@ -315,7 +315,7 @@ func set_view(v: Dictionary) -> void:
 	if _counter != null and is_instance_valid(_counter) and modal_kind == "counter":
 		var was: String = _counter.section
 		_counter.refresh(v)
-		if was == "board": _fill_board(_counter)   # board cards follow Accept / Deliver
+		if was == "board" or _counter.is_short(): _fill_board(_counter)   # board cards follow Accept / Deliver
 	if _profile != null and is_instance_valid(_profile) and modal_kind == "profile": _profile.update(v)
 	_refresh_hud()
 	_refresh_bar()
@@ -1337,7 +1337,7 @@ func open_counter(role: String, opts := {}) -> void:
 	if d.section == "specialty": _close_above(d, _CLOSE_ABOVE_SPECIALTY, P0CounterDrawer.SPECIALTY_PAD)   # MARKET-SPECIALTY
 	_counter = d
 	modal_kind = "counter"
-	if d.section == "board": _fill_board(d)
+	if d.section == "board" or d.is_short(): _fill_board(d)
 
 func _counter_action(role: String, action: StringName, id: String, payload: Dictionary) -> void:
 	match action:
@@ -1363,10 +1363,18 @@ func counter_events(events: Array) -> void:
 
 ## The board page of a counter: the Stall Board (legacy view.stall.board) or the Market Board (view.boards.market).
 func _fill_board(d: P0CounterDrawer) -> void:
+	var b: Dictionary = view.get("stall", {}).get("board", {}) if d.role == "homestead" else market_board(view)
+	# The P0 market fills its board while Buy shows too (its height is the taller page's); it rebuilds and re-measures
+	# only when the cards change, not on every refresh.
+	if d.is_short():
+		var key := [b, view.get("bag", {})].hash()
+		if d.get_meta("board_key", 0) == key: return
+		d.set_meta("board_key", key)
 	for c in d.board.get_children():
 		c.hide()
 		c.queue_free()
-	_board(d.board, view.get("stall", {}).get("board", {}) if d.role == "homestead" else market_board(view))
+	_board(d.board, b)
+	if d.is_short(): d.fit_height()
 
 ## view.boards.market in the Stall Board's shape ({slots, requests [{id, title, item, qty, have, coins, where,
 ## status}], refill_in}) so one renderer draws both boards.
