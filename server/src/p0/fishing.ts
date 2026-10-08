@@ -1,7 +1,7 @@
 /** Fishing at the homestead pond (plan §6): cast pre-pays energy, the fish is drawn server-side, gates run level → rod → reel. */
 import { fishById, rodById, type Fish, type FishSite, type P0Content } from './content.js';
 import { add, count, freeSlots, room, take } from './bag.js';
-import { energyDetail, gainEnergy, gainXp, grantOnce, spendEnergy, type P0Event } from './progress.js';
+import { firstXp, energyDetail, gainEnergy, gainXp, grantOnce, spendEnergy, type P0Event } from './progress.js';
 import { draw, maxEnergy, scaledXp, skillLevel, xpPercent } from './rules.js';
 import type { P0State } from './state.js';
 
@@ -67,8 +67,7 @@ export function castLine(c: P0Content, s: P0State, cmd: { bait?: string | null }
   events.push({ kind: 'cast', bite_in: bite_ms, rarity: fish.rarity, breaks, bait });
   if (!s.firsts.includes('cast')) {
     s.firsts.push('cast');
-    events.push({ kind: 'first', what: 'cast', xp: f.first_cast_xp });
-    gainXp(c, s, now, 'fishing', f.first_cast_xp, 100, events);
+    firstXp(c, s, now, 'fishing', 'cast', f.first_cast_xp, events);
   }
   return null;
 }
@@ -105,8 +104,7 @@ export function reelLine(c: P0Content, s: P0State, cmd: { outcome?: string }, no
       if (xp <= 0) continue;
       if (s.firsts.includes(key)) continue;
       s.firsts.push(key);
-      events.push({ kind: 'first', what: key, xp });
-      gainXp(c, s, now, 'fishing', xp, 100, events);
+      firstXp(c, s, now, 'fishing', key, xp, events);
     }
     grantOnce(c, s, now, `first_fish_${fish.rarity}`, c.rewards.first_fish[fish.rarity - 1] ?? 0, events);
     const kinds = Object.keys(s.fishing.caught).length;

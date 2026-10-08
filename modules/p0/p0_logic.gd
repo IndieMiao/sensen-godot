@@ -127,7 +127,9 @@ static func main_action(view: Dictionary, plot: Dictionary, seed_id: String, row
 		"wild":
 			return {"icon": "hoe", "verb": "Till", "sub": "Free", "enabled": true, "amber": false, "cmd": {"type": "till", "plot": plot_id}, "need": 0}
 		"tilled":
-			if seed_id == "":
+			# A pinned slot stays on the bar at 0 (LOCK-05) and P0Ui deselects it; a 0 seed is no seed here too, so the
+			# key never sends a sow the server turns down (PR #12 review, 李白 q(44) ③). The verb change stops a held row.
+			if seed_id == "" or bag_count(view, seed_id) <= 0:
 				a.sub = "Pick a seed"
 				return a
 			var cost := int(crop_for_seed(view, seed_id).get("energy", 2))
@@ -152,7 +154,9 @@ static func main_action(view: Dictionary, plot: Dictionary, seed_id: String, row
 	return a
 
 ## Five candidates for the current action — Farming: seeds, Fishing: bait — kept order: previously shown → most plentiful (§10.3.3).
-static func quick_bar(view: Dictionary, previous: Array, mode := "farm") -> Array:
+## Pinned ids always stay on the bar, also at 0 left (LOCK-05, §10.3.3 归零); ids the player dragged off the bar
+## (`removed`) are not refilled until pinned again (§10.3.4 "从栏上移除，物品仍在背包").
+static func quick_bar(view: Dictionary, previous: Array, mode := "farm", pinned: Array = [], removed: Array = []) -> Array:
 	var prefix := "bait_" if mode == "fish" else "seed_"
 	var counts := {}
 	for s in view.get("bag", {}).get("slots", []):
@@ -160,8 +164,10 @@ static func quick_bar(view: Dictionary, previous: Array, mode := "farm") -> Arra
 		if id.begins_with(prefix): counts[id] = int(counts.get(id, 0)) + int(s.get("qty", 0))
 	var bar: Array = []
 	for id in previous:
-		if counts.has(id) and bar.size() < 5: bar.append(id)
-	var rest: Array = counts.keys().filter(func(id): return not bar.has(id))
+		if bar.size() < 5 and not bar.has(id) and (pinned.has(id) or (counts.has(id) and not removed.has(id))): bar.append(id)
+	for id in pinned:
+		if bar.size() < 5 and not bar.has(id): bar.append(id)
+	var rest: Array = counts.keys().filter(func(id): return not bar.has(id) and not removed.has(id))
 	rest.sort_custom(func(a, b): return counts[a] > counts[b] if counts[a] != counts[b] else str(a) < str(b))
 	for id in rest:
 		if bar.size() < 5: bar.append(id)
@@ -206,8 +212,9 @@ static func plural(name: String) -> String:
 	if name.ends_with("y"): return name.substr(0, name.length() - 1) + "ies"
 	return name + "s"
 
-## Energy Card facts (§3.7.2 / §3.7.3): one card for short and zero; only facts, tiles only guide.
-static func energy_card(view: Dictionary, need: int, verb: String) -> Dictionary:
+## Energy Card facts (§3.7.2 / §3.7.3, LOCK-09): one card for short and zero; only facts, tiles only guide.
+## Away from home (the pond, later the mine) Cook and Rest are greyed with `At home` (q(6)).
+static func energy_card(view: Dictionary, need: int, verb: String, at_home := true) -> Dictionary:
 	var e: Dictionary = view.get("energy", {})
 	var have := int(e.get("value", 0))
 	var mx := int(e.get("max", 200))
@@ -223,18 +230,136 @@ static func energy_card(view: Dictionary, need: int, verb: String) -> Dictionary
 		if id.begins_with("fish_") and item(view, id).get("cook", true): fish += int(st.get("qty", 0))
 	var rest: Dictionary = view.get("rest", {})
 	var rest_left := int(rest.get("limit", 1)) - int(rest.get("used", 0))
+	var subtitle := "Recover or do something free" if have <= 0 else "%s needs %d Energy · you have %d" % [verb, need, have]
+	var cook := {"icon": "pot", "label": "Cook", "fact": "%d fish in creel" % fish if fish > 0 else "No fish to cook", "guide": "Show kitchen", "go": "stove", "on": fish > 0}
+	# TODO(SGODOT-224, bench): LOCK-09 guides Rest with "Show bench"; P0 has no bench, rest is at the farmhouse (197 60c82ad2).
+	var rest_tile := {"icon": "rest", "label": "Rest", "fact": "Available", "guide": "Show home", "go": "home", "on": true}
+	if rest_left <= 0:
+		rest_tile.fact = "Rested today"   # the reset time is on the bench card (李白, 225)
+		rest_tile.on = false
+	elif rest.has("away_ready_in"):   # q(41): Rest opens after 2 h away from the farm (SGODOT-228 / PR #16)
+		var away = rest.get("away_ready_in")
+		if away == null:
+			rest_tile.fact = "After %dh away" % int(rest.get("away_h", 2))
+			rest_tile.on = false
+		elif float(away) > 0.0:
+			rest_tile.fact = "Ready in %s" % duration(float(away))
+			rest_tile.on = false
+	if not at_home:
+		for t in [cook, rest_tile]:
+			t.fact = "At home"
+			t.on = false
 	return {
 		"title": "Energy %d/%d%s" % [have, mx, tick],
+		"have": have, "max": mx, "regen": "" if next_in == null else "+1 in %s" % duration(float(next_in)),
 		"zero": have <= 0,
-		"subtitle": "Recover or do something free" if have <= 0 else "%s needs %d Energy · you have %d" % [verb, need, have],
+		"subtitle": subtitle, "fact": subtitle,
 		"wait": "Wait · Full in %s" % duration(full_ms) if next_in != null else "Wait · Full now",
 		"tiles": [
-			{"icon": "eat", "label": "Eat", "fact": "%d dish%s in bag" % [dishes, "" if dishes == 1 else "es"] if dishes > 0 else "No dishes in bag", "guide": "Open bag", "go": "bag", "on": dishes > 0},
-			{"icon": "pot", "label": "Cook", "fact": "%d fish in creel" % fish if fish > 0 else "No fish to cook", "guide": "Show kitchen", "go": "stove", "on": fish > 0},
-			{"icon": "dish_fruit_tea", "label": "Tea", "fact": "Tea House opens later", "guide": "", "go": "", "on": false},
-			{"icon": "rest", "label": "Rest", "fact": "Available" if rest_left > 0 else "Rested today · %s" % duration(float(rest.get("resets_in", 0))), "guide": "Show home", "go": "home", "on": rest_left > 0},
+			{"icon": "dish_grilled_fish", "label": "Eat", "fact": "%d dish%s in bag" % [dishes, "" if dishes == 1 else "es"] if dishes > 0 else "No dishes in bag", "guide": "Open bag", "go": "bag", "on": dishes > 0},
+			cook,
+			_tea_tile(view),
+			rest_tile,
 		],
 	}
+
+## Tea on the Energy card (BAR-3 / E-11, §3.4.4): three cups a day shared by tea and coffee, from view.drinks
+## (SGODOT-228); copy 李白 (225). Facts only: the tile guides to the Tea House on the map. Without the server's
+## drinks the tile stays greyed with no line (安其拉 on #11: no placeholder state).
+static func _tea_tile(view: Dictionary) -> Dictionary:
+	var tea := {"icon": "dish_fruit_tea", "label": "Tea", "fact": "", "guide": "", "go": "", "on": false}
+	var drinks: Dictionary = view.get("drinks", {})
+	if drinks.is_empty(): return tea
+	tea.guide = "Show on map"
+	tea.go = "outpost:tea"
+	tea.on = true
+	if int(drinks.get("left", 0)) <= 0:
+		tea.fact = "%d/%d today" % [int(drinks.get("used", 0)), int(drinks.get("limit", 3))]
+		tea.on = false
+	elif bool(drinks.get("full", false)):
+		tea.fact = "Energy full"
+		tea.on = false
+	elif drinks.get("need", null) != null and int(drinks.need) > int(view.get("coins", 0)):
+		# drinks.need is the whole sum a cup asks (price + the 40-coin floor), so the gap is need − coins
+		tea.fact = "Need %d more coins" % (int(drinks.need) - int(view.get("coins", 0)))
+		tea.on = false
+	else:
+		tea.fact = "%d/%d today · %d coins" % [int(drinks.get("used", 0)), int(drinks.get("limit", 3)), int(drinks.get("price", 0))]
+	return tea
+
+## Inbox parcels as read-only lines until the stage 4 Inbox (SGODOT-234): `Radish ×3 · 22h left`, soonest to expire
+## first (奕星 on #11, LOCK-14). The view already sorts them by expiry; left is projected between replies.
+static func parcel_lines(view: Dictionary) -> Array:
+	var parcels: Array = view.get("inbox", {}).get("parcels", []).duplicate()
+	parcels.sort_custom(func(a, b) -> bool: return float(a.get("left", 0)) < float(b.get("left", 0)))
+	return parcels.map(func(p) -> String:
+		var left := float(p.get("left", 0))
+		var when := ("%dh left" % ceili(left / 3600000.0)) if left >= 3600000.0 else ("%dm left" % maxi(1, ceili(left / 60000.0)))
+		return "%s ×%d · %s" % [item_name(view, str(p.get("id", ""))), int(p.get("qty", 1)), when])
+
+## Energy panel under the HUD chip (LOCK-09 Kind=Panel): max, today's use as count tiles, the blessing.
+static func energy_panel(view: Dictionary) -> Dictionary:
+	var e: Dictionary = view.get("energy", {})
+	var m: Dictionary = view.get("meals", {})
+	var r: Dictionary = view.get("rest", {})
+	var out := {
+		"max": int(e.get("max", 200)), "level": "",
+		"uses": [
+			{"name": "Meals", "have": int(m.get("used", 0)), "need": int(m.get("cap", 200)), "icon": "dish_veggie_plate"},
+			{"name": "Rest", "have": int(r.get("used", 0)), "need": int(r.get("limit", 1)), "icon": "rest"},
+		],
+		"blessing": {},
+	}
+	var b = view.get("blessing", null)
+	if b is Dictionary:
+		var days := ceili(float(b.get("left", 0)) / 86400000.0)
+		out.blessing = {"title": "Newcomer Blessing · %d day%s left" % [days, "" if days == 1 else "s"],
+			"detail": "Energy returns %s× faster · Meals %d a day" % [str(snappedf(float(b.get("regen_mult", 1.5)), 0.1)), int(m.get("cap", 300))]}
+	return out
+
+## Level progress of a skill track, 0..1 (the HUD avatar ring).
+static func skill_progress(s: Dictionary) -> float:
+	if s.is_empty() or s.get("next", null) == null: return 1.0
+	return clampf(float(int(s.xp) - int(s.floor)) / maxf(1.0, float(int(s.next) - int(s.floor))), 0.0, 1.0)
+
+## HUD data for UiHud.apply (SGODOT-222, LOCK-06). ctx: next_cost (Energy the next action needs),
+## place (UiHud place dictionary), unread (overrides the Inbox count). Until the stage 4 Inbox (SGODOT-234) can show
+## expiry records, the bell counts the waiting parcels only (奕星 on #11, option B): what the bell's sheet lists.
+static func hud_state(view: Dictionary, ctx: Dictionary = {}) -> Dictionary:
+	var e: Dictionary = view.get("energy", {})
+	var have := int(e.get("value", 0))
+	var mx := int(e.get("max", 200))
+	var nx = e.get("next_in", null)
+	var regen := "Full"
+	if have > mx: regen = "Bonus +%d" % (have - mx)
+	elif nx != null: regen = "+1 in " + duration(float(nx))
+	var sk: Dictionary = view.get("skills", {})
+	var lines := today_lines(view)
+	var out := {
+		"energy": have, "energy_max": mx, "regen": regen, "next_cost": int(ctx.get("next_cost", 0)),
+		"skills": {"farming": skill_progress(sk.get("farming", {})), "fishing": skill_progress(sk.get("fishing", {}))},
+		"coins": int(view.get("coins", 0)), "unread": int(ctx.get("unread", (view.get("inbox", {}).get("parcels", []) as Array).size())), "buff": {},
+		"today": str(lines[0]) if not lines.is_empty() else "",
+	}
+	if ctx.has("place"): out["place"] = ctx.place
+	return out
+
+## Location chip data from a scene's "City · Space" text (P0 is always the home city).
+static func place_info(text: String, space_override := "") -> Dictionary:
+	var parts := text.split(" · ", false, 1)
+	var space := parts[1] if parts.size() > 1 else ""
+	if space_override != "": space = space_override
+	return {"city": parts[0] if parts.size() > 0 else "", "space": space, "kind": UiHud.PlaceKind.HOME, "day_pass": ""}
+
+## Where a material comes from, for the NeedSource line under a tapped NEED-TILE (LOCK-10): one line, and a
+## camera-only Show target ("" hides Show). Never a jump (LOCK-08).
+static func need_source(view: Dictionary, id: String) -> Dictionary:
+	var label := item_name(view, id)
+	if id.begins_with("seed_"): return {"text": "%s · Homestead Stall" % label, "go": "stall"}
+	if id.begins_with("crop_"): return {"text": "%s · Grow it on your plots" % label, "go": "plots"}
+	if id.begins_with("fish_"): return {"text": "%s · Ponds on the map" % label, "go": ""}
+	if id.begins_with("dish_"): return {"text": "%s · Cook it at the stove" % label, "go": "stove"}
+	return {"text": label, "go": ""}
 
 ## Locally advance a view by elapsed ms (energy ticks and crop timers) between server refreshes.
 static func project(view: Dictionary, elapsed_ms: float) -> Dictionary:
@@ -291,6 +416,13 @@ static func rarity_text_color(rarity: int) -> Color:
 	return RARITY_TEXT[clampi(rarity - 1, 0, 3)]
 
 ## Dish label with its quality star: "Grilled Crucian ★" (Good) / "★★" (Perfect).
+## COOK-4 for a pot that came out a Mystery Dish (SGODOT-232 S5): with the Newcomer Blessing's refund there is no
+## dish at all (李白 2026-10-08), so the card says so and offers no Eat.
+static func mystery_card(ev: Dictionary) -> Dictionary:
+	if bool(ev.get("none", false)):
+		return {title = "No dish this time", sub = "Ingredients back (%d left today)" % int(ev.get("trial_left", 0)), eat = false}
+	return {title = "Mystery Dish", sub = "Hmm… not a dish. Try another mix.", eat = true}
+
 static func dish_label(view: Dictionary, id: String) -> String:
 	var info := item(view, id)
 	var q := int(info.get("quality", 0))
@@ -298,6 +430,8 @@ static func dish_label(view: Dictionary, id: String) -> String:
 
 ## Main action at the pond (§6.6.1): Cast pre-pays 5; creel full / short energy say why.
 static func fish_action(view: Dictionary, bait: String, site := "pond") -> Dictionary:
+	# Bait is optional (不知火舞 on PR #12): a pinned bait at 0 stays on the bar, and the cast just goes without it.
+	if bait != "" and bag_count(view, bait) <= 0: bait = ""
 	var f: Dictionary = view.get("fishing", {})
 	var cost := int(f.get("cast_energy", 5))
 	var a := {"icon": "rod", "verb": "Cast", "sub": "%d Energy" % cost, "enabled": true, "amber": false,
@@ -305,9 +439,11 @@ static func fish_action(view: Dictionary, bait: String, site := "pond") -> Dicti
 	if f.get("cast", null) != null:
 		return {"icon": "bobber", "verb": "Fishing…", "sub": "Line in the water", "enabled": false, "amber": false, "cmd": {}, "need": 0}
 	if int(view.get("bag", {}).get("free", 1)) < 1:
-		# FISH-4: the key is greyed and says why; Open Bag / Go home pills float above the switch.
-		return {"icon": "rod", "verb": "Creel full", "sub": "0 free slots · Sell or cook first", "enabled": false, "amber": false,
+		# FISH-4: the key is greyed with the short reason (plan §10.2.2 `Cast · Creel full`); the creel badge and the
+		# toast carry the long one, and Open Bag / Go home pills float above the switch.
+		return {"icon": "rod", "verb": "Cast", "sub": "Creel full", "enabled": false, "amber": false,
 			"cmd": {}, "need": 0, "creel_full": true}
+
 	if int(view.get("energy", {}).get("value", 0)) < cost:
 		a.sub = "Need %d Energy" % cost
 		a.amber = true
@@ -454,41 +590,47 @@ static func next_line(view: Dictionary, skill: String, level: int) -> String:
 ## Today panel (§14.5): up to 3 lines — doable now first, then the shortest countdown, then the skill
 ## closest to its next level. Facts only; never "spend your Energy".
 static func today_lines(view: Dictionary) -> Array:
-	var now_lines: Array = []
-	var timed: Array = []    # [ms, text]
+	return today_rows(view).map(func(r): return r.line)
+
+## Today rows (§14.5, LOCK-06 TodayRow): {line, icon, go, state, tail}. Now-lines first, then countdowns, then
+## the nearest skill level; at most 3. `go` is a camera-only Show target ("" hides Show, LOCK-08).
+static func today_rows(view: Dictionary) -> Array:
+	var now_rows: Array = []
+	var timed: Array = []    # [ms, row]
 	var farmed := (view.get("firsts", []) as Array).any(func(f): return str(f).begins_with("harvest:")) \
 		or (view.get("plots", []) as Array).any(func(p): return str(p.get("state", "")) in ["sown", "growing", "ready"])
-	if not farmed: now_lines.append("Sow your first plot")
+	if not farmed: now_rows.append(_first_sow_row(view))
 	for r in view.get("stall", {}).get("board", {}).get("requests", []):
 		if str(r.get("status", "")) == "open":
-			now_lines.append("%s · %d %s · Stall Board" % [str(r.title), int(r.qty), item_name(view, str(r.item))])
+			now_rows.append(_row("%s · %d %s · Stall Board" % [str(r.title), int(r.qty), item_name(view, str(r.item))], "board", "stall"))
 			continue
 		if str(r.get("status", "")) != "accepted": continue
-		if int(r.have) >= int(r.qty): now_lines.append("%s · Deliver at the Stall" % str(r.title))
-		else: now_lines.append("%s · %s %d/%d" % [str(r.title), item_name(view, str(r.item)), int(r.have), int(r.qty)])
+		if int(r.have) >= int(r.qty): now_rows.append(_row("%s · Deliver at the Stall" % str(r.title), "board", "stall"))
+		else: now_rows.append(_row("%s · %s %d/%d" % [str(r.title), item_name(view, str(r.item)), int(r.have), int(r.qty)], str(r.item), ""))
 	var ready := {}
 	var sown := 0
 	for p in view.get("plots", []):
 		var st := str(p.get("state", ""))
 		if st == "ready": ready[str(p.crop)] = int(ready.get(str(p.crop), 0)) + 1
 		elif st == "sown": sown += 1
-		elif st == "growing": timed.append([float(p.get("ready_in", 0)), "%s ready in %s" % [plural(item_name(view, str(p.crop))), duration(float(p.get("ready_in", 0)))]])
-	for c in ready: now_lines.append("Harvest %d %s" % [int(ready[c]), plural(item_name(view, str(c))) if int(ready[c]) > 1 else item_name(view, str(c))])
-	if sown > 0: now_lines.append("Water %d sown plot%s · Free" % [sown, "" if sown == 1 else "s"])
+		elif st == "growing": timed.append([float(p.get("ready_in", 0)), _row("%s ready in %s" % [plural(item_name(view, str(p.crop))), duration(float(p.get("ready_in", 0)))], str(p.crop), "plots")])
+	for c in ready: now_rows.append(_row("Harvest %d %s" % [int(ready[c]), plural(item_name(view, str(c))) if int(ready[c]) > 1 else item_name(view, str(c))], str(c), "plots"))
+	if sown > 0: now_rows.append(_row("Water %d sown plot%s · Free" % [sown, "" if sown == 1 else "s"], "water", "plots"))
 	var stove = view.get("cooking", {}).get("stove", null)
 	if stove is Dictionary:
 		var dish := item_name(view, str(stove.dish)) if stove.get("dish", null) != null else "Your dish"
-		if float(stove.get("ready_in", 0)) <= 0.0: now_lines.append("%s ready at the stove" % dish)
-		else: timed.append([float(stove.ready_in), "%s · %s left at the stove" % [dish, duration(float(stove.ready_in))]])
+		var dish_icon := str(stove.dish) if stove.get("dish", null) != null else "pot"
+		if float(stove.get("ready_in", 0)) <= 0.0: now_rows.append(_row("%s ready at the stove" % dish, dish_icon, "stove"))
+		else: timed.append([float(stove.ready_in), _row("%s · %s left at the stove" % [dish, duration(float(stove.ready_in))], dish_icon, "stove")])
 	else:
 		var fish := 0
 		for st in view.get("bag", {}).get("slots", []):
 			if str(st.get("id", "")).begins_with("fish_") and item(view, str(st.id)).get("cook", true): fish += int(st.get("qty", 0))
-		if fish > 0: now_lines.append("%d fish · the stove is free" % fish)
+		if fish > 0: now_rows.append(_row("%d fish · the stove is free" % fish, "pot", "stove"))
 	timed.sort_custom(func(a, b): return float(a[0]) < float(b[0]))
-	var lines: Array = now_lines.duplicate()
+	var rows: Array = now_rows.duplicate()
 	for t in timed:
-		if lines.size() < 3 and not lines.has(t[1]): lines.append(t[1])
+		if rows.size() < 3 and not rows.any(func(r): return r.line == t[1].line): rows.append(t[1])
 	var best := ""
 	var best_gap := 1 << 30
 	for key in ["farming", "fishing", "cooking"]:
@@ -498,9 +640,22 @@ static func today_lines(view: Dictionary) -> Array:
 		if gap < best_gap:
 			best_gap = gap
 			best = "%s Lv%d in %d XP" % [key.capitalize(), int(sk.get("level", 1)) + 1, gap]
-	if lines.size() < 3 and best != "": lines.append(best)
-	if lines.is_empty(): lines.append("Sow your first plot")
-	return lines.slice(0, 3)
+	if rows.size() < 3 and best != "": rows.append(_row(best, "xp", ""))
+	if rows.is_empty(): rows.append(_first_sow_row(view))
+	return rows.slice(0, 3)
+
+static func _row(line: String, icon_id: String, go: String) -> Dictionary:
+	return {"line": line, "icon": icon_id, "go": go, "state": "default", "tail": ""}
+
+## "Sow your first plot", short of Energy when sowing a radish costs more than the player has (TodayRow Short).
+static func _first_sow_row(view: Dictionary) -> Dictionary:
+	var r := _row("Sow your first plot", "seed_radish", "plots")
+	var e: Dictionary = view.get("energy", {})
+	var cost := int(crop_for_seed(view, "seed_radish").get("energy", 2))
+	if int(e.get("value", 0)) < cost:
+		r.state = "short"
+		r.tail = "needs %d Energy" % cost + ("" if e.get("next_in", null) == null else " · +1 in %s" % duration(float(e.next_in)))
+	return r
 
 ## Resident dialogue bar data (LOCK-18, SGODOT-225 UiResidentBar) from view.residents facts + the content table:
 ## {id, portrait, name, role, stage, have, need, next, line, gift_reason, request_label, request_reason, request_cmd,

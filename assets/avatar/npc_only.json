@@ -1,0 +1,10 @@
+{
+	"version": 1,
+	"npc_only": [
+		"mask16_npc_kai",
+		"hairhat71_npc_kai",
+		"hairhat12_npc_mei",
+		"cloth11_npc_mei",
+		"hairhat80_npc_ama"
+	]
+}
