@@ -391,3 +391,25 @@ class _World extends Control:
 	func _ready() -> void: mouse_filter = Control.MOUSE_FILTER_STOP
 	func _gui_input(e: InputEvent) -> void:
 		if e is InputEventMouseButton or e is InputEventScreenTouch: n += 1
+
+func test_slot_at_finds_the_slot_under_a_finger_filled_or_empty() -> void:
+	# SGODOT-225: a bag item dragged over the bar lands on the slot under the finger, a gap included.
+	await await_idle_frame()
+	var cells := bar.cells()
+	assert_int(bar.slot_at(cells[1].get_global_rect().get_center())).is_equal(1)
+	assert_int(bar.slot_at(cells[4].get_global_rect().get_center())).is_equal(4)   # empty
+	assert_int(bar.slot_at(cells[2].get_global_rect().position + Vector2(1, 1 - GestureArbiter.DROP_SLOT_GROW))).is_equal(2)   # in the grown edge, nearer slot 2 than slot 1
+	assert_int(bar.slot_at(Vector2(-200, -200))).is_equal(-1)
+	bar.collapsed = true
+	assert_int(bar.slot_at(cells[1].get_global_rect().get_center())).is_equal(-1)
+
+func test_set_drop_target_lights_a_slot_even_an_empty_one() -> void:
+	var cells := bar.cells()
+	bar.set_drop_target(4)
+	assert_int(cells[4].state).is_equal(UiItemCell.State.DROP_TARGET)
+	bar.set_drop_target(1)
+	assert_int(cells[1].state).is_equal(UiItemCell.State.DROP_TARGET)
+	assert_int(cells[4].state).is_equal(UiItemCell.State.EMPTY)
+	bar.set_drop_target(-1)
+	assert_int(cells[1].state).is_equal(UiItemCell.State.DEFAULT)
+

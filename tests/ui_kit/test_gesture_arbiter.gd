@@ -240,3 +240,10 @@ func test_left_mouse_button_acts_as_the_first_finger_without_a_touchscreen() -> 
 	var up := down.duplicate()
 	up.pressed = false
 	assert_array(_kinds(a.feed(up, 100))).contains_exactly(["joystick_end", "tap"])
+
+func test_drop_zones_open_below_a_docked_bar() -> void:
+	# In the bag drawer the bar is the top row: the zones turn to its bottom edge + 96 (q(61)).
+	var z := GestureArbiter.drop_zone_centers(Rect2(12, 300, 336, 68), true)
+	assert_vector(z[0]).is_equal(Vector2(72, 464))
+	assert_vector(z[1]).is_equal(Vector2(168, 464))
+

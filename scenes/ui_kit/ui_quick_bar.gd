@@ -57,6 +57,8 @@ var capacity_warning := false: set = set_capacity_warning
 var bag_only := false: set = set_bag_only
 ## Vibrate on lift; off in tests and the gallery.
 var haptics := true
+## Docked as the bag drawer's top row (SGODOT-225): the drop zones open under the bar instead of over it (q(61)).
+var zones_below := false
 
 var _cells: Array[UiItemCell] = []
 var _row: HBoxContainer
@@ -182,8 +184,8 @@ func _refresh() -> void:
 		var qty := int(d.get("quantity", 0))
 		cell.quantity = "×%d" % qty if id != "" else ""
 		cell.pinned = bool(d.get("pinned", false)) and id != ""
-		if id == "": cell.state = UiItemCell.State.GHOST if bool(d.get("ghost", false)) else UiItemCell.State.EMPTY
-		elif i == _target: cell.state = UiItemCell.State.DROP_TARGET
+		if i == _target: cell.state = UiItemCell.State.DROP_TARGET   # an empty slot too: a bag item lands there (225)
+		elif id == "": cell.state = UiItemCell.State.GHOST if bool(d.get("ghost", false)) else UiItemCell.State.EMPTY
 		elif id == selected: cell.state = UiItemCell.State.SELECTED
 		elif qty <= 0 and cell.pinned: cell.state = UiItemCell.State.ZERO
 		else: cell.state = UiItemCell.State.DEFAULT
@@ -231,6 +233,29 @@ func cancel_drag() -> void:
 	if _dragging >= 0: _fly_back()
 	elif _lifted >= 0: _end_drag()
 
+## The slot under a finger dragging something in from the bag drawer (SGODOT-225): the slot itself, filled or
+## empty (gaps stay where they are, LOCK-05 v1.10), grown by DROP_SLOT_GROW like a slot-to-slot drop; -1 off the
+## slots, or while collapsed / bag-only.
+func slot_at(global_pos: Vector2) -> int:
+	if collapsed or bag_only: return -1
+	# Grown slots overlap across the gap between neighbours: the nearest centre wins.
+	var rects := _slot_rects()
+	var best := -1
+	for i in rects.size():
+		var r: Rect2 = rects[i]
+		if not r.grow(GestureArbiter.DROP_SLOT_GROW).has_point(global_pos): continue
+		if best < 0 or global_pos.distance_to(r.get_center()) < global_pos.distance_to((rects[best] as Rect2).get_center()): best = i
+	return best
+
+## Hover feedback for a drag from outside the bar: that slot shows DROP_TARGET (the slot-to-slot look); -1 clears.
+## Ignored while one of the bar's own slots is being dragged (that drag owns the target).
+func set_drop_target(index: int) -> void:
+	if _dragging >= 0: return
+	var t := index if index >= 0 and index < SLOTS else -1
+	if t == _target: return
+	_target = t
+	_refresh()
+
 ## The drop zones while a slot is lifted: [Pin / Unpin, Remove], or [] otherwise.
 func drop_zones() -> Array[UiBarDropZone]:
 	var out: Array[UiBarDropZone] = []
@@ -242,7 +267,7 @@ func _tick() -> void:
 	if haptics and OS.has_feature("mobile"): Input.vibrate_handheld(20)
 
 func _show_zones(pinned: bool) -> void:
-	var centers := GestureArbiter.drop_zone_centers(get_global_rect())
+	var centers := GestureArbiter.drop_zone_centers(get_global_rect(), zones_below)
 	_pin_zone = UiBarDropZone.new(UiBarDropZone.Kind.UNPIN if pinned else UiBarDropZone.Kind.PIN)
 	_remove_zone = UiBarDropZone.new(UiBarDropZone.Kind.REMOVE)
 	for k in 2:
@@ -295,7 +320,7 @@ func _drop(global_pos: Vector2) -> void:
 	var from := _dragging
 	var d := slot(from)
 	var id := str(d.get("id", ""))
-	var centers := GestureArbiter.drop_zone_centers(get_global_rect())
+	var centers := GestureArbiter.drop_zone_centers(get_global_rect(), zones_below)
 	var where := GestureArbiter.drop_on_bar(global_pos, from, _slot_rects(), centers[0], centers[1])
 	match where.kind:
 		&"pin_toggle":
@@ -330,7 +355,7 @@ func _fly_back(ms := _FLY_BACK_MS) -> void:
 ## Remove: the slot flies into the Remove zone's centre (150 ms) while the zones fade out (200 ms).
 func _fly_into_zone() -> void:
 	var ghost := _ghost
-	var target := _remove_zone.center if _remove_zone else GestureArbiter.drop_zone_centers(get_global_rect())[1]
+	var target := _remove_zone.center if _remove_zone else GestureArbiter.drop_zone_centers(get_global_rect(), zones_below)[1]
 	_ghost = null
 	_end_drag()
 	if ghost == null: return

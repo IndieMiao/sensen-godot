@@ -249,8 +249,9 @@ static func drop_on_bar(pos: Vector2, from: int, slots: Array, pin_zone: Vector2
 
 ## The two drop zones' centres for a quick bar (its global rect): [Pin / Unpin, Remove], DROP_ZONE_ABOVE over its
 ## top edge at x 72 and 168 on a 360-wide screen.
-static func drop_zone_centers(bar: Rect2) -> Array[Vector2]:
-	var y := bar.position.y - DROP_ZONE_ABOVE
+## In the bag drawer (`below`) they open DROP_ZONE_ABOVE under the bar's bottom edge instead (q(61)).
+static func drop_zone_centers(bar: Rect2, below := false) -> Array[Vector2]:
+	var y := bar.end.y + DROP_ZONE_ABOVE if below else bar.position.y - DROP_ZONE_ABOVE
 	return [Vector2(bar.position.x + PIN_ZONE_X, y), Vector2(bar.position.x + REMOVE_ZONE_X, y)]
 
 ## Scroll speed factor while dragging near a grid edge: -1..0 near the top, 0..1 near the bottom.

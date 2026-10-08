@@ -476,6 +476,110 @@ func _undo_remove(was: Dictionary) -> void:
 	_bar_sig = []
 	_refresh_bar()
 
+# ---------------------------------------------------------------- the bag drawer's way onto the bar (SGODOT-225, q(61))
+## The action whose bar takes this item ("farm": seeds and fertiliser, "fish": bait), or "" when none does.
+func bar_action_of(id: String) -> String: return P0Logic.bar_action_of(id)
+
+## The bar on screen takes this item (a seed never goes on the Fishing bar).
+func accepts(id: String) -> bool: return bar_action_of(id) != "" and bar_action_of(id) == bar_mode
+
+## Pinned on its own action's bar.
+func is_pinned(id: String) -> bool:
+	var mode := bar_action_of(id)
+	return mode != "" and _quick_for(mode).pins.has(id)
+
+## False when its action already has every slot pinned and it is not one of them (the detail card then greys Pin
+## out: `Bar full · Unpin one first`), or when no bar takes it.
+func can_pin(id: String) -> bool:
+	var mode := bar_action_of(id)
+	if mode == "": return false
+	var pins: Array = _quick_for(mode).pins
+	return pins.has(id) or pins.size() < UiQuickBar.SLOTS
+
+## Detail card Pin / a bag item dropped on the Pin zone: pinned on its own action's bar. On the bar now showing it
+## takes the first gap, else the free end, else the last unpinned slot (that item leaves the bar, not "removed");
+## on another action's bar it is only recorded and leads that bar next time. Clears it from "removed".
+func pin_to(id: String) -> bool:
+	if not can_pin(id): return false
+	var mode := bar_action_of(id)
+	var store := _quick_for(mode)
+	store.removed.erase(id)
+	if not store.pins.has(id): store.pins.append(id)
+	if mode == bar_mode and not _bar_ids.has(id):
+		var hole := _bar_ids.find("")
+		if hole >= 0: _bar_ids[hole] = id
+		elif _bar_ids.size() < UiQuickBar.SLOTS: _bar_ids.append(id)
+		else:
+			for k in range(_bar_ids.size() - 1, -1, -1):
+				if not store.pins.has(_bar_ids[k]):
+					_bar_ids[k] = id
+					break
+	_save_quick()
+	if mode == bar_mode: _refresh_bar()
+	return true
+
+## Detail card Unpin: stays where it is until the bar refills.
+func unpin(id: String) -> void:
+	var mode := bar_action_of(id)
+	if mode == "": return
+	_quick_for(mode).pins.erase(id)
+	_save_quick()
+	if mode == bar_mode: _refresh_bar()
+
+## A bag item dropped on slot `index` of the bar on screen: placed there, not pinned (q(61)). A gap or the free end
+## just takes it; an occupied slot's item leaves the bar with its pin and is not "removed"; an item already on the
+## bar swaps places with that slot. Clears it from this action's "removed". False when this bar does not take it.
+func place_at(index: int, id: String) -> bool:
+	if not accepts(id) or index < 0 or index >= UiQuickBar.SLOTS: return false
+	var store := _quick_for(bar_mode)
+	store.removed.erase(id)
+	while _bar_ids.size() <= index: _bar_ids.append("")
+	var there := str(_bar_ids[index])
+	var from := _bar_ids.find(id)
+	if from >= 0:
+		_bar_ids[from] = there
+	elif there != "":
+		store.pins.erase(there)
+	_bar_ids[index] = id
+	_save_quick()
+	_refresh_bar()
+	return true
+
+func quick_bar_node() -> UiQuickBar: return _bar
+
+var _bar_dock: Control = null
+var _bar_home_index := 0
+
+## The bag drawer's top row is this same bar, pushed up by the drawer (LOCK-04; plan §10.4): moved into `container`
+## at its 336 × 68, drop zones opening below it. Any drag in progress is cancelled.
+func dock_bar_into(container: Control) -> void:
+	if container == null or _bar_dock == container: return
+	_bar.cancel_drag()
+	_bar.set_drop_target(-1)
+	_bar_home_index = _bar.get_index()
+	_bar.get_parent().remove_child(_bar)
+	container.add_child(_bar)
+	_bar.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	_bar.custom_minimum_size = Vector2(UiTokens.SIZE_QUICK_BAR_W, UiTokens.SIZE_QUICK_BAR_H)
+	_bar.zones_below = true
+	_bar_dock = container
+
+## Back to its own place over the scene; a no-op when not docked. Every modal close comes through _drop_modal.
+func undock_bar() -> void:
+	if _bar_dock == null: return
+	_bar.cancel_drag()
+	_bar.set_drop_target(-1)
+	if is_instance_valid(_bar.get_parent()): _bar.get_parent().remove_child(_bar)
+	_kit.add_child(_bar)
+	_kit.move_child(_bar, mini(_bar_home_index, _kit.get_child_count() - 1))
+	_bar.custom_minimum_size = Vector2.ZERO
+	_bar.zones_below = false
+	_bar.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+	_bar_dock = null
+	_place_controls()
+
+func is_bar_docked() -> bool: return _bar_dock != null
+
 func _quick_for(mode: String) -> Dictionary:
 	if not _quick.has(mode): _quick[mode] = {pins = [], removed = []}
 	return _quick[mode]
@@ -621,6 +725,7 @@ func queue_card(show: Callable) -> void:
 	else: _card_queue.append(show)
 
 func _drop_modal() -> void:
+	undock_bar()   # before the drawer holding it goes (SGODOT-225)
 	if _modal: _modal.queue_free()
 	_modal = null
 	var was_kitchen := modal_kind == "kitchen"
