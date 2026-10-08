@@ -14,6 +14,7 @@ extends Node
 
 const HomePanel = preload("res://scenes/p0/home/p0_home_panel.gd")
 const MAP_SCENE := "res://scenes/p0/p0_map.tscn"
+const HOME_PLACE := "Shanghai · Homestead"   # the farm's place chip (p0_farm PLACE)
 
 static var _instance: P0Runtime
 
@@ -81,7 +82,7 @@ func _init() -> void:
 	ui.near_resident = func() -> String:   # an outpost's resident within reach (Gift to <Name>, SGODOT-225)
 		return str(world.call("p0_near_resident")) if is_instance_valid(world) and world.has_method("p0_near_resident") else ""
 	ui.home_choice.connect(func(choice: String): _call("p0_home", [choice]))
-	ui.place_pressed.connect(leave_world)
+	ui.place_pressed.connect(_on_place_pressed)
 	ui.home_requested.connect(func(): _leave_then("farm"))
 	ui.tackle_requested.connect(func(): _leave_then("tackle"))
 	session.state_changed.connect(func(_v, _e): _net_ok())   # any answer ends a run of failures (and offline)
@@ -115,6 +116,9 @@ func attach(w: Node) -> void:
 	ui.end_stick()
 	world = w
 	session.space = space_of(w)   # before the read below, which tells the server where the player is
+	if session.space != "map": return_to = route_of(w)
+	# On the map the chip still names where the player is; the farmhouse and the mine are the homestead (MAP-1).
+	elif return_to == "farm": ui.set_place(HOME_PLACE)
 	ui.space = session.space
 	session.place = str(w.call("p0_place")) if w.has_method("p0_place") else ""   # which pond (q(36))
 	if not session.busy and not session.view.is_empty(): session.refresh()   # entering a space reads fresh state
@@ -215,8 +219,40 @@ func _show_on_map(target: String) -> void:
 	_leave_then("show:" + target)
 
 ## One level back, for a room's door: the farm under the farmhouse, the map under an outpost.
+## Leaving a room (the farmhouse, an outpost): back to the world under it. One pushed straight onto the empty p0_boot
+## (the dev entry outpost:<id>) has only a blank screen under it: it leaves for the map instead (李元芳 int8).
 func leave_room() -> void:
-	if is_instance_valid(world) and AppRouter.top_instance() == world: AppRouter.pop_instance()
+	if not (is_instance_valid(world) and AppRouter.top_instance() == world): return
+	if room_leaves_for_map(AppRouter.instance_depth(), _root_is_world()): leave_to_map()
+	else: AppRouter.pop_instance()
+
+## Whether leaving a room must go to the map: it is the only layer, on a root that is no world (the empty p0_boot).
+## Over the farm root (the first session's farmhouse) or over the map it just pops.
+static func room_leaves_for_map(depth: int, root_is_world: bool) -> bool:
+	return depth <= 1 and not root_is_world
+
+func _root_is_world() -> bool:
+	var root := get_tree().current_scene if is_inside_tree() else null
+	return root != null and root.has_method("p0_surface")
+
+## Where the player is while the map is up (MAP-1, §10.6.1): the place chip keeps naming it, and a tap on the chip
+## goes back there. Set by every world but the map: "farm" for the farm, its farmhouse and the mine (they are the
+## homestead), "pond:<id>", "outpost:<id>".
+var return_to := "farm"
+
+## The route back to world `w` from the map, as return_to holds it.
+static func route_of(w: Object) -> String:
+	match space_of(w):
+		"pond": return "pond:" + (str(w.call("p0_place")) if w.has_method("p0_place") else "")
+		"outpost":
+			var o = w.get("outpost")
+			return "outpost:" + (str((o as Dictionary).get("id", "")) if o is Dictionary else "")
+	return "farm"
+
+## The location chip: from a world, to the map; on the map, back to where the player is (MAP-1).
+func _on_place_pressed() -> void:
+	if is_instance_valid(world) and str(_call("p0_surface", [])) == "map": _call("p0_return", [return_to])
+	else: leave_world()
 
 ## Back to the map, then on to the homestead or Old Kai's pin (the map reads after_leave on resume).
 func _leave_then(next: String) -> void:

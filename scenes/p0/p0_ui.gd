@@ -86,11 +86,6 @@ var _quick := {}          # per action: {pins: [], removed: []}, saved in quick_
 var _bar_sig := []        # last state pushed to the bar, so the per-frame refresh only rebuilds on change
 var _auto_pick := true    # pick the first slot once when an action is entered (§10.3.3 ①), not after a deselect
 var _mode_tool: Texture2D  # the current action's own tool icon for the key badge (set_action `tool` overrides per key)
-## MAP-1 keeps only Bag at the bottom of the map. The P0 map still carries the old Map / Farm / Me dock and its
-## zoom column where Bag would sit, so the map turns this on when that dock leaves (with the new HUD, SGODOT-222).
-## TODO(MAP-1, follow-up PR after #11 and #12, reviewed by 刘邦): p0_map drops the old dock and sets map_bag = true.
-## Not part of PR #12 (奕星 2026-10-08).
-var map_bag := false
 var _bar_ids: Array = []
 var selected_seed := ""
 var selected_bait := ""
@@ -106,7 +101,6 @@ var near_resident := Callable()
 ## Where the player is (the session's space: home = the farm and the farmhouse, pond, outpost, mine, map); set by
 ## the runtime on every attach. "" without a runtime (tests, the gallery): space_here() then goes by the surface.
 var space := ""
-var _hud_world := true   # set_surface: the map has no HUD
 var _hud_hash := 0       # last state given to hud.apply
 var _today_key = null    # the Today chip's focus row (P0Logic.today_chip_key); null before the first view
 var _hud_need := -1      # main action's Energy need last seen by the HUD
@@ -331,7 +325,7 @@ func _refresh_hud() -> void:
 	if hud == null: return
 	# No HUD before the first server view: an empty view would read as 0 Energy (red) and 0 coins, and its
 	# chips would still take taps.
-	hud.visible = _hud_world and not view.is_empty()
+	hud.visible = not view.is_empty()
 	if view.is_empty(): return
 	var place := P0Logic.place_info(_place_text, "Farmhouse" if modal_kind == "kitchen" else "")
 	var state := P0Logic.hud_state(view, {"next_cost": int(fab_state().get("need", 0)), "place": place})
@@ -382,8 +376,9 @@ func set_surface(name: String) -> void:
 		return
 	var action := name in ACTION_SURFACES
 	var world := name != "map"
-	_hud_world = world
-	hud.visible = world and not view.is_empty()
+	# MAP-1 (§10.6.1): the map keeps the two-row HUD — avatar, Energy, coins, bell, Today, the place chip — but has no
+	# stick (drag and pinch browse it).
+	hud.visible = not view.is_empty()
 	hud.show_balances = name != "busy"   # a busy world's own close button sits in the coins / bell corner
 	pad.visible = world
 	_keys.visible = action and _modal == null
@@ -403,9 +398,9 @@ func set_surface(name: String) -> void:
 	_flush_held_toast()
 
 ## Action spaces show the full bar. Rooms (farmhouse kitchen, outposts) and the map keep only Bag, with no action
-## or switch key (MAP-1, §10.3.5, o(8)); the map waits for map_bag. Busy worlds hide it.
+## or switch key (MAP-1, §10.3.5, o(8)). Busy worlds hide it.
 func _bar_shown() -> bool:
-	return surface in ACTION_SURFACES or surface == "room" or (surface == "map" and map_bag)
+	return surface in ACTION_SURFACES or surface in ["room", "map"]
 
 func set_mode(mode: String, place := "") -> void:
 	if place != "": set_place(place)
