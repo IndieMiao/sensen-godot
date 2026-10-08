@@ -892,6 +892,25 @@ func _scene_overlay(path: String, args: Dictionary) -> CanvasLayer:
 # ---------------------------------------------------------------- dev: scripted desktop screenshots
 ## P0_SHOT=/abs/path.png P0_SHOT_STEPS="walk:1:0:1.5,act,..." — run scripted inputs, save one frame, quit.
 ## Generic UI steps live here; world steps (goto, stove, until:bite …) go to world.p0_dev / p0_until.
+## Camera unification (用户 via 奕星, 2026-10-09): how tall the player stands on screen in this world's camera — from
+## the ground under the feet (the actor's origin) to the top of the head (the HeadEnd_M bone), as a fraction of the
+## screen height (resolution free) and in px of the 360 × 800 base; with the camera's pitch and orthographic size.
+## Bones, not the skinned meshes' boxes: those are rest-pose bounds whose depth also projects, more at a steeper pitch.
+func measure_actor() -> Dictionary:
+	var a = world.get("actor") if world != null else null
+	var c := get_viewport().get_camera_3d()
+	if not (a is Node3D) or c == null: return {}
+	var head := Vector3.INF
+	for sk: Skeleton3D in (a as Node3D).find_children("*", "Skeleton3D", true, false):
+		var b := sk.find_bone("HeadEnd_M")
+		if b >= 0: head = sk.global_transform * sk.get_bone_global_pose(b).origin
+	if head == Vector3.INF: return {}
+	var view := get_viewport().get_visible_rect().size
+	var frac := (c.unproject_position((a as Node3D).global_position).y - c.unproject_position(head).y) / maxf(view.y, 1.0)
+	var fwd := -c.global_basis.z
+	return {"frac": snappedf(frac, 0.0001), "px800": snappedf(frac * 800.0, 0.1), "pitch": snappedf(rad_to_deg(asin(-fwd.y)), 0.1),
+		"size": snappedf(c.size, 0.01), "view": [view.x, view.y], "world": str(world.name)}
+
 func _dev_shot(dt: float) -> void:
 	var path := OS.get_environment("P0_SHOT")
 	if path == "": return
@@ -983,6 +1002,7 @@ func _dev_shot(dt: float) -> void:
 					var parcel := {"kind": "parcel", "id": "seed_carrot", "qty": 5, "waiting": kind == "full"}
 					var more := [{"kind": "parcel", "id": "bait_worm", "qty": 3, "waiting": kind == "full"}] if kind != "" else []
 					ui.inbox_notice_when_clear(P0Logic.parcel_notice(session.current(), [parcel] + more))
+			"measure": print("P0_MEASURE ", JSON.stringify(measure_actor()))   # the player's height on screen (camera unification)
 			"netfail": _net_failed("dev", {"type": "dev"})   # netfail once: Didn't go through; twice: Offline (233)
 			"screen": _dev_screen(step[1] if step.size() > 1 else "launch")   # screen:launch|slow|fail|maint|update|scene|placefail
 			"wbtile":   # wbtile:craft_copper_pickaxe:0 taps that card's cost tile (NeedSource)
