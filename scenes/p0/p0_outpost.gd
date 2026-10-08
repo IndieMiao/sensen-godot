@@ -72,6 +72,7 @@ func _go_online(session: P0Session) -> void:
 	o.url = P0Online.ws_url(session.base_url)
 	o.player_id = session.player_id
 	o.access_key = session.access_key
+	o.version = session.version
 	o.appearance = OnlineAppearance.payload(Avatar.load_outfit())
 	attach_online(o)
 	var door := anchor_data("spawn")

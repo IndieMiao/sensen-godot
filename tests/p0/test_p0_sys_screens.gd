@@ -173,3 +173,17 @@ func test_the_runtime_hands_appRouter_its_scene_cover_and_takes_it_back() -> voi
 	remove_child(rt)
 	assert_bool(AppRouter.loading_overlay_factory.is_valid()).is_false()
 	add_child(rt)
+
+## 蒙恬 on q(74): the outpost room's handshake carries the version too, so an old build's join is turned away (426)
+## the same way as its requests; no version, no header.
+func test_the_outpost_handshake_carries_the_version() -> void:
+	var o := P0Online.new()
+	add_child(auto_free(o))
+	o.player_id = "p0-test"
+	o.version = 2026100901
+	o._connect()
+	assert_array(Array(o.socket.handshake_headers)).contains(["x-p0-version: 2026100901"])
+	o.version = 0
+	o._connect()
+	assert_bool(Array(o.socket.handshake_headers).any(func(h): return str(h).begins_with("x-p0-version"))).is_false()
+	o.stop()
