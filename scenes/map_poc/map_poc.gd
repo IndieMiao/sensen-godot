@@ -452,6 +452,19 @@ func _apply_world_delta(delta: Vector3) -> void:
 	_clamp_to_bounds()
 
 func _update_cameras() -> void:
+	var d := _place_camera()
+	_update_pawns(d)
+	if marker_layer:
+		marker_layer.sync(cam, anchor_lat, anchor_lng, d * CULL_FACTOR, center_world)
+	# 同一份位姿喂给地图（单一权威）
+	if map:
+		map.set_camera(center_lat, center_lng, zoom + _zoom_elastic, bearing, pitch)
+	if _placement_mode:
+		_update_placement_preview()
+
+## The Godot camera alone for the current centre / zoom / bearing / pitch (no map, pawns or markers): enough for
+## geo_to_screen while a host tries views (P0's opening frame), finished by one _update_cameras. Returns its distance.
+func _place_camera() -> float:
 	center_world = MapGeoMath.geo_to_world(center_lat, center_lng, anchor_lat, anchor_lng)
 	_maybe_reanchor()
 	var d := _cam_distance()
@@ -464,14 +477,7 @@ func _update_cameras() -> void:
 	cam.fov = MAP_FOV_DEG
 	cam.near = maxf(d / 1000.0, 0.05)
 	cam.far = d * 8.0
-	_update_pawns(d)
-	if marker_layer:
-		marker_layer.sync(cam, anchor_lat, anchor_lng, d * CULL_FACTOR, center_world)
-	# 同一份位姿喂给地图（单一权威）
-	if map:
-		map.set_camera(center_lat, center_lng, zoom + _zoom_elastic, bearing, pitch)
-	if _placement_mode:
-		_update_placement_preview()
+	return d
 
 ## 浮动原点：地图中心跑远了就把锚点搬过来（f64 精确拷贝），所有几何重算。
 func _maybe_reanchor() -> void:
