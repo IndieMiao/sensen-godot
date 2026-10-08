@@ -212,6 +212,9 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"zoom":
 			_set_zoom(float(step[1]))
 			_camera_dirty = true
+		"online":   # online:sh_tea_1:3 — the presence count an outpost pin says, for shots
+			_online[step[1]] = int(step[2])
+			_set_outpost_places()
 		"center":   # center:31.228:121.478 (the city overview) — where the camera looks, for shots
 			center_lat = float(step[1])
 			center_lng = float(step[2])
