@@ -567,6 +567,12 @@ func badge_height(id: String) -> float:
 	var b: UiStatusBadge = _badges.get(id)
 	return b.get_combined_minimum_size().y + _BADGE_CARD_GAP if b and b.visible else 0.0
 
+## True when a scene tap lands on a shown badge (with its caption): badges ignore the mouse, so the facility that
+## owns one tests this to treat a tap on its mark as its own (StatusBadge: tapping the badge = tapping the object).
+func badge_hit(id: String, screen: Vector2) -> bool:
+	var b: UiStatusBadge = _badges.get(id)
+	return b != null and b.is_visible_in_tree() and Rect2(b.global_position - root.global_position, b.size).grow(4).has_point(screen)
+
 ## Finger cards stay on screen (their facility is near, so on screen); a badge over an off-screen facility hides.
 func _place_marker(m: Control, screen: Vector2, clamp_inside: bool) -> void:
 	var size := m.get_combined_minimum_size()

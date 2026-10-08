@@ -206,3 +206,15 @@ func test_the_sign_mark_shows_its_level_and_folds_near() -> void:
 	ui.badge("homestead", UiStatusBadge.State.READY, Vector2(180, 300), true, "", P0Logic.icon("home"))
 	assert_int(b.state).is_equal(UiStatusBadge.State.READY)
 	assert_float(ui.badge_height("homestead")).is_less(tall)
+func test_a_tap_on_the_sign_mark_or_its_caption_is_the_sign() -> void:
+	# The mark sits above its anchor point and ignores the mouse; the farm asks badge_hit so the tap opens HOME-1
+	# instead of falling through to the farmhouse's 80 px circle.
+	var ui := _ui(_view())
+	await get_tree().process_frame
+	ui.badge("homestead", UiStatusBadge.State.AVAILABLE, Vector2(240, 320), true, "Homestead Lv2", P0Logic.icon("home"))
+	await get_tree().process_frame
+	var b: UiStatusBadge = ui._badges["homestead"]
+	var r := Rect2(b.global_position - ui.root.global_position, b.size)
+	assert_bool(ui.badge_hit("homestead", r.position + Vector2(r.size.x * 0.5, 6))).is_true()        # the round mark
+	assert_bool(ui.badge_hit("homestead", r.end - Vector2(r.size.x * 0.5, 4))).is_true()               # the caption
+	assert_bool(ui.badge_hit("homestead", r.position - Vector2(0, 30))).is_false()

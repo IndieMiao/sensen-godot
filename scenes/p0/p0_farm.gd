@@ -340,7 +340,7 @@ func p0_tap(screen: Vector2) -> void:
 ## The sign or its mark (tapping a mark or its card = tapping the object); small, so the door beside it stays the house.
 func _sign_hit(screen: Vector2) -> bool:
 	return cam.unproject_position(_sign + Vector3(0, 0.45, 0)).distance_to(screen) < 34 \
-		or cam.unproject_position(_sign + SIGN_BADGE).distance_to(screen) < 30
+		or cam.unproject_position(_sign + SIGN_BADGE).distance_to(screen) < 30 or rt.ui.badge_hit("homestead", screen)
 
 ## Facility marks (STATE-ICONS) show over the stall; finger cards appear when you walk up (LOCK-07 / LOCK-17).
 ## Tapping the card is tapping the facility, so it reuses p0_tap's own hit points.
