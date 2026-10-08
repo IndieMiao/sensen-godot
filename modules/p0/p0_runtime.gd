@@ -12,6 +12,8 @@ extends Node
 ## p0_recenter(), p0_show_spot(where), p0_energy_verb() -> String, p0_dev(step) -> bool,
 ## p0_until(name) -> bool.
 
+const MAP_SCENE := "res://scenes/p0/p0_map.tscn"
+
 static var _instance: P0Runtime
 
 var session: P0Session
@@ -113,12 +115,16 @@ func detach(w: Node) -> void:
 ## farmhouse included. Back locks still apply (a line in the water is reeled in first); a room's own Back
 ## (walking out through the door) is not one of them.
 func leave_world() -> void:
-	if not is_instance_valid(world) or AppRouter.top_instance() != world: return
+	if not is_instance_valid(world): return
+	if AppRouter.instance_depth() > 0 and AppRouter.top_instance() != world: return
 	if not (world is P0Room) and AppRouter.scene_locks_back_navigation(world): return
 	while AppRouter.instance_depth() > 0:
 		var depth := AppRouter.instance_depth()
 		AppRouter.pop_instance()
-		if AppRouter.instance_depth() >= depth: break   # a locked layer (a committed relocation map) stays
+		if AppRouter.instance_depth() >= depth: return   # a locked layer (a committed relocation map) stays
+	# The first session boots straight into the farm (p0_boot, q(44)), so no map lies under it: swap it for the map.
+	var root := get_tree().current_scene
+	if root != null and root.scene_file_path != MAP_SCENE: get_tree().change_scene_to_file(MAP_SCENE)
 
 ## One level back, for a room's door: the farm under the farmhouse, the map under an outpost.
 func leave_room() -> void:
