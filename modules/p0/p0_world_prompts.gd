@@ -6,7 +6,8 @@ extends RefCounted
 ## in reach, P0Garden.pick_card) and which show their button (within RANGE, or any distance with a state).
 ##
 ## A prompt is {icon: Texture2D, text, fact, status (UiStatusBadge.State or -1), dimmed, button (false: no icon
-## button, only the strip when open — the Upgrade Plaque)}.
+## button, only the strip when open — the Upgrade Plaque), count (the button's small tag, "" for none: the Mailbox's
+## `Parcel`)}.
 
 ## Metres: facilities this close show their icon button (spec 370794d2, engineering default).
 const RANGE := 8.0
@@ -14,15 +15,16 @@ const RANGE := 8.0
 enum Show { NONE, ICON, BAR }
 
 ## The open facility shows its strip; the others their button within RANGE, or from any distance while they carry a
-## state (LOCK-11 marks are unchanged: a stall request or a ready gathering spot shows from across the farm).
+## state or a tag (LOCK-11 marks are unchanged: a stall request or a ready gathering spot shows from across the farm;
+## the Mailbox's `Parcel` as far, 不知火舞 on 234).
 static func show(id: String, open: String, metres: float, prompt: Dictionary) -> Show:
 	if id == open: return Show.BAR
 	if not bool(prompt.get("button", true)): return Show.NONE
-	if int(prompt.get("status", -1)) >= 0 or metres <= RANGE: return Show.ICON
+	if int(prompt.get("status", -1)) >= 0 or str(prompt.get("count", "")) != "" or metres <= RANGE: return Show.ICON
 	return Show.NONE
 
-static func _p(icon: String, text: String, fact := "", status := -1, dimmed := false, button := true) -> Dictionary:
-	return {icon = P0Logic.icon(icon), text = text, fact = fact, status = status, dimmed = dimmed, button = button}
+static func _p(icon: String, text: String, fact := "", status := -1, dimmed := false, button := true, count := "") -> Dictionary:
+	return {icon = P0Logic.icon(icon), text = text, fact = fact, status = status, dimmed = dimmed, button = button, count = count}
 
 ## Homestead Stall: ✓ when a Stall Board request can be handed in, ! when one is open (P0Guide.stall_badge, q(44 / 48)),
 ## else New while goods unlocked since the last visit wait (STALL-NEW, E-04; `fresh` = P0Ui.stall_has_new()).
@@ -67,6 +69,13 @@ static func bench(view: Dictionary) -> Dictionary:
 		"away": return _p("rest", text, str(st.wait), UiStatusBadge.State.COUNTDOWN if str(st.caption) != "" else -1, true)
 		"full": return _p("rest", text, str(st.reason), -1, true)
 	return _p("rest", text)
+
+## The farmhouse Mailbox (§12.5.2; SGODOT-234 C, 不知火舞 on 234): the strip says `Mailbox` only; while parcels are in
+## the list — the bell's rule: a full bag still counts, the queued ones never (q(79)) — its button wears the small
+## `Parcel` tag (the Show count tag, like the Warming Cabinet's 4/6), no new LOCK-11 state. Icon i-mailbox 1822:104445;
+## WORLD-HINT-6a 1822:123663 (far, the tag) / 6b 1822:123873 (near, the strip).
+static func mailbox(view: Dictionary) -> Dictionary:
+	return _p("mailbox", "Mailbox", "", -1, false, true, "" if P0Inbox.parcels(view).is_empty() else "Parcel")
 
 ## Workbench (231): name only.
 static func workbench() -> Dictionary:

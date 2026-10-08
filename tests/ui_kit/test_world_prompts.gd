@@ -45,6 +45,12 @@ func test_count_hangs_a_quantity_tag_at_the_discs_bottom_right() -> void:
 	assert_vector(b._count.position).is_equal(Vector2(14, 20))   # in the 28 disc, overhanging its bottom right
 	var pill: UiStyleBox = b._count.get_theme_stylebox(&"panel")
 	assert_object(pill.bg_color).is_equal(UiTokens.COLOR_PRIMARY_TINT)
+	# A word wider than the pill grows it to the left, the right edge kept, 4 either side (WORLD-HINT-6a 1822:123663).
+	b.count = "Parcel"
+	await get_tree().process_frame
+	assert_float(b._count.size.x).is_equal(ceilf(b._count_label.get_minimum_size().x) + 8.0)
+	assert_float(b._count.size.x).is_greater(UiTokens.SIZE_QTY_PILL_W)
+	assert_float(b._count.position.x + b._count.size.x).is_equal(14.0 + UiTokens.SIZE_QTY_PILL_W)
 	b.count = ""
 	await await_idle_frame()
 	assert_bool(b._count.is_visible_in_tree()).is_false()

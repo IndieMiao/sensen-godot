@@ -2137,7 +2137,7 @@ func open_inbox(tab := "") -> P0InboxDrawer:
 		_claim_at = from.get_global_rect().get_center()
 		command.emit(cmd))
 	d.read_requested.connect(func(keys: Array): command.emit({"type": "read_inbox", "keys": keys}))
-	d.refused.connect(func(text: String): toast(text))
+	d.refused.connect(func(text: String): toast_error(text))   # the server's bag_full for a claim says the same (亚瑟 on #93)
 	_claim_at = Vector2.INF
 	_open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
 	_close_above(d, _CLOSE_ABOVE_SHEET, UiTokens.SPACE_PAGE)

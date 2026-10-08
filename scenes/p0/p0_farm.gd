@@ -25,6 +25,11 @@ const PLACE := "Shanghai · Homestead"
 const BENCH_TAP_PX := 44.0   # a 44 px touch target around the bench seat (engineering default)
 const BENCH_NEAR_M := 2.6    # the bench's finger card shows within this distance (stall 3.2, house 4.2)
 const LABOUR_CLIP := {"till": "till", "sow": "sow", "water": "water", "harvest": "harvest"}
+const MAILBOX_DIR := "res://assets/props/mailbox_placeholder/"
+const MAILBOX_SCALE := 0.65
+const MAILBOX_MARK := Vector3(0, 1.45, 0)   # its icon button, just over the 1.16 m post box
+const MAILBOX_HIT := Vector3(0, 0.6, 0)     # its own tap point, the box's middle (use_mailbox is the slot)
+const MAILBOX_TAP_PX := 40.0
 
 @onready var cam: Camera3D = $Camera3D
 @onready var ground: MeshInstance3D = $Ground
@@ -62,6 +67,7 @@ var _fence: Node3D   # p0_fence.gd: front stretch always, the ring from Homestea
 var _sign := Vector3.ZERO   # Homestead sign right of the farmhouse door (WorldBadges · Farm 1135:79267): HOME-1
 var _plaque := Vector3.ZERO   # Upgrade Plaque left of the door (1510:97492), shown from the first upgrade: PLAQUE-READ
 var _plaque_node: Node3D
+var _mailbox := Vector3.ZERO   # the farmhouse Mailbox (§12.5.2; SGODOT-234 C): opens the Inbox, as the bell does
 var _door := Vector3.ZERO     # the walkway cell in front of the farmhouse door
 var _door_armed := false
 var _inside := false          # the farmhouse is open above this farm
@@ -172,6 +178,9 @@ func _build_world() -> void:
 	_plaque_node.rotation.y = 0.35
 	_plaque_node.visible = false
 	props.add_child(_plaque_node)
+	_mailbox = P0Garden.mailbox_point(bp)
+	props.add_child(_mailbox_prop(_mailbox))
+	P0Garden.block_points(bp, [_mailbox])
 	grid = BlueprintGrid.new(bp)
 	# One thick soil bed per plot (plot.glb), tinted per state (watered beds read darker).
 	var xfs: Array = []
@@ -424,7 +433,11 @@ func p0_tap(screen: Vector2) -> void:
 	elif _plaque_node.visible and cam.unproject_position(_plaque + Vector3(0, 0.35, 0)).distance_to(screen) < 34:
 		actor.face(_plaque)
 		HomePanel.plaque(rt.ui)
-	# The bench stands beside the house: before the stall and the house, so the house's wider radius doesn't take it.
+	# The Mailbox and the bench stand beside the house: before the stall and the house, so the house's wider radius
+	# doesn't take them.
+	elif cam.unproject_position(_mailbox + MAILBOX_HIT).distance_to(screen) < MAILBOX_TAP_PX:
+		actor.face(_mailbox)
+		rt.ui.open_inbox()
 	elif cam.unproject_position(_bench + Vector3(0, 0.35, 0)).distance_to(screen) < BENCH_TAP_PX:
 		actor.face(_bench)
 		rt.ui.open_rest_card()
@@ -455,6 +468,9 @@ func _tap_card(id: String) -> bool:
 		"bench":
 			actor.face(_bench)
 			rt.ui.open_rest_card()
+		"mailbox":
+			actor.face(_mailbox)
+			rt.ui.open_inbox()
 		_:
 			return _materials.tap_card(id)   # SGODOT-231: spot_* and workbench cards
 	return true
@@ -476,6 +492,7 @@ func _prompts(v: Dictionary) -> void:
 	_plaque_node.visible = not v.get("homestead", {}).get("plaque", []).is_empty()
 	world_prompt("plaque", P0WorldPrompts.plaque(v), _plaque, Vector3(0, 0.85, 0), Vector3(0, 0.35, 0), _plaque_node.visible)
 	world_prompt("bench", P0WorldPrompts.bench(v), _bench, Vector3(0, 0.95, 0), Vector3(0, 0.35, 0))
+	world_prompt("mailbox", P0WorldPrompts.mailbox(v), _mailbox, MAILBOX_MARK, MAILBOX_HIT)
 
 ## One facility's prompt at `at` + `mark` (the former finger card's / mark's anchor): its strip when it is the open
 ## one, else its icon button (P0WorldPrompts.show). The button and strip forward their taps to `at` + `hit` by id.
@@ -488,7 +505,8 @@ func world_prompt(id: String, prompt: Dictionary, at: Vector3, mark: Vector3, hi
 		rt.ui.name_bar(id, prompt.icon, str(prompt.text), str(prompt.fact), screen, true, _strip_side, bool(prompt.dimmed),
 			int(prompt.status), tap)
 	else:
-		rt.ui.world_icon(id, prompt.icon, screen, show == P0WorldPrompts.Show.ICON, false, int(prompt.status), tap)
+		rt.ui.world_icon(id, prompt.icon, screen, show == P0WorldPrompts.Show.ICON, false, int(prompt.status), tap,
+			str(prompt.get("count", "")))
 
 ## The side a strip opens to: the character's facing on screen; facing the camera or away keeps the last side.
 func _facing_side() -> UiWorldNameBar.Dir:
@@ -500,7 +518,8 @@ func _facing_side() -> UiWorldNameBar.Dir:
 ## Every facility that can open its name strip on the farm, [id, position, reach m] in a fixed order (LOCK-07 v2: one
 ## strip, the nearest in reach): the rest bench, and SGODOT-231's five gathering spots and the workbench.
 func _card_candidates() -> Array:
-	var out: Array = [["stall", _stall, 3.2], ["home", _house, 4.2], ["sign", _sign, SIGN_NEAR], ["bench", _bench, BENCH_NEAR_M]]
+	var out: Array = [["stall", _stall, 3.2], ["home", _house, 4.2], ["sign", _sign, SIGN_NEAR], ["bench", _bench, BENCH_NEAR_M],
+		["mailbox", _mailbox, SIGN_NEAR]]
 	if _plaque_node.visible: out.append(["plaque", _plaque, SIGN_NEAR])
 	out.append_array(_materials.card_candidates())   # SGODOT-231: the five gathering spots and the workbench
 	return out
@@ -515,6 +534,21 @@ func _bench_prop(at: Vector3) -> Node3D:
 	mat.albedo_texture = load("res://assets/rooms/basic_room/room_albedo_ao.png")
 	mat.roughness = 0.8
 	mat.metallic_specular = 0.28
+	for m in model.find_children("*", "MeshInstance3D", true, false): (m as MeshInstance3D).material_override = mat
+	root.add_child(model)
+	return root
+
+## The Mailbox placeholder (SGODOT-234 C; assets/props/mailbox_placeholder): the post office's red post box at 0.65 —
+## 0.51 m wide, 1.16 m tall, one cell — with its room atlas; front (local +Z) toward the camera.
+func _mailbox_prop(at: Vector3) -> Node3D:
+	var root := Node3D.new()
+	root.name = "Mailbox"
+	root.position = at
+	root.scale = Vector3.ONE * MAILBOX_SCALE
+	var model := (load(MAILBOX_DIR + "red_post_box.glb") as PackedScene).instantiate() as Node3D
+	var mat := StandardMaterial3D.new()
+	mat.albedo_texture = load(MAILBOX_DIR + "room_albedo_ao.png")
+	mat.roughness = 0.9
 	for m in model.find_children("*", "MeshInstance3D", true, false): (m as MeshInstance3D).material_override = mat
 	root.add_child(model)
 	return root
@@ -561,6 +595,7 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"home": rt.ui.open_home_card()
 		"sign": p0_tap(cam.unproject_position(_sign + Vector3(0, 0.45, 0)))   # HOME-1 through the sign's own tap
 		"plaque": p0_tap(cam.unproject_position(_plaque + Vector3(0, 0.35, 0)))   # PLAQUE-READ
+		"mailbox": p0_tap(cam.unproject_position(_mailbox + MAILBOX_HIT))   # the Inbox through the Mailbox's own tap (234 C)
 		"zoomto": _zoom = clampf(float(step[1]), 0.8, 1.4)   # zoomto:0.8 (widest) … 1.4 (closest)
 		"near":   # near:<id> — stand 1.2 m in front of a facility, so its name strip opens (250 review shots)
 			for c in _card_candidates():
