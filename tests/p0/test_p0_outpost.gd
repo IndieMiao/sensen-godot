@@ -71,6 +71,14 @@ func test_tapping_the_counter_walks_there_and_reaches_the_keeper_entry() -> void
 	assert_array(r.used).is_equal(["use_counter"])
 	assert_float(P0Room._flat_distance(r.actor.position, r.anchor("stand_counter").global_position)).is_less(P0Room.REACH_M)
 
+func test_tapping_the_keeper_stops_in_front_of_them_not_inside() -> void:
+	for id in ["sh_tackle_1", "sh_tea_1", "sh_post_1", "sh_market_1"]:
+		var r := _room(id)
+		_tap(r, "npc_keeper")
+		_walk_until_idle(r)
+		assert_array(r.used).override_failure_message(id).is_equal(["npc_keeper"])
+		assert_float(P0Room._flat_distance(r.actor.position, r.anchor("npc_keeper").global_position)).override_failure_message(id).is_greater(0.5)
+
 func test_tapping_the_tea_table_sits_on_the_nearest_free_seat_and_the_joystick_stands_up() -> void:
 	var r := _room("sh_tea_1")
 	assert_dict(r._marker("use_tea_table_1", {})).is_equal({text = "Sit"})

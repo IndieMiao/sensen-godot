@@ -104,7 +104,9 @@ facing the room; standing behind a counter waits for the final scenes:
 ## Open
 
 - Keeper and door finger cards no longer overlap: each room has a `badge_keeper` point that lifts the
-  keeper's card clear above the door's (安其拉's design review of #14). Desktop render at the spawn:
+  keeper's card clear above the door's, and the keeper stands at the counter's middle, left of the door card,
+  with a `stand_keeper` point (= `stand_counter`) so tapping them stops in front of them (安其拉's design
+  review of #14, rounds 1–2). Desktop render at the spawn:
 
   ![Keeper and door cards apart](p0-outpost-rooms-2026-10-08/keeper-door-cards.jpg)
 - Seated pose not yet accepted by the art director; sitting while drinking is not done (see SGODOT-227).
