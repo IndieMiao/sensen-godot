@@ -123,13 +123,28 @@ func leave_world() -> void:
 	if not is_instance_valid(world): return
 	if AppRouter.instance_depth() > 0 and AppRouter.top_instance() != world: return
 	if not (world is P0Room) and AppRouter.scene_locks_back_navigation(world): return
+	leave_to_map()
+
+## Pop every P0 layer down to the map; a world booted as the root scene (the first session lands on the farm,
+## p0_boot q(44)) has no map under it, so the root is swapped for the map. No back locks are asked here.
+func leave_to_map() -> void:
 	while AppRouter.instance_depth() > 0:
 		var depth := AppRouter.instance_depth()
 		AppRouter.pop_instance()
 		if AppRouter.instance_depth() >= depth: return   # a locked layer (a committed relocation map) stays
-	# The first session boots straight into the farm (p0_boot, q(44)), so no map lies under it: swap it for the map.
 	var root := get_tree().current_scene
-	if root != null and root.scene_file_path != MAP_SCENE: get_tree().change_scene_to_file(MAP_SCENE)
+	if root == null or root.scene_file_path != MAP_SCENE: swap_root.call()
+
+## The scene change behind leave_to_map (tests replace it).
+var swap_root := func(): get_tree().change_scene_to_file(MAP_SCENE)
+
+## Android Back for a world with its own back lock (farm, pond), after its own layers: AppRouter ignores Back on a
+## P0 world that is the root scene, so with nothing left to close such a world leaves for the map itself (int5b
+## hand test 2: Inbox closed on the first Back, the second did nothing). True when it handled Back.
+func root_back() -> bool:
+	if AppRouter.instance_depth() > 0: return false   # stacked on the map: AppRouter pops it
+	leave_to_map()
+	return true
 
 ## One level back, for a room's door: the farm under the farmhouse, the map under an outpost.
 func leave_room() -> void:
