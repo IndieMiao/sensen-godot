@@ -5,6 +5,8 @@
 import { cropById, dishBuyback, dishParts, fishById, itemKind, recipeById, type Need, type P0Content } from './content.js';
 import { recipeRarity } from './cooking.js';
 import type { P0State } from './state.js';
+import { take } from './bag.js';
+import { takeStorageFirst } from './storage.js';
 
 /** Rarity of a bag id for a request: fish by species, dishes by recipe (0 = Mystery Dish / unknown). */
 export function rarityOf(c: P0Content, id: string): number {
@@ -37,12 +39,13 @@ export function floorPrice(c: P0Content, id: string): number {
 }
 
 /**
- * Bag units to hand in for one id list / need: plain stacks only, cheapest first (dishes: lowest quality first).
+ * Units to hand in for one id list / need: plain bag stacks (materials also Farm Storage), cheapest first (dishes: lowest quality first).
  * Returns [id, qty][] or null when the bag can't cover it.
  */
 export function pick(c: P0Content, s: P0State, need: Pick<Need, 'kind' | 'rarity'>, items: string[], qty: number): [string, number][] | null {
   const have = new Map<string, number>();
   for (const b of s.bag) if (!b.gift && matches(c, need, items, b.id)) have.set(b.id, (have.get(b.id) ?? 0) + b.qty);
+  if (need.kind === 'material') for (const [id, n] of Object.entries(s.storage)) if (matches(c, need, items, id)) have.set(id, (have.get(id) ?? 0) + n);
   const order = [...have.keys()].sort((a, b) => dishParts(a).quality - dishParts(b).quality || floorPrice(c, a) - floorPrice(c, b) || a.localeCompare(b));
   const out: [string, number][] = [];
   let left = qty;
@@ -56,7 +59,18 @@ export function pick(c: P0Content, s: P0State, need: Pick<Need, 'kind' | 'rarity
 }
 
 export function haveFor(c: P0Content, s: P0State, need: Pick<Need, 'kind' | 'rarity'>, items: string[]): number {
-  return s.bag.filter(b => !b.gift && matches(c, need, items, b.id)).reduce((n, b) => n + b.qty, 0);
+  const bag = s.bag.filter(b => !b.gift && matches(c, need, items, b.id)).reduce((n, b) => n + b.qty, 0);
+  if (need.kind !== 'material') return bag;
+  return bag + Object.entries(s.storage).filter(([id]) => matches(c, need, items, id)).reduce((n, [, q]) => n + q, 0);
+}
+
+/**
+ * Take a hand-in part: materials come from Farm Storage first, like upgrades (gathered Timber goes straight to storage,
+ * SGODOT-231); everything else from plain bag stacks.
+ */
+export function handOver(c: P0Content, s: P0State, id: string, qty: number): void {
+  if (itemKind(id) === 'material' && c.materials[id]) takeStorageFirst(s, id, qty);
+  else take(s.bag, id, qty, 'skip');
 }
 
 /** Completion bonus actually paid today: request bonuses share a 100-coin daily cap (§9.13.2). */
