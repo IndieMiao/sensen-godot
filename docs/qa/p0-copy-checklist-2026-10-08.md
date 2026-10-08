@@ -106,7 +106,7 @@
 |---|---|
 | HUD ★ | 两行 HUD 常驻，底部只有 `Bag`；没有旧底栏 `Map / Farm / Me`；P0 不显示 `Nearby Cities`（q(50)） |
 | pin 卡按钮 ★ | 农场 `Go home · Free`；据点与鱼塘 `Go` |
-| 据点 pin | `Lotus Tea House · 3 online` |
+| 据点 pin | `Lotus Tea House · 3 online`；没人在时只写名字 `Lotus Tea House`；P0 城市级不聚合，每处一枚 pin，不出 `×N`（q(72)） |
 | 标记 | P0 只有绿 ✓ / 金 ! / 青 ◆，没有 🔒 与 ★（q(48)） |
 
 ## 8. 背包、Gear、个人页、收件箱
