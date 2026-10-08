@@ -90,7 +90,7 @@ describe('the gate rules', () => {
     expect(new P0Gate(file, {}).state().maintenance).toEqual({ on: false });
   });
 
-  it('an empty url clears the run-time one: the environment's url and minimum apply again (苏烈 on #85)', () => {
+  it("an empty url clears the run-time one: the environment's url and minimum apply again (苏烈 on #85)", () => {
     const g = new P0Gate(undefined, { P0_MIN_VERSION: '4', P0_UPDATE_URL: 'https://example.test/env.apk' });
     g.setMinVersion(6, 'https://example.test/run.apk');
     expect(g.state()).toMatchObject({ min_version: 6, update_url: 'https://example.test/run.apk', update_on: true });
