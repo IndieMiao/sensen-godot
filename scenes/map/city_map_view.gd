@@ -1071,6 +1071,7 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int)
 	var label_rect := Rect2(c.point + Vector2(-c.label_w * 0.5, 3), Vector2(c.label_w, c.label_h))
 	var disc_off_screen := false
 	var label_above := false
+	var above_gap := UiMapDestination.above_gap_for(_marker_of(entry) != "")   # clear of a mark's badge (刘邦 on #111)
 	if not _destination(entry).is_empty():
 		label_rect.position.y = c.point.y + UiMapDestination.LABEL_GAP   # where the pin draws it
 		# The whole name on screen: while any of its disc is on screen it slides in from the edge, the disc stays. A disc
@@ -1093,8 +1094,7 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int)
 		if not label_fits and not _destination(entry).is_empty():
 			# A MapDestination's name tries over its disc before folding (不知火舞 on 234 A2): the order stays C30's,
 			# no outpost gets a privilege, but the second place often clears a neighbour's name (the market's at home).
-			var over := Rect2(label_rect.position.x, c.point.y - UiMapDestination.DISC - UiMapDestination.LABEL_GAP - c.label_h,
-				c.label_w, c.label_h)
+			var over := Rect2(label_rect.position.x, c.point.y - UiMapDestination.DISC - above_gap - c.label_h, c.label_w, c.label_h)
 			if not _hits(occupied, over):
 				label_rect = over
 				label_above = true
@@ -1132,6 +1132,7 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int)
 		pin.plate = bool(dest.get("plate", false))
 		pin.text = _label_text(entry)
 		pin.name_shown = label_fits
+		pin.above_gap = above_gap
 		pin.label_above = label_above
 		pin.label_shift = label_rect.position.x - (c.point.x - c.label_w * 0.5)
 		pin.position = -pin.anchor_offset()

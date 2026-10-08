@@ -513,13 +513,16 @@ func _frame_box(items: Array) -> Rect2:
 		first = false
 	return box
 
-## What a pin needs in the opening view: a MapDestination its disc and the row its name takes under it — the name
-## slides in from the screen edge (CityMapView.LABEL_EDGE), so only its height counts; other pins their whole footprint.
+## What a pin needs in the opening view: a MapDestination its disc and a name row under it and over it (the name goes
+## over when under touches another; 刘邦 on #111) — the name slides in from the screen edge (CityMapView.LABEL_EDGE),
+## so only its height counts; other pins their whole footprint.
 func _frame_footprint(it: Dictionary) -> Rect2:
 	if city_map._destination(it).is_empty(): return city_map.pin_footprint(it)
 	var name_h := UiMapDestination.label_size_for(city_map._label_text(it)).y
 	var d := UiMapDestination.DISC
-	return Rect2(-d * 0.5, -d, d, d + (UiMapDestination.LABEL_GAP + name_h if name_h > 0.0 else 0.0))
+	if name_h <= 0.0: return Rect2(-d * 0.5, -d, d, d)
+	var over := UiMapDestination.above_gap_for(city_map._marker_of(it) != "") + name_h
+	return Rect2(-d * 0.5, -d - over, d, over + d + UiMapDestination.LABEL_GAP + name_h)
 
 ## One trial view: the Godot camera only (刘邦 on #92: a hundred full updates in a frame would push the native map's
 ## camera and the marker sync each time).

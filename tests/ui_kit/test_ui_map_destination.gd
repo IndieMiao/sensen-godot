@@ -84,3 +84,15 @@ func test_a_name_over_the_disc() -> void:
 	var fp := d.footprint()
 	assert_float(fp.position.y).is_equal_approx(-40.0 - 2.0 - l.y, 0.01)
 	assert_float(fp.end.y).is_equal_approx(0.0, 0.01)
+
+## 刘邦 on #111: a name over a marked disc clears the mark's badge (it pokes MARK_OVERHANG over the disc's top).
+func test_a_name_over_a_marked_disc_clears_its_badge() -> void:
+	var d := _pin("Reed Pond · Beginner pond")
+	d.mark = "request"
+	await get_tree().process_frame
+	d.above_gap = UiMapDestination.above_gap_for(true)
+	d.label_above = true
+	var name_bottom := d._label_box.position.y + d.label_size().y
+	var badge_top := d._pin.position.y + d._badge.position.y
+	assert_float(name_bottom).is_less_equal(badge_top - UiMapDestination.LABEL_GAP + 0.01)
+	assert_float(UiMapDestination.above_gap_for(false)).is_equal(UiMapDestination.LABEL_GAP)

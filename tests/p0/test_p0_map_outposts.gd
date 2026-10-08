@@ -432,6 +432,7 @@ func test_a_selected_name_folds_the_names_it_touches() -> void:
 	assert_bool(home_pin.name_shown).is_true()
 	# The marked one's name, touched under its disc, goes over it (不知火舞 on 234 A2: under, then over, then folded).
 	assert_bool(reed_pin.name_shown and reed_pin.label_above).is_true()
+	assert_float(reed_pin.above_gap).is_equal(UiMapDestination.above_gap_for(true))   # clear of its ! (刘邦 on #111)
 	assert_bool(_dest_label_rect(city.markers[NEAREST_POND]).intersects(_dest_label_rect(city.markers["home"]))).is_false()
 	assert_array(city.displayed.map(func(mk): return str(mk.entry.id))).contains([NEAREST_POND, "home"])
 	city.selected = {}
