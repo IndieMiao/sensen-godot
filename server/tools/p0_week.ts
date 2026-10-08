@@ -105,7 +105,7 @@ export class WeekPlayer {
   requests(): void {
     for (const slot of [...this.s.boards.stall, ...this.s.boards.market]) {
       const req = slot.req;
-      if (!req || req.status === 'done') continue;
+      if (!req) continue;
       const item = req.items.find(id => count(this.s.bag, id) >= req.qty);
       if (!item) continue;
       if (req.status === 'open') this.act({ type: 'accept', request: req.id, space: 'home' });
