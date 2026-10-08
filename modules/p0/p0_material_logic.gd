@@ -73,16 +73,46 @@ static func mine_entry_card(view: Dictionary) -> Dictionary:
 	var runs: Dictionary = mine.get("runs", {})
 	match str(run.get("new_run_block", "")):
 		"clear_floor_2":
-			return {"show": true, "label": "New run · Clear Floor 2 first", "line2": "", "enabled": false, "amber": false, "cmd": {}}
+			return {"show": true, "label": "New run · Clear Floor 2 first", "line2": "", "enabled": false, "amber": false, "cmd": {},
+				"toast": "New run · Clear Floor 2 first"}
 		"no_runs":
-			return {"show": true, "label": _runs_line(mine), "line2": "", "enabled": false, "amber": false, "cmd": {}}
+			return {"show": true, "label": _runs_line(mine), "line2": "", "enabled": false, "amber": false, "cmd": {}, "toast": _runs_line(mine)}
 	if not mine.get("entry_bag_ok", true):   # q(48): no fee into a floor whose first rock wouldn't fit
-		return {"show": true, "label": "New run · Bag full", "line2": "", "enabled": false, "amber": false, "cmd": {}}
+		return {"show": true, "label": "New run · Bag full", "line2": "", "enabled": false, "amber": false, "cmd": {}, "toast": BAG_FULL}
 	if _energy(view) < fee:
 		return {"show": true, "label": "New run · Need %d Energy" % fee, "line2": "", "enabled": true, "amber": true, "cmd": {"type": "energy_card"}}
 	return {"show": true, "label": "New run · %d Energy" % fee,
 		"line2": "Current run will end · Runs today %d/%d" % [int(runs.get("used", 0)), int(runs.get("limit", 2))],
 		"enabled": true, "amber": false, "cmd": {"type": "mine_new_run"}}
+
+## What a server refusal of a material command says (苏烈's #39 review). null: not ours, the runtime's own wording
+## applies (need_energy opens the Energy card). "": quiet — a race the next frame shows anyway (a held repeat hitting
+## the 0.9 s tempo, a rock another press already broke, a torch already lit, a run that just ended). Else a toast.
+static func refusal_text(code: String, detail: Dictionary, cmd: Dictionary) -> Variant:
+	var type := str(cmd.get("type", ""))
+	if not (type.begins_with("mine_") or type == "gather"): return null
+	match code:
+		"tempo", "rock_gone", "lit", "no_run", "floor_not_paid", "bad_floor", "not_in_mine", "stale_state", "bad_spot":
+			return ""
+		"bag_full":
+			return BAG_FULL if type.begins_with("mine_") else "Bag full · free a slot first"
+		"no_runs":
+			return "Enter mine · No runs left"
+		"clear_floor_first":
+			return "Clear Floor %d first" % maxi(1, int(detail.get("floor", 2)) - 1)
+		"homestead_level":
+			return "Homestead Lv%d" % int(detail.get("need", 2))
+		"not_ready":
+			return "Ready in %s" % P0Logic.duration(float(detail.get("ready_in", 0)))
+	return null
+
+## The Energy card's verb for a refused material command ("Mine", "Enter mine", "Floor 2"); `fallback` for others.
+static func energy_verb(cmd: Dictionary, fallback: String) -> String:
+	match str(cmd.get("type", "")):
+		"mine_rock": return "Mine"
+		"mine_enter", "mine_new_run": return "Enter mine"
+		"mine_floor": return "Floor %d" % int(cmd.get("floor", 2))
+	return fallback
 
 ## "Run ended at daily reset" once per ended run (q(44)): the text when the view's `ended.at` is newer than the last shown.
 static func reset_notice(view: Dictionary, shown_at: float) -> String:

@@ -104,3 +104,12 @@ func test_an_unavailable_key_toasts_its_reason() -> void:
 	assert_array(sent).is_empty()
 	assert_bool(ui._toast.visible).is_true()
 	assert_str(ui._toast.text).is_equal("Bag full · free a slot to mine")
+
+func test_status_line_set_before_ready_is_kept() -> void:
+	var early := P0Ui.new()
+	early.quick_store = STORE
+	early.set_status_line("Rocks 0/6")   # not in the tree yet
+	add_child(auto_free(early))
+	early.layer = 128
+	await await_idle_frame()
+	assert_str(early._status_text.text).is_equal("Rocks 0/6")   # applied from _pending in _ready

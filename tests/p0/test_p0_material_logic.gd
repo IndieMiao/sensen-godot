@@ -295,3 +295,29 @@ func test_mine_bar_follows_pins_and_removals() -> void:
 	assert_array(P0MaterialLogic.mine_bar(none, [], ["torch"])).is_equal(["torch"])          # pinned at 0
 	assert_array(P0MaterialLogic.mine_bar(v, [], [], ["torch"])).is_empty()                  # flung off
 	assert_array(P0MaterialLogic.mine_bar(v, [], ["seed_radish", "torch"])).is_equal(["torch"])   # only Mining's family
+
+## 苏烈's #39 review: mine / gathering refusals never surface as "Can't do that (tempo)".
+func test_material_refusals_are_quiet_or_say_why() -> void:
+	var rock := {"type": "mine_rock", "floor": 1, "rock": 2}
+	for code in ["tempo", "rock_gone", "lit", "no_run", "floor_not_paid"]:
+		assert_str(str(P0MaterialLogic.refusal_text(code, {}, rock))).override_failure_message(code).is_empty()
+	assert_str(str(P0MaterialLogic.refusal_text("bag_full", {"floor": 2}, {"type": "mine_floor", "floor": 2}))).is_equal(P0MaterialLogic.BAG_FULL)
+	assert_str(str(P0MaterialLogic.refusal_text("no_runs", {}, {"type": "mine_enter"}))).is_equal("Enter mine · No runs left")
+	assert_str(str(P0MaterialLogic.refusal_text("homestead_level", {"need": 2}, {"type": "gather", "spot": "spot_clay_bank"}))).is_equal("Homestead Lv2")
+	assert_str(str(P0MaterialLogic.refusal_text("tempo", {}, {"type": "gather"}))).is_empty()
+	# need_energy and other commands keep the runtime's own handling.
+	assert_object(P0MaterialLogic.refusal_text("need_energy", {"need": 2}, rock)).is_null()
+	assert_object(P0MaterialLogic.refusal_text("tempo", {}, {"type": "sow"})).is_null()
+	assert_str(P0MaterialLogic.energy_verb(rock, "Sow ×1")).is_equal("Mine")
+	assert_str(P0MaterialLogic.energy_verb({"type": "mine_floor", "floor": 2}, "Sow ×1")).is_equal("Floor 2")
+	assert_str(P0MaterialLogic.energy_verb({"type": "sow"}, "Sow ×1")).is_equal("Sow ×1")
+
+## LOCK-10: a greyed EntryCard says why when pressed.
+func test_greyed_entry_card_carries_its_reason() -> void:
+	var v := {"energy": {"value": 200}, "mine": {"floor_energy": 2, "runs": {"used": 1, "limit": 2}, "entry_bag_ok": false,
+		"run": {"id": "r1", "deepest": 2, "can_new_run": false, "new_run_block": "", "floors": []}}}
+	var card := P0MaterialLogic.mine_entry_card(v)
+	assert_bool(bool(card.enabled)).is_false()
+	assert_str(str(card.toast)).is_equal(P0MaterialLogic.BAG_FULL)
+	v.mine.run.new_run_block = "clear_floor_2"
+	assert_str(str(P0MaterialLogic.mine_entry_card(v).toast)).is_equal("New run · Clear Floor 2 first")

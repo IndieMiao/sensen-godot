@@ -136,6 +136,7 @@ func _ready() -> void:
 	if _pending.has("mode"): set_mode(_pending.mode)
 	if _pending.has("place"): set_place(_pending.place)
 	set_surface(_pending.get("surface", surface))
+	if _pending.has("status"): set_status_line(_pending.status)
 	_pending.clear()
 
 func _process(dt: float) -> void:
@@ -323,7 +324,9 @@ func set_place(text: String) -> void:
 ## One status line under the HUD where the creel sits while fishing (SGODOT-231: the mine's "Rocks 2/6", "Run 1/2
 ## today" for its first 3 s). "" hides it; changing action clears it.
 func set_status_line(text: String) -> void:
-	if not is_node_ready(): return
+	if not is_node_ready():
+		_pending["status"] = text   # the mine sets it on its first frame, maybe before the HUD exists (苏烈, #39)
+		return
 	if _status_text.text != text: _status_text.text = text
 	_status.visible = text != "" and surface in ACTION_SURFACES
 

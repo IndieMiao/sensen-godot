@@ -265,9 +265,14 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 		session.send({"type": "reel", "outcome": "escaped"})
 		ui.toast("Creel full · the fish slipped away")
 		return
+	# Mine and gathering refusals (SGODOT-231): races stay quiet, the rest say why in their own words.
+	var said = P0MaterialLogic.refusal_text(code, detail, cmd)
+	if said != null:
+		if str(said) != "": ui.toast(str(said))
+		return
 	match code:
 		"need_energy":
-			ui.open_energy_card(int(detail.get("need", 0)), "Cast" if str(cmd.get("type", "")) == "cast" else "Sow ×1")
+			ui.open_energy_card(int(detail.get("need", 0)), "Cast" if str(cmd.get("type", "")) == "cast" else P0MaterialLogic.energy_verb(cmd, "Sow ×1"))
 			session.report({"kind": "energy_card", "need": int(detail.get("need", 0)), "refused": str(cmd.get("type", ""))})
 		"locked":
 			ui.toast("%s Lv%d · %d XP to go" % [str(detail.get("skill", "farming")).capitalize(), int(detail.get("level", 2)), int(detail.get("xp_to_go", 0))])

@@ -19,6 +19,7 @@ var _entry: PanelContainer
 var _entry_button: Button
 var _entry_line: Label
 var _entry_cmd := {}
+var _entry_card := {}
 var _reset_shown := 0.0
 var _stored_shown := 0.0
 var _opening := false
@@ -105,7 +106,9 @@ func frame(v: Dictionary, card := "") -> void:
 	_entry.visible = near and bool(entry.get("show", false)) and not rt.ui.has_modal()
 	if _entry.visible:
 		_entry_button.text = str(entry.label)
-		_entry_button.disabled = not bool(entry.enabled)
+		# LOCK-10: a greyed EntryCard still takes the press and says why (苏烈, #39), so it is never `disabled`.
+		_entry_button.add_theme_color_override("font_color", P0Ui.GREEN_D if bool(entry.enabled) else UiTokens.COLOR_DISABLED_INK)
+		_entry_card = entry
 		_entry_line.text = str(entry.line2)
 		_entry_line.visible = _entry_line.text != ""
 		_entry_cmd = entry.cmd
@@ -221,6 +224,9 @@ func _build_entry_card() -> void:
 	rt.ui.root.add_child(_entry)
 
 func _on_entry() -> void:
+	if not bool(_entry_card.get("enabled", false)):
+		rt.ui.toast(str(_entry_card.get("toast", _entry_card.get("label", ""))))
+		return
 	match str(_entry_cmd.get("type", "")):
 		"mine_new_run":
 			P0MaterialCards.open_new_run(rt.ui, rt.session.current(), func(cmd: Dictionary): rt.session.send(cmd))
