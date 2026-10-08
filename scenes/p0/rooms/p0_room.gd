@@ -948,6 +948,18 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"at":
 			var m := anchor(step[1])
 			if m: actor.teleport(Vector3(m.global_position.x, floor_y, m.global_position.z))
+		"atedge":   # atedge:top|bottom|left|right — the walkable spot nearest the floor's corner furthest that way (shots)
+			var forward := -_cam_dir
+			var right := forward.cross(Vector3.UP).normalized()
+			var axis: Vector3 = {"top": right.cross(forward).normalized(), "bottom": -right.cross(forward).normalized(),
+				"left": -right, "right": right}.get(step[1], right)
+			var best := Vector3.ZERO
+			for c in [floor_rect.position, floor_rect.end, Vector2(floor_rect.position.x, floor_rect.end.y), Vector2(floor_rect.end.x, floor_rect.position.y)]:
+				var p := room.position + Vector3(c.x, floor_y, c.y)
+				if best == Vector3.ZERO or p.dot(axis) > best.dot(axis): best = p
+			actor.teleport(P0RoomNav.nearest_walkable(bp, best))
+			_focus = actor.position   # as if walked there: the view comes along (kept inside the art)
+			_follow.held = false
 		"tap": walk_to(step[1])
 		"focus": focus(step[1])
 		"exit": leave()
