@@ -1,0 +1,269 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    240
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiActionKey"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        18
+      ],
+      "variation": "CaptionR12",
+      "text": "ActionKey 1117:78924 · LOCK-02 / 03"
+    },
+    {
+      "type": "HFlowContainer",
+      "rect": [
+        0,
+        52,
+        328,
+        188
+      ],
+      "children": [
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            52,
+            113,
+            188
+          ],
+          "children": [
+            {
+              "type": "UiActionKey",
+              "rect": [
+                9,
+                52,
+                95,
+                168
+              ],
+              "children": [
+                {
+                  "type": "Button",
+                  "rect": [
+                    36,
+                    52,
+                    48,
+                    48
+                  ],
+                  "text": "",
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        48,
+                        64,
+                        24,
+                        24
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "UiSceneAction",
+                  "rect": [
+                    16,
+                    112,
+                    88,
+                    88
+                  ],
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        20,
+                        134,
+                        80,
+                        22
+                      ],
+                      "variation": "ButtonXB15",
+                      "text": "Sow ×1"
+                    },
+                    {
+                      "type": "Label",
+                      "rect": [
+                        20,
+                        160,
+                        80,
+                        18
+                      ],
+                      "variation": "CaptionB12",
+                      "text": "2 Energy"
+                    }
+                  ]
+                },
+                {
+                  "type": "Panel",
+                  "rect": [
+                    9,
+                    106,
+                    28,
+                    28
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        14,
+                        111,
+                        18,
+                        18
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    8,
+                    204,
+                    96,
+                    24
+                  ],
+                  "variation": "CaptionB12",
+                  "text": "uses your Energy"
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                226,
+                113,
+                14
+              ],
+              "variation": "C9B",
+              "text": "farming · first-time caption"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            133,
+            52,
+            115,
+            188
+          ],
+          "children": [
+            {
+              "type": "UiActionKey",
+              "rect": [
+                143,
+                52,
+                95,
+                148
+              ],
+              "children": [
+                {
+                  "type": "Button",
+                  "rect": [
+                    170,
+                    52,
+                    48,
+                    48
+                  ],
+                  "text": "",
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        182,
+                        64,
+                        24,
+                        24
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "UiSceneAction",
+                  "rect": [
+                    150,
+                    112,
+                    88,
+                    88
+                  ],
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        154,
+                        134,
+                        80,
+                        22
+                      ],
+                      "variation": "ButtonXB15",
+                      "text": "Cast"
+                    },
+                    {
+                      "type": "Label",
+                      "rect": [
+                        154,
+                        161,
+                        80,
+                        16
+                      ],
+                      "variation": "CaptionB12",
+                      "text": "Need 5 Energy"
+                    }
+                  ]
+                },
+                {
+                  "type": "Panel",
+                  "rect": [
+                    143,
+                    106,
+                    28,
+                    28
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        148,
+                        111,
+                        18,
+                        18
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                133,
+                206,
+                115,
+                14
+              ],
+              "variation": "C9B",
+              "text": "fishing · not enough Energy"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

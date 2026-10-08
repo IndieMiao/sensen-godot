@@ -459,6 +459,124 @@
 			"thumb": "res://assets/avatar/thumbs/glass8.png",
 			"tier": 0,
 			"unity_guid": "a31a8ec11cac7794b9e67c558b7d6f0e"
+		},
+		{
+			"attach": "socket",
+			"id": "mask16_npc_kai",
+			"offset": {
+				"pos": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"rot": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/mask16_npc_kai.res",
+			"slot": "mask",
+			"thumb": "res://assets/avatar/thumbs/mask16_npc_kai.png",
+			"tier": 0,
+			"unity_guid": "1d2bb1a729b712346b49cad7e51c03d3"
+		},
+		{
+			"attach": "socket",
+			"id": "hairhat71_npc_kai",
+			"offset": {
+				"pos": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"rot": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/hairhat71_npc_kai.res",
+			"slot": "hairHat",
+			"thumb": "res://assets/avatar/thumbs/hairhat71_npc_kai.png",
+			"tier": 0,
+			"unity_guid": "9904d49bb97a50e42942ba1ee03cb96c"
+		},
+		{
+			"attach": "socket",
+			"id": "hairhat12_npc_mei",
+			"offset": {
+				"pos": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"rot": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/hairhat12_npc_mei.res",
+			"slot": "hairHat",
+			"thumb": "res://assets/avatar/thumbs/hairhat12_npc_mei.png",
+			"tier": 0,
+			"unity_guid": "d3d637fa7aa46ba4ba8686ec6c4ade06"
+		},
+		{
+			"attach": "mesh",
+			"id": "cloth11_npc_mei",
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/cloth11_npc_mei.res",
+			"slot": "cloth",
+			"thumb": "res://assets/avatar/thumbs/cloth11_npc_mei.png",
+			"tier": 0,
+			"unity_guid": "None"
+		},
+		{
+			"attach": "socket",
+			"id": "hairhat80_npc_ama",
+			"offset": {
+				"pos": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"rot": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/hairhat80_npc_ama.res",
+			"slot": "hairHat",
+			"thumb": "res://assets/avatar/thumbs/hairhat80_npc_ama.png",
+			"tier": 0,
+			"unity_guid": "9d01a54960b00f843a9fb624ef0339bb"
 		}
 	],
 	"version": 1

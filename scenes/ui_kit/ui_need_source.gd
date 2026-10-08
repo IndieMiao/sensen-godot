@@ -1,0 +1,67 @@
+class_name UiNeedSource
+extends PanelContainer
+## NeedSource (SGODOT-222; Gensen Refactor/NeedSource 1092:77266, LOCK-10 / LOCK-08): shown only after a
+## UiNeedTile is tapped, anchored just above it. One line of source + `Show ›`. Show only moves the camera
+## or highlights the place; it never walks the player, never opens a panel and never acts. Emits `show_pressed`.
+
+signal show_pressed
+
+const _PAD := Vector4(15, 7, 7, 7)   # NeedSource main: padding 14 / 6 / 6 / 6 plus its 1 px border (the card is 45 high)
+const _GAP := 10
+
+var text := "": set = set_text
+
+var _label: Label
+var _show: UiShowPill
+
+## can_show false hides Show when there is nothing to point the camera at (e.g. a place on the map).
+func _init(text_: String = "", can_show := true) -> void:
+	var box := UiStyleBox.make(UiTokens.COLOR_SURFACE, UiTokens.RADIUS_PILL, UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT)
+	# the main floats on a 0 4 12 drop shadow (unbound, α 0.14); the menu shadow is the nearest token (α 0.16)
+	box.shadow_color = UiTokens.COLOR_SHADOW_MENU
+	box.shadow_size = UiTokens.SIZE_SHADOW_MENU_RADIUS
+	box.shadow_offset = Vector2(0, UiTokens.SIZE_SHADOW_MENU_OFFSET_Y)
+	add_theme_stylebox_override(&"panel", box.with_margins(_PAD.x, _PAD.y, _PAD.z, _PAD.w))
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override(&"separation", _GAP)
+	add_child(row)
+	_label = UiKit.label("", UiTokens.STYLE_BODY_B14)
+	_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	row.add_child(_label)
+	_show = UiShowPill.new("Show ›", UiShowPill.Kind.SOURCE)   # 65 × 31 like the main, 44 to the touch
+	_show.pressed.connect(func(): show_pressed.emit())
+	_show.visible = can_show
+	row.add_child(_show)
+	text = text_
+
+func set_text(v: String) -> void:
+	text = v
+	if _label != null: _label.text = v
+
+## Pops a source line just above `anchor` (global rect) inside `host`; a tap anywhere else closes it.
+## Returns the popup layer (free it to close); `on_show` runs after Show, then the popup closes.
+static func popup(host: Control, anchor: Rect2, source: String, on_show: Callable = Callable()) -> Control:
+	var layer := Control.new()
+	layer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	layer.mouse_filter = Control.MOUSE_FILTER_STOP
+	layer.gui_input.connect(func(e: InputEvent):
+		if (e is InputEventMouseButton or e is InputEventScreenTouch) and not e.pressed: layer.queue_free())
+	host.add_child(layer)
+	var pill := UiNeedSource.new(source, on_show.is_valid())
+	pill.custom_minimum_size.x = host.size.x - UiTokens.SPACE_PAGE * 2.0   # one column, like the main (317 of 360)
+	layer.add_child(pill)
+	pill.show_pressed.connect(func():
+		if on_show.is_valid(): on_show.call()
+		layer.queue_free())
+	var place := func() -> void:
+		var area := host.get_global_rect()
+		var w := minf(pill.get_combined_minimum_size().x, area.size.x - UiTokens.SPACE_PAGE * 2.0)
+		var h := pill.get_combined_minimum_size().y
+		var x := clampf(anchor.get_center().x - w * 0.5, area.position.x + UiTokens.SPACE_PAGE, area.end.x - UiTokens.SPACE_PAGE - w)
+		var y := maxf(area.position.y, anchor.position.y - h - UiTokens.SPACE_WITHIN)
+		pill.global_position = Vector2(x, y)
+		pill.size = Vector2(w, h)
+	place.call_deferred()
+	return layer
