@@ -194,6 +194,16 @@ func place_for(target: String) -> Dictionary:
 
 func p0_surface() -> String: return "map"
 
+## Map markers the client knows before the server's map_markers come (蒙恬 on #83, q(48)): while the tutorial Pond
+## Catch is on the stall's board and still short of its fish, the beginner pond Today points at wears the Request ! —
+## so the first session's map shows it at the city level beside the Tackle Shop, 200 m away (CityMapView packs marker
+## pins first). Read off the board like the guide (P0Guide.tutorial), not req_done: that keeps only the last 20.
+func city_pin_markers() -> Dictionary:
+	var v: Dictionary = rt.session.current() if rt != null and rt.session != null else {}
+	var t := P0Guide.tutorial(v)
+	if t.is_empty() or int(t.get("have", 0)) >= int(t.get("qty", 1)): return {}   # handed in, or off to the stall
+	return {NEAREST_POND: "request"}
+
 # ---------------------------------------------------------------- dev steps for P0_SHOT
 func p0_dev(step: PackedStringArray) -> bool:
 	match step[0]:
@@ -211,6 +221,13 @@ func p0_dev(step: PackedStringArray) -> bool:
 			if city_map: city_map._on_info_action()
 		"zoom":
 			_set_zoom(float(step[1]))
+			_camera_dirty = true
+		"online":   # online:sh_tea_1:3 — the presence count an outpost pin says, for shots
+			_online[step[1]] = int(step[2])
+			_set_outpost_places()
+		"center":   # center:31.228:121.478 (the city overview) — where the camera looks, for shots
+			center_lat = float(step[1])
+			center_lng = float(step[2])
 			_camera_dirty = true
 		_: return false
 	return true
