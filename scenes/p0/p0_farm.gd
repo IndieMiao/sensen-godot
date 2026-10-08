@@ -11,7 +11,8 @@ const MineArt = preload("res://modules/mining/mine_art.gd")
 const GardenScenery = preload("res://scenes/p0/p0_garden_scenery.gd")
 const Fence = preload("res://scenes/p0/p0_fence.gd")
 const HomePanel = preload("res://scenes/p0/home/p0_home_panel.gd")
-const SIGN_BADGE := Vector3(0, 1.15, 0)   # the Homestead sign's badge, just above the board
+const SIGN_BADGE := Vector3(0, 1.15, 0)   # the Homestead sign's mark, just above the board
+const SIGN_NEAR := 2.6                    # metres: the sign's and the plaque's finger cards show this close
 
 const STYLE := "cottage"          # the orange-roof cottage of the polished farm
 const PLACE := "Shanghai · Homestead"
@@ -234,6 +235,7 @@ func p0_joystick(v: Vector2) -> void:
 func p0_frame(v: Dictionary, dt: float) -> void:
 	actor.step(dt)
 	_follow(dt)
+	rt.ui.player_screen = cam.unproject_position(actor.position + Vector3(0, 0.9, 0))   # the radial fans out from here
 	_sync_plots(v, dt)
 	_fence.sync(v)
 	_pick_front(v)
@@ -324,8 +326,7 @@ func p0_tap(screen: Vector2) -> void:
 	if _sign_hit(screen):
 		actor.face(_sign)
 		HomePanel.open(rt.ui)
-	elif _plaque_node.visible and (cam.unproject_position(_plaque + Vector3(0, 0.35, 0)).distance_to(screen) < 34
-			or rt.ui.tag_hit("plaque", screen)):
+	elif _plaque_node.visible and cam.unproject_position(_plaque + Vector3(0, 0.35, 0)).distance_to(screen) < 34:
 		actor.face(_plaque)
 		HomePanel.plaque(rt.ui)
 	elif cam.unproject_position(_stall + Vector3(0, 0.4, 0)).distance_to(screen) < 56:
@@ -336,32 +337,44 @@ func p0_tap(screen: Vector2) -> void:
 	elif cam.unproject_position(_mine + Vector3(0, 0.8, 0)).distance_to(screen) < 60:
 		rt.ui.toast("The mine opens soon")
 
-## The sign or its badge (tapping a badge = tapping the object); small, so the door beside it stays the house.
+## The sign or its mark (tapping a mark or its card = tapping the object); small, so the door beside it stays the house.
 func _sign_hit(screen: Vector2) -> bool:
 	return cam.unproject_position(_sign + Vector3(0, 0.45, 0)).distance_to(screen) < 34 \
-		or cam.unproject_position(_sign + SIGN_BADGE).distance_to(screen) < 30 or rt.ui.tag_hit("homestead", screen)
+		or cam.unproject_position(_sign + SIGN_BADGE).distance_to(screen) < 30
 
+## Facility marks (STATE-ICONS) show over the stall; finger cards appear when you walk up (LOCK-07 / LOCK-17).
+## Tapping the card is tapping the facility, so it reuses p0_tap's own hit points.
 func _tags(v: Dictionary) -> void:
-	var near_stall := actor.position.distance_to(_stall) < 3.2
-	var note := ""
+	var stall_top := cam.unproject_position(_stall + Vector3(0, 1.05, 0))
+	var request := -1
 	for r in v.get("stall", {}).get("board", {}).get("requests", []):
-		if str(r.status) == "open" or (str(r.status) == "accepted" and int(r.have) >= int(r.qty)): note = " · !"
-	rt.ui.tag("stall", "Homestead Stall · Tap to shop" + note, cam.unproject_position(_stall + Vector3(0, 1.05, 0)), near_stall or note != "", true)
-	var st = v.get("cooking", {}).get("stove", null)
-	var home := "Home · Kitchen · Rest"
-	if st != null: home = "Home · Dish ready" if float(st.get("ready_in", 0)) <= 0.0 else "Home · Cooking " + P0Logic.duration(float(st.get("ready_in", 0)))
-	rt.ui.tag("home", home, cam.unproject_position(_house + Vector3(0, 2.6, 0.4)), actor.position.distance_to(_house) < 4.2 or st != null, st != null)
+		if str(r.status) == "accepted" and int(r.have) >= int(r.qty): request = UiStatusBadge.State.DELIVERABLE
+		elif str(r.status) == "open" and request < 0: request = UiStatusBadge.State.REQUEST
+	rt.ui.badge("stall", maxi(request, 0), stall_top, request >= 0)
+	rt.ui.tag("stall", "Tap to shop", stall_top - Vector2(0, rt.ui.badge_height("stall")),
+		actor.position.distance_to(_stall) < 3.2, cam.unproject_position(_stall + Vector3(0, 0.4, 0)))
+	# The farmhouse carries no state badge (不知火舞 on SGODOT-221): the stove's state belongs to the stove inside,
+	# and Today already names the dish and its time. The card's copy becomes "Farmhouse · Tap to go in" once the
+	# door card goes (bench SGODOT-224, room SGODOT-226).
+	rt.ui.tag("home", "Home · Kitchen · Rest", cam.unproject_position(_house + Vector3(0, 2.6, 0.4)),
+		actor.position.distance_to(_house) < 4.2, cam.unproject_position(_house + Vector3(0, 1.0, 0.6)))
+	# Homestead sign (WorldBadges · Farm 1135:79267, LOCK-11; 不知火舞 on SGODOT-228): a home mark with the caption
+	# "Homestead LvN" always shows, Ready once the Needs are met; walking up folds the caption to the mark and the
+	# finger card "Homestead LvN · Tap to upgrade" sits above it (LOCK-07). Mark, card and sign all open HOME-1.
 	var h: Dictionary = v.get("homestead", {})
-	var nxt = h.get("next", null)   # lit when the next level is ready to take
-	rt.ui.tag("homestead", "Homestead Lv%d" % int(h.get("level", 1)), cam.unproject_position(_sign + SIGN_BADGE), true,
-		nxt is Dictionary and bool(nxt.get("can_upgrade", false)))
-	rt.ui.clamp_tag("homestead")
-	rt.ui.lift_tag("homestead", "stall")
-	# TapCard (LOCK-07): only near the plaque; tapping the card = tapping the plaque (the card sits right above it).
+	var nxt = h.get("next", null)
+	var lit: bool = nxt is Dictionary and bool(nxt.get("can_upgrade", false))
+	var lvl := int(h.get("level", 1))
+	var sign_top := cam.unproject_position(_sign + SIGN_BADGE)
+	var near_sign := actor.position.distance_to(_sign) < SIGN_NEAR
+	rt.ui.badge("homestead", UiStatusBadge.State.READY if lit else UiStatusBadge.State.AVAILABLE, sign_top, true,
+		"" if near_sign else "Homestead Lv%d" % lvl, P0Logic.icon("home"))
+	rt.ui.tag("homestead", "Homestead Lv%d · Tap to upgrade" % lvl, sign_top - Vector2(0, rt.ui.badge_height("homestead")),
+		near_sign, cam.unproject_position(_sign + Vector3(0, 0.45, 0)))
+	# Upgrade Plaque: no mark; the finger card only near it, and its tap is the plaque's (PLAQUE-READ).
 	_plaque_node.visible = not h.get("plaque", []).is_empty()
 	rt.ui.tag("plaque", "Upgrade Plaque · Tap to read", cam.unproject_position(_plaque + Vector3(0, 0.85, 0)),
-		_plaque_node.visible and actor.position.distance_to(_plaque) < 2.6)
-	rt.ui.clamp_tag("plaque")
+		_plaque_node.visible and actor.position.distance_to(_plaque) < SIGN_NEAR, cam.unproject_position(_plaque + Vector3(0, 0.35, 0)))
 
 func _teaching(v: Dictionary) -> void:
 	if rt.ui.has_modal(): return

@@ -179,15 +179,30 @@ func test_need_material_from_a_shop_or_the_workbench_names_its_own_gap() -> void
 	rt._on_refused("need_material", {"item": "wood", "need": 16, "have": 10}, {"type": "homestead_upgrade"})
 	assert_str(rt.ui._toast.text).is_equal("Need 6 more Timber")   # HOME-1's gap, in tile order
 
-func test_a_tag_at_the_screen_edge_slides_inward_whole() -> void:
+func test_the_sign_card_stays_on_screen_and_its_tap_is_the_sign() -> void:
+	# #12's finger cards clamp themselves inside (Pointer flips inward); a tap on the card goes to the sign.
 	var ui := _ui(_view())
 	await get_tree().process_frame
-	ui.tag("homestead", "Homestead Lv3", Vector2(ui.root.size.x - 4, 300), true)
-	ui.clamp_tag("homestead")
-	var t: Label = ui._tags["homestead"]
-	assert_float(t.position.x + t.size.x).is_less_equal(ui.root.size.x - 8.0)
-	ui.tag("homestead", "Homestead Lv3", Vector2(2, 300), true)
-	ui.clamp_tag("homestead")
-	assert_float(t.position.x).is_greater_equal(8.0)
-	assert_bool(ui.tag_hit("homestead", t.position + t.size * 0.5)).is_true()
-	assert_bool(ui.tag_hit("homestead", t.position + Vector2(t.size.x + 40, 0))).is_false()
+	var sign := Vector2(ui.root.size.x - 30, 320)
+	ui.tag("homestead", "Homestead Lv3 · Tap to upgrade", Vector2(ui.root.size.x - 4, 300), true, sign)
+	var c: UiTapCard = ui._cards["homestead"]
+	assert_float(c.position.x + c.size.x).is_less_equal(ui._kit.size.x)
+	ui.tag("homestead", "Homestead Lv3 · Tap to upgrade", Vector2(2, 300), true, sign)
+	assert_float(c.position.x).is_greater_equal(0.0)
+	var hits := []
+	ui.tapped.connect(func(p): hits.append(p))
+	assert_bool(ui._tap_at(c.hit_rect().get_center(), false)).is_true()
+	assert_array(hits).is_equal([sign])
+
+func test_the_sign_mark_shows_its_level_and_folds_near() -> void:
+	# WorldBadges · Farm (不知火舞 on SGODOT-228): home mark + "Homestead LvN", Ready when the Needs are met; near, the
+	# caption folds so the finger card can sit right above the mark.
+	var ui := _ui(_view())
+	await get_tree().process_frame
+	ui.badge("homestead", UiStatusBadge.State.AVAILABLE, Vector2(180, 300), true, "Homestead Lv2", P0Logic.icon("home"))
+	var b: UiStatusBadge = ui._badges["homestead"]
+	assert_str(b.caption).is_equal("Homestead Lv2")
+	var tall := ui.badge_height("homestead")
+	ui.badge("homestead", UiStatusBadge.State.READY, Vector2(180, 300), true, "", P0Logic.icon("home"))
+	assert_int(b.state).is_equal(UiStatusBadge.State.READY)
+	assert_float(ui.badge_height("homestead")).is_less(tall)

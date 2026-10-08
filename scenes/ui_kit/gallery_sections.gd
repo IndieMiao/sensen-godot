@@ -34,6 +34,14 @@ static func all() -> Array[Dictionary]:
 		{id = "energy_card", title = "UiEnergyCard · card", figma = "Energy 1094:77504 Kind=Card · EnergyTile 1093:77292 · LOCK-09", build = _energy_cards},
 		{id = "energy_panel", title = "UiEnergyCard · panel", figma = "Energy 1094:77504 Kind=Panel · LOCK-09", build = _energy_panels},
 		{id = "empty_state", title = "UiEmptyState", figma = "EmptyState 1234:87237 Kind=Panel / Row · WP6", build = _empty_states},
+		# SGODOT-221 world controls · interaction
+		{id = "quick_bar", title = "UiQuickBar (drawn at 328 of 336)", figma = "Compact/QuickSlot 633:41279 · QuickEnd/Bag 907:72112 · BAR-1 / BAR-1-2 · LOCK-04 / 05", build = _quick_bars},
+		{id = "pin_menu", title = "UiPinMenu", figma = "PinMenu 1141:80291 · LOCK-05", build = _pin_menus},
+		{id = "scene_action", title = "UiSceneAction", figma = "SceneAction 1116:78934 · LOCK-02", build = _scene_actions},
+		{id = "action_key", title = "UiActionKey", figma = "ActionKey 1117:78924 · LOCK-02 / 03", build = _action_keys},
+		{id = "action_radial", title = "UiActionRadial", figma = "RadialPetal 1122:79385 · BAR-2 482:23 · LOCK-03", build = _action_radial},
+		{id = "status_badge", title = "UiStatusBadge", figma = "StatusBadge 1132:79554 · LOCK-11", build = _status_badges},
+		{id = "tap_card", title = "UiTapCard", figma = "TapCard 1135:101133 · LOCK-07", build = _tap_cards},
 	]
 	return out
 
@@ -263,7 +271,7 @@ static func _cells_quick() -> Control:
 		["default", {}], ["selected", {state = S.SELECTED}], ["pinned", {pinned = true}],
 		["pinned + selected", {pinned = true, state = S.SELECTED}], ["lifted", {pinned = true, state = S.LIFTED}],
 		["drop target", {state = S.DROP_TARGET}], ["zero", {pinned = true, state = S.ZERO, quantity = "×0"}],
-		["empty", {state = S.EMPTY}],
+		["empty", {state = S.EMPTY}], ["ghost", {state = S.GHOST, title = "Seeds", quantity = ""}],
 	]
 	for sample in samples:
 		var fields: Dictionary = radish.duplicate()
@@ -473,4 +481,134 @@ static func _energy_panels() -> Control:
 	holder.add_theme_constant_override(&"margin_top", int(UiTokens.SPACE_ROW))
 	holder.add_child(p)
 	v.add_child(holder)
+	return v
+
+## The real bar is 336 wide (12 px screen margins); the gallery column is 328, so it is drawn scaled.
+static func _fit_bar(bar: UiQuickBar, caption: String) -> VBoxContainer:
+	var k := 328.0 / UiTokens.SIZE_QUICK_BAR_W
+	var host := Control.new()
+	host.custom_minimum_size = Vector2(328, (UiTokens.SIZE_QUICK_BAR_H + UiTokens.SIZE_QUICK_SLOT_LIFT) * k)
+	bar.haptics = false
+	bar.scale = Vector2(k, k)
+	bar.position.y = UiTokens.SIZE_QUICK_SLOT_LIFT * k
+	host.add_child(bar)
+	return _captioned(host, caption)
+
+static func _bar_slots() -> Array:
+	return [
+		{id = "seed_radish", icon = _tex("seed_radish"), title = "Radish Seeds", quantity = 24, pinned = true},
+		{id = "seed_carrot", icon = _tex("seed_carrot"), title = "Carrot Seeds", quantity = 6},
+		{id = "compost", icon = _tex("compost"), title = "Compost", quantity = 0, pinned = true},
+		{id = "seed_potato", icon = _tex("seed_potato"), title = "Potato Seeds", quantity = 3},
+	]
+
+static func _quick_bars() -> Control:
+	var v := _column()
+	var a := UiQuickBar.new()
+	a.slots = _bar_slots()
+	a.selected = "seed_carrot"
+	v.add_child(_fit_bar(a, "selected · pinned · zero (pinned, 0 left) · empty"))
+	var g := UiQuickBar.new()
+	g.slots = [{id = "compost", icon = _tex("compost"), title = "Compost", quantity = 6},
+		{ghost = true, icon = _tex("seed_radish"), title = "Seeds"}]
+	v.add_child(_fit_bar(g, "no seeds on the bar: the first empty slot is the Seeds ghost"))
+	var b := UiQuickBar.new()
+	b.slots = _bar_slots()
+	b.capacity_warning = true
+	b.cells()[0].state = UiItemCell.State.LIFTED
+	b.cells()[3].state = UiItemCell.State.DROP_TARGET
+	v.add_child(_fit_bar(b, "lifted (dragging) · drop target · Bag at 90%"))
+	var c := UiQuickBar.new()
+	c.slots = _bar_slots()
+	c.bag_open = true
+	v.add_child(_fit_bar(c, "bag drawer open: Close"))
+	var d := UiQuickBar.new()
+	d.collapsed = true
+	v.add_child(_fit_bar(d, "no action chosen: handle + Bag"))
+	return v
+
+static func _pin_menus() -> Control:
+	var row := _row(UiTokens.SPACE_ROW)
+	row.add_child(_captioned(UiPinMenu.new(true), "after pinning"))
+	row.add_child(_captioned(UiPinMenu.new(false), "after unpinning"))
+	return row
+
+static func _scene_action(verb: String, cost: String, state: UiSceneAction.State, progress := 0.0) -> UiSceneAction:
+	var k := UiSceneAction.new()
+	k.verb = verb
+	k.cost = cost
+	k.state = state
+	k.hold_progress = progress
+	k.set_process(false)   # keep the Pending spinner still for the PNG snapshot
+	return k
+
+static func _scene_actions() -> Control:
+	var row := _row(UiTokens.SPACE_ROW)
+	var S := UiSceneAction.State
+	row.add_child(_captioned(_scene_action("Cast", "5 Energy", S.DEFAULT), "default"))
+	row.add_child(_captioned(_scene_action("Sow ×1", "Need 2 Energy", S.INSUFFICIENT), "insufficient"))
+	row.add_child(_captioned(_scene_action("Growing", "Ready in 2h", S.UNAVAILABLE), "unavailable"))
+	row.add_child(_captioned(_scene_action("Cast", "5 Energy", S.PRESSED), "pressed"))
+	row.add_child(_captioned(_scene_action("Sow ×1", "2 Energy", S.HOLDING, 0.6), "holding"))
+	row.add_child(_captioned(_scene_action("Cast", "5 Energy", S.PENDING), "pending"))
+	row.add_child(_captioned(_scene_action("Till", "", S.DEFAULT), "0 Energy: no price"))
+	return row
+
+static func _action_keys() -> Control:
+	var row := _row(UiTokens.SPACE_SECTION)
+	var a := UiActionKey.new()
+	a.tool_icon = _tex("hoe")
+	a.key().verb = "Sow ×1"
+	a.key().cost = "2 Energy"
+	a.caption = "uses your Energy"
+	row.add_child(_captioned(a, "farming · first-time caption"))
+	var b := UiActionKey.new()
+	b.tool_icon = _tex("rod")
+	b.key().verb = "Cast"
+	b.key().cost = "Need 5 Energy"
+	b.key().state = UiSceneAction.State.INSUFFICIENT
+	row.add_child(_captioned(b, "fishing · not enough Energy"))
+	return row
+
+static func _action_radial() -> Control:
+	var host := Control.new()
+	host.custom_minimum_size = Vector2(328, 250)
+	var r := UiActionRadial.new()
+	host.add_child(r)   # full-rect inside the host; no explicit size (it would add to the anchors)
+	r.options = [
+		{id = "farming", name = "Farming", icon = _tex("hoe"), available = true},
+		{id = "fishing", name = "Fishing", icon = _tex("fish"), available = false, reason = "No water nearby"},
+		{id = "mining", name = "Mining", icon = _tex("pickaxe"), available = false, reason = "Enter the mine"},
+		{id = "combat", name = "Combat", icon = _tex("sword"), available = false, reason = "Mine floors 3–5"},
+	]
+	r.selected = "farming"
+	r.open_at(Vector2(36, 125))
+	return _captioned(host, "fanned from the character · Farming selected")
+
+static func _status_badges() -> Control:
+	var v := _column()
+	var row := _row(UiTokens.SPACE_ROW)
+	var names := ["available", "ready", "countdown", "cooling", "used today", "locked", "insufficient", "full", "new",
+		"request", "deliverable", "event", "gift", "blocked", "sell"]
+	for s in UiStatusBadge.State.values():
+		var b := UiStatusBadge.new(s)
+		b.icon = _tex("dish_grilled_fish")
+		if s == UiStatusBadge.State.COUNTDOWN: b.caption = "1h 12m"
+		row.add_child(_captioned(b, names[s]))
+	v.add_child(row)
+	var npc := _row(UiTokens.SPACE_ROW)
+	for s in [UiStatusBadge.State.REQUEST, UiStatusBadge.State.DELIVERABLE, UiStatusBadge.State.GIFT, UiStatusBadge.State.NEW]:
+		npc.add_child(_captioned(UiStatusBadge.new(s, UiStatusBadge.Size.NPC), "NPC · " + names[s]))
+	v.add_child(npc)
+	return v
+
+static func _tap_cards() -> Control:
+	var v := _column()
+	v.add_child(_captioned(UiTapCard.new("Tap to cook"), "centred"))
+	var left := UiTapCard.new("Rest · +60 Energy · once a day")
+	left.point_at(0.0)
+	v.add_child(_captioned(left, "facility near the left edge"))
+	var right := UiTapCard.new("Mei · Tap to talk")
+	right.point_at(1000.0)
+	v.add_child(_captioned(right, "facility near the right edge"))
 	return v
