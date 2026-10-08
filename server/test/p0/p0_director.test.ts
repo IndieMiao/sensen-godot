@@ -24,7 +24,7 @@ class Director {
   ledger: { at: number; what: string; energy: number; fishing: number; cooking: number }[] = [];
   firsts: Record<string, number> = {};
   constructor(player: string) { this.s = freshState(c, player, T0); }
-  do(cmd: P0Command, t: number, what = cmd.type): P0Event[] {
+  do(cmd: P0Command, t: number, what: string = cmd.type): P0Event[] {
     const r = applyP0(c, this.s, cmd, t);
     if (!r.ok) throw new Error(`${what} at ${((t - T0) / MIN).toFixed(1)} min: ${r.code} ${JSON.stringify(r.detail ?? {})}`);
     this.s = r.state;
@@ -96,6 +96,9 @@ describe('first session director table (§14.2; SGODOT-232 V2)', () => {
     for (let i = 20; i < 30; i++) d.do({ type: 'till', plot: i, space: 'home' }, at(16, 20 + (i - 20) * 3), 'till');
     const beforeLettuce = d.energyAt(at(17));
     for (let i = 20; i < 30; i++) d.do({ type: 'sow', plot: i, seed: 'seed_lettuce', space: 'home' }, at(17, (i - 20) * 6), 'sow lettuce');
+    // Today then says "Lettuce ready in 7h 58m": growth starts at watering, which the key offers next (free)
+    for (let i = 20; i < 30; i++) d.do({ type: 'water', plot: i, space: 'home' }, at(17, 58 + (i - 20)), 'water');
+    expect(d.s.plots.filter(p => p.crop === 'crop_lettuce' && p.state === 'growing')).toHaveLength(10);
     expect(beforeLettuce - d.energyAt(at(17, 55))).toBeLessThanOrEqual(20);
     expect(count(d.s.bag, 'seed_lettuce')).toBe(0);
 
@@ -177,6 +180,7 @@ function playFirstSession(player: string) {
   for (let i = 20; i < 30; i++) d.do({ type: 'till', plot: i, space: 'home' }, t + (i - 20) * 3 * SEC);
   t += 40 * SEC;
   for (let i = 20; i < 30; i++) d.do({ type: 'sow', plot: i, seed: 'seed_lettuce', space: 'home' }, t + (i - 20) * 6 * SEC);
+  for (let i = 20; i < 30; i++) d.do({ type: 'water', plot: i, space: 'home' }, t + 60 * SEC + (i - 20) * SEC);
   t += 120 * SEC;
   while (skillLevel(c, d.s, 'fishing') < 2 && casts < 20) { d.fish(t); casts += 1; t += 40 * SEC; }
   let fine = false;
