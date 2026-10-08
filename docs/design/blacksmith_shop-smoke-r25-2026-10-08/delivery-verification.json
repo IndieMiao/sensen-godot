@@ -1,0 +1,70 @@
+{
+  "revision": "R2.5",
+  "shared_smoke_commit": "09a4b9ea",
+  "review_evidence_commit": "347e1005",
+  "plane_attachments": 10,
+  "plane_all_download_hashes_match": true,
+  "plane_files": [
+    {
+      "name": "SGODOT-178_R25_smoke-detail.png",
+      "sha256": "063d7eca0a4e5b337705ed2d861e98f2f6682473ad1caf9ead28249bd0f2bce9"
+    },
+    {
+      "name": "SGODOT-178_R25_godot-whole.png",
+      "sha256": "17999f2889d93c381b1fc7a1a054686a5482db69b1966b6a08ead9a1c323e29b"
+    },
+    {
+      "name": "SGODOT-178_R25_comparison.png",
+      "sha256": "1ce488eed969cbb2cdb80976e4953902bee3c0d0d254a99c62eff8c8ddee77ab"
+    },
+    {
+      "name": "SGODOT-178_R25_contrast-sampling.png",
+      "sha256": "53e8a8f52e17e441bcda14e5e24eb4230979f4db878ad0e11bd927443880622e"
+    },
+    {
+      "name": "SGODOT-178_R25_contrast-verification.json",
+      "sha256": "d5b1b13e5a7c99ff8c1d2c0aba54d35dabf8455cb02d9b8f0b82f284f5be7351"
+    },
+    {
+      "name": "SGODOT-178_R25_preservation.json",
+      "sha256": "9e7644dff9f8e0b72df84a1c9e8aa6076b9ee49a04eb794c5ba5d48dc3e64ae7"
+    },
+    {
+      "name": "SGODOT-178_R25_standalone-validation.json",
+      "sha256": "453b26b9c9560909332a60b3169503fbe27936afc2726c4ddbeb976213fa9b50"
+    },
+    {
+      "name": "SGODOT-178_R25_smoke-timeline.jpg",
+      "sha256": "93a64c3b099f721d2349952e3c038d55f6b12ec4306532b4e8aaf2978ccc7325"
+    },
+    {
+      "name": "SGODOT-178_R25_README.md",
+      "sha256": "6e8dcbb91ecfab258c7cf2813ca943def76eee71b04ae74fb01726ee5995eaa3"
+    },
+    {
+      "name": "SGODOT-178_R25_smoke-motion.mp4",
+      "sha256": "2fabbe84eaf0c918734a31efaaf8f9086c3b7fe1f14889ed4a32c2084f772bad"
+    }
+  ],
+  "lark_messages": 4,
+  "lark_media": [
+    {
+      "name": "whole",
+      "sha256": "17999f2889d93c381b1fc7a1a054686a5482db69b1966b6a08ead9a1c323e29b",
+      "byte_identical": true
+    },
+    {
+      "name": "closeup",
+      "sha256": "063d7eca0a4e5b337705ed2d861e98f2f6682473ad1caf9ead28249bd0f2bce9",
+      "byte_identical": true
+    },
+    {
+      "name": "smoke-motion",
+      "sha256": "2fabbe84eaf0c918734a31efaaf8f9086c3b7fe1f14889ed4a32c2084f772bad",
+      "byte_identical": true
+    }
+  ],
+  "card_state": "Review",
+  "card_comment_id": "84969377-715e-44af-aa8a-0658e4b91160",
+  "parent_review_request_id": "d37e719a-cd47-4f45-b027-c7eb26176bdc"
+}
