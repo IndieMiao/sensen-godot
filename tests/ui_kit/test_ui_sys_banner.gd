@@ -25,3 +25,10 @@ func test_back_online_and_cmd_fail_have_no_retry() -> void:
 	assert_that([(on.get_theme_stylebox(&"panel") as UiStyleBox).bg_color, on.retry_button().visible]).is_equal([UiTokens.COLOR_PRIMARY, false])
 	var box := fail.get_theme_stylebox(&"panel") as UiStyleBox
 	assert_that([box.bg_color, box.border_color, fail.retry_button().visible]).is_equal([UiTokens.COLOR_DANGER_TINT, UiTokens.COLOR_DANGER, false])
+
+## The line can stay up a long while (Offline): taps on it go to what is under it; only Retry takes its own.
+func test_taps_pass_through_the_line_but_not_retry() -> void:
+	var b := _banner(UiSysBanner.Kind.OFFLINE)
+	await get_tree().process_frame
+	var stops := b.find_children("*", "Control", true, false).filter(func(c): return (c as Control).mouse_filter == Control.MOUSE_FILTER_STOP)
+	assert_that([b.mouse_filter, stops]).is_equal([Control.MOUSE_FILTER_IGNORE, [b.retry_button()]])

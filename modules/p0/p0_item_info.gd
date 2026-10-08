@@ -111,6 +111,7 @@ static func spec(view: Dictionary, item_id: String, context: StringName, opts :=
 		var text := fill(str(line), t)
 		if text != "": out.facts.append(text)
 	out.buttons = _buttons(rule, f, t)
+	for b in out.buttons: b.sends = sends(b, context)
 	if rule.get("price", false): out.price = _price(view, item_id, opts)
 	# STALL-NEW-2 (E-04): a buy row unlocked since the stall was last opened reads `◆ New for you` in newInk.
 	if context == &"counter_buy" and _new_offer(item_id, opts) and out.facts.has(NEW_FOR_YOU): out.gate_tone = &"new"
@@ -142,6 +143,17 @@ static func holds(expr: String, f: Dictionary) -> bool:
 		assert(f.has(name), "P0ItemInfo: unknown flag %s" % name)
 		if bool(f.get(name, false)) == neg: return false
 	return true
+
+## Buttons that only open or pick something on this device: they keep working offline (§10.7.1). A card's Gift opens
+## the resident's gift drawer; only the gift drawer's own Gift sends the gift.
+const LOCAL_BUTTONS: Array[StringName] = [&"pin", &"unpin", &"bag_room"]
+
+## Whether button `b` (from `buttons`) sends a server command: greyed to `Offline` while offline, its press tracked.
+static func sends(b: Dictionary, context: StringName) -> bool:
+	var id := StringName(b.get("id", &""))
+	# An unavailable one is grey already and keeps its reason (✓ Equipped, Locked, Need 2 more Radish).
+	if StringName(b.get("kind", &"")) in [&"nav", &"unavailable"] or LOCAL_BUTTONS.has(id): return false
+	return id != &"gift" or context == &"gift"
 
 static func _buttons(rule: Dictionary, f: Dictionary, t: Dictionary) -> Array:
 	var out := []

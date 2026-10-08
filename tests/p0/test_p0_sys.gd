@@ -78,3 +78,76 @@ func test_the_creel_badge_moves_down_under_the_system_line() -> void:
 	assert_float(rt.ui._creel.position.y).is_equal(y + P0Ui.SYS_SHIFT)
 	await get_tree().create_timer(P0Runtime.CMD_FAIL_S + 0.1).timeout
 	assert_float(rt.ui._creel.position.y).is_equal(y)
+
+## §10.7.1 "离线时": every command button reads `Offline` and does nothing; one that only opens or browses keeps working;
+## an already unavailable one keeps its reason; the drawer stays open. Back online gives them their labels back.
+func test_offline_greys_the_command_buttons_and_leaves_the_rest() -> void:
+	var buy := UiCommandButton.new("Buy")
+	buy.sends = true
+	var gift := UiCommandButton.new("Gift")   # opens the gift drawer: local
+	var short := UiCommandButton.new("Craft")
+	short.sends = true
+	short.reason = "Need 2 more Timber"
+	for b in [buy, gift, short]: rt.ui.root.add_child(b)
+	var fired: Array = []
+	buy.activated.connect(func(): fired.append("buy"))
+	gift.activated.connect(func(): fired.append("gift"))
+	_fail()
+	_fail()
+	assert_that([buy.text, buy.disabled, gift.text, short.text]).is_equal(["Offline", true, "Gift", "Need 2 more Timber"])
+	var built_now := UiCommandButton.new("Sell")   # a drawer refreshed while offline builds its buttons Offline too
+	built_now.sends = true
+	assert_str(built_now.text).is_equal("Offline")
+	built_now.free()
+	buy.pressed.emit()
+	gift.pressed.emit()
+	assert_array(fired).is_equal(["gift"])
+	_answer()
+	assert_that([buy.text, buy.disabled]).is_equal(["Buy", false])
+
+func test_the_offline_flag_does_not_outlive_its_ui() -> void:
+	_fail()
+	_fail()
+	assert_bool(UiCommandButton.offline).is_true()
+	remove_child(rt)
+	assert_bool(UiCommandButton.offline).is_false()
+	add_child(rt)
+
+## F-08 / §10.7.1 界面命令: the button that sent a keyed command locks at once and dims after
+## MOTION_PENDING_DELAY_MS without a reply (label kept); the reply gives it back.
+func test_a_panel_command_tracks_the_button_that_sent_it() -> void:
+	var buy := UiCommandButton.new("Buy")
+	buy.sends = true
+	rt.ui.root.add_child(buy)
+	buy.activated.connect(func(): rt.ui.command.emit({"type": "buy", "item": "seed_radish", "qty": 1}))
+	buy.pressed.emit()
+	assert_int(buy.phase).is_equal(CommandLifecycle.State.SUBMITTING)
+	assert_array(asked).contains(["/p0/commands"])
+	rt.ui.lifecycle.tick(Time.get_ticks_msec() + UiTokens.MOTION_PENDING_DELAY_MS)
+	assert_that([buy.phase, buy.text, buy.modulate.a]).is_equal([CommandLifecycle.State.PENDING, "Buy", UiTokens.OPACITY_PENDING])
+	var sent_before := asked.size()
+	buy.pressed.emit()   # a repeat tap before the result: ignored
+	assert_int(asked.size()).is_equal(sent_before)
+	rt.session._finish(HTTPRequest.RESULT_SUCCESS, 200, JSON.stringify({"ok": true, "state": {}, "events": []}).to_utf8_buffer(), {})
+	assert_int(buy.phase).is_equal(CommandLifecycle.State.IDLE)
+
+## A world action that did not go through ends the hold: no more sowing along the row on a dead line.
+func test_a_failed_world_action_ends_the_hold() -> void:
+	rt.ui.fab_held = true
+	rt.session.connection_failed.emit("Can't reach the farm server", {"type": "sow", "plots": [3]})
+	assert_bool(rt.ui.fab_held).is_false()
+
+## Which card buttons send a command (P0ItemInfo.sends): Pin, nav rows and a bag card's Gift (it opens the gift drawer)
+## stay local; the gift drawer's Gift, Equip, Eat, Sell send; unavailable ones keep their reason.
+func test_card_buttons_that_send_commands() -> void:
+	var cases := [
+		[{id = &"pin", kind = &"secondary"}, &"bag", false],
+		[{id = &"gift", kind = &"nav"}, &"bag", false],
+		[{id = &"gift", kind = &"primary"}, &"bag", false],
+		[{id = &"gift", kind = &"primary"}, &"gift", true],
+		[{id = &"equip", kind = &"primary"}, &"gear", true],
+		[{id = &"eat", kind = &"primary"}, &"bag", true],
+		[{id = &"sell", kind = &"secondary"}, &"counter_sell", true],
+		[{id = &"equipped", kind = &"unavailable"}, &"gear", false],
+	]
+	for c in cases: assert_bool(P0ItemInfo.sends(c[0], c[1])).override_failure_message(str(c)).is_equal(c[2])

@@ -59,6 +59,7 @@ static func open_new_run(ui: P0Ui, view: Dictionary, send: Callable) -> void:
 	v.add_child(UiFactRow.new(str(sheet.cost[0]), str(sheet.cost[1]), UiFactRow.Kind.COST))
 	v.add_child(UiKit.label(str(sheet.note), UiTokens.STYLE_BODY_R14))
 	var go := UiCommandButton.new(str(sheet.confirm.label), UiCommandButton.Kind.PRIMARY)
+	go.sends = true   # mine_new_run (§10.7.1 Offline)
 	var cmd: Dictionary = sheet.confirm.cmd
 	go.activated.connect(func():
 		ui.close_modal()

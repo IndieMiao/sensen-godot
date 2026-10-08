@@ -37,7 +37,9 @@ var _retry: Button
 
 func _init() -> void:
 	custom_minimum_size = Vector2(WIDTH, HEIGHT)
-	mouse_filter = Control.MOUSE_FILTER_STOP
+	# A status line that may stay up a long while (Offline): taps on it reach the scene or drawer under it; only
+	# Retry takes its own.
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var row := HBoxContainer.new()
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	row.add_theme_constant_override(&"separation", int(_GAP))

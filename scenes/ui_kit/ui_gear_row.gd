@@ -55,6 +55,7 @@ func _init(data_: Dictionary = {}) -> void:
 		var b := UiCommandButton.new(str(a.get("label", "")),
 			UiCommandButton.Kind.PRIMARY if StringName(a.get("kind", &"")) == &"primary" else UiCommandButton.Kind.SECONDARY, true)
 		if StringName(a.get("kind", &"")) == &"unavailable": b.reason = str(a.get("label", ""))
+		b.sends = bool(a.get("sends", true))   # Equip: a server command (§10.7.1 Offline)
 		b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		var id := StringName(a.get("id", &""))
 		b.activated.connect(func(): action_pressed.emit(id))

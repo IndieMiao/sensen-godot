@@ -1173,7 +1173,24 @@ const _SYS_UNDER_HUD := 2.0   # SysBanner y 100: 2 under the HUD's two rows (16 
 
 func set_offline(v: bool) -> void:
 	offline = v
+	# Every command button on screen reads `Offline` and does nothing; drawers stay open (§10.7.1).
+	UiCommandButton.set_offline(get_tree() if is_inside_tree() else null, v)
 	if is_node_ready() and not _fab_state.is_empty(): set_action(_fab_state)
+
+func _exit_tree() -> void:
+	if offline: UiCommandButton.set_offline(get_tree(), false)   # a static flag: it must not outlive this UI
+
+## Panel command lifecycle (WP7-B F-08, §10.7.1): the runtime watches the session with it. A command key that starts
+## in the same frame a sending button was pressed belongs to that button: it ignores repeat taps at once, dims after
+## MOTION_PENDING_DELAY_MS without a reply (label kept), and comes back when the command settles (8 s at most).
+var lifecycle := CommandLifecycle.new()
+
+func _init() -> void:
+	add_child(lifecycle)   # ticks SUBMITTING → PENDING; a child from the start, so a UI never added frees it too
+
+func track_pressed(key: String) -> void:
+	var b := UiCommandButton.take_pressed()
+	if b != null and is_instance_valid(b): b.track(lifecycle, key)
 
 ## The system line under the HUD (SysBanner, x 16 y 100): over the scene and over an open drawer (SYS-OFFLINE-3).
 ## `seconds` > 0 takes it down after that long (Back online 1.5 s, Didn't go through 3 s); 0 keeps it (Offline).
@@ -1873,6 +1890,7 @@ func open_rest_card() -> void:
 	if str(st.state) != "used":
 		var b := UiCommandButton.new(str(st.button) if st.can_rest else "", UiCommandButton.Kind.PRIMARY)
 		if not st.can_rest: b.reason = str(st.reason)
+		b.sends = true   # rest (§10.7.1 Offline)
 		b.activated.connect(func(): close_modal(); command.emit({"type": "rest"}))
 		v.add_child(b)
 	var bye := UiDismissButton.new(str(st.close))
@@ -2213,7 +2231,9 @@ func open_resident_request(id: String) -> void:
 		close_modal()
 		command.emit(cmd)
 		return
-	var card := UiRequestCard.new(_request_card_data(view, id, d))
+	var data := _request_card_data(view, id, d)
+	data["sends"] = not cmd.is_empty()   # Accept sends; an empty one only closes
+	var card := UiRequestCard.new(data)
 	card.theme = UiKit.theme()
 	card.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
 	card.offset_left = UiTokens.SIZE_QUICK_BAR_X

@@ -92,9 +92,14 @@ func _init() -> void:
 	session.refused.connect(_on_refused)
 	session.connection_failed.connect(func(msg: String, cmd: Dictionary):
 		_net_failed(msg)
+		# A world action that did not go through ends the hold: no more sowing along the row on a dead line; the
+		# player presses again (§10.7.1). Nothing was taken locally — the server's state is what the scene shows.
+		if not cmd.is_empty(): ui.fab_held = false
 		# The world may be waiting on that command (a cast in flight): let it recover.
 		if not cmd.is_empty(): _call("p0_event", [{"kind": "send_failed", "cmd": cmd}, session.current()]))
 	ui.sys_retry.connect(_probe)
+	ui.lifecycle.watch(session)
+	session.command_started.connect(ui.track_pressed)
 	if OS.get_environment("P0_AUTO") == "1" or FileAccess.file_exists("user://p0_auto"):
 		P0Fishing.auto_play = true
 		P0Cooking.auto_play = true
