@@ -15,6 +15,8 @@
 | 存档快照 | 每小时把存档复制成 `snapshots/p0-state-YYYYMMDDHH.json`，保留最近 48 份 | `P0_SNAPSHOT_DIR`（默认存档旁的 `snapshots/`） |
 | 健康检查 | `/v1/healthz` 返回内容版本、玩家数、运行秒数 | — |
 | 观察日志 | S7（PR #23）合入后生效，写到 `/data/events` | `P0_EVENT_DIR` |
+| 强制更新 SYS-UPDATE | `server/src/p0/gate.ts`。请求头 `x-p0-version`（演示包的 versionCode，`build_demo_apk.sh` 写进 `demo_server.json`）低于最低版本时，`/v1/p0/*` 和据点 WebSocket 握手都返回 426 `{"ok":false,"code":"update_required","url"}`。不带这个头（桌面、编辑器、测试包）一律放行。运行中用 `deploy-hk.sh min-version <versionCode> [url]` 改 | `P0_MIN_VERSION`（0 或不设 = 不拦）、`P0_UPDATE_URL` |
+| 维护 SYS-MAINT | 打开时 `/v1/p0/*`（含 presence、telemetry）和据点 WebSocket 握手都返回 503 `{"ok":false,"code":"maintenance","back_at"}`，back_at 是 UTC ISO，不知道就不写。顺序：口令 401 → 更新 426 → 维护 503 → 限流（§10.7.1 更新优先）。`/v1/healthz` 和管理口不受影响，healthz 多返回 `maintenance` 和 `min_version`。运行中用 `deploy-hk.sh maint-on [回来时间]` / `maint-off`；设置写在数据卷的 `gate.json`，容器重启后仍保持。环境变量只能更严：最低版本取两者较大者，`P0_MAINT=1` 时维护一直开着。维护期间 smoke 会失败，先 `maint-off` 再跑 | `P0_MAINT=1`、`P0_MAINT_UNTIL` |
 
 存档是一个 JSON 文件，存全部玩家，每条命令写一次（先写临时文件再改名）。演示规模够用；人数上来要换数据库，不在这次范围内。
 

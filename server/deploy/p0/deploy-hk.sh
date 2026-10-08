@@ -19,6 +19,12 @@
 #   server/deploy/p0/deploy-hk.sh players                       # player ids by join time (the name ↔ id table)
 #   server/deploy/p0/deploy-hk.sh energy <player id> <value>     # F1: set one player's Energy (day-4 revisit, ~80)
 #   server/deploy/p0/deploy-hk.sh report <player id> [YYYY-MM-DD] # F2: that player's session report + the day's lines
+# SYS-MAINT / SYS-UPDATE (gate.ts; kept in the data volume, so a restart keeps them; healthz and admin stay open):
+#   server/deploy/p0/deploy-hk.sh maint-on [back at]             # every /v1/p0 request answers 503 maintenance; back at =
+#                                                                #   any time, e.g. 2026-10-09T23:30+08:00 (sent as UTC ISO)
+#   server/deploy/p0/deploy-hk.sh maint-off                      # back to normal (then run smoke)
+#   server/deploy/p0/deploy-hk.sh min-version <versionCode> [url] # older clients (x-p0-version) get 426 update_required
+#   server/deploy/p0/deploy-hk.sh gate                           # what is in force
 #
 # The access key: P0_KEY=… in the environment, else output/p0-deploy/key; the admin key likewise P0_ADMIN_KEY or
 # output/p0-deploy/admin-key (both created once with openssl, never committed).
@@ -187,6 +193,27 @@ PY
     [[ "$value" =~ ^[0-9]{1,4}$ ]] || { echo "value must be a whole number: $value"; exit 2; }
     say "F1: Energy of $player → $value (logged in the container log as an admin line)"
     admin /admin/energy "{\"player\":\"$player\",\"value\":$value}" | tee -a "$out/admin.txt"; echo
+    ;;
+  maint-on)
+    back="${1:-}"
+    [[ -z "$back" || "$back" =~ ^[0-9T:.+Z-]{10,32}$ ]] || { echo "back at must be a time like 2026-10-09T23:30+08:00: $back"; exit 2; }
+    say "maintenance ON${back:+ (back at $back)}: every /v1/p0 request answers 503 maintenance; healthz and admin stay open"
+    if [ -n "$back" ]; then admin /admin/maintenance "{\"on\":true,\"back_at\":\"$back\"}"; else admin /admin/maintenance '{"on":true}'; fi | tee -a "$out/admin.txt"; echo
+    ;;
+  maint-off)
+    say "maintenance OFF (run smoke next)"
+    admin /admin/maintenance '{"on":false}' | tee -a "$out/admin.txt"; echo
+    ;;
+  min-version)
+    v="${1:?min-version <versionCode> [download url]}"; url="${2:-}"
+    [[ "$v" =~ ^[0-9]{1,10}$ ]] || { echo "versionCode must be a whole number: $v"; exit 2; }
+    re_url='^https://[A-Za-z0-9./:_~%?=&-]+$'   # no quotes or spaces: it goes into the JSON body as is
+    [[ -z "$url" || "$url" =~ $re_url ]] || { echo "url must be an https link: $url"; exit 2; }
+    say "minimum client versionCode $v${url:+ (update at $url)}; 0 = no minimum"
+    if [ -n "$url" ]; then admin /admin/min-version "{\"version\":$v,\"url\":\"$url\"}"; else admin /admin/min-version "{\"version\":$v}"; fi | tee -a "$out/admin.txt"; echo
+    ;;
+  gate)
+    admin /admin/gate; echo
     ;;
   report)
     player="${1:?report <player id> [YYYY-MM-DD]}"; day="${2:-$(date -u +%Y-%m-%d)}"

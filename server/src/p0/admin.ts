@@ -8,10 +8,11 @@
  */
 import type { FastifyInstance } from 'fastify';
 import type { P0Content } from './content.js';
+import { isoMinute, type P0Gate } from './gate.js';
 import { maxEnergy, settleEnergy } from './rules.js';
 import type { P0Store } from './store.js';
 
-export interface P0AdminDeps { content: P0Content; store: P0Store; now: () => number; key: string; log?: (line: string) => void }
+export interface P0AdminDeps { content: P0Content; store: P0Store; now: () => number; key: string; log?: (line: string) => void; gate?: P0Gate }
 
 export function registerP0Admin(app: FastifyInstance, deps: P0AdminDeps): void {
   if (!deps.key) throw new Error('P0 admin needs P0_ADMIN_KEY');
@@ -45,5 +46,33 @@ export function registerP0Admin(app: FastifyInstance, deps: P0AdminDeps): void {
     store.put(s);
     log(JSON.stringify({ admin: 'energy', player: s.player, from, to: value, max: maxEnergy(c, s), at: deps.now() }));
     return { ok: true, player: s.player, from, to: value, max: maxEnergy(c, s) };
+  });
+
+  const gate = deps.gate;
+  if (!gate) return;
+  /** SYS-UPDATE / SYS-MAINT settings now in force (gate.ts). */
+  app.get('/admin/gate', async () => ({ ok: true, ...gate.state() }));
+
+  /** Maintenance on ({on:true, back_at?: ISO}) or off ({on:false}); persists across restarts (deploy-hk.sh maint-on / maint-off). */
+  app.post('/admin/maintenance', async (req, reply) => {
+    const body = (req.body ?? {}) as { on?: unknown; back_at?: unknown };
+    if (typeof body.on !== 'boolean') return reply.code(400).send({ ok: false, code: 'bad_value' });
+    if (body.back_at !== undefined && body.back_at !== null && body.back_at !== '' && !isoMinute(body.back_at)) {
+      return reply.code(400).send({ ok: false, code: 'bad_back_at' });
+    }
+    const st = gate.setMaintenance(body.on, typeof body.back_at === 'string' ? body.back_at : undefined);
+    log(JSON.stringify({ admin: 'maintenance', ...st.maintenance, at: deps.now() }));
+    return { ok: true, ...st };
+  });
+
+  /** The lowest client versionCode served ({version: 0 = no minimum, url?: download page}). */
+  app.post('/admin/min-version', async (req, reply) => {
+    const body = (req.body ?? {}) as { version?: unknown; url?: unknown };
+    const version = Number(body.version);
+    if (!Number.isInteger(version) || version < 0) return reply.code(400).send({ ok: false, code: 'bad_value' });
+    if (body.url !== undefined && typeof body.url !== 'string') return reply.code(400).send({ ok: false, code: 'bad_url' });
+    const st = gate.setMinVersion(version, body.url as string | undefined);
+    log(JSON.stringify({ admin: 'min_version', min_version: st.min_version, update_url: st.update_url, at: deps.now() }));
+    return { ok: true, ...st };
   });
 }
