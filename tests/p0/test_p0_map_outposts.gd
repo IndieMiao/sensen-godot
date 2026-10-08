@@ -389,3 +389,33 @@ func test_the_selected_pin_draws_over_pins_made_after_it() -> void:
 	for mk in city.markers.values(): top = maxi(top, (mk.node as Node).get_index())
 	assert_int((city.markers["sh_market_1"].node as Node).get_index()).is_equal(top)
 	city.selected = {}
+
+## 不知火舞 on 234 A2: the selected pin's name always shows and the names it touches fold — a marked pin's too — until
+## the card closes; every pin stays.
+func test_a_selected_name_folds_the_names_it_touches() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved: Dictionary = rt.session.view
+	rt.session.view = _board(0)   # Reed Pond wears the !
+	var city: CityMapView = m.city_map
+	var reed := SystemPonds.location(NEAREST_POND)
+	var at := Vector2(float(reed.lat), float(reed.lng))
+	var home: Dictionary = m.home_entry().merged({"lat": at.x - 0.0002, "lng": at.y}, true)   # 22 m south of it
+	city.set_places(P0Outposts.all().map(func(o): return P0Outposts.place_entry(o)) + [home])
+	_look(m, at, 15.0, 0.0)
+	var reed_pin: UiMapDestination = city.markers[NEAREST_POND].dest
+	var home_pin: UiMapDestination = city.markers["home"].dest
+	assert_bool(reed_pin.name_shown).is_true()    # nothing selected: the marked pin packs first
+	assert_bool(home_pin.name_shown).is_false()
+	city.selected = city.entries.filter(func(e): return str(e.get("id", "")) == "home")[0]
+	_look(m, at, 15.0, 0.0)
+	assert_bool(home_pin.name_shown).is_true()
+	assert_bool(reed_pin.name_shown).is_false()
+	assert_array(city.displayed.map(func(mk): return str(mk.entry.id))).contains([NEAREST_POND, "home"])
+	city.selected = {}
+	_look(m, at, 15.0, 0.0)
+	assert_bool(reed_pin.name_shown).is_true()
+	m._set_outpost_places()
+	rt.session.view = saved

@@ -69,7 +69,11 @@ func test_place_cards_follow_q80() -> void:
 	assert_str(rt.ui.modal_kind).is_equal("place_card")
 	assert_str(_primary(rt)).is_equal("Back to Homestead")
 	assert_array(_facts(rt)).is_empty()
+	m.p0_frame(rt.session.view, 0.0)
+	assert_bool(city.recenter.visible).is_false()   # the recenter key gives way to the sheet (不知火舞 on 234 A2)
 	await _close(rt)
+	m.p0_frame(rt.session.view, 0.0)
+	assert_bool(city.recenter.visible).is_true()
 	var tea := P0Outposts.by_role("tea")
 	rt.here = {"space": "outpost", "place": str(tea.id)}
 	m._sync_here()
@@ -183,8 +187,9 @@ func test_a_room_on_the_empty_boot_leaves_for_the_map() -> void:
 	assert_bool(P0Runtime.room_leaves_for_map(1, true)).is_false()    # farmhouse on the farm root, or a room on the map
 	assert_bool(P0Runtime.room_leaves_for_map(2, false)).is_false()   # farmhouse on a farm on the boot
 
-## 不知火舞 on 234: opening the map frames the home set — the own avatar, each role's outpost nearest home and the
-## marked pins (the first session's Reed Pond), labels included — in the safe frame, as close as z12–16 allows.
+## 不知火舞 on 234 / A2: opening the map frames the home set in z13.5–16, labels included, in the safe frame — the own
+## avatar and the marked pins (the first session's Reed Pond) always, then each role's outpost nearest home, nearest
+## the avatar first, while z13.5 holds them all.
 func _board(have: int) -> Dictionary:
 	var reqs: Array = [] if have < 0 else [{"id": P0Guide.TUTORIAL, "have": have, "qty": 2}]
 	return {"stall": {"board": {"requests": reqs}}}
@@ -195,27 +200,36 @@ func test_the_opening_view_frames_the_home_set() -> void:
 	m.set_process(false)
 	var rt: P0Runtime = m.rt
 	var saved: Dictionary = rt.session.view
-	var zooms := {}
+	var safe: Rect2 = m.frame_safe_rect()
+	var id_of := func(it): return str(it.get("id", "self"))
 	for phase in [[0, "first"], [-1, "after"]]:
 		rt.session.view = _board(int(phase[0]))
 		m.frame_home_set()
-		var items: Array = m.home_set_items()
-		var ids: Array = items.map(func(it): return str(it.get("id", "self")))
-		assert_array(ids).contains(["self", "sh_tea_1", "sh_market_1", "sh_tackle_1", "sh_post_1"])
-		assert_bool(ids.has("pond_shanghai_05")).is_equal(phase[1] == "first")   # Reed Pond while it wears the !
-		assert_float(m.zoom).is_between(12.0, 16.0)
-		var safe: Rect2 = m.frame_safe_rect()
-		var box: Rect2 = m._frame_box(items)
+		var framed: Array = m.framed
+		var z: float = m.zoom
+		var at := Vector2(m.center_lat, m.center_lng)
+		var ids: Array = framed.map(id_of)
+		assert_bool(ids.has("self")).is_true()
+		assert_bool(ids.has("pond_shanghai_05")).is_equal(phase[1] == "first")   # the marked pin always goes in
+		assert_float(m.zoom).append_failure_message(phase[1]).is_between(13.5, 16.0)
+		var box: Rect2 = m._frame_box(framed)
 		assert_bool(safe.grow(0.5).encloses(box)).append_failure_message("%s: %s in %s at z%.1f" % [phase[1], box, safe, m.zoom]).is_true()
-		zooms[phase[1]] = m.zoom
+		# The home set goes in nearest the avatar first and stops at the first that z13.5 cannot hold with the rest.
+		var must: int = m.frame_must().size()
+		var optional: Array = m.frame_optional()
+		var n := framed.size() - must
+		assert_array(framed.slice(must).map(id_of)).is_equal(optional.slice(0, n).map(id_of))
+		if n < optional.size(): assert_dict(m._fit(framed + [optional[n]], safe)).is_empty()   # (moves the camera)
+		if phase[1] == "first":   # the first session (不知火舞 on 234 A2): the far Travel Post stays offscreen
+			assert_bool(ids.has("sh_post_1")).is_false()
+			assert_array(ids).contains(["sh_tea_1", "sh_market_1", "sh_tackle_1"])
 		# The smallest such view: a tenth closer, the set no longer fits wherever it is centred.
 		var fits_closer := false
-		var z: float = m.zoom
 		if z + 0.1 <= 16.0:
-			m._look(Vector2(m.center_lat, m.center_lng), z + 0.1)
+			m._look(at, z + 0.1)
 			for k in 3:
-				var b: Rect2 = m._frame_box(items)
+				var b: Rect2 = m._frame_box(framed)
 				m._pan_by(safe.get_center() - b.get_center())
-			fits_closer = safe.encloses(m._frame_box(items))
+			fits_closer = safe.encloses(m._frame_box(framed))
 		assert_bool(fits_closer).append_failure_message(phase[1]).is_false()
 	rt.session.view = saved

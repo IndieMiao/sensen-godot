@@ -402,13 +402,18 @@ func _on_city_visit_requested(farm_id: String) -> void:
 	else: super._on_city_visit_requested(farm_id)
 
 # ---------------------------------------------------------------- the opening view (MAP-1, 不知火舞 on 234)
-## Opening the map frames the home set: the smallest view in z12–16 holding the player's own avatar, each role's
-## outpost nearest home and every pin wearing a marker (the first session's Reed Pond), labels and all, inside the
-## safe frame — under the HUD's second row + 16, over Bag − 16, 16 from the sides. Not even z12 holds them: z12 on the
-## avatar. Recenter keeps the zoom; Show on map and the camera kept on return are unchanged.
+## Opening the map frames the home set (MAP-1; 不知火舞 on 234 A2): a view in z13.5–16, labels and all inside the safe
+## frame — under the HUD's second row + 16, over Bag − 16, 16 from the sides. The avatar and every pin wearing a marker
+## (the first session's Reed Pond) always go in; then the home set — each role's outpost nearest home, and away from
+## home the Homestead pin — nearest the avatar first, each while the view still holds them all at z13.5: the first that
+## would not stays offscreen, and so do the farther ones. At z13.5 outposts of different roles (300 m apart at least)
+## never cover each other whole. Not even the must-haves fit: z13.5 on the avatar. Recenter keeps the zoom; Show on
+## map and the camera kept on return are unchanged.
 const FRAME_ZOOM_MAX := 16.0
-const FRAME_ZOOM_MIN := 12.0
+const FRAME_ZOOM_MIN := 13.5
 const FRAME_PAD := 16.0
+## What the last opening view holds (frame_home_set).
+var framed: Array = []
 
 func _frame_home() -> void:
 	# A farm booted as the root scene (the first session lands on the farm, q(44)) leaves by swapping the root for a
@@ -418,41 +423,68 @@ func _frame_home() -> void:
 
 func frame_home_set() -> void:
 	if city_map == null or city_map.size.y <= 0.0 or not is_inside_tree(): return
-	var items := home_set_items()
 	var safe := frame_safe_rect()
+	var chosen := frame_must()
+	var view := _fit(chosen, safe)
+	if not view.is_empty():
+		for it in frame_optional():
+			var more := _fit(chosen + [it], safe)
+			if more.is_empty(): break   # the nearest that does not fit: it and the farther ones stay offscreen
+			chosen.append(it)
+			view = more
+	framed = chosen
+	if view.is_empty(): _look(_origin(), FRAME_ZOOM_MIN)
+	else: _look(view.at, float(view.z))
+	_update_cameras()   # the trials moved only the Godot camera: now the map, pawns and markers follow
+
+## The smallest view in z13.5–16 holding `items` inside `safe`, centred on them: {at, z}; {} when z13.5 does not hold
+## them. Trials move the Godot camera only (刘邦 on #92).
+func _fit(items: Array, safe: Rect2) -> Dictionary:
 	var mid := Vector2.ZERO
 	for it in items: mid += Vector2(float(it.lat), float(it.lng))
 	mid /= maxf(1.0, items.size())
 	var steps := int(round((FRAME_ZOOM_MAX - FRAME_ZOOM_MIN) * 10.0))
+	var at := mid
 	for i in steps + 1:
-		_look(mid, FRAME_ZOOM_MAX - i * 0.1)
-		for k in 3:   # centre the set in the frame: with the map's pitch its middle is not the screen's
+		_look(at, FRAME_ZOOM_MAX - i * 0.1)
+		for k in 4:   # centre the set in the frame: with the map's pitch its middle is not the screen's
 			var box := _frame_box(items)
 			var shift := safe.get_center() - box.get_center()
 			if shift.length() < 1.0: break
 			_pan_by(shift)
-		if safe.encloses(_frame_box(items)):
-			_update_cameras()   # the trials moved only the Godot camera: now the map, pawns and markers follow
-			return
-	_look(Vector2(home_lat, home_lng), FRAME_ZOOM_MIN)
-	_update_cameras()
+		if safe.encloses(_frame_box(items)): return {"at": Vector2(center_lat, center_lng), "z": zoom}
+		at = Vector2(center_lat, center_lng)   # the next tenth starts centred where this one ended
+	return {}
 
-## What the opening view must hold: {lat, lng, rect} — the own avatar, the home set's outposts, the marked pins.
-func home_set_items() -> Array:
+## What the opening view always holds: the own avatar (where the player is) and every pin wearing a marker.
+func frame_must() -> Array:
 	var at := _origin()
 	var out: Array = [{lat = at.x, lng = at.y, self_pin = true, shift = avatar_shift()}]
-	if away(): out.append(home_entry())
+	var marked := city_pin_markers()
+	for e in city_map.entries:
+		if marked.has(str(e.get("id", ""))): out.append((e as Dictionary).merged({marker = marked[str(e.id)]}, true))
+	return out
+
+## The home set it adds while they fit, nearest the avatar first: each role's outpost nearest home, and away from home
+## the Homestead pin; pins already in frame_must are not repeated.
+func frame_optional() -> Array:
 	var nearest := {}   # role -> outpost
 	for o in P0Outposts.all():
 		var e := P0Outposts.place_entry(o, int(_online.get(str(o.id), 0)))
 		var r := str(o.role)
 		if not nearest.has(r) or city_map._home_distance(e) < city_map._home_distance(nearest[r]): nearest[r] = e
-	out.append_array(nearest.values())
-	var marked := city_pin_markers()
-	for e in city_map.entries:
-		if marked.has(str(e.get("id", ""))) and not out.any(func(x): return str(x.get("id", "")) == str(e.id)):
-			out.append((e as Dictionary).merged({marker = marked[str(e.id)]}, true))
+	var out: Array = nearest.values()
+	if away(): out.append(home_entry())
+	var must := frame_must().map(func(x): return str(x.get("id", "")))
+	out = out.filter(func(x): return not must.has(str(x.get("id", ""))))
+	var at := _origin()
+	out.sort_custom(func(a, b): return P0PlaceSheet.km_between(at, Vector2(float(a.lat), float(a.lng))) \
+		< P0PlaceSheet.km_between(at, Vector2(float(b.lat), float(b.lng))))
 	return out
+
+## Every pin the opening view may hold: frame_must, then frame_optional in the order they are tried.
+func home_set_items() -> Array:
+	return frame_must() + frame_optional()
 
 ## The safe frame in screen space: under the HUD's second row + 16, over Bag − 16, 16 from the sides.
 func frame_safe_rect() -> Rect2:
@@ -572,6 +604,9 @@ func p0_surface() -> String: return "map"
 func p0_frame(view: Dictionary, _dt: float) -> void:
 	if city_map == null: return
 	_sync_here()
+	# The recenter key gives way to an open sheet (不知火舞 on 234 A2: it showed under the card's ×).
+	var key_shown := not rt.ui.has_modal()
+	if city_map.recenter.visible != key_shown: city_map.recenter.visible = key_shown
 	var list := pin_marks(view)
 	var home := home_mark(view)
 	# Away, the homestead's ✓ hangs on its pin (deliverable, the highest mark, so first); at home on the avatar.
