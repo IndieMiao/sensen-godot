@@ -32,7 +32,7 @@ static func all() -> Array[Dictionary]:
 		{id = "pin_menu", title = "UiPinMenu", figma = "PinMenu 1141:80291 · LOCK-05", build = _pin_menus},
 		{id = "scene_action", title = "UiSceneAction", figma = "SceneAction 1116:78934 · LOCK-02", build = _scene_actions},
 		{id = "action_key", title = "UiActionKey", figma = "ActionKey 1117:78924 · LOCK-02 / 03", build = _action_keys},
-		{id = "bar_remove_zone", title = "UiBarRemoveZone · UiUndoToast", figma = "BarRemoveZone 1588:97952 · Toast Tone=Info 1178:82247 · BAR-DRAG-3 / 4 · LOCK-04 / 05 v1.10", build = _bar_remove_zone},
+		{id = "bar_drop_zone", title = "UiBarDropZone · UiUndoToast", figma = "BarDropZone 1588:97952 · Toast Tone=Info 1178:82247 · LOCK-04 / 05 v1.11 (221 b0a83924)", build = _bar_drop_zones},
 		{id = "action_radial", title = "UiActionRadial", figma = "RadialPetal 1122:79385 · BAR-2 482:23 · LOCK-03", build = _action_radial},
 		{id = "status_badge", title = "UiStatusBadge", figma = "StatusBadge 1132:79554 · LOCK-11", build = _status_badges},
 		{id = "tap_card", title = "UiTapCard", figma = "TapCard 1135:101133 · LOCK-07", build = _tap_cards},
@@ -503,20 +503,22 @@ static func _bar_slots() -> Array:
 		{id = "seed_potato", icon = _tex("seed_potato"), title = "Potato Seeds", quantity = 3},
 	]
 
-static func _bar_remove_zone() -> Control:
+static func _bar_drop_zones() -> Control:
 	var v := _column(UiTokens.SPACE_SECTION)
-	var row := _row(UiTokens.SPACE_ROW)
+	var K := UiBarDropZone.Kind
 	for hover in [false, true]:
-		var host := ColorRect.new()   # over a scene-grey backdrop: on the gallery's surface the zone's own surface vanishes
-		host.color = UiKit.alpha(UiTokens.COLOR_TEXT, UiTokens.OPACITY_SCRIM_MODAL)
-		host.custom_minimum_size = Vector2(150, 120)
-		var z := UiBarRemoveZone.new()
-		z.top_level = false   # drawn in the gallery cell, not at its screen spot
-		z.hover = hover
-		host.add_child(z)
-		z.center = Vector2(75, 46)
-		row.add_child(_captioned(host, "hover · Release to remove" if hover else "idle · Remove from bar"))
-	v.add_child(row)
+		var row := ColorRect.new()   # over a scene-grey backdrop: on the gallery's surface the zones' own surface vanishes
+		row.color = UiKit.alpha(UiTokens.COLOR_TEXT, UiTokens.OPACITY_SCRIM_MODAL)
+		row.custom_minimum_size = Vector2(328, 116)
+		var x := 56.0
+		for k in [K.PIN, K.UNPIN, K.REMOVE]:
+			var z := UiBarDropZone.new(k)
+			z.top_level = false   # drawn in the gallery row, not at its screen spot
+			z.hover = hover
+			row.add_child(z)
+			z.center = Vector2(x, 42)
+			x += 108.0
+		v.add_child(_captioned(row, "hover · Release to pin / unpin / remove" if hover else "idle · Pin · Unpin · Remove"))
 	v.add_child(_captioned(UiUndoToast.new("Radish Seeds off the bar"), "removed: Info toast with Undo (5 s)"))
 	return v
 

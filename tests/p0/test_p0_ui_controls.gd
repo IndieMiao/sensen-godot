@@ -94,7 +94,6 @@ func test_pins_and_removals_persist_per_action() -> void:
 	ui.set_view(_view())
 	ui._on_pin_toggled("seed_lettuce", true)
 	assert_bool(ui._bar.slots[1].pinned).is_true()
-	assert_object(ui._pin_menu).is_not_null()
 	ui._on_slot_removed("seed_radish")
 	# LOCK-05 v1.10 (BAR-DRAG-4): the slot stays a gap in place, nothing refills it.
 	assert_array(ui._bar.slots.map(func(s): return s.get("id", ""))).is_equal(["", "seed_lettuce"])
@@ -117,12 +116,14 @@ func test_removing_a_slot_offers_undo_which_restores_place_and_pin() -> void:
 	assert_array(ui._bar.slots.map(func(s): return s.get("id", ""))).is_equal(["seed_radish", "seed_lettuce"])
 	assert_bool(ui._bar.slots[0].pinned).is_true()
 
-func test_a_swap_shows_the_pin_menu_over_the_slot_it_landed_on() -> void:
+func test_a_swap_moves_places_only_and_pins_follow_their_items() -> void:
+	# LOCK-05 v1.11 (221 b0a83924): no auto-pin, no PinMenu.
 	ui.set_view(_view())
+	ui._on_pin_toggled("seed_radish", true)
 	ui._on_slots_swapped(0, 1)
 	assert_array(ui._bar.slots.map(func(s): return s.id)).is_equal(["seed_lettuce", "seed_radish"])
-	assert_object(ui._pin_menu).is_not_null()
-	assert_bool(ui._pin_menu.pinned).is_true()
+	assert_bool(ui._bar.slots[0].pinned).is_false()
+	assert_bool(ui._bar.slots[1].pinned).is_true()
 
 func test_opening_a_drawer_cancels_a_slot_drag() -> void:
 	ui.set_view(_view())

@@ -133,6 +133,16 @@ func _emit(outcomes: Array) -> void:
 		if g.has("pos"): g.pos = get_global_transform() * (g.pos as Vector2)
 		gesture.emit(g)
 
+## QuickSlot pin badge pop after a pin toggle on the Pin zone (LOCK-05 v1.11): 1 → 1.3 → 1 over 300 ms.
+const _PIN_POP := 1.3
+const _PIN_POP_MS := 300.0
+func pop_pin() -> void:
+	if _badge == null or not _badge.visible: return
+	_badge.pivot_offset = _badge.size * 0.5
+	var t := _badge.create_tween()
+	t.tween_property(_badge, ^"scale", Vector2.ONE * _PIN_POP, UiKit.secs(_PIN_POP_MS * 0.5)).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	t.tween_property(_badge, ^"scale", Vector2.ONE, UiKit.secs(_PIN_POP_MS * 0.5)).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+
 ## The state actually drawn: the extra QuickSlot states fall back to DEFAULT (GHOST to EMPTY) on the other mains.
 func drawn_state() -> State:
 	if density != Density.QUICK and state in [State.LIFTED, State.DROP_TARGET, State.ZERO]: return State.DEFAULT

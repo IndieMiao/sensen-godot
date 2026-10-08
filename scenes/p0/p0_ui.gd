@@ -52,7 +52,6 @@ var _kit: Control
 var _bar: UiQuickBar
 var _keys: UiActionKey
 var _radial: UiActionRadial
-var _pin_menu: UiPinMenu
 var _undo_toast: UiUndoToast
 var _cards := {}          # id -> UiTapCard
 var _card_hits := {}      # id -> screen point a tap on the card forwards to the world (the facility's own tap point)
@@ -320,7 +319,7 @@ func set_surface(name: String) -> void:
 	_bar.bag_only = not action
 	_bar_sig = []
 	if _radial.visible: _radial.close()
-	_close_pin_menu()   # no PinMenu left over when fishing starts or the map opens (PR #12 review)
+	_bar.cancel_drag()   # no lifted slot or drop zones left over when fishing starts or the map opens
 	_creel.visible = action and bar_mode == "fish"
 	if _dev_box: _dev_box.visible = world
 	for c in _cards.values(): (c as Control).visible = false
@@ -417,9 +416,9 @@ func _on_slot_tapped(id: String) -> void:
 		seed_selected.emit(selected_seed)
 	_refresh_bar()
 
+## Dropped on the Pin / Unpin zone (LOCK-05 v1.11): the pin flips; the bar pops the badge, no PinMenu, no toast.
 func _on_pin_toggled(id: String, pinned: bool) -> void:
 	_set_pin(id, pinned)
-	_show_pin_menu(id, pinned)
 
 func _set_pin(id: String, pinned: bool) -> void:
 	var store := _quick_for(bar_mode)
@@ -430,20 +429,15 @@ func _set_pin(id: String, pinned: bool) -> void:
 	_save_quick()
 	_refresh_bar()
 
-## Drag onto another slot: the two swap places, both become pinned, and the PinMenu (Pinned=yes · Unpin) shows
-## over the slot it landed on (§10.3.4, LOCK-05 v1.10 BAR-DRAG-5). Onto a gap it simply moves there.
+## Drag onto another slot: the two swap places only; pins follow their items, nothing is pinned by it and no menu
+## shows (LOCK-05 v1.11, 221 b0a83924). Onto a gap it simply moves there.
 func _on_slots_swapped(a: int, b: int) -> void:
 	while _bar_ids.size() <= maxi(a, b): _bar_ids.append("")
 	var t = _bar_ids[a]
 	_bar_ids[a] = _bar_ids[b]
 	_bar_ids[b] = t
-	var store := _quick_for(bar_mode)
-	for id in [_bar_ids[a], _bar_ids[b]]:
-		if str(id) != "" and not store.pins.has(id): store.pins.append(id)
 	_save_quick()
 	_refresh_bar()
-	var landed := str(_bar_ids[b]) if b < _bar_ids.size() else ""
-	if landed != "": _show_pin_menu(landed, true)
 
 ## Dropped on the remove zone: off the bar, still in the Bag (§10.3.4); its slot stays a gap, nothing refills it
 ## (LOCK-05 v1.10 BAR-DRAG-4), and an Info toast `<Item> off the bar · Undo` (5 s) puts it back, pin and place.
@@ -481,27 +475,6 @@ func _undo_remove(was: Dictionary) -> void:
 	_save_quick()
 	_bar_sig = []
 	_refresh_bar()
-
-## PinMenu over the slot a long press just toggled (LOCK-05): the new state and the reverse in one tap.
-func _show_pin_menu(id: String, pinned: bool) -> void:
-	if _pin_menu: _pin_menu.queue_free()
-	_pin_menu = UiPinMenu.new(pinned)
-	_kit.add_child(_pin_menu)
-	var i := _bar_ids.find(id)
-	var cell := _bar.cells()[clampi(i, 0, UiQuickBar.SLOTS - 1)]
-	var tip := cell.get_global_rect().get_center().x - _kit.global_position.x
-	var size := _pin_menu.get_combined_minimum_size()
-	var x := clampf(tip - UiPinMenu.POINTER_TIP_X, UiTokens.SPACE_PAGE, _kit.size.x - UiTokens.SPACE_PAGE - size.x)
-	_pin_menu.position = Vector2(x, _bar.position.y - size.y - UiTokens.SPACE_WITHIN)
-	_pin_menu.pointer_x = tip - x - UiTokens.SIZE_POINTER_W * 0.5
-	_pin_menu.toggled.connect(func():
-		_set_pin(id, not pinned)
-		_close_pin_menu())
-	_pin_menu.dismissed.connect(_close_pin_menu)
-
-func _close_pin_menu() -> void:
-	if _pin_menu: _pin_menu.queue_free()
-	_pin_menu = null
 
 func _quick_for(mode: String) -> Dictionary:
 	if not _quick.has(mode): _quick[mode] = {pins = [], removed = []}
@@ -683,7 +656,6 @@ func _open_modal(content: Control, dim := 0.32, hide_controls := false) -> void:
 		_keys.visible = false
 		_fab_pills.visible = false
 		_bar.visible = false
-	_close_pin_menu()
 
 ## Bottom system inset (gesture bar, rounded corners) in UI units; 0 on desktop.
 func safe_bottom() -> float:
@@ -1370,7 +1342,7 @@ func open_radial() -> void:
 	if _modal != null:
 		close_modal()
 		return
-	_close_pin_menu()
+	_bar.cancel_drag()
 	var options := []
 	for it in [["farm", "hoe", "Farming", "No plots here"], ["fish", "fish", "Fishing", "No water nearby"],
 			["mine", "pickaxe", "Mining", "Enter the mine"], ["combat", "sword", "Combat", "Mine floors 3–5"]]:
