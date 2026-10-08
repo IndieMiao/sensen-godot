@@ -131,7 +131,7 @@ static func plaque(ui: P0Ui) -> void:
 	holder.add_child(close)
 	panel.resized.connect(func():
 		close.position = Vector2(panel.size.x - 16 - UiTokens.SIZE_CLOSE, panel.position.y - 6 - UiTokens.SIZE_CLOSE))
-	ui._open_modal(holder, 0.0, false)
+	ui._open_modal(holder, 0.0, true)   # like HOME-1: the main key and quick bar step aside (the frame has neither)
 	ui.modal_kind = "plaque"
 
 ## HOME-2: the MomentBanner (Kind=LevelUp: gold accent and level disc) under the HUD for MOMENT_S, gone on a
