@@ -154,7 +154,7 @@ func _ready() -> void:
 	_toast.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_toast.hide()
 	root.add_child(_toast)
-	if OS.is_debug_build(): _build_dev()
+	if dev_tools_on(OS.is_debug_build(), P0Session.is_demo_build()): _build_dev()
 	if _pending.has("mode"): set_mode(_pending.mode)
 	if _pending.has("place"): set_place(_pending.place)
 	set_surface(_pending.get("surface", surface))
@@ -293,6 +293,11 @@ func _place_controls() -> void:
 	_fab_pills.offset_left = -UiTokens.SPACE_PAGE - 1
 	_fab_pills.offset_bottom = -pills_bottom
 	_fab_pills.offset_top = -pills_bottom - 32
+
+## The +1h / +4h clock buttons: test builds only. The demo APK is a debug export too, but its server has no dev
+## routes (P0_DEV=0, dev/skip is 404) and the buttons covered the Toast's end (李元芳, int6), so it has none.
+static func dev_tools_on(debug_build: bool, demo_build: bool) -> bool:
+	return debug_build and not demo_build
 
 func _build_dev() -> void:
 	var box := HBoxContainer.new()

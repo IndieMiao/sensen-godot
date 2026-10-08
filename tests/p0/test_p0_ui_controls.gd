@@ -405,3 +405,10 @@ func test_free_to_do_now_opens_today_with_the_free_list() -> void:
 	var labels := ui._modal.find_children("*", "Label", true, false).map(func(l): return (l as Label).text)
 	assert_that(labels).contains(["Harvest 1 ready", "Browse the map"])
 	ui.close_modal()
+
+## SGODOT-232 D2: the demo APK is a debug export that carries the demo server config; it gets no +1h / +4h buttons
+## (李元芳 int6: they covered the Toast's end, and the demo server has no dev routes anyway).
+func test_the_clock_buttons_are_for_test_builds_only() -> void:
+	assert_bool(P0Ui.dev_tools_on(true, false)).is_true()     # a test build (android_p0.sh, the editor)
+	assert_bool(P0Ui.dev_tools_on(true, true)).is_false()     # the demo APK (build_demo_apk.sh)
+	assert_bool(P0Ui.dev_tools_on(false, false)).is_false()   # a release export
