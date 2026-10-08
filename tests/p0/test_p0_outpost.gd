@@ -56,7 +56,7 @@ func test_each_outpost_opens_with_its_keeper_and_residents() -> void:
 		assert_str(r.place_name).is_equal(str(P0Outposts.find(id).name))
 		assert_array(r.npcs.keys()).override_failure_message(id).contains_exactly_in_any_order(expected[id])
 		assert_float(P0Room._flat_distance(r.actor.position, r.anchor("spawn").global_position)).is_less(0.2)
-		assert_str(r.exit_text).is_equal("Exit · Back to map" if id == "sh_market_1" else "Door · Back to map")
+		assert_str(r.exit_to).is_equal("Map")   # the door's world prompt: i-door + Map
 	assert_str(str(_room("sh_tackle_1").npcs.npc_keeper.name)).is_equal("Finn")
 	assert_str(_room("sh_tea_1").p0_place()).is_equal("sh_tea_1")   # space "outpost", place = the outpost id
 	assert_str(P0Runtime.space_of(_room("sh_tea_1"))).is_equal("outpost")
@@ -460,3 +460,15 @@ func test_residents_facilities_and_doors_are_walked_to() -> void:
 		r.walk_to("exit")
 		_walk_until_idle(r, 10.0)
 		assert_int(left[0]).override_failure_message(id).is_equal(1)
+
+## SGODOT-235 (LOCK-07 v1 retired with UiTapCard, 不知火舞 on 235): every marker an outpost room hangs is a world prompt
+## with a kind — npc, seat or facility — never a text finger card; the door is i-door + Map.
+func test_every_outpost_marker_is_a_world_prompt() -> void:
+	for o in P0Outposts.all():
+		var r := _room(str(o.id))
+		for n in r._tappable():
+			var m: Dictionary = r._marker(n, {})
+			if m.is_empty(): continue
+			assert_str(str(m.get("kind", ""))).override_failure_message("%s %s" % [o.id, n]).is_not_empty()
+			assert_bool(m.has("text")).override_failure_message("%s %s" % [o.id, n]).is_false()
+		assert_str(str(r._marker("exit", {}).get("name", ""))).is_equal("Map")

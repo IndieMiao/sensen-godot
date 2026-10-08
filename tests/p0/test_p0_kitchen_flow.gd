@@ -119,7 +119,7 @@ func test_a_level_up_in_the_same_reply_waits_behind_the_result_card() -> void:
 	assert_str(k.phase).is_equal("idle")
 
 func test_the_tab_asked_for_is_the_tab_that_opens() -> void:
-	# The rack's Open Experiment ›, the Energy card's Cook and ui.open_kitchen(tab) walk to the stove; arriving used to
+	# The rack's Open Experiment › and the Energy card's Cook walk to the stove; arriving used to
 	# open Cookbook (or Cook Again) first and then drop the tab.
 	var r := await _farmhouse()
 	var k: P0Kitchen = r.get("kitchen")

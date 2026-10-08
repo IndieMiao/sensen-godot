@@ -1,6 +1,6 @@
 class_name UiPointer
 extends Control
-## The small downward pointer under floating cards (SGODOT-221): TapCard 1135:101133 and PinMenu 1141:80291
+## The small downward pointer under floating cards (SGODOT-221): EntryCard 1468:94344 and PinMenu 1141:80291
 ## both draw a SIZE_POINTER_W × SIZE_POINTER_H triangle in the card fill with the card's border on its two
 ## slanted edges, overlapping the card's bottom edge by one stroke so the border reads as continuous.
 

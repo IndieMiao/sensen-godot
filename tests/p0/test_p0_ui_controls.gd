@@ -176,29 +176,28 @@ func test_switch_key_opens_the_radial_around_the_screen_centre() -> void:
 	ui._radial.advance(UiTokens.MOTION_RADIAL_RETRACT_MS + 1)
 	assert_bool(ui._radial.visible).is_false()
 
-func test_finger_card_forwards_its_tap_to_the_facility() -> void:
+## A world prompt's icon button forwards its tap to the facility (SGODOT-250; formerly the finger card's test).
+func test_an_icon_button_forwards_its_tap_to_the_facility() -> void:
 	var taps := []
+	var recentred := []
 	ui.tapped.connect(func(p): taps.append(p))
-	ui.tag("stall", "Tap to shop", Vector2(180, 300), true, Vector2(180, 340))
-	var card: UiTapCard = ui._cards.stall
-	assert_bool(card.visible).is_true()
-	assert_str(card.text).is_equal("Tap to shop")
-	assert_float(card.get_rect().end.y).is_equal(300.0 - UiTokens.SPACE_WITHIN)
+	ui.recenter.connect(func(): recentred.append(true))
+	ui.world_icon("stall", P0Logic.icon("homestead_stall"), Vector2(180, 300), true, false, -1, Vector2(180, 340))
+	var b: UiWorldIconButton = ui._icons.stall
+	assert_bool(b.visible).is_true()
 	await await_idle_frame()
-	var on_card := card.hit_rect().get_center()
-	ui._tap_at(on_card, false)   # the scene pad's real tap on the card = the facility's tap
+	var on_button := b.hit_rect().get_center()
+	ui._tap_at(on_button, false)   # the scene pad's real tap on the button = the facility's tap
 	assert_array(taps).is_equal([Vector2(180, 340)])
-	ui._tap_at(on_card, true)    # a double tap on a card never recenters
+	ui._tap_at(on_button, true)    # a double tap on a button never recenters
 	assert_array(taps).is_equal([Vector2(180, 340), Vector2(180, 340)])
+	assert_array(recentred).is_empty()
 	ui._tap_at(Vector2(40, 600), false)   # elsewhere it is the world's tap
 	assert_vector(taps[-1]).is_equal(Vector2(40, 600))
-	# Near the edge the card stays on screen and its pointer keeps aiming at the facility.
-	ui.tag("stall", "Tap to shop", Vector2(4, 300), true)
-	assert_float(card.position.x).is_equal(float(UiTokens.SPACE_WITHIN))
-	ui.tag("stall", "Tap to shop", Vector2(180, 300), false)
-	assert_bool(card.visible).is_false()
+	ui.world_icon("stall", null, Vector2(180, 300), false)
+	assert_bool(b.visible).is_false()
 
-func test_badges_show_state_and_lift_the_finger_card() -> void:
+func test_badges_show_state_and_report_their_height() -> void:
 	ui.badge("home", UiStatusBadge.State.COUNTDOWN, Vector2(200, 260), true, "1:12")
 	var b: UiStatusBadge = ui._badges.home
 	assert_bool(b.visible).is_true()
@@ -212,17 +211,18 @@ func test_badges_show_state_and_lift_the_finger_card() -> void:
 	ui.badge("home", UiStatusBadge.State.READY, Vector2(ui._kit.size.x + 100, 260), true)   # facility off screen
 	assert_bool(b.visible).is_false()
 
-func test_a_drag_from_a_finger_card_starts_the_joystick() -> void:
-	# PR #12 review fix 3: the card is passive, so the press reaches the scene pad under it.
-	ui.tag("stall", "Tap to shop", Vector2(180, 300), true)
+func test_a_drag_from_an_icon_button_starts_the_joystick() -> void:
+	# PR #12 review fix 3 (then the finger card, now the world prompt): the button is passive, so the press reaches the
+	# scene pad under it.
+	ui.world_icon("stall", P0Logic.icon("homestead_stall"), Vector2(180, 300), true)
 	await await_idle_frame()
-	var card: UiTapCard = ui._cards.stall
+	var card: UiWorldIconButton = ui._icons.stall
 	var at := card.hit_rect().get_center()
 	var sticks := []
 	var taps := []
 	ui.joystick.connect(func(v): sticks.append(v))
 	ui.tapped.connect(func(p): taps.append(p))
-	assert_int(card._card.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
+	assert_int(card.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
 	_touch(at, true)
 	var drag := InputEventMouseMotion.new()
 	drag.position = at + Vector2(0, -40)
@@ -377,13 +377,13 @@ func test_the_last_bait_on_a_hook_empties_the_hook_with_a_toast() -> void:
 	assert_str(ui.selected_bait).is_empty()
 	assert_str(ui.toast_text()).is_equal("Out of Worm Bait · no bait on the hook")
 
-func test_a_card_tap_cannot_start_a_double_tap() -> void:
-	# PR #12 re-review: a tap elsewhere right after a card tap is a plain tap, not a recenter.
-	ui.tag("stall", "Tap to shop", Vector2(180, 300), true)
+func test_a_prompt_tap_cannot_start_a_double_tap() -> void:
+	# PR #12 re-review: a tap elsewhere right after a prompt tap (then the finger card) is a plain tap, not a recenter.
+	ui.world_icon("stall", P0Logic.icon("homestead_stall"), Vector2(180, 300), true)
 	await await_idle_frame()
 	var recentred := [0]
 	ui.recenter.connect(func(): recentred[0] += 1)
-	var on_card: Vector2 = (ui._cards.stall as UiTapCard).hit_rect().get_center()
+	var on_card: Vector2 = (ui._icons.stall as UiWorldIconButton).hit_rect().get_center()
 	for e in [[on_card, true], [on_card, false], [Vector2(60, 560), true], [Vector2(60, 560), false]]:
 		var m := InputEventMouseButton.new()
 		m.button_index = MOUSE_BUTTON_LEFT

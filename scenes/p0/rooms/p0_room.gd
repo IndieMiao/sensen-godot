@@ -21,7 +21,7 @@ const BASIC_ROOM_LAYOUT := "res://assets/rooms/basic_room/layout.json"
 ## Engineering defaults (SGODOT-226); WP7 v2 finalises the camera numbers from Figma.
 const TAP_RADIUS := 64.0          # F-04 screen pick radius (P0 uses 56–80 px)
 const MIN_HIT := 44.0             # a facility tapped by its art: at least this box on screen (touch target)
-const CARD_NEAR_M := 3.0          # finger cards float up this close (LOCK-07)
+const CARD_NEAR_M := 3.0          # the nearest prompt within this opens (LOCK-07 v2)
 const EXIT_RADIUS_M := 0.6        # walking onto the door leaves, no confirmation
 const EXIT_ARM_M := 1.0           # … once the player has been this far from it (spawn is one step inside)
 const REACH_M := 0.35             # close enough to a stand_ point to use the facility
@@ -39,10 +39,8 @@ var layout_path := BASIC_ROOM_LAYOUT
 var anchors_path := ""
 var city := "Shanghai"
 var place_name := ""
-## Finger card over the door; per space (farmhouse "Door · Back to farm", market "Exit · Back to map").
-var exit_text := "Door · Back to map"
-## Where the door leads, for the world prompts (SGODOT-250: i-door + "Map" / "Farm"); "" keeps the old door card.
-var exit_to := ""
+## Where the door leads, for the world prompts (SGODOT-250: i-door + "Map" / "Farm").
+var exit_to := "Map"
 ## The colours around the room as they must appear on screen (SGODOT-227 美术决定 2b53b84d, sampled from the scene's
 ## signed render): {top, bottom, blend: [from, to]} in hex; top and bottom flat, a smooth change between those screen
 ## heights (0 = top, 1 = bottom); `top` alone is one colour. Empty: the kit's review background, else the Basic Room
@@ -90,7 +88,7 @@ var _shot_k := 0.0
 var _shot_tween: Tween
 var _walk := {}           # {name, point: Vector3, done: Callable}
 var _shown := {}          # marker ids currently on screen
-var _card := ""           # the one tappable whose finger card shows (SGODOT-250: one card at a time)
+var _card := ""           # the one tappable whose prompt is open (SGODOT-250: one at a time)
 var _exit_armed := false
 var _leaving := false
 var _perf_left := -1.0    # debug builds with user://p0_perf: log fps / draw calls every 5 s (logcat tag godot)
@@ -211,12 +209,12 @@ func _tappable() -> PackedStringArray:
 ## Called once the player stands at the facility (after facility_tapped).
 func _on_facility(_name: String) -> void: pass
 
-## Finger card and status badge over a tappable anchor: {text, badge, caption, icon}; badge is a STATE-ICONS
-## key ("available", "countdown", "ready", … = UiStatusBadge.State in lower case). Empty = nothing; the
-## door's card comes from exit_text.
+## World prompt and status badge over a tappable anchor: {kind, …, badge, caption, icon} (see _markers); badge is a
+## STATE-ICONS key ("available", "countdown", "ready", … = UiStatusBadge.State in lower case). Empty = nothing; the
+## door is i-door + exit_to.
 func _marker(name: String, _view: Dictionary) -> Dictionary:
 	if name != "exit": return {}
-	return {kind = "facility", icon = P0Logic.icon("door"), name = exit_to} if exit_to != "" else {text = exit_text}
+	return {kind = "facility", icon = P0Logic.icon("door"), name = exit_to}
 
 func _module_visible(module: String) -> bool:
 	return level >= int(module_levels.get(module, 0))
@@ -713,7 +711,7 @@ func p0_tap(screen: Vector2) -> void:
 	var n := tap_target(screen)
 	if n != "": walk_to(n)
 
-## What a tap at `screen` asks for: a finger card's or world prompt's own anchor by id, not through the point test
+## What a tap at `screen` asks for: a world prompt's own anchor by id, not through the point test
 ## (PR #21's rule for the farm), else pick(screen); "" for nothing.
 func tap_target(screen: Vector2) -> String:
 	var card := str(rt.ui.tapped_card) if rt else ""
@@ -751,21 +749,20 @@ func _door_check() -> void:
 	if d > EXIT_ARM_M: _exit_armed = true
 	elif _exit_armed and d <= EXIT_RADIUS_M: leave()
 
-## SGODOT-250 (spec 370794d2 item 5, LOCK-07 v2): one finger card at a time in a room as on the farm — the nearest
-## anchor with a card within CARD_NEAR_M; the one showing keeps it unless another is clearly nearer, so standing
-## between the keeper, a seat and the door never shows two or three cards (hand test 246 pictures 06 / 07).
+## SGODOT-250 (spec 370794d2 item 5, LOCK-07 v2): one open prompt at a time in a room as on the farm — the nearest
+## anchor with a prompt within CARD_NEAR_M; the open one keeps it unless another is clearly nearer, so standing
+## between the keeper, a seat and the door never opens two or three (hand test 246 pictures 06 / 07).
 ## `marks` maps anchor names to their _marker(); returns the anchor whose card shows, or "".
 func card_pick(marks: Dictionary) -> String:
 	var cands: Array = []
 	for n in marks:
 		var m: Dictionary = marks[n]
-		if (m.has("text") or m.has("kind")) and anchor(n): cands.append([n, anchor(n).global_position, CARD_NEAR_M])
+		if m.has("kind") and anchor(n): cands.append([n, anchor(n).global_position, CARD_NEAR_M])
 	_card = P0Garden.pick_card(cands, actor.position, _card)
 	return _card
 
-## Finger cards and status badges over tappable anchors (221's rt.ui.tag / rt.ui.badge when present).
-## A marker with `kind` uses the world prompts instead of a finger card (SGODOT-250, LOCK-07 / 16 / 30 v2), with the
-## one in reach (`_card`) the only one opened:
+## World prompts and status badges over tappable anchors (SGODOT-250, LOCK-07 / 16 / 30 v2; rt.ui.badge when present),
+## with the one in reach (`_card`) the only one opened:
 ##   "npc"      {name, head}: the name over the head (NpcNameTag), highlighted while it is the one in reach; `talking`
 ##              keeps it up and highlighted over the greeting card / dialogue bar (P0Ui.npc_tag, #57);
 ##   "seat"     {icon}: an icon button that goes Near, never a strip;
@@ -784,7 +781,6 @@ func _markers(v: Dictionary) -> void:
 		var at := anchor(n).global_position + _hit_lift(n) * 1.1
 		var badge_at := anchor("badge_" + (P0RoomAnchors.object_of(n) if P0RoomAnchors.object_of(n) != "" else n))   # badge_exit for the door
 		var screen := cam.unproject_position(badge_at.global_position if badge_at else at)
-		var lift := 0.0
 		var state := badge_state(str(m.get("badge", "")))
 		var kind := str(m.get("kind", ""))
 		now[id] = kind
@@ -797,11 +793,8 @@ func _markers(v: Dictionary) -> void:
 			continue
 		if state >= 0 and rt.ui.has_method("badge"):
 			rt.ui.call("badge", id, state, screen, true, str(m.get("caption", "")), m.get("icon", null))
-			if rt.ui.has_method("badge_height"): lift = float(rt.ui.call("badge_height", id))
 		if kind == "npc":
 			rt.ui.npc_tag(id, str(m.name), cam.unproject_position(m.head), true, n == _card, bool(m.get("talking", false)))
-		elif m.has("text"):
-			rt.ui.tag(id, str(m.text), screen - Vector2(0, lift), n == _card)
 	for id in _shown.keys():
 		if now.has(id): continue
 		match str(_shown[id]):
@@ -810,7 +803,6 @@ func _markers(v: Dictionary) -> void:
 				rt.ui.name_bar(id, null, "", "", Vector2.ZERO, false)
 				rt.ui.world_icon(id, null, Vector2.ZERO, false)
 			"npc": rt.ui.npc_tag(id, "", Vector2.ZERO, false)
-			_: rt.ui.tag(id, "", Vector2.ZERO, false)
 		if rt.ui.has_method("badge"): rt.ui.call("badge", id, 0, Vector2.ZERO, false)
 	_shown = now
 

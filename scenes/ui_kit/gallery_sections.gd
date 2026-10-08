@@ -47,7 +47,6 @@ static func all() -> Array[Dictionary]:
 		{id = "action_radial_motion", title = "UiActionRadial · opening", figma = "Motion 1651:100816 · 0 / 80 / 160 / 300 ms", build = _action_radial_motion},
 		{id = "status_badge", title = "UiStatusBadge", figma = "StatusBadge 1132:79554 · LOCK-11", build = _status_badges},
 		{id = "world_prompts", title = "World prompts", figma = "UiWorldIconButton · UiWorldNameBar · UiNpcNameTag · WorldIconButton 1674:101157 · WorldNameBar 1674:101190 · NpcNameTag 1674:101195 · row 51 · LOCK-07 / 16 v2", build = _world_prompts},
-		{id = "tap_card", title = "UiTapCard", figma = "TapCard 1135:101133 · LOCK-07", build = _tap_cards},
 		{id = "entry_card", title = "UiEntryCard", figma = "EntryCard 1468:94344 · LOCK-21 / LOCK-10", build = _entry_cards},
 		# SGODOT-222 world display
 		{id = "need_tile", title = "UiNeedTile", figma = "NeedTile 1090:78003 · LOCK-10", build = _need_tiles},
@@ -1160,17 +1159,6 @@ static func _status_badges() -> Control:
 	for s in [UiStatusBadge.State.REQUEST, UiStatusBadge.State.DELIVERABLE, UiStatusBadge.State.GIFT, UiStatusBadge.State.NEW]:
 		npc.add_child(_captioned(UiStatusBadge.new(s, UiStatusBadge.Size.NPC), "NPC · " + names[s]))
 	v.add_child(npc)
-	return v
-
-static func _tap_cards() -> Control:
-	var v := _column()
-	v.add_child(_captioned(UiTapCard.new("Tap to cook"), "centred"))
-	var left := UiTapCard.new("Rest · +60 Energy · once a day")
-	left.point_at(0.0)
-	v.add_child(_captioned(left, "facility near the left edge"))
-	var right := UiTapCard.new("Mei · Tap to talk")
-	right.point_at(1000.0)
-	v.add_child(_captioned(right, "facility near the right edge"))
 	return v
 
 ## The main's four variants: State=Available / Unavailable × Pointer=Center / Right (gate near the right edge).

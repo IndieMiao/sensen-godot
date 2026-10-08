@@ -5,7 +5,7 @@ extends Control
 ## facility icon — inside an invisible 44 px touch area. State Near (seats and other sit-on places that grow but never
 ## open a name strip): 2 px color/primary edge and 1.1× scale. With a state (LOCK-11) the whole button becomes the
 ## StatusBadge World 28 instead: the state outranks the facility icon. Display only: a tap on it is a tap on the
-## facility (the host checks hit_rect(), as for UiTapCard). Count (Show count, 1749:0): a small tag at the disc's
+## facility (the host checks hit_rect(), as for UiEntryCard). Count (Show count, 1749:0): a small tag at the disc's
 ## bottom right, like a cell's quantity pill (the Warming Cabinet's 4/6 / Full, q(31); C21). At least the pill's 24;
 ## a wider word grows it to the left, its right edge kept (Count tag: right-anchored, padding 4 — the Mailbox's
 ## `Parcel`, WORLD-HINT-6a 1822:123663, 不知火舞 on 234).
