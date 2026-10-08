@@ -48,6 +48,7 @@ static func all() -> Array[Dictionary]:
 		{id = "status_badge", title = "UiStatusBadge", figma = "StatusBadge 1132:79554 · LOCK-11", build = _status_badges},
 		{id = "world_prompts", title = "World prompts", figma = "UiWorldIconButton · UiWorldNameBar · UiNpcNameTag · WorldIconButton 1674:101157 · WorldNameBar 1674:101190 · NpcNameTag 1674:101195 · row 51 · LOCK-07 / 16 v2", build = _world_prompts},
 		{id = "entry_card", title = "UiEntryCard", figma = "EntryCard 1468:94344 · LOCK-21 / LOCK-10", build = _entry_cards},
+		{id = "tip_card", title = "UiTipCard", figma = "TipCard 1243:87540 · TUT-2 482:72 · A-03 (SGODOT-232 U6, 235-B2)", build = _tip_cards},
 		# SGODOT-222 world display
 		{id = "need_tile", title = "UiNeedTile", figma = "NeedTile 1090:78003 · LOCK-10", build = _need_tiles},
 		{id = "need_source", title = "UiNeedSource", figma = "NeedSource 1092:77266 · LOCK-10 / 08", build = _need_sources},
@@ -1320,3 +1321,18 @@ static func _reward_moments() -> Control:
 		item_name = "Cookbook 8/48", strip = "Title · +50 Energy"}), "Milestone · no buttons"))
 	return row
 
+## TUT-2 specimens (482:72): the P0 first-session sentences with their icons, 10 apart.
+static func _tip_cards() -> Control:
+	var v := VBoxContainer.new()
+	v.add_theme_constant_override(&"separation", 10)
+	for t in [["sow", "Pick a seed, walk up to a plot and press Sow. Hold to keep sowing."],
+			["creel", "Your creel is your bag: 10 fish per free slot."], ["cast", "Casting uses 5 Energy"],
+			["cook", "Tap Cook to grill your first fish"], ["heat", "Tap when the needle hits gold!"],
+			["eat", "Energy comes back over time. A meal brings it back now."],
+			["levels", "Levels unlock gear, fish and seeds. Basics never lock."],
+			["map", "Browse the map for free. Travel costs Energy and coins."]]:
+		var card := UiTipCard.new()
+		card.show_tip(str(t[1]), str(t[0]))
+		card.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		v.add_child(card)
+	return v

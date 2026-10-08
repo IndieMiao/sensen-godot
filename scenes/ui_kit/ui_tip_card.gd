@@ -15,6 +15,7 @@ const _PAD_Y := 12.0
 const _GAP := 10
 const _RADIUS := 16.0
 const _ICON := 22.0
+const _MIN_H := 48.0   # one line is 48 in the main (Nunito 14 lays out 2 px shorter here)
 const _SHADOW := Color(0x2E / 255.0, 0x3B / 255.0, 0x33 / 255.0, 0.2)   # rgba(46, 59, 51, 0.2)
 const _SHADOW_BLUR := 14.0
 const _SHADOW_OFFSET := Vector2(0, 10)
@@ -39,8 +40,8 @@ var _text: Label
 
 func _init() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
-	custom_minimum_size = Vector2(WIDTH, 0)
-	size = Vector2(WIDTH, 0)
+	custom_minimum_size = Vector2(WIDTH, _MIN_H)
+	size = Vector2(WIDTH, _MIN_H)
 	var box := UiStyleBox.make(UiTokens.COLOR_SURFACE, _RADIUS, UiTokens.COLOR_BORDER, 1.0).with_margins(_PAD_X, _PAD_Y, _PAD_X, _PAD_Y)
 	box.shadow_color = _SHADOW
 	box.shadow_size = _SHADOW_BLUR

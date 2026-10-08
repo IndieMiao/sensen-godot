@@ -1,0 +1,380 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    604
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiTipCard"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        36
+      ],
+      "variation": "CaptionR12",
+      "text": "TipCard 1243:87540 · TUT-2 482:72 · A-03 (SGODOT-232 U6, 235-B2)"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        70,
+        328,
+        534
+      ],
+      "children": [
+        {
+          "type": "UiTipCard",
+          "rect": [
+            0,
+            70,
+            296,
+            64
+          ],
+          "children": [
+            {
+              "type": "HBoxContainer",
+              "rect": [
+                14,
+                82,
+                268,
+                40
+              ],
+              "children": [
+                {
+                  "type": "TextureRect",
+                  "rect": [
+                    14,
+                    91,
+                    22,
+                    22
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    46,
+                    82,
+                    236,
+                    40
+                  ],
+                  "variation": "BodyB14",
+                  "text": "Pick a seed, walk up to a plot and press Sow. Hold to keep sowing."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "UiTipCard",
+          "rect": [
+            0,
+            144,
+            296,
+            64
+          ],
+          "children": [
+            {
+              "type": "HBoxContainer",
+              "rect": [
+                14,
+                156,
+                268,
+                40
+              ],
+              "children": [
+                {
+                  "type": "TextureRect",
+                  "rect": [
+                    14,
+                    165,
+                    22,
+                    22
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    46,
+                    156,
+                    236,
+                    40
+                  ],
+                  "variation": "BodyB14",
+                  "text": "Your creel is your bag: 10 fish per free slot."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "UiTipCard",
+          "rect": [
+            0,
+            218,
+            296,
+            48
+          ],
+          "children": [
+            {
+              "type": "HBoxContainer",
+              "rect": [
+                14,
+                230,
+                268,
+                24
+              ],
+              "children": [
+                {
+                  "type": "TextureRect",
+                  "rect": [
+                    14,
+                    231,
+                    22,
+                    22
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    46,
+                    232,
+                    236,
+                    20
+                  ],
+                  "variation": "BodyB14",
+                  "text": "Casting uses 5 Energy"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "UiTipCard",
+          "rect": [
+            0,
+            276,
+            296,
+            48
+          ],
+          "children": [
+            {
+              "type": "HBoxContainer",
+              "rect": [
+                14,
+                288,
+                268,
+                24
+              ],
+              "children": [
+                {
+                  "type": "TextureRect",
+                  "rect": [
+                    14,
+                    289,
+                    22,
+                    22
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    46,
+                    290,
+                    236,
+                    20
+                  ],
+                  "variation": "BodyB14",
+                  "text": "Tap Cook to grill your first fish"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "UiTipCard",
+          "rect": [
+            0,
+            334,
+            296,
+            48
+          ],
+          "children": [
+            {
+              "type": "HBoxContainer",
+              "rect": [
+                14,
+                346,
+                268,
+                24
+              ],
+              "children": [
+                {
+                  "type": "TextureRect",
+                  "rect": [
+                    14,
+                    347,
+                    22,
+                    22
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    46,
+                    348,
+                    236,
+                    20
+                  ],
+                  "variation": "BodyB14",
+                  "text": "Tap when the needle hits gold!"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "UiTipCard",
+          "rect": [
+            0,
+            392,
+            296,
+            64
+          ],
+          "children": [
+            {
+              "type": "HBoxContainer",
+              "rect": [
+                14,
+                404,
+                268,
+                40
+              ],
+              "children": [
+                {
+                  "type": "TextureRect",
+                  "rect": [
+                    14,
+                    413,
+                    22,
+                    22
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    46,
+                    404,
+                    236,
+                    40
+                  ],
+                  "variation": "BodyB14",
+                  "text": "Energy comes back over time. A meal brings it back now."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "UiTipCard",
+          "rect": [
+            0,
+            466,
+            296,
+            64
+          ],
+          "children": [
+            {
+              "type": "HBoxContainer",
+              "rect": [
+                14,
+                478,
+                268,
+                40
+              ],
+              "children": [
+                {
+                  "type": "TextureRect",
+                  "rect": [
+                    14,
+                    487,
+                    22,
+                    22
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    46,
+                    478,
+                    236,
+                    40
+                  ],
+                  "variation": "BodyB14",
+                  "text": "Levels unlock gear, fish and seeds. Basics never lock."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "UiTipCard",
+          "rect": [
+            0,
+            540,
+            296,
+            64
+          ],
+          "children": [
+            {
+              "type": "HBoxContainer",
+              "rect": [
+                14,
+                552,
+                268,
+                40
+              ],
+              "children": [
+                {
+                  "type": "TextureRect",
+                  "rect": [
+                    14,
+                    561,
+                    22,
+                    22
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    46,
+                    552,
+                    236,
+                    40
+                  ],
+                  "variation": "BodyB14",
+                  "text": "Browse the map for free. Travel costs Energy and coins."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
