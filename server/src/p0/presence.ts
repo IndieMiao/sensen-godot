@@ -8,6 +8,7 @@ import type { P0Content } from './content.js';
 import { storeMaterials } from './gathering.js';
 import type { P0Event } from './progress.js';
 import type { P0State } from './state.js';
+import { noteSeenAt } from './markers.js';
 
 const AWAY = new Set(['pond', 'outpost', 'mine']);
 
@@ -45,6 +46,7 @@ export function notePresence(c: P0Content, s: P0State, space: unknown, now: numb
  */
 export function notePlace(c: P0Content, s: P0State, space: unknown, place: unknown): void {
   if (typeof space !== 'string' || space === '') return;
+  if (space === 'outpost' && typeof place === 'string') noteSeenAt(c, s, place);   // the map's ◆ there is seen (q(48))
   if (space !== 'pond') { s.presence.place = null; return; }
   if (place === undefined || place === null || place === '') return;
   const p = typeof place === 'string' ? c.fishing.places[place] : undefined;
