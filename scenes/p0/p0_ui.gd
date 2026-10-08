@@ -399,6 +399,7 @@ func set_surface(name: String) -> void:
 	for c in _cards.values(): (c as Control).visible = false
 	for b in _badges.values(): (b as Control).visible = false
 	for m in _icons.values() + _name_bars.values() + _npc_tags.values(): (m as Control).visible = false
+	_flush_held_cards()
 	_flush_held_toast()
 
 ## Action spaces show the full bar. Rooms (farmhouse kitchen, outposts) and the map keep only Bag, with no action
@@ -1016,6 +1017,9 @@ func _make_float(text: String, tone: int, icon: Texture2D) -> UiFloatText:
 	var f := UiFloatText.new(text, tone, icon, UiFloatText.Layout.WRAP if text.length() > _FLOAT_HUG_CHARS else UiFloatText.Layout.HUG)
 	f.theme = UiKit.theme()
 	root.add_child(f)
+	# A result moment on screen stays readable: the floats rise under its card, not over its rewards (李元芳 int7:
+	# `+5 XP` across the level banner's `+3 Wild Herb`). In a drawer they stay on top (BOARD-DONE floats from a row).
+	if _moment_open and _modal != null: root.move_child(f, _modal.get_index())
 	return f
 
 ## Floats never rise over the HUD (int6, 李元芳: `+5 Cooking XP ★` crossed the Today chip; 不知火舞 233): a group's start
@@ -1249,16 +1253,25 @@ func toast(text: String, seconds := 0.0) -> void:
 ## Where the toast sits (WP2 D-01, q(16)): over the quick bar's top edge, in the scene or docked in the bag; over a
 ## drawer without the bar (the workbench, a counter), just above the drawer's top edge — clear of its rows and of the
 ## Close key on the right — when there is room under the HUD; else the bar's spot.
+const _TOAST_DRAWER_FOOT := 16.0   # q(16): a toast's bottom edge over a drawer's bottom (GUESTBOOK-DELETED)
+
 func _aim_toast() -> void:
-	if _bar != null and _bar.is_visible_in_tree():
+	if _bar != null and _bar.is_visible_in_tree():   # the scene's quick bar, or the bar docked in the bag (q(16))
 		_toasts.anchor_above(_bar)
 		return
 	var content: Control = _modal.get_child(1) if _modal != null and _modal.get_child_count() > 1 else null
+	if content is UiDrawer and content.is_visible_in_tree():
+		# q(16), 不知火舞 on #86: in a drawer, above its fixed decision area; without one, at the drawer's foot (16 over
+		# its bottom and the safe inset, 232 wide). Never above the drawer, never back at the bar's spot over it.
+		var area := (content as UiDrawer).action_area()
+		if area != null: _toasts.anchor_above(area)
+		else: _toasts.anchor_bottom(root.size.y - _TOAST_DRAWER_FOOT - safe_bottom(), ToastLayer.NARROW_WIDTH)
+		return
 	if content != null and content.is_visible_in_tree():
 		var top := content.get_global_rect().position.y - root.global_position.y
 		var hud_bottom := _marker_area().position.y + _kit.global_position.y - root.global_position.y
 		if top - UiTokens.SPACE_OVERLAY_BODY - UiTokens.SIZE_TOAST_MIN_H >= hud_bottom:
-			_toasts.anchor_above(content)
+			_toasts.anchor_above(content)   # a card or sheet that leaves room above it
 			return
 	_toasts.anchor_above(_bar)
 
@@ -1360,6 +1373,25 @@ func _flush_held_toast() -> void:
 func queue_card(show: Callable) -> void:
 	if _modal == null and _card_queue.is_empty(): show.call()
 	else: _card_queue.append(show)
+
+## A card with a button must not open under the fishing presentation, whose input shield over this layer takes every
+## touch (李元芳 int7: the first level-up's Use bait could not be pressed). It waits until the world is back from
+## "busy", then queues like any card.
+var _held_cards: Array[Callable] = []
+
+func queue_card_when_clear(show: Callable) -> void:
+	_held_cards.append(show)
+	_flush_held_cards()
+
+func _flush_held_cards() -> void:
+	if _held_cards.is_empty() or not is_node_ready() or surface == "busy": return
+	var cards := _held_cards.duplicate()
+	_held_cards.clear()
+	for c in cards: queue_card(c)
+
+## The card queue's turn opened nothing (a held card): let the next one come.
+func _next_card() -> void:
+	if _modal == null and not _card_queue.is_empty(): (_card_queue.pop_front() as Callable).call_deferred()
 
 func _drop_modal() -> void:
 	_modal_back = Callable()   # each layer sets its own way back after it opens
@@ -1804,9 +1836,12 @@ func _fill_board(d: P0CounterDrawer) -> void:
 func open_gear() -> void:
 	open_bag("", "gear")
 
-## The older entries now open the counter drawer (SGODOT-224).
+## The older entries now open the counter drawer (SGODOT-224). With no tab named, the stall opens where its badge points
+## (q(44)): a request to hand in (✓) or one open (!) lands on the Stall Board, otherwise on Buy (a New badge's
+## `◆ New for you` is on Buy).
 func open_stall(tab := "") -> void:
-	open_counter("homestead", {"section": tab if tab != "" else "buy"})
+	if tab == "": tab = "board" if P0Guide.stall_badge(view) != "" else "buy"
+	open_counter("homestead", {"section": tab})
 
 func open_tackle(_bubble := "") -> void:
 	open_counter("tackle")
@@ -1925,15 +1960,24 @@ func _kit_card() -> VBoxContainer:
 ## levelled before this one.
 func show_level_up(ev: Dictionary, first := false) -> void:
 	var spec := P0Logic.level_banner(view, ev, first)
+	if str(spec.get("action", "")) != "" and surface == "busy":
+		queue_card_when_clear(func(): show_level_up(ev, first))   # Use bait waits out the fishing panel's shield
+		_next_card()
+		return
 	show_banner(spec, func(): _banner_action(str(spec.get("action_id", ""))))
 
 func _banner_action(id: String) -> void:
 	match id:
 		"use_bait":   # puts the gift bait on the hook, in place (the quick bar's bait slot, q(44))
 			for s in _bag_slots():
-				if str(s.get("id", "")).begins_with("bait_"):
-					if bar_mode == "fish" and selected_bait != str(s.id): _on_slot_tapped(str(s.id))
-					break
+				var bait := str(s.get("id", ""))
+				if not bait.begins_with("bait_"): continue
+				if selected_bait != bait:
+					if bar_mode == "fish": _on_slot_tapped(bait)
+					else:   # away from the water: it is on the hook for the next cast (the pond's bar shows it)
+						selected_bait = bait
+						toast("%s on the hook · used at the bite" % P0Logic.item_name(view, bait))
+				break
 
 func _center_card(width: float) -> VBoxContainer:
 	var center := CenterContainer.new()
@@ -2605,9 +2649,14 @@ func show_moment(card: Control, auto_close := true, seconds := MOMENT_AUTO_S) ->
 	var banner := card is UiMomentBanner
 	var place := func():
 		if is_instance_valid(card):
+			# Back to its content's size: a wrapped line first measured at zero width makes the card tall, and a card
+			# outside a container never shrinks again on its own (李元芳 int7: the level banner reaching the bottom).
+			var fit := card.get_combined_minimum_size()
+			if not card.size.is_equal_approx(fit): card.size = fit
 			var y := (UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H + _BANNER_UNDER_HUD + safe_top()) if banner else root.size.y * _MOMENT_TOP
 			card.position = Vector2(roundf((root.size.x - card.size.x) * 0.5), roundf(y))
 	card.resized.connect(place)
+	card.minimum_size_changed.connect(place)   # shrinking content never resizes the card by itself
 	place.call()
 	if not auto_close: return
 	var holder_id := _modal.get_instance_id()
