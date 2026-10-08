@@ -88,7 +88,9 @@ func _init(view_: Dictionary = {}, tab_ := "cookbook") -> void:
 
 func set_queue_mode(v: bool) -> void:
 	queue_mode = v
-	if _cook: _cook.label = _verb()
+	if _cook:
+		_cook.label = _verb()
+		_cook.reason = P0KitchenLogic.experiment_reason(view, pot, queue_mode)
 	if _recipe_button and selected_page != "": _show_page(selected_page)   # relabel and lay the card out again
 
 func _verb() -> String: return "Queue" if queue_mode else "Cook"
@@ -333,7 +335,7 @@ func _refresh_experiment() -> void:
 	var items := P0KitchenLogic.experiment_items(view, pot, experiment_chip)
 	_bag.capacity = maxi(10, ceili(items.size() / 5.0) * 5)
 	_bag.items = items
-	_cook.reason = P0KitchenLogic.experiment_reason(view, pot)
+	_cook.reason = P0KitchenLogic.experiment_reason(view, pot, queue_mode)
 	_pot_energy.text = P0KitchenLogic.pot_energy(view, pot)
 	_tried.visible = P0KitchenLogic.tried(view, pot)
 

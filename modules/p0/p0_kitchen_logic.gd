@@ -289,19 +289,21 @@ static func pot_energy(view_: Dictionary, pot: Array) -> String:
 	var t: Dictionary = cooking(view).get("tiers", {}).get(str(int(known.rarity)), {})
 	return "+%d Energy" % int(t.get("energy", 0))
 
-## Preview for a Cookbook page: COOK-2a writes `Ready to cook` when the page can cook now.
-static func page_preview(view: Dictionary, p: Dictionary) -> Dictionary:
+## Preview for a Cookbook page: COOK-2a writes `Ready to cook` when the page can cook now; `Ready to queue` in the drawer
+## opened from Queue next › (q(84): only that word changes).
+static func page_preview(view: Dictionary, p: Dictionary, queue := false) -> Dictionary:
 	var rarity := int(p.get("rarity", 1))
 	var t: Dictionary = cooking(view).get("tiers", {}).get(str(rarity), {})
 	var title := "Unknown dish"
-	if p.get("known", false): title = "Ready to cook" if p.get("can_cook", false) else str(p.get("name", ""))
+	if p.get("known", false): title = ("Ready to queue" if queue else "Ready to cook") if p.get("can_cook", false) else str(p.get("name", ""))
 	return {title = title, state = P0Logic.rarity_name(view, rarity), time = "%d s" % (int(t.get("ms", 5000)) / 1000)}
 
-## Experiment's Cook button: the gap when it cannot cook (LOCK-10), else "Cook" (never "Free", §7.2.7).
-static func experiment_reason(view: Dictionary, pot: Array) -> String:
+## Experiment's Cook button: the gap when it cannot cook (LOCK-10), else "Cook" (never "Free", §7.2.7). In the drawer
+## opened from Queue next › the pot on the stove is the point: the button reads Queue, never Stove busy (q(71)).
+static func experiment_reason(view: Dictionary, pot: Array, queue := false) -> String:
 	if pot.is_empty(): return "Add an ingredient"
 	if preview(view, pot).title == "Needs a main ingredient": return "Needs a main ingredient"
-	if stove(view) != null: return "Stove busy"
+	if stove(view) != null and not queue: return "Stove busy"
 	return ""
 
 # ---------------------------------------------------------------- the dish comes out (COOK-4 / 6 / P0-9, COOK-7-2)

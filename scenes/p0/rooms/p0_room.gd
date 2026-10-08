@@ -766,7 +766,9 @@ func card_pick(marks: Dictionary) -> String:
 ##   "npc"      {name, head}: the name over the head (NpcNameTag), highlighted while it is the one in reach; `talking`
 ##              keeps it up and highlighted over the greeting card / dialogue bar (P0Ui.npc_tag, #57);
 ##   "seat"     {icon}: an icon button that goes Near, never a strip;
-##   "facility" {icon, name, fact?, count?}: an icon button (count: its small count tag) that opens into a name strip.
+##   "facility" {icon, name, fact?, count?, strip_badge?}: an icon button (count: its small count tag) that opens into
+##              a name strip. strip_badge false: the strip keeps the facility icon and the state stays in the far
+##              button's badge and the fact (the stove, like the bench; 不知火舞 on #104, 1760:103708).
 ## `badge` on a seat or facility rides in the button / strip (StatusBadge World 28); an NPC's stays a badge.
 func _markers(v: Dictionary) -> void:
 	var now := {}
@@ -788,7 +790,8 @@ func _markers(v: Dictionary) -> void:
 			rt.ui.world_icon(id, m.icon, screen, true, n == _card, state)
 			continue
 		if kind == "facility":
-			if n == _card: rt.ui.name_bar(id, m.icon, str(m.name), str(m.get("fact", "")), screen, true, -1, false, state)
+			if n == _card: rt.ui.name_bar(id, m.icon, str(m.name), str(m.get("fact", "")), screen, true, -1, false,
+				state if bool(m.get("strip_badge", true)) else -1)
 			else: rt.ui.world_icon(id, m.icon, screen, true, false, state, Vector2.INF, str(m.get("count", "")))
 			continue
 		if state >= 0 and rt.ui.has_method("badge"):

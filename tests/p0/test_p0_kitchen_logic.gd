@@ -403,3 +403,16 @@ func test_queue_two_entry_state_line_and_turn_over_toast() -> void:
 	var none := {"kind": "dish", "dish": "dish_mystery", "mystery": true, "none": true, "trial_left": 7}
 	assert_str(P0KitchenLogic.rotation_line(v, none, "dish_herb_grilled_fish")).is_equal("Ingredients back · Herb Grilled Fish cooking")
 	assert_str(P0KitchenLogic.rotation_line(v, none, null)).is_equal("Ingredients back · Unknown dish cooking")
+
+func test_queue_mode_reads_ready_to_queue_and_never_stove_busy() -> void:
+	# q(84): only `Ready to cook` becomes `Ready to queue`; q(71): the Experiment button in the drawer opened from Queue
+	# next › is not stopped by the pot on the stove — that pot is why the drawer is open.
+	var v := _view()
+	var page: Dictionary = P0KitchenLogic.pages(v)[0]   # Grilled Crucian, can cook
+	assert_str(P0KitchenLogic.page_preview(v, page).title).is_equal("Ready to cook")
+	assert_str(P0KitchenLogic.page_preview(v, page, true).title).is_equal("Ready to queue")
+	assert_str(P0KitchenLogic.page_preview(v, P0KitchenLogic.pages(v)[1], true).title).is_equal("Radish Salad")   # short: the name, as before
+	v.cooking.stove = {"id": 3, "ms": 15000, "ready_in": 9000, "heats": []}
+	assert_str(P0KitchenLogic.experiment_reason(v, ["fish_crucian"])).is_equal("Stove busy")
+	assert_str(P0KitchenLogic.experiment_reason(v, ["fish_crucian"], true)).is_equal("")
+	assert_str(P0KitchenLogic.experiment_reason(v, [], true)).is_equal("Add an ingredient")

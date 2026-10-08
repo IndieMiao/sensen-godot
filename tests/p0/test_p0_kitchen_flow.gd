@@ -146,6 +146,13 @@ func test_queue_next_opens_the_drawer_in_queue_mode_and_the_queued_pot_returns_t
 	assert_str(k.drawer.get("_cook").label).is_equal("Queue")
 	assert_str(k.drawer.get("_recipe_button").label).is_equal("Queue")
 	assert_str(P0KitchenLogic.header(rt.session.view).state).is_equal("Cooking 0:14")   # Stove 1/1 · Cooking Lv · Cooking m:ss
+	assert_str((k.get("_preview").get("_title") as Label).text).is_equal("Ready to queue")   # q(84)
+	# Experiment in the queue drawer: the pot on the stove does not grey Queue out (no Stove busy).
+	k.drawer.tab = "experiment"
+	k._on_ingredient("fish_crucian", Vector2.INF)
+	assert_str(k.drawer.get("_cook").reason).is_equal("")
+	assert_str(k.drawer.get("_cook").label).is_equal("Queue")
+	k.drawer.tab = "cookbook"
 	k.drawer.cook_requested.emit({"type": "cook", "recipe": "dish_grilled_crucian"})
 	# The reply: the pot went in behind the one cooking.
 	var v := _queue_view()
@@ -314,3 +321,50 @@ func test_a_turn_over_that_finds_no_room_falls_back_to_the_result_card() -> void
 	assert_str(rt.ui.modal_kind).is_equal("kitchen_card")
 	rt.ui.close_modal()
 	await get_tree().process_frame
+
+func test_up_close_the_stove_strip_keeps_the_pot_and_the_far_button_the_countdown() -> void:
+	# 不知火舞 on #104 (1760:103708): the strip near the stove is i-pot + `Stove 1/1 · Cooking 0:22`, like the bench's
+	# strip; the countdown stays on the button seen from afar.
+	var v := _view()
+	v.cooking.stove = {"id": 3, "dish": "dish_grilled_crucian", "ms": 30000, "elapsed": 8000, "ready_in": 22000, "heats": []}
+	_set_view(v)
+	var r := await _farmhouse()
+	r.p0_dev(PackedStringArray(["at", "stand_stove"]))
+	for i in 3: r.p0_frame(rt.session.current(), 1.0 / 30.0)
+	var bar: UiWorldNameBar = rt.ui._name_bars.get("room:use_stove_1")
+	assert_object(bar).is_not_null()
+	assert_int(bar.status).is_equal(-1)
+	assert_object(bar.icon).is_same(P0Logic.icon("pot"))
+	assert_str(bar.fact).is_equal("Cooking 0:22")
+	r.p0_dev(PackedStringArray(["at", "exit"]))   # walk away: the stove folds back into its button
+	for i in 3: r.p0_frame(rt.session.current(), 1.0 / 30.0)
+	var b: UiWorldIconButton = rt.ui._icons.get("room:use_stove_1")
+	assert_int(b.status).is_equal(UiStatusBadge.State.COUNTDOWN)
+
+func test_a_turn_over_collect_that_fails_recovers_like_a_failed_serve() -> void:
+	# 后裔 on #104: with the stove empty, or the same pot still on it (no network), the rotate refusal used to leave the
+	# player hidden and the camera on the stove, or re-enter the watch and resend 250 ms later. Now only a different
+	# pot on the stove is watched; anything else recovers as a failed serve does.
+	var v := _queue_view()
+	v.cooking.queued = {"id": 4, "dish": "dish_grilled_crucian", "rarity": 1, "ms": 5000, "starts_in": 0}
+	_set_view(v)
+	var sent: Array = []
+	rt.session.transport = func(_m: int, _p: String, _b: Dictionary, cmd: Dictionary): sent.append(cmd)
+	var r := await _farmhouse()
+	var k: P0Kitchen = r.get("kitchen")
+	for failure in ["send_failed", "empty"]:
+		k.watch(v.cooking.stove)
+		k.serve([])
+		assert_str(k.phase).override_failure_message(failure).is_equal("rotate")
+		if failure == "send_failed":   # the same pot is still on the stove
+			rt.session.connection_failed.emit("Can't reach the farm server", {"type": "collect", "pot": 3})
+		else:
+			var empty := _view()
+			_set_view(empty)
+			rt._on_refused("stove_empty", {}, {"type": "collect", "pot": 3})
+		assert_str(k.phase).override_failure_message(failure).is_equal("idle")
+		assert_bool(r.actor.visible).override_failure_message(failure + ": the player is back").is_true()
+		var before := sent.size()
+		for i in 20: await get_tree().process_frame   # no watch, so no automatic resend
+		assert_int(sent.size()).override_failure_message(failure + ": nothing resent").is_equal(before)
+		_set_view(v)

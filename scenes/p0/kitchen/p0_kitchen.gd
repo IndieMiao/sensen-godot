@@ -253,7 +253,7 @@ func _refresh_overlay() -> void:
 			s.quantity = "×1"
 			s.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			_slots.add_child(s)
-		var pp := P0KitchenLogic.page_preview(v, page) if not page.is_empty() else {title = "", state = "", time = ""}
+		var pp := P0KitchenLogic.page_preview(v, page, _queue_mode) if not page.is_empty() else {title = "", state = "", time = ""}
 		_preview.show_facts(pp.title, pp.state, pp.time)
 	_place_overlay.call_deferred()
 
@@ -558,11 +558,17 @@ func on_event(ev: Dictionary) -> bool:
 				"collect":
 					_retrying = false
 					if phase == "serve": _recover()
-					elif phase == "rotate":   # back to whatever is on the stove now (stale_pot: the next pot already)
-						phase = "idle"
+					elif phase == "rotate":
+						# stale_pot after a command kept the watched pot: the next one is on, watch it. Anything else
+						# (no network, the same pot, an empty stove) recovers as a failed serve does: camera and player
+						# back, no automatic resend; a tap on the stove serves or watches it again (后裔 on #104).
 						var st = P0KitchenLogic.stove(rt.session.current())
-						if st != null: watch(st)
-						else: on_collected()
+						if st != null and st.get("id", null) != null and st.get("id", null) != _stove.get("id", null) and float(st.get("ready_in", 1)) > 0.0:
+							phase = "idle"
+							watch(st)
+						else:
+							phase = "serve"
+							_recover()
 			return false
 		"queue":   # the waiting pot fired (Queue ×2): the kept toast names it
 			_queue_ev = ev
@@ -777,4 +783,5 @@ func _after_kept(ev: Dictionary, events: Array) -> void:
 
 func _exit_tree() -> void:
 	if _ring and is_instance_valid(_ring): _ring.queue_free()
+	if _queue_badge and is_instance_valid(_queue_badge): _queue_badge.queue_free()
 	_hide_sheet()

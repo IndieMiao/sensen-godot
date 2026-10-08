@@ -59,7 +59,9 @@ func _marker(n: String, v: Dictionary) -> Dictionary:
 		return {kind = "facility", icon = P0Logic.icon("cabinet"), name = "Warming Cabinet", fact = P0KitchenLogic.cabinet_badge(v),
 			count = P0KitchenLogic.cabinet_count(v)}
 	if n != STOVE: return super(n, v)
-	var stove := {kind = "facility", icon = P0Logic.icon("pot"), name = "Stove 1/1"}   # i-pot (250 walkthrough)
+	# i-pot (250 walkthrough). Up close the strip keeps the pot: the state is the far button's badge and the fact
+	# (Cooking 0:22 / the dish), as on the bench (不知火舞 on #104, 1760:103708).
+	var stove := {kind = "facility", icon = P0Logic.icon("pot"), name = "Stove 1/1", strip_badge = false}
 	if P0KitchenLogic.queued(v) != null: stove.count = "+1"   # Queue ×2: a pot waits behind this one (q(71), 1760:103578)
 	var st = P0KitchenLogic.stove(v)
 	if st == null: return stove.merged({fact = "Empty"})
