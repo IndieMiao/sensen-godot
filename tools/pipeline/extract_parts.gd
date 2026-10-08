@@ -87,8 +87,10 @@ static func pending(recipes: Array, manifest_parts: Array) -> Array:
 static func append_entries(text: String, entries: Array) -> String:
 	if entries.is_empty(): return text
 	# The first top-level "]" after "parts": [ closes it; nested arrays sit deeper, other top-level arrays come later.
-	var open := text.find("\"parts\": [")
-	var close := text.find("\n\t]", open) if open >= 0 else -1
+	const KEY := "\"parts\": ["
+	var open := text.find(KEY)
+	if open < 0 or text.substr(open + KEY.length(), 1) == "]": return ""   # missing or empty: nothing to append after
+	var close := text.find("\n\t]", open)
 	if close < 0: return ""
 	var block := ""
 	for e in entries:

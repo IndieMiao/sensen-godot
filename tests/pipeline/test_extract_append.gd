@@ -51,3 +51,4 @@ func test_entries_land_in_parts_not_in_a_later_top_level_array() -> void:
 	var full := JSON.stringify({"version": 1, "parts": [a, c], "tags": ["x"]}, "\t")
 	assert_str(Extract.append_entries(before, [c])).is_equal(full)
 	assert_str(Extract.append_entries(JSON.stringify({"version": 1, "parts": []}, "\t"), [c])).is_empty()
+	assert_str(Extract.append_entries(JSON.stringify({"version": 1, "parts": [], "tags": ["x"]}, "\t"), [c])).is_empty()
