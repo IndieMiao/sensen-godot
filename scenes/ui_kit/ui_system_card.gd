@@ -2,7 +2,8 @@ class_name UiSystemCard
 extends PanelContainer
 ## SystemCard 1237:87229 (E-03 / D-10 error template; WP6, SGODOT-233): a 328-wide card centred on a dimmed backdrop,
 ## no HUD, no ✕. Icon disc 64 (a 32 icon), the title (what happened), one body line (only facts the system knows),
-## the primary command (Retry, never Try again) and, for Error, one optional secondary under it.
+## the primary command (Retry, never Try again) and one optional secondary under it — a CommandButton Kind=secondary,
+## as wide and tall as the primary (Go back on SYS-LOADING-SCENE-FAIL 1780:103778).
 ##   Kind.BLOCKING  whole-screen system states: SYS-MAINT, SYS-UPDATE, SYS-LOADING Can't connect (primaryTint disc)
 ##   Kind.ERROR     recoverable failures: a place that would not open (disabled-grey disc)
 ## show_card({icon, title, body, primary, secondary}): "" hides that part. Emits primary_pressed / secondary_pressed.
@@ -30,7 +31,7 @@ var icon_rect: TextureRect
 var title: Label
 var body: Label
 var primary: UiCommandButton
-var secondary: UiDismissButton
+var secondary: UiCommandButton
 
 var _disc: Panel
 var _gap: Control
@@ -70,8 +71,8 @@ func _init(kind_: Kind = Kind.BLOCKING) -> void:
 	primary = UiCommandButton.new("", UiCommandButton.Kind.PRIMARY)
 	primary.activated.connect(func(): primary_pressed.emit())
 	col.add_child(primary)
-	secondary = UiDismissButton.new("")
-	secondary.pressed.connect(func(): secondary_pressed.emit())
+	secondary = UiCommandButton.new("", UiCommandButton.Kind.SECONDARY)
+	secondary.activated.connect(func(): secondary_pressed.emit())
 	col.add_child(secondary)
 
 static func _line(style: StringName, color: Color) -> Label:
@@ -93,5 +94,5 @@ func show_card(d: Dictionary) -> void:
 	primary.label = str(d.get("primary", ""))
 	primary.visible = primary.label != ""
 	_gap.visible = primary.visible
-	secondary.text = str(d.get("secondary", ""))
-	secondary.visible = secondary.text != ""
+	secondary.label = str(d.get("secondary", ""))
+	secondary.visible = secondary.label != ""
