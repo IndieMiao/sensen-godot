@@ -280,10 +280,48 @@ func test_the_pond_card_reads_back_to_at_the_pond_the_player_is_at() -> void:
 	assert_str((card.find_child("Primary", true, false) as UiCommandButton).label).is_equal("Back to Reed Pond")
 	assert_array(card.find_children("*", "UiFactRow", true, false).map(func(f): return str((f as UiFactRow).label))).not_contains(["Distance"])
 	rt.ui.close_modal()
+	await get_tree().process_frame
 	rt.here = {"space": "home", "place": ""}
 	m.p0_dev(PackedStringArray(["pondcard", NEAREST_POND]))
 	card = rt.ui._modal
 	assert_str((card.find_child("Primary", true, false) as UiCommandButton).label).is_equal("Go")
 	assert_array(card.find_children("*", "UiFactRow", true, false).map(func(f): return str((f as UiFactRow).label))).contains(["Distance"])
 	rt.ui.close_modal()
+	await get_tree().process_frame
 	rt.here = saved
+	_drain_shore()
+
+## Back and a tap outside on the fish list go back to the pond card like its × (哪吒 on #95; the layered way back of
+## #37 / #87), the pin still selected; from the card they close it and clear the selection.
+func test_back_on_the_fish_list_goes_back_to_the_pond_card() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var city: CityMapView = m.city_map
+	var details := func():   # the card's own Details ›, as a tap
+		(rt.ui._modal.find_child("Details", true, false) as Button).pressed.emit()
+		await get_tree().process_frame
+	m.p0_dev(PackedStringArray(["pondcard", NEAREST_POND]))
+	await details.call()
+	assert_str(rt.ui.modal_kind).is_equal("pond_fish")
+	assert_bool(rt.ui.close_top_layer()).is_true()   # Android Back
+	await get_tree().process_frame
+	assert_str(rt.ui.modal_kind).is_equal("pond_card")
+	assert_str(str(city.selected.get("id", ""))).is_equal(NEAREST_POND)
+	await details.call()
+	rt.ui.back_modal()   # a tap outside
+	await get_tree().process_frame
+	assert_str(rt.ui.modal_kind).is_equal("pond_card")
+	assert_str(str(city.selected.get("id", ""))).is_equal(NEAREST_POND)
+	assert_bool(rt.ui.close_top_layer()).is_true()   # Back from the card closes it
+	await get_tree().process_frame
+	assert_bool(rt.ui.has_modal()).is_false()
+	assert_dict(city.selected).is_empty()
+	_drain_shore()
+
+## Selecting a pond pin prewarms its bank on a worker thread (WaterShore.prewarm): a test that opens a pond card waits
+## for it, else the detached bank counts as an orphan and the thread is still running when the engine shuts down.
+static func _drain_shore() -> void:
+	for key in WaterShore._pending.keys(): WorkerThreadPool.wait_for_task_completion(WaterShore._pending[key])
+	WaterShore._pending.clear()

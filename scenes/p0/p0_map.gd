@@ -136,7 +136,8 @@ func is_here(space: String, place: String) -> bool:
 	return rt != null and str(rt.here.get("space", "")) == space and str(rt.here.get("place", "")) == place
 
 ## Details ›: the pond's fish list (q(48) c): caught fish in colour with their name, the rest as a silhouette with
-## the Fishing level they need. × goes back to the pond card; tapping outside closes both.
+## the Fishing level they need. ×, Back and a tap outside all go back to the pond card (P0Ui.back_modal, the layered
+## way back of 亚瑟 on #37; 哪吒 on #95); from the card they close it.
 func _open_pond_fish(entry: Dictionary) -> void:
 	var ui := rt.ui
 	var info := _pond_info(entry)
@@ -181,6 +182,9 @@ func _open_pond_fish(entry: Dictionary) -> void:
 		if not back[0] and city_map and str(city_map.selected.get("id", "")) == id: city_map.clear_selection())
 	ui._open_modal(holder, 0.0, false)
 	ui.modal_kind = "pond_fish"
+	ui._modal_back = func():   # set after _open_modal, which clears it
+		back[0] = true
+		_open_pond_card(entry, info)
 
 func _prewarm_pond(id: String) -> void:
 	var pond := SystemPonds.location(id)
