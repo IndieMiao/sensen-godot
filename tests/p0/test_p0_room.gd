@@ -77,10 +77,15 @@ func test_validation_reports_each_naming_rule() -> void:
 	assert_int(errors.size()).is_equal(7)
 
 func test_the_placeholder_anchor_files_pass_validation() -> void:
-	var layout := P0RoomAnchors.read_json(P0Room.BASIC_ROOM_LAYOUT)
-	var modules: Array = layout.assets.map(func(a): return str(a.name)) + layout.instances.map(func(a): return str(a.name))
+	# Each file against its own room kit: an outpost's art (p0_outposts.json), else the Basic Room (SGODOT-227).
+	var kit_of := {}
+	for o in P0Outposts.all(): kit_of[str(o.anchors)] = str(o.get("art", "basic_room"))
 	for path in _anchor_files("res://assets/p0"):
-		var errors := P0RoomAnchors.validate(P0RoomAnchors.merge(layout, P0RoomAnchors.read_json(path)), modules)
+		var layout := P0RoomAnchors.read_json("res://assets/rooms/%s/layout.json" % kit_of.get(path, "basic_room"))
+		var modules: Array = layout.get("assets", []).map(func(a): return str(a.name)) + layout.get("instances", []).map(func(a): return str(a.name))
+		var external := P0RoomAnchors.read_json(path)
+		var known: Array = modules + P0RoomAnchors.props(external).map(func(p): return str(p.name))
+		var errors := P0RoomAnchors.validate(P0RoomAnchors.merge(layout, external), known)
 		assert_array(errors).override_failure_message(path + "\n" + "\n".join(errors)).is_empty()
 
 func _anchor_files(dir: String) -> Array:
@@ -193,19 +198,27 @@ func test_push_in_puts_the_stove_in_the_band_above_the_drawer() -> void:
 # ---------------------------------------------------------------- farmhouse (placeholder Basic Room)
 const FARMHOUSE := preload("res://scenes/p0/rooms/p0_farmhouse.gd")
 
-func _farmhouse() -> P0Room:
+func _farmhouse(level := 1) -> P0Room:
 	var r: P0Room = FARMHOUSE.new()
 	r.use_runtime = false
+	r.level = level
 	add_child(r)
 	auto_free(r)
 	return r
+
+## Show from inside the farmhouse (亚瑟 on #37): the stove is the room's own spot; farm targets are not, so the
+## runtime steps out to the farm and shows them there.
+func test_farmhouse_has_the_stove_spot_but_not_the_farms() -> void:
+	var r := _farmhouse()
+	assert_bool(r.p0_has_spot("stove")).is_true()
+	for where in ["plots", "stall", "bench", "home"]: assert_bool(r.p0_has_spot(where)).override_failure_message(where).is_false()
 
 func test_farmhouse_opens_on_the_stove_corner_with_a_door_back_to_the_farm() -> void:
 	var r := _farmhouse()
 	for n in ["use_stove_1", "drop_pot_1", "badge_stove_1", "stand_stove", "cam_stove", "spawn", "exit"]:
 		assert_object(r.anchor(n)).override_failure_message(n).is_not_null()
 	assert_str(r.place_name).is_equal("Farmhouse")
-	assert_dict(r._marker("exit", {})).is_equal({text = "Door · Back to farm"})
+	assert_dict(r._marker("exit", {})).is_equal({kind = "facility", icon = P0Logic.icon("door"), name = "Farm"})   # 250: i-door + Farm
 	assert_array(Array(r._tappable())).contains_exactly_in_any_order(["use_stove_1", "exit"])
 	assert_array(r.grid.point_path(r.actor.position, r.anchor("stand_stove").global_position)).is_not_empty()
 	# The opening shot keeps the stove and the door on screen.
@@ -213,18 +226,61 @@ func test_farmhouse_opens_on_the_stove_corner_with_a_door_back_to_the_farm() -> 
 	for n in ["use_stove_1", "exit"]:
 		assert_bool(view.has_point(r.cam.unproject_position(r.anchor(n).global_position))).override_failure_message(n).is_true()
 
+func test_the_room_has_one_hearth_lamp_ahead_of_the_art() -> void:
+	# The Basic Room's particle fire (PR #29) looks for ../HearthGlow when the art enters the tree; it must find
+	# the room's lamp rather than add a second one.
+	var r := _farmhouse()
+	var lamps := r.room.find_children("HearthGlow", "OmniLight3D", true, false)
+	assert_int(lamps.size()).is_equal(1)
+	assert_int(lamps[0].get_index()).is_less(r.art.get_index())
+	assert_object(r.room.get_node_or_null("HearthGlow")).is_not_null()
+	# …and the fire drives that very lamp (its light_path is relative to the fire node, Hou Yi's review on #32).
+	var fire: Node = r.art.get("fire")
+	assert_object(fire.get_node_or_null(fire.get("light_path"))).is_same(r.room.get_node("HearthGlow"))
+
+func test_the_kitchen_corner_grows_with_the_homestead() -> void:
+	# Lv1: no Spice Rack, no Warming Cabinet (props hidden, their anchors absent, nothing to tap).
+	var lv1 := _farmhouse(1)
+	assert_bool(lv1.art.get_node("spice_rack").visible).is_false()
+	assert_bool(lv1.art.get_node("warming_cabinet").visible).is_false()
+	assert_object(lv1.anchor("use_warming_cabinet")).is_null()
+	assert_array(Array(lv1._tappable())).not_contains(["use_spice_rack", "use_warming_cabinet"])
+	# Lv2: the rack; Lv3: the cabinet too, with its glow, a collider in the walkable grid and a reachable stand.
+	var lv2 := _farmhouse(2)
+	assert_bool(lv2.art.get_node("spice_rack").visible).is_true()
+	assert_bool(lv2.art.get_node("warming_cabinet").visible).is_false()
+	var lv3 := _farmhouse(3)
+	assert_array(Array(lv3._tappable())).contains(["use_spice_rack", "use_warming_cabinet"])
+	assert_bool(lv3.art.get_node("warming_cabinet_glow").visible).is_true()
+	var cab := lv3.anchor("use_warming_cabinet").global_position
+	assert_bool(lv3.bp.is_walkable(lv3.bp.world_to_cell(Vector3(cab.x, 0, cab.z)))).override_failure_message("the cabinet blocks the floor").is_false()
+	assert_array(lv3.grid.point_path(lv3.actor.position, lv3.anchor("stand_warming_cabinet").global_position)).is_not_empty()
+	assert_str(str(lv3._marker("use_spice_rack", {}).name)).is_equal("Spice Rack")
+	assert_str((lv3._marker("use_spice_rack", {}).icon as Texture2D).resource_path).is_equal("res://assets/p0/icons/spice_rack.svg")   # i-spice-rack
+	var cab_mark := lv3._marker("use_warming_cabinet", {"cooking": {"cabinet": {"cap": 6, "have": 6, "items": []}}})
+	assert_str(str(cab_mark.name)).is_equal("Warming Cabinet")
+	assert_str(str(cab_mark.fact)).is_equal("Full")
+	assert_str(str(cab_mark.count)).is_equal("Full")   # C21: its button hangs the count from afar
+	assert_str(str(lv3._marker("use_warming_cabinet", {"cooking": {"cabinet": {"cap": 6, "have": 4, "items": []}}}).count)).is_equal("4/6")
+	assert_str(str(lv3._marker("use_warming_cabinet", {"cooking": {"cabinet": {"cap": 6, "have": 0, "items": []}}}).count)).is_equal("")
+	assert_str((cab_mark.icon as Texture2D).resource_path).is_equal("res://assets/p0/icons/cabinet.svg")   # i-cabinet
+
 func test_farmhouse_stove_card_and_badge_follow_the_server_stove() -> void:
 	var r := _farmhouse()
+	# SGODOT-250 (q(62) "Stove 1/1 · Empty"): i-pot + name + one fact; the stove's state rides as its status mark.
 	var empty := r._marker("use_stove_1", {"cooking": {"stove": null}})
-	assert_str(empty.text).is_equal("Stove 1/1 · Empty · Tap to cook")
-	assert_str(empty.badge).is_equal("available")
+	assert_str(str(empty.kind)).is_equal("facility")
+	assert_str(str(empty.name)).is_equal("Stove 1/1")
+	assert_str(str(empty.fact)).is_equal("Empty")
+	assert_bool(empty.has("badge")).is_false()   # an empty stove shows the pot, no status
 	var cooking := r._marker("use_stove_1", {"cooking": {"stove": {"ready_in": 22000, "dish": "dish_grilled_crucian"}}})
-	assert_str(cooking.text).is_equal("Stove 1/1 · Cooking 0:22")
-	assert_str(cooking.badge).is_equal("countdown")
-	assert_str(cooking.caption).is_equal("0:22")
+	assert_str(str(cooking.fact)).is_equal("Cooking 0:22")
+	assert_str(str(cooking.badge)).is_equal("countdown")
 	var ready := r._marker("use_stove_1", {"cooking": {"stove": {"ready_in": 0, "dish": null}}})
-	assert_str(ready.text).is_equal("Stove · Ready · Unknown dish")
-	assert_str(ready.badge).is_equal("ready")
+	assert_str(str(ready.fact)).is_equal("Unknown dish")
+	assert_str(str(ready.badge)).is_equal("ready")
+	for n in r._tappable():   # no Tap to anywhere in the farmhouse
+		assert_bool(r._marker(n, {}).has("text")).override_failure_message(n).is_false()
 
 func test_a_room_that_fits_the_screen_holds_its_framing_while_walking() -> void:
 	var r := _farmhouse()
@@ -264,3 +320,189 @@ func test_back_at_the_door_leaves_at_once_and_is_still_handled() -> void:
 	assert_bool(r.is_back_navigation_locked()).is_true()
 	assert_int(left[0]).is_equal(1)
 	r.p0_frame({}, 0.1)   # a frame after leaving does nothing
+
+## Hard constraint (Arthur, SGODOT-226): with the cooking drawer up (480 of 800 at 360 wide), the whole stove stays
+## above the drawer's top edge, and the pot sits between the HUD and the slot bar.
+func test_pushed_in_stove_clears_the_cooking_drawer_on_a_360_by_800_screen() -> void:
+	var sv := SubViewport.new()
+	sv.size = Vector2i(360, 800)
+	sv.own_world_3d = true
+	add_child(auto_free(sv))
+	var r: P0Room = FARMHOUSE.new()
+	r.use_runtime = false
+	sv.add_child(r)
+	r.focus("cam_stove", {band = r.band_below_hud(P0Kitchen.BAND_TOP_DRAWER), size = r.view_size() * P0Kitchen.FOCUS_SIZE})
+	r._shot_k = 1.0
+	r._update_camera()
+	var drawer_top := 800.0 - P0KitchenDrawer.HEIGHT
+	var lowest := -INF
+	var hearth: Node3D = r.art.get_node("hearth")
+	for mi in hearth.find_children("*", "MeshInstance3D", true, false):
+		var box: AABB = (mi as MeshInstance3D).global_transform * (mi as MeshInstance3D).get_aabb()
+		for i in 8: lowest = maxf(lowest, r.cam.unproject_position(box.get_endpoint(i)).y)
+	assert_float(lowest).override_failure_message("stove bottom %.0f vs drawer top %.0f" % [lowest, drawer_top]).is_less(drawer_top)
+	var pot := r.cam.unproject_position(r.anchor("drop_pot_1").global_position).y
+	assert_float(pot).is_greater(P0Room.HUD_BOTTOM)
+	assert_float(pot).is_less(drawer_top - 80.0)   # slot bar (50) and preview (26) sit above the drawer
+
+# ---------------------------------------------------------------- environment and backdrop (SGODOT-248 / 249)
+## The real farm scene and its suspend() / resume(), without the farm's _ready (runtime, session, world build).
+func _farm_under() -> Node3D:
+	var stub := GDScript.new()
+	stub.source_code = "extends \"res://scenes/p0/p0_farm.gd\"\nfunc _ready() -> void: pass\nfunc _exit_tree() -> void: pass\n"
+	stub.reload()
+	var farm: Node3D = load("res://scenes/p0/p0_farm.tscn").instantiate()
+	farm.set_script(stub)
+	add_child(farm)
+	auto_free(farm)
+	return farm
+
+func test_the_farm_hands_its_environment_to_the_farmhouse_above_it() -> void:
+	# The viewport lights with the first WorldEnvironment in the tree: unless the farm lets go of its own, the
+	# farmhouse shows the farm's cool ambient and green backdrop (hand test 249).
+	var farm := _farm_under()
+	var farm_env: Environment = farm.world_env.environment
+	assert_object(farm_env).is_not_null()
+	farm.suspend()
+	assert_object(farm.world_env.environment).is_null()
+	# Its canvas backdrop (layer −1, BG_CANVAS only) would otherwise cover the room's colour background.
+	assert_bool(farm.get_node("FarmBackground").visible).is_false()
+	var r := _farmhouse()
+	await get_tree().process_frame
+	assert_object(r.get_viewport().find_world_3d().environment).is_same(r.environment)
+	r.suspend()
+	farm.resume()
+	await get_tree().process_frame
+	assert_object(farm.world_env.environment).is_same(farm_env)
+	assert_object(farm.get_viewport().find_world_3d().environment).is_same(farm_env)
+	assert_bool(farm.get_node("FarmBackground").visible).is_true()
+	farm.suspend()
+	farm.suspend()   # twice in a row still keeps the farm's own
+	farm.resume()
+	assert_object(farm.world_env.environment).is_same(farm_env)
+
+func test_a_room_is_opaque_over_the_map() -> void:
+	# The map's root is transparent so its tiles show; a room pushed above it must not let them through (248).
+	var was := get_viewport().transparent_bg
+	get_viewport().transparent_bg = true
+	var r := _farmhouse()
+	assert_bool(r.get_viewport().transparent_bg).is_false()
+	r.suspend()
+	get_viewport().transparent_bg = true   # the map underneath on its own resume
+	r.resume()
+	assert_bool(r.get_viewport().transparent_bg).is_false()
+	get_viewport().transparent_bg = was
+
+func test_the_spice_rack_takes_taps_beside_it_and_the_stove_keeps_to_its_body() -> void:
+	# int6 C8: the rack is a small shelf on the wall beside the stove; picking by the nearest anchor gave taps just
+	# beside the shelf to the stove. Now each of the three is tapped by its art: the rack's box is at least 44 × 44,
+	# overlaps go to the smaller (small things first), and the stove never reaches past its body and pot.
+	for lv in [2, 3]:
+		var r := _farmhouse(lv)
+		await get_tree().process_frame
+		var rack := r.hit_rect("use_spice_rack")
+		var stove := r.hit_rect("use_stove_1")
+		assert_bool(rack.size.x >= P0Room.MIN_HIT and rack.size.y >= P0Room.MIN_HIT).override_failure_message(str(rack)).is_true()
+		assert_str(r.pick(rack.get_center())).is_equal("use_spice_rack")
+		# Every corner of the rack's box (including the edge towards the stove) opens the rack.
+		for corner in [rack.position, rack.end - Vector2.ONE, Vector2(rack.end.x - 1, rack.position.y), Vector2(rack.position.x, rack.end.y - 1)]:
+			assert_str(r.pick(corner)).override_failure_message("Lv%d %s" % [lv, corner]).is_equal("use_spice_rack")
+		# The stove's body still opens the stove; a point on the wall left of its box is no longer the stove's.
+		var pot := r.cam.unproject_position(r.anchor("use_stove_1").global_position)
+		assert_bool(stove.has_point(pot)).is_true()
+		assert_str(r.pick(pot)).is_equal("use_stove_1")
+		assert_str(r.pick(Vector2(stove.position.x - 4, pot.y))).is_not_equal("use_stove_1")
+	var lv3 := _farmhouse(3)
+	await get_tree().process_frame
+	var cab := lv3.hit_rect("use_warming_cabinet")
+	var rack3 := lv3.hit_rect("use_spice_rack")
+	var below := Vector2(cab.get_center().x, maxf(cab.get_center().y, rack3.end.y + 4))
+	assert_bool(cab.has_point(below)).override_failure_message("%s not in the cabinet's box %s" % [below, cab]).is_true()
+	assert_str(lv3.pick(below)).is_equal("use_warming_cabinet")   # under the shelf, the cabinet's own
+
+## Godot's ACES as P0Room models it gives exactly the screen colours 248 and 227 measured, and reverses the art
+## director's backdrop colours (SGODOT-227 美术决定 2b53b84d) to inputs that show them.
+func test_the_aces_model_matches_the_measured_screen_colours_and_reverses() -> void:
+	var lin := func(hex: String) -> Vector3:
+		var c := Color(hex).srgb_to_linear()
+		return Vector3(c.r, c.g, c.b)
+	assert_str(P0Room.aces_screen(lin.call("e8e4c8")).to_html(false)).is_equal("f7f6ea")   # 248, Metal and Vulkan
+	assert_str(P0Room.aces_screen(lin.call("d3e7d8")).to_html(false)).is_equal("eff7f1")   # 227, the tea house
+	for hex in ["e6f5f1", "fffbee", "eff7f4", "fdfcf4", "d5eff3", "f7f6ea"]:
+		assert_str(P0Room.aces_screen(P0Room.aces_input(Color(hex))).to_html(false)).override_failure_message(hex).is_equal(hex)
+
+## The Basic Room has no review_lighting: the farmhouse keeps the P0Room benchmark light (249) and the plain plate.
+func test_the_basic_room_keeps_the_benchmark_light() -> void:
+	var r := _room()
+	assert_str(r.environment.ambient_light_color.to_html(false)).is_equal("fff0dc")
+	assert_float(r.environment.ambient_light_energy).is_equal_approx(0.70, 0.001)
+	var sun := r.room.get_node("RoomSun") as DirectionalLight3D
+	assert_str(sun.light_color.to_html(false)).is_equal("ffe6c2")
+	assert_float(sun.light_energy).is_equal_approx(1.05, 0.001)
+	assert_float(sun.shadow_bias).is_equal_approx(0.045, 0.001)
+	assert_float(sun.shadow_normal_bias).is_equal_approx(0.4, 0.001)
+	assert_float(sun.directional_shadow_max_distance).is_equal_approx(30.0, 0.001)
+	assert_int(sun.directional_shadow_mode).is_equal(DirectionalLight3D.SHADOW_ORTHOGONAL)
+	assert_float(sun.light_angular_distance).is_equal_approx(1.4, 0.001)
+	assert_array(r.room.find_children("ReviewLamp*", "OmniLight3D", false, false)).is_empty()
+	var plate := r.cam.get_node("Backdrop") as MeshInstance3D
+	assert_str((plate.material_override as StandardMaterial3D).albedo_color.to_html(false)).is_equal("e8e4c8")
+	assert_float(r.cam.near).is_equal_approx(0.1, 0.0001)
+	assert_float(r.cam.far).is_equal_approx(70.0, 0.0001)
+	assert_vector(r.sun_direction()).is_equal(Vector3(-6, 7, 1.5))   # layout.sun_direction
+
+## A kit whose review lamp sits on the hearth keeps one hearth lamp: HearthGlow, the one the fire brightens (#29 / #32).
+func test_a_review_lamp_on_the_hearth_is_not_added_twice() -> void:
+	var layout := P0RoomAnchors.read_json(P0Room.BASIC_ROOM_LAYOUT)
+	var fire: Array = layout.fire_position
+	layout["review_lighting"] = {"ambient_color": "c0ada9", "ambient": 0.67, "sun_color": "ffe0ae", "sun": 1.55,
+		"sun_position": [6, 9, -4], "sun_target": [0, 0, 0.8],
+		"points": [{"position": fire, "color": "ffb85e", "energy": 1.0}, {"position": [1.0, 2.2, 0.5], "color": "ffe0a3", "energy": 1.2, "range": 1.45}]}
+	layout["lighting"] = {"angular_distance": 4.5}
+	var path := "user://test_review_room.layout.json"
+	var f := FileAccess.open(path, FileAccess.WRITE)
+	f.store_string(JSON.stringify(layout))
+	f.close()
+	var r := Sample.new()
+	r.setup({})
+	r.layout_path = path
+	add_child(r)
+	auto_free(r)
+	assert_int(r.room.find_children("HearthGlow", "OmniLight3D", false, false).size()).is_equal(1)
+	var lamps := r.room.find_children("ReviewLamp*", "OmniLight3D", false, false)
+	assert_int(lamps.size()).is_equal(1)
+	assert_vector((lamps[0] as OmniLight3D).position).is_equal(Vector3(1.0, 2.2, 0.5))
+	assert_float((lamps[0] as OmniLight3D).omni_range).is_equal_approx(1.45, 0.001)
+	var sun := r.room.get_node("RoomSun") as DirectionalLight3D
+	assert_float(sun.light_angular_distance).is_equal_approx(4.5, 0.001)
+	# No shadow values in the review: Godot's own shadow, as render_r1 signed the Coffee Shop and Fruit Shop.
+	assert_int(sun.directional_shadow_mode).is_equal(DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS)
+	assert_float(sun.directional_shadow_max_distance).is_equal_approx(40.0, 0.001)
+	assert_float(sun.shadow_bias).is_equal_approx(0.1, 0.001)
+	assert_float(sun.shadow_normal_bias).is_equal_approx(2.0, 0.001)
+	# The signed sun wins over the Basic Room's layout.sun_direction, and the camera clips as render_r1's did.
+	assert_vector(r.sun_direction()).is_equal(Vector3(6, 9, -4.8))
+	assert_float(r.cam.near).is_equal_approx(0.05, 0.0001)
+	assert_float(r.cam.far).is_equal_approx(150.0, 0.0001)
+
+## A review with shadow values was signed through review_room.gd: one orthogonal map with those values (Farm Tools
+## Store, Post Office); the ones it leaves out take that tool's defaults.
+func test_review_shadow_values_cast_the_review_tools_shadow() -> void:
+	var sun := DirectionalLight3D.new()
+	P0Room._set_sun_shadow(sun, {"sun": 1.2, "shadow_bias": 0.03})
+	assert_int(sun.directional_shadow_mode).is_equal(DirectionalLight3D.SHADOW_ORTHOGONAL)
+	assert_float(sun.shadow_bias).is_equal_approx(0.03, 0.001)
+	assert_float(sun.shadow_normal_bias).is_equal_approx(0.18, 0.001)
+	assert_float(sun.directional_shadow_max_distance).is_equal_approx(35.0, 0.001)
+	sun.free()
+	# … and its camera clipped at Godot's defaults: at the old 70 m the Post Office's west wall shaded the floor by
+	# the door, which the signed render does not show.
+	assert_vector(P0Room.review_clip({"shadow_bias": 0.065})).is_equal(Vector2(0.05, 4000.0))
+	assert_vector(P0Room.review_clip({"sun": 1.55})).is_equal(Vector2(0.05, 150.0))
+	assert_vector(P0Room.review_clip({})).is_equal(Vector2(0.1, 70.0))
+
+## A door without its own badge_exit point keeps its prompt and pick point over the threshold (the Basic Room's door).
+func test_a_door_without_a_badge_point_is_picked_over_the_threshold() -> void:
+	var r := _room()
+	assert_object(r.anchor("badge_exit")).is_null()
+	assert_vector(r.pick_point("exit")).is_equal(r.anchor("exit").global_position + Vector3(0, 1.0, 0))

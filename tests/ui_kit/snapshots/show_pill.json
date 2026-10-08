@@ -1,0 +1,201 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    141
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiShowPill"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        36
+      ],
+      "variation": "CaptionR12",
+      "text": "Show pill of TodayRow 1145:81714 / NeedSource 1092:77266 · LOCK-08"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        70,
+        328,
+        71
+      ],
+      "children": [
+        {
+          "type": "HFlowContainer",
+          "rect": [
+            0,
+            70,
+            328,
+            51
+          ],
+          "children": [
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                0,
+                70,
+                70,
+                51
+              ],
+              "children": [
+                {
+                  "type": "UiShowPill",
+                  "rect": [
+                    7,
+                    70,
+                    55,
+                    28
+                  ],
+                  "text": "",
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        18,
+                        75,
+                        33,
+                        18
+                      ],
+                      "variation": "CaptionXB12",
+                      "text": "Show"
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    0,
+                    104,
+                    70,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "TODAY · 28 high"
+                }
+              ]
+            },
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                90,
+                70,
+                100,
+                51
+              ],
+              "children": [
+                {
+                  "type": "UiShowPill",
+                  "rect": [
+                    90,
+                    70,
+                    100,
+                    28
+                  ],
+                  "text": "",
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        101,
+                        75,
+                        78,
+                        18
+                      ],
+                      "variation": "CaptionXB12",
+                      "text": "Show on map"
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    90,
+                    104,
+                    100,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "TODAY · elsewhere"
+                }
+              ]
+            },
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                210,
+                70,
+                76,
+                51
+              ],
+              "children": [
+                {
+                  "type": "UiShowPill",
+                  "rect": [
+                    215,
+                    70,
+                    65,
+                    31
+                  ],
+                  "text": "",
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        229,
+                        77,
+                        40,
+                        18
+                      ],
+                      "variation": "CaptionXB12",
+                      "text": "Show ›"
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    210,
+                    107,
+                    76,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "SOURCE · 31 high"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            127,
+            328,
+            14
+          ],
+          "variation": "C9B",
+          "text": "Drawn at the main's size; touches reach 44 × 44 around it (_has_point)."
+        }
+      ]
+    }
+  ]
+}

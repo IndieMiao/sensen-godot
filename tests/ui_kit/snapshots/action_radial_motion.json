@@ -1,0 +1,920 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    416
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiActionRadial · opening"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        18
+      ],
+      "variation": "CaptionR12",
+      "text": "Motion 1651:100816 · 0 / 80 / 160 / 300 ms"
+    },
+    {
+      "type": "GridContainer",
+      "rect": [
+        0,
+        52,
+        328,
+        364
+      ],
+      "children": [
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            52,
+            159,
+            179
+          ],
+          "children": [
+            {
+              "type": "Control",
+              "rect": [
+                0,
+                52,
+                158,
+                159
+              ],
+              "children": [
+                {
+                  "type": "Control",
+                  "rect": [
+                    0,
+                    52,
+                    158,
+                    158
+                  ],
+                  "children": [
+                    {
+                      "type": "UiActionRadial",
+                      "rect": [
+                        0,
+                        52,
+                        158,
+                        158
+                      ],
+                      "children": [
+                        {
+                          "type": "ColorRect",
+                          "rect": [
+                            0,
+                            52,
+                            158,
+                            158
+                          ]
+                        },
+                        {
+                          "type": "Control",
+                          "rect": [
+                            0,
+                            52,
+                            158,
+                            158
+                          ],
+                          "children": [
+                            {
+                              "type": "Button",
+                              "rect": [
+                                71,
+                                123,
+                                16,
+                                16
+                              ],
+                              "text": "",
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    76,
+                                    128,
+                                    7,
+                                    7
+                                  ]
+                                },
+                                {
+                                  "type": "Panel",
+                                  "rect": [
+                                    83,
+                                    124,
+                                    4,
+                                    4
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "TextureRect",
+                                      "rect": [
+                                        83,
+                                        125,
+                                        3,
+                                        3
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Button",
+                              "rect": [
+                                71,
+                                123,
+                                16,
+                                16
+                              ],
+                              "text": "",
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    75,
+                                    127,
+                                    8,
+                                    8
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Button",
+                              "rect": [
+                                71,
+                                123,
+                                16,
+                                16
+                              ],
+                              "text": "",
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    76,
+                                    128,
+                                    7,
+                                    7
+                                  ]
+                                },
+                                {
+                                  "type": "Panel",
+                                  "rect": [
+                                    83,
+                                    124,
+                                    4,
+                                    4
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "TextureRect",
+                                      "rect": [
+                                        83,
+                                        125,
+                                        3,
+                                        3
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Button",
+                              "rect": [
+                                71,
+                                123,
+                                16,
+                                16
+                              ],
+                              "text": "",
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    76,
+                                    128,
+                                    7,
+                                    7
+                                  ]
+                                },
+                                {
+                                  "type": "Panel",
+                                  "rect": [
+                                    83,
+                                    124,
+                                    4,
+                                    4
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "TextureRect",
+                                      "rect": [
+                                        83,
+                                        125,
+                                        3,
+                                        3
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                217,
+                159,
+                14
+              ],
+              "variation": "C9B",
+              "text": "0 ms"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            165,
+            52,
+            159,
+            179
+          ],
+          "children": [
+            {
+              "type": "Control",
+              "rect": [
+                165,
+                52,
+                158,
+                159
+              ],
+              "children": [
+                {
+                  "type": "Control",
+                  "rect": [
+                    165,
+                    52,
+                    158,
+                    158
+                  ],
+                  "children": [
+                    {
+                      "type": "UiActionRadial",
+                      "rect": [
+                        165,
+                        52,
+                        158,
+                        158
+                      ],
+                      "children": [
+                        {
+                          "type": "ColorRect",
+                          "rect": [
+                            165,
+                            52,
+                            158,
+                            158
+                          ]
+                        },
+                        {
+                          "type": "Control",
+                          "rect": [
+                            165,
+                            52,
+                            158,
+                            158
+                          ],
+                          "children": [
+                            {
+                              "type": "Button",
+                              "rect": [
+                                172,
+                                59,
+                                53,
+                                53
+                              ],
+                              "text": "",
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    186,
+                                    73,
+                                    25,
+                                    25
+                                  ]
+                                },
+                                {
+                                  "type": "Panel",
+                                  "rect": [
+                                    210,
+                                    60,
+                                    13,
+                                    13
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "TextureRect",
+                                      "rect": [
+                                        212,
+                                        62,
+                                        9,
+                                        9
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Button",
+                              "rect": [
+                                256,
+                                78,
+                                42,
+                                42
+                              ],
+                              "text": "",
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    266,
+                                    88,
+                                    22,
+                                    22
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Button",
+                              "rect": [
+                                236,
+                                123,
+                                16,
+                                16
+                              ],
+                              "text": "",
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    241,
+                                    128,
+                                    7,
+                                    7
+                                  ]
+                                },
+                                {
+                                  "type": "Panel",
+                                  "rect": [
+                                    248,
+                                    124,
+                                    4,
+                                    4
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "TextureRect",
+                                      "rect": [
+                                        248,
+                                        125,
+                                        3,
+                                        3
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Button",
+                              "rect": [
+                                236,
+                                123,
+                                16,
+                                16
+                              ],
+                              "text": "",
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    241,
+                                    128,
+                                    7,
+                                    7
+                                  ]
+                                },
+                                {
+                                  "type": "Panel",
+                                  "rect": [
+                                    248,
+                                    124,
+                                    4,
+                                    4
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "TextureRect",
+                                      "rect": [
+                                        248,
+                                        125,
+                                        3,
+                                        3
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                165,
+                217,
+                159,
+                14
+              ],
+              "variation": "C9B",
+              "text": "80 ms"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            237,
+            159,
+            179
+          ],
+          "children": [
+            {
+              "type": "Control",
+              "rect": [
+                0,
+                237,
+                158,
+                159
+              ],
+              "children": [
+                {
+                  "type": "Control",
+                  "rect": [
+                    0,
+                    237,
+                    158,
+                    158
+                  ],
+                  "children": [
+                    {
+                      "type": "UiActionRadial",
+                      "rect": [
+                        0,
+                        237,
+                        158,
+                        158
+                      ],
+                      "children": [
+                        {
+                          "type": "ColorRect",
+                          "rect": [
+                            0,
+                            237,
+                            158,
+                            158
+                          ]
+                        },
+                        {
+                          "type": "Control",
+                          "rect": [
+                            0,
+                            237,
+                            158,
+                            158
+                          ],
+                          "children": [
+                            {
+                              "type": "Button",
+                              "rect": [
+                                8,
+                                245,
+                                52,
+                                52
+                              ],
+                              "text": "",
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    21,
+                                    258,
+                                    25,
+                                    25
+                                  ]
+                                },
+                                {
+                                  "type": "Panel",
+                                  "rect": [
+                                    45,
+                                    246,
+                                    13,
+                                    13
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "TextureRect",
+                                      "rect": [
+                                        48,
+                                        248,
+                                        9,
+                                        9
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Button",
+                              "rect": [
+                                100,
+                                241,
+                                54,
+                                54
+                              ],
+                              "text": "",
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    113,
+                                    254,
+                                    29,
+                                    29
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Button",
+                              "rect": [
+                                99,
+                                336,
+                                53,
+                                53
+                              ],
+                              "text": "",
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    113,
+                                    350,
+                                    25,
+                                    25
+                                  ]
+                                },
+                                {
+                                  "type": "Panel",
+                                  "rect": [
+                                    137,
+                                    337,
+                                    13,
+                                    13
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "TextureRect",
+                                      "rect": [
+                                        139,
+                                        339,
+                                        9,
+                                        9
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Button",
+                              "rect": [
+                                26,
+                                328,
+                                42,
+                                42
+                              ],
+                              "text": "",
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    37,
+                                    339,
+                                    20,
+                                    20
+                                  ]
+                                },
+                                {
+                                  "type": "Panel",
+                                  "rect": [
+                                    56,
+                                    329,
+                                    10,
+                                    10
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "TextureRect",
+                                      "rect": [
+                                        58,
+                                        331,
+                                        7,
+                                        7
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                402,
+                159,
+                14
+              ],
+              "variation": "C9B",
+              "text": "160 ms"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            165,
+            237,
+            159,
+            179
+          ],
+          "children": [
+            {
+              "type": "Control",
+              "rect": [
+                165,
+                237,
+                158,
+                159
+              ],
+              "children": [
+                {
+                  "type": "Control",
+                  "rect": [
+                    165,
+                    237,
+                    158,
+                    158
+                  ],
+                  "children": [
+                    {
+                      "type": "UiActionRadial",
+                      "rect": [
+                        165,
+                        237,
+                        158,
+                        158
+                      ],
+                      "children": [
+                        {
+                          "type": "ColorRect",
+                          "rect": [
+                            165,
+                            237,
+                            158,
+                            158
+                          ]
+                        },
+                        {
+                          "type": "Control",
+                          "rect": [
+                            165,
+                            237,
+                            158,
+                            158
+                          ],
+                          "children": [
+                            {
+                              "type": "Button",
+                              "rect": [
+                                173,
+                                245,
+                                52,
+                                52
+                              ],
+                              "text": "",
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    187,
+                                    259,
+                                    24,
+                                    24
+                                  ]
+                                },
+                                {
+                                  "type": "Panel",
+                                  "rect": [
+                                    211,
+                                    247,
+                                    13,
+                                    13
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "TextureRect",
+                                      "rect": [
+                                        213,
+                                        249,
+                                        9,
+                                        9
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Button",
+                              "rect": [
+                                261,
+                                243,
+                                56,
+                                56
+                              ],
+                              "text": "",
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    274,
+                                    257,
+                                    30,
+                                    30
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Button",
+                              "rect": [
+                                263,
+                                335,
+                                52,
+                                52
+                              ],
+                              "text": "",
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    277,
+                                    349,
+                                    24,
+                                    24
+                                  ]
+                                },
+                                {
+                                  "type": "Panel",
+                                  "rect": [
+                                    301,
+                                    337,
+                                    13,
+                                    13
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "TextureRect",
+                                      "rect": [
+                                        303,
+                                        339,
+                                        9,
+                                        9
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Button",
+                              "rect": [
+                                173,
+                                335,
+                                52,
+                                52
+                              ],
+                              "text": "",
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    187,
+                                    349,
+                                    24,
+                                    24
+                                  ]
+                                },
+                                {
+                                  "type": "Panel",
+                                  "rect": [
+                                    211,
+                                    337,
+                                    13,
+                                    13
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "TextureRect",
+                                      "rect": [
+                                        213,
+                                        339,
+                                        9,
+                                        9
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                165,
+                402,
+                159,
+                14
+              ],
+              "variation": "C9B",
+              "text": "300 ms"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

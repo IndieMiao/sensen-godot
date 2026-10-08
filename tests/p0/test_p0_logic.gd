@@ -22,6 +22,11 @@ func test_main_action_follows_the_plot_in_front() -> void:
 	assert_str(str(sow.sub)).is_equal("2 Energy")
 	assert_that(sow.cmd).is_equal({"type": "sow", "plot": 3, "seed": "seed_radish"})
 	assert_str(str(P0Logic.main_action(v, {"id": 3, "state": "tilled"}, "").sub)).is_equal("Pick a seed")
+	# A pinned seed at 0 stays on the bar; the key says so instead of sending a sow the server turns down.
+	var out := P0Logic.main_action(v, {"id": 3, "state": "tilled"}, "seed_carrot")
+	assert_bool(bool(out.enabled)).is_false()
+	assert_str(str(out.sub)).is_equal("Pick a seed")   # 李白 q(44) ③: a 0 seed reads as no seed
+	assert_that(out.cmd).is_equal({})
 	assert_str(str(P0Logic.main_action(v, {"id": 3, "state": "sown"}, "").verb)).is_equal("Water")
 	assert_str(str(P0Logic.main_action(v, {"id": 3, "state": "ready"}, "").verb)).is_equal("Harvest")
 	var growing := P0Logic.main_action(v, {"id": 3, "state": "growing", "ready_in": 4320000}, "seed_radish")
@@ -31,6 +36,7 @@ func test_main_action_follows_the_plot_in_front() -> void:
 func test_short_energy_turns_amber_and_opens_the_card() -> void:
 	var v := _view()
 	v.energy = {"value": 2, "max": 200, "next_in": 161000, "regen_ms": 240000}
+	v.bag.slots.append({"id": "seed_carrot", "qty": 4})
 	var a := P0Logic.main_action(v, {"id": 1, "state": "tilled"}, "seed_carrot")
 	assert_bool(bool(a.amber)).is_true()
 	assert_str(str(a.sub)).is_equal("Need 3 Energy")
@@ -47,6 +53,14 @@ func test_quick_bar_keeps_order_then_fills_by_count() -> void:
 	var v := _view()
 	assert_that(P0Logic.quick_bar(v, [])).is_equal(["seed_radish", "seed_lettuce"])
 	assert_that(P0Logic.quick_bar(v, ["seed_lettuce"])).is_equal(["seed_lettuce", "seed_radish"])
+
+func test_quick_bar_keeps_pinned_slots_at_zero_and_skips_removed_ones() -> void:
+	var v := _view()
+	# A pinned seed the bag no longer holds stays in its place at 0 (LOCK-05, §10.3.3 归零).
+	assert_that(P0Logic.quick_bar(v, ["seed_carrot", "seed_radish"], "farm", ["seed_carrot"])).is_equal(["seed_carrot", "seed_radish", "seed_lettuce"])
+	# A seed dragged off the bar is not refilled until it is pinned again (§10.3.4).
+	assert_that(P0Logic.quick_bar(v, [], "farm", [], ["seed_radish"])).is_equal(["seed_lettuce"])
+	assert_that(P0Logic.quick_bar(v, [], "farm", ["seed_radish"], ["seed_radish"])).is_equal(["seed_radish", "seed_lettuce"])
 
 func test_today_line_names_the_nearest_crop() -> void:
 	var v := _view()
@@ -85,7 +99,7 @@ func test_today_panel_orders_now_then_countdown_then_skill() -> void:
 	v.stall.board.requests.clear()
 	v["skills"] = {"farming": {"level": 1, "xp": 20, "next": 50}, "fishing": {"level": 1, "xp": 60, "next": 70}}
 	v.plots = [{"state": "growing", "crop": "crop_radish", "ready_in": 4320000}, {"state": "sown", "crop": "crop_carrot"}]
-	assert_that(P0Logic.today_lines(v)).is_equal(["Water 1 sown plot · Free", "Radishes ready in 1h 12m", "Fishing Lv2 in 10 XP"])
+	assert_that(P0Logic.today_lines(v)).is_equal(["Water 1 sown plot · Free", "Radishes ready in 1h 12m", "Fishing Lv 2 · 10 XP to go"])   # q(69)
 
 func test_parcel_countdowns_run_between_responses() -> void:
 	var v := _view()

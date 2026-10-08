@@ -3,28 +3,59 @@ extends Control
 ## One item cell, four densities (SGODOT-212; WP7-C F-05 "one item_cell, density picks the Figma main"):
 ##   INVENTORY  Compact/InventoryCell 633:41278  52×52  icon, quantity pill, rarity dot             (LOCK-12)
 ##   QUICK      Compact/QuickSlot 633:41279      52×68  icon + name + quantity only, pin state     (LOCK-04 / 05)
-##   KITCHEN    Compact/Kitchen/Cell 655:58506   52×58  icon, state label, selected / cooked mark  (LOCK-20)
+##   KITCHEN    Compact/Kitchen/Cell 655:58506   52×58  icon, state label, selected / cooked mark  (LOCK-20);
+##              `kitchen_state` adds the main's Cookbook / Experiment states (hidden … notForCooking)
 ##   GEAR       Compact/GearSlot 663:61299       52×88  role above, equipment name below           (LOCK-13)
 ## Data in (the fields below), signals out. Each cell runs its own GestureArbiter (QUICK: SLOT mode, others:
 ## CELL mode, WP7-B F-04 §3 / §4), so a touch is exactly one outcome: `tapped` only for the arbiter's tap;
-## everything else (lift, pin_toggle / long_press, drag_start / drag_move / drop, swipe_up, cancel) goes out
+## everything else (lift, long_press, drag_start / drag_move / drop, swipe_up, cancel) goes out
 ## through `gesture` for the quick bar / bag drawer, which then sets `state` / `pinned`. mouse_filter is
 ## PASS, so a TouchScrollContainer still takes vertical drags (CELL mode answers them with cancel).
 ## Hosts outside a scroll container (the quick bar) need a STOP backing control, or the touch also reaches
 ## _unhandled_input (the map's tap handling, for one).
-## LIFTED, DROP_TARGET and ZERO exist on the QuickSlot main only; other densities draw them as DEFAULT.
+## DROP_TARGET and ZERO exist on the QuickSlot main only, LIFTED on QuickSlot and InventoryCell (State=lifted 1641:34159:
+## the default look with the QuickSlot lift shadow); other densities draw them as DEFAULT.
+## GHOST (QuickSlot State=ghost 1415:94114, A-08) is an empty slot showing what the action can use: dashed like
+## EMPTY, the family icon at 35 %, a one-word family name in secondary ink (`title`), no count, never pinned.
+## Other densities draw it as EMPTY.
 
 signal tapped
-## A GestureArbiter outcome other than tap, e.g. {kind = &"pin_toggle", pos}; `pos` is in global coordinates.
+## A GestureArbiter outcome other than tap, e.g. {kind = &"lift", pos}; `pos` is in global coordinates. Pinning is the
+## quick bar's drop on its Pin zone (LOCK-05 v1.11), never a cell outcome.
 signal gesture(outcome: Dictionary)
 
 enum Density { INVENTORY, QUICK, KITCHEN, GEAR }
-enum State { DEFAULT, SELECTED, EMPTY, LIFTED, DROP_TARGET, ZERO }
+## UNCOLLECTED (InventoryCell 1405:92952, Fish-dex): the default surface with the icon dimmed to 35 %, no quantity, no
+## rarity dot — a silhouette not caught yet. InventoryCell only (the other mains draw it as DEFAULT).
+enum State { DEFAULT, SELECTED, EMPTY, LIFTED, DROP_TARGET, ZERO, GHOST, UNCOLLECTED }
+## Compact/Kitchen/Cell states beyond default / selected / empty (WP1b B1-02; inPot / notForCooking 223):
+##   HIDDEN       unknown page: grey dish silhouette + ingredient family dots, never the real dish art
+##   CLUED        unknown page with a known slot: the silhouette and the family row with that slot lit
+##   (both draw one dot per slot from `families`, a lit slot from `clues`; `might_have` adds State=mightHave's ring)
+##   TASTED       half-colour icon + `Tasted` chip inside the cell
+##   MASTERED     gold star at the bottom right (Cooked ×10); the can-cook check keeps the top right; no quantity
+##   LOCKED       3-slot page before Cooking Lv4: silhouette + `Lv4` lock tag (text from `status`, else Lv4)
+##   IN_POT       Experiment: in the pot (selected stroke, icon raised); `In pot` only once none is left (no quantity),
+##                otherwise the remaining quantity (COOK-2b / P0-2 instances: Show state off while ×N shows)
+##   NOT_FOR_COOKING  Experiment: the icon at 25 %, `Not for cooking`; it cannot go in the pot
+enum KitchenState { DEFAULT, HIDDEN, CLUED, TASTED, MASTERED, LOCKED, IN_POT, NOT_FOR_COOKING }
 
 const RARITY_COLORS := [UiTokens.COLOR_RARITY_COMMON, UiTokens.COLOR_RARITY_FINE, UiTokens.COLOR_RARITY_RARE,
 	UiTokens.COLOR_RARITY_LEGENDARY]
 const PIN_GLYPH := preload("res://assets/ui/kit_icons/pin.svg")
 const CHECK_GLYPH := preload("res://assets/ui/kit_icons/check.svg")
+const STAR_GLYPH := preload("res://assets/ui/kit_icons/star.svg")
+const LOCK_GLYPH := preload("res://assets/ui/kit_icons/lock.svg")
+const SILHOUETTE := preload("res://assets/ui/kit_icons/kitchen/dish_silhouette.svg")
+## Ingredient families (plan §7.3.1: W water, F field, O orchard, S seasoning): the dot colours color/family/* and the
+## one-colour icons of a slot lit by a family clue, i-fam-fish / produce / fruit / seasoning (Figma 1727:102700 /
+## 102705 / 102710 / 102717; 不知火舞 and 安其拉, SGODOT-226 33725b5e).
+const FAMILY_COLORS := {"W": UiTokens.COLOR_FAMILY_WATER, "F": UiTokens.COLOR_FAMILY_FIELD, "O": UiTokens.COLOR_FAMILY_ORCHARD,
+	"S": UiTokens.COLOR_FAMILY_SEASONING}
+const FAMILY_ICONS := {"W": preload("res://assets/ui/kit_icons/kitchen/fam_fish.svg"),
+	"F": preload("res://assets/ui/kit_icons/kitchen/fam_produce.svg"), "O": preload("res://assets/ui/kit_icons/kitchen/fam_fruit.svg"),
+	"S": preload("res://assets/ui/kit_icons/kitchen/fam_seasoning.svg")}
+const HOME_GLYPH := preload("res://assets/ui/kit_icons/home.svg")
 
 # Positions inside the fixed-size mains (layout of one main, not shared tokens):
 const _CELL_ICON_TOP := 10.0      # InventoryCell: 27 px icon at y 10 of 52
@@ -36,13 +67,38 @@ const _KITCHEN_LABEL_TOP := 31.0  # "Cell state label" 52×25 at y 31, radius 5,
 const _KITCHEN_LABEL_H := 25.0
 const _KITCHEN_LABEL_RADIUS := 5.0
 const _KITCHEN_MARK_OUT := 2.0    # mark 13×13 at (41, -2): overhangs the top-right corner by 2
+const _KITCHEN_SILHOUETTE := Rect2(10.4, 9.4, 30, 22)   # hidden / clued / locked
+const _KITCHEN_FAMILY_TOP := 37.4   # Ingredient family dots: centred, top at y 38 of the main; dots 5, 3 apart,
+const _KITCHEN_FAMILY_DOT := 5.0     # a lit slot 10 (the row is then 10 high and the dots sit on its middle)
+const _KITCHEN_FAMILY_GAP := 3.0
+const _KITCHEN_FAMILY_ICON := 10.0
+const _KITCHEN_GLOW_SPREAD := 2.0    # State=mightHave 1726:32864: ring outside the cell, 0 offset, blur 4, spread 2,
+const _KITCHEN_GLOW_BLUR := 4.0      # color/new at 50 %, still
+const _KITCHEN_GLOW_ALPHA := 0.5
+const _KITCHEN_STAR := Rect2(36.4, 36.4, 12, 12)       # State=mastered 1228:105954 (C28, 226 f5523358): bottom right,
+const _KITCHEN_STAR_GLYPH := 7.7                        # clear of the can-cook check at the top right
+const _KITCHEN_TAG := Vector2(1.4, 1.4)                 # Lv4 lock tag: 3 px side padding, radius 5
+const _KITCHEN_TAG_PAD := 3.0
+const _KITCHEN_TAG_RADIUS := 5.0
+const _KITCHEN_TAG_GLYPH := 8.0
+const _KITCHEN_RACK_STROKE := 0.6                        # Rack tag (Show rack, 226 e8e5617a): surface, 0.6 border
+const _KITCHEN_CHIP := Vector2(6.4, 35.4)               # Tasted chip: 4 px side padding, radius 6
+const _KITCHEN_CHIP_PAD := 4.0
+const _KITCHEN_CHIP_RADIUS := 6.0
+const _KITCHEN_TASTED_ALPHA := 0.5                      # "half colour"
+const _KITCHEN_RAISED_ICON_TOP := 1.5                   # inPot / notForCooking: icon at y 1.5 / 2.4
+const _KITCHEN_IN_POT_LABEL := Vector2(20, 16)          # `In pot` band: y 20, 16 high, no fill
+const _KITCHEN_NFC_LABEL := Vector2(25, 25)             # `Not for / cooking`: y 25, two lines
+const _KITCHEN_NFC_ALPHA := 0.25
+const _STORED_AT := Vector2(4, 38)   # InventoryCell: Icon/i-home 11×11 at (4, 38) on storage stacks (BAG-2-2)
+const _STORED_ICON := 11.0
 const _QUICK_PAD := 4.0           # QuickSlot "Slot surface" padding
 const _QUICK_NAME_H := 22.0       # two-line name block, then the 12 px quantity line
 const _QUICK_QTY_H := 12.0
 const _GEAR_ROLE_H := 11.0        # GearSlot: role 11 high, slot at y 16, name at y 71 (16 high)
 const _GEAR_SLOT_TOP := 16.0
 const _GEAR_NAME_TOP := 71.0
-const _GEAR_NAME_H := 16.0
+const _GEAR_NAME_H := 23.0       # two lines of 9 / 125 % (WP1b: names wrap, never truncate; they may hang below 88)
 
 var density: Density
 var state: State = State.DEFAULT: set = set_state
@@ -61,6 +117,23 @@ var role := "": set = set_role
 var status := "": set = set_status
 ## Kitchen check mark for a cooked dish; SELECTED shows it too ("Selected or cooked mark").
 var marked := false: set = set_marked
+## KITCHEN only; DEFAULT keeps the plain behaviour above (status label, mark when selected or marked).
+var kitchen_state: KitchenState = KitchenState.DEFAULT: set = set_kitchen_state
+## KITCHEN only: a seasoning held on the Spice Rack (Show rack): a `Rack` tag top-left where the Lv4 lock sits, and
+## no rarity dot (q(46); An Qi La, 226 e8e5617a). The quantity is the stored count. In the pot it keeps the tag
+## (COOK-2b-RACK): taking it out returns it to the rack.
+var rack := false: set = set_rack
+## INVENTORY: the stack is in Farm Storage, not the bag — a small house at the bottom left (BAG-2-2).
+var stored := false: set = set_stored
+## KITCHEN unknown pages: each slot's family, e.g. ["W", "S"] — one dot per slot in its colour (FAMILY_COLORS).
+var families: Array = []: set = set_families
+## KITCHEN unknown pages: per slot, the clue that lit it — the ingredient's own icon, or family_icon() when the clue
+## is a family ("Any Common fish") — or null. Never the dish art (§7.2.7: 线索点亮为具体原料).
+var clues: Array = []: set = set_clues
+## KITCHEN: "You might have what it takes" (§7.5.1, server `maybe`): the page's families can all be filled from what
+## the stove reaches. Kitchen/Cell State=mightHave (1726:32864) is the hidden look with this ring; a clued page keeps
+## its lit slot under it.
+var might_have := false: set = set_might_have
 
 ## Milliseconds for the arbiter; tests inject a fake clock.
 var clock := Callable(Time, &"get_ticks_msec")
@@ -76,7 +149,18 @@ var _role: Label
 var _status: Panel
 var _mark: Panel
 var _strip: Panel
+var _new_ring: Panel   # QuickSlot State=new (1663:101150): the color/new ring of a first-time item
 var _badge: Panel
+var _silhouette: TextureRect
+var _family: HBoxContainer
+var _glow: Panel
+var _star: Panel
+var _tag: PanelContainer
+var _rack_tag: PanelContainer
+var _tag_label: Label
+var _chip: PanelContainer
+var _chip_label: Label
+var _home: TextureRect
 
 func _init(d: Density = Density.INVENTORY) -> void:
 	density = d
@@ -104,10 +188,29 @@ func set_pinned(v: bool) -> void: pinned = v; _refresh()
 func set_role(v: String) -> void: role = v; _refresh()
 func set_status(v: String) -> void: status = v; _refresh()
 func set_marked(v: bool) -> void: marked = v; _refresh()
+func set_kitchen_state(v: KitchenState) -> void: kitchen_state = v; _refresh()
+func set_rack(v: bool) -> void: rack = v; _refresh()
+func set_stored(v: bool) -> void: stored = v; _refresh()
+func set_families(v: Array) -> void:
+	if v == families: return   # a grid refresh sets them on every cell
+	families = v
+	_build_family()
+	_refresh()
+func set_clues(v: Array) -> void:
+	if v == clues: return
+	clues = v
+	_build_family()
+	_refresh()
+func set_might_have(v: bool) -> void: might_have = v; _refresh()
+
+static func family_icon(family: String) -> Texture2D: return FAMILY_ICONS.get(family, null)
 
 func _gui_input(event: InputEvent) -> void:
 	_emit(_arbiter.feed(event, clock.call()))
 	set_process(_arbiter.is_active())
+	# A lifted or dragged cell keeps its touch: the scroll container behind it must not take the drag (the bag's
+	# way onto the quick bar, SGODOT-225 / BAR-DRAG-9). Before the lift a vertical drag still scrolls the grid.
+	if _arbiter.is_lifted() or _arbiter.is_dragging(): accept_event()
 
 ## Long presses fire on time alone, so tick while a finger is down.
 func _process(_delta: float) -> void:
@@ -130,9 +233,39 @@ func _emit(outcomes: Array) -> void:
 		if g.has("pos"): g.pos = get_global_transform() * (g.pos as Vector2)
 		gesture.emit(g)
 
-## The state actually drawn: the extra QuickSlot states fall back to DEFAULT on the other mains.
+## QuickSlot pin badge pop after a pin toggle on the Pin zone (LOCK-05 v1.11): 1 → 1.3 → 1 over 300 ms.
+const _PIN_POP := 1.3
+const _PIN_POP_MS := 300.0
+func pop_pin() -> void:
+	if _badge == null or not _badge.visible: return
+	_badge.pivot_offset = _badge.size * 0.5
+	var t := _badge.create_tween()
+	t.tween_property(_badge, ^"scale", Vector2.ONE * _PIN_POP, UiKit.secs(_PIN_POP_MS * 0.5)).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	t.tween_property(_badge, ^"scale", Vector2.ONE, UiKit.secs(_PIN_POP_MS * 0.5)).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+
+## QuickSlot State=new (1663:101150, §10.3.3 ④): a first-time item's slot rings once in color/new, in then out over
+## MOTION_NEW_UNLOCK_FLASH_MS; size, place and icon stay, no badge, no buzz. QuickSlot and InventoryCell (the Fish-dex's
+## newly caught fish, 1699:102396).
+func flash() -> void:
+	if _new_ring == null: return
+	var half := UiKit.secs(UiTokens.MOTION_NEW_UNLOCK_FLASH_MS * 0.5)
+	var t := _new_ring.create_tween()
+	_new_ring.modulate.a = 0.0
+	t.tween_property(_new_ring, ^"modulate:a", 1.0, half).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	t.tween_property(_new_ring, ^"modulate:a", 0.0, half).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+
+func is_flashing() -> bool: return _new_ring != null and _new_ring.modulate.a > 0.0
+
+## The ring at its peak, held: the gallery and snapshots only (a still of State=new).
+func show_new_ring() -> void:
+	if _new_ring: _new_ring.modulate.a = 1.0
+
+## The state actually drawn: the extra QuickSlot states fall back to DEFAULT (GHOST to EMPTY) on the other mains.
 func drawn_state() -> State:
-	if density != Density.QUICK and state in [State.LIFTED, State.DROP_TARGET, State.ZERO]: return State.DEFAULT
+	if density != Density.QUICK and state in [State.DROP_TARGET, State.ZERO]: return State.DEFAULT
+	if density not in [Density.QUICK, Density.INVENTORY] and state == State.LIFTED: return State.DEFAULT
+	if density != Density.QUICK and state == State.GHOST: return State.EMPTY
+	if density != Density.INVENTORY and state == State.UNCOLLECTED: return State.DEFAULT
 	return state
 
 # ------------------------------------------------------------------ build
@@ -197,7 +330,18 @@ func _build_cell() -> void:
 	_add_icon(_surface, UiTokens.SIZE_INVENTORY_ICON, _KITCHEN_ICON_TOP if kitchen else _CELL_ICON_TOP)
 	_add_dot(_surface, _KITCHEN_DOT_INSET if kitchen else _DOT_INSET)
 	_add_pill(_surface)
-	if not kitchen: return
+	if not kitchen:
+		_home = UiKit.icon(HOME_GLYPH, _STORED_ICON)   # Farm Storage stack: 11 px house at (4, 38)
+		_home.self_modulate = UiTokens.COLOR_SECONDARY
+		_place(_home, 0.0, _STORED_AT.x, _STORED_AT.y, _STORED_ICON, _STORED_ICON)
+		_surface.add_child(_home)
+		# InventoryCell State=new (1699:102396): 2 px color/new inside the cell, flashed once like the QuickSlot's.
+		_new_ring = _box(_surface)
+		_new_ring.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		_new_ring.add_theme_stylebox_override(&"panel", UiStyleBox.make(Color.TRANSPARENT, UiTokens.RADIUS_INVENTORY_CELL,
+			UiTokens.COLOR_NEW, UiTokens.STROKE_SELECTED))
+		_new_ring.modulate.a = 0.0
+		return
 	_status = _box(self)
 	_place(_status, 0.0, 0.0, _KITCHEN_LABEL_TOP, side, _KITCHEN_LABEL_H)
 	_status.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_SURFACE, _KITCHEN_LABEL_RADIUS))
@@ -212,6 +356,85 @@ func _build_cell() -> void:
 	_place(check, 0.5, -UiTokens.SIZE_KITCHEN_CHECK_ICON * 0.5, (m - UiTokens.SIZE_KITCHEN_CHECK_ICON) * 0.5,
 		UiTokens.SIZE_KITCHEN_CHECK_ICON, UiTokens.SIZE_KITCHEN_CHECK_ICON)
 	_mark.add_child(check)
+	_build_kitchen_extras()
+
+## The Cookbook / Experiment marks of the Kitchen/Cell main (hidden, clued, tasted, mastered, locked).
+func _build_kitchen_extras() -> void:
+	_silhouette = UiKit.icon(SILHOUETTE, _KITCHEN_SILHOUETTE.size.y)
+	_silhouette.self_modulate = UiTokens.COLOR_DISABLED
+	_place(_silhouette, 0.0, _KITCHEN_SILHOUETTE.position.x, _KITCHEN_SILHOUETTE.position.y, _KITCHEN_SILHOUETTE.size.x, _KITCHEN_SILHOUETTE.size.y)
+	_surface.add_child(_silhouette)
+	_family = HBoxContainer.new()
+	_family.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_family.alignment = BoxContainer.ALIGNMENT_CENTER
+	_family.add_theme_constant_override(&"separation", int(_KITCHEN_FAMILY_GAP))
+	_family.anchor_right = 1.0
+	_family.offset_top = _KITCHEN_FAMILY_TOP
+	_family.offset_bottom = _KITCHEN_FAMILY_TOP   # grows down to its tallest child: 5 with dots only, 10 with a lit slot
+	_surface.add_child(_family)
+	var g := _KITCHEN_GLOW_SPREAD
+	_glow = _box(self)
+	move_child(_glow, 0)   # under the surface: only the ring outside it shows
+	_place(_glow, 0.0, -g, -g, UiTokens.SIZE_KITCHEN_CELL_W + g * 2.0, UiTokens.SIZE_KITCHEN_CELL_W + g * 2.0)
+	var ring := UiStyleBox.make(Color.TRANSPARENT, UiTokens.RADIUS_INVENTORY_CELL + g)
+	ring.shadow_color = UiKit.alpha(UiTokens.COLOR_NEW, _KITCHEN_GLOW_ALPHA)
+	ring.shadow_size = _KITCHEN_GLOW_BLUR
+	_glow.add_theme_stylebox_override(&"panel", ring)
+	_star = _box(_surface)
+	_place(_star, 0.0, _KITCHEN_STAR.position.x, _KITCHEN_STAR.position.y, _KITCHEN_STAR.size.x, _KITCHEN_STAR.size.y)
+	_star.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_GOLD_DEEP, _KITCHEN_STAR.size.x * 0.5))   # the white star needs the deep gold
+	var star := UiKit.icon(STAR_GLYPH, _KITCHEN_STAR_GLYPH)
+	star.self_modulate = UiTokens.COLOR_SURFACE_RAISED
+	var inset := (_KITCHEN_STAR.size.x - _KITCHEN_STAR_GLYPH) * 0.5
+	_place(star, 0.0, inset, inset, _KITCHEN_STAR_GLYPH, _KITCHEN_STAR_GLYPH)
+	_star.add_child(star)
+	_tag = _pill_tag(UiTokens.COLOR_DISABLED, Color.TRANSPARENT, _KITCHEN_TAG_RADIUS, _KITCHEN_TAG_PAD)
+	_tag.position = _KITCHEN_TAG
+	var row := HBoxContainer.new()
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_theme_constant_override(&"separation", 1)
+	var lock := UiKit.icon(LOCK_GLYPH, _KITCHEN_TAG_GLYPH)
+	lock.self_modulate = UiTokens.COLOR_SECONDARY
+	lock.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(lock)
+	_tag_label = UiKit.label("", UiTokens.STYLE_C9_B, UiTokens.COLOR_SECONDARY)
+	row.add_child(_tag_label)
+	_tag.add_child(row)
+	_surface.add_child(_tag)
+	_rack_tag = PanelContainer.new()
+	_rack_tag.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_rack_tag.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_SURFACE, _KITCHEN_TAG_RADIUS, UiTokens.COLOR_BORDER,
+		_KITCHEN_RACK_STROKE).with_margins(_KITCHEN_TAG_PAD, 0.0, _KITCHEN_TAG_PAD, 0.0))
+	_rack_tag.position = _KITCHEN_TAG
+	_rack_tag.add_child(UiKit.label("Rack", UiTokens.STYLE_C9_B, UiTokens.COLOR_SECONDARY))
+	_surface.add_child(_rack_tag)
+	_chip = _pill_tag(UiTokens.COLOR_SURFACE_RAISED, UiTokens.COLOR_BORDER, _KITCHEN_CHIP_RADIUS, _KITCHEN_CHIP_PAD)
+	_chip.position = _KITCHEN_CHIP
+	_chip_label = UiKit.label("Tasted", UiTokens.STYLE_C9_B, UiTokens.COLOR_SECONDARY)
+	_chip.add_child(_chip_label)
+	_surface.add_child(_chip)
+
+## One 5 px dot per slot in its family colour; a slot with a clue is its 10 px icon instead, the dots centred on it.
+func _build_family() -> void:
+	if _family == null: return
+	for c in _family.get_children(): c.free()
+	for i in families.size():
+		var clue = clues[i] if i < clues.size() else null
+		if clue is Texture2D:
+			_family.add_child(UiKit.icon(clue, _KITCHEN_FAMILY_ICON))
+			continue
+		var dot := _box(_family)
+		dot.custom_minimum_size = Vector2(_KITCHEN_FAMILY_DOT, _KITCHEN_FAMILY_DOT)
+		dot.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		var color: Color = FAMILY_COLORS.get(str(families[i]), UiTokens.COLOR_DISABLED)
+		dot.add_theme_stylebox_override(&"panel", UiStyleBox.make(color, _KITCHEN_FAMILY_DOT * 0.5))
+
+static func _pill_tag(bg: Color, border: Color, radius: float, pad: float) -> PanelContainer:
+	var p := PanelContainer.new()
+	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var box := UiStyleBox.make(bg, radius, border, UiTokens.STROKE_DEFAULT if border.a > 0.0 else 0.0)
+	p.add_theme_stylebox_override(&"panel", box.with_margins(pad, 0.0, pad, 0.0))
+	return p
 
 func _build_quick() -> void:
 	_surface.anchor_right = 1.0
@@ -228,6 +451,10 @@ func _build_quick() -> void:
 	_name.max_lines_visible = 2
 	_name.custom_minimum_size.x = w
 	_qty = _band_label(body, UiTokens.STYLE_C10_XB, 0.0, _QUICK_QTY_H, HORIZONTAL_ALIGNMENT_RIGHT)
+	_new_ring = _box(_surface)
+	_new_ring.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_new_ring.add_theme_stylebox_override(&"panel", UiStyleBox.make(Color.TRANSPARENT, UiTokens.RADIUS_CELL, UiTokens.COLOR_NEW, UiTokens.STROKE_SELECTED))
+	_new_ring.modulate.a = 0.0
 	_strip = _box(_surface)
 	_strip.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_PIN_AMBER, UiTokens.SIZE_PIN_STRIP_H * 0.5))
 	var b := UiTokens.SIZE_PIN_BADGE
@@ -247,7 +474,10 @@ func _build_gear() -> void:
 	var side := UiTokens.SIZE_INVENTORY_ICON
 	_add_icon(_surface, side, (UiTokens.SIZE_INVENTORY_CELL - side) * 0.5)
 	_name = _band_label(self, UiTokens.STYLE_C9_B, _GEAR_NAME_TOP, _GEAR_NAME_H)
-	_name.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	_name.vertical_alignment = VERTICAL_ALIGNMENT_TOP
+	_name.grow_vertical = Control.GROW_DIRECTION_END
+	_name.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_name.max_lines_visible = 2
 
 # ------------------------------------------------------------------ refresh
 
@@ -262,22 +492,69 @@ func _refresh() -> void:
 		Density.GEAR:
 			_surface.add_theme_stylebox_override(&"panel", _cell_box(s, UiTokens.RADIUS_INVENTORY_CELL))
 			_role.text = role
-			_name.text = title
+			_name.text = "Empty" if empty else title   # an empty slot says only Empty (WP1b, A-08)
 		_:
 			_surface.add_theme_stylebox_override(&"panel", _cell_box(s, UiTokens.RADIUS_INVENTORY_CELL))
-			_pill.visible = quantity != "" and not empty
+			var dim := s == State.UNCOLLECTED
+			_pill.visible = quantity != "" and not empty and not dim
 			_qty.text = quantity
-			_dot.visible = rarity > 0 and not empty
+			_dot.visible = rarity > 0 and not empty and not dim and not (density == Density.KITCHEN and rack)
+			_icon.modulate.a = UiTokens.OPACITY_ZERO_ICON if dim else 1.0   # "Icon · dimmed" 35 %, as the ghost slot
+			if _home != null: _home.visible = stored and not empty
 			if rarity > 0:
 				_dot.add_theme_stylebox_override(&"panel", UiStyleBox.make(RARITY_COLORS[clampi(rarity - 1, 0, 3)], UiTokens.SIZE_RARITY_DOT * 0.5))
-			if density == Density.KITCHEN:
-				_surface.modulate.a = UiTokens.OPACITY_KITCHEN_EMPTY if empty else 1.0
-				_status.visible = status != "" and not empty
-				_name.text = status
-				_mark.visible = (marked or s == State.SELECTED) and not empty
+			if density == Density.KITCHEN: _refresh_kitchen(s, empty)
 
-## InventoryCell / Kitchen Cell / GearSlot surface: hairline border, 1.5 primary when selected, dashed when empty.
+## Kitchen/Cell: DEFAULT keeps the plain cell (status label, mark when selected or marked); the other
+## kitchen states draw the main's marks and their own labels.
+func _refresh_kitchen(s: State, empty: bool) -> void:
+	var k := KitchenState.DEFAULT if empty else kitchen_state
+	var unknown := k in [KitchenState.HIDDEN, KitchenState.CLUED, KitchenState.LOCKED]
+	_surface.modulate.a = UiTokens.OPACITY_KITCHEN_EMPTY if empty else 1.0
+	var in_pot := k == KitchenState.IN_POT
+	if in_pot: _surface.add_theme_stylebox_override(&"panel", _cell_box(State.SELECTED, UiTokens.RADIUS_INVENTORY_CELL))
+	_icon.visible = icon != null and not empty and not unknown
+	var raised := k in [KitchenState.IN_POT, KitchenState.NOT_FOR_COOKING]
+	var top := _KITCHEN_RAISED_ICON_TOP if raised else _KITCHEN_ICON_TOP
+	_icon.offset_top = top
+	_icon.offset_bottom = top + UiTokens.SIZE_INVENTORY_ICON
+	_icon.modulate.a = _KITCHEN_NFC_ALPHA if k == KitchenState.NOT_FOR_COOKING else (_KITCHEN_TASTED_ALPHA if k == KitchenState.TASTED else 1.0)
+	_silhouette.visible = unknown
+	_family.visible = unknown
+	_glow.visible = might_have and not empty
+	_star.visible = k == KitchenState.MASTERED
+	_tag.visible = k == KitchenState.LOCKED
+	_rack_tag.visible = rack and not empty and k in [KitchenState.DEFAULT, KitchenState.IN_POT]
+	_tag_label.text = status if status != "" else "Lv4"
+	_chip.visible = k == KitchenState.TASTED
+	_pill.visible = _pill.visible and k in [KitchenState.DEFAULT, KitchenState.HIDDEN, KitchenState.CLUED,
+		KitchenState.LOCKED, KitchenState.TASTED, KitchenState.IN_POT]   # the star has the bottom right on a mastered page
+	match k:
+		KitchenState.IN_POT, KitchenState.NOT_FOR_COOKING:
+			var band := _KITCHEN_IN_POT_LABEL if in_pot else _KITCHEN_NFC_LABEL
+			_status.visible = not in_pot or quantity == ""
+			_status.offset_top = band.x
+			_status.offset_bottom = band.x + band.y
+			_status.self_modulate.a = 0.0   # these two labels sit on the cell without the label plate
+			_name.text = "In pot" if in_pot else "Not for\ncooking"
+		_:
+			_status.offset_top = _KITCHEN_LABEL_TOP
+			_status.offset_bottom = _KITCHEN_LABEL_TOP + _KITCHEN_LABEL_H
+			_status.self_modulate.a = 1.0
+			_status.visible = status != "" and not empty and k in [KitchenState.DEFAULT, KitchenState.MASTERED]
+			_name.text = status
+	_name.offset_bottom = _status.offset_bottom - _status.offset_top if k == KitchenState.NOT_FOR_COOKING else UiTokens.SIZE_QTY_PILL_H
+	_mark.visible = (marked or s == State.SELECTED or in_pot) and not empty and k != KitchenState.NOT_FOR_COOKING
+
+## InventoryCell / Kitchen Cell / GearSlot surface: hairline border, 1.5 primary when selected, dashed when empty;
+## a lifted InventoryCell keeps the default look under the QuickSlot lift shadow (1641:34159).
 func _cell_box(s: State, radius: float) -> UiStyleBox:
+	if s == State.LIFTED:
+		var lifted := UiStyleBox.make(UiTokens.COLOR_SURFACE, radius, UiTokens.COLOR_BORDER, UiTokens.STROKE_CELL_HAIRLINE)
+		lifted.shadow_color = UiTokens.COLOR_LIFT_SHADOW
+		lifted.shadow_size = UiTokens.SIZE_LIFT_SHADOW_RADIUS
+		lifted.shadow_offset = Vector2(0.0, UiTokens.SIZE_LIFT_SHADOW_OFFSET_Y)
+		return lifted
 	if s == State.SELECTED:
 		return UiStyleBox.make(UiTokens.COLOR_SURFACE, radius, UiTokens.COLOR_PRIMARY, UiTokens.STROKE_SELECTED_CELL)
 	if s == State.EMPTY:
@@ -309,7 +586,7 @@ func _refresh_quick(s: State) -> void:
 				box.shadow_color = UiTokens.COLOR_LIFT_SHADOW
 				box.shadow_size = UiTokens.SIZE_LIFT_SHADOW_RADIUS
 				box.shadow_offset = Vector2(0.0, UiTokens.SIZE_LIFT_SHADOW_OFFSET_Y)
-		State.EMPTY:
+		State.EMPTY, State.GHOST:
 			box = _dashed(UiStyleBox.make(UiTokens.COLOR_SURFACE, UiTokens.RADIUS_CELL, UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT), UiTokens.DASH_QUICK)
 		State.DROP_TARGET:
 			box = _dashed(UiStyleBox.make(UiTokens.COLOR_PRIMARY_TINT, UiTokens.RADIUS_CELL, UiTokens.COLOR_PRIMARY, UiTokens.STROKE_SELECTED), UiTokens.DASH_DROP_TARGET)
@@ -325,12 +602,19 @@ func _refresh_quick(s: State) -> void:
 	_name.text = title
 	_name.visible = title != "" and not empty
 	_qty.text = quantity
-	_qty.visible = quantity != "" and not empty
-	_icon.modulate.a = UiTokens.OPACITY_ZERO_ICON if s == State.ZERO else 1.0
+	var ghost := s == State.GHOST
+	_qty.visible = quantity != "" and not empty and not ghost
+	# The ghost's "Icon · dimmed" is the same 35 % as the ×0 icon (no separate token yet).
+	_icon.modulate.a = UiTokens.OPACITY_ZERO_ICON if s in [State.ZERO, State.GHOST] else 1.0
+	_name.add_theme_color_override(&"font_color", UiTokens.COLOR_SECONDARY if ghost else UiTokens.COLOR_TEXT)
 	_qty.add_theme_color_override(&"font_color", UiTokens.COLOR_SECONDARY if s == State.ZERO else UiTokens.COLOR_TEXT)
-	var show_pin := pinned and not empty
+	var show_pin := pinned and not empty and not ghost
 	_strip.visible = show_pin
 	_badge.visible = show_pin
+	# The new ring sits inside the outline too: green outside, cyan inside when both show (1663:101150).
+	var inset := 0.0 if box.border_color == UiTokens.COLOR_BORDER else float(box.border_width)
+	for side in [&"offset_left", &"offset_top"]: _new_ring.set(side, inset)
+	for side in [&"offset_right", &"offset_bottom"]: _new_ring.set(side, -inset)
 	# The amber strip sits inside the outline, so it moves down with the 2 px selected stroke (LOCK-05).
 	var w := UiTokens.SIZE_PIN_STRIP_W
 	_place(_strip, 0.5, -w * 0.5, box.border_width, w, UiTokens.SIZE_PIN_STRIP_H)

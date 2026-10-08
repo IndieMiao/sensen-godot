@@ -53,7 +53,7 @@ export function workbenchView(c: P0Content, s: P0State) {
       const block = craftBlock(c, s, r);
       return {
         id: r.id, tab: r.tab, item: r.out, name: itemName(c, r.out), qty: r.qty, to: r.to,
-        have: r.to === 'bag' ? count(s.bag, r.out) : null,                 // Supplies: You have 6
+        have: r.to === 'bag' ? haveTotal(s, r.out) : null,                 // Supplies: You have 6 (bag + Farm Storage, B2-06)
         cost: r.cost.map(([id, need]) => ({ id, name: itemName(c, id), need, have: haveTotal(s, id), storage: stored(s, id), bag: haveTotal(s, id) - stored(s, id) })),
         gate: r.gate ? { skill: r.gate[0], level: r.gate[1], ok: skillLevel(c, s, r.gate[0]) >= r.gate[1],
           xp_to_go: Math.max(0, c.skills[r.gate[0]][r.gate[1] - 1] - s.skills[r.gate[0]]) } : null,

@@ -105,7 +105,7 @@ def restart():
     adb('shell','am','start','-n',PKG+'/com.godot.game.GodotAppLauncher')
     return until(lambda s:s['ready'] and s['time']>2,'Fresh cold-start model and avatar',60)
 
-def suite():
+def suite(smoke_only=False):
     dismiss_system_tips()
     s=until(lambda s:s['ready'] and s['time']>2,'Scene ready after Android education',60)
     check('Android Vulkan Mobile scene loads',s['rendering_method']=='mobile',s['rendering_device'])
@@ -139,7 +139,7 @@ def suite():
     check('Real touch cannot leave open room edge',s['position'][0]<3.02,s['position'])
     command(reset=True)
     before=state();w,h=dimensions()
-    touch('pinch',round(w*.5),round(h*.53),round(w*.25),round(w*.43),700)
+    touch('pinch',round(w*.5),round(h*.53),round(w*.25),round(w*.92),1500)
     after=until(lambda s:s['zoom']<9,'Pinch updates orthographic camera')
     check('Two-finger pinch changes camera scale',after['zoom']<9,[before['zoom'],after['zoom']])
     check('Two-finger zoom keeps avatar still',math.dist(before['position'],after['position'])<.06,[before['position'],after['position']])
@@ -149,6 +149,7 @@ def suite():
     check('View button restores whole-room scale',abs(s['zoom']-10.75)<.01)
     command(beauty=True,hud=False)
     screenshot('04-room-clean')
+    if smoke_only:return {'passed':True,'checks':checks,'touch_operations':touches}
     command(beauty=False,hud=True,reset=True)
     before=state();pid=before['pid']
     adb('shell','input','keyevent','3');time.sleep(.8)
@@ -198,8 +199,47 @@ def record():
     screenshot('video-cover')
     command(beauty=False,hud=True,reset=True)
 
+def performance(seconds=30):
+    """Same idle camera/avatar, 10s warm-up, no screenshot/recording in sample window."""
+    dismiss_system_tips()
+    until(lambda s:s['ready'] and s['time']>2,'Ready for performance sample',90)
+    command(reset=True,beauty=False,hud=True)
+    time.sleep(10)
+    before=state()
+    screenshot('performance-before')
+    request=int(time.time()*1000)
+    payload=json.dumps({'id':request,'seconds':seconds}).encode()
+    adb('shell',f"run-as {PKG} sh -c 'cat > files/room-qa/performance-command.pending'",data=payload)
+    adb('shell','run-as',PKG,'mv','files/room-qa/performance-command.pending','files/room-qa/performance-command.json')
+    deadline=time.monotonic()+seconds+30
+    while time.monotonic()<deadline:
+        time.sleep(1)
+        try:
+            result=json.loads(adb('exec-out','run-as',PKG,'cat','files/room-qa/performance.json'))
+            if result['id']==request:break
+        except (ValueError,RuntimeError):pass
+    else:raise AssertionError('Frame-probe timeout; stage with --frame-probe')
+    after=state()
+    assert result['pid']==before['pid']==after['pid']
+    assert before['zoom']==after['zoom'] and math.dist(before['position'],after['position'])<.01
+    frames=result['frame_ms'];assert len(frames)>50
+    worst=sorted(frames,reverse=True)[:max(1,math.ceil(len(frames)*.01))]
+    result.update(fps_median=1000/statistics.median(frames),fps_1_percent_low=1000/statistics.mean(worst),sample_count=len(frames),requested_seconds=seconds,warmup_seconds=10,one_percent_low_definition='1000 / mean slowest ceil(N*0.01) frame intervals in ms',before=before,after=after,scope='Android emulator frame-completion intervals; not physical-phone performance or GPU timestamps')
+    (OUT/'performance.json').write_text(json.dumps(result,indent=2))
+    screenshot('performance-after')
+    print('PERFORMANCE',json.dumps({k:v for k,v in result.items() if k not in ['frame_ms','before','after']}),flush=True)
+    return result
+
 if __name__=='__main__':
-    parser=argparse.ArgumentParser();parser.add_argument('--record-only',action='store_true');args=parser.parse_args()
+    parser=argparse.ArgumentParser();parser.add_argument('--record-only',action='store_true');parser.add_argument('--performance-only',action='store_true');parser.add_argument('--smoke-only',action='store_true');parser.add_argument('--seconds',type=float,default=30);parser.add_argument('--output');args=parser.parse_args()
+    if args.output:OUT=Path(args.output);OUT.mkdir(parents=True,exist_ok=True)
+    if args.performance_only:
+        performance(args.seconds)
+        raise SystemExit(0)
+    if args.smoke_only:
+        result=suite(smoke_only=True)
+        (OUT/'smoke-result.json').write_text(json.dumps(result,indent=2))
+        raise SystemExit(0)
     try:
         metrics=None if args.record_only else suite()
         record()

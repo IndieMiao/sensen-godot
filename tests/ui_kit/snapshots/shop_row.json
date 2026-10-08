@@ -1,0 +1,979 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    418
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiShopRow · UiStepper"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        36
+      ],
+      "variation": "CaptionR12",
+      "text": "Compact/ShopProduct 702:80447 · Compact/Stepper 1245:108953 · FARM-6 482:46 · C1-01"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        70,
+        328,
+        348
+      ],
+      "children": [
+        {
+          "type": "UiShopRow",
+          "rect": [
+            0,
+            70,
+            328,
+            58
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                0,
+                83,
+                32,
+                32
+              ],
+              "children": [
+                {
+                  "type": "TextureRect",
+                  "rect": [
+                    2,
+                    85,
+                    28,
+                    28
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                40,
+                72,
+                184,
+                24
+              ],
+              "variation": "C14XB",
+              "text": "Radish Seeds"
+            },
+            {
+              "type": "Label",
+              "rect": [
+                232,
+                73,
+                4,
+                24
+              ],
+              "variation": "C12B",
+              "text": "›"
+            },
+            {
+              "type": "Label",
+              "rect": [
+                40,
+                91,
+                120,
+                24
+              ],
+              "variation": "C11B",
+              "text": "Ready in 4h"
+            },
+            {
+              "type": "Label",
+              "rect": [
+                40,
+                108,
+                120,
+                24
+              ],
+              "variation": "C10B",
+              "text": "Bag ×24"
+            },
+            {
+              "type": "Label",
+              "rect": [
+                252,
+                74,
+                76,
+                24
+              ],
+              "variation": "C12XB",
+              "text": "4 coins"
+            },
+            {
+              "type": "HBoxContainer",
+              "rect": [
+                0,
+                86,
+                328,
+                52
+              ],
+              "children": [
+                {
+                  "type": "UiStepper",
+                  "rect": [
+                    172,
+                    86,
+                    76,
+                    52
+                  ],
+                  "children": [
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        172,
+                        91,
+                        76,
+                        34
+                      ]
+                    },
+                    {
+                      "type": "Button",
+                      "rect": [
+                        172,
+                        86,
+                        32,
+                        44
+                      ],
+                      "text": "",
+                      "disabled": true,
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            172,
+                            86,
+                            32,
+                            44
+                          ],
+                          "variation": "C14XB",
+                          "text": "−"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Button",
+                      "rect": [
+                        223,
+                        86,
+                        32,
+                        44
+                      ],
+                      "text": "",
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            223,
+                            86,
+                            32,
+                            44
+                          ],
+                          "variation": "C14XB",
+                          "text": "+"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Label",
+                      "rect": [
+                        197,
+                        86,
+                        26,
+                        44
+                      ],
+                      "variation": "C12XB",
+                      "text": "1"
+                    }
+                  ]
+                },
+                {
+                  "type": "UiCommandButton",
+                  "rect": [
+                    252,
+                    86,
+                    76,
+                    52
+                  ],
+                  "variation": "CmdSecondaryCompact",
+                  "text": "Buy"
+                }
+              ]
+            },
+            {
+              "type": "ColorRect",
+              "rect": [
+                0,
+                127,
+                328,
+                1
+              ]
+            }
+          ]
+        },
+        {
+          "type": "UiShopRow",
+          "rect": [
+            0,
+            128,
+            328,
+            58
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                0,
+                141,
+                32,
+                32
+              ],
+              "children": [
+                {
+                  "type": "TextureRect",
+                  "rect": [
+                    2,
+                    143,
+                    28,
+                    28
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                40,
+                130,
+                184,
+                24
+              ],
+              "variation": "C14XB",
+              "text": "Compost"
+            },
+            {
+              "type": "Label",
+              "rect": [
+                232,
+                131,
+                4,
+                24
+              ],
+              "variation": "C12B",
+              "text": "›"
+            },
+            {
+              "type": "Label",
+              "rect": [
+                40,
+                149,
+                120,
+                24
+              ],
+              "variation": "C11B",
+              "text": "2 × 2 coins"
+            },
+            {
+              "type": "Label",
+              "rect": [
+                40,
+                166,
+                120,
+                24
+              ],
+              "variation": "C10B",
+              "text": "Bag ×6"
+            },
+            {
+              "type": "Label",
+              "rect": [
+                252,
+                132,
+                76,
+                24
+              ],
+              "variation": "C12XB",
+              "text": "4 coins"
+            },
+            {
+              "type": "HBoxContainer",
+              "rect": [
+                0,
+                144,
+                328,
+                52
+              ],
+              "children": [
+                {
+                  "type": "UiStepper",
+                  "rect": [
+                    172,
+                    144,
+                    76,
+                    52
+                  ],
+                  "children": [
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        172,
+                        149,
+                        76,
+                        34
+                      ]
+                    },
+                    {
+                      "type": "Button",
+                      "rect": [
+                        172,
+                        144,
+                        32,
+                        44
+                      ],
+                      "text": "",
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            172,
+                            144,
+                            32,
+                            44
+                          ],
+                          "variation": "C14XB",
+                          "text": "−"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Button",
+                      "rect": [
+                        223,
+                        144,
+                        32,
+                        44
+                      ],
+                      "text": "",
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            223,
+                            144,
+                            32,
+                            44
+                          ],
+                          "variation": "C14XB",
+                          "text": "+"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Label",
+                      "rect": [
+                        197,
+                        144,
+                        26,
+                        44
+                      ],
+                      "variation": "C12XB",
+                      "text": "2"
+                    }
+                  ]
+                },
+                {
+                  "type": "UiCommandButton",
+                  "rect": [
+                    252,
+                    144,
+                    76,
+                    52
+                  ],
+                  "variation": "CmdSecondaryCompact",
+                  "text": "Buy"
+                }
+              ]
+            },
+            {
+              "type": "ColorRect",
+              "rect": [
+                0,
+                185,
+                328,
+                1
+              ]
+            }
+          ]
+        },
+        {
+          "type": "UiShopRow",
+          "rect": [
+            0,
+            186,
+            328,
+            58
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                0,
+                199,
+                32,
+                32
+              ],
+              "children": [
+                {
+                  "type": "TextureRect",
+                  "rect": [
+                    2,
+                    201,
+                    28,
+                    28
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                40,
+                188,
+                184,
+                24
+              ],
+              "variation": "C14XB",
+              "text": "Worm Bait"
+            },
+            {
+              "type": "Label",
+              "rect": [
+                232,
+                189,
+                4,
+                24
+              ],
+              "variation": "C12B",
+              "text": "›"
+            },
+            {
+              "type": "Label",
+              "rect": [
+                40,
+                207,
+                107,
+                24
+              ],
+              "variation": "C11B",
+              "text": "Bites come faster"
+            },
+            {
+              "type": "Label",
+              "rect": [
+                40,
+                224,
+                107,
+                24
+              ],
+              "variation": "C10B",
+              "text": "Stock 0/30 · Bag ×5"
+            },
+            {
+              "type": "Label",
+              "rect": [
+                252,
+                190,
+                76,
+                24
+              ],
+              "variation": "C12XB",
+              "text": "2 coins"
+            },
+            {
+              "type": "HBoxContainer",
+              "rect": [
+                0,
+                202,
+                328,
+                52
+              ],
+              "children": [
+                {
+                  "type": "UiCommandButton",
+                  "rect": [
+                    195,
+                    202,
+                    133,
+                    52
+                  ],
+                  "variation": "CmdBlockedCompact",
+                  "text": "Sold out · 9h 12m"
+                }
+              ]
+            },
+            {
+              "type": "ColorRect",
+              "rect": [
+                0,
+                243,
+                328,
+                1
+              ]
+            }
+          ]
+        },
+        {
+          "type": "UiShopRow",
+          "rect": [
+            0,
+            244,
+            328,
+            58
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                0,
+                257,
+                32,
+                32
+              ],
+              "children": [
+                {
+                  "type": "TextureRect",
+                  "rect": [
+                    2,
+                    259,
+                    28,
+                    28
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                40,
+                246,
+                184,
+                24
+              ],
+              "variation": "C14XB",
+              "text": "Carrot Seeds"
+            },
+            {
+              "type": "Label",
+              "rect": [
+                232,
+                247,
+                4,
+                24
+              ],
+              "variation": "C12B",
+              "text": "›"
+            },
+            {
+              "type": "Label",
+              "rect": [
+                40,
+                265,
+                120,
+                24
+              ],
+              "variation": "C11B",
+              "text": "Ready in 12h"
+            },
+            {
+              "type": "Label",
+              "rect": [
+                40,
+                282,
+                120,
+                24
+              ],
+              "variation": "C10B",
+              "text": "◆ New for you"
+            },
+            {
+              "type": "Label",
+              "rect": [
+                252,
+                248,
+                76,
+                24
+              ],
+              "variation": "C12XB",
+              "text": "9 coins"
+            },
+            {
+              "type": "HBoxContainer",
+              "rect": [
+                0,
+                260,
+                328,
+                52
+              ],
+              "children": [
+                {
+                  "type": "UiStepper",
+                  "rect": [
+                    172,
+                    260,
+                    76,
+                    52
+                  ],
+                  "children": [
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        172,
+                        265,
+                        76,
+                        34
+                      ]
+                    },
+                    {
+                      "type": "Button",
+                      "rect": [
+                        172,
+                        260,
+                        32,
+                        44
+                      ],
+                      "text": "",
+                      "disabled": true,
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            172,
+                            260,
+                            32,
+                            44
+                          ],
+                          "variation": "C14XB",
+                          "text": "−"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Button",
+                      "rect": [
+                        223,
+                        260,
+                        32,
+                        44
+                      ],
+                      "text": "",
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            223,
+                            260,
+                            32,
+                            44
+                          ],
+                          "variation": "C14XB",
+                          "text": "+"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Label",
+                      "rect": [
+                        197,
+                        260,
+                        26,
+                        44
+                      ],
+                      "variation": "C12XB",
+                      "text": "1"
+                    }
+                  ]
+                },
+                {
+                  "type": "UiCommandButton",
+                  "rect": [
+                    252,
+                    260,
+                    76,
+                    52
+                  ],
+                  "variation": "CmdSecondaryCompact",
+                  "text": "Buy"
+                }
+              ]
+            },
+            {
+              "type": "ColorRect",
+              "rect": [
+                0,
+                301,
+                328,
+                1
+              ]
+            }
+          ]
+        },
+        {
+          "type": "UiShopRow",
+          "rect": [
+            0,
+            302,
+            328,
+            58
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                0,
+                315,
+                32,
+                32
+              ],
+              "children": [
+                {
+                  "type": "TextureRect",
+                  "rect": [
+                    2,
+                    317,
+                    28,
+                    28
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                40,
+                304,
+                184,
+                24
+              ],
+              "variation": "C14XB",
+              "text": "Tomato Seeds"
+            },
+            {
+              "type": "Label",
+              "rect": [
+                232,
+                305,
+                4,
+                24
+              ],
+              "variation": "C12B",
+              "text": "›"
+            },
+            {
+              "type": "Label",
+              "rect": [
+                40,
+                323,
+                97,
+                24
+              ],
+              "variation": "C11B",
+              "text": "Ready in 6h"
+            },
+            {
+              "type": "Label",
+              "rect": [
+                40,
+                340,
+                97,
+                24
+              ],
+              "variation": "C10B",
+              "text": "210 XP to go"
+            },
+            {
+              "type": "Label",
+              "rect": [
+                252,
+                306,
+                76,
+                24
+              ],
+              "variation": "C12XB",
+              "text": "12 coins"
+            },
+            {
+              "type": "HBoxContainer",
+              "rect": [
+                0,
+                318,
+                328,
+                52
+              ],
+              "children": [
+                {
+                  "type": "UiCommandButton",
+                  "rect": [
+                    181,
+                    318,
+                    147,
+                    52
+                  ],
+                  "variation": "CmdBlockedCompact",
+                  "text": "Farming Lv4 needed"
+                }
+              ]
+            },
+            {
+              "type": "ColorRect",
+              "rect": [
+                0,
+                359,
+                328,
+                1
+              ]
+            }
+          ]
+        },
+        {
+          "type": "UiShopRow",
+          "rect": [
+            0,
+            360,
+            328,
+            58
+          ],
+          "children": [
+            {
+              "type": "Panel",
+              "rect": [
+                0,
+                373,
+                32,
+                32
+              ],
+              "children": [
+                {
+                  "type": "TextureRect",
+                  "rect": [
+                    2,
+                    375,
+                    28,
+                    28
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                40,
+                362,
+                184,
+                24
+              ],
+              "variation": "C14XB",
+              "text": "Reed Rod"
+            },
+            {
+              "type": "Label",
+              "rect": [
+                232,
+                363,
+                4,
+                24
+              ],
+              "variation": "C12B",
+              "text": "›"
+            },
+            {
+              "type": "Label",
+              "rect": [
+                40,
+                381,
+                204,
+                24
+              ],
+              "variation": "C11B",
+              "text": "Lands up to Rare fish"
+            },
+            {
+              "type": "Label",
+              "rect": [
+                40,
+                398,
+                204,
+                24
+              ],
+              "variation": "C10B",
+              "text": "Fishing Lv3"
+            },
+            {
+              "type": "Label",
+              "rect": [
+                252,
+                364,
+                76,
+                24
+              ],
+              "variation": "C12XB",
+              "text": "80 coins"
+            },
+            {
+              "type": "HBoxContainer",
+              "rect": [
+                0,
+                376,
+                328,
+                52
+              ],
+              "children": [
+                {
+                  "type": "UiCommandButton",
+                  "rect": [
+                    252,
+                    376,
+                    76,
+                    52
+                  ],
+                  "variation": "CmdSecondaryCompact",
+                  "text": "Buy"
+                }
+              ]
+            },
+            {
+              "type": "ColorRect",
+              "rect": [
+                0,
+                417,
+                328,
+                1
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

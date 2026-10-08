@@ -1,0 +1,733 @@
+{
+  "_doc": [
+    "F-07 confirmed item detail rules (SGODOT-207 comment 168a4cc3, revisions 1-2; product wording 25f3cb4c; K-3 = A).",
+    "Keys are kind/context. Kinds: seed crop fish dish bait rod material. Contexts: bag gear counter_buy counter_sell gift storage workbench (a recipe's item on the B2-06 workbench: what it does, no buttons; the card has Craft / Equip).",
+    "A kind/context without an entry shows no card (cooking picks never show one).",
+    "facts: lines in order (count and source, use, cost, XP hint); {token} values come from P0ItemInfo.tokens(); a line whose",
+    "  tokens are empty is dropped. when: a predicate expression over P0ItemInfo.flags() (names, !, &), empty = always.",
+    "buttons: in order; hidden unless `when` holds; `unless` lists unavailable states, the first one that holds replaces the",
+    "  button with a grey reason (kind unavailable). kind: primary, secondary, nav (Gift ›). Never-possible actions have no",
+    "  entry at all (no grey text: seeds and bait are never sold).",
+    "promote: the button id that becomes primary when its own `when` holds, demoting the default primary (Deliver over Eat).",
+    "lock: the title-area lock icon is shown; price: the buy row has a price column; quota: the sell area shows the quota line.",
+    "Capability flags (can_store, can_lock, can_gift) gate actions the P0 server can't do yet: no button and no grey text until the view carries the feature (storage, locked on bag stacks, residents / social).",
+    "Rarity and dish stars sit on the card's state line (spec.rarity_text, spec.quality), not in facts.",
+    "any/<context> is the fallback for every kind (storage: Take 10 shows only when more than 10 are stored; both send take_out with qty 10 / \"all\").",
+    "{count_source} is \"12 · Harvested at home\"; without a known source the line drops (the title already shows ×N)."
+  ],
+  "seed/bag": {
+    "facts": [
+      "{energy} Energy per plot · Ready in {grow}",
+      "{xp_hint}"
+    ],
+    "buttons": [
+      {
+        "id": "pin",
+        "label": "{pin_verb}",
+        "kind": "secondary",
+        "unless": [
+          {
+            "when": "bar_full",
+            "label": "Bar full · Unpin one first"
+          }
+        ]
+      },
+      {
+        "id": "store",
+        "label": "Store",
+        "kind": "secondary",
+        "unless": [
+          {
+            "when": "!at_home",
+            "label": "At home only"
+          }
+        ],
+        "when": "can_store"
+      }
+    ],
+    "lock": true
+  },
+  "seed/counter_buy": {
+    "facts": [
+      "{use}",
+      "{stock_line}"
+    ],
+    "price": true,
+    "buttons": [
+      {
+        "id": "buy",
+        "label": "Buy",
+        "kind": "secondary",
+        "unless": [
+          {
+            "when": "!unlocked",
+            "label": "{gate_text}"
+          },
+          {
+            "when": "!homestead_ok",
+            "label": "{homestead_gate}"
+          },
+          {
+            "when": "sold_out",
+            "label": "Sold out · {restock_in}"
+          },
+          {
+            "when": "!can_afford",
+            "label": "Need {coins_short} more coins"
+          }
+        ]
+      }
+    ]
+  },
+  "crop/bag": {
+    "facts": [
+      "{count_source}",
+      "Sells for {sell}"
+    ],
+    "buttons": [],
+    "lock": true
+  },
+  "crop/counter_sell": {
+    "facts": [
+      "{count} · {region_line}",
+      "{sell_here} each"
+    ],
+    "quota": true,
+    "buttons": [
+      {
+        "id": "sell",
+        "label": "Sell",
+        "kind": "secondary",
+        "when": "sold_here & quota_left & !locked",
+        "payload": {
+          "qty": 1
+        }
+      },
+      {
+        "id": "sell_all",
+        "label": "{sell_all_label}",
+        "kind": "primary",
+        "when": "sold_here & quota_left & !locked",
+        "payload": {
+          "qty": "all"
+        }
+      },
+      {
+        "id": "limit",
+        "label": "Limit reached · {quota_resets_in}",
+        "kind": "unavailable",
+        "when": "sold_here & !quota_left & !locked"
+      },
+      {
+        "id": "elsewhere",
+        "label": "Sell at home",
+        "kind": "unavailable",
+        "when": "!sold_here & !locked"
+      },
+      {
+        "id": "locked",
+        "label": "Locked",
+        "kind": "unavailable",
+        "when": "locked"
+      },
+      {
+        "id": "unlock",
+        "label": "Unlock",
+        "kind": "secondary",
+        "when": "locked"
+      }
+    ]
+  },
+  "crop/gift": {
+    "facts": [],
+    "buttons": [
+      {
+        "id": "deliver",
+        "label": "Deliver",
+        "kind": "primary",
+        "when": "deliverable"
+      }
+    ]
+  },
+  "fish/bag": {
+    "facts": [
+      "{count_source}",
+      "Sells for {sell} · Fish-dex {dex}",
+      "{xp_hint}"
+    ],
+    "buttons": [
+      {
+        "id": "gift",
+        "label": "Gift ›",
+        "kind": "nav",
+        "unless": [
+          {
+            "when": "!has_friends",
+            "label": "Gift · Mutual friends only"
+          }
+        ],
+        "when": "can_gift"
+      }
+    ],
+    "lock": true
+  },
+  "fish/counter_sell": {
+    "facts": [
+      "{count} · {region_line}",
+      "{sell_here} each"
+    ],
+    "quota": true,
+    "buttons": [
+      {
+        "id": "sell",
+        "label": "Sell",
+        "kind": "secondary",
+        "when": "sold_here & quota_left & !locked",
+        "payload": {
+          "qty": 1
+        }
+      },
+      {
+        "id": "sell_all",
+        "label": "{sell_all_label}",
+        "kind": "primary",
+        "when": "sold_here & quota_left & !locked",
+        "payload": {
+          "qty": "all"
+        }
+      },
+      {
+        "id": "limit",
+        "label": "Limit reached · {quota_resets_in}",
+        "kind": "unavailable",
+        "when": "sold_here & !quota_left & !locked"
+      },
+      {
+        "id": "elsewhere",
+        "label": "Sell at home",
+        "kind": "unavailable",
+        "when": "!sold_here & !locked"
+      },
+      {
+        "id": "locked",
+        "label": "Locked",
+        "kind": "unavailable",
+        "when": "locked"
+      },
+      {
+        "id": "unlock",
+        "label": "Unlock",
+        "kind": "secondary",
+        "when": "locked"
+      }
+    ]
+  },
+  "fish/gift": {
+    "facts": [],
+    "buttons": [
+      {
+        "id": "deliver",
+        "label": "Deliver",
+        "kind": "primary",
+        "when": "deliverable"
+      },
+      {
+        "id": "gift",
+        "label": "Gift",
+        "kind": "primary",
+        "when": "!deliverable & player_target",
+        "unless": [
+          {
+            "when": "!has_friends",
+            "label": "Gift · Mutual friends only"
+          }
+        ]
+      }
+    ]
+  },
+  "dish/bag": {
+    "facts": [
+      "+{meal} Energy",
+      "{gifted_line}",
+      "{expires_line}"
+    ],
+    "promote": "deliver",
+    "buttons": [
+      {
+        "id": "eat",
+        "label": "{eat_label}",
+        "kind": "primary",
+        "unless": [
+          {
+            "when": "energy_full",
+            "label": "Energy full"
+          }
+        ]
+      },
+      {
+        "id": "deliver",
+        "label": "Deliver",
+        "kind": "secondary",
+        "when": "deliverable & !gifted & !mystery"
+      },
+      {
+        "id": "gift",
+        "label": "{gift_near_label}",
+        "kind": "secondary",
+        "when": "can_gift",
+        "unless": [
+          {
+            "when": "!resident_near",
+            "label": "Gift to a resident"
+          },
+          {
+            "when": "near_gifted_today",
+            "label": "Gift already given today"
+          }
+        ]
+      }
+    ],
+    "lock": true
+  },
+  "dish/counter_sell": {
+    "facts": [
+      "{count}",
+      "{sell_here} each"
+    ],
+    "quota": true,
+    "buttons": [
+      {
+        "id": "sell",
+        "label": "Sell",
+        "kind": "secondary",
+        "when": "sold_here & quota_left & !locked & !never_sold",
+        "payload": {
+          "qty": 1
+        }
+      },
+      {
+        "id": "sell_all",
+        "label": "{sell_all_label}",
+        "kind": "primary",
+        "when": "sold_here & quota_left & !locked & !never_sold",
+        "payload": {
+          "qty": "all"
+        }
+      },
+      {
+        "id": "limit",
+        "label": "Limit reached · {quota_resets_in}",
+        "kind": "unavailable",
+        "when": "sold_here & !quota_left & !locked & !never_sold"
+      },
+      {
+        "id": "elsewhere",
+        "label": "Sell at home",
+        "kind": "unavailable",
+        "when": "!sold_here & !locked & !never_sold"
+      },
+      {
+        "id": "locked",
+        "label": "Locked",
+        "kind": "unavailable",
+        "when": "locked & !never_sold"
+      },
+      {
+        "id": "unlock",
+        "label": "Unlock",
+        "kind": "secondary",
+        "when": "locked & !never_sold"
+      }
+    ]
+  },
+  "dish/gift": {
+    "facts": [
+      "{affinity_line}"
+    ],
+    "buttons": [
+      {
+        "id": "deliver",
+        "label": "Deliver",
+        "kind": "primary",
+        "when": "deliverable & !gifted & !mystery"
+      },
+      {
+        "id": "gift",
+        "label": "{gift_label}",
+        "kind": "primary",
+        "when": "!deliverable & has_target",
+        "unless": [
+          {
+            "when": "resident_target & gifted_today",
+            "label": "Gift already given today"
+          },
+          {
+            "when": "gifted & player_target",
+            "label": "Residents only"
+          }
+        ]
+      }
+    ]
+  },
+  "bait/bag": {
+    "facts": [
+      "Faster bites"
+    ],
+    "buttons": [
+      {
+        "id": "pin",
+        "label": "{pin_verb}",
+        "kind": "secondary",
+        "unless": [
+          {
+            "when": "bar_full",
+            "label": "Bar full · Unpin one first"
+          }
+        ]
+      }
+    ],
+    "lock": true
+  },
+  "bait/counter_buy": {
+    "facts": [
+      "{use}",
+      "{stock_line}"
+    ],
+    "price": true,
+    "buttons": [
+      {
+        "id": "buy",
+        "label": "Buy",
+        "kind": "secondary",
+        "unless": [
+          {
+            "when": "!unlocked",
+            "label": "{gate_text}"
+          },
+          {
+            "when": "!homestead_ok",
+            "label": "{homestead_gate}"
+          },
+          {
+            "when": "sold_out",
+            "label": "Sold out · {restock_in}"
+          },
+          {
+            "when": "!can_afford",
+            "label": "Need {coins_short} more coins"
+          }
+        ]
+      }
+    ]
+  },
+  "rod/gear": {
+    "facts": [
+      "{rod_effect}",
+      "{rod_gate}"
+    ],
+    "buttons": [
+      {
+        "id": "equipped",
+        "label": "✓ Equipped",
+        "kind": "unavailable",
+        "when": "owned & equipped"
+      },
+      {
+        "id": "equip",
+        "label": "Equip",
+        "kind": "primary",
+        "when": "owned & !equipped"
+      }
+    ]
+  },
+  "rod/counter_buy": {
+    "facts": [
+      "{rod_reach}",
+      "{owned_line}"
+    ],
+    "price": true,
+    "buttons": [
+      {
+        "id": "buy",
+        "label": "Buy",
+        "kind": "secondary",
+        "unless": [
+          {
+            "when": "owned",
+            "label": "Owned"
+          },
+          {
+            "when": "!unlocked",
+            "label": "{gate_text}"
+          },
+          {
+            "when": "!homestead_ok",
+            "label": "{homestead_gate}"
+          },
+          {
+            "when": "!can_afford",
+            "label": "Need {coins_short} more coins"
+          }
+        ]
+      }
+    ]
+  },
+  "material/bag": {
+    "facts": [
+      "{count_source}",
+      "{sell_at_home}"
+    ],
+    "buttons": [
+      {
+        "id": "store",
+        "label": "Store",
+        "kind": "secondary",
+        "when": "!gate_item & can_store",
+        "unless": [
+          {
+            "when": "!at_home",
+            "label": "At home only"
+          }
+        ]
+      }
+    ],
+    "lock": true
+  },
+  "material/counter_sell": {
+    "facts": [
+      "{count}",
+      "{sell_here} each"
+    ],
+    "quota": true,
+    "buttons": [
+      {
+        "id": "sell",
+        "label": "Sell",
+        "kind": "secondary",
+        "when": "recyclable & sold_here & quota_left & !locked",
+        "payload": {
+          "qty": 1
+        }
+      },
+      {
+        "id": "sell_all",
+        "label": "{sell_all_label}",
+        "kind": "primary",
+        "when": "recyclable & sold_here & quota_left & !locked",
+        "payload": {
+          "qty": "all"
+        }
+      },
+      {
+        "id": "limit",
+        "label": "Limit reached · {quota_resets_in}",
+        "kind": "unavailable",
+        "when": "recyclable & sold_here & !quota_left & !locked"
+      },
+      {
+        "id": "elsewhere",
+        "label": "Sell at home",
+        "kind": "unavailable",
+        "when": "recyclable & !sold_here & !locked"
+      },
+      {
+        "id": "locked",
+        "label": "Locked",
+        "kind": "unavailable",
+        "when": "recyclable & locked"
+      }
+    ]
+  },
+  "fert/bag": {
+    "facts": [
+      "{count}"
+    ],
+    "buttons": [
+      {
+        "id": "pin",
+        "label": "{pin_verb}",
+        "kind": "secondary",
+        "unless": [
+          {
+            "when": "bar_full",
+            "label": "Bar full · Unpin one first"
+          }
+        ]
+      },
+      {
+        "id": "store",
+        "label": "Store",
+        "kind": "secondary",
+        "when": "can_store",
+        "unless": [
+          {
+            "when": "!at_home",
+            "label": "At home only"
+          }
+        ]
+      }
+    ],
+    "lock": true
+  },
+  "any/workbench": {
+    "facts": [
+      "{craft_effect}",
+      "{craft_note}"
+    ],
+    "buttons": []
+  },
+  "any/storage": {
+    "facts": [
+      "{stored} · Farm Storage"
+    ],
+    "buttons": [
+      {
+        "id": "take_out",
+        "label": "{take_some}",
+        "kind": "secondary",
+        "when": "take_some & at_home",
+        "payload": {
+          "qty": 10
+        }
+      },
+      {
+        "id": "take_out",
+        "label": "Take all",
+        "kind": "primary",
+        "payload": {
+          "qty": "all"
+        },
+        "unless": [
+          {
+            "when": "!at_home",
+            "label": "At home only"
+          }
+        ]
+      }
+    ]
+  },
+  "pick/gear": {
+    "facts": [
+      "{pick_effect}",
+      "{pick_source}"
+    ],
+    "buttons": [
+      {
+        "id": "equipped",
+        "label": "✓ Equipped",
+        "kind": "unavailable",
+        "when": "owned & equipped"
+      },
+      {
+        "id": "equip",
+        "label": "Equip",
+        "kind": "primary",
+        "when": "owned & !equipped"
+      }
+    ]
+  },
+  "fert/counter_buy": {
+    "facts": [
+      "{use}",
+      "{stock_line}"
+    ],
+    "price": true,
+    "buttons": [
+      {
+        "id": "buy",
+        "label": "Buy",
+        "kind": "secondary",
+        "unless": [
+          {
+            "when": "!unlocked",
+            "label": "{gate_text}"
+          },
+          {
+            "when": "!homestead_ok",
+            "label": "{homestead_gate}"
+          },
+          {
+            "when": "sold_out",
+            "label": "Sold out · {restock_in}"
+          },
+          {
+            "when": "!can_afford",
+            "label": "Need {coins_short} more coins"
+          }
+        ]
+      }
+    ]
+  },
+  "tool/counter_buy": {
+    "facts": [
+      "{tool_effect}",
+      "{owned_line}"
+    ],
+    "price": true,
+    "buttons": [
+      {
+        "id": "buy",
+        "label": "Buy",
+        "kind": "secondary",
+        "unless": [
+          {
+            "when": "owned",
+            "label": "Owned"
+          },
+          {
+            "when": "!unlocked",
+            "label": "{gate_text}"
+          },
+          {
+            "when": "!homestead_ok",
+            "label": "{homestead_gate}"
+          },
+          {
+            "when": "!can_afford",
+            "label": "Need {coins_short} more coins"
+          }
+        ]
+      }
+    ]
+  },
+  "any/counter_buy": {
+    "facts": [
+      "{use}",
+      "{need_line}"
+    ],
+    "price": true,
+    "buttons": [
+      {
+        "id": "buy",
+        "label": "Buy",
+        "kind": "secondary",
+        "unless": [
+          {
+            "when": "owned",
+            "label": "Owned"
+          },
+          {
+            "when": "!unlocked",
+            "label": "{gate_text}"
+          },
+          {
+            "when": "!homestead_ok",
+            "label": "{homestead_gate}"
+          },
+          {
+            "when": "sold_out",
+            "label": "Sold out · {restock_in}"
+          },
+          {
+            "when": "!materials_ok",
+            "label": "Need {materials_short}"
+          },
+          {
+            "when": "!can_afford",
+            "label": "Need {coins_short} more coins"
+          }
+        ]
+      }
+    ]
+  }
+}

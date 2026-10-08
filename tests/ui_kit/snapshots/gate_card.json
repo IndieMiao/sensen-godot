@@ -1,0 +1,739 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    499
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "Gate card (UiInfoSheet)"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        18
+      ],
+      "variation": "CaptionR12",
+      "text": "SKILL-2 482:169 · §4.8.7 four things (SGODOT-233)"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        52,
+        328,
+        447
+      ],
+      "children": [
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            52,
+            328,
+            263
+          ],
+          "children": [
+            {
+              "type": "UiInfoSheet",
+              "rect": [
+                0,
+                52,
+                328,
+                243
+              ],
+              "children": [
+                {
+                  "type": "HBoxContainer",
+                  "rect": [
+                    10,
+                    62,
+                    310,
+                    233
+                  ],
+                  "children": [
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        10,
+                        62,
+                        40,
+                        40
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            17,
+                            69,
+                            27,
+                            27
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "VBoxContainer",
+                      "rect": [
+                        58,
+                        62,
+                        262,
+                        233
+                      ],
+                      "children": [
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            58,
+                            62,
+                            262,
+                            20
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                58,
+                                62,
+                                242,
+                                20
+                              ],
+                              "variation": "C14XB",
+                              "text": "Carrot Seeds"
+                            },
+                            {
+                              "type": "Control",
+                              "rect": [
+                                306,
+                                65,
+                                14,
+                                14
+                              ],
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    306,
+                                    65,
+                                    14,
+                                    14
+                                  ]
+                                },
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    291,
+                                    50,
+                                    44,
+                                    44
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            58,
+                            82,
+                            262,
+                            15
+                          ],
+                          "variation": "C10B",
+                          "text": "Locked"
+                        },
+                        {
+                          "type": "VBoxContainer",
+                          "rect": [
+                            58,
+                            97,
+                            262,
+                            159
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                58,
+                                97,
+                                262,
+                                18
+                              ],
+                              "variation": "C12XB",
+                              "text": "Farming Lv2 unlocks Carrot and Herb"
+                            },
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                58,
+                                123,
+                                262,
+                                71
+                              ],
+                              "children": [
+                                {
+                                  "type": "UiNeedTile",
+                                  "rect": [
+                                    58,
+                                    123,
+                                    104,
+                                    71
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "VBoxContainer",
+                                      "rect": [
+                                        58,
+                                        123,
+                                        104,
+                                        71
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "Control",
+                                          "rect": [
+                                            86,
+                                            123,
+                                            48,
+                                            48
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "TextureRect",
+                                              "rect": [
+                                                97,
+                                                134,
+                                                26,
+                                                26
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "HBoxContainer",
+                                          "rect": [
+                                            58,
+                                            176,
+                                            104,
+                                            18
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                58,
+                                                176,
+                                                67,
+                                                18
+                                              ],
+                                              "variation": "CaptionXB12",
+                                              "text": "Farming XP"
+                                            },
+                                            {
+                                              "type": "HBoxContainer",
+                                              "rect": [
+                                                128,
+                                                176,
+                                                34,
+                                                18
+                                              ],
+                                              "children": [
+                                                {
+                                                  "type": "Label",
+                                                  "rect": [
+                                                    128,
+                                                    176,
+                                                    15,
+                                                    18
+                                                  ],
+                                                  "variation": "CaptionXB12",
+                                                  "text": "32"
+                                                },
+                                                {
+                                                  "type": "Label",
+                                                  "rect": [
+                                                    143,
+                                                    176,
+                                                    19,
+                                                    18
+                                                  ],
+                                                  "variation": "CaptionB12",
+                                                  "text": "/50"
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    172,
+                                    141,
+                                    148,
+                                    35
+                                  ],
+                                  "variation": "C12B",
+                                  "text": "18 XP to go · harvest 9 radishes"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "VBoxContainer",
+                              "rect": [
+                                58,
+                                202,
+                                262,
+                                54
+                              ],
+                              "children": [
+                                {
+                                  "type": "HBoxContainer",
+                                  "rect": [
+                                    58,
+                                    202,
+                                    262,
+                                    18
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        58,
+                                        202,
+                                        239,
+                                        18
+                                      ],
+                                      "variation": "C12XB",
+                                      "text": "Carrot Seeds"
+                                    },
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        305,
+                                        202,
+                                        15,
+                                        18
+                                      ],
+                                      "variation": "C12XB",
+                                      "text": "×5"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    58,
+                                    223,
+                                    262,
+                                    15
+                                  ],
+                                  "variation": "C10B",
+                                  "text": "Level-up gift"
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    58,
+                                    241,
+                                    262,
+                                    15
+                                  ],
+                                  "variation": "C10B",
+                                  "text": "At Lv2"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "VBoxContainer",
+                          "rect": [
+                            58,
+                            256,
+                            262,
+                            0
+                          ]
+                        },
+                        {
+                          "type": "MarginContainer",
+                          "rect": [
+                            58,
+                            256,
+                            262,
+                            39
+                          ],
+                          "children": [
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                58,
+                                251,
+                                262,
+                                44
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    58,
+                                    264,
+                                    170,
+                                    18
+                                  ],
+                                  "variation": "C12XB",
+                                  "text": ""
+                                },
+                                {
+                                  "type": "HBoxContainer",
+                                  "rect": [
+                                    236,
+                                    251,
+                                    84,
+                                    44
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "UiNavButton",
+                                      "rect": [
+                                        236,
+                                        251,
+                                        84,
+                                        44
+                                      ],
+                                      "variation": "NavCompact",
+                                      "text": "Show my plots"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                301,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "gate card · seed (SKILL-2)"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            327,
+            328,
+            172
+          ],
+          "children": [
+            {
+              "type": "UiInfoSheet",
+              "rect": [
+                0,
+                327,
+                328,
+                152
+              ],
+              "children": [
+                {
+                  "type": "HBoxContainer",
+                  "rect": [
+                    10,
+                    337,
+                    310,
+                    132
+                  ],
+                  "children": [
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        10,
+                        337,
+                        40,
+                        40
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            17,
+                            344,
+                            27,
+                            27
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "VBoxContainer",
+                      "rect": [
+                        58,
+                        337,
+                        262,
+                        132
+                      ],
+                      "children": [
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            58,
+                            337,
+                            262,
+                            20
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                58,
+                                337,
+                                242,
+                                20
+                              ],
+                              "variation": "C14XB",
+                              "text": "Golden Koi"
+                            },
+                            {
+                              "type": "Control",
+                              "rect": [
+                                306,
+                                340,
+                                14,
+                                14
+                              ],
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    306,
+                                    340,
+                                    14,
+                                    14
+                                  ]
+                                },
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    291,
+                                    325,
+                                    44,
+                                    44
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            58,
+                            357,
+                            262,
+                            15
+                          ],
+                          "variation": "C10B",
+                          "text": "Rare · Locked"
+                        },
+                        {
+                          "type": "VBoxContainer",
+                          "rect": [
+                            58,
+                            372,
+                            262,
+                            97
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                58,
+                                372,
+                                262,
+                                18
+                              ],
+                              "variation": "C12XB",
+                              "text": "Reed Rod lands up to Rare fish"
+                            },
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                58,
+                                398,
+                                262,
+                                71
+                              ],
+                              "children": [
+                                {
+                                  "type": "UiNeedTile",
+                                  "rect": [
+                                    58,
+                                    398,
+                                    69,
+                                    71
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "VBoxContainer",
+                                      "rect": [
+                                        58,
+                                        398,
+                                        69,
+                                        71
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "Control",
+                                          "rect": [
+                                            68,
+                                            398,
+                                            48,
+                                            48
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "TextureRect",
+                                              "rect": [
+                                                79,
+                                                409,
+                                                26,
+                                                26
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "HBoxContainer",
+                                          "rect": [
+                                            58,
+                                            451,
+                                            69,
+                                            18
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                58,
+                                                451,
+                                                32,
+                                                18
+                                              ],
+                                              "variation": "CaptionXB12",
+                                              "text": "Coins"
+                                            },
+                                            {
+                                              "type": "HBoxContainer",
+                                              "rect": [
+                                                93,
+                                                451,
+                                                34,
+                                                18
+                                              ],
+                                              "children": [
+                                                {
+                                                  "type": "Label",
+                                                  "rect": [
+                                                    93,
+                                                    451,
+                                                    15,
+                                                    18
+                                                  ],
+                                                  "variation": "CaptionXB12",
+                                                  "text": "40"
+                                                },
+                                                {
+                                                  "type": "Label",
+                                                  "rect": [
+                                                    108,
+                                                    451,
+                                                    19,
+                                                    18
+                                                  ],
+                                                  "variation": "CaptionB12",
+                                                  "text": "/80"
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    137,
+                                    424,
+                                    183,
+                                    18
+                                  ],
+                                  "variation": "C12B",
+                                  "text": "80 coins at Tackle Shop"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "VBoxContainer",
+                          "rect": [
+                            58,
+                            469,
+                            262,
+                            0
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                485,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "gate card · Fish-dex silhouette, rod"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

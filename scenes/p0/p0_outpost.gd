@@ -1,9 +1,10 @@
 extends P0Room
-## A home-set outpost room (SGODOT-227) on the indoor shell (P0Room, SGODOT-226): the outpost's placeholder art
-## and anchors, its keeper and residents at their npc_ anchors, tap-triggered counters and seats (LOCK-07), and
-## the outpost's realtime room: P0Online + OnlineCrowd show the other players, and the server picks Room 1,
-## Room 2 … (indoor 12, Market Square 30). Counters and residents open the panel entries of SGODOT-224 / 225
-## when present; until then the tackle counter keeps the existing greeting.
+## A home-set outpost room (SGODOT-227) on the indoor shell (P0Room, SGODOT-226): the outpost's room kit (its
+## `art` in p0_outposts.json, a Scene_design scene standing in until SGODOT-218) and anchors, its keeper and
+## residents at their npc_ anchors, tap-triggered counters and seats (LOCK-07), and the outpost's realtime room:
+## P0Online + OnlineCrowd show the other players, and the server picks Room 1, Room 2 … (indoor 12, Market
+## Square 30). Counters and residents open the panel entries of SGODOT-224 / 225 when present; until then the
+## tackle counter keeps the existing greeting.
 
 const OnlineCrowd = preload("res://modules/net/online_crowd.gd")
 const NPCS_PATH := "res://assets/p0/outpost_npcs.json"
@@ -12,7 +13,7 @@ const DECOR := ["use_fish_board", "use_fee_board", "use_stamp_desk", "use_coffee
 ## Tapping the counter is tapping the keeper (LOCK-15 / 16).
 const COUNTERS := ["use_counter", "use_stall_1", "npc_keeper"]
 ## Furniture that seats: its seat_ anchors are seat_<group>_<n>.
-const SEAT_GROUPS := {"use_tea_table_1": "seat_table1_", "use_bench": "seat_bench_"}
+const SEAT_GROUPS := {"use_tea_table_1": "seat_table1_", "use_tea_table_2": "seat_table2_", "use_bench": "seat_bench_"}
 ## sit_idle puts the hip joint 0.426 m above the rig root and the thighs rest about 0.086 m below the joint
 ## (measured on the base rig, SGODOT-227), so a seated root sits this far below the seat surface.
 const SIT_ROOT_BELOW_SEAT := 0.34
@@ -41,7 +42,10 @@ func setup(args: Dictionary) -> void:
 	keeper = outpost.get("keeper", {})
 	place_name = str(outpost.get("name", "Outpost"))
 	anchors_path = str(outpost.get("anchors", ""))
+	use_art(str(outpost.get("art", "")))   # the outpost's room kit; the anchors file is written for that kit
+	backdrop = outpost.get("backdrop", {})   # screen colours sampled from the kit's signed render
 	if role == "market": exit_text = "Exit · Back to map"
+	exit_to = "Map"   # the door's world prompt: i-door + Map (SGODOT-250)
 
 func _room_ready() -> void:
 	_spawn_npcs()
@@ -68,6 +72,7 @@ func _go_online(session: P0Session) -> void:
 	o.url = P0Online.ws_url(session.base_url)
 	o.player_id = session.player_id
 	o.access_key = session.access_key
+	o.version = session.version
 	o.appearance = OnlineAppearance.payload(Avatar.load_outfit())
 	attach_online(o)
 	var door := anchor_data("spawn")
@@ -105,6 +110,7 @@ func to_room(world: Vector3) -> Vector3:
 	return world - room.position
 
 func _room_frame(_view: Dictionary, dt: float) -> void:
+	if _talking != "" and (rt == null or not rt.ui.has_modal()): _talking = ""   # the greeting / dialogue closed
 	if not _glide.is_empty():
 		_glide.t = float(_glide.t) + dt
 		var p := _glide_point()
@@ -136,15 +142,8 @@ func _spawn_npcs() -> void:
 		rig.rotation.y = PI   # the rig faces +Z; the anchor's yaw is where the NPC faces
 		root.add_child(rig)
 		rig.config_applied.connect(func(_c): rig.play_motion("idle"))
-		rig.apply_config(OnlineAppearance.config({"version": 1, "slots": def.get("slots", {})}))
-		var tag := Label3D.new()   # every NPC carries a name tag (art director, SGODOT-227)
-		tag.text = str(def.get("name", ""))
-		tag.font = UiKit.font(&"bold")
-		tag.font_size = 28
-		tag.pixel_size = 0.006
-		tag.position.y = 2.0
-		tag.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-		root.add_child(tag)
+		rig.apply_config(OnlineAppearance.config({"version": 1, "slots": def.get("slots", {})}, true))   # NPC-only parts (SGODOT-229) too
+		# The name rides over the head as the UI's NpcNameTag (SGODOT-250, LOCK-16 v2), not a Label3D: see _marker.
 		npcs[n] = {"id": str(cast[n]), "name": str(def.get("name", "")), "root": root}
 
 # ---------------------------------------------------------------- taps
@@ -158,7 +157,7 @@ func _tappable() -> PackedStringArray:
 
 func p0_tap(screen: Vector2) -> void:
 	if rt and rt.ui.has_modal(): return
-	var n := pick(screen)
+	var n := tap_target(screen)   # a world prompt's tap goes to its own anchor, wherever its badge_ point puts it
 	if n == "": return
 	if not _standing.is_empty(): return
 	var go := func():
@@ -168,9 +167,13 @@ func p0_tap(screen: Vector2) -> void:
 	else: go.call()
 
 func _on_facility(n: String) -> void:
-	if COUNTERS.has(n): _open_keeper()
+	if COUNTERS.has(n):
+		_open_keeper()
+		_talking = "npc_keeper"
 	elif n.begins_with("seat_"): _claim(n)
-	elif npcs.has(n): _open_resident(str(npcs[n].id), str(npcs[n].name))
+	elif npcs.has(n):
+		_open_resident(str(npcs[n].id), str(npcs[n].name))
+		_talking = n
 	# Boards and shelves are facilities, not keepers: they open the market counter directly (LOCK-16 / 07).
 	elif n == "use_market_board": _open_entry("open_counter", ["market", counter_opts("board")], "Market Board")
 	elif n == "use_specialty_shelf": _open_entry("open_counter", ["market", counter_opts("specialty")], "City Specialty")
@@ -178,9 +181,7 @@ func _on_facility(n: String) -> void:
 ## LOCK-16: keepers greet first, Trade opens the counter (SGODOT-224's open_keeper_greeting(role, ctx)).
 func _open_keeper() -> void:
 	if rt == null: return
-	if rt.ui.has_method("open_keeper_greeting"): rt.ui.call("open_keeper_greeting", role, keeper_ctx())
-	elif role == "tackle": rt.ui.open_kai_greeting()   # the existing tackle greeting until 224 lands
-	else: rt.ui.toast("%s · %s" % [str(keeper.get("role", "")), str(keeper.get("name", ""))])
+	rt.ui.open_keeper_greeting(role, keeper_ctx())
 
 ## What P0Logic.keeper_lines takes from the outpost data (names and places are data, not UI copy): the keeper's
 ## name, the place ("Keeps the stall · Xuhui Market Square") and, for the tackle shop, the pond it names.
@@ -200,17 +201,46 @@ func _open_resident(id: String, resident_name: String) -> void:
 	if rt == null: return
 	if not (rt.ui.has_method("open_resident") and rt.ui.call("open_resident", id)): rt.ui.toast(resident_name)
 
+## The resident within reach: a finger card's distance (CARD_NEAR_M), the nearest of several; "" when none.
+## The bag's dish card offers `Gift to <Name>` for them (SGODOT-225, 不知火舞 / 李白 on 225).
+func p0_near_resident() -> String:
+	var best := ""
+	var best_d := CARD_NEAR_M
+	var residents: Dictionary = P0Logic.content().get("residents", {})
+	for n in npcs:
+		if not residents.has(str(npcs[n].id)): continue   # the keeper stands here too, but takes no gifts
+		var a := anchor(n)
+		if a == null: continue
+		var d := _flat_distance(actor.position, a.global_position)
+		if d < best_d:
+			best_d = d
+			best = str(npcs[n].id)
+	return best
+
 func _open_entry(method: String, args: Array, fallback: String) -> void:
 	if rt == null: return
 	if rt.ui.has_method(method): rt.ui.callv(method, args)
 	else: rt.ui.toast(fallback)
 
+## Where an NPC's name sits, in the NPC's own space (above the head; the rig's root carries the NPC's scale).
+const NAME_OVER_HEAD := Vector3(0, 2.0, 0)
+## The NPC anchor whose greeting card or dialogue bar this room opened; "" once that modal closes.
+var _talking := ""
+
 func _marker(n: String, view: Dictionary) -> Dictionary:
 	if _dev_no_marks: return {}
-	if npcs.has(n): return {text = "%s · Tap to talk" % str(npcs[n].name)}
-	if SEAT_GROUPS.has(n): return {text = "Sit"} if seat == "" and not _free_seats(str(SEAT_GROUPS[n])).is_empty() else {}
-	if n == "use_market_board": return {text = "Market Board"}
-	if n == "use_specialty_shelf": return {text = "City Specialty"}
+	# World prompts (SGODOT-250, LOCK-07 / 16 / 30 v2, q(62)): names only, no "Tap to …"; the room opens one at a time.
+	if npcs.has(n):
+		# Talking while the greeting card or dialogue bar this room opened for them is up (不知火舞 on #57: that NPC's
+		# name stays lit over those two; P0Ui decides what shows under which modal).
+		var talking: bool = n == _talking and rt != null and rt.ui.has_modal()
+		return {kind = "npc", name = str(npcs[n].name), head = (npcs[n].root as Node3D).to_global(NAME_OVER_HEAD), talking = talking}
+	if SEAT_GROUPS.has(n):
+		return {kind = "seat", icon = P0Logic.icon("seat")} if seat == "" and not _free_seats(str(SEAT_GROUPS[n])).is_empty() else {}
+	if n == "use_market_board":
+		var open := int(view.get("keepers", {}).get("market", {}).get("board_open", 0))
+		return {kind = "facility", icon = P0Logic.icon("board"), name = "Market Board", badge = "request" if open > 0 else ""}
+	if n == "use_specialty_shelf": return {kind = "facility", icon = P0Logic.icon("postcard"), name = "City Specialty"}
 	return super._marker(n, view)
 
 # ---------------------------------------------------------------- seats (茶桌 / 长椅, LOCK-30: the card says Sit)

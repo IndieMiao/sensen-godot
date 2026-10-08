@@ -45,6 +45,11 @@ const POI_CACHE_LIMIT := 400
 ## overlap exceeds the margin; newcomers need clearance plus the margin), and a
 ## marker that lost its slot cannot re-enter within the cooldown.
 const PACK_MARGIN := 8.0
+## A pin wearing a map marker (q(48): Deliverable ✓ > Request ! > New ◆) is packed before the others, so the marker
+## above it is not packed away with it (蒙恬 on C30). Entries carry it as `marker`.
+const MARKER_ORDER := {"deliverable": 0, "request": 1, "new": 2}
+## The render priority of an outpost pin or a pin wearing a marker: over other art, under the selected pin (2).
+const PLACE_PRIORITY := 1
 const REAPPEAR_COOLDOWN_MS := 400
 ## Display diversity: once this many dining markers are placed, remaining dining
 ## candidates wait until every non-dining candidate had its chance at the space.
@@ -70,6 +75,11 @@ var marks: Array = []
 ## state key → Control for one mark; tests swap it. Default: a UiStatusBadge when the build has one.
 var mark_factory := Callable()
 var displayed: Array = []
+## The outpost and marked-pin labels shown this update (local rects): the player's own My Farm label gives way to them.
+var _place_labels: Array = []
+## Map markers the host gives by pin id (q(48)), asked once per update through its `city_pin_markers()`; an entry's
+## own `marker` wins.
+var _pin_markers := {}
 var subtitle: Label
 var status: Label
 var info: PanelContainer
@@ -508,6 +518,18 @@ func _label_width(entry: Dictionary) -> float:
 	if font == null: return 48.0
 	return minf(LABEL_MAX_W, font.get_string_size(_label_text(entry), HORIZONTAL_ALIGNMENT_LEFT, -1, LABEL_FONT).x + LABEL_PAD)
 
+## Labels written whole, never cut: an outpost's and any pin's wearing a marker (不知火舞 on C30 / #83); unmarked ponds
+## and landmarks keep their cut labels.
+func _whole_label(entry: Dictionary) -> bool:
+	return entry.get("kind") == "place" or _marker_of(entry) != ""
+
+## A whole label's width: its text on one line at the pins' 9 pt, with no cap (不知火舞 on C30), plus the marker
+## style's 4 + 4 and 2 to spare.
+func _whole_label_width(entry: Dictionary) -> float:
+	var font := get_theme_font("font", "Label")
+	if font == null: return 48.0
+	return ceilf(font.get_string_size(_label_text(entry), HORIZONTAL_ALIGNMENT_LEFT, -1, 9).x) + 10.0
+
 ## 名牌在给定宽度下按词折行需要的高度（最多 3 行）。
 func _label_height(entry: Dictionary, width: float) -> float:
 	var font := get_theme_font("font", "Label")
@@ -872,6 +894,8 @@ func _make_marker(entry: Dictionary) -> Dictionary:
 
 func _update_markers() -> void:
 	displayed.clear()
+	_place_labels.clear()
+	_pin_markers = host.call("city_pin_markers") if host.has_method("city_pin_markers") else {}
 	# Cull only outside the screen plus the artwork's extent. UI panels cover
 	# geography; they never move or hide its anchors to make room for themselves.
 	var area := Rect2(-global_position, get_viewport_rect().size).grow(120)
@@ -911,7 +935,9 @@ func _update_markers() -> void:
 		var art_side: float = 88 if entry.kind == "landmark" else lerpf(42, 64, clampf((host.zoom - 13) / 3, 0, 1))
 		var top := 40.0 if entry.kind == "resident" else 54.0 if art_key in ["hollywood_sign", "griffith_observatory", "santa_monica_pier"] else 80.0 if entry.kind == "landmark" else 56.0
 		if entry.kind == "poi": top = maxf(36, art_side * 0.94)
-		var label_h := _label_height(entry, width) if is_sel else 16.0
+		var label_h := _label_height(entry, width) if is_sel and not _whole_label(entry) else 16.0
+		# An outpost's label and a marked pin's are never cut: the whole text on one line (不知火舞 on C30, q(72)).
+		var label_w := _whole_label_width(entry) if _whole_label(entry) else width
 		var art_w := 36.0 if entry.kind == "resident" else art_side
 		var art_h := top
 		var side := maxf(width, art_side)
@@ -924,7 +950,7 @@ func _update_markers() -> void:
 		var bounds := Rect2(point - Vector2(side * 0.5, top), Vector2(side, top + below))
 		candidates.append({"entry": entry, "id": id, "world": world, "point": point,
 			"bounds": bounds, "width": width, "art_side": art_side, "art": art_key,
-			"label_h": label_h, "art_w": art_w, "art_h": art_h, "k": k})
+			"label_h": label_h, "label_w": label_w, "art_w": art_w, "art_h": art_h, "k": k})
 	# Screen-space packing: anchors never move; a marker either shows in place
 	# or yields entirely. Order: selected, landmarks, residents, then POIs by
 	# incumbency (anti-flicker), source rank and id — fully deterministic.
@@ -944,6 +970,7 @@ func _update_markers() -> void:
 			dining += 1
 	for c in deferred:
 		_place_candidate(c, occupied, blockers, now)
+	_yield_own_label()
 	var shown := displayed.map(func(m): return str(m.entry.id))
 	_shown_last = {}
 	for id in shown: _shown_last[id] = true
@@ -980,14 +1007,31 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int)
 	if not is_selected:
 		if not incumbent and now < int(_hidden_until.get(id, 0)): return false
 		var probe: Rect2 = c.bounds.grow(-PACK_MARGIN if incumbent else PACK_MARGIN)
-		# 地标相互之间也做遮挡剔除，但不给玩家 pin 让位；其余标记两者都让。
-		var blocked: bool = _hits(occupied, probe) or (entry.kind != "landmark" and _hits(blockers, probe))
+		# 地标相互之间也做遮挡剔除，但不给玩家 pin 让位；其余标记两者都让。宿主的地点（P0 据点）从不让位：
+		# 城市级也每处一枚（q(72)），只是名牌和已放下的标记相撞时先收起。
+		var blocked: bool = entry.kind != "place" and (_hits(occupied, probe) or (entry.kind != "landmark" and not _over_avatar(entry) and _hits(blockers, probe)))
 		if blocked:
 			if incumbent: _hidden_until[id] = now + REAPPEAR_COOLDOWN_MS
 			return false
+	var label_rect := Rect2(c.point + Vector2(-c.label_w * 0.5, 3), Vector2(c.label_w, c.label_h))
 	if entry.kind == "landmark":
 		label_fits = is_selected or not _hits(occupied, Rect2(c.point - Vector2(c.width * 0.5, -3), Vector2(c.width, 20)))
-	occupied.append(c.bounds)
+	elif entry.kind == "place":
+		# An outpost keeps its pin; its label shows unless it would cover a pin or a label placed before it (higher
+		# priority), and comes back once zooming in parts them or the pin is selected (不知火舞 on C30).
+		label_fits = is_selected or not _hits(occupied, label_rect)
+	if entry.kind == "place":
+		occupied.append(Rect2(c.point - Vector2(c.art_w * 0.5, c.art_h), Vector2(c.art_w, c.art_h)))
+		if label_fits:
+			occupied.append(label_rect)
+			_place_labels.append(label_rect)
+	else:
+		occupied.append(c.bounds)
+		# A marked pin's whole label reaches past its bounds: what comes after keeps clear of it too, and My Farm's label
+		# gives way to it as to an outpost's (不知火舞 on #83).
+		if _marker_of(entry) != "":
+			occupied.append(label_rect)
+			if entry.kind != "poi" or is_selected or host.zoom >= 16: _place_labels.append(label_rect)
 	if not markers.has(id): markers[id] = _make_marker(entry)
 	var marker: Dictionary = markers[id]
 	marker.entry = entry
@@ -1000,12 +1044,16 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int)
 		marker.portrait.position = Vector2(-18, -38)
 	else:
 		_place_art(marker, c)
+		# A marker comes and goes with the view: the draw rule follows it (the selected pin keeps its front priority).
+		marker.sprite.no_depth_test = _over_avatar(entry)
+		if not is_selected: marker.sprite.render_priority = PLACE_PRIORITY if _over_avatar(entry) else 0
 	marker.label.text = _label_text(entry)
 	# 名牌永远跟随图标居中（出屏也不挪）；选中项长名按词折行，不再省略号截断。
-	marker.label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART if is_selected else TextServer.AUTOWRAP_OFF
-	marker.label.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING if is_selected else TextServer.OVERRUN_TRIM_ELLIPSIS
-	marker.label.position = Vector2(-c.width * 0.5, 3)
-	marker.label.size = Vector2(c.width, c.label_h)
+	var whole := _whole_label(entry)   # one line, never cut
+	marker.label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART if is_selected and not whole else TextServer.AUTOWRAP_OFF
+	marker.label.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING if is_selected or whole else TextServer.OVERRUN_TRIM_ELLIPSIS
+	marker.label.position = Vector2(-c.label_w * 0.5, 3)
+	marker.label.size = Vector2(c.label_w, c.label_h)
 	marker.label.add_theme_font_size_override("font_size", 9)
 	marker.label.visible = label_fits and (entry.kind != "poi" or is_selected or host.zoom >= 16)
 	# 点击热区只取可见的贴图与名牌，不用（为让位而放大的）占位框：
@@ -1013,7 +1061,7 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int)
 	var k: float = c.k
 	marker.hit = [Rect2(c.point - Vector2(c.art_w * 0.5, c.art_h) * k, Vector2(c.art_w, c.art_h) * k)]
 	if marker.label.visible:
-		marker.hit.append(Rect2(c.point + Vector2(-c.width * 0.5, 3) * k, Vector2(c.width, c.label_h) * k))
+		marker.hit.append(Rect2(c.point + Vector2(-c.label_w * 0.5, 3) * k, Vector2(c.label_w, c.label_h) * k))
 	displayed.append(marker)
 	return true
 
@@ -1060,7 +1108,7 @@ func _set_marker_front(id: String, front: bool) -> void:
 	if not markers.has(id): return
 	var marker: Dictionary = markers[id]
 	if marker.has("sprite"):
-		marker.sprite.render_priority = 2 if front else 0
+		marker.sprite.render_priority = 2 if front else (PLACE_PRIORITY if _over_avatar(marker.entry) else 0)
 		marker.shadow.render_priority = 1 if front else -1
 	if front: move_child(marker.node, maxi(0, markers.size() - 1))
 
@@ -1076,12 +1124,32 @@ func _animate_focus(id: String, to: float, duration: float) -> void:
 		_apply_marker_scale(marker), float(marker.get("focus", 1.0)), to, duration)
 
 func _pack_key(c: Dictionary) -> Array:
-	var kind_order := {"landmark": 0, "resident": 1, "pond": 2, "place": 2.5, "poi": 3}
+	# A host place (P0 outpost) goes before everything but the selected pin and a pin wearing a map marker (蒙恬 on
+	# C30): the city level shows every outpost (q(72)). Journey has no place pins, so its order is unchanged.
+	# Outposts among themselves: nearest home first, then id (不知火舞 on C30) — geography, so panning never reorders them.
+	var kind_order := {"place": -1, "landmark": 0, "resident": 1, "pond": 2, "poi": 3}
 	return [0 if selected.get("id", null) == c.entry.get("id") else 1,
+		int(MARKER_ORDER.get(_marker_of(c.entry), MARKER_ORDER.size())),
 		kind_order.get(c.entry.kind, 3),
+		_home_distance(c.entry) if c.entry.kind == "place" else 0.0,
 		0 if _shown_last.has(c.id) else 1,
 		float(c.entry.get("rank", 5)),
 		c.id]
+
+## The map marker a pin wears (q(48): "deliverable" / "request" / "new"), "" for none.
+func _marker_of(entry: Dictionary) -> String:
+	return str(entry.get("marker", _pin_markers.get(str(entry.get("id", "")), "")))
+
+## Outposts and pins wearing a marker draw over the player's own 3D avatar (no depth test) and never give way to it:
+## both pack before everything but the selected pin (不知火舞 / 蒙恬 on C30).
+func _over_avatar(entry: Dictionary) -> bool:
+	return entry.get("kind") == "place" or _marker_of(entry) != ""
+
+## How far a place is from home (degrees, the latitude scaled to the longitude's length): only ever compared.
+func _home_distance(entry: Dictionary) -> float:
+	var lat := float(host.get("home_lat")) if host.get("home_lat") != null else 0.0
+	var lng := float(host.get("home_lng")) if host.get("home_lng") != null else 0.0
+	return Vector2((float(entry.lat) - lat) / maxf(0.01, cos(deg_to_rad(lat))), float(entry.lng) - lng).length()
 
 static func _hits_point(rects: Array, point: Vector2) -> bool:
 	for r in rects:
@@ -1094,6 +1162,15 @@ static func _hits(rects: Array, rect: Rect2) -> bool:
 	return false
 
 ## Screen footprints of the player and other players, in this view's space.
+## My Farm's label gives way to an outpost or marked-pin label it would touch: at the city level the avatar itself
+## says where home is (不知火舞 on C30 / #83).
+func _yield_own_label() -> void:
+	var fm = host.get("farm_markers")
+	if fm == null or not fm.has_method("yield_self_label"): return
+	var own: Rect2 = fm.self_label_rect()
+	own.position += fm.global_position - global_position
+	fm.yield_self_label(own.has_area() and _hits(_place_labels, own))
+
 func _player_blockers() -> Array:
 	var result: Array = []
 	var fm = host.get("farm_markers")
@@ -1127,6 +1204,17 @@ func _free_marker(id: String) -> void:
 		marker.shadow.queue_free()
 	markers.erase(id)
 	_hidden_until.erase(id)
+
+## A tap on a shown host place (P0 outpost) pin selects it before anything drawn with it (the player's own avatar,
+## 蒙恬 on C30); false when the tap is not on one.
+func activate_place_at(screen: Vector2) -> bool:
+	if not host.city_detail_visible(): return false
+	var local := screen - global_position
+	for marker in displayed:
+		if marker.entry.kind == "place" and _hits_point(marker.get("hit", [marker.rect]), local):
+			select(marker.entry)
+			return true
+	return false
 
 func activate_at(screen: Vector2) -> bool:
 	var local := screen - global_position

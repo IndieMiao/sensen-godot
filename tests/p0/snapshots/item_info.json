@@ -1,0 +1,433 @@
+{
+  "bait_worm/bag": {
+    "badge": "",
+    "buttons": [
+      "secondary:Pin"
+    ],
+    "facts": [
+      "Faster bites"
+    ],
+    "lock": {
+      "locked": false,
+      "shown": false
+    },
+    "price": {},
+    "quota": {}
+  },
+  "bait_worm/counter_buy": {
+    "badge": "",
+    "buttons": [
+      "secondary:Buy"
+    ],
+    "facts": [
+      "Bites come faster",
+      "Stock 7/30 · Bag ×5"
+    ],
+    "lock": {
+      "locked": false,
+      "shown": false
+    },
+    "price": {
+      "each": 2,
+      "line": "",
+      "text": "2 coins",
+      "total": 2
+    },
+    "quota": {}
+  },
+  "bait_worm/storage": {
+    "badge": "",
+    "buttons": [
+      "primary:Take all"
+    ],
+    "facts": [
+      "Farm Storage"
+    ],
+    "lock": {
+      "locked": false,
+      "shown": false
+    },
+    "price": {},
+    "quota": {}
+  },
+  "crop_radish/bag": {
+    "badge": "",
+    "buttons": [],
+    "facts": [
+      "12 · Harvested at home",
+      "Sells for 5"
+    ],
+    "lock": {
+      "locked": false,
+      "shown": false
+    },
+    "price": {},
+    "quota": {}
+  },
+  "crop_radish/counter_sell": {
+    "badge": "",
+    "buttons": [
+      "secondary:Sell",
+      "primary:Sell All · 60 coins"
+    ],
+    "facts": [
+      "12",
+      "5 each"
+    ],
+    "lock": {
+      "locked": false,
+      "shown": false
+    },
+    "price": {},
+    "quota": {
+      "have": 0,
+      "note": "",
+      "text": "Crops & fish · no daily limit",
+      "total": 0
+    }
+  },
+  "crop_radish/gift": {
+    "badge": "",
+    "buttons": [],
+    "facts": [],
+    "lock": {
+      "locked": false,
+      "shown": false
+    },
+    "price": {},
+    "quota": {}
+  },
+  "crop_radish/storage": {
+    "badge": "",
+    "buttons": [
+      "primary:Take all"
+    ],
+    "facts": [
+      "Farm Storage"
+    ],
+    "lock": {
+      "locked": false,
+      "shown": false
+    },
+    "price": {},
+    "quota": {}
+  },
+  "dish_grilled_crucian/bag": {
+    "badge": "",
+    "buttons": [
+      "primary:Eat · +45 Energy"
+    ],
+    "facts": [
+      "+45 Energy"
+    ],
+    "lock": {
+      "locked": false,
+      "shown": false
+    },
+    "price": {},
+    "quota": {}
+  },
+  "dish_grilled_crucian/counter_sell": {
+    "badge": "",
+    "buttons": [
+      "unavailable:Sell at home"
+    ],
+    "facts": [
+      "1"
+    ],
+    "lock": {
+      "locked": false,
+      "shown": false
+    },
+    "price": {},
+    "quota": {
+      "have": 0,
+      "note": "Homestead Stall · resets in 9h 12m",
+      "text": "Dish buy-back today 0/120",
+      "total": 120
+    }
+  },
+  "dish_grilled_crucian/gift": {
+    "badge": "",
+    "buttons": [],
+    "facts": [],
+    "lock": {
+      "locked": false,
+      "shown": false
+    },
+    "price": {},
+    "quota": {}
+  },
+  "dish_grilled_crucian/storage": {
+    "badge": "",
+    "buttons": [
+      "primary:Take all"
+    ],
+    "facts": [
+      "Farm Storage"
+    ],
+    "lock": {
+      "locked": false,
+      "shown": false
+    },
+    "price": {},
+    "quota": {}
+  },
+  "fish_crucian/bag": {
+    "badge": "",
+    "buttons": [],
+    "facts": [
+      "Sells for 6 · Fish-dex 1/2"
+    ],
+    "lock": {
+      "locked": false,
+      "shown": false
+    },
+    "price": {},
+    "quota": {}
+  },
+  "fish_crucian/counter_sell": {
+    "badge": "",
+    "buttons": [
+      "secondary:Sell",
+      "primary:Sell All · 18 coins"
+    ],
+    "facts": [
+      "3",
+      "6 each"
+    ],
+    "lock": {
+      "locked": false,
+      "shown": false
+    },
+    "price": {},
+    "quota": {
+      "have": 0,
+      "note": "",
+      "text": "Crops & fish · no daily limit",
+      "total": 0
+    }
+  },
+  "fish_crucian/gift": {
+    "badge": "",
+    "buttons": [],
+    "facts": [],
+    "lock": {
+      "locked": false,
+      "shown": false
+    },
+    "price": {},
+    "quota": {}
+  },
+  "fish_crucian/storage": {
+    "badge": "",
+    "buttons": [
+      "primary:Take all"
+    ],
+    "facts": [
+      "Farm Storage"
+    ],
+    "lock": {
+      "locked": false,
+      "shown": false
+    },
+    "price": {},
+    "quota": {}
+  },
+  "rod_reed/counter_buy": {
+    "badge": "",
+    "buttons": [
+      "unavailable:Fishing Lv3 needed"
+    ],
+    "facts": [
+      "Lands up to Rare fish"
+    ],
+    "lock": {
+      "locked": false,
+      "shown": false
+    },
+    "price": {
+      "each": 80,
+      "line": "",
+      "text": "80 coins",
+      "total": 80
+    },
+    "quota": {}
+  },
+  "rod_reed/gear": {
+    "badge": "",
+    "buttons": [],
+    "facts": [
+      "Lands up to Rare fish · Bite window 2.6 s",
+      "Fishing Lv3 · Tackle Shop"
+    ],
+    "lock": {
+      "locked": false,
+      "shown": false
+    },
+    "price": {},
+    "quota": {}
+  },
+  "rod_reed/storage": {
+    "badge": "",
+    "buttons": [
+      "primary:Take all"
+    ],
+    "facts": [
+      "Farm Storage"
+    ],
+    "lock": {
+      "locked": false,
+      "shown": false
+    },
+    "price": {},
+    "quota": {}
+  },
+  "rod_starter/counter_buy": {
+    "badge": "",
+    "buttons": [
+      "unavailable:Owned"
+    ],
+    "facts": [
+      "Lands up to Fine fish",
+      "In Gear"
+    ],
+    "lock": {
+      "locked": false,
+      "shown": false
+    },
+    "price": {},
+    "quota": {}
+  },
+  "rod_starter/gear": {
+    "badge": "",
+    "buttons": [
+      "unavailable:✓ Equipped"
+    ],
+    "facts": [
+      "Lands up to Fine fish · Bite window 2.2 s"
+    ],
+    "lock": {
+      "locked": false,
+      "shown": false
+    },
+    "price": {},
+    "quota": {}
+  },
+  "rod_starter/storage": {
+    "badge": "",
+    "buttons": [
+      "primary:Take all"
+    ],
+    "facts": [
+      "Farm Storage"
+    ],
+    "lock": {
+      "locked": false,
+      "shown": false
+    },
+    "price": {},
+    "quota": {}
+  },
+  "seed_radish/bag": {
+    "badge": "",
+    "buttons": [
+      "secondary:Pin"
+    ],
+    "facts": [
+      "2 Energy per plot · Ready in 4h"
+    ],
+    "lock": {
+      "locked": false,
+      "shown": false
+    },
+    "price": {},
+    "quota": {}
+  },
+  "seed_radish/counter_buy": {
+    "badge": "",
+    "buttons": [
+      "secondary:Buy"
+    ],
+    "facts": [
+      "Ready in 4h",
+      "Bag ×20"
+    ],
+    "lock": {
+      "locked": false,
+      "shown": false
+    },
+    "price": {
+      "each": 4,
+      "line": "",
+      "text": "4 coins",
+      "total": 4
+    },
+    "quota": {}
+  },
+  "seed_radish/storage": {
+    "badge": "",
+    "buttons": [
+      "primary:Take all"
+    ],
+    "facts": [
+      "Farm Storage"
+    ],
+    "lock": {
+      "locked": false,
+      "shown": false
+    },
+    "price": {},
+    "quota": {}
+  },
+  "timber/bag": {
+    "badge": "",
+    "buttons": [],
+    "facts": [
+      "Sells for 2 at home"
+    ],
+    "lock": {
+      "locked": false,
+      "shown": false
+    },
+    "price": {},
+    "quota": {}
+  },
+  "timber/counter_sell": {
+    "badge": "",
+    "buttons": [
+      "secondary:Sell",
+      "primary:Sell All · 24 coins"
+    ],
+    "facts": [
+      "12",
+      "2 each"
+    ],
+    "lock": {
+      "locked": false,
+      "shown": false
+    },
+    "price": {},
+    "quota": {
+      "have": 0,
+      "note": "Homestead Stall · resets in 9h 12m",
+      "text": "Material buy-back today 0/30",
+      "total": 30
+    }
+  },
+  "timber/storage": {
+    "badge": "",
+    "buttons": [
+      "primary:Take all"
+    ],
+    "facts": [
+      "Farm Storage"
+    ],
+    "lock": {
+      "locked": false,
+      "shown": false
+    },
+    "price": {},
+    "quota": {}
+  }
+}

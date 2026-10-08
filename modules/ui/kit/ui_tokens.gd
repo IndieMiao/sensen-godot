@@ -22,18 +22,25 @@ const COLOR_ENERGY_BONUS := Color("7FC66A")
 const COLOR_ENERGY_HUD_DEEP := Color("C9962A")
 const COLOR_ENERGY_HUD_FILL := Color("E3B341")
 const COLOR_ENERGY_HUD_LIGHT := Color("F4D27A")
+const COLOR_FAMILY_FIELD := Color("7FAE6E")
+const COLOR_FAMILY_ORCHARD := Color("D98A78")
+const COLOR_FAMILY_SEASONING := Color("B9A27A")
+const COLOR_FAMILY_WATER := Color("6F9BBF")
 const COLOR_FLOAT_AFFINITY := Color("C04F7A")
 const COLOR_FLOAT_COINS := Color("806C0C")
 const COLOR_FLOAT_ENERGY_COST := Color("C0563F")
 const COLOR_FLOAT_ENERGY_GAIN := Color("3E7D43")
 const COLOR_FLOAT_XP := Color("17808F")
 const COLOR_GOLD := Color("F0D75E")
+const COLOR_GOLD_DEEP := Color("D9A521")
 const COLOR_GOLD_INK := Color("806C0C")
 const COLOR_INFO := Color("426A88")
 const COLOR_JOYSTICK_RING := Color("FBF8F173")
 const COLOR_JOYSTICK_THUMB := Color("3E7D43B2")
 const COLOR_LIFT_SHADOW := Color("2E3B3338")
 const COLOR_MUTED := Color("6E7B74")
+const COLOR_NEW := Color("4FB8C9")
+const COLOR_NEW_INK := Color("1B7381")
 const COLOR_PIN_AMBER := Color("E3B341")
 const COLOR_PIN_WARM := Color("FBF4E6")
 const COLOR_PRIMARY := Color("3E7D43")
@@ -244,8 +251,12 @@ const SIZE_ACTION_KEY_W := 95
 const SIZE_ACTION_KEY_H := 148
 const SIZE_HOLD_RING := 4.4
 const SIZE_PENDING_RING := 3.5
-const SIZE_RADIAL_PETAL := 52
-const SIZE_RADIAL_ICON := 28
+const SIZE_RADIAL_PETAL := 64
+const SIZE_RADIAL_PETAL_CURRENT := 72
+const SIZE_RADIAL_HIT := 72
+const SIZE_RADIAL_RING := 88
+const SIZE_RADIAL_ICON := 34
+const SIZE_RADIAL_ICON_CURRENT := 38
 const SIZE_RADIAL_LOCK_BADGE := 18
 const SIZE_RADIAL_LOCK_ICON := 12
 const SIZE_TAP_CARD_H := 32
@@ -317,6 +328,13 @@ const MOTION_FLOAT_TEXT_MS := 800
 const MOTION_RECENTER_MS := 600
 const MOTION_DOUBLE_TAP_RECENTER_MS := 400
 const MOTION_RADIAL_FADE_MS := 200
+const MOTION_RADIAL_SCRIM_MS := 120
+const MOTION_RADIAL_PETAL_IN_MS := 180
+const MOTION_RADIAL_STAGGER_MS := 40
+const MOTION_RADIAL_RETRACT_MS := 120
+const MOTION_RADIAL_TAP_MS := 150
+const MOTION_RADIAL_SHAKE_MS := 200
+const MOTION_RADIAL_REASON_MS := 1500
 const MOTION_QUICK_BAR_REFILL_MS := 300
 const MOTION_NEW_UNLOCK_FLASH_MS := 600
 const MOTION_DRAWER_MS := 250
@@ -385,5 +403,10 @@ const PANEL_BADGE := &"Badge"
 const PENDING := {
 	"wp1b": "container mains (Sheet / drawers, SegmentTab, InventoryCell, GearSlot, Kitchen/*, counter, NPC) await WP1b (SGODOT-201)",
 	"segmentTab": "selected style must not use command green (LOCK-13), WP1b",
-	"toast": "sizes read Toast R1 (1178:82265); its tone look (light fills, tone icon, optional action) is not generated yet: ToastPanel and ToastLayer still draw the old dark panel",
+	"toast": "sizes read Toast R1 (1178:82265); ToastLayer draws its tone look (light fills, tone icon, optional action; SGODOT-233); the ToastPanel variation still holds the old dark panel for pre-P0 screens",
+	"entryCard": "EntryCard 1468:94344 (SGODOT-231): radius 16 and padding 8 / 14 / 9 / 14, gap 2, Pointer=Right inset 21 are constants in UiEntryCard until the next token export adds them",
+	"blueprintCard": "BlueprintCard 1434:93844 and the B2-06 Workbench drawer (SGODOT-231): card radius 16, padding 12 / 14, gap 10, icon tile 44 with a 32 icon, material gap 8, the recipe name 16 ExtraBold and the drawer title 22 ExtraBold are constants in UiBlueprintCard / P0WorkbenchDrawer until the next token export adds them",
+	"family": "color/family/* (1726:32854–32857), color/newInk (1398:92869) and color/goldDeep (1755:33005, the Mastered star, C28) were added by hand under the names the exporter gives (SGODOT-226, 2026-10-08); the next full export replaces this note",
+	"guidePulse": "GuidePulse 1407:113987 (SGODOT-232 U6, A-03): ring stroke 2, growth to +10 and frame inset 4 are constants in UiGuidePulse until the next token export adds them; color/primary and MOTION_NEW_UNLOCK_FLASH_MS (600 ms, ease-out) are tokens",
+	"systemCard": "SystemCard 1237:87229, Wordmark (placeholder) 1187:82582, Spinner 1237:87185 and the SYS-LOADING screens (SGODOT-233): card padding 28 / 21 / 20 / 21, gap 10, icon disc 64 with a 32 icon, 6 above the button, the 0 10 28 card shadow; the wordmark's sprout 30, gap 6 and name 32 ExtraBold; the spinner's 28 ring with a 3 stroke; the scene loading's destination 18 ExtraBold are constants in UiSystemCard / UiWordmark / UiSpinner / P0SysScreen until the next token export adds them",
 }

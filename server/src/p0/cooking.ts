@@ -1,8 +1,13 @@
 /** Cooking and eating (plan §7.2–7.6, §7.17): pots cost no energy; quality comes from heat taps judged on the server. */
 import { dishId, dishParts, fishById, ingredient, itemKind, recipeById, type CookTier, type P0Content, type Recipe } from './content.js';
-import { cabinetCap, dishesFit, eatFrom, haveDish, haveIngredient, ingredientStock, routeDish, takeIngredient } from './kitchen_storage.js';
-import { gainEnergy, gainXp, grantOnce, type P0Event } from './progress.js';
+import { add, room } from './bag.js';
+import { fireSpeed, giveClue, goldWidth, hasConvenience, noteMishap, triedBefore, trialRefundsLeft } from './cookbook.js';
+import { isSeasoning } from './gathering.js';
+import { cabinetCap, dishesFit, eatFrom, haveDish, haveIngredient, ingredientStock, rackOn, routeDish, takeIngredient } from './kitchen_storage.js';
+import { grantItems } from './parcels.js';
+import { firstXp, gainEnergy, gainXp, grantOnce, type P0Event } from './progress.js';
 import { draw, foodCap, scaledXp, skillLevel, xpPercent } from './rules.js';
+import { putInStorage } from './storage.js';
 import type { Heat, P0State, Pot } from './state.js';
 import type { Refusal } from './fishing.js';
 
@@ -16,7 +21,7 @@ export function cookSlots(c: P0Content, s: P0State): number {
 }
 
 /** One token of a recipe: a specific id or a family × rarity tag such as W1 ("Any Common fish"). */
-function tokenInfo(c: P0Content, token: string): { family: string; rarity: number } | null {
+export function tokenInfo(c: P0Content, token: string): { family: string; rarity: number } | null {
   const tag = TAG.exec(token);
   if (tag) return { family: tag[1], rarity: Number(tag[2]) };
   return ingredient(c, token);
@@ -33,7 +38,7 @@ export function recipeRarity(c: P0Content, recipe: Recipe): number {
   return deriveRarity(c, recipe.in.map(t => tokenInfo(c, t)!));
 }
 
-function tokenMatches(c: P0Content, token: string, id: string): boolean {
+export function tokenMatches(c: P0Content, token: string, id: string): boolean {
   const tag = TAG.exec(token);
   if (!tag) return token === id;
   const ing = ingredient(c, id);
@@ -62,31 +67,55 @@ export function matchRecipe(c: P0Content, items: string[]): Recipe | null {
   return c.cooking.recipes.filter(r => fits(c, r, items)).sort((a, b) => wild(a) - wild(b))[0] ?? null;
 }
 
-/** Concrete items for a known page: tag slots take the cheapest matching item the stove can reach. */
+/**
+ * Concrete items for a known page: tag slots take the cheapest matching items the stove can reach, preferring a set
+ * that would make this same page if laid out freely (q(67): Grilled Fish takes a carp before a crucian, which alone
+ * is Grilled Crucian's). Without such a set, the cheapest set that fits still cooks this page (startPot cooks the
+ * chosen page); null when nothing fits.
+ */
 export function ingredientsFor(c: P0Content, s: P0State, recipe: Recipe): string[] | null {
   const left = ingredientStock(c, s);
-  const out: string[] = [];
   const priceOf = (id: string) => fishById(c, id)?.price ?? c.crops.find(cr => cr.id === id)?.price ?? 0;
   // Specific tokens first so a tag never eats the item a named slot needs.
   const order = [...recipe.in].sort((a, b) => Number(TAG.test(a)) - Number(TAG.test(b)));
-  for (const token of order) {
-    const options = [...left.entries()].filter(([id, n]) => n > 0 && tokenMatches(c, token, id)).sort((a, b) => priceOf(a[0]) - priceOf(b[0]));
-    if (!options.length) return null;
-    out.push(options[0][0]);
-    left.set(options[0][0], options[0][1] - 1);
-  }
-  return out;
+  const out: string[] = [];
+  let fallback: string[] | null = null;
+  let tries = 0;
+  const pick = (i: number): string[] | null => {
+    if (i === order.length) {
+      if (!fallback) fallback = [...out];
+      return matchRecipe(c, out)?.id === recipe.id ? [...out] : null;
+    }
+    const options = [...left.entries()].filter(([id, n]) => n > 0 && tokenMatches(c, order[i], id)).sort((a, b) => priceOf(a[0]) - priceOf(b[0]));
+    for (const [id, n] of options) {
+      if (++tries > 200) break;   // pages have at most three slots; this only bounds a pathological stock
+      left.set(id, n - 1); out.push(id);
+      const found = pick(i + 1);
+      out.pop(); left.set(id, n);
+      if (found) return found;
+    }
+    return null;
+  };
+  return pick(0) ?? fallback;
 }
 
 export function startPot(c: P0Content, s: P0State, cmd: { items?: unknown; recipe?: unknown }, now: number, events: P0Event[]): Refusal | null {
-  if (s.stove) return { code: 'stove_busy', detail: { ready_in: Math.max(0, s.stove.started_at + s.stove.ms - now) } };
+  // Queue ×2 (Cooking Lv5): with a pot on and none waiting, the new pot waits behind it; plates left on the stove block both.
+  const queueing = !!s.stove && !s.stove.left && !s.queue && hasConvenience(c, s, 'queue_two');
+  if (s.stove && !queueing) {
+    return { code: 'stove_busy', detail: { ready_in: Math.max(0, s.stove.started_at + s.stove.ms - now), queued: !!s.queue, left: !!s.stove.left } };
+  }
   let items: string[];
+  // A page the player chose (Cookbook Cook, Cook Again) cooks that page; only free slots go through matchRecipe (q(67)).
+  let chosen: Recipe | null = null;
   if (cmd.recipe !== undefined) {
     const recipe = recipeById(c, String(cmd.recipe));
     if (!recipe || !s.cookbook.includes(recipe.id)) return { code: 'unknown_recipe' };
     const picked = ingredientsFor(c, s, recipe);
-    if (!picked) return { code: 'missing_ingredients', detail: { recipe: recipe.id } };
+    // Never falls back to another page: what was picked must fit the chosen one.
+    if (!picked || !fits(c, recipe, picked)) return { code: 'missing_ingredients', detail: { recipe: recipe.id } };
     items = picked;
+    chosen = recipe;
   } else {
     if (!Array.isArray(cmd.items)) return { code: 'bad_items' };
     items = cmd.items.map(String);
@@ -109,19 +138,24 @@ export function startPot(c: P0Content, s: P0State, cmd: { items?: unknown; recip
     const need = items.filter(x => x === id).length;
     takeIngredient(c, s, id, need, events);
   }
-  const recipe = matchRecipe(c, items);
+  const recipe = chosen ?? matchRecipe(c, items);
   const rarity = deriveRarity(c, parts);
   const tier: CookTier = c.cooking.tiers[String(rarity)];
   const teach = s.fires === 0;
-  const width = teach ? c.cooking.first_fire.gold : tier.gold;
+  // The first fire is the wide teaching ring; later pots get Steady Hand I / Mastered widths and Quick Fire timing.
+  const width = teach ? c.cooking.first_fire.gold : goldWidth(c, s, recipe?.id ?? null, tier.gold);
   const spin = teach ? c.cooking.first_fire.spin_ms : tier.spin_ms;
-  const heats: Heat[] = tier.heats.map(at => ({ at, spin, width, gold: round3(0.1 + draw(s) * (0.85 - width)) }));
+  const speed = fireSpeed(c, s), ms = Math.round(tier.ms * speed);
+  const heats: Heat[] = tier.heats.map(at => ({ at: Math.round(at * speed), spin, width, gold: round3(0.1 + draw(s) * (0.85 - width)) }));
   s.fires += 1;
-  s.stove = {
-    dish: recipe?.id ?? c.cooking.mystery.id, rarity, started_at: now, ms: tier.ms, heats,
-    xp_pct: xpPercent(c, skillLevel(c, s, 'cooking'), tier.level), mystery: !recipe,
+  const pot: Pot = {
+    dish: recipe?.id ?? c.cooking.mystery.id, rarity, started_at: now, ms, heats,
+    xp_pct: xpPercent(c, skillLevel(c, s, 'cooking'), tier.level), mystery: !recipe, items, id: s.fires,
   };
-  events.push({ kind: 'pot', dish: recipe && s.cookbook.includes(recipe.id) ? recipe.id : null, rarity, ms: tier.ms });
+  if (queueing) s.queue = pot; else s.stove = pot;
+  // tried is on every pot: true only for a combination already in Kitchen Mishaps, which the player has seen fail.
+  events.push({ kind: 'pot', id: pot.id, dish: recipe && s.cookbook.includes(recipe.id) ? recipe.id : null, rarity, ms,
+    tried: triedBefore(s, items), ...(queueing ? { queued: true } : {}) });
   return null;
 }
 
@@ -142,28 +176,110 @@ export function heatHits(c: P0Content, heats: Heat[], taps: number[]): number {
  * With eat: true (COOK-4 Eat) the main portion is eaten from the pot instead, so a full kitchen never blocks
  * eating (§7.2.6). Portions with no place stay on the stove as `left` (Bag full · dish left on the stove); the
  * stove can't start a pot until a later collect takes them (Li Bai, 226 comment 250e4ef1). Never to the Inbox. */
-export function collectPot(c: P0Content, s: P0State, cmd: { taps?: unknown; eat?: unknown }, now: number, events: P0Event[], max: number): Refusal | null {
+export function collectPot(c: P0Content, s: P0State, cmd: { taps?: unknown; eat?: unknown; pot?: unknown }, now: number, events: P0Event[], max: number): Refusal | null {
   const pot = s.stove;
   if (!pot) return { code: 'stove_empty' };
+  if (!aimsAt(cmd, pot)) return { code: 'stale_pot', detail: { pot: pot.id ?? null } };
   const eat = cmd.eat === true;
-  if (eat && s.energy.value >= max) return { code: 'energy_full' };
-  if (pot.left) return collectLeft(c, s, pot, eat, now, events);
+  if (eat && s.energy.value >= max && !(pot.mystery && !pot.left && noDish(c, s, pot, now))) return { code: 'energy_full' };
+  if (pot.left) {
+    const refusal = collectLeft(c, s, pot, eat, now, events);
+    if (!refusal) startQueued(c, s, now, events);
+    return refusal;
+  }
   const left = pot.started_at + pot.ms - now;
   if (left > 0) return { code: 'not_ready', detail: { ready_in: left } };
-  const taps = Array.isArray(cmd.taps) ? cmd.taps.slice(0, 20).map(Number).filter(Number.isFinite) : [];
+  // The waiting pot fires when this one was done, as settleStove would have done it, unless it had no place then.
+  const onTime = !pot.no_room && potFits(c, s, pot, now);
+  finishPot(c, s, pot, [...(pot.taps ?? []), ...readTaps(cmd.taps)], eat, now, events);
+  startQueued(c, s, onTime ? pot.started_at + pot.ms : now, events);
+  return null;
+}
+
+/** heat / collect name their pot (`pot`: the id from the pot event or view.cooking.stove.id); without one, the pot on the stove. */
+export function aimsAt(cmd: { pot?: unknown }, pot: Pot): boolean {
+  return cmd.pot === undefined || cmd.pot === null || cmd.pot === (pot.id ?? null);
+}
+
+const autoQuality = (c: P0Content, pot: Pot): number => Math.min(pot.mystery ? 0 : heatHits(c, pot.heats, pot.taps ?? []), 2);
+
+/**
+ * A failed pot whose ingredients all come back (Newcomer Blessing, the first trial_refunds a day) makes no Mystery
+ * Dish (李白 2026-10-08, PR #22 review): otherwise those pots are free Energy. COOK-4 says
+ * `No dish this time · ingredients back (9 left today)`; from the 11th, and after the Blessing, the Mystery Dish comes out.
+ */
+function noDish(c: P0Content, s: P0State, pot: Pot, now: number): boolean {
+  return pot.mystery && (trialRefundsLeft(c, s, now) ?? 0) > 0;
+}
+
+/** Whether the pot, kept automatically, finds a place (a pot that makes no dish always does). */
+function potFits(c: P0Content, s: P0State, pot: Pot, now: number): boolean {
+  return noDish(c, s, pot, now) || dishesFit(c, s, [[dishId(pot.dish, autoQuality(c, pot)), 1]]);
+}
+
+const readTaps = (taps: unknown): number[] => (Array.isArray(taps) ? taps.slice(0, 20).map(Number).filter(Number.isFinite) : []);
+
+/**
+ * Heat taps sent as they happen (SGODOT-232 S5): the first tap per ring is kept on the pot, so a pot that is kept
+ * automatically (Queue ×2) is judged on what the player really did. collect may still send taps itself.
+ */
+export function recordHeat(s: P0State, cmd: { taps?: unknown; pot?: unknown }): Refusal | null {
+  const pot = s.stove;
+  if (!pot || pot.left) return { code: 'stove_empty' };
+  if (!aimsAt(cmd, pot)) return { code: 'stale_pot', detail: { pot: pot.id ?? null } };
+  const taps = readTaps(cmd.taps).filter(t => t >= 0 && t <= pot.ms);
+  pot.taps = [...(pot.taps ?? []), ...taps].slice(0, 20);
+  return null;
+}
+
+/**
+ * Queue ×2 (§4.6.3 Lv5; 李白 2026-10-08): once the pot on the stove is done, it goes the Keep way (Warming Cabinet,
+ * then bag) on its own, judged on the heat taps it has, and the waiting pot fires at that moment (never before it was
+ * queued). With no room for it, it stays on the stove (no_room) and the waiting pot fires when a later command finds
+ * room or the player takes it. The view runs this too, so it shows what the next command will find. The reducer runs
+ * it before every command (except heat / collect aimed at the pot on the stove, which bring its taps) and again after.
+ */
+export function settleStove(c: P0Content, s: P0State, now: number, events: P0Event[]): void {
+  const pot = s.stove, next = s.queue;
+  if (!pot || !next || pot.left) return;
+  const readyAt = pot.started_at + pot.ms;
+  if (now < readyAt) return;
+  if (!potFits(c, s, pot, now)) { pot.no_room = true; return; }
+  const late = !!pot.no_room;
+  finishPot(c, s, pot, pot.taps ?? [], false, now, events, true);
+  startQueued(c, s, late ? now : readyAt, events);
+}
+
+/** The waiting pot fires once the stove is clear (no pot, no plates left on it), never before it was queued. */
+function startQueued(c: P0Content, s: P0State, at: number, events: P0Event[]): void {
+  if (s.stove || !s.queue) return;
+  const from = Math.max(at, s.queue.started_at);
+  s.stove = { ...s.queue, started_at: from };
+  s.queue = null;
+  events.push({ kind: 'queue', id: s.stove.id, dish: s.cookbook.includes(s.stove.dish) && !s.stove.mystery ? s.stove.dish : null, started_at: from, ms: s.stove.ms });
+}
+
+/** Judge a done pot and pay it out: portions the Keep way (or eaten), Cookbook, first-time rewards and XP.
+ * auto: kept on its own (Queue ×2), so the client shows the Keep toast instead of the COOK-4 card. */
+function finishPot(c: P0Content, s: P0State, pot: Pot, taps: number[], eat: boolean, now: number, events: P0Event[], auto = false): void {
   const hits = pot.mystery ? 0 : heatHits(c, pot.heats, taps);
   const quality = Math.min(hits, 2);
   const main = dishId(pot.dish, quality);
   const extra = quality === 2 ? 1 : 0; // Perfect: a second, Plain portion (§7.2.5)
-  const portions = extra ? [main, pot.dish] : [main];
+  const none = noDish(c, s, pot, now);
+  const portions = none ? [] : extra ? [main, pot.dish] : [main];
   keepOrLeave(c, s, pot, eat ? portions.slice(1) : portions, events);
   const firstKey = `cook:${pot.dish}`;
   const first = !s.firsts.includes(firstKey);
   if (first) s.firsts.push(firstKey);
-  events.push({ kind: 'dish', dish: pot.dish, quality, qty: 1 + extra, first, mystery: pot.mystery, hits });
-  if (eat) eatMeal(c, s, main, now, events);
-  if (pot.mystery) return null;
+  events.push({ kind: 'dish', pot: pot.id, dish: pot.dish, quality, qty: portions.length, first, mystery: pot.mystery, hits,
+    ...(none ? { none: true as const, trial_left: Math.max(0, (trialRefundsLeft(c, s, now) ?? 0) - 1) } : {}), ...(auto ? { auto: true as const } : {}) });
+  if (eat && !none) eatMeal(c, s, main, now, events);
+  if (pot.mystery) { failedPot(c, s, pot.items ?? [], pot.started_at, now, events); return; }
   if (!s.cookbook.includes(pot.dish)) s.cookbook.push(pot.dish);
+  s.book.cooked[pot.dish] = (s.book.cooked[pot.dish] ?? 0) + 1;
+  s.book.best[pot.dish] = Math.max(s.book.best[pot.dish] ?? 0, quality);
+  if (first) s.book.first_at[pot.dish] = now;
   if (first) {
     grantOnce(c, s, now, `first_dish_${pot.rarity}`, c.rewards.first_dish[pot.rarity - 1] ?? 0, events);
     const cooked = s.firsts.filter(f => f.startsWith('cook:') && f !== `cook:${c.cooking.mystery.id}`).length;
@@ -173,15 +289,41 @@ export function collectPot(c: P0Content, s: P0State, cmd: { taps?: unknown; eat?
   const before = s.day.cooked[pot.dish] ?? 0;
   s.day.cooked[pot.dish] = before + 1;
   if (first) {
-    events.push({ kind: 'first', what: firstKey, xp: tier.first_xp });
-    gainXp(c, s, now, 'cooking', tier.first_xp, 100, events);
+    firstXp(c, s, now, 'cooking', firstKey, tier.first_xp, events);
   }
   // §7.6.2: level difference, then same-page decay (2nd half rounded up, 3rd+ none), then quality, rounded down.
   // The first pot of a page earns this as well as the first-cook bonus (§14.2.2: Good Grilled Crucian 10 + 4 × 1.25).
   const scaled = scaledXp(s, tier.xp, pot.xp_pct);
   const decayed = before === 0 ? scaled : before === 1 ? Math.ceil(scaled / 2) : 0;
   gainXp(c, s, now, 'cooking', Math.floor(decayed * c.cooking.quality_xp[quality]), pot.xp_pct, events);
-  return null;
+}
+
+/**
+ * A Mystery Dish came out (§7.5.2): Kitchen Mishaps keeps each combination once; a new one turns over a clue. In the
+ * Newcomer Blessing the first trial_refunds failures a day give every ingredient back; otherwise only Rare and
+ * Legendary ones come back. No XP either way.
+ */
+function failedPot(c: P0Content, s: P0State, items: string[], potAt: number, now: number, events: P0Event[]): void {
+  const trial = (trialRefundsLeft(c, s, now) ?? 0) > 0;
+  s.day.mishaps += 1;
+  const fresh = noteMishap(s, items, now);
+  const clue = fresh ? giveClue(c, s, items) : null;
+  const back: string[] = [];
+  items.forEach((id, i) => {
+    if (!trial && (ingredient(c, id)?.rarity ?? 1) < 3) return;
+    giveBack(c, s, id, `refund:${potAt}:${i}`, now, events);
+    back.push(id);
+  });
+  events.push({ kind: 'mishap', items: [...items].sort(), tried: !fresh, refund: back, trial_left: trialRefundsLeft(c, s, now),
+    clue: clue ? { page: clue.page, slots: clue.slots } : null });
+}
+
+/** A refunded ingredient goes back where the stove took it: seasonings to storage with the rack, the rest to the bag;
+ * with no room it waits in the Inbox rather than being lost. */
+function giveBack(c: P0Content, s: P0State, id: string, key: string, now: number, events: P0Event[]): void {
+  if (rackOn(c, s) && isSeasoning(c, id)) { putInStorage(s, id, 1); return; }
+  if (room(c, s, id) > 0) { add(c, s, id, 1); events.push({ kind: 'item', id, delta: 1 }); return; }
+  grantItems(c, s, now, key, 'Kitchen refund', [[id, 1]], events);
 }
 
 /** Portions already judged and waiting on the stove: Eat takes the first, the rest go the Keep way again. */
@@ -208,7 +350,8 @@ function keepOrLeave(c: P0Content, s: P0State, pot: Pot, ids: string[], events: 
 /** Nominal energy of one portion today: rarity + quality bonus, same page halves then zeroes (§7.17.1). */
 export function mealValue(c: P0Content, s: P0State, id: string): number {
   const { base, quality } = dishParts(id);
-  if (base === c.cooking.mystery.id) return c.cooking.mystery.energy;
+  // Mystery Dish: never decays; Cooking Lv3 Hearty Mishap raises it (§7.5.2).
+  if (base === c.cooking.mystery.id) return hasConvenience(c, s, 'hearty_mishap') ? c.cooking.mystery.hearty : c.cooking.mystery.energy;
   const recipe = recipeById(c, base);
   if (!recipe) return 0;
   const tier = c.cooking.tiers[String(recipeRarity(c, recipe))];

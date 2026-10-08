@@ -1,7 +1,7 @@
 /** What the client receives: the settled state plus everything it would otherwise have to re-derive. */
 import { cropBySeed, dishId, fishById, ingredient, itemKind, itemName, QUALITIES, rodById, SHOPS, SKILLS, type BoardId, type P0Content, type QuotaId, type ShopId } from './content.js';
 import { count, freeSlots } from './bag.js';
-import { cookSlots, ingredientsFor, mealValue, recipeRarity } from './cooking.js';
+import { cookSlots, mealValue, recipeRarity, settleStove } from './cooking.js';
 import { sellPrice, stallOffer } from './reducer.js';
 import { blessed, dayKey, foodCap, maxEnergy, nextTickIn, regenMs, settleEnergy, skillLevel, untilRollover } from './rules.js';
 import { emptyDay, type P0State } from './state.js';
@@ -18,6 +18,7 @@ import { gatherView } from './gathering.js';
 import { workbenchView } from './workbench.js';
 import { restReadyIn } from './presence.js';
 import { inboxView, settleParcels } from './parcels.js';
+import { cookbookView } from './cookbook.js';
 
 /** opts.online: players in the P0 outpost rooms right now (SGODOT-227), for the Tea Host's answer; null when not known. */
 export function viewOf(c: P0Content, input: P0State, now: number, opts: { online?: number | null } = {}) {
@@ -26,6 +27,7 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
   if (s.day.key !== dayKey(c, now)) s.day = emptyDay(dayKey(c, now));
   expireGiftMeals(s);
   settleBoards(c, s, now);   // same draw as the next command makes (both start from the stored rng)
+  settleStove(c, s, now, []);   // Queue ×2: show the waiting pot already fired, as the next command will
   settleMine(c, s, now);
   settleParcels(c, s, now);
   const skills = Object.fromEntries(SKILLS.map(skill => {
@@ -100,25 +102,30 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     cooking: {
       slots: cookSlots(c, s),
       stove: s.stove ? {
+        id: s.stove.id ?? null,   // send it back as `pot` on heat / collect
         dish: s.cookbook.includes(s.stove.dish) && !s.stove.mystery ? s.stove.dish : null, rarity: s.stove.rarity,
         ms: s.stove.ms, elapsed: Math.max(0, now - s.stove.started_at), ready_in: Math.max(0, s.stove.started_at + s.stove.ms - now),
         heats: s.stove.heats,
         left: s.stove.left ?? null,   // portions waiting on the stove after a collect with no room (§7.2.6)
       } : null,
+      // Queue ×2 (Cooking Lv5): the pot waiting behind the stove's; it fires when that one is kept (starts_in from now).
+      // null when it waits on the player: plates left on the stove, or a done pot with no place to keep it.
+      queued: s.queue ? { id: s.queue.id ?? null, dish: s.cookbook.includes(s.queue.dish) && !s.queue.mystery ? s.queue.dish : null,
+        rarity: s.queue.rarity, ms: s.queue.ms,
+        starts_in: s.stove && !s.stove.left && s.stove.started_at + s.stove.ms > now ? s.stove.started_at + s.stove.ms - now : null } : null,
       first_fire: s.fires === 0,
       // Spice Rack (Homestead Lv2, q(46)): stored seasonings the stove reaches; Experiment shows them with a Rack badge.
       rack: { on: rackOn(c, s), items: [...rackStock(c, s)].map(([id, qty]) => ({ id, name: itemName(c, id), qty })) },
       // Warming Cabinet (Homestead Lv3, §7.7): null until unlocked; energy = what one portion restores today.
       cabinet: cabinetCap(c, s) > 0 ? { cap: cabinetCap(c, s), have: cabinetCount(s),
         items: s.cabinet.map(b => ({ id: b.id, name: itemName(c, b.id), qty: b.qty, energy: mealValue(c, s, b.id) })) } : null,
-      cookbook: c.cooking.recipes.map(r => {
-        const known = s.cookbook.includes(r.id);
-        const rarity = recipeRarity(c, r);
-        return { id: r.id, name: known ? r.name : null, rarity, in: known ? r.in : r.in.map(() => '?'),
-          known, cooked: s.firsts.includes(`cook:${r.id}`), slots: r.in.length,
-          can_cook: known && r.in.length <= cookSlots(c, s) && ingredientsFor(c, s, r) !== null,
-          today: s.day.cooked[r.id] ?? 0 };
-      }),
+      // §7.5 / q(39): all 48 pages in order (14 cookable P0 pages + 34 silhouettes), with state, clue slots ("?" =
+      // not shown), Lv4 lock, "You might have it" and Mastered; then Kitchen Mishaps, conveniences and trial refunds.
+      ...(() => {
+        const book = cookbookView(c, s, now);
+        return { cookbook: book.pages, pages_total: book.total, discovered: book.discovered, mishaps: book.mishaps,
+          conveniences: book.conveniences, third_slot: book.third_slot, trial_refunds: book.trial_refunds };
+      })(),
       derive: c.cooking.derive,
       tiers: Object.fromEntries(Object.entries(c.cooking.tiers).map(([k, t]) => [k, { energy: t.energy, ms: t.ms, bonus: t.bonus }])),
     },
@@ -154,9 +161,11 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
       ...Object.entries(c.goods).map(([id, g]) => [id, g.name]), ...c.fishing.rods.map(r => [r.id, r.name]),
       ...Object.entries(c.tools.names), [c.cooking.mystery.id, c.cooking.mystery.name],
       ...Object.entries(c.materials).map(([id, m]) => [id, m.name]), ...Object.entries(c.drinks.items).map(([id, d]) => [id, d.name]),
-      ...Object.entries(c.specialty).map(([id, sp]) => [id, sp.name]), ...c.bag_upgrades.map(u => [u.id, u.name])]),
+      ...Object.entries(c.specialty).map(([id, sp]) => [id, sp.name]), ...c.bag_upgrades.map(u => [u.id, u.name]),
+      ...Object.entries(c.supplies).map(([id, x]) => [id, x.name])]),
     crops: c.crops.map(crop => ({ id: crop.id, seed: crop.seed, energy: crop.energy, grow_h: crop.grow_h, level: crop.level })),
     firsts: s.firsts,
+    req_done: s.req_done,   // requests handed in (newest last, ≤ 20): the first session's Deliver row ticks on Pond Catch (q(58))
   };
 }
 

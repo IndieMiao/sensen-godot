@@ -1,0 +1,1037 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    555
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiInfoSheet"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        36
+      ],
+      "variation": "CaptionR12",
+      "text": "Compact/SelectedItem 633:41257 · BAG-1 482:10 · F-07 (SGODOT-207 168a4cc3)"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        70,
+        328,
+        485
+      ],
+      "children": [
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            70,
+            328,
+            102
+          ],
+          "children": [
+            {
+              "type": "UiInfoSheet",
+              "rect": [
+                0,
+                70,
+                328,
+                82
+              ],
+              "children": [
+                {
+                  "type": "HBoxContainer",
+                  "rect": [
+                    10,
+                    80,
+                    310,
+                    72
+                  ],
+                  "children": [
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        10,
+                        96,
+                        40,
+                        40
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            17,
+                            103,
+                            27,
+                            27
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "VBoxContainer",
+                      "rect": [
+                        58,
+                        80,
+                        262,
+                        72
+                      ],
+                      "children": [
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            58,
+                            80,
+                            262,
+                            20
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                58,
+                                80,
+                                203,
+                                20
+                              ],
+                              "variation": "C14XB",
+                              "text": "Grilled Crucian"
+                            },
+                            {
+                              "type": "Control",
+                              "rect": [
+                                267,
+                                83,
+                                14,
+                                14
+                              ],
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    267,
+                                    83,
+                                    14,
+                                    14
+                                  ]
+                                },
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    252,
+                                    68,
+                                    44,
+                                    44
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "PanelContainer",
+                              "rect": [
+                                287,
+                                81,
+                                22,
+                                18
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    291,
+                                    82,
+                                    14,
+                                    16
+                                  ],
+                                  "variation": "C11XB",
+                                  "text": "×3"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Label",
+                              "rect": [
+                                315,
+                                80,
+                                5,
+                                20
+                              ],
+                              "variation": "C14B",
+                              "text": "›"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            58,
+                            100,
+                            262,
+                            15
+                          ],
+                          "variation": "C10B",
+                          "text": "Common ★"
+                        },
+                        {
+                          "type": "VBoxContainer",
+                          "rect": [
+                            58,
+                            115,
+                            262,
+                            0
+                          ]
+                        },
+                        {
+                          "type": "MarginContainer",
+                          "rect": [
+                            58,
+                            115,
+                            262,
+                            37
+                          ],
+                          "children": [
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                58,
+                                108,
+                                262,
+                                44
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    58,
+                                    121,
+                                    76,
+                                    18
+                                  ],
+                                  "variation": "C12XB",
+                                  "text": "+20 Energy"
+                                },
+                                {
+                                  "type": "HBoxContainer",
+                                  "rect": [
+                                    142,
+                                    108,
+                                    178,
+                                    44
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "UiNavButton",
+                                      "rect": [
+                                        142,
+                                        108,
+                                        44,
+                                        44
+                                      ],
+                                      "variation": "NavCompact",
+                                      "text": "Gift ›"
+                                    },
+                                    {
+                                      "type": "UiCommandButton",
+                                      "rect": [
+                                        194,
+                                        108,
+                                        126,
+                                        44
+                                      ],
+                                      "variation": "CmdPrimaryCompact",
+                                      "text": "Eat · +20 Energy"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                158,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "bag · dish"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            192,
+            328,
+            122
+          ],
+          "children": [
+            {
+              "type": "UiInfoSheet",
+              "rect": [
+                0,
+                192,
+                328,
+                102
+              ],
+              "children": [
+                {
+                  "type": "HBoxContainer",
+                  "rect": [
+                    10,
+                    202,
+                    310,
+                    92
+                  ],
+                  "children": [
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        10,
+                        228,
+                        40,
+                        40
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            17,
+                            235,
+                            27,
+                            27
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "VBoxContainer",
+                      "rect": [
+                        58,
+                        202,
+                        262,
+                        92
+                      ],
+                      "children": [
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            58,
+                            202,
+                            262,
+                            20
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                58,
+                                202,
+                                197,
+                                20
+                              ],
+                              "variation": "C14XB",
+                              "text": "Radish"
+                            },
+                            {
+                              "type": "Control",
+                              "rect": [
+                                261,
+                                205,
+                                14,
+                                14
+                              ],
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    261,
+                                    205,
+                                    14,
+                                    14
+                                  ]
+                                },
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    246,
+                                    190,
+                                    44,
+                                    44
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "PanelContainer",
+                              "rect": [
+                                281,
+                                203,
+                                28,
+                                18
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    285,
+                                    204,
+                                    20,
+                                    16
+                                  ],
+                                  "variation": "C11XB",
+                                  "text": "×12"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Label",
+                              "rect": [
+                                315,
+                                202,
+                                5,
+                                20
+                              ],
+                              "variation": "C14B",
+                              "text": "›"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            58,
+                            222,
+                            262,
+                            15
+                          ],
+                          "variation": "C10B",
+                          "text": "Common"
+                        },
+                        {
+                          "type": "VBoxContainer",
+                          "rect": [
+                            58,
+                            237,
+                            262,
+                            18
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                58,
+                                237,
+                                262,
+                                18
+                              ],
+                              "variation": "C12B",
+                              "text": "12 · Harvested at home"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "MarginContainer",
+                          "rect": [
+                            58,
+                            255,
+                            262,
+                            39
+                          ],
+                          "children": [
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                58,
+                                250,
+                                262,
+                                44
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    58,
+                                    263,
+                                    69,
+                                    18
+                                  ],
+                                  "variation": "C12XB",
+                                  "text": "4 each"
+                                },
+                                {
+                                  "type": "HBoxContainer",
+                                  "rect": [
+                                    135,
+                                    250,
+                                    185,
+                                    44
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "UiCommandButton",
+                                      "rect": [
+                                        135,
+                                        250,
+                                        55,
+                                        44
+                                      ],
+                                      "variation": "CmdSecondaryCompact",
+                                      "text": "Sell"
+                                    },
+                                    {
+                                      "type": "UiCommandButton",
+                                      "rect": [
+                                        198,
+                                        250,
+                                        122,
+                                        44
+                                      ],
+                                      "variation": "CmdPrimaryCompact",
+                                      "text": "Sell 5 · 20 coins"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                300,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "counter sell · quota short"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            334,
+            328,
+            94
+          ],
+          "children": [
+            {
+              "type": "UiInfoSheet",
+              "rect": [
+                0,
+                334,
+                328,
+                74
+              ],
+              "children": [
+                {
+                  "type": "HBoxContainer",
+                  "rect": [
+                    10,
+                    344,
+                    310,
+                    64
+                  ],
+                  "children": [
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        10,
+                        356,
+                        40,
+                        40
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            17,
+                            363,
+                            27,
+                            27
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "VBoxContainer",
+                      "rect": [
+                        58,
+                        344,
+                        262,
+                        64
+                      ],
+                      "children": [
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            58,
+                            344,
+                            262,
+                            20
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                58,
+                                344,
+                                197,
+                                20
+                              ],
+                              "variation": "C14XB",
+                              "text": "Radish"
+                            },
+                            {
+                              "type": "Control",
+                              "rect": [
+                                261,
+                                347,
+                                14,
+                                14
+                              ],
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    261,
+                                    347,
+                                    14,
+                                    14
+                                  ]
+                                },
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    246,
+                                    332,
+                                    44,
+                                    44
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "PanelContainer",
+                              "rect": [
+                                281,
+                                345,
+                                28,
+                                18
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    285,
+                                    346,
+                                    20,
+                                    16
+                                  ],
+                                  "variation": "C11XB",
+                                  "text": "×12"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Label",
+                              "rect": [
+                                315,
+                                344,
+                                5,
+                                20
+                              ],
+                              "variation": "C14B",
+                              "text": "›"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "VBoxContainer",
+                          "rect": [
+                            58,
+                            364,
+                            262,
+                            0
+                          ]
+                        },
+                        {
+                          "type": "MarginContainer",
+                          "rect": [
+                            58,
+                            364,
+                            262,
+                            44
+                          ],
+                          "children": [
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                58,
+                                364,
+                                262,
+                                44
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    58,
+                                    377,
+                                    101,
+                                    18
+                                  ],
+                                  "variation": "C12XB",
+                                  "text": "5 each"
+                                },
+                                {
+                                  "type": "HBoxContainer",
+                                  "rect": [
+                                    167,
+                                    364,
+                                    153,
+                                    44
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "UiCommandButton",
+                                      "rect": [
+                                        167,
+                                        364,
+                                        73,
+                                        44
+                                      ],
+                                      "variation": "CmdBlockedCompact",
+                                      "text": "Locked"
+                                    },
+                                    {
+                                      "type": "UiCommandButton",
+                                      "rect": [
+                                        248,
+                                        364,
+                                        72,
+                                        44
+                                      ],
+                                      "variation": "CmdSecondaryCompact",
+                                      "text": "Unlock"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                414,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "locked stack"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            448,
+            328,
+            107
+          ],
+          "children": [
+            {
+              "type": "UiInfoSheet",
+              "rect": [
+                0,
+                448,
+                328,
+                87
+              ],
+              "children": [
+                {
+                  "type": "HBoxContainer",
+                  "rect": [
+                    10,
+                    458,
+                    310,
+                    77
+                  ],
+                  "children": [
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        10,
+                        476,
+                        40,
+                        40
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            17,
+                            483,
+                            27,
+                            27
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "VBoxContainer",
+                      "rect": [
+                        58,
+                        458,
+                        262,
+                        77
+                      ],
+                      "children": [
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            58,
+                            458,
+                            262,
+                            20
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                58,
+                                458,
+                                177,
+                                20
+                              ],
+                              "variation": "C14XB",
+                              "text": "Radish Seeds"
+                            },
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                241,
+                                461,
+                                14,
+                                14
+                              ]
+                            },
+                            {
+                              "type": "Control",
+                              "rect": [
+                                261,
+                                461,
+                                14,
+                                14
+                              ],
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    261,
+                                    461,
+                                    14,
+                                    14
+                                  ]
+                                },
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    246,
+                                    446,
+                                    44,
+                                    44
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "PanelContainer",
+                              "rect": [
+                                281,
+                                459,
+                                28,
+                                18
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    285,
+                                    460,
+                                    20,
+                                    16
+                                  ],
+                                  "variation": "C11XB",
+                                  "text": "×20"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Label",
+                              "rect": [
+                                315,
+                                458,
+                                5,
+                                20
+                              ],
+                              "variation": "C14B",
+                              "text": "›"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "VBoxContainer",
+                          "rect": [
+                            58,
+                            478,
+                            262,
+                            18
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                58,
+                                478,
+                                262,
+                                18
+                              ],
+                              "variation": "C12B",
+                              "text": "2 Energy per plot · Ready in 4h 0m"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "MarginContainer",
+                          "rect": [
+                            58,
+                            496,
+                            262,
+                            39
+                          ],
+                          "children": [
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                58,
+                                491,
+                                262,
+                                44
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    58,
+                                    504,
+                                    71,
+                                    18
+                                  ],
+                                  "variation": "C12XB",
+                                  "text": ""
+                                },
+                                {
+                                  "type": "HBoxContainer",
+                                  "rect": [
+                                    137,
+                                    491,
+                                    183,
+                                    44
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "UiCommandButton",
+                                      "rect": [
+                                        137,
+                                        491,
+                                        66,
+                                        44
+                                      ],
+                                      "variation": "CmdSecondaryCompact",
+                                      "text": "Unpin"
+                                    },
+                                    {
+                                      "type": "UiCommandButton",
+                                      "rect": [
+                                        211,
+                                        491,
+                                        109,
+                                        44
+                                      ],
+                                      "variation": "CmdBlockedCompact",
+                                      "text": "At home only"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                541,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "bag · seed away from home"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

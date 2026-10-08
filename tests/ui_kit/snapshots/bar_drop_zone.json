@@ -1,0 +1,437 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    518
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiBarDropZone"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        36
+      ],
+      "variation": "CaptionR12",
+      "text": "BarDropZone 1588:97952 · LOCK-04 / 05 v1.11 (221 b0a83924)"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        70,
+        328,
+        448
+      ],
+      "children": [
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            70,
+            328,
+            136
+          ],
+          "children": [
+            {
+              "type": "ColorRect",
+              "rect": [
+                0,
+                70,
+                328,
+                116
+              ],
+              "children": [
+                {
+                  "type": "UiBarDropZone",
+                  "rect": [
+                    24,
+                    80,
+                    64,
+                    94
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        44,
+                        100,
+                        24,
+                        24
+                      ]
+                    },
+                    {
+                      "type": "PanelContainer",
+                      "rect": [
+                        37,
+                        150,
+                        39,
+                        24
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            47,
+                            150,
+                            19,
+                            24
+                          ],
+                          "variation": "C12XB",
+                          "text": "Pin"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "UiBarDropZone",
+                  "rect": [
+                    132,
+                    80,
+                    64,
+                    94
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        152,
+                        100,
+                        24,
+                        24
+                      ]
+                    },
+                    {
+                      "type": "PanelContainer",
+                      "rect": [
+                        137,
+                        150,
+                        54,
+                        24
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            147,
+                            150,
+                            34,
+                            24
+                          ],
+                          "variation": "C12XB",
+                          "text": "Unpin"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "UiBarDropZone",
+                  "rect": [
+                    239,
+                    80,
+                    66,
+                    94
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        260,
+                        100,
+                        24,
+                        24
+                      ]
+                    },
+                    {
+                      "type": "PanelContainer",
+                      "rect": [
+                        239,
+                        150,
+                        66,
+                        24
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            249,
+                            150,
+                            46,
+                            24
+                          ],
+                          "variation": "C12XB",
+                          "text": "Remove"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                192,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "idle · Pin · Unpin · Remove"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            226,
+            328,
+            136
+          ],
+          "children": [
+            {
+              "type": "ColorRect",
+              "rect": [
+                0,
+                226,
+                328,
+                116
+              ],
+              "children": [
+                {
+                  "type": "UiBarDropZone",
+                  "rect": [
+                    22,
+                    232,
+                    101,
+                    102
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        58,
+                        254,
+                        28,
+                        28
+                      ]
+                    },
+                    {
+                      "type": "PanelContainer",
+                      "rect": [
+                        22,
+                        310,
+                        101,
+                        24
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            32,
+                            310,
+                            81,
+                            24
+                          ],
+                          "variation": "C12XB",
+                          "text": "Release to pin"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "UiBarDropZone",
+                  "rect": [
+                    135,
+                    236,
+                    66,
+                    94
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        156,
+                        256,
+                        24,
+                        24
+                      ]
+                    },
+                    {
+                      "type": "PanelContainer",
+                      "rect": [
+                        135,
+                        306,
+                        66,
+                        24
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            145,
+                            306,
+                            46,
+                            24
+                          ],
+                          "variation": "C12XB",
+                          "text": "Remove"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                348,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "hover Pin · Remove idle (x 72 / 168)"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            382,
+            328,
+            136
+          ],
+          "children": [
+            {
+              "type": "ColorRect",
+              "rect": [
+                0,
+                382,
+                328,
+                116
+              ],
+              "children": [
+                {
+                  "type": "UiBarDropZone",
+                  "rect": [
+                    40,
+                    392,
+                    64,
+                    94
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        60,
+                        412,
+                        24,
+                        24
+                      ]
+                    },
+                    {
+                      "type": "PanelContainer",
+                      "rect": [
+                        45,
+                        462,
+                        54,
+                        24
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            55,
+                            462,
+                            34,
+                            24
+                          ],
+                          "variation": "C12XB",
+                          "text": "Unpin"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "UiBarDropZone",
+                  "rect": [
+                    106,
+                    388,
+                    125,
+                    102
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        154,
+                        410,
+                        28,
+                        28
+                      ]
+                    },
+                    {
+                      "type": "PanelContainer",
+                      "rect": [
+                        106,
+                        466,
+                        125,
+                        24
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            116,
+                            466,
+                            105,
+                            24
+                          ],
+                          "variation": "C12XB",
+                          "text": "Release to remove"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                504,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "Unpin idle · hover Remove"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

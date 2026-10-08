@@ -4,8 +4,9 @@ extends RefCounted
 ## one surface in one mode and turns pointer input into outcome dictionaries {kind = …}:
 ##   SCENE  (Z2 scene band, LOCK-01 / 07): joystick_show / joystick_move {vector} / joystick_end,
 ##          tap {pos, double}, pinch_start / pinch {factor, center} / pinch_end
-##   SLOT   (quick bar slot, LOCK-04 / 05): tap, lift, pin_toggle, drag_start / drag_move {pos} / drop {pos},
-##          swipe_up, cancel
+##   SLOT   (quick bar slot, LOCK-04 / 05 v1.11): tap, lift, drag_start / drag_move {pos} / drop {pos} (where it
+##          lands: drop_on_bar), swipe_up, cancel (released while only lifted, a second finger, or moving past the
+##          slop before the lift). A lifted slot drags at once.
 ##   CELL   (bag grid cell inside a TouchScrollContainer, LOCK-12): tap, lift, long_press, drag_start /
 ##          drag_move / drop, cancel (a vertical drag before the lift belongs to the scroll container)
 ##   HANDLE (drawer grab handle): close, cancel
@@ -19,7 +20,11 @@ const TAP_MAX_MS := 350         ## scene tap must release within this
 const DOUBLE_TAP_MS := 320      ## second scene tap within this recenters (§10.1)
 const LONG_PRESS_MS := 450      ## slot / cell lift
 const SWIPE_UP := 24.0          ## px upward on the quick bar opens the bag (§10.3.4)
-const FLING_REMOVE := 40.0      ## px above the bar: dropping a lifted slot there removes it from the bar
+const DROP_SLOT_GROW := 6.0     ## the finger point within another slot grown by this drops on it (LOCK-04 v1.11)
+const DROP_ZONE_ABOVE := 96.0   ## BarDropZone centres above the quick bar's top edge (scene y 612 of 800)
+const PIN_ZONE_X := 60.0        ## Pin / Unpin centre from the bar's left edge (x 72 on 360)
+const REMOVE_ZONE_X := 156.0    ## Remove centre from the bar's left edge (x 168 on 360)
+const DROP_ZONE_HIT := 44.0     ## finger within this of a zone centre hovers it and drops on it
 const EDGE_AUTOSCROLL := 24.0   ## px band at grid edges that scrolls while dragging
 const DRAWER_CLOSE := 48.0      ## px downward drag on a drawer handle closes it
 const DRAWER_FLING := 800.0     ## px/s downward release speed that also closes it
@@ -50,9 +55,13 @@ func _init(m: Mode = Mode.SCENE) -> void:
 
 func is_active() -> bool: return _state != _S.IDLE and _state != _S.DONE
 func is_dragging() -> bool: return _state == _S.DRAGGING
+## A slot or cell floats after its long press and has not been dragged yet.
+func is_lifted() -> bool: return _state == _S.LIFTED
 func is_joystick() -> bool: return _state == _S.JOYSTICK
 ## A single finger is down in SCENE mode and steering (not pinching).
 func is_steering() -> bool: return _state == _S.PRESSED or _state == _S.JOYSTICK
+## Two fingers are down in SCENE mode (between pinch_start and pinch_end).
+func is_pinching() -> bool: return _state == _S.PINCH
 ## Current press origin and finger position (for drawing a joystick or a lifted slot).
 func origin() -> Vector2: return _start
 func position() -> Vector2: return _pos
@@ -90,7 +99,12 @@ func press(index: int, pos: Vector2, now_ms: int) -> Array:
 			_spread = _current_spread()
 			out.append({kind = &"pinch_start", center = _center()})
 		return out
-	if _id >= 0: return []   # a second finger on a slot / cell / handle is ignored
+	if _id >= 0:
+		# A second finger cancels a slot / cell press, lift or drag (LOCK-04 v1.10); on a handle it is ignored.
+		if mode in [Mode.SLOT, Mode.CELL] and _state in [_S.PRESSED, _S.MOVED, _S.LIFTED, _S.DRAGGING]:
+			_state = _S.DONE
+			return [{kind = &"cancel"}]
+		return []
 	_id = index
 	_start = pos
 	_pos = pos
@@ -185,7 +199,8 @@ func _cell_move(travel: Vector2) -> Array:
 	return _lifted_move(travel)
 
 func _lifted_move(travel: Vector2) -> Array:
-	if _state == _S.LIFTED and travel.length() > TAP_SLOP:
+	# A lifted quick-bar slot drags at once (v1.11); a bag cell still waits for the tap slop.
+	if _state == _S.LIFTED and travel.length() > (0.0 if mode == Mode.SLOT else TAP_SLOP):
 		_state = _S.DRAGGING
 		return [{kind = &"drag_start", pos = _pos}, {kind = &"drag_move", pos = _pos}]
 	if _state == _S.DRAGGING: return [{kind = &"drag_move", pos = _pos}]
@@ -196,9 +211,8 @@ func _press_release(state: int, held: int, still: bool, pos: Vector2) -> Array:
 		_S.PRESSED:
 			if still and held < LONG_PRESS_MS: return [{kind = &"tap", pos = pos}]
 			return [{kind = &"cancel"}]
-		_S.LIFTED:
-			if still: return [{kind = &"pin_toggle" if mode == Mode.SLOT else &"long_press", pos = pos}]
-			return [{kind = &"cancel"}]
+		_S.LIFTED:   # lifted and never dragged: nothing on the bar (v1.11, pins go through the Pin zone)
+			return [{kind = &"cancel" if mode == Mode.SLOT else &"long_press", pos = pos}]
 		_S.DRAGGING:
 			return [{kind = &"drop", pos = pos}]
 		_S.MOVED:
@@ -227,13 +241,22 @@ static func stick_vector(offset: Vector2, radius: float) -> Vector2:
 	if v.length() > 1.0: v = v.normalized()
 	return Vector2.ZERO if v.length() < STICK_DEADZONE else v
 
-## Where a dragged quick-bar slot lands (§10.3.4): {kind = &"swap", index} over a slot, &"remove" when
-## released more than FLING_REMOVE above the bar, otherwise &"cancel".
-static func drop_on_bar(pos: Vector2, bar: Rect2, slots: Array) -> Dictionary:
+## Where a dragged quick-bar slot lands, by the release point only (LOCK-04 / 05 v1.11, 221 b0a83924): within
+## DROP_ZONE_HIT of the Pin / Unpin zone → &"pin_toggle"; of the Remove zone → &"remove"; another slot grown
+## DROP_SLOT_GROW → {kind = &"swap", index}; its own slot or anywhere else → &"cancel" (it flies back).
+static func drop_on_bar(pos: Vector2, from: int, slots: Array, pin_zone: Vector2, remove_zone: Vector2) -> Dictionary:
+	if pos.distance_to(pin_zone) <= DROP_ZONE_HIT: return {kind = &"pin_toggle"}
+	if pos.distance_to(remove_zone) <= DROP_ZONE_HIT: return {kind = &"remove"}
 	for i in slots.size():
-		if (slots[i] as Rect2).has_point(pos): return {kind = &"swap", index = i}
-	if pos.y < bar.position.y - FLING_REMOVE: return {kind = &"remove"}
+		if i != from and (slots[i] as Rect2).grow(DROP_SLOT_GROW).has_point(pos): return {kind = &"swap", index = i}
 	return {kind = &"cancel"}
+
+## The two drop zones' centres for a quick bar (its global rect): [Pin / Unpin, Remove], DROP_ZONE_ABOVE over its
+## top edge at x 72 and 168 on a 360-wide screen.
+## In the bag drawer (`below`) they open DROP_ZONE_ABOVE under the bar's bottom edge instead (q(61)).
+static func drop_zone_centers(bar: Rect2, below := false) -> Array[Vector2]:
+	var y := bar.end.y + DROP_ZONE_ABOVE if below else bar.position.y - DROP_ZONE_ABOVE
+	return [Vector2(bar.position.x + PIN_ZONE_X, y), Vector2(bar.position.x + REMOVE_ZONE_X, y)]
 
 ## Scroll speed factor while dragging near a grid edge: -1..0 near the top, 0..1 near the bottom.
 static func autoscroll(pos_y: float, area: Rect2) -> float:

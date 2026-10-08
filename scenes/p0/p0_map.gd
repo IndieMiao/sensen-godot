@@ -16,6 +16,8 @@ const NEAREST_POND := "pond_shanghai_05"   # Reed Pond, the closest to home
 const PondCard := preload("res://modules/p0/p0_pond_card.gd")
 ## Online counts on the outpost pins (GET /p0/presence), refreshed while the map is on top.
 const PRESENCE_S := 15.0
+## Show on map lands this close (the outpost / pond pins and the homestead read at this zoom).
+const SHOW_ZOOM := 15.5
 
 var rt: P0Runtime
 var _presence: HTTPRequest
@@ -293,25 +295,47 @@ func resume() -> void:
 	rt.after_leave = ""
 	match next:
 		"farm": _open_my_farm.call_deferred()      # FISH-4 Go home · Free
-		"tackle": _show_tackle_shop.call_deferred()  # FISH-5 Tackle Shop: the camera goes to Old Kai's pin
+		"tackle": show_place.call_deferred("outpost:tackle")   # FISH-5 Tackle Shop: the camera goes to Old Kai's pin
+		_:
+			# Show on map (SGODOT-225): P0Runtime._leave_then("show:<target>") from Today, NeedSource, the Energy card.
+			if next.begins_with("show:"): show_place.call_deferred(next.trim_prefix("show:"))
 
-func _show_tackle_shop() -> void:
+## Show on map (SGODOT-225; LOCK-08, guidance only, nothing is entered): the camera flies to the target's pin and
+## selects it — "outpost:<role>" an outpost, "pond:<id>" a catalog pond, "home" the homestead (fly only: its pin
+## would offer Enter). "map" (Browse the map) and unknown targets leave the camera where the player left it.
+func show_place(target: String) -> void:
 	if city_map == null: return
+	var entry := place_for(target)
+	if entry.is_empty(): return
 	_reset_gesture()
 	_city_bounds()   # city-wide pan bounds, else the homestead's 450 m box pulls the camera back
-	var shop := P0Outposts.place_entry(P0Outposts.by_role("tackle"), int(_online.get(str(P0Outposts.by_role("tackle").id), 0)))
-	fly_to(float(shop.lat), float(shop.lng))
-	_set_zoom(15.5)
+	fly_to(float(entry.lat), float(entry.lng))
+	_set_zoom(SHOW_ZOOM)
 	_camera_dirty = true
-	city_map.select(shop)
+	if target != "home": city_map.select(entry)
+
+## Show from a panel opened on the map (Today, the Energy card, a NeedSource): every target is a pin here; a homestead
+## target (plots, stall, stove …) is the homestead's.
+func p0_show_spot(where: String) -> void:
+	show_place(P0Ui.map_target(where))
+
+## The pin a Show on map target points at ({lat, lng} plus the city-map entry for outposts and ponds), or {}.
+func place_for(target: String) -> Dictionary:
+	if target == "home": return {"lat": home_lat, "lng": home_lng}
+	if target.begins_with("outpost:"):
+		var o := P0Outposts.by_role(target.trim_prefix("outpost:"))
+		return {} if o.is_empty() else P0Outposts.place_entry(o, int(_online.get(str(o.id), 0)))
+	if target.begins_with("pond:"): return SystemPonds.location(target.trim_prefix("pond:"))
+	return {}
 
 func p0_surface() -> String: return "map"
 
-## Map marks from the server's view.map_markers (蒙恬, SGODOT-232 U6; plan §9.5.2, q(48)): ✓ deliverable,
-## ! request, ◆ new, already in priority order; the city view shows the first five whose pins are on screen.
+## Map marks (plan §9.5.2, q(48)): ✓ deliverable, ! request, ◆ new, in priority order. One list badges the pins
+## (CityMapView.set_marks: the first five on screen) and packs them first with whole labels (#83's _marker_of, through
+## city_pin_markers), so a badge and its pin never disagree (亚瑟 on 234).
 func p0_frame(view: Dictionary, _dt: float) -> void:
 	if city_map == null: return
-	var list := marks_from(view)
+	var list := pin_marks(view)
 	var sig := JSON.stringify(list)
 	var home := home_mark(view)
 	sig += home
@@ -322,8 +346,13 @@ func p0_frame(view: Dictionary, _dt: float) -> void:
 
 const MARK_STATES := {"deliver": "deliverable", "request": "request", "new": "new"}
 
-## [{id, state}] for CityMapView.set_marks: place ids are the pins' ids (catalog pond ids, outpost ids); "home" is
-## the homestead's farm pin, which FarmMarkers draws (home_mark).
+## The pins' marks [{id, state}]: the server's view.map_markers whenever it sends them (蒙恬, SGODOT-232 U6), else
+## the ones the client knows before then (tutorial_marks).
+static func pin_marks(view: Dictionary) -> Array:
+	return marks_from(view) if view.has("map_markers") else tutorial_marks(view)
+
+## [{id, state}] from view.map_markers: place ids are the pins' ids (catalog pond ids, outpost ids); "home" is the
+## homestead's farm pin, which FarmMarkers draws (home_mark).
 static func marks_from(view: Dictionary) -> Array:
 	var out: Array = []
 	for m in view.get("map_markers", []):
@@ -331,6 +360,23 @@ static func marks_from(view: Dictionary) -> Array:
 		var state := str(MARK_STATES.get(str(m.get("kind", "")), ""))
 		var place := str(m.get("place", ""))
 		if state != "" and place != "" and place != "home": out.append({"id": place, "state": state})
+	return out
+
+## Map markers the client knows before the server's map_markers come (蒙恬 on #83, q(48)): while the tutorial Pond
+## Catch is on the stall's board and still short of its fish, the beginner pond Today points at wears the Request ! —
+## so the first session's map shows it at the city level beside the Tackle Shop, 200 m away (CityMapView packs marker
+## pins first). Read off the board like the guide (P0Guide.tutorial), not req_done: that keeps only the last 20.
+static func tutorial_marks(view: Dictionary) -> Array:
+	var t := P0Guide.tutorial(view)
+	if t.is_empty() or int(t.get("have", 0)) >= int(t.get("qty", 1)): return []   # handed in, or off to the stall
+	return [{"id": NEAREST_POND, "state": "request"}]
+
+## CityMapView asks once per update (#83): the same marks by pin id, the first (highest) mark per pin.
+func city_pin_markers() -> Dictionary:
+	var v: Dictionary = rt.session.current() if rt != null and rt.session != null else {}
+	var out := {}
+	for m in pin_marks(v):
+		if not out.has(str(m.id)): out[str(m.id)] = str(m.state)
 	return out
 
 ## The homestead's mark ("deliverable" when a Stall Board request can be handed in; 蒙恬's server only sends
@@ -366,6 +412,13 @@ func p0_dev(step: PackedStringArray) -> bool:
 			if city_map: city_map._on_info_action()
 		"zoom":
 			_set_zoom(float(step[1]))
+			_camera_dirty = true
+		"online":   # online:sh_tea_1:3 — the presence count an outpost pin says, for shots
+			_online[step[1]] = int(step[2])
+			_set_outpost_places()
+		"center":   # center:31.228:121.478 (the city overview) — where the camera looks, for shots
+			center_lat = float(step[1])
+			center_lng = float(step[2])
 			_camera_dirty = true
 		_: return false
 	return true
