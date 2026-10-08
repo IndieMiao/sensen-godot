@@ -425,19 +425,28 @@ func test_a_new_recipe_turn_over_with_no_room_falls_back_to_the_card_with_its_fi
 	rt.ui.close_modal()
 	await get_tree().process_frame
 
-func test_a_first_time_dish_kept_away_from_the_kitchen_floats_no_first_cook_line() -> void:
-	# 不知火舞 on 226: away from the kitchen a pot Queue ×2 kept on its own is silent, and the stove is not on screen to
-	# float from; the first-cook XP still counts (the server has added it), only the `First cooked` line is not shown.
+func test_a_pot_kept_away_from_the_kitchen_floats_and_toasts_nothing_but_the_command_still_does() -> void:
+	# 不知火舞 on 226: away from the kitchen a pot Queue ×2 kept on its own is silent, its floats and toasts included (the
+	# stove is not on screen to float from); the XP still counts (the server has added it) and a Cooking level-up still
+	# shows its banner. The server settles the stove before the command, so the reply carries the harvest that sent it.
 	var w: Node3D = auto_free(Node3D.new())
 	add_child(w)
 	rt.attach(w)
 	var kept := _dish(true)
 	kept.auto = true
 	rt.ui.clear_toast()
-	rt.session.state_changed.emit(rt.session.view, [kept, {"kind": "first", "what": "cook:dish_grilled_crucian", "xp": 10},
-		{"kind": "xp", "skill": "cooking", "amount": 10, "percent": 100}])
-	for i in 2: await get_tree().process_frame
+	rt.session.state_changed.emit(rt.session.view, [{"kind": "item", "id": "dish_grilled_crucian_good", "delta": 1}, kept,
+		{"kind": "energy", "delta": 10, "reason": "reward"}, {"kind": "reward", "id": "first_dish_1", "energy": 10},
+		{"kind": "first", "what": "cook:dish_grilled_crucian", "xp": 10}, {"kind": "xp", "skill": "cooking", "amount": 10, "percent": 100},
+		{"kind": "xp", "skill": "cooking", "amount": 5, "percent": 100}, {"kind": "level", "skill": "cooking", "level": 2, "energy": 0, "gifts": []},
+		{"kind": "queue", "id": 4, "dish": "dish_herb_grilled_fish", "started_at": 0, "ms": 60000},
+		{"kind": "item", "id": "crop_radish", "delta": 2}, {"kind": "xp", "skill": "farming", "amount": 4, "percent": 100}])
+	for i in 3: await get_tree().process_frame
 	var floats: Array = rt.ui.root.find_children("*", "UiFloatText", true, false).map(func(f): return (f as UiFloatText).text)
-	assert_bool(floats.any(func(t): return str(t).begins_with("First cooked"))).override_failure_message(str(floats)).is_false()
+	assert_array(floats).contains_exactly_in_any_order(["+2 crop_radish", "+4 XP"])   # the harvest's own (no names in this view)
+	for word in ["First cooked", "Cooking", "Energy"]:
+		assert_bool(floats.any(func(t): return str(t).contains(word))).override_failure_message(str(floats)).is_false()
 	assert_str(rt.ui.toast_text()).is_equal("")
+	assert_int(rt.ui.root.find_children("*", "UiMomentBanner", true, false).size()).is_equal(1)   # the Cooking Lv2 banner
+	rt.ui.close_modal()
 	rt.detach(w)

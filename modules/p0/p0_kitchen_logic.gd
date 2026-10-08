@@ -64,6 +64,42 @@ static func new_recipe_line(view: Dictionary, dish_ev: Dictionary) -> String:
 	if not bool(dish_ev.get("first", false)) or bool(dish_ev.get("mystery", false)) or bool(dish_ev.get("none", false)): return ""
 	return "New recipe! %s kept" % P0Logic.item_name(view, str(dish_ev.get("dish", "")))
 
+## The events of a reply that a pot Queue ×2 kept on its own brought (server settleStove: finishPot, then startQueued),
+## each `dish` with `auto` and around it: the Keep way before it (dish into the bag, the Warming Cabinet, plates left on
+## the stove); after it the ingredients a Mishap gives back and its `mishap`, the first-time Energy rewards, the
+## first-cook bonus, the pot's Cooking XP, Cooking level-ups with the gifts that did not fit, and the waiting pot firing.
+## Away from the kitchen none of them floats or toasts (不知火舞 on 226); the XP still counts and a level-up still shows.
+static func auto_kept_events(events: Array) -> Array:
+	var out: Array = []
+	for d in events.size():
+		var dish: Dictionary = events[d]
+		if str(dish.get("kind", "")) != "dish" or not bool(dish.get("auto", false)): continue
+		var i := d - 1
+		while i >= 0 and _kept_way(events[i]): i -= 1
+		var j := d + 1
+		if bool(dish.get("mystery", false)):
+			var m := j
+			while m < events.size() and str(events[m].get("kind", "")) in ["item", "parcel"]: m += 1
+			if m < events.size() and str(events[m].get("kind", "")) == "mishap": j = m + 1
+		var gifts := false   # a level-up's gifts that did not fit the bag follow it as parcels
+		while j < events.size():
+			var e: Dictionary = events[j]
+			var k := str(e.get("kind", ""))
+			var ours := (k == "energy" and str(e.get("reason", "")) == "reward") \
+				or (k == "reward" and (str(e.get("id", "")).begins_with("first_dish_") or str(e.get("id", "")).begins_with("cookbook_"))) \
+				or (k == "first" and str(e.get("what", "")).begins_with("cook:")) \
+				or (k in ["xp", "level"] and str(e.get("skill", "")) == "cooking") or (k == "parcel" and gifts)
+			if not ours: break
+			gifts = k == "level" or (k == "parcel" and gifts)
+			j += 1
+		if j < events.size() and str(events[j].get("kind", "")) == "queue": j += 1
+		out.append_array(events.slice(i + 1, j))
+	return out
+
+static func _kept_way(e: Dictionary) -> bool:
+	var k := str(e.get("kind", ""))
+	return k in ["cabinet", "plate"] or (k == "item" and str(e.get("id", "")).begins_with("dish_"))
+
 ## "Lv4 · 60 XP to go" for the locked 3rd slot (SGODOT-203: the 90 px label holds the short form); "Lv4" when
 ## the cooking thresholds are unknown.
 static func locked_slot_label(view: Dictionary) -> String:
