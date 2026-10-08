@@ -65,6 +65,7 @@ static func all() -> Array[Dictionary]:
 		{id = "float_text", title = "UiFloatText", figma = "FloatText 1178:82191 · six tones, Hug / Wrap (static pills)", build = _float_texts},
 		# SGODOT-224 panels
 		{id = "info_sheet", title = "UiInfoSheet", figma = "Compact/SelectedItem 633:41257 · BAG-1 482:10 · F-07 (SGODOT-207 168a4cc3)", build = _info_sheets},
+		{id = "keeper_bar", title = "UiKeeperBar", figma = "KeeperBar 1143:102525 Layout=Titled · NPC-2-2 482:118 / NPC-7-P0 1507:97237 · LOCK-16 (336 at 328)", build = _keeper_bars},
 		{id = "shop_row", title = "UiShopRow · UiStepper", figma = "Compact/ShopProduct 702:80447 · Compact/Stepper 1245:108953 · FARM-6 482:46 · C1-01", build = _shop_rows},
 	]
 	return out
@@ -761,6 +762,29 @@ static func _info_sheets() -> Control:
 	return v
 
 ## Counter buy rows as FARM-6 draws them: available (stepper + Buy), more than one, sold out, gated, a one-off rod.
+static func _keeper_bars() -> Control:
+	var v := _column(UiTokens.SPACE_SECTION)
+	var samples := [
+		[UiKeeperBar.Role.TACKLE, "finn", "Finn's Tackle", "Xuhui Tackle Shop", "Tackle Keeper · Finn",
+			"Reed rods are in. Fishing Lv3 and Fine fish stop slipping the hook.", "", "tackle · the line wraps"],
+		[UiKeeperBar.Role.MARKET, "mei", "Mei's Stall", "Xuhui Market Square", "Market Keeper · Mei",
+			"Row Hoe's 240 coins. Farming Lv4 to use.", "", "market"],
+		[UiKeeperBar.Role.TEA, "ama", "Ama's Tea", "Lotus Tea House", "Tea Host · Ama",
+			"Sit a minute. Hot tea, 30 Energy a cup.", "Counts across all tea houses · 3 cups a day", "tea · with a note"],
+		[UiKeeperBar.Role.POST, "sigrid", "Sigrid's Desk", "Huangpu Travel Post", "Post Clerk · Sigrid",
+			"Coffee's fresh. Pip's been asking for a hand.", "Shares the 3 cups a day with tea", "post · with a note"],
+	]
+	for s in samples:
+		var b := UiKeeperBar.new(s[0])
+		b.portrait = load("res://assets/p0/art/keepers/%s_head.jpg" % s[1])
+		b.title = s[2]
+		b.place = s[3]
+		b.keeper = s[4]
+		b.line = s[5]
+		b.note = s[6]
+		v.add_child(_captioned(_at_336(b), s[7]))
+	return v
+
 static func _shop_rows() -> Control:
 	var v := _column(0)
 	var buy := [{id = &"buy", label = "Buy", kind = &"secondary", payload = {}}]

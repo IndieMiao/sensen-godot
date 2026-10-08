@@ -240,7 +240,7 @@
       "unavailable:Fishing Lv3 needed"
     ],
     "facts": [
-      "Lands up to Rare fish · Bite window 2.6 s"
+      "Lands up to Rare fish"
     ],
     "lock": {
       "locked": false,
@@ -289,7 +289,7 @@
       "unavailable:Owned"
     ],
     "facts": [
-      "Lands up to Fine fish · Bite window 2.2 s",
+      "Lands up to Fine fish",
       "In Gear"
     ],
     "lock": {
