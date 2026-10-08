@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cwk6j1gxcujia"
-path="res://.godot/imported/family_dots.svg-c462fd7327221109e6281d5fb2dcc396.ctex"
+uid="uid://cwypfykhw5q3"
+path="res://.godot/imported/fam_seasoning.svg-48960980a0c25f47ccf1acf6a5bc52d2.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ui/kit_icons/kitchen/family_dots.svg"
-dest_files=["res://.godot/imported/family_dots.svg-c462fd7327221109e6281d5fb2dcc396.ctex"]
+source_file="res://assets/ui/kit_icons/kitchen/fam_seasoning.svg"
+dest_files=["res://.godot/imported/fam_seasoning.svg-48960980a0c25f47ccf1acf6a5bc52d2.ctex"]
 
 [params]
 

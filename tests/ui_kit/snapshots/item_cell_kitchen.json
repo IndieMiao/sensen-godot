@@ -475,12 +475,41 @@
                       ]
                     },
                     {
-                      "type": "TextureRect",
+                      "type": "HBoxContainer",
                       "rect": [
-                        79,
+                        64,
                         179,
-                        21,
+                        52,
                         5
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            79,
+                            179,
+                            5,
+                            5
+                          ]
+                        },
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            87,
+                            179,
+                            5,
+                            5
+                          ]
+                        },
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            95,
+                            179,
+                            5,
+                            5
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -537,12 +566,41 @@
                       ]
                     },
                     {
-                      "type": "TextureRect",
+                      "type": "HBoxContainer",
                       "rect": [
-                        140,
+                        128,
                         179,
-                        26,
+                        52,
                         10
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            141,
+                            179,
+                            10,
+                            10
+                          ]
+                        },
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            154,
+                            181,
+                            5,
+                            5
+                          ]
+                        },
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            162,
+                            181,
+                            5,
+                            5
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -567,14 +625,14 @@
           "rect": [
             192,
             142,
-            52,
+            56,
             78
           ],
           "children": [
             {
               "type": "UiItemCell",
               "rect": [
-                192,
+                194,
                 142,
                 52,
                 58
@@ -583,7 +641,7 @@
                 {
                   "type": "Panel",
                   "rect": [
-                    192,
+                    194,
                     142,
                     52,
                     52
@@ -592,103 +650,28 @@
                     {
                       "type": "TextureRect",
                       "rect": [
-                        205,
-                        150,
-                        27,
-                        27
+                        204,
+                        151,
+                        30,
+                        22
                       ]
                     },
                     {
-                      "type": "PanelContainer",
+                      "type": "HBoxContainer",
                       "rect": [
-                        198,
-                        177,
-                        36,
-                        14
-                      ],
-                      "children": [
-                        {
-                          "type": "Label",
-                          "rect": [
-                            202,
-                            177,
-                            28,
-                            14
-                          ],
-                          "variation": "C9B",
-                          "text": "Tasted"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "Label",
-              "rect": [
-                192,
-                206,
-                52,
-                14
-              ],
-              "variation": "C9B",
-              "text": "tasted"
-            }
-          ]
-        },
-        {
-          "type": "VBoxContainer",
-          "rect": [
-            256,
-            142,
-            52,
-            78
-          ],
-          "children": [
-            {
-              "type": "UiItemCell",
-              "rect": [
-                256,
-                142,
-                52,
-                58
-              ],
-              "children": [
-                {
-                  "type": "Panel",
-                  "rect": [
-                    256,
-                    142,
-                    52,
-                    52
-                  ],
-                  "children": [
-                    {
-                      "type": "TextureRect",
-                      "rect": [
-                        269,
-                        150,
-                        27,
-                        27
-                      ]
-                    },
-                    {
-                      "type": "Panel",
-                      "rect": [
-                        291,
-                        143,
-                        14,
-                        14
+                        194,
+                        179,
+                        52,
+                        10
                       ],
                       "children": [
                         {
                           "type": "TextureRect",
                           "rect": [
-                            294,
-                            146,
-                            9,
-                            9
+                            215,
+                            179,
+                            10,
+                            10
                           ]
                         }
                       ]
@@ -700,13 +683,104 @@
             {
               "type": "Label",
               "rect": [
-                256,
+                192,
+                206,
+                56,
+                14
+              ],
+              "variation": "C9B",
+              "text": "clued · family"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            260,
+            142,
+            52,
+            78
+          ],
+          "children": [
+            {
+              "type": "UiItemCell",
+              "rect": [
+                260,
+                142,
+                52,
+                58
+              ],
+              "children": [
+                {
+                  "type": "Panel",
+                  "rect": [
+                    258,
+                    140,
+                    56,
+                    56
+                  ]
+                },
+                {
+                  "type": "Panel",
+                  "rect": [
+                    260,
+                    142,
+                    52,
+                    52
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        270,
+                        151,
+                        30,
+                        22
+                      ]
+                    },
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        260,
+                        179,
+                        52,
+                        5
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            279,
+                            179,
+                            5,
+                            5
+                          ]
+                        },
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            287,
+                            179,
+                            5,
+                            5
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                260,
                 206,
                 52,
                 14
               ],
               "variation": "C9B",
-              "text": "mastered"
+              "text": "might have"
             }
           ]
         },
@@ -740,60 +814,31 @@
                     {
                       "type": "TextureRect",
                       "rect": [
-                        10,
-                        241,
-                        30,
-                        22
-                      ]
-                    },
-                    {
-                      "type": "TextureRect",
-                      "rect": [
-                        15,
-                        269,
-                        21,
-                        5
+                        13,
+                        240,
+                        27,
+                        27
                       ]
                     },
                     {
                       "type": "PanelContainer",
                       "rect": [
-                        1,
-                        233,
-                        30,
+                        6,
+                        267,
+                        36,
                         14
                       ],
                       "children": [
                         {
-                          "type": "HBoxContainer",
+                          "type": "Label",
                           "rect": [
-                            4,
-                            233,
-                            24,
+                            10,
+                            267,
+                            28,
                             14
                           ],
-                          "children": [
-                            {
-                              "type": "TextureRect",
-                              "rect": [
-                                4,
-                                236,
-                                8,
-                                8
-                              ]
-                            },
-                            {
-                              "type": "Label",
-                              "rect": [
-                                13,
-                                233,
-                                15,
-                                14
-                              ],
-                              "variation": "C9B",
-                              "text": "Lv4"
-                            }
-                          ]
+                          "variation": "C9B",
+                          "text": "Tasted"
                         }
                       ]
                     }
@@ -810,7 +855,7 @@
                 14
               ],
               "variation": "C9B",
-              "text": "locked"
+              "text": "tasted"
             }
           ]
         },
@@ -845,7 +890,7 @@
                       "type": "TextureRect",
                       "rect": [
                         77,
-                        234,
+                        240,
                         27,
                         27
                       ]
@@ -853,52 +898,21 @@
                     {
                       "type": "Panel",
                       "rect": [
-                        68,
-                        236,
-                        6,
-                        6
-                      ]
-                    },
-                    {
-                      "type": "Panel",
-                      "rect": [
-                        89,
-                        268,
-                        24,
-                        13
+                        99,
+                        233,
+                        14,
+                        14
                       ],
                       "children": [
                         {
-                          "type": "Label",
+                          "type": "TextureRect",
                           "rect": [
-                            89,
-                            267,
-                            24,
-                            15
-                          ],
-                          "variation": "C10XB",
-                          "text": "×2"
+                            102,
+                            236,
+                            9,
+                            9
+                          ]
                         }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "Panel",
-                  "rect": [
-                    105,
-                    230,
-                    13,
-                    13
-                  ],
-                  "children": [
-                    {
-                      "type": "TextureRect",
-                      "rect": [
-                        107,
-                        232,
-                        9,
-                        9
                       ]
                     }
                   ]
@@ -914,7 +928,7 @@
                 14
               ],
               "variation": "C9B",
-              "text": "in pot"
+              "text": "mastered"
             }
           ]
         },
@@ -923,14 +937,14 @@
           "rect": [
             128,
             232,
-            65,
+            52,
             78
           ],
           "children": [
             {
               "type": "UiItemCell",
               "rect": [
-                134,
+                128,
                 232,
                 52,
                 58
@@ -939,7 +953,7 @@
                 {
                   "type": "Panel",
                   "rect": [
-                    134,
+                    128,
                     232,
                     52,
                     52
@@ -948,7 +962,140 @@
                     {
                       "type": "TextureRect",
                       "rect": [
-                        147,
+                        138,
+                        241,
+                        30,
+                        22
+                      ]
+                    },
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        128,
+                        269,
+                        52,
+                        10
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            141,
+                            271,
+                            5,
+                            5
+                          ]
+                        },
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            149,
+                            269,
+                            10,
+                            10
+                          ]
+                        },
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            162,
+                            271,
+                            5,
+                            5
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "PanelContainer",
+                      "rect": [
+                        129,
+                        233,
+                        30,
+                        14
+                      ],
+                      "children": [
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            132,
+                            233,
+                            24,
+                            14
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                132,
+                                236,
+                                8,
+                                8
+                              ]
+                            },
+                            {
+                              "type": "Label",
+                              "rect": [
+                                141,
+                                233,
+                                15,
+                                14
+                              ],
+                              "variation": "C9B",
+                              "text": "Lv4"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                128,
+                296,
+                52,
+                14
+              ],
+              "variation": "C9B",
+              "text": "locked"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            192,
+            232,
+            52,
+            78
+          ],
+          "children": [
+            {
+              "type": "UiItemCell",
+              "rect": [
+                192,
+                232,
+                52,
+                58
+              ],
+              "children": [
+                {
+                  "type": "Panel",
+                  "rect": [
+                    192,
+                    232,
+                    52,
+                    52
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        205,
                         234,
                         27,
                         27
@@ -957,10 +1104,32 @@
                     {
                       "type": "Panel",
                       "rect": [
-                        138,
+                        196,
                         236,
                         6,
                         6
+                      ]
+                    },
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        217,
+                        268,
+                        24,
+                        13
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            217,
+                            267,
+                            24,
+                            15
+                          ],
+                          "variation": "C10XB",
+                          "text": "×2"
+                        }
                       ]
                     }
                   ]
@@ -968,29 +1137,7 @@
                 {
                   "type": "Panel",
                   "rect": [
-                    134,
-                    252,
-                    52,
-                    16
-                  ],
-                  "children": [
-                    {
-                      "type": "Label",
-                      "rect": [
-                        134,
-                        251,
-                        52,
-                        15
-                      ],
-                      "variation": "C10B",
-                      "text": "In pot"
-                    }
-                  ]
-                },
-                {
-                  "type": "Panel",
-                  "rect": [
-                    175,
+                    233,
                     230,
                     13,
                     13
@@ -999,7 +1146,7 @@
                     {
                       "type": "TextureRect",
                       "rect": [
-                        177,
+                        235,
                         232,
                         9,
                         9
@@ -1012,7 +1159,111 @@
             {
               "type": "Label",
               "rect": [
-                128,
+                192,
+                296,
+                52,
+                14
+              ],
+              "variation": "C9B",
+              "text": "in pot"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            256,
+            232,
+            65,
+            78
+          ],
+          "children": [
+            {
+              "type": "UiItemCell",
+              "rect": [
+                262,
+                232,
+                52,
+                58
+              ],
+              "children": [
+                {
+                  "type": "Panel",
+                  "rect": [
+                    262,
+                    232,
+                    52,
+                    52
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        275,
+                        234,
+                        27,
+                        27
+                      ]
+                    },
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        266,
+                        236,
+                        6,
+                        6
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Panel",
+                  "rect": [
+                    262,
+                    252,
+                    52,
+                    16
+                  ],
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        262,
+                        251,
+                        52,
+                        15
+                      ],
+                      "variation": "C10B",
+                      "text": "In pot"
+                    }
+                  ]
+                },
+                {
+                  "type": "Panel",
+                  "rect": [
+                    303,
+                    230,
+                    13,
+                    13
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        305,
+                        232,
+                        9,
+                        9
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                256,
                 296,
                 65,
                 14
@@ -1025,8 +1276,8 @@
         {
           "type": "VBoxContainer",
           "rect": [
-            205,
-            232,
+            0,
+            322,
             52,
             78
           ],
@@ -1034,8 +1285,8 @@
             {
               "type": "UiItemCell",
               "rect": [
-                205,
-                232,
+                0,
+                322,
                 52,
                 58
               ],
@@ -1043,8 +1294,8 @@
                 {
                   "type": "Panel",
                   "rect": [
-                    205,
-                    232,
+                    0,
+                    322,
                     52,
                     52
                   ],
@@ -1052,8 +1303,8 @@
                     {
                       "type": "TextureRect",
                       "rect": [
-                        218,
-                        240,
+                        13,
+                        330,
                         27,
                         27
                       ]
@@ -1061,8 +1312,8 @@
                     {
                       "type": "Panel",
                       "rect": [
-                        230,
-                        268,
+                        25,
+                        358,
                         24,
                         13
                       ],
@@ -1070,8 +1321,8 @@
                         {
                           "type": "Label",
                           "rect": [
-                            230,
-                            267,
+                            25,
+                            357,
                             24,
                             15
                           ],
@@ -1083,8 +1334,8 @@
                     {
                       "type": "PanelContainer",
                       "rect": [
-                        206,
-                        233,
+                        1,
+                        323,
                         27,
                         14
                       ],
@@ -1092,8 +1343,8 @@
                         {
                           "type": "Label",
                           "rect": [
-                            209,
-                            233,
+                            4,
+                            323,
                             21,
                             14
                           ],
@@ -1109,8 +1360,8 @@
             {
               "type": "Label",
               "rect": [
-                205,
-                296,
+                0,
+                386,
                 52,
                 14
               ],
@@ -1122,8 +1373,8 @@
         {
           "type": "VBoxContainer",
           "rect": [
-            269,
-            232,
+            64,
+            322,
             52,
             78
           ],
@@ -1131,8 +1382,8 @@
             {
               "type": "UiItemCell",
               "rect": [
-                269,
-                232,
+                64,
+                322,
                 52,
                 58
               ],
@@ -1140,8 +1391,8 @@
                 {
                   "type": "Panel",
                   "rect": [
-                    269,
-                    232,
+                    64,
+                    322,
                     52,
                     52
                   ],
@@ -1149,8 +1400,8 @@
                     {
                       "type": "TextureRect",
                       "rect": [
-                        282,
-                        234,
+                        77,
+                        324,
                         27,
                         27
                       ]
@@ -1158,8 +1409,8 @@
                     {
                       "type": "PanelContainer",
                       "rect": [
-                        270,
-                        233,
+                        65,
+                        323,
                         27,
                         14
                       ],
@@ -1167,8 +1418,8 @@
                         {
                           "type": "Label",
                           "rect": [
-                            273,
-                            233,
+                            68,
+                            323,
                             21,
                             14
                           ],
@@ -1182,8 +1433,8 @@
                 {
                   "type": "Panel",
                   "rect": [
-                    269,
-                    252,
+                    64,
+                    342,
                     52,
                     16
                   ],
@@ -1191,8 +1442,8 @@
                     {
                       "type": "Label",
                       "rect": [
-                        269,
-                        251,
+                        64,
+                        341,
                         52,
                         15
                       ],
@@ -1204,8 +1455,8 @@
                 {
                   "type": "Panel",
                   "rect": [
-                    310,
-                    230,
+                    105,
+                    320,
                     13,
                     13
                   ],
@@ -1213,8 +1464,8 @@
                     {
                       "type": "TextureRect",
                       "rect": [
-                        312,
-                        232,
+                        107,
+                        322,
                         9,
                         9
                       ]
@@ -1226,8 +1477,8 @@
             {
               "type": "Label",
               "rect": [
-                269,
-                296,
+                64,
+                386,
                 52,
                 14
               ],
@@ -1239,7 +1490,7 @@
         {
           "type": "VBoxContainer",
           "rect": [
-            0,
+            128,
             322,
             63,
             78
@@ -1248,7 +1499,7 @@
             {
               "type": "UiItemCell",
               "rect": [
-                5,
+                133,
                 322,
                 52,
                 58
@@ -1257,7 +1508,7 @@
                 {
                   "type": "Panel",
                   "rect": [
-                    5,
+                    133,
                     322,
                     52,
                     52
@@ -1266,7 +1517,7 @@
                     {
                       "type": "TextureRect",
                       "rect": [
-                        18,
+                        146,
                         324,
                         27,
                         27
@@ -1275,7 +1526,7 @@
                     {
                       "type": "Panel",
                       "rect": [
-                        9,
+                        137,
                         326,
                         6,
                         6
@@ -1286,7 +1537,7 @@
                 {
                   "type": "Panel",
                   "rect": [
-                    5,
+                    133,
                     347,
                     52,
                     25
@@ -1295,7 +1546,7 @@
                     {
                       "type": "Label",
                       "rect": [
-                        5,
+                        133,
                         345,
                         52,
                         29
@@ -1310,7 +1561,7 @@
             {
               "type": "Label",
               "rect": [
-                0,
+                128,
                 386,
                 63,
                 14

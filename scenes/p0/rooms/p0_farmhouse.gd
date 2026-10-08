@@ -23,6 +23,9 @@ func _init() -> void:
 	place_name = "Farmhouse"
 	exit_text = "Door · Back to farm"
 	exit_to = "Farm"   # the door's world prompt: i-door + Farm (SGODOT-250)
+	# The stove is its body and pot only; the shelf on the wall beside it and the cabinet under that are their own,
+	# and where they overlap the smaller takes the tap (int6 C8). The final farmhouse_lv1 art renames these nodes.
+	hit_nodes = {STOVE: "hearth", RACK: "spice_rack", CABINET: "warming_cabinet"}
 
 ## The space commands are sent from (SGODOT-228 PR #16, Rest needs ≥ 2 h away, q(41)): the farmhouse is home.
 func p0_space() -> String: return "home"
@@ -164,6 +167,7 @@ func p0_dev(step: PackedStringArray) -> bool:
 	match step[0]:
 		"stove": open_stove(step[1] if step.size() > 1 else "cookbook")
 		"kitchen": p0_open_kitchen(step[1] if step.size() > 1 else "cookbook")
+		"page": if kitchen.drawer: kitchen.drawer.select_page(step[1])   # a Cookbook page's card (shots)
 		"put":
 			if kitchen.phase != "compose": kitchen.open("experiment")
 			if kitchen.drawer and kitchen.drawer.tab != "experiment": kitchen.drawer.tab = "experiment"
