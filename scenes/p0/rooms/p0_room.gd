@@ -87,6 +87,7 @@ func _ready() -> void:
 	room = Node3D.new()
 	room.name = "Room"
 	add_child(room)
+	_build_hearth_glow()   # before the art: the Basic Room's particle fire (SGODOT-236) takes ../HearthGlow
 	art = art_scene.instantiate()
 	room.add_child(art)
 	_dress_art()
@@ -263,15 +264,19 @@ func _build_lights() -> void:
 	room.add_child(sun)
 	sun.position = P0RoomAnchors.vec(layout.get("sun_direction", [-6, 7, 1.5]))
 	sun.look_at(room.global_position)
-	if layout.get("fire_position", null) is Array:
-		var glow := OmniLight3D.new()
-		glow.name = "HearthGlow"
-		glow.position = P0RoomAnchors.vec(layout.fire_position)
-		glow.light_color = Color("ff9b35")
-		glow.light_energy = 0.75
-		glow.omni_range = 1.25
-		glow.omni_attenuation = 1.6
-		room.add_child(glow)
+
+## The one hearth lamp at layout.fire_position. It exists before the art enters the tree, so the art's fire effect
+## drives this lamp instead of adding a second one (PR #29, SGODOT-236).
+func _build_hearth_glow() -> void:
+	if not (layout.get("fire_position", null) is Array): return
+	var glow := OmniLight3D.new()
+	glow.name = "HearthGlow"
+	glow.position = P0RoomAnchors.vec(layout.fire_position)
+	glow.light_color = Color("ff9b35")
+	glow.light_energy = 0.75
+	glow.omni_range = 1.25
+	glow.omni_attenuation = 1.6
+	room.add_child(glow)
 
 # ---------------------------------------------------------------- camera: the room's accepted view + safe box
 func _build_camera() -> void:

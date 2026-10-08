@@ -24,9 +24,13 @@ const PLATE_R := 0.17
 const PLATE_SLIDE := 0.32     # metres towards the camera
 const PLATE_S := 0.45
 const GLOW_R := 0.32
+const COOKING_GLOW := 2.2       # the hearth burns this much brighter while a pot cooks
 
 var cam: Camera3D
 var glow_light: OmniLight3D   ## the room's hearth light, brightened while cooking
+## The art's fire effect when it drives the lamp itself (SGODOT-236 particle fire rewrites light_energy every
+## frame): then the boost goes through its `glow_boost` multiplier instead of the lamp (agreed on PR #29).
+var fire_fx: Node
 var _cards := {}              # id -> {node: Node3D, sprite: Sprite3D, count: Label3D, n: int}
 var _order: Array = []        # ids in landing order (rim positions)
 var _ghosts: Array[Node3D] = []
@@ -204,7 +208,9 @@ func _screen_to_world(p: Vector2) -> Vector3:
 func set_cooking(on: bool) -> void:
 	_cooking = on
 	_steam.emitting = on
-	if glow_light: create_tween().tween_property(glow_light, "light_energy", _base_glow * (2.2 if on else 1.0), 0.5)
+	if fire_fx and "glow_boost" in fire_fx:
+		create_tween().tween_property(fire_fx, "glow_boost", COOKING_GLOW if on else 1.0, 0.5)
+	elif glow_light: create_tween().tween_property(glow_light, "light_energy", _base_glow * (COOKING_GLOW if on else 1.0), 0.5)
 
 func is_cooking() -> bool: return _cooking
 

@@ -216,6 +216,15 @@ func test_farmhouse_opens_on_the_stove_corner_with_a_door_back_to_the_farm() -> 
 	for n in ["use_stove_1", "exit"]:
 		assert_bool(view.has_point(r.cam.unproject_position(r.anchor(n).global_position))).override_failure_message(n).is_true()
 
+func test_the_room_has_one_hearth_lamp_ahead_of_the_art() -> void:
+	# The Basic Room's particle fire (PR #29) looks for ../HearthGlow when the art enters the tree; it must find
+	# the room's lamp rather than add a second one.
+	var r := _farmhouse()
+	var lamps := r.room.find_children("HearthGlow", "OmniLight3D", true, false)
+	assert_int(lamps.size()).is_equal(1)
+	assert_int(lamps[0].get_index()).is_less(r.art.get_index())
+	assert_object(r.room.get_node_or_null("HearthGlow")).is_not_null()
+
 func test_the_kitchen_corner_grows_with_the_homestead() -> void:
 	# Lv1: no Spice Rack, no Warming Cabinet (props hidden, their anchors absent, nothing to tap).
 	var lv1 := _farmhouse(1)
