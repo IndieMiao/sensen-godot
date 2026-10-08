@@ -78,6 +78,7 @@ static func _line(style: StringName, color: Color) -> Label:
 	var l := UiKit.label("", style, color)
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	l.custom_minimum_size.x = WIDTH - _PAD_X * 2.0   # wraps at the card's width from the first measure, never at 0
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return l
 

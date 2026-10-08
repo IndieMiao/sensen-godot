@@ -31,7 +31,8 @@ const _SCENE_SPINNER := 370.0
 const _SCENE_TEXT := 410.0
 const _SCENE_TEXT_SIZE := 18     # Destination ExtraBold 18 white, 0 2 6 shadow
 const _SCENE_SHADOW_Y := 2
-const _BLUR_DIV := 12            # the screen behind, shrunk this much and stretched back: SYS-LOADING-SCENE's layer blur
+const _BLUR_LOD := 3.5           # SYS-LOADING-SCENE's layer blur 10: the screen behind read from a low mip
+const _BLUR_SHADER := "shader_type canvas_item;\nuniform float lod = 3.5;\nvoid fragment() { COLOR = textureLod(TEXTURE, UV, lod); }\n"
 
 var kind: Kind = Kind.LAUNCH
 var detail := {}
@@ -71,7 +72,13 @@ func _init() -> void:
 	_shot = TextureRect.new()
 	_shot.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_shot.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-	_shot.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	_shot.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	var blur := Shader.new()
+	blur.code = _BLUR_SHADER
+	var mat := ShaderMaterial.new()
+	mat.shader = blur
+	mat.set_shader_parameter(&"lod", _BLUR_LOD)
+	_shot.material = mat
 	_shot.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_shot.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(_shot)
@@ -98,6 +105,7 @@ func _init() -> void:
 	add_child(_place)
 	card = UiSystemCard.new()
 	card.primary_pressed.connect(func(): primary_pressed.emit(kind))
+	card.minimum_size_changed.connect(_layout)   # a card outside a container never shrinks on its own
 	add_child(card)
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	resized.connect(_layout)
@@ -185,12 +193,12 @@ func _layout() -> void:
 	card.position = Vector2(roundf((w - card_size.x) * 0.5), roundf((h - card_size.y) * 0.5))
 	card.size = card_size
 
-## The screen as it is now, shrunk and stretched back: the blurred backdrop SYS-LOADING-SCENE puts the spinner on.
-## Null where nothing has been drawn (headless runs).
+## The screen as it is now, halved and with mipmaps: the scene cover reads it from a low mip (blurred). Null where
+## nothing has been drawn (headless runs).
 static func blurred_screen(vp: Viewport) -> Texture2D:
 	var tex := vp.get_texture() if vp else null
 	var img := tex.get_image() if tex else null
 	if img == null or img.is_empty(): return null
-	var small := Vector2i(maxi(1, img.get_width() / _BLUR_DIV), maxi(1, img.get_height() / _BLUR_DIV))
-	img.resize(small.x, small.y, Image.INTERPOLATE_BILINEAR)
+	img.resize(maxi(1, img.get_width() / 2), maxi(1, img.get_height() / 2), Image.INTERPOLATE_BILINEAR)
+	img.generate_mipmaps()
 	return ImageTexture.create_from_image(img)
