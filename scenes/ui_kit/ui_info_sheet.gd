@@ -235,6 +235,11 @@ func refresh() -> void:
 	_lift.visible = not _spec.get("buttons", []).is_empty() or _last_fact != ""
 	_box.content_margin_bottom = 0.0 if _lift.visible else _PAD_T   # the touch row pads the bottom when it is there
 	_place_last_fact()
+	# New wrapping lines measure tall until they get their width, so the card can grow on the way while its minimum
+	# ends where it was (Lettuce → Radish): the parent hears no change and would leave it tall, its medallion centred
+	# out of sight and its bottom edge under the grid (int10c 256 ②). Have the parent fit it again.
+	var host := get_parent() as Container
+	if host != null: host.queue_sort()
 
 ## The last fact sits beside the buttons when it fits the room they leave ("+20 Energy", as in the main), otherwise
 ## on its own fact line. The 44 touch row overlaps the text above it so it starts at y 38 of the card without fact

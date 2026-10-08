@@ -83,6 +83,47 @@ func test_tapping_a_cell_opens_the_bag_card_and_a_blank_cell_folds_it() -> void:
 	assert_bool(d.sheet.is_open()).is_false()
 	assert_bool(d._hint.visible).is_true()
 
+## int10c 256 ②: River Perch → Lettuce → Radish left the card tall (its new lines measure tall before they have a
+## width, its minimum ended where it was, so the drawer never fitted it again): medallion centred out of sight, the
+## bottom edge under the grid. The card fits its content after every switch.
+func test_switching_items_keeps_the_card_fitted_to_its_content() -> void:
+	var v := {"bag": {"capacity": 25, "slots": [{"id": "fish_perch", "qty": 2}, {"id": "crop_lettuce", "qty": 2},
+		{"id": "crop_radish", "qty": 2}]},
+		"items": {"fish_perch": {"rarity": 2, "sell": 9}, "crop_lettuce": {"sell": 4}, "crop_radish": {"sell": 5}},
+		"names": {"fish_perch": "River Perch", "crop_lettuce": "Lettuce", "crop_radish": "Radish"}}
+	var d := P0BagDrawer.new(v, "bag")
+	d.animate = false
+	d.persist = false
+	var host := Control.new()
+	host.theme = UiKit.theme()
+	host.size = Vector2(360, 800)
+	add_child(auto_free(host))
+	host.add_child(d)
+	for i in 3: await get_tree().process_frame
+	for id in ["fish_perch", "crop_lettuce", "crop_radish"]:
+		d.grid.select(id)
+		for i in 4: await get_tree().process_frame
+		assert_float(d.sheet.size.y).override_failure_message(id).is_equal(d.sheet.get_combined_minimum_size().y)
+		assert_float(d.sheet.get_rect().end.y).is_less_equal(d.grid.position.y)
+		assert_float(d.sheet._medallion.get_global_rect().end.y).is_less_equal(d.sheet.get_global_rect().end.y)
+
+## int10c 256 ③ (不知火舞): the Bag side's header on both sides; switching back and forth moves neither the switch
+## nor where the content starts.
+func test_switching_bag_and_gear_moves_nothing() -> void:
+	var d := _drawer()
+	for i in 3: await get_tree().process_frame
+	var tabs_y := d.header.tabs().global_position.y
+	var content_y := d._bag_box.global_position.y
+	for i in 10:
+		var seg: BaseButton = d.header.tabs().tabs()[(i + 1) % 2]
+		seg.pressed.emit()
+		seg.button_pressed = true
+		for f in 2: await get_tree().process_frame
+		var box: Control = d._gear_box if d.side == "gear" else d._bag_box
+		assert_str(d.side).is_equal("gear" if i % 2 == 0 else "bag")
+		assert_float(d.header.tabs().global_position.y).is_equal(tabs_y)
+		assert_float(box.global_position.y).is_equal(content_y)
+
 func test_category_chip_and_sort_change_what_the_grid_lists() -> void:
 	var d := _drawer()
 	await get_tree().process_frame
