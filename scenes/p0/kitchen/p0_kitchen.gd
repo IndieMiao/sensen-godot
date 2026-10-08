@@ -144,6 +144,7 @@ func open(tab := "cookbook", page_id := "") -> void:
 	rt.ui.modal_kind = "kitchen"
 	_wrap.tree_exited.connect(_on_closed)
 	phase = "compose"
+	rt.ui.teach("cook")   # U6: "Tap Cook to grill your first fish" the first time the drawer opens (§14.2)
 	_hide_player(true)
 	room.focus("cam_stove", {band = room.band_below_hud(BAND_TOP_DRAWER), size = room.view_size() * FOCUS_SIZE, release_on_move = false})
 	if page_id != "" and not drawer.page(page_id).is_empty(): drawer.select_page(page_id)
@@ -271,10 +272,18 @@ func _after_pot_change() -> void:
 	drawer.refresh()
 	_refresh_overlay()
 
+## One Cook per opening; a refusal or a failed send gives the buttons back (see on_event).
 func _on_cook(cmd: Dictionary) -> void:
 	if _cook_sent: return
 	_cook_sent = true
 	rt.session.send(cmd, P0Session.ui_key(cmd))
+
+## The drawer redraws from the latest view while it is open (a collect or a sale changes the bag under it).
+func sync_view(v: Dictionary) -> void:
+	if phase != "compose" or drawer == null or drawer.view.get("seq", -1) == v.get("seq", -2): return
+	drawer.view = v
+	drawer.refresh()
+	_refresh_overlay()
 
 # ---------------------------------------------------------------- server: the fire is lit
 ## `pot` event: the stove started. Close the drawer and watch the pot.
@@ -293,10 +302,16 @@ func on_pot(stove: Dictionary) -> void:
 
 ## Watch a cooking stove: camera on the pot, heat ring over it, taps judged locally and sent at collect.
 func watch(stove: Dictionary) -> void:
+	# Watching the same pot again keeps the heat taps already judged (they go out at collect when the server does
+	# not keep them as they come); rings that went by unwatched are misses, without a "Missed" float each.
+	if stove.get("id", null) == null or stove.get("id", null) != _stove.get("id", null):
+		_taps.clear()
+		_judged.clear()
 	_stove = stove
 	_start_ms = Time.get_ticks_msec() - int(float(stove.get("elapsed", 0)))
-	_taps.clear()
-	_judged.clear()
+	var heats: Array = stove.get("heats", [])
+	for i in heats.size():
+		if not _judged.has(i) and elapsed() > float(heats[i].at) + float(heats[i].spin): _judged[i] = false
 	phase = "watch"
 	_hide_player(true)
 	stage.set_cooking(true)
@@ -424,7 +439,17 @@ func serve(taps: Array, from_stove := false) -> void:
 	if phase == "serve" or phase == "card": return
 	var v := rt.session.current()
 	var st = P0KitchenLogic.stove(v)
-	if st == null: return
+	# Watching: serve the pot being watched. Gone from the stove (S5 Queue ×2 kept it on its own) or another pot on
+	# it now: nothing to collect here, so the watch ends instead of waiting (PR #54 review).
+	if phase == "watch" and (st == null or st.get("id", null) != _stove.get("id", null)):
+		stop_watching()
+		on_collected()
+		return
+	if st == null:
+		on_collected()
+		return
+	# Back at a Ready stove after watching part of this pot: the rings already hit still count.
+	if from_stove and taps.is_empty() and st.get("id", null) != null and st.get("id", null) == _stove.get("id", null): taps = _taps.duplicate()
 	phase = "serve"
 	_from_stove = from_stove
 	_events.clear()
@@ -448,8 +473,17 @@ func on_event(ev: Dictionary) -> bool:
 				_toast_keep.call_deferred(ev, P0KitchenLogic.routes(_events + [ev]))
 				return true
 			_events.append(ev)
-			if phase == "serve": _show_card.call_deferred()
+			# Once the whole reply is in, and through the card queue: a card already open (an Energy card, a level-up
+			# from elsewhere) is not dropped, and this reply's level-up waits behind COOK-4 (PR #54 review).
+			if phase == "serve": (func(): rt.ui.queue_card(_show_card)).call_deferred()
 			return true
+		"refused", "send_failed":   # a cook or collect that did not go through (the runtime toasts why)
+			match str(ev.get("cmd", {}).get("type", "")):
+				"cook": _cook_sent = false
+				"collect":
+					_retrying = false
+					if phase == "serve": _recover()
+			return false
 		"cabinet", "item", "plate", "first", "mishap":
 			if _retrying and str(ev.kind) in ["cabinet", "item", "plate"]:
 				_retrying = false
@@ -459,6 +493,12 @@ func on_event(ev: Dictionary) -> bool:
 				return false
 			_events.append(ev)
 	return false
+
+## A collect that failed or was refused (not_ready, stale_pot, no network): the plate goes back, the camera and
+## the player return, taps and Back work again; the stove shows its state and a tap serves or watches it again.
+func _recover() -> void:
+	on_collected()
+	stage.set_cooking(P0KitchenLogic.stove(rt.session.current()) != null)
 
 ## The server settled the pot without a card (refused as empty): back to idle, the plate goes away.
 func on_collected() -> void:
@@ -473,6 +513,9 @@ func on_collected() -> void:
 
 # ---------------------------------------------------------------- the result card (COOK-4 / 6 / P0-9)
 func _show_card() -> void:
+	if phase != "serve":
+		rt.ui.close_modal()   # left the stove before the card's turn: let the next queued card come up
+		return
 	_left_card = false
 	var dish_ev: Dictionary = {}
 	var first_xp := 0
@@ -480,7 +523,10 @@ func _show_card() -> void:
 		if str(ev.kind) == "dish": dish_ev = ev.duplicate()
 		if str(ev.kind) == "first" and str(ev.get("what", "")).begins_with("cook:"): first_xp = int(ev.xp)
 		if str(ev.kind) == "mishap": dish_ev["clue"] = ev.get("clue", null)
-	if dish_ev.is_empty(): return
+	if dish_ev.is_empty():
+		_recover()
+		rt.ui.close_modal()
+		return
 	var v := rt.session.current()
 	var fields := P0KitchenLogic.dish_card(v, dish_ev, first_xp, _from_stove)
 	_card_dish = str(fields.dish_id)

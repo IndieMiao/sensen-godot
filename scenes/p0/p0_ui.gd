@@ -171,7 +171,7 @@ func _process(dt: float) -> void:
 	# q(49): a waiting TipCard comes up only when no RewardMoment / result card is on screen; one already up stays.
 	# TODO(SGODOT-232 U6): call tips.moment_opened / moment_closed from UiRewardMoment / MomentBanner once #24 lands;
 	# until then the result cards (modal_kind "card") stand in for them.
-	if tips and modal_kind != "card":
+	if tips and not modal_kind in ["card", "kitchen_card"]:   # the farmhouse's COOK-4 is a result card too
 		var key := tips.next()
 		if key != "": _show_tip(str(P0Guide.TIPS[key]))
 

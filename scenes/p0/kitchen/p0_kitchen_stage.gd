@@ -85,7 +85,7 @@ func add_ingredient(id: String, texture: Texture2D, from_screen := Vector2.INF) 
 		return
 	var from := to_local(_screen_to_world(from_screen))
 	node.position = from
-	var t := create_tween()
+	var t := node.create_tween()   # bound to the card: freed mid-flight (a tab switch, a quick reply), the tween goes too
 	t.tween_method(func(k: float): node.position = _arc(from, to, k), 0.0, 1.0, FLY_S).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	t.tween_callback(func():
 		_bounce(node)
@@ -108,7 +108,7 @@ func remove_ingredient(id: String, to_screen := Vector2.INF) -> void:
 		return
 	var from := node.position
 	var to := to_local(_screen_to_world(to_screen))
-	var t := create_tween()
+	var t := node.create_tween()
 	t.tween_method(func(k: float): node.position = _arc(from, to, k), 0.0, 1.0, FLY_S).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	t.tween_callback(node.queue_free)
 

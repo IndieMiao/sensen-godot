@@ -16,6 +16,7 @@ const CABINET_GLOW_AT := Vector3(-2.13, 0.75, -1.69)   # in front of the cabinet
 
 var kitchen: P0Kitchen
 var _sheet: P0StorageSheet
+var _pending_tab := ""   # the drawer tab p0_open_kitchen walked to the stove for (see _on_facility)
 
 func _init() -> void:
 	anchors_path = "res://assets/p0/rooms/farmhouse.anchors.json"
@@ -62,7 +63,12 @@ func _marker(n: String, v: Dictionary) -> Dictionary:
 	return {text = "Stove 1/1 · Cooking " + clock, badge = "countdown", caption = clock}
 
 func _on_facility(n: String) -> void:
-	if n == STOVE: open_stove("cookbook", true)
+	if n == STOVE:
+		# Sent here with a tab (the rack's Open Experiment ›, the Energy card's Cook, ui.open_kitchen): open on it,
+		# not on Cookbook or Cook Again (PR #54 review). A plain tap on the stove has none.
+		var tab := _pending_tab
+		_pending_tab = ""
+		open_stove(tab if tab != "" else "cookbook", tab == "")
 	elif n == RACK: open_sheet("rack")
 	elif n == CABINET: open_sheet("cabinet")
 
@@ -103,9 +109,11 @@ func open_stove(tab := "cookbook", tapped := false) -> void:
 	elif float(st.get("ready_in", 0)) <= 0.0: kitchen.serve([], true)
 	else: kitchen.watch(st)
 
-## The cooking drawer from elsewhere (the Energy card's Cook tile, dev steps): walk to the stove first.
+## The cooking drawer from elsewhere (the Energy card's Cook tile, dev steps): walk to the stove first. Arriving
+## runs _on_facility, which opens the drawer on this tab; any other tap or the stick drops it.
 func p0_open_kitchen(tab := "cookbook") -> void:
-	walk_to(STOVE, func(): open_stove(tab))
+	_pending_tab = tab if tab != "" else "cookbook"
+	walk_to(STOVE)
 
 ## Returns true when the kitchen shows the result itself (the runtime then skips its old dish card).
 ## Floats rise over the plate while the pot's result is on screen (COOK-4: the XP chip above the plate), else over
@@ -126,6 +134,7 @@ func p0_event(ev: Dictionary, v: Dictionary) -> bool:
 func _room_frame(v: Dictionary, _dt: float) -> void:
 	if _sheet and rt and rt.session.view.get("seq", -1) != _sheet.view.get("seq", -2): _sheet.refresh(rt.session.current())
 	if kitchen == null: return
+	kitchen.sync_view(v)
 	var st = P0KitchenLogic.stove(v)
 	var cooking: bool = st != null and float(st.get("ready_in", 0)) > 0.0
 	if kitchen.phase == "idle" and kitchen.stage.is_cooking() != cooking: kitchen.stage.set_cooking(cooking)
@@ -133,10 +142,12 @@ func _room_frame(v: Dictionary, _dt: float) -> void:
 
 func p0_tap(screen: Vector2) -> void:
 	if kitchen and kitchen.tap(): return
+	_pending_tab = ""   # a new target: whatever sent us to the stove with a tab no longer applies
 	super(screen)
 
 ## Walking away from the pot stops watching it; the pot keeps cooking (§7.2.3).
 func _on_joystick(v: Vector2) -> void:
+	if v != Vector2.ZERO: _pending_tab = ""
 	if v != Vector2.ZERO and kitchen and kitchen.phase == "watch": kitchen.stop_watching()
 
 ## Back while watching the pot steps back from it; then the room's own Back (drawer, then the door).

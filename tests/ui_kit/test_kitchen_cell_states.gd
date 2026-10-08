@@ -103,12 +103,16 @@ func test_a_rack_seasoning_shows_the_rack_tag_and_no_rarity_dot() -> void:
 	var c := _cell({icon = salt, quantity = "×12", rarity = 1, rack = true})
 	await _settle()
 	assert_array(_texts(c)).contains(["Rack", "×12"])
-	var dots := c.find_children("*", "Panel", true, false).filter(func(p): return p.is_visible_in_tree() and p.size == Vector2(UiTokens.SIZE_RARITY_DOT, UiTokens.SIZE_RARITY_DOT))
-	assert_array(dots).is_empty()
+	assert_array(_rarity_dots(c)).is_empty()
 	var plain := _cell({icon = salt, quantity = "×12", rarity = 1})
 	await _settle()
 	assert_array(_texts(plain)).not_contains(["Rack"])
+	assert_array(_rarity_dots(plain)).has_size(1)   # the same lookup does find the dot on a plain cell (PR #54 review)
 	var in_pot := _cell({icon = salt, rarity = 1, rack = true, kitchen_state = UiItemCell.KitchenState.IN_POT})   # COOK-2b-RACK
 	await _settle()
 	assert_array(_texts(in_pot)).contains(["Rack", "In pot"])
 
+## Visible rarity dots on a cell (SIZE_RARITY_DOT squares).
+func _rarity_dots(c: Control) -> Array:
+	var dot := Vector2(UiTokens.SIZE_RARITY_DOT, UiTokens.SIZE_RARITY_DOT)
+	return c.find_children("*", "Panel", true, false).filter(func(p): return p.is_visible_in_tree() and p.size.is_equal_approx(dot))

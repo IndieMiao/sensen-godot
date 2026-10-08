@@ -287,8 +287,9 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				_call("p0_event", [ev, v])
 			"dish":
 				var lines := xp_lines.duplicate()
-				# The farmhouse stove shows its own result card (COOK-4 / 6 / P0-9); elsewhere the old one.
-				if not bool(_call("p0_event", [ev, v])): ui.queue_card(func(): ui.show_dish(ev, lines))
+				# The farmhouse stove shows its own result card (COOK-4 / 6 / P0-9); elsewhere the old one. A world
+				# without p0_event (farm, map, outpost) gives null, so compare instead of bool() (PR #54 review).
+				if _call("p0_event", [ev, v]) != true: ui.queue_card(func(): ui.show_dish(ev, lines))
 			"request":
 				if str(ev.status) == "accepted": ui.toast("Tracking · it shows in Today")
 				else: ui.toast("Request complete · +%d coins" % int(ev.coins))
@@ -299,7 +300,9 @@ func _on_state(v: Dictionary, events: Array) -> void:
 					ui.toast("+%d Energy · Meals today %d/%d" % [int(ev.gain), int(ev.meals), int(ev.cap)])
 			"level":
 				var lv: Dictionary = ev
-				ui.queue_card(func(): ui.show_level_up(lv))
+				# Deferred, so a result card the same reply opens (the kitchen's COOK-4, itself deferred until the
+				# whole reply is in) comes first and the level-up queues behind it (C16; PR #54 review).
+				ui.queue_card.call_deferred(func(): ui.show_level_up(lv))
 				session.report({"kind": "level_banner", "skill": str(lv.skill), "level": int(lv.level)})
 			"affinity":   # SGODOT-225 / 228: first chat of the day, gifts, requests
 				var reply := P0Logic.resident_reply(str(ev.get("resident", "")), str(ev.get("verdict", "")))
@@ -359,6 +362,8 @@ func _on_catch(ev: Dictionary, _xp_lines: Array, at := Vector2.INF) -> void:
 			ui.toast("Line in · Energy back")
 
 func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
+	# The farmhouse kitchen waits on cook / collect (its Cook buttons, the plate being served): let it recover.
+	if str(cmd.get("type", "")) in ["cook", "collect"]: _call("p0_event", [{"kind": "refused", "code": code, "cmd": cmd}, session.view])
 	if str(cmd.get("type", "")) == "cast": _call("p0_event", [{"kind": "cast_refused", "code": code}, session.view])
 	if code == "bag_full" and str(cmd.get("type", "")) == "reel":
 		_call("p0_event", [{"kind": "fish_abort"}, session.view])
