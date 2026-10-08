@@ -48,7 +48,7 @@ const PACK_MARGIN := 8.0
 ## A pin wearing a map marker (q(48): Deliverable ✓ > Request ! > New ◆) is packed before the others, so the marker
 ## above it is not packed away with it (蒙恬 on C30). Entries carry it as `marker`.
 const MARKER_ORDER := {"deliverable": 0, "request": 1, "new": 2}
-## An outpost pin's render priority: over other art, under the selected pin (2).
+## The render priority of an outpost pin or a pin wearing a marker: over other art, under the selected pin (2).
 const PLACE_PRIORITY := 1
 const REAPPEAR_COOLDOWN_MS := 400
 ## Display diversity: once this many dining markers are placed, remaining dining
@@ -70,6 +70,9 @@ var markers: Dictionary = {}
 var displayed: Array = []
 ## The outpost labels shown this update (local rects): the player's own My Farm label gives way to them.
 var _place_labels: Array = []
+## Map markers the host gives by pin id (q(48)), asked once per update through its `city_pin_markers()`; an entry's
+## own `marker` wins.
+var _pin_markers := {}
 var subtitle: Label
 var status: Label
 var info: PanelContainer
@@ -787,10 +790,6 @@ func _make_marker(entry: Dictionary) -> Dictionary:
 		# matching the previous 2D layout (art top = anchor - 0.94 * side).
 		sprite.pixel_size = 1.0 / maxf(1.0, texture.get_height())
 		sprite.offset = Vector2(0, texture.get_height() * 0.44)
-		if entry.kind == "place":
-			# An outpost pin draws in front of the player's own 3D avatar, never hidden by depth (不知火舞 on C30).
-			sprite.no_depth_test = true
-			sprite.render_priority = PLACE_PRIORITY
 		_art_parent().add_child(sprite)
 		result.sprite = sprite
 		# 阴影 = 素材自身的剪影：同一张贴图染成半透明墨色，右下偏移垫底，
@@ -816,6 +815,7 @@ func _make_marker(entry: Dictionary) -> Dictionary:
 func _update_markers() -> void:
 	displayed.clear()
 	_place_labels.clear()
+	_pin_markers = host.call("city_pin_markers") if host.has_method("city_pin_markers") else {}
 	# Cull only outside the screen plus the artwork's extent. UI panels cover
 	# geography; they never move or hide its anchors to make room for themselves.
 	var area := Rect2(-global_position, get_viewport_rect().size).grow(120)
@@ -928,7 +928,7 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int)
 		var probe: Rect2 = c.bounds.grow(-PACK_MARGIN if incumbent else PACK_MARGIN)
 		# 地标相互之间也做遮挡剔除，但不给玩家 pin 让位；其余标记两者都让。宿主的地点（P0 据点）从不让位：
 		# 城市级也每处一枚（q(72)），只是名牌和已放下的标记相撞时先收起。
-		var blocked: bool = entry.kind != "place" and (_hits(occupied, probe) or (entry.kind != "landmark" and _hits(blockers, probe)))
+		var blocked: bool = entry.kind != "place" and (_hits(occupied, probe) or (entry.kind != "landmark" and not _over_avatar(entry) and _hits(blockers, probe)))
 		if blocked:
 			if incumbent: _hidden_until[id] = now + REAPPEAR_COOLDOWN_MS
 			return false
@@ -956,6 +956,9 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int)
 		marker.portrait.position = Vector2(-18, -38)
 	else:
 		_place_art(marker, c)
+		# A marker comes and goes with the view: the draw rule follows it (the selected pin keeps its front priority).
+		marker.sprite.no_depth_test = _over_avatar(entry)
+		if not is_selected: marker.sprite.render_priority = PLACE_PRIORITY if _over_avatar(entry) else 0
 	marker.label.text = _label_text(entry)
 	# 名牌永远跟随图标居中（出屏也不挪）；选中项长名按词折行，不再省略号截断。
 	var whole: bool = entry.kind == "place"   # one line, never cut
@@ -1017,7 +1020,7 @@ func _set_marker_front(id: String, front: bool) -> void:
 	if not markers.has(id): return
 	var marker: Dictionary = markers[id]
 	if marker.has("sprite"):
-		marker.sprite.render_priority = 2 if front else (PLACE_PRIORITY if marker.entry.kind == "place" else 0)
+		marker.sprite.render_priority = 2 if front else (PLACE_PRIORITY if _over_avatar(marker.entry) else 0)
 		marker.shadow.render_priority = 1 if front else -1
 	if front: move_child(marker.node, maxi(0, markers.size() - 1))
 
@@ -1038,12 +1041,21 @@ func _pack_key(c: Dictionary) -> Array:
 	# Outposts among themselves: nearest home first, then id (不知火舞 on C30) — geography, so panning never reorders them.
 	var kind_order := {"place": -1, "landmark": 0, "resident": 1, "pond": 2, "poi": 3}
 	return [0 if selected.get("id", null) == c.entry.get("id") else 1,
-		int(MARKER_ORDER.get(str(c.entry.get("marker", "")), MARKER_ORDER.size())),
+		int(MARKER_ORDER.get(_marker_of(c.entry), MARKER_ORDER.size())),
 		kind_order.get(c.entry.kind, 3),
 		_home_distance(c.entry) if c.entry.kind == "place" else 0.0,
 		0 if _shown_last.has(c.id) else 1,
 		float(c.entry.get("rank", 5)),
 		c.id]
+
+## The map marker a pin wears (q(48): "deliverable" / "request" / "new"), "" for none.
+func _marker_of(entry: Dictionary) -> String:
+	return str(entry.get("marker", _pin_markers.get(str(entry.get("id", "")), "")))
+
+## Outposts and pins wearing a marker draw over the player's own 3D avatar (no depth test) and never give way to it:
+## both pack before everything but the selected pin (不知火舞 / 蒙恬 on C30).
+func _over_avatar(entry: Dictionary) -> bool:
+	return entry.get("kind") == "place" or _marker_of(entry) != ""
 
 ## How far a place is from home (degrees, the latitude scaled to the longitude's length): only ever compared.
 func _home_distance(entry: Dictionary) -> float:

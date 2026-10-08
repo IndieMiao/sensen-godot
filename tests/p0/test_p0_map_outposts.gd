@@ -111,6 +111,10 @@ func test_outpost_labels_never_overlap_and_the_nearest_home_keeps_its_label() ->
 	for i in 3: await get_tree().process_frame
 	m.set_process(false)
 	var city: CityMapView = m.city_map
+	# Outposts among themselves: after the tutorial, so Reed Pond wears no marker that packs before them.
+	var rt: P0Runtime = m.rt
+	var saved: Dictionary = rt.session.view
+	rt.session.view = {"req_done": [P0Guide.TUTORIAL]}
 	var home := Vector2(m.home_lat, m.home_lng)
 	var by_home: Array = P0Outposts.all().duplicate()
 	by_home.sort_custom(func(a, b): return city._home_distance(a) < city._home_distance(b))
@@ -129,6 +133,7 @@ func test_outpost_labels_never_overlap_and_the_nearest_home_keeps_its_label() ->
 		shown_at[zoom] = ["sh_tea_1", "sh_market_1", "sh_tackle_1"].filter(func(id): return (labels[id] as Label).visible).size()
 	# Zooming in parts them: the three by home get their names back.
 	assert_int(int(shown_at[15.0])).is_greater(int(shown_at[12.2]))
+	rt.session.view = saved
 
 ## q(72) / 不知火舞 on C30: the whole name and who is in, never cut; a selected outpost's label always shows.
 func test_an_outpost_label_is_whole_and_shows_when_selected() -> void:
@@ -191,3 +196,28 @@ func test_my_farm_label_gives_way_to_an_outpost_label() -> void:
 	_look(m, home, 15.0, 0.0)
 	assert_bool(fm.self_label_yields).is_false()
 	assert_bool(fm._buttons["self"].visible).is_true()
+
+## 蒙恬 on #83: the first session's map (minutes 5–9: the chip → the map → Reed Pond) opens at the city level with
+## nothing selected; while the tutorial Pond Catch is not handed in, Reed Pond wears the Request ! (q(48)) and shows
+## beside the Tackle Shop 200 m away, over the player's avatar. Once it is handed in, the pond packs as a pond again.
+func test_the_beginner_pond_shows_at_the_city_level_until_pond_catch_is_handed_in() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var city: CityMapView = m.city_map
+	var rt: P0Runtime = m.rt
+	var saved: Dictionary = rt.session.view
+	rt.session.view = {"req_done": []}
+	assert_dict(m.city_pin_markers()).is_equal({NEAREST_POND: "request"})
+	assert_dict(city.selected).is_empty()
+	for at in [OVERVIEW, Vector2(m.home_lat, m.home_lng)]:
+		assert_array(_look(m, at, 12.2, 18.0 if at == OVERVIEW else 0.0)).append_failure_message(str(at)) \
+			.contains([NEAREST_POND, "sh_tackle_1"])
+	var reed: Sprite3D = city.markers[NEAREST_POND].sprite
+	assert_bool(reed.no_depth_test).is_true()
+	assert_int(reed.render_priority).is_equal(CityMapView.PLACE_PRIORITY)
+	rt.session.view = {"req_done": [P0Guide.TUTORIAL]}
+	assert_dict(m.city_pin_markers()).is_empty()
+	assert_array(_look(m, OVERVIEW, 12.2)).not_contains([NEAREST_POND])   # 200 m from the Tackle Shop: it gives way
+	assert_bool(city._over_avatar(city.markers[NEAREST_POND].entry)).is_false()   # drawn like any pond when it shows again
+	rt.session.view = saved
