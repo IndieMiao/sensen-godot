@@ -35,7 +35,9 @@ var sell_mode := false: set = set_sell_mode
 var can_sell := Callable(): set = set_can_sell
 ## Called with the item when a filled cell is tapped (after the selection is drawn).
 var on_select := Callable()
-var selected_id := ""
+## The selected item's id. Setting it only marks the cell (a page a drawer opens on, a refresh keeping the choice): it
+## repaints at once and emits nothing; a tap's select() / clear_selection() emit item_selected / selection_cleared.
+var selected_id := "": set = set_selected_id
 ## The item in the air (a cell lifted toward the quick bar): its cell draws as an empty dashed cell until the drag
 ## ends; "" puts it back (BAR-DRAG-9, as the quick bar's own dragged slot; 不知火舞 on 225).
 var lifted_id := "": set = set_lifted_id
@@ -43,6 +45,10 @@ var lifted_id := "": set = set_lifted_id
 func set_lifted_id(v: String) -> void:
 	lifted_id = v
 	_paint_selection()
+
+func set_selected_id(v: String) -> void:
+	selected_id = v
+	if not _cells.is_empty(): _paint_selection()
 
 var _grid: GridContainer
 var _cells: Array[UiItemCell] = []
@@ -84,15 +90,13 @@ func select(id: String) -> void:
 	if item.is_empty():
 		clear_selection()
 		return
-	selected_id = id
-	_paint_selection()
+	selected_id = id   # the setter paints
 	item_selected.emit(item)
 	if on_select.is_valid(): on_select.call(item)
 
 func clear_selection() -> void:
 	var had := selected_id != ""
-	selected_id = ""
-	_paint_selection()
+	selected_id = ""   # the setter paints
 	if had: selection_cleared.emit()
 
 ## Rebuilds the cell contents; cells are reused, so the scroll position survives a refresh. A selection whose

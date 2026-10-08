@@ -279,6 +279,26 @@ func test_tapping_a_filled_cell_selects_it_and_runs_the_select_hook() -> void:
 	assert_int(cleared[0]).is_equal(1)
 	assert_int(g.cells()[4].state).is_equal(UiItemCell.State.DEFAULT)
 
+## Setting selected_id (the page a drawer opens on, a refresh keeping the choice) marks its cell in the same frame and
+## emits nothing; only a tap's select() / clear_selection() emit (刘邦 on the kitchen drawer's first frame).
+func test_setting_selected_id_marks_the_cell_at_once_without_a_signal() -> void:
+	var g := _grid(10)
+	await _settle()
+	var got := []
+	var cleared := [0]
+	g.item_selected.connect(func(it): got.append(it.id))
+	g.selection_cleared.connect(func(): cleared[0] += 1)
+	g.items = _items(10)
+	g.selected_id = "it3"
+	assert_int(g.cell_for("it3").state).is_equal(UiItemCell.State.SELECTED)
+	g.selected_id = "it5"
+	assert_int(g.cell_for("it3").state).is_equal(UiItemCell.State.DEFAULT)
+	assert_int(g.cell_for("it5").state).is_equal(UiItemCell.State.SELECTED)
+	g.selected_id = ""
+	assert_int(g.cell_for("it5").state).is_equal(UiItemCell.State.DEFAULT)
+	assert_array(got).is_empty()
+	assert_int(cleared[0]).is_equal(0)
+
 func test_sell_mode_lists_only_what_this_counter_takes() -> void:
 	var g := _grid(10)
 	await _settle()

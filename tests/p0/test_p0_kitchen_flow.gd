@@ -357,6 +357,17 @@ func test_a_level_up_in_the_same_reply_waits_behind_the_result_card() -> void:
 	assert_int(rt.ui.root.find_children("*", "UiMomentBanner", true, false).size()).is_equal(1)   # the level-up banner (233)
 	assert_str(k.phase).is_equal("idle")
 
+## 不知火舞 on #120: the Cookbook's selected page is marked from the drawer's first frame, not after the first refresh.
+func test_the_cookbook_marks_its_selected_page_as_the_drawer_opens() -> void:
+	var r := await _farmhouse()
+	var k: P0Kitchen = r.get("kitchen")
+	k.open("cookbook")
+	var grid: UiInventoryGrid = k.drawer.get("_pages")
+	assert_str(k.drawer.selected_page).is_not_empty()
+	assert_int(grid.cell_for(k.drawer.selected_page).state).is_equal(UiItemCell.State.SELECTED)
+	rt.ui.close_modal()
+	await get_tree().process_frame
+
 func test_the_tab_asked_for_is_the_tab_that_opens() -> void:
 	# The rack's Open Experiment › and the Energy card's Cook walk to the stove; arriving used to
 	# open Cookbook (or Cook Again) first and then drop the tab.
