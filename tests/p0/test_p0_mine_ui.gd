@@ -80,6 +80,12 @@ func test_key_badge_shows_the_equipped_pickaxe() -> void:
 	ui.set_mode("farm")
 	assert_object(ui._keys.tool_icon).is_equal(P0Logic.icon("hoe"))
 
+func test_mining_free_moves_keep_free_on_the_key() -> void:
+	ui.set_action(P0MaterialLogic._key("elevator", "Elevator", "Free", {"type": "elevator"}))
+	assert_str(ui._keys.key().cost).is_equal("Free")   # LOCK-21 Elevator · Free
+	ui.set_action({"verb": "Till", "sub": "Free", "enabled": true, "amber": false, "cmd": {"type": "till"}, "need": 0})
+	assert_str(ui._keys.key().cost).is_empty()         # LOCK-02 elsewhere: 0 Energy carries no price
+
 func test_an_unavailable_key_toasts_its_reason() -> void:
 	var sent := []
 	ui.action_pressed.connect(func(cmd): sent.append(cmd))

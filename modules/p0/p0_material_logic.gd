@@ -13,8 +13,12 @@ const ENTRANCE := 0
 static func _energy(view: Dictionary) -> int:
 	return int(view.get("energy", {}).get("value", 0))
 
+## Mining's free moves keep "Free" on the key: LOCK-21 and its 10-08 LOCK-02 clarification write `Elevator · Free`,
+## q(46) `Exit mine · Free` / `Floor 1 · Free`, §13.3.8 `Light Torch · Free` (P0Ui drops "Free" elsewhere).
 static func _key(icon: String, verb: String, sub: String, cmd := {}, enabled := true, amber := false, need := 0) -> Dictionary:
-	return {"icon": icon, "verb": verb, "sub": sub, "enabled": enabled, "amber": amber, "cmd": cmd, "need": need}
+	var k := {"icon": icon, "verb": verb, "sub": sub, "enabled": enabled, "amber": amber, "cmd": cmd, "need": need}
+	if sub == "Free": k["show_free"] = true
+	return k
 
 ## A grey key whose press toasts `reason`.
 static func _unavailable(icon: String, verb: String, sub: String, reason: String) -> Dictionary:
