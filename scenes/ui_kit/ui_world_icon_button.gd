@@ -5,11 +5,13 @@ extends Control
 ## facility icon — inside an invisible 44 px touch area. State Near (seats and other sit-on places that grow but never
 ## open a name strip): 2 px color/primary edge and 1.1× scale. With a state (LOCK-11) the whole button becomes the
 ## StatusBadge World 28 instead: the state outranks the facility icon. Display only: a tap on it is a tap on the
-## facility (the host checks hit_rect(), as for UiTapCard).
+## facility (the host checks hit_rect(), as for UiTapCard). Count (Show count, 1749:0): a small tag at the disc's
+## bottom right, like a cell's quantity pill (the Warming Cabinet's 4/6 / Full, q(31); C21).
 
 const _VISUAL := 28.0
 const _ICON := 22.0
 const _NEAR_SCALE := 1.1
+const _COUNT_AT := Vector2(14, 20)   # the count tag in the 28 disc, overhanging its bottom right
 
 ## The facility icon (i-home, i-stall, i-seat …).
 var icon: Texture2D: set = set_icon
@@ -17,10 +19,14 @@ var icon: Texture2D: set = set_icon
 var near := false: set = set_near
 ## A UiStatusBadge.State to show instead of the icon, or -1 for none.
 var status := -1: set = set_status
+## The count tag's text, e.g. "4/6" or "Full"; "" hides it (an empty cabinet hangs none).
+var count := "": set = set_count
 
 var _disc: Panel
 var _glyph: TextureRect
 var _badge: UiStatusBadge
+var _count: Panel
+var _count_label: Label
 
 func _init() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -36,6 +42,18 @@ func _init() -> void:
 	_glyph.size = Vector2(_ICON, _ICON)
 	_glyph.position = (_disc.size - _glyph.size) * 0.5
 	_disc.add_child(_glyph)
+	_count = Panel.new()
+	_count.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_count.position = _COUNT_AT
+	_count.size = Vector2(UiTokens.SIZE_QTY_PILL_W, UiTokens.SIZE_QTY_PILL_H)
+	_count.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_PRIMARY_TINT, UiTokens.SIZE_QTY_PILL_H * 0.5))
+	_count_label = UiKit.label("", UiTokens.STYLE_C10_XB)
+	_count_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_count_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_count_label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_count_label.grow_vertical = Control.GROW_DIRECTION_BOTH
+	_count.add_child(_count_label)
+	_disc.add_child(_count)
 	_refresh()
 
 # Hosts set these every frame (P0Ui.world_icon): an unchanged value does nothing.
@@ -48,6 +66,9 @@ func set_near(v: bool) -> void:
 func set_status(v: int) -> void:
 	if v == status: return
 	status = v; _refresh()
+func set_count(v: String) -> void:
+	if v == count: return
+	count = v; _refresh()
 
 ## The 44 px touch area in global coordinates (the host's _tap_at tests it).
 func hit_rect() -> Rect2: return get_global_rect()
@@ -65,6 +86,8 @@ func _refresh() -> void:
 	box.shadow_offset = Vector2(0, UiTokens.SIZE_SHADOW_FLOAT_OFFSET_Y)
 	_disc.add_theme_stylebox_override(&"panel", box)
 	_glyph.texture = icon
+	_count.visible = count != ""
+	_count_label.text = count
 	scale = Vector2.ONE * (_NEAR_SCALE if near else 1.0)
 	var badged := status >= 0
 	_disc.visible = not badged

@@ -586,7 +586,7 @@ func card_pick(marks: Dictionary) -> String:
 ##   "npc"      {name, head}: the name over the head (NpcNameTag), highlighted while it is the one in reach; `talking`
 ##              keeps it up and highlighted over the greeting card / dialogue bar (P0Ui.npc_tag, #57);
 ##   "seat"     {icon}: an icon button that goes Near, never a strip;
-##   "facility" {icon, name, fact?}: an icon button that opens into a name strip.
+##   "facility" {icon, name, fact?, count?}: an icon button (count: its small count tag) that opens into a name strip.
 ## `badge` on a seat or facility rides in the button / strip (StatusBadge World 28); an NPC's stays a badge.
 func _markers(v: Dictionary) -> void:
 	var now := {}
@@ -610,7 +610,7 @@ func _markers(v: Dictionary) -> void:
 			continue
 		if kind == "facility":
 			if n == _card: rt.ui.name_bar(id, m.icon, str(m.name), str(m.get("fact", "")), screen, true, -1, false, state)
-			else: rt.ui.world_icon(id, m.icon, screen, true, false, state)
+			else: rt.ui.world_icon(id, m.icon, screen, true, false, state, Vector2.INF, str(m.get("count", "")))
 			continue
 		if state >= 0 and rt.ui.has_method("badge"):
 			rt.ui.call("badge", id, state, screen, true, str(m.get("caption", "")), m.get("icon", null))

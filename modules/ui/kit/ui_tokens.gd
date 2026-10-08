@@ -32,6 +32,7 @@ const COLOR_FLOAT_ENERGY_COST := Color("C0563F")
 const COLOR_FLOAT_ENERGY_GAIN := Color("3E7D43")
 const COLOR_FLOAT_XP := Color("17808F")
 const COLOR_GOLD := Color("F0D75E")
+const COLOR_GOLD_DEEP := Color("D9A521")
 const COLOR_GOLD_INK := Color("806C0C")
 const COLOR_INFO := Color("426A88")
 const COLOR_JOYSTICK_RING := Color("FBF8F173")
@@ -405,5 +406,5 @@ const PENDING := {
 	"toast": "sizes read Toast R1 (1178:82265); its tone look (light fills, tone icon, optional action) is not generated yet: ToastPanel and ToastLayer still draw the old dark panel",
 	"entryCard": "EntryCard 1468:94344 (SGODOT-231): radius 16 and padding 8 / 14 / 9 / 14, gap 2, Pointer=Right inset 21 are constants in UiEntryCard until the next token export adds them",
 	"blueprintCard": "BlueprintCard 1434:93844 and the B2-06 Workbench drawer (SGODOT-231): card radius 16, padding 12 / 14, gap 10, icon tile 44 with a 32 icon, material gap 8, the recipe name 16 ExtraBold and the drawer title 22 ExtraBold are constants in UiBlueprintCard / P0WorkbenchDrawer until the next token export adds them",
-	"family": "color/family/* (1726:32854–32857) and color/newInk (1398:92869) were added by hand under the names the exporter gives (SGODOT-226 Cookbook family dots and mightHave, 2026-10-08); the next full export replaces this note",
+	"family": "color/family/* (1726:32854–32857), color/newInk (1398:92869) and color/goldDeep (the Mastered star, C28) were added by hand under the names the exporter gives (SGODOT-226, 2026-10-08); the next full export replaces this note",
 }
