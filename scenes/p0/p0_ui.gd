@@ -39,6 +39,12 @@ var quick_store := "user://p0_quickbar.json"   # per-action pins / removals (tes
 const _KEY_ABOVE_BAR := 40.0        # BAR-1 482:18: ActionKey bottom at y 668, quick bar top at 708
 const _BADGE_CARD_GAP := 4.0        # a finger card over a facility that also shows a badge sits this far above it
 const ACTION_SURFACES := ["farm", "pond", "mine"]   # spaces with the action key group (SGODOT-231: the mine, Mining)
+## A-08 ghost slot per action: [id prefix of the family, ghost icon, noun] (q(44): Seeds / Bait / Torch in P0).
+const GHOST_FAMILY := {
+	"farm": ["seed_", "seed_radish", "Seeds"],
+	"fish": ["bait_", "bait_worm", "Bait"],
+	"mine": ["torch", "torch", "Torch"],
+}
 
 var view: Dictionary = {}
 var root: Control
@@ -472,8 +478,7 @@ func _refresh_bar() -> void:
 	# A-08 ghost: a bar holding nothing of the action's family shows it in the first empty slot; a tap opens the
 	# Bag (ghost_tapped). TODO(SGODOT-225 bag drawer): open on the family tab (Seeds → Seeds, Bait → Tackle) and
 	# flash the slot 600 ms when a real item lands.
-	var family: Array = ["bait_", "bait_worm", "Bait"] if bar_mode == "fish" \
-		else ["torch", "torch", "Torch"] if bar_mode == "mine" else ["seed_", "seed_radish", "Seeds"]   # q(44) ghost words
+	var family: Array = GHOST_FAMILY.get(bar_mode, GHOST_FAMILY.farm)
 	if slots.size() < UiQuickBar.SLOTS and not ids.any(func(id): return str(id).begins_with(family[0])):
 		slots.append({ghost = true, icon = P0Logic.icon(family[1]), title = family[2]})
 	_bar.slots = slots
