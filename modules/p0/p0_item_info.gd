@@ -11,6 +11,8 @@ extends RefCounted
 ##   &"counter_sell"  a counter's Sell here selection (LOCK-15)
 ##   &"gift"          the gift drawer, Bag side only
 ##   &"storage"       a Farm Storage stack in the bag drawer (Take 10 / Take all; take_out {item, qty})
+##   &"workbench"     a recipe's item on the workbench (B2-06, 不知火舞 231 walkthrough): what it does, read only — the
+##                    blueprint card itself has Craft / Equip; no item page behind it (no ›)
 ##
 ## opts (all optional):
 ##   place: String     "home" (own farm / farmhouse), "pond", "outpost" — at-home rules (Store, Sell at home)
@@ -37,7 +39,7 @@ extends RefCounted
 ## (can_store = view.storage, can_lock = bag stacks carry `locked`, can_gift = view.residents / view.social): no
 ## button, no grey text and no lock icon until the field appears (刘邦 / 奕星 2026-10-08).
 
-const CONTEXTS: Array[StringName] = [&"bag", &"gear", &"counter_buy", &"counter_sell", &"gift", &"storage"]
+const CONTEXTS: Array[StringName] = [&"bag", &"gear", &"counter_buy", &"counter_sell", &"gift", &"storage", &"workbench"]
 const RULES_PATH := "res://modules/p0/item_info_rules.json"
 const KINDS := ["seed", "crop", "fish", "dish", "bait", "rod", "pick", "tool"]
 const SEP := " · "
@@ -82,6 +84,8 @@ static func spec(view: Dictionary, item_id: String, context: StringName, opts :=
 	var rule: Dictionary = rules().get("%s/%s" % [kind, context], rules().get("any/%s" % context, {}))
 	# The generic buy row (postcards, Bag Upgrade I) only stands for goods this counter actually sells.
 	if context == &"counter_buy" and not rules().has("%s/%s" % [kind, context]) and _offer(view, item_id, opts).is_empty(): rule = {}
+	# The workbench card stands only for what the workbench makes.
+	if context == &"workbench" and not P0MaterialLogic.EFFECTS.has(item_id): rule = {}
 	var badge: StringName = &"locked" if f.locked else (&"pinned" if f.pinned else &"")
 	var out := {
 		card = not rule.is_empty(),
@@ -90,7 +94,7 @@ static func spec(view: Dictionary, item_id: String, context: StringName, opts :=
 		icon = P0Logic.icon(item_id),
 		title = P0Logic.item_name(view, item_id),
 		quantity = P0Logic.bag_count(view, item_id),
-		info = true,
+		info = context != &"workbench",   # no item page for a workbench item in P0: no dead-end ›
 		rarity = rarity,
 		rarity_text = P0Logic.rarity_name(view, rarity) if rarity > 0 else "",
 		quality = int(it.get("quality", 0)),
@@ -331,10 +335,22 @@ static func tokens(view: Dictionary, item_id: String, context: StringName, opts 
 		# LOCK-29: "1 Stone per rock"; where a pickaxe comes from while it isn't owned (Copper Pickaxe: Workbench).
 		pick_effect = ("%d Stone per rock" % int(rod.stone)) if rod.has("stone") else "",
 		pick_source = str({"start": "Starter", "workbench": "Workbench"}.get(str(rod.get("source", "")), "")) if not rod.get("owned", false) else "",
+		# A workbench item (SGODOT-231 B2-06): its effect line, then In Gear for an owned pickaxe or the gloves' passive note.
+		craft_effect = str(P0MaterialLogic.EFFECTS.get(item_id, "")),
+		craft_note = _craft_note(view, item_id),
 	}
 	var src := str(t.source)
 	t.count_source = ("%s · %s" % [t.count, src]) if src != "" and t.count != "" else ""
 	return t
+
+## The workbench card's second line: an owned pickaxe is In Gear, the Gather Gloves work without a slot (GLOVES-DONE copy).
+static func _craft_note(view: Dictionary, item_id: String) -> String:
+	for r in view.get("workbench", {}).get("recipes", []):
+		if str(r.get("item", "")) != item_id or not r.get("owned", false): continue
+		match str(r.get("to", "")):
+			"gear": return "In Gear"
+			"owned": return "Passive · no gear slot needed"
+	return ""
 
 static func _deliverable(view: Dictionary, item_id: String, target: Dictionary) -> bool:
 	if not target.has("request"): return false

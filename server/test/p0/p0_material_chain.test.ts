@@ -402,6 +402,13 @@ describe('workbench (§13.4, q(31) / q(44))', () => {
     ]);
     expect(w.recipes.find(r => r.id === 'craft_compost')!.gate).toEqual({ skill: 'farming', level: 3, ok: false, xp_to_go: 150 });
   });
+
+  it('Supplies say You have N over the bag and Farm Storage together (B2-06)', () => {
+    const s = fresh();
+    s.storage = { torch: 3 };
+    add(c, s, 'torch', 2);
+    expect(viewOf(c, s, T0).workbench.recipes.find(r => r.id === 'craft_torch')!.have).toBe(5);
+  });
 });
 
 describe('coming home (q(40)) and Timber Run from storage', () => {

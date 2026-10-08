@@ -351,6 +351,31 @@ static func gloves_moment(view: Dictionary) -> Dictionary:
 	return {"title": "Gather Gloves", "line": "+1 at every gathering spot",
 		"fact": "Next Timber harvest: %d" % next, "note": "Passive · no gear slot needed"}
 
+# --- Material sources (NeedSource) ---
+
+## Where a material comes from, for a tapped NEED-TILE (LOCK-10, one line; Show only moves the camera, LOCK-08):
+## `Timber · Timber Grove`, `Copper Ore · Mine floors 1–2` (B2-06 SOURCE; the P0 mine has two floors), `Clay · Clay
+## Bank or Mine floor 1`. `go` is the first source's spot on the farm ("spot_grove", "mine"). {} for anything that is
+## not a material (content.materials) or that no spot or floor yields.
+static func material_source(view: Dictionary, id: String) -> Dictionary:
+	var c := P0Logic.content()
+	if not c.get("materials", {}).has(id): return {}   # bait also comes from the tackle shop: only materials here
+	var spots: Array = []
+	var gather: Dictionary = c.get("gather", {}).get("spots", {})
+	for sid in gather:
+		for y in gather[sid].get("yield", []):
+			if str(y[0]) == id: spots.append(str(sid))
+	var floors: Array = []
+	for f in c.get("mine", {}).get("floors", []):
+		for d in f.get("drops", []):
+			if d[0] != null and str(d[0]) == id: floors.append(int(f.get("floor", 0)))
+	if spots.is_empty() and floors.is_empty(): return {}
+	var where: Array = spots.map(func(sid): return str(gather[sid].get("name", "")))
+	if floors.size() == 1: where.append("Mine floor %d" % floors[0])
+	elif floors.size() > 1: where.append("Mine floors %d–%d" % [floors.min(), floors.max()])
+	return {"text": "%s · %s" % [P0Logic.item_name(view, id), " or ".join(where)],
+		"go": str(spots[0]) if not spots.is_empty() else "mine"}
+
 # --- Workbench (B2-06) ---
 
 ## Effect line under each recipe name (LOCK-29; q(45) gloves sentence; Compost per Li Bai / Anqila, B2-06).
@@ -375,7 +400,8 @@ static func workbench_model(view: Dictionary, tab: String) -> Array:
 		}
 		if str(r.get("to", "")) == "bag":
 			card.yield = "You get %d" % int(r.get("qty", 1))
-			card.have = "You have %d" % int(r.get("have", 0))
+			card.have = "You have %d" % int(r.get("have", 0))   # bag + Farm Storage (server, B2-06)
+		if r.get("owned", false): card.cost = []   # an owned tool turns its materials row off (BlueprintCard main)
 		card.button = _craft_button(r)
 		out.append(card)
 	return out

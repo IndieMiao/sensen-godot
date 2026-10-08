@@ -174,9 +174,36 @@ func tap_card(id: String) -> bool:
 		return true
 	return false
 
-## TODO(SGODOT-231): the B2-06 drawer extends 225's UiDrawer once feat/p0-panels-2b is in; a toast until then.
+## B2-06: the workbench drawer (P0Ui.open_workbench); what a craft shows afterwards is _on_craft's.
 func _open_workbench() -> void:
-	rt.ui.toast("Workbench · coming next")
+	rt.ui.open_workbench()
+
+## A NeedSource Show target this helper owns (a gathering spot, "mine", "workbench"), else null (LOCK-08: Show only
+## moves the camera there).
+func spot_at(where: String) -> Variant:
+	if _spots.has(where): return _spots[where]
+	if where == "mine": return mouth
+	if where == "workbench": return _bench
+	return null
+
+## What one craft shows (B2-06): a Supply stays in the drawer and floats `+2 Torch` on its card (TORCH-DONE; away from
+## the drawer, over the player); the Copper Pickaxe closes the drawer for its `Crafted!` Moment with Equip
+## (PICKAXE-DONE); the Gather Gloves keep the drawer and get the MomentBanner (GLOVES-DONE). The runtime leaves a
+## crafting reply's item floats to this.
+func _on_craft(v: Dictionary, e: Dictionary) -> void:
+	var item := str(e.get("item", ""))
+	match str(e.get("to", "")):
+		"bag":
+			var line := "+%d %s" % [int(e.get("qty", 1)), P0Logic.item_name(v, item)]
+			var drawer := rt.ui.workbench()
+			if drawer == null or drawer.float_on(str(e.get("recipe", "")), line, P0Logic.icon(item)) == null:
+				rt.ui.float_text(line, rt.anchor(), P0Ui.GREEN_D)
+		"gear":
+			if rt.ui.workbench() != null: rt.ui.close_modal()
+			rt.ui.queue_card(func(): P0MaterialCards.open_crafted(rt.ui, rt.session.current(), item,
+				func(cmd: Dictionary): rt.session.send(cmd)))
+		"owned":
+			P0MaterialCards.gloves_banner(rt.ui, v)
 
 ## Commands this helper owns; false lets the farm handle the rest.
 func act(cmd: Dictionary) -> bool:
@@ -193,6 +220,8 @@ func act(cmd: Dictionary) -> bool:
 ## A gather floats what went to storage at the spot (the runtime floats what went to the bag).
 func _on_state(v: Dictionary, events: Array) -> void:
 	if rt.world != farm or _opening: return
+	for e in events:
+		if str(e.get("kind", "")) == "craft": _on_craft(v, e)
 	for e in events:
 		if str(e.get("kind", "")) == "gather":
 			# Stacked above the runtime's own item floats (what went to the bag) at the same anchor, never across them.
