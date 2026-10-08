@@ -307,10 +307,13 @@ func _finish_stand() -> void:
 	if (s.then as Callable).is_valid(): (s.then as Callable).call()
 
 ## Back while seated stands up first: the seat is inside the chair's collider, so the walk to the door
-## would find no path from it. The room has handled Back either way.
+## would find no path from it. Back while already standing up (joystick, a tap) turns that into the walk out
+## (哪吒's review of #14). The room has handled Back either way.
 func is_back_navigation_locked() -> bool:
 	if (seat != "" or not _standing.is_empty()) and not (rt and rt.ui.has_modal()):
-		if seat != "": _stand_up(func(): walk_to("exit"))
+		var out := func(): walk_to("exit")
+		if seat != "": _stand_up(out)
+		else: _standing.then = out
 		return true
 	return super.is_back_navigation_locked()
 

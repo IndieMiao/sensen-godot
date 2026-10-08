@@ -161,3 +161,17 @@ func test_the_keeper_greeting_gets_names_and_places_from_the_outpost_data() -> v
 		"ctx": {"keeper": "Mei", "place": "Xuhui Market Square"}})
 	for o in P0Outposts.all():   # nearest.site keys view.keepers.tackle.next_fish (fishing.sites)
 		if o.has("nearest"): assert_array(["pond", "river"]).contains([str(o.nearest.site)])
+
+func test_back_while_standing_up_from_the_joystick_walks_out_once_standing() -> void:
+	var r := _room("sh_tea_1")
+	var left := [0]
+	r.left.connect(func(): left[0] += 1)
+	_tap(r, "use_tea_table_1")
+	_walk_until_idle(r)
+	r.p0_joystick(Vector2(0, 1))   # stands up, no walk out
+	r.p0_joystick(Vector2.ZERO)
+	assert_bool(r.is_back_navigation_locked()).override_failure_message("Back during sit_up is the room's").is_true()
+	assert_int(left[0]).is_equal(0)
+	for i in 30: r.p0_frame({}, 1.0 / 30.0)   # sit_up ends, then the walk to the door
+	_walk_until_idle(r, 8.0)
+	assert_int(left[0]).is_equal(1)
