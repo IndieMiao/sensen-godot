@@ -304,6 +304,19 @@ func test_the_player_scale_size_is_the_farms_view_at_its_pitch() -> void:
 	assert_float(FarmCamera.player_scale_size(view, 24.8)).is_equal_approx(6.72 * cos(deg_to_rad(24.8)) / cos(deg_to_rad(43.0)), 0.0001)
 	assert_float(FarmCamera.player_scale_size(view, 24.8)).is_greater(FarmCamera.player_scale_size(view, 37.0))
 
+## Camera unification step 2 (用户 2026-10-09: yaw kept at the kits' ~45°, pitch unified): the room looks down at the
+## farm's 43° from its kit's own yaw, so its view width is the farm's (6.72 m on 360 × 800).
+func test_the_room_camera_keeps_its_kits_yaw_at_the_farms_pitch() -> void:
+	var r := _farmhouse()
+	var spec: Dictionary = r.layout.camera
+	var kit := (P0RoomAnchors.vec(spec.position) - P0RoomAnchors.vec(spec.target)).normalized()
+	var dir := -r.cam.global_basis.z * -1.0   # towards the camera
+	assert_float(rad_to_deg(asin(r._cam_dir.y))).is_equal_approx(FarmCamera.PITCH_DEG, 0.01)
+	assert_float(rad_to_deg(atan2(r._cam_dir.x, r._cam_dir.z))).is_equal_approx(rad_to_deg(atan2(kit.x, kit.z)), 0.01)
+	assert_float(rad_to_deg(asin(dir.y))).is_equal_approx(FarmCamera.PITCH_DEG, 0.01)
+	assert_float(r.cam.size).is_equal_approx(FarmCamera.player_scale_size(r._view(), FarmCamera.PITCH_DEG), 0.001)   # the farm's own width
+	assert_vector(P0Room.at_farm_pitch(Vector3(0.0, 1.0, 0.0))).is_equal_approx(Vector3(0.0, sin(deg_to_rad(43.0)), cos(deg_to_rad(43.0))), Vector3.ONE * 0.0001)
+
 ## Camera unification (用户 2026-10-09; 不知火舞 on 226): the farmhouse shows the player at the farm's scale, which
 ## supersedes the whole-room diorama opening; it pans across inside its art, follows the player as they walk, and its
 ## push-ins keep framing from the whole room's width.

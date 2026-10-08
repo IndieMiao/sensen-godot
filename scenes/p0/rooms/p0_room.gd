@@ -378,12 +378,23 @@ func _build_hearth_glow() -> void:
 	room.add_child(glow)
 
 # ---------------------------------------------------------------- camera: the room's accepted view + safe box
+## One camera pitch everywhere (用户 2026-10-09, camera unification step 2): a room keeps its kit's yaw (about 45°, the
+## corner view its art was built for — the user kept it) and distance, and looks down at the farm's pitch
+## (FarmCamera.PITCH_DEG) instead of its kit's 25–37°. All three spaces are orthographic, so with the farm's player
+## scale (frame_all) the picture is the farm's too. The kit's own camera stays for the reviewcam shot step.
+static func at_farm_pitch(dir: Vector3) -> Vector3:
+	var flat := Vector2(dir.x, dir.z)
+	flat = flat.normalized() if flat.length() > 0.001 else Vector2(0.0, 1.0)
+	var p := deg_to_rad(FarmCamera.PITCH_DEG)
+	return Vector3(flat.x * cos(p), sin(p), flat.y * cos(p))
+
 func _build_camera() -> void:
 	var spec: Dictionary = layout.get("camera", {})
 	if spec.has("position") and spec.has("target"):
 		var off := P0RoomAnchors.vec(spec.position) - P0RoomAnchors.vec(spec.target)
 		_cam_dir = off.normalized()
 		_cam_dist = off.length()
+	_cam_dir = at_farm_pitch(_cam_dir)
 	_cam_size = float(spec.get("size", _cam_size))
 	cam = Camera3D.new()
 	cam.name = "RoomCamera"
@@ -959,6 +970,15 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"at":
 			var m := anchor(step[1])
 			if m: actor.teleport(Vector3(m.global_position.x, floor_y, m.global_position.z))
+		"wholeview":   # the whole room in view at this camera (shots: the art review's panorama, exposed backs)
+			var view := _view()
+			var need := maxf((_bounds_hi.x - _bounds_lo.x) / FRAME_W, (_bounds_hi.y - _bounds_lo.y) / (FRAME_H * view.y / maxf(view.x, 1.0)))
+			_zoom = _cam_size / maxf(need, 0.01)
+			var forward := -_cam_dir
+			var right := forward.cross(Vector3.UP).normalized()
+			_focus = _on_floor(right, right.cross(forward).normalized(), forward, (_bounds_lo + _bounds_hi) * 0.5)
+			_follow.hold()
+			_update_camera()
 		"atedge":   # atedge:top|bottom|left|right — the walkable spot nearest the floor's corner furthest that way (shots)
 			var forward := -_cam_dir
 			var right := forward.cross(Vector3.UP).normalized()

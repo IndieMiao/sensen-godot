@@ -353,6 +353,8 @@ func test_a_tap_on_an_npc_name_tag_is_that_npc() -> void:
 		r.rt = rt
 		for n in r.npcs:
 			r.actor.position = r.anchor(n).global_position + Vector3(0.6, 0, 0.6)   # beside them: no strip open over the tags
+			r._focus = r.actor.position   # walked there: the view came along (a room taller than the band follows down too)
+			r._update_camera()
 			r._markers({})
 			var tag: UiNpcNameTag = rt.ui._npc_tags.get("room:" + n)
 			assert_bool(tag != null and tag.visible and not bool(tag.get_meta("covered", false))) \
