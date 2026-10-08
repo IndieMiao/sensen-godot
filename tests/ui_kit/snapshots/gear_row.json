@@ -4,7 +4,7 @@
     0,
     0,
     328,
-    267
+    281
   ],
   "children": [
     {
@@ -35,7 +35,7 @@
         0,
         52,
         328,
-        215
+        229
       ],
       "children": [
         {
@@ -149,7 +149,7 @@
                         15
                       ],
                       "variation": "C10B",
-                      "text": "Lands up to Fine fish"
+                      "text": "Lands up to Fine fish · Bite window 2.2 s"
                     }
                   ]
                 }
@@ -235,7 +235,7 @@
                         15
                       ],
                       "variation": "C10B",
-                      "text": "Lands up to Rare fish · Bite window +0.4 s"
+                      "text": "Lands up to Rare fish · Bite window 2.6 s"
                     }
                   ]
                 },
@@ -247,7 +247,7 @@
                     65,
                     44
                   ],
-                  "variation": "CmdSecondaryCompact",
+                  "variation": "CmdPrimaryCompact",
                   "text": "Equip"
                 }
               ]
@@ -321,7 +321,7 @@
                         15
                       ],
                       "variation": "C10B",
-                      "text": "Fishing Lv5 · Tackle Shop"
+                      "text": "Fishing Lv6 · 350 coins at the Tackle Shop"
                     },
                     {
                       "type": "Label",
@@ -339,6 +339,17 @@
               ]
             }
           ]
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            267,
+            328,
+            14
+          ],
+          "variation": "C9B",
+          "text": "locked · P1 only (BAG-2 lists Starter and Reed in P0)"
         }
       ]
     }

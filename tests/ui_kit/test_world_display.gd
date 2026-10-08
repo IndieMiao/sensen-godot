@@ -73,8 +73,12 @@ func test_need_source_pops_above_the_tile_and_show_only_runs_the_guide() -> void
 	var pill: UiNeedSource = layer.get_child(0)
 	assert_float(pill.get_global_rect().end.y).is_less_equal(anchor.position.y)
 	assert_bool(pill.get_global_rect().position.x >= UiTokens.SPACE_PAGE).is_true()
-	var show_btn: UiCommandButton = pill.find_children("*", "UiCommandButton", true, false)[0]
+	var show_btn: UiShowPill = pill.find_children("*", "UiShowPill", true, false)[0]
 	assert_bool(show_btn.visible).is_true()
+	assert_float(show_btn.size.y).is_equal(31.0)   # NeedSource main: Show 65 × 31, card 45 high
+	assert_float(show_btn.size.x).is_equal_approx(65.0, 2.0)
+	assert_float(pill.size.y).override_failure_message("card %s show %s" % [pill.size, show_btn.size]).is_equal_approx(45.0, 1.5)   # 6 + 31 + 6 + the 1 px border (Figma rounds 31.2)
+	assert_bool(show_btn._has_point(Vector2(32, -6))).is_true()   # touch area reaches 44 around the pill
 	show_btn.pressed.emit()
 	await _settle()
 	assert_array(shown).is_equal([true])
@@ -86,7 +90,7 @@ func test_need_source_without_a_target_hides_show() -> void:
 	_host(host)
 	var layer := UiNeedSource.popup(host, Rect2(100, 300, 60, 60), "Pond Crucian · Ponds on the map")
 	await _settle()
-	var show_btn: UiCommandButton = layer.find_children("*", "UiCommandButton", true, false)[0]
+	var show_btn: UiShowPill = layer.find_children("*", "UiShowPill", true, false)[0]
 	assert_bool(show_btn.visible).is_false()
 	var box: UiStyleBox = (layer.get_child(0) as UiNeedSource).get_theme_stylebox(&"panel")
 	assert_that(box.shadow_color).is_equal(UiTokens.COLOR_SHADOW_MENU)   # floats over the world like the main
@@ -133,6 +137,9 @@ func test_hud_rows_read_today_and_the_actual_place() -> void:
 	await _settle()
 	assert_array(_labels(hud)).contains(["Today · Radishes ready in 1h 12m", "Tokyo · ", " · Day Pass 23h"])
 	assert_str(UiHud.place_text(hud.data.place)).is_equal("Tokyo · Arrived · Day Pass 23h")
+	# LOCK-06 v1.9: Helping wins over the pass; an expired pass leaves no third segment
+	assert_str(UiHud.place_text({city = "Tokyo", space = "Mia's Farm", day_pass = "3h", helping = true})).is_equal("Tokyo · Mia's Farm · Helping")
+	assert_str(UiHud.place_text({city = "Tokyo", space = "Sumida Pond", day_pass = ""})).is_equal("Tokyo · Sumida Pond")
 	# the space is truncated first and always shows its "…" (Godot alone only adds it once 6 letters fit)
 	var space: Label = hud._place_space
 	assert_str(space.text).ends_with("…")
@@ -201,11 +208,13 @@ func test_today_panel_has_at_most_three_rows_and_show_only_where_given() -> void
 	assert_int(p.row_count()).is_equal(UiTodayPanel.MAX_ROWS)
 	assert_array(_labels(p)).not_contains(["Fourth line"])
 	assert_array(_labels(p)).contains(["needs 2 Energy · +1 in 2:41"])
-	var pills := p.find_children("*", "UiCommandButton", true, false)
+	var pills := p.find_children("*", "UiShowPill", true, false)
 	assert_int(pills.size()).is_equal(2)                  # a done row shows its tick, not Show
+	assert_float((pills[0] as UiShowPill).size.y).is_equal(28.0)   # TodayRow main: Show 55 × 28
+	assert_float((pills[0] as UiShowPill).size.x).is_equal_approx(55.0, 2.5)
 	var picked := []
 	p.show_pressed.connect(func(i): picked.append(i))
-	(pills[1] as UiCommandButton).pressed.emit()
+	(pills[1] as UiShowPill).pressed.emit()
 	assert_array(picked).is_equal([1])
 	assert_float(p.size.x).is_equal(float(UiTokens.SIZE_TODAY_PANEL_W))
 
@@ -216,7 +225,7 @@ func _facts(home := true) -> Dictionary:
 		wait = "Wait · Full in 13h 20m", tiles = [
 			{label = "Eat", fact = "3 dishes in bag", guide = "Open bag", go = "bag", on = true},
 			{label = "Cook", fact = "At home" if not home else "4 fish in creel", guide = "Show kitchen", go = "stove", on = home},
-			{label = "Tea", fact = "Tea House opens later", guide = "", go = "", on = false},
+			{label = "Tea", fact = "0/3 today · 40 coins", guide = "Show on map", go = "outpost:tea", on = true},
 			{label = "Rest", fact = "At home" if not home else "Available", guide = "Show home", go = "home", on = home},
 		]}
 
@@ -241,7 +250,7 @@ func test_energy_tiles_only_guide_and_grey_out_with_the_reason() -> void:
 	var gone := []
 	card.tile_pressed.connect(func(go): gone.append(go))
 	for t in card.find_children("*", "UiEnergyTile", true, false): (t as UiEnergyTile).pressed.emit()
-	assert_array(gone).is_equal(["bag"])                  # Cook / Rest are At home away from home, Tea later
+	assert_array(gone).is_equal(["bag", "outpost:tea"])   # Cook / Rest are At home away from home; Tea is on the map
 	var texts := _labels(card)
 	assert_int(texts.count("At home")).is_equal(2)
 	assert_array(texts).not_contains(["Show kitchen ›", "Show home ›"])

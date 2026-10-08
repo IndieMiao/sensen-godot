@@ -113,6 +113,7 @@ func refresh() -> void:
 			c.marked = bool(it.get("marked", false))
 			c.kitchen_state = int(it.get("kitchen_state", UiItemCell.KitchenState.DEFAULT))
 			c.rack = bool(it.get("rack", false))
+			c.stored = bool(it.get("stored", false))
 		else:
 			c.icon = null
 			c.quantity = ""
@@ -121,6 +122,7 @@ func refresh() -> void:
 			c.marked = false
 			c.kitchen_state = UiItemCell.KitchenState.DEFAULT
 			c.rack = false
+			c.stored = false
 	if selected_id != "" and _item(selected_id).is_empty():
 		clear_selection()
 	else:

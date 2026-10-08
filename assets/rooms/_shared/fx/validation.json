@@ -1,0 +1,23 @@
+{
+  "checks": [
+    "Borrow existing light without replacing owner/name",
+    "Three independent GPU emitters",
+    "Default hearth is 16 flames + 4 sparks, <=20",
+    "30Hz and full-lifetime warmup: Flames",
+    "No collision or shadow: Flames",
+    "Explicit AABB: Flames",
+    "30Hz and full-lifetime warmup: Sparks",
+    "No collision or shadow: Sparks",
+    "Explicit AABB: Sparks",
+    "30Hz and full-lifetime warmup: Smoke",
+    "No collision or shadow: Smoke",
+    "Explicit AABB: Smoke",
+    "Bounded animated light, no extra writer"
+  ],
+  "count": 13,
+  "light_max": 3.34452295303345,
+  "light_min": 2.96054315567017,
+  "passed": true,
+  "renderer": "mobile",
+  "self_contained": true
+}

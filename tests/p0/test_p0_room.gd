@@ -203,6 +203,13 @@ func _farmhouse(level := 1) -> P0Room:
 	auto_free(r)
 	return r
 
+## Show from inside the farmhouse (亚瑟 on #37): the stove is the room's own spot; farm targets are not, so the
+## runtime steps out to the farm and shows them there.
+func test_farmhouse_has_the_stove_spot_but_not_the_farms() -> void:
+	var r := _farmhouse()
+	assert_bool(r.p0_has_spot("stove")).is_true()
+	for where in ["plots", "stall", "bench", "home"]: assert_bool(r.p0_has_spot(where)).override_failure_message(where).is_false()
+
 func test_farmhouse_opens_on_the_stove_corner_with_a_door_back_to_the_farm() -> void:
 	var r := _farmhouse()
 	for n in ["use_stove_1", "drop_pot_1", "badge_stove_1", "stand_stove", "cam_stove", "spawn", "exit"]:
@@ -224,6 +231,9 @@ func test_the_room_has_one_hearth_lamp_ahead_of_the_art() -> void:
 	assert_int(lamps.size()).is_equal(1)
 	assert_int(lamps[0].get_index()).is_less(r.art.get_index())
 	assert_object(r.room.get_node_or_null("HearthGlow")).is_not_null()
+	# …and the fire drives that very lamp (its light_path is relative to the fire node, Hou Yi's review on #32).
+	var fire: Node = r.art.get("fire")
+	assert_object(fire.get_node_or_null(fire.get("light_path"))).is_same(r.room.get_node("HearthGlow"))
 
 func test_the_kitchen_corner_grows_with_the_homestead() -> void:
 	# Lv1: no Spice Rack, no Warming Cabinet (props hidden, their anchors absent, nothing to tap).
@@ -320,3 +330,51 @@ func test_pushed_in_stove_clears_the_cooking_drawer_on_a_360_by_800_screen() -> 
 	var pot := r.cam.unproject_position(r.anchor("drop_pot_1").global_position).y
 	assert_float(pot).is_greater(P0Room.HUD_BOTTOM)
 	assert_float(pot).is_less(drawer_top - 80.0)   # slot bar (50) and preview (26) sit above the drawer
+
+# ---------------------------------------------------------------- environment and backdrop (SGODOT-248 / 249)
+## The real farm scene and its suspend() / resume(), without the farm's _ready (runtime, session, world build).
+func _farm_under() -> Node3D:
+	var stub := GDScript.new()
+	stub.source_code = "extends \"res://scenes/p0/p0_farm.gd\"\nfunc _ready() -> void: pass\nfunc _exit_tree() -> void: pass\n"
+	stub.reload()
+	var farm: Node3D = load("res://scenes/p0/p0_farm.tscn").instantiate()
+	farm.set_script(stub)
+	add_child(farm)
+	auto_free(farm)
+	return farm
+
+func test_the_farm_hands_its_environment_to_the_farmhouse_above_it() -> void:
+	# The viewport lights with the first WorldEnvironment in the tree: unless the farm lets go of its own, the
+	# farmhouse shows the farm's cool ambient and green backdrop (hand test 249).
+	var farm := _farm_under()
+	var farm_env: Environment = farm.world_env.environment
+	assert_object(farm_env).is_not_null()
+	farm.suspend()
+	assert_object(farm.world_env.environment).is_null()
+	# Its canvas backdrop (layer −1, BG_CANVAS only) would otherwise cover the room's colour background.
+	assert_bool(farm.get_node("FarmBackground").visible).is_false()
+	var r := _farmhouse()
+	await get_tree().process_frame
+	assert_object(r.get_viewport().find_world_3d().environment).is_same(r.environment)
+	r.suspend()
+	farm.resume()
+	await get_tree().process_frame
+	assert_object(farm.world_env.environment).is_same(farm_env)
+	assert_object(farm.get_viewport().find_world_3d().environment).is_same(farm_env)
+	assert_bool(farm.get_node("FarmBackground").visible).is_true()
+	farm.suspend()
+	farm.suspend()   # twice in a row still keeps the farm's own
+	farm.resume()
+	assert_object(farm.world_env.environment).is_same(farm_env)
+
+func test_a_room_is_opaque_over_the_map() -> void:
+	# The map's root is transparent so its tiles show; a room pushed above it must not let them through (248).
+	var was := get_viewport().transparent_bg
+	get_viewport().transparent_bg = true
+	var r := _farmhouse()
+	assert_bool(r.get_viewport().transparent_bg).is_false()
+	r.suspend()
+	get_viewport().transparent_bg = true   # the map underneath on its own resume
+	r.resume()
+	assert_bool(r.get_viewport().transparent_bg).is_false()
+	get_viewport().transparent_bg = was

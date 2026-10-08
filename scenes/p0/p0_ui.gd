@@ -10,14 +10,25 @@ signal action_pressed(cmd: Dictionary)
 signal seed_selected(seed_id: String)
 signal command(cmd: Dictionary)
 signal dev_skip(minutes: int)
-signal zoom(factor: float)
+## A pinch step about a screen point (the two-finger centre, or the mouse for a wheel tick).
+signal zoom(factor: float, at: Vector2)
+## The fingers lifted after a pinch (or a wheel tick ended): the scene springs back if past a zoom limit.
+signal zoom_end
 signal show_spot(where: String)
+## A target in another space (TodayRow `Show on map`): leave for the map and point at its pin ("home",
+## "pond:<id>", "tackle").
+signal show_on_map(target: String)
 signal home_choice(choice: String)
 signal recenter()
 signal place_pressed()
 signal home_requested()        # FISH-4 "Go home · Free"
 signal tackle_requested()      # FISH-5 rod variant "Tackle Shop"
 
+const _RESIDENT_SHEET_H := 443.0   # RES-PIP: Sheet 443 of 800
+const _CLOSE_ABOVE_SHEET := 6.0    # RES-PIP: Close · 44 px sits 6 above the sheet, 16 in from the right
+const _CLOSE_ABOVE_CARD := 8.0     # RES-KAI-TALK: 8 above the dialogue bar, flush with its right edge
+const _AFFINITY_INSET := 8.0       # RES-KAI-TALK: the affinity float sits 8 in from the bar's left edge …
+const _AFFINITY_ABOVE := 6.0       # … and 6 above its top
 const PAPER := Color("fbf8f1")
 const CARD := Color(0.984, 0.973, 0.945, 0.94)
 const EDGE := Color("e1dac8")
@@ -35,20 +46,45 @@ const GOLD := Color("e9c35e")        # kit-cook --gold-light → --gold
 const GOLD_D := Color("c9962a")
 const RED := Color("e07a5f")         # --energy-red
 const XP := Color("1f8c88")          # --xp-deep (floating XP)
+var quick_store := "user://p0_quickbar.json"   # per-action pins / removals (tests point it elsewhere)
+const _KEY_ABOVE_BAR := 40.0        # BAR-1 482:18: ActionKey bottom at y 668, quick bar top at 708
+const _BADGE_CARD_GAP := 4.0        # a finger card over a facility that also shows a badge sits this far above it
+const ACTION_SURFACES := ["farm", "pond", "mine"]   # spaces with the action key group (SGODOT-231: the mine, Mining)
+## A-08 ghost slot per action: [id prefix of the family, ghost icon, noun] (q(44): Seeds / Bait / Torch in P0).
+const GHOST_FAMILY := {
+	"farm": ["seed_", "seed_radish", "Seeds"],
+	"fish": ["bait_", "bait_worm", "Bait"],
+	"mine": ["torch", "torch", "Torch"],
+}
 
 var view: Dictionary = {}
 var root: Control
 var pad: Control
 var hud: UiHud                   # two-row HUD (SGODOT-222, LOCK-06)
 var _place_text := "Shanghai · Homestead"
-var _fab: Control
-var _fab_icon: TextureRect
-var _fab_verb: Label
-var _fab_sub: Label
 var _fab_state: Dictionary = {}
 var fab_held := false            # §14.2: hold the main action to keep sowing along a row
 var fab_verb := ""
-var _bar_box: HBoxContainer
+## SGODOT-221 world controls (UI kit, own theme layer): quick bar, action key group, radial, finger cards, badges.
+var _kit: Control
+var _bar: UiQuickBar
+var _keys: UiActionKey
+var _radial: UiActionRadial
+var _undo_toast: UiUndoToast
+var _cards := {}          # id -> UiTapCard
+var _card_hits := {}      # id -> screen point a tap on the card forwards to the world (the facility's own tap point)
+var _badges := {}         # id -> UiStatusBadge
+## The finger card a `tapped` comes from, only while that signal is being handled ("" for a scene tap).
+var tapped_card := ""
+var _quick := {}          # per action: {pins: [], removed: []}, saved in quick_store (LOCK-05: 每个行动各记各的)
+var _bar_sig := []        # last state pushed to the bar, so the per-frame refresh only rebuilds on change
+var _auto_pick := true    # pick the first slot once when an action is entered (§10.3.3 ①), not after a deselect
+var _mode_tool: Texture2D  # the current action's own tool icon for the key badge (set_action `tool` overrides per key)
+## MAP-1 keeps only Bag at the bottom of the map. The P0 map still carries the old Map / Farm / Me dock and its
+## zoom column where Bag would sit, so the map turns this on when that dock leaves (with the new HUD, SGODOT-222).
+## TODO(MAP-1, follow-up PR after #11 and #12, reviewed by 刘邦): p0_map drops the old dock and sets map_bag = true.
+## Not part of PR #12 (奕星 2026-10-08).
+var map_bag := false
 var _bar_ids: Array = []
 var selected_seed := ""
 var selected_bait := ""
@@ -59,6 +95,11 @@ var surface := "farm"
 ## Set by the runtime: true when the current world can move its camera to a spot (p0_show_spot). Show
 ## buttons (Today, NeedSource) only appear then, so a Show never closes a panel and does nothing (LOCK-08).
 var can_show_spot := Callable()
+## The resident id within reach in an outpost, "" elsewhere (the runtime asks the world's p0_near_resident).
+var near_resident := Callable()
+## Where the player is (the session's space: home = the farm and the farmhouse, pond, outpost, mine, map); set by
+## the runtime on every attach. "" without a runtime (tests, the gallery): space_here() then goes by the surface.
+var space := ""
 var _hud_world := true   # set_surface: the map has no HUD
 var _hud_hash := 0       # last state given to hud.apply
 var _hud_need := -1      # main action's Energy need last seen by the HUD
@@ -67,11 +108,10 @@ var _dev_box: Control
 var _creel: PanelContainer
 var _creel_count: Label
 var _creel_free: Label
-var _fab_dot: Control
 var _fab_pills: HBoxContainer
-var _fab_badge: TextureRect
-var _switch: Button
-var player_screen := Vector2(180, 320)   # set by the farm each frame: the radial fans out from the character
+var _status: PanelContainer     # SGODOT-231 mine status line (Rocks 2/6), where the creel sits while fishing
+var _status_text: Label
+var player_screen := Vector2(180, 320)   # set by the farm / pond each frame (mid-body): the radial fans out from it
 var _modal: Control
 var modal_kind := ""            # "stall", "bag", "kitchen", "card", ... — which drawer is open
 var _kitchen_tab := "cookbook"
@@ -80,7 +120,6 @@ var _card_queue: Array = []
 var _teach: PanelContainer
 var _teach_left := 0.0
 var _taught := {}
-var _tags := {}
 var _toast: Label
 var _toast_left := 0.0
 var _regular: FontVariation
@@ -115,6 +154,7 @@ func _ready() -> void:
 	if _pending.has("mode"): set_mode(_pending.mode)
 	if _pending.has("place"): set_place(_pending.place)
 	set_surface(_pending.get("surface", surface))
+	if _pending.has("status"): set_status_line(_pending.status)
 	_pending.clear()
 
 func _process(dt: float) -> void:
@@ -154,47 +194,51 @@ func _build_hud() -> void:
 	root.add_child(_creel)
 
 func _build_bar() -> void:
-	_bar_box = HBoxContainer.new()
-	_bar_box.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
-	_bar_box.position = Vector2(10, -41 - 53)
-	_bar_box.add_theme_constant_override("separation", 4)
-	root.add_child(_bar_box)
+	# Phase 1A world controls (SGODOT-221) sit in their own layer with the UI kit theme; the other P0 panels
+	# keep the old GameUi theme until phase 2 rebuilds them.
+	_kit = Control.new()
+	_kit.theme = UiKit.theme()
+	_kit.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_kit.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(_kit)
+	_load_quick()
+	_bar = UiQuickBar.new()
+	_bar.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+	_kit.add_child(_bar)
+	_bar.slot_tapped.connect(_on_slot_tapped)
+	_bar.ghost_tapped.connect(func(_i: int): open_bag())
+	_bar.pin_toggled.connect(_on_pin_toggled)
+	_bar.slots_swapped.connect(_on_slots_swapped)
+	_bar.slot_removed.connect(_on_slot_removed)
+	_bar.bag_requested.connect(func(): open_bag())
+	_bar.close_requested.connect(close_modal)
+	_bar.handle_tapped.connect(open_radial)
+	_status = PanelContainer.new()
+	_status.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_SURFACE, UiTokens.RADIUS_CHIP,
+		UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT).with_margins(8, 3, 8, 3))
+	_status.position = _creel.position
+	_status.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_status_text = UiKit.label("", UiTokens.STYLE_C11_XB)
+	_status.add_child(_status_text)
+	_status.hide()
+	_kit.add_child(_status)   # kit theme for the C11XB type style
 
 func _build_fab() -> void:
-	_fab = _Fab.new()
-	_fab.ui = self
-	_fab.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
-	_fab.size = Vector2(59, 59)
-	_fab.position = Vector2(-10 - 59, -41 - 53 - 14 - 59)
-	var v := VBoxContainer.new()
-	v.set_anchors_preset(Control.PRESET_FULL_RECT)
-	v.alignment = BoxContainer.ALIGNMENT_CENTER
-	v.add_theme_constant_override("separation", 0)
-	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_fab_icon = _icon("sow", 20)
-	_fab_icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	v.add_child(_fab_icon)
-	_fab_verb = _label("Sow", 10, INK, true)
-	_fab_verb.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	v.add_child(_fab_verb)
-	_fab_sub = _label("", 7, INK2)
-	_fab_sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	v.add_child(_fab_sub)
-	_fab.add_child(v)
-	var badge := PanelContainer.new()
-	badge.add_theme_stylebox_override("panel", _box(PAPER, 10, GREEN_D, 1, Vector4(2, 2, 2, 2)))
-	badge.position = Vector2(-4, -4)
-	badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_fab_badge = _icon("hoe", 13)
-	badge.add_child(_fab_badge)
-	_fab.add_child(badge)
-	_fab_dot = _Dot.new()
-	_fab_dot.position = Vector2(12, -6)
-	_fab_dot.size = Vector2(7, 7)
-	_fab_dot.hide()
-	_fab.add_child(_fab_dot)
-	root.add_child(_fab)
-	# FISH-4: two pills above the switch while the creel is full.
+	_keys = UiActionKey.new()
+	_keys.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
+	_kit.add_child(_keys)
+	# Touch-down fires like the shipped key; holding keeps fab_held up so the farm repeats along a row (§14.2).
+	_keys.key().pressed_down.connect(func():
+		fab_held = true
+		_fab_pressed())
+	_keys.key().released.connect(func(): fab_held = false)
+	_keys.switch_pressed.connect(open_radial)
+	_mode_tool = P0Logic.icon("rod" if bar_mode == "fish" else "hoe")   # set_mode skips the mode it starts in
+	_keys.tool_icon = _mode_tool
+	_radial = UiActionRadial.new()
+	_kit.add_child(_radial)
+	_radial.picked.connect(func(id: String): if id != bar_mode: set_mode(id))
+	# FISH-4: two pills above the switch key while the creel is full.
 	_fab_pills = HBoxContainer.new()
 	_fab_pills.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
 	_fab_pills.grow_horizontal = Control.GROW_DIRECTION_BEGIN
@@ -208,27 +252,35 @@ func _build_fab() -> void:
 		b.add_theme_font_size_override("font_size", 10)
 		b.custom_minimum_size = Vector2(0, 32)
 		_fab_pills.add_child(b)
-	# Right-aligned to the screen margin, 8 px above the switch; grows left to fit both pills.
-	var pills_bottom := -41.0 - 53 - 14 - 59 - 8 - 32 - 8
-	_fab_pills.offset_right = -10
-	_fab_pills.offset_left = -11
-	_fab_pills.offset_bottom = pills_bottom
-	_fab_pills.offset_top = pills_bottom - 32
 	_fab_pills.hide()
 	root.add_child(_fab_pills)
-	var sw := Button.new()
-	_switch = sw
-	sw.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
-	sw.position = Vector2(-10 - 46, -41 - 53 - 14 - 59 - 8 - 32)
-	sw.custom_minimum_size = Vector2(32, 32)
-	sw.size = Vector2(32, 32)
-	sw.icon = P0Logic.icon("hoe")
-	sw.expand_icon = true
-	sw.add_theme_stylebox_override("normal", _box(Color(0.92, 0.92, 0.9, 0.9), 16, EDGE, 1, Vector4(6, 6, 6, 6)))
-	sw.add_theme_stylebox_override("pressed", _box(Color(0.85, 0.85, 0.82, 0.9), 16, EDGE, 1, Vector4(6, 6, 6, 6)))
-	for k in ["icon_normal_color", "icon_hover_color", "icon_pressed_color", "icon_focus_color"]: sw.add_theme_color_override(k, Color.WHITE)
-	sw.pressed.connect(open_radial)
-	root.add_child(sw)
+	_place_controls()
+
+## Bottom controls per BAR-1: bar at x 12, 24 above the safe bottom; the action group 16 from the right edge,
+## 40 above the bar; the creel pills 8 above the group.
+func _place_controls() -> void:
+	var bottom := UiTokens.SIZE_QUICK_BAR_BOTTOM + safe_bottom()
+	_bar.offset_left = UiTokens.SIZE_QUICK_BAR_X
+	_bar.offset_right = UiTokens.SIZE_QUICK_BAR_X + UiTokens.SIZE_QUICK_BAR_W
+	_bar.offset_bottom = -bottom
+	_bar.offset_top = -bottom - UiTokens.SIZE_QUICK_BAR_H
+	var key_bottom := bottom + UiTokens.SIZE_QUICK_BAR_H + _KEY_ABOVE_BAR
+	_keys.offset_right = -UiTokens.SPACE_PAGE
+	_keys.offset_left = -UiTokens.SPACE_PAGE - UiTokens.SIZE_ACTION_KEY_W
+	_keys.offset_bottom = -key_bottom
+	_keys.offset_top = -key_bottom - UiTokens.SIZE_ACTION_KEY_H
+	if _teach:
+		# The one-line teaching card sits above the quick bar and left of the action key group, clear of both
+		# (PR #12 review fix 5), with the safe area already in `bottom`.
+		_teach.offset_left = UiTokens.SPACE_PAGE
+		_teach.offset_right = -(UiTokens.SPACE_PAGE + UiTokens.SIZE_ACTION_KEY_W + UiTokens.SPACE_OVERLAY_BODY)
+		_teach.offset_bottom = -(bottom + UiTokens.SIZE_QUICK_BAR_H + UiTokens.SPACE_OVERLAY_BODY)
+		_teach.offset_top = _teach.offset_bottom
+	var pills_bottom := key_bottom + UiTokens.SIZE_ACTION_KEY_H + UiTokens.SPACE_OVERLAY_BODY
+	_fab_pills.offset_right = -UiTokens.SPACE_PAGE
+	_fab_pills.offset_left = -UiTokens.SPACE_PAGE - 1
+	_fab_pills.offset_bottom = -pills_bottom
+	_fab_pills.offset_top = -pills_bottom - 32
 
 func _build_dev() -> void:
 	var box := HBoxContainer.new()
@@ -247,7 +299,7 @@ func _build_dev() -> void:
 # ---------------------------------------------------------------- refresh
 func set_view(v: Dictionary) -> void:
 	view = v
-	if _bag != null and is_instance_valid(_bag) and modal_kind in ["bag", "gear"]: _bag.refresh(v)
+	if _bag != null and is_instance_valid(_bag) and modal_kind in ["bag", "gear", "gift"]: _bag.refresh(v)
 	if _profile != null and is_instance_valid(_profile) and modal_kind == "profile": _profile.update(v)
 	_refresh_hud()
 	_refresh_bar()
@@ -288,6 +340,15 @@ func set_place(text: String) -> void:
 	_place_text = text
 	_refresh_hud()
 
+## One status line under the HUD where the creel sits while fishing (SGODOT-231: the mine's "Rocks 2/6", "Run 1/2
+## today" for its first 3 s). "" hides it; changing action clears it.
+func set_status_line(text: String) -> void:
+	if not is_node_ready():
+		_pending["status"] = text   # the mine sets it on its first frame, maybe before the HUD exists (苏烈, #39)
+		return
+	if _status_text.text != text: _status_text.text = text
+	_status.visible = text != "" and surface in ACTION_SURFACES
+
 ## Which world the HUD sits on (§10.2.4): action spaces show everything; rooms are facility spaces
 ## (no quick bar, main action or switch key); the map shows only toasts and cards.
 func set_surface(name: String) -> void:
@@ -295,19 +356,30 @@ func set_surface(name: String) -> void:
 	if not is_node_ready():
 		_pending["surface"] = name
 		return
-	var action := name in ["farm", "pond"]
+	var action := name in ACTION_SURFACES
 	var world := name != "map"
 	_hud_world = world
 	hud.visible = world and not view.is_empty()
 	hud.show_balances = name != "busy"   # a busy world's own close button sits in the coins / bell corner
 	pad.visible = world
-	_fab.visible = action and _modal == null
-	_fab_pills.visible = _fab.visible and bool(_fab_state.get("creel_full", false))
-	_switch.visible = action
-	_bar_box.visible = action and _modal == null
+	_keys.visible = action and _modal == null
+	_fab_pills.visible = _keys.visible and bool(_fab_state.get("creel_full", false))
+	_bar.visible = _bar_shown() and (_modal == null or is_bar_docked())   # docked in the bag drawer it stays
+	_bar.bag_only = not action
+	_bar_sig = []
+	if _radial.visible: _radial.close()
+	_bar.cancel_drag()   # no lifted slot or drop zones left over when fishing starts or the map opens
 	_creel.visible = action and bar_mode == "fish"
+	_status.visible = action and _status_text.text != ""
 	if _dev_box: _dev_box.visible = world
-	for t in _tags.values(): (t as Control).visible = false
+	for c in _cards.values(): (c as Control).visible = false
+	for b in _badges.values(): (b as Control).visible = false
+	_flush_held_toast()
+
+## Action spaces show the full bar. Rooms (farmhouse kitchen, outposts) and the map keep only Bag, with no action
+## or switch key (MAP-1, §10.3.5, o(8)); the map waits for map_bag. Busy worlds hide it.
+func _bar_shown() -> bool:
+	return surface in ACTION_SURFACES or surface == "room" or (surface == "map" and map_bag)
 
 func set_mode(mode: String, place := "") -> void:
 	if place != "": set_place(place)
@@ -317,17 +389,26 @@ func set_mode(mode: String, place := "") -> void:
 	if mode == bar_mode: return
 	bar_mode = mode
 	_bar_ids = []
-	for c in _bar_box.get_children(): c.queue_free()
-	_bar_box.get_children().map(func(c): _bar_box.remove_child(c))
-	_fab_badge.texture = P0Logic.icon("rod" if mode == "fish" else "hoe")
-	_switch.icon = P0Logic.icon("rod" if mode == "fish" else "hoe")
+	_bar_sig = []
+	_auto_pick = true
+	# SGODOT-231: the mine shows the pickaxe; set_action's `tool` swaps in the equipped one.
+	_mode_tool = P0Logic.icon("rod" if mode == "fish" else "pickaxe" if mode == "mine" else "hoe")
+	_keys.tool_icon = _mode_tool
 	_creel.visible = mode == "fish"
+	set_status_line("")
 	_refresh_bar()
 
 func _refresh_bar() -> void:
-	var ids := P0Logic.quick_bar(view, [] if _bar_ids.is_empty() else _bar_ids, bar_mode)
+	var store := _quick_for(bar_mode)
+	# SGODOT-231: Mining's bar holds only what helps underground (a torch); seeds and bait never show there.
+	var ids := P0MaterialLogic.mine_bar(view, _bar_ids, store.pins, store.removed) if bar_mode == "mine" \
+		else P0Logic.quick_bar(view, _bar_ids, bar_mode, store.pins, store.removed)
 	if bar_mode == "fish":
 		if selected_bait != "" and not ids.has(selected_bait): selected_bait = ""
+		# The last bait went on a hook: the slot stays pinned at 0, the hook goes empty (李白 q(44) ④).
+		if selected_bait != "" and P0Logic.bag_count(view, selected_bait) <= 0:
+			toast_when_clear("Out of %s · no bait on the hook" % P0Logic.item_name(view, selected_bait))
+			selected_bait = ""
 		var free := int(view.get("bag", {}).get("free", 0))
 		_creel_count.text = P0Logic.creel_line(view).get_slice(" · ", 0)
 		_creel_free.text = "%d free" % free
@@ -336,99 +417,272 @@ func _refresh_bar() -> void:
 		_creel.add_theme_stylebox_override("panel", _box(GOLD if full else CARD, 11, GOLD_D if full else EDGE, 1, Vector4(6, 3, 8, 3)))
 	else:
 		if selected_seed != "" and not ids.has(selected_seed): selected_seed = ""
-		if selected_seed == "" and not ids.is_empty():
-			selected_seed = str(ids[0])
+		# A pinned seed sown to 0 stays on the bar but is deselected: the key reads Sow · Pick a seed and a held
+		# row stops there (李白 q(44) ③, PR #12 review fix 2).
+		if selected_seed != "" and P0Logic.bag_count(view, selected_seed) <= 0:
+			selected_seed = ""
+			seed_selected.emit("")
+		# First slot on entering the action (§10.3.3 ①); a deliberate deselect stays deselected. Farming only: a
+		# torch is chosen on purpose, like bait (§13.3.8: the key stays Mine).
+		var stocked := ids.filter(func(id): return str(id) != "" and P0Logic.bag_count(view, str(id)) > 0)
+		if _auto_pick and bar_mode == "farm" and selected_seed == "" and not stocked.is_empty():
+			selected_seed = str(stocked[0])
 			seed_selected.emit(selected_seed)
-	if ids == _bar_ids and _bar_box.get_child_count() > 0:
-		_update_bar_counts()
-		return
+		if ids.any(func(id): return str(id) != ""): _auto_pick = false
 	_bar_ids = ids
-	for c in _bar_box.get_children(): c.queue_free()
-	for i in 5:
-		var slot := _slot(str(ids[i]) if i < ids.size() else "")
-		_bar_box.add_child(slot)
-	var bag := Button.new()
-	bag.custom_minimum_size = Vector2(53, 53)
-	bag.text = "Bag"
-	bag.icon = P0Logic.icon("bag")
-	bag.expand_icon = false
-	bag.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
-	bag.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	bag.add_theme_font_size_override("font_size", 10)
-	bag.add_theme_constant_override("icon_max_width", 22)
-	_style_button(bag, PAPER, EDGE, 11)
-	bag.pressed.connect(open_bag)
-	_bar_box.add_child(bag)
+	var bag: Dictionary = view.get("bag", {})
+	var counts := ids.map(func(id): return P0Logic.bag_count(view, str(id)) if str(id) != "" else 0)
+	var used := _bag_slots().size()
+	var sig := [bar_mode, ids, counts, store.pins.duplicate(), selected_bait if bar_mode == "fish" else selected_seed,
+		used * 10 >= int(bag.get("capacity", 25)) * 9, modal_kind in ["bag", "gear"]]
+	if sig == _bar_sig: return
+	_bar_sig = sig
+	var slots := []
+	for i in ids.size():
+		var id := str(ids[i])
+		if id == "": slots.append({})   # a gap left by a drag-remove (LOCK-05 v1.10): no item, no pin
+		else: slots.append({id = id, icon = P0Logic.icon(id), title = P0Logic.item_name(view, id), quantity = counts[i], pinned = store.pins.has(id)})
+	# A-08 ghost (LOCK-04): a bar with nothing of this action in stock shows the action's family in the first empty
+	# slot; a slot pinned at 0 is not stock (int5b hand test 9), Compost alone is. The first gap a drag-remove left
+	# takes it (LOCK-05 v1.10), else the free end; five occupied slots leave no room, so no ghost. A tap opens the Bag
+	# (ghost_tapped). TODO(SGODOT-225 bag drawer): open on the family tab (Seeds → Seeds, Bait → Tackle).
+	var family: Array = GHOST_FAMILY.get(bar_mode, GHOST_FAMILY.farm)   # q(44): Seeds / Bait / Torch
+	if not counts.any(func(n): return int(n) > 0):
+		var ghost := {ghost = true, icon = P0Logic.icon(family[1]), title = family[2]}
+		var gap := slots.find({})
+		if gap >= 0: slots[gap] = ghost
+		elif slots.size() < UiQuickBar.SLOTS: slots.append(ghost)
+	_bar.slots = slots
+	_bar.selected = sig[4]
+	_bar.capacity_warning = sig[5]
+	_bar.bag_open = sig[6]
 
-func _update_bar_counts() -> void:
-	for i in mini(_bar_ids.size(), 5):
-		var slot := _bar_box.get_child(i)
-		var cnt := slot.find_child("Count", true, false) as Label
-		if cnt: cnt.text = "×%d" % P0Logic.bag_count(view, str(_bar_ids[i]))
-		slot.set_meta("selected", str(_bar_ids[i]) == (selected_bait if bar_mode == "fish" else selected_seed))
-		slot.queue_redraw()
+func _on_slot_tapped(id: String) -> void:
+	# A slot at 0 can't be picked; a light buzz says so (李白 q(44) ③), and a toast too: the release Journey build
+	# has no vibrate permission (PR #12 re-review). The copy is the slot's refill hint (§10.3.3).
+	if P0Logic.bag_count(view, id) <= 0 and id != selected_seed and id != selected_bait:
+		if _bar.haptics and OS.has_feature("mobile"): Input.vibrate_handheld(10)
+		toast("Craft at Workbench" if bar_mode == "mine" else "Buy at Homestead Stall")   # q(44) refill hints
+		return
+	if bar_mode == "fish":
+		# Tapping bait only sets the current bait (0 Energy, nothing consumed); tap again to fish without bait.
+		selected_bait = "" if selected_bait == id else id
+		toast(("%s on the hook · used at the bite" % P0Logic.item_name(view, id)) if selected_bait != "" else "No bait")
+	else:
+		# Select, tap again to clear (§10.3.4); the main action then asks for a seed.
+		selected_seed = "" if selected_seed == id else id
+		seed_selected.emit(selected_seed)
+	_refresh_bar()
 
-func _slot(seed_id: String) -> Control:
-	var slot := _Slot.new()
-	slot.custom_minimum_size = Vector2(53, 53)
-	slot.set_meta("selected", seed_id != "" and seed_id == (selected_bait if bar_mode == "fish" else selected_seed))
-	if seed_id == "":
-		slot.set_meta("ghost", true)
-		return slot
-	var col := VBoxContainer.new()
-	col.set_anchors_preset(Control.PRESET_FULL_RECT)
-	col.offset_left = 3
-	col.offset_right = -3
-	col.offset_top = 3
-	col.offset_bottom = -2
-	col.add_theme_constant_override("separation", 0)
-	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var ic := _icon(seed_id, 24)
-	ic.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	col.add_child(ic)
-	var row := HBoxContainer.new()
-	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var nm := _label(P0Logic.item_name(view, seed_id).replace(" Seeds", ""), 7, INK, true)
-	nm.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	nm.clip_text = true
-	row.add_child(nm)
-	var cnt := _label("×%d" % P0Logic.bag_count(view, seed_id), 8, INK, true)
-	cnt.name = "Count"
-	row.add_child(cnt)
-	col.add_child(row)
-	slot.add_child(col)
-	slot.gui_input.connect(func(e: InputEvent):
-		if P0Ui.is_tap(e):
-			if bar_mode == "fish":
-				# Tapping bait only sets the current bait (0 Energy, nothing consumed); tap again to fish without bait.
-				selected_bait = "" if selected_bait == seed_id else seed_id
-				toast(("%s on the hook · used at the bite" % P0Logic.item_name(view, seed_id)) if selected_bait != "" else "No bait")
-			else:
-				selected_seed = seed_id
-				seed_selected.emit(seed_id)
-			_update_bar_counts())
-	return slot
+## Dropped on the Pin / Unpin zone (LOCK-05 v1.11): the pin flips; the bar pops the badge, no PinMenu, no toast.
+func _on_pin_toggled(id: String, pinned: bool) -> void:
+	_set_pin(id, pinned)
 
-## Main action button state from P0Logic.main_action().
+func _set_pin(id: String, pinned: bool) -> void:
+	var store := _quick_for(bar_mode)
+	store.pins.erase(id)
+	if pinned:
+		store.pins.append(id)
+		store.removed.erase(id)
+	_save_quick()
+	_refresh_bar()
+
+## Drag onto another slot: the two swap places only; pins follow their items, nothing is pinned by it and no menu
+## shows (LOCK-05 v1.11, 221 b0a83924). Onto a gap it simply moves there.
+func _on_slots_swapped(a: int, b: int) -> void:
+	while _bar_ids.size() <= maxi(a, b): _bar_ids.append("")
+	var t = _bar_ids[a]
+	_bar_ids[a] = _bar_ids[b]
+	_bar_ids[b] = t
+	_save_quick()
+	_refresh_bar()
+
+## Dropped on the remove zone: off the bar, still in the Bag (§10.3.4); its slot stays a gap, nothing refills it
+## (LOCK-05 v1.10 BAR-DRAG-4), and an Info toast `<Item> off the bar · Undo` (5 s) puts it back, pin and place.
+func _on_slot_removed(id: String) -> void:
+	var store := _quick_for(bar_mode)
+	var was := {id = id, index = _bar_ids.find(id), pinned = store.pins.has(id), mode = bar_mode}
+	store.pins.erase(id)
+	if not store.removed.has(id): store.removed.append(id)
+	if was.index >= 0: _bar_ids[was.index] = ""
+	if selected_seed == id: selected_seed = ""
+	if selected_bait == id: selected_bait = ""
+	_save_quick()
+	_refresh_bar()
+	_show_undo_toast(was)
+
+func _show_undo_toast(was: Dictionary) -> void:
+	if _undo_toast: _undo_toast.queue_free()
+	_undo_toast = UiUndoToast.new("%s off the bar" % P0Logic.item_name(view, str(was.id)))
+	_undo_toast.theme = UiKit.theme()
+	# Over the bar it came off: on the scene, or over the bag drawer's top row when the bar is docked there (the
+	# drawer and its scrim sit above the scene layer, so it goes on the drawer's layer then; 刘邦 on #38).
+	(_modal if is_bar_docked() and _modal != null else _kit).add_child(_undo_toast)
+	# Its height is only known once the message has wrapped at the card's width: refit then, keeping the bottom edge.
+	var t := _undo_toast
+	t.minimum_size_changed.connect(func(): if is_instance_valid(t): t.reset_size())
+	t.resized.connect(_place_undo_toast)
+	t.reset_size()
+	_place_undo_toast()
+	_undo_toast.undo_pressed.connect(func(): _undo_remove(was))
+
+## BAR-DRAG-4: left 16 (the page margin), its bottom SPACE_WITHIN over the bar's top edge, wherever the bar is.
+func _place_undo_toast() -> void:
+	if _undo_toast == null or not is_instance_valid(_undo_toast): return
+	_undo_toast.global_position = Vector2(_kit.global_position.x + UiTokens.SPACE_PAGE,
+		_bar.get_global_rect().position.y - UiTokens.SPACE_WITHIN - _undo_toast.size.y)
+
+func _undo_remove(was: Dictionary) -> void:
+	var store := _quick_for(str(was.mode))
+	var id := str(was.id)
+	store.removed.erase(id)
+	if bool(was.pinned) and not store.pins.has(id): store.pins.append(id)
+	if str(was.mode) == bar_mode:
+		var i := int(was.index)
+		if i >= 0 and i < _bar_ids.size() and str(_bar_ids[i]) == "": _bar_ids[i] = id
+		elif not _bar_ids.has(id): _bar_ids.insert(clampi(i, 0, _bar_ids.size()), id)
+	_save_quick()
+	_bar_sig = []
+	_refresh_bar()
+
+# ---------------------------------------------------------------- the bag drawer's way onto the bar (SGODOT-225, q(61))
+## The action whose bar takes this item ("farm": seeds and fertiliser, "fish": bait), or "" when none does.
+func bar_action_of(id: String) -> String: return P0Logic.bar_action_of(id)
+
+## The bar on screen takes this item (a seed never goes on the Fishing bar).
+func accepts(id: String) -> bool: return bar_action_of(id) != "" and bar_action_of(id) == bar_mode
+
+## Pinned on its own action's bar.
+func is_pinned(id: String) -> bool:
+	var mode := bar_action_of(id)
+	return mode != "" and _quick_for(mode).pins.has(id)
+
+## False when its action already has every slot pinned and it is not one of them (the detail card then greys Pin
+## out: `Bar full · Unpin one first`), or when no bar takes it.
+func can_pin(id: String) -> bool:
+	var mode := bar_action_of(id)
+	if mode == "": return false
+	var pins: Array = _quick_for(mode).pins
+	return pins.has(id) or pins.size() < UiQuickBar.SLOTS
+
+## Detail card Pin / a bag item dropped on the Pin zone: pinned on its own action's bar. On the bar now showing it
+## takes the first gap, else the free end, else the last unpinned slot (that item leaves the bar, not "removed");
+## on another action's bar it is only recorded and leads that bar next time. Clears it from "removed".
+func pin_to(id: String) -> bool:
+	if not can_pin(id): return false
+	var mode := bar_action_of(id)
+	var store := _quick_for(mode)
+	store.removed.erase(id)
+	if not store.pins.has(id): store.pins.append(id)
+	if mode == bar_mode and not _bar_ids.has(id):
+		var hole := _bar_ids.find("")
+		if hole >= 0: _bar_ids[hole] = id
+		elif _bar_ids.size() < UiQuickBar.SLOTS: _bar_ids.append(id)
+		else:
+			for k in range(_bar_ids.size() - 1, -1, -1):
+				if not store.pins.has(_bar_ids[k]):
+					_bar_ids[k] = id
+					break
+	_save_quick()
+	if mode == bar_mode: _refresh_bar()
+	return true
+
+## Detail card Unpin: stays where it is until the bar refills.
+func unpin(id: String) -> void:
+	var mode := bar_action_of(id)
+	if mode == "": return
+	_quick_for(mode).pins.erase(id)
+	_save_quick()
+	if mode == bar_mode: _refresh_bar()
+
+## A bag item dropped on slot `index` of the bar on screen: placed there, not pinned (q(61)). A gap or the free end
+## just takes it; an occupied slot's item leaves the bar with its pin and is not "removed"; an item already on the
+## bar swaps places with that slot. Clears it from this action's "removed". False when this bar does not take it.
+func place_at(index: int, id: String) -> bool:
+	if not accepts(id) or index < 0 or index >= UiQuickBar.SLOTS: return false
+	var store := _quick_for(bar_mode)
+	store.removed.erase(id)
+	while _bar_ids.size() <= index: _bar_ids.append("")
+	var there := str(_bar_ids[index])
+	var from := _bar_ids.find(id)
+	if from >= 0:
+		_bar_ids[from] = there
+	elif there != "":
+		store.pins.erase(there)
+	_bar_ids[index] = id
+	_save_quick()
+	_refresh_bar()
+	return true
+
+func quick_bar_node() -> UiQuickBar: return _bar
+
+var _bar_dock: Control = null
+var _bar_home_index := 0
+
+## The bag drawer's top row is this same bar, pushed up by the drawer (LOCK-04; plan §10.4): moved into `container`
+## at its 336 × 68, drop zones opening below it. Any drag in progress is cancelled.
+func dock_bar_into(container: Control) -> void:
+	if container == null or _bar_dock == container: return
+	_bar.cancel_drag()
+	_bar.set_drop_target(-1)
+	_bar_home_index = _bar.get_index()
+	_bar.get_parent().remove_child(_bar)
+	container.add_child(_bar)
+	_bar.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	_bar.custom_minimum_size = Vector2(UiTokens.SIZE_QUICK_BAR_W, UiTokens.SIZE_QUICK_BAR_H)
+	_bar.zones_below = true
+	_bar_dock = container
+
+## Back to its own place over the scene; a no-op when not docked. Every modal close comes through _drop_modal.
+func undock_bar() -> void:
+	if _bar_dock == null: return
+	_bar.cancel_drag()
+	_bar.set_drop_target(-1)
+	if is_instance_valid(_bar.get_parent()): _bar.get_parent().remove_child(_bar)
+	_kit.add_child(_bar)
+	_kit.move_child(_bar, mini(_bar_home_index, _kit.get_child_count() - 1))
+	_bar.custom_minimum_size = Vector2.ZERO
+	_bar.zones_below = false
+	_bar.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+	_bar_dock = null
+	_place_controls()
+
+func is_bar_docked() -> bool: return _bar_dock != null
+
+func _quick_for(mode: String) -> Dictionary:
+	if not _quick.has(mode): _quick[mode] = {pins = [], removed = []}
+	return _quick[mode]
+
+func _load_quick() -> void:
+	if not FileAccess.file_exists(quick_store): return
+	var data = JSON.parse_string(FileAccess.get_file_as_string(quick_store))
+	if not data is Dictionary: return
+	for mode in data:
+		var d: Dictionary = data[mode]
+		_quick[mode] = {pins = Array(d.get("pins", [])), removed = Array(d.get("removed", []))}
+
+func _save_quick() -> void:
+	var f := FileAccess.open(quick_store, FileAccess.WRITE)
+	if f: f.store_string(JSON.stringify(_quick))
+
+## Main action key from P0Logic.main_action() / fish_action() (LOCK-02).
+## TODO(SGODOT-221 → stage 3, F-08 command lifecycle): drive HOLDING (hold_progress) and PENDING from the command
+## queue; P0 has no source for them yet.
 func set_action(a: Dictionary) -> void:
 	_fab_state = a
-	_fab_icon.texture = P0Logic.icon(str(a.get("icon", "sow")))
-	_fab_verb.text = str(a.get("verb", ""))
-	_fab_sub.text = str(a.get("sub", ""))
-	var full := bool(a.get("creel_full", false))
-	# FISH-4: the greyed key carries the whole reason in three small lines under a smaller icon.
-	_fab_sub.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART if full else TextServer.AUTOWRAP_OFF
-	_fab_sub.custom_minimum_size.x = 51.0 if full else 0.0
-	_fab_sub.size_flags_horizontal = Control.SIZE_SHRINK_CENTER if full else Control.SIZE_FILL
-	_fab_sub.add_theme_font_size_override("font_size", 6 if full else 7)
-	_fab_verb.add_theme_font_size_override("font_size", 9 if full else 10)
-	_fab_icon.custom_minimum_size = Vector2(14, 14) if full else Vector2(20, 20)
-	_fab_icon.modulate = Color(1, 1, 1, 0.55) if full else Color.WHITE
-	_fab_dot.visible = full
-	_fab_pills.visible = full and _fab.visible
-	_fab_verb.add_theme_color_override("font_color", AMBER_D if a.get("amber", false) else (INK if a.get("enabled", false) else INK2))
-	_fab.set_meta("state", a)
-	_fab.queue_redraw()
+	var k := _keys.key()
+	k.verb = str(a.get("verb", ""))
+	var sub := str(a.get("sub", ""))
+	# Zero-Energy actions carry no price (LOCK-02 "0 体力的动作不写价"); reasons and costs stay.
+	# Mining's free moves keep it (show_free: LOCK-21 `Elevator · Free`, SGODOT-231).
+	k.cost = "" if int(a.get("need", 0)) == 0 and sub == "Free" and not a.get("show_free", false) else sub
+	if a.get("amber", false): k.state = UiSceneAction.State.INSUFFICIENT
+	elif not a.get("enabled", false): k.state = UiSceneAction.State.UNAVAILABLE
+	else: k.state = UiSceneAction.State.DEFAULT
+	# The equipped tool in the key's badge (SGODOT-231: Starter / Copper Pickaxe at the mine mouth and inside); a key
+	# without one shows the action's own tool, so the farm's Sow after the mouth is a hoe again (walkthrough fix).
+	_keys.tool_icon = P0Logic.icon(str(a.tool)) if a.has("tool") else _mode_tool
+	_fab_pills.visible = bool(a.get("creel_full", false)) and _keys.visible
 	var need := int(a.get("need", 0))
 	if need != _hud_need:   # the worlds call set_action every frame
 		_hud_need = need
@@ -436,7 +690,10 @@ func set_action(a: Dictionary) -> void:
 
 func _fab_pressed() -> void:
 	fab_verb = ""
-	if not _fab_state.get("enabled", false) or _modal != null: return
+	if _modal != null: return
+	if not _fab_state.get("enabled", false):
+		if _fab_state.has("toast"): toast(str(_fab_state.toast))   # SGODOT-231: unavailable keys say why (LOCK-10)
+		return
 	fab_verb = str(_fab_state.get("verb", ""))
 	action_pressed.emit(_fab_state.get("cmd", {}))
 
@@ -444,20 +701,118 @@ func _fab_pressed() -> void:
 func fab_state() -> Dictionary: return _fab_state
 
 # ---------------------------------------------------------------- world tags & floats
-func tag(id: String, text: String, screen: Vector2, show: bool, lit := false) -> void:
-	var t: Label = _tags.get(id)
-	if t == null:
-		t = _label("", 10, INK, true)
-		t.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		root.add_child(t)
-		root.move_child(t, 1)
-		_tags[id] = t
-	t.visible = show and _modal == null
-	if not t.visible: return
-	t.text = text
-	t.add_theme_stylebox_override("normal", _box(Color("e6f4df") if lit else CARD, 11, GREEN_D if lit else EDGE, 1, Vector4(8, 3, 8, 3)))
-	t.reset_size()
-	t.position = screen - Vector2(t.size.x * 0.5, t.size.y + 6)
+## Facility finger card (TapCard 1135:101133, LOCK-07 / LOCK-17): bottom centre `SPACE_WITHIN` above `screen`,
+## kept inside the screen with its pointer still on the facility. Tapping the card is tapping the facility: it
+## forwards `hit` (the facility's own tap point; defaults to `screen`) to the world as a tap. The card is passive:
+## the scene pad under it gets the press, so a drag that starts on a card is the joystick, and only the pad's real
+## tap (GestureArbiter thresholds) on the card's 44 px hit rect counts (_tap_at, PR #12 review fix 3).
+func tag(id: String, text: String, screen: Vector2, show: bool, hit := Vector2.INF) -> void:
+	var c: UiTapCard = _cards.get(id)
+	if c == null:
+		c = UiTapCard.new()
+		c.passive = true
+		_kit.add_child(c)
+		_kit.move_child(c, 0)
+		_cards[id] = c
+	c.visible = show and _modal == null
+	if not c.visible: return
+	_card_hits[id] = screen if hit == Vector2.INF else hit
+	c.text = text
+	_place_marker(c, screen, true)
+
+## Facility / resident state mark (StatusBadge 1132:79554, STATE-ICONS): display only, the facility takes the tap.
+## A scene tap: on a shown finger card it is that facility's tap, elsewhere the world's (also a double tap: a card
+## never recenters the camera by accident). Returns true for a card tap, which then can't start a double tap either.
+func _tap_at(global_pos: Vector2, double: bool) -> bool:
+	for id in _cards:
+		var c: UiTapCard = _cards[id]
+		if c.is_visible_in_tree() and c.hit_rect().has_point(global_pos):
+			if _modal == null:
+				# The world sees which card it was (tapped_card) as well as the facility's point, so another facility's
+				# mark over that point can't take the tap (PR #21 review: the farmhouse card under the sign's caption).
+				tapped_card = str(id)
+				tapped.emit(_card_hits[id])
+				tapped_card = ""
+			return true
+	if double: recenter.emit()
+	else: tapped.emit(global_pos - root.global_position)
+	return false
+
+func badge(id: String, state: UiStatusBadge.State, screen: Vector2, show: bool, caption := "", icon: Texture2D = null) -> void:
+	var b: UiStatusBadge = _badges.get(id)
+	if b == null:
+		b = UiStatusBadge.new()
+		b.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_kit.add_child(b)
+		_kit.move_child(b, 0)
+		_badges[id] = b
+	b.visible = show and _modal == null
+	if not b.visible: return
+	b.state = state
+	b.caption = caption
+	b.icon = icon
+	_place_marker(b, screen, false)
+
+## Height a shown badge takes over `screen`, so a finger card over the same facility can sit above it.
+func badge_height(id: String) -> float:
+	var b: UiStatusBadge = _badges.get(id)
+	return b.get_combined_minimum_size().y + _BADGE_CARD_GAP if b and b.visible else 0.0
+
+## True when a scene tap lands on a shown badge (with its caption): badges ignore the mouse, so the facility that
+## owns one tests this to treat a tap on its mark as its own (StatusBadge: tapping the badge = tapping the object).
+func badge_hit(id: String, screen: Vector2) -> bool:
+	var r := badge_rect(id)
+	return r.has_area() and r.grow(4).has_point(screen)
+
+## Slide a shown finger card sideways off `avoid` (another facility's mark), keeping `gap` px between them; the
+## pointer stays on its facility (TapCard Pointer=Left / Right), and the card stays on screen. Returns whether it moved.
+## TODO(亚瑟, world controls): 不知火舞's general rule for marks under cards (SGODOT-228 293b4190) replaces this.
+func slide_card_off(id: String, avoid: Rect2, gap := 8.0) -> bool:
+	var c: UiTapCard = _cards.get(id)
+	if c == null or not c.is_visible_in_tree() or not avoid.has_area(): return false
+	var r := Rect2(c.position, c.size)
+	if not r.grow(gap).intersects(avoid): return false
+	var left := avoid.position.x - gap - r.end.x     # move this much (negative) to clear on the left
+	var right := avoid.end.x + gap - r.position.x    # or this much to clear on the right
+	var dx := left if absf(left) <= absf(right) else right
+	var inner := Rect2(Vector2.ZERO, _kit.size).grow(-UiTokens.SPACE_WITHIN)
+	var x := clampf(r.position.x + dx, inner.position.x, inner.end.x - r.size.x)
+	if is_equal_approx(x, r.position.x): return false
+	var aim: float = (_card_hits.get(id, r.get_center()) as Vector2).x
+	c.position.x = x
+	c.point_at(aim - x)
+	return true
+
+## A shown finger card's rect in root coordinates; empty when hidden.
+func card_rect(id: String) -> Rect2:
+	var c: UiTapCard = _cards.get(id)
+	return Rect2(c.global_position - root.global_position, c.size) if c != null and c.is_visible_in_tree() else Rect2()
+
+## A shown badge's rect (with its caption) in root coordinates; empty when hidden.
+func badge_rect(id: String) -> Rect2:
+	var b: UiStatusBadge = _badges.get(id)
+	return Rect2(b.global_position - root.global_position, b.size) if b != null and b.is_visible_in_tree() else Rect2()
+
+## Finger cards stay on screen (their facility is near, so on screen); a badge over an off-screen facility hides.
+func _place_marker(m: Control, screen: Vector2, clamp_inside: bool) -> void:
+	var size := m.get_combined_minimum_size()
+	var area := _marker_area()
+	var r := WorldAnchor.place(size, screen - Vector2(0, UiTokens.SPACE_WITHIN), area, UiTokens.SPACE_WITHIN, clamp_inside)
+	m.visible = r.has_area()
+	if not m.visible: return
+	m.size = size
+	m.position = r.position
+	if m.has_method(&"point_at"): m.point_at(screen.x - r.position.x)
+
+## Where world markers may sit (LOCK-07): below the two-row HUD and above the quick bar. A finger card is passive, so
+## one lying under a HUD chip lost its tap to the chip (int5 hand test 8: the Homestead card slid under Energy and
+## opened the Energy panel); a card clamps into this band instead, a badge outside it hides.
+func _marker_area() -> Rect2:
+	var top := 0.0
+	if hud and hud.visible: top = UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H + safe_top()
+	var bottom := _kit.size.y
+	if _bar.visible: bottom = minf(bottom, _bar.position.y)
+	return Rect2(0.0, top, _kit.size.x, maxf(0.0, bottom - top))
 
 func float_text(text: String, screen: Vector2, color: Color) -> void:
 	var l := _label(text, 12, color, true)
@@ -478,13 +833,69 @@ func toast(text: String, seconds := 2.6) -> void:
 	_toast_left = seconds
 
 # ---------------------------------------------------------------- modals
-func has_modal() -> bool: return _modal != null
+## Going to the background cancels a slot drag: the slot flies back, nothing changes (LOCK-04 v1.10).
+func _notification(what: int) -> void:
+	if what in [NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_APPLICATION_FOCUS_OUT] and _bar != null: _bar.cancel_drag()
+
+## Android Back closes what is on top first, one layer per press (LOCK-06, int5 hand test 012–013 / 023–024): the
+## a quick slot being dragged (it flies back, LOCK-04 v1.11; the PinMenu is gone), the radial, then a card or
+## drawer. True when it closed something; the world only leaves on false.
+func close_top_layer() -> bool:
+	if _bar != null and (_bar.is_dragging() or _bar.is_lifted()):   # lifted and not moved yet counts too (刘邦 on #38)
+		_bar.cancel_drag()
+		return true
+	if _radial.visible:
+		_radial.close()
+		return true
+	if _modal != null:
+		back_modal()
+		return true
+	return false
+
+## What Back and a scrim tap do to the open layer: its own way back when it has one (a layer opened from the
+## resident bar returns to the bar, as its own Close does), else close it (亚瑟 on #37).
+var _modal_back := Callable()
+
+func back_modal() -> void:
+	if _modal_back.is_valid():
+		var back := _modal_back
+		_modal_back = Callable()
+		back.call()
+	else:
+		close_modal()
+
+## A world change ends the stick: a finger still down when the farmhouse door took the player in never sends its
+## release to this pad (int5 hand test 029–030), so its ring would stay and the old world keep walking.
+## The first attach (a world booted as the root scene, P0Runtime.ensure) runs before this UI's _ready built the pad:
+## there is no stick to end yet (哪吒: `end_stick` on Nil at every farm start).
+func end_stick() -> void:
+	if pad != null: (pad as _TouchPad).end_stick()
+	joystick.emit(Vector2.ZERO)
+
+func has_modal() -> bool: return _modal != null or (_radial != null and _radial.visible)
 
 func close_modal() -> void:
 	_drop_modal()
 	if not _card_queue.is_empty():
 		var next: Callable = _card_queue.pop_front()
 		next.call_deferred()
+	else:
+		_flush_held_toast()
+
+## A toast that must not be lost under the fishing presentation (layer 30, over this layer) or a result card: the
+## last bait goes at the reel's settlement, while the panel still shows the landing (int5b hand test 10). Shown at
+## once when nothing covers the UI, else held until the world is back from "busy" and no card is open or queued.
+var _held_toast := ""
+
+func toast_when_clear(text: String) -> void:
+	_held_toast = text
+	_flush_held_toast()
+
+func _flush_held_toast() -> void:
+	if _held_toast == "" or not is_node_ready(): return
+	if surface == "busy" or _modal != null or not _card_queue.is_empty(): return
+	toast(_held_toast)
+	_held_toast = ""
 
 ## Result cards (catch, dish, level up) wait their turn instead of replacing each other.
 func queue_card(show: Callable) -> void:
@@ -492,22 +903,26 @@ func queue_card(show: Callable) -> void:
 	else: _card_queue.append(show)
 
 func _drop_modal() -> void:
+	_modal_back = Callable()   # each layer sets its own way back after it opens
+	_bag_drag_end()   # a bag cell lifted toward the bar goes with its drawer
+	undock_bar()   # before the drawer holding it goes (SGODOT-225)
 	if _modal: _modal.queue_free()
 	_modal = null
 	var was_kitchen := modal_kind == "kitchen"
 	modal_kind = ""
 	if was_kitchen: _refresh_hud()   # back out of the farmhouse
-	_fab.visible = surface in ["farm", "pond"]
-	_bar_box.visible = surface in ["farm", "pond"]
-	_fab_pills.visible = _fab.visible and bool(_fab_state.get("creel_full", false))
+	_keys.visible = surface in ACTION_SURFACES
+	_bar.visible = _bar_shown()
+	_fab_pills.visible = _keys.visible and bool(_fab_state.get("creel_full", false))
 
 func _open_modal(content: Control, dim := 0.32, hide_controls := false) -> void:
+	_bar.cancel_drag()   # a drawer or card opening cancels a slot drag (LOCK-04 v1.10)
 	_drop_modal()
 	var veil := ColorRect.new()
 	veil.set_anchors_preset(Control.PRESET_FULL_RECT)
 	veil.color = Color(0.184, 0.227, 0.2, dim)
 	veil.gui_input.connect(func(e: InputEvent):
-		if P0Ui.is_tap(e): close_modal())
+		if P0Ui.is_tap(e): back_modal())
 	var holder := Control.new()
 	holder.set_anchors_preset(Control.PRESET_FULL_RECT)
 	holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -523,9 +938,9 @@ func _open_modal(content: Control, dim := 0.32, hide_controls := false) -> void:
 	root.add_child(holder)
 	_modal = holder
 	if hide_controls:
-		_fab.visible = false
+		_keys.visible = false
 		_fab_pills.visible = false
-		_bar_box.visible = false
+		_bar.visible = false
 
 ## Bottom system inset (gesture bar, rounded corners) in UI units; 0 on desktop.
 func safe_bottom() -> float:
@@ -575,7 +990,7 @@ func open_bag(focus := "", side := "") -> void:
 	var d := P0BagDrawer.new(view, bag_side, focus)
 	d.theme = UiKit.theme()
 	d.safe_bottom = safe_bottom()
-	d.place = "pond" if surface in ["pond", "busy"] else "home"
+	d.place = space_here()   # home only at the homestead: an outpost room is a room, not home (亚瑟 on #37)
 	d.set_gear_slot(gear_slot)
 	d.close_requested.connect(close_modal)
 	d.side_changed.connect(func(s: String):
@@ -583,14 +998,117 @@ func open_bag(focus := "", side := "") -> void:
 		modal_kind = "bag" if s == "bag" else "gear")
 	d.gear_slot_changed.connect(func(k: String): gear_slot = k)
 	d.action_requested.connect(_bag_action)
+	d.unavailable_requested.connect(_bag_unavailable)
+	d.near = near_resident_info()
+	d.pinned = func(id: String) -> bool: return is_pinned(id)
+	d.bar_full = func(id: String) -> bool: return bar_action_of(id) != "" and not can_pin(id)
+	d.grid.cell_gesture.connect(_on_bag_cell)
+	if focus != "" and d.grid.selected_id == focus: d.grid.select(focus)   # the card again, with place and near set
 	_eat_armed = ""
 	_open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
 	_bag = d
 	modal_kind = "bag" if bag_side == "bag" else "gear"
+	# LOCK-12 / q(61): the drawer's first row is the quick bar itself, moved in (its end cell turns into Close);
+	# _drop_modal moves it back. Spaces without an action (rooms, the map) have no slots to bring along.
+	if not _bar.bag_only:
+		dock_bar_into(d.quick_row)
+		_bar.visible = true
+	_bar_sig = []
+	_refresh_bar()
+
+# ---------------------------------------------------------------- the bag's way onto the quick bar (225, q(61))
+## A bag cell some bar takes (seeds, fertiliser, bait) lifts on a long press (450 ms, LOCK-12 user decision on 197
+## 5e4631b1) and opens only the Pin zone under the docked bar (BAR-DRAG-9); it rides the finger while the grid
+## dims. Released on the Pin zone: pinned on its own action's bar (pin_to; a pinned one shows Unpin and unpins);
+## on a slot of this bar: placed there, not pinned (place_at); anywhere else, or released in place: nothing.
+const _BAG_RIDE_ABOVE := 24.0    # as the bar's own dragged slot (LOCK-04 v1.11)
+const _BAG_HOVER_SCALE := 0.8    # over the Pin zone (InventoryCell State=lifted 1641:34159, runtime)
+var _bag_drag := {}              # {id, ghost: UiItemCell, zone: UiBarDropZone}
+
+func _on_bag_cell(it: Dictionary, o: Dictionary) -> void:
+	var id := str(it.get("id", ""))
+	match o.kind:
+		&"lift":
+			if _bag_drag.is_empty() and is_bar_docked() and bar_action_of(id) != "" and not bool(it.get("stored", false)):
+				_bag_lift(it, o.get("pos", Vector2.ZERO))
+		&"drag_start", &"drag_move":
+			if not _bag_drag.is_empty(): _bag_drag_to(o.pos)
+		&"drop":
+			if not _bag_drag.is_empty(): _bag_drop(o.pos)
+		&"long_press", &"cancel":   # released where it lifted, or the touch was taken: nothing changes
+			_bag_drag_end()
+
+func _bag_lift(it: Dictionary, at: Vector2) -> void:
+	var id := str(it.id)
+	var ghost := UiItemCell.new(UiItemCell.Density.INVENTORY)
+	ghost.theme = UiKit.theme()
+	ghost.icon = it.get("icon", P0Logic.icon(id))
+	ghost.quantity = "×%d" % int(it.get("qty", 0))
+	ghost.rarity = int(it.get("rarity", 0))
+	ghost.state = UiItemCell.State.LIFTED
+	ghost.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	ghost.top_level = true
+	ghost.pivot_offset = ghost.custom_minimum_size * 0.5
+	_modal.add_child(ghost)
+	var zone := UiBarDropZone.new(UiBarDropZone.Kind.UNPIN if is_pinned(id) else UiBarDropZone.Kind.PIN)
+	zone.theme = UiKit.theme()
+	_modal.add_child(zone)
+	zone.center = GestureArbiter.drop_zone_centers(_bar.get_global_rect(), true)[0]
+	zone.appear()
+	if _bag: _bag.grid.modulate.a = UiTokens.OPACITY_PENDING   # the grid dims and takes no drop (不知火舞 on 225)
+	if _bar.haptics and OS.has_feature("mobile"): Input.vibrate_handheld(20)
+	_bag_drag = {id = id, ghost = ghost, zone = zone}
+	_bag_drag_to(at)
+
+func _bag_drag_to(at: Vector2) -> void:
+	var ghost: UiItemCell = _bag_drag.ghost
+	var zone: UiBarDropZone = _bag_drag.zone
+	var over := at.distance_to(zone.center) <= GestureArbiter.DROP_ZONE_HIT
+	zone.hover = over
+	ghost.scale = Vector2.ONE * (_BAG_HOVER_SCALE if over else 1.0)
+	ghost.global_position = at - Vector2(ghost.custom_minimum_size.x * 0.5, ghost.custom_minimum_size.y + _BAG_RIDE_ABOVE)
+	_bar.set_drop_target(-1 if over or not accepts(str(_bag_drag.id)) else _bar.slot_at(at))
+
+func _bag_drop(at: Vector2) -> void:
+	var id := str(_bag_drag.id)
+	var on_zone := at.distance_to((_bag_drag.zone as UiBarDropZone).center) <= GestureArbiter.DROP_ZONE_HIT
+	var slot := -1 if on_zone or not accepts(id) else _bar.slot_at(at)
+	_bag_drag_end()
+	if on_zone:
+		if is_pinned(id): unpin(id)
+		else: pin_to(id)
+	elif slot >= 0: place_at(slot, id)
+	else: return
+	if _bag and _bag.grid.selected_id == id: _bag.grid.select(id)   # its card again: Pin ↔ Unpin
+
+func _bag_drag_end() -> void:
+	if _bag_drag.is_empty(): return
+	if is_instance_valid(_bag_drag.ghost): (_bag_drag.ghost as Node).queue_free()
+	if is_instance_valid(_bag_drag.zone): (_bag_drag.zone as UiBarDropZone).vanish()
+	if _bag and is_instance_valid(_bag): _bag.grid.modulate.a = 1.0
+	_bar.set_drop_target(-1)
+	_bag_drag = {}
+
+## The resident within reach (near_resident): {id, name, gifted_today}, or {} when there is none.
+func near_resident_info() -> Dictionary:
+	var id := str(near_resident.call()) if near_resident.is_valid() else ""
+	if id == "": return {}
+	var def: Dictionary = P0Logic.content().get("residents", {}).get(id, {})
+	var r: Dictionary = view.get("residents", {}).get(id, {})
+	return {id = id, name = str(def.get("name", r.get("name", ""))), gifted_today = bool(r.get("gift_today", false))}
+
+## A greyed button on the bag card. A dish's `Gift to a resident` says where (李白 on 225); it never leaves the bag.
+func _bag_unavailable(action: StringName, id: String, _reason: String) -> void:
+	if action == &"gift" and P0ItemInfo.kind_of(view, id) == "dish" and near_resident_info().is_empty():
+		toast("Find a resident at an outpost to gift this dish")
 
 ## A button on the bag card or a Gear row. The drawer only reports; commands go to the server from here.
 func _bag_action(action: StringName, id: String, payload: Dictionary) -> void:
 	match action:
+		&"bag_room":   # BAG-5: Bag Upgrade I is a homestead matter; Show the house (or the homestead on the map)
+			close_modal()
+			if show_label("home", space_here(), spot_reachable()) == "Show": show_spot.emit("home")
+			else: show_on_map.emit("home")
 		&"eat":
 			var confirm := str(P0Logic.eat_button(view, id).get("confirm", ""))
 			if confirm != "" and _eat_armed != id:
@@ -605,9 +1123,18 @@ func _bag_action(action: StringName, id: String, payload: Dictionary) -> void:
 		&"lock", &"unlock":   # the title-area lock icon (F-07); Sell All skips locked items (SGODOT-228)
 			command.emit({"type": String(action), "item": id})
 		&"store":             # farm storage (SGODOT-228 store / take_out); the card shows Store only at home
-			command.emit({"type": "store", "item": id, "qty": payload.get("qty", "all")})
-		&"pin", &"unpin":
-			pass   # TODO(SGODOT-225 after #12): pin through the quick bar's pin record (P0Ui.bind_quick_bar)
+			if space_here() == "home": command.emit({"type": "store", "item": id, "qty": payload.get("qty", "all")})
+		&"take_out":          # a Farm Storage stack's card: Take 10 / Take all (payload qty 10 or "all")
+			if space_here() == "home": command.emit({"type": "take_out", "item": id, "qty": payload.get("qty", "all")})
+		&"gift":   # a dish's `Gift to <Name>` (不知火舞 on 225): that resident's gift drawer with this dish selected
+			var near := near_resident_info()
+			if P0ItemInfo.kind_of(view, id) != "dish" or near.is_empty() or bool(near.gifted_today): return
+			close_modal()
+			open_gift(str(near.id), id)
+		&"pin", &"unpin":   # the card's Pin / Unpin (q(61)): on the item's own action's bar; the card then flips
+			if is_pinned(id): unpin(id)
+			elif not pin_to(id): return   # five pinned: the card already says Bar full · Unpin one first
+			if _bag: _bag.grid.select(id)
 		_:
 			push_warning("P0 bag: no command for %s" % action)
 
@@ -886,7 +1413,8 @@ func open_energy_card(need: int, verb: String) -> void:
 	card.tile_pressed.connect(func(go: String):
 		close_modal()
 		if go == "bag": open_bag()
-		else: show_spot.emit(go))
+		elif show_label(go, space_here(), spot_reachable()) == "Show": show_spot.emit(go)
+		else: show_on_map.emit(map_target(go)))   # Tea's outpost, or home from the pond
 	var center := CenterContainer.new()
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
 	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -909,10 +1437,6 @@ func open_energy_panel() -> void:
 
 ## The farmhouse (§3.4.3 "回家休息 Rest"; COOK-1 kitchen inside): one card, two doors.
 func open_home_card() -> void:
-	var r: Dictionary = view.get("rest", {})
-	var used := int(r.get("used", 0)) >= int(r.get("limit", 1))
-	var e: Dictionary = view.get("energy", {})
-	var full := int(e.get("value", 0)) >= int(e.get("max", 200))
 	var card := _center_card(280)
 	modal_kind = "home"
 	card.add_child(_label("Home · Farmhouse", 13, INK, true))
@@ -922,34 +1446,50 @@ func open_home_card() -> void:
 	var k := _pill_button(kitchen_line, true)
 	k.pressed.connect(func(): close_modal(); home_choice.emit("kitchen"))
 	card.add_child(k)
-	var rest_text := "Rest · +%d Energy · once a day" % int(r.get("amount", 60))
-	if used: rest_text = "Rested today · resets in " + P0Logic.duration(float(r.get("resets_in", 0)))
-	elif full: rest_text = "Rest · Energy full"
-	var b := _pill_button(rest_text, false)
-	b.disabled = used or full
-	b.pressed.connect(func(): close_modal(); command.emit({"type": "rest"}))
-	card.add_child(b)
+	# Rest moved to the bench by the farmhouse (q(30), FARM-7): the door card keeps the kitchen only.
 	var bye := _flat_button("Not now")
 	bye.pressed.connect(close_modal)
 	card.add_child(bye)
 
+## Rest bench sheet (FARM-7-2 482:52, q(30)): the bench is the one Rest entry. Title, state and effect (ObjectHeader),
+## one fact row, then Rest (primary, the real gain when near full) or the reason it can't (grey), and Not now / Close.
 func open_rest_card() -> void:
-	var r: Dictionary = view.get("rest", {})
-	var used := int(r.get("used", 0)) >= int(r.get("limit", 1))
-	var e: Dictionary = view.get("energy", {})
-	var full := int(e.get("value", 0)) >= int(e.get("max", 200))
-	var card := _center_card(260)
-	card.add_child(_label("Home · Rest", 12, INK, true))
-	card.add_child(_label("+%d Energy · once a day" % int(r.get("amount", 60)), 11, INK))
-	var b := _pill_button("Rest", true)
-	if used:
-		card.add_child(_label("Used today · resets in " + P0Logic.duration(float(r.get("resets_in", 0))), 10, INK2))
-		b.disabled = true
-	elif full:
-		card.add_child(_label("Energy full", 10, INK2))
-		b.disabled = true
-	b.pressed.connect(func(): close_modal(); command.emit({"type": "rest"}))
-	card.add_child(b)
+	var st := P0Logic.rest_state(view)
+	var v := _kit_card()
+	modal_kind = "rest"
+	v.add_child(UiObjectHeader.new({title = "Rest bench", state = str(st.sheet_state), effect = str(st.effect)}))
+	v.add_child(UiFactRow.new(str(st.fact), str(st.fact_value)))
+	if str(st.state) != "used":
+		var b := UiCommandButton.new(str(st.button) if st.can_rest else "", UiCommandButton.Kind.PRIMARY)
+		if not st.can_rest: b.reason = str(st.reason)
+		b.activated.connect(func(): close_modal(); command.emit({"type": "rest"}))
+		v.add_child(b)
+	var bye := UiDismissButton.new(str(st.close))
+	bye.pressed.connect(close_modal)
+	v.add_child(bye)
+	if str(st.note) != "":
+		var note := UiKit.label(str(st.note), UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_SECONDARY)
+		note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		v.add_child(note)
+
+## A centred card in the UI kit's look (InformationSheet 932:71686: surface, card radius, 16 inset, 12 gap) for the
+## phase-2 panels; the older P0 cards keep _center_card until they are rebuilt.
+func _kit_card() -> VBoxContainer:
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	center.theme = UiKit.theme()
+	var panel := PanelContainer.new()
+	panel.custom_minimum_size.x = UiTokens.SIZE_QUICK_BAR_W
+	var box := UiStyleBox.make(UiTokens.COLOR_SURFACE, UiTokens.RADIUS_CARD, UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT)
+	box.with_margins(UiTokens.SIZE_SHEET_PAD, UiTokens.SIZE_SHEET_PAD, UiTokens.SIZE_SHEET_PAD, UiTokens.SIZE_SHEET_PAD)
+	panel.add_theme_stylebox_override(&"panel", box)
+	var v := VBoxContainer.new()
+	v.add_theme_constant_override(&"separation", int(UiTokens.SIZE_SHEET_GAP))
+	panel.add_child(v)
+	center.add_child(panel)
+	_open_modal(center, UiTokens.OPACITY_SCRIM_MODAL)
+	return v
 
 func show_level_up(ev: Dictionary) -> void:
 	var card := _center_card(310)
@@ -1005,48 +1545,23 @@ func _tile(icon_id: String, text: String, note: String, cb := Callable()) -> Con
 
 
 
-## §10.2.3: the switch key fans the four actions out from the character; what this spot can't do is
-## greyed with the reason. P0 preselects by where you stand (plots → Farming, water → Fishing).
+## §10.2.3: the switch key fans the four actions out from the character (ActionRadial, LOCK-04); what this
+## spot can't do is greyed with the reason. P0 preselects by where you stand (plots → Farming, water → Fishing).
 func open_radial() -> void:
+	if _radial.visible:
+		_radial.close()
+		return
 	if _modal != null:
 		close_modal()
 		return
-	var layer := Control.new()
-	layer.set_anchors_preset(Control.PRESET_FULL_RECT)
-	layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var items := [
-		["farm", "hoe", "Farming", "No plots here"],
-		["fish", "rod", "Fishing", "No water nearby"],
-		["mine", "pickaxe", "Mining", "Enter the mine"],
-		["combat", "sword", "Combat", "Mine floors 3–5"],
-	]
-	var center := player_screen + Vector2(0, -30)
-	center.x = clampf(center.x, 110, root.size.x - 110)
-	center.y = clampf(center.y, 180, root.size.y - 260)
-	for i in items.size():
-		var it: Array = items[i]
-		var on: bool = it[0] == bar_mode
-		var ang := -PI * 0.5 + TAU * i / items.size() - PI * 0.25
-		var b := Button.new()
-		b.text = str(it[2]) if on else "%s\n%s" % [it[2], it[3]]
-		b.icon = P0Logic.icon(str(it[1]))
-		b.expand_icon = false
-		b.add_theme_constant_override("icon_max_width", 22)
-		b.add_theme_font_size_override("font_size", 9)
-		b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		b.custom_minimum_size = Vector2(104, 44)
-		b.size = Vector2(104, 44)
-		_style_button(b, Color("e6f4df") if on else PAPER, GREEN_D if on else EDGE, 22)
-		if not on:
-			b.modulate = Color(1, 1, 1, 0.72)
-			var reason := "%s · %s" % [it[2], it[3]]
-			b.pressed.connect(func(): toast(reason))
-		else:
-			b.pressed.connect(close_modal)
-		b.position = center + Vector2(cos(ang), sin(ang)) * 92.0 - b.size * 0.5
-		layer.add_child(b)
-	_open_modal(layer, 0.18)
-	modal_kind = "radial"
+	_bar.cancel_drag()
+	var options := []
+	for it in [["farm", "hoe", "Farming", "No plots here"], ["fish", "fish", "Fishing", "No water nearby"],
+			["mine", "pickaxe", "Mining", "Enter the mine"], ["combat", "sword", "Combat", "Mine floors 3–5"]]:
+		options.append({id = it[0], name = it[2], icon = P0Logic.icon(it[1]), available = it[0] == bar_mode, reason = it[3]})
+	_radial.options = options
+	_radial.selected = bar_mode
+	_radial.open_at(player_screen - _kit.global_position)
 
 ## Today panel (§14.5, LOCK-06): at most three rows right under the HUD chips; Show only moves the camera.
 func open_today() -> void:
@@ -1054,37 +1569,289 @@ func open_today() -> void:
 	var shown := rows.map(func(r):
 		var d: Dictionary = r.duplicate()
 		d.icon = P0Logic.icon(str(r.icon))
-		d.action = "Show" if str(r.go) != "" and spot_reachable() else ""   # TODO(SGODOT-225): Show on map for targets elsewhere
+		d.action = show_label(str(r.go), space_here(), spot_reachable())
 		return d)
 	var panel := UiTodayPanel.new(shown)
 	panel.theme = UiKit.theme()
 	panel.position = Vector2(UiTokens.SIZE_TODAY_PANEL_X, UiTokens.SIZE_TODAY_PANEL_Y + safe_top())
 	panel.show_pressed.connect(func(i: int):
 		close_modal()
-		show_spot.emit(str(rows[i].go)))
+		var go := str(rows[i].go)
+		if show_label(go, space_here(), spot_reachable()) == "Show": show_spot.emit(go)
+		else: show_on_map.emit(map_target(go)))
 	_open_modal(panel, 0.0)
 	modal_kind = "today"
+
+## TodayRow action (不知火舞 on 197, 2026-10-08): a target in the current space reads `Show` and only moves the
+## camera; a target somewhere else reads `Show on map` (the map opens on its pin). Homestead targets (plots,
+## stall, stove) live on the farm; `pond:<id>` and `tackle` are map pins. "" = no target, no button.
+const HOME_TARGETS := ["plots", "stall", "stove", "board", "home", "bench"]
+
+static func show_label(go: String, here: String, camera_here: bool) -> String:
+	if go == "": return ""
+	# The homestead is one space: on the farm or in the farmhouse a farm target is Show (the runtime steps out of the
+	# farmhouse first); anywhere else it is Show on map (亚瑟 on #37: the farmhouse used to send it to the map).
+	if go in HOME_TARGETS and here in ["home", "farm"]: return "Show" if camera_here else ""
+	return "Show on map"
+
+## Where the player is for Show and the bag: the runtime's space; without one (tests, the gallery) the surface says
+## (farm and room count as home there).
+func space_here() -> String:
+	if space != "": return space
+	return "home" if surface in ["farm", "room"] else ("pond" if surface == "busy" else surface)
+
+## The map pin for a target elsewhere: the homestead for farm targets, else the target itself.
+static func map_target(go: String) -> String:
+	return "home" if go in HOME_TARGETS else go
 
 ## Whether a Show can move the camera in the current world (the pond has no camera targets yet).
 func spot_reachable() -> bool:
 	return can_show_spot.is_valid() and bool(can_show_spot.call())
 
-## The bell (parcels / letters). TODO(stage 4, Inbox): replace this empty state with the Inbox drawer and its
-## tabs; P0 has no parcels yet, so it only shows the agreed EmptyState line.
+## The bell (parcels / letters). TODO(stage 4, SGODOT-234 Inbox): the Inbox drawer with its tabs and Claim. Until
+## then the parcels waiting for a free slot (SGODOT-232) are listed read-only, one line each, soonest to expire first
+## (奕星 on #11); `No parcels` only when there are none (LOCK-14).
 func open_inbox() -> void:
 	var v := _sheet(220, "Inbox", "bell")
 	modal_kind = "inbox"
-	var empty := UiEmptyState.new("No parcels", P0Logic.icon("bell"))
-	empty.theme = UiKit.theme()
-	empty.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	v.add_child(empty)
+	var lines := P0Logic.parcel_lines(view)
+	if lines.is_empty():
+		var empty := UiEmptyState.new("No parcels", P0Logic.icon("bell"))
+		empty.theme = UiKit.theme()
+		empty.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		v.add_child(empty)
+		return
+	var list := VBoxContainer.new()
+	list.theme = UiKit.theme()
+	list.add_theme_constant_override(&"separation", int(UiTokens.SPACE_WITHIN))
+	for line in lines: list.add_child(UiKit.label(str(line), UiTokens.STYLE_BODY_B14))
+	v.add_child(list)
+
+## Resident dialogue bar (SGODOT-225, LOCK-18): greet first, then choose. Called by the outpost rooms (SGODOT-227)
+## for res_pip / res_old_kai. Sends the day's `talk` (first-chat affinity, gift meal: the server decides) and
+## shows the bar from P0Logic.resident_bar (SGODOT-228). Returns false when the view has no such resident.
+var _resident := ""
+var _reply := {}   # {id, line}: the resident's answer shown in the bubble until another resident's bar opens
+
+func open_resident(id: String) -> bool:
+	var d := P0Logic.resident_bar(view, id)
+	if d.is_empty(): return false
+	if _resident != id or modal_kind != "resident": command.emit({"type": "talk", "resident": id})
+	if _resident != id: _reply = {}
+	_resident = id
+	_show_resident(d)
+	return true
+
+## RES-KAI-TALK / RESIDENT-GIFT-MYSTERY: with the resident's bar open, an affinity change is a FloatText pill
+## (Affinity tone) over the bar's top-left, `+2 · first chat today`, and their answer replaces the bubble line until
+## another resident's bar opens. Returns false when the bar is not showing that resident (the caller floats it).
+func resident_affinity(ev: Dictionary, reply := "") -> bool:
+	var id := str(ev.get("resident", ""))
+	if modal_kind != "resident" or id != _resident or _modal == null: return false
+	if reply != "": _reply = {"id": id, "line": reply}
+	if int(ev.get("delta", 0)) == 0: return true
+	var bar: Control = _modal.get_child(1) if _modal.get_child_count() > 1 else null
+	var ft := UiFloatText.new(affinity_text(ev), UiFloatText.Tone.AFFINITY)
+	ft.theme = UiKit.theme()
+	root.add_child(ft)
+	var top_left := (bar.global_position - root.global_position) if bar != null else Vector2(UiTokens.SIZE_QUICK_BAR_X, root.size.y * 0.6)
+	ft.play(top_left + Vector2(_AFFINITY_INSET + ft.shown_size().x * 0.5, -_AFFINITY_ABOVE))
+	return true
+
+## `+2 · first chat today`, `−2 · not a fan` (RES-KAI-TALK, RESIDENT-GIFT-MYSTERY); the other reasons are 刘邦's
+## wording pending 李白 (SGODOT-225).
+static func affinity_text(ev: Dictionary) -> String:
+	var why := ""
+	match str(ev.get("reason", "")):
+		"chat": why = "first chat today"
+		"request": why = "request done"
+		"gift":
+			why = {"loved": "loved it", "liked": "liked it", "received": "thanks", "not_a_fan": "not a fan"}.get(str(ev.get("verdict", "")), "")
+	var n := ("%+d" % int(ev.get("delta", 0))).replace("-", "−")
+	return n if why == "" else "%s · %s" % [n, why]
+
+func _show_resident(d: Dictionary) -> void:
+	var data := d.duplicate()
+	data.portrait = _portrait(str(d.portrait))
+	var ask := resident_ask(view, str(d.id))
+	if ask != "": data.line = ask   # NPC-5: with a request open the bar asks it, in the request card's words (李白 q(46))
+	if str(_reply.get("id", "")) == str(d.id): data.line = str(_reply.line)
+	var bar := UiResidentBar.new(data)
+	bar.theme = UiKit.theme()
+	bar.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+	bar.offset_left = UiTokens.SIZE_QUICK_BAR_X
+	bar.offset_right = -UiTokens.SIZE_QUICK_BAR_X
+	bar.offset_bottom = -bottom_pad()
+	bar.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	var id := str(d.id)
+	bar.gift_pressed.connect(func(): open_gift(id))
+	bar.request_pressed.connect(func(): open_resident_request(id))
+	bar.identity_pressed.connect(func(): open_resident_profile(id))
+	bar.meal_pressed.connect(func(): _open_todays_meal(id))   # lesson_pressed: P0 has no lessons (lesson is always false)
+	_open_modal(bar, 0.0, true)
+	_close_above(bar, _CLOSE_ABOVE_CARD)
+	modal_kind = "resident"
+
+## Today's meal on the bar (§3.4.5): the dish they gave today, its card open in the bag; the Inbox when it waits there
+## because the bag was full. The bar only offers it while the meal is still there (P0Logic.gift_meal).
+func _open_todays_meal(id: String) -> void:
+	var meal := P0Logic.gift_meal(view, id)
+	match str(meal.get("at", "")):
+		"bag": open_bag(str(meal.item), "bag")
+		"inbox": open_inbox()
+
+## The name on the bar: the resident's profile sheet (RES-PIP / RES-KAI). Back returns to the bar.
+func open_resident_profile(id: String) -> void:
+	var d := resident_profile_data(view, id)
+	if d.is_empty(): return
+	var sheet := UiDrawer.new(_RESIDENT_SHEET_H)
+	sheet.pad = UiTokens.SPACE_PAGE
+	sheet.theme = UiKit.theme()
+	sheet.safe_bottom = safe_bottom()
+	var page := UiResidentProfile.new(d)
+	page.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	page.back_pressed.connect(func(): open_resident(id))
+	sheet.body.add_child(page)
+	sheet.close_requested.connect(close_modal)
+	_open_modal(sheet, UiTokens.OPACITY_SCRIM_DRAWER, true)
+	_close_above(sheet, _CLOSE_ABOVE_SHEET, UiTokens.SPACE_PAGE)
+	modal_kind = "resident_profile"
+	_modal_back = func(): open_resident(id)   # Android Back = the sheet's Back
+
+## The open (not yet accepted) request's own line, e.g. Pip's `Could you catch me a fish? Any kind is fine.`; ""
+## when the resident has no open request.
+static func resident_ask(view_: Dictionary, id: String) -> String:
+	var r: Dictionary = view_.get("residents", {}).get(id, {})
+	var req = r.get("request", null)
+	if not (req is Dictionary) or str(r.get("request_state", "open")) != "open": return ""
+	for q in P0Logic.content().get("residents", {}).get(id, {}).get("requests", []):
+		if str(q.get("id", "")) == str(req.get("id", "")): return str(q.get("text", ""))
+	return ""
+
+## RES-PIP data: face, name, role, stage, `Friendship have/need`, favourite style with a dish of that style.
+## Details › has no page behind it in P0, so it stays hidden (TODO SGODOT-225 / 209: the resident's details page).
+static func resident_profile_data(view_: Dictionary, id: String) -> Dictionary:
+	var bar := P0Logic.resident_bar(view_, id)
+	if bar.is_empty(): return {}
+	var def: Dictionary = P0Logic.content().get("residents", {}).get(id, {})
+	var likes := str(def.get("likes", ""))
+	var dish := ""
+	for r in P0Logic.content().get("cooking", {}).get("recipes", []):
+		if str(r.get("style", "")) == likes:
+			dish = str(r.get("id", ""))
+			break
+	var face_path := "res://assets/p0/art/residents/%s.svg" % id
+	return {"face": load(face_path) if ResourceLoader.exists(face_path) else _portrait(str(def.get("portrait", ""))),
+		"name": str(bar.name), "role": str(bar.role), "stage": str(bar.stage),
+		"friendship": ("%d/%d" % [int(bar.have), int(bar.need)]) if str(bar.get("next", "")) != "" else str(int(bar.have)),
+		"likes": likes, "likes_icon": P0Logic.icon(dish) if dish != "" else null, "details": false}
+
+## A 44 Close above a bottom card or sheet, right-aligned `inset` in from its right edge and `gap` above its top
+## (Close · 44 px: 6 above a sheet, 8 above the dialogue bar). It follows the content as it slides and resizes.
+func _close_above(content: Control, gap: float, inset := 0.0) -> void:
+	var close := UiCloseButton.new()
+	close.theme = UiKit.theme()
+	close.size = Vector2(UiTokens.SIZE_CLOSE, UiTokens.SIZE_CLOSE)
+	var follow := func():
+		if is_instance_valid(close):
+			close.position = content.position + Vector2(content.size.x - inset - UiTokens.SIZE_CLOSE, -gap - UiTokens.SIZE_CLOSE)
+	content.item_rect_changed.connect(follow)
+	close.pressed.connect(close_modal)
+	_modal.add_child(close)
+	follow.call()
+
+## The resident's portrait (assets/p0/art/<key>-portrait.jpg), or none.
+static func _portrait(key: String) -> Texture2D:
+	var path := "res://assets/p0/art/%s-portrait.jpg" % key
+	return load(path) if key != "" and ResourceLoader.exists(path) else null
+
+## Request on the bar: an open request shows the card (Accept / Not now); an accepted one that is ready
+## delivers. The bar's button carries the gap or the wait, so it never dead-ends (LOCK-10 / 18).
+func open_resident_request(id: String) -> void:
+	var d := P0Logic.resident_bar(view, id)
+	if d.is_empty(): return
+	var cmd: Dictionary = d.get("request_cmd", {})
+	if str(cmd.get("type", "")) == "deliver":
+		close_modal()
+		command.emit(cmd)
+		return
+	var card := UiRequestCard.new(_request_card_data(view, id, d))
+	card.theme = UiKit.theme()
+	card.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+	card.offset_left = UiTokens.SIZE_QUICK_BAR_X
+	card.offset_right = -UiTokens.SIZE_QUICK_BAR_X
+	card.offset_bottom = -bottom_pad()
+	card.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	card.action_pressed.connect(func():
+		close_modal()
+		if not cmd.is_empty(): command.emit(cmd))
+	card.dismissed.connect(func(): open_resident(id))
+	_open_modal(card, 0.0, true)
+	modal_kind = "resident_request"
+	_modal_back = func(): open_resident(id)
+
+## ResidentRequestCard data from the resident's open request (content table + view facts).
+static func _request_card_data(view_: Dictionary, id: String, bar: Dictionary) -> Dictionary:
+	var def: Dictionary = P0Logic.content().get("residents", {}).get(id, {})
+	var req: Dictionary = view_.get("residents", {}).get(id, {}).get("request", {}) if view_.get("residents", {}).get(id, {}).get("request", null) != null else {}
+	var text := ""
+	var need_line := ""
+	var title := "%s's request" % str(def.get("name", ""))
+	for q in def.get("requests", []):
+		if str(q.get("id", "")) == str(req.get("id", "")):
+			text = str(q.get("text", ""))
+			need_line = str(q.get("need_line", ""))
+	var kind := str(req.get("kind", ""))
+	var need := {"name": "", "have": int(req.get("have", 0)), "need": int(req.get("qty", 1)), "icon": null}
+	match kind:
+		"fish":
+			var rarity := int(req.get("rarity", 0)) if req.get("rarity", null) != null else 0
+			need.name = (P0Logic.rarity_name(view_, rarity) + " fish") if rarity > 0 else "Fish"
+			need.icon = P0Logic.icon("fish_crucian")
+		"dish":
+			need.name = "Any dish"
+			need.icon = P0Logic.icon("pot")
+		"sow":
+			need.name = "Plots sown"
+			need.icon = P0Logic.icon("sow")
+	# Li Bai q(46): a request's own need line wins (`1 Rare fish · Golden Koi · Pond`); the tile shows the count itself.
+	if need_line != "": need.name = need_line.trim_prefix("%d " % int(need.need))
+	var reward := []
+	if int(P0Logic.content().get("affinity", {}).get("request", 0)) > 0:
+		reward.append("+%d Friendship" % int(P0Logic.content().affinity.request))
+	if int(req.get("coins", 0)) > 0: reward.append("%d coins" % int(req.coins))
+	return {"portrait": _portrait(str(def.get("portrait", ""))), "title": title,
+		"who": "%s · %s · personal request" % [str(def.get("name", "")), str(def.get("role", ""))],
+		"line": text, "needs": [need] if kind != "" else [], "reward": " · ".join(reward),
+		"deliver_to": str(def.get("name", "")), "action": "Accept",
+		"reason": str(bar.get("request_reason", ""))}
+
+## Gift on the bar, or a dish card's `Gift to <Name>` (item: that dish, selected): the gift drawer (Bag side only,
+## Dishes first); the card's Gift sends `gift`.
+func open_gift(id: String, item := "") -> void:
+	var def: Dictionary = P0Logic.content().get("residents", {}).get(id, {})
+	var likes := str(def.get("likes", ""))
+	var d := P0BagDrawer.new(view, "bag", item, {"kind": "resident", "id": id, "name": str(def.get("name", "")),
+		"gifted_today": bool(view.get("residents", {}).get(id, {}).get("gift_today", false)),
+		"likes": ("Likes %s · 1 gift a day" % likes) if likes != "" else "1 gift a day"})
+	d.theme = UiKit.theme()
+	d.safe_bottom = safe_bottom()
+	d.close_requested.connect(func(): open_resident(id))
+	d.action_requested.connect(func(a: StringName, item: String, _p: Dictionary):
+		if a == &"gift":
+			close_modal()
+			command.emit({"type": "gift", "resident": id, "item": item}))
+	_open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
+	_bag = d
+	modal_kind = "gift"
+	_modal_back = func(): open_resident(id)
 
 ## Own profile (SGODOT-225; PROFILE-1-P0, LOCK-22), opened from the HUD avatar. A skill ring opens the skill
 ## details; Edit look opens the dressing room above the current world and comes back here.
 var _profile: P0ProfilePage
 
-func open_profile() -> void:
-	var page := P0ProfilePage.new(view, safe_top())
+func open_profile(look_saved := false) -> void:
+	var page := P0ProfilePage.new(view, safe_top(), look_saved)
 	page.theme = UiKit.theme()
 	page.back_pressed.connect(close_modal)
 	page.skill_pressed.connect(func(_skill: String): open_skills())
@@ -1100,9 +1867,13 @@ func edit_look() -> void:
 	var room := AppRouter.push_instance(AppRouter.DRESS)
 	if room == null: return
 	visible = false
+	var saved := [false]   # Done saves the outfit; Back drops the draft
+	var on_saved := func(_config): saved[0] = true
+	Avatar.outfit_saved.connect(on_saved)
 	room.tree_exited.connect(func():
+		Avatar.outfit_saved.disconnect(on_saved)
 		visible = true
-		open_profile(), CONNECT_ONE_SHOT)
+		open_profile(saved[0]), CONNECT_ONE_SHOT)
 
 ## SKILL-1 (P0 cut): three track cards — level ring, XP and how far to go, what the next level opens —
 ## and the "First times" collection tiles. Opened from the avatar ring.
@@ -1165,18 +1936,18 @@ const TIPS_PATH := "user://p0_tips.json"
 
 ## A one-sentence card above the quick bar, once per account on this device; tap or 7 s to dismiss.
 ## Never a hand animation, never moves the player (§14.3 "不画手指动画循环").
+## One card at a time: while another tip is up, this one is neither shown nor counted as learned, so a caller that
+## asks every frame (the pond's Cast, then Bait) gets it once the first card goes (李元芳 first-session test 12).
 func teach(key: String, text: String) -> void:
 	_load_tips()
 	if _taught.has(key): return
+	if _teach != null and _teach.visible: return
 	_taught[key] = true
 	_save_tips()
 	if _teach == null:
 		_teach = PanelContainer.new()
 		_teach.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-		_teach.offset_left = 10
-		_teach.offset_right = -84
-		_teach.offset_top = -41 - 53 - 14 - 64
-		_teach.offset_bottom = -41 - 53 - 12
+		_teach.grow_vertical = Control.GROW_DIRECTION_BEGIN
 		_teach.add_theme_stylebox_override("panel", _box(Color("2f3a33"), 14, Color("2f3a33"), 0, Vector4(12, 8, 12, 8)))
 		var l := _label("", 11, PAPER, true)
 		l.name = "Text"
@@ -1186,6 +1957,7 @@ func teach(key: String, text: String) -> void:
 		_teach.gui_input.connect(func(e: InputEvent):
 			if P0Ui.is_tap(e) or (e is InputEventScreenTouch and e.pressed): _teach.hide())
 		root.add_child(_teach)
+		_place_controls()
 	(_teach.get_node("Text") as Label).text = text
 	_teach.show()
 	_teach_left = 7.0
@@ -1653,11 +2425,12 @@ func show_dish(ev: Dictionary, xp_lines: Array) -> void:
 	ic.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	card.add_child(ic)
 	var mystery := bool(ev.get("mystery", false))
-	var title := "Mystery Dish" if mystery else P0Logic.dish_label(view, id)
+	var mc := P0Logic.mystery_card(ev)
+	var title := str(mc.title) if mystery else P0Logic.dish_label(view, id)
 	var t := _label(title, 15, INK, true)
 	t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	card.add_child(t)
-	var sub := "Hmm… not a dish. Try another mix." if mystery else "%s%s · +%d Energy" % [["", "Good · ", "Perfect · "][q], P0Logic.rarity_name(view, int(info.get("rarity", 1))), int(info.get("full", 20))]
+	var sub := str(mc.sub) if mystery else "%s%s · +%d Energy" % [["", "Good · ", "Perfect · "][q], P0Logic.rarity_name(view, int(info.get("rarity", 1))), int(info.get("full", 20))]
 	var s2 := _label(sub, 10, INK2, true)
 	s2.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	card.add_child(s2)
@@ -1683,8 +2456,9 @@ func show_dish(ev: Dictionary, xp_lines: Array) -> void:
 			return
 		close_modal()
 		command.emit({"type": "eat", "item": id}))
-	row.add_child(eat)
-	var keep := _pill_button("Keep", false)
+	if mc.eat or not mystery: row.add_child(eat)
+	else: eat.free()
+	var keep := _pill_button("Keep" if mc.eat or not mystery else "OK", false)
 	keep.custom_minimum_size = Vector2(70, 32)
 	keep.pressed.connect(close_modal)
 	row.add_child(keep)
@@ -1781,9 +2555,18 @@ class _TouchPad extends Control:
 	var ui: P0Ui
 	var _arb := GestureArbiter.new(GestureArbiter.Mode.SCENE)
 	func _ready() -> void: mouse_filter = Control.MOUSE_FILTER_STOP
+	func end_stick() -> void:
+		# A pinch cut short (a world change, the app going to the background) still ends: its zoom springs back.
+		var pinching := _arb.is_pinching()
+		_arb.reset()
+		queue_redraw()
+		if pinching and ui != null: ui.zoom_end.emit()
+	func _notification(what: int) -> void:
+		if what in [NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_APPLICATION_FOCUS_OUT] and _arb.is_pinching(): end_stick()
 	func _gui_input(e: InputEvent) -> void:
 		if e is InputEventMouseButton and e.pressed and e.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
-			ui.zoom.emit(0.9 if e.button_index == MOUSE_BUTTON_WHEEL_UP else 1.1)
+			ui.zoom.emit(0.9 if e.button_index == MOUSE_BUTTON_WHEEL_UP else 1.1, get_global_transform_with_canvas() * e.position)
+			ui.zoom_end.emit()
 			return
 		for o in _arb.feed(e, Time.get_ticks_msec()):
 			match o.kind:
@@ -1794,9 +2577,12 @@ class _TouchPad extends Control:
 					ui.joystick.emit(Vector2.ZERO)
 					queue_redraw()
 				&"tap":
-					if o.double: ui.recenter.emit()
-					else: ui.tapped.emit(o.pos)
-				&"pinch": ui.zoom.emit(o.factor)
+					if ui._tap_at(get_global_transform() * o.pos, bool(o.double)): _arb.consume_tap()
+				# Screen point for the camera: the canvas transform includes this UI layer's offset. Taps above go to
+				# _tap_at in the UI's own global space (its markers live there); with P0Ui's layer at the origin the
+				# two agree, so keep this pair in step if the layer ever moves (刘邦 on #47).
+				&"pinch": ui.zoom.emit(o.factor, get_global_transform_with_canvas() * o.center)
+				&"pinch_end": ui.zoom_end.emit()
 	func _draw() -> void:
 		var start := _arb.origin()
 		var now := _arb.position()
@@ -1842,62 +2628,6 @@ class _DexTile extends Control:   # FISH-5 mini Fish-dex tile: blank / caught (r
 		if texture:
 			var tint := glow if state == "caught" else Color("8a918c") if state == "lit" else Color("cfc6b0")
 			draw_texture_rect(texture, r.grow(-size.x * 0.15), false, tint)
-
-class _Dot extends Control:   # the red dot on the FAB's gear badge (FISH-4: creel full)
-	func _draw() -> void:
-		draw_circle(size * 0.5, size.x * 0.5 + 1.0, P0Ui.PAPER)
-		draw_circle(size * 0.5, size.x * 0.5, P0Ui.RED)
-
-class _Fab extends Control:
-	var ui: P0Ui
-	func _ready() -> void: mouse_filter = Control.MOUSE_FILTER_STOP
-	func _gui_input(e: InputEvent) -> void:
-		# The right thumb is often the second finger (the left one is on the joystick), and only the first
-		# touch is emulated as a mouse — so on touchscreens read touches, on desktop read the mouse.
-		var touch := DisplayServer.is_touchscreen_available()
-		var down: bool = (touch and e is InputEventScreenTouch and e.pressed) or (not touch and P0Ui.is_tap(e))
-		var up: bool = (touch and e is InputEventScreenTouch and not e.pressed) or (not touch and e is InputEventMouseButton and not e.pressed and e.button_index == MOUSE_BUTTON_LEFT)
-		if down:
-			ui.fab_held = true
-			ui._fab_pressed()
-			accept_event()
-		elif up:
-			ui.fab_held = false
-			accept_event()
-	func _draw() -> void:
-		var st: Dictionary = get_meta("state", {})
-		var c := size * 0.5
-		var fill := Color("fbf8f1")
-		var ring := Color("7fc66a")
-		if st.get("amber", false):
-			fill = Color("fbf1da")
-			ring = Color("e3b341")
-		elif not st.get("enabled", false):
-			fill = Color("eceae4")
-			ring = Color("c4c2ba")
-		draw_circle(c + Vector2(0, 2), size.x * 0.5, Color(0.18, 0.23, 0.2, 0.08))
-		draw_circle(c, size.x * 0.5, fill)
-		draw_arc(c, size.x * 0.5 - 1.3, 0, TAU, 64, ring, 2.6)
-
-class _Slot extends Control:
-	func _ready() -> void: mouse_filter = Control.MOUSE_FILTER_STOP
-	func _draw() -> void:
-		var r := Rect2(Vector2.ZERO, size)
-		var s := StyleBoxFlat.new()
-		s.set_corner_radius_all(11)
-		if get_meta("ghost", false):
-			s.bg_color = Color(1, 1, 1, 0.25)
-			s.border_color = Color("d9c7a6")
-			s.set_border_width_all(1)
-		elif get_meta("selected", false):
-			s.bg_color = Color("fbf8f1")
-			s.border_color = Color("5fa85a")
-			s.set_border_width_all(2)
-		else:
-			s.bg_color = Color(0.984, 0.973, 0.945, 0.94)
-			s.border_color = Color("e1dac8")
-			s.set_border_width_all(1)
-		draw_style_box(s, r)
 
 ## Skill level ring on the Skills sheet (progress within the level). Item have / need is UiNeedTile (LOCK-10).
 class _LevelRing extends Control:

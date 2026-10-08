@@ -12,16 +12,23 @@ const ROWS := 5
 const PLOT_ORIGIN := Vector2i(4, 3)   # plot 0 sits nearest the camera, on the left
 const BED_H := 0.15                   # soil bed thickness (plot.glb top), crops grow from here
 
-## Point anchors (cells). The house faces the field; the stall (seed box for now) stands on its right.
+## Point anchors (cells). The house faces the field; the stall (seed box for now) stands on its right and the
+## rest bench (FARM-7, q(30)) on its left, two cells wide, clear of the beds, the stall and the mine.
 const ANCHORS := {
 	"spawn": Vector2i(9, 1), "exit": Vector2i(9, 0),
 	"house": Vector2i(9, 16), "storage": Vector2i(14, 15),
-	"well": Vector2i(17, 8), "mine": Vector2i(2, 14),
+	"well": Vector2i(17, 8), "mine": Vector2i(2, 14), "bench": Vector2i(5, 16),
+	# SGODOT-231 / q(45): five gathering spots on the farm edge (no Old Tree in P0) and the workbench on the house's
+	# right past the stall (SGODOT-224's rest bench takes the left, Vector2i(5, 16)).
+	"spot_grove": Vector2i(17, 12), "spot_rock_pile": Vector2i(18, 4), "spot_reed_bank": Vector2i(2, 4),
+	"spot_clay_bank": Vector2i(2, 7), "spot_herb_patch": Vector2i(3, 17), "workbench": Vector2i(17, 16),
 }
 ## Solid footprints beyond the plots (inclusive rects: x, y, w, h).
 const FOOTPRINTS := {
 	"house": Rect2i(8, 15, 4, 3), "storage": Rect2i(14, 15, 1, 1),
-	"well": Rect2i(17, 8, 1, 1), "mine": Rect2i(1, 13, 2, 2),
+	"well": Rect2i(17, 8, 1, 1), "mine": Rect2i(1, 13, 2, 2), "bench": Rect2i(5, 16, 2, 1),
+	"spot_grove": Rect2i(17, 12, 1, 1), "spot_rock_pile": Rect2i(18, 4, 1, 1), "spot_reed_bank": Rect2i(2, 4, 1, 1),
+	"spot_clay_bank": Rect2i(2, 7, 1, 1), "spot_herb_patch": Rect2i(3, 17, 1, 1), "workbench": Rect2i(16, 16, 3, 1),
 }
 ## Scenery trees stand outside the walkable yard, so they are not footprints.
 const WALK_RECT := Rect2i(1, 0, 19, 20)
@@ -79,6 +86,89 @@ static func blueprint() -> FarmBlueprint:
 		bp.masks.buildable.append("1".repeat(GRID.x))
 		bp.masks.cultivable.append(cultivable)
 	return bp
+
+## Homestead fence (plan §8.3, q(35); 不知火舞 on SGODOT-228 7e1db1f8), one fence.glb kit:
+## Lv1–2 only the stretch in front of the farmhouse, either side of the door path with a 2 m opening;
+## Lv3 adds the ring round the field and yard, open at the mine and the way out to the map.
+## Each segment is {pos: Vector3, yaw: float, stretch: float} (stretch scales fence.glb along its length).
+const FENCE_SEG := 1.24              # fence.glb length (m)
+const FENCE_FRONT_ROW := 13          # the yard row between the field and the farmhouse
+const FENCE_RING := {"west": 0.38, "east": 12.95, "back": -12.35, "front": 0.1}
+
+static func fence_front(bp: FarmBlueprint) -> Array:
+	var door := bp.cell_to_world(ANCHORS.house)
+	var z := bp.cell_to_world(Vector2i(0, FENCE_FRONT_ROW)).z
+	return [{"pos": Vector3(door.x - 1.0 - FENCE_SEG * 0.5, 0, z), "yaw": 0.0, "stretch": 1.0},
+		{"pos": Vector3(door.x + 1.0 + FENCE_SEG * 0.5, 0, z), "yaw": 0.0, "stretch": 1.0}]
+
+static func fence_ring(bp: FarmBlueprint) -> Array:
+	var r := FENCE_RING
+	var exit := bp.cell_to_world(ANCHORS.exit)
+	var mine := Rect2i(FOOTPRINTS.mine)
+	var mine_z0 := bp.cell_to_world(mine.position).z + bp.cell_m * 0.5        # near edge of the mine (towards the camera)
+	var mine_z1 := mine_z0 - mine.size.y * bp.cell_m
+	var out: Array = []
+	out.append_array(_fence_run(Vector2(r.west, r.back), Vector2(r.east, r.back), []))
+	out.append_array(_fence_run(Vector2(r.west, r.back), Vector2(r.west, r.front), [Vector2(mine_z1 - 0.2, mine_z0 + 0.2)]))
+	out.append_array(_fence_run(Vector2(r.east, r.back), Vector2(r.east, r.front), []))
+	out.append_array(_fence_run(Vector2(r.west, r.front), Vector2(r.east, r.front), [Vector2(exit.x - 1.0, exit.x + 1.0)]))
+	return out
+
+## Segments along a → b (xz), evenly stretched to fill it; gaps are [from, to] on the axis the run follows.
+static func _fence_run(a: Vector2, b: Vector2, gaps: Array) -> Array:
+	var length := a.distance_to(b)
+	var n := maxi(1, roundi(length / FENCE_SEG))
+	var step := length / n
+	var along_x := absf(b.x - a.x) > absf(b.y - a.y)
+	var out: Array = []
+	for i in n:
+		var p := a.lerp(b, (i + 0.5) / n)
+		var c := p.x if along_x else p.y
+		var lo := c - step * 0.5
+		var hi := c + step * 0.5
+		if gaps.any(func(g: Vector2): return hi > minf(g.x, g.y) and lo < maxf(g.x, g.y)): continue
+		out.append({"pos": Vector3(p.x, 0, p.y), "yaw": 0.0 if along_x else PI * 0.5, "stretch": step / FENCE_SEG})
+	return out
+
+## Points along the yard fence for block_points: the player walks round it, through the door opening.
+static func fence_block_points(bp: FarmBlueprint) -> Array:
+	var points: Array = []
+	for seg in fence_front(bp):
+		for k in 5: points.append(seg.pos + Vector3((k / 4.0 - 0.5) * FENCE_SEG * 0.9, 0, 0))
+	return points
+
+## The Homestead sign (WorldBadges · Farm 1135:79267): right of the farmhouse door, between the house and the
+## yard fence, clear of the door path (cell 9) so the door and the sign stay two tap targets.
+const SIGN_CELL := Vector2i(11, 14)
+
+static func sign_point(bp: FarmBlueprint) -> Vector3:
+	return bp.cell_to_world(SIGN_CELL)
+
+## The Upgrade Plaque (HOME-LV3-FENCE 1510:97492): left of the farmhouse door, mirroring the sign, from the first upgrade.
+const PLAQUE_CELL := Vector2i(7, 14)
+
+static func plaque_point(bp: FarmBlueprint) -> Vector3:
+	return bp.cell_to_world(PLAQUE_CELL)
+
+## LOCK-07 (亚瑟 / 不知火舞 / 周瑜 on SGODOT-231): one finger card on the farm at a time — the nearest facility within
+## its reach; the card showing keeps it unless another is CARD_KEEP nearer, so standing between two never flickers.
+## cands = [[id, position, reach m], ...]; an exact tie goes to the earlier entry. Distance on the ground (a bed or a
+## slope never pushes a facility out of reach). The one copy: SGODOT-231 folded its own P0FarmMaterials.pick_card in.
+const CARD_KEEP := 0.2
+
+static func pick_card(cands: Array, at: Vector3, current: String) -> String:
+	var best := ""
+	var best_d := INF
+	var current_d := INF
+	for c in cands:
+		var p: Vector3 = c[1]
+		var d := Vector2(at.x - p.x, at.z - p.z).length()
+		if d > float(c[2]): continue
+		if str(c[0]) == current: current_d = d
+		if d < best_d:
+			best = str(c[0])
+			best_d = d
+	return current if current_d < INF and current_d <= best_d + CARD_KEEP else best
 
 ## Mark scenery rocks solid: each rock blocks the cell it stands in (trees already stand outside the yard).
 static func block_points(bp: FarmBlueprint, points: Array) -> void:

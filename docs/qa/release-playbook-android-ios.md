@@ -34,6 +34,14 @@ version/code=2026092906
 version/name="0.17.9"
 ```
 
+发布工程的 preset 还要有这两行权限（2026-10-08 起；0.17.10 / 0.17.11 都缺 VIBRATE，钓鱼面板的震动在 Android 上不生效）。
+主仓库的 `Android` preset 已经带上；发布工程的 `export_presets.cfg` 不在 git 里，新建或复制发布工程时手动确认：
+
+```
+permissions/internet=true
+permissions/vibrate=true
+```
+
 签名不用动：`package/signed=true` + 不填 keystore = Godot 用 `~/.android/debug.keystore`，
 这就是 Journey 一直用的"正式"证书（SHA-256 `38771d94…8515673`），换了证书用户就不能原位升级。
 
@@ -59,6 +67,7 @@ export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
 BT=~/Library/Android/sdk/build-tools/37.0.0
 $BT/apksigner verify --print-certs roaming/*.apk | grep 'SHA-256'   # 必须是 38771d94…
 $BT/aapt dump badging roaming/*.apk | grep -o "versionCode='[^']*' versionName='[^']*'"
+$BT/aapt dump permissions roaming/*.apk | grep -E "VIBRATE|INTERNET"   # 两行都要有（VIBRATE 缺了震动会静默失效）
 ```
 
 再用 Python `zipfile` 按 CRC 对比上一版 APK：正常只应变 `classes6.dex`、`assets/assets.sparsepck`、

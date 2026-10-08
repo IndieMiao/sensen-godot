@@ -8,19 +8,24 @@ extends Control
 ##   GEAR       Compact/GearSlot 663:61299       52×88  role above, equipment name below           (LOCK-13)
 ## Data in (the fields below), signals out. Each cell runs its own GestureArbiter (QUICK: SLOT mode, others:
 ## CELL mode, WP7-B F-04 §3 / §4), so a touch is exactly one outcome: `tapped` only for the arbiter's tap;
-## everything else (lift, pin_toggle / long_press, drag_start / drag_move / drop, swipe_up, cancel) goes out
+## everything else (lift, long_press, drag_start / drag_move / drop, swipe_up, cancel) goes out
 ## through `gesture` for the quick bar / bag drawer, which then sets `state` / `pinned`. mouse_filter is
 ## PASS, so a TouchScrollContainer still takes vertical drags (CELL mode answers them with cancel).
 ## Hosts outside a scroll container (the quick bar) need a STOP backing control, or the touch also reaches
 ## _unhandled_input (the map's tap handling, for one).
-## LIFTED, DROP_TARGET and ZERO exist on the QuickSlot main only; other densities draw them as DEFAULT.
+## DROP_TARGET and ZERO exist on the QuickSlot main only, LIFTED on QuickSlot and InventoryCell (State=lifted 1641:34159:
+## the default look with the QuickSlot lift shadow); other densities draw them as DEFAULT.
+## GHOST (QuickSlot State=ghost 1415:94114, A-08) is an empty slot showing what the action can use: dashed like
+## EMPTY, the family icon at 35 %, a one-word family name in secondary ink (`title`), no count, never pinned.
+## Other densities draw it as EMPTY.
 
 signal tapped
-## A GestureArbiter outcome other than tap, e.g. {kind = &"pin_toggle", pos}; `pos` is in global coordinates.
+## A GestureArbiter outcome other than tap, e.g. {kind = &"lift", pos}; `pos` is in global coordinates. Pinning is the
+## quick bar's drop on its Pin zone (LOCK-05 v1.11), never a cell outcome.
 signal gesture(outcome: Dictionary)
 
 enum Density { INVENTORY, QUICK, KITCHEN, GEAR }
-enum State { DEFAULT, SELECTED, EMPTY, LIFTED, DROP_TARGET, ZERO }
+enum State { DEFAULT, SELECTED, EMPTY, LIFTED, DROP_TARGET, ZERO, GHOST }
 ## Compact/Kitchen/Cell states beyond default / selected / empty (WP1b B1-02; inPot / notForCooking 223):
 ##   HIDDEN       unknown page: grey dish silhouette + ingredient family dots, never the real dish art
 ##   CLUED        unknown page with a known slot: the silhouette and the lit-slot family row
@@ -41,6 +46,7 @@ const LOCK_GLYPH := preload("res://assets/ui/kit_icons/lock.svg")
 const SILHOUETTE := preload("res://assets/ui/kit_icons/kitchen/dish_silhouette.svg")
 const FAMILY_DOTS := preload("res://assets/ui/kit_icons/kitchen/family_dots.svg")
 const FAMILY_DOTS_CLUED := preload("res://assets/ui/kit_icons/kitchen/family_dots_clued.svg")
+const HOME_GLYPH := preload("res://assets/ui/kit_icons/home.svg")
 
 # Positions inside the fixed-size mains (layout of one main, not shared tokens):
 const _CELL_ICON_TOP := 10.0      # InventoryCell: 27 px icon at y 10 of 52
@@ -70,6 +76,8 @@ const _KITCHEN_RAISED_ICON_TOP := 1.5                   # inPot / notForCooking:
 const _KITCHEN_IN_POT_LABEL := Vector2(20, 16)          # `In pot` band: y 20, 16 high, no fill
 const _KITCHEN_NFC_LABEL := Vector2(25, 25)             # `Not for / cooking`: y 25, two lines
 const _KITCHEN_NFC_ALPHA := 0.25
+const _STORED_AT := Vector2(4, 38)   # InventoryCell: Icon/i-home 11×11 at (4, 38) on storage stacks (BAG-2-2)
+const _STORED_ICON := 11.0
 const _QUICK_PAD := 4.0           # QuickSlot "Slot surface" padding
 const _QUICK_NAME_H := 22.0       # two-line name block, then the 12 px quantity line
 const _QUICK_QTY_H := 12.0
@@ -101,6 +109,8 @@ var kitchen_state: KitchenState = KitchenState.DEFAULT: set = set_kitchen_state
 ## no rarity dot (q(46); An Qi La, 226 e8e5617a). The quantity is the stored count. In the pot it keeps the tag
 ## (COOK-2b-RACK): taking it out returns it to the rack.
 var rack := false: set = set_rack
+## INVENTORY: the stack is in Farm Storage, not the bag — a small house at the bottom left (BAG-2-2).
+var stored := false: set = set_stored
 
 ## Milliseconds for the arbiter; tests inject a fake clock.
 var clock := Callable(Time, &"get_ticks_msec")
@@ -116,6 +126,7 @@ var _role: Label
 var _status: Panel
 var _mark: Panel
 var _strip: Panel
+var _new_ring: Panel   # QuickSlot State=new (1663:101150): the color/new ring of a first-time item
 var _badge: Panel
 var _silhouette: TextureRect
 var _dots: TextureRect
@@ -125,6 +136,7 @@ var _rack_tag: PanelContainer
 var _tag_label: Label
 var _chip: PanelContainer
 var _chip_label: Label
+var _home: TextureRect
 
 func _init(d: Density = Density.INVENTORY) -> void:
 	density = d
@@ -154,10 +166,14 @@ func set_status(v: String) -> void: status = v; _refresh()
 func set_marked(v: bool) -> void: marked = v; _refresh()
 func set_kitchen_state(v: KitchenState) -> void: kitchen_state = v; _refresh()
 func set_rack(v: bool) -> void: rack = v; _refresh()
+func set_stored(v: bool) -> void: stored = v; _refresh()
 
 func _gui_input(event: InputEvent) -> void:
 	_emit(_arbiter.feed(event, clock.call()))
 	set_process(_arbiter.is_active())
+	# A lifted or dragged cell keeps its touch: the scroll container behind it must not take the drag (the bag's
+	# way onto the quick bar, SGODOT-225 / BAR-DRAG-9). Before the lift a vertical drag still scrolls the grid.
+	if _arbiter.is_lifted() or _arbiter.is_dragging(): accept_event()
 
 ## Long presses fire on time alone, so tick while a finger is down.
 func _process(_delta: float) -> void:
@@ -180,9 +196,37 @@ func _emit(outcomes: Array) -> void:
 		if g.has("pos"): g.pos = get_global_transform() * (g.pos as Vector2)
 		gesture.emit(g)
 
-## The state actually drawn: the extra QuickSlot states fall back to DEFAULT on the other mains.
+## QuickSlot pin badge pop after a pin toggle on the Pin zone (LOCK-05 v1.11): 1 → 1.3 → 1 over 300 ms.
+const _PIN_POP := 1.3
+const _PIN_POP_MS := 300.0
+func pop_pin() -> void:
+	if _badge == null or not _badge.visible: return
+	_badge.pivot_offset = _badge.size * 0.5
+	var t := _badge.create_tween()
+	t.tween_property(_badge, ^"scale", Vector2.ONE * _PIN_POP, UiKit.secs(_PIN_POP_MS * 0.5)).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	t.tween_property(_badge, ^"scale", Vector2.ONE, UiKit.secs(_PIN_POP_MS * 0.5)).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+
+## QuickSlot State=new (1663:101150, §10.3.3 ④): a first-time item's slot rings once in color/new, in then out over
+## MOTION_NEW_UNLOCK_FLASH_MS; size, place and icon stay, no badge, no buzz. QuickSlot only.
+func flash() -> void:
+	if _new_ring == null: return
+	var half := UiKit.secs(UiTokens.MOTION_NEW_UNLOCK_FLASH_MS * 0.5)
+	var t := _new_ring.create_tween()
+	_new_ring.modulate.a = 0.0
+	t.tween_property(_new_ring, ^"modulate:a", 1.0, half).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	t.tween_property(_new_ring, ^"modulate:a", 0.0, half).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+
+func is_flashing() -> bool: return _new_ring != null and _new_ring.modulate.a > 0.0
+
+## The ring at its peak, held: the gallery and snapshots only (a still of State=new).
+func show_new_ring() -> void:
+	if _new_ring: _new_ring.modulate.a = 1.0
+
+## The state actually drawn: the extra QuickSlot states fall back to DEFAULT (GHOST to EMPTY) on the other mains.
 func drawn_state() -> State:
-	if density != Density.QUICK and state in [State.LIFTED, State.DROP_TARGET, State.ZERO]: return State.DEFAULT
+	if density != Density.QUICK and state in [State.DROP_TARGET, State.ZERO]: return State.DEFAULT
+	if density not in [Density.QUICK, Density.INVENTORY] and state == State.LIFTED: return State.DEFAULT
+	if density != Density.QUICK and state == State.GHOST: return State.EMPTY
 	return state
 
 # ------------------------------------------------------------------ build
@@ -247,7 +291,12 @@ func _build_cell() -> void:
 	_add_icon(_surface, UiTokens.SIZE_INVENTORY_ICON, _KITCHEN_ICON_TOP if kitchen else _CELL_ICON_TOP)
 	_add_dot(_surface, _KITCHEN_DOT_INSET if kitchen else _DOT_INSET)
 	_add_pill(_surface)
-	if not kitchen: return
+	if not kitchen:
+		_home = UiKit.icon(HOME_GLYPH, _STORED_ICON)   # Farm Storage stack: 11 px house at (4, 38)
+		_home.self_modulate = UiTokens.COLOR_SECONDARY
+		_place(_home, 0.0, _STORED_AT.x, _STORED_AT.y, _STORED_ICON, _STORED_ICON)
+		_surface.add_child(_home)
+		return
 	_status = _box(self)
 	_place(_status, 0.0, 0.0, _KITCHEN_LABEL_TOP, side, _KITCHEN_LABEL_H)
 	_status.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_SURFACE, _KITCHEN_LABEL_RADIUS))
@@ -328,6 +377,10 @@ func _build_quick() -> void:
 	_name.max_lines_visible = 2
 	_name.custom_minimum_size.x = w
 	_qty = _band_label(body, UiTokens.STYLE_C10_XB, 0.0, _QUICK_QTY_H, HORIZONTAL_ALIGNMENT_RIGHT)
+	_new_ring = _box(_surface)
+	_new_ring.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_new_ring.add_theme_stylebox_override(&"panel", UiStyleBox.make(Color.TRANSPARENT, UiTokens.RADIUS_CELL, UiTokens.COLOR_NEW, UiTokens.STROKE_SELECTED))
+	_new_ring.modulate.a = 0.0
 	_strip = _box(_surface)
 	_strip.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_PIN_AMBER, UiTokens.SIZE_PIN_STRIP_H * 0.5))
 	var b := UiTokens.SIZE_PIN_BADGE
@@ -371,6 +424,7 @@ func _refresh() -> void:
 			_pill.visible = quantity != "" and not empty
 			_qty.text = quantity
 			_dot.visible = rarity > 0 and not empty and not (density == Density.KITCHEN and rack)
+			if _home != null: _home.visible = stored and not empty
 			if rarity > 0:
 				_dot.add_theme_stylebox_override(&"panel", UiStyleBox.make(RARITY_COLORS[clampi(rarity - 1, 0, 3)], UiTokens.SIZE_RARITY_DOT * 0.5))
 			if density == Density.KITCHEN: _refresh_kitchen(s, empty)
@@ -418,8 +472,15 @@ func _refresh_kitchen(s: State, empty: bool) -> void:
 	_name.offset_bottom = _status.offset_bottom - _status.offset_top if k == KitchenState.NOT_FOR_COOKING else UiTokens.SIZE_QTY_PILL_H
 	_mark.visible = (marked or s == State.SELECTED or in_pot) and not empty and k != KitchenState.NOT_FOR_COOKING
 
-## InventoryCell / Kitchen Cell / GearSlot surface: hairline border, 1.5 primary when selected, dashed when empty.
+## InventoryCell / Kitchen Cell / GearSlot surface: hairline border, 1.5 primary when selected, dashed when empty;
+## a lifted InventoryCell keeps the default look under the QuickSlot lift shadow (1641:34159).
 func _cell_box(s: State, radius: float) -> UiStyleBox:
+	if s == State.LIFTED:
+		var lifted := UiStyleBox.make(UiTokens.COLOR_SURFACE, radius, UiTokens.COLOR_BORDER, UiTokens.STROKE_CELL_HAIRLINE)
+		lifted.shadow_color = UiTokens.COLOR_LIFT_SHADOW
+		lifted.shadow_size = UiTokens.SIZE_LIFT_SHADOW_RADIUS
+		lifted.shadow_offset = Vector2(0.0, UiTokens.SIZE_LIFT_SHADOW_OFFSET_Y)
+		return lifted
 	if s == State.SELECTED:
 		return UiStyleBox.make(UiTokens.COLOR_SURFACE, radius, UiTokens.COLOR_PRIMARY, UiTokens.STROKE_SELECTED_CELL)
 	if s == State.EMPTY:
@@ -451,7 +512,7 @@ func _refresh_quick(s: State) -> void:
 				box.shadow_color = UiTokens.COLOR_LIFT_SHADOW
 				box.shadow_size = UiTokens.SIZE_LIFT_SHADOW_RADIUS
 				box.shadow_offset = Vector2(0.0, UiTokens.SIZE_LIFT_SHADOW_OFFSET_Y)
-		State.EMPTY:
+		State.EMPTY, State.GHOST:
 			box = _dashed(UiStyleBox.make(UiTokens.COLOR_SURFACE, UiTokens.RADIUS_CELL, UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT), UiTokens.DASH_QUICK)
 		State.DROP_TARGET:
 			box = _dashed(UiStyleBox.make(UiTokens.COLOR_PRIMARY_TINT, UiTokens.RADIUS_CELL, UiTokens.COLOR_PRIMARY, UiTokens.STROKE_SELECTED), UiTokens.DASH_DROP_TARGET)
@@ -467,12 +528,19 @@ func _refresh_quick(s: State) -> void:
 	_name.text = title
 	_name.visible = title != "" and not empty
 	_qty.text = quantity
-	_qty.visible = quantity != "" and not empty
-	_icon.modulate.a = UiTokens.OPACITY_ZERO_ICON if s == State.ZERO else 1.0
+	var ghost := s == State.GHOST
+	_qty.visible = quantity != "" and not empty and not ghost
+	# The ghost's "Icon · dimmed" is the same 35 % as the ×0 icon (no separate token yet).
+	_icon.modulate.a = UiTokens.OPACITY_ZERO_ICON if s in [State.ZERO, State.GHOST] else 1.0
+	_name.add_theme_color_override(&"font_color", UiTokens.COLOR_SECONDARY if ghost else UiTokens.COLOR_TEXT)
 	_qty.add_theme_color_override(&"font_color", UiTokens.COLOR_SECONDARY if s == State.ZERO else UiTokens.COLOR_TEXT)
-	var show_pin := pinned and not empty
+	var show_pin := pinned and not empty and not ghost
 	_strip.visible = show_pin
 	_badge.visible = show_pin
+	# The new ring sits inside the outline too: green outside, cyan inside when both show (1663:101150).
+	var inset := 0.0 if box.border_color == UiTokens.COLOR_BORDER else float(box.border_width)
+	for side in [&"offset_left", &"offset_top"]: _new_ring.set(side, inset)
+	for side in [&"offset_right", &"offset_bottom"]: _new_ring.set(side, -inset)
 	# The amber strip sits inside the outline, so it moves down with the 2 px selected stroke (LOCK-05).
 	var w := UiTokens.SIZE_PIN_STRIP_W
 	_place(_strip, 0.5, -w * 0.5, box.border_width, w, UiTokens.SIZE_PIN_STRIP_H)

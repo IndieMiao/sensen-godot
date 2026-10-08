@@ -99,12 +99,29 @@ func test_zero_quick_slot_dims_the_icon_and_greys_the_count() -> void:
 	var count: Label = _visible_named(c, "Label").filter(func(l): return (l as Label).text == "×0")[0]
 	assert_str(count.get_theme_color(&"font_color").to_html()).is_equal(UiTokens.COLOR_SECONDARY.to_html())
 
+func test_ghost_quick_slot_is_dashed_with_a_dimmed_icon_and_a_grey_family_name() -> void:
+	var c := _quick({state = UiItemCell.State.GHOST, title = "Seeds", quantity = "×5", pinned = true})
+	await _settle()
+	var icon: TextureRect = _visible_named(c, "TextureRect").filter(func(t): return (t as TextureRect).texture != UiItemCell.PIN_GLYPH)[0]
+	assert_float(icon.modulate.a).is_equal_approx(UiTokens.OPACITY_ZERO_ICON, 0.001)
+	var labels := _visible_named(c, "Label")
+	assert_array(labels.map(func(l): return (l as Label).text)).contains_exactly(["Seeds"])   # no count
+	assert_str((labels[0] as Label).get_theme_color(&"font_color").to_html()).is_equal(UiTokens.COLOR_SECONDARY.to_html())
+	assert_bool(_visible_named(c, "TextureRect").any(func(t): return (t as TextureRect).texture == UiItemCell.PIN_GLYPH)).is_false()
+	var box := _surface(c).get_theme_stylebox(&"panel") as UiStyleBox
+	assert_bool(box.dashed).is_true()
+	assert_float(box.dash).is_equal(float(UiTokens.DASH_QUICK[0]))
+
 func test_quick_only_states_fall_back_to_default_on_other_mains() -> void:
 	for d in [UiItemCell.Density.INVENTORY, UiItemCell.Density.KITCHEN, UiItemCell.Density.GEAR]:
 		var c: UiItemCell = auto_free(UiItemCell.new(d))
 		for s in [UiItemCell.State.LIFTED, UiItemCell.State.DROP_TARGET, UiItemCell.State.ZERO]:
 			c.state = s
-			assert_int(c.drawn_state()).is_equal(UiItemCell.State.DEFAULT)
+			# InventoryCell has its own lifted look (1641:34159, the bag's way onto the quick bar, SGODOT-225)
+			var lifted_here: bool = d == UiItemCell.Density.INVENTORY and s == UiItemCell.State.LIFTED
+			assert_int(c.drawn_state()).is_equal(UiItemCell.State.LIFTED if lifted_here else UiItemCell.State.DEFAULT)
+		c.state = UiItemCell.State.GHOST
+		assert_int(c.drawn_state()).is_equal(UiItemCell.State.EMPTY)
 
 func test_inventory_cell_quantity_pill_and_rarity_dot() -> void:
 	var c: UiItemCell = _host(UiItemCell.new(UiItemCell.Density.INVENTORY))
@@ -175,9 +192,10 @@ func test_short_press_taps_once() -> void:
 		assert_int(rec.taps).is_equal(1)
 		assert_array(rec.gestures).is_empty()
 
-func test_long_press_pins_without_a_tap() -> void:
-	# LOCK-05 (quick slot: release after the lift toggles the pin) and LOCK-12 (bag cell: long press).
-	var expect := {UiItemCell.Density.QUICK: "pin_toggle", UiItemCell.Density.INVENTORY: "long_press"}
+func test_long_press_lifts_without_a_tap() -> void:
+	# LOCK-05 v1.11 (quick slot: a long press only lifts; released where it lifted it cancels — pinning is a drop on
+	# the Pin zone) and LOCK-12 (bag cell: long press).
+	var expect := {UiItemCell.Density.QUICK: "cancel", UiItemCell.Density.INVENTORY: "long_press"}
 	for d in expect:
 		var c: UiItemCell = _host(UiItemCell.new(d))
 		var rec := _record(c)
@@ -362,8 +380,12 @@ func test_interactive_components_keep_a_44_hit_area() -> void:
 	await _settle()
 	for b in box.find_children("*", "BaseButton", true, false):
 		var size: Vector2 = (b as Control).size
-		assert_bool(size.x >= UiTokens.SIZE_TOUCH and size.y >= UiTokens.SIZE_TOUCH) \
-			.override_failure_message("%s is %s" % [b.get_class(), size]).is_true()
+		# A control drawn smaller than 44 (SegmentedTabs 28, Show pills) grows its touch area through _has_point.
+		var c := size * 0.5
+		var h := UiTokens.SIZE_TOUCH * 0.5 - 0.5
+		var touch := (size.x >= UiTokens.SIZE_TOUCH and size.y >= UiTokens.SIZE_TOUCH) or \
+			[c + Vector2(-h, -h), c + Vector2(h, -h), c + Vector2(-h, h), c + Vector2(h, h)].all(func(p): return (b as Control)._has_point(p))
+		assert_bool(touch).override_failure_message("%s is %s" % [b.get_class(), size]).is_true()
 
 func test_segment_tab_keeps_exactly_one_selected() -> void:
 	var seg: UiSegmentTab = _host(UiSegmentTab.new([{label = "Cookbook", count = "4/48"}, "Experiment"], 0))

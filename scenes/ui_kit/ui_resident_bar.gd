@@ -7,7 +7,8 @@ extends UiDialogueCard
 ## A reason on Gift or Request turns the button unavailable with the reason as its label (LOCK-10, e.g.
 ## `Gift already given today`) and stacks both buttons on full-width rows
 ## (Choices=Stacked), so the reason fits.
-## data: {portrait, name, role, stage, have, need, next, line, gift_reason, request_label, request_reason, meal, lesson}
+## data: {portrait, name, role, stage, have, need, next, line, gift_reason, request_label, request_reason, meal, lesson,
+## meal_note}
 ## (P0Logic.resident_bar builds it from the server view, SGODOT-228; `request_label` defaults to Request.)
 
 signal gift_pressed
@@ -57,6 +58,10 @@ func _init(data_: Dictionary = {}) -> void:
 		today.add_child(lesson)
 	if today.get_child_count() > 0: content.add_child(today)
 	else: today.free()
+	if str(data.get("meal_note", "")) != "":   # e.g. `Bag full · free a slot for Pip's meal` (SGODOT-228)
+		var note := UiKit.label(str(data.meal_note), UiTokens.STYLE_C10_B, UiTokens.COLOR_WARNING)
+		note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		content.add_child(note)
 
 ## Stage pill · meter · `52/90 · next Trusted`.
 func _affinity() -> HBoxContainer:

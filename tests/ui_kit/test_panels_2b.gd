@@ -98,6 +98,132 @@ func test_drawer_quick_flick_closes() -> void:
 	d._gui_input(r)
 	assert_int(closes[0]).is_equal(1)
 
+# Real viewport input: header content passes the swipe on, the grid and KEEP_INPUT subtrees keep theirs.
+
+func _mouse(at: Vector2, down: bool) -> void:
+	var e := InputEventMouseButton.new()
+	e.position = at
+	e.global_position = at
+	e.button_index = MOUSE_BUTTON_LEFT
+	e.pressed = down
+	get_viewport().push_input(e, true)
+
+func _swipe(from: Vector2, by: Vector2, steps := 8) -> void:
+	_mouse(from, true)
+	for i in steps:
+		var m := InputEventMouseMotion.new()
+		m.position = from + by * float(i + 1) / steps
+		m.global_position = m.position
+		m.relative = by / steps
+		m.button_mask = MOUSE_BUTTON_MASK_LEFT
+		get_viewport().push_input(m, true)
+		await get_tree().process_frame
+	_mouse(from + by, false)
+	await get_tree().process_frame
+
+## A drawer like the Bag: a tab row on top, a scrolling grid, a kept row (the docked quick bar) at the bottom.
+func _bag_like() -> Dictionary:
+	var d := UiDrawer.new(500.0)
+	d.animate = false
+	var early := Button.new()   # built before the drawer enters the tree, as P0BagDrawer does
+	early.custom_minimum_size = Vector2(120, 34)
+	d.body.add_child(early)
+	_host(d)
+	var tab := Button.new()     # added later, on a refresh
+	tab.custom_minimum_size = Vector2(120, 34)
+	var row := HBoxContainer.new()
+	row.add_child(tab)
+	d.body.add_child(row)
+	var grid := TouchScrollContainer.new()
+	grid.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	grid.custom_minimum_size.y = 200
+	d.body.add_child(grid)
+	var cell := Button.new()
+	cell.custom_minimum_size = Vector2(100, 400)
+	grid.add_child(cell)
+	var kept := PanelContainer.new()
+	kept.set_meta(UiDrawer.KEEP_INPUT, true)
+	var slot := Button.new()
+	slot.custom_minimum_size = Vector2(60, 44)
+	kept.add_child(slot)
+	d.body.add_child(kept)
+	return {drawer = d, early = early, tab = tab, cell = cell, slot = slot}
+
+func _count(sig: Signal) -> Array:
+	var n := [0]
+	sig.connect(func(): n[0] += 1)
+	return n
+
+func test_drawer_swipe_from_a_header_tab_closes_without_firing_the_tab() -> void:
+	if DisplayServer.is_touchscreen_available(): return
+	var p := _bag_like()
+	await _settle()
+	var d: UiDrawer = p.drawer
+	assert_int(p.early.mouse_filter).is_equal(Control.MOUSE_FILTER_PASS)
+	assert_int(p.tab.mouse_filter).is_equal(Control.MOUSE_FILTER_PASS)
+	var closes := _count(d.close_requested)
+	var taps := _count(p.tab.pressed)
+	await _swipe(p.tab.get_global_rect().get_center(), Vector2(0, 60))
+	assert_int(closes[0]).is_equal(1)
+	assert_int(taps[0]).is_zero()
+
+func test_drawer_tap_on_a_header_tab_still_taps_and_does_not_close() -> void:
+	if DisplayServer.is_touchscreen_available(): return
+	var p := _bag_like()
+	await _settle()
+	var closes := _count(p.drawer.close_requested)
+	var taps := _count(p.tab.pressed)
+	var at: Vector2 = p.tab.get_global_rect().get_center()
+	_mouse(at, true)
+	await get_tree().process_frame
+	_mouse(at, false)
+	await get_tree().process_frame
+	assert_int(taps[0]).is_equal(1)
+	assert_int(closes[0]).is_zero()
+
+func test_drawer_flick_from_a_tab_closes_and_eats_the_release() -> void:
+	if DisplayServer.is_touchscreen_available(): return
+	var p := _bag_like()
+	await _settle()
+	var d: UiDrawer = p.drawer
+	var now := [0]
+	d.clock = func() -> int: return now[0]
+	var closes := _count(d.close_requested)
+	var taps := _count(p.tab.pressed)
+	var at: Vector2 = p.tab.get_global_rect().get_center()
+	_mouse(at, true)
+	await get_tree().process_frame
+	now[0] = 100
+	_mouse(at + Vector2(0, 20), false)   # 20 px within 100 ms: the release still lands on the tab
+	await get_tree().process_frame
+	assert_int(closes[0]).is_equal(1)
+	assert_int(taps[0]).is_zero()
+
+func test_drawer_swipe_that_ends_on_the_same_tall_row_does_not_fire_it() -> void:
+	if DisplayServer.is_touchscreen_available(): return
+	var d := _drawer(500.0)
+	var row := Button.new()   # a gear row or notice taller than the swipe
+	row.custom_minimum_size = Vector2(300, 120)
+	d.body.add_child(row)
+	await _settle()
+	var closes := _count(d.close_requested)
+	var taps := _count(row.pressed)
+	var top := row.get_global_rect().position + Vector2(150, 10)
+	await _swipe(top, Vector2(0, 60))   # closes on the way; the release is still inside the row
+	assert_bool(row.get_global_rect().has_point(top + Vector2(0, 60))).is_true()
+	assert_int(closes[0]).is_equal(1)
+	assert_int(taps[0]).is_zero()
+
+func test_drawer_grid_and_kept_rows_keep_their_drags() -> void:
+	if DisplayServer.is_touchscreen_available(): return
+	var p := _bag_like()
+	await _settle()
+	var closes := _count(p.drawer.close_requested)
+	await _swipe(p.cell.get_global_rect().get_center(), Vector2(0, 60))
+	assert_int(p.slot.mouse_filter).is_equal(Control.MOUSE_FILTER_STOP)   # untouched
+	await _swipe(p.slot.get_global_rect().get_center(), Vector2(0, 60))
+	assert_int(closes[0]).is_zero()
+
 # ---------------------------------------------------------------- UiInventoryGrid
 
 func _items(n: int) -> Array:
@@ -230,9 +356,9 @@ func _click(c: Control, at: Vector2) -> void:
 func test_keeper_head_has_a_place_line_and_no_profile_link() -> void:
 	var c: UiDialogueCard = _host(UiDialogueCard.new(PIP, "Tackle Keeper · Finn", "", "Pick a rod, I'll string it."))
 	c.portrait_size = UiDialogueCard.KEEPER_PORTRAIT
-	c.place = "Rods and bait · Shanghai Tackle Shop"
+	c.place = "Rods and bait · Xuhui Tackle Shop"
 	await _settle()
-	assert_array(_texts(c)).contains(["Tackle Keeper · Finn", "Rods and bait · Shanghai Tackle Shop", "Pick a rod, I'll string it."])
+	assert_array(_texts(c)).contains(["Tackle Keeper · Finn", "Rods and bait · Xuhui Tackle Shop", "Pick a rod, I'll string it."])
 	assert_array(_texts(c)).not_contains(["›"])
 	assert_vector(c._portrait.size).is_equal(UiDialogueCard.KEEPER_PORTRAIT)
 	var hits := [0]
@@ -279,8 +405,12 @@ func test_bag_header_count_sort_and_capacity_bar() -> void:
 	var h: UiBagHeader = _host(UiBagHeader.new(19, 25))
 	await _settle()
 	assert_array(_texts(h)).contains(["Bag 19/25"])
-	assert_str(h.sort_button().label).is_equal("Sort · Recent")
+	assert_str(h.sort_button().label).is_equal("Sort · Type")
+	assert_str(h.sort_button().text).is_equal("Sort · Type")   # a toggle, so no ›
+	assert_str(h.sort_button().get_theme_color(&"font_color").to_html()).is_equal(UiTokens.COLOR_INFO.to_html())
 	assert_bool(h.sort_button().visible).is_true()
+	assert_float(h.tabs().size.y).is_equal(34.0)   # SegmentedTabs track 34, segments 28
+	assert_float(h.tabs().tabs()[0].size.y).is_equal(28.0)
 	assert_bool(h.is_nearly_full()).is_false()
 	h.used = 23   # 92 %: amber (§10.4.1)
 	assert_bool(h.is_nearly_full()).is_true()
@@ -313,3 +443,251 @@ func test_gear_row_states() -> void:
 	assert_array(_texts(locked)).contains(["Fishing Lv5 · Tackle Shop"])
 	assert_object(locked.action_button()).is_null()
 	assert_float(locked._icon.modulate.a).is_equal_approx(UiTokens.OPACITY_UNAVAILABLE_ICON, 0.001)
+
+# ---------------------------------------------------------------- profile parts (LOCK-22)
+
+func test_profile_top_bar_self_and_other() -> void:
+	var me: UiProfileTopBar = _host(UiProfileTopBar.new(UiProfileTopBar.Kind.SELF, "Profile"))
+	var other: UiProfileTopBar = _host(UiProfileTopBar.new(UiProfileTopBar.Kind.OTHER, "Ann"))
+	await _settle()
+	assert_array(_texts(me)).contains(["Profile"])
+	assert_array(_texts(other)).contains(["Ann"])
+	var got := []
+	me.back_pressed.connect(func(): got.append("back"))
+	me.settings_pressed.connect(func(): got.append("settings"))
+	other.more_pressed.connect(func(_r: Rect2): got.append("more"))
+	me.get_child(0).pressed.emit()
+	me.right_button().pressed.emit()
+	other.right_button().pressed.emit()
+	assert_array(got).is_equal(["back", "settings", "more"])
+	assert_vector(me.right_button().size).is_equal(Vector2(UiTokens.SIZE_CLOSE, UiTokens.SIZE_CLOSE))
+	me.show_settings = false   # P0: no Settings page; the slot stays so the title does not move
+	assert_float(me.right_button().modulate.a).is_equal(0.0)
+	assert_int(me.right_button().mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
+
+func test_more_menu_rows_follow_the_relation() -> void:
+	for case in [[&"default", ["Unfollow", "Block", "Report"]], [&"close_friend", ["Unfollow", "Remove Close Friend", "Block", "Report"]],
+			[&"blocked", ["Report"]]]:
+		var menu: UiProfileMoreMenu = auto_free(UiProfileMoreMenu.new(case[0]))
+		assert_array(menu.labels()).is_equal(case[1])
+	var m: UiProfileMoreMenu = _host(UiProfileMoreMenu.new())
+	var got := []
+	m.picked.connect(func(id: StringName): got.append(id))
+	(m.get_child(0).get_child(1) as Button).pressed.emit()
+	assert_array(got).is_equal([&"block"])
+
+func test_skill_card_ring_floors_to_ten_percent_and_reads_the_level() -> void:
+	var c: UiSkillCard = _host(UiSkillCard.new("Farming", 3, 0.67, load("res://assets/p0/icons/hoe.svg")))
+	await _settle()
+	assert_array(_texts(c)).contains(["Farming", "Lv3"])
+	assert_float(c.shown_progress()).is_equal_approx(0.6, 0.0001)
+	assert_vector(c.size).is_equal(Vector2(107, 56))
+	var hits := [0]
+	c.pressed.connect(func(): hits[0] += 1)
+	c.pressed.emit()
+	assert_int(hits[0]).is_equal(1)
+
+func test_farm_card_lines() -> void:
+	var f: UiFarmCard = _host(UiFarmCard.new("Farmer's Homestead", "Level 1", "Radishes ready 3h 32m", load("res://assets/p0/art/homestead-thumb.jpg")))
+	await _settle()
+	assert_array(_texts(f)).contains(["Farmer's Homestead", "Level 1", "Radishes ready 3h 32m"])
+	f.status = ""
+	assert_array(_texts(f)).not_contains(["Radishes ready 3h 32m"])
+	assert_float(f.size.y).is_equal(76.0)
+
+func _request(fields := {}) -> Dictionary:
+	var d := {portrait = PIP, title = "Pip's request", who = "Pip · Courier Kid · personal request",
+		line = "Could you catch me a fish? Any kind is fine.", needs = [{name = "Common fish", have = 0, need = 1,
+		icon = load("res://assets/p0/icons/fish_crucian.svg")}], reward = "+5 Friendship · 20 coins", deliver_to = "Pip · Travel Post"}
+	d.merge(fields, true)
+	return d
+
+func test_request_card_reads_the_request_and_offers_accept_or_not_now() -> void:
+	var c: UiRequestCard = _host(UiRequestCard.new(_request()))
+	await _settle()
+	assert_array(_texts(c)).contains(["Pip's request", "Pip · Courier Kid · personal request", "Could you catch me a fish? Any kind is fine.",
+		"Bring", "Reward", "+5 Friendship · 20 coins", "Deliver to", "Pip · Travel Post"])
+	assert_int(c.find_children("*", "UiNeedTile", true, false).size()).is_equal(1)
+	var got := []
+	c.action_pressed.connect(func(): got.append("accept"))
+	c.dismissed.connect(func(): got.append("later"))
+	assert_str(c.action_button().text).is_equal("Accept")
+	c.action_button().activated.emit()
+	(c.find_children("*", "UiDismissButton", true, false)[0] as Button).pressed.emit()
+	assert_array(got).is_equal(["accept", "later"])
+
+func test_request_card_short_of_items_puts_the_gap_on_the_button() -> void:
+	var c: UiRequestCard = _host(UiRequestCard.new(_request({action = "Deliver", reason = "Need 1 more Common fish"})))
+	await _settle()
+	assert_str(c.action_button().text).is_equal("Need 1 more Common fish")
+	assert_bool(c.action_button().is_unavailable()).is_true()
+
+func test_stored_stack_shows_the_house_badge() -> void:
+	var g := UiInventoryGrid.new()
+	g.custom_minimum_size = Vector2(336, 240)
+	var it := _items(2)
+	it[1]["stored"] = true
+	g.items = it
+	_host(g)
+	await _settle()
+	assert_bool(g.cells()[0]._home.visible).is_false()
+	assert_bool(g.cells()[1]._home.visible).is_true()
+	assert_vector(g.cells()[1]._home.position).is_equal(Vector2(4, 38))
+	assert_bool(g.cells()[5]._home.visible).is_false()   # empty cells never
+
+# ---------------------------------------------------------------- resident profile, notice row, float text
+
+func test_drawer_pad_sets_the_sheet_inset() -> void:
+	var d := _drawer(443)
+	d.pad = UiTokens.SPACE_PAGE
+	await _settle()
+	assert_vector(d.body.position).is_equal(Vector2(16, 16))
+
+func test_resident_profile_lists_identity_stage_friendship_and_likes() -> void:
+	var p: UiResidentProfile = _host(UiResidentProfile.new({name = "Pip", role = "Courier Kid", stage = "Familiar",
+		friendship = "52/90", likes = "Dessert"}))
+	p.size = Vector2(328, 411)
+	await _settle()
+	var texts := p.find_children("*", "Label", true, false).filter(func(l): return l.is_visible_in_tree()).map(func(l): return l.text)
+	for t in ["Pip", "Courier Kid", "Familiar", "Friendship", "52/90", "Favourite dishes", "Dessert"]:
+		assert_bool(t in texts).override_failure_message("missing %s in %s" % [t, texts]).is_true()
+	assert_bool(p.details_button().visible).is_false()   # no page behind Details in P0: never a dead end
+	var back := [false]
+	p.back_pressed.connect(func(): back[0] = true)
+	var dismiss := p.find_children("*", "UiDismissButton", true, false)[0] as UiDismissButton
+	assert_str(dismiss.text).is_equal("Back")
+	dismiss.pressed.emit()
+	assert_bool(back[0]).is_true()
+
+func test_notice_row_reads_one_line_with_a_chevron() -> void:
+	var r: UiNoticeRow = _host(UiNoticeRow.new("Bag full · +5 slots at Homestead Lv3"))
+	r.size = Vector2(336, 44)
+	await _settle()
+	assert_str(r.notice()).is_equal("Bag full · +5 slots at Homestead Lv3")
+	assert_float(r.size.y).is_equal(44.0)
+
+func test_float_text_affinity_has_the_heart_and_rose_ink() -> void:
+	var f: UiFloatText = _host(UiFloatText.new("+2 · first chat today", UiFloatText.Tone.AFFINITY))
+	await _settle()
+	var label := f.find_children("*", "Label", true, false)[0] as Label
+	assert_str(label.get_theme_color(&"font_color").to_html()).is_equal(UiTokens.COLOR_FLOAT_AFFINITY.to_html())
+	assert_bool((f.find_children("*", "TextureRect", true, false)[0] as TextureRect).visible).is_true()
+	# laid out at the ×1.3 peak and shown at ×1.0
+	assert_float(f.shown_size().x).is_equal_approx(f.size.x / 1.3, 0.01)
+	assert_float(f.scale.x).is_equal_approx(1.0 / 1.3, 0.001)
+
+func test_float_text_plays_bottom_centre_and_frees_itself() -> void:
+	var f: UiFloatText = _host(UiFloatText.new("+5 XP", UiFloatText.Tone.XP))
+	await _settle()
+	var done := [false]
+	f.finished.connect(func(): done[0] = true)
+	f.play(Vector2(180, 400))
+	assert_vector(f.position + f.pivot_offset).is_equal(Vector2(180, 400))
+	assert_float(f.scale.x).is_equal_approx(0.5 / 1.3, 0.001)
+	await get_tree().create_timer(1.25).timeout
+	assert_bool(done[0]).is_true()
+	assert_bool(is_instance_valid(f) and not f.is_queued_for_deletion()).is_false()
+
+func test_float_text_stacks_and_caps_the_peak_width() -> void:
+	var a: UiFloatText = _host(UiFloatText.new("+48 XP · 12 plants", UiFloatText.Tone.XP))
+	var b: UiFloatText = _host(UiFloatText.new("−2 Energy", UiFloatText.Tone.ENERGY_COST))
+	await _settle()
+	a.play(Vector2(180, 400))
+	b.play(Vector2(180, 400), 1)
+	assert_float((a.position.y + a.pivot_offset.y) - (b.position.y + b.pivot_offset.y)).is_equal(28.0)
+	var wide: UiFloatText = _host(UiFloatText.new("Granny Wu shared a meal with you and it was very good indeed · +20 Energy",
+		UiFloatText.Tone.ENERGY_GAIN, null, UiFloatText.Layout.WRAP))
+	await _settle()
+	assert_float(wide.shown_size().x).is_less_equal(320.0 + 0.5)
+	assert_float(wide.shown_size().x * wide._peak).is_less_equal(336.0 + 0.5)
+
+func test_float_text_bump_updates_in_place() -> void:
+	var f: UiFloatText = _host(UiFloatText.new("+12 XP", UiFloatText.Tone.XP))
+	await _settle()
+	f.play(Vector2(180, 400))
+	await get_tree().create_timer(0.9).timeout
+	f.bump("+24 XP · 2 plants")
+	var y := f.position.y
+	await get_tree().create_timer(0.5).timeout
+	assert_bool(is_instance_valid(f)).is_true()   # the fade restarted 650 ms after the bump
+	assert_float(f.position.y).is_equal(y)        # it holds its height
+	assert_str((f.find_children("*", "Label", true, false)[0] as Label).text).is_equal("+24 XP · 2 plants")
+
+func test_float_text_static_pill_is_the_same_look_at_one_x() -> void:
+	var p: PanelContainer = _host(UiFloatText.pill("+20 Cooking XP", UiFloatText.Tone.XP))
+	await _settle()
+	var label := p.find_children("*", "Label", true, false)[0] as Label
+	assert_str(label.text).is_equal("+20 Cooking XP")
+	assert_str(label.get_theme_color(&"font_color").to_html()).is_equal(UiTokens.COLOR_FLOAT_XP.to_html())
+	assert_int(label.get_theme_font_size(&"font_size")).is_equal(15)
+	assert_float((p.get_theme_stylebox(&"panel") as UiStyleBox).content_margin_left).is_equal(8.0)
+
+# ---------------------------------------------------------------- a lifted bag cell keeps its drag (225 / BAR-DRAG-9)
+
+func test_inventory_cell_lifted_keeps_the_default_look_under_the_lift_shadow() -> void:
+	var c: UiItemCell = auto_free(UiItemCell.new(UiItemCell.Density.INVENTORY))
+	add_child(c)
+	c.state = UiItemCell.State.LIFTED
+	assert_int(c.drawn_state()).is_equal(UiItemCell.State.LIFTED)
+	var box := c._surface.get_theme_stylebox(&"panel") as UiStyleBox
+	assert_str(box.border_color.to_html()).is_equal(UiTokens.COLOR_BORDER.to_html())
+	assert_str(box.shadow_color.to_html()).is_equal(UiTokens.COLOR_LIFT_SHADOW.to_html())
+	var k: UiItemCell = auto_free(UiItemCell.new(UiItemCell.Density.KITCHEN))
+	k.state = UiItemCell.State.LIFTED
+	assert_int(k.drawn_state()).is_equal(UiItemCell.State.DEFAULT)
+
+## A phone sends the touch and its emulated mouse twin; the scroll drags on the mouse, the cell reads the touch.
+func _touch_and_mouse(at: Vector2, down: bool) -> void:
+	var t := InputEventScreenTouch.new()
+	t.position = at
+	t.pressed = down
+	get_viewport().push_input(t, true)
+	_mouse(at, down)
+
+func _drag_and_motion(at: Vector2, rel: Vector2) -> void:
+	var d := InputEventScreenDrag.new()
+	d.position = at
+	d.relative = rel
+	get_viewport().push_input(d, true)
+	var m := InputEventMouseMotion.new()
+	m.position = at
+	m.global_position = at
+	m.relative = rel
+	m.button_mask = MOUSE_BUTTON_MASK_LEFT
+	get_viewport().push_input(m, true)
+
+func test_a_lifted_cell_in_a_scroll_keeps_the_drag_from_the_scroll() -> void:
+	if DisplayServer.is_touchscreen_available(): return
+	var emulate := Input.emulate_touch_from_mouse
+	Input.emulate_touch_from_mouse = true   # as on a phone: the scroll container drags on the (emulated) mouse
+	var scroll := TouchScrollContainer.new()
+	scroll.position = Vector2(20, 100)
+	scroll.size = Vector2(300, 200)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	add_child(auto_free(scroll))
+	var col := VBoxContainer.new()
+	scroll.add_child(col)
+	var cell := UiItemCell.new(UiItemCell.Density.INVENTORY)
+	var now := [0]
+	cell.clock = func() -> int: return now[0]
+	col.add_child(cell)
+	var filler := Control.new()
+	filler.custom_minimum_size = Vector2(10, 600)
+	col.add_child(filler)
+	for i in 3: await get_tree().process_frame
+	var kinds := []
+	cell.gesture.connect(func(o: Dictionary): kinds.append(o.kind))
+	var at := cell.get_global_rect().get_center()
+	_touch_and_mouse(at, true)
+	now[0] = GestureArbiter.LONG_PRESS_MS + 20
+	await get_tree().process_frame
+	await get_tree().process_frame
+	assert_array(kinds).contains([&"lift"])
+	for step in 6:
+		_drag_and_motion(at + Vector2(0, 20.0 * (step + 1)), Vector2(0, 20))
+		await get_tree().process_frame
+	_touch_and_mouse(at + Vector2(0, 120), false)
+	await get_tree().process_frame
+	Input.emulate_touch_from_mouse = emulate
+	assert_int(scroll.scroll_vertical).is_equal(0)   # the grid did not scroll under the lifted cell
+	assert_array(kinds).contains([&"drag_start", &"drop"])

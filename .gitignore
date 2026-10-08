@@ -40,3 +40,10 @@ __pycache__/
 
 # AI image API raw responses (base64 duplicates of the PNGs next to them)
 docs/design/**/*.response.json
+
+# SGODOT-232 D2: the P0 demo build bakes its server here at build time; it may hold a demo key, never commit it.
+/assets/p0/demo_server.json
+
+# Godot import caches of design images under docs/ (generated on each machine's import; never shared, or they block
+# every other worktree's checkout and merge). Already-tracked ones stay tracked.
+docs/**/*.import

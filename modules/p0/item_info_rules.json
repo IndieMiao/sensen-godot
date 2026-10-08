@@ -10,7 +10,10 @@
     "  entry at all (no grey text: seeds and bait are never sold).",
     "promote: the button id that becomes primary when its own `when` holds, demoting the default primary (Deliver over Eat).",
     "lock: the title-area lock icon is shown; price: the buy row has a price column; quota: the sell area shows the quota line.",
-    "Capability flags (can_store, can_lock, can_gift) gate actions the P0 server can't do yet: no button and no grey text until the view carries the feature (storage, locked on bag stacks, residents / social)."
+    "Capability flags (can_store, can_lock, can_gift) gate actions the P0 server can't do yet: no button and no grey text until the view carries the feature (storage, locked on bag stacks, residents / social).",
+    "Rarity and dish stars sit on the card's state line (spec.rarity_text, spec.quality), not in facts.",
+    "any/<context> is the fallback for every kind (storage: Take 10 shows only when more than 10 are stored; both send take_out with qty 10 / \"all\").",
+    "{count_source} is \"12 · Harvested at home\"; without a known source the line drops (the title already shows ×N)."
   ],
   "seed/bag": {
     "facts": [
@@ -21,7 +24,13 @@
       {
         "id": "pin",
         "label": "{pin_verb}",
-        "kind": "secondary"
+        "kind": "secondary",
+        "unless": [
+          {
+            "when": "bar_full",
+            "label": "Bar full · Unpin one first"
+          }
+        ]
       },
       {
         "id": "store",
@@ -55,6 +64,10 @@
             "label": "{gate_text}"
           },
           {
+            "when": "!homestead_ok",
+            "label": "{homestead_gate}"
+          },
+          {
             "when": "sold_out",
             "label": "Sold out · {restock_in}"
           },
@@ -68,7 +81,7 @@
   },
   "crop/bag": {
     "facts": [
-      "{count} · {source}",
+      "{count_source}",
       "Sells for {sell}"
     ],
     "buttons": [],
@@ -138,8 +151,7 @@
   },
   "fish/bag": {
     "facts": [
-      "{rarity_line}",
-      "{count} · {source}",
+      "{count_source}",
       "Sells for {sell} · Fish-dex {dex}",
       "{xp_hint}"
     ],
@@ -161,7 +173,6 @@
   },
   "fish/counter_sell": {
     "facts": [
-      "{rarity_line}",
       "{count} · {region_line}",
       "{sell_here} each"
     ],
@@ -212,9 +223,7 @@
     ]
   },
   "fish/gift": {
-    "facts": [
-      "{rarity_line}"
-    ],
+    "facts": [],
     "buttons": [
       {
         "id": "deliver",
@@ -238,7 +247,6 @@
   },
   "dish/bag": {
     "facts": [
-      "{rarity_line}",
       "+{meal} Energy",
       "{gifted_line}",
       "{expires_line}"
@@ -264,16 +272,25 @@
       },
       {
         "id": "gift",
-        "label": "Gift ›",
-        "kind": "nav",
-        "when": "!mystery & can_gift"
+        "label": "{gift_near_label}",
+        "kind": "secondary",
+        "when": "can_gift",
+        "unless": [
+          {
+            "when": "!resident_near",
+            "label": "Gift to a resident"
+          },
+          {
+            "when": "near_gifted_today",
+            "label": "Gift already given today"
+          }
+        ]
       }
     ],
     "lock": true
   },
   "dish/counter_sell": {
     "facts": [
-      "{rarity_line}",
       "{count}",
       "{sell_here} each"
     ],
@@ -325,7 +342,6 @@
   },
   "dish/gift": {
     "facts": [
-      "{rarity_line}",
       "{affinity_line}"
     ],
     "buttons": [
@@ -339,7 +355,7 @@
         "id": "gift",
         "label": "{gift_label}",
         "kind": "primary",
-        "when": "!deliverable & !mystery & has_target",
+        "when": "!deliverable & has_target",
         "unless": [
           {
             "when": "resident_target & gifted_today",
@@ -361,14 +377,20 @@
       {
         "id": "pin",
         "label": "{pin_verb}",
-        "kind": "secondary"
+        "kind": "secondary",
+        "unless": [
+          {
+            "when": "bar_full",
+            "label": "Bar full · Unpin one first"
+          }
+        ]
       }
     ],
     "lock": true
   },
   "bait/counter_buy": {
     "facts": [
-      "Faster bites",
+      "{use}",
       "{stock_line}"
     ],
     "price": true,
@@ -381,6 +403,10 @@
           {
             "when": "!unlocked",
             "label": "{gate_text}"
+          },
+          {
+            "when": "!homestead_ok",
+            "label": "{homestead_gate}"
           },
           {
             "when": "sold_out",
@@ -409,7 +435,7 @@
       {
         "id": "equip",
         "label": "Equip",
-        "kind": "secondary",
+        "kind": "primary",
         "when": "owned & !equipped"
       }
     ]
@@ -435,6 +461,10 @@
             "label": "{gate_text}"
           },
           {
+            "when": "!homestead_ok",
+            "label": "{homestead_gate}"
+          },
+          {
             "when": "!can_afford",
             "label": "Need {coins_short} more coins"
           }
@@ -444,7 +474,7 @@
   },
   "material/bag": {
     "facts": [
-      "{count} · {source}",
+      "{count_source}",
       "{sell_at_home}"
     ],
     "buttons": [
@@ -505,6 +535,119 @@
         "label": "Locked",
         "kind": "unavailable",
         "when": "recyclable & locked"
+      }
+    ]
+  },
+  "fert/bag": {
+    "facts": [
+      "{count}"
+    ],
+    "buttons": [
+      {
+        "id": "pin",
+        "label": "{pin_verb}",
+        "kind": "secondary",
+        "unless": [
+          {
+            "when": "bar_full",
+            "label": "Bar full · Unpin one first"
+          }
+        ]
+      },
+      {
+        "id": "store",
+        "label": "Store",
+        "kind": "secondary",
+        "when": "can_store",
+        "unless": [
+          {
+            "when": "!at_home",
+            "label": "At home only"
+          }
+        ]
+      }
+    ],
+    "lock": true
+  },
+  "any/storage": {
+    "facts": [
+      "{stored} · Farm Storage"
+    ],
+    "buttons": [
+      {
+        "id": "take_out",
+        "label": "{take_some}",
+        "kind": "secondary",
+        "when": "take_some & at_home",
+        "payload": {
+          "qty": 10
+        }
+      },
+      {
+        "id": "take_out",
+        "label": "Take all",
+        "kind": "primary",
+        "payload": {
+          "qty": "all"
+        },
+        "unless": [
+          {
+            "when": "!at_home",
+            "label": "At home only"
+          }
+        ]
+      }
+    ]
+  },
+  "pick/gear": {
+    "facts": [
+      "{pick_effect}",
+      "{pick_source}"
+    ],
+    "buttons": [
+      {
+        "id": "equipped",
+        "label": "✓ Equipped",
+        "kind": "unavailable",
+        "when": "owned & equipped"
+      },
+      {
+        "id": "equip",
+        "label": "Equip",
+        "kind": "primary",
+        "when": "owned & !equipped"
+      }
+    ]
+  },
+  "fert/counter_buy": {
+    "facts": [
+      "{use}",
+      "{stock_line}"
+    ],
+    "price": true,
+    "buttons": [
+      {
+        "id": "buy",
+        "label": "Buy",
+        "kind": "secondary",
+        "unless": [
+          {
+            "when": "!unlocked",
+            "label": "{gate_text}"
+          },
+          {
+            "when": "!homestead_ok",
+            "label": "{homestead_gate}"
+          },
+          {
+            "when": "sold_out",
+            "label": "Sold out · {restock_in}"
+          },
+          {
+            "when": "!can_afford",
+            "label": "Need {coins_short} more coins"
+          }
+        ]
       }
     ]
   }

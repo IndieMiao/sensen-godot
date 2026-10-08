@@ -34,10 +34,14 @@ var preview: BagCharacterPreview
 
 var _body: VBoxContainer
 var _refreshed_ms := 0
+var _shown := {}   # the profile_data last drawn: rebuild only when it changes
+## Back from the dressing room with Done (KEEP-P0-2): `Look saved` under the home line.
+var look_saved := false
 
-func _init(view_: Dictionary = {}, safe_top_ := 0.0) -> void:
+func _init(view_: Dictionary = {}, safe_top_ := 0.0, look_saved_ := false) -> void:
 	view = view_
 	safe_top = safe_top_
+	look_saved = look_saved_
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	var bg := ColorRect.new()
@@ -70,10 +74,13 @@ func _init(view_: Dictionary = {}, safe_top_ := 0.0) -> void:
 	_body.add_child(_look())
 	refresh(view_)
 
-## The P0 UI hands every frame's view here; the facts are rebuilt at most once a second (the farm countdown).
+## The P0 UI hands every frame's view here; the facts are checked at most once a second (the farm countdown) and
+## rebuilt only when they changed, so a tap is never cut in two by a rebuild (亚瑟 on #37).
 func update(view_: Dictionary) -> void:
 	view = view_
-	if Time.get_ticks_msec() - _refreshed_ms >= 1000: refresh(view_)
+	if Time.get_ticks_msec() - _refreshed_ms < 1000: return
+	_refreshed_ms = Time.get_ticks_msec()
+	if profile_data(view_) != _shown: refresh(view_)
 
 ## Rebuild the facts below the outfit from a new view (the outfit and top bar stay).
 func refresh(view_: Dictionary) -> void:
@@ -84,6 +91,7 @@ func refresh(view_: Dictionary) -> void:
 		_body.remove_child(c)
 		c.queue_free()
 	var d := profile_data(view)
+	_shown = d
 	var col := VBoxContainer.new()
 	col.add_theme_constant_override(&"separation", int(_CONTENT_GAP))
 	_body.add_child(col)
@@ -91,6 +99,7 @@ func refresh(view_: Dictionary) -> void:
 	id.add_theme_constant_override(&"separation", int(_CONTENT_GAP))
 	id.add_child(UiKit.label(str(d.name), UiTokens.STYLE_C14_XB))
 	if str(d.home_line) != "": id.add_child(UiKit.label(str(d.home_line), UiTokens.STYLE_C10_B, UiTokens.COLOR_SECONDARY))
+	if look_saved: id.add_child(UiKit.label("Look saved", UiTokens.STYLE_C10_B, UiTokens.COLOR_PRIMARY))   # KEEP-P0-2
 	col.add_child(id)
 	var skills := HBoxContainer.new()
 	skills.add_theme_constant_override(&"separation", int(_SKILL_GAP))

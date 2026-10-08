@@ -4,6 +4,7 @@ extends RefCounted
 const MANIFEST_VERSION := 1
 const REQUIRED_FIELDS := ["id", "slot", "attach", "res"]
 const DENYLIST_VERSION := 1
+const NPC_ONLY_VERSION := 1
 
 class AvatarPartMeta:
 	extends RefCounted
@@ -17,9 +18,13 @@ class AvatarPartMeta:
 	var offset_pos := Vector3.ZERO
 	var offset_rot_deg := Vector3.ZERO
 	var offset_scale := Vector3.ONE
+	## Made for an NPC (SGODOT-229): part(id) finds it, the player and passer-by pools (parts_for_slot) do not.
+	var npc_only := false
+	var order := 0   # position in the manifest: a part moved back into a pool goes back to its place
 
 var _by_id: Dictionary = {}
 var _by_slot: Dictionary = {}
+var _npc_by_slot: Dictionary = {}   # slot → NPC-only metas, kept out of _by_slot
 
 static func load_from_file(path: String) -> PartCatalog:
 	if not FileAccess.file_exists(path):
@@ -40,6 +45,7 @@ static func load_from_file(path: String) -> PartCatalog:
 				push_warning("PartCatalog: 缺字段 %s: %s" % [field, str(entry)])
 				return null
 		var meta := AvatarPartMeta.new()
+		meta.order = cat._by_id.size()
 		meta.id = entry.id
 		meta.slot = StringName(entry.slot)
 		meta.attach = entry.attach
@@ -74,8 +80,42 @@ func part(id: String) -> AvatarPartMeta:
 func has_part(id: String) -> bool:
 	return _by_id.has(id)
 
-func parts_for_slot(slot: StringName) -> Array:
-	return _by_slot.get(slot, [])
+## The parts a player may wear in this slot (outfit list, random passers-by). include_npc adds the NPC-only parts
+## (tools, contact sheets); that list is a new array, the default one is the catalogue's own (see apply_denylist).
+func parts_for_slot(slot: StringName, include_npc := false) -> Array:
+	if not include_npc: return _by_slot.get(slot, [])
+	return _by_slot.get(slot, []) + _npc_by_slot.get(slot, [])
+
+func is_npc_only(id: String) -> bool:
+	var meta: AvatarPartMeta = _by_id.get(id)
+	return meta != null and meta.npc_only
+
+## Marks parts as NPC-only (SGODOT-229): they leave parts_for_slot() but stay findable by part(id), so the outpost
+## NPCs can wear them while no player outfit, passer-by or online appearance can. Unknown ids are ignored; an
+## empty list changes nothing. Returns how many parts it marked.
+func apply_npc_only(ids: PackedStringArray) -> int:
+	var marked := 0
+	for id in ids:
+		if set_npc_only(id, true): marked += 1
+	return marked
+
+## One part in or out of the NPC-only set; false when the id is unknown or already so.
+func set_npc_only(id: String, on: bool) -> bool:
+	var meta: AvatarPartMeta = _by_id.get(id)
+	if meta == null or meta.npc_only == on: return false
+	meta.npc_only = on
+	var pool: Array = _by_slot.get(meta.slot, [])
+	if not _by_slot.has(meta.slot): _by_slot[meta.slot] = pool
+	var npc: Array = _npc_by_slot.get(meta.slot, [])
+	if not _npc_by_slot.has(meta.slot): _npc_by_slot[meta.slot] = npc
+	if on:
+		pool.erase(meta)   # in place: callers holding the pool see it shrink, as with apply_denylist
+		npc.append(meta)
+	else:
+		npc.erase(meta)
+		pool.append(meta)
+		pool.sort_custom(func(a, b): return a.order < b.order)   # in place, manifest order
+	return true
 
 func size() -> int:
 	return _by_id.size()
@@ -99,8 +139,26 @@ func apply_denylist(ids: PackedStringArray) -> int:
 		# 拷贝，剔除名单会静默失效，而且测试照样全绿（没有用例断言对象同一性）。
 		var arr: Array = _by_slot.get(meta.slot, [])
 		arr.erase(meta)
+		(_npc_by_slot.get(meta.slot, []) as Array).erase(meta)
 		removed += 1
 	return removed
+
+## The NPC-only list (assets/avatar/npc_only.json: {"version": 1, "npc_only": [ids]}). Like the denylist it lives
+## outside parts_manifest.json, which extract_parts.gd rewrites on every conversion. Missing or malformed = empty.
+static func load_npc_only(path: String) -> PackedStringArray:
+	return _load_ids(path, NPC_ONLY_VERSION, "npc_only")
+
+static func _load_ids(path: String, version: int, key: String) -> PackedStringArray:
+	if not FileAccess.file_exists(path):
+		return PackedStringArray()
+	var data = JSON.parse_string(FileAccess.get_file_as_string(path))
+	if typeof(data) != TYPE_DICTIONARY or int(data.get("version", 0)) != version or typeof(data.get(key)) != TYPE_ARRAY:
+		push_warning("PartCatalog: %s 版本/格式非法 %s" % [key, path])
+		return PackedStringArray()
+	var out := PackedStringArray()
+	for x in data.get(key):
+		out.append(str(x))
+	return out
 
 ## 读 demo 剔除名单。**独立于 parts_manifest.json**——后者是管线产物，
 ## extract_parts.gd 每次转换全量覆写，写进去的标记必被擦除。

@@ -2,7 +2,7 @@
 
 - 日期：2026-10-02
 - 界面设计（Figma，用户于 2026-10-07 定为游戏 UI 唯一依据，见 SGODOT-197 LOCK-28）：[Gensen (US) · 14 · UI semantic refactor](https://www.figma.com/design/OMLTC3yw3u2WDjOZhLnhaR/Gensen--US-?node-id=481-53)（R1 修订中，锁定项以 [SGODOT-197](https://plane.sensenjoy.cn/zili/browse/SGODOT-197/) 为准）。文件 key：`OMLTC3yw3u2WDjOZhLnhaR`，页面 node：`481:53`。后续界面进度核查与设计对照从此页进入。原型页 [Gensen (US) · Prototype](https://www.figma.com/design/OMLTC3yw3u2WDjOZhLnhaR/Gensen--US-?node-id=310-2955)（node `310:2955`，2026-10-05 确认）为 Archive，截至 2026-10-06。
-- 状态：**2026-10-07（Figma 页面 14 UI 审阅 R1 · WP0，SGODOT-199）：铜镐按每块岩石 2 石料、派对房入口撤销并在 P2 社交恢复好友组队语音、新增 `Say thanks`、Cook All 不含 Legendary 且同页 ≤ 2 锅、界面编号以 §16.3 为准（改动清单 q(1)–q(5)）。** **2026-10-07（R1 · WP1a 样板，SGODOT-200）：离家场景的 Energy Card 把 Cook / Rest 瓦片灰显写 At home、材料进度格新增 count 计数态、三档尺寸按 360 基准落定（改动清单 q(6)–q(8)）。** **2026-10-07（R1 · WP0b，SGODOT-210；WP1a 验收）：料理只在农场驿站回收、柜台额度与卖出口径、食物上限部分回复、金币格含 40 地板、x/y 写法、§16.3 样例按 Fixture 统一、体力条不按百分比变色（超上限段浅绿）、柜台标题并入掌柜栏且集市改莓红 / 茶馆改玉青（改动清单 q(9)–q(13)）。** **2026-10-07（POI 与 WP2 / WP6 拍板）：三档房型为农舍室内、厨房为农舍灶台角、可进入的 POI 第一批规则、出锅稀有度光与色点同色、Toast 位置、WP6 首启与 Settings 各项、附录 B.9 补录（改动清单 q(14)–q(18)）。** **2026-10-07（K-1 / K-2）：农舍室内位置芯片写 `Shanghai · Farmhouse`、居民赠餐进背包不进保温柜、保温柜与 NPC-3 文案补录（改动清单 q(19)–q(21)）。** **2026-10-07（WP4 / WP5 拍板，SGODOT-210；用户全部按推荐）：设施一步建造、可移动不可拆；Plot Marks 留 P0 但不做一键执行，新增模态编辑例外；P0 的 Lv3 外观只换篱笆，布置模式归 P1；付费到达落城市概览，位置芯片第三段增补；教学卡时长同 Toast、快满写实得；驿站柜台与门禁物品；社交可见范围、屏蔽与举报；作物不可送礼、摆件直入仓库；P0 补长椅；样例与文案统一（改动清单 q(22)–q(31)）。** **2026-10-07（据点命名与 P0 据点口径，SGODOT-227 / 228）：茶馆用词池、其余据点「地名 + 类型」、取消首处用城市名、据点名 ≤ 24 字符、每簇标定新手塘；P0 驿站只卖咖啡、盖章台只作摆设、特产货架卖 1 件明信片、Old Kai 为居民并有 1 条委托；房号不进位置芯片；飘字动效；P0 的 Lv3 篱笆从门前一段补成整圈（改动清单 q(32)–q(35)）。** **2026-10-08（P0 覆盖审计口径收口）：P0 可钓 7 种鱼、模板跟点位不跟外形、上海新手塘 Reed Pond；首条鱼 50 XP、Cooking 升级不回体力；Cooking Lv1–6 便利进 P0；P0 料理 14 页定表；P0 农场 30 格、种子随身带、野香草是材料；Rest 的离开判定；料理回收价只乘一次 0.8（改动清单 q(36)–q(42)）。** **2026-10-08（P0 七日账本复跑 V1，评审后修订）：体力账在 ±20% 内、30 格够用（首周主约束是种子钱）、材料链是硬依赖；正餐前用池 P0 未达标、石英并入哪项与 Cooking Lv6 是否留 P0 待拍板；老树随 P1（改动清单 q(43)）。** **2026-10-08（主行动键第二行与 P0 矿洞 / 工作台 / 首会话口径）：键面第二行 ≤ 80 px、长原因进 toast；种子 / 鱼饵用完的键面；幽灵格只写名词；工作台产物与芦苇滩蚯蚓的去向、P0 有电梯、堆肥配方 Farming Lv3、满包按层灰显；TipCard 8 句、驿站棚挂委托板的 !；居民委托先付地板价；Plot Marks 从 demo 砍掉（改动清单 q(44)）。** **2026-10-08（旧卡对照收口）：包裹满时排队、七日节奏第 4–7 天的 P0 回退仪式、水面不响应点击、界面依据改为页面 14 + Screen Registry、Reed / Clay Bank 在农场边缘、手套效果句与 gathering spot（改动清单 q(45)）。** **2026-10-05 下午（06 批次 2 审图）：农场驿站无人值守（撤伙计 Bao）、新增个人页 Profile（PASS-3 并入）、背包与 Tools & Gear 合并为背包 Gear 页、删除满包二选一、包裹入口 = 铃铛 / 农舍信箱（改动清单 p(6)–p(9)）。** 2026-10-03 修订：操作模型（第 10/16 章及连带）——位移摇杆与安全框相机、主行动键与行动径向、消耗品快捷栏、Tools & Gear、顶栏重排与位置芯片、灶台触发的烹饪面板；连带第 0 / 1 / 3 / 4 / 5 / 6 / 7 / 8 / 9 / 12 / 13 / 14 / 17 / 18 章与附录 A / B。**2026-10-03 第三轮（与 Joey 会议后）：Cooking 技能轨（投料槽 2 → 3，Lv4 开第 3 槽）、矿井按层计费（每层 2、电梯免费、精英石英日限）、据点组六档生成 + Tea Counter 茶座柜台 + POI 降为纯视觉层**——连带第 0 / 1 / 2 / 3 / 4 / 5 / 6 / 7 / 8 / 9 / 10 / 11 / 13 / 14 / 15 / 16 / 17 / 18 章与附录 A / B。**2026-10-04 第四轮：烹饪面板第五版（3D 灶台 + Cookbook / Experiment）、Energy Card 只引导、钉住态、设施点击触发、据点拆成每岗位一处（集市广场为唯一室外）、柜台 + 背包同屏、掌柜先问候再 Trade**——见第 1.5 节改动清单 o(7)–o(10)、p(1)–p(3)。
+- 状态：**2026-10-07（Figma 页面 14 UI 审阅 R1 · WP0，SGODOT-199）：铜镐按每块岩石 2 石料、派对房入口撤销并在 P2 社交恢复好友组队语音、新增 `Say thanks`、Cook All 不含 Legendary 且同页 ≤ 2 锅、界面编号以 §16.3 为准（改动清单 q(1)–q(5)）。** **2026-10-07（R1 · WP1a 样板，SGODOT-200）：离家场景的 Energy Card 把 Cook / Rest 瓦片灰显写 At home、材料进度格新增 count 计数态、三档尺寸按 360 基准落定（改动清单 q(6)–q(8)）。** **2026-10-07（R1 · WP0b，SGODOT-210；WP1a 验收）：料理只在农场驿站回收、柜台额度与卖出口径、食物上限部分回复、金币格含 40 地板、x/y 写法、§16.3 样例按 Fixture 统一、体力条不按百分比变色（超上限段浅绿）、柜台标题并入掌柜栏且集市改莓红 / 茶馆改玉青（改动清单 q(9)–q(13)）。** **2026-10-07（POI 与 WP2 / WP6 拍板）：三档房型为农舍室内、厨房为农舍灶台角、可进入的 POI 第一批规则、出锅稀有度光与色点同色、Toast 位置、WP6 首启与 Settings 各项、附录 B.9 补录（改动清单 q(14)–q(18)）。** **2026-10-07（K-1 / K-2）：农舍室内位置芯片写 `Shanghai · Farmhouse`、居民赠餐进背包不进保温柜、保温柜与 NPC-3 文案补录（改动清单 q(19)–q(21)）。** **2026-10-07（WP4 / WP5 拍板，SGODOT-210；用户全部按推荐）：设施一步建造、可移动不可拆；Plot Marks 留 P0 但不做一键执行，新增模态编辑例外；P0 的 Lv3 外观只换篱笆，布置模式归 P1；付费到达落城市概览，位置芯片第三段增补；教学卡时长同 Toast、快满写实得；驿站柜台与门禁物品；社交可见范围、屏蔽与举报；作物不可送礼、摆件直入仓库；P0 补长椅；样例与文案统一（改动清单 q(22)–q(31)）。** **2026-10-07（据点命名与 P0 据点口径，SGODOT-227 / 228）：茶馆用词池、其余据点「地名 + 类型」、取消首处用城市名、据点名 ≤ 24 字符、每簇标定新手塘；P0 驿站只卖咖啡、盖章台只作摆设、特产货架卖 1 件明信片、Old Kai 为居民并有 1 条委托；房号不进位置芯片；飘字动效；P0 的 Lv3 篱笆从门前一段补成整圈（改动清单 q(32)–q(35)）。** **2026-10-08（P0 覆盖审计口径收口）：P0 可钓 7 种鱼、模板跟点位不跟外形、上海新手塘 Reed Pond；首条鱼 50 XP、Cooking 升级不回体力；Cooking Lv1–6 便利进 P0；P0 料理 14 页定表；P0 农场 30 格、种子随身带、野香草是材料；Rest 的离开判定；料理回收价只乘一次 0.8（改动清单 q(36)–q(42)）。** **2026-10-08（P0 七日账本复跑 V1，评审后修订）：体力账在 ±20% 内、30 格够用（首周主约束是种子钱）、材料链是硬依赖；正餐前用池 P0 未达标、石英并入哪项与 Cooking Lv6 是否留 P0 待拍板；老树随 P1（改动清单 q(43)）。** **2026-10-08（主行动键第二行与 P0 矿洞 / 工作台 / 首会话口径）：键面第二行 ≤ 80 px、长原因进 toast；种子 / 鱼饵用完的键面；幽灵格只写名词；工作台产物与芦苇滩蚯蚓的去向、P0 有电梯、堆肥配方 Farming Lv3、满包按层灰显；TipCard 8 句、驿站棚挂委托板的 !；居民委托先付地板价；Plot Marks 从 demo 砍掉（改动清单 q(44)）。** **2026-10-08（旧卡对照收口）：包裹满时排队、七日节奏第 4–7 天的 P0 回退仪式、水面不响应点击、界面依据改为页面 14 + Screen Registry、Reed / Clay Bank 在农场边缘、手套效果句与 gathering spot（改动清单 q(45)）。** **2026-10-08 夜（各实现卡问出的口径）：调味架直接读仓库、Lv1 调味料跟人走；出锅待收与 Keep 链、Queue ×2、满包吃 Perfect、保温柜只在家用；新手期退料不出 Mystery Dish；P0 集市 / 渔具铺 / 茶馆 / 居民文案按 P0 内容改；采集、矿洞、Energy 卡、客票卡、包裹排队补文案（改动清单 q(46)）。** **2026-10-08（q(43) 三旋钮用户拍板）：P0 第 2 层石英并入岩盐、正餐前用池不作 P0 门槛、Cooking Lv6 排 P0 末位可砍（改动清单 q(47)）。** **2026-10-08（V2 回归与收尾口径）：Tea 格写已喝杯数、首会话生菜浇水、真实规则回放（钱包约 426）、满包进矿先拦、Cook Again 从灶台进、P0 集市不收东西、新手塘卡与地图标记的来源（改动清单 q(48)）。** **2026-10-08（阶段 3 产品输入）：P0 反馈触发表、门禁四件事卡内容表、命令生命周期与系统态（改动清单 q(49)）。** **2026-10-08（阶段 4 产品输入）：P0 收件箱三 Tab 的内容与空态、信箱占位交互、地图页 HUD 入口去留（改动清单 q(50)）。** **2026-10-08（阶段 5 文案核对清单）：新增 P0 英文文案逐字核对清单，附录 B.3 统一四处旧写法（改动清单 q(51)）。** **2026-10-08（demo 上线后看数与 P1 排序）：P0 观察日志 14 项指标的算法、异常线与先调什么；P1 开工顺序（改动清单 q(52)）。** **2026-10-08（真人试玩观察员手册）：P0 回访三问、延长段与第 4 天体力 80 的安排（改动清单 q(53)）。** **2026-10-08（经济基线）：复跑补上卖鱼与真实买卖打法，与 V2 对齐，作为 P1 调经济的起点（改动清单 q(54)）。** **2026-10-08（附录 B 清扫）：首做奖励条只放首做 XP、Mystery Dish 可送居民的卡面、挣脱卡写实退、今日次数统一写法与一批旧文案（改动清单 q(55)）。** **2026-10-08：Experiment 里再次投入失败过的组合，胶囊标题写 Tried before、Cook 行上方一行提示、不弹 Toast（改动清单 q(56)）。** **2026-10-08：挣脱卡不带按钮，去渔具铺 / 看图鉴的引导挪到 Fish-dex 剪影点开的门禁卡（改动清单 q(57)）。** **2026-10-08：首会话 Today 第一行跟着委托状态走（鱼够了写 Deliver，交付后才打勾，改动清单 q(58)）。** **2026-10-08（P1 第一步）：新增第 5 天之后的种田开发包——Homestead Lv3 起 40 格、卷心菜 / 玉米 / 黄瓜、4 页料理、洒水器按原规则落到紧凑农场（改动清单 q(59)）。** **2026-10-08：Experiment 背包格写成 5 列、至少 2 行、末行补齐（改动清单 q(60)）。** **2026-10-08：快捷栏按 v1.11 对齐——长按只浮起，拖进放置区钉住或移除，从背包拖入不自动钉住，详情卡 Pin 与栏满规则（改动清单 q(61)）。** **2026-10-08：世界提示与行动环只留图标——设施图标钮与名字条、NPC 只写名字、座位图标、行动环以屏幕中心为圆心且瓣上无字（改动清单 q(62)）；料理详情卡 Gift 文案（改动清单 q(63)）。** **2026-10-05 下午（06 批次 2 审图）：农场驿站无人值守（撤伙计 Bao）、新增个人页 Profile（PASS-3 并入）、背包与 Tools & Gear 合并为背包 Gear 页、删除满包二选一、包裹入口 = 铃铛 / 农舍信箱（改动清单 p(6)–p(9)）。** 2026-10-03 修订：操作模型（第 10/16 章及连带）——位移摇杆与安全框相机、主行动键与行动径向、消耗品快捷栏、Tools & Gear、顶栏重排与位置芯片、灶台触发的烹饪面板；连带第 0 / 1 / 3 / 4 / 5 / 6 / 7 / 8 / 9 / 12 / 13 / 14 / 17 / 18 章与附录 A / B。**2026-10-03 第三轮（与 Joey 会议后）：Cooking 技能轨（投料槽 2 → 3，Lv4 开第 3 槽）、矿井按层计费（每层 2、电梯免费、精英石英日限）、据点组六档生成 + Tea Counter 茶座柜台 + POI 降为纯视觉层**——连带第 0 / 1 / 2 / 3 / 4 / 5 / 6 / 7 / 8 / 9 / 10 / 11 / 13 / 14 / 15 / 16 / 17 / 18 章与附录 A / B。**2026-10-04 第四轮：烹饪面板第五版（3D 灶台 + Cookbook / Experiment）、Energy Card 只引导、钉住态、设施点击触发、据点拆成每岗位一处（集市广场为唯一室外）、柜台 + 背包同屏、掌柜先问候再 Trade**——见第 1.5 节改动清单 o(7)–o(10)、p(1)–p(3)。
 - 性质：原型阶段的完整玩法策划文档。本文自包含：全部原则、规则、数值、物品、文案都在文内，不依赖任何其他文档。
 - 术语（全文统一）：Energy = 体力；Homestead = 农场等级；Trip 1–7 = 旅行档（Local / Nearby / Regional / Long Haul / Continental / Intercontinental / Antipodal）；Resident = 角色 NPC；Keeper = 功能 NPC；Outpost = 据点（一处系统生成的 NPC 空间：茶馆 Tea House / 渔具铺 Tackle Shop / 集市广场 Market Square / 驿站 Travel Post / 小木屋 Trading Post，每岗位一处、各一枚地图 pin，按城市簇分档生成；除集市广场外全部室内）；Home Set = 家一套（每种据点离家最近的一处）；Cooking = 烹饪技能轨（与 Farming / Fishing 平行的第三条轨）；Neighbor = 其他玩家；Cookbook = 料理图鉴；Fish-dex = 鱼图鉴；Passport = 护照；稀有度一律 Common / Fine / Rare / Legendary（常见 / 上品 / 稀有 / 传说），鱼与料理共用同一套词。
 - 文案约定：App 内用户可见文案一律英文（物品名 ≤ 18 字符），本文用中文写作并给出每件物品的 id、中文名、英文名。
@@ -264,6 +264,24 @@
 | q(43) | **P0 子集七日账本复跑（审计 V1）与两处材料口径（2026-10-08；不知火舞评审后修订）** | §17.2.2 要求用 P0 子集复跑七日账本，§14.6 / §17.2.3 只有全量规则的推演；P0 农场 30 格够不够待验证；P0 不做石英与硬木，§13.3.3 第 2 层却掉石英、§13.2.1 老树在 Homestead Lv3 开放；§14.6 合计写 ≈ 1,412、逐日相加是 1,434 | **新增 14.6.2 与 17.2.3 的 P0 子集表**：目标玩家七日体力 1,389（比本表少 3%，首日对齐后少 11%，在 ±20% 内），0 次撞墙；5 分钟 ✓、30 分钟 −19%，重度 −26% 内容封顶不对表。Homestead Lv2 第 4.8 天（前提：留 3 份盐给升级，不留则首周 0%）、首道 3 槽菜第 5.3 天、Cooking Lv5 第 6.8 天，第 7 天三轨 Lv5。**30 格够用**：首周主约束是种子钱，给 40 格 Farming XP 只多 1%，P0 不扩田。**材料链是硬依赖**。**比本表慢**：Cooking −35%、Fishing −12% 来自 P0 收窄；Farming −24% 来自 §14.6.1 种子钱算低（勘误），与 P0 无关。**正餐前用池** 37% / 51%，P0 30 格结构上限约 59%，未达标；是否作 P0 门槛待拍板（旋钮 C）。q(38) 的前提（第 5 天 Lv5、第 7 天 Lv6）在 P0 不成立，Lv6 是否留在 P0 待拍板（旋钮 D）。**P0 矿洞第 2 层的石英暂并入「无」**（并入岩盐待拍板，旋钮 A），**老树 P0 不出现**，两者随 P1。§14.8.3 加 P0 走查注；§14.6 合计更正为 1,434 | 第 4 章 4.6.3；第 13 章 13.2.1、13.3、13.3.3；第 14 章 14.6、14.6.2、14.8.3；第 17 章 17.2.2、17.2.3 |
 | q(44) | 主行动键第二行、矿洞与工作台口径、首会话 A-03 回写、Plot Marks 移出 demo（2026-10-08；亚瑟 PR #12 审核必改 4、周瑜 SGODOT-231 六问、不知火舞 SGODOT-204 A-03、后裔审 PR #15、用户经奕星） | 键面第二行没有长度约束，`Walk to the shore` / `Floor 2 · Clear this floor first` / `Mine runs today 2/2 · Resets in 9h 12m` 放不下 80 px；种子 / 鱼饵用完、走向岸边途中没有键面口径；幽灵提示整句放不下 52 px 格；工作台产物去向、芦苇滩蚯蚓去向、P0 有无电梯、居民委托金币是否整笔计入完成奖上限、堆肥配方门禁、日切飘字在哪显示、满包时岩石按块还是按层判断未定；教学卡与驿站棚 `!`、TUT-3-END 与 A-03 定稿不一致；Plot Marks 排在 P0 | **键面**：第二行 ≤ 80 px（约 16 字符），长原因进 toast；离岸远保持 `Cast · 5 Energy`（按下先走再抛），途中 `Cast · On the way`（不灰显、按了无效）；选中的种子用完 → 自动取消选中回 `Sow · Pick a seed`，0 格不可选；选中的鱼饵用完 → 自动摘掉，toast `Out of Worm Bait · no bait on the hook`，空钩照钓；鱼篓满 `Cast · Creel full`；楼梯口 `Floor 2 · Clear Floor 1`；两局用完 `Enter mine · No runs left` + toast 原句。**幽灵格**只写名词 `Seeds` / `Bait` / `Torch` / `Potion`，点开对应 Tab（Torch / Potion 在 Materials），P0 只出现前三个。**材料与矿洞**：火把、堆肥进背包，放不下不做、不扣料，按钮 `No room · free a slot first`；铜镐进 Gear、手套即生效；芦苇滩蚯蚓进背包，放不下随芦苇进仓库，仓库 Tackle 页可 Take；P0 有电梯（无 Express）；堆肥配方门禁 Farming Lv3，锁定配方按 LOCK-10 写在按钮上；`Run ended at daily reset` 只在确有局被结束时于矿口飘一次，04:00 人在矿里回矿口外；满包时按一块岩石的最坏掉落判断、整层灰显。**首会话**：TipCard 无按钮，P0 共 8 句（加 `Tap when the needle hits gold!`）；驿站棚挂委托板的 `!`，指尖卡仍 `Tap to shop`，徽标来自委托板时停在 Stall Board 页；TUT-3-END 不出 Session complete，结束态 = Today 三行；TUT-1 保留 ‹ 回昵称页。**居民委托金币**（后裔审 PR #15）：与系统委托同构，所交物品的回收地板价先付、不受上限，只有标价减地板的部分计入完成奖日上限 100，上限用完时交 Rare 鱼不会拿 0。**Plot Marks 与 `Plan tomorrow's field` 从 demo 砍掉**（用户 2026-10-08），后续再做；LOCK-01 / 02 模态编辑例外保留给 P1 放置模式；Free to do now 之后的清单去掉这一行 | 第 3 章 3.7.3、3.7.4；第 4 章 4.6.1；第 5 章 5.8；第 9 章 9.6；第 10 章 10.1、10.2.2、10.3.2、10.3.3、10.4.8；第 13 章 13.2.2、13.3、13.3.12、13.4；第 14 章 14.2；第 16 章 FISH-1 / 2、FARM-1、BAR-1、BAG-4、HUD-3、MINE-1、TUT-2 / 3；第 18 章；附录 B |
 | q(45) | 旧卡对照收口与零碎回写（2026-10-08；奕星转亚瑟的旧 P0 卡对照 153 / 158 / 168、周瑜 SGODOT-231、不知火舞 / 安其拉 WP4 B2-06） | 10-05 用户定的「包裹满时排队」只在 wt-p0-dev 未提交的方案副本里；七日节奏第 4 / 6 / 7 天的回退仪式用的是旅行迷雾、鱼笼、亮片、洒水器，都不在 P0，第 5 天还把 Homestead 标成 P1；§6 抛竿行与 FISH-1 写「点水面」，与 LOCK-02「水面不响应点击」冲突；§17.2 的界面行仍写「批次 1 的 31 张图」；Reed Bank / Clay Bank 写在「农场水边」，P0 农场没有水；手套效果句两种写法；FARM-5 蓝图卡按钮写在右上 | **包裹满时排队**写进 §10.4.8（待发、腾位后按序入列起算 24 小时、拆件、Claim / Claim all、到期 × 0.8 折现、记录 100 条）。**七日 P0 回退**：第 4 天落在 Farming Lv4（番茄、辣椒上架，Row Hoe 可买），Cooking Lv4 第 3 槽约第 4–5 天；第 5 天 Homestead Lv2 改标 P0；第 6 天 ① 有 Golden Koi 就交 Old Kai 的委托，② 没有就做出 Copper Pickaxe 装上；第 7 天第一局铜镐矿洞 + Cooking Lv5 + 技能页第一周小结。**水面不响应点击**：抛竿只走主行动键，落点取角色面前的水面。**界面依据**改为 Figma 页面 14 + SGODOT-209 Screen Registry。**Reed Bank / Clay Bank 在农场边缘**（低洼湿地，无水面，不触发 Fishing）。手套效果句 `Gather Gloves · +1 at every gathering spot`，`gathering spot` 是采集点通称；蓝图卡按钮在右下 | 第 6 章 6.5.1；第 10 章 10.4.8；第 13 章 13.2.1、13.2.2；第 14 章 14.6；第 16 章 FISH-1、FARM-5；第 17 章 17.1、17.2.1、17.2.2；附录 B.13 |
+| q(46) | 今晚各实现卡问出的口径（2026-10-08；哪吒 226 / #20、周瑜 231、苏烈 228、蒙恬 232 / #22、亚瑟 224、后裔 227、刘邦 225、安其拉与不知火舞 WP4 E-11 / E-13 / C2-01、后裔审 #20、V1 评审风险 4 / 7；奕星按授权推送） | 调味架「各存 30 份」与 q(40) 的材料自动入库冲突（盐会有架、仓库、背包三处）；§7.7 写出锅自动入柜，而 COOK-1 / COOK-P0-9 画的是灶上 Ready 待收；Queue ×2 的前一锅放哪没写；满包吃 Perfect 会连主份一起被拒；保温柜离家能远程取餐；新手期退料的失败锅仍出能吃的 Mystery Dish，等于每天 50–100 点免费体力；P0 集市、渔具铺、茶馆、Pip 的样例文案仍是全量版（甘薯、碳素竿、渔情板、`30 Energy back`）；采集、矿洞出口、工作台、Energy 卡瓦片、客票确认卡、包裹排队等缺文案 | **调味架**：不另存一份，灶台直接取用仓库里的调味料；Homestead Lv1 时岩盐、野香草跟人走，升到 Lv2 那一刻收进仓库（`Spice Rack · seasonings off your bag`）；Experiment 写仓库实数、不封顶 30。**出锅**：到点人在厨房 → 先按 Keep 链放好再弹 COOK-4（关卡 = Keep，Gift P0 灰）；人不在 → 菜留在灶上等玩家来收；Queue ×2 的前一锅自动走 Keep 链，都满则第二锅等待，一口灶同时最多一份菜；Perfect 多出的那份同走 Keep 链，满包也能吃主份、不进包裹；保温柜只在自家农场取用。**新手期退料的 10 锅不出 Mystery Dish**（`No dish this time` / `Ingredients back (9 left today)`）。**P0 文案**：集市名一律 `Xuhui Market Square`；Mei 的 P0 问候改为 Row Hoe；Ama `Hot tea, 30 Energy a cup`；Pip 对话条与委托卡同句；Old Kai 需求行 `Rare fish · Golden Koi · Pond`；奖励行好感叫 `Friendship`；P0 委托卡不写 city stamp；P0 渔具铺货架只有 Reed Rod 80（Fishing Lv3）与 Worm Bait 2（`30 left today`），只有一页时不显示 Tab 条，渔情板只作摆设；P0 的 Fishing 槽不列 Carbon Rod；Lv1→Lv2 升级面板三行与满级 `Highest level for now`。**其余文案**：采集指尖卡与飘字按去向（`+6 Timber · Stored` / `+2 Worm Bait`）、`Exit mine · Free`、`Floor 1 · Free`、`Workbench · Tap to craft`、`Crops ready 20% sooner`、`Owned · always on`；Energy 卡 Rest / Tea 瓦片各态；客票确认卡与 MAP-5 同卡；包裹排队细则；Cooking Lv4 后 Today 线索；MINE-P0-7 删去 `Unmined rocks on Floor 2 are lost`。q(43) 的旋钮 A / C / D 仍待用户拍板 | 第 3 章 3.4、3.7.3；第 4 章 4.6.3；第 7 章 7.2、7.5、7.7、7.16；第 8 章 8.0、8.3；第 9 章 9.4、9.13；第 10 章 10.4.8；第 12 章 12.2；第 13 章 13.2.2；第 16 章 NPC-1、NPC-5、NPC-G1、NPC-6、MAP-1；附录 B |
+| q(47) | **q(43) 三个旋钮的用户拍板（2026-10-08，奕星转达）** | V1 评审留给用户的三项：P0 矿洞第 2 层的石英并入哪一项（A）、正餐前用池 60–80% 是否作 P0 出口门槛（C）、Cooking Lv6 Quick Fire 是否留在 P0（D）；方案 §13.3.3、§17.2.2、§4.6.3、§17.2.1 / §17.3 标着「待拍板」 | **A**：P0 第 2 层石英并入岩盐，铜 30 / 盐 35 / 无 35，只在 P0，P1 恢复原表；每局 A 盐约 2.7 → 3.6，不留盐的玩家首周到 Homestead Lv2 0% → 70%。**C**：正餐前用池 P0 不作出口门槛，记为已知不达标（37% / 51%，30 格结构上限约 59%），P1 扩田后复核。**D**：Cooking Lv5（Steady Hand I、Queue ×2）留在 P0，Lv6 Quick Fire 排到 P0 最后、进度紧时可砍。14.6.2 补「旋钮 A 之后」的复跑数 | 第 4 章 4.6.3；第 13 章 13.3.3；第 14 章 14.6.2；第 17 章 17.2.1、17.2.2、17.3 |
+| q(48) | V2 回归与各实现卡收尾的口径（2026-10-08；蒙恬 232 V2 / 地图标记、亚瑟 224、后裔 227、安其拉 Cook Again、刘邦 Tea 格） | Tea 格 `1/3 today · 40 coins` 与全游戏「已用 / 上限」的写法不一致；首会话第 16–18 分钟生菜没写浇水；V1 复跑没算卖鱼，真实规则下钱包高出一倍；满包进矿先扣层费才提示放不下；Cook Again 写在出锅卡上，与页面 14 的 COOK-P0-7 不一致；饮品满体力、P0 集市不收东西、新手塘卡、地图标记的来源与首会话节奏未写 | **Tea 格** N = 今天已喝杯数，价格写下一杯（`0/3 today · 40 coins` → `1/3 · 50` → `2/3 · 60` → `3/3 today`）；饮品满体力灰显 `Energy full`。**首会话**：生菜连播后按住 `Water · Free` 走一遍。**14.6.2 记真实规则回放**（V2：七日 1,497、Lv2 第 3.3 天、钱包约 426），驿站收鱼 P0 不限额、不折价，七日走查 Lv2 第 3–5 天都算通过。**满包进矿**：付费入口先判最坏掉落，灰 `Enter mine · Bag full` / `Floor 2 · Bag full`，不扣体力。**Cook Again** 收走上一锅后点灶台出现（COOK-P0-7 / P0-8），出锅卡只有 Eat / Keep。**P0 集市柜台**不贴背包。**鱼塘卡与 pin**：距离按所在地、推荐等级按模板、Details 鱼表（全球鱼剪影带名字）。**地图标记**：金 ! 三种来源（集市板、居民、Track 中的鱼类委托指向鱼塘），未 Track 的鱼类委托要能钓到才亮；✓ 只看能不能当场交；home 不挂；首会话只亮 Track 的那个；P0 无 🔒 与 ★ | 第 3 章 3.7.3；第 4 章 4.6.3；第 6 章 6.3；第 7 章 7.2；第 9 章 9.5.2、9.11；第 10 章 10.2.2；第 14 章 14.2、14.6.2；第 16 章 HUD-3、NPC-6；附录 B |
+| q(49) | 阶段 3（SGODOT-233）开发前的产品输入（2026-10-08；与刘邦、亚瑟、蒙恬对齐） | WP2 / WP6 已验收组件与系统态稿，但哪个事件用哪种呈现、同时发生怎么排队、P0 的门禁卡逐条内容、命令超时与去重的玩家可见规则都散在各章或只在工程规格里；§10.7 的「重发不重扣」与实现（expect_seq）不一致；Figma FISH-5-2 的逃走飘字与方案不同 | 新增 **4.8.6 P0 反馈触发表**（FloatText / ItemFly / RewardMoment / MomentBanner / Toast 的分工、≤ 3 行飘字与合并、落点、同一时间一个 Moment、Toast 新替旧、Moment 期间不弹 TipCard，以及 P0 全部事件的呈现与英文）；**4.8.7 P0 门禁四件事卡内容表**（12 行 + 动作量取法 + 第一次变灰 + SKILL-1 当期分母）；**10.7.1 命令生命周期与系统态**（300 ms 才显示 pending、8 秒超时、两次失败转离线、5 秒探测、去重与重连）；§10.7 幂等行改为 expect_seq；逃走飘字统一为 `It got away · Energy refunded (9 left today)` | 第 4 章 4.8.6、4.8.7；第 10 章 10.7、10.7.1 |
+| q(50) | 阶段 4（SGODOT-234）开发前的产品输入（2026-10-08） | §12.5 按全量写了九类消息，P0 只有包裹与系统消息，To do 在 P0 没有来源；Updates 在 P0 收什么、空态与角标是否计待发未写；农舍信箱占位的交互未写；地图页撤掉旧底栏后入口怎么留未写 | 新增 **12.5.2 P0 收件箱与信箱**：照 LOCK-14 保留三个 Tab，To do 显示空态 `No invites right now`；Parcels 的 P0 来源、排序、排队与文案；Updates 的 P0 来源（Homestead 升级、包裹到期结果），倒序、打开即已读；铃铛角标不计待发；农舍信箱是点击触发的设施，打开同一面板，可领时挂 `Parcel` 小牌，只在家可点。§10.6.1 补**地图页 HUD**：撤旧底栏、两行 HUD 常驻、只留 Bag、P0 隐藏 Nearby Cities、pin 卡按钮 `Go home · Free` / `Go`；第二次挣脱的飘字把退费并进同一条（`Got away · Lv4 · Energy refunded (8 left today)`） | 第 10 章 10.6.1；第 12 章 12.5.2 |
+| q(51) | 阶段 5（SGODOT-235）的英文文案核对清单（2026-10-08） | 页面巡检要逐字核对英文，但 P0 文案散在各章与附录 B，且 q(44) 起的定稿 Figma 页面 14 可能还没跟上；附录 B.3 还留着几处旧写法 | 新增 `docs/qa/p0-copy-checklist-2026-10-08.md`：通用规则 + 按页面（HUD 与体力卡、农场、鱼塘、厨房、矿洞、据点与居民、地图、背包与收件箱、首会话、系统态）列出 P0 应出现的文案，★ 标出页面 14 之后才定的条目与 q 号，末尾列「已统一的写法」。附录 B.3 统一四处：鱼篓满、挣脱卡三行、满条进食 `Energy full`、客票成本行 | 附录 B.3；docs/qa/p0-copy-checklist-2026-10-08.md |
+| q(52) | demo 上线后看哪些数、P1 先做什么（2026-10-08，奕星排序 ③） | P0 出口标准写了要达成什么，但没写 demo 上线后从观察日志怎么算、看到什么算异常、该动哪个旋钮；P1 范围（17.3.1）只有清单，没有按 P0 数据排定的先后 | 新增 **17.2.4**：按 #23 观察日志（命令 JSONL + 白名单 UI 时刻 + 首会话报告）列 14 项指标的算法、期望、异常线与先调什么（先文案、引导与 demo 安排，后数值；旋钮 B 已否，旋钮 F 起始钱包 180 → 280 备用）。新增 **17.3.3**：P1 开工顺序——第 5 天之后的种田（40 格、Lv5–6 作物、洒水器）→ 钓鱼第二段（River Rare、亮片、鱼笼）→ Homestead Lv4–5 与厨房 → 矿洞 3–5 层与石英 → 金币去处 → 居民第二段，并写明哪个 P0 数会让它提前或推后 | 第 17 章 17.2.4、17.3.3 |
+| q(53) | SGODOT-150 真人试玩的观察员手册（2026-10-08，奕星排序 ①） | §14.8.2 的第 4 / 7 天问句问的是旅行与社交（P2），P0 用不上；V1 评审要求的 demo 安排（延长段连续钓鱼、第 4 天"晚饭前约 80 体力"）只写在评审里；观察员没有一页可用的表 | 新增 `docs/qa/p0-playtest-observer-kit-2026-10-08.md`：安排总表、三分法记录栏、首会话逐分钟观察表（按 §14.2 导演表）、延长段观察、自问七条、P0 回访三问、出口判定表与每次会话后取数；§14.8.2 加 P0 回访三问与 P0 观察安排两行。需要工程准备两项：F1 第 4 天回访前把指定账号体力设为约 80；F2 按账号取首会话报告与日志摘要 | 第 14 章 14.8.2；docs/qa/p0-playtest-observer-kit-2026-10-08.md |
+| q(54) | 模拟器补上卖鱼与真实买卖打法，作为 P1 调经济的可复跑基线（2026-10-08，奕星排序 ④） | V1 复跑的钱包约 210，真实规则回放（V2）约 426：复跑每种鱼留 6 条、作物留 3–6 个，每场把蚯蚓补到 2 倍（一周约 300 金币），也没有旋钮 A；P1 调经济没有一份和真实规则对得上、又能离线快速复跑的基线 | `p0_v1.py` 新增情形 D（`--v2`，默认 A / B / C 输出逐字节不变）：旋钮 A 的掉落 + V2 机器人的留量与蚯蚓打法；30 个种子的结果与 V2 相差在 ±16% 内（钱包 495 vs 426），存 `out_7d_v2align.md`；14.6.2 记一条 | 第 14 章 14.6.2；research/…/p0-v1-2026-10-08/ |
+| q(55) | 附录 B 的 P1 / P2 文案清扫，并收口 int6 烹饪清单问出的两处（2026-10-08，奕星排序 ③；哪吒 SGODOT-226） | 附录 B 与各章还留着旧写法：首做奖励条把首做 XP 与本锅 XP 合成 `+15`，§4.8.6 却只放首做、分母写当期 14 页，而 §7.14.0 定了 P0 Cookbook 显示 48 页；§4.8.6 写 Mystery Dish `Can't be gifted`，与 q(33) 可送居民矛盾；挣脱卡在保护期内仍写 `3 Energy back`、还带按钮与 `about 30 casts`；孤立的 `Not enough`；`Guest pass` 小写；产出委托 Dusk Haul 写 `+1 city stamp`；今日次数混用 `4 of 6` 与 `1/2`；COOK-7 与 §7.17.1 写新手祝福乘料理；Cooking Lv4 横幅带 `+30 Energy`；Cooking 升级礼写成配方卡入包 | **首做奖励条**只放首做的一次性 XP（`First cooked · +10 Cooking XP · Cookbook 1/48`），本锅 XP 照常飘字（`+5 Cooking XP ★`），合计不变；分母 = Cookbook 显示的页数（P0 为 48）。**Mystery Dish** 卡：`Hmm… not a dish` / `A clue was added to your Cookbook` / `Can't be sold or delivered`。**挣脱卡**无按钮，末行写实退：保护期内 `Energy refunded (8 left today)`，保护期外 `+3 Energy back`。**缺料**写 `Need 1 more Pond Crucian`，旅行写 `Trip 3 needs 20 Energy · you have 9 · +11 in 44m` / `Need 40 more coins`。**产出模板只给金币**，印章进度只来自地区 / 探索模板。**玩家自己的今日次数**写 `<名词> today 已用/上限`（与 Meals / Mine runs / Tea 同一读法），商品库存仍写 `N left today`（q(10)）。新手祝福只加食物上限、不乘料理；Cooking 升级不回体力；升级礼配方卡直接打开 Cookbook 页（Tasted），不占背包格（与实现一致）；升级横幅写 `Farming Lv 5`、`Fishing Lv 2` | 第 3 章 3.3.2；第 4 章 4.8.2、4.8.3、4.8.6；第 6 章 6.7.5；第 7 章 7.9.1、7.9.2、7.17.1；第 8 章 8.6.2；第 9 章 9.6.5、9.13.2；第 12 章 12.2.1；第 14 章 14.2、14.8.3；第 16 章 COOK-4、COOK-7、G 组升级横幅、NPC-4；附录 B.3–B.14；docs/qa/p0-copy-checklist-2026-10-08.md |
+| q(56) | Experiment 里再次投入失败过的组合怎么提示（2026-10-08，安其拉 SGODOT-226 设计稿，哪吒已实现） | §7.2.7 只写胶囊「旁注」`Tried before · still a Mystery Dish`，§7.5.2 写「Cook 按钮旁提示」，实现原先弹 Toast，三处不一致；新手祝福期当日还有退料次数时失败锅不出 Mystery Dish（q(46)），`still a Mystery Dish` 在这时说错（不知火舞，226） | **胶囊标题写 `Tried before`**；Experiment 抽屉 **Cook 行正上方单独一行** `Tried before · not a recipe`（次级色 Bold 12），任何状态都写这一句，结果由出锅卡说（退料 `No dish this time` 或 Mystery Dish）；不弹 Toast；Cook 照常可点；换掉任一原料这一行即消失。哪吒 feat/p0-kitchen-stage 51d9abe4 已按此实现 | 第 7 章 7.2.7、7.5.2；第 16 章 COOK-2b；附录 B.7 |
+| q(57) | 挣脱卡撤掉按钮后，去渔具铺 / 看图鉴的引导放哪（2026-10-08，刘邦 SGODOT-233） | 实现里的挣脱卡带三个按钮（`Tackle Shop` 或 `Fish-dex`，外加 `Keep fishing`）；§4.8.6 第 3 条要求无按钮、1.5 秒自动收起；撤掉后这两条引导没有去处 | **挣脱卡不带按钮**，钓鱼不被打断；卡上已写清差什么（等级与 XP、或哪根竿多少钱）。**引导挪到 §4.8.7 的门禁四件事卡**：Fish-dex 里挣脱过的剪影可点，点开同一张卡，新增「等级不够」「鱼竿不够」两行；P0 不放引导按钮（渔具铺柜台的 Reed Rod 行本来就有自己的卡） | 第 4 章 4.8.7 |
+| q(58) | 首会话 Today 第一行在鱼够了之后写什么（2026-10-08，蒙恬 SGODOT-232 U6） | §14.3 写鱼篓有 2 条时第一行打勾、第二行高亮 Cook it；但委托要回驿站交付才付 14 coins，打勾后 Today 上没有「去交付」这一行，只剩驿站棚与 home pin 上的 ✓ | **第一行跟着委托状态走**：鱼不够 `Catch 2 Pond Crucian · Reed Pond`；鱼篓够 2 条变成 `Deliver 2 Pond Crucian · Stall`（不打勾，Show 只移动相机到驿站棚；人不在农场时是 Show on map，指向 home pin）；交付后才打勾；鱼被吃掉、不够 2 条时退回 Catch 行。Today 只高亮第一条没完成的行；先做菜也不拦。复数：鱼名不加 s；Lettuce / Chamomile / Corn 不变，其余作物加复数（Chilies）。蒙恬已实现（feat/p0-u6-guide 8594074b） | 第 14 章 14.2、14.3；附录 B.14 |
+| q(59) | P1 第一步开发包：第 5 天之后的种田（2026-10-08，奕星排序 ②） | §17.3.3 第 1 行只有清单；方案的田数（开垦上限 200 → 600）、洒水器「占 1 格浇 8 格」都是按地理农场写的，P0 紧凑农场是 6 × 5 块带走道的田；Lv5 的 Sow Again、地区种子在第一步做不做没定；P0 的 14 页里番茄单下锅没有兜底页 | 新增开发包 `docs/product/p1-step1-farming-2026-10-08.md`（范围、口径、数据 / 服务端 / 客户端改动、文案、模拟、测试清单、拆卡）。**田块**：Homestead Lv1–2 30 格、Lv3 起 40 格（多 10 格荒地，编号 30–39，0–29 不动；HOME-1 / HOME-2 后果写 `Plots +10`），Lv4 以后随第 3 步重定。**作物**：卷心菜、玉米（Lv5）、黄瓜（Lv6），数值照 §5.2.2。**料理**：补 #8 / #18 / #21 / #22 四页，当期 18 页；Roast Veggies 回来后番茄、玉米单下锅不再失败（P0 不改，记为已知差异）。**洒水器**按 §5.7 原规则落到紧凑农场：占 1 块空田、浇田格网上周围 8 格、−15%（时长在开始生长时锁定），可用状态卡 `Move` 免费移动、不可拆；模拟里占格只少 Farming 1–2.4%，不另做走道版。**Coverage Overlay**：被覆盖的田块描浅蓝边，点洒水器高亮。**推后**：Sow Again 随 Plot Marks、地区种子随集市；旋钮 A 留到第 4 步恢复石英。模拟 `p1_step1.py`（14 天 × 30 seed）：目标玩家 14 天 Farming 1,120 → 1,397、Farming Lv7 第 13 → 11 天，重度第 2 周播种 124 → 183 / 日；第 14 天钱包 1,000 以上（P0 基线即如此），支持「金币去处」提前，待试玩数据确认 | 第 4 章 4.8.7；第 5 章 5.3、5.7、5.8；第 7 章 7.14.0；第 8 章 8.2；第 13 章 13.3.3；第 16 章 HOME-2；第 17 章 17.3.3；附录 B.5；docs/product/p1-step1-farming-2026-10-08.md |
+| q(60) | Experiment 背包格的行数（2026-10-08，不知火舞 SGODOT-226 评论 e3b4ca2e） | §16 COOK-2b 写「5 × 4 格」，会被当成固定 20 格的规则；实际定稿与哪吒的实现是按可入菜原料的数量排 | Experiment 背包格写成 **5 列格，至少 2 行，末行补齐**；不是固定 5 × 4 | 第 7 章 7.2.7；第 16 章 COOK-2b（两处） |
+| q(61) | 快捷栏 v1.11 与方案的口径对齐（2026-10-08，刘邦核出，不知火舞 SGODOT-221 b0a83924 / 225 9f72803f，奕星转达） | v1.11（197 LOCK-04 / 05，用户已确认）定的是长按只浮起、拖进 Pin / Remove 放置区钉住或移除、从背包拖入不自动钉住；方案 §10.3.3 第 2 条、§10.3.4、§10.4.5、BAG-4、BAR-1 与 §16.1 快捷栏行还写长按钉住、拖入自动钉住、互换并都钉住；详情卡 Pin、栏满、抽屉里放置区位置没写 | **以 v1.11 为准**：长按 450 ms 只浮起，淡入 Pin / Unpin（琥珀）与 Remove（垃圾桶）两个放置区；松在 Pin 区切换钉住、Remove 区移除（Toast `Radish Seeds off the bar · Undo`）、另一格只互换（钉子跟着物品走）、本格或别处取消；PinMenu 弃用。**从背包拖入 = 放入落点格、不自动钉住**，落在有物品的格时替换该格，被替换的不算「已移除」。**「已移除」只由 Remove 区产生**，按行动保存，自动填充不补回，从背包拖回时清掉。**详情卡 `Pin` 保留**：钉到物品所属行动的栏（第一个空格，没有就顶掉最后一个未钉住格），已钉住写 `Unpin`，5 格都钉住灰显 `Bar full · Unpin one first`。**抽屉里**放置区翻到快捷栏行下方（x 72 / 168，y = 行下沿 + 96）。**背包格长按**（LOCK-12，用户 2026-10-08 同意）：450 ms 浮起并出 Pin 区、不出 Remove；拖到 Pin 区 = 放进所属行动的快捷栏并钉住，拖到快捷栏格 = 放入不钉住（落在有物品的格 = 替换），松在原地或别处 = 取消；详情卡 `Pin` 一步钉住保留 | 第 10 章 10.3.3、10.3.4、10.4.4、10.4.5；第 16 章 §16.1 快捷栏行、BAG-4、BAR-1；第 17 章 17.2.1；附录 B.10 |
+| q(62) | 世界提示与行动环只留图标（2026-10-08，SGODOT-246 用户手测反馈；247 / 250 用户确认，197 LOCK-03 / 07 / 16 / 17 / 30 改为 v2，不知火舞 197 72b6233e、247 1929a8e9、250 370794d2 / f02e1a43，奕星转达） | 方案各章与附录 B 仍写指尖卡 `Tap to cook` / `Tap to craft` / `Tap to shop` / `<Name> · Tap to talk` / `Talking` / `Sit`，径向菜单「围着角色扇出、瓣旁写名字与原因、选中瓣连线到角色」；快捷栏空格还写 `Tap to pick a seed`、BAR-1 的幽灵格写整句（与 q(44) 只写名词矛盾） | **世界提示**：任何地方不写 Tap to…、不画手指。视野内约 8 m 的设施挂图标钮（有状态时显示状态徽标）；交互半径内最近的一个朝角色前方展开成名字条（图标 + 名字 + 至多一条事实：`Farmhouse` / `Workbench` / `Homestead Stall` / `Timber Grove` / `Upgrade Plaque` / 门牌 `Homestead Lv1` / `Stove 1/1 · Empty` / 长椅 `+60 Energy` / `Rested today` / 集市委托板 `Market Board`（有可接委托时换 `!` 徽标，不知火舞补）/ 门 = 门图标 + `Farm` / `Map`），同一时间只展开一个（据点房间同样）。**NPC** 头顶常驻名字条，只写名字；最近的一个主色描边放大 1.1 倍，对话中保持高亮，不再改写成 `Talking`；不可交互的 NPC 不挂名字。**茶桌与可坐长凳**只用座位图标 `i-seat`。**行动环**：以屏幕中心为圆心的四瓣环，瓣上无字；当前行动主色实心瓣；不可用瓣置灰加锁，点了在环心出 1.5 s 原因气泡；四瓣依次从中心弹出；去掉到角色的连线。**快捷栏**：空格只留空，幽灵格只写名词。P0 文案清单同步 | 第 7、9、10、11、12、13、14、16 章；附录 A.0.11、B.7、B.9、B.10、B.11、B.13、B.14；docs/qa/p0-copy-checklist-2026-10-08.md |
+| q(63) | 背包料理详情卡的 `Gift` 文案（2026-10-08，不知火舞 SGODOT-225 定去向，刘邦实现） | §10.4.4 料理行只写 `Gift`，没写身边没有居民时怎么显示、点了说什么 | 身边有居民：`Gift to Ama`（居民名字，同出锅卡 `Gift to Mira`），点了打开该居民的送礼抽屉并选中这道菜；其他地方灰显 `Gift to a resident`，点了 toast `Find a resident at an outpost to gift this dish`；今天已送过：`Gift already given today`；Mystery Dish 照样可送（好感 −2，q(33)） | 第 10 章 10.4.4；附录 B.10 |
 
 ---
 
@@ -514,7 +532,7 @@ flowchart LR
 | 旅行 Trip 6 Intercontinental | **50**（+ 300 金币 + 门禁物品） | 同上 | Trip 6 · 50 Energy · 300 coins · Ticket |
 | 旅行 Trip 7 Antipodal | **60**（+ 500 金币 + 门禁物品） | 同上 | Trip 7 · 60 Energy · 500 coins · Ticket |
 | 日票有效期内往返 / 回家 | 0 | 到达起滚动 24 小时 | Pass active · Free / Go home · Free |
-| 客票（密友邀请）旅行 | 该 Trip 档体力的一半（向上取 5 的倍数），0 金币，不需门禁物品 | 到达 +10（见 3.4.7，不超过所付体力）；日上限由第 12 章定 | Guest pass · 10 Energy · Host online |
+| 客票（密友邀请）旅行 | 该 Trip 档体力的一半（向上取 5 的倍数），0 金币，不需门禁物品 | 到达 +10（见 3.4.7，不超过所付体力）；日上限由第 12 章定 | Guest Pass · 10 Energy → 132 left · Host is online |
 | 帮工：浇水 / 一年生收获 | 0 | 不检查 | Watering is free |
 | 帮工：补播 / 多年生收获 | 按主人同价，扣**帮工自己** | 日上限由第 12 章定（建议帮工支出 ≤ 40 / 日） | Helping · uses your Energy · 2 per plot |
 | 关注 / 组队语音 / 一起做菜 / 明信片 / 收件箱 | 0 | 不检查 | — |
@@ -557,7 +575,7 @@ flowchart LR
 | 规则 | 内容 | 理由 |
 |---|---|---|
 | 回复档 = 稀有度 | Common 20 / Fine 40 / Rare 70 / Legendary 70 | 稀有度由原料稀有度与原料族数决定（料理章）；Legendary 不再往上加回复，它的价值是 Buff、收藏分与赠礼——否则 Legendary 鱼成为体力引擎 |
-| 黑暗料理 Mystery Dish | `dish_mystery` 黑暗料理 / Mystery Dish：+5，占食物上限，不递减 | 配方实验失败也有一点点回报，且进图鉴失败页；新手期退料限当日前 10 次（料理章），所以它不是免费体力源 |
+| 黑暗料理 Mystery Dish | `dish_mystery` 黑暗料理 / Mystery Dish：+5，占食物上限，不递减 | 配方实验失败也有一点点回报，且进图鉴失败页；新手期当日前 10 次失败退回全部原料、**但不出 Mystery Dish**（q(46)），所以它不是免费体力源 |
 | 食物上限 | 每玩家日 200（Homestead +10 / 级；新手祝福 +100） | 一天的饭 = 再来一条池 |
 | 同菜递减 | 同一道菜当日第 1 份 100%、第 2 份 50%（向上取整）、第 3 份起 0（可以吃，只给图鉴与饱腹动画） | 吃满 200 至少需要 2 道不同 Rare 菜或 4 道不同 Fine 菜，与 Cookbook 多样化联动 |
 | 满条不能吃 | 当前 = 上限时 Eat 按钮置灰「Energy full · eat later」 | 不浪费食物 |
@@ -873,7 +891,7 @@ flowchart LR
 | 标题 | ⚡ Energy 1/200 · +1 in 2:41（琥珀） | ⚡ Energy 0/200 · +1 in 3:59（红） |
 | 副标题 | Sow 1 plot needs 2 Energy · you have 1（Row Hoe：Sow 3 plots needs 6 Energy · you have 4） | Recover or do something free |
 | 信息行 | 时钟图标 · Wait · Full in 13h 20m | 同左 |
-| RECOVER 分组 | 小号大写标签 + 折叠箭头 + 细分隔线；2×2 引导瓦片（浅底、圆角 20，右端灰字 + ›）：Eat · 3 dishes in bag · Open bag › / Cook · 4 fish in creel · Show kitchen › / Tea · 1/3 today · 40 coins · Show on map › / Rest · Available 或 1h 12m to go · Show bench › | 同左 |
+| RECOVER 分组 | 小号大写标签 + 折叠箭头 + 细分隔线；2×2 引导瓦片（浅底、圆角 20，右端灰字 + ›）：Eat · 3 dishes in bag · Open bag › / Cook · 4 fish in creel · Show kitchen › / Tea · 0/3 today · 40 coins · Show on map › / Rest · Available 或 1h 12m to go · Show bench › | 同左 |
 | 关闭 | 主色胶囊「Free to do now」+ 灰字 Closes this card · tiles only guide you, nothing is used automatically | 同左 |
 
 第一行写的是这一下行动的价（1 格、Row Hoe 3 格、1 竿、1 块岩石），不再有"20 格里先播 14 格"的裁剪结果；某项当前不可用时该瓦片灰显并写原因（No dishes in bag / Tea 3/3 / Rested today）；在矿洞等离家场景，Cook 与 Rest 两块灰显写 At home（q(6)）。卡片关闭后主行动键保持琥珀，直到投影体力够这一下为止；Today 的免费清单用同一判据，显示到体力条回到绿色（q(12)）为止，然后恢复常规 Today（q(22)）。Rest 瓦片在 P0 长椅接入前临时写 Show home，接入后写 Show bench（q(30)）。
@@ -886,7 +904,7 @@ flowchart LR
 |---|---|---|---|
 | 标题 | 红色体力数字 + 倒计时 | ⚡ Energy 0/200 · +1 in 3:59 / 副标题 Recover or do something free | — |
 | 等待 | 纯信息行（时钟图标，无边框无底色） | Full in 13h 20m | 只显示倒计时，不弹窗、不推送 |
-| 恢复 | 分组标签 RECOVER（小号大写 + 折叠箭头 + 细分隔线）下 2×2 引导瓦片：图标 + 标签 + 右侧事实数值 + 灰字引导 ›；点瓦片只带路不执行 | Eat · 3 dishes in bag · Open bag › / Cook · 4 fish in creel · Show kitchen › / Tea · 1/3 today · 40 coins · Show on map › / Rest · Available · Show bench › | 某项当前不可用时该瓦片灰显并写原因（No dishes in bag / Tea 3/3 / Rested today）；折叠箭头可收起分组 |
+| 恢复 | 分组标签 RECOVER（小号大写 + 折叠箭头 + 细分隔线）下 2×2 引导瓦片：图标 + 标签 + 右侧事实数值 + 灰字引导 ›；点瓦片只带路不执行 | Eat · 3 dishes in bag · Open bag › / Cook · 4 fish in creel · Show kitchen › / Tea · 0/3 today · 40 coins · Show on map › / Rest · Available · Show bench › | 某项当前不可用时该瓦片灰显并写原因（No dishes in bag / Tea 3/3 / Rested today）；Rest：`Available` / `Rested today` / `Ready in 1h 12m`（离开农场未满 2 小时）/ `After 2h away`（今天还没离开过农场）/ 离家 `At home`；Tea：`0/3 today · 40 coins`（已喝杯数 / 3 · 下一杯的价格：→ `1/3 today · 50 coins` → `2/3 today · 60 coins`，q(48)）/ `Need 15 more coins` / `3/3 today` / `Energy full`；瓦片只写固定事实，实得只写在柜台与长椅的按钮上（q(46)）；折叠箭头可收起分组 |
 | 关闭 | 唯一的主色胶囊按钮（下方灰字 Closes this card） | Free to do now | 关闭卡片回原处；Today 行随即列出 3.7.4 清单里当前可做的免费事项，至多 3 行，按此顺序取：可收的作物 → 可做的菜 → 可直售 ≥ 10 件 → 可交付的委托 → 没打完的矿洞局 → 规划明天的田（P0 不含，q(44)）→ 在线的密友或开放农场 → 浏览地图；只列当期已有的功能，空出的行由下一个候选补上（P0 例：Harvest 12 ready · Cook · 4 fish in creel · Sell 12 at Homestead Stall；`Browse the map` 永远可用，是兜底；社交行 P2 起、Decorate P1 起；q(22)、q(23)、q(24)） |
 
 首次出现（首会话）配 ≤ 3 秒的教学时刻：「Energy comes back over time. A meal brings it back now.」之后缩为飘字。
@@ -1287,17 +1305,17 @@ Cooking（阈值 0 / 30 / 100 / 220 / 400 / 650 / 950 / 1,350 / 1,700 / 2,350；
 | Lv | 累计 XP | 解锁 | 性质 | 玩家当天的"不一样" |
 |---|---|---|---|---|
 | 1 | 0 | **2 投料槽**（永不锁）；Cookbook / Experiment 两 Tab；初始已知 `dish_grilled_crucian` 烤鲫鱼 Grilled Crucian、`dish_radish_salad` 萝卜生菜沙拉 Radish Salad；Cookbook 48 页剪影全部可见 | 起点 | 第 15 分钟 5 秒烤出第一道菜 |
-| 2 | 30 | 升级礼 `cooking_lv2_gift`：配方卡 `recipe_card_dish_fish_soup` 鲜鱼汤 Fresh Fish Soup（页变 Tasted；原料 = 鲫鱼 + 小萝卜，小萝卜 3.5 小时后在田里收）；便利 `cook_again` Cook Again（出锅面板多一个按钮，料够时同一页再开一锅） | 门禁 + 便利 | 首会话第 27 分钟到达；Today 第三行 "Fresh Fish Soup · when radishes are ready" 把第二次会话钩住 |
+| 2 | 30 | 升级礼 `cooking_lv2_gift`：配方卡 `recipe_card_dish_fish_soup` 鲜鱼汤 Fresh Fish Soup（页变 Tasted；原料 = 鲫鱼 + 小萝卜，小萝卜 3.5 小时后在田里收）；便利 `cook_again` Cook Again（出锅卡不加按钮；收走上一锅后再点灶台，先弹上一锅那页 `Cook Again` / `Choose recipe ›`，料够时一键再开一锅，q(48)） | 门禁 + 便利 | 首会话第 27 分钟到达；Today 第三行 "Fresh Fish Soup · when radishes are ready" 把第二次会话钩住 |
 | 3 | 100 | 便利 `clue_double` Double Clue（每条新的失败组合在 Hidden 页翻开 2 槽线索，原为 1 槽）；`hearty_mishap` Hearty Mishap（黑暗料理 Mystery Dish 回复 +5 → **+10**，仍占食物上限、不递减、不给 XP） | 便利 | 第 2 天晚：实验的命中率明显上来，失败也不再那么"白费" |
 | 4 | **220** | **第 3 投料槽** → 三族菜 Rare 70 从此可做；Cookbook 12 页 3 槽页的 `Lv4` 锁角标消失 | **改变日常 ①** | 第 3–4 天：第一道 `dish_fisher_stew` 渔家炖锅 Fisher's Stew（Fine 鱼 + 土豆 + 岩盐）；横幅 "Cooking Lv 4 · 3rd slot" |
-| 5 | 400 | 便利 `steady_hand_1` Steady Hand I（全部菜火候金区 +5 个百分点）；`queue_two` Queue ×2（一口灶可排第二锅，前一锅出锅后自动开火，火候照常） | 便利 | 第 5 天：一口灶也能排两锅；Rare 的 Perfect 概率约 25% → 30% |
+| 5 | 400 | 便利 `steady_hand_1` Steady Hand I（全部菜火候金区 +5 个百分点）；`queue_two` Queue ×2（一口灶可排第二锅，前一锅到点即收进保温柜或背包、第二锅随即开火，火候照常；都放不下时第二锅等待，q(46)） | 便利 | 第 5 天：一口灶也能排两锅；Rare 的 Perfect 概率约 25% → 30% |
 | 6 | 650 | 便利 `quick_fire` Quick Fire（烹饪时长 −20%：5 / 15 / 30 / 60 s → 4 / 12 / 24 / 48 s；火候出现时刻按比例前移，针转速不变） | 便利 | 第 7 天：3 口灶 1–2 分钟做完一天的菜；同一天 Common 菜变灰，第一次弹 Cooking 解释卡 |
 | 7 | 950 | 便利 `steady_hand_2` Steady Hand II（金区再 +5，叠加上限 60% 不变）；`fast_mastery` Fast Mastery（Mastered 阈值 Cooked ≥ 10 → ≥ 7） | 便利 | 第 9–10 天：Rare 的 Perfect 概率约 35%；常做的菜更快拿到 Mastered 的 +10 金区 |
 | 8 | 1,350 | 便利 `cook_all` Cook All（Cookbook 页一键把料够的已知菜按稀有度高 → 低排满所有空闲灶与队列；不含 Legendary，同一页最多 2 锅，q(4)）；`provisions_plus` Bigger Provisions（旅途行囊 Provisions 3 → **4 格**） | 便利 | 第 12 天：3 口灶 1 分钟排满；出远门多带一份干粮 |
 | 9 | 1,700 | 便利 `chefs_touch` Chef's Touch（赠菜给居民的好感 +1，封顶由 +4 提到 +5；每位居民每日 1 份不变） | 便利 | 第 15 天：同一道 Rare 菜送居民多 1 点好感 |
 | 10 | 2,350 | `title_chef` **Chef**；便利 `lucky_double` Lucky Double（任意出锅 10% 概率多 1 份 Plain，Legendary 除外，与大锅 Double 不叠加）；Cookbook 封面金丝带；**P2 预留**：Cooking 等级上限扩展（Lv11–15 或 Master 档）开第 4 / 5 投料槽与 8 页 4–5 槽配方，本期不实装 | 便利 + 称号 | 大厨 |
 
-**分期**（q(38)）：P0 做 Lv1–6 的便利（全量规则下目标玩家第 5 天到 Lv5、第 7 天到 Lv6；P0 子集里为第 7 / 11 天，首周只有重度玩家到 Lv6，见 14.6.2；Lv6 Quick Fire 是否留在 P0 待用户拍板，q(43) 旋钮 D）；Lv7–10 的便利随 P1，P0 里等级与 XP 照常累计。Cooking 升级不回体力（§3.4.8）。
+**分期**（q(38)）：P0 做 Lv1–6 的便利（全量规则下目标玩家第 5 天到 Lv5、第 7 天到 Lv6；P0 子集里为第 7 / 11 天，首周只有重度玩家到 Lv6，见 14.6.2；**Lv5 留在 P0，Lv6 Quick Fire 排到 P0 最后、进度紧时可砍**，用户 2026-10-08 拍板，q(47)）；Lv7–10 的便利随 P1，P0 里等级与 XP 照常累计。Cooking 升级不回体力（§3.4.8）。
 
 Cooking 的奖励全部是"做菜更顺手"，没有一级改变回复 20 / 40 / 70、不改稀有度派生、不改食物日上限；唯一的门禁是 Lv4 的第 3 槽。灶口 1 → 2 → 3、调味架（只做储物）、保温柜、大锅、名厨招牌仍随 Homestead，与 Cooking 无关。
 
@@ -1425,7 +1443,7 @@ Cooking 的门禁表只有一行真正的"锁"（Lv4 第 3 槽），其余都是
 | 位置 | 呈现 | 文案 |
 |---|---|---|
 | 钓获 / 收获飘字 | 全额："+10 XP"；减额："+7 XP" 加一枚小下箭头；灰色：灰字 "Outleveled" | 长按箭头："Reduced · 75% · you outlevel this fish" |
-| 出锅飘字（Cooking，随 Cookbook 翻页条一起出） | 全额："+20 Cooking XP ★"；同页第 2 锅："+10 Cooking XP · 2nd today"；第 3 锅起："No XP · 3rd today"；减额："+12 Cooking XP" 加小下箭头；灰色："Outleveled"；首做另起一行 "First cooked! +40" | 长按箭头："Reduced · 75% · you outlevel this dish"；长按 "2nd today"："Same dish again · half XP · resets 04:00" |
+| 出锅飘字（Cooking，随 Cookbook 翻页条一起出） | 全额："+20 Cooking XP ★"；同页第 2 锅："+10 Cooking XP · 2nd today"；第 3 锅起："No XP · 3rd today"；减额："+12 Cooking XP" 加小下箭头；灰色："Outleveled"；首做的一次性 XP 不另飘，写在出锅卡奖励条上（`First cooked · +40 Cooking XP · Cookbook 9/48`，q(55)） | 长按箭头："Reduced · 75% · you outlevel this dish"；长按 "2nd today"："Same dish again · half XP · resets 04:00" |
 | 第一次变灰（每轨一次） | 解释卡 ≤ 3 秒 + 按钮 | "You've outleveled Pond Crucian. It still sells and cooks, but gives no XP. Fish Fine or better for full XP." [Where to fish] → 地图高亮推荐渔场；Cooking："You've outleveled Grilled Crucian. It still feeds you, but gives no XP. Cook Rare or better for full XP." [Cookbook] → Cookbook 筛到当前全额的页 |
 | Cookbook 每页（详情卡） | 同三态 XP 标签，加 "2nd today" 角标 | "XP: Full" / "XP: 50%" / "XP: None · outleveled" / "2nd today · half" |
 | 种子摊 / 柜台每件商品 | XP 标签三态：Full / Reduced（含百分比）/ None | "XP: Full" / "XP: 50%" / "XP: None · outleveled" |
@@ -1438,7 +1456,7 @@ Cooking 的门禁表只有一行真正的"锁"（Lv4 第 3 槽），其余都是
 | 事件类 | ≤ 3 秒时刻（第一次） | 第二次起 | 永久痕迹 |
 |---|---|---|---|
 | 账号首次升级（首会话 Fishing Lv2） | 全幅横幅 "Fishing Lv2" + 一行 "Fine fish now stay on the hook" + 教学句 "Levels unlock gear, fish and seeds. Basics never lock." + 升级礼入包动画 | — | 技能页该行点亮并记日期；个人资料徽记出现等级环（**头像环维持 Farming / Fishing 双色，Cooking 不加第三段**） |
-| 账号第二次升级（首会话第 27 分钟 Cooking Lv2） | 1.5 秒横幅 "Cooking Lv 2 · Recipe: Fresh Fish Soup" + 配方卡入包动画；不重复教学句 | — | 技能页第三张卡点亮；Cookbook 页多一页 Fresh Fish Soup（Tasted） |
+| 账号第二次升级（首会话第 27 分钟 Cooking Lv2） | 1.5 秒横幅 "Cooking Lv 2 · Recipe: Fresh Fish Soup"（等出锅卡关掉才出）+ 配方卡飞进 Cookbook（页变 Tasted，不占背包格，q(55)）；不重复教学句 | — | 技能页第三张卡点亮；Cookbook 页多一页 Fresh Fish Soup（Tasted） |
 | 门禁 / 便利类升级 | 1.5 秒横幅 "Farming Lv5" + 解锁行 "Corn, Cabbage, Sow Again" + 下一级预告 "Next Lv6 · Sprinkler · 250 XP"；Cooking 同式："Cooking Lv 5 · Steady Hand I · Queue ×2" + "Next Lv6 · Quick Fire · 250 XP" | 同样 1.5 秒（每级是不同事件，不缩为飘字） | 技能页行点亮；种子摊 / 柜台锁角标当场消失并闪一次 |
 | 改变日常类升级（Farming 6 / 7 / 8，Fishing 4 / 5 / 6 / 8 / 9，**Cooking 4**） | 全幅 ≤ 3 秒：横幅 + 设施蓝图落到工作台 / 柜台的动画 + "Today changes: no more watering" 一句；Cooking Lv4：横幅 **"Cooking Lv 4 · 3rd slot"** + 灶台投料槽从 2 个长出第 3 个的动画 + "Today changes: 3-ingredient dishes" | — | 工作台出现蓝图卡；地图上 River / Coast 卡片转全彩；农场里设施本体就是痕迹；Cookbook 12 页 3 槽页锁角标消失并闪一次 |
 | Lv10 | 全幅 ≤ 3 秒：称号 "Master Gardener / Master Angler / Chef" + 图鉴金框（Cooking：Cookbook 封面金丝带） | — | 称号常驻名片；图鉴金框；手账框 |
@@ -1460,6 +1478,89 @@ Cooking 的门禁表只有一行真正的"锁"（Lv4 第 3 槽），其余都是
 ### 4.8.5 英文文案表
 
 （本节内容已汇总到附录 B.4，此处不重复。）
+
+### 4.8.6 P0 反馈触发表（阶段 3 输入，SGODOT-233，q(49)）
+
+组件按 WP2 已验收的结果时刻与反馈层（SGODOT-202）：**FloatText + ItemFly**（轻）、**RewardMoment**（结果卡）、**MomentBanner**（LevelUp / Complete，重，≤ 3 秒、点一下跳过）、**Toast**（Success / Info / Error）。
+
+**分工与排队**（与刘邦、蒙恬对齐）：
+
+1. **FloatText** 写每一次动作的增量，不排队、不挡输入。同一时刻最多 3 行，按 Energy → XP → 物品 → 金币 → 好感排序，超出的并进最后一行（`+6 Timber · +14 coins`），不丢；同类合并成一行（`+48 XP · 12 plants`），合并时 bump 一下。
+2. **ItemFly** 的落点：进背包的飞向快捷栏末尾的 Bag 格；鱼飞向鱼篓角标；进仓库的（`· Stored`）飞向农舍；看不到落点时只出飘字、不飞。
+3. **RewardMoment** 只给"第一次"和结果卡。没有按钮的卡（`Caught!`、`Too strong`）1.5 秒自动收起，点一下也收；有按钮的卡（出锅卡 COOK-4）等玩家关闭，点卡外按默认动作（Keep）。
+4. **同一时间只有一个 Moment**：所有 RewardMoment / MomentBanner 走同一个队列，同一刻触发时 RewardMoment 在前；后一张等前一张关掉才出（厨房里的升级横幅等出锅卡关掉）。
+5. **Toast** 同时只显示一条：新的替换旧的；同一句 2 秒内重复出现只延长显示、不重弹。
+6. **TipCard**（引导层）在 Moment 显示期间不弹新的，等 Moment 关掉再出；已在显示的保留。
+7. 体力不足一律走 Energy 卡（LOCK-09），不用 Toast。
+
+| 事件 | 呈现 | 文案 | 备注 |
+|---|---|---|---|
+| 钓获 · 该鱼种第一次 | RewardMoment（Reward，无按钮）+ FloatText | `Caught!` / `Pond Crucian · Common` / `Fish-dex 3/N`；一次性条 `First catch! +15 XP`（Fine 30 / Rare 60）、`New city! +10 XP`；首条 Fine / Rare 另一条 `+20 Energy` / `+30 Energy` | N = 当期图鉴页数 |
+| 钓获 · 重复鱼种 | FloatText + ItemFly → 鱼篓角标 | `+5 XP` / `Pond Crucian ×1` | 不出卡（旧版"第二次钓获反馈卡"由此取代） |
+| 逃走 · 保护期内（Fishing Lv1–3 每日前 10 次） | FloatText | `It got away · Energy refunded (9 left today)` | Figma FISH-5-2 的 `+5 Energy · 9 protected left` 改为此句 |
+| 逃走 · 保护期外 | FloatText | `It got away · 3 Energy back` | |
+| 挣脱 · 门禁鱼（每鱼种第一次） | RewardMoment（Neutral，无按钮） | `Too strong` / `Golden Koi · Rare` / `Fishing Lv4 needed · You: Lv3 · 30 XP to go` / `+3 Energy back` | 末行写实退：保护期内 `Energy refunded (8 left today)`，保护期外 `+3 Energy back`（q(55)）；剪影点亮；第二次起 FloatText `Got away · Lv4 · Energy refunded (8 left today)`，保护期外 `Got away · Lv4 · 3 Energy back`（q(50)） |
+| 挣脱 · 鱼竿不够（每鱼种第一次） | RewardMoment（Neutral，无按钮） | `Too heavy for your rod` / `Golden Koi · Rare` / `Reed Rod · Fishing Lv3 · 80 coins` / `+3 Energy back` | 末行写实退，同上；第二次起 FloatText `Got away · Reed Rod · Energy refunded (8 left today)` / `Got away · Reed Rod · 3 Energy back`（q(50)） |
+| 鱼篓满 | Toast Error | `Creel full · 0 free slots · Sell or cook first` + `Open bag ›` | 主行动键灰 `Cast · Creel full` |
+| 播种 | FloatText | 每格 `−2 Energy`；按住连播时右侧累计小字 `−20` | |
+| 收获 · 单次 | FloatText + ItemFly → Bag | `+2 XP` / `Radish ×1`；该作物第一次另飘 `First harvest! +10 XP · Radish` | |
+| 收获 · 按住连收结束 | E-04 结果条（FARM-3-RESULT / RESULT-2，按 SGODOT-204 铺开稿） | 满包时 `Harvest 12 of 30 · bag full`；首收写成结果条里单独一条 | 隔夜回流用 RETURN-SESSION / STALL-NEW |
+| 出锅 · 首做 | 出锅卡 COOK-4（RewardMoment Reward）+ Eat / Keep | `New recipe!` / `Herb Grilled Fish · Fine · ★ Good` / `First cooked · +20 Cooking XP · Cookbook 2/N`；首道 Rare 另一条 `+30 Energy` | 稀有度光用色点颜色；N = Cookbook 显示的页数（P0 仍显示 48 页剪影，§7.14.0，写 `Cookbook 2/48`）；奖励条只放首做的一次性 XP，本锅自己的 XP 照常飘字（`+10 Cooking XP · ★ Good`），不并进奖励条（q(55)） |
+| 出锅 · 重复 | COOK-4 + FloatText | `Cooked!` / 菜名 · 稀有度 · 品质；飘 `+10 Cooking XP · ★ Good` / `+5 Cooking XP · 2nd today` / `No XP · 3rd today` | |
+| 出锅 · 失败 | COOK-4（Neutral） | `Mystery Dish` / `Hmm… not a dish` / 线索条 `A clue was added to your Cookbook` / 灰字 `Can't be sold or delivered` | 可以送居民（好感 −2，q(33)），所以灰字不写 gifted；`Clue found` 只作 Cookbook 页角签（q(55)） |
+| 出锅 · 新手期退料 | COOK-4（Neutral），按钮 `OK` | `No dish this time` / `Ingredients back (9 left today)` | q(46) |
+| 进食 | FloatText | `+40 Energy` / `Meals today 60/300`；快满写实得 | 不出卡 |
+| Cookbook 8 页 | RewardMoment（Milestone） | `Home Cook` / `Cookbook 8 · +50 Energy` / 下一档 `Line Cook · 20 dishes` | 称号作标题 |
+| 账号首次技能升级 | MomentBanner LevelUp（全幅 ≤ 3 秒） | `Fishing Lv 2` / `Fine fish now stay on the hook` / Rewards `+50 Energy` · `3 Worm Bait` · `3 Wild Herb` / Detail `Recipe: Herb Grilled Fish` / Tip `Levels unlock gear, fish and seeds. Basics never lock.` / 动作 `Use bait` | 动作只做原地的下一步，不跳转 |
+| 其后 Farming / Fishing 升级 | MomentBanner LevelUp（1.5 秒） | `Farming Lv 3` / 解锁行 `Potato, Chamomile, Compost` / `+30 Energy` / Detail `Next Lv4 · Tomato, Chili, Row Hoe · 150 XP` | 下一级在当期没有新内容时，Detail 只写 `Next Lv5 · 200 XP` |
+| Cooking 升级 | MomentBanner LevelUp（1.5 秒，无体力） | `Cooking Lv 4 · 3rd slot` / `Three-ingredient dishes now possible` / `Next Lv5 · Steady Hand I · Queue ×2` | q(37)；Lv4 之后 Today 出线索（q(46)） |
+| Homestead 升级 | MomentBanner LevelUp（HOME-2） | `Homestead Lv 2` / `Max Energy 210 · Meals 210 a day` / `Spice Rack · seasonings off your bag` / `Clay Bank opened` | HUD 体力同时回满到新上限 |
+| 做出铜镐 / 采集手套 | MomentBanner Complete | `Copper Pickaxe` / `2 Stone per rock` / 动作 `Equip`；`Gather Gloves` / `+1 at every gathering spot` | |
+| 做出火把 / 堆肥 | FloatText + ItemFly → Bag | `+2 Torch` / `+2 Compost` | |
+| 采集 | FloatText + ItemFly | `+6 Timber · Stored`（→ 农舍）/ `+2 Worm Bait`（→ Bag） | q(46) |
+| 敲岩 / 层费 | FloatText + ItemFly → Bag | `+1 Stone` / `+1 Copper Ore`；层费 `Floor 2 · −2 Energy` | |
+| 清完一层 | Toast Success | `Floor 2 cleared · Elevator stop` | P0 没有 `Run complete` |
+| 日切结束未完成局 | 矿口上方 FloatText | `Run ended at daily reset` | q(44) |
+| 回家入库 | Toast Info | `Stored · 12 Stone · 3 Copper Ore` | |
+| 交委托 | FloatText + ItemFly（Bag → 板 / 居民） | `+14 coins`；居民委托另飘 `+5 Friendship` | 不出卡 |
+| 买 / 卖 | FloatText | `−80 coins` / `+24 coins` | |
+| 茶 / Rest | FloatText | `+30 Energy` / `+60 Energy` | 快满写实得 |
+| 居民赠餐 | Toast Success + ItemFly → Bag | `Pip shared a meal with you · +20 Energy` | 菜进背包（q(20)） |
+| 好感 | FloatText（玫红） | `+2 · first chat today` / `+3 · loved it` / `−2 · not a fan` | |
+| 满包时的被动获得 | Toast Info（铃铛下） | `Bag full · Perch ×7 sent to Inbox · 24h` | LOCK-14 |
+| 领取包裹 | ItemFly → Bag | `Perch ×7` | |
+| 命令被拒（非体力） | Toast Error | 按附录 B 的拒绝文案（如 `Bag full · free a slot to mine`） | 体力不足走 Energy 卡 |
+
+### 4.8.7 P0 门禁四件事卡内容表（阶段 3 输入，q(49)）
+
+种子摊、柜台、Cookbook 第 3 槽、Experiment 第 3 槽、工作台锁定配方、锁定的采集点、Fish-dex 里挣脱过的剪影共用一张卡，走 224 的 InfoSheet，数据用 228 的 `locked {skill, level, xp_to_go}`。四行：锁了什么 / 哪条等级 / 还差多少 / 跨过去会怎样。不写 `Got it`：卡片底下有半透明遮罩，点卡外任何地方或按安卓返回键即关（一次关一层）。按钮只放引导（`Show my plots` / `Cookbook` / `Skills`），点了先关卡片，再移动相机或打开对应面板，不跳转（LOCK-08）；没有可引导的地方就只有事实行、没有按钮。§4.8.1 表里的 `[Got it]` 在 P0 一律不出。
+
+**"还差多少"的动作量**（§4.8.1 规则在 P0 的取法）：Farming 写 `harvest N <作物>`，作物取玩家当前能种、全额 XP 的最高档，N = ⌈xp_to_go ÷ 每株 XP⌉；Fishing 写 `about N casts`，按玩家等级对应的推荐塘每竿期望 XP（Pond 约 3.8–4.9，River 约 5.1，§4.4.2）；Cooking 写 `about N new dishes`（首做 XP），没有可做的新页时写 `about N Fine dishes`；超过一天写 `about N days`（按该玩家最近 7 天日均 XP）。算不出动作量时只写 XP。
+
+| 场景 | 锁了什么 | 哪条等级 | 还差多少（样例） | 跨过去会怎样 | 引导按钮 |
+|---|---|---|---|---|---|
+| 驿站种子 | Carrot Seeds / Herb Seeds | Farming Lv2 | 18 XP to go · harvest 9 radishes | Unlocks Carrot, Herb | Show my plots |
+| 驿站种子 / 堆肥 | Potato Seeds / Chamomile Seeds / Compost | Farming Lv3 | 40 XP to go · harvest 14 carrots | Unlocks Potato, Chamomile · Compost: crops ready 20% sooner | Show my plots |
+| 驿站种子 | Tomato Seeds / Chili Seeds | Farming Lv4 | 65 XP to go · harvest 22 carrots | Unlocks Tomato, Chili | Show my plots |
+| 集市柜台 | Row Hoe | Farming Lv4 | 65 XP to go · harvest 22 carrots | Sows 3 plots per action · 240 coins | Show my plots |
+| 工作台配方 | Compost | Farming Lv3 | 40 XP to go · harvest 14 carrots | Crops ready 20% sooner | Show my plots |
+| 驿站 / 渔具铺 | Worm Bait | Fishing Lv2 | 10 XP to go · about 2 casts | Faster bites · more Fine fish | — |
+| 渔具铺 | Reed Rod | Fishing Lv3 | 60 XP to go · about 16 casts | Lands up to Rare · 80 coins | — |
+| Fish-dex 剪影（等级不够，q(57)） | Golden Koi · Rare | Fishing Lv4 | 30 XP to go · about 7 casts | Golden Koi stays on the hook | — |
+| Fish-dex 剪影（鱼竿不够，q(57)） | Golden Koi · Rare | Reed Rod · Fishing Lv3 | 80 coins at Tackle Shop | Lands up to Rare | — |
+| Cookbook 3 槽页 | Fisher's Stew · 3 ingredients | Cooking Lv4 | 85 XP to go · about 4 new dishes | 3-ingredient dishes · Rare 70 | Cookbook |
+| Experiment 第 3 槽 | 3rd slot | Cooking Lv4 | 85 XP to go | Mix 3 ingredients | — |
+| Homestead 升级 | Homestead Lv2 / Lv3 | Skills total 3 / 5 needed (now 2 / 4) | 1 more level on either track | Max Energy +10 · Spice Rack, Clay Bank（Lv2）/ Warming Cabinet, Bag Upgrade I（Lv3） | Skills |
+| 驿站扩容 | Bag Upgrade I | Homestead Lv3 | 1 level to go | Bag 25 → 30 · 150 coins | — |
+| 驿站种子（P1 第一步，q(59)） | Cabbage Seeds / Corn Seeds | Farming Lv5 | 120 XP to go · harvest 30 tomatoes | Unlocks Cabbage, Corn | Show my plots |
+| 驿站种子（P1 第一步，q(59)） | Cucumber Seeds | Farming Lv6 | 250 XP to go · harvest 63 corn | Unlocks Cucumber | Show my plots |
+| 工作台蓝图（P1 第一步，q(59)） | Sprinkler | Farming Lv6 | 250 XP to go · harvest 63 corn | Waters 8 plots for you | Show my plots |
+| 采集点 | Clay Bank | Homestead Lv2 | 1 level to go | Gather Clay here | — |
+
+**第一次变灰**（每轨一次，P0 第二周可能出现）：沿用 §4.8.2 的解释卡——`You've outleveled Pond Crucian. It still sells and cooks, but gives no XP. Fish Fine or better for full XP.`（`Where to fish` 只移动地图相机到推荐鱼塘）；Farming 用小萝卜同式（`Grow Carrot or better for full XP.`，`Show my plots`）；Cooking 用 `You've outleveled Grilled Crucian. It still feeds you, but gives no XP. Cook Rare or better for full XP.`（`Cookbook` 筛到当前全额的页）。
+
+**技能页 SKILL-1（P0）**：三张轨卡按 §4.8.4；`Next` 行只列当期有的内容，当期没有新内容时只写 `Next: Lv5 · 200 XP`；解锁列表只显示当期的行；首次类进度用当期分母：`Crops first-harvested n/8 · Fish first-caught n/7 · Dishes first-cooked n/14`，不显示 `Cities fished`（P0 没有旅行）。
+
 
 
 ---
@@ -1630,7 +1731,7 @@ XP：种下的 6 点体力在**首熟那一次收获**时记 6 XP（d 按种下�
 |---|---|
 | 田格状态 | 荒地 → 已翻 → 已播 → 生长中 → 成熟 → 已翻（一年生）；多年生从种下起走 生长中 → 成熟 → 再生中 → 成熟 循环，直到砍除 |
 | 体力计费 | **只在播种时按格扣，扣作物档位点数**（2 / 3 / 4 / 6；地区 4；多年生种下 6、每次收获 2）。翻地、浇水、施肥、一年生收获、砍除、买种、规划、堆肥转换一律 0。每按一次主行动键播 1 格（装备 Row Hoe 一条命令 3 格），服务端按格校验、不足整条拒绝，回包带"需要 / 现有 / 下一个 +1 还有多久"；不做裁剪与「Sow 14 of 20」（§3.8、§10.7） |
-| 翻地 | 0 体力；开垦上限由 Homestead 等级决定：Lv1 200 格，Lv2–6 每级 +40（Lv6 = 400），Lv7–10 每级 +50（Lv10 = 600）；多年生占地与温室内 16 格计入。**P0** 农场固定 30 格（20 格已翻 + 10 格荒地可翻），Homestead Lv1–3 不扩（q(33)、q(40)） |
+| 翻地 | 0 体力；开垦上限由 Homestead 等级决定：Lv1 200 格，Lv2–6 每级 +40（Lv6 = 400），Lv7–10 每级 +50（Lv10 = 600）；多年生占地与温室内 16 格计入。**P0** 农场固定 30 格（20 格已翻 + 10 格荒地可翻），Homestead Lv1–3 不扩（q(33)、q(40)）。**P1 紧凑农场**（q(59)）：Homestead Lv1–2 30 格，Lv3 起 40 格（升级那一刻多 10 格荒地，编号 30–39，0–29 不动）；Lv4 以后随 P1 第 3 步重定，上面的 200–600 是地理农场的尺度 |
 | 浇水 | 播种后浇水一次即开始生长，之后不需要再浇；洒水器范围内与温室内播种即生长 |
 | 不枯萎、不腐烂、不连作、无季节 | 成熟作物挂在田里无限期等你，没有"错过"；任何作物在任何季节、任何气候带都能种（地区作物异带只罚时长） |
 | 等级门禁 | 每种种子有内容等级（Farming）；未达标时种子在驿站 / Market 柜台**可见不可买**：置灰 + 锁角标 + "Lv N" 标签，选中弹四件事卡（锁了什么 / 哪条等级 / 还差多少 XP 与多少次收获 / 解锁后能做什么），不隐藏、不报错 |
@@ -1738,7 +1839,7 @@ d = 玩家 Farming 等级 − 作物内容等级：d ≤ 1 全额；d = 2 → 75
 | 设施 / 工具 | id | 解锁 | 建造 / 获得 | 做什么 | 省的是什么 | 明确不省什么 | 数量上限 |
 |---|---|---|---|---|---|---|---|
 | 行锄 | `tool_row_hoe` 行锄 / Row Hoe | Farming Lv4 | 集市 Market 240 金币（不是工作台配方） | 翻地 / 播种 / 浇水 / 收获一次 3 格（主行动键 Sow ×3 · 6 Energy） | 按键次数 | 播 3 格仍扣 3 格体力 | 1（装备槽，不占背包） |
-| 洒水器 | `facility_sprinkler` 洒水器 / Sprinkler | **Farming Lv6（改变日常 ①）** | 工作台：木材 8 + 石材 6 + 铜矿石 3 | 占 1 格，自动浇湿周围 8 格：范围内播种即开始生长；范围内一年生成熟时长 **−15%**（与堆肥叠加，封顶 −35%） | 浇水步骤、等待小时数 | 播种体力、产量、单价；帮工在范围内补播仍扣帮工体力 | 3 + Homestead 等级（Lv1 4 → Lv7 10 封顶） |
+| 洒水器 | `facility_sprinkler` 洒水器 / Sprinkler | **Farming Lv6（改变日常 ①）** | 工作台：木材 8 + 石材 6 + 铜矿石 3 | 占 1 格，自动浇湿周围 8 格：范围内播种即开始生长；范围内一年生成熟时长 **−15%**（与堆肥叠加，封顶 −35%）。**P1 紧凑农场**（q(59)）：占 1 块空田（已翻或荒地、无作物），覆盖田格网上周围 8 格（含斜角，靠边的少于 8 格、预览写实数）；覆盖内播种即长、放下时已播未浇的格立即开始长；时长在开始生长时锁定、已在长的不重算；40 格全覆盖要 6 台、可种 34 格 | 浇水步骤、等待小时数 | 播种体力、产量、单价；帮工在范围内补播仍扣帮工体力 | 3 + Homestead 等级（Lv1 4 → Lv7 10 封顶） |
 | 苹果树（多年生模板） | `seed_apple` Apple Sapling | **Farming Lv7（改变日常 ②）** | Market 40 金币 | 一次种下、每 48 h 收一次 | 种子钱、翻地 / 播种 / 浇水三步 | 每次收获 2 点体力 | 多年生槽位 |
 | 堆肥箱 | `facility_compost_bin` 堆肥箱 / Compost Bin | Farming Lv7 | 工作台：木材 6 + 石材 4 | 每日投入 ≤ 5 份任意作物 → 等量堆肥 | 堆肥的金币 | 不产生金币、不加速自身 | 1 |
 | 温室 | `facility_greenhouse` 温室 / Greenhouse | **Farming Lv8（改变日常 ③）** | 工作台：木材 20 + 石材 12 + 铜矿石 8 + 300 金币 | 4 × 4 = 16 格室内田：自动浇水；所有一年生成熟时长 **−25%**（与堆肥叠加，封顶 −45%）；地区作物无"水土不服"（按原产带时长） | 等待小时数、地区作物异带惩罚 | 播种体力、产量、单价；室内不可种多年生 | 1 座（Lv8）、2 座（Lv10） |
@@ -1759,7 +1860,7 @@ d = 玩家 Farming 等级 − 作物内容等级：d ≤ 1 全额；d = 2 → 75
 | 2 | 50 | 胡萝卜、香草 | 升级礼 5 枚胡萝卜种子（随升级横幅进背包） | 门禁 | 第二次会话第一次收获当场升级；"鱼 + 香草"的 Fine 料理成立 |
 | 3 | 150 | 土豆、洋甘菊 | 堆肥可购买；便利 Plot Marks（标记明天的田，播种仍逐格按键，不做一键执行，q(23)；P0 不含，q(44)） | 门禁 + 便利 | 第一次施肥：18 h 的洋甘菊变 14.4 h；第一种 Fine 原料 |
 | 4 | 300 | 辣椒、番茄 | Row Hoe 可买（集市 240 金币，一次 3 格） | 门禁 + 便利 | 按键减到 1/3，体力不变 |
-| 5 | 500 | 卷心菜、玉米；**地区种子购买资格**（家城气候带那一种立刻可在家一套的集市广场买，另三种去对应气候带的城市买） | 便利 Sow Again（不做一键补播，P1 开工前按同一原则定形态，q(23)） | 门禁 + 便利 | 第一次有"去外城买种子"的理由；第一次种 Rare 原料 |
+| 5 | 500 | 卷心菜、玉米；**地区种子购买资格**（家城气候带那一种立刻可在家一套的集市广场买，另三种去对应气候带的城市买；P1 第一步不含，随集市出售地区种子那一步，q(59)） | 便利 Sow Again（不做一键补播，P1 开工前按同一原则定形态，q(23)；推到与 Plot Marks 一起做，二者共用"格子记住作物"的标记，q(59)） | 门禁 + 便利 | 第一次有"去外城买种子"的理由；第一次种 Rare 原料 |
 | 6 | 750 | 黄瓜 | **洒水器**配方（改变日常 ①）；便利 Coverage Overlay（田上叠显洒水器覆盖范围，q(23)） | 设施 + 便利 | 从此不用浇水；小萝卜 / 生菜第一次变灰 |
 | 7 | 1,050 | **苹果树**（多年生模板，Market 售树苗） | 堆肥箱配方；果木肥可购买 | 设施（改变日常 ②） | 农场第一次有"每两天回来收一次"的东西 |
 | 8 | 1,450 | 草莓（档 4） | **温室**配方（改变日常 ③） | 设施 + 门禁 | 异带地区作物在家正常种 |
@@ -2047,8 +2148,8 @@ d = 玩家 Farming 等级 − 作物内容等级：d ≤ 1 全额；d = 2 → 75
 
 | 项 | 内容 |
 |---|---|
-| 地图 pin | 模板图标 + 推荐等级；推荐等级达标后转全彩（Lv4 River、Lv6 Coast 的"今天不一样"） |
-| 鱼塘卡片 | 名字 · 模板 · "best for Lv1–3"/"Pond · outleveled" 一句话 · 时段图标 · 今日天气加成 · 本簇 2 种地区鱼剪影（钓到后显示名字）· Fishing Lv8 起"现在活跃鱼种" · 在线人数 · 按钮 Go |
+| 地图 pin | 模板图标 + 推荐等级；推荐等级达标后转全彩（Lv4 River、Lv6 Coast 的"今天不一样"）；名牌 `Reed Pond · Beginner pond · 0.8 km`，其他塘「名字 · 模板 · 距离」（q(48)） |
+| 鱼塘卡片 | 名字 · 模板 · "best for Lv1–3"/"Pond · outleveled" 一句话 · 时段图标 · 今日天气加成 · 本簇 2 种地区鱼剪影（钓到后显示名字）· Fishing Lv8 起"现在活跃鱼种" · 在线人数 · 按钮 Go。**P0**（q(48)）：新手塘副标题 `Beginner pond` 并加一句 `A nearby pond for your first catch.`，其余塘副标题写模板名；`Distance` 按位置芯片所在地算；`Recommended` 按模板（Pond Lv1–3 / River Lv4–5），全塘鱼对玩家都已 0 XP 才写 `Outleveled`；`Details ›` = 该塘当期可钓的鱼表：钓过的显示图标 + 名字，全球鱼未钓到显示剪影 + 名字 + `Fishing Lv N`，地区鱼钓到前只显示剪影 + `?`；P0 不做时段与天气 |
 | 房间 | 公共实时房间，每线 16 人；看得到其他玩家持竿与昵称；每个人的抛竿独立结算，不抢鱼；密友在 10 m 内钓获 XP × 1.2（第 12 章判定） |
 | 进入 | 家城免费；外城需有效通行证（旅行 / 日票 / 客票，第 11 章）；未探索城的鱼塘 pin 可点但只弹旅行确认面板 |
 
@@ -2244,7 +2345,7 @@ Fishing 的到达天数与每日竿数成反比；全文统一的 30 分钟玩�
 |---|---|---|---|---|
 | 10 | 1 | 教学卡"Casting uses 5 Energy"；第 1 次咬钩固定池塘鲫鱼，收线成功 | 首竿 10 + 首提 10 + 首城 10 + 首钓 15 + 钓获 5 = **50** | −5 |
 | 11–12 | 2–3 | 教学钉 1：前 3 次咬钩固定池塘鲫鱼（第 2 种 Common 的首钓 +15 留给第 5 竿起） | +5 / +5 → 60 | −10 |
-| 12 | 4 | 强制 Fine 鱼挣脱教学：卡片"Too strong · Fishing Lv 2 · 3 XP to go · Unlocks Fine fish (Perch, Bass) · 3 Energy back"（保护期全退）；Fish-dex 点亮河鲈剪影 | 0 | 0 |
+| 12 | 4 | 强制 Fine 鱼挣脱教学：卡片"Too strong / Fishing Lv2 needed · You: Lv1 · 3 XP to go / Unlocks Fine fish (Perch, Bass) / Energy refunded (9 left today)"（保护期全退，末行写实退）；Fish-dex 点亮河鲈剪影 | 0 | 0 |
 | 13–14 | 5–7 | 再 1–2 条 Common（鲤鱼首钓 +15）→ **Fishing Lv2**（中位第 6 竿、约第 20 分钟，模拟 100% 在 30 分钟内）；全幅横幅 + "Fine fish now stay on the hook" + "+50 Energy" + 升级礼蚯蚓 × 3 / 野香草 × 3 / 配方卡；教学句"Levels unlock gear, fish and seeds. Basics never lock." | 70+ | −10～−15，+50 |
 | 15 | — | 带 3 条鲫鱼回农场，5 秒烤鲫鱼（第 7 章） | Fishing 0（首做 +15 归 Cooking） | +25（Good；新手祝福只乘自然回复） |
 | 20–28 | 8–24 | 挂蚯蚓回鱼塘，收一条 Fine 河鲈（首钓 +30）；再钓 10–16 竿（Lv2 失败率 22%，全部在保护内）；带 Fine 鱼回厨房做香草烤鱼 | Fishing 累计中位约 120（首做 XP 已归 Cooking），**不到 Lv3 的 220，Lv3 留给第二天**；Cooking 两锅 45 → Lv2 | −50～−80（逃走全退）；首次 Fine 鱼 +20 |
@@ -2353,7 +2454,7 @@ Fishing 的到达天数与每日竿数成反比；全文统一的 30 分钟玩�
 3. **配方靠实验发现。** Cookbook 从第一天就列出全部页，但只给剪影、稀有度边框、槽位数与每槽的原料族图标；玩家自由投料；组合无效出"黑暗料理 Mystery Dish"（+5 体力，Cooking Lv3 起 +10；进图鉴失败页、并在某个未发现页上点亮一条线索，Lv3 起两条；不给 XP）。NPC 教学、配方卡、品尝只把页"揭示"成可见，亲手做一次才算发现。**单一主料单独下锅永不失败**，所以新手第一次开火必有菜。
 4. **烹饪是第三条 10 级技能轨 Cooking**（阈值 0 / 30 / 100 / 220 / 400 / 650 / 950 / 1,350 / 1,700 / 2,350）：**首次做成任何菜给一次性 XP**（Common 10 / Fine 20 / Rare 40 / Legendary 80，48 页合计 1,700，**全部归 Cooking**），重复烹饪按菜品稀有度 4 / 8 / 16 / 32（同一页每日第 1 锅 100%、第 2 锅 50%、第 3 锅起 0；Good ×1.25 / Perfect ×1.5；内容等级按菜品稀有度 1 / 2 / 4 / 6 走等级差）。Cooking 唯一的门禁是 Lv4 的第 3 投料槽，其余等级全是做菜便利，Lv10 称号 Chef；Cookbook 完成度（4 个里程碑）与厨房设施仍是另两条成长线。
 5. **用途四标签 Eat / Gift / Request / Trail Food 取代"家常 / 招牌 / 宴席"三层。** 宴席取消：Homestead 升级 = 材料 + 金币（+ Farming / Fishing 等级门槛，Cooking 不计入），不再需要料理；"居民聚餐"只作为可选社交事件留在后续路线图。
-6. **农场决定厨房有多大，技能决定你的手能做什么。** 厨房设施随 Homestead：灶口 1 → 2 → 3（Lv1 / 4 / 8）、调味架（Lv2，**只做储物**：调味料不占背包）、保温柜（Lv3）、大锅（Lv6，一锅双份）、名厨招牌（Lv10）；**投料槽随 Cooking**：Lv1 2 槽、Lv4 3 槽，第 4 / 5 槽与 8 页 4–5 槽配方整体是 P2 的等级上限扩展。
+6. **农场决定厨房有多大，技能决定你的手能做什么。** 厨房设施随 Homestead：灶口 1 → 2 → 3（Lv1 / 4 / 8）、调味架（Lv2：灶台直接取用仓库里的调味料，调味料从此不占背包，q(46)）、保温柜（Lv3）、大锅（Lv6，一锅双份）、名厨招牌（Lv10）；**投料槽随 Cooking**：Lv1 2 槽、Lv4 3 槽，第 4 / 5 槽与 8 页 4–5 槽配方整体是 P2 的等级上限扩展。
 7. **首会话：** 第 15 分钟左右用 5 秒烤出第一道烤鲫鱼并当场吃掉（Good 品质 +25；新手祝福只加快自然回复，不乘料理；首做 +10 Cooking XP）；第 25 分钟前用 Fishing Lv2 送的野香草做出第一道 Fine 菜（15 秒，+40/45；首做 +20），**第 27 分钟 Cooking Lv2**（累计 45 ≥ 30），升级礼 = 配方卡 Fresh Fish Soup，把 3.5 小时后的小萝卜收获钩成第二次会话。
 
 配方总表与进食细表（本章下半 7.13–7.18）的结论：
@@ -2396,13 +2497,13 @@ Fishing 的到达天数与每日竿数成反比；全文统一的 30 分钟玩�
 
 | 步 | 玩家做什么 | 屏幕上发生什么 | 时长 | 规则 |
 |---|---|---|---|---|
-| 1 进厨房 | 走进农舍，到室内的灶台角（厨房不单独成间，q(14)；位置芯片 `Shanghai · Farmhouse`） | **厨房没有快捷栏**，底部只有 Bag 按钮（厨房没有行动，主行动键与切换键隐藏）；点灶台打开烹饪面板，靠近的空灶口上方浮出指尖卡 `Tap to cook`；每口灶上方一块状态牌：空闲 `Empty` / 烹饪中（进度环）/ 待取（盘子） | — | 异城与旅途中没有灶；出门前把菜做好带走 |
+| 1 进厨房 | 走进农舍，到室内的灶台角（厨房不单独成间，q(14)；位置芯片 `Shanghai · Farmhouse`） | **厨房没有快捷栏**，底部只有 Bag 按钮（厨房没有行动，主行动键与切换键隐藏）；点灶台打开烹饪面板，靠近的空灶口图标钮展开成名字条 `Stove 1/1 · Empty`（q(62)）；每口灶上方一块状态牌：空闲 `Empty` / 烹饪中（进度环）/ 待取（盘子） | — | 异城与旅途中没有灶；出门前把菜做好带走 |
 | 2 打开面板 | 点一口灶台（离得远自动走过去；厨房没有主行动键） | 底部升起约 60% 屏高的烹饪面板：顶栏 `Stove 1/3 · Cooking Lv2 · Empty` + ✕（点 "Cooking Lv2" 直达技能页第三张卡），两个 Tab **Cookbook / Experiment**；相机同时推到灶台，锅是 3D 物件（§7.2.7） | — | 从主行动键打开时默认落在最近的空闲灶；点灶台打开时落在那口灶；灶在烹饪中只能看进度，不能再投料 |
 | 3 选菜或投料 | **Cookbook**：点一页已知菜，详情卡上的 `Cook` 一键开火；**Experiment**：从 `From your bag` 背包格点选原料飞进锅里，1–3 份（**槽数由 Cooking 等级决定：Lv1 2 槽、Lv4 3 槽；第 4、5 槽 P2**） | Cookbook 详情卡直接显示菜名、稀有度、回复、时长与材料列，料不够的按钮写 `Need Wild Herb ×1`，3 槽页在 Cooking Lv1–3 的按钮写 `Cooking Lv4 · 3rd slot`；Experiment 预览区对已知组合显示菜名，对未知组合显示 `? · Fine · 15 s · Unknown dish`（稀有度与时长可预见，菜名不可见），未开的第 3 槽显示锁 + `Lv4` | — | 槽位、标签与来源规则见 §7.2.3；两个 Tab 的规则见 §7.2.7 |
 | 4 开火 | Cookbook 详情卡的 `Cook` 即是开火；Experiment 页点底部 `Cook` | 面板收起到灶台，锅盖合上、火起；原料即刻扣除；进度环开始走 | 5 / 15 / 30 / 60 s | 含 Rare / Legendary 原料时先弹一次确认 "Cook with Silver Sturgeon?" |
 | 5 火候 | 在火候环出现时点按 1–2 次 | 环上一根针转动，金区闪亮；命中飘 "Nice heat! ★"，未中飘 "Missed · still cooking" | 每次 1 圈（1.2–1.6 s） | 成功 = 品质 +1；失败无惩罚；不点按视作未中 |
 | 6 出锅 | 看动画 | 锅盖揭开、蒸气、盘子滑出；稀有度特效与稀有度色点同色（Common 无 / Fine 蓝色微光 / Rare 紫色爆光 / Legendary 金色彩纸 + 短音，q(16)）；Cooking XP 飘字 "+20 Cooking XP ★"（同页第 2 锅 "+10 · 2nd today"，第 3 锅起 "No XP · 3rd today"，已超出 "Outleveled"）；**首次做成**时叠加 Cookbook 翻页条 "New recipe!"，显示菜名与首做 XP；升级时再叠 1.5 秒横幅 "Cooking Lv 4 · 3rd slot" | ≤ 2 s（首次 +1.5 s） | 黑暗料理：灰烟、盘子晃一下、"?"，不给 XP |
-| 7 三选一 | Eat / Keep / Gift（Cooking Lv2 起多一个 `Cook Again`） | 三个大按钮；Eat 当场回体力并飘 "+40 Energy · Meals today 60/200"；Keep 入保温柜或背包；Gift 在有居民 / 邻居在场时直送，否则灰显并提示 "Gift later from your bag"；`Cook Again` 料够时同一页再开一锅（第 2 锅 XP 减半，按钮角标 "2nd today · half XP"） | ≤ 1.5 s | 吃任何地点 0 体力；背包满时菜留在灶上，该灶在取走前不能再开火 |
+| 7 三选一 | Eat / Keep / Gift（Gift 在 P0 灰显；Cook Again 不在这张卡上，q(48)） | **到点时人在厨房**：菜先按 Keep 链放好（保温柜 Lv3 起 → 背包 → 留在灶上），随即弹这张卡；Eat 从刚放的地方吃一份；Keep、点卡外或直接走开都算 Keep，此时才出入柜 / 进背包的 Toast；Gift 在 P0 灰显。**到点时人不在厨房**：菜留在灶上（`Stove · Ready · …`），回来点灶台再收（COOK-P0-9）。Perfect 多出的那份同走 Keep 链，Eat 只吃一份；满包也能吃主份，多出的放不下就留在灶上、不进包裹（q(46)）。三个大按钮；Eat 当场回体力并飘 "+40 Energy · Meals today 60/200"；Keep 入保温柜或背包；Gift 在有居民 / 邻居在场时直送，否则灰显并提示 "Gift later from your bag"；`Cook Again`（Cooking Lv2）：菜收走后再点灶台，灶空、上一锅是已知配方时先弹 COOK-P0-7（上一锅那页：`Cook Again` / `Choose recipe ›`，第 2 锅写 `Cooks today 2nd` / `Cooking XP Half`），缺料弹 COOK-P0-8（q(48)） | ≤ 1.5 s | 吃任何地点 0 体力；背包满时菜留在灶上，该灶在取走前不能再开火 |
 
 ### 7.2.3 投料规则
 
@@ -2411,11 +2512,11 @@ Fishing 的到达天数与每日竿数成反比；全文统一的 30 分钟玩�
 | 槽位 | **由 Cooking 等级决定：Lv1 2 个槽，Lv4 第 3 个槽**（30 分钟玩家第 3–4 天，所有画像早于 Fishing Lv7，传说鱼到手时 3 槽已开）；第 4、5 槽作为 Cooking 等级上限扩展推到 P2；每槽放 1 份原料；**同一原料可以占多个槽**（如 2 份土豆）；调味架（Homestead Lv2）只是调味料的储物，不开槽 |
 | 可入槽的原料 | 四族（§7.3.1）：田 Field、果 Orchard、水 Water、味 Seasoning。观赏鱼（金锦鲤）不可入槽，提示 "Not for cooking"。种子、材料、工具不可入槽 |
 | 主料约束 | 至少 1 份主料（田 / 果 / 水族）；只投调味料提示 "Needs a main ingredient" |
-| 原料来源 | Experiment 页的 `From your bag` 背包格：列出背包里全部可入菜的原料（按 水 / 田 / 果 / 味 分组，带数量）；调味架上的调味料（Lv2 起，不占背包）也列在这一行并带 `Rack` 角标；保温柜里的成品菜不能再入锅（没有"菜再加工"） |
+| 原料来源 | Experiment 页的 `From your bag` 背包格：列出背包里全部可入菜的原料（按 水 / 田 / 果 / 味 分组，带数量）；仓库里的调味料（Lv2 起，调味架）也列在这一行，带 `Rack` 角标、写仓库实际数量（q(46)）；保温柜里的成品菜不能再入锅（没有"菜再加工"） |
 | 配方匹配 | 投料集合先匹配"指定原料"的配方，再匹配"标签"配方（如 Any Common fish）；多条标签配方同时匹配时取通配最少的一条；都不匹配 → 黑暗料理。标签只能限定在同一稀有度内，所以一页配方的稀有度唯一（§7.3.3） |
 | 单主料保底 | **任一主料单独下锅必有一道菜**（通过"按族 × 稀有度"的标签页兜底，如 Grilled Fish = Any Common fish），所以 1 份原料永不失败 |
 | 多份出锅 | 默认 1 份；Perfect 品质 +1 份（§7.2.5）；Homestead Lv6 大锅可"双份"（原料 ×2、同一轮火候、出 2 份，Legendary 除外；XP 按 1 锅计）；Cooking Lv10 双份手气 Lucky Double：任意出锅 10% 概率多 1 份 Plain（Legendary 除外，与大锅不叠加）；3 槽跨气候带 Legendary 页（§7.4.1）基础 2 份 |
-| 排队与批量 | Cooking Lv5 `queue_two` Queue ×2：每口灶可排第二锅，前一锅出锅即自动开火、火候照常；Cooking Lv8 `cook_all` Cook All：Cookbook 页一键把料够的已知菜按稀有度高 → 低（Rare → Fine → Common）排满所有空闲灶与队列；**不含 Legendary**（Legendary 只能单页 `Cook`，不替玩家用掉传说鱼与旅行带回的地区作物），**同一页最多排 2 锅**（同页当天第 3 锅起 XP 0、第 3 份进食回复 0）（2026-10-07 q(4)）；两者都不省原料、不省火候、不改 XP 规则 |
+| 排队与批量 | Cooking Lv5 `queue_two` Queue ×2：每口灶可排第二锅：前一锅到点时自动走 Keep 链（保温柜 → 背包），第二锅随即开火、火候照常；柜和背包都满时第二锅不开火、前一锅留在灶上待领——一口灶同时最多一份菜；人不在厨房时不出 Toast（q(46)）；Cooking Lv8 `cook_all` Cook All：Cookbook 页一键把料够的已知菜按稀有度高 → 低（Rare → Fine → Common）排满所有空闲灶与队列；**不含 Legendary**（Legendary 只能单页 `Cook`，不替玩家用掉传说鱼与旅行带回的地区作物），**同一页最多排 2 锅**（同页当天第 3 锅起 XP 0、第 3 份进食回复 0）（2026-10-07 q(4)）；两者都不省原料、不省火候、不改 XP 规则 |
 | 取消 | 开火即扣料，不可取消（最长也只有 60 秒）；误触由 Rare / Legendary 原料的二次确认兜住 |
 | 离开 | 烹饪中离开厨房或切后台：火候视作全部未中，菜按时出锅为 Plain 品质，放在灶上等待取走；没有烧焦 |
 
@@ -2459,21 +2560,21 @@ Fishing 的到达天数与每日竿数成反比；全文统一的 30 分钟玩�
 | 按钮 | 去哪 | 规则 |
 |---|---|---|
 | Eat | 当场吃掉 | 0 体力、0 时间、任何地点都能吃背包里的菜；回复按 §7.4.2；受每日食物上限与同菜递减约束（第 3 章）；**满条时不能吃**（含 Legendary），按钮灰显 "Energy full"，想要 Buff 先去花体力 |
-| Keep | 保温柜（Lv3 起）→ 背包 | 保温柜满、背包也满 → 菜留在灶上；料理堆叠 5、不腐烂、没有保质期 |
+| Keep | 保温柜（Lv3 起）→ 背包 | 保温柜满、背包也满 → 菜留在灶上；料理堆叠 5、不腐烂、没有保质期；从柜里吃、`Take one` 都只在自家农场（同 Rest，q(46)） |
 | Gift | 在场的居民 / 邻居 | 居民：每位每日收 1 份，好感按 §7.6.3；邻居：收到的菜带 "gifted" 标记，可吃、可交委托、不可卖、不可再赠（第 12 章） |
 
 ### 7.2.7 烹饪面板：3D 灶台舞台 + Cookbook / Experiment 两个 Tab（2026-10-04 第五版）
 
-厨房是纯设施空间：没有快捷栏，不切换行动，底部只有 Bag 按钮，主行动键与切换键隐藏。点灶台打开烹饪面板（靠近的空灶口上方浮出指尖卡 `Stove 1/3 · Empty · Tap to cook`）；主行动键永远不显示设施动词（2026-10-04 用户定稿：设施像长椅一样靠点击触发）。
+厨房是纯设施空间：没有快捷栏，不切换行动，底部只有 Bag 按钮，主行动键与切换键隐藏。点灶台打开烹饪面板，靠近的空灶口图标钮展开成名字条 `Stove 1/3 · Empty`（q(62)）；主行动键永远不显示设施动词（2026-10-04 用户定稿：设施像长椅一样靠点击触发）。
 
 第五版（2026-10-04 用户审图 + Figma 标注）把面板拆成上下两层：**上 40% 是场景本身**——相机推近到当前灶口，**灶与锅是 3D 物件**，投料、火候、出锅三步都发生在这口锅上；**下 60% 的抽屉只放两个 Tab 与背包 / 图鉴**。原来的 Recipes 列表与独立的全屏 Cookbook 合并成一个竖排的 **Cookbook** Tab（参考《Spiritfarer》的菜谱页，按手机竖屏改为"上详情卡、下页格"，与背包同一套版式）。
 
 | 区块 | 内容 | 规则 |
 |---|---|---|
-| 舞台（上 40%，场景层） | 相机推近到当前灶口；锅是 3D 物件：投料时原料飞进锅里并留在锅里可见，开火后锅盖合上、火候环在锅上方（§7.2.4），出锅时盘子从锅里滑出；锅下一条**槽条**（2–3 枚圆标，带 ✕ 可取出；第 3 槽未开时灰锁 `Cooking Lv4 · 3rd slot`）+ 一枚**预览胶囊** | 胶囊只写事实：已知组合 `Grilled Crucian · Common · 5 s · Ready to cook`，未知组合 `? · Fine · 15 s · Unknown dish`（稀有度与时长按投料派生可见，菜名不可见），再次投入失败过的组合旁注 `Tried before · still a Mystery Dish`；舞台上没有任何按钮；打开面板不暂停灶上正在走的进度环 |
+| 舞台（上 40%，场景层） | 相机推近到当前灶口；锅是 3D 物件：投料时原料飞进锅里并留在锅里可见，开火后锅盖合上、火候环在锅上方（§7.2.4），出锅时盘子从锅里滑出；锅下一条**槽条**（2–3 枚圆标，带 ✕ 可取出；第 3 槽未开时灰锁 `Cooking Lv4 · 3rd slot`）+ 一枚**预览胶囊** | 胶囊只写事实：已知组合 `Grilled Crucian · Common · 5 s · Ready to cook`，未知组合 `? · Fine · 15 s · Unknown dish`（稀有度与时长按投料派生可见，菜名不可见）；再次投入失败过的组合时胶囊标题写 `Tried before`，Experiment 抽屉 Cook 行正上方另起一行 `Tried before · not a recipe`（次级色 Bold 12；新手期退料与否都写这一句），不弹 Toast、Cook 照常可点，换掉任一原料这一行即消失（安其拉 SGODOT-226 设计稿，q(56)）；舞台上没有任何按钮；打开面板不暂停灶上正在走的进度环 |
 | 抽屉（下 60%） | 顶栏 `Stove 1/1 · Cooking Lv3 · Empty` + ✕：当前灶口序号 / 总数 · **Cooking 等级**（点它直达技能页第三张卡；升级当刻闪一次）· 状态（`Empty` / `Cooking 12 s` / `Ready` / Lv5 起 `Queued 1`），顺序与 §16.1.4、COOK-2a 一致（q(31)）；两 Tab `Cookbook 12/48` / `Experiment`；点空白处或 ✕ 关闭；开火后自动收起 | 多灶时左右滑或点序号切换灶口；Homestead Lv6 起右侧一个 `Double` 开关（大锅，§7.2.3）；点灶台打开落在那口灶；这是玩家最常看见 Cooking 等级的地方（头像环维持 Farming / Fishing 双色） |
 | Tab 1 **Cookbook**（= 原 Recipes + 图鉴，2026-10-04 合并） | 竖排三段。① 筛选条 `All 48 · Can cook 5 · Common · Fine · Rare · Legendary`。② **详情卡**（与背包详情卡同形）：左菜图 + 稀有度点，中 名字 · 稀有度 / `+20 Energy · 5 s · Grilled · Cooked ×3 · Best ★ Good` / 一句描述，右 **Ingredients 材料列**（每槽一枚圆标：具体原料写 `×1 · have 3` 绿 / `have 0` 红；未知页写原料族 `Any fish ?`；线索槽绿框；未开的第 3 槽灰锁 `Lv4`），卡底 XP 标签三态 + 用途标签 `Eat · Gift · Request · Trail` + 右下按钮。③ **5 列页格**（与背包格同尺寸）：48 页全部可见——可做页右上绿勾、Tasted 页半彩 + `Tasted` 角签、未知页灰剪影 + 底部原料族小点（线索点亮为具体原料）、3 槽页 Lv1–3 灰锁角标、购买页 `Shop` 角签、"You might have what it takes" 页微光、Mastered 金星；排序：料够的在前（按稀有度高 → 低）→ 已发现但缺料 → Tasted → 有线索 → 未知（按稀有度组 → 内容等级）；末页 Kitchen Mishaps | 按钮四态：料够 **`Cook`**（一键开火，原料从背包 / 调味架按配方自动扣）；料不够灰显 `Need Wild Herb ×1`（缺多种时写最先缺的那一种，材料列里全部可见）；3 槽页 Lv1–3 灰显 `Cooking Lv4 · 3rd slot`，卡上另有 `Cooking Lv4 · 85 XP to go` 胶囊（点它弹四件事卡）；未知页**只引导** `Try in Experiment ›`（切 Tab，不替玩家投料）。选中一页时舞台的锅上悬浮该页原料的虚影（未知页是族剪影 + 已知线索），锅下槽条写 `Pond Crucian · have 3`。XP 标签三态 `XP: Full` / `XP: 50%` / `XP: None · outleveled`，当日已做过的页加 `2nd today · half`；Cooking Lv8 起筛选条右端 `Cook All` |
-| Tab 2 **Experiment** | 抽屉整段就是背包：`From your bag · 2 of 2 slots used` + `Sort` 芯片；筛选 `All · Fish · Produce · Fruit · Seasoning`；5 列格只列可入菜的原料与调味架上的调味料（观赏鱼留在格里但灰显 `Not for cooking`，非原料不出现）；**点一格 → 原料飞进 3D 锅**（该格绿框 + 勾、数量减 1，用完写 `In the pot`）；点锅里的原料或槽条的 ✕ → 退回背包；底部大按钮 **`Cook`**（不再写 Free——烹饪本来就不花体力、不花钱，写出来反而像在收费） | 槽数随 Cooking 等级（§7.2.3；未开的第 3 槽在锅下显示灰锁 + `Lv4`，点它弹四件事卡）；只投调味料时按钮灰显 `Needs a main ingredient`；组合无效出黑暗料理 Mystery Dish（回 5 体力，§7.5.2）；按钮下方小字 `Mystery dishes still restore 5 Energy` |
+| Tab 2 **Experiment** | 抽屉整段就是背包：`From your bag · 2 of 2 slots used` + `Sort` 芯片；筛选 `All · Fish · Produce · Fruit · Seasoning`；5 列格（至少 2 行，末行补齐，q(60)）只列可入菜的原料与调味架上的调味料（观赏鱼留在格里但灰显 `Not for cooking`，非原料不出现）；**点一格 → 原料飞进 3D 锅**（该格绿框 + 勾、数量减 1，用完写 `In the pot`）；点锅里的原料或槽条的 ✕ → 退回背包；底部大按钮 **`Cook`**（不再写 Free——烹饪本来就不花体力、不花钱，写出来反而像在收费） | 槽数随 Cooking 等级（§7.2.3；未开的第 3 槽在锅下显示灰锁 + `Lv4`，点它弹四件事卡）；只投调味料时按钮灰显 `Needs a main ingredient`；组合无效出黑暗料理 Mystery Dish（回 5 体力，§7.5.2）；按钮下方小字 `Mystery dishes still restore 5 Energy` |
 | 不做的事 | 没有食材快捷栏、没有"选中食材再点槽位"的两步操作、没有独立的 Recipes 列表、不再做独立的全屏 Cookbook 书页（背包 Dishes 页右上与成就页打开的是同一张 Cookbook Tab，只是没有 Cook 按钮，底行灰字 `Cook at your stove`）、没有火候以外的任何体力或金币消耗 | 两个 Tab 之外不再有第三种做菜入口 |
 
 两个 Tab 的分工：Cookbook 的 `Can cook` 筛选就是原来的 Recipes——"今天把知道的菜做出来"的效率入口（30 分钟玩家一天 4–5 道菜在这里 1–2 分钟做完），同一页格里的灰剪影随时提醒还有多少页没点亮；Experiment 是"发现新菜"的入口（§7.5）。灶与锅做成 3D 的理由：投料、火候、出锅三步发生在同一个看得见的物件上，烹饪的表现力不再被抽屉里的平面槽位限制，抽屉也因此腾出整段给背包。
@@ -2626,10 +2727,10 @@ Buff 白名单（**P3 预留**；每道 Legendary 菜恰好挂 1 个；全身同
 | 项 | 规则 |
 |---|---|
 | 物品 | dish_mystery 黑暗料理 Mystery Dish：+5 体力（Cooking Lv3 起 +10；占食物上限、不递减）；堆叠 10；可以送居民但好感 −2（暂定，后续扩展，q(33)），不可送玩家、不可交委托、不可回收；全文档只用这一个名字，不再叫 Burnt Dish |
-| 原料消耗 | 失败时 **Common / Fine 原料消耗，Rare / Legendary 原料退回背包**；新手祝福期内**当日前 10 次失败**全部原料退回（HUD 显示 "Trial refunds · 7 left today"），第 11 次起按稳态规则——否则注册 7 天内反复投两根小萝卜（5 秒一锅）可 0 成本把 Mystery Dish +5 吃满食物上限 |
+| 原料消耗 | 失败时 **Common / Fine 原料消耗，Rare / Legendary 原料退回背包**；新手祝福期内**当日前 10 次失败**全部原料退回（HUD 显示 "Trial refunds · 7 left today"），这 10 锅**不出 Mystery Dish**、只翻线索并记入失败页，出锅卡写 `No dish this time` / `Ingredients back (9 left today)`、按钮 `OK`（q(46)），第 11 次起按稳态规则——否则注册 7 天内反复投两根小萝卜（5 秒一锅）可 0 成本把 Mystery Dish +5 吃满食物上限 |
 | 失败页 | Cookbook 末页 "Kitchen Mishaps"：按时间列出每次失败的原料组合图标；同一组合只记一条，计数 "Mishaps 12" |
 | 线索 | 每条**新的**失败组合，在一个 Hidden 页上把 1 槽翻成具体原料（Cooking Lv3 `clue_double` 起翻 2 槽）；优先选"包含本次至少 1 种原料、且玩家当前解锁的原料能做出来"的页，其次任意最低稀有度的 Hidden 页；页数全部 Discovered 时不再送 |
-| 重复警告 | 再次投入已失败的组合时 Cook 按钮旁提示 "Tried before · still a Mystery Dish"，可继续 |
+| 重复警告 | 再次投入已失败的组合时胶囊标题写 "Tried before"，Cook 行正上方一行 "Tried before · not a recipe"；不弹 Toast，可继续（q(56)） |
 | XP | **黑暗料理不给 Cooking XP，首次也不给**；实验的激励全在"失败送线索"与 Lv3 起的 +10 回复，这样"故意乱投"没有刷 XP 的入口；失败页第 20 条给称号 Brave Palate |
 | 不做的事 | 不扣体力、不扣金币、不锁灶、不冷却 |
 
@@ -2728,8 +2829,8 @@ Buff 白名单（**P3 预留**；每道 Legendary 菜恰好挂 1 个；全身同
 | Homestead Lv | 升级 id | 中文 | 英文（UI） | 效果 | 第一眼看见 |
 |---|---|---|---|---|---|
 | 1 | kitchen_stove_1 | 土灶 | Stove | 1 口灶；投料槽数由 Cooking 等级决定（Lv1 2 槽） | 厨房里一口锅 |
-| 2 | kitchen_spice_rack | 调味架 | Spice Rack | **只做储物**：四种调味料存架上，各 30 份，不占背包，Experiment 背包格带 `Rack` 角标 | 灶台墙上多一排罐子 |
-| 3 | kitchen_warming_cabinet | 保温柜 | Warming Cabinet | 出锅自动入柜，6 份；可从柜里直接吃 / 赠（有居民或邻居在场时）；居民赠餐不进柜子，照 §3.4.5 实物进背包（q(20)） | 灶边多一个发光的柜子 |
+| 2 | kitchen_spice_rack | 调味架 | Spice Rack | **灶台直接取用农场仓库里的调味料**（岩盐、野香草；不另存一份、不封顶 30，q(46)）：Homestead Lv1 时调味料跟人走（矿洞、香草丛所得进背包，回家不自动入库）；升到 Lv2 那一刻背包里的调味料收进仓库（`Spice Rack · seasonings off your bag`），此后自动入库；烹饪先扣仓库再扣背包；Experiment 格列出仓库里的调味料，带 `Rack` 角标、写实际数量（如 `Rock Salt 12`）；香草、辣椒是作物，照旧在背包 | 灶台墙上多一排罐子（外观：仓库里有该调味料时亮） |
+| 3 | kitchen_warming_cabinet | 保温柜 | Warming Cabinet | 6 份；出锅按 Keep 链先进柜（人在厨房时随后弹 COOK-4；人不在时菜留在灶上等玩家来收，Queue ×2 的前一锅除外，q(46)）；可从柜里直接吃或 `Take one` 进背包，**只在自家农场**；从柜里赠送（有居民或邻居在场时）P0 不做；居民赠餐不进柜子，照 §3.4.5 实物进背包（q(20)） | 灶边多一个发光的柜子 |
 | 4 | kitchen_stove_2 | 第二口灶 | Second Stove | 两道并行；火候环可能重叠 | 两口锅 |
 | 6 | kitchen_big_pot | 大锅 | Big Pot | 任一灶可选 Double：原料 ×2、同一轮火候、出 2 份（Legendary 不可） | 锅变大一号 |
 | 8 | kitchen_stove_3 | 第三口灶 | Third Stove | 三道并行；保温柜扩到 12 份 | 三口锅、灶房扩建外观 |
@@ -2742,7 +2843,7 @@ Lv5 / 7 / 9 的 Homestead 后果在别处（开垦、槽位、背包），厨房
 | Cooking Lv | 累计 XP | 厨房里看得见的变化 | 升级礼 / 便利 id |
 |---|---|---|---|
 | 1 | 0 | 2 个投料槽；Cookbook / Experiment 两 Tab | — |
-| 2 | 30 | 出锅面板多一个 `Cook Again`；Cookbook 页多一页 Fresh Fish Soup（Tasted） | **升级礼 `cooking_lv2_gift` = 配方卡 `recipe_card_dish_fish_soup` 鲜鱼汤 Fresh Fish Soup**；`cook_again` |
+| 2 | 30 | 收走上一锅后点灶台出现 `Cook Again`（q(48)）；Cookbook 页多一页 Fresh Fish Soup（Tasted） | **升级礼 `cooking_lv2_gift` = 配方卡 `recipe_card_dish_fish_soup` 鲜鱼汤 Fresh Fish Soup**；`cook_again` |
 | 3 | 100 | 失败组合翻 2 槽线索；黑暗料理 +5 → +10 | `clue_double`、`hearty_mishap` |
 | 4 | **220** | **第 3 投料槽**长出来；Cookbook 12 页 3 槽页的 `Lv4` 锁消失；三族菜 Rare 70 从此可做 | 横幅 "Cooking Lv 4 · 3rd slot" |
 | 5 | 400 | 金区 +5；每口灶可排第二锅（顶栏 `Queued 1`） | `steady_hand_1`、`queue_two` |
@@ -2774,12 +2875,12 @@ Lv5 / 7 / 9 的 Homestead 后果在别处（开垦、槽位、背包），厨房
 
 | 秒 | 玩家 | 屏幕 | 规则 / 备注 |
 |---|---|---|---|
-| 0 | 走进厨房，走近灶台 | 厨房没有快捷栏，底部只有 Bag；靠近的空灶口上方指尖卡 `Stove 1/1 · Empty · Tap to cook` 脉动 | 设施交互：点灶台（第 10 章） |
+| 0 | 走进厨房，走近灶台 | 厨房没有快捷栏，底部只有 Bag；靠近的空灶口图标钮展开成名字条 `Stove 1/1 · Empty` 并脉动一次（q(62)） | 设施交互：点灶台（第 10 章） |
 | 2 | 按 `Cook`（或点灶） | 烹饪面板升起，顶栏 "Stove 1/1 · Cooking Lv1 · Empty"，停在 **Cookbook** Tab（0/48）：Grilled Crucian 一页选中（材料列 Pond Crucian ×1 · have 3，按钮 `Cook` 亮）、Radish Salad 一页（按钮灰显 `Need Radish ×1`）；页格里其余 46 页是灰剪影；锅上悬浮鲫鱼虚影 | 初始已知 2 页；Cooking Lv1 两槽只在 Experiment 页可见（第 3 槽显示锁 + `Lv4`） |
 | 4 | 看一眼 | 教学一行 "Tap Cook to grill your first fish"；Grilled Crucian 行上预览 "Grilled Crucian · Common · +20 Energy · 5 s" | 已知配方显示名字 |
 | 6 | 点行上的 `Cook` | 面板收起，锅盖合上、火起，5 秒进度环；教学一行 "Tap when the needle hits gold!" | 一键开火，鲫鱼 ×1 自动扣除；账号首次开火：金区 50%、针 2.0 s |
 | 8.5 | 火候环出现，点锅 | 命中 → "Nice heat! ★"；未中 → "Missed · still cooking" | 不惩罚；教学期命中率应 >80% |
-| 11 | 出锅动画 | 盘子滑出 "Grilled Crucian ★ Good"；Cookbook 翻页条 "First cooked! **+15 Cooking XP** · Cookbook 1/48"；三个大按钮 Eat / Keep / Gift | 首做 10 + Good 重复 5（4 × 1.25）= 15 → Cooking（未中则 +14）；玩家第一次看到第三条轨；技能页第三张卡 "Cooking Lv1 · 15/30" |
+| 11 | 出锅动画 | 盘子滑出 "Grilled Crucian ★ Good"；奖励条 "First cooked · +10 Cooking XP · Cookbook 1/48"，XP 飘字 "+5 Cooking XP ★"（未中 "+4 Cooking XP"）；三个大按钮 Eat / Keep / Gift | 首做 10 + Good 重复 5（4 × 1.25）= 15 → Cooking（未中则 +14）；玩家第一次看到第三条轨；技能页第三张卡 "Cooking Lv1 · 15/30" |
 | 13 | 点 Eat | 吃动画 1 s；HUD 飘 "+25 Energy · Meals today 25/300"（Good 25；未中则 +20）；教学一行 "Meals bring Energy back now. It also returns over time." | 新手期食物上限 200 + 100 |
 | 16 | 完成 | 今日目标第二行打勾；第三行亮 "Catch 2 more · Fishing Lv 2 unlocks Herb Grilled Fish" | 整段 ≤ 20 秒 |
 
@@ -2791,7 +2892,7 @@ Lv5 / 7 / 9 的 Homestead 后果在别处（开垦、槽位、背包），厨房
 | 回厨房 +0 | 点灶台 | 面板 Cookbook Tab 多出一行 Herb Grilled Fish（角标 `Tasted`，鲫鱼与野香草都在包里，按钮 `Cook` 亮）；行上预览 "Herb Grilled Fish · Fine · +40 Energy · 15 s"；原料小图标旁族图标 水 + 味 | 2 族 → Fine；也可在 Experiment 页从 From your bag 点鲫鱼 + 野香草得到同一预览 |
 | +2 | 点行上的 `Cook` | 15 秒进度环，火候在第 9 秒 | 金区 30%（教学加宽只在账号首次） |
 | +11 | 点锅 | 命中 → Good | — |
-| +17 | 出锅 | 绿色微光；"New recipe! Herb Grilled Fish · **+30 Cooking XP** · Cookbook 2/48"；页由 Tasted 变 Discovered；累计 45 ≥ 30 → 叠 1.5 秒横幅 **"Cooking Lv 2 · Recipe: Fresh Fish Soup"**，配方卡入包动画 | Fine 首做 20 + Good 重复 10（8 × 1.25）= 30；账号第二次升级用小横幅，不重复教学句；Cookbook 页多一页 Fresh Fish Soup（Tasted，按钮灰 `Need Radish ×1`）；出锅面板多出 `Cook Again` 按钮 |
+| +17 | 出锅 | 绿色微光；"New recipe!"，奖励条 "First cooked · +20 Cooking XP · Cookbook 2/48"，飘字 "+10 Cooking XP ★"；页由 Tasted 变 Discovered；累计 45 ≥ 30 → 叠 1.5 秒横幅 **"Cooking Lv 2 · Recipe: Fresh Fish Soup"**（出锅卡关掉后），配方卡飞进 Cookbook | Fine 首做 20 + Good 重复 10（8 × 1.25）= 30；账号第二次升级用小横幅，不重复教学句；Cookbook 页多一页 Fresh Fish Soup（Tasted，按钮灰 `Need Radish ×1`）；Cook Again 从此可用（收走这锅后再点灶台才出现，q(48)） |
 | +19 | Eat 或 Keep | 吃：+45（Plain +40）；此时体力在奖励区（首次 Fine 鱼 +20 后 213/200），Eat 置灰 "Energy full · eat later" → 留：背包 Dishes 页第一件存货；Today 第三行亮 "Fresh Fish Soup · when radishes are ready" | 玩家在 25 分钟内见过 Common → Fine 的档差，在 27 分钟见过第三条轨升级 |
 
 这两段加起来不到 40 秒的厨房时间，却完成了五件事：第一次体力"回来"、第一页图鉴、第一次火候、第一次档差、Cooking Lv2。首会话 Cooking XP 账：15（第 15 分钟）→ 45（第 27 分钟，Lv2）；即使两次火候都未中也是 10 + 20 = 30，正好达线。第二次会话（3.5 小时后）：收小萝卜 → Farming Lv2 → 萝卜生菜沙拉首做 10 + 5 → 鲜鱼汤首做 20 + Good 10 → 累计约 90，第 2 天晚 Cooking Lv3。
@@ -2944,7 +3045,7 @@ Lv5 / 7 / 9 的 Homestead 后果在别处（开垦、槽位、背包），厨房
 
 ### 7.14.0 P0 子集（14 页：Common 5 / Fine 6 / Rare 3，q(39)）
 
-只用 P0 的 8 种作物、6 种可入菜的鱼（金锦鲤不入菜，鲭鱼 P0 钓不到）与岩盐、野香草两种材料。其余 34 页随 P1；P0 的 Cookbook 仍显示 48 页剪影。
+只用 P0 的 8 种作物、6 种可入菜的鱼（金锦鲤不入菜，鲭鱼 P0 钓不到）与岩盐、野香草两种材料。其余 34 页随 P1；P0 的 Cookbook 仍显示 48 页剪影。**P1 第一步**补 4 页（#8 Cabbage Stew、#18 Cucumber Salad、#21 Roast Veggies、#22 Corn Cake），当期 18 页；P0 没有田 × Fine 兜底页，番茄单独下锅出 Mystery Dish，与 §7.2.3 单主料保底不符，P0 试玩期间不改，P1 第一步补回 Roast Veggies 后恢复（q(59)）。
 
 | 稀有度 | # | 页 | 原料 | 怎么得到 | P0 里的作用 |
 |---|---|---|---|---|---|
@@ -3068,7 +3169,7 @@ Lv5 / 7 / 9 的 Homestead 后果在别处（开垦、槽位、背包），厨房
 
 | id | 中文 | 英文（UI）| 原料 | 回复 | 时长 / 火候 | 发现 | 用途 | 回收 | 规则 |
 |---|---|---|---|---|---|---|---|---|---|
-| dish_mystery | 黑暗料理 | Mystery Dish | 任何不匹配任何页的投料组合（只会从 Experiment 页做出来，Cookbook 页只有已知菜能一键 Cook）| **+5**（Cooking Lv3 起 **+10**；占食物上限，不递减；新手祝福不乘料理）| 按投料预测的稀有度走（预览显示 "? · Fine · 15 s · Unknown dish"）；火候环照常出现，命中与否都不改结果 | 实验失败 | **可 Eat**；可送居民但好感 −2（暂定，后续扩展，q(33)）；不可送玩家、不可交委托、不可回收、不可装进行囊 | — | 失败时 Common / Fine 原料消耗、Rare / Legendary 原料退回，新手祝福期当日前 10 次失败全退（第 11 次起按稳态）；每条新失败组合在一个 Hidden 页上翻开 1 槽线索（Cooking Lv3 起 2 槽）；**不给 Cooking XP，首次也不给**；堆叠 10；失败页第 20 条给称号 Brave Palate |
+| dish_mystery | 黑暗料理 | Mystery Dish | 任何不匹配任何页的投料组合（只会从 Experiment 页做出来，Cookbook 页只有已知菜能一键 Cook）| **+5**（Cooking Lv3 起 **+10**；占食物上限，不递减；新手祝福不乘料理）| 按投料预测的稀有度走（预览显示 "? · Fine · 15 s · Unknown dish"）；火候环照常出现，命中与否都不改结果 | 实验失败 | **可 Eat**；可送居民但好感 −2（暂定，后续扩展，q(33)）；不可送玩家、不可交委托、不可回收、不可装进行囊 | — | 失败时 Common / Fine 原料消耗、Rare / Legendary 原料退回，新手祝福期当日前 10 次失败全退且不出 Mystery Dish（第 11 次起按稳态，q(46)）；每条新失败组合在一个 Hidden 页上翻开 1 槽线索（Cooking Lv3 起 2 槽）；**不给 Cooking XP，首次也不给**；堆叠 10；失败页第 20 条给称号 Brave Palate |
 
 ### 7.14.6 P2 扩展预留：4–5 槽 8 页（本期不实装）
 
@@ -3201,7 +3302,7 @@ Lv5 / 7 / 9 的 Homestead 后果在别处（开垦、槽位、背包），厨房
 
 两轨 Lv2–9 每级都至少有 1 页，升级横幅因此每级都带一行 New recipe，不需要在等级奖励里塞配方卡（Fishing Lv2 与 Cooking Lv2 例外，都为首会话服务）。
 
-**Cooking 等级的新可做页**只有两处：Lv1 起始 = 全部 36 页 1–2 槽页（受两轨原料门禁约束）；**Lv4 = 12 页 3 槽页**（17、20、28、37、38、40、42、43、45、46、47、48，各自仍受原料门禁约束；30 分钟玩家第 3–4 天此刻通常能立刻做 37 渔家炖锅与 17 盐水土豆）。Lv2 升级礼把 12 鲜鱼汤翻成 Tasted，但它本来就是 2 槽页。其余 Cooking 等级不开新页，横幅写便利名（"Cooking Lv 5 · Steady Hand I · Queue ×2"）。
+**Cooking 等级的新可做页**只有两处：Lv1 起始 = 全部 36 页 1–2 槽页（受两轨原料门禁约束）；**Lv4 = 12 页 3 槽页**（17、20、28、37、38、40、42、43、45、46、47、48，各自仍受原料门禁约束；30 分钟玩家第 3–4 天此刻通常能立刻做 37 渔家炖锅与 17 盐水土豆）。Lv2 升级礼把 12 鲜鱼汤翻成 Tasted，但它本来就是 2 槽页。其余 Cooking 等级不开新页，横幅写便利名（"Cooking Lv 5 · Steady Hand I · Queue ×2"）。Lv4 横幅之后 Today 第一行给一条线索 `3rd slot open · try Fine fish + Potato + Rock Salt`——只给原料、不给菜名、不跳转（V1 评审风险 4，q(46)）。
 
 ### 7.16.5 首做 XP 的归属与总量
 
@@ -3224,7 +3325,7 @@ Lv5 / 7 / 9 的 Homestead 后果在别处（开垦、槽位、背包），厨房
 | 规则 | 内容 | 界面 |
 |---|---|---|
 | 每日食物上限 | **200**，Homestead 每级 +10（Lv10 = 290）；新手祝福期（注册 7 天内）+100 | Meals today 100/200 · resets in 7h 12m |
-| 计数口径 | 按**名义值**计（含品质加成与新手倍率），即使被体力上限截掉也全额计入 | Eat · +12 Energy（名义 40 照常计入，q(26)） |
+| 计数口径 | 按**名义值**计（含品质加成；新手祝福只加上限、不乘料理回复），即使被体力上限截掉也全额计入 | Eat · +12 Energy（名义 40 照常计入，q(26)） |
 | 同菜递减 | 同一道菜当日第 1 份 100%、第 2 份 50%（向上取整：20 → 10、40 → 20、70 → 35）、第 3 份起 0；按配方页计，不分品质；第 3 份仍给 Legendary 的 Buff | Same dish again · +20 (half) / Same dish · no Energy today |
 | 满条不能吃 | 当前体力 = 上限时 Eat 置灰（含 Legendary）；想要 Buff 先去花体力 | Energy full |
 | 上限用满 | 当日名义合计达到上限后任何菜回 0，仍可吃（给 Buff、图鉴、饱腹动画）| Full belly · Meals reset in 9h 12m |
@@ -3336,7 +3437,7 @@ Lv5 / 7 / 9 的 Homestead 后果在别处（开垦、槽位、背包），厨房
 ## 8.0 本章结论
 
 1. **升级 = 材料 + 金币 + 两条技能等级之和，不需要任何料理。** 九次升级共 **11,300 金币**（250 → 2,850）与 8 种材料（木材 150 / 石料 140 / 芦苇 80 / 铜矿石 75 / 黏土 50 / 石英 22 / 硬木 28 / 岩盐 15），升到 Lv N 另需 Farming + Fishing 等级之和 ≥ 2N − 1（Lv10 需 19；**Cooking 不计入**）。材料全部能在自家农场的探索节点与矿洞拿到，与家格在哪无关。
-2. **每级都有"第一眼看见"的后果。** 每级固定 +10 体力池、+10 每日食物上限、+40（Lv7 起 +50）开垦格，并在此之上每级至少一项"做事方式改变"：Lv2 调味架（只做储物：四种调味料各存 30 份不占背包；**投料槽数由 Cooking 等级决定**——Lv1 2 槽、Cooking Lv4 开第 3 槽，不随 Homestead）、Lv3 保温柜 + 背包扩容 I 开售（25 → 30）+ 驿站板第 3 槽、Lv4 第二口灶 + 长途票资格、Lv5 布告栏 + Trip 7 出发资格、Lv6 大锅 + 扩容 II 开售（30 → 35）、Lv7 果园 / 洒水器 / 密友三件封顶、Lv8 第三口灶 + 第二故乡第 5 槽、Lv9 扩容 III 开售（35 → 40）、Lv10 名厨招牌 + 称号。背包容量 25 起、三档各 +5 正好各加一行；快捷栏固定 5 格，不随农场等级变化。
+2. **每级都有"第一眼看见"的后果。** 每级固定 +10 体力池、+10 每日食物上限、+40（Lv7 起 +50）开垦格，并在此之上每级至少一项"做事方式改变"：Lv2 调味架（灶台直接取用仓库里的调味料，调味料从此不占背包，q(46)；**投料槽数由 Cooking 等级决定**——Lv1 2 槽、Cooking Lv4 开第 3 槽，不随 Homestead）、Lv3 保温柜 + 背包扩容 I 开售（25 → 30）+ 驿站板第 3 槽、Lv4 第二口灶 + 长途票资格、Lv5 布告栏 + Trip 7 出发资格、Lv6 大锅 + 扩容 II 开售（30 → 35）、Lv7 果园 / 洒水器 / 密友三件封顶、Lv8 第三口灶 + 第二故乡第 5 槽、Lv9 扩容 III 开售（35 → 40）、Lv10 名厨招牌 + 称号。背包容量 25 起、三档各 +5 正好各加一行；快捷栏固定 5 格，不随农场等级变化。
 3. **节奏由金币决定，材料给方向，技能和是闸不是墙。** 三类玩家到 Lv10（数值校验章的会话模拟）：30 分钟玩家约 **8–9 周**（统一画像第 58–60 天；只买必需品冲刺第 49 天）、重度玩家约 **4.5 周**（第 31 天；冲刺第 22 天）、5 分钟玩家约 **4–5 个月**（Lv9 第 102 天；Lv6 第 48 天）。每日下矿的画像每一级的最紧材料都在 8 天内可得、不长于金币间隔（Lv3 与 Lv8 两级与金币同期）；**隔日下矿的钓鱼向 30 分钟玩家例外**：石英（每日 0.45 件）与铜在 Lv6–10 每级卡 7–11 天，特产换料是他的正规出路，升级面板要把换料入口写进"还差什么"。硬木（每轮探索 1 件、Lv3 开）是 Lv6–10 的节奏材料，也是重度冲刺的天然封顶（冲刺时硬木与金币同时到账）。技能和的闸只对"只玩一条轨"的玩家生效（最多 Lv6），对三类画像都不先于金币生效。
 4. **公平：任何家格的玩家走完十级的天数差 ≤ 10%。** 升级材料不依赖任何真实地点，只依赖自家矿洞与探索节点；只种田不挖矿的玩家可以在家一套的集市广场用本气候带地区特产按 2 : 1 换四种矿物（每级配额至多一半）。
 5. **升级是一个 ≤ 3 秒的时刻 + 一块永久木牌。** 农舍门口常驻面板四件事同屏（要什么 / 有什么 / 差什么与去哪拿 / 升了会怎样），点下 Upgrade 当场回满体力到新上限、农舍外观在 Lv3 / 5 / 8 / 10 二选一换装；庭院立一块升级木牌记每一级的日期，访客看得见。
@@ -3414,7 +3515,7 @@ Lv5 / 7 / 9 的 Homestead 后果在别处（开垦、槽位、背包），厨房
 | Lv | 体力池 / 食物上限 | 开垦上限 | 厨房 | 背包容量（可购） | 多年生槽 | 洒水器上限 | 摆件上限 | 第二故乡槽 | 密友槽 | 帮工人数 | 农场驿站 | 旅行资格 | 农舍外观 | 本级「第一眼看见」 |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 1 | 200 / 200 | 200 | 土灶 1 口（投料槽随 Cooking：Lv1 2 槽、Lv4 3 槽） | 25（5 行） | 2 | 4 | 20 | 1 | 2 | 1 | 委托板 2 槽 | Trip 1–5 | 阶段 0 · 农舍 | 起点 |
-| 2 | 210 / 210 | 240 | **调味架 Spice Rack**：四种调味料各存 30 份不占背包（不开投料槽） | 25 | 3 | 5 | 24 | 2 | 3 | 1 | — | — | — | 灶台墙上一排罐子，岩盐与香草不再占背包格；庭院开黏土溪岸 |
+| 2 | 210 / 210 | 240 | **调味架 Spice Rack**：灶台直接取用仓库里的调味料，Lv1 时随身的岩盐 / 野香草在升级那一刻收进仓库（不开投料槽，q(46)） | 25 | 3 | 5 | 24 | 2 | 3 | 1 | — | — | — | 灶台墙上一排罐子，岩盐与香草不再占背包格；庭院开黏土溪岸 |
 | 3 | 220 / 220 | 280 | **保温柜 Warming Cabinet 6 份** | **30 可购（扩容 I · 150）** | 4 | 6 | 28 | 2 | 4 | 1 | **委托板第 3 槽** | — | **阶段 1 · 篱笆与信箱（a / b）**（P0：门前一段篱笆补成整圈，q(35)） | 农舍第一次变样；驿站货架出现扩容 I（背包多一行）；苗圃角开老树（硬木） |
 | 4 | 230 / 230 | 320 | **第二口灶 Second Stove** | 30 | 5 | 7 | 32 | 3 | 5 | **2** | — | **可制作 / 购买长途票（Trip 6）** | — | 两道菜同时做；长途票柜台解锁 |
 | 5 | 240 / 240 | 360 | — | 30 | 6 | 8 | 36 | 3 | 6 | 2 | **布告栏 Notice Board** | **Trip 7 出发资格** | **阶段 2 · 门廊（a / b）** | 门廊可坐访客；地图上最远一档解锁 |
@@ -3434,7 +3535,7 @@ Lv5 / 7 / 9 的 Homestead 后果在别处（开垦、槽位、背包），厨房
 |---|---|---|
 | 体力池 | 200 + 10 × (Lv − 1) | 290 |
 | 每日食物上限 | 200 + 10 × (Lv − 1)（新手祝福期另 +100） | 290 |
-| 开垦上限（格，多年生占地与温室 16 格计入） | Lv1–6：200 + 40 × (Lv − 1)；Lv7–10：400 + 50 × (Lv − 6) | 600 |
+| 开垦上限（格，多年生占地与温室 16 格计入） | Lv1–6：200 + 40 × (Lv − 1)；Lv7–10：400 + 50 × (Lv − 6)。**P1 紧凑农场**：Lv1–2 30、Lv3 40，Lv4 起随 P1 第 3 步重定；本行是地理农场的尺度（q(59)） | 600 |
 | 多年生槽位 | 1 + Lv | 8（Lv7） |
 | 洒水器数量上限 | 3 + Lv | 10（Lv7） |
 | 摆件上限 | 20 + 4 × (Lv − 1) | 56 |
@@ -3607,9 +3708,9 @@ Lv5 / 7 / 9 的 Homestead 后果在别处（开垦、槽位、背包），厨房
 | 面板 | Needs / You have / Still missing / What changes / Upgrade / Go home to upgrade · Free | 四件事与按钮 |
 | 缺口 | Need 4 more Hardwood / Need 120 more coins / Skills total 9 needed · now 8 / Clay · Clay Bank · opens at Lv2 / Hardwood · Old Tree · 1 per round / Quartz 2/4 · Mine floor 2 · or Barter 2 Sweet Potato → 1 | 带去向的缺口（矿物永远同时给出矿洞与换料两条路） |
 | 时刻 | Homestead Lv4 / Max Energy 230 · Energy full / Meals 230 a day / Plots 320 / Second Stove / Choose your porch · A / B | 横幅与飘字 |
-| 后果 | Spice Rack · seasonings off your bag / Warming Cabinet / Second Stove / Big Pot · Double / Third Stove / Chef's Sign / Bag Upgrade I for sale · 150 coins / Bag Upgrade II for sale · 400 coins / Bag Upgrade III for sale · 1,000 coins / Bag 25 → 30 / Stall Board · 3rd slot / Notice Board / Orchard 8/8 / Sprinklers 10/10 / Second Home · 3 slots / Close Friends · 5 / Helpers · 2 / Long-haul Ticket unlocked / Trip 7 unlocked | 后果行 |
+| 后果 | Max Energy 210 · Meals 210 a day / Spice Rack · seasonings off your bag / Clay Bank · Clay next to the Reed Bank / Clay Bank opened / Highest level for now（P0 封顶 Lv3，中性灰，q(46)）/ Warming Cabinet / Second Stove / Big Pot · Double / Third Stove / Chef's Sign / Bag Upgrade I for sale · 150 coins / Bag Upgrade II for sale · 400 coins / Bag Upgrade III for sale · 1,000 coins / Bag 25 → 30 / Stall Board · 3rd slot / Notice Board / Orchard 8/8 / Sprinklers 10/10 / Second Home · 3 slots / Close Friends · 5 / Helpers · 2 / Long-haul Ticket unlocked / Trip 7 unlocked | 后果行 |
 | 痕迹 | Upgrade Plaque / Lv4 · Oct 12 / Homestead Master | 木牌与称号 |
-| 换料 | Barter · 2 Sweet Potato → 1 Copper Ore / Barter 4 of 6 today / Up to half of this level by barter | 特产换料 |
+| 换料 | Barter · 2 Sweet Potato → 1 Copper Ore / Barter today 4/6 / Up to half of this level by barter | 特产换料 |
 | 访客 | Homestead Lv6 · Big Pot kitchen | 门口标签 |
 
 所有名字 ≤ 18 字符（Warming Cabinet 15、Upgrade Plaque 14、Homestead Master 16、Long-haul Ticket 16）。
@@ -3775,7 +3876,7 @@ Lv5 / 7 / 9 的 Homestead 后果在别处（开垦、槽位、背包），厨房
 |---|---|
 | id / 名称 | `homestead_stall` 农场驿站 / Homestead Stall（15 字符） |
 | 位置 | 农舍门口，开局即有；访客可见，但只有农场主人可用 |
-| 人形 | **无**（2026-10-05 p(6) 用户拍板撤掉伙计）：农场驿站是无人值守的自助小摊——柜台一端一只诚实箱 Honesty Box、梁上一只小铃；点驿站棚直接打开驿站抽屉（FARM-6，指尖卡 `Tap to shop`），没有问候卡、没有掌柜栏。原 `npc_stallhand` 驿站伙计作废 |
+| 人形 | **无**（2026-10-05 p(6) 用户拍板撤掉伙计）：农场驿站是无人值守的自助小摊——柜台一端一只诚实箱 Honesty Box、梁上一只小铃；点驿站棚直接打开驿站抽屉（FARM-6，名字条 `Homestead Stall`，q(62)），没有问候卡、没有掌柜栏。原 `npc_stallhand` 驿站伙计作废 |
 | 卖什么 | 通用种子（全部一年生通用作物，按 Farming 等级逐档解锁）、蚯蚓 `bait_worm` 蚯蚓 / Worm Bait（Fishing Lv2 起）、堆肥 `fert_compost` 堆肥 / Compost（Farming Lv3 起）。**不卖**地区种子、树苗、果木肥、亮片、鱼竿、鱼笼、旅行门禁物品——这些是出门的理由 |
 | 收什么 | 产物与鱼全价直售、不限量；料理与材料按回收地板价、账号级日额度（数字见本章后半） |
 | 委托板 | `board_homestead` 驿站委托板 / Stall Board，3 槽系统委托（9.6） |
@@ -3859,7 +3960,7 @@ Lv5 / 7 / 9 的 Homestead 后果在别处（开垦、槽位、背包），厨房
 | 掌柜名牌 | `keeper_name` 掌柜名牌 / Keeper Name Tag（纯外观，无好感、无故事、不进任何系统），按气候带名字池取、同城不重复、避开 12 个角色名（例外：P0 上海家一套沿用页面 14 已验收的 Ama / Finn / Mei / Sigrid，随据点一起冻结，q(32)）：tropical = Ama · Kofi · Nia · Tane · Lani · Ravi · Sefa · Ines；subtropical = Mei · Lin · Jun · Rosa · Hiro · Ana · Wen · Bao；temperate = Ola · Finn · Maya · Leo · Ida · Noor · Tom · Elsa；cool = Sigrid · Bjorn · Anya · Eero · Maren · Ivar · Lumi · Sven | "Tea Host · Ama" |
 | 掌柜外观 | 4 个据点岗位 × 4 气候带 × 3 套参数化外观变体（发型 / 肤色 / 服饰配色），按据点种子选 | 两家茶馆的 Tea Host 发型配色不同 |
 | 门头与芯片 | 门头写据点名（美术文字）；位置芯片写「<城市> · Lotus Tea House ›」；芯片放不下时截断地名、保留类型（q(32)） | "Xuhui Tackle Shop" |
-| 台词 | 模板不变，加入据点名变量 | "Welcome to Lotus Tea House. Hot tea, 30 Energy back." |
+| 台词 | 模板不变，加入据点名变量 | "Welcome to Lotus Tea House. Hot tea, 30 Energy a cup." |
 | 功能 | **完全一致**：同城任一处同类据点买到的东西、价目、库存口径一模一样 | — |
 
 **命名示例：上海与旧金山（q(32)；渔具铺按鱼塘实算，其余落点等生成器按密度定，名单为示意）**
@@ -4037,8 +4138,8 @@ Lv5 / 7 / 9 的 Homestead 后果在别处（开垦、槽位、背包），厨房
 | id | 中文 / 英文 | 所在 | 做什么 | 台词模板举例 |
 |---|---|---|---|---|
 | （无人值守） | 农场驿站 / Homestead Stall | 农场驿站 | 通用种子、蚯蚓、堆肥；直售；回收；驿站委托板 | 无台词；点驿站棚直接开抽屉（p(6)） |
-| `npc_market_keeper` | 集市掌柜 / Market Keeper | 集市广场 Market Square（室外） | 地区种子、树苗、果木肥、地区食谱卡、行锄；特产回收；集市委托板；广场 1 的城市特产货架与周末市集 | "Welcome to Pudong Market Square. Sweet potato seeds, fresh in. Farming Lv5 to plant." |
-| `npc_tea_host` | 茶座主人 / Tea Host | 茶馆 Tea House（室内） | 热茶 +30 体力，每日 3 杯（与咖啡共享）；端杯到茶桌坐下是动画，茶桌可坐 | "Sit a minute. Hot tea, 30 Energy back." |
+| `npc_market_keeper` | 集市掌柜 / Market Keeper | 集市广场 Market Square（室外） | 地区种子、树苗、果木肥、地区食谱卡、行锄；特产回收；集市委托板；广场 1 的城市特产货架与周末市集 | "Welcome to Xuhui Market Square. Sweet potato seeds, fresh in. Farming Lv5 to plant." |
+| `npc_tea_host` | 茶座主人 / Tea Host | 茶馆 Tea House（室内） | 热茶 +30 体力，每日 3 杯（与咖啡共享）；端杯到茶桌坐下是动画，茶桌可坐 | "Sit a minute. Hot tea, 30 Energy a cup." |
 | `npc_tackle_keeper` | 渔具老板 / Tackle Keeper | 渔具铺 Tackle Shop（室内，贴鱼塘） | 鱼竿、亮片、鱼笼、蚯蚓；鱼回收；渔情板 | "Perch bite at dusk here. Bring worms." |
 | `npc_post_clerk` | 驿站职员 / Post Clerk | 驿站 Travel Post（室内） | 旅行许可、长途票、旅行饼干、咖啡；护照服务与盖章台；费用预览；据点章 | "Shanghai: Trip 6, 50 Energy, 300 coins, Long-haul Ticket." |
 
@@ -4048,7 +4149,7 @@ Lv5 / 7 / 9 的 Homestead 后果在别处（开垦、槽位、背包），厨房
 
 | 步 | 画面 | 规则 |
 |---|---|---|
-| 1 点掌柜 | 掌柜（四个据点岗位）头顶的指尖卡写 `<名字> · Tap to talk`（不再有 Tap to shop）；点了亮成 `Talking` | 点柜台实物等同于点掌柜；没有任何入口直接弹商店 |
+| 1 点掌柜 | 掌柜（四个据点岗位）头顶常驻名字条，只写名字（`Mei` / `Ama` / `Finn` / `Sigrid`）；交互半径内最近的一个主色描边、放大到 1.1 倍，对话期间保持高亮，名字条文字不变（q(62)） | 点柜台实物等同于点掌柜；没有任何入口直接弹商店 |
 | 2 问候卡 | 底部升起问候卡：左侧掌柜大幅形象（半身近景，带名字），右侧 岗位 · 名牌、所在据点、**一句带今日信息的问候**（模板 + 本地变量：今日库存 / 渔情 / 票价 / 茶价），下方三个选项 | 问候语每日首次完整版、再来缩短版；信息来自该据点的真实数据，不编 |
 | 3 选项 | **`Trade`**（统一名字，主按钮；副文案按岗位：open the stall / see the rods / order tea / book a trip）→ 打开柜台 + 背包抽屉（9.11）；**信息问句**（What's fresh today? / Where are they biting? / Any news in town? / Fares today?）→ 只回一句话、不开店；**`Just passing by`** → 告辞关闭 | 三个选项固定顺序；角色 NPC（Resident）的对话条不变（Gift / Request） |
 | 4 柜台抽屉 | 顶部是**掌柜栏**：首行是抽屉标题 + ✕（`Mei's Stall · Market Square` / `Finn's Tackle · Xuhui`），标题下是岗位 · 名牌，左侧头像近景，一句随操作变化的气泡占满一行（选中商品 / 卖出 / 额度满各有台词）；岗位配色：集市莓红 `color/role/market` #9B3D6A / 渔具铺海蓝 / 茶馆玉青 `color/role/tea` #2B7369 / 驿站藏青（标题并入掌柜栏与两处色值为 2026-10-07 用户选定的样板 1 · B，q(13)）；农场驿站抽屉没有掌柜栏，标题 `Homestead Stall` | 四处柜台靠形象、配色与标题一眼可辨，不再是"换个头像的同一张表" |
@@ -4144,7 +4245,7 @@ Lv5 / 7 / 9 的 Homestead 后果在别处（开垦、槽位、背包），厨房
 | 层 | 元素 | id | 形态与颜色 | 含义 | 消失条件 |
 |---|---|---|---|---|---|
 | 地图 | 据点 / 鱼塘 / 农场上方 | `marker_deliver` | 绿色 ✓ 环 | 这里有你能立刻交付的委托 | 交付后 |
-| 地图 | 集市广场上方 | `marker_request` | 金色 ! | 这里有可接的委托 | 接单或板上无单 |
+| 地图 | 集市广场 / 居民所在据点 / 鱼塘上方 | `marker_request` | 金色 ! | 这里有可接的委托：集市板有单；据点里的居民有可接的委托（未 Track 的鱼类委托要等鱼的等级 ≤ 玩家 Fishing 等级、且当期有鱼塘能钓到）；已 Track 但还没凑够的鱼类委托挂在能钓到那条鱼的塘上（按模板筛，有新手塘选新手塘，否则离农场最近）（q(48)） | 接单或板上无单；鱼凑够后改在交付点亮 ✓ |
 | 地图 | 据点上方 | `marker_new` | 青色 ◆ | 这里有你刚解锁、还没看过的商品 / 配方卡 / 角色对话页 | 查看一次后 |
 | 地图 | 据点 / 鱼塘上方（运营活动期内可临时挂在被点亮的 POI 上） | `marker_event` | 紫色 ★ | 事件进行中或 2 小时内开始 | 事件结束 |
 | 地图 | 据点 / 鱼塘 / 城市 | `marker_locked` | 灰色 🔒 | 可见但锁定（等级 / 旅行档 / 迷雾） | 解锁后 |
@@ -4156,6 +4257,8 @@ Lv5 / 7 / 9 的 Homestead 后果在别处（开垦、槽位、背包），厨房
 | 场景 | NPC 头顶 | `bubble_gift` | 淡红 ♥ | 今日尚未赠礼，且背包里有他喜欢的菜 | 赠礼后或当日结束 |
 | 场景 | 委托板 | 板面角标 | 数字 | 板上可接 / 可交付的数量 | 随板刷新 |
 | 农场 | 驿站 | 角标 | 「Sell 12」 | 背包里可直售的产物件数 ≥10 | 卖出后 |
+
+**P0 标记**（q(48)）：不出现 🔒 与 ★；◆ = 渔具铺 Worm Bait（Fishing Lv2）/ Reed Rod（Fishing Lv3）上架、集市 Row Hoe（Farming Lv4）上架、居民开出第 2 页对话，进店一次即消失；地图上的 home 不挂 ◆ 与 !（驿站板与新种子的提示在农场驿站棚上）；✓ 只看能不能当场交，不论是否 Track；**首会话**（教学委托 Pond Catch 还在驿站板上）只亮已 Track 的标记，交付后居民的 ! 才出现。
 | 农场 | 田 / 灶 / 鱼笼 | 角标 | 「Ready」 | 可收获 / 出锅 / 收笼 | 收取后 |
 | 面板 | Today | — | 底部常驻可收起的 3 行 | 见 9.5.3 | — |
 
@@ -4235,7 +4338,7 @@ Lv5 / 7 / 9 的 Homestead 后果在别处（开垦、槽位、背包），厨房
 |---|---|
 | 标题 / 发布者 | Dusk Haul · Market Board |
 | 要求 | 4 Fine fish · any kind |
-| 奖励 | 36 coins · +1 city stamp |
+| 奖励 | 36 coins（产出模板只给金币；地区 / 探索模板另写印章进度，如 Stamp Run `40 coins · Outpost Stamp`，q(55)） |
 | 交付地点 | Deliver at any Shanghai outpost（板角 "Same board at all 6 outposts"） |
 | 状态 | Open → Tracked → Ready to deliver → Done / Dropped |
 | 按钮 | Track / Deliver / Drop / Show on map（只移动相机） |
@@ -4295,7 +4398,7 @@ Lv5 / 7 / 9 的 Homestead 后果在别处（开垦、槽位、背包），厨房
 
 ## 9.11 售卖表（四处柜台 + 城市特产货架）
 
-**柜台版式统一（2026-10-04 用户定稿）**：农场驿站、集市广场货摊、渔具铺这三处会收东西的柜台共用同一张"柜台 + 背包同屏"抽屉（第 16 章 FARM-6 / NPC-2 / NPC-2-2 / NPC-3）：三处都从掌柜问候卡的 `Trade` 进入（9.4.2）。上半 = 柜台名 · 掌柜栏 · `Buy` / 板子（Stall Board / Market Board / Bite Board）两个 Tab · ≤ 4 行商品（多出的行在区内滚动）；下半 = 背包（标题与容量条、**该柜台的日额度条**、`Sell here` 筛选 + 类型 Tab、详情卡 `Pin` / `Sell` / `Sell All`、5 × 5 格）。**没有独立的 Sell Tab**——卖东西永远是"点包里的格 → Sell / Sell All"；打开柜台时背包自动切到 `Sell here`（农场驿站 = 作物、鱼、料理与可回收材料；渔具铺 = 鱼；集市 = 本带地区作物与地区鱼；**料理只在农场驿站回收**，q(9)）；不可在此卖的物品详情卡按钮写 `Sell at home`，额度满时条变红、按钮写 `Limit reached · resets in 9h 12m`；剩余额度不够卖整堆时主按钮写实得、只卖额度内件数（`Sell 5 · 30 coins`）；农场驿站有料理 120 与材料 30 两份额度，额度条跟随选中物品类别（`Dish buy-back today 96/120` / `Material buy-back today 12/30`），选作物或鱼时写 `Crops & fish · no daily limit`（q(9)）。驿站 Travel Post 不收东西，不带背包（NPC-7 不变）。
+**柜台版式统一（2026-10-04 用户定稿）**：农场驿站、集市广场货摊、渔具铺这三处会收东西的柜台共用同一张"柜台 + 背包同屏"抽屉（第 16 章 FARM-6 / NPC-2 / NPC-2-2 / NPC-3）：三处都从掌柜问候卡的 `Trade` 进入（9.4.2）。上半 = 柜台名 · 掌柜栏 · `Buy` / 板子（Stall Board / Market Board / Bite Board）两个 Tab · ≤ 4 行商品（多出的行在区内滚动）；下半 = 背包（标题与容量条、**该柜台的日额度条**、`Sell here` 筛选 + 类型 Tab、详情卡 `Pin` / `Sell` / `Sell All`、5 × 5 格）。**P0 集市不收东西**（特产回收要等地区作物，属 P1）：柜台只有上半 `Buy | Market Board` 与 Row Hoe 一行，不贴背包（q(48)）。**没有独立的 Sell Tab**——卖东西永远是"点包里的格 → Sell / Sell All"；打开柜台时背包自动切到 `Sell here`（农场驿站 = 作物、鱼、料理与可回收材料；渔具铺 = 鱼；集市 = 本带地区作物与地区鱼；**料理只在农场驿站回收**，q(9)）；不可在此卖的物品详情卡按钮写 `Sell at home`，额度满时条变红、按钮写 `Limit reached · resets in 9h 12m`；剩余额度不够卖整堆时主按钮写实得、只卖额度内件数（`Sell 5 · 30 coins`）；农场驿站有料理 120 与材料 30 两份额度，额度条跟随选中物品类别（`Dish buy-back today 96/120` / `Material buy-back today 12/30`），选作物或鱼时写 `Crops & fish · no daily limit`（q(9)）。驿站 Travel Post 不收东西，不带背包（NPC-7 不变）。
 
 
 ### 9.11.1 农场驿站 Homestead Stall（每个农场自带，0 旅行成本，只有主人可用）
@@ -4355,7 +4458,7 @@ Lv5 / 7 / 9 的 Homestead 后果在别处（开垦、槽位、背包），厨房
 | `item_longhaul_ticket` 制作 | 同上 | 150 + 旅行许可 1 + 硬木 2 + 石英 2 | 无限 | Homestead Lv4 + 印章 ≥ 8 | 也可在农场驿站制作 |
 | `dish_travel_biscuits` | 旅行饼干 Travel Biscuits | 40 | 3 份 / 日 | 无 | Common 料理、+20 体力、Trail Food；不做菜的玩家出远门的保底 |
 | `drink_coffee` | 咖啡 Coffee | 当日第 1 / 2 / 3 杯 40 / 50 / 60 | 3 杯（与热茶共享） | 无 | +30 体力；旅途中人在异城的恢复出口 |
-| 服务 | 护照（盖章台点击打开护照 `Tap to open passport`；翻看印章、第二故乡登记）；据点章首次进入任何据点自动发放，不在盖章台领（q(27)）；费用预览板（到任意城的 Trip 档与成本） | 0 | | | |
+| 服务 | 护照（点盖章台打开护照，盖章台名字条 `Stamp Desk`，q(62)；翻看印章、第二故乡登记）；据点章首次进入任何据点自动发放，不在盖章台领（q(27)）；费用预览板（到任意城的 Trip 档与成本） | 0 | | | |
 
 ### 9.11.5 城市特产货架与角色奖励（内容不等，产能相等）
 
@@ -4437,7 +4540,7 @@ Lv5 / 7 / 9 的 Homestead 后果在别处（开垦、槽位、背包），厨房
 | 委托 | 要求 | 地板 × 件数 | 完成奖 | 合计 | 直接卖 | 差 | 玩家为什么接 |
 |---|---|---|---|---|---|---|---|
 | Fresh Greens | 生菜 × 3（单价 8） | 6 × 3 = 18 | 10 | 28 | 24 | +4 | 好感 / 街边成果 / 首会话教学 |
-| Dusk Haul | Fine 鱼 × 4（单价约 5） | 4 × 4 = 16 | 20 | 36 | 20 | +16 | 城市章进度 |
+| Dusk Haul | Fine 鱼 × 4（单价约 5） | 4 × 4 = 16 | 20 | 36 | 20 | +16 | 比自己卖多 16；产出模板不给印章进度 |
 | A Proper Meal | Fine 料理 × 2（回收约 3） | 3 × 2 = 6 | 20 | 26 | 6 | +20 | 做多了的菜有去处 |
 | Taste of Home（地区） | 甘薯 × 4（单价 10） | 8 × 4 = 32 | 40 | 72 | 40 | +32 | 城市章进度 + 当地交付 |
 | Stamp Run（探索） | 到据点签到 | — | 40 | 40 | — | +40 | 据点章 |
@@ -4596,7 +4699,7 @@ Lv5 / 7 / 9 的 Homestead 后果在别处（开垦、槽位、背包），厨房
 |---|---|---|
 | 1 | 位移 = 浮动虚拟摇杆，相机 = 安全框跟随 | 取消"单指拖相机"与"划格连播"，两条误触扣体力的路一起关掉 |
 | 2 | 四种行动 Farming / Fishing / Mining / Combat，一个 176 px 主行动键写"动词 + 体力价" | 每一下花多少写在手指底下；键只做四种行动，灶台 / 柜台 / 掌柜 / 长椅等设施一律点击触发 |
-| 3 | 切换键 96 px 扇出径向菜单，进场景自动预选 | 做不了的行动置灰并写原因 |
+| 3 | 切换键 96 px 在屏幕中央弹出四瓣行动环，进场景自动预选 | 瓣上不写字；做不了的瓣置灰加锁，点它才在环心冒一行原因（q(62)） |
 | 4 | 快捷栏 5 格 + Bag 固定不变，只放消耗品 | 锄、鱼竿、镐、剑是装备，不占格 |
 | 5 | 背包 25 → 30 / 35 / 40，Tab 只是过滤器，鱼篓 = 空格 | 鱼 10 / 料理 5 / 作物 50 的堆叠让重度一天满、基准两天满 |
 | 6 | Tools & Gear：四工具槽 + 两饰品槽，不占背包 | 一行动一槽，升级路径一眼读完 |
@@ -4649,17 +4752,18 @@ Lv5 / 7 / 9 的 Homestead 后果在别处（开垦、槽位、背包），厨房
 | Mining | `Mine · 2 Energy` | 2 | 背包满 → 灰 `Mine · Bag full`；不在矿洞 → 灰 `Mining · Enter the mine` | 选中火把时变 `Light Torch · Free`；选中炸药时变 `Blast · 12 Energy`（本层剩余岩石数 × 2，不足写 `Blast · Need 12 Energy`） |
 | Combat | `Attack` | 0 | 不在 3–5 层 → 灰 `Combat · Mine floors 3–5` | 0 体力不写价；选中治疗药水时变 `Drink · Free` |
 | 体力不足（任一行动） | 琥珀 `Sow ×1 · Need 2 Energy` | — | 本地投影 < 本次价 | 按下不发命令，弹四件事卡 |
-| 靠近设施 | 保持当前行动的动词与体力价不变；设施靠点击触发——靠近时设施上方浮出指尖卡（`Stove 1/3 · Empty · Tap to cook` / `Mei · Tap to talk` / `Rest · +60 Energy · once a day` / `Tap to craft`），点设施或点卡执行 | 0 | — | 灶台 / 居民 / 柜台 / 摊位 / 长椅 / 工作台 / 门牌 / 信箱；**主行动键永远不显示设施动词**（2026-10-04 用户定稿，与长椅 Rest 一致） |
-| 靠近矿口 · 无未完成局 | `Enter mine · 2 Energy` | 2（= 第 1 层层费；没有一次性进矿费） | 当日 2 局用完 → 灰 `Enter mine · No runs left`，按下 toast `Mine runs today 2/2 · Resets in 9h 12m`（q(44)）；不足 → 琥珀 `Enter mine · Need 2 Energy` | 按下 = 开新局 + 踏入第 1 层；账号已解锁 Express 时键下方多一个次级文字按钮 `Floor 5 · Express · Free`（0 体力直达，也算一局） |
+| 靠近设施 | 保持当前行动的动词与体力价不变；设施靠点击触发——视野内约 8 m 的设施挂图标钮，交互半径内最近的一个展开成名字条（`Stove 1/3 · Empty` / `Workbench` / 长椅 `+60 Energy`），NPC 头顶只有名字条（`Mei`）；点图标钮、名字条或物件本身都执行（q(62)） | 0 | — | 灶台 / 居民 / 柜台 / 摊位 / 长椅 / 工作台 / 门牌 / 信箱；**主行动键永远不显示设施动词**（2026-10-04 用户定稿，与长椅 Rest 一致） |
+| 靠近矿口 · 无未完成局 | `Enter mine · 2 Energy` | 2（= 第 1 层层费；没有一次性进矿费） | 当日 2 局用完 → 灰 `Enter mine · No runs left`，按下 toast `Mine runs today 2/2 · Resets in 9h 12m`（q(44)）；不足 → 琥珀 `Enter mine · Need 2 Energy`；背包放不下第 1 层一块岩石的最坏掉落 → 灰 `Enter mine · Bag full`，不扣体力（q(48)） | 按下 = 开新局 + 踏入第 1 层；账号已解锁 Express 时键下方多一个次级文字按钮 `Floor 5 · Express · Free`（0 体力直达，也算一局） |
 | 靠近矿口 · 有未完成局 | `Continue run · Free` | 0 | 当日 2 局用完时次级按钮灰 `Mine runs today 2/2 · Resets in 9h 12m`；本局未清完第 2 层 → 次级按钮灰 `New run · Clear Floor 2 first` | 落到本局最深的已付费层；次级文字按钮 `New run · 2 Energy`（小字 `Current run will end · Runs today 1/2`）= 重开；未完成的局在家农场时区 04:00 日切时结束 |
-| 靠近楼梯口 | `Floor 2 · 2 Energy` | 2（= 下一层层费，一局每层只收一次） | 本层未清完 → 灰 `Floor 2 · Clear Floor 1`；不足 → 琥珀 `Floor 2 · Need 2 Energy` | 本层 6 块全碎后亮起；第 5 层没有楼梯口 |
+| 靠近楼梯口 | `Floor 2 · 2 Energy` | 2（= 下一层层费，一局每层只收一次） | 本层未清完 → 灰 `Floor 2 · Clear Floor 1`；不足 → 琥珀 `Floor 2 · Need 2 Energy`；背包放不下下一层的最坏掉落 → 灰 `Floor 2 · Bag full`，不扣体力（q(48)） | 本层 6 块全碎后亮起；第 5 层没有楼梯口 |
 | 靠近电梯 | `Elevator · Free` | 0 | — | 打开楼层面板：Entrance 与本局已付费层写 `Free`、下一个未付费层写 `2 Energy`（需上一层清完）、更深层灰 `Clear Floor 3 first`、账号已解锁时 `Floor 5 · Express · Free`；电梯本身永远 0 体力 |
 
 **设施点击规则**（2026-10-04 定稿）：
 
-- 设施只有一种触发——**点设施**（或点它上方的指尖卡）：离得远角色自动走过去，走到就打开；主行动键不显示设施动词，走近按键也不会打开设施。田格、水面、岩石**不响应点击**，只响应主行动键（唯一例外：模态编辑模式里田格可点按或拖动来选位、打标，见 10.1，q(23)）。
-- **NPC 一律先打招呼、再交易**（2026-10-04 夜用户拍板）：所有功能 NPC——集市广场 / 茶馆 / 渔具铺 / 驿站的掌柜——头顶指尖卡写 `<名字> · Tap to talk`（如 `Mei · Tap to talk`；据点柜台不再有 Tap to shop），点了亮成 `Talking`；点掌柜或柜台实物 → 问候卡（掌柜近景 + 岗位 · 名牌 + 一句带今日信息的问候 + 三个固定选项 `Trade` / 信息问句 / `Just passing by`）→ 选 `Trade` 才打开柜台抽屉；没有任何入口直接弹商店。完整规则见 9.4.2 掌柜交互表，界面见 NPC-G1 系列。农场驿站无人值守（p(6)）：点驿站棚直接开抽屉，指尖卡 `Tap to shop`。
-- 角色 NPC（Resident）点了是对话条（头像 + 好感 + 一句招呼 + Gift / Request），本身就是先招呼、再选项，不另加问候卡。委托板、留言板等非 NPC 设施点了直接打开。
+- 设施只有一种触发——**点设施**（或点它的图标钮 / 名字条，q(62)）：离得远角色自动走过去，走到就打开；主行动键不显示设施动词，走近按键也不会打开设施。田格、水面、岩石**不响应点击**，只响应主行动键（唯一例外：模态编辑模式里田格可点按或拖动来选位、打标，见 10.1，q(23)）。
+- **图标钮与名字条**（LOCK-07 v2，2026-10-08 用户确认）：视野内约 8 m 的可交互设施挂**图标钮**（28 px 白圆 + 22 px 设施图标；设施有状态时改挂 LOCK-11 状态徽标，状态优先于图标）；交互半径内**最近的一个**向角色面朝的一侧展开成**名字条**：设施图标 + 名字（+ 至多一条关键事实），160 ms 展开，离开半径收回，贴屏幕边时向内翻；同时只展开一个（据点室内也一样）。点图标钮、名字条或物件本身都触发（点击触发规则不变）。名字条定稿：`Farmhouse`、`Workbench`、`Homestead Stall`、`Timber Grove`（其他采集点写名字，如 `Reed Bank`；未开 `Clay Bank · Homestead Lv2`；没好 `Timber Grove · Ready in 2h 10m`）、`Upgrade Plaque`、门牌 `Homestead Lv1`、灶口 `Stove 1/1 · Empty`（多灶 `Stove 1/3 · Empty`）、长椅 `+60 Energy`（今天用过灰 `Rested today`）、信箱 `Mailbox`（可领时挂 `Parcel` 小牌）、保温柜 `Warming Cabinet 4/6`、特产货架 `City Specialty`、集市委托板 `Market Board`（`board_market`，图标 `i-board`，有可接委托时换成 `!` 徽标）、留言板 `Guestbook`、门 = 门图标 + 目的地（`Farm` / `Map`）。茶桌与据点里可坐的长椅只挂座位图标 `i-seat`，走近放大高亮，不写字（农舍门口的 Rest 长椅是设施，按上面的名字条）。任何世界提示都不写点按引导语（Tap to …）、不画手指（q(62)）。
+- **NPC 一律先打招呼、再交易**（2026-10-04 夜用户拍板）：所有功能 NPC——集市广场 / 茶馆 / 渔具铺 / 驿站的掌柜——头顶常驻名字条只写名字（如 `Mei`），交互半径内最近的一个主色描边、放大到 1.1 倍，对话期间保持高亮（LOCK-16 / 17 / 30 v2，q(62)）；点掌柜或柜台实物 → 问候卡（掌柜近景 + 岗位 · 名牌 + 一句带今日信息的问候 + 三个固定选项 `Trade` / 信息问句 / `Just passing by`）→ 选 `Trade` 才打开柜台抽屉；没有任何入口直接弹商店。完整规则见 9.4.2 掌柜交互表，界面见 NPC-G1 系列。农场驿站无人值守（p(6)）：点驿站棚直接开抽屉，名字条 `Homestead Stall`（q(62)）。
+- 角色 NPC（Resident）点了是对话条（头像 + 好感 + 一句招呼 + Gift / Request），本身就是先招呼、再选项，不另加问候卡；可交互的角色 NPC 头顶同样只有名字条（`Pip` / `Old Kai`），不可交互的 NPC 不挂名字条（q(62)）。委托板、留言板等非 NPC 设施点了直接打开。
 
 Row Hoe 一次作用于角色面前同一行 3 格，只有可播的格才扣体力。
 
@@ -4670,17 +4774,18 @@ Row Hoe 一次作用于角色面前同一行 3 格，只有可播的格才扣体
 | 项 | 规则 |
 |---|---|
 | 位置 / 尺寸 | 主行动键正上方 **96 px** 圆键，显示当前行动图标 |
-| 按下 | 从角色扇出四个行动的径向菜单（直径约 480 px）；再按或点空白收起；打开时位置芯片淡出 0.2 s、摇杆不可用 |
-| 置灰 | 做不了的行动置灰写原因：`Fishing · No water nearby`、`Combat · Mine floors 3–5`、`Mining · Enter the mine`、`Farming · No plots here` |
+| 按下 | 以**屏幕中心**为圆心弹出四瓣行动环（不围着角色）：Farming → Fishing → Mining → Combat 顺时针排在 −135° / −45° / 45° / 135°，360 × 800 下半径 88（圆心 180, 400），永远在屏内，不镜像、不贴边滑动；瓣与角色之间不画连线；四瓣从屏幕中心顺时针依次弹出（每瓣 180 ms ease-out-back，间隔 40 ms，共约 300 ms），收起 120 ms；再按或点空白收起；打开时位置芯片淡出 0.2 s、摇杆不可用（LOCK-03 v2，q(62)） |
+| 瓣的三态 | 瓣上不写任何字（没有行动名、没有常驻原因）：当前行动 = 主色实心瓣 72（白图标、3 px 白描边）；可选 = 米色瓣 64 + 彩色图标；不可用 = 米色瓣 64、图标 35 %、锁角标（q(62)） |
+| 点不可用瓣 | 该瓣抖一下，环心出单行原因气泡（Caption 12，带指向该瓣的小尾巴），1.5 s 后淡出，菜单不收：`No water nearby` / `Enter the mine` / `Mine floors 3–5` / `No plots here`（q(62)） |
 | 切换效果 | 主行动键换动词与体力价；快捷栏按新行动候选表翻面重填（0.3 s）；工具徽标随之换 |
 
 ### 10.2.4 自动预选表
 
 | 进入的空间 | 自动预选 | 其他可选 | 说明 |
 |---|---|---|---|
-| 自家田地 / 温室 / 帮工中的邻居农场 | Farming | — | 其余置灰写原因 |
+| 自家田地 / 温室 / 帮工中的邻居农场 | Farming | — | 其余瓣置灰加锁，点了才弹原因气泡（q(62)） |
 | 水塘 / 河 / 海岸钓点 | Fishing | — | 同上 |
-| 矿洞 1–2 层 / 3–4 层 / 5 层 | Mining / Mining / Combat | — / Combat / — | 1–2 层 Combat 灰 `Combat · Mine floors 3–5`；3–4 层遇怪不自动切；5 层 Mining 灰 `Mining · No rocks here` |
+| 矿洞 1–2 层 / 3–4 层 / 5 层 | Mining / Mining / Combat | — / Combat / — | 1–2 层 Combat 瓣灰（点了气泡 `Mine floors 3–5`）；3–4 层遇怪不自动切；5 层 Mining 瓣灰（气泡 `No rocks here`）（q(62)） |
 | 厨房 / 柜台 / 地图 / 非帮工的邻居农场 | 无 | — | 快捷栏收起成把手；主行动键与切换键隐藏（纯设施空间没有行动） |
 
 ### 10.2.5 体力不足：四件事卡
@@ -4708,7 +4813,7 @@ Row Hoe 一次作用于角色面前同一行 3 格，只有可播的格才扣体
 | 格数 / 位置 | **固定 5 格 + 右端 Bag**，6 个 160 × 160 圆角 32 等距铺满 1,080 宽，不随农场等级变化；竖屏底部，距屏底安全区 24 px，高 200 px |
 | 格内 | 图标 + 物品名 + 数量；**不写体力价**（在主行动键上）；钉住态要一眼可见：格顶边中央一枚 36 px 实心图钉徽标（琥珀 #E3B341 底、白图钉、1 px 深描边，一半压在格外）+ 格顶部 6 px 琥珀色条 + 略暖底色 #FBF4E6；可与选中态叠加（绿描边在外、琥珀顶条在内）（2026-10-04 用户要求钉住状态更明显） |
 | 选中态 | 上抬 **12 px** + 主色描边；选中物决定主行动键的动词与消耗（种子档位 → 体力价；鱼饵 → 挂饵；火把 / 鱼笼 → 键面临时变 `Light Torch · Free` / `Set Trap · Free`，执行一次后复原） |
-| 空格 | 浅虚线幽灵格 + 提示（`Tap to pick a seed`）；点它打开背包对应 Tab |
+| 空格 | 留空（浅虚线框）；本行动在栏里没有数量 > 0 的物品时，第一个空格变成幽灵格（虚图标 + 一个名词 `Seeds` / `Bait` / `Torch` / `Potion`，见下文），点它打开背包对应 Tab；不写点按引导语（q(44)、q(62)） |
 | 收起态 | 未选行动时整条收起成**把手**（240 × 40 px）+ 右端 Bag；选了行动后展开并自动填充 |
 | Bag 按钮 | 带容量小点（≥ 90% 琥珀）；点它或上滑整条打开背包 |
 
@@ -4726,7 +4831,7 @@ Row Hoe 一次作用于角色面前同一行 3 格，只有可播的格才扣体
 ### 10.3.3 自动填充、钉住与归零
 
 1. **填充顺序**：进入行动时每个未钉住的格按 ① 已选中 → ② 上次用过 → ③ 数量最多 → ④ 最近获得 填入；同一 id 最多出现一次，多堆显示合计、从最少的堆扣起。
-2. **钉住 Pin**：长按钉住 / 取消（菜单里 Unpin 项前带同款图钉徽标，菜单下一行灰字 "Pinned slots stay when the bar refills"）；从背包拖入的自动钉住；**每个行动各记各的**；钉住态的视觉见 10.3.1 格内行（图钉徽标 + 顶条）。
+2. **钉住与移除（v1.11，SGODOT-197 LOCK-04 / 05，用户 2026-10-08 确认；q(61)）**：长按 450 ms 只让格子浮起（轻震），浮起即可拖；同时在快捷栏上沿上方、主行动键左边淡入两个放置区——左 Pin / Unpin（琥珀，随物品当前状态），右 Remove（垃圾桶）。松在 Pin / Unpin 区 = 切换这一格的钉住（钉子角标弹一下 + 轻震，不出气泡、不出 Toast）；松在 Remove 区 = 从栏上移除（物品仍在背包，这一格留空、不补位，Toast `Radish Seeds off the bar · Undo` 5 秒）；松在另一格 = 只互换位置，钉子跟着物品走、不自动钉住；松在本格或别处 = 取消。PinMenu 弃用。**从背包网格拖进快捷栏 = 放入，不自动钉住**（落在有物品的格时替换该格：被替换的物品离开快捷栏、钉子随它去掉，不算「已移除」，下次照常补位）。**每个行动各记各的**：钉住与「已移除」都按行动保存；「已移除」记录只由 Remove 区产生：移除过的物品不会被自动填充补回，直到玩家从背包把它拖回快捷栏——拖回时清掉它的「已移除」记录。背包详情卡的 `Pin` 见 10.4.4。钉住态的视觉见 10.3.1 格内行（图钉徽标 + 顶条）。
 3. **归零**：钉住的格到 0 不消失，灰图标 + `0` + 补货提示（`Buy at Homestead Stall` / `Craft at Workbench`）；未钉住的格到 0 下次进入时被替换。选中的格到 0 时自动取消选中（种子回到 `Sow · Pick a seed`；鱼饵摘掉、空钩照钓）；0 格不能被选中，点了只轻震（q(44)）。
 4. **解锁即上栏**：新解锁的种子 / 鱼饵首次进对应行动占最后一个未钉住格并闪 0.6 s。
 5. **标记格自动选种**（Plot Marks，q(23)；P0 不含，q(44)）：站上带种子标记的已翻空格时，Farming 快捷栏自动选中该格标记的种子，仍由玩家按主行动键播，不替玩家执行。
@@ -4735,8 +4840,8 @@ Row Hoe 一次作用于角色面前同一行 3 格，只有可播的格才扣体
 
 | 手势 | 结果 |
 |---|---|
-| 点格子 / 长按格子 | 选中，再点取消（主行动键回到无选中物的动词）/ 钉住或取消钉住，轻震一次 |
-| 拖格到格 / 拖格向上甩出 | 互换并都钉住 / 从栏上移除（物品仍在背包） |
+| 点格子 / 长按格子 | 选中，再点取消（主行动键回到无选中物的动词）/ 浮起 + 轻震，淡入 Pin / Unpin 与 Remove 两个放置区（v1.11，q(61)） |
+| 浮起后松在另一格 / Pin（Unpin）区 / Remove 区 / 本格或别处 | 只互换位置，钉子跟着物品走 / 切换钉住 / 从栏上移除（物品仍在背包，Toast + Undo）/ 取消 |
 | 点空幽灵格 / 点 Bag / 上滑整条 | 打开背包对应 Tab / 打开背包抽屉 |
 | 点把手（收起态） | 展开径向菜单（等于按切换键） |
 
@@ -4745,8 +4850,8 @@ Row Hoe 一次作用于角色面前同一行 3 格，只有可播的格才扣体
 | 空间 | 底部只剩 | 主行动键 |
 |---|---|---|
 | 厨房 | Bag 按钮 | 无主行动键；点灶台打开烹饪面板（食材在烹饪面板的 `From your bag` 行里选）；烹饪面板顶栏写灶口与烹饪等级 `Stove 1/3 · Cooking Lv2`——Cooking 是与 Farming / Fishing 平行的第三条技能轨，它的等级只在这里与技能页显示，头像环仍是双色 |
-| 集市广场 / 茶馆 / 渔具铺 / 驿站 / 农场驿站柜台；邻居农场（非帮工） | Bag 按钮 | 无主行动键；点掌柜 / 柜台 / 居民 / 留言板触发（指尖卡 `Mei · Tap to talk` / `Tap to shop`（农场驿站）/ `Tap to talk` / `Leave a note`）；NPC 一律先问候再 Trade（10.2.2 设施点击规则） |
-| 可进入的 POI 室内（P2，q(15)） | Bag 按钮 | 无主行动键；座位点击触发（指尖卡 `Sit`），没有柜台与 NPC |
+| 集市广场 / 茶馆 / 渔具铺 / 驿站 / 农场驿站柜台；邻居农场（非帮工） | Bag 按钮 | 无主行动键；点掌柜 / 柜台 / 居民 / 留言板触发（NPC 头顶名字条 `Mei` / `Pip`；农场驿站名字条 `Homestead Stall`；留言板名字条 `Guestbook`，q(62)）；NPC 一律先问候再 Trade（10.2.2 设施点击规则） |
+| 可进入的 POI 室内（P2，q(15)） | Bag 按钮 | 无主行动键；座位点击触发（座位只挂 `i-seat` 图标，走近放大高亮，不写字，q(62)），没有柜台与 NPC |
 | 二级面板；地图浏览、飞行过场 | Bag 按钮 | 隐藏 |
 
 ---
@@ -4798,9 +4903,9 @@ Row Hoe 一次作用于角色面前同一行 3 格，只有可播的格才扣体
 |---|---|---|
 | 作物 crop | 无（**不可送礼**，K-3，q(29)）；在柜台抽屉的背包里 `Sell` / `Sell All` | 委托要求作物且在交付地点时出 `Deliver`；背包详情只有 Lock |
 | 鱼 fish | `Gift ›`（只列互关及以上；没有互关好友时灰显 `Gift · Mutual friends only`）；在柜台抽屉的背包里 `Sell` / `Sell All` | 农场驿站全价；渔具铺 × 0.8 向下取整，按钮写实得 `Sell All · 6 coins`，不写 `Sell · 80%`；集市只收本带地区鱼，其余处灰 `Sell at home`；居民不收鱼作礼物 |
-| 料理 dish | `Eat · +40 Energy` / `Gift` / `Deliver`；在农场驿站柜台另有 `Sell` / `Sell All`（回收价，额度 120），别处写 `Sell at home`（q(9)） | 食物上限用满 `Eat · no Energy today` 仍可点；只剩一部分时写实得 `Eat · +20 Energy`（q(10)） |
-| 种子 / 肥料 | `Pin` / `Store` | Pin 钉到 Farming 快捷栏；Store 在家入仓库 |
-| 鱼饵 / 鱼笼 / 火把 / 炸药 / 治疗药水 | `Pin` | 钉到对应行动快捷栏 |
+| 料理 dish | `Eat · +40 Energy` / `Gift` / `Deliver`；`Gift` 的写法：身边有居民 `Gift to Ama`（点了打开该居民的送礼抽屉并选中这道菜），其他地方灰显 `Gift to a resident`，点了 toast `Find a resident at an outpost to gift this dish`，今天已送过灰显 `Gift already given today`（q(63)）；在农场驿站柜台另有 `Sell` / `Sell All`（回收价，额度 120），别处写 `Sell at home`（q(9)） | 食物上限用满 `Eat · no Energy today` 仍可点；只剩一部分时写实得 `Eat · +20 Energy`（q(10)） |
+| 种子 / 肥料 | `Pin` / `Store` | Pin 钉到 Farming 快捷栏：放进该栏第一个空格，没有空格就顶掉最后一个未钉住格（被顶掉的不算「已移除」）；已钉住时按钮写 `Unpin`；5 格都钉住时灰显 `Bar full · Unpin one first`（q(61)）；Store 在家入仓库 |
+| 鱼饵 / 鱼笼 / 火把 / 炸药 / 治疗药水 | `Pin` | 钉到物品所属行动的快捷栏（鱼饵、鱼笼 → Fishing，火把、炸药 → Mining，药水 → Combat），放法与 `Unpin` / `Bar full · Unpin one first` 同上一行（q(61)） |
 | 材料 material | `Store`（在家；离家灰 `At home only`）；可回收的在农场驿站柜台抽屉里 `Sell` | Stone / Quartz / Hardwood 不出 Sell；门禁物品只有事实行、没有按钮（q(29)） |
 | 工具 / 饰品 | — | 不在背包网格里；在背包抽屉的 Gear 一侧点槽位换装（10.5） |
 | 任意 | `Lock` / `Unlock` | 锁定的堆批量出售时跳过 |
@@ -4811,7 +4916,7 @@ Row Hoe 一次作用于角色面前同一行 3 格，只有可播的格才扣体
 
 ### 10.4.5 手势
 
-点格 = 浮出详情卡，点空白处关闭；长按格 = 快速钉住到当前行动快捷栏（仅消耗品）；拖格到第 1 行快捷栏 = 放入并钉住、顶掉原物；点 Tab / Sort = 过滤 / 循环排序，容量数字不变；下滑把手或点 ✕ = 关闭。
+点格 = 浮出详情卡，点空白处关闭；长按格（仅消耗品）= 450 ms 浮起 + 轻震，同时出 Pin 区（不出 Remove 区）；拖到 Pin 区 = 放进物品所属行动的快捷栏并钉住（放法同 10.4.4 的 `Pin`），拖到第 1 行快捷栏格 = 放入、不钉住（落在有物品的格 = 替换该格），松在原地或别处 = 取消；详情卡 `Pin` 仍是一步钉住（LOCK-12，用户 2026-10-08 同意，q(61)）；拖格到第 1 行快捷栏 = 放入落点那一格、不自动钉住；落在有物品的格时替换该格，被替换的物品离开快捷栏、钉子随它去掉，不算「已移除」（v1.11，q(61)）；抽屉里拖第一行快捷栏格时，Pin / Unpin 与 Remove 两个放置区翻到快捷栏行下方（x 与主界面相同 72 / 168，y = 快捷栏行下沿 + 96，360 × 800 基准）；点 Tab / Sort = 过滤 / 循环排序，容量数字不变；下滑把手或点 ✕ = 关闭。
 
 ### 10.4.6 鱼篓 Creel
 
@@ -4839,9 +4944,9 @@ Row Hoe 一次作用于角色面前同一行 3 格，只有可播的格才扣体
 | 容器 | id | 英文 | 规则 |
 |---|---|---|---|
 | 待领包裹 | `inbox_parcel` | Parcel | **在哪看**：HUD 铃铛（任何场景）→ 收件箱 `Parcels` Tab；在家时点农舍信箱打开同一面板（信箱不是第二个容器）。只收**被动获得**（赠礼、首访礼、奖励、委托回包、离线帮工收成），不收任何主动劳动所得、也不收背包里原有的东西；8 件 × 24 小时（8 件已满时新的被动获得排队待发，见本节末「包裹满时排队」，q(45)）；页顶一条背包容量，`Claim all · N slots` 按空格数领；Claim 需空格，不足 `Make room · 1 slot`；到期可回收品按地板价折现（×0.8），不可回收品消失 |
-| 农场仓库 | `farm_storage` | Farm Storage | 不限格、每堆 99；回家时**只有材料自动入库**（木材、石料、芦苇、铜矿石、岩盐、黏土、石英、硬木、野香草）；种子、肥料、鱼饵、火把、药水是快捷栏的消耗品，随身带、不自动入库，可在家手动 `Store`（q(40)）；产物、鱼、料理、门禁物品不入；摆件获得时就直入仓库、从不进背包（q(29)）；升级、设施、调味先扣仓库；带出门在 Seeds / Tackle / Materials Tab 点仓库堆 `Take 10 / Take all`（Tackle 页显示仓库里的鱼饵、亮片，q(44)）；不在家灰显 `At home` |
+| 农场仓库 | `farm_storage` | Farm Storage | 不限格、每堆 99；回家时**只有材料自动入库**（木材、石料、芦苇、铜矿石、岩盐、黏土、石英、硬木、野香草；其中岩盐、野香草两种调味料要到 Homestead Lv2 调味架起才入库，Lv1 时跟人走，q(46)）；种子、肥料、鱼饵、火把、药水是快捷栏的消耗品，随身带、不自动入库，可在家手动 `Store`（q(40)）；产物、鱼、料理、门禁物品不入；摆件获得时就直入仓库、从不进背包（q(29)）；升级、设施、调味先扣仓库；带出门在 Seeds / Tackle / Materials Tab 点仓库堆 `Take 10 / Take all`（Tackle 页显示仓库里的鱼饵、亮片，q(44)）；不在家灰显 `At home` |
 
-**包裹满时排队**（2026-10-05 用户确认，SGODOT-158；q(45) 回写）：8 件包裹已满时，新的系统被动奖励转为**待发**——不丢弃、不挤掉现有包裹、不立即折现；包裹腾出位置后按获得顺序入列，从入列时起算 24 小时；待发数在收件箱可见。每件包裹不超过该物品一堆的上限，超量拆件；`Claim` 用一个空背包格，`Claim all` 只领当前空格容得下的；到期按整件总地板价 × 0.8 向下取整折成金币；领取 / 到期记录保留最近 100 条。本规则不扩展到玩家寄物与 P2 赠礼。
+**包裹满时排队**（2026-10-05 用户确认，SGODOT-158；q(45) 回写）：8 件包裹已满时，新的系统被动奖励转为**待发**——不丢弃、不挤掉现有包裹、不立即折现；包裹腾出位置后按获得顺序入列，从入列时起算 24 小时；待发数在收件箱可见。每件包裹不超过该物品一堆的上限，超量拆件；`Claim` 用一个空背包格，`Claim all` 只领当前空格容得下的；到期按整件总地板价 × 0.8 向下取整折成金币；领取 / 到期记录保留最近 100 条。本规则不扩展到玩家寄物与 P2 赠礼。**细则**（q(46)）：待发不设上限；只在 Parcels 页规则行显示数量 `Parcels 8/8 · 2 more waiting · Kept 24h · Claim needs a free slot`，不逐件列出、不计入铃铛角标；排队期间不计时；到期时不可回收品消失、赠礼退回赠送人。
 
 ### 10.4.9 三类玩家日容量校验（不变）
 
@@ -4899,6 +5004,8 @@ Row Hoe 一次作用于角色面前同一行 3 格，只有可播的格才扣体
 | 钓点页附加 | `Creel 7 · 6 free`（第 2 行下方左侧） | — | — |
 
 删除 Passport 小书、`F4 · F6` 等级环、Map 按钮；所有可点目标 ≥ 96 px。
+
+**地图页的 HUD（MAP-1，P0，阶段 4 输入，q(50)）**：旧的底栏 `Map / Farm / Me` 撤掉；地图页照常显示两行 HUD——头像进个人页（LOCK-22 的入口只剩头像）、体力卡、金币、铃铛进收件箱、Today 芯片、位置芯片（写玩家实际所在地，点它回到所在场景）。快捷栏收成把手，主行动键与切换键隐藏，底部只留 `Bag`。`Nearby Cities` 在 P0 隐藏（旅行属 P2）。pin 卡上的按钮：农场 `Go home · Free`；据点与鱼塘 `Go`（同城免费，不弹 Travel 面板）。地图页没有摇杆，拖动与双指缩放浏览，点 POI 只弹名片。
 
 ### 10.6.2 个人页 Profile（2026-10-05 p(7)）
 
@@ -4961,8 +5068,23 @@ Row Hoe 一次作用于角色面前同一行 3 格，只有可播的格才扣体
 | 矿洞楼层命令 | Enter / Descend / Elevator / New run 各一条命令：目标层必须可达（上一层已清完，或为本局已付费层，或为账号已解锁的 Express 第 5 层）；目标层本局未付费时校验并扣 2，已付费或 Express 一律 0，不足整条拒绝；New run 校验本局已清完第 2 层与日局数 < 2；层费付讫标记按局存储，随重开与家农场时区 04:00 日切清零；第 5 层精英的石英掉落按玩家日只结算一次 |
 | 消耗品与工具 | 命令携带消耗品 id，校验持有并扣减（鱼饵在咬钩时扣 1）；命令不携带工具，服务端按账号装备槽决定倍数（Row Hoe 3 格；Copper Pickaxe 每块石料 2）；Equip 单独一条命令并校验门槛 |
 | 背包 | 入包按堆叠上限与容量校验；收获 / 采摘按空格裁剪；买 / 挖 / 抛竿放不下则拒绝 |
-| 幂等 | 每条命令带客户端序号，重发不重扣 |
+| 幂等 | 每条命令带客户端看到的状态版本 `expect_seq`，版本对不上就拒绝（`stale_state`，返回最新状态），重复包不会执行两次（q(49)，见 10.7.1） |
 | 多设备 | 同一账号新登录顶掉旧设备，旧设备出 SYS-SESSION，被顶后不自动重连（q(17)）。现网尚未做到：HTTP 两台设备都能用，只有实时连接一个账号一条；服务端要撤销旧令牌并区分「被顶 / 过期 / 删号」三种错误码，前后端约 9–11 人天（SGODOT-206 亚瑟评估）。**不进 P0**，正式上线前再排期；同时允许几台、宽限期、旧包怎么处理到时再定 |
+
+### 10.7.1 命令生命周期与系统态（P0，阶段 3 输入，q(49)）
+
+按亚瑟 WP7-B F-08（SGODOT-207）与现有实现：
+
+| 项 | 规则 | 玩家看到 |
+|---|---|---|
+| 界面命令（买、卖、Craft、升级、领取等） | 按下即锁定按钮；300 毫秒内回包不显示等待态；超过 300 毫秒显示 pending（置灰 + 转圈，文案不变） | — |
+| 超时 | 8 秒没有回包或回 5xx：按钮回到可用，顶部出 SYS-CMD-FAIL；连续两次失败升级为 SYS-OFFLINE，之后每 5 秒自动探测，通了自动消失 | `Didn't go through · try again`（3 秒后消失）/ `Offline · Reconnecting…` + `Retry` / `Back online`（1.5 秒后消失） |
+| 离线时 | 不阻断浏览；所有命令按钮置灰写 `Offline`，主行动键写 `Sow · Offline` 一类；抽屉不关、选中项保留 | — |
+| 世界动作（按住连播、收线、收取） | 不锁按钮，走本地投影 + 命令队列；失败时停止连播，作废本地投影，用服务端最新状态重画 | Toast `3 plots not sown · Energy returned` |
+| 去重 · 客户端 | 同一按钮拿到结果前再点，静默忽略；按住连播每次是不同地块，不算重复；网络失败后排在后面的界面命令丢弃，玩家刷新后重新操作 | 不提示 |
+| 去重 · 服务端 | 每条命令带客户端看到的状态版本 `expect_seq`，对不上就拒绝并返回 `stale_state` 与最新状态，不执行 | 不提示，只刷新界面 |
+| 重连之后 | 先刷新状态；已结算的不补动画、不补飘字；在途的界面命令不自动重发（超时那条若服务端已执行，刷新后就能看到结果）；世界动作队列里还没发出的继续发，已发出未确认的不重发 | `Back online` |
+| 优先级 | SYS-UPDATE > SYS-MAINT > SYS-SESSION > SYS-LOADING > SYS-OFFLINE > SYS-CMD-FAIL > Toast | |
 
 ---
 
@@ -4974,11 +5096,11 @@ Row Hoe 一次作用于角色面前同一行 3 格，只有可播的格才扣体
 | 主行动键 · Farming | Sow ×1 · 2 Energy / Sow ×3 · 6 Energy / Plant · 6 Energy / Fertilize · Free / Till · Free / Water · Free / Harvest · Free / Pick · 2 Energy / Sow · Pick a seed | 动词 + 体力价 |
 | 主行动键 · 其他 | Cast · 5 Energy / Set Trap · Free / Mine · 2 Energy / Light Torch · Free / Blast · 12 Energy / Blast · Need 12 Energy / Attack / Drink · Free / Enter mine · 2 Energy / Continue run · Free / Floor 2 · 2 Energy / Elevator · Free / Floor 5 · Express · Free / New run · 2 Energy | 矿口键 = 第 1 层层费；楼梯键 = 下一层层费；电梯与 Express 永远 Free |
 | 矿洞次级按钮与面板 | Current run will end · Runs today 1/2 / Entrance · Free / Floor 1 · Free / Floor 2 · Here / Floor 3 · 2 Energy / Floor 4 · Clear Floor 3 first / Floor 2 · −2 Energy / Floor 2 cleared · Elevator stop / Run complete / Run ended at daily reset / Quartz · once a day | 电梯面板行 ≤ 26 字符；飘字 |
-| 置灰原因 | Cast · Creel full / Mine · Bag full / Fishing · No water nearby / Combat · Mine floors 3–5 / Mining · Enter the mine / Mining · No rocks here / Farming · No plots here / Plant · No tree slot / Fertilize · Nothing to feed / Enter mine · No runs left / Mine runs today 2/2 · Resets in 9h 12m（toast）/ Floor 2 · Clear Floor 1 / New run · Clear Floor 2 first | 数字 + 原因 |
+| 置灰原因 | Cast · Creel full / Mine · Bag full / Fishing · No water nearby / Combat · Mine floors 3–5 / Mining · Enter the mine / Mining · No rocks here / Farming · No plots here / Plant · No tree slot / Fertilize · Nothing to feed / Enter mine · No runs left / Mine runs today 2/2 · Resets in 9h 12m（toast）/ Floor 2 · Clear Floor 1 / New run · Clear Floor 2 first | 数字 + 原因；主行动键写整句，径向菜单点灰瓣的气泡去掉行动名前缀（`No water nearby` / `Mine floors 3–5` / `Enter the mine`）（q(62)） |
 | 体力不足 | Sow ×1 · Need 2 Energy / Sow ×3 · 6 Energy needed / You have 4 / Need 2 more · +2 in 5:22 / Sow ×1 now / Eat +40 / Rest +60 / Free to do now / Enter mine · Need 2 Energy / Floor 2 · Need 2 Energy | 四件事卡 |
-| 设施指尖卡 | Tap to cook / Tap to talk / Mei · Tap to talk / Mei · Talking / Tap to shop / Rest · +60 Energy · once a day / Tap to craft / Tap to upgrade / Tap to open / Leave a note | 设施靠点击触发；主行动键不显示设施动词；NPC 一律写 "<名字> · Tap to talk"、点了亮成 Talking，问候卡文案见附录 B.9；`Tap to shop` 只用于无人值守的农场驿站（p(6)） |
+| 设施与 NPC 名字条 | Farmhouse / Workbench / Homestead Stall / Timber Grove / Reed Bank / Timber Grove · Ready in 2h 10m / Clay Bank · Homestead Lv2 / Upgrade Plaque / Homestead Lv1 / Stove 1/1 · Empty / Stove 1/3 · Empty / +60 Energy / Rested today / Mailbox / Warming Cabinet 4/6 / City Specialty / Market Board / Guestbook / Farm / Map / Mei / Ama / Finn / Sigrid / Pip / Old Kai | 视野内约 8 m 的设施挂图标钮（有状态时换 LOCK-11 状态徽标），交互半径内最近的一个展开成名字条：图标 + 名字（+ 至多一条关键事实）；门 = 门图标 + 目的地；NPC 头顶常驻名字条只写名字，最近的一个主色描边、放大 1.1 倍，对话中保持；茶桌等座位只挂 `i-seat` 图标、不写字；主行动键不显示设施动词；问候卡文案见附录 B.9（LOCK-07 / 16 / 17 / 30 v2，q(62)） |
 | 烹饪面板顶栏 | Stove 1/3 · Cooking Lv2 | 灶口占用 + 烹饪等级 |
-| 快捷栏 | Seeds / Bait / Torch / Potion（幽灵格，q(44)）/ Buy at Homestead Stall / Craft at Workbench / Pin / Unpin | 幽灵提示与补货 |
+| 快捷栏 | Seeds / Bait / Torch / Potion（幽灵格，q(44)）/ Buy at Homestead Stall / Craft at Workbench / Pin / Unpin / Release to pin / Release to unpin / Release to remove / Radish Seeds off the bar · Undo / Bar full · Unpin one first（q(61)） | 幽灵提示与补货；放置区与移除（v1.11） |
 | 背包 | Bag 19/25 / Bag almost full · 23/25 / Bag full / Sort · Recent / Value / Name / All / Seeds / Fish / Produce / Dishes / Materials / Tackle / Fish 23 | 抽屉 |
 | 详情卡 | Eat · +40 Energy / Eat · no Energy today / Sell / Sell All · 6 coins / Sell at home / Gift › / Gift · Mutual friends only / Deliver / Pin / Store / At home only / Equip / Lock / Unlock / Sells for 10 · Fish-dex 9/20 / Caught at Willow Pond / Radish Seeds · 2 Energy per plot / XP: 75% · Reduced / XP: None · outleveled | 按钮必带文字 |
 | 满包与仓库 | Harvest 12 of 30 · bag full / Picked 4 of 6 · bag full / No room · free a slot first / Bag full · dish left on the stove / Bag full · Perch ×7 sent to Inbox · 24h / Stored · 12 Timber · 8 Reeds / Take 10 / Take all / At home | 裁剪与入库 |
@@ -5457,7 +5579,7 @@ Row Hoe 一次作用于角色面前同一行 3 格，只有可播的格才扣体
 | 印章 | 落地即盖（地标章或气候带章），**按城市簇发放**，图案取自该城手工地标图标，没有则城市章 + 气候带章；进护照 | 11.9 | 无 |
 | 首访礼 | Trip 3 及以上首访：任一组 Market 柜台赠 2 枚本气候带地区种子（账号 × 簇 1 次） | 让"回家能种一样新东西"成为到达的物证；Trip 1–2 不送（防刷） | 每日计数首访 ≤2 |
 | 体力 | 每簇首访一次性 +10 体力（与"受邀做客到达 +10"同一来源，同一次到达不叠加） | 让"到了"有一口气 | 计数首访 |
-| 据点章 | 每处据点首访一枚 `stamp_outpost` 据点章 / Outpost Stamp，首次进入该据点时自动发放（`Outpost Stamp collected`），不用去盖章台；进护照 Outposts 分页（"Outposts · Shanghai 4/17"），纯收藏。驿站盖章台点击打开护照（`Tap to open passport`），P0 没有护照页时不挂指尖卡（q(27)） | 给大城市的多处据点一个被逛完的小目标 | 不进任何门禁与计数 |
+| 据点章 | 每处据点首访一枚 `stamp_outpost` 据点章 / Outpost Stamp，首次进入该据点时自动发放（`Outpost Stamp collected`），不用去盖章台；进护照 Outposts 分页（"Outposts · Shanghai 4/17"），纯收藏。驿站盖章台点击打开护照（名字条 `Stamp Desk`），P0 没有护照页时不挂图标钮与名字条（q(27)、q(62)） | 给大城市的多处据点一个被逛完的小目标 | 不进任何门禁与计数 |
 
 到达兑现率观测：到达后 10 分钟内发生一次当地钓鱼 / 购买 / 交付 ≥60%；新增观测"到达后首次进入的是集市广场 1 或驿站 1 的比例"，用来验证 ≤800 m 规则是否起作用。
 
@@ -5678,7 +5800,7 @@ Row Hoe 一次作用于角色面前同一行 3 格，只有可播的格才扣体
 | 不需客票的情形 | 客人与主人同城（Trip 1 本来免费）；客人已持该城有效日票 / 第二故乡；按钮显示 "Already free" / "Pass active" |
 | 在途中接受 | 客人正在自费旅行途中接受客票 = 取消本次旅行并全额退款 |
 | 机器人 | 不能发、不能收 |
-| 拒绝原因 | Guest passes used today 2/2 · Resets in 9h 12m / Host isn't home right now / Invite expired / Close Friends only / Not enough Energy |
+| 拒绝原因 | Guest passes used today 2/2 · Resets in 9h 12m / Host isn't home right now / Invite expired / Close Friends only / Need 4 more Energy · +4 in 16m |
 
 ### 12.2.2 为什么是"一半"而不是折扣或全免
 
@@ -5692,9 +5814,9 @@ Row Hoe 一次作用于角色面前同一行 3 格，只有可播的格才扣体
 ### 12.2.3 流程
 
 1. 主人在家城任一房间打开 Friends 面板 → 对一位密友点 **Invite over**，按钮副文 "Guest Pass · they pay 10 Energy · 4 left today"（上海 ↔ 杭州是 Trip 3，客票 = 20 的一半）。
-2. 客人收件箱出现 "Mia invites you to Hangzhou · 10 Energy · 28:40"（倒计时 1 秒节拍）→ **Accept** 弹出与 Travel 相同的确认面板，成本行替换为 "Guest Pass · 10 Energy → 132 left · Host is online" → Fly（样例：Lin 142 体力，q(31)）。
+2. 客人收件箱出现 "Mia invites you to Hangzhou · 10 Energy · 28:40"（倒计时 1 秒节拍）→ **Accept** 弹出与 Travel 相同的确认面板，成本行替换为 "Guest Pass · 10 Energy → 132 left · Host is online" → Fly（样例：Lin 142 体力，q(31)）。确认卡与 MAP-5 是同一张：标题 `Hangzhou, China · 09:12 local · 14 online`、档位行 `Trip 3 · Regional`、成本行左 `Guest Pass · Host is online` 右 `10 Energy → 132 left`、副行 `Guest of Mia · lands at Mia's Farm`、底部 `+10 Energy when you arrive · Return home is always free`、按钮 `Fly` / `Not now`；到达横幅不写 Guest Pass 剩余时间，停留计时在位置芯片第三段 `Day Pass 24h`（帮工时写 `Helping`，q(46)）。
 3. 接受瞬间重新校验主人在场、双方日上限、客人体力；原子扣体力、签发 24 小时客票。
-4. 飞行动画、公里数滚动、盖章（首访）或 "Welcome back"，落在主人所在的房间；到达回复入账（132 → 142）。不弹卡，只有横幅 "Welcome to Hangzhou · Guest of Mia · +10 Energy" 与世界内标记：留言板指尖卡 `Leave a note`、主人未浇格高亮 `Water 3 plots for Mia · Free`（q(22)）。
+4. 飞行动画、公里数滚动、盖章（首访）或 "Welcome back"，落在主人所在的房间；到达回复入账（132 → 142）。不弹卡，只有横幅 "Welcome to Hangzhou · Guest of Mia · +10 Energy" 与世界内标记：留言板名字条 `Guestbook`、主人未浇格高亮 `Water 3 plots for Mia · Free`（q(22)、q(62)）。
 
 ---
 
@@ -5806,6 +5928,21 @@ Row Hoe 一次作用于角色面前同一行 3 格，只有可播的格才扣体
 | 对方收到 | 收件箱 Updates 一行 `inbox_thanks`：`Mia said thanks · Herb Grilled Fish` / `Mia said thanks · 9 plots watered` / `Mia said thanks · Harvest Together` |
 | 规则 | 0 体力、0 奖励；**不计入**密友互动（12.1.3，赠礼本身已计）；每件事每人只能谢 1 次；演示机器人不收不发（12.8） |
 | 不做 | 贴纸；回赠入口 `Send one back`（以后可作为 `Say thanks` 之后的第二步再加） |
+
+### 12.5.2 P0 收件箱与信箱（阶段 4 输入，SGODOT-234，q(50)）
+
+| 项 | P0 规则 | 文案 |
+|---|---|---|
+| 三个 Tab | 照 LOCK-14 保留 `To do / Parcels / Updates` 三个，不因 P0 没有社交而删 Tab；默认页签按 q(22)：有待办开 To do，否则有包裹（含待发）开 Parcels，否则 Updates | `To do` / `Parcels` / `Updates` |
+| To do | P0 没有来源（客票、帮工邀请、密友确认都属 P2），显示空态 | `No invites right now` |
+| Parcels · 来源 | 满包时的被动获得：升级礼里放不下的物品、居民赠餐（满包时）、系统补偿；P0 没有首访礼与图鉴物品奖励 | 行：物品格 + 名字 + 来源 + 倒计时 + `Claim`，如 `Worm Bait ×3 · Level-up gift · 23h 40m left` |
+| Parcels · 排序与排队 | 按剩余时间升序；8 件满时新的排队待发，只在规则行显示数量（10.4.8，q(45)、q(46)） | 页顶 `Bag 19/25 · 6 slots free`；规则行 `Parcels 3/8 · Kept 24h · Claim needs a free slot`（满时 `Parcels 8/8 · 2 more waiting · …`）；`Claim all · 2 slots` / `Make room · 1 slot`；空态 `No parcels` |
+| Updates · 来源 | 系统消息：Homestead 升级、包裹到期的结果（折现 / 消失 / 退回）；P0 没有留言、来访、帮工小结、感谢、印章 | `Homestead Lv 2 · Max Energy 210` / `Parcel expired · +18 coins` / `Neighbor's parcels are full · gift returned`（P2）；空态 `No updates yet` |
+| Updates · 排序与已读 | 按时间倒序；Tab 只显示未读小点；打开 Updates 即全部已读 | — |
+| 铃铛角标 | = 未读 Updates + 待操作的 To do + 可领的 Parcels；**待发的不计** | 数字 |
+| 农舍信箱（占位：红色邮筒） | 农舍旁的设施，点击触发（LOCK-07）：离得远自动走过去，走到即打开**同一个收件箱面板**（不是第二个容器）；有可领包裹时头顶挂 `Parcel` 小牌（STATE-ICONS） | 名字条 `Mailbox`；可领时小牌 `Parcel`（q(62)） |
+| 不在家 | 铃铛照常可用；信箱只在家（农场与农舍室内）可点 | — |
+| 操作 | 全部 0 体力；Claim 走命令生命周期（10.7.1）；领到的物品 ItemFly 飞向 Bag 格 | — |
 
 ---
 
@@ -5947,7 +6084,7 @@ Row Hoe 一次作用于角色面前同一行 3 格，只有可播的格才扣体
 4. **去向只有五类**：Homestead 升级（九级合计木 150 / 石 140 / 芦苇 80 / 铜 75 / 黏土 50 / 石英 22 / 硬木 28 / 岩盐 15 + 11,300 金币，配额表以农场等级章 8.2.1 为准、13.5 只做材料侧校验）、设施与工具（工作台）、背包扩容（第 10 章）、长途票（硬木 2 + 石英 2 / 张，第 11 章）、料理调味（岩盐、野香草）。前六级由金币与芦苇 / 木材卡节奏，Lv7–10 由铜 / 石英 / 硬木卡节奏——这三样是重度（走 B 局、每天采 2–3 次）与休闲（A 局、每天采 1 次）之间的天然差距，上界约 2 倍。
 5. **公平性由来源保证**：全部材料来自自家农场的采集点与自家矿口（每个农场都有，不依赖任何城市 POI 或据点），所以撒哈拉腹地与上海的玩家到 Homestead Lv10 的材料天数完全相同。
 6. **矿洞 3–5 层是 P1 内容，1–2 层就是全部主循环需要的**：3–4 层只是多一点石英与一点怪物掉落（铜 / 盐 / 蚯蚓 / 石英），没有 1–2 层拿不到的独占材料；电梯直达第 5 层的 Express 精英局（账号级解锁：曾清过第 4 层一次）**0 体力**、占一局日局数；它不成为漏洞靠的是**第 5 层精英每日只掉一次石英**（当日第 2 次击败只掉铜矿石 / 岩盐 / 蚯蚓），所以 0 体力的精英局一天最多带回 0.4 石英，不到一局 A（0.9）的一半。
-7. **矿洞里的操作是两种行动：Mining 与 Combat。** 进矿后切换键自动预选 Mining，主行动键写 `Mine · 2 Energy`；镐是装备（Tools & Gear 的 Mining 槽：Starter Pickaxe · 1 Stone per rock → Copper Pickaxe · 2 Stone per rock），不占背包也不占快捷栏；Mining 快捷栏只放火把与炸药。Combat 只在 3–5 层可选（1–2 层切换键里置灰写 `Combat · Mine floors 3–5`），主行动键变 `Attack`（0 体力），伤害只看 Combat 槽里的武器（默认木剑 Wooden Sword · Attack 3），Combat 快捷栏只放药水。镐不参与战斗，武器不敲石头（§13.3.8）。
+7. **矿洞里的操作是两种行动：Mining 与 Combat。** 进矿后切换键自动预选 Mining，主行动键写 `Mine · 2 Energy`；镐是装备（Tools & Gear 的 Mining 槽：Starter Pickaxe · 1 Stone per rock → Copper Pickaxe · 2 Stone per rock），不占背包也不占快捷栏；Mining 快捷栏只放火把与炸药。Combat 只在 3–5 层可选（1–2 层径向菜单里 Combat 瓣置灰加锁，点它气泡写 `Mine floors 3–5`，q(62)），主行动键变 `Attack`（0 体力），伤害只看 Combat 槽里的武器（默认木剑 Wooden Sword · Attack 3），Combat 快捷栏只放药水。镐不参与战斗，武器不敲石头（§13.3.8）。
 
 ---
 
@@ -6024,8 +6161,8 @@ Row Hoe 一次作用于角色面前同一行 3 格，只有可播的格才扣体
 | 体力 | 采集 0 体力；每个采集点一次点击收完，0.9 秒节拍只作防脚本 |
 | 再生 | 每个采集点各自计时，采完起 8 小时再生；没有固定重置时刻；一天最多 3 次（0:00 采、8:00 采、16:00 采） |
 | 采集手套 | 每个采集点每次 +1 件（木 7 / 石 5 / 芦苇 4 / 香草 3 / 黏土 3 / 硬木 2）；效果句 `Gather Gloves · +1 at every gathering spot`（q(45)） |
-| 入库 | 采到的材料直接进农场仓库，不占背包；芦苇滩附带的蚯蚓是鱼饵，进背包（先叠已有的堆），放不下随芦苇进仓库——采集是主动劳动，不拒绝、不进包裹（q(44)） |
-| 标记 | 可采的采集点上方有 "Ready" 角标；农场 HUD 的 Today 面板第二行可出现 "Timber Grove ready in 2h 10m" |
+| 入库 | 采到的材料直接进农场仓库，不占背包；芦苇滩附带的蚯蚓是鱼饵，进背包（先叠已有的堆），放不下随芦苇进仓库——采集是主动劳动，不拒绝、不进包裹（q(44)）；香草丛的野香草在 Homestead Lv1 进背包（调味料跟人走）；飘字按去向：进仓库 `+6 Timber · Stored`，进背包 `+2 Worm Bait`，溢出进仓库也写 `· Stored`（q(46)） |
+| 标记 | 可采的采集点上方有 "Ready" 角标；农场 HUD 的 Today 面板第二行可出现 "Timber Grove · Ready in 2h 10m"；视野内约 8 m 挂图标钮，走近 ≤ 3 m 时最近的一处展开名字条 `Timber Grove`（其他采集点写名字，如 `Reed Bank`）/ 没好 `Timber Grove · Ready in 2h 10m` / 未开 `Clay Bank · Homestead Lv2`（q(46)、q(62)） |
 | 帮工 | 帮工不能替主人采集（采集 0 体力、0 XP，交给别人没有意义，且会让帮工变成材料搬运工） |
 | 金币出口 | 材料不上摊；只能在农场驿站按回收地板价卖，账号级日额度 30 金币 / 日（第 9 章） |
 
@@ -6046,7 +6183,7 @@ Row Hoe 一次作用于角色面前同一行 3 格，只有可播的格才扣体
 | 楼梯口 | 本层清完后楼梯口亮起，走近时主行动键 `Floor N+1 · 2 Energy`（= 下一层层费）；体力 < 2 → 琥珀 `Floor N+1 · Need 2 Energy`；第 5 层没有楼梯口 | Floor 2 · 2 Energy / Floor 2 · Need 2 Energy |
 | 电梯 | **电梯本身全程 0 体力**：每层楼梯口旁一部，走近 `Elevator · Free` 打开楼层面板（叠在场景上的小卡，行文案 ≤ 26 字符）；入口与本局任一已付费层之间任意往返 0；到下一个未付费层按该层层费 2（与楼梯同价、同样要求上一层清完）；更深的未付费层灰显 | Elevator · Free / Entrance · Free / Floor 1 · Free / Floor 3 · 2 Energy / Floor 2 · Here |
 | Express 直达第 5 层 | 账号级解锁条件不变：曾清过第 4 层一次。解锁后矿口与所有电梯面板都多一行 `Floor 5 · Express · Free`——**整程 0 体力，不收第 5 层层费**（它是账号级奖励）；从矿口直达 = 开新局（日局数 +1）、从局内直达不计新局；它的闸是石英日限（见"怪物"行） | Floor 5 · Express · Free |
-| 行动 | 进矿后切换键自动预选 **Mining**；3–5 层可切 **Combat**，1–2 层 Combat 置灰并写原因（§13.3.8） | Mining / Combat · Mine floors 3–5 |
+| 行动 | 进矿后切换键自动预选 **Mining**；3–5 层可切 **Combat**，1–2 层 Combat 瓣置灰加锁，点了才弹原因气泡（§13.3.8，q(62)） | Mining / Combat / 气泡 Mine floors 3–5（q(62)） |
 | 主行动键 | Mining 时 `Mine · 2 Energy`（左上角徽标 = 当前镐）；Combat 时 `Attack`（0 体力，徽标 = 当前武器）；快捷栏选中火把 / 炸药 / 药水时分别变 `Light Torch · Free` / `Blast · 12 Energy` / `Drink · Free` | Mine · 2 Energy / Attack |
 | 岩石 | **每块 2 体力**，敲碎时扣：走近岩石按主行动键（岩石不响应点击，见 10.2.2）；体力 < 2 时主行动键变琥珀写 `Mine · Need 2 Energy`，按下弹四件事卡 | Mine · 2 Energy / Mine · Need 2 Energy |
 | 镐 | 装备于 Tools & Gear 的 Mining 槽：Starter Pickaxe 每块 1 石料 → Copper Pickaxe 每块 2 石料；不占背包、不占快捷栏；镐不参与战斗 | Starter Pickaxe · 1 Stone per rock / Copper Pickaxe · 2 Stone per rock |
@@ -6078,7 +6215,7 @@ Row Hoe 一次作用于角色面前同一行 3 格，只有可播的格才扣体
 | 5 | 精英场 | 2（Express 到达 0） | 0 | 0 | **58**（= C 局）/ Express 局 **0** | 精英史莱姆 1 | 击败即局终 | P1 内容 |
 | 电梯 | 入口与本局任一已付费层之间任意往返 **0**；到下一个未付费层按层费 2（需上一层清完）；曾清过第 4 层一次后账号级解锁 `Floor 5 · Express · Free`（0 体力直达，不收第 5 层层费） | 0 | — | — | — | — | — | 精英局（D 局） |
 
-每层"层费 + 敲岩"恒为 14，但各层影子金币逐层递增（13.3.6），所以每点体力的产出越往下越高——层费本身就在把人往下推。一局 = 从第 1 层（或 Express 直达第 5 层）开始，到离矿后重开、当日 04:00 日切或打完精英为止；任何时候可以离矿，未敲完的岩石与未打的怪保留在这一局里，直到日切。Combat 行动只在 3–5 层可选：1–2 层没有怪，切换键的径向菜单里 Combat 置灰写 `Combat · Mine floors 3–5`；进入第 3 层时不自动切行动，玩家仍在 Mining，想打怪才切 Combat（怪可不打）。
+每层"层费 + 敲岩"恒为 14，但各层影子金币逐层递增（13.3.6），所以每点体力的产出越往下越高——层费本身就在把人往下推。一局 = 从第 1 层（或 Express 直达第 5 层）开始，到离矿后重开、当日 04:00 日切或打完精英为止；任何时候可以离矿，未敲完的岩石与未打的怪保留在这一局里，直到日切。Combat 行动只在 3–5 层可选：1–2 层没有怪，切换键的径向菜单里 Combat 瓣置灰加锁，点它环心气泡写 `Mine floors 3–5`（q(62)）；进入第 3 层时不自动切行动，玩家仍在 Mining，想打怪才切 Combat（怪可不打）。
 
 ### 13.3.3 分层岩石掉落表
 
@@ -6091,7 +6228,7 @@ Row Hoe 一次作用于角色面前同一行 3 格，只有可播的格才扣体
 | 3 | 35 | 20 | — | 15 | 30 | 2.1 / 1.2 / 0 / 0.9 |
 | 4 | 35 | 15 | — | 20 | 30 | 2.1 / 0.9 / 0 / 1.2 |
 
-1 层给盐，让第一局就能拿到调味；黏土只在 1 层、石英从 2 层起，让"走到 2 层"有理由而不必下到怪物层；3–4 层只是多一点石英，不给 1–2 层拿不到的东西。**P0**（q(43)）：P0 不做石英，第 2 层的石英 15 暂并入「无」（铜 30 / 盐 20 / 无 50）；是否改为并入岩盐（铜 30 / 盐 35 / 无 35——盐是 P0 首周瓶颈，并入后不留盐的玩家首周到 Homestead Lv2 从 0% 升到 70%，见 14.6.2）待用户拍板（q(43) 旋钮 A）；P1 恢复上表。
+1 层给盐，让第一局就能拿到调味；黏土只在 1 层、石英从 2 层起，让"走到 2 层"有理由而不必下到怪物层；3–4 层只是多一点石英，不给 1–2 层拿不到的东西。**P0**（q(43)、q(47)）：P0 不做石英，第 2 层的石英 15 **并入岩盐**（铜 30 / 盐 35 / 无 35；用户 2026-10-08 拍板）——盐是 P0 首周瓶颈，并入后每局 A 的盐约 2.7 → 3.6，不留盐的玩家首周到 Homestead Lv2 从 0% 升到 70%（见 14.6.2）；P1 第 4 步（矿洞 3–5 层与石英）恢复上表，第 1–3 步用不到石英，仍按 P0 并入岩盐（q(59)）。
 
 ### 13.3.4 怪物与掉落
 
@@ -6155,7 +6292,7 @@ A 局每点体力 ≈ 1.2 金币，比上一稿的 ≈ 1.0 高两成，这是一
 
 ### 13.3.8 矿洞里的两种行动：装备、快捷栏与主行动键
 
-矿洞沿用全游戏同一套操作：左手浮动摇杆走位，右下主行动键做事，主行动键正上方的切换键扇出四种行动。矿洞里只有 Mining 与 Combat 两种可用，Farming / Fishing 置灰写 `No field here` / `No water nearby`。
+矿洞沿用全游戏同一套操作：左手浮动摇杆走位，右下主行动键做事，主行动键正上方的切换键在屏幕中央弹出四瓣行动环（q(62)）。矿洞里只有 Mining 与 Combat 两种可用，Farming / Fishing 瓣置灰加锁，点了气泡写 `No field here` / `No water nearby`（q(62)）。
 
 | 行动 | 可用楼层 | 主行动键 | 装备（Tools & Gear 槽） | 快捷栏消耗品 | 体力 |
 |---|---|---|---|---|---|
@@ -6316,7 +6453,7 @@ A 局每点体力 ≈ 1.2 金币，比上一稿的 ≈ 1.0 高两成，这是一
 | 设施与工具 | 木 / 石 / 芦苇 / 铜 | 本章 13.1.3 | 硬木 / 石英 / 黏土不进设施配方 |
 | 背包扩容 I / II / III | 芦苇 10 + 木 6；硬木 4 + 黏土 6 + 铜 4；硬木 8 + 石英 4 + 铜 8 | 第 10 章 | 与升级争硬木时"可买不必买" |
 | 长途票 Long-haul Ticket | 硬木 2 + 石英 2 / 张（+ 许可 + 150 金币） | 第 11 章 | 重度玩家约每两周 1–2 张；累计为其预留硬木 8 / 石英 8 |
-| 料理调味 | 岩盐、野香草 | 第 7 章 | 调味架（Homestead Lv2）各存 30 份不占背包 |
+| 料理调味 | 岩盐、野香草 | 第 7 章 | Homestead Lv1 随身；Lv2（调味架）起入仓库、灶台直接取用（q(46)） |
 | 鱼饵 / 肥料 | 蚯蚓、亮片、堆肥、果木肥 | 第 6 / 5 章 | 不改体力单价 |
 | 矿洞消耗品 | 火把（木 1 + 芦苇 1 → 2）、炸药（铜 1 + 芦苇 1 → 1）；治疗药水只在驿站买 | 本章 13.1.2 / 13.3.8 | 只给信息或省时间，不改体力单价、不加产量；用量小（每日 ≤ 2 局），不进 13.5.3 的材料账 |
 
@@ -6463,14 +6600,14 @@ A 局每点体力 ≈ 1.2 金币，比上一稿的 ≈ 1.0 高两成，这是一
 | 累计时间 | 玩家做什么 | 体力（行末） | Fishing XP | 首次看见的 UI 与英文文案 | 世界内标记（引导） | 可停点 / 下一项好奇心 |
 |---|---|---|---|---|---|---|
 | **0–3 分钟** | 选城（IP 预填，选城不受迷雾影响）→ 建农场 → 落地在首畦旁（20 格已翻地）→ 教学卡一句 → 快捷栏第 1 格 Radish Seeds 已选中 → 左手按下场景区召出摇杆走到畦头 → 右手按住主行动键 "Sow ×1 · 2 Energy" 沿畦边走边播 20 格（−40，每格飘 "−2"）→ 松手，再按住 "Water · Free" 走一遍浇水（0） | 200 → **160** | 0 | 体力卡 "⚡ 160/200 · +1 in 2:40"；教学卡 "Pick a seed, walk up to a plot and press Sow. Hold to keep sowing."；主行动键 "Sow ×1 · 2 Energy"（锄头徽标）→ 走过已播格时动词自动变 "Water · Free"；每格冒苗、每格飘 "−2 Energy"；位置芯片 "Shanghai · Homestead ›"；Today 三行：Catch 2 Pond Crucian · Reed Pond / Cook it: Grilled Crucian / Radishes ready in 3h 58m | 脚前可播格浅绿高亮；驿站板上方金色 "!"；Today 第一行带 "Show on map" | "Crops are growing" 不是停点：Today 第一行指向鱼塘 |
-| **3–5 分钟** | 点农场驿站棚（棚和委托板是同一物件：棚上挂委托板的 "!"，指尖卡仍是 "Tap to shop"，离得远自动走过去；徽标来自委托板时抽屉停在 Stall Board 页，q(44)）→ 接 "Pond Catch · 2 Pond Crucian · 14 coins"（回收地板 2 × 2 + 完成奖 10）→ Track | 160 | 0 | 委托卡 "2 Pond Crucian · any pond · 14 coins · Deliver here"；矿口与工作台在农场原位可见（走近矿口时主行动键显示 "Enter mine · 2 Energy"；工作台靠点击，指尖卡 "Tap to craft"），不弹 | 接单后驿站板 "!" 消失，地图上 Reed Pond 图钉出现金色 "!" | 可先去看田；Today 第一行高亮 |
+| **3–5 分钟** | 点农场驿站棚（棚和委托板是同一物件：棚上挂委托板的 "!"，名字条仍是 "Homestead Stall"，离得远自动走过去；徽标来自委托板时抽屉停在 Stall Board 页，q(44)、q(62)）→ 接 "Pond Catch · 2 Pond Crucian · 14 coins"（回收地板 2 × 2 + 完成奖 10）→ Track | 160 | 0 | 委托卡 "2 Pond Crucian · any pond · 14 coins · Deliver here"；矿口与工作台在农场原位可见（走近矿口时主行动键显示 "Enter mine · 2 Energy"；工作台靠点击，名字条 "Workbench"，q(62)），不弹 | 接单后驿站板 "!" 消失，地图上 Reed Pond 图钉出现金色 "!" | 可先去看田；Today 第一行高亮 |
 | **5–9 分钟** | 点位置芯片 "Shanghai · Homestead ›" 进地图：家城全彩、其他城市灰度但地名可见 → 最近的新手塘图钉 "Reed Pond · Beginner pond · 0.8 km" → 点开塘卡 → **Go**（同城 Trip 1 免费，不弹 Travel 面板）→ 进钓点，岸边若有其他玩家持竿可见 | **161** | 0 | 塘卡 "Pond · best for Lv1–3 · Pond Crucian OK · 2 regional fish ?"（剪影）；进塘自动预选 Fishing：主行动键变 "Cast · 5 Energy"（鱼竿徽标），快捷栏翻面为 Fishing 候选、空栏第 1 格是幽灵格 "Bait"（q(44)）；位置芯片 "Shanghai · Reed Pond"；其下 "Creel 0 · 24 free"；教学卡 "Your creel is your bag: 10 fish per free slot." | 塘图钉 "!"；进塘后主行动键 "Cast · 5 Energy" 脉动一次 | 别的城市是灰的但看得见名字——"那里有什么"第一次出现，不解释 |
-| **9–14 分钟** | 三竿：走到岸边 → 按主行动键 Cast → 咬钩（**钉 1：前 3 次咬钩 = 池塘鲫鱼**）→ 提竿 → 收线小游戏 → "Caught! Pond Crucian"；若错过提竿窗口：退 5（Lv1–3 前 10 次全退） | 161 → 156 → 151 → **146** | 第 1 条：首竿 10 + 首提 10 + 首城 10 + 首钓 15 + 钓获 5 = **50**；第 2、3 条各 +5 → **60** | 教学卡 "Casting uses 5 Energy"（一次；体力价常驻键面 "Cast · 5 Energy"）；"Bite!"；"Caught! Pond Crucian · Common"；"First catch! +15 XP" "New city! +10 XP"；技能条 "Fishing 60/70 · Lv 2 in 10 XP · about 2 casts"；Fish-dex 1/20（其余剪影标 Lv 2 / Lv 4 / Lv 7 / Lv 9）；失败时 "It got away · Energy refunded (9 left today)" | 第 2 条落袋时 Today 第一行打勾、第二行高亮 "Cook it"；农场门口 "Go home · Free" | 第一次"体力掉了 15"被看见；鱼篓 3 |
-| **14–16 分钟** | Go home（免费）→ 驿站交 2 条鲫鱼 → 进农舍（位置芯片 `Shanghai · Farmhouse`）→ 点灶台角的灶口 → 烹饪面板停在 Cookbook 页 → Grilled Crucian 一行按 **Cook**（鲫鱼 ×1 自动扣）→ 第 2.5 秒火候环点锅 → 出锅 → **Eat** | 146 → +6 回复 → 151 → **176** | 60（Cooking 15） | "Request complete · +14 coins"（钱包 194）；厨房无快捷栏，底部只有 Bag；灶口指尖卡 "Tap to cook" 脉动；面板顶栏 "Stove 1/1 · Cooking Lv1 · Empty"；Cookbook 页 Grilled Crucian 详情卡 "Grilled Crucian · Common · +20 Energy · 5 s" 的 Cook 按钮亮、Radish Salad 页灰显 "Need Radish ×1"；锅上悬浮鲫鱼虚影；教学 "Tap Cook to grill your first fish" → "Tap when the needle hits gold!"（首次金区 50%）；出锅 "Grilled Crucian ★ Good" + "First cooked! +15 Cooking XP · Cookbook 1/48"（首做 10 + 本锅 4 × Good 1.25）；Eat → "+25 Energy · Meals today 25/300"（Good）；**教学时刻（≤ 3 秒，只此一次）**："Energy comes back over time. A meal brings it back now." | 农舍门 "!"（背包里有可入菜的鱼且 Today 有 Cook 行时出现）；Today 第二行打勾 | **硬指标二在第 16 分钟闭合**：条从 151 跳到 176 |
-| **16–18 分钟** | Today 新行 "Sow 10 Lettuce · 20 Energy" → 出农舍回到田里（自动预选 Farming，快捷栏展开）：点选生菜种子格 → 走到空格前按住 "Sow ×1 · 2 Energy" 连播 10 格 | **156** | 60（15） | 回到田里时通知软提示 `Get a ping when your radishes are ready?` · `Allow` / `Not now`（选 Allow 才弹系统框，只此一次，q(17)）；快捷栏生菜格 0.6 秒闪一次；主行动键 "Sow ×1 · 2 Energy"；每格飘 "−2 Energy"，累计小字 "−20"；Today "Lettuce ready in 7h 58m" | 快捷栏生菜格闪（解锁即上栏）；脚前可播格高亮 | 闭环第二圈：吃回来的体力立刻种下去；没有新教学卡——与第 2 分钟同一个动作 |
+| **9–14 分钟** | 三竿：走到岸边 → 按主行动键 Cast → 咬钩（**钉 1：前 3 次咬钩 = 池塘鲫鱼**）→ 提竿 → 收线小游戏 → "Caught! Pond Crucian"；若错过提竿窗口：退 5（Lv1–3 前 10 次全退） | 161 → 156 → 151 → **146** | 第 1 条：首竿 10 + 首提 10 + 首城 10 + 首钓 15 + 钓获 5 = **50**；第 2、3 条各 +5 → **60** | 教学卡 "Casting uses 5 Energy"（一次；体力价常驻键面 "Cast · 5 Energy"）；"Bite!"；"Caught! Pond Crucian · Common"；"First catch! +15 XP" "New city! +10 XP"；技能条 "Fishing 60/70 · Lv 2 in 10 XP · about 2 casts"；Fish-dex 1/20（其余剪影标 Lv 2 / Lv 4 / Lv 7 / Lv 9）；失败时 "It got away · Energy refunded (9 left today)" | 第 2 条落袋时 Today 第一行变成 "Deliver 2 Pond Crucian · Stall"（高亮，不打勾；交付后才打勾，q(58)）；农场门口 "Go home · Free" | 第一次"体力掉了 15"被看见；鱼篓 3 |
+| **14–16 分钟** | Go home（免费）→ 驿站交 2 条鲫鱼 → 进农舍（位置芯片 `Shanghai · Farmhouse`）→ 点灶台角的灶口 → 烹饪面板停在 Cookbook 页 → Grilled Crucian 一行按 **Cook**（鲫鱼 ×1 自动扣）→ 第 2.5 秒火候环点锅 → 出锅 → **Eat** | 146 → +6 回复 → 151 → **176** | 60（Cooking 15） | "Request complete · +14 coins"（钱包 194）；厨房无快捷栏，底部只有 Bag；灶口图标钮展开成名字条 "Stove 1/1 · Empty" 并脉动一次（q(62)）；面板顶栏 "Stove 1/1 · Cooking Lv1 · Empty"；Cookbook 页 Grilled Crucian 详情卡 "Grilled Crucian · Common · +20 Energy · 5 s" 的 Cook 按钮亮、Radish Salad 页灰显 "Need Radish ×1"；锅上悬浮鲫鱼虚影；教学 "Tap Cook to grill your first fish" → "Tap when the needle hits gold!"（首次金区 50%）；出锅 "Grilled Crucian ★ Good" + "First cooked · +10 Cooking XP · Cookbook 1/48" + 飘字 "+5 Cooking XP ★"（首做 10 在奖励条，本锅 4 × Good 1.25 照常飘字）；Eat → "+25 Energy · Meals today 25/300"（Good）；**教学时刻（≤ 3 秒，只此一次）**："Energy comes back over time. A meal brings it back now." | 农舍门 "!"（背包里有可入菜的鱼且 Today 有 Cook 行时出现）；Today 第二行打勾 | **硬指标二在第 16 分钟闭合**：条从 151 跳到 176 |
+| **16–18 分钟** | Today 新行 "Sow 10 Lettuce · 20 Energy" → 出农舍回到田里（自动预选 Farming，快捷栏展开）：点选生菜种子格 → 走到空格前按住 "Sow ×1 · 2 Energy" 连播 10 格 → 按住 "Water · Free" 走一遍（0 体力；浇完水才开始长，q(48)） | **156** | 60（15） | 回到田里时通知软提示 `Get a ping when your radishes are ready?` · `Allow` / `Not now`（选 Allow 才弹系统框，只此一次，q(17)）；快捷栏生菜格 0.6 秒闪一次；主行动键 "Sow ×1 · 2 Energy"；每格飘 "−2 Energy"，累计小字 "−20"；Today "Lettuce ready in 7h 58m"（浇完水后出现） | 快捷栏生菜格闪（解锁即上栏）；脚前可播格高亮 | 闭环第二圈：吃回来的体力立刻种下去；没有新教学卡——与第 2 分钟同一个动作 |
 | **18–22 分钟** | 回塘（位置芯片进地图 → Go，免费）→ 第 4 竿（**钉 2：第 4 次咬钩 = Fine 鱼**；Lv1 → 收线 1.5–3 秒后挣脱）→ 第 5、6 竿正常权重，Common 落袋 → XP ≥ 70 → **Fishing Lv2** | 156 → 156（挣脱全退）→ 151 → 146 → +2 → 148 → **198/200** | 挣脱 0；第 5 条 +5（若是鲤鱼首钓 +20）；第 6 条 +5 → **70–85 → Lv2** | 挣脱卡（四件事同屏）："Fine fish got away · Fishing Lv 2 needed · 10 XP to go · about 2 casts · Fine fish stay hooked · Energy refunded" + Fish-dex 剪影描边点亮；**升级横幅（全幅 ≤ 3 秒）**："Fishing Lv 2 · Fine fish now stay on the hook · +50 Energy" + "Level-up gift: 3 Worm Bait · 3 Wild Herb · Recipe: Herb Grilled Fish" + 教学句 "Levels unlock gear, fish and seeds. Basics never lock."；Cookbook 页 Herb Grilled Fish 由 Hidden 变 Tasted；HUD "198/200" | 技能页进度环点亮；快捷栏第 2 格 Worm Bait 闪一次 | **硬指标三前半：门打开**；若第 5 竿是鲤鱼则第 5 竿到 Lv2 |
 | **22–25 分钟** | 点快捷栏 Worm Bait 设为当前饵 → 第 7 竿（**钉 3：Lv2 后首次挂饵咬钩 = Fine 全球鱼**）→ 咬钩更快 → 收线 → "Caught! River Perch · Fine" | 193 → +20（首次 Fine 鱼）→ **213/200 · bonus** | +10 + 首钓 30 → **110–125** | "Worm Bait ×2 left · faster bites"；"First catch! +30 XP"；"First Fine fish! +20 Energy"；HUD "213/200 · bonus"；Fish-dex 3/20；Today 第三行 "Cook: Herb Grilled Fish · new recipe" | 农舍门 "!" | **硬指标三后半：门用过一次** |
-| **25–28 分钟** | Go home → 进农舍 → 点灶台 → Cookbook 页多了一页 "Herb Grilled Fish · Fine · +40 Energy · 15 s"（角标 Tasted，来自配方卡）→ 按 **Cook**（第 5 / 6 竿的 Common 鱼 ×1 + 野香草 ×1 自动扣）→ 第 9 秒点锅 → 出锅绿色微光 → Eat 置灰 "Energy full · eat later"（奖励区） → **Keep** | 213 | Fishing 不变 **110–125**；Cooking +30（首做 Fine 20 + 本锅 8 × 1.25）→ 45 ≥ 30 → **Cooking Lv2** | Recipes 行上的族图标 水 + 味；"New recipe! Herb Grilled Fish · +30 Cooking XP · Cookbook 2/48"；**第二次升级横幅（小横幅 1.5 秒）**"Cooking Lv 2 · Recipe: Fresh Fish Soup"，出锅面板多出 "Cook Again" 按钮，Cookbook 页多一页 Fresh Fish Soup（Tasted，灰显 "Need Radish ×1"）；按钮 "Energy full"（灰）/ Keep / Gift；背包 Dishes 页第一件 "Herb Grilled Fish ★ Good · +45 Energy" | — | 玩家在 25 分钟内见过 Common → Fine 的档差；一份 +45 的菜留给明天；第三条技能轨 Cooking 第一次露面 |
+| **25–28 分钟** | Go home → 进农舍 → 点灶台 → Cookbook 页多了一页 "Herb Grilled Fish · Fine · +40 Energy · 15 s"（角标 Tasted，来自配方卡）→ 按 **Cook**（第 5 / 6 竿的 Common 鱼 ×1 + 野香草 ×1 自动扣）→ 第 9 秒点锅 → 出锅绿色微光 → Eat 置灰 "Energy full · eat later"（奖励区） → **Keep** | 213 | Fishing 不变 **110–125**；Cooking +30（首做 Fine 20 + 本锅 8 × 1.25）→ 45 ≥ 30 → **Cooking Lv2** | Recipes 行上的族图标 水 + 味；"New recipe!" + "First cooked · +20 Cooking XP · Cookbook 2/48" + 飘字 "+10 Cooking XP ★"；**第二次升级横幅（小横幅 1.5 秒，出锅卡关掉后）**"Cooking Lv 2 · Recipe: Fresh Fish Soup"，Cook Again 从此可用（收走这锅后再点灶台才出现，q(48)），Cookbook 页多一页 Fresh Fish Soup（Tasted，灰显 "Need Radish ×1"）；按钮 "Energy full"（灰）/ Keep / Gift；背包 Dishes 页第一件 "Herb Grilled Fish ★ Good · +45 Energy" | — | 玩家在 25 分钟内见过 Common → Fine 的档差；一份 +45 的菜留给明天；第三条技能轨 Cooking 第一次露面 |
 | **28–30 分钟** | 看 Today、体力卡、个人页（技能环 / 图鉴 / 护照）、Fish-dex、护照封面 → 结束 | **213/200** | 110–125（Lv2，Lv3 还差 95–110）；Cooking 45（Lv2） | 体力卡 "⚡ 213/200 · bonus"；头像外圈蓝半圈（Fishing Lv2）；Today："Radishes ready in 3h 32m · Farming Lv 2 at first harvest" / "Lettuce ready in 7h 46m" / "Fresh Fish Soup · when radishes are ready"；技能页三张卡 "Fishing Lv2 · 115/220 · Next Lv3 · Reed Rod, Regional fish" / "Farming Lv1 · 0/50" / "Cooking Lv2 · 45/100 · Next Lv3 · Double Clue"；护照封面家城章 | — | 结束钩子 = 3.5 小时后小萝卜可收 → 首收当场 Farming Lv2 → 5 枚胡萝卜种子升级礼 + 驿站货架新种子；不是体力耗尽 |
 | **30–45 分钟，可选** | 继续钓（Lv2 可收 Fine）/ 回家卖鱼（点驿站棚 → 驿站抽屉 → 背包详情卡 Sell）/ 看地图剪影卡（最近 3 城 "Trip 1 · Free"）/ 走到矿口看一眼（主行动键 "Enter mine · 2 Energy"，不推）/ 布置 | ≈ 180–200 | ≈ 160–190 | 剪影卡字段（第 11 章）；摊位 "Sell" | 没有新标记 | 不承诺鱼 + 布置足以支撑所有玩家 45 分钟；第二次会话由 4 小时作物拉回 |
 
@@ -6540,15 +6677,15 @@ Farming：首会话 0 XP；田里锁着 20 × 2 + 10 × 2 = 60，首收奖励 10
 | 播完 | 下一步去哪 | 驿站板金色 "!"；Today 三行 | Catch 2 Pond Crucian · Reed Pond | 不弹"去钓鱼"对话框 |
 | 接单后 | 鱼塘在哪、地图怎么进 | 位置芯片 "Shanghai · Homestead ›"；地图鱼塘图钉金色 "!"；Today 第一行 "Show on map"（只移动相机并高亮 2 秒） | Reed Pond · 0.8 km · Go | 不自动飞过去 |
 | 进塘 | 怎么抛竿 | 主行动键自动变 "Cast · 5 Energy" 并脉动一次；教学卡一句话 | Casting uses 5 Energy | 不画手指动画循环 |
-| 鱼篓有 2 条 | 该回家了 | Today 第一行打勾、第二行高亮；农舍门 "!"（条件：背包有可入菜的鱼） | Cook it: Grilled Crucian | 不弹"回家做菜吧" |
-| 进厨房 | 怎么做菜 | 灶口上方指尖卡 "Tap to cook" 脉动；面板 Cookbook 页 Grilled Crucian 行的 Cook 按钮亮；教学一行 | Tap Cook to grill your first fish | 不自动打开面板、不自动投料 |
+| 鱼篓有 2 条 | 该回家交单、做菜 | Today 第一行改成交付行（不打勾，Show 只移动相机到驿站棚；人不在农场时是 Show on map，指向 home pin），交付完成才打勾；鱼被吃掉、不够 2 条时退回 Catch 行（按委托状态，不按事件）。Today 只高亮第一条没完成的行；先做菜也不拦。农舍门 "!"（条件：背包有可入菜的鱼）（q(58)） | Deliver 2 Pond Crucian · Stall / Cook it: Grilled Crucian | 不弹"回家做菜吧" |
+| 进厨房 | 怎么做菜 | 灶口图标钮展开成名字条 "Stove 1/1 · Empty" 并脉动一次（q(62)）；面板 Cookbook 页 Grilled Crucian 行的 Cook 按钮亮；教学一行 | Tap Cook to grill your first fish | 不自动打开面板、不自动投料 |
 | 吃完 | 体力回来了可以再种 | Today 新行；快捷栏生菜格闪一次；可播格高亮 | Sow 10 Lettuce · 20 Energy | 不自动打开田 |
 | 挣脱 | 为什么没钓到、差多少 | 挣脱卡四件事 + 图鉴剪影 | Fine fish got away · Fishing Lv 2 needed · 10 XP to go · about 2 casts | 不写孤立的 Locked |
 | 升级 | 门开了、马上能用 | 升级横幅 + 快捷栏 Worm Bait 闪一次 | Level-up gift: 3 Worm Bait | 不弹第二个面板 |
 | 钓到河鲈 | 新配方可以做了 | Today 第三行；农舍门 "!" | Cook: Herb Grilled Fish · new recipe | — |
 | 结束 | 下次为什么回来 | Today 倒计时三行；HUD | Radishes ready in 3h 32m / Farming Lv 2 at your first harvest | 不写 "Out of energy"、不推送"体力已满" |
 
-可见但不推的入口：农场里的矿口与工作台（原位；走近矿口时主行动键才显示 "Enter mine · 2 Energy"，工作台点了才开，指尖卡 "Tap to craft"）、家一套各据点（地图上灰 ◆ 标 "New for you" 要到 第 2 天之后才亮）、其他城市（灰度剪影卡）、收件箱铃铛（无角标）、Friends（空列表）。
+可见但不推的入口：农场里的矿口与工作台（原位；走近矿口时主行动键才显示 "Enter mine · 2 Energy"，工作台点了才开，名字条 "Workbench"，q(62)）、家一套各据点（地图上灰 ◆ 标 "New for you" 要到 第 2 天之后才亮）、其他城市（灰度剪影卡）、收件箱铃铛（无角标）、Friends（空列表）。
 
 ---
 
@@ -6634,12 +6771,15 @@ Farming：首会话 0 XP；田里锁着 20 × 2 + 10 × 2 = 60，首收奖励 10
 - **账本过关**：目标玩家七日 1,389，比本表少 3%；把第 1 天按本表口径（首会话 + 5 竿）对齐后为 1,276，少 11%，逐日 −19% 至 −2%，仍在 ±20% 内；0 次撞墙。5 分钟玩家日均 100（§14.7 为 90–100）；30 分钟（34 竿 + 130 画像）日均 243，比 §14.7 的约 300 少 19%；重度日均 497，比 §14.7 少 26%——P0 没有 3–5 层、旅行与每日茶，重度第 5 天已看完 P0 内容，**不对表**。
 - **30 格够用**：首周的主约束是种子钱，不是田块。给 40 格 Farming XP 只多 1%、总体力 1,390；首周播种因钱停 100 次、因田满停 73 次（30 种子 × 7 天），给 40 格后因田满停归零、因钱停升到 165。重度玩家 40 格 Farming +15%，但他第 5 天已看完 P0 内容。P0 不扩田。
 - **材料链是硬依赖**：没有采集点与矿洞 1–2 层时，首周做不出任何 3 槽菜（P0 的 3 页 3 槽页都要岩盐）、Homestead 停在 Lv1、Cooking 382（Lv4）。
-- **Homestead Lv2 在第 5 天的前提**：玩家把 3 份岩盐留给升级（模拟器的厨房只用下一级所需之外的盐）。不留盐、见到盐菜就做的玩家，首周到 Lv2 为 0%，Cooking +22%、Cookbook 13 页。第 3 天的盐烤鱼仪式与第 5 天的升级在首周互相抢盐，见 13.3.3 的 P0 注。
+- **Homestead Lv2 在第 5 天的前提**：玩家把 3 份岩盐留给升级（模拟器的厨房只用下一级所需之外的盐）。不留盐、见到盐菜就做的玩家，首周到 Lv2 为 0%，Cooking +22%、Cookbook 13 页。第 3 天的盐烤鱼仪式与第 5 天的升级在首周互相抢盐；第 2 层石英并入岩盐后（13.3.3，q(47)）每局 A 的盐约 2.7 → 3.6，不留盐的玩家首周到 Lv2 升到 70%。
 - **比本表慢**：Cooking −35%、Fishing −12% 来自 P0 收窄——同一画像跑全量内容 + 40 格为 Cooking 710、Fishing 1,217（Pond / River）。Farming −24% 与 P0 无关：全量也只有 580；差距来自本表的种子钱口径（§14.6.1 每日 50–90，§5.9 与模拟器约 3 金币 / 播种体力，即每日 160–280），P1 不会自动补回。节点日期多数只晚 0–1 天；Cooking Lv5 第 7 天、Lv6 第 11 天（30 分钟第 10 天），首周只有重度到 Lv6。不改数值。
 - **第 2 周**（14 天复跑）：目标玩家 Homestead Lv3 第 10.2 天、Cooking Lv6 第 10.8 天，第 14 天三轨 Lv6–7；14 页料理全部做过。
-- **正餐前用池**：30 分钟单会话玩家第 1 周中位 37%、第 2 周 51%，都低于 60–80%。原因不是新手祝福——单会话玩家每天进场都是满条，关掉祝福结果不变——而是晚饭前的体力只花在种田与矿洞：首周种植被种子钱卡到日均 68、第 2 周 97；30 格 × 均价约 3 + 矿洞 28 ≈ 118 ≈ 池的 59%，P0 结构上到不了 60%。第 15 章全量的 P30C 也只有 52%（按 P30 的 59% 判过）。P0 是否以此项为出口门槛见 §17.2.2。
+- **正餐前用池**：30 分钟单会话玩家第 1 周中位 37%、第 2 周 51%，都低于 60–80%。原因不是新手祝福——单会话玩家每天进场都是满条，关掉祝福结果不变——而是晚饭前的体力只花在种田与矿洞：首周种植被种子钱卡到日均 68、第 2 周 97；30 格 × 均价约 3 + 矿洞 28 ≈ 118 ≈ 池的 59%，P0 结构上到不了 60%。第 15 章全量的 P30C 也只有 52%（按 P30 的 59% 判过）。P0 不以此项为出口门槛，P1 扩田后复核（§17.2.2，q(47)）。
 - **Fish-dex**：P0 最多 7 种，本表第 7 天的 Fish-dex 10 / 20（+30 体力）在 P0 达不到。模拟里玩家到 Fishing Lv4 后改去 River、不回 Pond，金锦鲤（只在 Pond）几乎钓不到，所以 Fish-dex 停在 6；回 Pond 补钓则 7 / 7、Fishing +26。Old Kai 的委托要的 Rare 鱼在 P0 只有金锦鲤。
 - **模拟口径**：玩家升级前不再预留 2.5 天种子钱（第 15 章模拟器 = 种植预算 × 2.5 = 275），目标玩家与 30 分钟玩家改为 60、5 分钟 30、重度 120——升级面板只显示 250 + 40 地板，真实玩家不会算种子钱。敏感性：预留 0 时 Lv2 第 4 天、首道 3 槽菜推到第 7 天；30–120 时两者都在第 5 天；200 时一半人第 7 天前到；275 时 7%。代价：升级次日少种约 30%（第 6 天 175 / 220）。
+- **旋钮 A 之后**（q(47)）：上表按第 2 层石英并入「无」跑出；改为并入岩盐后（评审复跑，30 个种子）七日体力 1,382 → 1,391、Cooking 438 → 484、30 分钟玩家首周到 Homestead Lv2 67% → 77%、5 分钟玩家首周做出 3 槽菜 80% → 97%，其余结论不变。
+- **真实规则回放**（V2，蒙恬，farm-dev 含 #27 旋钮 A 与 #28 满包入口，q(48)）：目标玩家七日 1,497（本节复跑 1,389，+8%）、Farming 570 / Fishing 1,096 / Cooking 441、Homestead Lv2 第 3.3 天、Cooking Lv5 第 6.7 天、Cookbook 10.3 页、钱包约 426、0 次撞墙；120 人里首周没升 Lv2 的：留盐 0、不留盐 1。差别主要来自卖鱼：农场驿站全价、不限量收鱼（体力是唯一阀门），本节复跑没算卖鱼。P0 不加收鱼限额、不折价，试玩观察「钱多、没东西买」。Lv2 提前到第 3–4 天，第 5 天由首道 3 槽菜接上，七日节奏表不改；七日走查 Lv2 落在第 3–5 天都算通过。
+- **可复跑的经济基线 D**（q(54)）：`p0_v1.py --v2 --seeds 30` 在复跑里加上旋钮 A 与 V2 机器人的买卖打法（每种鱼留 2 条、作物留 3 个，其余卖给驿站；每天只补到 10 条蚯蚓），结果存 `out_7d_v2align.md`：目标玩家七日 1,435、Farming 601 / Fishing 986 / Cooking 468、Homestead Lv2 第 3.0 天、钱包约 495、Cookbook 11.1 页、0 次撞墙——与 V2 真实规则回放（1,497 / 570 / 1,096 / 441 / 第 3.3 天 / 约 426 / 10.3 页）相差在 ±16% 内，钱包偏高 16%、Fishing 偏低 10%。A / B / C 的输出不变。P1 调经济时以 D 为起点复跑。
 
 ---
 
@@ -6697,6 +6837,8 @@ Farming：首会话 0 XP；田里锁着 20 × 2 + 10 × 2 = 60，首收奖励 10
 | 第 2 天三问 | 回来是因为什么？看到升级礼（胡萝卜种子）时想到什么？现在的目标是什么？ |
 | 第 4 天三问 | 去了哪座城、为什么选它？那座城有什么是家里没有的（地区鱼 / 印章任一）？会再去吗？ |
 | 第 7 天三问 | 这周有谁帮过你 / 你帮过谁（或为什么没有）？护照周页上最想要的下一个目标是哪一个？下周还玩吗、为什么？ |
+| **P0 回访三问**（q(53)，替代上面问旅行与社交的版本） | 第 2 天：今天回来是因为什么？昨天收到的升级礼（蚯蚓、胡萝卜种子）用了吗、用在哪？现在的目标是什么？第 4 天（先把体力设为约 80，见下）：这几天哪件事让你觉得"今天不一样"？打算用第 3 个投料槽做什么？体力只剩这么多，晚饭前怎么安排？第 7 天：这周在农场里升级了什么、下一个最想要的是什么？有没有想做却做不了的事（钱、盐、背包、等级）？下周还玩吗、为什么？ |
+| **P0 观察安排**（q(53)） | 第 1 天首会话后加一段 ≥ 40 分钟的连续钓鱼（只说"想钓就继续钓"，不提体力），观察体力见底、体力卡与 `Free to do now`；第 4 天回访前由工程把该玩家体力设为约 80（F1）；每次会话后按账号取首会话报告与日志摘要（F2）。观察员手册：`docs/qa/p0-playtest-observer-kit-2026-10-08.md` |
 | 产出 | 一张"看不懂 / 做不了 / 不想做"热图（按首会话分钟与七日天数），每格标修法指向（文案 / 入口 / 规则 / 数值）；作为 P0 出口的修订输入，不作开工门槛 |
 
 ### 14.8.3 可复现脚本（测试账号，测试时钟可缩放）
@@ -6714,7 +6856,7 @@ Farming：首会话 0 XP；田里锁着 20 × 2 + 10 × 2 = 60，首收奖励 10
 9. 回塘第 4 竿（Lv1）→ 必为 Fine 鱼 → 挣脱 → 退 5、Fish-dex 剪影 +1、挣脱卡四字段齐全。
 10. 第 5、6 竿 → XP ≥ 70 → Lv2；+50 体力到 198；蚯蚓 ×3、野香草 ×3、配方卡入包；Cookbook 页 Herb Grilled Fish 变 Tasted。
 11. 挂蚯蚓第 7 竿 → 咬钩等待缩短、必为 Fine 鱼 → 成功 → XP +10 +30；蚯蚓 −1；首次 Fine 鱼 +20 体力 → 213/200 奖励区。
-12. 回家 → 点灶台 → Cookbook 页新页 Herb Grilled Fish（Tasted）一键 Cook → 15 秒、火候第 9 秒 → +30 Cooking XP、Cookbook 2/48 → Cooking 45 ≥ 30 → 小横幅 "Cooking Lv 2 · Recipe: Fresh Fish Soup"、配方卡入包、出锅面板出现 Cook Again；Eat 置灰 "Energy full"；Keep → 背包 Dishes 1；检查点：结束体力 213 ± 5、Fishing 110–125、Cooking 45、技能页三张卡（Fishing Lv2 / Farming Lv1 / Cooking Lv2）、Today 三行更新、未出现任何孤立的 "Locked"。
+12. 回家 → 点灶台 → Cookbook 页新页 Herb Grilled Fish（Tasted）一键 Cook → 15 秒、火候第 9 秒 → +30 Cooking XP、Cookbook 2/48 → Cooking 45 ≥ 30 → 小横幅 "Cooking Lv 2 · Recipe: Fresh Fish Soup"、配方卡入包、Cook Again 从此可用（收走后再点灶台出现，q(48)）；Eat 置灰 "Energy full"；Keep → 背包 Dishes 1；检查点：结束体力 213 ± 5、Fishing 110–125、Cooking 45、技能页三张卡（Fishing Lv2 / Farming Lv1 / Cooking Lv2）、Today 三行更新、未出现任何孤立的 "Locked"。
 
 七日 7 步（每步跳 1 天并把体力复位到该日目标值）：
 
@@ -7198,7 +7340,7 @@ Lv9 → 10 占总量 28%（650 / 2,350）却占到达时间的 40%（重度第 8
 | 位移 | 浮动虚拟摇杆：在场景区（HUD 下沿到底部控件上沿之间）任意处按下，摇杆就出现在按下点（外圈 260 px、内圈 120 px、半透明），左手拇指推动，抬手消失；不再有"单指拖动平移相机"与"手指划过一行格子连播" | 常态图（图 1）不画摇杆；只有 CTRL-1 与明确标注"按下态"的图才画摇杆 |
 | 相机 | 安全框跟随：屏幕中部一个不可见安全框（约宽 40%、高 45%），角色在框内相机不动，碰到框边才平移，角色停下后 0.6 s 内缓动回中；双指缩放范围"整座岛加一圈边 → 约 3 格田宽"；双击回中到角色；初始取景把"角色 + 当前场景可互动集合"框进中间 60% 高度 | 每张场景图的默认视角必须同时看到角色与可互动物；岛 / 房间可以小，但要留可走动的路与空地 |
 | 行动 | 四种行动 Farming / Fishing / Mining / Combat = 消耗体力、用工具做的事；烹饪、商店、对话、布置是设施交互，不算行动 | 四枚行动图标固定：锄 / 鱼竿 / 镐 / 剑，径向菜单与主行动键共用 |
-| 主行动键 | 右下 176 px 圆：当前行动图标 + 动词 + 体力价 "Sow ×1 · 2 Energy"（Row Hoe 时 "Sow ×3 · 6 Energy"）/ "Cast · 5 Energy" / "Mine · 2 Energy" / "Attack"；靠近设施不变、纯设施空间（厨房 / 柜台）隐藏（设施靠点击触发，设施上方指尖卡）；左上角 56 px 小徽标 = 当前装备的工具；按下执行一次，Farming 可按住连续执行（边走边播）；体力不足变琥珀写 "Sow ×1 · Need 2 Energy"，按下弹四件事卡 | 四个工作场景同一位置、同一尺寸；正上方 96 px 切换键按下从角色扇出四行动径向菜单，做不了的置灰写原因 "Fishing · No water nearby" |
+| 主行动键 | 右下 176 px 圆：当前行动图标 + 动词 + 体力价 "Sow ×1 · 2 Energy"（Row Hoe 时 "Sow ×3 · 6 Energy"）/ "Cast · 5 Energy" / "Mine · 2 Energy" / "Attack"；靠近设施不变、纯设施空间（厨房 / 柜台）隐藏（设施靠点击触发，设施挂图标钮、最近的一个展开名字条，q(62)）；左上角 56 px 小徽标 = 当前装备的工具；按下执行一次，Farming 可按住连续执行（边走边播）；体力不足变琥珀写 "Sow ×1 · Need 2 Energy"，按下弹四件事卡 | 四个工作场景同一位置、同一尺寸；正上方 96 px 切换键按下在屏幕中心弹出四瓣行动环（不围着角色、不画连线、瓣上不写字），做不了的瓣置灰加锁，点了环心气泡写原因 "No water nearby"（q(62)） |
 | 快捷栏 | 固定 5 格 + 右端 Bag（6 个 160 × 160 圆角 32 等距铺满），不随农场等级变化；只放当前行动的可消耗品（Farming 种子 / 肥料；Fishing 鱼饵 / 亮片 / 鱼笼；Mining 火把 / 炸药；Combat 药水），工具不占格；格内只写图标 + 名字 + 数量，不写体力价；无场景芯片；未选行动时收起成一个把手；选中格上抬 12 px 主色描边；空格浅虚线幽灵格，点它开背包对应 Tab | 田 / 水边 / 矿三张场景图快捷栏像素级一致；厨房与据点无快捷栏，底部只有 Bag 与主行动键 |
 | 背包 | 抽屉从底部升到 y = 800（高 1,600）；第一行就是快捷栏（5 格 + ✕）；第二行 "Bag 19/25" + 容量条 + "Sort · Recent / Value / Name"；第三行 Tab All / Seeds / Fish / Produce / Dishes / Materials / Tackle（Tackle 只放渔具消耗品并计容量；装备在抽屉顶部 Bag | Gear 的 Gear 一侧，p(8)）；5 列网格，容量 25，三档扩容各 +5；点格 = 详情卡，长按 = 快速钉住，拖到快捷栏 = 替换该格；鱼篓 Creel = 背包空格数 | 抽屉首行快捷栏与场景内快捷栏同位同尺寸，升起时像"同一条栏被抽屉顶上去" |
 | 工具 | 背包 Gear 页（背包抽屉顶部 Bag | Gear 切换，p(8)）：Equipped 四槽一行动一槽（锄 / 鱼竿 / 镐 / 武器）+ Accessories 两槽 Ring / Charm；角色默认自带四件初级工具；工具不占背包容量；原"行工具"改为 Row Hoe 锄等级，体力仍按格扣（Sow ×3 一次扣 3 格） | 工具只出现在主行动键左上徽标与背包 Gear 页，不出现在快捷栏格里 |
@@ -7250,18 +7392,19 @@ Lv9 → 10 占总量 28%（650 / 2,350）却占到达时间的 40%（重度第 8
 | 材料进度格 Need Tile（**凡材料 / 数量进度一律用它**） | 圆形图标外套环形进度，下面一行「名字 已有/需要」（已有数字加粗、/需要灰）；环 = 已有 ÷ 需要、满了封顶；三档：L 156 px · 环 12 · 字 25（面板，一行 4）/ M 112 · 环 9 · 字 22（卡片里的配方，一行 5）/ S 72 · 环 6 · 字 19（列表行、提示卡，一行 6+）；以上为 1080 画布，360 竖屏基准为环 L 64 / M 48 / S 36、字 12 / 12 / 11，成组用换行布局（横 10 / 纵 12）（q(8)）；齐了满绿环，差的琥珀环 + 琥珀数字，多了照实写（5/4）；用量与收集计数（Meals 100/300、图鉴 12/20）用 count 态：绿色部分弧、数字不变色（q(7)）；顺序 材料 → 金币 → 其他计数（技能和、印章）；**金币格分母 = 价格 + 40 钱包地板**（`Coins 830/440`），点格来源写 `Wallet floor · keep 40 coins`，格与按钮的缺口一致（q(10)）；用于 HOME-1、FARM-5 工作台蓝图、NPC-7 旅行证件配方及以后一切制作 / 升级 / 条件 | 2026-10-04 夜用户："之后只要是材料的进度，全部都用这种形式"，已写进 Figma 组件约定（Section 00 · NEED-TILE）；只写数字，不常驻来源与提示句，不打勾、不用红；来源点格才弹（一句 + Show，只引导）；缺口写在按钮上；等级类门禁（Homestead Lv4）不是格，只写在按钮上；不再用横向进度条、芯片列表或 "you have N" |
 | 数字写法 x/y | 带条或环的 x/y = 已用（已有）/ 总数（额度条、材料进度格）；不带条的事实行写剩余 `N left today`；带名词的 `Stock 8/10` 照旧（q(10)） | 同一屏不出现两种读法 |
 | 右上常驻卡 | 只剩登机牌：旅途中在位置芯片下方挂 "In transit · Tokyo · 7:42"；外城日票不再单独出卡，并入位置芯片尾部 "Day Pass 7h"；二者同时时登机牌在上、芯片照常 | 1 秒节拍 |
-| 快捷栏 Quick Bar | 底部固定 5 格 + 右端 Bag（6 个 160 × 160 圆角 32，等距铺满宽度），不随农场等级变化；只放当前行动的可消耗品（Farming 种子 / 肥料；Fishing 鱼饵 / 亮片 / 鱼笼；Mining 火把 / 炸药；Combat 药水），工具不占格；格内只写图标 + 物品名 + 数量（"Radish Seeds ×24"），不写体力价；无场景芯片；空格为浅虚线幽灵格，点它打开背包对应 Tab；未选行动时整条收起成一枚居中把手（可点区 ≥ 96 px） | 选中格上抬 12 px 主色描边，其余格压暗 15%；进场景按该行动候选表自动填充（已选中 → 上次用过 → 数量最多 → 最近获得），长按钉住（每个行动各记各的），拖格互换，上滑整条开背包；厨房等纯设施空间没有快捷栏，只有 Bag 与主行动键；详见第 10 章 |
-| 主行动键 Action Button | 右下 176 px 圆，底边与快捷栏对齐；显示当前行动图标 + 动词 + 体力价："Sow ×1 · 2 Energy"（Row Hoe 时 "Sow ×3 · 6 Energy"）/ "Cast · 5 Energy" / "Mine · 2 Energy" / "Attack"；靠近设施时保持当前行动，纯设施空间隐藏（设施靠点击触发，设施上方指尖卡 "Tap to cook" / "Mei · Tap to talk" / "Rest · +60 Energy"）；左上角 56 px 小徽标显示当前装备的工具 | 按下执行一次；Farming 可按住连续执行（边走边播）；体力不足变琥珀写 "Sow ×1 · Need 2 Energy"，按下弹四件事卡；设施只靠点击触发（点设施，离得远自动走过去）；NPC 一律先问候再 Trade（10.2.2） |
-| 切换键与径向菜单 Action Radial | 96 px 圆，主行动键正上方；按下从角色身上扇出四瓣径向菜单 Farming / Fishing / Mining / Combat（图标 + 名字）；进入明确场景时自动预选对应行动（进水边 → Fishing）；此处做不了的行动置灰并写原因 "Fishing · No water nearby" / "Combat · Mine floors 3–5" | 径向打开时场景标签淡出；选中后快捷栏按该行动候选表重填 |
+| 快捷栏 Quick Bar | 底部固定 5 格 + 右端 Bag（6 个 160 × 160 圆角 32，等距铺满宽度），不随农场等级变化；只放当前行动的可消耗品（Farming 种子 / 肥料；Fishing 鱼饵 / 亮片 / 鱼笼；Mining 火把 / 炸药；Combat 药水），工具不占格；格内只写图标 + 物品名 + 数量（"Radish Seeds ×24"），不写体力价；无场景芯片；空格为浅虚线幽灵格，点它打开背包对应 Tab；未选行动时整条收起成一枚居中把手（可点区 ≥ 96 px） | 选中格上抬 12 px 主色描边，其余格压暗 15%；进场景按该行动候选表自动填充（已选中 → 上次用过 → 数量最多 → 最近获得），长按浮起后拖进 Pin / Unpin 或 Remove 放置区钉住、取消或移除（v1.11，每个行动各记各的），松在另一格只互换，上滑整条开背包；厨房等纯设施空间没有快捷栏，只有 Bag 与主行动键；详见第 10 章 |
+| 主行动键 Action Button | 右下 176 px 圆，底边与快捷栏对齐；显示当前行动图标 + 动词 + 体力价："Sow ×1 · 2 Energy"（Row Hoe 时 "Sow ×3 · 6 Energy"）/ "Cast · 5 Energy" / "Mine · 2 Energy" / "Attack"；靠近设施时保持当前行动，纯设施空间隐藏（设施靠点击触发：设施挂图标钮，最近的一个展开名字条 "Stove 1/1 · Empty" / "+60 Energy"，NPC 头顶名字条 "Mei"，q(62)）；左上角 56 px 小徽标显示当前装备的工具 | 按下执行一次；Farming 可按住连续执行（边走边播）；体力不足变琥珀写 "Sow ×1 · Need 2 Energy"，按下弹四件事卡；设施只靠点击触发（点设施，离得远自动走过去）；NPC 一律先问候再 Trade（10.2.2） |
+| 切换键与径向菜单 Action Radial | 96 px 圆，主行动键正上方；按下以屏幕中心为圆心弹出四瓣环 Farming → Fishing → Mining → Combat（顺时针 −135° / −45° / 45° / 135°，360 × 800 下半径 88、圆心 180, 400），瓣上只有图标、不写字：当前行动主色实心瓣 72（白图标 + 3 px 白描边），可选米色瓣 64 + 彩色图标，不可用米色瓣 64 + 图标 35 % + 锁角标；进入明确场景时自动预选对应行动（进水边 → Fishing）（q(62)） | 四瓣从屏幕中心顺时针依次弹出（每瓣 180 ms ease-out-back、间隔 40 ms，约 300 ms），收起 120 ms；永远在屏内，不镜像、不贴边滑动，不画到角色的连线；点不可用瓣：该瓣抖一下，环心出单行原因气泡（Caption 12，小尾巴指向该瓣）"No water nearby" / "Mine floors 3–5"，1.5 s 淡出，菜单不收；径向打开时场景标签淡出；选中后快捷栏按该行动候选表重填（q(62)） |
 | 浮动摇杆与相机 Joystick & Camera | 场景区任意处按下即在按下点出现摇杆（外圈 260 px、内圈 120 px、半透明），抬手消失；相机安全框约宽 40%、高 45%，角色碰框边才平移，停下后 0.6 s 回中；双指缩放"整座岛加一圈边 → 约 3 格田宽"；双击回中 | 不画常驻摇杆；生图里摇杆只出现在 CTRL-1 与标注"按下态"的图 |
 | Gear 页 | 背包抽屉 `Bag | Gear` 的 Gear 一侧：Equipped 一行六槽（Farming 锄 / Fishing 鱼竿 / Mining 镐 / Combat 武器 / Ring / Charm），点槽 → 下方只列该槽已拥有的装备（Equipped / Equip / 灰显门槛与来源），每件一句效果 "Starter Hoe · Sows 1 plot per action" / "Row Hoe · Sows 3 plots per action" | 唯一入口是背包抽屉；工具不占背包容量；装备切换后主行动键徽标与文案同步；没有 Outfit（外观在个人页 Edit look） |
-| 按钮 | 胶囊形，高 112 px，必带文字；主按钮填充主色、次按钮描边；禁用态 60% 灰且**文字写明原因**（"Need 40 more coins"） | 不做纯图标按钮（HUD 固定位的头像、Inbox 圆钮、Bag、切换键四枚除外） |
+| 按钮 | 胶囊形，高 112 px，必带文字；主按钮填充主色、次按钮描边；禁用态 60% 灰且**文字写明原因**（"Need 40 more coins"） | 不做纯图标按钮（HUD 固定位的头像、Inbox 圆钮、Bag、切换键四枚除外；世界里的设施图标钮、座位图标与径向菜单四瓣也除外，q(62)） |
 | 卡片四件事 | 任何门禁 / 不足都用一张卡四行：要什么 / 有什么 / 差多少与多久 / 现在能做什么 | 禁止孤立的 "Locked" / "Not enough" |
 | 稀有度色点 | 直径 28 px 圆点在格子左上：Common 灰绿 #9DB89A / Fine 蓝 #6FA8DC / Rare 紫 #A98BD6 / Legendary 金 #E3B341 | 鱼与料理共用；作物无稀有度 |
 | 反馈提示 Toast | 非模态、不吃输入；Success / Info / Error 三档（不设琥珀档）；可带一个只引导的动作（`Open bag ›` / `Show ›`，不跳转）；时长 2 秒 + 每 20 字符 0.5 秒、最长 5 秒，点一下提前关闭；同时只显示一条，1 秒内相同文案合并 ×2；需要玩家确认的反馈不用 Toast | **位置**：场景里贴快捷栏上沿、主行动键左侧，不遮主行动键、快捷栏与恢复入口；抽屉里放在固定操作区上方（2026-10-07 WP2 拍板，q(16)） |
 | 状态徽标系统（农场 / 地图统一） | 圆形奶油底 #FBF8F1 + 1px 暖灰描边 #8A8070（奶油描边在 diorama 上会消失）、无投影；56 px 挂在场景物件上方（长椅 / 灶台 / 驿站 / 信箱 / 矿口 / 田格），72 px 在 NPC 头顶，56 px 作地图 pin 右上角标。14 种状态：Available 可用（绿 #6CBF73 环 + 功能图标）/ Ready 可收取（绿填充 + 白对勾）/ Countdown 倒计时（外圈主色进度弧 + 时钟，下方胶囊 "1h 12m" 或 "0:22"）/ Cooling 冷却中（灰 + 时钟 + "back in 1h 12m"）/ Used today 今日已用（灰 + 灰对勾）/ Locked 锁定（灰 + 小锁 + "Farming Lv4"）/ Insufficient 不足（琥珀 #E3B341 + ⚡ + "Need 2 Energy"）/ Full 已满（琥珀 + 容器 + "Creel full"）/ New 新内容（青 #4FB8C9 ◆）/ Request 可接委托（金 !）/ Deliverable 可交付（绿 ✓ 环）/ Event 活动（紫 ★）/ Gift 可赠礼（淡红 ♥，NPC 头顶）/ Blocked 不可用（红 #E07A5F ✕，闪 1.5 s 后复原）；Request 的变体：奶油底 + 金环 + 金 ? = 已接委托进行中；驿站角标 Sell 12 = 金底 + 金币图形 + 胶囊 | 同一物件只显示一个状态徽标，取最高优先级：Ready > Blocked > Insufficient / Full > Countdown > Cooling > Locked > Done > Available；点徽标 = 点物件；徽标不替代四件事卡（不足 / 锁定点开仍弹卡）；倒计时一律 "m:ss" 或 "h m"；地图同屏 ≤5 个角标，优先级 Deliverable > Request > New > Event > Locked。样式表见界面清单 STATE-ICONS（2026-10-04 用户要求统一） |
 | 地图标记 | 据点 / 鱼塘 / 农场上方 56 px 徽标：绿 ✓ 环（可交付）/ 金 !（可接委托）/ 青 ◆（新内容）/ 紫 ★（事件）/ 灰 🔒（锁定）；据点 pin 下挂在线数小字 "Lotus Tea House · 3 online"（城市级缩放同类聚合 "Tea House ×6"）；城市气泡右上数字角标（折叠数）；**真实 POI 图标只亮灯、不挂任何标记**（运营活动期服务端可临时点亮紫 ★），点击只弹只读名片 | 同屏 ≤ 5 个，按可交付 > 可接 > 新内容 > 事件排序 |
 | NPC 头顶气泡 | 直径 72 px：黄 !（新委托 / 新对话）/ 黄 ?（等你交付）/ 淡红 ♥（可赠礼） | 对话后消失 |
+| 设施图标钮与名字条 | 视野内约 8 m 的可交互设施挂图标钮：28 px 白圆 + 22 px 设施图标；设施有状态时改挂状态徽标（见上「状态徽标系统」，状态优先）；交互半径内最近的一个朝角色面朝的一侧展开成名字条：设施图标 + 名字（+ 至多一条关键事实），160 ms 展开、离开半径收回，贴屏幕边向内翻；同时只展开一个（据点室内也一样）；门 = 门图标 + 目的地；可交互 NPC 头顶常驻名字条只写名字，最近的一个主色描边 + 放大 1.1 倍，对话中保持，不可交互的 NPC 不挂；茶桌等座位只挂 `i-seat` 图标，走近放大高亮 | 点图标钮、名字条或物件本身都触发；不写点按引导语、不画手指；样例 `Stove 1/1 · Empty` / `Workbench` / `+60 Energy` / `Mei`（LOCK-07 / 16 / 17 / 30 v2，q(62)） |
 | 农场角标 | 田 / 灶 / 鱼笼上 "Ready"；驿站上 "Sell 12" | 收取后消失 |
 | 迷雾 | 全球半透明灰层（#B9BDC4 60%）按已探索城市半径挖圆孔，孔边 48 px 羽化；未探索城的图标灰色剪影 | 地名、气泡、在线人数、朋友头像画在迷雾之上 |
 | 倒计时 | 全部 "m:ss" 或 "h m"：成熟、灶口、旅途、日票、茶馆、Rest、矿洞局数重置 | 不显示"几点" |
@@ -7354,7 +7497,7 @@ flowchart LR
 
 | 编号 | 界面英文名 | 中文 | 所属功能 | 图 1 画什么 | 图 2 画什么 | 必须出现的控件与英文文案 | 关键手势与反馈 | 从哪来 / 到哪去 |
 |---|---|---|---|---|---|---|---|---|
-| MAP-1 | Map Browse | 地图浏览 | 旅行 · 迷雾 | 以家城为中心的城市级视图：真实地图瓦片做成粉彩低对比底图，家城全彩，周边 3–4 座城灰层覆盖；家城内有 2 个鱼塘 pin、各类据点 pin（茶馆 / 渔具铺 / 集市广场 / 驿站各自图标，带在线数小字，如 "Lotus Tea House · 3 online"；城市级缩放同类聚合）、农场家徽 pin、2 个朋友头像；真实 POI 图标全彩亮灯但不挂任何标记；城市气泡带名字与在线人数；顶部 HUD 两行（第二行位置芯片保持玩家所在 "Shanghai · Homestead"，地图里点它 = 回所在场景）；快捷栏收起成把手、主行动键与切换键隐藏，底部只剩 Bag 按钮；右下 "Nearby Cities" 入口 | 国家级缩放：十几座城的气泡（名字 + 在线数），其中 3 座全彩、1 座带家徽角标（第二故乡）、其余灰；一个紫 ★ 事件标记与一个 "4 more in this city" 数字角标 | "Shanghai · 14 online" 气泡；"Reed Pond · Beginner pond · 0.8 km" pin 文案；"Pudong Market Square · 3 online" pin 文案；"Nearby Cities" 按钮；"Unexplored" 灰城标签；HUD 体力卡 "142/200 · +1 in 2:41"；Today 芯片；位置芯片 "Shanghai · Homestead"；画面里没有 "Map" 按钮 | 双指缩放 / 单指拖动 = 浏览地图（0 成本，自动切城只改相机；地图页没有摇杆）；点鱼塘 / 据点 pin 弹卡；点 POI 图标只弹名片；点灰城弹剪影卡；缩放到国家级时气泡聚合 | 来自任何场景第二行位置芯片 ›（Map 按钮已删除）、走出农场大门、任何场景的 "Go home"；去 Pond（Go）、Outpost 据点（Go）、剪影卡 / 城市卡（MAP-3）、Travel 确认（MAP-5）、Nearby 列表（MAP-8）；Passport 改从头像面板进入 |
+| MAP-1 | Map Browse | 地图浏览 | 旅行 · 迷雾 | 以家城为中心的城市级视图：真实地图瓦片做成粉彩低对比底图，家城全彩，周边 3–4 座城灰层覆盖；家城内有 2 个鱼塘 pin、各类据点 pin（茶馆 / 渔具铺 / 集市广场 / 驿站各自图标，带在线数小字，如 "Lotus Tea House · 3 online"；城市级缩放同类聚合）、农场家徽 pin、2 个朋友头像；真实 POI 图标全彩亮灯但不挂任何标记；城市气泡带名字与在线人数；顶部 HUD 两行（第二行位置芯片保持玩家所在 "Shanghai · Homestead"，地图里点它 = 回所在场景）；快捷栏收起成把手、主行动键与切换键隐藏，底部只剩 Bag 按钮；右下 "Nearby Cities" 入口 | 国家级缩放：十几座城的气泡（名字 + 在线数），其中 3 座全彩、1 座带家徽角标（第二故乡）、其余灰；一个紫 ★ 事件标记与一个 "4 more in this city" 数字角标 | "Shanghai · 14 online" 气泡；"Reed Pond · Beginner pond · 0.8 km" pin 文案；"Xuhui Market Square · 3 online" pin 文案；"Nearby Cities" 按钮；"Unexplored" 灰城标签；HUD 体力卡 "142/200 · +1 in 2:41"；Today 芯片；位置芯片 "Shanghai · Homestead"；画面里没有 "Map" 按钮 | 双指缩放 / 单指拖动 = 浏览地图（0 成本，自动切城只改相机；地图页没有摇杆）；点鱼塘 / 据点 pin 弹卡；点 POI 图标只弹名片；点灰城弹剪影卡；缩放到国家级时气泡聚合 | 来自任何场景第二行位置芯片 ›（Map 按钮已删除）、走出农场大门、任何场景的 "Go home"；去 Pond（Go）、Outpost 据点（Go）、剪影卡 / 城市卡（MAP-3）、Travel 确认（MAP-5）、Nearby 列表（MAP-8）；Passport 改从头像面板进入 |
 | MAP-2 | Fog States | 迷雾三态 | 旅行 · 迷雾 | 三联并排（每联 1/3 屏宽缩放）：同一座城在 Unexplored（灰层 + 灰剪影图标不可点，气泡仍彩色）/ Explored（全彩，鱼塘与据点图标可点、POI 图标亮灯只弹名片，气泡带"已访"角标）/ Second Home（全彩 + 家徽角标 + 气泡描边）三态 | — | 三联底部标签 "Unexplored" / "Explored" / "Second Home"；Unexplored 联上一行 "Explore to visit"；Explored 联角上小字 "POI icons: tap for name card only"；Second Home 联上 "Free travel" | 点 Unexplored 的鱼塘图标 → 直接弹 Travel 确认面板（不进入）；点 Explored 鱼塘 → Go | 常驻于 MAP-1；三态变化由到达仪式（MAP-7）与第二故乡设定（PASS-2）触发 |
 | MAP-3 | City Card & Silhouette Card | 城市卡与剪影卡 | 旅行 | 剪影卡（未探索城 Tokyo）：顶部城市名 + 国旗 + 气候带图标；"1,758 km · Trip 5 · Continental · 40 Energy / 200 coins / Travel Permit · 10 min"；"Stamps 6/5 ✓"；两条地区鱼剪影 "? ? · Fishing Lv 1 / Lv 5"；"3 ponds · 6 outposts · 7 residents"；"Sells Temperate seeds"；"12 open farms · 2 friends here · 14 online · 09:12 local"；空印章槽；底部 "Travel here" | 城市卡（已探索城）：印章已盖、"Visited ×3"、三档进度 "Regular · 2 visits · 1 delivery to go"、"Day Pass active · 7h 12m"、按钮 "Go"（日票期内）与 "Set as Second Home"（置灰写明 "Regular needed"） | 上述全部字段；"Travel here" / "Go" / "Not now" | 点 pin 或气泡弹出；上滑卡片看更多（地区鱼、各据点卖什么、哪些居民在；信息来源 = 该簇的据点与鱼塘数据）；点 "Travel here" → MAP-5 | 来自 MAP-1 / MAP-8 / Today 的 Show on map；去 MAP-5；已探索城 "Go" → 该城概览 |
 | MAP-4 | Markers & Bubbles | 据点与 NPC 标记 | NPC · 委托 · 引导 | 家城地图局部放大："Xuhui Market Square" pin 上方绿 ✓ 环、"Xuhui Tackle Shop" pin 上金 !、"Lotus Tea House" pin 上青 ◆、一口鱼塘上紫 ★（钓鱼大赛）、未探索邻城的据点 pin 上灰 🔒；真实 POI 图标全彩亮灯但不挂任何标记；气泡右上 "4 more in this city"；底部 Today 展开 3 行，每行 "Show on map" | 场景层：集市广场里 3 个 NPC，头顶分别黄 !、黄 ?、淡红 ♥；委托板上数字角标 "3"；农场里田格上 "Ready"、驿站上 "Sell 12"；旁一帧：点一个 POI 图标弹出只读名片 "Nanjing Road · Shopping street"，无按钮、无进入 | 标记图例小字 "Deliver here / Request available / New for you / Event · starts in 1h 40m / Locked"；Today 三行示例 "Deliver 4 Fine fish · Shanghai Market / Radishes ready in 1h 12m / Fishing Lv 4 · 60 XP to go"；POI 名片 "Nanjing Road · Shopping street" | 点标记 → 相机飞到目标并高亮 2 秒，玩家不动；点 Today 行同理；标记不弹窗、不计时消失；点 POI 只弹名片，不进入 | 常驻于 MAP-1 与各场景；不产生跳转（**无任何自动跳转**） |
@@ -7363,19 +7506,19 @@ flowchart LR
 | MAP-7 | Arrival Ritual | 到达仪式 | 旅行 · 成就 | 大圆弧飞行帧：国家级地图上一道弧线从上海到东京，弧上小飞机，屏幕中央大数字 "1,758 km" 滚动，底部档名 "Trip 5 · Continental"，右上 "Skip" | 盖章帧：护照从底部弹出，一枚东京地标章（圆形印章、朱红墨色、城市名文字环；图案取自手工地标图标，按城市簇发放，不依赖任何 POI）正在砸下，墨迹微晕；横幅 "Welcome to Tokyo"；飘字 "+10 Energy"；下方兑现卡 "3 things to do here"：Fish the local pond / Visit the market / Try a regional fish，每行 "Show"；落到城市概览，位置芯片变为 "Tokyo · Arrived · Day Pass 24h" 开始倒计时（q(25)） | 上述全部；再访时只飘字 "Welcome back · Day Pass 24h" | 飞行 3–5 秒可 Skip；盖章 ≤ 1.5 秒；兑现卡 10 秒自动收起，每行 Show 只把相机移到图钉，玩家自己点 Go | 来自 MAP-5 Fly（P2 第一版没有在途；第二版 Trip 3 起来自 MAP-6 Land）；去该城 MAP-1 概览 |
 | MAP-8 | Destination Lists | 目的地四列表 | 旅行 | 全屏列表，顶部四个 Tab "Nearby Cities / Friends & Team / Open Farms / Featured"，当前 Nearby：10 行缩略剪影卡（国旗 · 名字 · "84 km · Trip 2 · 10 Energy / 20 coins" · 门禁物品图标 · 前置状态 · 印章槽），已探索的行带印章 | Friends & Team Tab：每行 PlayerChip，同城 "Ann · Shanghai · online" + "Visit"（同城免费），外城 "Mia · Hangzhou · online" + "Travel · Trip 3"；只是关注的人写家城、不写当前城；Open Farms Tab 顶部 "In Shanghai" 段列本城公开农场（PlayerChip + "Homestead Lv3" + "Visit"），下面是城市列表（q(28)） | 四个 Tab 名；行内 "Trip 2 · Nearby · 10 Energy · 20 coins"；"Return −50%" 标签 | 点行弹 MAP-3；上滑翻页 | 来自 MAP-1 右下入口；去 MAP-3 |
 | POI-1 | Place Card | POI 名片 | 地图 · 社交 | **P2，q(15)。** 地图上点一个可进入类别的 POI：名片 "Lantern Café · Coffee shop" + 类别图标 + 主按钮 "Go in"（同城写 "Free"，外城写旅行档与价）；旁边一张不可进入类别的名片 "Nanjing Road · Shopping street"，没有按钮 | 未探索城的同类 POI：灰剪影，不可点 | "Go in" / "Free" / "Lantern Café · Coffee shop" | Go in 同城直接进入 POI-2，外城弹 MAP-5 Travel；不做自动跳转 | 来自 MAP-1；去 POI-2 / MAP-5 |
-| POI-2 | Place Interior | POI 室内 | 社交 · 氛围 | **P2，q(15)。** 第一批场景之一（如 Coffee Shop）：门头只写 "Coffee Shop"，室内有座位与其他玩家（名牌、表情），没有柜台与 NPC；位置芯片 "Shanghai · Lantern Café"；底部只有 Bag，没有主行动键与快捷栏；座位上方指尖卡 "Sit" | 频道满员后进新频道的提示一行；好友在别的频道时的跟随入口 | "Sit" / "Leave" / "Shanghai · Lantern Café" | 走动、坐下、表情、截图；不卖不收、不接委托、不回体力（LOCK-33） | 来自 POI-1；回地图或所在城 |
+| POI-2 | Place Interior | POI 室内 | 社交 · 氛围 | **P2，q(15)。** 第一批场景之一（如 Coffee Shop）：门头只写 "Coffee Shop"，室内有座位与其他玩家（名牌、表情），没有柜台与 NPC；位置芯片 "Shanghai · Lantern Café"；底部只有 Bag，没有主行动键与快捷栏；座位只挂 `i-seat` 图标，走近放大高亮，不写字（q(62)） | 频道满员后进新频道的提示一行；好友在别的频道时的跟随入口 | "Leave" / "Shanghai · Lantern Café"（座位只有图标，q(62)） | 走动、坐下、表情、截图；不卖不收、不接委托、不回体力（LOCK-33） | 来自 POI-1；回地图或所在城 |
 
 ### B. 农场 Farm
 
 | 编号 | 界面英文名 | 中文 | 所属功能 | 图 1 画什么 | 图 2 画什么 | 必须出现的控件与英文文案 | 关键手势与反馈 | 从哪来 / 到哪去 |
 |---|---|---|---|---|---|---|---|---|
-| FARM-1 | Farm Overview | 农场总览 | 种植 · HUD · 操控 | 一块圆角基座上的农场 diorama：左上农舍（门口 Rest 长椅与 Homestead 门牌 "Homestead Lv2"）、门边农场驿站小棚（角标 "Sell 12"）、信箱、右侧 6 × 8 田格（半数已播、几格 "Ready"）、一棵 2 × 2 苹果树挂果、一座洒水器、远角矿洞入口与 Explore 牌；田格之间留一条可走的土路；玩家 Avatar 站在田边一格空地前；HUD 第一行头像（技能环）+ 体力卡 + 金币 + Inbox 圆钮，第二行 Today 芯片 + 位置芯片 "Shanghai · Homestead ›"（带小房子）；底部 5 格快捷栏（与 BAR-1 同序）：Radish Seeds ×24（选中上抬）/ Compost ×6 / Carrot Seeds ×10 / Pumpkin Seeds ×4 / 空格 + 右端 Bag；右下主行动键 "Sow ×1 · 2 Energy" 左上锄头小徽标，正上方切换键；常态不画摇杆 | 夜景同构图：灶口窗亮、田里成熟作物发微光、Today 芯片显示 "Today · Radishes ready in 0:42 ▾"；用于校验粉彩夜色 | "142/210" / "+1 in 2:41" / "230" / "Today · Radishes ready in 1h 12m ▾" / "Shanghai · Homestead" / "Sell 12" / "Ready" / "Homestead Lv2" / "Radish Seeds ×24" / "Compost ×6" / "Carrot Seeds ×10" / "Tap to pick a seed" / "Sow ×1 · 2 Energy" / "Explore" 牌；画面里没有 "Map" 按钮、没有场景芯片、格内没有体力价 | 场景区按下出现浮动摇杆走动，相机安全框跟随；双指缩放、双击回中；走到田格前按主行动键播种（按住边走边播）；点农舍 / 门牌 / 驿站 / 信箱 / 长椅 = 自动走过去并触发（进厨房 / HOME-1 / FARM-6 / Inbox / Rest）；点位置芯片进地图 | 来自任何场景 "Go home · Free"、登录；去 Map / Kitchen / Mine / 二级面板 |
+| FARM-1 | Farm Overview | 农场总览 | 种植 · HUD · 操控 | 一块圆角基座上的农场 diorama：左上农舍（门口 Rest 长椅与 Homestead 门牌 "Homestead Lv2"）、门边农场驿站小棚（角标 "Sell 12"）、信箱、右侧 6 × 8 田格（半数已播、几格 "Ready"）、一棵 2 × 2 苹果树挂果、一座洒水器、远角矿洞入口与 Explore 牌；田格之间留一条可走的土路；玩家 Avatar 站在田边一格空地前；HUD 第一行头像（技能环）+ 体力卡 + 金币 + Inbox 圆钮，第二行 Today 芯片 + 位置芯片 "Shanghai · Homestead ›"（带小房子）；底部 5 格快捷栏（与 BAR-1 同序）：Radish Seeds ×24（选中上抬）/ Compost ×6 / Carrot Seeds ×10 / Pumpkin Seeds ×4 / 空格 + 右端 Bag；右下主行动键 "Sow ×1 · 2 Energy" 左上锄头小徽标，正上方切换键；常态不画摇杆 | 夜景同构图：灶口窗亮、田里成熟作物发微光、Today 芯片显示 "Today · Radishes ready in 0:42 ▾"；用于校验粉彩夜色 | "142/210" / "+1 in 2:41" / "230" / "Today · Radishes ready in 1h 12m ▾" / "Shanghai · Homestead" / "Sell 12" / "Ready" / "Homestead Lv2" / "Radish Seeds ×24" / "Compost ×6" / "Carrot Seeds ×10" / "Sow ×1 · 2 Energy" / "Explore" 牌；画面里没有 "Map" 按钮、没有场景芯片、格内没有体力价 | 场景区按下出现浮动摇杆走动，相机安全框跟随；双指缩放、双击回中；走到田格前按主行动键播种（按住边走边播）；点农舍 / 门牌 / 驿站 / 信箱 / 长椅 = 自动走过去并触发（进厨房 / HOME-1 / FARM-6 / Inbox / Rest）；点位置芯片进地图 | 来自任何场景 "Go home · Free"、登录；去 Map / Kitchen / Mine / 二级面板 |
 | FARM-2 | Sowing | 播种 | 种植 · 主行动键 | 快捷栏第 1 格 Radish Seeds ×24 选中（上抬 12 px 主色描边）；玩家站在一格翻好的空地前，脚前那一格高亮为浅绿发光面，其余空格微亮、已播格不亮；右下主行动键 "Sow ×1 · 2 Energy" 带锄头徽标，正被按住；玩家边走边播：身后刚走过的 3 格依次冒出小苗，每格飘字 "−2 Energy"，累计小字 "−6 Energy"；HUD 体力数字 142 → 136；画面一角小图：换上 Row Hoe 后主行动键写 "Sow ×3 · 6 Energy"，前方一次三格同时出苗 | 体力不足态：主行动键变琥珀写 "Sow ×1 · Need 2 Energy"，HUD 体力卡 "1/200" 红；按下后居中弹四件事卡 "Sow 1 plot · 2 Energy needed / You have 1 · +1 in 2:41 / [Eat +40] [Tea +30 · 40 coins] [Rest · +60] [Free to do now]"；田格仍高亮但不出苗 | "Radish Seeds ×24" / "Sow ×1 · 2 Energy" / "Sow ×3 · 6 Energy" / "−2 Energy" / "Sow ×1 · Need 2 Energy" / 四件事卡全部文案 | 走到格前按主行动键 = 播 1 格（Row Hoe 为前方 3 格，一次扣 3 格体力）；按住 = 连续播、松手停；不再有"手指划过一行格子连播"与点格播种；体力不足整次拒绝、不会播一半；换种子 = 点快捷栏另一格 | 常驻 FARM-1；来自 BAR-1 选中；去 BAR-3 |
 | FARM-3 | Harvest | 收获 | 种植 | 三行成熟小萝卜顶着 "Ready" 角标，玩家走到田边，主行动键写 "Harvest · Free"，按住边走边收，走过的格子作物跳入背包，每格飘 "+1 Radish"，连续收获合并飘字 "+48 XP · 12 plants"；Bag 按钮出现小点 | 背包不够：飘字 "Harvest 12 of 30 · bag full"，剩余 18 格仍挂 "Ready"；底部出现一行 "Bag 25/25 · Sell at Homestead Stall" | "Ready" / "Harvest · Free" / "+48 XP · 12 plants" / "Harvest 12 of 30 · bag full" | 田格不响应点击（LOCK-02）；走近按主行动键 "Harvest · Free"，按住 = 连续收获，0 体力；浇水同理，主行动键写 "Water · Free" | 常驻 FARM-1；满包提示 → 点击打开 BAG-1 |
 | FARM-4 | Perennials | 多年生 | 种植 | 果园角：2 × 2 苹果树挂 6 颗果（头顶 "Ready"）、2 × 2 柑橘幼树（牌 "First fruit in 31h"）、1 × 1 葡萄架（"Regrow 22h"）、两块空树坑、计数牌 "Orchard 3/5"；玩家站在苹果树前（树根高亮），右下主行动键 "Pick · 2 Energy"（锄徽标），快捷栏为 Farming 候选（种子 / Compost / Orchard Feed） | 果木肥：快捷栏选中 Orchard Feed，主行动键变 "Fertilize · Free"，按下后树冠冒小星、倒计时 "Regrow 48h → 24h"；砍树在布置模式里做："Remove this tree? You get 2 Timber back; the sapling is lost." | "Orchard 3/5" / "Pick apples · 2 Energy" / "First fruit in 31h" / "Regrow 24h" / "Picked 4 of 6 · bag full" | 站到树前按主行动键 Pick = 采摘（2 体力 / 株）；树不响应点击（10.2.2，与田格、水面、岩石一致）；选中 Orchard Feed 时主行动键变 Fertilize · Free；砍除只在布置模式里做 | 常驻 FARM-1 |
 | FARM-5 | Facilities | 设施 | 种植 · 工作台 | 点工作台打开半屏抽屉（相机框住工作台、温室、堆肥箱与洒水器田）：顶栏 "Workbench" + ✕，Tab "Facilities / Tools / Supplies"（默认上次用的页签，首次开 Tools；P0 不显示 Facilities，设施属 P1，q(22)、q(31)）；三张蓝图卡：每卡图标 + 名称 + 等级胶囊 + 一行效果，右下按钮写缺口（与 Inbox 一致，缺口文案放得下，q(45)），下方一行 M 号材料进度格（从农场仓库扣）——Sprinkler "Farming Lv6 · Waters 8 plots for you" · "Timber 20/8 / Stone 12/6 / Copper Ore 1/3（琥珀）" · 按钮灰 "Need 2 more Copper Ore"；Compost Bin（锁 "Farming Lv7"，整卡半透明）"5 crops → 5 Compost a day" · 按钮灰 "Farming Lv7 needed"；Greenhouse（锁 "Farming Lv8"）"Any seed grows inside" · "Timber 20/20 / Stone 12/12 / Copper Ore 1/8 / Coins 230/340"（分母含 40 地板，q(10)） · 按钮灰 "Farming Lv8 needed" | 放置模式（q(22)）：蓝图卡 "Build" → 预览默认落在离玩家最近的合法格，3 × 3 浅蓝覆盖范围可拖可点，小标 "Coverage preview · 8 plots"，底部 "Build" / "Cancel"；不合法时只把中心格染红，按钮写 "Plot occupied" / "Outside your fields"；温室 4 × 4 冲突格染红，按钮写 "Needs 4×4 clear plots" | 上述文案；"Build" 按钮；"Coverage preview" 小标 | 蓝图卡 Build 进放置模式，按 Build 才扣料落位，Cancel 不扣；已放设施可免费移动（入口随 P1 布置模式）、不可拆除；点设施看状态；堆肥箱点开投料（每日 ≤ 5 份） | 来自 FARM-1 点工作台；去 SKILL-2（锁定蓝图弹门禁卡） |
-| FARM-6 | Homestead Stall | 农场驿站 | NPC · 经济 · 背包 | 点驿站棚（指尖卡 `Tap to shop`，p(6) 起无人值守、没有问候卡）：相机推到农舍门边的驿站棚（柜台无人、一只诚实箱，背景压暗），抽屉从 HUD 下方升到底部，顶栏 "Homestead Stall" + ✕，**上半是驿站、下半贴背包**（用户 2026-10-04 在 Figma 上定稿：买种子时必须看得见库存）。上半只有两个 Tab "Buy / Stall Board"（**没有 Sell Tab**），Tab 下直接是商品行（没有掌柜栏）：Buy 列出 Radish Seeds · 4 coins（右侧小字 "Bag ×24"）、Compost · 2 coins、Worm Bait · 2 coins（灰按钮 "Sold out · 9h 12m"）、Strawberry Seeds · 17 coins（灰按钮 "Farming Lv8 needed"，第二行 "210 XP to go"）；下半是完整背包区：Bag 19/25 容量条 + Sort、七个 Tab、选中格详情卡（驿站语境下按钮为 Pin / Sell / Sell All）、5×5 网格；正在购买的种子在网格里主色描边并标 "In bag ×24" | 从背包出售态：Produce Tab 选中，详情卡 "Radish ×12 · Common crop · 5 each · Sell All = 60 coins"，背包标题下的额度条跟随选中物品类别：选作物时灰色无填充 "Crops & fish · no daily limit"（料理 "Dish buy-back today 96/120"、材料 "Material buy-back today 12/30"，q(9)）；上半驿站保持 Buy 常态 | "Tap to shop" / "Homestead Stall" / "Buy / Stall Board" / "Sold out · 9h 12m" / "Bag ×24" / "In bag ×24" / "Sell / Sell All" / "Crops & fish · no daily limit" / "Dish buy-back today 96/120" / 锁定行 "Strawberry Seeds · Farming Lv8 needed · 210 XP to go" | 点商品行 + / − 选数量再 "Buy"；出售只在背包详情卡上做：Sell 卖一份、Sell All 卖整堆，额度满时按钮写原因；锁定行点开弹 SKILL-2；点空白处关闭 | 来自 FARM-1 点驿站棚；去 NPC-4（Stall Board 同委托板组件）、SKILL-2、BAG-3 |
-| FARM-7 | Rest | 回家休息 | 体力 · 设施 | 农舍门口长椅，玩家站在长椅旁；长椅上方只有一个 56 px 状态缩略图标（可用 = 绿色休息图标 / 冷却中 = 时钟 / 今日已休息 = 灰色对勾），常态图用可用态；**主行动键保持当前行动 "Sow ×1 · 2 Energy"，不显示 Rest**（2026-10-04 用户定稿：休息像烹饪一样靠点击长椅触发） | 点长椅之后：场景压暗，居中浮卡 "Rest on the bench" 三行 "+60 Energy · once a day" / "Available now" / "Next rest: tomorrow 4:00 after a rest"，按钮 "Rest · +60 Energy" / "Not now"；底部两张缩小卡展示另外两态：冷却中 "Rest · back after 2h away · 1h 12m to go"（按钮灰显 "Not yet"）、今日已休息 "Rested today · Back tomorrow 4:00"（按钮灰显） | 上述文案；"Tap the bench · status icon shows availability" | 点长椅 = 弹状态卡；卡上 Rest = 休息（每日 1 次，需离家 ≥ 2 小时后在自家农场）；主行动键与此无关 | 常驻 FARM-1 |
+| FARM-6 | Homestead Stall | 农场驿站 | NPC · 经济 · 背包 | 点驿站棚（名字条 `Homestead Stall`，p(6) 起无人值守、没有问候卡，q(62)）：相机推到农舍门边的驿站棚（柜台无人、一只诚实箱，背景压暗），抽屉从 HUD 下方升到底部，顶栏 "Homestead Stall" + ✕，**上半是驿站、下半贴背包**（用户 2026-10-04 在 Figma 上定稿：买种子时必须看得见库存）。上半只有两个 Tab "Buy / Stall Board"（**没有 Sell Tab**），Tab 下直接是商品行（没有掌柜栏）：Buy 列出 Radish Seeds · 4 coins（右侧小字 "Bag ×24"）、Compost · 2 coins、Worm Bait · 2 coins（灰按钮 "Sold out · 9h 12m"）、Strawberry Seeds · 17 coins（灰按钮 "Farming Lv8 needed"，第二行 "210 XP to go"）；下半是完整背包区：Bag 19/25 容量条 + Sort、七个 Tab、选中格详情卡（驿站语境下按钮为 Pin / Sell / Sell All）、5×5 网格；正在购买的种子在网格里主色描边并标 "In bag ×24" | 从背包出售态：Produce Tab 选中，详情卡 "Radish ×12 · Common crop · 5 each · Sell All = 60 coins"，背包标题下的额度条跟随选中物品类别：选作物时灰色无填充 "Crops & fish · no daily limit"（料理 "Dish buy-back today 96/120"、材料 "Material buy-back today 12/30"，q(9)）；上半驿站保持 Buy 常态 | "Homestead Stall"（名字条与抽屉标题，q(62)）/ "Buy / Stall Board" / "Sold out · 9h 12m" / "Bag ×24" / "In bag ×24" / "Sell / Sell All" / "Crops & fish · no daily limit" / "Dish buy-back today 96/120" / 锁定行 "Strawberry Seeds · Farming Lv8 needed · 210 XP to go" | 点商品行 + / − 选数量再 "Buy"；出售只在背包详情卡上做：Sell 卖一份、Sell All 卖整堆，额度满时按钮写原因；锁定行点开弹 SKILL-2；点空白处关闭 | 来自 FARM-1 点驿站棚；去 NPC-4（Stall Board 同委托板组件）、SKILL-2、BAG-3 |
+| FARM-7 | Rest | 回家休息 | 体力 · 设施 | 农舍门口长椅，玩家站在长椅旁；长椅上方只有一个 56 px 状态缩略图标（可用 = 绿色休息图标 / 冷却中 = 时钟 / 今日已休息 = 灰色对勾），常态图用可用态；走近展开名字条 `+60 Energy`（今天用过灰 `Rested today`）（q(62)）；**主行动键保持当前行动 "Sow ×1 · 2 Energy"，不显示 Rest**（2026-10-04 用户定稿：休息像烹饪一样靠点击长椅触发） | 点长椅之后：场景压暗，居中浮卡 "Rest on the bench" 三行 "+60 Energy · once a day" / "Available now" / "Next rest: tomorrow 4:00 after a rest"，按钮 "Rest · +60 Energy" / "Not now"；底部两张缩小卡展示另外两态：冷却中 "Rest · back after 2h away · 1h 12m to go"（按钮灰显 "Not yet"）、今日已休息 "Rested today · Back tomorrow 4:00"（按钮灰显） | 上述文案；名字条 "+60 Energy" / "Rested today"（q(62)） | 点长椅 = 弹状态卡；卡上 Rest = 休息（每日 1 次，需离家 ≥ 2 小时后在自家农场）；主行动键与此无关 | 常驻 FARM-1 |
 
 ### C. 钓鱼 Fishing
 
@@ -7392,14 +7535,14 @@ flowchart LR
 
 | 编号 | 界面英文名 | 中文 | 所属功能 | 图 1 画什么 | 图 2 画什么 | 必须出现的控件与英文文案 | 关键手势与反馈 | 从哪来 / 到哪去 |
 |---|---|---|---|---|---|---|---|---|
-| COOK-1 | Kitchen & Stove Select | 厨房与选灶口 | 料理 | 农舍室内的灶台角（不单独成间，q(14)；Lv1–4 Basic Room、Lv5 起 Standard Room、Lv10 Deluxe Room）：样例取 FX-K「厨房时点」（Lin 升到 Homestead Lv3：142/220、Cooking Lv3，q(31)）：一口灶（Basic Room 预留的另两个灶口位画成空台面；Lv4 第二口、Lv8 第三口属 P1），灶上方状态牌 "Stove 1/1 · Empty"，烹饪中 "Stove 1/1 · Cooking 0:22"（锅盖冒蒸汽、灶口橙光；火候环即将出现时灶卡放大），待取 "Stove · Ready · Grilled Crucian"（盘子发光 + "Ready" 角标）；墙上 Cookbook 挂书、调味架 Spice Rack（Rock Salt / Wild Herb 小罐）、保温柜 "Warming Cabinet 4/6"；灶前留一条可走的地砖路，玩家站在 Stove 1 前；HUD 第二行位置芯片 "Shanghai · Farmhouse ›"（q(19)）；底部没有快捷栏、没有切换键、没有主行动键，只有右端 Bag 按钮；靠近的空灶口上方指尖卡 "Stove 1/1 · Empty · Tap to cook"（主色描边） | 只有一口灶的新手厨房（Homestead Lv1）：灶卡 "Stove 1/1 · Empty · Tap to cook"，玩家点灶台后烹饪抽屉（60% 高）直接升起停在 Cookbook Tab，灶卡在抽屉顶栏；多灶只在 P1 示意卡出现（Homestead Lv4 起：142/230、"Stove 1/2"、保温柜 4/6，审阅说明标 P1） | "Stove 1/1 · Empty" / "Stove 1/1 · Cooking 0:22" / "Stove · Ready · Grilled Crucian" / "Stove 1/2"（P1）/ "All stoves busy"（P1）/ "Warming Cabinet 4/6" / "Cookbook" / "Tap to cook" / "Shanghai · Farmhouse"；画面里没有快捷栏与主行动键 | 点空闲灶台（或其指尖卡）自动走过去 → 打开烹饪面板 COOK-2a；点 Ready 灶口直接弹 COOK-4；点 Cooking 灶口看倒计时（开火即扣料、不可取消，最长 60 秒）；离开厨房菜照出为 Plain 品质留在灶上，没有烧焦 | 来自 FARM-1 走进农舍；去 COOK-2a / COOK-2b / COOK-5；出门回 FARM-1 |
+| COOK-1 | Kitchen & Stove Select | 厨房与选灶口 | 料理 | 农舍室内的灶台角（不单独成间，q(14)；Lv1–4 Basic Room、Lv5 起 Standard Room、Lv10 Deluxe Room）：样例取 FX-K「厨房时点」（Lin 升到 Homestead Lv3：142/220、Cooking Lv3，q(31)）：一口灶（Basic Room 预留的另两个灶口位画成空台面；Lv4 第二口、Lv8 第三口属 P1），灶上方状态牌 "Stove 1/1 · Empty"，烹饪中 "Stove 1/1 · Cooking 0:22"（锅盖冒蒸汽、灶口橙光；火候环即将出现时灶卡放大），待取 "Stove · Ready · Grilled Crucian"（盘子发光 + "Ready" 角标）；墙上 Cookbook 挂书、调味架 Spice Rack（Rock Salt / Wild Herb 小罐）、保温柜 "Warming Cabinet 4/6"；灶前留一条可走的地砖路，玩家站在 Stove 1 前；HUD 第二行位置芯片 "Shanghai · Farmhouse ›"（q(19)）；底部没有快捷栏、没有切换键、没有主行动键，只有右端 Bag 按钮；靠近的空灶口图标钮展开成名字条 "Stove 1/1 · Empty"（主色描边，q(62)） | 只有一口灶的新手厨房（Homestead Lv1）：灶口名字条 "Stove 1/1 · Empty"（q(62)），玩家点灶台后烹饪抽屉（60% 高）直接升起停在 Cookbook Tab，灶卡在抽屉顶栏；多灶只在 P1 示意卡出现（Homestead Lv4 起：142/230、"Stove 1/2"、保温柜 4/6，审阅说明标 P1） | "Stove 1/1 · Empty" / "Stove 1/1 · Cooking 0:22" / "Stove · Ready · Grilled Crucian" / "Stove 1/2"（P1）/ "All stoves busy"（P1）/ "Warming Cabinet 4/6" / "Cookbook" / "Shanghai · Farmhouse"（灶口名字条即 "Stove 1/1 · Empty"，q(62)）；画面里没有快捷栏与主行动键 | 点空闲灶台（或其图标钮 / 名字条，q(62)）自动走过去 → 打开烹饪面板 COOK-2a；点 Ready 灶口直接弹 COOK-4；点 Cooking 灶口看倒计时（开火即扣料、不可取消，最长 60 秒）；离开厨房菜照出为 Plain 品质留在灶上，没有烧焦 | 来自 FARM-1 走进农舍；去 COOK-2a / COOK-2b / COOK-5；出门回 FARM-1 |
 | COOK-2a | Cooking Panel · Cookbook | 烹饪面板 · 图鉴（含配方） | 料理 · 图鉴 · Cooking 等级 | 相机推到灶台，锅是 3D 物件：锅上悬浮选中页原料的虚影，锅下槽条 "Pond Crucian · have 3" + 预览胶囊 "Grilled Crucian · Common · 5 s · Ready to cook"；抽屉（60%）：顶栏 "Stove 1/1 · Cooking Lv3 · Empty" + ✕，Tab "Cookbook 12/48"（选中）/ "Experiment"（样例取 FX-K，q(31)）；筛选条 "All 48 · Can cook 5 · Common · Fine · Rare · Legendary"；详情卡：菜图 + 色点 + 绿勾、"Grilled Crucian · Common"、"+20 Energy · 5 s · Grilled · Cooked ×3 · Best ★ Good"、一句描述、右侧 "INGREDIENTS" 列 "Pond Crucian ×1 · have 3"、卡底 "+4 XP · 2nd today ½" + "Eat · Gift · Request · Trail" + 按钮 "Cook"；5 列页格：可做页绿勾、Tasted 半彩角签、灰剪影 + 原料族小点、线索点、Lv4 锁角标、"Shop" 角签、微光页，第 5 行在渐隐下露出一截（可滚动） | COOK-2a-2：All 筛选、第一周末存档（Cooking Lv3 · Cookbook 9/48），五种页态同屏——可做页绿勾（按稀有度高 → 低排前）、Grilled Crucian 金签 "Mastered"、已发现缺料页无角标、新点亮页青 ◆、Mullet Skewers 半彩 "Tasted"、有线索页（Rare 炖锅：土豆点亮 + Lv4 锁 / Fine 汤：萝卜点亮）、灰剪影 + 原料族小点、"Shop" 页、微光页，第 5 行露出 Rare 锁页（接替原 COOK-5 "五种页态同屏"）；选中那页有线索的 3 槽未知菜——锅上族剪影 + 土豆、第 3 槽灰锁；卡 "Unknown dish · Rare" / "+70 Energy · 30 s · 3 ingredients · Clue found" / "A Mystery Dish left a clue: potato goes in. Find the rest at the stove." / 材料列 "Any fish ?" "Potato ×1 · have 1" "3rd slot Lv4" / 灰标 "First cooked · +40 Cooking XP" + "Cooking Lv4 · 85 XP to go" / 按钮 "Try in Experiment ›"；其他态：料不够 "Need Wild Herb ×1"、Lv6 顶栏 "Double · uses 2× ingredients"、三灶都忙 "All stoves busy" 且 Cook 置灰 | "Stove 1/1 · Cooking Lv3 · Empty" / "Cookbook 12/48" / "Experiment" / "All · Can cook · Common · Fine · Rare · Legendary" / "Ingredients" / "×1 · have 3" / "Cook" / "Need Wild Herb ×1" / "Cooking Lv4 · 3rd slot" / "Cooking Lv4 · 85 XP to go" / "Try in Experiment ›" / "Tasted" / "Shop" / "Ready to cook" / "Clue found" / "Unknown dish" | 点页格 → 详情卡与锅上虚影一起切换；点 Cook 立即扣料开火 → COOK-3；灰按钮不可点但写明差什么；"Try in Experiment ›" 只切 Tab；点 ✕ 或抽屉外关闭回 COOK-1 | 来自 COOK-1 点灶台 / 墙上挂书 / 背包 Dishes 页右上 / Collections；去 COOK-3 / COOK-2b |
-| COOK-2b | Cooking Panel · Experiment | 烹饪面板 · 试做 | 料理 · 配方发现 · Cooking 等级 | 相机推到灶台：Pond Crucian 与 Wild Herb 已在 3D 锅里（原料实物可见），锅下槽条两枚圆标各带 ✕ + 第 3 枚灰锁 "Cooking Lv4 · 3rd slot"，预览胶囊 "? · Fine · 15 s · Unknown dish"；抽屉只剩背包：顶栏同 COOK-2a，Tab "Experiment" 选中；"From your bag · 2 of 2 slots used" + "Sort · Fish first"；筛选 "All · Fish 4 · Produce 4 · Fruit 1 · Seasoning 2"；5 × 4 格：锅里的 Pond Crucian ×2 / Wild Herb 格绿框 + 勾（香草用完写 "In the pot"），Golden Koi 灰显 "Not for cooking"，其余按数量；底部 "Mystery dishes still restore 5 Energy" + 大按钮 "Cook"（不写 Free） | COOK-2b-2（第五版重切：四态都画成锅在场景里、槽条在锅下、抽屉是背包）：Lv4 三槽 "? · Rare · 30 s · Unknown dish"；原料族标签 "Any Common fish ✓ / Any seasoning"；只放调味料 → 胶囊 "Needs a main ingredient"、Cook 置灰同句；点灰锁弹四件事卡 "3rd ingredient slot / Cooking Lv4 · 120 XP to go · about 2 days / Cook new or Fine dishes for full XP / Unlocks 3-ingredient dishes" + "Got it"；"Tried before · still a Mystery Dish"；Rare 原料二次确认 "Cook with Silver Sturgeon?" | "Experiment" / "From your bag" / "slots used" / "In the pot" / "Not for cooking" / "Cooking Lv4 · 3rd slot" / "? · Fine · 15 s · Unknown dish" / "Cook" / "Needs a main ingredient" / "Mystery dishes still restore 5 Energy" / "Tried before · still a Mystery Dish" | 点背包格 → 原料飞进锅、格变绿框；点锅里的原料或槽条 ✕ → 退回；点 Cook 开火 → COOK-3；点灰锁 → 四件事卡 | 来自 COOK-2a Tab / "Try in Experiment ›"；去 COOK-3 / COOK-6 |
+| COOK-2b | Cooking Panel · Experiment | 烹饪面板 · 试做 | 料理 · 配方发现 · Cooking 等级 | 相机推到灶台：Pond Crucian 与 Wild Herb 已在 3D 锅里（原料实物可见），锅下槽条两枚圆标各带 ✕ + 第 3 枚灰锁 "Cooking Lv4 · 3rd slot"，预览胶囊 "? · Fine · 15 s · Unknown dish"；抽屉只剩背包：顶栏同 COOK-2a，Tab "Experiment" 选中；"From your bag · 2 of 2 slots used" + "Sort · Fish first"；筛选 "All · Fish 4 · Produce 4 · Fruit 1 · Seasoning 2"；5 列格（至少 2 行，末行补齐，q(60)）：锅里的 Pond Crucian ×2 / Wild Herb 格绿框 + 勾（香草用完写 "In the pot"），Golden Koi 灰显 "Not for cooking"，其余按数量；底部 "Mystery dishes still restore 5 Energy" + 大按钮 "Cook"（不写 Free） | COOK-2b-2（第五版重切：四态都画成锅在场景里、槽条在锅下、抽屉是背包）：Lv4 三槽 "? · Rare · 30 s · Unknown dish"；原料族标签 "Any Common fish ✓ / Any seasoning"；只放调味料 → 胶囊 "Needs a main ingredient"、Cook 置灰同句；点灰锁弹四件事卡 "3rd ingredient slot / Cooking Lv4 · 120 XP to go · about 2 days / Cook new or Fine dishes for full XP / Unlocks 3-ingredient dishes" + "Got it"；胶囊标题 "Tried before" + Cook 行上方 "Tried before · not a recipe"（q(56)）；Rare 原料二次确认 "Cook with Silver Sturgeon?" | "Experiment" / "From your bag" / "slots used" / "In the pot" / "Not for cooking" / "Cooking Lv4 · 3rd slot" / "? · Fine · 15 s · Unknown dish" / "Cook" / "Needs a main ingredient" / "Mystery dishes still restore 5 Energy" / "Tried before" / "Tried before · not a recipe" | 点背包格 → 原料飞进锅、格变绿框；点锅里的原料或槽条 ✕ → 退回；点 Cook 开火 → COOK-3；点灰锁 → 四件事卡 | 来自 COOK-2a Tab / "Try in Experiment ›"；去 COOK-3 / COOK-6 |
 | COOK-3 | Heat Ring | 火候互动 | 料理 | 锅在灶上冒气，锅上方弹出一个圆环：一根针从 12 点顺时针转一圈（1.2–1.6 秒），环上一段金色弧（金区）；玩家在针进入金区时点锅的任意位置；命中飘 "Nice heat! ★"；锅下进度环显示烹饪倒计时 "0:09"；账号首次开火时环下一行教学 "Tap when the needle hits gold!" | 三态并排小卡：未中 "Missed · still cooking" / 命中 "Nice heat! ★" / Rare 与 Legendary 第二次命中 "Perfect! ★★ · Extra portion"；旁边多灶并行帧：两口灶的火候环同时出现，即将出现火候的灶卡提前 1 秒放大并振动 | "Tap when the needle hits gold!" / "Nice heat! ★" / "Missed · still cooking" / "Perfect! ★★ · Extra portion" / 倒计时 | 每次火候只接受 1 次点按（整锅可点，不必对准环）；Common / Fine 1 次、Rare / Legendary 2 次；未中无惩罚、不点按视作未中；命中次数决定品质 Plain / Good ★ / Perfect ★★ | 来自 COOK-2；去 COOK-4 / COOK-6 |
-| COOK-4 | Dish Reveal | 出锅 | 料理 · 图鉴 · Cooking 等级 | 锅盖揭开、蒸汽散开、盘子滑出到屏幕中央定格（圆润黏土质感的烤鱼 + 香草）；稀有度特效（Common 无 / Fine 蓝色微光 / Rare 紫色爆光 / Legendary 金色彩纸，与稀有度色点同色，q(16)）；卡片 "Herb Grilled Fish ★ Good · Fine · +45 Energy"（Fine 蓝点、★ 品质角标）；首次做成叠加 Cookbook 翻页条 "New recipe! · First cooked! +20 Cooking XP · Cookbook 2/48"；三个大按钮 "Eat · +45 Energy" / "Keep" / "Gift to Mira"（面对居民时；否则灰字 "Gift later from your bag"） | 背包不够：菜留在灶上，灶卡 "Stove · Ready · Herb Grilled Fish" + 提示 "Bag full · dish left on the stove"；满体力时 Eat 置灰写 "Energy full" | "Herb Grilled Fish ★ Good" / "New recipe!" / "First cooked! +20 Cooking XP · Cookbook 2/48" / "Eat · +45 Energy" / "Keep" / "Gift to Mira" / "Gift later from your bag" / "Bag full · dish left on the stove" / "Energy full" | 点 Eat 立刻进 COOK-7 结算；点 Keep 入背包（不同品质分开堆叠）；卡外点关闭 = Keep；首次翻页条 +1.5 秒 | 来自 COOK-3 / COOK-1 点 Ready；去 COOK-7 / 回 COOK-1 |
+| COOK-4 | Dish Reveal | 出锅 | 料理 · 图鉴 · Cooking 等级 | 锅盖揭开、蒸汽散开、盘子滑出到屏幕中央定格（圆润黏土质感的烤鱼 + 香草）；稀有度特效（Common 无 / Fine 蓝色微光 / Rare 紫色爆光 / Legendary 金色彩纸，与稀有度色点同色，q(16)）；卡片 "Herb Grilled Fish ★ Good · Fine · +45 Energy"（Fine 蓝点、★ 品质角标）；首次做成：标题 "New recipe!"，奖励条 "First cooked · +20 Cooking XP · Cookbook 2/48"（只放首做 XP，本锅 XP 照常飘 "+10 Cooking XP ★"）；三个大按钮 "Eat · +45 Energy" / "Keep" / "Gift to Mira"（面对居民时；否则灰字 "Gift later from your bag"） | 背包不够：菜留在灶上，灶卡 "Stove · Ready · Herb Grilled Fish" + 提示 "Bag full · dish left on the stove"；满体力时 Eat 置灰写 "Energy full" | "Herb Grilled Fish ★ Good" / "New recipe!" / "First cooked · +20 Cooking XP · Cookbook 2/48" / "Eat · +45 Energy" / "Keep" / "Gift to Mira" / "Gift later from your bag" / "Bag full · dish left on the stove" / "Energy full" | 点 Eat 立刻进 COOK-7 结算；点 Keep 入背包（不同品质分开堆叠）；卡外点关闭 = Keep；首次翻页条 +1.5 秒 | 来自 COOK-3 / COOK-1 点 Ready；去 COOK-7 / 回 COOK-1 |
 | COOK-5 | Cookbook（已并入 COOK-2a） | 料理图鉴 | 图鉴 · 配方发现 | 2026-10-04 起不再是独立的全屏书页：图鉴 = 烹饪面板的 Cookbook Tab（见 COOK-2a / COOK-2a-2）；从背包 Dishes 页右上或成就页打开时是同一张页，只是舞台换成当前场景、详情卡按钮位置灰字 "Cook at your stove"；五种页态、"New for you" 青 ◆、称号条 "Home Cook · Line Cook · Head Chef · Master Chef"、页尾 "Kitchen Mishaps 12" 都挂在同一张页（称号条在筛选条下方一行，Mishaps 在页格末尾） | — | "Cook at your stove" / "New for you" / "Kitchen Mishaps 12" / "Home Cook · Line Cook · Head Chef · Master Chef" | 同 COOK-2a；点 "Kitchen Mishaps 12" 进失败页 | 来自背包 Dishes 页、Collections；无位置跳转 |
 | COOK-6 | Mystery Dish | 黑暗料理 | 料理 · 配方发现 | 出锅帧变体：灰烟、盘子晃一下，盘里一团带 "?" 的灰褐色黏土团；卡片 "Mystery Dish · +5 Energy"，副行 "Hmm… not a dish. A clue was added to your Cookbook"，右侧小图：某未发现页的一个槽被点亮为具体原料；按钮 "Eat · +5 Energy" / "Keep" | Cookbook 的 Kitchen Mishaps 页："Kitchen Mishaps 12" 标题，每格记录当时的组合 "Radish + Radish + Rock Salt"，页脚称号 "Brave Palate"；送给居民时的小气泡 "Oh… thanks, I suppose."（好感 −2，暂定，q(33)） | "Mystery Dish · +5 Energy" / "Hmm… not a dish. A clue was added to your Cookbook" / "Kitchen Mishaps 12" / "Brave Palate" / "−2 · not a fan" | 与 COOK-4 相同；黑暗料理可送居民但好感 −2（暂定），不可送玩家、不可交委托、不可回收，+5 不递减 | 来自 COOK-3（组合无效）；去 COOK-7 / COOK-5 Mishaps 页 |
-| COOK-7 | Eat Panel | 进食结算 | 体力 · 料理 | 吃下动作：Avatar 举盘，头顶飘 "+40 Energy"，HUD 体力 102 → 142 数字滚动；下方小条 "Meals today 60/200 · resets in 7h 12m"；新手祝福期小标 "Newcomer Blessing · ×1.5" | 四态并排小卡："Same dish again · +20 (half)" / "Same dish · no Energy today" / "Full belly · Meals reset in 9h 12m" / 快满写实得 "Eat · +12 Energy"（q(26)） | 上述全部文案；"Energy full" | 点 Eat 即结算；快满时按钮写实得、按一下即吃；满条时按钮置灰 "Energy full" | 来自 COOK-4 / BAG-1 Dishes Tab 的 Eat；回原处 |
+| COOK-7 | Eat Panel | 进食结算 | 体力 · 料理 | 吃下动作：Avatar 举盘，头顶飘 "+40 Energy"，HUD 体力 102 → 142 数字滚动；下方小条 "Meals today 60/200 · resets in 7h 12m"；新手祝福期上限写 "Meals today 60/300"（祝福只加上限、不乘料理回复） | 四态并排小卡："Same dish again · +20 (half)" / "Same dish · no Energy today" / "Full belly · Meals reset in 9h 12m" / 快满写实得 "Eat · +12 Energy"（q(26)） | 上述全部文案；"Energy full" | 点 Eat 即结算；快满时按钮写实得、按一下即吃；满条时按钮置灰 "Energy full" | 来自 COOK-4 / BAG-1 Dishes Tab 的 Eat；回原处 |
 
 ### E. 背包 Bag
 
@@ -7408,16 +7551,16 @@ flowchart LR
 | BAG-1 | Bag Drawer | 背包抽屉 | 背包 | 农场常态背景压暗，抽屉从底部升到 y = 800（高 1,600）：第一行就是快捷栏（5 格与场景内同位同尺寸，Radish Seeds ×24 的选中态保留，右端 ✕ 关闭顶替 Bag 按钮）；第二行 "Bag 19/25" + 细容量条 + 右侧 "Sort · Recent" 芯片；第三行 Tab "All · Seeds · Fish · Produce · Dishes · Materials · Tackle"（Fish 角标 23）；5 列 × 5 行网格：19 格有物（鱼格左上色点、料理格色点、作物格右下数量 "50"、种子格左下房子角标）、6 空格虚线 | 点中一格（Grilled Crucian ×3）后：详情卡在 Tab 行与网格之间浮出：大图标 + "Grilled Crucian ×3 · Common" + 效果 "+20 Energy" + 一句描述 "Simple, warm, gone in two bites." + 按钮行 "Eat · +20 Energy / Gift / Sell / Pin"（按物品类型出现）；网格下移、被点格描亮 | 上述全部；Tab 名；"Sort · Recent / Value / Name"；"Eat · +20 Energy" / "Gift" / "Sell" / "Pin" | 上滑快捷栏或点 Bag 呼出；点格 = 详情卡；长按格 = 快速钉住到快捷栏；拖格到第一行快捷栏 = 替换该格；点空白处关闭详情卡，点 ✕ 或下滑收起抽屉；点 Tab 过滤同一份容量；Tackle 页工具不计容量，格上按钮 "Equip" 跳 EQUIP-1 | 来自任何场景；去 BAG-3 / BAG-4 / COOK-7 / EQUIP-1 |
 | BAG-2 | Bag · Gear | 背包 · 装备 | 背包 · 装备 | **p(8) 重画：背包与 Tools & Gear 合并。** 背包抽屉首行快捷栏 + ✕；其下分段切换 "Bag 19/25 | Gear"（Gear 选中）；"Equipped · Tap a slot to change it"；一行六槽：Farming Starter Hoe / Fishing Starter Rod（选中，主色描边）/ Mining Starter Pickaxe / Combat Wooden Sword / Ring Empty（虚线）/ Charm Lucky Charm；"Fishing slot · 3 rods · 1 locked"；三行：Starter Rod "Equipped" · Bite window 2.0 s · lands up to Fine / Reed Rod · Bite window 2.6 s · lands up to Rare · [Equip] / Carbon Rod 灰显 · Lands up to Legendary · 350 coins at Tackle Shop · [🔒 Fishing Lv6]；脚注 "Gear doesn't take Bag space · looks live in Profile › Edit look" | BAG-2-2 Materials Tab（不变）：背包里的 Copper Ore ×4、Rock Salt ×2 在前，农场仓库的 Timber ×99 / Stone ×64 / Reeds ×30 / Clay ×12 / Quartz ×3 带房子角标在后；点 Timber 弹 "Timber ×99 · Farm Storage · Take 10 / Take all"；不在家时仓库堆灰显 "At home" | "Bag / Gear" / "Equipped" / "Tap a slot to change it" / "Empty" / "Equip" / "Fishing Lv6" / "At home" / "Take 10 / Take all" | 点槽筛选下方列表；Equip 即换装（0 体力），主行动键徽标与文案同步；灰显行点开弹 SKILL-2；点仓库堆弹 "Take 10 / Take all" | 常驻 BAG-1；去 SKILL-2 |
 | BAG-3 | Item Detail | 物品详情卡 | 背包 | 抽屉内 Tab 行与网格之间浮出的详情卡 6 行："Golden Koi · Rare"（金锦鲤大图 + 紫点）/ "3 / 10 · Caught at Willow Pond" / "Sells for 10 · Not for cooking · Fish-dex 9/20" / "XP: 50% · Reduced" / 一句描述 / 按钮行 "Gift · Sell" | 种子详情变体："Radish Seeds · 2 Energy per plot / 24 / 99 · Homestead Stall / Grows in 4h · sells 2 / XP: 25% · Reduced / [Pin] [Sell] [Store]"；工具变体 "Reed Rod · Lands Fine fish / Fishing Lv3 ✓ / Not counted in Bag / [Equip]" | 上述文案；按钮按类型出现：Eat / Gift / Sell / Equip / Pin / Store | 点格弹出；长按格 = 不弹卡、直接钉住（轻震）；点卡外关闭 | 来自 BAG-1 点格；"Equip" 去 EQUIP-1；回原处 |
-| BAG-4 | Drag to Bar | 拖入快捷栏 | 背包 · 快捷栏 | 抽屉第一行的快捷栏：手指正把 Compost 从网格拖向第 3 格，目标格放大描亮，原格半透明；格落入后格顶出现 36 px 琥珀图钉徽标与顶部琥珀色条（钉住） | 长按快捷栏格钉住（图钉徽标 + 琥珀顶条出现、轻震）与再长按取消的两帧并排；取消后该格回到自动填充，无候选时留空；整条栏都空时第 1 格是幽灵格 "Seeds"（q(44)） | "Pin" / "Unpin" / 幽灵提示 | 拖入 = 替换该格并钉住（"咚"一下）；栏内拖格互换；长按切换钉住 / 取消；上滑整条打开背包（不再有上甩移除） | 常驻 BAG-1 + BAR-1 |
+| BAG-4 | Drag to Bar | 拖入快捷栏 | 背包 · 快捷栏 | 抽屉第一行的快捷栏：手指正把长按浮起的 Compost 从网格拖向第 3 格：原位留虚线空格、网格压暗、Pin 区淡入（LOCK-12，画面以 BAR-DRAG-9 为准），目标格放大描亮；格落入后显示该物品，不自动钉住（v1.11，q(61)） | 浮起后拖进 Pin 区钉住（钉子角标弹一下、轻震）与拖进 Unpin 区取消的两帧并排（v1.11，q(61)）；取消后该格回到自动填充，无候选时留空；整条栏都空时第 1 格是幽灵格 "Seeds"（q(44)） | "Pin" / "Unpin" / 幽灵提示 | 背包格长按浮起后：拖到快捷栏格 = 放入、不钉住（落在有物品的格 = 替换该格）；拖到 Pin 区 = 放进所属行动的栏并钉住（也可用详情卡 `Pin` 一步钉住）；松在原地或别处 = 取消（LOCK-12）。快捷栏格长按浮起后：松在另一格只互换、松在 Pin / Unpin 或 Remove 区钉住、取消或移除（v1.11）；上滑整条打开背包（q(61)） | 常驻 BAG-1 + BAR-1 |
 | BAG-5 | Bag Full States | 满包状态 | 背包 | 抽屉标题 "Bag 25/25" 容量条琥珀色，HUD Bag 按钮带小点；底部一行 "Bag Upgrade I · Homestead Lv3 needed · 1 level to go · +5 slots" | 满包时来了被动获得（BAG-5-2，p(9) 重画）：农场常态，铃铛角标 3 → 4，铃铛下方飘条 "Bag full · Perch ×7 sent to Inbox · 24h"，农舍信箱头顶小牌 "Parcel"；**没有 Keep which? 选择卡** | 上述全部；"Bag almost full · 23/25"（≥ 90% 时） | 飘条 2 秒自动消失；点飘条或铃铛 → SOC-4 Parcels | 常驻 BAG-1 的反馈态；去 HOME-1 / SOC-4 |
 
 ### F. 快捷栏、径向菜单与体力卡 Quick Bar · Action Radial · Energy Card
 
 | 编号 | 界面英文名 | 中文 | 所属功能 | 图 1 画什么 | 图 2 画什么 | 必须出现的控件与英文文案 | 关键手势与反馈 | 从哪来 / 到哪去 |
 |---|---|---|---|---|---|---|---|---|
-| BAR-1 | Quick Bar · Consumables | 快捷栏（消耗品） | 快捷栏 | 快捷栏特写（底部 1/4 屏，上方田地可见）：5 格 + 右端 Bag 等距铺满：Radish Seeds ×24（选中：上抬 12 px 主色描边）/ Compost ×6 / Carrot Seeds ×10 / Pumpkin Seeds ×4 / 空格；格内只有图标 + 名字 + 数量，没有体力价、没有场景芯片、没有工具；右下主行动键 "Sow ×1 · 2 Energy" 带锄头徽标与正上方切换键；上方田格高亮为可播面 | 四行动候选并排（各 1/5 屏）：Farming（见图 1）/ Fishing：Worm Bait ×12 · Spinner Lure ×3 · Fish Trap ×2 · 空 · 空，幽灵 "Bait · faster bites" / Mining：Torch ×8 · Dynamite ×2 · 空 · 空 · 空，幽灵 "Torch · see what rocks hold" / Combat：Healing Potion ×3 · 空 · 空 · 空 · 空，幽灵 "Potion · heal in a pinch"；最下一条是未选行动时的收起把手；一格左上有图钉；一格数量 0 灰显写 "Buy at Homestead Stall" | "Radish Seeds ×24" / "Compost ×6" / "Tap to pick a seed" / "Bait · faster bites" / "Torch · see what rocks hold" / "Potion · heal in a pinch" / "Buy at Homestead Stall" / "Sow ×1 · 2 Energy" | 点格选中 / 再点取消；长按钉住（每个行动各记各的）；拖格互换；上滑整条打开背包；选了行动才展开，未选时只剩把手；选中格的物品名显示在主行动键动词后不重复（体力价只在主行动键） | 常驻三个行动场景（Farm / Pond / Mine）；厨房与据点无快捷栏 |
-| BAR-2 | Action Radial | 行动切换径向菜单 | 快捷栏 · 主行动键 | 田场景中，切换键按下态：从角色身上扇出四瓣圆钮（每瓣 ≥ 96 px，图标 + 名字）：Farming（已选，主色填充，连线到角色）/ Fishing（置灰 "Fishing · No water nearby"）/ Mining（置灰 "Mining · Enter the mine first"）/ Combat（置灰 + 锁 "Combat · Mine floors 3–5"）；场景标签淡出；快捷栏与主行动键保持在位 | 四态并排小卡：已选（主色填充 "Farming"）/ 可选（描边 "Fishing"，水边场景）/ 此处不可（置灰 "Fishing · No water nearby"）/ 未解锁（置灰 + 锁 "Combat · Mine floors 3–5"）；旁一帧：进水边时径向自动预选 Fishing，Fishing 瓣短暂放大 | "Farming" / "Fishing" / "Mining" / "Combat" / "Fishing · No water nearby" / "Mining · Enter the mine first" / "Combat · Mine floors 3–5" | 按切换键打开，点瓣选中并关闭；点外部或再按切换键关闭；选中后快捷栏按该行动候选表重填，主行动键换图标与文案；进入明确场景自动预选 | 常驻三个行动场景；不产生位置跳转 |
-| BAR-3 | Energy Card · Insufficient | 体力不足卡（与 HUD-3 同一组件） | 体力 · 主行动键 | 田场景：主行动键琥珀态 "Sow ×1 · Need 2 Energy"（锄头徽标照常），HUD 体力卡 "1/200" 琥珀；按下后居中 Energy Card 不足态：标题 "⚡ Energy 1/200 · +1 in 2:41"，副标题 "Sow 1 plot needs 2 Energy · you have 1"，信息行 "Wait · Full in 13h 20m"，RECOVER 分组下 2×2 引导瓦片 "Eat · 3 dishes in bag · Open bag ›" / "Cook · 4 fish in creel · Show kitchen ›" / "Tea · 1/3 today · 40 coins · Show on map ›" / "Rest · Available · Show bench ›"，底部唯一按钮 "Free to do now" + 灰字 "Closes this card · tiles only guide you, nothing is used automatically"（2026-10-04 用户定稿：只写事实、不替玩家执行、与 HUD-3 同一组件） | 点 Rest 之后：卡收起，相机 zoom 到长椅，长椅状态徽标放大带光晕，顶部提示胶囊 "Rest on the bench · +60 Energy · once a day"，主行动键仍琥珀；底部说明 "Guidance only · the card never acts for you" | 上述全部文案 | 主行动键琥珀态按下只弹卡、不执行；瓦片只引导（Open bag / Show kitchen / Show on map / Show bench），从不代替玩家吃、做、买、休息；Free to do now 关闭；没有"先播几格"的裁剪按钮 | 来自任何体力扣减动作；回原处 |
+| BAR-1 | Quick Bar · Consumables | 快捷栏（消耗品） | 快捷栏 | 快捷栏特写（底部 1/4 屏，上方田地可见）：5 格 + 右端 Bag 等距铺满：Radish Seeds ×24（选中：上抬 12 px 主色描边）/ Compost ×6 / Carrot Seeds ×10 / Pumpkin Seeds ×4 / 空格；格内只有图标 + 名字 + 数量，没有体力价、没有场景芯片、没有工具；右下主行动键 "Sow ×1 · 2 Energy" 带锄头徽标与正上方切换键；上方田格高亮为可播面 | 四行动候选并排（各 1/5 屏）：Farming（见图 1）/ Fishing：Worm Bait ×12 · Spinner Lure ×3 · Fish Trap ×2 · 空 · 空 / Mining：Torch ×8 · Dynamite ×2 · 空 · 空 · 空 / Combat：Healing Potion ×3 · 空 · 空 · 空 · 空（栏里有可用物品时空格只留空、不出幽灵格；幽灵格只写名词 `Seeds` / `Bait` / `Torch` / `Potion`，LOCK-04，q(44)、q(62)）；最下一条是未选行动时的收起把手；一格左上有图钉；一格数量 0 灰显写 "Buy at Homestead Stall" | "Radish Seeds ×24" / "Compost ×6" / "Seeds" / "Bait" / "Torch" / "Potion"（幽灵格，只在本行动栏里没有可用物品时出现） / "Buy at Homestead Stall" / "Sow ×1 · 2 Energy" | 点格选中 / 再点取消；长按浮起后拖进 Pin / Unpin 或 Remove 放置区钉住、取消或移除（v1.11，每个行动各记各的）；松在另一格只互换；上滑整条打开背包；选了行动才展开，未选时只剩把手；选中格的物品名显示在主行动键动词后不重复（体力价只在主行动键） | 常驻三个行动场景（Farm / Pond / Mine）；厨房与据点无快捷栏 |
+| BAR-2 | Action Radial | 行动切换径向菜单 | 快捷栏 · 主行动键 | 田场景中，切换键按下态：以屏幕中心为圆心弹出四瓣环（不围着角色、不画连线；半径 88，Farming → Fishing → Mining → Combat 顺时针排在 −135° / −45° / 45° / 135°），瓣上只有图标、不写字：Farming（当前，主色实心瓣 72、白图标、3 px 白描边）/ Fishing、Mining、Combat（此处都不可用：米色瓣 64、图标 35 %、锁角标）；场景标签淡出；快捷栏与主行动键保持在位（q(62)） | 四态并排小卡：当前（主色实心瓣 72）/ 可选（米色瓣 64 + 彩色图标，水边场景的 Fishing）/ 不可用（米色瓣 64、图标 35 %、锁角标）/ 点不可用瓣（该瓣抖一下，环心单行气泡 "No water nearby"，小尾巴指向 Fishing 瓣，1.5 s 淡出，菜单不收）；旁一帧：四瓣从屏幕中心顺时针依次弹出（每瓣 180 ms、间隔 40 ms），进水边时径向自动预选 Fishing，Fishing 瓣短暂放大（q(62)） | 瓣上无字；点灰瓣的气泡 "No water nearby" / "Enter the mine" / "Mine floors 3–5"（q(62)） | 按切换键打开，点可用瓣选中并关闭；点不可用瓣只弹原因气泡、菜单不收；点外部或再按切换键关闭（收起 120 ms）；选中后快捷栏按该行动候选表重填，主行动键换图标与文案；进入明确场景自动预选（q(62)） | 常驻三个行动场景；不产生位置跳转 |
+| BAR-3 | Energy Card · Insufficient | 体力不足卡（与 HUD-3 同一组件） | 体力 · 主行动键 | 田场景：主行动键琥珀态 "Sow ×1 · Need 2 Energy"（锄头徽标照常），HUD 体力卡 "1/200" 琥珀；按下后居中 Energy Card 不足态：标题 "⚡ Energy 1/200 · +1 in 2:41"，副标题 "Sow 1 plot needs 2 Energy · you have 1"，信息行 "Wait · Full in 13h 20m"，RECOVER 分组下 2×2 引导瓦片 "Eat · 3 dishes in bag · Open bag ›" / "Cook · 4 fish in creel · Show kitchen ›" / "Tea · 0/3 today · 40 coins · Show on map ›" / "Rest · Available · Show bench ›"，底部唯一按钮 "Free to do now" + 灰字 "Closes this card · tiles only guide you, nothing is used automatically"（2026-10-04 用户定稿：只写事实、不替玩家执行、与 HUD-3 同一组件） | 点 Rest 之后：卡收起，相机 zoom 到长椅，长椅状态徽标放大带光晕，顶部提示胶囊 "Rest on the bench · +60 Energy · once a day"，主行动键仍琥珀；底部说明 "Guidance only · the card never acts for you" | 上述全部文案 | 主行动键琥珀态按下只弹卡、不执行；瓦片只引导（Open bag / Show kitchen / Show on map / Show bench），从不代替玩家吃、做、买、休息；Free to do now 关闭；没有"先播几格"的裁剪按钮 | 来自任何体力扣减动作；回原处 |
 
 ### G. 技能与门禁 Skills
 
@@ -7425,27 +7568,27 @@ flowchart LR
 |---|---|---|---|---|---|---|---|---|
 | SKILL-1 | Skills Panel | 技能面板 | 技能 | 全屏抽屉（农场压暗）：顶栏 "Skills" + ✕；三张轨卡上下排，左侧等级环（环 = 本级进度，中间 "Lv 7"），右侧名称、"1,240 / 1,450 XP · 210 to go"、"Next: Lv8 · Strawberry Seeds, Greenhouse"；Farming 卡展开 Lv1–10 解锁列表（已解锁打勾 + 日期，下一级琥珀行写 "210 XP to go"，其余锁角标；改变日常的设施行带设施小图标）；Fishing Lv6 "1,540 / 1,850 XP · 310 to go" · "Next: Lv7 · Silver Sturgeon, Gift Clues"；Cooking Lv3 "160 / 220 XP · 60 to go" · "Next: Lv4 · 3rd ingredient slot"，名称旁三枚槽位点 ●●○；底部 "First times" 三枚 M 号材料进度格 "Crops 7/20 / Fish 9/20 / Dishes 12/48"（收集进度用绿环）（2026-10-05 出图；原稿 "Farming Lv4 · 212 / 500" 与 Lv4 = 300 的阈值矛盾，改为 412；2026-10-07 按常态玩家 Lin 改为 Farming Lv7，q(11)） | 等级差提示区：五枚 XP 徽标并排 "XP: Full · XP: 75% · XP: 50% · XP: 25% · XP: None · outleveled"（后两枚灰色），下方首次解释卡 "You've outleveled Pond Crucian. It still sells and cooks, but gives no XP. Fish Fine or better for full XP." + 按钮 "Where to fish"；飘字示例 "+7 XP · Reduced · 75%"；旁一帧 Cooking 卡的同页递减提示 "Same dish today · 2nd pot 50% XP · 3rd pot none" | 上述文案（阈值以技能章与烹饪章为准）；"Farming / Fishing / Cooking" / "Next: Lv4 · 3rd ingredient slot" / "XP: None · outleveled" / "Daily XP limit reached"（仅技能页一行） | 点解锁行弹 SKILL-2；点进度环无动作；头像环维持 Farming / Fishing 双色，Cooking 等级只在本页与烹饪面板顶栏显示 | 来自头像面板 Skills / 头像技能环、种子摊 / 柜台锁角标直达对应行；去 SKILL-2、Collections |
 | SKILL-2 | Gate Card | 门禁卡（四件事同屏） | 技能 · 门禁 | 在驿站抽屉（FARM-6）里选中锁定行：抽屉压暗，被选中的 Carrot Seeds 行浮起（琥珀描边 + "Farming Lv2 · 18 XP to go"），下方门禁卡（箭头朝上）："Carrot Seeds" + 锁胶囊 "Farming Lv2"；一枚 M 号材料进度格 "XP 32/50"；右侧 "Lv2 unlocks · Carrot · Herb · 5 Carrot Seeds gift"；两个按钮 "Show my plots"（只移动相机）/ "Got it"（关闭）；不写"怎么做"的句子（p(5)） | 渔具铺变体："Carbon Rod · 350 coins / Fishing Lv6 · 220 XP to go / about 12 casts at the river / Lands Legendary fish · wider hook window / [Got it]" | 上述文案；锁定物"可见不可买" | 选中锁定物即弹卡，不在点购买后报错；Show my plots 只移动相机；Got it 关闭 | 来自 FARM-6 / NPC-2 / FARM-5 / SKILL-1；回原处 |
-| SKILL-3 | Level-up Moment | 升级时刻 | 技能 · 仪式 | 钓点场景上全幅横幅（≤ 3 秒）："Fishing Lv 2" 大字 + 一行 "Fine fish now stay on the hook" + "+50 Energy"（首次升级）+ 教学句 "Levels unlock gear, fish and seeds. Basics never lock." + "Level-up gift: 3 Worm Bait" + 按钮 "Use bait"（升级礼落入快捷栏并闪一次） | 两帧并排：① 改变日常类升级横幅 "Farming Lv6 · Sprinkler" + 蓝图卡落到工作台的动画帧 + "Today changes: no more watering"；② 厨房里的 Cooking 升级横幅 "Cooking Lv 4 · 3rd slot" + 一行 "Three-ingredient dishes now possible" + "+30 Energy"，烹饪面板 Experiment 页第 3 槽的锁打开并闪一次；另附首会话第 27 分钟的 1.5 秒小横幅 "Cooking Lv 2 · Fresh Fish Soup recipe"（并入出锅面板上方，不全幅） | 上述文案；"Level-up gift: 3 Worm Bait"；"Cooking Lv 4 · 3rd slot"；"Next Lv3 · 150 XP" 预告小字 | 横幅可点跳过；解锁物在快捷栏末格闪 0.6 秒；Cooking 升级礼（配方卡）直接进 Cookbook 页变 Tasted | 来自任何 XP 入账触发；回原场景 |
+| SKILL-3 | Level-up Moment | 升级时刻 | 技能 · 仪式 | 钓点场景上全幅横幅（≤ 3 秒）："Fishing Lv 2" 大字 + 一行 "Fine fish now stay on the hook" + "+50 Energy"（首次升级）+ 教学句 "Levels unlock gear, fish and seeds. Basics never lock." + "Level-up gift: 3 Worm Bait" + 按钮 "Use bait"（升级礼落入快捷栏并闪一次） | 两帧并排：① 改变日常类升级横幅 "Farming Lv6 · Sprinkler" + 蓝图卡落到工作台的动画帧 + "Today changes: no more watering"；② 厨房里的 Cooking 升级横幅 "Cooking Lv 4 · 3rd slot" + 一行 "Three-ingredient dishes now possible"（Cooking 升级不回体力，q(37)），烹饪面板 Experiment 页第 3 槽的锁打开并闪一次；另附首会话第 27 分钟的 1.5 秒小横幅 "Cooking Lv 2 · Fresh Fish Soup recipe"（并入出锅面板上方，不全幅） | 上述文案；"Level-up gift: 3 Worm Bait"；"Cooking Lv 4 · 3rd slot"；"Next Lv3 · 150 XP" 预告小字 | 横幅可点跳过；解锁物在快捷栏末格闪 0.6 秒；Cooking 升级礼（配方卡）直接进 Cookbook 页变 Tasted | 来自任何 XP 入账触发；回原场景 |
 
 ### H. 农场等级 Homestead
 
 | 编号 | 界面英文名 | 中文 | 所属功能 | 图 1 画什么 | 图 2 画什么 | 必须出现的控件与英文文案 | 关键手势与反馈 | 从哪来 / 到哪去 |
 |---|---|---|---|---|---|---|---|---|
 | HOME-1 | Homestead Panel | 农场等级面板 | 农场升级 | 点农舍门牌打开，抽屉按内容高度从底部升起（上方露出农舍，农场压暗）：标题 "Homestead Lv2 → Lv3" + ✕；顶部左右两卡——左 "Now · Lv2" 当前农舍缩略、右虚线卡 "Lv3 look · Full fence"（P0：门前一段篱笆补成整圈；信箱从开局就在，不进外观二选一，q(35)；P1 起为 "Lv3 look · Fence & Mailbox · Pick A or B when you upgrade" + 两枚 "Look A / Look B"，关掉二选一卡 = Look A，升级后在 Now 卡上免费切换，q(24)）；**Needs** 一组材料进度格（4 列两行，按 8.2.1 的 Lv3 行）："Timber 10/16"（琥珀环）/ "Stone 12/12" / "Reeds 10/10" / "Clay 4/4" / "Rock Salt 5/4" / "Coins 830/440"（分母含 40 地板，q(10)）/ "Skills 13/5"，齐了满绿环，不写来源与提示句；**What changes** 五行："Max Energy 220 · Meals 220 a day · now 210" / "Plots 280 · now 240"（P0 农场田块固定，HOME-1 不列这一行，q(33)） / "Warming Cabinet · keeps 6 dishes by the stove" / "Bag Upgrade I for sale · 150 coins · Bag 25 → 30" / "Stall Board · 3rd slot · now 2"；按钮缺口写在按钮上，置灰 "Need 6 more Timber"（齐了才是 "Upgrade"）；底注 "Upgrading is free of Energy · fills Energy to the new max" | 10 级阶梯缩略：Lv1–Lv10 十个农舍外观阶段小图横排，已达级全彩、未达级剪影，每级下一行最醒目的后果 | 上述文案（材料数为示意，以农场等级章为准） | 点材料格弹来源一句 + Show（只移动相机 / 打开工作台）；点 Upgrade 进入 HOME-2 | 来自 FARM-1 门牌、BAG-5 扩容提示；去 HOME-2 |
-| HOME-2 | Upgrade Moment | 升级时刻 | 农场升级 · 仪式 | 农场 diorama 上农舍外观从"农舍"变为"篱笆与信箱"阶段的中间帧（新部件从天而降落位、尘土小云；P0 只有新篱笆段从上方落位补成整圈，横幅 ≤ 3 秒内完成，信箱开局就在，图中白篱笆 + 蓝信箱是 P1 Look A 的示意，q(35)），横幅 "Homestead Lv 3 · Max Energy 220 · Energy full"，下方后果飘字 "Plots +40"（P1 起；P0 农场固定 30 格、Lv3 不扩田，不出这一行，q(33)）/ "Warming Cabinet" / "Bag Upgrade I unlocked · 150 coins"；Bag 按钮闪一次 | — | 上述文案 | ≤ 3 秒全幅，可点跳过；Bag 按钮 0.6 秒闪 | 来自 HOME-1；回 FARM-1 |
+| HOME-2 | Upgrade Moment | 升级时刻 | 农场升级 · 仪式 | 农场 diorama 上农舍外观从"农舍"变为"篱笆与信箱"阶段的中间帧（新部件从天而降落位、尘土小云；P0 只有新篱笆段从上方落位补成整圈，横幅 ≤ 3 秒内完成，信箱开局就在，图中白篱笆 + 蓝信箱是 P1 Look A 的示意，q(35)），横幅 "Homestead Lv 3 · Max Energy 220 · Energy full"，下方后果飘字 "Plots +10"（P1 起，Homestead Lv3 30 → 40 格，新 10 格荒地随篱笆落位，q(59)；P0 农场固定 30 格、Lv3 不扩田，不出这一行，q(33)）/ "Warming Cabinet" / "Bag Upgrade I unlocked · 150 coins"；Bag 按钮闪一次 | — | 上述文案 | ≤ 3 秒全幅，可点跳过；Bag 按钮 0.6 秒闪 | 来自 HOME-1；回 FARM-1 |
 
 ### I. NPC 与据点 Outposts
 
 | 编号 | 界面英文名 | 中文 | 所属功能 | 图 1 画什么 | 图 2 画什么 | 必须出现的控件与英文文案 | 关键手势与反馈 | 从哪来 / 到哪去 |
 |---|---|---|---|---|---|---|---|---|
-| NPC-1 | Outpost Rooms | 据点场景（四处） | NPC · 经济 | **第四轮（2026-10-04）：一处据点一张图，除集市广场外全部室内。** NPC-1a 茶馆 Tea House：两面墙切开的室内单间 diorama（约 12 × 12 m，相机同农场 / 厨房），柜台后 Tea Host（名牌 "Tea Host · Ama"）与冒气的壶，三张茶桌与蒲团、靠窗长椅、墙上茶罐架；Hana 在角落张罗（头顶淡红 ♥）；门口的玩家；柜台上方指尖卡 "Ama · Tap to talk"，茶桌上方 "Sit"；门头 "Lotus Tea House"；位置芯片 "Shanghai · Lotus Tea House ›"；底部只有 Bag。NPC-1b 渔具铺 Tackle Shop：室内单间，墙上挂满鱼竿与红白浮标、柜台玻璃罐里的蚯蚓、角落的鱼笼堆与渔情板（画着鱼剪影与时钟），Tackle Keeper（"Tackle Keeper · Finn"）站柜后，Old Kai 坐在角落修网（头顶黄 !）；指尖卡 "Finn · Tap to talk"，渔情板 "Bite Board · Tap to read"；窗外能看到鱼塘水面；门头 "Xuhui Tackle Shop"。NPC-1c 集市广场 Market Square（**唯一室外据点**）：露天小广场 diorama，木檐货摊柜台堆满产物筐，Market Keeper（"Market Keeper · Mei"）站柜后，旁边木质委托板 "Market Board"、城市特产货架、周末市集横幅，Nadia 在面点摊后（头顶黄 !）、Theo 在苗圃角浇花，两名其他玩家；指尖卡 "Mei · Tap to talk"、"Market Board · Tap to read"；门头牌 "Xuhui Market Square"。NPC-1d 驿站 Travel Post：室内单间，柜台后 Post Clerk（"Post Clerk · Sigrid"），墙上大幅世界地图与时刻表牌、费用预览板、角落的护照盖章台与咖啡壶；Pip 蹦在柜台前（头顶黄 !）、Sam 在时刻表前看表；指尖卡 "Sigrid · Tap to talk"、"Stamp desk · Tap to open passport"（P0 没有护照页时不挂，q(27)）；门头 "Huangpu Travel Post" | NPC-1e 小木屋 Trading Post（S 档与荒野）：一间室内木屋里四个小柜台各站一名掌柜（茶柜台带壶、渔具柜台挂竿、杂货柜台堆筐、驿站柜台带盖章台），中央一张茶桌，Granny Wu 坐在炉火旁（头顶淡红 ♥）、Pip 在门口；门头 "Tundra Trading Post"；位置芯片 "Tromsø · Tundra Trading Post ›" | "Shanghai · Lotus Tea House" / "Lotus Tea House" / "Xuhui Tackle Shop" / "Xuhui Market Square" / "Huangpu Travel Post" / "Tundra Trading Post" / "Tea Host · Ama" / "Tackle Keeper · Finn" / "Market Keeper · Mei" / "Post Clerk · Sigrid" / "Tap to talk" / "Tap to open passport" / "Outpost Stamp collected" / "Tap to read" / "Sit" / "Market Board" / "Bite Board" / 气泡 ! ♥ / 远程时屏幕上方一行 "Travel to use · Trip 3 · 20 Energy · 60 coins" 或 "Free · Home Set"（家一套）/ "Free · Trip 1 · Local"（同城其他据点，q(27)） | 点掌柜或柜台 → 问候卡 NPC-G1（Trade 之后才开 NPC-2 / 2-2 / 7 / 6）；点委托板弹 NPC-4；点角色弹 NPC-5；点茶桌坐下（P1 起可发起共做）；点门或 "Go home · Free" 回地图 | 来自 MAP-1 据点 pin "Go" / Nearby 列表 / Travel；去 NPC-2–7；回 MAP-1 / FARM-1 |
-| NPC-G1 | Keeper Greeting | 掌柜问候卡 | NPC · 经济 | 点掌柜（Mei）后：场景轻压暗，她头顶指尖卡亮成 "Mei · Talking"；底部问候卡：左 300 × 512 掌柜近景（场景同套美术，底部名字 "Mei"），右 "Market Keeper · Mei" / 小字 "Keeps the stall · Xuhui Market Square" / 问候 "Morning! Sweet potato seeds just came in — Farming Lv5 to plant. Anything I can get you?" / 三个选项：主按钮 "Trade · open the stall"、"What's fresh today?"、灰字 "Just passing by" | NPC-G1-2 茶馆 Ama："Sit a minute. Hot tea, 30 Energy back — first cup's 40 coins today. Or just sit, the table's free." / Trade · order tea / Any news in town?；NPC-G1-3 渔具铺 Finn："Reed rods are in… Perch bite at dusk here." / Trade · see the rods / Where are they biting?；NPC-G1-4 驿站 Sigrid："Tokyo today? Trip 5 — 40 Energy, 200 coins and a Travel Permit. Where to?" / Trade · book a trip / Fares today? | "Tap to talk" / "Talking" / "Trade" / "open the stall" / "see the rods" / "order tea" / "book a trip" / "What's fresh today?" / "Where are they biting?" / "Any news in town?" / "Fares today?" / "Just passing by" | Trade → 对应柜台抽屉（NPC-2 / 2-2 / 6 / 7）；信息问句 → 卡内再出一句回答，不开店；Just passing by → 关卡回房间 | 来自 NPC-1a–1e 点掌柜 / 柜台；去 NPC-2 / 2-2 / 6 / 7；回 NPC-1a–1e（NPC-G1-5 农场驿站已随 p(6) 作废） |
+| NPC-1 | Outpost Rooms | 据点场景（四处） | NPC · 经济 | **第四轮（2026-10-04）：一处据点一张图，除集市广场外全部室内。** 可交互的 NPC（掌柜与角色）头顶常驻名字条只写名字，最近的一个主色描边、放大 1.1 倍；同时只展开一个设施名字条（q(62)）。NPC-1a 茶馆 Tea House：两面墙切开的室内单间 diorama（约 12 × 12 m，相机同农场 / 厨房），柜台后 Tea Host（名牌 "Tea Host · Ama"）与冒气的壶，三张茶桌与蒲团、靠窗长椅、墙上茶罐架；Hana 在角落张罗（头顶淡红 ♥）；门口的玩家；Ama 头顶名字条 "Ama"，茶桌上方只有座位图标 `i-seat`（q(62)）；门头 "Lotus Tea House"；位置芯片 "Shanghai · Lotus Tea House ›"；底部只有 Bag。NPC-1b 渔具铺 Tackle Shop：室内单间，墙上挂满鱼竿与红白浮标、柜台玻璃罐里的蚯蚓、角落的鱼笼堆与渔情板（画着鱼剪影与时钟），Tackle Keeper（"Tackle Keeper · Finn"）站柜后，Old Kai 坐在角落修网（头顶黄 !）；Finn 头顶名字条 "Finn"，渔情板名字条 "Bite Board"（P0 只作摆设，不挂图标钮、名字条与徽标，q(46)、q(62)）；窗外能看到鱼塘水面；门头 "Xuhui Tackle Shop"。NPC-1c 集市广场 Market Square（**唯一室外据点**）：露天小广场 diorama，木檐货摊柜台堆满产物筐，Market Keeper（"Market Keeper · Mei"）站柜后，旁边木质委托板 "Market Board"、城市特产货架、周末市集横幅，Nadia 在面点摊后（头顶黄 !）、Theo 在苗圃角浇花，两名其他玩家；Mei 头顶名字条 "Mei"、委托板名字条 "Market Board"（q(62)）；门头牌 "Xuhui Market Square"。NPC-1d 驿站 Travel Post：室内单间，柜台后 Post Clerk（"Post Clerk · Sigrid"），墙上大幅世界地图与时刻表牌、费用预览板、角落的护照盖章台与咖啡壶；Pip 蹦在柜台前（头顶黄 !）、Sam 在时刻表前看表；Sigrid 头顶名字条 "Sigrid"、盖章台名字条 "Stamp Desk"（P0 没有护照页时不挂，q(27)、q(62)）；门头 "Huangpu Travel Post" | NPC-1e 小木屋 Trading Post（S 档与荒野）：一间室内木屋里四个小柜台各站一名掌柜（茶柜台带壶、渔具柜台挂竿、杂货柜台堆筐、驿站柜台带盖章台），中央一张茶桌，Granny Wu 坐在炉火旁（头顶淡红 ♥）、Pip 在门口；门头 "Tundra Trading Post"；位置芯片 "Tromsø · Tundra Trading Post ›" | "Shanghai · Lotus Tea House" / "Lotus Tea House" / "Xuhui Tackle Shop" / "Xuhui Market Square" / "Huangpu Travel Post" / "Tundra Trading Post" / "Tea Host · Ama" / "Tackle Keeper · Finn" / "Market Keeper · Mei" / "Post Clerk · Sigrid" / 名字条 "Ama" / "Finn" / "Mei" / "Sigrid" / "Stamp Desk" / "Outpost Stamp collected" / "Market Board" / "Bite Board"（座位只有 `i-seat` 图标、不写字，q(62)）/ 气泡 ! ♥ / 远程时屏幕上方一行 "Travel to use · Trip 3 · 20 Energy · 60 coins" 或 "Free · Home Set"（家一套）/ "Free · Trip 1 · Local"（同城其他据点，q(27)） | 点掌柜或柜台 → 问候卡 NPC-G1（Trade 之后才开 NPC-2 / 2-2 / 7 / 6）；点委托板弹 NPC-4；点角色弹 NPC-5；点茶桌坐下（P1 起可发起共做）；点门或 "Go home · Free" 回地图 | 来自 MAP-1 据点 pin "Go" / Nearby 列表 / Travel；去 NPC-2–7；回 MAP-1 / FARM-1 |
+| NPC-G1 | Keeper Greeting | 掌柜问候卡 | NPC · 经济 | 点掌柜（Mei）后：场景轻压暗，她头顶名字条 "Mei" 保持主色描边、放大 1.1 倍（q(62)）；底部问候卡：左 300 × 512 掌柜近景（场景同套美术，底部名字 "Mei"），右 "Market Keeper · Mei" / 小字 "Keeps the stall · Xuhui Market Square" / 问候 "Morning! Row Hoes just came in — sows three plots at once, Farming Lv4. Anything I can get you?"（P0 版，P0 集市卖 Row Hoe，q(46)） / 三个选项：主按钮 "Trade · open the stall"、"What's fresh today?"、灰字 "Just passing by" | NPC-G1-2 茶馆 Ama："Sit a minute. Hot tea, 30 Energy a cup — first one's 40 coins today. Or just sit, the table's free." / Trade · order tea / Any news in town?；NPC-G1-3 渔具铺 Finn："Reed rods are in… Perch bite at dusk here." / Trade · see the rods / Where are they biting?；NPC-G1-4 驿站 Sigrid："Tokyo today? Trip 5 — 40 Energy, 200 coins and a Travel Permit. Where to?" / Trade · book a trip / Fares today? | 名字条 "Mei"（对话中保持高亮，q(62)）/ "Trade" / "open the stall" / "see the rods" / "order tea" / "book a trip" / "What's fresh today?" / "Where are they biting?" / "Any news in town?" / "Fares today?" / "Just passing by" | Trade → 对应柜台抽屉（NPC-2 / 2-2 / 6 / 7）；信息问句 → 卡内再出一句回答，不开店；Just passing by → 关卡回房间 | 来自 NPC-1a–1e 点掌柜 / 柜台；去 NPC-2 / 2-2 / 6 / 7；回 NPC-1a–1e（NPC-G1-5 农场驿站已随 p(6) 作废） |
 | NPC-2 | Market Counter + Bag | 集市柜台与背包同屏 | 经济 · 门禁 · 背包 | **与 FARM-6 同一版式（2026-10-04 定稿，Sell Tab 取消）**：集市广场背景压暗，抽屉从 HUD 下方升到底部。上半：**掌柜栏**（莓红底 `color/role/market` #9B3D6A，样板 1 · B，q(13)）首行是抽屉标题 "Mei's Stall · Market Square" + ✕，名牌 "Market Keeper · Mei" 在标题下，左侧 Mei 头像近景，气泡 "Sweet potato seeds, fresh in. Farming Lv5 to plant." 占满一行（小字 "Shared stock · all Shanghai markets" 可选）；其下 Tab "Buy"（选中）/ "Market Board"，4 行商品：Sweet Potato Seeds · 15 coins · Stock 8/10 · Farming Lv5 to plant（Bag ×0 · − 1 + · Buy）/ Citrus Sapling · 80 coins · 灰按钮 "Farming Lv9 needed"（第二行 "2 levels to go"；常态玩家 Lin 为 Farming Lv7，q(11)）/ Orchard Feed · 6 coins（− 0 + · Buy）/ Recipe Card ◆ New for you · City Specialty · Fisher's Stew · 200 coins（Buy）。下半：Bag 19/25 + 容量条 + Sort，Tab "Sell here 3 · All（选中）· Seeds · Fish · Produce · Dishes · Materials"，详情卡 Grilled Crucian ×3 · Common dish · +20 Energy + Pin / 灰 "Sell at home"（料理只在农场驿站回收，q(9)；不加解释句），5 × 5 格 19 格有物（可在此卖的 3 格带绿签 "Sell here"） | NPC-2-2：渔具铺同版式（渔具铺室内背景）：掌柜栏（海蓝底）首行是标题 "Finn's Tackle · Xuhui" + ✕，名牌 "Tackle Keeper · Finn" 在标题下，Finn 头像近景，气泡 "Reed rods are in. Fishing Lv3 and Fine fish stop slipping the hook." 占满一行；其下 Tab "Buy / Bite Board"，4 行（Lin 为 Fishing Lv6，q(11)）：Reed Rod · 80 coins · 灰按钮 "Owned" / Carbon Rod · 350 coins · 灰按钮 "Need 160 more coins" / Spinner Lure · 6 coins · Stock 7/10（Bag ×3 · Buy）/ Fish Trap · 120 coins（Buy）；下半背包额度条 "Fish buy-back today 30/80 · all tackle shops · resets in 9h 12m"，Tab "Sell here 4" 选中，详情卡 Pond Crucian ×3 · Common fish · Caught at Willow Pond · "2 each · Sell All = 6 coins" + Pin / Sell / Sell All，格：Pond Crucian ×3（选中）/ Pond Carp ×2 / Minnow ×2 / Golden Koi ×1 | "Buy" / "Market Board" / "Bite Board" / "Shared stock · all Shanghai markets" / "Bag ×0" / "Stock 8/10" / "Farming Lv9 needed" / "2 levels to go" / "Owned" / "Need 160 more coins" / "◆ New for you" / "Sell here" / "Sell at home" / "Sell" / "Sell All" / "Fish buy-back today 30/80" | 商品行 − / + 改数量、Buy 立即扣币入包（包里对应格高亮 "In bag ×N"）；点包里的格 → 详情卡；可卖 → Sell / Sell All；不可卖 → 按钮写原因，不可点；点 ✕ 或抽屉外关闭 | 来自 NPC-G1 问候卡的 Trade（NPC-1c 点 Mei / NPC-1b 点 Finn）；去 NPC-3（卖）/ NPC-4（Market Board）/ NPC-1b 渔情板；回 NPC-1c / NPC-1b |
 | NPC-3 | Sell from the Bag | 在柜台从背包卖 | 经济 · 背包 | 同一张柜台 + 背包抽屉的"卖"态（集市广场）：上半不变，掌柜栏气泡改说 "I'll take your grass carp and sweet potatoes — 30 coins' worth more today."（额度只剩 30，与额度条和主按钮一致，q(21)）；下半 Bag 标题下额度条 "Buy-back today 30/60 · all Shanghai markets · resets in 9h 12m"，Tab "Sell here 2" 选中（格里只有 Sweet Potato ×12 / Grass Carp ×6，其余空格虚线），详情卡 "Grass Carp ×6 · Regional fish · Subtropical · 6 each"，剩余额度 30 只够 5 条：主按钮 "Sell 5 · 30 coins"（q(9)），次 Sell、Pin | NPC-3-2 额度已满：条变红 "Limit reached · resets in 9h 12m"（60/60），掌柜栏气泡 "That's all I can take today. Same for every market in Shanghai, I'm afraid."，详情卡按钮灰显 "Limit reached" / "Limit reached · 9h 12m" | "Sell here" / "Buy-back today 30/60" / "all Shanghai markets" / "6 each" / "Sell 5 · 30 coins" / "Sell" / "Sell All" / "Limit reached" / "resets in 9h 12m" | Sell 卖 1 件、Sell All 卖整堆，金币即时入账、额度条即时增长；满额不可卖但原因写在按钮上；换一处集市广场再卖不会得到新的额度 | 来自 NPC-2 的背包 Sell here 筛选；回 NPC-1c |
-| NPC-4 | Request Board | 委托板 | 委托 | 木质委托板上 3 张卡（Stall Board 3 槽 / Market Board 2 槽）："Dusk Haul · Market Board / 4 Fine fish · any kind / 36 coins · +1 city stamp / Deliver at any Shanghai outpost / [Track] [Show on map]"；第二张状态 "Tracked"；第三张 "Ready to deliver" 绿色 + 按钮 "Deliver"；板角 "Requests today 4 of 6 · Next request in 3h 58m" 与 "Same board at all 3 market squares" | 共做委托卡："Harvest Together · Together · 2–6 players / 3 joined · 7:12 to start / Everyone gets the full reward / [Join]"；旁一张 "Not enough players · solo request" | 上述文案；状态词 "Open / Tracked / Ready to deliver / Done / Dropped"；按钮 "Track / Deliver / Drop / Show on map / Join"；"Deliver at any Shanghai market" / "Same board at all 3 market squares" | Track 把它加入 Today；Deliver 原子交付（本城任一集市广场皆可）；Show on map 只移动相机 | 来自 NPC-1c / FARM-6 Stall Board；无位置跳转 |
-| NPC-5 | Resident Dialogue | 角色对话 | NPC · 好感 | 场景底部对话条：Pip 半身像（圆头、信使帽）、名字 "Pip · Courier Kid"、好感阶段标签 "Acquainted" + 小进度条、台词 "Got a Common fish for me? Any kind."；右侧按钮 "Gift"（背包有他喜欢的菜时亮，否则灰 "Nothing he likes in your bag"）、"Request"；头顶气泡从 ! 变为无 | 赠餐时刻："Granny Wu shared a meal with you · +20 Energy"，一碗汤从她手里递到玩家手里的中间帧；对话条下 "+2 · first chat today" 飘字 | 上述文案；好感五阶 "Stranger / Acquainted / Familiar / Trusted / Kindred"；"Gift already given today"；送礼飘字 "+3 · loved it / +2 · liked it / +1 · gift received"；Request 不可用 "Next request in 9h 12m / Next request at Familiar / No more requests"（q(18)） | 点 NPC 弹对话；Gift 打开背包 Dishes 过滤他喜欢的族；对话 0 体力 | 来自 NPC-1a–1e 点角色 / FARM-6；去 BAG-1（Gift） |
-| NPC-6 | Tea House Counter | 茶馆柜台 | 体力 · 经济 | 从 Ama 的问候卡选 Trade · order tea 之后：相机推到柜台，点单卡顶部是掌柜栏（玉青底 `color/role/tea` #2B7369，样板 1 · B，q(13)）：首行标题 "Ama's Tea · Lotus Tea House" + ✕，名牌 "Tea Host · Ama" 在标题下，Ama 近景，气泡占满一行 "Sit a minute. Hot tea, 30 Energy back — first cup's 40 coins today." + 小字 "Counts across all tea houses · 3 cups a day"）；下面 Tea Host（名牌 "Tea Host · Ama"）隔着柜台递出一杯冒气的茶，小卡 "Hot Tea · +30 Energy · 40 coins (1/3)"，按钮 "Hot Tea · +30 Energy"，副行小字 "Coffee · at the Travel Post"；买完角色端杯走到茶桌坐下，HUD 体力 +30；茶桌上方指尖卡 "Sit" | 用尽态："Tea 3/3 today · back tomorrow"，按钮置灰；条下小字 "Counts across all tea houses"；旁一帧满体力态按钮置灰 "Energy full" | 上述文案；第 2、3 杯价格 "50 coins" / "60 coins"；"Tea House" | 点按钮购买即饮（0 体力可做）；端杯到茶桌坐下是约 2 秒动画；坐在茶桌上再点一次 = 发起共做（P1） | 来自 NPC-G1-2 的 Trade / 体力卡 "Show on map ›" 带到最近的茶馆；回 NPC-1a |
-| NPC-7 | Travel Post Desk | 驿站柜台 | 旅行 · 门禁 | 从 Sigrid 的问候卡选 Trade · book a trip 之后打开：驿站室内压暗，抽屉标题并入掌柜栏（q(13)）：首行 "Sigrid's Desk · Travel Post" + ✕，下为藏青底 Sigrid 近景 + "Post Clerk · Sigrid" + 气泡 "Shanghai to Tokyo: Trip 5 — 40 Energy, 200 coins and a Travel Permit. Where to?" + 小字 "Permits 2 a week · Long-haul Tickets 1 a week · resets Monday"；Tab "Buy（选中）/ Passport / Fares"（q(27)）；Buy 页上部三行可买：Coffee · +30 Energy · 50 coins (2/3) / Travel Biscuits · 40 coins / Mira 当周的货（她在本城时）；下部两张配方卡（样例取 FX-L：印章 4、230 coins）：**Travel Permit** · "For trips beyond 1,600 km · Trip 5 and up · you have 0" · "Craft: 2 regional specialties from 2 climates + 100 coins" · M 号气候槽 "Subtropical 1/1"（Grass Carp 图标）/ "Temperate 1/1"（Smelt 图标，Lin 在青岛钓的）/ "Coins 230/140"（分母含 40 地板），全满绿环 · 按钮 "Craft · 100 coins · 3 left" / 灰 "Buy · 1 more stamp"（购买需印章 ≥ 5）；**Long-haul Ticket** · "For trips beyond 4,000 km · Trip 6–7 · you have 0" · "Craft: Travel Permit + Hardwood ×2 + Quartz ×2 + 150 coins" · M 号材料进度格 "Travel Permit 0/1" / "Hardwood 0/2" / "Quartz 0/2"（琥珀空环）/ "Coins 230/190"（满绿，分母含 40 地板）/ "Stamps 4/8"（琥珀环），等级门禁不做格 · 按钮合为一个灰 "Homestead Lv4 needed"；原页脚三行已并入 Buy 页上部，据点章进门自动发（q(27)） | Fares 页：费用预览板，列出 Nearby 10 城与收藏城 "Tokyo · Trip 5 · 40 Energy · 200 coins · Travel Permit · 10 min"；Passport 页一行 "Outposts · Shanghai 4/17"；盖章飘字 "Outpost Stamp collected" | 上述文案；"Craft · 100 coins · 3 left" / "Buy · 250 coins · 2 left" / "Buy · 1 more stamp" / "Limit reached · 2d 9h" / "Sold out · 2d 9h" / "Choose a 2nd climate" / "Stamps 4/8" / "Homestead Lv4 needed" / "Outposts · Shanghai 4/17" | 点 Craft 即时制作（0 体力）；气候槽自动填、点格可换（11.3.2）；不满足时按钮写差什么；周限购写在按钮上 | 来自 NPC-G1-4 的 Trade；回 NPC-1d |
+| NPC-4 | Request Board | 委托板 | 委托 | 木质委托板上 3 张卡（Stall Board 3 槽 / Market Board 2 槽）："Dusk Haul · Market Board / 4 Fine fish · any kind / 36 coins / Deliver at any Shanghai outpost / [Track] [Show on map]"；第二张状态 "Tracked"；第三张 "Ready to deliver" 绿色 + 按钮 "Deliver"；板角 "Requests today 4/6 · Next request in 3h 58m" 与 "Same board at all 3 market squares" | 共做委托卡："Harvest Together · Together · 2–6 players / 3 joined · 7:12 to start / Everyone gets the full reward / [Join]"；旁一张 "Not enough players · solo request" | 上述文案；状态词 "Open / Tracked / Ready to deliver / Done / Dropped"；按钮 "Track / Deliver / Drop / Show on map / Join"；"Deliver at any Shanghai market" / "Same board at all 3 market squares" | Track 把它加入 Today；Deliver 原子交付（本城任一集市广场皆可）；Show on map 只移动相机 | 来自 NPC-1c / FARM-6 Stall Board；无位置跳转 |
+| NPC-5 | Resident Dialogue | 角色对话 | NPC · 好感 | 场景底部对话条：Pip 半身像（圆头、信使帽）、名字 "Pip · Courier Kid"、好感阶段标签 "Acquainted" + 小进度条、台词 "Could you catch me a fish? Any kind is fine."（与委托卡 `Pip's First Fish` 同句，q(46)）；右侧按钮 "Gift"（背包有他喜欢的菜时亮，否则灰 "Nothing he likes in your bag"）、"Request"；头顶气泡从 ! 变为无 | 赠餐时刻："Granny Wu shared a meal with you · +20 Energy"，一碗汤从她手里递到玩家手里的中间帧；对话条下 "+2 · first chat today" 飘字 | 上述文案；好感五阶 "Stranger / Acquainted / Familiar / Trusted / Kindred"；"Gift already given today"；送礼飘字 "+3 · loved it / +2 · liked it / +1 · gift received"；Request 不可用 "Next request in 9h 12m / Next request at Familiar / No more requests"（q(18)） | 点 NPC 弹对话；Gift 打开背包 Dishes 过滤他喜欢的族；对话 0 体力 | 来自 NPC-1a–1e 点角色 / FARM-6；去 BAG-1（Gift） |
+| NPC-6 | Tea House Counter | 茶馆柜台 | 体力 · 经济 | 从 Ama 的问候卡选 Trade · order tea 之后：相机推到柜台，点单卡顶部是掌柜栏（玉青底 `color/role/tea` #2B7369，样板 1 · B，q(13)）：首行标题 "Ama's Tea · Lotus Tea House" + ✕，名牌 "Tea Host · Ama" 在标题下，Ama 近景，气泡占满一行 "Sit a minute. Hot tea, 30 Energy a cup — first one's 40 coins today." + 小字 "Counts across all tea houses · 3 cups a day"）；下面 Tea Host（名牌 "Tea Host · Ama"）隔着柜台递出一杯冒气的茶，小卡 "Hot Tea · +30 Energy · 40 coins (0/3 today)"，按钮 "Hot Tea · +30 Energy"，副行小字 "Coffee · at the Travel Post"；买完角色端杯走到茶桌坐下，HUD 体力 +30；茶桌上方只有座位图标 `i-seat`（不写字，q(62)） | 用尽态："Tea 3/3 today · back tomorrow"，按钮置灰；条下小字 "Counts across all tea houses"；旁一帧满体力态按钮置灰 "Energy full" | 上述文案；第 2、3 杯价格 "50 coins" / "60 coins"；"Tea House" | 点按钮购买即饮（0 体力可做）；端杯到茶桌坐下是约 2 秒动画；坐在茶桌上再点一次 = 发起共做（P1） | 来自 NPC-G1-2 的 Trade / 体力卡 "Show on map ›" 带到最近的茶馆；回 NPC-1a |
+| NPC-7 | Travel Post Desk | 驿站柜台 | 旅行 · 门禁 | 从 Sigrid 的问候卡选 Trade · book a trip 之后打开：驿站室内压暗，抽屉标题并入掌柜栏（q(13)）：首行 "Sigrid's Desk · Travel Post" + ✕，下为藏青底 Sigrid 近景 + "Post Clerk · Sigrid" + 气泡 "Shanghai to Tokyo: Trip 5 — 40 Energy, 200 coins and a Travel Permit. Where to?" + 小字 "Permits 2 a week · Long-haul Tickets 1 a week · resets Monday"；Tab "Buy（选中）/ Passport / Fares"（q(27)）；Buy 页上部三行可买：Coffee · +30 Energy · 50 coins (1/3 today) / Travel Biscuits · 40 coins / Mira 当周的货（她在本城时）；下部两张配方卡（样例取 FX-L：印章 4、230 coins）：**Travel Permit** · "For trips beyond 1,600 km · Trip 5 and up · you have 0" · "Craft: 2 regional specialties from 2 climates + 100 coins" · M 号气候槽 "Subtropical 1/1"（Grass Carp 图标）/ "Temperate 1/1"（Smelt 图标，Lin 在青岛钓的）/ "Coins 230/140"（分母含 40 地板），全满绿环 · 按钮 "Craft · 100 coins · 3 left" / 灰 "Buy · 1 more stamp"（购买需印章 ≥ 5）；**Long-haul Ticket** · "For trips beyond 4,000 km · Trip 6–7 · you have 0" · "Craft: Travel Permit + Hardwood ×2 + Quartz ×2 + 150 coins" · M 号材料进度格 "Travel Permit 0/1" / "Hardwood 0/2" / "Quartz 0/2"（琥珀空环）/ "Coins 230/190"（满绿，分母含 40 地板）/ "Stamps 4/8"（琥珀环），等级门禁不做格 · 按钮合为一个灰 "Homestead Lv4 needed"；原页脚三行已并入 Buy 页上部，据点章进门自动发（q(27)） | Fares 页：费用预览板，列出 Nearby 10 城与收藏城 "Tokyo · Trip 5 · 40 Energy · 200 coins · Travel Permit · 10 min"；Passport 页一行 "Outposts · Shanghai 4/17"；盖章飘字 "Outpost Stamp collected" | 上述文案；"Craft · 100 coins · 3 left" / "Buy · 250 coins · 2 left" / "Buy · 1 more stamp" / "Limit reached · 2d 9h" / "Sold out · 2d 9h" / "Choose a 2nd climate" / "Stamps 4/8" / "Homestead Lv4 needed" / "Outposts · Shanghai 4/17" | 点 Craft 即时制作（0 体力）；气候槽自动填、点格可换（11.3.2）；不满足时按钮写差什么；周限购写在按钮上 | 来自 NPC-G1-4 的 Trade；回 NPC-1d |
 
 ### J. 护照、成就与图鉴 Passport
 
@@ -7475,7 +7618,7 @@ flowchart LR
 |---|---|---|---|---|---|---|---|---|
 | HUD-1 | HUD Layout | 常驻 HUD | HUD | 透明背景上只画 HUD 与底部控件骨架（供所有场景图对齐）：第一行左头像 112 px 带双色技能环（绿半圈 Farming / 蓝半圈 Fishing）、紧贴体力卡 ⚡ "142/200" + 240 × 12 三段条 + "+1 in 2:41"、右金币 "230" + Inbox 圆钮 96 px（角标 3）；第二行左 Today 芯片 "Today · Deliver 4 Fine fish · Shanghai Market ▾"、右位置芯片 "Shanghai · Homestead ›" 带小房子；位置芯片下方登机牌卡位虚框；底部 5 格快捷栏 + Bag 虚框、右下主行动键 176 px 虚框与正上方切换键 96 px 虚框、左下"摇杆可出现区"淡色阴影（示意） | 同骨架的四个体力色态并排：绿 "142/200" / 琥珀 "42/200" / 红 "12/200" / 超上限 "230/200 · bonus"；下方一行位置芯片三态 "Shanghai · Homestead" / "Shanghai · Willow Pond" / "Tokyo · Sumida Pond · Day Pass 7h" | 上述文案；"Full"（满条）；画面里没有 Passport 小书、没有 "F4 · F6"、没有 Map 按钮 | 点头像 → 个人页 PROFILE-1（p(7)）；点体力卡 → HUD-2；点 Inbox 圆钮 → SOC-4；点位置芯片 → MAP-1；点 Today 芯片展开 HUD-4 | 常驻 |
 | HUD-2 | Energy Panel | 体力面板 | 体力 | 点体力卡从下方弹出小面板（指向体力卡的小三角）：第一行 "Max 200 · Homestead Lv1"；一行四枚 S 号材料进度格（今日用量，绿环）"Meals 100/300"（新手祝福期食物上限 300）/ "Tea 1/3" / "Rest 0/1" / "Refunds 3/10"（Fishing Lv1–3 失败退还次数）；底部暖黄条 "Newcomer Blessing · 5 days left" + 小字 "Energy returns 1.5× faster · Meals 300 a day"；背后农场常态（快捷栏、Sow ×1 主行动键） | 新手祝福到期前一日 "Newcomer Blessing ends tomorrow"；祝福结束后 Meals 分母回到 200；Homestead 升级后 "Max 210 · Homestead Lv2" | 上述文案 | 点行无动作（纯信息）；点外关闭 | 来自 HUD-1；回原处 |
-| HUD-3 | Zero Energy Card | 0 体力卡 | 体力 | 田场景压暗，中央卡 920 宽：标题 "⚡ Energy 0/200 · +1 in 3:59"（红色数字）+ 副标题 "Recover or do something free"；其下一行纯信息（时钟图标，无边框）"Full in 13h 20m"；分组标签 "RECOVER"（小号大写 + 折叠箭头 + 细分隔线，不是按钮）下 2×2 信息瓦片（浅底、圆角 20、不可点）：图标 + 标签 + 右侧等宽数值 "Eat · 3 dishes" / "Cook · 4 fish in creel" / "Tea · 1/3 · 40 coins" / "Rest · +60"；底部唯一的主色胶囊按钮 "Free to do now"，作用是关闭卡片（2026-10-04 用户定稿：卡内只有它可点） | 首会话首次出现时顶部教学句 "Energy comes back over time. A meal brings it back now."；Free to do now 关闭后 Today 行列出可做的免费事项，至多 3 行（P0 候选："Harvest 12 ready / Cook · 4 fish in creel / Sell 12 at Homestead Stall / Continue run · Free / Browse the map"；Plot Marks 不在 P0，q(44)；社交行 P2 起、Decorate P1 起），显示到体力条回到绿色为止（q(22)、q(23)、q(24)） | 上述文案；"Closes this card"（按钮下灰字） | 卡片是信息 + 一个关闭钮：等待是信息、恢复途径是信息瓦片；点 "Free to do now" 关闭回原处 | 来自体力归 0 的任何动作；回原处 |
+| HUD-3 | Zero Energy Card | 0 体力卡 | 体力 | 田场景压暗，中央卡 920 宽：标题 "⚡ Energy 0/200 · +1 in 3:59"（红色数字）+ 副标题 "Recover or do something free"；其下一行纯信息（时钟图标，无边框）"Full in 13h 20m"；分组标签 "RECOVER"（小号大写 + 折叠箭头 + 细分隔线，不是按钮）下 2×2 信息瓦片（浅底、圆角 20、不可点）：图标 + 标签 + 右侧等宽数值 "Eat · 3 dishes" / "Cook · 4 fish in creel" / "Tea · 0/3 · 40 coins" / "Rest · +60"；底部唯一的主色胶囊按钮 "Free to do now"，作用是关闭卡片（2026-10-04 用户定稿：卡内只有它可点） | 首会话首次出现时顶部教学句 "Energy comes back over time. A meal brings it back now."；Free to do now 关闭后 Today 行列出可做的免费事项，至多 3 行（P0 候选："Harvest 12 ready / Cook · 4 fish in creel / Sell 12 at Homestead Stall / Continue run · Free / Browse the map"；Plot Marks 不在 P0，q(44)；社交行 P2 起、Decorate P1 起），显示到体力条回到绿色为止（q(22)、q(23)、q(24)） | 上述文案；"Closes this card"（按钮下灰字） | 卡片是信息 + 一个关闭钮：等待是信息、恢复途径是信息瓦片；点 "Free to do now" 关闭回原处 | 来自体力归 0 的任何动作；回原处 |
 | HUD-4 | Today Panel | 今日目标面板 | 引导 | 点第二行 Today 芯片后，芯片下方展开三行（右侧位置芯片保持不动），每行左图标 + 文案 + 右 "Show on map"："Deliver 4 Fine fish · Shanghai Market" / "Radishes ready in 1h 12m" / "Fishing Lv 4 · 60 XP to go"；一行完成打勾淡出、下一行补位的中间帧 | 体力不足时某行末尾灰小字 "needs 12 Energy · +4 in 1h"（不灰掉整行） | 上述文案；芯片态 "Today · Deliver 4 Fine fish · Shanghai Market ▾" | 点 Show on map 只移动相机并高亮 2 秒；点行外收起回芯片态 | 来自 HUD-1 Today 芯片；不产生位置跳转 |
 
 ### M. 矿洞 Mine
@@ -7563,9 +7706,9 @@ flowchart LR
 
 | 编号 | 中文画面描述 | English keywords（Scene） |
 |---|---|---|
-| COOK-1 | 农舍厨房：灶口状态牌 Empty / Cooking 0:22 冒蒸汽 / Ready 发光盘子，墙上 Cookbook、调味架与保温柜，灶前地砖路与玩家，位置芯片 "Shanghai · Farmhouse"；底部只有 Bag，无快捷栏、无主行动键，靠近的空灶口上方指尖卡 "Stove 1/3 · Empty · Tap to cook" | Scene: cozy clay kitchen diorama with three round stoves in a row, each with a small status sign — Empty, Cooking with a steaming lid and orange glow, Ready with a glowing plated dish — a cookbook hanging on the wall, a spice rack with salt and herb jars, a small warming cabinet, a tiled walkway in front of the stoves with the avatar standing at the first stove, a location chip reading "Shanghai · Farmhouse", a small cream pointer card above the nearest empty stove reading "Stove 1/3 · Empty · Tap to cook", at the bottom only a Bag button, no quick bar and no action button |
+| COOK-1 | 农舍厨房：灶口状态牌 Empty / Cooking 0:22 冒蒸汽 / Ready 发光盘子，墙上 Cookbook、调味架与保温柜，灶前地砖路与玩家，位置芯片 "Shanghai · Farmhouse"；底部只有 Bag，无快捷栏、无主行动键，靠近的空灶口名字条 "Stove 1/3 · Empty"（q(62)） | Scene: cozy clay kitchen diorama with three round stoves in a row, each with a small status sign — Empty, Cooking with a steaming lid and orange glow, Ready with a glowing plated dish — a cookbook hanging on the wall, a spice rack with salt and herb jars, a small warming cabinet, a tiled walkway in front of the stoves with the avatar standing at the first stove, a location chip reading "Shanghai · Farmhouse", a small cream pointer card above the nearest empty stove reading "Stove 1/3 · Empty", at the bottom only a Bag button, no quick bar and no action button |
 | COOK-2a | 第五版：相机推到灶台，锅是 3D 物件、锅上悬浮选中页原料虚影，锅下槽条 + 胶囊 "Grilled Crucian · Common · 5 s · Ready to cook"；抽屉 60%：顶栏 + ✕，Tab "Cookbook 4/48" / "Experiment"，筛选条，详情卡（菜图 · 名字与事实 · 描述 · 右侧 Ingredients 材料列 · 卡底 XP / 用途 / Cook），5 列页格五种页态 | Scene: the camera pushed in on a clay stove with a 3D pot, a faint ghost of a fish hovering over the pot, a small slot chip and a fact capsule under the pot; a cream drawer on the lower 60% with tabs Cookbook and Experiment, a filter row, a detail card with a dish icon, name, facts, a short description and an Ingredients column on the right with a green Cook pill, then a 5-column grid of dish pages — colorful cooked dishes with green check badges, half-colored tasted ones, gray silhouettes with tiny ingredient-family dots, a few with small lock badges |
-| COOK-2b | 第五版：相机推到灶台，鱼与香草已在 3D 锅里，锅下槽条两枚带 ✕ + 第 3 枚灰锁 "Cooking Lv4 · 3rd slot"，胶囊 "? · Fine · 15 s · Unknown dish"；抽屉只剩背包：From your bag 标题、Fish / Produce / Fruit / Seasoning 筛选、5 × 4 格（锅里的格绿框 + 勾），底部大按钮 "Cook" | Scene: the camera pushed in on a clay stove, a fish and a sprig of herb visibly sitting inside a 3D pot, two round ingredient chips with small close buttons and a gray locked third chip under the pot, a capsule reading "? · Fine · 15 s · Unknown dish"; a cream drawer on the lower 60% with the Experiment tab selected and a bag grid of ingredient cells with rarity dots and counts, two cells outlined in green with check badges, a wide green Cook button at the bottom |
+| COOK-2b | 第五版：相机推到灶台，鱼与香草已在 3D 锅里，锅下槽条两枚带 ✕ + 第 3 枚灰锁 "Cooking Lv4 · 3rd slot"，胶囊 "? · Fine · 15 s · Unknown dish"；抽屉只剩背包：From your bag 标题、Fish / Produce / Fruit / Seasoning 筛选、5 列格（至少 2 行、末行补齐；锅里的格绿框 + 勾），底部大按钮 "Cook" | Scene: the camera pushed in on a clay stove, a fish and a sprig of herb visibly sitting inside a 3D pot, two round ingredient chips with small close buttons and a gray locked third chip under the pot, a capsule reading "? · Fine · 15 s · Unknown dish"; a cream drawer on the lower 60% with the Experiment tab selected and a bag grid of ingredient cells with rarity dots and counts, two cells outlined in green with check badges, a wide green Cook button at the bottom |
 | COOK-3 | 火候环：锅冒气，锅上方圆环与旋转的针、一段金色弧，针正进入金区，手指点锅，"Nice heat! ★" 飘字，锅下进度环倒计时 | Scene: steaming pot on a stove, a round gauge ring floating above the pot with a rotating needle and a short golden arc, the needle entering the gold zone, a finger tapping the pot, a floating "Nice heat! ★", a small progress ring under the pot reading 0:09 |
 | COOK-4 | 出锅：锅盖揭开蒸汽散开，盘子滑出到中央带蓝色微光（Fine，与稀有度色点同色），卡片名字 ★ Good 稀有度 +45 Energy，New recipe! 翻页条，Eat / Keep / Gift 三按钮 | Scene: pot lid lifting with steam clouds, a round clay plate of grilled fish with herbs sliding to the center with a soft blue glow, a card with dish name, a star quality badge, a blue Fine dot, "+45 Energy", a cookbook page-flip strip reading "New recipe!", three pill buttons |
 | COOK-5 | 已并入 COOK-2a / COOK-2a-2（Cookbook Tab）；不再单独出图 | — |
@@ -7579,10 +7722,10 @@ flowchart LR
 | BAG-1 | 抽屉升到 y = 800：首行即快捷栏 5 格 + ✕，第二行 Bag 19/25 容量条 + Sort 芯片，第三行七 Tab 带角标，5 × 5 网格有色点 / 数量 / 房子角标 / 虚线空格 | Scene: farm dimmed behind a tall cream drawer rising from the bottom, its first row the same five quick bar slots plus a close cross, a second row "Bag 19/25" with a thin capacity bar and a Sort chip, a third row of seven tabs with count badges, a 5×5 grid of rounded item cells — fish with colored rarity dots, dishes, radishes with "50" counts, seed bags with a tiny house badge — six dashed empty cells |
 | BAG-2 | 背包抽屉 Bag | Gear 切换的 Gear 一侧：六槽（四工具 + Ring 虚线空槽 + Charm），选中 Fishing 槽，下方三行鱼竿（Equipped / Equip / 灰锁门槛） | Scene: the farm dimmed behind the bag drawer — the quick bar row at its top, a two-part switch Bag and Gear with Gear selected, a row of six rounded equipment slots (hoe, rod selected with a green outline, pickaxe, wooden sword, an empty dashed ring slot, a clover charm), below it three rod rows: one tagged Equipped, one with a green Equip pill, one grayed with a padlock level pill, and a quiet footer line |
 | BAG-3 | 长按详情卡六行：鱼大图与紫点、数量来源、用途、等级差 XP 提示、按钮行 | Scene: a centered six-line detail card with a large golden koi icon and a purple Rare dot, lines for count and origin, uses, a small XP percentage badge, a row of four small pill buttons |
-| BAG-4 | 从网格拖堆肥到抽屉首行快捷栏第 3 格，目标格放大描亮，落入后图钉 | Scene: a finger dragging a compost bag icon from the drawer grid up to the third slot of the quick bar row at the top of the drawer, the target slot enlarged and glowing, a tiny pin icon appearing on the slot |
+| BAG-4 | 从网格拖长按浮起的堆肥到抽屉首行快捷栏第 3 格，原位留虚线空格、网格压暗，目标格放大描亮，落入后不出图钉（q(61)） | Scene: a finger dragging a lifted compost bag icon from the drawer grid up to the third slot of the quick bar row at the top of the drawer; the grid is dimmed and the item's original cell shows a dashed empty outline; the target slot is enlarged and glowing; no pin appears on the slot |
 | BAG-5 | 满包：Bag 25/25 琥珀条，底部扩容提示；图 2 满包时奖励进包裹的飘条与信箱小牌 | Scene: bag drawer header "Bag 25/25" in amber, a bottom line about Bag Upgrade I; second frame: the farm in its normal state with a small toast under the bell icon about a parcel sent to the inbox and a small parcel tag above the mailbox |
 | BAR-1 | 快捷栏特写：5 格（选中种子上抬、堆肥、胡萝卜、南瓜、幽灵空格）+ Bag 铺满，无芯片无体力价；右下主行动键 "Sow ×1 · 2 Energy" + 切换键 | Scene: close-up of the bottom quick bar over farm plots, five rounded slots filling the width — a lifted glowing radish seed slot with name and count, compost, carrot seeds, pumpkin seeds, a ghosted empty slot with hint text — and a Bag button, no scene chip, no energy prices on the slots, a large round action button bottom-right reading "Sow ×1 · 2 Energy" with a hoe badge and a smaller round toggle above it |
-| BAR-2 | 切换键按下，从角色扇出四瓣径向菜单：Farming 已选主色、Fishing / Mining 置灰带原因、Combat 置灰带锁；场景标签淡出 | Scene: farm scene with a radial menu of four round petals fanning out from the avatar — a filled Farming petal with a hoe icon connected to the avatar, grayed Fishing and Mining petals with short reason text, a grayed Combat petal with a padlock — the small toggle button above the big action button in pressed state, scene labels faded |
+| BAR-2 | 切换键按下，以屏幕中心为圆心弹出四瓣环（不围着角色、无连线、瓣上无字）：Farming 当前主色实心、Fishing / Mining / Combat 米色带锁；场景标签淡出（q(62)） | Scene: farm scene, softly dimmed, with a ring of four round icon-only petals centred on the middle of the screen (not around the avatar, no connecting lines, no text on any petal) — a solid primary-green Farming petal with a white hoe icon, beige Fishing and Mining petals with faded icons and small padlock badges, a beige Combat petal with a padlock; one tiny single-line reason bubble at the ring centre pointing to the Fishing petal — the small toggle button above the big action button in pressed state, scene labels faded |
 | BAR-3 | 主行动键琥珀态 "Sow ×1 · Need 2 Energy"，HUD 1/200 琥珀，Energy Card 不足态（事实数值 + 引导瓦片 + 唯一关闭钮）；图 2 点 Rest 后相机 zoom 到长椅 | Scene: farm scene with the large round action button turned amber reading "Sow ×1 · Need 2 Energy", HUD energy 1/200 amber, a centered cream card with a red-amber energy header, a plain wait line, an uppercase RECOVER label with a divider, four light guidance tiles each with an icon, a label, a factual count and a small grey "Open bag ›" style hint, and one green pill "Free to do now"; figure 2: the card gone, camera zoomed on the bench with its glowing status badge and a top hint pill "Rest on the bench · +60 Energy · once a day" |
 | EQUIP-1 | 已并入 BAG-2（p(8)）；以下为旧提示词留档：70% 抽屉 Tools & Gear，Equipped 四槽各一句效果，Accessories 两槽，Owned 列表 | Scene: farm dimmed behind a tall cream drawer at 70% height, header "Tools & Gear" with a close cross, two tabs Tools and a grayed Outfit with a small "Later" note, an Equipped row of four rounded slots holding a hoe, a fishing rod, a pickaxe and a wooden sword each with a one-line effect, an Accessories row with an empty dashed Ring slot and a Charm slot, an Owned list with Equip pills and one grayed row with a padlock and a coin price, a footer line "Gear doesn't take Bag space" |
 | CTRL-1 | 农场按下态：左下浮动摇杆（外圈 260 内圈 120 半透明）内圈推向右上，角色行走带尘云；屏幕中部虚线安全框与标注；HUD、5 格快捷栏、主行动键在位 | Scene: farm diorama with a translucent floating virtual joystick appearing under a thumb at the lower left of the scene — a large outer ring and a smaller inner knob pushed toward the upper right — the avatar walking that way with tiny dust puffs, a dashed annotation rectangle in the middle of the screen labeled "Camera follows outside this box", full HUD, five-slot quick bar and the large round action button all in place |
@@ -7602,12 +7745,12 @@ flowchart LR
 | 编号 | 中文画面描述 | English keywords（Scene） |
 |---|---|---|
 | NPC-1 | 第四轮：一处据点一张图。NPC-1a 茶馆室内单间（柜台后 Tea Host 与茶壶、茶桌蒲团、靠窗长椅、茶罐架，Hana 在角落），NPC-1b 渔具铺室内（挂竿与浮标、蚯蚓罐、鱼笼、渔情板，Old Kai 修网），NPC-1c 集市广场室外（货摊、委托板、特产货架、市集横幅，Nadia 面点摊、Theo 苗圃角），NPC-1d 驿站室内（世界地图与时刻表、费用预览板、盖章台、咖啡壶，Pip 与 Sam），NPC-1e 小木屋室内（四个小柜台 + 茶桌 + 炉火，Granny Wu 与 Pip） | Scene (indoor rooms): a cutaway room diorama with two back walls and an open front, on a rounded base slab, same tilted camera as the farm; tea house — a wooden counter with a steaming kettle and a shelf of tea tins, three low round tables with cushions, a bench under a window; tackle shop — rods and red-and-white bobbers hanging on the wall, a glass jar of worms on the counter, stacked fish traps, a small chalkboard with fish silhouettes; travel post — a counter with a large wall map and a timetable board, a stamp desk with a round stamp, a coffee pot; trading post cabin — four small counters, a tea table, a stove fire. Scene (outdoor, the only one): a small open market square diorama with a wooden-eave stall stacked with produce crates, a wooden request board, a specialty shelf, a bunting banner, a baker's stall and a nursery corner with potted seedlings. No text anywhere |
-| NPC-G1 | 掌柜问候卡：掌柜头顶指尖卡亮成 Talking，底部大卡左掌柜近景、右名字岗位 + 一句带今日信息的问候 + 三个选项 Trade（主）/ 信息问句 / Just passing by；G1-2 茶馆 Ama、G1-3 渔具铺 Finn、G1-4 驿站 Sigrid（G1-5 农场驿站随 p(6) 作废） | Scene: a room diorama lightly dimmed, a lit green talk card above the keeper's head, and a large cream greeting card at the bottom — a rounded close-up portrait of the keeper on the left with her name, on the right her title and post, a two-line greeting in quotes, a full-width green Trade pill with a small hint on its right, a second outlined question pill, and a plain "Just passing by" line |
+| NPC-G1 | 掌柜问候卡：掌柜头顶名字条只写名字、主色描边放大 1.1 倍（q(62)），底部大卡左掌柜近景、右名字岗位 + 一句带今日信息的问候 + 三个选项 Trade（主）/ 信息问句 / Just passing by；G1-2 茶馆 Ama、G1-3 渔具铺 Finn、G1-4 驿站 Sigrid（G1-5 农场驿站随 p(6) 作废） | Scene: a room diorama lightly dimmed, a short name label above the keeper's head (just her name, with a green outline, slightly enlarged), and a large cream greeting card at the bottom — a rounded close-up portrait of the keeper on the left with her name, on the right her title and post, a two-line greeting in quotes, a full-width green Trade pill with a small hint on its right, a second outlined question pill, and a plain "Just passing by" line |
 | NPC-2 | 统一版式：集市广场柜台 + 背包同屏——上半掌柜栏（莓红，首行标题 + ✕、名牌、整行气泡）、Buy / Market Board、4 行商品（Bag ×0、灰锁、◆ 新品、City Specialty），下半背包 All Tab，选中料理时按钮灰写 Sell at home；NPC-2-2 渔具铺同版式，背包开在 Sell here = 鱼，额度条 Fish buy-back today 30/80 | Scene: a tall cream drawer over a dimmed market square — upper half topped by a berry-red keeper bar (stall title and close button on its first line, the keeper name tag below, a small portrait, a full-width speech line), then two tabs Buy and Market Board, four compact item rows with coin prices, a stepper and a green Buy pill, one locked grey row; a thin divider; lower half the player's bag with a capacity bar, a row of small type tabs, a detail card with a dish icon and two grey pills reading "Sell at home", and a five-column item grid |
 | NPC-3 | 同一抽屉的"卖"态：下半 Bag 标题下额度条 Buy-back today 30/60 · all Shanghai markets，Sell here 筛选只剩 2 格，详情卡 Grass Carp ×6 · 6 each，主按钮 Sell 5 · 30 coins + Sell / Pin；NPC-3-2 额度满条变红、按钮灰写 Limit reached | Scene: the same counter-and-bag drawer, the bag half showing a daily quota bar, a filter tab "Sell here" selected, two filled cells and many dashed empty cells, a detail card with a grass carp icon, a unit price line and a green Sell 5 pill |
 | NPC-4 | 木委托板三张卡：Open / Tracked / Ready to deliver 绿，板角计数与下次刷新 | Scene: a wooden request board with three pinned cream cards — one open with Track button, one marked Tracked, one green Ready to deliver with a Deliver button — a corner note with request count, next refresh countdown and a line Same board at all 6 outposts |
 | NPC-5 | 对话条：Pip 半身像、好感标签与进度、台词、Gift / Request 按钮 | Scene: bottom dialogue bar with a round-headed courier kid portrait, name and role, an Acquainted tag with a tiny progress bar, a speech line, two pill buttons Gift and Request |
-| NPC-6 | 茶馆室内压暗，柜台上方点单卡：Tea Host 递杯，小卡 +30 Energy · 40 coins (1/3)，按钮 Hot Tea；茶桌上方 Sit | Scene: the tea house room dimmed, a cream order card floating above the counter with a tea host handing out a steaming cup, a small line "+30 Energy · 40 coins (1/3)", a green Hot Tea pill, a small fingertip card over a tea table |
+| NPC-6 | 茶馆室内压暗，柜台上方点单卡：Tea Host 递杯，小卡 +30 Energy · 40 coins (0/3 today)，按钮 Hot Tea；茶桌上方只有座位图标（q(62)） | Scene: the tea house room dimmed, a cream order card floating above the counter with a tea host handing out a steaming cup, a small line "+30 Energy · 40 coins (0/3 today)", a green Hot Tea pill, a small round seat icon floating over a tea table (no text) |
 | NPC-7 | 驿站柜台抽屉：职员台词，Permits 页两张卡（许可与长途票的配方与购买），配方材料用 M 号材料进度格（图标外套环形进度 + 名字 已有/需要） | Scene: half-screen travel post drawer with a clerk portrait, two large cards for Travel Permit and Long-haul Ticket, each showing its recipe as a row of round icons wrapped in ring progress with a short name and have/need count under each (full green or partial amber), Craft and Buy pills |
 
 ### 16.4.8 护照、社交、HUD、矿洞、教学
@@ -7716,13 +7859,13 @@ flowchart LR
 |---|---|---|
 | 操作层（第 10 章） | 浮动摇杆与安全框相机（双指缩放、双击回中、初始取景）；四种行动与 176 px 主行动键（动词 + 体力价、工具徽标、琥珀不足态 + 四件事卡；设施靠点击触发、主行动键不显示设施动词）；96 px 切换键径向菜单与自动预选；消耗品快捷栏固定 5 格 + Bag（Farming / Fishing / Mining 三张候选表、钉住、收起把手）；Tools & Gear 四工具槽 + 两饰品槽（四件初级工具默认装备；Row Hoe 集市可买、Reed Rod 渔具店可买、Copper Pickaxe 工作台可做）；烹饪面板 3D 灶台舞台 + Cookbook / Experiment；HUD 两行与位置芯片（点它进地图） | Outfit Tab（随换装系统）；饰品内容（只留 Ring / Charm 空槽）；Combat 行动与治疗药水（随 P1 的 3–5 层）；炸药 |
 | 体力（第 3 章） | 池 200、+1 / 4 分钟、满停、无重置；三类计费动作全表；料理 / Rest（农舍门口长椅，点击触发；P0 补这张长椅，农舍门卡不设 Rest，q(30)）/ 茶 / 赠餐 / 新手祝福 / 成就六条回复渠道；HUD 常驻与 1 秒倒计时；不足卡四件事同屏；0 体力三出口；玩家日 04:00 计数 | 社交回复（来访 / 做客）；活动接口 |
-| 技能（第 4 章） | 三轨 10 级阈值全表（Cooking 0 / 30 / 100 / 220 / 400 / 650 / 950 / 1,350 / 1,700 / 2,350）；等级差规则（Cooking 按菜品稀有度）；XP 来源表（首做 XP 全归 Cooking、同页每日 100 / 50 / 0）；一次性奖励；Cooking Lv1–6 便利（Lv2 Cook Again、Lv3 Double Clue 与 Hearty Mishap、Lv4 第 3 投料槽、Lv5 Steady Hand I 与 Queue ×2、Lv6 Quick Fire；Lv7–10 的便利随 P1，等级与 XP 照常累计，q(38)）；门禁表与"永不锁"护栏；四件事卡、灰色解释卡、升级仪式、技能页三张卡 | 密友同塘 ×1.2；帮工 XP；第 4 / 5 投料槽（P2） |
+| 技能（第 4 章） | 三轨 10 级阈值全表（Cooking 0 / 30 / 100 / 220 / 400 / 650 / 950 / 1,350 / 1,700 / 2,350）；等级差规则（Cooking 按菜品稀有度）；XP 来源表（首做 XP 全归 Cooking、同页每日 100 / 50 / 0）；一次性奖励；Cooking Lv1–6 便利（Lv2 Cook Again、Lv3 Double Clue 与 Hearty Mishap、Lv4 第 3 投料槽、Lv5 Steady Hand I 与 Queue ×2、Lv6 Quick Fire（P0 末位、可砍，q(47)）；Lv7–10 的便利随 P1，等级与 XP 照常累计，q(38)）；门禁表与"永不锁"护栏；四件事卡、灰色解释卡、升级仪式、技能页三张卡 | 密友同塘 ×1.2；帮工 XP；第 4 / 5 投料槽（P2） |
 | 作物（第 5 章） | 8 种：小萝卜、生菜、香草、胡萝卜、土豆、洋甘菊、辣椒、番茄（内容等级 1–4）；堆肥；Row Hoe（Farming Lv4，集市 240 金币，装备在 Tools & Gear） | 其余 12 种、多年生、洒水器、温室、地区作物；Plot Marks 与 `Plan tomorrow's field`（2026-10-08 用户从 demo 砍掉，q(44)） |
 | 钓鱼（第 6 章） | 7 种可钓：池塘鲫鱼、鲤鱼、鲻鱼、河鲈、大口黑鲈、虹鳟、金锦鲤（内容等级 1–4）；鲭鱼只在 Coast，P0 的 Fish-dex 里显示剪影与 `Coast`、钓不到（q(36)）；家城 6 口系统鱼塘（Pond 3 + River 3，新手塘 Reed Pond，§6.3.3）；新手竿 + 芦苇竿；蚯蚓；保护期退费；教学钉三颗；Fish-dex 剪影 | 碳素竿、亮片、鱼笼、Coast 模板与鲭鱼、地区鱼、天气 / 时段 |
 | 料理（第 7 章） | 烹饪七步与火候环；品质；稀有度派生表；Cookbook 五种页状态与黑暗料理；首会话两道菜 + 覆盖 8 作物、6 种可入菜的鱼与岩盐、野香草的 14 页（Common 5 / Fine 6 / Rare 3，§7.14.0，q(39)；3 槽页 3 页都要岩盐）；灶口 1、调味架（Lv2，只做储物）、保温柜（Lv3）；投料槽 2 → 3 随 Cooking Lv4，烹饪面板顶栏 Stove 1/1 · Cooking Lv1 · Empty | 其余 34 页；Legendary；料理 Buff（P3）；配方卡商店；居民教学；大锅、第三口灶；第 4 / 5 槽与器具（P2） |
 | Homestead（第 8 章） | Lv1–3 的消耗与可见后果（Lv1–2 门前一段篱笆，Lv3 用同一套篱笆补成整圈，q(35)）；升级面板四件事；升级回满；木牌；农舍旁的信箱（收件箱入口，LOCK-14，从开局就在，先用已完成的模型占位） | Lv4–10；Lv3 的 a / b 外观（篱笆与信箱两套）与二选一卡、布置模式（P1，q(24)） |
 | NPC 与经济（第 9 章） | 农场驿站（通用种子 / 蚯蚓 / 堆肥 / 直售 / 回收 / 2–3 槽委托板）；家一套四处（q(33)）：渔具铺（芦苇竿、蚯蚓、收鱼；掌柜 Finn，居民 Old Kai 在角落）、茶馆（热茶，茶桌可坐）、驿站（柜台只卖咖啡；Pip；盖章台只作摆设）三间室内单间 + 集市广场（行锄、集市委托板、城市特产货架只卖 1 件城市明信片）——每城保底 ≥1 处，真实 POI 只做视觉层（名片）；居民 Pip（3 条新手委托）与 Old Kai（1 条委托）的对话条、好感与赠餐（Granny Wu 只住 S 档与荒野小木屋，上海没有）；可视化标记与 Today 面板；委托模板 7 条（农场驿站 4、集市板 3）；价目与回收日额度 | Travel Post 的许可 / 长途票 / 旅行饼干 / 费用预览 / 护照服务与据点章；组 2–6（P1）；其余 10 个角色；地区种子 / 配方卡 / 特产回收；旅行商人；共做委托 |
-| 背包（第 10 章） | 25 格 + 7 Tab（Tackle 页显示工具不计容量，Equip 跳 Tools & Gear）；堆叠；鱼篓；农场仓库；抽屉第一行即快捷栏；点格详情卡 / 长按钉住；满包提示与裁剪；扩容 I 开售（Homestead Lv3）；收件箱包裹区（只收成就 / 委托回包） | 扩容 II / III |
+| 背包（第 10 章） | 25 格 + 7 Tab（Tackle 页显示工具不计容量，Equip 跳 Tools & Gear）；堆叠；鱼篓；农场仓库；抽屉第一行即快捷栏；点格详情卡 / 长按浮起拖进 Pin 区钉住（q(61)）；满包提示与裁剪；扩容 I 开售（Homestead Lv3）；收件箱包裹区（只收成就 / 委托回包） | 扩容 II / III |
 | 材料（第 13 章） | 9 种原料中的 7 种（木、石、芦苇、铜、岩盐、黏土、野香草）；6 个采集点；矿洞 1–2 层按层计费（层费 2 + 敲岩 2，重开须清完第 2 层，日切结束未完成局）；电梯（第 1 层在楼梯口旁、第 2 层在到达点旁；面板 `Entrance · Free` / `Floor 1 · Free` / `Floor 2 · Here`，去第 2 层同楼梯价，无 Express；离矿走电梯回 Entrance 或矿口出口，q(44)）；铜镐、采集手套、火把、堆肥配方（工作台只显示 Tools / Supplies 页签，不显示 Facilities，q(31)） | 石英、硬木；3–5 层与怪物；温室 |
 | 首会话（第 14 章） | 导演表 12 步逐分钟实现（第 22 分钟 Fishing Lv2、第 27 分钟 Cooking Lv2）；七日节奏表的第 1–3 天与第 5 天（第 4 / 6 / 7 天的旅行、社交、洒水器仪式用回退仪式替代，P0 版回退见 14.6 七日节奏表，q(45)） | 旅行与社交相关的日子 |
 | 界面（第 16 章） | Figma 页面 14 是唯一设计依据（LOCK-28），P0 页面以 SGODOT-209 Screen Registry 为准（q(45)；原「批次 1 的 31 张图」只作历史记录）：农场、田、鱼塘、厨房与烹饪面板、背包、快捷栏、摇杆与相机、Bag \| Gear、技能页、驿站、HUD、不足卡、首会话教学 | 批次 2、3 |
@@ -7734,7 +7877,7 @@ flowchart LR
 | 首会话闭环 | 20 分钟内（慢玩家 30 分钟）完成"钓 → 做 → 吃 → 体力回来"的新玩家 ≥ 5 / 6；30 分钟内 Fishing Lv2 ≥ 5 / 6、Cooking Lv2 ≥ 5 / 6；会话结束体力中位 ≥ 180 | 第 14 章 14.8 的 12 步脚本 + 4–6 人观察 |
 | 体力被理解 | 观察者能说出"体力会掉、吃饭回来、不吃也会慢慢回来"三件事的 ≥ 5 / 6；0 体力后 10 分钟内发生一次 0 体力活动的比例 ≥ 80% | 观察 + 第 3 章 3.7.4 的指标 |
 | 烹饪有期待 | 第一次火候命中率 > 80%（教学加宽）；"做菜"被观察者主动提起为"好玩的部分"≥ 3 / 6；首周内 Cooking Lv4 打开第 3 槽并做出一道 3 槽菜 ≥ 4 / 6 | 观察 |
-| 账本 | 第 15 章模拟器用 P0 的内容子集复跑：三类玩家第 1–7 天的体力账与第 14 章七日节奏表差 ≤ 20%；30 分钟玩家正餐前用池 60–80%。**V1 复跑（14.6.2，q(43)）**：体力账目标玩家 −3%（首日对齐 −11%）、5 分钟 ✓、30 分钟 −19% ✓；重度内容封顶不对表。正餐前用池 37% / 51% ✗（P0 30 格结构上限约 59%）——P0 是否以此为出口门槛待用户拍板（q(43) 旋钮 C；推荐 P0 不作门槛，P1 扩田后复核） | 模拟器 |
+| 账本 | 第 15 章模拟器用 P0 的内容子集复跑：三类玩家第 1–7 天的体力账与第 14 章七日节奏表差 ≤ 20%；30 分钟玩家正餐前用池 60–80%。**V1 复跑（14.6.2，q(43)）**：体力账目标玩家 −3%（首日对齐 −11%）、5 分钟 ✓、30 分钟 −19% ✓；重度内容封顶不对表。正餐前用池 37% / 51% ✗（P0 30 格结构上限约 59%）——**P0 不以此为出口门槛**，记为已知不达标，P1 扩田后复核（用户 2026-10-08 拍板，q(47)） | 模拟器 |
 | 门禁表现 | "到了不能钓"拒绝次数 = 0；每道锁都能在种子摊 / 柜台 / 工作台看见并弹四件事卡 | 走查 |
 | 引导无跳转 | 全部引导只靠世界内标记与 Today；没有任何自动移动玩家的路径 | 走查 |
 | 操作被理解 | 无提示下 2 分钟内用摇杆走到畦前并按出第一格 Sow 的新玩家 ≥ 5 / 6；首会话内没有一次"误触扣体力"（事件最小集里没有玩家否认的体力消费）；主行动键、切换键、快捷栏在田 / 塘 / 矿 / 厨房四个场景位置一致 | 观察 + 事件最小集 + 第 16 章 16.5 检查表第 5、13 条 |
@@ -7759,6 +7902,27 @@ flowchart LR
 | 目标玩家（早 15 + 晚 30 分钟，14.6.2） | Farming Lv2、Fishing Lv3、Cooking Lv2 | Farming Lv3、Fishing Lv4、Cooking Lv3 | 三轨 Lv5、Homestead Lv2（第 5 天）、首道 3 槽菜（第 5 天）、Cookbook 11 页、钱包约 210 |
 | 重度（两场各 2 小时） | Farming Lv2、Fishing Lv3、Cooking Lv2 | Farming Lv4、Fishing Lv5、Cooking Lv4、Homestead Lv2 | 三轨 Lv6、Homestead Lv3（第 5 天）、Cookbook 14 / 14、Fish-dex 6–7 / 7 |
 
+### 17.2.4 P0 上线后看哪些数（观察日志 → 判断 → 调什么，q(52)）
+
+数据来自 #23 观察日志（SGODOT-232 S7）：服务端每条命令一行 JSONL（`output/p0/events/p0-events-<UTC 日>.jsonl`：时刻、玩家、seq、命令白名单字段、按法 `src` hold / tap、结果或拒绝码、体力前后、XP / 升级 / 首次事件），客户端只报白名单 UI 时刻（`tip_shown` / `tip_hidden{why}` / `card_shown` / `today_done` / `energy_card` / `gate_card` / `screen` / `level_banner` / `session_start` / `session_end`）；首会话里程碑由 `server/tools/p0_session_report.ts` 汇总。下表的"期望"取自 §14.2、§17.2.2 与 14.6.2 的 V1 / V2 复跑；**先查原因再动手，能靠文案、引导或 demo 安排解决的不改数值**。
+
+| 指标 | 怎么从日志算 | 期望 | 看到什么算异常 | 先调什么（P0 可动）→ 再考虑（P1） |
+|---|---|---|---|---|
+| 首会话闭环（钓 → 做 → 吃） | 报告里程碑：首竿、首钓、首道菜、首次进食的分钟数 | ≤ 20 分钟，≥ 5/6 人完成 | > 25 分钟，或 ≤ 4/6 完成 | 看卡在哪一步：`tip_hidden` 的 `why = timeout` 多 → 改教学句或提前出；首钓前拒绝多 → 查新手塘 ! 与 `Go`；不动数值 |
+| 30 分钟内两轨 Lv2 | `level_banner` / 升级事件 | Fishing 第 17–21 分钟、Cooking 约第 27 分钟（V2） | 30 分钟内 < 5/6 | 查逃走次数与首做是否发生；前 3 竿钉鲫鱼、首竿首提 10 / 10 已在，不再加 XP |
+| 首会话结束体力 | 报告结束体力 | 中位 ≥ 180（V2 211–216） | 中位 < 160 | 查是否连播超出首畦；不动数值 |
+| 体力存在感 | 每人每天 `energy_card` 次数、日内最低体力、进场体力 | 首周很少见底（V2 日内最低中位 86–104）；第 1 天延长段 ≥ 1 次见卡 | 试玩者说"没感觉到体力"，且第 1 天延长段也 0 次见卡 | P0 不改数值（旋钮 B 已否），靠 demo 安排（第 1 天连续钓 ≥ 40 分钟、第 4 天"晚饭前约 80 体力"）；P1 扩田 40 格与中档作物给体力去处，仍无存在感再议播种档 +1 |
+| 见底后 10 分钟内做免费的事 | `energy_card` 之后 10 分钟内的 0 体力命令（收、卖、做菜、采集、交付） | ≥ 80%（§17.2.2） | < 60% | 改 `Free to do now` 之后的 Today 清单与瓦片引导 |
+| 种子钱 | 种子摊买种被拒（金币不足）次数；田里连续 2 天空着的格数 | 首周偶有（V1：因钱停播是主约束） | 试玩者说"钱不够买种子"，或半数以上田空置 ≥ 2 天 | 旋钮 F：起始钱包 180 → 280（已评估：Lv2 更早，首道 3 槽菜可能推迟）；或小萝卜种子 4 → 3 金币 |
+| 钱多、没东西买 | 第 7 天钱包；近 3 天无金币支出 | 第 7 天约 426（V2） | 钱包 > 600 且连续 2 天无支出 | P0 不给收鱼加限额（q(48)）；P1 把布置模式、扩容 II、特产货架提前，或再议驿站收鱼日额度 |
+| Homestead Lv2 到达日 | Homestead 升级事件 | 第 3–5 天（V2 第 3.3 天） | 第 7 天仍未到的 > 1/3 | 看缺哪样：盐 → 旋钮 A 已上；钱 → 旋钮 F；技能和 → 不动 |
+| 首周 3 槽菜 | 3 槽页的首做事件 | ≥ 4/6（§17.2.2） | < 4/6 | Today 线索已加（q(46)）；仍低就把线索提前到 Cooking Lv3，或让 Old Kai 教一页 |
+| 钓鱼挫败 | 逃走 / 挣脱事件占抛竿比 | 保护期内全退，Lv1–3 逃走不致命 | 逃走 > 40%，且试玩者表现沮丧 | 先调收线小游戏窗口；再议保护期次数 10 → 15 |
+| 背包压力 | `bag_full` / `creel_full` 拒绝次数；进包裹件数 | 第 7 天接近满（V2） | 每人每天 ≥ 3 次满包拒绝 | 加卖出引导（`Sell here`、驿站 `Sell 12` 角标）；P1 再议扩容 I 提前 |
+| 引导被理解 | `tip_hidden` 里 `why = acted` 的比例；`gate_card` 打开后 24 小时内达成解锁 | acted ≥ 60% | < 40% | 逐句改 TipCard；门禁卡的动作量写法 |
+| 回访 | `session_start` 第 2 / 4 / 7 天 | §14.8 的第 2 天回访率 | 第 2 天回访 < 4/6 | 先看第 1 天结束钩子（Today 倒计时三行）是否出现 |
+| 误触扣费 | 观察者记录，日志辅助：同一格 3 秒内播了又被玩家否认 | 无否认的误触扣费（§17.2.2） | 任何一例 | 按住连播的触发距离与松手判定，不改体力 |
+
 ## 17.3 P1 内容
 
 ### 17.3.1 范围
@@ -7767,7 +7931,7 @@ flowchart LR
 |---|---|
 | 作物 | 剩余 12 种（卷心菜、玉米、黄瓜、草莓、甜瓜、4 种地区作物、苹果树、柑橘树、葡萄藤）；果木肥；洒水器、堆肥箱、温室（可免费移动、不可拆除，q(22)）；Plot Marks（q(44) 移出 P0）、Sow Again、Coverage Overlay、Harvest All（按「不做一键执行」定形态，q(23)）、Seed Saver；多年生槽位 |
 | 钓鱼 | 剩余 12 种（鲇鱼、海鲈、银鲟、河鳗 + 8 种地区鱼）；Coast 模板；碳素竿；亮片；鱼笼 1 → 3；时段 / 天气加成与 3-day Forecast；渔情板；Fish-dex 里程碑与路标 |
-| 料理 | 剩余 34 页（含 8 页 Legendary、6 道地区菜、Travel Biscuits；Buff 效果留 P3，页上先显示 "Buff · coming later"）；配方卡（驿站每日 2 张、Market 地区卡）；居民教学；大锅、第三口灶、名厨招牌；Cooking Lv7–10 便利（Steady Hand II、Fast Mastery、Cook All、Bigger Provisions、Chef's Touch、Lucky Double、称号 Chef；Lv5–6 的 Steady Hand I、Queue ×2、Quick Fire 已在 P0，q(38)）；Cookbook 里程碑四级；Gift Clues |
+| 料理 | 剩余 34 页（含 8 页 Legendary、6 道地区菜、Travel Biscuits；Buff 效果留 P3，页上先显示 "Buff · coming later"）；配方卡（驿站每日 2 张、Market 地区卡）；居民教学；大锅、第三口灶、名厨招牌；Cooking Lv7–10 便利（Steady Hand II、Fast Mastery、Cook All、Bigger Provisions、Chef's Touch、Lucky Double、称号 Chef；Lv5 的 Steady Hand I、Queue ×2 已在 P0；Lv6 Quick Fire 是 P0 末位，P0 砍掉时随 P1（q(38)、q(47)））；Cookbook 里程碑四级；Gift Clues |
 | Homestead | Lv4–10 全表；外观四次换装（含 Lv3 篱笆与信箱的 a / b 两套与二选一卡）；布置模式 Decorate（与设施放置模式共用一个壳，入口在农舍门牌或 HOME-1，q(24)）；布告栏；扩容 II / III；特产换料入口 |
 | NPC 与经济 | 据点按城市簇六档全球生成、每岗位一处（茶馆 = 档数 1–6、渔具铺跟鱼塘、集市广场 1–3、驿站 1–2，与建成区面积档取大；S 档与荒野 0.5° 格每格 1 间小木屋；集市广场 1 距新手塘 ≤ 800 m、同类据点两两 ≥ 3 km、落点可参考 POI 密度）；掌柜 5 岗位 × 4 气候带 × 3 变体；日额度按账号或账号 × 城市簇共享）；Travel Post 柜台（费用预览与护照服务先做为只读）；真实 POI 名片层与紫 ★ 运营接口；其余 10 个角色 NPC 按顺位安置到据点（按职业）、住址规则、好感五阶段、个人委托 3–6 条 / 角色；委托模板 30 条；系统委托每日 6 份与完成奖日上限；金币去向表全部项目；茶桌共做委托（按 q(2) 归 P1，q(31)） |
 | 材料 | 石英、硬木；矿洞 3–5 层、史莱姆与精英（第 5 层精英每日只掉一次石英）、电梯（本局 0 体力 + 清过第 4 层后 Express 直达第 5 层 0 体力）；特产换料 2 : 1 |
@@ -7783,6 +7947,21 @@ flowchart LR
 | 节奏 | 模拟器复跑：30 分钟玩家两轨 21 ± 5 天、重度 ≥ 8 天、5 分钟玩家 ≤ 90 天；Cooking 30 分钟玩家 21 ± 5 天、Lv4 首周内、重度 ≥ 8 天；Homestead Lv10 重度 30–35 天、30 分钟玩家 60–70 天（下沿差 1–2 天按口径接受）；金币去向中界 60–80%；重度日撞墙 ≤ 1 |
 | 公平 | 任意家城（含极地 / 沙漠 / 海岛）都有 ≥ 1 组据点（三栋齐全）+ ≥ 1 口鱼塘；到 Homestead Lv10 的材料天数与家格无关 |
 | 七日节奏 | 第 14 章七日节奏表第 1–3、5、7 天全部按原设计触发（第 4、6 天留到 P2） |
+
+### 17.3.3 P1 先做什么（按 P0 数据排序，q(52)）
+
+V1 / V2 已经看到三件事：重度玩家第 5 天看完 P0 内容；首周体力几乎没有存在感；真实价格下第 7 天钱包约 426。P1 范围（17.3.1）按下面的顺序开工，P0 试玩数据出来后按 17.2.4 的结论调序：
+
+| 顺序 | 做什么 | 为什么排在这里 | 哪个 P0 数会让它提前或推后 |
+|---|---|---|---|
+| 1 | **第 5 天之后的种田**：40 格扩田、Farming Lv5–6 作物（卷心菜、玉米、黄瓜）、洒水器（第一个"改变日常"）。开发包：`docs/product/p1-step1-farming-2026-10-08.md`（q(59)） | 重度第 5 天、30 分钟玩家第 2 周就没有新作物；扩田同时给体力去处 | 体力存在感低、钱多没东西买 → 提前；种子钱抱怨多 → 先调起始钱包再做 |
+| 2 | **钓鱼的第二段**：River 的 Rare 鱼（鲇鱼，P0 的 River 没有 Rare）、亮片（Fishing Lv5）、鱼笼 | P0 Fishing 到 Lv4 后 River 只多 Fine；Rare 鱼只有 Pond 的金锦鲤 | 钓鱼挫败高 → 先调小游戏，本项不提前 |
+| 3 | **Homestead Lv4–5 与厨房**：第二口灶、布告栏、扩容 II，以及 Cooking Lv6–7 便利与更多 3 槽页 | 2 / 3 的人第 7 天就凑够 Lv3 的钱（V2），Lv3 之后没有下一级 | Homestead Lv2 普遍晚 → 推后 |
+| 4 | **矿洞 3–5 层、战斗与石英**，以及硬木与老树 | 给重度玩家更大的体力去处（B 局 56），也是 Homestead Lv4+ 的石英来源 | 依赖顺序 3 |
+| 5 | **金币去处**：布置模式 Decorate、特产货架扩到多件、扩容 III | 钱包偏高时的出口 | 钱多没东西买 → 提到第 2 位 |
+| 6 | **居民第二段**：好感 Familiar 的赠餐、更多居民委托、其他 10 位角色按城市安置 | 首周 Pip 到不了 Familiar（V1），赠餐要第 2 周才出现 | 回访率低 → 提前（给第 2 周一个理由） |
+
+旅行、社交与地区内容仍在 P2（17.4），不因 P0 数据提前。
 
 ## 17.4 P2 地图与社交
 
@@ -8047,7 +8226,7 @@ flowchart LR
 | `style_tea` | 第 7 章 | 茶饮 / Tea |
 | `dish_travel_biscuits` | 第 7 章 | 旅行饼干 Travel Biscuits——Common、+20、Dessert、Trail Food，只在驿站 Tra |
 | `kitchen_stove_1` | 第 7 章 | 土灶 / Stove |
-| `kitchen_spice_rack` | 第 7 章 | 调味架 / Spice Rack（只做储物：四种调味料各存 30 份不占背包；不开投料槽） |
+| `kitchen_spice_rack` | 第 7 章 | 调味架 / Spice Rack（灶台直接取用仓库里的调味料；不开投料槽，q(46)） |
 | `kitchen_warming_cabinet` | 第 7 章 | 保温柜 / Warming Cabinet |
 | `kitchen_stove_2` | 第 7 章 | 第二口灶 / Second Stove |
 | `kitchen_big_pot` | 第 7 章 | 大锅 / Big Pot |
@@ -8344,7 +8523,7 @@ flowchart LR
 | `joystick` | 浮动虚拟摇杆 | Joystick | 场景区按下处出现；外圈 260 px、内圈 120 px；抬手消失（10.1） |
 | `camera_safe_frame` | 相机安全框 | Camera Safe Frame | 屏幕中部宽 40% × 高 45%；碰框边才平移，停下 0.6 s 回中（10.1） |
 | `action_button` | 主行动键 | Action Button | 右下 176 px 圆键：动词 + 体力价 + 56 px 工具徽标；琥珀 = 体力不足（10.2.2） |
-| `action_switch` / `action_radial` | 切换键 / 行动径向菜单 | Action Switch / Action Radial | 主行动键正上方 96 px；扇出 Farming / Fishing / Mining / Combat（10.2.3） |
+| `action_switch` / `action_radial` | 切换键 / 行动径向菜单 | Action Switch / Action Radial | 主行动键正上方 96 px；按下在屏幕中心弹出 Farming / Fishing / Mining / Combat 四瓣环（10.2.3，q(62)） |
 | `energy_card` | 体力不足四件事卡 | Energy Card | 要什么 / 有什么 / 差多少与多久 / 现在能做什么（10.2.5） |
 | `quick_bar` | 快捷栏 | Quick Bar | 固定 5 格 + Bag，只放当前行动的消耗品；收起态为把手（10.3） |
 | `bag` | 背包抽屉 | Bag | 升到 y ≈ 800；第一行即快捷栏；25 → 30 / 35 / 40（10.4） |
@@ -8452,8 +8631,8 @@ flowchart LR
 | 抛竿 | Cast · 5 Energy / Casting uses 5 Energy | 主行动键常驻 / 首次一张教学卡 |
 | 鱼逃走（保护内，Fishing Lv1–3） | It got away · Energy refunded (7 left today) | |
 | 鱼逃走（保护外） | It got away · 3 Energy back | |
-| 鱼篓满 | Creel full · Sell or cook first | 与体力无关但同一入口 |
-| 挣脱 | Too strong · Fishing Lv 4 · 3 Energy back | 门禁 + 退费 |
+| 鱼篓满 | Creel full · 0 free slots · Sell or cook first | toast 与鱼篓角标；键面写 `Cast · Creel full`（q(51)） |
+| 挣脱 | Too strong / Fishing Lv4 needed · You: Lv3 · 30 XP to go / +3 Energy back | 门禁 + 退费；卡片三行，第二次起飘字 `Got away · Lv4 · Energy refunded (8 left today)` / `Got away · Lv4 · 3 Energy back`（q(50)、q(51)） |
 | 进矿（第 1 层层费） | Enter mine · 2 Energy / Enter mine · Need 2 Energy / Continue run · Free | 矿口的主行动键；有未完成局时免费继续 |
 | 进入新楼层（每层 2） | Floor 2 · 2 Energy / Floor 2 · Need 2 Energy / Floor 2 · Clear Floor 1 / Floor 4 · Clear Floor 3 first / Floor 2 · −2 Energy | 楼梯口的主行动键；一局每层只收一次 |
 | 电梯 | Elevator · Free / Entrance · Free / Floor 1 · Free / Floor 2 · Here / Floor 3 · 2 Energy / Floor 5 · Express · Free | 电梯本身全程 0 体力，含直达第 5 层 |
@@ -8464,14 +8643,14 @@ flowchart LR
 | 同菜第二份 | Same dish again · +20 (half) | 向上取整 |
 | 同菜第三份 | Same dish · no Energy today | 可吃但不回复 |
 | 食物上限用满 | Full belly · Meals reset in 9h 12m | |
-| 满条进食 | Energy full · eat later | 按钮置灰 |
+| 满条进食 | Energy full | 按钮置灰（与饮品同一写法，q(51)） |
 | 快满进食 | Eat · +12 Energy | 写实得，按一下即吃（q(26)） |
-| 黑暗料理 | Mystery Dish · +5 Energy · Cookbook: failed page | |
+| 黑暗料理 | Mystery Dish · +5 Energy / Mystery Dish · +10 Energy（Cooking Lv3 起） | 不递减；出锅卡副行见 B.7 |
 | Rest 可用 | Rest · +60 Energy | 农舍门口长椅（P0 也有，q(30)） |
 | Rest 快满 | Rest · +25 Energy | 写实得，保留到当日用完（q(26)） |
 | Rest 条件未满足 | Rest · back after 2h away · 1h 12m to go | 倒计时 |
 | Rest 已用 | Rested today · tomorrow 4:00 | |
-| 茶 | Hot Tea · +30 Energy · 40 coins (1/3) / Coffee · +30 Energy · 50 coins (2/3) / Hot Tea · +12 Energy · 40 coins（快满时写实得，q(26)） | 第 2、3 杯 50 / 60 |
+| 茶 | Hot Tea · +30 Energy · 40 coins (0/3 today) / Coffee · +30 Energy · 50 coins (1/3 today) / Hot Tea · +12 Energy · 40 coins（快满时写实得，q(26)）/ Energy full（满体力时饮品按钮灰显，超上限段也算满，q(48)） | 第 2、3 杯 50 / 60 |
 | 茶用尽 | Tea 3/3 today · back tomorrow | |
 | 赠餐 | Granny Wu made you Cabbage Stew · +20 Energy · expires in 6h | 收件箱与背包同时出现 |
 | 新手祝福 | Newcomer Blessing · Energy returns 1.5× faster · 5 days left | 面板常驻 |
@@ -8485,7 +8664,7 @@ flowchart LR
 | 旅行不足 | Trip 3 needs 20 Energy · you have 9 · +11 in 44m | 不写 Locked |
 | 回家 | Go home · Free | 永远免费 |
 | 日票 | Los Angeles · Pier Pond · Day Pass 7h | 并入位置芯片第三段；不再有右上独立卡 |
-| 客票 | Guest pass · 10 Energy · Host is online | |
+| 客票 | Guest Pass · Host is online · 10 Energy → 132 left（P2；确认卡成本行左右两栏，q(46)、q(51)） | |
 | 帮工补播 | Helping · uses your Energy · 2 per plot | 浇水 / 收获显示 Free |
 | 教学时刻 | Energy comes back over time. A meal brings it back now. | 首会话一次 |
 
@@ -8499,13 +8678,13 @@ flowchart LR
 | 轨名 / 等级 | Farming / Fishing / Cooking / Farming Lv4 / Fishing Lv2 / Cooking Lv2 | 三条技能轨与等级 |
 | 进度 | 212 / 500 XP · 288 XP to go · about 2 days · Today +212 XP | 进度 |
 | 门禁卡 | Carrot Seeds · Farming Lv2 · 18 XP to go · harvest 9 radishes · Unlocks Carrot, Herb | 四件事 |
-| 鱼 | Fine fish got away · Fishing Lv2 needed · about 6 casts · Fine fish stay hooked / Too heavy for your rod · Reed Rod (Lv3, 80 coins) / Got away · Lv4 | 挣脱 |
+| 鱼 | Too strong / Fishing Lv4 needed · You: Lv3 · 30 XP to go / Too heavy for your rod / Reed Rod · Fishing Lv3 · 80 coins / Got away · Lv4 · 3 Energy back | 挣脱（卡片与第二次起的飘字，§4.8.6） |
 | 等级差 | +7 XP · Reduced · 75% / Outleveled / XP: Full / XP: 50% / XP: None · outleveled / You've outleveled Pond Crucian. It still sells and cooks, but gives no XP. Fish Fine or better for full XP. / Where to fish / Full XP now: Fine fish · Carrot, Herb / You've outleveled Grilled Crucian. It still feeds you, but gives no XP. Cook Rare or better for full XP. / Full XP now: Rare dishes · 6 new recipes within reach / Same dish again · half XP · resets 04:00 / 2nd today · half / No XP · 3rd today / Reduced · 75% · you outlevel this dish | 减额与灰色（Cooking 同口径，按菜品稀有度） |
-| 一次性 | First catch! +60 XP / First harvest! +20 XP / First cooked! +15 Cooking XP · Cookbook 1/48 / New recipe! Herb Grilled Fish · +30 Cooking XP · Cookbook 2/48 / New city! +10 XP | 首次类；首做 XP 全归 Cooking |
+| 一次性 | First catch! +60 XP / First harvest! +20 XP / First cooked · +10 Cooking XP · Cookbook 1/48 / First cooked · +20 Cooking XP · Cookbook 2/48 / New city! +10 XP | 首次类；首做 XP 全归 Cooking；奖励条只放首做 XP，本锅 XP 照常飘字（q(55)） |
 | 出锅 XP 飘字 | +20 Cooking XP ★ / +10 Cooking XP · 2nd today / No XP · 3rd today / Outleveled | 同页每日三态 |
 | 设施 | Sprinkler · Farming Lv6 · Waters 8 plots for you / Greenhouse · Farming Lv8 · Any seed grows inside / Fish Trap · Fishing Lv5 · 1 fish every 8 hours | 改变日常 |
 | 工具门禁卡 | Row Hoe · Farming Lv4 · 65 XP to go · harvest 22 carrots · Sows 3 plots per action · 240 coins · [Show my plots] [Got it] / Row Hoe in Tools & Gear · Equip it to sow 3 plots per action · [Equip] [Later] | 集市柜台上的 Row Hoe；已买未装备 |
-| 升级 | Farming Lv5! · Corn, Cabbage, Sow Again · Next Lv6 · Sprinkler · 250 XP / Fishing Lv2 · Fine fish now stay on the hook / Today changes: no more watering / Level-up gift: 3 Worm Bait · 3 Wild Herb · Recipe: Herb Grilled Fish / Cooking Lv 2 · Recipe: Fresh Fish Soup / Cooking Lv 4 · 3rd slot / Today changes: 3-ingredient dishes / Cooking Lv 5 · Steady Hand I · Queue ×2 / Next Lv6 · Quick Fire · 250 XP | 仪式 |
+| 升级 | Farming Lv 5 · Corn, Cabbage, Sow Again · +30 Energy · Next Lv6 · Sprinkler · 250 XP / Fishing Lv 2 · Fine fish now stay on the hook / Today changes: no more watering / Level-up gift: 3 Worm Bait · 3 Wild Herb · Recipe: Herb Grilled Fish / Cooking Lv 2 · Recipe: Fresh Fish Soup / Cooking Lv 4 · 3rd slot / Today changes: 3-ingredient dishes / Cooking Lv 5 · Steady Hand I · Queue ×2 / Next Lv6 · Quick Fire · 250 XP | 仪式 |
 | Cooking 门禁卡 | Fisher's Stew · 3 ingredients · Cooking Lv4 · 85 XP to go · about 4 new dishes · 3-ingredient dishes · Rare 70 · [Cookbook] [Got it] / 3rd slot · Cooking Lv4 · Mix 3 ingredients / Cooking Lv4 · 3rd slot | 第 3 投料槽是 Cooking 唯一真锁 |
 | 技能页 · Cooking | Cooking Lv2 · 45 / 100 XP · Next: Lv3 · Double Clue / Next: Lv4 · 3rd slot / Dishes today 5 · 4 pages / Dishes first-cooked 4/48 | 第三张轨卡 |
 | 教学句 | Levels unlock gear, fish and seeds. Basics never lock. | 首次升级 |
@@ -8545,16 +8724,17 @@ flowchart LR
 | 果木肥 | Orchard Feed · regrow 48h → 24h | 施后树冠冒星 |
 | 砍树 | Remove this tree? You get 2 Timber back; the sapling is lost. | 二次确认 |
 | 槽位满 | Orchard full 5/5 · Homestead Lv5 adds 1 | 不写 Locked |
-| 堆肥 | Compost · −20% time / Compost Bin · 5 crops → 5 Compost · today 2/5 | |
-| 开垦上限 | Plots 120/200 · Homestead Lv1 / Plots +40 | 田地角标；升级后果 |
+| 堆肥 | Crops ready 20% sooner（q(46)）/ Compost Bin · 5 crops → 5 Compost · today 2/5 | |
+| 开垦上限 | Plots 120/200 · Homestead Lv1 / Plots +40 | 田地角标；升级后果（地理农场尺度）。P1 紧凑农场只在 Homestead Lv3 的后果里写 `Plots +10`，不做计数角标（q(59)） |
+| P1 第一步（q(59)） | Cabbage Seeds / Corn Seeds / Cucumber Seeds / Farming Lv 5 · Cabbage, Corn · +30 Energy · Next Lv6 · Cucumber, Sprinkler · 250 XP / Farming Lv 6 · Cucumber, Sprinkler · +30 Energy / Today changes: no more watering / Show Workbench / Sprinkler · Waters 8 plots / Move / Coverage preview · 5 plots / Sprinklers 6/6 · Homestead Lv4 adds 1 / Plots +10 / Next: Lv7 · 300 XP | 第一步的 Lv5 不含 Sow Again 与地区种子；Show Workbench 只移动相机；状态卡点洒水器打开 |
 | 洒水器 | Sprinkler · Farming Lv6 · Waters 8 plots for you · Timber 8/8 · Stone 6/6 · Copper Ore 1/3 / Sprinklers 2/4 / Coverage preview · 8 plots / Build / Cancel / Plot occupied / Outside your fields / Sprinkler built / Sprinklers 7/7 · Homestead Lv5 adds 1 / Greenhouse · 4×4 / Needs 4×4 clear plots | 工作台蓝图卡与放置模式（q(22)） |
 | 温室 | Greenhouse · Farming Lv8 · Any seed grows inside · 300 coins / Greenhouse 16 plots | |
 | 行锄 | Row Hoe · Farming Lv4 · Sows 3 plots per action · 240 coins / Row Hoe in Tools & Gear · Equip it to sow 3 plots per action | 集市柜台 / 已买未装备 |
 | 便利 | Plot Marks / Mark plots / Radish · 12 marked / Done / Clear marks / Plan tomorrow's field / 12 plots marked · Radish · 24 Energy / Sow Again / Coverage Overlay / Harvest All / Seed Saver · +1 Lettuce Seeds | Plot Marks 不做一键执行；Sow Again、Harvest All 的形态 P1 开工前定（q(23)） |
-| 升级 | Farming Lv5! · Corn, Cabbage, Sow Again · Next Lv6 · Sprinkler · 250 XP / Today changes: no more watering | |
+| 升级 | Farming Lv 5 · Corn, Cabbage, Sow Again · +30 Energy · Next Lv6 · Sprinkler · 250 XP / Today changes: no more watering | |
 | 称号 | Master Gardener / Crop-dex 20/20 | Lv10 |
 | 帮工 | Helping · uses your Energy · 2 per plot / Watering is free | |
-| 拒绝兜底 | Farming Lv4 needed / Not enough Energy · +3 in 9:12 / Plot limit · Homestead Lv2 adds 40 / Orchard full / Regional seeds · back tomorrow | 服务端兜底 |
+| 拒绝兜底 | Farming Lv4 needed / Need 3 more Energy · +3 in 9:12 / Plot limit · Homestead Lv2 adds 40 / Orchard full / Regional seeds · back tomorrow | 服务端兜底 |
 
 文案规则：用 Energy 不用 Stamina；货币写 coins；作物与种子名 ≤ 18 字符（最长 Sweet Potato Seeds 18、Grapevine Cutting 17、Strawberry Seeds 16）；稀有度只用 Common / Fine / Rare；禁止孤立的 Locked。
 
@@ -8570,15 +8750,15 @@ flowchart LR
 | 咬钩 | Bite! / Hook / Keep the fish in the green | 小游戏 |
 | 咬钩前收竿 | Line in · Energy back | |
 | 钓获 | Caught! Pond Crucian · Common / +5 XP / Fish-dex 3/20 | 1.5 秒自动收起 |
-| 首钓 | First catch! +60 XP | ≤ 3 秒闪光 |
+| 首钓 | First catch! +15 XP（Fine +30 / Rare +60） | ≤ 3 秒闪光 |
 | 首次 Fine / Rare / Legendary | First Fine fish! +20 Energy | 与钓获卡同屏 |
 | 地区鱼钓获 | Caught! Smelt · Common · Temperate / Regional fish · 1 of 2 here / Counts toward Travel Permit | 气候带标签 |
 | 逃走（保护内） | It got away · Energy refunded (7 left today) | Lv1–3 |
 | 逃走（保护外） | It got away · 3 Energy back | |
-| 挣脱（等级） | Rare fish got away / Fishing Lv4 needed · about 30 casts / Unlocks Golden Koi, Catfish / 3 Energy back | 四件事卡；按钮 Fish-dex / Keep fishing |
-| 挣脱（鱼竿） | Too heavy for your rod / Reed Rod · Fishing Lv3 · 80 coins / Lands Rare fish / 3 Energy back | 按钮 Tackle Shop / Keep fishing |
-| 挣脱（第二次起） | Got away · Lv4 | 飘字 |
-| 首会话挣脱教学 | Too strong · Fishing Lv 2 · 3 XP to go · Unlocks Fine fish (Perch, Bass) · 3 Energy back | 一次 |
+| 挣脱（等级） | Too strong / Fishing Lv4 needed · You: Lv3 · 30 XP to go / Unlocks Golden Koi, Catfish / +3 Energy back | 每鱼种第一次；卡片无按钮，1.5 秒自动收起（§4.8.6）；保护期内末行写实退 `Energy refunded (8 left today)` |
+| 挣脱（鱼竿） | Too heavy for your rod / Reed Rod · Fishing Lv3 · 80 coins / Lands Rare fish / +3 Energy back | 每鱼种第一次；卡片无按钮（§4.8.6）；退费行同上 |
+| 挣脱（第二次起） | Got away · Lv4 · Energy refunded (8 left today) / Got away · Lv4 · 3 Energy back / Got away · Reed Rod · 3 Energy back | 飘字，退费并进同一条（q(50)） |
+| 首会话挣脱教学 | Too strong / Fishing Lv2 needed · You: Lv1 · 3 XP to go / Unlocks Fine fish (Perch, Bass) / Energy refunded (9 left today) | 一次；保护期内全退 |
 | 等级差 | +7 XP · Reduced · 75% / Outleveled / XP: Full / XP: 50% · Reduced / XP: None · outleveled | 徽标与飘字 |
 | 第一次变灰 | You've outleveled Pond Crucian. It still sells and cooks, but gives no XP. Fish Fine or better for full XP. / Where to fish | 每轨一次 |
 | 鱼塘卡片 | Reed Pond · Beginner pond / River · best for Lv4–5 / Pond · outleveled / Night · River Eel / Active now: Perch, Catfish | |
@@ -8586,7 +8766,7 @@ flowchart LR
 | 鱼竿 | Starter Rod · Equipped / Reed Rod · Fishing Lv3 · 80 coins · Lands Rare fish / Carbon Rod · Fishing Lv6 · 350 coins · Lands Legendary fish · wider hook window / Equip | 柜台、Tools & Gear 与四件事卡；鱼竿不进快捷栏 |
 | 鱼饵 | Worm Bait · faster bites / Spinner Lure · Rare bites +15%, faster XP / Bait（幽灵格）/ Out of Worm Bait · no bait on the hook | 好处句只在详情卡；幽灵格只写名词；鱼饵用完的 toast（q(44)） |
 | 鱼笼 | Fish Trap · Fishing Lv5 · 1 fish every 8 hours / Set Trap · Free / Trap · 2 fish · ready in 3h 12m / Trap full · 3 fish | Fishing 快捷栏可投放物 |
-| 升级 | Fishing Lv 2 · Fine fish now stay on the hook / Level-up gift: 3 Worm Bait / Use bait / Next Lv3 · 150 XP / Today changes: River is your water now | 横幅 |
+| 升级 | Fishing Lv 2 · Fine fish now stay on the hook / Level-up gift: 3 Worm Bait · 3 Wild Herb · Recipe: Herb Grilled Fish / Use bait / Next Lv3 · 150 XP / Today changes: River is your water now | 横幅 |
 | 便利 | 3-day Forecast / Gift Clues / Quick Recast | |
 | 渔情板 | Bite Board · Perch bite at dusk here · Rain tomorrow: Trout ×2 | Tackle Shop |
 | 不入菜 | Not for cooking | 金锦鲤 |
@@ -8602,15 +8782,15 @@ flowchart LR
 
 | 场景 | 英文 | 备注 |
 |---|---|---|
-| 厨房 | Kitchen / Tap to cook / Stove 1/1 · Cooking Lv1 · Empty / Stove 1/3 · Cooking Lv2 · Empty / Stove 2/3 · Cooking Lv2 · Cooking 12 s / Stove 2/3 · Ready / Queued 1 / All stoves busy | 点灶台打开面板（主行动键不显示设施动词）；面板顶栏常驻 Cooking 等级，1 秒节拍倒计时；厨房无快捷栏 |
+| 厨房 | Kitchen / Stove 1/1 · Empty / Stove 1/1 · Cooking Lv1 · Empty / Stove 1/3 · Cooking Lv2 · Empty / Stove 2/3 · Cooking Lv2 · Cooking 12 s / Stove 2/3 · Ready / Queued 1 / All stoves busy | 点灶台打开面板（主行动键不显示设施动词）；`Stove 1/1 · Empty` 是灶口名字条（q(62)）；面板顶栏常驻 Cooking 等级，1 秒节拍倒计时；厨房无快捷栏 |
 | 烹饪面板 Tab | Cookbook / Experiment / Can cook / Ingredients / From your bag / slots used / In the pot / Not for cooking / Rack / Cook / Ready to cook / Try in Experiment › / Need Wild Herb ×1 / Need Radish ×1 / Need Potato ×1 / Cooking Lv4 · 3rd slot / Cooking Lv4 · 85 XP to go / Lv4 · 60 XP to go（第 3 槽锁的短写，面板顶栏已写 Cooking 等级，q(31)）/ XP: Full / XP: 50% / XP: None · outleveled / 2nd today · half / Tasted / Shop / Clue found / Tap Cook to grill your first fish / Cook at your stove | Cookbook 页料够一键 Cook、缺料写 Need；未知页按钮只引导 Try in Experiment ›；Cook 不带 Free；"N more to discover" 一行取消（页格里的灰剪影本身就是提醒） |
 | 投料（Experiment） | Needs a main ingredient / Not for cooking / Any Common fish / Any seasoning / Double · uses 2× ingredients / Cook with Silver Sturgeon? | 从 From your bag 背包格点选投入；标签与大锅 |
-| 预览 | Grilled Crucian · Common · +20 Energy · 5 s / Grilled Crucian · Common · +20 Energy · 5 s（Cookbook 详情卡格式） / ? · Fine · 15 s · Unknown dish / Tried before · still a Mystery Dish / You might have what it takes / ? · Legendary · 2 climates · coming in a later update | 未知组合只显示稀有度与时长；跨带预览本期只提示 |
+| 预览 | Grilled Crucian · Common · +20 Energy · 5 s / Grilled Crucian · Common · +20 Energy · 5 s（Cookbook 详情卡格式） / ? · Fine · 15 s · Unknown dish / Tried before（胶囊标题）/ Tried before · not a recipe（Cook 行上方，q(56)）/ You might have what it takes / ? · Legendary · 2 climates · coming in a later update | 未知组合只显示稀有度与时长；跨带预览本期只提示 |
 | 气候带标签 | Any regional fish · 2 zones / 2 different regional crops / Smelt · Temperate | 仅跨带 3 槽页与鱼堆气候带标记 |
 | 火候 | Tap when the needle hits gold! / Nice heat! ★ / Missed · still cooking / Perfect! ★★ · Extra portion | 教学只出现一次 |
-| 出锅 | New recipe! / First cooked! +15 Cooking XP · Cookbook 1/48 / New recipe! Herb Grilled Fish · +30 Cooking XP · Cookbook 2/48 / +20 Cooking XP ★ / +10 Cooking XP · 2nd today / No XP · 3rd today / Grilled Crucian ★ Good / Mystery Dish · +5 Energy / Mystery Dish · +10 Energy（Cooking Lv3 起）/ Mystery dishes still restore 5 Energy / Hmm… not a dish. A clue was added to your Cookbook | 黑暗料理只从 Experiment 做出 |
-| 三选一 | Eat · +40 Energy / Keep / Gift to Mira / Gift later from your bag / Energy full / Cook Again / Cook Again · 2nd today · half XP / Cook All | Cook Again 自 Cooking Lv2、Cook All 自 Lv8 |
-| 保温柜 | 4/6 / Full（世界里柜子上的徽标，带柜子图标）/ Warming Cabinet 4/6（点开后的卡片标题）/ Tap to open / No dishes yet / Take one / Bag full / Kept · Warming Cabinet 5/6 / Cabinet full · Herb Grilled Fish sent to bag / Cabinet and bag full · dish left on the stove | Homestead Lv3 起；`Cabinet full` 只用在 Toast（`Cabinet full · Herb Grilled Fish sent to bag`），不做世界徽标（q(31)）；柜里每行 `Herb Grilled Fish ★ Good · +45 Energy · ×1`，主按钮 Eat（写实际回复）、次按钮 Take one；Lv8 起 12 格（q(21)） |
+| 出锅 | New recipe! / First cooked · +10 Cooking XP · Cookbook 1/48 / First cooked · +20 Cooking XP · Cookbook 2/48 / +20 Cooking XP ★ / +10 Cooking XP · 2nd today / No XP · 3rd today / Grilled Crucian ★ Good / Mystery Dish · +5 Energy / Mystery Dish · +10 Energy（Cooking Lv3 起）/ Mystery dishes still restore 5 Energy / Hmm… not a dish. A clue was added to your Cookbook / Can't be sold or delivered | 黑暗料理只从 Experiment 做出，可以送居民（好感 −2，q(33)）；首做奖励条只放首做 XP，本锅 XP 照常飘字（q(55)） |
+| 三选一 | Eat · +40 Energy / Keep / Gift to Mira / Gift later from your bag / Energy full / Cook Again / Choose recipe › / Cooks today 2nd / Cooking XP Half / Cook All | Cook Again 自 Cooking Lv2（收走上一锅后点灶台出现，q(48)）、Cook All 自 Lv8 |
+| 保温柜 | 4/6 / Full（世界里柜子上的徽标，带柜子图标）/ Warming Cabinet 4/6（名字条与点开后的卡片标题，q(62)）/ No dishes yet / Take one / Bag full / Kept · Warming Cabinet 5/6 / Cabinet full · Herb Grilled Fish sent to bag / Cabinet and bag full · dish left on the stove | Homestead Lv3 起；`Cabinet full` 只用在 Toast（`Cabinet full · Herb Grilled Fish sent to bag`），不做世界徽标（q(31)）；柜里每行 `Herb Grilled Fish ★ Good · +45 Energy · ×1`，主按钮 Eat（写实际回复）、次按钮 Take one；Lv8 起 12 格（q(21)） |
 | 进食 | +40 Energy · Meals today 60/200 / Same dish again · +20 (half) / Same dish · no Energy today / Full belly · Meals reset in 9h 12m / Trial refunds · 7 left today | 新手期显示 Meals today 25/300 |
 | Buff | Harvest Focus · 2h 40m / Angler Focus / Steady Hands · 7 casts left / Travel Rations · −20% travel time / Roomy Creel · +2 slots / Replace Steady Hands with Harvest Focus? / Buff · coming later | HUD 体力条旁；Buff 效果为 P3，本期 Cookbook 页只显示 Buff · coming later |
 | Cookbook | Cookbook / Common · Fine · Rare · Legendary / Not yet discovered / Clue found / Tasted · cook it once to discover / Cooked ×12 · Best: Perfect / Mastered / Cook again / Style: Grilled / Kitchen Mishaps 12 / Home Cook · Line Cook · Head Chef · Master Chef / Brave Palate / Muscle Memory | — |
@@ -8618,7 +8798,7 @@ flowchart LR
 | 厨房升级 | Spice Rack · seasonings off your bag / Warming Cabinet 4/6 / Second Stove / Big Pot · Double / Third Stove / Chef's Sign | Homestead 升级面板（投料槽不在其中） |
 | Cooking 升级 | Cooking Lv 2 · Recipe: Fresh Fish Soup / Cooking Lv 4 · 3rd slot / Three-ingredient dishes now possible / Next: Lv4 · 3rd ingredient slot / Cooking Lv 5 · Steady Hand I · Queue ×2 / Cooking Lv 10 · Chef | 横幅与技能页 |
 | 旅途干粮 | Trail Food / Provisions 2/3 / Eat on the road · −10% travel time / Travel Biscuits · 40 coins · 3 left today | 旅行面板、驿站 |
-| 错误 | Not enough ingredients / Stove busy / Bag full · dish left on the stove | — |
+| 错误 | Need 1 more Pond Crucian / Need 1 more Fish / Stove busy / Bag full · dish left on the stove / Cabinet and bag full · dish left on the stove | 缺料与 COOK-P0-8 同一写法（q(48)）；不写孤立的 Not enough |
 
 所有菜名英文 ≤ 18 字符；Energy 不用 Stamina；货币一律 coins。
 
@@ -8631,18 +8811,18 @@ flowchart LR
 | 实时房间 | Room 1 is full · you're in Room 2 / Mia's room is full · you're in Room 2 / Online · Lotus Tea House · Room 1 | 房号不进位置芯片（q(34)） |
 | 驿站 | Homestead Stall / Stall Board / Sell 12 / Stored | 农场驿站 |
 | 岗位 | Market Keeper / Tea Host / Tackle Keeper / Post Clerk / Market Keeper · Mei / Tackle Keeper · Finn / Post Clerk · Sigrid / Tea Host · Ama | 功能 NPC 与掌柜名牌（纯外观） |
-| 茶座 | Tea House / Hot Tea · +30 Energy / Coffee · at the Travel Post / 2 of 3 drinks left today / Counts across all outposts | Market 柜台一端的茶座柜台；3 杯日额度全球共用 |
+| 茶座 | Tea House / Hot Tea · +30 Energy / Coffee · at the Travel Post / Tea 1/3 today / Counts across all outposts | Market 柜台一端的茶座柜台；3 杯日额度全球共用 |
 | 远程 | Travel to use / Browse only / Travel to use · Trip 3 · 20 Energy · 60 coins / Free · Home Set | 浏览与到场 |
 | 锁定 | Locked · Farming Lv5 / Locked · Fishing Lv6 / Locked · Travel here first / Trip 5 needs Travel Permit | 可见但锁定 |
-| 角色 | Resident / Pip · Courier Kid / Granny Wu · Campfire Elder / Mira · Travelling Trader / Mira is in Lisbon this week / Old Kai: Fish bite early here. / Welcome to Pudong Market Square. Sweet potato seeds, fresh in. Farming Lv5 to plant. | 角色 NPC 与掌柜招呼 |
+| 角色 | Resident / Pip · Courier Kid / Granny Wu · Campfire Elder / Mira · Travelling Trader / Mira is in Lisbon this week / Old Kai: Fish bite early here. / Welcome to Xuhui Market Square. Sweet potato seeds, fresh in. Farming Lv5 to plant. | 角色 NPC 与掌柜招呼 |
 | 好感 | Stranger / Acquainted / Familiar / Trusted / Kindred / +2 · first chat today / +3 · loved it / +2 · liked it / +1 · gift received / Hana shared a meal with you · +20 Energy / Gift already given today / −2 · not a fan / Um… thanks? I'll save it for later. / Hm. That's… a choice. / Oh… thanks, I suppose. | 好感（送礼飘字按 §9.4.4 三档，q(18)；送黑暗料理 −2 与收下时的台词，暂定，q(33)） |
 | 居民委托 | Could you bring me something sweet? A Fine dessert would be lovely. / Next request in 9h 12m / Next request at Familiar / No more requests | Hana 的委托台词；Request 按钮不可用的三种原因（q(18)） |
-| 居民（P0） | Pip · Courier Kid / Hi! I'm Pip. I carry letters all over Shanghai. / You again! Got anything sweet? / I saved you something. Don't tell the others. / Pip's First Fish · Could you catch me a fish? Any kind is fine. / Five Little Plots · Plant five plots for me? I want to watch them grow. / Lunch for Pip · I'm starving. Any dish will do! / Old Kai · Harbour Elder / Hm. You fish? / Fish bite early here. / Sit. I grilled too much again. / An Old Man's Catch · Bring me a Rare fish. Haven't seen one in weeks. / Pip shared a meal with you · +20 Energy / Bag full · free a slot for Pip's meal | 招呼按好感阶段（Stranger / Acquainted / Familiar 起）；P0 委托（q(33)） |
+| 居民（P0） | Pip · Courier Kid / Hi! I'm Pip. I carry letters all over Shanghai. / You again! Got anything sweet? / I saved you something. Don't tell the others. / Pip's First Fish · Could you catch me a fish? Any kind is fine. / Five Little Plots · Plant five plots for me? I want to watch them grow. / Lunch for Pip · I'm starving. Any dish will do! / Old Kai · Harbour Elder / Hm. You fish? / Fish bite early here. / Sit. I grilled too much again. / An Old Man's Catch · Bring me a Rare fish. Haven't seen one in weeks. / Rare fish · Golden Koi · Pond 0/1 / +5 Friendship · 50 coins / +5 Friendship · 20 coins / Pip shared a meal with you · +20 Energy / Bag full · free a slot for Pip's meal | 招呼按好感阶段（Stranger / Acquainted / Familiar 起）；P0 委托（q(33)） |
 | 掌柜问候 | Keeps the stall · Xuhui Market Square / Pours the tea · Lotus Tea House / Minds the tackle · Xuhui Tackle Shop / Runs the post · Huangpu Travel Post（P0；P2 第二版起 Books the trips）/ Welcome to Tokyo! Pumpkin seeds just came in — Farming Lv5 to plant. Anything I can get you? / Keeps the stall · Sumida Market Square | 问候卡「所在据点」一行与外城集市问候（q(18)、q(32)、q(33)） |
-| POI 名片 | Nanjing Road · Shopping street / Lantern Café · Coffee shop / Go in / Free / Sit / Leave | 真实 POI 纯视觉层（上一稿 Old Kai moved to the pier 废弃） |
+| POI 名片 | Nanjing Road · Shopping street / Lantern Café · Coffee shop / Go in / Free / Leave | 真实 POI 纯视觉层（上一稿 Old Kai moved to the pier 废弃）；室内座位只有 `i-seat` 图标、不写字（q(62)） |
 | 共享额度 | Shared stock · all Shanghai outposts / Counts across all Shanghai outposts / Deliver at any Shanghai outpost / Same board at all 6 outposts | 同功能多实例按账号 × 城市簇共享 |
 | 农场选址 | Too close to an outpost | 据点中心 300 m 禁建 |
-| 委托板 | Stall Board / Market Board / Open / Tracked / Ready to deliver / Done / Dropped / Track / Deliver / Drop / Next request in 3h 58m / Requests today 4 of 6 | 委托 |
+| 委托板 | Stall Board / Market Board / Open / Tracked / Ready to deliver / Done / Dropped / Track / Deliver / Drop / Next request in 3h 58m / Requests today 4/6 | 委托 |
 | 委托标题 | Fresh Greens / Pond Catch / Home Cooking / Timber Run / Market Basket / Dusk Haul / A Proper Meal / Taste of Home / Local Waters / Stamp Run / Postcard Trip / Harvest Together | 模板标题 |
 | 共做 | Together · 2–6 players / Join / 3 joined · 7:12 to start / Everyone gets the full reward / Not enough players · solo request | 共做委托 |
 | 标记 | Deliver here / Request available / New for you / Event · starts in 1h 40m / Locked / 4 more in this city | 地图标记 |
@@ -8657,21 +8837,21 @@ flowchart LR
 | 场景 | 英文 | 中文释义 |
 |---|---|---|
 | 柜台 | Homestead Stall / Market Square / Tea House / Tackle Shop / Travel Post / Specialty Counter / Decor | 柜台与页签 |
-| 掌柜问候 | Mei · Tap to talk / Mei · Talking / Market Keeper · Mei / Keeps the stall · Xuhui Market Square / Trade · open the stall / Trade · order tea / Trade · see the rods / Trade · book a trip / Trade · get a coffee（P0 驿站）/ What's fresh today? / Any news in town? / Where are they biting? / Fares today? / Who needs help today?（P0 驿站，代替 Fares today?）/ Just passing by | 四处据点掌柜先问候再交易（9.4.2；农场驿站无人值守，p(6)）；Trade 下的小字按岗位，信息问句按岗位各一条 |
-| 掌柜问候 · P0 | Sit a minute. Hot tea, 30 Energy back. / You look rested. Tea's here when you need it. / That's three cups today. Come back tomorrow. / Quiet day. 12 people around Shanghai right now. / Reed Rod's in. 80 coins, lands up to Rare. / Worms are 2 coins. 30 left today. / Reed Pond is closest. River Perch need Fishing Lv2. / Reed Pond is closest. You can land everything there. / Row Hoe's 240 coins. Farming Lv4 to use. / The Market Board has 2 requests today. / Fresh off the board: Dusk Haul and Market Basket. / Board's empty. Next request in 3h 58m. / Coffee's fresh. Pip's been asking for a hand. / Coffee's fresh. 2 cups left today. / Pip has a request for you. / All quiet. The Market Board refills in 3h 58m. | Ama / Finn / Mei / Sigrid 的 P0 问候句与问句回答，按真实数据选句，不说 P0 做不到的事（q(33)，SGODOT-227 / 228） |
-| 特产货架 | City Specialty · Tap to look / Shanghai Postcard · 100 coins / Goes to your Farm Storage / Owned | P0 只卖 1 件（q(33)） |
+| 掌柜问候 | Mei（头顶名字条）/ Market Keeper · Mei / Keeps the stall · Xuhui Market Square / Trade · open the stall / Trade · order tea / Trade · see the rods / Trade · book a trip / Trade · get a coffee（P0 驿站）/ What's fresh today? / Any news in town? / Where are they biting? / Fares today? / Who needs help today?（P0 驿站，代替 Fares today?）/ Just passing by | 四处据点掌柜先问候再交易（9.4.2；农场驿站无人值守，p(6)）；Trade 下的小字按岗位，信息问句按岗位各一条；掌柜头顶名字条只写名字，对话中保持高亮（q(62)） |
+| 掌柜问候 · P0 | Sit a minute. Hot tea, 30 Energy a cup. / You look rested. Tea's here when you need it. / That's three cups today. Come back tomorrow. / Quiet day. 12 people around Shanghai right now. / Reed Rod's in. 80 coins, lands up to Rare. / Worms are 2 coins. 30 left today. / Reed Pond is closest. River Perch need Fishing Lv2. / Reed Pond is closest. You can land everything there. / Row Hoe's 240 coins. Farming Lv4 to use. / The Market Board has 2 requests today. / Fresh off the board: Dusk Haul and Market Basket. / Board's empty. Next request in 3h 58m. / Coffee's fresh. Pip's been asking for a hand. / Coffee's fresh. 2 cups left today. / Pip has a request for you. / All quiet. The Market Board refills in 3h 58m. | Ama / Finn / Mei / Sigrid 的 P0 问候句与问句回答，按真实数据选句，不说 P0 做不到的事（q(33)，SGODOT-227 / 228） |
+| 特产货架 | City Specialty / Shanghai Postcard · 100 coins / Goes to your Farm Storage / Owned | P0 只卖 1 件（q(33)）；`City Specialty` 是货架名字条（q(62)） |
 | 柜台抽屉标题 | Homestead Stall / Mei's Stall · Market Square / Ama's Tea · Lotus Tea House / Finn's Tackle · Xuhui / Sigrid's Desk · Travel Post | 掌柜名 + 据点；顶部掌柜栏带岗位配色；农场驿站无掌柜栏 |
-| 售卖 | Buy / Sold out today · resets in 9h 12m / 10 of 10 regional seeds today / Farming Lv5 needed / Fishing Lv3 needed · 60 XP to go / Homestead Lv3 needed · 1 level to go / Need 70 more coins / Row Hoe · 240 coins · Farming Lv4 / Healing Potion · 20 coins · 5 left today | 购买与门禁；Row Hoe 在 Market，药水在 Homestead Stall |
+| 售卖 | Buy / Sold out today · resets in 9h 12m / Regional seeds today 10/10 / Farming Lv5 needed / Fishing Lv3 needed · 60 XP to go / Homestead Lv3 needed · 1 level to go / Need 70 more coins / Row Hoe · 240 coins · Farming Lv4 / Healing Potion · 20 coins · 5 left today | 购买与门禁；Row Hoe 在 Market，药水在 Homestead Stall |
 | 直售 | Sell / Sell all / Sold · +84 coins / Sell at home（鱼在外城） | 农场驿站直售 |
-| 回收 | Buy-back / Buy-back price · 7 coins / Buy-back 96 of 120 today / Limit reached · resets in 9h 12m / Not accepted here | 地板回收与额度 |
-| 异城 | Local produce · 0.8× / Delivery counted · Regular 2 of 3 / 60 coins left here today | 特产回收与当地交付 |
-| 茶座 | Tea House / Hot Tea · +30 Energy · 40 coins / Coffee · +30 Energy · 50 coins (2/3) / 3 of 3 drinks today / Energy full | 饮品（茶馆柜台；额度全球共用） |
-| 换料 | Barter / 2 Sweet Potato → 1 Copper Ore / Barter 4 of 6 today / Up to half of this level by barter | 特产换料 |
-| 委托 | Reward · 36 coins · +1 city stamp / Bonus today 90 of 100 / Good · +10% / Perfect · +25% / Gifted items can't be delivered | 委托价目 |
+| 回收 | Buy-back / Buy-back price · 7 coins / Buy-back today 96/120 / Limit reached · resets in 9h 12m / Not accepted here | 地板回收与额度 |
+| 异城 | Local produce · 0.8× / Delivery counted · Regular 2/3 / 60 coins left here today | 特产回收与当地交付 |
+| 茶座 | Tea House / Hot Tea · +30 Energy · 40 coins / Coffee · +30 Energy · 50 coins (1/3 today) / Tea 3/3 today / Energy full | 饮品（茶馆柜台；额度全球共用） |
+| 换料 | Barter / 2 Sweet Potato → 1 Copper Ore / Barter today 4/6 / Up to half of this level by barter | 特产换料 |
+| 委托 | Reward · 36 coins / Reward · 40 coins · Outpost Stamp / Request bonus today 90/100 / Good · +10% / Perfect · +25% / Gifted items can't be delivered | 委托价目 |
 | 钱包 | 180 coins / Wallet floor · keep 40 coins / Need 40 more coins | 钱包 |
 | 门禁物品 | Travel Permit · 250 coins · 2 left this week / Long-haul Ticket · 600 coins · 1 left this week / Craft · 100 coins + 2 specialties / Craft · 150 coins + Permit + 2 Hardwood + 2 Quartz | 驿站柜台 |
 | 干粮 | Travel Biscuits · 40 coins · 3 left today | 驿站 |
-| 摆件 | Decor 12 of 28 / Windmill · Homestead Lv3 / Placed | 摆件 |
+| 摆件 | Decor 12/28 / Windmill · Homestead Lv3 / Placed | 摆件 |
 | 配方卡 | Recipe Card · Herb Grilled Fish · 80 coins / Two new cards today / Regional Recipe Card · 200 coins | 配方卡 |
 | 包裹折现 | Parcel expired · +18 coins | 收件箱 |
 
@@ -8683,21 +8863,21 @@ flowchart LR
 | 场景 | 英文 | 中文释义 |
 |---|---|---|
 | 容器名 | Bag / Creel / Tools & Gear / Farm Storage / Parcel / Quick Bar | 背包 / 鱼篓 / 工具与装备 / 农场仓库 / 包裹 / 快捷栏 |
-| 行动名 | Farming / Fishing / Mining / Combat | 四种行动（径向菜单四项） |
+| 行动名 | Farming / Fishing / Mining / Combat | 四种行动；径向菜单四瓣只放图标、不写名字（q(62)） |
 | 主行动键 · Farming | Sow ×1 · 2 Energy / Sow ×3 · 6 Energy / Plant · 6 Energy / Fertilize · Free / Till · Free / Water · Free / Harvest · Free / Pick · 2 Energy / Sow · Pick a seed | 动词 + 体力价；左上角工具徽标 |
 | 主行动键 · 其他 | Cast · 5 Energy / Set Trap · Free / Mine · 2 Energy / Light Torch · Free / Blast · 12 Energy / Blast · Need 12 Energy / Attack / Drink · Free / Enter mine · 2 Energy / Continue run · Free / Floor 2 · 2 Energy / Elevator · Free / Floor 5 · Express · Free / New run · 2 Energy | 矿洞按层计费：层费 2 + 敲岩 2，电梯 0 |
-| 置灰原因 | Cast · Creel full / Mine · Bag full / Fishing · No water nearby / Combat · Mine floors 3–5 / Mining · Enter the mine / Mining · No rocks here / Farming · No plots here / Plant · No tree slot / Fertilize · Nothing to feed / Enter mine · No runs left / Mine runs today 2/2 · Resets in 9h 12m（toast）/ Floor 2 · Clear Floor 1 / New run · Clear Floor 2 first | 数字 + 原因；径向菜单与主行动键共用 |
+| 置灰原因 | Cast · Creel full / Mine · Bag full / Fishing · No water nearby / Combat · Mine floors 3–5 / Mining · Enter the mine / Mining · No rocks here / Farming · No plots here / Plant · No tree slot / Fertilize · Nothing to feed / Enter mine · No runs left / Mine runs today 2/2 · Resets in 9h 12m（toast）/ Floor 2 · Clear Floor 1 / New run · Clear Floor 2 first | 数字 + 原因；主行动键写整句，径向菜单点灰瓣的气泡去掉行动名前缀（`No water nearby` / `Mine floors 3–5` / `Enter the mine`）（q(62)） |
 | 体力不足 | Sow ×1 · Need 2 Energy / Sow ×3 · 6 Energy needed / You have 4 / Need 2 more · +2 in 5:22 / Sow ×1 now / Eat +40 / Rest +60 / Free to do now / Enter mine · Need 2 Energy / Floor 2 · Need 2 Energy | 琥珀键面 + 四件事卡 |
-| 设施指尖卡 | Tap to cook / Tap to talk / Mei · Tap to talk / Mei · Talking / Tap to shop / Rest · +60 Energy · once a day / Tap to craft / Tap to upgrade / Tap to open / Leave a note | 设施靠点击触发；主行动键不显示设施动词；NPC 一律写 "<名字> · Tap to talk"、点了亮成 Talking，问候卡文案见附录 B.9；`Tap to shop` 只用于无人值守的农场驿站（p(6)） |
+| 设施与 NPC 名字条 | Farmhouse / Workbench / Homestead Stall / Timber Grove / Reed Bank / Timber Grove · Ready in 2h 10m / Clay Bank · Homestead Lv2 / Upgrade Plaque / Homestead Lv1 / Stove 1/1 · Empty / Stove 1/3 · Empty / +60 Energy / Rested today / Mailbox / Warming Cabinet 4/6 / City Specialty / Market Board / Guestbook / Farm / Map / Mei / Ama / Finn / Sigrid / Pip / Old Kai | 视野内约 8 m 的设施挂图标钮（有状态时换 LOCK-11 状态徽标），交互半径内最近的一个展开成名字条：图标 + 名字（+ 至多一条关键事实）；门 = 门图标 + 目的地；NPC 头顶常驻名字条只写名字，最近的一个主色描边、放大 1.1 倍，对话中保持；茶桌等座位只挂 `i-seat` 图标、不写字；主行动键不显示设施动词；问候卡文案见附录 B.9（LOCK-07 / 16 / 17 / 30 v2，q(62)） |
 | 教学卡（操作） | Pick a seed, walk up to a plot and press Sow. Hold to keep sowing. | 首会话一次 |
 | Tab | All / Seeds / Fish / Produce / Dishes / Materials / Tackle | 七个 Tab；Tackle 显示工具但不计容量 |
 | 容量 | Bag 19/25 · Bag almost full · 23/25 · Bag full / Bag 19/25 · Upgrade I for sale / Fish 23 | 容量条与件数角标 |
 | 排序 | Sort · Recent / Value / Name | 排序芯片 |
 | 稀有度 | Common / Fine / Rare / Legendary | 鱼与料理共用 |
-| 详情卡动作 | Eat · +40 Energy / Eat · +20 Energy / Eat · no Energy today / Sell / Sell All · 6 coins / Sell at home / Gift › / Gift · Mutual friends only / Deliver / Pin / Unpin / Store / At home only / Equip / Lock / Unlock / Expires in 9h 12m / Take 10 / Take all / Sells for 10 · Fish-dex 9/20 / Caught at Willow Pond / Radish Seeds · 2 Energy per plot / Not counted in Bag | 按钮必带文字；点格浮出、点空白关闭 |
+| 详情卡动作 | Eat · +40 Energy / Eat · +20 Energy / Eat · no Energy today / Gift to Ama / Gift to a resident / Find a resident at an outpost to gift this dish（q(63)）/ Sell / Sell All · 6 coins / Sell at home / Gift › / Gift · Mutual friends only / Deliver / Pin / Unpin / Store / At home only / Equip / Lock / Unlock / Expires in 9h 12m / Take 10 / Take all / Sells for 10 · Fish-dex 9/20 / Caught at Willow Pond / Radish Seeds · 2 Energy per plot / Not counted in Bag | 按钮必带文字；点格浮出、点空白关闭 |
 | 仓库 | Stored · 12 Timber · 8 Reeds / At home / Take seeds first | 自动入库与带出 |
 | 模态编辑模式 | Build / Cancel / Mark plots / Radish · 12 marked / Done / Clear marks | 放置模式与标记模式的底部操作条（q(22)、q(23)） |
-| 快捷栏 | Radish Seeds ×24 / Seeds / Bait / Torch / Potion（幽灵格，q(44)）/ Buy at Homestead Stall / Craft at Workbench / Pin / Unpin | 格内只有名字 + 数量；幽灵提示与补货；无场景芯片、无体力价 |
+| 快捷栏 | Radish Seeds ×24 / Seeds / Bait / Torch / Potion（幽灵格，q(44)）/ Buy at Homestead Stall / Craft at Workbench / Pin / Unpin / Release to pin / Release to unpin / Release to remove / Radish Seeds off the bar · Undo / Bar full · Unpin one first（q(61)） | 格内只有名字 + 数量；幽灵提示与补货；无场景芯片、无体力价 |
 | 鱼篓 | Creel 7 · 6 free / Creel full · 0 free slots · Sell or cook first / Sell at home | 位置芯片下方 |
 | 满包 | Harvest 12 of 30 · bag full / Picked 4 of 6 · bag full / Mine · Bag full / Cast · Creel full / No room · free a slot first / Bag full · dish left on the stove | 收获裁剪；抛竿 / 挖矿写在主行动键上 |
 | 满包进包裹 | Bag full · Perch ×7 sent to Inbox · 24h / Parcel | 满包时被动获得直接进包裹（Keep which? 已删除，p(9)） |
@@ -8725,11 +8905,11 @@ flowchart LR
 | 费用 | 40 Energy → 141 left / 200 coins → 230 left / First visit / Return −50% / Need 40 more coins / Return home is always free | 成本行 |
 | 迷雾 | Unexplored / Explored / Explore to visit / N farms · Explore to visit | 三态 |
 | 到达 | Welcome to Tokyo / Welcome back / 1,758 km / +10 Energy / 3 things to do here / Fish the local pond / Visit the market / Try a regional fish / Show | 到达仪式（落城市概览；Show 只移动相机，q(25)） |
-| 成就 | City Stamp / Passport / Visited / Regular / Local / Local of Tokyo / Explorer Bronze / Silver / Gold / Platinum / Wanderer / Globetrotter / Ink drying / Outpost Stamp collected / Tap to open passport | 印章与奖章；据点章进门自动发（q(27)） |
+| 成就 | City Stamp / Passport / Visited / Regular / Local / Local of Tokyo / Explorer Bronze / Silver / Gold / Platinum / Wanderer / Globetrotter / Ink drying / Outpost Stamp collected / Stamp Desk | 印章与奖章；据点章进门自动发（q(27)）；`Stamp Desk` 是盖章台名字条（q(62)） |
 | 剪影卡 | Regional fish / Not yet caught / Fishing Lv 5 / 3 ponds · 6 outposts · 7 residents / 1 pond · 1 outpost · 2 residents / Sells Temperate seeds / 12 open farms / 2 friends here / 14 online / 09:12 local | 卡片字段 |
 | 特产标签 | Smelt · Temperate / Tilapia · Tropical / Grass Carp · Subtropical / Arctic Char · Cool | 地区鱼的气候带 |
 | 列表 | Nearby Cities / Friends & Team / Open Farms / Featured | 四列表 |
-| 错误 | Pass required / Trip expired / Not enough Energy / Not enough coins / Travel Permit needed / Long-haul Ticket needed / Already in transit | 拒绝原因 |
+| 错误 | Pass required / Trip expired / Trip 3 needs 20 Energy · you have 9 · +11 in 44m / Need 40 more coins / Travel Permit needed / Long-haul Ticket needed / Already in transit | 拒绝原因 |
 
 所有物品名 ≤18 字符：Travel Permit 13、Long-haul Ticket 16、Day Pass 8、Guest Pass 10、Second Home 11、City Stamp 10。
 
@@ -8766,11 +8946,11 @@ flowchart LR
 | 消耗品 | Worm Bait / Spinner Lure / Compost / Orchard Feed / Torch / Dynamite / Healing Potion | 7 种，各属一种行动的快捷栏 |
 | 工具与设施 | Starter Pickaxe / Copper Pickaxe / Wooden Sword / Gather Gloves / Sprinkler / Compost Bin / Greenhouse / Fish Trap / Workbench | 镐与剑是 Tools & Gear 装备 |
 | 装备效果句 | Starter Pickaxe · 1 Stone per rock / Copper Pickaxe · 2 Stone per rock / Wooden Sword · Attack 3 / HP full | Tools & Gear 与详情卡 |
-| 采集点 | gathering spot（通称，q(45)）/ Timber Grove / Rock Pile / Reed Bank / Herb Patch / Clay Bank / Old Tree / Gather Gloves · +1 at every gathering spot / Ready / Timber Grove ready in 2h 10m / Clay Bank · Homestead Lv2 / Old Tree · Homestead Lv3 | 采集 |
-| 矿洞 | Enter mine · 2 Energy / Enter mine · Need 2 Energy / Continue run · Free / New run · 2 Energy / New run · Clear Floor 2 first / Current run will end · Runs today 1/2 / Mine runs today 1/2 / Enter mine · No runs left / Mine runs today 2/2 · Resets in 9h 12m / Floor 1 / Run 1/2 today / Floor 2 · 2 Energy / Floor 2 · Need 2 Energy / Floor 2 · Clear Floor 1 / Floor 4 · Clear Floor 3 first / Floor 2 · −2 Energy / Floor 2 cleared · Elevator stop / Run complete / Run ended at daily reset / Elevator · Free / Entrance · Free / Floor 1 · Free / Floor 2 · Here / Floor 3 · 2 Energy / Floor 5 · Express · Free / Quartz · once a day / Mine · 2 Energy / Mine · Need 2 Energy / Mine · Bag full / Attack / Blast · 12 Energy / Blast · Need 12 Energy / Drink · Free / Combat · Mine floors 3–5 / Mining · Enter the mine / Mining · No rocks here / Knocked out · back at the entrance / Shanghai · Mine · Floor 2 | 主行动键、楼梯口与电梯面板、径向置灰原因与位置芯片；废弃：Enter mine · 10 Energy / Elevator · Floor 5 / Start new run |
+| 采集点 | gathering spot（通称，q(45)）/ Timber Grove / Rock Pile / Reed Bank / Herb Patch / Clay Bank / Old Tree / Gather Gloves · +1 at every gathering spot / Owned · always on / Ready / Timber Grove · Ready in 2h 10m / +6 Timber · Stored / +2 Worm Bait / Stored · 12 Stone · 3 Copper Ore / Workbench / Clay Bank · Homestead Lv2 / Old Tree · Homestead Lv3 | 采集；名字条只写名字（`Timber Grove` / `Workbench`），未开或没好时带一条事实（q(62)） |
+| 矿洞 | Enter mine · 2 Energy / Enter mine · Need 2 Energy / Exit mine · Free / Floor 1 · Free（第 2 层上行梯，q(46)）/ Enter mine · Bag full / Floor 2 · Bag full（q(48)）/ Continue run · Free / New run · 2 Energy / New run · Clear Floor 2 first / Current run will end · Runs today 1/2 / Mine runs today 1/2 / Enter mine · No runs left / Mine runs today 2/2 · Resets in 9h 12m / Floor 1 / Run 1/2 today / Floor 2 · 2 Energy / Floor 2 · Need 2 Energy / Floor 2 · Clear Floor 1 / Floor 4 · Clear Floor 3 first / Floor 2 · −2 Energy / Floor 2 cleared · Elevator stop / Run complete / Run ended at daily reset / Elevator · Free / Entrance · Free / Floor 1 · Free / Floor 2 · Here / Floor 3 · 2 Energy / Floor 5 · Express · Free / Quartz · once a day / Mine · 2 Energy / Mine · Need 2 Energy / Mine · Bag full / Attack / Blast · 12 Energy / Blast · Need 12 Energy / Drink · Free / Combat · Mine floors 3–5 / Mining · Enter the mine / Mining · No rocks here / Knocked out · back at the entrance / Shanghai · Mine · Floor 2 | 主行动键、楼梯口与电梯面板、径向置灰原因与位置芯片；废弃：Enter mine · 10 Energy / Elevator · Floor 5 / Start new run |
 | 火把与炸药 | Torch · see what rocks hold / Light Torch · Free / Lit · this floor / Dynamite · clears this floor | Mining 快捷栏消耗品 |
 | 怪物 | Slime / Elite Slime | 两种 |
-| 工作台 | Tap to craft / Craft / Materials 8/8 · 6/6 · 1/3 / Sprinkler · Farming Lv6 | 点工作台打开（设施靠点击触发）；配方卡 |
+| 工作台 | Workbench / Craft / Materials 8/8 · 6/6 · 1/3 / Sprinkler · Farming Lv6 | 点工作台打开（设施靠点击触发；名字条 `Workbench`，q(62)）；配方卡 |
 | 入库 | Stored · 12 Stone · 4 Copper Ore | 回家飘字 |
 | 回收 | Sell · 2 coins each · 14 coins left today | 驿站回收 |
 | 升级面板材料行 | Timber 12/12 · Reeds 4/6 · Stone 8/8 · 6 Timber to go | 第 8 章面板 |
@@ -8783,14 +8963,14 @@ flowchart LR
 | 场景 | 英文 | 中文释义 |
 |---|---|---|
 | 选城与首畦 | Where is home? / This is home / You can travel anywhere later. Home is where your farm is. / Sow ×1 · 2 Energy / Water · Free / Shanghai · Homestead | 开局；首畦按住主行动键连播 20 格，没有一次性大按钮 |
-| Today | Today / Catch 2 Pond Crucian · Reed Pond / Cook it: Grilled Crucian / Radishes ready in 3h 58m / Sow 10 Lettuce · 20 Energy / Lettuce ready in 7h 58m / Cook: Herb Grilled Fish · new recipe / Farming Lv 2 at your first harvest (50 XP) / Fresh Fish Soup · when radishes are ready / Fishing Lv 3 · 95 XP to go / Cooking Lv4 · 2 new dishes away / Follow a neighbor / needs 20 Energy · +8 in 21m / Show on map | 今日目标 |
+| Today | Today / Catch 2 Pond Crucian · Reed Pond / Deliver 2 Pond Crucian · Stall / Cook it: Grilled Crucian / Radishes ready in 3h 58m / Sow 10 Lettuce · 20 Energy / Lettuce ready in 7h 58m / Cook: Herb Grilled Fish · new recipe / Farming Lv 2 at your first harvest (50 XP) / Fresh Fish Soup · when radishes are ready / Fishing Lv 3 · 95 XP to go / Cooking Lv4 · 2 new dishes away / Follow a neighbor / needs 20 Energy · +8 in 21m / Show on map | 今日目标 |
 | 委托 | Pond Catch / 2 Pond Crucian · any pond · 14 coins · Deliver here / Track / Request complete · +14 coins | 教学委托 |
 | 鱼塘 | Reed Pond · Beginner pond · 0.8 km / Pond · best for Lv1–3 · Pond Crucian OK · 2 regional fish ? / Go / Cast · 5 Energy / Shanghai · Reed Pond / Creel 0 · 24 free | 地图塘卡与进塘后的主行动键、位置芯片 |
 | 教学卡 TipCard（各一次，P0 共 8 句） | Pick a seed, walk up to a plot and press Sow. Hold to keep sowing. / Casting uses 5 Energy / Your creel is your bag: 10 fish per free slot. / Tap Cook to grill your first fish / Tap when the needle hits gold! / Energy comes back over time. A meal brings it back now. / Levels unlock gear, fish and seeds. Basics never lock. / Browse the map for free. Travel costs Energy and coins. | 无按钮；时长同 Toast（q(26)、q(44)） |
 | 钓鱼 | Bite! / Caught! Pond Crucian · Common / First catch! +15 XP / New city! +10 XP / It got away · Energy refunded (9 left today) / Fishing 60/70 · Lv 2 in 10 XP · about 2 casts | 首会话钓鱼（首竿 / 首提各 +10） |
-| 挣脱卡 | Fine fish got away · Fishing Lv 2 needed · 10 XP to go · about 2 casts · Fine fish stay hooked · Energy refunded / Fish-dex / Keep fishing | 门禁 = 目标 |
+| 挣脱卡 | Too strong / Fishing Lv2 needed · You: Lv1 · 10 XP to go / Unlocks Fine fish (Perch, Bass) / Energy refunded (9 left today) | 门禁 = 目标；卡片无按钮（§4.8.6） |
 | 升级 | Fishing Lv 2 · Fine fish now stay on the hook · +50 Energy / Level-up gift: 3 Worm Bait · 3 Wild Herb · Recipe: Herb Grilled Fish / Worm Bait ×2 left · faster bites / First Fine fish! +20 Energy / 213/200 · bonus | 门打开并立刻用 |
-| 厨房与进食 | Cook / Stove 1/1 · Cooking Lv1 · Empty / Cookbook / Tasted / Need Radish ×1 / Grilled Crucian · Common · +20 Energy · 5 s / Tap when the needle hits gold! / Grilled Crucian ★ Good / First cooked! +15 Cooking XP · Cookbook 1/48 / +25 Energy · Meals today 25/300 / Herb Grilled Fish · Fine · +40 Energy · 15 s / New recipe! Herb Grilled Fish · +30 Cooking XP · Cookbook 2/48 / Cooking Lv 2 · Recipe: Fresh Fish Soup / Cook Again / Energy full / Keep | 闭环；第 27 分钟 Cooking Lv2 |
+| 厨房与进食 | Cook / Stove 1/1 · Cooking Lv1 · Empty / Cookbook / Tasted / Need Radish ×1 / Grilled Crucian · Common · +20 Energy · 5 s / Tap when the needle hits gold! / Grilled Crucian ★ Good / First cooked · +10 Cooking XP · Cookbook 1/48 / +5 Cooking XP ★ / +25 Energy · Meals today 25/300 / Herb Grilled Fish · Fine · +40 Energy · 15 s / First cooked · +20 Cooking XP · Cookbook 2/48 / Cooking Lv 2 · Recipe: Fresh Fish Soup / Cook Again / Energy full / Keep | 闭环；第 27 分钟 Cooking Lv2 |
 | 第 2 天仪式 | Farming Lv 2 · +30 Energy / Level-up gift: 5 Carrot Seeds / New for you · Carrot Seeds, Herb Seeds | 首收升级 |
 | 第 3 天仪式 | Home Set · Free / Tea House / Pip · Courier Kid / Enter mine · 2 Energy / Floor 2 · 2 Energy / Mine runs today 1/2 / Reed Rod · 80 coins | 据点与矿洞（层费 2） |
 | 第 4 天仪式 | Welcome to Suzhou / +10 Energy / 3 things to do here / Fish the local pond / Try a regional fish / New city! +10 XP / Grass Carp · Subtropical / Cooking Lv 4 · 3rd slot / Today changes: 3-ingredient dishes / Fisher's Stew · Rare · +70 Energy | 首访与第 3 投料槽 |
@@ -8798,7 +8978,7 @@ flowchart LR
 | 第 6 天仪式 | Mia watered 9 plots and harvested 6 radishes while you were away / Helped by Mia · 9 plots watered / Mia invites you to Hangzhou · Trip 3 · 10 Energy · 28:40 / Gift from Mia / Fish Trap · 120 coins | 社交 |
 | 第 7 天仪式 | Today changes: no more watering / Week one / Explorer Bronze · +30 Energy / Home Cook · +50 Energy / Next up: Trip 4 · Travel Permit needs 2 climates / Fishing Lv 6 · Carbon Rod · 350 coins / Homestead Lv 3 · Reeds 4 to go / Smoked Trout · Rare · +70 Energy / Cooking Lv 6 · Quick Fire | 护照周页 |
 | 结束 | Energy 213/200 · bonus / Radishes ready in 3h 32m | 结束钩子（无 "Out of energy"） |
-| 矿口与工作台 | Enter mine · 2 Energy / Tap to craft | 农场原位；矿口走近时主行动键才显示，工作台靠点击（指尖卡）；没有 Explore 菜单 |
+| 矿口与工作台 | Enter mine · 2 Energy / Workbench | 农场原位；矿口走近时主行动键才显示，工作台靠点击（名字条 `Workbench`，q(62)）；没有 Explore 菜单 |
 
 所有名字 ≤ 18 字符；时间派生文案 1 秒节拍；禁止孤立的 Locked / Not enough；用 Energy 不用 Stamina，货币一律 coins。
 

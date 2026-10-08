@@ -1,0 +1,19 @@
+{
+  "clip": "fire-close.mp4",
+  "duration_seconds": 8,
+  "captured_frames": 130,
+  "encoded_fps": 30,
+  "accelerated": false,
+  "renderer": "Desktop Godot Mobile/Vulkan; not Android recording",
+  "sha256": "e8c031c10de9cef40cde490ef40e8a9e542fe3b9240a9c2b23b46d2a684083a2",
+  "sample_times": [
+    0.25,
+    4,
+    7.5
+  ],
+  "black_frames": 0,
+  "pixel_motion": [
+    3.063599175347222,
+    3.1500962094907408
+  ]
+}

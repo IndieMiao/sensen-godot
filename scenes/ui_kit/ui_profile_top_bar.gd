@@ -71,7 +71,7 @@ class _Round extends Button:
 		var ink := UiTokens.COLOR_TEXT
 		match glyph:
 			Glyph.BACK:
-				var w := UiTokens.STROKE_RING
+				var w := UiTokens.STROKE_DEFAULT * 2.0   # the main's ‹ is a thin ExtraBold glyph
 				draw_polyline(PackedVector2Array([c + Vector2(3, -7), c + Vector2(-4, 0), c + Vector2(3, 7)]), ink, w, true)
 			Glyph.MORE:
 				for dx in [-6.0, 0.0, 6.0]: draw_circle(c + Vector2(dx, 0), 2.0, ink, true, -1.0, true)

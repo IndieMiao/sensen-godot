@@ -66,6 +66,9 @@ var _cam_size := 10.75
 var _focus := Vector3.ZERO
 var _follow := P0Follow.new()
 var _zoom := 1.0
+const ElasticZoom = preload("res://modules/p0/p0_elastic_zoom.gd")
+var _pinch = ElasticZoom.new(ZOOM_RANGE.x, ZOOM_RANGE.y)   # rubber band past the range
+var _zoom_at := Vector2.INF                              # the last pinch centre (screen)
 var _framed := Vector3.ZERO   # the opening shot's centre
 var _fits := false            # the whole floor fits the opening shot: hold it instead of following
 var _shot := {}           # push-in: {center: Vector3, size: float, release_on_move: bool}
@@ -73,6 +76,7 @@ var _shot_k := 0.0
 var _shot_tween: Tween
 var _walk := {}           # {name, point: Vector3, done: Callable}
 var _shown := {}          # marker ids currently on screen
+var _card := ""           # the one tappable whose finger card shows (SGODOT-250: one card at a time)
 var _exit_armed := false
 var _leaving := false
 var _perf_left := -1.0    # debug builds with user://p0_perf: log fps / draw calls every 5 s (logcat tag godot)
@@ -83,6 +87,9 @@ func _ready() -> void:
 	if use_runtime: P0Runtime.mark("%s _ready start" % name)
 	if art_scene == null: art_scene = load(BASIC_ROOM_ART)
 	layout = P0RoomAnchors.read_json(layout_path)
+	# Pushed above the map, whose tiles show through a transparent root (SGODOT-248); the map makes it transparent
+	# again on its own resume. Same as p0_farm / p0_pond.
+	get_viewport().transparent_bg = false
 	_build_environment()
 	room = Node3D.new()
 	room.name = "Room"
@@ -241,7 +248,7 @@ static func yaw_dir(yaw_degrees: float) -> Vector3:
 func _build_environment() -> void:
 	environment = Environment.new()
 	environment.background_mode = Environment.BG_COLOR
-	environment.background_color = Color("e8e4c8")
+	environment.background_color = BACKDROP   # also the Backdrop plate's colour, see _backdrop()
 	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	environment.ambient_light_color = Color("fff0dc")
 	environment.ambient_light_energy = 0.70
@@ -294,6 +301,26 @@ func _build_camera() -> void:
 	cam.far = 70.0
 	add_child(cam)
 	cam.make_current()
+	cam.add_child(_backdrop())
+
+## The colour around the room (SGODOT-248 R1.1): an unshaded plate just inside the far plane, so it is tone-mapped the
+## same way as the room on every renderer. The environment's clear colour alone came out #F7F6EA through ACES on Metal
+## but pure white on Android Vulkan; the plate keeps both at #F7F6EA. It belongs to the room, so it hides with it.
+const BACKDROP := Color("e8e4c8")
+func _backdrop() -> MeshInstance3D:
+	var plate := MeshInstance3D.new()
+	plate.name = "Backdrop"
+	var quad := QuadMesh.new()
+	quad.size = Vector2(400, 400)   # well past any room's orthographic view
+	plate.mesh = quad
+	var mat := StandardMaterial3D.new()
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.albedo_color = BACKDROP
+	mat.disable_fog = true
+	plate.material_override = mat
+	plate.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	plate.position = Vector3(0, 0, -(cam.far - 1.0))
+	return plate
 
 ## Opening shot (§10.1): the player, every tappable anchor and the room's floor (a cut-away diorama reads
 ## wrong cropped) in the middle of the screen; held until the player first moves. Re-run when a room changes
@@ -452,7 +479,9 @@ func p0_joystick(v: Vector2) -> void:
 
 func p0_tap(screen: Vector2) -> void:
 	if rt and rt.ui.has_modal(): return
-	var n := pick(screen)
+	# A finger card's tap goes to its own anchor by id, not through the point test (PR #21's rule for the farm).
+	var card := str(rt.ui.tapped_card) if rt else ""
+	var n := card.trim_prefix("room:") if card.begins_with("room:") and anchor(card.trim_prefix("room:")) else pick(screen)
 	if n != "": walk_to(n)
 
 func p0_frame(v: Dictionary, dt: float) -> void:
@@ -467,7 +496,8 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 	# a space larger than the screen (the market square), the safe box follows the player (§10.1).
 	if _fits and _zoom <= 1.0: _focus = _framed
 	else: _focus = _follow.step(cam, _focus, actor.position, actor.mover.is_moving(), dt)
-	_update_camera()
+	if _pinch.step(dt): _set_zoom(_pinch.value)   # springing back from past a zoom limit, about the same point
+	else: _update_camera()
 	if rt: _markers(v)
 	_room_frame(v, dt)
 	if _perf_left >= 0.0:
@@ -486,13 +516,28 @@ func _door_check() -> void:
 	if d > EXIT_ARM_M: _exit_armed = true
 	elif _exit_armed and d <= EXIT_RADIUS_M: leave()
 
+## SGODOT-250 (spec 370794d2 item 5, LOCK-07 v2): one finger card at a time in a room as on the farm — the nearest
+## anchor with a card within CARD_NEAR_M; the one showing keeps it unless another is clearly nearer, so standing
+## between the keeper, a seat and the door never shows two or three cards (hand test 246 pictures 06 / 07).
+## `marks` maps anchor names to their _marker(); returns the anchor whose card shows, or "".
+func card_pick(marks: Dictionary) -> String:
+	var cands: Array = []
+	for n in marks:
+		if (marks[n] as Dictionary).has("text") and anchor(n): cands.append([n, anchor(n).global_position, CARD_NEAR_M])
+	_card = P0Garden.pick_card(cands, actor.position, _card)
+	return _card
+
 ## Finger cards and status badges over tappable anchors (221's rt.ui.tag / rt.ui.badge when present).
 func _markers(v: Dictionary) -> void:
 	var now := {}
+	var marks := {}
 	for n in _tappable():
 		var m := _marker(n, v)
-		var id := "room:" + n
-		if m.is_empty(): continue
+		if not m.is_empty(): marks[n] = m
+	card_pick(marks)
+	for n in marks:
+		var m: Dictionary = marks[n]
+		var id: String = "room:" + n
 		now[id] = true
 		var at := anchor(n).global_position + _hit_lift(n) * 1.1
 		var badge_at := anchor("badge_" + P0RoomAnchors.object_of(n))
@@ -503,8 +548,7 @@ func _markers(v: Dictionary) -> void:
 			rt.ui.call("badge", id, state, screen, true, str(m.get("caption", "")), m.get("icon", null))
 			if rt.ui.has_method("badge_height"): lift = float(rt.ui.call("badge_height", id))
 		if m.has("text"):
-			var near := _flat_distance(actor.position, anchor(n).global_position) < CARD_NEAR_M
-			rt.ui.tag(id, str(m.text), screen - Vector2(0, lift), near)
+			rt.ui.tag(id, str(m.text), screen - Vector2(0, lift), n == _card)
 	for id in _shown.keys():
 		if now.has(id): continue
 		rt.ui.tag(id, "", Vector2.ZERO, false)
@@ -520,14 +564,34 @@ static func badge_state(key: String) -> int:
 func p0_anchor() -> Vector2:
 	return cam.unproject_position(actor.position + Vector3(0, 2.0, 0))
 
-func p0_zoom(f: float) -> void:
-	_zoom = clampf(_zoom / f, ZOOM_RANGE.x, ZOOM_RANGE.y)
-	if _zoom > 1.0 and _fits: _follow.held = false
+## Zoom about the last pinch centre (ScenePan's focal pinch). A room that fits the screen keeps its diorama framing
+## at zoom ≤ 1, so the shift only holds once zoomed in.
+func _set_zoom(value: float) -> void:
+	_zoom = value
+	if cam == null or not is_inside_tree(): return   # not placed yet: the next frame frames it
+	var before = ElasticZoom.ground_at(cam, _zoom_at, _focus.y)
+	_update_camera()
+	var d := ElasticZoom.shift(before, ElasticZoom.ground_at(cam, _zoom_at, _focus.y))
+	if d != Vector3.ZERO and not (_fits and _zoom <= 1.0):
+		_focus += d
+		_update_camera()
+
+func p0_zoom(f: float, at := Vector2.INF) -> void:
+	_zoom_at = at
+	_pinch.pinch(f)
+	_follow.hold()   # the pinched framing stays until the player walks
+	_set_zoom(_pinch.value)
+
+func p0_zoom_end() -> void: _pinch.release()
 
 func p0_recenter() -> void:
 	if _fits and _zoom <= 1.0: return   # the whole room is already in view
 	_focus = actor.position
 	_follow.held = false
+
+## Whether p0_show_spot has something to show here (the runtime steps out of the farmhouse for farm targets).
+func p0_has_spot(where: String) -> bool:
+	return ["cam_" + where, "use_" + where, "use_" + where + "_1"].any(func(n): return anchor(n) != null)
 
 ## Energy card guidance (LOCK-08: only moves the camera): show cam_<where>, else use_<where>[_1].
 func p0_show_spot(where: String) -> void:
@@ -561,6 +625,7 @@ func suspend() -> void:
 func resume() -> void:
 	process_mode = Node.PROCESS_MODE_INHERIT
 	show()
+	get_viewport().transparent_bg = false
 	world_env.environment = environment
 	cam.make_current()
 	if rt:

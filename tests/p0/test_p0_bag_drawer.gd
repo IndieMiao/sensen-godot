@@ -95,6 +95,11 @@ func test_category_chip_and_sort_change_what_the_grid_lists() -> void:
 	assert_str(d.header.sort_button().label).is_equal("Sort · Type")
 	d.header.sort_pressed.emit()   # and back
 	assert_str(d.sort).is_equal("Recent")
+	d.set_category("Fish")         # each Tab keeps its own Sort (BagHeader main)
+	assert_str(d.sort).is_equal("Type")
+	assert_str(d.header.sort_button().label).is_equal("Sort · Type")
+	d.set_category("All")
+	assert_str(d.sort).is_equal("Recent")
 
 func test_gear_side_lists_the_slot_and_forwards_equip() -> void:
 	var d := _drawer("gear")
@@ -185,3 +190,53 @@ func test_profile_page_emits_back_edit_look_and_skill() -> void:
 	(page.find_children("*", "UiSkillCard", true, false)[1] as UiSkillCard).pressed.emit()
 	assert_array(got).is_equal(["back", "look", "fishing"])
 	assert_float(page.top_bar.right_button().modulate.a).is_equal(0.0)   # no Settings page in P0 yet
+
+# ---------------------------------------------------------------- Farm Storage (§10.4.8)
+
+func test_storage_stacks_follow_the_bag_on_their_tabs_at_home_only() -> void:
+	var v := _view()
+	v["storage"] = {"items": [{"id": "wood", "qty": 99}, {"id": "seed_radish", "qty": 40}]}
+	v.items["wood"] = {"kind": "material"}
+	var ready := &"storage" in P0ItemInfo.CONTEXTS
+	var mats := P0BagDrawer.storage_items(v, "Materials")
+	if ready:
+		assert_that(mats.map(func(it): return [it.id, it.item, it.qty, it.stored])).is_equal([["storage:wood", "wood", 99, true]])
+		assert_str(P0BagDrawer.hint_for("Materials", true)).is_equal("Materials · Bag first, then Farm Storage")
+	else:
+		assert_array(mats).is_empty()   # no storage card in the rules yet: no dead cells
+	assert_array(P0BagDrawer.storage_items(v, "All")).is_empty()
+	assert_array(P0BagDrawer.storage_items(v, "Materials", "pond")).is_empty()
+	v.storage.items.append({"id": "fert_compost", "qty": 6})   # §10.4.2: compost sits on the Seeds tab
+	if ready:
+		assert_that(P0BagDrawer.storage_items(v, "Seeds").map(func(it): return it.item)).is_equal(["seed_radish", "fert_compost"])
+	v.erase("storage")
+	assert_array(P0BagDrawer.storage_items(v, "Seeds")).is_empty()
+	assert_str(P0BagDrawer.hint_for("Seeds", false)).is_equal("Select an item to see its details.")
+
+func test_mining_slot_lists_the_picks_with_equip() -> void:
+	var v := _view()
+	v.gear.slots.mining = "pick_starter"
+	v.gear["picks"] = [{"id": "pick_starter", "name": "Starter Pickaxe", "owned": true, "equipped": true, "stone": 1, "level": 0, "price": 0, "source": "start"},
+		{"id": "pick_copper", "name": "Copper Pickaxe", "owned": true, "equipped": false, "stone": 2, "level": 0, "price": 0, "source": "workbench"}]
+	v.names["pick_copper"] = "Copper Pickaxe"
+	v.names["pick_starter"] = "Starter Pickaxe"
+	var rows := P0BagDrawer.gear_rows(v, "mining")
+	assert_that(rows.map(func(r): return r.state)).is_equal([&"equipped", &"owned"])
+	assert_str(str(rows[1].effect)).is_equal("2 Stone per rock")
+	assert_str(str(rows[1].action.label)).is_equal("Equip")
+	assert_bool((rows[0].action as Dictionary).is_empty()).is_true()
+
+func test_full_bag_shows_where_more_room_comes_from() -> void:
+	var v := _view()
+	v.bag.capacity = 2
+	v.bag.slots = [{"id": "seed_radish", "qty": 5}, {"id": "fish_crucian", "qty": 1}]
+	v["homestead"] = {"unlocks": {"bag_upgrade_1": "locked"}}
+	var up: Dictionary = P0Logic.content().bag_upgrades[0]
+	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("Bag full · +%d slots at Homestead Lv%d" % [int(up.capacity) - 2, int(up.homestead)])
+	v.homestead.unlocks.bag_upgrade_1 = "for_sale"
+	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("Bag full · +%d slots · %s" % [int(up.capacity) - 2, str(up.name)])
+	v.homestead.unlocks.bag_upgrade_1 = "owned"
+	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("")
+	v.homestead.unlocks.bag_upgrade_1 = "locked"
+	v.bag.capacity = 25
+	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("")   # room left: no row

@@ -29,6 +29,13 @@ func _view() -> Dictionary:
 		"gear": {"rods": [{"id": "rod_starter", "name": "Starter Rod", "reach": 2, "level": 1, "hook_bonus_ms": 0, "owned": true, "equipped": true},
 			{"id": "rod_reed", "name": "Reed Rod", "reach": 3, "level": 3, "hook_bonus_ms": 400, "owned": false, "equipped": false}]},
 		"fishing": {"dex": [{"id": "fish_crucian", "caught": 3}, {"id": "fish_carp", "caught": 0}]},
+		# The counters as the P0 server sends them (SGODOT-228, assets/p0/p0_content.json shops / quotas).
+		"shops": {"homestead": {"sell": [{"kind": "crop", "rate": 1, "quota": null}, {"kind": "fish", "rate": 1, "quota": null},
+				{"kind": "dish", "rate": 1, "quota": "dish"}, {"kind": "material", "rate": 1, "quota": "material"}]},
+			"tackle": {"sell": [{"kind": "fish", "rate": 0.8, "quota": "fish_tackle"}]}},
+		"quotas": {"fish_tackle": {"used": 0, "cap": 80, "resets_in": 33120000, "scope": "any Tackle Shop"},
+			"dish": {"used": 0, "cap": 120, "resets_in": 33120000, "scope": "Homestead Stall"},
+			"material": {"used": 0, "cap": 30, "resets_in": 33120000, "scope": "Homestead Stall"}},
 		"rarity_names": ["Common", "Fine", "Rare", "Legendary"],
 	}
 
@@ -81,7 +88,7 @@ func _full() -> Dictionary:
 
 func test_seed_in_the_bag_pins_and_stores_only_at_home() -> void:
 	var s := P0ItemInfo.spec(_full(), "seed_radish", &"bag", {place = "home"})
-	assert_array(s.facts).is_equal(["2 Energy per plot · Ready in 4h 0m"])
+	assert_array(s.facts).is_equal(["2 Energy per plot · Ready in 4h"])   # F-07 wording: whole hours, int Energy
 	assert_array(_labels(s)).is_equal(["secondary:Pin", "secondary:Store"])   # no primary button
 	assert_bool(s.lock.shown).is_true()
 	s = P0ItemInfo.spec(_full(), "seed_radish", &"bag", {place = "pond", pinned = true})
@@ -106,16 +113,27 @@ func test_tackle_pays_eighty_percent_rounded_down_and_says_the_coins() -> void:
 	assert_bool(s.facts.has("4 each")).is_true()
 
 func test_quota_short_of_the_stack_and_used_up() -> void:
+	# Server shapes (SGODOT-228): shops[role].sell = [{kind, rate, quota}], view.quotas[id] = {used, cap, resets_in, scope}.
 	var v := _view()
-	v["shops"] = {"market": {"accepts": ["crop", "fish"], "mult": 0.8,
-		"quotas": {"crop": {"label": "", "used": 55, "cap": 60, "resets_in": 33120000, "scope": "all Shanghai markets"}}}}
-	var s := P0ItemInfo.spec(v, "crop_radish", &"counter_sell", {counter = "market"})
-	assert_array(_labels(s)).is_equal(["secondary:Sell", "primary:Sell 5 · 20 coins"])
-	assert_str(s.quota.text).is_equal("Buy-back today 55/60")
-	assert_str(s.quota.note).is_equal("all Shanghai markets · resets in 9h 12m")
-	v.shops.market.quotas.crop.used = 60
-	s = P0ItemInfo.spec(v, "crop_radish", &"counter_sell", {counter = "market"})
+	v["shops"] = {"tackle": {"sell": [{"kind": "fish", "rate": 0.8, "quota": "fish_tackle"}]}}
+	v["quotas"] = {"fish_tackle": {"used": 78, "cap": 80, "resets_in": 33120000, "scope": "any Tackle Shop"}}
+	var s := P0ItemInfo.spec(v, "fish_crucian", &"counter_sell", {counter = "tackle"})
+	assert_array(_labels(s)).is_equal(["secondary:Sell", "primary:Sell 2 · 8 coins"])   # 2 of 3 fit, ⌊6 × 0.8⌋ = 4 each
+	assert_str(s.quota.text).is_equal("Fish buy-back today 78/80")
+	assert_str(s.quota.note).is_equal("any Tackle Shop · resets in 9h 12m")
+	v.quotas.fish_tackle.used = 80
+	s = P0ItemInfo.spec(v, "fish_crucian", &"counter_sell", {counter = "tackle"})
 	assert_array(_labels(s)).is_equal(["unavailable:Limit reached · 9h 12m"])
+	v.shops["market"] = {"sell": []}   # P0 markets take nothing
+	assert_array(_labels(P0ItemInfo.spec(v, "crop_radish", &"counter_sell", {counter = "market"}))).is_equal(["unavailable:Sell at home"])
+
+func test_a_market_quota_short_of_the_stack_sells_what_fits() -> void:
+	var v := _view()
+	v["shops"] = {"market": {"sell": [{"kind": "crop", "rate": 0.8, "quota": "crop_market"}]}}
+	v["quotas"] = {"crop_market": {"used": 55, "cap": 60, "resets_in": 33120000, "scope": "all Shanghai markets"}}
+	var s := P0ItemInfo.spec(v, "crop_radish", &"counter_sell", {counter = "market"})
+	assert_array(_labels(s)).is_equal(["secondary:Sell", "primary:Sell 5 · 20 coins"])   # 5 of 12 fit, ⌊5 × 0.8⌋ = 4 each
+	assert_str(s.quota.note).is_equal("all Shanghai markets · resets in 9h 12m")
 
 func test_locked_stack_shows_locked_and_unlock_only() -> void:
 	var v := _view()
@@ -128,18 +146,38 @@ func test_locked_stack_shows_locked_and_unlock_only() -> void:
 func test_fish_gift_is_grey_without_mutual_friends() -> void:
 	var s := P0ItemInfo.spec(_full(), "fish_crucian", &"bag")
 	assert_array(_labels(s)).is_equal(["unavailable:Gift · Mutual friends only"])
-	assert_array(s.facts).is_equal(["Common", "3", "Sells for 6 · Fish-dex 1/2"])
+	assert_array(s.facts).is_equal(["Sells for 6 · Fish-dex 1/2"])   # no known source: no bare "3" line (×3 is in the title)
+	assert_str(s.rarity_text).is_equal("Common")   # rarity sits on the state line, not in facts
 	var v := _full()
 	v["social"] = {"mutual": 2}
 	assert_array(_labels(P0ItemInfo.spec(v, "fish_crucian", &"bag"))).is_equal(["nav:Gift ›"])
 
 func test_dish_eats_and_deliver_takes_the_primary_slot() -> void:
 	var s := P0ItemInfo.spec(_full(), "dish_grilled_crucian", &"bag")
-	assert_array(_labels(s)).is_equal(["primary:Eat · +45 Energy", "nav:Gift ›"])
-	assert_str(s.facts[0]).is_equal("Common ★")
+	assert_array(_labels(s)).is_equal(["primary:Eat · +45 Energy", "unavailable:Gift to a resident"])
+	assert_str(s.rarity_text).is_equal("Common")
+	assert_int(s.quality).is_equal(1)
+	assert_array(s.facts).is_equal(["+45 Energy"])
 	var v := _full()
 	v.energy.value = 200
-	assert_array(_labels(P0ItemInfo.spec(v, "dish_grilled_crucian", &"bag"))).is_equal(["unavailable:Energy full", "nav:Gift ›"])
+	assert_array(_labels(P0ItemInfo.spec(v, "dish_grilled_crucian", &"bag"))).is_equal(["unavailable:Energy full", "unavailable:Gift to a resident"])
+
+## A dish's Gift on the bag card (不知火舞 / 李白 on 225): `Gift to <Name>` for the resident within reach, else grey
+## `Gift to a resident`; grey `Gift already given today` once that resident has had today's gift. Mystery Dish too.
+func test_dish_gift_names_the_resident_within_reach() -> void:
+	var near := {id = "res_pip", name = "Pip", gifted_today = false}
+	assert_array(_labels(P0ItemInfo.spec(_full(), "dish_grilled_crucian", &"bag", {near = near}))) \
+		.is_equal(["primary:Eat · +45 Energy", "secondary:Gift to Pip"])
+	near.gifted_today = true
+	assert_array(_labels(P0ItemInfo.spec(_full(), "dish_grilled_crucian", &"bag", {near = near}))) \
+		.is_equal(["primary:Eat · +45 Energy", "unavailable:Gift already given today"])
+	var v := _full()
+	v.bag.slots.append({"id": "dish_mystery", "qty": 1})
+	v.items["dish_mystery"] = {"name": "Mystery Dish", "kind": "dish", "sell": null, "meal": 10, "full": 10}
+	var gifts := _labels(P0ItemInfo.spec(v, "dish_mystery", &"bag", {near = {id = "res_pip", name = "Pip"}}))
+	assert_bool(gifts.has("secondary:Gift to Pip")).is_true()   # residents take it, not a fan (q(33))
+	var drawer := _labels(P0ItemInfo.spec(v, "dish_mystery", &"gift", {target = {kind = "resident", id = "res_pip"}}))
+	assert_bool(drawer.has("primary:Gift")).is_true()
 
 func test_buy_rows_say_why_they_cannot_be_bought() -> void:
 	var s := P0ItemInfo.spec(_view(), "rod_reed", &"counter_buy", {counter = "tackle"})
@@ -154,10 +192,15 @@ func test_buy_rows_say_why_they_cannot_be_bought() -> void:
 	assert_bool(s.facts.has("Stock 7/30 · Bag ×5")).is_true()
 
 func test_rods_in_gear_equip_or_show_equipped() -> void:
-	assert_array(_labels(P0ItemInfo.spec(_view(), "rod_starter", &"gear"))).is_equal(["unavailable:✓ Equipped"])
+	var starter := P0ItemInfo.spec(_view(), "rod_starter", &"gear")
+	assert_array(_labels(starter)).is_equal(["unavailable:✓ Equipped"])
+	assert_str(str(starter.facts[0])).is_equal("Lands up to Fine fish · Bite window 2.2 s")   # absolute window (76834e35)
 	var s := P0ItemInfo.spec(_view(), "rod_reed", &"gear")
 	assert_array(_labels(s)).is_empty()
-	assert_array(s.facts).is_equal(["Lands up to Rare fish · Bite window +0.4 s", "Fishing Lv3 · Tackle Shop"])
+	assert_array(s.facts).is_equal(["Lands up to Rare fish · Bite window 2.6 s", "Fishing Lv3 · Tackle Shop"])
+	var v := _view()
+	for r in v.gear.rods: if str(r.id) == "rod_reed": r.owned = true
+	assert_array(_labels(P0ItemInfo.spec(v, "rod_reed", &"gear"))).is_equal(["primary:Equip"])   # solid (BAG-2)
 
 func test_snapshot_of_every_kind_and_context() -> void:
 	var v := _view()
@@ -174,3 +217,54 @@ func test_snapshot_of_every_kind_and_context() -> void:
 		f.store_string(text)
 		f.close()
 	assert_str(text).is_equal(FileAccess.get_file_as_string(SNAPSHOT))
+
+func test_hours_read_like_f07() -> void:
+	assert_str(P0ItemInfo.hours(4.0)).is_equal("4h")
+	assert_str(P0ItemInfo.hours(1.5)).is_equal("1h 30m")
+	assert_str(P0ItemInfo.hours(0.75)).is_equal("45m")
+
+func test_storage_stacks_take_ten_or_all_at_home() -> void:
+	var v := _full()
+	v.storage = {"items": [{"id": "timber", "name": "Timber", "qty": 12}, {"id": "seed_radish", "name": "Radish Seeds", "qty": 4}]}
+	var s := P0ItemInfo.spec(v, "timber", &"storage", {place = "home"})
+	assert_array(s.facts).is_equal(["12 · Farm Storage"])
+	assert_array(_labels(s)).is_equal(["secondary:Take 10", "primary:Take all"])
+	assert_that(s.buttons.map(func(b): return [b.id, b.payload])).is_equal([[&"take_out", {"qty": 10}], [&"take_out", {"qty": "all"}]])
+	assert_array(_labels(P0ItemInfo.spec(v, "seed_radish", &"storage", {place = "home"}))).is_equal(["primary:Take all"])   # 4 stored: no Take 10
+	assert_array(_labels(P0ItemInfo.spec(v, "timber", &"storage", {place = "pond"}))).is_equal(["unavailable:At home only"])
+
+func test_buy_rows_use_the_server_wallet_need_and_homestead_gate() -> void:
+	var v := _view()
+	v["shops"] = {"homestead": {"buy": [
+		{"id": "seed_radish", "price": 4, "need": 44, "skill": "farming", "gate": 1, "unlocked": true, "homestead": null, "homestead_ok": true, "left": null},
+		{"id": "bait_worm", "price": 2, "need": 42, "skill": "fishing", "gate": 1, "unlocked": true, "homestead": 2, "homestead_ok": false, "left": 30}]}}
+	assert_array(_labels(P0ItemInfo.spec(v, "seed_radish", &"counter_buy"))).is_equal(["unavailable:Need 4 more coins"])   # 40 coins, needs 44
+	assert_array(_labels(P0ItemInfo.spec(v, "bait_worm", &"counter_buy"))).is_equal(["unavailable:Homestead Lv2 needed"])
+
+func test_torches_read_as_materials() -> void:
+	var v := _view()
+	v.items["torch"] = {"name": "Torch", "kind": "torch", "sell": null}
+	assert_str(P0ItemInfo.kind_of(v, "torch")).is_equal("material")
+
+func test_pickaxes_in_gear_say_stone_per_rock_and_where_from() -> void:
+	# LOCK-29; view.gear.picks as the server sends it (SGODOT-231 PR #17).
+	var v := _view()
+	v.gear["picks"] = [{"id": "pick_starter", "name": "Starter Pickaxe", "owned": true, "equipped": true, "stone": 1, "level": 1},
+		{"id": "pick_copper", "name": "Copper Pickaxe", "owned": false, "equipped": false, "stone": 2, "level": 2, "price": 0, "source": "workbench"}]   # machine codes (周瑜 #17)
+	assert_str(P0ItemInfo.kind_of(v, "pick_copper")).is_equal("pick")
+	var s := P0ItemInfo.spec(v, "pick_starter", &"gear")
+	assert_array(s.facts).is_equal(["1 Stone per rock"])
+	assert_array(_labels(s)).is_equal(["unavailable:✓ Equipped"])
+	s = P0ItemInfo.spec(v, "pick_copper", &"gear")
+	assert_array(s.facts).is_equal(["2 Stone per rock", "Workbench"])
+	assert_array(_labels(s)).is_empty()
+
+func test_bag_tabs_follow_the_plan() -> void:
+	var v := _view()
+	v.items["torch"] = {"name": "Torch", "kind": "torch", "sell": null}
+	var tabs := {}
+	for id in ["seed_radish", "fert_compost", "crop_radish", "fish_crucian", "dish_grilled_crucian", "bait_worm", "rod_reed", "timber", "torch"]:
+		tabs[id] = P0ItemInfo.tab_of(v, id)
+	assert_dict(tabs).is_equal({"seed_radish": &"seeds", "fert_compost": &"seeds", "crop_radish": &"produce", "fish_crucian": &"fish",
+		"dish_grilled_crucian": &"dishes", "bait_worm": &"tackle", "rod_reed": &"tackle", "timber": &"materials", "torch": &"materials"})
+	assert_str(P0ItemInfo.tab_of(v, "postcard_shanghai")).is_empty()   # keepsakes: All only

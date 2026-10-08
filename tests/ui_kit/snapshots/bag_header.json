@@ -4,7 +4,7 @@
     0,
     0,
     328,
-    368
+    358
   ],
   "children": [
     {
@@ -35,7 +35,7 @@
         0,
         52,
         328,
-        316
+        306
       ],
       "children": [
         {
@@ -50,96 +50,107 @@
             {
               "type": "UiBagHeader",
               "rect": [
-                6,
+                15,
                 52,
-                315,
+                297,
                 52
               ],
               "children": [
                 {
                   "type": "HBoxContainer",
                   "rect": [
-                    6,
+                    15,
                     52,
-                    315,
+                    297,
                     44
                   ],
                   "children": [
                     {
                       "type": "UiSegmentTab",
                       "rect": [
-                        6,
-                        52,
+                        15,
+                        57,
                         220,
-                        44
+                        34
                       ],
                       "children": [
                         {
-                          "type": "Button",
+                          "type": "HBoxContainer",
                           "rect": [
-                            6,
-                            52,
-                            107,
-                            44
+                            18,
+                            60,
+                            214,
+                            28
                           ],
-                          "variation": "SegmentTab",
-                          "text": "",
-                          "pressed": true,
                           "children": [
                             {
-                              "type": "HBoxContainer",
+                              "type": "Button",
                               "rect": [
-                                6,
-                                52,
-                                107,
-                                44
+                                18,
+                                60,
+                                106,
+                                28
                               ],
+                              "variation": "SegmentTab",
+                              "text": "",
+                              "pressed": true,
                               "children": [
                                 {
-                                  "type": "Label",
+                                  "type": "HBoxContainer",
                                   "rect": [
-                                    25,
-                                    64,
-                                    68,
-                                    20
+                                    18,
+                                    60,
+                                    106,
+                                    28
                                   ],
-                                  "variation": "BodyB14",
-                                  "text": "Bag 19/25"
+                                  "children": [
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        41,
+                                        65,
+                                        59,
+                                        18
+                                      ],
+                                      "variation": "C12XB",
+                                      "text": "Bag 19/25"
+                                    }
+                                  ]
                                 }
                               ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": "Button",
-                          "rect": [
-                            119,
-                            52,
-                            107,
-                            44
-                          ],
-                          "variation": "SegmentTab",
-                          "text": "",
-                          "children": [
+                            },
                             {
-                              "type": "HBoxContainer",
+                              "type": "Button",
                               "rect": [
-                                119,
-                                52,
-                                107,
-                                44
+                                126,
+                                60,
+                                106,
+                                28
                               ],
+                              "variation": "SegmentTab",
+                              "text": "",
                               "children": [
                                 {
-                                  "type": "Label",
+                                  "type": "HBoxContainer",
                                   "rect": [
-                                    156,
-                                    64,
-                                    32,
-                                    20
+                                    126,
+                                    60,
+                                    106,
+                                    28
                                   ],
-                                  "variation": "BodyB14",
-                                  "text": "Gear"
+                                  "children": [
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        165,
+                                        65,
+                                        27,
+                                        18
+                                      ],
+                                      "variation": "C12B",
+                                      "text": "Gear"
+                                    }
+                                  ]
                                 }
                               ]
                             }
@@ -150,7 +161,7 @@
                     {
                       "type": "Control",
                       "rect": [
-                        234,
+                        243,
                         52,
                         0,
                         44
@@ -159,29 +170,29 @@
                     {
                       "type": "UiNavButton",
                       "rect": [
-                        242,
+                        251,
                         52,
-                        79,
+                        61,
                         44
                       ],
                       "variation": "NavCompact",
-                      "text": "Sort · Recent ›"
+                      "text": "Sort · Type"
                     }
                   ]
                 },
                 {
                   "type": "MarginContainer",
                   "rect": [
-                    6,
+                    15,
                     100,
-                    315,
+                    297,
                     4
                   ],
                   "children": [
                     {
                       "type": "Control",
                       "rect": [
-                        12,
+                        21,
                         100,
                         100,
                         4
@@ -200,7 +211,7 @@
                 14
               ],
               "variation": "C9B",
-              "text": "Bag side · Sort · Recent · capacity bar"
+              "text": "Bag side · Sort · Type · capacity bar"
             }
           ]
         },
@@ -216,96 +227,107 @@
             {
               "type": "UiBagHeader",
               "rect": [
-                6,
+                15,
                 144,
-                315,
+                297,
                 52
               ],
               "children": [
                 {
                   "type": "HBoxContainer",
                   "rect": [
-                    6,
+                    15,
                     144,
-                    315,
+                    297,
                     44
                   ],
                   "children": [
                     {
                       "type": "UiSegmentTab",
                       "rect": [
-                        6,
-                        144,
+                        15,
+                        149,
                         220,
-                        44
+                        34
                       ],
                       "children": [
                         {
-                          "type": "Button",
+                          "type": "HBoxContainer",
                           "rect": [
-                            6,
-                            144,
-                            107,
-                            44
+                            18,
+                            152,
+                            214,
+                            28
                           ],
-                          "variation": "SegmentTab",
-                          "text": "",
-                          "pressed": true,
                           "children": [
                             {
-                              "type": "HBoxContainer",
+                              "type": "Button",
                               "rect": [
-                                6,
-                                144,
-                                107,
-                                44
+                                18,
+                                152,
+                                106,
+                                28
                               ],
+                              "variation": "SegmentTab",
+                              "text": "",
+                              "pressed": true,
                               "children": [
                                 {
-                                  "type": "Label",
+                                  "type": "HBoxContainer",
                                   "rect": [
-                                    25,
-                                    156,
-                                    68,
-                                    20
+                                    18,
+                                    152,
+                                    106,
+                                    28
                                   ],
-                                  "variation": "BodyB14",
-                                  "text": "Bag 23/25"
+                                  "children": [
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        41,
+                                        157,
+                                        59,
+                                        18
+                                      ],
+                                      "variation": "C12XB",
+                                      "text": "Bag 23/25"
+                                    }
+                                  ]
                                 }
                               ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": "Button",
-                          "rect": [
-                            119,
-                            144,
-                            107,
-                            44
-                          ],
-                          "variation": "SegmentTab",
-                          "text": "",
-                          "children": [
+                            },
                             {
-                              "type": "HBoxContainer",
+                              "type": "Button",
                               "rect": [
-                                119,
-                                144,
-                                107,
-                                44
+                                126,
+                                152,
+                                106,
+                                28
                               ],
+                              "variation": "SegmentTab",
+                              "text": "",
                               "children": [
                                 {
-                                  "type": "Label",
+                                  "type": "HBoxContainer",
                                   "rect": [
-                                    156,
-                                    156,
-                                    32,
-                                    20
+                                    126,
+                                    152,
+                                    106,
+                                    28
                                   ],
-                                  "variation": "BodyB14",
-                                  "text": "Gear"
+                                  "children": [
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        165,
+                                        157,
+                                        27,
+                                        18
+                                      ],
+                                      "variation": "C12B",
+                                      "text": "Gear"
+                                    }
+                                  ]
                                 }
                               ]
                             }
@@ -316,7 +338,7 @@
                     {
                       "type": "Control",
                       "rect": [
-                        234,
+                        243,
                         144,
                         0,
                         44
@@ -325,29 +347,29 @@
                     {
                       "type": "UiNavButton",
                       "rect": [
-                        242,
+                        251,
                         144,
-                        79,
+                        61,
                         44
                       ],
                       "variation": "NavCompact",
-                      "text": "Sort · Recent ›"
+                      "text": "Sort · Type"
                     }
                   ]
                 },
                 {
                   "type": "MarginContainer",
                   "rect": [
-                    6,
+                    15,
                     192,
-                    315,
+                    297,
                     4
                   ],
                   "children": [
                     {
                       "type": "Control",
                       "rect": [
-                        12,
+                        21,
                         192,
                         100,
                         4
@@ -376,7 +398,7 @@
             0,
             236,
             328,
-            64
+            54
           ],
           "children": [
             {
@@ -385,7 +407,7 @@
                 50,
                 236,
                 228,
-                44
+                34
               ],
               "children": [
                 {
@@ -394,7 +416,7 @@
                     50,
                     236,
                     228,
-                    44
+                    34
                   ],
                   "children": [
                     {
@@ -403,75 +425,86 @@
                         50,
                         236,
                         220,
-                        44
+                        34
                       ],
                       "children": [
                         {
-                          "type": "Button",
+                          "type": "HBoxContainer",
                           "rect": [
-                            50,
-                            236,
-                            107,
-                            44
+                            53,
+                            239,
+                            214,
+                            28
                           ],
-                          "variation": "SegmentTab",
-                          "text": "",
                           "children": [
                             {
-                              "type": "HBoxContainer",
+                              "type": "Button",
                               "rect": [
-                                50,
-                                236,
-                                107,
-                                44
+                                53,
+                                239,
+                                106,
+                                28
                               ],
+                              "variation": "SegmentTab",
+                              "text": "",
                               "children": [
                                 {
-                                  "type": "Label",
+                                  "type": "HBoxContainer",
                                   "rect": [
-                                    69,
-                                    248,
-                                    68,
-                                    20
+                                    53,
+                                    239,
+                                    106,
+                                    28
                                   ],
-                                  "variation": "BodyB14",
-                                  "text": "Bag 19/25"
+                                  "children": [
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        77,
+                                        244,
+                                        58,
+                                        18
+                                      ],
+                                      "variation": "C12B",
+                                      "text": "Bag 19/25"
+                                    }
+                                  ]
                                 }
                               ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": "Button",
-                          "rect": [
-                            163,
-                            236,
-                            107,
-                            44
-                          ],
-                          "variation": "SegmentTab",
-                          "text": "",
-                          "pressed": true,
-                          "children": [
+                            },
                             {
-                              "type": "HBoxContainer",
+                              "type": "Button",
                               "rect": [
-                                163,
-                                236,
-                                107,
-                                44
+                                161,
+                                239,
+                                106,
+                                28
                               ],
+                              "variation": "SegmentTab",
+                              "text": "",
+                              "pressed": true,
                               "children": [
                                 {
-                                  "type": "Label",
+                                  "type": "HBoxContainer",
                                   "rect": [
-                                    200,
-                                    248,
-                                    32,
-                                    20
+                                    161,
+                                    239,
+                                    106,
+                                    28
                                   ],
-                                  "variation": "BodyB14",
-                                  "text": "Gear"
+                                  "children": [
+                                    {
+                                      "type": "Label",
+                                      "rect": [
+                                        200,
+                                        244,
+                                        28,
+                                        18
+                                      ],
+                                      "variation": "C12XB",
+                                      "text": "Gear"
+                                    }
+                                  ]
                                 }
                               ]
                             }
@@ -485,7 +518,7 @@
                         278,
                         236,
                         0,
-                        44
+                        34
                       ]
                     }
                   ]
@@ -496,7 +529,7 @@
               "type": "Label",
               "rect": [
                 0,
-                286,
+                276,
                 328,
                 14
               ],
@@ -509,7 +542,7 @@
           "type": "VBoxContainer",
           "rect": [
             0,
-            320,
+            310,
             328,
             48
           ],
@@ -518,7 +551,7 @@
               "type": "UiBagHeader",
               "rect": [
                 111,
-                320,
+                310,
                 106,
                 28
               ],
@@ -527,7 +560,7 @@
                   "type": "HBoxContainer",
                   "rect": [
                     111,
-                    320,
+                    310,
                     106,
                     20
                   ],
@@ -536,7 +569,7 @@
                       "type": "Label",
                       "rect": [
                         111,
-                        320,
+                        310,
                         69,
                         20
                       ],
@@ -547,7 +580,7 @@
                       "type": "Control",
                       "rect": [
                         188,
-                        320,
+                        310,
                         29,
                         20
                       ]
@@ -558,7 +591,7 @@
                   "type": "MarginContainer",
                   "rect": [
                     111,
-                    344,
+                    334,
                     106,
                     4
                   ],
@@ -567,7 +600,7 @@
                       "type": "Control",
                       "rect": [
                         117,
-                        344,
+                        334,
                         100,
                         4
                       ]
@@ -580,7 +613,7 @@
               "type": "Label",
               "rect": [
                 0,
-                354,
+                344,
                 328,
                 14
               ],

@@ -25,7 +25,7 @@ func test_every_hairhat_sits_on_the_head() -> void:
 	if not FileAccess.file_exists("res://assets/avatar/parts_manifest.json"):
 		push_warning("转换产物缺失，跳过")
 		return
-	var metas := Avatar.catalog.parts_for_slot(&"hairHat")
+	var metas := Avatar.catalog.parts_for_slot(&"hairHat", true)   # NPC-only hairHats too (SGODOT-229)
 	assert_int(metas.size()).is_greater(0)
 
 	var rig := Avatar.create_rig()
