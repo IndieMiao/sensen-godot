@@ -60,7 +60,9 @@ static func bench(view: Dictionary) -> Dictionary:
 	var text := "+%d Energy" % (gain if gain > 0 else amount)
 	match str(st.state):
 		"used": return _p("rest", "Rested today", "", UiStatusBadge.State.USED_TODAY, true)
-		"away": return _p("rest", text, str(st.wait), UiStatusBadge.State.COUNTDOWN, true)
+		# The clock means a timer is running (FARM-7): an account that never left has none, so no state at all — the
+		# button is the plain bench, the strip Dimmed like Rested today (不知火舞 on #76, q(70)).
+		"away": return _p("rest", text, str(st.wait), UiStatusBadge.State.COUNTDOWN if str(st.caption) != "" else -1, true)
 		"full": return _p("rest", text, str(st.reason), -1, true)
 	return _p("rest", text)
 
