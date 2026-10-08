@@ -82,6 +82,9 @@ func _ready() -> void:
 	if use_runtime: P0Runtime.mark("%s _ready start" % name)
 	if art_scene == null: art_scene = load(BASIC_ROOM_ART)
 	layout = P0RoomAnchors.read_json(layout_path)
+	# Pushed above the map, whose tiles show through a transparent root (SGODOT-248); the map makes it transparent
+	# again on its own resume. Same as p0_farm / p0_pond.
+	get_viewport().transparent_bg = false
 	_build_environment()
 	room = Node3D.new()
 	room.name = "Room"
@@ -512,6 +515,7 @@ func suspend() -> void:
 func resume() -> void:
 	process_mode = Node.PROCESS_MODE_INHERIT
 	show()
+	get_viewport().transparent_bg = false
 	world_env.environment = environment
 	cam.make_current()
 	if rt:

@@ -276,3 +276,48 @@ func test_back_at_the_door_leaves_at_once_and_is_still_handled() -> void:
 	assert_bool(r.is_back_navigation_locked()).is_true()
 	assert_int(left[0]).is_equal(1)
 	r.p0_frame({}, 0.1)   # a frame after leaving does nothing
+
+# ---------------------------------------------------------------- environment and backdrop (SGODOT-248 / 249)
+## The real farm scene and its suspend() / resume(), without the farm's _ready (runtime, session, world build).
+func _farm_under() -> Node3D:
+	var stub := GDScript.new()
+	stub.source_code = "extends \"res://scenes/p0/p0_farm.gd\"\nfunc _ready() -> void: pass\nfunc _exit_tree() -> void: pass\n"
+	stub.reload()
+	var farm: Node3D = load("res://scenes/p0/p0_farm.tscn").instantiate()
+	farm.set_script(stub)
+	add_child(farm)
+	auto_free(farm)
+	return farm
+
+func test_the_farm_hands_its_environment_to_the_farmhouse_above_it() -> void:
+	# The viewport lights with the first WorldEnvironment in the tree: unless the farm lets go of its own, the
+	# farmhouse shows the farm's cool ambient and green backdrop (hand test 249).
+	var farm := _farm_under()
+	var farm_env: Environment = farm.world_env.environment
+	assert_object(farm_env).is_not_null()
+	farm.suspend()
+	assert_object(farm.world_env.environment).is_null()
+	var r := _farmhouse()
+	await get_tree().process_frame
+	assert_object(r.get_viewport().find_world_3d().environment).is_same(r.environment)
+	r.suspend()
+	farm.resume()
+	await get_tree().process_frame
+	assert_object(farm.world_env.environment).is_same(farm_env)
+	assert_object(farm.get_viewport().find_world_3d().environment).is_same(farm_env)
+	farm.suspend()
+	farm.suspend()   # twice in a row still keeps the farm's own
+	farm.resume()
+	assert_object(farm.world_env.environment).is_same(farm_env)
+
+func test_a_room_is_opaque_over_the_map() -> void:
+	# The map's root is transparent so its tiles show; a room pushed above it must not let them through (248).
+	var was := get_viewport().transparent_bg
+	get_viewport().transparent_bg = true
+	var r := _farmhouse()
+	assert_bool(r.get_viewport().transparent_bg).is_false()
+	r.suspend()
+	get_viewport().transparent_bg = true   # the map underneath on its own resume
+	r.resume()
+	assert_bool(r.get_viewport().transparent_bg).is_false()
+	get_viewport().transparent_bg = was

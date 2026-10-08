@@ -22,12 +22,14 @@ const LABOUR_CLIP := {"till": "till", "sow": "sow", "water": "water", "harvest":
 
 @onready var cam: Camera3D = $Camera3D
 @onready var ground: MeshInstance3D = $Ground
+@onready var world_env: WorldEnvironment = $WorldEnvironment
 
 var rt: P0Runtime
 var bp: FarmBlueprint
 var grid: BlueprintGrid
 var actor: P0Actor
 var crops: CropField
+var _saved_env: Environment   # handed over while a room (the farmhouse) is on top, see suspend()
 var beds: MultiMeshInstance3D
 var _hi: MeshInstance3D
 var _house := Vector3.ZERO
@@ -62,13 +64,18 @@ func _ready() -> void:
 func _exit_tree() -> void:
 	if rt: rt.detach(self)
 
-## AppRouter stacking: the map below us hands back its camera and environment on resume.
+## AppRouter stacking: the map below us hands back its camera and environment on resume. Going under a room we hand
+## ours over as well: the viewport uses the first WorldEnvironment in the tree, so the farmhouse otherwise lit with the
+## farm's cool ambient and green backdrop (SGODOT-249; farm.gd and P0Room.suspend() do the same).
 func suspend() -> void:
 	set_process(false)
 	visible = false
+	if world_env.environment: _saved_env = world_env.environment
+	world_env.environment = null
 
 func resume() -> void:
 	get_viewport().transparent_bg = false
+	if _saved_env: world_env.environment = _saved_env
 	visible = true
 	set_process(true)
 	cam.make_current()
