@@ -33,3 +33,5 @@ Desktop capture: run tools/dev/basic_room/record_fire.gd in the staged project w
 PR targets farm-dev. Art-director review and user approval are required before merge; this work does not merge, deploy or mark the card Done.
 
 Cleanup: only owned emulator PID 1192577 (ADB 5067 / emulator-5584) was stopped after the runner stopped its app; the touch fixture was removed. Existing emulators 5560/5570 were left running. No pkill or global adb shutdown was used.
+
+Delivery: nine Plane attachments downloaded with matching hashes; three Lark messages with two byte-identical media downloads. PR #29 remains open. 奕星 received the notification in wt-p0-design-cd on the Mac mini and forwarded it to 哪吒/后裔 and the art reviewer; 后裔 acknowledged no 227 interface impact. See delivery-verification.json.
