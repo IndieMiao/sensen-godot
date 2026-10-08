@@ -40,6 +40,7 @@ const INK := Color("232b30")
 const MUTED := Color("69716e")
 const LIME := Color("cafa91")
 const CONTENT_TOP := 108.0
+const RECENTER_GAP := 12.0   # host_chrome: the recenter key's margin from the edge and over the host's bottom row
 const POI_CACHE_LIMIT := 400
 ## Anti-flicker: packing tests use a dead zone (incumbents keep their slot until
 ## overlap exceeds the margin; newcomers need clearance plus the margin), and a
@@ -89,6 +90,13 @@ var info_address: Label
 var info_art: TextureRect
 var info_action: Button
 var dock: PanelContainer
+## The host draws its own HUD and bottom controls (P0 MAP-1, §10.6.1): the city title, filters, place list and compass,
+## the Map / Farm / Me dock and the zoom buttons give way. The pin card and the recenter key sit above `bottom_inset`
+## (the host's bottom row). Journey leaves it off.
+var host_chrome := false: set = set_host_chrome
+## The pond card's action (Journey "Enter pond"; P0 "Go", §10.6.1 MAP-1).
+var pond_action := "Enter pond"
+var bottom_inset := 0.0: set = set_bottom_inset
 var list_panel: PanelContainer
 var list_rows: VBoxContainer
 var filters: Dictionary = {}
@@ -377,20 +385,41 @@ func _build_list() -> void:
 	scroll.add_child(list_rows)
 	list_panel.hide()
 
+func set_host_chrome(v: bool) -> void:
+	host_chrome = v
+	if dock == null: return
+	for n in [city_button, subtitle, _underline, dock, get_node("MapLandmarkList"), get_node("MapFilters"), get_node("MapNorth"),
+			get_node("MapZoom_plus"), get_node("MapZoom_minus")]:
+		(n as CanvasItem).visible = not v
+	status.position.y = CONTENT_TOP if v else 94.0   # under the host's HUD
+	_layout()
+
+## The lowest y the map's own content uses: the dock's top, or the host's bottom row with host_chrome.
+func content_bottom() -> float:
+	return size.y - bottom_inset if host_chrome else dock.position.y
+
+func set_bottom_inset(v: float) -> void:
+	bottom_inset = v
+	if dock != null: _layout()
+
 func _layout() -> void:
 	if dock == null: return
 	var dock_width := minf(300, size.x)
 	dock.position = Vector2((size.x - dock_width) * 0.5, size.y - 54)
 	dock.size = Vector2(dock_width, 48)
+	# With the host's chrome the bottom edge is the host's row (P0's Bag), not the dock.
+	var floor_y := content_bottom()
 	get_node("MapCredits").position = Vector2(0, size.y - 4)
 	get_node("MapCredits").size = Vector2(size.x, 12)
 	var info_height := maxf(72, info.get_combined_minimum_size().y)
-	info.position = Vector2(0, dock.position.y - 8 - info_height)
+	info.position = Vector2(0, floor_y - 8 - info_height)
 	info.size = Vector2(size.x, info_height)
 	info.clip_contents = true
 	list_panel.position = Vector2(maxf(0, size.x - 212), 44)
 	list_panel.size = Vector2(minf(212, size.x), minf(340, size.y - 180))
-	recenter.position = Vector2(size.x - 44, (info.position.y if info.visible else dock.position.y) - 52)
+	# With the host's chrome: right-aligned over its Bag, 12 apart (不知火舞 on 234: 12 from the edge, 12 above Bag).
+	var edge := RECENTER_GAP if host_chrome else 0.0
+	recenter.position = Vector2(size.x - 44 - edge, (info.position.y if info.visible else floor_y) - 44 - (RECENTER_GAP if host_chrome else 8.0))
 	recenter.size = Vector2(44, 44)
 	for index in 2:
 		var b := get_node("MapZoom_" + ("plus" if index == 0 else "minus")) as Button
@@ -560,7 +589,7 @@ func select(entry: Dictionary) -> void:
 		info_action.icon = GameUi.icon("message-circle")
 	elif entry.kind == "pond":
 		info_category.text = L10n.text(str(SystemPonds.TITLES.get(entry.template_id, "Fishing pond")))
-		info_action.text = L10n.text("Enter pond")
+		info_action.text = L10n.text(pond_action)
 		info_action.icon = GameUi.icon("fish")
 	elif entry.kind == "place":
 		info_category.text = L10n.text(str(entry.get("category", "Place")))
@@ -579,7 +608,7 @@ func select(entry: Dictionary) -> void:
 
 ## 选中其他玩家：底部详情卡与 POI 同款，行动按钮“拜访农场”跳到对方的空间。
 ## 不发 sheet_opened——那个信号会让宿主清空玩家选中，与本卡互斥。
-func select_player(entry: Dictionary, portrait: Texture2D) -> void:
+func select_player(entry: Dictionary, portrait: Texture2D, action := "Visit Farm") -> void:
 	list_panel.hide()
 	if not selected.is_empty() and str(selected.get("id", "")) != str(entry.get("id", "")):
 		_animate_focus(str(selected.get("id", "")), 1.0, 0.14)
@@ -590,7 +619,7 @@ func select_player(entry: Dictionary, portrait: Texture2D) -> void:
 	info_address.text = ""
 	info_address.visible = false
 	info_action.visible = true
-	info_action.text = L10n.text("Visit Farm")
+	info_action.text = L10n.text(action)
 	info_action.icon = GameUi.icon("footprints")
 	info_art.texture = portrait if portrait != null else GameUi.icon("user-round")
 	info_art.modulate = Color.WHITE
@@ -927,18 +956,14 @@ func _update_markers() -> void:
 		if projected == null: continue
 		var point: Vector2 = (projected as Vector2) - global_position
 		if not area.has_point(point): continue
-		var width := 82.0 if entry.kind == "landmark" else 78.0 if entry.kind == "resident" else 48.0
 		var is_sel: bool = selected.get("id", null) == entry.get("id")
-		# 选中项名牌放宽到完整名称宽度（不再省略号截断）；占位一起变宽让邻居让位。
-		if is_sel: width = maxf(width, _label_width(entry))
-		# 视野最大（低 zoom）时 POI 也要有存在感：下限 42px（≈原 32 的 1.3 倍）。
-		var art_side: float = 88 if entry.kind == "landmark" else lerpf(42, 64, clampf((host.zoom - 13) / 3, 0, 1))
-		var top := 40.0 if entry.kind == "resident" else 54.0 if art_key in ["hollywood_sign", "griffith_observatory", "santa_monica_pier"] else 80.0 if entry.kind == "landmark" else 56.0
-		if entry.kind == "poi": top = maxf(36, art_side * 0.94)
-		var label_h := _label_height(entry, width) if is_sel and not _whole_label(entry) else 16.0
-		# An outpost's label and a marked pin's are never cut: the whole text on one line (不知火舞 on C30, q(72)).
-		var label_w := _whole_label_width(entry) if _whole_label(entry) else width
-		var art_w := 36.0 if entry.kind == "resident" else art_side
+		var pm := _pin_metrics(entry, is_sel)
+		var width: float = pm.width
+		var art_side: float = pm.art_side
+		var top: float = pm.top
+		var label_h: float = pm.label_h
+		var label_w: float = pm.label_w
+		var art_w: float = pm.art_w
 		var art_h := top
 		var side := maxf(width, art_side)
 		var below := 3.0 + label_h + 1.0
@@ -1144,6 +1169,31 @@ func _marker_of(entry: Dictionary) -> String:
 ## both pack before everything but the selected pin (不知火舞 / 蒙恬 on C30).
 func _over_avatar(entry: Dictionary) -> bool:
 	return entry.get("kind") == "place" or _marker_of(entry) != ""
+
+## A pin's sizes at the current zoom, as _update_markers lays it out: {width (its slot), art_side, top (art height
+## over the anchor), label_h, label_w, art_w}.
+func _pin_metrics(entry: Dictionary, is_sel := false) -> Dictionary:
+	var width := 82.0 if entry.kind == "landmark" else 78.0 if entry.kind == "resident" else 48.0
+	# 选中项名牌放宽到完整名称宽度（不再省略号截断）；占位一起变宽让邻居让位。
+	if is_sel: width = maxf(width, _label_width(entry))
+	# 视野最大（低 zoom）时 POI 也要有存在感：下限 42px（≈原 32 的 1.3 倍）。
+	var art_side: float = 88 if entry.kind == "landmark" else lerpf(42, 64, clampf((host.zoom - 13) / 3, 0, 1))
+	var art_key := CityMapData.art_key(entry)
+	var top := 40.0 if entry.kind == "resident" else 54.0 if art_key in ["hollywood_sign", "griffith_observatory", "santa_monica_pier"] else 80.0 if entry.kind == "landmark" else 56.0
+	if entry.kind == "poi": top = maxf(36, art_side * 0.94)
+	var label_h := _label_height(entry, width) if is_sel and not _whole_label(entry) else 16.0
+	# An outpost's label and a marked pin's are never cut: the whole text on one line (不知火舞 on C30, q(72)).
+	var label_w := _whole_label_width(entry) if _whole_label(entry) else width
+	return {width = width, art_side = art_side, top = top, label_h = label_h, label_w = label_w,
+		art_w = 36.0 if entry.kind == "resident" else art_side}
+
+## What a pin covers around its anchor at the current zoom, unselected: its art over the anchor and its label under
+## it (a host frames a view by it, P0 MAP-1).
+func pin_footprint(entry: Dictionary) -> Rect2:
+	var pm := _pin_metrics(entry)
+	var side := maxf(float(pm.width), float(pm.art_side))
+	return Rect2(-side * 0.5, -float(pm.top), side, float(pm.top)).merge(
+		Rect2(-float(pm.label_w) * 0.5, 3.0, float(pm.label_w), float(pm.label_h)))
 
 ## How far a place is from home (degrees, the latitude scaled to the longitude's length): only ever compared.
 func _home_distance(entry: Dictionary) -> float:

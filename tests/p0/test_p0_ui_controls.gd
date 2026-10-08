@@ -144,12 +144,12 @@ func test_opening_a_drawer_cancels_a_slot_drag() -> void:
 	ui.open_bag()
 	assert_bool(ui._bar.is_dragging()).is_false()
 
-func test_map_keeps_only_bag_and_hides_the_keys() -> void:
+## MAP-1 (§10.6.1): the map keeps the two-row HUD and only Bag at the bottom; no keys, no stick.
+func test_map_keeps_the_hud_and_only_bag_and_hides_the_keys() -> void:
+	ui.set_view(_view())
 	ui.set_surface("map")
-	assert_bool(ui._bar.visible).is_false()   # until the map drops its old dock (map_bag)
-	assert_bool(ui._keys.visible).is_false()
-	ui.map_bag = true
-	ui.set_surface("map")
+	assert_bool(ui.hud.visible).is_true()
+	assert_bool(ui.pad.visible).is_false()
 	assert_bool(ui._bar.visible).is_true()
 	assert_bool(ui._bar.bag_only).is_true()
 	assert_bool(ui._keys.visible).is_false()
