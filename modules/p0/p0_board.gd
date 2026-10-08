@@ -5,6 +5,9 @@ extends RefCounted
 ## page's fact lines. A request's command follows the frames: ready to hand in → Deliver (taken or not, q(48)); open
 ## → Track (accept); tracked and short → the gap on the button (LOCK-10).
 
+## P0 is set in Shanghai (the map: "P0 is set in Shanghai"; rooms default to it too).
+const CITY := "Shanghai"
+
 ## The board a counter shows: the Homestead Stall's Stall Board, the market's Market Board.
 static func board_id(role: String) -> String:
 	return "stall" if role == "homestead" else "market"
@@ -105,8 +108,9 @@ static func _name(view: Dictionary, id: String, qty: int) -> String:
 
 # ---------------------------------------------------------------- one request (BOARD-1 / BOARD-3 / BOARD-DROPPED)
 
-## BOARD-1 482:284 for request `id` on `board`: {title, state, effect, needs, delivery, next ({} or {slot, in}),
-## go (where its items come from, for Show / Show on map; "" for none), item (for Details), tracked (only a tracked
+## BOARD-1 482:284 for request `id` on `board`: {title, state, effect, needs, delivery, next ({} or {slot, within}),
+## go (where its items come from, for Show / Show on map; "" for none), item (for Details; "" when there is no single
+## item), tracked (only a tracked
 ## request can be dropped; an open one swaps itself after 72 h), noun ("fish", "crops" …)}; {} once it is gone.
 static func detail(view: Dictionary, board: String, id: String) -> Dictionary:
 	var slots: Array = view.get("boards", {}).get(board, {}).get("slots", [])
@@ -115,11 +119,15 @@ static func detail(view: Dictionary, board: String, id: String) -> Dictionary:
 		if r.get("empty", false) or str(r.get("id", "")) != id: continue
 		var c := card(view, r, i)
 		var items: Array = r.get("items", [])
-		var item := str(items[0]) if not items.is_empty() else str(r.get("icon", ""))
-		var noun := _noun(str(r.get("kind", "")))
+		# Details › only for a request of one item: "4 Fine fish · any kind" or a mixed basket has no single item.
+		var item := str(items[0]) if items.size() == 1 else ""
+		var noun := _noun(view, r)
+		# 李白 q(68): the stall's own sentence from BOARD-1; the Market Board takes deliveries at any market of the home
+		# city (§9.6.5).
+		var where := "the Homestead Stall" if board == "stall" else "any %s market" % CITY
 		var d := {title = c.title, state = c.status, needs = c.needs, delivery = c.reward, next = {}, item = item,
-			tracked = str(r.get("status", "")) == "accepted", noun = noun, go = _go(view, r, item),
-			effect = "Bring the required %s to the %s." % [noun, "Homestead Stall" if board == "stall" else "Market Board"]}
+			tracked = str(r.get("status", "")) == "accepted", noun = noun, go = _go(view, r, str(items[0]) if not items.is_empty() else ""),
+			effect = "Bring the required %s to %s." % [noun, where]}
 		for j in slots.size():
 			var other: Dictionary = slots[j]
 			if j != i and other.get("empty", false) and other.has("refill_in"):
@@ -137,7 +145,12 @@ static func _go(view: Dictionary, r: Dictionary, item: String) -> String:
 		"dish": return "stove"
 	return str(P0Logic.need_source(view, item).get("go", "")) if item != "" else ""
 
-static func _noun(kind: String) -> String:
+## What the sentences call the request's items (李白 q(68)): fish / crops / dishes, a material by its own name
+## ("timber" for Timber Run).
+static func _noun(view: Dictionary, r: Dictionary) -> String:
+	var kind := str(r.get("kind", ""))
+	var items: Array = r.get("items", [])
+	if kind == "material" and items.size() == 1: return P0Logic.item_name(view, str(items[0])).to_lower()
 	return {"fish": "fish", "crop": "crops", "dish": "dishes", "material": "materials"}.get(kind, "items")
 
 ## "72h", "8h", "3h 58m", "12:30" — whole hours without the minutes (BOARD-1 `Available in 72h`).

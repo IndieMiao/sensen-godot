@@ -66,7 +66,17 @@ func test_the_request_sheet_knows_where_and_what_comes_next() -> void:
 	assert_array([d.title, d.state, d.effect, d.delivery, d.tracked, d.go]).is_equal(["Pond Catch", "Tracked",
 		"Bring the required fish to the Homestead Stall.", "14 coins", true, "pond:" + P0Guide.BEGINNER_POND])
 	assert_dict(d.next).is_equal({"slot": "Second board slot", "within": "72h"})
-	assert_bool(P0Board.detail(_view(), "market", "m2").tracked).is_false()   # open: no Drop request
+	var basket := P0Board.detail(_view(), "market", "m2")
+	assert_bool(basket.tracked).is_false()   # open: no Drop request
+	assert_str(basket.effect).is_equal("Bring the required crops to any Shanghai market.")   # 李白 q(68)
+	assert_str(basket.item).is_empty()   # a mixed basket has no single item: no Details ›
+	assert_str(P0Board.detail(_view(), "market", "m1").item).is_empty()   # nor has "4 Fine fish · any kind"
+	assert_str(d.item).is_equal("fish_crucian")
+	var timber := _view()
+	timber.names["wood"] = "Timber"
+	timber.boards.stall.slots[0] = {"id": "t1", "title": "Timber Run", "kind": "material", "items": ["wood"], "qty": 10,
+		"have": 0, "ready": false, "coins": 30, "status": "accepted"}
+	assert_str(P0Board.detail(timber, "stall", "t1").effect).is_equal("Bring the required timber to the Homestead Stall.")
 	assert_dict(P0Board.detail(_view(), "market", "gone")).is_empty()
 
 # ---------------------------------------------------------------- P0Ui
@@ -151,3 +161,25 @@ func test_an_open_request_cannot_be_dropped_and_back_returns_to_the_list() -> vo
 	ui.back_modal()
 	assert_str(ui.modal_kind).is_equal("counter")
 	assert_str(ui._counter.section).is_equal("board")
+
+## 不知火舞 on 224: Details › lays the item's InfoSheet over the sheet (×0 when none in the bag, no buttons); a tap
+## outside or Back returns to the request.
+func test_details_lay_the_items_card_over_the_request() -> void:
+	var v := _view()
+	v.bag.slots = []
+	var ui := _ui(v)
+	await await_idle_frame()
+	ui.open_board_request("homestead", "req_pond_catch")
+	var nav: UiNavButton = ui._modal.find_children("*", "UiNavButton", true, false).filter(func(b): return (b as UiNavButton).label == "Details")[0]
+	nav.pressed.emit()
+	var sheet: UiInfoSheet = ui._modal.find_children("*", "UiInfoSheet", true, false)[0]
+	assert_str(sheet._title.text).is_equal("Pond Crucian")
+	assert_bool(sheet._qty_pill.visible).is_true()
+	assert_str(sheet._qty.text).is_equal("×0")
+	assert_str(ui.modal_kind).is_equal("board_request")
+	ui.back_modal()   # closes the card, not the request
+	await await_idle_frame()
+	assert_str(ui.modal_kind).is_equal("board_request")
+	assert_array(ui._modal.find_children("*", "UiInfoSheet", true, false)).is_empty()
+	ui.back_modal()
+	assert_str(ui.modal_kind).is_equal("counter")
