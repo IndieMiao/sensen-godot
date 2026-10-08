@@ -114,6 +114,8 @@ func test_switching_bag_and_gear_moves_nothing() -> void:
 	for i in 3: await get_tree().process_frame
 	var tabs_y := d.header.tabs().global_position.y
 	var content_y := d._bag_box.global_position.y
+	var strip := d._chips.get_parent() as Control
+	var chips_mid := strip.get_global_rect().get_center().y
 	for i in 10:
 		var seg: BaseButton = d.header.tabs().tabs()[(i + 1) % 2]
 		seg.pressed.emit()
@@ -123,6 +125,9 @@ func test_switching_bag_and_gear_moves_nothing() -> void:
 		assert_str(d.side).is_equal("gear" if i % 2 == 0 else "bag")
 		assert_float(d.header.tabs().global_position.y).is_equal(tabs_y)
 		assert_float(box.global_position.y).is_equal(content_y)
+		if d.side == "gear":   # the first lines share a centre line: the chips' row and `✓ Equipped`
+			var badge := d._gear_box.find_children("*", "PanelContainer", true, false)[0] as Control
+			assert_float(badge.get_global_rect().get_center().y).is_equal(chips_mid)
 
 func test_category_chip_and_sort_change_what_the_grid_lists() -> void:
 	var d := _drawer()
