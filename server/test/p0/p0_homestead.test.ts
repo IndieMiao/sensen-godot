@@ -89,6 +89,19 @@ describe('Homestead Lv1–3 (§8.1–8.3)', () => {
     expect(s.homestead.level).toBe(1);
   });
 
+  it('only at home: refused from the pond and from the map after it, fine once back home (§8.1.1 ①)', () => {
+    const s = ready(2);
+    const away = applyP0(c, s, { type: 'homestead_upgrade', space: 'pond' }, T0);
+    expect(away.ok).toBe(false);
+    if (!away.ok) expect(away.code).toBe('not_home');
+    const left = structuredClone(s);
+    left.presence = { ...left.presence, space: 'away', left_at: T0 - H };   // last seen at the pond
+    const map = applyP0(c, left, { type: 'homestead_upgrade', space: 'map' }, T0);
+    expect(map.ok).toBe(false);
+    expect(step(s, { type: 'homestead_upgrade', space: 'home' }).s.homestead.level).toBe(2);
+    expect(step(s, { type: 'homestead_upgrade' }).s.homestead.level).toBe(2);   // a save that never left
+  });
+
   it('materials come from storage first, then the bag; gift meals never count', () => {
     const s = ready(2);
     s.storage.wood = 5;

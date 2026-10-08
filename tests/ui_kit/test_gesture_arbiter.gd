@@ -126,28 +126,43 @@ func test_slot_hold_still_lifts_on_time_alone() -> void:
 	assert_array(_kinds(a.tick(GestureArbiter.LONG_PRESS_MS))).contains_exactly(["lift"])
 	assert_array(a.tick(GestureArbiter.LONG_PRESS_MS + 100)).is_empty()
 
-func test_slot_lift_then_release_in_place_toggles_pin() -> void:
+func test_slot_lift_then_release_in_place_does_nothing() -> void:
+	# LOCK-04 v1.11: pins go through the Pin zone; a long press only lifts.
 	var a := GestureArbiter.new(GestureArbiter.Mode.SLOT)
 	a.feed(_touch(0, Vector2(40, 740), true), 0)
 	a.tick(500)
-	assert_array(_kinds(a.feed(_touch(0, Vector2(42, 741), false), 700))).contains_exactly(["pin_toggle"])
+	assert_array(_kinds(a.feed(_touch(0, Vector2(40, 740), false), 700))).contains_exactly(["cancel"])
 
 func test_slot_lift_then_move_drags_and_drops() -> void:
 	var a := GestureArbiter.new(GestureArbiter.Mode.SLOT)
 	a.feed(_touch(0, Vector2(40, 740), true), 0)
 	a.tick(500)
-	assert_array(_kinds(a.feed(_drag(0, Vector2(100, 742)), 550))).contains_exactly(["drag_start", "drag_move"])
+	assert_array(_kinds(a.feed(_drag(0, Vector2(43, 740)), 520))).contains_exactly(["drag_start", "drag_move"])   # at once
 	assert_array(_kinds(a.feed(_drag(0, Vector2(150, 742)), 600))).contains_exactly(["drag_move"])
 	var out := a.feed(_touch(0, Vector2(150, 742), false), 650)
 	assert_array(_kinds(out)).contains_exactly(["drop"])
-	var bar := Rect2(12, 708, 336, 68)
 	var slots := [Rect2(12, 708, 52, 68), Rect2(68, 708, 52, 68), Rect2(124, 708, 52, 68)]
-	assert_dict(GestureArbiter.drop_on_bar(out[0].pos, bar, slots)).is_equal({kind = &"swap", index = 2})
+	var z := GestureArbiter.drop_zone_centers(Rect2(12, 708, 336, 68))
+	assert_dict(GestureArbiter.drop_on_bar(out[0].pos, 0, slots, z[0], z[1])).is_equal({kind = &"swap", index = 2})
 
-func test_slot_drop_far_above_the_bar_removes_and_near_it_cancels() -> void:
-	var bar := Rect2(12, 708, 336, 68)
-	assert_str(String(GestureArbiter.drop_on_bar(Vector2(100, 708 - 41), bar, []).kind)).is_equal("remove")
-	assert_str(String(GestureArbiter.drop_on_bar(Vector2(100, 708 - 20), bar, []).kind)).is_equal("cancel")
+func test_drop_is_decided_by_the_release_point() -> void:
+	# LOCK-04 / 05 v1.11 (221 b0a83924): Pin / Unpin zone, Remove zone, another slot, else cancel (own slot too).
+	var slots := [Rect2(12, 708, 52, 68), Rect2(68, 708, 52, 68)]
+	var z := GestureArbiter.drop_zone_centers(Rect2(12, 708, 336, 68))
+	assert_array(z).is_equal([Vector2(72, 612), Vector2(168, 612)])
+	assert_str(String(GestureArbiter.drop_on_bar(Vector2(72 + 40, 620), 0, slots, z[0], z[1]).kind)).is_equal("pin_toggle")
+	assert_str(String(GestureArbiter.drop_on_bar(Vector2(168, 612 + 44), 0, slots, z[0], z[1]).kind)).is_equal("remove")
+	assert_dict(GestureArbiter.drop_on_bar(Vector2(124, 740), 0, slots, z[0], z[1])).is_equal({kind = &"swap", index = 1})
+	assert_str(String(GestureArbiter.drop_on_bar(Vector2(38, 740), 0, slots, z[0], z[1]).kind)).is_equal("cancel")   # own slot
+	assert_str(String(GestureArbiter.drop_on_bar(Vector2(260, 612), 0, slots, z[0], z[1]).kind)).is_equal("cancel")
+
+func test_a_second_finger_cancels_a_lifted_slot() -> void:
+	var a := GestureArbiter.new(GestureArbiter.Mode.SLOT)
+	a.feed(_touch(0, Vector2(40, 740), true), 0)
+	a.tick(500)
+	a.feed(_drag(0, Vector2(100, 742)), 550)
+	assert_array(_kinds(a.feed(_touch(1, Vector2(200, 400), true), 560))).contains_exactly(["cancel"])
+	assert_array(a.feed(_touch(0, Vector2(100, 742), false), 600)).is_empty()
 
 func test_slot_upward_swipe_before_lift_opens_the_bag() -> void:
 	var a := GestureArbiter.new(GestureArbiter.Mode.SLOT)
@@ -225,3 +240,10 @@ func test_left_mouse_button_acts_as_the_first_finger_without_a_touchscreen() -> 
 	var up := down.duplicate()
 	up.pressed = false
 	assert_array(_kinds(a.feed(up, 100))).contains_exactly(["joystick_end", "tap"])
+
+func test_drop_zones_open_below_a_docked_bar() -> void:
+	# In the bag drawer the bar is the top row: the zones turn to its bottom edge + 96 (q(61)).
+	var z := GestureArbiter.drop_zone_centers(Rect2(12, 300, 336, 68), true)
+	assert_vector(z[0]).is_equal(Vector2(72, 464))
+	assert_vector(z[1]).is_equal(Vector2(168, 464))
+

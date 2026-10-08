@@ -1,5 +1,7 @@
 class_name UiPinMenu
 extends Control
+## DEPRECATED (LOCK-05 v1.11, 221 b0a83924): pins go through the BarDropZone Pin / Unpin zone; the P0 UI no longer
+## shows this bubble. Kept for the gallery until the main is removed.
 ## PinMenu 1141:80291 (SGODOT-221, LOCK-05; plan §10.3.3): the result bubble of a long press on a quick slot.
 ## The pin state toggles when the finger lifts (no second tap; 不知火舞 2026-10-07 on SGODOT-221); the bubble then
 ## shows the NEW state and undoes it in one tap: after pinning `Unpin` with the slot's pin badge +

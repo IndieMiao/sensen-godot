@@ -41,7 +41,9 @@ export function upgradeBlock(c: P0Content, s: P0State): Refusal | null {
 }
 
 export function upgradeHomestead(c: P0Content, s: P0State, now: number, events: P0Event[]): Refusal | null {
-  // TODO(P1): only at home (§8.1.1 前置 ①); the P0 server has no position, the client offers it at home only.
+  // §8.1.1 前置 ①: only at home. The command's space (SGODOT-228 q(41)) has already moved presence; "away" =
+  // pond / outpost / mine. A command from the map leaves it as it was, so a map tap after leaving still refuses.
+  if (s.presence.space === 'away') return { code: 'not_home' };
   const block = upgradeBlock(c, s);
   if (block) return block;
   const next = nextLevel(c, s)!;

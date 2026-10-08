@@ -190,9 +190,10 @@ func test_short_press_taps_once() -> void:
 		assert_int(rec.taps).is_equal(1)
 		assert_array(rec.gestures).is_empty()
 
-func test_long_press_pins_without_a_tap() -> void:
-	# LOCK-05 (quick slot: release after the lift toggles the pin) and LOCK-12 (bag cell: long press).
-	var expect := {UiItemCell.Density.QUICK: "pin_toggle", UiItemCell.Density.INVENTORY: "long_press"}
+func test_long_press_lifts_without_a_tap() -> void:
+	# LOCK-05 v1.11 (quick slot: a long press only lifts; released where it lifted it cancels — pinning is a drop on
+	# the Pin zone) and LOCK-12 (bag cell: long press).
+	var expect := {UiItemCell.Density.QUICK: "cancel", UiItemCell.Density.INVENTORY: "long_press"}
 	for d in expect:
 		var c: UiItemCell = _host(UiItemCell.new(d))
 		var rec := _record(c)
