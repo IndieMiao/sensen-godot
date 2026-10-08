@@ -2,6 +2,7 @@
 import type { FastifyInstance } from 'fastify';
 import type { P0Content } from './content.js';
 import { applyP0, type P0Command } from './reducer.js';
+import { settleEnergy } from './rules.js';
 import type { P0Store } from './store.js';
 import { viewOf } from './view.js';
 import type { P0State } from './state.js';
@@ -9,9 +10,12 @@ import { add } from './bag.js';
 import { itemName } from './content.js';
 import { putInStorage } from './storage.js';
 import { notePresence } from './presence.js';
+import { commandFields, uiEvent, type P0EventLog } from './telemetry.js';
 
-/** presence: players in the outpost rooms right now (SGODOT-227 OutpostRooms.total()); optional. */
-export interface P0RouteDeps { content: P0Content; store: P0Store; now: () => number; dev: boolean; presence?: () => number }
+/** presence: players in the outpost rooms right now (SGODOT-227 OutpostRooms.total()); log: the observation log (S7). */
+export interface P0RouteDeps { content: P0Content; store: P0Store; now: () => number; dev: boolean; presence?: () => number; log?: P0EventLog }
+
+const UI_BATCH = 20, UI_PER_MINUTE = 120, UI_ALL_PER_MINUTE = 3_000;
 
 const PLAYER_RE = /^[A-Za-z0-9_-]{8,64}$/;
 
@@ -42,9 +46,37 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
     const s = store.get(player, deps.now());
     const now = clock(s.clock_ms);
     const result = applyP0(c, s, (req.body ?? {}) as P0Command, now);
+    if (result.ok) store.put(result.state);   // saved before the log line: the log can never cost a command
+    // Energy before = the stored value with natural recovery up to now, as the command saw it (a refusal: both the same).
+    const before = { ...s, energy: { ...s.energy } };
+    settleEnergy(c, before, now);
+    deps.log?.write({ kind: 'command', t: deps.now(), clock: now, player, seq: s.seq, cmd: commandFields(req.body), ok: result.ok,
+      ...(result.ok ? {} : { code: result.code, detail: result.detail ?? {} }),
+      energy: [before.energy.value, result.ok ? result.state.energy.value : before.energy.value], events: result.ok ? result.events : [] });
     if (!result.ok) return reply.send({ ok: false, code: result.code, detail: result.detail ?? {}, state: view(s, now) });
-    store.put(result.state);
     return reply.send({ ok: true, events: result.events, state: view(result.state, now) });
+  });
+
+  /** UI moments for the observation log (S7): known kinds only, a few a minute per player; nothing in the game changes. */
+  // Counts are per minute: the map starts over each minute, and a total cap stops new player ids getting around it.
+  const uiSeen = new Map<string, number>();
+  let uiMinute = -1, uiTotal = 0;
+  app.post('/v1/p0/telemetry', async (req, reply) => {
+    const player = playerOf(req.headers);
+    if (!player) return reply.code(400).send({ ok: false, code: 'bad_player' });
+    const list = (req.body as { events?: unknown } | undefined)?.events;
+    if (!Array.isArray(list) || list.length > UI_BATCH) return reply.code(400).send({ ok: false, code: 'bad_events' });
+    const t = deps.now(), minute = Math.floor(t / 60_000);
+    if (minute !== uiMinute) { uiSeen.clear(); uiMinute = minute; uiTotal = 0; }
+    let accepted = 0;
+    for (const raw of list) {
+      const event = uiEvent(raw);
+      const n = uiSeen.get(player) ?? 0;
+      if (!event || n >= UI_PER_MINUTE || uiTotal >= UI_ALL_PER_MINUTE) continue;
+      uiSeen.set(player, n + 1); uiTotal += 1; accepted += 1;
+      deps.log?.write({ kind: 'ui', t, player, event });
+    }
+    return reply.send({ ok: true, accepted });
   });
 
   if (!deps.dev) return;

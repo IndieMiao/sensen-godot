@@ -413,6 +413,13 @@ static func rarity_text_color(rarity: int) -> Color:
 	return RARITY_TEXT[clampi(rarity - 1, 0, 3)]
 
 ## Dish label with its quality star: "Grilled Crucian ★" (Good) / "★★" (Perfect).
+## COOK-4 for a pot that came out a Mystery Dish (SGODOT-232 S5): with the Newcomer Blessing's refund there is no
+## dish at all (李白 2026-10-08), so the card says so and offers no Eat.
+static func mystery_card(ev: Dictionary) -> Dictionary:
+	if bool(ev.get("none", false)):
+		return {title = "No dish this time", sub = "Ingredients back (%d left today)" % int(ev.get("trial_left", 0)), eat = false}
+	return {title = "Mystery Dish", sub = "Hmm… not a dish. Try another mix.", eat = true}
+
 static func dish_label(view: Dictionary, id: String) -> String:
 	var info := item(view, id)
 	var q := int(info.get("quality", 0))
