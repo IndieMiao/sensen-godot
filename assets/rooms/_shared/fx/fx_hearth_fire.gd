@@ -8,6 +8,7 @@ const Style = preload("res://assets/rooms/_shared/fx/particle_style.gd")
 @export_range(.1, 2.0) var flame_height: float = .68
 @export_range(.5, .9) var flame_lifetime: float = .72
 @export_range(0.0, 8.0) var light_energy: float = 3.1
+@export_range(0.0, 4.0) var glow_boost: float = 1.0
 @export_range(0.0, .10) var flicker_strength: float = .08
 @export var light_path: NodePath
 @export var light_range: float = 4.25
@@ -74,4 +75,4 @@ func _process(delta: float) -> void:
  _phase += delta
  # Smooth, deterministic low frequencies; convex sum stays within +/- strength.
  var wave := .55*sin(_phase*2.13)+.30*sin(_phase*3.71+.9)+.15*sin(_phase*5.03+2.0)
- light.light_energy = _base_light_energy*(1.0+clampf(flicker_strength,0,.1)*wave)
+ light.light_energy = _base_light_energy*glow_boost*(1.0+clampf(flicker_strength,0,.1)*wave)
