@@ -1,7 +1,7 @@
-"""Smoke-only R2.3 packing. Leaves approved flame/spark resources untouched.
+"""Smoke-only R2.4 packing. Leaves approved flame/spark resources untouched.
 
 Input is the four original render_smoke.py outputs, never the packed result.
-Premultiplied RGB dilation prevents dark fringes at newly softened alpha edges.
+Warm near-white values retain lobe shading; transparent RGB is filled before filtering.
 """
 from pathlib import Path
 from PIL import Image, ImageFilter
@@ -13,9 +13,14 @@ for i in range(4):
     src = Image.open(ROOT / f'output/shared-fx/smoke-{i}.png').convert('RGBA')
     alpha = src.getchannel('A')
     arr = np.asarray(src).copy()
-    # Fill transparent RGB with the neutral cloud edge colour before filtering.
-    arr[arr[:, :, 3] < 12, :3] = [218, 222, 224]
-    rgb = Image.fromarray(arr[:, :, :3]).filter(ImageFilter.GaussianBlur(2))
+    # Remap the original neutral lobe lighting to pale warm shadows / ivory white.
+    # Keep the R2.3 alpha silhouette byte-identical; only RGB changes this round.
+    luma = arr[:, :, :3].astype(float).mean(axis=2)
+    lo, hi = np.percentile(luma[arr[:, :, 3] > 240], [2, 98])
+    weight = np.clip((luma-lo)/max(hi-lo, 1), 0, 1)[..., None]
+    rgb_values = np.array([215, 212, 203]) + weight * np.array([35, 36, 41])
+    rgb_values[arr[:, :, 3] < 12] = [244, 243, 239]
+    rgb = Image.fromarray(rgb_values.astype('uint8')).filter(ImageFilter.GaussianBlur(2))
     # Erode before blur: keep lobes and a soft inward edge, not a glowing halo.
     alpha = alpha.filter(ImageFilter.MinFilter(9)).filter(ImageFilter.GaussianBlur(4.5))
     rgba = rgb.convert('RGBA')
