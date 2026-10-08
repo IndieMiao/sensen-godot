@@ -215,7 +215,7 @@ func test_farmhouse_opens_on_the_stove_corner_with_a_door_back_to_the_farm() -> 
 	for n in ["use_stove_1", "drop_pot_1", "badge_stove_1", "stand_stove", "cam_stove", "spawn", "exit"]:
 		assert_object(r.anchor(n)).override_failure_message(n).is_not_null()
 	assert_str(r.place_name).is_equal("Farmhouse")
-	assert_dict(r._marker("exit", {})).is_equal({text = "Door · Back to farm"})
+	assert_dict(r._marker("exit", {})).is_equal({kind = "facility", icon = P0Logic.icon("door"), name = "Farm"})   # 250: i-door + Farm
 	assert_array(Array(r._tappable())).contains_exactly_in_any_order(["use_stove_1", "exit"])
 	assert_array(r.grid.point_path(r.actor.position, r.anchor("stand_stove").global_position)).is_not_empty()
 	# The opening shot keeps the stove and the door on screen.
@@ -252,21 +252,27 @@ func test_the_kitchen_corner_grows_with_the_homestead() -> void:
 	var cab := lv3.anchor("use_warming_cabinet").global_position
 	assert_bool(lv3.bp.is_walkable(lv3.bp.world_to_cell(Vector3(cab.x, 0, cab.z)))).override_failure_message("the cabinet blocks the floor").is_false()
 	assert_array(lv3.grid.point_path(lv3.actor.position, lv3.anchor("stand_warming_cabinet").global_position)).is_not_empty()
-	assert_str(lv3._marker("use_spice_rack", {}).text).is_equal("Spice Rack · Tap to open")
-	assert_str(lv3._marker("use_warming_cabinet", {"cooking": {"cabinet": {"cap": 6, "have": 6, "items": []}}}).text).is_equal("Warming Cabinet Full · Tap to open")
+	assert_str(str(lv3._marker("use_spice_rack", {}).name)).is_equal("Spice Rack")
+	var cab_mark := lv3._marker("use_warming_cabinet", {"cooking": {"cabinet": {"cap": 6, "have": 6, "items": []}}})
+	assert_str(str(cab_mark.name)).is_equal("Warming Cabinet")
+	assert_str(str(cab_mark.fact)).is_equal("Full")
 
 func test_farmhouse_stove_card_and_badge_follow_the_server_stove() -> void:
 	var r := _farmhouse()
+	# SGODOT-250 (q(62) "Stove 1/1 · Empty"): i-pot + name + one fact; the stove's state rides as its status mark.
 	var empty := r._marker("use_stove_1", {"cooking": {"stove": null}})
-	assert_str(empty.text).is_equal("Stove 1/1 · Empty · Tap to cook")
-	assert_str(empty.badge).is_equal("available")
+	assert_str(str(empty.kind)).is_equal("facility")
+	assert_str(str(empty.name)).is_equal("Stove 1/1")
+	assert_str(str(empty.fact)).is_equal("Empty")
+	assert_bool(empty.has("badge")).is_false()   # an empty stove shows the pot, no status
 	var cooking := r._marker("use_stove_1", {"cooking": {"stove": {"ready_in": 22000, "dish": "dish_grilled_crucian"}}})
-	assert_str(cooking.text).is_equal("Stove 1/1 · Cooking 0:22")
-	assert_str(cooking.badge).is_equal("countdown")
-	assert_str(cooking.caption).is_equal("0:22")
+	assert_str(str(cooking.fact)).is_equal("Cooking 0:22")
+	assert_str(str(cooking.badge)).is_equal("countdown")
 	var ready := r._marker("use_stove_1", {"cooking": {"stove": {"ready_in": 0, "dish": null}}})
-	assert_str(ready.text).is_equal("Stove · Ready · Unknown dish")
-	assert_str(ready.badge).is_equal("ready")
+	assert_str(str(ready.fact)).is_equal("Unknown dish")
+	assert_str(str(ready.badge)).is_equal("ready")
+	for n in r._tappable():   # no Tap to anywhere in the farmhouse
+		assert_bool(r._marker(n, {}).has("text")).override_failure_message(n).is_false()
 
 func test_a_room_that_fits_the_screen_holds_its_framing_while_walking() -> void:
 	var r := _farmhouse()
