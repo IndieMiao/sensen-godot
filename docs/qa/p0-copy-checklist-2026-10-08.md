@@ -71,6 +71,7 @@
 | Experiment | `From your bag · 2 of 2 slots used`；调味料格带 `Rack` 角标、写仓库实数（如 `Rock Salt 12`，不写 /30，q(46)）；`Not for cooking`（金锦鲤）；`In the pot` |
 | 火候 | `Tap when the needle hits gold!` / `Nice heat! ★` / `Missed · still cooking` / `Perfect! ★★ · Extra portion` |
 | 出锅卡 COOK-4 ★ | 首做 `New recipe!` + 奖励条 `First cooked · +10 Cooking XP · Cookbook 1/48`（只放首做 XP；本锅 XP 照常飘 `+5 Cooking XP ★`，q(55)）/ 重复 `Cooked!` / 失败 `Mystery Dish` + `Hmm… not a dish` + `A clue was added to your Cookbook` + 灰字 `Can't be sold or delivered`（q(55)）/ 退料 `No dish this time` + 名字行 `Ingredients back` + 第二行 `9 left today` + `OK`（q(66)）；按钮只有 `Eat · +45 Energy` / `Keep`，Gift 在 P0 灰；没有 Cook Again 按钮（q(46)、q(48)、q(49)） |
+| Queue ×2 ★ | Cooking Lv5 起、灶在烧且队列空时计时卡次按钮 `Queue next ›`；抽屉主按钮 `Queue`；排队中 `Cooking · Queued 1`，灶台图标钮挂 `+1`（q(71)）。人在厨房时轮转 toast `Grilled Crucian kept · Herb Grilled Fish cooking`；下一锅未知 `Grilled Crucian kept · Unknown dish cooking`；前一锅黑暗料理 `Mystery Dish kept · Herb Grilled Fish cooking`；前一锅新手期退料 `Ingredients back · Herb Grilled Fish cooking`；可叠加如 `Ingredients back · Unknown dish cooking`；人不在厨房不出（q(82)） |
 | Cook Again ★ | 收走后点灶台：`Cook Again` / `Choose recipe ›`，第 2 锅 `Cooks today 2nd` / `Cooking XP Half`（q(48)） |
 | 保温柜 | 名字条 `Warming Cabinet 4/6`（q(62)）/ `Take one` / `Kept · Warming Cabinet 5/6` / `Cabinet full · Herb Grilled Fish sent to bag` / `Cabinet and bag full · dish left on the stove` / `Bag full · dish left on the stove` |
 | Cooking Lv4 之后 Today ★ | `3rd slot open · try Fine fish + Potato + Rock Salt`（q(46)） |
@@ -93,7 +94,7 @@
 | 名字 ★ | `Xuhui Tackle Shop` / `Lotus Tea House` / `Xuhui Market Square` / `Huangpu Travel Post`（q(32)、q(46)） |
 | 掌柜名字条 | `Finn` / `Ama` / `Mei` / `Sigrid`（只写名字；最近的一个主色描边、放大 1.1 倍，对话中保持高亮，q(62)）；问候选项 `Trade` / 信息问句 / `Just passing by` |
 | Mei 问候 ★ | `Morning! Row Hoes just came in — sows three plots at once, Farming Lv4. Anything I can get you?`（q(46)） |
-| Ama 问候 ★ | `Sit a minute. Hot tea, 30 Energy a cup — first one's 40 coins today.`（不写 back，q(46)）；喝后 `Enjoy. Next cup's 50 coins.` |
+| Ama 问候 ★ | `Sit a minute. Hot tea, 30 Energy a cup.`（不写 back，也不带价格，价格看柜台，q(46)、§10.8）；满体力 `You look rested. Tea's here when you need it.`；三杯用完 `That's three cups today. Come back tomorrow.`；喝后 `Enjoy. Next cup's 50 coins.`。**问候写标称的 30，柜台按钮快满时写实得**（如差 15 满时 `Hot Tea · +15 Energy · 40 coins`，q(26)）：两处数字不同是设计，不是错 |
 | 渔具铺柜台 ★ | 只有 Buy 一页、不显示 Tab 条；`Reed Rod · 80 coins`（`Fishing Lv3` / `Owned`）/ `Worm Bait · 2 coins` · `30 left today` / `Sold out · 9h 12m`；收鱼 × 0.8；渔情板只作摆设，不挂图标钮与名字条（q(46)、q(62)） |
 | 集市柜台 ★ | `Buy | Market Board`，只有 Row Hoe 一行，不贴背包（q(48)）；特产货架名字条 `City Specialty`、委托板名字条 `Market Board`（有可接委托时换 `!` 徽标）（q(62)）/ `Shanghai Postcard · 100 coins` / `Owned` |
 | 驿站柜台 | 只卖咖啡 `Trade · get a coffee`；盖章台只作摆设 |

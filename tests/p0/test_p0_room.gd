@@ -206,6 +206,18 @@ func _farmhouse(level := 1) -> P0Room:
 	auto_free(r)
 	return r
 
+## SGODOT-235 (LOCK-07 v1 retired with UiTapCard): every marker the farmhouse and a plain room hang has a kind; the
+## door is i-door + Farm (a plain room's: Map).
+func test_every_room_marker_is_a_world_prompt() -> void:
+	for r in [_farmhouse(), _room()]:
+		for n in r._tappable():
+			var m: Dictionary = r._marker(n, {})
+			if m.is_empty(): continue
+			assert_str(str(m.get("kind", ""))).override_failure_message(n).is_not_empty()
+			assert_bool(m.has("text")).override_failure_message(n).is_false()
+	assert_str(str(_farmhouse()._marker("exit", {}).get("name", ""))).is_equal("Farm")
+	assert_str(str(_room()._marker("exit", {}).get("name", ""))).is_equal("Map")
+
 ## Show from inside the farmhouse (亚瑟 on #37): the stove is the room's own spot; farm targets are not, so the
 ## runtime steps out to the farm and shows them there.
 func test_farmhouse_has_the_stove_spot_but_not_the_farms() -> void:

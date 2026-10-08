@@ -104,7 +104,6 @@ func _init() -> void:
 	ui.can_show_spot = func() -> bool: return is_instance_valid(world) and world.has_method("p0_show_spot")
 	ui.near_resident = func() -> String:   # an outpost's resident within reach (Gift to <Name>, SGODOT-225)
 		return str(world.call("p0_near_resident")) if is_instance_valid(world) and world.has_method("p0_near_resident") else ""
-	ui.home_choice.connect(func(choice: String): _call("p0_home", [choice]))
 	ui.place_pressed.connect(_on_place_pressed)
 	ui.home_requested.connect(func(): _leave_then("farm"))
 	ui.tackle_requested.connect(func(): _leave_then("tackle"))
@@ -129,8 +128,7 @@ func _init() -> void:
 	ui.lifecycle.watch(session)
 	session.command_started.connect(ui.track_pressed)
 	if OS.get_environment("P0_AUTO") == "1" or FileAccess.file_exists("user://p0_auto"):
-		P0Fishing.auto_play = true
-		P0Cooking.auto_play = true
+		P0FishingPanel.auto_play = true
 		P0Kitchen.auto_play = true
 
 ## The active world takes over input and the HUD surface; the previous one is simply forgotten.
@@ -276,12 +274,14 @@ var return_to := "farm"
 
 ## The route back to world `w` from the map, as return_to holds it.
 static func route_of(w: Object) -> String:
+	var id := ""
 	match space_of(w):
-		"pond": return "pond:" + (str(w.call("p0_place")) if w.has_method("p0_place") else "")
+		"pond": id = str(w.call("p0_place")) if w.has_method("p0_place") else ""
 		"outpost":
 			var o = w.get("outpost")
-			return "outpost:" + (str((o as Dictionary).get("id", "")) if o is Dictionary else "")
-	return "farm"
+			id = str((o as Dictionary).get("id", "")) if o is Dictionary else ""
+	# A pond or outpost that does not say which one goes back to the farm (刘邦 on #92), never to "pond:".
+	return "%s:%s" % [space_of(w), id] if id != "" else "farm"
 
 ## The location chip: from a world, to the map; on the map, back to where the player is (MAP-1).
 func _on_place_pressed() -> void:
@@ -901,11 +901,9 @@ func _dev_shot(dt: float) -> void:
 			"energy": ui.open_energy_card(3, "Sow ×1")
 			"close": ui.close_modal()
 			"auto":
-				P0Fishing.auto_play = true
-				P0Cooking.auto_play = true
+				P0FishingPanel.auto_play = true
 				P0Kitchen.auto_play = true
 			"manual":
-				P0Cooking.auto_play = false
 				P0Kitchen.auto_play = false
 			"dex": ui.open_fishdex()
 			"dexcell":   # dexcell:fish_koi — a Fish-dex cell tap (gate card or fish card, SGODOT-233)
@@ -947,11 +945,8 @@ func _dev_shot(dt: float) -> void:
 				ui.close_modal()
 				ui.show_spot.emit(step[1])
 			"radial": ui.open_radial()
-			"kitchen", "put":
-				# The farmhouse owns the cooking drawer; elsewhere the interim panel opens.
-				if not bool(_call("p0_dev", [step])):
-					if step[0] == "put": ui._exp_slots.append(step[1])
-					ui.open_kitchen(step[1] if step[0] == "kitchen" and step.size() > 1 else ("experiment" if step[0] == "put" else "cookbook"))
+			"kitchen", "put":   # the farmhouse owns the cooking drawer (P0Farmhouse.p0_dev); elsewhere there is no stove
+				if not bool(_call("p0_dev", [step])): push_warning("P0_SHOT: %s works in the farmhouse only" % step[0])
 			"cook": session.send({"type": "cook", "recipe": step[1]})
 			"send":
 				# send:type=reel|outcome=landed (commas separate steps, so no JSON here)

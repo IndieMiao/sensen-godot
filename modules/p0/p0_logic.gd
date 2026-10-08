@@ -4,11 +4,6 @@ extends RefCounted
 ## §10.3.3 quick bar fill, §3.7 countdown format, §9.5.3 Today line; M2: §6.6.1 Cast states,
 ## §7.2.4 heat ring, §7.17.1 eating). Pure and static: tested headless.
 
-## Design kit rarity colours (kit.css --rar-*): Common sage · Fine blue · Rare violet · Legendary gold.
-const RARITY_COLORS := [Color("9db89a"), Color("6fa8dc"), Color("a98bd6"), Color("e3b341")]
-## Text on cream needs a deeper sage for Common (kit-cook.css .rar-common).
-const RARITY_TEXT := [Color("7fa37b"), Color("6fa8dc"), Color("a98bd6"), Color("c9962a")]
-
 const ICON_DIR := "res://assets/p0/icons/%s.svg"
 
 static var _content: Dictionary = {}
@@ -656,12 +651,6 @@ static func rarity_name(view: Dictionary, rarity: int) -> String:
 	var names: Array = view.get("rarity_names", ["Common", "Fine", "Rare", "Legendary"])
 	return str(names[clampi(rarity - 1, 0, names.size() - 1)])
 
-static func rarity_color(rarity: int) -> Color:
-	return RARITY_COLORS[clampi(rarity - 1, 0, 3)]
-
-static func rarity_text_color(rarity: int) -> Color:
-	return RARITY_TEXT[clampi(rarity - 1, 0, 3)]
-
 ## Dish label with its quality star: "Grilled Crucian ★" (Good) / "★★" (Perfect).
 ## COOK-4 for a pot that came out a Mystery Dish (SGODOT-232 S5): with the Newcomer Blessing's refund there is no
 ## dish at all (李白 2026-10-08), so the card says so and offers no Eat.
@@ -708,10 +697,6 @@ static func protection_line(view: Dictionary) -> String:
 	var left = view.get("fishing", {}).get("protection_left", null)
 	return "" if left == null else "Catch protection %d left today" % int(left)
 
-static func meal_line(view: Dictionary) -> String:
-	var m: Dictionary = view.get("meals", {})
-	return "Meals today %d/%d · resets in %s" % [int(m.get("used", 0)), int(m.get("cap", 200)), duration(float(m.get("resets_in", 0)))]
-
 ## Eat button for one dish (§7.17.1): full → disabled; clipped → ask; same page → half / none.
 static func eat_button(view: Dictionary, id: String) -> Dictionary:
 	var e: Dictionary = view.get("energy", {})
@@ -732,12 +717,6 @@ static func eat_button(view: Dictionary, id: String) -> Dictionary:
 	var confirm := ""
 	if gain < value: confirm = "Only +%d of %d · Eat anyway?" % [gain, value]
 	return {"text": text, "enabled": true, "confirm": confirm, "gain": gain}
-
-## One Cookbook row's facts: rarity, energy, time, ingredients with what the bag has.
-static func page_line(view: Dictionary, page: Dictionary) -> String:
-	var tiers: Dictionary = view.get("cooking", {}).get("tiers", {})
-	var t: Dictionary = tiers.get(str(int(page.get("rarity", 1))), {})
-	return "%s · +%d Energy · %ds" % [rarity_name(view, int(page.get("rarity", 1))), int(t.get("energy", 20)), int(t.get("ms", 5000)) / 1000]
 
 static func ingredient_label(view: Dictionary, token: String) -> String:
 	if token == "?": return "?"

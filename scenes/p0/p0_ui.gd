@@ -21,7 +21,6 @@ signal show_on_map(target: String)
 ## A panel this UI does not own was asked for (the gate card's Cookbook, the Fish-dex's Cookbook tab): the host
 ## opens it if it can (LOCK-08: never by travelling).
 signal panel_requested(panel: String)
-signal home_choice(choice: String)
 signal recenter()
 signal place_pressed()
 signal home_requested()        # FISH-4 "Go home · Free"
@@ -51,7 +50,7 @@ const RED := Color("e07a5f")         # --energy-red
 const XP := Color("1f8c88")          # --xp-deep (floating XP)
 var quick_store := "user://p0_quickbar.json"   # per-action pins / removals (tests point it elsewhere)
 const _KEY_ABOVE_BAR := 40.0        # BAR-1 482:18: ActionKey bottom at y 668, quick bar top at 708
-const _BADGE_CARD_GAP := 4.0        # a finger card over a facility that also shows a badge sits this far above it
+const _BADGE_CARD_GAP := 4.0        # a card over a facility that also shows a badge sits this far above it (the mine's EntryCard)
 const ACTION_SURFACES := ["farm", "pond", "mine"]   # spaces with the action key group (SGODOT-231: the mine, Mining)
 ## A-08 ghost slot per action: [id prefix of the family, ghost icon, noun] (q(44): Seeds / Bait / Torch in P0).
 const GHOST_FAMILY := {
@@ -68,19 +67,18 @@ var _place_text := "Shanghai · Homestead"
 var _fab_state: Dictionary = {}
 var fab_held := false            # §14.2: hold the main action to keep sowing along a row
 var fab_verb := ""
-## SGODOT-221 world controls (UI kit, own theme layer): quick bar, action key group, radial, finger cards, badges.
+## SGODOT-221 world controls (UI kit, own theme layer): quick bar, action key group, radial, world prompts, badges.
 var _kit: Control
 var _bar: UiQuickBar
 var _keys: UiActionKey
 var _radial: UiActionRadial
 var _undo_toast: UiUndoToast
-var _cards := {}          # id -> UiTapCard
 var _card_hits := {}      # id -> screen point a tap on the card forwards to the world (the facility's own tap point)
 var _badges := {}         # id -> UiStatusBadge
 var _icons := {}          # id -> UiWorldIconButton (SGODOT-250)
 var _name_bars := {}      # id -> UiWorldNameBar
 var _npc_tags := {}       # id -> UiNpcNameTag
-## The finger card a `tapped` comes from, only while that signal is being handled ("" for a scene tap).
+## The world prompt a `tapped` comes from, only while that signal is being handled ("" for a scene tap).
 var tapped_card := ""
 var _quick := {}          # per action: {pins: [], removed: []}, saved in quick_store (LOCK-05: 每个行动各记各的)
 var _bar_sig := []        # last state pushed to the bar, so the per-frame refresh only rebuilds on change
@@ -114,9 +112,7 @@ var _status: PanelContainer     # SGODOT-231 mine status line (Rocks 2/6), where
 var _status_text: Label
 var player_screen := Vector2(180, 320)   # set by the farm / pond each frame (mid-body): the radial fans out from it
 var _modal: Control
-var modal_kind := ""            # "stall", "bag", "kitchen", "card", ... — which drawer is open
-var _kitchen_tab := "cookbook"
-var _exp_slots: Array = []      # Experiment tab: ids placed in the pot
+var modal_kind := ""            # "stall", "bag", "inbox", "card", ... — which drawer is open
 var _card_queue: Array = []
 var _teach: UiTipCard
 var _teach_left := 0.0
@@ -386,7 +382,6 @@ func set_surface(name: String) -> void:
 	_creel.visible = action and bar_mode == "fish"
 	_status.visible = action and _status_text.text != ""
 	if _dev_box: _dev_box.visible = world
-	for c in _cards.values(): (c as Control).visible = false
 	for b in _badges.values(): (b as Control).visible = false
 	for m in _icons.values() + _name_bars.values() + _npc_tags.values(): (m as Control).visible = false
 	_flush_held_cards()
@@ -726,25 +721,6 @@ func _fab_pressed() -> void:
 func fab_state() -> Dictionary: return _fab_state
 
 # ---------------------------------------------------------------- world tags & floats
-## Facility finger card (TapCard 1135:101133, LOCK-07 / LOCK-17): bottom centre `SPACE_WITHIN` above `screen`,
-## kept inside the screen with its pointer still on the facility. Tapping the card is tapping the facility: it
-## forwards `hit` (the facility's own tap point; defaults to `screen`) to the world as a tap. The card is passive:
-## the scene pad under it gets the press, so a drag that starts on a card is the joystick, and only the pad's real
-## tap (GestureArbiter thresholds) on the card's 44 px hit rect counts (_tap_at, PR #12 review fix 3).
-func tag(id: String, text: String, screen: Vector2, show: bool, hit := Vector2.INF) -> void:
-	var c: UiTapCard = _cards.get(id)
-	if c == null:
-		c = UiTapCard.new()
-		c.passive = true
-		_kit.add_child(c)
-		_kit.move_child(c, 0)
-		_cards[id] = c
-	c.visible = show and _modal == null
-	if not c.visible: return
-	_card_hits[id] = screen if hit == Vector2.INF else hit
-	c.text = text
-	_place_marker(c, screen, true)
-
 # ---------------------------------------------------------------- world prompts (SGODOT-250, LOCK-07 v2 / LOCK-16 v2)
 ## A facility within view and about 8 m: its icon button (WorldIconButton 1674:101157) centred on `screen` (this UI's
 ## coordinates, like tag()). `near` grows a seat 1.1× with a primary edge; `status` (a UiStatusBadge.State, -1 none)
@@ -811,7 +787,7 @@ func name_bar(id: String, icon: Texture2D, text: String, fact: String, screen: V
 ## bar; this one goes to the top of that group.
 func _raise_marker(m: Control) -> void:
 	var top := m.get_index()
-	for group in [_cards, _badges, _icons, _name_bars, _npc_tags]:
+	for group in [_badges, _icons, _name_bars, _npc_tags]:
 		for other in group.values():
 			if (other as Node).get_parent() == _kit: top = maxi(top, (other as Node).get_index())
 	if top > m.get_index(): _kit.move_child(m, top)
@@ -922,7 +898,7 @@ func _covers_marker(strip: Rect2, own: String) -> bool:
 	return false
 
 ## Facility / resident state mark (StatusBadge 1132:79554, STATE-ICONS): display only, the facility takes the tap.
-## A scene tap: on a shown finger card it is that facility's tap, elsewhere the world's (also a double tap: a card
+## A scene tap: on a shown icon button or name strip it is that facility's tap, elsewhere the world's (also a double tap: a prompt
 ## never recenters the camera by accident). Returns true for a card tap, which then can't start a double tap either.
 func _tap_at(global_pos: Vector2, double: bool) -> bool:
 	# World prompts (SGODOT-250): an open name strip, then an icon button; a tap on either is its facility's tap.
@@ -935,16 +911,6 @@ func _tap_at(global_pos: Vector2, double: bool) -> bool:
 					tapped.emit(_card_hits[id])
 					tapped_card = ""
 				return true
-	for id in _cards:
-		var c: UiTapCard = _cards[id]
-		if c.is_visible_in_tree() and c.hit_rect().has_point(global_pos):
-			if _modal == null:
-				# The world sees which card it was (tapped_card) as well as the facility's point, so another facility's
-				# mark over that point can't take the tap (PR #21 review: the farmhouse card under the sign's caption).
-				tapped_card = str(id)
-				tapped.emit(_card_hits[id])
-				tapped_card = ""
-			return true
 	if double: recenter.emit()
 	else: tapped.emit(global_pos - root.global_position)
 	return false
@@ -968,12 +934,12 @@ func badge(id: String, state: UiStatusBadge.State, screen: Vector2, show: bool, 
 		b.caption = ""
 		_place_marker(b, screen, false)
 
-## Height a shown badge takes over `screen`, so a finger card over the same facility can sit above it.
+## Height a shown badge takes over `screen`, so a card over the same facility (the mine's EntryCard) can sit above it.
 func badge_height(id: String) -> float:
 	var b: UiStatusBadge = _badges.get(id)
 	return b.get_combined_minimum_size().y + _BADGE_CARD_GAP if b and b.visible else 0.0
 
-## Finger cards stay on screen (their facility is near, so on screen); a badge over an off-screen facility hides.
+## clamp_inside keeps a marker on screen; a badge over an off-screen facility hides.
 func _place_marker(m: Control, screen: Vector2, clamp_inside: bool) -> void:
 	var size := m.get_combined_minimum_size()
 	var area := _marker_area()
@@ -1959,22 +1925,6 @@ func open_energy_panel() -> void:
 	_open_modal(panel, 0.0)
 	modal_kind = "energy_panel"
 
-## The farmhouse (§3.4.3 "回家休息 Rest"; COOK-1 kitchen inside): one card, two doors.
-func open_home_card() -> void:
-	var card := _center_card(280)
-	modal_kind = "home"
-	card.add_child(_label("Home · Farmhouse", 13, INK, true))
-	var st = view.get("cooking", {}).get("stove", null)
-	var kitchen_line := "Kitchen · Cook"
-	if st != null: kitchen_line = "Kitchen · Dish ready" if float(st.get("ready_in", 0)) <= 0.0 else "Kitchen · Cooking " + P0Logic.duration(float(st.get("ready_in", 0)))
-	var k := _pill_button(kitchen_line, true)
-	k.pressed.connect(func(): close_modal(); home_choice.emit("kitchen"))
-	card.add_child(k)
-	# Rest moved to the bench by the farmhouse (q(30), FARM-7): the door card keeps the kitchen only.
-	var bye := _flat_button("Not now")
-	bye.pressed.connect(close_modal)
-	card.add_child(bye)
-
 ## Rest bench sheet (FARM-7-2 482:52, q(30)): the bench is the one Rest entry. Title, state and effect (ObjectHeader),
 ## one fact row, then Rest (primary, the real gain when near full) or the reason it can't (grey), and Not now / Close.
 func open_rest_card() -> void:
@@ -2053,24 +2003,6 @@ func _center_card(width: float) -> VBoxContainer:
 	center.add_child(panel)
 	_open_modal(center, 0.3)
 	return v
-
-func _tile(icon_id: String, text: String, note: String, cb := Callable()) -> Control:
-	var b := Button.new()
-	b.text = text
-	b.icon = P0Logic.icon(icon_id)
-	b.expand_icon = false
-	b.add_theme_constant_override("icon_max_width", 18)
-	b.add_theme_font_size_override("font_size", 9)
-	b.custom_minimum_size = Vector2(130, 40)
-	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_style_button(b, PAPER, EDGE, 10)
-	b.pressed.connect(func():
-		if cb.is_valid(): cb.call()
-		elif note != "": toast(note))
-	return b
-
-
 
 ## §10.2.3: the switch key fans the four actions out from the character (ActionRadial, LOCK-04); what this
 ## spot can't do is greyed with the reason. P0 preselects by where you stand (plots → Farming, water → Fishing).
@@ -2528,197 +2460,6 @@ func _place_tip() -> void:
 	_teach.position = Vector2(x, y)
 	_teach.size = Vector2(UiTipCard.WIDTH, h)
 
-# ---------------------------------------------------------------- M2: kitchen, catch and dish cards
-## Stove panel (§7.2.7, COOK-2a/2b): Cookbook (known pages cook in one tap, missing ones say what is short)
-## and Experiment (free slots from the bag). Cooking costs no Energy.
-func open_kitchen(tab := "") -> void:
-	teach("cook")   # Tap Cook to grill your first fish (§14.2 minute 14–16)
-	# The farmhouse's stove corner owns the cooking drawer (SGODOT-226): walk there and open it.
-	var world = P0Runtime.ensure().world
-	if is_instance_valid(world) and world.has_method("p0_open_kitchen"):
-		world.call("p0_open_kitchen", tab if tab != "" else _kitchen_tab)
-		return
-	if tab != "": _kitchen_tab = tab
-	var ck: Dictionary = view.get("cooking", {})
-	var lvl := int(view.get("skills", {}).get("cooking", {}).get("level", 1))
-	var v := _sheet(540 if _kitchen_tab == "cookbook" else 440, "Stove · Empty · Cooking Lv%d" % lvl, "stove")
-	modal_kind = "kitchen"
-	_refresh_hud()   # the kitchen is the farmhouse's stove corner: the chip reads "Shanghai · Farmhouse"
-	var tabs := HBoxContainer.new()
-	tabs.add_theme_constant_override("separation", 6)
-	var pages: Array = ck.get("cookbook", [])
-	var known := pages.filter(func(p): return p.get("known", false)).size()
-	for t in [["cookbook", "Cookbook %d/%d" % [known, pages.size()]], ["experiment", "Experiment"]]:
-		var b := _pill_button(str(t[1]), t[0] == _kitchen_tab)
-		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		var key := str(t[0])
-		b.pressed.connect(func(): open_kitchen(key))
-		tabs.add_child(b)
-	v.add_child(tabs)
-	v.add_child(_label(P0Logic.meal_line(view), 8, INK2))
-	if _kitchen_tab == "cookbook": _cookbook(v, pages)
-	else: _experiment(v, int(ck.get("slots", 2)))
-
-func _cookbook(v: VBoxContainer, pages: Array) -> void:
-	var scroll := TouchScrollContainer.new()   # drags that start on a row or cell still scroll (WP7-B F-04 §4)
-	scroll.custom_minimum_size = Vector2(0, 420)
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	var list := VBoxContainer.new()
-	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	list.add_theme_constant_override("separation", 4)
-	scroll.add_child(list)
-	v.add_child(scroll)
-	var order := pages.duplicate()
-	order.sort_custom(func(a, b):
-		if bool(a.known) != bool(b.known): return bool(a.known)
-		if bool(a.get("can_cook", false)) != bool(b.get("can_cook", false)): return bool(a.get("can_cook", false))
-		return int(a.rarity) < int(b.rarity))
-	for page in order:
-		var h := HBoxContainer.new()
-		h.add_theme_constant_override("separation", 6)
-		h.custom_minimum_size = Vector2(0, 46)
-		var known := bool(page.get("known", false))
-		var ic := _icon(str(page.id) if known else "question", 30)
-		if not known: ic.modulate = Color(1, 1, 1, 0.35)
-		h.add_child(ic)
-		var mid := VBoxContainer.new()
-		mid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		mid.add_theme_constant_override("separation", 0)
-		var nm := HBoxContainer.new()
-		nm.add_theme_constant_override("separation", 4)
-		var dot := ColorRect.new()
-		dot.custom_minimum_size = Vector2(7, 7)
-		dot.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		dot.color = P0Logic.rarity_color(int(page.rarity))
-		nm.add_child(dot)
-		nm.add_child(_label(str(page.name) if known else "Unknown dish", 10, INK if known else INK2, true))
-		mid.add_child(nm)
-		mid.add_child(_label(P0Logic.page_line(view, page), 8, INK2))
-		var parts: Array = []
-		for token in page.get("in", []):
-			parts.append(P0Logic.ingredient_label(view, str(token)) + ("" if not known or str(token).length() <= 2 else " · have %d" % P0Logic.bag_count(view, str(token))))
-		var ing := _label(" + ".join(parts) if known else ("1 ingredient" if int(page.get("slots", 1)) == 1 else "%d ingredients" % int(page.get("slots", 1))) + " · discover it in Experiment", 8, INK2)
-		ing.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		mid.add_child(ing)
-		h.add_child(mid)
-		if known:
-			var slots_ok := int(page.get("slots", 1)) <= int(view.get("cooking", {}).get("slots", 2))
-			var b := _pill_button("Cook" if page.get("can_cook", false) else ("Cooking Lv4" if not slots_ok else "Missing"), true)
-			b.custom_minimum_size = Vector2(70, 30)
-			b.disabled = not page.get("can_cook", false)
-			var pid := str(page.id)
-			b.pressed.connect(func(): close_modal(); command.emit({"type": "cook", "recipe": pid}))
-			h.add_child(b)
-		else:
-			var b := _pill_button("Try ›", false)
-			b.custom_minimum_size = Vector2(56, 30)
-			b.pressed.connect(func(): open_kitchen("experiment"))
-			h.add_child(b)
-		list.add_child(h)
-
-func _experiment(v: VBoxContainer, slots: int) -> void:
-	_exp_slots = _exp_slots.filter(func(id): return P0Logic.bag_count(view, str(id)) > 0)
-	while _exp_slots.size() > slots: _exp_slots.pop_back()
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 8)
-	row.alignment = BoxContainer.ALIGNMENT_CENTER
-	for i in 3:
-		var cell := PanelContainer.new()
-		cell.custom_minimum_size = Vector2(70, 70)
-		if i >= slots:
-			cell.add_theme_stylebox_override("panel", _box(DIS, 35, DIS, 0, Vector4(4, 4, 4, 4)))
-			var lk := _label("Cooking Lv4\n3rd slot", 8, INK2, true)
-			lk.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-			lk.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-			cell.add_child(lk)
-		elif i < _exp_slots.size():
-			cell.add_theme_stylebox_override("panel", _box(PAPER, 35, GREEN_D, 2, Vector4(4, 4, 4, 4)))
-			var box := VBoxContainer.new()
-			box.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			box.alignment = BoxContainer.ALIGNMENT_CENTER
-			var ic := _icon(str(_exp_slots[i]), 30)
-			ic.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-			box.add_child(ic)
-			var x := _label("✕ " + P0Logic.item_name(view, str(_exp_slots[i])), 7, INK, true)
-			x.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-			x.clip_text = true
-			box.add_child(x)
-			cell.add_child(box)
-			var idx := i
-			cell.gui_input.connect(func(e: InputEvent):
-				if P0Ui.is_tap(e):
-					_exp_slots.remove_at(idx)
-					open_kitchen("experiment"))
-		else:
-			cell.add_theme_stylebox_override("panel", _box(Color(1, 1, 1, 0.35), 35, Color("d9c7a6"), 1, Vector4(4, 4, 4, 4)))
-		row.add_child(cell)
-	v.add_child(row)
-	var preview := _label(_experiment_preview(), 10, INK, true)
-	preview.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	preview.add_theme_stylebox_override("normal", _box(PAPER, 12, EDGE, 1, Vector4(10, 4, 10, 4)))
-	v.add_child(preview)
-	v.add_child(_label("From your bag", 10, INK, true))
-	var grid := GridContainer.new()
-	grid.columns = 5
-	grid.add_theme_constant_override("h_separation", 5)
-	grid.add_theme_constant_override("v_separation", 5)
-	var shown := {}
-	for st in _bag_slots():
-		var id := str(st.id)
-		if shown.has(id) or not P0Logic.item(view, id).get("cook", false): continue
-		shown[id] = true
-		var left := P0Logic.bag_count(view, id) - _exp_slots.count(id)
-		var b := Button.new()
-		b.custom_minimum_size = Vector2(58, 58)
-		b.icon = P0Logic.icon(id)
-		b.expand_icon = false
-		b.add_theme_constant_override("icon_max_width", 26)
-		b.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
-		b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		b.text = "×%d" % left
-		b.add_theme_font_size_override("font_size", 9)
-		_style_button(b, PAPER, EDGE, 10)
-		for k in ["icon_normal_color", "icon_hover_color", "icon_pressed_color", "icon_focus_color", "icon_hover_pressed_color"]:
-			b.add_theme_color_override(k, Color.WHITE)
-		b.add_theme_color_override("icon_disabled_color", Color(1, 1, 1, 0.4))
-		b.disabled = left <= 0 or _exp_slots.size() >= slots
-		b.pressed.connect(func():
-			_exp_slots.append(id)
-			open_kitchen("experiment"))
-		grid.add_child(b)
-	if shown.is_empty(): v.add_child(_label("Fish or harvest something to cook.", 9, INK2))
-	v.add_child(grid)
-	var cook := _pill_button("Cook", true)
-	cook.custom_minimum_size = Vector2(0, 40)
-	cook.disabled = _exp_slots.is_empty()
-	cook.pressed.connect(func():
-		var items := _exp_slots.duplicate()
-		_exp_slots.clear()
-		close_modal()
-		command.emit({"type": "cook", "items": items}))
-	v.add_child(cook)
-
-## Preview capsule: "? · Fine · 15 s · Unknown dish" — rarity is derivable from what is in the pot (§7.4.1).
-func _experiment_preview() -> String:
-	if _exp_slots.is_empty(): return "Put 1–%d ingredients in the pot" % int(view.get("cooking", {}).get("slots", 2))
-	var fams := {}
-	var top := 1
-	var mains := 0
-	for id in _exp_slots:
-		var info := P0Logic.item(view, str(id))
-		fams[str(info.get("family", "F"))] = true
-		top = maxi(top, int(info.get("rarity", 1)))
-		if str(info.get("family", "")) != "S": mains += 1
-	if mains == 0: return "Needs a main ingredient"
-	var known := P0Logic.match_known(view, _exp_slots)
-	if not known.is_empty():
-		var kt: Dictionary = view.get("cooking", {}).get("tiers", {}).get(str(int(known.rarity)), {})
-		return "%s · %s · %d s · In your Cookbook" % [str(known.name), P0Logic.rarity_name(view, int(known.rarity)), int(kt.get("ms", 5000)) / 1000]
-	var derive: Array = view.get("cooking", {}).get("derive", [[1, 2, 3], [2, 3, 3], [3, 3, 4], [4, 4, 4]])
-	var r := int(derive[top - 1][mini(fams.size(), 3) - 1])
-	var t: Dictionary = view.get("cooking", {}).get("tiers", {}).get(str(r), {})
-	return "? · %s · %d s · Unknown dish" % [P0Logic.rarity_name(view, r), int(t.get("ms", 5000)) / 1000]
-
 # ---------------------------------------------------------------- result moments (SGODOT-233, q(49) / §4.8.6)
 ## A RewardMoment (哪吒's kit card) on its own: one at a time through queue_card (q(49) ④). Without buttons it folds
 ## away after MOMENT_AUTO_S or on a tap anywhere and the scene stays bright (③); with buttons it waits for them and
@@ -2848,26 +2589,6 @@ func _gate_guide(go: String) -> void:
 			if show_label(go, space_here(), spot_reachable()) == "Show": show_spot.emit(go)
 			else: show_on_map.emit(map_target(go))
 		_: request_panel(go)
-
-## A result card placed like the design's .modal (centred, top at a share of the screen, width a share
-## of it) over an undimmed scene. Tapping outside or the button closes it; it also closes after auto_s.
-func _scene_card(width_frac: float, top_frac: float, auto_s: float) -> VBoxContainer:
-	var vp := root.size
-	var w := roundf(vp.x * width_frac)
-	var panel := PanelContainer.new()
-	panel.custom_minimum_size = Vector2(w, 0)
-	panel.position = Vector2(roundf((vp.x - w) * 0.5), roundf(vp.y * top_frac))
-	panel.add_theme_stylebox_override("panel", _box(PAPER, 13, EDGE, 1, Vector4(13, 12, 13, 12)))
-	panel.mouse_filter = Control.MOUSE_FILTER_STOP
-	var v := VBoxContainer.new()
-	v.add_theme_constant_override("separation", 4)
-	panel.add_child(v)
-	_open_modal(panel, 0.0)
-	var holder_id := _modal.get_instance_id()
-	if auto_s > 0.0:
-		get_tree().create_timer(auto_s).timeout.connect(func():
-			if is_instance_valid(_modal) and _modal.get_instance_id() == holder_id: close_modal())
-	return v
 
 ## True the first time a key comes up on this device (kept with the teaching tips).
 func first_time(key: String) -> bool:
@@ -3011,15 +2732,6 @@ func _pill_button(text: String, primary: bool) -> Button:
 		_style_button(b, PAPER, GREEN_D, 16)
 	return b
 
-func _flat_button(text: String) -> Button:
-	var b := Button.new()
-	b.text = text
-	b.flat = true
-	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
-	b.add_theme_font_size_override("font_size", 10)
-	b.add_theme_color_override("font_color", INK2)
-	return b
-
 # ---------------------------------------------------------------- small drawn widgets
 class _TouchPad extends Control:
 	## Scene area: a press-and-drag is the floating joystick (§10.1); a short tap picks a facility;
@@ -3065,9 +2777,3 @@ class _TouchPad extends Control:
 		var k := start + ((now - start).limit_length(radius))
 		draw_circle(k, radius * 0.45, Color(0.98, 0.97, 0.94, 0.95))
 		draw_circle(k, radius * 0.3, Color(0.5, 0.78, 0.42))
-
-class _RarityDot extends Control:   # FISH-3 title dot: rarity colour in a cream ring
-	var color := Color.WHITE
-	func _draw() -> void:
-		draw_circle(size * 0.5, size.x * 0.5, P0Ui.PAPER)
-		draw_circle(size * 0.5, size.x * 0.5 - 1.0, color)

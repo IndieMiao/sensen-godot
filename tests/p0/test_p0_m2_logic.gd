@@ -129,11 +129,6 @@ func test_got_away_lines_for_level_and_rod_gates() -> void:
 	assert_str(str(P0Logic.rod_for(v, 3).name)).is_equal("Reed Rod")
 	assert_bool(P0Logic.rod_for(v, 4).is_empty()).is_true()
 
-func test_rarity_colours_follow_the_design_kit() -> void:
-	assert_str(P0Logic.rarity_color(2).to_html(false)).is_equal("6fa8dc")   # Fine blue
-	assert_str(P0Logic.rarity_color(3).to_html(false)).is_equal("a98bd6")   # Rare violet
-	assert_str(P0Logic.rarity_text_color(1).to_html(false)).is_equal("7fa37b")
-
 ## 李白 2026-10-08 (PR #22): a refunded failed pot makes no dish, so COOK-4 says so and offers no Eat.
 func test_a_refunded_mystery_pot_says_no_dish() -> void:
 	var none := P0Logic.mystery_card({"kind": "dish", "mystery": true, "qty": 0, "none": true, "trial_left": 9})
