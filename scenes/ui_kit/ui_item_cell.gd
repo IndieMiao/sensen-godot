@@ -27,7 +27,8 @@ enum State { DEFAULT, SELECTED, EMPTY, LIFTED, DROP_TARGET, ZERO }
 ##   TASTED       half-colour icon + `Tasted` chip inside the cell
 ##   MASTERED     gold star at the top right (Cooked ×10)
 ##   LOCKED       3-slot page before Cooking Lv4: silhouette + `Lv4` lock tag (text from `status`, else Lv4)
-##   IN_POT       Experiment: in the pot (selected stroke, icon raised, `In pot`)
+##   IN_POT       Experiment: in the pot (selected stroke, icon raised); `In pot` only once none is left (no quantity),
+##                otherwise the remaining quantity (COOK-2b / P0-2 instances: Show state off while ×N shows)
 ##   NOT_FOR_COOKING  Experiment: the icon at 25 %, `Not for cooking`; it cannot go in the pot
 enum KitchenState { DEFAULT, HIDDEN, CLUED, TASTED, MASTERED, LOCKED, IN_POT, NOT_FOR_COOKING }
 
@@ -388,7 +389,7 @@ func _refresh_kitchen(s: State, empty: bool) -> void:
 	match k:
 		KitchenState.IN_POT, KitchenState.NOT_FOR_COOKING:
 			var band := _KITCHEN_IN_POT_LABEL if in_pot else _KITCHEN_NFC_LABEL
-			_status.visible = true
+			_status.visible = not in_pot or quantity == ""
 			_status.offset_top = band.x
 			_status.offset_bottom = band.x + band.y
 			_status.self_modulate.a = 0.0   # these two labels sit on the cell without the label plate

@@ -49,7 +49,8 @@ func test_tasted_mastered_in_pot_and_not_for_cooking() -> void:
 	assert_bool(_shows(mastered, UiItemCell.STAR_GLYPH)).is_true()
 	var in_pot := _cell({icon = fish, quantity = "×2", kitchen_state = K.IN_POT})
 	await _settle()
-	assert_array(_texts(in_pot)).contains(["In pot", "×2"])
+	assert_array(_texts(in_pot)).contains(["×2"])   # some left: the count, no label (COOK-2b / P0-2)
+	assert_array(_texts(in_pot)).not_contains(["In pot"])
 	assert_bool(_shows(in_pot, UiItemCell.CHECK_GLYPH)).is_true()
 	var nfc := _cell({icon = fish, quantity = "×1", kitchen_state = K.NOT_FOR_COOKING})
 	await _settle()
@@ -86,3 +87,14 @@ func test_the_grid_passes_kitchen_state_to_its_cells() -> void:
 	g.items = [{id = "fish_crucian", icon = load("res://assets/p0/icons/fish_crucian.svg"), qty = 2}]
 	await _settle()
 	assert_int(g.cell_for("fish_crucian").kitchen_state).is_equal(K.DEFAULT)
+
+func test_in_pot_names_itself_only_once_none_is_left() -> void:
+	var dish := load("res://assets/p0/icons/fish_crucian.svg")
+	var some := _cell({icon = dish, kitchen_state = K.IN_POT, quantity = "×2"})
+	await _settle()
+	assert_bool(_texts(some).has("In pot")).override_failure_message(str(_texts(some))).is_false()
+	assert_bool(_texts(some).has("×2")).is_true()
+	var none := _cell({icon = dish, kitchen_state = K.IN_POT, quantity = ""})
+	await _settle()
+	assert_bool(_texts(none).has("In pot")).is_true()
+

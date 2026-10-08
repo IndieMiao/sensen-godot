@@ -335,7 +335,7 @@ func test_a_mix_that_failed_before_says_tried_before() -> void:
 	var v := _view()
 	v.cooking["mishaps"] = [{"items": ["crop_radish", "crop_radish"], "n": 1, "at": 0}]
 	assert_bool(P0KitchenLogic.tried(v, ["crop_radish", "crop_radish"])).is_true()
-	assert_str(P0KitchenLogic.preview(v, ["crop_radish", "crop_radish"]).title).is_equal("Tried before")
+	assert_str(P0KitchenLogic.preview(v, ["crop_radish", "crop_radish"]).title).is_equal("Unknown dish")   # the note is beside it
 	assert_bool(P0KitchenLogic.tried(v, ["crop_radish"])).is_false()
 	assert_str(P0KitchenLogic.preview(v, ["crop_radish", "fish_koi"]).title).is_equal("Unknown dish")
 
