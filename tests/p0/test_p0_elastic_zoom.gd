@@ -7,7 +7,10 @@ class ZoomWorld extends Node:
 	var zooms: Array = []
 	var ends := 0
 	func p0_surface() -> String: return "farm"
-	func p0_zoom(f: float) -> void: zooms.append(f)
+	var ats: Array = []
+	func p0_zoom(f: float, at := Vector2.INF) -> void:
+		zooms.append(f)
+		ats.append(at)
 	func p0_zoom_end() -> void: ends += 1
 
 func _settle(z, seconds := 1.0) -> void:
@@ -100,10 +103,39 @@ func test_two_fingers_on_the_scene_pad_reach_the_world_as_zoom_then_zoom_end() -
 	_drag(pad, 0, Vector2(60, 300))    # 80 → 120
 	assert_int(world.zooms.size()).is_equal(2)
 	assert_float(world.zooms[0]).is_equal_approx(0.5, 0.0001)
+	assert_vector(world.ats[0]).is_equal_approx(Vector2(140, 300), Vector2(0.01, 0.01))   # the two-finger centre
 	assert_int(world.ends).is_equal(0)
 	_touch(pad, 1, Vector2(180, 300), false)
 	assert_int(world.ends).is_equal(0)   # one finger still down: still pinching
 	_touch(pad, 0, Vector2(60, 300), false)
 	assert_int(world.ends).is_equal(1)
 	rt.detach(world)
+
+func test_zooming_about_a_point_keeps_the_ground_under_the_fingers() -> void:
+	# User 2026-10-08: pinch zoom centres on the two fingers. A P0-style orthographic camera looking down at 45°.
+	var vp := SubViewport.new()
+	vp.size = Vector2i(360, 800)
+	add_child(auto_free(vp))
+	var cam := Camera3D.new()
+	cam.projection = Camera3D.PROJECTION_ORTHOGONAL
+	cam.keep_aspect = Camera3D.KEEP_WIDTH
+	vp.add_child(cam)
+	var focus := Vector3(2, 0, -3)
+	var place := func(size: float, f: Vector3) -> void:   # GDScript lambdas capture locals by value: pass the focus
+		cam.size = size
+		cam.position = f + Vector3(0, 1, 1).normalized() * 40
+		cam.look_at(f, Vector3.UP)
+	place.call(7.5, focus)
+	var at := Vector2(300, 220)   # off centre, upper right
+	var before = ElasticZoom.ground_at(cam, at)
+	assert_object(before).is_not_null()
+	place.call(7.5 / 1.3, focus)   # closer
+	var moved = ElasticZoom.ground_at(cam, at)
+	assert_float((moved - before).length()).is_greater(0.1)   # a centre zoom would slide that point away
+	focus += ElasticZoom.shift(before, moved)
+	place.call(7.5 / 1.3, focus)
+	var after = ElasticZoom.ground_at(cam, at)
+	assert_vector(after).is_equal_approx(before, Vector3(0.001, 0.001, 0.001))
+	assert_object(ElasticZoom.ground_at(cam, Vector2.INF)).is_null()
+	assert_vector(ElasticZoom.shift(null, before)).is_equal(Vector3.ZERO)
 

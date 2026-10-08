@@ -3,7 +3,9 @@ extends RefCounted
 ## room cameras' share of Journey's ScenePan (modules/farm/scene_pan.gd). The zoom the fingers ask for adds up in
 ## log space and shows through ScenePan's rubber curve, at most ZOOM_ELASTIC past a limit (about 13 %); once the
 ## fingers lift, ScenePan's critically damped spring brings it back to the limit (about 0.3 s). A mouse wheel tick
-## is a pinch released at once, so it bounces at a limit too. The zoom centre is unchanged (the character).
+## is a pinch released at once, so it bounces at a limit too. The scenes zoom about the two-finger centre (user
+## 2026-10-08, as the map does): ground_at() before and after a size change gives the focus shift that keeps the
+## ground point under the fingers still, through the bounce too.
 
 const ZOOM_ELASTIC := 0.12      ## ScenePan.ZOOM_ELASTIC: the farthest the shown zoom goes past a limit, in log space
 const SPRING := 18.0            ## ScenePan.SPRING
@@ -78,3 +80,16 @@ func _rubber(v: float) -> float:
 func _unrubber(v: float) -> float:
 	var bound := clampf(v, _low, _high)
 	return bound - signf(v - bound) * ZOOM_ELASTIC * log(maxf(0.001, 1.0 - absf(v - bound) / ZOOM_ELASTIC))
+
+## The ground point (the horizontal plane at height `y`) under a screen point, or null (no point, no camera, or a
+## ray along the plane). Read it before and after a camera size change; the difference is the focus shift that
+## keeps that point under the fingers.
+static func ground_at(cam: Camera3D, screen: Vector2, y := 0.0) -> Variant:
+	if cam == null or not cam.is_inside_tree() or screen == Vector2.INF: return null
+	return Plane(Vector3.UP, y).intersects_ray(cam.project_ray_origin(screen), cam.project_ray_normal(screen))
+
+## Horizontal focus shift from two ground_at() readings (zero when either is missing).
+static func shift(before: Variant, after: Variant) -> Vector3:
+	if not (before is Vector3 and after is Vector3): return Vector3.ZERO
+	return Vector3(before.x - after.x, 0.0, before.z - after.z)
+

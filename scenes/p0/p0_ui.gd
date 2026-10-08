@@ -10,7 +10,8 @@ signal action_pressed(cmd: Dictionary)
 signal seed_selected(seed_id: String)
 signal command(cmd: Dictionary)
 signal dev_skip(minutes: int)
-signal zoom(factor: float)
+## A pinch step about a screen point (the two-finger centre, or the mouse for a wheel tick).
+signal zoom(factor: float, at: Vector2)
 ## The fingers lifted after a pinch (or a wheel tick ended): the scene springs back if past a zoom limit.
 signal zoom_end
 signal show_spot(where: String)
@@ -2111,7 +2112,7 @@ class _TouchPad extends Control:
 		queue_redraw()
 	func _gui_input(e: InputEvent) -> void:
 		if e is InputEventMouseButton and e.pressed and e.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
-			ui.zoom.emit(0.9 if e.button_index == MOUSE_BUTTON_WHEEL_UP else 1.1)
+			ui.zoom.emit(0.9 if e.button_index == MOUSE_BUTTON_WHEEL_UP else 1.1, get_global_transform_with_canvas() * e.position)
 			ui.zoom_end.emit()
 			return
 		for o in _arb.feed(e, Time.get_ticks_msec()):
@@ -2124,7 +2125,7 @@ class _TouchPad extends Control:
 					queue_redraw()
 				&"tap":
 					if ui._tap_at(get_global_transform() * o.pos, bool(o.double)): _arb.consume_tap()
-				&"pinch": ui.zoom.emit(o.factor)
+				&"pinch": ui.zoom.emit(o.factor, get_global_transform_with_canvas() * o.center)
 				&"pinch_end": ui.zoom_end.emit()
 	func _draw() -> void:
 		var start := _arb.origin()
