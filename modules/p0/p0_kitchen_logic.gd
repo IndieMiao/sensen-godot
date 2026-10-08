@@ -33,6 +33,30 @@ static func stove_state(view: Dictionary) -> String:
 	var queued := " · Queued 1" if cooking(view).get("queued", null) is Dictionary else ""   # S5 Queue ×2 (Lv5)
 	return ("Ready" if left <= 0.0 else "Cooking " + P0Logic.duration(left)) + queued
 
+# ---------------------------------------------------------------- Queue ×2 (Cooking Lv5, q(71))
+## The pot waiting behind the one on the stove ({id, dish, rarity, ms, starts_in}), or null.
+static func queued(view: Dictionary):
+	var q = cooking(view).get("queued", null)
+	return q if q is Dictionary else null
+
+## Whether the watch sheet offers `Queue next ›`: Queue ×2 is open (Cooking Lv5), a pot is cooking and none waits.
+## Lv1–4 and a full queue show nothing, not a grey button (q(71)).
+static func can_queue(view: Dictionary) -> bool:
+	return cooking(view).get("conveniences", []).has("queue_two") and stove(view) != null and queued(view) == null
+
+## The watch sheet's state line: `Cooking`, or `Cooking · Queued 1` with a pot waiting (q(71) supplement).
+static func watch_state(view: Dictionary) -> String:
+	return "Cooking · Queued 1" if queued(view) != null else "Cooking"
+
+## The toast when the stove turns over to the waiting pot while the player is in the kitchen (q(71)):
+## "Grilled Crucian kept · Herb Grilled Fish cooking". dish_ev = the kept pot's `dish` event; next_dish = the pot now
+## cooking (null when the server does not name it: an unknown mix).
+static func rotation_line(view: Dictionary, dish_ev: Dictionary, next_dish) -> String:
+	var kept := "Ingredients back" if bool(dish_ev.get("none", false)) else \
+		"%s kept" % P0Logic.item_name(view, "dish_mystery" if bool(dish_ev.get("mystery", false)) else str(dish_ev.get("dish", "")))
+	var next := P0Logic.item_name(view, str(next_dish)) if next_dish != null and str(next_dish) != "" else "Unknown dish"
+	return "%s · %s cooking" % [kept, next]
+
 ## "Lv4 · 60 XP to go" for the locked 3rd slot (SGODOT-203: the 90 px label holds the short form); "Lv4" when
 ## the cooking thresholds are unknown.
 static func locked_slot_label(view: Dictionary) -> String:

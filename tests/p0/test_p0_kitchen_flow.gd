@@ -30,6 +30,12 @@ func _view() -> Dictionary:
 				"cooked": true, "can_cook": true, "slots": 1}]},
 	}
 
+## A view as if it had just arrived: P0Session.current() projects timers from the last reply's arrival, and a view
+## assigned straight into the session would otherwise look as old as the whole test run (its pots done).
+func _set_view(v: Dictionary) -> void:
+	rt.session.view = v
+	rt.session.set("_received_ms", Time.get_ticks_msec())
+
 func _farmhouse() -> P0Room:
 	var r: P0Room = FARMHOUSE.new()
 	r.use_runtime = false
@@ -45,18 +51,23 @@ func _dish(first := false) -> Dictionary:
 
 func test_a_dish_away_from_the_farmhouse_pops_no_card() -> void:
 	# §7.2.7 step 7 (q(46), 不知火舞 on 251): away from the stove the dish waits there and Today / the stove's sign say
-	# so; a pot kept on its own (Queue ×2) or a collect answered after leaving only says where it went. The farm, the map
-	# and the outposts have no p0_event; _call gives null there (bool(null) used to abort the reply).
+	# so. A pot Queue ×2 kept on its own says nothing away from the kitchen (q(46) / q(71)); a collect answered after
+	# the player left says where it went. The farm, the map and the outposts have no p0_event; _call gives null there
+	# (bool(null) used to abort the reply).
 	var w: Node3D = auto_free(Node3D.new())
 	add_child(w)
 	rt.attach(w)
 	var kept := _dish()
 	kept.auto = true
-	rt.session.state_changed.emit(rt.session.view, [kept, {"kind": "cabinet", "id": "dish_grilled_crucian@good", "delta": 1}])
+	rt.ui.clear_toast()
+	rt.session.state_changed.emit(rt.session.view, [{"kind": "cabinet", "id": "dish_grilled_crucian@good", "delta": 1}, kept])
 	# Read the toast at once: this test has no server, and a "Can't reach" toast may replace it a few frames later.
-	assert_str(rt.ui.toast_text()).is_equal("Kept")   # the view has no cabinet figures: the bare line
+	assert_str(rt.ui.toast_text()).is_equal("")   # Queue ×2 away from the kitchen: silent
 	for i in 2: await get_tree().process_frame
 	assert_bool(rt.ui.has_modal()).is_false()
+	rt.ui.clear_toast()
+	rt.session.state_changed.emit(rt.session.view, [{"kind": "cabinet", "id": "dish_grilled_crucian@good", "delta": 1}, _dish()])
+	assert_str(rt.ui.toast_text()).is_equal("Kept")   # a collect answered after leaving: where it went (no cabinet figures)
 	var none := _dish()
 	none.none = true
 	rt.ui.clear_toast()
@@ -92,15 +103,134 @@ func test_a_refused_or_failed_collect_returns_the_kitchen_to_idle() -> void:
 		assert_bool(k._retrying).override_failure_message(failure).is_false()
 		assert_bool(k.tap()).override_failure_message(failure + ": taps reach the room again").is_false()
 
-func test_the_watch_ends_when_its_pot_is_gone_from_the_stove() -> void:
+func test_the_watch_ends_when_its_pot_is_gone_and_moves_on_to_the_next_pot() -> void:
 	var r := await _farmhouse()
 	var k: P0Kitchen = r.get("kitchen")
 	k.watch({"id": 3, "ms": 5000, "elapsed": 0, "heats": []})
-	k.serve([])   # the view has no stove: S5 Queue ×2 kept it on its own
+	k.serve([])   # the view has no stove: S5 Queue ×2 kept it on its own and nothing waited
 	assert_str(k.phase).is_equal("idle")
-	rt.session.view.cooking.stove = {"id": 4, "ms": 5000, "ready_in": 4000, "heats": []}   # the next pot is on now
+	# The view already shows Queue ×2's turn-over (it settles the stove as the next command will): collect the watched
+	# pot to land it now, with its toast (q(71)), instead of ending the watch as before Queue ×2 had an entry. If a
+	# command kept it already, stale_pot sends the watch on to the next pot all the same.
+	var sent: Array = []
+	rt.session.transport = func(_m: int, _p: String, _b: Dictionary, cmd: Dictionary): sent.append(cmd)
+	var turned := _view()
+	turned.cooking.stove = {"id": 4, "ms": 5000, "ready_in": 4000, "elapsed": 1000, "heats": []}
+	_set_view(turned)
 	k.watch({"id": 3, "ms": 5000, "elapsed": 0, "heats": []})
 	k.serve([])
+	assert_str(k.phase).is_equal("rotate")
+	assert_array(sent.map(func(c): return [c.type, c.get("pot")])).is_equal([["collect", 3]])
+	rt._on_refused("stale_pot", {"pot": 4}, {"type": "collect", "pot": 3})
+	assert_str(k.phase).is_equal("watch")
+	assert_int(int(k.get("_stove").id)).is_equal(4)
+	k.stop_watching()
+
+# ---------------------------------------------------------------- Queue ×2 (Cooking Lv5, q(71))
+func _queue_view() -> Dictionary:
+	var v := _view()
+	v.cooking.conveniences = ["cook_again", "queue_two"]
+	v.cooking.stove = {"id": 3, "dish": "dish_grilled_crucian", "ms": 15000, "elapsed": 1000, "ready_in": 14000, "heats": []}
+	return v
+
+func test_queue_next_opens_the_drawer_in_queue_mode_and_the_queued_pot_returns_to_the_watch() -> void:
+	_set_view(_queue_view())
+	var r := await _farmhouse()
+	var k: P0Kitchen = r.get("kitchen")
+	k.watch(rt.session.view.cooking.stove)
+	assert_bool(k.get("_queue_next").visible).is_true()
+	assert_str(k.get("_sheet_header").state).is_equal("Cooking")
+	k.open_queue()
+	assert_str(k.phase).is_equal("compose")
+	assert_bool(k.drawer.queue_mode).is_true()
+	assert_str(k.drawer.get("_cook").label).is_equal("Queue")
+	assert_str(k.drawer.get("_recipe_button").label).is_equal("Queue")
+	assert_str(P0KitchenLogic.header(rt.session.view).state).is_equal("Cooking 0:14")   # Stove 1/1 · Cooking Lv · Cooking m:ss
+	k.drawer.cook_requested.emit({"type": "cook", "recipe": "dish_grilled_crucian"})
+	# The reply: the pot went in behind the one cooking.
+	var v := _queue_view()
+	v.seq = 6
+	v.cooking.queued = {"id": 4, "dish": "dish_grilled_crucian", "rarity": 1, "ms": 5000, "starts_in": 14000}
+	_set_view(v)
+	rt.session.state_changed.emit(v, [{"kind": "pot", "id": 4, "dish": "dish_grilled_crucian", "rarity": 1, "ms": 5000, "queued": true}])
+	await get_tree().process_frame
+	assert_str(k.phase).is_equal("watch")
+	assert_int(int(k.get("_stove").id)).is_equal(3)   # still the pot that was cooking
+	assert_bool(rt.ui.has_modal()).is_false()
+	assert_str(k.get("_sheet_header").state).is_equal("Cooking · Queued 1")
+	assert_bool(k.get("_queue_next").visible).is_false()   # full: no button, not a grey one
+	var badge: UiWorldIconButton = k.get("_queue_badge")
+	assert_bool(badge.visible).is_true()
+	assert_object(badge.icon).is_same(P0Logic.icon("dish_grilled_crucian"))
+	k.open_queue()   # full: nothing opens
+	assert_str(k.phase).is_equal("watch")
+	k.stop_watching()
+	# Away from the pot, the stove's world prompt keeps its countdown and hangs +1 (the prompts hide while watching).
+	var mark: Dictionary = r._marker("use_stove_1", v)
+	assert_str(str(mark.get("badge", ""))).is_equal("countdown")
+	assert_str(str(mark.get("count", ""))).is_equal("+1")
+
+func test_queue_next_is_offered_only_from_cooking_lv5_with_nothing_waiting() -> void:
+	var r := await _farmhouse()
+	var k: P0Kitchen = r.get("kitchen")
+	rt.session.view.cooking.stove = {"id": 3, "ms": 15000, "elapsed": 1000, "ready_in": 14000, "heats": []}
+	k.watch(rt.session.view.cooking.stove)   # Lv1–4: no Queue ×2
+	assert_bool(k.get("_queue_next").visible).is_false()
+	k.open_queue()
+	assert_str(k.phase).is_equal("watch")
+	k.stop_watching()
+	_set_view(_queue_view())
+	k.watch(rt.session.view.cooking.stove)
+	k.open_queue()
+	rt.ui.close_modal()   # × without queueing: back to the same pot
+	await get_tree().process_frame   # the drawer leaves the tree at the end of the frame
+	assert_str(k.phase).is_equal("watch")
+	assert_int(int(k.get("_stove").id)).is_equal(3)
+	k.stop_watching()
+
+func test_the_stove_turns_over_with_a_toast_and_no_card() -> void:
+	# q(71): the watched pot is done with another waiting: collect it (its taps), no plate, no result card; the toast
+	# says what was kept and what cooks now, and the watch moves on to the next pot.
+	var v := _queue_view()
+	v.cooking.queued = {"id": 4, "dish": "dish_grilled_crucian", "rarity": 1, "ms": 5000, "starts_in": 0}
+	_set_view(v)
+	var sent: Array = []
+	rt.session.transport = func(_m: int, _p: String, _b: Dictionary, cmd: Dictionary): sent.append(cmd)
+	var r := await _farmhouse()
+	var k: P0Kitchen = r.get("kitchen")
+	k.watch(v.cooking.stove)
+	k.serve([1200])
+	assert_str(k.phase).is_equal("rotate")
+	assert_array(sent.map(func(c): return [c.type, c.get("pot"), c.get("taps")])).is_equal([["collect", 3, [1200]]])
+	var after := _view()
+	after.seq = 7
+	after.cooking.conveniences = ["cook_again", "queue_two"]
+	after.cooking.stove = {"id": 4, "dish": "dish_grilled_crucian", "ms": 5000, "elapsed": 0, "ready_in": 5000, "heats": []}
+	_set_view(after)
+	rt.ui.clear_toast()
+	var dish := _dish()
+	dish.pot = 3
+	rt.session.state_changed.emit(after, [{"kind": "cabinet", "id": "dish_grilled_crucian@good", "delta": 1}, dish,
+		{"kind": "queue", "id": 4, "dish": "dish_grilled_crucian", "started_at": 0, "ms": 5000}])
+	for i in 2: await get_tree().process_frame
+	assert_bool(rt.ui.has_modal()).is_false()   # no COOK-4
+	assert_str(rt.ui.toast_text()).is_equal("Grilled Crucian kept · Grilled Crucian cooking")
+	assert_str(k.phase).is_equal("watch")
+	assert_int(int(k.get("_stove").id)).is_equal(4)
+	assert_str(k.get("_sheet_header").state).is_equal("Cooking")
+	k.stop_watching()
+
+func test_a_pot_kept_on_its_own_in_the_kitchen_names_the_next_one() -> void:
+	# In the farmhouse but not watching: a command settled the stove (Queue ×2) — the toast, no card.
+	var r := await _farmhouse()
+	var k: P0Kitchen = r.get("kitchen")
+	var kept := _dish()
+	kept.auto = true
+	rt.ui.clear_toast()
+	rt.session.state_changed.emit(rt.session.view, [kept, {"kind": "queue", "id": 4, "dish": null, "started_at": 0, "ms": 5000}])
+	for i in 2: await get_tree().process_frame
+	assert_bool(rt.ui.has_modal()).is_false()
+	assert_str(rt.ui.toast_text()).is_equal("Grilled Crucian kept · Unknown dish cooking")
 	assert_str(k.phase).is_equal("idle")
 
 func test_a_level_up_in_the_same_reply_waits_behind_the_result_card() -> void:
@@ -166,3 +296,21 @@ func test_back_in_a_room_takes_the_open_layers_own_way_back() -> void:
 	await get_tree().process_frame
 	assert_bool(r.is_back_navigation_locked()).is_true()
 	assert_str(str(r.get("_walk").get("name", ""))).is_equal("exit")
+
+func test_a_turn_over_that_finds_no_room_falls_back_to_the_result_card() -> void:
+	# q(46): cabinet and bag full, the kept pot stays on the stove and the waiting one does not fire (no `queue` event):
+	# the turn-over the player watched shows the result card, which says the dish was left on the stove.
+	var v := _queue_view()
+	v.cooking.queued = {"id": 4, "dish": "dish_grilled_crucian", "rarity": 1, "ms": 5000, "starts_in": 0}
+	_set_view(v)
+	var r := await _farmhouse()
+	var k: P0Kitchen = r.get("kitchen")
+	k.watch(v.cooking.stove)
+	k.serve([])
+	assert_str(k.phase).is_equal("rotate")
+	rt.session.state_changed.emit(v, [{"kind": "plate", "ids": ["dish_grilled_crucian@good"]}, _dish()])
+	for i in 3: await get_tree().process_frame
+	assert_str(k.phase).is_equal("card")
+	assert_str(rt.ui.modal_kind).is_equal("kitchen_card")
+	rt.ui.close_modal()
+	await get_tree().process_frame

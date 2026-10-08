@@ -373,3 +373,33 @@ func test_every_p0_dish_has_its_own_icon() -> void:
 	for r in P0Logic.content().get("cooking", {}).get("recipes", []):
 		var id := str(r.id)
 		assert_bool(ResourceLoader.exists(P0Logic.ICON_DIR % id)).override_failure_message(id + " has no icon").is_true()
+
+func test_queue_two_entry_state_line_and_turn_over_toast() -> void:
+	# q(71) / q(82): Queue next › only from Cooking Lv5 with a pot cooking and none waiting; the watch sheet says
+	# Queued 1; the toast is "<kept> · <next> cooking" for the plain and the three edge cases (and their mixes).
+	var v := _s5_view()
+	assert_bool(P0KitchenLogic.can_queue(v)).is_false()   # no queue_two yet
+	v.cooking.conveniences = ["cook_again", "queue_two"]
+	assert_bool(P0KitchenLogic.can_queue(v)).is_false()    # _s5_view already has a pot waiting
+	v.cooking.erase("queued")
+	assert_bool(P0KitchenLogic.can_queue(v)).is_true()
+	assert_str(P0KitchenLogic.watch_state(v)).is_equal("Cooking")
+	v.cooking.queued = {"id": 9, "dish": null, "rarity": 2, "ms": 15000, "starts_in": 3000}
+	assert_bool(P0KitchenLogic.can_queue(v)).is_false()    # full: no button at all
+	assert_str(P0KitchenLogic.watch_state(v)).is_equal("Cooking · Queued 1")
+	var empty := _s5_view()
+	empty.cooking.conveniences = ["queue_two"]
+	empty.cooking.stove = null
+	empty.cooking.erase("queued")
+	assert_bool(P0KitchenLogic.can_queue(empty)).is_false()   # nothing cooking: plain Cook, not Queue
+	v.names["dish_grilled_crucian"] = "Grilled Crucian"
+	v.names["dish_herb_grilled_fish"] = "Herb Grilled Fish"
+	v.names["dish_mystery"] = "Mystery Dish"
+	var crucian := {"kind": "dish", "dish": "dish_grilled_crucian", "quality": 0}
+	assert_str(P0KitchenLogic.rotation_line(v, crucian, "dish_herb_grilled_fish")).is_equal("Grilled Crucian kept · Herb Grilled Fish cooking")
+	assert_str(P0KitchenLogic.rotation_line(v, crucian, null)).is_equal("Grilled Crucian kept · Unknown dish cooking")
+	var mystery := {"kind": "dish", "dish": "dish_mystery", "mystery": true}
+	assert_str(P0KitchenLogic.rotation_line(v, mystery, "dish_herb_grilled_fish")).is_equal("Mystery Dish kept · Herb Grilled Fish cooking")
+	var none := {"kind": "dish", "dish": "dish_mystery", "mystery": true, "none": true, "trial_left": 7}
+	assert_str(P0KitchenLogic.rotation_line(v, none, "dish_herb_grilled_fish")).is_equal("Ingredients back · Herb Grilled Fish cooking")
+	assert_str(P0KitchenLogic.rotation_line(v, none, null)).is_equal("Ingredients back · Unknown dish cooking")

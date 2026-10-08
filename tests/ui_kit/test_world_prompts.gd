@@ -72,6 +72,27 @@ func test_near_grows_with_a_primary_edge_and_a_state_takes_the_whole_button() ->
 	assert_bool(b._disc.visible).is_true()
 	assert_bool(b._badge.visible).is_false()
 
+func test_a_count_stays_over_a_state_badge() -> void:
+	# Queue ×2 (q(71)): the cooking stove keeps its countdown badge and hangs +1 while a pot waits behind it.
+	var b := _host(UiWorldIconButton.new()) as UiWorldIconButton
+	b.icon = HOME
+	b.status = UiStatusBadge.State.COUNTDOWN
+	b.count = "+1"
+	await await_idle_frame()
+	assert_bool(b._badge.is_visible_in_tree()).is_true()
+	assert_bool(b._count.is_visible_in_tree()).is_true()
+	assert_str(b._count_label.text).is_equal("+1")
+	assert_bool(b._glyph.visible).is_false()   # the badge shows the state, not the facility icon
+	assert_float(b._disc.self_modulate.a).is_equal(0.0)   # the disc itself draws nothing under the badge
+	assert_int(b._badge.get_index()).is_less(b._disc.get_index())   # the count tag is drawn over the badge
+	b.count = ""
+	await await_idle_frame()
+	assert_bool(b._disc.visible).is_false()
+	b.status = -1
+	await await_idle_frame()
+	assert_bool(b._glyph.visible).is_true()
+	assert_float(b._disc.self_modulate.a).is_equal(1.0)
+
 func test_name_bar_reads_icon_name_fact_and_keeps_the_icon_on_its_anchor() -> void:
 	var bar := _host(UiWorldNameBar.new()) as UiWorldNameBar
 	bar.icon = HOME

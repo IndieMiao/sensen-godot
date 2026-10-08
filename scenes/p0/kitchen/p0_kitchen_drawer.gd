@@ -38,6 +38,9 @@ var experiment_chip := "All"
 var selected_page := ""
 ## Item ids in the pot, one per unit (owned by the controller; set it, then refresh()).
 var pot: Array = []
+## Queue ×2 (Cooking Lv5, q(71)): opened from the watch sheet's Queue next ›, the primary buttons read `Queue`; the
+## same cook command goes out and the server puts the pot behind the one on the stove.
+var queue_mode := false: set = set_queue_mode
 
 var _stove: Label
 var _level: Label
@@ -82,6 +85,13 @@ func _init(view_: Dictionary = {}, tab_ := "cookbook") -> void:
 	body.add_child(_experiment)
 	tab = tab_
 	refresh()
+
+func set_queue_mode(v: bool) -> void:
+	queue_mode = v
+	if _cook: _cook.label = _verb()
+	if _recipe_button and selected_page != "": _show_page(selected_page)   # relabel and lay the card out again
+
+func _verb() -> String: return "Queue" if queue_mode else "Cook"
 
 func set_tab(v: String) -> void:
 	var changed := v != tab
@@ -237,7 +247,7 @@ func _show_page(id: String) -> void:
 	else:
 		_recipe_button.visible = true
 		_recipe_button.reason = card.reason
-		_recipe_button.label = "Cook"
+		_recipe_button.label = _verb()
 	_layout_recipe()
 
 ## The card grows with what it says (int6 C3 / C41, 不知火舞 on 226): the might-have line pushes the effect line

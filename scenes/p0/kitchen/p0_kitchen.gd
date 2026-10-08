@@ -9,6 +9,9 @@ extends Node
 ##            tap (the whole pot is the target, §7.2.4), sent at once as `heat`. Walking away or × stops watching:
 ##            the pot keeps cooking and the unwatched rings count as misses (Plain, §7.2.3).
 ##   serve    at the end the plate slides out with its rarity glow, then `collect` goes to the server once.
+##   rotate   Queue ×2 (Cooking Lv5, q(71)): the watched pot is done and another waits behind it. `collect` goes out
+##            with no plate and no card; the toast says what was kept and what cooks now, and the watch moves on to
+##            the next pot. Queue next › on the watch sheet opens the drawer (its Cook reads Queue) over the pot.
 ##   card     the result card (COOK-4 New recipe! / COOK-6 Mystery Dish / COOK-P0-9 Dish ready): Eat or Keep.
 ##            The server already kept the portions (Warming Cabinet → bag → stove, PR #20); Eat eats one from
 ##            where it went, Keep or a tap outside says where it went (KEEP-STATES). Li Bai, 226 250e4ef1.
@@ -23,6 +26,7 @@ const SLOT_BAR_GAP := 3.0
 const SLOT_GAP := 8.0
 const WATCH_SHEET_H := 196.0      # COOK-3 sheet: dish, Cooking, m:ss remaining, the heat hint
 const CLOSE_GAP := 6.0            # × sits this far above the sheet's top edge (COOK-3: 554 → 604)
+const QUEUE_BADGE_AT := Vector2(59, 33)   # COOK-QUEUE-1c 1758:103247: the next pot's dish beside the pot (design px)
 const CARD_TOP := 0.425           # RewardMoment top at 340 of 800 (COOK-4)
 const FLOAT_AT := 0.205           # result floats (XP) rise from just above the plate: COOK-4 chip at y 150–176 of 800
 const PLATE := preload("res://assets/p0/kitchen/reveal/plate.svg")
@@ -71,6 +75,10 @@ var _card_done := false
 var _left_card := false            # the card is for a portion waiting on the stove (COOK-P0-9 from leftovers)
 var _retrying := false             # Keep sent a collect for leftovers: its reply says where they went
 var _card: UiRewardMoment
+var _queue_mode := false           # the drawer was opened from Queue next ›: closing it goes back to the watch
+var _queue_next: UiNavButton
+var _queue_badge: UiWorldIconButton
+var _queue_ev: Dictionary = {}     # this reply's `queue` event: the waiting pot just fired
 
 func _init(room_: P0Room) -> void:
 	room = room_
@@ -130,6 +138,7 @@ func open(tab := "cookbook", page_id := "") -> void:
 	_wrap.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_wrap.theme = UiKit.theme()
 	drawer = P0KitchenDrawer.new(rt.session.current(), tab)
+	drawer.queue_mode = _queue_mode
 	drawer.safe_bottom = rt.ui.safe_bottom()
 	drawer.close_requested.connect(func(): rt.ui.close_modal())
 	drawer.page_selected.connect(_on_page)
@@ -159,9 +168,30 @@ func _on_closed() -> void:
 	pot.clear()
 	stage.clear_ingredients()
 	stage.clear_ghosts()
+	if _queue_mode:   # opened from Queue next ›: back to the pot on the stove, whether a pot was queued or not (q(71))
+		_queue_mode = false
+		var st = P0KitchenLogic.stove(rt.session.current())
+		if st != null:
+			watch(st)
+			return
 	room.release_focus()
 	_hide_player(false)
 
+## Queue next › (q(71)): the cooking drawer over the pot being watched, its Cook reading Queue. The watch resumes when
+## the drawer closes; rings that pass meanwhile count as misses, as when walking away from the pot.
+func open_queue() -> void:
+	if phase != "watch" or not P0KitchenLogic.can_queue(rt.session.current()): return
+	_hide_ring()
+	_hide_sheet()
+	phase = "idle"
+	_queue_mode = true
+	open("cookbook")
+
+## `pot` event with queued (q(71)): the pot went in behind the one cooking. The ingredients are taken already; the
+## drawer closes and the watch resumes, now saying Queued 1 with the next dish beside the pot.
+func on_queued() -> void:
+	if phase == "compose" and _queue_mode: rt.ui.close_modal()
+	elif phase == "watch": _refresh_watch(rt.session.current())
 ## COOK-2a / 2b show the stove alone: the player steps out of the pushed-in shot and back when it ends.
 func _hide_player(on: bool) -> void:
 	if room.actor: room.actor.visible = not on
@@ -277,8 +307,12 @@ func _on_cook(cmd: Dictionary) -> void:
 	_cook_sent = true
 	rt.session.send(cmd, P0Session.ui_key(cmd))
 
-## The drawer redraws from the latest view while it is open (a collect or a sale changes the bag under it).
+## The drawer redraws from the latest view while it is open (a collect or a sale changes the bag under it); the watch
+## sheet follows the queue (Queued 1, Queue next ›).
 func sync_view(v: Dictionary) -> void:
+	if phase == "watch":
+		_refresh_watch(v)
+		return
 	if phase != "compose" or drawer == null or drawer.view.get("seq", -1) == v.get("seq", -2): return
 	drawer.view = v
 	drawer.refresh()
@@ -320,6 +354,10 @@ func watch(stove: Dictionary) -> void:
 		_ring.theme = UiKit.theme()
 		rt.ui.root.add_child(_ring)
 	_ring.visible = false
+	if _queue_badge == null:
+		_queue_badge = UiWorldIconButton.new()   # display only: taps on it are heat taps like the rest of the scene
+		_queue_badge.theme = UiKit.theme()
+		rt.ui.root.add_child(_queue_badge)
 	_show_sheet(stove)
 
 ## COOK-3 bottom sheet: ObjectHeader (dish · Cooking · m:ss remaining) and the heat hint, × above it. Not modal:
@@ -335,17 +373,34 @@ func _show_sheet(stove: Dictionary) -> void:
 		var hint := UiKit.label("Tap when the needle reaches gold.", UiTokens.STYLE_EFFECT_B15)
 		hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		_sheet.body.add_child(hint)
+		_queue_next = UiNavButton.new("Queue next", true)   # COOK-QUEUE-1a 1758:103013: centred under the hint
+		_queue_next.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		_queue_next.pressed.connect(open_queue)
+		_sheet.body.add_child(_queue_next)
 		rt.ui.root.add_child(_sheet)
 		_close = UiCloseButton.new()
 		_close.theme = UiKit.theme()
 		_close.pressed.connect(stop_watching)
 		rt.ui.root.add_child(_close)
+		rt.ui.set_toast_over(_close)   # a toast while watching (the turn-over, q(71)) sits above the sheet and its ×
 	var dish = stove.get("dish", null)
 	_sheet_header.title = P0Logic.item_name(rt.session.current(), str(dish)) if dish != null else "Unknown dish"
-	_sheet_header.state = "Cooking"
 	_sheet_header.quantity_label = "remaining"
+	_refresh_watch(rt.session.current())
 	_update_sheet()
 
+## The watch sheet's queue facts (q(71)): Cooking · Queued 1 and the next dish beside the pot while one waits;
+## Queue next › only when Queue ×2 is open and nothing waits (Lv1–4 or a full queue: no button at all).
+func _refresh_watch(v: Dictionary) -> void:
+	if _sheet == null: return
+	_sheet_header.state = P0KitchenLogic.watch_state(v)
+	_queue_next.visible = P0KitchenLogic.can_queue(v)
+	var q = P0KitchenLogic.queued(v)
+	if _queue_badge:
+		_queue_badge.visible = q != null
+		if q != null:
+			var dish = q.get("dish", null)
+			_queue_badge.icon = P0Logic.icon(str(dish)) if dish != null else UiItemCell.SILHOUETTE
 func _update_sheet() -> void:
 	if _sheet == null: return
 	var left := maxf(0.0, float(_stove.get("ms", 0)) - elapsed())
@@ -354,10 +409,12 @@ func _update_sheet() -> void:
 	_close.position = Vector2(rt.ui.root.size.x - UiTokens.SPACE_PAGE - UiTokens.SIZE_CLOSE, top - CLOSE_GAP - UiTokens.SIZE_CLOSE)
 
 func _hide_sheet() -> void:
+	if _sheet and rt: rt.ui.set_toast_over(null)
 	if _sheet and is_instance_valid(_sheet): _sheet.queue_free()
 	if _close and is_instance_valid(_close): _close.queue_free()
 	_sheet = null
 	_close = null
+	if _queue_badge: _queue_badge.visible = false
 
 ## Stop watching (walked away / left): the pot keeps cooking on the server; unjudged rings are misses.
 func stop_watching() -> void:
@@ -428,6 +485,7 @@ func _process(_dt: float) -> void:
 			_ring.turn = clampf((e - float(h.at)) / float(h.spin), 0.0, 1.0)
 			_ring.result = (1 if _judged[active] else 0) if _judged.has(active) else -1
 			_ring.position = _ring_center() - _ring.size * 0.5
+	if _queue_badge and _queue_badge.visible: _queue_badge.place_at(_ring_center() + QUEUE_BADGE_AT)
 	_update_sheet()
 	if e >= total + 250.0: serve(_taps.duplicate())
 
@@ -438,11 +496,20 @@ func serve(taps: Array, from_stove := false) -> void:
 	if phase == "serve" or phase == "card": return
 	var v := rt.session.current()
 	var st = P0KitchenLogic.stove(v)
-	# Watching: serve the pot being watched. Gone from the stove (S5 Queue ×2 kept it on its own) or another pot on
-	# it now: nothing to collect here, so the watch ends instead of waiting (PR #54 review).
+	# Watching: serve the pot being watched. Gone from the stove: nothing to collect here, so the watch ends instead of
+	# waiting (PR #54 review). Another pot on it now: the view already shows Queue ×2's turn-over (it settles the
+	# stove as the next command will), so collect the watched pot to land it now with its toast, then watch the next
+	# one with its rings (q(71)); a command that kept it already answers stale_pot and the watch moves on all the same.
 	if phase == "watch" and (st == null or st.get("id", null) != _stove.get("id", null)):
+		if st != null and st.get("id", null) != null and float(st.get("ready_in", 1)) > 0.0:
+			_rotate(taps)
+			return
 		stop_watching()
 		on_collected()
+		return
+	# Queue ×2: the watched pot is done and another waits. The stove turns over: no plate, no card (q(71)).
+	if phase == "watch" and P0KitchenLogic.queued(v) != null:
+		_rotate(taps)
 		return
 	if st == null:
 		on_collected()
@@ -461,6 +528,14 @@ func serve(taps: Array, from_stove := false) -> void:
 		await room.get_tree().create_timer(SERVE_HOLD_S).timeout
 		rt.session.send(_with_pot({"type": "collect", "taps": taps}, st), P0Session.ui_key({"type": "collect"})))
 
+## Queue ×2 turns the stove over (q(71)): collect the watched pot with its taps, without the plate; the reply's
+## `queue` event is the next pot firing (_after_kept).
+func _rotate(taps: Array) -> void:
+	phase = "rotate"
+	_events.clear()
+	_hide_ring()
+	rt.session.send(_with_pot({"type": "collect", "taps": taps}, _stove), P0Session.ui_key({"type": "collect"}))
+
 ## A collect's events in order (cabinet / item / plate / dish / first / mishap): the card is built once the
 ## whole reply is in. Returns true when the kitchen shows the result itself (no old dish card).
 func on_event(ev: Dictionary) -> bool:
@@ -468,8 +543,9 @@ func on_event(ev: Dictionary) -> bool:
 		"dish":
 			var known := not bool(ev.get("mystery", false)) and not bool(ev.get("none", false))
 			last_page = str(ev.get("dish", "")) if known else ""
-			if bool(ev.get("auto", false)):   # S5 Queue ×2 kept it on its own: the toast only, no card
-				_toast_keep.call_deferred(ev, _events + [ev])
+			# Kept without a card: S5 Queue ×2 kept it on its own, or the stove turned over under the watch (q(71)).
+			if bool(ev.get("auto", false)) or phase == "rotate":
+				_after_kept.call_deferred(ev, _events + [ev])
 				return true
 			_events.append(ev)
 			# Once the whole reply is in, and through the card queue: a card already open (an Energy card, a level-up
@@ -482,6 +558,14 @@ func on_event(ev: Dictionary) -> bool:
 				"collect":
 					_retrying = false
 					if phase == "serve": _recover()
+					elif phase == "rotate":   # back to whatever is on the stove now (stale_pot: the next pot already)
+						phase = "idle"
+						var st = P0KitchenLogic.stove(rt.session.current())
+						if st != null: watch(st)
+						else: on_collected()
+			return false
+		"queue":   # the waiting pot fired (Queue ×2): the kept toast names it
+			_queue_ev = ev
 			return false
 		"cabinet", "item", "plate", "first", "mishap":
 			if _retrying and str(ev.kind) in ["cabinet", "item", "plate"]:
@@ -665,9 +749,31 @@ func _on_card_closed() -> void:
 	stage.clear_ingredients()
 	stage.set_cooking(false)
 
-func _toast_keep(ev: Dictionary, events: Array) -> void:
-	var line := P0KitchenLogic.kept_line(rt.session.current(), ev, events)
-	if not line.is_empty(): rt.ui.toast(str(line.text))
+## Once the whole reply is in, for a pot kept without a card. The stove turned over (a `queue` event): the toast says
+## what was kept and what cooks now, and a watch moves on to the next pot with its rings (q(71)). It did not (the
+## next pot had no room: cabinet and bag full, the kept pot stays on the stove, q(46)): a turn-over the player was
+## watching falls back to the result card, which says so; a pot kept on its own gets the Keep line.
+func _after_kept(ev: Dictionary, events: Array) -> void:
+	var v := rt.session.current()
+	var turned := not _queue_ev.is_empty()
+	var next = _queue_ev.get("dish", null)
+	_queue_ev = {}
+	if not turned and phase == "rotate":
+		phase = "serve"
+		_events = events
+		_from_stove = false
+		rt.ui.queue_card(_show_card)
+		return
+	if turned: rt.ui.toast(P0KitchenLogic.rotation_line(v, ev, next))
+	else:
+		var line := P0KitchenLogic.kept_line(v, ev, events)
+		if not line.is_empty(): rt.ui.toast(str(line.text))
+	if phase in ["rotate", "watch"]:
+		var st = P0KitchenLogic.stove(v)
+		if st != null and float(st.get("ready_in", 1)) > 0.0: watch(st)
+		elif phase == "rotate":
+			phase = "watch"
+			stop_watching()
 
 func _exit_tree() -> void:
 	if _ring and is_instance_valid(_ring): _ring.queue_free()
