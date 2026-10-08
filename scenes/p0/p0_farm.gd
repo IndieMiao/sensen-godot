@@ -292,7 +292,9 @@ func _hold_repeat() -> void:
 	if not a.get("enabled", false) or cmd.is_empty() or str(cmd.get("type", "")) == "energy_card": return
 	if rt.ui.fab_verb == "": rt.ui.fab_verb = str(a.get("verb", ""))
 	if str(a.get("verb", "")) != rt.ui.fab_verb: return
+	rt.holding_repeat = true   # the observation log's "hold" (S7); the first press went out as a tap
 	p0_action(cmd)
+	rt.holding_repeat = false
 
 ## Facilities respond to taps only (§10.2.2): the stall opens its drawer directly (unattended, p(6)),
 ## the farmhouse (Kitchen / Rest), the mine.

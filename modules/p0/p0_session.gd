@@ -27,6 +27,9 @@ var view: Dictionary = {}
 var space := ""
 ## The catalog pond inside a pond space (q(36)): the server reads the pond's template from its own table.
 var place := ""
+## How the player pressed for the next command ("hold" / "tap"), for the observation log (S7): P0Runtime sets a
+## callable that says "hold" only for the farm's hold-to-repeat commands. Sent beside the command, like space.
+var src_of := Callable()
 var busy := false
 var _queue: Array = []        # {cmd, key} sent while a request was in flight (reel / collect must never be dropped)
 var _inflight := {}           # the {cmd, key} on the wire; {} for state refreshes and dev calls
@@ -34,6 +37,11 @@ var _inflight := {}           # the {cmd, key} on the wire; {} for state refresh
 var transport := Callable()
 var _received_ms := 0
 var _refresh_left := REFRESH_S
+## UI moments for the observation log (S7): batched, sent apart from commands, dropped when the server is away.
+const UI_BATCH := 20
+const UI_FLUSH_S := 10.0
+var _ui_events: Array = []
+var _ui_flush_left := UI_FLUSH_S
 
 func _ready() -> void:
 	var demo := demo_config(FileAccess.get_file_as_string(DEMO_CONFIG) if FileAccess.file_exists(DEMO_CONFIG) else "")
@@ -47,10 +55,13 @@ func _ready() -> void:
 		player_id = "p0-" + bytes.hex_encode()
 		var f := FileAccess.open("user://p0_player.txt", FileAccess.WRITE)
 		if f: f.store_line(player_id)
+	report({"kind": "session_start"})
 	# Deferred: P0Runtime adds the session before P0Ui, and an immediate failure would toast on a UI not built yet.
 	refresh.call_deferred()
 
 func _process(dt: float) -> void:
+	_ui_flush_left -= dt
+	if _ui_flush_left <= 0.0 or _ui_events.size() >= UI_BATCH: _flush_ui()
 	_refresh_left -= dt
 	if _refresh_left <= 0.0 and not busy:
 		_refresh_left = REFRESH_S
@@ -71,7 +82,8 @@ func refresh() -> void:
 func send(cmd: Dictionary, key := "") -> bool:
 	if key != "" and (str(_inflight.get("key", "")) == key or _queue.any(func(q): return q.key == key)):
 		return false
-	var entry := {cmd = cmd, key = key, space = space, place = place}   # where the player issued it from, even if it waits in the queue
+	var src := str(src_of.call()) if src_of.is_valid() else ""
+	var entry := {cmd = cmd, key = key, space = space, place = place, src = src}   # where and how it was issued, even if it waits
 	if key != "": command_started.emit(key)
 	if busy: _queue.append(entry)
 	else: _post(entry)
@@ -89,7 +101,30 @@ func _post(entry: Dictionary) -> void:
 	if view.has("seq"): body["expect_seq"] = int(view.seq)
 	if str(entry.get("space", "")) != "": body["space"] = str(entry.space)
 	if str(entry.get("place", "")) != "": body["place"] = str(entry.place)
+	if str(entry.get("src", "")) != "": body["src"] = str(entry.src)
 	_request(HTTPClient.METHOD_POST, "/p0/commands", body, entry.cmd)
+
+## A UI moment for the observation log: {kind = "tip_shown", key = "sow"} and the like (server keeps known kinds only).
+func report(event: Dictionary) -> void:
+	_ui_events.append(event)
+	if _ui_events.size() >= UI_BATCH: _flush_ui()
+
+## Fire and forget: the log never blocks or reorders commands, and a failed send is simply dropped.
+func _flush_ui() -> void:
+	_ui_flush_left = UI_FLUSH_S
+	if _ui_events.is_empty(): return
+	var body := {"events": _ui_events.slice(0, UI_BATCH)}
+	_ui_events = _ui_events.slice(UI_BATCH)
+	if transport.is_valid():
+		transport.call(HTTPClient.METHOD_POST, "/p0/telemetry", body, {"type": "telemetry"})
+		return
+	if not is_inside_tree(): return
+	var http := HTTPRequest.new()
+	http.timeout = 8.0
+	add_child(http)
+	http.request_completed.connect(func(_r, _c, _h, _b): http.queue_free())
+	# _headers(): the demo key too, or a deployed server (P0_ACCESS_KEYS) would refuse every report with 401
+	if http.request(base_url + "/p0/telemetry", _headers(), HTTPClient.METHOD_POST, JSON.stringify(body)) != OK: http.queue_free()
 
 func dev_skip(minutes: int) -> void:
 	_request(HTTPClient.METHOD_POST, "/p0/dev/skip", {"minutes": minutes}, {})
