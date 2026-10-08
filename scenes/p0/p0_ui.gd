@@ -70,6 +70,7 @@ var _badges := {}         # id -> UiStatusBadge
 var _quick := {}          # per action: {pins: [], removed: []}, saved in quick_store (LOCK-05: 每个行动各记各的)
 var _bar_sig := []        # last state pushed to the bar, so the per-frame refresh only rebuilds on change
 var _auto_pick := true    # pick the first slot once when an action is entered (§10.3.3 ①), not after a deselect
+var _mode_tool: Texture2D  # the current action's own tool icon for the key badge (set_action `tool` overrides per key)
 ## MAP-1 keeps only Bag at the bottom of the map. The P0 map still carries the old Map / Farm / Me dock and its
 ## zoom column where Bag would sit, so the map turns this on when that dock leaves (with the new HUD, SGODOT-222).
 ## TODO(MAP-1, follow-up PR after #11 and #12, reviewed by 刘邦): p0_map drops the old dock and sets map_bag = true.
@@ -286,7 +287,8 @@ func _build_fab() -> void:
 		_fab_pressed())
 	_keys.key().released.connect(func(): fab_held = false)
 	_keys.switch_pressed.connect(open_radial)
-	_keys.tool_icon = P0Logic.icon("rod" if bar_mode == "fish" else "hoe")   # set_mode skips the mode it starts in
+	_mode_tool = P0Logic.icon("rod" if bar_mode == "fish" else "hoe")   # set_mode skips the mode it starts in
+	_keys.tool_icon = _mode_tool
 	_radial = UiActionRadial.new()
 	_kit.add_child(_radial)
 	_radial.picked.connect(func(id: String): if id != bar_mode: set_mode(id))
@@ -427,7 +429,8 @@ func set_mode(mode: String, place := "") -> void:
 	_bar_sig = []
 	_auto_pick = true
 	# SGODOT-231: the mine shows the pickaxe; set_action's `tool` swaps in the equipped one.
-	_keys.tool_icon = P0Logic.icon("rod" if mode == "fish" else "pickaxe" if mode == "mine" else "hoe")
+	_mode_tool = P0Logic.icon("rod" if mode == "fish" else "pickaxe" if mode == "mine" else "hoe")
+	_keys.tool_icon = _mode_tool
 	_creel.visible = mode == "fish"
 	set_status_line("")
 	_refresh_bar()
@@ -591,8 +594,9 @@ func set_action(a: Dictionary) -> void:
 	if a.get("amber", false): k.state = UiSceneAction.State.INSUFFICIENT
 	elif not a.get("enabled", false): k.state = UiSceneAction.State.UNAVAILABLE
 	else: k.state = UiSceneAction.State.DEFAULT
-	# The equipped tool in the key's badge (SGODOT-231: Starter / Copper Pickaxe); set_mode resets it per action.
-	if a.has("tool"): _keys.tool_icon = P0Logic.icon(str(a.tool))
+	# The equipped tool in the key's badge (SGODOT-231: Starter / Copper Pickaxe at the mine mouth and inside); a key
+	# without one shows the action's own tool, so the farm's Sow after the mouth is a hoe again (walkthrough fix).
+	_keys.tool_icon = P0Logic.icon(str(a.tool)) if a.has("tool") else _mode_tool
 	_fab_pills.visible = bool(a.get("creel_full", false)) and _keys.visible
 
 func _fab_pressed() -> void:

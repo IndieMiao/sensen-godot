@@ -169,6 +169,8 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				var dlt := int(ev.delta)
 				# A catch's refund is said by its own float or card ("3 Energy back"), not twice.
 				if settles_catch and str(ev.get("reason", "")) in ["refund", "line_in"]: continue
+				# Inside the mine a floor fee is said by the mine's own float ("Floor 2 · −2 Energy", q(46)), not twice.
+				if str(ev.get("reason", "")) == "mine_floor" and str(_call("p0_surface", [])) == "mine": continue
 				ui.float_text(("%+d Energy" % dlt).replace("-", "−"), at + Vector2(0, dy), Color("d9772f") if dlt < 0 else Color("4f934b"))
 			"xp":
 				if int(ev.amount) > 0:

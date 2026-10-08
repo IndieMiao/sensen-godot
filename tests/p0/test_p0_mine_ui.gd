@@ -80,6 +80,15 @@ func test_key_badge_shows_the_equipped_pickaxe() -> void:
 	ui.set_mode("farm")
 	assert_object(ui._keys.tool_icon).is_equal(P0Logic.icon("hoe"))
 
+## Walkthrough bug: at the mine mouth the farm key carries the pickaxe; walking back to a bed the Sow key must
+## show the hoe again, not keep the pickaxe.
+func test_a_key_without_tool_shows_the_actions_own_tool() -> void:
+	ui.set_mode("farm")
+	ui.set_action({"verb": "Enter mine", "sub": "2 Energy", "enabled": true, "amber": false, "cmd": {"type": "mine_enter"}, "need": 2, "tool": "pick_starter"})
+	assert_object(ui._keys.tool_icon).is_equal(P0Logic.icon("pick_starter"))
+	ui.set_action({"verb": "Sow ×1", "sub": "2 Energy", "enabled": true, "amber": false, "cmd": {"type": "sow"}, "need": 2})
+	assert_object(ui._keys.tool_icon).is_equal(P0Logic.icon("hoe"))
+
 func test_mining_free_moves_keep_free_on_the_key() -> void:
 	ui.set_action(P0MaterialLogic._key("elevator", "Elevator", "Free", {"type": "elevator"}))
 	assert_str(ui._keys.key().cost).is_equal("Free")   # LOCK-21 Elevator · Free
