@@ -1,0 +1,1146 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    596
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "World prompts"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        72
+      ],
+      "variation": "CaptionR12",
+      "text": "UiWorldIconButton · UiWorldNameBar · UiNpcNameTag · WorldIconButton 1674:101157 · WorldNameBar 1674:101190 · NpcNameTag 1674:101195 · row 51 · LOCK-07 / 16 v2"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        106,
+        328,
+        490
+      ],
+      "children": [
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            106,
+            328,
+            80
+          ],
+          "children": [
+            {
+              "type": "ColorRect",
+              "rect": [
+                0,
+                106,
+                328,
+                60
+              ],
+              "children": [
+                {
+                  "type": "UiWorldIconButton",
+                  "rect": [
+                    8,
+                    114,
+                    44,
+                    44
+                  ],
+                  "children": [
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        16,
+                        122,
+                        28,
+                        28
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            19,
+                            125,
+                            22,
+                            22
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "UiWorldIconButton",
+                  "rect": [
+                    72,
+                    112,
+                    48,
+                    48
+                  ],
+                  "children": [
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        81,
+                        121,
+                        31,
+                        31
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            84,
+                            124,
+                            24,
+                            24
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "UiWorldIconButton",
+                  "rect": [
+                    140,
+                    114,
+                    44,
+                    44
+                  ],
+                  "children": [
+                    {
+                      "type": "UiStatusBadge",
+                      "rect": [
+                        148,
+                        122,
+                        28,
+                        28
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            148,
+                            122,
+                            28,
+                            28
+                          ],
+                          "children": [
+                            {
+                              "type": "TextureRect",
+                              "rect": [
+                                154,
+                                128,
+                                17,
+                                17
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "UiWorldIconButton",
+                  "rect": [
+                    206,
+                    114,
+                    44,
+                    44
+                  ],
+                  "children": [
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        214,
+                        122,
+                        28,
+                        28
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            217,
+                            125,
+                            22,
+                            22
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "UiWorldIconButton",
+                  "rect": [
+                    272,
+                    114,
+                    44,
+                    44
+                  ],
+                  "children": [
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        280,
+                        122,
+                        28,
+                        28
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            283,
+                            125,
+                            22,
+                            22
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                172,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "icons · default · Near · state"
+            }
+          ]
+        },
+        {
+          "type": "GridContainer",
+          "rect": [
+            0,
+            206,
+            328,
+            290
+          ],
+          "children": [
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                0,
+                206,
+                160,
+                68
+              ],
+              "children": [
+                {
+                  "type": "ColorRect",
+                  "rect": [
+                    0,
+                    206,
+                    160,
+                    48
+                  ],
+                  "children": [
+                    {
+                      "type": "UiWorldNameBar",
+                      "rect": [
+                        10,
+                        214,
+                        108,
+                        32
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            10,
+                            214,
+                            108,
+                            32
+                          ]
+                        },
+                        {
+                          "type": "Control",
+                          "rect": [
+                            10,
+                            214,
+                            96,
+                            32
+                          ],
+                          "children": [
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                15,
+                                219,
+                                91,
+                                22
+                              ],
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    15,
+                                    219,
+                                    22,
+                                    22
+                                  ]
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    43,
+                                    221,
+                                    63,
+                                    18
+                                  ],
+                                  "variation": "CaptionXB12",
+                                  "text": "Farmhouse"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    0,
+                    260,
+                    160,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "Right"
+                }
+              ]
+            },
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                166,
+                206,
+                160,
+                68
+              ],
+              "children": [
+                {
+                  "type": "ColorRect",
+                  "rect": [
+                    166,
+                    206,
+                    160,
+                    48
+                  ],
+                  "children": [
+                    {
+                      "type": "UiWorldNameBar",
+                      "rect": [
+                        208,
+                        214,
+                        108,
+                        32
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            208,
+                            214,
+                            108,
+                            32
+                          ]
+                        },
+                        {
+                          "type": "Control",
+                          "rect": [
+                            220,
+                            214,
+                            96,
+                            32
+                          ],
+                          "children": [
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                220,
+                                219,
+                                91,
+                                22
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    220,
+                                    221,
+                                    63,
+                                    18
+                                  ],
+                                  "variation": "CaptionXB12",
+                                  "text": "Farmhouse"
+                                },
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    289,
+                                    219,
+                                    22,
+                                    22
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    166,
+                    260,
+                    160,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "Left · edge"
+                }
+              ]
+            },
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                0,
+                280,
+                160,
+                68
+              ],
+              "children": [
+                {
+                  "type": "ColorRect",
+                  "rect": [
+                    0,
+                    280,
+                    160,
+                    48
+                  ],
+                  "children": [
+                    {
+                      "type": "UiWorldNameBar",
+                      "rect": [
+                        10,
+                        288,
+                        150,
+                        32
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            10,
+                            288,
+                            150,
+                            32
+                          ]
+                        },
+                        {
+                          "type": "Control",
+                          "rect": [
+                            10,
+                            288,
+                            138,
+                            32
+                          ],
+                          "children": [
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                15,
+                                293,
+                                133,
+                                22
+                              ],
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    15,
+                                    293,
+                                    22,
+                                    22
+                                  ]
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    43,
+                                    295,
+                                    54,
+                                    18
+                                  ],
+                                  "variation": "CaptionXB12",
+                                  "text": "Stove 1/1"
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    103,
+                                    295,
+                                    3,
+                                    18
+                                  ],
+                                  "variation": "CaptionB12",
+                                  "text": "·"
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    112,
+                                    295,
+                                    36,
+                                    18
+                                  ],
+                                  "variation": "CaptionB12",
+                                  "text": "Empty"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    0,
+                    334,
+                    160,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "one fact"
+                }
+              ]
+            },
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                166,
+                280,
+                160,
+                68
+              ],
+              "children": [
+                {
+                  "type": "ColorRect",
+                  "rect": [
+                    166,
+                    280,
+                    160,
+                    48
+                  ],
+                  "children": [
+                    {
+                      "type": "UiWorldNameBar",
+                      "rect": [
+                        176,
+                        288,
+                        141,
+                        32
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            176,
+                            288,
+                            141,
+                            32
+                          ]
+                        },
+                        {
+                          "type": "Control",
+                          "rect": [
+                            176,
+                            288,
+                            129,
+                            32
+                          ],
+                          "children": [
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                181,
+                                293,
+                                124,
+                                22
+                              ],
+                              "children": [
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    181,
+                                    293,
+                                    22,
+                                    22
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "UiStatusBadge",
+                                      "rect": [
+                                        181,
+                                        293,
+                                        22,
+                                        22
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "Panel",
+                                          "rect": [
+                                            181,
+                                            293,
+                                            22,
+                                            22
+                                          ],
+                                          "children": [
+                                            {
+                                              "type": "TextureRect",
+                                              "rect": [
+                                                185,
+                                                297,
+                                                13,
+                                                13
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    209,
+                                    295,
+                                    96,
+                                    18
+                                  ],
+                                  "variation": "CaptionXB12",
+                                  "text": "Homestead Stall"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    166,
+                    334,
+                    160,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "state"
+                }
+              ]
+            },
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                0,
+                354,
+                160,
+                68
+              ],
+              "children": [
+                {
+                  "type": "ColorRect",
+                  "rect": [
+                    0,
+                    354,
+                    160,
+                    48
+                  ],
+                  "children": [
+                    {
+                      "type": "UiWorldNameBar",
+                      "rect": [
+                        10,
+                        362,
+                        110,
+                        32
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            10,
+                            362,
+                            110,
+                            32
+                          ]
+                        },
+                        {
+                          "type": "Control",
+                          "rect": [
+                            10,
+                            362,
+                            98,
+                            32
+                          ],
+                          "children": [
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                15,
+                                367,
+                                93,
+                                22
+                              ],
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    15,
+                                    367,
+                                    22,
+                                    22
+                                  ]
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    43,
+                                    369,
+                                    65,
+                                    18
+                                  ],
+                                  "variation": "CaptionXB12",
+                                  "text": "+60 Energy"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    0,
+                    408,
+                    160,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "bench"
+                }
+              ]
+            },
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                166,
+                354,
+                160,
+                68
+              ],
+              "children": [
+                {
+                  "type": "ColorRect",
+                  "rect": [
+                    166,
+                    354,
+                    160,
+                    48
+                  ],
+                  "children": [
+                    {
+                      "type": "UiWorldNameBar",
+                      "rect": [
+                        176,
+                        362,
+                        120,
+                        32
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            176,
+                            362,
+                            120,
+                            32
+                          ]
+                        },
+                        {
+                          "type": "Control",
+                          "rect": [
+                            176,
+                            362,
+                            108,
+                            32
+                          ],
+                          "children": [
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                181,
+                                367,
+                                103,
+                                22
+                              ],
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    181,
+                                    367,
+                                    22,
+                                    22
+                                  ]
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    209,
+                                    369,
+                                    75,
+                                    18
+                                  ],
+                                  "variation": "CaptionXB12",
+                                  "text": "Rested today"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    166,
+                    408,
+                    160,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "Dimmed"
+                }
+              ]
+            },
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                0,
+                428,
+                160,
+                68
+              ],
+              "children": [
+                {
+                  "type": "ColorRect",
+                  "rect": [
+                    0,
+                    428,
+                    160,
+                    48
+                  ],
+                  "children": [
+                    {
+                      "type": "UiWorldNameBar",
+                      "rect": [
+                        10,
+                        436,
+                        70,
+                        32
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            10,
+                            436,
+                            70,
+                            32
+                          ]
+                        },
+                        {
+                          "type": "Control",
+                          "rect": [
+                            10,
+                            436,
+                            58,
+                            32
+                          ],
+                          "children": [
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                15,
+                                441,
+                                53,
+                                22
+                              ],
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    15,
+                                    441,
+                                    22,
+                                    22
+                                  ]
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    43,
+                                    443,
+                                    25,
+                                    18
+                                  ],
+                                  "variation": "CaptionXB12",
+                                  "text": "Map"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    0,
+                    482,
+                    160,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "door"
+                }
+              ]
+            },
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                166,
+                428,
+                160,
+                68
+              ],
+              "children": [
+                {
+                  "type": "ColorRect",
+                  "rect": [
+                    166,
+                    428,
+                    160,
+                    48
+                  ],
+                  "children": [
+                    {
+                      "type": "UiWorldNameBar",
+                      "rect": [
+                        176,
+                        436,
+                        72,
+                        32
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            176,
+                            436,
+                            72,
+                            32
+                          ]
+                        },
+                        {
+                          "type": "Control",
+                          "rect": [
+                            176,
+                            436,
+                            63,
+                            32
+                          ],
+                          "children": [
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                181,
+                                441,
+                                94,
+                                22
+                              ],
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    181,
+                                    441,
+                                    22,
+                                    22
+                                  ]
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    209,
+                                    443,
+                                    66,
+                                    18
+                                  ],
+                                  "variation": "CaptionXB12",
+                                  "text": "Workbench"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    166,
+                    482,
+                    160,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "opening 50 %"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            516,
+            328,
+            80
+          ],
+          "children": [
+            {
+              "type": "ColorRect",
+              "rect": [
+                0,
+                516,
+                328,
+                60
+              ],
+              "children": [
+                {
+                  "type": "UiNpcNameTag",
+                  "rect": [
+                    76,
+                    534,
+                    49,
+                    26
+                  ],
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        87,
+                        538,
+                        27,
+                        18
+                      ],
+                      "variation": "CaptionXB12",
+                      "text": "Ama"
+                    }
+                  ]
+                },
+                {
+                  "type": "UiNpcNameTag",
+                  "rect": [
+                    196,
+                    531,
+                    47,
+                    31
+                  ],
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        210,
+                        536,
+                        21,
+                        20
+                      ],
+                      "variation": "CaptionXB12",
+                      "text": "Pip"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                582,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "NPC · Default · Highlight"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
