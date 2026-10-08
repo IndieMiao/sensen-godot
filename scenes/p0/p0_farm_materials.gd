@@ -44,7 +44,7 @@ func _build_spots() -> void:
 	for id in SPOTS:
 		_spots[id] = bp.cell_to_world(bp.anchor(id))
 		farm.add_child(P0SpotArt.build(id, _spots[id]))
-	_bench = bp.cell_to_world(bp.anchor("workbench")) + Vector3(bp.cell_m, 0, 0)
+	_bench = bp.cell_to_world(bp.anchor("workbench"))   # the anchor is the middle of its three cells
 	farm.add_child(P0SpotArt.build("workbench", _bench))
 
 func _exit_tree() -> void:

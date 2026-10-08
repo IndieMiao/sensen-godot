@@ -227,3 +227,18 @@ func test_mine_keys_carry_the_equipped_pickaxe_badge() -> void:
 	v["gear"] = {"slots": {"mining": "pick_copper"}}
 	assert_str(str(P0MaterialLogic.mine_action(v, {"floor": 1, "target": "rock", "rock": 0}).tool)).is_equal("pick_copper")
 	assert_str(str(P0MaterialLogic.mine_entry_action(_view()).tool)).is_equal("pickaxe")
+
+## The gathering spots and the workbench share the yard with other cards' facilities (the rest bench took the
+## workbench's first cell in 2B): no two footprints may overlap, none may cover a plot, all stay in the yard.
+func test_material_footprints_overlap_nothing() -> void:
+	var owner := {}
+	for key in P0Garden.FOOTPRINTS:
+		var r: Rect2i = P0Garden.FOOTPRINTS[key]
+		for x in range(r.position.x, r.end.x):
+			for y in range(r.position.y, r.end.y):
+				var c := Vector2i(x, y)
+				assert_bool(owner.has(c)).override_failure_message("%s overlaps %s at %s" % [key, owner.get(c, ""), c]).is_false()
+				assert_int(P0Garden.id_of(c)).override_failure_message("%s covers a plot at %s" % [key, c]).is_equal(-1)
+				if str(key).begins_with("spot_") or key == "workbench":
+					assert_bool(P0Garden.WALK_RECT.has_point(c)).override_failure_message("%s leaves the yard" % key).is_true()
+				owner[c] = key
