@@ -8,7 +8,9 @@ extends RefCounted
 const TUTORIAL := "req_pond_catch"
 const BEGINNER_POND := "pond_shanghai_05"   # Reed Pond (q(32))
 
-## The eight TipCards of P0 (q(44), TUT-2): one sentence, no button, each shown once.
+## The TipCards of P0 (q(44), TUT-2): one sentence, no button, each shown once. TUT-2's eighth sentence, "Levels unlock
+## gear, fish and seeds…", is the Tip line of the account's first level-up banner (P0Logic.LEVEL_TIP), never a card
+## (q(86); TUT-2 frame note A-03 / TUT-3-10, 不知火舞 on 235-B2).
 const TIPS := {
 	"sow": "Pick a seed, walk up to a plot and press Sow. Hold to keep sowing.",
 	"cast": "Casting uses 5 Energy",
@@ -16,7 +18,6 @@ const TIPS := {
 	"cook": "Tap Cook to grill your first fish",
 	"heat": "Tap when the needle hits gold!",
 	"meal": "Energy comes back over time. A meal brings it back now.",
-	"level": "Levels unlock gear, fish and seeds. Basics never lock.",
 	"map": "Browse the map for free. Travel costs Energy and coins.",
 }
 ## Doing what a tip teaches closes it (q(26)); the other tips wait out their time or a tap.
@@ -28,7 +29,7 @@ static func tip_seconds(text: String) -> float:
 
 ## The tip a moment calls for (TUT-2 sources), or "": the first time the player is on the farm / at a pond / on the
 ## map / at the stove; and from server events, the first cast, the account's first fire, the first meal or the first
-## time Energy runs out, the first level-up.
+## time Energy runs out (the first level-up teaches in its banner instead).
 static func tip_for_surface(surface: String) -> String:
 	return {"farm": "sow", "pond": "creel", "map": "map", "stove": "cook"}.get(surface, "")
 
@@ -39,7 +40,6 @@ static func tip_for_event(ev: Dictionary, before: Dictionary, after: Dictionary)
 		"cast": return "cast"
 		"pot": return "heat" if before.get("cooking", {}).get("first_fire", false) else ""
 		"meal": return "meal" if int(ev.get("gain", 0)) > 0 else ""
-		"level": return "level"
 		"energy": return "meal" if int(ev.get("delta", 0)) < 0 and int(after.get("energy", {}).get("value", 1)) <= 0 else ""
 	return ""
 
