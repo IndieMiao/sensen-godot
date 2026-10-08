@@ -71,6 +71,7 @@
 | Experiment | `From your bag · 2 of 2 slots used`；调味料格带 `Rack` 角标、写仓库实数（如 `Rock Salt 12`，不写 /30，q(46)）；`Not for cooking`（金锦鲤）；`In the pot` |
 | 火候 | `Tap when the needle hits gold!` / `Nice heat! ★` / `Missed · still cooking` / `Perfect! ★★ · Extra portion` |
 | 出锅卡 COOK-4 ★ | 首做 `New recipe!` + 奖励条 `First cooked · +10 Cooking XP · Cookbook 1/48`（只放首做 XP；本锅 XP 照常飘 `+5 Cooking XP ★`，q(55)）/ 重复 `Cooked!` / 失败 `Mystery Dish` + `Hmm… not a dish` + `A clue was added to your Cookbook` + 灰字 `Can't be sold or delivered`（q(55)）/ 退料 `No dish this time` + 名字行 `Ingredients back` + 第二行 `9 left today` + `OK`（q(66)）；按钮只有 `Eat · +45 Energy` / `Keep`，Gift 在 P0 灰；没有 Cook Again 按钮（q(46)、q(48)、q(49)） |
+| Queue ×2 ★ | Cooking Lv5 起、灶在烧且队列空时计时卡次按钮 `Queue next ›`；抽屉主按钮 `Queue`；排队中 `Cooking · Queued 1`，灶台图标钮挂 `+1`（q(71)）。人在厨房时轮转 toast `Grilled Crucian kept · Herb Grilled Fish cooking`；下一锅未知 `Grilled Crucian kept · Unknown dish cooking`；前一锅黑暗料理 `Mystery Dish kept · Herb Grilled Fish cooking`；前一锅新手期退料 `Ingredients back · Herb Grilled Fish cooking`；可叠加如 `Ingredients back · Unknown dish cooking`；人不在厨房不出（q(82)） |
 | Cook Again ★ | 收走后点灶台：`Cook Again` / `Choose recipe ›`，第 2 锅 `Cooks today 2nd` / `Cooking XP Half`（q(48)） |
 | 保温柜 | 名字条 `Warming Cabinet 4/6`（q(62)）/ `Take one` / `Kept · Warming Cabinet 5/6` / `Cabinet full · Herb Grilled Fish sent to bag` / `Cabinet and bag full · dish left on the stove` / `Bag full · dish left on the stove` |
 | Cooking Lv4 之后 Today ★ | `3rd slot open · try Fine fish + Potato + Rock Salt`（q(46)） |
