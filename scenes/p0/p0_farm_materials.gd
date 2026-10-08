@@ -66,7 +66,7 @@ func action(v: Dictionary) -> Dictionary:
 static func flat(a: Vector3, b: Vector3) -> float:
 	return Vector2(a.x - b.x, a.z - b.z).length()
 
-## This helper's finger-card candidates for the farm's P0Garden.pick_card (LOCK-07, one card at a time; the same
+## This helper's candidates for the farm's open name strip (P0Garden.pick_card, LOCK-07 v2: one at a time; the same
 ## rule SGODOT-231 and SGODOT-228 each wrote, kept once in P0Garden): the five spots and the workbench.
 func card_candidates() -> Array:
 	var out: Array = []
@@ -114,23 +114,16 @@ func frame(v: Dictionary, card := "") -> void:
 		_stored_shown = float(v.storage.auto.at)
 		rt.ui.float_text(stored, rt.anchor() + Vector2(0, -36), P0Ui.GREEN_D)
 
-## STATE-ICONS badge over a spot (READY, LOCKED for Clay Bank before Homestead Lv2; a countdown spot shows none) and,
-## when it holds the farm's one finger card, the card (Timber Grove · Tap to gather / · Ready in 2h 10m / Clay Bank ·
-## Homestead Lv2) above the badge. Tapping the card is tapping the spot.
+## World prompts (SGODOT-250, LOCK-07 v2): each gathering spot and the workbench show their icon button within
+## P0WorldPrompts.RANGE — a spot's state (Ready, or Locked for Clay Bank before Homestead Lv2) from anywhere, in the
+## icon's place — and the one holding the farm's open strip (`card`) opens it: `Timber Grove`, `Clay Bank · Homestead
+## Lv2`, `Reed Bank · Ready in 2h 10m`, `Workbench`. A tap on either is the spot's (tap_card, by id).
 func _spot_marks(v: Dictionary, card: String) -> void:
-	var cam: Camera3D = farm.cam
-	var modal := rt.ui.has_modal()
 	for m in P0MaterialLogic.gather_marks(v):
 		var id := str(m.id)
 		var at: Vector3 = _spots.get(id, Vector3.ZERO)
-		var screen := cam.unproject_position(at + Vector3(0, 1.3, 0))
-		var state := UiStatusBadge.State.READY if str(m.badge) == "ready" else UiStatusBadge.State.LOCKED
-		rt.ui.badge(id, state, screen, not modal and str(m.badge) != "countdown")
-		rt.ui.tag(id, str(m.caption), screen - Vector2(0, rt.ui.badge_height(id)), not modal and card == id,
-			cam.unproject_position(at + Vector3(0, 0.6, 0)))
-	var bench_screen := cam.unproject_position(_bench + Vector3(0, 1.4, 0))
-	rt.ui.tag("workbench", "Workbench · Tap to craft", bench_screen,
-		not modal and card == "workbench", cam.unproject_position(_bench + Vector3(0, 0.8, 0)))
+		farm.world_prompt(id, P0WorldPrompts.spot(v, m), at, Vector3(0, 1.3, 0), Vector3(0, 0.6, 0))
+	farm.world_prompt("workbench", P0WorldPrompts.workbench(), _bench, Vector3(0, 1.4, 0), Vector3(0, 0.8, 0))
 
 ## A real tap on the EntryCard (it is passive, so the scene layer's tap arrives here first from p0_tap).
 func tap_entry(screen: Vector2) -> bool:

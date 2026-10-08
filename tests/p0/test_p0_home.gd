@@ -179,45 +179,55 @@ func test_need_material_from_a_shop_or_the_workbench_names_its_own_gap() -> void
 	rt._on_refused("need_material", {"item": "wood", "need": 16, "have": 10}, {"type": "homestead_upgrade"})
 	assert_str(rt.ui._toast.text).is_equal("Need 6 more Timber")   # HOME-1's gap, in tile order
 
-func test_the_sign_card_stays_on_screen_and_its_tap_is_the_sign() -> void:
-	# #12's finger cards clamp themselves inside (Pointer flips inward); a tap on the card goes to the sign.
-	var ui := _ui(_view())
-	await get_tree().process_frame
-	var sign := Vector2(ui.root.size.x - 30, 320)
-	ui.tag("homestead", "Homestead Lv3 · Tap to upgrade", Vector2(ui.root.size.x - 4, 300), true, sign)
-	var c: UiTapCard = ui._cards["homestead"]
-	assert_float(c.position.x + c.size.x).is_less_equal(ui._kit.size.x)
-	ui.tag("homestead", "Homestead Lv3 · Tap to upgrade", Vector2(2, 300), true, sign)
-	assert_float(c.position.x).is_greater_equal(0.0)
-	var hits := []
-	ui.tapped.connect(func(p): hits.append(p))
-	assert_bool(ui._tap_at(c.hit_rect().get_center(), false)).is_true()
-	assert_array(hits).is_equal([sign])
+func test_the_sign_prompt_reads_its_level_and_lights_ready() -> void:
+	# WORLD-HINT-5 (228 64c75e54, SGODOT-250): the house mark, Ready once the Needs are met; open: `Homestead LvN`.
+	var p := P0WorldPrompts.sign(_view())
+	assert_str(p.text).is_equal("Homestead Lv2")
+	assert_str(p.fact).is_empty()
+	assert_int(p.status).is_equal(-1)
+	assert_object(p.icon).is_same(P0Logic.icon("home"))
+	var lit := _view()
+	lit.homestead.next.can_upgrade = true
+	assert_int(P0WorldPrompts.sign(lit).status).is_equal(UiStatusBadge.State.READY)
+	assert_int(P0WorldPrompts.show("sign", "", 30.0, P0WorldPrompts.sign(lit))).is_equal(P0WorldPrompts.Show.ICON)   # Ready from afar
+	assert_int(P0WorldPrompts.show("sign", "", 30.0, p)).is_equal(P0WorldPrompts.Show.NONE)
+	assert_int(P0WorldPrompts.show("sign", "", 7.5, p)).is_equal(P0WorldPrompts.Show.ICON)
+	assert_int(P0WorldPrompts.show("sign", "sign", 2.0, p)).is_equal(P0WorldPrompts.Show.BAR)
 
-func test_the_sign_mark_shows_its_level_and_folds_near() -> void:
-	# WorldBadges · Farm (不知火舞 on SGODOT-228): home mark + "Homestead LvN", Ready when the Needs are met; near, the
-	# caption folds so the finger card can sit right above the mark.
+func test_the_sign_strip_flips_at_the_edge_and_its_tap_is_the_sign() -> void:
+	# A tap on the strip or the button goes to the sign by id, never through the farmhouse's 80 px circle (PR #21 review).
 	var ui := _ui(_view())
 	await get_tree().process_frame
-	ui.badge("homestead", UiStatusBadge.State.AVAILABLE, Vector2(180, 300), true, "Homestead Lv2", P0Logic.icon("home"))
-	var b: UiStatusBadge = ui._badges["homestead"]
-	assert_str(b.caption).is_equal("Homestead Lv2")
-	var tall := ui.badge_height("homestead")
-	ui.badge("homestead", UiStatusBadge.State.READY, Vector2(180, 300), true, "", P0Logic.icon("home"))
-	assert_int(b.state).is_equal(UiStatusBadge.State.READY)
-	assert_float(ui.badge_height("homestead")).is_less(tall)
-func test_a_tap_on_the_sign_mark_or_its_caption_is_the_sign() -> void:
-	# The mark sits above its anchor point and ignores the mouse; the farm asks badge_hit so the tap opens HOME-1
-	# instead of falling through to the farmhouse's 80 px circle.
+	var p := P0WorldPrompts.sign(_view())
+	var a := ui._marker_area()
+	var at := Vector2(a.end.x - 24, a.get_center().y)
+	var sign := at + Vector2(0, 30)
+	ui.name_bar("sign", p.icon, p.text, p.fact, at, true, UiWorldNameBar.Dir.RIGHT, false, p.status, sign)
+	var bar: UiWorldNameBar = ui._name_bars["sign"]
+	assert_int(bar.side).is_equal(UiWorldNameBar.Dir.LEFT)   # no room on the right
+	var seen := []
+	ui.tapped.connect(func(q): seen.append([ui.tapped_card, q]))
+	assert_bool(ui._tap_at(bar.hit_rect().get_center(), false)).is_true()
+	ui.world_icon("plaque", P0Logic.icon("board"), Vector2(120, a.get_center().y), true, false, -1, Vector2(120, 400))
+	assert_bool(ui._tap_at(ui.prompt_rect("plaque").get_center() + Vector2(0, 19), false)).is_true()   # the 44 area, below the disc
+	assert_array(seen).is_equal([["sign", sign], ["plaque", Vector2(120, 400)]])
+
+func test_an_open_strip_folds_a_caption_it_covers() -> void:
+	# 不知火舞 on SGODOT-228 (293b4190), now for every CaptionPill: under an open name strip a mark shows without its caption.
 	var ui := _ui(_view())
 	await get_tree().process_frame
-	ui.badge("homestead", UiStatusBadge.State.AVAILABLE, Vector2(240, 320), true, "Homestead Lv2", P0Logic.icon("home"))
-	await get_tree().process_frame
-	var b: UiStatusBadge = ui._badges["homestead"]
-	var r := Rect2(b.global_position - ui.root.global_position, b.size)
-	assert_bool(ui.badge_hit("homestead", r.position + Vector2(r.size.x * 0.5, 6))).is_true()        # the round mark
-	assert_bool(ui.badge_hit("homestead", r.end - Vector2(r.size.x * 0.5, 4))).is_true()               # the caption
-	assert_bool(ui.badge_hit("homestead", r.position - Vector2(0, 30))).is_false()
+	var a := ui._marker_area()
+	var at := Vector2(a.position.x + 60, a.get_center().y)
+	ui.badge("mine", UiStatusBadge.State.AVAILABLE, at + Vector2(40, 30), true, "Floor 1 · 2 runs left", P0Logic.icon("pickaxe"))
+	var b: UiStatusBadge = ui._badges["mine"]
+	assert_str(b.caption).is_equal("Floor 1 · 2 runs left")
+	ui.name_bar("workbench", P0Logic.icon("workbench"), "Workbench", "", at, true)
+	ui.badge("mine", UiStatusBadge.State.AVAILABLE, at + Vector2(40, 30), true, "Floor 1 · 2 runs left", P0Logic.icon("pickaxe"))
+	assert_str(b.caption).is_empty()
+	ui.world_icon("workbench", P0Logic.icon("workbench"), at, true)   # folds
+	await get_tree().create_timer(0.3).timeout
+	ui.badge("mine", UiStatusBadge.State.AVAILABLE, at + Vector2(40, 30), true, "Floor 1 · 2 runs left", P0Logic.icon("pickaxe"))
+	assert_str(b.caption).is_equal("Floor 1 · 2 runs left")
 
 func test_one_finger_card_the_nearest_in_reach_and_it_does_not_flicker() -> void:
 	# LOCK-07: near both the sign and the stall only one card shows; the showing card keeps it inside CARD_KEEP.
@@ -226,20 +236,6 @@ func test_one_finger_card_the_nearest_in_reach_and_it_does_not_flicker() -> void
 	assert_str(P0Garden.pick_card(cands, Vector3(8.5, 0, -9.7), "sign")).is_equal("sign")    # stall barely nearer: keep
 	assert_str(P0Garden.pick_card(cands, Vector3(9.3, 0, -9.9), "sign")).is_equal("stall")   # clearly nearer: switch
 	assert_str(P0Garden.pick_card(cands, Vector3(20, 0, 0), "stall")).is_equal("")           # out of every reach
-
-func test_a_card_slides_off_another_mark_and_keeps_pointing_at_its_facility() -> void:
-	# 不知火舞 on SGODOT-228 (293b4190): the plaque's card never covers the sign's mark; it moves sideways, ≥ 8 px clear,
-	# and its pointer stays on the plaque.
-	var ui := _ui(_view())
-	await get_tree().process_frame
-	var plaque := Vector2(160, 330)
-	ui.tag("plaque", "Upgrade Plaque · Tap to read", plaque - Vector2(0, 30), true, plaque)
-	var c: UiTapCard = ui._cards["plaque"]
-	var mark := Rect2(Vector2(c.position.x + c.size.x - 30, c.position.y + 10), Vector2(28, 28))   # under the card's right end
-	assert_bool(ui.slide_card_off("plaque", mark)).is_true()
-	assert_float(mark.position.x - (c.position.x + c.size.x)).is_greater_equal(8.0 - 0.01)
-	assert_float(c.position.x + c.pointer_tip_x()).is_equal_approx(plaque.x, 1.0)
-	assert_bool(ui.slide_card_off("plaque", Rect2(Vector2(340, 700), Vector2(10, 10)))).is_false()   # nothing to clear
 
 func test_a_card_tap_names_its_card_while_the_world_handles_it() -> void:
 	# PR #21 review: the farmhouse card's point can sit under the sign's caption, so the world dispatches card taps by

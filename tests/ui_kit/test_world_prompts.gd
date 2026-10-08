@@ -65,6 +65,7 @@ func test_name_bar_reads_icon_name_fact_and_keeps_the_icon_on_its_anchor() -> vo
 	await await_idle_frame()
 	var shown_left := bar._row.get_children().filter(func(c): return (c as Control).visible)
 	assert_object(shown_left[shown_left.size() - 1]).is_same(bar._glyph)   # icon last, text to its left
+	assert_array(shown_left.slice(0, 3).map(func(c): return (c as Label).text)).is_equal(["Stove 1/1", "·", "Empty"])   # still reads name · fact
 	assert_float(bar._glyph.get_global_rect().get_center().x).is_equal_approx(120.0, 0.5)
 	assert_float(bar.get_global_rect().end.x).is_equal_approx(120.0 + 16.0, 0.5)
 

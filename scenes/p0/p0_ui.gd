@@ -780,6 +780,12 @@ func name_bar(id: String, icon: Texture2D, text: String, fact: String, screen: V
 	bar.dimmed = dimmed
 	bar.status = status
 	bar.side = _name_bar_side(bar, screen, UiWorldNameBar.Dir.RIGHT if side < 0 else side)
+	# Over an NPC's name tag it opens the other way, if that side is clear and fits (#57, 不知火舞); covering tags on
+	# both sides fade while it is open (npc_tag).
+	var other := UiWorldNameBar.Dir.LEFT if bar.side == UiWorldNameBar.Dir.RIGHT else UiWorldNameBar.Dir.RIGHT
+	if _covers_npc_tag(bar.rect_for(screen, bar.side)) and not _covers_npc_tag(bar.rect_for(screen, other)) \
+			and _name_bar_side(bar, screen, other) == other:
+		bar.side = other
 	bar.anchor_at(screen)
 	var b: UiWorldIconButton = _icons.get(id)
 	if b: b.visible = false   # the strip stands in for its button
@@ -795,7 +801,8 @@ func name_bar(id: String, icon: Texture2D, text: String, fact: String, screen: V
 func _raise_marker(m: Control) -> void:
 	var top := m.get_index()
 	for group in [_cards, _badges, _icons, _name_bars, _npc_tags]:
-		for other in group.values(): top = maxi(top, (other as Node).get_index())
+		for other in group.values():
+			if (other as Node).get_parent() == _kit: top = maxi(top, (other as Node).get_index())
 	if top > m.get_index(): _kit.move_child(m, top)
 
 func _fold_name_bar(bar: UiWorldNameBar) -> void:
@@ -809,6 +816,13 @@ func _fold_name_bar(bar: UiWorldNameBar) -> void:
 	if bar.openness() <= 0.0 or not bar.is_inside_tree(): done.call()
 	else: get_tree().create_timer(UiKit.secs(170.0)).timeout.connect(done)
 
+## A shown world prompt's touch rect (its open strip, else its icon button) in global coordinates; empty when neither shows.
+func prompt_rect(id: String) -> Rect2:
+	for markers in [_name_bars, _icons]:
+		var m: Control = markers.get(id)
+		if m != null and m.is_visible_in_tree() and not m.get_meta("folding", false): return m.hit_rect()
+	return Rect2()
+
 ## The wanted side unless the strip would leave the marker band there; then the other one (贴边翻转).
 func _name_bar_side(bar: UiWorldNameBar, screen: Vector2, want: int) -> int:
 	var area := _marker_area()
@@ -818,8 +832,11 @@ func _name_bar_side(bar: UiWorldNameBar, screen: Vector2, want: int) -> int:
 	return want
 
 ## An interactable NPC's name over its head (NpcNameTag 1674:101195): the name only; `highlight` when nearest within
-## reach or in a conversation. Display only — the NPC itself takes the tap.
-func npc_tag(id: String, text: String, head_screen: Vector2, show: bool, highlight := false) -> void:
+## reach. `talking`: this NPC is the one speaking in the keeper greeting card or the resident dialogue bar — its tag
+## stays up and highlighted over that card while every other tag and icon button hides (NPC-G1, #57); under any other
+## card or drawer all tags hide. A tag an open name strip covers fades out until the strip folds (#57). Display only —
+## the NPC itself takes the tap.
+func npc_tag(id: String, text: String, head_screen: Vector2, show: bool, highlight := false, talking := false) -> void:
 	var t: UiNpcNameTag = _npc_tags.get(id)
 	if t == null:
 		t = UiNpcNameTag.new()
@@ -827,11 +844,43 @@ func npc_tag(id: String, text: String, head_screen: Vector2, show: bool, highlig
 		_kit.add_child(t)
 		_kit.move_child(t, 0)
 		_npc_tags[id] = t
-	t.visible = show and _modal == null and _marker_area().has_point(head_screen)
+	var over := talking and _modal != null and modal_kind in ["greeting", "resident"]
+	# The speaker's tag sits over the card's veil (NPC-G1: it keeps its primary edge); otherwise back among the markers.
+	if over and t.get_parent() != root:
+		t.reparent(root)
+		root.move_child(t, -1)
+	elif not over and t.get_parent() != _kit:
+		t.reparent(_kit)
+		_kit.move_child(t, 0)
+	t.visible = show and (_modal == null or over) and _marker_area().has_point(head_screen)
 	if not t.visible: return
 	t.text = text
-	t.highlight = highlight
+	t.highlight = highlight or talking
 	t.place_over(head_screen)
+	_yield_tag(t, _modal == null and _strip_covers(Rect2(t.position, t.size)))
+
+## Fade a name tag out while an open strip covers it, back in once it folds (120 ms).
+func _yield_tag(t: UiNpcNameTag, covered: bool) -> void:
+	if bool(t.get_meta("covered", false)) == covered: return
+	t.set_meta("covered", covered)
+	var tw := t.create_tween()
+	tw.tween_property(t, "modulate:a", 0.0 if covered else 1.0, UiKit.secs(120.0))
+
+## Rects (this UI's coordinates) of the name strips open or opening now.
+func _open_strips() -> Array[Rect2]:
+	var out: Array[Rect2] = []
+	for bar in _name_bars.values():
+		if (bar as UiWorldNameBar).visible and not bar.get_meta("folding", false): out.append((bar as UiWorldNameBar).full_rect())
+	return out
+
+func _strip_covers(r: Rect2) -> bool:
+	return _open_strips().any(func(s: Rect2): return s.grow(UiTokens.SPACE_ROW).intersects(r))
+
+func _covers_npc_tag(strip: Rect2) -> bool:
+	for t in _npc_tags.values():
+		var tag := t as UiNpcNameTag
+		if tag.visible and strip.grow(UiTokens.SPACE_ROW).intersects(Rect2(tag.position, tag.size)): return true
+	return false
 
 ## Facility / resident state mark (StatusBadge 1132:79554, STATE-ICONS): display only, the facility takes the tap.
 ## A scene tap: on a shown finger card it is that facility's tap, elsewhere the world's (also a double tap: a card
@@ -875,46 +924,15 @@ func badge(id: String, state: UiStatusBadge.State, screen: Vector2, show: bool, 
 	b.caption = caption
 	b.icon = icon
 	_place_marker(b, screen, false)
+	# 228 293b4190, for every CaptionPill: an open name strip over a mark's caption folds it to the mark while it shows.
+	if caption != "" and b.visible and _strip_covers(Rect2(b.position, b.size)):
+		b.caption = ""
+		_place_marker(b, screen, false)
 
 ## Height a shown badge takes over `screen`, so a finger card over the same facility can sit above it.
 func badge_height(id: String) -> float:
 	var b: UiStatusBadge = _badges.get(id)
 	return b.get_combined_minimum_size().y + _BADGE_CARD_GAP if b and b.visible else 0.0
-
-## True when a scene tap lands on a shown badge (with its caption): badges ignore the mouse, so the facility that
-## owns one tests this to treat a tap on its mark as its own (StatusBadge: tapping the badge = tapping the object).
-func badge_hit(id: String, screen: Vector2) -> bool:
-	var r := badge_rect(id)
-	return r.has_area() and r.grow(4).has_point(screen)
-
-## Slide a shown finger card sideways off `avoid` (another facility's mark), keeping `gap` px between them; the
-## pointer stays on its facility (TapCard Pointer=Left / Right), and the card stays on screen. Returns whether it moved.
-## TODO(亚瑟, world controls): 不知火舞's general rule for marks under cards (SGODOT-228 293b4190) replaces this.
-func slide_card_off(id: String, avoid: Rect2, gap := 8.0) -> bool:
-	var c: UiTapCard = _cards.get(id)
-	if c == null or not c.is_visible_in_tree() or not avoid.has_area(): return false
-	var r := Rect2(c.position, c.size)
-	if not r.grow(gap).intersects(avoid): return false
-	var left := avoid.position.x - gap - r.end.x     # move this much (negative) to clear on the left
-	var right := avoid.end.x + gap - r.position.x    # or this much to clear on the right
-	var dx := left if absf(left) <= absf(right) else right
-	var inner := Rect2(Vector2.ZERO, _kit.size).grow(-UiTokens.SPACE_WITHIN)
-	var x := clampf(r.position.x + dx, inner.position.x, inner.end.x - r.size.x)
-	if is_equal_approx(x, r.position.x): return false
-	var aim: float = (_card_hits.get(id, r.get_center()) as Vector2).x
-	c.position.x = x
-	c.point_at(aim - x)
-	return true
-
-## A shown finger card's rect in root coordinates; empty when hidden.
-func card_rect(id: String) -> Rect2:
-	var c: UiTapCard = _cards.get(id)
-	return Rect2(c.global_position - root.global_position, c.size) if c != null and c.is_visible_in_tree() else Rect2()
-
-## A shown badge's rect (with its caption) in root coordinates; empty when hidden.
-func badge_rect(id: String) -> Rect2:
-	var b: UiStatusBadge = _badges.get(id)
-	return Rect2(b.global_position - root.global_position, b.size) if b != null and b.is_visible_in_tree() else Rect2()
 
 ## Finger cards stay on screen (their facility is near, so on screen); a badge over an off-screen facility hides.
 func _place_marker(m: Control, screen: Vector2, clamp_inside: bool) -> void:

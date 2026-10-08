@@ -100,3 +100,60 @@ func test_the_open_name_bar_draws_over_badges_and_icon_buttons() -> void:
 	assert_object(ui._bar.get_parent()).is_same(bar.get_parent())
 	assert_int(bar.get_index()).is_less(ui._bar.get_index())   # still under the quick bar and the rest of the UI
 
+
+## #57 (不知火舞): an open strip over an NPC's name tag opens the other way when that side is clear.
+func test_a_strip_over_a_name_tag_opens_the_other_way() -> void:
+	var at := _mid()
+	ui.npc_tag("ama", "Ama", at + Vector2(70, 10), true)
+	ui.name_bar("stall", HOME, "Homestead Stall", "", at, true, UiWorldNameBar.Dir.RIGHT)
+	assert_int(ui._name_bars.stall.side).is_equal(UiWorldNameBar.Dir.LEFT)
+	ui.name_bar("cabinet", HOME, "Warming Cabinet", "", at + Vector2(0, 120), true, UiWorldNameBar.Dir.RIGHT)
+	assert_int(ui._name_bars.cabinet.side).is_equal(UiWorldNameBar.Dir.RIGHT)   # nothing in the way
+
+## #57: covered on both sides, the tag under the strip fades while it is open and comes back once it folds.
+func test_a_name_tag_the_strip_covers_fades_until_it_folds() -> void:
+	var at := _mid()
+	var tags := func():
+		ui.npc_tag("ama", "Ama", at + Vector2(60, 10), true)
+		ui.npc_tag("pip", "Pip", at + Vector2(-60, 10), true)
+	tags.call()
+	ui.name_bar("stall", HOME, "Homestead Stall", "", at, true, UiWorldNameBar.Dir.RIGHT)
+	assert_int(ui._name_bars.stall.side).is_equal(UiWorldNameBar.Dir.RIGHT)   # both sides covered: keeps its side
+	tags.call()
+	await get_tree().create_timer(0.2).timeout
+	assert_float(ui._npc_tags.ama.modulate.a).is_equal_approx(0.0, 0.01)
+	assert_float(ui._npc_tags.pip.modulate.a).is_equal_approx(1.0, 0.01)
+	ui.world_icon("stall", HOME, at, true)   # another facility is nearest: the strip folds
+	await get_tree().create_timer(0.3).timeout
+	tags.call()
+	await get_tree().create_timer(0.2).timeout
+	assert_float(ui._npc_tags.ama.modulate.a).is_equal_approx(1.0, 0.01)
+
+## #57 / NPC-G1: in the greeting card or the dialogue bar the speaker's tag stays, highlighted, over the veil; other
+## tags and icon buttons hide; under any other card or drawer every tag hides.
+func test_the_speakers_tag_stays_over_the_conversation() -> void:
+	var at := _mid()
+	var frame := func(talking: bool):
+		ui.npc_tag("ama", "Ama", at, true, false, talking)
+		ui.npc_tag("pip", "Pip", at + Vector2(90, 0), true)
+		ui.world_icon("seat", HOME, at + Vector2(0, 80), true, true)
+	frame.call(false)
+	ui._open_modal(Control.new())   # the keeper greeting card (2A, #56) as P0Ui opens it
+	ui.modal_kind = "greeting"
+	frame.call(true)
+	var ama: UiNpcNameTag = ui._npc_tags.ama
+	assert_bool(ama.visible).is_true()
+	assert_bool(ama.highlight).is_true()
+	assert_object(ama.get_parent()).is_same(ui.root)
+	assert_int(ama.get_index()).is_greater(ui._modal.get_index())   # over the card's veil
+	assert_bool(ui._npc_tags.pip.visible).is_false()
+	assert_bool(ui._icons.seat.visible).is_false()
+	ui.close_modal()
+	ui.open_inbox()
+	frame.call(true)
+	assert_bool(ama.visible).is_false()
+	ui.close_modal()
+	frame.call(false)
+	assert_bool(ama.visible).is_true()
+	assert_bool(ama.highlight).is_false()
+	assert_object(ama.get_parent()).is_same(ui._kit)

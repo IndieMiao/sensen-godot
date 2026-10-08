@@ -99,6 +99,16 @@ func anchor_at(icon_center: Vector2) -> void:
 ## Fully open width (the pill's natural size).
 func full_width() -> float: return _PAD_ICON + _row.get_combined_minimum_size().x + _PAD_TEXT
 
+## Where the fully open strip sits for `dir` with its icon on `icon_center` (parent coordinates): the host tests it
+## against NPC name tags and captions before it opens (the yield rules, 228 293b4190 / #57).
+func rect_for(icon_center: Vector2, dir: Dir) -> Rect2:
+	var full := full_width()
+	var off := _PAD_ICON + _ICON * 0.5
+	return Rect2(icon_center.x - off if dir == Dir.RIGHT else icon_center.x + off - full, icon_center.y - _H * 0.5, full, _H)
+
+## The open strip's full extent where it is anchored now.
+func full_rect() -> Rect2: return rect_for(_anchor, side)
+
 ## Width when folded: just the icon with its padding.
 func folded_width() -> float: return _PAD_ICON * 2.0 + _ICON
 
@@ -151,8 +161,8 @@ func _rebuild() -> void:
 	_badge_holder.visible = status >= 0
 	_dot.visible = fact != ""
 	_fact.visible = fact != ""
-	var order: Array[Control] = [_glyph, _badge_holder, _name, _dot, _fact]
-	if not right: order.reverse()
+	# Left keeps the reading order (name · fact) and moves the icon to the end, next to the button's spot.
+	var order: Array = [_glyph, _badge_holder, _name, _dot, _fact] if right else [_name, _dot, _fact, _badge_holder, _glyph]
 	for i in order.size(): _row.move_child(order[i], i)
 	_layout()
 
