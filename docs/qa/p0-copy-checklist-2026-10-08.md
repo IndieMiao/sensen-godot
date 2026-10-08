@@ -56,6 +56,7 @@
 | 主行动键 · Fishing ★ | `Cast · 5 Energy`（离岸远也是这句，q(44)）/ 途中 `Cast · On the way`（不灰显）/ 灰 `Cast · Creel full` / 灰 `Fishing · No water nearby` |
 | 鱼篓角标 | `Creel 7 · 6 free` / 满 `Creel full · 0 free slots · Sell or cook first`（只在角标与 toast） |
 | 鱼饵用完 ★ | toast `Out of Worm Bait · no bait on the hook`（q(44)） |
+| 挂上 / 取下鱼饵 ★ | 点快捷栏饵格 toast `Worm Bait on the hook · used at the bite`，再点取下 `No bait`；首次升级横幅按 `Use bait` 也出挂上那句（在水边选中饵格并闪一次，不在水边只挂上留到下一竿），不跳转（q(77)） |
 | 钓获卡（首次） | `Caught!` / `Pond Crucian · Common` / `Fish-dex 3/N` / `First catch! +15 XP` / `New city! +10 XP` |
 | 逃走 ★ | 保护期内 `It got away · Energy refunded (9 left today)` / 保护期外 `It got away · 3 Energy back`（q(49)，不写 `protected left`） |
 | 挣脱 ★ | 卡 `Too strong` / `Fishing Lv4 needed · You: Lv3 · 30 XP to go` / `+3 Energy back`，无按钮；末行写实退：保护期内 `Energy refunded (8 left today)`，保护期外 `+3 Energy back`（q(55)）；第二次起飘字 `Got away · Lv4 · Energy refunded (8 left today)` / `Got away · Lv4 · 3 Energy back`（q(50)）；鱼竿不够 `Too heavy for your rod` / `Reed Rod · Fishing Lv3 · 80 coins` |
@@ -139,6 +140,7 @@
 | 离线时按钮 | 命令按钮灰 `Offline`；主行动键如 `Sow · Offline` |
 | 维护卡 SYS-MAINT | `Down for maintenance` / `We'll be back around 14:30.`（设备本地时间、24 小时制；★ 结束时刻不在今天写 `We'll be back around Oct 10, 14:30.`）/ `We'll be back soon.`（没有预计时间或已过时）/ `Check again`（q(74)） |
 | 强制更新卡 SYS-UPDATE | `Update to keep playing` / `This version is out of date.` / `Update`；两张卡都没有关闭按钮（q(74)） |
+| 换场景加载 ★ | 加载画面写目的地位置芯片文字（如 `Shanghai · Willow Pond`），8 秒后加 `Taking longer than usual…`；打不开时卡片 `Couldn't get there` / `Check your connection and try again.` / 主按钮 `Retry` / 次按钮 `Go back`（q(78)） |
 | 世界动作失败 | P0 只出横幅 `Didn't go through · try again`，**不出** toast `3 plots not sown · Energy returned`（P0 世界动作没有本地投影，那句 toast 留给以后有投影的版本，q(75)） |
 | 去重与 stale_state | 不出任何提示 |
 | 启动与账号 | `When were you born?` / `Pick your birthday` / `Continue` / `Before you start` / `Agree to continue` / `Terms of Service ›` / `Privacy Policy ›` / `Continue with Apple` / `Continue with Google` / `Continue with Email` / `Taking longer than usual…` / `Can't connect` / `That name isn't allowed` / `Try another name`（WP6，SGODOT-206） |
