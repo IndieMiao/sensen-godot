@@ -97,6 +97,9 @@ var surface := "farm"
 var can_show_spot := Callable()
 ## The resident id within reach in an outpost, "" elsewhere (the runtime asks the world's p0_near_resident).
 var near_resident := Callable()
+## Where the player is (the session's space: home = the farm and the farmhouse, pond, outpost, mine, map); set by
+## the runtime on every attach. "" without a runtime (tests, the gallery): space_here() then goes by the surface.
+var space := ""
 var _hud_world := true   # set_surface: the map has no HUD
 var _hud_hash := 0       # last state given to hud.apply
 var _hud_need := -1      # main action's Energy need last seen by the HUD
@@ -845,9 +848,21 @@ func close_top_layer() -> bool:
 		_radial.close()
 		return true
 	if _modal != null:
-		close_modal()
+		back_modal()
 		return true
 	return false
+
+## What Back and a scrim tap do to the open layer: its own way back when it has one (a layer opened from the
+## resident bar returns to the bar, as its own Close does), else close it (亚瑟 on #37).
+var _modal_back := Callable()
+
+func back_modal() -> void:
+	if _modal_back.is_valid():
+		var back := _modal_back
+		_modal_back = Callable()
+		back.call()
+	else:
+		close_modal()
 
 ## A world change ends the stick: a finger still down when the farmhouse door took the player in never sends its
 ## release to this pad (int5 hand test 029–030), so its ring would stay and the old world keep walking.
@@ -888,6 +903,7 @@ func queue_card(show: Callable) -> void:
 	else: _card_queue.append(show)
 
 func _drop_modal() -> void:
+	_modal_back = Callable()   # each layer sets its own way back after it opens
 	_bag_drag_end()   # a bag cell lifted toward the bar goes with its drawer
 	undock_bar()   # before the drawer holding it goes (SGODOT-225)
 	if _modal: _modal.queue_free()
@@ -906,7 +922,7 @@ func _open_modal(content: Control, dim := 0.32, hide_controls := false) -> void:
 	veil.set_anchors_preset(Control.PRESET_FULL_RECT)
 	veil.color = Color(0.184, 0.227, 0.2, dim)
 	veil.gui_input.connect(func(e: InputEvent):
-		if P0Ui.is_tap(e): close_modal())
+		if P0Ui.is_tap(e): back_modal())
 	var holder := Control.new()
 	holder.set_anchors_preset(Control.PRESET_FULL_RECT)
 	holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -974,7 +990,7 @@ func open_bag(focus := "", side := "") -> void:
 	var d := P0BagDrawer.new(view, bag_side, focus)
 	d.theme = UiKit.theme()
 	d.safe_bottom = safe_bottom()
-	d.place = "pond" if surface in ["pond", "busy"] else "home"
+	d.place = space_here()   # home only at the homestead: an outpost room is a room, not home (亚瑟 on #37)
 	d.set_gear_slot(gear_slot)
 	d.close_requested.connect(close_modal)
 	d.side_changed.connect(func(s: String):
@@ -1091,7 +1107,7 @@ func _bag_action(action: StringName, id: String, payload: Dictionary) -> void:
 	match action:
 		&"bag_room":   # BAG-5: Bag Upgrade I is a homestead matter; Show the house (or the homestead on the map)
 			close_modal()
-			if show_label("home", surface, spot_reachable()) == "Show": show_spot.emit("home")
+			if show_label("home", space_here(), spot_reachable()) == "Show": show_spot.emit("home")
 			else: show_on_map.emit("home")
 		&"eat":
 			var confirm := str(P0Logic.eat_button(view, id).get("confirm", ""))
@@ -1107,9 +1123,9 @@ func _bag_action(action: StringName, id: String, payload: Dictionary) -> void:
 		&"lock", &"unlock":   # the title-area lock icon (F-07); Sell All skips locked items (SGODOT-228)
 			command.emit({"type": String(action), "item": id})
 		&"store":             # farm storage (SGODOT-228 store / take_out); the card shows Store only at home
-			command.emit({"type": "store", "item": id, "qty": payload.get("qty", "all")})
+			if space_here() == "home": command.emit({"type": "store", "item": id, "qty": payload.get("qty", "all")})
 		&"take_out":          # a Farm Storage stack's card: Take 10 / Take all (payload qty 10 or "all")
-			command.emit({"type": "take_out", "item": id, "qty": payload.get("qty", "all")})
+			if space_here() == "home": command.emit({"type": "take_out", "item": id, "qty": payload.get("qty", "all")})
 		&"gift":   # a dish's `Gift to <Name>` (不知火舞 on 225): that resident's gift drawer with this dish selected
 			var near := near_resident_info()
 			if P0ItemInfo.kind_of(view, id) != "dish" or near.is_empty() or bool(near.gifted_today): return
@@ -1397,7 +1413,7 @@ func open_energy_card(need: int, verb: String) -> void:
 	card.tile_pressed.connect(func(go: String):
 		close_modal()
 		if go == "bag": open_bag()
-		elif show_label(go, surface, spot_reachable()) == "Show": show_spot.emit(go)
+		elif show_label(go, space_here(), spot_reachable()) == "Show": show_spot.emit(go)
 		else: show_on_map.emit(map_target(go)))   # Tea's outpost, or home from the pond
 	var center := CenterContainer.new()
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -1553,7 +1569,7 @@ func open_today() -> void:
 	var shown := rows.map(func(r):
 		var d: Dictionary = r.duplicate()
 		d.icon = P0Logic.icon(str(r.icon))
-		d.action = show_label(str(r.go), surface, spot_reachable())
+		d.action = show_label(str(r.go), space_here(), spot_reachable())
 		return d)
 	var panel := UiTodayPanel.new(shown)
 	panel.theme = UiKit.theme()
@@ -1561,7 +1577,7 @@ func open_today() -> void:
 	panel.show_pressed.connect(func(i: int):
 		close_modal()
 		var go := str(rows[i].go)
-		if show_label(go, surface, spot_reachable()) == "Show": show_spot.emit(go)
+		if show_label(go, space_here(), spot_reachable()) == "Show": show_spot.emit(go)
 		else: show_on_map.emit(map_target(go)))
 	_open_modal(panel, 0.0)
 	modal_kind = "today"
@@ -1573,9 +1589,16 @@ const HOME_TARGETS := ["plots", "stall", "stove", "board", "home", "bench"]
 
 static func show_label(go: String, here: String, camera_here: bool) -> String:
 	if go == "": return ""
-	var on_farm := go in HOME_TARGETS
-	if on_farm and here == "farm": return "Show" if camera_here else ""
+	# The homestead is one space: on the farm or in the farmhouse a farm target is Show (the runtime steps out of the
+	# farmhouse first); anywhere else it is Show on map (亚瑟 on #37: the farmhouse used to send it to the map).
+	if go in HOME_TARGETS and here in ["home", "farm"]: return "Show" if camera_here else ""
 	return "Show on map"
+
+## Where the player is for Show and the bag: the runtime's space; without one (tests, the gallery) the surface says
+## (farm and room count as home there).
+func space_here() -> String:
+	if space != "": return space
+	return "home" if surface in ["farm", "room"] else ("pond" if surface == "busy" else surface)
 
 ## The map pin for a target elsewhere: the homestead for farm targets, else the target itself.
 static func map_target(go: String) -> String:
@@ -1664,9 +1687,18 @@ func _show_resident(d: Dictionary) -> void:
 	bar.gift_pressed.connect(func(): open_gift(id))
 	bar.request_pressed.connect(func(): open_resident_request(id))
 	bar.identity_pressed.connect(func(): open_resident_profile(id))
+	bar.meal_pressed.connect(func(): _open_todays_meal(id))   # lesson_pressed: P0 has no lessons (lesson is always false)
 	_open_modal(bar, 0.0, true)
 	_close_above(bar, _CLOSE_ABOVE_CARD)
 	modal_kind = "resident"
+
+## Today's meal on the bar (§3.4.5): the dish they gave today, its card open in the bag; the Inbox when it waits there
+## because the bag was full. The bar only offers it while the meal is still there (P0Logic.gift_meal).
+func _open_todays_meal(id: String) -> void:
+	var meal := P0Logic.gift_meal(view, id)
+	match str(meal.get("at", "")):
+		"bag": open_bag(str(meal.item), "bag")
+		"inbox": open_inbox()
 
 ## The name on the bar: the resident's profile sheet (RES-PIP / RES-KAI). Back returns to the bar.
 func open_resident_profile(id: String) -> void:
@@ -1684,6 +1716,7 @@ func open_resident_profile(id: String) -> void:
 	_open_modal(sheet, UiTokens.OPACITY_SCRIM_DRAWER, true)
 	_close_above(sheet, _CLOSE_ABOVE_SHEET, UiTokens.SPACE_PAGE)
 	modal_kind = "resident_profile"
+	_modal_back = func(): open_resident(id)   # Android Back = the sheet's Back
 
 ## The open (not yet accepted) request's own line, e.g. Pip's `Could you catch me a fish? Any kind is fine.`; ""
 ## when the resident has no open request.
@@ -1755,6 +1788,7 @@ func open_resident_request(id: String) -> void:
 	card.dismissed.connect(func(): open_resident(id))
 	_open_modal(card, 0.0, true)
 	modal_kind = "resident_request"
+	_modal_back = func(): open_resident(id)
 
 ## ResidentRequestCard data from the resident's open request (content table + view facts).
 static func _request_card_data(view_: Dictionary, id: String, bar: Dictionary) -> Dictionary:
@@ -1798,6 +1832,7 @@ func open_gift(id: String, item := "") -> void:
 	var def: Dictionary = P0Logic.content().get("residents", {}).get(id, {})
 	var likes := str(def.get("likes", ""))
 	var d := P0BagDrawer.new(view, "bag", item, {"kind": "resident", "id": id, "name": str(def.get("name", "")),
+		"gifted_today": bool(view.get("residents", {}).get(id, {}).get("gift_today", false)),
 		"likes": ("Likes %s · 1 gift a day" % likes) if likes != "" else "1 gift a day"})
 	d.theme = UiKit.theme()
 	d.safe_bottom = safe_bottom()
@@ -1809,6 +1844,7 @@ func open_gift(id: String, item := "") -> void:
 	_open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
 	_bag = d
 	modal_kind = "gift"
+	_modal_back = func(): open_resident(id)
 
 ## Own profile (SGODOT-225; PROFILE-1-P0, LOCK-22), opened from the HUD avatar. A skill ring opens the skill
 ## details; Edit look opens the dressing room above the current world and comes back here.

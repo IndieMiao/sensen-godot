@@ -218,8 +218,9 @@ func test_bag_dish_gift_goes_to_the_resident_within_reach() -> void:
 	bag.unavailable_requested.emit(&"gift", "dish_grilled_crucian", "Gift to a resident")
 	assert_str(ui._toast.text).is_equal("Find a resident at an outpost to gift this dish")
 	assert_str(ui.modal_kind).is_equal("bag")
+	ui._toast.text = ""
 	bag.unavailable_requested.emit(&"gift", "fish_crucian", "Gift · Mutual friends only")   # fish: no resident Toast
-	assert_str(ui._toast.text).is_equal("Find a resident at an outpost to gift this dish")
+	assert_str(ui._toast.text).is_equal("")
 	ui.close_modal()
 	await get_tree().process_frame
 	near[0] = "res_pip"
@@ -232,6 +233,69 @@ func test_bag_dish_gift_goes_to_the_resident_within_reach() -> void:
 	var gift: P0BagDrawer = ui.find_children("*", "P0BagDrawer", true, false).filter(func(d): return not d.is_queued_for_deletion())[0]
 	assert_str(str(gift.gift_to.id)).is_equal("res_pip")
 	assert_str(gift.grid.selected_id).is_equal("dish_grilled_crucian")
+
+## 亚瑟 on #37: the homestead is one space (farm or farmhouse) for Show; an outpost room is not home for the bag.
+func test_show_and_the_bag_go_by_the_space_not_the_surface() -> void:
+	assert_str(P0Ui.show_label("plots", "home", true)).is_equal("Show")        # in the farmhouse: steps out, then Show
+	assert_str(P0Ui.show_label("stove", "home", true)).is_equal("Show")
+	assert_str(P0Ui.show_label("plots", "outpost", true)).is_equal("Show on map")
+	var ui := _ui(true)
+	ui.set_surface("room")
+	ui.space = "outpost"
+	assert_str(ui.space_here()).is_equal("outpost")
+	ui.open_bag()
+	var bag: P0BagDrawer = ui.find_children("*", "P0BagDrawer", true, false)[0]
+	assert_str(bag.place).is_equal("outpost")
+	var sent := []
+	ui.command.connect(func(c: Dictionary): sent.append(c))
+	ui._bag_action(&"store", "crop_radish", {})
+	ui._bag_action(&"take_out", "crop_radish", {})
+	assert_array(sent).is_empty()   # Farm Storage only at home
+	ui.space = "home"
+	ui._bag_action(&"store", "crop_radish", {})
+	assert_str(str(sent.back().type)).is_equal("store")
+
+## Today's meal on the bar (亚瑟 on #37): only while the meal is there; it opens the bag on it or the Inbox.
+func test_todays_meal_opens_where_the_meal_is() -> void:
+	var v := _resident_view()
+	v.residents.res_pip["meal"] = "given"
+	assert_bool(P0Logic.resident_bar(v, "res_pip").meal).is_false()   # given, then eaten: no button
+	v.bag.slots.append({"id": "dish_carrot_cake", "qty": 1, "gifted": true, "from": "res_pip"})
+	assert_dict(P0Logic.gift_meal(v, "res_pip")).is_equal({"at": "bag", "item": "dish_carrot_cake"})
+	assert_bool(P0Logic.resident_bar(v, "res_pip").meal).is_true()
+	var ui := _ui(true)
+	ui.set_view(v)
+	ui._open_todays_meal("res_pip")
+	await get_tree().process_frame
+	assert_str(ui.modal_kind).is_equal("bag")
+	var bag: P0BagDrawer = ui.find_children("*", "P0BagDrawer", true, false).filter(func(d): return not d.is_queued_for_deletion())[0]
+	assert_str(bag.grid.selected_id).is_equal("dish_carrot_cake")
+	v.bag.slots.pop_back()
+	v["inbox"] = {"parcels": [{"key": "gift_meal:res_pip:2026-10-08:0", "id": "dish_carrot_cake", "qty": 1, "left": 3600000}]}
+	assert_dict(P0Logic.gift_meal(v, "res_pip")).is_equal({"at": "inbox", "item": "dish_carrot_cake"})
+	ui.set_view(v)
+	ui._open_todays_meal("res_pip")
+	assert_str(ui.modal_kind).is_equal("inbox")
+
+## Back and a scrim tap on a layer opened from the resident bar return to the bar, as its own Close does.
+func test_back_from_a_layer_over_the_resident_bar_returns_to_the_bar() -> void:
+	var ui := _ui(true)
+	ui.set_view(_resident_view())
+	await get_tree().process_frame
+	for open in [func(): ui.open_gift("res_pip"), func(): ui.open_resident_profile("res_pip"), func(): ui.open_resident_request("res_pip")]:
+		open.call()
+		assert_bool(ui.close_top_layer()).is_true()
+		assert_str(ui.modal_kind).is_equal("resident")
+	ui.open_bag()
+	ui.close_top_layer()
+	assert_str(ui.modal_kind).is_equal("")   # the bag from the HUD just closes
+
+func test_rest_tile_at_full_energy_says_so_and_is_off() -> void:
+	var v := _view()
+	v.energy.value = int(v.energy.get("max", 200))
+	v["rest"] = {"used": 0, "limit": 1, "resets_in": 3600000, "amount": 60, "away_ready_in": 0}
+	var rest: Dictionary = P0Logic.energy_card(v, 2, "Sow").tiles.filter(func(t): return t.label == "Rest")[0]
+	assert_that([rest.fact, rest.on]).is_equal(["Energy full", false])
 
 func test_energy_card_tea_and_rest_read_the_drinks_and_away_facts() -> void:
 	var v := _view()

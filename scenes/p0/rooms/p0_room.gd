@@ -523,6 +523,10 @@ func p0_recenter() -> void:
 	_focus = actor.position
 	_follow.held = false
 
+## Whether p0_show_spot has something to show here (the runtime steps out of the farmhouse for farm targets).
+func p0_has_spot(where: String) -> bool:
+	return ["cam_" + where, "use_" + where, "use_" + where + "_1"].any(func(n): return anchor(n) != null)
+
 ## Energy card guidance (LOCK-08: only moves the camera): show cam_<where>, else use_<where>[_1].
 func p0_show_spot(where: String) -> void:
 	for n in ["cam_" + where, "use_" + where, "use_" + where + "_1"]:

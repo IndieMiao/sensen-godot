@@ -66,6 +66,18 @@ func test_buttons_emit_their_action_and_unavailable_ones_stay_silent() -> void:
 	assert_array(got).is_equal([[&"sell", "crop_radish", {qty = 1}], [&"sell_all", "crop_radish", {}]])
 	assert_bool((b[2] as UiCommandButton).is_unavailable()).is_true()
 
+func test_a_greyed_button_reports_its_action_and_reason_on_a_tap() -> void:
+	var got := []
+	var acted := []
+	sheet.unavailable_requested.connect(func(a, id, r): got.append([a, id, r]))
+	sheet.action_requested.connect(func(a, _id, _p): acted.append(a))
+	sheet.open("crop_radish", &"counter_sell")
+	await await_idle_frame()
+	var b: UiCommandButton = sheet._buttons.get_child(2)
+	b._on_pressed()
+	assert_array(got).is_equal([[StringName(sheet.spec().buttons[2].id), "crop_radish", b.reason]])
+	assert_array(acted).is_empty()
+
 func test_open_again_switches_and_close_fires_once() -> void:
 	var n := [0]
 	sheet.closed.connect(func(): n[0] += 1)

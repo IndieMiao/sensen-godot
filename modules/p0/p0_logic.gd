@@ -266,6 +266,9 @@ static func energy_card(view: Dictionary, need: int, verb: String, at_home := tr
 		elif float(away) > 0.0:
 			rest_tile.fact = "Ready in %s" % duration(float(away))
 			rest_tile.on = false
+	if rest_tile.on and str(rs.get("state", "")) == "full":   # nothing to gain: no "+0 Energy" tile (亚瑟 on #37)
+		rest_tile.fact = "Energy full"
+		rest_tile.on = false
 	if not at_home:
 		for t in [cook, rest_tile]:
 			t.fact = "At home"
@@ -717,8 +720,17 @@ static func resident_bar(view: Dictionary, id: String) -> Dictionary:
 		"next": str(r.get("next_stage", "")) if r.get("next_stage", null) != null else "",
 		"line": line, "gift_reason": gift_reason,
 		"request_label": label, "request_reason": reason, "request_cmd": cmd,
-		"meal": meal == "given", "meal_note": note, "lesson": false,
+		"meal": meal == "given" and not gift_meal(view, id).is_empty(), "meal_note": note, "lesson": false,
 	}
+
+## Where today's gift meal from resident `id` is (§3.4.5): {at: "bag", item} for the stack they gave (it carries
+## `from`), {at: "inbox", item} for the parcel it became with the bag full; {} once it is eaten, passed on or gone.
+static func gift_meal(view: Dictionary, id: String) -> Dictionary:
+	for s in view.get("bag", {}).get("slots", []):
+		if str(s.get("from", "")) == id: return {"at": "bag", "item": str(s.get("id", ""))}
+	for p in view.get("inbox", {}).get("parcels", []):
+		if str(p.get("key", "")).begins_with("gift_meal:%s:" % id): return {"at": "inbox", "item": str(p.get("id", ""))}
+	return {}
 
 ## A resident's line after a gift (Mystery Dish only so far, q(33)); "" keeps the stage line.
 static func resident_reply(id: String, verdict: String) -> String:

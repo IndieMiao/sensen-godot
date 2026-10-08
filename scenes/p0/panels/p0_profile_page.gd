@@ -34,6 +34,7 @@ var preview: BagCharacterPreview
 
 var _body: VBoxContainer
 var _refreshed_ms := 0
+var _shown := {}   # the profile_data last drawn: rebuild only when it changes
 ## Back from the dressing room with Done (KEEP-P0-2): `Look saved` under the home line.
 var look_saved := false
 
@@ -73,10 +74,13 @@ func _init(view_: Dictionary = {}, safe_top_ := 0.0, look_saved_ := false) -> vo
 	_body.add_child(_look())
 	refresh(view_)
 
-## The P0 UI hands every frame's view here; the facts are rebuilt at most once a second (the farm countdown).
+## The P0 UI hands every frame's view here; the facts are checked at most once a second (the farm countdown) and
+## rebuilt only when they changed, so a tap is never cut in two by a rebuild (亚瑟 on #37).
 func update(view_: Dictionary) -> void:
 	view = view_
-	if Time.get_ticks_msec() - _refreshed_ms >= 1000: refresh(view_)
+	if Time.get_ticks_msec() - _refreshed_ms < 1000: return
+	_refreshed_ms = Time.get_ticks_msec()
+	if profile_data(view_) != _shown: refresh(view_)
 
 ## Rebuild the facts below the outfit from a new view (the outfit and top bar stay).
 func refresh(view_: Dictionary) -> void:
@@ -87,6 +91,7 @@ func refresh(view_: Dictionary) -> void:
 		_body.remove_child(c)
 		c.queue_free()
 	var d := profile_data(view)
+	_shown = d
 	var col := VBoxContainer.new()
 	col.add_theme_constant_override(&"separation", int(_CONTENT_GAP))
 	_body.add_child(col)

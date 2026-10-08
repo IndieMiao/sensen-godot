@@ -65,7 +65,7 @@ func _init() -> void:
 	ui.zoom.connect(func(f: float, at: Vector2): _call("p0_zoom", [f, at]))
 	ui.zoom_end.connect(func(): _call("p0_zoom_end", []))
 	ui.recenter.connect(func(): _call("p0_recenter", []))
-	ui.show_spot.connect(func(where: String): _call("p0_show_spot", [where]))
+	ui.show_spot.connect(_show_spot)
 	ui.show_on_map.connect(func(target: String): _leave_then("show:" + target))   # the map points at the pin (p0_map resume)
 	ui.can_show_spot = func() -> bool: return is_instance_valid(world) and world.has_method("p0_show_spot")
 	ui.near_resident = func() -> String:   # an outpost's resident within reach (Gift to <Name>, SGODOT-225)
@@ -91,9 +91,13 @@ func attach(w: Node) -> void:
 	ui.end_stick()
 	world = w
 	session.space = space_of(w)   # before the read below, which tells the server where the player is
+	ui.space = session.space
 	session.place = str(w.call("p0_place")) if w.has_method("p0_place") else ""   # which pond (q(36))
 	if not session.busy and not session.view.is_empty(): session.refresh()   # entering a space reads fresh state
 	mark("attach " + str(w.name))
+	if _spot_after_room != "" and w.has_method("p0_show_spot"):   # stepped out of the farmhouse to show a farm spot
+		w.call_deferred("p0_show_spot", _spot_after_room)
+		_spot_after_room = ""
 	_first_frame.call_deferred(str(w.name))
 	ui.set_surface(str(w.call("p0_surface")) if w.has_method("p0_surface") else "farm")
 
@@ -119,6 +123,7 @@ func detach(w: Node) -> void:
 		ui.close_modal()
 		ui.set_surface("map")
 		session.space = "map"
+		ui.space = "map"
 		session.place = ""
 
 ## Back to the map (the place chip, LOCK-06): every P0 world stacked above it closes, the farm under the
@@ -150,6 +155,17 @@ func root_back() -> bool:
 	if AppRouter.instance_depth() > 0: return false   # stacked on the map: AppRouter pops it
 	leave_to_map()
 	return true
+
+## Show (LOCK-08, the camera only). In the farmhouse a farm target (plots, stall, bench …) steps out to the farm first,
+## which shows it once it is back (attach); the stove and the room's own spots show in the room (亚瑟 on #37).
+var _spot_after_room := ""
+
+func _show_spot(where: String) -> void:
+	if world is P0Room and session.space == "home" and not bool(_call("p0_has_spot", [where])):
+		_spot_after_room = where
+		leave_room()
+		return
+	_call("p0_show_spot", [where])
 
 ## One level back, for a room's door: the farm under the farmhouse, the map under an outpost.
 func leave_room() -> void:
