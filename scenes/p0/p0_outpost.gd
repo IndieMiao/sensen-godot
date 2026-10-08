@@ -133,7 +133,7 @@ func _spawn_npcs() -> void:
 		rig.rotation.y = PI   # the rig faces +Z; the anchor's yaw is where the NPC faces
 		root.add_child(rig)
 		rig.config_applied.connect(func(_c): rig.play_motion("idle"))
-		rig.apply_config(OnlineAppearance.config({"version": 1, "slots": def.get("slots", {})}))
+		rig.apply_config(OnlineAppearance.config({"version": 1, "slots": def.get("slots", {})}, true))   # NPC-only parts (SGODOT-229) too
 		var tag := Label3D.new()   # every NPC carries a name tag (art director, SGODOT-227)
 		tag.text = str(def.get("name", ""))
 		tag.font = UiKit.font(&"bold")

@@ -174,3 +174,28 @@ func test_the_keeper_greeting_gets_names_and_places_from_the_outpost_data() -> v
 		"ctx": {"keeper": "Mei", "place": "Xuhui Market Square"}})
 	for o in P0Outposts.all():   # nearest.site keys view.keepers.tackle.next_fish (fishing.sites)
 		if o.has("nearest"): assert_array(["pond", "river"]).contains([str(o.nearest.site)])
+
+## SGODOT-229: the NPC-only parts reach the NPCs. OnlineAppearance.config drops them unless asked (they are kept out of
+## player outfits and the online appearances), so the spawn has to pass allow_npc.
+func test_npcs_wear_their_npc_only_parts() -> void:
+	var kai: Node = _room("sh_tackle_1").npcs.npc_kai.root
+	var rig: AvatarRig = kai.find_children("*", "AvatarRig", true, false)[0]
+	var worn: Dictionary = rig.get("_desired")
+	assert_str(str(worn.get(&"hairHat", ""))).is_equal("hairhat71_npc_kai")
+	assert_str(str(worn.get(&"mask", ""))).is_equal("mask16_npc_kai")
+	assert_str(str(worn.get(&"cloth", ""))).is_equal("cloth11_npc_mei")
+	assert_bool(Avatar.catalog.is_npc_only("hairhat71_npc_kai")).is_true()
+
+## Every outfit part exists in its slot; no two NPCs share both hairHat and cloth (the outfit rules in the file's note).
+func test_npc_outfits_name_real_parts_and_stay_distinct() -> void:
+	var npcs: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/p0/outpost_npcs.json")).npcs
+	var pairs := {}
+	for id in npcs:
+		var slots: Dictionary = npcs[id].slots
+		for slot in slots:
+			var part = Avatar.catalog.part(str(slots[slot]))
+			assert_object(part).override_failure_message("%s: %s" % [id, slots[slot]]).is_not_null()
+			if part: assert_str(String(part.slot)).override_failure_message("%s: %s" % [id, slots[slot]]).is_equal(str(slot))
+		var pair := "%s|%s" % [slots.get("hairHat", ""), slots.get("cloth", "")]
+		assert_bool(pairs.has(pair)).override_failure_message("%s shares %s with %s" % [id, pair, pairs.get(pair, "")]).is_false()
+		pairs[pair] = id
