@@ -989,9 +989,11 @@ func _update_markers() -> void:
 		var art_w: float = pm.art_w
 		var art_h := top
 		var side := maxf(width, art_side)
-		var below := 3.0 + label_h + 1.0
-		# 选中项的占位随果冻放大同步变大，邻居的贴图和名牌为它让位。
-		var k := FOCUS_SCALE if is_sel else 1.0
+		var dest := not _destination(entry).is_empty()
+		# A MapDestination holds only its disc: its name folds on its own and the pin stays (不知火舞 on 234 A2).
+		var below := 0.0 if dest else 3.0 + label_h + 1.0
+		# 选中项的占位随果冻放大同步变大，邻居的贴图和名牌为它让位。MapDestination 选中不放大。
+		var k := FOCUS_SCALE if is_sel and not dest else 1.0
 		side *= k
 		top *= k
 		below *= k
@@ -1058,16 +1060,19 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int)
 		var probe: Rect2 = c.bounds.grow(-PACK_MARGIN if incumbent else PACK_MARGIN)
 		# 地标相互之间也做遮挡剔除，但不给玩家 pin 让位；其余标记两者都让。宿主的地点（P0 据点）从不让位：
 		# 城市级也每处一枚（q(72)），只是名牌和已放下的标记相撞时先收起。
-		var blocked: bool = entry.kind != "place" and (_hits(occupied, probe) or (entry.kind != "landmark" and not _over_avatar(entry) and _hits(blockers, probe)))
+		# A pin wearing a marker is always shown too (不知火舞 on 234 A2: the avatar and the marked pins always go in).
+		var blocked: bool = entry.kind != "place" and _marker_of(entry) == "" and (_hits(occupied, probe) or (entry.kind != "landmark" and not _over_avatar(entry) and _hits(blockers, probe)))
 		if blocked:
 			if incumbent: _hidden_until[id] = now + REAPPEAR_COOLDOWN_MS
 			return false
 	var label_rect := Rect2(c.point + Vector2(-c.label_w * 0.5, 3), Vector2(c.label_w, c.label_h))
 	if entry.kind == "landmark":
 		label_fits = is_selected or not _hits(occupied, Rect2(c.point - Vector2(c.width * 0.5, -3), Vector2(c.width, 20)))
-	elif entry.kind == "place":
+	elif entry.kind == "place" or not _destination(entry).is_empty():
 		# An outpost keeps its pin; its label shows unless it would cover a pin or a label placed before it (higher
-		# priority), and comes back once zooming in parts them or the pin is selected (不知火舞 on C30).
+		# priority), and comes back once zooming in parts them or the pin is selected (不知火舞 on C30). Any MapDestination
+		# likewise, marked or not: the selected pin packs first, so its name always shows and the names it touches fold
+		# until the card closes (不知火舞 on 234 A2).
 		label_fits = is_selected or not _hits(occupied, label_rect)
 	if entry.kind == "place":
 		occupied.append(Rect2(c.point - Vector2(c.art_w * 0.5, c.art_h), Vector2(c.art_w, c.art_h)))
@@ -1078,9 +1083,13 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int)
 		occupied.append(c.bounds)
 		# A marked pin's whole label reaches past its bounds: what comes after keeps clear of it too, and My Farm's label
 		# gives way to it as to an outpost's (不知火舞 on #83).
-		if _marker_of(entry) != "":
+		var dest_name := not _destination(entry).is_empty()
+		if _marker_of(entry) != "" and (label_fits or not dest_name):
 			occupied.append(label_rect)
 			if entry.kind != "poi" or is_selected or host.zoom >= 16: _place_labels.append(label_rect)
+		elif dest_name and label_fits:
+			occupied.append(label_rect)   # a MapDestination's whole name: what comes after keeps clear of it
+			if is_selected: _place_labels.append(label_rect)
 	if not markers.has(id): markers[id] = _make_marker(entry)
 	var marker: Dictionary = markers[id]
 	marker.entry = entry
