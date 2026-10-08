@@ -1171,7 +1171,10 @@ func _set_marker_shown(marker: Dictionary, on: bool) -> void:
 ## The selected pin's 2D node over every other pin's, pins made after it was selected included: a MapDestination's
 ## name is 2D, and a neighbour's disc must not cover it.
 func _raise_selected() -> void:
-	var id := str(selected.get("id", ""))
+	_raise(str(selected.get("id", "")))
+
+## A pin's node over every other pin's (the pins are not the view's only children: a count of pins is no index).
+func _raise(id: String) -> void:
 	if not markers.has(id): return
 	var top := 0
 	for m in markers.values(): top = maxi(top, (m.node as Node).get_index())
@@ -1184,7 +1187,7 @@ func _set_marker_front(id: String, front: bool) -> void:
 	if marker.has("sprite"):
 		marker.sprite.render_priority = 2 if front else (PLACE_PRIORITY if _over_avatar(marker.entry) else 0)
 		marker.shadow.render_priority = 1 if front else -1
-	if front: move_child(marker.node, maxi(0, markers.size() - 1))
+	if front: _raise(id)
 
 func _animate_focus(id: String, to: float, duration: float) -> void:
 	if not markers.has(id): return

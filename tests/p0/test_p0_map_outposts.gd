@@ -180,7 +180,9 @@ func test_outpost_pins_draw_over_the_avatar() -> void:
 	assert_object(tea.dest).is_instanceof(UiMapDestination)
 	assert_bool((tea.node as Node).is_ancestor_of(tea.dest)).is_true()
 	city._set_marker_front("sh_tea_1", true)
-	assert_int((tea.node as Node).get_index()).is_equal(city.markers.size() - 1)   # in front of the other pins
+	var top := 0
+	for mk in city.markers.values(): top = maxi(top, (mk.node as Node).get_index())
+	assert_int((tea.node as Node).get_index()).is_equal(top)   # in front of the other pins
 	city._set_marker_front("sh_tea_1", false)
 
 ## 不知火舞 on C30: My Farm's label gives way to an outpost label it touches; it is back when they part.
