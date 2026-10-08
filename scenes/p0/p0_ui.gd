@@ -320,7 +320,7 @@ func set_view(v: Dictionary) -> void:
 	if _counter != null and is_instance_valid(_counter) and modal_kind == "counter":
 		var was: String = _counter.section
 		_counter.refresh(v)
-		if was == "board" or _counter.is_short(): _fill_board(_counter)   # board cards follow Accept / Deliver
+		if was == "board" or _counter.is_short(): _fill_board(_counter)   # board rows follow Accept / Deliver (only on change)
 	if _profile != null and is_instance_valid(_profile) and modal_kind == "profile": _profile.update(v)
 	if workbench() != null: _workbench.refresh(v)
 	_refresh_hud()
@@ -1392,47 +1392,79 @@ func _counter_action(role: String, action: StringName, id: String, payload: Dict
 ## A counter's events (P0Runtime): the keeper says what just happened (TEA-DONE `Enjoy. Next cup's 50 coins.`,
 ## the rod strung after buying it); the drawer itself follows the view.
 func counter_events(events: Array) -> void:
-	if _counter == null or not is_instance_valid(_counter) or _counter.keeper_bar == null: return
+	if _counter == null or not is_instance_valid(_counter): return
+	var bar := _counter.keeper_bar   # none at the unattended Homestead Stall (p(6)): its board rows still turn Done
 	for ev in events:
 		match str(ev.get("kind", "")):
 			"drink":
+				if bar == null: continue
 				var price := int(view.get("drinks", {}).get("price", 0))
-				_counter.keeper_bar.line = ("Enjoy. Next cup's %d coins." % price) if int(ev.get("left", 0)) > 0 \
+				bar.line = ("Enjoy. Next cup's %d coins." % price) if int(ev.get("left", 0)) > 0 \
 					else str(P0Logic.keeper_lines(view, _counter.role, _counter.ctx).get("counter", ""))
 			"item":
-				if str(ev.get("id", "")).begins_with("rod_") and int(ev.get("delta", 0)) > 0:
-					_counter.keeper_bar.line = "Strung and ready — it's on your belt. Swap rods in Bag › Gear."
+				if bar != null and str(ev.get("id", "")).begins_with("rod_") and int(ev.get("delta", 0)) > 0:
+					bar.line = "Strung and ready — it's on your belt. Swap rods in Bag › Gear."
+			"request":
+				if str(ev.get("status", "")) == "done": _board_done(_counter, str(ev.get("id", "")), int(ev.get("coins", 0)))
 
-## The board page of a counter: the Stall Board (legacy view.stall.board) or the Market Board (view.boards.market).
+## A board request's own sheet (BOARD-1), from its row's title ›.
+func open_board_request(role: String, id: String) -> void:
+	P0BoardRequest.open(self, role, id)
+
+## The request BOARD-3 asked the server to drop: {role, id, title, noun, item} until its dropped event arrives.
+var pending_drop := {}
+
+## The server dropped a request: BOARD-DROPPED when it was the one confirmed here.
+func board_dropped(id: String) -> void:
+	if pending_drop.is_empty() or str(pending_drop.get("id", "")) != id: return
+	var gone := pending_drop
+	pending_drop = {}
+	P0BoardRequest.dropped(self, gone)
+
+## A request delivered from this drawer: its row stays, Done, until the drawer closes, and the coins float up from
+## where its button was (BOARD-DONE; 不知火舞 on 224: no result card, the page facts follow the view).
+func _board_done(d: P0CounterDrawer, id: String, coins: int) -> void:
+	var row: Dictionary = d.get_meta("board_seen", {}).get(id, {})
+	if row.is_empty(): return
+	var done: Dictionary = d.get_meta("board_done", {})
+	done[int(row.slot)] = row
+	d.set_meta("board_done", done)
+	d.set_meta("board_key", 0)
+	_fill_board(d)
+	var at: Vector2 = d.get_meta("board_spots", {}).get(id, Vector2.INF)
+	if at != Vector2.INF and coins > 0:
+		float_text("+%d coins" % coins, at - root.global_position, UiFloatText.Tone.COINS, P0Logic.icon("coin"))
+
+## The board page of a counter: the Stall Board or the Market Board (view.boards[stall | market]).
 func _fill_board(d: P0CounterDrawer) -> void:
-	var b: Dictionary = view.get("stall", {}).get("board", {}) if d.role == "homestead" else market_board(view)
-	# The P0 market fills its board while Buy shows too (its height is the taller page's); it rebuilds and re-measures
-	# only when the cards change, not on every refresh.
-	if d.is_short():
-		var key := [b, view.get("bag", {})].hash()
-		if d.get_meta("board_key", 0) == key: return
-		d.set_meta("board_key", key)
+	var board := P0Board.board_id(d.role)
+	var cards := P0Board.cards(view, board, d.get_meta("board_done", {}))
+	var facts := P0Board.facts(view, board)
+	# The runtime sets the view every frame: the rows are rebuilt only when they change, or a tap pressed on one
+	# button would be released on its replacement and lost (蒙恬 rc0: the first Accept after switching to the board did
+	# nothing). The page facts (a countdown) update in place. The P0 market fills its board while Buy shows too (its
+	# height is the taller page's) and re-measures only then.
+	var key := [cards, facts.map(func(f): return f[0]), view.get("bag", {})].hash()
+	if d.get_meta("board_key", 0) == key:
+		var rows := d.board.get_children().filter(func(c): return c is HBoxContainer and not c is UiBoardCard and not c.is_queued_for_deletion())
+		for i in mini(rows.size(), facts.size()): ((rows[i] as HBoxContainer).get_child(1) as Label).text = str(facts[i][1])
+		return
+	d.set_meta("board_key", key)
+	# What each row was and where its button sat: a delivery empties the slot before counter_events runs, and the row
+	# then turns Done in place with the coins floating up from its button (不知火舞 on 224).
+	var seen: Dictionary = d.get_meta("board_seen", {})
+	var spots: Dictionary = d.get_meta("board_spots", {})
 	for c in d.board.get_children():
+		if c is UiBoardCard and c.is_visible_in_tree():
+			spots[(c as UiBoardCard).request_id] = (c as UiBoardCard).command_button().get_global_rect().get_center()
 		c.hide()
 		c.queue_free()
-	_board(d.board, b)
+	for c in cards:
+		if not bool(c.done): seen[str(c.id)] = c
+	d.set_meta("board_seen", seen)
+	d.set_meta("board_spots", spots)
+	_board(d, facts, cards)
 	if d.is_short(): d.fit_height()
-
-## view.boards.market in the Stall Board's shape ({slots, requests [{id, title, item, qty, have, coins, where,
-## status}], refill_in}) so one renderer draws both boards.
-static func market_board(v: Dictionary) -> Dictionary:
-	var b: Dictionary = v.get("boards", {}).get("market", {})
-	var reqs := []
-	var refill := -1.0
-	for sl in b.get("slots", []):
-		if sl.get("empty", false):
-			if sl.has("refill_in"): refill = float(sl.refill_in) if refill < 0.0 else minf(refill, float(sl.refill_in))
-			continue
-		var any := ("any %s %s" % [P0Logic.rarity_name(v, int(sl.rarity)), str(sl.kind)]) if sl.get("rarity", null) != null else "any " + str(sl.get("kind", ""))
-		reqs.append({"id": str(sl.id), "title": str(sl.get("title", "")), "item": str(sl.get("icon", "")), "qty": int(sl.get("qty", 1)),
-			"have": int(sl.get("have", 0)), "coins": int(sl.get("coins", 0)), "status": str(sl.get("status", "open")),
-			"where": any if (sl.get("items", []) as Array).is_empty() else ("any pond" if str(sl.get("kind", "")) == "fish" else "from your farm")})
-	return {"slots": (b.get("slots", []) as Array).size(), "requests": reqs, "refill_in": maxf(refill, 0.0)}
 
 ## Gear lives in the bag drawer now (p(8)); callers that opened Tools & Gear land on the Gear side.
 func open_gear() -> void:
@@ -1445,56 +1477,21 @@ func open_stall(tab := "") -> void:
 func open_tackle(_bubble := "") -> void:
 	open_counter("tackle")
 
-## Stall Board (FARM-6 tab): request cards with a need tile; Accept tracks it, Deliver pays coins (no XP).
-func _board(v: VBoxContainer, board: Dictionary) -> void:
-	# A delivered request leaves the board and frees its slot (§14.5 "完成打勾并补位").
-	var reqs: Array = board.get("requests", []).filter(func(r): return str(r.status) != "done")
-	for r in reqs:
-		var card := PanelContainer.new()
-		var done := str(r.status) == "done"
-		card.add_theme_stylebox_override("panel", _box(PAPER if not done else Color(1, 1, 1, 0.5), 14, AMBER if str(r.status) == "accepted" else EDGE, 2 if str(r.status) == "accepted" else 1, Vector4(10, 8, 10, 8)))
-		var h := HBoxContainer.new()
-		h.add_theme_constant_override("separation", 10)
-		var item_id := str(r.item)
-		var tile := UiNeedTile.new(P0Logic.item_name(view, item_id), int(r.have), int(r.qty), UiNeedTile.Size.M, P0Logic.icon(item_id))
-		tile.theme = UiKit.theme()
-		tile.pressed.connect(func(): _show_need_source(tile, item_id))
-		h.add_child(tile)
-		var mid := VBoxContainer.new()
-		mid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		mid.add_theme_constant_override("separation", 1)
-		mid.add_child(_label(str(r.title) + (" · done" if done else ""), 12, INK if not done else INK2, true))
-		var what := P0Logic.item_name(view, str(r.item))   # fish plurals stay as they are ("2 Pond Crucian")
-		if int(r.qty) > 1 and not str(r.item).begins_with("fish_"): what = P0Logic.plural(what)
-		var line := _label("%d %s · %s · %d coins · Deliver here" % [int(r.qty), what, str(r.get("where", "")), int(r.coins)], 8, INK2)
-		line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		line.custom_minimum_size = Vector2(1, 0)   # wraps in what the NEED-TILE and the button leave
-		mid.add_child(line)
-		h.add_child(mid)
-		if not done:
-			var id := str(r.id)
-			var b: Button
-			if str(r.status) == "open":
-				b = _pill_button("Accept", true)
-				b.pressed.connect(func(): command.emit({"type": "accept", "request": id}))
-			elif int(r.have) >= int(r.qty):
-				b = _pill_button("Deliver", true)
-				b.pressed.connect(func(): command.emit({"type": "deliver", "request": id}))
-			else:
-				b = _pill_button("Tracking", false)
-				b.disabled = true
-			b.custom_minimum_size = Vector2(78, 34)
-			b.size_flags_vertical = Control.SIZE_SHRINK_CENTER   # the NEED-TILE makes the card taller
-			h.add_child(b)
-		card.add_child(h)
-		v.add_child(card)
-	for i in maxi(0, int(board.get("slots", 2)) - reqs.size()):
-		var empty := _label("New request in %s" % P0Logic.duration(float(board.get("refill_in", 0))), 10, INK2, true)
-		empty.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		empty.custom_minimum_size = Vector2(0, 56)
-		empty.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		empty.add_theme_stylebox_override("normal", _box(Color(1, 1, 1, 0.3), 14, Color("d9c7a6"), 1, Vector4(8, 6, 8, 6)))
-		v.add_child(empty)
+## A counter's board page (FARM-6 Stall Board tab, NPC-2-2 Market Board; BOARD-READY / SHORT / DONE): the page facts,
+## then one UiBoardCard per request — Track sends accept, Deliver pays coins (no XP), a gap on the button says what is
+## missing, a NeedTile shows where it comes from, the title opens the request (BOARD-1).
+func _board(d: P0CounterDrawer, facts: Array, cards: Array) -> void:
+	for f in facts: d.board.add_child(UiBoardCard.fact_row(str(f[0]), str(f[1])))
+	for c in cards:
+		var card := UiBoardCard.new()
+		card.show_request(c)
+		var cmd: Dictionary = c.cmd
+		var id := str(c.id)
+		card.command_pressed.connect(func(): if not cmd.is_empty(): command.emit(cmd))
+		card.unavailable_pressed.connect(func(r: String): toast(r))
+		card.need_pressed.connect(func(item: String, tile: UiNeedTile): _show_need_source(tile, item))
+		card.info_pressed.connect(func(): open_board_request(d.role, id))
+		d.board.add_child(card)
 
 ## Energy Card (§3.7.2 / HUD-3): facts, a Wait line, RECOVER tiles that only guide, one button that closes.
 ## The ONE Energy interface (LOCK-09): a centred card over the modal scrim. Its only button is

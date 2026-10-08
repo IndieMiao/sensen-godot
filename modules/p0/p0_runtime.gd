@@ -288,6 +288,8 @@ func _on_state(v: Dictionary, events: Array) -> void:
 					ui.float_text("+%d %s" % [int(ev.delta), P0Logic.item_name(v, iid)], at, UiFloatText.Tone.ITEM, P0Logic.icon(iid), stack)
 					stack += 1
 			"coins":
+				# A request delivered from the counter drawer: its row floats the coins from its button (BOARD-DONE).
+				if ui.modal_kind == "counter" and events.any(func(e): return str(e.get("kind", "")) == "request" and str(e.get("status", "")) == "done"): continue
 				ui.float_text(("%+d coins" % int(ev.delta)).replace("-", "−"), at, UiFloatText.Tone.COINS, null, stack)
 				stack += 1
 			"parcel":
@@ -310,8 +312,11 @@ func _on_state(v: Dictionary, events: Array) -> void:
 					var kept := P0KitchenLogic.kept_line(v, ev, events)
 					if not kept.is_empty(): ui.toast(str(kept.text))
 			"request":
-				if str(ev.status) == "accepted": ui.toast("Tracking · it shows in Today")
-				else: ui.toast("Request complete · +%d coins" % int(ev.coins))
+				match str(ev.status):
+					"accepted": ui.toast("Tracking · it shows in Today")
+					"dropped": ui.board_dropped(str(ev.get("id", "")))   # BOARD-DROPPED says what dropping left
+					_:   # in the counter drawer the row itself turns Done (BOARD-DONE, no result card)
+						if ui.modal_kind != "counter": ui.toast("Request complete · +%d coins" % int(ev.coins))
 			"meal":
 				if int(ev.gain) <= 0:
 					ui.toast("Full belly · Meals reset in " + P0Logic.duration(float(v.get("meals", {}).get("resets_in", 0))) if int(ev.counted) <= 0 and int(ev.nominal) > 0 else "Same dish · no Energy today")
@@ -479,6 +484,12 @@ func _dev_shot(dt: float) -> void:
 			"release": ui.fab_held = false
 			"stall": ui.open_stall(step[1] if step.size() > 1 else "")
 			"counter": ui.open_counter(step[1], {"section": step[2] if step.size() > 2 else "buy", "ctx": _dev_ctx(step[1])})
+			"boardreq": ui.open_board_request(step[1], step[2])   # boardreq:<role>:<request id> — BOARD-1
+			"dropconfirm": P0BoardRequest.confirm_drop(ui, step[1], step[2])   # dropconfirm:<role>:<request id> — BOARD-3
+			"boardinfo": P0BoardRequest.info(ui, step[1])   # boardinfo:<item> — Details over the open request sheet
+			"presscmd":   # the open card's command button (BOARD-3 Drop request → BOARD-DROPPED)
+				if ui._modal != null:
+					for b in ui._modal.find_children("*", "UiCommandButton", true, false): (b as UiCommandButton).activated.emit()
 			"greet": ui.open_keeper_greeting(step[1], _dev_ctx(step[1]))
 			"bag": ui.open_bag(step[1] if step.size() > 1 else "")
 			"bagcat":   # bag drawer on one category tab, e.g. bagcat:Materials (SGODOT-225 storage stacks)

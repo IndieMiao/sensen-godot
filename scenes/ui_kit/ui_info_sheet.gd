@@ -183,7 +183,7 @@ func refresh() -> void:
 	_title.text = str(_spec.get("title", ""))
 	var qty := int(_spec.get("quantity", 0))
 	_qty.text = "×%d" % qty
-	_qty_pill.visible = qty > 0
+	_qty_pill.visible = qty > 0 or bool(_spec.get("quantity_shown", false))   # a request's item reads ×0 too (BOARD-1 Details)
 	var badge := StringName(_spec.get("badge", &""))
 	# Locked > Pinned > New: the lock is the Locked badge, so the pin badge shows only on an unlocked stack.
 	_badge.visible = badge == &"pinned"
