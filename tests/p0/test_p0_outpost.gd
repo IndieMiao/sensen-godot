@@ -156,3 +156,8 @@ func test_the_keeper_greeting_gets_names_and_places_from_the_outpost_data() -> v
 	assert_dict(_room("sh_market_1").keeper_ctx()).is_equal({"keeper": "Mei", "place": "Xuhui Market Square"})
 	assert_dict(_room("sh_tackle_1").keeper_ctx()).is_equal({"keeper": "Finn", "place": "Xuhui Tackle Shop",
 		"nearest": {"name": "Reed Pond", "site": "pond"}})
+	# The board and the shelf open the counter without the greeting: they carry the keeper ctx themselves.
+	assert_dict(_room("sh_market_1").counter_opts("board")).is_equal({"section": "board",
+		"ctx": {"keeper": "Mei", "place": "Xuhui Market Square"}})
+	for o in P0Outposts.all():   # nearest.site keys view.keepers.tackle.next_fish (fishing.sites)
+		if o.has("nearest"): assert_array(["pond", "river"]).contains([str(o.nearest.site)])

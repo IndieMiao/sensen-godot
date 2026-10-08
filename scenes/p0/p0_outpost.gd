@@ -169,8 +169,8 @@ func _on_facility(n: String) -> void:
 	elif n.begins_with("seat_"): _claim(n)
 	elif npcs.has(n): _open_resident(str(npcs[n].id), str(npcs[n].name))
 	# Boards and shelves are facilities, not keepers: they open the market counter directly (LOCK-16 / 07).
-	elif n == "use_market_board": _open_entry("open_counter", ["market", {"section": "board"}], "Market Board")
-	elif n == "use_specialty_shelf": _open_entry("open_counter", ["market", {"section": "specialty"}], "City Specialty")
+	elif n == "use_market_board": _open_entry("open_counter", ["market", counter_opts("board")], "Market Board")
+	elif n == "use_specialty_shelf": _open_entry("open_counter", ["market", counter_opts("specialty")], "City Specialty")
 
 ## LOCK-16: keepers greet first, Trade opens the counter (SGODOT-224's open_keeper_greeting(role, ctx)).
 func _open_keeper() -> void:
@@ -185,6 +185,11 @@ func keeper_ctx() -> Dictionary:
 	var ctx := {"keeper": str(keeper.get("name", "")), "place": place_name}
 	if outpost.has("nearest"): ctx["nearest"] = (outpost.nearest as Dictionary).duplicate()
 	return ctx
+
+## open_counter opts for a facility that opens the counter without the greeting: the section, and the keeper ctx
+## so the keeper bar has its name and place even when the player never greeted the keeper (224 keeps it per role).
+func counter_opts(section: String) -> Dictionary:
+	return {"section": section, "ctx": keeper_ctx()}
 
 ## LOCK-18: residents open the dialogue bar (SGODOT-225); open_resident() is false when the view has no such
 ## resident, and then only their name shows.
