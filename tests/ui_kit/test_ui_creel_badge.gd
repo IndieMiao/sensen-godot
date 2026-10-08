@@ -42,13 +42,23 @@ func test_the_pill_is_26_high_and_the_dot_hangs_over_its_top_right() -> void:
 	assert_vector(b._dot.size).is_equal(Vector2(8, 8))
 	assert_vector(b.size).is_equal(r.size)
 
-func test_a_tap_is_the_hosts() -> void:
+func _mouse(pos: Vector2, down: bool) -> InputEventMouseButton:
+	var e := InputEventMouseButton.new()
+	e.button_index = MOUSE_BUTTON_LEFT
+	e.position = pos
+	e.pressed = down
+	return e
+
+## A real tap only (亚瑟 on #106): released where it went down; a press alone or a drag off it is no tap.
+func test_a_tap_is_the_hosts_a_drag_is_not() -> void:
 	var b := _badge()
 	await await_idle_frame()
 	var taps := [0]
 	b.pressed.connect(func(): taps[0] += 1)
-	var e := InputEventMouseButton.new()
-	e.button_index = MOUSE_BUTTON_LEFT
-	e.pressed = true
-	b._gui_input(e)
+	b._gui_input(_mouse(Vector2(20, 10), true))
+	assert_int(taps[0]).is_equal(0)   # not on the press
+	b._gui_input(_mouse(Vector2(22, 11), false))
 	assert_int(taps[0]).is_equal(1)
+	b._gui_input(_mouse(Vector2(20, 10), true))
+	b._gui_input(_mouse(Vector2(20 + GestureArbiter.TAP_SLOP + 10, 10), false))
+	assert_int(taps[0]).is_equal(1)   # dragged past the slop

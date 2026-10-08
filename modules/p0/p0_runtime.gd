@@ -917,7 +917,6 @@ func _dev_shot(dt: float) -> void:
 			"skills": ui.open_skills()
 			"profile": ui.open_profile()
 			"resident": ui.open_resident(step[1] if step.size() > 1 else "res_pip")   # SGODOT-225 dialogue bar
-			"resprofile": ui.open_resident_profile(step[1] if step.size() > 1 else "res_pip")   # RES-PIP / RES-KAI sheet
 			"creel":   # creel:0 — the creel badge's states for shots: the bag's free slots set locally (235 B1)
 				var cv: Dictionary = session.view.duplicate(true)
 				cv["bag"] = cv.get("bag", {}).duplicate()
@@ -927,7 +926,7 @@ func _dev_shot(dt: float) -> void:
 				ui.set_view(session.current())
 				ui.set_action(P0Logic.fish_action(session.current(), ""))
 			"creeltap": ui._creel.pressed.emit()   # a tap on the creel badge
-			"resprofile": ui.open_resident_profile(ui._resident)                     # its name → profile sheet
+			"resprofile": ui.open_resident_profile(step[1] if step.size() > 1 else ui._resident)   # resprofile[:res_old_kai]
 			# SGODOT-233 result moments, shown directly: catchcard:<fish>, gotaway:<fish>:level|rod
 			"catchcard": ui.show_catch(step[1], int(P0Logic.item(session.current(), step[1]).get("rarity", 1)), 15, {"energy": 20})
 			"gotaway":

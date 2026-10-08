@@ -6,7 +6,7 @@ extends Control
 ##   NORMAL  surface, 1 px border, text
 ##   LOW     one slot left: surface, 1 px amber, warning text
 ##   FULL    no slot left: warning tint, 1 px amber, warning text, and the 8 alert dot over the top-right corner
-## The host takes the tap (`pressed`): full, the Error toast with Open bag ›; otherwise the bag on its Fish page.
+## The host takes a real tap (`pressed`): full, the Error toast with Open bag ›; otherwise the bag on its Fish page.
 
 signal pressed
 
@@ -98,8 +98,21 @@ func _layout() -> void:
 	size = s
 	_dot.position = Vector2(s.x - _DOT_IN, -_DOT_UP)
 
-## One tap (mouse button; raw touches arrive as emulated mouse events): the host decides what it opens.
+## A real tap only, as UiEntryCard (released within GestureArbiter TAP_SLOP / TAP_MAX_MS; 亚瑟 on #106): one event
+## family (mouse buttons; raw touches only without touchscreen emulation). The host decides what it opens.
+var _down_at := Vector2.INF
+var _down_ms := 0
+
 func _gui_input(e: InputEvent) -> void:
-	if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
-		accept_event()
-		pressed.emit()
+	var is_mouse: bool = e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT
+	var is_touch: bool = e is InputEventScreenTouch and not DisplayServer.is_touchscreen_available()
+	if not (is_mouse or is_touch): return
+	accept_event()
+	if e.pressed:
+		_down_at = e.position
+		_down_ms = Time.get_ticks_msec()
+		return
+	var tap: bool = _down_at != Vector2.INF and e.position.distance_to(_down_at) <= GestureArbiter.TAP_SLOP \
+		and Time.get_ticks_msec() - _down_ms <= GestureArbiter.TAP_MAX_MS
+	_down_at = Vector2.INF
+	if tap: pressed.emit()
