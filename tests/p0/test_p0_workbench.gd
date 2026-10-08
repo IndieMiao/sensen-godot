@@ -54,14 +54,15 @@ func after_test() -> void:
 
 func test_material_sources_name_the_spot_or_the_mine_floors() -> void:
 	var v := _view()
-	assert_that(P0MaterialLogic.material_source(v, "copper_ore")).is_equal({"text": "Copper Ore · Mine floors 1–2", "go": "mine"})
+	assert_that(P0MaterialLogic.material_source(v, "copper_ore")).is_equal({"text": "Copper Ore · Mine floors 1–\u20602", "go": "mine"})
 	assert_that(P0MaterialLogic.material_source(v, "wood")).is_equal({"text": "Timber · Timber Grove", "go": "spot_grove"})
-	assert_that(P0MaterialLogic.material_source(v, "clay")).is_equal({"text": "Clay · Clay Bank or Mine floor 1", "go": "spot_clay_bank"})
-	assert_that(P0MaterialLogic.material_source(v, "rock_salt")).is_equal({"text": "Rock Salt · Mine floors 1–2", "go": "mine"})
+	# Clay Bank opens at Homestead Lv2 (this view has no spot states, so the content's gate counts): open sources first (q(65)).
+	assert_that(P0MaterialLogic.material_source(v, "clay")).is_equal({"text": "Clay · Mine floor 1 · or Clay Bank from Homestead Lv2", "go": "mine"})
+	assert_that(P0MaterialLogic.material_source(v, "rock_salt")).is_equal({"text": "Rock Salt · Mine floors 1–\u20602", "go": "mine"})
 	# Not materials: bait also comes from the tackle shop, seeds from the stall; the other rules say those.
 	assert_that(P0MaterialLogic.material_source(v, "bait_worm")).is_empty()
 	assert_that(P0MaterialLogic.material_source(v, "seed_radish")).is_empty()
-	assert_that(P0Logic.need_source(v, "copper_ore")).is_equal({"text": "Copper Ore · Mine floors 1–2", "go": "mine"})
+	assert_that(P0Logic.need_source(v, "copper_ore")).is_equal({"text": "Copper Ore · Mine floors 1–\u20602", "go": "mine"})
 
 # --- The drawer ---
 

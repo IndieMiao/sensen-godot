@@ -942,7 +942,8 @@ static func home_panel(view: Dictionary, at_home := true) -> Dictionary:
 		break
 	return out
 
-## The one-line source for a HOME-1 tile (NeedSource, guide only): coins, skill levels, or a material's places.
+## The one-line source for a HOME-1 tile (NeedSource, guide only): coins, skill levels, or a material's places, the
+## same line as the workbench (P0MaterialLogic.material_source, Li Bai q(65)).
 static func home_source(view: Dictionary, id: String) -> Dictionary:
 	var sk: Dictionary = view.get("skills", {})
 	match id:
@@ -950,23 +951,7 @@ static func home_source(view: Dictionary, id: String) -> Dictionary:
 		"skills":
 			return {"text": "Farming %d + Fishing %d · Cooking not counted" % [int(sk.get("farming", {}).get("level", 1)),
 				int(sk.get("fishing", {}).get("level", 1))], "go": ""}
-	return material_source(view, id)
-
-## Where a material comes from (NeedSource, one line): its gathering spots (SGODOT-231, from view.gather; one that
-## opens later says its Homestead level) and the mine (any floor that can drop it; Stone comes from every rock).
-static func material_source(view: Dictionary, id: String) -> Dictionary:
-	var places: Array = []
-	for spot in view.get("gather", {}).get("spots", []):
-		var y: Array = spot.get("yield", [])
-		if y.is_empty() or str(y[0][0]) != id: continue
-		places.append(str(spot.name) if bool(spot.get("open", true)) else "%s (Homestead Lv%d)" % [str(spot.name), int(spot.get("homestead", 2))])
-	var mined := id == "stone"
-	for f in content().get("mine", {}).get("floors", []):
-		for d in f.get("drops", []):
-			if d[0] != null and str(d[0]) == id: mined = true
-	if mined: places.append("the Mine")
-	var label := item_name(view, id)
-	return {"text": label if places.is_empty() else "%s · %s" % [label, " or ".join(places)], "go": ""}
+	return need_source(view, id)
 
 ## PLAQUE-READ (Figma 1510:97745): the Upgrade Plaque's lines, one per Homestead upgrade, "Lv2" / "Oct 5" in the
 ## device's time zone. Empty until the first upgrade (the plaque appears in the yard with its first line).

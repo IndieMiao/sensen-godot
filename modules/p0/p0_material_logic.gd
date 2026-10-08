@@ -353,28 +353,45 @@ static func gloves_moment(view: Dictionary) -> Dictionary:
 
 # --- Material sources (NeedSource) ---
 
-## Where a material comes from, for a tapped NEED-TILE (LOCK-10, one line; Show only moves the camera, LOCK-08):
-## `Timber · Timber Grove`, `Copper Ore · Mine floors 1–2` (B2-06 SOURCE; the P0 mine has two floors), `Clay · Clay
-## Bank or Mine floor 1`. `go` is the first source's spot on the farm ("spot_grove", "mine"). {} for anything that is
-## not a material (content.materials) or that no spot or floor yields.
+## Where a material comes from, for a tapped NEED-TILE (LOCK-10, one line; Show only moves the camera, LOCK-08), shared
+## by HOME-1 and the workbench. Li Bai q(65), plan §8.6.1 / §8.6.2: sources joined by ` · or `; a spot that is not open
+## yet comes last with its gate, `Clay · Mine floor 1 · or Clay Bank from Homestead Lv2`, and loses only the gate once
+## open, `Clay · Mine floor 1 · or Clay Bank`. Order: spots open from the start, then the mine floors that yield it
+## (every rock gives Stone, so Stone names both floors), then spots a Homestead level opens; still-locked ones last.
+## `go` (Show, 不知火舞 on 228): the first open source ("spot_grove", "mine"); with none open, the first source (its
+## name strip says the gate). {} for anything that is not a material (content.materials) or that nothing yields.
 static func material_source(view: Dictionary, id: String) -> Dictionary:
 	var c := P0Logic.content()
 	if not c.get("materials", {}).has(id): return {}   # bait also comes from the tackle shop: only materials here
-	var spots: Array = []
+	var live := {}   # the view's spot states (open / homestead) by id
+	for sp in view.get("gather", {}).get("spots", []): live[str(sp.get("id", ""))] = sp
+	var level := int(view.get("homestead", {}).get("level", 1))
+	var first: Array = []
+	var gated: Array = []
 	var gather: Dictionary = c.get("gather", {}).get("spots", {})
 	for sid in gather:
-		for y in gather[sid].get("yield", []):
-			if str(y[0]) == id: spots.append(str(sid))
+		var y: Array = gather[sid].get("yield", [])
+		if y.is_empty() or str(y[0][0]) != id: continue   # a side yield (Worm Bait at the Reed Bank) is not the spot's material
+		var sp: Dictionary = live.get(str(sid), {})
+		var gate := int(sp.get("homestead", gather[sid].get("homestead", 1)))
+		var src := {"name": str(sp.get("name", gather[sid].get("name", ""))), "go": str(sid), "gate": gate,
+			"open": bool(sp.get("open", gate <= level))}
+		(first if gate <= 1 else gated).append(src)
 	var floors: Array = []
 	for f in c.get("mine", {}).get("floors", []):
+		var yields := id == "stone"
 		for d in f.get("drops", []):
-			if d[0] != null and str(d[0]) == id: floors.append(int(f.get("floor", 0)))
-	if spots.is_empty() and floors.is_empty(): return {}
-	var where: Array = spots.map(func(sid): return str(gather[sid].get("name", "")))
-	if floors.size() == 1: where.append("Mine floor %d" % floors[0])
-	elif floors.size() > 1: where.append("Mine floors %d–%d" % [floors.min(), floors.max()])
-	return {"text": "%s · %s" % [P0Logic.item_name(view, id), " or ".join(where)],
-		"go": str(spots[0]) if not spots.is_empty() else "mine"}
+			if d[0] != null and str(d[0]) == id: yields = true
+		if yields: floors.append(int(f.get("floor", 0)))
+	if not floors.is_empty():
+		# U+2060 after the en dash: the NeedSource label wraps, and "Mine floors 1–" / "2" must never split.
+		var where := "Mine floor %d" % floors[0] if floors.size() == 1 else "Mine floors %d–\u2060%d" % [floors.min(), floors.max()]
+		first.append({"name": where, "go": "mine", "gate": 1, "open": true})
+	var all: Array = first + gated
+	if all.is_empty(): return {}
+	var ordered: Array = all.filter(func(s): return s.open) + all.filter(func(s): return not s.open)
+	var parts: Array = ordered.map(func(s): return s.name if s.open else "%s from Homestead Lv%d" % [s.name, s.gate])
+	return {"text": "%s · %s" % [P0Logic.item_name(view, id), " · or ".join(parts)], "go": str(ordered[0].go)}
 
 # --- Workbench (B2-06) ---
 
