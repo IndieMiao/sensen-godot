@@ -83,7 +83,7 @@ static func pick_card(cands: Array, at: Vector3, current: String) -> String:
 		if d < best_d:
 			best = str(c[0])
 			best_d = d
-	return current if current_d <= best_d + CARD_KEEP else best
+	return current if current_d < INF and current_d <= best_d + CARD_KEEP else best
 
 ## This helper's finger-card candidates for the farm's pick_card: the five spots and the workbench.
 func card_candidates() -> Array:
@@ -101,14 +101,14 @@ func frame(v: Dictionary, card := "") -> void:
 	rt.ui.badge("mine", UiStatusBadge.State.AVAILABLE, top, not rt.ui.has_modal(), P0MaterialLogic.mine_badge(v),
 		P0Logic.icon("pickaxe"))
 	top.y -= rt.ui.badge_height("mine")
-	var card := P0MaterialLogic.mine_entry_card(v)
-	_entry.visible = near and bool(card.get("show", false)) and not rt.ui.has_modal()
+	var entry := P0MaterialLogic.mine_entry_card(v)
+	_entry.visible = near and bool(entry.get("show", false)) and not rt.ui.has_modal()
 	if _entry.visible:
-		_entry_button.text = str(card.label)
-		_entry_button.disabled = not bool(card.enabled)
-		_entry_line.text = str(card.line2)
+		_entry_button.text = str(entry.label)
+		_entry_button.disabled = not bool(entry.enabled)
+		_entry_line.text = str(entry.line2)
 		_entry_line.visible = _entry_line.text != ""
-		_entry_cmd = card.cmd
+		_entry_cmd = entry.cmd
 		_entry.reset_size()
 		_entry.position = top - Vector2(_entry.size.x * 0.5, _entry.size.y + 30)
 	if near:
