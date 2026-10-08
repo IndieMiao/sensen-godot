@@ -91,6 +91,7 @@ var _exp_slots: Array = []      # Experiment tab: ids placed in the pot
 var _card_queue: Array = []
 var _teach: PanelContainer
 var _teach_left := 0.0
+var tips: P0Guide.TipQueue   # the TipCard order and "shown before" (SGODOT-232 U6)
 var _taught := {}
 var _toast: Label
 var _toast_left := 0.0
@@ -134,7 +135,11 @@ func _process(dt: float) -> void:
 		if _toast_left <= 0.0: _toast.hide()
 	if _teach_left > 0.0:
 		_teach_left -= dt
-		if _teach_left <= 0.0 and _teach: _teach.hide()
+		if _teach_left <= 0.0: _hide_tip()
+	# q(49): a waiting TipCard comes up only when no RewardMoment / result card is on screen; one already up stays.
+	if tips and modal_kind != "card":
+		var key := tips.next()
+		if key != "": _show_tip(str(P0Guide.TIPS[key]))
 
 func _build_hud() -> void:
 	hud = UiHud.new()
@@ -1442,10 +1447,24 @@ const TIPS_PATH := "user://p0_tips.json"
 
 ## A one-sentence card above the quick bar, once per account on this device; tap or 7 s to dismiss.
 ## Never a hand animation, never moves the player (§14.3 "不画手指动画循环").
-func teach(key: String, text: String) -> void:
+## A TipCard (q(44): the eight P0 sentences in P0Guide.TIPS, each once; shown in order through P0Guide.TipQueue,
+## timed like a Toast and closed by doing what it teaches, a tap, or time). `_text` is ignored: the copy is P0Guide's.
+func teach(key: String, _text := "") -> void:
 	_load_tips()
-	if _taught.has(key): return
-	_taught[key] = true
+	if tips == null: tips = P0Guide.TipQueue.new(_taught)
+	tips.request(key)
+
+## The player did what the tip on screen teaches (sow / cast / cook / heat): it closes now.
+func tip_did(action: String) -> void:
+	if tips and tips.did(action): _hide_tip(false)
+
+func _hide_tip(close_queue := true) -> void:
+	_teach_left = 0.0
+	if _teach: _teach.hide()
+	if close_queue and tips: tips.close()
+
+func _show_tip(text: String) -> void:
+	for k in tips.seen: _taught[k] = true
 	_save_tips()
 	if _teach == null:
 		_teach = PanelContainer.new()
@@ -1458,17 +1477,18 @@ func teach(key: String, text: String) -> void:
 		l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		_teach.add_child(l)
 		_teach.gui_input.connect(func(e: InputEvent):
-			if P0Ui.is_tap(e) or (e is InputEventScreenTouch and e.pressed): _teach.hide())
+			if P0Ui.is_tap(e) or (e is InputEventScreenTouch and e.pressed): _hide_tip())
 		root.add_child(_teach)
 		_place_controls()
 	(_teach.get_node("Text") as Label).text = text
 	_teach.show()
-	_teach_left = 7.0
+	_teach_left = P0Guide.tip_seconds(text)
 
 # ---------------------------------------------------------------- M2: kitchen, catch and dish cards
 ## Stove panel (§7.2.7, COOK-2a/2b): Cookbook (known pages cook in one tap, missing ones say what is short)
 ## and Experiment (free slots from the bag). Cooking costs no Energy.
 func open_kitchen(tab := "") -> void:
+	teach("cook")   # Tap Cook to grill your first fish (§14.2 minute 14–16)
 	if tab != "": _kitchen_tab = tab
 	var ck: Dictionary = view.get("cooking", {})
 	var lvl := int(view.get("skills", {}).get("cooking", {}).get("level", 1))

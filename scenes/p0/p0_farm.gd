@@ -330,7 +330,7 @@ func _teaching(v: Dictionary) -> void:
 	if rt.ui.has_modal(): return
 	var firsts: Array = v.get("firsts", [])
 	if not firsts.any(func(f): return str(f).begins_with("harvest:")) and not v.get("plots", []).any(func(p): return str(p.state) in ["sown", "growing", "ready"]):
-		rt.ui.teach("sow", "Pick a seed, walk up to a bed and press Sow. Hold to keep sowing.")
+		rt.ui.teach("sow")   # copy in P0Guide.TIPS (q(44))
 
 func p0_anchor() -> Vector2:
 	if not _front.is_empty():

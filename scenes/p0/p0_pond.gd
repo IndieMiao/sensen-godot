@@ -142,9 +142,8 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 		cam.global_transform = _blend_from.interpolate_with(cam.global_transform, k)
 		cam.size = lerpf(_blend_size, cam.size, k)
 	rt.ui.set_action(_action_state(v))
-	if not rt.ui.has_modal():
-		rt.ui.teach("cast", "Casting uses 5 Energy. If the fish gets away, most of it comes back.")
-		if P0Logic.bag_count(v, "bait_worm") > 0: rt.ui.teach("bait", "Tap Worm Bait to put it on the hook · faster bites, more Fine fish.")
+	# At the pond: "Your creel is your bag…" (§14.2 minute 5–9); "Casting uses 5 Energy" comes with the first cast (P0Guide).
+	if not rt.ui.has_modal(): rt.ui.teach("creel")
 
 ## Away from the bank the key still casts: it walks to the nearest bank spot first (the old Go fishing).
 func _action_state(v: Dictionary) -> Dictionary:

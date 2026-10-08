@@ -198,7 +198,8 @@ func test_teaching_card_stays_clear_of_the_bar_and_the_keys() -> void:
 	var had_tips := FileAccess.file_exists(P0Ui.TIPS_PATH)
 	var saved := FileAccess.get_file_as_string(P0Ui.TIPS_PATH) if had_tips else ""
 	ui._taught = {"_": true}   # non-empty: teach() won't load saved tips over it
-	ui.teach("probe_tip", "Pick a seed, walk up to a bed and press Sow. Hold to keep sowing.")
+	ui.tips = null             # a fresh TipQueue (SGODOT-232 U6): the longest P0 tip comes up on the next frame
+	ui.teach("sow")
 	await await_idle_frame()
 	await await_idle_frame()
 	var tip := ui._teach.get_global_rect()
