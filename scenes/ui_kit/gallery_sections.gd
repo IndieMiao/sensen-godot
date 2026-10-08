@@ -29,6 +29,7 @@ static func all() -> Array[Dictionary]:
 		# SGODOT-222 world display
 		{id = "need_tile", title = "UiNeedTile", figma = "NeedTile 1090:78003 · LOCK-10", build = _need_tiles},
 		{id = "need_source", title = "UiNeedSource", figma = "NeedSource 1092:77266 · LOCK-10 / 08", build = _need_sources},
+		{id = "show_pill", title = "UiShowPill", figma = "Show pill of TodayRow 1145:81714 / NeedSource 1092:77266 · LOCK-08", build = _show_pills},
 		{id = "hud", title = "UiHud", figma = "HUD 1143:103373 · LOCK-06 (shown at 328/360)", build = _huds},
 		{id = "today_panel", title = "UiTodayPanel", figma = "TodayPanel 1145:81715 · TodayRow 1145:81714 · LOCK-06 (328/360)", build = _today_panels},
 		{id = "energy_card", title = "UiEnergyCard · card", figma = "Energy 1094:77504 Kind=Card · EnergyTile 1093:77292 · LOCK-09", build = _energy_cards},
@@ -658,6 +659,18 @@ static func _request_cards() -> Control:
 		line = "Could you catch me a fish? Any kind is fine.", needs = [{name = "Common fish", have = 0, need = 1, icon = _tex("fish_crucian")}],
 		reward = "+5 Friendship · 20 coins", deliver_to = "Pip · Travel Post"}
 	return _captioned(_at_336(UiRequestCard.new(d)), "open · Accept")
+static func _show_pills() -> Control:
+	var row := _row(UiTokens.SPACE_SECTION)
+	row.add_child(_captioned(UiShowPill.new("Show", UiShowPill.Kind.TODAY), "TODAY · 28 high"))
+	row.add_child(_captioned(UiShowPill.new("Show on map", UiShowPill.Kind.TODAY), "TODAY · elsewhere"))
+	row.add_child(_captioned(UiShowPill.new("Show ›", UiShowPill.Kind.SOURCE), "SOURCE · 31 high"))
+	var note := UiKit.label("Drawn at the main's size; touches reach 44 × 44 around it (_has_point).", UiTokens.STYLE_C9_B, UiTokens.COLOR_SECONDARY)
+	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var v := _column(UiTokens.SPACE_WITHIN)
+	v.add_child(row)
+	v.add_child(note)
+	return v
+
 static func _resident_profiles() -> Control:
 	var d := {face = load("res://assets/p0/art/residents/res_pip.svg"), name = "Pip", role = "Courier Kid", stage = "Familiar",
 		friendship = "52/90", likes = "Dessert", likes_icon = _tex("dish_carrot_cake")}
