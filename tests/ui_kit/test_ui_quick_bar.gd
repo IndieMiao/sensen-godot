@@ -88,14 +88,60 @@ func test_drag_onto_another_slot_swaps_them() -> void:
 	assert_bool(bar.is_dragging()).is_false()
 	assert_int(bar.cells()[2].state).is_equal(UiItemCell.State.ZERO)
 
-func test_fling_above_the_bar_removes_the_slot() -> void:
+func test_drag_shows_the_remove_zone_and_dropping_on_it_removes() -> void:
 	var c := bar.cells()[1]
+	c.gesture.emit({kind = &"lift", pos = _center(1)})
+	c.gesture.emit({kind = &"drag_start", pos = _center(1)})
+	var zone := bar.remove_zone()
+	assert_object(zone).is_not_null()
+	var bar_top := bar.get_global_rect().position.y
+	assert_vector(zone.center).is_equal(Vector2(bar.get_viewport_rect().size.x * 0.5, bar_top - 96.0))
+	assert_bool(zone.hover).is_false()
+	c.gesture.emit({kind = &"drag_move", pos = zone.center + Vector2(30, 20)})   # within 48
+	assert_bool(zone.hover).is_true()
+	assert_vector(bar._ghost.scale).is_equal(Vector2(0.8, 0.8))
+	c.gesture.emit({kind = &"drop", pos = zone.center + Vector2(30, 20)})
+	assert_array(events).contains_exactly([["slot_removed", "seed_carrot", null]])
+	assert_bool(bar.is_dragging()).is_false()
+
+func test_dragged_slot_rides_above_the_finger() -> void:
+	var c := bar.cells()[0]
+	c.gesture.emit({kind = &"lift", pos = _center(0)})
+	c.gesture.emit({kind = &"drag_start", pos = Vector2(150, 600)})
+	var g: UiItemCell = bar._ghost
+	assert_float(g.global_position.y + g.custom_minimum_size.y).is_equal(600.0 - 24.0)
+	assert_float(g.global_position.x + g.custom_minimum_size.x * 0.5).is_equal(150.0)
+
+func test_release_anywhere_else_flies_back_and_changes_nothing() -> void:
+	var c := bar.cells()[1]
+	c.gesture.emit({kind = &"lift", pos = _center(1)})
 	c.gesture.emit({kind = &"drag_start", pos = _center(1)})
 	var top := bar.get_global_rect().position.y
-	c.gesture.emit({kind = &"drop", pos = Vector2(_center(1).x, top - GestureArbiter.FLING_REMOVE + 1)})   # not far enough
+	c.gesture.emit({kind = &"drop", pos = Vector2(_center(1).x, top - 41.0)})   # the old "40 above removes" is gone
+	assert_array(events).is_empty()
+	assert_bool(bar.is_dragging()).is_false()
+	assert_int(c.state).is_equal(UiItemCell.State.DEFAULT)
+
+func test_released_back_on_its_own_slot_toggles_the_pin() -> void:
+	var c := bar.cells()[1]
+	c.gesture.emit({kind = &"lift", pos = _center(1)})
 	c.gesture.emit({kind = &"drag_start", pos = _center(1)})
-	c.gesture.emit({kind = &"drop", pos = Vector2(_center(1).x, top - GestureArbiter.FLING_REMOVE - 1)})
-	assert_array(events).contains_exactly([["slot_removed", "seed_carrot", null]])
+	c.gesture.emit({kind = &"drag_move", pos = _center(3)})
+	c.gesture.emit({kind = &"drop", pos = _center(1) + Vector2(0, -36)})   # out and back, within its slot +8
+	assert_array(events).contains_exactly([["pin_toggled", "seed_carrot", true]])
+
+func test_a_cancel_or_cancel_drag_flies_back() -> void:
+	var c := bar.cells()[1]
+	c.gesture.emit({kind = &"lift", pos = _center(1)})
+	c.gesture.emit({kind = &"drag_start", pos = _center(1)})
+	c.gesture.emit({kind = &"cancel"})   # a second finger
+	assert_bool(bar.is_dragging()).is_false()
+	c.gesture.emit({kind = &"lift", pos = _center(1)})
+	c.gesture.emit({kind = &"drag_start", pos = _center(1)})
+	bar.cancel_drag()   # app paused / a drawer opening
+	assert_bool(bar.is_dragging()).is_false()
+	assert_object(bar.remove_zone()).is_null()
+	assert_array(events).is_empty()
 
 func test_swipe_up_bag_and_close() -> void:
 	bar.cells()[3].gesture.emit({kind = &"swipe_up"})
@@ -262,7 +308,8 @@ func test_pin_badge_sits_at_the_buttons_left_like_the_main() -> void:
 	assert_float(b.get_center().y).is_equal(menu.button().size.y * 0.5)
 	assert_float(menu._verb.get_rect().get_center().x).is_equal(menu.button().size.x * 0.5)   # verb stays centred
 
-func test_long_press_that_turns_into_a_drag_does_not_pin() -> void:
+func test_a_drag_released_back_on_its_own_slot_pins_it() -> void:
+	# LOCK-04 / 05 v1.10 (BAR-DRAG-1): the release point decides, not the movement, so a shaky drag out and back pins.
 	var now := [0]
 	for c in bar.cells(): c.clock = func() -> int: return now[0]
 	await _into_view()
@@ -277,7 +324,7 @@ func test_long_press_that_turns_into_a_drag_does_not_pin() -> void:
 	_push(_move(at))   # back over its own slot
 	_push(_press(at, false))
 	await await_idle_frame()
-	assert_array(events.filter(func(e): return e[0] in ["pin_toggled", "slots_swapped", "slot_removed"])).is_empty()
+	assert_array(events.filter(func(e): return e[0] in ["pin_toggled", "slots_swapped", "slot_removed"])).is_equal([["pin_toggled", "seed_carrot", true]])
 
 func _move(pos: Vector2) -> InputEvent:
 	if DisplayServer.is_touchscreen_available():

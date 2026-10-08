@@ -57,6 +57,7 @@ var _bar: UiQuickBar
 var _keys: UiActionKey
 var _radial: UiActionRadial
 var _pin_menu: UiPinMenu
+var _undo_toast: UiUndoToast
 var _cards := {}          # id -> UiTapCard
 var _card_hits := {}      # id -> screen point a tap on the card forwards to the world (the facility's own tap point)
 var _badges := {}         # id -> UiStatusBadge
@@ -427,14 +428,14 @@ func _refresh_bar() -> void:
 			selected_seed = ""
 			seed_selected.emit("")
 		# First slot on entering the action (§10.3.3 ①); a deliberate deselect stays deselected.
-		var stocked := ids.filter(func(id): return P0Logic.bag_count(view, str(id)) > 0)
+		var stocked := ids.filter(func(id): return str(id) != "" and P0Logic.bag_count(view, str(id)) > 0)
 		if _auto_pick and selected_seed == "" and not stocked.is_empty():
 			selected_seed = str(stocked[0])
 			seed_selected.emit(selected_seed)
-		if not ids.is_empty(): _auto_pick = false
+		if ids.any(func(id): return str(id) != ""): _auto_pick = false
 	_bar_ids = ids
 	var bag: Dictionary = view.get("bag", {})
-	var counts := ids.map(func(id): return P0Logic.bag_count(view, str(id)))
+	var counts := ids.map(func(id): return P0Logic.bag_count(view, str(id)) if str(id) != "" else 0)
 	var used := _bag_slots().size()
 	var sig := [bar_mode, ids, counts, store.pins.duplicate(), selected_bait if bar_mode == "fish" else selected_seed,
 		used * 10 >= int(bag.get("capacity", 25)) * 9, modal_kind in ["bag", "gear"]]
@@ -443,13 +444,17 @@ func _refresh_bar() -> void:
 	var slots := []
 	for i in ids.size():
 		var id := str(ids[i])
-		slots.append({id = id, icon = P0Logic.icon(id), title = P0Logic.item_name(view, id), quantity = counts[i], pinned = store.pins.has(id)})
+		if id == "": slots.append({})   # a gap left by a drag-remove (LOCK-05 v1.10): no item, no pin
+		else: slots.append({id = id, icon = P0Logic.icon(id), title = P0Logic.item_name(view, id), quantity = counts[i], pinned = store.pins.has(id)})
 	# A-08 ghost: a bar holding nothing of the action's family shows it in the first empty slot; a tap opens the
 	# Bag (ghost_tapped). TODO(SGODOT-225 bag drawer): open on the family tab (Seeds → Seeds, Bait → Tackle) and
 	# flash the slot 600 ms when a real item lands.
 	var family: Array = ["bait_", "bait_worm", "Bait"] if bar_mode == "fish" else ["seed_", "seed_radish", "Seeds"]
-	if slots.size() < UiQuickBar.SLOTS and not ids.any(func(id): return str(id).begins_with(family[0])):
-		slots.append({ghost = true, icon = P0Logic.icon(family[1]), title = family[2]})
+	if not ids.any(func(id): return str(id).begins_with(family[0])):
+		var ghost := {ghost = true, icon = P0Logic.icon(family[1]), title = family[2]}
+		var gap := slots.find({})
+		if gap >= 0: slots[gap] = ghost
+		elif slots.size() < UiQuickBar.SLOTS: slots.append(ghost)
 	_bar.slots = slots
 	_bar.selected = sig[4]
 	_bar.capacity_warning = sig[5]
@@ -485,7 +490,8 @@ func _set_pin(id: String, pinned: bool) -> void:
 	_save_quick()
 	_refresh_bar()
 
-## Drag onto another slot: the two swap places and both become pinned (§10.3.4).
+## Drag onto another slot: the two swap places, both become pinned, and the PinMenu (Pinned=yes · Unpin) shows
+## over the slot it landed on (§10.3.4, LOCK-05 v1.10 BAR-DRAG-5). Onto a gap it simply moves there.
 func _on_slots_swapped(a: int, b: int) -> void:
 	while _bar_ids.size() <= maxi(a, b): _bar_ids.append("")
 	var t = _bar_ids[a]
@@ -494,19 +500,46 @@ func _on_slots_swapped(a: int, b: int) -> void:
 	var store := _quick_for(bar_mode)
 	for id in [_bar_ids[a], _bar_ids[b]]:
 		if str(id) != "" and not store.pins.has(id): store.pins.append(id)
-	_bar_ids = _bar_ids.filter(func(id): return str(id) != "")
 	_save_quick()
 	_refresh_bar()
+	var landed := str(_bar_ids[b]) if b < _bar_ids.size() else ""
+	if landed != "": _show_pin_menu(landed, true)
 
-## Fling off the bar: gone from the bar, still in the bag (§10.3.4); not refilled until pinned again.
+## Dropped on the remove zone: off the bar, still in the Bag (§10.3.4); its slot stays a gap, nothing refills it
+## (LOCK-05 v1.10 BAR-DRAG-4), and an Info toast `<Item> off the bar · Undo` (5 s) puts it back, pin and place.
 func _on_slot_removed(id: String) -> void:
 	var store := _quick_for(bar_mode)
+	var was := {id = id, index = _bar_ids.find(id), pinned = store.pins.has(id), mode = bar_mode}
 	store.pins.erase(id)
 	if not store.removed.has(id): store.removed.append(id)
-	_bar_ids.erase(id)
+	if was.index >= 0: _bar_ids[was.index] = ""
 	if selected_seed == id: selected_seed = ""
 	if selected_bait == id: selected_bait = ""
 	_save_quick()
+	_refresh_bar()
+	_show_undo_toast(was)
+
+func _show_undo_toast(was: Dictionary) -> void:
+	if _undo_toast: _undo_toast.queue_free()
+	_undo_toast = UiUndoToast.new("%s off the bar" % P0Logic.item_name(view, str(was.id)))
+	_undo_toast.theme = UiKit.theme()
+	_kit.add_child(_undo_toast)
+	var size := _undo_toast.get_combined_minimum_size()
+	_undo_toast.size = size
+	_undo_toast.position = Vector2(UiTokens.SPACE_PAGE, _bar.position.y - UiTokens.SPACE_WITHIN - size.y)   # BAR-DRAG-4
+	_undo_toast.undo_pressed.connect(func(): _undo_remove(was))
+
+func _undo_remove(was: Dictionary) -> void:
+	var store := _quick_for(str(was.mode))
+	var id := str(was.id)
+	store.removed.erase(id)
+	if bool(was.pinned) and not store.pins.has(id): store.pins.append(id)
+	if str(was.mode) == bar_mode:
+		var i := int(was.index)
+		if i >= 0 and i < _bar_ids.size() and str(_bar_ids[i]) == "": _bar_ids[i] = id
+		elif not _bar_ids.has(id): _bar_ids.insert(clampi(i, 0, _bar_ids.size()), id)
+	_save_quick()
+	_bar_sig = []
 	_refresh_bar()
 
 ## PinMenu over the slot a long press just toggled (LOCK-05): the new state and the reverse in one tap.
@@ -653,6 +686,10 @@ func toast(text: String, seconds := 2.6) -> void:
 	_toast_left = seconds
 
 # ---------------------------------------------------------------- modals
+## Going to the background cancels a slot drag: the slot flies back, nothing changes (LOCK-04 v1.10).
+func _notification(what: int) -> void:
+	if what in [NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_APPLICATION_FOCUS_OUT] and _bar != null: _bar.cancel_drag()
+
 func has_modal() -> bool: return _modal != null or (_radial != null and _radial.visible)
 
 func close_modal() -> void:
@@ -675,6 +712,7 @@ func _drop_modal() -> void:
 	_fab_pills.visible = _keys.visible and bool(_fab_state.get("creel_full", false))
 
 func _open_modal(content: Control, dim := 0.32, hide_controls := false) -> void:
+	_bar.cancel_drag()   # a drawer or card opening cancels a slot drag (LOCK-04 v1.10)
 	_drop_modal()
 	var veil := ColorRect.new()
 	veil.set_anchors_preset(Control.PRESET_FULL_RECT)

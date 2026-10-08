@@ -32,6 +32,7 @@ static func all() -> Array[Dictionary]:
 		{id = "pin_menu", title = "UiPinMenu", figma = "PinMenu 1141:80291 · LOCK-05", build = _pin_menus},
 		{id = "scene_action", title = "UiSceneAction", figma = "SceneAction 1116:78934 · LOCK-02", build = _scene_actions},
 		{id = "action_key", title = "UiActionKey", figma = "ActionKey 1117:78924 · LOCK-02 / 03", build = _action_keys},
+		{id = "bar_remove_zone", title = "UiBarRemoveZone · UiUndoToast", figma = "BarRemoveZone 1588:97952 · Toast Tone=Info 1178:82247 · BAR-DRAG-3 / 4 · LOCK-04 / 05 v1.10", build = _bar_remove_zone},
 		{id = "action_radial", title = "UiActionRadial", figma = "RadialPetal 1122:79385 · BAR-2 482:23 · LOCK-03", build = _action_radial},
 		{id = "status_badge", title = "UiStatusBadge", figma = "StatusBadge 1132:79554 · LOCK-11", build = _status_badges},
 		{id = "tap_card", title = "UiTapCard", figma = "TapCard 1135:101133 · LOCK-07", build = _tap_cards},
@@ -382,6 +383,22 @@ static func _bar_slots() -> Array:
 		{id = "compost", icon = _tex("compost"), title = "Compost", quantity = 0, pinned = true},
 		{id = "seed_potato", icon = _tex("seed_potato"), title = "Potato Seeds", quantity = 3},
 	]
+
+static func _bar_remove_zone() -> Control:
+	var v := _column(UiTokens.SPACE_SECTION)
+	var row := _row(UiTokens.SPACE_ROW)
+	for hover in [false, true]:
+		var host := Control.new()
+		host.custom_minimum_size = Vector2(140, 110)
+		var z := UiBarRemoveZone.new()
+		z.top_level = false   # drawn in the gallery cell, not at its screen spot
+		z.hover = hover
+		host.add_child(z)
+		z.center = Vector2(70, 40)
+		row.add_child(_captioned(host, "hover · Release to remove" if hover else "idle · Remove from bar"))
+	v.add_child(row)
+	v.add_child(_captioned(UiUndoToast.new("Radish Seeds off the bar"), "removed: Info toast with Undo (5 s)"))
+	return v
 
 static func _quick_bars() -> Control:
 	var v := _column()
