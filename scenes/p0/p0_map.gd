@@ -141,7 +141,10 @@ func fly_to_city(id: String) -> void:
 func _on_net_booted(_ok: bool) -> void: pass
 func _on_net_booted_guest(_ok: bool) -> void: pass
 func _on_account_changed(_signed_in: bool) -> void: pass
-func _refresh_nearby() -> void: pass
+## P0 has no nearby list, but the region must count as set up: map_poc's resume rebuilds the region UI when
+## _nearby_region differs, which flies the camera back to the homestead (int5 hand test 31: back from an outpost
+## the map must stay where it was).
+func _refresh_nearby() -> void: _nearby_region = str(region.get("id", ""))
 func _refresh_city_counts() -> void: pass
 func _open_account() -> void: pass
 
@@ -175,6 +178,11 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"pond": _on_city_pond_requested({"id": step[1]})
 		"shop":
 			if city_map: city_map.select(P0Outposts.place_entry(P0Outposts.by_role(step[1] if step.size() > 1 else "tackle")))
+		"listpick":   # as a tap on the place list: select the outpost and fly the camera to it
+			var e := P0Outposts.place_entry(P0Outposts.by_role(step[1] if step.size() > 1 else "post"))
+			if city_map:
+				city_map.select(e)
+				city_map.focus_requested.emit(e)
 		"outpost": _open_outpost(step[1])
 		"enter":
 			if city_map: city_map._on_info_action()
