@@ -342,13 +342,14 @@ func test_the_tea_house_door_is_at_the_front_and_leaves() -> void:
 ## not tapping the door.
 func test_the_front_door_prompt_sits_on_the_steps_clear_of_the_player() -> void:
 	var r := _room("sh_tea_1")
-	assert_vector(r.pick_point("exit")).is_equal(r.anchor("badge_exit").global_position)
 	var feet := r.cam.unproject_position(r.actor.position)
 	var head := r.cam.unproject_position(r.actor.position + Vector3(0, 1.75, 0))
 	var prompt := r.cam.unproject_position(r.pick_point("exit"))
 	assert_float(prompt.y - feet.y).override_failure_message("prompt %s, feet %s" % [prompt, feet]).is_greater(10.0)
 	assert_str(r.pick(prompt)).is_equal("exit")
 	assert_str(r.pick((feet + head) * 0.5)).is_not_equal("exit")
+	assert_object(r.anchor("badge_exit")).is_not_null()
+	if r.anchor("badge_exit"): assert_vector(r.pick_point("exit")).is_equal(r.anchor("badge_exit").global_position)
 	# The Basic Room's back door keeps its prompt over the threshold.
 	var tackle := _room("sh_tackle_1")
 	assert_vector(tackle.pick_point("exit")).is_equal(tackle.anchor("exit").global_position + Vector3(0, 1.0, 0))
