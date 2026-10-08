@@ -34,6 +34,13 @@ var can_sell := Callable(): set = set_can_sell
 ## Called with the item when a filled cell is tapped (after the selection is drawn).
 var on_select := Callable()
 var selected_id := ""
+## The item in the air (a cell lifted toward the quick bar): its cell draws as an empty dashed cell until the drag
+## ends; "" puts it back (BAR-DRAG-9, as the quick bar's own dragged slot; 不知火舞 on 225).
+var lifted_id := "": set = set_lifted_id
+
+func set_lifted_id(v: String) -> void:
+	lifted_id = v
+	_paint_selection()
 
 var _grid: GridContainer
 var _cells: Array[UiItemCell] = []
@@ -136,8 +143,10 @@ func _item(id: String) -> Dictionary:
 func _paint_selection() -> void:
 	for i in _cells.size():
 		var filled := i < _shown.size()
-		var on := filled and str(_shown[i].get("id", "")) == selected_id
-		_cells[i].state = UiItemCell.State.SELECTED if on else (UiItemCell.State.DEFAULT if filled else UiItemCell.State.EMPTY)
+		var id := str(_shown[i].get("id", "")) if filled else ""
+		var on := filled and id == selected_id
+		var out := filled and lifted_id != "" and id == lifted_id
+		_cells[i].state = UiItemCell.State.EMPTY if out or not filled else (UiItemCell.State.SELECTED if on else UiItemCell.State.DEFAULT)
 
 func _on_tap(i: int) -> void:
 	if i < _shown.size(): select(str(_shown[i].get("id", "")))

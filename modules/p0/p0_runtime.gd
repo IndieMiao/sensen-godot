@@ -66,7 +66,7 @@ func _init() -> void:
 	ui.zoom_end.connect(func(): _call("p0_zoom_end", []))
 	ui.recenter.connect(func(): _call("p0_recenter", []))
 	ui.show_spot.connect(_show_spot)
-	ui.show_on_map.connect(func(target: String): _leave_then("show:" + target))   # the map points at the pin (p0_map resume)
+	ui.show_on_map.connect(_show_on_map)
 	ui.can_show_spot = func() -> bool: return is_instance_valid(world) and world.has_method("p0_show_spot")
 	ui.near_resident = func() -> String:   # an outpost's resident within reach (Gift to <Name>, SGODOT-225)
 		return str(world.call("p0_near_resident")) if is_instance_valid(world) and world.has_method("p0_near_resident") else ""
@@ -175,10 +175,20 @@ var _spot_after_room := ""
 
 func _show_spot(where: String) -> void:
 	if world is P0Room and session.space == "home" and not bool(_call("p0_has_spot", [where])):
+		# Only when the farmhouse really steps out (it is on top); else nothing waits to jump the camera later (亚瑟 on #37).
+		if AppRouter.top_instance() != world: return
 		_spot_after_room = where
 		leave_room()
 		return
 	_call("p0_show_spot", [where])
+
+## Show on map: from a world, back to the map, which points at the pin on resume (p0_map.show_place); on the map
+## itself the map points at it at once (蒙恬 on #44).
+func _show_on_map(target: String) -> void:
+	if is_instance_valid(world) and world.has_method("show_place"):
+		world.call("show_place", target)
+		return
+	_leave_then("show:" + target)
 
 ## One level back, for a room's door: the farm under the farmhouse, the map under an outpost.
 func leave_room() -> void:
