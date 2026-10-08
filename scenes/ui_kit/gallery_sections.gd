@@ -65,6 +65,8 @@ static func all() -> Array[Dictionary]:
 		{id = "float_text", title = "UiFloatText", figma = "FloatText 1178:82191 · six tones, Hug / Wrap (static pills)", build = _float_texts},
 		# SGODOT-224 panels
 		{id = "info_sheet", title = "UiInfoSheet", figma = "Compact/SelectedItem 633:41257 · BAG-1 482:10 · F-07 (SGODOT-207 168a4cc3)", build = _info_sheets},
+		{id = "board_card", title = "UiBoardCard", figma = "BOARD-READY 1498:96193 · Compact/Information row · E-11 (312 wide)", build = _board_cards},
+		{id = "board_card_states", title = "UiBoardCard states", figma = "BOARD-SHORT 1498:96574 · BOARD-DONE 1498:96382", build = _board_card_states},
 		{id = "keeper_bar", title = "UiKeeperBar", figma = "KeeperBar 1143:102525 Layout=Titled · NPC-2-2 482:118 / NPC-7-P0 1507:97237 · LOCK-16 (336 at 328)", build = _keeper_bars},
 		{id = "shop_row", title = "UiShopRow · UiStepper", figma = "Compact/ShopProduct 702:80447 · Compact/Stepper 1245:108953 · FARM-6 482:46 · C1-01", build = _shop_rows},
 		# SGODOT-231 workbench
@@ -762,6 +764,37 @@ static func _info_sheets() -> Control:
 		sheet.open("sample", &"bag")
 		v.add_child(_captioned(sheet, pair[0]))
 	return v
+
+## The Market Board page as BOARD-READY draws it: the day's facts, a request ready to hand in, an open one taking
+## three crops (short ones in amber on the tiles).
+static func _board_cards() -> Control:
+	var page := _column(8)
+	page.custom_minimum_size.x = 312
+	page.add_child(UiBoardCard.fact_row("Requests today", "4 of 6"))
+	page.add_child(UiBoardCard.fact_row("Next request", "3h 58m"))
+	page.add_child(_board_card({id = "m1", title = "Dusk Haul", info = true, status = "Ready to deliver", facts = ["4 Fine fish · any kind"],
+		reward = "36 coins", needs = [{id = "fish_crucian", name = "Fine fish", have = 4, need = 4, icon = _tex("fish_crucian")}], command = "Deliver"}))
+	page.add_child(_board_card({id = "m2", title = "Market Basket", info = true, status = "Open", facts = ["3 crops · 6 each"],
+		reward = "140 coins", needs = [{id = "crop_radish", name = "Radish", have = 6, need = 6, icon = _tex("crop_radish")},
+			{id = "crop_carrot", name = "Carrot", have = 4, need = 6, icon = _tex("crop_carrot")},
+			{id = "crop_potato", name = "Potato", have = 0, need = 6, icon = _tex("crop_potato")}], command = "Track"}))
+	return _captioned(page, "page facts · Ready · Open")
+
+## BOARD-SHORT: tracked and short, the gap on the button; BOARD-DONE: delivered, Done with its Reward, no button.
+static func _board_card_states() -> Control:
+	var page := _column(8)
+	page.custom_minimum_size.x = 312
+	page.add_child(_board_card({id = "m1", title = "Dusk Haul", info = true, status = "Tracked", facts = ["4 Fine fish · any kind"],
+		reward = "36 coins", needs = [{id = "fish_crucian", name = "Fine fish", have = 3, need = 4, icon = _tex("fish_crucian")}],
+		command = "Deliver", reason = "Need 1 more Fine fish"}))
+	page.add_child(_board_card({id = "m1", title = "Dusk Haul", info = false, status = "Done", facts = ["4 Fine fish · any kind"],
+		reward = "36 coins", done = true}))
+	return _captioned(page, "Tracked · short · Done")
+
+static func _board_card(d: Dictionary) -> UiBoardCard:
+	var c := UiBoardCard.new()
+	c.show_request(d)
+	return c
 
 ## Counter buy rows as FARM-6 draws them: available (stepper + Buy), more than one, sold out, gated, a one-off rod.
 static func _keeper_bars() -> Control:
