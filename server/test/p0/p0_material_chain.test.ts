@@ -175,6 +175,37 @@ describe('mine floors 1–2 (§13.3, LOCK-21)', () => {
     expect(c.mine.floors[0].drops).toEqual([['copper_ore', 35], ['rock_salt', 25], ['clay', 15], [null, 25]]);
   });
 
+  it('a fee is never paid into a floor whose first rock would not fit: Enter mine / New run / Floor 2 · Bag full (q(48))', () => {
+    const full = fresh();
+    for (let i = 0; i < 22; i++) full.bag.push({ id: 'fish_crucian', qty: 10 });   // 1 free slot: Stone + an ore need 2
+    expect(viewOf(c, full, T0).mine.entry_bag_ok).toBe(false);
+    expect(refuse(full, { type: 'mine_enter' })).toEqual({ code: 'bag_full', detail: { floor: 1 } });
+    expect(full.day.mine_runs).toBe(0);
+    // Inside a run: floor 1 cleared, then the bag fills before the stairs.
+    let { s } = step(fresh(), { type: 'mine_enter' });
+    let t = T0;
+    ({ s, t } = clearFloor(s, 1, t));
+    s.bag = Array.from({ length: s.bag_cap }, () => ({ id: 'fish_crucian', qty: 10 }));   // no slot, no Stone stack
+    const energy = s.energy.value;
+    expect(refuse(s, { type: 'mine_floor', floor: 2 }, t + STEP)).toEqual({ code: 'bag_full', detail: { floor: 2 } });
+    expect(s.energy.value).toBe(energy);
+    // Continue run and a paid floor stay free and open.
+    expect(step(s, { type: 'mine_enter' }, t + STEP).ev).toContainEqual(expect.objectContaining({ kind: 'mine', action: 'continue' }));
+    expect(step(s, { type: 'mine_floor', floor: 1 }, t + STEP).ev).toContainEqual(expect.objectContaining({ kind: 'mine', action: 'floor', floor: 1, cost: 0 }));
+  });
+
+  it('New run with a full bag is refused before any Energy (q(48))', () => {
+    let { s } = step(fresh(), { type: 'mine_enter' });
+    let t = T0;
+    ({ s, t } = clearFloor(s, 1, t));
+    s = step(s, { type: 'mine_floor', floor: 2 }, t += STEP).s;
+    ({ s, t } = clearFloor(s, 2, t));
+    s.bag = Array.from({ length: s.bag_cap }, () => ({ id: 'fish_crucian', qty: 10 }));
+    const energy = s.energy.value;
+    expect(refuse(s, { type: 'mine_new_run' }, t + STEP)).toEqual({ code: 'bag_full', detail: { floor: 1 } });
+    expect(s.energy.value).toBe(energy);
+  });
+
   it('a torch needs one in the bag', () => {
     const { s } = step(fresh(), { type: 'mine_enter' });
     expect(refuse(s, { type: 'mine_torch', floor: 1 }, T0 + STEP)).toEqual({ code: 'no_item', detail: { item: 'torch' } });
