@@ -773,7 +773,9 @@ func _after_kept(ev: Dictionary, events: Array) -> void:
 		_from_stove = false
 		rt.ui.queue_card(_show_card)
 		return
-	if turned: rt.ui.toast(P0KitchenLogic.rotation_line(v, ev, next))
+	var fresh := P0KitchenLogic.new_recipe_line(v, ev)
+	if turned and fresh != "": rt.ui.toast_success(fresh)   # q(85): a new recipe, its first-cook XP floats from the pot
+	elif turned: rt.ui.toast(P0KitchenLogic.rotation_line(v, ev, next))
 	else:
 		var line := P0KitchenLogic.kept_line(v, ev, events)
 		if not line.is_empty(): rt.ui.toast(str(line.text))

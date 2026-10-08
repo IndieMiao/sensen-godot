@@ -370,8 +370,9 @@ func test_a_turn_over_collect_that_fails_recovers_like_a_failed_serve() -> void:
 		_set_view(v)
 
 func test_a_first_time_dish_on_a_turn_over_floats_its_first_cook_xp_from_the_pot() -> void:
-	# 不知火舞 on 226: the turn-over has no result card to carry the first-cook strip, so that XP floats with the pot's
-	# own, from the pot; the toast marks the new recipe. A normal serve keeps the bonus on its card (int6 C11).
+	# q(85) (不知火舞 on 226): the turn-over has no result card to carry the first-cook strip, so `First cooked · +N
+	# Cooking XP` floats from the pot beside the pot's own XP, and a Success toast says `New recipe! <dish> kept`.
+	# A normal serve keeps the bonus on its card (int6 C11).
 	var v := _queue_view()
 	v.cooking.queued = {"id": 4, "dish": "dish_grilled_crucian", "rarity": 1, "ms": 5000, "starts_in": 0}
 	_set_view(v)
@@ -386,6 +387,8 @@ func test_a_first_time_dish_on_a_turn_over_floats_its_first_cook_xp_from_the_pot
 	after.cooking.stove = {"id": 4, "dish": "dish_grilled_crucian", "ms": 5000, "elapsed": 0, "ready_in": 5000, "heats": []}
 	_set_view(after)
 	rt.ui.clear_toast()
+	var shown: Array = []
+	rt.ui._toasts.shown.connect(func(text: String, severity): shown.append([text, severity]))
 	var dish := _dish(true)
 	dish.pot = 3
 	rt.session.state_changed.emit(after, [dish, {"kind": "first", "what": "cook:dish_grilled_crucian", "xp": 10},
@@ -393,7 +396,7 @@ func test_a_first_time_dish_on_a_turn_over_floats_its_first_cook_xp_from_the_pot
 		{"kind": "queue", "id": 4, "dish": "dish_grilled_crucian", "started_at": 0, "ms": 5000}])
 	for i in 2: await get_tree().process_frame
 	assert_bool(rt.ui.has_modal()).is_false()
-	assert_str(rt.ui.toast_text()).is_equal("New recipe! Grilled Crucian kept · Grilled Crucian cooking")
+	assert_array(shown).is_equal([["New recipe! Grilled Crucian kept", ToastLayer.Severity.SUCCESS]])
 	var xp: Array = rt.ui.root.find_children("*", "UiFloatText", true, false).filter(func(f): return (f as UiFloatText).text.contains("Cooking XP"))
-	assert_array(xp.map(func(f): return (f as UiFloatText).text)).is_equal(["+15 Cooking XP ★"])   # bonus 10 + pot 5, one line
+	assert_array(xp.map(func(f): return (f as UiFloatText).text)).contains_exactly_in_any_order(["First cooked · +10 Cooking XP", "+5 Cooking XP ★"])
 	k.stop_watching()

@@ -354,7 +354,8 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	# card's strip (Li Bai, int6 C11), the first harvest's as `First harvest! +10 XP · Radish` (§4.8.6).
 	var first_cook_xp: Array = []
 	# …the first cook's only when that card comes (a normal serve at the stove); a Queue ×2 turn-over or a pot kept on its
-	# own has none, so its bonus floats with the pot's XP (不知火舞 on 226). A world without the hook gives null.
+	# own has none, so it floats a line of its own, `First cooked · +20 Cooking XP` (q(85)). A world without the hook
+	# gives null.
 	var cook_card: bool = _call("p0_cook_card_coming", []) == true
 	# A harvest reply's XP counts its plants, so a held harvest reads `+40 XP · 20 plants` (§4.8.3).
 	var plants := events.filter(func(e): return str(e.get("kind", "")) == "item" and str(e.get("id", "")).begins_with("crop_") \
@@ -370,8 +371,10 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				# The server emits a first-time bonus as `first` immediately followed by its `xp`.
 				var bonus: bool = i > 0 and str(events[i - 1].get("kind", "")) == "first" and int(events[i - 1].xp) == int(ev.amount)
 				var what := str(events[i - 1].get("what", "")) if bonus else ""
-				if bonus and ((str(ev.skill) == "cooking" and cook_card) or what.begins_with("catch:") or what.begins_with("harvest:")):
+				if bonus and (str(ev.skill) == "cooking" or what.begins_with("catch:") or what.begins_with("harvest:")):
 					first_cook_xp.append(ev)
+				if what.begins_with("cook:") and not cook_card:
+					floats.append({kind = "first", key = what, text = "First cooked · +%d Cooking XP" % int(ev.amount), tone = UiFloatText.Tone.XP})
 				if what.begins_with("harvest:"):
 					var crop := what.trim_prefix("harvest:")
 					floats.append({kind = "first", key = what, text = "First harvest! +%d XP · %s" % [int(ev.amount),
