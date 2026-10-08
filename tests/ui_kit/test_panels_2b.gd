@@ -609,9 +609,24 @@ func test_each_affinity_stage_has_its_tone_on_the_profile_and_the_bar() -> void:
 		assert_object(_fill(label.get_parent() as Control)).is_equal(_TONES[i][0])
 		assert_object(label.get_theme_color(&"font_color")).is_equal(_TONES[i][1])
 		assert_float(badge.size.y).is_equal(float(UiTokens.SIZE_STATE_BADGE_H))   # size as it was
-		assert_float((badge.get_theme_stylebox(&"panel") as UiStyleBox).border_width).is_equal(0.0)   # no edge
+		var box := badge.get_theme_stylebox(&"panel") as UiStyleBox
+		var theme_box := UiKit.theme().get_stylebox(&"panel", UiTokens.PANEL_BADGE) as UiStyleBox
+		assert_float(box.border_width).is_equal(0.0)   # no edge
+		assert_object(box.corner_radius).is_equal(theme_box.corner_radius)   # the theme Badge's shape and padding
+		assert_float(box.content_margin_left).is_equal(theme_box.content_margin_left)
+		assert_float(box.content_margin_top).is_equal(theme_box.content_margin_top)
 	assert_array(UiResidentBar.stage_tone(-1)).is_equal(_TONES[0])
 	assert_array(UiResidentBar.stage_tone(9)).is_equal(_TONES[0])
+
+func test_the_top_stage_writes_only_the_points_with_a_full_meter() -> void:
+	var b: UiResidentBar = _host(UiResidentBar.new(_pip({stage = "Kindred", stage_index = 4, have = 157, need = 157, next = ""})))
+	await _settle()
+	assert_array(_texts(b)).contains(["Kindred", "157"])   # 李白 q(91): no denominator, no `· next`
+	assert_bool(_texts(b).any(func(t): return "/" in t or "next" in t)).is_false()
+	assert_float(b.progress()).is_equal(1.0)
+	var mid: UiResidentBar = _host(UiResidentBar.new(_pip()))
+	await _settle()
+	assert_array(_texts(mid)).contains(["52/90 · next Trusted"])
 
 func test_a_plain_state_badge_keeps_its_own_tone() -> void:
 	var ready: UiBadge = _host(UiBadge.new("Ready"))
