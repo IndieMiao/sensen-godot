@@ -310,6 +310,7 @@ func set_view(v: Dictionary) -> void:
 	view = v
 	if _bag != null and is_instance_valid(_bag) and modal_kind in ["bag", "gear", "gift"]: _bag.refresh(v)
 	if _profile != null and is_instance_valid(_profile) and modal_kind == "profile": _profile.update(v)
+	if workbench() != null: _workbench.refresh(v)
 	_refresh_hud()
 	_refresh_bar()
 
@@ -1730,6 +1731,35 @@ func open_resident_profile(id: String) -> void:
 	_close_above(sheet, _CLOSE_ABOVE_SHEET, UiTokens.SPACE_PAGE)
 	modal_kind = "resident_profile"
 	_modal_back = func(): open_resident(id)   # Android Back = the sheet's Back
+
+## The workbench drawer (SGODOT-231 B2-06): P0WorkbenchDrawer over the view, Close 44 six above its top and 16 in
+## (as RES-PIP's sheet). It follows the view while open; Craft / Equip go to the server, a grey button toasts its
+## reason (LOCK-10) and a cost tile shows where the material comes from (NeedSource, Show only moves the camera,
+## LOCK-08). What a craft shows afterwards (the card's float, the pickaxe's Moment, the gloves' banner) belongs to
+## the farm's P0FarmMaterials.
+const _WORKBENCH_KIND := "workbench"
+var workbench_tab := "tools"
+var _workbench: P0WorkbenchDrawer
+
+func open_workbench(tab := "") -> P0WorkbenchDrawer:
+	if tab != "": workbench_tab = tab
+	var d := P0WorkbenchDrawer.new(view, workbench_tab)
+	d.theme = UiKit.theme()
+	d.safe_bottom = safe_bottom()
+	d.close_requested.connect(close_modal)
+	d.tab_changed.connect(func(t: String): workbench_tab = t)
+	d.command_requested.connect(func(cmd: Dictionary): command.emit(cmd))
+	d.unavailable_requested.connect(func(reason: String): toast(reason))
+	d.source_requested.connect(_show_need_source)
+	_open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
+	_close_above(d, _CLOSE_ABOVE_SHEET, UiTokens.SPACE_PAGE)
+	_workbench = d
+	modal_kind = _WORKBENCH_KIND
+	return d
+
+## The open workbench drawer, or null.
+func workbench() -> P0WorkbenchDrawer:
+	return _workbench if is_instance_valid(_workbench) and modal_kind == _WORKBENCH_KIND else null
 
 ## The open (not yet accepted) request's own line, e.g. Pip's `Could you catch me a fish? Any kind is fine.`; ""
 ## when the resident has no open request.

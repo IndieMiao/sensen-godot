@@ -226,6 +226,8 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	var xp_lines: Array = []
 	last_first_catch_xp = 0
 	var settles_catch := events.any(func(e): return str(e.get("kind", "")) == "catch")
+	# A craft's output is said by the workbench (`+2 Torch` on its card, the pickaxe's Moment; SGODOT-231 B2-06).
+	var crafted := events.any(func(e): return str(e.get("kind", "")) == "craft")
 	for i in events.size():
 		var ev: Dictionary = events[i]
 		match str(ev.get("kind", "")):
@@ -262,7 +264,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 					ui.float_text("+%d XP" % int(ev.amount) + ("" if int(ev.percent) >= 100 else " · %d%%" % int(ev.percent)), at + Vector2(0, dy), Color("1e9bb0"))
 			"item":
 				var iid := str(ev.id)
-				if int(ev.delta) > 0 and not iid.begins_with("seed_") and not iid.begins_with("dish_") and not iid.begins_with("fish_"):
+				if int(ev.delta) > 0 and not crafted and not iid.begins_with("seed_") and not iid.begins_with("dish_") and not iid.begins_with("fish_"):
 					ui.float_text("+%d %s" % [int(ev.delta), P0Logic.item_name(v, iid)], at + Vector2(0, dy), Color("4f934b"))
 			"coins":
 				ui.float_text("%+d coins" % int(ev.delta), at + Vector2(0, dy), Color("c9962a"))
@@ -465,6 +467,13 @@ func _dev_shot(dt: float) -> void:
 			"today": ui.open_today()
 			"energypanel": ui.open_energy_panel()
 			"inbox": ui.open_inbox()
+			"workbench": ui.open_workbench(step[1] if step.size() > 1 else "")   # SGODOT-231 B2-06 drawer, tools / supplies
+			"wbtile":   # wbtile:craft_copper_pickaxe:0 taps that card's cost tile (NeedSource)
+				var wb := ui.workbench()
+				if wb != null and wb.card(step[1]) != null: wb.card(step[1]).tiles()[int(step[2])].pressed.emit()
+			"showspot":   # showspot:mine — what a NeedSource's Show does (closes the layer, camera only, LOCK-08)
+				ui.close_modal()
+				ui.show_spot.emit(step[1])
 			"radial": ui.open_radial()
 			"kitchen": ui.open_kitchen(step[1] if step.size() > 1 else "cookbook")
 			"put":
