@@ -633,15 +633,20 @@ static func project(view: Dictionary, elapsed_ms: float) -> Dictionary:
 		parcel["left"] = maxf(0.0, float(parcel.get("left", 0)) - elapsed_ms)
 	return v
 
-## LOCK-14: one float for the rewards of one server reply that did not fit the bag ("" when there is nothing to say).
-## A resident's gift meal is said by the resident bar instead (SGODOT-225), so gift parcels are left out here.
-static func parcel_toast(view: Dictionary, events: Array) -> String:
+## LOCK-14 / q(87): one InboxNotice card (BAG-5-2) for the rewards of one server reply that did not fit the bag, {} when
+## there is nothing to say: {title, item, quantity, line} for UiInboxNotice. The card speaks of the first parcel: its
+## name and ×N, `Sent to Inbox` and `Expires in 24h`, or `Inbox full · waiting` and `Claim a parcel first` when it is
+## waiting for a place (its 24 h start once it is in, §10.4.8); the reply's other parcels (stacks split included) are
+## `+N more · ` before the third line. A resident's gift meal is said by the resident bar instead (SGODOT-225), so gift
+## parcels are left out here.
+static func parcel_notice(view: Dictionary, events: Array) -> Dictionary:
 	var parcels := events.filter(func(e): return str(e.get("kind", "")) == "parcel" and not bool(e.get("gift", false)))
-	if parcels.is_empty(): return ""
-	var waiting := parcels.all(func(e): return bool(e.get("waiting", false)))
-	var what := "%s ×%d" % [item_name(view, str(parcels[0].id)), int(parcels[0].qty)] if parcels.size() == 1 \
-		else "%d rewards" % parcels.size()
-	return ("Inbox full · %s saved for later" if waiting else "Bag full · %s sent to Inbox · 24h") % what
+	if parcels.is_empty(): return {}
+	var first: Dictionary = parcels[0]
+	var waiting := bool(first.get("waiting", false))
+	var more := ("+%d more · " % (parcels.size() - 1)) if parcels.size() > 1 else ""
+	return {title = "Inbox full · waiting" if waiting else "Sent to Inbox", item = item_name(view, str(first.get("id", ""))),
+		quantity = "×%d" % int(first.get("qty", 1)), line = more + ("Claim a parcel first" if waiting else "Expires in 24h")}
 
 # ---------------------------------------------------------------- M2: fishing, cooking, eating
 static func item(view: Dictionary, id: String) -> Dictionary:
