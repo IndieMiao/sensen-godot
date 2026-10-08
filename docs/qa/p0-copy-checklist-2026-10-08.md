@@ -137,6 +137,8 @@
 |---|---|
 | 横幅 | `Offline · Reconnecting…` + `Retry` / `Back online` / `Didn't go through · try again` |
 | 离线时按钮 | 命令按钮灰 `Offline`；主行动键如 `Sow · Offline` |
+| 维护卡 SYS-MAINT | `Down for maintenance` / `We'll be back around 14:30.`（设备本地时间、24 小时制；★ 结束时刻不在今天写 `We'll be back around Oct 10, 14:30.`）/ `We'll be back soon.`（没有预计时间或已过时）/ `Check again`（q(74)） |
+| 强制更新卡 SYS-UPDATE | `Update to keep playing` / `This version is out of date.` / `Update`；两张卡都没有关闭按钮（q(74)） |
 | 世界动作回滚 | toast `3 plots not sown · Energy returned` |
 | 去重与 stale_state | 不出任何提示 |
 | 启动与账号 | `When were you born?` / `Pick your birthday` / `Continue` / `Before you start` / `Agree to continue` / `Terms of Service ›` / `Privacy Policy ›` / `Continue with Apple` / `Continue with Google` / `Continue with Email` / `Taking longer than usual…` / `Can't connect` / `That name isn't allowed` / `Try another name`（WP6，SGODOT-206） |
