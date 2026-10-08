@@ -77,6 +77,13 @@ describe('observation log (§14.8.1, §17.2.2; SGODOT-232 S7)', () => {
     expect(uiEvent([{ kind: 'screen' }])).toBeNull();
   });
 
+  it('keeps a scene load with its timings and the device, nothing else (int9: the vivo has no app logcat)', () => {
+    expect(uiEvent({ kind: 'scene_load', scene: 'P0Outpost', place: 'sh_tea_1', attach_ms: 912, first_ms: 2036, second_ms: 2287,
+      cold: false, cores: 8, model: 'V2509A', gpu: 'Mali-G1-Ultra MC12', lat: 31.2, name: 'someone' })).toEqual({
+      kind: 'scene_load', scene: 'P0Outpost', place: 'sh_tea_1', attach_ms: 912, first_ms: 2036, second_ms: 2287,
+      cold: false, cores: 8, model: 'V2509A', gpu: 'Mali-G1-Ultra MC12' });
+  });
+
   it('records Energy before a command with the recovery the command saw, also on a refusal (PR #23 review)', async () => {
     await withServer(async (app, records, _tick, store) => {
       const s = store.get('telemetry-player', T0);

@@ -52,3 +52,29 @@ func test_ui_reports_carry_the_demo_key() -> void:
 	session.player_id = "p0-telemetry-key"
 	session.access_key = "demo-key"
 	assert_that(Array(session._headers())).contains(["x-p0-player: p0-telemetry-key", "x-p0-key: demo-key"])
+
+## int9: the vivo shows no app logcat, so each world's load timings (P0_TIMING) also go to the observation log.
+func test_a_scene_load_reports_its_timings_and_the_device() -> void:
+	var e := P0Runtime.scene_load_event("P0Outpost", "sh_tea_1", 912, 2036, 2287, false)
+	assert_str(str(e.kind)).is_equal("scene_load")
+	assert_that([e.scene, e.place, e.attach_ms, e.first_ms, e.second_ms, e.cold]).is_equal(["P0Outpost", "sh_tea_1", 912, 2036, 2287, false])
+	assert_int(int(e.cores)).is_greater(0)
+	assert_bool(e.has("model") and e.has("gpu")).is_true()
+	session.report(e)
+	session._flush_ui()
+	assert_str(str(sent[0].path)).is_equal("/p0/telemetry")
+	assert_str(str((sent[0].body.events as Array)[0].kind)).is_equal("scene_load")
+
+## 亚瑟 on #94: only a navigation (or the first world after launch) reports a scene_load; a world attaching again when
+## a layer above it closes has no navigation behind it and reports nothing.
+func test_only_a_navigation_or_the_cold_start_reports_a_scene_load() -> void:
+	P0Runtime._nav_pending = false
+	P0Runtime._cold_done = false
+	assert_that(P0Runtime.take_load_report()).is_equal({"report": true, "cold": true})     # the first world after launch
+	assert_that(P0Runtime.take_load_report()).is_equal({"report": false, "cold": false})   # back from the farmhouse: no navigation
+	P0Runtime.nav_started()
+	assert_that(P0Runtime.take_load_report()).is_equal({"report": true, "cold": false})    # map → pond
+	assert_that(P0Runtime.take_load_report()).is_equal({"report": false, "cold": false})   # taken once only
+	P0Runtime.nav_started()
+	P0Runtime.cancel_nav()                                                                  # Couldn't get there → Go back
+	assert_that(P0Runtime.take_load_report()).is_equal({"report": false, "cold": false})   # the map it falls back to: nothing
