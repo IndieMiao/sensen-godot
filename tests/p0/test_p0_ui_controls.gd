@@ -425,5 +425,7 @@ func test_the_today_chip_pulses_once_when_its_focus_row_changes() -> void:
 	later.plots[0].ready_in = 13000000
 	ui.set_view(later)                                                  # the countdown ticks: no pulse
 	assert_int(ui.hud.today_pulses).is_equal(1)
-	await await_millis(UiTokens.MOTION_GUIDE_PULSE_MS + 80)
-	assert_vector(ui.hud.today_chip_rect().size).is_not_equal(Vector2.ZERO)
+	var pulses := ui.hud.find_children("*", "UiGuidePulse", true, false)
+	assert_int(pulses.size()).is_equal(1)                                # GuidePulse Shape=Pill on the chip
+	await await_millis(UiTokens.MOTION_NEW_UNLOCK_FLASH_MS + 120)
+	assert_int(ui.hud.find_children("*", "UiGuidePulse", true, false).size()).is_equal(0)   # once, then gone
