@@ -62,6 +62,12 @@ func _ready() -> void:
 func _exit_tree() -> void:
 	if rt: rt.detach(self)
 
+## Android Back: the UI's top layer (PinMenu, radial, a card or drawer) closes first, one per press; with nothing
+## open, back to the map: AppRouter pops a farm stacked on the map, a farm that is the root scene leaves by itself
+## (int5 hand test 012–013 / 023–024, int5b test 2; rooms do the same, p0_room).
+func is_back_navigation_locked() -> bool:
+	return rt != null and (rt.ui.close_top_layer() or rt.root_back())
+
 ## AppRouter stacking: the map below us hands back its camera and environment on resume.
 func suspend() -> void:
 	set_process(false)
@@ -333,15 +339,16 @@ func _hold_repeat() -> void:
 	p0_action(cmd)
 	rt.holding_repeat = false
 
-## Facilities respond to taps only (§10.2.2): the stall opens its drawer directly (unattended, p(6)),
-## the farmhouse (Kitchen / Rest), the mine.
+## Facilities respond to taps only (§10.2.2): the stall opens its drawer directly (unattended, p(6)), the farmhouse
+## takes the player in (its kitchen is inside since SGODOT-226; the door card is gone, int5 hand test 37), the mine.
 func p0_tap(screen: Vector2) -> void:
 	if rt.ui.has_modal(): return
 	if cam.unproject_position(_stall + Vector3(0, 0.4, 0)).distance_to(screen) < 56:
 		actor.face(_stall)
 		rt.ui.open_stall()
 	elif cam.unproject_position(_house + Vector3(0, 1.0, 0.6)).distance_to(screen) < 80:
-		rt.ui.open_home_card()
+		actor.face(_door)
+		enter_farmhouse()
 	elif cam.unproject_position(_mine + Vector3(0, 0.8, 0)).distance_to(screen) < 60:
 		rt.ui.toast("The mine opens soon")
 
@@ -357,9 +364,9 @@ func _tags(v: Dictionary) -> void:
 	rt.ui.tag("stall", "Tap to shop", stall_top - Vector2(0, rt.ui.badge_height("stall")),
 		actor.position.distance_to(_stall) < 3.2, cam.unproject_position(_stall + Vector3(0, 0.4, 0)))
 	# The farmhouse carries no state badge (不知火舞 on SGODOT-221): the stove's state belongs to the stove inside,
-	# and Today already names the dish and its time. The card's copy becomes "Farmhouse · Tap to go in" once the
-	# door card goes (bench SGODOT-224, room SGODOT-226).
-	rt.ui.tag("home", "Home · Kitchen · Rest", cam.unproject_position(_house + Vector3(0, 2.6, 0.4)),
+	# and Today already names the dish and its time. Tapping it goes in (the door card is gone; Rest is the bench,
+	# SGODOT-224).
+	rt.ui.tag("home", "Farmhouse · Tap to go in", cam.unproject_position(_house + Vector3(0, 2.6, 0.4)),
 		actor.position.distance_to(_house) < 4.2, cam.unproject_position(_house + Vector3(0, 1.0, 0.6)))
 
 func _teaching(v: Dictionary) -> void:
