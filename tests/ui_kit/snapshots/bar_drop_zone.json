@@ -1,0 +1,724 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    722
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiBarDropZone · UiUndoToast"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        36
+      ],
+      "variation": "CaptionR12",
+      "text": "BarDropZone 1588:97952 · Toast Tone=Info 1178:82247 · LOCK-04 / 05 v1.11 (221 b0a83924)"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        70,
+        328,
+        652
+      ],
+      "children": [
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            70,
+            328,
+            136
+          ],
+          "children": [
+            {
+              "type": "ColorRect",
+              "rect": [
+                0,
+                70,
+                328,
+                116
+              ],
+              "children": [
+                {
+                  "type": "UiBarDropZone",
+                  "rect": [
+                    24,
+                    80,
+                    64,
+                    94
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        44,
+                        100,
+                        24,
+                        24
+                      ]
+                    },
+                    {
+                      "type": "PanelContainer",
+                      "rect": [
+                        37,
+                        150,
+                        39,
+                        24
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            47,
+                            150,
+                            19,
+                            24
+                          ],
+                          "variation": "C12XB",
+                          "text": "Pin"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "UiBarDropZone",
+                  "rect": [
+                    132,
+                    80,
+                    64,
+                    94
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        152,
+                        100,
+                        24,
+                        24
+                      ]
+                    },
+                    {
+                      "type": "PanelContainer",
+                      "rect": [
+                        137,
+                        150,
+                        54,
+                        24
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            147,
+                            150,
+                            34,
+                            24
+                          ],
+                          "variation": "C12XB",
+                          "text": "Unpin"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "UiBarDropZone",
+                  "rect": [
+                    239,
+                    80,
+                    66,
+                    94
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        260,
+                        100,
+                        24,
+                        24
+                      ]
+                    },
+                    {
+                      "type": "PanelContainer",
+                      "rect": [
+                        239,
+                        150,
+                        66,
+                        24
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            249,
+                            150,
+                            46,
+                            24
+                          ],
+                          "variation": "C12XB",
+                          "text": "Remove"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                192,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "idle · Pin · Unpin · Remove"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            226,
+            328,
+            136
+          ],
+          "children": [
+            {
+              "type": "ColorRect",
+              "rect": [
+                0,
+                226,
+                328,
+                116
+              ],
+              "children": [
+                {
+                  "type": "UiBarDropZone",
+                  "rect": [
+                    6,
+                    232,
+                    101,
+                    102
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        42,
+                        254,
+                        28,
+                        28
+                      ]
+                    },
+                    {
+                      "type": "PanelContainer",
+                      "rect": [
+                        6,
+                        310,
+                        101,
+                        24
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            16,
+                            310,
+                            81,
+                            24
+                          ],
+                          "variation": "C12XB",
+                          "text": "Release to pin"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "UiBarDropZone",
+                  "rect": [
+                    107,
+                    232,
+                    115,
+                    102
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        150,
+                        254,
+                        28,
+                        28
+                      ]
+                    },
+                    {
+                      "type": "PanelContainer",
+                      "rect": [
+                        107,
+                        310,
+                        115,
+                        24
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            117,
+                            310,
+                            95,
+                            24
+                          ],
+                          "variation": "C12XB",
+                          "text": "Release to unpin"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "UiBarDropZone",
+                  "rect": [
+                    210,
+                    232,
+                    125,
+                    102
+                  ],
+                  "children": [
+                    {
+                      "type": "TextureRect",
+                      "rect": [
+                        258,
+                        254,
+                        28,
+                        28
+                      ]
+                    },
+                    {
+                      "type": "PanelContainer",
+                      "rect": [
+                        210,
+                        310,
+                        125,
+                        24
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            220,
+                            310,
+                            105,
+                            24
+                          ],
+                          "variation": "C12XB",
+                          "text": "Release to remove"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                348,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "hover · Release to pin / unpin / remove"
+            }
+          ]
+        },
+        {
+          "type": "HFlowContainer",
+          "rect": [
+            0,
+            382,
+            328,
+            240
+          ],
+          "children": [
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                0,
+                382,
+                150,
+                240
+              ],
+              "children": [
+                {
+                  "type": "ColorRect",
+                  "rect": [
+                    0,
+                    382,
+                    150,
+                    220
+                  ],
+                  "children": [
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        49,
+                        440,
+                        52,
+                        68
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            49,
+                            434,
+                            52,
+                            64
+                          ],
+                          "children": [
+                            {
+                              "type": "Control",
+                              "rect": [
+                                53,
+                                438,
+                                44,
+                                56
+                              ],
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    64,
+                                    438,
+                                    22,
+                                    22
+                                  ]
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    53,
+                                    457,
+                                    44,
+                                    29
+                                  ],
+                                  "variation": "C10B",
+                                  "text": "Radish Seeds"
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    53,
+                                    481,
+                                    44,
+                                    15
+                                  ],
+                                  "variation": "C10XB",
+                                  "text": "×12"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        68,
+                        525,
+                        14,
+                        14
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    0,
+                    608,
+                    150,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "drag: 24 above finger"
+                }
+              ]
+            },
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                170,
+                382,
+                150,
+                240
+              ],
+              "children": [
+                {
+                  "type": "ColorRect",
+                  "rect": [
+                    170,
+                    382,
+                    150,
+                    220
+                  ],
+                  "children": [
+                    {
+                      "type": "UiBarDropZone",
+                      "rect": [
+                        195,
+                        496,
+                        101,
+                        102
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            231,
+                            518,
+                            28,
+                            28
+                          ]
+                        },
+                        {
+                          "type": "PanelContainer",
+                          "rect": [
+                            195,
+                            574,
+                            101,
+                            24
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                205,
+                                574,
+                                81,
+                                24
+                              ],
+                              "variation": "C12XB",
+                              "text": "Release to pin"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "UiItemCell",
+                      "rect": [
+                        224,
+                        447,
+                        42,
+                        54
+                      ],
+                      "children": [
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            224,
+                            442,
+                            42,
+                            51
+                          ],
+                          "children": [
+                            {
+                              "type": "Control",
+                              "rect": [
+                                227,
+                                445,
+                                35,
+                                45
+                              ],
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    236,
+                                    445,
+                                    18,
+                                    18
+                                  ]
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    227,
+                                    460,
+                                    35,
+                                    23
+                                  ],
+                                  "variation": "C10B",
+                                  "text": "Radish Seeds"
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    227,
+                                    479,
+                                    35,
+                                    12
+                                  ],
+                                  "variation": "C10XB",
+                                  "text": "×12"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        238,
+                        525,
+                        14,
+                        14
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    170,
+                    608,
+                    150,
+                    14
+                  ],
+                  "variation": "C9B",
+                  "text": "over a zone: 80 %"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            642,
+            328,
+            80
+          ],
+          "children": [
+            {
+              "type": "UiUndoToast",
+              "rect": [
+                48,
+                642,
+                232,
+                60
+              ],
+              "children": [
+                {
+                  "type": "VBoxContainer",
+                  "rect": [
+                    58,
+                    651,
+                    210,
+                    42
+                  ],
+                  "children": [
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        58,
+                        651,
+                        210,
+                        20
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            58,
+                            651,
+                            20,
+                            20
+                          ]
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            86,
+                            651,
+                            182,
+                            20
+                          ],
+                          "variation": "C14XB",
+                          "text": "Radish Seeds off the bar"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "MarginContainer",
+                      "rect": [
+                        58,
+                        675,
+                        210,
+                        18
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            86,
+                            675,
+                            31,
+                            18
+                          ],
+                          "variation": "C12XB",
+                          "text": "Undo"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                708,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "removed: Info toast with Undo (5 s)"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

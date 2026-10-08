@@ -519,8 +519,43 @@ static func _bar_drop_zones() -> Control:
 			z.center = Vector2(x, 42)
 			x += 108.0
 		v.add_child(_captioned(row, "hover · Release to pin / unpin / remove" if hover else "idle · Pin · Unpin · Remove"))
+	var lifted := _row(UiTokens.SPACE_SECTION)
+	lifted.add_child(_captioned(_lifted_slot(false), "drag: 24 above finger"))
+	lifted.add_child(_captioned(_lifted_slot(true), "over a zone: 80 %"))
+	v.add_child(lifted)
 	v.add_child(_captioned(UiUndoToast.new("Radish Seeds off the bar"), "removed: Info toast with Undo (5 s)"))
 	return v
+
+## A lifted quick slot placed the way UiQuickBar._move_drag places it over the finger (white dot), optionally over
+## a hovered Pin zone (centred on the finger) at the hover scale.
+static func _lifted_slot(over_zone: bool) -> Control:
+	var frame := ColorRect.new()
+	frame.color = UiKit.alpha(UiTokens.COLOR_TEXT, UiTokens.OPACITY_SCRIM_MODAL)
+	frame.custom_minimum_size = Vector2(150, 220)
+	var finger := Vector2(75, 150)
+	if over_zone:
+		var z := UiBarDropZone.new(UiBarDropZone.Kind.PIN)
+		z.top_level = false
+		z.hover = true
+		frame.add_child(z)
+		z.center = finger
+	var cell := UiItemCell.new(UiItemCell.Density.QUICK)
+	cell.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	cell.icon = _tex("seed_radish")
+	cell.title = "Radish Seeds"
+	cell.quantity = "×12"
+	cell.state = UiItemCell.State.LIFTED
+	cell.pivot_offset = cell.custom_minimum_size * 0.5
+	frame.add_child(cell)
+	cell.position = finger - Vector2(cell.custom_minimum_size.x * 0.5, cell.custom_minimum_size.y + UiQuickBar._RIDE_ABOVE)
+	if over_zone: cell.scale = Vector2.ONE * UiQuickBar._HOVER_SCALE
+	var dot := Panel.new()
+	dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	dot.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_SURFACE, 7))
+	dot.size = Vector2(14, 14)
+	dot.position = finger - Vector2(7, 7)
+	frame.add_child(dot)
+	return frame
 
 static func _quick_bars() -> Control:
 	var v := _column()
@@ -529,9 +564,9 @@ static func _quick_bars() -> Control:
 	a.selected = "seed_carrot"
 	v.add_child(_fit_bar(a, "selected · pinned · zero (pinned, 0 left) · empty"))
 	var g := UiQuickBar.new()
-	g.slots = [{id = "compost", icon = _tex("compost"), title = "Compost", quantity = 6},
+	g.slots = [{id = "seed_lettuce", icon = _tex("seed_lettuce"), title = "Lettuce Seeds", quantity = 0, pinned = true},
 		{ghost = true, icon = _tex("seed_radish"), title = "Seeds"}]
-	v.add_child(_fit_bar(g, "no seeds on the bar: the first empty slot is the Seeds ghost"))
+	v.add_child(_fit_bar(g, "nothing in stock (pinned 0): first empty slot is the ghost"))
 	var b := UiQuickBar.new()
 	b.slots = _bar_slots()
 	b.capacity_warning = true
