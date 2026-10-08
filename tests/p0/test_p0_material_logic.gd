@@ -241,4 +241,6 @@ func test_material_footprints_overlap_nothing() -> void:
 				assert_int(P0Garden.id_of(c)).override_failure_message("%s covers a plot at %s" % [key, c]).is_equal(-1)
 				if str(key).begins_with("spot_") or key == "workbench":
 					assert_bool(P0Garden.WALK_RECT.has_point(c)).override_failure_message("%s leaves the yard" % key).is_true()
+					# Row 18's back edge is the Lv3 fence line (z −12.35 m, SGODOT-228; 苏烈 on 231): nothing past row 17.
+					assert_int(c.y).override_failure_message("%s sits on the back fence" % key).is_less_equal(17)
 				owner[c] = key
