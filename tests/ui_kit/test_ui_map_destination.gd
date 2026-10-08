@@ -71,3 +71,16 @@ func test_status_badge_state_of_a_key() -> void:
 	assert_int(UiStatusBadge.state_of("request")).is_equal(UiStatusBadge.State.REQUEST)
 	assert_int(UiStatusBadge.state_of("deliverable")).is_equal(UiStatusBadge.State.DELIVERABLE)
 	assert_int(UiStatusBadge.state_of("")).is_equal(-1)
+
+## The city map's second place for a name: over the disc (不知火舞 on 234 A2); the disc keeps its place.
+func test_a_name_over_the_disc() -> void:
+	var d := _pin("Xuhui Market Square")
+	await get_tree().process_frame
+	var disc_at := d._pin.position
+	d.label_above = true
+	var l := d.label_size()
+	assert_that(d._pin.position).is_equal(disc_at)
+	assert_float(d._label_box.position.y).is_equal_approx(-2.0 - l.y, 0.01)
+	var fp := d.footprint()
+	assert_float(fp.position.y).is_equal_approx(-40.0 - 2.0 - l.y, 0.01)
+	assert_float(fp.end.y).is_equal_approx(0.0, 0.01)
