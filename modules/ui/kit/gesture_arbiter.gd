@@ -53,6 +53,8 @@ func is_dragging() -> bool: return _state == _S.DRAGGING
 func is_joystick() -> bool: return _state == _S.JOYSTICK
 ## A single finger is down in SCENE mode and steering (not pinching).
 func is_steering() -> bool: return _state == _S.PRESSED or _state == _S.JOYSTICK
+## Two fingers are down in SCENE mode (between pinch_start and pinch_end).
+func is_pinching() -> bool: return _state == _S.PINCH
 ## Current press origin and finger position (for drawing a joystick or a lifted slot).
 func origin() -> Vector2: return _start
 func position() -> Vector2: return _pos

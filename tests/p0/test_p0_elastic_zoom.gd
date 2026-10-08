@@ -54,13 +54,17 @@ func test_lifting_springs_back_to_the_limit_within_half_a_second() -> void:
 		assert_bool(z.step(1.0 / 60.0)).is_false()   # and at rest soon after
 		assert_float(z.value).is_equal_approx(bound, 0.0001)
 
-func test_a_wheel_tick_at_a_limit_bounces_and_a_lost_lift_still_springs_back() -> void:
+func test_a_wheel_tick_bounces_and_resting_fingers_keep_the_stretch() -> void:
 	var z = ElasticZoom.new(0.5, 1.4, 1.4)
 	z.nudge(0.9)   # wheel up at the max
 	assert_float(z.value).is_greater(1.4)
 	_settle(z, 0.5)
 	assert_float(z.value).is_equal_approx(1.4, 0.005)
-	z.pinch(0.5)   # held past the max, the pinch_end never comes
+	z.pinch(0.5)   # past the max, then the fingers rest without moving (刘邦 on #41)
+	var held: float = z.value
+	_settle(z, 0.8)
+	assert_float(z.value).is_equal(held)
+	z.release()
 	_settle(z, 0.8)
 	assert_float(z.value).is_equal_approx(1.4, 0.005)
 
@@ -138,4 +142,21 @@ func test_zooming_about_a_point_keeps_the_ground_under_the_fingers() -> void:
 	assert_vector(after).is_equal_approx(before, Vector3(0.001, 0.001, 0.001))
 	assert_object(ElasticZoom.ground_at(cam, Vector2.INF)).is_null()
 	assert_vector(ElasticZoom.shift(null, before)).is_equal(Vector3.ZERO)
+
+func test_a_pinch_cut_short_still_ends() -> void:
+	# A world change (end_stick) or the app going away mid-pinch: the pad sends zoom_end itself.
+	var rt: P0Runtime = auto_free(P0Runtime.new())
+	add_child(rt)
+	await get_tree().process_frame
+	var world: ZoomWorld = auto_free(ZoomWorld.new())
+	rt.attach(world)
+	var pad: Control = rt.ui.pad
+	_touch(pad, 0, Vector2(100, 300), true)
+	_touch(pad, 1, Vector2(140, 300), true)
+	_drag(pad, 1, Vector2(180, 300))
+	rt.ui.end_stick()
+	assert_int(world.ends).is_equal(1)
+	rt.ui.end_stick()   # no pinch left: nothing more
+	assert_int(world.ends).is_equal(1)
+	rt.detach(world)
 

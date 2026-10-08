@@ -9,7 +9,6 @@ extends RefCounted
 
 const ZOOM_ELASTIC := 0.12      ## ScenePan.ZOOM_ELASTIC: the farthest the shown zoom goes past a limit, in log space
 const SPRING := 18.0            ## ScenePan.SPRING
-const RELEASE_TIMEOUT := 0.25   ## s without a pinch step while held counts as lifted (a lost pinch_end)
 const SETTLE := 0.0005
 const RAW_SLACK := 3.0
 
@@ -19,7 +18,6 @@ var _raw := 0.0       # log zoom as the fingers asked
 var _log := 0.0       # log zoom shown
 var _vel := 0.0
 var _held := false
-var _since := 0.0
 
 ## Zoom 1 = the scene's own framing; > 1 closer (the scenes divide their camera size by it).
 var value: float:
@@ -38,7 +36,6 @@ func pinch(factor: float) -> void:
 		_held = true
 		_raw = _unrubber(_log)   # pick up from what is shown, mid-bounce included
 		_vel = 0.0
-	_since = 0.0
 	# Past a limit the raw zoom stops at three band widths (95 % of the band shown), so pinching back in answers
 	# at once instead of first unwinding everything the fingers spread beyond it.
 	_raw = clampf(_raw - log(factor), _low - RAW_SLACK * ZOOM_ELASTIC, _high + RAW_SLACK * ZOOM_ELASTIC)
@@ -55,10 +52,9 @@ func nudge(factor: float) -> void:
 
 ## Advance the spring; true while the zoom is still moving back.
 func step(dt: float) -> bool:
-	if _held:
-		_since += dt
-		if _since < RELEASE_TIMEOUT: return false
-		_held = false
+	# Held fingers keep the stretch however long they rest (刘邦 on #41); pinch_end always comes: the pad sends it
+	# when the last finger lifts, and also when a pinch is cut short (a world change, the app going away).
+	if _held: return false
 	var bound := clampf(_log, _low, _high)
 	var displacement := _log - bound
 	if absf(displacement) < SETTLE and absf(_vel) < SETTLE:

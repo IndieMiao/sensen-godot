@@ -2108,8 +2108,13 @@ class _TouchPad extends Control:
 	var _arb := GestureArbiter.new(GestureArbiter.Mode.SCENE)
 	func _ready() -> void: mouse_filter = Control.MOUSE_FILTER_STOP
 	func end_stick() -> void:
+		# A pinch cut short (a world change, the app going to the background) still ends: its zoom springs back.
+		var pinching := _arb.is_pinching()
 		_arb.reset()
 		queue_redraw()
+		if pinching and ui != null: ui.zoom_end.emit()
+	func _notification(what: int) -> void:
+		if what in [NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_APPLICATION_FOCUS_OUT] and _arb.is_pinching(): end_stick()
 	func _gui_input(e: InputEvent) -> void:
 		if e is InputEventMouseButton and e.pressed and e.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
 			ui.zoom.emit(0.9 if e.button_index == MOUSE_BUTTON_WHEEL_UP else 1.1, get_global_transform_with_canvas() * e.position)
