@@ -127,7 +127,9 @@ static func main_action(view: Dictionary, plot: Dictionary, seed_id: String, row
 		"wild":
 			return {"icon": "hoe", "verb": "Till", "sub": "Free", "enabled": true, "amber": false, "cmd": {"type": "till", "plot": plot_id}, "need": 0}
 		"tilled":
-			if seed_id == "":
+			# A pinned slot stays on the bar at 0 (LOCK-05) and P0Ui deselects it; a 0 seed is no seed here too, so the
+			# key never sends a sow the server turns down (PR #12 review, 李白 q(44) ③). The verb change stops a held row.
+			if seed_id == "" or bag_count(view, seed_id) <= 0:
 				a.sub = "Pick a seed"
 				return a
 			var cost := int(crop_for_seed(view, seed_id).get("energy", 2))
@@ -152,7 +154,9 @@ static func main_action(view: Dictionary, plot: Dictionary, seed_id: String, row
 	return a
 
 ## Five candidates for the current action — Farming: seeds, Fishing: bait — kept order: previously shown → most plentiful (§10.3.3).
-static func quick_bar(view: Dictionary, previous: Array, mode := "farm") -> Array:
+## Pinned ids always stay on the bar, also at 0 left (LOCK-05, §10.3.3 归零); ids the player dragged off the bar
+## (`removed`) are not refilled until pinned again (§10.3.4 "从栏上移除，物品仍在背包").
+static func quick_bar(view: Dictionary, previous: Array, mode := "farm", pinned: Array = [], removed: Array = []) -> Array:
 	var prefix := "bait_" if mode == "fish" else "seed_"
 	var counts := {}
 	for s in view.get("bag", {}).get("slots", []):
@@ -160,8 +164,10 @@ static func quick_bar(view: Dictionary, previous: Array, mode := "farm") -> Arra
 		if id.begins_with(prefix): counts[id] = int(counts.get(id, 0)) + int(s.get("qty", 0))
 	var bar: Array = []
 	for id in previous:
-		if counts.has(id) and bar.size() < 5: bar.append(id)
-	var rest: Array = counts.keys().filter(func(id): return not bar.has(id))
+		if bar.size() < 5 and not bar.has(id) and (pinned.has(id) or (counts.has(id) and not removed.has(id))): bar.append(id)
+	for id in pinned:
+		if bar.size() < 5 and not bar.has(id): bar.append(id)
+	var rest: Array = counts.keys().filter(func(id): return not bar.has(id) and not removed.has(id))
 	rest.sort_custom(func(a, b): return counts[a] > counts[b] if counts[a] != counts[b] else str(a) < str(b))
 	for id in rest:
 		if bar.size() < 5: bar.append(id)
@@ -298,6 +304,8 @@ static func dish_label(view: Dictionary, id: String) -> String:
 
 ## Main action at the pond (§6.6.1): Cast pre-pays 5; creel full / short energy say why.
 static func fish_action(view: Dictionary, bait: String, site := "pond") -> Dictionary:
+	# Bait is optional (不知火舞 on PR #12): a pinned bait at 0 stays on the bar, and the cast just goes without it.
+	if bait != "" and bag_count(view, bait) <= 0: bait = ""
 	var f: Dictionary = view.get("fishing", {})
 	var cost := int(f.get("cast_energy", 5))
 	var a := {"icon": "rod", "verb": "Cast", "sub": "%d Energy" % cost, "enabled": true, "amber": false,
@@ -305,9 +313,11 @@ static func fish_action(view: Dictionary, bait: String, site := "pond") -> Dicti
 	if f.get("cast", null) != null:
 		return {"icon": "bobber", "verb": "Fishing…", "sub": "Line in the water", "enabled": false, "amber": false, "cmd": {}, "need": 0}
 	if int(view.get("bag", {}).get("free", 1)) < 1:
-		# FISH-4: the key is greyed and says why; Open Bag / Go home pills float above the switch.
-		return {"icon": "rod", "verb": "Creel full", "sub": "0 free slots · Sell or cook first", "enabled": false, "amber": false,
+		# FISH-4: the key is greyed with the short reason (plan §10.2.2 `Cast · Creel full`); the creel badge and the
+		# toast carry the long one, and Open Bag / Go home pills float above the switch.
+		return {"icon": "rod", "verb": "Cast", "sub": "Creel full", "enabled": false, "amber": false,
 			"cmd": {}, "need": 0, "creel_full": true}
+
 	if int(view.get("energy", {}).get("value", 0)) < cost:
 		a.sub = "Need %d Energy" % cost
 		a.amber = true

@@ -252,9 +252,8 @@ func _marks(v: Dictionary) -> void:
 		elif not show and _previews.has(i):
 			_previews[i].queue_free()
 			_previews.erase(i)
-	if rt.ui.has_method("set_status_line"):
-		var intro := Time.get_ticks_msec() - _entered_ms < STATUS_INTRO_MS
-		rt.ui.call("set_status_line", P0MaterialLogic.mine_status(v, floor_n, intro))
+	var intro := Time.get_ticks_msec() - _entered_ms < STATUS_INTRO_MS
+	rt.ui.set_status_line(P0MaterialLogic.mine_status(v, floor_n, intro))
 
 # ---------------------------------------------------------------- actions
 func p0_action(cmd: Dictionary) -> void:

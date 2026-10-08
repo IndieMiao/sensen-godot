@@ -32,7 +32,7 @@ func test_cast_states_follow_creel_energy_and_line() -> void:
 	v.energy.value = 4
 	assert_that(P0Logic.fish_action(v, "").cmd).is_equal({"type": "energy_card"})
 	v.bag.free = 0
-	assert_str(str(P0Logic.fish_action(v, "").verb)).is_equal("Creel full")
+	assert_str(str(P0Logic.fish_action(v, "").sub)).is_equal("Creel full")
 	v.fishing.cast = {"rarity": 1, "bite_in": 1000}
 	assert_bool(bool(P0Logic.fish_action(v, "").enabled)).is_false()
 
@@ -95,9 +95,19 @@ func test_creel_full_key_carries_the_fish4_reason_and_pills() -> void:
 	v.bag.free = 0
 	var a := P0Logic.fish_action(v, "")
 	assert_bool(bool(a.enabled)).is_false()
-	assert_str(str(a.sub)).is_equal("0 free slots · Sell or cook first")
+	assert_str(str(a.verb)).is_equal("Cast")
+	assert_str(str(a.sub)).is_equal("Creel full")   # plan §10.2.2; the long reason is the creel badge's and the toast's
 	assert_bool(bool(a.get("creel_full", false))).is_true()
 	assert_bool(P0Logic.fish_action(_view(), "").has("creel_full")).is_false()
+
+func test_bait_at_zero_casts_without_bait() -> void:
+	# Bait is optional (不知火舞 on PR #12): a pinned bait at 0 leaves Cast as it is and goes without bait.
+	var v := _view()
+	v.bag.slots = v.bag.slots.filter(func(s): return s.id != "bait_worm")   # pinned at 0 on the bar, none in the bag
+	var a := P0Logic.fish_action(v, "bait_worm")
+	assert_bool(bool(a.enabled)).is_true()
+	assert_str(str(a.sub)).is_equal("5 Energy")
+	assert_that(a.cmd).is_equal({"type": "cast", "bait": null, "site": "pond"})
 
 func test_got_away_lines_for_level_and_rod_gates() -> void:
 	# Thresholds come from the bundled content (Fishing: 0, 70, 220, 480 …); Common catches give 5 XP.
