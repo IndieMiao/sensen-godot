@@ -27,6 +27,7 @@ signal tackle_requested()      # FISH-5 rod variant "Tackle Shop"
 const _RESIDENT_SHEET_H := 443.0   # RES-PIP: Sheet 443 of 800
 const _CLOSE_ABOVE_SHEET := 6.0    # RES-PIP: Close · 44 px sits 6 above the sheet, 16 in from the right
 const _CLOSE_ABOVE_SPECIALTY := 2.0   # MARKET-SPECIALTY: Close 44 at (300, 617), the sheet at y 663
+const _FLOAT_HUG_CHARS := 32         # longer float copy wraps to two lines (FloatText Layout=Wrap)
 const _CLOSE_ABOVE_CARD := 8.0     # RES-KAI-TALK: 8 above the dialogue bar, flush with its right edge
 const _AFFINITY_INSET := 8.0       # RES-KAI-TALK: the affinity float sits 8 in from the bar's left edge …
 const _AFFINITY_ABOVE := 6.0       # … and 6 above its top
@@ -41,8 +42,6 @@ const AMBER := Color("e3b341")
 const AMBER_D := Color("b8831c")
 const BLUE := Color("6fa8dc")
 const DIS := Color("d6d5ce")
-const SEA := Color("cfe3ee")        # Old Kai's role colour (tackle · sea blue)
-const SEA_LIGHT := Color("e3eff5")
 const GOLD := Color("e9c35e")        # kit-cook --gold-light → --gold
 const GOLD_D := Color("c9962a")
 const RED := Color("e07a5f")         # --energy-red
@@ -92,7 +91,7 @@ var map_bag := false
 var _bar_ids: Array = []
 var selected_seed := ""
 var selected_bait := ""
-## Where Old Kai keeps shop (a fixed map place since ponds moved to the map).
+## The pond the tackle keeper names when no outpost ctx says which (the map's tackle pin before SGODOT-227).
 var tackle_place := "Reed Pond"
 var bar_mode := "farm"          # "farm" (seeds) or "fish" (bait) — the quick bar holds the current action's consumables
 var surface := "farm"
@@ -942,18 +941,17 @@ func _marker_area() -> Rect2:
 	if _bar.visible: bottom = minf(bottom, _bar.position.y)
 	return Rect2(0.0, top, _kit.size.x, maxf(0.0, bottom - top))
 
-func float_text(text: String, screen: Vector2, color: Color) -> void:
-	var l := _label(text, 12, color, true)
-	l.add_theme_color_override("font_outline_color", PAPER)
-	l.add_theme_constant_override("outline_size", 5)
-	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	root.add_child(l)
-	l.reset_size()
-	l.position = screen - Vector2(l.size.x * 0.5, l.size.y)
-	var tw := create_tween()
-	tw.tween_property(l, "position:y", l.position.y - 34, 1.1)
-	tw.parallel().tween_property(l, "modulate:a", 0.0, 1.1).set_delay(0.5)
-	tw.tween_callback(l.queue_free)
+## FloatText (1178:82191, UiFloatText from 2B; SGODOT-224): one line rising from `screen` (its bottom centre) in its
+## tone; `stack` = the line's place in one reply (each starts 28 higher and 60 ms later, at most 3). Copy longer
+## than one line wraps (Layout=Wrap, two lines at most). `tone` also takes the older Color argument (callers in
+## other PRs, e.g. SGODOT-231's material notices): any colour draws in the ITEM tone.
+func float_text(text: String, screen: Vector2, tone: Variant = UiFloatText.Tone.ITEM, icon: Texture2D = null, stack := 0) -> UiFloatText:
+	var t: UiFloatText.Tone = UiFloatText.Tone.ITEM if tone is Color else int(tone)
+	var f := UiFloatText.new(text, t, icon, UiFloatText.Layout.WRAP if text.length() > _FLOAT_HUG_CHARS else UiFloatText.Layout.HUG)
+	f.theme = UiKit.theme()
+	root.add_child(f)
+	f.play(screen, stack)
+	return f
 
 func toast(text: String, seconds := 2.6) -> void:
 	_toast.text = text

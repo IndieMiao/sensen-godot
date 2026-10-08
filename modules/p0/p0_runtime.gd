@@ -222,7 +222,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	if not before.is_empty():
 		for id in P0Guide.new_items(before, v): ui.quick_bar_node().flash(str(id))
 	var at := anchor()
-	var dy := 0.0
+	var stack := 0   # floats of one reply stack upward (UiFloatText.play stack_index)
 	var xp_lines: Array = []
 	last_first_catch_xp = 0
 	var settles_catch := events.any(func(e): return str(e.get("kind", "")) == "catch")
@@ -256,16 +256,20 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				if settles_catch and str(ev.get("reason", "")) in ["refund", "line_in"]: continue
 				# Inside the mine a floor fee is said by the mine's own float ("Floor 2 · −2 Energy", q(46)), not twice.
 				if str(ev.get("reason", "")) == "mine_floor" and str(_call("p0_surface", [])) == "mine": continue
-				ui.float_text(("%+d Energy" % dlt).replace("-", "−"), at + Vector2(0, dy), Color("d9772f") if dlt < 0 else Color("4f934b"))
+				ui.float_text(("%+d Energy" % dlt).replace("-", "−"), at, UiFloatText.Tone.ENERGY_COST if dlt < 0 else UiFloatText.Tone.ENERGY_GAIN, null, stack)
+				stack += 1
 			"xp":
 				if int(ev.amount) > 0:
-					ui.float_text("+%d XP" % int(ev.amount) + ("" if int(ev.percent) >= 100 else " · %d%%" % int(ev.percent)), at + Vector2(0, dy), Color("1e9bb0"))
+					ui.float_text("+%d XP" % int(ev.amount) + ("" if int(ev.percent) >= 100 else " · %d%%" % int(ev.percent)), at, UiFloatText.Tone.XP, null, stack)
+					stack += 1
 			"item":
 				var iid := str(ev.id)
 				if int(ev.delta) > 0 and not iid.begins_with("seed_") and not iid.begins_with("dish_") and not iid.begins_with("fish_"):
-					ui.float_text("+%d %s" % [int(ev.delta), P0Logic.item_name(v, iid)], at + Vector2(0, dy), Color("4f934b"))
+					ui.float_text("+%d %s" % [int(ev.delta), P0Logic.item_name(v, iid)], at, UiFloatText.Tone.ITEM, P0Logic.icon(iid), stack)
+					stack += 1
 			"coins":
-				ui.float_text("%+d coins" % int(ev.delta), at + Vector2(0, dy), Color("c9962a"))
+				ui.float_text(("%+d coins" % int(ev.delta)).replace("-", "−"), at, UiFloatText.Tone.COINS, null, stack)
+				stack += 1
 			"parcel":
 				# LOCK-14: rewards that did not fit the bag wait in the Inbox; one float for the whole reply.
 				if not parcels_said:
@@ -298,7 +302,8 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				# On the resident's open bar: the Affinity pill over it and the answer in the bubble (RES-KAI-TALK).
 				if not ui.resident_affinity(ev, reply):
 					if int(ev.get("delta", 0)) != 0:
-						ui.float_text("♥ " + P0Ui.affinity_text(ev), at + Vector2(0, dy), UiTokens.COLOR_FLOAT_AFFINITY)
+						ui.float_text(P0Ui.affinity_text(ev), at, UiFloatText.Tone.AFFINITY, null, stack)   # the tone draws the heart
+						stack += 1
 					if reply != "": ui.toast(reply)
 			"gift_meal":
 				var who := str(P0Logic.content().get("residents", {}).get(str(ev.get("resident", "")), {}).get("name", ""))
@@ -309,7 +314,6 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				# HOME-2 (SGODOT-228): HOME-1 closes, the MomentBanner says what changed; the farm swaps the fence.
 				if ui.modal_kind == "homestead": ui.close_modal()
 				HomePanel.moment(ui, P0Logic.home_moment(v, ev))
-		dy -= 16.0
 	if ui.modal_kind == "counter" and events.size() > 0:
 		ui.set_view(session.current())   # the counter drawer follows the view; floats say what changed
 		ui.counter_events(events)
@@ -332,19 +336,19 @@ func _on_catch(ev: Dictionary, _xp_lines: Array, at := Vector2.INF) -> void:
 				var first := last_first_catch_xp
 				ui.queue_card(func(): ui.show_catch(fid, r, first))
 			else:
-				ui.float_text("%s · %s" % [P0Logic.item_name(v, fid), P0Logic.rarity_name(v, r)], where + Vector2(0, -22), P0Logic.rarity_text_color(r))
+				ui.float_text("%s · %s" % [P0Logic.item_name(v, fid), P0Logic.rarity_name(v, r)], where, UiFloatText.Tone.ITEM, P0Logic.icon(fid))
 		"broke_free":
 			var gone: Dictionary = ev
 			if ui.first_time("gotaway:" + str(ev.fish)):
 				ui.queue_card(func(): ui.show_got_away(gone))
 				session.report({"kind": "card_shown", "card": "got_away", "fish": str(gone.get("fish", ""))})
 			else:
-				ui.float_text(("Got away · Lv%d" % int(ev.need_level)) if ev.has("need_level") else "Got away · rod too light", where, P0Ui.INK2)
+				ui.float_text(("Got away · Lv%d" % int(ev.need_level)) if ev.has("need_level") else "Got away · rod too light", where)
 		"escaped":
 			var refund := int(ev.refund)
 			var protected: bool = ev.has("protected_left") and refund >= int(v.get("fishing", {}).get("cast_energy", 5))
 			ui.float_text(("It got away · Energy refunded (%d left today)" % int(ev.protected_left)) if protected
-				else "It got away · %d Energy back" % refund, where, P0Ui.GREEN_D)
+				else "It got away · %d Energy back" % refund, where, UiFloatText.Tone.ENERGY_GAIN)
 		"cancelled":
 			ui.toast("Line in · Energy back")
 
