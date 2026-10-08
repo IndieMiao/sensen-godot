@@ -47,14 +47,13 @@ secret() {   # $1 = env value, $2 = file under output/p0-deploy, $3 = bytes
 }
 key() { secret "${P0_KEY:-}" key 8; }
 admin_key() { secret "${P0_ADMIN_KEY:-}" admin-key 16; }
-# One admin call inside the container: loopback only, never reachable through Caddy.
+# One admin call inside the container: loopback only, never reachable through Caddy. The key comes from the
+# container's environment ($P0_ADMIN_KEY, expanded by the container's sh), so it never appears on a command line.
+# The body (POST) is built from validated values only.
 admin() {   # $1 = path, $2 = JSON body (POST) or empty (GET)
-  local k; k=$(admin_key)
-  if [ -n "${2:-}" ]; then
-    hk "docker exec p0-p0-1 wget -qO- --header 'x-p0-admin: $k' --header 'content-type: application/json' --post-data '$2' http://127.0.0.1:3111$1"
-  else
-    hk "docker exec p0-p0-1 wget -qO- --header 'x-p0-admin: $k' http://127.0.0.1:3111$1"
-  fi
+  local body=""
+  [ -n "${2:-}" ] && body="--header 'content-type: application/json' --post-data '$2'"
+  printf '%s\n' "wget -qO- --header \"x-p0-admin: \$P0_ADMIN_KEY\" $body http://127.0.0.1:3111$1" | hk 'docker exec -i p0-p0-1 sh'
 }
 
 health() {   # $1 = label: Journey and farm healthz, saved for the before / after comparison
@@ -102,10 +101,10 @@ case "$step" in
     say "files → $HK:$REMOTE"
     hk "mkdir -p $REMOTE/backups"
     scp "${SSH_OPTS[@]}" -q "$here/docker-compose.p0.yml" "$here/backup-p0.sh" "$here/p0-report.sh" "$HK:$REMOTE/"
-    k=$(key); ak=$(admin_key)
-    # .env.p0: the container's settings (the demo key, the admin key); .env: what compose itself interpolates (the
-    # image), so later `docker compose -p p0 ps / logs` work without the variable on the command line
-    hk "umask 077 && printf 'P0_ACCESS_KEYS=%s\nP0_ADMIN_KEY=%s\n' '$k' '$ak' > $REMOTE/.env.p0 && printf 'P0_IMAGE=p0-server:%s\n' '$sha' > $REMOTE/.env && chmod +x $REMOTE/backup-p0.sh $REMOTE/p0-report.sh"
+    # .env.p0: the container's settings (the demo key, the admin key), written from stdin so neither key is on a
+    # command line; .env: what compose itself interpolates (the image), so `docker compose -p p0 ps / logs` work later
+    printf 'P0_ACCESS_KEYS=%s\nP0_ADMIN_KEY=%s\n' "$(key)" "$(admin_key)" | hk "umask 077 && cat > $REMOTE/.env.p0"
+    hk "printf 'P0_IMAGE=p0-server:%s\n' '$sha' > $REMOTE/.env && chmod +x $REMOTE/backup-p0.sh $REMOTE/p0-report.sh"
     say "compose up (project p0)"
     hk "cd $REMOTE && docker compose -p p0 -f docker-compose.p0.yml up -d"
     say "wait for healthy"
@@ -177,11 +176,14 @@ PY
     ;;
   energy)
     player="${1:?energy <player id> <value>}"; value="${2:?energy <player id> <value>}"
+    [[ "$player" =~ ^[A-Za-z0-9_-]{8,64}$ ]] || { echo "bad player id: $player"; exit 2; }   # the server's PLAYER_RE
+    [[ "$value" =~ ^[0-9]{1,4}$ ]] || { echo "value must be a whole number: $value"; exit 2; }
     say "F1: Energy of $player → $value (logged in the container log as an admin line)"
     admin /admin/energy "{\"player\":\"$player\",\"value\":$value}" | tee -a "$out/admin.txt"; echo
     ;;
   report)
     player="${1:?report <player id> [YYYY-MM-DD]}"; day="${2:-$(date -u +%Y-%m-%d)}"
+    [[ "$player" =~ ^[A-Za-z0-9_-]{8,64}$ && "$day" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] || { echo "bad player id or day"; exit 2; }
     say "F2: $player on $day (UTC) — session report, then the day's command and refusal counts"
     hk "$REMOTE/p0-report.sh '$player' '$day'" | tee "$out/report-$player-$day.txt"
     ;;

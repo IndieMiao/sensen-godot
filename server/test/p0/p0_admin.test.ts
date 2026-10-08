@@ -27,6 +27,7 @@ describe('P0 admin tools (SGODOT-150, q(53))', () => {
       const r = await admin.inject({ method: 'POST', url: '/admin/energy', headers: { 'x-p0-admin': KEY }, payload: { player: 'admin-player-01', value: 80 } });
       expect(r.json()).toEqual({ ok: true, player: 'admin-player-01', from: 200, to: 80, max: 200 });
       expect(store.peek('admin-player-01')!.energy).toEqual({ value: 80, tick_ms: T0 });
+      expect(store.peek('admin-player-01')!.seq).toBe(1);   // a client on the old view is refused stale_state
       expect(JSON.parse(lines[0])).toMatchObject({ admin: 'energy', player: 'admin-player-01', from: 200, to: 80 });
     } finally { await admin.close(); }
   });

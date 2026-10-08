@@ -1,9 +1,10 @@
 /**
  * Observer tools for the real-player playtest (SGODOT-150 observer manual, q(53)). A second Fastify app that listens
  * on 127.0.0.1 inside the P0 container only (P0_ADMIN_PORT): Caddy and the internet reach the game port, never this
- * one, and every call also needs P0_ADMIN_KEY in `x-p0-admin`. Use it from the host with docker exec, e.g.
- *   docker exec p0-p0-1 wget -qO- --header "x-p0-admin: $KEY" --header 'content-type: application/json' \
- *     --post-data '{"player":"p0-…","value":80}' http://127.0.0.1:3111/admin/energy
+ * one, and every call also needs P0_ADMIN_KEY in `x-p0-admin`. Use it from the host with docker exec; the key is read
+ * from the container's own environment, never typed on a command line (ps would show it):
+ *   docker exec p0-p0-1 sh -c 'wget -qO- --header "x-p0-admin: $P0_ADMIN_KEY" --header "content-type: application/json" \
+ *     --post-data "{\"player\":\"p0-…\",\"value\":80}" http://127.0.0.1:3111/admin/energy'
  * Each change is printed as one JSON line ({admin, player, from, to, at}) to the container log.
  */
 import type { FastifyInstance } from 'fastify';
@@ -41,6 +42,7 @@ export function registerP0Admin(app: FastifyInstance, deps: P0AdminDeps): void {
     settleEnergy(c, s, now);
     const from = s.energy.value;
     s.energy = { value, tick_ms: now };
+    s.seq += 1;   // like every other change: a client holding the old view is refused stale_state and refreshes
     store.put(s);
     log(JSON.stringify({ admin: 'energy', player: s.player, from, to: value, max: maxEnergy(c, s), at: deps.now() }));
     return { ok: true, player: s.player, from, to: value, max: maxEnergy(c, s) };
