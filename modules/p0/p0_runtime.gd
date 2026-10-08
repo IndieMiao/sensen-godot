@@ -274,12 +274,14 @@ var return_to := "farm"
 
 ## The route back to world `w` from the map, as return_to holds it.
 static func route_of(w: Object) -> String:
+	var id := ""
 	match space_of(w):
-		"pond": return "pond:" + (str(w.call("p0_place")) if w.has_method("p0_place") else "")
+		"pond": id = str(w.call("p0_place")) if w.has_method("p0_place") else ""
 		"outpost":
 			var o = w.get("outpost")
-			return "outpost:" + (str((o as Dictionary).get("id", "")) if o is Dictionary else "")
-	return "farm"
+			id = str((o as Dictionary).get("id", "")) if o is Dictionary else ""
+	# A pond or outpost that does not say which one goes back to the farm (刘邦 on #92), never to "pond:".
+	return "%s:%s" % [space_of(w), id] if id != "" else "farm"
 
 ## The location chip: from a world, to the map; on the map, back to where the player is (MAP-1).
 func _on_place_pressed() -> void:

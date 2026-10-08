@@ -452,6 +452,19 @@ func _apply_world_delta(delta: Vector3) -> void:
 	_clamp_to_bounds()
 
 func _update_cameras() -> void:
+	var d := _place_camera()
+	_update_pawns(d)
+	if marker_layer:
+		marker_layer.sync(cam, anchor_lat, anchor_lng, d * CULL_FACTOR, center_world)
+	# 同一份位姿喂给地图（单一权威）
+	if map:
+		map.set_camera(center_lat, center_lng, zoom + _zoom_elastic, bearing, pitch)
+	if _placement_mode:
+		_update_placement_preview()
+
+## The Godot camera alone for the current centre / zoom / bearing / pitch (no map, pawns or markers): enough for
+## geo_to_screen while a host tries views (P0's opening frame), finished by one _update_cameras. Returns its distance.
+func _place_camera() -> float:
 	center_world = MapGeoMath.geo_to_world(center_lat, center_lng, anchor_lat, anchor_lng)
 	_maybe_reanchor()
 	var d := _cam_distance()
@@ -464,14 +477,7 @@ func _update_cameras() -> void:
 	cam.fov = MAP_FOV_DEG
 	cam.near = maxf(d / 1000.0, 0.05)
 	cam.far = d * 8.0
-	_update_pawns(d)
-	if marker_layer:
-		marker_layer.sync(cam, anchor_lat, anchor_lng, d * CULL_FACTOR, center_world)
-	# 同一份位姿喂给地图（单一权威）
-	if map:
-		map.set_camera(center_lat, center_lng, zoom + _zoom_elastic, bearing, pitch)
-	if _placement_mode:
-		_update_placement_preview()
+	return d
 
 ## 浮动原点：地图中心跑远了就把锚点搬过来（f64 精确拷贝），所有几何重算。
 func _maybe_reanchor() -> void:
@@ -496,6 +502,9 @@ func _update_pawns(d: float) -> void:
 		var vis: bool = p.ready and n.position.distance_to(center_world) <= cull_r and city_detail_visible()
 		if city_map and str(p.cohort).begins_with("farm:"):
 			vis = vis and farm_markers.selected_id == str(p.cohort).trim_prefix("farm:")
+		if city_map and p.cohort == "self" and farm_markers and farm_markers.anchor_shift.has("self") \
+				and farm_markers.world_positions.has("self"):
+			n.position = farm_markers.world_positions.self   # beside the pin of the place it stands at (P0 MAP-1)
 		if street_mode and farm_markers and city_map == null:
 			var id := str(p.cohort).trim_prefix("farm:")
 			if farm_markers.selected_id == id: character_scale = 1.0
@@ -1641,6 +1650,19 @@ func _open_place(id: String) -> void:
 	if AppRouter.top_instance() != null or not Net or not Net.session: return
 	if not PlaceCatalog.available(id, Net.session.state): return
 	AppRouter.open_instance(AppRouter.PLACE, {"place_id": id, "session": Net.session})
+
+## The player's own avatar somewhere other than home (P0 MAP-1: where the player is); home itself stays put.
+func set_self_at(lat: float, lng: float) -> void:
+	for list in [_pawns, _spawn_queue]:
+		for p in list:
+			if p.cohort == "self":
+				p.lat = lat
+				p.lng = lng
+	if farm_markers:
+		if is_equal_approx(lat, home_lat) and is_equal_approx(lng, home_lng): farm_markers.anchor_override.erase("self")
+		else: farm_markers.anchor_override["self"] = Vector2(lat, lng)
+	_reposition_pawns()
+	_camera_dirty = true
 
 func _anchor_self_to_farm(center: Vector2) -> void:
 	home_lat = center.x
