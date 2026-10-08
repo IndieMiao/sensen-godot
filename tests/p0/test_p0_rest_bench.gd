@@ -29,13 +29,18 @@ func test_two_hours_away_first() -> void:
 	assert_str(s.state).is_equal("away")
 	assert_str(s.badge).is_equal("countdown")
 	assert_str(s.caption).is_equal("1h 12m")
-	assert_str(s.sheet_state).is_equal("Cooling down")
-	assert_array([s.fact, s.fact_value]).is_equal(["Available in", "1h 12m"])
-	assert_str(s.reason).is_equal("Ready in 1h 12m")
+	assert_str(s.sheet_state).is_equal("Rest · back after 2h away · 1h 12m to go")   # q(70), FARM-7 cooling card
+	assert_str(s.wait).is_equal("in 1h 12m")
+	assert_str(s.reason).is_equal("Not yet")
+	assert_bool(s.can_rest).is_false()
 	assert_str(s.close).is_equal("Close")
-	s = P0Logic.rest_state(_view({"away_ready_in": null}))   # never left home
+	# q(70): a new account that never left the farm (server away_ready_in null) shows no countdown at all.
+	s = P0Logic.rest_state(_view({"away_ready_in": null}))
 	assert_str(s.state).is_equal("away")
-	assert_str(s.reason).is_equal("After 2h away")
+	assert_str(s.caption).is_empty()
+	assert_str(s.sheet_state).is_equal("Rest · back after 2h away")
+	assert_str(s.wait).is_equal("after 2h away")
+	assert_bool(s.can_rest).is_false()
 
 func test_used_today() -> void:
 	var s := P0Logic.rest_state(_view({"used": 1, "away_ready_in": null}))
