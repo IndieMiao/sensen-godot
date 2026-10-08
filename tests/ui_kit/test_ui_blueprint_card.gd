@@ -62,3 +62,11 @@ func test_supplies_lines_hide_on_tools() -> void:
 	var c := _host(UiBlueprintCard.new(d)) as UiBlueprintCard
 	assert_bool(c._yield.visible).is_false()
 	assert_str(c._have.text).is_empty()
+
+func test_the_icon_tile_asks_for_the_items_info() -> void:
+	var c := _host(UiBlueprintCard.new(_data({"label": "Craft", "kind": UiBlueprintCard.Kind.PRIMARY}))) as UiBlueprintCard
+	var asked := [0]
+	c.icon_pressed.connect(func(): asked[0] += 1)
+	var hit: Button = c.find_children("*", "Button", true, false).filter(func(b): return b.flat)[0]
+	hit.pressed.emit()
+	assert_int(asked[0]).is_equal(1)

@@ -165,3 +165,35 @@ func test_the_gloves_banner_says_the_next_harvest_and_leaves_the_drawer() -> voi
 	assert_that(texts).is_equal(["Gather Gloves", "+1 at every gathering spot", "Next Timber harvest: 7", "Passive · no gear slot needed"])
 	assert_object(ui.workbench()).is_same(d)   # GLOVES-DONE: the banner sits over the open drawer
 	banner.queue_free()
+
+# --- The item's InfoSheet (不知火舞 on 231: CRAFT-1/2/4 are the shared InfoSheet) ---
+
+func test_workbench_info_is_read_only_with_what_the_item_does() -> void:
+	var v := _view(5)
+	var pick := P0ItemInfo.spec(v, "pick_copper", &"workbench")
+	assert_bool(pick.card).is_true()
+	assert_str(pick.title).is_equal("Copper Pickaxe")
+	assert_that(pick.facts).is_equal(["2 Stone per rock"])
+	assert_array(pick.buttons).is_empty()   # Craft / Equip live on the blueprint card
+	assert_bool(pick.info).is_false()       # no item page behind it in P0: no ›
+	v.workbench.recipes[0].owned = true
+	assert_that(P0ItemInfo.spec(v, "pick_copper", &"workbench").facts).is_equal(["2 Stone per rock", "In Gear"])
+	v.workbench.recipes[1].owned = true
+	assert_that(P0ItemInfo.spec(v, "gather_gloves", &"workbench").facts).is_equal(["+1 at every gathering spot", "Passive · no gear slot needed"])
+	assert_that(P0ItemInfo.spec(v, "torch", &"workbench").facts).is_equal(["See what rocks hold"])
+
+func test_an_icon_opens_the_items_info_and_folds_it_again() -> void:
+	var d: P0WorkbenchDrawer = await _drawer("tools")
+	assert_bool(d.sheet.is_open()).is_false()
+	d.card("craft_copper_pickaxe").icon_pressed.emit()
+	assert_bool(d.sheet.is_open()).is_true()
+	assert_str(d.sheet.item_id()).is_equal("pick_copper")
+	assert_str(d.sheet.context()).is_equal("workbench")
+	d.card("craft_gather_gloves").icon_pressed.emit()      # another item switches the card
+	assert_str(d.sheet.item_id()).is_equal("gather_gloves")
+	d.card("craft_gather_gloves").icon_pressed.emit()      # the same one folds it
+	assert_bool(d.sheet.is_open()).is_false()
+	d.card("craft_copper_pickaxe").icon_pressed.emit()
+	d._tabs.selected = 1
+	d._tabs.changed.emit(1)                                # another tab folds it
+	assert_bool(d.sheet.is_open()).is_false()

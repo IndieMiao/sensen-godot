@@ -7,11 +7,15 @@ extends PanelContainer
 ##             or the reason / done state in the neutral look (`Need 1 more Copper Ore`, `No room · free a slot
 ##             first`, `Farming Lv3`, `Equipped`, `Owned · always on`) — those still take the tap (LOCK-10).
 ## The card only lays the recipe out; its owner sends the command (`pressed`), toasts a reason
-## (`unavailable_pressed`) and shows a tile's source (`material_pressed`, NeedSource above the tile).
+## (`unavailable_pressed`), shows a tile's source (`material_pressed`, NeedSource above the tile) and the item's
+## InfoSheet (`icon_pressed`).
 
 signal pressed
 signal unavailable_pressed(reason: String)
 signal material_pressed(index: int, tile: UiNeedTile)
+## The item's icon tile was tapped: the owner shows the item's InfoSheet (不知火舞 on 231: CRAFT-1/2/4 are replaced by
+## B2-06; the details are the shared InfoSheet).
+signal icon_pressed
 
 enum Kind { PRIMARY, SECONDARY, UNAVAILABLE }
 
@@ -53,6 +57,11 @@ func _init(data := {}) -> void:
 	_icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	_icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	tile.add_child(_icon)
+	var hit := Button.new()   # the 44 tile is its own touch target; a flat button so a scroll drag cancels it
+	hit.flat = true
+	hit.focus_mode = Control.FOCUS_NONE
+	hit.pressed.connect(func(): icon_pressed.emit())
+	tile.add_child(hit)
 	var text := VBoxContainer.new()
 	text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	text.size_flags_vertical = Control.SIZE_SHRINK_CENTER

@@ -10,6 +10,8 @@ extends UiDrawer
 ##                                     camera, LOCK-08)
 ## A craft that stays here (Torch, Compost) floats `+2 Torch` on its card (TORCH-DONE, float_on); the Copper
 ## Pickaxe's Moment and the gloves' banner belong to the owner.
+## Tapping a card's item icon shows the shared InfoSheet (P0ItemInfo context &"workbench", read only) docked under the
+## tabs, as the bag docks it above its grid; the same icon again, another tab or a closed drawer folds it.
 
 signal command_requested(cmd: Dictionary)
 signal unavailable_requested(reason: String)
@@ -25,6 +27,7 @@ const _KINDS := {"primary": UiBlueprintCard.Kind.PRIMARY, "secondary": UiBluepri
 var view := {}
 var tab := "tools"
 var _tabs: UiSegmentTab
+var sheet: UiInfoSheet
 var _scroll: TouchScrollContainer
 var _list: VBoxContainer
 var _cards := {}              # recipe id -> UiBlueprintCard
@@ -43,10 +46,15 @@ func _init(view_: Dictionary = {}, tab_ := "tools") -> void:
 	_tabs = UiSegmentTab.new([{label = "Tools"}, {label = "Supplies"}], TABS.find(tab))
 	_tabs.changed.connect(func(i: int):
 		tab = TABS[i]
+		sheet.close()
 		_key = 0
 		refresh(view)
 		tab_changed.emit(tab))
 	body.add_child(_tabs)
+	sheet = UiInfoSheet.new()
+	sheet.rules = func(id: String, ctx: StringName, o: Dictionary) -> Dictionary: return P0ItemInfo.spec(view, id, ctx, o)
+	sheet.visible = false
+	body.add_child(sheet)
 	_scroll = TouchScrollContainer.new()
 	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -65,6 +73,7 @@ func refresh(v: Dictionary) -> void:
 	var key := hash([tab, model])
 	if key == _key: return
 	_key = key
+	if sheet.is_open(): sheet.refresh()   # Equipped, In Gear, ×N follow the view
 	var ids: Array = model.map(func(m): return str(m.id))
 	if ids != _cards.keys():
 		for c in _list.get_children(): c.queue_free()
@@ -80,6 +89,7 @@ func _new_card(id: String) -> UiBlueprintCard:
 		var cmd: Dictionary = _models.get(id, {}).get("button", {}).get("cmd", {})
 		if not cmd.is_empty(): command_requested.emit(cmd))
 	card.unavailable_pressed.connect(func(r: String): unavailable_requested.emit(r))
+	card.icon_pressed.connect(func(): show_info(str(_models.get(id, {}).get("item", ""))))
 	card.material_pressed.connect(func(i: int, tile: UiNeedTile):
 		var cost: Array = _models.get(id, {}).get("cost", [])
 		if i < cost.size(): source_requested.emit(tile, str(cost[i].id)))
@@ -95,6 +105,14 @@ static func _card_data(m: Dictionary) -> Dictionary:
 	}
 
 func card(recipe_id: String) -> UiBlueprintCard: return _cards.get(recipe_id)
+
+## The item's InfoSheet under the tabs; the same item again folds it.
+func show_info(item_id: String) -> void:
+	if item_id == "": return
+	if sheet.is_open() and sheet.item_id() == item_id:
+		sheet.close()
+		return
+	sheet.open(item_id, &"workbench")
 
 ## TORCH-DONE: `+2 Torch` (FloatText Tone=Item, Hug) starts at the right end of the card's materials row and rises;
 ## the drawer stays open and the counts on the card follow the view.
