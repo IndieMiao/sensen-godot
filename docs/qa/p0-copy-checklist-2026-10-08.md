@@ -54,7 +54,7 @@
 | 位置 | 应出现 |
 |---|---|
 | 主行动键 · Fishing ★ | `Cast · 5 Energy`（离岸远也是这句，q(44)）/ 途中 `Cast · On the way`（不灰显）/ 灰 `Cast · Creel full` / 灰 `Fishing · No water nearby` |
-| 鱼篓角标 | `Creel 7 · 6 free` / 满 `Creel full · 0 free slots · Sell or cook first`（只在角标与 toast） |
+| 鱼篓角标 | `Creel 7 · 6 free` / 满 `Creel full · 0 free slots · Sell or cook first`（只在角标与 toast）；满时点角标出 toast + `Open bag ›`，不满时点角标直接开背包 Fish 页；满篓**没有** `Open Bag` / `Go home · Free` 次按钮，回家用位置芯片（q(83)） |
 | 鱼饵用完 ★ | toast `Out of Worm Bait · no bait on the hook`（q(44)） |
 | 挂上 / 取下鱼饵 ★ | 点快捷栏饵格 toast `Worm Bait on the hook · used at the bite`，再点取下 `No bait`；首次升级横幅按 `Use bait` 也出挂上那句（在水边选中饵格并闪一次，不在水边只挂上留到下一竿），不跳转（q(77)） |
 | 钓获卡（首次） | `Caught!` / `Pond Crucian · Common` / `Fish-dex 3/N` / `First catch! +15 XP` / `New city! +10 XP` |
