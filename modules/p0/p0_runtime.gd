@@ -298,9 +298,11 @@ func _call(method: String, args: Array):
 
 func _enter_tree() -> void:
 	AppRouter.loading_overlay_factory = _scene_overlay   # SYS-LOADING-SCENE for the P0 worlds AppRouter opens
+	AppRouter.preload_paths = P0RoomPreload.paths_for   # rooms load their kit off the main thread (SGODOT-252)
 
 func _exit_tree() -> void:
 	if AppRouter.loading_overlay_factory == Callable(self, &"_scene_overlay"): AppRouter.loading_overlay_factory = Callable()
+	if AppRouter.preload_paths == Callable(P0RoomPreload, &"paths_for"): AppRouter.preload_paths = Callable()
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_RESUMED: _on_resumed()

@@ -21,6 +21,11 @@ var _loading: CanvasLayer
 ## A host's own loading layer for open_instance (P0: SYS-LOADING-SCENE, SGODOT-233): factory(scene_path, args)
 ## returns a CanvasLayer with failed() and close_button like loading_overlay.gd, or null to keep that overlay.
 var loading_overlay_factory := Callable()
+## Resources a scene builds from in its _ready, beyond its own dependencies (SGODOT-252): (scene_path, args) ->
+## PackedStringArray. They load on worker threads under the same cover after the scene itself and are held until
+## the scene is in the tree, so its _ready finds them cached instead of loading them on the main thread.
+var preload_paths := Callable()
+var _held: Array = []
 ## 实例栈（PRD §3.2 第二层空间）：地图常驻为底，农场/地点/换装房压在上面。
 var _stack: Array[Node] = []
 var _relocation_source: Node
@@ -225,11 +230,30 @@ func _load_with_feedback(scene_path: String, args := {}) -> PackedScene:
 			if Time.get_ticks_msec() - started > 30000: break
 			await get_tree().process_frame
 		if ResourceLoader.load_threaded_get_status(scene_path) == ResourceLoader.THREAD_LOAD_LOADED:
-			return ResourceLoader.load_threaded_get(scene_path) as PackedScene
+			var packed := ResourceLoader.load_threaded_get(scene_path) as PackedScene
+			await _preload_extras(scene_path, args, started)
+			return packed
 	_loading.failed()
 	_loading.close_button.pressed.connect(_clear_transition, CONNECT_ONE_SHOT)
 	return null
 
+
+## preload_paths' resources on worker threads, within the same 30 s as the scene; whatever is not loaded by then the
+## scene loads itself as before. Held in _held until the transition ends.
+func _preload_extras(scene_path: String, args: Dictionary, started: int) -> void:
+	_held = []
+	if not preload_paths.is_valid(): return
+	var pending: Array = []
+	for path in preload_paths.call(scene_path, args):
+		if ResourceLoader.has_cached(path): _held.append(ResourceLoader.load(path))
+		elif ResourceLoader.load_threaded_request(path) == OK: pending.append(path)
+	while not pending.is_empty() and Time.get_ticks_msec() - started <= 30000:
+		for path in pending.duplicate():
+			var status := ResourceLoader.load_threaded_get_status(path)
+			if status == ResourceLoader.THREAD_LOAD_IN_PROGRESS: continue
+			if status == ResourceLoader.THREAD_LOAD_LOADED: _held.append(ResourceLoader.load_threaded_get(path))
+			pending.erase(path)
+		if not pending.is_empty(): await get_tree().process_frame
 
 func _render_frame() -> void:
 	await get_tree().process_frame
@@ -243,6 +267,7 @@ func _end_transition() -> void:
 
 
 func _clear_transition() -> void:
+	_held = []
 	if is_instance_valid(_loading):
 		remove_child(_loading)
 		_loading.queue_free()
