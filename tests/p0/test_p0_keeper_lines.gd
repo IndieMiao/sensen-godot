@@ -21,7 +21,7 @@ func test_tea_house() -> void:
 	var v := _view()
 	var l := P0Logic.keeper_lines(v, "tea", {place = "Lotus Tea House"})
 	assert_str(l.line).is_equal("Pours the tea · Lotus Tea House")
-	assert_str(l.greet).is_equal("Sit a minute. Hot tea, 30 Energy back.")
+	assert_str(l.greet).is_equal("Sit a minute. Hot tea, 30 Energy a cup.")
 	assert_str(l.trade).is_equal("Trade · order tea")
 	assert_str(l.question).is_equal("Any news in town?")
 	assert_str(l.answer).is_equal("Quiet day. 12 people around Shanghai right now.")

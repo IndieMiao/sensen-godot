@@ -759,7 +759,7 @@ static func _keeper_bars() -> Control:
 		[UiKeeperBar.Role.MARKET, "mei", "Mei's Stall", "Xuhui Market Square", "Market Keeper · Mei",
 			"Row Hoes just came in.", "", "market"],
 		[UiKeeperBar.Role.TEA, "ama", "Ama's Tea", "Lotus Tea House", "Tea Host · Ama",
-			"Sit a minute. Hot tea, 30 Energy back.", "Counts across all tea houses · 3 cups a day", "tea · with a note"],
+			"Sit a minute. Hot tea, 30 Energy a cup.", "Counts across all tea houses · 3 cups a day", "tea · with a note"],
 		[UiKeeperBar.Role.POST, "sigrid", "Sigrid's Desk", "Huangpu Travel Post", "Post Clerk · Sigrid",
 			"Coffee's fresh. Pip's been asking for a hand.", "Shares the 3 cups a day with tea", "post · with a note"],
 	]

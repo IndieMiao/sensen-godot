@@ -792,7 +792,7 @@ static func keeper_lines(view: Dictionary, role: String, ctx := {}) -> Dictionar
 			match str(k.get("greet", "")):
 				"cups_out": greet = _CUPS_OUT
 				"full": greet = "You look rested. Tea's here when you need it."
-				_: greet = "Sit a minute. Hot tea, %d Energy back." % int(view.get("drinks", {}).get("energy", 30))
+				_: greet = "Sit a minute. Hot tea, %d Energy a cup." % int(view.get("drinks", {}).get("energy", 30))
 			answer = "Quiet day."
 			if k.get("online", null) != null: answer += " %d %s around Shanghai right now." % [int(k.online), "person" if int(k.online) == 1 else "people"]
 		"post":
