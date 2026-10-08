@@ -10,6 +10,7 @@ services:
     environment:
       P0_DEV: "0"
       P0_TRUST_PROXY: "1"   # behind Caddy: the client address comes from X-Forwarded-For (per-address request cap)
+      P0_ADMIN_PORT: "3111" # observer tools on 127.0.0.1 inside the container only; key P0_ADMIN_KEY in .env.p0
     volumes: [p0data:/data]
     mem_limit: 256m
     cpus: 0.5             # 2 cores shared with farm, Journey, social demo and voice: P0 never takes more than half of one

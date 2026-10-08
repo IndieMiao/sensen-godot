@@ -20,6 +20,9 @@ export class P0Store {
     return s;
   }
   size(): number { return this.players.size; }
+  /** A stored player, without creating one (admin tools). */
+  peek(player: string): P0State | undefined { return this.players.get(player); }
+  all(): P0State[] { return [...this.players.values()]; }
   put(state: P0State): void { this.players.set(state.player, state); this.flush(); }
   reset(player: string, now: number): P0State { const s = freshState(this.c, player, now); this.put(s); return s; }
   private flush(): void {

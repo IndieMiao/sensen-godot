@@ -27,6 +27,7 @@
 | `docker-compose.p0.yml` | 香港 ECS：加入 farm 项目的网络 `farm_default`，由 farm 的 Caddy 转发；内存上限 256 MB |
 | `docker-compose.devserver.yml` | 局域网 devserver：同一个镜像直接发布到 3150 端口，不经 Caddy |
 | `Caddyfile.p0.snippet` | 要并入线上 Caddyfile 的一段：`/preview/p0/*` 去掉前缀后转给 `p0-demo:3110`（容器在 farm_default 上的别名） |
+| `deploy-hk.sh` | 香港部署的逐步脚本（preflight / build / transfer / backup-caddy / up / verify-internal / caddy / smoke / crontab / stats / rollback），每步单独运行 |
 | `smoke.sh` | 冒烟：healthz、无口令 401、带口令读状态、一条命令往返、dev 路由 404、UI 上报。用一次性玩家 id `smoke-<时间戳>`，不碰真实玩家 |
 | `backup-p0.sh` | 每晚把 `/data` 卷打包，保留 14 份；按 compose 标签找卷（项目名 `P0_PROJECT`，默认 p0），不写死卷名 |
 
