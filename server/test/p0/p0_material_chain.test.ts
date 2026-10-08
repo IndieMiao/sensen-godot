@@ -156,6 +156,25 @@ describe('mine floors 1–2 (§13.3, LOCK-21)', () => {
     expect([...floor2].sort()).toEqual(['copper_ore', 'rock_salt', null].sort());
   });
 
+  it('floor 2 drops in P0 are copper 30 / rock salt 35 / none 35 (quartz folded into salt, knob A, q(47)); floor 1 is unchanged', () => {
+    const { s } = step(fresh(), { type: 'mine_enter' });
+    const run = s.mine.run!;
+    const share = (floor: number) => {
+      const n: Record<string, number> = {};
+      for (let seed = 0; seed < 3000; seed++) {
+        const id = String(rockDrop(c, s, { ...run, seed }, floor, seed % 6));
+        n[id] = (n[id] ?? 0) + 1;
+      }
+      return Object.fromEntries(Object.entries(n).map(([k, v]) => [k, Math.round(v / 30)]));   // percent
+    };
+    const f2 = share(2);
+    expect(Object.keys(f2).sort()).toEqual(['copper_ore', 'null', 'rock_salt']);
+    expect(Math.abs(f2.copper_ore - 30)).toBeLessThanOrEqual(3);
+    expect(Math.abs(f2.rock_salt - 35)).toBeLessThanOrEqual(3);
+    expect(Math.abs(f2.null - 35)).toBeLessThanOrEqual(3);
+    expect(c.mine.floors[0].drops).toEqual([['copper_ore', 35], ['rock_salt', 25], ['clay', 15], [null, 25]]);
+  });
+
   it('a torch needs one in the bag', () => {
     const { s } = step(fresh(), { type: 'mine_enter' });
     expect(refuse(s, { type: 'mine_torch', floor: 1 }, T0 + STEP)).toEqual({ code: 'no_item', detail: { item: 'torch' } });
