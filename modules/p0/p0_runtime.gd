@@ -411,6 +411,10 @@ func _on_state(v: Dictionary, events: Array) -> void:
 					last_catch_extras["city_xp"] = int(ev.xp)
 	last_xp_lines = xp_lines
 	var parcels_said := false
+	# A level-up's banner speaks first (q(49): one thing at a time): the reply's `… sent to Inbox · 24h` waits until it
+	# closes, at the stove or away (不知火舞 on 226 / 233); the bell counts the parcels at once from the view.
+	var levelled := events.any(func(e): return str(e.get("kind", "")) == "level")
+	var parcel_line := ""
 	var first_level := not before.is_empty() and ["farming", "fishing", "cooking"].all(func(k):
 		return int(before.get("skills", {}).get(k, {}).get("level", 1)) <= 1)
 	for ev in events:
@@ -447,9 +451,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				if not parcels_said:
 					parcels_said = true
 					var line := P0Logic.parcel_toast(v, events.filter(func(e): return not hushed.call(e)))
-					# A pot kept on its own away from the kitchen: its Cooking level-up's gifts are said after the
-					# level-up banner, as the banner's rule has it (不知火舞 on 226; the banner is queued deferred).
-					if line != "" and quiet.any(func(q): return str(q.get("kind", "")) == "level"): ui.toast_when_clear.call_deferred(line)
+					if levelled: parcel_line = line
 					elif line != "": ui.toast(line, 2.0)
 			"catch":
 				# A world that shows the catch itself (the open fishing panel) returns true.
@@ -503,6 +505,8 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				if ui.modal_kind == "homestead": ui.close_modal()
 				var home := P0Logic.home_moment(v, ev)
 				ui.queue_card(func(): HomePanel.moment(ui, home))   # one moment at a time (q(49) ④)
+	# After the loop, so it is queued behind the level-up banner (itself deferred) even when the parcel came first.
+	if parcel_line != "": ui.toast_when_clear.call_deferred(parcel_line)
 	ui.queue_floats(floats, at)   # with the world's own lines of this reply, at the end of the frame
 	if ui.modal_kind == "counter" and events.size() > 0:
 		ui.set_view(session.current())   # the counter drawer follows the view; floats say what changed
