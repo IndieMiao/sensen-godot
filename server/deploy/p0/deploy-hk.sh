@@ -47,13 +47,19 @@ secret() {   # $1 = env value, $2 = file under output/p0-deploy, $3 = bytes
 }
 key() { secret "${P0_KEY:-}" key 8; }
 admin_key() { secret "${P0_ADMIN_KEY:-}" admin-key 16; }
-# One admin call inside the container: loopback only, never reachable through Caddy. The key comes from the
-# container's environment ($P0_ADMIN_KEY, expanded by the container's sh), so it never appears on a command line.
-# The body (POST) is built from validated values only.
+# One admin call inside the container: loopback only, never reachable through Caddy. The image's own node sends it
+# and reads the key from its environment in-process, so the key is in no process's arguments, host or container
+# (a wget there would show it to the host's ps). The script arrives on stdin; the body is built from checked values.
 admin() {   # $1 = path, $2 = JSON body (POST) or empty (GET)
-  local body=""
-  [ -n "${2:-}" ] && body="--header 'content-type: application/json' --post-data '$2'"
-  printf '%s\n' "wget -qO- --header \"x-p0-admin: \$P0_ADMIN_KEY\" $body http://127.0.0.1:3111$1" | hk 'docker exec -i p0-p0-1 sh'
+  local method=GET body=null
+  if [ -n "${2:-}" ]; then method=POST; body="$2"; fi
+  hk 'docker exec -i p0-p0-1 node --input-type=module -' <<JS
+const r = await fetch('http://127.0.0.1:3111$1', { method: '$method',
+  headers: { 'x-p0-admin': process.env.P0_ADMIN_KEY ?? '', 'content-type': 'application/json' },
+  ...('$method' === 'POST' ? { body: JSON.stringify($body) } : {}) });
+console.log(await r.text());
+process.exit(r.ok ? 0 : 1);
+JS
 }
 
 health() {   # $1 = label: Journey and farm healthz, saved for the before / after comparison

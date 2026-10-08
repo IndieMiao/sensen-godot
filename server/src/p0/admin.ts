@@ -1,10 +1,9 @@
 /**
  * Observer tools for the real-player playtest (SGODOT-150 observer manual, q(53)). A second Fastify app that listens
  * on 127.0.0.1 inside the P0 container only (P0_ADMIN_PORT): Caddy and the internet reach the game port, never this
- * one, and every call also needs P0_ADMIN_KEY in `x-p0-admin`. Use it from the host with docker exec; the key is read
- * from the container's own environment, never typed on a command line (ps would show it):
- *   docker exec p0-p0-1 sh -c 'wget -qO- --header "x-p0-admin: $P0_ADMIN_KEY" --header "content-type: application/json" \
- *     --post-data "{\"player\":\"p0-…\",\"value\":80}" http://127.0.0.1:3111/admin/energy'
+ * one, and every call also needs P0_ADMIN_KEY in `x-p0-admin`. Use it from the host through server/deploy/p0/deploy-hk.sh
+ * (players / energy): it pipes a small script into `docker exec -i p0-p0-1 node`, which reads the key from its own
+ * environment, so the key is in no process's arguments (host ps sees container processes too).
  * Each change is printed as one JSON line ({admin, player, from, to, at}) to the container log.
  */
 import type { FastifyInstance } from 'fastify';
