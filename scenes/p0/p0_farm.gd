@@ -320,8 +320,10 @@ func _tags(v: Dictionary) -> void:
 	rt.ui.tag("stall", "Tap to shop", stall_top - Vector2(0, rt.ui.badge_height("stall")),
 		actor.position.distance_to(_stall) < 3.2, cam.unproject_position(_stall + Vector3(0, 0.4, 0)))
 	# The farmhouse carries no state badge (不知火舞 on SGODOT-221): the stove's state belongs to the stove inside,
-	# and Today already names the dish and its time. The card's copy becomes "Farmhouse · Tap to go in" once the
-	# door card goes (bench SGODOT-224, room SGODOT-226).
+	# and Today already names the dish and its time — except the guide's "!" (A-03, TUT-3-07A2): above the door while
+	# a cookable fish is in the bag and Today has a Cook row to do (P0Guide.door_badge; 不知火舞 on SGODOT-232).
+	# The card's copy becomes "Farmhouse · Tap to go in" once the door card goes (bench SGODOT-224, room SGODOT-226).
+	rt.ui.badge("door", UiStatusBadge.State.REQUEST, cam.unproject_position(_house + Vector3(-0.45, 1.3, 0.95)), P0Guide.door_badge(v))
 	rt.ui.tag("home", "Home · Kitchen · Rest", cam.unproject_position(_house + Vector3(0, 2.6, 0.4)),
 		actor.position.distance_to(_house) < 4.2, cam.unproject_position(_house + Vector3(0, 1.0, 0.6)))
 
