@@ -174,18 +174,68 @@ func _on_closed() -> void:
 		if st != null:
 			watch(st)
 			return
+		_hide_ring()   # no pot to go back to: the ring the drawer kept running goes too (刘邦 on #120)
 	room.release_focus()
 	_hide_player(false)
 
 ## Queue next › (q(71)): the cooking drawer over the pot being watched, its Cook reading Queue. The watch resumes when
-## the drawer closes; rings that pass meanwhile count as misses, as when walking away from the pot.
+## the drawer closes. The queue drawer is not leaving the pot (§7.2.3; 不知火舞 on 226): the heat rings go on over the
+## pot in the band above it, drawn over the slot bar and the preview, and a tap on that band inside a ring's window
+## judges it with its float, the drawer staying open; rings judged meanwhile stand when the watch resumes.
 func open_queue() -> void:
 	if phase != "watch" or not P0KitchenLogic.can_queue(rt.session.current()): return
-	_hide_ring()
 	_hide_sheet()
 	phase = "idle"
 	_queue_mode = true
 	open("cookbook")
+	if phase != "compose": return
+	_band = _heat_band()
+	_wrap.add_child(_band)
+	_wrap.move_child(_band, 0)   # under the drawer, the slot bar and the preview: they keep their own taps
+	if _ring: rt.ui.root.move_child(_ring, -1)   # over the drawer's layer
+
+## The pot band's heat taps while the queue drawer is open: in a ring's window a tap judges it; while a ring shows
+## (growing 1 s before its turn, the 350 ms it stays after) a tap outside the window does nothing, as tap() swallows it
+## while watching (不知火舞 on 226); with no ring showing it is the scrim's tap, as before (back closes the drawer).
+var _band: Control
+func _heat_band() -> Control:
+	var band := Control.new()
+	band.set_anchors_preset(Control.PRESET_FULL_RECT)
+	band.mouse_filter = Control.MOUSE_FILTER_STOP
+	band.gui_input.connect(func(e: InputEvent):   # STOP: the scrim under it never sees the tap
+		if P0Ui.is_tap(e) and not _judge_tap() and not (_ring and _ring.visible): rt.ui.back_modal())
+	return band
+
+## The heat rings run while watching and while the queue drawer is open over the pot (open_queue).
+func _heat_live() -> bool: return phase == "watch" or (phase == "compose" and _queue_mode)
+
+## Shots (until:gold / until:goldsoon, then heattap): a ring not yet judged has its needle on gold `lead_ms` from now.
+func at_gold(lead_ms := 0.0) -> bool:
+	if not _heat_live(): return false
+	var e := elapsed() + lead_ms
+	var heats: Array = _stove.get("heats", [])
+	for i in heats.size():
+		if not _judged.has(i) and e >= float(heats[i].at) and P0Logic.heat_hit(heats[i], e, 0.0): return true
+	return false
+
+## Shots: the heat tap a player's finger makes now (on the watched pot or the queue drawer's pot band).
+func dev_heat_tap() -> void: _judge_tap()
+
+## Shots: a press on the queue drawer's pot band, as a finger makes it.
+func dev_band_press() -> void:
+	if _band == null or not is_instance_valid(_band): return
+	var press := InputEventMouseButton.new()
+	press.button_index = MOUSE_BUTTON_LEFT
+	press.pressed = true
+	_band.gui_input.emit(press)
+
+## Shots (until:growsoon, then heatband): a ring not yet judged is growing, before its window, `lead_ms` from now.
+func ring_growing(lead_ms := 0.0) -> bool:
+	if not _heat_live(): return false
+	var e := elapsed() + lead_ms
+	for h in _stove.get("heats", []):
+		if e >= float(h.at) - RING_EARLY_MS + 100.0 and e < float(h.at) - 100.0: return true
+	return false
 
 ## `pot` event with queued (q(71)): the pot went in behind the one cooking. The ingredients are taken already; the
 ## drawer closes and the watch resumes, now saying Queued 1 with the next dish beside the pot.
@@ -434,6 +484,12 @@ func elapsed() -> float: return float(Time.get_ticks_msec() - _start_ms)
 func tap() -> bool:
 	if phase == "serve" or phase == "card": return true
 	if phase != "watch": return false
+	_judge_tap()
+	return true
+
+## Judges the ring whose window is open now, with its float: true when one was judged.
+func _judge_tap() -> bool:
+	if not _heat_live(): return false
 	var e := elapsed()
 	var heats: Array = _stove.get("heats", [])
 	for i in heats.size():
@@ -448,7 +504,7 @@ func tap() -> bool:
 		rt.ui.float_text("Nice heat! ★" if hit else "Missed · still cooking", _ring_center(), UiTokens.COLOR_GOLD_INK if hit else UiTokens.COLOR_SECONDARY)
 		if hit: Input.vibrate_handheld(40)
 		return true
-	return true
+	return false
 
 ## S5 Queue ×2 (PR #22): heat and collect name the pot they are for, so a pot the server already kept on its own
 ## answers stale_pot instead of judging the next one.
@@ -466,14 +522,14 @@ func _ring_center() -> Vector2:
 	return room.cam.unproject_position(mouth.global_position)
 
 func _process(_dt: float) -> void:
-	if phase != "watch": return
+	if not _heat_live(): return
 	var e := elapsed()
 	var total := float(_stove.get("ms", 5000))
 	var heats: Array = _stove.get("heats", [])
 	var active := -1
 	for i in heats.size():
 		var h: Dictionary = heats[i]
-		if auto_play and not _judged.has(i) and e >= float(h.at) + (float(h.gold) + float(h.width) * 0.5) * float(h.spin): tap()
+		if auto_play and not _judged.has(i) and e >= float(h.at) + (float(h.gold) + float(h.width) * 0.5) * float(h.spin): _judge_tap()
 		if not _judged.has(i) and e > float(h.at) + float(h.spin):
 			_judged[i] = false
 			rt.ui.float_text("Missed · still cooking", _ring_center(), UiTokens.COLOR_SECONDARY)
@@ -488,6 +544,7 @@ func _process(_dt: float) -> void:
 			_ring.turn = clampf((e - float(h.at)) / float(h.spin), 0.0, 1.0)
 			_ring.result = (1 if _judged[active] else 0) if _judged.has(active) else -1
 			_ring.position = _ring_center() - _ring.size * 0.5
+	if phase != "watch": return   # the queue drawer: no sheet; a pot done meanwhile is served when the watch resumes
 	if _queue_badge and _queue_badge.visible: _queue_badge.place_at(_ring_center() + QUEUE_BADGE_AT)
 	_update_sheet()
 	if e >= total + 250.0: serve(_taps.duplicate())

@@ -182,6 +182,8 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"stove": open_stove(step[1] if step.size() > 1 else "cookbook")
 		"kitchen": p0_open_kitchen(step[1] if step.size() > 1 else "cookbook")
 		"queue": kitchen.open_queue()   # Queue next › on the watch sheet (shots)
+		"heattap": kitchen.dev_heat_tap()   # a heat tap now: until:gold first (shots)
+		"heatband": kitchen.dev_band_press()   # a press on the queue drawer's pot band (shots)
 		"page": if kitchen.drawer: kitchen.drawer.select_page(step[1])   # a Cookbook page's card (shots)
 		"put":
 			if kitchen.phase != "compose": kitchen.open("experiment")
@@ -203,5 +205,8 @@ func p0_until(n: String) -> bool:
 		"turned": return kitchen != null and kitchen.phase == "watch" and P0KitchenLogic.queued(rt.session.current()) == null   # Queue ×2 turned over
 		"card": return kitchen != null and kitchen.phase == "card"
 		"compose": return kitchen != null and kitchen.phase == "compose"
+		"gold": return kitchen != null and kitchen.at_gold()   # a ring's needle on gold (shots)
+		"goldsoon": return kitchen != null and kitchen.at_gold(800.0)   # on gold when the next step runs (0.8 s on)
+		"growsoon": return kitchen != null and kitchen.ring_growing(800.0)   # a ring growing when the next step runs
 		"idle": return (kitchen == null or not kitchen.busy()) and super(n)
 	return super(n)

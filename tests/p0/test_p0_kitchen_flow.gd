@@ -177,6 +177,108 @@ func test_queue_next_opens_the_drawer_in_queue_mode_and_the_queued_pot_returns_t
 	assert_str(str(mark.get("badge", ""))).is_equal("countdown")
 	assert_str(str(mark.get("count", ""))).is_equal("+1")
 
+## 不知火舞 on 226 (§7.2.3): the queue drawer is not leaving the pot. Its ring goes on over the pot, drawn over the
+## drawer's layer; a tap on the pot band inside the ring's window judges it with its float and the drawer stays open;
+## back at the watch the ring stands judged. Outside every window the tap is the scrim's, as before: back.
+func _band_press(k: P0Kitchen) -> void:
+	var band: Control = (k.get("_wrap") as Control).get_child(0)
+	var press := InputEventMouseButton.new()
+	press.button_index = MOUSE_BUTTON_LEFT
+	press.pressed = true
+	band.gui_input.emit(press)
+
+func test_the_heat_ring_goes_on_under_the_queue_drawer_and_a_hit_there_stands() -> void:
+	var v := _queue_view()
+	v.cooking.stove.heats = [{"at": 3000, "spin": 1600, "gold": 0.5, "width": 0.2}]
+	_set_view(v)
+	var r := await _farmhouse()
+	var k: P0Kitchen = r.get("kitchen")
+	k.watch(rt.session.view.cooking.stove)
+	k.open_queue()
+	assert_str(k.phase).is_equal("compose")
+	k.set("_start_ms", Time.get_ticks_msec() - 2500)   # the ring grows over the pot 1 s before its turn
+	k._process(0.0)
+	var ring: UiHeatRing = k.get("_ring")
+	assert_bool(ring.visible).is_true()
+	assert_int(ring.get_index()).is_greater(rt.ui._modal.get_index())   # over the drawer, the slot bar and the preview
+	k.set("_start_ms", Time.get_ticks_msec() - int(3000 + 0.5 * 1600))   # the needle on gold
+	var picked := k.drawer.selected_page
+	var tab := k.drawer.tab
+	_band_press(k)
+	assert_str(k.phase).is_equal("compose")   # the drawer stays, its choice untouched
+	assert_str(k.drawer.selected_page).is_equal(picked)
+	assert_str(k.drawer.tab).is_equal(tab)
+	assert_bool(rt.ui.has_modal()).is_true()
+	assert_bool(bool(k.get("_judged").get(0, false))).is_true()
+	var floats: Array = rt.ui.root.find_children("*", "UiFloatText", true, false).map(func(f): return (f as UiFloatText).text)
+	assert_array(floats).contains(["Nice heat! ★"])
+	rt.ui.close_modal()   # back to the watch: the ring stands as hit, not judged again
+	await get_tree().process_frame
+	assert_str(k.phase).is_equal("watch")
+	assert_bool(bool(k.get("_judged").get(0, false))).is_true()
+	k._process(0.0)
+	assert_int(ring.result).is_equal(1)
+	k.stop_watching()
+
+func test_a_tap_on_the_pot_band_outside_a_ring_closes_the_queue_drawer_as_before() -> void:
+	var v := _queue_view()
+	v.cooking.stove.heats = [{"at": 9000, "spin": 1600, "gold": 0.5, "width": 0.2}]
+	_set_view(v)
+	var r := await _farmhouse()
+	var k: P0Kitchen = r.get("kitchen")
+	k.watch(rt.session.view.cooking.stove)
+	k.open_queue()
+	_band_press(k)
+	await get_tree().process_frame
+	assert_bool(rt.ui.has_modal()).is_false()
+	assert_str(k.phase).is_equal("watch")
+	assert_bool(k.get("_judged").has(0)).is_false()   # nothing judged
+	k.stop_watching()
+
+## 不知火舞 on 226: while a ring shows (growing 1 s before its window, the 350 ms it stays after its turn) a tap on the
+## pot band outside the window does nothing, as tap() swallows it while watching; the drawer stays.
+func test_a_tap_on_the_pot_band_while_a_ring_shows_but_outside_its_window_keeps_the_drawer() -> void:
+	var v := _queue_view()
+	v.cooking.stove.heats = [{"at": 3000, "spin": 1600, "gold": 0.5, "width": 0.2}]
+	_set_view(v)
+	var r := await _farmhouse()
+	var k: P0Kitchen = r.get("kitchen")
+	k.watch(rt.session.view.cooking.stove)
+	k.open_queue()
+	for at in [2400, 3000 + 1600 + 200]:   # growing; then turned and still showing
+		k.set("_start_ms", Time.get_ticks_msec() - at)
+		k._process(0.0)
+		assert_bool((k.get("_ring") as UiHeatRing).visible).override_failure_message(str(at)).is_true()
+		_band_press(k)
+		await get_tree().process_frame
+		assert_str(k.phase).override_failure_message(str(at)).is_equal("compose")
+		assert_bool(rt.ui.has_modal()).is_true()
+	assert_bool(bool(k.get("_judged").get(0, true))).is_false()   # the turn went by: a miss, from the clock, not the taps
+	rt.ui.close_modal()
+	await get_tree().process_frame
+	k.stop_watching()
+
+## 刘邦 on #120: the queue drawer closing with no pot left on the stove does not leave its running ring on screen.
+func test_the_ring_goes_when_the_queue_drawer_closes_on_an_empty_stove() -> void:
+	var v := _queue_view()
+	v.cooking.stove.heats = [{"at": 3000, "spin": 1600, "gold": 0.5, "width": 0.2}]
+	_set_view(v)
+	var r := await _farmhouse()
+	var k: P0Kitchen = r.get("kitchen")
+	k.watch(rt.session.view.cooking.stove)
+	k.open_queue()
+	k.set("_start_ms", Time.get_ticks_msec() - 3500)
+	k._process(0.0)
+	var ring: UiHeatRing = k.get("_ring")
+	assert_bool(ring.visible).is_true()
+	var empty := _queue_view()
+	empty.cooking.stove = null   # kept and gone meanwhile (another device, a command's settle)
+	_set_view(empty)
+	rt.ui.close_modal()
+	await get_tree().process_frame
+	assert_str(k.phase).is_equal("idle")
+	assert_bool(ring.visible).is_false()
+
 func test_queue_next_is_offered_only_from_cooking_lv5_with_nothing_waiting() -> void:
 	var r := await _farmhouse()
 	var k: P0Kitchen = r.get("kitchen")
