@@ -238,9 +238,10 @@ static func skill_unlocks(view: Dictionary, skill: String, level: int) -> Array:
 			for main in [true, false]:
 				for c in crops:
 					if (str(c.get("ingr", ["F"])[0]) == "F") == main: out.append(str(c.name))
-		"fishing":
+		"fishing":   # this season's waters: ponds and rivers (no coast in P0)
 			for f in content().get("fish", []):
-				if int(f.get("level", 1)) == level: out.append(item_name(view, str(f.id)))
+				var where: Array = f.get("where", ["pond"])
+				if int(f.get("level", 1)) == level and (where.has("pond") or where.has("river")): out.append(item_name(view, str(f.id)))
 	return out
 
 ## The level-up gift of a skill level as the gate card's info row ("Carrot Seeds ×5" / "Level-up gift" / "At Lv2"),
@@ -856,12 +857,17 @@ static func level_unlocks(view: Dictionary, skill: String, level: int) -> Array:
 			var hoe: Dictionary = content().get("tools", {}).get("row_hoe", {})
 			if int(hoe.get("gate", 0)) == level: out.append(item_name(view, str(hoe.get("id", ""))))
 		"fishing":
+			# The fish, then gear and goods the level opens (Worm Bait at Lv2, the Reed Rod at Lv3).
 			out = skill_unlocks(view, "fishing", level)
+			for o in view.get("stall", {}).get("buy", []):
+				if str(o.get("skill", "")) == "fishing" and int(o.get("gate", 1)) == level: out.append(item_name(view, str(o.get("id", ""))))
+			for r in content().get("fishing", {}).get("rods", []):
+				if int(r.get("level", 1)) == level and int(r.get("price", 0)) > 0: out.append(str(r.get("name", "")))
 		"cooking":
 			var conv: Dictionary = content().get("cooking", {}).get("conveniences", {})
 			for k in conv:
 				if int(conv[k]) == level: out.append(str(CONVENIENCE_NAMES.get(k, k)))
-			if level == 4: out.push_front("3rd slot")
+			if level == 4: out.push_front("third ingredient slot")   # SKILL-1 482:167
 	return out
 
 ## `Fine fish now stay on the hook` when a level opens a whole rarity, else the fish by name (`Golden Koi now stays
@@ -882,7 +888,6 @@ static func next_level_line(view: Dictionary, skill: String, level: int) -> Stri
 	if level >= th.size(): return ""
 	var to_go := maxi(0, int(th[level]) - int(view.get("skills", {}).get(skill, {}).get("xp", th[level - 1])))
 	var opens := level_unlocks(view, skill, level + 1)
-	if skill == "fishing": opens = skill_unlocks(view, "fishing", level + 1)
 	return "Next Lv%d%s · %d XP" % [level + 1, (" · " + ", ".join(opens)) if not opens.is_empty() else "", to_go]
 
 ## §3.4.8 one-time rewards, said at the moment that earned them.

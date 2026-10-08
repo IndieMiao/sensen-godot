@@ -323,7 +323,6 @@ func set_view(v: Dictionary) -> void:
 	_refresh_hud()
 	_refresh_bar()
 
-func _skill_pct(s: Dictionary) -> float: return P0Logic.skill_progress(s)
 
 ## HUD from the view, the next action's cost (Low = short of it) and where the player actually is: the
 ## kitchen is the farmhouse's stove corner, so the chip reads "Shanghai · Farmhouse" there (LOCK-06).
@@ -1178,6 +1177,10 @@ func toast_success(text: String) -> void:
 ## What the toast says now ("" when none is up).
 func toast_text() -> String: return _toasts.current_text() if _toasts else ""
 
+## Takes the toast down now (tests, or a panel that replaces what it said).
+func clear_toast() -> void:
+	if _toasts: _toasts.dismiss()
+
 func _on_toast_action(action: String) -> void:
 	match action:
 		"Open bag": open_bag()
@@ -1583,7 +1586,7 @@ func stall_new_ids() -> Array:
 		_taught["stall_seen"] = open
 		_save_tips()
 		return []
-	var seen: Array = _taught.stall_seen
+	var seen: Array = _taught.stall_seen if _taught.stall_seen is Array else open
 	return open.filter(func(id): return not seen.has(id))
 
 func stall_has_new() -> bool: return not stall_new_ids().is_empty()
@@ -1591,7 +1594,7 @@ func stall_has_new() -> bool: return not stall_new_ids().is_empty()
 func _mark_stall_seen() -> void:
 	var open: Array = (view.get("stall", {}).get("buy", []) as Array).filter(func(o): return bool(o.get("unlocked", true))).map(func(o): return str(o.id))
 	_load_tips()
-	var seen: Array = _taught.get("stall_seen", [])
+	var seen: Array = _taught.get("stall_seen", []) if _taught.get("stall_seen", []) is Array else []
 	for id in open:
 		if not seen.has(id): seen.append(id)
 	_taught["stall_seen"] = seen
@@ -2186,7 +2189,7 @@ func open_profile(look_saved := false) -> void:
 	var page := P0ProfilePage.new(view, safe_top(), look_saved)
 	page.theme = UiKit.theme()
 	page.back_pressed.connect(close_modal)
-	page.skill_pressed.connect(func(_skill: String): open_skills())
+	page.skill_pressed.connect(func(_skill: String): open_skills(func(): open_profile()))
 	page.edit_look_pressed.connect(edit_look)
 	page.collection_pressed.connect(func(key: String):
 		if key == "fish": open_fishdex(func(): open_profile())
@@ -2212,59 +2215,17 @@ func edit_look() -> void:
 
 ## SKILL-1 (P0 cut): three track cards — level ring, XP and how far to go, what the next level opens —
 ## and the "First times" collection tiles. Opened from the avatar ring.
-func open_skills() -> void:
-	var v := _sheet(520, "Skills", "xp")
+## SKILL-1 (P0SkillsDrawer): from the profile's skill cards and the gate card's `Skills`; `back` reopens the panel it
+## came from on Back or a tap outside.
+func open_skills(back := Callable()) -> void:
+	var d := P0SkillsDrawer.new(view)
+	d.theme = UiKit.theme()
+	d.safe_bottom = safe_bottom()
+	d.close_requested.connect(close_modal)
+	d.close_pressed.connect(close_modal)
+	_open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
 	modal_kind = "skills"
-	var sk: Dictionary = view.get("skills", {})
-	for key in ["farming", "fishing", "cooking"]:
-		var s: Dictionary = sk.get(key, {})
-		var card := PanelContainer.new()
-		card.add_theme_stylebox_override("panel", _box(PAPER, 14, EDGE, 1, Vector4(10, 8, 10, 8)))
-		var h := HBoxContainer.new()
-		h.add_theme_constant_override("separation", 10)
-		var ring := _LevelRing.new()
-		ring.custom_minimum_size = Vector2(58, 58)
-		ring.set_meta("pct", _skill_pct(s))
-		ring.set_meta("text", "Lv %d" % int(s.get("level", 1)))
-		h.add_child(ring)
-		var mid := VBoxContainer.new()
-		mid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		mid.add_theme_constant_override("separation", 1)
-		var name_row := HBoxContainer.new()
-		name_row.add_child(_label(key.capitalize(), 13, INK, true))
-		if key == "cooking":
-			var slots := int(view.get("cooking", {}).get("slots", 2))
-			name_row.add_child(_label("  " + "●".repeat(slots) + "○".repeat(maxi(0, 3 - slots)), 11, GREEN_D, true))
-		mid.add_child(name_row)
-		var nxt = s.get("next", null)
-		if nxt == null:
-			mid.add_child(_label("%d XP · top level" % int(s.get("xp", 0)), 9, INK2))
-		else:
-			mid.add_child(_label("%d / %d XP · %d to go" % [int(s.xp), int(nxt), int(nxt) - int(s.xp)], 9, INK2))
-		var nl := _label(P0Logic.next_line(view, key, int(s.get("level", 1)) + 1), 9, AMBER_D, true)
-		nl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		nl.custom_minimum_size = Vector2(200, 0)
-		mid.add_child(nl)
-		h.add_child(mid)
-		card.add_child(h)
-		v.add_child(card)
-	v.add_child(_label("First times", 11, INK, true))
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 10)
-	row.alignment = BoxContainer.ALIGNMENT_CENTER
-	var firsts: Array = view.get("firsts", [])
-	var crops := firsts.filter(func(f): return str(f).begins_with("harvest:")).size()
-	var dex: Array = view.get("fishing", {}).get("dex", [])
-	var fish := dex.filter(func(d): return int(d.get("caught", 0)) > 0).size()
-	var pages: Array = view.get("cooking", {}).get("cookbook", [])
-	var dishes := pages.filter(func(p): return p.get("cooked", false)).size()
-	for t in [["crop_radish", "Crops", crops, (view.get("crops", []) as Array).size()], ["fish_crucian", "Fish", fish, dex.size()], ["dish_grilled_crucian", "Dishes", dishes, pages.size()]]:
-		# Collection counts: NEED-TILE count state (LOCK-10 q(7)), display only.
-		var tile := UiNeedTile.new(str(t[1]), int(t[2]), int(t[3]), UiNeedTile.Size.M, P0Logic.icon(str(t[0])), true)
-		tile.theme = UiKit.theme()
-		tile.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		row.add_child(tile)
-	v.add_child(row)
+	_modal_back = back
 
 # ---------------------------------------------------------------- one-line teaching cards (§14.3)
 const TIPS_PATH := "user://p0_tips.json"
@@ -2290,7 +2251,8 @@ func _hide_tip(close_queue := true) -> void:
 	if close_queue and tips: tips.close()
 
 func _show_tip(text: String) -> void:
-	for k in tips.seen: _taught[k] = true
+	for k in tips.seen:
+		if P0Guide.TIPS.has(k): _taught[k] = true   # only the tips: the store also keeps stall_seen / dex_seen lists
 	_save_tips()
 	if _teach == null:
 		_teach = PanelContainer.new()
@@ -2667,7 +2629,7 @@ func _save_tips() -> void:
 func open_fishdex(back := Callable(), animate := true) -> void:
 	_load_tips()
 	var caught: Array = view.get("fishing", {}).get("dex", []).filter(func(f): return int(f.get("caught", 0)) > 0).map(func(f): return str(f.id))
-	var seen: Array = _taught.get("dex_seen", [])
+	var seen: Array = _taught.get("dex_seen", []) if _taught.get("dex_seen", []) is Array else []
 	var fresh := caught.filter(func(id): return not seen.has(id))
 	if not fresh.is_empty():
 		_taught["dex_seen"] = caught
@@ -2900,20 +2862,3 @@ class _RarityDot extends Control:   # FISH-3 title dot: rarity colour in a cream
 	func _draw() -> void:
 		draw_circle(size * 0.5, size.x * 0.5, P0Ui.PAPER)
 		draw_circle(size * 0.5, size.x * 0.5 - 1.0, color)
-
-## Skill level ring on the Skills sheet (progress within the level). Item have / need is UiNeedTile (LOCK-10).
-class _LevelRing extends Control:
-	func _draw() -> void:
-		var c := size * 0.5
-		var r := minf(size.x, size.y) * 0.5 - 3
-		draw_circle(c, r, Color("fbf8f1"))
-		draw_arc(c, r, 0, TAU, 64, Color(0.18, 0.23, 0.2, 0.12), 4.0, true)
-		draw_arc(c, r, -PI * 0.5, -PI * 0.5 + TAU * clampf(float(get_meta("pct", 0.0)), 0.0, 1.0), 64, Color("7fc66a"), 4.0, true)
-		var tex: Texture2D = get_meta("icon") if has_meta("icon") else null
-		if tex: draw_texture_rect(tex, Rect2(c - Vector2(r, r) * 0.62, Vector2(r, r) * 1.24), false)
-		var text := str(get_meta("text", ""))
-		if text != "":
-			var font := get_theme_default_font()
-			var w := font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x
-			draw_string(font, c + Vector2(-w * 0.5, 5), text, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color("2f3a33"))
-
