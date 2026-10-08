@@ -444,11 +444,21 @@ func test_the_events_of_a_pot_kept_on_its_own_are_told_from_the_commands() -> vo
 	var spent := {"kind": "energy", "delta": -2, "reason": "harvest"}
 	# Before the command: the harvest's items and XP stay.
 	var events := [bagged, dish, xp, level, gift, fired, spent, crop, farm_xp]
-	assert_array(P0KitchenLogic.auto_kept_events(events)).is_equal([bagged, dish, xp, level, gift, fired])
+	assert_array(P0KitchenLogic.auto_kept_events(events)).is_equal([bagged, dish, xp, level, fired])   # the gift is the level-up's
 	# After it, and a pot with plates left on the stove (no `queue`): the next command's XP is not the pot's.
 	var plate := {"kind": "plate", "ids": ["dish_grilled_crucian"], "cabinet": false}
 	assert_array(P0KitchenLogic.auto_kept_events([crop, farm_xp, plate, dish, xp])).is_equal([plate, dish, xp])
 	assert_array(P0KitchenLogic.auto_kept_events([plate, dish, xp, crop, farm_xp])).is_equal([plate, dish, xp])
+	# A dish the command took out (eaten from the bag or the Warming Cabinet) just before is the command's (后裔 on #108).
+	var eaten := {"kind": "item", "id": "dish_grilled_crucian", "delta": -1}
+	var taken := {"kind": "cabinet", "id": "dish_grilled_crucian", "delta": -1, "to_bag": 0, "have": 0, "cap": 6}
+	assert_array(P0KitchenLogic.auto_kept_events([eaten, taken, plate, dish, xp])).is_equal([plate, dish, xp])
+	# A full Warming Cabinet sends the dish on to the bag: the cabinet says delta 0, to_bag 1 (server routeDish).
+	var past := {"kind": "cabinet", "id": "dish_grilled_crucian", "delta": 0, "to_bag": 1, "have": 6, "cap": 6}
+	assert_array(P0KitchenLogic.auto_kept_events([eaten, bagged, past, dish, xp])).is_equal([bagged, past, dish, xp])
+	# `Take one` from the cabinet into the bag (item +1, then the cabinet −1 with to_bag 1) is the command's too.
+	var took := {"kind": "cabinet", "id": "dish_grilled_crucian", "delta": -1, "to_bag": 1, "have": 5, "cap": 6}
+	assert_array(P0KitchenLogic.auto_kept_events([bagged, took, bagged.duplicate(), past, dish])).is_equal([bagged, past, dish])
 	# A Mystery Dish: the ingredients it gives back, then its Mishap, then the waiting pot.
 	var odd := dish.duplicate()
 	odd.mystery = true

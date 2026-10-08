@@ -450,3 +450,26 @@ func test_a_pot_kept_away_from_the_kitchen_floats_and_toasts_nothing_but_the_com
 	assert_int(rt.ui.root.find_children("*", "UiMomentBanner", true, false).size()).is_equal(1)   # the Cooking Lv2 banner
 	rt.ui.close_modal()
 	rt.detach(w)
+
+func test_a_level_up_gift_that_did_not_fit_is_said_after_its_banner_away_from_the_kitchen() -> void:
+	# 不知火舞 on 226: the gifts of a Cooking level-up a pot kept on its own brought are the level-up's, not the pot's.
+	# LOCK-14's `… sent to Inbox · 24h` still comes, behind the level-up banner; the pot's own floats stay quiet.
+	var w: Node3D = auto_free(Node3D.new())
+	add_child(w)
+	rt.attach(w)
+	var kept := _dish(false)
+	kept.auto = true
+	rt.ui.clear_toast()
+	rt.session.state_changed.emit(rt.session.view, [kept, {"kind": "xp", "skill": "cooking", "amount": 5, "percent": 100},
+		{"kind": "level", "skill": "cooking", "level": 3, "energy": 0, "gifts": [["spice_pepper", 2]]},
+		{"kind": "parcel", "id": "spice_pepper", "qty": 2, "key": "level:cooking:3:0", "waiting": false, "expires_in": 86400000},
+		{"kind": "queue", "id": 4, "dish": null, "started_at": 0, "ms": 60000}])
+	for i in 3: await get_tree().process_frame
+	assert_int(rt.ui.root.find_children("*", "UiMomentBanner", true, false).size()).is_equal(1)
+	assert_str(rt.ui.toast_text()).is_equal("")   # not over the banner
+	var floats: Array = rt.ui.root.find_children("*", "UiFloatText", true, false).map(func(f): return (f as UiFloatText).text)
+	assert_bool(floats.any(func(t): return str(t).contains("Cooking"))).override_failure_message(str(floats)).is_false()
+	rt.ui.close_modal()
+	for i in 2: await get_tree().process_frame
+	assert_str(rt.ui.toast_text()).is_equal("Bag full · spice_pepper ×2 sent to Inbox · 24h")
+	rt.detach(w)

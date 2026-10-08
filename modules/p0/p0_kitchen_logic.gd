@@ -67,8 +67,10 @@ static func new_recipe_line(view: Dictionary, dish_ev: Dictionary) -> String:
 ## The events of a reply that a pot Queue ×2 kept on its own brought (server settleStove: finishPot, then startQueued),
 ## each `dish` with `auto` and around it: the Keep way before it (dish into the bag, the Warming Cabinet, plates left on
 ## the stove); after it the ingredients a Mishap gives back and its `mishap`, the first-time Energy rewards, the
-## first-cook bonus, the pot's Cooking XP, Cooking level-ups with the gifts that did not fit, and the waiting pot firing.
-## Away from the kitchen none of them floats or toasts (不知火舞 on 226); the XP still counts and a level-up still shows.
+## first-cook bonus, the pot's Cooking XP, Cooking level-ups and the waiting pot firing. Away from the kitchen none of
+## them floats or toasts (不知火舞 on 226); the XP still counts and a level-up still shows. A level-up's gifts that did
+## not fit the bag are the level-up's, not the pot's (LOCK-14 `… sent to Inbox · 24h`, the bell +1), so they are left
+## out.
 static func auto_kept_events(events: Array) -> Array:
 	var out: Array = []
 	for d in events.size():
@@ -93,12 +95,21 @@ static func auto_kept_events(events: Array) -> Array:
 			gifts = k == "level" or (k == "parcel" and gifts)
 			j += 1
 		if j < events.size() and str(events[j].get("kind", "")) == "queue": j += 1
-		out.append_array(events.slice(i + 1, j))
+		var level := false
+		for e in events.slice(i + 1, j):
+			var k := str(e.get("kind", ""))
+			if not (k == "parcel" and level): out.append(e)
+			level = k == "level" or (k == "parcel" and level)
 	return out
 
+## What the Keep way of a pot pushes before its dish: a dish into the bag, into the Warming Cabinet (or past a full one,
+## to_bag), plates left. A dish taken out (eaten, sold) is the command's, not the pot's (后裔 on #108).
 static func _kept_way(e: Dictionary) -> bool:
-	var k := str(e.get("kind", ""))
-	return k in ["cabinet", "plate"] or (k == "item" and str(e.get("id", "")).begins_with("dish_"))
+	match str(e.get("kind", "")):
+		"plate": return true
+		"cabinet": return int(e.get("delta", 0)) > 0 or (int(e.get("delta", 0)) == 0 and int(e.get("to_bag", 0)) > 0)
+		"item": return str(e.get("id", "")).begins_with("dish_") and int(e.get("delta", 0)) > 0
+	return false
 
 ## "Lv4 · 60 XP to go" for the locked 3rd slot (SGODOT-203: the 90 px label holds the short form); "Lv4" when
 ## the cooking thresholds are unknown.

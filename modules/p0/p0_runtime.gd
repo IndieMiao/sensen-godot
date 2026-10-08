@@ -446,8 +446,11 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				# LOCK-14: rewards that did not fit the bag wait in the Inbox; one float for the whole reply.
 				if not parcels_said:
 					parcels_said = true
-					var line := P0Logic.parcel_toast(v, events)
-					if line != "": ui.toast(line, 2.0)
+					var line := P0Logic.parcel_toast(v, events.filter(func(e): return not hushed.call(e)))
+					# A pot kept on its own away from the kitchen: its Cooking level-up's gifts are said after the
+					# level-up banner, as the banner's rule has it (不知火舞 on 226; the banner is queued deferred).
+					if line != "" and quiet.any(func(q): return str(q.get("kind", "")) == "level"): ui.toast_when_clear.call_deferred(line)
+					elif line != "": ui.toast(line, 2.0)
 			"catch":
 				# A world that shows the catch itself (the open fishing panel) returns true.
 				if not bool(_call("p0_event", [ev, v])): _on_catch(ev, xp_lines)
