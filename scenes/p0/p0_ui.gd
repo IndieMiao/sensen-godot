@@ -1113,15 +1113,24 @@ static func map_target(go: String) -> String:
 func spot_reachable() -> bool:
 	return can_show_spot.is_valid() and bool(can_show_spot.call())
 
-## The bell (parcels / letters). TODO(stage 4, Inbox): replace this empty state with the Inbox drawer and its
-## tabs; P0 has no parcels yet, so it only shows the agreed EmptyState line.
+## The bell (parcels / letters). TODO(stage 4, SGODOT-234 Inbox): the Inbox drawer with its tabs and Claim. Until
+## then the parcels waiting for a free slot (SGODOT-232) are listed read-only, one line each, soonest to expire first
+## (奕星 on #11); `No parcels` only when there are none (LOCK-14).
 func open_inbox() -> void:
 	var v := _sheet(220, "Inbox", "bell")
 	modal_kind = "inbox"
-	var empty := UiEmptyState.new("No parcels", P0Logic.icon("bell"))
-	empty.theme = UiKit.theme()
-	empty.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	v.add_child(empty)
+	var lines := P0Logic.parcel_lines(view)
+	if lines.is_empty():
+		var empty := UiEmptyState.new("No parcels", P0Logic.icon("bell"))
+		empty.theme = UiKit.theme()
+		empty.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		v.add_child(empty)
+		return
+	var list := VBoxContainer.new()
+	list.theme = UiKit.theme()
+	list.add_theme_constant_override(&"separation", int(UiTokens.SPACE_WITHIN))
+	for line in lines: list.add_child(UiKit.label(str(line), UiTokens.STYLE_BODY_B14))
+	v.add_child(list)
 
 ## Resident dialogue bar (SGODOT-225, LOCK-18): greet first, then choose. Called by the outpost rooms (SGODOT-227)
 ## for res_pip / res_old_kai. Sends the day's `talk` (first-chat affinity, gift meal: the server decides) and
