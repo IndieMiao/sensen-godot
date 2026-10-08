@@ -147,6 +147,11 @@ func test_a_gift_meal_sent_to_the_inbox_says_who_and_when_it_goes_back() -> void
 	queued.erase("expires_in")
 	assert_dict(P0Logic.gift_meal_notice(v, meal, [queued])).is_equal({title = "Inbox full · waiting", item = "Grilled Crucian",
 		quantity = "×1", line = "From %s · Claim a parcel first" % pip})
+	# 刘邦 on #118: no parcel in the reply — the Inbox's own row gives the time; with neither, no time rather than `1m`.
+	v["inbox"] = {"parcels": [{"key": "gift_meal:res_pip:d", "id": "dish_grilled_crucian", "qty": 1, "left": 3600000, "gift": {"from": "res_pip"}}]}
+	assert_str(str(P0Logic.gift_meal_notice(v, meal, []).line)).is_equal("From %s · Expires in 1h" % pip)
+	v["inbox"] = {"parcels": []}
+	assert_str(str(P0Logic.gift_meal_notice(v, meal, []).line)).is_equal("From %s" % pip)
 	var bagged := meal.duplicate()
 	bagged.erase("to")
 	assert_dict(P0Logic.gift_meal_notice(v, bagged, [])).is_empty()   # into the bag: the resident bar says it
