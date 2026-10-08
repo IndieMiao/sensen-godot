@@ -28,7 +28,8 @@ enum Density { INVENTORY, QUICK, KITCHEN, GEAR }
 enum State { DEFAULT, SELECTED, EMPTY, LIFTED, DROP_TARGET, ZERO, GHOST }
 ## Compact/Kitchen/Cell states beyond default / selected / empty (WP1b B1-02; inPot / notForCooking 223):
 ##   HIDDEN       unknown page: grey dish silhouette + ingredient family dots, never the real dish art
-##   CLUED        unknown page with a known slot: the silhouette and the lit-slot family row
+##   CLUED        unknown page with a known slot: the silhouette and the family row with that slot lit
+##   (both draw one dot per slot from `families`, a lit slot from `clues`; `might_have` adds State=mightHave's ring)
 ##   TASTED       half-colour icon + `Tasted` chip inside the cell
 ##   MASTERED     gold star at the top right (Cooked ×10)
 ##   LOCKED       3-slot page before Cooking Lv4: silhouette + `Lv4` lock tag (text from `status`, else Lv4)
@@ -44,8 +45,14 @@ const CHECK_GLYPH := preload("res://assets/ui/kit_icons/check.svg")
 const STAR_GLYPH := preload("res://assets/ui/kit_icons/star.svg")
 const LOCK_GLYPH := preload("res://assets/ui/kit_icons/lock.svg")
 const SILHOUETTE := preload("res://assets/ui/kit_icons/kitchen/dish_silhouette.svg")
-const FAMILY_DOTS := preload("res://assets/ui/kit_icons/kitchen/family_dots.svg")
-const FAMILY_DOTS_CLUED := preload("res://assets/ui/kit_icons/kitchen/family_dots_clued.svg")
+## Ingredient families (plan §7.3.1: W water, F field, O orchard, S seasoning): the dot colours color/family/* and the
+## one-colour icons of a slot lit by a family clue, i-fam-fish / produce / fruit / seasoning (Figma 1727:102700 /
+## 102705 / 102710 / 102717; 不知火舞 and 安其拉, SGODOT-226 33725b5e).
+const FAMILY_COLORS := {"W": UiTokens.COLOR_FAMILY_WATER, "F": UiTokens.COLOR_FAMILY_FIELD, "O": UiTokens.COLOR_FAMILY_ORCHARD,
+	"S": UiTokens.COLOR_FAMILY_SEASONING}
+const FAMILY_ICONS := {"W": preload("res://assets/ui/kit_icons/kitchen/fam_fish.svg"),
+	"F": preload("res://assets/ui/kit_icons/kitchen/fam_produce.svg"), "O": preload("res://assets/ui/kit_icons/kitchen/fam_fruit.svg"),
+	"S": preload("res://assets/ui/kit_icons/kitchen/fam_seasoning.svg")}
 const HOME_GLYPH := preload("res://assets/ui/kit_icons/home.svg")
 
 # Positions inside the fixed-size mains (layout of one main, not shared tokens):
@@ -59,8 +66,13 @@ const _KITCHEN_LABEL_H := 25.0
 const _KITCHEN_LABEL_RADIUS := 5.0
 const _KITCHEN_MARK_OUT := 2.0    # mark 13×13 at (41, -2): overhangs the top-right corner by 2
 const _KITCHEN_SILHOUETTE := Rect2(10.4, 9.4, 30, 22)   # hidden / clued / locked
-const _KITCHEN_DOTS := Rect2(14.9, 37.4, 21, 5)
-const _KITCHEN_DOTS_CLUED := Rect2(12.4, 37.4, 26, 10)
+const _KITCHEN_FAMILY_TOP := 37.4   # Ingredient family dots: centred, top at y 38 of the main; dots 5, 3 apart,
+const _KITCHEN_FAMILY_DOT := 5.0     # a lit slot 10 (the row is then 10 high and the dots sit on its middle)
+const _KITCHEN_FAMILY_GAP := 3.0
+const _KITCHEN_FAMILY_ICON := 10.0
+const _KITCHEN_GLOW_SPREAD := 2.0    # State=mightHave 1726:32864: ring outside the cell, 0 offset, blur 4, spread 2,
+const _KITCHEN_GLOW_BLUR := 4.0      # color/new at 50 %, still
+const _KITCHEN_GLOW_ALPHA := 0.5
 const _KITCHEN_STAR := Rect2(35.4, 1.4, 14, 14)
 const _KITCHEN_STAR_GLYPH := 9.0
 const _KITCHEN_TAG := Vector2(1.4, 1.4)                 # Lv4 lock tag: 3 px side padding, radius 5
@@ -111,6 +123,15 @@ var kitchen_state: KitchenState = KitchenState.DEFAULT: set = set_kitchen_state
 var rack := false: set = set_rack
 ## INVENTORY: the stack is in Farm Storage, not the bag — a small house at the bottom left (BAG-2-2).
 var stored := false: set = set_stored
+## KITCHEN unknown pages: each slot's family, e.g. ["W", "S"] — one dot per slot in its colour (FAMILY_COLORS).
+var families: Array = []: set = set_families
+## KITCHEN unknown pages: per slot, the clue that lit it — the ingredient's own icon, or family_icon() when the clue
+## is a family ("Any Common fish") — or null. Never the dish art (§7.2.7: 线索点亮为具体原料).
+var clues: Array = []: set = set_clues
+## KITCHEN: "You might have what it takes" (§7.5.1, server `maybe`): the page's families can all be filled from what
+## the stove reaches. Kitchen/Cell State=mightHave (1726:32864) is the hidden look with this ring; a clued page keeps
+## its lit slot under it.
+var might_have := false: set = set_might_have
 
 ## Milliseconds for the arbiter; tests inject a fake clock.
 var clock := Callable(Time, &"get_ticks_msec")
@@ -129,7 +150,8 @@ var _strip: Panel
 var _new_ring: Panel   # QuickSlot State=new (1663:101150): the color/new ring of a first-time item
 var _badge: Panel
 var _silhouette: TextureRect
-var _dots: TextureRect
+var _family: HBoxContainer
+var _glow: Panel
 var _star: Panel
 var _tag: PanelContainer
 var _rack_tag: PanelContainer
@@ -167,6 +189,19 @@ func set_marked(v: bool) -> void: marked = v; _refresh()
 func set_kitchen_state(v: KitchenState) -> void: kitchen_state = v; _refresh()
 func set_rack(v: bool) -> void: rack = v; _refresh()
 func set_stored(v: bool) -> void: stored = v; _refresh()
+func set_families(v: Array) -> void:
+	if v == families: return   # a grid refresh sets them on every cell
+	families = v
+	_build_family()
+	_refresh()
+func set_clues(v: Array) -> void:
+	if v == clues: return
+	clues = v
+	_build_family()
+	_refresh()
+func set_might_have(v: bool) -> void: might_have = v; _refresh()
+
+static func family_icon(family: String) -> Texture2D: return FAMILY_ICONS.get(family, null)
 
 func _gui_input(event: InputEvent) -> void:
 	_emit(_arbiter.feed(event, clock.call()))
@@ -319,8 +354,22 @@ func _build_kitchen_extras() -> void:
 	_silhouette.self_modulate = UiTokens.COLOR_DISABLED
 	_place(_silhouette, 0.0, _KITCHEN_SILHOUETTE.position.x, _KITCHEN_SILHOUETTE.position.y, _KITCHEN_SILHOUETTE.size.x, _KITCHEN_SILHOUETTE.size.y)
 	_surface.add_child(_silhouette)
-	_dots = UiKit.icon(FAMILY_DOTS, _KITCHEN_DOTS.size.y)
-	_surface.add_child(_dots)
+	_family = HBoxContainer.new()
+	_family.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_family.alignment = BoxContainer.ALIGNMENT_CENTER
+	_family.add_theme_constant_override(&"separation", int(_KITCHEN_FAMILY_GAP))
+	_family.anchor_right = 1.0
+	_family.offset_top = _KITCHEN_FAMILY_TOP
+	_family.offset_bottom = _KITCHEN_FAMILY_TOP   # grows down to its tallest child: 5 with dots only, 10 with a lit slot
+	_surface.add_child(_family)
+	var g := _KITCHEN_GLOW_SPREAD
+	_glow = _box(self)
+	move_child(_glow, 0)   # under the surface: only the ring outside it shows
+	_place(_glow, 0.0, -g, -g, UiTokens.SIZE_KITCHEN_CELL_W + g * 2.0, UiTokens.SIZE_KITCHEN_CELL_W + g * 2.0)
+	var ring := UiStyleBox.make(Color.TRANSPARENT, UiTokens.RADIUS_INVENTORY_CELL + g)
+	ring.shadow_color = UiKit.alpha(UiTokens.COLOR_NEW, _KITCHEN_GLOW_ALPHA)
+	ring.shadow_size = _KITCHEN_GLOW_BLUR
+	_glow.add_theme_stylebox_override(&"panel", ring)
 	_star = _box(_surface)
 	_place(_star, 0.0, _KITCHEN_STAR.position.x, _KITCHEN_STAR.position.y, _KITCHEN_STAR.size.x, _KITCHEN_STAR.size.y)
 	_star.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_GOLD, _KITCHEN_STAR.size.x * 0.5))
@@ -354,6 +403,21 @@ func _build_kitchen_extras() -> void:
 	_chip_label = UiKit.label("Tasted", UiTokens.STYLE_C9_B, UiTokens.COLOR_SECONDARY)
 	_chip.add_child(_chip_label)
 	_surface.add_child(_chip)
+
+## One 5 px dot per slot in its family colour; a slot with a clue is its 10 px icon instead, the dots centred on it.
+func _build_family() -> void:
+	if _family == null: return
+	for c in _family.get_children(): c.free()
+	for i in families.size():
+		var clue = clues[i] if i < clues.size() else null
+		if clue is Texture2D:
+			_family.add_child(UiKit.icon(clue, _KITCHEN_FAMILY_ICON))
+			continue
+		var dot := _box(_family)
+		dot.custom_minimum_size = Vector2(_KITCHEN_FAMILY_DOT, _KITCHEN_FAMILY_DOT)
+		dot.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		var color: Color = FAMILY_COLORS.get(str(families[i]), UiTokens.COLOR_DISABLED)
+		dot.add_theme_stylebox_override(&"panel", UiStyleBox.make(color, _KITCHEN_FAMILY_DOT * 0.5))
 
 static func _pill_tag(bg: Color, border: Color, radius: float, pad: float) -> PanelContainer:
 	var p := PanelContainer.new()
@@ -444,10 +508,8 @@ func _refresh_kitchen(s: State, empty: bool) -> void:
 	_icon.offset_bottom = top + UiTokens.SIZE_INVENTORY_ICON
 	_icon.modulate.a = _KITCHEN_NFC_ALPHA if k == KitchenState.NOT_FOR_COOKING else (_KITCHEN_TASTED_ALPHA if k == KitchenState.TASTED else 1.0)
 	_silhouette.visible = unknown
-	_dots.visible = unknown
-	var dots := _KITCHEN_DOTS_CLUED if k == KitchenState.CLUED else _KITCHEN_DOTS
-	_dots.texture = FAMILY_DOTS_CLUED if k == KitchenState.CLUED else FAMILY_DOTS
-	_place(_dots, 0.0, dots.position.x, dots.position.y, dots.size.x, dots.size.y)
+	_family.visible = unknown
+	_glow.visible = might_have and not empty
 	_star.visible = k == KitchenState.MASTERED
 	_tag.visible = k == KitchenState.LOCKED
 	_rack_tag.visible = rack and not empty and k in [KitchenState.DEFAULT, KitchenState.IN_POT]
