@@ -47,7 +47,7 @@
 | 采集点 ★ | 名字条 `Timber Grove`（其他写名字，如 `Reed Bank`）/ 没好 `Timber Grove · Ready in 2h 10m` / 未开 `Clay Bank · Homestead Lv2`（q(46)、q(62)）；P0 共 5 处，没有 Old Tree（q(43)） |
 | 采集与入库飘字 ★ | 进仓库 `+6 Timber · Stored` / 进背包 `+2 Worm Bait` / 回家入库 `Stored · 12 Stone · 3 Copper Ore`（数字在前、不带 ×，q(46)） |
 | 农舍门牌 / 升级面板 ★ | 名字条：农舍 `Farmhouse`、门牌 `Homestead Lv1`、木牌 `Upgrade Plaque`（q(62)）；标题 `Homestead Lv1 → Lv2`；What changes `Max Energy 210 · Meals 210 a day` / `Spice Rack · seasonings off your bag` / `Clay Bank · Clay next to the Reed Bank`；满级 `Highest level for now`（q(46)）；横幅 `Homestead Lv 2` / `Clay Bank opened` |
-| 信箱 ★ | 名字条 `Mailbox`；可领时小牌 `Parcel`（q(50)、q(62)） |
+| 信箱 ★ | 名字条 `Mailbox`；有在列包裹时小牌 `Parcel`，背包满也挂（q(50)、q(62)、q(79)） |
 
 ## 3. 鱼塘与钓鱼
 
@@ -119,7 +119,7 @@
 | Gear ★ | `Bag | Gear`；Fishing 槽只有 Starter Rod / Reed Rod，P0 不列 Carbon Rod（q(46)） |
 | 个人页 | `Edit look` / `Edit` / `Following` / `Followers` / `Mutual` / `Close Friends` / `All skills ›` |
 | 技能页 ★ | `Crops first-harvested n/8 · Fish first-caught n/7 · Dishes first-cooked n/14`；不显示 `Cities fished`（q(49)） |
-| 收件箱 ★ | Tab `To do / Parcels / Updates`；To do 空态 `No invites right now`；Parcels 空态 `No parcels`；Updates 空态 `No updates yet`；规则行 `Parcels 3/8 · Kept 24h · Claim needs a free slot` / 满 `Parcels 8/8 · 2 more waiting · …`；`Claim all · 2 slots` / `Make room · 1 slot`；`Parcel expired · +18 coins`（q(50)） |
+| 收件箱 ★ | Tab `To do / Parcels / Updates`；To do 空态 `No invites right now`；Parcels 空态 `No parcels`；Updates 空态 `No updates yet`；规则行 `Parcels 3/8 · Kept 24h · Claim needs a free slot` / 满 `Parcels 8/8 · 2 more waiting · …`；`Claim all · 2 slots` / `Make room · 1 slot`；Updates 只有三种：`Parcel expired · +18 coins` / `Parcel expired · Worm Bait ×3 lost` / `Pip's gift meal went back · unclaimed`，不出 Homestead 升级与领取记录（q(50)、q(79)）；铃铛数字 = 在列包裹（背包满也计）+ 未读 Updates，待发不计（q(79)） |
 | 满包的被动获得 | toast `Bag full · Perch ×7 sent to Inbox · 24h`（LOCK-14） |
 
 ## 9. 首会话与引导
