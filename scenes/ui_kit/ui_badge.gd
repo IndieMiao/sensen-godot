@@ -3,8 +3,6 @@ extends PanelContainer
 ## StateBadge 483:324 (SGODOT-212): a 32 px primaryTint pill with a short state word, e.g. "Ready",
 ## "Familiar". Display only; hugs its text. World and map status icons are STATE-ICONS (LOCK-11), not this.
 
-const _PAD_X := 8.0   # the Badge style's side padding (gen_theme)
-
 var text := "": set = set_text
 
 var _label: Label
@@ -26,8 +24,9 @@ func set_text(v: String) -> void:
 ## Another tone than the main's primaryTint / primary (a resident's affinity stage, UiResidentBar.stage_tone): the
 ## pill keeps the Badge style's shape and padding, only its fill and ink change.
 func set_tone(fill: Color, ink: Color) -> void:
-	# The Badge style as the theme builds it (a full-round pill, 8 side padding: tools/ui/gen_theme.gd), in this fill;
-	# built here, not copied from the theme, so it works before the badge is in the tree.
-	add_theme_stylebox_override(&"panel", UiStyleBox.make(fill, UiTokens.SIZE_STATE_BADGE_H * 0.5)
-		.with_margins(_PAD_X, 0.0, _PAD_X, 0.0))
+	# The theme's own Badge style in this fill: read from the kit theme resource, so it works before the badge is in
+	# the tree and cannot drift from gen_theme (亚瑟 on #124).
+	var box := UiKit.theme().get_stylebox(&"panel", UiTokens.PANEL_BADGE).duplicate() as UiStyleBox
+	box.bg_color = fill
+	add_theme_stylebox_override(&"panel", box)
 	_label.add_theme_color_override(&"font_color", ink)
