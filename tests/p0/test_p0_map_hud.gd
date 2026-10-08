@@ -26,6 +26,10 @@ func test_the_maps_own_chrome_gives_way_to_the_hud_and_bag() -> void:
 			city.get_node("MapNorth"), city.get_node("MapZoom_plus"), city.get_node("MapZoom_minus")]:
 		assert_bool((n as CanvasItem).visible).append_failure_message(str(n.name)).is_false()
 	assert_bool(city.recenter.visible).is_true()
+	# MapLocateButton 1793:103795: 44, styled like Close, the i-locate glyph in its own colours.
+	assert_object(city.recenter.icon).is_same(P0Logic.icon("locate"))
+	assert_str(str(city.recenter.theme_type_variation)).is_equal(str(UiTokens.BUTTON_CLOSE_ROUND))
+	assert_that(city.recenter.size).is_equal(Vector2(44, 44))
 	# Right-aligned over Bag, 12 from the edge and 12 above the bar's row (Bag 24 + 68 from the bottom).
 	var bag_top := city.size.y - UiTokens.SIZE_QUICK_BAR_BOTTOM - UiTokens.SIZE_QUICK_BAR_H
 	assert_float(city.recenter.position.x + city.recenter.size.x).is_equal_approx(city.size.x - 12.0, 0.5)

@@ -70,6 +70,7 @@ func _install_city_map() -> void:
 		city_map.host_chrome = true
 		city_map.bottom_inset = UiTokens.SIZE_QUICK_BAR_BOTTOM + UiTokens.SIZE_QUICK_BAR_H
 		city_map.pond_action = "Go"
+		_style_locate(city_map.recenter)
 	if city_map and not city_map.bundled_ponds:
 		city_map.preload_ponds(SystemPonds.data().locations.filter(func(e): return str(e.region_id) == P0_REGION))
 		_set_outpost_places()
@@ -141,6 +142,26 @@ func _city_action(action: String) -> void:
 		"outfit": rt.ui.toast("Outfits come later")
 		"city": rt.ui.toast("P0 is set in Shanghai")
 		_: super._city_action(action)
+
+## MapLocateButton 1793:103795 (LOCK-24): the recenter key as a 44 round button styled like Close (color/surface,
+## 1 px color/border) with a light shadow, the 22 i-locate in its own colours.
+func _style_locate(b: Button) -> void:
+	b.theme = UiKit.theme()
+	b.theme_type_variation = UiTokens.BUTTON_CLOSE_ROUND
+	for state in [&"normal", &"hover", &"focus", &"disabled", &"pressed", &"hover_pressed"]:
+		b.remove_theme_stylebox_override(state)   # the map's own 32 disc
+		var sb := b.get_theme_stylebox(state).duplicate() as StyleBoxFlat
+		if sb != null:
+			sb.shadow_color = UiTokens.COLOR_SHADOW_FLOAT
+			sb.shadow_size = UiTokens.SIZE_SHADOW_FLOAT_RADIUS
+			sb.shadow_offset = Vector2(0, UiTokens.SIZE_SHADOW_FLOAT_OFFSET_Y)
+			b.add_theme_stylebox_override(state, sb)
+		b.add_theme_color_override(StringName("icon_%s_color" % state), Color.WHITE)   # the glyph's own ink and green
+	b.icon = P0Logic.icon("locate")
+	b.expand_icon = true
+	b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	b.add_theme_constant_override(&"icon_max_width", 22)
+	b.custom_minimum_size = Vector2(UiTokens.SIZE_CLOSE, UiTokens.SIZE_CLOSE)
 
 ## The player's own pin: its card says Go home · Free (MAP-1 §10.6.1); a second tap closes it.
 func _own_pin_pressed() -> void:
