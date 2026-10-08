@@ -1025,6 +1025,11 @@ func close_top_layer() -> bool:
 		_radial.close()
 		return true
 	if _modal != null:
+		# An InfoSheet laid over the open panel (UiInfoSheet.layered) goes first: one layer per press (§4.8.7, 刘邦 on #73).
+		var layers := _modal.find_children("InfoSheetLayer", "Control", true, false).filter(func(l): return not l.is_queued_for_deletion())
+		if not layers.is_empty():
+			((layers.back() as Control).find_children("*", "UiInfoSheet", true, false)[0] as UiInfoSheet).close()
+			return true
 		back_modal()
 		return true
 	return false
