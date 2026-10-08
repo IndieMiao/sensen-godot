@@ -12,7 +12,8 @@ extends Control
 ## PASS, so a TouchScrollContainer still takes vertical drags (CELL mode answers them with cancel).
 ## Hosts outside a scroll container (the quick bar) need a STOP backing control, or the touch also reaches
 ## _unhandled_input (the map's tap handling, for one).
-## LIFTED, DROP_TARGET and ZERO exist on the QuickSlot main only; other densities draw them as DEFAULT.
+## DROP_TARGET and ZERO exist on the QuickSlot main only, LIFTED on QuickSlot and InventoryCell (State=lifted 1641:34159:
+## the default look with the QuickSlot lift shadow); other densities draw them as DEFAULT.
 ## GHOST (QuickSlot State=ghost 1415:94114, A-08) is an empty slot showing what the action can use: dashed like
 ## EMPTY, the family icon at 35 %, a one-word family name in secondary ink (`title`), no count, never pinned.
 ## Other densities draw it as EMPTY.
@@ -120,6 +121,9 @@ func set_stored(v: bool) -> void: stored = v; _refresh()
 func _gui_input(event: InputEvent) -> void:
 	_emit(_arbiter.feed(event, clock.call()))
 	set_process(_arbiter.is_active())
+	# A lifted or dragged cell keeps its touch: the scroll container behind it must not take the drag (the bag's
+	# way onto the quick bar, SGODOT-225 / BAR-DRAG-9). Before the lift a vertical drag still scrolls the grid.
+	if _arbiter.is_lifted() or _arbiter.is_dragging(): accept_event()
 
 ## Long presses fire on time alone, so tick while a finger is down.
 func _process(_delta: float) -> void:
@@ -170,7 +174,8 @@ func show_new_ring() -> void:
 
 ## The state actually drawn: the extra QuickSlot states fall back to DEFAULT (GHOST to EMPTY) on the other mains.
 func drawn_state() -> State:
-	if density != Density.QUICK and state in [State.LIFTED, State.DROP_TARGET, State.ZERO]: return State.DEFAULT
+	if density != Density.QUICK and state in [State.DROP_TARGET, State.ZERO]: return State.DEFAULT
+	if density not in [Density.QUICK, Density.INVENTORY] and state == State.LIFTED: return State.DEFAULT
 	if density != Density.QUICK and state == State.GHOST: return State.EMPTY
 	return state
 
@@ -328,8 +333,15 @@ func _refresh() -> void:
 				_name.text = status
 				_mark.visible = (marked or s == State.SELECTED) and not empty
 
-## InventoryCell / Kitchen Cell / GearSlot surface: hairline border, 1.5 primary when selected, dashed when empty.
+## InventoryCell / Kitchen Cell / GearSlot surface: hairline border, 1.5 primary when selected, dashed when empty;
+## a lifted InventoryCell keeps the default look under the QuickSlot lift shadow (1641:34159).
 func _cell_box(s: State, radius: float) -> UiStyleBox:
+	if s == State.LIFTED:
+		var lifted := UiStyleBox.make(UiTokens.COLOR_SURFACE, radius, UiTokens.COLOR_BORDER, UiTokens.STROKE_CELL_HAIRLINE)
+		lifted.shadow_color = UiTokens.COLOR_LIFT_SHADOW
+		lifted.shadow_size = UiTokens.SIZE_LIFT_SHADOW_RADIUS
+		lifted.shadow_offset = Vector2(0.0, UiTokens.SIZE_LIFT_SHADOW_OFFSET_Y)
+		return lifted
 	if s == State.SELECTED:
 		return UiStyleBox.make(UiTokens.COLOR_SURFACE, radius, UiTokens.COLOR_PRIMARY, UiTokens.STROKE_SELECTED_CELL)
 	if s == State.EMPTY:

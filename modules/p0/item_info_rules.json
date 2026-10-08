@@ -24,7 +24,13 @@
       {
         "id": "pin",
         "label": "{pin_verb}",
-        "kind": "secondary"
+        "kind": "secondary",
+        "unless": [
+          {
+            "when": "bar_full",
+            "label": "Bar full · Unpin one first"
+          }
+        ]
       },
       {
         "id": "store",
@@ -371,7 +377,13 @@
       {
         "id": "pin",
         "label": "{pin_verb}",
-        "kind": "secondary"
+        "kind": "secondary",
+        "unless": [
+          {
+            "when": "bar_full",
+            "label": "Bar full · Unpin one first"
+          }
+        ]
       }
     ],
     "lock": true
@@ -534,7 +546,13 @@
       {
         "id": "pin",
         "label": "{pin_verb}",
-        "kind": "secondary"
+        "kind": "secondary",
+        "unless": [
+          {
+            "when": "bar_full",
+            "label": "Bar full · Unpin one first"
+          }
+        ]
       },
       {
         "id": "store",

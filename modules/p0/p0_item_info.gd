@@ -237,6 +237,7 @@ static func flags(view: Dictionary, item_id: String, context: StringName, opts :
 	return {
 		at_home = str(opts.get("place", "home")) == "home",
 		pinned = bool(opts.get("pinned", false)),
+		bar_full = bool(opts.get("bar_full", false)),   # five pinned on its bar and it isn't one (q(61))
 		locked = bool(stack.get("locked", false)),
 		gifted = gifted,
 		mystery = item_id.split("@")[0] == _MYSTERY,

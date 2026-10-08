@@ -47,6 +47,8 @@ var place := "home"
 var near := {}
 ## Pins of the current action's quick bar, for the info card's Pin / Unpin (kept by the P0 UI).
 var pinned := func(_id: String) -> bool: return false
+## True when Pin can't take this item: its bar has five pinned already (the card greys Pin, q(61)).
+var bar_full := func(_id: String) -> bool: return false
 ## Gift drawer (RESIDENT-GIFT): {kind: "resident", id, name, likes}. The header becomes `Gift to <name>` and the
 ## count only (Bag side, no Gear: WP1b), the Dishes chip is preselected, and the card uses the &"gift" rules.
 var gift_to := {}
@@ -306,7 +308,8 @@ func _build_bag() -> void:
 	grid.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	grid.on_select = func(it: Dictionary):
 		if bool(it.get("stored", false)): sheet.open(str(it.item), &"storage", {place = place})
-		elif gift_to.is_empty(): sheet.open(str(it.id), &"bag", {place = place, pinned = bool(pinned.call(str(it.id))), near = near})
+		elif gift_to.is_empty(): sheet.open(str(it.id), &"bag", {place = place, pinned = bool(pinned.call(str(it.id))),
+			bar_full = bool(bar_full.call(str(it.id))), near = near})
 		else: sheet.open(str(it.id), &"gift", {place = place, target = gift_to})
 		_hint.visible = false
 	grid.selection_cleared.connect(func():

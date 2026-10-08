@@ -621,3 +621,73 @@ func test_float_text_static_pill_is_the_same_look_at_one_x() -> void:
 	assert_str(label.get_theme_color(&"font_color").to_html()).is_equal(UiTokens.COLOR_FLOAT_XP.to_html())
 	assert_int(label.get_theme_font_size(&"font_size")).is_equal(15)
 	assert_float((p.get_theme_stylebox(&"panel") as UiStyleBox).content_margin_left).is_equal(8.0)
+
+# ---------------------------------------------------------------- a lifted bag cell keeps its drag (225 / BAR-DRAG-9)
+
+func test_inventory_cell_lifted_keeps_the_default_look_under_the_lift_shadow() -> void:
+	var c: UiItemCell = auto_free(UiItemCell.new(UiItemCell.Density.INVENTORY))
+	add_child(c)
+	c.state = UiItemCell.State.LIFTED
+	assert_int(c.drawn_state()).is_equal(UiItemCell.State.LIFTED)
+	var box := c._surface.get_theme_stylebox(&"panel") as UiStyleBox
+	assert_str(box.border_color.to_html()).is_equal(UiTokens.COLOR_BORDER.to_html())
+	assert_str(box.shadow_color.to_html()).is_equal(UiTokens.COLOR_LIFT_SHADOW.to_html())
+	var k: UiItemCell = auto_free(UiItemCell.new(UiItemCell.Density.KITCHEN))
+	k.state = UiItemCell.State.LIFTED
+	assert_int(k.drawn_state()).is_equal(UiItemCell.State.DEFAULT)
+
+## A phone sends the touch and its emulated mouse twin; the scroll drags on the mouse, the cell reads the touch.
+func _touch_and_mouse(at: Vector2, down: bool) -> void:
+	var t := InputEventScreenTouch.new()
+	t.position = at
+	t.pressed = down
+	get_viewport().push_input(t, true)
+	_mouse(at, down)
+
+func _drag_and_motion(at: Vector2, rel: Vector2) -> void:
+	var d := InputEventScreenDrag.new()
+	d.position = at
+	d.relative = rel
+	get_viewport().push_input(d, true)
+	var m := InputEventMouseMotion.new()
+	m.position = at
+	m.global_position = at
+	m.relative = rel
+	m.button_mask = MOUSE_BUTTON_MASK_LEFT
+	get_viewport().push_input(m, true)
+
+func test_a_lifted_cell_in_a_scroll_keeps_the_drag_from_the_scroll() -> void:
+	if DisplayServer.is_touchscreen_available(): return
+	var emulate := Input.emulate_touch_from_mouse
+	Input.emulate_touch_from_mouse = true   # as on a phone: the scroll container drags on the (emulated) mouse
+	var scroll := TouchScrollContainer.new()
+	scroll.position = Vector2(20, 100)
+	scroll.size = Vector2(300, 200)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	add_child(auto_free(scroll))
+	var col := VBoxContainer.new()
+	scroll.add_child(col)
+	var cell := UiItemCell.new(UiItemCell.Density.INVENTORY)
+	var now := [0]
+	cell.clock = func() -> int: return now[0]
+	col.add_child(cell)
+	var filler := Control.new()
+	filler.custom_minimum_size = Vector2(10, 600)
+	col.add_child(filler)
+	for i in 3: await get_tree().process_frame
+	var kinds := []
+	cell.gesture.connect(func(o: Dictionary): kinds.append(o.kind))
+	var at := cell.get_global_rect().get_center()
+	_touch_and_mouse(at, true)
+	now[0] = GestureArbiter.LONG_PRESS_MS + 20
+	await get_tree().process_frame
+	await get_tree().process_frame
+	assert_array(kinds).contains([&"lift"])
+	for step in 6:
+		_drag_and_motion(at + Vector2(0, 20.0 * (step + 1)), Vector2(0, 20))
+		await get_tree().process_frame
+	_touch_and_mouse(at + Vector2(0, 120), false)
+	await get_tree().process_frame
+	Input.emulate_touch_from_mouse = emulate
+	assert_int(scroll.scroll_vertical).is_equal(0)   # the grid did not scroll under the lifted cell
+	assert_array(kinds).contains([&"drag_start", &"drop"])

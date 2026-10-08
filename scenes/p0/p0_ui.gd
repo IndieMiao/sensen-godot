@@ -331,7 +331,7 @@ func set_surface(name: String) -> void:
 	pad.visible = world
 	_keys.visible = action and _modal == null
 	_fab_pills.visible = _keys.visible and bool(_fab_state.get("creel_full", false))
-	_bar.visible = _bar_shown() and _modal == null
+	_bar.visible = _bar_shown() and (_modal == null or is_bar_docked())   # docked in the bag drawer it stays
 	_bar.bag_only = not action
 	_bar_sig = []
 	if _radial.visible: _radial.close()
@@ -475,11 +475,22 @@ func _show_undo_toast(was: Dictionary) -> void:
 	if _undo_toast: _undo_toast.queue_free()
 	_undo_toast = UiUndoToast.new("%s off the bar" % P0Logic.item_name(view, str(was.id)))
 	_undo_toast.theme = UiKit.theme()
-	_kit.add_child(_undo_toast)
-	var size := _undo_toast.get_combined_minimum_size()
-	_undo_toast.size = size
-	_undo_toast.position = Vector2(UiTokens.SPACE_PAGE, _bar.position.y - UiTokens.SPACE_WITHIN - size.y)   # BAR-DRAG-4
+	# Over the bar it came off: on the scene, or over the bag drawer's top row when the bar is docked there (the
+	# drawer and its scrim sit above the scene layer, so it goes on the drawer's layer then; 刘邦 on #38).
+	(_modal if is_bar_docked() and _modal != null else _kit).add_child(_undo_toast)
+	# Its height is only known once the message has wrapped at the card's width: refit then, keeping the bottom edge.
+	var t := _undo_toast
+	t.minimum_size_changed.connect(func(): if is_instance_valid(t): t.reset_size())
+	t.resized.connect(_place_undo_toast)
+	t.reset_size()
+	_place_undo_toast()
 	_undo_toast.undo_pressed.connect(func(): _undo_remove(was))
+
+## BAR-DRAG-4: left 16 (the page margin), its bottom SPACE_WITHIN over the bar's top edge, wherever the bar is.
+func _place_undo_toast() -> void:
+	if _undo_toast == null or not is_instance_valid(_undo_toast): return
+	_undo_toast.global_position = Vector2(_kit.global_position.x + UiTokens.SPACE_PAGE,
+		_bar.get_global_rect().position.y - UiTokens.SPACE_WITHIN - _undo_toast.size.y)
 
 func _undo_remove(was: Dictionary) -> void:
 	var store := _quick_for(str(was.mode))
@@ -833,6 +844,7 @@ func queue_card(show: Callable) -> void:
 	else: _card_queue.append(show)
 
 func _drop_modal() -> void:
+	_bag_drag_end()   # a bag cell lifted toward the bar goes with its drawer
 	undock_bar()   # before the drawer holding it goes (SGODOT-225)
 	if _modal: _modal.queue_free()
 	_modal = null
@@ -928,11 +940,94 @@ func open_bag(focus := "", side := "") -> void:
 	d.action_requested.connect(_bag_action)
 	d.unavailable_requested.connect(_bag_unavailable)
 	d.near = near_resident_info()
+	d.pinned = func(id: String) -> bool: return is_pinned(id)
+	d.bar_full = func(id: String) -> bool: return bar_action_of(id) != "" and not can_pin(id)
+	d.grid.cell_gesture.connect(_on_bag_cell)
 	if focus != "" and d.grid.selected_id == focus: d.grid.select(focus)   # the card again, with place and near set
 	_eat_armed = ""
 	_open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
 	_bag = d
 	modal_kind = "bag" if bag_side == "bag" else "gear"
+	# LOCK-12 / q(61): the drawer's first row is the quick bar itself, moved in (its end cell turns into Close);
+	# _drop_modal moves it back. Spaces without an action (rooms, the map) have no slots to bring along.
+	if not _bar.bag_only:
+		dock_bar_into(d.quick_row)
+		_bar.visible = true
+	_bar_sig = []
+	_refresh_bar()
+
+# ---------------------------------------------------------------- the bag's way onto the quick bar (225, q(61))
+## A bag cell some bar takes (seeds, fertiliser, bait) lifts on a long press (450 ms, LOCK-12 user decision on 197
+## 5e4631b1) and opens only the Pin zone under the docked bar (BAR-DRAG-9); it rides the finger while the grid
+## dims. Released on the Pin zone: pinned on its own action's bar (pin_to; a pinned one shows Unpin and unpins);
+## on a slot of this bar: placed there, not pinned (place_at); anywhere else, or released in place: nothing.
+const _BAG_RIDE_ABOVE := 24.0    # as the bar's own dragged slot (LOCK-04 v1.11)
+const _BAG_HOVER_SCALE := 0.8    # over the Pin zone (InventoryCell State=lifted 1641:34159, runtime)
+var _bag_drag := {}              # {id, ghost: UiItemCell, zone: UiBarDropZone}
+
+func _on_bag_cell(it: Dictionary, o: Dictionary) -> void:
+	var id := str(it.get("id", ""))
+	match o.kind:
+		&"lift":
+			if _bag_drag.is_empty() and is_bar_docked() and bar_action_of(id) != "" and not bool(it.get("stored", false)):
+				_bag_lift(it, o.get("pos", Vector2.ZERO))
+		&"drag_start", &"drag_move":
+			if not _bag_drag.is_empty(): _bag_drag_to(o.pos)
+		&"drop":
+			if not _bag_drag.is_empty(): _bag_drop(o.pos)
+		&"long_press", &"cancel":   # released where it lifted, or the touch was taken: nothing changes
+			_bag_drag_end()
+
+func _bag_lift(it: Dictionary, at: Vector2) -> void:
+	var id := str(it.id)
+	var ghost := UiItemCell.new(UiItemCell.Density.INVENTORY)
+	ghost.theme = UiKit.theme()
+	ghost.icon = it.get("icon", P0Logic.icon(id))
+	ghost.quantity = "×%d" % int(it.get("qty", 0))
+	ghost.rarity = int(it.get("rarity", 0))
+	ghost.state = UiItemCell.State.LIFTED
+	ghost.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	ghost.top_level = true
+	ghost.pivot_offset = ghost.custom_minimum_size * 0.5
+	_modal.add_child(ghost)
+	var zone := UiBarDropZone.new(UiBarDropZone.Kind.UNPIN if is_pinned(id) else UiBarDropZone.Kind.PIN)
+	zone.theme = UiKit.theme()
+	_modal.add_child(zone)
+	zone.center = GestureArbiter.drop_zone_centers(_bar.get_global_rect(), true)[0]
+	zone.appear()
+	if _bag: _bag.grid.modulate.a = UiTokens.OPACITY_PENDING   # the grid dims and takes no drop (不知火舞 on 225)
+	if _bar.haptics and OS.has_feature("mobile"): Input.vibrate_handheld(20)
+	_bag_drag = {id = id, ghost = ghost, zone = zone}
+	_bag_drag_to(at)
+
+func _bag_drag_to(at: Vector2) -> void:
+	var ghost: UiItemCell = _bag_drag.ghost
+	var zone: UiBarDropZone = _bag_drag.zone
+	var over := at.distance_to(zone.center) <= GestureArbiter.DROP_ZONE_HIT
+	zone.hover = over
+	ghost.scale = Vector2.ONE * (_BAG_HOVER_SCALE if over else 1.0)
+	ghost.global_position = at - Vector2(ghost.custom_minimum_size.x * 0.5, ghost.custom_minimum_size.y + _BAG_RIDE_ABOVE)
+	_bar.set_drop_target(-1 if over or not accepts(str(_bag_drag.id)) else _bar.slot_at(at))
+
+func _bag_drop(at: Vector2) -> void:
+	var id := str(_bag_drag.id)
+	var on_zone := at.distance_to((_bag_drag.zone as UiBarDropZone).center) <= GestureArbiter.DROP_ZONE_HIT
+	var slot := -1 if on_zone or not accepts(id) else _bar.slot_at(at)
+	_bag_drag_end()
+	if on_zone:
+		if is_pinned(id): unpin(id)
+		else: pin_to(id)
+	elif slot >= 0: place_at(slot, id)
+	else: return
+	if _bag and _bag.grid.selected_id == id: _bag.grid.select(id)   # its card again: Pin ↔ Unpin
+
+func _bag_drag_end() -> void:
+	if _bag_drag.is_empty(): return
+	if is_instance_valid(_bag_drag.ghost): (_bag_drag.ghost as Node).queue_free()
+	if is_instance_valid(_bag_drag.zone): (_bag_drag.zone as UiBarDropZone).vanish()
+	if _bag and is_instance_valid(_bag): _bag.grid.modulate.a = 1.0
+	_bar.set_drop_target(-1)
+	_bag_drag = {}
 
 ## The resident within reach (near_resident): {id, name, gifted_today}, or {} when there is none.
 func near_resident_info() -> Dictionary:
@@ -976,8 +1071,10 @@ func _bag_action(action: StringName, id: String, payload: Dictionary) -> void:
 			if P0ItemInfo.kind_of(view, id) != "dish" or near.is_empty() or bool(near.gifted_today): return
 			close_modal()
 			open_gift(str(near.id), id)
-		&"pin", &"unpin":
-			pass   # TODO(SGODOT-225 after #12): pin through the quick bar's pin record (P0Ui.bind_quick_bar)
+		&"pin", &"unpin":   # the card's Pin / Unpin (q(61)): on the item's own action's bar; the card then flips
+			if is_pinned(id): unpin(id)
+			elif not pin_to(id): return   # five pinned: the card already says Bar full · Unpin one first
+			if _bag: _bag.grid.select(id)
 		_:
 			push_warning("P0 bag: no command for %s" % action)
 

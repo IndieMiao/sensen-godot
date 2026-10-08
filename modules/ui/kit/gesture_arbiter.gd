@@ -55,6 +55,8 @@ func _init(m: Mode = Mode.SCENE) -> void:
 
 func is_active() -> bool: return _state != _S.IDLE and _state != _S.DONE
 func is_dragging() -> bool: return _state == _S.DRAGGING
+## A slot or cell floats after its long press and has not been dragged yet.
+func is_lifted() -> bool: return _state == _S.LIFTED
 func is_joystick() -> bool: return _state == _S.JOYSTICK
 ## A single finger is down in SCENE mode and steering (not pinching).
 func is_steering() -> bool: return _state == _S.PRESSED or _state == _S.JOYSTICK

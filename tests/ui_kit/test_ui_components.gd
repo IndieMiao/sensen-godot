@@ -117,7 +117,9 @@ func test_quick_only_states_fall_back_to_default_on_other_mains() -> void:
 		var c: UiItemCell = auto_free(UiItemCell.new(d))
 		for s in [UiItemCell.State.LIFTED, UiItemCell.State.DROP_TARGET, UiItemCell.State.ZERO]:
 			c.state = s
-			assert_int(c.drawn_state()).is_equal(UiItemCell.State.DEFAULT)
+			# InventoryCell has its own lifted look (1641:34159, the bag's way onto the quick bar, SGODOT-225)
+			var lifted_here: bool = d == UiItemCell.Density.INVENTORY and s == UiItemCell.State.LIFTED
+			assert_int(c.drawn_state()).is_equal(UiItemCell.State.LIFTED if lifted_here else UiItemCell.State.DEFAULT)
 		c.state = UiItemCell.State.GHOST
 		assert_int(c.drawn_state()).is_equal(UiItemCell.State.EMPTY)
 
