@@ -54,7 +54,7 @@ func _run() -> void:
 	var font := ThemeDB.fallback_font
 	var failed := 0
 	for slot in _slots:
-		var ids: Array = avatar.catalog.parts_for_slot(StringName(slot)).map(func(m): return str(m.id))
+		var ids: Array = avatar.catalog.parts_for_slot(StringName(slot), true).map(func(m): return str(m.id))
 		ids.sort()
 		if ids.is_empty():
 			printerr("no parts for slot " + slot)

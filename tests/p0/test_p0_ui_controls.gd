@@ -232,6 +232,32 @@ func test_a_drag_from_a_finger_card_starts_the_joystick() -> void:
 	assert_bool(sticks.any(func(v): return v != Vector2.ZERO)).is_true()
 	assert_array(taps).is_empty()
 
+func test_a_second_tip_waits_for_the_first_card_and_is_not_learned_meanwhile() -> void:
+	# 李元芳 first-session test 12: two tips asked for in one frame must not cover each other, and the waiting one is
+	# not counted as learned unseen. With P0Guide.TipQueue (SGODOT-232 U6) the second waits for the first to go.
+	var had_tips := FileAccess.file_exists(P0Ui.TIPS_PATH)
+	var saved := FileAccess.get_file_as_string(P0Ui.TIPS_PATH) if had_tips else ""
+	ui._taught = {"_": true}   # non-empty: teach() won't load saved tips over it
+	ui.tips = null
+	ui.teach("cast")
+	ui.teach("creel")
+	await await_idle_frame()
+	var text := ui._teach.get_node("Text") as Label
+	assert_str(text.text).is_equal(str(P0Guide.TIPS.cast))
+	assert_bool(ui._taught.has("cast")).is_true()
+	assert_bool(ui._taught.has("creel")).is_false()
+	ui._hide_tip()   # tapped away (or its time ran out)
+	ui.teach("cast")   # already learned: nothing
+	await await_idle_frame()
+	assert_bool(ui._teach.visible).is_true()
+	assert_str(text.text).is_equal(str(P0Guide.TIPS.creel))
+	assert_bool(ui._taught.has("creel")).is_true()
+	if had_tips:
+		var f := FileAccess.open(P0Ui.TIPS_PATH, FileAccess.WRITE)
+		f.store_string(saved)
+	else:
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(P0Ui.TIPS_PATH))
+
 func test_teaching_card_stays_clear_of_the_bar_and_the_keys() -> void:
 	# PR #12 review fix 5: the tip sits above the quick bar and left of the action key group.
 	var had_tips := FileAccess.file_exists(P0Ui.TIPS_PATH)

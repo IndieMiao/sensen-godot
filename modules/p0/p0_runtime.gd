@@ -147,9 +147,19 @@ var swap_root := func(): get_tree().change_scene_to_file(MAP_SCENE)
 ## P0 world that is the root scene, so with nothing left to close such a world leaves for the map itself (int5b
 ## hand test 2: Inbox closed on the first Back, the second did nothing). True when it handled Back.
 func root_back() -> bool:
-	if AppRouter.instance_depth() > 0: return false   # stacked on the map: AppRouter pops it
+	if not leaves_itself(AppRouter.instance_depth(), _root_is_map()): return false   # AppRouter pops it
 	leave_to_map()
 	return true
+
+## Whether Back with nothing left to close must take a world to the map itself: a root world (no map under it,
+## p0_boot q(44)), or one stacked on a root that is not the map — the dev entry pond:<id> pushes the pond on the
+## empty p0_boot, and popping it would leave a blank screen (刘邦 on #40). Stacked on the map: AppRouter pops it.
+static func leaves_itself(depth: int, root_is_map: bool) -> bool:
+	return depth == 0 or (depth == 1 and not root_is_map)
+
+func _root_is_map() -> bool:
+	var root := get_tree().current_scene if is_inside_tree() else null
+	return root != null and root.scene_file_path == MAP_SCENE
 
 ## One level back, for a room's door: the farm under the farmhouse, the map under an outpost.
 func leave_room() -> void:
@@ -225,6 +235,8 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				var dlt := int(ev.delta)
 				# A catch's refund is said by its own float or card ("3 Energy back"), not twice.
 				if settles_catch and str(ev.get("reason", "")) in ["refund", "line_in"]: continue
+				# Inside the mine a floor fee is said by the mine's own float ("Floor 2 · −2 Energy", q(46)), not twice.
+				if str(ev.get("reason", "")) == "mine_floor" and str(_call("p0_surface", [])) == "mine": continue
 				ui.float_text(("%+d Energy" % dlt).replace("-", "−"), at + Vector2(0, dy), Color("d9772f") if dlt < 0 else Color("4f934b"))
 			"xp":
 				if int(ev.amount) > 0:
@@ -313,9 +325,14 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 		session.send({"type": "reel", "outcome": "escaped"})
 		ui.toast("Creel full · the fish slipped away")
 		return
+	# Mine and gathering refusals (SGODOT-231): races stay quiet, the rest say why in their own words.
+	var said = P0MaterialLogic.refusal_text(code, detail, cmd)
+	if said != null:
+		if str(said) != "": ui.toast(str(said))
+		return
 	match code:
 		"need_energy":
-			ui.open_energy_card(int(detail.get("need", 0)), "Cast" if str(cmd.get("type", "")) == "cast" else "Sow ×1")
+			ui.open_energy_card(int(detail.get("need", 0)), "Cast" if str(cmd.get("type", "")) == "cast" else P0MaterialLogic.energy_verb(cmd, "Sow ×1"))
 			session.report({"kind": "energy_card", "need": int(detail.get("need", 0)), "refused": str(cmd.get("type", ""))})
 		"locked":
 			ui.toast("%s Lv%d · %d XP to go" % [str(detail.get("skill", "farming")).capitalize(), int(detail.get("level", 2)), int(detail.get("xp_to_go", 0))])
