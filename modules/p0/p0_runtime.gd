@@ -33,6 +33,14 @@ var after_leave := ""
 ## The press itself, even with the key still down, is a tap (刘邦, PR #23 review).
 var holding_repeat := false
 var _held_plants := 0   # plants harvested in the current hold (E-04's `Harvest 12 of 30 · bag full`)
+# Network state (SGODOT-233, §10.7.1, WP6): one failed request → `Didn't go through · try again` for 3 s; a second in a
+# row → Offline (`Offline · Reconnecting…`, Retry, the keys read Offline) with a check every PROBE_S; the first answer
+# after that → `Back online` for 1.5 s. Any answer clears the count.
+const PROBE_S := 5.0
+const CMD_FAIL_S := 3.0
+const BACK_ONLINE_S := 1.5
+var _net_fails := 0
+var _probe_left := 0.0
 
 ## Load timing (logcat tag godot, "P0_TIMING"): navigation start → world _ready → first drawn frame.
 static var _nav_ms := 0
@@ -76,14 +84,17 @@ func _init() -> void:
 	ui.place_pressed.connect(leave_world)
 	ui.home_requested.connect(func(): _leave_then("farm"))
 	ui.tackle_requested.connect(func(): _leave_then("tackle"))
+	session.state_changed.connect(func(_v, _e): _net_ok())   # any answer ends a run of failures (and offline)
 	session.state_changed.connect(_on_state)
 	# U6: doing what the TipCard on screen teaches closes it (sow / cast / cook / heat are command types).
 	session.sent.connect(func(cmd: Dictionary): ui.tip_did(str(cmd.get("type", ""))))
+	session.refused.connect(func(_c, _d, _cmd): _net_ok())
 	session.refused.connect(_on_refused)
 	session.connection_failed.connect(func(msg: String, cmd: Dictionary):
-		ui.toast(msg + " · " + session.base_url, 4.0)
+		_net_failed(msg)
 		# The world may be waiting on that command (a cast in flight): let it recover.
 		if not cmd.is_empty(): _call("p0_event", [{"kind": "send_failed", "cmd": cmd}, session.current()]))
+	ui.sys_retry.connect(_probe)
 	if OS.get_environment("P0_AUTO") == "1" or FileAccess.file_exists("user://p0_auto"):
 		P0Fishing.auto_play = true
 		P0Cooking.auto_play = true
@@ -208,6 +219,9 @@ func _call(method: String, args: Array):
 
 func _process(dt: float) -> void:
 	_dev_shot(dt)
+	if ui.offline:
+		_probe_left -= dt
+		if _probe_left <= 0.0: _probe()
 	var v := session.current()
 	if v.is_empty(): return
 	ui.set_view(v)
@@ -493,6 +507,31 @@ func _harvest_bag_full() -> void:
 	ui.fab_held = false
 	_held_plants = 0
 
+## A request that never got an answer (8 s, a 5xx or not JSON). The server URL goes to the log, not the screen.
+func _net_failed(msg: String) -> void:
+	_net_fails += 1
+	push_warning("P0: %s · %s" % [msg, session.base_url])
+	if _net_fails >= 2:
+		if not ui.offline:
+			ui.offline = true
+			ui.show_sys(UiSysBanner.Kind.OFFLINE, "Offline · Reconnecting…")
+		_probe_left = PROBE_S
+	else:
+		ui.show_sys(UiSysBanner.Kind.CMD_FAIL, "Didn't go through · try again", CMD_FAIL_S)
+
+## Any answer from the server: the count clears; offline ends with `Back online` (the fresh state redraws everything;
+## nothing settled is replayed and no UI command is resent, §10.7.1).
+func _net_ok() -> void:
+	_net_fails = 0
+	if ui.offline:
+		ui.offline = false
+		ui.show_sys(UiSysBanner.Kind.BACK_ONLINE, "Back online", BACK_ONLINE_S)
+
+## Retry, and the check every PROBE_S while offline: one state read.
+func _probe() -> void:
+	_probe_left = PROBE_S
+	if not session.busy: session.refresh()
+
 # ---------------------------------------------------------------- dev: scripted desktop screenshots
 ## P0_SHOT=/abs/path.png P0_SHOT_STEPS="walk:1:0:1.5,act,..." — run scripted inputs, save one frame, quit.
 ## Generic UI steps live here; world steps (goto, stove, until:bite …) go to world.p0_dev / p0_until.
@@ -560,6 +599,7 @@ func _dev_shot(dt: float) -> void:
 			"inbox": ui.open_inbox()
 			"workbench": ui.open_workbench(step[1] if step.size() > 1 else "")   # SGODOT-231 B2-06 drawer, tools / supplies
 			"toasterr": ui.toast_error(step[1] if step.size() > 1 else "Need 1 more Copper Ore")   # a refusal's Error toast (233)
+			"netfail": _net_failed("dev")   # netfail once: Didn't go through; twice: Offline (233)
 			"wbtile":   # wbtile:craft_copper_pickaxe:0 taps that card's cost tile (NeedSource)
 				var wb := ui.workbench()
 				if wb != null and wb.card(step[1]) != null: wb.card(step[1]).tiles()[int(step[2])].pressed.emit()

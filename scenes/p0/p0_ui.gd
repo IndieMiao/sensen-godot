@@ -688,6 +688,15 @@ func _save_quick() -> void:
 ## TODO(SGODOT-221 → stage 3, F-08 command lifecycle): drive HOLDING (hold_progress) and PENDING from the command
 ## queue; P0 has no source for them yet.
 func set_action(a: Dictionary) -> void:
+	# SYS-OFFLINE (WP6, §10.7.1): offline every action key is Unavailable with `Offline` as its second line (`Sow ·
+	# Offline`, the verb follows the action); a tap says nothing more than the banner already does.
+	if offline:
+		a = a.duplicate()
+		a.sub = "Offline"
+		a.enabled = false
+		a.amber = false
+		a.need = 0
+		a.erase("toast")
 	_fab_state = a
 	var k := _keys.key()
 	k.verb = str(a.get("verb", ""))
@@ -1138,6 +1147,65 @@ static func _float_line_text(parts: Dictionary) -> String:
 		if str(p.get("unit", "")) != "" and int(p.get("count", 1)) > 1: line += " · %d %s" % [int(p.count), str(p.unit)]
 		return line))
 
+# ---------------------------------------------------------------- system states (SGODOT-233, WP6, §10.7.1)
+## The runtime's network state: offline the action keys read `Offline` (set_action) and the Offline banner stays up.
+var offline := false: set = set_offline
+## The Offline banner's Retry: the runtime checks the server now.
+signal sys_retry
+var _sys: UiSysBanner
+var _sys_id := 0
+const _SYS_UNDER_HUD := 2.0   # SysBanner y 100: 2 under the HUD's two rows (16 + 82)
+
+func set_offline(v: bool) -> void:
+	offline = v
+	if is_node_ready() and not _fab_state.is_empty(): set_action(_fab_state)
+
+## The system line under the HUD (SysBanner, x 16 y 100): over the scene and over an open drawer (SYS-OFFLINE-3).
+## `seconds` > 0 takes it down after that long (Back online 1.5 s, Didn't go through 3 s); 0 keeps it (Offline).
+## Offline outranks Didn't go through (WP6 priority): while offline, a failed command does not replace it.
+func show_sys(kind: UiSysBanner.Kind, message: String, seconds := 0.0) -> void:
+	if _sys != null and is_instance_valid(_sys) and _sys.visible and _sys.kind == UiSysBanner.Kind.OFFLINE and kind == UiSysBanner.Kind.CMD_FAIL:
+		return
+	if _sys == null or not is_instance_valid(_sys):
+		_sys = UiSysBanner.new()
+		_sys.theme = UiKit.theme()
+		_sys.set_anchors_preset(Control.PRESET_CENTER_TOP)
+		_sys.grow_horizontal = Control.GROW_DIRECTION_BOTH
+		_sys.retry_pressed.connect(func(): sys_retry.emit())
+		root.add_child(_sys)
+	_sys.kind = kind
+	_sys.message = message
+	_sys.offset_left = -UiSysBanner.WIDTH * 0.5
+	_sys.offset_right = UiSysBanner.WIDTH * 0.5
+	_sys.offset_top = UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H + _SYS_UNDER_HUD + safe_top()
+	_sys.visible = true
+	root.move_child(_sys, -1)
+	_sys_id += 1
+	_place_under_hud()
+	if seconds > 0.0:
+		var id := _sys_id
+		get_tree().create_timer(seconds).timeout.connect(func():
+			if id == _sys_id and is_instance_valid(_sys):
+				_sys.visible = false
+				_place_under_hud())
+
+func hide_sys() -> void:
+	_sys_id += 1
+	if _sys != null and is_instance_valid(_sys): _sys.visible = false
+	_place_under_hud()
+
+## The creel badge and the status line sit under the HUD; the system line takes that spot while it is up, so they move
+## down by SYS_SHIFT (WP6, 206 31317bce) and come back when it goes.
+const SYS_SHIFT := 48.0
+func _place_under_hud() -> void:
+	var y := UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H + UiTokens.SPACE_WITHIN + safe_top()
+	if _sys != null and is_instance_valid(_sys) and _sys.visible: y += SYS_SHIFT
+	for c in [_creel, _status]:
+		if c != null: (c as Control).position.y = y
+
+## What the system line shows now ("" when it is down): tests and the runtime read it.
+func sys_text() -> String: return _sys.message if _sys != null and is_instance_valid(_sys) and _sys.visible else ""
+
 ## Toast (Toast R1, §4.8.6; q(49) ⑤): one at a time, a new one replaces the one showing and the same sentence again
 ## within 2 s only stays up longer. Info; `seconds` > 0 overrides the length rule (2 s + 0.5 s per 20 characters,
 ## at most 5 s). A tap closes it early. Feedback the player must confirm is a card, never a toast.
@@ -1294,6 +1362,7 @@ func _open_modal(content: Control, dim := 0.32, hide_controls := false) -> void:
 			content.add_theme_stylebox_override("panel", sb)
 	root.add_child(holder)
 	root.move_child(_toasts, -1)   # a toast stays readable over a drawer or card
+	if _sys != null and is_instance_valid(_sys): root.move_child(_sys, -1)   # the system line too (SYS-OFFLINE-3)
 	_modal = holder
 	if hide_controls:
 		_keys.visible = false
