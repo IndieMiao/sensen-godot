@@ -35,8 +35,16 @@ static func build(spot: String, at: Vector3) -> Node3D:
 
 ## Three of the farm's round trees (tree_1 / tree_2 are otherwise unused) right of the field. Canopies (about 0.95 m
 ## × scale) stay inside the Homestead Lv3 fence ring (east x 12.95 m, SGODOT-228) and off the walk to the workbench.
+const GROVE_TREES := [[Vector3(0.5, 0, -0.35), "tree_1", 0.78], [Vector3(-0.35, 0, 0.2), "tree_2", 0.7], [Vector3(0.55, 0, 0.6), "tree_1", 0.66]]
+
+## World points that should block walking for a spot at `at`: the grove's trunks (canopies stay walkable, 不知火舞
+## on 231). Other spots block only their footprint cell.
+static func solid_points(spot: String, at: Vector3) -> Array:
+	if spot != "spot_grove": return []
+	return GROVE_TREES.map(func(p): return at + (p[0] as Vector3))
+
 static func _grove(root: Node3D) -> void:
-	for p in [[Vector3(0.5, 0, -0.35), "tree_1", 0.78], [Vector3(-0.35, 0, 0.2), "tree_2", 0.7], [Vector3(0.55, 0, 0.6), "tree_1", 0.66]]:
+	for p in GROVE_TREES:
 		var t := Art.instance(str(p[1]), p[0], float(p[2]))
 		t.rotation.y = float(p[0].x) * 2.1
 		root.add_child(t)

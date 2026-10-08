@@ -44,6 +44,7 @@ func _build_spots() -> void:
 	for id in SPOTS:
 		_spots[id] = bp.cell_to_world(bp.anchor(id))
 		farm.add_child(P0SpotArt.build(id, _spots[id]))
+		P0Garden.block_points(bp, P0SpotArt.solid_points(id, _spots[id]))   # the grove's trunks
 	_bench = bp.cell_to_world(bp.anchor("workbench"))   # the anchor is the middle of its three cells
 	farm.add_child(P0SpotArt.build("workbench", _bench))
 
