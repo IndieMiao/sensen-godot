@@ -106,3 +106,13 @@ func test_a_root_world_leaves_for_the_map_once_nothing_is_left_to_close() -> voi
 	assert_int(swaps[0]).is_equal(0)
 	assert_bool(rt.ui.close_top_layer() or rt.root_back()).is_true()   # second Back: to the map
 	assert_int(swaps[0]).is_equal(1)
+
+func test_end_stick_before_the_pad_exists_is_harmless() -> void:
+	# farm-dev after #40: a farm started as the root scene attaches before P0Ui._ready built the pad.
+	var u: P0Ui = auto_free(P0Ui.new())   # not in the tree: no _ready, no pad
+	assert_object(u.pad).is_null()
+	var sticks := []
+	u.joystick.connect(func(v): sticks.append(v))
+	u.end_stick()
+	assert_array(sticks).is_equal([Vector2.ZERO])
+

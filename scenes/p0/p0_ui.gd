@@ -625,8 +625,10 @@ func close_top_layer() -> bool:
 
 ## A world change ends the stick: a finger still down when the farmhouse door took the player in never sends its
 ## release to this pad (int5 hand test 029–030), so its ring would stay and the old world keep walking.
+## The first attach (a world booted as the root scene, P0Runtime.ensure) runs before this UI's _ready built the pad:
+## there is no stick to end yet (哪吒: `end_stick` on Nil at every farm start).
 func end_stick() -> void:
-	(pad as _TouchPad).end_stick()
+	if pad != null: (pad as _TouchPad).end_stick()
 	joystick.emit(Vector2.ZERO)
 
 func has_modal() -> bool: return _modal != null or (_radial != null and _radial.visible)
