@@ -169,6 +169,9 @@ const FRAME_ZOOM_MIN := 12.0
 const FRAME_PAD := 16.0
 
 func _frame_home() -> void:
+	# A farm booted as the root scene (the first session lands on the farm, q(44)) leaves by swapping the root for a
+	# fresh map, so no resume: a Show on map from there points at its pin instead of the opening view (int9 S1).
+	if _take_after_leave(): return
 	frame_home_set.call_deferred()   # the city view has its size once the frame lays it out
 
 func frame_home_set() -> void:
@@ -266,6 +269,12 @@ func resume() -> void:
 	super.resume()
 	rt.attach(self)
 	_poll_presence.call_deferred()   # back from a room: refresh the outpost online counts
+	_take_after_leave()
+
+## What the world just left asked for (P0Runtime._leave_then), on resume or on a fresh map (_frame_home); true when
+## it moves the camera or the player, so the opening view is not framed over it.
+func _take_after_leave() -> bool:
+	if rt == null: return false
 	var next := rt.after_leave
 	rt.after_leave = ""
 	match next:
@@ -273,7 +282,9 @@ func resume() -> void:
 		"tackle": show_place.call_deferred("outpost:tackle")   # FISH-5 Tackle Shop: the camera goes to Old Kai's pin
 		_:
 			# Show on map (SGODOT-225): P0Runtime._leave_then("show:<target>") from Today, NeedSource, the Energy card.
-			if next.begins_with("show:"): show_place.call_deferred(next.trim_prefix("show:"))
+			if not next.begins_with("show:"): return false
+			show_place.call_deferred(next.trim_prefix("show:"))
+	return true
 
 ## Show on map (SGODOT-225; LOCK-08, guidance only, nothing is entered): the camera flies to the target's pin and
 ## selects it — "outpost:<role>" an outpost, "pond:<id>" a catalog pond, "home" the homestead (fly only: its pin

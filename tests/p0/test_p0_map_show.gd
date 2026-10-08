@@ -86,3 +86,20 @@ func test_show_from_a_panel_on_the_map_flies_at_once() -> void:
 	var tea := P0Outposts.by_role("tea")
 	_at(float(tea.lat), float(tea.lng))
 	assert_str(rt.after_leave).is_equal("")
+
+## int9 S1: a farm booted as the root scene (the first session lands on the farm, q(44)) leaves by swapping the root
+## for a fresh map, which never resumes: the fresh map takes the waiting Show instead of framing the home set.
+func test_a_fresh_map_takes_a_waiting_show() -> void:
+	var rt := map.get("rt") as P0Runtime
+	rt.after_leave = "show:pond:pond_shanghai_05"
+	var fresh: Node = (load(P0_MAP) as PackedScene).instantiate()
+	add_child(fresh)
+	for i in 5: await get_tree().process_frame
+	var pond := SystemPonds.location("pond_shanghai_05")
+	assert_float(fresh.get("center_lat")).is_equal_approx(float(pond.lat), 1e-6)
+	assert_float(fresh.get("center_lng")).is_equal_approx(float(pond.lng), 1e-6)
+	assert_str(str(fresh.get("city_map").selected.get("id", ""))).is_equal("pond_shanghai_05")
+	assert_str(rt.after_leave).is_equal("")
+	_settle_prewarm()
+	fresh.free()
+	rt.attach(map)
