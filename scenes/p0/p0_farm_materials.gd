@@ -7,6 +7,8 @@ extends Node
 
 const P0_MINE := "res://scenes/p0/p0_mine.tscn"
 const MOUTH_REACH := 2.4        # m: the key turns into Enter mine / Continue run, the EntryCard shows
+const MOUTH_MARK := Vector3(0, 1.9, 0)   # the mouth's badge / world prompt sits here …
+const MOUTH_HIT := Vector3(0, 0.8, 0)    # … and a tap on it is a tap on the gate
 const NOTICE_S := 2.0           # "Run ended at daily reset" float (q(44))
 const SPOT_REACH := 3.0         # m: finger cards show and taps gather only this close (Arthur, 231)
 const SPOTS := ["spot_grove", "spot_rock_pile", "spot_reed_bank", "spot_clay_bank", "spot_herb_patch"]
@@ -82,10 +84,14 @@ func frame(v: Dictionary, card := "") -> void:
 	var cam: Camera3D = farm.cam
 	var near := near_mouth()
 	var top := cam.unproject_position(mouth + Vector3(0, 1.9, 0))
-	# The mouth's world badge (MAT-1 / MINE-P0-5): display only, the mouth takes the tap (LOCK-07).
-	rt.ui.badge("mine", UiStatusBadge.State.AVAILABLE, top, not rt.ui.has_modal(), P0MaterialLogic.mine_badge(v),
+	# With an unfinished run the mouth keeps its Run 1/2 badge near and far (MINE-P0-5, LOCK-11: a state over the plain
+	# icon) and the EntryCard opens when near; without one it is a world prompt like the other facilities — the pickaxe
+	# button within 8 m, the strip `The mine · Runs today 0/2` when it holds the farm's card (不知火舞 on 235). Never both.
+	var running: bool = v.get("mine", {}).get("run", null) != null
+	rt.ui.badge("mine", UiStatusBadge.State.AVAILABLE, top, running and not rt.ui.has_modal(), P0MaterialLogic.mine_badge(v),
 		P0Logic.icon("pickaxe"))
-	top.y -= rt.ui.badge_height("mine")
+	farm.world_prompt("mine", P0WorldPrompts.mine(v), mouth, MOUTH_MARK, MOUTH_HIT, not running)
+	if running: top.y -= rt.ui.badge_height("mine")
 	var entry := P0MaterialLogic.mine_entry_card(v)
 	if _ensure_entry(): _entry.visible = card == "mine" and bool(entry.get("show", false)) and not rt.ui.has_modal()
 	if is_instance_valid(_entry) and _entry.visible:
@@ -151,6 +157,9 @@ func tap(screen: Vector2) -> bool:
 ## A finger card's tap by id (苏烈's #21 _tap_card dispatch): a gathering spot gathers / shows MAT-3 / says when it is
 ## ready; the workbench opens. False for ids this helper doesn't own.
 func tap_card(id: String) -> bool:
+	if id == "mine":   # the mouth's strip or button (no unfinished run): "The mine" sheet; entering stays on the key
+		P0MaterialCards.open_mine_sheet(rt.ui, rt.session.current())
+		return true
 	if id == "workbench":
 		farm.actor.face(_bench)
 		_open_workbench()

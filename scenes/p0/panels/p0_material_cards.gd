@@ -83,7 +83,7 @@ static func open_new_run(ui: P0Ui, view: Dictionary, send: Callable) -> UiDrawer
 
 ## MAT-3: a spot that opens later (Clay Bank before Homestead Lv2): ObjectHeader `Clay Bank` / `Locked` / what it
 ## gives, the `Unlock · Homestead Lv2` fact and NavigationRow `View homestead ›`, which opens the HOME-1 upgrade sheet
-## (a panel only: no jump, the camera stays, LOCK-08). The frame's `Details ›` row is left out: P0 has no details page
+## (a panel only: no jump, the camera stays, LOCK-08); Back from it returns to this sheet. The frame's `Details ›` row is left out: P0 has no details page
 ## (不知火舞 on 235).
 static func open_locked_spot(ui: P0Ui, view: Dictionary, spot_id: String) -> UiDrawer:
 	var sheet := P0MaterialLogic.locked_spot_sheet(view, spot_id)
@@ -92,7 +92,9 @@ static func open_locked_spot(ui: P0Ui, view: Dictionary, spot_id: String) -> UiD
 	d.body.add_child(UiObjectHeader.new({"title": sheet.title, "state": sheet.subtitle, "effect": sheet.line}))
 	for f in sheet.facts: d.body.add_child(UiFactRow.new(str(f[0]), str(f[1])))
 	var home := UiNavButton.new(VIEW_HOMESTEAD)
-	home.pressed.connect(func(): HomePanel.open(ui))
+	home.pressed.connect(func():
+		HomePanel.open(ui)
+		ui._modal_back = func(): open_locked_spot(ui, ui.view, spot_id))   # Back from HOME-1 returns here (苏烈 on #102)
 	d.body.add_child(home)
 	_show(ui, d, "locked_spot")
 	return d
