@@ -24,8 +24,22 @@ describe('Stall Board (§9.6, §14.1.2)', () => {
     const v = viewOf(c, fresh(), T0);
     expect(v.boards.stall.slots).toHaveLength(2);
     expect(v.boards.stall.slots[0]).toMatchObject({ id: 'req_pond_catch', title: 'Pond Catch', items: ['fish_crucian'], qty: 2, coins: 14, base: 4, bonus: 10, status: 'open', expires_in: null });
-    expect(v.boards.stall.slots[1]).toEqual({ empty: true, refill_in: 72 * H });
+    expect(v.boards.stall.slots[1]).toEqual({ empty: true, held: true });   // held 72 h: no countdown, not "Next request" (q(99))
     expect(v.boards.market.slots[0]).toMatchObject({ empty: true, locked: { template: 'req_sys_fish_fine', title: 'Dusk Haul', gate: [['fishing', 3]] } });
+  });
+
+  it('the held slot never counts as the next request; after the tutorial the freed slot does (q(99))', () => {
+    let s = fresh();
+    expect(viewOf(c, s, T0 + 10 * 60_000).stall.board.refill_in).toBe(0);   // legacy shape: no refilling slot yet
+    s.bag.push({ id: 'fish_crucian', qty: 2 });
+    s = step(s, { type: 'accept', request: 'req_pond_catch' }).s;
+    s = step(s, { type: 'deliver', request: 'req_pond_catch' }).s;
+    const v = viewOf(c, s, T0);
+    expect(v.boards.stall.slots[0]).toEqual({ empty: true, refill_in: 4 * H });   // the tutorial's slot: back in 4 h
+    expect(v.boards.stall.slots[1]).toEqual({ empty: true, held: true });          // still held
+    expect(v.stall.board.refill_in).toBe(4 * H);
+    s = step(s, { type: 'drop', request: (viewOf(c, s, T0 + 5 * H).boards.stall.slots[0] as { id: string }).id }, T0 + 5 * H).s;
+    expect(viewOf(c, s, T0 + 5 * H).boards.stall.slots[0]).toEqual({ empty: true, refill_in: 8 * H });   // a drop's wait still counts
   });
 
   it('slot 2 fills after 72 h; the view and the next command see the same request', () => {

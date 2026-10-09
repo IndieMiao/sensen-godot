@@ -110,6 +110,15 @@ export function settleBoards(c: P0Content, s: P0State, now: number): void {
   }
 }
 
+/**
+ * §14.1.2: a new account's Stall Board slot 2 stays empty for refill_h (72 h) from creation. Until it fills it is a held
+ * slot (q(99), 李白 / 不知火舞): the view draws it as a plain empty slot with no countdown and leaves it out of
+ * `Next request`, which counts only slots refilling after a delivery or a drop. The rule itself is unchanged.
+ */
+export function heldSlot(c: P0Content, s: P0State, board: BoardId, sl: BoardSlot): boolean {
+  return board === 'stall' && !sl.req && sl.refill_at === s.created_at + c.requests.refill_h * H;
+}
+
 export function findBoardRequest(s: P0State, id: string): { board: BoardId; slot: BoardSlot } | null {
   for (const board of BOARDS) for (const slot of s.boards[board]) if (slot.req?.id === id) return { board, slot };
   return null;

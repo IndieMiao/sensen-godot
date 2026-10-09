@@ -6,7 +6,7 @@ import { sellPrice, stallOffer } from './reducer.js';
 import { blessed, dayKey, foodCap, maxEnergy, nextTickIn, regenMs, settleEnergy, skillLevel, untilRollover } from './rules.js';
 import { emptyDay, type P0State } from './state.js';
 import { catalog, drinkPrice, offerOf, owns, walletNeed } from './shops.js';
-import { BOARDS, handIn, lockedTemplate, payout, settleBoards, slotCount } from './boards.js';
+import { BOARDS, handIn, heldSlot, lockedTemplate, payout, settleBoards, slotCount } from './boards.js';
 import { expireGiftMeals, progressOf, requestState, residentState, stageIndex } from './residents.js';
 import { floorPrice, haveFor, matches } from './requests.js';
 import type { BoardRequest } from './state.js';
@@ -291,6 +291,8 @@ function boardView(c: P0Content, s: P0State, board: BoardId, now: number) {
     title: c.requests.boards[board].title, deliver_at: board === 'stall' ? 'homestead' : 'market',
     slots: s.boards[board].slice(0, slotCount(c, s, board)).map(sl => sl.req ? requestView(c, s, sl.req, now)
       : locked ? { empty: true, locked: { template: locked.template, title: c.requests.templates[locked.template].title, gate: locked.gate } }
+      // q(99): the new account's held slot 2 shows no countdown (clients count only slots with refill_in)
+      : heldSlot(c, s, board, sl) ? { empty: true, held: true }
       : { empty: true, refill_in: Math.max(0, sl.refill_at - now) }),
   };
 }
@@ -298,7 +300,7 @@ function boardView(c: P0Content, s: P0State, board: BoardId, now: number) {
 /** The pre-SGODOT-224 shape of the Stall Board (scenes/p0/p0_ui.gd _board, P0Logic Today lines). */
 function legacyBoard(c: P0Content, s: P0State, now: number) {
   const slots = s.boards.stall.slice(0, slotCount(c, s, 'stall'));
-  const empty = slots.filter(sl => !sl.req).map(sl => sl.refill_at);
+  const empty = slots.filter(sl => !sl.req && !heldSlot(c, s, 'stall', sl)).map(sl => sl.refill_at);   // q(99)
   return {
     slots: slots.length,
     requests: slots.filter(sl => sl.req).map(sl => {
