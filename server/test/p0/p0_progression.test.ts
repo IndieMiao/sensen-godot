@@ -112,6 +112,22 @@ describe('P0 first-session XP (q(37); SGODOT-232 S1, rescued from SGODOT-131)', 
     expect(s.skills.cooking).toBe(22); // next day: base Good 5, no first bonus
   });
 
+  it("a pot's XP event says which pot of its page today it is, the 3rd with no XP included (q(94))", () => {
+    let s = fresh(); s.bag.push({ id: 'fish_crucian', qty: 5 });
+    const xp: unknown[] = [];
+    for (let i = 0; i < 3; i++) {
+      const at = T + i * 10_000;
+      s = step(s, { type: 'cook', items: ['fish_crucian'] }, at);
+      const pot = s.stove!, h = pot.heats[0];
+      const r = applyP0(c, s, { type: 'collect', taps: [h.at + (h.gold + h.width / 2) * h.spin] }, at + pot.ms + 10);
+      expect(r.ok).toBe(true);
+      if (!r.ok) return;
+      s = r.state;
+      xp.push(r.events.filter(e => e.kind === 'xp' && e.skill === 'cooking' && !('first' in e)).at(-1));
+    }
+    expect(xp).toMatchObject([{ nth: 1 }, { amount: 2, nth: 2 }, { amount: 0, nth: 3 }]);
+  });
+
   it('at high skill only the base XP is reduced; the first-cook award remains full', () => {
     let s = fresh(); s.skills.cooking = 220; // Lv4, Common content Lv1: 50%
     s.bag.push({ id: 'fish_crucian', qty: 1 });

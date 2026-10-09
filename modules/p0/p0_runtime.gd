@@ -438,11 +438,16 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				if str(ev.get("reason", "")) == "mine_floor" and str(_call("p0_surface", [])) == "mine": continue
 				floats.append({kind = "energy", key = "energy", amount = dlt, fmt = "%s Energy"})
 			"xp":
-				if int(ev.amount) > 0 and not first_cook_xp.any(func(x): return is_same(x, ev)):
-					# A pot's own XP names its track and a Good / Perfect pot's star: +5 Cooking XP ★ (§4.8.6 / §7.2.2).
-					var cook := str(ev.skill) == "cooking"
+				var cook := str(ev.skill) == "cooking"
+				var nth := int(ev.get("nth", 0))   # a pot's place among today's pots of its page (q(94))
+				if cook and nth >= 3 and int(ev.amount) <= 0:   # the 3rd pot of a page on: no XP, and the float says why
+					floats.append({kind = "xp", key = "cook_nth", text = "No XP · %s today" % P0KitchenLogic.ordinal(nth), tone = UiFloatText.Tone.MUTED})
+				elif int(ev.amount) > 0 and not first_cook_xp.any(func(x): return is_same(x, ev)):
+					# A pot's own XP names its track and a Good / Perfect pot's star: +5 Cooking XP ★ (§4.8.6 / §7.2.2);
+					# the 2nd pot of a page today says so instead of a percentage: +10 Cooking XP ★ · 2nd today (q(94)).
 					var fmt := ("%s Cooking XP" + (" ★" if good_pot else "")) if cook else "%s XP"
-					fmt += "" if int(ev.percent) >= 100 else " · %d%%%%" % int(ev.percent)
+					if cook and nth == 2: fmt += " · 2nd today"
+					elif int(ev.percent) < 100: fmt += " · %d%%%%" % int(ev.percent)
 					var part := {kind = "xp", key = fmt, amount = int(ev.amount), fmt = fmt, tone = UiFloatText.Tone.XP}
 					if plants > 0 and str(ev.skill) == "farming": part.merge({unit = "plants", count = plants})
 					floats.append(part)

@@ -213,6 +213,7 @@ func p0_until(n: String) -> bool:
 		"cooking": return kitchen != null and kitchen.phase == "watch"
 		"turned": return kitchen != null and kitchen.phase == "watch" and P0KitchenLogic.queued(rt.session.current()) == null   # Queue ×2 turned over
 		"card": return kitchen != null and kitchen.phase == "card"
+		"floating": return rt != null and not rt.ui.root.find_children("*", "UiFloatText", true, false).is_empty()   # a float is up (shots)
 		"compose": return kitchen != null and kitchen.phase == "compose"
 		"gold": return kitchen != null and kitchen.at_gold()   # a ring's needle on gold (shots)
 		"goldsoon": return kitchen != null and kitchen.at_gold(800.0)   # on gold when the next step runs (0.8 s on)
