@@ -378,12 +378,24 @@ func _build_hearth_glow() -> void:
 	room.add_child(glow)
 
 # ---------------------------------------------------------------- camera: the room's accepted view + safe box
+## One camera pitch everywhere (用户 2026-10-09, camera unification step 2): a room keeps its kit's yaw (about 45°, the
+## corner view its art was built for — the user kept it) and distance, and looks down at the farm's pitch
+## (FarmCamera.PITCH_DEG) instead of its kit's 25–37°. All three spaces are orthographic, so with the farm's player
+## scale (frame_all) the picture is the farm's too. The kit's own camera stays for the reviewcam shot step.
+static func at_farm_pitch(dir: Vector3) -> Vector3:
+	var flat := Vector2(dir.x, dir.z)
+	flat = flat.normalized() if flat.length() > 0.001 else Vector2(0.0, 1.0)
+	var p := deg_to_rad(FarmCamera.PITCH_DEG)
+	return Vector3(flat.x * cos(p), sin(p), flat.y * cos(p))
+
 func _build_camera() -> void:
 	var spec: Dictionary = layout.get("camera", {})
 	if spec.has("position") and spec.has("target"):
 		var off := P0RoomAnchors.vec(spec.position) - P0RoomAnchors.vec(spec.target)
 		_cam_dir = off.normalized()
 		_cam_dist = off.length()
+	_kit_dir = _cam_dir
+	_cam_dir = at_farm_pitch(_cam_dir)
 	_cam_size = float(spec.get("size", _cam_size))
 	cam = Camera3D.new()
 	cam.name = "RoomCamera"
@@ -941,10 +953,68 @@ func resume() -> void:
 		rt.attach(self)
 		rt.ui.set_place(city + " · " + place_name)
 
+# ---------------------------------------------------------------- light sampling across cameras (dev)
+## Camera unification step 2's light check (美术总监: the same face of the same object, the signed render against the
+## 43° game view). `spec` {image: [w, h], points: {name: [x, y]}}: pixels of an image this camera rendered (the
+## reviewcam / kitpitch framing of the signed render) cast onto the art's visible surfaces after "calibmesh" (else the
+## room's colliders), else the floor plane; {name: [x, y, z]}.
+func calib_rays(spec: Dictionary) -> Dictionary:
+	var out := {}
+	var view := _view()
+	var img := Vector2(float(spec.image[0]), float(spec.image[1]))
+	var space := get_world_3d().direct_space_state
+	for n in spec.points:
+		var p: Array = spec.points[n]
+		var at := Vector2(float(p[0]), float(p[1])) * view / img
+		var from := cam.project_ray_origin(at)
+		var dir := cam.project_ray_normal(at)
+		var hit := space.intersect_ray(PhysicsRayQueryParameters3D.create(from, from + dir * 500.0, CALIB_LAYER if _calib_meshed else 0xFFFFFFFF))
+		var q: Vector3
+		if not hit.is_empty(): q = hit.position
+		else: q = from + dir * ((floor_y - from.y) / dir.y if absf(dir.y) > 0.0001 else 0.0)
+		out[n] = [q.x, q.y, q.z, "hit" if not hit.is_empty() else "floor"]
+	return out
+
+## Shot step "calibmesh": the art's visible surfaces as trimesh bodies on a layer of their own, so "calibrays" (a later
+## step: bodies join the space on the next physics frame) lands on what the picture shows, not the nav's walls.
+const CALIB_LAYER := 1 << 19
+var _calib_meshed := false
+func calib_mesh() -> int:
+	var n := 0
+	for mi in room.find_children("*", "MeshInstance3D", true, false):
+		if not (mi as MeshInstance3D).is_visible_in_tree() or (mi as MeshInstance3D).mesh == null: continue
+		var body := StaticBody3D.new()
+		body.collision_layer = CALIB_LAYER
+		body.collision_mask = 0
+		var shape := CollisionShape3D.new()
+		shape.shape = (mi as MeshInstance3D).mesh.create_trimesh_shape()
+		body.add_child(shape)
+		add_child(body)
+		body.global_transform = (mi as MeshInstance3D).global_transform
+		n += 1
+	_calib_meshed = true
+	return n
+
+## {name: [x, y, z, …]} to {view: [w, h], points: {name: [x, y]}} in this view's coordinates (scale them by the saved
+## image's size over `view`; the texture's size reads differently on a HiDPI desktop), -1 when behind the camera.
+func calib_project(points: Dictionary) -> Dictionary:
+	var out := {}
+	var view := _view()
+	for n in points:
+		var p: Array = points[n]
+		var w := Vector3(float(p[0]), float(p[1]), float(p[2]))
+		var s := Vector2(-1, -1) if cam.is_position_behind(w) else cam.unproject_position(w)
+		out[n] = [snappedf(s.x, 0.01), snappedf(s.y, 0.01)]
+	return {view = [view.x, view.y], points = out}
+
 # ---------------------------------------------------------------- dev steps for P0_SHOT
 var _review_view := false
+var _kit_dir := Vector3.ZERO   # the kit's own direction, before the farm's pitch (shot step "kitpitch")
 func p0_dev(step: PackedStringArray) -> bool:
 	match step[0]:
+		"kitpitch":   # back to the kit's own pitch (light sampling against renders signed at it)
+			_cam_dir = _kit_dir
+			_update_camera()
 		"reviewcam":   # the kit's layout.camera, as its signed render framed it (art comparisons, SGODOT-227)
 			var spec: Dictionary = layout.get("camera", {})
 			_review_view = true
@@ -953,12 +1023,29 @@ func p0_dev(step: PackedStringArray) -> bool:
 			cam.position = room.global_position + P0RoomAnchors.vec(spec.position)
 			cam.look_at(room.global_position + P0RoomAnchors.vec(spec.target), Vector3.UP)
 		"noui": if rt: rt.ui.visible = false
+		"calibmesh": print("P0_CALIBMESH ", calib_mesh())
+		"calibrays":   # light sampling (camera unification step 2): P0_CALIB's points, px of its image, to 3D points
+			print("P0_CALIB3D ", JSON.stringify(calib_rays(JSON.parse_string(FileAccess.get_file_as_string(OS.get_environment("P0_CALIB"))))))
+		"calibproject":   # … and P0_CALIB3D's 3D points to px of this shot
+			print("P0_CALIBPX ", JSON.stringify(calib_project(JSON.parse_string(FileAccess.get_file_as_string(OS.get_environment("P0_CALIB3D"))))))
 		"goto":
 			actor.teleport(Vector3(float(step[1]), floor_y, float(step[2])))
 			_focus = actor.position
 		"at":
 			var m := anchor(step[1])
-			if m: actor.teleport(Vector3(m.global_position.x, floor_y, m.global_position.z))
+			if m:
+				actor.teleport(Vector3(m.global_position.x, floor_y, m.global_position.z))
+				_focus = actor.position   # as if walked there: the view comes along (at 43° the room stands taller on screen)
+				_follow.held = false
+		"wholeview":   # the whole room in view at this camera (shots: the art review's panorama, exposed backs)
+			var view := _view()
+			var need := maxf((_bounds_hi.x - _bounds_lo.x) / FRAME_W, (_bounds_hi.y - _bounds_lo.y) / (FRAME_H * view.y / maxf(view.x, 1.0)))
+			_zoom = _cam_size / maxf(need, 0.01)
+			var forward := -_cam_dir
+			var right := forward.cross(Vector3.UP).normalized()
+			_focus = _on_floor(right, right.cross(forward).normalized(), forward, (_bounds_lo + _bounds_hi) * 0.5)
+			_follow.hold()
+			_update_camera()
 		"atedge":   # atedge:top|bottom|left|right — the walkable spot nearest the floor's corner furthest that way (shots)
 			var forward := -_cam_dir
 			var right := forward.cross(Vector3.UP).normalized()
