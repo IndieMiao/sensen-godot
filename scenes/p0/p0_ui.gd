@@ -292,6 +292,8 @@ func _refresh_hud() -> void:
 
 ## Top system inset (status bar, notch) in UI units; 0 on desktop.
 func safe_top() -> float:
+	# Desktop shots of a phone's status-bar inset (P0_DEV_SAFE_TOP=38: the emulator in int12-pre); unset everywhere else.
+	if OS.has_environment("P0_DEV_SAFE_TOP"): return float(OS.get_environment("P0_DEV_SAFE_TOP"))
 	if not (OS.has_feature("android") or OS.has_feature("ios")): return 0.0
 	return UIMetrics.safe_margins(DisplayServer.get_display_safe_area(), DisplayServer.window_get_size(),
 		get_viewport().get_visible_rect().size, 0.0).y
@@ -958,6 +960,16 @@ func _keep_off_sides(c: Control, drawn: Rect2) -> void:
 
 ## Only Bag at the bottom (a room: no quick bar slots, no main key; 不知火舞 on #127): the room frames lower.
 func bag_only() -> bool: return _bar != null and _bar.visible and _bar.bag_only and not _keys.visible
+
+## The marker area (_marker_area) as it is with the HUD and the quick bar up in their places, whatever covers or docks
+## them right now (the Bag drawer takes the bar into itself): what a world's opening shot frames for, so a panel open on
+## arrival doesn't move the shot when it closes (int12-pre; 后裔 on #166). The bar's place is _place_controls'.
+## Empty until the HUD has laid out.
+func open_marker_area() -> Rect2:
+	if _kit == null or _kit.size.y <= 0.0: return Rect2()
+	var top := UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H + safe_top()
+	var bottom := _kit.size.y - UiTokens.SIZE_QUICK_BAR_BOTTOM - safe_bottom() - UiTokens.SIZE_QUICK_BAR_H
+	return Rect2(0.0, top, _kit.size.x, maxf(0.0, bottom - top))
 
 ## Where world markers may sit (LOCK-07): below the two-row HUD and above the quick bar. A finger card is passive, so
 ## one lying under a HUD chip lost its tap to the chip (int5 hand test 8: the Homestead card slid under Energy and
