@@ -105,7 +105,16 @@ func test_no_tab_row_and_the_profile_tile_opens_the_dex() -> void:
 	ui.close_modal()
 	ui.open_profile()
 	await await_idle_frame()
+	var page := ui._profile
 	ui._profile.collection_pressed.emit("fish")
+	await await_idle_frame()
+	assert_str(ui.modal_kind).is_equal("fishdex")
+	assert_object(ui._modal.get_child(0)).is_same(page)   # 256 ⑧: the profile stays behind the dex …
+	_dex().cell_pressed.emit("fish_crucian")
+	await await_idle_frame()
+	assert_str(ui.modal_kind).is_equal("fish")
+	assert_object(ui._modal.get_child(0)).is_same(page)   # … and behind the card the dex opens
+	ui.close_top_layer()   # the card: back to the dex
 	await await_idle_frame()
 	assert_str(ui.modal_kind).is_equal("fishdex")
 	ui.close_top_layer()

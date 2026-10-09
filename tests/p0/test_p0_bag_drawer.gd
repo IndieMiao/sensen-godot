@@ -237,6 +237,45 @@ func test_profile_page_emits_back_edit_look_and_skill() -> void:
 	assert_array(got).is_equal(["back", "look", "fishing"])
 	assert_float(page.top_bar.right_button().modulate.a).is_equal(0.0)   # no Settings page in P0 yet
 
+func _mouse(down: bool) -> InputEventMouseButton:
+	var m := InputEventMouseButton.new()
+	m.button_index = MOUSE_BUTTON_LEFT
+	m.pressed = down
+	return m
+
+func _motion(rel: Vector2) -> InputEventMouseMotion:
+	var m := InputEventMouseMotion.new()
+	m.relative = rel
+	return m
+
+## int10c 256 ⑦: a sideways drag over the outfit turns the figure (0.01 rad a pixel, as in the dressing room) once it
+## is past the tap slop; an upward drag is left to the page's scroll; nothing turns before the press.
+func test_a_sideways_drag_on_the_outfit_turns_the_figure() -> void:
+	var page := P0ProfilePage.new(_view())
+	var host := Control.new()
+	host.theme = UiKit.theme()
+	host.size = Vector2(360, 800)
+	add_child(auto_free(host))
+	host.add_child(page)
+	await get_tree().process_frame
+	var spin := page.spin
+	spin._gui_input(_motion(Vector2(40, 0)))   # no press: no turn
+	assert_float(page.preview.yaw()).is_equal(0.0)
+	spin._gui_input(_mouse(true))
+	spin._gui_input(_motion(Vector2(10, 0)))   # within the tap slop: not yet
+	assert_bool(spin.turning()).is_false()
+	spin._gui_input(_motion(Vector2(10, 2)))   # past it, sideways: turning from here
+	assert_bool(spin.turning()).is_true()
+	spin._gui_input(_motion(Vector2(20, 0)))
+	assert_float(page.preview.yaw()).is_equal_approx(-0.3, 0.0001)
+	spin._gui_input(_mouse(false))
+	assert_bool(spin.turning()).is_false()
+	var before := page.preview.yaw()
+	spin._gui_input(_mouse(true))
+	for i in 4: spin._gui_input(_motion(Vector2(2, -12)))   # mostly upward: the page scrolls, the figure stays
+	spin._gui_input(_mouse(false))
+	assert_float(page.preview.yaw()).is_equal(before)
+
 # ---------------------------------------------------------------- Farm Storage (§10.4.8)
 
 func test_storage_stacks_follow_the_bag_on_their_tabs_at_home_only() -> void:

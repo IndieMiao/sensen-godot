@@ -1387,6 +1387,7 @@ func speaker() -> String:
 	return ""
 
 func close_modal() -> void:
+	_over_profile = false   # out to the world: what opens next is over the world
 	_drop_modal()
 	if not _card_queue.is_empty():
 		var next: Callable = _card_queue.pop_front()
@@ -1519,6 +1520,7 @@ func _drop_modal() -> void:
 
 func _open_modal(content: Control, dim := 0.32, hide_controls := false) -> void:
 	_bar.cancel_drag()   # a drawer or card opening cancels a slot drag (LOCK-04 v1.10)
+	var under := _profile_to_keep()
 	_drop_modal()
 	var veil := ColorRect.new()
 	veil.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -1528,6 +1530,7 @@ func _open_modal(content: Control, dim := 0.32, hide_controls := false) -> void:
 	var holder := Control.new()
 	holder.set_anchors_preset(Control.PRESET_FULL_RECT)
 	holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if under != null: holder.add_child(under)   # the profile stays behind the scrim (256 ⑧)
 	holder.add_child(veil)
 	holder.add_child(content)
 	if surface == "map" and content is PanelContainer:
@@ -1538,6 +1541,7 @@ func _open_modal(content: Control, dim := 0.32, hide_controls := false) -> void:
 			(sb as StyleBoxFlat).bg_color.a = 1.0
 			content.add_theme_stylebox_override("panel", sb)
 	root.add_child(holder)
+	if under != null: (under as P0ProfilePage).preview.set_active(true)   # moved: watch its new ancestors' visibility
 	root.move_child(_toasts, -1)   # a toast stays readable over a drawer or card
 	if _sys != null and is_instance_valid(_sys): root.move_child(_sys, -1)   # the system line too (SYS-OFFLINE-3)
 	_modal = holder
@@ -2444,19 +2448,34 @@ func open_gift(id: String, item := "") -> void:
 ## Own profile (SGODOT-225; PROFILE-1-P0, LOCK-22), opened from the HUD avatar. A skill ring opens the skill
 ## details; Edit look opens the dressing room above the current world and comes back here.
 var _profile: P0ProfilePage
+## A panel opened from the profile (Skills, the Fish-dex and the cards it opens) keeps the profile behind its scrim,
+## not the world (int10c 256 ⑧): the same page moves under each layer of that chain, so its figure isn't built again.
+## Set by the profile's buttons; cleared when the chain goes back to the profile or out to the world.
+var _over_profile := false
 
 func open_profile(look_saved := false) -> void:
+	_over_profile = false
 	var page := P0ProfilePage.new(view, safe_top(), look_saved)
 	page.theme = UiKit.theme()
 	page.back_pressed.connect(close_modal)
-	page.skill_pressed.connect(func(_skill: String): open_skills(func(): open_profile()))
+	page.skill_pressed.connect(func(_skill: String):
+		_over_profile = true
+		open_skills(func(): open_profile()))
 	page.edit_look_pressed.connect(edit_look)
 	page.collection_pressed.connect(func(key: String):
-		if key == "fish": open_fishdex(func(): open_profile())
+		if key == "fish":
+			_over_profile = true
+			open_fishdex(func(): open_profile())
 		elif can_request_panel(): request_panel("cookbook"))
 	_open_modal(page, 0.0, true)
 	_profile = page
 	modal_kind = "profile"
+
+## The profile page to move under the next layer: while a chain opened from the profile goes on (256 ⑧).
+func _profile_to_keep() -> Control:
+	if not _over_profile or _profile == null or not is_instance_valid(_profile) or _profile.is_queued_for_deletion(): return null
+	if _profile.get_parent() != null: _profile.get_parent().remove_child(_profile)
+	return _profile
 
 ## The existing dressing room (Avatar outfit; the P0 actor follows the saved outfit). The P0 layer hides while
 ## it is on top and the profile comes back when it closes (Back or Done).

@@ -970,6 +970,24 @@ func _dev_shot(dt: float) -> void:
 			"skills": ui.open_skills()
 			"profile": ui.open_profile()
 			"editlook": ui.edit_look()   # the profile's Edit look ›: the dressing room above the current world (KEEP-P0-2)
+			# 256 ⑦⑧ shots: profskill:farming / profdex tap the profile's skill card / Fish tile; profspin:120 drags
+			# the outfit 120 px sideways (the spin's own gesture: press, past the slop, release).
+			"profskill": if ui._profile: ui._profile.skill_pressed.emit(step[1] if step.size() > 1 else "farming")
+			"profdex": if ui._profile: ui._profile.collection_pressed.emit("fish")
+			"profspin":
+				if ui._profile:
+					var sp := ui._profile.spin
+					var press := InputEventMouseButton.new()
+					press.button_index = MOUSE_BUTTON_LEFT
+					press.pressed = true
+					sp._gui_input(press)
+					for i in 12:
+						var m := InputEventMouseMotion.new()
+						m.relative = Vector2(float(step[1] if step.size() > 1 else "120") / 12.0, 0)
+						sp._gui_input(m)
+					press = press.duplicate()
+					press.pressed = false
+					sp._gui_input(press)
 			"resident": ui.open_resident(step[1] if step.size() > 1 else "res_pip")   # SGODOT-225 dialogue bar
 			"creel":   # creel:0 — the creel badge's states for shots: the bag's free slots set locally (235 B1)
 				var cv: Dictionary = session.view.duplicate(true)
