@@ -1277,23 +1277,12 @@ func toast_text_width() -> float:
 	var panel: float = minf(_toasts._width, _toasts.size.x - UiTokens.SPACE_PAGE * 2.0) if _toasts.size.x > 0.0 else _toasts._width
 	return panel - UiTokens.SIZE_TOAST_PAD_LEFT - UiTokens.SIZE_TOAST_PAD_RIGHT - UiTokens.SIZE_TOAST_ICON - ToastLayer._ICON_GAP
 
-## Two lines break at a " · " (不知火舞 on #188, q(103)): a text that does not fit the toast's one line goes to the next
-## line after the last " · " that still leaves the first line inside the text width, the dot dropped —
-## `Pond Catch` / `Pond Crucian 1/2`, `Pond Catch · 2/2` / `Deliver at the Stall`. Callers opt in (break_at_dot);
-## the toast itself still wraps by words. Measured with the toast's own label font, at its current width.
+## A toast that opts in breaks its two lines at a " · " (UiKit.break_at_dot), measured with the toast's own label font
+## at its current width; the toast itself still wraps by words.
 func _break_at_dot(text: String) -> String:
 	var l: Label = _toasts._label
-	if l == null or not text.contains(" · "): return text
-	var font := l.get_theme_font(&"font")
-	var size := l.get_theme_font_size(&"font_size")
-	var w := toast_text_width()
-	var fits := func(t: String) -> bool: return font.get_string_size(t, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x <= w
-	if fits.call(text): return text
-	var parts := text.split(" · ")
-	for i in range(parts.size() - 1, 0, -1):
-		var first := " · ".join(parts.slice(0, i))
-		if fits.call(first): return first + "\n" + " · ".join(parts.slice(i))
-	return text
+	if l == null: return text
+	return UiKit.break_at_dot(text, l.get_theme_font(&"font"), l.get_theme_font_size(&"font_size"), toast_text_width())
 
 ## Where the toast sits (WP2 D-01, q(16)): over the quick bar's top edge, in the scene or docked in the bag; over a
 ## drawer without the bar (the workbench, a counter), just above the drawer's top edge — clear of its rows and of the

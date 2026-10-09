@@ -38,6 +38,20 @@ static func icon(texture: Texture2D, side: float) -> TextureRect:
 	r.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return r
 
+## Two lines break at a " · " (不知火舞 on #188, q(103)): a text wider than `width` goes to the next line after the last
+## " · " that still leaves the first line inside it, the dot dropped — `Pond Catch` / `Pond Crucian 1/2`,
+## `Catch 2 Pond Crucian` / `Fern Pond`. A text that fits, has no " · " or no first part that fits stays as it is
+## (the label still wraps by words). Toasts that opt in and Today's rows use it, each with its own label's font.
+static func break_at_dot(text: String, font: Font, font_size: int, width: float) -> String:
+	if font == null or width <= 0.0 or not text.contains(" · "): return text
+	var fits := func(t: String) -> bool: return font.get_string_size(t, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x <= width
+	if fits.call(text): return text
+	var parts := text.split(" · ")
+	for i in range(parts.size() - 1, 0, -1):
+		var first := " · ".join(parts.slice(0, i))
+		if fits.call(first): return first + "\n" + " · ".join(parts.slice(i))
+	return text
+
 ## Colour with the alpha of an opacity token, e.g. UiKit.alpha(UiTokens.COLOR_SURFACE, UiTokens.OPACITY_SHEET_SURFACE).
 static func alpha(color: Color, opacity: float) -> Color:
 	return Color(color, opacity)

@@ -218,6 +218,32 @@ func test_today_panel_has_at_most_three_rows_and_show_only_where_given() -> void
 	assert_array(picked).is_equal([1])
 	assert_float(p.size.x).is_equal(float(UiTokens.SIZE_TODAY_PANEL_W))
 
+## A row too long for its line breaks at a " · " (不知火舞 on #201, UiKit.break_at_dot): `Catch 2 Pond Crucian` / `Fern Pond`
+## beside Show on map, not `Catch 2 Pond Crucian ·` / `Fern Pond`; one that fits is left alone.
+func test_today_rows_break_their_two_lines_at_a_dot() -> void:
+	var rows := [
+		{line = "Catch 2 Pond Crucian · Fern Pond", action = "Show on map"},
+		{line = "Pip's First Fish · Common fish 0/1"},
+		{line = "Pond Catch · 2/2", action = "Show"},
+	]
+	var p: UiTodayPanel = _host(UiTodayPanel.new(rows))
+	await _settle()
+	var texts := _labels(p)
+	assert_array(texts).contains(["Catch 2 Pond Crucian\nFern Pond", "Pond Catch · 2/2"])
+	var pip: Label = p.find_children("*", "Label", true, false).filter(func(l): return (l as Label).text.begins_with("Pip"))[0]
+	var fs := pip.get_theme_font_size(&"font_size")
+	var whole := pip.get_theme_font(&"font").get_string_size("Pip's First Fish · Common fish 0/1", HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+	# beside no pill it breaks only if the whole line is wider than the label
+	assert_str(pip.text).is_equal("Pip's First Fish\nCommon fish 0/1" if whole > pip.size.x else "Pip's First Fish · Common fish 0/1")
+
+func test_break_at_dot_keeps_the_first_line_inside_the_width() -> void:
+	var font := UiKit.font(&"bold")
+	var w := font.get_string_size("Pond Catch · Pond Crucian", HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x
+	assert_str(UiKit.break_at_dot("Pond Catch · Pond Crucian · 1/2", font, 14, w)).is_equal("Pond Catch · Pond Crucian\n1/2")
+	assert_str(UiKit.break_at_dot("Pond Catch · Pond Crucian · 1/2", font, 14, w - 1.0)).is_equal("Pond Catch\nPond Crucian · 1/2")
+	assert_str(UiKit.break_at_dot("Short", font, 14, 10.0)).is_equal("Short")          # no dot: the label wraps by words
+	assert_str(UiKit.break_at_dot("A · B", font, 14, 1000.0)).is_equal("A · B")        # fits
+
 # ---------------------------------------------------------------- Energy card / panel
 
 func _facts(home := true) -> Dictionary:
