@@ -23,7 +23,7 @@ func _view() -> Dictionary:
 			"stall": {"slots": [
 				{"id": "req_pond_catch", "title": "Pond Catch", "kind": "fish", "items": ["fish_crucian"], "rarity": null,
 					"icon": "fish_crucian", "qty": 2, "have": 1, "ready": false, "coins": 14, "status": "accepted"},
-				{"empty": true, "refill_in": 259200000}]}},
+				{"empty": true, "held": true}]}},   # a new account's slot 2, held 72 h: no countdown (q(99))
 	}
 
 func after_test() -> void:
@@ -51,7 +51,11 @@ func test_page_facts_count_the_day_and_the_next_request() -> void:
 	assert_array(P0Board.facts(_view(), "market")).is_equal([["Requests today", "4/6"]])
 	var v := _view()
 	v.quotas.request_bonus.used = 20
-	assert_array(P0Board.facts(v, "stall")).is_equal([["Requests today", "4/6"], ["Next request", "72h"], ["Bonus today", "20/100"]])
+	# q(99): the held slot is not the next request — before the tutorial is handed in there is no "Next request" line …
+	assert_array(P0Board.facts(v, "stall")).is_equal([["Requests today", "4/6"], ["Bonus today", "20/100"]])
+	# … after it, its slot refills in 4 h and that is the line (whole hours, q(97)); the held slot still doesn't count.
+	v.boards.stall.slots[0] = {"empty": true, "refill_in": 4 * 3600000}
+	assert_array(P0Board.facts(v, "stall")).is_equal([["Requests today", "4/6"], ["Next request", "4h"], ["Bonus today", "20/100"]])
 	assert_str(P0Board.hours(14280000)).is_equal("3h 58m")
 
 func test_a_delivered_slot_shows_its_row_done() -> void:
@@ -65,7 +69,10 @@ func test_the_request_sheet_knows_where_and_what_comes_next() -> void:
 	var d := P0Board.detail(_view(), "stall", "req_pond_catch")
 	assert_array([d.title, d.state, d.effect, d.delivery, d.tracked, d.go]).is_equal(["Pond Catch", "Tracked",
 		"Bring the required fish to the Homestead Stall.", "14 coins", true, "pond:" + P0Guide.BEGINNER_POND])
-	assert_dict(d.next).is_equal({"slot": "Second board slot", "within": "72h"})
+	assert_dict(d.next).is_empty()   # slot 2 is held (q(99)): no "next" countdown for it
+	var refilling := _view()
+	refilling.boards.stall.slots[1] = {"empty": true, "refill_in": 8 * 3600000}   # e.g. after a drop
+	assert_dict(P0Board.detail(refilling, "stall", "req_pond_catch").next).is_equal({"slot": "Second board slot", "within": "8h"})
 	var basket := P0Board.detail(_view(), "market", "m2")
 	assert_bool(basket.tracked).is_false()   # open: no Drop request
 	assert_str(basket.effect).is_equal("Bring the required crops to any Shanghai market.")   # 李白 q(68)
@@ -149,11 +156,12 @@ func test_a_delivery_at_the_unattended_stall_turns_its_row_done() -> void:
 ## 蒙恬 rc0: the runtime sets the view every frame; the board's buttons must survive an unchanged view, or a tap
 ## pressed on one is released on its replacement and lost. A countdown fact still ticks in place.
 func test_an_unchanged_view_keeps_the_rows_and_ticks_the_facts() -> void:
-	var ui := _ui()
+	var v := _view()
+	v.boards.stall.slots[1] = {"empty": true, "refill_in": 8 * 3600000}   # slot 2 refilling (after a drop): a countdown to tick
+	var ui := _ui(v)
 	await await_idle_frame()
 	ui.open_counter("homestead", {"section": "board"})
 	var before: UiCommandButton = (_rows(ui)[0] as UiBoardCard).command_button()
-	var v := _view()
 	ui.set_view(v)
 	ui.set_view(v)
 	assert_object((_rows(ui)[0] as UiBoardCard).command_button()).is_same(before)
