@@ -26,6 +26,11 @@ var ui: P0Ui
 var world: Node
 var _shot_t := 0.0
 var _shot_script: Array = []
+var _shot_drag := false   # a drag step's press is down (SGODOT-265 videos)
+var _shot_at := Vector2.ZERO
+var _shot_left := -1
+var _shot_finger: Control   # a grey dot where the drag step's touch is, so videos show the finger
+var _shot_ms := 0.0   # movie time: --write-movie frames run slower or faster than the wall clock
 ## XP / reward lines of the last state change, for worlds that show results themselves (the fishing panel).
 var last_xp_lines: Array = []
 ## First-catch bonus of the last state change (FISH-3 gold chip); 0 when the species was caught before.
@@ -952,16 +957,82 @@ func measure_actor() -> Dictionary:
 	return {"frac": snappedf(frac, 0.0001), "px800": snappedf(frac * 800.0, 0.1), "pitch": snappedf(rad_to_deg(asin(-fwd.y)), 0.1),
 		"size": snappedf(c.size, 0.01), "view": [view.x, view.y], "world": str(world.name)}
 
+## One frame of a drag step, as a real touch: Godot emulates it from the mouse, so lists scroll natively and the
+## drawer sees the same ScreenTouch / ScreenDrag a phone sends. True once lifted.
+func _shot_drag_step(step: PackedStringArray) -> bool:
+	var at := Vector2(float(step[1]), float(step[2]))
+	var to := at + Vector2(float(step[3]), float(step[4]))
+	var ms := float(step[5]) if step.size() > 5 else 300.0
+	var hold := float(step[6]) if step.size() > 6 else 0.0
+	var t := (_shot_t - 2.0) * 1000.0
+	if not _shot_drag:
+		Input.emulate_touch_from_mouse = true
+		# Flings and long presses are timed on movie frames, as a phone would see them at 30 fps.
+		for c in ui.find_children("*", "Control", true, false):
+			if c is UiDrawer or c is UiItemCell: c.set(&"clock", func() -> int: return int(_shot_ms))
+		_shot_drag = true
+		_shot_mouse(at, true)
+		return false
+	var k := clampf((t - hold) / maxf(ms, 1.0), 0.0, 1.0)
+	_shot_mouse(at.lerp(to, k), null)
+	if t < hold + ms: return false
+	_shot_mouse(to, false)
+	_shot_drag = false
+	return true
+
+func _shot_mouse(at: Vector2, press: Variant) -> void:
+	var e: InputEventMouse
+	if press == null:
+		var m := InputEventMouseMotion.new()
+		m.button_mask = MOUSE_BUTTON_MASK_LEFT
+		m.relative = at - _shot_at
+		e = m
+	else:
+		var b := InputEventMouseButton.new()
+		b.button_index = MOUSE_BUTTON_LEFT
+		b.pressed = press
+		b.button_mask = MOUSE_BUTTON_MASK_LEFT if press else 0
+		e = b
+	e.position = at
+	e.global_position = at
+	Input.parse_input_event(e)   # never warp_mouse: that moves the user's own cursor
+	_shot_at = at
+	if _shot_finger == null:
+		var layer := CanvasLayer.new()
+		layer.layer = 128
+		add_child(layer)
+		_shot_finger = Panel.new()
+		_shot_finger.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_shot_finger.size = Vector2(36, 36)
+		var dot := StyleBoxFlat.new()
+		dot.bg_color = Color(0.1, 0.1, 0.1, 0.35)
+		dot.set_corner_radius_all(18)
+		dot.set_border_width_all(2)
+		dot.border_color = Color(1, 1, 1, 0.8)
+		_shot_finger.add_theme_stylebox_override(&"panel", dot)
+		layer.add_child(_shot_finger)
+	_shot_finger.position = at - _shot_finger.size * 0.5
+	_shot_finger.visible = press == null or bool(press)
+
 func _dev_shot(dt: float) -> void:
 	var path := OS.get_environment("P0_SHOT")
 	if path == "": return
 	if _shot_t == 0.0: _shot_script = OS.get_environment("P0_SHOT_STEPS").split(",", false)
 	_shot_t += dt
+	_shot_ms += dt * 1000.0
+	# P0_SHOT_FRAMES=<dir>: every frame of the whole viewport, for videos (run with --fixed-fps 30). --write-movie on a
+	# Mac writes only the window's middle 640 px of an 800 px viewport.
+	var frames := OS.get_environment("P0_SHOT_FRAMES")
+	if frames != "":
+		get_viewport().get_texture().get_image().save_png("%s/f%05d.png" % [frames, Engine.get_frames_drawn()])
 	var limit := OS.get_environment("P0_SHOT_LIMIT_MS")
 	if Time.get_ticks_msec() > int(limit if limit != "" else "30000"): get_tree().quit(2)
 	if world == null and _shot_t < 6.0: return
 	if not _shot_script.is_empty() and _shot_t > 2.0:
 		var step := str(_shot_script[0]).split(":")
+		if _shot_script.size() != _shot_left:   # once per step: the frame a video of it starts at
+			_shot_left = _shot_script.size()
+			print("P0_SHOT step %s frame %d" % [_shot_script[0], Engine.get_frames_drawn()])
 		match step[0]:
 			"walk":
 				_call("p0_joystick", [Vector2(float(step[1]), float(step[2]))])
@@ -1153,6 +1224,8 @@ func _dev_shot(dt: float) -> void:
 					var kv := pair.split("=")
 					cmd[kv[0]] = int(kv[1]) if kv[1].is_valid_int() else kv[1]
 				session.send(cmd)
+			"drag":   # drag:x:y:dx:dy[:ms[:hold ms]] — a touch at (x, y), held, moved by (dx, dy) over ms, lifted (SGODOT-265)
+				if not _shot_drag_step(step): return
 			"wait":
 				if _shot_t < 2.0 + float(step[1]): return
 			"until":
