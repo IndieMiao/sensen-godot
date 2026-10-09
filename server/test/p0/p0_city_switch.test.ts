@@ -7,6 +7,16 @@ import { freshState, upgradeState } from '../../src/p0/state.js';
 
 const base = loadP0Content();
 const withZone = (tz?: string): P0Content => ({ ...base, profile: { ...base.profile, timezone: tz } });
+/** A Shanghai home set spelled out, so these cases hold whatever city the shipped content is in. */
+const shanghai: P0Content = {
+  ...base,
+  profile: { ...base.profile, city: 'Shanghai', timezone: 'Asia/Shanghai' },
+  day: { ...base.day, utc_offset_hours: 8 },
+  fishing: { ...base.fishing, places: {
+    pond_shanghai_05: { name: 'Reed Pond', site: 'pond', city: 'shanghai', beginner: true },
+    pond_shanghai_04: { name: 'Pebble Pond', site: 'river', city: 'shanghai' },
+  } },
+};
 const sf = withZone('America/Los_Angeles');
 const H = 3_600_000;
 
@@ -27,7 +37,7 @@ describe('the 04:00 rollover in the home time zone (SGODOT-270)', () => {
   });
 
   it('without a time zone the fixed offset still applies (Shanghai, UTC+8)', () => {
-    const sh = withZone(undefined);
+    const sh: P0Content = { ...shanghai, profile: { ...shanghai.profile, timezone: undefined } };
     expect(dayKey(sh, Date.UTC(2026, 9, 8, 19, 59))).toBe('2026-10-08');   // 03:59 CST
     expect(dayKey(sh, Date.UTC(2026, 9, 8, 20, 0))).toBe('2026-10-09');    // 04:00 CST
     expect(rolloverAfter(sh, '2026-10-09')).toBe(Date.UTC(2026, 9, 9, 20));
@@ -46,10 +56,10 @@ describe('the 04:00 rollover in the home time zone (SGODOT-270)', () => {
 describe('a save lets go of a pond that is no longer on the map (SGODOT-270)', () => {
   const T = Date.UTC(2026, 9, 9, 14);
   const gone = 'pond_shanghai_05';
-  const moved: P0Content = { ...base, fishing: { ...base.fishing, places: Object.fromEntries(Object.entries(base.fishing.places).filter(([id]) => id !== gone)) } };
+  const moved: P0Content = { ...shanghai, fishing: { ...shanghai.fishing, places: { pond_shanghai_04: shanghai.fishing.places.pond_shanghai_04 } } };
 
   it('forgets the place and brings an unfinished cast in with its Energy back', () => {
-    const s = freshState(base, 'switch-01', T);
+    const s = freshState(shanghai, 'switch-01', T);
     s.energy.value = 150;
     s.presence = { ...s.presence, space: 'pond', place: gone };
     s.cast = { fish: 'fish_crucian', site: 'pond', place: gone, at: T, bite_ms: 4000, bait: null, xp_pct: 100, breaks: null, pin: 'pin_first_cast' };
@@ -57,17 +67,17 @@ describe('a save lets go of a pond that is no longer on the map (SGODOT-270)', (
     const u = upgradeState(moved, structuredClone(s), T);
     expect(u.presence.place).toBeNull();
     expect(u.cast).toBeNull();
-    expect(u.energy.value).toBe(150 + base.fishing.cast_energy);
+    expect(u.energy.value).toBe(150 + shanghai.fishing.cast_energy);
     expect(u.firsts).not.toContain('pin_first_cast');
   });
 
   it('a refund never lifts Energy past the bonus ceiling, and ponds still on the map are kept', () => {
-    const s = freshState(base, 'switch-02', T);
-    const cap = base.energy.max_base + base.energy.bonus_zone;
+    const s = freshState(shanghai, 'switch-02', T);
+    const cap = shanghai.energy.max_base + shanghai.energy.bonus_zone;
     s.energy.value = cap - 1;
     s.cast = { fish: 'fish_crucian', site: 'pond', place: gone, at: T, bite_ms: 4000, bait: null, xp_pct: 100, breaks: null };
     expect(upgradeState(moved, structuredClone(s), T).energy.value).toBe(cap);
-    const kept = Object.keys(moved.fishing.places)[0];
+    const kept = 'pond_shanghai_04';
     s.presence = { ...s.presence, space: 'pond', place: kept };
     s.cast = { ...s.cast, place: kept };
     const u = upgradeState(moved, structuredClone(s), T);
@@ -76,13 +86,13 @@ describe('a save lets go of a pond that is no longer on the map (SGODOT-270)', (
   });
 
   it('a pond still listed but in another city than home is let go too (as notePlace judges, 后裔 on #194)', () => {
-    const s = freshState(base, 'switch-03', T);
+    const s = freshState(shanghai, 'switch-03', T);
     s.presence = { ...s.presence, space: 'pond', place: gone };
     s.cast = { fish: 'fish_crucian', site: 'pond', place: gone, at: T, bite_ms: 4000, bait: null, xp_pct: 100, breaks: null };
-    const elsewhere: P0Content = { ...base, profile: { ...base.profile, city: 'San Francisco' } };   // Shanghai's ponds still listed
+    const elsewhere: P0Content = { ...shanghai, profile: { ...shanghai.profile, city: 'San Francisco' } };   // Shanghai's ponds still listed
     const u = upgradeState(elsewhere, structuredClone(s), T);
     expect(u.presence.place).toBeNull();
     expect(u.cast).toBeNull();
-    expect(upgradeState(base, structuredClone(s), T).presence.place).toBe(gone);   // at home in Shanghai it stays
+    expect(upgradeState(shanghai, structuredClone(s), T).presence.place).toBe(gone);   // at home in Shanghai it stays
   });
 });
