@@ -52,6 +52,7 @@ var _card := ""   # LOCK-07 v2: the one facility whose name strip is open this f
 var _strip_side := UiWorldNameBar.Dir.RIGHT   # the side the strip opens to: the way the character faces on screen
 var _focus := Vector3.ZERO
 var _cam_follow := P0Follow.new()
+var _opening := false   # the opening shot waits for the HUD's area to keep the farmhouse mark clear of it (_fit_opening)
 var _zoom := 1.0
 const ElasticZoom = preload("res://modules/p0/p0_elastic_zoom.gd")
 var _pinch = ElasticZoom.new(0.8, 1.4)   # rubber band past 0.8 / 1.4
@@ -138,6 +139,7 @@ func resume() -> void:
 		_inside = false
 		actor.teleport(_door)
 		actor.face(_door + Vector3(0, 0, 1))
+		_opening = false
 		_focus = _door
 		_cam_follow.hold()
 		_place_camera()
@@ -221,6 +223,7 @@ func _build_world() -> void:
 	# Opening shot like the polished farm: cottage on top, beds below, the player at the front edge.
 	_focus = actor.position.lerp(_house, 0.42)
 	_cam_follow.hold()   # the opening shot stays until the player first moves
+	_opening = true
 	_place_camera()
 
 ## A soft mint rounded-square outline on top of the bed in front of the player.
@@ -275,7 +278,44 @@ func _place_camera() -> void:
 		cam.look_at(c, Vector3.UP)
 	FarmCamera.fit_ground_depth(cam)
 
+## The opening shot keeps the farmhouse's mark clear of the HUD (李元芳 int12-pre on 256): framed from the walk-in point
+## alone, a phone's status-bar inset brought the HUD down over the roof, and the mark — hidden there, as every mark
+## outside P0Ui.marker_area — only showed after a few steps. Once the HUD is up with no panel over it, the picture moves
+## down just enough for the mark to sit MARK_ROOM inside the area, never bringing the player's feet within FEET_ROOM of
+## the quick bar. Once: a later panel, step, pinch or Show leaves the framing alone.
+const HOME_MARK := Vector3(0, 2.6, 0.4)   # the farmhouse prompt's anchor (world_prompt "home")
+const MARK_ROOM := 24.0   # half the near icon disc (28 × 1.1) and the 8 px edge gap prompts keep
+const FEET_ROOM := 16.0
+func _fit_opening() -> void:
+	if not _opening: return
+	if not _cam_follow.held:   # walking already: the safe box has the camera
+		_opening = false
+		return
+	if rt == null or not rt.ui.is_node_ready() or rt.ui.has_modal() or not rt.ui.hud.visible: return
+	_opening = false
+	_place_camera()
+	_focus = opening_focus(cam, _focus, _house + HOME_MARK, actor.position, rt.ui.marker_area())
+	_place_camera()
+
+## `focus` moved along the ground, away from the camera, by as much as the mark needs to sit MARK_ROOM below the area's
+## top — at most what keeps `feet` FEET_ROOM above its bottom (opening_shift). `cam` is placed at `focus` already.
+static func opening_focus(cam: Camera3D, focus: Vector3, mark: Vector3, feet: Vector3, area: Rect2) -> Vector3:
+	var dy := opening_shift(cam.unproject_position(mark).y, cam.unproject_position(feet).y, area)
+	if dy <= 0.0: return focus
+	var px := cam.get_viewport().get_visible_rect().size.x / cam.size   # px per metre (KEEP_WIDTH)
+	var ahead := -cam.global_basis.z
+	ahead.y = 0.0
+	return focus + ahead.normalized() * dy / (px * sin(deg_to_rad(FarmCamera.PITCH_DEG)))
+
+## How far (px) the opening picture moves down: the mark's shortfall below `area`'s top + MARK_ROOM, capped by the room
+## the feet have above its bottom − FEET_ROOM; 0 when the mark is clear already.
+static func opening_shift(mark_y: float, feet_y: float, area: Rect2) -> float:
+	var need := area.position.y + MARK_ROOM - mark_y
+	var room := area.end.y - FEET_ROOM - feet_y
+	return clampf(need, 0.0, maxf(0.0, room))
+
 func _follow(dt: float) -> void:
+	_fit_opening()
 	_focus = _cam_follow.step(cam, _focus, actor.position, actor.mover.is_moving(), dt)
 	if _pinch.step(dt): _set_zoom(_pinch.value)   # springing back from past a limit, about the same point
 	else: _place_camera()
@@ -292,12 +332,14 @@ func _set_zoom(value: float) -> void:
 		_place_camera()
 
 func p0_zoom(f: float, at := Vector2.INF) -> void:
+	_opening = false
 	_zoom_at = at
 	_pinch.pinch(f)
 	_cam_follow.hold()   # the pinched framing stays until the player walks (the safe box takes over then)
 	_set_zoom(_pinch.value)
 func p0_zoom_end() -> void: _pinch.release()
 func p0_recenter() -> void:
+	_opening = false
 	_focus = actor.position
 	_cam_follow.held = false
 
@@ -306,6 +348,7 @@ func p0_show_spot(where: String) -> void:
 	if where == "stall": at = _stall
 	elif where == "plots": at = _plots_center()
 	elif _materials.spot_at(where) != null: at = _materials.spot_at(where)   # SGODOT-231: spot_*, mine, workbench
+	_opening = false
 	_focus = at
 	_cam_follow.hold()
 	var ring := MeshInstance3D.new()
@@ -499,7 +542,7 @@ func _sign_hit(screen: Vector2) -> bool:
 func _prompts(v: Dictionary) -> void:
 	_strip_side = _facing_side()
 	world_prompt("stall", P0WorldPrompts.stall(v, rt.ui.stall_has_new()), _stall, Vector3(0, 1.05, 0), Vector3(0, 0.4, 0))
-	world_prompt("home", P0WorldPrompts.farmhouse(v), _house, Vector3(0, 2.6, 0.4), Vector3(0, 1.0, 0.6))
+	world_prompt("home", P0WorldPrompts.farmhouse(v), _house, HOME_MARK, Vector3(0, 1.0, 0.6))
 	world_prompt("sign", P0WorldPrompts.sign(v), _sign, SIGN_BADGE, Vector3(0, 0.45, 0))
 	_plaque_node.visible = not v.get("homestead", {}).get("plaque", []).is_empty()
 	world_prompt("plaque", P0WorldPrompts.plaque(v), _plaque, Vector3(0, 0.85, 0), Vector3(0, 0.35, 0), _plaque_node.visible)
@@ -578,6 +621,7 @@ func p0_anchor() -> Vector2:
 
 # ---------------------------------------------------------------- dev steps for P0_SHOT
 func p0_dev(step: PackedStringArray) -> bool:
+	if step[0] in ["goto", "gocell", "near"]: _opening = false   # a teleport frames itself
 	match step[0]:
 		"yaw": _dev_yaw = float(step[1])
 		"goto":
