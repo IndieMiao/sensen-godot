@@ -2674,18 +2674,20 @@ func open_gate_card(gate: Dictionary, back := Callable()) -> UiInfoSheet:
 	sheet.offset_bottom = -bottom_pad()
 	sheet.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	sheet.action_requested.connect(func(action: StringName, _id: String, payload: Dictionary):
-		if action == &"guide": _gate_guide(str(payload.get("go", ""))))
+		if action == &"guide": _gate_guide(str(payload.get("go", "")), func(): open_gate_card(gate, back)))
 	_open_modal(sheet, 0.32, true)   # the card sits where the quick bar was; bar and keys hide under it
 	modal_kind = "gate"
 	sheet.open("gate", &"gate")
 	_modal_back = back
 	return sheet
 
-func _gate_guide(go: String) -> void:
+## `again` reopens the gate card: Skills goes back to it (and on through its own way back, e.g. the Fish-dex and the
+## profile behind both, 256 ⑧; 亚瑟 on #136: Back from these Skills went straight to the world).
+func _gate_guide(go: String, again := Callable()) -> void:
 	match go:
 		"skills":
 			_drop_modal()   # on to another panel: a queued card must not come up over it (亚瑟 on #77)
-			open_skills()
+			open_skills(again)
 		"plots", "stall", "stove", "board", "home", "bench":
 			close_modal()
 			if show_label(go, space_here(), spot_reachable()) == "Show": show_spot.emit(go)
@@ -2755,6 +2757,7 @@ func open_fish_card(id: String, back := Callable()) -> UiInfoSheet:
 
 ## A panel this UI does not own, opened by the host that listens on panel_requested.
 func request_panel(panel: String) -> void:
+	_over_profile = false   # the host's panel is not over the profile
 	_drop_modal()   # the host's panel comes next; a queued card waits for it to close, not over it
 	panel_requested.emit(panel)
 
