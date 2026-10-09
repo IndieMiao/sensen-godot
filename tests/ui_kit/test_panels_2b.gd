@@ -277,6 +277,83 @@ func test_kept_rows_keep_their_drags() -> void:
 	await get_tree().create_timer(0.25).timeout
 	assert_int(closes[0]).is_zero()
 
+## 亚瑟 on #196: a fast 60 px drag that rests 500 ms before the lift springs back (60 < a quarter of 546; the finger has
+## no speed left), where the speed of the drag 100 ms earlier closed it.
+func test_a_fast_drag_that_rests_before_the_lift_springs_back() -> void:
+	if DisplayServer.is_touchscreen_available(): return
+	var d := _drawer()
+	await _settle()
+	var now := _fake_clock(d)
+	var closes := _count(d.close_requested)
+	var at := _band(d)
+	await _swipe(at, Vector2(0, 60), 4, now, 10, false)
+	now[0] += 500   # the finger rests
+	await get_tree().process_frame
+	_mouse(at + Vector2(0, 60), false)   # where the finger is, not _band(d): the drawer has moved down with it
+	await get_tree().create_timer(0.35).timeout
+	assert_int(closes[0]).is_zero()
+	assert_float(d.offset_bottom).is_equal_approx(0.0, 0.5)
+
+## A filter strip in a drawer, flung sideways, coasts after the lift as one outside a drawer does, and a move with no
+## button down does not drag it afterwards (亚瑟 on #196: the eaten release left it dragging, with no inertia).
+func test_a_strip_flung_in_a_drawer_coasts_and_ends_its_drag() -> void:
+	var emulate := Input.emulate_touch_from_mouse
+	Input.emulate_touch_from_mouse = true
+	var d := _drawer()
+	var spacer := Control.new()
+	spacer.custom_minimum_size.y = 60   # below the handle band
+	d.body.add_child(spacer)
+	var strip := TouchScrollContainer.new()
+	strip.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	strip.custom_minimum_size = Vector2(336, 40)
+	var row := HBoxContainer.new()
+	for i in 12:
+		var b := Button.new()
+		b.text = "Filter %d" % i
+		b.custom_minimum_size = Vector2(90, 36)
+		row.add_child(b)
+	strip.add_child(row)
+	d.body.add_child(strip)
+	for i in 3: await get_tree().process_frame
+	var at := strip.get_global_rect().get_center()
+	_touch_and_mouse(at, true)
+	await get_tree().physics_frame
+	for i in 8:
+		_drag_and_motion(at + Vector2(-20 * (i + 1), 0), Vector2(-20, 0))
+		await get_tree().physics_frame
+	var lifted := strip.scroll_horizontal
+	_touch_and_mouse(at + Vector2(-160, 0), false)
+	for i in 20: await get_tree().physics_frame
+	var coasted := strip.scroll_horizontal - lifted
+	var before := strip.scroll_horizontal
+	for i in 4:
+		var m := InputEventMouseMotion.new()
+		m.position = at + Vector2(-160 + 15 * (i + 1), 0)
+		m.global_position = m.position
+		m.relative = Vector2(15, 0)
+		get_viewport().push_input(m, true)
+		await get_tree().physics_frame
+	Input.emulate_touch_from_mouse = emulate
+	assert_int(lifted).is_greater(0)
+	assert_int(coasted).is_greater(0)
+	assert_int(strip.scroll_horizontal - before).is_zero()
+
+## A title button the drag began on is not left drawn pressed once the drawer springs back (亚瑟 on #196).
+func test_a_band_button_is_not_left_pressed_after_a_drag_springs_back() -> void:
+	if DisplayServer.is_touchscreen_available(): return
+	var d := _drawer()
+	var b := Button.new()
+	b.custom_minimum_size = Vector2(120, 30)
+	d.body.add_child(b)
+	await _settle()
+	var now := _fake_clock(d)
+	var fired := _count(b.pressed)
+	var at := b.get_global_rect().get_center()
+	await _swipe(at, Vector2(0, 60), 4, now, 60)
+	await get_tree().create_timer(0.35).timeout
+	assert_int(b.get_draw_mode()).is_not_equal(BaseButton.DRAW_PRESSED)
+	assert_int(fired[0]).is_zero()
+
 # ---------------------------------------------------------------- UiInventoryGrid
 
 func _items(n: int) -> Array:

@@ -77,7 +77,7 @@ var _samples: Array = []       # [ms, finger y] over the last _SPEED_MS
 var _settle_tween: Tween
 var _band_down := false        # the handle band is pressed: the handle shows it
 var _sent := false
-var _swallow := false   # after a drag moved the drawer: eat the gesture's release so the button under it stays quiet
+var _cancelled := false   # this gesture's taps are cancelled (SCROLL_BEGIN sent to the content)
 
 func _init(height_: float = 0.0) -> void:
 	clip_contents = true
@@ -181,7 +181,7 @@ func _begin(at: Vector2, sc: ScrollContainer) -> void:
 	_pressing = true
 	_dragging = false
 	_sent = false
-	_swallow = false
+	_cancelled = false
 	_samples = []
 	_pull_scroll = null
 	_from_scroll = sc != null
@@ -198,15 +198,17 @@ func _begin(at: Vector2, sc: ScrollContainer) -> void:
 ## before the button or scroll it started on does.
 func _input(e: InputEvent) -> void:
 	var down := _is_press(e)
-	if _swallow:
-		# Both the touch and its emulated mouse twin: a new press ends the gesture, any release of it is eaten.
-		var touch: bool = e is InputEventScreenTouch or (e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT)
-		if touch and e.pressed: _swallow = false
-		elif touch: get_viewport().set_input_as_handled()
 	if _pressing and down != 1:
 		var parent := get_parent() as CanvasItem
 		_track(parent.make_input_local(e) if parent != null else make_input_local(e), down)
-	if not _pressing and not _swallow: set_process_input(false)
+	if not _pressing: set_process_input(false)
+
+## Not a tap: the buttons under the finger drop this press, as a ScrollContainer's drag makes them do; the release
+## still reaches them and any scroll, so their states end cleanly.
+func _cancel_taps() -> void:
+	if _cancelled: return
+	_cancelled = true
+	body.propagate_notification(NOTIFICATION_SCROLL_BEGIN)
 
 func _track(e: InputEvent, down: int) -> void:
 	if not _pressing: return
@@ -220,7 +222,7 @@ func _track(e: InputEvent, down: int) -> void:
 		# A drag on plain content closes nothing now; its release does not fire the button it began on either (a
 		# scroll's content keeps its own: its drags cancel clicks, and a lifted bag cell must get its drop).
 		if _grab == _Grab.OFF:
-			if _pull_scroll == null and not _from_scroll: _swallow = true
+			if _pull_scroll == null and not _from_scroll: _cancel_taps()
 			return
 		var mostly_down := d.y > 0.0 and absf(d.x) <= d.y * _VERTICAL
 		# In a scroll: still at its top, and before a long press lifts the cell under the finger (LOCK-12 v1.11).
@@ -229,11 +231,11 @@ func _track(e: InputEvent, down: int) -> void:
 		if not (mostly_down and scroll_ok):
 			_grab = _Grab.OFF   # a scroll, a sideways strip, a lifted cell: this gesture is theirs
 			_set_band_down(false)
-			if not _from_scroll: _swallow = true   # a sideways drag in the band: its release taps nothing
+			if not _from_scroll: _cancel_taps()   # a sideways drag in the band: its release taps nothing
 			return
 		_dragging = true
 		_drag_from = 0.0   # 1:1 from the press: the drawer keeps the point under the finger
-		_swallow = true   # the button it started on never fires
+		_cancel_taps()   # the button it started on never fires
 		if _slide != null and _slide.is_running():
 			_slide.kill()
 			_place()
@@ -250,15 +252,18 @@ func _release() -> void:
 	_set_band_down(false)
 	if not _dragging: return
 	_dragging = false
+	if not _samples.is_empty(): _samples.append([int(clock.call()), _samples[-1][1]])   # a finger that rested before lifting has no speed left
 	var h := _shown_height()
 	if _drop > maxf(h * _CLOSE_SHARE, _CLOSE_MIN) or (_drop > _FLING_MIN and _speed() >= _FLING_SPEED): _close_down()
 	else: _settle_to(0.0, _BACK_SECS, Tween.EASE_OUT, Callable())
 
 ## Finger speed down at the release, px/s, over the last _SPEED_MS of motion.
 func _speed() -> float:
-	if _samples.size() < 2: return 0.0
-	var first: Array = _samples[0]
-	var last: Array = _samples[-1]
+	var now := int(clock.call())
+	var recent := _samples.filter(func(s): return now - int(s[0]) <= _SPEED_MS)
+	if recent.size() < 2: return 0.0
+	var first: Array = recent[0]
+	var last: Array = recent[-1]
 	var dt := float(int(last[0]) - int(first[0]))
 	return 0.0 if dt <= 0.0 else (float(last[1]) - float(first[1])) * 1000.0 / dt
 
