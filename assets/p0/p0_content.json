@@ -1800,11 +1800,18 @@
     }
   },
   "specialty": {
+    "postcard_san_francisco": {
+      "name": "San Francisco Postcard",
+      "price": 100,
+      "shop": "market",
+      "to": "storage"
+    },
     "postcard_shanghai": {
       "name": "Shanghai Postcard",
       "price": 100,
       "shop": "market",
-      "to": "storage"
+      "to": "storage",
+      "_kept": "No longer sold (SGODOT-270, q(106): P0 moved to San Francisco); kept so a save that bought one still names it."
     }
   },
   "shops": {
@@ -1856,7 +1863,7 @@
       "tool_row_hoe"
     ],
     "specialty": [
-      "postcard_shanghai"
+      "postcard_san_francisco"
     ]
   },
   "quotas": {
@@ -1931,7 +1938,7 @@
       "gift_meal": "dish_carrot_cake",
       "one_per_day": true,
       "lines": {
-        "Stranger": "Hi! I'm Pip. I carry letters all over Shanghai.",
+        "Stranger": "Hi! I'm Pip. I carry letters all over San Francisco.",
         "Acquainted": "You again! Got anything sweet?",
         "Familiar": "I saved you something. Don't tell the others.",
         "mystery": "Um… thanks? I'll save it for later."
