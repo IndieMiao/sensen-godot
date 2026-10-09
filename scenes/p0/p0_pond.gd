@@ -27,8 +27,15 @@ var _focus := Vector3(6, 0, -6)
 var _cam_follow := P0Follow.new()
 var _zoom := 1.0
 const ElasticZoom = preload("res://modules/p0/p0_elastic_zoom.gd")
-var _pinch = ElasticZoom.new(0.5, 1.4)   # rubber band past 0.5 / 1.4
+var _pinch = ElasticZoom.new(0.8, 1.4)   # the farm's range, rubber band past 0.8 / 1.4
 var _zoom_at := Vector2.INF            # the last pinch centre (screen)
+var _band := Rect2()                   # the last camera band seen with no panel up
+var _opening := true                   # the opening shot: framed low in the band until the first step or pinch
+## The farm's pitch (camera unification, 奕星 2026-10-09); the pond keeps its own yaw 0, looking straight up the pond.
+const PITCH_DEG := FarmCamera.PITCH_DEG
+const DISTANCE := 40.0
+## The opening shot puts the player's feet this far above the band's bottom edge (不知火舞 on 231).
+const OPENING_LIFT := 40.0
 var _plan: Dictionary = {}
 # Camera blend from the fishing close-up back to the pond framing when the panel closes.
 var _blend_from := Transform3D.IDENTITY
@@ -93,7 +100,7 @@ func _ready() -> void:
 	actor = P0Actor.new()
 	add_child(actor)
 	actor.setup(bp, grid, cam)
-	_focus = _rest_focus()
+	_focus = actor.position   # the opening shot frames once the HUD has laid out the band
 	panel = P0FishingPanel.new()
 	add_child(panel)
 	panel.opened.connect(_begin_fishing)
@@ -234,19 +241,62 @@ func _settle(ev: Dictionary, delay: float, first_xp: int) -> void:
 # ---------------------------------------------------------------- camera (old pond framing + safe box)
 func _follow(_dt: float) -> void:
 	_focus = _cam_follow.step(cam, _focus, actor.position, actor.mover.is_moving(), _dt)
+	if not _cam_follow.held: _opening = false   # walking: the safe box follows from where the opening left it
 	if _pinch.step(_dt): _set_zoom(_pinch.value)   # springing back from past a limit, about the same point
 	else: _update_camera()
 
-## The opening shot leans toward the nearest water so the pond is in the frame (held until the first step).
-func _rest_focus() -> Vector3:
-	var shore := FishingModel.nearest_water(str(entry.id), actor.position, site_spec)
-	var lean := Vector3(shore.x - actor.position.x, 0, shore.z - actor.position.z).limit_length(2.6) * 0.5
-	return actor.position + lean
-
+## Camera unification (用户 via 奕星, 2026-10-09, as the mine in #129): the farm's size and pitch, and the screen kept on
+## the decorated meadow (不知火舞 on 231) — flush with its sides, and the band between the HUD's second row and the
+## quick bar / key on it; along an axis the meadow can't fill the band holds the middle.
 func _update_camera() -> void:
-	cam.size = 7.5 / _zoom
-	cam.position = _focus + Vector3(0, 1, 1).normalized() * 40
-	cam.look_at(_focus, Vector3.UP)
+	var view := get_viewport().get_visible_rect().size
+	cam.size = view_size(view, _zoom)
+	var band := _camera_band(rt.ui if rt != null else null)
+	if band.has_area():
+		if _opening: _focus = opening_focus(actor.position, cam.size, view, band)
+		_focus = clamp_focus(_focus, cam.size, view, band, PondScenery.MEADOW)
+	place(cam, _focus)
+
+static func view_size(view: Vector2, zoom: float) -> float:
+	return FarmCamera.player_scale_size(view, PITCH_DEG) / zoom
+
+## The opening shot (不知火舞 on 231, 2026-10-09): the player centred across, feet OPENING_LIFT above the band's bottom
+## edge (the main key / quick bar), so from a bank the water beyond fills the band instead of the grass behind them.
+## Inside P0Follow's safe box, so the first steps move the player, not the camera.
+static func opening_focus(player: Vector3, size: float, view: Vector2, band: Rect2) -> Vector3:
+	var px := view.x / size
+	var nearer := (band.end.y - OPENING_LIFT - view.y * 0.5) / px / sin(deg_to_rad(PITCH_DEG))   # ground metres below the centre row
+	return Vector3(player.x, player.y, player.z - nearer)
+
+static func place(camera: Camera3D, focus: Vector3) -> void:
+	var pitch := deg_to_rad(PITCH_DEG)
+	camera.position = focus + Vector3(0, sin(pitch), cos(pitch)) * DISTANCE
+	camera.look_at(focus, Vector3.UP)
+
+## The focus that keeps `band` (screen) inside `art` (x, z on the ground). Yaw 0 and orthographic, so a screen column
+## is one world x and a screen row one ground z: the sides stop flush with art's x edges, the band's top row on its
+## far edge and its bottom row on its near edge.
+static func clamp_focus(focus: Vector3, size: float, view: Vector2, band: Rect2, art: Rect2) -> Vector3:
+	var half := size * 0.5
+	var px := view.x / size   # px per metre (KEEP_WIDTH)
+	var pitch := deg_to_rad(PITCH_DEG)
+	var lift := focus.y / tan(pitch)   # the focus sits on a raised bank: the centre row meets the ground beyond it
+	var ahead := (view.y * 0.5 - band.position.y) / px / sin(pitch)   # ground metres from the centre row to the band's top …
+	var behind := (view.y * 0.5 - band.end.y) / px / sin(pitch)       # … and to its bottom (negative: nearer)
+	var x := clamp_or_centre(focus.x, art.position.x + half, art.end.x - half)
+	var z := clamp_or_centre(focus.z, art.position.y + lift + ahead, art.end.y + lift + behind)
+	return Vector3(x, focus.y, z)
+
+static func clamp_or_centre(v: float, lo: float, hi: float) -> float:
+	return (lo + hi) * 0.5 if lo > hi else clampf(v, lo, hi)
+
+## The band from P0Ui, kept from before a panel or the fishing panel opened: either folds the quick bar and the key away,
+## which would stretch it and move the pond behind them (苏烈 on #129). Empty until the HUD has laid out: the first frame
+## is not clamped, since the whole screen as the band is deeper than the meadow and would centre the opening shot on it.
+func _camera_band(ui: P0Ui) -> Rect2:
+	var fishing := panel != null and panel.visible
+	if ui != null and ui.is_node_ready() and not ui.has_modal() and not fishing: _band = ui.camera_band()
+	return _band
 
 ## Zoom about the last pinch centre: the ground point under the fingers stays put (ScenePan's focal pinch).
 func _set_zoom(value: float) -> void:
@@ -263,6 +313,7 @@ func p0_zoom(f: float, at := Vector2.INF) -> void:
 	_zoom_at = at
 	_pinch.pinch(f)
 	_cam_follow.hold()   # the pinched framing stays until the player walks
+	_opening = false
 	_set_zoom(_pinch.value)
 func p0_zoom_end() -> void: _pinch.release()
 func p0_recenter() -> void:
@@ -300,17 +351,26 @@ func p0_dev(step: PackedStringArray) -> bool:
 	match step[0]:
 		"goto":
 			actor.teleport(Vector3(float(step[1]), 0, float(step[2])))
-			_focus = _rest_focus()
+			_reopen()
 		"shore":
 			# stand at the plan origin nearest the spawn, facing the water
 			var plan := FishingModel.plan(str(entry.id), actor.position, Vector3.INF, grid, site_spec)
 			if not plan.is_empty():
 				actor.teleport(plan.origin)
 				actor.face(plan.target)
-				_focus = _rest_focus()
+				_reopen()
 		"cast": _go_cast(Vector3.INF)
+		"castat": _go_cast(Vector3(float(step[1]), 0, float(step[2])))   # castat:x:z — a cast at that water point
+		"zoom":   # zoom:0.8 — a pinch to that zoom, fingers lifted (the whole-pond shot)
+			p0_zoom(_pinch.value / float(step[1]))
+			p0_zoom_end()
 		_: return false
 	return true
+
+## A teleport frames like the opening shot.
+func _reopen() -> void:
+	_opening = true
+	_cam_follow.hold()
 
 func p0_until(name: String) -> bool:
 	match name:
