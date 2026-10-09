@@ -23,6 +23,7 @@ var bp: FarmBlueprint
 var grid: BlueprintGrid
 var scenery: Node3D
 var objects: Node3D
+var backdrop: Node3D   # the underground backdrop (SGODOT-257), outside scenery / objects
 var _rocks := {}            # rock index → Node3D (gone once broken)
 var _previews := {}         # rock index → Sprite3D torch preview
 var _breaking := {}         # rock index → true while its break plays (the view may already say broken)
@@ -80,7 +81,7 @@ func p0_energy_verb() -> String: return str(rt.ui.fab_state().get("verb", "Mine"
 func _build_light() -> void:
 	environment = Environment.new()
 	environment.background_mode = Environment.BG_COLOR
-	environment.background_color = Color("242125")
+	environment.background_color = MineBackdrop.VOID   # the backdrop's outer edge fades into this (SGODOT-257)
 	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	environment.ambient_light_color = Color("e8dfea")
 	environment.ambient_light_energy = 0.48
@@ -108,7 +109,7 @@ func _build_light() -> void:
 ## (Exit mine on floor 1, Floor 1 on floor 2), the down ladder to floor 2 and an elevator on both floors (q(44)).
 func _build_floor(n: int) -> void:
 	floor_n = n
-	for node in [scenery, objects]:
+	for node in [scenery, objects, backdrop]:
 		if is_instance_valid(node):
 			remove_child(node)
 			node.queue_free()
@@ -134,6 +135,10 @@ func _build_floor(n: int) -> void:
 	for node in objects.get_children():   # the elevator and the down ladder stand against the walls; rocks are inside
 		if not str(node.name).begins_with("Rock"): _art_points.append_array(_art_vertices(node))
 	_art_right = Vector3.ZERO
+	# The underground backdrop (SGODOT-257) hangs off the world itself, outside scenery / objects: the camera's walls box
+	# and art edges above never see it, so it frames nothing. Its outer edge fades into the Environment's background.
+	backdrop = MineBackdrop.build(n)
+	add_child(backdrop)
 	_rebuild_nav(broken)
 
 func _rebuild_nav(broken: Array) -> void:
@@ -561,6 +566,11 @@ func p0_dev(step: PackedStringArray) -> bool:
 					(n as UiElevatorPanel).row(int(step[1])).pressed.emit()
 					break
 		"exit": _leave()
+		"backdrop":   # backdrop:0|1 — the on/off check (SGODOT-257)
+			if is_instance_valid(backdrop): backdrop.visible = step[1] != "0"
+		"zoom":   # zoom:0.8 — a pinch to that zoom, fingers lifted
+			p0_zoom(_pinch.value / float(step[1]))
+			p0_zoom_end()
 		_: return false
 	return true
 
