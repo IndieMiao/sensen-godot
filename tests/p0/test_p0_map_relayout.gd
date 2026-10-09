@@ -59,6 +59,13 @@ func _look(lat: float, lng: float) -> void:
 func _settle() -> void:
 	for i in 12: await get_tree().process_frame
 
+## Until the farm markers' pop-ins are over. They run on time (0.22 s), so a frame count waits less the faster the
+## screen refreshes: 40 frames are 0.33 s at 120 Hz but 0.17 s at 240 Hz, the name still growing (2 s at most).
+func _pops_done(fm: FarmMarkers) -> void:
+	var until := Time.get_ticks_msec() + 2000
+	while Time.get_ticks_msec() < until and fm._pin_tweens.values().any(func(t): return t is Tween and (t as Tween).is_running()):
+		await get_tree().process_frame
+
 ## Whether `change` makes the next frames lay the pins out (from a settled, still map).
 func _lays_out(change: Callable, frames := 2) -> bool:
 	await _settle()
@@ -226,7 +233,7 @@ func test_the_players_own_name_folding_lays_the_pins_out() -> void:
 	_look(map.home_lat, map.home_lng)   # the avatar and its name on screen
 	await _settle()
 	assert_bool((fm._buttons["self"] as Control).visible).is_true()
-	for i in 40: await get_tree().process_frame   # its name pops in, scaled by the zoom boost, for some 30 frames
+	await _pops_done(fm)   # its name pops in, scaled by the zoom boost
 	assert_bool(await _lays_out(func(): pass)).is_false()   # settled: nothing to lay out
 	assert_bool(await _lays_out(func(): fm.yield_self_label(true))).is_true()
 	fm.yield_self_label(false)
