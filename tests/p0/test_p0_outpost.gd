@@ -18,10 +18,16 @@ class Sample extends "res://scenes/p0/p0_outpost.gd":
 		arrived[n] = actor.position
 		super._on_facility(n)
 
-func _room(id: String) -> Sample:
+func _room(id: String, phone := false) -> Sample:
 	var r := Sample.new()
 	r.setup({"outpost_id": id})
-	add_child(r)
+	if phone:   # a 360 × 800 SubViewport: tests about the framing see a phone's portrait screen (headless roots are 640 × 640)
+		var vp := SubViewport.new()
+		vp.size = Vector2i(360, 800)
+		add_child(auto_free(vp))
+		vp.add_child(r)
+	else:
+		add_child(r)
 	auto_free(r)
 	return r
 
@@ -554,7 +560,7 @@ func test_every_outpost_opens_on_its_kit() -> void:
 	var kits := {"sh_tackle_1": "farm_tools_store", "sh_tea_1": "coffee_shop", "sh_post_1": "post_office", "sh_market_1": "fruit_shop"}
 	for id in kits:
 		var o := P0Outposts.find(id)
-		var r := _room(id)
+		var r := _room(id, true)
 		assert_str(str(o.art)).is_equal(kits[id])
 		assert_str(r.layout_path).override_failure_message(id).is_equal("res://assets/rooms/%s/layout.json" % kits[id])
 		for a in P0RoomAnchors.read_json(str(o.anchors)).anchors:

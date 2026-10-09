@@ -6,6 +6,7 @@ extends Node3D
 
 const Art = preload("res://modules/mining/mine_art.gd")
 const Layout = preload("res://modules/mining/mine_layout.gd")
+const ElasticZoom = preload("res://modules/p0/p0_elastic_zoom.gd")
 const FarmCamera = preload("res://modules/farm/farm_camera.gd")
 const PLACE := "Shanghai · Mine · Floor %d"
 const REACH := 1.7          # m: a rock, ladder or the elevator in front of the player within this distance
@@ -27,7 +28,16 @@ var _previews := {}         # rock index → Sprite3D torch preview
 var _breaking := {}         # rock index → true while its break plays (the view may already say broken)
 var _focus := Vector3.ZERO
 var _cam_follow := P0Follow.new()
-var _zoom := 0.8            # the mine opens at its widest view (mine-max-view 2026-09-25), pinch 0.8–1.4
+# Camera unification (用户 via 奕星, 2026-10-09; target 哪吒, 65.8 px at 360 × 800): the farm's size and pinch — zoom 1 is
+# FarmCamera.player_scale_size at the farm's 43° pitch, rubber-banded 0.8–1.4 about the pinch centre (ElasticZoom).
+var _zoom := 1.0
+var _room := AABB()          # this floor's walls (the camera's vertical framing, _frame_chamber); empty until built
+var _art_points := PackedVector3Array()   # this floor's art vertices incl. the ladders and the elevator (side stops)
+var _art_sides := PackedVector3Array()    # of those, the leftmost and rightmost for the camera's right (_side_points)
+var _art_right := Vector3.ZERO            # the camera right _art_sides were found for
+var _band := Rect2()         # the last camera band seen with no panel up (_camera_band)
+var _pinch = ElasticZoom.new(0.8, 1.4)
+var _zoom_at := Vector2.INF
 var _target := {}           # {kind, rock, at}
 var _entered_ms := 0
 var _hold_until := 0
@@ -107,6 +117,7 @@ func _build_floor(n: int) -> void:
 	_breaking.clear()
 	scenery = Art.floor_scenery(n, true)   # adds the up ladder, and the elevator on floor 1
 	add_child(scenery)
+	_room = _walls_box(scenery)
 	objects = Node3D.new()
 	objects.name = "MineObjects"
 	add_child(objects)
@@ -119,6 +130,10 @@ func _build_floor(n: int) -> void:
 		rock.name = "Rock%d" % i
 		objects.add_child(rock)
 		_rocks[i] = rock
+	_art_points = _art_vertices(scenery)
+	for node in objects.get_children():   # the elevator and the down ladder stand against the walls; rocks are inside
+		if not str(node.name).begins_with("Rock"): _art_points.append_array(_art_vertices(node))
+	_art_right = Vector3.ZERO
 	_rebuild_nav(broken)
 
 func _rebuild_nav(broken: Array) -> void:
@@ -359,14 +374,148 @@ func _kick_out() -> void:
 # ---------------------------------------------------------------- camera (old mine framing + safe box)
 func _follow(dt: float) -> void:
 	_focus = _cam_follow.step(cam, _focus, actor.position, actor.mover.is_moving(), dt)
-	_update_camera()
+	if _pinch.step(dt): _set_zoom(_pinch.value)   # springing back from past a limit, about the same point
+	else: _update_camera()
 
 func _update_camera() -> void:
-	cam.size = FarmCamera.close_view_size(get_viewport().get_visible_rect().size) / _zoom
+	cam.size = FarmCamera.player_scale_size(get_viewport().get_visible_rect().size, FarmCamera.PITCH_DEG) / _zoom
 	FarmCamera.place(cam, _focus + Vector3.UP * 0.7)
+	_frame_chamber()
 	FarmCamera.fit_ground_depth(cam)
 
-func p0_zoom(f: float) -> void: _zoom = clampf(_zoom / f, 0.8, 1.4)
+## Framing (不知火舞 on 231, the rooms' rule of #127). Down: the four corners of the band between the HUD and the quick
+## bar / main key (_camera_band) land in the room — the top corners at the wall tops within the back wall, the bottom
+## corners on the floor within the front edge; the room is wider than that band, so the focus stays at the middle of
+## the range this gives (fixed). Across: the room is wider than the screen, so the safe box follows, but stops where the
+## art's outer edge — the walls, the ladders and the elevator on them — comes P0Room.SIDE_MARGIN (18 px) from the
+## screen's side, the mine's dark backdrop showing past it. Moves `_focus` itself, so the follow and the pinch carry on.
+func _frame_chamber() -> void:
+	if _room.size == Vector3.ZERO: return
+	var vp := get_viewport().get_visible_rect().size
+	var band := _camera_band(rt.ui if rt != null else null, vp)
+	if band.size.x <= 0.0 or band.size.y <= 0.0: return
+	var lo := -INF
+	var hi := INF
+	for c in [band.position, Vector2(band.end.x, band.position.y), Vector2(band.position.x, band.end.y), band.end]:
+		var far: bool = c.y == band.position.y
+		var off := _ray_at(c, _room.end.y if far else _room.position.y) - _focus
+		if far: lo = maxf(lo, _room.position.z - off.z)
+		else: hi = minf(hi, _room.end.z - off.z)
+	var z := clamp_or_centre(_focus.z, lo, hi)
+	if not is_equal_approx(z, _focus.z):
+		_focus.z = z
+		FarmCamera.place(cam, _focus + Vector3.UP * 0.7)
+	# Across, on screen: the art's outermost points against the side margins. Moving the focus along the ground's x
+	# moves the picture across by cos(yaw) of it (orthographic: the same everywhere), so one step lands it.
+	var sides := _side_points()
+	if sides.is_empty(): return
+	var dx := side_shift(cam.unproject_position(sides[0]).x, cam.unproject_position(sides[1]).x, vp.x, P0Room.SIDE_MARGIN)
+	if is_zero_approx(dx): return
+	var px_per_x := cam.global_basis.x.x * vp.x / cam.size   # screen px per metre of ground x
+	if absf(px_per_x) < 0.0001: return
+	_focus.x -= dx / px_per_x
+	FarmCamera.place(cam, _focus + Vector3.UP * 0.7)
+
+## How far (px) the art spanning left..right must move across a screen `width` wide: into the middle when it fits
+## inside the margins, else only so far that neither side shows more than `margin` of backdrop.
+static func side_shift(left: float, right: float, width: float, margin: float) -> float:
+	if right - left <= width - 2.0 * margin: return (width - left - right) * 0.5
+	if left > margin: return margin - left
+	if right < width - margin: return width - margin - right
+	return 0.0
+
+## The band to frame into: P0Ui.camera_band while no panel is up, else the last one seen then (苏烈 on #129). A panel
+## that hides the quick bar and the key (the inbox, the profile, the skills) would stretch the band to the screen's
+## foot and the fixed middle would move — the room jumping behind the panel and back. The whole viewport until a band
+## has been seen.
+func _camera_band(ui: P0Ui, viewport: Vector2) -> Rect2:
+	if ui != null and ui.is_node_ready() and not ui.has_modal(): _band = ui.camera_band()
+	return _band if _band.has_area() else Rect2(Vector2.ZERO, viewport)
+
+## Where the camera ray through a screen point (this UI's coordinates) crosses the plane at height y.
+func _ray_at(screen: Vector2, y: float) -> Vector3:
+	var o := cam.project_ray_origin(screen)
+	var n := cam.project_ray_normal(screen)
+	return o + n * ((y - o.y) / n.y) if absf(n.y) > 0.0001 else o
+
+## The allowed range's middle when it is empty (the band is wider than the room: that axis stays fixed), else v clamped.
+static func clamp_or_centre(v: float, lo: float, hi: float) -> float:
+	return (lo + hi) * 0.5 if lo > hi else clampf(v, lo, hi)
+
+## The floor's walls: of the art's meshes, the one standing taller than half a metre with the widest footprint — the
+## carved walls; Art.VIEW_BOUNDS if none is found.
+static func _walls_box(root: Node3D) -> AABB:
+	var best := AABB()
+	for b in _art_boxes(root):
+		if b.size.y > 0.5 and b.size.x * b.size.z > best.size.x * best.size.z: best = b
+	return best if best.size != Vector3.ZERO else Art.VIEW_BOUNDS
+
+## The art's leftmost and rightmost vertex on screen. The camera only turns with the yaw, which is fixed, so they are
+## found once per floor (and again only if the camera's right changes) and projected each frame — the real outer edge,
+## not a box corner standing out past a rounded wall end.
+func _side_points() -> PackedVector3Array:
+	var r := cam.global_basis.x
+	if _art_points.is_empty(): return PackedVector3Array()
+	if r.is_equal_approx(_art_right) and _art_sides.size() == 2: return _art_sides
+	var lo := _art_points[0]
+	var hi := _art_points[0]
+	for p in _art_points:
+		if p.dot(r) < lo.dot(r): lo = p
+		if p.dot(r) > hi.dot(r): hi = p
+	_art_right = r
+	_art_sides = PackedVector3Array([lo, hi])
+	return _art_sides
+
+## Every mesh vertex under `root` in world space (MeshInstance3D and MultiMeshInstance3D); lights and decals have none
+## that matter here, the wall contact shade lies flat inside the walls' reach.
+static func _art_vertices(root: Node) -> PackedVector3Array:
+	var out := PackedVector3Array()
+	if root == null: return out
+	var nodes: Array = root.find_children("*", "GeometryInstance3D", true, false)
+	if root is GeometryInstance3D: nodes.append(root)
+	for g in nodes:
+		if g is MeshInstance3D and (g as MeshInstance3D).mesh != null:
+			var xf: Transform3D = (g as Node3D).global_transform
+			if (g as MeshInstance3D).get_aabb().size.y <= 0.01: continue   # flat decals
+			for v in (g as MeshInstance3D).mesh.get_faces(): out.append(xf * v)
+		elif g is MultiMeshInstance3D and (g as MultiMeshInstance3D).multimesh != null:
+			var mm := (g as MultiMeshInstance3D).multimesh
+			if mm.mesh == null: continue
+			var faces := mm.mesh.get_faces()
+			var base: Transform3D = (g as Node3D).global_transform
+			for i in mm.instance_count:
+				var xf := base * mm.get_instance_transform(i)
+				for v in faces: out.append(xf * v)
+	return out
+
+## One world box per mesh under `root` — lights and flat decals left out (the wall contact shade reaches past the
+## walls); not merged, so a tall piece inside (the elevator) does not raise the walls' corners.
+static func _art_boxes(root: Node3D) -> Array[AABB]:
+	var out: Array[AABB] = []
+	if root == null: return out
+	for vi in root.find_children("*", "VisualInstance3D", true, false):
+		if vi is Light3D: continue
+		var b: AABB = (vi as VisualInstance3D).global_transform * (vi as VisualInstance3D).get_aabb()
+		if b.size.y > 0.01: out.append(b)
+	return out
+
+## Zoom about the last pinch centre: the ground point under the fingers stays put (the farm's _set_zoom).
+func _set_zoom(value: float) -> void:
+	_zoom = value
+	if cam == null or not is_inside_tree(): return
+	var before = ElasticZoom.ground_at(cam, _zoom_at, _focus.y)
+	_update_camera()
+	var d := ElasticZoom.shift(before, ElasticZoom.ground_at(cam, _zoom_at, _focus.y))
+	if d != Vector3.ZERO:
+		_focus += d
+		_update_camera()
+
+func p0_zoom(f: float, at := Vector2.INF) -> void:
+	_zoom_at = at
+	_pinch.pinch(f)
+	_cam_follow.hold()   # the pinched framing stays until the player walks (the safe box takes over then)
+	_set_zoom(_pinch.value)
+func p0_zoom_end() -> void: _pinch.release()
 func p0_recenter() -> void:
 	_focus = actor.position
 	_cam_follow.held = false

@@ -200,13 +200,23 @@ func test_push_in_puts_the_stove_in_the_band_above_the_drawer() -> void:
 # ---------------------------------------------------------------- farmhouse (placeholder Basic Room)
 const FARMHOUSE := preload("res://scenes/p0/rooms/p0_farmhouse.gd")
 
-func _farmhouse(level := 1) -> P0Room:
+func _farmhouse(level := 1, phone := false) -> P0Room:
 	var r: P0Room = FARMHOUSE.new()
 	r.use_runtime = false
 	r.level = level
-	add_child(r)
+	_host(phone).add_child(r)
 	auto_free(r)
 	return r
+
+## Where a room is added: this suite, or (phone) a 360 × 800 SubViewport, so tests about the framing see a phone's
+## portrait screen whatever the runner's window is (headless runs have a 640 × 640 root; 苏烈 on #127, as #109 did for
+## the map).
+func _host(phone: bool) -> Node:
+	if not phone: return self
+	var vp := SubViewport.new()
+	vp.size = Vector2i(360, 800)
+	add_child(auto_free(vp))
+	return vp
 
 ## SGODOT-235 (LOCK-07 v1 retired with UiTapCard): every marker the farmhouse and a plain room hang has a kind; the
 ## door is i-door + Farm (a plain room's: Map).
@@ -321,7 +331,7 @@ func test_the_room_camera_keeps_its_kits_yaw_at_the_farms_pitch() -> void:
 ## supersedes the whole-room diorama opening; it pans across inside its art, follows the player as they walk, and its
 ## push-ins keep framing from the whole room's width.
 func test_the_room_shows_the_player_at_the_farms_scale_and_pans_inside_its_art() -> void:
-	var r := _farmhouse()
+	var r := _farmhouse(1, true)
 	_assert_player_scale_framing(r, "farmhouse")
 	assert_float(r.view_size()).is_greater(r.cam.size)   # push-ins still frame from the whole room
 	r.frame_all()   # straight onto the player at the door, the view stopped at the art's edge
@@ -345,7 +355,7 @@ func test_with_bag_alone_the_room_frames_lower_and_clears_bag() -> void:
 	rt.ui.set_surface("room")
 	await get_tree().process_frame
 	assert_bool(rt.ui.bag_only()).is_true()
-	var r := _farmhouse()
+	var r := _farmhouse(1, true)
 	r.rt = rt
 	var e_full := _art_edges_px(r)   # framed before the room knew its UI: the quick bar's band
 	r.frame_all()
@@ -472,8 +482,9 @@ func test_the_farm_hands_its_environment_to_the_farmhouse_above_it() -> void:
 	assert_object(farm_env).is_not_null()
 	farm.suspend()
 	assert_object(farm.world_env.environment).is_null()
-	# Its canvas backdrop (layer −1, BG_CANVAS only) would otherwise cover the room's colour background.
-	assert_bool(farm.get_node("FarmBackground").visible).is_false()
+	# Its canvas backdrop (layer −1, BG_CANVAS only) would otherwise cover the room's colour background: it leaves the
+	# tree while the farm is suspended (hidden was not enough under a BG_CANVAS scene, SGODOT-256 ⑥).
+	assert_object(farm.get_node_or_null("FarmBackground")).is_null()
 	var r := _farmhouse()
 	await get_tree().process_frame
 	assert_object(r.get_viewport().find_world_3d().environment).is_same(r.environment)

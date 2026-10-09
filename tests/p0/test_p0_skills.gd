@@ -40,6 +40,34 @@ func test_first_times_count_this_seasons_things() -> void:
 	var d := P0SkillsDrawer.skills_data(_view())
 	assert_array(d.firsts.map(func(f): return [f.name, f.have, f.need])).is_equal([["Crops", 2, 8], ["Fish", 1, 7], ["Dishes", 1, 2]])
 
+## int10c 256 ⑧: what the profile opens sits over the profile, not the world: the same page moves under its scrim.
+func test_what_the_profile_opens_keeps_the_profile_behind_it() -> void:
+	var ui := P0Ui.new()
+	ui.quick_store = STORE
+	ui.tips_path = TIPS
+	add_child(auto_free(ui))
+	await await_idle_frame()
+	ui.set_view(_view())
+	ui.open_profile()
+	await await_idle_frame()
+	var page := ui._profile
+	page.skill_pressed.emit("farming")
+	await await_idle_frame()
+	assert_str(ui.modal_kind).is_equal("skills")
+	assert_object(ui._modal.get_child(0)).is_same(page)   # the same page, under the drawer's scrim
+	assert_bool(page.is_visible_in_tree()).is_true()
+	assert_int(ui._modal.find_children("*", "P0ProfilePage", true, false).size()).is_equal(1)
+	ui.close_top_layer()   # Back: the profile itself again
+	await await_idle_frame()
+	assert_str(ui.modal_kind).is_equal("profile")
+	ui._profile.skill_pressed.emit("cooking")
+	await await_idle_frame()
+	ui.close_modal()   # the drawer's ✕: out to the world …
+	await await_idle_frame()
+	ui.open_skills()   # … so what opens from the world next has the world behind it
+	await await_idle_frame()
+	assert_int(ui._modal.find_children("*", "P0ProfilePage", true, false).size()).is_equal(0)
+
 func test_milestones_unfold_in_place_and_the_drawer_comes_back_to_the_profile() -> void:
 	var ui := P0Ui.new()
 	ui.quick_store = STORE

@@ -207,6 +207,8 @@ func p0_until(n: String) -> bool:
 		"compose": return kitchen != null and kitchen.phase == "compose"
 		"gold": return kitchen != null and kitchen.at_gold()   # a ring's needle on gold (shots)
 		"goldsoon": return kitchen != null and kitchen.at_gold(800.0)   # on gold when the next step runs (0.8 s on)
+		"earlysoon": return kitchen != null and kitchen.ring_at(800.0, 0.1, 0.2)   # in its window before gold (an early tap)
+		"tailsoon": return kitchen != null and kitchen.ring_at(400.0, 1.03, 1.15)   # just turned, still showing, at the shot
 		"growsoon": return kitchen != null and kitchen.ring_growing(800.0)   # a ring growing when the next step runs
 		"idle": return (kitchen == null or not kitchen.busy()) and super(n)
 	return super(n)

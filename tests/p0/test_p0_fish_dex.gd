@@ -87,6 +87,39 @@ func test_a_gated_silhouette_opens_the_gate_card_and_back_returns_to_the_dex() -
 	assert_str(ui.modal_kind).is_equal("fishdex")   # one layer at a time
 	assert_bool(_dex().animate).is_false()
 
+## 亚瑟 on #136: profile → Fish → Golden Koi's gate card → Skills kept the profile behind but went back to the world.
+## Skills goes back to the gate card, the card to the dex, the dex to the profile, the profile behind each.
+func test_skills_from_a_gate_card_go_back_the_way_they_came() -> void:
+	ui.open_profile()
+	await await_idle_frame()
+	var page := ui._profile
+	page.collection_pressed.emit("fish")
+	await await_idle_frame()
+	_dex().cell_pressed.emit("fish_koi")
+	await await_idle_frame()
+	var sheet: UiInfoSheet = ui.find_children("*", "UiInfoSheet", true, false)[0]
+	sheet.action_requested.emit(&"guide", "gate", {"go": "skills"})
+	await await_idle_frame()
+	assert_str(ui.modal_kind).is_equal("skills")
+	assert_object(ui._modal.get_child(0)).is_same(page)
+	for kind in ["gate", "fishdex", "profile"]:
+		ui.close_top_layer()
+		await await_idle_frame()
+		assert_str(ui.modal_kind).is_equal(kind)
+		if kind != "profile": assert_object(ui._modal.get_child(0)).is_same(page)
+
+func test_a_host_panel_is_not_over_the_profile() -> void:
+	ui.panel_requested.connect(func(_p): pass)
+	ui.open_profile()
+	await await_idle_frame()
+	ui._profile.collection_pressed.emit("fish")
+	await await_idle_frame()
+	ui.request_panel("cookbook")   # the host's panel: this UI's layers and the profile go
+	assert_bool(ui._over_profile).is_false()
+	ui.open_skills()
+	await await_idle_frame()
+	assert_int(ui._modal.find_children("*", "P0ProfilePage", true, false).size()).is_equal(0)
+
 func test_other_cells_open_the_fish_card() -> void:
 	ui.open_fishdex()
 	await await_idle_frame()
@@ -105,7 +138,16 @@ func test_no_tab_row_and_the_profile_tile_opens_the_dex() -> void:
 	ui.close_modal()
 	ui.open_profile()
 	await await_idle_frame()
+	var page := ui._profile
 	ui._profile.collection_pressed.emit("fish")
+	await await_idle_frame()
+	assert_str(ui.modal_kind).is_equal("fishdex")
+	assert_object(ui._modal.get_child(0)).is_same(page)   # 256 ⑧: the profile stays behind the dex …
+	_dex().cell_pressed.emit("fish_crucian")
+	await await_idle_frame()
+	assert_str(ui.modal_kind).is_equal("fish")
+	assert_object(ui._modal.get_child(0)).is_same(page)   # … and behind the card the dex opens
+	ui.close_top_layer()   # the card: back to the dex
 	await await_idle_frame()
 	assert_str(ui.modal_kind).is_equal("fishdex")
 	ui.close_top_layer()

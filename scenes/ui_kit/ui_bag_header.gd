@@ -2,7 +2,8 @@ class_name UiBagHeader
 extends VBoxContainer
 ## Bag drawer header (SGODOT-225; BagHeader 1225:83885, LOCK-12 / 13): the Bag | Gear switch (the Bag segment
 ## carries the count, `Bag 19/25`), `Sort · …` on the Bag side only, and a capacity bar under the Bag segment that
-## turns amber at 90 % (§10.4.1). The gift drawer hides the switch and shows the count as a plain title
+## turns amber at 90 % (§10.4.1). Both sides are the same height: on the Gear side Sort and the bar keep their place
+## unseen (int10c 256 ③). The gift drawer hides the switch and shows the count as a plain title
 ## (`show_tabs = false`, WP1b: a gift is always from the Bag side).
 ## Emits `side_changed(side)` (0 Bag, 1 Gear) and `sort_pressed`.
 
@@ -55,6 +56,7 @@ func _init(used_ := 0, capacity_ := 25, side_: Pane = Pane.BAG) -> void:
 	row.add_child(_sort)
 	var bar_row := MarginContainer.new()
 	bar_row.add_theme_constant_override(&"margin_left", int(_BAR_X))
+	bar_row.custom_minimum_size.y = _BAR.y   # the row keeps its height on the Gear side, bar hidden (256 ③)
 	add_child(bar_row)
 	_bar = _Bar.new()
 	_bar.custom_minimum_size = _BAR
@@ -81,6 +83,11 @@ func fill() -> float: return clampf(float(used) / maxf(1.0, float(capacity)), 0.
 func is_nearly_full() -> bool: return fill() >= _FULL_AT
 func tabs() -> UiSegmentTab: return _tabs
 func sort_button() -> UiNavButton: return _sort
+## Whether `Sort · …` is offered: on the Bag side with the switch and a label. Off, it keeps its place unseen and
+## untappable, so the switch row keeps its height (int10c 256 ③, 不知火舞).
+func sort_shown() -> bool: return side == Pane.BAG and show_tabs and sort_label != ""
+## Whether the capacity bar is drawn (Bag side); its row keeps its height either way (256 ③).
+func bar_shown() -> bool: return _bar.visible
 
 func _refresh() -> void:
 	if _bar == null: return
@@ -92,9 +99,16 @@ func _refresh() -> void:
 	_title.visible = not show_tabs
 	_title.text = count
 	var bag := side == Pane.BAG
-	_sort.visible = bag and show_tabs and sort_label != ""
+	# int10c 256 ③: both sides keep the Bag side's header — Sort and the capacity bar are hidden in place, not
+	# taken out, so the switch and the first row under the header don't move when the player switches.
+	var sort_on := sort_shown()
+	_sort.visible = show_tabs   # the gift drawer's plain title has no switch to hold steady, nor a Sort place
+	_sort.modulate.a = 1.0 if sort_on else 0.0
+	_sort.disabled = not sort_on
+	_sort.mouse_filter = Control.MOUSE_FILTER_STOP if sort_on else Control.MOUSE_FILTER_IGNORE
+	_sort.focus_mode = Control.FOCUS_ALL if sort_on else Control.FOCUS_NONE
 	_sort.label = "Sort · " + sort_label
-	_bar.get_parent().visible = bag
+	_bar.visible = bag
 	_bar.fill = fill()
 	_bar.amber = is_nearly_full()
 	_bar.queue_redraw()

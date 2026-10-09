@@ -954,6 +954,15 @@ func _marker_area() -> Rect2:
 	if _bar.visible: bottom = minf(bottom, _bar.position.y)
 	return Rect2(0.0, top, _kit.size.x, maxf(0.0, bottom - top))
 
+## The band a world camera frames into (camera unification, 不知火舞 on 231): below the HUD's second row, above the
+## quick bar and the main key group, in this UI's coordinates. A scene that fits along an axis centres in this band,
+## so its front edge never sits under the bar or the key.
+func camera_band() -> Rect2:
+	var r := _marker_area()
+	if _keys != null and _keys.is_visible_in_tree():
+		r.end.y = minf(r.end.y, _keys.get_global_rect().position.y - root.global_position.y)
+	return r
+
 ## FloatText (1178:82191, UiFloatText from 2B; SGODOT-224): one line rising from `screen` (its bottom centre) in its
 ## tone; `stack` = the line's place in one reply (each starts 28 higher and 60 ms later, at most 3). Copy longer
 ## than one line wraps (Layout=Wrap, two lines at most). `tone` also takes the older Color argument (callers in
@@ -1378,6 +1387,7 @@ func speaker() -> String:
 	return ""
 
 func close_modal() -> void:
+	_over_profile = false   # out to the world: what opens next is over the world
 	_drop_modal()
 	if not _card_queue.is_empty():
 		var next: Callable = _card_queue.pop_front()
@@ -1510,6 +1520,7 @@ func _drop_modal() -> void:
 
 func _open_modal(content: Control, dim := 0.32, hide_controls := false) -> void:
 	_bar.cancel_drag()   # a drawer or card opening cancels a slot drag (LOCK-04 v1.10)
+	var under := _profile_to_keep()
 	_drop_modal()
 	var veil := ColorRect.new()
 	veil.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -1519,6 +1530,7 @@ func _open_modal(content: Control, dim := 0.32, hide_controls := false) -> void:
 	var holder := Control.new()
 	holder.set_anchors_preset(Control.PRESET_FULL_RECT)
 	holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if under != null: holder.add_child(under)   # the profile stays behind the scrim (256 ⑧)
 	holder.add_child(veil)
 	holder.add_child(content)
 	if surface == "map" and content is PanelContainer:
@@ -1529,6 +1541,7 @@ func _open_modal(content: Control, dim := 0.32, hide_controls := false) -> void:
 			(sb as StyleBoxFlat).bg_color.a = 1.0
 			content.add_theme_stylebox_override("panel", sb)
 	root.add_child(holder)
+	if under != null: (under as P0ProfilePage).preview.set_active(true)   # moved: watch its new ancestors' visibility
 	root.move_child(_toasts, -1)   # a toast stays readable over a drawer or card
 	if _sys != null and is_instance_valid(_sys): root.move_child(_sys, -1)   # the system line too (SYS-OFFLINE-3)
 	_modal = holder
@@ -1794,6 +1807,11 @@ var _counter_ctx := {}   # role -> the last keeper ctx an outpost gave
 ## (BOARD-1 / BOARD-3 / BOARD-DROPPED) go back to it, so `◆ New for you` stays for the whole visit (亚瑟 on #77).
 var _stall_visit_new: Variant = null
 const _COUNTER_FLOW := ["counter", "board_request", "board_drop", "board_dropped"]
+
+## The counter drawer while it is open, its Market Board sheets over it included (the outposts push the camera in on
+## the keeper above it, #128); null otherwise.
+func counter_drawer() -> P0CounterDrawer:
+	return _counter if modal_kind in _COUNTER_FLOW and is_instance_valid(_counter) else null
 
 func open_counter(role: String, opts := {}) -> void:
 	if opts.has("ctx"): _counter_ctx[role] = opts.ctx
@@ -2430,19 +2448,34 @@ func open_gift(id: String, item := "") -> void:
 ## Own profile (SGODOT-225; PROFILE-1-P0, LOCK-22), opened from the HUD avatar. A skill ring opens the skill
 ## details; Edit look opens the dressing room above the current world and comes back here.
 var _profile: P0ProfilePage
+## A panel opened from the profile (Skills, the Fish-dex and the cards it opens) keeps the profile behind its scrim,
+## not the world (int10c 256 ⑧): the same page moves under each layer of that chain, so its figure isn't built again.
+## Set by the profile's buttons; cleared when the chain goes back to the profile or out to the world.
+var _over_profile := false
 
 func open_profile(look_saved := false) -> void:
+	_over_profile = false
 	var page := P0ProfilePage.new(view, safe_top(), look_saved)
 	page.theme = UiKit.theme()
 	page.back_pressed.connect(close_modal)
-	page.skill_pressed.connect(func(_skill: String): open_skills(func(): open_profile()))
+	page.skill_pressed.connect(func(_skill: String):
+		_over_profile = true
+		open_skills(func(): open_profile()))
 	page.edit_look_pressed.connect(edit_look)
 	page.collection_pressed.connect(func(key: String):
-		if key == "fish": open_fishdex(func(): open_profile())
+		if key == "fish":
+			_over_profile = true
+			open_fishdex(func(): open_profile())
 		elif can_request_panel(): request_panel("cookbook"))
 	_open_modal(page, 0.0, true)
 	_profile = page
 	modal_kind = "profile"
+
+## The profile page to move under the next layer: while a chain opened from the profile goes on (256 ⑧).
+func _profile_to_keep() -> Control:
+	if not _over_profile or _profile == null or not is_instance_valid(_profile) or _profile.is_queued_for_deletion(): return null
+	if _profile.get_parent() != null: _profile.get_parent().remove_child(_profile)
+	return _profile
 
 ## The existing dressing room (Avatar outfit; the P0 actor follows the saved outfit). The P0 layer hides while
 ## it is on top and the profile comes back when it closes (Back or Done).
@@ -2641,18 +2674,22 @@ func open_gate_card(gate: Dictionary, back := Callable()) -> UiInfoSheet:
 	sheet.offset_bottom = -bottom_pad()
 	sheet.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	sheet.action_requested.connect(func(action: StringName, _id: String, payload: Dictionary):
-		if action == &"guide": _gate_guide(str(payload.get("go", ""))))
+		if action == &"guide": _gate_guide(str(payload.get("go", "")), func(): open_gate_card(gate, back)))
 	_open_modal(sheet, 0.32, true)   # the card sits where the quick bar was; bar and keys hide under it
 	modal_kind = "gate"
 	sheet.open("gate", &"gate")
 	_modal_back = back
 	return sheet
 
-func _gate_guide(go: String) -> void:
+## `again` reopens the gate card: Skills goes back to it (and on through its own way back, e.g. the Fish-dex and the
+## profile behind both, 256 ⑧; 亚瑟 on #136: Back from these Skills went straight to the world).
+func _gate_guide(go: String, again := Callable()) -> void:
 	match go:
 		"skills":
-			_drop_modal()   # on to another panel: a queued card must not come up over it (亚瑟 on #77)
-			open_skills()
+			# On to another panel through _open_modal's own drop, not close_modal: a queued card must not come up over it
+			# (亚瑟 on #77). No drop of ours first: the profile under this chain moves out of the old layer before it
+			# goes, not because its freeing happens to wait (亚瑟 on #137).
+			open_skills(again)
 		"plots", "stall", "stove", "board", "home", "bench":
 			close_modal()
 			if show_label(go, space_here(), spot_reachable()) == "Show": show_spot.emit(go)
@@ -2722,6 +2759,7 @@ func open_fish_card(id: String, back := Callable()) -> UiInfoSheet:
 
 ## A panel this UI does not own, opened by the host that listens on panel_requested.
 func request_panel(panel: String) -> void:
+	_over_profile = false   # the host's panel is not over the profile
 	_drop_modal()   # the host's panel comes next; a queued card waits for it to close, not over it
 	panel_requested.emit(panel)
 
