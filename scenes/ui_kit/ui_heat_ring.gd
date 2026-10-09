@@ -11,6 +11,7 @@ extends Control
 
 const _SIDE := 120.0
 const _OUTER := 50.0
+const OUTER := _OUTER   # the track's outer radius at scale 1 (a host places things by the ring's edge)
 const _TRACK := 8.0
 const _NEEDLE := Vector2(3, 43)
 const _MARK := (_TRACK + 6.0) * 0.5   # the result dot's radius: the track's width + 6 across (不知火舞 on #131)

@@ -518,7 +518,7 @@ func _judge_tap() -> bool:
 		if _ring:
 			_ring.result = 1 if hit else 0
 			_ring.mark_turn = _judged_turn[i]
-		rt.ui.float_text("Nice heat! ★" if hit else "Missed · still cooking", _ring_center(), UiTokens.COLOR_GOLD_INK if hit else UiTokens.COLOR_SECONDARY)
+		rt.ui.float_text("Nice heat! ★" if hit else "Missed · still cooking", float_from(_judged_turn[i]), UiTokens.COLOR_GOLD_INK if hit else UiTokens.COLOR_SECONDARY)
 		if hit: Input.vibrate_handheld(40)
 		return true
 	return false
@@ -528,6 +528,14 @@ func _judge_tap() -> bool:
 static func _with_pot(cmd: Dictionary, pot: Dictionary) -> Dictionary:
 	if pot.get("id", null) != null: cmd["pot"] = pot.id
 	return cmd
+
+## Where a judged ring's float rises from (不知火舞 on #131): its dot (at `turn` of the needle's round) on the upper half
+## (an early tap, a ring gone round) would sit under a float rising from the centre, so that float starts at the ring's
+## lower edge — its 48 px rise stops short of the centre; a dot on the lower half (a hit, usually) keeps the centre.
+func float_from(turn: float) -> Vector2:
+	var upper := sin(-PI * 0.5 + TAU * turn) < 0.0
+	var radius := UiHeatRing.OUTER * (_ring.scale.y if _ring else 1.0)
+	return _ring_center() + (Vector2(0.0, radius) if upper else Vector2.ZERO)
 
 ## Where the stove's floats rise from while the pot is watched or turns over (a first-cook XP float, 不知火舞 on 226).
 func ring_center() -> Vector2: return _ring_center()
@@ -550,7 +558,7 @@ func _process(_dt: float) -> void:
 		if not _judged.has(i) and e > float(h.at) + float(h.spin):
 			_judged[i] = false
 			_judged_turn[i] = 1.0   # the needle went round untouched: its dot where it stopped
-			rt.ui.float_text("Missed · still cooking", _ring_center(), UiTokens.COLOR_SECONDARY)
+			rt.ui.float_text("Missed · still cooking", float_from(1.0), UiTokens.COLOR_SECONDARY)
 		if e >= float(h.at) - RING_EARLY_MS and e <= float(h.at) + float(h.spin) + 350.0: active = i
 	if _ring:
 		_ring.visible = active >= 0
