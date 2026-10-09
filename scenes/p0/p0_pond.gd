@@ -272,7 +272,7 @@ func _arrival_hint() -> void:
 		waited += get_process_delta_time()
 	if not is_inside_tree(): return
 	why = PinReason.reason(rt.session.current(), p0_place())   # still worn: a fish landed meanwhile may have completed it
-	if str(why.get("state", "")) == "request" and str(why.get("text", "")) != "": rt.ui.toast(str(why.text))
+	if str(why.get("state", "")) == "request" and str(why.get("text", "")) != "": rt.ui.toast(str(why.text), 0.0, true)
 
 ## What a landed fish did to that request: a progress float under `Pond Crucian ×1` (`Pond Catch 1/2`, ink, no
 ## icon) while it is short; on the catch that completes it, a Success toast instead (`Pond Catch · 2/2 · Deliver at
@@ -286,7 +286,7 @@ func _request_progress() -> Array:
 		return [{kind = "request", key = "request:" + _hint_req, text = str(said.float), tone = UiFloatText.Tone.ITEM}]
 	if said.has("toast"):
 		var done := str(said.toast)
-		get_tree().create_timer(CARD_AFTER_FLOATS_S + 0.05).timeout.connect(func(): rt.ui.toast_success_when_clear(done))
+		get_tree().create_timer(CARD_AFTER_FLOATS_S + 0.05).timeout.connect(func(): rt.ui.toast_success_when_clear(done, true))
 	return []
 
 ## r = PinReason.request_of after a landed fish, before = the request's count before it: {float: `Pond Catch 1/2`}

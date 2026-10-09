@@ -1272,10 +1272,28 @@ func sys_text() -> String: return _sys.message if _sys != null and is_instance_v
 ## Toast (Toast R1, §4.8.6; q(49) ⑤): one at a time, a new one replaces the one showing and the same sentence again
 ## within 2 s only stays up longer. Info; `seconds` > 0 overrides the length rule (2 s + 0.5 s per 20 characters,
 ## at most 5 s). A tap closes it early. Feedback the player must confirm is a card, never a toast.
-func toast(text: String, seconds := 0.0) -> void:
+func toast(text: String, seconds := 0.0, break_at_dot := false) -> void:
 	if not _toasts: return
 	_aim_toast()
-	_toasts.show_toast(text, ToastLayer.Severity.INFO, "", seconds)
+	_toasts.show_toast(_break_at_dot(text) if break_at_dot else text, ToastLayer.Severity.INFO, "", seconds)
+
+## Two lines break at a " · " (不知火舞 on #188, q(103)): a text that does not fit the toast's one line goes to the next
+## line after the last " · " that still leaves the first line inside the text width, the dot dropped —
+## `Pond Catch` / `Pond Crucian 1/2`, `Pond Catch · 2/2` / `Deliver at the Stall`. Callers opt in (break_at_dot);
+## the toast itself still wraps by words. Measured with the toast's own label font, at its current width.
+func _break_at_dot(text: String) -> String:
+	var l: Label = _toasts._label
+	if l == null or not text.contains(" · "): return text
+	var font := l.get_theme_font(&"font")
+	var size := l.get_theme_font_size(&"font_size")
+	var w: float = _toasts._width - UiTokens.SIZE_TOAST_PAD_LEFT - UiTokens.SIZE_TOAST_PAD_RIGHT - UiTokens.SIZE_TOAST_ICON - ToastLayer._ICON_GAP
+	var fits := func(t: String) -> bool: return font.get_string_size(t, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x <= w
+	if fits.call(text): return text
+	var parts := text.split(" · ")
+	for i in range(parts.size() - 1, 0, -1):
+		var first := " · ".join(parts.slice(0, i))
+		if fits.call(first): return first + "\n" + " · ".join(parts.slice(i))
+	return text
 
 ## Where the toast sits (WP2 D-01, q(16)): over the quick bar's top edge, in the scene or docked in the bag; over a
 ## drawer without the bar (the workbench, a counter), just above the drawer's top edge — clear of its rows and of the
@@ -1338,10 +1356,10 @@ func toast_creel_full() -> void:
 	_toast_bag_tab = "Fish"
 
 ## Done, worth saying once: a cleared mine floor, a resident's meal (§4.8.6 Toast Success).
-func toast_success(text: String) -> void:
+func toast_success(text: String, break_at_dot := false) -> void:
 	if not _toasts: return
 	_aim_toast()
-	_toasts.show_toast(text, ToastLayer.Severity.SUCCESS)
+	_toasts.show_toast(_break_at_dot(text) if break_at_dot else text, ToastLayer.Severity.SUCCESS)
 
 ## What the toast says now ("" when none is up).
 func toast_text() -> String: return _toasts.current_text() if _toasts else ""
@@ -1435,26 +1453,30 @@ func close_modal() -> void:
 ## once when nothing covers the UI, else held until the world is back from "busy" and no card is open or queued.
 var _held_toast := ""
 var _held_success := false   # the held toast is a Success one (toast_success_when_clear)
+var _held_break := false     # … and breaks its two lines at a " · " (_break_at_dot)
 
 func toast_when_clear(text: String) -> void:
 	_held_toast = text
 	_held_success = false
+	_held_break = false
 	_flush_held_toast()
 
 ## The same for a Success toast: the pond's `Pond Catch · 2/2 · Deliver at the Stall` waits for the Caught! card and
 ## a level banner of the same catch (q(103)). One slot: the latest held toast wins, as a new toast replaces a shown one.
-func toast_success_when_clear(text: String) -> void:
+func toast_success_when_clear(text: String, break_at_dot := false) -> void:
 	_held_toast = text
 	_held_success = true
+	_held_break = break_at_dot
 	_flush_held_toast()
 
 func _flush_held_toast() -> void:
 	if _held_toast == "" or not is_node_ready(): return
 	if surface == "busy" or _modal != null or not _card_queue.is_empty(): return
-	if _held_success: toast_success(_held_toast)
-	else: toast(_held_toast)
+	if _held_success: toast_success(_held_toast, _held_break)
+	else: toast(_held_toast, 0.0, _held_break)
 	_held_toast = ""
 	_held_success = false
+	_held_break = false
 
 ## InboxNotice (BAG-5-2 / FARM-LV2-2, LOCK-14, q(87) / q(88); SGODOT-234): rewards that did not fit the bag went to the
 ## Inbox. The card hangs under the bell, its right edge on the bell's (top: _notice_top), for MOTION_TOAST_BASE_MS

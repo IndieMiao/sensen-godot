@@ -74,3 +74,22 @@ func test_the_completion_toast_waits_for_the_card_and_is_a_success() -> void:
 	assert_int(ui._toasts.current_severity()).is_equal(ToastLayer.Severity.SUCCESS)
 	ui.toast_when_clear("Worm Bait · all used")   # the plain held toast stays an Info one
 	assert_int(ui._toasts.current_severity()).is_equal(ToastLayer.Severity.INFO)
+
+## 不知火舞 on #188: two lines break at a " · " (the dot dropped), a text that fits stays one line, and only callers
+## that ask for it (the pond's two toasts) do this; the toast still wraps by words otherwise.
+func test_two_lines_break_at_a_dot() -> void:
+	var ui := _ui()
+	await get_tree().process_frame
+	ui.toast("Pond Catch · Pond Crucian 0/2", 0.0, true)
+	assert_str(ui.toast_text()).is_equal("Pond Catch\nPond Crucian 0/2")
+	ui.toast_success("Pond Catch · 2/2 · Deliver at the Stall", true)
+	assert_str(ui.toast_text()).is_equal("Pond Catch · 2/2\nDeliver at the Stall")
+	ui.toast("Line in · Energy back", 0.0, true)
+	assert_str(ui.toast_text()).is_equal("Line in · Energy back")
+	ui.toast("Pond Catch · Pond Crucian 1/2")
+	assert_str(ui.toast_text()).is_equal("Pond Catch · Pond Crucian 1/2")
+	var card := Control.new()
+	ui.show_moment(card, false)
+	ui.toast_success_when_clear("Pond Catch · 2/2 · Deliver at the Stall", true)
+	ui.close_modal()
+	assert_str(ui.toast_text()).is_equal("Pond Catch · 2/2\nDeliver at the Stall")
