@@ -161,6 +161,9 @@ func cancel_walk() -> void:
 
 func card_open() -> bool: return is_instance_valid(_entry) and _entry.visible
 
+## The mouth was tapped and walked up to and its card is meant to show (it may not have drawn yet this frame).
+func card_wanted() -> bool: return _card_open
+
 ## Taps on the farm's material facilities (LOCK-07): the mouth walks up to it (tap_mouth); a spot gathers when the
 ## player stands near it, a locked one shows MAT-3; the workbench opens its drawer.
 func tap(screen: Vector2) -> bool:

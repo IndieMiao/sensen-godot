@@ -49,7 +49,7 @@ var _hold_until := 0
 var _leaving := false
 var _grey := false
 var _elevator_to := -1      # the floor an elevator ride asked for: it lands beside the elevator, not at the stairs
-var _facilities := {}       # id ("mine_up", "mine_down", "mine_elevator") → {kind, at, node} on this floor
+var _facilities := {}       # id ("mine_up", "mine_down", "mine_elevator") → {kind, at, node, box} on this floor
 var _walk := {}             # a tapped facility being walked to: {id, point}
 var _card_for := ""         # the facility whose EntryCard shows (a new floor's fee), "" none
 var _strip_open := ""        # the facility holding the open strip (P0Garden.pick_card)
@@ -183,7 +183,8 @@ func _broken(v: Dictionary, n: int) -> Array:
 	return out
 
 ## This floor's facilities and their art (the tap box and where the prompt sits): the up ladder (Exit on floor 1), the
-## down ladder above floor 2 and the elevator.
+## down ladder above floor 2 and the elevator. Their art stands still, so its world box is found once here (亚瑟 on #190)
+## rather than walked through every frame.
 func _find_facilities(n: int) -> void:
 	if rt != null:   # a new floor: the old floor's prompts fold (the ladder down is not on floor 2)
 		for id in _facilities: rt.ui.world_icon(id, null, Vector2.ZERO, false)
@@ -196,6 +197,7 @@ func _find_facilities(n: int) -> void:
 	var lift := scenery.find_child("MineElevator", true, false) as Node3D
 	if lift == null: lift = objects.find_child("MineElevator", true, false) as Node3D
 	_facilities["mine_elevator"] = {"kind": "elevator", "at": Layout.ELEVATOR, "node": lift}
+	for id in _facilities: _facilities[id]["box"] = _art_box(_facilities[id].node)
 
 ## Stairs, the elevator or a new floor: rebuild the chamber and land at the spawn (the elevator lands beside it).
 func _go_floor(n: int, by_elevator := false) -> void:
@@ -227,7 +229,7 @@ func facility_at(screen: Vector2) -> String:
 	var best := ""
 	var best_area := INF
 	for id in _facilities:
-		var box := _screen_rect(_facilities[id].node)
+		var box := _screen_rect(_facilities[id].box)
 		if box.has_point(screen) and box.get_area() < best_area:
 			best = id
 			best_area = box.get_area()
@@ -367,7 +369,7 @@ func _prompts(v: Dictionary) -> void:
 	_strip_side = _facing_side()
 	for id in _facilities:
 		var f: Dictionary = _facilities[id]
-		var box := _art_box(f.node)
+		var box: AABB = f.box
 		var at: Vector3 = f.at
 		var mark: Vector3 = Vector3(box.get_center().x, box.end.y + 0.15, box.get_center().z) if box.size != Vector3.ZERO else at + Vector3(0, 1.9, 0)
 		var hit: Vector3 = box.get_center() if box.size != Vector3.ZERO else at + Vector3(0, 0.8, 0)
@@ -384,10 +386,9 @@ func _prompts(v: Dictionary) -> void:
 				str(prompt.get("count", "")))
 	_show_card(v)
 
-## A facility's art on screen: its _art_box's corners projected, grown to the 44 touch size (the floor hatch of the
+## A facility's art on screen: its world box's corners projected, grown to the 44 touch size (the floor hatch of the
 ## ladder down is flat); empty without art.
-func _screen_rect(node: Node3D) -> Rect2:
-	var box := _art_box(node)
+func _screen_rect(box: AABB) -> Rect2:
 	if box.size == Vector3.ZERO: return Rect2()
 	var r := Rect2(cam.unproject_position(box.get_endpoint(0)), Vector2.ZERO)
 	for i in range(1, 8): r = r.expand(cam.unproject_position(box.get_endpoint(i)))
@@ -440,7 +441,7 @@ func _show_card(v: Dictionary) -> void:
 	_entry.action = str(_entry_data.label)
 	_entry.state = UiEntryCard.State.AVAILABLE if bool(_entry_data.enabled) else UiEntryCard.State.UNAVAILABLE
 	_entry.amber = bool(_entry_data.amber)
-	var box := _art_box(f.node)
+	var box: AABB = f.box
 	var at: Vector3 = f.at
 	var top := cam.unproject_position(Vector3(box.get_center().x, box.end.y + 0.15, box.get_center().z) if box.size != Vector3.ZERO else at + Vector3(0, 1.9, 0))
 	var size := _entry.get_combined_minimum_size()
@@ -768,7 +769,7 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"floor": _go_floor(int(step[1]))
 		"elevator": p0_action({"type": "elevator"})
 		"tapfac":   # tapfac:mine_down — a tap on that facility's model (walk up, then use it; SGODOT-266)
-			p0_tap(cam.unproject_position(_art_box(_facilities[step[1]].node).get_center()) if _facilities.has(step[1]) else Vector2(-1, -1))
+			p0_tap(cam.unproject_position((_facilities[step[1]].box as AABB).get_center()) if _facilities.has(step[1]) else Vector2(-1, -1))
 		"cardtap":   # cardtap — a real tap on the open fee card's button
 			if card_shown(): p0_tap(_entry.main_rect().get_center() - rt.ui.root.global_position)
 		"elevrow":   # elevrow:0 — press that row of the open elevator panel (row 0 is Ground)

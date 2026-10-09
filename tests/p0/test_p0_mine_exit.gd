@@ -152,6 +152,7 @@ func test_at_the_mouth_the_card_carries_the_fee() -> void:
 	m.tap_mouth()
 	m.frame(farm.rt.session.current())
 	assert_bool(m.card_open()).is_true()
+	assert_bool(m.card_wanted()).is_true()   # it holds the farm's one card meanwhile (LOCK-07, 亚瑟 on #190)
 	var card: UiEntryCard = m._entry
 	assert_str("%s · %s" % [card.title, card.title_fact]).is_equal("The mine · Runs today 0/2")
 	assert_str(card.main_text()).is_equal("Enter mine · 2 Energy")
@@ -160,6 +161,7 @@ func test_at_the_mouth_the_card_carries_the_fee() -> void:
 	card.pressed.emit()
 	assert_array(sent).is_equal([{"type": "mine_enter"}])
 	assert_bool(m.card_open()).is_false()
+	assert_bool(m.card_wanted()).is_false()
 	await _end(farm)
 
 ## With a run: Continue run · Free, New run under it; short of Energy the main is amber and opens the Energy card;
