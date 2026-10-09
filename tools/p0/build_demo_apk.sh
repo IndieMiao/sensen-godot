@@ -27,7 +27,8 @@ CODE="${CODE:-$(date +%Y%m%d)01}"
 [[ "$CODE" =~ ^20[0-9]{6}[0-9]{2}$ ]] || { echo "--code must be YYYYMMDDNN, got $CODE" >&2; exit 2; }
 # What the APK is built from, read before this script touches export_presets.cfg (周瑜 on #163): tracked changes, and
 # untracked files, since an all_resources export packs untracked scenes, scripts and json too (the preset's
-# exclude_filter is applied to the list in build.json; publish_demo_apk.mjs refuses anything but .uid files).
+# exclude_filter is applied to the list in build.json; publish_demo_apk.mjs refuses anything but .uid files). Files git
+# ignores are not listed: mapbox_token.txt and this script's demo_server.json belong in the APK by design.
 COMMIT="$(git rev-parse HEAD)"
 DIRTY="$(git status --porcelain --untracked-files=no | head -1)"
 export P0_UNTRACKED="$(git ls-files --others --exclude-standard)"
