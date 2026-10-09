@@ -23,6 +23,24 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 [[ "$SERVER" == http://* || "$SERVER" == https://* ]] || { echo "--server http(s)://…/v1 is required" >&2; exit 2; }
+# The native side the demo needs, as in the int test packages (SGODOT-261: an APK exported from a bare template had
+# no Mapbox and no LiveKit, so its map was black). android/ is not tracked: tools/android/setup_android_build.sh puts
+# the Mapbox overlay on the 4.7.2 template and the three prepare_*_plugin.py add voice (LiveKit), WebView and Sign in
+# with Google; mapbox_token.txt (ignored, never committed) goes in the repo root. Refuse to export without them.
+missing=()
+[[ -s mapbox_token.txt ]] || missing+=("mapbox_token.txt in the repo root")
+B=android/build
+grep -qs 'com.mapbox.maps:android' "$B/build.gradle" && [[ -f "$B/src/main/java/com/sensen/map/GodotMapPlugin.kt" ]] \
+  || missing+=("the Mapbox overlay (tools/android/setup_android_build.sh)")
+grep -qs 'io.livekit:livekit-android' "$B/build.gradle" && [[ -f "$B/src/main/java/com/sensen/voice/GodotVoicePlugin.kt" ]] \
+  || missing+=("GodotVoice / LiveKit (python3 tools/android/prepare_voice_plugin.py)")
+[[ -f "$B/src/main/java/com/sensen/webview/GodotWebViewPlugin.kt" ]] || missing+=("GodotWebView (python3 tools/android/prepare_webview_plugin.py)")
+[[ -f "$B/src/main/java/com/sensen/googleauth/GodotGoogleSignInPlugin.kt" ]] || missing+=("GodotGoogleSignIn (python3 tools/android/prepare_google_signin_plugin.py)")
+if (( ${#missing[@]} )); then
+  printf 'not building: the Android build is missing\n' >&2; printf '  - %s\n' "${missing[@]}" >&2
+  echo "run tools/android/setup_android_build.sh, then the three prepare_*_plugin.py, and put mapbox_token.txt in place" >&2
+  exit 2
+fi
 CODE="${CODE:-$(date +%Y%m%d)01}"
 [[ "$CODE" =~ ^20[0-9]{6}[0-9]{2}$ ]] || { echo "--code must be YYYYMMDDNN, got $CODE" >&2; exit 2; }
 # What the APK is built from, read before this script touches export_presets.cfg (周瑜 on #163): tracked changes, and
@@ -59,10 +77,8 @@ version = int(re.search(r"version/code=(\d+)", seg).group(1))
 json.dump({"url": url.rstrip("/"), "key": key, "version": version}, open("assets/p0/demo_server.json", "w"))
 PY
 
-TEMPLATE=()
-[[ -d android/build ]] || TEMPLATE=(--install-android-build-template)
 "$GODOT" --headless --path . --import > "$LOGS/import.log" 2>&1 || true
-"$GODOT" --headless --path . ${TEMPLATE[@]+"${TEMPLATE[@]}"} --export-debug "Android P0" "$OUT" > "$LOGS/export.log" 2>&1 \
+"$GODOT" --headless --path . --export-debug "Android P0" "$OUT" > "$LOGS/export.log" 2>&1 \
   || { echo "export failed, see $LOGS/export.log" >&2; exit 1; }
 
 # Read back what was built: package, version, signer, the baked server (never print the key), checksum.
@@ -84,6 +100,11 @@ signer = re.search(r"SHA-256 digest: ([0-9a-f]+)", open(f"{logs}/signer.txt").re
 with zipfile.ZipFile(apk) as z:
     names = [n for n in z.namelist() if n.endswith("p0/demo_server.json")]
     baked = json.loads(z.read(names[0])) if names else None
+    entries = set(z.namelist())
+# What the map and voice need inside the APK (SGODOT-261): both Mapbox libraries, LiveKit's, the token.
+NATIVE = ["lib/arm64-v8a/libmapbox-maps.so", "lib/arm64-v8a/libmapbox-common.so",
+          "lib/arm64-v8a/liblkjingle_peerconnection_so.so", "assets/mapbox_token.txt"]
+native_missing = [n for n in NATIVE if n not in entries]
 result = {
     "apk": apk, "sha256": hashlib.sha256(open(apk, "rb").read()).hexdigest(),
     "package": pkg.group(1) if pkg else None, "version_code": int(pkg.group(2)) if pkg else None,
@@ -93,10 +114,12 @@ result = {
     "key_baked": bool(baked) and baked.get("key") == key and key != "",
     "version_baked": baked.get("version") if baked else None,
     "source_commit": commit, "source_dirty": dirty != "",
+    "native_ok": not native_missing, "native_missing": native_missing,
     "untracked_exported": untracked[:200], "untracked_exported_count": len(untracked),
 }
 json.dump(result, open(f"{logs}/build.json", "w"), indent=2)
 print(json.dumps(result, indent=2))
-ok = result["package"] == "com.sensen.p0demo" and result["server_matches"] and result["version_baked"] == result["version_code"]
+ok = result["package"] == "com.sensen.p0demo" and result["server_matches"] and result["version_baked"] == result["version_code"] \
+    and result["native_ok"]
 sys.exit(0 if ok else 1)
 PY
