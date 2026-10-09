@@ -50,7 +50,8 @@ static func all() -> Array[Dictionary]:
 		{id = "action_radial_motion", title = "UiActionRadial · opening", figma = "Motion 1651:100816 · 0 / 80 / 160 / 300 ms", build = _action_radial_motion},
 		{id = "status_badge", title = "UiStatusBadge", figma = "StatusBadge 1132:79554 · LOCK-11", build = _status_badges},
 		{id = "world_prompts", title = "World prompts", figma = "UiWorldIconButton · UiWorldNameBar · UiNpcNameTag · WorldIconButton 1674:101157 · WorldNameBar 1674:101190 · NpcNameTag 1674:101195 · row 51 · LOCK-07 / 16 v2", build = _world_prompts},
-		{id = "entry_card", title = "UiEntryCard", figma = "EntryCard 1468:94344 · LOCK-21 / LOCK-10", build = _entry_cards},
+		{id = "entry_card", title = "UiEntryCard · mine mouth", figma = "EntryCard 1468:94344 · SGODOT-266 (LOCK-21 rev. 10-09)", build = _entry_cards},
+		{id = "entry_card_ladder", title = "UiEntryCard · ladder", figma = "EntryCard · SGODOT-266 · LOCK-10", build = _entry_cards_ladder},
 		{id = "tip_card", title = "UiTipCard", figma = "TipCard 1243:87540 · TUT-2 482:72 · A-03 (SGODOT-232 U6, 235-B2)", build = _tip_cards},
 		{id = "inbox_notice", title = "UiInboxNotice", figma = "InboxNotice 1860:104768 · BAG-5-2 482:146 · FARM-LV2-2 1368:91701 · q(87) (SGODOT-234)", build = _inbox_notices},
 		# SGODOT-222 world display
@@ -1252,18 +1253,38 @@ static func _status_badges() -> Control:
 	v.add_child(npc)
 	return v
 
-## The main's four variants: State=Available / Unavailable × Pointer=Center / Right (gate near the right edge).
+## SGODOT-266 (不知火舞 9ce583a8, copy 李白 q(102)): the mine mouth's card with no run, short of Energy and with a run
+## (Continue + New run and its note).
 static func _entry_cards() -> Control:
+	return _entry_card_column([["The mine", "Runs today 0/2", "Enter mine · 2 Energy", false, false, "", false, "", false, "no run"],
+		["The mine", "Runs today 0/2", "Enter mine · Need 2 Energy", false, true, "", false, "", false, "short of Energy"],
+		["The mine", "Runs today 1/2", "Continue run · Free", false, false, "New run · 2 Energy", false, "Current run will end", false,
+			"a run: New run under it"]])
+
+## The mouth's New run when it can't (no note), then a ladder's card (no title): new floor, short, unavailable near the
+## right edge.
+static func _entry_cards_ladder() -> Control:
+	return _entry_card_column([["The mine", "Runs today 1/2", "Continue run · Free", false, false, "New run · Clear Floor 2 first", true,
+			"Current run will end", false, "mouth · New run unavailable: no note"],
+		["", "", "Floor 2 · 2 Energy", false, false, "", false, "", false, "ladder · new floor"],
+		["", "", "Floor 2 · Need 2 Energy", false, true, "", false, "", false, "ladder · short of Energy"],
+		["", "", "Floor 2 · Clear Floor 1 first", true, false, "", false, "", true, "ladder · unavailable, near the right edge"]])
+
+## [title, fact, main, main grey, amber, second, second grey, note, near the right edge, caption] per card.
+static func _entry_card_column(cards: Array) -> Control:
 	var v := _column()
 	var A := UiEntryCard.State.AVAILABLE
 	var U := UiEntryCard.State.UNAVAILABLE
-	for it in [["New run · 2 Energy", "Current run will end · Runs today 1/2", A, false, "available"],
-			["New run · Clear Floor 2 first", "", U, false, "unavailable: the reason on the action line"],
-			["New run · 2 Energy", "Current run will end · Runs today 1/2", A, true, "available, gate near the right edge"],
-			["Mine runs today 2/2 · Resets in 9h 12m", "", U, true, "unavailable, gate near the right edge"]]:
-		var c := UiEntryCard.new(it[0], it[1], it[2])
-		if it[3]: c.point_at(1000.0)
-		v.add_child(_captioned(c, it[4]))
+	for it in cards:
+		var c := UiEntryCard.new(it[2], U if it[3] else A)
+		c.title = it[0]
+		c.title_fact = it[1]
+		c.amber = it[4]
+		c.second = it[5]
+		c.second_state = U if it[6] else A
+		c.note = it[7]
+		if it[8]: c.point_at(1000.0)
+		v.add_child(_captioned(c, it[9]))
 	return v
 
 ## B2-06's cards: Tools (a gap on the button, craftable, Equip, Equipped, Owned · always on) and Supplies (Craft with

@@ -678,21 +678,6 @@ func _fab_pressed() -> void:
 ## While held, the farm repeats the action for each new plot with the same verb.
 func fab_state() -> Dictionary: return _fab_state
 
-## The main key's GuidePulse, once: a tap on what the key acts on, made where the key is already the way in (the mine
-## mouth, 不知火舞 on 231, int11 ②: entering costs Energy, so it stays on the key, LOCK-21). A 3 px ring from full, out
-## to +12 px, held full until half its time (0.3 s, 0.75 of the ease-out) and faded after: the main's 2 px fading from
-## the start read faint against the key's own green ring over the fields (不知火舞 on #156 / #160).
-const KEY_PULSE_RING := 3.0
-const KEY_PULSE_ALPHA := 1.0
-const KEY_PULSE_GROW := 12.0
-const KEY_PULSE_FADE_FROM := 0.75
-var key_pulses := 0
-func pulse_key() -> UiGuidePulse:
-	if _keys == null or not _keys.is_visible_in_tree(): return null
-	key_pulses += 1
-	return UiGuidePulse.play(_keys.key(), Rect2(), UiGuidePulse.Shape.CIRCLE, 16.0, KEY_PULSE_RING, KEY_PULSE_ALPHA,
-		KEY_PULSE_GROW, KEY_PULSE_FADE_FROM)
-
 # ---------------------------------------------------------------- world tags & floats
 # ---------------------------------------------------------------- world prompts (SGODOT-250, LOCK-07 v2 / LOCK-16 v2)
 ## A facility within view and about 8 m: its icon button (WorldIconButton 1674:101157) centred on `screen` (this UI's
@@ -970,6 +955,11 @@ func open_marker_area() -> Rect2:
 	var top := UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H + safe_top()
 	var bottom := _kit.size.y - UiTokens.SIZE_QUICK_BAR_BOTTOM - safe_bottom() - UiTokens.SIZE_QUICK_BAR_H
 	return Rect2(0.0, top, _kit.size.x, maxf(0.0, bottom - top))
+
+## The highest a card lifted off the player goes (SGODOT-266, 不知火舞 on #190; P0Actor.screen_box): 8 px under the
+## HUD's second row.
+const CARD_UNDER_HUD := 8.0
+func card_top() -> float: return UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H + safe_top() + CARD_UNDER_HUD
 
 ## Where world markers may sit (LOCK-07): below the two-row HUD and above the quick bar. A finger card is passive, so
 ## one lying under a HUD chip lost its tap to the chip (int5 hand test 8: the Homestead card slid under Energy and

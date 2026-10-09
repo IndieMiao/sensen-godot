@@ -90,6 +90,21 @@ func lock(on: bool) -> void:
 	state = "locked" if on else "idle"
 	if not on: _play("idle", true)
 
+## The player on screen through `camera` (SGODOT-266, 不知火舞 on #190), for UI that keeps off them: from the feet to the
+## top of the head — the outfit's own top (hair, a hat) once the rig has drawn, else HEAD_M — and HALF_WIDTH_M either side
+## of the body's axis (P0Pond's player box for the reel gauge). Not the rig's box projected whole: its rest-pose arms
+## and its depth would make it half again as wide and tall as the figure.
+const HEAD_M := 1.8
+const HALF_WIDTH_M := 0.3
+func screen_box(camera: Camera3D) -> Rect2:
+	var box := DressingCamera.merged_aabb(rig) if rig != null else AABB()
+	var top := box.end.y if box.has_volume() else position.y + HEAD_M
+	var feet := camera.unproject_position(position)
+	var head := camera.unproject_position(Vector3(position.x, top, position.z))
+	var side := camera.unproject_position(position + camera.global_basis.x * HALF_WIDTH_M).x - feet.x
+	var r := Rect2(feet, Vector2.ZERO).expand(head)
+	return Rect2(r.position.x - absf(side), r.position.y, r.size.x + absf(side) * 2.0, r.size.y)
+
 func teleport(p: Vector3) -> void:
 	mover.stop()
 	mover.position = p

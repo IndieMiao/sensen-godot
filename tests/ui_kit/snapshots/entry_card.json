@@ -4,7 +4,7 @@
     0,
     0,
     328,
-    376
+    532
   ],
   "children": [
     {
@@ -16,7 +16,7 @@
         22
       ],
       "variation": "RowTitleXB15",
-      "text": "UiEntryCard"
+      "text": "UiEntryCard · mine mouth"
     },
     {
       "type": "Label",
@@ -24,77 +24,99 @@
         0,
         28,
         328,
-        18
+        36
       ],
       "variation": "CaptionR12",
-      "text": "EntryCard 1468:94344 · LOCK-21 / LOCK-10"
+      "text": "EntryCard 1468:94344 · SGODOT-266 (LOCK-21 rev. 10-09)"
     },
     {
       "type": "VBoxContainer",
       "rect": [
         0,
-        52,
+        70,
         328,
-        324
+        462
       ],
       "children": [
         {
           "type": "VBoxContainer",
           "rect": [
             0,
-            52,
+            70,
             328,
-            81
+            121
           ],
           "children": [
             {
               "type": "UiEntryCard",
               "rect": [
-                55,
-                52,
-                218,
-                61
+                44,
+                70,
+                240,
+                101
               ],
               "children": [
                 {
                   "type": "PanelContainer",
                   "rect": [
-                    55,
-                    52,
-                    218,
-                    54
+                    44,
+                    70,
+                    240,
+                    94
                   ],
                   "children": [
                     {
                       "type": "VBoxContainer",
                       "rect": [
-                        69,
-                        60,
-                        190,
-                        37
+                        56,
+                        82,
+                        216,
+                        70
                       ],
                       "children": [
                         {
-                          "type": "Label",
+                          "type": "HBoxContainer",
                           "rect": [
-                            69,
-                            60,
-                            190,
-                            19
+                            56,
+                            82,
+                            216,
+                            18
                           ],
-                          "variation": "C13XB",
-                          "text": "New run · 2 Energy"
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                89,
+                                82,
+                                53,
+                                18
+                              ],
+                              "variation": "C12XB",
+                              "text": "The mine"
+                            },
+                            {
+                              "type": "Label",
+                              "rect": [
+                                146,
+                                82,
+                                93,
+                                18
+                              ],
+                              "variation": "C12XB",
+                              "text": "· Runs today 0/2"
+                            }
+                          ]
                         },
                         {
-                          "type": "Label",
+                          "type": "Button",
                           "rect": [
-                            69,
-                            81,
-                            190,
-                            16
+                            56,
+                            108,
+                            216,
+                            44
                           ],
-                          "variation": "C11B",
-                          "text": "Current run will end · Runs today 1/2"
+                          "variation": "CmdPrimary",
+                          "text": "Enter mine · 2 Energy"
                         }
                       ]
                     }
@@ -104,7 +126,7 @@
                   "type": "UiPointer",
                   "rect": [
                     157,
-                    106,
+                    164,
                     14,
                     7
                   ]
@@ -115,12 +137,12 @@
               "type": "Label",
               "rect": [
                 0,
-                119,
+                177,
                 328,
                 14
               ],
               "variation": "C9B",
-              "text": "available"
+              "text": "no run"
             }
           ]
         },
@@ -128,48 +150,81 @@
           "type": "VBoxContainer",
           "rect": [
             0,
-            145,
+            203,
             328,
-            63
+            121
           ],
           "children": [
             {
               "type": "UiEntryCard",
               "rect": [
-                63,
-                145,
-                201,
-                43
+                39,
+                203,
+                250,
+                101
               ],
               "children": [
                 {
                   "type": "PanelContainer",
                   "rect": [
-                    63,
-                    145,
-                    201,
-                    36
+                    39,
+                    203,
+                    250,
+                    94
                   ],
                   "children": [
                     {
                       "type": "VBoxContainer",
                       "rect": [
-                        77,
-                        153,
-                        173,
-                        19
+                        51,
+                        215,
+                        226,
+                        70
                       ],
                       "children": [
                         {
-                          "type": "Label",
+                          "type": "HBoxContainer",
                           "rect": [
-                            77,
-                            153,
-                            173,
-                            19
+                            51,
+                            215,
+                            226,
+                            18
                           ],
-                          "variation": "C13XB",
-                          "text": "New run · Clear Floor 2 first"
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                89,
+                                215,
+                                53,
+                                18
+                              ],
+                              "variation": "C12XB",
+                              "text": "The mine"
+                            },
+                            {
+                              "type": "Label",
+                              "rect": [
+                                146,
+                                215,
+                                93,
+                                18
+                              ],
+                              "variation": "C12XB",
+                              "text": "· Runs today 0/2"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Button",
+                          "rect": [
+                            51,
+                            241,
+                            226,
+                            44
+                          ],
+                          "variation": "CmdPrimary",
+                          "text": "Enter mine · Need 2 Energy"
                         }
                       ]
                     }
@@ -179,7 +234,7 @@
                   "type": "UiPointer",
                   "rect": [
                     157,
-                    181,
+                    297,
                     14,
                     7
                   ]
@@ -190,12 +245,12 @@
               "type": "Label",
               "rect": [
                 0,
-                194,
+                310,
                 328,
                 14
               ],
               "variation": "C9B",
-              "text": "unavailable: the reason on the action line"
+              "text": "short of Energy"
             }
           ]
         },
@@ -203,59 +258,114 @@
           "type": "VBoxContainer",
           "rect": [
             0,
-            220,
+            336,
             328,
-            81
+            196
           ],
           "children": [
             {
               "type": "UiEntryCard",
               "rect": [
-                55,
-                220,
-                218,
-                61
+                44,
+                336,
+                240,
+                176
               ],
               "children": [
                 {
                   "type": "PanelContainer",
                   "rect": [
-                    55,
-                    220,
-                    218,
-                    54
+                    44,
+                    336,
+                    240,
+                    169
                   ],
                   "children": [
                     {
                       "type": "VBoxContainer",
                       "rect": [
-                        69,
-                        228,
-                        190,
-                        37
+                        56,
+                        348,
+                        216,
+                        145
                       ],
                       "children": [
                         {
-                          "type": "Label",
+                          "type": "HBoxContainer",
                           "rect": [
-                            69,
-                            228,
-                            190,
-                            19
+                            56,
+                            348,
+                            216,
+                            18
                           ],
-                          "variation": "C13XB",
-                          "text": "New run · 2 Energy"
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                89,
+                                348,
+                                53,
+                                18
+                              ],
+                              "variation": "C12XB",
+                              "text": "The mine"
+                            },
+                            {
+                              "type": "Label",
+                              "rect": [
+                                146,
+                                348,
+                                93,
+                                18
+                              ],
+                              "variation": "C12XB",
+                              "text": "· Runs today 1/2"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Button",
+                          "rect": [
+                            56,
+                            374,
+                            216,
+                            44
+                          ],
+                          "variation": "CmdPrimary",
+                          "text": "Continue run · Free"
+                        },
+                        {
+                          "type": "CenterContainer",
+                          "rect": [
+                            56,
+                            426,
+                            216,
+                            44
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                97,
+                                437,
+                                133,
+                                22
+                              ],
+                              "variation": "ButtonB15",
+                              "text": "New run · 2 Energy"
+                            }
+                          ]
                         },
                         {
                           "type": "Label",
                           "rect": [
-                            69,
-                            249,
-                            190,
-                            16
+                            56,
+                            478,
+                            216,
+                            15
                           ],
-                          "variation": "C11B",
-                          "text": "Current run will end · Runs today 1/2"
+                          "variation": "C10B",
+                          "text": "Current run will end"
                         }
                       ]
                     }
@@ -264,8 +374,8 @@
                 {
                   "type": "UiPointer",
                   "rect": [
-                    238,
-                    274,
+                    157,
+                    505,
                     14,
                     7
                   ]
@@ -276,87 +386,12 @@
               "type": "Label",
               "rect": [
                 0,
-                287,
+                518,
                 328,
                 14
               ],
               "variation": "C9B",
-              "text": "available, gate near the right edge"
-            }
-          ]
-        },
-        {
-          "type": "VBoxContainer",
-          "rect": [
-            0,
-            313,
-            328,
-            63
-          ],
-          "children": [
-            {
-              "type": "UiEntryCard",
-              "rect": [
-                30,
-                313,
-                268,
-                43
-              ],
-              "children": [
-                {
-                  "type": "PanelContainer",
-                  "rect": [
-                    30,
-                    313,
-                    268,
-                    36
-                  ],
-                  "children": [
-                    {
-                      "type": "VBoxContainer",
-                      "rect": [
-                        44,
-                        321,
-                        240,
-                        19
-                      ],
-                      "children": [
-                        {
-                          "type": "Label",
-                          "rect": [
-                            44,
-                            321,
-                            240,
-                            19
-                          ],
-                          "variation": "C13XB",
-                          "text": "Mine runs today 2/2 · Resets in 9h 12m"
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "UiPointer",
-                  "rect": [
-                    263,
-                    349,
-                    14,
-                    7
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "Label",
-              "rect": [
-                0,
-                362,
-                328,
-                14
-              ],
-              "variation": "C9B",
-              "text": "unavailable, gate near the right edge"
+              "text": "a run: New run under it"
             }
           ]
         }

@@ -81,12 +81,36 @@ static func mailbox(view: Dictionary) -> Dictionary:
 static func workbench() -> Dictionary:
 	return _p("workbench", "Workbench")
 
-## The mine mouth with no unfinished run (231, 不知火舞 on 235; MINE-P0-1 copy): the plain pickaxe button within RANGE,
-## open: `The mine` · `Runs today 0/2` (`2/2` once used up). With an unfinished run the mouth keeps its Run 1/2 badge
-## and the EntryCard instead (LOCK-11 / LOCK-21), so the farm does not show this prompt then.
+## The mine mouth (231, 不知火舞 on 235; MINE-P0-1 / P0-5 copy): the plain pickaxe button within RANGE, open:
+## `The mine` · `Runs today 0/2` (`1/2` with a run, `2/2` once used up) — with or without an unfinished run (SGODOT-266,
+## 不知火舞 on #190: no Run 1/2 badge). Its EntryCard takes the strip's place once tapped and walked up to.
 static func mine(view: Dictionary) -> Dictionary:
 	var runs: Dictionary = view.get("mine", {}).get("runs", {})
 	return _p("pickaxe", "The mine", "Runs today %d/%d" % [int(runs.get("used", 0)), int(runs.get("limit", 2))])
+
+## The mine's facilities (SGODOT-266, copy 李白 q(102) / 不知火舞): tapped like the farm's, so they carry the same icon
+## button and strip, labels only — the fee is confirmed on the card at the ladder, never by the tap. A ladder up names
+## where it goes, as a door does: floor 1's way out `Farm` (i-door), the ladder below it `Floor 1` (i-ladder). The ladder
+## down `Floor 2 · 2 Energy`, only `Floor 2` once paid this run, `Floor 2 · Clear Floor 1 first` while this floor is not
+## cleared; the elevator `Elevator`. kind: P0MaterialLogic.mine_facility's ("exit", "up", "stairs", "elevator").
+static func mine_facility(view: Dictionary, n: int, kind: String) -> Dictionary:
+	match kind:
+		"exit": return _p("door", "Farm")
+		"up": return _p("ladder", "Floor %d" % (n - 1))
+		"elevator": return _p("elevator", "Elevator")
+		"stairs":
+			var mine: Dictionary = view.get("mine", {})
+			var floors: Array = (mine.get("run", {}) if mine.get("run", null) is Dictionary else {}).get("floors", [])
+			var here := {}
+			var next := {}
+			for f in floors:
+				if int(f.get("floor", 0)) == n: here = f
+				if int(f.get("floor", 0)) == n + 1: next = f
+			var name := "Floor %d" % (n + 1)
+			if next.get("paid", false): return _p("ladder", name)
+			if not here.get("cleared", false): return _p("ladder", name, "Clear Floor %d first" % n)
+			return _p("ladder", name, "%d Energy" % int(mine.get("floor_energy", 2)))
+	return {}
 
 ## A gathering spot from P0MaterialLogic.gather_marks: its first yield's icon; Ready from anywhere; locked (Clay Bank
 ## before Homestead Lv2) with the level as its fact; cooling down: the time left.

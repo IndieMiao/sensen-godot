@@ -1,0 +1,399 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    522
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiEntryCard · ladder"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        18
+      ],
+      "variation": "CaptionR12",
+      "text": "EntryCard · SGODOT-266 · LOCK-10"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        52,
+        328,
+        470
+      ],
+      "children": [
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            52,
+            328,
+            173
+          ],
+          "children": [
+            {
+              "type": "UiEntryCard",
+              "rect": [
+                44,
+                52,
+                240,
+                153
+              ],
+              "children": [
+                {
+                  "type": "PanelContainer",
+                  "rect": [
+                    44,
+                    52,
+                    240,
+                    146
+                  ],
+                  "children": [
+                    {
+                      "type": "VBoxContainer",
+                      "rect": [
+                        56,
+                        64,
+                        216,
+                        122
+                      ],
+                      "children": [
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            56,
+                            64,
+                            216,
+                            18
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                89,
+                                64,
+                                53,
+                                18
+                              ],
+                              "variation": "C12XB",
+                              "text": "The mine"
+                            },
+                            {
+                              "type": "Label",
+                              "rect": [
+                                146,
+                                64,
+                                93,
+                                18
+                              ],
+                              "variation": "C12XB",
+                              "text": "· Runs today 1/2"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Button",
+                          "rect": [
+                            56,
+                            90,
+                            216,
+                            44
+                          ],
+                          "variation": "CmdPrimary",
+                          "text": "Continue run · Free"
+                        },
+                        {
+                          "type": "CenterContainer",
+                          "rect": [
+                            56,
+                            142,
+                            216,
+                            44
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                66,
+                                153,
+                                195,
+                                22
+                              ],
+                              "variation": "ButtonB15",
+                              "text": "New run · Clear Floor 2 first"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "UiPointer",
+                  "rect": [
+                    157,
+                    198,
+                    14,
+                    7
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                211,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "mouth · New run unavailable: no note"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            237,
+            328,
+            87
+          ],
+          "children": [
+            {
+              "type": "UiEntryCard",
+              "rect": [
+                44,
+                237,
+                240,
+                67
+              ],
+              "children": [
+                {
+                  "type": "PanelContainer",
+                  "rect": [
+                    44,
+                    237,
+                    240,
+                    60
+                  ],
+                  "children": [
+                    {
+                      "type": "VBoxContainer",
+                      "rect": [
+                        52,
+                        245,
+                        224,
+                        44
+                      ],
+                      "children": [
+                        {
+                          "type": "Button",
+                          "rect": [
+                            52,
+                            245,
+                            224,
+                            44
+                          ],
+                          "variation": "CmdPrimary",
+                          "text": "Floor 2 · 2 Energy"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "UiPointer",
+                  "rect": [
+                    157,
+                    297,
+                    14,
+                    7
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                310,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "ladder · new floor"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            336,
+            328,
+            87
+          ],
+          "children": [
+            {
+              "type": "UiEntryCard",
+              "rect": [
+                44,
+                336,
+                240,
+                67
+              ],
+              "children": [
+                {
+                  "type": "PanelContainer",
+                  "rect": [
+                    44,
+                    336,
+                    240,
+                    60
+                  ],
+                  "children": [
+                    {
+                      "type": "VBoxContainer",
+                      "rect": [
+                        52,
+                        344,
+                        224,
+                        44
+                      ],
+                      "children": [
+                        {
+                          "type": "Button",
+                          "rect": [
+                            52,
+                            344,
+                            224,
+                            44
+                          ],
+                          "variation": "CmdPrimary",
+                          "text": "Floor 2 · Need 2 Energy"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "UiPointer",
+                  "rect": [
+                    157,
+                    396,
+                    14,
+                    7
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                409,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "ladder · short of Energy"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            435,
+            328,
+            87
+          ],
+          "children": [
+            {
+              "type": "UiEntryCard",
+              "rect": [
+                44,
+                435,
+                240,
+                67
+              ],
+              "children": [
+                {
+                  "type": "PanelContainer",
+                  "rect": [
+                    44,
+                    435,
+                    240,
+                    60
+                  ],
+                  "children": [
+                    {
+                      "type": "VBoxContainer",
+                      "rect": [
+                        52,
+                        443,
+                        224,
+                        44
+                      ],
+                      "children": [
+                        {
+                          "type": "Button",
+                          "rect": [
+                            52,
+                            443,
+                            224,
+                            44
+                          ],
+                          "variation": "CmdBlocked",
+                          "text": "Floor 2 · Clear Floor 1 first"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "UiPointer",
+                  "rect": [
+                    249,
+                    495,
+                    14,
+                    7
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                508,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "ladder · unavailable, near the right edge"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

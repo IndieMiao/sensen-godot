@@ -331,10 +331,15 @@ func _process(dt: float) -> void:
 func _on_action(cmd: Dictionary) -> void:
 	if str(cmd.get("type", "")) == "energy_card":
 		var verb = _call("p0_energy_verb", [])
-		ui.open_energy_card(int(ui.fab_state().get("need", 0)), str(verb) if verb != null else str(ui.fab_state().get("verb", "")))
-		session.report({"kind": "energy_card", "need": int(ui.fab_state().get("need", 0))})
+		energy_card(int(ui.fab_state().get("need", 0)), str(verb) if verb != null else str(ui.fab_state().get("verb", "")))
 		return
 	if not cmd.is_empty(): _call("p0_action", [cmd])
+
+## The Energy card for an action short of Energy (LOCK-09) and its observation-log line: the main key's (above), or a
+## facility's fee button, which names its own need and verb (`Floor 2`, `Enter mine`; SGODOT-266).
+func energy_card(need: int, verb: String) -> void:
+	ui.open_energy_card(need, verb)
+	session.report({"kind": "energy_card", "need": need})
 
 ## The floats a landed catch's reply held for the world (catch_floats), handed over once: the world lets them rise.
 func take_catch_floats() -> Array:
