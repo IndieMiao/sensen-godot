@@ -92,3 +92,11 @@ func test_the_key_pulse_is_the_thicker_ring() -> void:
 	assert_float(pulse.start_alpha).is_equal(P0Ui.KEY_PULSE_ALPHA)
 	assert_float(P0Ui.KEY_PULSE_RING).is_equal(3.0)
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(store))
+
+## The mouth's box reaches the Herb Patch's 64 px tap circle (苏烈 on #156): a tap on both goes to the nearer one.
+func test_a_tap_on_both_the_mouth_and_a_spot_goes_to_the_nearer() -> void:
+	var mouth := Vector2(100, 300)
+	var herb := Vector2(170, 330)
+	assert_bool(P0FarmMaterials.mouth_nearest(Vector2(110, 300), mouth, [herb])).is_true()    # by the gate
+	assert_bool(P0FarmMaterials.mouth_nearest(Vector2(160, 325), mouth, [herb])).is_false()   # by the Herb Patch
+	assert_bool(P0FarmMaterials.mouth_nearest(Vector2(60, 250), mouth, [herb])).is_true()     # outside the spot's circle
