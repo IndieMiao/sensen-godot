@@ -245,12 +245,14 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
   }
   s.presence ??= { left_at: null, last_at: 0, space: null };
   s.presence.place ??= null;
-  // SGODOT-270: the home city moved (Shanghai → San Francisco). A pond that is no longer on the map is let go when the
-  // save loads: the place is forgotten, and a cast still out there comes in as a line in before the bite would — the
-  // Energy back, no fish, no XP, an unused teaching pin returned. Old casts without a place are left alone.
-  if (s.presence.place && !c.fishing.places[s.presence.place]) s.presence.place = null;
+  // SGODOT-270: the home city moved (Shanghai → San Francisco). A pond that is no longer one of the home city's (gone
+  // from the map, or left in another city, as notePlace judges) is let go when the save loads: the place is forgotten,
+  // and a cast still out there comes in as a line in before the bite would — the Energy back, no fish, no XP, an unused
+  // teaching pin returned. Old casts without a place are left alone.
+  const home = (id: string) => c.fishing.places[id]?.city === c.profile.city.toLowerCase();
+  if (s.presence.place && !home(s.presence.place)) s.presence.place = null;
   const cast = s.cast;
-  if (cast?.place && !c.fishing.places[cast.place]) {
+  if (cast?.place && !home(cast.place)) {
     if (cast.pin) s.firsts = s.firsts.filter(f => f !== cast.pin);
     const cap = maxEnergy(c, s) + c.energy.bonus_zone;
     s.energy.value = Math.max(s.energy.value, Math.min(cap, s.energy.value + c.fishing.cast_energy));

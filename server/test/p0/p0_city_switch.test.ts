@@ -74,4 +74,15 @@ describe('a save lets go of a pond that is no longer on the map (SGODOT-270)', (
     expect(u.presence.place).toBe(kept);
     expect(u.cast?.place).toBe(kept);
   });
+
+  it('a pond still listed but in another city than home is let go too (as notePlace judges, 后裔 on #194)', () => {
+    const s = freshState(base, 'switch-03', T);
+    s.presence = { ...s.presence, space: 'pond', place: gone };
+    s.cast = { fish: 'fish_crucian', site: 'pond', place: gone, at: T, bite_ms: 4000, bait: null, xp_pct: 100, breaks: null };
+    const elsewhere: P0Content = { ...base, profile: { ...base.profile, city: 'San Francisco' } };   // Shanghai's ponds still listed
+    const u = upgradeState(elsewhere, structuredClone(s), T);
+    expect(u.presence.place).toBeNull();
+    expect(u.cast).toBeNull();
+    expect(upgradeState(base, structuredClone(s), T).presence.place).toBe(gone);   // at home in Shanghai it stays
+  });
 });
