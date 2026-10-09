@@ -8,7 +8,7 @@
 
 | 规则 | 说明 |
 |---|---|
-| P0 家城旧金山 ★ | q(106)：本清单里 P0 场景的上海名称一律按对照表读——`Shanghai` → `San Francisco`、`Xuhui Tackle Shop` → `Mission Tackle Shop`、`Lotus Tea House` → `Oak Tea House`、`Xuhui Market Square` → `Mission Market Square`、`Huangpu Travel Post` → `Union Square Travel Post`、新手塘 `Reed Pond` → `Fern Pond`、`Shanghai Postcard` → `San Francisco Postcard`；位置芯片 `San Francisco · Homestead`，放不下时 `SF · Homestead`（不截断空间名）；掌柜 Ama / Finn / Mei / Sigrid 不变 |
+| P0 家城旧金山 ★ | q(106)：本清单里 P0 场景的上海名称一律按对照表读——`Shanghai` → `San Francisco`、`Xuhui Tackle Shop` → `Mission Tackle Shop`、`Lotus Tea House` → `Oak Tea House`、`Xuhui Market Square` → `Mission Market Square`、`Huangpu Travel Post` → `Union Square Travel Post`、新手塘 `Reed Pond` → `Fern Pond`、`Shanghai Postcard` → `San Francisco Postcard`；位置芯片写全称 `San Francisco · Homestead`（q(107)：Today 改图标后放得下；过渡包 0.1.1 若图标没赶上，先写 `SF · Homestead`）；掌柜 Ama / Finn / Mei / Sigrid 不变 |
 | 一律英文 | 玩家可见文案不出现中文（LOCK-23）；物品名 ≤ 18 字符 |
 | Energy，不写 Stamina | 体力一律 `Energy` |
 | 分隔符 | 半角空格 + `·` + 半角空格：`Cast · 5 Energy` |
@@ -68,6 +68,7 @@
 | 进塘与凑齐 ★ | 进挂 ! 的塘 Info toast `Pond Catch · Pond Crucian 0/2`（教学卡之后）；钓到要的鱼飘字 `Pond Catch 1/2`；凑够 Success toast `Pond Catch · 2/2 · Deliver at the Stall`，鱼塘 ! 消失、家图钉 ✓（q(103)） |
 | 委托的鱼还钓不上 ★ | 已接下但鱼的等级高于玩家 Fishing 等级：鱼塘不挂 !；Today 委托行小字 `Fishing Lv4 needed`，点开是鱼图鉴剪影那张门禁卡 `Fishing Lv4 keeps Golden Koi on the hook` / 需求格 `Fishing XP 70/300` · `230 XP to go`（不另写一句）；委托卡交付按钮缺口 `Fishing Lv4 needed`（不写 `Need 1 more Rare fish`）（q(104)） |
 | Today 委托行 ★ | 已接下的驿站板、集市、居民委托都进 Today（没接的不进；教学委托例外，开局未接也显示引导行 `Catch 2 Pond Crucian · Fern Pond`）：进度 `Fresh Greens · Radish 1/4` / `Dusk Haul · Fine fish 1/4` / `An Old Man's Catch · Rare fish 0/1`（只限稀有度写 `<稀有度> fish`，与原因行一致）；交付 `Pond Catch · Deliver at the Stall` / `Dusk Haul · Deliver at Mission Market Square` / `An Old Man's Catch · Deliver to Old Kai`（q(104) 补） |
+| Today 芯片 ★ | 只留图标 + 红点，不写字、不写数字；点开是原 Today 面板（q(107)）。红点亮：可交付 / 可收获 / 出锅 / 新解锁的行出现且没看过；打开一次面板即灭 |
 
 ## 4. 厨房与烹饪
 
