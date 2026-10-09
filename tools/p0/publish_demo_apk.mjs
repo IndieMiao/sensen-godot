@@ -2,7 +2,8 @@
 // P0 internal demo APK → Aliyun OSS (SGODOT-232; the user's choice of 2026-10-09: OSS for now, internal only).
 // Like the Journey releases (docs/qa/release-playbook-android-ios.md §1.5, server/deploy/downloads/README.md): one
 // immutable directory per build, p0/demo/releases/p0-demo-<YYYYMMDD>-<sha256 first 12>/, holding the APK, release.json
-// (the manifest) and SHA256SUMS. Nothing is ever overwritten (ossutil --ignore-existing); a new build is a new path.
+// (the manifest) and SHA256SUMS. Nothing is ever overwritten: an object already at the path must be byte-identical,
+// else the script stops; a new build is a new path.
 //
 //   node tools/p0/publish_demo_apk.mjs --apk build/p0-demo.apk --evidence <evidence.json> --backend <p0 image sha>
 //        --check-only     builds the release directory under output/p0-demo/release/ and checks the live server; no upload
@@ -15,6 +16,7 @@
 // Publishing needs the user's approval each time (AGENTS.md: the demo is internal only). The Update button a player
 // sees opens the URL the server sends with 426 (deploy-hk.sh min-version <code> <url>), so the URL printed here is
 // what a later min-version uses; the APK itself carries no update address.
+// Needs the aliyun CLI with ossutil 2.x (`aliyun ossutil version`; 2.4.0 on 2026-10-09), logged in for bucket sensenjoy.
 import {execFile} from 'node:child_process';
 import {promisify, isDeepStrictEqual} from 'node:util';
 import {readFile, writeFile, mkdir, copyFile} from 'node:fs/promises';
@@ -47,6 +49,11 @@ const code = String(build.version_code);
 assert.match(code, /^20\d{6}\d{2}$/, 'versionCode YYYYMMDDNN');
 if (!has('--dry-run')) assert(!code.endsWith('00'), 'a …00 versionCode is a dry run and is never published');
 assert.equal(build.source_dirty, false, 'built from uncommitted changes');
+// An all_resources export packs untracked scenes, scripts and json as well (周瑜 on #163); only stray .uid files pass.
+assert(Array.isArray(build.untracked_exported), 'build.json predates the untracked check: rebuild with the current script');
+assert(build.untracked_exported_count === build.untracked_exported.length, 'too many untracked files to list: clean the tree');
+const stray = build.untracked_exported.filter((f) => !f.endsWith('.uid'));
+assert.equal(stray.length, 0, 'untracked files went into the APK: ' + stray.join(', '));
 const evidence = JSON.parse(await readFile(evidencePath, 'utf8'));
 assert.equal(evidence.sha256, hash, 'evidence is not for this exact APK');
 assert.equal(typeof evidence.emulator_validation, 'boolean');
@@ -65,6 +72,18 @@ const manifest = {package: PACKAGE, version: build.version_name, versionCode: bu
   sha256: hash, certificate_sha256: CERTIFICATE, api: API, backend_image: 'p0-server:' + backend, client_release: releaseId,
   source_commit: build.source_commit, url, internal_only: true, server_min_version_at_publish: health.min_version ?? 0,
   emulator_validation: evidence.emulator_validation, physical_installation_verified: evidence.physical_installation_verified};
+// One versionCode, one APK: a second build the same day with an unchanged code would be indistinguishable to
+// min-version (周瑜 on #163). Other releases of this day are listed (read-only) and their manifests compared.
+const dayPrefix = `oss://sensenjoy/p0/demo/releases/${releaseId}-`;
+const listed = (await run('aliyun', ['ossutil', 'ls', dayPrefix, '-d'], {timeout: 60000})).stdout;
+for (const other of new Set(listed.match(/oss:\/\/sensenjoy\/p0\/demo\/releases\/[^/\s]+\//g) ?? [])) {
+  if (other.endsWith(`/${name}/`)) continue;
+  const res = await fetch(`https://oss.sensenjoy.cn/${other.slice('oss://sensenjoy/'.length)}release.json`, {signal: AbortSignal.timeout(30000), cache: 'no-store'});
+  if (res.status === 404) continue;
+  assert.equal(res.status, 200, `cannot read ${other}release.json`);
+  const theirs = await res.json();
+  assert.notEqual(theirs.versionCode, build.version_code, `versionCode ${code} is already ${other} (sha ${theirs.sha256}): build again with --code …${String(Number(code.slice(8)) + 1).padStart(2, '0')}`);
+}
 const dir = `output/p0-demo/release/${has('--dry-run') ? 'dryrun-' : ''}${name}`;
 await mkdir(dir, {recursive: true});
 const manifestBytes = Buffer.from(JSON.stringify(manifest, null, 2) + '\n');
@@ -80,13 +99,26 @@ if (has('--check-only')) {
   process.exit(0);
 }
 
+// The path is immutable: an object already there must be byte-identical (a re-run after a failed read-back), never
+// replaced. ossutil's --ignore-existing skips silently, so look first (周瑜 on #163) and stop on any difference.
+const base = `https://oss.sensenjoy.cn/${path}/`;
 for (const file of [filename, 'release.json', 'SHA256SUMS']) {
-  await run('aliyun', ['ossutil', 'cp', `${dir}/${file}`, `oss://sensenjoy/${path}/${file}`,
-    '--acl', 'public-read', '--ignore-existing', '--quiet'], {timeout: 600000});
+  const head = await fetch(base + file, {method: 'HEAD', signal: AbortSignal.timeout(30000), cache: 'no-store'});
+  if (head.status === 404) {
+    await run('aliyun', ['ossutil', 'cp', `${dir}/${file}`, `oss://sensenjoy/${path}/${file}`,
+      '--acl', 'public-read', '--ignore-existing', '--quiet'], {timeout: 600000});
+    continue;
+  }
+  assert.equal(head.status, 200, `${file}: unexpected HEAD ${head.status}`);
+  const there = Buffer.from(await (await fetch(base + file, {signal: AbortSignal.timeout(600000), cache: 'no-store'})).arrayBuffer());
+  assert.equal(digest(there), digest(await readFile(`${dir}/${file}`)),
+    `${path}/${file} already exists with different bytes: this immutable path is taken, do not overwrite it`);
+  console.log(JSON.stringify({phase: 'already_uploaded', file}));
 }
 console.log(JSON.stringify({phase: 'oss_uploaded', url}));
-const response = await fetch(url, {signal: AbortSignal.timeout(600000)});
+const response = await fetch(url, {signal: AbortSignal.timeout(600000), cache: 'no-store'});
 assert.equal(response.status, 200);
+assert.equal(response.headers.get('content-type'), 'application/vnd.android.package-archive');
 const bytes = Buffer.from(await response.arrayBuffer());
 assert.equal(bytes.length, apk.length);
 assert.equal(digest(bytes), hash);
@@ -95,11 +127,14 @@ const range = await fetch(url, {headers: {range: `bytes=${start}-${end}`}, signa
 assert.equal(range.status, 206);
 assert.equal(range.headers.get('content-range'), `bytes ${start}-${end}/${apk.length}`);
 assert(Buffer.from(await range.arrayBuffer()).equals(apk.subarray(start, end + 1)), 'Range bytes differ');
-const base = url.slice(0, -filename.length);
-const publicManifest = Buffer.from(await (await fetch(base + 'release.json', {signal: AbortSignal.timeout(30000)})).arrayBuffer());
+const manifestResponse = await fetch(base + 'release.json', {signal: AbortSignal.timeout(30000), cache: 'no-store'});
+assert.equal(manifestResponse.status, 200, 'release.json not readable');
+const publicManifest = Buffer.from(await manifestResponse.arrayBuffer());
 assert(publicManifest.equals(manifestBytes), 'public manifest differs');
 assert(isDeepStrictEqual(JSON.parse(publicManifest.toString()), manifest));
-const publicChecksum = Buffer.from(await (await fetch(base + 'SHA256SUMS', {signal: AbortSignal.timeout(30000)})).arrayBuffer());
+const checksumResponse = await fetch(base + 'SHA256SUMS', {signal: AbortSignal.timeout(30000), cache: 'no-store'});
+assert.equal(checksumResponse.status, 200, 'SHA256SUMS not readable');
+const publicChecksum = Buffer.from(await checksumResponse.arrayBuffer());
 assert(publicChecksum.equals(checksumBytes), 'public checksum differs');
 const verification = {passed: true, url, full_download_verified: true, sha256: hash, bytes: apk.length,
   range_206_verified: true, manifest_verified: true, checksum_verified: true};

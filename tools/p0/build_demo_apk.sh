@@ -25,8 +25,12 @@ done
 [[ "$SERVER" == http://* || "$SERVER" == https://* ]] || { echo "--server http(s)://…/v1 is required" >&2; exit 2; }
 CODE="${CODE:-$(date +%Y%m%d)01}"
 [[ "$CODE" =~ ^20[0-9]{6}[0-9]{2}$ ]] || { echo "--code must be YYYYMMDDNN, got $CODE" >&2; exit 2; }
+# What the APK is built from, read before this script touches export_presets.cfg (周瑜 on #163): tracked changes, and
+# untracked files, since an all_resources export packs untracked scenes, scripts and json too (the preset's
+# exclude_filter is applied to the list in build.json; publish_demo_apk.mjs refuses anything but .uid files).
 COMMIT="$(git rev-parse HEAD)"
-DIRTY="$(git status --porcelain --untracked-files=no -- . ':!export_presets.cfg' | head -1)"
+DIRTY="$(git status --porcelain --untracked-files=no | head -1)"
+export P0_UNTRACKED="$(git ls-files --others --exclude-standard)"
 export ADB_SERVER_SOCKET="tcp:localhost:${P0_ADB_PORT:-5071}" ANDROID_ADB_SERVER_PORT="${P0_ADB_PORT:-5071}"
 GODOT="${GODOT_BIN:-godot}"
 SDK="${ANDROID_HOME:-$HOME/Library/Android/sdk}"
@@ -65,8 +69,13 @@ BT="$(ls -d "$SDK"/build-tools/* | sort -V | tail -1)"
 "$BT/aapt" dump badging "$OUT" > "$LOGS/badging.txt"
 "$BT/apksigner" verify --print-certs "$OUT" > "$LOGS/signer.txt"
 python3 - "$OUT" "$SERVER" "$KEY" "$LOGS" "$COMMIT" "$DIRTY" <<'PY'
-import hashlib, json, re, sys, zipfile
+import fnmatch, hashlib, json, os, re, sys, zipfile
 apk, server, key, logs, commit, dirty = sys.argv[1:7]
+presets = open("export_presets.cfg").read()
+seg = presets[presets.index('name="Android P0"'):]
+excluded = [p.strip() for p in re.search(r'exclude_filter="([^"]*)"', seg).group(1).split(",") if p.strip()]
+untracked = [f for f in os.environ.get("P0_UNTRACKED", "").splitlines()
+             if f and not any(fnmatch.fnmatch(f, p) for p in excluded)]
 badging = open(f"{logs}/badging.txt").read()
 pkg = re.search(r"package: name='([^']+)' versionCode='(\d+)' versionName='([^']*)'", badging)
 label = re.search(r"application-label:'([^']*)'", badging)
@@ -83,6 +92,7 @@ result = {
     "key_baked": bool(baked) and baked.get("key") == key and key != "",
     "version_baked": baked.get("version") if baked else None,
     "source_commit": commit, "source_dirty": dirty != "",
+    "untracked_exported": untracked[:200], "untracked_exported_count": len(untracked),
 }
 json.dump(result, open(f"{logs}/build.json", "w"), indent=2)
 print(json.dumps(result, indent=2))
