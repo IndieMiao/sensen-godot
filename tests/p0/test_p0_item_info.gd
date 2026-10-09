@@ -301,4 +301,4 @@ func test_bag_tabs_follow_the_plan() -> void:
 		tabs[id] = P0ItemInfo.tab_of(v, id)
 	assert_dict(tabs).is_equal({"seed_radish": &"seeds", "fert_compost": &"seeds", "crop_radish": &"produce", "fish_crucian": &"fish",
 		"dish_grilled_crucian": &"dishes", "bait_worm": &"tackle", "rod_reed": &"tackle", "timber": &"materials", "torch": &"materials"})
-	assert_str(P0ItemInfo.tab_of(v, "postcard_shanghai")).is_empty()   # keepsakes: All only
+	assert_str(P0ItemInfo.tab_of(v, "postcard_san_francisco")).is_empty()   # keepsakes: All only

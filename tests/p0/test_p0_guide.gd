@@ -84,12 +84,12 @@ func test_tip_queue_waits_for_moments_and_shows_each_tip_once() -> void:
 
 func test_first_session_rows_follow_the_director_table() -> void:
 	var v := _view({"plots": _plots(["growing"])})
-	assert_that(_lines(Guide.lead_rows(v))).is_equal(["Catch 2 Pond Crucian · Reed Pond", "Cook it: Grilled Crucian"])
+	assert_that(_lines(Guide.lead_rows(v))).is_equal(["Catch 2 Pond Crucian · Fern Pond", "Cook it: Grilled Crucian"])
 	assert_str(Guide.lead_rows(v)[1].get("page", "")).is_equal("dish_grilled_crucian")   # its Show opens the drawer on it (q(99))
 	assert_str(Guide.lead_rows(v)[0].get("page", "")).is_equal("")
-	assert_str(Guide.lead_rows(v)[0].go).is_equal("pond:pond_shanghai_05")   # Show on map (q(31)); the stall's "!" takes it
+	assert_str(Guide.lead_rows(v)[0].go).is_equal("pond:pond_san_francisco_03")   # Show on map (q(31)); the stall's "!" takes it
 	v.stall.board.requests[0].status = "accepted"
-	assert_str(Guide.lead_rows(v)[0].go).is_equal("pond:pond_shanghai_05")   # Show on map at Reed Pond
+	assert_str(Guide.lead_rows(v)[0].go).is_equal("pond:pond_san_francisco_03")   # Show on map at Fern Pond
 	# q(58): two in the creel → Deliver at the stall, not ticked, and it has the focus
 	v.stall.board.requests[0].have = 2
 	var rows := Guide.lead_rows(v)
@@ -99,7 +99,7 @@ func test_first_session_rows_follow_the_director_table() -> void:
 	assert_str(Guide.stall_badge(v)).is_equal("deliver")
 	# a fish eaten: back to Catch (the request's state, not an event)
 	v.stall.board.requests[0].have = 1
-	assert_str(Guide.lead_rows(v)[0].line).is_equal("Catch 2 Pond Crucian · Reed Pond")
+	assert_str(Guide.lead_rows(v)[0].line).is_equal("Catch 2 Pond Crucian · Fern Pond")
 	# handed in (Request complete · +14 coins): Deliver ticks, Cook it takes the focus; no lettuce row yet
 	v.stall.board.requests = []
 	v.req_done = ["req_pond_catch"]
@@ -206,12 +206,12 @@ func test_today_rows_lead_with_the_guide_and_drop_their_generic_twins() -> void:
 	v.bag.slots = [{"id": "fish_crucian", "qty": 1}]
 	var rows := P0Logic.today_rows(v)
 	# Catch (not "Pond Catch · Pond Crucian 0/2"), Cook it (not "1 fish · the stove is free"), then the radishes' timer
-	assert_that(_lines(rows)).is_equal(["Catch 2 Pond Crucian · Reed Pond", "Cook it: Grilled Crucian", "Radishes ready in 3h 54m"])
+	assert_that(_lines(rows)).is_equal(["Catch 2 Pond Crucian · Fern Pond", "Cook it: Grilled Crucian", "Radishes ready in 3h 54m"])
 	assert_that(rows.map(func(r): return r.focus)).is_equal([true, false, false])
 
 func test_today_rows_before_the_first_sow_put_sowing_first() -> void:
 	var v := _view()
-	assert_that(_lines(P0Logic.today_rows(v))).is_equal(["Sow your first plot", "Catch 2 Pond Crucian · Reed Pond", "Cook it: Grilled Crucian"])
+	assert_that(_lines(P0Logic.today_rows(v))).is_equal(["Sow your first plot", "Catch 2 Pond Crucian · Fern Pond", "Cook it: Grilled Crucian"])
 
 ## q(69): the level a harvest brings is its own info row (no button) right after its source row — never a tail on a
 ## crop's row, which read as that crop's own level.

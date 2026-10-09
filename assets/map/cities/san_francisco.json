@@ -1,0 +1,48 @@
+{
+  "format": 1,
+  "overview": {
+    "lat": 37.785,
+    "lng": -122.44,
+    "zoom": 12.2,
+    "bearing": 0.0
+  },
+  "landmarks": [
+    {
+      "id": "golden_gate_bridge",
+      "name": "Golden Gate Bridge",
+      "zh": "金门大桥",
+      "lat": 37.8199,
+      "lng": -122.4783,
+      "category": "Bridge",
+      "art": "landmarks/golden_gate_bridge"
+    },
+    {
+      "id": "fishermans_wharf",
+      "name": "Fisherman's Wharf",
+      "zh": "渔人码头",
+      "lat": 37.808,
+      "lng": -122.4177,
+      "category": "Waterfront",
+      "art": "landmarks/fishermans_wharf"
+    },
+    {
+      "id": "alcatraz_island",
+      "name": "Alcatraz Island",
+      "zh": "恶魔岛",
+      "lat": 37.8267,
+      "lng": -122.423,
+      "category": "Island",
+      "art": "landmarks/alcatraz_island"
+    },
+    {
+      "id": "painted_ladies",
+      "name": "Painted Ladies",
+      "zh": "彩绘女士",
+      "lat": 37.7763,
+      "lng": -122.4328,
+      "category": "Landmark",
+      "art": "landmarks/painted_ladies"
+    }
+  ],
+  "residents": []
+}

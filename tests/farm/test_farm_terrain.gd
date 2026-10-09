@@ -130,3 +130,17 @@ func test_cached_terrain_rejects_changed_source_but_accepts_private_region_label
 	private_terrain.erase("source")
 	for i in private_terrain.plot.regions.size(): private_terrain.plot.regions[i].id = "region_%d" % i
 	assert_object(FarmPlot.register_terrain(private_terrain)).is_same(original)
+
+## SGODOT-270: a layout patch placed in another city (P0's sh_a at the San Francisco homestead) takes that city's region,
+## so the map lands on it there; the farm itself is the same. A choice without a region_id (every Journey choice of a
+## patch) keeps the patch's own.
+func test_a_placed_patch_takes_the_region_it_is_placed_in() -> void:
+	var own := FarmBlueprint.load_choice({"layout_patch_id": "sh_a", "revision": 2})
+	assert_str(own.region_id).is_equal("shanghai")
+	var at := {"lat": 37.7558, "lng": -122.4345}
+	var placed := FarmBlueprint.load_choice({"layout_patch_id": "sh_a", "revision": 2, "location": at, "region_id": "san_francisco"})
+	assert_str(placed.region_id).is_equal("san_francisco")
+	assert_float((placed.overlay.center as Vector2).x).is_equal_approx(37.7558, 1e-5)   # a float32 Vector2
+	assert_float((placed.overlay.center as Vector2).y).is_equal_approx(-122.4345, 1e-4)
+	assert_str(placed.checksum).is_equal(own.checksum)
+	assert_str(FarmBlueprint.load_choice({"layout_patch_id": "sh_a", "revision": 2, "location": at}).region_id).is_equal("shanghai")

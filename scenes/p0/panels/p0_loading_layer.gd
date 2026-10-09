@@ -7,6 +7,7 @@ extends CanvasLayer
 
 const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
 const SLOW_S := 8.0
+const P0Ponds := preload("res://modules/p0/p0_ponds.gd")   # pond names for the chip (SGODOT-270)
 
 var screen: P0SysScreen
 var close_button: Button
@@ -54,7 +55,7 @@ func failed() -> void:
 static func destination(path: String, args: Dictionary) -> String:
 	match path.get_file():
 		"p0_farm.tscn": return P0City.chip("Homestead")
-		"p0_pond.tscn": return P0City.chip(str(SystemPonds.location(str(args.get("pond_id", ""))).get("name", "Pond")))
+		"p0_pond.tscn": return P0City.chip(str(P0Ponds.location(str(args.get("pond_id", ""))).get("name", "Pond")))
 		"p0_outpost.tscn": return P0City.chip(str(P0Outposts.find(str(args.get("outpost_id", ""))).get("name", "Outpost")))
 		"p0_mine.tscn": return P0City.chip("Mine · Floor %d" % int(args.get("floor", 1)))
 	return ""

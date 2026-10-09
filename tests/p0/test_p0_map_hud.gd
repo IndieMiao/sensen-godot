@@ -88,7 +88,7 @@ func test_place_cards_follow_q80() -> void:
 	await _close(rt)
 	assert_dict(city.selected).is_empty()   # closing the card clears the pin
 	m._own_pin_pressed()
-	assert_str(_primary(rt)).is_equal("Back to Lotus Tea House")
+	assert_str(_primary(rt)).is_equal("Back to Oak Tea House")
 	await _close(rt)
 	var tackle := P0Outposts.by_role("tackle")
 	city.select(P0Outposts.place_entry(tackle))
@@ -97,7 +97,7 @@ func test_place_cards_follow_q80() -> void:
 	await _close(rt)
 	m._online = {str(tackle.id): 3}
 	var spec: Dictionary = m.place_card(P0Outposts.place_entry(tackle, 3))
-	assert_str(str(spec.title)).is_equal("Xuhui Tackle Shop")
+	assert_str(str(spec.title)).is_equal("Mission Tackle Shop")
 	assert_str(str(spec.subtitle)).is_equal("Tackle shop · Rods and bait")
 	assert_array(spec.facts[1]).is_equal(["Online now", "3"])
 	m._online = {}
@@ -125,9 +125,9 @@ func test_the_avatar_stands_where_the_player_is() -> void:
 	await _landed(m)
 	assert_float(m.center_lat).is_equal_approx(float(tea.lat), 1e-6)
 	assert_float(m.center_lng).is_equal_approx(float(tea.lng), 1e-6)
-	rt.here = {"space": "pond", "place": "pond_shanghai_05"}
+	rt.here = {"space": "pond", "place": "pond_san_francisco_03"}
 	m._sync_here()
-	var reed := SystemPonds.location("pond_shanghai_05").merged({"kind": "pond"})
+	var reed := preload("res://modules/p0/p0_ponds.gd").location("pond_san_francisco_03").merged({"kind": "pond"})
 	assert_str(m._pin_tag(reed)).is_equal("Beginner pond")   # no distance at the pond the player is at (q(80))
 	rt.here = {"space": "mine", "place": ""}   # the mine is the homestead
 	m._sync_here()
@@ -161,9 +161,9 @@ func test_the_place_chip_on_the_map_goes_back_where_the_player_is() -> void:
 	await get_tree().process_frame
 	var w: FakeWorld = auto_free(FakeWorld.new())
 	rt.world = w
-	rt.return_to = "pond:pond_shanghai_05"
+	rt.return_to = "pond:pond_san_francisco_03"
 	rt._on_place_pressed()
-	assert_array(w.routes).is_equal(["pond:pond_shanghai_05"])
+	assert_array(w.routes).is_equal(["pond:pond_san_francisco_03"])
 
 ## Where each world sends the place chip back to: the farm, its farmhouse and the mine are the homestead.
 class SpaceWorld extends Object:
@@ -175,7 +175,7 @@ class SpaceWorld extends Object:
 
 func test_the_route_back_from_each_world() -> void:
 	var w := SpaceWorld.new()
-	for c in [["home", "", {}, "farm"], ["mine", "", {}, "farm"], ["pond", "pond_shanghai_05", {}, "pond:pond_shanghai_05"],
+	for c in [["home", "", {}, "farm"], ["mine", "", {}, "farm"], ["pond", "pond_san_francisco_03", {}, "pond:pond_san_francisco_03"],
 			["outpost", "", {"id": "sh_tea_1"}, "outpost:sh_tea_1"], ["pond", "", {}, "farm"], ["outpost", "", {}, "farm"]]:
 		w.space = c[0]
 		w.place = c[1]
@@ -191,7 +191,7 @@ func test_a_room_on_the_empty_boot_leaves_for_the_map() -> void:
 	assert_bool(P0Runtime.room_leaves_for_map(2, false)).is_false()   # farmhouse on a farm on the boot
 
 ## 不知火舞 on 234 / A2: opening the map frames the home set in z13.5–16, labels included, in the safe frame — the own
-## avatar and the marked pins (the first session's Reed Pond) always, then each role's outpost nearest home, nearest
+## avatar and the marked pins (the first session's Fern Pond) always, then each role's outpost nearest home, nearest
 ## the avatar first, while z13.5 holds them all.
 func _board(have: int) -> Dictionary:
 	var reqs: Array = [] if have < 0 else [{"id": P0Guide.TUTORIAL, "have": have, "qty": 2, "status": "accepted"}]   # taken (q(103))
@@ -213,7 +213,7 @@ func test_the_opening_view_frames_the_home_set() -> void:
 		var at := Vector2(m.center_lat, m.center_lng)
 		var ids: Array = framed.map(id_of)
 		assert_bool(ids.has("self")).is_true()
-		assert_bool(ids.has("pond_shanghai_05")).is_equal(phase[1] == "first")   # the marked pin always goes in
+		assert_bool(ids.has("pond_san_francisco_03")).is_equal(phase[1] == "first")   # the marked pin always goes in
 		assert_float(m.zoom).append_failure_message(phase[1]).is_between(13.5, 16.0)
 		var box: Rect2 = m._frame_box(framed)
 		assert_bool(safe.grow(0.5).encloses(box)).append_failure_message("%s: %s in %s at z%.1f" % [phase[1], box, safe, m.zoom]).is_true()
@@ -256,7 +256,7 @@ func test_a_marked_pins_card_says_why_under_its_subtitle() -> void:
 	v.stall.board.requests[0]["title"] = "Pond Catch"
 	v.stall.board.requests[0]["item"] = "fish_crucian"
 	rt.session.view = v
-	var reed := SystemPonds.location("pond_shanghai_05").duplicate(true)
+	var reed := preload("res://modules/p0/p0_ponds.gd").location("pond_san_francisco_03").duplicate(true)
 	reed["kind"] = "pond"
 	m._on_entry_selected(reed)
 	assert_str(rt.ui.modal_kind).is_equal("pond_card")
@@ -269,7 +269,7 @@ func test_a_marked_pins_card_says_why_under_its_subtitle() -> void:
 	assert_int(row.get_index()).is_equal(1)
 	assert_str((col.get_child(2) as Label).text).is_equal(PondCard.BEGINNER_LINE)   # … above the description line
 	await _close(rt)
-	# The fish in the bag: Reed Pond's ! is gone with its line, and the homestead's card (away) says ✓ and why.
+	# The fish in the bag: Fern Pond's ! is gone with its line, and the homestead's card (away) says ✓ and why.
 	v.stall.board.requests[0].have = 2
 	m._on_entry_selected(reed)
 	assert_object(rt.ui._modal.find_child("Reason", true, false)).is_null()
@@ -320,7 +320,7 @@ func test_back_on_the_map_closes_p0_layers_one_at_a_time() -> void:
 		await get_tree().process_frame
 	# Two layers on the map: a pond card and its Details › fish list (#95). Back: the list, then the card, then the
 	# map's own. (The map's quick bar is Bag alone, so no slot can be lifted or dragged here.)
-	m.p0_dev(PackedStringArray(["pondfish", "pond_shanghai_05"]))
+	m.p0_dev(PackedStringArray(["pondfish", "pond_san_francisco_03"]))
 	await get_tree().process_frame
 	assert_str(ui.modal_kind).is_equal("pond_fish")
 	assert_bool(m.is_back_navigation_locked()).is_true()

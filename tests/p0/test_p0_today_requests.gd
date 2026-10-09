@@ -39,9 +39,9 @@ func test_a_fish_the_player_cannot_land_yet_says_the_level_it_needs() -> void:
 ## At Fishing Lv4 it reads as before: no small line, and Show on map points at the pond its ! hangs on.
 func test_at_the_level_the_row_points_at_the_marked_pond() -> void:
 	var v := _view(4)
-	v["map_markers"] = [{"place": "pond_shanghai_05", "kind": "request", "why": {"request": KAI, "tracked": true}}]
+	v["map_markers"] = [{"place": "pond_san_francisco_03", "kind": "request", "why": {"request": KAI, "tracked": true}}]
 	var r := _row(v, "An Old Man's Catch · Rare fish 0/1")
-	assert_that([r.state, r.tail, r.go, r.has("gate")]).is_equal(["default", "", "pond:pond_shanghai_05", false])
+	assert_that([r.state, r.tail, r.go, r.has("gate")]).is_equal(["default", "", "pond:pond_san_francisco_03", false])
 
 ## Ready to hand in, it leads, Show on map at the outpost where its resident is (Old Kai at the Tackle Shop).
 func test_a_request_ready_to_hand_in_leads() -> void:

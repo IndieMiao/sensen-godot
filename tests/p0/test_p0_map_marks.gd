@@ -7,14 +7,14 @@ const P0Map := preload("res://scenes/p0/p0_map.gd")
 func test_server_markers_become_pin_marks_in_their_order() -> void:
 	var view := {"map_markers": [
 		{"place": "sh_market_1", "kind": "deliver", "why": {"request": "mk_1"}},
-		{"place": "pond_shanghai_05", "kind": "request", "why": {"request": "req_tutorial", "tracked": true}},
+		{"place": "pond_san_francisco_03", "kind": "request", "why": {"request": "req_tutorial", "tracked": true}},
 		{"place": "home", "kind": "deliver", "why": {"request": "st_1"}},
 		{"place": "sh_tackle_1", "kind": "new", "why": {"item": "rod_reed"}},
 		{"place": "sh_tea_1", "kind": "event"},
 	]}
 	assert_array(P0Map.marks_from(view)).is_equal([
 		{"id": "sh_market_1", "state": "deliverable"},
-		{"id": "pond_shanghai_05", "state": "request"},
+		{"id": "pond_san_francisco_03", "state": "request"},
 		{"id": "sh_tackle_1", "state": "new"},
 	])
 	assert_array(P0Map.marks_from({})).is_empty()
@@ -36,29 +36,29 @@ func _view(fishing_level := 1, caught := []) -> Dictionary:
 		"fishing": {"dex": caught.map(func(id): return {"id": id, "caught": 1})}}
 
 func test_the_beginner_pond_card_and_tag() -> void:
-	var reed := PondCard.info(_view(), "pond_shanghai_05", 0.84)
-	assert_str(str(reed.title)).is_equal("Reed Pond")
-	assert_str(str(reed.subtitle)).is_equal("Beginner")
-	assert_str(str(reed.line)).is_equal("A nearby pond for your first catch.")
-	assert_array(reed.facts).is_equal([["Distance", "0.8 km"], ["Recommended", "Lv1–3"]])
-	assert_str(str(reed.tag)).is_equal("Beginner pond · 0.8 km")
+	var fern := PondCard.info(_view(), "pond_san_francisco_03", 0.84)   # Fern Pond, San Francisco's beginner pond (SGODOT-270)
+	assert_str(str(fern.title)).is_equal("Fern Pond")
+	assert_str(str(fern.subtitle)).is_equal("Beginner")
+	assert_str(str(fern.line)).is_equal("A nearby pond for your first catch.")
+	assert_array(fern.facts).is_equal([["Distance", "0.8 km"], ["Recommended", "Lv1–3"]])
+	assert_str(str(fern.tag)).is_equal("Beginner pond · 0.8 km")
 
 func test_other_ponds_name_their_template_and_have_no_beginner_line() -> void:
-	var willow := PondCard.info(_view(), "pond_shanghai_01", 1.6)
+	var willow := PondCard.info(_view(), "pond_san_francisco_01", 1.6)
 	assert_str(str(willow.subtitle)).is_equal("Pond")
 	assert_str(str(willow.line)).is_empty()
 	assert_str(str(willow.tag)).is_equal("Pond · 1.6 km")
-	var pebble := PondCard.info(_view(), "pond_shanghai_04", 2.3)
+	var pebble := PondCard.info(_view(), "pond_san_francisco_04", 2.3)
 	assert_str(str(pebble.subtitle)).is_equal("River")
 	assert_array(pebble.facts[1]).is_equal(["Recommended", "Lv4–5"])
-	assert_dict(PondCard.info(_view(), "pond_sf_01", 1.0)).is_empty()   # not a P0 pond
+	assert_dict(PondCard.info(_view(), "pond_shanghai_05", 1.0)).is_empty()   # not a P0 pond (P0 was Shanghai before SGODOT-270)
 
 func test_recommended_turns_outleveled_when_no_fish_pays_xp() -> void:
-	assert_array(PondCard.info(_view(8), "pond_shanghai_05", 1.0).facts[1]).is_equal(["Recommended", "Lv1–3"])   # Koi Lv4: a 4-level gap still pays 25 %
-	assert_array(PondCard.info(_view(99), "pond_shanghai_05", 1.0).facts[1]).is_equal(["Recommended", "Outleveled"])
+	assert_array(PondCard.info(_view(8), "pond_san_francisco_03", 1.0).facts[1]).is_equal(["Recommended", "Lv1–3"])   # Koi Lv4: a 4-level gap still pays 25 %
+	assert_array(PondCard.info(_view(99), "pond_san_francisco_03", 1.0).facts[1]).is_equal(["Recommended", "Outleveled"])
 
 func test_the_fish_list_is_easiest_first_with_caught_ones_marked() -> void:
-	var rows := PondCard.fish_rows(_view(1, ["fish_crucian"]), "pond_shanghai_05")
+	var rows := PondCard.fish_rows(_view(1, ["fish_crucian"]), "pond_san_francisco_03")
 	var ids := rows.map(func(r): return str(r.id))
 	assert_array(ids).contains(["fish_crucian", "fish_koi"])
 	assert_str(str(ids[-1])).is_equal("fish_koi")   # Golden Koi, the hardest, last: its silhouette tells Old Kai's quest
@@ -82,7 +82,7 @@ func test_the_homestead_mark_hangs_on_the_farm_pin() -> void:
 
 # ---------------------------------------------------------------- one list for badges and packing (亚瑟 on 234)
 ## The pins' marks badge them (set_marks) and pack them first (#83's city_pin_markers) from one list: the server's
-## map_markers whenever it sends them, else the client's own tutorial mark on Reed Pond — once Pond Catch is taken
+## map_markers whenever it sends them, else the client's own tutorial mark on the beginner pond — once Pond Catch is taken
 ## (q(103), as the server).
 func test_pin_marks_take_the_server_list_else_the_tutorial_mark() -> void:
 	var board := {"stall": {"board": {"requests": [{"id": P0Guide.TUTORIAL, "have": 0, "qty": 2, "status": "open"}]}}, "req_done": []}
@@ -99,11 +99,11 @@ func test_pin_marks_take_the_server_list_else_the_tutorial_mark() -> void:
 ## At the place the player is at, the card has no Distance row and its primary is Back to <name> (re-entering it);
 ## anywhere else Distance shows and the primary is Go.
 func test_the_place_card_reads_back_to_at_the_place_the_player_is_at() -> void:
-	var info := PondCard.info(_view(), "pond_shanghai_05", 0.84)
+	var info := PondCard.info(_view(), "pond_san_francisco_03", 0.84)
 	var away := P0PlaceSheet.for_here(info, false)
 	assert_str(str(away.primary)).is_equal("Go")
 	assert_array(away.facts.map(func(f): return str(f[0]))).is_equal(["Distance", "Recommended"])
 	var here := P0PlaceSheet.for_here(info, true)
-	assert_str(str(here.primary)).is_equal("Back to Reed Pond")
+	assert_str(str(here.primary)).is_equal("Back to Fern Pond")
 	assert_array(here.facts.map(func(f): return str(f[0]))).is_equal(["Recommended"])
 	assert_array(info.facts.map(func(f): return str(f[0]))).is_equal(["Distance", "Recommended"])   # the spec is not changed

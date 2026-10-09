@@ -649,8 +649,8 @@
      "in_bag": 0
     },
     {
-     "id": "postcard_shanghai",
-     "name": "Shanghai Postcard",
+     "id": "postcard_san_francisco",
+     "name": "San Francisco Postcard",
      "price": 100,
      "need": 140,
      "to": "storage",
@@ -2095,7 +2095,7 @@
   "wild_herb": "Wild Herb",
   "drink_hot_tea": "Hot Tea",
   "drink_coffee": "Coffee",
-  "postcard_shanghai": "Shanghai Postcard",
+  "postcard_san_francisco": "San Francisco Postcard",
   "bag_upgrade_1": "Bag Upgrade I"
  },
  "crops": [

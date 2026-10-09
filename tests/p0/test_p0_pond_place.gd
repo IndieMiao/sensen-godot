@@ -13,21 +13,21 @@ func before_test() -> void:
 
 func test_the_entry_read_names_the_pond() -> void:
 	session.space = "pond"
-	session.place = "pond_shanghai_05"
+	session.place = "pond_san_francisco_03"
 	session.refresh()
-	assert_str(str(sent[0].path)).is_equal("/p0/state?space=pond&place=pond_shanghai_05")
+	assert_str(str(sent[0].path)).is_equal("/p0/state?space=pond&place=pond_san_francisco_03")
 
 func test_no_place_without_a_space() -> void:
-	session.place = "pond_shanghai_05"
+	session.place = "pond_san_francisco_03"
 	session.refresh()
 	assert_str(str(sent[0].path)).is_equal("/p0/state")
 
 func test_commands_carry_the_pond_they_were_issued_from() -> void:
 	session.space = "pond"
-	session.place = "pond_shanghai_04"
+	session.place = "pond_san_francisco_06"
 	var cast := {"type": "cast"}
 	session.send(cast)
-	assert_str(str(sent[0].body.place)).is_equal("pond_shanghai_04")
+	assert_str(str(sent[0].body.place)).is_equal("pond_san_francisco_06")
 	assert_bool(cast.has("place")).is_false()   # beside the command, never inside it
 	session.busy = false
 	session.space = "home"

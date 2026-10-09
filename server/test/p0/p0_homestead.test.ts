@@ -140,7 +140,7 @@ describe('Homestead Lv1–3 (§8.1–8.3)', () => {
   it('the Profile page reads the homestead level and the account start (SGODOT-225)', () => {
     const s = fresh();
     s.homestead.level = 2;
-    expect(viewOf(c, s, T0).profile).toEqual({ name: 'Farmer', city: 'Shanghai', climate: 'Subtropical', since_ms: s.created_at,
+    expect(viewOf(c, s, T0).profile).toEqual({ name: 'Farmer', city: 'San Francisco', climate: 'Temperate', since_ms: s.created_at,
       farm: { name: "Farmer's Homestead", level: 2 } });
   });
 

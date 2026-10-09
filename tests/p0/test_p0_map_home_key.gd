@@ -78,7 +78,7 @@ func test_away_the_home_key_flies_home_and_selects_the_homestead() -> void:
 	var saved: Dictionary = rt.here
 	var city: CityMapView = m.city_map
 	var tea := P0Outposts.by_role("tea")
-	for here in [{"space": "outpost", "place": str(tea.id)}, {"space": "pond", "place": "pond_shanghai_05"}]:
+	for here in [{"space": "outpost", "place": str(tea.id)}, {"space": "pond", "place": "pond_san_francisco_03"}]:
 		rt.here = here
 		m._sync_here()
 		m._city_action("recenter")   # the camera follows the player to the place

@@ -19,12 +19,12 @@ func _view() -> Dictionary:
 
 func test_tea_house() -> void:
 	var v := _view()
-	var l := P0Logic.keeper_lines(v, "tea", {place = "Lotus Tea House"})
-	assert_str(l.line).is_equal("Pours the tea · Lotus Tea House")
+	var l := P0Logic.keeper_lines(v, "tea", {place = "Oak Tea House"})
+	assert_str(l.line).is_equal("Pours the tea · Oak Tea House")
 	assert_str(l.greet).is_equal("Sit a minute. Hot tea, 30 Energy a cup.")
 	assert_str(l.trade).is_equal("Trade · order tea")
 	assert_str(l.question).is_equal("Any news in town?")
-	assert_str(l.answer).is_equal("Quiet day. 12 people around Shanghai right now.")
+	assert_str(l.answer).is_equal("Quiet day. 12 people around San Francisco right now.")
 	assert_str(l.leave).is_equal("Just passing by")
 	v.keepers.tea.greet = "full"
 	assert_str(P0Logic.keeper_lines(v, "tea").greet).is_equal("You look rested. Tea's here when you need it.")
@@ -36,8 +36,8 @@ func test_tea_house() -> void:
 
 func test_travel_post() -> void:
 	var v := _view()
-	var l := P0Logic.keeper_lines(v, "post", {place = "Huangpu Travel Post"})
-	assert_str(l.line).is_equal("Runs the post · Huangpu Travel Post")
+	var l := P0Logic.keeper_lines(v, "post", {place = "Union Square Travel Post"})
+	assert_str(l.line).is_equal("Runs the post · Union Square Travel Post")
 	assert_str(l.greet).is_equal("Coffee's fresh. Pip's been asking for a hand.")
 	assert_str(l.trade).is_equal("Trade · get a coffee")
 	assert_str(l.answer).is_equal("Pip has a request for you.")
@@ -63,8 +63,8 @@ func test_tackle_shop() -> void:
 
 func test_market_square() -> void:
 	var v := _view()
-	var l := P0Logic.keeper_lines(v, "market", {place = "Xuhui Market Square"})
-	assert_str(l.line).is_equal("Keeps the stall · Xuhui Market Square")
+	var l := P0Logic.keeper_lines(v, "market", {place = "Mission Market Square"})
+	assert_str(l.line).is_equal("Keeps the stall · Mission Market Square")
 	assert_str(l.greet).is_equal("Morning! Row Hoes just came in — sows three plots at once, Farming Lv4. Anything I can get you?")
 	assert_str(l.counter).is_equal("Row Hoe's 240 coins. Farming Lv4 to use.")   # the counter's bar never asks the card's question
 	assert_str(l.trade).is_equal("Trade · open the stall")

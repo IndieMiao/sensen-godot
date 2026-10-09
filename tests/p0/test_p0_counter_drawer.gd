@@ -72,12 +72,12 @@ func test_market_buys_nothing_so_it_has_no_bag_half_and_specialty_is_its_own_she
 
 func test_city_specialty_is_its_own_short_sheet() -> void:
 	# MARKET-SPECIALTY 1394:92801 (李白 q(48)): no keeper bar, no tabs, no bag; the postcard row only.
-	var d := _drawer("market", {"keeper": "Mei", "place": "Xuhui Market Square"}, "specialty")
+	var d := _drawer("market", {"keeper": "Mei", "place": "Mission Market Square"}, "specialty")
 	await _settle()
 	assert_object(d.keeper_bar).is_null()
-	assert_array(_row_ids(d)).is_equal(["postcard_shanghai"])
+	assert_array(_row_ids(d)).is_equal(["postcard_san_francisco"])
 	assert_float(d.height).is_equal(137.0)
-	var row: UiShopRow = d._rows["postcard_shanghai"]
+	var row: UiShopRow = d._rows["postcard_san_francisco"]
 	assert_str(row._effect.text).is_equal("Goes to your Farm Storage")
 	assert_str(row._gate.text).is_equal("Stock 1/1")
 	assert_float(row.get_global_rect().position.y).is_equal(714.0)

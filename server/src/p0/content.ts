@@ -19,8 +19,8 @@ export interface Crop {
 export interface Fish { id: string; name: string; rarity: number; level: number; price: number; cook?: boolean; where: string[] }
 export interface Rod { id: string; name: string; reach: number; level: number; price: number; hook_bonus_ms: number; band_bonus: number }
 export interface FishSite { name: string; template: string; weights: number[]; fish: string[] }
-/** A catalog pond on the map (assets/ponds/catalog.json id): its fishing template follows the point, not its shape (q(36)). */
-export interface FishPlace { name: string; site: string; city: string; beginner?: boolean; at?: [number, number] }   // at: the catalog point
+/** A pond on the map (assets/p0/p0_ponds.json id): its fishing template follows the point, not its shape (q(36)). */
+export interface FishPlace { name: string; site: string; city: string; beginner?: boolean; at?: [number, number] }   // at: the pond list's point
 /** An outpost on the P0 map (assets/p0/p0_outposts.json, SGODOT-227): its role and the residents who live there. */
 export interface OutpostDef { id: string; role: string; residents: string[] }
 
@@ -168,7 +168,8 @@ export const DEFAULT_P0_CONTENT = path.resolve(path.dirname(fileURLToPath(import
 /**
  * The content table, plus the map data the map markers read (SGODOT-232, q(48)) from their own files beside it:
  * outpost ids, roles and residents from the outpost table (assets/p0/p0_outposts.json, SGODOT-227) and each pond's
- * point from the shared catalog (assets/ponds/catalog.json). Either file missing leaves that part out.
+ * point from P0's pond list (assets/p0/p0_ponds.json, SGODOT-270: the San Francisco points Journey's server serves,
+ * the client registers the same file). Either file missing leaves that part out.
  */
 export function loadP0Content(file = DEFAULT_P0_CONTENT): P0Content {
   const c = JSON.parse(readFileSync(file, 'utf8')) as P0Content;
@@ -178,9 +179,9 @@ export function loadP0Content(file = DEFAULT_P0_CONTENT): P0Content {
     c.outposts = (JSON.parse(readFileSync(outposts, 'utf8')).outposts as { id: string; role: string; residents?: string[] }[])
       .map(o => ({ id: o.id, role: o.role, residents: o.residents ?? [] }));
   }
-  const catalog = path.join(dir, '../ponds/catalog.json');
-  if (existsSync(catalog)) {
-    for (const l of JSON.parse(readFileSync(catalog, 'utf8')).locations as { id: string; lat: number; lng: number }[]) {
+  const ponds = path.join(dir, 'p0_ponds.json');
+  if (existsSync(ponds)) {
+    for (const l of JSON.parse(readFileSync(ponds, 'utf8')).locations as { id: string; lat: number; lng: number }[]) {
       const place = c.fishing.places[l.id];
       if (place) place.at = [l.lat, l.lng];
     }

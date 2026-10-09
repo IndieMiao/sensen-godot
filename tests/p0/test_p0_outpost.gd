@@ -55,7 +55,7 @@ func test_the_outpost_table_and_anchor_files_agree() -> void:
 		for a in anchors: at[str(a.name)] = Vector3(a.position[0], a.position[1], a.position[2])
 		assert_bool(at.has("badge_keeper")).override_failure_message(str(o.id) + " badge_keeper").is_true()
 		assert_float(at.badge_keeper.y - (at.exit.y + 1.1)).override_failure_message(str(o.id) + " cards apart").is_greater(0.9)
-	assert_str(str(P0Outposts.by_role("tea").name)).is_equal("Lotus Tea House")
+	assert_str(str(P0Outposts.by_role("tea").name)).is_equal("Oak Tea House")
 
 func test_each_outpost_opens_with_its_keeper_and_residents() -> void:
 	var expected := {"sh_tackle_1": ["npc_keeper", "npc_kai"], "sh_tea_1": ["npc_keeper"], "sh_post_1": ["npc_keeper", "npc_pip"], "sh_market_1": ["npc_keeper"]}
@@ -184,12 +184,12 @@ func test_back_while_seated_stands_up_and_walks_out() -> void:
 	assert_int(left[0]).is_equal(1)
 
 func test_the_keeper_greeting_gets_names_and_places_from_the_outpost_data() -> void:
-	assert_dict(_room("sh_market_1").keeper_ctx()).is_equal({"keeper": "Mei", "place": "Xuhui Market Square"})
-	assert_dict(_room("sh_tackle_1").keeper_ctx()).is_equal({"keeper": "Finn", "place": "Xuhui Tackle Shop",
-		"nearest": {"name": "Reed Pond", "site": "pond"}})
+	assert_dict(_room("sh_market_1").keeper_ctx()).is_equal({"keeper": "Mei", "place": "Mission Market Square"})
+	assert_dict(_room("sh_tackle_1").keeper_ctx()).is_equal({"keeper": "Finn", "place": "Mission Tackle Shop",
+		"nearest": {"name": "Fern Pond", "site": "pond"}})
 	# The board and the shelf open the counter without the greeting: they carry the keeper ctx themselves.
 	assert_dict(_room("sh_market_1").counter_opts("board")).is_equal({"section": "board",
-		"ctx": {"keeper": "Mei", "place": "Xuhui Market Square"}})
+		"ctx": {"keeper": "Mei", "place": "Mission Market Square"}})
 	for o in P0Outposts.all():   # nearest.site keys view.keepers.tackle.next_fish (fishing.sites)
 		if o.has("nearest"): assert_array(["pond", "river"]).contains([str(o.nearest.site)])
 

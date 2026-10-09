@@ -244,7 +244,7 @@ func test_the_players_own_name_folding_lays_the_pins_out() -> void:
 ## last time all counting.
 func test_the_packing_order_is_unchanged() -> void:
 	var marked := rt.session.view.duplicate(true)
-	marked["map_markers"] = [{"place": TEA, "kind": "request"}, {"place": "pond_shanghai_05", "kind": "new"}]
+	marked["map_markers"] = [{"place": TEA, "kind": "request"}, {"place": "pond_san_francisco_03", "kind": "new"}]
 	rt.session.view = marked
 	city.select(_entry("poi7"))
 	await _settle()

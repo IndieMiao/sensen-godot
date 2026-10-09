@@ -907,7 +907,7 @@ func _dev_inbox(which: String) -> void:
 	ui.open_inbox("" if which == "full" else which)
 
 ## Desktop shots of the whole-screen states (233): the launch cover, its slow line and Can't connect; maintenance back in
-## 90 minutes; update; the scene cover over the farm (named Reed Pond) and its failure.
+## 90 minutes; update; the scene cover over the farm (named the beginner pond) and its failure.
 func _dev_screen(which: String) -> void:
 	match which:
 		"launch", "slow", "fail":
@@ -1136,7 +1136,7 @@ func _dev_shot(dt: float) -> void:
 			"wbicon":   # wbicon:craft_copper_pickaxe taps that card's item icon (its InfoSheet)
 				var wbi := ui.workbench()
 				if wbi != null and wbi.card(step[1]) != null: wbi.card(step[1]).icon_pressed.emit()
-			"showmap":   # showmap:pond:pond_shanghai_05 — what Today's Show on map does (int9 S1)
+			"showmap":   # showmap:pond:pond_san_francisco_03 — what Today's Show on map does (int9 S1)
 				ui.close_modal()
 				ui.show_on_map.emit(":".join(step.slice(1)))
 			"minesheet": P0MaterialCards.open_mine_sheet(ui, session.current())        # MINE-P0-1 / P0-8 (235 B3)
