@@ -2210,7 +2210,7 @@ td { font-variant-numeric: tabular-nums; }
 <td>q(104)</td>
 <td>已接下的鱼类委托，等级够不上时鱼塘挂不挂 !（2026-10-09，蒙恬实现服务端标记 PR #185 时在 268 问，评论 60b8b791）</td>
 <td>q(48) 写「已 Track 但还没凑够的鱼类委托挂在能钓到那条鱼的塘上」，只对没接的委托写明了「鱼的等级 ≤ 玩家 Fishing 等级」；香港现有存档：Joey 接了 Old Kai 的 Golden Koi（Rare，Fishing Lv4），他 Lv2，按字面服务端会在 Reed Pond 挂 !，卡上写 <code>Old Kai's request · Golden Koi 0/1</code>，可他在那里钓上来也会挣脱（<code>Too strong</code>）</td>
-<td><strong>选 A：等级够不上就不挂鱼塘</strong>，升到那一级才挂。鱼塘的 ! 是「现在去这里能做成」，把人引去一个只会挣脱的塘是白跑；q(48) 的「能钓到」本来就该包括等级，这里写明，规则不变。委托照常留在 Track 与 Today 里，<strong>下一步要看得见</strong>（奕星补）：Today 委托行小字写 <code>Fishing Lv4 needed</code>，点这一行打开那条鱼的四件事卡（同鱼图鉴剪影：<code>Fishing Lv4 needed · You: Lv2 · 230 XP to go</code>），不移动相机；委托卡交付按钮的缺口也写 <code>Fishing Lv4 needed</code>（取代 <code>Need 1 more Rare fish</code>，缺口写在按钮上，LOCK-10）；升到 Lv4 后两处恢复原写法，鱼塘挂 !。不选 B（照挂、原因行补 <code>· Fishing Lv4</code>）：! 的意思会变成「这里有事但你做不成」，和其他 ! 不一致。实现：蒙恬改服务端 PR #185（客户端兜底若读同一规则也一起改）；Today 行与委托卡的 <code>Fishing Lv4 needed</code> 由奕星派（Today 刘邦、居民委托卡苏烈）</td>
+<td><strong>选 A：等级够不上就不挂鱼塘</strong>，升到那一级才挂。鱼塘的 ! 是「现在去这里能做成」，把人引去一个只会挣脱的塘是白跑；q(48) 的「能钓到」本来就该包括等级，这里写明，规则不变。委托照常留在 Track 与 Today 里，<strong>下一步要看得见</strong>（奕星补）：Today 委托行小字写 <code>Fishing Lv4 needed</code>，点这一行打开那条鱼的门禁四件事卡——就是鱼图鉴剪影点开的同一张（§4.8.7、q(57)）：<code>Fishing Lv4 keeps Golden Koi on the hook</code>，需求格 <code>Fishing XP 70/300</code> · <code>230 XP to go</code>，不移动相机；委托卡交付按钮的缺口也写 <code>Fishing Lv4 needed</code>（取代 <code>Need 1 more Rare fish</code>，缺口写在按钮上，LOCK-10）；升到 Lv4 后两处恢复原写法，鱼塘挂 !。不选 B（照挂、原因行补 <code>· Fishing Lv4</code>）：! 的意思会变成「这里有事但你做不成」，和其他 ! 不一致。实现：蒙恬改服务端 PR #185（客户端兜底若读同一规则也一起改）；Today 行与委托卡的 <code>Fishing Lv4 needed</code> 由奕星派（Today 刘邦、居民委托卡苏烈）</td>
 <td>第 9 章 9.5.2；第 10 章 10.6.1 图钉卡原因行表；<code>docs/qa/p0-copy-checklist-2026-10-08.md</code></td>
 </tr>
 <tr>
@@ -18278,7 +18278,7 @@ td { font-variant-numeric: tabular-nums; }
 <td>集市广场 / 居民所在据点 / 鱼塘上方</td>
 <td><code>marker_request</code></td>
 <td>金色 !</td>
-<td>这里有可接的委托：集市板有单；据点里的居民有可接的委托（未 Track 的鱼类委托要等鱼的等级 ≤ 玩家 Fishing 等级、且当期有鱼塘能钓到）；已 Track 但还没凑够的鱼类委托挂在能钓到那条鱼的塘上（按模板筛，有新手塘选新手塘，否则离农场最近）（q(48)）；「能钓到」同样要求鱼的等级 ≤ 玩家 Fishing 等级——够不上时不挂鱼塘（钓上来也会挣脱），升到那一级才挂；这期间玩家从两处看到下一步：Today 的委托行小字 <code>Fishing Lv4 needed</code>、委托卡交付按钮的缺口写 <code>Fishing Lv4 needed</code>（取代 <code>Need 1 more Rare fish</code>），点 Today 这一行打开那条鱼的四件事卡（同鱼图鉴剪影，<code>Fishing Lv4 needed · You: Lv2 · 230 XP to go</code>），不移动相机（q(104)）；<strong>还没接的鱼类委托不挂鱼塘</strong>——它的 ! 在委托板所在处（q(103)）</td>
+<td>这里有可接的委托：集市板有单；据点里的居民有可接的委托（未 Track 的鱼类委托要等鱼的等级 ≤ 玩家 Fishing 等级、且当期有鱼塘能钓到）；已 Track 但还没凑够的鱼类委托挂在能钓到那条鱼的塘上（按模板筛，有新手塘选新手塘，否则离农场最近）（q(48)）；「能钓到」同样要求鱼的等级 ≤ 玩家 Fishing 等级——够不上时不挂鱼塘（钓上来也会挣脱），升到那一级才挂；这期间玩家从两处看到下一步：Today 的委托行小字 <code>Fishing Lv4 needed</code>、委托卡交付按钮的缺口写 <code>Fishing Lv4 needed</code>（取代 <code>Need 1 more Rare fish</code>），点 Today 这一行打开那条鱼的门禁四件事卡——就是鱼图鉴剪影点开的同一张（§4.8.7、q(57)）：<code>Fishing Lv4 keeps Golden Koi on the hook</code>，需求格 <code>Fishing XP 70/300</code> · <code>230 XP to go</code>，不移动相机（q(104)）；<strong>还没接的鱼类委托不挂鱼塘</strong>——它的 ! 在委托板所在处（q(103)）</td>
 <td>接单或板上无单；鱼凑够后改在交付点亮 ✓，没交之前鱼少了又挂回鱼塘；放弃委托或取消 Track 即消失。系统委托接了不过期，没凑齐前会一直挂着，所以原因必须写在卡上（q(103)）</td>
 </tr>
 <tr>
