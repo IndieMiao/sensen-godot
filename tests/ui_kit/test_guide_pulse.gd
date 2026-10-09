@@ -25,15 +25,21 @@ func test_the_ring_has_room_to_grow_around_the_given_rect() -> void:
 	assert_vector(p.position).is_equal(Vector2(-12, -6))               # 10 px growth + 2 px stroke outside the rect
 	assert_vector(p.size).is_equal(Vector2(194, 56))
 
-## A caller may thicken the ring and lower its opening opacity (the mine mouth's main key, 不知火舞 on #156); the main
-## stays 2 px from full for everyone else.
-func test_a_caller_may_thicken_the_ring_without_changing_the_main() -> void:
+## A caller may tune the ring — width, opening opacity, growth, when the fade starts (the mine mouth's main key, 不知火舞
+## on #156 / #160); the main stays 2 px from full out to +10, fading all the way, for everyone else.
+func test_a_caller_may_tune_the_ring_without_changing_the_main() -> void:
 	var t := _target()
 	var main := UiGuidePulse.play(t)
 	assert_float(main.stroke).is_equal(2.0)
-	assert_float(main.start_alpha).is_equal(1.0)
-	var key := UiGuidePulse.play(t, Rect2(), UiGuidePulse.Shape.CIRCLE, 16.0, 3.0, 0.8)
-	assert_float(key.stroke).is_equal(3.0)
-	assert_float(key.start_alpha).is_equal(0.8)
-	assert_vector(key.position).is_equal(Vector2(-13, -13))            # 10 px growth + 3 px stroke outside the target
-	assert_vector(key.size).is_equal(Vector2(196, 70))
+	assert_float(main.grow_px).is_equal(10.0)
+	main.progress = 0.5
+	assert_float(main.ring_alpha()).is_equal_approx(0.5, 0.0001)     # the main fades from the start
+	var key := UiGuidePulse.play(t, Rect2(), UiGuidePulse.Shape.CIRCLE, 16.0, 3.0, 1.0, 12.0, 0.75)
+	assert_vector(key.position).is_equal(Vector2(-15, -15))            # 12 px growth + 3 px stroke outside the target
+	assert_vector(key.size).is_equal(Vector2(200, 74))
+	key.progress = 0.75                                                # 0.3 s into the 0.6 s ease-out
+	assert_float(key.ring_alpha()).is_equal_approx(1.0, 0.0001)        # still full
+	key.progress = 0.875
+	assert_float(key.ring_alpha()).is_equal_approx(0.5, 0.0001)
+	key.progress = 1.0
+	assert_float(key.ring_alpha()).is_equal_approx(0.0, 0.0001)

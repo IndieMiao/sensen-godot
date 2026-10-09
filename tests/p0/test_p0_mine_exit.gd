@@ -72,7 +72,7 @@ func test_the_whole_model_takes_the_tap() -> void:
 	assert_bool(box.has_point(cam.unproject_position(Vector3(0, 0.1, 0)))).is_true()   # at its foot
 	assert_bool(box.has_point(cam.unproject_position(Vector3(6, 0, 0)))).is_false()    # well beside it
 
-## At the mouth the key pulses once, its ring 3 px from 80 % (不知火舞 on #156: the main's 2 px read faint there).
+## At the mouth the key pulses once: a 3 px ring from full out to +12 px, still full at 0.3 s (不知火舞 on #156 / #160).
 func test_the_key_pulse_is_the_thicker_ring() -> void:
 	var store := "user://test_p0_mine_exit.json"
 	var ui := P0Ui.new()
@@ -88,7 +88,9 @@ func test_the_key_pulse_is_the_thicker_ring() -> void:
 	var pulse := ui.pulse_key()
 	assert_object(pulse).is_not_null()
 	assert_int(ui.key_pulses).is_equal(1)
-	assert_float(pulse.stroke).is_equal(P0Ui.KEY_PULSE_RING)
-	assert_float(pulse.start_alpha).is_equal(P0Ui.KEY_PULSE_ALPHA)
-	assert_float(P0Ui.KEY_PULSE_RING).is_equal(3.0)
+	assert_float(pulse.stroke).is_equal(3.0)
+	assert_float(pulse.start_alpha).is_equal(1.0)
+	assert_float(pulse.grow_px).is_equal(12.0)
+	pulse.progress = 0.75   # 0.3 s: still full (不知火舞 on #160)
+	assert_float(pulse.ring_alpha()).is_equal(1.0)
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(store))
