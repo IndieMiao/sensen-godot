@@ -31,6 +31,7 @@ var _pinch = ElasticZoom.new(0.8, 1.4)   # the farm's range, rubber band past 0.
 var _zoom_at := Vector2.INF            # the last pinch centre (screen)
 var _band := Rect2()                   # the last camera band seen with no panel up
 var _opening := true                   # the opening shot: framed low in the band until the first step or pinch
+var _settling := false                 # after a cast: easing from its framing back into the walking band
 ## The farm's pitch (camera unification, 奕星 2026-10-09); the pond keeps its own yaw 0, looking straight up the pond.
 const PITCH_DEG := FarmCamera.PITCH_DEG
 const DISTANCE := 40.0
@@ -200,7 +201,8 @@ func _begin_fishing(_id: String) -> void:
 func _end_fishing() -> void:
 	if is_instance_valid(view):
 		view.finish()
-		_cam_follow.hold()   # the cast's framing stays until the player walks
+		_cam_follow.hold()   # the cast's framing stays until the player walks …
+		_settling = true     # … eased into the walking band, which can sit a few metres off the fishing one (苏烈 on #143)
 	view = null
 	if actor: actor.lock(false)
 	if rt and rt.world == self: rt.ui.set_surface("pond")
@@ -238,18 +240,25 @@ func _follow(_dt: float) -> void:
 	_focus = _cam_follow.step(cam, _focus, actor.position, actor.mover.is_moving(), _dt)
 	if not _cam_follow.held: _opening = false   # walking: the safe box follows from where the opening left it
 	if _pinch.step(_dt): _set_zoom(_pinch.value)   # springing back from past a limit, about the same point
-	else: _update_camera()
+	else: _update_camera(_dt)
 
 ## Camera unification (用户 via 奕星, 2026-10-09, as the mine in #129): the farm's size and pitch, and the screen kept on
 ## the decorated meadow (不知火舞 on 231) — flush with its sides, and the band between the HUD's second row and the
 ## quick bar / key on it; along an axis the meadow can't fill the band holds the middle.
-func _update_camera() -> void:
+## `dt` < 0 (a pinch step): the clamp applies at once.
+func _update_camera(dt := -1.0) -> void:
 	var view := get_viewport().get_visible_rect().size
 	cam.size = view_size(view, _zoom)
 	var band := _camera_band(rt.ui if rt != null else null)
 	if band.has_area():
 		if _opening: _focus = opening_focus(actor.position, cam.size, view, band)
-		_focus = clamp_focus(_focus, cam.size, view, band, PondScenery.MEADOW)
+		var target := clamp_focus(_focus, cam.size, view, band, PondScenery.MEADOW)
+		if _settling and dt >= 0.0:
+			_focus = _focus.lerp(target, 1.0 - exp(-dt * FISH_EASE))
+			_settling = _focus.distance_to(target) > 0.005
+		else:
+			_focus = target
+			_settling = false
 	place(cam, _focus)
 
 static func view_size(view: Vector2, zoom: float) -> float:
