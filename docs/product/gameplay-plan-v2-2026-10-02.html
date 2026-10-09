@@ -2203,7 +2203,7 @@ td { font-variant-numeric: tabular-nums; }
 <td>q(103)</td>
 <td>鱼塘图钉的 ! 看不出原因（2026-10-09，用户手测 demo 反馈 SGODOT-263 第 5 条 → SGODOT-268；亚瑟查明现状，李白出方案，不知火舞定样式）</td>
 <td>用户：地图钓鱼图标一直挂着 !，点了拿不到更多信息，鱼塘详情页也没有说明，问能否在详情页说明或进入空间后提示。亚瑟查明（268 评论 ca3d0bfd）：线上只有客户端兜底一种来源——教学委托 Pond Catch 还在驿站板上（接没接都算）且背包 Crucian 不到 2 条，就挂在 Reed Pond；系统委托不过期，没交前鱼吃掉、卖掉又挂回，所以看起来一直挂着；鱼塘卡上没有任何说明；q(48) 的服务端标记 <code>map_markers</code>（feat/p0-map-markers 0325aab6、028e3972）没合入、没部署，凑齐后家上的 ✓、集市与居民的 !、据点的 ◆ 线上都没有</td>
-<td>① <strong>! 的含义不变（q(48)、§9.5.2）</strong>：鱼塘上的金 ! = 你已接下（Track）的鱼类委托要的鱼这里钓得到、背包里还不够；<strong>还没接的不挂鱼塘</strong>（它的 ! 在委托板所在处）。② <strong>图钉卡写原因</strong>：副标题下一行，标记图标 + 原因，<code>Pond Catch · Pond Crucian 0/2</code>（与 Today 行同一写法）；集市 <code>Market Board · 2 requests</code>、居民据点 <code>Pip · New request</code>、交付点 ✓ <code>Pond Catch · Ready to deliver</code>、◆ <code>New for you · Reed Rod</code>；几件同时有写最高优先级一件加 <code>· +1 more</code>；样式由不知火舞定。③ <strong>进塘提示</strong>：走进挂 ! 的塘出一次 Info toast，写同一行原因，排在教学卡之后；钓到要的鱼飘字多一行 <code>Pond Catch 1/2</code>；凑够出 Success toast <code>Pond Catch · 2/2 · Deliver at the Stall</code>（集市 <code>Deliver at &lt;据点名&gt;</code>、居民 <code>Deliver to &lt;居民名&gt;</code>）。④ <strong>何时消失</strong>：背包里够数即消失，交付点亮 ✓（驿站板的委托 → 家图钉）；交付后 ✓ 消失；没交之前鱼少了又挂回 !；放弃委托或取消 Track 即消失。⑤ <strong>实现</strong>：服务端 <code>map_markers</code> 合入并部署（奕星已排蒙恬）；客户端兜底改成同一规则（接下才挂、凑够后家上 ✓）；卡上的原因行与进塘提示由奕星派地图与钓鱼的实现人</td>
+<td>① <strong>! 的含义不变（q(48)、§9.5.2）</strong>：鱼塘上的金 ! = 你已接下（Track）的鱼类委托要的鱼这里钓得到、背包里还不够；<strong>还没接的不挂鱼塘</strong>（它的 ! 在委托板所在处）。② <strong>图钉卡写原因</strong>：副标题下、描述句上一行，标记图标 + 原因，<code>Pond Catch · Pond Crucian 0/2</code>（与 Today 行同一写法）；集市 <code>Market Board · 2 requests</code>、居民据点 <code>Pip · New request</code>、交付点 ✓ <code>Pond Catch · Ready to deliver</code>、◆ <code>New for you · Reed Rod</code>；几件同时有写最高优先级一件加 <code>· +1 more</code>；样式不知火舞已定（迷你标记图标 18 px + C13 粗墨色，不加底色）。③ <strong>进塘提示</strong>：走进挂 ! 的塘出一次 Info toast，写同一行原因，排在教学卡之后；钓到要的鱼飘字多一行 <code>Pond Catch 1/2</code>；凑够出 Success toast <code>Pond Catch · 2/2 · Deliver at the Stall</code>（集市 <code>Deliver at &lt;据点名&gt;</code>、居民 <code>Deliver to &lt;居民名&gt;</code>）。④ <strong>何时消失</strong>：背包里够数即消失，交付点亮 ✓（驿站板的委托 → 家图钉）；交付后 ✓ 消失；没交之前鱼少了又挂回 !；放弃委托或取消 Track 即消失。⑤ <strong>实现</strong>：服务端 <code>map_markers</code> 合入并部署（奕星已排蒙恬）；客户端兜底改成同一规则（接下才挂、凑够后家上 ✓）；卡上的原因行与进塘提示由奕星派地图与钓鱼的实现人</td>
 <td>第 9 章 9.5.2；第 10 章 10.6.1 地图 pin 卡；第 14 章 14.3；附录 B；<code>docs/qa/p0-copy-checklist-2026-10-08.md</code></td>
 </tr>
 </tbody>
@@ -21178,7 +21178,7 @@ td { font-variant-numeric: tabular-nums; }
 </tr>
 </tbody>
 </table></div>
-<p><strong>图钉卡原因行</strong>（q(103)）：一行，标记图标 + 原因，写在副标题下面、事实行上面；几件同时有时写最高优先级的一件并加 <code>· +1 more</code>。样式由不知火舞定。</p>
+<p><strong>图钉卡原因行</strong>（q(103)）：一行，写在副标题下面、描述句（如 <code>A nearby pond for your first catch.</code>）上面——它是卡上唯一要玩家动手的信息；几件同时有时写最高优先级的一件并加 <code>· +1 more</code>。样式（不知火舞定）：不加底色；左边与图钉同款的迷你标记图标（STATE-ICONS，18 px，颜色同图钉），间距 6，文字 C13 粗、墨色；行高 24，上下各空 8，超长省略号截断。</p>
 <div class="tbl"><table>
 <thead>
 <tr>
