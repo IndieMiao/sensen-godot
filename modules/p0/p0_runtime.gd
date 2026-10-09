@@ -974,6 +974,8 @@ func _dev_shot(dt: float) -> void:
 			# the outfit 120 px sideways (the spin's own gesture: press, past the slop, release).
 			"profskill": if ui._profile: ui._profile.skill_pressed.emit(step[1] if step.size() > 1 else "farming")
 			"profdex": if ui._profile: ui._profile.collection_pressed.emit("fish")
+			"proffarm": if ui._profile: ui._profile.farm_pressed.emit()   # the farm card: HOME-1 over the profile (int11)
+			"closelayer": ui.close_layer()   # a drawer's Close: one layer back over the profile, else the world (int11)
 			"profspin":
 				if ui._profile:
 					var sp := ui._profile.spin

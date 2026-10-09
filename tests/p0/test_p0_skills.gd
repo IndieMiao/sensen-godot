@@ -68,6 +68,71 @@ func test_what_the_profile_opens_keeps_the_profile_behind_it() -> void:
 	await await_idle_frame()
 	assert_int(ui._modal.find_children("*", "P0ProfilePage", true, false).size()).is_equal(0)
 
+func _ui_with_view(v: Dictionary) -> P0Ui:
+	var ui := P0Ui.new()
+	ui.quick_store = STORE
+	ui.tips_path = TIPS
+	add_child(auto_free(ui))
+	await await_idle_frame()
+	ui.set_view(v)
+	ui.set_surface("farm")
+	return ui
+
+## int11 (不知火舞 on 225): Close on what the profile opened closes that layer only, back to the profile, as the system
+## Back does; opened from the world, Close goes to the world.
+func test_close_on_what_the_profile_opened_comes_back_to_the_profile() -> void:
+	var ui: P0Ui = await _ui_with_view(_view())
+	ui.open_profile()
+	await await_idle_frame()
+	ui._profile.skill_pressed.emit("farming")
+	await await_idle_frame()
+	(ui.find_children("*", "P0SkillsDrawer", true, false)[0] as P0SkillsDrawer).close_pressed.emit()
+	await await_idle_frame()
+	assert_str(ui.modal_kind).is_equal("profile")
+	ui._profile.collection_pressed.emit("fish")
+	await await_idle_frame()
+	(ui.find_children("*", "P0FishDex", true, false)[0] as P0FishDex).close_pressed.emit()
+	await await_idle_frame()
+	assert_str(ui.modal_kind).is_equal("profile")
+	ui.close_modal()   # the profile's own ‹: the world
+	await await_idle_frame()
+	ui.open_skills()   # from the world …
+	await await_idle_frame()
+	(ui.find_children("*", "P0SkillsDrawer", true, false)[0] as P0SkillsDrawer).close_pressed.emit()
+	await await_idle_frame()
+	assert_str(ui.modal_kind).is_equal("")   # … Close goes to the world
+	assert_bool(ui.has_modal()).is_false()
+
+## int11: the profile's farm card has a › and opens HOME-1 over the profile; its Close comes back to the profile. Away
+## from the homestead the upgrade is greyed with HOME-1's own away wording.
+func test_the_farm_card_opens_home_1_over_the_profile() -> void:
+	var v := _view()
+	v["homestead"] = {"level": 1, "next": {"level": 2, "coins": {"need": 100, "have": 200}, "skills": {"need": 3, "have": 6},
+		"materials": [], "energy": 220, "meals": 220, "unlocks": [], "can_upgrade": true}}
+	var ui: P0Ui = await _ui_with_view(v)
+	ui.open_profile()
+	await await_idle_frame()
+	var page := ui._profile
+	var card := page.find_children("*", "UiFarmCard", true, false)[0] as UiFarmCard
+	assert_bool(card.chevron).is_true()
+	card.pressed.emit()
+	await await_idle_frame()
+	assert_str(ui.modal_kind).is_equal("homestead")
+	assert_object(ui._modal.get_child(0)).is_same(page)   # over the profile
+	var button := ui._modal.find_children("*", "UiCommandButton", true, false)[0] as UiCommandButton
+	assert_str(button.reason).is_equal("")   # at home: as HOME-1 says from the farm
+	(ui._modal.find_children("*", "UiDismissButton", true, false)[0] as UiDismissButton).pressed.emit()
+	await await_idle_frame()
+	assert_str(ui.modal_kind).is_equal("profile")
+	ui.space = "outpost"   # away from home
+	ui._profile.farm_pressed.emit()
+	await await_idle_frame()
+	button = ui._modal.find_children("*", "UiCommandButton", true, false)[0] as UiCommandButton
+	assert_str(button.reason).is_equal(str(P0Logic.home_panel(ui.view, false).reason))   # HOME-1's own away wording (苏烈 #146)
+	assert_str(button.reason).is_not_empty()
+	ui.close_modal()
+	await await_idle_frame()
+
 func test_milestones_unfold_in_place_and_the_drawer_comes_back_to_the_profile() -> void:
 	var ui := P0Ui.new()
 	ui.quick_store = STORE

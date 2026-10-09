@@ -2467,9 +2467,25 @@ func open_profile(look_saved := false) -> void:
 			_over_profile = true
 			open_fishdex(func(): open_profile())
 		elif can_request_panel(): request_panel("cookbook"))
+	page.farm_pressed.connect(func():
+		_over_profile = true
+		open_home_panel(func(): open_profile()))
 	_open_modal(page, 0.0, true)
 	_profile = page
 	modal_kind = "profile"
+
+## Close on a layer of the profile chain (Skills, the Fish-dex, HOME-1 opened from the profile) closes that layer only,
+## back to what is under it, as the system Back does; only the profile's own ‹ goes out to the world. Opened from the
+## world, Close goes to the world as before (int11, 不知火舞 on 225).
+func close_layer() -> void:
+	if _over_profile: back_modal()
+	else: close_modal()
+
+## HOME-1 (§10.6.2) from the profile's farm card: over the profile; away from the homestead the upgrade is greyed with
+## HOME-1's own wording (P0Logic.home_panel, 苏烈). Loaded here, not preloaded: the panel's script names P0Ui.
+func open_home_panel(back := Callable()) -> void:
+	load("res://scenes/p0/home/p0_home_panel.gd").open(self, space_here() == "home")
+	_modal_back = back
 
 ## The profile page to move under the next layer: while a chain opened from the profile goes on (256 ⑧).
 func _profile_to_keep() -> Control:
@@ -2500,8 +2516,8 @@ func open_skills(back := Callable()) -> void:
 	var d := P0SkillsDrawer.new(view)
 	d.theme = UiKit.theme()
 	d.safe_bottom = safe_bottom()
-	d.close_requested.connect(close_modal)
-	d.close_pressed.connect(close_modal)
+	d.close_requested.connect(close_layer)
+	d.close_pressed.connect(close_layer)
 	_open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
 	modal_kind = "skills"
 	_modal_back = back
@@ -2728,8 +2744,8 @@ func open_fishdex(back := Callable(), animate := true) -> void:
 	d.theme = UiKit.theme()
 	d.animate = animate
 	d.safe_bottom = safe_bottom()
-	d.close_requested.connect(close_modal)
-	d.close_pressed.connect(close_modal)
+	d.close_requested.connect(close_layer)
+	d.close_pressed.connect(close_layer)
 	var again := func(): open_fishdex(back, false)
 	d.cell_pressed.connect(func(id: String):
 		var gate := P0Logic.fish_gate(view, id)

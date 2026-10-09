@@ -76,7 +76,7 @@ static func open(ui: P0Ui, at_home := true) -> void:
 		foot.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		col.add_child(foot)
 	var close := UiDismissButton.new("Close")
-	close.pressed.connect(ui.close_modal)
+	close.pressed.connect(ui.close_layer)   # from the profile: back to it, as the system Back (int11); else the world
 	col.add_child(close)
 	ui._open_modal(panel, 0.3, true)
 	ui.modal_kind = "homestead"
