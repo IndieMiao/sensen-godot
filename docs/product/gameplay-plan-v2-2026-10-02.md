@@ -5067,10 +5067,11 @@ Row Hoe 一次作用于角色面前同一行 3 格，只有可播的格才扣体
 | 标记 | 挂在哪 | 原因行 |
 |---|---|---|
 | 金 ! | 鱼塘（已 Track、背包里的鱼还不够的鱼类委托） | `Pond Catch · Pond Crucian 0/2`（委托名 · 鱼名 已有/要求，与 Today 行同一写法） |
-| 金 ! | 集市广场（集市板上有没接的单） | `Market Board · 2 requests` |
+| 金 ! | 集市广场（集市板上有没接的单） | `Market Board · 2 requests`（只有 1 条时单数 `Market Board · 1 request`） |
 | 金 ! | 居民所在据点（居民有可接的委托） | `Pip · New request` |
 | 绿 ✓ | 交付点（驿站板的委托 → 家；集市板 → 集市广场；居民 → 其据点） | `Pond Catch · Ready to deliver` |
-| 青 ◆ | 据点（新解锁、还没看过的货 / 配方卡 / 对话页） | `New for you · Reed Rod` |
+| 青 ◆ | 据点（新解锁、还没看过的货 / 配方卡） | `New for you · Reed Rod` |
+| 青 ◆ | 居民所在据点（居民开出新的对话页，q(48)：到 Acquainted） | `Pip · New chat`（与 `Pip · New request` 同一写法；同一位居民两件都有时按优先级写 `Pip · New request · +1 more`） |
 
 ### 10.6.2 个人页 Profile（2026-10-05 p(7)）
 
