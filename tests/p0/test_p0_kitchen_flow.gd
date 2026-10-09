@@ -727,6 +727,9 @@ func test_the_second_ring_hit_says_perfect_and_its_extra_portion() -> void:
 	k.set("_start_ms", Time.get_ticks_msec() - int(22000 + 0.55 * 1600))   # the second
 	assert_bool(k.tap()).is_true()
 	assert_array(texts.call()).contains(["Perfect! ★★ · Extra portion"])
+	# Hits read in item ink, as they always showed (不知火舞 on #158: gold is the coins' colour; ★ says the hit).
+	var perfect: Array = rt.ui.root.find_children("*", "UiFloatText", true, false).filter(func(f): return (f as UiFloatText).text.begins_with("Perfect"))
+	assert_int((perfect[0] as UiFloatText).tone).is_equal(UiFloatText.Tone.ITEM)
 
 
 func test_a_ring_gone_by_floats_missed_in_secondary_ink() -> void:

@@ -10,7 +10,7 @@ func after_test() -> void:
 func _floats(ui: P0Ui) -> Array:
 	return ui.root.get_children().filter(func(c): return c is UiFloatText and not c.is_queued_for_deletion())
 
-func test_float_text_draws_its_tone_and_an_older_colour_reads_as_item() -> void:
+func test_float_text_draws_its_tone() -> void:
 	var ui := P0Ui.new()
 	ui.quick_store = STORE
 	add_child(auto_free(ui))
@@ -20,9 +20,9 @@ func test_float_text_draws_its_tone_and_an_older_colour_reads_as_item() -> void:
 	assert_int(xp.layout).is_equal(UiFloatText.Layout.HUG)
 	var wood := ui.float_text("+6 Timber", Vector2(180, 400), UiFloatText.Tone.ITEM, P0Logic.icon("wood"))
 	assert_object(wood.icon).is_same(P0Logic.icon("wood"))
-	# Callers from other PRs still pass a Color (mine, farm materials): drawn in the ITEM tone until 233 sorts them.
-	var old := ui.float_text("Stored at home", Vector2(180, 400), Color("4f934b"))
-	assert_int(old.tone).is_equal(UiFloatText.Tone.ITEM)
+	# A tone only (刘邦 on #158): no Color fallback any more; nothing gained reads MUTED.
+	var none := ui.float_text("Missed · still cooking", Vector2(180, 400), UiFloatText.Tone.MUTED)
+	assert_int(none.tone).is_equal(UiFloatText.Tone.MUTED)
 	var long := ui.float_text("It got away · Energy refunded (2 left today)", Vector2(180, 400), UiFloatText.Tone.ENERGY_GAIN)
 	assert_int(long.layout).is_equal(UiFloatText.Layout.WRAP)
 	assert_bool(xp.get_parent() == ui.root).is_true()
