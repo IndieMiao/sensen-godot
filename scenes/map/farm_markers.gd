@@ -472,17 +472,20 @@ func yield_self_label(on: bool) -> void:
 			and not self_label_off
 
 ## City-mode screen footprints of players (local space): the city POI layer
-## packs its markers around people so artwork never buries an avatar's pin.
-func blocker_rects() -> Array:
+## packs its markers around people so artwork never buries an avatar's pin. `body_only`: the body as its tap target
+## holds it and its name, without the margin a POI's tall artwork keeps (space pins, SGODOT-269, 不知火舞).
+func blocker_rects(body_only := false) -> Array:
 	var result: Array = []
 	if not city_mode: return result
 	for id in visible_farm_ids:
 		var target: Control = _avatar_targets[id]
 		var rect := Rect2(target.position, target.size)
-		if (id == "self" or id == expanded_avatar_id) and not low_detail:
+		if (id == "self" or id == expanded_avatar_id) and not low_detail and not body_only:
 			# The full-body 3D actor draws wider and taller than its tap target.
 			rect = rect.grow_individual(26, 84, 26, 0)
-		result.append(rect.merge(Rect2(_buttons[id].position, _buttons[id].size)))
+		var label: Control = _buttons[id]
+		if not body_only or label.visible: rect = rect.merge(Rect2(label.position, label.size))   # its name, when shown
+		result.append(rect)
 	return result
 
 func activate_at(screen: Vector2) -> bool:
