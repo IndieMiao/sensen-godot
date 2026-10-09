@@ -10,7 +10,9 @@ func test_available_rests_up_to_sixty() -> void:
 	var s := P0Logic.rest_state(_view())
 	assert_str(s.state).is_equal("ready")
 	assert_str(s.badge).is_equal("available")
-	assert_str(s.card).is_equal("Rest · +60 Energy · once a day")
+	# No `card` line: the bench strip (P0WorldPrompts.bench), the bench sheet (P0Ui) and the Energy card's Rest tile
+	# (P0Logic) each word their own, and nothing read it (李白 q(94)).
+	assert_bool(s.has("card")).is_false()
 	assert_str(s.sheet_state).is_equal("Available")
 	assert_str(s.effect).is_equal("Restores up to 60 Energy")
 	assert_array([s.fact, s.fact_value]).is_equal(["Uses left", "1 today"])
@@ -47,5 +49,6 @@ func test_used_today() -> void:
 	assert_str(s.state).is_equal("used")
 	assert_str(s.badge).is_equal("used_today")
 	assert_array([s.fact, s.fact_value]).is_equal(["Uses", "1/1"])
-	assert_str(s.note).is_equal("Available again at the next home-day reset.")
+	assert_str(s.note).is_equal("Available again in 9h 12m")   # to the 04:00 reset, as the mine's `Resets in` (q(96))
+	assert_str(P0Logic.rest_state(_view({"used": 1, "resets_in": 2_520_000})).note).is_equal("Available again in 42:00")
 	assert_bool(s.can_rest).is_false()

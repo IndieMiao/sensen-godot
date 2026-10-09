@@ -676,6 +676,21 @@ func _fab_pressed() -> void:
 ## While held, the farm repeats the action for each new plot with the same verb.
 func fab_state() -> Dictionary: return _fab_state
 
+## The main key's GuidePulse, once: a tap on what the key acts on, made where the key is already the way in (the mine
+## mouth, 不知火舞 on 231, int11 ②: entering costs Energy, so it stays on the key, LOCK-21). A 3 px ring from full, out
+## to +12 px, held full until half its time (0.3 s, 0.75 of the ease-out) and faded after: the main's 2 px fading from
+## the start read faint against the key's own green ring over the fields (不知火舞 on #156 / #160).
+const KEY_PULSE_RING := 3.0
+const KEY_PULSE_ALPHA := 1.0
+const KEY_PULSE_GROW := 12.0
+const KEY_PULSE_FADE_FROM := 0.75
+var key_pulses := 0
+func pulse_key() -> UiGuidePulse:
+	if _keys == null or not _keys.is_visible_in_tree(): return null
+	key_pulses += 1
+	return UiGuidePulse.play(_keys.key(), Rect2(), UiGuidePulse.Shape.CIRCLE, 16.0, KEY_PULSE_RING, KEY_PULSE_ALPHA,
+		KEY_PULSE_GROW, KEY_PULSE_FADE_FROM)
+
 # ---------------------------------------------------------------- world tags & floats
 # ---------------------------------------------------------------- world prompts (SGODOT-250, LOCK-07 v2 / LOCK-16 v2)
 ## A facility within view and about 8 m: its icon button (WorldIconButton 1674:101157) centred on `screen` (this UI's
@@ -965,10 +980,10 @@ func camera_band() -> Rect2:
 
 ## FloatText (1178:82191, UiFloatText from 2B; SGODOT-224): one line rising from `screen` (its bottom centre) in its
 ## tone; `stack` = the line's place in one reply (each starts 28 higher and 60 ms later, at most 3). Copy longer
-## than one line wraps (Layout=Wrap, two lines at most). `tone` also takes the older Color argument (callers in
-## other PRs, e.g. SGODOT-231's material notices): any colour draws in the ITEM tone.
-func float_text(text: String, screen: Vector2, tone: Variant = UiFloatText.Tone.ITEM, icon: Texture2D = null, stack := 0) -> UiFloatText:
-	var f := _make_float(text, UiFloatText.Tone.ITEM if tone is Color else int(tone), icon)
+## than one line wraps (Layout=Wrap, two lines at most). `tone` is a UiFloatText.Tone only: a Color used to be taken
+## and drawn as ITEM, so a caller's gold or grey never showed (刘邦 on #158); a nothing-gained line is MUTED.
+func float_text(text: String, screen: Vector2, tone: UiFloatText.Tone = UiFloatText.Tone.ITEM, icon: Texture2D = null, stack := 0) -> UiFloatText:
+	var f := _make_float(text, tone, icon)
 	f.play(_float_start(screen, [f], stack), stack)
 	return f
 

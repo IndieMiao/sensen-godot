@@ -295,7 +295,7 @@ function finishPot(c: P0Content, s: P0State, pot: Pot, taps: number[], eat: bool
   // The first pot of a page earns this as well as the first-cook bonus (§14.2.2: Good Grilled Crucian 10 + 4 × 1.25).
   const scaled = scaledXp(s, tier.xp, pot.xp_pct);
   const decayed = before === 0 ? scaled : before === 1 ? Math.ceil(scaled / 2) : 0;
-  gainXp(c, s, now, 'cooking', Math.floor(decayed * c.cooking.quality_xp[quality]), pot.xp_pct, events);
+  gainXp(c, s, now, 'cooking', Math.floor(decayed * c.cooking.quality_xp[quality]), pot.xp_pct, events, before + 1);
 }
 
 /**

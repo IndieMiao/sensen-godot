@@ -195,6 +195,7 @@ func _begin_fishing(_id: String) -> void:
 	view.float_ring = true
 	view.line_px = LINE_PX
 	view.line_color = LINE_INK
+	view.catch_pop = CATCH_POP   # the landed fish reads at the walking scale in flight (美术总监 / 不知火舞 on 231)
 	add_child(view)
 	view.configure(panel, actor, actor.rig, cam, [])
 	_opening = false
@@ -227,16 +228,32 @@ func p0_event(ev: Dictionary, _v: Dictionary) -> bool:
 			if panel.visible: panel.on_send_failed(ev.cmd)
 	return false
 
-## After the landing arc (or the ripples), close the panel, ease the camera back to the pond and let the
-## runtime show the result card or float at the cast point (FISH-3 / FISH-5).
+## After the landing arc (or the ripples), close the panel and let the runtime show the result card or float (FISH-3 /
+## FISH-5): an escape's at the cast point; a landed fish's reply floats — held by the runtime while the fish flew, so
+## `+25 XP` no longer crosses it — rise from over the player's head now that it is in the hand, and a first catch's
+## Caught! card comes CARD_AFTER_FLOATS_S after them (不知火舞 on 231 / #154, q(49)).
 func _settle(ev: Dictionary, delay: float, first_xp: int) -> void:
 	await get_tree().create_timer(delay).timeout
 	if not is_inside_tree(): return
 	var land := panel.landing
 	if panel.visible: panel.close()
 	var at := cam.unproject_position(land) if not cam.is_position_behind(land) else Vector2.INF
+	var floats := rt.take_catch_floats()
+	if str(ev.get("result", "")) == "landed": at = over_head()
+	rt.ui.queue_floats(floats, at)
 	rt.last_first_catch_xp = first_xp
-	rt._on_catch(ev, rt.last_xp_lines, at)
+	rt._on_catch(ev, rt.last_xp_lines, at, CARD_AFTER_FLOATS_S if not floats.is_empty() else 0.0)
+
+## Where a landed fish's floats rise (不知火舞 on 231): FLOAT_OVER_HEAD_PX above the top of the player's head on screen
+## (the top of the outfit — hair or hat — at the middle of the figure).
+const FLOAT_OVER_HEAD_PX := 8.0
+## A first catch's Caught! card follows its floats by this much (不知火舞 on #154): only the order matters — the floats
+## over the head, the card in the lower half — and waiting for them to play out read as a stall.
+const CARD_AFTER_FLOATS_S := 0.5
+func over_head() -> Vector2:
+	var box := DressingCamera.merged_aabb(actor.rig) if actor.rig != null else AABB()
+	var top := Vector3(actor.position.x, box.end.y if box.has_volume() else actor.position.y + HEAD_M, actor.position.z)
+	return cam.unproject_position(top) - Vector2(0, FLOAT_OVER_HEAD_PX)
 
 # ---------------------------------------------------------------- camera (old pond framing + safe box)
 func _follow(_dt: float) -> void:
@@ -289,6 +306,7 @@ const FISH_EASE := 7.0
 const PLAYER_HALF_M := 0.3   # the player's box on screen: feet to head (HEAD_M), this far either side
 const HEAD_M := 1.8
 const FLOAT_SCALE := 1.6
+const CATCH_POP := 1.5
 const LINE_PX := 1.5
 const LINE_INK := Color("#2F3A33B3")   # ink, 70 %
 static func fishing_focus(player: Vector3, landing: Vector3, focus_y: float, size: float, view: Vector2, band: Rect2) -> Vector3:

@@ -360,12 +360,14 @@ func _chips(at: Vector3) -> void:
 	p.emitting = true
 	get_tree().create_timer(1.0).timeout.connect(p.queue_free)
 
-## Out of the mine: back to the farm (this world sits above it), 0 Energy (q(44)). The run stays until 04:00.
+## Out of the mine: back to the farm (this world sits above it), 0 Energy (q(44)). The run stays until 04:00. One
+## layer down, like a room's door: leave_world goes all the way to the map (the place chip's path), which took the
+## exit ladder and the elevator's Ground to the map (user int11 ①, 不知火舞 on 231).
 func _leave() -> void:
 	if _leaving: return
 	_leaving = true
 	actor.set_input(Vector2.ZERO)
-	rt.leave_world()
+	rt.leave_room()
 
 ## 04:00 while inside: back outside the mouth, where the farm floats "Run ended at daily reset" once (q(44)).
 func _kick_out() -> void:
@@ -553,6 +555,11 @@ func p0_dev(step: PackedStringArray) -> bool:
 			_focus = actor.position
 		"floor": _go_floor(int(step[1]))
 		"elevator": p0_action({"type": "elevator"})
+		"elevrow":   # elevrow:0 — press that row of the open elevator panel (row 0 is Ground)
+			for n in rt.ui.find_children("*", "", true, false):
+				if n is UiElevatorPanel and (n as UiElevatorPanel).row(int(step[1])) != null:
+					(n as UiElevatorPanel).row(int(step[1])).pressed.emit()
+					break
 		"exit": _leave()
 		_: return false
 	return true

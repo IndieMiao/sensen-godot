@@ -621,6 +621,9 @@ static func cabinet_actions(view: Dictionary, id: String) -> Dictionary:
 const TAG_NAMES := {"W": "Fish", "F": "Vegetable", "O": "Fruit", "S": "Seasoning"}
 const ORDINALS := ["1st", "2nd", "3rd"]
 
+## 1st, 2nd, 3rd, 4th … (Cooks today, and the XP float's `· 2nd today` / `No XP · 3rd today`).
+static func ordinal(n: int) -> String: return ORDINALS[n - 1] if n >= 1 and n <= 3 else "%dth" % n
+
 ## Cooking Lv2's Cook Again is unlocked (S5 conveniences).
 static func cook_again_on(view: Dictionary) -> bool:
 	return cooking(view).get("conveniences", []).has("cook_again")
@@ -677,7 +680,7 @@ static func cook_again(view: Dictionary, page_id: String) -> Dictionary:
 	var facts: Array = []
 	var rarity := int(p.get("rarity", 1))
 	if short.is_empty(): facts.append(["Cooking", cook_time(view, rarity)])
-	facts.append(["Cooks today", ORDINALS[mini(today, 2)] if today < 3 else "%dth" % (today + 1)])
+	facts.append(["Cooks today", ordinal(today + 1)])
 	facts.append(["Cooking XP", "Full" if today == 0 else ("Half" if today == 1 else "None")])
 	var first: Dictionary = short[0] if not short.is_empty() else {}
 	return {title = str(p.get("name", "")), state = "Can cook again" if short.is_empty() else "Materials short",

@@ -73,7 +73,7 @@ static func all() -> Array[Dictionary]:
 		{id = "resident_profile", title = "UiResidentProfile", figma = "RES-PIP 482:586 / RES-KAI 482:592 · sheet content (328/360)", build = _resident_profiles},
 		{id = "affinity_stages", title = "Affinity stage tones", figma = "StateBadge on RES-PIP / RES-KAI · AffinityMeter stage pill · 225 验收 (197)", build = _affinity_stages},
 		{id = "notice_row", title = "UiNoticeRow", figma = "Bag capacity recovery of BAG-5 482:144 (336 at 328)", build = _notice_rows},
-		{id = "float_text", title = "UiFloatText", figma = "FloatText 1178:82191 · six tones, Hug / Wrap (static pills)", build = _float_texts},
+		{id = "float_text", title = "UiFloatText", figma = "FloatText 1178:82191 · six tones + muted (#158), Hug / Wrap (static pills)", build = _float_texts},
 		# SGODOT-224 panels
 		{id = "info_sheet", title = "UiInfoSheet", figma = "Compact/SelectedItem 633:41257 · BAG-1 482:10 · F-07 (SGODOT-207 168a4cc3)", build = _info_sheets},
 		{id = "gate_card", title = "Gate card (UiInfoSheet)", figma = "SKILL-2 482:169 · §4.8.7 four things (SGODOT-233)", build = _gate_cards},
@@ -819,7 +819,8 @@ static func _float_texts() -> Control:
 	var v := _column(UiTokens.SPACE_ROW)
 	var tones := [["+5 XP", UiFloatText.Tone.XP, null], ["+25 Energy", UiFloatText.Tone.ENERGY_GAIN, null],
 		["−2 Energy", UiFloatText.Tone.ENERGY_COST, null], ["+12 coins", UiFloatText.Tone.COINS, null],
-		["+2 · first chat today", UiFloatText.Tone.AFFINITY, null], ["+6 Timber", UiFloatText.Tone.ITEM, _tex("wood")]]
+		["+2 · first chat today", UiFloatText.Tone.AFFINITY, null], ["+6 Timber", UiFloatText.Tone.ITEM, _tex("wood")],
+		["No XP · 3rd today", UiFloatText.Tone.MUTED, null]]
 	for t in tones:
 		var row := HBoxContainer.new()   # hugs the pill
 		row.add_child(UiFloatText.pill(t[0], t[1], t[2]))
@@ -884,7 +885,7 @@ static func _gate_cards() -> Control:
 static func _board_cards() -> Control:
 	var page := _column(8)
 	page.custom_minimum_size.x = 312
-	page.add_child(UiBoardCard.fact_row("Requests today", "4 of 6"))
+	page.add_child(UiBoardCard.fact_row("Requests today", "4/6"))
 	page.add_child(UiBoardCard.fact_row("Next request", "3h 58m"))
 	page.add_child(_board_card({id = "m1", title = "Dusk Haul", info = true, status = "Ready to deliver", facts = ["4 Fine fish · any kind"],
 		reward = "36 coins", needs = [{id = "fish_crucian", name = "Fine fish", have = 4, need = 4, icon = _tex("fish_crucian")}], command = "Deliver"}))
