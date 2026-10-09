@@ -77,4 +77,12 @@ func test_the_open_marker_area_is_the_marker_area_with_the_hud_up() -> void:
 	ui._bar.visible = false
 	assert_float(ui._marker_area().position.y).is_equal(0.0)   # covered: the live area changes …
 	assert_that(ui.open_marker_area()).is_equal(shown)         # … the opening's does not
+	ui._bar.visible = true
+	var drawer := Control.new()   # the Bag drawer takes the bar into itself, near the top of the screen
+	drawer.position = Vector2(0, 200)
+	ui._kit.add_child(drawer)
+	ui.dock_bar_into(drawer)
+	await get_tree().process_frame
+	assert_that(ui.open_marker_area()).is_equal(shown)   # its place, not where the drawer holds it (int12-pre shot)
+	ui.undock_bar()
 	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_p0_farm_opening.json"))
