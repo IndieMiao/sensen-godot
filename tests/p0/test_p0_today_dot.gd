@@ -179,3 +179,17 @@ func test_cook_it_lights_again_after_the_fish_is_eaten_and_caught_again() -> voi
 	assert_bool(ui.hud.today_dot_shown()).is_false()
 	ui.set_view(v)                                # caught again
 	assert_bool(ui.hud.today_dot_shown()).is_true()
+
+## A new account on this device (the server reset it, the app still open) starts with nothing seen: the same first
+## rows light the dot again (亚瑟 on #201).
+func test_a_new_account_sees_its_dot_even_on_the_same_keys() -> void:
+	var v := _kai(_view())
+	v["profile"] = {"since_ms": 1_700_000_000_000}
+	var ui := await _ui(v)
+	ui.open_today()
+	ui.close_modal()
+	assert_bool(ui.hud.today_dot_shown()).is_false()
+	var fresh := v.duplicate(true)
+	fresh.profile.since_ms = 1_800_000_000_000
+	ui.set_view(fresh)
+	assert_bool(ui.hud.today_dot_shown()).is_true()

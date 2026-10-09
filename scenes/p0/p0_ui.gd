@@ -2838,6 +2838,7 @@ func _check_account(v: Dictionary) -> void:
 		stale = FileAccess.get_modified_time(tips_path) * 1000 < since - 60_000   # a minute's leeway for the phone's clock
 	if stale:
 		_taught = {}
+		_dot_keys = null   # the new account's Today dot is judged afresh, even on the same keys (亚瑟 on #201)
 		tips = null
 		_hide_tip()
 		_quick = {}
