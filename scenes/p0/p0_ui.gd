@@ -1598,6 +1598,9 @@ func _open_modal(content: Control, dim := 0.32, hide_controls := false) -> void:
 	if under != null: holder.add_child(under)   # the profile stays behind the scrim (256 ⑧)
 	holder.add_child(veil)
 	holder.add_child(content)
+	# A drawer dragged down fades its scrim with it (SGODOT-265); a drawer may sit inside the content (the Fish-dex).
+	for d in ([content] if content is UiDrawer else []) + content.find_children("*", "UiDrawer", true, false):
+		(d as UiDrawer).scrim = veil
 	if surface == "map" and content is PanelContainer:
 		# Over the map, translucent paper lets the map's own buttons ghost through the card.
 		var sb := (content as PanelContainer).get_theme_stylebox("panel")
