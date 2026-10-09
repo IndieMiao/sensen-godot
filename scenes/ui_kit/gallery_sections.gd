@@ -754,9 +754,9 @@ static func _profile_parts() -> Control:
 ## opens HOME-1 (int11; 亚瑟 on #148).
 static func _farm_cards() -> Control:
 	var v := _column(UiTokens.SPACE_ROW)
-	var farm := UiFarmCard.new("Farmer's Homestead", "Level 1", "Radishes ready 3h 32m", load("res://assets/p0/art/homestead-thumb.jpg"))
+	var farm := UiFarmCard.new("Farmer's Homestead", "Level 1", "Radishes ready in 3h 32m", load("res://assets/p0/art/homestead-thumb.jpg"))
 	v.add_child(_captioned(_at_336(farm), "farm overview"))
-	var own := UiFarmCard.new("Farmer's Homestead", "Level 1", "Radishes ready 3h 32m", load("res://assets/p0/art/homestead-thumb.jpg"))
+	var own := UiFarmCard.new("Farmer's Homestead", "Level 1", "Radishes ready in 3h 32m", load("res://assets/p0/art/homestead-thumb.jpg"))
 	own.chevron = true
 	v.add_child(_captioned(_at_336(own), "your profile · › opens HOME-1"))
 	return v

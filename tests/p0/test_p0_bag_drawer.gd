@@ -221,7 +221,7 @@ func test_profile_data_reads_the_view_and_hides_what_is_missing() -> void:
 	assert_float(float(d.skills[2].progress)).is_equal(1.0)   # top level: full ring
 	assert_str(str(d.farm.name)).is_equal("Farmer's Homestead")
 	assert_str(str(d.farm.level_line)).is_equal("Level 1")
-	assert_str(str(d.farm.status)).is_equal("Radishes ready 3h 32m")
+	assert_str(str(d.farm.status)).is_equal("Radishes ready in 3h 32m")
 	assert_that(d.collections.map(func(c): return [c.name, c.have, c.need])).is_equal([["Fish", 2, 3], ["Pages", 1, 48]])
 	assert_str("%d/%d" % [int(d.collections[1].have), int(d.collections[1].need)]).is_equal(P0KitchenLogic.cookbook_count(v))   # as the tab
 	var bare := P0ProfilePage.profile_data({})
