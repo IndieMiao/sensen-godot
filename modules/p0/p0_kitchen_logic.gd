@@ -264,6 +264,63 @@ static func missing_reason(view: Dictionary, p: Dictionary) -> String:
 		used[found] = int(used.get(found, 0)) + 1
 	return "Missing ingredients"
 
+## A known page short of one ingredient only, a crop still in the ground (plan §14.2 end, §14.5; 李白 A3 / q(95)):
+## {page, name, crop, ms, fish} for the Today line `Fresh Fish Soup · when radishes are ready`, or {} when none. The bag
+## and the Spice Rack cover the rest; the one short kind is a crop sown or growing on the plots (a family slot takes the
+## soonest such crop) — two kinds short, no line. A ripe crop is a Harvest line instead, so the page drops out then.
+## Of several, the one whose crop is ripe first. `fish` is how many of the bag's fish it keeps for itself (the stove-free
+## line counts the rest).
+static func waiting_on_crops(view_: Dictionary) -> Dictionary:
+	var view := with_rack(view_)
+	var pool := {}
+	for s in view.get("bag", {}).get("slots", []): pool[str(s.get("id", ""))] = int(pool.get(str(s.get("id", "")), 0)) + int(s.get("qty", 0))
+	for r in rack_rows(view_): pool[str(r.id)] = int(pool.get(str(r.id), 0)) + int(r.quantity)
+	var growing: Array = []   # [ms, crop]; a sown plot not watered yet counts, last
+	for p in view.get("plots", []):
+		var st := str(p.get("state", ""))
+		if st == "growing": growing.append([float(p.get("ready_in", 0)), str(p.crop)])
+		elif st == "sown": growing.append([INF, str(p.crop)])
+		elif st == "ready": pool[str(p.crop)] = int(pool.get(str(p.crop), 0)) + 1   # ripe: a Harvest away, not waited on
+	if growing.is_empty(): return {}
+	growing.sort_custom(func(a, b): return float(a[0]) < float(b[0]))
+	var best := {}
+	for p in pages(view):
+		var known := bool(p.get("known", false)) or str(p.get("state", "")) in ["tasted", "discovered", "mastered"]
+		if not known or bool(p.get("can_cook", false)): continue
+		var left := pool.duplicate()
+		var short: Array = []   # the tokens the bag cannot cover
+		var fish := 0
+		for token in p.get("in", []):
+			var t := str(token)
+			var found := ""
+			for id in left:
+				if int(left[id]) > 0 and P0Logic._token_matches(view, t, str(id)):
+					found = str(id)
+					break
+			if found == "":
+				short.append(t)
+				continue
+			left[found] = int(left[found]) - 1
+			if found.begins_with("fish_"): fish += 1
+		if short.is_empty(): continue
+		var crop := ""
+		var ms := 0.0
+		for t in short:   # one kind short: every uncovered slot is the same growing crop
+			var grow: Array = []
+			for g in growing:
+				if P0Logic._token_matches(view, t, str(g[1])):
+					grow = g
+					break
+			if grow.is_empty() or (crop != "" and str(grow[1]) != crop):
+				crop = ""
+				break
+			crop = str(grow[1])
+			ms = float(grow[0])
+		if crop == "": continue
+		if best.is_empty() or ms < float(best.ms):
+			best = {page = str(p.id), name = str(p.get("name", P0Logic.item_name(view, str(p.id)))), crop = crop, ms = ms, fish = fish}
+	return best
+
 ## Ghosts and slot bar for a selected page: [{id, name, icon}] per ingredient (family tokens show their label).
 static func page_ingredients(view: Dictionary, p: Dictionary) -> Array:
 	var out: Array = []

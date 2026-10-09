@@ -222,6 +222,64 @@ func test_after_the_first_session_the_crop_timer_says_what_the_harvest_does() ->
 	assert_that(_lines(rows).slice(0, 2)).is_equal(["Radishes ready in 3h 53m", "Farming Lv 2 at your first harvest"])
 	assert_str(str(rows[1].go)).is_equal("")   # an info row: no Show
 
+## §14.2 end / §14.5 (李白 A3): a known recipe short only of crops in the ground hooks the next session —
+## `Fresh Fish Soup · when radishes are ready`, the third line, after the radish countdown and its level row (q(69)).
+func _session_end(radish := "growing") -> Dictionary:
+	var plots: Array = []
+	for i in 20: plots.append({"id": i, "state": radish, "crop": "crop_radish", "xp_pct": 100, "ready_in": 12720000})
+	for i in 10: plots.append({"id": 20 + i, "state": "growing", "crop": "crop_lettuce", "xp_pct": 100, "ready_in": 27960000})
+	var v := _view({"plots": plots, "req_done": ["req_pond_catch"]})
+	v.stall.board.requests = []
+	v.cooking.cookbook[0].cooked = true
+	v.items.merge({"fish_crucian": {"kind": "fish", "family": "W", "rarity": 1, "cook": true},
+		"crop_radish": {"kind": "crop", "family": "F", "rarity": 1, "cook": true},
+		"crop_lettuce": {"kind": "crop", "family": "F", "rarity": 1, "cook": true}}, true)
+	v.cooking.cookbook.append({"id": "dish_fish_soup", "name": "Fresh Fish Soup", "slots": 2, "known": true, "cooked": false,
+		"can_cook": false, "in": ["W1", "F1"]})
+	v.cooking.stove = null
+	v.bag.slots = [{"id": "dish_herb_grilled_fish", "qty": 1}]   # no fish left: the soup waits on the fish too
+	return v
+
+func _soup(v: Dictionary, fish: int) -> Dictionary:
+	v.bag.slots = [{"id": "fish_crucian", "qty": fish}] if fish > 0 else []
+	return v
+
+func test_the_waiting_recipe_is_the_third_line_and_keeps_its_fish() -> void:
+	# As many crucian as the soup needs (1): they are kept for it, no stove-free line; the soup line is the third.
+	var rows := P0Logic.today_rows(_soup(_session_end(), 1))
+	assert_that(_lines(rows)).is_equal(["Radishes ready in 3h 32m", "Farming Lv 2 at your first harvest",
+		"Fresh Fish Soup · when radishes are ready"])
+	assert_str(str(rows[2].go)).is_equal("plots")   # Show: the radishes, its source
+	assert_str(str(rows[2].icon)).is_equal("dish_fish_soup")
+	assert_str(str(P0KitchenLogic.waiting_on_crops(_soup(_session_end(), 1)).crop)).is_equal("crop_radish")   # F1: soonest
+	# More fish than it needs: the stove-free line counts the rest (3 − 1); the soup line falls to the 4th place.
+	var more := _lines(P0Logic.today_rows(_soup(_session_end(), 3)))
+	assert_str(str(more[0])).is_equal("2 fish · the stove is free")
+	# Fewer (none): the soup is short of a fish and a crop, two kinds — no waiting line; the lettuce comes back.
+	var none := _lines(P0Logic.today_rows(_soup(_session_end(), 0)))
+	assert_bool(none.any(func(l): return str(l).contains("Fresh Fish Soup"))).is_false()
+	assert_that(none).is_equal(["Radishes ready in 3h 32m", "Farming Lv 2 at your first harvest", "Lettuces ready in 7h 46m"])
+
+func test_two_kinds_short_no_line_and_of_two_waiting_the_first_ripe() -> void:
+	var v := _soup(_session_end(), 1)
+	v.cooking.cookbook[-1].known = false   # the soup aside: a salad short of radish and lettuce, both in the ground
+	v.cooking.cookbook.append({"id": "dish_veggie_plate", "name": "Veggie Plate", "known": true, "cooked": false,
+		"can_cook": false, "in": ["crop_radish", "crop_lettuce"]})
+	assert_dict(P0KitchenLogic.waiting_on_crops(v)).is_empty()   # two kinds short
+	v = _soup(_session_end(), 1)
+	v.cooking.cookbook.push_front({"id": "dish_lettuce_fish", "name": "Lettuce Fish", "known": true, "cooked": true,
+		"can_cook": false, "in": ["W1", "crop_lettuce"]})   # first in the book, but its lettuce is ripe later
+	assert_str(str(P0KitchenLogic.waiting_on_crops(v).name)).is_equal("Fresh Fish Soup")
+
+func test_the_waiting_line_goes_once_its_crop_is_ripe_and_the_stove_line_comes_back() -> void:
+	var lines := _lines(P0Logic.today_rows(_soup(_session_end("ready"), 1)))
+	assert_bool(lines.any(func(l): return str(l).contains("· when "))).is_false()   # Harvest now; the lettuce is not waited on
+	assert_bool(lines.has("1 fish · the stove is free")).is_true()   # its fish are free again
+	var v := _soup(_session_end(), 1)
+	v.bag.slots.append({"id": "crop_radish", "qty": 1})
+	v.cooking.cookbook[-1].can_cook = true
+	assert_bool(_lines(P0Logic.today_rows(v)).any(func(l): return str(l).contains("· when "))).is_false()   # it can cook
+
 ## RETURN-SESSION (q(69)): ready plots that reach the level — `Harvest 20 Radishes` then `Farming Lv 2 with this harvest`.
 func test_a_ready_harvest_that_levels_is_followed_by_its_info_row() -> void:
 	var twenty: Array = []
