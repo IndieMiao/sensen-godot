@@ -125,7 +125,7 @@ func show_request(d: Dictionary) -> void:
 
 func command_button() -> UiCommandButton: return _command
 
-## A page fact above the rows (BOARD-READY `Requests today  4 of 6`): C11 Bold secondary label, C12 ExtraBold value
+## A page fact above the rows (BOARD-READY `Requests today  4/6`): C11 Bold secondary label, C12 ExtraBold value
 ## right-aligned, 25 high.
 static func fact_row(label: String, value: String) -> HBoxContainer:
 	var row := HBoxContainer.new()

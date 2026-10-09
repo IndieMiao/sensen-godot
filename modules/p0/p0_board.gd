@@ -12,13 +12,14 @@ const CITY := "Shanghai"
 static func board_id(role: String) -> String:
 	return "stall" if role == "homestead" else "market"
 
-## Page facts above the rows: `Requests today 4 of 6` (both boards share the daily count), `Next request 3h 58m`
-## (the soonest empty slot), `Bonus today 20 of 100` once any bonus has been paid. [[label, value], …]
+## Page facts above the rows: `Requests today 4/6` (both boards share the daily count), `Next request 3h 58m`
+## (the soonest empty slot), `Bonus today 20/100` once any bonus has been paid. Counts are x/y, the general rule
+## (李白's copy audit 1009 A2). [[label, value], …]
 static func facts(view: Dictionary, board: String) -> Array:
 	var out: Array = []
 	var q: Dictionary = view.get("quotas", {})
 	var sys: Dictionary = q.get("sys_requests", {})
-	if not sys.is_empty(): out.append(["Requests today", "%d of %d" % [int(sys.get("used", 0)), int(sys.get("cap", 0))]])
+	if not sys.is_empty(): out.append(["Requests today", "%d/%d" % [int(sys.get("used", 0)), int(sys.get("cap", 0))]])
 	var soonest := -1.0
 	for sl in view.get("boards", {}).get(board, {}).get("slots", []):
 		if sl.get("empty", false) and sl.has("refill_in"):
@@ -26,7 +27,7 @@ static func facts(view: Dictionary, board: String) -> Array:
 			soonest = t if soonest < 0.0 else minf(soonest, t)
 	if soonest >= 0.0: out.append(["Next request", hours(soonest)])
 	var bonus: Dictionary = q.get("request_bonus", {})
-	if int(bonus.get("used", 0)) > 0: out.append(["Bonus today", "%d of %d" % [int(bonus.used), int(bonus.get("cap", 0))]])
+	if int(bonus.get("used", 0)) > 0: out.append(["Bonus today", "%d/%d" % [int(bonus.used), int(bonus.get("cap", 0))]])
 	return out
 
 ## The board's rows in slot order: each request as UiBoardCard data; a slot whose request was delivered while the
