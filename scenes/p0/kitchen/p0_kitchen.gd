@@ -219,6 +219,16 @@ func at_gold(lead_ms := 0.0) -> bool:
 		if not _judged.has(i) and e >= float(heats[i].at) and P0Logic.heat_hit(heats[i], e, 0.0): return true
 	return false
 
+## Shots (until:earlysoon / until:tailsoon): a ring not yet judged has its needle `lead_ms` from now between `from` and
+## `to` (fractions of its turn; past 1 is the 350 ms it stays after its turn).
+func ring_at(lead_ms: float, from: float, to: float) -> bool:
+	if not _heat_live(): return false
+	var e := elapsed() + lead_ms
+	for h in _stove.get("heats", []):
+		var f := (e - float(h.at)) / float(h.spin)
+		if f >= from and f <= to: return true
+	return false
+
 ## Shots: the heat tap a player's finger makes now (on the watched pot or the queue drawer's pot band).
 func dev_heat_tap() -> void: _judge_tap()
 
