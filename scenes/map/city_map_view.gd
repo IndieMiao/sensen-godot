@@ -135,6 +135,19 @@ var _art_root: Node3D
 var _shown_last: Dictionary = {}
 ## id -> ticks_msec before which a culled marker may not reappear.
 var _hidden_until: Dictionary = {}
+## The pins are laid out again only when something _update_markers reads has changed since the last layout (SGODOT-260:
+## a still map laid them out every frame, 2.9 ms a frame on a desktop over a busy street, and a warm phone fell to 30 fps).
+## Compared by value: the camera (centre, zoom, the zoom's elastic overshoot, bearing, pitch), the view's size and place,
+## the language, and the player's own pins on screen (FarmMarkers: the pins give way to them, and its name to theirs).
+## Compared by identity, being replaced, never edited, when they change: the selection (select / clear_selection), the
+## entries (refresh_content: the city, the filter, the ponds, a host's places — P0's outposts and their counts, the
+## Homestead pin while away), the live POIs (_merge_pois) and the marks (set_marks: P0's from each server reply).
+## Then until it settles: a layout that changed which pins show runs again (a pin shown last time packs with a smaller
+## margin), as does one whose reappear cooldown runs out (_hidden_until).
+var _layout_values: Array = []
+var _layout_refs: Array = []
+var _layout_settling := true
+var _layout_due := 0   # ticks_msec: the first reappear cooldown after the last layout that runs out (0: none)
 ## 左上角标题：随中心所在位置变化（已开通城市名 / 瓦片地名）。
 var city_button: Button
 var _underline: ColorRect
@@ -850,7 +863,8 @@ func tick(dt: float) -> void:
 		if geocoder and host._touch_count == 0 and host._fling_vel.length() <= host.FLING_MIN_SPEED:
 			geocoder.lookup(host.center_lat, host.center_lng, host.zoom, TranslationServer.get_locale())
 	if geocoder: places = geocoder.places
-	_update_markers()
+	if _layout_wanted(): _update_markers()
+	else: _show_selected_art()   # a portrait drawn while the map is still
 	_update_bubbles()
 	_update_header()
 
@@ -959,6 +973,25 @@ func _make_marker(entry: Dictionary) -> Dictionary:
 	result.label = label
 	return result
 
+## Whether the pins need laying out this frame (see _layout_values): what _update_markers reads is read here, cheaply,
+## and kept for the next frame.
+func _layout_wanted() -> bool:
+	var fm = host.get("farm_markers")
+	var own := []
+	if fm != null and fm.has_method("blocker_rects"):
+		own = [fm.blocker_rects(), fm.self_label_rect() if fm.has_method("self_label_rect") else Rect2(), fm.global_position]
+	var values := [host.center_lat, host.center_lng, host.zoom, host.get("_zoom_elastic"), host.bearing, host.pitch,
+		get_viewport_rect().size, global_position, TranslationServer.get_locale(), own]
+	var refs := [selected, entries, live_pois, marks]
+	var wanted := _layout_settling or values != _layout_values or refs.size() != _layout_refs.size() \
+		or (_layout_due > 0 and Time.get_ticks_msec() >= _layout_due)
+	for i in refs.size():
+		if wanted: break
+		wanted = not is_same(refs[i], _layout_refs[i])
+	_layout_values = values
+	_layout_refs = refs
+	return wanted
+
 func _update_markers() -> void:
 	displayed.clear()
 	_place_labels.clear()
@@ -1019,7 +1052,7 @@ func _update_markers() -> void:
 	# Screen-space packing: anchors never move; a marker either shows in place
 	# or yields entirely. Order: selected, landmarks, residents, then POIs by
 	# incumbency (anti-flicker), source rank and id — fully deterministic.
-	candidates.sort_custom(func(a, b): return _pack_key(a) < _pack_key(b))
+	_pack_order(candidates)
 	var blockers := _player_blockers()
 	var now := Time.get_ticks_msec()
 	var occupied: Array = []
@@ -1037,8 +1070,10 @@ func _update_markers() -> void:
 		_place_candidate(c, occupied, blockers, now)
 	_yield_own_label()
 	var shown := displayed.map(func(m): return str(m.entry.id))
-	_shown_last = {}
-	for id in shown: _shown_last[id] = true
+	var shown_now := {}
+	for id in shown: shown_now[id] = true
+	_layout_settling = shown_now != _shown_last   # the pins shown now pack differently next time: run once more
+	_shown_last = shown_now
 	for id in markers.keys():
 		_set_marker_shown(markers[id], shown.has(id))
 		if not keep.has(id): _free_marker(id)
@@ -1047,8 +1082,17 @@ func _update_markers() -> void:
 	if _hidden_until.size() > 256:
 		for id in _hidden_until.keys():
 			if now >= int(_hidden_until[id]): _hidden_until.erase(id)
+	_layout_due = 0
+	for until in _hidden_until.values():
+		if int(until) > now and (_layout_due == 0 or int(until) < _layout_due): _layout_due = int(until)
 	if _provider_error.is_empty():
 		status.text = L10n.text("No dining places in view. Move or zoom the map.") if filter == "food" and displayed.is_empty() else ""
+	_show_selected_art()
+	# Keep controls on top even when dynamically creating markers.
+
+## The selected resident's or player's portrait on its card: drawn asynchronously, so looked for every frame, laid out
+## or not.
+func _show_selected_art() -> void:
 	if selected.get("kind") == "resident" and markers.has(selected.id):
 		var portrait: MapPortrait = markers[selected.id].portrait
 		if not portrait._shown_key.is_empty() and portrait._shown_key == portrait._desired_key:
@@ -1059,7 +1103,6 @@ func _update_markers() -> void:
 		if fm and fm.has_method("portrait_texture"):
 			var tex: Texture2D = fm.portrait_texture(str(selected.get("farm_id", "")))
 			if tex != null: info_art.texture = tex
-	# Keep controls on top even when dynamically creating markers.
 
 ## One placement attempt. Anchors never move: on success the marker is laid out
 ## in place, on failure it stays hidden this frame. Dead-zone margins plus the
@@ -1267,14 +1310,21 @@ func _animate_focus(id: String, to: float, duration: float) -> void:
 		marker.focus = v
 		_apply_marker_scale(marker), float(marker.get("focus", 1.0)), to, duration)
 
+const KIND_ORDER := {"place": -1, "landmark": 0, "resident": 1, "pond": 2, "poi": 3}
+
+## Sorts the candidates by _pack_key, each candidate's key made once: made in the comparison, it was made twice per
+## comparison, about a thousand times a frame over a busy street (SGODOT-260). The same keys, so the same order.
+func _pack_order(candidates: Array) -> void:
+	for c in candidates: c["key"] = _pack_key(c)
+	candidates.sort_custom(func(a, b): return a.key < b.key)
+
 func _pack_key(c: Dictionary) -> Array:
 	# A host place (P0 outpost) goes before everything but the selected pin and a pin wearing a map marker (蒙恬 on
 	# C30): the city level shows every outpost (q(72)). Journey has no place pins, so its order is unchanged.
 	# Outposts among themselves: nearest home first, then id (不知火舞 on C30) — geography, so panning never reorders them.
-	var kind_order := {"place": -1, "landmark": 0, "resident": 1, "pond": 2, "poi": 3}
 	return [0 if selected.get("id", null) == c.entry.get("id") else 1,
 		int(MARKER_ORDER.get(_marker_of(c.entry), MARKER_ORDER.size())),
-		kind_order.get(c.entry.kind, 3),
+		KIND_ORDER.get(c.entry.kind, 3),
 		_home_distance(c.entry) if c.entry.kind == "place" else 0.0,
 		0 if _shown_last.has(c.id) else 1,
 		float(c.entry.get("rank", 5)),
