@@ -1021,6 +1021,11 @@ func _dev_shot(dt: float) -> void:
 			"energypanel": ui.open_energy_panel()
 			"inbox": ui.open_inbox()
 			"inboxdemo": _dev_inbox(step[1] if step.size() > 1 else "parcels")   # inboxdemo:parcels|full|updates|todo (234)
+			"homeaway":   # HOME-1 from the Profile farm card away from home (At home); homeaway:tap also taps the grey button
+				HomePanel.open(ui, false)
+				if step.size() > 1 and ui._modal != null:
+					for b in ui._modal.find_children("*", "UiCommandButton", true, false):
+						(b as UiCommandButton).unavailable_pressed.emit((b as UiCommandButton).reason)
 			"workbench": ui.open_workbench(step[1] if step.size() > 1 else "")   # SGODOT-231 B2-06 drawer, tools / supplies
 			"toasterr": ui.toast_error(step[1] if step.size() > 1 else "Need 1 more Copper Ore")   # a refusal's Error toast (233)
 			"inboxnotice":   # inboxnotice[:more|:full|:gift] — the Sent to Inbox card under the bell (BAG-5-2, q(87) / q(88); 234)
