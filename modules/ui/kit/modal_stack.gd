@@ -71,6 +71,7 @@ func _open(layer: Layer, content: Control, scrim_opacity: float, opts: Dictionar
 		scrim.gui_input.connect(_on_scrim_input.bind(layer))
 	add_child(scrim)
 	add_child(content)
+	if content is UiDrawer: (content as UiDrawer).scrim = scrim   # it fades as the drawer is dragged down (SGODOT-265)
 	_scrim[layer] = scrim
 	_content[layer] = content
 	if opts.has("on_close"): _on_close[layer] = opts.on_close

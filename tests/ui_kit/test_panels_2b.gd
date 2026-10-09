@@ -46,59 +46,8 @@ func test_drawer_slides_up_when_animated() -> void:
 	await get_tree().create_timer(UiKit.secs(UiTokens.MOTION_DRAWER_MS) + 0.1).timeout
 	assert_float(d.position.y).is_equal_approx(800.0 - 546.0, 0.5)
 
-## Press at `from`, move to `to`, release there after `ms` on the drawer's fake clock `now`.
-func _drag(d: UiDrawer, from: Vector2, to: Vector2, now: Array, ms := 600) -> void:
-	var p := InputEventMouseButton.new()
-	p.button_index = MOUSE_BUTTON_LEFT
-	p.pressed = true
-	p.position = from
-	d._gui_input(p)
-	var m := InputEventMouseMotion.new()
-	m.button_mask = MOUSE_BUTTON_MASK_LEFT
-	m.position = to
-	d._gui_input(m)
-	now[0] += ms
-	var r := InputEventMouseButton.new()
-	r.button_index = MOUSE_BUTTON_LEFT
-	r.pressed = false
-	r.position = to
-	d._gui_input(r)
-
-func test_drawer_swipe_down_48_closes_and_short_or_sideways_drags_do_not() -> void:
-	if DisplayServer.is_touchscreen_available(): return   # synthetic mouse input below
-	var d := _drawer()
-	await _settle()
-	var now := [0]
-	d.clock = func() -> int: return now[0]
-	var closes := [0]
-	d.close_requested.connect(func(): closes[0] += 1)
-	_drag(d, Vector2(100, 10), Vector2(100, 40), now)       # 30 px, slow: stays
-	_drag(d, Vector2(100, 10), Vector2(160, 70), now, 50)   # diagonal, even fast: stays
-	assert_int(closes[0]).is_equal(0)
-	_drag(d, Vector2(100, 10), Vector2(104, 60), now)       # 50 px down: closes once
-	assert_int(closes[0]).is_equal(1)
-
-func test_drawer_quick_flick_closes() -> void:
-	if DisplayServer.is_touchscreen_available(): return
-	var d := _drawer()
-	await _settle()
-	var now := [0]
-	d.clock = func() -> int: return now[0]
-	var closes := [0]
-	d.close_requested.connect(func(): closes[0] += 1)
-	var p := InputEventMouseButton.new()
-	p.button_index = MOUSE_BUTTON_LEFT
-	p.pressed = true
-	p.position = Vector2(100, 10)
-	d._gui_input(p)
-	now[0] = 100
-	var r := InputEventMouseButton.new()
-	r.button_index = MOUSE_BUTTON_LEFT
-	r.position = Vector2(100, 30)
-	d._gui_input(r)
-	assert_int(closes[0]).is_equal(1)
-
-# Real viewport input: header content passes the swipe on, the grid and KEEP_INPUT subtrees keep theirs.
+# Real viewport input (SGODOT-265, 不知火舞's spec): the handle band moves the drawer, a scroll at its top does from its
+# top, other content does not; 1:1, closed past a quarter (≥ 80 px) or by a fling, else back into place.
 
 func _mouse(at: Vector2, down: bool) -> void:
 	var e := InputEventMouseButton.new()
@@ -108,25 +57,39 @@ func _mouse(at: Vector2, down: bool) -> void:
 	e.pressed = down
 	get_viewport().push_input(e, true)
 
-func _swipe(from: Vector2, by: Vector2, steps := 8) -> void:
-	_mouse(from, true)
-	for i in steps:
-		var m := InputEventMouseMotion.new()
-		m.position = from + by * float(i + 1) / steps
-		m.global_position = m.position
-		m.relative = by / steps
-		m.button_mask = MOUSE_BUTTON_MASK_LEFT
-		get_viewport().push_input(m, true)
-		await get_tree().process_frame
-	_mouse(from + by, false)
-	await get_tree().process_frame
+func _motion(at: Vector2, rel: Vector2) -> void:
+	var m := InputEventMouseMotion.new()
+	m.position = at
+	m.global_position = at
+	m.relative = rel
+	m.button_mask = MOUSE_BUTTON_MASK_LEFT
+	get_viewport().push_input(m, true)
 
-## A drawer like the Bag: a tab row on top, a scrolling grid, a kept row (the docked quick bar) at the bottom.
+## Press at `from`, move by `by` in `steps` (a frame each, `ms` on the fake clock `now` each when given), release.
+func _swipe(from: Vector2, by: Vector2, steps := 8, now: Array = [], ms := 40, release := true, press := true) -> void:
+	if press:
+		_mouse(from, true)
+		await get_tree().process_frame
+	for i in steps:
+		if not now.is_empty(): now[0] += ms
+		_motion(from + by * float(i + 1) / steps, by / steps)
+		await get_tree().process_frame
+	if release:
+		_mouse(from + by, false)
+		await get_tree().process_frame
+
+func _fake_clock(d: UiDrawer) -> Array:
+	var now := [1000]
+	d.clock = func() -> int: return now[0]
+	return now
+
+## A drawer like the Bag: a tab row in the handle band, a second row under it, a scrolling grid, a kept row (the
+## docked quick bar) at the bottom.
 func _bag_like() -> Dictionary:
 	var d := UiDrawer.new(500.0)
 	d.animate = false
 	var early := Button.new()   # built before the drawer enters the tree, as P0BagDrawer does
-	early.custom_minimum_size = Vector2(120, 34)
+	early.custom_minimum_size = Vector2(120, 30)
 	d.body.add_child(early)
 	_host(d)
 	var tab := Button.new()     # added later, on a refresh
@@ -139,7 +102,7 @@ func _bag_like() -> Dictionary:
 	grid.custom_minimum_size.y = 200
 	d.body.add_child(grid)
 	var cell := Button.new()
-	cell.custom_minimum_size = Vector2(100, 400)
+	cell.custom_minimum_size = Vector2(100, 600)
 	grid.add_child(cell)
 	var kept := PanelContainer.new()
 	kept.set_meta(UiDrawer.KEEP_INPUT, true)
@@ -147,82 +110,249 @@ func _bag_like() -> Dictionary:
 	slot.custom_minimum_size = Vector2(60, 44)
 	kept.add_child(slot)
 	d.body.add_child(kept)
-	return {drawer = d, early = early, tab = tab, cell = cell, slot = slot}
+	return {drawer = d, early = early, tab = tab, grid = grid, cell = cell, slot = slot}
 
 func _count(sig: Signal) -> Array:
 	var n := [0]
 	sig.connect(func(): n[0] += 1)
 	return n
 
-func test_drawer_swipe_from_a_header_tab_closes_without_firing_the_tab() -> void:
+func _band(d: UiDrawer) -> Vector2: return d.get_global_rect().position + Vector2(180, 24)   # mid handle band
+
+func test_every_drawer_has_a_handle_that_shows_a_press_in_its_band() -> void:
+	if DisplayServer.is_touchscreen_available(): return   # synthetic mouse input below
+	var d := _drawer(500.0)
+	await _settle()
+	assert_bool(d.handle).is_true()
+	_mouse(_band(d), true)
+	await get_tree().process_frame
+	assert_bool(d._band_down).is_true()   # color/secondary while pressed
+	_mouse(_band(d), false)
+	await get_tree().process_frame
+	assert_bool(d._band_down).is_false()
+	_mouse(d.get_global_rect().position + Vector2(180, 200), true)   # under the band: no
+	await get_tree().process_frame
+	assert_bool(d._band_down).is_false()
+	_mouse(d.get_global_rect().position + Vector2(180, 200), false)
+
+func test_a_drag_on_the_handle_band_follows_and_springs_back_when_short() -> void:
+	if DisplayServer.is_touchscreen_available(): return
+	var d := _drawer(546.0)
+	await _settle()
+	var now := _fake_clock(d)
+	var veil := ColorRect.new()   # behind the drawer, as a host's scrim
+	veil.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	d.get_parent().add_child(veil)
+	d.get_parent().move_child(veil, 0)
+	d.scrim = veil
+	var closes := _count(d.close_requested)
+	var top := d.position.y
+	await _swipe(_band(d), Vector2(0, 110), 10, now, 60, false)   # slow, 110 px: under a quarter (136.5)
+	assert_float(d.position.y - top).is_equal_approx(110.0, 1.0)   # 1:1 with the finger from the press
+	assert_float(veil.modulate.a).is_equal_approx(1.0 - 110.0 / 546.0, 0.01)
+	_mouse(_band(d) + Vector2(0, 110), false)
+	await get_tree().create_timer(0.3).timeout
+	assert_float(d.position.y).is_equal_approx(top, 0.5)   # back into place
+	assert_float(veil.modulate.a).is_equal_approx(1.0, 0.01)
+	assert_int(closes[0]).is_zero()
+
+func test_a_drag_past_a_quarter_closes_from_where_it_is() -> void:
+	if DisplayServer.is_touchscreen_available(): return
+	var d := _drawer(546.0)
+	await _settle()
+	var now := _fake_clock(d)
+	var closes := _count(d.close_requested)
+	await _swipe(_band(d), Vector2(0, 160), 8, now, 80)   # slow, 150 px past the slop
+	assert_int(closes[0]).is_zero()   # on its way down first
+	await get_tree().create_timer(0.25).timeout
+	assert_int(closes[0]).is_equal(1)
+	assert_float(d.position.y).is_equal_approx(800.0, 1.0)   # all the way down
+
+func test_a_fling_closes_and_a_slow_short_drag_does_not() -> void:
+	if DisplayServer.is_touchscreen_available(): return
+	var d := _drawer(546.0)
+	await _settle()
+	var now := _fake_clock(d)
+	var closes := _count(d.close_requested)
+	await _swipe(_band(d), Vector2(0, 40), 4, now, 60)   # 30 px past the slop at ~170 px/s: back
+	await get_tree().create_timer(0.3).timeout
+	assert_int(closes[0]).is_zero()
+	await _swipe(_band(d), Vector2(0, 50), 4, now, 10)   # 40 px at ~1250 px/s: a fling
+	await get_tree().create_timer(0.25).timeout
+	assert_int(closes[0]).is_equal(1)
+
+func test_a_drag_up_or_sideways_on_the_band_does_not_move_it() -> void:
+	if DisplayServer.is_touchscreen_available(): return
+	var d := _drawer(546.0)
+	await _settle()
+	var top := d.position.y
+	await _swipe(_band(d), Vector2(0, -60), 6, [], 40, false)
+	assert_float(d.position.y).is_equal_approx(top, 0.5)
+	_mouse(_band(d) + Vector2(0, -60), false)
+	await _swipe(_band(d) + Vector2(-80, 0), Vector2(120, 40), 6, [], 40, false)   # 18° off horizontal
+	assert_float(d.position.y).is_equal_approx(top, 0.5)
+	_mouse(_band(d) + Vector2(40, 40), false)
+
+func test_a_tap_on_a_title_button_taps_and_a_drag_from_it_moves_the_drawer_without_firing_it() -> void:
 	if DisplayServer.is_touchscreen_available(): return
 	var p := _bag_like()
 	await _settle()
 	var d: UiDrawer = p.drawer
 	assert_int(p.early.mouse_filter).is_equal(Control.MOUSE_FILTER_PASS)
-	assert_int(p.tab.mouse_filter).is_equal(Control.MOUSE_FILTER_PASS)
+	var at: Vector2 = p.early.get_global_rect().get_center()
+	assert_float(at.y - d.get_global_rect().position.y).is_less(UiDrawer.HANDLE_H)   # in the band
 	var closes := _count(d.close_requested)
-	var taps := _count(p.tab.pressed)
-	await _swipe(p.tab.get_global_rect().get_center(), Vector2(0, 60))
-	assert_int(closes[0]).is_equal(1)
-	assert_int(taps[0]).is_zero()
-
-func test_drawer_tap_on_a_header_tab_still_taps_and_does_not_close() -> void:
-	if DisplayServer.is_touchscreen_available(): return
-	var p := _bag_like()
-	await _settle()
-	var closes := _count(p.drawer.close_requested)
-	var taps := _count(p.tab.pressed)
-	var at: Vector2 = p.tab.get_global_rect().get_center()
+	var taps := _count(p.early.pressed)
 	_mouse(at, true)
 	await get_tree().process_frame
 	_mouse(at, false)
 	await get_tree().process_frame
 	assert_int(taps[0]).is_equal(1)
-	assert_int(closes[0]).is_zero()
+	await _swipe(at, Vector2(0, 200), 8, _fake_clock(d), 60)
+	await get_tree().create_timer(0.25).timeout
+	assert_int(closes[0]).is_equal(1)
+	assert_int(taps[0]).is_equal(1)   # the drag fired nothing
 
-func test_drawer_flick_from_a_tab_closes_and_eats_the_release() -> void:
+func test_other_content_does_not_close_it_and_a_drag_there_fires_nothing() -> void:
 	if DisplayServer.is_touchscreen_available(): return
 	var p := _bag_like()
 	await _settle()
 	var d: UiDrawer = p.drawer
-	var now := [0]
-	d.clock = func() -> int: return now[0]
+	var top := d.position.y
 	var closes := _count(d.close_requested)
 	var taps := _count(p.tab.pressed)
-	var at: Vector2 = p.tab.get_global_rect().get_center()
+	var at: Vector2 = p.tab.get_global_rect().get_center()   # the second row, under the band
+	assert_float(at.y - d.get_global_rect().position.y).is_greater(UiDrawer.HANDLE_H)
+	await _swipe(at, Vector2(0, 20), 4)   # a short drag ending on the tab
+	await _swipe(at, Vector2(0, 200), 8)
+	await get_tree().create_timer(0.3).timeout
+	assert_float(d.position.y).is_equal_approx(top, 0.5)
+	assert_int(closes[0]).is_zero()
+	assert_int(taps[0]).is_zero()
+
+func test_a_scroll_at_its_top_moves_the_drawer_from_its_top_and_one_lower_only_scrolls() -> void:
+	if DisplayServer.is_touchscreen_available(): return
+	var p := _bag_like()
+	await _settle()
+	var d: UiDrawer = p.drawer
+	var grid: ScrollContainer = p.grid
+	var now := _fake_clock(d)
+	var closes := _count(d.close_requested)
+	var top := d.position.y
+	grid.scroll_vertical = 120   # scrolled down: a drag down scrolls back to the top and stops there
+	await get_tree().process_frame
+	await _swipe(grid.get_global_rect().get_center(), Vector2(0, 260), 10, now, 60)
+	await get_tree().create_timer(0.3).timeout
+	assert_float(d.position.y).is_equal_approx(top, 0.5)
+	assert_int(closes[0]).is_zero()
+	grid.scroll_vertical = 0   # at the top as the press starts: the drawer follows and closes
+	await get_tree().process_frame
+	await _swipe(grid.get_global_rect().get_center(), Vector2(0, 220), 8, now, 60)
+	await get_tree().create_timer(0.25).timeout
+	assert_int(closes[0]).is_equal(1)
+
+func test_a_long_press_in_a_scroll_lifts_before_a_drag_counts() -> void:
+	if DisplayServer.is_touchscreen_available(): return
+	var p := _bag_like()
+	await _settle()
+	var d: UiDrawer = p.drawer
+	var now := _fake_clock(d)
+	var top := d.position.y
+	var at: Vector2 = p.grid.get_global_rect().get_center()
 	_mouse(at, true)
 	await get_tree().process_frame
-	now[0] = 100
-	_mouse(at + Vector2(0, 20), false)   # 20 px within 100 ms: the release still lands on the tab
+	now[0] += GestureArbiter.LONG_PRESS_MS + 10   # held: the cell lifts (LOCK-12 v1.11)
+	await _swipe(at, Vector2(0, 200), 8, now, 30, false, false)
+	assert_float(d.position.y).is_equal_approx(top, 0.5)
+	_mouse(at + Vector2(0, 200), false)
 	await get_tree().process_frame
-	assert_int(closes[0]).is_equal(1)
-	assert_int(taps[0]).is_zero()
 
-func test_drawer_swipe_that_ends_on_the_same_tall_row_does_not_fire_it() -> void:
-	if DisplayServer.is_touchscreen_available(): return
-	var d := _drawer(500.0)
-	var row := Button.new()   # a gear row or notice taller than the swipe
-	row.custom_minimum_size = Vector2(300, 120)
-	d.body.add_child(row)
-	await _settle()
-	var closes := _count(d.close_requested)
-	var taps := _count(row.pressed)
-	var top := row.get_global_rect().position + Vector2(150, 10)
-	await _swipe(top, Vector2(0, 60))   # closes on the way; the release is still inside the row
-	assert_bool(row.get_global_rect().has_point(top + Vector2(0, 60))).is_true()
-	assert_int(closes[0]).is_equal(1)
-	assert_int(taps[0]).is_zero()
-
-func test_drawer_grid_and_kept_rows_keep_their_drags() -> void:
+func test_kept_rows_keep_their_drags() -> void:
 	if DisplayServer.is_touchscreen_available(): return
 	var p := _bag_like()
 	await _settle()
 	var closes := _count(p.drawer.close_requested)
-	await _swipe(p.cell.get_global_rect().get_center(), Vector2(0, 60))
 	assert_int(p.slot.mouse_filter).is_equal(Control.MOUSE_FILTER_STOP)   # untouched
 	await _swipe(p.slot.get_global_rect().get_center(), Vector2(0, 60))
+	await get_tree().create_timer(0.25).timeout
 	assert_int(closes[0]).is_zero()
+
+## 亚瑟 on #196: a fast 60 px drag that rests 500 ms before the lift springs back (60 < a quarter of 546; the finger has
+## no speed left), where the speed of the drag 100 ms earlier closed it.
+func test_a_fast_drag_that_rests_before_the_lift_springs_back() -> void:
+	if DisplayServer.is_touchscreen_available(): return
+	var d := _drawer()
+	await _settle()
+	var now := _fake_clock(d)
+	var closes := _count(d.close_requested)
+	var at := _band(d)
+	await _swipe(at, Vector2(0, 60), 4, now, 10, false)
+	now[0] += 500   # the finger rests
+	await get_tree().process_frame
+	_mouse(at + Vector2(0, 60), false)   # where the finger is, not _band(d): the drawer has moved down with it
+	await get_tree().create_timer(0.35).timeout
+	assert_int(closes[0]).is_zero()
+	assert_float(d.offset_bottom).is_equal_approx(0.0, 0.5)
+
+## A filter strip in a drawer, flung sideways, coasts after the lift as one outside a drawer does, and a move with no
+## button down does not drag it afterwards (亚瑟 on #196: the eaten release left it dragging, with no inertia).
+func test_a_strip_flung_in_a_drawer_coasts_and_ends_its_drag() -> void:
+	var emulate := Input.emulate_touch_from_mouse
+	Input.emulate_touch_from_mouse = true
+	var d := _drawer()
+	var spacer := Control.new()
+	spacer.custom_minimum_size.y = 60   # below the handle band
+	d.body.add_child(spacer)
+	var strip := TouchScrollContainer.new()
+	strip.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	strip.custom_minimum_size = Vector2(336, 40)
+	var row := HBoxContainer.new()
+	for i in 12:
+		var b := Button.new()
+		b.text = "Filter %d" % i
+		b.custom_minimum_size = Vector2(90, 36)
+		row.add_child(b)
+	strip.add_child(row)
+	d.body.add_child(strip)
+	for i in 3: await get_tree().process_frame
+	var at := strip.get_global_rect().get_center()
+	_touch_and_mouse(at, true)
+	await get_tree().physics_frame
+	for i in 8:
+		_drag_and_motion(at + Vector2(-20 * (i + 1), 0), Vector2(-20, 0))
+		await get_tree().physics_frame
+	var lifted := strip.scroll_horizontal
+	_touch_and_mouse(at + Vector2(-160, 0), false)
+	for i in 20: await get_tree().physics_frame
+	var coasted := strip.scroll_horizontal - lifted
+	var before := strip.scroll_horizontal
+	for i in 4:
+		var m := InputEventMouseMotion.new()
+		m.position = at + Vector2(-160 + 15 * (i + 1), 0)
+		m.global_position = m.position
+		m.relative = Vector2(15, 0)
+		get_viewport().push_input(m, true)
+		await get_tree().physics_frame
+	Input.emulate_touch_from_mouse = emulate
+	assert_int(lifted).is_greater(0)
+	assert_int(coasted).is_greater(0)
+	assert_int(strip.scroll_horizontal - before).is_zero()
+
+## A title button the drag began on is not left drawn pressed once the drawer springs back (亚瑟 on #196).
+func test_a_band_button_is_not_left_pressed_after_a_drag_springs_back() -> void:
+	if DisplayServer.is_touchscreen_available(): return
+	var d := _drawer()
+	var b := Button.new()
+	b.custom_minimum_size = Vector2(120, 30)
+	d.body.add_child(b)
+	await _settle()
+	var now := _fake_clock(d)
+	var fired := _count(b.pressed)
+	var at := b.get_global_rect().get_center()
+	await _swipe(at, Vector2(0, 60), 4, now, 60)
+	await get_tree().create_timer(0.35).timeout
+	assert_int(b.get_draw_mode()).is_not_equal(BaseButton.DRAW_PRESSED)
+	assert_int(fired[0]).is_zero()
 
 # ---------------------------------------------------------------- UiInventoryGrid
 
