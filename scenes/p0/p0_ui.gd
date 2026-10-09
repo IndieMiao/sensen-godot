@@ -2686,7 +2686,9 @@ func open_gate_card(gate: Dictionary, back := Callable()) -> UiInfoSheet:
 func _gate_guide(go: String, again := Callable()) -> void:
 	match go:
 		"skills":
-			_drop_modal()   # on to another panel: a queued card must not come up over it (亚瑟 on #77)
+			# On to another panel through _open_modal's own drop, not close_modal: a queued card must not come up over it
+			# (亚瑟 on #77). No drop of ours first: the profile under this chain moves out of the old layer before it
+			# goes, not because its freeing happens to wait (亚瑟 on #137).
 			open_skills(again)
 		"plots", "stall", "stove", "board", "home", "bench":
 			close_modal()
