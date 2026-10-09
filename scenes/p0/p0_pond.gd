@@ -191,8 +191,8 @@ func _begin_fishing(_id: String) -> void:
 	rt.ui.set_surface("busy")
 	view = FishingPresentation.new()
 	view.close_up = false   # camera unification: no side close-up, the pond camera pans (用户 via 奕星, 不知火舞)
-	view.float_scale = FLOAT_SCALE   # the float, its ring and the line read at the walking scale (不知火舞)
-	view.float_ring = true
+	view.float_scale = FLOAT_SCALE   # the float and the line read at the walking scale (不知火舞)
+	view.float_ring = false   # no ink ring around the float: the user's demo test read it as a black ring (SGODOT-263 ①)
 	view.line_px = LINE_PX
 	view.line_color = LINE_INK
 	view.catch_pop = CATCH_POP   # the landed fish reads at the walking scale in flight (美术总监 / 不知火舞 on 231)
