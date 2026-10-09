@@ -323,8 +323,17 @@ func test_a_strip_flung_in_a_drawer_coasts_and_ends_its_drag() -> void:
 		await get_tree().physics_frame
 	var lifted := strip.scroll_horizontal
 	_touch_and_mouse(at + Vector2(-160, 0), false)
-	for i in 20: await get_tree().physics_frame
+	for i in 3: await get_tree().physics_frame
 	var coasted := strip.scroll_horizontal - lifted
+	# The coast lasts as long as it lasts (in a full run it outlasted 20 ticks short of the strip's end): the move with
+	# no button down comes once the strip is still.
+	var last := strip.scroll_horizontal
+	var still := 0
+	for i in 300:
+		await get_tree().physics_frame
+		still = still + 1 if strip.scroll_horizontal == last else 0
+		last = strip.scroll_horizontal
+		if still >= 3: break
 	var before := strip.scroll_horizontal
 	for i in 4:
 		var m := InputEventMouseMotion.new()
