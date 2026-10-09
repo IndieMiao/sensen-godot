@@ -269,6 +269,24 @@ func counter_shot(top: float) -> Dictionary:
 
 ## Where an NPC's name sits, in the NPC's own space (above the head; the rig's root carries the NPC's scale).
 const NAME_OVER_HEAD := Vector3(0, 2.0, 0)
+
+## The opening shot shows the keeper whole, the name tag over their head included, and the counter (不知火舞 on 227,
+## int12-pre: Ama stood off the tea house's opening shot). The tag counts at its highlighted height and a long name's
+## half width either side, so `Ama` / `Sigrid` stay whole on screen.
+const OPENING_TAG_HALF_PX := 40.0
+func opening_subjects() -> Array:
+	if not npcs.has("npc_keeper"): return []
+	var forward := -_cam_dir
+	var right := forward.cross(Vector3.UP).normalized()
+	var up := right.cross(forward).normalized()
+	var m := cam.size / maxf(_view().x, 1.0)
+	var root := npcs.npc_keeper.root as Node3D
+	var tag := root.to_global(NAME_OVER_HEAD) + up * COUNTER_TAG_PX * m
+	var keeper := [root.global_position, tag - right * OPENING_TAG_HALF_PX * m, tag + right * OPENING_TAG_HALF_PX * m]
+	var counter := []
+	for n in COUNTERS:
+		if n != "npc_keeper" and anchor(n): counter.append(anchor(n).global_position)
+	return [keeper, counter] if not counter.is_empty() else [keeper]
 func _marker(n: String, view: Dictionary) -> Dictionary:
 	if _dev_no_marks: return {}
 	# World prompts (SGODOT-250, LOCK-07 / 16 / 30 v2, q(62)): names only, no "Tap to …"; the room opens one at a time.
