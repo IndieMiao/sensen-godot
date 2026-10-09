@@ -1287,9 +1287,10 @@ static func home_panel(view: Dictionary, at_home := true) -> Dictionary:
 				out.changes.append({"icon": "bag", "text": "Bag Upgrade I for sale · 150 coins",
 					"note": "Bag %d → %d" % [int(view.get("bag", {}).get("capacity", 25)), int(view.get("bag", {}).get("capacity", 25)) + 5]})
 			"board_slot_3": out.changes.append({"icon": "board", "text": "Stall Board · 3rd slot", "note": "now %d" % board_now})
-	# The first gap in tile order goes on the button (LOCK-10); away from home the button says how to get there.
+	# The first gap in tile order goes on the button (LOCK-10). Away from home (HOME-1 from the Profile farm card) the
+	# button is grey with `At home`, as the Energy card's Cook / Rest tiles (q(6); 不知火舞 on the Profile entry, §10.6.2).
 	if not at_home:
-		out.reason = "Go home to upgrade · Free"
+		out.reason = "At home"
 		return out
 	for t in out.tiles:
 		if int(t.have) >= int(t.need): continue

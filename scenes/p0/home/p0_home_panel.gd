@@ -10,7 +10,8 @@ const MOMENT_TOP := 108.0
 const MOMENT_S := 3.0           # the first Homestead upgrade: 3 s; later ones MOMENT_LATER_S (§8.1.2 ②); tap to skip
 const MOMENT_LATER_S := 1.5
 
-## HOME-1 over the farm. at_home false (e.g. from the Profile farm card) puts "Go home to upgrade" on the button.
+## HOME-1 over the farm. at_home false (the Profile farm card away from home: ui.space != "home") greys the button
+## with `At home`; the tiles, What changes and the sources still read (the view carries homestead.next anywhere).
 static func open(ui: P0Ui, at_home := true) -> void:
 	var model := P0Logic.home_panel(ui.view, at_home)
 	var panel := PanelContainer.new()
