@@ -148,4 +148,14 @@ describe('map pin markers (§9.5.2, q(48); SGODOT-232)', () => {
     s.bag.push({ id: 'fish_crucian', qty: 2 });
     expect(mapMarkers(c, s)).toEqual([{ place: 'home', kind: 'deliver', why: { request: 'req_pond_catch', tracked: true } }]);
   });
+
+  it('a taken fish request marks a pond only once the player can land that fish (q(104): Old Kai\'s Golden Koi from Fishing Lv4)', () => {
+    let s = afterTutorial();
+    s.skills.fishing = 160;   // Lv2, like Joey's save on 10-09: the Rare Golden Koi needs Lv4
+    s = step(s, { type: 'accept', request: 'req_res_kai_1' });   // taken in the shop before Lv4 (allowed)
+    expect(mapMarkers(c, s).filter(m => m.why.request === 'req_res_kai_1')).toEqual([]);   // no ! on a pond it can't be caught at
+    s.skills.fishing = 480;   // Lv4
+    expect(mapMarkers(c, s).find(m => m.why.request === 'req_res_kai_1'))
+      .toEqual({ place: 'pond_shanghai_05', kind: 'request', why: { request: 'req_res_kai_1', resident: 'res_old_kai', tracked: true } });
+  });
 });

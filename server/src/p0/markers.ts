@@ -6,8 +6,9 @@
  *   Market Board → the market square, a resident's request → their outpost).
  * - request !: an open Market Board slot (market square), a resident's open request (their outpost), and a tracked fish
  *   request the bag is still short of → the pond for that fish: the beginner pond when its template has it, else the
- *   one nearest the farm (fixed, so the pin never jumps as the player walks). Crop and dish requests stay off the map;
- *   the Stall Board's ! hangs on the farm's own stall, not on the home pin.
+ *   one nearest the farm (fixed, so the pin never jumps as the player walks). Only fish the player can land yet count
+ *   (q(104)): a taken request for a fish above their Fishing level marks no pond until they reach it. Crop and dish
+ *   requests stay off the map; the Stall Board's ! hangs on the farm's own stall, not on the home pin.
  * - new ◆: what a level opened at an outpost that the player has not walked in to see since (Worm Bait and the Reed Rod
  *   at the tackle shop, the Row Hoe at the market square) and a resident's second page of talk at Acquainted. Entering
  *   the outpost marks them seen (noteSeenAt, from presence). No locked or star pins in P0.
@@ -80,12 +81,12 @@ export function pondFor(c: P0Content, fish: string[]): string | null {
   return fits.sort((a, b) => dist(a[1].at) - dist(b[1].at))[0]?.[0] ?? null;
 }
 
-/** A fish of the request's rarity the player can land now somewhere in P0 (its level reached, a pond or river has it). */
-function catchable(c: P0Content, s: P0State, need: Pick<Need, 'kind' | 'rarity'>, items: string[]): boolean {
-  const sites = Object.values(c.fishing.sites);
-  return fishFor(c, items, need).some(id => {
+/** Of these fish, the ones the player can land now somewhere in P0 (its level reached, a pond or river has it). */
+function landable(c: P0Content, s: P0State, fish: string[]): string[] {
+  const sites = Object.values(c.fishing.sites), level = skillLevel(c, s, 'fishing');
+  return fish.filter(id => {
     const f = c.fish.find(x => x.id === id);
-    return !!f && f.level <= skillLevel(c, s, 'fishing') && sites.some(site => site.fish.includes(id));
+    return !!f && f.level <= level && sites.some(site => site.fish.includes(id));
   });
 }
 
@@ -102,8 +103,8 @@ export function mapMarkers(c: P0Content, s: P0State): MapMarker[] {
       if (!r || !place) continue;
       const tracked = r.status === 'accepted';
       if (handIn(c, s, r)) all.push({ place, kind: 'deliver', why: { request: r.id, ...(tracked ? { tracked: true as const } : {}) } });
-      else if (tracked && r.kind === 'fish') {
-        const pond = pondFor(c, fishFor(c, r.items, { kind: 'fish', rarity: r.rarity }));
+      else if (tracked && r.kind === 'fish') {   // only the fish the player can land yet (q(104))
+        const pond = pondFor(c, landable(c, s, fishFor(c, r.items, { kind: 'fish', rarity: r.rarity })));
         if (pond) all.push({ place: pond, kind: 'request', why: { request: r.id, tracked: true } });
       } else if (!tracked && board === 'market') {
         const m: MapMarker = { place, kind: 'request', why: { request: r.id } };
@@ -120,9 +121,9 @@ export function mapMarkers(c: P0Content, s: P0State): MapMarker[] {
     const ready = q.need.kind !== 'sow' || tracked ? progressOf(c, s, id, q) >= q.qty : false;
     if (ready) all.push({ place, kind: 'deliver', why: { request: q.id, resident: id, ...(tracked ? { tracked: true as const } : {}) } });
     else if (tracked && q.need.kind === 'fish') {
-      const pond = pondFor(c, fishFor(c, q.need.id ? [q.need.id] : [], q.need));
+      const pond = pondFor(c, landable(c, s, fishFor(c, q.need.id ? [q.need.id] : [], q.need)));
       if (pond) all.push({ place: pond, kind: 'request', why: { request: q.id, resident: id, tracked: true } });
-    } else if (!tracked && (q.need.kind !== 'fish' || catchable(c, s, q.need, q.need.id ? [q.need.id] : []))) {
+    } else if (!tracked && (q.need.kind !== 'fish' || landable(c, s, fishFor(c, q.need.id ? [q.need.id] : [], q.need)).length)) {
       all.push({ place, kind: 'request', why: { request: q.id, resident: id } });
     }
   }
