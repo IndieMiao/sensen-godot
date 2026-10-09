@@ -259,6 +259,7 @@ func _build_dev() -> void:
 # ---------------------------------------------------------------- refresh
 func set_view(v: Dictionary) -> void:
 	view = v
+	_check_account(v)
 	if _bag != null and is_instance_valid(_bag) and modal_kind in ["bag", "gear", "gift"]: _bag.refresh(v)
 	if _counter != null and is_instance_valid(_counter) and modal_kind == "counter":
 		var was: String = _counter.section
@@ -2807,6 +2808,28 @@ func first_time(key: String) -> bool:
 	_taught[key] = true
 	_save_tips()
 	return true
+
+## A server-side reset starts a new account under the same player id (SGODOT-270: Joey's account starts over in San
+## Francisco). The teaching tips, "seen" lists and quick-bar pins on this device belonged to the old account, so they go
+## and the first session teaches again. The account is known by its creation time (view.profile.since_ms), kept with the
+## tips; a tips file written before this build kept that is judged by its age: last written before the account was made.
+func _check_account(v: Dictionary) -> void:
+	var since := int(v.get("profile", {}).get("since_ms", 0))
+	if since <= 0: return
+	_load_tips()
+	var known := int(_taught.get("account_since", 0))
+	if known == since: return
+	var stale := known != 0
+	if known == 0 and FileAccess.file_exists(tips_path):
+		stale = FileAccess.get_modified_time(tips_path) * 1000 < since - 60_000   # a minute's leeway for the phone's clock
+	if stale:
+		_taught = {}
+		tips = null
+		_hide_tip()
+		_quick = {}
+		_save_quick()
+	_taught["account_since"] = since
+	_save_tips()
 
 func _load_tips() -> void:
 	if _taught.is_empty() and FileAccess.file_exists(tips_path):
