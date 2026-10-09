@@ -19,6 +19,7 @@ import { workbenchView } from './workbench.js';
 import { restReadyIn } from './presence.js';
 import { inboxView, settleParcels } from './parcels.js';
 import { cookbookView } from './cookbook.js';
+import { mapMarkers } from './markers.js';
 
 /** opts.online: players in the P0 outpost rooms right now (SGODOT-227), for the Tea Host's answer; null when not known. */
 export function viewOf(c: P0Content, input: P0State, now: number, opts: { online?: number | null } = {}) {
@@ -42,6 +43,8 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     blessing: blessed(c, s, now) ? { left: s.created_at + c.blessing.days * 86_400_000 - now, regen_mult: c.blessing.regen_mult, food_bonus: c.blessing.food_bonus } : null,
     coins: s.coins,
     inbox: inboxView(s, now),   // §10.4.8 parcels; the Inbox panel comes with stage 4, the bell reads `badge`
+    // Map pin markers (§9.5.2, q(48)): one per place, deliver > request > new; the map draws the first five on screen
+    map_markers: mapMarkers(c, s),
     skills,
     plots: s.plots.map(p => ({
       id: p.id, state: p.state === 'growing' && (p.ready_at ?? Infinity) <= now ? 'ready' : p.state,

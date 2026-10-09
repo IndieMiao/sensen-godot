@@ -1,5 +1,5 @@
 /** P0 content (assets/p0/p0_content.json), shared with the Godot client. */
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -20,7 +20,9 @@ export interface Fish { id: string; name: string; rarity: number; level: number;
 export interface Rod { id: string; name: string; reach: number; level: number; price: number; hook_bonus_ms: number; band_bonus: number }
 export interface FishSite { name: string; template: string; weights: number[]; fish: string[] }
 /** A catalog pond on the map (assets/ponds/catalog.json id): its fishing template follows the point, not its shape (q(36)). */
-export interface FishPlace { name: string; site: string; city: string; beginner?: boolean }
+export interface FishPlace { name: string; site: string; city: string; beginner?: boolean; at?: [number, number] }   // at: the catalog point
+/** An outpost on the P0 map (assets/p0/p0_outposts.json, SGODOT-227): its role and the residents who live there. */
+export interface OutpostDef { id: string; role: string; residents: string[] }
 
 export interface CookTier {
   energy: number; ms: number; heats: number[]; gold: number; spin_ms: number;
@@ -65,6 +67,7 @@ export interface ResidentDef {
 }
 
 export interface P0Content {
+  outposts?: OutpostDef[];   // loaded from p0_outposts.json beside the table (loadP0Content)
   version: string;
   energy: { max_base: number; regen_ms: number; bonus_zone: number; rest_amount: number; rest_away_h: number };
   day: { utc_offset_hours: number; rollover_hour: number };
@@ -117,7 +120,7 @@ export interface P0Content {
   };
   residents: Record<string, ResidentDef>;
   /** P0 has no nickname or city choice yet: what the Profile page shows (SGODOT-225). */
-  profile: { name: string; city: string; climate: string; farm_name: string };
+  profile: { name: string; city: string; climate: string; farm_name: string; farm_at?: [number, number] };
   /** §9.6 / §9.13.2 request boards: the Stall Board (slot 1 starts with the tutorial) and the Market Board. */
   requests: {
     slots: number; refill_h: number; tutorial: { id: string; title: string; item: string; qty: number; coins: number; where: string };
@@ -162,8 +165,27 @@ export interface P0Content {
 
 export const DEFAULT_P0_CONTENT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../assets/p0/p0_content.json');
 
+/**
+ * The content table, plus the map data the map markers read (SGODOT-232, q(48)) from their own files beside it:
+ * outpost ids, roles and residents from the outpost table (assets/p0/p0_outposts.json, SGODOT-227) and each pond's
+ * point from the shared catalog (assets/ponds/catalog.json). Either file missing leaves that part out.
+ */
 export function loadP0Content(file = DEFAULT_P0_CONTENT): P0Content {
-  return JSON.parse(readFileSync(file, 'utf8')) as P0Content;
+  const c = JSON.parse(readFileSync(file, 'utf8')) as P0Content;
+  const dir = path.dirname(file);
+  const outposts = path.join(dir, 'p0_outposts.json');
+  if (existsSync(outposts)) {
+    c.outposts = (JSON.parse(readFileSync(outposts, 'utf8')).outposts as { id: string; role: string; residents?: string[] }[])
+      .map(o => ({ id: o.id, role: o.role, residents: o.residents ?? [] }));
+  }
+  const catalog = path.join(dir, '../ponds/catalog.json');
+  if (existsSync(catalog)) {
+    for (const l of JSON.parse(readFileSync(catalog, 'utf8')).locations as { id: string; lat: number; lng: number }[]) {
+      const place = c.fishing.places[l.id];
+      if (place) place.at = [l.lat, l.lng];
+    }
+  }
+  return c;
 }
 
 export function cropById(c: P0Content, id: string): Crop | undefined { return c.crops.find(crop => crop.id === id); }
