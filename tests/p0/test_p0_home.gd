@@ -246,6 +246,26 @@ func test_need_material_from_a_shop_or_the_workbench_names_its_own_gap() -> void
 	rt._on_refused("need_material", {"item": "wood", "need": 16, "have": 10}, {"type": "homestead_upgrade"})
 	assert_str(rt.ui.toast_text()).is_equal("Need 6 more Timber")   # HOME-1's gap, in tile order
 
+## A refused upgrade (后裔 on #150): away from home it says what HOME-1's grey button says; when the fresh view shows no gap
+## any more (it changed under the tap) the server's detail names it instead of an empty toast.
+func test_a_refused_upgrade_says_where_and_what_is_missing() -> void:
+	var rt: P0Runtime = auto_free(P0Runtime.new())
+	add_child(rt)
+	await get_tree().process_frame
+	rt.session.view = _view()
+	rt.session.view["names"] = {"wood": "Timber"}   # the server's names, as in a real view
+	rt._on_refused("not_home", {}, {"type": "homestead_upgrade"})
+	assert_str(rt.ui.toast_text()).is_equal("Upgrade at home · Going home is free")
+	rt._on_refused("not_home", {}, {"type": "rest"})
+	assert_str(rt.ui.toast_text()).is_equal("At home only")                     # other commands stay short
+	rt.ui.space = "pond"                                                         # HOME-1's line from where the player is
+	rt._on_refused("need_material", {"item": "wood", "need": 16, "have": 10}, {"type": "homestead_upgrade"})
+	assert_str(rt.ui.toast_text()).is_equal("Upgrade at home · Going home is free")
+	rt.ui.space = "home"
+	rt.session.view.homestead.next.materials[0].have = 16                        # the view has no gap left
+	rt._on_refused("need_material", {"item": "wood", "need": 16, "have": 15}, {"type": "homestead_upgrade"})
+	assert_str(rt.ui.toast_text()).is_equal("Need 1 more Timber")
+
 func test_the_sign_prompt_reads_its_level_and_lights_ready() -> void:
 	# WORLD-HINT-5 (228 64c75e54, SGODOT-250): the house mark, Ready once the Needs are met; open: `Homestead LvN`.
 	var p := P0WorldPrompts.sign(_view())

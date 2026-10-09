@@ -582,10 +582,13 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 		"rest_used":
 			ui.toast_error("Rest used today")
 		"not_home":
-			ui.toast_error("At home only")
+			# The upgrade away from home says what HOME-1's grey button says (不知火舞 / 李白, #150); other commands stay short.
+			ui.toast_error(P0Logic.HOME_AWAY_TAP if str(cmd.get("type", "")) == "homestead_upgrade" else "At home only")
 		"need_material", "skills_short", "max_level":
-			# The shops and the workbench refuse with need_material too: only the upgrade reads HOME-1's gap.
-			if str(cmd.get("type", "")) == "homestead_upgrade": ui.toast_error(P0Logic.home_panel(session.current()).reason)
+			# The shops and the workbench refuse with need_material too: only the upgrade reads HOME-1's gap — from where the
+			# player is, and from the server's detail when the fresh view has no gap left to name (后裔 on #150).
+			var gap := _home_gap() if str(cmd.get("type", "")) == "homestead_upgrade" else ""
+			if gap != "": ui.toast_error(gap)
 			elif code == "need_material":
 				ui.toast_error("Need %d more %s" % [int(detail.get("need", 0)) - int(detail.get("have", 0)),
 					P0Logic.item_name(session.current(), str(detail.get("item", "")))])
@@ -622,6 +625,11 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 			pass   # a retry of something the server already applied; the returned state re-renders the screen
 		_:
 			ui.toast_error("Can't do that (%s)" % code)
+
+## HOME-1's line for a refused upgrade: the tap line away from home, else the first gap; "" when the view shows none.
+func _home_gap() -> String:
+	var hp := P0Logic.home_panel(session.current(), ui.space_here() == "home")
+	return str(hp.tap) if str(hp.tap) != "" else str(hp.reason)
 
 ## P0_SHOT counters away from the outposts: the keeper ctx the outpost would pass (assets/p0/p0_outposts.json, SGODOT-227).
 static func _dev_ctx(role: String) -> Dictionary:
