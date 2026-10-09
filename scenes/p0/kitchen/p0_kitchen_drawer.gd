@@ -268,11 +268,13 @@ func _layout_recipe() -> void:
 	# The fact lines run up to 8 px short of what sits in the corner (不知火舞, 256 follow-up: not the 142 of the text box).
 	var beside := (right - w if b.visible else _recipe_nav.position.x) - _RECIPE_PAD - _FACTS_X
 	_fit_effect(beside)
-	if not b.visible or _text_width(_recipe_state) <= beside and _text_width(_recipe_effect) <= beside:
+	_recipe_state.size.x = beside
+	if not b.visible or (_text_width(_recipe_state) <= beside and _text_width(_recipe_effect) <= beside):
 		b.position = Vector2(right - w, _RECIPE_BUTTON_AT.y + extra)
 		b.size = Vector2(w, _RECIPE_BUTTON.y)
 	else:   # a row of its own under the facts; the facts take the card's width
 		_fit_effect(right - _FACTS_X)
+		_recipe_state.size.x = right - _FACTS_X
 		var top := _recipe_effect.position.y + _recipe_effect.size.y + _RECIPE_ROW_GAP
 		b.position = Vector2(_RECIPE_PAD, top)
 		b.size = Vector2(_RECIPE.x - _RECIPE_PAD * 2.0, _RECIPE_BUTTON.y)
