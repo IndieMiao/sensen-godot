@@ -3,6 +3,9 @@ extends Node3D
 ## Static, seeded scenery shared by entry previews and playable ponds.
 var _rng := RandomNumberGenerator.new()
 const Art = preload("res://modules/farm/farm_art.gd")
+## The decorated meadow (x, z): the turf pile covers it, flowers and trees sit inside; past it the bank ground runs on
+## plain. The P0 pond camera keeps the screen on it (不知火舞 on 231).
+const MEADOW := Rect2(-3, -19, 18, 21)
 
 static func build(entry: Dictionary) -> PondScenery:
 	var scene := PondScenery.new()
@@ -34,7 +37,7 @@ static func build(entry: Dictionary) -> PondScenery:
 	# Small batched tufts give the meadow a soft pile instead of a flat plane.
 	var turf: Array = []
 	for index in 4200:
-		var point := Vector3(scene._rng.randf_range(-3,15), 0.0, scene._rng.randf_range(-19,2))
+		var point := Vector3(scene._rng.randf_range(MEADOW.position.x, MEADOW.end.x), 0.0, scene._rng.randf_range(MEADOW.position.y, MEADOW.end.y))
 		if FishingModel.contains(str(entry.id), point, .10, spec): continue
 		var scale_value := scene._rng.randf_range(.09,.18)
 		turf.append(Transform3D(Basis(Vector3.UP, scene._rng.randf_range(0,TAU)).scaled(Vector3(scale_value,scale_value*.65,scale_value)),point))
