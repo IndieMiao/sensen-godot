@@ -64,9 +64,11 @@ export function gainEnergy(c: P0Content, s: P0State, now: number, amount: number
 }
 
 /**
- * Add XP; every Farming / Fishing level crossed grants the one-time energy reward (may enter the bonus zone, §3.4.8).
- * Cooking levels give no Energy (q(37)): their rewards are the slot, recipe cards and conveniences. Level gifts go
- * into the bag, and what does not fit becomes Inbox parcels (§10.4.8).
+ * Add XP; every level crossed gives its level gift and unlocks. No skill level restores Energy any more: Cooking never did
+ * (q(37)), and Farming / Fishing stopped with q(101) (SGODOT-262: the first session's Fishing Lv2 +50 and first Fine fish
+ * +20 paid for twelve casts, so the player never saw fishing cost Energy). level_up_energy stays in the content at 0, so
+ * a later decision can bring an amount back without code. Level gifts go into the bag, and what does not fit becomes
+ * Inbox parcels (§10.4.8).
  */
 export function gainXp(c: P0Content, s: P0State, now: number, skill: Skill, amount: number, percent: number, events: P0Event[], nth?: number): void {
   const tag = nth ? { nth } : {};
@@ -90,9 +92,11 @@ export function gainXp(c: P0Content, s: P0State, now: number, skill: Skill, amou
     const energy = !paysEnergy ? 0 : firstEver ? c.level_up_energy.first : c.level_up_energy.later;
     if (firstEver) s.rewards.push('levelup_first');
     const cap = maxEnergy(c, s) + c.energy.bonus_zone;
-    const granted = Math.max(0, Math.min(energy, cap - s.energy.value));
-    s.energy.value += granted;
-    if (s.energy.value >= maxEnergy(c, s)) s.energy.tick_ms = now;
+    const granted = energy > 0 ? Math.max(0, Math.min(energy, cap - s.energy.value)) : 0;
+    if (granted > 0) {
+      s.energy.value += granted;
+      if (s.energy.value >= maxEnergy(c, s)) s.energy.tick_ms = now;
+    }
     const gifts = c.level_gifts[`${skill}:${level}`] ?? [];
     events.push({ kind: 'level', skill, level, energy: granted, gifts });
     grantItems(c, s, now, `level:${skill}:${level}`, `${skill[0].toUpperCase()}${skill.slice(1)} Lv${level} reward`, gifts, events);
