@@ -33,6 +33,9 @@ func test_mine_mouth_key_follows_lock_21() -> void:
 	assert_str("%s · %s" % [none.verb, none.sub]).is_equal("Enter mine · No runs left")
 	assert_bool(bool(none.enabled)).is_false()
 	assert_str(str(none.toast)).is_equal("Mine runs today 2/2 · Resets in 9h 12m")
+	var late := _view(null, 200, 2)
+	late.mine.runs.resets_in = 2520000
+	assert_str(str(P0MaterialLogic.mine_entry_action(late).toast)).is_equal("Mine runs today 2/2 · Resets in 42m")   # not `42:00`
 	var full := _view()
 	full.mine["entry_bag_ok"] = false
 	var gated := P0MaterialLogic.mine_entry_action(full)

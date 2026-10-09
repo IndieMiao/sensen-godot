@@ -493,7 +493,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 						if ui.modal_kind != "counter": ui.toast_success("Request complete · +%d coins" % int(ev.coins))
 			"meal":
 				if int(ev.gain) <= 0:
-					ui.toast("Full belly · Meals reset in " + P0Logic.duration(float(v.get("meals", {}).get("resets_in", 0))) if int(ev.counted) <= 0 and int(ev.nominal) > 0 else "Same dish · no Energy today")
+					ui.toast("Full belly · Meals reset in " + P0Logic.span(float(v.get("meals", {}).get("resets_in", 0))) if int(ev.counted) <= 0 and int(ev.nominal) > 0 else "Same dish · no Energy today")
 				else:
 					ui.toast("+%d Energy · Meals today %d/%d" % [int(ev.gain), int(ev.meals), int(ev.cap)])
 			"level":

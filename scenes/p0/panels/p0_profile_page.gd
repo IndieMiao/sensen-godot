@@ -181,7 +181,7 @@ static func _farm_status(view: Dictionary) -> String:
 			best = float(p.get("ready_in", INF))
 			crop = str(p.get("crop", ""))
 	if ready != "": return "%s ready to harvest" % P0Logic.plural(P0Logic.item_name(view, ready))
-	if crop != "": return "%s ready %s" % [P0Logic.plural(P0Logic.item_name(view, crop)), P0Logic.duration(best)]
+	if crop != "": return "%s ready %s" % [P0Logic.plural(P0Logic.item_name(view, crop)), P0Logic.span(best)]
 	return ""
 
 func _look() -> Control:

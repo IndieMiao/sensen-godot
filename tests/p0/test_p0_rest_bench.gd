@@ -33,6 +33,11 @@ func test_two_hours_away_first() -> void:
 	assert_str(s.caption).is_equal("1h 12m")
 	assert_str(s.sheet_state).is_equal("Rest · back after 2h away · 1h 12m to go")   # q(70), FARM-7 cooling card
 	assert_str(s.wait).is_equal("in 1h 12m")
+	# Under an hour the sentences say `42m`; the capsule under the bench's badge keeps ticking `42:00` (SGODOT-224).
+	var soon := P0Logic.rest_state(_view({"away_ready_in": 2520000}))
+	assert_str(soon.caption).is_equal("42:00")
+	assert_str(soon.sheet_state).is_equal("Rest · back after 2h away · 42m to go")
+	assert_str(soon.wait).is_equal("in 42m")
 	assert_str(s.reason).is_equal("Not yet")
 	assert_bool(s.can_rest).is_false()
 	assert_str(s.close).is_equal("Close")
@@ -50,5 +55,5 @@ func test_used_today() -> void:
 	assert_str(s.badge).is_equal("used_today")
 	assert_array([s.fact, s.fact_value]).is_equal(["Uses", "1/1"])
 	assert_str(s.note).is_equal("Available again in 9h 12m")   # to the 04:00 reset, as the mine's `Resets in` (q(96))
-	assert_str(P0Logic.rest_state(_view({"used": 1, "resets_in": 2_520_000})).note).is_equal("Available again in 42:00")
+	assert_str(P0Logic.rest_state(_view({"used": 1, "resets_in": 2_520_000})).note).is_equal("Available again in 42m")   # q(97): not `42:00`
 	assert_bool(s.can_rest).is_false()

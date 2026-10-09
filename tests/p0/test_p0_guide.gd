@@ -138,7 +138,7 @@ func test_short_of_energy_the_sow_row_says_when() -> void:
 	var row: Dictionary = Guide.lead_rows(v)[0]
 	assert_str(row.line).is_equal("Sow 2 Lettuce · 4 Energy")
 	assert_str(row.state).is_equal("short")
-	assert_str(row.tail).is_equal("needs 4 Energy · +3 in 7m")   # 60 s + 2 × 160 s = 380 s
+	assert_str(row.tail).is_equal("needs 4 Energy · +3 in 6:20")   # 60 s + 2 × 160 s = 380 s; regen keeps m:ss (q(97) ①)
 
 func test_new_recipe_and_third_slot_rows() -> void:
 	var v := _view({"stall": {"board": {"requests": []}}})
@@ -206,7 +206,7 @@ func test_today_rows_lead_with_the_guide_and_drop_their_generic_twins() -> void:
 	v.bag.slots = [{"id": "fish_crucian", "qty": 1}]
 	var rows := P0Logic.today_rows(v)
 	# Catch (not "Pond Catch · Pond Crucian 0/2"), Cook it (not "1 fish · the stove is free"), then the radishes' timer
-	assert_that(_lines(rows)).is_equal(["Catch 2 Pond Crucian · Reed Pond", "Cook it: Grilled Crucian", "Radishes ready in 3h 53m"])
+	assert_that(_lines(rows)).is_equal(["Catch 2 Pond Crucian · Reed Pond", "Cook it: Grilled Crucian", "Radishes ready in 3h 54m"])
 	assert_that(rows.map(func(r): return r.focus)).is_equal([true, false, false])
 
 func test_today_rows_before_the_first_sow_put_sowing_first() -> void:
@@ -222,7 +222,7 @@ func test_after_the_first_session_the_crop_timer_says_what_the_harvest_does() ->
 	v.stall.board.requests = []
 	v.cooking.cookbook[0].cooked = true
 	var rows := P0Logic.today_rows(v)
-	assert_that(_lines(rows).slice(0, 2)).is_equal(["Radishes ready in 3h 53m", "Farming Lv2 at your first harvest"])
+	assert_that(_lines(rows).slice(0, 2)).is_equal(["Radishes ready in 3h 54m", "Farming Lv2 at your first harvest"])
 	assert_str(str(rows[1].go)).is_equal("")   # an info row: no Show
 
 ## §14.2 end / §14.5 (李白 A3): a known recipe short only of crops in the ground hooks the next session —

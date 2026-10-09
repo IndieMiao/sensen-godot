@@ -35,7 +35,7 @@ static func _with_pick(view: Dictionary, key: Dictionary) -> Dictionary:
 
 static func _runs_line(mine: Dictionary) -> String:
 	var runs: Dictionary = mine.get("runs", {})
-	return "Mine runs today %d/%d · Resets in %s" % [int(runs.get("used", 0)), int(runs.get("limit", 2)), P0Logic.duration(float(runs.get("resets_in", 0)))]
+	return "Mine runs today %d/%d · Resets in %s" % [int(runs.get("used", 0)), int(runs.get("limit", 2)), P0Logic.span(float(runs.get("resets_in", 0)))]
 
 static func _floor(view: Dictionary, n: int) -> Dictionary:
 	var run = view.get("mine", {}).get("run", null)
@@ -108,7 +108,7 @@ static func refusal_text(code: String, detail: Dictionary, cmd: Dictionary) -> V
 		"homestead_level":
 			return "Homestead Lv%d" % int(detail.get("need", 2))
 		"not_ready":
-			return "Ready in %s" % P0Logic.duration(float(detail.get("ready_in", 0)))
+			return "Ready in %s" % P0Logic.span(float(detail.get("ready_in", 0)))
 	return null
 
 ## The Energy card's verb for a refused material command ("Mine", "Enter mine", "Floor 2"); `fallback` for others.
@@ -316,7 +316,7 @@ static func gather_marks(view: Dictionary) -> Array:
 			mark.caption = "%s · Tap to gather" % name
 		else:
 			mark.badge = "countdown"
-			mark.caption = "%s · Ready in %s" % [name, P0Logic.duration(float(sp.get("ready_in", 0)))]
+			mark.caption = "%s · Ready in %s" % [name, P0Logic.span(float(sp.get("ready_in", 0)))]
 		out.append(mark)
 	return out
 
@@ -328,7 +328,7 @@ static func today_gather_line(view: Dictionary) -> String:
 		if sp.get("ready", false): return ""
 		if best.is_empty() or float(sp.get("ready_in", 0)) < float(best.get("ready_in", 0)): best = sp
 	if best.is_empty(): return ""
-	return "%s · Ready in %s" % [str(best.get("name", "")), P0Logic.duration(float(best.get("ready_in", 0)))]
+	return "%s · Ready in %s" % [str(best.get("name", "")), P0Logic.span(float(best.get("ready_in", 0)))]
 
 ## Floats for one gather event (MAT-2): "+6 Timber · Stored" for what went to Farm Storage. What went to the bag
 ## ("+2 Worm Bait") is an item event the runtime floats already, so the Reed Bank still shows two lines (Li Bai 3f6b8fb5).
