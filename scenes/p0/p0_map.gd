@@ -75,6 +75,8 @@ func _install_city_map() -> void:
 		city_map.destination_style = _destination_style
 		city_map.host_card = _own_card
 		_style_locate(city_map.recenter)
+		_style_locate(city_map.home_key, "home")   # the home key over it: the same key, i-home (SGODOT-261)
+		city_map.home_key.visible = true
 	if city_map and not city_map.bundled_ponds:
 		city_map.preload_ponds(SystemPonds.data().locations.filter(func(e): return str(e.region_id) == P0_REGION))
 		_set_outpost_places()
@@ -362,13 +364,23 @@ func _city_action(action: String) -> void:
 		"recenter":
 			var at := _origin()
 			fly_to(at.x, at.y)
+		"home": go_home_view()
 		"outfit": rt.ui.toast("Outfits come later")
 		"city": rt.ui.toast("P0 is set in Shanghai")
 		_: super._city_action(action)
 
+## The home key (SGODOT-261, the user's call; 不知火舞 keeps 197): from anywhere — at a pond or an outpost the camera
+## follows the player there and the homestead is lost among the pins — the camera flies back to the homestead and
+## selects it, as a tap on its pin does away (its card: Homestead · Go home · Free) and on the avatar at home.
+func go_home_view() -> void:
+	if city_map == null or rt == null: return
+	show_place("home")
+	if away(): city_map.select(home_entry())
+	else: _own_pin_pressed()
+
 ## MapLocateButton 1793:103795 (LOCK-24): the recenter key as a 44 round button styled like Close (color/surface,
-## 1 px color/border) with a light shadow, the 22 i-locate in its own colours.
-func _style_locate(b: Button) -> void:
+## 1 px color/border) with a light shadow, the 22 i-locate in its own colours. The home key wears the same with i-home.
+func _style_locate(b: Button, glyph := "locate") -> void:
 	b.theme = UiKit.theme()
 	b.theme_type_variation = UiTokens.BUTTON_CLOSE_ROUND
 	for state in [&"normal", &"hover", &"focus", &"disabled", &"pressed", &"hover_pressed"]:
@@ -380,7 +392,7 @@ func _style_locate(b: Button) -> void:
 			sb.shadow_offset = Vector2(0, UiTokens.SIZE_SHADOW_FLOAT_OFFSET_Y)
 			b.add_theme_stylebox_override(state, sb)
 		b.add_theme_color_override(StringName("icon_%s_color" % state), Color.WHITE)   # the glyph's own ink and green
-	b.icon = P0Logic.icon("locate")
+	b.icon = P0Logic.icon(glyph)
 	b.expand_icon = true
 	b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	b.add_theme_constant_override(&"icon_max_width", 22)
@@ -647,6 +659,7 @@ func p0_frame(view: Dictionary, _dt: float) -> void:
 	# The recenter key gives way to an open sheet (不知火舞 on 234 A2: it showed under the card's ×).
 	var key_shown := not rt.ui.has_modal()
 	if city_map.recenter.visible != key_shown: city_map.recenter.visible = key_shown
+	if city_map.home_key.visible != key_shown: city_map.home_key.visible = key_shown   # the home key with it
 	var list := pin_marks(view)
 	var home := home_mark(view)
 	# Away, the homestead's ✓ hangs on its pin (deliverable, the highest mark, so first); at home on the avatar.
@@ -736,6 +749,7 @@ func p0_dev(step: PackedStringArray) -> bool:
 			if not hit.is_empty(): city_map.select(hit[0])
 		"tapself": _own_pin_pressed()   # a tap on the player's own avatar: the card of where the player is
 		"recenter": _city_action("recenter")   # the MapLocateButton: back to the player, the zoom kept
+		"homekey": _city_action("home")   # the home key over it: back to the homestead, selected (SGODOT-261)
 		"center":   # center:31.228:121.478 (the city overview) — where the camera looks, for shots
 			center_lat = float(step[1])
 			center_lng = float(step[2])
