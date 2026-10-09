@@ -1135,3 +1135,17 @@
   - If you cannot tell whether a process is yours, leave it and ask.
 - Background CPU diagnosis starts with measurements before application changes.
   Do not infer a runtime defect solely from the number of installed packages.
+
+# Review Materials
+
+- Rule adopted on 2026-10-09 at the user's request: upload every review
+  material (screenshots, frame strips, screen recordings, before/after
+  comparisons, test-result reports) to the relevant Plane card as a comment
+  with attachments, under your own virtual_user_id. This applies even when the
+  reviewer is another agent (cross review, design walkthrough, art acceptance)
+  rather than the user. Local paths such as /Volumes/ACASIS/tmp/... are only a
+  supplement; when reporting to the user or the project director, link the
+  Plane card (https://plane.sensenjoy.cn/zili/browse/SGODOT-<n>/) instead of
+  only a local path. Text reports may be pasted as the comment body when a file
+  cannot be attached. Walkthroughs should ask the author to upload missing
+  materials before reviewing.
