@@ -1255,9 +1255,12 @@ static func rest_state(view: Dictionary) -> Dictionary:
 		out.merge({"state": "full", "reason": "Energy full", "can_rest": false}, true)
 	return out
 
+## HOME-1 away from home: the toast for a tap on the grey `At home` button, and for an upgrade refused not_home.
+const HOME_AWAY_TAP := "Upgrade at home · Going home is free"
+
 ## HOME-1 (Figma 482:152, §8.6.1, LOCK-10) from view.homestead facts: title, the look line, NEED-TILEs in order
 ## materials → coins → skills, what changes, and the button (the first gap is written on it). P0 stops at Lv3.
-## {title, look, tiles: [{id, name, have, need, icon}], changes: [{icon, text, note}], label, reason, footer, max}
+## {title, look, tiles: [{id, name, have, need, icon}], changes: [{icon, text, note}], label, reason, tap, footer, max}
 static func home_panel(view: Dictionary, at_home := true) -> Dictionary:
 	var h: Dictionary = view.get("homestead", {})
 	var level := int(h.get("level", 1))
@@ -1293,7 +1296,7 @@ static func home_panel(view: Dictionary, at_home := true) -> Dictionary:
 	# here (k(1), q(83); 不知火舞 and 李白, 2026-10-09).
 	if not at_home:
 		out.reason = "At home"
-		out.tap = "Upgrade at home · Going home is free"
+		out.tap = HOME_AWAY_TAP
 		return out
 	for t in out.tiles:
 		if int(t.have) >= int(t.need): continue

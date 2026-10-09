@@ -92,9 +92,9 @@ static func open_locked_spot(ui: P0Ui, view: Dictionary, spot_id: String) -> UiD
 	d.body.add_child(UiObjectHeader.new({"title": sheet.title, "state": sheet.subtitle, "effect": sheet.line}))
 	for f in sheet.facts: d.body.add_child(UiFactRow.new(str(f[0]), str(f[1])))
 	var home := UiNavButton.new(VIEW_HOMESTEAD)
-	home.pressed.connect(func():
-		HomePanel.open(ui)
-		ui._modal_back = func(): open_locked_spot(ui, ui.view, spot_id))   # Back from HOME-1 returns here (苏烈 on #102)
+	# P0Ui.open_home_panel decides "at home" (space_here, as the Profile's farm card does; 后裔 on #150) and sets the
+	# way back: Back from HOME-1 returns here (苏烈 on #102).
+	home.pressed.connect(func(): ui.open_home_panel(func(): open_locked_spot(ui, ui.view, spot_id)))
 	d.body.add_child(home)
 	_show(ui, d, "locked_spot")
 	return d
