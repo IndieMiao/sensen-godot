@@ -119,11 +119,12 @@ func _labels(m: Node) -> Dictionary:   # outpost id -> its pin (MapDestination: 
 		if mk.entry.kind == "place": out[str(mk.entry.id)] = mk.get("dest", mk.label)
 	return out
 
-static func _dest_label_rect(marker: Dictionary) -> Rect2:   # a MapDestination's name, in the city view
+static func _dest_label_rect(marker: Dictionary) -> Rect2:   # a MapDestination's name, in the city view, as drawn
 	var pin: UiMapDestination = marker.dest
 	if not pin.name_shown: return Rect2()
 	var box: Control = pin._label_box
-	return Rect2((marker.anchor as Vector2) + pin.position + box.position, box.size)
+	var k: Vector2 = (marker.node as Control).scale   # a selected pin is drawn scaled about its point (SGODOT-261)
+	return Rect2((marker.anchor as Vector2) + (pin.position + box.position) * k, box.size * k)
 
 static func _shown(pin: Control) -> bool:   # whether the pin says its name
 	return (pin as UiMapDestination).name_shown if pin is UiMapDestination else pin.visible
@@ -372,8 +373,9 @@ func test_destination_pins_wear_their_icons() -> void:
 	assert_dict(m._destination_style({"kind": "landmark", "id": "x"})).is_empty()
 	assert_dict(m._destination_style({"kind": "poi", "id": "x"})).is_empty()
 
-## Figma 1802:118612: a selected MapDestination keeps its size (no jelly); Today's Show pulse scales only its disc.
-func test_a_selected_destination_keeps_its_size_and_a_pulse_scales_its_disc() -> void:
+## SGODOT-261 (用户 via 奕星): a selected MapDestination grows with the jelly every pin plays (it used to keep its size,
+## Figma 1802:118612); Today's Show pulse still scales only its disc. test_p0_map_space_pins plays them frame by frame.
+func test_a_selected_destination_grows_and_a_pulse_scales_its_disc() -> void:
 	var m := _map()
 	for i in 3: await get_tree().process_frame
 	m.set_process(false)
@@ -383,16 +385,19 @@ func test_a_selected_destination_keeps_its_size_and_a_pulse_scales_its_disc() ->
 	if tea.get("pop_tween") is Tween: (tea.pop_tween as Tween).kill()
 	tea.pop = 1.0   # settled in (it may still be popping in)
 	tea.focus = CityMapView.FOCUS_SCALE
+	tea.pulse = false   # the selection jelly (_animate_focus)
 	city.selected = tea.entry
 	city._apply_marker_scale(tea)
-	assert_float((tea.node as Control).scale.x).is_equal_approx(1.0, 1e-6)
+	assert_float((tea.node as Control).scale.x).is_equal_approx(CityMapView.FOCUS_SCALE, 1e-6)   # the whole pin
 	assert_float((tea.dest as UiMapDestination).focus).is_equal_approx(1.0, 1e-6)
 	city.selected = {}
 	tea.focus = 1.18
+	tea.pulse = true   # Show on map (pulse_pin)
 	city._apply_marker_scale(tea)
 	assert_float((tea.dest as UiMapDestination).focus).is_equal_approx(1.18, 1e-6)
 	assert_float((tea.node as Control).scale.x).is_equal_approx(1.0, 1e-6)   # the name keeps its size
 	tea.focus = 1.0
+	tea.pulse = false
 	city._apply_marker_scale(tea)
 
 ## A selected pin's name stays over its neighbours' discs, pins packed after it was selected included.
@@ -462,6 +467,10 @@ func test_a_name_by_the_edge_stays_on_screen() -> void:
 	city.selected = city.entries.filter(func(e): return str(e.get("id", "")) == "sh_tackle_1")[0]
 	city._update_markers()
 	var mk: Dictionary = city.markers["sh_tackle_1"]
+	if mk.get("pop_tween") is Tween: (mk.pop_tween as Tween).kill()
+	mk.pop = 1.0
+	mk.focus = CityMapView.FOCUS_SCALE   # at its selected size (SGODOT-261): the drawn name is the scaled one
+	city._apply_marker_scale(mk)
 	var name_rect := _dest_label_rect(mk)
 	var on_screen := Rect2(name_rect.position + city.global_position, name_rect.size)   # in the screen's coordinates
 	assert_float(on_screen.position.x).is_greater_equal(CityMapView.LABEL_EDGE - 0.5)

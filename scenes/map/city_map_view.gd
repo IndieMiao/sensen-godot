@@ -786,6 +786,7 @@ func pulse_pin(id: String, seconds := 0.6) -> void:
 	if marker.get("focus_tween") is Tween: (marker.focus_tween as Tween).kill()
 	var tween := create_tween()
 	marker.focus_tween = tween
+	marker.pulse = true   # a MapDestination's pulse scales only its disc (_apply_marker_scale)
 	tween.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	var step := func(v: float):
 		marker.focus = v
@@ -995,8 +996,8 @@ func _update_markers() -> void:
 		var dest := not _destination(entry).is_empty()
 		# A MapDestination holds only its disc: its name folds on its own and the pin stays (不知火舞 on 234 A2).
 		var below := 0.0 if dest else 3.0 + label_h + 1.0
-		# 选中项的占位随果冻放大同步变大，邻居的贴图和名牌为它让位。MapDestination 选中不放大。
-		var k := FOCUS_SCALE if is_sel and not dest else 1.0
+		# 选中项的占位随果冻放大同步变大，邻居的贴图和名牌为它让位。MapDestination 也一样（SGODOT-261）。
+		var k := FOCUS_SCALE if is_sel else 1.0
 		side *= k
 		top *= k
 		below *= k
@@ -1081,7 +1082,10 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int)
 		var half := UiMapDestination.DISC * 0.5   # any of the disc on screen
 		if c.point.x + half >= screen_x0 and c.point.x - half <= screen_x0 + screen_w:
 			var lo := screen_x0 + LABEL_EDGE
-			label_rect.position.x = clampf(label_rect.position.x, lo, maxf(lo, screen_x0 + screen_w - LABEL_EDGE - c.label_w))
+			# A selected pin draws its name scaled about its point (k): that drawn name stays on screen.
+			var drawn_x := clampf(c.point.x + (label_rect.position.x - c.point.x) * c.k, lo,
+				maxf(lo, screen_x0 + screen_w - LABEL_EDGE - c.label_w * c.k))
+			label_rect.position.x = c.point.x + (drawn_x - c.point.x) / c.k
 		else: disc_off_screen = true
 	if entry.kind == "landmark":
 		label_fits = is_selected or not _hits(occupied, Rect2(c.point - Vector2(c.width * 0.5, -3), Vector2(c.width, 20)))
@@ -1100,6 +1104,11 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int)
 				label_above = true
 				label_fits = true
 	if disc_off_screen: label_fits = false   # no name without its pin on screen
+	# The pin lays its name out unscaled (label_shift); a selected one draws it scaled about its point like every pin's
+	# art (k, SGODOT-261): what packs after it and the taps keep to where it is drawn.
+	var label_shift: float = label_rect.position.x - (c.point.x - c.label_w * 0.5)
+	if not _destination(entry).is_empty() and c.k != 1.0:
+		label_rect = Rect2(c.point + (label_rect.position - c.point) * c.k, label_rect.size * c.k)
 	if entry.kind == "place":
 		occupied.append(Rect2(c.point - Vector2(c.art_w * 0.5, c.art_h), Vector2(c.art_w, c.art_h)))
 		if label_fits:
@@ -1116,7 +1125,12 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int)
 		elif dest_name and label_fits:
 			occupied.append(label_rect)   # a MapDestination's whole name: what comes after keeps clear of it
 			if is_selected: _place_labels.append(label_rect)
-	if not markers.has(id): markers[id] = _make_marker(entry)
+	if not markers.has(id):
+		markers[id] = _make_marker(entry)
+		# Selected before its pin was made (Show on map flies, then selects): the same jelly a tap plays (SGODOT-261).
+		if is_selected:
+			_animate_focus(id, FOCUS_SCALE, 0.28)
+			_set_marker_front(id, true)
 	var marker: Dictionary = markers[id]
 	marker.entry = entry
 	marker.node.position = c.point
@@ -1134,7 +1148,7 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int)
 		pin.name_shown = label_fits
 		pin.above_gap = above_gap
 		pin.label_above = label_above
-		pin.label_shift = label_rect.position.x - (c.point.x - c.label_w * 0.5)
+		pin.label_shift = label_shift
 		pin.position = -pin.anchor_offset()
 	elif entry.kind == "resident":
 		marker.portrait.position = Vector2(-18, -38)
@@ -1156,7 +1170,7 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int)
 	# 否则长名选中后旁边的空地也算点中自己，点空白取消不了选择。
 	var k: float = c.k
 	marker.hit = [Rect2(c.point - Vector2(c.art_w * 0.5, c.art_h) * k, Vector2(c.art_w, c.art_h) * k)]
-	if marker.has("dest") and label_fits: marker.hit.append(label_rect)   # where the name is drawn (k is 1)
+	if marker.has("dest") and label_fits: marker.hit.append(label_rect)   # where the name is drawn (scaled by k)
 	elif marker.label.visible:
 		marker.hit.append(Rect2(c.point + Vector2(-c.label_w * 0.5, 3) * k, Vector2(c.label_w, c.label_h) * k))
 	displayed.append(marker)
@@ -1165,14 +1179,16 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int)
 ## Marker scale = pop (appear/disappear) x focus (selection jelly), anchored at
 ## the geographic point: the 2D node scales around its origin, the billboard and
 ## shadow scale in world space so camera motion never drags a mid-animation art.
+## A MapDestination scales with its selection like every pin (用户 via 奕星, SGODOT-261; it used to keep its size, Figma
+## 1802:118612). Only a Show on map pulse (pulse_pin) scales just its disc. Which one is playing is the marker's own
+## state, never the selection: the selection is cleared at once while the pin shrinks back after it (the jump on Go).
 func _apply_marker_scale(marker: Dictionary) -> void:
+	var focus := float(marker.get("focus", 1.0))
 	if marker.has("dest"):
-		# MapDestination keeps its size when selected (Figma 1802:118612); a pulse scales only its disc.
-		marker.node.scale = Vector2.ONE * maxf(0.001, float(marker.get("pop", 1.0)))
-		var selected_here := str(selected.get("id", "")) == str((marker.get("entry", {}) as Dictionary).get("id", ""))
-		(marker.dest as UiMapDestination).focus = 1.0 if selected_here else float(marker.get("focus", 1.0))
-		return
-	var s := maxf(0.001, float(marker.get("pop", 1.0)) * float(marker.get("focus", 1.0)))
+		var pulse := bool(marker.get("pulse", false))
+		(marker.dest as UiMapDestination).focus = focus if pulse else 1.0
+		if pulse: focus = 1.0
+	var s := maxf(0.001, float(marker.get("pop", 1.0)) * focus)
 	marker.node.scale = Vector2.ONE * s
 	if marker.has("sprite"):
 		var h := float(marker.get("world_h", 1.0))
@@ -1234,6 +1250,7 @@ func _animate_focus(id: String, to: float, duration: float) -> void:
 	if marker.get("focus_tween") is Tween: (marker.focus_tween as Tween).kill()
 	var tween := create_tween()
 	marker.focus_tween = tween
+	marker.pulse = false   # the selection jelly: the whole pin, MapDestination included
 	if to > 1.0: tween.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	tween.tween_method(func(v: float):
 		marker.focus = v
