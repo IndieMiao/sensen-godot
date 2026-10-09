@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Compare UI kit gallery PNG shots with goldens (SGODOT-211). Exit 1 when a section is missing, resized,
-or its mean per-channel difference exceeds the tolerance. Uses Godot-free decoding via `sips` fallback-free PNG reader."""
+or its mean per-channel difference exceeds the tolerance, and when a shot section has no golden at all (刘邦 on #149:
+a section added without its PNG was never compared). Uses Godot-free decoding via `sips` fallback-free PNG reader."""
 import sys, os, zlib, struct
 
 def read_png(path):
@@ -37,6 +38,9 @@ def main(golden, shot, tol=2.0):
         diff = sum(abs(g[y][x * gc + k] - s[y][x * sc + k]) for y in range(gh) for x in range(gw) for k in range(3))
         mean = diff / (gw * gh * 3)
         if mean > tol: bad.append(f'{name}: mean diff {mean:.2f} > {tol}')
+    for name in sorted(os.listdir(shot)):
+        if name.endswith('.png') and not os.path.exists(os.path.join(golden, name)):
+            bad.append(f'{name}: no golden (record it with tools/ui/shoot_gallery.sh --update, or copy the shot in)')
     print('\n'.join(bad) if bad else 'all gallery shots match')
     return 1 if bad else 0
 
