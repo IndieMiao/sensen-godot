@@ -11,7 +11,7 @@ import { add, count, room, take, type BagHolder } from './bag.js';
 import type { P0Content } from './content.js';
 import type { Refusal } from './fishing.js';
 import { energyDetail, spendEnergy, type P0Event } from './progress.js';
-import { dayKey, untilRollover } from './rules.js';
+import { dayKey, rolloverAfter, untilRollover } from './rules.js';
 import type { MineRun, P0State } from './state.js';
 
 export type MineCommand =
@@ -34,11 +34,6 @@ export function settleMine(c: P0Content, s: P0State, now: number): void {
     s.mine.run = null;
     s.mine.ended = { reason: 'reset', at: rolloverAfter(c, run.day) };
   }
-}
-
-/** The 04:00 home-time moment that ends player day `day` (YYYY-MM-DD). */
-function rolloverAfter(c: P0Content, day: string): number {
-  return Date.parse(`${day}T00:00:00Z`) + 86_400_000 - (c.day.utc_offset_hours - c.day.rollover_hour) * 3_600_000;
 }
 
 export function floorCleared(c: P0Content, run: MineRun, floor: number): boolean {

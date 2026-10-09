@@ -1,5 +1,6 @@
 /** P0 player state (one homestead per player; no compatibility with the old farm state). */
 import type { P0Content, Skill } from './content.js';
+import { maxEnergy } from './rules.js';
 
 export type PlotState = 'wild' | 'tilled' | 'sown' | 'growing';
 export interface Plot {
@@ -244,6 +245,17 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
   }
   s.presence ??= { left_at: null, last_at: 0, space: null };
   s.presence.place ??= null;
+  // SGODOT-270: the home city moved (Shanghai → San Francisco). A pond that is no longer on the map is let go when the
+  // save loads: the place is forgotten, and a cast still out there comes in as a line in before the bite would — the
+  // Energy back, no fish, no XP, an unused teaching pin returned. Old casts without a place are left alone.
+  if (s.presence.place && !c.fishing.places[s.presence.place]) s.presence.place = null;
+  const cast = s.cast;
+  if (cast?.place && !c.fishing.places[cast.place]) {
+    if (cast.pin) s.firsts = s.firsts.filter(f => f !== cast.pin);
+    const cap = maxEnergy(c, s) + c.energy.bonus_zone;
+    s.energy.value = Math.max(s.energy.value, Math.min(cap, s.energy.value + c.fishing.cast_energy));
+    s.cast = null;
+  }
   s.inbox ??= emptyInbox();   // SGODOT-232: filled for v3 and v4 saves alike, without a version of its own
   s.seen ??= [];   // SGODOT-232 map markers, the same way
   s.day = { ...emptyDay(s.day?.key ?? ''), ...s.day };

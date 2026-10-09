@@ -10,7 +10,9 @@ import { freshState, type P0State } from '../../src/p0/state.js';
 import { P0Store } from '../../src/p0/store.js';
 import { viewOf } from '../../src/p0/view.js';
 
-const c = loadP0Content();
+const content = loadP0Content();
+// The 04:00 instants in these tests are Shanghai's (UTC+8), whatever the home city is; p0_city_switch checks the city's zone.
+const c = { ...content, profile: { ...content.profile, timezone: 'Asia/Shanghai' } };
 const T = Date.UTC(2026, 9, 8, 2);   // 10:00 Shanghai
 const REED = 'pond_shanghai_05', PEBBLE = 'pond_shanghai_04';
 const fresh = () => freshState(c, 'pond-rules-player', T, 7);
