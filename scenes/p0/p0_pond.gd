@@ -285,8 +285,8 @@ func _request_progress() -> Array:
 	if said.has("float"):
 		return [{kind = "request", key = "request:" + _hint_req, text = str(said.float), tone = UiFloatText.Tone.ITEM}]
 	if said.has("toast"):
-		var done := str(said.toast)
-		get_tree().create_timer(CARD_AFTER_FLOATS_S + 0.05).timeout.connect(func(): rt.ui.toast_success_when_clear(done, true))
+		# Bound to the UI, not this pond (哪吒 on #188): a player who leaves within the wait still gets the toast.
+		get_tree().create_timer(CARD_AFTER_FLOATS_S + 0.05).timeout.connect(rt.ui.toast_success_when_clear.bind(str(said.toast), true))
 	return []
 
 ## r = PinReason.request_of after a landed fish, before = the request's count before it: {float: `Pond Catch 1/2`}

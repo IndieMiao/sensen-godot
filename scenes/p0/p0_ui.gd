@@ -1277,6 +1277,14 @@ func toast(text: String, seconds := 0.0, break_at_dot := false) -> void:
 	_aim_toast()
 	_toasts.show_toast(_break_at_dot(text) if break_at_dot else text, ToastLayer.Severity.INFO, "", seconds)
 
+## The width the toast's text gets: ToastLayer's panel (its width, never wider than the layer less SPACE_PAGE each
+## side, as _place sizes it) less the panel padding, the glyph and the gap after it. This reads ToastLayer's own
+## layout (its _width, _ICON_GAP and the toast tokens), so a change there must come here too (哪吒 on #188);
+## test_p0_pond_request_hints checks it against the laid-out label.
+func toast_text_width() -> float:
+	var panel: float = minf(_toasts._width, _toasts.size.x - UiTokens.SPACE_PAGE * 2.0) if _toasts.size.x > 0.0 else _toasts._width
+	return panel - UiTokens.SIZE_TOAST_PAD_LEFT - UiTokens.SIZE_TOAST_PAD_RIGHT - UiTokens.SIZE_TOAST_ICON - ToastLayer._ICON_GAP
+
 ## Two lines break at a " · " (不知火舞 on #188, q(103)): a text that does not fit the toast's one line goes to the next
 ## line after the last " · " that still leaves the first line inside the text width, the dot dropped —
 ## `Pond Catch` / `Pond Crucian 1/2`, `Pond Catch · 2/2` / `Deliver at the Stall`. Callers opt in (break_at_dot);
@@ -1286,7 +1294,7 @@ func _break_at_dot(text: String) -> String:
 	if l == null or not text.contains(" · "): return text
 	var font := l.get_theme_font(&"font")
 	var size := l.get_theme_font_size(&"font_size")
-	var w: float = _toasts._width - UiTokens.SIZE_TOAST_PAD_LEFT - UiTokens.SIZE_TOAST_PAD_RIGHT - UiTokens.SIZE_TOAST_ICON - ToastLayer._ICON_GAP
+	var w := toast_text_width()
 	var fits := func(t: String) -> bool: return font.get_string_size(t, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x <= w
 	if fits.call(text): return text
 	var parts := text.split(" · ")
