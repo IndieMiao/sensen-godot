@@ -113,6 +113,9 @@ var list_panel: PanelContainer
 var list_rows: VBoxContainer
 var filters: Dictionary = {}
 var recenter: Button
+## A host's home key over the recenter key (P0 MAP-1, SGODOT-261): hidden unless the host shows and styles it; it
+## asks for action "home", RECENTER_GAP over the recenter key (不知火舞 on 261). The Journey map keeps none.
+var home_key: Button
 var _last_state := ""
 var _timer := 0.0
 var _request := 0
@@ -329,6 +332,12 @@ func _ready() -> void:
 	compact_round_button(recenter)
 	recenter.pressed.connect(func(): action_requested.emit("recenter"))
 	add_child(recenter)
+	home_key = Button.new()
+	home_key.name = "MapHome"
+	home_key.focus_mode = Control.FOCUS_NONE
+	home_key.visible = false
+	home_key.pressed.connect(func(): action_requested.emit("home"))
+	add_child(home_key)
 	for spec in [["plus", 1.0], ["minus", -1.0]]:
 		var b := flat_button(spec[0], "", "MapZoom_" + spec[0])
 		compact_round_button(b)
@@ -433,6 +442,8 @@ func _layout() -> void:
 	var edge := RECENTER_GAP if host_chrome else 0.0
 	recenter.position = Vector2(size.x - 44 - edge, (info.position.y if info.visible else floor_y) - 44 - (RECENTER_GAP if host_chrome else 8.0))
 	recenter.size = Vector2(44, 44)
+	home_key.position = recenter.position - Vector2(0, 44 + RECENTER_GAP)
+	home_key.size = Vector2(44, 44)
 	for index in 2:
 		var b := get_node("MapZoom_" + ("plus" if index == 0 else "minus")) as Button
 		b.position = recenter.position - Vector2(0, 48 * (2 - index))
