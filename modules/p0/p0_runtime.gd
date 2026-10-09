@@ -148,6 +148,7 @@ func attach(w: Node) -> void:
 	ui.end_stick()
 	world = w
 	session.space = space_of(w)   # before the read below, which tells the server where the player is
+	if session.space in ["map", "pond", "outpost"]: ui.cook_page_from_today = ""   # left home: Today's stove page goes (q(99))
 	if session.space != "map": return_to = route_of(w)
 	# On the map the chip still names where the player is; the farmhouse and the mine are the homestead (MAP-1).
 	elif return_to == "farm": ui.set_place(HOME_PLACE)
@@ -987,6 +988,10 @@ func _dev_shot(dt: float) -> void:
 				if ui._bag != null and is_instance_valid(ui._bag) and not ui._bag.grid.shown_items().is_empty():
 					ui._bag.grid.select(step[1] if step.size() > 1 else str(ui._bag.grid.shown_items().back().id))
 			"energy": ui.open_energy_card(3, "Sow ×1")
+			"todayshow":   # todayshow:<i> — Today opened and row i's Show pressed (q(99) shots)
+				ui.open_today()
+				for c in ui.find_children("*", "Control", true, false):
+					if c is UiTodayPanel: (c as UiTodayPanel).show_pressed.emit(int(step[1]) if step.size() > 1 else 0)
 			"close": ui.close_modal()
 			"auto":
 				P0FishingPanel.auto_play = true

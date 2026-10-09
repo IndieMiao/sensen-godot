@@ -339,3 +339,30 @@ describe('Cooking a chosen page (q(67): Cookbook Cook and Cook Again cook that p
     if (!r.ok) expect(r).toMatchObject({ code: 'missing_ingredients', detail: { recipe: 'dish_grilled_fish' } });
   });
 });
+
+describe('A chosen page leaves what else is spoken for (q(99), 李元芳 int12-pre)', () => {
+  const herbFish = (bag: [string, number][]) => {
+    const s = veteran();
+    s.cookbook.push('dish_herb_grilled_fish');
+    s.bag = bag.map(([id, qty]) => ({ id, qty }));
+    return s;
+  };
+  it("Herb Grilled Fish's any-fish slot takes the carp, not the only crucian Grilled Crucian names", () => {
+    const r = step(herbFish([['fish_crucian', 1], ['fish_carp', 1], ['fish_perch', 1], ['wild_herb', 1]]), { type: 'cook', recipe: 'dish_herb_grilled_fish' });
+    expect(r.s.stove!.dish).toBe('dish_herb_grilled_fish');
+    expect(r.s.stove!.items).toEqual(expect.arrayContaining(['fish_carp']));
+    expect(count(r.s.bag, 'fish_crucian')).toBe(1);   // Today's Cook it: Grilled Crucian can still cook
+  });
+  it("an accepted request's fish is picked last too (the Stall Board's tutorial included)", () => {
+    const s = herbFish([['fish_carp', 1], ['fish_mullet', 1], ['wild_herb', 1]]);
+    s.boards.stall[0].req = { ...s.boards.stall[0].req!, items: ['fish_carp'], status: 'accepted' };
+    const r = step(s, { type: 'cook', recipe: 'dish_herb_grilled_fish' });
+    expect(r.s.stove!.items).toEqual(expect.arrayContaining(['fish_mullet']));
+    expect(count(r.s.bag, 'fish_carp')).toBe(1);
+  });
+  it('with only spoken-for fish left it still cooks the chosen page (q(67))', () => {
+    const r = step(herbFish([['fish_crucian', 1], ['wild_herb', 1]]), { type: 'cook', recipe: 'dish_herb_grilled_fish' });
+    expect(r.s.stove!.dish).toBe('dish_herb_grilled_fish');
+    expect(count(r.s.bag, 'fish_crucian')).toBe(0);
+  });
+});

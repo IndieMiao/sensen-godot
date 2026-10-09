@@ -2117,6 +2117,10 @@ func open_radial() -> void:
 	_radial.selected = bar_mode
 	_radial.open()   # around the screen centre (247, LOCK-03 v2)
 
+## q(99) (李元芳 int12-pre): the page a Today cook row's Show pointed at (`Cook it: Grilled Crucian`). The stove
+## drawer's next opening selects it and spends it (P0Kitchen.open); leaving home drops it (P0Runtime.attach).
+var cook_page_from_today := ""
+
 ## Today panel (§14.5, LOCK-06): at most three rows right under the HUD chips; Show only moves the camera.
 ## rows: Today's own (P0Logic.today_rows) unless given, e.g. P0Guide.free_now after the Energy card's Free to do now.
 ## Show / Show on map by show_label (#37): "pond:<id>", "outpost:<role>" and "map" open the map on that pin.
@@ -2133,7 +2137,10 @@ func open_today(given: Array = []) -> void:
 	panel.show_pressed.connect(func(i: int):
 		close_modal()
 		var go := str(rows[i].go)
-		if show_label(go, space_here(), spot_reachable()) == "Show": show_spot.emit(go)
+		if show_label(go, space_here(), spot_reachable()) == "Show":
+			var dish := str(rows[i].get("icon", ""))
+			if go == "stove" and dish.begins_with("dish_") and str(rows[i].get("state", "")) != "done": cook_page_from_today = dish
+			show_spot.emit(go)
 		else: show_on_map.emit(map_target(go)))
 	_open_modal(panel, 0.0)
 	modal_kind = "today"
