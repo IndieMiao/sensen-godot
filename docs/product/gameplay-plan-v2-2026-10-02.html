@@ -18458,7 +18458,7 @@ td { font-variant-numeric: tabular-nums; }
 </tr>
 <tr>
 <td>来源与排序</td>
-<td>① 已追踪的委托（可交付优先；驿站板、集市板、居民的委托一律算，接下即进 Today，没接的不进——它们的 ! 在地图上，q(104) 补）；② 倒计时最短的「Ready」（作物 / 灶 / 鱼笼）；③ 两条技能里「下一级还差 N」取较近者；④ 收件箱待操作；⑤ 新解锁未查看。永远不写「花光体力」</td>
+<td>① 已追踪的委托（可交付优先；驿站板、集市板、居民的委托一律算，接下即进 Today，没接的不进——它们的 ! 在地图上，q(104) 补；<strong>教学委托 Pond Catch 例外</strong>：开局就是 Today 第一行 <code>Catch 2 Pond Crucian · Reed Pond</code>，接没接都显示，接单在之后去驿站板（§14.3），q(104) 补正）；② 倒计时最短的「Ready」（作物 / 灶 / 鱼笼）；③ 两条技能里「下一级还差 N」取较近者；④ 收件箱待操作；⑤ 新解锁未查看。永远不写「花光体力」</td>
 </tr>
 <tr>
 <td>每行按钮</td>
@@ -18466,7 +18466,7 @@ td { font-variant-numeric: tabular-nums; }
 </tr>
 <tr>
 <td>委托行写法（q(104) 补）</td>
-<td><strong>进度行</strong>：<code>&lt;委托名&gt; · &lt;要的东西&gt; 已有/要求</code>，与驿站板一致——指定鱼写鱼名（<code>Pond Catch · Pond Crucian 0/2</code>），只限稀有度写 <code>&lt;稀有度&gt; fish</code>（<code>Dusk Haul · Fine fish 1/4</code>、Old Kai 的 <code>An Old Man's Catch · Rare fish 0/1</code>），与图钉卡原因行同一写法，种田、料理委托写委托卡上的需求名（<code>Five Little Plots · Plots 3/5</code>）；要的鱼玩家还钓不上时小字 <code>Fishing Lv4 needed</code>，点这一行打开那条鱼的门禁卡（同鱼图鉴剪影，q(104)）；只限稀有度的委托打开当期这个稀有度门槛最低的那条鱼的门禁卡（Old Kai → Golden Koi）。<strong>交付行</strong>（背包里够了）：驿站板 <code>&lt;委托名&gt; · Deliver at the Stall</code>、集市 <code>&lt;委托名&gt; · Deliver at &lt;据点名&gt;</code>（<code>Dusk Haul · Deliver at Xuhui Market Square</code>）、居民 <code>&lt;委托名&gt; · Deliver to &lt;居民名&gt;</code>（<code>An Old Man's Catch · Deliver to Old Kai</code>），与 q(103) 凑够时的 toast 同一写法。<strong>按钮</strong>：交付行 Show on map 指向交付处的图钉；鱼的进度行 Show on map 指向挂 ! 的鱼塘，钓不上时没有 Show、点行开门禁卡。<strong>排序</strong>：交付行算可立即做，排最前；进度行排在其他可立即做之后、倒计时之前；首会话只显示教学委托（q(58)）</td>
+<td><strong>进度行</strong>：<code>&lt;委托名&gt; · &lt;要的东西&gt; 已有/要求</code>，与驿站板一致——卡上点名的物品写物品名（<code>Fresh Greens · Radish 1/4</code>），只限稀有度写 <code>&lt;稀有度&gt; fish</code>（<code>Dusk Haul · Fine fish 1/4</code>、Old Kai 的 <code>An Old Man's Catch · Rare fish 0/1</code>），与图钉卡原因行同一写法，种田、料理委托写委托卡上的需求名（<code>Five Little Plots · Plots 3/5</code>）；要的鱼玩家还钓不上时小字 <code>Fishing Lv4 needed</code>，点这一行打开那条鱼的门禁卡（同鱼图鉴剪影，q(104)）；只限稀有度的委托打开当期这个稀有度门槛最低的那条鱼的门禁卡（Old Kai → Golden Koi）。<strong>交付行</strong>（背包里够了）：驿站板 <code>&lt;委托名&gt; · Deliver at the Stall</code>、集市 <code>&lt;委托名&gt; · Deliver at &lt;据点名&gt;</code>（<code>Dusk Haul · Deliver at Xuhui Market Square</code>）、居民 <code>&lt;委托名&gt; · Deliver to &lt;居民名&gt;</code>（<code>An Old Man's Catch · Deliver to Old Kai</code>），与 q(103) 凑够时的 toast 同一写法。<strong>按钮</strong>：交付行 Show on map 指向交付处的图钉；鱼的进度行 Show on map 指向挂 ! 的鱼塘，钓不上时没有 Show、点行开门禁卡。<strong>排序</strong>：交付行算可立即做，排最前；进度行排在其他可立即做之后、倒计时之前；首会话只显示教学委托，写法沿用引导行 <code>Catch 2 Pond Crucian · Reed Pond</code> / <code>Deliver 2 Pond Crucian · Stall</code>（q(58)），不套本行写法</td>
 </tr>
 <tr>
 <td>更新</td>
@@ -27861,7 +27861,7 @@ td { font-variant-numeric: tabular-nums; }
 <tbody>
 <tr>
 <td>来源</td>
-<td>① 驿站委托（首会话只有 1 条；第 2 天起集市与居民的委托接下后同样进 Today，写法见 9.5.3，q(104) 补）；② 两条技能里"下一级还差 N"取较近者；③ 成熟 / 灶位倒计时；④（第 2 天起）收件箱待操作；⑤ 新解锁未查看</td>
+<td>① 驿站委托（首会话只有 1 条，即教学委托，开局未接也显示；第 2 天起集市与居民的委托接下后同样进 Today，写法见 9.5.3，q(104) 补）；② 两条技能里"下一级还差 N"取较近者；③ 成熟 / 灶位倒计时；④（第 2 天起）收件箱待操作；⑤ 新解锁未查看</td>
 </tr>
 <tr>
 <td>条数</td>
