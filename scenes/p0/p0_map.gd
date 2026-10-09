@@ -661,6 +661,7 @@ func _switch_city(r: Dictionary) -> void:
 
 func fly_to_city(id: String) -> void:
 	if id == P0_REGION: super.fly_to_city(id)
+	else: _city_action("city")   # another city's bubble at the farthest zoom says where P0 is set (不知火舞 on 270)
 
 # ---------------------------------------------------------------- old server / account hooks off
 func _on_net_booted(_ok: bool) -> void: pass
