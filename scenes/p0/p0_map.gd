@@ -14,6 +14,7 @@ const P0_FARM_CHOICE := {"layout_patch_id": "sh_a", "revision": 2}
 const P0_OUTPOST := "res://scenes/p0/p0_outpost.tscn"
 const NEAREST_POND := "pond_shanghai_05"   # Reed Pond, the closest to home
 const PondCard := preload("res://modules/p0/p0_pond_card.gd")
+const PinReason := preload("res://modules/p0/p0_pin_reason.gd")   # why a pin wears its mark (q(103))
 ## Online counts on the outpost pins (GET /p0/presence), refreshed while the map is on top.
 const PRESENCE_S := 15.0
 ## Show on map lands this close (the outpost / pond pins and the homestead read at this zoom).
@@ -139,6 +140,7 @@ func _open_pond_card(entry: Dictionary, info: Dictionary) -> void:
 	var id := str(entry.id)
 	var to_fish := [false]
 	var spec := P0PlaceSheet.for_here(info, is_here("pond", id))
+	spec["reason"] = PinReason.reason(_view(), id)   # q(103): why the pin wears its mark, under the subtitle
 	P0PlaceSheet.open(rt.ui, spec,
 		func():
 			rt.ui.close_modal()
@@ -314,15 +316,19 @@ func place_card(entry: Dictionary) -> Dictionary:
 	var to := Vector2(float(entry.get("lat", 0.0)), float(entry.get("lng", 0.0)))
 	var distance := ["Distance", P0PlaceSheet.distance_text(P0PlaceSheet.km_between(_origin(), to))]
 	if id == HOME_PIN:
-		return P0PlaceSheet.for_here({"title": "Homestead", "subtitle": "Your farm", "facts": [distance],
-			"primary": "Go home · Free"}, not away())
+		return P0PlaceSheet.for_here({"title": "Homestead", "subtitle": "Your farm", "reason": PinReason.reason(_view(), id),
+			"facts": [distance], "primary": "Go home · Free"}, not away())
 	var o := P0Outposts.find(id)
 	if o.is_empty(): return {}
 	var facts: Array = [distance]
 	var online := int(_online.get(id, 0))
 	if online > 0: facts.append(["Online now", str(online)])
-	return P0PlaceSheet.for_here({"title": str(o.name), "subtitle": str(o.category), "facts": facts, "primary": "Go"},
-		is_here("outpost", id))
+	return P0PlaceSheet.for_here({"title": str(o.name), "subtitle": str(o.category), "reason": PinReason.reason(_view(), id),
+		"facts": facts, "primary": "Go"}, is_here("outpost", id))
+
+## The view as received (no copy, as _pond_info); {} before a session.
+func _view() -> Dictionary:
+	return rt.session.view if rt != null and rt.session != null else {}
 
 ## Go / Back to: the homestead's opens the farm, an outpost's its room (re-entered through the loading cover when the
 ## player was there, q(80)). Tapping outside closes the card and clears the selection.
@@ -373,22 +379,41 @@ func _on_presence(result: int, code: int, _h: PackedStringArray, body: PackedByt
 ## (不知火舞 on 234); outfit and city switching are not in P0 (their buttons are gone with the old chrome).
 func _city_action(action: String) -> void:
 	match action:
-		"recenter":
+		"recenter":   # back to the player, the zoom kept, nothing selected (LOCK-24; flies since SGODOT-267)
 			var at := _origin()
-			fly_to(at.x, at.y)
+			_fly("recenter", at.x, at.y, zoom)
 		"home": go_home_view()
 		"outfit": rt.ui.toast("Outfits come later")
 		"city": rt.ui.toast("P0 is set in Shanghai")
 		_: super._city_action(action)
 
 ## The home key (SGODOT-261, the user's call; 不知火舞 keeps 197): from anywhere — at a pond or an outpost the camera
-## follows the player there and the homestead is lost among the pins — the camera flies back to the homestead and
-## selects it, as a tap on its pin does away (its card: Homestead · Go home · Free) and on the avatar at home.
+## follows the player there and the homestead is lost among the pins — the camera flies back to the homestead and, on
+## landing, selects it, as a tap on its pin does away (its card: Homestead · Go home · Free) and on the avatar at home.
 func go_home_view() -> void:
 	if city_map == null or rt == null: return
-	show_place("home")
-	if away(): city_map.select(home_entry())
-	else: _own_pin_pressed()
+	_fly("home", home_lat, home_lng, SHOW_ZOOM, func():
+		if away(): city_map.select(home_entry())
+		else: _own_pin_pressed())
+
+## The map's own camera moves fly (SGODOT-267, the user's call; 197 LOCK-24 / LOCK-08 updated by 不知火舞): the home
+## key, the recenter key and Show on map share one flight, the city's (MapFlight, cubic in-out) capped at FLIGHT_MAX_S,
+## each with what it does on landing (`land`). A touch on the map stops it where it is with nothing landing (MapPoc
+## kills the flight on a press); the same move asked again while it flies is ignored, another one takes over.
+const FLIGHT_MAX_S := 1.2   # a same-city flight longer than this feels like waiting; MapFlight's 3 s is a city's
+var _flight: Tween
+var _flight_kind := ""
+
+func _fly(kind: String, lat: float, lng: float, to_zoom: float, land := Callable()) -> void:
+	if _flight != null and _flight.is_running() and kind == _flight_kind: return
+	_flight_kind = kind
+	# Already there (to about a centimetre: is_equal_approx's relative tolerance is some 35 m at this latitude).
+	if absf(center_lat - lat) < 1e-7 and absf(center_lng - lng) < 1e-7 and absf(zoom - to_zoom) < 1e-3:
+		if _flight != null: _flight.kill()   # a flight elsewhere gives way
+		if land.is_valid(): land.call()   # already there: nothing to fly
+		return
+	_fly_to(lat, lng, to_zoom, city_bearing, land, FLIGHT_MAX_S)
+	_flight = _focus_tween
 
 ## MapLocateButton 1793:103795 (LOCK-24): the recenter key as a 44 round button styled like Close (color/surface,
 ## 1 px color/border) with a light shadow, the 22 i-locate in its own colours. The home key wears the same with i-home.
@@ -676,12 +701,9 @@ func show_place(target: String) -> void:
 	if city_map == null: return
 	var entry := place_for(target)
 	if entry.is_empty(): return
-	_reset_gesture()
-	_city_bounds()   # city-wide pan bounds, else the homestead's 450 m box pulls the camera back
-	fly_to(float(entry.lat), float(entry.lng))
-	_set_zoom(SHOW_ZOOM)
-	_camera_dirty = true
-	if target != "home": city_map.select(entry)
+	# Flies since SGODOT-267 (_fly sets the city-wide pan bounds, else the homestead's 450 m box pulls the camera back);
+	# the pin is selected on landing.
+	_fly("show:" + target, float(entry.lat), float(entry.lng), SHOW_ZOOM, func(): if target != "home": city_map.select(entry))
 
 ## Show from a panel opened on the map (Today, the Energy card, a NeedSource): every target is a pin here; a homestead
 ## target (plots, stall, stove …) is the homestead's.
@@ -730,7 +752,7 @@ func p0_frame(view: Dictionary, _dt: float) -> void:
 const MARK_STATES := {"deliver": "deliverable", "request": "request", "new": "new"}
 
 ## The pins' marks [{id, state}]: the server's view.map_markers whenever it sends them (蒙恬, SGODOT-232 U6), else
-## the ones the client knows before then (tutorial_marks).
+## the ones the client knows before then (tutorial_marks). The homestead's goes on the farm pin (home_mark).
 static func pin_marks(view: Dictionary) -> Array:
 	return marks_from(view) if view.has("map_markers") else tutorial_marks(view)
 
@@ -745,14 +767,17 @@ static func marks_from(view: Dictionary) -> Array:
 		if state != "" and place != "" and place != "home": out.append({"id": place, "state": state})
 	return out
 
-## Map markers the client knows before the server's map_markers come (蒙恬 on #83, q(48)): while the tutorial Pond
-## Catch is on the stall's board and still short of its fish, the beginner pond Today points at wears the Request ! —
-## so the first session's map shows it at the city level beside the Tackle Shop, 200 m away (CityMapView packs marker
-## pins first). Read off the board like the guide (P0Guide.tutorial), not req_done: that keeps only the last 20.
+## Map markers the client knows before the server's map_markers come (蒙恬 on #83, q(48); the server's rule since
+## q(103) ④, PinReason.fallback): once the tutorial Pond Catch is taken and while it is still short of its fish, the
+## beginner pond Today points at wears the Request ! — at the city level beside the Tackle Shop, 200 m away
+## (CityMapView packs marker pins first). Untaken it marks no pond: its ! is the stall's own. With the fish in the bag
+## the ✓ goes on the homestead (home_mark). Read off the board like the guide (P0Guide.tutorial), not req_done: that
+## keeps only the last 20.
 static func tutorial_marks(view: Dictionary) -> Array:
-	var t := P0Guide.tutorial(view)
-	if t.is_empty() or int(t.get("have", 0)) >= int(t.get("qty", 1)): return []   # handed in, or off to the stall
-	return [{"id": NEAREST_POND, "state": "request"}]
+	var out: Array = []
+	for m in PinReason.fallback(view):
+		if str(m.place) != HOME_PIN: out.append({"id": str(m.place), "state": str(MARK_STATES.get(str(m.kind), ""))})
+	return out
 
 ## CityMapView asks once per update (#83): the same marks by pin id, the first (highest) mark per pin.
 func city_pin_markers() -> Dictionary:
@@ -765,10 +790,11 @@ func city_pin_markers() -> Dictionary:
 	return out
 
 ## The homestead's mark ("deliverable" when a Stall Board request can be handed in; 蒙恬's server only sends
-## deliver for home), drawn on the farm pin by FarmMarkers; "" for none.
+## deliver for home, and the client's own first-session marks give it the taken Pond Catch's ✓, q(103)), drawn on the
+## farm pin by FarmMarkers; "" for none.
 static func home_mark(view: Dictionary) -> String:
-	for m in view.get("map_markers", []):
-		if m is Dictionary and str(m.get("place", "")) == "home": return str(MARK_STATES.get(str(m.get("kind", "")), ""))
+	for m in PinReason.markers(view):
+		if str(m.get("place", "")) == HOME_PIN: return str(MARK_STATES.get(str(m.get("kind", "")), ""))
 	return ""
 
 ## Today's "Show on map" (SGODOT-232 U6): a short pulse on that place's pin.
@@ -807,6 +833,17 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"tapself": _own_pin_pressed()   # a tap on the player's own avatar: the card of where the player is
 		"recenter": _city_action("recenter")   # the MapLocateButton: back to the player, the zoom kept
 		"homekey": _city_action("home")   # the home key over it: back to the homestead, selected (SGODOT-261)
+		"maptouch":   # maptouch:180:300[:1.15] — a finger down and up on the map there, after that many seconds (steps
+			# run 0.8 s apart: a delay lands it inside the next step's flight); it stops a flight (SGODOT-267)
+			var at := Vector2(float(step[1]), float(step[2]))
+			var tap := func():
+				for down in [true, false]:
+					var touch := InputEventScreenTouch.new()
+					touch.position = at
+					touch.pressed = down
+					_unhandled_input(touch)
+			if step.size() > 3: get_tree().create_timer(float(step[3])).timeout.connect(tap)
+			else: tap.call()
 		"center":   # center:31.228:121.478 (the city overview) — where the camera looks, for shots
 			center_lat = float(step[1])
 			center_lng = float(step[2])

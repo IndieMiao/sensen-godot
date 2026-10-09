@@ -27,6 +27,7 @@ var _focus := Vector3(6, 0, -6)
 var _cam_follow := P0Follow.new()
 var _zoom := 1.0
 const ElasticZoom = preload("res://modules/p0/p0_elastic_zoom.gd")
+const PinReason := preload("res://modules/p0/p0_pin_reason.gd")
 var _pinch = ElasticZoom.new(0.8, 1.4)   # the farm's range, rubber band past 0.8 / 1.4
 var _zoom_at := Vector2.INF            # the last pinch centre (screen)
 var _band := Rect2()                   # the last camera band seen with no panel up
@@ -39,6 +40,8 @@ const DISTANCE := 40.0
 ## The opening shot puts the player's feet this far above the band's bottom edge (不知火舞 on 231).
 const OPENING_LIFT := 40.0
 var _plan: Dictionary = {}
+var _hint_req := ""     # the request this pond's ! is for (q(103)): its progress floats and its completion toast
+var _hint_have := -1    # that request's count before the next catch
 
 ## The catalog pond id: the session sends it with the entry read and every command from here (q(36)).
 func p0_place() -> String:
@@ -107,6 +110,7 @@ func _ready() -> void:
 	rt = P0Runtime.ensure()
 	rt.attach(self)
 	rt.ui.set_mode("fish", "Shanghai · " + str(entry.get("name", "Pond")))
+	_arrival_hint()
 
 func _exit_tree() -> void:
 	_end_fishing()
@@ -239,10 +243,61 @@ func _settle(ev: Dictionary, delay: float, first_xp: int) -> void:
 	if panel.visible: panel.close()
 	var at := cam.unproject_position(land) if not cam.is_position_behind(land) else Vector2.INF
 	var floats := rt.take_catch_floats()
-	if str(ev.get("result", "")) == "landed": at = over_head()
+	if str(ev.get("result", "")) == "landed":
+		at = over_head()
+		floats.append_array(_request_progress())
 	rt.ui.queue_floats(floats, at)
 	rt.last_first_catch_xp = first_xp
 	rt._on_catch(ev, rt.last_xp_lines, at, CARD_AFTER_FLOATS_S if not floats.is_empty() else 0.0)
+
+# ---------------------------------------------------------------- the pond's ! (q(103), SGODOT-268)
+## A pond wearing the Request ! says why once per visit: an Info toast with the pin card's reason line
+## (`Pond Catch · Pond Crucian 0/2`), after the TipCard of the arrival (q(49)). The surface's tip is asked for in the
+## frames around the attach, so the hint first waits ARRIVAL_HINT_DELAY_S, then while a tip is up or waits.
+const ARRIVAL_HINT_DELAY_S := 0.4
+const ARRIVAL_HINT_WAIT_S := 12.0   # TipCards close within 5 s; never hold the hint past this
+func _arrival_hint() -> void:
+	# Straight into a pond (a dev boot, a cold start back in place) the first view may not have come yet.
+	if rt.session.current().is_empty(): await rt.session.state_changed
+	if not is_inside_tree(): return
+	# The request and its count are taken at once, so a fish landed while the tip is still up counts too.
+	var why := PinReason.reason(rt.session.current(), p0_place())
+	if str(why.get("state", "")) != "request": return
+	_hint_req = str(why.get("request", ""))
+	_hint_have = int(PinReason.request_of(rt.session.current(), _hint_req).get("have", -1)) if _hint_req != "" else -1
+	await get_tree().create_timer(ARRIVAL_HINT_DELAY_S).timeout
+	var waited := 0.0
+	while is_inside_tree() and rt.ui.tip_pending() and waited < ARRIVAL_HINT_WAIT_S:
+		await get_tree().process_frame
+		waited += get_process_delta_time()
+	if not is_inside_tree(): return
+	why = PinReason.reason(rt.session.current(), p0_place())   # still worn: a fish landed meanwhile may have completed it
+	if str(why.get("state", "")) == "request" and str(why.get("text", "")) != "": rt.ui.toast(str(why.text), 0.0, true)
+
+## What a landed fish did to that request: a progress float under `Pond Crucian ×1` (`Pond Catch 1/2`, ink, no
+## icon) while it is short; on the catch that completes it, a Success toast instead (`Pond Catch · 2/2 · Deliver at
+## the Stall`), after the catch's Caught! card and level banner. Nothing for a fish it does not take, or past the count.
+func _request_progress() -> Array:
+	if _hint_req == "": return []
+	var r := PinReason.request_of(rt.session.current(), _hint_req)
+	var said := request_progress(r, _hint_have)
+	_hint_have = int(r.get("have", _hint_have))
+	if said.has("float"):
+		return [{kind = "request", key = "request:" + _hint_req, text = str(said.float), tone = UiFloatText.Tone.ITEM}]
+	if said.has("toast"):
+		var done := str(said.toast)
+		get_tree().create_timer(CARD_AFTER_FLOATS_S + 0.05).timeout.connect(func(): rt.ui.toast_success_when_clear(done, true))
+	return []
+
+## r = PinReason.request_of after a landed fish, before = the request's count before it: {float: `Pond Catch 1/2`}
+## while it is still short, {toast: `Pond Catch · 2/2 · Deliver at the Stall`} on the catch that completes it, else {}.
+static func request_progress(r: Dictionary, before: int) -> Dictionary:
+	var have := int(r.get("have", -1))
+	var qty := int(r.get("qty", 0))
+	if r.is_empty() or have <= before or before >= qty: return {}
+	var title := str(r.get("title", ""))
+	if have < qty: return {float = "%s %d/%d" % [title, have, qty]}
+	return {toast = "%s · %d/%d · %s" % [title, have, qty, str(r.get("deliver", ""))]}
 
 ## Where a landed fish's floats rise (不知火舞 on 231): FLOAT_OVER_HEAD_PX above the top of the player's head on screen
 ## (the top of the outfit — hair or hat — at the middle of the figure).

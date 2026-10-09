@@ -2213,7 +2213,8 @@ func fly_to_city(id: String) -> void:
 		return
 
 ## van Wijk 飞行：先拉远、平移、再拉近。任何新触摸都会打断（_focus_tween 被按下事件 kill）。
-func _fly_to(lat: float, lng: float, target_zoom: float, target_bearing: float, on_land := Callable()) -> void:
+func _fly_to(lat: float, lng: float, target_zoom: float, target_bearing: float, on_land := Callable(),
+		max_s := MapFlight.MAX_DURATION) -> void:
 	_reset_gesture()
 	_city_bounds()
 	if _focus_tween: _focus_tween.kill()
@@ -2230,7 +2231,7 @@ func _fly_to(lat: float, lng: float, target_zoom: float, target_bearing: float, 
 		city_bearing = from_bearing + turn * t
 		bearing = city_bearing
 		_set_zoom(target_zoom if t >= 1.0 else p.z)
-		_camera_dirty = true, 0.0, 1.0, flight.duration()).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
+		_camera_dirty = true, 0.0, 1.0, flight.duration(max_s)).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
 	if on_land.is_valid(): _focus_tween.tween_callback(on_land)
 
 func _install_city_map() -> void:

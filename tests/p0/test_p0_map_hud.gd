@@ -5,6 +5,7 @@ extends GdUnitTestSuite
 ## homestead's says Go home · Free, ponds and outposts Go, the place the player is at Back to <name> (q(80)).
 
 const P0_MAP := "res://scenes/p0/p0_map.tscn"
+const PondCard := preload("res://modules/p0/p0_pond_card.gd")
 
 func before_test() -> void:
 	Net.use_transport(FakeTransport.new([]).callable())
@@ -48,6 +49,7 @@ func test_recenter_brings_the_camera_home_and_keeps_the_zoom() -> void:
 	m.center_lng = m.home_lng + 0.02
 	m.zoom = 13.3
 	m._city_action("recenter")
+	await _landed(m)   # it flies (SGODOT-267)
 	assert_float(m.center_lat).is_equal_approx(m.home_lat, 1e-6)
 	assert_float(m.center_lng).is_equal_approx(m.home_lng, 1e-6)
 	assert_float(m.zoom).is_equal_approx(13.3, 1e-6)
@@ -120,6 +122,7 @@ func test_the_avatar_stands_where_the_player_is() -> void:
 	var item: Dictionary = m.home_set_items()[0]
 	assert_float(float(item.lat)).is_equal_approx(float(tea.lat), 1e-5)   # a Vector2 point
 	m._city_action("recenter")
+	await _landed(m)
 	assert_float(m.center_lat).is_equal_approx(float(tea.lat), 1e-6)
 	assert_float(m.center_lng).is_equal_approx(float(tea.lng), 1e-6)
 	rt.here = {"space": "pond", "place": "pond_shanghai_05"}
@@ -191,7 +194,7 @@ func test_a_room_on_the_empty_boot_leaves_for_the_map() -> void:
 ## avatar and the marked pins (the first session's Reed Pond) always, then each role's outpost nearest home, nearest
 ## the avatar first, while z13.5 holds them all.
 func _board(have: int) -> Dictionary:
-	var reqs: Array = [] if have < 0 else [{"id": P0Guide.TUTORIAL, "have": have, "qty": 2}]
+	var reqs: Array = [] if have < 0 else [{"id": P0Guide.TUTORIAL, "have": have, "qty": 2, "status": "accepted"}]   # taken (q(103))
 	return {"stall": {"board": {"requests": reqs}}}
 
 func test_the_opening_view_frames_the_home_set() -> void:
@@ -238,6 +241,53 @@ func test_the_opening_view_frames_the_home_set() -> void:
 	var name_h := UiMapDestination.label_size_for(m.city_map._label_text(tea)).y
 	assert_float(fp.position.y).is_equal_approx(-UiMapDestination.DISC - UiMapDestination.above_gap_for(false) - name_h, 0.01)
 	assert_float(fp.end.y).is_equal_approx(UiMapDestination.LABEL_GAP + name_h, 0.01)
+	rt.session.view = saved
+
+## q(103) (不知火舞 on 268): a card whose pin wears a mark says why on one line under the subtitle — the pin's mark at
+## 18 px and the reason — above the description line; a card with no mark has no such row.
+func test_a_marked_pins_card_says_why_under_its_subtitle() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved: Dictionary = rt.session.view
+	var v := _board(0)
+	v["names"] = {"fish_crucian": "Pond Crucian"}
+	v.stall.board.requests[0]["title"] = "Pond Catch"
+	v.stall.board.requests[0]["item"] = "fish_crucian"
+	rt.session.view = v
+	var reed := SystemPonds.location("pond_shanghai_05").duplicate(true)
+	reed["kind"] = "pond"
+	m._on_entry_selected(reed)
+	assert_str(rt.ui.modal_kind).is_equal("pond_card")
+	var row: Control = rt.ui._modal.find_child("Reason", true, false)
+	assert_object(row).is_not_null()
+	assert_str((row.get_node("Text") as Label).text).is_equal("Pond Catch · Pond Crucian 0/2")
+	assert_int((row.get_node("Mark").get_child(0) as UiStatusBadge).state).is_equal(UiStatusBadge.State.REQUEST)
+	var col := row.get_parent()
+	assert_object(col.get_child(0)).is_instanceof(UiObjectHeader)   # title / Beginner, then the reason …
+	assert_int(row.get_index()).is_equal(1)
+	assert_str((col.get_child(2) as Label).text).is_equal(PondCard.BEGINNER_LINE)   # … above the description line
+	await _close(rt)
+	# The fish in the bag: Reed Pond's ! is gone with its line, and the homestead's card (away) says ✓ and why.
+	v.stall.board.requests[0].have = 2
+	m._on_entry_selected(reed)
+	assert_object(rt.ui._modal.find_child("Reason", true, false)).is_null()
+	await _close(rt)
+	var here: Dictionary = rt.here
+	rt.here = {"space": "outpost", "place": "sh_tea_1"}
+	m._sync_here()
+	m._on_entry_selected(m.home_entry())
+	row = rt.ui._modal.find_child("Reason", true, false)
+	assert_str((row.get_node("Text") as Label).text).is_equal("Pond Catch · Ready to deliver")
+	assert_int((row.get_node("Mark").get_child(0) as UiStatusBadge).state).is_equal(UiStatusBadge.State.DELIVERABLE)
+	await _close(rt)
+	# An outpost with no mark: no row, no gap.
+	m._on_entry_selected(P0Outposts.place_entry(P0Outposts.by_role("tackle")))
+	assert_object(rt.ui._modal.find_child("Reason", true, false)).is_null()
+	await _close(rt)
+	rt.here = here
+	m._sync_here()
 	rt.session.view = saved
 
 ## The P0Runtime singleton the map brought up goes with the suite (P0Runtime.free_instance_for_tests).
@@ -294,3 +344,7 @@ func _bag_view() -> Dictionary:
 		"items": {"seed_herb": {"kind": "seed"}}, "names": {"seed_herb": "Herb Seeds"},
 		"bag": {"capacity": 25, "free": 24, "slots": [{"id": "seed_herb", "qty": 5}]}, "plots": [],
 		"inbox": {"limit": 8, "badge": 0, "waiting": 0, "claim_slots": 0, "parcels": [], "updates": []}}
+
+func _landed(m: Node) -> void:   # the map's own flight (SGODOT-267) has landed, at most 2 s
+	var until := Time.get_ticks_msec() + 2000
+	while m._flight != null and m._flight.is_running() and Time.get_ticks_msec() < until: await get_tree().process_frame

@@ -6,6 +6,10 @@ extends RefCounted
 ## same rule for the place the player is at (q(80)): no Distance row, and the primary reads "Back to <name>",
 ## re-entering that scene through the loading cover as Go does.
 
+const REASON_H := 24      # q(103): one line, 24 high (the column's 8 above and below)
+const REASON_ICON := 18.0
+const REASON_GAP := 6
+
 ## "0.8 km" on a card or pin tag; 0.1 km at the least.
 static func distance_text(km: float) -> String:
 	return "%.1f km" % maxf(0.1, km)
@@ -21,7 +25,8 @@ static func km_between(a: Vector2, b: Vector2) -> float:
 	return 2.0 * r * asin(minf(1.0, sqrt(h)))
 
 ## The card spec for where the player is (q(80)): `here` drops the Distance fact and sets primary "Back to <title>";
-## elsewhere the primary is spec.primary, else "Go". spec: {title, subtitle, line?, facts: [[label, value]], primary?}.
+## elsewhere the primary is spec.primary, else "Go". spec: {title, subtitle, reason? (PinReason.reason), line?, facts:
+## [[label, value]], primary?}.
 static func for_here(spec: Dictionary, here: bool) -> Dictionary:
 	var out := spec.duplicate(true)
 	if here:
@@ -30,6 +35,34 @@ static func for_here(spec: Dictionary, here: bool) -> Dictionary:
 	else:
 		out["primary"] = str(spec.get("primary", "Go"))
 	return out
+
+## The reason line (q(103), 不知火舞 on 268): the pin's own mark as an 18 px STATE-ICONS badge, 6 px, the reason in
+## C13 bold ink on one 24 px line, cut with an ellipsis; no fill. Placed under the subtitle, above the line.
+static func reason_row(why: Dictionary) -> Control:
+	var row := HBoxContainer.new()
+	row.name = "Reason"
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.custom_minimum_size.y = REASON_H
+	row.add_theme_constant_override(&"separation", REASON_GAP)
+	var mark := Control.new()   # the 28 px world badge drawn at 18 px
+	mark.name = "Mark"
+	mark.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	mark.custom_minimum_size = Vector2(REASON_ICON, REASON_ICON)
+	mark.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	var state := UiStatusBadge.state_of(str(why.get("state", "")))
+	if state >= 0:
+		var badge := UiStatusBadge.new(state as UiStatusBadge.State)
+		badge.scale = Vector2.ONE * (REASON_ICON / float(UiTokens.SIZE_STATUS_BADGE_WORLD))
+		mark.add_child(badge)
+	row.add_child(mark)
+	var text := UiKit.label(str(why.get("text", "")), UiTokens.STYLE_C13_B, UiTokens.COLOR_TEXT)
+	text.name = "Text"
+	text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	text.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	text.clip_text = true
+	text.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	row.add_child(text)
+	return row
 
 ## Opens the sheet as `ui`'s modal (modal_kind = kind). go: the primary's action (the sheet does not close itself;
 ## the caller decides); details: Details › (none when empty); closed: called once the sheet leaves the tree.
@@ -49,6 +82,8 @@ static func open(ui: P0Ui, spec: Dictionary, go: Callable, details := Callable()
 	col.add_theme_constant_override(&"separation", 8)
 	panel.add_child(col)
 	col.add_child(UiObjectHeader.new({"title": str(spec.get("title", "")), "state": str(spec.get("subtitle", ""))}))
+	var why: Dictionary = spec.get("reason", {}) if spec.get("reason", {}) is Dictionary else {}
+	if not why.is_empty(): col.add_child(reason_row(why))
 	if str(spec.get("line", "")) != "": col.add_child(UiKit.label(str(spec.line), UiTokens.STYLE_C14_B))
 	for f in spec.get("facts", []): col.add_child(UiFactRow.new(str(f[0]), str(f[1])))
 	if details.is_valid():

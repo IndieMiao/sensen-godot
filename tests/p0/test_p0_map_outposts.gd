@@ -285,14 +285,14 @@ func test_my_farm_label_gives_way_to_an_outpost_label() -> void:
 	assert_bool(fm.self_label_yields).is_false()
 	assert_bool(fm._buttons["self"].visible).is_true()
 
-## The stall board of a view: Pond Catch with `have` of its 2 fish caught, or handed in (-1: not on the board).
-func _board(have: int) -> Dictionary:
-	var reqs: Array = [] if have < 0 else [{"id": P0Guide.TUTORIAL, "have": have, "qty": 2}]
+## The stall board of a view: Pond Catch taken with `have` of its 2 fish caught, or handed in (-1: not on the board).
+func _board(have: int, status := "accepted") -> Dictionary:
+	var reqs: Array = [] if have < 0 else [{"id": P0Guide.TUTORIAL, "have": have, "qty": 2, "status": status}]
 	return {"stall": {"board": {"requests": reqs}}, "req_done": [P0Guide.TUTORIAL] if have < 0 else []}
 
 ## 蒙恬 on #83: the first session's map (minutes 5–9: the chip → the map → Reed Pond) opens at the city level with
-## nothing selected; while the tutorial Pond Catch is on the board and short of its fish, Reed Pond wears the Request !
-## (q(48)) and shows beside the Tackle Shop 200 m away, over the player's avatar, its label whole and clear of My
+## nothing selected; while the tutorial Pond Catch is taken and short of its fish, Reed Pond wears the Request !
+## (q(48); untaken it marks no pond, q(103)) and shows beside the Tackle Shop 200 m away, over the player's avatar, its label whole and clear of My
 ## Farm's (不知火舞 on #83). With the fish caught (off to the stall) or the request handed in, it packs as a pond again.
 func test_the_beginner_pond_shows_at_the_city_level_until_pond_catch_is_handed_in() -> void:
 	var m := _map()
@@ -302,6 +302,8 @@ func test_the_beginner_pond_shows_at_the_city_level_until_pond_catch_is_handed_i
 	var fm: FarmMarkers = m.farm_markers
 	var rt: P0Runtime = m.rt
 	var saved: Dictionary = rt.session.view
+	rt.session.view = _board(0, "open")
+	assert_dict(m.city_pin_markers()).is_empty()   # not taken yet: its ! is the stall's (q(103))
 	rt.session.view = _board(0)
 	assert_dict(m.city_pin_markers()).is_equal({NEAREST_POND: "request"})
 	rt.session.view = _board(1)
