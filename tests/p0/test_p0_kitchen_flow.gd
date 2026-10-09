@@ -210,6 +210,7 @@ func test_the_heat_ring_goes_on_under_the_queue_drawer_and_a_hit_there_stands() 
 	assert_str(k.drawer.tab).is_equal(tab)
 	assert_bool(rt.ui.has_modal()).is_true()
 	assert_bool(bool(k.get("_judged").get(0, false))).is_true()
+	assert_float(ring.mark_turn).is_equal_approx(0.5, 0.02)   # its dot where the needle was (SGODOT-256 ⑩)
 	var floats: Array = rt.ui.root.find_children("*", "UiFloatText", true, false).map(func(f): return (f as UiFloatText).text)
 	assert_array(floats).contains(["Nice heat! ★"])
 	rt.ui.close_modal()   # back to the watch: the ring stands as hit, not judged again
@@ -254,6 +255,7 @@ func test_a_tap_on_the_pot_band_while_a_ring_shows_but_outside_its_window_keeps_
 		assert_str(k.phase).override_failure_message(str(at)).is_equal("compose")
 		assert_bool(rt.ui.has_modal()).is_true()
 	assert_bool(bool(k.get("_judged").get(0, true))).is_false()   # the turn went by: a miss, from the clock, not the taps
+	assert_float((k.get("_ring") as UiHeatRing).mark_turn).is_equal(1.0)   # its dot where the untouched needle stopped
 	rt.ui.close_modal()
 	await get_tree().process_frame
 	k.stop_watching()
@@ -278,6 +280,24 @@ func test_the_ring_goes_when_the_queue_drawer_closes_on_an_empty_stove() -> void
 	await get_tree().process_frame
 	assert_str(k.phase).is_equal("idle")
 	assert_bool(ring.visible).is_false()
+
+## 不知火舞 on #131: a float rising from the ring's centre covered a dot on the upper half (an early tap at 1 o'clock, a
+## ring gone round at 12): those floats start at the ring's lower edge, short of the centre after their 48 px rise; a
+## dot on the lower half (a hit) keeps the centre.
+func test_a_judged_rings_float_starts_clear_of_its_dot() -> void:
+	var r := await _farmhouse()
+	var k: P0Kitchen = r.get("kitchen")
+	k.watch({"id": 3, "ms": 15000, "elapsed": 0, "heats": [{"at": 3000, "spin": 1600, "gold": 0.5, "width": 0.2}]})
+	k._process(0.0)
+	var ring: UiHeatRing = k.get("_ring")
+	var centre: Vector2 = k._ring_center()
+	var edge := UiHeatRing.OUTER * ring.scale.y
+	for t in [0.0, 0.1, 0.9, 1.0]:   # upper half
+		assert_vector(k.float_from(t)).override_failure_message(str(t)).is_equal_approx(centre + Vector2(0.0, edge), Vector2(0.01, 0.01))
+	for t in [0.4, 0.5, 0.6]:   # lower half
+		assert_vector(k.float_from(t)).override_failure_message(str(t)).is_equal_approx(centre, Vector2(0.01, 0.01))
+	assert_float(edge).is_greater(UiFloatText._RISE)   # risen, the float's foot stays below the centre
+	k.stop_watching()
 
 func test_queue_next_is_offered_only_from_cooking_lv5_with_nothing_waiting() -> void:
 	var r := await _farmhouse()
