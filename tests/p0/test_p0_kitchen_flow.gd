@@ -623,7 +623,7 @@ func test_a_level_up_gift_that_did_not_fit_is_said_after_its_banner_where_the_pl
 	rt.ui.clear_toast()
 	rt.session.state_changed.emit(rt.session.view, [{"kind": "parcel", "id": "crop_radish", "qty": 3, "key": "harvest:1:0", "waiting": false, "expires_in": 86400000},
 		{"kind": "xp", "skill": "farming", "amount": 40, "percent": 100},
-		{"kind": "level", "skill": "farming", "level": 3, "energy": 30, "gifts": [["seed_lettuce", 4]]},
+		{"kind": "level", "skill": "farming", "level": 3, "energy": 0, "gifts": [["seed_lettuce", 4]]},
 		{"kind": "parcel", "id": "seed_lettuce", "qty": 4, "key": "level:farming:3:0", "waiting": false, "expires_in": 86400000}])
 	for i in 3: await get_tree().process_frame
 	assert_int(rt.ui.root.find_children("*", "UiMomentBanner", true, false).size()).is_equal(1)

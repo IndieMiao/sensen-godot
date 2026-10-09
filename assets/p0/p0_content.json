@@ -2007,7 +2007,12 @@
     "name": "Farmer",
     "city": "Shanghai",
     "climate": "Subtropical",
-    "farm_name": "Farmer's Homestead"
+    "farm_name": "Farmer's Homestead",
+    "farm_at": [
+      31.204,
+      121.447
+    ],
+    "_farm_at": "The homestead's map point (sh_a r2 overlay_wgs84 center): map markers send a fish request to the beginner pond, else the nearest pond to it (SGODOT-232, q(48))."
   },
   "supplies": {
     "torch": {

@@ -24,26 +24,57 @@ func after_test() -> void:
 	for f in [STORE, TIPS]: DirAccess.remove_absolute(ProjectSettings.globalize_path(f))
 
 func test_the_accounts_first_level_up_teaches() -> void:
-	var b := P0Logic.level_banner(_view(), {"skill": "fishing", "level": 2, "energy": 50,
+	var b := P0Logic.level_banner(_view(), {"skill": "fishing", "level": 2, "energy": 0,
 		"gifts": [["bait_worm", 3], ["wild_herb", 3], ["recipe:dish_herb_grilled_fish", 1]]}, true)
 	# SKILL-3 (482:65)
 	assert_that([b.title, b.subtitle, b.detail, b.tip, b.action, b.seconds]).is_equal(["Fishing Lv2",
 		"Fine fish now stay on the hook", "New recipe: Herb Grilled Fish", P0Logic.LEVEL_TIP, "Use bait", 3.0])
-	assert_array(b.rewards.map(func(r): return r.text)).is_equal(["+50 Energy", "+3 Worm Bait", "+3 Wild Herb"])
+	# q(101): skill level-ups give no Energy, the gift's items alone (no `+50 Energy`)
+	assert_array(b.rewards.map(func(r): return r.text)).is_equal(["+3 Worm Bait", "+3 Wild Herb"])
 
 ## FARM-LV2 (1368:91797) with q(69): New for you · the crops, the gift as a pill, the next level on Tip.
 func test_farming_lv2_reads_like_the_accepted_frame() -> void:
 	var v := _view()
 	v.skills.farming = {"level": 2, "xp": 50}
-	var b := P0Logic.level_banner(v, {"skill": "farming", "level": 2, "energy": 30, "gifts": [["seed_carrot", 5]]})
+	var b := P0Logic.level_banner(v, {"skill": "farming", "level": 2, "energy": 0, "gifts": [["seed_carrot", 5]]})
 	assert_that([b.title, b.subtitle, b.detail, b.tip, b.seconds]).is_equal(["Farming Lv2",
 		"New for you · Carrot, Herb", "", "Next Lv3 · Potato, Chamomile, Compost · 100 XP", 1.5])
-	assert_array(b.rewards.map(func(r): return r.text)).is_equal(["+30 Energy", "+5 Carrot Seeds"])
+	assert_array(b.rewards.map(func(r): return r.text)).is_equal(["+5 Carrot Seeds"])   # q(101): no `+30 Energy`
 
 func test_a_later_level_says_what_opened_and_what_is_next() -> void:
-	var b := P0Logic.level_banner(_view(), {"skill": "farming", "level": 3, "energy": 30, "gifts": []})
+	var b := P0Logic.level_banner(_view(), {"skill": "farming", "level": 3, "energy": 0, "gifts": []})
 	assert_that([b.title, b.subtitle, b.detail, b.tip, b.action, b.seconds]).is_equal(["Farming Lv3",
 		"New for you · Potato, Chamomile, Compost", "", "Next Lv4 · Tomato, Chili, Row Hoe · 150 XP", "", 1.5])
+	assert_bool(b.rewards.is_empty()).is_true()   # a level without a gift has no reward row (q(101))
+
+## q(101) across versions: this client with a server from before it, which still pays the level-up Energy, says what was
+## paid (the bar moved, never unsaid); with one after it (0, or no field at all) there is no Energy pill — never `+0`.
+func test_the_energy_pill_shows_only_what_a_server_really_paid() -> void:
+	var gifts := [["bait_worm", 3], ["wild_herb", 3]]
+	var old := P0Logic.level_banner(_view(), {"skill": "fishing", "level": 2, "energy": 50, "gifts": gifts}, true)
+	assert_array(old.rewards.map(func(r): return r.text)).is_equal(["+50 Energy", "+3 Worm Bait", "+3 Wild Herb"])
+	for ev in [{"skill": "fishing", "level": 2, "energy": 0, "gifts": gifts}, {"skill": "fishing", "level": 2, "gifts": gifts}]:
+		var b := P0Logic.level_banner(_view(), ev, true)
+		assert_array(b.rewards.map(func(r): return r.text)).is_equal(["+3 Worm Bait", "+3 Wild Herb"])
+		assert_bool(b.rewards.any(func(r): return str(r.text).contains("Energy"))).is_false()
+	var later := P0Logic.level_banner(_view(), {"skill": "farming", "level": 3, "energy": 0, "gifts": []})
+	assert_bool(later.rewards.any(func(r): return str(r.text).contains("Energy"))).is_false()
+
+## On screen: a level without a gift shows the banner without its reward row (UiMomentBanner hides an empty one).
+func test_a_banner_without_rewards_shows_no_reward_row() -> void:
+	var ui := P0Ui.new()
+	ui.quick_store = STORE
+	ui.tips_path = TIPS
+	add_child(auto_free(ui))
+	await await_idle_frame()
+	ui.set_view(_view())
+	ui.show_level_up({"skill": "farming", "level": 3, "energy": 0, "gifts": []})
+	await await_idle_frame()
+	var banners := ui.find_children("*", "UiMomentBanner", true, false)
+	assert_int(banners.size()).is_equal(1)
+	var b: UiMomentBanner = banners[0]
+	assert_str(b.title).is_equal("Farming Lv3")
+	assert_bool(b._rewards_box.visible).is_false()
 
 func test_cooking_levels_name_their_slot_recipe_and_conveniences() -> void:
 	var four := P0Logic.level_banner(_view(), {"skill": "cooking", "level": 4, "energy": 0, "gifts": []})
@@ -66,7 +97,7 @@ func test_banners_queue_with_the_other_moments_and_use_bait_acts_in_place() -> v
 	ui.set_mode("fish")
 	ui.set_surface("pond")
 	ui.queue_card(func(): ui.show_catch("fish_crucian", 1, 15))
-	ui.queue_card(func(): ui.show_level_up({"skill": "fishing", "level": 2, "energy": 50, "gifts": [["bait_worm", 3]]}, true))
+	ui.queue_card(func(): ui.show_level_up({"skill": "fishing", "level": 2, "energy": 0, "gifts": [["bait_worm", 3]]}, true))
 	await await_idle_frame()
 	assert_int(ui.find_children("*", "UiMomentBanner", true, false).size()).is_equal(0)   # the catch card first
 	ui.close_modal()
@@ -118,7 +149,7 @@ func test_use_bait_waits_out_the_fishing_panel_and_then_works() -> void:
 	ui.set_view(_view())
 	ui.set_mode("fish")
 	ui.set_surface("busy")   # the fishing presentation
-	ui.queue_card(func(): ui.show_level_up({"skill": "fishing", "level": 2, "energy": 50, "gifts": [["bait_worm", 3]]}, true))
+	ui.queue_card(func(): ui.show_level_up({"skill": "fishing", "level": 2, "energy": 0, "gifts": [["bait_worm", 3]]}, true))
 	ui.queue_card(func(): ui.show_catch("fish_crucian", 1, 15))   # behind it in the queue
 	await await_idle_frame()
 	await await_idle_frame()

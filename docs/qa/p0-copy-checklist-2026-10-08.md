@@ -33,7 +33,7 @@
 | RECOVER 瓦片 · Cook | `4 fish in creel` · `Show kitchen ›` / 离家灰 `At home` |
 | RECOVER 瓦片 · Tea ★ | `0/3 today · 40 coins` → `1/3 today · 50 coins` → `2/3 today · 60 coins` / 灰 `Need 15 more coins` / `3/3 today` / `Energy full`；引导 `Show on map ›`（q(46)、q(48)） |
 | RECOVER 瓦片 · Rest ★ | `Available` / 灰 `Rested today` / `Ready in 1h 12m` / `After 2h away` / 离家 `At home`；引导 `Show bench ›`（q(46)） |
-| 体力不足（主行动键琥珀） | `Sow ×1 · Need 2 Energy` / `Cast · Need 5 Energy` / `Mine · Need 2 Energy` / `Enter mine · Need 2 Energy` |
+| 体力不足（主行动键琥珀） | `Sow ×1 · Need 2 Energy` / `Cast · Need 5 Energy` / `Mine · Need 2 Energy`；矿口入口卡 `Enter mine · Need 2 Energy` 与下行梯小卡 `Floor 2 · Need 2 Energy` 同样琥珀、按下弹 Energy 卡（主行动键不显示，q(102)） |
 
 ## 2. 农场、驿站、长椅、工作台、采集点
 
@@ -63,6 +63,9 @@
 | 逃走 ★ | 保护期内 `It got away · Energy refunded (9 left today)` / 保护期外 `It got away · 3 Energy back`（q(49)，不写 `protected left`） |
 | 挣脱 ★ | 卡 `Too strong` / `Fishing Lv4 needed · You: Lv3 · 30 XP to go` / `+3 Energy back`，无按钮；末行写实退：保护期内 `Energy refunded (8 left today)`，保护期外 `+3 Energy back`（q(55)）；第二次起飘字 `Got away · Lv4 · Energy refunded (8 left today)` / `Got away · Lv4 · 3 Energy back`（q(50)）；鱼竿不够 `Too heavy for your rod` / `Reed Rod · Fishing Lv3 · 80 coins` |
 | 鱼塘 pin 与卡 ★ | `Reed Pond · Beginner pond · 0.8 km` / 其他 `Pebble Pond · River · 2.3 km`；卡 `Beginner pond` + `A nearby pond for your first catch.`（仅 Reed Pond）/ `Distance 0.8 km` / `Recommended Lv1–3`（River `Lv4–5`）/ `Details ›` / `Go`；鱼表剪影写名字 + `Fishing Lv N`（q(48)） |
+| 图钉卡原因行 ★ | 图钉挂标记时副标题下一行：鱼塘 `Pond Catch · Pond Crucian 0/2`（只在已接下、鱼不够时）/ 集市 `Market Board · 2 requests`（1 条 `Market Board · 1 request`）/ 居民据点 `Pip · New request` / 交付点 `Pond Catch · Ready to deliver` / 据点 ◆ `New for you · Reed Rod` / 居民新对话 ◆ `Pip · New chat`；几件同时写一件加 ` · +1 more`（q(103)） |
+| 进塘与凑齐 ★ | 进挂 ! 的塘 Info toast `Pond Catch · Pond Crucian 0/2`（教学卡之后）；钓到要的鱼飘字 `Pond Catch 1/2`；凑够 Success toast `Pond Catch · 2/2 · Deliver at the Stall`，鱼塘 ! 消失、家图钉 ✓（q(103)） |
+| 委托的鱼还钓不上 ★ | 已接下但鱼的等级高于玩家 Fishing 等级：鱼塘不挂 !；Today 委托行小字 `Fishing Lv4 needed`，点开是那条鱼的四件事卡 `Fishing Lv4 needed · You: Lv2 · 230 XP to go`；委托卡交付按钮缺口 `Fishing Lv4 needed`（不写 `Need 1 more Rare fish`）（q(104)） |
 
 ## 4. 厨房与烹饪
 
@@ -83,10 +86,10 @@
 
 | 位置 | 应出现 |
 |---|---|
-| 矿口 | `Enter mine · 2 Energy` / `Continue run · Free` / 次级 `New run · 2 Energy` + `Current run will end · Runs today 1/2` / 灰 `New run · Clear Floor 2 first` |
-| 矿口用尽 ★ | 键面 `Enter mine · No runs left`；按下 toast `Mine runs today 2/2 · Resets in 9h 12m`（q(44)） |
+| 矿口 | 点击触发，主行动键不显示矿口动词（q(102)）；名字条 `The mine · Runs today 0/2`；入口卡 `Enter mine · 2 Energy` / `Continue run · Free` / 次级 `New run · 2 Energy` + `Current run will end · Runs today 1/2` / 灰 `New run · Clear Floor 2 first` |
+| 矿口用尽 ★ | 点矿口直接开 MINE-P0-8，灰按钮 `Mine runs today 2/2 · Resets in 9h 12m`；不出 `Enter mine · No runs left`（q(102)） |
 | 满包 ★ | `Enter mine · Bag full` / `Floor 2 · Bag full`（不扣体力，q(48)）；岩石灰 `Bag full · free a slot to mine`；主行动键 `Mine · Bag full` |
-| 楼梯与电梯 ★ | `Floor 2 · 2 Energy` / 灰 `Floor 2 · Clear Floor 1`（q(44)）/ 第 2 层上行 `Floor 1 · Free` / 出口 `Exit mine · Free` / `Elevator · Free`；面板 `Entrance · Free` / `Floor 1 · Free` / `Floor 2 · Here`（P0 没有 Express） |
+| 楼梯与电梯 ★ | 点击触发，主行动键不显示（q(102)）：下行梯名字条 `Floor 2 · 2 Energy`（到过只写 `Floor 2`），去没到过的层出小卡按钮 `Floor 2 · 2 Energy`；灰 `Floor 2 · Clear Floor 1 first`；上行梯名字条写目的地：第 1 层 `Farm`、第 2 层 `Floor 1`；电梯名字条 `Elevator`；面板 `Entrance · Free` / `Floor 1 · Free` / `Floor 2 · Here`（P0 没有 Express） |
 | 飘字 | `Floor 2 · −2 Energy` / `Floor 2 cleared · Elevator stop` / `Run ended at daily reset`；P0 没有 `Run complete`；MINE-P0-7 不写 `Unmined rocks on Floor 2 are lost`（q(46)） |
 | 火把 | `Light Torch · Free` / `Lit · this floor` |
 
