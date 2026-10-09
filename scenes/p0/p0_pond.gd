@@ -31,7 +31,8 @@ var _pinch = ElasticZoom.new(0.8, 1.4)   # the farm's range, rubber band past 0.
 var _zoom_at := Vector2.INF            # the last pinch centre (screen)
 var _band := Rect2()                   # the last camera band seen with no panel up
 var _opening := true                   # the opening shot: framed low in the band until the first step or pinch
-var _settling := false                 # after a cast: easing from its framing back into the walking band
+var _parked := false                   # after a cast: the camera holds still, the meadow clamp waits (不知火舞)
+var _settling := false                 # … then eases back in once the safe box first moves the camera
 ## The farm's pitch (camera unification, 奕星 2026-10-09); the pond keeps its own yaw 0, looking straight up the pond.
 const PITCH_DEG := FarmCamera.PITCH_DEG
 const DISTANCE := 40.0
@@ -201,8 +202,10 @@ func _begin_fishing(_id: String) -> void:
 func _end_fishing() -> void:
 	if is_instance_valid(view):
 		view.finish()
-		_cam_follow.hold()   # the cast's framing stays until the player walks …
-		_settling = true     # … eased into the walking band, which can sit a few metres off the fishing one (苏烈 on #143)
+		# The cast's framing stays (不知火舞 on #143): the camera holds until the safe box moves it, and only then does
+		# the walking band's clamp come back — eased, as from the far bank it can sit about 2 m off (苏烈 on #143).
+		_cam_follow.hold()
+		_parked = true
 	view = null
 	if actor: actor.lock(false)
 	if rt and rt.world == self: rt.ui.set_surface("pond")
@@ -237,8 +240,12 @@ func _settle(ev: Dictionary, delay: float, first_xp: int) -> void:
 
 # ---------------------------------------------------------------- camera (old pond framing + safe box)
 func _follow(_dt: float) -> void:
+	var before := _focus
 	_focus = _cam_follow.step(cam, _focus, actor.position, actor.mover.is_moving(), _dt)
 	if not _cam_follow.held: _opening = false   # walking: the safe box follows from where the opening left it
+	if _parked and not _focus.is_equal_approx(before):   # the safe box moved the camera: the clamp comes back, eased
+		_parked = false
+		_settling = true
 	if _pinch.step(_dt): _set_zoom(_pinch.value)   # springing back from past a limit, about the same point
 	else: _update_camera(_dt)
 
@@ -250,7 +257,7 @@ func _update_camera(dt := -1.0) -> void:
 	var view := get_viewport().get_visible_rect().size
 	cam.size = view_size(view, _zoom)
 	var band := _camera_band(rt.ui if rt != null else null)
-	if band.has_area():
+	if band.has_area() and not _parked:
 		if _opening: _focus = opening_focus(actor.position, cam.size, view, band)
 		var target := clamp_focus(_focus, cam.size, view, band, PondScenery.MEADOW)
 		if _settling and dt >= 0.0:
@@ -310,12 +317,16 @@ static func player_box(camera: Camera3D, player: Vector3, view: Vector2) -> Rect
 	var r := Rect2(feet, Vector2.ZERO).expand(head)
 	return Rect2(r.position.x - half, r.position.y, r.size.x + half * 2.0, r.size.y)
 
+## The band under the bite notice at its two-line height (the reel prompt): the notice grows from one line to two at the
+## bite, and the cast's framing must not drift with it.
+const NOTICE_H := 68.0
 func _fishing_band() -> Rect2:
 	var top: Control = panel._message_card
 	var bottom: Control = panel._guide
 	var view := get_viewport().get_visible_rect().size
 	if top == null or bottom == null: return Rect2(Vector2.ZERO, view)
-	var y0 := top.get_global_rect().end.y
+	var notice := top.get_global_rect()
+	var y0 := notice.position.y + maxf(notice.size.y, NOTICE_H)
 	return Rect2(0.0, y0, view.x, bottom.get_global_rect().position.y - y0)
 
 func _frame_fishing(dt: float) -> void:
@@ -362,14 +373,18 @@ func _set_zoom(value: float) -> void:
 	_zoom = value
 	if cam == null or not is_inside_tree(): return   # not placed yet: the next frame frames it
 	var before = ElasticZoom.ground_at(cam, _zoom_at, _focus.y)
-	_update_camera()
+	var dt := get_process_delta_time() if _settling else -1.0   # still easing back after a cast: keep easing
+	_update_camera(dt)
 	var d := ElasticZoom.shift(before, ElasticZoom.ground_at(cam, _zoom_at, _focus.y))
 	if d != Vector3.ZERO:
 		_focus += d
-		_update_camera()
+		_update_camera(dt)
 
 func p0_zoom(f: float, at := Vector2.INF) -> void:
 	if panel.visible: return   # the cast's framing holds while fishing
+	if _parked:   # a pinch after a cast brings the walking band's clamp back, eased like a step (不知火舞 on #143)
+		_parked = false
+		_settling = true
 	_zoom_at = at
 	_pinch.pinch(f)
 	_cam_follow.hold()   # the pinched framing stays until the player walks
@@ -430,6 +445,7 @@ func p0_dev(step: PackedStringArray) -> bool:
 ## A teleport frames like the opening shot.
 func _reopen() -> void:
 	_opening = true
+	_parked = false
 	_cam_follow.hold()
 
 func p0_until(name: String) -> bool:
