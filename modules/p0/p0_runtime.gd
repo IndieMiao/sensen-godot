@@ -12,9 +12,10 @@ extends Node
 ## p0_recenter(), p0_show_spot(where), p0_energy_verb() -> String, p0_near_resident() -> String, p0_dev(step) -> bool,
 ## p0_until(name) -> bool.
 
+const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
 const HomePanel = preload("res://scenes/p0/home/p0_home_panel.gd")
 const MAP_SCENE := "res://scenes/p0/p0_map.tscn"
-const HOME_PLACE := "Shanghai · Homestead"   # the farm's place chip (p0_farm PLACE)
+static var HOME_PLACE := P0City.chip("Homestead")   # the farm's place chip (p0_farm PLACE)
 
 static var _instance: P0Runtime
 
@@ -666,9 +667,11 @@ func _home_gap() -> String:
 
 ## P0_SHOT counters away from the outposts: the keeper ctx the outpost would pass (assets/p0/p0_outposts.json, SGODOT-227).
 static func _dev_ctx(role: String) -> Dictionary:
-	return {"tackle": {"keeper": "Finn", "place": "Xuhui Tackle Shop", "nearest": {"name": "Reed Pond", "site": "pond"}},
-		"tea": {"keeper": "Ama", "place": "Lotus Tea House"}, "post": {"keeper": "Sigrid", "place": "Huangpu Travel Post"},
-		"market": {"keeper": "Mei", "place": "Xuhui Market Square"}}.get(role, {})
+	var o := P0Outposts.by_role(role)
+	if o.is_empty(): return {}
+	var ctx := {"keeper": str(o.get("keeper", {}).get("name", "")), "place": str(o.get("name", ""))}
+	if o.has("nearest"): ctx["nearest"] = o.nearest
+	return ctx
 
 ## FARM-3-RESULT-2 (E-04): the bag filled during a harvest. What went in stays in, the rest stays ready on the field;
 ## the run says how far it got (`Harvest 12 of 30 · bag full`, of the plants ready when it started) and the Error toast
@@ -916,7 +919,7 @@ func _dev_screen(which: String) -> void:
 			_on_blocked("maintenance", {"back_at": at})
 		"update": _on_blocked("update_required", {"url": "https://example.test/p0demo.apk"})
 		"scene", "placefail":
-			var layer := _scene_overlay("res://scenes/p0/p0_pond.tscn", {"pond_id": "pond_shanghai_05"}) as P0LoadingLayer
+			var layer := _scene_overlay("res://scenes/p0/p0_pond.tscn", {"pond_id": P0City.beginner_pond()}) as P0LoadingLayer
 			add_child(layer)
 			layer.screen.modulate.a = 1.0
 			if which == "placefail": layer.failed()

@@ -15,6 +15,7 @@ extends Node3D
 signal facility_tapped(name: String)
 signal left()
 
+const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
 const FarmCamera = preload("res://modules/farm/farm_camera.gd")
 const BASIC_ROOM_ART := "res://scenes/basic_room/basic_room_art.tscn"
 const BASIC_ROOM_LAYOUT := "res://assets/rooms/basic_room/layout.json"
@@ -37,7 +38,6 @@ const BADGE_SCRIPT := "res://scenes/ui_kit/ui_status_badge.gd"   # UiStatusBadge
 var art_scene: PackedScene
 var layout_path := BASIC_ROOM_LAYOUT
 var anchors_path := ""
-var city := "Shanghai"
 var place_name := ""
 ## Where the door leads, for the world prompts (SGODOT-250: i-door + "Map" / "Farm").
 var exit_to := "Map"
@@ -149,7 +149,7 @@ func _ready() -> void:
 	if use_runtime:
 		rt = P0Runtime.ensure()
 		rt.attach(self)
-		rt.ui.set_place(city + " · " + place_name)
+		rt.ui.set_place(P0City.chip(place_name))
 
 func _exit_tree() -> void:
 	if rt: rt.detach(self)
@@ -984,7 +984,7 @@ func resume() -> void:
 	cam.make_current()
 	if rt:
 		rt.attach(self)
-		rt.ui.set_place(city + " · " + place_name)
+		rt.ui.set_place(P0City.chip(place_name))
 
 # ---------------------------------------------------------------- light sampling across cameras (dev)
 ## Camera unification step 2's light check (美术总监: the same face of the same object, the signed render against the

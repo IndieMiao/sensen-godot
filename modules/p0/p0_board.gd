@@ -1,12 +1,11 @@
 class_name P0Board
 extends RefCounted
+const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
 ## The counter drawer's board page (SGODOT-224; BOARD-READY / SHORT / DONE 1498:96193 / 96574 / 96382, E-11; the
 ## Stall Board uses the same rows): server facts (view.boards[id].slots, view.quotas) as UiBoardCard data and the
 ## page's fact lines. A request's command follows the frames: ready to hand in → Deliver (taken or not, q(48)); open
 ## → Track (accept); tracked and short → the gap on the button (LOCK-10).
 
-## P0 is set in Shanghai (the map: "P0 is set in Shanghai"; rooms default to it too).
-const CITY := "Shanghai"
 
 ## The board a counter shows: the Homestead Stall's Stall Board, the market's Market Board.
 static func board_id(role: String) -> String:
@@ -125,7 +124,7 @@ static func detail(view: Dictionary, board: String, id: String) -> Dictionary:
 		var noun := _noun(view, r)
 		# 李白 q(68): the stall's own sentence from BOARD-1; the Market Board takes deliveries at any market of the home
 		# city (§9.6.5).
-		var where := "the Homestead Stall" if board == "stall" else "any %s market" % CITY
+		var where := "the Homestead Stall" if board == "stall" else "any %s market" % P0City.city_name()
 		var d := {title = c.title, state = c.status, needs = c.needs, delivery = c.reward, next = {}, item = item,
 			tracked = str(r.get("status", "")) == "accepted", noun = noun, go = _go(view, r, str(items[0]) if not items.is_empty() else ""),
 			effect = "Bring the required %s to %s." % [noun, where]}

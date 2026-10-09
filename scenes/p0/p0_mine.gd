@@ -6,11 +6,12 @@ extends Node3D
 ## are facilities (SGODOT-266, user on 263 ③): an icon button and strip each (P0WorldPrompts.mine_facility), a tap
 ## walks the player up, then a free move goes at once and a new floor's fee waits on the EntryCard's button.
 
+const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
 const Art = preload("res://modules/mining/mine_art.gd")
 const Layout = preload("res://modules/mining/mine_layout.gd")
 const ElasticZoom = preload("res://modules/p0/p0_elastic_zoom.gd")
 const FarmCamera = preload("res://modules/farm/farm_camera.gd")
-const PLACE := "Shanghai · Mine · Floor %d"
+var PLACE := P0City.chip("Mine · Floor %d")
 const REACH := 1.7          # m: a rock in front of the player within this distance; a facility used from this close
 const CARD_REACH := 2.4     # m: a facility's strip opens, its EntryCard stays (the farm's mouth reach)
 const BREAK_S := 0.45       # rock break: shake, shrink, chips
