@@ -375,7 +375,7 @@ func test_the_pond_card_reads_back_to_at_the_pond_the_player_is_at() -> void:
 	m.p0_dev(PackedStringArray(["pondcard", NEAREST_POND]))
 	var card: Control = rt.ui._modal
 	assert_str(rt.ui.modal_kind).is_equal("pond_card")
-	assert_str((card.find_child("Primary", true, false) as UiCommandButton).label).is_equal("Back to Reed Pond")
+	assert_str((card.find_child("Primary", true, false) as UiCommandButton).label).is_equal("Back to Fern Pond")
 	assert_array(card.find_children("*", "UiFactRow", true, false).map(func(f): return str((f as UiFactRow).label))).not_contains(["Distance"])
 	rt.ui.close_modal()
 	await get_tree().process_frame
