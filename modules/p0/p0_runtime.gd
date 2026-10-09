@@ -1036,6 +1036,25 @@ func _dev_shot(dt: float) -> void:
 				ui.set_view(session.current())
 				ui.set_action(P0Logic.fish_action(session.current(), ""))
 			"creeltap": ui._creel.pressed.emit()   # a tap on the creel badge
+			"waitsoup":   # the first session's end, locally (A3 / q(95)): radishes and lettuce growing, the soup page known, one crucian
+				var wv: Dictionary = session.view.duplicate(true)
+				var plots: Array = []
+				for i in 30: plots.append({"id": i, "state": "growing", "crop": "crop_radish" if i < 20 else "crop_lettuce",
+					"xp_pct": 100, "ready_in": 12720000 if i < 20 else 27960000})
+				wv["plots"] = plots
+				wv["bag"] = wv.get("bag", {}).duplicate()
+				wv.bag["slots"] = [{"id": "fish_crucian", "qty": 1}, {"id": "dish_herb_grilled_fish", "qty": 1}]
+				for pg in wv.get("cooking", {}).get("cookbook", []):
+					if str(pg.get("id", "")) == "dish_fish_soup":
+						pg.merge({"known": true, "cooked": false, "can_cook": false, "name": "Fresh Fish Soup", "in": ["W1", "F1"]}, true)
+					elif str(pg.get("id", "")) in ["dish_grilled_crucian", "dish_herb_grilled_fish"]: pg.merge({"known": true, "cooked": true}, true)
+					else: pg["can_cook"] = false   # the made-up bag holds one crucian: nothing else cooks
+				wv["req_done"] = [P0Guide.TUTORIAL]   # the first session is over: its guide rows are done
+				if wv.get("stall", {}).get("board", {}).has("requests"):
+					wv.stall.board.requests = wv.stall.board.requests.filter(func(r): return str(r.get("id", "")) != P0Guide.TUTORIAL)
+				session.view = wv
+				session.busy = true   # dev only: no answer replaces the made-up view
+				ui.set_view(session.current())
 			"restcard":   # restcard[:used] — the bench sheet (FARM-7-2); `used` marks today's rest taken, locally (q(96) shots)
 				if step.size() > 1 and step[1] == "used":
 					var rv: Dictionary = session.view.duplicate(true)

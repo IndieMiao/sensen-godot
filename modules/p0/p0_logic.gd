@@ -993,6 +993,9 @@ static func today_rows(view: Dictionary) -> Array:
 	if not ready.is_empty() and bool(level.get("now", false)):
 		now_rows.append(_row("Farming Lv %d with this harvest" % int(level.level), "hoe", ""))
 	if sown > 0: now_rows.append(_row("Water %d sown plot%s · Free" % [sown, "" if sown == 1 else "s"], "water", "plots"))
+	# A known recipe waiting on one crop in the ground (A3 / q(95)) keeps the fish it needs: the stove-free line counts
+	# only the rest, and none when the soup takes them all.
+	var wait := P0KitchenLogic.waiting_on_crops(view)
 	var stove = view.get("cooking", {}).get("stove", null)
 	if stove is Dictionary:
 		var dish := item_name(view, str(stove.dish)) if stove.get("dish", null) != null else "Your dish"
@@ -1003,6 +1006,7 @@ static func today_rows(view: Dictionary) -> Array:
 		var fish := 0
 		for st in view.get("bag", {}).get("slots", []):
 			if str(st.get("id", "")).begins_with("fish_") and item(view, str(st.id)).get("cook", true): fish += int(st.get("qty", 0))
+		fish -= int(wait.get("fish", 0))
 		if fish > 0 and not guided_stove: now_rows.append(_row("%d fish · the stove is free" % fish, "pot", "stove"))
 	timed.sort_custom(func(a, b): return float(a[0]) < float(b[0]))
 	var rows: Array = now_rows.duplicate()
@@ -1015,6 +1019,19 @@ static func today_rows(view: Dictionary) -> Array:
 		for i in rows.size():
 			if str(rows[i].go) == "plots" and at < 0: at = i
 		if at >= 0: rows.insert(at + 1, _row("Farming Lv %d at your first harvest" % int(level.level), "hoe", ""))
+	# The waiting recipe's line (§14.2 end, §14.5; 李白 A3 / q(95)): `Fresh Fish Soup · when radishes are ready`, the first
+	# session's closing hook. Like the level's info row it goes with its source (q(69)): right after its crop's countdown
+	# and that crop's level row, so it is the third line at the end of the first session.
+	if not wait.is_empty():
+		var line := "%s · when %s are ready" % [str(wait.name), plural(item_name(view, str(wait.crop))).to_lower()]
+		if not rows.any(func(r): return r.line == line):
+			var at := -1
+			for i in rows.size():
+				if str(rows[i].icon) == str(wait.crop) and str(rows[i].go) == "plots": at = i
+			if at >= 0 and at + 1 < rows.size() and str(rows[at + 1].icon) == "hoe" and str(rows[at + 1].go) == "": at += 1
+			var row := _row(line, str(wait.page), "plots")
+			if at >= 0: rows.insert(at + 1, row)
+			elif rows.size() < 3: rows.append(row)
 	var best := ""
 	var best_gap := 1 << 30
 	for key in ["farming", "fishing", "cooking"]:
