@@ -36,7 +36,7 @@ func test_world_anchor_keeps_the_pointer_on_a_facility_at_the_screen_edge() -> v
 	_host(layer)
 	layer.size = Vector2(360, 640)
 	layer.camera = cam
-	var card := UiEntryCard.new("New run · 2 Energy", "Current run will end · Runs today 1/2")
+	var card := UiEntryCard.new("Floor 2 · 2 Energy")
 	layer.track(card, stove, {clamp = true})
 	await _settle()
 	# Near the right edge the card is clamped inside; its pointer still ends over the gate, as far right as the card
@@ -85,28 +85,77 @@ func test_caption_pill_hangs_under_the_badge() -> void:
 	assert_bool(b._pill.visible).is_false()
 	assert_vector(b.get_combined_minimum_size()).is_equal(Vector2(28, 28))
 
-func test_entry_card_matches_the_main() -> void:
-	var c := _host(UiEntryCard.new("New run · 2 Energy", "Current run will end · Runs today 1/2")) as UiEntryCard
+## SGODOT-266 (不知火舞 9ce583a8): the mouth's card — title row with the fact in secondary, the map card's Go as the main
+## button across the card, New run as a secondary text button 44 high and its note right under it.
+func test_entry_card_reads_title_main_then_second() -> void:
+	var c := _host(UiEntryCard.new("Continue run · Free")) as UiEntryCard
+	c.title = "The mine"
+	c.title_fact = "Runs today 1/2"
+	c.second = "New run · 2 Energy"
+	c.note = "Current run will end"
 	await _settle()
-	assert_float(c._card.size.y).is_between(50.0, 58.0)     # main 54 high: 8 + 13 × 1.35 + 2 + 11 + 9
-	assert_float(c._card.size.x).is_between(200.0, 240.0)    # hugs the copy, 220 in the main
-	assert_bool(c._caption.visible).is_true()
-	assert_object(c._action.get_theme_color(&"font_color")).is_equal(UiTokens.COLOR_PRIMARY)
+	assert_bool(c._title_row.visible).is_true()
+	assert_object(c._title.get_theme_color(&"font_color")).is_equal(UiTokens.COLOR_TEXT)
+	assert_object(c._title_fact.get_theme_color(&"font_color")).is_equal(UiTokens.COLOR_SECONDARY)
+	assert_str(c.main_text()).is_equal("Continue run · Free")
+	assert_str(str(c._main.theme_type_variation)).is_equal(str(UiTokens.BUTTON_CMD_PRIMARY))
+	assert_float(c._main.size.x).is_equal_approx(c._card.size.x - 24.0, 0.5)   # across the card, 12 in from each side
+	assert_float(c._main.size.y).is_equal(float(UiTokens.SIZE_COMMAND))
+	assert_float(c.second_rect().size.y).is_greater_equal(float(UiTokens.SIZE_TOUCH))
+	assert_bool(c.note_shown()).is_true()
+	assert_float(c._note.get_global_rect().position.y).is_less(c.second_rect().end.y)   # inside the second's 44
+	assert_float(c._card.size.x).is_greater_equal(UiEntryCard.MIN_WIDTH)
 	assert_float(c.pointer_tip_x()).is_equal_approx(c._card.size.x * 0.5, 0.5)
 	assert_float(c.get_combined_minimum_size().y).is_equal(c._card.size.y + UiTokens.SIZE_POINTER_H)
 
-func test_unavailable_entry_card_writes_the_reason_and_drops_the_caption() -> void:
-	var c := _host(UiEntryCard.new("New run · Clear Floor 2 first", "Current run will end", UiEntryCard.State.UNAVAILABLE)) as UiEntryCard
+## A ladder's card: no title, one button (the destination is on it).
+func test_a_ladder_card_is_one_button_without_a_title() -> void:
+	var c := _host(UiEntryCard.new("Floor 2 · 2 Energy")) as UiEntryCard
 	await _settle()
-	assert_bool(c._caption.visible).is_false()
-	assert_object(c._action.get_theme_color(&"font_color")).is_equal(UiTokens.COLOR_SECONDARY)
+	assert_bool(c._title_row.visible).is_false()
+	assert_bool(c.second_shown()).is_false()
+	assert_float(c._card.size.y).is_equal_approx(float(UiTokens.SIZE_COMMAND) + 24.0, 0.5)
+
+## LOCK-10: grey is CmdBlocked with the reason and still takes the tap; amber (short of Energy) keeps the whole line.
+func test_unavailable_and_amber_main() -> void:
+	var c := _host(UiEntryCard.new("Floor 2 · Clear Floor 1 first", UiEntryCard.State.UNAVAILABLE)) as UiEntryCard
+	await _settle()
+	assert_str(str(c._main.theme_type_variation)).is_equal(str(UiTokens.BUTTON_CMD_BLOCKED))
+	assert_str(c.main_text()).is_equal("Floor 2 · Clear Floor 1 first")
+	assert_bool(c.is_amber()).is_false()
+	var hits := [0]
+	c.pressed.connect(func(): hits[0] += 1)
+	assert_str(c.tap_at(c.main_rect().get_center())).is_equal("main")
+	assert_int(hits[0]).is_equal(1)   # the owner toasts why
 	c.state = UiEntryCard.State.AVAILABLE
+	c.action = "Floor 2 · Need 2 Energy"
 	c.amber = true
-	assert_object(c._action.get_theme_color(&"font_color")).is_equal(UiTokens.COLOR_WARNING)
-	assert_bool(c._caption.visible).is_true()   # short of Energy keeps the consequence (不知火舞 on #45)
+	await _settle()
+	assert_bool(c.is_amber()).is_true()
+	assert_str(c.main_text()).is_equal("Floor 2 · Need 2 Energy")
+	var box := c._main.get_theme_stylebox(&"normal")
+	assert_object(box.get(&"bg_color")).is_equal(UiTokens.COLOR_AMBER)
+	assert_object(c._main.get_theme_color(&"font_color")).is_equal(UiTokens.COLOR_TEXT)
+	c.amber = false
+	assert_bool(c.is_amber()).is_false()
+
+## The second: secondary ink, amber short of Energy, grey with its reason and then no note.
+func test_second_states_and_note() -> void:
+	var c := _host(UiEntryCard.new("Continue run · Free")) as UiEntryCard
+	c.second = "New run · 2 Energy"
+	c.note = "Current run will end"
+	await _settle()
+	assert_object(c._second.get_theme_color(&"font_color")).is_equal(UiTokens.COLOR_SECONDARY)
+	c.second_amber = true
+	assert_object(c._second.get_theme_color(&"font_color")).is_equal(UiTokens.COLOR_WARNING)
+	assert_bool(c.note_shown()).is_true()   # short of Energy keeps the consequence (不知火舞 on #45)
+	c.second = "New run · Clear Floor 2 first"
+	c.second_state = UiEntryCard.State.UNAVAILABLE
+	assert_object(c._second.get_theme_color(&"font_color")).is_equal(UiTokens.COLOR_DISABLED_INK)
+	assert_bool(c.note_shown()).is_false()
 
 func test_entry_card_pointer_right_sits_21_px_in() -> void:
-	var c := _host(UiEntryCard.new("New run · 2 Energy", "Current run will end · Runs today 1/2")) as UiEntryCard
+	var c := _host(UiEntryCard.new("Floor 2 · 2 Energy")) as UiEntryCard
 	await _settle()
 	var w := c._card.size.x
 	c.point_at(w + 80.0)
@@ -114,30 +163,43 @@ func test_entry_card_pointer_right_sits_21_px_in() -> void:
 	c.point_at(-80.0)
 	assert_float(c.pointer_tip_x()).is_equal(21.0 + 7.0)
 
-func test_entry_card_is_one_button_that_ignores_drags() -> void:
-	var c := _host(UiEntryCard.new("New run · 2 Energy")) as UiEntryCard
-	var hits := [0]
-	c.pressed.connect(func(): hits[0] += 1)
-	c._on_input(_mouse(Vector2(30, 12), true))
-	c._on_input(_mouse(Vector2(32, 14), false))
-	assert_int(hits[0]).is_equal(1)
-	c._on_input(_mouse(Vector2(30, 12), true))
-	c._on_input(_mouse(Vector2(30 + GestureArbiter.TAP_SLOP + 1, 12), false))
-	assert_int(hits[0]).is_equal(1)
+## A real tap on a part (down and up on it within the slop) is that part's; a drag or a tap between them is nothing.
+func test_entry_card_taps_its_parts_and_ignores_drags() -> void:
+	var c := _host(UiEntryCard.new("Continue run · Free")) as UiEntryCard
+	c.second = "New run · 2 Energy"
+	await _settle()
+	var hits := {"main": 0, "second": 0}
+	c.pressed.connect(func(): hits.main += 1)
+	c.second_pressed.connect(func(): hits.second += 1)
+	var main := c.main_rect().get_center() - c._card.global_position
+	var second := c.second_rect().get_center() - c._card.global_position
+	c._on_input(_mouse(main, true))
+	c._on_input(_mouse(main + Vector2(2, 2), false))
+	assert_int(hits.main).is_equal(1)
+	c._on_input(_mouse(second, true))
+	c._on_input(_mouse(second, false))
+	assert_int(hits.second).is_equal(1)
+	c._on_input(_mouse(main, true))
+	c._on_input(_mouse(main + Vector2(GestureArbiter.TAP_SLOP + 1, 0), false))
+	assert_int(hits.main).is_equal(1)
+	assert_str(c.tap_at(Vector2(-50, -50))).is_equal("")
+	assert_str(c.tap_at(c._card.global_position + Vector2(4, 4))).is_equal("card")   # its padding: nothing
+	assert_int(hits.main + hits.second).is_equal(2)
 
 func test_passive_entry_card_lets_the_scene_take_the_press() -> void:
-	var c := _host(UiEntryCard.new("New run · 2 Energy")) as UiEntryCard
+	var c := _host(UiEntryCard.new("Floor 2 · 2 Energy")) as UiEntryCard
 	c.passive = true
 	assert_int(c._card.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
+	assert_int(c._main.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
 	await _settle()
 	assert_float(c.hit_rect().size.y).is_greater_equal(float(UiTokens.SIZE_TOUCH))
 
 func test_entry_card_setters_skip_unchanged_values() -> void:
-	var c := _host(UiEntryCard.new("New run · 2 Energy", "Current run will end")) as UiEntryCard
+	var c := _host(UiEntryCard.new("Floor 2 · 2 Energy")) as UiEntryCard
 	await _settle()
-	c._action.remove_theme_color_override(&"font_color")   # a restyle would put it back
-	c.action = "New run · 2 Energy"
+	c._second.remove_theme_color_override(&"font_color")   # a restyle would put it back
+	c.action = "Floor 2 · 2 Energy"
 	c.state = UiEntryCard.State.AVAILABLE
-	assert_bool(c._action.has_theme_color_override(&"font_color")).is_false()
+	assert_bool(c._second.has_theme_color_override(&"font_color")).is_false()
 	c.state = UiEntryCard.State.UNAVAILABLE
-	assert_object(c._action.get_theme_color(&"font_color")).is_equal(UiTokens.COLOR_SECONDARY)
+	assert_str(str(c._main.theme_type_variation)).is_equal(str(UiTokens.BUTTON_CMD_BLOCKED))

@@ -46,22 +46,37 @@ static func _floor(view: Dictionary, n: int) -> Dictionary:
 
 # --- Mine mouth (farm side) ---
 
-## Main action key at the farm's mine mouth (LOCK-21): Continue run · Free with an unfinished run, else Enter mine.
-static func mine_entry_action(view: Dictionary) -> Dictionary:
-	return _with_pick(view, _mine_entry_action(view))
-
-static func _mine_entry_action(view: Dictionary) -> Dictionary:
+## The EntryCard at the farm's mine mouth (SGODOT-266; 不知火舞 2e580bed / 9ce583a8, copy 李白 q(102)): the player
+## tapped the mouth and walked up to it; entering costs the first floor's fee, confirmed here, never by the tap or the
+## main key (LOCK-21 复议 2026-10-09). {title, fact, main, second, note}: title `The mine` · fact `Runs today 0/2`;
+## main {label, enabled, amber, cmd, need, verb, toast} — `Enter mine · 2 Energy`, amber `Enter mine · Need 2 Energy`
+## (the Energy card), grey `Enter mine · Bag full` (q(48)); with an unfinished run `Continue run · Free` and the second,
+## `New run · 2 Energy` (mine_entry_card) with its note `Current run will end`. With today's runs used up and none
+## unfinished there is no card: the mouth opens MINE-P0-8 (mine_runs_spent).
+static func mine_mouth_card(view: Dictionary) -> Dictionary:
 	var mine: Dictionary = view.get("mine", {})
 	var fee := int(mine.get("floor_energy", 2))
-	if mine.get("run", null) != null:
-		return _key("pickaxe", "Continue run", "Free", {"type": "mine_enter"})
 	var runs: Dictionary = mine.get("runs", {})
-	if int(runs.get("used", 0)) >= int(runs.get("limit", 2)):
-		return _unavailable("pickaxe", "Enter mine", "No runs left", _runs_line(mine))
-	if not mine.get("entry_bag_ok", true): return _unavailable("pickaxe", "Enter mine", "Bag full", BAG_FULL)   # q(48)
-	if _energy(view) < fee:
-		return _key("pickaxe", "Enter mine", "Need %d Energy" % fee, {"type": "energy_card"}, true, true, fee)
-	return _key("pickaxe", "Enter mine", "%d Energy" % fee, {"type": "mine_enter"}, true, false, fee)
+	var card := {"title": "The mine", "fact": "Runs today %d/%d" % [int(runs.get("used", 0)), int(runs.get("limit", 2))],
+		"main": {}, "second": {}, "note": ""}
+	if mine.get("run", null) != null:
+		card.main = _button("Continue run · Free", {"type": "mine_enter"})
+		var e := mine_entry_card(view)
+		card.second = {"label": e.label, "enabled": e.enabled, "amber": e.amber, "cmd": e.cmd, "toast": e.get("toast", ""),
+			"need": fee, "verb": "New run"}
+		card.note = str(e.line2)
+	elif not mine.get("entry_bag_ok", true):   # q(48): no fee into a floor whose first rock wouldn't fit
+		card.main = _button("Enter mine · Bag full", {}, false)
+	elif _energy(view) < fee:
+		card.main = _button("Enter mine · Need %d Energy" % fee, {"type": "energy_card"}, true, true, fee, "Enter mine")
+	else:
+		card.main = _button("Enter mine · %d Energy" % fee, {"type": "mine_enter"}, true, false, fee, "Enter mine")
+	return card
+
+## One card button {label, enabled, amber, cmd, need, verb, toast}: verb names the action on the Energy card; a grey
+## press toasts exactly its label (不知火舞 on 266, 5181bba0).
+static func _button(label: String, cmd: Dictionary, enabled := true, amber := false, need := 0, verb := "") -> Dictionary:
+	return {"label": label, "enabled": enabled, "amber": amber, "cmd": cmd, "need": need, "verb": verb, "toast": "" if enabled else label}
 
 ## Today's runs are used up and none is left unfinished: the mouth's tap opens MINE-P0-8 (不知火舞 on 231, int11 ②).
 static func mine_runs_spent(view: Dictionary) -> bool:
@@ -69,8 +84,9 @@ static func mine_runs_spent(view: Dictionary) -> bool:
 	var runs: Dictionary = mine.get("runs", {})
 	return mine.get("run", null) == null and int(runs.get("used", 0)) >= int(runs.get("limit", 2))
 
-## The EntryCard over the mine mouth (MINE-P0-5): only with an unfinished run; a secondary text button to start over.
-## {show, label, line2, enabled, amber, cmd}; line2 is empty when unavailable (the reason is the label).
+## The mouth card's second button with an unfinished run (MINE-P0-5, mine_mouth_card): `New run · 2 Energy` to start
+## over. {show, label, line2, enabled, amber, cmd}; line2, the note under it, is empty when unavailable (the reason is
+## the label).
 static func mine_entry_card(view: Dictionary) -> Dictionary:
 	var mine: Dictionary = view.get("mine", {})
 	var run = mine.get("run", null)
@@ -84,8 +100,8 @@ static func mine_entry_card(view: Dictionary) -> Dictionary:
 		"no_runs":
 			return {"show": true, "label": _runs_line(mine), "line2": "", "enabled": false, "amber": false, "cmd": {}, "toast": _runs_line(mine)}
 	if not mine.get("entry_bag_ok", true):   # q(48): no fee into a floor whose first rock wouldn't fit
-		return {"show": true, "label": "New run · Bag full", "line2": "", "enabled": false, "amber": false, "cmd": {}, "toast": BAG_FULL}
-	var consequence := "Current run will end · Runs today %d/%d" % [int(runs.get("used", 0)), int(runs.get("limit", 2))]
+		return {"show": true, "label": "New run · Bag full", "line2": "", "enabled": false, "amber": false, "cmd": {}, "toast": "New run · Bag full"}
+	var consequence := "Current run will end"   # Runs today sits in the card's title row (不知火舞 9ce583a8)
 	if _energy(view) < fee:   # warning action line, the consequence kept, the tap opens the Energy card (不知火舞 on #45)
 		return {"show": true, "label": "New run · Need %d Energy" % fee, "line2": consequence, "enabled": true, "amber": true, "cmd": {"type": "energy_card"}}
 	return {"show": true, "label": "New run · %d Energy" % fee, "line2": consequence, "enabled": true, "amber": false, "cmd": {"type": "mine_new_run"}}
@@ -172,9 +188,10 @@ static func mine_status(view: Dictionary, n: int, just_entered := false) -> Stri
 
 # --- Inside the mine ---
 
-## Main action key in the mine. ctx: {floor: int, target: "rock" | "stairs" | "up" | "exit" | "elevator" | "", rock: int,
-## item: String} where item is the quick-bar selection ("torch" or ""). Rocks and stairs never respond to taps (LOCK-02).
-## Every 0-Energy move reads "· Free" (Exit mine · Free, Floor 1 · Free; Li Bai q(46)).
+## Main action key in the mine: Mining itself only (SGODOT-266, user on 263 ③). ctx: {floor: int, target: "rock" | "",
+## rock: int, item: String} where item is the quick-bar selection ("torch" or ""). Rocks never respond to taps (LOCK-02);
+## the ladders and the elevator are tapped like any facility (mine_facility), so the key never names them.
+## A 0-Energy move reads "· Free" (Light Torch · Free; Li Bai q(46)).
 static func mine_action(view: Dictionary, ctx: Dictionary) -> Dictionary:
 	return _with_pick(view, _mine_action(view, ctx))
 
@@ -186,33 +203,48 @@ static func _mine_action(view: Dictionary, ctx: Dictionary) -> Dictionary:
 	if str(ctx.get("item", "")) == "torch":
 		if floor.get("lit", false): return _key("torch", "Light Torch", "Lit", {}, false)
 		return _key("torch", "Light Torch", "Free", {"type": "mine_torch", "floor": n})
-	var fee := int(mine.get("floor_energy", 2))
-	match str(ctx.get("target", "")):
-		"elevator":
-			return _key("elevator", "Elevator", "Free", {"type": "elevator"})
-		"exit":
-			return _key("stairs", "Exit mine", "Free", {"type": "mine_exit"})
-		"up":
-			return _key("stairs", "Floor %d" % (n - 1), "Free", {"type": "mine_floor", "floor": n - 1})
-		"stairs":
-			var next := _floor(view, n + 1)
-			if next.is_empty(): return _key("stairs", "Stairs", "Deepest floor", {}, false)
-			var verb := "Floor %d" % (n + 1)
-			if next.get("paid", false): return _key("stairs", verb, "Free", {"type": "mine_floor", "floor": n + 1})
-			if not floor.get("cleared", false): return _unavailable("stairs", verb, "Clear Floor %d" % n, "%s · Clear this floor first" % verb)
-			if not next.get("bag_ok", true): return _unavailable("stairs", verb, "Bag full", BAG_FULL)   # q(48)
-			if _energy(view) < fee: return _key("stairs", verb, "Need %d Energy" % fee, {"type": "energy_card"}, true, true, fee)
-			return _key("stairs", verb, "%d Energy" % fee, {"type": "mine_floor", "floor": n + 1}, true, false, fee)
-		"rock":
-			var rock := int(ctx.get("rock", -1))
-			var broken: Array = floor.get("broken", [])
-			var cost := int(mine.get("rock_energy", 2))
-			if rock < 0 or rock >= broken.size() or bool(broken[rock]): return _key("pickaxe", "Mine", "Walk to a rock", {}, false)
-			if not floor.get("bag_ok", true): return _unavailable("pickaxe", "Mine", "Bag full", BAG_FULL)
-			if _energy(view) < cost: return _key("pickaxe", "Mine", "Need %d Energy" % cost, {"type": "energy_card"}, true, true, cost)
-			return _key("pickaxe", "Mine", "%d Energy" % cost, {"type": "mine_rock", "floor": n, "rock": rock}, true, false, cost)
+	if str(ctx.get("target", "")) == "rock":
+		var rock := int(ctx.get("rock", -1))
+		var broken: Array = floor.get("broken", [])
+		var cost := int(mine.get("rock_energy", 2))
+		if rock < 0 or rock >= broken.size() or bool(broken[rock]): return _key("pickaxe", "Mine", "Walk to a rock", {}, false)
+		if not floor.get("bag_ok", true): return _unavailable("pickaxe", "Mine", "Bag full", BAG_FULL)
+		if _energy(view) < cost: return _key("pickaxe", "Mine", "Need %d Energy" % cost, {"type": "energy_card"}, true, true, cost)
+		return _key("pickaxe", "Mine", "%d Energy" % cost, {"type": "mine_rock", "floor": n, "rock": rock}, true, false, cost)
 	if int(floor.get("left", 0)) == 0: return _key("pickaxe", "Mine", "Floor cleared", {}, false)
 	return _key("pickaxe", "Mine", "Walk to a rock", {}, false)
+
+## The mine's facilities, tapped and walked to (SGODOT-266; 不知火舞's spec 2e580bed, 197 LOCK-21 复议 2026-10-09):
+## kind "exit" (floor 1's up ladder), "up" (the up ladder below floor 1), "stairs" (the down ladder), "elevator".
+## What arriving does: {card: false, cmd} goes at once — the free moves (Exit, Floor 1, a floor paid this run) and
+## the elevator's stop panel; {card: true, label, enabled, amber, cmd, need, toast} shows the EntryCard over the ladder
+## with the fee button (`Floor 2 · 2 Energy`): amber `Need 2 Energy` opens the Energy card, grey says why (LOCK-10).
+## The fee itself is unchanged: 2 per new floor, 0 for ladders and the elevator.
+static func mine_facility(view: Dictionary, n: int, kind: String) -> Dictionary:
+	var mine: Dictionary = view.get("mine", {})
+	var fee := int(mine.get("floor_energy", 2))
+	match kind:
+		"elevator": return {"card": false, "cmd": {"type": "elevator"}}
+		"exit": return {"card": false, "cmd": {"type": "mine_exit"}}
+		"up": return {"card": false, "cmd": {"type": "mine_floor", "floor": n - 1}}
+		"stairs":
+			var floor := _floor(view, n)
+			var next := _floor(view, n + 1)
+			if floor.is_empty() or next.is_empty(): return {"card": false, "cmd": {}}
+			var verb := "Floor %d" % (n + 1)
+			if next.get("paid", false): return {"card": false, "cmd": {"type": "mine_floor", "floor": n + 1}}
+			if not floor.get("cleared", false): return _fee_card("%s · Clear Floor %d first" % [verb, n])
+			if not next.get("bag_ok", true): return _fee_card("%s · Bag full" % verb)   # q(48)
+			if _energy(view) < fee:
+				return {"card": true, "label": "%s · Need %d Energy" % [verb, fee], "enabled": true, "amber": true,
+					"cmd": {"type": "energy_card"}, "need": fee, "verb": verb}
+			return {"card": true, "label": "%s · %d Energy" % [verb, fee], "enabled": true, "amber": false,
+				"cmd": {"type": "mine_floor", "floor": n + 1}, "need": fee, "verb": verb}
+	return {"card": false, "cmd": {}}
+
+## A grey fee button: its label is the reason, and a press toasts exactly that line (不知火舞 on 266, 5181bba0).
+static func _fee_card(label: String) -> Dictionary:
+	return {"card": true, "label": label, "enabled": false, "amber": false, "cmd": {}, "toast": label}
 
 ## Mining quick bar: torches only (§13.3.8; P0 has no dynamite). Ghost word when empty: "Torch" (q(44)).
 const MINE_FAMILY := ["torch"]
@@ -271,7 +303,8 @@ static func _elevator_rows(view: Dictionary, here: int) -> Array:
 		elif f.get("paid", false): row = {"label": "Floor %d · Free" % n, "enabled": true, "amber": false, "cmd": {"type": "mine_floor", "floor": n}}
 		elif i > 0 and not floors[i - 1].get("cleared", false): row.label = "Floor %d · Clear Floor %d first" % [n, n - 1]
 		elif not f.get("bag_ok", true): row.label = "Floor %d · Bag full" % n   # q(48)
-		elif _energy(view) < fee: row = {"label": "Floor %d · Need %d Energy" % [n, fee], "enabled": true, "amber": true, "cmd": {"type": "energy_card"}}
+		elif _energy(view) < fee: row = {"label": "Floor %d · Need %d Energy" % [n, fee], "enabled": true, "amber": true,
+			"cmd": {"type": "energy_card", "need": fee, "verb": "Floor %d" % n}}
 		else: row = {"label": "Floor %d · %d Energy" % [n, fee], "enabled": true, "amber": false, "cmd": {"type": "mine_floor", "floor": n}}
 		rows.append(row)
 	return rows

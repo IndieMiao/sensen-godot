@@ -1,7 +1,8 @@
 extends GdUnitTestSuite
 ## User int11 (SGODOT-231, 不知火舞): ① the mine's exits — the elevator's Ground, the exit ladder, the 04:00 kick-out —
-## go back to the farm under the mine, not to the map; ② a tap on the mouth never enters (LOCK-21): it walks up to the
-## mouth, pulses the main key there, or opens MINE-P0-8 with today's runs used up.
+## go back to the farm under the mine, not to the map; ② a tap on the mouth walks up to it and opens its EntryCard, whose
+## button carries the fee (SGODOT-266, LOCK-21 复议: never the main key, never the tap itself), or opens MINE-P0-8 with
+## today's runs used up.
 
 const P0Mine := preload("res://scenes/p0/p0_mine.gd")
 const PROBE := "res://tests/fixtures/scenes/stack_probe.tscn"
@@ -36,8 +37,8 @@ func test_runs_spent_only_without_a_run_and_with_none_left() -> void:
 	assert_bool(P0MaterialLogic.mine_runs_spent({"mine": {"runs": {"used": 1, "limit": 2}}})).is_false()
 	assert_bool(P0MaterialLogic.mine_runs_spent({"mine": {"run": {"floor": 2}, "runs": {"used": 2, "limit": 2}}})).is_false()
 
-## Where a tap from afar walks to: walkable cells by the mouth, inside the reach that turns the key into Enter mine,
-## nearest the player first.
+## Where a tap from afar walks to: walkable cells by the mouth, inside the reach where its card stays, nearest the
+## player first.
 func test_the_walk_ends_by_the_mouth_within_its_reach() -> void:
 	var bp := P0Garden.blueprint()
 	var grid := BlueprintGrid.new(bp)
@@ -72,29 +73,6 @@ func test_the_whole_model_takes_the_tap() -> void:
 	assert_bool(box.has_point(cam.unproject_position(Vector3(0, 0.1, 0)))).is_true()   # at its foot
 	assert_bool(box.has_point(cam.unproject_position(Vector3(6, 0, 0)))).is_false()    # well beside it
 
-## At the mouth the key pulses once: a 3 px ring from full out to +12 px, still full at 0.3 s (不知火舞 on #156 / #160).
-func test_the_key_pulse_is_the_thicker_ring() -> void:
-	var store := "user://test_p0_mine_exit.json"
-	var ui := P0Ui.new()
-	ui.quick_store = store
-	add_child(auto_free(ui))
-	await await_idle_frame()
-	ui.set_view({"energy": {"value": 200, "max": 200, "next_in": null, "regen_ms": 240000}, "bag": {"capacity": 25, "free": 25,
-		"slots": []}, "plots": [], "coins": 40, "skills": {}, "rest": {"used": 0, "limit": 1, "resets_in": 1},
-		"inbox": {"parcels": [], "letters": []}})
-	ui.set_mode("farm")
-	ui.set_surface("farm")
-	await await_idle_frame()
-	var pulse := ui.pulse_key()
-	assert_object(pulse).is_not_null()
-	assert_int(ui.key_pulses).is_equal(1)
-	assert_float(pulse.stroke).is_equal(3.0)
-	assert_float(pulse.start_alpha).is_equal(1.0)
-	assert_float(pulse.grow_px).is_equal(12.0)
-	pulse.progress = 0.75   # 0.3 s: still full (不知火舞 on #160)
-	assert_float(pulse.ring_alpha()).is_equal(1.0)
-	DirAccess.remove_absolute(ProjectSettings.globalize_path(store))
-
 ## The mouth's box reaches the Herb Patch's 64 px tap circle (苏烈 on #156): a tap on both goes to the nearer one.
 func test_a_tap_on_both_the_mouth_and_a_spot_goes_to_the_nearer() -> void:
 	var mouth := Vector2(100, 300)
@@ -102,3 +80,115 @@ func test_a_tap_on_both_the_mouth_and_a_spot_goes_to_the_nearer() -> void:
 	assert_bool(P0FarmMaterials.mouth_nearest(Vector2(110, 300), mouth, [herb])).is_true()    # by the gate
 	assert_bool(P0FarmMaterials.mouth_nearest(Vector2(160, 325), mouth, [herb])).is_false()   # by the Herb Patch
 	assert_bool(P0FarmMaterials.mouth_nearest(Vector2(60, 250), mouth, [herb])).is_true()     # outside the spot's circle
+
+const STORE := "user://test_p0_mine_mouth.json"
+
+func _mouth_view(run = null, energy := 200, used := 0) -> Dictionary:
+	return {"energy": {"value": energy, "max": 200, "next_in": null, "regen_ms": 240000}, "coins": 40, "skills": {}, "plots": [],
+		"bag": {"capacity": 25, "free": 25, "slots": []}, "names": {}, "inbox": {"parcels": [], "letters": []},
+		"rest": {"used": 0, "limit": 1, "resets_in": 1},
+		"mine": {"runs": {"used": used, "limit": 2, "resets_in": 33120000}, "ended": null, "floor_energy": 2, "rock_energy": 2,
+			"rocks": 6, "run": run}}
+
+## The real farm scene without its _ready, its mine mouth helper on a runtime with no server.
+func _farm(v: Dictionary, sent: Array) -> Node3D:
+	UiCommandButton.offline = false
+	P0Runtime.free_instance_for_tests()
+	var rt := P0Runtime.ensure()
+	rt.ui.quick_store = STORE
+	rt.session.transport = func(_m, _p, _b, _c): pass
+	rt.session.sent.connect(func(cmd): sent.append(cmd))
+	await get_tree().process_frame
+	rt.session.view = v
+	rt.ui.set_view(v)
+	var stub := GDScript.new()
+	stub.source_code = "extends \"res://scenes/p0/p0_farm.gd\"\nfunc _ready() -> void: pass\nfunc _exit_tree() -> void: pass\nfunc _process(_d) -> void: pass\nfunc p0_frame(_v, _d) -> void: pass\n"
+	stub.reload()
+	var farm: Node3D = load("res://scenes/p0/p0_farm.tscn").instantiate()
+	farm.set_script(stub)
+	add_child(farm)
+	farm.rt = rt
+	farm.bp = P0Garden.blueprint()
+	farm.grid = BlueprintGrid.new(farm.bp)
+	farm.actor = P0Actor.new()
+	farm.add_child(farm.actor)
+	farm.actor.setup(farm.bp, farm.grid, farm.cam)
+	farm._mine = farm.bp.cell_to_world(farm.bp.anchor("mine")) + Vector3(-0.3, 0, 0.3)
+	farm._materials = P0FarmMaterials.new().setup(farm, farm._mine)
+	farm.add_child(farm._materials)
+	rt.world = farm
+	await get_tree().process_frame
+	return farm
+
+func _end(farm: Node3D) -> void:
+	farm.queue_free()
+	P0Runtime.free_instance_for_tests()
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(STORE))
+	await get_tree().process_frame
+
+## SGODOT-266: tapped from afar the player walks up; pushing the stick on the way cancels and nothing opens.
+func test_a_tap_on_the_mouth_walks_up_and_the_stick_cancels() -> void:
+	var sent: Array = []
+	var farm := await _farm(_mouth_view(), sent)
+	var m: P0FarmMaterials = farm._materials
+	assert_bool(m.near_mouth()).is_false()
+	m.tap_mouth()
+	assert_bool(m._to_mouth).is_true()
+	assert_bool(farm.actor.mover.is_moving()).is_true()
+	farm.p0_joystick(Vector2(1, 0))
+	assert_bool(m._to_mouth).is_false()
+	farm.p0_joystick(Vector2.ZERO)
+	assert_bool(m.card_open()).is_false()
+	assert_array(sent).is_empty()
+	await _end(farm)
+
+## At the mouth: the card with the fee button; only its button enters (the farm's key stays Farming's: p0_farm.gd and
+## the P0_SHOT walkthrough on SGODOT-266).
+func test_at_the_mouth_the_card_carries_the_fee() -> void:
+	var sent: Array = []
+	var farm := await _farm(_mouth_view(), sent)
+	var m: P0FarmMaterials = farm._materials
+	farm.actor.teleport(P0FarmMaterials.mouth_stands(farm.grid, farm._mine, farm.actor.position)[0])
+	m.tap_mouth()
+	m.frame(farm.rt.session.current())
+	assert_bool(m.card_open()).is_true()
+	var card: UiEntryCard = m._entry
+	assert_str("%s · %s" % [card.title, card.title_fact]).is_equal("The mine · Runs today 0/2")
+	assert_str(card.main_text()).is_equal("Enter mine · 2 Energy")
+	assert_bool(card.second_shown()).is_false()
+	assert_array(sent).is_empty()   # the tap spent nothing
+	card.pressed.emit()
+	assert_array(sent).is_equal([{"type": "mine_enter"}])
+	assert_bool(m.card_open()).is_false()
+	await _end(farm)
+
+## With a run: Continue run · Free, New run under it; short of Energy the main is amber and opens the Energy card;
+## today's runs used up with none unfinished: MINE-P0-8, no card.
+func test_the_mouth_card_states() -> void:
+	var sent: Array = []
+	var run := {"id": 1, "deepest": 1, "can_new_run": false, "new_run_block": "clear_floor_2", "floors": [{"floor": 1, "paid": true}]}
+	var farm := await _farm(_mouth_view(run, 200, 1), sent)
+	var m: P0FarmMaterials = farm._materials
+	farm.actor.teleport(P0FarmMaterials.mouth_stands(farm.grid, farm._mine, farm.actor.position)[0])
+	m.tap_mouth()
+	m.frame(farm.rt.session.current())
+	var card: UiEntryCard = m._entry
+	assert_str(card.main_text()).is_equal("Continue run · Free")
+	assert_str(card.second).is_equal("New run · Clear Floor 2 first")
+	card.second_pressed.emit()
+	assert_str(farm.rt.ui.toast_text()).is_equal("New run · Clear Floor 2 first")
+	farm.rt.session.view = _mouth_view(null, 1)
+	m.frame(farm.rt.session.current())
+	assert_str(card.main_text()).is_equal("Enter mine · Need 2 Energy")
+	assert_bool(card.is_amber()).is_true()
+	card.pressed.emit()
+	assert_str(farm.rt.ui.modal_kind).is_equal("energy")
+	farm.rt.ui.close_modal()
+	assert_array(sent).is_empty()
+	farm.rt.session.view = _mouth_view(null, 200, 2)
+	m.frame(farm.rt.session.current())
+	assert_bool(m.card_open()).is_false()   # nothing to enter today: the card folds
+	m.tap_mouth()
+	assert_str(farm.rt.ui.modal_kind).is_not_empty()   # MINE-P0-8
+	assert_bool(m.card_open()).is_false()
+	await _end(farm)

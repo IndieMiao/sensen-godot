@@ -373,6 +373,7 @@ func p0_show_spot(where: String) -> void:
 # ---------------------------------------------------------------- frame
 func p0_joystick(v: Vector2) -> void:
 	if actor: actor.set_input(v)
+	if v != Vector2.ZERO and _materials: _materials.cancel_walk()   # a tapped walk to the mine mouth stops (266)
 
 func p0_frame(v: Dictionary, dt: float) -> void:
 	actor.step(dt)
@@ -382,7 +383,8 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 	_sync_plots(v, dt)
 	_fence.sync(v)
 	_pick_front(v)
-	rt.ui.set_action(_materials.action(v) if _materials.near_mouth() else P0Logic.main_action(v, _front, rt.ui.selected_seed, _row))
+	# The key is Farming here even at the mine mouth: the mouth is tapped like any facility (SGODOT-266, user on 263 ③).
+	rt.ui.set_action(P0Logic.main_action(v, _front, rt.ui.selected_seed, _row))
 	_card = P0Garden.pick_card(_card_candidates(), actor.position, _card)
 	_materials.frame(v, _card)
 	_hold_repeat()
@@ -483,8 +485,12 @@ func _hold_repeat() -> void:
 ## takes the player in (its kitchen is inside since SGODOT-226; the door card is gone, int5 hand test 37), the mine.
 func p0_tap(screen: Vector2) -> void:
 	if rt.ui.has_modal(): return
-	if _tap_card(rt.ui.tapped_card): return
-	if _materials.tap_entry(screen): return   # the mine's EntryCard sits over the scene (passive, SGODOT-231)
+	var card := str(rt.ui.tapped_card)
+	# The mine's EntryCard sits over the scene (passive, SGODOT-231): a tap on it is its button's; any other tap folds
+	# it and goes on (SGODOT-266).
+	if card == "" and _materials.tap_entry(screen): return
+	if card != "": _materials.close_card()
+	if _tap_card(card): return
 	if _sign_hit(screen):
 		actor.face(_sign)
 		HomePanel.open(rt.ui)
@@ -655,6 +661,9 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"plaque": p0_tap(cam.unproject_position(_plaque + Vector3(0, 0.35, 0)))   # PLAQUE-READ
 		"mailbox": p0_tap(cam.unproject_position(_mailbox + MAILBOX_HIT))   # the Inbox through the Mailbox's own tap (234 C)
 		"mouth": p0_tap(cam.unproject_position(_mine + Vector3(0, 1.6, 0)))   # the mine mouth's model, high on the arch (int11 ②)
+		"cardtap", "cardnew":   # a real tap on the mouth's EntryCard: its main button / New run (SGODOT-266)
+			var e: UiEntryCard = _materials._entry if _materials.card_open() else null
+			if e != null: p0_tap((e.main_rect() if step[0] == "cardtap" else e.second_rect()).get_center() - rt.ui.root.global_position)
 		"zoomto": _zoom = clampf(float(step[1]), 0.8, 1.4)   # zoomto:0.8 (widest) … 1.4 (closest)
 		"near":   # near:<id> — stand 1.2 m in front of a facility, so its name strip opens (250 review shots)
 			for c in _card_candidates():
@@ -673,4 +682,5 @@ func p0_dev(step: PackedStringArray) -> bool:
 func p0_until(name: String) -> bool:
 	match name:
 		"idle": return not actor.busy()
+		"card": return _materials.card_open()
 	return false

@@ -1,15 +1,18 @@
 extends Node3D
 ## P0 mine floors 1–2 (SGODOT-231; plan §13.3, LOCK-21, LOCK-24): the old polished mine chambers (MineArt B1 / B2,
 ## approved 2026-09-24) with the P0 actor, safe-box camera and main action key. The server owns the run (view.mine);
-## this world draws it, picks what the player faces and sends mine_* commands. P0MaterialLogic writes every key, row
-## and float; rocks, ladders and the elevator never respond to taps (LOCK-02), only to the main action key.
+## this world draws it, picks the rock the player faces and sends mine_* commands. P0MaterialLogic writes every key,
+## row and float. Rocks respond only to the main key (LOCK-02), which is Mining's alone; the ladders and the elevator
+## are facilities (SGODOT-266, user on 263 ③): an icon button and strip each (P0WorldPrompts.mine_facility), a tap
+## walks the player up, then a free move goes at once and a new floor's fee waits on the EntryCard's button.
 
 const Art = preload("res://modules/mining/mine_art.gd")
 const Layout = preload("res://modules/mining/mine_layout.gd")
 const ElasticZoom = preload("res://modules/p0/p0_elastic_zoom.gd")
 const FarmCamera = preload("res://modules/farm/farm_camera.gd")
 const PLACE := "Shanghai · Mine · Floor %d"
-const REACH := 1.7          # m: a rock, ladder or the elevator in front of the player within this distance
+const REACH := 1.7          # m: a rock in front of the player within this distance; a facility used from this close
+const CARD_REACH := 2.4     # m: a facility's strip opens, its EntryCard stays (the farm's mouth reach)
 const BREAK_S := 0.45       # rock break: shake, shrink, chips
 const STATUS_INTRO_MS := 3000   # "Run 1/2 today" first, then "Rocks 2/6" (MINE-1 / P0-2)
 
@@ -46,6 +49,13 @@ var _hold_until := 0
 var _leaving := false
 var _grey := false
 var _elevator_to := -1      # the floor an elevator ride asked for: it lands beside the elevator, not at the stairs
+var _facilities := {}       # id ("mine_up", "mine_down", "mine_elevator") → {kind, at, node} on this floor
+var _walk := {}             # a tapped facility being walked to: {id, point}
+var _card_for := ""         # the facility whose EntryCard shows (a new floor's fee), "" none
+var _strip_open := ""        # the facility holding the open strip (P0Garden.pick_card)
+var _strip_side := UiWorldNameBar.Dir.RIGHT
+var _entry: UiEntryCard     # the fee card over a ladder (built on first use, on the P0 UI's root)
+var _entry_data := {}       # P0MaterialLogic.mine_facility for _card_for
 
 func setup(args: Dictionary) -> void:
 	floor_n = clampi(int(args.get("floor", 1)), 1, 2)
@@ -69,6 +79,7 @@ func _ready() -> void:
 	rt.session.state_changed.connect(_on_state)
 
 func _exit_tree() -> void:
+	if is_instance_valid(_entry): _entry.queue_free()
 	if rt:
 		if rt.session.state_changed.is_connected(_on_state): rt.session.state_changed.disconnect(_on_state)
 		rt.detach(self)
@@ -136,6 +147,7 @@ func _build_floor(n: int) -> void:
 	for node in objects.get_children():   # the elevator and the down ladder stand against the walls; rocks are inside
 		if not str(node.name).begins_with("Rock"): _art_points.append_array(_art_vertices(node))
 	_art_right = Vector3.ZERO
+	_find_facilities(n)
 	# The underground backdrop (SGODOT-257) hangs off the world itself, outside scenery / objects: the camera's walls box
 	# and art edges above never see it, so it frames nothing. Its outer edge fades into the Environment's background.
 	backdrop = MineBackdrop.build(n)
@@ -170,6 +182,21 @@ func _broken(v: Dictionary, n: int) -> Array:
 			for i in mini(b.size(), out.size()): out[i] = bool(b[i])
 	return out
 
+## This floor's facilities and their art (the tap box and where the prompt sits): the up ladder (Exit on floor 1), the
+## down ladder above floor 2 and the elevator.
+func _find_facilities(n: int) -> void:
+	if rt != null:   # a new floor: the old floor's prompts fold (the ladder down is not on floor 2)
+		for id in _facilities: rt.ui.world_icon(id, null, Vector2.ZERO, false)
+	_facilities.clear()
+	_walk = {}
+	close_card()
+	var up := scenery.find_child("UpLadder", true, false) as Node3D
+	_facilities["mine_up"] = {"kind": "exit" if n == 1 else "up", "at": Layout.UP, "node": up}
+	if n < 2: _facilities["mine_down"] = {"kind": "stairs", "at": Layout.DOWN, "node": objects.find_child("DownLadder", true, false)}
+	var lift := scenery.find_child("MineElevator", true, false) as Node3D
+	if lift == null: lift = objects.find_child("MineElevator", true, false) as Node3D
+	_facilities["mine_elevator"] = {"kind": "elevator", "at": Layout.ELEVATOR, "node": lift}
+
 ## Stairs, the elevator or a new floor: rebuild the chamber and land at the spawn (the elevator lands beside it).
 func _go_floor(n: int, by_elevator := false) -> void:
 	_build_floor(n)
@@ -182,10 +209,58 @@ func _go_floor(n: int, by_elevator := false) -> void:
 # ---------------------------------------------------------------- frame
 func p0_joystick(v: Vector2) -> void:
 	if actor and not _leaving: actor.set_input(v)
+	if v != Vector2.ZERO: _walk = {}   # pushing the stick on the way cancels the walk (SGODOT-266)
 
-## Facilities respond to taps, rocks and ladders don't (LOCK-02): taps in the mine only move nothing.
-func p0_tap(_screen: Vector2) -> void:
-	pass
+## A tap on a ladder or the elevator — its icon button, strip or the model itself — walks the player up to it, then
+## uses it (SGODOT-266). On the open fee card: its button's. Rocks never respond to taps (LOCK-02), and any other tap
+## folds the card.
+func p0_tap(screen: Vector2) -> void:
+	if _leaving or rt.ui.has_modal(): return
+	var id := str(rt.ui.tapped_card)
+	if id == "" and is_instance_valid(_entry) and _entry.visible and _entry.tap_at(screen + rt.ui.root.global_position) != "": return
+	close_card()
+	if not _facilities.has(id): id = facility_at(screen)
+	if id != "": walk_to(id)
+
+## The facility whose model holds a screen point (the smallest box when two overlap), "" none.
+func facility_at(screen: Vector2) -> String:
+	var best := ""
+	var best_area := INF
+	for id in _facilities:
+		var box := _screen_rect(_facilities[id].node)
+		if box.has_point(screen) and box.get_area() < best_area:
+			best = id
+			best_area = box.get_area()
+	return best
+
+## Walk up to a facility (the nearest walkable point by it, Layout.approach), then use it; from close by, use it now.
+func walk_to(id: String) -> void:
+	var f: Dictionary = _facilities.get(id, {})
+	if f.is_empty(): return
+	if P0FarmMaterials.flat(actor.position, f.at) <= REACH:
+		_arrive(id)
+		return
+	var point := Layout.approach(actor.mover, f.at)
+	if P0FarmMaterials.flat(point, f.at) > REACH or not actor.mover.set_target_position(point):
+		return   # nowhere to stand by it (not on the shipped floors)
+	_walk = {"id": id, "point": point}
+
+## Arrived (or already there): face it, then a free move goes now; a new floor's fee opens the card (SGODOT-266).
+func _arrive(id: String) -> void:
+	_walk = {}
+	var f: Dictionary = _facilities.get(id, {})
+	if f.is_empty(): return
+	actor.face(f.at)
+	var use := P0MaterialLogic.mine_facility(_view(), floor_n, str(f.kind))
+	if bool(use.get("card", false)):
+		_card_for = id
+		return
+	var cmd: Dictionary = use.get("cmd", {})
+	if not cmd.is_empty(): p0_action(cmd)
+
+func close_card() -> void:
+	_card_for = ""
+	if is_instance_valid(_entry): _entry.visible = false
 
 func p0_frame(v: Dictionary, dt: float) -> void:
 	if _leaving: return
@@ -193,6 +268,11 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 		_kick_out()
 		return
 	actor.step(dt)
+	if not _walk.is_empty() and not actor.mover.is_moving():
+		var id := str(_walk.id)
+		_walk = {}
+		if _facilities.has(id) and P0FarmMaterials.flat(actor.position, _facilities[id].at) <= REACH: _arrive(id)
+		if _leaving or not is_inside_tree(): return   # the way out popped the mine mid-frame (as P0Room's door)
 	_follow(dt)
 	_sync_rocks(v)
 	_pick_target()
@@ -201,6 +281,7 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 	rt.ui.set_action(P0MaterialLogic.mine_action(v, ctx))
 	_hold_repeat()
 	_marks(v)
+	_prompts(v)
 
 ## Rocks the server says are broken (another device, a reconnect) leave without the break animation.
 func _sync_rocks(v: Dictionary) -> void:
@@ -213,16 +294,14 @@ func _sync_rocks(v: Dictionary) -> void:
 			changed = true
 	if changed: _rebuild_nav(broken)
 
-## The rock, ladder or elevator in front: nearest within reach, favouring what the player faces.
+## The rock in front: nearest within reach, favouring what the player faces. Ladders and the elevator are tapped, never
+## the key's (SGODOT-266).
 func _pick_target() -> void:
 	var best := {}
 	var best_score := INF
 	var f := actor.facing()
 	var candidates: Array = []
 	for i in _rocks: candidates.append({"kind": "rock", "rock": int(i), "at": Layout.FALLBACK_POSITIONS[i]})
-	candidates.append({"kind": "exit" if floor_n == 1 else "up", "at": Layout.UP})
-	if floor_n < 2: candidates.append({"kind": "stairs", "at": Layout.DOWN})
-	candidates.append({"kind": "elevator", "at": Layout.ELEVATOR})
 	for c in candidates:
 		var to: Vector3 = c.at - actor.position
 		to.y = 0
@@ -276,6 +355,116 @@ func _marks(v: Dictionary) -> void:
 	var intro := Time.get_ticks_msec() - _entered_ms < STATUS_INTRO_MS
 	rt.ui.set_status_line(P0MaterialLogic.mine_status(v, floor_n, intro))
 
+## The facilities' world prompts (LOCK-07 v2, as on the farm): each one's icon button within P0WorldPrompts.RANGE, the
+## nearest within CARD_REACH opens its strip; the one with its fee card up shows the card instead. The card folds when
+## the player walks off.
+func _prompts(v: Dictionary) -> void:
+	if _card_for != "" and (not _facilities.has(_card_for) or P0FarmMaterials.flat(actor.position, _facilities[_card_for].at) > CARD_REACH):
+		close_card()
+	var cands: Array = []
+	for id in _facilities: cands.append([id, _facilities[id].at, CARD_REACH])
+	_strip_open = P0Garden.pick_card(cands, actor.position, _strip_open)
+	_strip_side = _facing_side()
+	for id in _facilities:
+		var f: Dictionary = _facilities[id]
+		var box := _art_box(f.node)
+		var at: Vector3 = f.at
+		var mark: Vector3 = Vector3(box.get_center().x, box.end.y + 0.15, box.get_center().z) if box.size != Vector3.ZERO else at + Vector3(0, 1.9, 0)
+		var hit: Vector3 = box.get_center() if box.size != Vector3.ZERO else at + Vector3(0, 0.8, 0)
+		var prompt := P0WorldPrompts.mine_facility(v, floor_n, str(f.kind))
+		var screen := cam.unproject_position(mark)
+		var tap := cam.unproject_position(hit)
+		var show := P0WorldPrompts.show(id, _strip_open, P0FarmMaterials.flat(actor.position, f.at), prompt) \
+			if id != _card_for and not rt.ui.has_modal() else P0WorldPrompts.Show.NONE
+		if show == P0WorldPrompts.Show.BAR:
+			rt.ui.name_bar(id, prompt.icon, str(prompt.text), str(prompt.fact), screen, true, _strip_side, bool(prompt.dimmed),
+				int(prompt.status), tap)
+		else:
+			rt.ui.world_icon(id, prompt.icon, screen, show == P0WorldPrompts.Show.ICON, false, int(prompt.status), tap,
+				str(prompt.get("count", "")))
+	_show_card(v)
+
+## A facility's art on screen: its _art_box's corners projected, grown to the 44 touch size (the floor hatch of the
+## ladder down is flat); empty without art.
+func _screen_rect(node: Node3D) -> Rect2:
+	var box := _art_box(node)
+	if box.size == Vector3.ZERO: return Rect2()
+	var r := Rect2(cam.unproject_position(box.get_endpoint(0)), Vector2.ZERO)
+	for i in range(1, 8): r = r.expand(cam.unproject_position(box.get_endpoint(i)))
+	var grow := maxf(0.0, UiTokens.SIZE_TOUCH - minf(r.size.x, r.size.y)) * 0.5
+	return r.grow(grow)
+
+## A facility's art in world space (all its meshes, the node's own included), an empty AABB without one.
+static func _art_box(node: Node3D) -> AABB:
+	if not is_instance_valid(node): return AABB()
+	var box := AABB()
+	var first := true
+	for vi in node.find_children("*", "GeometryInstance3D", true, false):
+		var b: AABB = (vi as GeometryInstance3D).global_transform * (vi as GeometryInstance3D).get_aabb()
+		if b.size == Vector3.ZERO: continue
+		box = b if first else box.merge(b)
+		first = false
+	if node is GeometryInstance3D and (node as GeometryInstance3D).get_aabb().size != Vector3.ZERO:
+		var own: AABB = node.global_transform * (node as GeometryInstance3D).get_aabb()
+		box = own if first else box.merge(own)
+	return box
+
+## The side a strip opens to: the character's facing on screen; facing the camera or away keeps the last side.
+func _facing_side() -> UiWorldNameBar.Dir:
+	var from := cam.unproject_position(actor.position)
+	var dx := cam.unproject_position(actor.position + actor.facing()).x - from.x
+	if absf(dx) < 6.0: return _strip_side
+	return UiWorldNameBar.Dir.LEFT if dx < 0.0 else UiWorldNameBar.Dir.RIGHT
+
+## The fee card over a ladder (UiEntryCard without a title: the destination is on its one button, 不知火舞 9ce583a8).
+func _show_card(v: Dictionary) -> void:
+	var on := _card_for != "" and not rt.ui.has_modal()
+	if not on:
+		if is_instance_valid(_entry): _entry.visible = false
+		return
+	if not is_instance_valid(_entry):
+		if rt.ui.root == null: return
+		_entry = UiEntryCard.new()
+		_entry.theme = UiKit.theme()
+		_entry.passive = true   # a drag starting on it is the joystick; p0_tap resolves the real tap (as on the farm)
+		_entry.pressed.connect(_on_card_pressed)
+		rt.ui.root.add_child(_entry)
+	var f: Dictionary = _facilities[_card_for]
+	_entry_data = P0MaterialLogic.mine_facility(v, floor_n, str(f.kind))
+	if not bool(_entry_data.get("card", false)):   # paid meanwhile (the elevator, another device): a free move now
+		var id := _card_for
+		close_card()
+		_arrive(id)
+		return
+	_entry.visible = true
+	_entry.action = str(_entry_data.label)
+	_entry.state = UiEntryCard.State.AVAILABLE if bool(_entry_data.enabled) else UiEntryCard.State.UNAVAILABLE
+	_entry.amber = bool(_entry_data.amber)
+	var box := _art_box(f.node)
+	var at: Vector3 = f.at
+	var top := cam.unproject_position(Vector3(box.get_center().x, box.end.y + 0.15, box.get_center().z) if box.size != Vector3.ZERO else at + Vector3(0, 1.9, 0))
+	var size := _entry.get_combined_minimum_size()
+	var r := WorldAnchor.place(size, top - Vector2(0, UiTokens.SPACE_WITHIN), Rect2(Vector2.ZERO, rt.ui.root.size), UiTokens.SPACE_WITHIN, true)
+	_entry.size = size
+	_entry.position = r.position
+	_entry.point_at(top.x - r.position.x)
+
+## The fee button: grey says why (LOCK-10), amber opens the Energy card for this floor, else the floor (2 Energy).
+func _on_card_pressed() -> void:
+	var d := _entry_data
+	if not bool(d.get("enabled", false)):
+		rt.ui.toast(str(d.get("toast", d.get("label", ""))))
+		return
+	var cmd: Dictionary = d.get("cmd", {})
+	if str(cmd.get("type", "")) == "energy_card":
+		rt.energy_card(int(d.get("need", 0)), str(d.get("verb", "")))
+		return
+	close_card()
+	p0_action(cmd)
+
+func card_shown() -> bool: return is_instance_valid(_entry) and _entry.visible
+func card_entry() -> UiEntryCard: return _entry if card_shown() else null
+
 # ---------------------------------------------------------------- actions
 func p0_action(cmd: Dictionary) -> void:
 	match str(cmd.get("type", "")):
@@ -303,7 +492,7 @@ func _on_elevator_row(cmd: Dictionary) -> void:
 			if int(cmd.get("floor", 0)) == floor_n: return
 			_elevator_to = int(cmd.get("floor", 0))
 			rt.session.send(cmd)
-		"energy_card": rt._on_action(cmd)
+		"energy_card": rt.energy_card(int(cmd.get("need", 0)), str(cmd.get("verb", "")))
 
 ## Server results for this world: a rock breaks, a floor is reached or cleared, a torch lights the floor.
 func _on_state(v: Dictionary, events: Array) -> void:
@@ -372,6 +561,7 @@ func _chips(at: Vector3) -> void:
 func _leave() -> void:
 	if _leaving: return
 	_leaving = true
+	close_card()
 	actor.set_input(Vector2.ZERO)
 	rt.leave_room()
 
@@ -548,6 +738,7 @@ func p0_anchor() -> Vector2:
 func is_back_navigation_locked() -> bool: return false
 
 func suspend() -> void:
+	close_card()
 	process_mode = Node.PROCESS_MODE_DISABLED
 	hide()
 	cam.current = false
@@ -574,6 +765,10 @@ func p0_dev(step: PackedStringArray) -> bool:
 			_focus = actor.position
 		"floor": _go_floor(int(step[1]))
 		"elevator": p0_action({"type": "elevator"})
+		"tapfac":   # tapfac:mine_down — a tap on that facility's model (walk up, then use it; SGODOT-266)
+			p0_tap(cam.unproject_position(_art_box(_facilities[step[1]].node).get_center()) if _facilities.has(step[1]) else Vector2(-1, -1))
+		"cardtap":   # cardtap — a real tap on the open fee card's button
+			if card_shown(): p0_tap(_entry.main_rect().get_center() - rt.ui.root.global_position)
 		"elevrow":   # elevrow:0 — press that row of the open elevator panel (row 0 is Ground)
 			for n in rt.ui.find_children("*", "", true, false):
 				if n is UiElevatorPanel and (n as UiElevatorPanel).row(int(step[1])) != null:
@@ -594,5 +789,8 @@ func p0_dev(step: PackedStringArray) -> bool:
 func p0_until(name: String) -> bool:
 	match name:
 		"floor2": return floor_n == 2
+		"floor1": return floor_n == 1
 		"idle": return not actor.busy()
+		"arrived": return _walk.is_empty() and not actor.mover.is_moving()
+		"card": return card_shown()
 	return false
