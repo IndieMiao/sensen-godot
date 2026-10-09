@@ -149,8 +149,13 @@ func tap_entry(screen: Vector2) -> bool:
 func tap(screen: Vector2) -> bool:
 	var cam: Camera3D = farm.cam
 	if _mouth_hit(screen):
-		tap_mouth()
-		return true
+		# The model's box reaches the Herb Patch's and the bench's tap circles (苏烈 on #156): a tap on both goes to the
+		# nearer of the mouth's middle and that facility's point.
+		var others: Array = [cam.unproject_position(_bench + Vector3(0, 0.8, 0))]
+		for id in SPOTS: others.append(cam.unproject_position(_spots.get(id, Vector3.ZERO) + Vector3(0, 0.6, 0)))
+		if mouth_nearest(screen, _mouth_centre(), others):
+			tap_mouth()
+			return true
 	for id in SPOTS:
 		var at: Vector3 = _spots.get(id, Vector3.ZERO)
 		if cam.unproject_position(at + Vector3(0, 0.6, 0)).distance_to(screen) >= 64: continue
@@ -195,6 +200,21 @@ static func mouth_stands(grid: BlueprintGrid, at: Vector3, from: Vector3) -> Arr
 			if d > 0.5 and d < MOUTH_REACH - 0.5: out.append(p)
 	out.sort_custom(func(a, b): return flat(a, from) < flat(b, from))
 	return out
+
+## Whether a tap on the mouth's box is the mouth's: unless another facility's tap circle holds it with its point nearer.
+static func mouth_nearest(screen: Vector2, mouth_at: Vector2, others: Array, radius := 64.0) -> bool:
+	var d := screen.distance_to(mouth_at)
+	for o in others:
+		var e := screen.distance_to(o)
+		if e < radius and e < d: return false
+	return true
+
+func _mouth_centre() -> Vector2:
+	var cam: Camera3D = farm.cam
+	if is_instance_valid(_mouth_art):
+		var box := screen_box(cam, _mouth_art)
+		if box.has_area(): return box.get_center()
+	return cam.unproject_position(mouth + MOUTH_HIT)
 
 ## The mouth's model on screen (any part of it counts); a circle round the gate without the model.
 func _mouth_hit(screen: Vector2) -> bool:
