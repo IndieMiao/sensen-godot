@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 # P0 internal demo APK (SGODOT-232 D2). Preset "Android P0": feature p0 (opens straight into P0, no adb marker),
 # package com.sensen.p0demo (never the Journey package, never the user's com.sensen.p0proto), its own version.
-#   tools/p0/build_demo_apk.sh --server https://host/preview/p0/v1 [--key DEMO_KEY] [--code N] [--name p0-0.1.N]
+#   tools/p0/build_demo_apk.sh --server https://host/preview/p0/v1 [--key DEMO_KEY] [--code N] [--name 0.1.N]
 #                              [--out build/p0-demo.apk]
+# Versions (user, 2026-10-09): versionName from the preset (0.1.0); versionCode YYYYMMDDNN, by default the build
+# day + 01. A second build the same day passes --code …02; …00 is for dry runs, which publish_demo_apk.mjs refuses.
 # The server URL (and demo key) go into assets/p0/demo_server.json for this export only and are removed afterwards;
 # export_presets.cfg is restored too. Godot's Android exporter stops "its" adb server when it exits, so this script
 # points it at a private port (P0_ADB_PORT, default 5071) and never touches another session's adb (5037 and others).
@@ -21,6 +23,15 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 [[ "$SERVER" == http://* || "$SERVER" == https://* ]] || { echo "--server http(s)://…/v1 is required" >&2; exit 2; }
+CODE="${CODE:-$(date +%Y%m%d)01}"
+[[ "$CODE" =~ ^20[0-9]{6}[0-9]{2}$ ]] || { echo "--code must be YYYYMMDDNN, got $CODE" >&2; exit 2; }
+# What the APK is built from, read before this script touches export_presets.cfg (周瑜 on #163): tracked changes, and
+# untracked files, since an all_resources export packs untracked scenes, scripts and json too (the preset's
+# exclude_filter is applied to the list in build.json; publish_demo_apk.mjs refuses anything but .uid files). Files git
+# ignores are not listed: mapbox_token.txt and this script's demo_server.json belong in the APK by design.
+COMMIT="$(git rev-parse HEAD)"
+DIRTY="$(git status --porcelain --untracked-files=no | head -1)"
+export P0_UNTRACKED="$(git ls-files --others --exclude-standard)"
 export ADB_SERVER_SOCKET="tcp:localhost:${P0_ADB_PORT:-5071}" ANDROID_ADB_SERVER_PORT="${P0_ADB_PORT:-5071}"
 GODOT="${GODOT_BIN:-godot}"
 SDK="${ANDROID_HOME:-$HOME/Library/Android/sdk}"
@@ -58,9 +69,14 @@ TEMPLATE=()
 BT="$(ls -d "$SDK"/build-tools/* | sort -V | tail -1)"
 "$BT/aapt" dump badging "$OUT" > "$LOGS/badging.txt"
 "$BT/apksigner" verify --print-certs "$OUT" > "$LOGS/signer.txt"
-python3 - "$OUT" "$SERVER" "$KEY" "$LOGS" <<'PY'
-import hashlib, json, re, sys, zipfile
-apk, server, key, logs = sys.argv[1:5]
+python3 - "$OUT" "$SERVER" "$KEY" "$LOGS" "$COMMIT" "$DIRTY" <<'PY'
+import fnmatch, hashlib, json, os, re, sys, zipfile
+apk, server, key, logs, commit, dirty = sys.argv[1:7]
+presets = open("export_presets.cfg").read()
+seg = presets[presets.index('name="Android P0"'):]
+excluded = [p.strip() for p in re.search(r'exclude_filter="([^"]*)"', seg).group(1).split(",") if p.strip()]
+untracked = [f for f in os.environ.get("P0_UNTRACKED", "").splitlines()
+             if f and not any(fnmatch.fnmatch(f, p) for p in excluded)]
 badging = open(f"{logs}/badging.txt").read()
 pkg = re.search(r"package: name='([^']+)' versionCode='(\d+)' versionName='([^']*)'", badging)
 label = re.search(r"application-label:'([^']*)'", badging)
@@ -76,6 +92,8 @@ result = {
     "server": baked.get("url") if baked else None, "server_matches": bool(baked) and baked.get("url") == server.rstrip("/"),
     "key_baked": bool(baked) and baked.get("key") == key and key != "",
     "version_baked": baked.get("version") if baked else None,
+    "source_commit": commit, "source_dirty": dirty != "",
+    "untracked_exported": untracked[:200], "untracked_exported_count": len(untracked),
 }
 json.dump(result, open(f"{logs}/build.json", "w"), indent=2)
 print(json.dumps(result, indent=2))
