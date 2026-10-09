@@ -73,6 +73,7 @@ static func open(ui: P0Ui, at_home := true) -> void:
 	var tap := str(model.get("tap", ""))   # away from home: `Upgrade at home · Going home is free`, else the gap itself
 	button.unavailable_pressed.connect(func(reason: String): ui.toast(tap if tap != "" else reason))
 	col.add_child(button)
+	panel.set_meta(&"toast_above", button)   # q(16): a toast over the sheet's fixed decision area, 8 above the button
 	if not bool(model.max):
 		var foot := UiKit.label(str(model.footer), UiTokens.STYLE_C11_B, UiTokens.COLOR_SECONDARY)
 		foot.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

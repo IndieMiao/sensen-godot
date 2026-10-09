@@ -117,9 +117,13 @@ func test_home_1_away_from_home_greys_the_button_with_at_home() -> void:
 	assert_str(button.reason).is_equal("At home")
 	var sent: Array = []
 	ui.command.connect(func(cmd): sent.append(cmd))
+	await get_tree().process_frame   # laid out, as when a player taps it
 	button.unavailable_pressed.emit(button.reason)
 	assert_array(sent).is_empty()
 	assert_str(ui.toast_text()).is_equal("Upgrade at home · Going home is free")
+	# q(16) (不知火舞 on #150): over the sheet's fixed decision area — the toast's bottom 8 above the button, not under the HUD.
+	var toast: Control = ui._toasts._panel
+	assert_float(toast.get_global_rect().end.y).is_equal_approx(button.get_global_rect().position.y - UiTokens.SPACE_OVERLAY_BODY, 1.0)
 
 func test_home_1_at_max_level_has_no_tiles_and_says_so() -> void:
 	var v := _view(3)
