@@ -538,11 +538,11 @@ func test_skill_card_ring_floors_to_ten_percent_and_reads_the_level() -> void:
 	assert_int(hits[0]).is_equal(1)
 
 func test_farm_card_lines() -> void:
-	var f: UiFarmCard = _host(UiFarmCard.new("Farmer's Homestead", "Level 1", "Radishes ready 3h 32m", load("res://assets/p0/art/homestead-thumb.jpg")))
+	var f: UiFarmCard = _host(UiFarmCard.new("Farmer's Homestead", "Level 1", "Radishes ready in 3h 32m", load("res://assets/p0/art/homestead-thumb.jpg")))
 	await _settle()
-	assert_array(_texts(f)).contains(["Farmer's Homestead", "Level 1", "Radishes ready 3h 32m"])
+	assert_array(_texts(f)).contains(["Farmer's Homestead", "Level 1", "Radishes ready in 3h 32m"])
 	f.status = ""
-	assert_array(_texts(f)).not_contains(["Radishes ready 3h 32m"])
+	assert_array(_texts(f)).not_contains(["Radishes ready in 3h 32m"])
 	assert_float(f.size.y).is_equal(76.0)
 
 func _request(fields := {}) -> Dictionary:

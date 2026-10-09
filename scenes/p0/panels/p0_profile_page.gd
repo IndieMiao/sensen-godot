@@ -169,7 +169,7 @@ static func since_text(ms: float, now_ms := -1.0) -> String:
 	var text := "%s %d" % [_MONTHS[int(d.month) - 1], int(d.day)]
 	return text if int(d.year) == int(now.year) else "%s, %d" % [text, int(d.year)]
 
-## The earliest crop on the plots: `Radishes ready 3h 32m`, or the first thing to do there.
+## The earliest crop on the plots: `Radishes ready in 3h 32m` (as Today says it; int12), or the first thing to do there.
 static func _farm_status(view: Dictionary) -> String:
 	var best := INF
 	var crop := ""
@@ -181,7 +181,7 @@ static func _farm_status(view: Dictionary) -> String:
 			best = float(p.get("ready_in", INF))
 			crop = str(p.get("crop", ""))
 	if ready != "": return "%s ready to harvest" % P0Logic.plural(P0Logic.item_name(view, ready))
-	if crop != "": return "%s ready %s" % [P0Logic.plural(P0Logic.item_name(view, crop)), P0Logic.span(best)]
+	if crop != "": return "%s ready in %s" % [P0Logic.plural(P0Logic.item_name(view, crop)), P0Logic.span(best)]
 	return ""
 
 func _look() -> Control:

@@ -1,7 +1,7 @@
 class_name UiFarmCard
 extends BaseButton
 ## Farm overview on the profile (SGODOT-225; "Farm overview" of PROFILE-1, LOCK-22): a 62 thumbnail of the farm,
-## its name, `Level 1` (plus `· Friends only` on the full profile) and one status line (`Radishes ready 3h 32m`).
+## its name, `Level 1` (plus `· Friends only` on the full profile) and one status line (`Radishes ready in 3h 32m`).
 ## On someone else's profile it leads to Visit farm (WP5); on your own it opens HOME-1 (`pressed` is left to the
 ## caller). `chevron` puts a › at the right when the card leads somewhere.
 
