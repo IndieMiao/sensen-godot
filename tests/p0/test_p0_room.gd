@@ -20,8 +20,17 @@ class Sample extends P0Room:
 		place_name = "Farmhouse"
 	func _on_facility(n: String) -> void: used.append(n)
 
+## The anchors file the rooms here read. user:// is shared by every worktree of this project, so a suite running in
+## another session at the same time rewrote one fixed name between this write and the room's read: no `exit` anchor,
+## an intermittent Nil (刘邦 on a full run, 10-09). One file per process.
+static func _anchors_file() -> String:
+	return "user://test_room_%d.anchors.json" % OS.get_process_id()
+
+func after() -> void:
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(_anchors_file()))
+
 func _room(external := ROOM_ANCHORS) -> Sample:
-	var path := "user://test_room.anchors.json"
+	var path := _anchors_file()
 	var f := FileAccess.open(path, FileAccess.WRITE)
 	f.store_string(JSON.stringify(external))
 	f.close()
