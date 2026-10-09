@@ -68,6 +68,7 @@ static func all() -> Array[Dictionary]:
 		{id = "bag_header", title = "UiBagHeader", figma = "BagHeader 1225:83885 · LOCK-12 / 13", build = _bag_headers},
 		{id = "gear_row", title = "UiGearRow", figma = "Gear candidate rows of BAG-2 · Gear · LOCK-13", build = _gear_rows},
 		{id = "profile_parts", title = "Profile parts", figma = "ProfileTopBar 1233:107734 · ProfileMoreMenu 1233:107735 · SkillRing 1251:109246 · LOCK-22 (336 at 328)", build = _profile_parts},
+		{id = "farm_card", title = "UiFarmCard", figma = "Farm overview of PROFILE-1 · LOCK-22 (336 at 328); › on your own profile (int11)", build = _farm_cards},
 		{id = "request_card", title = "UiRequestCard", figma = "ResidentRequestCard 1211:83296 · LOCK-18 (336 at 328)", build = _request_cards},
 		{id = "resident_bar", title = "UiResidentBar", figma = "ResidentDialogue 1213:83392 Row / Stacked · LOCK-18 (336 at 328)", build = _resident_bars},
 		{id = "resident_profile", title = "UiResidentProfile", figma = "RES-PIP 482:586 / RES-KAI 482:592 · sheet content (328/360)", build = _resident_profiles},
@@ -747,8 +748,17 @@ static func _profile_parts() -> Control:
 	skills.add_child(UiSkillCard.new("Fishing", 2, 0.2, _tex("rod")))
 	skills.add_child(UiSkillCard.new("Cooking", 2, 0.1, _tex("pot")))
 	v.add_child(_captioned(_at_336(skills), "SkillRing · ring floored to 10 %"))
+	return v
+
+## The farm overview on its own section (it fell below Profile parts' shot): someone else's (facts) and yours, whose ›
+## opens HOME-1 (int11; 亚瑟 on #148).
+static func _farm_cards() -> Control:
+	var v := _column(UiTokens.SPACE_ROW)
 	var farm := UiFarmCard.new("Farmer's Homestead", "Level 1", "Radishes ready 3h 32m", load("res://assets/p0/art/homestead-thumb.jpg"))
 	v.add_child(_captioned(_at_336(farm), "farm overview"))
+	var own := UiFarmCard.new("Farmer's Homestead", "Level 1", "Radishes ready 3h 32m", load("res://assets/p0/art/homestead-thumb.jpg"))
+	own.chevron = true
+	v.add_child(_captioned(_at_336(own), "your profile · › opens HOME-1"))
 	return v
 
 static func _request_cards() -> Control:

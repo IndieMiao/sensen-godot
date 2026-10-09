@@ -1,0 +1,289 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    272
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiFarmCard"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        36
+      ],
+      "variation": "CaptionR12",
+      "text": "Farm overview of PROFILE-1 · LOCK-22 (336 at 328); › on your own profile (int11)"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        70,
+        328,
+        202
+      ],
+      "children": [
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            70,
+            328,
+            95
+          ],
+          "children": [
+            {
+              "type": "Container",
+              "rect": [
+                0,
+                70,
+                328,
+                75
+              ],
+              "children": [
+                {
+                  "type": "UiFarmCard",
+                  "rect": [
+                    0,
+                    70,
+                    328,
+                    74
+                  ],
+                  "children": [
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        0,
+                        70,
+                        328,
+                        74
+                      ]
+                    },
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        7,
+                        77,
+                        61,
+                        61
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            7,
+                            77,
+                            61,
+                            61
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "VBoxContainer",
+                      "rect": [
+                        78,
+                        70,
+                        243,
+                        74
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            78,
+                            82,
+                            243,
+                            18
+                          ],
+                          "variation": "C12XB",
+                          "text": "Farmer's Homestead"
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            78,
+                            101,
+                            243,
+                            15
+                          ],
+                          "variation": "C10B",
+                          "text": "Level 1"
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            78,
+                            118,
+                            243,
+                            15
+                          ],
+                          "variation": "C10B",
+                          "text": "Radishes ready 3h 32m"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                151,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "farm overview"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            177,
+            328,
+            95
+          ],
+          "children": [
+            {
+              "type": "Container",
+              "rect": [
+                0,
+                177,
+                328,
+                75
+              ],
+              "children": [
+                {
+                  "type": "UiFarmCard",
+                  "rect": [
+                    0,
+                    177,
+                    328,
+                    74
+                  ],
+                  "children": [
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        0,
+                        177,
+                        328,
+                        74
+                      ]
+                    },
+                    {
+                      "type": "Panel",
+                      "rect": [
+                        7,
+                        184,
+                        61,
+                        61
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            7,
+                            184,
+                            61,
+                            61
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "VBoxContainer",
+                      "rect": [
+                        78,
+                        177,
+                        225,
+                        74
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            78,
+                            189,
+                            225,
+                            18
+                          ],
+                          "variation": "C12XB",
+                          "text": "Farmer's Homestead"
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            78,
+                            208,
+                            225,
+                            15
+                          ],
+                          "variation": "C10B",
+                          "text": "Level 1"
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            78,
+                            225,
+                            225,
+                            15
+                          ],
+                          "variation": "C10B",
+                          "text": "Radishes ready 3h 32m"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Label",
+                      "rect": [
+                        309,
+                        177,
+                        12,
+                        74
+                      ],
+                      "variation": "C13XB",
+                      "text": "›"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                258,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "your profile · › opens HOME-1"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
