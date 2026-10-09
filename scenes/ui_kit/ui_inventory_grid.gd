@@ -1,9 +1,10 @@
 class_name UiInventoryGrid
 extends TouchScrollContainer
 ## Bag grid (SGODOT-225; "Inventory · source five-column grid" in the Bag layout, LOCK-12, and the counter's
-## bag half, LOCK-15). Five columns of Compact/InventoryCell, column pitch equal to the quick bar's (52 + 4) so
-## the grid lines up with the first five quick slots; filled cells first, then dashed empty cells up to
-## `capacity`. Scrolls vertically (TouchScrollContainer); cells keep their own GestureArbiter.
+## bag half, LOCK-15). Five columns of Compact/InventoryCell spread edge to edge: the first on the content's left
+## edge, the last on its right, four equal gaps (int10c 256 ④, 不知火舞: no longer on the quick bar's 52 + 4 pitch);
+## rows 12 apart. Filled cells first, then dashed empty cells up to `capacity`. Scrolls vertically
+## (TouchScrollContainer); cells keep their own GestureArbiter.
 ## Shared by the Bag | Gear drawer (2B) and the counter (2A), through two hooks:
 ##   on_select  Callable(item) run when a filled cell is tapped (bag: open the info sheet; counter: show the
 ##              sell area). Tapping another cell switches, tapping an empty cell clears (`selection_cleared`).
@@ -22,7 +23,8 @@ signal selection_cleared
 signal cell_gesture(item: Dictionary, outcome: Dictionary)
 
 const COLUMNS := 5
-const _ROW_GAP := 6.0   # rows are 58 apart in the Bag layout (52 cell + 6)
+const ROW_GAP := 12.0   # 256 ④: rows 12 apart (52 + 12 in the bag, 58 + 12 in the kitchen)
+const _MIN_COLUMN_GAP := 4.0   # before the grid has a width (and on a width too narrow for five cells)
 
 ## Cell main: INVENTORY (bag, counter) or KITCHEN (Experiment). Set before the first items.
 var density: UiItemCell.Density = UiItemCell.Density.INVENTORY: set = set_density
@@ -50,17 +52,19 @@ func set_selected_id(v: String) -> void:
 	selected_id = v
 	if not _cells.is_empty(): _paint_selection()
 
-var _grid: GridContainer
+var _grid: _Spread
 var _cells: Array[UiItemCell] = []
 var _shown: Array = []   # items behind the filled cells, in order
 
 func _init() -> void:
 	horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	_grid = GridContainer.new()
-	_grid.columns = COLUMNS
-	_grid.add_theme_constant_override(&"h_separation", int(UiTokens.SPACE_QUICK_BAR_GAP))
-	_grid.add_theme_constant_override(&"v_separation", int(_ROW_GAP))
+	_grid = _Spread.new()
+	_grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL   # the scroll's whole width, to spread over
 	add_child(_grid)
+
+## The gap between columns: (width − 5 × 52) / 4, 17 in the bag drawer's 328, 19 in the kitchen drawer's 336
+## (256 ④; Inventory and Kitchen cells are both 52 wide).
+func column_gap() -> int: return _Spread.gap_for(_grid.size.x)
 
 func set_items(v: Array) -> void: items = v; refresh()
 func set_density(v: UiItemCell.Density) -> void:
@@ -170,3 +174,34 @@ func _on_tap(i: int) -> void:
 
 func _on_gesture(outcome: Dictionary, i: int) -> void:
 	if i < _shown.size(): cell_gesture.emit(_shown[i], outcome)
+
+## Five columns spread edge to edge, rows ROW_GAP apart (256 ④). A GridContainer's fixed separation can't do it:
+## a gap taken from the width would make the content as wide as it was given, and a scroll container is never
+## narrower than its content, so the grid could never narrow again. This one asks for five cells and the narrow gap
+## only, and spreads the columns over whatever width it gets.
+class _Spread extends Container:
+	static func gap_for(width: float) -> int:
+		return maxi(int(_MIN_COLUMN_GAP), floori((width - COLUMNS * UiTokens.SIZE_INVENTORY_CELL) / float(COLUMNS - 1)))
+
+	func _cells_shown() -> Array:
+		return get_children().filter(func(c): return c is Control and (c as Control).visible)
+
+	func _cell() -> Vector2:
+		var cell := Vector2.ZERO
+		for c in _cells_shown(): cell = cell.max((c as Control).get_combined_minimum_size())
+		return cell
+
+	func _get_minimum_size() -> Vector2:
+		var n := _cells_shown().size()
+		if n == 0: return Vector2.ZERO
+		var cell := _cell()
+		var rows := ceili(n / float(COLUMNS))
+		return Vector2(COLUMNS * cell.x + (COLUMNS - 1) * _MIN_COLUMN_GAP, rows * cell.y + (rows - 1) * ROW_GAP)
+
+	func _notification(what: int) -> void:
+		if what != NOTIFICATION_SORT_CHILDREN: return
+		var cell := _cell()
+		var pitch := Vector2(cell.x + gap_for(size.x), cell.y + ROW_GAP)
+		var shown := _cells_shown()
+		for i in shown.size():
+			fit_child_in_rect(shown[i], Rect2(Vector2(i % COLUMNS, floori(i / float(COLUMNS))) * pitch, cell))

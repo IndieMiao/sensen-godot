@@ -241,14 +241,37 @@ func _grid(n := 7, cap := 25) -> UiInventoryGrid:
 	g.items = _items(n)
 	return _host(g)
 
-func test_grid_has_five_columns_on_the_quick_bar_pitch_and_58_row_pitch() -> void:
-	var g := _grid(7)
+## int10c 256 ④ (不知火舞): five columns spread edge to edge, gap (width − 260) / 4, rows 12 apart.
+func test_grid_spreads_five_columns_edge_to_edge_with_12_between_rows() -> void:
+	for w in [328, 336]:
+		var g := UiInventoryGrid.new()
+		g.custom_minimum_size = Vector2(w, 240)
+		g.items = _items(7)
+		_host(g)
+		await _settle()
+		var cells := g.cells()
+		var gap: int = (int(w) - 5 * UiTokens.SIZE_INVENTORY_CELL) / 4   # 17 in the bag drawer, 19 in the kitchen drawer
+		assert_int(g.column_gap()).is_equal(gap)
+		for i in UiInventoryGrid.COLUMNS:
+			assert_float(cells[i].position.x).is_equal(float(i * (UiTokens.SIZE_INVENTORY_CELL + gap)))
+		assert_float(cells[4].get_global_rect().end.x).is_equal(g.get_global_rect().end.x)   # flush right, scrolling or not
+		assert_float(cells[5].position.y - cells[0].position.y).is_equal(UiTokens.SIZE_INVENTORY_CELL + 12.0)
+		assert_vector(cells[0].size).is_equal(Vector2(UiTokens.SIZE_INVENTORY_CELL, UiTokens.SIZE_INVENTORY_CELL))
+
+func test_grid_follows_its_host_when_the_width_narrows() -> void:
+	var box: VBoxContainer = _host(VBoxContainer.new())
+	box.size = Vector2(336, 400)
+	var g := UiInventoryGrid.new()
+	g.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	g.items = _items(7)
+	box.add_child(g)
 	await _settle()
-	var cells := g.cells()
-	for i in UiInventoryGrid.COLUMNS:
-		assert_float(cells[i].position.x).is_equal(float(i * (UiTokens.SIZE_INVENTORY_CELL + UiTokens.SPACE_QUICK_BAR_GAP)))
-	assert_float(cells[5].position.y - cells[0].position.y).is_equal(58.0)
-	assert_vector(cells[0].size).is_equal(Vector2(UiTokens.SIZE_INVENTORY_CELL, UiTokens.SIZE_INVENTORY_CELL))
+	assert_int(g.column_gap()).is_equal(19)
+	box.size = Vector2(328, 400)
+	await _settle()
+	assert_float(g.size.x).is_equal(328.0)
+	assert_int(g.column_gap()).is_equal(17)
+	assert_float(g.cells()[4].get_global_rect().end.x).is_equal(g.get_global_rect().end.x)
 
 func test_grid_lists_items_then_dashed_empties_up_to_capacity() -> void:
 	var g := _grid(7, 25)
@@ -341,7 +364,7 @@ func test_kitchen_density_draws_kitchen_cells_with_status_and_mark() -> void:
 	assert_vector(c0.size).is_equal(Vector2(UiTokens.SIZE_KITCHEN_CELL_W, UiTokens.SIZE_KITCHEN_CELL_H))
 	assert_str(c0.status).is_equal("In pot")
 	assert_bool(g.cells()[1].marked).is_true()
-	assert_float(g.cells()[5].position.y - c0.position.y).is_equal(float(UiTokens.SIZE_KITCHEN_CELL_H) + 6.0)
+	assert_float(g.cells()[5].position.y - c0.position.y).is_equal(float(UiTokens.SIZE_KITCHEN_CELL_H) + UiInventoryGrid.ROW_GAP)   # 256 ④: rows 12 apart
 
 func test_grid_scrolls_vertically_only() -> void:
 	var g := _grid(25)
@@ -428,7 +451,7 @@ func test_bag_header_count_sort_and_capacity_bar() -> void:
 	assert_str(h.sort_button().label).is_equal("Sort · Type")
 	assert_str(h.sort_button().text).is_equal("Sort · Type")   # a toggle, so no ›
 	assert_str(h.sort_button().get_theme_color(&"font_color").to_html()).is_equal(UiTokens.COLOR_INFO.to_html())
-	assert_bool(h.sort_button().visible).is_true()
+	assert_bool(h.sort_shown()).is_true()
 	assert_float(h.tabs().size.y).is_equal(34.0)   # SegmentedTabs track 34, segments 28
 	assert_float(h.tabs().tabs()[0].size.y).is_equal(28.0)
 	assert_bool(h.is_nearly_full()).is_false()
@@ -436,14 +459,22 @@ func test_bag_header_count_sort_and_capacity_bar() -> void:
 	assert_bool(h.is_nearly_full()).is_true()
 	var got := []
 	h.side_changed.connect(func(s: int): got.append(s))
+	var bag_h := h.size.y
+	var tabs_y := h.tabs().global_position.y
 	h.tabs().tabs()[1].pressed.emit()
 	h.tabs().tabs()[1].button_pressed = true
+	await _settle()
 	assert_array(got).contains([1])
-	assert_bool(h.sort_button().visible).is_false()   # Sort is a Bag-side control
+	assert_bool(h.sort_shown()).is_false()   # Sort is a Bag-side control …
+	assert_float(h.sort_button().modulate.a).is_equal(0.0)
+	assert_int(h.sort_button().mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
+	assert_bool(h.bar_shown()).is_false()
+	assert_float(h.size.y).is_equal(bag_h)   # … but both keep their place: the header doesn't shrink (256 ③)
+	assert_float(h.tabs().global_position.y).is_equal(tabs_y)
 	h.side = UiBagHeader.Pane.BAG
 	h.show_tabs = false                               # the gift drawer: just the count
 	assert_bool(h.tabs().visible).is_false()
-	assert_bool(h.sort_button().visible).is_false()
+	assert_bool(h.sort_shown()).is_false()
 	assert_bool(h._title.visible).is_true()
 
 func test_gear_row_states() -> void:
