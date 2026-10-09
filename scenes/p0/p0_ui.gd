@@ -676,6 +676,17 @@ func _fab_pressed() -> void:
 ## While held, the farm repeats the action for each new plot with the same verb.
 func fab_state() -> Dictionary: return _fab_state
 
+## The main key's GuidePulse, once: a tap on what the key acts on, made where the key is already the way in (the mine
+## mouth, 不知火舞 on 231, int11 ②: entering costs Energy, so it stays on the key, LOCK-21). A 3 px ring from 80 %:
+## the main's 2 px read faint against the key's own green ring over the fields (不知火舞 on #156).
+const KEY_PULSE_RING := 3.0
+const KEY_PULSE_ALPHA := 0.8
+var key_pulses := 0
+func pulse_key() -> UiGuidePulse:
+	if _keys == null or not _keys.is_visible_in_tree(): return null
+	key_pulses += 1
+	return UiGuidePulse.play(_keys.key(), Rect2(), UiGuidePulse.Shape.CIRCLE, 16.0, KEY_PULSE_RING, KEY_PULSE_ALPHA)
+
 # ---------------------------------------------------------------- world tags & floats
 # ---------------------------------------------------------------- world prompts (SGODOT-250, LOCK-07 v2 / LOCK-16 v2)
 ## A facility within view and about 8 m: its icon button (WorldIconButton 1674:101157) centred on `screen` (this UI's

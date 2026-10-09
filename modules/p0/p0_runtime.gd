@@ -260,8 +260,8 @@ func _show_on_map(target: String) -> void:
 		return
 	_leave_then("show:" + target)
 
-## One level back, for a room's door: the farm under the farmhouse, the map under an outpost.
-## Leaving a room (the farmhouse, an outpost): back to the world under it. One pushed straight onto the empty p0_boot
+## One level back, for a room's door and the mine's exit: the farm under the farmhouse and the mine, the map under an
+## outpost. Leaving a room (the farmhouse, an outpost) or the mine: back to the world under it. One pushed straight onto the empty p0_boot
 ## (the dev entry outpost:<id>) has only a blank screen under it: it leaves for the map instead (李元芳 int8).
 func leave_room() -> void:
 	if not (is_instance_valid(world) and AppRouter.top_instance() == world): return

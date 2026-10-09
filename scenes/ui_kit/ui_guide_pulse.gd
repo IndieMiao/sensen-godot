@@ -15,6 +15,10 @@ const _INSET := 4.0       # the main's frame is the target plus 4 px on every si
 
 var shape: Shape = Shape.PILL
 var card_radius := 16.0
+## The ring's width and opening opacity: the main's 2 px from full; one caller may thicken it where 2 px reads faint (the
+## mine mouth's main key over the fields, 不知火舞 on #156). The other callers keep the main.
+var stroke := _STROKE
+var start_alpha := 1.0
 ## 0 → 1 over the pulse; drives the ring's offset and fade.
 var progress := 0.0:
 	set(v):
@@ -23,15 +27,18 @@ var progress := 0.0:
 var _target_size := Vector2.ZERO
 
 ## Plays one pulse around `rect` (local to `parent`; empty = the parent's whole rect) and returns it.
-static func play(parent: Control, rect := Rect2(), pulse_shape: Shape = Shape.PILL, radius := 16.0) -> UiGuidePulse:
+static func play(parent: Control, rect := Rect2(), pulse_shape: Shape = Shape.PILL, radius := 16.0, ring := _STROKE,
+		alpha := 1.0) -> UiGuidePulse:
 	var r := rect if rect.has_area() else Rect2(Vector2.ZERO, parent.size)
 	var p := UiGuidePulse.new()
 	p.shape = pulse_shape
 	p.card_radius = radius
+	p.stroke = ring
+	p.start_alpha = alpha
 	p._target_size = r.size
 	# Room for the whole growth; the ring is drawn relative to the target's edge in the middle.
-	p.position = r.position - Vector2.ONE * (_GROW + _STROKE)
-	p.size = r.size + Vector2.ONE * 2.0 * (_GROW + _STROKE)
+	p.position = r.position - Vector2.ONE * (_GROW + ring)
+	p.size = r.size + Vector2.ONE * 2.0 * (_GROW + ring)
 	parent.add_child(p)
 	var tw := p.create_tween()
 	tw.tween_property(p, "progress", 1.0, UiKit.secs(UiTokens.MOTION_NEW_UNLOCK_FLASH_MS)) \
@@ -49,14 +56,14 @@ func frame_size() -> Vector2: return _target_size + Vector2.ONE * 2.0 * _INSET
 func _draw() -> void:
 	if progress >= 1.0: return
 	var grow := _GROW * progress
-	var rect := Rect2(Vector2.ONE * (_GROW + _STROKE - grow), _target_size + Vector2.ONE * 2.0 * grow)
+	var rect := Rect2(Vector2.ONE * (_GROW + stroke - grow), _target_size + Vector2.ONE * 2.0 * grow)
 	var radius := card_radius + grow
 	if shape == Shape.PILL: radius = rect.size.y * 0.5
 	elif shape == Shape.CIRCLE: radius = minf(rect.size.x, rect.size.y) * 0.5
 	var box := StyleBoxFlat.new()
 	box.draw_center = false
-	box.set_border_width_all(int(round(_STROKE)))
-	box.border_color = Color(UiTokens.COLOR_PRIMARY, 1.0 - progress)
+	box.set_border_width_all(int(round(stroke)))
+	box.border_color = Color(UiTokens.COLOR_PRIMARY, start_alpha * (1.0 - progress))
 	box.set_corner_radius_all(int(round(radius)))
 	box.anti_aliasing = true
 	draw_style_box(box, rect)

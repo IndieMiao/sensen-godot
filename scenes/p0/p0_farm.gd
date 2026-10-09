@@ -172,7 +172,7 @@ func _build_world() -> void:
 	mine.position = _mine
 	mine.rotation.y = PI * 0.15
 	props.add_child(mine)
-	_materials = P0FarmMaterials.new().setup(self, _mine)
+	_materials = P0FarmMaterials.new().setup(self, _mine, mine)
 	add_child(_materials)
 	var scenery := GardenScenery.new()
 	add_child(scenery)
@@ -607,6 +607,7 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"sign": p0_tap(cam.unproject_position(_sign + Vector3(0, 0.45, 0)))   # HOME-1 through the sign's own tap
 		"plaque": p0_tap(cam.unproject_position(_plaque + Vector3(0, 0.35, 0)))   # PLAQUE-READ
 		"mailbox": p0_tap(cam.unproject_position(_mailbox + MAILBOX_HIT))   # the Inbox through the Mailbox's own tap (234 C)
+		"mouth": p0_tap(cam.unproject_position(_mine + Vector3(0, 1.6, 0)))   # the mine mouth's model, high on the arch (int11 ②)
 		"zoomto": _zoom = clampf(float(step[1]), 0.8, 1.4)   # zoomto:0.8 (widest) … 1.4 (closest)
 		"near":   # near:<id> — stand 1.2 m in front of a facility, so its name strip opens (250 review shots)
 			for c in _card_candidates():

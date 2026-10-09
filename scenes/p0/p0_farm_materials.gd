@@ -24,10 +24,13 @@ var _stored_shown := 0.0
 var _opening := false
 var _spots := {}                # spot id → world position (the spot's anchor cell)
 var _bench := Vector3.ZERO
+var _mouth_art: Node3D          # the mouth's model: a tap anywhere on it is a tap on the mouth
+var _to_mouth := false          # a tap on the mouth from afar: walking up to it
 
-func setup(farm_node: Node3D, mouth_at: Vector3) -> P0FarmMaterials:
+func setup(farm_node: Node3D, mouth_at: Vector3, art: Node3D = null) -> P0FarmMaterials:
 	farm = farm_node
 	mouth = mouth_at
+	_mouth_art = art
 	name = "FarmMaterials"
 	return self
 
@@ -83,6 +86,9 @@ func card_candidates() -> Array:
 func frame(v: Dictionary, card := "") -> void:
 	var cam: Camera3D = farm.cam
 	var near := near_mouth()
+	if _to_mouth and not farm.actor.mover.is_moving():   # arrived (or the stick took over: then nothing more)
+		_to_mouth = false
+		if near: _at_mouth()
 	var top := cam.unproject_position(mouth + Vector3(0, 1.9, 0))
 	# With an unfinished run the mouth keeps its Run 1/2 badge near and far (MINE-P0-5, LOCK-11: a state over the plain
 	# icon) and the EntryCard opens when near; without one it is a world prompt like the other facilities — the pickaxe
@@ -138,12 +144,12 @@ func tap_entry(screen: Vector2) -> bool:
 	_on_entry()
 	return true
 
-## Taps on the farm's material facilities (LOCK-07): the mouth shows "The mine" (MINE-P0-1 / P0-8; entering stays on the
-## key); a spot gathers when the player stands near it, a locked one shows MAT-3; the workbench opens its drawer.
+## Taps on the farm's material facilities (LOCK-07): the mouth walks up to it (tap_mouth); a spot gathers when the
+## player stands near it, a locked one shows MAT-3; the workbench opens its drawer.
 func tap(screen: Vector2) -> bool:
 	var cam: Camera3D = farm.cam
-	if cam.unproject_position(mouth + Vector3(0, 0.8, 0)).distance_to(screen) < 60:
-		P0MaterialCards.open_mine_sheet(rt.ui, rt.session.current())
+	if _mouth_hit(screen):
+		tap_mouth()
 		return true
 	for id in SPOTS:
 		var at: Vector3 = _spots.get(id, Vector3.ZERO)
@@ -154,14 +160,73 @@ func tap(screen: Vector2) -> bool:
 		return tap_card("workbench")
 	return false
 
+## A tap on the mouth — its model, button or strip (不知火舞 on 231, int11 ②) — never enters: entering costs the first
+## floor's 2 Energy, which the main key shows and confirms (LOCK-21). From afar the player walks up to the mouth and gets
+## what walking up shows (the strip and Enter mine, or Continue run and the EntryCard); at the mouth the key pulses
+## once to point at the way in; with today's runs used up the MINE-P0-8 drawer opens instead.
+func tap_mouth() -> void:
+	if near_mouth():
+		_at_mouth()
+		return
+	for p in mouth_stands(farm.grid, mouth, farm.actor.position):
+		if farm.actor.mover.set_target_position(p):
+			_to_mouth = true
+			return
+	_at_mouth()   # nowhere to stand by it (not on the shipped farm): answer from here
+
+func _at_mouth() -> void:
+	farm.actor.face(mouth)
+	var v := rt.session.current()
+	if P0MaterialLogic.mine_runs_spent(v): P0MaterialCards.open_mine_sheet(rt.ui, v)
+	else: rt.ui.pulse_key()
+
+## Walkable points by the mouth, well inside MOUTH_REACH, nearest the player first (the mouth's own cell is the gate).
+static func mouth_stands(grid: BlueprintGrid, at: Vector3, from: Vector3) -> Array:
+	var bp := grid.bp
+	var centre := bp.world_to_cell(at)
+	var reach := ceili(MOUTH_REACH / bp.cell_m)
+	var out: Array = []
+	for dy in range(-reach, reach + 1):
+		for dx in range(-reach, reach + 1):
+			var cell := centre + Vector2i(dx, dy)
+			if cell.x < 0 or cell.y < 0 or cell.x >= bp.grid.x or cell.y >= bp.grid.y or grid.astar.is_point_solid(cell): continue
+			var p := bp.cell_to_world(cell)
+			var d := flat(p, at)
+			if d > 0.5 and d < MOUTH_REACH - 0.5: out.append(p)
+	out.sort_custom(func(a, b): return flat(a, from) < flat(b, from))
+	return out
+
+## The mouth's model on screen (any part of it counts); a circle round the gate without the model.
+func _mouth_hit(screen: Vector2) -> bool:
+	var cam: Camera3D = farm.cam
+	if is_instance_valid(_mouth_art) and _mouth_art.is_visible_in_tree():
+		var box := screen_box(cam, _mouth_art)
+		if box.has_area(): return box.has_point(screen)
+	return cam.unproject_position(mouth + MOUTH_HIT).distance_to(screen) < 60
+
+## A model's bounds projected on screen: every mesh's box corners (geometry only: a light's box is its whole range).
+static func screen_box(cam: Camera3D, root: Node3D) -> Rect2:
+	var box := Rect2()
+	var first := true
+	for n in root.find_children("*", "GeometryInstance3D", true, false):
+		var vi := n as GeometryInstance3D
+		var aabb := vi.get_aabb()
+		if aabb.size == Vector3.ZERO: continue
+		for i in 8:
+			var p := cam.unproject_position(vi.global_transform * aabb.get_endpoint(i))
+			if first: box = Rect2(p, Vector2.ZERO)
+			else: box = box.expand(p)
+			first = false
+	return box
+
 ## A finger card's tap by id (苏烈's #21 _tap_card dispatch): a gathering spot gathers / shows MAT-3 / says when it is
 ## ready; the workbench opens. False for ids this helper doesn't own.
 func tap_card(id: String) -> bool:
 	# A tap that reaches the world while a sheet or card is already up (a fast second tap on a spot's button before the
 	# frame hides it) opens nothing more (SGODOT-256 ①).
 	if rt.ui.has_modal() and (id in SPOTS or id in ["workbench", "mine"]): return true
-	if id == "mine":   # the mouth's strip or button (no unfinished run): "The mine" sheet; entering stays on the key
-		P0MaterialCards.open_mine_sheet(rt.ui, rt.session.current())
+	if id == "mine":   # the mouth's strip or button
+		tap_mouth()
 		return true
 	if id == "workbench":
 		farm.actor.face(_bench)
