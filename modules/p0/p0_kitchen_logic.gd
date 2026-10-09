@@ -127,9 +127,15 @@ static func locked_slot_toast(view: Dictionary) -> String: return "Cooking " + l
 static func pages(view: Dictionary) -> Array: return cooking(view).get("cookbook", [])
 
 static func cookbook_count(view: Dictionary) -> String:
-	if cooking(view).has("pages_total"): return "%d/%d" % [int(cooking(view).get("discovered", 0)), int(cooking(view).pages_total)]   # S5
+	var n := cookbook_progress(view)
+	return "%d/%d" % [n.x, n.y]
+
+## Discovered pages (cooked at least once) and the pages the Cookbook shows (48 in P0): the Cookbook tab's count and the
+## profile's Pages tile read this one (李白 q(100): Pages counted known pages too, 4/48 against the tab's 1/48).
+static func cookbook_progress(view: Dictionary) -> Vector2i:
+	if cooking(view).has("pages_total"): return Vector2i(int(cooking(view).get("discovered", 0)), int(cooking(view).pages_total))   # S5
 	var all := pages(view)
-	return "%d/%d" % [all.filter(func(p): return p.get("known", false)).size(), all.size()]
+	return Vector2i(all.filter(func(p): return p.get("known", false)).size(), all.size())
 
 ## Pages in the grid order of §7.2.7: can cook (rarity high → low) → discovered but short → Tasted → clued → unknown.
 static func cookbook_order(view: Dictionary, chip := "All") -> Array:

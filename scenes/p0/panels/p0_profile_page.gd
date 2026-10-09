@@ -143,7 +143,7 @@ static func profile_data(view: Dictionary) -> Dictionary:
 	var farm: Dictionary = p.get("farm", {})
 	var name := str(p.get("name", ""))
 	var dex: Array = view.get("fishing", {}).get("dex", [])
-	var pages: Array = view.get("cooking", {}).get("cookbook", [])
+	var book := P0KitchenLogic.cookbook_progress(view)   # discovered pages / the pages shown (q(100))
 	return {
 		name = name if name != "" else "You",
 		home_line = " · ".join(home),
@@ -153,7 +153,7 @@ static func profile_data(view: Dictionary) -> Dictionary:
 			status = _farm_status(view)},
 		collections = [
 			{key = "fish", name = "Fish", have = dex.filter(func(f): return int(f.get("caught", 0)) > 0).size(), need = dex.size(), icon = "fish_crucian"},
-			{key = "pages", name = "Pages", have = pages.filter(func(r): return r.get("name", null) != null).size(), need = pages.size(), icon = "recipe_card"},
+			{key = "pages", name = "Pages", have = book.x, need = book.y, icon = "recipe_card"},   # as the Cookbook tab (q(100))
 		],
 	}
 

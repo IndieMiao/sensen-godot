@@ -210,7 +210,9 @@ func test_profile_data_reads_the_view_and_hides_what_is_missing() -> void:
 		"farm": {"name": "Farmer's Homestead", "level": 1}}
 	v["plots"] = [{"state": "growing", "crop": "crop_radish", "ready_in": 12720000}, {"state": "tilled"}]
 	v["fishing"] = {"dex": [{"id": "fish_crucian", "caught": 2}, {"id": "fish_perch", "caught": 0}, {"id": "fish_bass", "caught": 1}]}
-	v["cooking"] = {"cookbook": [{"id": "a", "name": "Grilled Crucian"}, {"id": "b", "name": null}]}
+	# S5: 1 page discovered (cooked) of the 48 shown; a known page not cooked yet (a recipe card's) is not counted (q(100))
+	v["cooking"] = {"discovered": 1, "pages_total": 48, "cookbook": [{"id": "a", "name": "Grilled Crucian", "state": "discovered"},
+		{"id": "b", "name": "Fresh Fish Soup", "state": "tasted"}, {"id": "c", "name": null}]}
 	var d := P0ProfilePage.profile_data(v)
 	assert_str(str(d.name)).is_equal("Farmer")
 	assert_str(str(d.home_line)).starts_with("Shanghai · Subtropical · Since ")
@@ -220,7 +222,8 @@ func test_profile_data_reads_the_view_and_hides_what_is_missing() -> void:
 	assert_str(str(d.farm.name)).is_equal("Farmer's Homestead")
 	assert_str(str(d.farm.level_line)).is_equal("Level 1")
 	assert_str(str(d.farm.status)).is_equal("Radishes ready 3h 32m")
-	assert_that(d.collections.map(func(c): return [c.name, c.have, c.need])).is_equal([["Fish", 2, 3], ["Pages", 1, 2]])
+	assert_that(d.collections.map(func(c): return [c.name, c.have, c.need])).is_equal([["Fish", 2, 3], ["Pages", 1, 48]])
+	assert_str("%d/%d" % [int(d.collections[1].have), int(d.collections[1].need)]).is_equal(P0KitchenLogic.cookbook_count(v))   # as the tab
 	var bare := P0ProfilePage.profile_data({})
 	assert_str(str(bare.name)).is_equal("You")
 	assert_str(str(bare.home_line)).is_equal("")

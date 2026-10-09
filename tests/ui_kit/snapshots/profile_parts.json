@@ -4,7 +4,7 @@
     0,
     0,
     328,
-    760
+    645
   ],
   "children": [
     {
@@ -35,7 +35,7 @@
         0,
         88,
         328,
-        672
+        557
       ],
       "children": [
         {
@@ -662,123 +662,6 @@
               ],
               "variation": "C9B",
               "text": "SkillRing · ring floored to 10 %"
-            }
-          ]
-        },
-        {
-          "type": "VBoxContainer",
-          "rect": [
-            0,
-            665,
-            328,
-            95
-          ],
-          "children": [
-            {
-              "type": "Container",
-              "rect": [
-                0,
-                665,
-                328,
-                75
-              ],
-              "children": [
-                {
-                  "type": "UiFarmCard",
-                  "rect": [
-                    0,
-                    665,
-                    328,
-                    74
-                  ],
-                  "children": [
-                    {
-                      "type": "Panel",
-                      "rect": [
-                        0,
-                        665,
-                        328,
-                        74
-                      ]
-                    },
-                    {
-                      "type": "Panel",
-                      "rect": [
-                        7,
-                        672,
-                        61,
-                        61
-                      ],
-                      "children": [
-                        {
-                          "type": "TextureRect",
-                          "rect": [
-                            7,
-                            672,
-                            61,
-                            61
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "type": "VBoxContainer",
-                      "rect": [
-                        78,
-                        665,
-                        243,
-                        74
-                      ],
-                      "children": [
-                        {
-                          "type": "Label",
-                          "rect": [
-                            78,
-                            677,
-                            243,
-                            18
-                          ],
-                          "variation": "C12XB",
-                          "text": "Farmer's Homestead"
-                        },
-                        {
-                          "type": "Label",
-                          "rect": [
-                            78,
-                            696,
-                            243,
-                            15
-                          ],
-                          "variation": "C10B",
-                          "text": "Level 1"
-                        },
-                        {
-                          "type": "Label",
-                          "rect": [
-                            78,
-                            713,
-                            243,
-                            15
-                          ],
-                          "variation": "C10B",
-                          "text": "Radishes ready 3h 32m"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "Label",
-              "rect": [
-                0,
-                746,
-                328,
-                14
-              ],
-              "variation": "C9B",
-              "text": "farm overview"
             }
           ]
         }
