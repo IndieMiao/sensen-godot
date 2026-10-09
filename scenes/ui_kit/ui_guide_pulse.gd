@@ -15,6 +15,13 @@ const _INSET := 4.0       # the main's frame is the target plus 4 px on every si
 
 var shape: Shape = Shape.PILL
 var card_radius := 16.0
+## The ring's width, opening opacity, growth and where its fade starts (in the eased progress): the main's 2 px from full,
+## out to +10 px, fading all the way. One caller may tune them where the main reads faint (the mine mouth's main key over
+## the fields, 不知火舞 on #156 / #160); the other callers keep the main.
+var stroke := _STROKE
+var start_alpha := 1.0
+var grow_px := _GROW
+var fade_from := 0.0
 ## 0 → 1 over the pulse; drives the ring's offset and fade.
 var progress := 0.0:
 	set(v):
@@ -23,15 +30,20 @@ var progress := 0.0:
 var _target_size := Vector2.ZERO
 
 ## Plays one pulse around `rect` (local to `parent`; empty = the parent's whole rect) and returns it.
-static func play(parent: Control, rect := Rect2(), pulse_shape: Shape = Shape.PILL, radius := 16.0) -> UiGuidePulse:
+static func play(parent: Control, rect := Rect2(), pulse_shape: Shape = Shape.PILL, radius := 16.0, ring := _STROKE,
+		alpha := 1.0, grow := _GROW, fade := 0.0) -> UiGuidePulse:
 	var r := rect if rect.has_area() else Rect2(Vector2.ZERO, parent.size)
 	var p := UiGuidePulse.new()
 	p.shape = pulse_shape
 	p.card_radius = radius
+	p.stroke = ring
+	p.start_alpha = alpha
+	p.grow_px = grow
+	p.fade_from = fade
 	p._target_size = r.size
 	# Room for the whole growth; the ring is drawn relative to the target's edge in the middle.
-	p.position = r.position - Vector2.ONE * (_GROW + _STROKE)
-	p.size = r.size + Vector2.ONE * 2.0 * (_GROW + _STROKE)
+	p.position = r.position - Vector2.ONE * (grow + ring)
+	p.size = r.size + Vector2.ONE * 2.0 * (grow + ring)
 	parent.add_child(p)
 	var tw := p.create_tween()
 	tw.tween_property(p, "progress", 1.0, UiKit.secs(UiTokens.MOTION_NEW_UNLOCK_FLASH_MS)) \
@@ -46,17 +58,21 @@ func _init() -> void:
 ## The frame the main draws: the target plus _INSET on each side (for checks against the Figma frame).
 func frame_size() -> Vector2: return _target_size + Vector2.ONE * 2.0 * _INSET
 
+## The ring's opacity now: full until fade_from, then down to 0 at the end (the main fades from the start).
+func ring_alpha() -> float:
+	return start_alpha * (1.0 - clampf((progress - fade_from) / maxf(1.0 - fade_from, 0.001), 0.0, 1.0))
+
 func _draw() -> void:
 	if progress >= 1.0: return
-	var grow := _GROW * progress
-	var rect := Rect2(Vector2.ONE * (_GROW + _STROKE - grow), _target_size + Vector2.ONE * 2.0 * grow)
+	var grow := grow_px * progress
+	var rect := Rect2(Vector2.ONE * (grow_px + stroke - grow), _target_size + Vector2.ONE * 2.0 * grow)
 	var radius := card_radius + grow
 	if shape == Shape.PILL: radius = rect.size.y * 0.5
 	elif shape == Shape.CIRCLE: radius = minf(rect.size.x, rect.size.y) * 0.5
 	var box := StyleBoxFlat.new()
 	box.draw_center = false
-	box.set_border_width_all(int(round(_STROKE)))
-	box.border_color = Color(UiTokens.COLOR_PRIMARY, 1.0 - progress)
+	box.set_border_width_all(int(round(stroke)))
+	box.border_color = Color(UiTokens.COLOR_PRIMARY, ring_alpha())
 	box.set_corner_radius_all(int(round(radius)))
 	box.anti_aliasing = true
 	draw_style_box(box, rect)

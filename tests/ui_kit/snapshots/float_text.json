@@ -4,7 +4,7 @@
     0,
     0,
     328,
-    324
+    382
   ],
   "children": [
     {
@@ -24,43 +24,43 @@
         0,
         28,
         328,
-        18
+        36
       ],
       "variation": "CaptionR12",
-      "text": "FloatText 1178:82191 · six tones, Hug / Wrap (static pills)"
+      "text": "FloatText 1178:82191 · six tones + muted (#158), Hug / Wrap (static pills)"
     },
     {
       "type": "VBoxContainer",
       "rect": [
         0,
-        52,
+        70,
         328,
-        272
+        312
       ],
       "children": [
         {
           "type": "PanelContainer",
           "rect": [
             65,
-            52,
+            70,
             197,
-            252
+            292
           ],
           "children": [
             {
               "type": "VBoxContainer",
               "rect": [
                 77,
-                64,
+                82,
                 173,
-                228
+                268
               ],
               "children": [
                 {
                   "type": "HBoxContainer",
                   "rect": [
                     77,
-                    64,
+                    82,
                     173,
                     28
                   ],
@@ -69,7 +69,7 @@
                       "type": "PanelContainer",
                       "rect": [
                         77,
-                        64,
+                        82,
                         59,
                         28
                       ],
@@ -78,7 +78,7 @@
                           "type": "HBoxContainer",
                           "rect": [
                             85,
-                            67,
+                            85,
                             43,
                             22
                           ],
@@ -87,7 +87,7 @@
                               "type": "Label",
                               "rect": [
                                 85,
-                                67,
+                                85,
                                 43,
                                 22
                               ],
@@ -104,7 +104,7 @@
                   "type": "HBoxContainer",
                   "rect": [
                     77,
-                    104,
+                    122,
                     173,
                     28
                   ],
@@ -113,7 +113,7 @@
                       "type": "PanelContainer",
                       "rect": [
                         77,
-                        104,
+                        122,
                         97,
                         28
                       ],
@@ -122,7 +122,7 @@
                           "type": "HBoxContainer",
                           "rect": [
                             85,
-                            107,
+                            125,
                             81,
                             22
                           ],
@@ -131,7 +131,7 @@
                               "type": "Label",
                               "rect": [
                                 85,
-                                107,
+                                125,
                                 81,
                                 22
                               ],
@@ -148,7 +148,7 @@
                   "type": "HBoxContainer",
                   "rect": [
                     77,
-                    144,
+                    162,
                     173,
                     28
                   ],
@@ -157,7 +157,7 @@
                       "type": "PanelContainer",
                       "rect": [
                         77,
-                        144,
+                        162,
                         88,
                         28
                       ],
@@ -166,7 +166,7 @@
                           "type": "HBoxContainer",
                           "rect": [
                             85,
-                            147,
+                            165,
                             72,
                             22
                           ],
@@ -175,7 +175,7 @@
                               "type": "Label",
                               "rect": [
                                 85,
-                                147,
+                                165,
                                 72,
                                 22
                               ],
@@ -192,7 +192,7 @@
                   "type": "HBoxContainer",
                   "rect": [
                     77,
-                    184,
+                    202,
                     173,
                     28
                   ],
@@ -201,7 +201,7 @@
                       "type": "PanelContainer",
                       "rect": [
                         77,
-                        184,
+                        202,
                         84,
                         28
                       ],
@@ -210,7 +210,7 @@
                           "type": "HBoxContainer",
                           "rect": [
                             85,
-                            187,
+                            205,
                             68,
                             22
                           ],
@@ -219,7 +219,7 @@
                               "type": "Label",
                               "rect": [
                                 85,
-                                187,
+                                205,
                                 68,
                                 22
                               ],
@@ -236,7 +236,7 @@
                   "type": "HBoxContainer",
                   "rect": [
                     77,
-                    224,
+                    242,
                     173,
                     28
                   ],
@@ -245,7 +245,7 @@
                       "type": "PanelContainer",
                       "rect": [
                         77,
-                        224,
+                        242,
                         173,
                         28
                       ],
@@ -254,7 +254,7 @@
                           "type": "HBoxContainer",
                           "rect": [
                             85,
-                            227,
+                            245,
                             157,
                             22
                           ],
@@ -263,7 +263,7 @@
                               "type": "TextureRect",
                               "rect": [
                                 85,
-                                231,
+                                249,
                                 14,
                                 14
                               ]
@@ -272,7 +272,7 @@
                               "type": "Label",
                               "rect": [
                                 103,
-                                227,
+                                245,
                                 139,
                                 22
                               ],
@@ -289,7 +289,7 @@
                   "type": "HBoxContainer",
                   "rect": [
                     77,
-                    264,
+                    282,
                     173,
                     28
                   ],
@@ -298,7 +298,7 @@
                       "type": "PanelContainer",
                       "rect": [
                         77,
-                        264,
+                        282,
                         108,
                         28
                       ],
@@ -307,7 +307,7 @@
                           "type": "HBoxContainer",
                           "rect": [
                             85,
-                            267,
+                            285,
                             92,
                             22
                           ],
@@ -316,7 +316,7 @@
                               "type": "TextureRect",
                               "rect": [
                                 85,
-                                271,
+                                289,
                                 14,
                                 14
                               ]
@@ -325,12 +325,56 @@
                               "type": "Label",
                               "rect": [
                                 103,
-                                267,
+                                285,
                                 74,
                                 22
                               ],
                               "variation": "RowTitleXB15",
                               "text": "+6 Timber"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "HBoxContainer",
+                  "rect": [
+                    77,
+                    322,
+                    173,
+                    28
+                  ],
+                  "children": [
+                    {
+                      "type": "PanelContainer",
+                      "rect": [
+                        77,
+                        322,
+                        142,
+                        28
+                      ],
+                      "children": [
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            85,
+                            325,
+                            126,
+                            22
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                85,
+                                325,
+                                126,
+                                22
+                              ],
+                              "variation": "RowTitleXB15",
+                              "text": "No XP · 3rd today"
                             }
                           ]
                         }
@@ -346,7 +390,7 @@
           "type": "Label",
           "rect": [
             0,
-            310,
+            368,
             328,
             14
           ],

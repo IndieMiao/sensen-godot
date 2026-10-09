@@ -1238,7 +1238,8 @@ static func _rod_offer(view: Dictionary, id: String) -> Dictionary:
 ## The bench's state from view.rest {used, limit, resets_in, amount, away_h, away_ready_in} and Energy (FARM-7-2 482:52;
 ## q(70): `wait` is the strip's fact while it can't be used yet, "in 1h 12m" or "after 2h away"):
 ## state "ready" / "away" (2 h away from home first, q(41)) / "used" / "full"; the badge (STATE-ICONS: Available,
-## Countdown with the time left, Used today); the near card copy; the sheet's lines and its one button.
+## Countdown with the time left, Used today); the sheet's lines and its one button. Used today, the sheet's last line
+## counts down to the 04:00 home-day reset like the mine's `Resets in 9h 12m` (q(96)).
 ## Near-full Rest says the real gain (WP4-D10 ②: "Rest · +25 Energy"). away_ready_in null = never left home.
 static func rest_state(view: Dictionary) -> Dictionary:
 	var r: Dictionary = view.get("rest", {})
@@ -1249,7 +1250,6 @@ static func rest_state(view: Dictionary) -> Dictionary:
 	var away = r.get("away_ready_in", 0)
 	var out := {
 		"state": "ready", "badge": "available", "caption": "",
-		"card": "Rest · +%d Energy · once a day" % amount,
 		"sheet_state": "Available", "effect": "Restores up to %d Energy" % amount,
 		"fact": "Uses left", "fact_value": "%d today" % maxi(0, int(r.get("limit", 1)) - int(r.get("used", 0))),
 		"button": ("Rest · +%d Energy" % gain) if gain < amount else "Rest", "reason": "", "can_rest": true,
@@ -1258,7 +1258,7 @@ static func rest_state(view: Dictionary) -> Dictionary:
 	if used:
 		out.merge({"state": "used", "badge": "used_today", "sheet_state": "Used today", "effect": "",
 			"fact": "Uses", "fact_value": "%d/%d" % [int(r.get("used", 0)), int(r.get("limit", 1))], "button": "", "can_rest": false,
-			"close": "Close", "note": "Available again at the next home-day reset."}, true)
+			"close": "Close", "note": "Available again in " + duration(float(r.get("resets_in", 0)))}, true)
 	elif away == null or float(away) > 0.0:
 		# q(41) / q(70): Rest opens 2 h after leaving the homestead. A new account that never left has no leave time
 		# (away_ready_in null): no countdown at all, just "after 2h away"; after the first leave the time to go.

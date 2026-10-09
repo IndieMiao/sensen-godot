@@ -48,10 +48,10 @@ func test_rows_say_what_they_take_and_what_the_button_does() -> void:
 	assert_dict(pond.cmd).is_empty()
 
 func test_page_facts_count_the_day_and_the_next_request() -> void:
-	assert_array(P0Board.facts(_view(), "market")).is_equal([["Requests today", "4 of 6"]])
+	assert_array(P0Board.facts(_view(), "market")).is_equal([["Requests today", "4/6"]])
 	var v := _view()
 	v.quotas.request_bonus.used = 20
-	assert_array(P0Board.facts(v, "stall")).is_equal([["Requests today", "4 of 6"], ["Next request", "72h"], ["Bonus today", "20 of 100"]])
+	assert_array(P0Board.facts(v, "stall")).is_equal([["Requests today", "4/6"], ["Next request", "72h"], ["Bonus today", "20/100"]])
 	assert_str(P0Board.hours(14280000)).is_equal("3h 58m")
 
 func test_a_delivered_slot_shows_its_row_done() -> void:

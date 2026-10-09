@@ -3,7 +3,8 @@ extends Control
 ## FloatText 1178:82191 (SGODOT-225, for 亚瑟's float_text in 224; §16.1.2 feedback layer). A soft cream pill
 ## (82 %) with an optional 14 icon and one ExtraBold 15 line in its tone colour: XP cyan, ENERGY_GAIN green
 ## (eating, refunds), ENERGY_COST red-orange, COINS gold, AFFINITY rose with a heart (`+2 · first chat today`
-## over the resident bar), ITEM ink with the item's icon. Layout HUG = one line, auto width; WRAP = at most 320
+## over the resident bar), ITEM ink with the item's icon, MUTED secondary ink for a line that gives nothing
+## (`No XP · 3rd today`, `Missed · still cooking`; 不知火舞 on #158: the XP colour reads as a reward). Layout HUG = one line, auto width; WRAP = at most 320
 ## wide, centred, up to 2 lines, longer copy cut with …. Never takes input.
 ## play(at, stack_index): `at` is the bottom centre (the caller puts it 40 above the object). Motion (不知火舞
 ## 2026-10-07, SGODOT-204 c 45754a94) = pop → settle → rise → fade, 1100 ms, pivot bottom centre: ×0.5 → ×1.3 in
@@ -15,7 +16,7 @@ extends Control
 
 signal finished
 
-enum Tone { XP, ENERGY_GAIN, ENERGY_COST, COINS, AFFINITY, ITEM }
+enum Tone { XP, ENERGY_GAIN, ENERGY_COST, COINS, AFFINITY, ITEM, MUTED }
 enum Layout { HUG, WRAP }
 
 const HEART := preload("res://assets/ui/kit_icons/heart.svg")
@@ -47,7 +48,7 @@ const _BUMP_MS := 200.0
 const TONE_COLORS := {
 	Tone.XP: UiTokens.COLOR_FLOAT_XP, Tone.ENERGY_GAIN: UiTokens.COLOR_FLOAT_ENERGY_GAIN,
 	Tone.ENERGY_COST: UiTokens.COLOR_FLOAT_ENERGY_COST, Tone.COINS: UiTokens.COLOR_FLOAT_COINS,
-	Tone.AFFINITY: UiTokens.COLOR_FLOAT_AFFINITY, Tone.ITEM: UiTokens.COLOR_TEXT,
+	Tone.AFFINITY: UiTokens.COLOR_FLOAT_AFFINITY, Tone.ITEM: UiTokens.COLOR_TEXT, Tone.MUTED: UiTokens.COLOR_SECONDARY,
 }
 
 var text := "": set = set_text
