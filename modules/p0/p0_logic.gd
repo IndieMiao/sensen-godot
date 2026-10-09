@@ -835,8 +835,9 @@ const DAY_CHANGES := {"cooking:4": "Today changes: 3-ingredient dishes", "farmin
 ## the accepted FARM-LV2 (1368:91797), content and timing as §4.8.6 (不知火舞 233, 10-08):
 ##   subtitle  `New for you · Potato, Chamomile, Compost` (what the level opens, q(69)); Fishing `Fine fish now stay on the hook`;
 ##             Cooking Lv4 `Three-ingredient dishes now possible`
-##   rewards   pills: the Energy and the level-up gift's items (`+50 Energy` · `+3 Worm Bait` · `+3 Wild Herb`; SKILL-3
-##             482:65; Cooking levels give no Energy)
+##   rewards   pills: the level-up gift's items (`+3 Worm Bait` · `+3 Wild Herb`; SKILL-3 482:65); a level without a gift
+##             has no reward row. Skill level-ups give no Energy (q(101)); a server from before q(101) still pays it and
+##             says how much, and that shows as `+50 Energy` first — never a `+0 Energy`
 ##   detail    recipe cards only (`New recipe: Herb Grilled Fish`), else nothing
 ##   tip       the next level (`Next Lv4 · Tomato, Chili, Row Hoe · 150 XP`, its new things this season); the account's
 ##             first level-up teaches instead, a level that changes the day says `Today changes: …` (q(69))
@@ -846,7 +847,7 @@ static func level_banner(view: Dictionary, ev: Dictionary, first := false) -> Di
 	var lv := int(ev.get("level", 2))
 	var title := "%s Lv%d" % [skill.capitalize(), lv]
 	var rewards: Array = []
-	if int(ev.get("energy", 0)) > 0:
+	if int(ev.get("energy", 0)) > 0:   # only from a server before q(101): what it really paid, so the bar never moves unsaid
 		rewards.append({text = "+%d Energy" % int(ev.energy), tone = UiFloatText.Tone.ENERGY_GAIN})
 	var recipes: Array = []
 	var bait := ""
