@@ -142,6 +142,11 @@ func _fit() -> void:
 	# The pop's peak never makes the pill wider than 336 on screen.
 	_peak = minf(_PEAK, _PEAK_MAX_W / maxf(1.0, size.x * _unit))
 
+## Seconds from a group of `lines` starting to play to its last line gone (each line starts _STACK_DELAY_MS later):
+## what comes after the floats waits this long (a first catch's Caught! card, 不知火舞 on 231).
+static func play_s(lines := _STACK_MAX) -> float:
+	return UiKit.secs(_TOTAL_MS + _STACK_DELAY_MS * clampi(lines - 1, 0, _STACK_MAX - 1))
+
 ## Shows the float with its bottom centre at `at` (in the parent's space), the `stack_index`th line of one moment.
 func play(at: Vector2, stack_index := 0) -> void:
 	_relayout()

@@ -16,6 +16,13 @@ var line_color := Color("f5e9c9")
 const RING_PX := 1.5
 const RING_GAP_PX := 1.5
 const RING_INK := Color("#2F3A33CC")   # ink, 80 %
+## The landed fish's arc from the water to the hand, seconds.
+const CATCH_LIFT_S := 1.25
+## The P0 pond's catch pops at the walking scale (美术总监 / 不知火舞 on 231, 2026-10-09): the fish grows to this scale
+## in CATCH_POP_S as it leaves the water, holds it in flight and is back to its own size CATCH_POP_S before it reaches
+## the hand; only the fish, not the camera. 1 keeps Journey's pond, the street and remote players' fish as they were.
+var catch_pop := 1.0
+const CATCH_POP_S := 0.15
 var remote_state: Dictionary = {}
 var panel: FishingPanel
 var actor: Node3D
@@ -270,16 +277,17 @@ func step(dt: float) -> void:
 		bobber_position = grip.lerp(_landing, flight) + Vector3.UP * sin(flight * PI) * 1.2
 		if _cast_age - dt < 0.85 and _cast_age >= 0.85: _splash_age = 0
 	var landed: bool = _phase == "result" and model.get("outcome") == "caught" and result.get("outcome") == "caught"
-	if landed and _phase_age < 1.25:
+	if landed and _phase_age < CATCH_LIFT_S:
 		active_float = true
-		var lift := smoothstep(0, 1, _phase_age / 1.25)
+		var lift := smoothstep(0, 1, _phase_age / CATCH_LIFT_S)
 		bobber_position = _landing.lerp(grip + Vector3.UP * 0.25, lift) + Vector3.UP * sin(lift * PI) * 1.7
 		_catch.global_position = bobber_position - Vector3.UP * 0.15
 		_catch.rotation = Vector3(0, _clock * 3.0, sin(_clock * 17) * 0.3)
+		_catch.scale = Vector3.ONE * catch_scale(_phase_age)
 		var id := str(result.get("fish_id", ""))
 		var tier := int(result.get("tier", FishingModel.fish(id).get("tier", 1)))
 		_catch_material.albedo_color = [Color("a7c1a5"), Color("71aaba"), Color("e4ba63"), Color("bcb8df")][clampi(tier - 1, 0, 3)]
-	_catch.visible = landed and _phase_age < 1.25
+	_catch.visible = landed and _phase_age < CATCH_LIFT_S
 	_bobber.visible = active_float and not _catch.visible
 	# A larger float floats as high: the same share of it stays under the water line.
 	_bobber.global_position = bobber_position + Vector3.UP * 0.055 * (float_scale - 1.0)
@@ -293,6 +301,13 @@ func step(dt: float) -> void:
 	if is_instance_valid(_water): _water.interact(bobber_position, 0.7 if fighting else 0.3 if active_float and _cast_age >= 0.85 else 0.0)
 	_frame_camera(1.0 - exp(-dt * 7.0))
 	if not remote: panel.anchor_gauge(camera.unproject_position(_landing))
+
+## The landed fish's scale `age` seconds into its arc: catch_pop from CATCH_POP_S out of the water until CATCH_POP_S
+## before the hand, eased in and out (smoothstep); 1 at both ends.
+func catch_scale(age: float) -> float:
+	var up := smoothstep(0.0, 1.0, age / CATCH_POP_S)
+	var down := smoothstep(0.0, 1.0, (CATCH_LIFT_S - age) / CATCH_POP_S)
+	return lerpf(1.0, catch_pop, minf(up, down))
 
 func _global_pose(bone: int) -> Transform3D:
 	var pose := _skeleton.get_bone_pose(bone)
