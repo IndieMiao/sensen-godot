@@ -551,7 +551,9 @@ func _judge_tap() -> bool:
 		if _ring:
 			_ring.result = 1 if hit else 0
 			_ring.mark_turn = _judged_turn[i]
-		rt.ui.float_text(heat_float(hit, _judged.values().count(true)), float_from(_judged_turn[i]), UiTokens.COLOR_GOLD_INK if hit else UiFloatText.Tone.MUTED)
+		# A hit is item ink, as it always showed: gold ink is the coins' colour and would read as money; ★ says the hit
+		# (不知火舞 on #158). A miss gives nothing: secondary ink.
+		rt.ui.float_text(heat_float(hit, _judged.values().count(true)), float_from(_judged_turn[i]), UiFloatText.Tone.ITEM if hit else UiFloatText.Tone.MUTED)
 		if hit: Input.vibrate_handheld(40)
 		return true
 	return false

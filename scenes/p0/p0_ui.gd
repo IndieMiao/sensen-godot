@@ -980,10 +980,10 @@ func camera_band() -> Rect2:
 
 ## FloatText (1178:82191, UiFloatText from 2B; SGODOT-224): one line rising from `screen` (its bottom centre) in its
 ## tone; `stack` = the line's place in one reply (each starts 28 higher and 60 ms later, at most 3). Copy longer
-## than one line wraps (Layout=Wrap, two lines at most). `tone` also takes the older Color argument (callers in
-## other PRs, e.g. SGODOT-231's material notices): any colour draws in the ITEM tone.
-func float_text(text: String, screen: Vector2, tone: Variant = UiFloatText.Tone.ITEM, icon: Texture2D = null, stack := 0) -> UiFloatText:
-	var f := _make_float(text, UiFloatText.Tone.ITEM if tone is Color else int(tone), icon)
+## than one line wraps (Layout=Wrap, two lines at most). `tone` is a UiFloatText.Tone only: a Color used to be taken
+## and drawn as ITEM, so a caller's gold or grey never showed (刘邦 on #158); a nothing-gained line is MUTED.
+func float_text(text: String, screen: Vector2, tone: UiFloatText.Tone = UiFloatText.Tone.ITEM, icon: Texture2D = null, stack := 0) -> UiFloatText:
+	var f := _make_float(text, tone, icon)
 	f.play(_float_start(screen, [f], stack), stack)
 	return f
 
