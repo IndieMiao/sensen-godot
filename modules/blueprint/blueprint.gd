@@ -43,7 +43,11 @@ static func load_choice(choice: Dictionary) -> FarmBlueprint:
 	if str(choice.get("layout_patch_id", "")).begins_with("geo_"): return null
 	var bp := load_file(asset_path(str(choice.get("layout_patch_id", "")), int(choice.get("revision", choice.get("blueprint_revision", 2)))))
 	if bp != null:
-		return bp.with_location(choice.get("location", {}))
+		var placed := bp.with_location(choice.get("location", {}))
+		# A patch placed in another city takes that city (P0's one home city, SGODOT-270: sh_a's terrain at the San
+		# Francisco homestead): the map lands on the farm of its own region. A Journey choice of a patch carries none.
+		if str(choice.get("region_id", "")) != "": placed.region_id = str(choice.region_id)
+		return placed
 	return null
 
 ## Placement changes only the geographic overlay; logical cells and checksum stay identical.
