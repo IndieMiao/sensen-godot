@@ -969,6 +969,7 @@ func _dev_shot(dt: float) -> void:
 			"gear": ui.open_gear()
 			"skills": ui.open_skills()
 			"profile": ui.open_profile()
+			"editlook": ui.edit_look()   # the profile's Edit look ›: the dressing room above the current world (KEEP-P0-2)
 			# 256 ⑦⑧ shots: profskill:farming / profdex tap the profile's skill card / Fish tile; profspin:120 drags
 			# the outfit 120 px sideways (the spin's own gesture: press, past the slop, release).
 			"profskill": if ui._profile: ui._profile.skill_pressed.emit(step[1] if step.size() > 1 else "farming")

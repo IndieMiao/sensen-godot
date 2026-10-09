@@ -469,8 +469,9 @@ func test_the_farm_hands_its_environment_to_the_farmhouse_above_it() -> void:
 	assert_object(farm_env).is_not_null()
 	farm.suspend()
 	assert_object(farm.world_env.environment).is_null()
-	# Its canvas backdrop (layer −1, BG_CANVAS only) would otherwise cover the room's colour background.
-	assert_bool(farm.get_node("FarmBackground").visible).is_false()
+	# Its canvas backdrop (layer −1, BG_CANVAS only) would otherwise cover the room's colour background: it leaves the
+	# tree while the farm is suspended (hidden was not enough under a BG_CANVAS scene, SGODOT-256 ⑥).
+	assert_object(farm.get_node_or_null("FarmBackground")).is_null()
 	var r := _farmhouse()
 	await get_tree().process_frame
 	assert_object(r.get_viewport().find_world_3d().environment).is_same(r.environment)
