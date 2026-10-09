@@ -88,7 +88,7 @@ func test_place_cards_follow_q80() -> void:
 	await _close(rt)
 	assert_dict(city.selected).is_empty()   # closing the card clears the pin
 	m._own_pin_pressed()
-	assert_str(_primary(rt)).is_equal("Back to Lotus Tea House")
+	assert_str(_primary(rt)).is_equal("Back to Oak Tea House")
 	await _close(rt)
 	var tackle := P0Outposts.by_role("tackle")
 	city.select(P0Outposts.place_entry(tackle))
@@ -97,7 +97,7 @@ func test_place_cards_follow_q80() -> void:
 	await _close(rt)
 	m._online = {str(tackle.id): 3}
 	var spec: Dictionary = m.place_card(P0Outposts.place_entry(tackle, 3))
-	assert_str(str(spec.title)).is_equal("Xuhui Tackle Shop")
+	assert_str(str(spec.title)).is_equal("Mission Tackle Shop")
 	assert_str(str(spec.subtitle)).is_equal("Tackle shop · Rods and bait")
 	assert_array(spec.facts[1]).is_equal(["Online now", "3"])
 	m._online = {}

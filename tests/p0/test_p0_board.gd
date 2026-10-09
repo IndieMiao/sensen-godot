@@ -4,7 +4,7 @@ extends GdUnitTestSuite
 ## a delivery turning its row Done, and the request sheet with its drop flow.
 
 const STORE := "user://test_p0_board.json"
-const MEI := {"keeper": "Mei", "place": "Xuhui Market Square"}
+const MEI := {"keeper": "Mei", "place": "Mission Market Square"}
 
 func _view() -> Dictionary:
 	return {
@@ -76,7 +76,7 @@ func test_the_request_sheet_knows_where_and_what_comes_next() -> void:
 	assert_dict(P0Board.detail(refilling, "stall", "req_pond_catch").next).is_equal({"slot": "Second board slot", "within": "8h"})
 	var basket := P0Board.detail(_view(), "market", "m2")
 	assert_bool(basket.tracked).is_false()   # open: no Drop request
-	assert_str(basket.effect).is_equal("Bring the required crops to any Shanghai market.")   # 李白 q(68)
+	assert_str(basket.effect).is_equal("Bring the required crops to any San Francisco market.")   # 李白 q(68)
 	assert_str(basket.item).is_empty()   # a mixed basket has no single item: no Details ›
 	assert_str(P0Board.detail(_view(), "market", "m1").item).is_empty()   # nor has "4 Fine fish · any kind"
 	assert_str(d.item).is_equal("fish_crucian")
