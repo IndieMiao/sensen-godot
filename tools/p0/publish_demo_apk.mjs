@@ -49,6 +49,12 @@ const code = String(build.version_code);
 assert.match(code, /^20\d{6}\d{2}$/, 'versionCode YYYYMMDDNN');
 if (!has('--dry-run')) assert(!code.endsWith('00'), 'a …00 versionCode is a dry run and is never published');
 assert.equal(build.source_dirty, false, 'built from uncommitted changes');
+// The map and voice libraries and the Mapbox token must be in the APK itself (SGODOT-261: a demo without them had a
+// black map). Read the APK's own entries, not only what build.json says.
+const entries = new Set((await run('unzip', ['-Z1', apkPath], {maxBuffer: 64 * 1024 * 1024})).stdout.split('\n'));
+const nativeMissing = ['lib/arm64-v8a/libmapbox-maps.so', 'lib/arm64-v8a/libmapbox-common.so',
+  'lib/arm64-v8a/liblkjingle_peerconnection_so.so', 'assets/mapbox_token.txt'].filter((n) => !entries.has(n));
+assert.equal(nativeMissing.length, 0, 'the APK lacks ' + nativeMissing.join(', ') + ': build with the Mapbox / plugin setup');
 // An all_resources export packs untracked scenes, scripts and json as well (周瑜 on #163); only stray .uid files pass.
 assert(Array.isArray(build.untracked_exported), 'build.json predates the untracked check: rebuild with the current script');
 assert(build.untracked_exported_count === build.untracked_exported.length, 'too many untracked files to list: clean the tree');
