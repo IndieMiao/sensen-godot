@@ -705,3 +705,25 @@ func test_the_queue_drawer_sets_the_pot_lower_so_its_heat_ring_clears_the_hud() 
 	assert_float((queued - plain).dot(up)).is_equal_approx(drop, 0.0001)   # the view's centre up: the pot lower on screen
 	rt.ui.close_modal()
 	await get_tree().process_frame
+
+func test_the_second_ring_hit_says_perfect_and_its_extra_portion() -> void:
+	# 李白 copy audit A1: a Rare / Legendary pot has two rings; both hit is Perfect and the server serves a second portion
+	# (cooking.ts), so the second hit floats `Perfect! ★★ · Extra portion`, not another `Nice heat! ★`.
+	assert_str(P0Kitchen.heat_float(true, 1)).is_equal("Nice heat! ★")
+	assert_str(P0Kitchen.heat_float(true, 2)).is_equal("Perfect! ★★ · Extra portion")
+	assert_str(P0Kitchen.heat_float(false, 1)).is_equal("Missed · still cooking")
+	var v := _view()
+	v.cooking.stove = {"id": 5, "dish": "dish_grilled_crucian", "ms": 30000, "elapsed": 0, "ready_in": 30000,
+		"heats": [{"at": 10000, "spin": 1600, "gold": 0.45, "width": 0.2}, {"at": 22000, "spin": 1600, "gold": 0.45, "width": 0.2}]}
+	_set_view(v)
+	var r := await _farmhouse()
+	var k: P0Kitchen = r.get("kitchen")
+	k.watch(rt.session.view.cooking.stove)
+	var texts := func() -> Array:
+		return rt.ui.root.find_children("*", "UiFloatText", true, false).map(func(f): return (f as UiFloatText).text)
+	k.set("_start_ms", Time.get_ticks_msec() - int(10000 + 0.55 * 1600))   # the first needle on gold
+	assert_bool(k.tap()).is_true()
+	assert_array(texts.call()).contains(["Nice heat! ★"])
+	k.set("_start_ms", Time.get_ticks_msec() - int(22000 + 0.55 * 1600))   # the second
+	assert_bool(k.tap()).is_true()
+	assert_array(texts.call()).contains(["Perfect! ★★ · Extra portion"])

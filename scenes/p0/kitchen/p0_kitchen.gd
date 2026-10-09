@@ -551,10 +551,17 @@ func _judge_tap() -> bool:
 		if _ring:
 			_ring.result = 1 if hit else 0
 			_ring.mark_turn = _judged_turn[i]
-		rt.ui.float_text("Nice heat! ★" if hit else "Missed · still cooking", float_from(_judged_turn[i]), UiTokens.COLOR_GOLD_INK if hit else UiTokens.COLOR_SECONDARY)
+		rt.ui.float_text(heat_float(hit, _judged.values().count(true)), float_from(_judged_turn[i]), UiTokens.COLOR_GOLD_INK if hit else UiTokens.COLOR_SECONDARY)
 		if hit: Input.vibrate_handheld(40)
 		return true
 	return false
+
+## A judged ring's float: a hit is `Nice heat! ★`; the one that makes two (Rare and Legendary pots have two rings) is
+## Perfect, and the server serves a second portion for it, so it says so: `Perfect! ★★ · Extra portion` (李白, copy
+## audit A1). A miss: `Missed · still cooking`.
+static func heat_float(hit: bool, hits: int) -> String:
+	if not hit: return "Missed · still cooking"
+	return "Perfect! ★★ · Extra portion" if hits >= 2 else "Nice heat! ★"
 
 ## S5 Queue ×2 (PR #22): heat and collect name the pot they are for, so a pot the server already kept on its own
 ## answers stale_pot instead of judging the next one.
