@@ -1156,3 +1156,7 @@
   Get the card UUID with the MCP `retrieve_work_item_by_identifier`
   (e.g. SGODOT-231); prefix file names with the card number; virtual user ids
   are in /Volumes/ACASIS/tmp/gensen-ui-review/pm/virtual-users.md.
+- Never upload the user's private screens: phone home screen, other apps,
+  photos, notifications or system settings captured during device tests stay
+  local only; say in the comment that they were withheld. Upload only frames of
+  the test package itself.
