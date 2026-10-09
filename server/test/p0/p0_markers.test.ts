@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { loadP0Content } from '../../src/p0/content.js';
 import { mapMarkers, pondFor } from '../../src/p0/markers.js';
 import { applyP0, type P0Command } from '../../src/p0/reducer.js';
-import { freshState, upgradeState, type P0State } from '../../src/p0/state.js';
+import { freshState, upgradeState, type BoardRequest, type P0State } from '../../src/p0/state.js';
 import { viewOf } from '../../src/p0/view.js';
 
 const c = loadP0Content();
@@ -125,5 +125,27 @@ describe('map pin markers (§9.5.2, q(48); SGODOT-232)', () => {
     const old = structuredClone(fresh());
     delete old.seen;
     expect(upgradeState(c, old, T0).seen).toEqual([]);
+  });
+
+  it('more counts the other reasons behind the one shown at a place; the Market Board\'s open slots are one (q(103))', () => {
+    const s = afterTutorial();
+    // Pip at Acquainted (a second page of talk, ◆) with his first request still open (!): two reasons at the post
+    s.residents.res_pip = { affinity: 15, chat_day: '', gift_day: '', next: 0, req: null, done_day: '' };
+    expect(mapMarkers(c, s).find(m => m.place === 'sh_post_1')).toMatchObject({ kind: 'request', why: { resident: 'res_pip' }, more: 1 });
+    const open = (id: string): BoardRequest => ({ id, template: 'req_sys_fish_fine', items: ['fish_trout'], rarity: 2, kind: 'fish', qty: 2, bonus: 20, drawn_at: T0, status: 'open' });
+    s.boards.market = [{ req: open('m1'), refill_at: 0 }, { req: open('m2'), refill_at: 0 }];
+    const market = () => mapMarkers(c, s).find(m => m.place === 'sh_market_1');
+    expect(market()).toMatchObject({ kind: 'request', why: { request: 'm1' } });
+    expect(market()?.more).toBeUndefined();   // two open slots: one reason, the card writes `Market Board · 2 requests`
+    s.skills.farming = 300;   // Farming Lv4: the Row Hoe is new at the market square
+    expect(market()).toMatchObject({ kind: 'request', more: 1 });
+    expect(viewOf(c, s, T0).map_markers.find(m => m.place === 'sh_post_1')?.more).toBe(1);
+    expect(mapMarkers(c, afterTutorial()).every(m => m.more === undefined || m.more > 0)).toBe(true);   // never 0
+  });
+
+  it('first session: other reasons at the tracked place do not count toward more', () => {
+    let s = step(fresh(), { type: 'accept', request: 'req_pond_catch' });
+    s.bag.push({ id: 'fish_crucian', qty: 2 });
+    expect(mapMarkers(c, s)).toEqual([{ place: 'home', kind: 'deliver', why: { request: 'req_pond_catch', tracked: true } }]);
   });
 });

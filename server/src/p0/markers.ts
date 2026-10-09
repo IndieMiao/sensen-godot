@@ -12,10 +12,11 @@
  *   at the tackle shop, the Row Hoe at the market square) and a resident's second page of talk at Acquainted. Entering
  *   the outpost marks them seen (noteSeenAt, from presence). No locked or star pins in P0.
  * First session (q(48)): until Pond Catch is handed in, only tracked markers show (Reed Pond's !, then home's ✓), so
- * minutes 5–9 have one goal. A resident's open fish request lights their outpost only once the player can land such a
+ * minutes 5–9 have one goal. `more` counts the other reasons at the same place behind the one shown, for the pin card's
+ * ` · +N more` (q(103)); the Market Board's open slots are one reason (the card writes `Market Board · 2 requests`). A resident's open fish request lights their outpost only once the player can land such a
  * fish (Old Kai's Rare fish: Golden Koi, Fishing Lv4); it can still be taken in the shop before that.
  */
-import { BOARDS, handIn } from './boards.js';
+import { BOARDS, handIn, slotCount } from './boards.js';
 import type { Need, OutpostDef, P0Content, ShopId } from './content.js';
 import { matches } from './requests.js';
 import { progressOf, requestState, stageIndex } from './residents.js';
@@ -27,6 +28,7 @@ export type MarkerKind = 'deliver' | 'request' | 'new';
 export interface MapMarker {
   place: string; kind: MarkerKind;
   why: { request?: string; resident?: string; item?: string; tracked?: true };
+  more?: number;   // other reasons at this place behind this one (q(103) ` · +N more`); absent when none
 }
 
 const RANK: Record<MarkerKind, number> = { deliver: 0, request: 1, new: 2 };
@@ -92,9 +94,10 @@ const firstSession = (c: P0Content, s: P0State) => (s.boards.stall ?? []).some(s
 
 export function mapMarkers(c: P0Content, s: P0State): MapMarker[] {
   const all: MapMarker[] = [];
+  const reason = new Map<MapMarker, string>();   // what counts as one reason for `more`: the Market Board's open slots share one
   for (const board of BOARDS) {
     const place = board === 'stall' ? 'home' : outpostOf(c, 'market');
-    for (const slot of s.boards[board] ?? []) {
+    for (const slot of (s.boards[board] ?? []).slice(0, slotCount(c, s, board))) {   // the slots the board shows
       const r = slot.req;
       if (!r || !place) continue;
       const tracked = r.status === 'accepted';
@@ -102,7 +105,11 @@ export function mapMarkers(c: P0Content, s: P0State): MapMarker[] {
       else if (tracked && r.kind === 'fish') {
         const pond = pondFor(c, fishFor(c, r.items, { kind: 'fish', rarity: r.rarity }));
         if (pond) all.push({ place: pond, kind: 'request', why: { request: r.id, tracked: true } });
-      } else if (!tracked && board === 'market') all.push({ place, kind: 'request', why: { request: r.id } });
+      } else if (!tracked && board === 'market') {
+        const m: MapMarker = { place, kind: 'request', why: { request: r.id } };
+        all.push(m);
+        reason.set(m, 'board:market');
+      }
     }
   }
   for (const id of Object.keys(c.residents)) {
@@ -127,8 +134,15 @@ export function mapMarkers(c: P0Content, s: P0State): MapMarker[] {
   }
   // one marker per place, the strongest; then deliver > request > new, tracked first within a kind
   const order = (m: MapMarker) => RANK[m.kind] * 2 + (m.why.tracked ? 0 : 1);
-  const best = new Map<string, MapMarker>();
-  for (const m of all.sort((a, b) => order(a) - order(b))) if (!best.has(m.place)) best.set(m.place, m);
-  const shown = [...best.values()];
-  return firstSession(c, s) ? shown.filter(m => m.why.tracked) : shown;
+  const best = new Map<string, MapMarker>(), reasons = new Map<string, Set<string>>();
+  const kept = firstSession(c, s) ? all.filter(m => m.why.tracked) : all;
+  for (const m of kept.sort((a, b) => order(a) - order(b))) {
+    if (!best.has(m.place)) best.set(m.place, m);
+    if (!reasons.has(m.place)) reasons.set(m.place, new Set());
+    reasons.get(m.place)!.add(reason.get(m) ?? `${m.kind}:${m.why.request ?? ''}:${m.why.resident ?? ''}:${m.why.item ?? ''}`);
+  }
+  return [...best.values()].map(m => {
+    const more = reasons.get(m.place)!.size - 1;
+    return more > 0 ? { ...m, more } : m;
+  });
 }
