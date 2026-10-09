@@ -884,7 +884,7 @@ static func _gate_cards() -> Control:
 static func _board_cards() -> Control:
 	var page := _column(8)
 	page.custom_minimum_size.x = 312
-	page.add_child(UiBoardCard.fact_row("Requests today", "4 of 6"))
+	page.add_child(UiBoardCard.fact_row("Requests today", "4/6"))
 	page.add_child(UiBoardCard.fact_row("Next request", "3h 58m"))
 	page.add_child(_board_card({id = "m1", title = "Dusk Haul", info = true, status = "Ready to deliver", facts = ["4 Fine fish · any kind"],
 		reward = "36 coins", needs = [{id = "fish_crucian", name = "Fine fish", have = 4, need = 4, icon = _tex("fish_crucian")}], command = "Deliver"}))
