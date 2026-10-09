@@ -4,7 +4,7 @@ extends FishingPanel
 ## float, outcome notice) on the P0 rules. Only the backend changes: casts go out as P0 `cast`, the
 ## bite and hook window are timed from the server's bite_in / hook_ms, the reel minigame runs locally
 ## and reports `reel {landed | escaped | cancel}`; the server decides gates (broke free) and refunds.
-## FishingPresentation (pose, rod, line, float, landing arc, close camera) reads the same fields.
+## FishingPresentation (pose, rod, line, float, landing arc) reads the same fields.
 
 const BREAK_MS := {2: 1500.0, 3: 2000.0, 4: 3000.0}   # §6.5.2: a gated fish breaks free this far in
 ## Dev playtests (P0_AUTO=1 / scripted shots): hook on the bite and keep the band on the fish.
@@ -21,6 +21,15 @@ var _play_ms := 0.0
 var _last: Dictionary = {}
 var _reported := false
 var _reel_retries := 0
+## The player's box on screen (viewport px), set by the pond each frame; the reel gauge keeps clear of it.
+var player_rect := Rect2()
+
+## The reel gauge with the walking camera (不知火舞 on 231, 2026-10-09): GAUGE_GAP from the float as before, on the
+## side away from the player — on a north–south cast, the side with more room — at least GAUGE_EDGE from the screen
+## sides and never over the player's box grown by GAUGE_CLEAR.
+const GAUGE_GAP := 28.0
+const GAUGE_EDGE := 8.0
+const GAUGE_CLEAR := 8.0
 
 func _ready() -> void:
 	super._ready()
@@ -35,6 +44,38 @@ func _ready() -> void:
 
 func last_result() -> Dictionary:
 	return _last
+
+## +1: the gauge goes right of the float, -1 left (the pond frames the float with room on that side). A float beside
+## the player's box points away from it; one above or below it takes the side with more room.
+static func gauge_side(float_x: float, player: Rect2, width: float) -> int:
+	if player.has_area() and (float_x < player.position.x or float_x > player.end.x):
+		return 1 if player.get_center().x < float_x else -1
+	return 1 if width - float_x > float_x else -1
+
+func _place_gauge() -> void:
+	if not _gauge or not _root: return
+	if not player_rect.has_area() or _world_anchor.is_zero_approx():
+		super._place_gauge()
+		return
+	var origin := _root.global_position
+	var anchor := _world_anchor - origin
+	var body := Rect2(player_rect.position - origin, player_rect.size).grow(GAUGE_CLEAR)
+	_gauge.position = gauge_spot(anchor, body, _gauge.size, _root.size.x, _gauge_rows())
+
+## Where the gauge goes (panel coordinates): beside the float on its preferred side, then beside it on the other, and
+## only then above or below the player's box — so it doesn't jump when the bite notice folds away mid-reel and frees
+## the rows above; the preferred spot when nothing clears it.
+static func gauge_spot(anchor: Vector2, body: Rect2, size: Vector2, width: float, rows: Vector2) -> Vector2:
+	var side := gauge_side(anchor.x, body, width)
+	var y := clampf(anchor.y - size.y * 0.55, rows.x, rows.y)
+	var spots: Array[Vector2] = []
+	for row in [y, body.position.y - size.y, body.end.y]:
+		for s in [side, -side]:
+			var x := anchor.x + GAUGE_GAP if s > 0 else anchor.x - GAUGE_GAP - size.x
+			spots.append(Vector2(clampf(x, GAUGE_EDGE, maxf(GAUGE_EDGE, width - GAUGE_EDGE - size.x)), clampf(row, rows.x, rows.y)))
+	for at in spots:
+		if not Rect2(at, size).intersects(body): return at
+	return spots[0]
 
 ## The old layout puts the close X at the panel's safe-area top; dock it in the P0 HUD's coins/bell
 ## corner instead (hidden while fishing), so it never lands on the place chip on notched screens.

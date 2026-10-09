@@ -148,10 +148,15 @@ func _place_gauge() -> void:
 	if not _gauge or not _root: return
 	var anchor := _world_anchor - _root.global_position
 	if _world_anchor.is_zero_approx(): anchor = _root.size * Vector2(0.32, 0.46)
+	var rows := _gauge_rows()
+	_gauge.position = Vector2(clampf(anchor.x - _gauge.size.x - 28, 2, maxf(2, _root.size.x - _gauge.size.x)),
+		clampf(anchor.y - _gauge.size.y * 0.55, rows.x, rows.y))
+
+## The gauge's top edge stays between these (x, y): under the notice, above the guide line over the key.
+func _gauge_rows() -> Vector2:
 	var top := maxf(62, _message_card.position.y + _message_card.get_combined_minimum_size().y + 18) if _message_card.visible else 62.0
 	var bottom := maxf(62, _guide.position.y - _gauge.size.y - 24)
-	_gauge.position = Vector2(clampf(anchor.x - _gauge.size.x - 28, 2, maxf(2, _root.size.x - _gauge.size.x)),
-		clampf(anchor.y - _gauge.size.y * 0.55, minf(top, bottom), bottom))
+	return Vector2(minf(top, bottom), bottom)
 
 func open(value: FarmSession, target: String, water_target := Vector3.INF, site_override: Dictionary = {}) -> void:
 	if busy or value == null: return
