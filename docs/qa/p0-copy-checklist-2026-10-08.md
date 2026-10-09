@@ -15,7 +15,7 @@
 | 主行动键 | 第一行动词，第二行体力价或原因；第二行 ≤ 80 px（约 16 字符），长原因进按下后的 toast（q(44)）；0 体力的移动写 `· Free` |
 | 不写 Got it | Toast、TipCard、四件事卡都不写 `Got it`；点卡外 / 返回键关闭（q(26)、q(49)） |
 | 缺口写在按钮上 | 中性灰不可用态，如 `Need 6 more Timber`、`Farming Lv3`、`No room · free a slot first`（LOCK-10） |
-| 不做跳转 | `Show my plots` / `Show on map` / `Where to fish` 只移动相机或打开面板（LOCK-08） |
+| 不做跳转 | `Show my plots` / `Show on map` / `Where to fish` 只移动相机或打开面板（LOCK-08）；`Where to fish` 所在的第一次变灰解释卡排 P1，P0 不出（q(98)） |
 | 世界提示只写名字 | 设施挂图标钮，交互半径内最近的一个展开名字条（图标 + 名字 + 至多一条事实）；门 = 门图标 + 目的地（`Farm` / `Map`）；NPC 头顶只写名字（`Mei`），对话中只保持高亮；座位只有 `i-seat` 图标；任何地方都不出现点按引导语（Tap to …）与手指（LOCK-07 / 16 / 17 / 30 v2，q(62)） |
 | 径向菜单无字 | 四瓣环在屏幕中央，瓣上只有图标，不写行动名与原因；点灰瓣才在环心出单行气泡 `No water nearby` / `Enter the mine` / `Mine floors 3–5`（LOCK-03 v2，q(62)） |
 | 快满写实得 | `Eat · +12 Energy`、`Hot Tea · +12 Energy · 40 coins`、`Rest · +25 Energy`（q(26)）。热茶（茶馆）与咖啡（驿站）同价同效：标称都是 +30，当天第 1 / 2 / 3 杯 40 / 50 / 60 coins、两种共用 3 杯；柜台快满时写实得，如差 3 满时 `Coffee · +3 Energy · 40 coins`，不是数值错（§3.4.4） |
@@ -48,7 +48,7 @@
 | 工作台效果句 ★ | `Copper Pickaxe · 2 Stone per rock`（LOCK-29）/ `Gather Gloves · +1 at every gathering spot`（q(45)）/ 堆肥 `Crops ready 20% sooner`（q(46)） |
 | 采集点 ★ | 名字条 `Timber Grove`（其他写名字，如 `Reed Bank`）/ 没好 `Timber Grove · Ready in 2h 10m` / 未开 `Clay Bank · Homestead Lv2`（q(46)、q(62)）；P0 共 5 处，没有 Old Tree（q(43)） |
 | 采集与入库飘字 ★ | 进仓库 `+6 Timber · Stored` / 进背包 `+2 Worm Bait` / 回家入库 `Stored · 12 Stone · 3 Copper Ore`（数字在前、不带 ×，q(46)） |
-| 农舍门牌 / 升级面板 ★ | 名字条：农舍 `Farmhouse`、门牌 `Homestead Lv1`、木牌 `Upgrade Plaque`（q(62)）；标题 `Homestead Lv1 → Lv2`；What changes `Max Energy 210 · Meals 210 a day` / `Spice Rack · seasonings off your bag` / `Clay Bank · Clay next to the Reed Bank`；满级 `Highest level for now`（q(46)）；横幅 `Homestead Lv 2` / `Clay Bank opened`；不在家（从个人页远程打开）时升级按钮灰显 `At home`，点它出 toast `Upgrade at home · Going home is free`，不写 `Go home to upgrade · Free`（q(93)） |
+| 农舍门牌 / 升级面板 ★ | 名字条：农舍 `Farmhouse`、门牌 `Homestead Lv1`、木牌 `Upgrade Plaque`（q(62)）；标题 `Homestead Lv1 → Lv2`；What changes `Max Energy 210 · Meals 210 a day` / `Spice Rack · seasonings off your bag` / `Clay Bank · Clay next to the Reed Bank`；满级 `Highest level for now`（q(46)）；横幅 `Homestead Lv2` / `Clay Bank opened`；不在家（从个人页远程打开）时升级按钮灰显 `At home`，点它出 toast `Upgrade at home · Going home is free`，不写 `Go home to upgrade · Free`（q(93)） |
 | 信箱 ★ | 名字条 `Mailbox`；有在列包裹时小牌 `Parcel`，背包满也挂（q(50)、q(62)、q(79)） |
 
 ## 3. 鱼塘与钓鱼
@@ -98,6 +98,7 @@
 | 掌柜名字条 | `Finn` / `Ama` / `Mei` / `Sigrid`（只写名字；最近的一个主色描边、放大 1.1 倍，对话中保持高亮，q(62)）；问候选项 `Trade` / 信息问句 / `Just passing by` |
 | Mei 问候 ★ | `Morning! Row Hoes just came in — sows three plots at once, Farming Lv4. Anything I can get you?`（q(46)） |
 | Ama 问候 ★ | `Sit a minute. Hot tea, 30 Energy a cup.`（不写 back，也不带价格，价格看柜台，q(46)、§10.8）；满体力 `You look rested. Tea's here when you need it.`；三杯用完 `That's three cups today. Come back tomorrow.`；喝后 `Enjoy. Next cup's 50 coins.`。**问候写标称的 30，柜台按钮快满时写实得**（如差 15 满时 `Hot Tea · +15 Energy · 40 coins`，q(26)）：两处数字不同是设计，不是错 |
+| 柜台饮品页 | 事实行 `Cups used 0/3`（已用 / 上限，茶与咖啡共用 3 杯）；价格行 `Hot Tea · +30 Energy · 40 coins`（不带 `(1/3)`）；按钮 `Hot Tea · +30 Energy`；用尽 `Cups used 3/3` + 灰按钮 `Tea 3/3 today · Resets in 9h 12m`（不写 `back tomorrow`；不写 `Drinks left today 3 of 3`，q(98)） |
 | 渔具铺柜台 ★ | 只有 Buy 一页、不显示 Tab 条；`Reed Rod · 80 coins`（`Fishing Lv3` / `Owned`）/ `Worm Bait · 2 coins` · `30 left today` / `Sold out · 9h 12m`；收鱼 × 0.8；渔情板只作摆设，不挂图标钮与名字条（q(46)、q(62)） |
 | 集市柜台 ★ | `Buy | Market Board`，只有 Row Hoe 一行，不贴背包（q(48)）；特产货架名字条 `City Specialty`、委托板名字条 `Market Board`（有可接委托时换 `!` 徽标）（q(62)）/ `Shanghai Postcard · 100 coins` / `Owned` |
 | 驿站柜台 | 只卖咖啡 `Trade · get a coffee`；盖章台只作摆设 |
@@ -133,8 +134,8 @@
 | 位置 | 应出现 |
 |---|---|
 | TipCard（7 句，无按钮） ★ | `Pick a seed, walk up to a plot and press Sow. Hold to keep sowing.` / `Casting uses 5 Energy` / `Your creel is your bag: 10 fish per free slot.` / `Tap Cook to grill your first fish` / `Tap when the needle hits gold!` / `Energy comes back over time. A meal brings it back now.` / `Browse the map for free. Travel costs Energy and coins.`（q(44)）。`Levels unlock gear, fish and seeds. Basics never lock.` 不出卡，只在首次升级横幅的 Tip 行出现一次（q(86)） |
-| 首次升级横幅 | `Fishing Lv 2` / `Fine fish now stay on the hook` / 奖励药丸 `+50 Energy` · `+3 Worm Bait` · `+3 Wild Herb` / Detail `New recipe: Herb Grilled Fish` / Tip `Levels unlock gear, fish and seeds. Basics never lock.` / `Use bait`；不写 `Level-up gift: …`（q(94)） |
-| Today | `Radishes ready in 3h 32m` / `Farming Lv 2 at your first harvest` / `Lettuce ready in 7h 58m`（浇水后，q(48)）/ `Fresh Fish Soup · when radishes are ready`（等料行，跟在萝卜行与其升级信息行之后，q(95)）/ `2 fish · the stove is free`（汤要的鱼不算；只剩汤的那条鱼时整行不出，q(95)）；首会话末三行 = 萝卜倒计时 / `Farming Lv 2 at your first harvest` / 鲜鱼汤等料行 |
+| 首次升级横幅 | `Fishing Lv2` / `Fine fish now stay on the hook` / 奖励药丸 `+50 Energy` · `+3 Worm Bait` · `+3 Wild Herb` / Detail `New recipe: Herb Grilled Fish` / Tip `Levels unlock gear, fish and seeds. Basics never lock.` / `Use bait`；不写 `Level-up gift: …`（q(94)） |
+| Today | `Radishes ready in 3h 32m` / `Farming Lv2 at your first harvest` / `Lettuce ready in 7h 58m`（浇水后，q(48)）/ `Fresh Fish Soup · when radishes are ready`（等料行，跟在萝卜行与其升级信息行之后，q(95)）/ `2 fish · the stove is free`（汤要的鱼不算；只剩汤的那条鱼时整行不出，q(95)）；首会话末三行 = 萝卜倒计时 / `Farming Lv2 at your first harvest` / 鲜鱼汤等料行；作物熟了等料行消失；不可数作物写 `when lettuce is ready`；作物复数按 q(58)，不写 `Lettuces`（q(98)）；升级写 `Lv2` 不带空格（q(98)） |
 | 通知软提示 | `Get a ping when your radishes are ready?` · `Allow` / `Not now` |
 | 结束态 ★ | 不出 `Session complete`；农场 + Today 三行，HUD 大数字 `213/200`、小字 `Bonus +13`（q(94)）（q(44)） |
 
