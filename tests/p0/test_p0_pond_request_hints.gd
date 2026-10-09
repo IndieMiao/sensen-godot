@@ -93,3 +93,14 @@ func test_two_lines_break_at_a_dot() -> void:
 	ui.toast_success_when_clear("Pond Catch · 2/2 · Deliver at the Stall", true)
 	ui.close_modal()
 	assert_str(ui.toast_text()).is_equal("Pond Catch · 2/2\nDeliver at the Stall")
+
+## The width the dot break measures against is the toast label's real one (哪吒 on #188): a change in ToastLayer's
+## layout fails here instead of breaking the pond's toasts quietly.
+func test_the_measured_width_is_the_toast_labels() -> void:
+	var ui := _ui()
+	await get_tree().process_frame
+	ui.toast("Pond Catch · Pond Crucian 0/2", 0.0, true)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var label: Label = ui._toasts._label
+	assert_float(label.size.x).is_equal_approx(ui.toast_text_width(), 1.0)
