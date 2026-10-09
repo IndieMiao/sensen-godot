@@ -39,6 +39,7 @@ var _art_right := Vector3.ZERO            # the camera right _art_sides were fou
 var _band := Rect2()         # the last camera band seen with no panel up (_camera_band)
 var _pinch = ElasticZoom.new(0.8, 1.4)
 var _zoom_at := Vector2.INF
+var _after_pinch := false    # the fingers lifted: once the zoom settles, ease back if the player left the safe box
 var _target := {}           # {kind, rock, at}
 var _entered_ms := 0
 var _hold_until := 0
@@ -382,7 +383,17 @@ func _kick_out() -> void:
 func _follow(dt: float) -> void:
 	_focus = _cam_follow.step(cam, _focus, actor.position, actor.mover.is_moving(), dt)
 	if _pinch.step(dt): _set_zoom(_pinch.value)   # springing back from past a limit, about the same point
-	else: _update_camera()
+	else:
+		_update_camera()
+		if _after_pinch: _ease_back_after_pinch()
+
+## A pinch zooms about the fingers, which can leave the player outside the safe box — half off the screen at a room's
+## end (李元芳 int12, 奕星). Once the fingers have lifted and the zoom has settled, the camera eases back to them as
+## after a step (P0Follow, 0.6 s); with the player still inside the box the pinched framing stays until they walk.
+func _ease_back_after_pinch() -> void:
+	_after_pinch = false
+	if not P0Follow.box(get_viewport().get_visible_rect().size).has_point(cam.unproject_position(actor.position)):
+		_cam_follow.held = false
 
 func _update_camera() -> void:
 	cam.size = FarmCamera.player_scale_size(get_viewport().get_visible_rect().size, FarmCamera.PITCH_DEG) / _zoom
@@ -518,11 +529,14 @@ func _set_zoom(value: float) -> void:
 		_update_camera()
 
 func p0_zoom(f: float, at := Vector2.INF) -> void:
+	_after_pinch = false
 	_zoom_at = at
 	_pinch.pinch(f)
 	_cam_follow.hold()   # the pinched framing stays until the player walks (the safe box takes over then)
 	_set_zoom(_pinch.value)
-func p0_zoom_end() -> void: _pinch.release()
+func p0_zoom_end() -> void:
+	_pinch.release()
+	_after_pinch = true
 func p0_recenter() -> void:
 	_focus = actor.position
 	_cam_follow.held = false
@@ -570,6 +584,9 @@ func p0_dev(step: PackedStringArray) -> bool:
 			if is_instance_valid(backdrop): backdrop.visible = step[1] != "0"
 		"zoom":   # zoom:0.8 — a pinch to that zoom, fingers lifted
 			p0_zoom(_pinch.value / float(step[1]))
+			p0_zoom_end()
+		"pinch":   # pinch:1.4:4:400 — a pinch to that zoom about that screen point, fingers lifted (int12)
+			p0_zoom(_pinch.value / float(step[1]), Vector2(float(step[2]), float(step[3])))
 			p0_zoom_end()
 		_: return false
 	return true
