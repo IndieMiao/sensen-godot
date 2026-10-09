@@ -326,13 +326,15 @@ func test_a_strip_flung_in_a_drawer_coasts_and_ends_its_drag() -> void:
 	for i in 3: await get_tree().physics_frame
 	var coasted := strip.scroll_horizontal - lifted
 	# The coast lasts as long as it lasts (in a full run it outlasted 20 ticks short of the strip's end): the move with
-	# no button down comes once the strip is still.
-	var last := strip.scroll_horizontal
+	# no button down comes once the strip is still — by the scroll bar's float value: near the end of a coast the whole
+	# pixels can hold for 3 ticks while it still moves (刘邦 on #203).
+	var bar := strip.get_h_scroll_bar()
+	var last := bar.value
 	var still := 0
 	for i in 300:
 		await get_tree().physics_frame
-		still = still + 1 if strip.scroll_horizontal == last else 0
-		last = strip.scroll_horizontal
+		still = still + 1 if bar.value == last else 0
+		last = bar.value
 		if still >= 3: break
 	var before := strip.scroll_horizontal
 	for i in 4:
