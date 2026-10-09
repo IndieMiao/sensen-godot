@@ -1,13 +1,13 @@
 extends "res://scenes/map_poc/map_poc.gd"
 ## The P0 map: the old map scene and city view as they are (Mapbox tiles, 3D landmarks, POI
 ## declutter, pond pins and their info card, the farm miniature), with only the entry points
-## rewired to P0. Shanghai is fixed, the homestead sits at a fixed spot, pond pins come from P0's
+## rewired to P0. The home city is fixed (P0City), the homestead sits at its farm point, pond pins come from P0's
 ## pond list (P0Ponds), and nothing here talks to the old farm server or writes the old app's choices.
 
 const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
 const P0_FARM := "res://scenes/p0/p0_farm.tscn"
 const P0_POND := "res://scenes/p0/p0_pond.tscn"
-const P0_REGION := "shanghai"
+static var P0_REGION := P0City.region()   # the home city's map region (SGODOT-270: from content, san_francisco)
 ## The homestead's map footprint: the Hengshan Road layout, between Pebble Pond and Reed Pond.
 const P0_FARM_CHOICE := {"layout_patch_id": "sh_a", "revision": 2}
 ## The home-set outposts (tackle shop, tea house, travel post, market square) come from the shared
@@ -39,8 +39,14 @@ func _ready() -> void:
 		if child.name == "AccountButton" or child is LanguageButton: child.hide()
 
 # ---------------------------------------------------------------- homestead and ponds
+## The homestead: sh_a's farm placed at the home city's farm point, in its region (SGODOT-270: San Francisco's Noe
+## Valley). Placing it moves only its map overlay — the pin and where the map lands; the farm scene is P0Garden's.
 func _resolve_farm_choice() -> Dictionary:
-	return P0_FARM_CHOICE.duplicate(true)
+	var at := P0City.farm_at()
+	var choice := P0_FARM_CHOICE.duplicate(true)
+	if at != Vector2.ZERO: choice["location"] = {"lat": at.x, "lng": at.y}
+	choice["region_id"] = P0_REGION
+	return choice
 
 func _server_has_no_farm() -> bool:
 	return false
