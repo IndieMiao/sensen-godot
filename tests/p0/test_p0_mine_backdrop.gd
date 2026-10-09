@@ -23,10 +23,16 @@ func test_each_floor_tints_the_backdrop_with_its_darkened_wall_colour() -> void:
 			assert_int(g.cast_shadow).is_equal(GeometryInstance3D.SHADOW_CASTING_SETTING_OFF)
 			assert_int(g.gi_mode).is_equal(GeometryInstance3D.GI_MODE_DISABLED)
 
-## Authored for the mine camera at the world origin: no transform anywhere on the way down to the mesh.
-func test_the_backdrop_sits_as_authored_at_the_origin() -> void:
+## Authored for the mine camera at the world origin; slid only along the camera's view, which an orthographic picture
+## does not see (no turn, no scale, nothing below the root moved).
+func test_the_backdrop_sits_as_authored_slid_along_the_view() -> void:
 	var root: Node3D = auto_free(MineBackdrop.build(1))
-	assert_that(root.transform).is_equal(Transform3D.IDENTITY)
+	assert_that(root.basis).is_equal(Basis.IDENTITY)
+	assert_float(root.position.length()).is_equal_approx(MineBackdrop.FORWARD_M, 0.0001)
+	var cam := Camera3D.new()
+	add_child(auto_free(cam))
+	preload("res://modules/farm/farm_camera.gd").place(cam, Vector3(2, 0, -1))
+	assert_bool(root.position.normalized().is_equal_approx(cam.global_basis.z)).is_true()   # straight at the camera
 	for g: Node3D in root.find_children("*", "Node3D", true, false):
 		assert_that(g.transform).is_equal(Transform3D.IDENTITY)
 
