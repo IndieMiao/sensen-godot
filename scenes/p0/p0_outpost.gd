@@ -404,6 +404,9 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"sit": _go_sit(step[1] if step.size() > 1 else "seat_table1_")
 		"stand": _stand_up()
 		"nomarks": _dev_no_marks = true   # acceptance shots: finger cards off, name tags stay
+		"zoom":   # zoom:0.8 — a pinch to that zoom about the screen's centre (acceptance shots)
+			_zoom_at = _view() * 0.5
+			_set_zoom(float(step[1]) if step.size() > 1 else 1.0)
 		_: return super.p0_dev(step)
 	return true
 

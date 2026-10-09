@@ -1,11 +1,11 @@
 {
-  "_note": "Xuhui Tackle Shop on the Farm Tools Store kit (SGODOT-227 scene integration; placeholder until SGODOT-218). Room metres of assets/rooms/farm_tools_store/layout.json, floor top y 0.08. Finn keeps the sales counter from behind at its left end (head and shoulders seen over it, checked by raycast from the room camera), clear of the door's Map strip, which opens leftwards over the counter's right end (不知火舞 on #91: the threshold under the door is where the player stands and is covered by the entry plant, so the prompt stays over the door frame and Finn moves left). Tapping the counter is tapping him. Old Kai stands on the open floor by the seed wall. Spawn and exit at the green back door; its prompt (badge_exit) sits over the door frame, clear of the player who comes in. The kit has no fish board, so use_fish_board (decor) is left out.",
+  "_note": "Xuhui Tackle Shop on the Farm Tools Store kit (SGODOT-227 scene integration; placeholder until SGODOT-218). Room metres of assets/rooms/farm_tools_store/layout.json, floor top y 0.08. Finn stands at the sales counter's left end, beside it (camera step 2, 43°: behind the counter his name tag sat on the FARM TOOLS sign wherever he stood, at the opening view and at zoom 0.8, and the counter dressing hid all but his hat; 不知火舞 / UI on 226: tags have no exceptions, move Finn). He is seen whole there, his tag clear of the sign and of the door's Map strip (the door prompt stays over the door frame, 不知火舞 on #91). Tapping the counter is tapping him. Old Kai stands on the open floor by the seed wall. Spawn and exit at the green back door; its prompt (badge_exit) sits over the door frame, clear of the player who comes in. The kit has no fish board, so use_fish_board (decor) is left out.",
   "anchors": [
     {"name": "use_counter", "position": [-1.4, 1.25, -1.6], "module": "sales_counter"},
     {"name": "stand_counter", "position": [-1.4, 0.08, -1.05], "yaw_degrees": 0},
-    {"name": "npc_keeper", "position": [-1.5, 0.08, -2.55], "yaw_degrees": 180},
-    {"name": "badge_keeper", "position": [-1.5, 2.4, -2.55]},
-    {"name": "stand_keeper", "position": [-1.4, 0.08, -1.05], "yaw_degrees": 0},
+    {"name": "npc_keeper", "position": [-2.1, 0.08, -1.7], "yaw_degrees": 180},
+    {"name": "badge_keeper", "position": [-2.1, 2.4, -1.7]},
+    {"name": "stand_keeper", "position": [-2.1, 0.08, -1.0], "yaw_degrees": 0},
     {"name": "npc_kai", "position": [-2.3, 0.08, 0.2], "yaw_degrees": -90},
     {"name": "stand_kai", "position": [-1.6, 0.08, 0.2], "yaw_degrees": 90},
     {"name": "spawn", "position": [2.29, 0.08, -2.1], "yaw_degrees": 180},

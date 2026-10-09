@@ -69,7 +69,9 @@ func test_near_resident_is_a_resident_within_card_reach_never_the_keeper() -> vo
 	var r := _room("sh_tackle_1")
 	r.actor.position = r.anchor("npc_keeper").global_position
 	assert_str(r.p0_near_resident()).is_not_equal(str(r.npcs.npc_keeper.id))   # Finn keeps the shop: never a gift target (Kai may be in reach)
-	r.actor.position = r.anchor("npc_keeper").global_position + Vector3(1.5, 0, 0)   # only Finn within a card's reach
+	# Only Finn within a card's reach: along the counter, away from Kai (Finn at its left end is 1.9 m from him).
+	r.actor.position = r.anchor("npc_keeper").global_position + Vector3(2.3, 0, 0)
+	assert_float(P0Room._flat_distance(r.actor.position, r.anchor("npc_keeper").global_position)).is_less(P0Room.CARD_NEAR_M)
 	assert_float(P0Room._flat_distance(r.actor.position, r.anchor("npc_kai").global_position)).is_greater(P0Room.CARD_NEAR_M)
 	assert_str(r.p0_near_resident()).is_equal("")
 	var kai := r.anchor("npc_kai").global_position
