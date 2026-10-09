@@ -102,7 +102,7 @@ func frame(v: Dictionary, card := "") -> void:
 		var area := Rect2(Vector2.ZERO, rt.ui.root.size)
 		var r := WorldAnchor.place(size, top - Vector2(0, UiTokens.SPACE_WITHIN), area, UiTokens.SPACE_WITHIN, true)
 		# Never over the player: lifted clear of the body by 4, no higher than under the HUD (不知火舞 on #190).
-		r = WorldAnchor.lift_clear(r, rt.ui.player_body(cam.unproject_position(farm.actor.position)), BODY_GAP, rt.ui.card_top())
+		r = WorldAnchor.lift_clear(r, farm.actor.screen_box(cam), BODY_GAP, rt.ui.card_top())
 		_entry.size = size
 		_entry.position = r.position
 		_entry.point_at(top.x - r.position.x)

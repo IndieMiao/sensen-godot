@@ -78,9 +78,9 @@ func test_the_ladder_down_walks_up_then_asks_for_the_fee() -> void:
 	assert_array(_sent("mine_floor")).is_empty()   # the tap spent nothing
 	assert_str(mine.card_entry().main_text()).is_equal("Floor 2 · 2 Energy")
 	assert_bool(mine.card_entry()._title_row.visible).is_false()   # a ladder's card has no title
-	# Kept off the player (不知火舞 on #190): clear of the body by 4, unless already as high as it may go.
+	# Kept off the player (不知火舞 on #190): clear of their box on screen by 4, unless already as high as it may go.
 	await get_tree().process_frame
-	var body: Rect2 = rt.ui.player_body(mine.cam.unproject_position(mine.actor.position))
+	var body: Rect2 = mine.actor.screen_box(mine.cam)
 	var card := Rect2(mine.card_entry().position, mine.card_entry().size)
 	assert_bool(not card.intersects(body.grow(3.9)) or is_equal_approx(card.position.y, rt.ui.card_top())).is_true()
 	mine.p0_dev(PackedStringArray(["cardtap"]))
@@ -148,3 +148,17 @@ func test_the_facilities_wear_world_prompts() -> void:
 	mine.p0_dev(PackedStringArray(["tapfac", "mine_down"]))   # right there: the card at once, in the strip's place
 	assert_bool(await _until(func(): return mine.card_shown())).is_true()
 	assert_bool(rt.ui._name_bars.get("mine_down").visible and not rt.ui._name_bars.get("mine_down").get_meta("folding", false)).is_false()
+
+## The box a card keeps off (不知火舞 on #190): the figure on screen, feet to the top of the head and the body's width —
+## not the map avatar's 70 × 130 tap target.
+func test_the_player_box_is_the_figure_on_screen() -> void:
+	await _open(_view([_floor(1), _floor(2, false)]))
+	var r: Rect2 = mine.actor.screen_box(mine.cam)
+	var feet: Vector2 = mine.cam.unproject_position(mine.actor.position)
+	var px_per_m: float = mine.get_viewport().get_visible_rect().size.x / mine.cam.size
+	assert_float(r.end.y).is_equal_approx(feet.y, 0.5)
+	assert_float(r.get_center().x).is_equal_approx(feet.x, 0.5)
+	assert_float(r.size.x).is_equal_approx(2.0 * P0Actor.HALF_WIDTH_M * px_per_m, 1.0)
+	var head: Vector2 = mine.cam.unproject_position(mine.actor.position + Vector3.UP * P0Actor.HEAD_M)
+	assert_float(r.position.y).is_equal_approx(head.y, 8.0)   # the outfit's own top once drawn, else HEAD_M
+	assert_float(r.size.y / px_per_m).is_between(0.8, 1.8)     # the figure's own height on screen, in metres across

@@ -446,7 +446,7 @@ func _show_card(v: Dictionary) -> void:
 	var size := _entry.get_combined_minimum_size()
 	var r := WorldAnchor.place(size, top - Vector2(0, UiTokens.SPACE_WITHIN), Rect2(Vector2.ZERO, rt.ui.root.size), UiTokens.SPACE_WITHIN, true)
 	# Never over the player: lifted clear of the body by 4, no higher than under the HUD (不知火舞 on #190).
-	r = WorldAnchor.lift_clear(r, rt.ui.player_body(cam.unproject_position(actor.position)), P0FarmMaterials.BODY_GAP, rt.ui.card_top())
+	r = WorldAnchor.lift_clear(r, actor.screen_box(cam), P0FarmMaterials.BODY_GAP, rt.ui.card_top())
 	_entry.size = size
 	_entry.position = r.position
 	_entry.point_at(top.x - r.position.x)
