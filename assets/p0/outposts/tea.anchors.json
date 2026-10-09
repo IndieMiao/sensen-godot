@@ -1,5 +1,5 @@
 {
-  "_note": "Lotus Tea House on the Coffee Shop kit (SGODOT-227 scene integration; placeholder until SGODOT-218). Room metres of assets/rooms/coffee_shop/layout.json, floor top y 0.05. Ama stands behind the counter right of the espresso machine: from this camera the gap between the pastry case and the machine is hidden by pendant_2. Tapping the counter is tapping her. Two tables with two chairs each (table: chair_2 by the aisle, chair by the wall; table_2: chair_3, chair_4); seat y is the chair seat surface (0.065 + 0.65). No bench in this kit. Exit at the front steps; the door's prompt sits on the steps (badge_exit), not over the player coming in. The player comes in a step past them, clear of the flower box on the right low wall at the 43° camera (李元芳 int11 / UI rule: the whole player is in view on a room's first frame). The ivy arch on the left wall is decoration.",
+  "_note": "Lotus Tea House on the Coffee Shop kit (SGODOT-227 scene integration; placeholder until SGODOT-218). Room metres of assets/rooms/coffee_shop/layout.json, floor top y 0.05. Ama stands behind the counter right of the espresso machine: from this camera the gap between the pastry case and the machine is hidden by pendant_2. Tapping the counter is tapping her. Two tables with two chairs each (table: chair_2 by the aisle, chair by the wall; table_2: chair_3, chair_4); seat y is the chair seat surface (0.065 + 0.65). No bench in this kit. Exit at the front steps; the door's prompt sits on the steps (badge_exit), not over the player coming in. The player comes in a step past them, clear of the flower box on the right low wall at the 43° camera (李元芳 int11 / UI rule: the whole player is in view on a room's first frame), 1.2 m from the exit: past EXIT_ARM_M whatever the nav snaps, and a real walk back (0.6 m) before the 0.6 m exit radius (哪吒 on #147). The ivy arch on the left wall is decoration.",
   "anchors": [
     {"name": "use_counter", "position": [0.85, 1.25, -1.6], "module": "counter"},
     {"name": "stand_counter", "position": [0.85, 0.05, -1.0], "yaw_degrees": 0},
@@ -12,7 +12,7 @@
     {"name": "use_tea_table_2", "position": [1.45, 1.07, 1.0], "module": "table_2"},
     {"name": "seat_table2_1", "position": [0.84, 0.715, 1.2], "yaw_degrees": -90, "module": "chair_3"},
     {"name": "seat_table2_2", "position": [2.24, 0.715, 1.0], "yaw_degrees": 90, "module": "chair_4"},
-    {"name": "spawn", "position": [-0.15, 0.05, 1.75], "yaw_degrees": 0},
+    {"name": "spawn", "position": [-0.15, 0.05, 1.55], "yaw_degrees": 0},
     {"name": "exit", "position": [0.2, 0.05, 2.7]},
     {"name": "badge_exit", "position": [0.15, 0.0, 3.45]}
   ]
