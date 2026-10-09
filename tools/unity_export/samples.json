@@ -28,6 +28,10 @@
     { "asset": "ap_hairHat71",     "tier": 0, "id": "hairhat71_npc_kai" },
     { "asset": "ap_hairHat12_2",   "tier": 0, "id": "hairhat12_npc_mei" },
     { "asset": "ap_cloth11",       "tier": 0, "id": "cloth11_npc_mei" },
-    { "asset": "ap_hairHat80",     "tier": 0, "id": "hairhat80_npc_ama" }
+    { "asset": "ap_hairHat80",     "tier": 0, "id": "hairhat80_npc_ama" },
+    { "asset": "ap_cloth12",       "tier": 0, "id": "cloth12_npc_finn" },
+    { "asset": "ap_hairHat36",     "tier": 0, "id": "hairhat36_npc_sigrid" },
+    { "asset": "ap_cloth36",       "tier": 0, "id": "cloth36_npc_sigrid" },
+    { "asset": "ap_hairHat36",     "tier": 0, "id": "hairhat36_npc_pip" }
   ]
 }
