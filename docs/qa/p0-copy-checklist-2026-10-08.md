@@ -134,10 +134,10 @@
 | 位置 | 应出现 |
 |---|---|
 | TipCard（7 句，无按钮） ★ | `Pick a seed, walk up to a plot and press Sow. Hold to keep sowing.` / `Casting uses 5 Energy` / `Your creel is your bag: 10 fish per free slot.` / `Tap Cook to grill your first fish` / `Tap when the needle hits gold!` / `Energy comes back over time. A meal brings it back now.` / `Browse the map for free. Travel costs Energy and coins.`（q(44)）。`Levels unlock gear, fish and seeds. Basics never lock.` 不出卡，只在首次升级横幅的 Tip 行出现一次（q(86)） |
-| 首次升级横幅 | `Fishing Lv2` / `Fine fish now stay on the hook` / 奖励药丸 `+50 Energy` · `+3 Worm Bait` · `+3 Wild Herb` / Detail `New recipe: Herb Grilled Fish` / Tip `Levels unlock gear, fish and seeds. Basics never lock.` / `Use bait`；不写 `Level-up gift: …`（q(94)） |
+| 首次升级横幅 | `Fishing Lv2` / `Fine fish now stay on the hook` / 奖励药丸 `+3 Worm Bait` · `+3 Wild Herb`（技能升级不回体力，不出 `+50 Energy`，q(101)）/ Detail `New recipe: Herb Grilled Fish` / Tip `Levels unlock gear, fish and seeds. Basics never lock.` / `Use bait`；不写 `Level-up gift: …`（q(94)） |
 | Today | `Radishes ready in 3h 32m` / `Farming Lv2 at your first harvest` / `Lettuce ready in 7h 58m`（浇水后，q(48)）/ `Fresh Fish Soup · when radishes are ready`（等料行，跟在萝卜行与其升级信息行之后，q(95)）/ `2 fish · the stove is free`（汤要的鱼不算；只剩汤的那条鱼时整行不出，q(95)）；首会话末三行 = 萝卜倒计时 / `Farming Lv2 at your first harvest` / 鲜鱼汤等料行；作物熟了等料行消失；不可数作物写 `when lettuce is ready`；作物复数按 q(58)，不写 `Lettuces`（q(98)）；升级写 `Lv2` 不带空格（q(98)） |
 | 通知软提示 | `Get a ping when your radishes are ready?` · `Allow` / `Not now` |
-| 结束态 ★ | 不出 `Session complete`；农场 + Today 三行，HUD 大数字 `213/200`、小字 `Bonus +13`（q(94)）（q(44)） |
+| 结束态 ★ | 不出 `Session complete`；农场 + Today 三行，HUD `200/200` · `Full`（第二道菜吃下去回到满条；不进奖励区，q(101)）（q(44)） |
 
 ## 10. 系统态与命令（q(49)）
 
