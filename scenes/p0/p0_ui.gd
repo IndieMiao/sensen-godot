@@ -25,6 +25,7 @@ signal recenter()
 signal place_pressed()
 signal tackle_requested()      # FISH-5 rod variant "Tackle Shop"
 
+const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
 const _RESIDENT_SHEET_H := 443.0   # RES-PIP: Sheet 443 of 800
 const _CLOSE_ABOVE_SHEET := 6.0    # RES-PIP: Close · 44 px sits 6 above the sheet, 16 in from the right
 const _CLOSE_ABOVE_SPECIALTY := 2.0   # MARKET-SPECIALTY: Close 44 at (300, 617), the sheet at y 663
@@ -47,7 +48,7 @@ var view: Dictionary = {}
 var root: Control
 var pad: Control
 var hud: UiHud                   # two-row HUD (SGODOT-222, LOCK-06)
-var _place_text := "Shanghai · Homestead"
+var _place_text := P0City.chip("Homestead")
 var _fab_state: Dictionary = {}
 var fab_held := false            # §14.2: hold the main action to keep sowing along a row
 var fab_verb := ""
@@ -72,7 +73,7 @@ var _bar_ids: Array = []
 var selected_seed := ""
 var selected_bait := ""
 ## The pond the tackle keeper names when no outpost ctx says which (the map's tackle pin before SGODOT-227).
-var tackle_place := "Reed Pond"
+var tackle_place := str(P0Outposts.by_role("tackle").get("nearest", {}).get("name", "Pond"))
 var bar_mode := "farm"          # "farm" (seeds) or "fish" (bait) — the quick bar holds the current action's consumables
 var surface := "farm"
 ## Set by the runtime: true when the current world can move its camera to a spot (p0_show_spot). Show
@@ -1860,7 +1861,9 @@ func open_keeper_greeting(role: String, ctx := {}) -> void:
 
 ## The tackle shop before the outposts open it with their ctx (the map's tackle pin, P0_SHOT "kai").
 func open_kai_greeting() -> void:
-	open_keeper_greeting("tackle", {"keeper": "Finn", "place": "Xuhui Tackle Shop", "nearest": {"name": tackle_place, "site": "pond"}})
+	var o := P0Outposts.by_role("tackle")
+	open_keeper_greeting("tackle", {"keeper": str(o.get("keeper", {}).get("name", "")), "place": str(o.get("name", "")),
+		"nearest": {"name": tackle_place, "site": str(o.get("nearest", {}).get("site", "pond"))}})
 
 ## Counters (SGODOT-224; LOCK-15 / 16; FARM-6, NPC-2, NPC-2-2, NPC-6, NPC-7-P0): one drawer for every counter,
 ## P0CounterDrawer. role = the shop id ("homestead", "tackle", "market", "tea", "post"); opts: section ("buy" |

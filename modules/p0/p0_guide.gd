@@ -5,8 +5,9 @@ extends RefCounted
 ## that lead Today, the farmhouse door "!", the stall badge, Free to do now and the quick-bar flash. Every stage comes
 ## from the server's state, so a reinstall picks the guide up where the save is; only "tips already shown" is local.
 
+const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
 const TUTORIAL := "req_pond_catch"
-const BEGINNER_POND := "pond_shanghai_05"   # Reed Pond (q(32))
+static var BEGINNER_POND := P0City.beginner_pond()   # q(32): the content's beginner pond (SGODOT-270)
 
 ## The TipCards of P0 (q(44), TUT-2): one sentence, no button, each shown once. TUT-2's eighth sentence, "Levels unlock
 ## gear, fish and seeds…", is the Tip line of the account's first level-up banner (P0Logic.LEVEL_TIP), never a card
@@ -314,4 +315,4 @@ static func _place_name(view: Dictionary, place: String) -> String:
 	var p = view.get("fishing", {}).get("places", {}).get(place, null)
 	if p is Dictionary and p.has("name"): return str(p.name)
 	var c = P0Logic.content().get("fishing", {}).get("places", {}).get(place, {})
-	return str(c.get("name", "Reed Pond")) if c is Dictionary else "Reed Pond"
+	return str(c.get("name", "Pond")) if c is Dictionary else "Pond"

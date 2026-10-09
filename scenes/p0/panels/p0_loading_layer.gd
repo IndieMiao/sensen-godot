@@ -5,6 +5,7 @@ extends CanvasLayer
 ## shows after MOTION_PENDING_DELAY_MS (F-08: a quick load never flashes it); 8 s in it adds `Taking longer than
 ## usual…`. AppRouter's loading contract: failed() and close_button (the PLACE_FAIL card's Go back).
 
+const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
 const SLOW_S := 8.0
 
 var screen: P0SysScreen
@@ -48,13 +49,12 @@ func failed() -> void:
 	screen.show_kind(P0SysScreen.Kind.PLACE_FAIL, {shot = _shot})
 	screen.modulate.a = 1.0
 
-## Where an AppRouter.open_instance into a P0 world goes, as the place chip will read there (`Shanghai · Reed Pond`);
+## Where an AppRouter.open_instance into a P0 world goes, as the place chip will read there (`San Francisco · Fern Pond`);
 ## "" for a scene that is not a P0 world (AppRouter keeps its own overlay).
 static func destination(path: String, args: Dictionary) -> String:
-	const CITY := "Shanghai · "
 	match path.get_file():
-		"p0_farm.tscn": return CITY + "Homestead"
-		"p0_pond.tscn": return CITY + str(SystemPonds.location(str(args.get("pond_id", ""))).get("name", "Pond"))
-		"p0_outpost.tscn": return CITY + str(P0Outposts.find(str(args.get("outpost_id", ""))).get("name", "Outpost"))
-		"p0_mine.tscn": return CITY + "Mine · Floor %d" % int(args.get("floor", 1))
+		"p0_farm.tscn": return P0City.chip("Homestead")
+		"p0_pond.tscn": return P0City.chip(str(SystemPonds.location(str(args.get("pond_id", ""))).get("name", "Pond")))
+		"p0_outpost.tscn": return P0City.chip(str(P0Outposts.find(str(args.get("outpost_id", ""))).get("name", "Outpost")))
+		"p0_mine.tscn": return P0City.chip("Mine · Floor %d" % int(args.get("floor", 1)))
 	return ""

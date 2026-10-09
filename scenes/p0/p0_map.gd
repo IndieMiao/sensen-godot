@@ -4,6 +4,7 @@ extends "res://scenes/map_poc/map_poc.gd"
 ## rewired to P0. Shanghai is fixed, the homestead sits at a fixed spot, pond pins come from the
 ## bundled catalog, and nothing here talks to the old farm server or writes the old app's choices.
 
+const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
 const P0_FARM := "res://scenes/p0/p0_farm.tscn"
 const P0_POND := "res://scenes/p0/p0_pond.tscn"
 const P0_REGION := "shanghai"
@@ -12,7 +13,7 @@ const P0_FARM_CHOICE := {"layout_patch_id": "sh_a", "revision": 2}
 ## The home-set outposts (tackle shop, tea house, travel post, market square) come from the shared
 ## outpost table; Go opens the outpost room above the map like a pond (SGODOT-227).
 const P0_OUTPOST := "res://scenes/p0/p0_outpost.tscn"
-const NEAREST_POND := "pond_shanghai_05"   # Reed Pond, the closest to home
+static var NEAREST_POND := P0City.beginner_pond()   # the beginner pond, the closest to home (SGODOT-270: from content)
 const PondCard := preload("res://modules/p0/p0_pond_card.gd")
 const PinReason := preload("res://modules/p0/p0_pin_reason.gd")   # why a pin wears its mark (q(103))
 ## Online counts on the outpost pins (GET /p0/presence), refreshed while the map is on top.
@@ -384,7 +385,7 @@ func _city_action(action: String) -> void:
 			_fly("recenter", at.x, at.y, zoom)
 		"home": go_home_view()
 		"outfit": rt.ui.toast("Outfits come later")
-		"city": rt.ui.toast("P0 is set in Shanghai")
+		"city": rt.ui.toast("P0 is set in %s" % P0City.city_name())
 		_: super._city_action(action)
 
 ## The home key (SGODOT-261, the user's call; 不知火舞 keeps 197): from anywhere — at a pond or an outpost the camera

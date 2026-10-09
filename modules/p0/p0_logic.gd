@@ -4,6 +4,7 @@ extends RefCounted
 ## §10.3.3 quick bar fill, §3.7 countdown format, §9.5.3 Today line; M2: §6.6.1 Cast states,
 ## §7.2.4 heat ring, §7.17.1 eating). Pure and static: tested headless.
 
+const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
 const ICON_DIR := "res://assets/p0/icons/%s.svg"
 const PinReason := preload("res://modules/p0/p0_pin_reason.gd")   # the taken requests and the pins they mark (q(104))
 
@@ -1244,7 +1245,7 @@ static func keeper_lines(view: Dictionary, role: String, ctx := {}) -> Dictionar
 				"full": greet = "You look rested. Tea's here when you need it."
 				_: greet = "Sit a minute. Hot tea, %d Energy a cup." % int(view.get("drinks", {}).get("energy", 30))
 			answer = "Quiet day."
-			if k.get("online", null) != null: answer += " %d %s around Shanghai right now." % [int(k.online), "person" if int(k.online) == 1 else "people"]
+			if k.get("online", null) != null: answer += " %d %s around %s right now." % [int(k.online), "person" if int(k.online) == 1 else "people", P0City.city_name()]
 		"post":
 			var pip := resident_name(str(k.get("request_by", ""))) if k.get("request_by", null) != null else ""
 			match str(k.get("greet", "")):

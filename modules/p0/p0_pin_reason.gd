@@ -10,8 +10,9 @@ extends RefCounted
 ## the first session's (q(103) ④, the server's rule): while Pond Catch is on the Stall Board and taken, Reed Pond wears
 ## the ! until the bag holds the fish, then the homestead the ✓; untaken it hangs nowhere (its ! is the stall's own).
 
+const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
 const HOME := "home"
-const REED_POND := "pond_shanghai_05"   # the beginner pond, where the server points Pond Catch too
+static var REED_POND := P0City.beginner_pond()   # the beginner pond, where the server points Pond Catch too (SGODOT-270)
 const STATES := {"deliver": "deliverable", "request": "request", "new": "new"}
 const NOUNS := {"fish": "fish", "crop": "crops", "dish": "dishes", "material": "materials", "sow": "plots"}
 

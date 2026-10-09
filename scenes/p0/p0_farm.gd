@@ -4,6 +4,7 @@ extends Node3D
 ## and the new UI flow (joystick, main action, quick bar, cards) from P0Runtime.
 ## Ponds are on the map; the kitchen is inside the farmhouse (P0Room, SGODOT-226); nothing here is greybox.
 
+const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
 const FarmProps = preload("res://modules/farm/farm_props.gd")
 const FarmCamera = preload("res://modules/farm/farm_camera.gd")
 const FarmArt = preload("res://modules/farm/farm_art.gd")
@@ -21,7 +22,7 @@ const DOOR_HALF := Vector2(0.6, 0.4)
 const DOOR_ARM_M := 1.5
 
 const STYLE := "cottage"          # the orange-roof cottage of the polished farm
-const PLACE := "Shanghai · Homestead"
+var PLACE := P0City.chip("Homestead")
 const BENCH_TAP_PX := 44.0   # a 44 px touch target around the bench seat (engineering default)
 const BENCH_NEAR_M := 2.6    # the bench's finger card shows within this distance (stall 3.2, house 4.2)
 const LABOUR_CLIP := {"till": "till", "sow": "sow", "water": "water", "harvest": "harvest"}

@@ -15,6 +15,7 @@ extends Node3D
 signal facility_tapped(name: String)
 signal left()
 
+const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
 const FarmCamera = preload("res://modules/farm/farm_camera.gd")
 const BASIC_ROOM_ART := "res://scenes/basic_room/basic_room_art.tscn"
 const BASIC_ROOM_LAYOUT := "res://assets/rooms/basic_room/layout.json"
@@ -37,7 +38,7 @@ const BADGE_SCRIPT := "res://scenes/ui_kit/ui_status_badge.gd"   # UiStatusBadge
 var art_scene: PackedScene
 var layout_path := BASIC_ROOM_LAYOUT
 var anchors_path := ""
-var city := "Shanghai"
+var city := P0City.city_name()
 var place_name := ""
 ## Where the door leads, for the world prompts (SGODOT-250: i-door + "Map" / "Farm").
 var exit_to := "Map"

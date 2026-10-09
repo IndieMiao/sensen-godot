@@ -2006,12 +2006,16 @@
   "profile": {
     "name": "Farmer",
     "city": "Shanghai",
+    "city_short": "Shanghai",
+    "region": "shanghai",
     "climate": "Subtropical",
+    "timezone": "Asia/Shanghai",
     "farm_name": "Farmer's Homestead",
     "farm_at": [
       31.204,
       121.447
     ],
+    "_city": "The P0 home city every player shares (SGODOT-270: one data change moves the whole server; the client reads it through P0City). city_short = the chip's short form when the full name does not fit (q(106): SF); region = map region and city-data id; timezone = the day's 04:00 rollover; the beginner pond is fishing.places' beginner one.",
     "_farm_at": "The homestead's map point (sh_a r2 overlay_wgs84 center): map markers send a fish request to the beginner pond, else the nearest pond to it (SGODOT-232, q(48))."
   },
   "supplies": {
