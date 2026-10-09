@@ -135,15 +135,15 @@ var _art_root: Node3D
 var _shown_last: Dictionary = {}
 ## id -> ticks_msec before which a culled marker may not reappear.
 var _hidden_until: Dictionary = {}
-## The pins are laid out again only when something _update_markers reads has changed since the last layout (SGODOT-260:
-## a still map laid them out every frame, 2.9 ms a frame on a desktop over a busy street, and a warm phone fell to 30 fps).
-## Compared by value: the camera (centre, zoom, the zoom's elastic overshoot, bearing, pitch), the view's size and place,
-## the language, and the player's own pins on screen (FarmMarkers: the pins give way to them, and its name to theirs).
-## Compared by identity, being replaced, never edited, when they change: the selection (select / clear_selection), the
-## entries (refresh_content: the city, the filter, the ponds, a host's places — P0's outposts and their counts, the
-## Homestead pin while away), the live POIs (_merge_pois) and the marks (set_marks: P0's from each server reply).
-## Then until it settles: a layout that changed which pins show runs again (a pin shown last time packs with a smaller
-## margin), as does one whose reappear cooldown runs out (_hidden_until).
+## The pins are laid out again only when something _update_markers reads has changed since the last layout
+## (SGODOT-260: a still map laid them out every frame, 2.9 ms a frame on a desktop over a busy street, and a warm phone
+## fell to 30 fps). Compared by value: the camera (centre, zoom, the zoom's elastic overshoot, bearing, pitch, 3D
+## anchor), the view's size and place, the language, and the player's own pins on screen (FarmMarkers: the pins give way
+## to them, and its name to theirs). Compared by identity, being replaced, never edited, when they change: the selection
+## (select / clear_selection), the entries (refresh_content: the city, the filter, the ponds, a host's places — P0's
+## outposts and their counts, the Homestead pin while away), the live POIs (_merge_pois) and the marks (set_marks: P0's
+## from each server reply). Then until it settles: a layout that changed which pins show runs again (a pin shown last
+## time packs with a smaller margin), as does one whose reappear cooldown runs out (_hidden_until).
 var _layout_values: Array = []
 var _layout_refs: Array = []
 var _layout_settling := true
@@ -980,8 +980,10 @@ func _layout_wanted() -> bool:
 	var own := []
 	if fm != null and fm.has_method("blocker_rects"):
 		own = [fm.blocker_rects(), fm.self_label_rect() if fm.has_method("self_label_rect") else Rect2(), fm.global_position]
+	# The 3D anchor (the billboards' world points) moves only with the centre today (MapPoc._maybe_reanchor): compared too,
+	# so a re-anchor on its own would never leave them where they were (刘邦 on #181).
 	var values := [host.center_lat, host.center_lng, host.zoom, host.get("_zoom_elastic"), host.bearing, host.pitch,
-		get_viewport_rect().size, global_position, TranslationServer.get_locale(), own]
+		host.anchor_lat, host.anchor_lng, get_viewport_rect().size, global_position, TranslationServer.get_locale(), own]
 	var refs := [selected, entries, live_pois, marks]
 	var wanted := _layout_settling or values != _layout_values or refs.size() != _layout_refs.size() \
 		or (_layout_due > 0 and Time.get_ticks_msec() >= _layout_due)
