@@ -1033,7 +1033,10 @@ func p0_dev(step: PackedStringArray) -> bool:
 			_focus = actor.position
 		"at":
 			var m := anchor(step[1])
-			if m: actor.teleport(Vector3(m.global_position.x, floor_y, m.global_position.z))
+			if m:
+				actor.teleport(Vector3(m.global_position.x, floor_y, m.global_position.z))
+				_focus = actor.position   # as if walked there: the view comes along (at 43° the room stands taller on screen)
+				_follow.held = false
 		"wholeview":   # the whole room in view at this camera (shots: the art review's panorama, exposed backs)
 			var view := _view()
 			var need := maxf((_bounds_hi.x - _bounds_lo.x) / FRAME_W, (_bounds_hi.y - _bounds_lo.y) / (FRAME_H * view.y / maxf(view.x, 1.0)))
