@@ -76,14 +76,37 @@ export function scaledXp(s: P0State, base: number, percent: number): number {
   return whole + (draw(s) < exact - whole ? 1 : 0);
 }
 
+const zones = new Map<string, Intl.DateTimeFormat>();
+/**
+ * The home city's UTC offset at an instant, in ms. content.profile.timezone (an IANA name, e.g. America/Los_Angeles)
+ * follows daylight saving; without it the fixed day.utc_offset_hours applies (SGODOT-270: San Francisco moves between −7
+ * and −8 hours).
+ */
+function homeOffset(c: P0Content, at: number): number {
+  const tz = c.profile.timezone;
+  if (!tz) return c.day.utc_offset_hours * 3_600_000;
+  let f = zones.get(tz);
+  if (!f) {
+    f = new Intl.DateTimeFormat('en-US', { timeZone: tz, hourCycle: 'h23', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    zones.set(tz, f);
+  }
+  const p = Object.fromEntries(f.formatToParts(at).map(x => [x.type, x.value]));
+  return Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute, +p.second) - Math.floor(at / 1000) * 1000;
+}
+
 /** Player day key: home-city time shifted back by the 04:00 rollover (§3.1.1). */
 export function dayKey(c: P0Content, now: number): string {
-  const shifted = now + (c.day.utc_offset_hours - c.day.rollover_hour) * 3_600_000;
-  return new Date(shifted).toISOString().slice(0, 10);
+  return new Date(now + homeOffset(c, now) - c.day.rollover_hour * 3_600_000).toISOString().slice(0, 10);
+}
+
+/** The home-time 04:00 that ends player day `day` (YYYY-MM-DD): the next day's rollover, as an instant. */
+export function rolloverAfter(c: P0Content, day: string): number {
+  const local = Date.parse(`${day}T00:00:00Z`) + 86_400_000 + c.day.rollover_hour * 3_600_000;   // 04:00 the next day, home clock
+  const guess = local - homeOffset(c, local);
+  return local - homeOffset(c, guess);   // the offset in force at that moment (04:00 is clear of the 02:00 DST switch)
 }
 
 /** Milliseconds until the next 04:00 rollover. */
 export function untilRollover(c: P0Content, now: number): number {
-  const shifted = now + (c.day.utc_offset_hours - c.day.rollover_hour) * 3_600_000;
-  return 86_400_000 - (((shifted % 86_400_000) + 86_400_000) % 86_400_000);
+  return rolloverAfter(c, dayKey(c, now)) - now;
 }

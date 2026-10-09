@@ -4,7 +4,9 @@ import { applyP0, count, type P0Command, type P0Event } from '../../src/p0/reduc
 import { freshState, type P0State } from '../../src/p0/state.js';
 import { viewOf } from '../../src/p0/view.js';
 
-const c = loadP0Content();
+const content = loadP0Content();
+// The 04:00 instants in these tests are Shanghai's (UTC+8), whatever the home city is; p0_city_switch checks the city's zone.
+const c = { ...content, profile: { ...content.profile, timezone: 'Asia/Shanghai' } };
 const T0 = Date.UTC(2026, 9, 8, 2, 0, 0); // 10:00 Shanghai
 const H = 3_600_000;
 

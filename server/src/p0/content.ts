@@ -70,7 +70,7 @@ export interface P0Content {
   outposts?: OutpostDef[];   // loaded from p0_outposts.json beside the table (loadP0Content)
   version: string;
   energy: { max_base: number; regen_ms: number; bonus_zone: number; rest_amount: number; rest_away_h: number };
-  day: { utc_offset_hours: number; rollover_hour: number };
+  day: { utc_offset_hours: number; rollover_hour: number };   // the offset is the fallback when profile.timezone is absent
   start: { coins: number; tilled_plots: number; wild_plots: number; bag: [string, number][] };
   bag: { capacity: number; stack: Record<string, number> };
   skills: Record<Skill, number[]>;
@@ -120,7 +120,7 @@ export interface P0Content {
   };
   residents: Record<string, ResidentDef>;
   /** P0 has no nickname or city choice yet: what the Profile page shows (SGODOT-225). */
-  profile: { name: string; city: string; climate: string; farm_name: string; farm_at?: [number, number] };
+  profile: { name: string; city: string; climate: string; farm_name: string; farm_at?: [number, number]; timezone?: string };   // timezone: IANA, for the 04:00 rollover (SGODOT-270)
   /** §9.6 / §9.13.2 request boards: the Stall Board (slot 1 starts with the tutorial) and the Market Board. */
   requests: {
     slots: number; refill_h: number; tutorial: { id: string; title: string; item: string; qty: number; coins: number; where: string };
