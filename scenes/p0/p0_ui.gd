@@ -1804,6 +1804,11 @@ var _counter_ctx := {}   # role -> the last keeper ctx an outpost gave
 var _stall_visit_new: Variant = null
 const _COUNTER_FLOW := ["counter", "board_request", "board_drop", "board_dropped"]
 
+## The counter drawer while it is open, its Market Board sheets over it included (the outposts push the camera in on
+## the keeper above it, #128); null otherwise.
+func counter_drawer() -> P0CounterDrawer:
+	return _counter if modal_kind in _COUNTER_FLOW and is_instance_valid(_counter) else null
+
 func open_counter(role: String, opts := {}) -> void:
 	if opts.has("ctx"): _counter_ctx[role] = opts.ctx
 	var ctx: Dictionary = _counter_ctx.get(role, {}).duplicate()
