@@ -189,6 +189,10 @@ func p0_dev(step: PackedStringArray) -> bool:
 				kitchen.drawer.select_page(step[1])
 				kitchen._on_page(kitchen.drawer.page(step[1]))
 		"slottap": kitchen.dev_slot_tap(int(step[1]))   # a tap on the pot card's slot i (shots)
+		"again": kitchen.open_again(step[1])   # Cook Again on a page, as after a pot of it (shots)
+		"againlock":   # a tap on the Cook Again sheet's locked slot (shots)
+			for sl in rt.ui.root.find_children("*", "Control", true, false):
+				if sl is UiPotSlot and (sl as UiPotSlot).state == UiPotSlot.State.LOCKED: (sl as UiPotSlot).locked_tapped.emit()
 		"rects": print("P0_KITCHEN_RECTS ", JSON.stringify(kitchen.dev_rects().merged({hud = HUD_BOTTOM, view = [get_viewport().get_visible_rect().size.x, get_viewport().get_visible_rect().size.y]})))   # shots
 		"put":
 			if kitchen.phase != "compose": kitchen.open("experiment")

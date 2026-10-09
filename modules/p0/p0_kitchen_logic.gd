@@ -616,7 +616,7 @@ static func cook_again(view: Dictionary, page_id: String) -> Dictionary:
 	return {title = str(p.get("name", "")), state = "Can cook again" if short.is_empty() else "Materials short",
 		effect = "Repeat this recipe with the shown ingredients." if short.is_empty() else "Add %s to cook this recipe again." % str(first.get("name", "")).to_lower(),
 		facts = facts, section = "Ingredients · %d/%d" % [met, p.get("in", []).size()],
-		slots = p.get("in", []).size(), locked = slots(view) < 3,
+		slots = p.get("in", []).size(), locked = slots(view) < 3, lock_note = locked_slot_toast(view),
 		tiles = tiles, button = "Cook Again",
 		reason = "" if short.is_empty() else "Need %d more %s" % [int(first.need) - int(first.have), str(first.gap)],
 		command = {"type": "cook", "recipe": page_id}}

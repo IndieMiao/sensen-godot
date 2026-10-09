@@ -325,6 +325,24 @@ func test_cook_again_lists_facts_tiles_and_the_command() -> void:
 	assert_str(a.reason).is_equal("")
 	assert_dict(a.command).is_equal({"type": "cook", "recipe": "dish_herb_grilled_fish"})
 
+func test_cook_again_sheet_uses_the_pot_slots_and_its_lock_says_what_opens_it() -> void:
+	# 刘邦 on #142: COOK-P0-7 / P0-8 (784:77585) take PotSlot44 too — icons and ×1, no names, 20 apart; the lock alone.
+	var v := _again_view()
+	var a := P0KitchenLogic.cook_again(v, "dish_herb_grilled_fish")
+	var sheet: Control = auto_free(preload("res://scenes/p0/kitchen/p0_cook_again_sheet.gd").new(a))
+	var bar: HBoxContainer = sheet.call("_slot_bar")
+	auto_free(bar)
+	var slots := bar.get_children()
+	assert_int(bar.get_theme_constant(&"separation")).is_equal(20)
+	assert_array(slots.map(func(sl): return (sl as UiPotSlot).state)).is_equal(
+		[UiPotSlot.State.FILLED, UiPotSlot.State.FILLED, UiPotSlot.State.LOCKED])
+	assert_bool(slots.all(func(sl): return not (sl as UiPotSlot).removable)).is_true()
+	var said := []
+	sheet.connect("unavailable", func(r: String): said.append(r))
+	(slots[2] as UiPotSlot).locked_tapped.emit()
+	assert_array(said).is_equal([P0KitchenLogic.locked_slot_toast(v)])
+	assert_str(str(said[0])).starts_with("Cooking Lv4")
+
 func test_cook_again_short_names_the_gap_and_drops_the_time() -> void:
 	var v := _again_view()
 	v.bag.slots = []
