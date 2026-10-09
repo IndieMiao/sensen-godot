@@ -592,6 +592,9 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 			elif code == "need_material":
 				ui.toast_error("Need %d more %s" % [int(detail.get("need", 0)) - int(detail.get("have", 0)),
 					P0Logic.item_name(session.current(), str(detail.get("item", "")))])
+			elif code == "skills_short":   # HOME-1's own wording (appendix B), never the code (后裔 on #152)
+				ui.toast_error("Skills total %d needed · now %d" % [int(detail.get("need", 0)), int(detail.get("have", 0))])
+			elif code == "max_level": ui.toast_error("Highest level for now")
 			else: ui.toast_error("Can't do that (%s)" % code)
 		"energy_full":
 			ui.toast_error("Energy full · eat later" if str(cmd.get("type", "")) == "eat" else "Energy full")
