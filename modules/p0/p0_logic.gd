@@ -5,6 +5,7 @@ extends RefCounted
 ## §7.2.4 heat ring, §7.17.1 eating). Pure and static: tested headless.
 
 const ICON_DIR := "res://assets/p0/icons/%s.svg"
+const PinReason := preload("res://modules/p0/p0_pin_reason.gd")   # the taken requests and the pins they mark (q(104))
 
 static var _content: Dictionary = {}
 
@@ -149,11 +150,16 @@ static func fish_gate(view: Dictionary, fish_id: String) -> Dictionary:
 ## of its rarity that a pond or river holds — the lowest level, when the player is below it; 0 once one can be landed
 ## (the server's landable, #185). A taken request then marks no pond and its button reads `Fishing Lv4 needed`.
 static func fish_level_short(view: Dictionary, items: Array, rarity) -> int:
+	return int(fish_level_gate(view, items, rarity).get("level", 0))
+
+## The fish that holds such a request back (fish_level_short): {id, level} of the lowest-level fish it takes, when the
+## player's Fishing is below it, else {}. Today's request row opens its gate card (the Fish-dex silhouette's, q(104)).
+static func fish_level_gate(view: Dictionary, items: Array, rarity) -> Dictionary:
 	var c := content()
 	var held := {}
 	for site in c.get("fishing", {}).get("sites", {}).values():
 		for id in site.get("fish", []): held[str(id)] = true
-	var lowest := 0
+	var lowest := {}
 	for f in c.get("fish", []):
 		var id := str(f.get("id", ""))
 		if not held.has(id): continue
@@ -161,8 +167,9 @@ static func fish_level_short(view: Dictionary, items: Array, rarity) -> int:
 			if not items.has(id): continue
 		elif rarity == null or int(f.get("rarity", 0)) != int(rarity): continue
 		var lv := int(f.get("level", 1))
-		lowest = lv if lowest == 0 else mini(lowest, lv)
-	return lowest if lowest > int(view.get("skills", {}).get("fishing", {}).get("level", 1)) else 0
+		if lowest.is_empty() or lv < int(lowest.level): lowest = {"id": id, "level": lv}
+	if lowest.is_empty() or int(lowest.level) <= int(view.get("skills", {}).get("fishing", {}).get("level", 1)): return {}
+	return lowest
 
 static func dex_caught(view: Dictionary, fish_id: String) -> bool:
 	for f in view.get("fishing", {}).get("dex", []):
@@ -1004,14 +1011,16 @@ static func today_rows(view: Dictionary) -> Array:
 		or (view.get("plots", []) as Array).any(func(p): return str(p.get("state", "")) in ["sown", "growing", "ready"])
 	if not farmed: now_rows.append(_first_sow_row(view))
 	now_rows.append_array(lead)
-	for r in view.get("stall", {}).get("board", {}).get("requests", []):
-		if str(r.get("id", "")) == P0Guide.TUTORIAL: continue   # the guide's Catch / Deliver row
-		if str(r.get("status", "")) == "open":
-			now_rows.append(_row("%s · %d %s · Stall Board" % [str(r.title), int(r.qty), item_name(view, str(r.item))], "board", "stall"))
-			continue
-		if str(r.get("status", "")) != "accepted": continue
-		if int(r.have) >= int(r.qty): now_rows.append(_row("%s · Deliver at the Stall" % str(r.title), "board", "stall"))
-		else: now_rows.append(_row("%s · %s %d/%d" % [str(r.title), item_name(view, str(r.item)), int(r.have), int(r.qty)], str(r.item), ""))
+	# Taken requests (q(104), 李白 4ac4a4e7): the Stall Board's, the Market Board's and the residents'; untaken ones stay
+	# on their boards. One ready to hand in can be done now and leads; one still short follows what else can be done now,
+	# before the countdowns. The first session shows its tutorial request alone (the guide's row).
+	var progress: Array = []
+	if not P0Guide.first_phase(view):
+		var deliveries: Array = []
+		for r in PinReason.taken(view):
+			if bool(r.ready): deliveries.append(_row("%s · %s" % [str(r.title), str(r.deliver)], "board", str(r.deliver_go)))
+			else: progress.append(_request_row(view, r))
+		now_rows = deliveries + now_rows
 	var ready := {}
 	var sown := 0
 	for p in view.get("plots", []):
@@ -1047,6 +1056,7 @@ static func today_rows(view: Dictionary) -> Array:
 			if str(st.get("id", "")).begins_with("fish_") and item(view, str(st.id)).get("cook", true): fish += int(st.get("qty", 0))
 		fish -= int(wait.get("fish", 0))
 		if fish > 0 and not guided_stove: now_rows.append(_row("%d fish · the stove is free" % fish, "pot", "stove"))
+	now_rows.append_array(progress)
 	timed.sort_custom(func(a, b): return float(a[0]) < float(b[0]))
 	var rows: Array = now_rows.duplicate()
 	for t in timed:
@@ -1088,6 +1098,27 @@ static func today_rows(view: Dictionary) -> Array:
 
 static func _row(line: String, icon_id: String, go: String) -> Dictionary:
 	return {"line": line, "icon": icon_id, "go": go, "state": "default", "tail": "", "focus": false}
+
+## A taken request still short (李白 4ac4a4e7): `An Old Man's Catch · Rare fish 0/1`, what it takes as its card says it.
+## A fish one shows on the map the pond its ! hangs on; one the player cannot land yet (q(104)) has no Show, a small line
+## `Fishing Lv4 needed`, and the whole row opens that fish's gate card (`gate`: the Fish-dex silhouette's, P0Ui).
+static func _request_row(view: Dictionary, r: Dictionary) -> Dictionary:
+	var items: Array = r.get("items", [])
+	var kind := str(r.get("kind", ""))
+	var icon_id := str(items[0]) if items.size() == 1 else str({"fish": "fish", "sow": "seed_radish", "crop": "seed_radish", "dish": "pot"}.get(kind, "board"))
+	var row := _row("%s · %s %d/%d" % [str(r.title), str(r.need_name), int(r.have), int(r.qty)], icon_id, "")
+	if kind != "fish": return row
+	var gate := fish_level_gate(view, items, r.get("rarity", null))
+	if not gate.is_empty():
+		row.state = "short"
+		row.tail = "Fishing Lv%d needed" % int(gate.level)
+		row.gate = str(gate.id)
+		return row
+	for m in PinReason.markers(view):
+		if str(m.get("kind", "")) == "request" and str(m.get("why", {}).get("request", "")) == str(r.id) and str(m.get("place", "")).begins_with("pond_"):
+			row.go = "pond:" + str(m.place)
+			break
+	return row
 
 ## "Sow your first plot", short of Energy when sowing a radish costs more than the player has (TodayRow Short).
 static func _first_sow_row(view: Dictionary) -> Dictionary:

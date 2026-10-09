@@ -2183,6 +2183,7 @@ func open_today(given: Array = []) -> void:
 		var d: Dictionary = r.duplicate()
 		d.icon = P0Logic.icon(str(r.icon))
 		d.action = show_label(str(r.go), space_here(), spot_reachable())
+		d.tap = str(r.get("gate", "")) != ""   # a fish the player cannot land yet: the row opens its gate card (q(104))
 		return d)
 	var panel := UiTodayPanel.new(shown)
 	panel.theme = UiKit.theme()
@@ -2199,6 +2200,10 @@ func open_today(given: Array = []) -> void:
 			if go == "stove" and page != "" and stove_free and str(rows[i].get("state", "")) != "done": cook_page_from_today = page
 			show_spot.emit(go)
 		else: show_on_map.emit(map_target(go)))
+	# q(104): the fish's gate card, the Fish-dex silhouette's own (李白 A); the camera stays, Back returns to Today.
+	panel.row_pressed.connect(func(i: int):
+		var gate := P0Logic.fish_gate(view, str(rows[i].get("gate", "")))
+		if not gate.is_empty(): open_gate_card(gate, func(): open_today(given)))
 	_open_modal(panel, 0.0)
 	modal_kind = "today"
 

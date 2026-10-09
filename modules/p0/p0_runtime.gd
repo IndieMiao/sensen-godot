@@ -994,6 +994,14 @@ func _dev_shot(dt: float) -> void:
 				ui.open_today()
 				for c in ui.find_children("*", "Control", true, false):
 					if c is UiTodayPanel and i >= 0: (c as UiTodayPanel).show_pressed.emit(i)
+			"todaytap":   # todaytap:<text in the row> — Today opened and that row tapped (q(104): a fish it cannot land yet)
+				ui.open_today()
+				var rows := P0Logic.today_rows(ui.view).map(func(r): return str(r.line))
+				var at := -1
+				for k in rows.size():
+					if at < 0 and rows[k].contains(":".join(step.slice(1))): at = k
+				for c in ui.find_children("*", "Control", true, false):
+					if c is UiTodayPanel and at >= 0: (c as UiTodayPanel).row_pressed.emit(at)
 			"close": ui.close_modal()
 			"auto":
 				P0FishingPanel.auto_play = true
