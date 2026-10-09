@@ -27,17 +27,17 @@ describe('map pin markers (§9.5.2, q(48); SGODOT-232)', () => {
   it('loads the outposts and pond points the markers need', () => {
     expect(c.outposts?.map(o => o.id)).toEqual(expect.arrayContaining(['sh_tackle_1', 'sh_tea_1', 'sh_post_1', 'sh_market_1']));
     expect(c.outposts?.find(o => o.id === 'sh_post_1')?.residents).toContain('res_pip');
-    expect(c.fishing.places.pond_shanghai_05.at).toHaveLength(2);
+    expect(c.fishing.places.pond_san_francisco_03.at).toHaveLength(2);
   });
 
   it('a tracked fish request points to the beginner pond until the bag holds it, then the hand-in point shows ✓', () => {
     let s = fresh();
-    expect(at(s)).not.toContain('request:pond_shanghai_05:tracked');   // Pond Catch not taken yet: the ! is on the farm's stall
+    expect(at(s)).not.toContain('request:pond_san_francisco_03:tracked');   // Pond Catch not taken yet: the ! is on the farm's stall
     s = step(s, { type: 'accept', request: 'req_pond_catch' });
-    expect(at(s)[0]).toBe('request:pond_shanghai_05:tracked');   // §14.2 minute 3–5: Reed Pond's gold !
+    expect(at(s)[0]).toBe('request:pond_san_francisco_03:tracked');   // §14.2 minute 3–5: Fern Pond's gold !
     s.bag.push({ id: 'fish_crucian', qty: 2 });
     expect(at(s)[0]).toBe('deliver:home:tracked');
-    expect(at(s)).not.toContain('request:pond_shanghai_05:tracked');
+    expect(at(s)).not.toContain('request:pond_san_francisco_03:tracked');
     expect(viewOf(c, s, T0).map_markers[0]).toEqual({ place: 'home', kind: 'deliver', why: { request: 'req_pond_catch', tracked: true } });
   });
 
@@ -45,7 +45,7 @@ describe('map pin markers (§9.5.2, q(48); SGODOT-232)', () => {
     let s = fresh();
     expect(at(s)).toEqual([]);   // Pip's and Old Kai's requests are open, but minutes 5–9 have one goal
     s = step(s, { type: 'accept', request: 'req_pond_catch' });
-    expect(at(s)).toEqual(['request:pond_shanghai_05:tracked']);
+    expect(at(s)).toEqual(['request:pond_san_francisco_03:tracked']);
     s.bag.push({ id: 'fish_crucian', qty: 3 });
     expect(at(s)).toEqual(['deliver:home:tracked']);   // Pip could take a crucian too: not yet
     s = step(s, { type: 'deliver', request: 'req_pond_catch' });
@@ -110,9 +110,9 @@ describe('map pin markers (§9.5.2, q(48); SGODOT-232)', () => {
   });
 
   it('picks the beginner pond when its template has the fish, else the pond nearest the farm', () => {
-    expect(pondFor(c, ['fish_crucian'])).toBe('pond_shanghai_05');   // Reed Pond (beginner, Pond template)
-    expect(pondFor(c, ['fish_koi'])).toBe('pond_shanghai_05');       // Golden Koi lives in Pond only
-    expect(pondFor(c, ['fish_trout'])).toBe('pond_shanghai_04');     // River only: Pebble Pond is the nearest River pond
+    expect(pondFor(c, ['fish_crucian'])).toBe('pond_san_francisco_03');   // Fern Pond (beginner, Pond template)
+    expect(pondFor(c, ['fish_koi'])).toBe('pond_san_francisco_03');       // Golden Koi lives in Pond only
+    expect(pondFor(c, ['fish_trout'])).toBe('pond_san_francisco_06');     // River only: Blossom Pond is the nearest River pond (1.46 km)
     expect(pondFor(c, ['fish_mackerel'])).toBeNull();                // Coast: no such pond in P0
   });
 
@@ -156,6 +156,6 @@ describe('map pin markers (§9.5.2, q(48); SGODOT-232)', () => {
     expect(mapMarkers(c, s).filter(m => m.why.request === 'req_res_kai_1')).toEqual([]);   // no ! on a pond it can't be caught at
     s.skills.fishing = 480;   // Lv4
     expect(mapMarkers(c, s).find(m => m.why.request === 'req_res_kai_1'))
-      .toEqual({ place: 'pond_shanghai_05', kind: 'request', why: { request: 'req_res_kai_1', resident: 'res_old_kai', tracked: true } });
+      .toEqual({ place: 'pond_san_francisco_03', kind: 'request', why: { request: 'req_res_kai_1', resident: 'res_old_kai', tracked: true } });
   });
 });

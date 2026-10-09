@@ -49,10 +49,10 @@ func test_an_outpost_target_flies_to_its_pin_and_selects_it() -> void:
 	assert_object(AppRouter.top_instance()).is_null()   # guidance only: nothing opened
 
 func test_a_pond_target_selects_the_pond_pin() -> void:
-	await _back_with("show:pond:pond_shanghai_05")
-	var pond := SystemPonds.location("pond_shanghai_05")
+	await _back_with("show:pond:pond_san_francisco_03")
+	var pond := preload("res://modules/p0/p0_ponds.gd").location("pond_san_francisco_03")
 	_at(float(pond.lat), float(pond.lng))
-	assert_str(str(map.get("city_map").selected.get("id", ""))).is_equal("pond_shanghai_05")
+	assert_str(str(map.get("city_map").selected.get("id", ""))).is_equal("pond_san_francisco_03")
 	_settle_prewarm()
 	await get_tree().process_frame
 
@@ -79,7 +79,7 @@ func test_the_tackle_shop_keeps_its_own_entry() -> void:
 
 ## On the map itself (蒙恬 on #44): a panel's Show flies to the pin at once; a homestead target is the homestead.
 func test_show_from_a_panel_on_the_map_flies_at_once() -> void:
-	assert_str(P0Ui.show_label("pond:pond_shanghai_05", "map", false)).is_equal("Show")
+	assert_str(P0Ui.show_label("pond:pond_san_francisco_03", "map", false)).is_equal("Show")
 	assert_str(P0Ui.show_label("stove", "map", false)).is_equal("Show")
 	assert_str(P0Ui.show_label("map", "map", false)).is_equal("")
 	map.call("p0_show_spot", "outpost:post")
@@ -101,16 +101,16 @@ func test_show_from_a_panel_on_the_map_flies_at_once() -> void:
 ## for a fresh map, which never resumes: the fresh map takes the waiting Show instead of framing the home set.
 func test_a_fresh_map_takes_a_waiting_show() -> void:
 	var rt := map.get("rt") as P0Runtime
-	rt.after_leave = "show:pond:pond_shanghai_05"
+	rt.after_leave = "show:pond:pond_san_francisco_03"
 	var fresh: Node = (load(P0_MAP) as PackedScene).instantiate()
 	add_child(fresh)
 	for i in 5: await get_tree().process_frame
 	var until := Time.get_ticks_msec() + 2000   # it flies to the pin (SGODOT-267)
 	while fresh._flight != null and fresh._flight.is_running() and Time.get_ticks_msec() < until: await get_tree().process_frame
-	var pond := SystemPonds.location("pond_shanghai_05")
+	var pond := preload("res://modules/p0/p0_ponds.gd").location("pond_san_francisco_03")
 	assert_float(fresh.get("center_lat")).is_equal_approx(float(pond.lat), 1e-6)
 	assert_float(fresh.get("center_lng")).is_equal_approx(float(pond.lng), 1e-6)
-	assert_str(str(fresh.get("city_map").selected.get("id", ""))).is_equal("pond_shanghai_05")
+	assert_str(str(fresh.get("city_map").selected.get("id", ""))).is_equal("pond_san_francisco_03")
 	assert_str(rt.after_leave).is_equal("")
 	_settle_prewarm()
 	fresh.free()

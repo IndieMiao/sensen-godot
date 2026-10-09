@@ -1,8 +1,8 @@
 extends "res://scenes/map_poc/map_poc.gd"
 ## The P0 map: the old map scene and city view as they are (Mapbox tiles, 3D landmarks, POI
 ## declutter, pond pins and their info card, the farm miniature), with only the entry points
-## rewired to P0. Shanghai is fixed, the homestead sits at a fixed spot, pond pins come from the
-## bundled catalog, and nothing here talks to the old farm server or writes the old app's choices.
+## rewired to P0. Shanghai is fixed, the homestead sits at a fixed spot, pond pins come from P0's
+## pond list (P0Ponds), and nothing here talks to the old farm server or writes the old app's choices.
 
 const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
 const P0_FARM := "res://scenes/p0/p0_farm.tscn"
@@ -15,6 +15,7 @@ const P0_FARM_CHOICE := {"layout_patch_id": "sh_a", "revision": 2}
 const P0_OUTPOST := "res://scenes/p0/p0_outpost.tscn"
 static var NEAREST_POND := P0City.beginner_pond()   # the beginner pond, the closest to home (SGODOT-270: from content)
 const PondCard := preload("res://modules/p0/p0_pond_card.gd")
+const P0Ponds := preload("res://modules/p0/p0_ponds.gd")   # P0's own ponds: San Francisco (SGODOT-270)
 const PinReason := preload("res://modules/p0/p0_pin_reason.gd")   # why a pin wears its mark (q(103))
 ## Online counts on the outpost pins (GET /p0/presence), refreshed while the map is on top.
 const PRESENCE_S := 15.0
@@ -53,7 +54,7 @@ func _open_my_farm() -> void:
 
 func _on_city_pond_requested(entry: Dictionary) -> void:
 	if AppRouter.top_instance() != null or AppRouter._navigation_pending: return
-	var pond := SystemPonds.location(str(entry.get("id", "")))
+	var pond := P0Ponds.location(str(entry.get("id", "")))
 	if pond.is_empty(): return
 	_reset_gesture()
 	P0Runtime.nav_started()
@@ -81,7 +82,7 @@ func _install_city_map() -> void:
 		_style_locate(city_map.home_key, "home")   # the home key over it: the same key, i-home (SGODOT-261)
 		city_map.home_key.visible = true
 	if city_map and not city_map.bundled_ponds:
-		city_map.preload_ponds(SystemPonds.data().locations.filter(func(e): return str(e.region_id) == P0_REGION))
+		city_map.preload_ponds(P0Ponds.all())
 		_set_outpost_places()
 		city_map.place_requested.connect(_on_place_requested)
 		_start_presence()
@@ -100,7 +101,7 @@ func _origin() -> Vector2:
 			var o := P0Outposts.find(str(here.get("place", "")))
 			if not o.is_empty(): return Vector2(float(o.lat), float(o.lng))
 		"pond":
-			var p := SystemPonds.location(str(here.get("place", "")))
+			var p := P0Ponds.location(str(here.get("place", "")))
 			if not p.is_empty(): return Vector2(float(p.lat), float(p.lng))
 	return Vector2(home_lat, home_lng)
 
@@ -218,7 +219,7 @@ func _open_pond_fish(entry: Dictionary) -> void:
 		_open_pond_card(entry, info)
 
 func _prewarm_pond(id: String) -> void:
-	var pond := SystemPonds.location(id)
+	var pond := P0Ponds.location(id)
 	if not pond.is_empty(): WaterShore.prewarm(id, SystemPonds.site(pond))
 
 func _set_outpost_places() -> void:
@@ -445,7 +446,7 @@ func _own_pin_pressed() -> void:
 	var place := str(rt.here.get("place", ""))
 	match str(rt.here.get("space", "home")):
 		"pond":
-			var p := SystemPonds.location(place)
+			var p := P0Ponds.location(place)
 			if not p.is_empty():
 				city_map.select((p as Dictionary).merged({"kind": "pond"}))
 				return
@@ -717,7 +718,7 @@ func place_for(target: String) -> Dictionary:
 	if target.begins_with("outpost:"):
 		var o := P0Outposts.by_role(target.trim_prefix("outpost:"))
 		return {} if o.is_empty() else P0Outposts.place_entry(o, int(_online.get(str(o.id), 0)))
-	if target.begins_with("pond:"): return SystemPonds.location(target.trim_prefix("pond:"))
+	if target.begins_with("pond:"): return P0Ponds.location(target.trim_prefix("pond:"))
 	return {}
 
 func p0_surface() -> String: return "map"
@@ -808,7 +809,7 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"farm": _open_my_farm()
 		"pond": _on_city_pond_requested({"id": step[1]})
 		"pondcard", "pondfish":   # the pond card as after tapping the pin; pondfish then opens Details ›
-			var e := SystemPonds.location(step[1]).duplicate(true)
+			var e := P0Ponds.location(step[1]).duplicate(true)
 			e["kind"] = "pond"
 			if city_map: city_map.select(e)
 			if step[0] == "pondfish": _open_pond_fish(e)

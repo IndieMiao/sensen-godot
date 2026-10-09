@@ -18,10 +18,10 @@ function step(s: P0State, cmd: P0Command, at = T, content = c) {
   if (!r.ok) throw new Error(r.code);
   return r.state;
 }
-const REED = 'pond_shanghai_05', PEBBLE = 'pond_shanghai_04';
+const FERN = 'pond_san_francisco_03', BLOSSOM = 'pond_san_francisco_06';   // Fern Pond (Pond) / Blossom Pond (River)
 const fresh = () => freshState(c, 'progression-player', T, 7);
 /** Enter a pond (space + place, q(36)) and land one fish there. */
-function catchFish(s: P0State, place = REED, at = T, content = c) {
+function catchFish(s: P0State, place = FERN, at = T, content = c) {
   s = step(s, { type: 'cast', space: 'pond', place }, at, content);
   return step(s, { type: 'reel', outcome: 'landed' }, at + s.cast!.bite_ms + 10, content);
 }
@@ -36,19 +36,19 @@ describe('P0 first-session XP (q(37); SGODOT-232 S1, rescued from SGODOT-131)', 
   it('first crucian totals 50 XP; another pond template in the same city gives no second city bonus', () => {
     let s = catchFish(fresh());
     expect(s.skills.fishing).toBe(50);
-    expect(s.firsts).toContain('fishing_city:shanghai');
-    s = catchFish(s, PEBBLE, T + 60_000);
+    expect(s.firsts).toContain('fishing_city:san francisco');
+    s = catchFish(s, BLOSSOM, T + 60_000);
     expect(s.skills.fishing).toBe(55);
   });
 
   it('takes the city from the server pond table, ignoring a forged site or city in the command', () => {
-    let s = step(fresh(), { type: 'cast', space: 'pond', place: REED, site: 'river', city: 'invented' } as P0Command);
-    expect(s.cast).toMatchObject({ site: 'pond', place: REED });
+    let s = step(fresh(), { type: 'cast', space: 'pond', place: FERN, site: 'river', city: 'invented' } as P0Command);
+    expect(s.cast).toMatchObject({ site: 'pond', place: FERN });
     s = step(s, { type: 'reel', outcome: 'landed' }, T + s.cast!.bite_ms + 10);
-    expect(s.firsts.filter(f => f.startsWith('fishing_city:'))).toEqual(['fishing_city:shanghai']);
+    expect(s.firsts.filter(f => f.startsWith('fishing_city:'))).toEqual(['fishing_city:san francisco']);
     const other = structuredClone(c);
-    other.fishing.places[PEBBLE].city = 'test-other-city';
-    s.presence.place = PEBBLE;   // entered before the table changed
+    other.fishing.places[BLOSSOM].city = 'test-other-city';
+    s.presence.place = BLOSSOM;   // entered before the table changed
     s = step(s, { type: 'cast' }, T + 60_000, other);
     s = step(s, { type: 'reel', outcome: 'landed' }, T + 60_000 + s.cast!.bite_ms + 10, other);
     expect(s.skills.fishing).toBe(65);
@@ -56,15 +56,15 @@ describe('P0 first-session XP (q(37); SGODOT-232 S1, rescued from SGODOT-131)', 
   });
 
   it('cancel and escape do not grant city/landing XP; first-cast bonus cannot be repeated', () => {
-    let s = step(fresh(), { type: 'cast', space: 'pond', place: REED });
+    let s = step(fresh(), { type: 'cast', space: 'pond', place: FERN });
     s = step(s, { type: 'reel', outcome: 'cancel' }, T + 10);
     expect(s.skills.fishing).toBe(10);
-    expect(s.firsts).not.toContain('fishing_city:shanghai');
+    expect(s.firsts).not.toContain('fishing_city:san francisco');
     s = step(s, { type: 'cast' }, T + 100);
     s = step(s, { type: 'reel', outcome: 'escaped' }, T + 100 + s.cast!.bite_ms + 10);
     expect(s.skills.fishing).toBe(10);
     expect(s.firsts).not.toContain('landed');
-    s = catchFish(s, REED, T + 60_000);
+    s = catchFish(s, FERN, T + 60_000);
     expect(s.skills.fishing).toBe(50);
   });
 
@@ -95,9 +95,9 @@ describe('P0 first-session XP (q(37); SGODOT-232 S1, rescued from SGODOT-131)', 
     expect(done.events).toContainEqual(expect.objectContaining({ kind: 'level', skill: 'cooking', level: 2, energy: 0 }));
     expect(done.events.some(e => e.kind === 'energy')).toBe(false);
     expect(done.state.rewards).not.toContain('levelup_first');
-    s = catchFish(done.state, REED, T + 60_000);
+    s = catchFish(done.state, FERN, T + 60_000);
     s.skills.fishing = 69;
-    s = step(s, { type: 'cast', space: 'pond', place: REED }, T + 120_000);
+    s = step(s, { type: 'cast', space: 'pond', place: FERN }, T + 120_000);
     const before = s.energy.value;
     const landed = applyP0(c, s, { type: 'reel', outcome: 'landed' }, T + 120_000 + s.cast!.bite_ms + 10);
     if (!landed.ok) throw new Error(landed.code);
@@ -158,7 +158,7 @@ describe('P0 first-session XP (q(37); SGODOT-232 S1, rescued from SGODOT-131)', 
     try {
       const store = new P0Store(c, file);
       registerP0Routes(app, { content: c, store, now: () => now, dev: false });
-      await app.inject({ method: 'POST', url: '/v1/p0/commands', headers, payload: { type: 'cast', space: 'pond', place: REED } });
+      await app.inject({ method: 'POST', url: '/v1/p0/commands', headers, payload: { type: 'cast', space: 'pond', place: FERN } });
       now += store.get('progression-player', now).cast!.bite_ms + 10;
       const payload = { type: 'reel', outcome: 'landed' };
       const first = await app.inject({ method: 'POST', url: '/v1/p0/commands', headers, payload });
@@ -186,7 +186,7 @@ describe('first-session Energy ledger (§14.2.1, q(101); SGODOT-262)', () => {
     const energyAt = (at: number) => viewOf(c, s, at).energy.value;
     const afterTicks = (n: number) => s.energy.tick_ms + n * period + 1_000;   // just past the n-th +1 from now
     const cast = (bait?: string) => {
-      s = step(s, { type: 'cast', space: 'pond', place: REED, ...(bait ? { bait } : {}) }, t);
+      s = step(s, { type: 'cast', space: 'pond', place: FERN, ...(bait ? { bait } : {}) }, t);
       const r = applyP0(c, s, { type: 'reel', outcome: 'landed' }, t + s.cast!.bite_ms + 10);
       if (!r.ok) throw new Error(r.code);
       s = r.state;

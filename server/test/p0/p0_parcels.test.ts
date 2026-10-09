@@ -17,7 +17,7 @@ const T = Date.UTC(2026, 9, 5, 2);
 const player = 'parcel-test-player';
 function full() {
   const s = freshState(c, player, T);
-  s.presence.place = 'pond_shanghai_05';   // at Reed Pond, so a cast reaches the creel check
+  s.presence.place = 'pond_san_francisco_03';   // at Fern Pond, so a cast reaches the creel check
   s.bag = Array.from({ length: 25 }, () => ({ id: 'fish_crucian', qty: 10 }));
   return s;
 }

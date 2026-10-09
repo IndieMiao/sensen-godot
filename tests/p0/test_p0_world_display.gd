@@ -119,11 +119,11 @@ func test_show_label_follows_where_the_target_is() -> void:
 	assert_str(P0Ui.show_label("plots", "farm", true)).is_equal("Show")
 	assert_str(P0Ui.show_label("stall", "farm", false)).is_equal("")          # here, but no camera target
 	assert_str(P0Ui.show_label("stove", "pond", false)).is_equal("Show on map")
-	assert_str(P0Ui.show_label("pond:pond_shanghai_03", "farm", true)).is_equal("Show on map")
+	assert_str(P0Ui.show_label("pond:pond_san_francisco_03", "farm", true)).is_equal("Show on map")
 	assert_str(P0Ui.show_label("tackle", "farm", true)).is_equal("Show on map")
 	assert_str(P0Ui.show_label("", "farm", true)).is_equal("")
 	assert_str(P0Ui.map_target("plots")).is_equal("home")
-	assert_str(P0Ui.map_target("pond:pond_shanghai_03")).is_equal("pond:pond_shanghai_03")
+	assert_str(P0Ui.map_target("pond:pond_san_francisco_03")).is_equal("pond:pond_san_francisco_03")
 
 func test_show_on_map_reports_the_pin() -> void:
 	var pond := _ui(false)

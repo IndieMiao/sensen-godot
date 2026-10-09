@@ -476,36 +476,36 @@
       }
     },
     "places": {
-      "pond_shanghai_05": {
-        "name": "Reed Pond",
-        "site": "pond",
-        "city": "shanghai",
-        "beginner": true
-      },
-      "pond_shanghai_01": {
-        "name": "Willow Pond",
-        "site": "pond",
-        "city": "shanghai"
-      },
-      "pond_shanghai_03": {
+      "pond_san_francisco_03": {
         "name": "Fern Pond",
         "site": "pond",
-        "city": "shanghai"
+        "city": "san francisco",
+        "beginner": true
       },
-      "pond_shanghai_04": {
-        "name": "Pebble Pond",
-        "site": "river",
-        "city": "shanghai"
-      },
-      "pond_shanghai_06": {
+      "pond_san_francisco_06": {
         "name": "Blossom Pond",
         "site": "river",
-        "city": "shanghai"
+        "city": "san francisco"
       },
-      "pond_shanghai_02": {
+      "pond_san_francisco_02": {
         "name": "Clover Pond",
         "site": "river",
-        "city": "shanghai"
+        "city": "san francisco"
+      },
+      "pond_san_francisco_01": {
+        "name": "Willow Pond",
+        "site": "pond",
+        "city": "san francisco"
+      },
+      "pond_san_francisco_04": {
+        "name": "Pebble Pond",
+        "site": "river",
+        "city": "san francisco"
+      },
+      "pond_san_francisco_05": {
+        "name": "Reed Pond",
+        "site": "pond",
+        "city": "san francisco"
       }
     },
     "rods": [
@@ -2012,18 +2012,19 @@
   },
   "profile": {
     "name": "Farmer",
-    "city": "Shanghai",
-    "city_short": "Shanghai",
-    "region": "shanghai",
-    "climate": "Subtropical",
-    "timezone": "Asia/Shanghai",
+    "city": "San Francisco",
+    "city_short": "SF",
+    "chip_city": "SF",
+    "region": "san_francisco",
+    "climate": "Temperate",
+    "timezone": "America/Los_Angeles",
     "farm_name": "Farmer's Homestead",
     "farm_at": [
-      31.204,
-      121.447
+      37.7558,
+      -122.4345
     ],
     "_city": "The P0 home city every player shares (SGODOT-270: one data change moves the whole server; the client reads it through P0City). city_short = the chip's short form when the full name does not fit (q(106): SF); region = map region and city-data id; timezone = the day's 04:00 rollover; the beginner pond is fishing.places' beginner one.",
-    "_farm_at": "The homestead's map point (sh_a r2 overlay_wgs84 center): map markers send a fish request to the beginner pond, else the nearest pond to it (SGODOT-232, q(48))."
+    "_farm_at": "The homestead's map point (Noe Valley, 0.77 km from Fern Pond; 苏烈's plan on SGODOT-270): map markers send a fish request to the beginner pond, else the nearest pond to it (SGODOT-232, q(48))."
   },
   "supplies": {
     "torch": {

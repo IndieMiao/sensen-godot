@@ -24,7 +24,7 @@
 
 | 文件 | 用途 |
 |---|---|
-| `Dockerfile` | P0 镜像。构建上下文是仓库根，镜像里只有服务端代码和启动时要读的数据：`assets/p0/p0_content.json`、据点表 `assets/p0/p0_outposts.json`、据点房间校验外观用的 `assets/farm/data/regions.json` 与 `assets/avatar/` 下三个清单；以非 root 用户运行；数据在 `/data` 卷 |
+| `Dockerfile` | P0 镜像。构建上下文是仓库根，镜像里只有服务端代码和启动时要读的数据：`assets/p0/p0_content.json`、据点表 `assets/p0/p0_outposts.json`、鱼塘清单 `assets/p0/p0_ponds.json`（每口塘的地图点位，SGODOT-270）、据点房间校验外观用的 `assets/farm/data/regions.json` 与 `assets/avatar/` 下三个清单；以非 root 用户运行；数据在 `/data` 卷 |
 | `Dockerfile.dockerignore` | 这个镜像专用的放行清单（BuildKit 优先读它，不读根目录给 farm 用的 `.dockerignore`，那份没放行 `assets/p0`）。不会打进演示包的 `demo_server.json` |
 | `docker-compose.p0.yml` | 香港 ECS：加入 farm 项目的网络 `farm_default`，由 farm 的 Caddy 转发；内存上限 256 MB |
 | `docker-compose.devserver.yml` | 局域网 devserver：同一个镜像直接发布到 3150 端口，不经 Caddy |
@@ -47,7 +47,7 @@
    ```sh
    tar -C <repo> --exclude node_modules --exclude '.env*' -czf - \
      package.json pnpm-lock.yaml pnpm-workspace.yaml packages/blueprint-core server assets/p0/p0_content.json \
-     assets/p0/p0_outposts.json assets/farm/data/regions.json \
+     assets/p0/p0_outposts.json assets/p0/p0_ponds.json assets/ponds/catalog.json assets/farm/data/regions.json \
      assets/avatar/parts_manifest.json assets/avatar/demo_denylist.json assets/avatar/npc_only.json \
      | ssh "$HOST" 'mkdir -p /opt/farm/p0/src && tar -C /opt/farm/p0/src -xzf -'
    ssh "$HOST" "cd /opt/farm/p0/src && DOCKER_BUILDKIT=1 docker build -f server/deploy/p0/Dockerfile -t p0-server:<sha> ."

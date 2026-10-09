@@ -7,14 +7,14 @@ extends GdUnitTestSuite
 
 const P0_MAP := "res://scenes/p0/p0_map.tscn"
 ## One pin of each kind: a pond, the outposts by role, and the farm's own pin (drawn while the player is away).
-const PINS := ["pond_shanghai_05", "sh_tea_1", "sh_tackle_1", "sh_market_1", "sh_post_1", "home"]
+const PINS := ["pond_san_francisco_03", "sh_tea_1", "sh_tackle_1", "sh_market_1", "sh_post_1", "home"]
 
 var map: Node
 
 func before_test() -> void:
 	Net.use_transport(FakeTransport.new([]).callable())
 	# Away at a pond, so the Homestead pin is on the map too (P0 map: at home the avatar is the farm's mark).
-	P0Runtime.ensure().here = {"space": "pond", "place": "pond_shanghai_01"}
+	P0Runtime.ensure().here = {"space": "pond", "place": "pond_san_francisco_01"}
 	var viewport := SubViewport.new()
 	viewport.size = Vector2i(360, 800)
 	add_child(auto_free(viewport))

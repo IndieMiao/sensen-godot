@@ -6,7 +6,7 @@ extends GdUnitTestSuite
 ## on an outpost pin drawn over the player's avatar opens the outpost (SGODOT-224).
 
 const P0_MAP := "res://scenes/p0/p0_map.tscn"
-const NEAREST_POND := "pond_shanghai_05"   # Reed Pond (p0_map.gd)
+const NEAREST_POND := "pond_san_francisco_03"   # Fern Pond, the beginner pond (P0City.beginner_pond(), SGODOT-270)
 
 func before_test() -> void:
 	Net.use_transport(FakeTransport.new([]).callable())

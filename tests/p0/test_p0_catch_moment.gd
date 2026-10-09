@@ -162,7 +162,7 @@ func _pond() -> Node3D:
 	var pond: Node3D = Node3D.new()
 	pond.set_script(stub)
 	vp.add_child(pond)
-	pond.entry = SystemPonds.location("pond_shanghai_05")   # Reed Pond
+	pond.entry = preload("res://modules/p0/p0_ponds.gd").location("pond_san_francisco_03")   # Fern Pond
 	pond.bp = SystemPonds.blueprint(pond.entry)
 	pond.grid = BlueprintGrid.new(pond.bp)
 	pond.cam = Camera3D.new()

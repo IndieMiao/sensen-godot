@@ -14,9 +14,9 @@ function step(s: P0State, cmd: P0Command, now = T0): { s: P0State; ev: P0Event[]
   if (!r.ok) throw new Error(`${cmd.type}: ${r.code} ${JSON.stringify(r.detail ?? {})}`);
   return { s: r.state, ev: r.events };
 }
-const REED = 'pond_shanghai_05', PEBBLE = 'pond_shanghai_04';   // q(36): Reed Pond = Pond template, Pebble Pond = River
-// Standing at Reed Pond: casts take their template from the pond the player entered (SGODOT-232 S6).
-const fresh = (): P0State => { const s = { ...freshState(c, 'player-test-02', T0, 7), created_at: T0 - 8 * 24 * H }; s.presence.place = REED; return s; };
+const FERN = 'pond_san_francisco_03', BLOSSOM = 'pond_san_francisco_06';   // q(36): Fern Pond = Pond template, Blossom Pond = River
+// Standing at Fern Pond: casts take their template from the pond the player entered (SGODOT-232 S6).
+const fresh = (): P0State => { const s = { ...freshState(c, 'player-test-02', T0, 7), created_at: T0 - 8 * 24 * H }; s.presence.place = FERN; return s; };
 const catchOf = (ev: P0Event[]) => ev.find(e => e.kind === 'catch') as Extract<P0Event, { kind: 'catch' }>;
 
 /** Cast and wait out the bite, then report the outcome. */
@@ -83,7 +83,7 @@ describe('P0 fishing (§6.1–6.7)', () => {
     const seen = { pond: new Set<string>(), river: new Set<string>() };
     for (const site of ['pond', 'river'] as const) {
       for (let i = 0; i < 120; i++) {
-        const r = applyP0(c, s, { type: 'cast', space: 'pond', place: site === 'pond' ? REED : PEBBLE }, T0 + i * 60 * S);
+        const r = applyP0(c, s, { type: 'cast', space: 'pond', place: site === 'pond' ? FERN : BLOSSOM }, T0 + i * 60 * S);
         if (!r.ok) throw new Error(r.code);
         seen[site].add(r.state.cast!.fish);
         s = { ...r.state, cast: null };

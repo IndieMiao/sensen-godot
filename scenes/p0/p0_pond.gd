@@ -28,6 +28,8 @@ var _cam_follow := P0Follow.new()
 var _zoom := 1.0
 const ElasticZoom = preload("res://modules/p0/p0_elastic_zoom.gd")
 const PinReason := preload("res://modules/p0/p0_pin_reason.gd")
+const P0Ponds := preload("res://modules/p0/p0_ponds.gd")   # P0's own ponds: San Francisco (SGODOT-270)
+const P0City := preload("res://modules/p0/p0_city.gd")
 var _pinch = ElasticZoom.new(0.8, 1.4)   # the farm's range, rubber band past 0.8 / 1.4
 var _zoom_at := Vector2.INF            # the last pinch centre (screen)
 var _band := Rect2()                   # the last camera band seen with no panel up
@@ -43,7 +45,7 @@ var _plan: Dictionary = {}
 var _hint_req := ""     # the request this pond's ! is for (q(103)): its progress floats and its completion toast
 var _hint_have := -1    # that request's count before the next catch
 
-## The catalog pond id: the session sends it with the entry read and every command from here (q(36)).
+## The pond id (P0Ponds): the session sends it with the entry read and every command from here (q(36)).
 func p0_place() -> String:
 	return str(entry.get("id", ""))
 
@@ -51,7 +53,7 @@ static func site_for(template_id: String) -> String:
 	return str(SITE_FOR_TEMPLATE.get(template_id, "pond"))
 
 func setup(args: Dictionary) -> void:
-	entry = SystemPonds.location(str(args.get("pond_id", "")))
+	entry = P0Ponds.location(str(args.get("pond_id", "")))
 
 func _ready() -> void:
 	P0Runtime.mark("%s _ready start" % name)
@@ -109,7 +111,7 @@ func _ready() -> void:
 	_update_camera()
 	rt = P0Runtime.ensure()
 	rt.attach(self)
-	rt.ui.set_mode("fish", "Shanghai · " + str(entry.get("name", "Pond")))
+	rt.ui.set_mode("fish", P0City.chip(str(entry.get("name", "Pond"))))
 	_arrival_hint()
 
 func _exit_tree() -> void:
@@ -188,7 +190,7 @@ func p0_energy_verb() -> String: return "Cast"
 
 func _open_panel(plan: Dictionary) -> void:
 	actor.face(plan.target)
-	panel.open_p0(rt, str(entry.id), site_spec, plan.target, site, "Shanghai · " + str(entry.get("name", "Pond")))
+	panel.open_p0(rt, str(entry.id), site_spec, plan.target, site, P0City.chip(str(entry.get("name", "Pond"))))
 
 func _begin_fishing(_id: String) -> void:
 	actor.lock(true)
