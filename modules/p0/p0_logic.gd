@@ -145,6 +145,25 @@ static func fish_gate(view: Dictionary, fish_id: String) -> Dictionary:
 		if not rod.is_empty(): return base.merged({rod = rod})
 	return {}
 
+## The Fishing level a fish request still waits for (q(104)): of the fish it takes — the named ones, else every P0 fish
+## of its rarity that a pond or river holds — the lowest level, when the player is below it; 0 once one can be landed
+## (the server's landable, #185). A taken request then marks no pond and its button reads `Fishing Lv4 needed`.
+static func fish_level_short(view: Dictionary, items: Array, rarity) -> int:
+	var c := content()
+	var held := {}
+	for site in c.get("fishing", {}).get("sites", {}).values():
+		for id in site.get("fish", []): held[str(id)] = true
+	var lowest := 0
+	for f in c.get("fish", []):
+		var id := str(f.get("id", ""))
+		if not held.has(id): continue
+		if not items.is_empty():
+			if not items.has(id): continue
+		elif rarity == null or int(f.get("rarity", 0)) != int(rarity): continue
+		var lv := int(f.get("level", 1))
+		lowest = lv if lowest == 0 else mini(lowest, lv)
+	return lowest if lowest > int(view.get("skills", {}).get("fishing", {}).get("level", 1)) else 0
+
 static func dex_caught(view: Dictionary, fish_id: String) -> bool:
 	for f in view.get("fishing", {}).get("dex", []):
 		if str(f.get("id", "")) == fish_id: return int(f.get("caught", 0)) > 0
@@ -835,8 +854,9 @@ const DAY_CHANGES := {"cooking:4": "Today changes: 3-ingredient dishes", "farmin
 ## the accepted FARM-LV2 (1368:91797), content and timing as §4.8.6 (不知火舞 233, 10-08):
 ##   subtitle  `New for you · Potato, Chamomile, Compost` (what the level opens, q(69)); Fishing `Fine fish now stay on the hook`;
 ##             Cooking Lv4 `Three-ingredient dishes now possible`
-##   rewards   pills: the Energy and the level-up gift's items (`+50 Energy` · `+3 Worm Bait` · `+3 Wild Herb`; SKILL-3
-##             482:65; Cooking levels give no Energy)
+##   rewards   pills: the level-up gift's items (`+3 Worm Bait` · `+3 Wild Herb`; SKILL-3 482:65); a level without a gift
+##             has no reward row. Skill level-ups give no Energy (q(101)); a server from before q(101) still pays it and
+##             says how much, and that shows as `+50 Energy` first — never a `+0 Energy`
 ##   detail    recipe cards only (`New recipe: Herb Grilled Fish`), else nothing
 ##   tip       the next level (`Next Lv4 · Tomato, Chili, Row Hoe · 150 XP`, its new things this season); the account's
 ##             first level-up teaches instead, a level that changes the day says `Today changes: …` (q(69))
@@ -846,7 +866,7 @@ static func level_banner(view: Dictionary, ev: Dictionary, first := false) -> Di
 	var lv := int(ev.get("level", 2))
 	var title := "%s Lv%d" % [skill.capitalize(), lv]
 	var rewards: Array = []
-	if int(ev.get("energy", 0)) > 0:
+	if int(ev.get("energy", 0)) > 0:   # only from a server before q(101): what it really paid, so the bar never moves unsaid
 		rewards.append({text = "+%d Energy" % int(ev.energy), tone = UiFloatText.Tone.ENERGY_GAIN})
 	var recipes: Array = []
 	var bait := ""
@@ -1102,7 +1122,7 @@ static func resident_bar(view: Dictionary, id: String) -> Dictionary:
 		"accepted":
 			label = "Deliver"
 			if req.get("ready", false): cmd = {"type": "deliver", "request": str(req.id)}
-			else: reason = _request_gap(req)
+			else: reason = _request_gap(view, req)
 		"wait":
 			reason = "Next request in " + span(float(r.get("next_in", 0)))
 		"stage":
@@ -1149,13 +1169,16 @@ static func _has_dish(view: Dictionary) -> bool:
 		if str(s.get("id", "")).begins_with("dish_"): return true
 	return false
 
-## What an accepted request still needs, written on the button (LOCK-10: gaps on buttons).
-static func _request_gap(req: Dictionary) -> String:
+## What an accepted request still needs, written on the button (LOCK-10: gaps on buttons). A fish the player cannot
+## land yet says the level first, `Fishing Lv4 needed` (q(104)), not `Need 1 more Rare fish`.
+static func _request_gap(view: Dictionary, req: Dictionary) -> String:
 	var left := maxi(0, int(req.get("qty", 0)) - int(req.get("have", 0)))
 	match str(req.get("kind", "")):
 		"sow": return "Plant %d more plot%s" % [left, "" if left == 1 else "s"]
 		"dish": return "Need %d more dish%s" % [left, "" if left == 1 else "es"]
 		"fish":
+			var short := fish_level_short(view, [], req.get("rarity", null))
+			if short > 0: return "Fishing Lv%d needed" % short
 			var rarity := int(req.get("rarity", 0)) if req.get("rarity", null) != null else 0
 			var names: Array = content().get("rarity_names", [])
 			var what := (str(names[rarity - 1]) + " fish") if rarity > 0 and rarity <= names.size() else "fish"

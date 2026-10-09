@@ -145,6 +145,7 @@ export interface P0State {
   gather: { ready_at: Record<string, number>; last_at: number };   // §13.2: when each spot can be gathered again; last tap (tempo)
   mine: MineState;
   storage_auto: { at: number; items: [string, number][] } | null;   // last auto-store on coming home (q(40)), floated once by the client
+  seen?: string[];   // map markers' ◆ already looked at: item:<id> / talk:<resident> (SGODOT-232, q(48))
   fires: number;                 // pots ever started (first fire is the tutorial ring)
   rng: number;
   seq: number;
@@ -180,6 +181,7 @@ export function freshState(c: P0Content, player: string, now: number, seed = has
     gather: { ready_at: {}, last_at: 0 },
     mine: freshMine(),
     storage_auto: null,
+    seen: [],
     fires: 0,
     rng: seed, seq: 0,
   };
@@ -243,6 +245,7 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
   s.presence ??= { left_at: null, last_at: 0, space: null };
   s.presence.place ??= null;
   s.inbox ??= emptyInbox();   // SGODOT-232: filled for v3 and v4 saves alike, without a version of its own
+  s.seen ??= [];   // SGODOT-232 map markers, the same way
   s.day = { ...emptyDay(s.day?.key ?? ''), ...s.day };
   s.v = 4;
   return s;

@@ -112,6 +112,26 @@ func test_resident_bar_request_states() -> void:
 	assert_str(str(P0Logic.resident_bar(_res({"request_state": "wait", "next_in": 33120000}), "res_pip").request_reason)).is_equal("Next request in 9h 12m")
 	assert_str(str(P0Logic.resident_bar(_res({"request_state": "stage", "need_stage": "Familiar"}), "res_pip").request_reason)).is_equal("Next request at Familiar")
 
+## q(104): a taken request for a fish the player cannot land yet reads the level on its button — Old Kai's Rare fish is
+## the Golden Koi, Fishing Lv4 — and the usual gap once they reach it.
+func test_a_fish_request_above_the_players_level_asks_for_the_level() -> void:
+	var koi := {"id": "req_res_kai_1", "kind": "fish", "rarity": 3, "qty": 1, "coins": 60, "have": 0, "ready": false}
+	var v := _res({})
+	v.residents["res_old_kai"] = (v.residents.res_pip as Dictionary).merged({"request": koi, "request_state": "accepted"}, true)
+	v["skills"] = {"fishing": {"level": 2}}
+	var b := P0Logic.resident_bar(v, "res_old_kai")
+	assert_str(str(b.request_label)).is_equal("Deliver")
+	assert_str(str(b.request_reason)).is_equal("Fishing Lv4 needed")
+	assert_dict(b.request_cmd).is_empty()
+	assert_str(str(P0Ui._request_card_data(v, "res_old_kai", b).reason)).is_equal("Fishing Lv4 needed")   # the card's button
+	v.skills.fishing.level = 4
+	assert_str(str(P0Logic.resident_bar(v, "res_old_kai").request_reason)).is_equal("Need 1 more Rare fish")
+	# The level a request waits for: the lowest fish it can take that a pond or river holds.
+	assert_int(P0Logic.fish_level_short({"skills": {"fishing": {"level": 1}}}, [], 2)).is_equal(2)   # perch, bass …
+	assert_int(P0Logic.fish_level_short({"skills": {"fishing": {"level": 1}}}, ["fish_crucian"], null)).is_equal(0)
+	assert_int(P0Logic.fish_level_short({"skills": {"fishing": {"level": 3}}}, ["fish_koi"], null)).is_equal(4)
+	assert_int(P0Logic.fish_level_short({}, [], 1)).is_equal(0)   # no skills yet: Lv1, Common fish land
+
 func test_resident_bar_gift_and_meal() -> void:
 	assert_str(str(P0Logic.resident_bar(_res({"gift_today": true}), "res_pip").gift_reason)).is_equal("Gift already given today")
 	var empty := _res({})

@@ -44,6 +44,17 @@ func test_a_taken_pond_catch_marks_reed_pond_until_the_fish_are_in_the_bag() -> 
 	var done := {"names": NAMES, "boards": {"stall": {"slots": [{"empty": true}]}}, "stall": {"board": {"requests": []}}}
 	assert_array(PinReason.markers(done)).is_empty()
 
+## q(104): a taken request whose fish is above the player's Fishing level marks no pond (Pond Crucian is Lv1, so the
+## real Pond Catch always does; a heavier fish stands in here).
+func test_a_fish_the_player_cannot_land_yet_marks_no_pond() -> void:
+	var v := _tutorial("accepted", 0)
+	v.stall.board.requests[0].item = "fish_koi"
+	v.boards.stall.slots[0].items = ["fish_koi"]
+	v["skills"] = {"fishing": {"level": 2}}
+	assert_array(PinReason.markers(v)).is_empty()
+	v.skills.fishing.level = 4
+	assert_array(P0Map.pin_marks(v)).is_equal([{"id": REED, "state": "request"}])
+
 func test_the_older_stall_panel_alone_still_reads_the_tutorial() -> void:
 	var v := _tutorial("accepted", 0)
 	v.erase("boards")   # a server without view.boards

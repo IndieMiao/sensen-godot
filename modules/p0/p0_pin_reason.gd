@@ -20,12 +20,14 @@ static func markers(view: Dictionary) -> Array:
 	if not view.has("map_markers"): return fallback(view)
 	return (view.get("map_markers", []) as Array).filter(func(m): return m is Dictionary and str(m.get("place", "")) != "")
 
-## The first session's marks without the server's list (q(103) ④): only a taken Pond Catch is marked.
+## The first session's marks without the server's list (q(103) ④): only a taken Pond Catch is marked, and its pond only
+## while its fish can be landed at the player's Fishing level (q(104); Pond Crucian is Lv1, so always).
 static func fallback(view: Dictionary) -> Array:
 	var t := P0Guide.tutorial(view)
 	if t.is_empty() or str(t.get("status", "")) != "accepted": return []
 	var why := {"request": str(t.get("id", "")), "tracked": true}
 	if int(t.get("have", 0)) >= int(t.get("qty", 1)): return [{"place": HOME, "kind": "deliver", "why": why}]
+	if P0Logic.fish_level_short(view, [str(t.get("item", ""))], null) > 0: return []
 	return [{"place": REED_POND, "kind": "request", "why": why}]
 
 ## The reason line for a pin: {state (UiStatusBadge key), text (with ` · +N more`), request, resident, more}; {} when
