@@ -34,6 +34,7 @@ static func all() -> Array[Dictionary]:
 		{id = "quality_badge", title = "UiQualityBadge", figma = "QualityBadge 1178:82154", build = _quality_badges},
 		{id = "reward_moment", title = "UiRewardMoment", figma = "RewardMoment 1179:82271 · COOK-4 / COOK-6 / COOK-P0-9", build = _reward_moments},
 		{id = "moment_banner", title = "UiMomentBanner", figma = "MomentBanner 1226:104630 · §4.8.3 / §4.8.6 (SGODOT-233)", build = _moment_banners},
+		{id = "moment_banner_more", title = "UiMomentBanner · more", figma = "MomentBanner 1226:104630 · q(101)", build = _moment_banners_more},
 		{id = "sys_banner", title = "UiSysBanner", figma = "SysBanner 1187:82581 · SYS-OFFLINE / -2 / SYS-CMD-FAIL (WP6, SGODOT-233)", build = _sys_banners},
 		{id = "system_card", title = "UiSystemCard", figma = "SystemCard 1237:87229 Kind=Blocking · SYS-LOADING-FAIL 1243:108638 (SGODOT-233)", build = _system_cards},
 		{id = "system_card_trip", title = "UiSystemCard · secondary", figma = "SYS-LOADING-SCENE-FAIL 1780:103778 · q(78) (SGODOT-233)", build = _system_card_trip},
@@ -1378,16 +1379,16 @@ static func _wordmark_spinner() -> Control:
 	v.add_child(_captioned(row, "Spinner · SYS-LOADING-2"))
 	return v
 
-## MomentBanner (1226:104630, SGODOT-233): the account's first level-up (rewards, recipe, tip, Use bait), a later level
-## (unlocks and what is next) and Kind=Complete (a crafted tool).
+## MomentBanner (1226:104630, SGODOT-233): the account's first level-up (rewards, recipe, tip, Use bait) and a later level
+## (unlocks and what is next). The rest in _moment_banners_more: one section is one shot, and three banners overran it.
 static func _moment_banners() -> Control:
 	var v := _column()
 	var first := UiMomentBanner.new()
 	first.level = "2"
 	first.title = "Fishing Lv2"
 	first.subtitle = "Fine fish now stay on the hook"
-	first.rewards = [UiFloatText.pill("+50 Energy", UiFloatText.Tone.ENERGY_GAIN), UiFloatText.pill("+3 Worm Bait", UiFloatText.Tone.ITEM, _tex("bait_worm")),
-		UiFloatText.pill("+3 Wild Herb", UiFloatText.Tone.ITEM, _tex("crop_herb"))]
+	first.rewards = [UiFloatText.pill("+3 Worm Bait", UiFloatText.Tone.ITEM, _tex("bait_worm")),
+		UiFloatText.pill("+3 Wild Herb", UiFloatText.Tone.ITEM, _tex("crop_herb"))]   # no Energy pill: level-ups give none (q(101))
 	first.detail = "New recipe: Herb Grilled Fish"
 	first.tip = "Levels unlock gear, fish and seeds. Basics never lock."
 	first.action = "Use bait"
@@ -1396,9 +1397,20 @@ static func _moment_banners() -> Control:
 	later.level = "2"
 	later.title = "Farming Lv2"
 	later.subtitle = "New for you · Carrot Seeds, Herb Seeds"
-	later.rewards = [UiFloatText.pill("+30 Energy", UiFloatText.Tone.ENERGY_GAIN), UiFloatText.pill("+5 Carrot Seeds", UiFloatText.Tone.ITEM, _tex("seed_carrot"))]
+	later.rewards = [UiFloatText.pill("+5 Carrot Seeds", UiFloatText.Tone.ITEM, _tex("seed_carrot"))]
 	later.tip = "Next Lv3 · 150 XP"
 	v.add_child(_captioned(later, "LevelUp · FARM-LV2, a later level (1.5 s)"))
+	return v
+
+## A level without a gift (no reward row: level-ups give no Energy, q(101)) and Kind=Complete (a crafted tool).
+static func _moment_banners_more() -> Control:
+	var v := _column()
+	var bare := UiMomentBanner.new()
+	bare.level = "3"
+	bare.title = "Farming Lv3"
+	bare.subtitle = "New for you · Potato, Chamomile, Compost"
+	bare.tip = "Next Lv4 · Tomato, Chili, Row Hoe · 150 XP"
+	v.add_child(_captioned(bare, "LevelUp · a level without a gift: no reward row (q(101))"))
 	var done := UiMomentBanner.new()
 	done.kind = UiMomentBanner.Kind.COMPLETE
 	done.title = "Gather Gloves"

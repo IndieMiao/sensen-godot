@@ -1,0 +1,313 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    322
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiMomentBanner · more"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        18
+      ],
+      "variation": "CaptionR12",
+      "text": "MomentBanner 1226:104630 · q(101)"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        52,
+        328,
+        270
+      ],
+      "children": [
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            52,
+            328,
+            152
+          ],
+          "children": [
+            {
+              "type": "UiMomentBanner",
+              "rect": [
+                0,
+                52,
+                328,
+                132
+              ],
+              "children": [
+                {
+                  "type": "VBoxContainer",
+                  "rect": [
+                    0,
+                    52,
+                    328,
+                    118
+                  ],
+                  "children": [
+                    {
+                      "type": "ColorRect",
+                      "rect": [
+                        0,
+                        52,
+                        328,
+                        6
+                      ]
+                    },
+                    {
+                      "type": "MarginContainer",
+                      "rect": [
+                        0,
+                        68,
+                        328,
+                        74
+                      ],
+                      "children": [
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            16,
+                            72,
+                            296,
+                            70
+                          ],
+                          "children": [
+                            {
+                              "type": "PanelContainer",
+                              "rect": [
+                                16,
+                                83,
+                                48,
+                                48
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    16,
+                                    91,
+                                    48,
+                                    31
+                                  ],
+                                  "variation": "TitleXB20",
+                                  "text": "3"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "VBoxContainer",
+                              "rect": [
+                                76,
+                                72,
+                                236,
+                                70
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    76,
+                                    72,
+                                    236,
+                                    31
+                                  ],
+                                  "variation": "TitleXB20",
+                                  "text": "Farming Lv3"
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    76,
+                                    105,
+                                    236,
+                                    37
+                                  ],
+                                  "variation": "C13B",
+                                  "text": "New for you · Potato, Chamomile, Compost"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Label",
+                      "rect": [
+                        0,
+                        152,
+                        328,
+                        18
+                      ],
+                      "variation": "C12B",
+                      "text": "Next Lv4 · Tomato, Chili, Row Hoe · 150 XP"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                190,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "LevelUp · a level without a gift: no reward row (q(101))"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            216,
+            328,
+            106
+          ],
+          "children": [
+            {
+              "type": "UiMomentBanner",
+              "rect": [
+                0,
+                216,
+                328,
+                86
+              ],
+              "children": [
+                {
+                  "type": "VBoxContainer",
+                  "rect": [
+                    0,
+                    216,
+                    328,
+                    72
+                  ],
+                  "children": [
+                    {
+                      "type": "ColorRect",
+                      "rect": [
+                        0,
+                        216,
+                        328,
+                        6
+                      ]
+                    },
+                    {
+                      "type": "MarginContainer",
+                      "rect": [
+                        0,
+                        232,
+                        328,
+                        56
+                      ],
+                      "children": [
+                        {
+                          "type": "HBoxContainer",
+                          "rect": [
+                            16,
+                            236,
+                            296,
+                            52
+                          ],
+                          "children": [
+                            {
+                              "type": "PanelContainer",
+                              "rect": [
+                                16,
+                                238,
+                                48,
+                                48
+                              ],
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    27,
+                                    249,
+                                    26,
+                                    26
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "VBoxContainer",
+                              "rect": [
+                                76,
+                                236,
+                                236,
+                                52
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    76,
+                                    236,
+                                    236,
+                                    31
+                                  ],
+                                  "variation": "TitleXB20",
+                                  "text": "Gather Gloves"
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    76,
+                                    269,
+                                    236,
+                                    19
+                                  ],
+                                  "variation": "C13B",
+                                  "text": "+1 at every gathering spot"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                308,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "Complete"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
