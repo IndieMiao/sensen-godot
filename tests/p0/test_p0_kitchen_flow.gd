@@ -683,3 +683,25 @@ func test_the_pot_card_shows_icons_one_result_line_and_says_what_opens_the_lock(
 	assert_str(rt.ui.toast_text()).starts_with("Cooking Lv4")
 	rt.ui.close_modal()
 	await get_tree().process_frame
+
+func test_the_queue_drawer_sets_the_pot_lower_so_its_heat_ring_clears_the_hud() -> void:
+	# 不知火舞 on #142: over the queue drawer the ring's top met the HUD's second row. The pot sits QUEUE_DROP px lower
+	# there than over the cooking drawer (HUD + 8 ≤ ring, ring + 8 ≤ pot card, card + 8 ≤ drawer in the 360 × 800 shot).
+	_set_view(_queue_view())
+	var r := await _farmhouse()
+	var k: P0Kitchen = r.get("kitchen")
+	k.open("cookbook")
+	var plain: Vector3 = r.get("_shot").center
+	rt.ui.close_modal()
+	await get_tree().process_frame
+	k.watch(rt.session.view.cooking.stove)
+	k.open_queue()
+	var queued: Vector3 = r.get("_shot").center
+	var view: Vector2 = r._view()
+	var visible_h: float = float(r.get("_shot").size) * view.y / view.x
+	var forward: Vector3 = -r.get("_cam_dir")
+	var up := (Vector3.UP - forward * forward.dot(Vector3.UP)).normalized()
+	var drop := P0Kitchen.QUEUE_DROP / r.get_viewport().get_visible_rect().size.y * visible_h
+	assert_float((queued - plain).dot(up)).is_equal_approx(drop, 0.0001)   # the view's centre up: the pot lower on screen
+	rt.ui.close_modal()
+	await get_tree().process_frame

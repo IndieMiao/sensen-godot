@@ -19,6 +19,9 @@ extends Node
 
 const BAND_TOP_DRAWER := 0.29     # engineering default, WP7 v2: pot band ends above the slot bar
 const BAND_TOP_WATCH := 0.40      # COOK-3: the pot sits high, under the HUD, above the watch sheet
+## The queue drawer (Queue next ›) keeps the heat ring over the pot: the pot sits this much lower than in the cooking
+## drawer, so HUD + 8 ≤ the ring's top, its foot + 8 ≤ the pot card and the card + 8 ≤ the drawer (不知火舞 on #142).
+const QUEUE_DROP := 14.0
 const FOCUS_SIZE := 0.42          # pushed-in view: 42 % of the room's accepted width
 const WATCH_FOCUS_SIZE := 0.34    # COOK-3 pushes in further on the pot (approved kitchen camera ×1.85)
 const OVERLAY_GAP := 8.0          # the pot card's foot above the drawer top (row 53: 326 → 334)
@@ -154,7 +157,9 @@ func open(tab := "cookbook", page_id := "") -> void:
 	phase = "compose"
 	rt.ui.teach("cook")   # U6: "Tap Cook to grill your first fish" the first time the drawer opens (§14.2)
 	_hide_player(true)
-	room.focus("cam_stove", {band = room.band_below_hud(BAND_TOP_DRAWER), size = room.view_size() * FOCUS_SIZE, release_on_move = false})
+	var band := room.band_below_hud(BAND_TOP_DRAWER)
+	if _queue_mode: band.position.y += QUEUE_DROP / maxf(room.get_viewport().get_visible_rect().size.y, 1.0)
+	room.focus("cam_stove", {band = band, size = room.view_size() * FOCUS_SIZE, release_on_move = false})
 	if page_id != "" and not drawer.page(page_id).is_empty(): drawer.select_page(page_id)
 	if tab == "cookbook" and drawer.selected_page != "": _on_page(drawer.page(drawer.selected_page))
 	_refresh_overlay()
@@ -229,6 +234,14 @@ func ring_at(lead_ms: float, from: float, to: float) -> bool:
 
 ## Shots: the heat tap a player's finger makes now (on the watched pot or the queue drawer's pot band).
 func dev_heat_tap() -> void: _judge_tap()
+
+## Shots: where the heat ring, the pot card and the drawer sit (screen px), to check their gaps.
+func dev_rects() -> Dictionary:
+	var out := {}
+	if _ring: out.ring = [_ring_center().y - UiHeatRing.OUTER * _ring.scale.y, _ring_center().y + UiHeatRing.OUTER * _ring.scale.y]
+	if is_instance_valid(_pot_card): out.card = [_pot_card.get_global_rect().position.y, _pot_card.get_global_rect().end.y]
+	if drawer: out.drawer = drawer.top_y()
+	return out
 
 ## Shots: a tap on the pot card's slot `i` (a filled one goes back to the bag, the lock says what opens it).
 func dev_slot_tap(i: int) -> void:

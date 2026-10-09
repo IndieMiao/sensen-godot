@@ -189,6 +189,7 @@ func p0_dev(step: PackedStringArray) -> bool:
 				kitchen.drawer.select_page(step[1])
 				kitchen._on_page(kitchen.drawer.page(step[1]))
 		"slottap": kitchen.dev_slot_tap(int(step[1]))   # a tap on the pot card's slot i (shots)
+		"rects": print("P0_KITCHEN_RECTS ", JSON.stringify(kitchen.dev_rects().merged({hud = HUD_BOTTOM, view = [get_viewport().get_visible_rect().size.x, get_viewport().get_visible_rect().size.y]})))   # shots
 		"put":
 			if kitchen.phase != "compose": kitchen.open("experiment")
 			if kitchen.drawer and kitchen.drawer.tab != "experiment": kitchen.drawer.tab = "experiment"
