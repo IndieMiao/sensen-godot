@@ -2,7 +2,7 @@ extends GdUnitTestSuite
 ## The landed-fish moment at the P0 pond (美术总监 / 不知火舞 on 231, 2026-10-09; spec comment 626cd8a0): the reply's
 ## `+25 XP` waited for nothing and rose over the fish still in flight. Now ① the reply's floats wait until the fish is in
 ## the hand and rise from 8 px over the player's head, a repeat species' `Pond Crucian ×1` in the same group after the XP
-## and a first catch's Caught! card after them; ② the fish pops to 1.5× for its flight, 0.15 s in and out; and ③ (苏烈 on
+## and a first catch's Caught! card 0.5 s after them; ② the fish pops to 1.5× for its flight, 0.15 s in and out; and ③ (苏烈 on
 ## #143) the camera stays where the cast left it until the safe box moves it — or a pinch — and only then eases back.
 
 const P0Pond := preload("res://scenes/p0/p0_pond.gd")
@@ -136,7 +136,7 @@ func test_a_first_catchs_card_comes_after_its_floats() -> void:
 	assert_bool(rt.ui.has_modal()).is_false()   # the floats play first
 	await get_tree().create_timer(0.3).timeout
 	assert_bool(rt.ui.has_modal()).is_true()    # then Caught!
-	assert_float(UiFloatText.play_s()).is_equal_approx(1.22, 0.001)   # 1.1 s and two 60 ms stack delays
+	assert_float(P0Pond.CARD_AFTER_FLOATS_S).is_equal(0.5)   # the pond's wait (不知火舞 on #154): about 1.8 s after the catch
 	rt.ui.close_modal()
 
 # ---------------------------------------------------------------- ③ the camera after the cast (苏烈 on #143)

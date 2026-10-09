@@ -538,7 +538,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 ## ones a float; a gate break-free gets the four-line card once per species, then "Got away · Lv4";
 ## a plain escape is a float ("It got away · 3 Energy back", or the protection wording). `at` is where
 ## floats rise (over the player's head for a landed fish, the cast point for an escape, when the pond knows
-## them); `card_after` holds the Caught! card until the reply's floats there have played (不知火舞 on 231).
+## them); `card_after` holds the Caught! card that long after the reply's floats there (不知火舞 on 231 / #154).
 func _on_catch(ev: Dictionary, _xp_lines: Array, at := Vector2.INF, card_after := 0.0) -> void:
 	var where := at if at.is_finite() else anchor()
 	var v := session.current()

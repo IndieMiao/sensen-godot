@@ -231,7 +231,7 @@ func p0_event(ev: Dictionary, _v: Dictionary) -> bool:
 ## After the landing arc (or the ripples), close the panel and let the runtime show the result card or float (FISH-3 /
 ## FISH-5): an escape's at the cast point; a landed fish's reply floats — held by the runtime while the fish flew, so
 ## `+25 XP` no longer crosses it — rise from over the player's head now that it is in the hand, and a first catch's
-## Caught! card comes after them (不知火舞 on 231, q(49)).
+## Caught! card comes CARD_AFTER_FLOATS_S after them (不知火舞 on 231 / #154, q(49)).
 func _settle(ev: Dictionary, delay: float, first_xp: int) -> void:
 	await get_tree().create_timer(delay).timeout
 	if not is_inside_tree(): return
@@ -242,11 +242,14 @@ func _settle(ev: Dictionary, delay: float, first_xp: int) -> void:
 	if str(ev.get("result", "")) == "landed": at = over_head()
 	rt.ui.queue_floats(floats, at)
 	rt.last_first_catch_xp = first_xp
-	rt._on_catch(ev, rt.last_xp_lines, at, UiFloatText.play_s() if not floats.is_empty() else 0.0)
+	rt._on_catch(ev, rt.last_xp_lines, at, CARD_AFTER_FLOATS_S if not floats.is_empty() else 0.0)
 
 ## Where a landed fish's floats rise (不知火舞 on 231): FLOAT_OVER_HEAD_PX above the top of the player's head on screen
 ## (the top of the outfit — hair or hat — at the middle of the figure).
 const FLOAT_OVER_HEAD_PX := 8.0
+## A first catch's Caught! card follows its floats by this much (不知火舞 on #154): only the order matters — the floats
+## over the head, the card in the lower half — and waiting for them to play out read as a stall.
+const CARD_AFTER_FLOATS_S := 0.5
 func over_head() -> Vector2:
 	var box := DressingCamera.merged_aabb(actor.rig) if actor.rig != null else AABB()
 	var top := Vector3(actor.position.x, box.end.y if box.has_volume() else actor.position.y + HEAD_M, actor.position.z)
