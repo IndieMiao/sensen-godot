@@ -204,13 +204,24 @@ static func page_clues(p: Dictionary) -> Array:
 		else: out.append(P0Logic.icon(t))
 	return out
 
-## The detail card and its button (Compact/Kitchen/Recipe): {title, state, effect, icon, button, reason, nav, maybe}.
+## How long a pot of `rarity` cooks, as the stove runs it: the tier's time, × Quick Fire from Cooking Lv6 (5 / 15 / 30 /
+## 60 s, then 4 / 12 / 24 / 48 s). The pot card's result line, the detail card and Cook Again all say this one.
+static func cook_time(view: Dictionary, rarity: int) -> String:
+	var ms := int(cooking(view).get("tiers", {}).get(str(rarity), {}).get("ms", 5000))
+	if cooking(view).get("conveniences", []).has("quick_fire"):
+		ms = int(ms * float(P0Logic.content().get("cooking", {}).get("quick_fire", 0.8)))
+	return "%d s" % (ms / 1000)
+
+## The detail card and its button (Compact/Kitchen/Recipe): {title, state, effect, effect_parts, icon, button, reason,
+## nav, maybe}. `effect_parts`: a known page's `+40 Energy`, `15 s`, `Soup` (256 follow-up, 不知火舞: the card drops the
+## dish style first, then the time, when the line does not fit; the energy always stays); an unknown page's energy only.
 ## button "Cook" when it can cook; otherwise `reason` says the first gap (LOCK-10: the gap on the button);
 ## unknown pages only guide to Experiment (`nav`, never puts anything in the pot); `maybe` is their might-have line.
 static func page_card(view: Dictionary, p: Dictionary) -> Dictionary:
 	var rarity := int(p.get("rarity", 1))
 	var tier: Dictionary = cooking(view).get("tiers", {}).get(str(rarity), {})
-	var card := {icon = null, effect = "+%d Energy" % int(tier.get("energy", 0)), button = "", reason = "", nav = "", maybe = ""}
+	var energy := "+%d Energy" % int(tier.get("energy", 0))
+	var card := {icon = null, effect = energy, effect_parts = [energy], button = "", reason = "", nav = "", maybe = ""}
 	var locked: bool = p.get("lock", null) is Dictionary or (not p.has("state") and int(p.get("slots", 1)) > slots(view))
 	if not p.get("known", false):
 		card.title = "Unknown dish"
@@ -222,6 +233,9 @@ static func page_card(view: Dictionary, p: Dictionary) -> Dictionary:
 		return card
 	card.title = str(p.get("name", ""))
 	card.icon = P0Logic.icon(str(p.id))
+	card.effect_parts = [energy, cook_time(view, rarity)]
+	if str(p.get("style", "")) != "": card.effect_parts.append(str(p.style))
+	card.effect = " · ".join(PackedStringArray(card.effect_parts))
 	var made := int(p.get("cooked_total", 0))
 	card.state = "%s · %s" % [P0Logic.rarity_name(view, rarity), ("Cooked ×%d" % made if made > 1 else "Cooked") if p.get("cooked", false) else first_cook_line(rarity)]
 	if p.get("can_cook", false): card.button = "Cook"
@@ -324,9 +338,8 @@ static func preview(view_: Dictionary, pot: Array) -> Dictionary:
 	else:
 		var derive: Array = cooking(view).get("derive", [[1, 2, 3], [2, 3, 3], [3, 3, 4], [4, 4, 4]])
 		rarity = int(derive[clampi(top - 1, 0, derive.size() - 1)][clampi(fams.size(), 1, 3) - 1])
-	var t: Dictionary = cooking(view).get("tiers", {}).get(str(rarity), {})
 	var title := str(known.name) if not known.is_empty() else ("Tried before" if tried(view, pot) else "Unknown dish")
-	return {title = title, rarity = rarity, time = "%d s" % (int(t.get("ms", 5000)) / 1000)}
+	return {title = title, rarity = rarity, time = cook_time(view, rarity)}
 
 ## At least one main ingredient (field, orchard or water) besides the seasonings (§7.2.7).
 static func has_main(view_: Dictionary, pot: Array) -> bool:
@@ -361,9 +374,8 @@ static func pot_energy(view_: Dictionary, pot: Array) -> String:
 ## cook is the Cook / Queue button's (`Ready to cook` / `Ready to queue` retired, SGODOT-256 ⑤ A', q(92)).
 static func page_preview(view: Dictionary, p: Dictionary) -> Dictionary:
 	var rarity := int(p.get("rarity", 1))
-	var t: Dictionary = cooking(view).get("tiers", {}).get(str(rarity), {})
 	var title := str(p.get("name", "")) if p.get("known", false) else "Unknown dish"
-	return {title = title, rarity = rarity, time = "%d s" % (int(t.get("ms", 5000)) / 1000)}
+	return {title = title, rarity = rarity, time = cook_time(view, rarity)}
 
 ## Experiment's Cook button: the gap when it cannot cook (LOCK-10), else "Cook" (never "Free", §7.2.7). In the drawer
 ## opened from Queue next › the pot on the stove is the point: the button reads Queue, never Stove busy (q(71)).
@@ -607,9 +619,7 @@ static func cook_again(view: Dictionary, page_id: String) -> Dictionary:
 	var today := int(p.get("today", 0))
 	var facts: Array = []
 	var rarity := int(p.get("rarity", 1))
-	var ms := int(cooking(view).get("tiers", {}).get(str(rarity), {}).get("ms", 5000))
-	if cooking(view).get("conveniences", []).has("quick_fire"): ms = int(ms * 0.8)   # Quick Fire (Lv6): ×0.8
-	if short.is_empty(): facts.append(["Cooking", "%d s" % (ms / 1000)])
+	if short.is_empty(): facts.append(["Cooking", cook_time(view, rarity)])
 	facts.append(["Cooks today", ORDINALS[mini(today, 2)] if today < 3 else "%dth" % (today + 1)])
 	facts.append(["Cooking XP", "Full" if today == 0 else ("Half" if today == 1 else "None")])
 	var first: Dictionary = short[0] if not short.is_empty() else {}

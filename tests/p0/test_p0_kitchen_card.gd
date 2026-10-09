@@ -98,3 +98,23 @@ func test_the_first_page_keeps_cook_in_the_corner_once_the_drawer_has_its_theme(
 	var b: UiCommandButton = d.get("_recipe_button")
 	assert_float(b.size.x).is_equal(90.0)
 	assert_float(b.position.x + b.size.x).is_equal(328.0)
+
+func test_the_effect_line_runs_up_to_the_button_and_drops_the_style_then_the_time() -> void:
+	# 不知火舞 (256 follow-up): `+N Energy · T s · Style` runs up to 8 px short of the corner button (about 172 beside
+	# Cook, not the text box's 142): the longest real line, +70 Energy · 30 s · Dessert (153), fits whole. Beside a wide
+	# grey button the style goes first, then the time; the energy stays. A button on a row of its own gives it the card.
+	var d := _drawer()
+	await _settle()
+	var effect: Label = d.get("_recipe_effect")
+	var b: UiCommandButton = d.get("_recipe_button")
+	d.select_page("dish_grilled_crucian")   # Cook in the corner
+	await _settle()
+	d.set("_effect_parts", ["+70 Energy", "30 s", "Dessert"])
+	d.call("_layout_recipe")
+	assert_str(effect.text).is_equal("+70 Energy · 30 s · Dessert")
+	assert_float(b.position.x + b.size.x).is_equal(328.0)
+	assert_float(effect.position.x + effect.size.x).is_less_equal(b.position.x - 8.0 + 0.01)
+	d.call("_fit_effect", 120.0)   # beside a wide grey button
+	assert_str(effect.text).is_equal("+70 Energy · 30 s")
+	d.call("_fit_effect", 70.0)
+	assert_str(effect.text).is_equal("+70 Energy")
