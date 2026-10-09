@@ -70,6 +70,11 @@ func _row(r: Dictionary, index: int) -> HBoxContainer:
 	line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	line.max_lines_visible = 2
 	line.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	# Two lines break at a " · " (不知火舞 on #201): `Catch 2 Pond Crucian` / `Fern Pond`, not `… Crucian ·` / `Fern Pond`.
+	var said := str(r.get("line", ""))
+	line.resized.connect(func():
+		var shown := UiKit.break_at_dot(said, line.get_theme_font(&"font"), line.get_theme_font_size(&"font_size"), line.size.x)
+		if line.text != shown: line.text = shown)
 	text.add_child(line)
 	if state == "short" and str(r.get("tail", "")) != "":
 		var tail := UiKit.label(str(r.tail), UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_SECONDARY)
