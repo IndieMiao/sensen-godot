@@ -205,14 +205,14 @@ static func _short(ms: float) -> String:
 	var minutes := maxi(1, ceili(ms / 60000.0))
 	return "%dm" % minutes if minutes < 60 else "%dh %02dm" % [minutes / 60, minutes % 60]
 
-## ` · Farming Lv 2 at first harvest` (§14.2 end): what the growing beds' locked XP and first-harvest bonuses reach.
+## ` · Farming Lv2 at first harvest` (§14.2 end): what the growing beds' locked XP and first-harvest bonuses reach.
 static func harvest_level_tail(view: Dictionary) -> String:
 	var h := harvest_level(view)
 	return " · Farming Lv%d at first harvest" % int(h.level) if not h.is_empty() else ""
 
 ## Whether harvesting reaches the next Farming level (q(69), RETURN-SESSION): {level, now: true} when the plots ready
-## now are enough (`Farming Lv 2 with this harvest`); {level, now: false} when it takes the growing ones too and no crop
-## was ever harvested (`Farming Lv 2 at your first harvest`); {} otherwise. First-harvest bonuses count once a crop.
+## now are enough (`Farming Lv2 with this harvest`); {level, now: false} when it takes the growing ones too and no crop
+## was ever harvested (`Farming Lv2 at your first harvest`); {} otherwise. First-harvest bonuses count once a crop.
 static func harvest_level(view: Dictionary) -> Dictionary:
 	var sk: Dictionary = view.get("skills", {}).get("farming", {})
 	if sk.get("next", null) == null: return {}

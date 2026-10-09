@@ -989,7 +989,7 @@ static func today_rows(view: Dictionary) -> Array:
 		elif st == "sown": sown += 1
 		elif st == "growing": timed.append([float(p.get("ready_in", 0)), _row("%s ready in %s" % [plural(item_name(view, str(p.crop))), duration(float(p.get("ready_in", 0)))], str(p.crop), "plots")])
 	# One harvest row (q(69)): `Harvest 20 Radishes` for one crop, `Harvest 30 crops` for several; the level it brings
-	# follows it as an info row (`Farming Lv 2 with this harvest`, no button — §14.5's exception: it goes with its source).
+	# follows it as an info row (`Farming Lv2 with this harvest`, no button — §14.5's exception: it goes with its source).
 	var level := P0Guide.harvest_level(view)
 	if ready.size() == 1:
 		var c: String = ready.keys()[0]
