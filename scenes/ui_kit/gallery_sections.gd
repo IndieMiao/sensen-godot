@@ -21,6 +21,7 @@ static func all() -> Array[Dictionary]:
 		{id = "item_cell_quick", title = "UiItemCell · quick", figma = "Compact/QuickSlot 633:41279 · LOCK-04 / 05", build = _cells_quick},
 		{id = "item_cell_kitchen", title = "UiItemCell · kitchen", figma = "Compact/Kitchen/Cell 655:58506 · LOCK-20", build = _cells_kitchen},
 		{id = "pot_card", title = "UiPotCard · UiPotSlot", figma = "PotSlot44 1913:32881 · PotResultLine 1913:32882 · row 53 · LOCK-20 (256 ⑤ A')", build = _pot_cards},
+		{id = "pot_card_states", title = "UiPotCard · pot states", figma = "row 53: seasoning only · pot full (q(64)) · Tried before (256 ⑤ A')", build = _pot_card_states},
 		{id = "item_cell_gear", title = "UiItemCell · gear", figma = "Compact/GearSlot 663:61299 · LOCK-13", build = _cells_gear},
 		{id = "command_button", title = "UiCommandButton", figma = "CommandButton 483:216 · Compact/Command 633:41273 · LOCK-10", build = _commands},
 		{id = "nav_buttons", title = "UiNavButton · Dismiss · Close", figma = "NavigationRow 483:217 · Compact/Navigation 633:41276 · Dismiss 483:220 · Close 483:336", build = _navigation},
@@ -357,39 +358,44 @@ static func _cells_kitchen() -> Control:
 
 
 ## The pot card under the stove (256 ⑤ A', row 53): a Cookbook page, the Experiment pot with ✕ and the Lv4 lock, an
-## empty pot (no result line), seasonings only (`?`), the pot full (✕ rings, q(64)) and three slots Tried before.
+## empty pot (no result line). Two sections, so each fits one gallery shot (刘邦 on #149).
 static func _pot_cards() -> Control:
-	var col := VBoxContainer.new()
-	col.add_theme_constant_override(&"separation", int(UiTokens.SPACE_SECTION))
 	var S := UiPotSlot.State
-	var slot := func(state: int, icon_id := "", removable := false, point := false) -> UiPotSlot:
-		var s := UiPotSlot.new(state)
-		if icon_id != "": s.icon = _tex(icon_id)
-		if state == S.FILLED: s.quantity = "×1"
-		s.removable = removable
-		s.point_at_remove = point
-		return s
-	var card := func(slots: Array, title := "", rarity := 0, time := "") -> UiPotCard:
-		var c := UiPotCard.new()
-		c.set_slots(slots)
-		c.show_result(title, rarity, time)
-		return c
-	var a := _row(UiTokens.SPACE_ROW)
-	a.add_child(_captioned(card.call([slot.call(S.FILLED, "fish_crucian")], "Grilled Crucian", 1, "5 s"), "cookbook"))
-	a.add_child(_captioned(card.call([slot.call(S.FILLED, "fish_crucian", true), slot.call(S.FILLED, "crop_herb", true), slot.call(S.LOCKED)],
-		"Unknown dish", 2, "15 s"), "experiment · lock"))
-	col.add_child(a)
-	var b := _row(UiTokens.SPACE_ROW)
-	b.add_child(_captioned(card.call([slot.call(S.EMPTY), slot.call(S.EMPTY), slot.call(S.LOCKED)]), "empty pot"))
-	b.add_child(_captioned(card.call([slot.call(S.FILLED, "rock_salt", true), slot.call(S.EMPTY), slot.call(S.LOCKED)], "?"), "seasoning only"))
-	col.add_child(b)
-	var c := _row(UiTokens.SPACE_ROW)
-	c.add_child(_captioned(card.call([slot.call(S.FILLED, "fish_crucian", true, true), slot.call(S.FILLED, "crop_herb", true, true), slot.call(S.LOCKED)],
-		"Unknown dish", 2, "15 s"), "pot full"))
-	c.add_child(_captioned(card.call([slot.call(S.FILLED, "fish_crucian", true), slot.call(S.FILLED, "crop_potato", true), slot.call(S.FILLED, "rock_salt", true)],
-		"Tried before", 3, "30 s"), "3 slots · tried"))
-	col.add_child(c)
+	return _pot_card_column([
+		[_pot_card([_pot_slot(S.FILLED, "fish_crucian")], "Grilled Crucian", 1, "5 s"), "cookbook"],
+		[_pot_card([_pot_slot(S.FILLED, "fish_crucian", true), _pot_slot(S.FILLED, "crop_herb", true), _pot_slot(S.LOCKED)],
+			"Unknown dish", 2, "15 s"), "experiment · lock"],
+		[_pot_card([_pot_slot(S.EMPTY), _pot_slot(S.EMPTY), _pot_slot(S.LOCKED)]), "empty pot"]])
+
+## … and the pot's states: seasonings only (`?`), the pot full (✕ rings, q(64)) and three slots Tried before.
+static func _pot_card_states() -> Control:
+	var S := UiPotSlot.State
+	return _pot_card_column([
+		[_pot_card([_pot_slot(S.FILLED, "rock_salt", true), _pot_slot(S.EMPTY), _pot_slot(S.LOCKED)], "?"), "seasoning only"],
+		[_pot_card([_pot_slot(S.FILLED, "fish_crucian", true, true), _pot_slot(S.FILLED, "crop_herb", true, true), _pot_slot(S.LOCKED)],
+			"Unknown dish", 2, "15 s"), "pot full"],
+		[_pot_card([_pot_slot(S.FILLED, "fish_crucian", true), _pot_slot(S.FILLED, "crop_potato", true), _pot_slot(S.FILLED, "rock_salt", true)],
+			"Tried before", 3, "30 s"), "3 slots · tried"]])
+
+static func _pot_card_column(samples: Array) -> Control:
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override(&"separation", int(UiTokens.SPACE_ROW))
+	for sample in samples: col.add_child(_captioned(sample[0], sample[1]))
 	return col
+
+static func _pot_slot(state: int, icon_id := "", removable := false, point := false) -> UiPotSlot:
+	var s := UiPotSlot.new(state)
+	if icon_id != "": s.icon = _tex(icon_id)
+	if state == UiPotSlot.State.FILLED: s.quantity = "×1"
+	s.removable = removable
+	s.point_at_remove = point
+	return s
+
+static func _pot_card(slots: Array, title := "", rarity := 0, time := "") -> UiPotCard:
+	var c := UiPotCard.new()
+	c.set_slots(slots)
+	c.show_result(title, rarity, time)
+	return c
 
 static func _cells_gear() -> Control:
 	var row := _row(UiTokens.SPACE_ROW)

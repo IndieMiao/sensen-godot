@@ -1,0 +1,941 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    430
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiPotCard · pot states"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        36
+      ],
+      "variation": "CaptionR12",
+      "text": "row 53: seasoning only · pot full (q(64)) · Tried before (256 ⑤ A')"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        70,
+        328,
+        360
+      ],
+      "children": [
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            70,
+            328,
+            112
+          ],
+          "children": [
+            {
+              "type": "UiPotCard",
+              "rect": [
+                68,
+                70,
+                192,
+                92
+              ],
+              "children": [
+                {
+                  "type": "VBoxContainer",
+                  "rect": [
+                    78,
+                    80,
+                    172,
+                    72
+                  ],
+                  "children": [
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        78,
+                        80,
+                        172,
+                        44
+                      ],
+                      "children": [
+                        {
+                          "type": "UiPotSlot",
+                          "rect": [
+                            78,
+                            80,
+                            44,
+                            44
+                          ],
+                          "children": [
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                78,
+                                80,
+                                44,
+                                44
+                              ],
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    84,
+                                    86,
+                                    32,
+                                    32
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "PanelContainer",
+                              "rect": [
+                                104,
+                                110,
+                                24,
+                                16
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    108,
+                                    110,
+                                    16,
+                                    16
+                                  ],
+                                  "variation": "C11XB",
+                                  "text": "×1"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                107,
+                                77,
+                                18,
+                                18
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    107,
+                                    77,
+                                    18,
+                                    19
+                                  ],
+                                  "variation": "C13XB",
+                                  "text": "×"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Control",
+                              "rect": [
+                                94,
+                                64,
+                                44,
+                                44
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "UiPotSlot",
+                          "rect": [
+                            142,
+                            80,
+                            44,
+                            44
+                          ],
+                          "children": [
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                142,
+                                80,
+                                44,
+                                44
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "UiPotSlot",
+                          "rect": [
+                            206,
+                            80,
+                            44,
+                            44
+                          ],
+                          "children": [
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                206,
+                                80,
+                                44,
+                                44
+                              ],
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    220,
+                                    94,
+                                    16,
+                                    16
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        78,
+                        132,
+                        172,
+                        20
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            160,
+                            132,
+                            7,
+                            19
+                          ],
+                          "variation": "C13XB",
+                          "text": "?"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                168,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "seasoning only"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            194,
+            328,
+            112
+          ],
+          "children": [
+            {
+              "type": "UiPotCard",
+              "rect": [
+                68,
+                194,
+                192,
+                92
+              ],
+              "children": [
+                {
+                  "type": "VBoxContainer",
+                  "rect": [
+                    78,
+                    204,
+                    172,
+                    72
+                  ],
+                  "children": [
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        78,
+                        204,
+                        172,
+                        44
+                      ],
+                      "children": [
+                        {
+                          "type": "UiPotSlot",
+                          "rect": [
+                            78,
+                            204,
+                            44,
+                            44
+                          ],
+                          "children": [
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                78,
+                                204,
+                                44,
+                                44
+                              ],
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    84,
+                                    210,
+                                    32,
+                                    32
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "PanelContainer",
+                              "rect": [
+                                104,
+                                234,
+                                24,
+                                16
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    108,
+                                    234,
+                                    16,
+                                    16
+                                  ],
+                                  "variation": "C11XB",
+                                  "text": "×1"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                103,
+                                197,
+                                26,
+                                26
+                              ]
+                            },
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                107,
+                                201,
+                                18,
+                                18
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    107,
+                                    201,
+                                    18,
+                                    19
+                                  ],
+                                  "variation": "C13XB",
+                                  "text": "×"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Control",
+                              "rect": [
+                                94,
+                                188,
+                                44,
+                                44
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "UiPotSlot",
+                          "rect": [
+                            142,
+                            204,
+                            44,
+                            44
+                          ],
+                          "children": [
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                142,
+                                204,
+                                44,
+                                44
+                              ],
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    148,
+                                    210,
+                                    32,
+                                    32
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "PanelContainer",
+                              "rect": [
+                                168,
+                                234,
+                                24,
+                                16
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    172,
+                                    234,
+                                    16,
+                                    16
+                                  ],
+                                  "variation": "C11XB",
+                                  "text": "×1"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                167,
+                                197,
+                                26,
+                                26
+                              ]
+                            },
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                171,
+                                201,
+                                18,
+                                18
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    171,
+                                    201,
+                                    18,
+                                    19
+                                  ],
+                                  "variation": "C13XB",
+                                  "text": "×"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Control",
+                              "rect": [
+                                158,
+                                188,
+                                44,
+                                44
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "UiPotSlot",
+                          "rect": [
+                            206,
+                            204,
+                            44,
+                            44
+                          ],
+                          "children": [
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                206,
+                                204,
+                                44,
+                                44
+                              ],
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    220,
+                                    218,
+                                    16,
+                                    16
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        78,
+                        256,
+                        172,
+                        20
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            93,
+                            256,
+                            88,
+                            19
+                          ],
+                          "variation": "C13XB",
+                          "text": "Unknown dish"
+                        },
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            187,
+                            262,
+                            8,
+                            8
+                          ]
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            201,
+                            257,
+                            3,
+                            18
+                          ],
+                          "variation": "C12B",
+                          "text": "·"
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            210,
+                            257,
+                            24,
+                            18
+                          ],
+                          "variation": "C12B",
+                          "text": "15 s"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                292,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "pot full"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            318,
+            328,
+            112
+          ],
+          "children": [
+            {
+              "type": "UiPotCard",
+              "rect": [
+                68,
+                318,
+                192,
+                92
+              ],
+              "children": [
+                {
+                  "type": "VBoxContainer",
+                  "rect": [
+                    78,
+                    328,
+                    172,
+                    72
+                  ],
+                  "children": [
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        78,
+                        328,
+                        172,
+                        44
+                      ],
+                      "children": [
+                        {
+                          "type": "UiPotSlot",
+                          "rect": [
+                            78,
+                            328,
+                            44,
+                            44
+                          ],
+                          "children": [
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                78,
+                                328,
+                                44,
+                                44
+                              ],
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    84,
+                                    334,
+                                    32,
+                                    32
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "PanelContainer",
+                              "rect": [
+                                104,
+                                358,
+                                24,
+                                16
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    108,
+                                    358,
+                                    16,
+                                    16
+                                  ],
+                                  "variation": "C11XB",
+                                  "text": "×1"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                107,
+                                325,
+                                18,
+                                18
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    107,
+                                    325,
+                                    18,
+                                    19
+                                  ],
+                                  "variation": "C13XB",
+                                  "text": "×"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Control",
+                              "rect": [
+                                94,
+                                312,
+                                44,
+                                44
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "UiPotSlot",
+                          "rect": [
+                            142,
+                            328,
+                            44,
+                            44
+                          ],
+                          "children": [
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                142,
+                                328,
+                                44,
+                                44
+                              ],
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    148,
+                                    334,
+                                    32,
+                                    32
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "PanelContainer",
+                              "rect": [
+                                168,
+                                358,
+                                24,
+                                16
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    172,
+                                    358,
+                                    16,
+                                    16
+                                  ],
+                                  "variation": "C11XB",
+                                  "text": "×1"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                171,
+                                325,
+                                18,
+                                18
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    171,
+                                    325,
+                                    18,
+                                    19
+                                  ],
+                                  "variation": "C13XB",
+                                  "text": "×"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Control",
+                              "rect": [
+                                158,
+                                312,
+                                44,
+                                44
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "UiPotSlot",
+                          "rect": [
+                            206,
+                            328,
+                            44,
+                            44
+                          ],
+                          "children": [
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                206,
+                                328,
+                                44,
+                                44
+                              ],
+                              "children": [
+                                {
+                                  "type": "TextureRect",
+                                  "rect": [
+                                    212,
+                                    334,
+                                    32,
+                                    32
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "PanelContainer",
+                              "rect": [
+                                232,
+                                358,
+                                24,
+                                16
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    236,
+                                    358,
+                                    16,
+                                    16
+                                  ],
+                                  "variation": "C11XB",
+                                  "text": "×1"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Panel",
+                              "rect": [
+                                235,
+                                325,
+                                18,
+                                18
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    235,
+                                    325,
+                                    18,
+                                    19
+                                  ],
+                                  "variation": "C13XB",
+                                  "text": "×"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Control",
+                              "rect": [
+                                222,
+                                312,
+                                44,
+                                44
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        78,
+                        380,
+                        172,
+                        20
+                      ],
+                      "children": [
+                        {
+                          "type": "Label",
+                          "rect": [
+                            100,
+                            380,
+                            75,
+                            19
+                          ],
+                          "variation": "C13XB",
+                          "text": "Tried before"
+                        },
+                        {
+                          "type": "Panel",
+                          "rect": [
+                            181,
+                            386,
+                            8,
+                            8
+                          ]
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            195,
+                            381,
+                            3,
+                            18
+                          ],
+                          "variation": "C12B",
+                          "text": "·"
+                        },
+                        {
+                          "type": "Label",
+                          "rect": [
+                            204,
+                            381,
+                            24,
+                            18
+                          ],
+                          "variation": "C12B",
+                          "text": "30 s"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                416,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "3 slots · tried"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
