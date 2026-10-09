@@ -146,7 +146,7 @@ func test_queue_next_opens_the_drawer_in_queue_mode_and_the_queued_pot_returns_t
 	assert_str(k.drawer.get("_cook").label).is_equal("Queue")
 	assert_str(k.drawer.get("_recipe_button").label).is_equal("Queue")
 	assert_str(P0KitchenLogic.header(rt.session.view).state).is_equal("Cooking 0:14")   # Stove 1/1 · Cooking Lv · Cooking m:ss
-	assert_str((k.get("_preview").get("_title") as Label).text).is_equal("Ready to queue")   # q(84)
+	assert_str((k.get("_pot_card") as UiPotCard).result_title()).is_equal("Grilled Crucian")   # 256 ⑤ A': no Ready to queue
 	# Experiment in the queue drawer: the pot on the stove does not grey Queue out (no Stove busy).
 	k.drawer.tab = "experiment"
 	k._on_ingredient("fish_crucian", Vector2.INF)
@@ -417,8 +417,14 @@ func test_a_second_tap_on_a_bag_cell_puts_a_second_one_in() -> void:
 	k._on_ingredient("fish_crucian", Vector2.INF)   # two slots: the pot is full, nothing more goes in
 	assert_array(k.pot).is_equal(["fish_crucian", "fish_crucian"])
 	assert_str(rt.ui.toast_text()).is_equal("The pot is full · tap ✕ above to take one out")   # q(64)
+	# 256 ⑤ A': each ✕ wears the gold-brown ring while the toast says where to look.
+	var card: UiPotCard = k.get("_pot_card")
+	var filled := card.slots().filter(func(sl): return (sl as UiPotSlot).state == UiPotSlot.State.FILLED)
+	assert_int(filled.size()).is_equal(2)
+	assert_bool(filled.all(func(sl): return (sl as UiPotSlot).point_at_remove)).is_true()
 	k._take_out(1, Vector2.INF)
 	assert_array(k.pot).is_equal(["fish_crucian"])
+	assert_bool(card.slots().any(func(sl): return (sl as UiPotSlot).point_at_remove)).is_false()   # it did its job
 	rt.ui.close_modal()
 	await get_tree().process_frame
 
@@ -653,3 +659,27 @@ func test_a_gift_meal_sent_to_the_inbox_is_the_card_not_a_toast() -> void:
 		line = "From %s · Expires in 9h 12m" % pip})
 	assert_str(rt.ui.toast_text()).is_equal("")
 	rt.detach(w)
+
+func test_the_pot_card_shows_icons_one_result_line_and_says_what_opens_the_lock() -> void:
+	# 256 ⑤ A' (row 53): slots carry no names; an empty pot has no result line, seasonings alone read `?`, a fish names
+	# its dish; the locked 3rd slot is only a lock and a tap on it says what opens it.
+	var r := await _farmhouse()
+	var k: P0Kitchen = r.get("kitchen")
+	k.open("experiment")
+	await get_tree().process_frame
+	var card: UiPotCard = k.get("_pot_card")
+	var states := card.slots().map(func(sl): return (sl as UiPotSlot).state)
+	assert_array(states).is_equal([UiPotSlot.State.EMPTY, UiPotSlot.State.EMPTY, UiPotSlot.State.LOCKED])
+	assert_str(card.result_title()).is_equal("")   # no line: the card is just its slots
+	assert_str(k.drawer.get("_cook").reason).is_equal("Add an ingredient")
+	assert_array(card.find_children("*", "Label", true, false).filter(func(l): return l.is_visible_in_tree() and (l as Label).text != "")).is_empty()
+	k._on_ingredient("fish_crucian", Vector2.INF)
+	await get_tree().process_frame
+	assert_str(card.result_title()).is_equal("Grilled Crucian")
+	assert_bool(card.result_rarity_shown()).is_true()
+	assert_str(card.result_time()).is_equal("5 s")
+	var lock: UiPotSlot = card.slots()[2]
+	lock.locked_tapped.emit()
+	assert_str(rt.ui.toast_text()).starts_with("Cooking Lv4")
+	rt.ui.close_modal()
+	await get_tree().process_frame
