@@ -2014,7 +2014,6 @@
     "name": "Farmer",
     "city": "San Francisco",
     "city_short": "SF",
-    "chip_city": "SF",
     "region": "san_francisco",
     "climate": "Temperate",
     "timezone": "America/Los_Angeles",

@@ -5,9 +5,9 @@ extends Control
 ## chips take touches.
 ##   Row 1: avatar with the two-colour skill ring (→ Profile) · Energy chip (number, bar, +1 in m:ss / Full /
 ##          bonus) · optional Buff chip (icon + remaining) · coins · bell with the red unread count.
-##   Row 2: Today chip (`Today · <first line>`, or `Today · All caught up`) · location chip `City · Space`
-##          with the player's ACTUAL place (never Map; foreign city adds `· Day Pass 23h`; the space is
-##          truncated first).
+##   Row 2: Today icon (list-checks in a 32 x 24 pill, 44 hit area; a red dot at its top-right when the Today panel
+##          has something new to do now, q(107) / SGODOT-271) · location chip `City · Space` with the player's ACTUAL
+##          place in the rest of the row (never Map; foreign city adds `· Day Pass 23h`; the space is truncated first).
 ## Energy colour is never by percentage (user 2026-10-07): Normal / Full / Bonus green bar with an ink number
 ## (Bonus adds a light-green over-cap segment), Low amber only when Energy is short of the next action,
 ## Empty red at 0. There is no separate Map / Passport button: the location chip is the way to the map.
@@ -27,6 +27,7 @@ const ICON_COIN := preload("res://assets/p0/icons/coin.svg")
 const ICON_BELL := preload("res://assets/p0/icons/bell.svg")
 const ICON_HOME := preload("res://assets/p0/icons/home.svg")
 const ICON_FOREIGN := preload("res://assets/p0/icons/showmap.svg")
+const ICON_TODAY := preload("res://assets/ui/icons/game/list-checks.svg")
 const PORTRAIT := preload("res://assets/ui/kit_images/player_portrait.png")
 
 # Positions inside the HUD main (one main's layout, not shared tokens):
@@ -47,14 +48,16 @@ const _ICON_BELL := 18
 const _SKILL_GAP := 4.0           # degrees each skill half stops short of 12 and 6 o'clock
 const _ICON_BUFF := 14
 const _ICON_PLACE := 11
-const _CHEVRON := 12              # Today chip chevron box
+const _ICON_TODAY := 14
+const _DOT := 8.0                 # the Today icon's red dot: the unread dot of UiSegmentTab / UiInboxRow
+const _DOT_OVER := 2.0            # past the pill's right and top edges by 2, as the bell's badge sits out
 const _BADGE_OVER := Vector2(2, 8)   # unread badge: past the bell's right edge by 2, above its top by 8
 
 ## Merged state; apply() only replaces the keys it is given.
 var data := {
 	energy = 0, energy_max = 200, regen = "Full", next_cost = 0,
 	skills = {farming = 0.0, fishing = 0.0},
-	coins = 0, unread = 0, buff = {}, today = "",
+	coins = 0, unread = 0, buff = {}, today_dot = false,
 	place = {city = "", space = "", kind = PlaceKind.HOME, day_pass = "", helping = false},
 }
 var safe_top := 0.0: set = set_safe_top
@@ -76,7 +79,7 @@ var _inbox: _Chip
 var _badge: PanelContainer
 var _badge_count: Label
 var _today_chip: _Chip
-var _today: Label
+var _today_dot: Panel
 var _place_chip: _Chip
 var _place_icon: TextureRect
 var _place_city: Label
@@ -159,13 +162,17 @@ func set_show_balances(v: bool) -> void:
 
 func energy_chip_rect() -> Rect2: return _energy_chip.visual_rect()
 func balances_rect() -> Rect2: return _balances.get_global_rect()
+## The Today icon's drawn 32 x 24 pill (the TipCard hangs under its bottom edge, as under the old chip's).
 func today_chip_rect() -> Rect2: return _today_chip.visual_rect()
 
-## Pulses played on the Today chip (tests read it).
+## Whether the Today icon shows its red dot.
+func today_dot_shown() -> bool: return _today_dot.visible
+
+## Pulses played on the Today icon (tests read it).
 var today_pulses := 0
 
-## The Today chip's GuidePulse, once (its focus row changed; the caller decides, P0Ui): Shape=Pill around the chip's
-## visible pill, not its 44 px touch area.
+## The Today icon's GuidePulse, once (its focus row changed; the caller decides, P0Ui): Shape=Pill around the drawn
+## pill, not its 44 px touch area.
 func pulse_today() -> void:
 	today_pulses += 1
 	var visual := _today_chip.visual_rect()
@@ -275,20 +282,29 @@ func _build_row1() -> void:
 func _build_row2() -> void:
 	var row := HBoxContainer.new()
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	row.add_theme_constant_override(&"separation", int(UiTokens.SPACE_HUD_ROW_GAP))
 	var h := UiTokens.SIZE_HUD_ROW2_H
-	row.position = Vector2(-_ROW1_X * 2.0, _ROW2_Y - (UiTokens.SIZE_TOUCH - h) * 0.5)
-	row.size = Vector2(UiTokens.SIZE_HUD_W + _ROW1_X * 4.0, UiTokens.SIZE_TOUCH)
+	# The Today icon's 44 hit area is wider than its 32 pill: the row starts that much further left and the gap to
+	# the place chip is that much shorter, so the pill sits where the row starts and 8 before the place chip (300).
+	var overhang := (UiTokens.SIZE_TOUCH - UiTokens.SIZE_TODAY_ICON_W) * 0.5
+	row.add_theme_constant_override(&"separation", int(UiTokens.SPACE_HUD_ROW_GAP - overhang))
+	row.position = Vector2(-_ROW1_X * 2.0 - overhang, _ROW2_Y - (UiTokens.SIZE_TOUCH - h) * 0.5)
+	row.size = Vector2(UiTokens.SIZE_HUD_W + _ROW1_X * 4.0 + overhang, UiTokens.SIZE_TOUCH)
 	_frame.add_child(row)
-	_today_chip = _Chip.new(UiTokens.RADIUS_HUD_CHIP, h)
-	_today_chip.custom_minimum_size = Vector2(UiTokens.SIZE_TODAY_CHIP_W, UiTokens.SIZE_TOUCH)
+	_today_chip = _Chip.new(UiTokens.RADIUS_HUD_CHIP, h, UiTokens.SIZE_TODAY_ICON_W)
+	_today_chip.custom_minimum_size = Vector2(UiTokens.SIZE_TOUCH, UiTokens.SIZE_TOUCH)
 	_today_chip.pressed.connect(func(): today_pressed.emit())
-	var th := _chip_row(_today_chip)
-	_today = UiKit.label("", UiTokens.STYLE_C10_B)
-	_today.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_today.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	th.add_child(_today)
-	th.add_child(_Chevron.new())
+	var list := UiKit.icon(ICON_TODAY, _ICON_TODAY)
+	list.modulate = UiTokens.COLOR_TEXT   # the game glyph is white; the icon is ink (不知火舞 76ebeaad)
+	list.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	list.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_today_chip.body.add_child(list)
+	_today_dot = Panel.new()
+	_today_dot.name = "TodayDot"
+	_today_dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_today_dot.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_UNREAD_BADGE, _DOT * 0.5))
+	_today_dot.size = Vector2(_DOT, _DOT)
+	_today_dot.position = Vector2(overhang + UiTokens.SIZE_TODAY_ICON_W + _DOT_OVER - _DOT, _today_chip.margin_y() - _DOT_OVER)
+	_today_chip.add_child(_today_dot)
 	row.add_child(_today_chip)
 	_place_chip = _Chip.new(UiTokens.RADIUS_HUD_CHIP, h)
 	_place_chip.custom_minimum_size = Vector2(UiTokens.SIZE_TOUCH, UiTokens.SIZE_TOUCH)
@@ -365,8 +381,7 @@ func _refresh() -> void:
 	var unread := int(data.unread)
 	_badge.visible = unread > 0
 	_badge_count.text = str(unread) if unread < 100 else "99+"
-	var today := str(data.today)
-	_today.text = "Today · " + (today if today != "" else "All caught up")
+	_today_dot.visible = bool(data.today_dot)
 	var place: Dictionary = data.place
 	var kind := int(place.get("kind", PlaceKind.HOME))
 	_place_icon.texture = ICON_FOREIGN if kind == PlaceKind.FOREIGN else ICON_HOME
@@ -485,15 +500,3 @@ class _Track extends Control:
 			var w := maxf(size.y, size.x * over)
 			draw_rect(Rect2(Vector2(size.x - w, 0.0), Vector2(w, size.y)), UiTokens.COLOR_ENERGY_BONUS)
 
-## Today chip's small down chevron (the panel drops down under the chip).
-class _Chevron extends Control:
-	func _init() -> void:
-		mouse_filter = Control.MOUSE_FILTER_IGNORE
-		custom_minimum_size = Vector2(UiHud._CHEVRON, UiHud._CHEVRON)
-		size_flags_vertical = Control.SIZE_SHRINK_CENTER
-
-	func _draw() -> void:
-		var w := size.x * 0.5
-		var c := size * 0.5
-		draw_polyline(PackedVector2Array([c + Vector2(-w * 0.5, -w * 0.25), c + Vector2(0, w * 0.25), c + Vector2(w * 0.5, -w * 0.25)]),
-			UiTokens.COLOR_SECONDARY, UiTokens.STROKE_DEFAULT + 0.3, true)

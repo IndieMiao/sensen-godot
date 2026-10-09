@@ -86,68 +86,46 @@
                             {
                               "type": "HBoxContainer",
                               "rect": [
-                                9,
+                                4,
                                 105,
-                                310,
+                                315,
                                 40
                               ],
                               "children": [
                                 {
                                   "type": "BaseButton",
                                   "rect": [
-                                    9,
+                                    4,
                                     105,
-                                    142,
+                                    40,
                                     40
                                   ],
                                   "children": [
                                     {
                                       "type": "Panel",
                                       "rect": [
-                                        9,
+                                        4,
                                         105,
-                                        142,
+                                        40,
                                         40
                                       ]
                                     },
                                     {
                                       "type": "MarginContainer",
                                       "rect": [
-                                        9,
+                                        4,
                                         105,
-                                        142,
+                                        40,
                                         40
                                       ],
                                       "children": [
                                         {
-                                          "type": "HBoxContainer",
+                                          "type": "TextureRect",
                                           "rect": [
-                                            16,
-                                            114,
-                                            129,
-                                            22
-                                          ],
-                                          "children": [
-                                            {
-                                              "type": "Label",
-                                              "rect": [
-                                                16,
-                                                118,
-                                                114,
-                                                14
-                                              ],
-                                              "variation": "C10B",
-                                              "text": "Today · Radishes ready in 1h 12m"
-                                            },
-                                            {
-                                              "type": "Control",
-                                              "rect": [
-                                                135,
-                                                119,
-                                                11,
-                                                11
-                                              ]
-                                            }
+                                            17,
+                                            119,
+                                            13,
+                                            13
                                           ]
                                         }
                                       ]
@@ -157,43 +135,43 @@
                                 {
                                   "type": "BaseButton",
                                   "rect": [
-                                    159,
+                                    46,
                                     105,
-                                    160,
+                                    273,
                                     40
                                   ],
                                   "children": [
                                     {
                                       "type": "Panel",
                                       "rect": [
-                                        159,
+                                        46,
                                         105,
-                                        160,
+                                        273,
                                         40
                                       ]
                                     },
                                     {
                                       "type": "MarginContainer",
                                       "rect": [
-                                        159,
+                                        46,
                                         105,
-                                        160,
+                                        273,
                                         40
                                       ],
                                       "children": [
                                         {
                                           "type": "HBoxContainer",
                                           "rect": [
-                                            166,
+                                            53,
                                             114,
-                                            148,
+                                            261,
                                             22
                                           ],
                                           "children": [
                                             {
                                               "type": "TextureRect",
                                               "rect": [
-                                                166,
+                                                53,
                                                 119,
                                                 10,
                                                 10
@@ -202,27 +180,27 @@
                                             {
                                               "type": "HBoxContainer",
                                               "rect": [
-                                                180,
+                                                67,
                                                 114,
-                                                125,
+                                                238,
                                                 22
                                               ],
                                               "children": [
                                                 {
                                                   "type": "Label",
                                                   "rect": [
-                                                    180,
+                                                    67,
                                                     118,
-                                                    47,
+                                                    66,
                                                     14
                                                   ],
                                                   "variation": "C10B",
-                                                  "text": "Shanghai · "
+                                                  "text": "San Francisco · "
                                                 },
                                                 {
                                                   "type": "Label",
                                                   "rect": [
-                                                    228,
+                                                    133,
                                                     118,
                                                     49,
                                                     14
@@ -233,7 +211,7 @@
                                                 {
                                                   "type": "Label",
                                                   "rect": [
-                                                    277,
+                                                    182,
                                                     118,
                                                     1,
                                                     14
@@ -593,70 +571,57 @@
                             {
                               "type": "HBoxContainer",
                               "rect": [
-                                9,
+                                4,
                                 195,
-                                310,
+                                315,
                                 40
                               ],
                               "children": [
                                 {
                                   "type": "BaseButton",
                                   "rect": [
-                                    9,
+                                    4,
                                     195,
-                                    142,
+                                    40,
                                     40
                                   ],
                                   "children": [
                                     {
                                       "type": "Panel",
                                       "rect": [
-                                        9,
+                                        4,
                                         195,
-                                        142,
+                                        40,
                                         40
                                       ]
                                     },
                                     {
                                       "type": "MarginContainer",
                                       "rect": [
-                                        9,
+                                        4,
                                         195,
-                                        142,
+                                        40,
                                         40
                                       ],
                                       "children": [
                                         {
-                                          "type": "HBoxContainer",
+                                          "type": "TextureRect",
                                           "rect": [
-                                            16,
-                                            204,
-                                            129,
-                                            22
-                                          ],
-                                          "children": [
-                                            {
-                                              "type": "Label",
-                                              "rect": [
-                                                16,
-                                                208,
-                                                114,
-                                                14
-                                              ],
-                                              "variation": "C10B",
-                                              "text": "Today · Sow your first plot"
-                                            },
-                                            {
-                                              "type": "Control",
-                                              "rect": [
-                                                135,
-                                                209,
-                                                11,
-                                                11
-                                              ]
-                                            }
+                                            17,
+                                            209,
+                                            13,
+                                            13
                                           ]
                                         }
+                                      ]
+                                    },
+                                    {
+                                      "type": "Panel",
+                                      "rect": [
+                                        33,
+                                        202,
+                                        7,
+                                        7
                                       ]
                                     }
                                   ]
@@ -664,43 +629,43 @@
                                 {
                                   "type": "BaseButton",
                                   "rect": [
-                                    159,
+                                    46,
                                     195,
-                                    160,
+                                    273,
                                     40
                                   ],
                                   "children": [
                                     {
                                       "type": "Panel",
                                       "rect": [
-                                        159,
+                                        46,
                                         195,
-                                        160,
+                                        273,
                                         40
                                       ]
                                     },
                                     {
                                       "type": "MarginContainer",
                                       "rect": [
-                                        159,
+                                        46,
                                         195,
-                                        160,
+                                        273,
                                         40
                                       ],
                                       "children": [
                                         {
                                           "type": "HBoxContainer",
                                           "rect": [
-                                            166,
+                                            53,
                                             204,
-                                            148,
+                                            261,
                                             22
                                           ],
                                           "children": [
                                             {
                                               "type": "TextureRect",
                                               "rect": [
-                                                166,
+                                                53,
                                                 209,
                                                 10,
                                                 10
@@ -709,27 +674,27 @@
                                             {
                                               "type": "HBoxContainer",
                                               "rect": [
-                                                180,
+                                                67,
                                                 204,
-                                                125,
+                                                238,
                                                 22
                                               ],
                                               "children": [
                                                 {
                                                   "type": "Label",
                                                   "rect": [
-                                                    180,
+                                                    67,
                                                     208,
-                                                    47,
+                                                    66,
                                                     14
                                                   ],
                                                   "variation": "C10B",
-                                                  "text": "Shanghai · "
+                                                  "text": "San Francisco · "
                                                 },
                                                 {
                                                   "type": "Label",
                                                   "rect": [
-                                                    228,
+                                                    133,
                                                     208,
                                                     47,
                                                     14
@@ -740,7 +705,7 @@
                                                 {
                                                   "type": "Label",
                                                   "rect": [
-                                                    275,
+                                                    180,
                                                     208,
                                                     1,
                                                     14
@@ -1164,68 +1129,46 @@
                             {
                               "type": "HBoxContainer",
                               "rect": [
-                                9,
+                                4,
                                 285,
-                                310,
+                                315,
                                 40
                               ],
                               "children": [
                                 {
                                   "type": "BaseButton",
                                   "rect": [
-                                    9,
+                                    4,
                                     285,
-                                    142,
+                                    40,
                                     40
                                   ],
                                   "children": [
                                     {
                                       "type": "Panel",
                                       "rect": [
-                                        9,
+                                        4,
                                         285,
-                                        142,
+                                        40,
                                         40
                                       ]
                                     },
                                     {
                                       "type": "MarginContainer",
                                       "rect": [
-                                        9,
+                                        4,
                                         285,
-                                        142,
+                                        40,
                                         40
                                       ],
                                       "children": [
                                         {
-                                          "type": "HBoxContainer",
+                                          "type": "TextureRect",
                                           "rect": [
-                                            16,
-                                            294,
-                                            129,
-                                            22
-                                          ],
-                                          "children": [
-                                            {
-                                              "type": "Label",
-                                              "rect": [
-                                                16,
-                                                298,
-                                                114,
-                                                14
-                                              ],
-                                              "variation": "C10B",
-                                              "text": "Today · All caught up"
-                                            },
-                                            {
-                                              "type": "Control",
-                                              "rect": [
-                                                135,
-                                                299,
-                                                11,
-                                                11
-                                              ]
-                                            }
+                                            17,
+                                            299,
+                                            13,
+                                            13
                                           ]
                                         }
                                       ]
@@ -1235,43 +1178,43 @@
                                 {
                                   "type": "BaseButton",
                                   "rect": [
-                                    159,
+                                    46,
                                     285,
-                                    160,
+                                    273,
                                     40
                                   ],
                                   "children": [
                                     {
                                       "type": "Panel",
                                       "rect": [
-                                        159,
+                                        46,
                                         285,
-                                        160,
+                                        273,
                                         40
                                       ]
                                     },
                                     {
                                       "type": "MarginContainer",
                                       "rect": [
-                                        159,
+                                        46,
                                         285,
-                                        160,
+                                        273,
                                         40
                                       ],
                                       "children": [
                                         {
                                           "type": "HBoxContainer",
                                           "rect": [
-                                            166,
+                                            53,
                                             294,
-                                            148,
+                                            261,
                                             22
                                           ],
                                           "children": [
                                             {
                                               "type": "TextureRect",
                                               "rect": [
-                                                166,
+                                                53,
                                                 299,
                                                 10,
                                                 10
@@ -1280,16 +1223,16 @@
                                             {
                                               "type": "HBoxContainer",
                                               "rect": [
-                                                180,
+                                                67,
                                                 294,
-                                                125,
+                                                238,
                                                 22
                                               ],
                                               "children": [
                                                 {
                                                   "type": "Label",
                                                   "rect": [
-                                                    180,
+                                                    67,
                                                     298,
                                                     33,
                                                     14
@@ -1300,18 +1243,18 @@
                                                 {
                                                   "type": "Label",
                                                   "rect": [
-                                                    213,
+                                                    100,
                                                     298,
-                                                    24,
+                                                    32,
                                                     14
                                                   ],
                                                   "variation": "C10B",
-                                                  "text": "Arri…"
+                                                  "text": "Arrived"
                                                 },
                                                 {
                                                   "type": "Label",
                                                   "rect": [
-                                                    237,
+                                                    132,
                                                     298,
                                                     65,
                                                     14
@@ -1693,70 +1636,57 @@
                             {
                               "type": "HBoxContainer",
                               "rect": [
-                                9,
+                                4,
                                 375,
-                                310,
+                                315,
                                 40
                               ],
                               "children": [
                                 {
                                   "type": "BaseButton",
                                   "rect": [
-                                    9,
+                                    4,
                                     375,
-                                    142,
+                                    40,
                                     40
                                   ],
                                   "children": [
                                     {
                                       "type": "Panel",
                                       "rect": [
-                                        9,
+                                        4,
                                         375,
-                                        142,
+                                        40,
                                         40
                                       ]
                                     },
                                     {
                                       "type": "MarginContainer",
                                       "rect": [
-                                        9,
+                                        4,
                                         375,
-                                        142,
+                                        40,
                                         40
                                       ],
                                       "children": [
                                         {
-                                          "type": "HBoxContainer",
+                                          "type": "TextureRect",
                                           "rect": [
-                                            16,
-                                            384,
-                                            129,
-                                            22
-                                          ],
-                                          "children": [
-                                            {
-                                              "type": "Label",
-                                              "rect": [
-                                                16,
-                                                388,
-                                                114,
-                                                14
-                                              ],
-                                              "variation": "C10B",
-                                              "text": "Today · Pond Catch · 2 Pond Crucian · Stall Board"
-                                            },
-                                            {
-                                              "type": "Control",
-                                              "rect": [
-                                                135,
-                                                389,
-                                                11,
-                                                11
-                                              ]
-                                            }
+                                            17,
+                                            389,
+                                            13,
+                                            13
                                           ]
                                         }
+                                      ]
+                                    },
+                                    {
+                                      "type": "Panel",
+                                      "rect": [
+                                        33,
+                                        382,
+                                        7,
+                                        7
                                       ]
                                     }
                                   ]
@@ -1764,43 +1694,43 @@
                                 {
                                   "type": "BaseButton",
                                   "rect": [
-                                    159,
+                                    46,
                                     375,
-                                    160,
+                                    273,
                                     40
                                   ],
                                   "children": [
                                     {
                                       "type": "Panel",
                                       "rect": [
-                                        159,
+                                        46,
                                         375,
-                                        160,
+                                        273,
                                         40
                                       ]
                                     },
                                     {
                                       "type": "MarginContainer",
                                       "rect": [
-                                        159,
+                                        46,
                                         375,
-                                        160,
+                                        273,
                                         40
                                       ],
                                       "children": [
                                         {
                                           "type": "HBoxContainer",
                                           "rect": [
-                                            166,
+                                            53,
                                             384,
-                                            148,
+                                            261,
                                             22
                                           ],
                                           "children": [
                                             {
                                               "type": "TextureRect",
                                               "rect": [
-                                                166,
+                                                53,
                                                 389,
                                                 10,
                                                 10
@@ -1809,38 +1739,38 @@
                                             {
                                               "type": "HBoxContainer",
                                               "rect": [
-                                                180,
+                                                67,
                                                 384,
-                                                125,
+                                                238,
                                                 22
                                               ],
                                               "children": [
                                                 {
                                                   "type": "Label",
                                                   "rect": [
-                                                    180,
+                                                    67,
                                                     388,
-                                                    47,
+                                                    66,
                                                     14
                                                   ],
                                                   "variation": "C10B",
-                                                  "text": "Shanghai · "
+                                                  "text": "San Francisco · "
                                                 },
                                                 {
                                                   "type": "Label",
                                                   "rect": [
-                                                    228,
+                                                    133,
                                                     388,
-                                                    56,
+                                                    44,
                                                     14
                                                   ],
                                                   "variation": "C10B",
-                                                  "text": "Willow Pond"
+                                                  "text": "Fern Pond"
                                                 },
                                                 {
                                                   "type": "Label",
                                                   "rect": [
-                                                    284,
+                                                    177,
                                                     388,
                                                     1,
                                                     14
@@ -2200,70 +2130,57 @@
                             {
                               "type": "HBoxContainer",
                               "rect": [
-                                9,
+                                4,
                                 465,
-                                310,
+                                315,
                                 40
                               ],
                               "children": [
                                 {
                                   "type": "BaseButton",
                                   "rect": [
-                                    9,
+                                    4,
                                     465,
-                                    142,
+                                    40,
                                     40
                                   ],
                                   "children": [
                                     {
                                       "type": "Panel",
                                       "rect": [
-                                        9,
+                                        4,
                                         465,
-                                        142,
+                                        40,
                                         40
                                       ]
                                     },
                                     {
                                       "type": "MarginContainer",
                                       "rect": [
-                                        9,
+                                        4,
                                         465,
-                                        142,
+                                        40,
                                         40
                                       ],
                                       "children": [
                                         {
-                                          "type": "HBoxContainer",
+                                          "type": "TextureRect",
                                           "rect": [
-                                            16,
-                                            474,
-                                            129,
-                                            22
-                                          ],
-                                          "children": [
-                                            {
-                                              "type": "Label",
-                                              "rect": [
-                                                16,
-                                                478,
-                                                114,
-                                                14
-                                              ],
-                                              "variation": "C10B",
-                                              "text": "Today · Herb Grilled Fish ready at the stove"
-                                            },
-                                            {
-                                              "type": "Control",
-                                              "rect": [
-                                                135,
-                                                479,
-                                                11,
-                                                11
-                                              ]
-                                            }
+                                            17,
+                                            479,
+                                            13,
+                                            13
                                           ]
                                         }
+                                      ]
+                                    },
+                                    {
+                                      "type": "Panel",
+                                      "rect": [
+                                        33,
+                                        472,
+                                        7,
+                                        7
                                       ]
                                     }
                                   ]
@@ -2271,43 +2188,43 @@
                                 {
                                   "type": "BaseButton",
                                   "rect": [
-                                    159,
+                                    46,
                                     465,
-                                    160,
+                                    273,
                                     40
                                   ],
                                   "children": [
                                     {
                                       "type": "Panel",
                                       "rect": [
-                                        159,
+                                        46,
                                         465,
-                                        160,
+                                        273,
                                         40
                                       ]
                                     },
                                     {
                                       "type": "MarginContainer",
                                       "rect": [
-                                        159,
+                                        46,
                                         465,
-                                        160,
+                                        273,
                                         40
                                       ],
                                       "children": [
                                         {
                                           "type": "HBoxContainer",
                                           "rect": [
-                                            166,
+                                            53,
                                             474,
-                                            148,
+                                            261,
                                             22
                                           ],
                                           "children": [
                                             {
                                               "type": "TextureRect",
                                               "rect": [
-                                                166,
+                                                53,
                                                 479,
                                                 10,
                                                 10
@@ -2316,38 +2233,38 @@
                                             {
                                               "type": "HBoxContainer",
                                               "rect": [
-                                                180,
+                                                67,
                                                 474,
-                                                125,
+                                                238,
                                                 22
                                               ],
                                               "children": [
                                                 {
                                                   "type": "Label",
                                                   "rect": [
-                                                    180,
+                                                    67,
                                                     478,
-                                                    47,
+                                                    66,
                                                     14
                                                   ],
                                                   "variation": "C10B",
-                                                  "text": "Shanghai · "
+                                                  "text": "San Francisco · "
                                                 },
                                                 {
                                                   "type": "Label",
                                                   "rect": [
-                                                    228,
+                                                    133,
                                                     478,
-                                                    49,
+                                                    108,
                                                     14
                                                   ],
                                                   "variation": "C10B",
-                                                  "text": "Homestead"
+                                                  "text": "Union Square Travel Post"
                                                 },
                                                 {
                                                   "type": "Label",
                                                   "rect": [
-                                                    277,
+                                                    241,
                                                     478,
                                                     1,
                                                     14

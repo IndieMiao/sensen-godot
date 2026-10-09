@@ -15,7 +15,7 @@ func _view() -> Dictionary:
 		"meals": {"used": 100, "cap": 300, "resets_in": 3600000},
 	}
 
-func test_hud_state_carries_energy_regen_skills_and_today() -> void:
+func test_hud_state_carries_energy_regen_skills_and_the_today_dots() -> void:
 	var v := _view()
 	var h := P0Logic.hud_state(v, {"next_cost": 2, "place": {"city": "Shanghai", "space": "Homestead"}})
 	assert_int(int(h.energy)).is_equal(142)
@@ -23,7 +23,10 @@ func test_hud_state_carries_energy_regen_skills_and_today() -> void:
 	assert_int(int(h.next_cost)).is_equal(2)
 	assert_float(float(h.skills.farming)).is_equal_approx(0.4, 0.0001)
 	assert_int(int(h.coins)).is_equal(230)
-	assert_str(str(h.today)).is_equal(str(P0Logic.today_lines(v)[0]))
+	# The Today icon has no words (q(107)): the red dot's keys, none for a crop still growing.
+	assert_bool(h.has("today")).is_false()
+	assert_array(h.today_dots).is_equal(P0Logic.today_dots(P0Logic.today_rows(v)))
+	assert_array(h.today_dots).is_empty()
 	assert_str(str(h.place.space)).is_equal("Homestead")
 	v.energy = {"value": 200, "max": 200, "next_in": null}
 	assert_str(str(P0Logic.hud_state(v).regen)).is_equal("Full")

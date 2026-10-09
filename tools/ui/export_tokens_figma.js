@@ -263,7 +263,7 @@ Object.assign(size, {
   energyTrackW: child(hudChip, 'Energy track').width, energyTrackH: child(hudChip, 'Energy track').height,
   hudCapsuleH: child(hudN, 'Coins capsule').height, inbox: child(hudN, 'Inbox capsule').width,
   unreadBadgeW: child(hudN, 'Inbox unread badge').width, unreadBadgeH: child(hudN, 'Inbox unread badge').height,
-  todayChipW: child(hudN, 'Today navigation').width,
+  todayIconW: child(hudN, 'Today navigation').width,   // SGODOT-271: the 32 x 24 Today icon pill (安其拉 renames the layer if needed)
   needTileRingL: child(ntL, 'Ring').width, needTileRingM: child(ntM, 'Ring').width, needTileRingS: child(ntS, 'Ring').width,
   needTileStrokeL: ringStroke(ntL), needTileStrokeM: ringStroke(ntM), needTileStrokeS: ringStroke(ntS),
   needTileIconL: child(ntL, 'Icon').width, needTileIconM: child(ntM, 'Icon').width, needTileIconS: child(ntS, 'Icon').width,

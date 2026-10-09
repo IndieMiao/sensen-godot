@@ -526,18 +526,21 @@ static func _hud_sample(state: Dictionary) -> UiHud:
 static func _huds() -> Control:
 	var col := VBoxContainer.new()
 	col.add_theme_constant_override(&"separation", 0)
-	var home := {city = "Shanghai", space = "Homestead", kind = UiHud.PlaceKind.HOME}
+	# The Today icon with its red dot on and off (q(107), SGODOT-271); the place chip in the rest of the row writes the
+	# city in full, the longest P0 place included (不知火舞 76ebeaad: 189 of its 261 px).
+	var home := {city = "San Francisco", space = "Homestead", kind = UiHud.PlaceKind.HOME}
 	var samples := [
 		{energy = 142, energy_max = 200, regen = "+1 in 2:40", skills = {farming = 0.6, fishing = 0.4}, coins = 230,
-			today = "Radishes ready in 1h 12m", place = home},
+			today_dot = false, place = home},
 		{energy = 1, energy_max = 200, next_cost = 2, regen = "+1 in 2:41", skills = {farming = 0.6, fishing = 0.3}, coins = 230,
-			unread = 3, buff = {icon = _tex("crop_herb"), remaining = "2h 59m"}, today = "Sow your first plot",
-			place = {city = "Shanghai", space = "Farmhouse", kind = UiHud.PlaceKind.HOME}},
-		{energy = 0, energy_max = 200, regen = "+1 in 3:59", coins = 12, unread = 12, today = "",
+			unread = 3, buff = {icon = _tex("crop_herb"), remaining = "2h 59m"}, today_dot = true,
+			place = {city = "San Francisco", space = "Farmhouse", kind = UiHud.PlaceKind.HOME}},
+		{energy = 0, energy_max = 200, regen = "+1 in 3:59", coins = 12, unread = 12, today_dot = false,
 			place = {city = "Tokyo", space = "Arrived", kind = UiHud.PlaceKind.FOREIGN, day_pass = "23h"}},
 		{energy = 200, energy_max = 200, regen = "Full", skills = {farming = 1.0, fishing = 1.0}, coins = 1840,
-			today = "Pond Catch · 2 Pond Crucian · Stall Board", place = {city = "Shanghai", space = "Willow Pond", kind = UiHud.PlaceKind.HOME}},
-		{energy = 214, energy_max = 200, regen = "Bonus +14", coins = 230, today = "Herb Grilled Fish ready at the stove", place = home},
+			today_dot = true, place = {city = "San Francisco", space = "Fern Pond", kind = UiHud.PlaceKind.HOME}},
+		{energy = 214, energy_max = 200, regen = "Bonus +14", coins = 230, today_dot = true,
+			place = {city = "San Francisco", space = "Union Square Travel Post", kind = UiHud.PlaceKind.HOME}},
 	]
 	for s in samples:
 		var screen := Control.new()
