@@ -28,6 +28,7 @@ const _RECIPE_PAD := 8.0          # the button's right edge at 328; also its gap
 const _RECIPE_ROW_GAP := 4.0      # a button too long for the corner: its own row under the facts (44 hit, 34 drawn)
 const _RECIPE_MAYBE_TOP := 43.4   # "You might have what it takes" under the fact line (226 33725b5e)
 const _COOK_W := 164.0
+const _FACTS_X := 57.4            # the title, state and effect lines start here
 const _MEDALLION := Rect2(9.4, 15.4, 38, 38)
 const _DISH_ICON := 27.0
 
@@ -55,6 +56,7 @@ var _recipe_icon: TextureRect
 var _recipe_title: Label
 var _recipe_state: Label
 var _recipe_effect: Label
+var _effect_parts: Array = []   # `+40 Energy`, `15 s`, `Soup`: as many as fit the effect line (_fit_effect)
 var _recipe_button: UiCommandButton
 var _recipe_nav: UiNavButton
 var _pages: UiInventoryGrid
@@ -241,7 +243,7 @@ func _show_page(id: String) -> void:
 	_recipe_icon.self_modulate = Color.WHITE if card.icon != null else UiTokens.COLOR_DISABLED
 	_recipe_title.text = card.title
 	_recipe_state.text = card.state
-	_recipe_effect.text = card.effect
+	_effect_parts = card.effect_parts
 	_recipe_maybe.text = card.maybe
 	_recipe_maybe.visible = card.maybe != ""
 	if card.nav != "":
@@ -263,15 +265,18 @@ func _layout_recipe() -> void:
 	var b := _recipe_button
 	var w := maxf(_RECIPE_BUTTON.x, b.get_combined_minimum_size().x)
 	var right := _RECIPE.x - _RECIPE_PAD
-	var facts := 57.4 + maxf(_text_width(_recipe_state), _text_width(_recipe_effect)) + _RECIPE_PAD
-	if right - w >= facts:
+	# The fact lines run up to 8 px short of what sits in the corner (不知火舞, 256 follow-up: not the 142 of the text box).
+	var beside := (right - w if b.visible else _recipe_nav.position.x) - _RECIPE_PAD - _FACTS_X
+	_fit_effect(beside)
+	if not b.visible or _text_width(_recipe_state) <= beside and _text_width(_recipe_effect) <= beside:
 		b.position = Vector2(right - w, _RECIPE_BUTTON_AT.y + extra)
 		b.size = Vector2(w, _RECIPE_BUTTON.y)
-	else:
+	else:   # a row of its own under the facts; the facts take the card's width
+		_fit_effect(right - _FACTS_X)
 		var top := _recipe_effect.position.y + _recipe_effect.size.y + _RECIPE_ROW_GAP
 		b.position = Vector2(_RECIPE_PAD, top)
 		b.size = Vector2(_RECIPE.x - _RECIPE_PAD * 2.0, _RECIPE_BUTTON.y)
-		if b.visible: h = top + _RECIPE_BUTTON.y + _RECIPE_ROW_GAP
+		h = top + _RECIPE_BUTTON.y + _RECIPE_ROW_GAP
 	_recipe.size = Vector2(_RECIPE.x, h)
 	_recipe_wrap.custom_minimum_size = Vector2(_RECIPE.x, h)
 
@@ -280,6 +285,16 @@ func _layout_recipe() -> void:
 ## theme is there.
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_THEME_CHANGED and _recipe_wrap != null and _recipe.visible: _layout_recipe.call_deferred()
+
+## The effect line in `room` px (不知火舞, 256 follow-up): `+40 Energy · 15 s · Soup`, the dish style dropped first and
+## then the time when it does not fit; the energy always stays.
+func _fit_effect(room: float) -> void:
+	_recipe_effect.size.x = room
+	var parts := _effect_parts.duplicate()
+	_recipe_effect.text = " · ".join(PackedStringArray(parts))
+	while parts.size() > 1 and _text_width(_recipe_effect) > room:
+		parts.pop_back()
+		_recipe_effect.text = " · ".join(PackedStringArray(parts))
 
 ## How wide a clipped label's text really is (clip_text makes its minimum width 0).
 static func _text_width(l: Label) -> float:

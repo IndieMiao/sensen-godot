@@ -65,7 +65,7 @@ func test_page_cards_put_the_gap_on_the_button() -> void:
 	var a := P0KitchenLogic.page_card(v, pages[0])
 	assert_str(a.title).is_equal("Grilled Crucian")
 	assert_str(a.state).is_equal("Common · Cooked")
-	assert_str(a.effect).is_equal("+20 Energy")
+	assert_str(a.effect).is_equal("+20 Energy · 5 s")   # 256 follow-up: energy · time · style (no style in this view)
 	assert_str(a.button).is_equal("Cook")
 	assert_str(P0KitchenLogic.page_card(v, pages[1]).reason).is_equal("Need Lettuce ×1")
 	# 256 ⑨ / q(92): known, not cooked yet — the one-off first-cook XP of its tier, never the word Tasted.
@@ -74,6 +74,7 @@ func test_page_cards_put_the_gap_on_the_button() -> void:
 	assert_str(P0KitchenLogic.page_card(v, pages[2]).reason).is_equal("Need River Perch ×1")
 	var unknown := P0KitchenLogic.page_card(v, pages[3])
 	assert_str(unknown.title).is_equal("Unknown dish")
+	assert_array(unknown.effect_parts).is_equal(["+40 Energy"])   # an unknown page: the energy only, no time or style
 	assert_str(unknown.state).is_equal("Fine · 2 ingredients")
 	assert_str(unknown.nav).is_equal("Try in Experiment")
 	assert_str(P0KitchenLogic.page_card(v, pages[4]).reason).is_equal("Cooking Lv4 · 3rd slot")
@@ -491,3 +492,22 @@ func test_the_events_of_a_pot_kept_on_its_own_are_told_from_the_commands() -> vo
 	var served := dish.duplicate()
 	served.erase("auto")
 	assert_array(P0KitchenLogic.auto_kept_events([bagged, served, xp])).is_empty()
+
+func test_the_effect_line_reads_energy_time_and_style_and_quick_fire_shortens_every_time() -> void:
+	# 不知火舞 (256 follow-up): a known page reads `+40 Energy · 15 s · Soup`; the time is the stove's own, 4 / 12 / 24 / 48 s
+	# after Quick Fire (Cooking Lv6), as the pot card's result line and Cook Again say it.
+	var v := _view()
+	var perch: Dictionary = P0KitchenLogic.pages(v)[2]   # Herb Baked Perch, Fine
+	perch["style"] = "Grilled"
+	var card := P0KitchenLogic.page_card(v, perch)
+	assert_array(card.effect_parts).is_equal(["+40 Energy", "15 s", "Grilled"])
+	assert_str(card.effect).is_equal("+40 Energy · 15 s · Grilled")
+	v.cooking.conveniences = ["cook_again", "quick_fire"]
+	v.cooking.tiers["4"] = {"energy": 70, "ms": 60000}
+	assert_str(P0KitchenLogic.cook_time(v, 1)).is_equal("4 s")
+	assert_str(P0KitchenLogic.cook_time(v, 2)).is_equal("12 s")
+	assert_str(P0KitchenLogic.cook_time(v, 3)).is_equal("24 s")
+	assert_str(P0KitchenLogic.cook_time(v, 4)).is_equal("48 s")
+	assert_str(P0KitchenLogic.page_card(v, perch).effect).is_equal("+40 Energy · 12 s · Grilled")
+	assert_str(P0KitchenLogic.preview(v, ["fish_crucian"]).time).is_equal("4 s")
+	assert_str(P0KitchenLogic.page_preview(v, perch).time).is_equal("12 s")
