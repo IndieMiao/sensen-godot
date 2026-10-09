@@ -27,7 +27,7 @@ signal section_changed(section: String)
 signal fitted
 
 const HEIGHT := 696.0           # drawer top at y 104 of 800 (FARM-6, NPC-2-2)
-const HEIGHT_DRINKS := 266.0    # NPC-6 / NPC-7-P0: keeper bar at y 540
+const HEIGHT_DRINKS := 276.0    # NPC-6 / NPC-7-P0: keeper bar at y 540 (16 under the top, clear of the handle; 不知火舞 on 265)
 ## A counter that buys nothing back (the P0 market, sell []): keeper bar, tabs and its rows only, until fit_height()
 ## shortens it to its content (q(48): the P0 market has no bag half; 不知火舞 on #56).
 const HEIGHT_NO_BAG := 420.0
@@ -41,7 +41,7 @@ const DRINK_NOTES := {"tea": "Counts across all tea houses · %d cups a day", "p
 const DRINK_SHORT := {"tea": "Tea", "post": "Coffee"}
 const SHELF_ROWS := 4           # FARM-6: four product rows, then the divider at y 428
 const _ROW_H := 58.0
-const _TOP_KEEPER := 6.0        # keeper bar at y 110
+const _TOP_KEEPER := 16.0       # keeper bar at y 120: under the drawer handle (8–12) with 4 to spare (不知火舞 on 265, A)
 const _TOP_STALL := 0.0         # stall title row (44, Close) at y 104, its chips right under it
 const _GAP := 8.0
 const _SMALL := 4.0

@@ -127,6 +127,25 @@ func test_post_desk_note_and_keeper() -> void:
 	assert_str(d.keeper_bar.note).is_equal("Shares the 3 cups a day with tea")
 	assert_float(d.height).is_equal(P0CounterDrawer.HEIGHT_DRINKS)
 
+## Every drawer has its handle 8–12 under the top (#196); a counter's keeper bar starts 16 under it, 4 clear of the
+## handle, and what follows moves down with it; the drink counters grow by those 10 (276) so nothing inside is squeezed
+## and their keeper bar stays at y 540 (不知火舞 on 265, A).
+func test_the_keeper_bar_sits_under_the_handle() -> void:
+	for role in ["tackle", "market", "tea", "post"]:
+		var d := _drawer(role, {"keeper": "Kim", "place": "Somewhere"})
+		await _settle()
+		assert_bool(d.handle).override_failure_message(role).is_true()
+		var top := d.get_global_rect().position.y
+		var bar := d.keeper_bar.get_global_rect().position.y
+		assert_float(bar - top).override_failure_message(role).is_equal(16.0)
+		assert_float(bar - (top + 12.0)).override_failure_message(role + ": clear of the handle").is_equal(4.0)
+		if role in P0CounterDrawer.DRINK_ROLES:
+			assert_float(d.height).is_equal(276.0)
+			assert_float(bar).is_equal(540.0)
+	var stall := _drawer("homestead")
+	await _settle()
+	assert_float(stall._shelf_box.get_global_rect().position.y).is_equal(192.0)   # the stall has no keeper bar: unchanged
+
 # ---------------------------------------------------------------- P0Ui entries
 
 func _ui() -> P0Ui:
