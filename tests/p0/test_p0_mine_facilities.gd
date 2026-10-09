@@ -145,6 +145,7 @@ func test_the_facilities_wear_world_prompts() -> void:
 	assert_str(mine._strip_open).is_equal("mine_down")
 	assert_bool(rt.ui._name_bars.has("mine_down")).is_true()
 	assert_bool(rt.ui._icons.has("mine_up") and rt.ui._icons.has("mine_elevator")).is_true()
+	for id in mine._facilities: assert_bool((mine._facilities[id].box as AABB).has_volume()).is_true()   # found once a floor
 	mine.p0_dev(PackedStringArray(["tapfac", "mine_down"]))   # right there: the card at once, in the strip's place
 	assert_bool(await _until(func(): return mine.card_shown())).is_true()
 	assert_bool(rt.ui._name_bars.get("mine_down").visible and not rt.ui._name_bars.get("mine_down").get_meta("folding", false)).is_false()

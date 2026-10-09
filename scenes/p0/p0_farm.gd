@@ -386,6 +386,9 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 	# The key is Farming here even at the mine mouth: the mouth is tapped like any facility (SGODOT-266, user on 263 ③).
 	rt.ui.set_action(P0Logic.main_action(v, _front, rt.ui.selected_seed, _row))
 	_card = P0Garden.pick_card(_card_candidates(), actor.position, _card)
+	# The mouth's EntryCard holds the farm's one card while it is up (LOCK-07: one at a time; 亚瑟 on #190): a gathering
+	# spot or the bench nearby keeps its button, never opens its strip beside it.
+	if _materials.card_wanted(): _card = "mine"
 	_materials.frame(v, _card)
 	_hold_repeat()
 	_prompts(v)
