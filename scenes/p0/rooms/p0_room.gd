@@ -535,10 +535,43 @@ func frame_all() -> void:
 	# Fits: the art fits the free band both ways at the player's scale, so the room holds still, centred in it.
 	_framed = _clamp_focus(_on_floor(right, up, forward, (_bounds_lo + _bounds_hi) * 0.5))
 	_fits = _clamp_focus(_on_floor(right, up, forward, _bounds_lo)).is_equal_approx(_framed)
-	# Otherwise straight onto the player (no slide in), kept inside the art (_update_camera).
-	_focus = _framed if _fits else actor.position
+	# Otherwise on the player and who the room is for (opening_focus, no slide in), kept inside the art (_update_camera).
+	_focus = _framed if _fits else opening_focus(right, up, forward)
 	_follow.hold()
 	_update_camera()
+
+## What the opening shot shows besides the player, most important first: groups of world points (an outpost's keeper
+## with the name tag over their head, then the counter; P0Outpost). [] keeps the opening on the player alone.
+func opening_subjects() -> Array:
+	return []
+
+## The opening shot of a room that does not fit at the player's scale (不知火舞 on 227, int12-pre: the tea house opened
+## with Ama off screen). Priority player > keeper and counter > the rest: the player with every opening_subjects()
+## group when they fit the free band together (the band _clamp_focus keeps: SIDE_MARGIN across, the HUD's bottom to
+## the bottom controls down), centred in it; otherwise the middle of the player and the first group (the keeper),
+## centred the same way. _update_camera then keeps it inside the art, as for any followed shot.
+func opening_focus(right: Vector3, up: Vector3, forward: Vector3) -> Vector3:
+	var groups := opening_subjects()
+	if groups.is_empty(): return actor.position
+	var view := _view()
+	var m := cam.size / maxf(view.x, 1.0)   # metres per px
+	var band_lo := Vector2(-(view.x * 0.5 - SIDE_MARGIN), -(view.y * 0.5 - _bottom_px().x)) * m
+	var band_hi := Vector2(view.x * 0.5 - SIDE_MARGIN, view.y * 0.5 - (_safe_top() + HUD_BOTTOM)) * m
+	var player := _screen_box([actor.position, actor.position + Vector3(0, 1.75, 0)], right, up)
+	var all := player
+	for g in groups: all = all.merge(_screen_box(g, right, up))
+	var mid := all.get_center()
+	if all.size.x > band_hi.x - band_lo.x or all.size.y > band_hi.y - band_lo.y:
+		mid = (player.get_center() + _screen_box(groups[0], right, up).get_center()) * 0.5
+	return _on_floor(right, up, forward, mid - (band_lo + band_hi) * 0.5)
+
+## The points' extent on the screen plane (along right; along up), in metres.
+func _screen_box(points: Array, right: Vector3, up: Vector3) -> Rect2:
+	var box := Rect2()
+	for i in points.size():
+		var q := Vector2((points[i] as Vector3).dot(right), (points[i] as Vector3).dot(up))
+		box = Rect2(q, Vector2.ZERO) if i == 0 else box.expand(q)
+	return box
 
 ## The point on the floor under the screen-plane point q = (along right, along up): moved along the view axis.
 func _on_floor(right: Vector3, up: Vector3, forward: Vector3, q: Vector2) -> Vector3:

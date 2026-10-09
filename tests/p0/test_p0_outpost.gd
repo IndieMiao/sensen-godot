@@ -662,3 +662,23 @@ func _assert_player_scale_framing(r: P0Room, label: String) -> void:
 			assert_float(absf(float(e.top) - float(e.bottom))).override_failure_message("%s centred down %s" % [label, e]).is_less(1.0)
 		else:   # taller than the band: the art's edge on the band's
 			assert_float(minf(absf(float(e.top)), absf(float(e.bottom)))).override_failure_message("%s down %s" % [label, e]).is_less(0.5)
+
+## The opening shot shows the keeper (不知火舞 on 227, int12-pre: the tea house opened with Ama off screen). Priority
+## player > keeper and counter > the rest: on a phone the player, the keeper's feet and the whole name tag over their
+## head are on screen, the tag's anchor inside the band world marks show in (below the HUD, above the bottom controls).
+func test_the_opening_shot_shows_the_player_and_the_keeper_with_the_whole_name_tag() -> void:
+	for o in P0Outposts.all():
+		var r := _room(str(o.id), true)
+		await get_tree().process_frame
+		r.p0_frame({}, 1.0 / 30.0)
+		var view := r._view()
+		var band := Rect2(0.0, P0Room.HUD_BOTTOM, view.x, view.y - P0Room.HUD_BOTTOM - r._bottom_px().x)
+		for p in [r.actor.position, r.actor.position + Vector3(0, 1.75, 0)]:
+			assert_bool(band.has_point(r.cam.unproject_position(p))).override_failure_message("%s player %s" % [o.id, r.cam.unproject_position(p)]).is_true()
+		var groups: Array = r.opening_subjects()
+		assert_array(groups).override_failure_message(str(o.id)).is_not_empty()
+		for p in groups[0]:   # the keeper's feet and the tag's two top corners
+			var at := r.cam.unproject_position(p)
+			assert_bool(Rect2(Vector2.ZERO, view).has_point(at)).override_failure_message("%s keeper %s" % [o.id, at]).is_true()
+		var head := r.cam.unproject_position((r.npcs.npc_keeper.root as Node3D).to_global(OutpostScript.NAME_OVER_HEAD))
+		assert_bool(band.has_point(head)).override_failure_message("%s tag anchor %s" % [o.id, head]).is_true()
