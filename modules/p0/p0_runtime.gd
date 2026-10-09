@@ -988,10 +988,12 @@ func _dev_shot(dt: float) -> void:
 				if ui._bag != null and is_instance_valid(ui._bag) and not ui._bag.grid.shown_items().is_empty():
 					ui._bag.grid.select(step[1] if step.size() > 1 else str(ui._bag.grid.shown_items().back().id))
 			"energy": ui.open_energy_card(3, "Sow ×1")
-			"todayshow":   # todayshow:<i> — Today opened and row i's Show pressed (q(99) shots)
+			"todayshow":   # todayshow:<i | go> — Today opened and Show pressed on row i, or on the row going there (q(99) shots)
+				var want := step[1] if step.size() > 1 else "0"
+				var i := int(want) if want.is_valid_int() else P0Logic.today_rows(ui.view).map(func(r): return str(r.go)).find(want)
 				ui.open_today()
 				for c in ui.find_children("*", "Control", true, false):
-					if c is UiTodayPanel: (c as UiTodayPanel).show_pressed.emit(int(step[1]) if step.size() > 1 else 0)
+					if c is UiTodayPanel and i >= 0: (c as UiTodayPanel).show_pressed.emit(i)
 			"close": ui.close_modal()
 			"auto":
 				P0FishingPanel.auto_play = true
