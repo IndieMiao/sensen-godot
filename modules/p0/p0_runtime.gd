@@ -30,6 +30,9 @@ var _shot_script: Array = []
 var last_xp_lines: Array = []
 ## First-catch bonus of the last state change (FISH-3 gold chip); 0 when the species was caught before.
 var last_first_catch_xp := 0
+## A landed catch the world shows itself (the P0 pond's arc to the hand) keeps its reply's floats here until the fish is
+## in the hand; the world lets them rise then (take_catch_floats; 不知火舞 on 231: `+25 XP` crossed the fish in flight).
+var catch_floats: Array = []
 var last_catch_extras := {}   # the same response's New city XP and first-fish Energy, for the Caught! card
 ## What to do once the map is back on top (FISH-4 Go home, FISH-5 Tackle Shop): "farm" / "tackle".
 var after_leave := ""
@@ -332,6 +335,12 @@ func _on_action(cmd: Dictionary) -> void:
 		return
 	if not cmd.is_empty(): _call("p0_action", [cmd])
 
+## The floats a landed catch's reply held for the world (catch_floats), handed over once: the world lets them rise.
+func take_catch_floats() -> Array:
+	var held := catch_floats
+	catch_floats = []
+	return held
+
 func anchor() -> Vector2:
 	var at = _call("p0_anchor", [])
 	return at if at is Vector2 else get_viewport().get_visible_rect().size * Vector2(0.5, 0.42)
@@ -357,6 +366,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	last_first_catch_xp = 0
 	last_catch_extras = {}
 	var settles_catch := events.any(func(e): return str(e.get("kind", "")) == "catch")
+	var world_lands := false   # the world shows this reply's landed fish: its floats wait for the hand
 	# A first's bonus XP is said by its own line, not added into the XP float: the first cook's and catch's on their
 	# card's strip (Li Bai, int6 C11), the first harvest's as `First harvest! +10 XP · Radish` (§4.8.6).
 	var first_cook_xp: Array = []
@@ -455,8 +465,9 @@ func _on_state(v: Dictionary, events: Array) -> void:
 					if levelled: parcel_notice = notice
 					else: ui.inbox_notice_when_clear(notice)
 			"catch":
-				# A world that shows the catch itself (the open fishing panel) returns true.
-				if not bool(_call("p0_event", [ev, v])): _on_catch(ev, xp_lines)
+				# A world that shows the catch itself (the open fishing panel) returns true; none at all gives null.
+				if _call("p0_event", [ev, v]) == true: world_lands = str(ev.get("result", "")) == "landed"
+				else: _on_catch(ev, xp_lines)
 			"cast", "pot", "cabinet", "plate", "first", "mishap", "queue":
 				_call("p0_event", [ev, v])
 			"dish":
@@ -512,6 +523,10 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				ui.queue_card(func(): HomePanel.moment(ui, home))   # one moment at a time (q(49) ④)
 	# After the loop, so it is queued behind the level-up banner (itself deferred) even when the parcel came first.
 	if not parcel_notice.is_empty(): ui.inbox_notice_when_clear.call_deferred(parcel_notice)
+	# Any catch resets what is held: a player who left the pond mid-arc never let the last fish's floats rise, and an
+	# escape after that must not float them (刘邦 on #154).
+	if settles_catch: catch_floats = floats if world_lands else []
+	if world_lands: floats = []
 	ui.queue_floats(floats, at)   # with the world's own lines of this reply, at the end of the frame
 	if ui.modal_kind == "counter" and events.size() > 0:
 		ui.set_view(session.current())   # the counter drawer follows the view; floats say what changed
@@ -523,8 +538,9 @@ func _on_state(v: Dictionary, events: Array) -> void:
 ## FISH-3 / FISH-5 (§6.6, 16 · FISH-2 → 3 / 5): the first catch of a species gets the catch card, later
 ## ones a float; a gate break-free gets the four-line card once per species, then "Got away · Lv4";
 ## a plain escape is a float ("It got away · 3 Energy back", or the protection wording). `at` is where
-## floats rise (the cast point when the pond knows it).
-func _on_catch(ev: Dictionary, _xp_lines: Array, at := Vector2.INF) -> void:
+## floats rise (over the player's head for a landed fish, the cast point for an escape, when the pond knows
+## them); `card_after` holds the Caught! card that long after the reply's floats there (不知火舞 on 231 / #154).
+func _on_catch(ev: Dictionary, _xp_lines: Array, at := Vector2.INF, card_after := 0.0) -> void:
 	var where := at if at.is_finite() else anchor()
 	var v := session.current()
 	match str(ev.result):
@@ -534,9 +550,12 @@ func _on_catch(ev: Dictionary, _xp_lines: Array, at := Vector2.INF) -> void:
 			if last_first_catch_xp > 0:
 				var first := last_first_catch_xp
 				var extras := last_catch_extras.duplicate()
-				ui.queue_card(func(): ui.show_catch(fid, r, first, extras))
-			else:   # a repeat species: no card, `Pond Crucian ×1` beside its +XP (§4.8.6)
-				ui.float_text("%s ×1" % P0Logic.item_name(v, fid), where, UiFloatText.Tone.ITEM, P0Logic.icon(fid))
+				var card := func(): ui.queue_card(func(): ui.show_catch(fid, r, first, extras))
+				if card_after > 0.0: get_tree().create_timer(card_after).timeout.connect(card)
+				else: card.call()
+			else:   # a repeat species: no card, `Pond Crucian ×1` beside its +XP (§4.8.6) — one group, Energy → XP → items
+				ui.queue_floats([{kind = "item", key = "catch:" + fid, text = "%s ×1" % P0Logic.item_name(v, fid),
+					tone = UiFloatText.Tone.ITEM, icon = P0Logic.icon(fid)}], where)
 		"broke_free":
 			var gone: Dictionary = ev
 			if ui.first_time("gotaway:" + str(ev.fish)):
@@ -582,13 +601,19 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 		"rest_used":
 			ui.toast_error("Rest used today")
 		"not_home":
-			ui.toast_error("At home only")
+			# The upgrade away from home says what HOME-1's grey button says (不知火舞 / 李白, #150); other commands stay short.
+			ui.toast_error(P0Logic.HOME_AWAY_TAP if str(cmd.get("type", "")) == "homestead_upgrade" else "At home only")
 		"need_material", "skills_short", "max_level":
-			# The shops and the workbench refuse with need_material too: only the upgrade reads HOME-1's gap.
-			if str(cmd.get("type", "")) == "homestead_upgrade": ui.toast_error(P0Logic.home_panel(session.current()).reason)
+			# The shops and the workbench refuse with need_material too: only the upgrade reads HOME-1's gap — from where the
+			# player is, and from the server's detail when the fresh view has no gap left to name (后裔 on #150).
+			var gap := _home_gap() if str(cmd.get("type", "")) == "homestead_upgrade" else ""
+			if gap != "": ui.toast_error(gap)
 			elif code == "need_material":
 				ui.toast_error("Need %d more %s" % [int(detail.get("need", 0)) - int(detail.get("have", 0)),
 					P0Logic.item_name(session.current(), str(detail.get("item", "")))])
+			elif code == "skills_short":   # HOME-1's own wording (appendix B), never the code (后裔 on #152)
+				ui.toast_error("Skills total %d needed · now %d" % [int(detail.get("need", 0)), int(detail.get("have", 0))])
+			elif code == "max_level": ui.toast_error("Highest level for now")
 			else: ui.toast_error("Can't do that (%s)" % code)
 		"energy_full":
 			ui.toast_error("Energy full · eat later" if str(cmd.get("type", "")) == "eat" else "Energy full")
@@ -622,6 +647,11 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 			pass   # a retry of something the server already applied; the returned state re-renders the screen
 		_:
 			ui.toast_error("Can't do that (%s)" % code)
+
+## HOME-1's line for a refused upgrade: the tap line away from home, else the first gap; "" when the view shows none.
+func _home_gap() -> String:
+	var hp := P0Logic.home_panel(session.current(), ui.space_here() == "home")
+	return str(hp.tap) if str(hp.tap) != "" else str(hp.reason)
 
 ## P0_SHOT counters away from the outposts: the keeper ctx the outpost would pass (assets/p0/p0_outposts.json, SGODOT-227).
 static func _dev_ctx(role: String) -> Dictionary:
@@ -1023,6 +1053,11 @@ func _dev_shot(dt: float) -> void:
 			"energypanel": ui.open_energy_panel()
 			"inbox": ui.open_inbox()
 			"inboxdemo": _dev_inbox(step[1] if step.size() > 1 else "parcels")   # inboxdemo:parcels|full|updates|todo (234)
+			"homeaway":   # HOME-1 from the Profile farm card away from home (At home); homeaway:tap also taps the grey button
+				HomePanel.open(ui, false)
+				if step.size() > 1 and ui._modal != null:
+					for b in ui._modal.find_children("*", "UiCommandButton", true, false):
+						(b as UiCommandButton).unavailable_pressed.emit((b as UiCommandButton).reason)
 			"workbench": ui.open_workbench(step[1] if step.size() > 1 else "")   # SGODOT-231 B2-06 drawer, tools / supplies
 			"toasterr": ui.toast_error(step[1] if step.size() > 1 else "Need 1 more Copper Ore")   # a refusal's Error toast (233)
 			"inboxnotice":   # inboxnotice[:more|:full|:gift] — the Sent to Inbox card under the bell (BAG-5-2, q(87) / q(88); 234)

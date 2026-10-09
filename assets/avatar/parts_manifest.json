@@ -577,6 +577,80 @@
 			"thumb": "res://assets/avatar/thumbs/hairhat80_npc_ama.png",
 			"tier": 0,
 			"unity_guid": "9d01a54960b00f843a9fb624ef0339bb"
+		},
+		{
+			"attach": "mesh",
+			"id": "cloth12_npc_finn",
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/cloth12_npc_finn.res",
+			"slot": "cloth",
+			"thumb": "res://assets/avatar/thumbs/cloth12_npc_finn.png",
+			"tier": 0,
+			"unity_guid": "f8fd8eee0da6ca84cb1256e313faa652"
+		},
+		{
+			"attach": "socket",
+			"id": "hairhat36_npc_sigrid",
+			"offset": {
+				"pos": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"rot": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/hairhat36_npc_sigrid.res",
+			"slot": "hairHat",
+			"thumb": "res://assets/avatar/thumbs/hairhat36_npc_sigrid.png",
+			"tier": 0,
+			"unity_guid": "d4f6b64264dd2d74598f8af604f7e578"
+		},
+		{
+			"attach": "mesh",
+			"id": "cloth36_npc_sigrid",
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/cloth36_npc_sigrid.res",
+			"slot": "cloth",
+			"thumb": "res://assets/avatar/thumbs/cloth36_npc_sigrid.png",
+			"tier": 0,
+			"unity_guid": "802c20106c368dd419da3067bbecc119"
+		},
+		{
+			"attach": "socket",
+			"id": "hairhat36_npc_pip",
+			"offset": {
+				"pos": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"rot": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/hairhat36_npc_pip.res",
+			"slot": "hairHat",
+			"thumb": "res://assets/avatar/thumbs/hairhat36_npc_pip.png",
+			"tier": 0,
+			"unity_guid": "d4f6b64264dd2d74598f8af604f7e578"
 		}
 	],
 	"version": 1

@@ -1255,15 +1255,18 @@ static func rest_state(view: Dictionary) -> Dictionary:
 		out.merge({"state": "full", "reason": "Energy full", "can_rest": false}, true)
 	return out
 
+## HOME-1 away from home: the toast for a tap on the grey `At home` button, and for an upgrade refused not_home.
+const HOME_AWAY_TAP := "Upgrade at home · Going home is free"
+
 ## HOME-1 (Figma 482:152, §8.6.1, LOCK-10) from view.homestead facts: title, the look line, NEED-TILEs in order
 ## materials → coins → skills, what changes, and the button (the first gap is written on it). P0 stops at Lv3.
-## {title, look, tiles: [{id, name, have, need, icon}], changes: [{icon, text, note}], label, reason, footer, max}
+## {title, look, tiles: [{id, name, have, need, icon}], changes: [{icon, text, note}], label, reason, tap, footer, max}
 static func home_panel(view: Dictionary, at_home := true) -> Dictionary:
 	var h: Dictionary = view.get("homestead", {})
 	var level := int(h.get("level", 1))
 	var next = h.get("next", null)
 	var out := {"title": "Homestead Lv%d" % level, "look": "", "tiles": [], "changes": [], "label": "Upgrade",
-		"reason": "", "footer": "Upgrading is free of Energy · fills Energy to the new max", "max": next == null}
+		"reason": "", "tap": "", "footer": "Upgrading is free of Energy · fills Energy to the new max", "max": next == null}
 	if next == null:
 		out.reason = "Highest level for now"
 		return out
@@ -1287,9 +1290,13 @@ static func home_panel(view: Dictionary, at_home := true) -> Dictionary:
 				out.changes.append({"icon": "bag", "text": "Bag Upgrade I for sale · 150 coins",
 					"note": "Bag %d → %d" % [int(view.get("bag", {}).get("capacity", 25)), int(view.get("bag", {}).get("capacity", 25)) + 5]})
 			"board_slot_3": out.changes.append({"icon": "board", "text": "Stall Board · 3rd slot", "note": "now %d" % board_now})
-	# The first gap in tile order goes on the button (LOCK-10); away from home the button says how to get there.
+	# The first gap in tile order goes on the button (LOCK-10). Away from home (HOME-1 from the Profile farm card,
+	# §10.6.2) the button is grey with `At home`, as the Energy card's Cook / Rest tiles (q(6)); a tap says
+	# `Upgrade at home · Going home is free` and sends nothing. Going home is the place chip / the map, not a button
+	# here (k(1), q(83); 不知火舞 and 李白, 2026-10-09).
 	if not at_home:
-		out.reason = "Go home to upgrade · Free"
+		out.reason = "At home"
+		out.tap = HOME_AWAY_TAP
 		return out
 	for t in out.tiles:
 		if int(t.have) >= int(t.need): continue

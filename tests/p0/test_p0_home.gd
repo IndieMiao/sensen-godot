@@ -39,7 +39,13 @@ func test_the_button_carries_the_first_gap_in_tile_order() -> void:
 	var ready := P0Logic.home_panel(v)
 	assert_str(str(ready.reason)).is_equal("")
 	assert_str(str(ready.label)).is_equal("Upgrade")
-	assert_str(str(P0Logic.home_panel(v, false).reason)).is_equal("Go home to upgrade · Free")
+	# Away from home (the Profile farm card): grey `At home`, like the Energy card (q(6)), even with every Need met.
+	var away := P0Logic.home_panel(v, false)
+	assert_str(str(away.reason)).is_equal("At home")
+	assert_str(str(away.tap)).is_equal("Upgrade at home · Going home is free")
+	assert_str(str(ready.tap)).is_empty()                     # at home a tap says the gap itself
+	assert_array(away.tiles).has_size(ready.tiles.size())     # the Needs still read away from home
+	assert_array(away.changes).has_size(ready.changes.size())
 
 func test_lv1_to_lv2_lists_the_spice_rack_and_no_look_line() -> void:
 	var v := _view(1)
@@ -88,12 +94,36 @@ func test_home_1_lays_out_tiles_changes_and_the_gap_on_the_button() -> void:
 	assert_array(tiles.map(func(t): return (t as UiNeedTile).item_name)).is_equal(["Timber", "Stone", "Reeds", "Clay", "Rock Salt", "Coins", "Skills"])
 	var button: UiCommandButton = ui.find_children("*", "UiCommandButton", true, false)[0]
 	assert_str(button.reason).is_equal("Need 6 more Timber")
+	button.unavailable_pressed.emit(button.reason)
+	assert_str(ui.toast_text()).is_equal("Need 6 more Timber")   # at home a grey tap says the gap itself
 	var sent: Array = []
 	ui.command.connect(func(cmd): sent.append(cmd))
 	button.activated.emit()   # the kit only emits activated when ready; here the host wiring is what's under test
 	assert_array(sent).is_equal([{"type": "homestead_upgrade"}])
 	(ui.find_children("*", "UiDismissButton", true, false)[0] as Button).pressed.emit()
 	assert_bool(ui.has_modal()).is_false()
+
+## From the Profile farm card away from home (§10.6.2; 不知火舞 and 李白): the same sheet, the button grey with `At home`;
+## a tap says `Upgrade at home · Going home is free` and sends nothing, even with every Need met.
+func test_home_1_away_from_home_greys_the_button_with_at_home() -> void:
+	var v := _view()
+	v.homestead.next.materials[0].have = 16   # every Need met: only the place stops it
+	v.homestead.next.can_upgrade = true
+	var ui := _ui(v)
+	HomePanel.open(ui, false)
+	assert_str(ui.modal_kind).is_equal("homestead")
+	assert_array(ui.find_children("*", "UiNeedTile", true, false)).has_size(7)
+	var button: UiCommandButton = ui.find_children("*", "UiCommandButton", true, false)[0]
+	assert_str(button.reason).is_equal("At home")
+	var sent: Array = []
+	ui.command.connect(func(cmd): sent.append(cmd))
+	await get_tree().process_frame   # laid out, as when a player taps it
+	button.unavailable_pressed.emit(button.reason)
+	assert_array(sent).is_empty()
+	assert_str(ui.toast_text()).is_equal("Upgrade at home · Going home is free")
+	# q(16) (不知火舞 on #150): over the sheet's fixed decision area — the toast's bottom 8 above the button, not under the HUD.
+	var toast: Control = ui._toasts._panel
+	assert_float(toast.get_global_rect().end.y).is_equal_approx(button.get_global_rect().position.y - UiTokens.SPACE_OVERLAY_BODY, 1.0)
 
 func test_home_1_at_max_level_has_no_tiles_and_says_so() -> void:
 	var v := _view(3)
@@ -215,6 +245,30 @@ func test_need_material_from_a_shop_or_the_workbench_names_its_own_gap() -> void
 	assert_str(rt.ui.toast_text()).is_equal("Need 2 more Copper Ore")
 	rt._on_refused("need_material", {"item": "wood", "need": 16, "have": 10}, {"type": "homestead_upgrade"})
 	assert_str(rt.ui.toast_text()).is_equal("Need 6 more Timber")   # HOME-1's gap, in tile order
+
+## A refused upgrade (后裔 on #150): away from home it says what HOME-1's grey button says; when the fresh view shows no gap
+## any more (it changed under the tap) the server's detail names it instead of an empty toast.
+func test_a_refused_upgrade_says_where_and_what_is_missing() -> void:
+	var rt: P0Runtime = auto_free(P0Runtime.new())
+	add_child(rt)
+	await get_tree().process_frame
+	rt.session.view = _view()
+	rt.session.view["names"] = {"wood": "Timber"}   # the server's names, as in a real view
+	rt._on_refused("not_home", {}, {"type": "homestead_upgrade"})
+	assert_str(rt.ui.toast_text()).is_equal("Upgrade at home · Going home is free")
+	rt._on_refused("not_home", {}, {"type": "rest"})
+	assert_str(rt.ui.toast_text()).is_equal("At home only")                     # other commands stay short
+	rt.ui.space = "pond"                                                         # HOME-1's line from where the player is
+	rt._on_refused("need_material", {"item": "wood", "need": 16, "have": 10}, {"type": "homestead_upgrade"})
+	assert_str(rt.ui.toast_text()).is_equal("Upgrade at home · Going home is free")
+	rt.ui.space = "home"
+	rt.session.view.homestead.next.materials[0].have = 16                        # the view has no gap left
+	rt._on_refused("need_material", {"item": "wood", "need": 16, "have": 15}, {"type": "homestead_upgrade"})
+	assert_str(rt.ui.toast_text()).is_equal("Need 1 more Timber")
+	rt._on_refused("skills_short", {"need": 5, "have": 4}, {"type": "homestead_upgrade"})
+	assert_str(rt.ui.toast_text()).is_equal("Skills total 5 needed · now 4")   # never "Can't do that (skills_short)"
+	rt._on_refused("max_level", {"level": 3}, {"type": "homestead_upgrade"})
+	assert_str(rt.ui.toast_text()).is_equal("Highest level for now")
 
 func test_the_sign_prompt_reads_its_level_and_lights_ready() -> void:
 	# WORLD-HINT-5 (228 64c75e54, SGODOT-250): the house mark, Ready once the Needs are met; open: `Homestead LvN`.
