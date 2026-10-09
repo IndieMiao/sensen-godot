@@ -431,7 +431,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				var cook := str(ev.skill) == "cooking"
 				var nth := int(ev.get("nth", 0))   # a pot's place among today's pots of its page (q(94))
 				if cook and nth >= 3 and int(ev.amount) <= 0:   # the 3rd pot of a page on: no XP, and the float says why
-					floats.append({kind = "xp", key = "cook_nth", text = "No XP · %s today" % P0KitchenLogic.ordinal(nth), tone = UiFloatText.Tone.XP})
+					floats.append({kind = "xp", key = "cook_nth", text = "No XP · %s today" % P0KitchenLogic.ordinal(nth), tone = UiFloatText.Tone.MUTED})
 				elif int(ev.amount) > 0 and not first_cook_xp.any(func(x): return is_same(x, ev)):
 					# A pot's own XP names its track and a Good / Perfect pot's star: +5 Cooking XP ★ (§4.8.6 / §7.2.2);
 					# the 2nd pot of a page today says so instead of a percentage: +10 Cooking XP ★ · 2nd today (q(94)).

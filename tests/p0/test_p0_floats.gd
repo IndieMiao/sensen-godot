@@ -186,6 +186,7 @@ func test_a_pots_xp_float_says_the_2nd_and_3rd_of_its_page_today() -> void:
 		return _floats(rt.ui).map(func(f): return f.text)
 	assert_array(await said.call([{"kind": "xp", "skill": "cooking", "amount": 3, "percent": 75, "nth": 2}])).is_equal(["+3 Cooking XP · 2nd today"])
 	assert_array(await said.call([{"kind": "xp", "skill": "cooking", "amount": 0, "percent": 100, "nth": 3}])).is_equal(["No XP · 3rd today"])
+	assert_int(_floats(rt.ui)[0].tone).is_equal(UiFloatText.Tone.MUTED)   # nothing gained: secondary ink (不知火舞 on #158)
 	assert_array(await said.call([{"kind": "xp", "skill": "cooking", "amount": 0, "percent": 100, "nth": 4}])).is_equal(["No XP · 4th today"])
 	assert_array(await said.call([{"kind": "xp", "skill": "cooking", "amount": 3, "percent": 75, "nth": 1}])).is_equal(["+3 Cooking XP · 75%"])
 	assert_array(await said.call([{"kind": "xp", "skill": "cooking", "amount": 0, "percent": 100}])).is_empty()   # no pot place: nothing, as before

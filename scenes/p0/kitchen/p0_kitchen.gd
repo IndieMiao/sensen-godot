@@ -551,7 +551,7 @@ func _judge_tap() -> bool:
 		if _ring:
 			_ring.result = 1 if hit else 0
 			_ring.mark_turn = _judged_turn[i]
-		rt.ui.float_text(heat_float(hit, _judged.values().count(true)), float_from(_judged_turn[i]), UiTokens.COLOR_GOLD_INK if hit else UiTokens.COLOR_SECONDARY)
+		rt.ui.float_text(heat_float(hit, _judged.values().count(true)), float_from(_judged_turn[i]), UiTokens.COLOR_GOLD_INK if hit else UiFloatText.Tone.MUTED)
 		if hit: Input.vibrate_handheld(40)
 		return true
 	return false
@@ -598,7 +598,7 @@ func _process(_dt: float) -> void:
 		if not _judged.has(i) and e > float(h.at) + float(h.spin):
 			_judged[i] = false
 			_judged_turn[i] = 1.0   # the needle went round untouched: its dot where it stopped
-			rt.ui.float_text("Missed · still cooking", float_from(1.0), UiTokens.COLOR_SECONDARY)
+			rt.ui.float_text("Missed · still cooking", float_from(1.0), UiFloatText.Tone.MUTED)
 		if e >= float(h.at) - RING_EARLY_MS and e <= float(h.at) + float(h.spin) + 350.0: active = i
 	if _ring:
 		_ring.visible = active >= 0
