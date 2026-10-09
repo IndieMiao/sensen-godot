@@ -1034,6 +1034,7 @@ func _dev_shot(dt: float) -> void:
 					press.pressed = false
 					sp._gui_input(press)
 			"resident": ui.open_resident(step[1] if step.size() > 1 else "res_pip")   # SGODOT-225 dialogue bar
+			"resreq": ui.open_resident_request(step[1] if step.size() > 1 else "res_pip")   # the request card (q(104) shots)
 			"creel":   # creel:0 — the creel badge's states for shots: the bag's free slots set locally (235 B1)
 				var cv: Dictionary = session.view.duplicate(true)
 				cv["bag"] = cv.get("bag", {}).duplicate()

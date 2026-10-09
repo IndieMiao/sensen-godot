@@ -14,6 +14,7 @@ const P0_FARM_CHOICE := {"layout_patch_id": "sh_a", "revision": 2}
 const P0_OUTPOST := "res://scenes/p0/p0_outpost.tscn"
 const NEAREST_POND := "pond_shanghai_05"   # Reed Pond, the closest to home
 const PondCard := preload("res://modules/p0/p0_pond_card.gd")
+const PinReason := preload("res://modules/p0/p0_pin_reason.gd")   # why a pin wears its mark (q(103))
 ## Online counts on the outpost pins (GET /p0/presence), refreshed while the map is on top.
 const PRESENCE_S := 15.0
 ## Show on map lands this close (the outpost / pond pins and the homestead read at this zoom).
@@ -138,6 +139,7 @@ func _open_pond_card(entry: Dictionary, info: Dictionary) -> void:
 	var id := str(entry.id)
 	var to_fish := [false]
 	var spec := P0PlaceSheet.for_here(info, is_here("pond", id))
+	spec["reason"] = PinReason.reason(_view(), id)   # q(103): why the pin wears its mark, under the subtitle
 	P0PlaceSheet.open(rt.ui, spec,
 		func():
 			rt.ui.close_modal()
@@ -304,15 +306,19 @@ func place_card(entry: Dictionary) -> Dictionary:
 	var to := Vector2(float(entry.get("lat", 0.0)), float(entry.get("lng", 0.0)))
 	var distance := ["Distance", P0PlaceSheet.distance_text(P0PlaceSheet.km_between(_origin(), to))]
 	if id == HOME_PIN:
-		return P0PlaceSheet.for_here({"title": "Homestead", "subtitle": "Your farm", "facts": [distance],
-			"primary": "Go home · Free"}, not away())
+		return P0PlaceSheet.for_here({"title": "Homestead", "subtitle": "Your farm", "reason": PinReason.reason(_view(), id),
+			"facts": [distance], "primary": "Go home · Free"}, not away())
 	var o := P0Outposts.find(id)
 	if o.is_empty(): return {}
 	var facts: Array = [distance]
 	var online := int(_online.get(id, 0))
 	if online > 0: facts.append(["Online now", str(online)])
-	return P0PlaceSheet.for_here({"title": str(o.name), "subtitle": str(o.category), "facts": facts, "primary": "Go"},
-		is_here("outpost", id))
+	return P0PlaceSheet.for_here({"title": str(o.name), "subtitle": str(o.category), "reason": PinReason.reason(_view(), id),
+		"facts": facts, "primary": "Go"}, is_here("outpost", id))
+
+## The view as received (no copy, as _pond_info); {} before a session.
+func _view() -> Dictionary:
+	return rt.session.view if rt != null and rt.session != null else {}
 
 ## Go / Back to: the homestead's opens the farm, an outpost's its room (re-entered through the loading cover when the
 ## player was there, q(80)). Tapping outside closes the card and clears the selection.
@@ -675,7 +681,7 @@ func p0_frame(view: Dictionary, _dt: float) -> void:
 const MARK_STATES := {"deliver": "deliverable", "request": "request", "new": "new"}
 
 ## The pins' marks [{id, state}]: the server's view.map_markers whenever it sends them (蒙恬, SGODOT-232 U6), else
-## the ones the client knows before then (tutorial_marks).
+## the ones the client knows before then (tutorial_marks). The homestead's goes on the farm pin (home_mark).
 static func pin_marks(view: Dictionary) -> Array:
 	return marks_from(view) if view.has("map_markers") else tutorial_marks(view)
 
@@ -690,14 +696,17 @@ static func marks_from(view: Dictionary) -> Array:
 		if state != "" and place != "" and place != "home": out.append({"id": place, "state": state})
 	return out
 
-## Map markers the client knows before the server's map_markers come (蒙恬 on #83, q(48)): while the tutorial Pond
-## Catch is on the stall's board and still short of its fish, the beginner pond Today points at wears the Request ! —
-## so the first session's map shows it at the city level beside the Tackle Shop, 200 m away (CityMapView packs marker
-## pins first). Read off the board like the guide (P0Guide.tutorial), not req_done: that keeps only the last 20.
+## Map markers the client knows before the server's map_markers come (蒙恬 on #83, q(48); the server's rule since
+## q(103) ④, PinReason.fallback): once the tutorial Pond Catch is taken and while it is still short of its fish, the
+## beginner pond Today points at wears the Request ! — at the city level beside the Tackle Shop, 200 m away
+## (CityMapView packs marker pins first). Untaken it marks no pond: its ! is the stall's own. With the fish in the bag
+## the ✓ goes on the homestead (home_mark). Read off the board like the guide (P0Guide.tutorial), not req_done: that
+## keeps only the last 20.
 static func tutorial_marks(view: Dictionary) -> Array:
-	var t := P0Guide.tutorial(view)
-	if t.is_empty() or int(t.get("have", 0)) >= int(t.get("qty", 1)): return []   # handed in, or off to the stall
-	return [{"id": NEAREST_POND, "state": "request"}]
+	var out: Array = []
+	for m in PinReason.fallback(view):
+		if str(m.place) != HOME_PIN: out.append({"id": str(m.place), "state": str(MARK_STATES.get(str(m.kind), ""))})
+	return out
 
 ## CityMapView asks once per update (#83): the same marks by pin id, the first (highest) mark per pin.
 func city_pin_markers() -> Dictionary:
@@ -710,10 +719,11 @@ func city_pin_markers() -> Dictionary:
 	return out
 
 ## The homestead's mark ("deliverable" when a Stall Board request can be handed in; 蒙恬's server only sends
-## deliver for home), drawn on the farm pin by FarmMarkers; "" for none.
+## deliver for home, and the client's own first-session marks give it the taken Pond Catch's ✓, q(103)), drawn on the
+## farm pin by FarmMarkers; "" for none.
 static func home_mark(view: Dictionary) -> String:
-	for m in view.get("map_markers", []):
-		if m is Dictionary and str(m.get("place", "")) == "home": return str(MARK_STATES.get(str(m.get("kind", "")), ""))
+	for m in PinReason.markers(view):
+		if str(m.get("place", "")) == HOME_PIN: return str(MARK_STATES.get(str(m.get("kind", "")), ""))
 	return ""
 
 ## Today's "Show on map" (SGODOT-232 U6): a short pulse on that place's pin.

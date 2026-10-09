@@ -82,9 +82,12 @@ func test_the_homestead_mark_hangs_on_the_farm_pin() -> void:
 
 # ---------------------------------------------------------------- one list for badges and packing (亚瑟 on 234)
 ## The pins' marks badge them (set_marks) and pack them first (#83's city_pin_markers) from one list: the server's
-## map_markers whenever it sends them, else the client's own tutorial mark on Reed Pond.
+## map_markers whenever it sends them, else the client's own tutorial mark on Reed Pond — once Pond Catch is taken
+## (q(103), as the server).
 func test_pin_marks_take_the_server_list_else_the_tutorial_mark() -> void:
-	var board := {"stall": {"board": {"requests": [{"id": P0Guide.TUTORIAL, "have": 0, "qty": 2}]}}, "req_done": []}
+	var board := {"stall": {"board": {"requests": [{"id": P0Guide.TUTORIAL, "have": 0, "qty": 2, "status": "open"}]}}, "req_done": []}
+	assert_array(P0Map.pin_marks(board)).is_empty()
+	board.stall.board.requests[0].status = "accepted"
 	assert_array(P0Map.pin_marks(board)).is_equal([{"id": P0Map.NEAREST_POND, "state": "request"}])
 	var server := board.duplicate(true)
 	server["map_markers"] = [{"place": "sh_tackle_1", "kind": "new"}]
