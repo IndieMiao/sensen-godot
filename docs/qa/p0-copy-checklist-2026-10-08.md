@@ -28,7 +28,7 @@
 | 位置 | 应出现 |
 |---|---|
 | 体力卡 | `142/210` · `+1 in 2:41` · 满 `Full` · 超上限大数字 `230/210`、小字 `Bonus +20`（q(94)） |
-| 位置芯片 | `Shanghai · Homestead` / `Shanghai · Farmhouse`（农舍室内，K-1）/ `Shanghai · Reed Pond` / `Shanghai · Mine · Floor 2` / `Shanghai · Xuhui Market Square`（q(46)：不是 Shanghai Market Square） |
+| 位置芯片 | `San Francisco · Homestead` / `San Francisco · Farmhouse`（农舍室内，K-1）/ `San Francisco · Fern Pond` / `San Francisco · Mine · Floor 2` / `San Francisco · Mission Market Square`（q(46)：不是 Mission Market Square） |
 | Energy 卡 | 标题 `Energy 0/210 · +1 in 3:59`；信息行 `Wait · Full in 13h 20m`；分组 `RECOVER`；唯一按钮 `Free to do now` |
 | RECOVER 瓦片 · Eat | `3 dishes in bag` · `Open bag ›` / 灰 `No dishes in bag` |
 | RECOVER 瓦片 · Cook | `4 fish in creel` · `Show kitchen ›` / 离家灰 `At home` |
@@ -63,11 +63,11 @@
 | 钓获卡（首次） | `Caught!` / `Pond Crucian · Common` / `Fish-dex 3/N` / `First catch! +15 XP` / `New city! +10 XP` |
 | 逃走 ★ | 保护期内 `It got away · Energy refunded (9 left today)` / 保护期外 `It got away · 3 Energy back`（q(49)，不写 `protected left`） |
 | 挣脱 ★ | 卡 `Too strong` / `Fishing Lv4 needed · You: Lv3 · 30 XP to go` / `+3 Energy back`，无按钮；末行写实退：保护期内 `Energy refunded (8 left today)`，保护期外 `+3 Energy back`（q(55)）；第二次起飘字 `Got away · Lv4 · Energy refunded (8 left today)` / `Got away · Lv4 · 3 Energy back`（q(50)）；鱼竿不够 `Too heavy for your rod` / `Reed Rod · Fishing Lv3 · 80 coins` |
-| 鱼塘 pin 与卡 ★ | `Reed Pond · Beginner pond · 0.8 km` / 其他 `Pebble Pond · River · 2.3 km`；卡 `Beginner pond` + `A nearby pond for your first catch.`（仅 Reed Pond）/ `Distance 0.8 km` / `Recommended Lv1–3`（River `Lv4–5`）/ `Details ›` / `Go`；鱼表剪影写名字 + `Fishing Lv N`（q(48)） |
+| 鱼塘 pin 与卡 ★ | `Fern Pond · Beginner pond · 0.8 km` / 其他 `Pebble Pond · River · 2.3 km`；卡 `Beginner pond` + `A nearby pond for your first catch.`（仅 Fern Pond）/ `Distance 0.8 km` / `Recommended Lv1–3`（River `Lv4–5`）/ `Details ›` / `Go`；鱼表剪影写名字 + `Fishing Lv N`（q(48)） |
 | 图钉卡原因行 ★ | 图钉挂标记时副标题下一行：鱼塘 `Pond Catch · Pond Crucian 0/2`（只在已接下、鱼不够时）/ 集市 `Market Board · 2 requests`（1 条 `Market Board · 1 request`）/ 居民据点 `Pip · New request` / 交付点 `Pond Catch · Ready to deliver` / 据点 ◆ `New for you · Reed Rod` / 居民新对话 ◆ `Pip · New chat`；几件同时写一件加 ` · +1 more`（q(103)） |
 | 进塘与凑齐 ★ | 进挂 ! 的塘 Info toast `Pond Catch · Pond Crucian 0/2`（教学卡之后）；钓到要的鱼飘字 `Pond Catch 1/2`；凑够 Success toast `Pond Catch · 2/2 · Deliver at the Stall`，鱼塘 ! 消失、家图钉 ✓（q(103)） |
 | 委托的鱼还钓不上 ★ | 已接下但鱼的等级高于玩家 Fishing 等级：鱼塘不挂 !；Today 委托行小字 `Fishing Lv4 needed`，点开是鱼图鉴剪影那张门禁卡 `Fishing Lv4 keeps Golden Koi on the hook` / 需求格 `Fishing XP 70/300` · `230 XP to go`（不另写一句）；委托卡交付按钮缺口 `Fishing Lv4 needed`（不写 `Need 1 more Rare fish`）（q(104)） |
-| Today 委托行 ★ | 已接下的驿站板、集市、居民委托都进 Today（没接的不进；教学委托例外，开局未接也显示引导行 `Catch 2 Pond Crucian · Reed Pond`）：进度 `Fresh Greens · Radish 1/4` / `Dusk Haul · Fine fish 1/4` / `An Old Man's Catch · Rare fish 0/1`（只限稀有度写 `<稀有度> fish`，与原因行一致）；交付 `Pond Catch · Deliver at the Stall` / `Dusk Haul · Deliver at Xuhui Market Square` / `An Old Man's Catch · Deliver to Old Kai`（q(104) 补） |
+| Today 委托行 ★ | 已接下的驿站板、集市、居民委托都进 Today（没接的不进；教学委托例外，开局未接也显示引导行 `Catch 2 Pond Crucian · Fern Pond`）：进度 `Fresh Greens · Radish 1/4` / `Dusk Haul · Fine fish 1/4` / `An Old Man's Catch · Rare fish 0/1`（只限稀有度写 `<稀有度> fish`，与原因行一致）；交付 `Pond Catch · Deliver at the Stall` / `Dusk Haul · Deliver at Mission Market Square` / `An Old Man's Catch · Deliver to Old Kai`（q(104) 补） |
 
 ## 4. 厨房与烹饪
 
@@ -99,13 +99,13 @@
 
 | 位置 | 应出现 |
 |---|---|
-| 名字 ★ | `Xuhui Tackle Shop` / `Lotus Tea House` / `Xuhui Market Square` / `Huangpu Travel Post`（q(32)、q(46)） |
+| 名字 ★ | `Mission Tackle Shop` / `Oak Tea House` / `Mission Market Square` / `Union Square Travel Post`（q(32)、q(46)） |
 | 掌柜名字条 | `Finn` / `Ama` / `Mei` / `Sigrid`（只写名字；最近的一个主色描边、放大 1.1 倍，对话中保持高亮，q(62)）；问候选项 `Trade` / 信息问句 / `Just passing by` |
 | Mei 问候 ★ | `Morning! Row Hoes just came in — sows three plots at once, Farming Lv4. Anything I can get you?`（q(46)） |
 | Ama 问候 ★ | `Sit a minute. Hot tea, 30 Energy a cup.`（不写 back，也不带价格，价格看柜台，q(46)、§10.8）；满体力 `You look rested. Tea's here when you need it.`；三杯用完 `That's three cups today. Come back tomorrow.`；喝后 `Enjoy. Next cup's 50 coins.`。**问候写标称的 30，柜台按钮快满时写实得**（如差 15 满时 `Hot Tea · +15 Energy · 40 coins`，q(26)）：两处数字不同是设计，不是错 |
 | 柜台饮品页 | 事实行 `Cups used 0/3`（已用 / 上限，茶与咖啡共用 3 杯）；价格行 `Hot Tea · +30 Energy · 40 coins`（不带 `(1/3)`）；按钮 `Hot Tea · +30 Energy`；用尽 `Cups used 3/3` + 灰按钮 `Tea 3/3 today · Resets in 9h 12m`（不写 `back tomorrow`；不写 `Drinks left today 3 of 3`，q(98)） |
 | 渔具铺柜台 ★ | 只有 Buy 一页、不显示 Tab 条；`Reed Rod · 80 coins`（`Fishing Lv3` / `Owned`）/ `Worm Bait · 2 coins` · `30 left today` / `Sold out · 9h 12m`；收鱼 × 0.8；渔情板只作摆设，不挂图标钮与名字条（q(46)、q(62)） |
-| 集市柜台 ★ | `Buy | Market Board`，只有 Row Hoe 一行，不贴背包（q(48)）；特产货架名字条 `City Specialty`、委托板名字条 `Market Board`（有可接委托时换 `!` 徽标）（q(62)）/ `Shanghai Postcard · 100 coins` / `Owned` |
+| 集市柜台 ★ | `Buy | Market Board`，只有 Row Hoe 一行，不贴背包（q(48)）；特产货架名字条 `City Specialty`、委托板名字条 `Market Board`（有可接委托时换 `!` 徽标）（q(62)）/ `San Francisco Postcard · 100 coins` / `Owned` |
 | 驿站柜台 | 只卖咖啡 `Trade · get a coffee`；盖章台只作摆设 |
 | 集市委托板 ★ | `Dusk Haul · Market Board` / `4 Fine fish · any kind` / `36 coins`（P0 不写 `+1 city stamp`）；`Market Basket` / `3 crops · 6 each`（q(46)） |
 | 居民 ★ | 头顶名字条只写名字 `Pip` / `Old Kai`（q(62)）；Pip `Could you catch me a fish? Any kind is fine.`（对话条与委托卡同句）；Old Kai 需求行 `Rare fish · Golden Koi · Pond 0/1`；奖励行 `+5 Friendship · 20 coins` / `+5 Friendship · 50 coins`（q(46)）；赠餐 toast `Pip gave you Carrot Cake · in your bag`（菜进背包、没有吃，不写体力，q(94)）；好感进度 `52/90 · next Trusted`，最高档 Kindred 只写 `157`、进度条满格，资料卡 Friendship 行同样 `157`（q(91)） |
@@ -116,10 +116,10 @@
 | 位置 | 应出现 |
 |---|---|
 | HUD ★ | 两行 HUD 常驻，底部只有 `Bag`；没有旧底栏 `Map / Farm / Me`；P0 不显示 `Nearby Cities`（q(50)） |
-| pin 卡按钮 ★ | 农场 `Go home · Free`；据点与鱼塘 `Go`；玩家就在这里时改 `Back to Homestead` / `Back to Lotus Tea House` / `Back to Reed Pond`，并且不显示 Distance 行（q(80)） |
+| pin 卡按钮 ★ | 农场 `Go home · Free`；据点与鱼塘 `Go`；玩家就在这里时改 `Back to Homestead` / `Back to Oak Tea House` / `Back to Fern Pond`，并且不显示 Distance 行（q(80)） |
 | 家的 pin 与卡 ★ | 名牌 `Homestead`（不再写 `My Farm`）；卡 `Homestead` / `Your farm` / `Distance 0.8 km`（q(80)） |
-| 据点卡 ★ | `Lotus Tea House` / `Tea house · Hot tea`（其他：`Tackle shop · Rods and bait` / `Market square · Requests` / `Travel post · Coffee`）/ `Distance 0.8 km` / `Online now 3`（0 人整行不显示）/ `Go`（q(80)） |
-| 据点 pin | `Lotus Tea House · 3 online`；没人在时只写名字 `Lotus Tea House`；P0 城市级不聚合，每处一枚 pin，不出 `×N`（q(72)）；和 POI 一样会让位收起，选中的、带标记的、玩家所在地的图钉始终显示（q(105)） |
+| 据点卡 ★ | `Oak Tea House` / `Tea house · Hot tea`（其他：`Tackle shop · Rods and bait` / `Market square · Requests` / `Travel post · Coffee`）/ `Distance 0.8 km` / `Online now 3`（0 人整行不显示）/ `Go`（q(80)） |
+| 据点 pin | `Oak Tea House · 3 online`；没人在时只写名字 `Oak Tea House`；P0 城市级不聚合，每处一枚 pin，不出 `×N`（q(72)）；和 POI 一样会让位收起，选中的、带标记的、玩家所在地的图钉始终显示（q(105)） |
 | 标记 | P0 只有绿 ✓ / 金 ! / 青 ◆，没有 🔒 与 ★（q(48)） |
 
 ## 8. 背包、Gear、个人页、收件箱
@@ -129,7 +129,7 @@
 | 背包 | `Bag 19/25 · 6 slots free` / 7 个 Tab `All / Seeds / Fish / Produce / Dishes / Materials / Tackle` / 仓库堆 `Take 10 / Take all` / 不在家 `At home` |
 | 料理详情卡 Gift ★ | 身边有居民 `Gift to Pip` / `Gift to Old Kai`；其他地方灰 `Gift to a resident`，点了 toast `Find a resident at an outpost to gift this dish`；今天已送过 `Gift already given today`（q(63)） |
 | Gear ★ | `Bag | Gear`；Fishing 槽只有 Starter Rod / Reed Rod，P0 不列 Carbon Rod（q(46)） |
-| 个人页 | P0 子集（PROFILE-1-P0）：`Profile` / `Edit look ›` / `Shanghai · <climate> · Since Oct 2` / 三张技能卡 / 农场卡（农场名 + `Level 2`）/ `Collections`：`Fish n/N` · `Pages n/N`（Pages 数做出过的页，和 Cookbook 页签同一个数，q(100)）；P0 不出 `Edit` / `Following` / `Followers` / `Mutual` / `Close Friends` / `All skills ›`（q(94)） |
+| 个人页 | P0 子集（PROFILE-1-P0）：`Profile` / `Edit look ›` / `San Francisco · <climate> · Since Oct 2` / 三张技能卡 / 农场卡（农场名 + `Level 2`）/ `Collections`：`Fish n/N` · `Pages n/N`（Pages 数做出过的页，和 Cookbook 页签同一个数，q(100)）；P0 不出 `Edit` / `Following` / `Followers` / `Mutual` / `Close Friends` / `All skills ›`（q(94)） |
 | 技能页 ★ | 小标题 `First times` + NEED-TILE `Crops n/8` / `Fish n/7` / `Dishes n/14`（q(94)）；不显示 `Cities fished`（q(49)） |
 | 收件箱 ★ | Tab `To do / Parcels / Updates`；To do 空态 `No invites right now`；Parcels 空态 `No parcels`；Updates 空态 `No updates yet`；规则行 `Parcels 3/8 · Kept 24h · Claim needs a free slot` / 满 `Parcels 8/8 · 2 more waiting · …`；`Claim all · 2 slots` / `Make room · 1 slot`；列表下方固定一行 `If not claimed: sellable items turn into coins at 80% · gifts go back · the rest is lost`（有包裹时显示，不随内容变，不写 regional seeds，q(81)）；Updates 只有三种：`Parcel expired · +18 coins` / `Parcel expired · Worm Bait ×3 lost` / `Pip's gift meal went back · unclaimed`，不出 Homestead 升级与领取记录（q(50)、q(79)）；铃铛数字 = 在列包裹（背包满也计）+ 未读 Updates，待发不计（q(79)） |
 | 满包的被动获得 ★ | 铃铛下方 InboxNotice 卡三行：`Sent to Inbox` / 图标 + `Perch` + `×7` / `Expires in 24h ›`（BAG-5-2 定稿，替代原 toast `Bag full · Perch ×7 sent to Inbox · 24h`，LOCK-14）；同一回包多件：物品行写第一件，第三行 `+1 more · Expires in 24h ›`；Inbox 已满排队：`Inbox full · waiting` / 物品行照旧 / `Claim a parcel first ›`（多件 `+1 more · Claim a parcel first ›`）；不写 `2 rewards`、`saved for later`（q(87)）；居民赠餐：第三行 `From Pip · Expires in 9h 12m ›`（到 04:00 的倒计时），排队 `From Pip · Claim a parcel first ›`，不再出 toast `Bag full · Pip's meal sent to Inbox`（q(88)） |
@@ -152,7 +152,7 @@
 | 离线时按钮 | 命令按钮灰 `Offline`；主行动键如 `Sow · Offline` |
 | 维护卡 SYS-MAINT | `Down for maintenance` / `We'll be back around 14:30.`（设备本地时间、24 小时制；★ 结束时刻不在今天写 `We'll be back around Oct 10, 14:30.`）/ `We'll be back soon.`（没有预计时间或已过时）/ `Check again`（q(74)） |
 | 强制更新卡 SYS-UPDATE | `Update to keep playing` / `This version is out of date.` / `Update`；两张卡都没有关闭按钮（q(74)） |
-| 换场景加载 ★ | 加载画面写目的地位置芯片文字（如 `Shanghai · Willow Pond`），8 秒后加 `Taking longer than usual…`；打不开时卡片 `Couldn't get there` / `Check your connection and try again.` / 主按钮 `Retry` / 次按钮 `Go back`（q(78)） |
+| 换场景加载 ★ | 加载画面写目的地位置芯片文字（如 `San Francisco · Willow Pond`），8 秒后加 `Taking longer than usual…`；打不开时卡片 `Couldn't get there` / `Check your connection and try again.` / 主按钮 `Retry` / 次按钮 `Go back`（q(78)） |
 | 世界动作失败 | P0 只出横幅 `Didn't go through · try again`，**不出** toast `3 plots not sown · Energy returned`（P0 世界动作没有本地投影，那句 toast 留给以后有投影的版本，q(75)） |
 | 去重与 stale_state | 不出任何提示 |
 | 启动与账号 | `When were you born?` / `Pick your birthday` / `Continue` / `Before you start` / `Agree to continue` / `Terms of Service ›` / `Privacy Policy ›` / `Continue with Apple` / `Continue with Google` / `Continue with Email` / `Taking longer than usual…` / `Can't connect` / `That name isn't allowed` / `Try another name`（WP6，SGODOT-206） |
@@ -167,7 +167,7 @@
 | `Guest pass · 10 Energy · Host is online` | P2 内容；P0 不出现 |
 | `It got away · +5 Energy · 9 protected left` | `It got away · Energy refunded (9 left today)` |
 | `Sweet potato seeds just came in — Farming Lv5 to plant`（集市问候） | P0 用 Row Hoe 那句 |
-| `Shanghai Market Square` / `Pudong Market Square` | `Xuhui Market Square` |
+| `Shanghai Market Square` / `Pudong Market Square` | `Mission Market Square`（q(106)；原 `Xuhui Market Square`） |
 | `Compost · −20% time` | `Crops ready 20% sooner` |
 | `1/3 today · 40 coins`（茶的第一杯） | `0/3 today · 40 coins` |
 | `Stove 1/1 · Empty · Tap to cook` / `Workbench · Tap to craft` / `Mailbox · Tap to open` / `Tap to shop` / `Rest · +60 Energy · once a day`（世界里的指尖卡） | 名字条 `Stove 1/1 · Empty` / `Workbench` / `Mailbox` / `Homestead Stall` / `+60 Energy`（q(62)） |
