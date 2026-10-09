@@ -222,6 +222,17 @@ func test_npc_outfits_name_real_parts_and_stay_distinct() -> void:
 		assert_bool(pairs.has(pair)).override_failure_message("%s shares %s with %s" % [id, pair, pairs.get(pair, "")]).is_false()
 		pairs[pair] = id
 
+## 227 second batch (#125): Sigrid wears her postal cap and uniform, Finn his overalls, Pip the cap without the ponytail
+## — NPC-only parts, never in the players' pools.
+func test_the_second_batch_npcs_wear_their_npc_only_parts() -> void:
+	var npcs: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/p0/outpost_npcs.json")).npcs
+	var expect := {"sigrid": ["hairhat36_npc_sigrid", "cloth36_npc_sigrid"], "finn": ["cloth12_npc_finn"], "res_pip": ["hairhat36_npc_pip"]}
+	for id in expect:
+		var worn: Array = (npcs[id].slots as Dictionary).values()
+		for part in expect[id]:
+			assert_array(worn).override_failure_message("%s wears %s" % [id, part]).contains([part])
+			assert_bool(Avatar.catalog.is_npc_only(part)).override_failure_message(part + " is NPC-only").is_true()
+
 ## SGODOT-250 (spec 370794d2 item 5): one finger card at a time in a room. Hand test 246 pictures 06 / 07 showed the
 ## keeper's, the seat's and the door's cards together; now only the nearest within reach shows, and it keeps the
 ## card until another is clearly nearer. On the Coffee Shop the door is at the front, so three prompts meet between
