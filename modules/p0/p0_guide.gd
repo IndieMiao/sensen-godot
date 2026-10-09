@@ -128,6 +128,7 @@ static func lead_rows(view: Dictionary) -> Array:
 	# Cook it: Grilled Crucian — through the first session (ticked once cooked), and after it until the first dish is made
 	if not grill.is_empty() and (first or not grill.get("cooked", false)):
 		var cook := _row("Cook it: %s" % str(grill.get("name", "Grilled Crucian")), "dish_grilled_crucian", "stove")
+		cook.page = "dish_grilled_crucian"   # Show opens the stove drawer on it (q(99))
 		if grill.get("cooked", false): cook.state = "done"
 		rows.append(cook)
 	if first: return focus_first(rows)   # the third row is the radishes' timer (P0Logic), not another goal
@@ -152,7 +153,9 @@ static func focus_first(rows: Array) -> Array:
 static func new_recipe_row(view: Dictionary) -> Dictionary:
 	for p in view.get("cooking", {}).get("cookbook", []):
 		if p.get("known", false) and not p.get("cooked", false) and p.get("can_cook", false) and str(p.id) != "dish_grilled_crucian":
-			return _row("Cook: %s · new recipe" % str(p.get("name", "")), str(p.id), "stove")
+			var fresh := _row("Cook: %s · new recipe" % str(p.get("name", "")), str(p.id), "stove")
+			fresh.page = str(p.id)   # Show opens the stove drawer on it (q(99))
+			return fresh
 	return {}
 
 ## `3rd slot open · try Fine fish + Potato + Rock Salt` (q(46)): from Cooking Lv4 until the first 3-slot dish.

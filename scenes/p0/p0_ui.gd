@@ -2138,8 +2138,12 @@ func open_today(given: Array = []) -> void:
 		close_modal()
 		var go := str(rows[i].go)
 		if show_label(go, space_here(), spot_reachable()) == "Show":
-			var dish := str(rows[i].get("icon", ""))
-			if go == "stove" and dish.begins_with("dish_") and str(rows[i].get("state", "")) != "done": cook_page_from_today = dish
+			# Only a row that asks to cook a page (Cook it: …, Cook: … · new recipe) names one, and only while the stove is
+			# free: a pot cooking or a dish waiting there is watched or collected, the drawer does not open, and the page
+			# would wait for a later tap and skip its Cook Again (刘邦 / 奕星 on #170).
+			var page := str(rows[i].get("page", ""))
+			var stove_free := P0KitchenLogic.stove(view) == null and P0KitchenLogic.stove_left(view).is_empty()
+			if go == "stove" and page != "" and stove_free and str(rows[i].get("state", "")) != "done": cook_page_from_today = page
 			show_spot.emit(go)
 		else: show_on_map.emit(map_target(go)))
 	_open_modal(panel, 0.0)
