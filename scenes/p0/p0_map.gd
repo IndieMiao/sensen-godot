@@ -291,6 +291,8 @@ func _sync_here() -> void:
 		farm_markers.self_label_off = away()   # the avatar is not the homestead's mark there
 		if away(): farm_markers.anchor_shift["self"] = AVATAR_BESIDE
 		else: farm_markers.anchor_shift.erase("self")
+	# Also how the pins learn where the player is: a pond's name says its distance from here (_pin_tag), and the city
+	# view lays its pins out again only when their entries are replaced (SGODOT-260, CityMapView._layout_wanted).
 	_set_outpost_places()
 	_marks_sig = ""   # the homestead's mark moves between the avatar and its pin
 
