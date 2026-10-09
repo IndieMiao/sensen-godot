@@ -175,6 +175,20 @@ func test_refresh_skips_a_view_that_changes_nothing_shown_and_follows_a_new_coun
 	assert_str(d.grid.cell_for("fish_crucian").quantity).is_equal("×4")
 	assert_str(d.header._tabs.tabs()[0].find_child("Title", true, false).text).is_equal("Bag 5/25")
 
+## int11 (不知火舞 on 225, as 256 ④): the six Gear slots spread edge to edge, five equal gaps.
+func test_the_gear_slots_spread_edge_to_edge() -> void:
+	var d := _drawer("gear")
+	for i in 3: await get_tree().process_frame
+	var cells := d._gear_box.find_children("*", "UiItemCell", true, false)
+	assert_int(cells.size()).is_equal(6)
+	var row := (cells[0] as Control).get_parent() as Control
+	assert_float((cells[0] as Control).get_global_rect().position.x).is_equal(row.get_global_rect().position.x)
+	assert_float((cells[5] as Control).get_global_rect().end.x).is_equal_approx(row.get_global_rect().end.x, 0.5)
+	var gaps := []
+	for i in 5: gaps.append((cells[i + 1] as Control).get_global_rect().position.x - (cells[i] as Control).get_global_rect().end.x)
+	var even := (row.size.x - 6.0 * UiTokens.SIZE_GEAR_SLOT_W) / 5.0   # 336 wide: 4.8 (the fixed 4 left the last slot 4 short)
+	for g in gaps: assert_float(g).is_equal_approx(even, 1.0)
+
 func test_gear_slot_change_is_reported_for_the_next_open() -> void:
 	var d := _drawer("gear")
 	await get_tree().process_frame

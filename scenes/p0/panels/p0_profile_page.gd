@@ -7,7 +7,7 @@ extends Control
 ##   look        the saved outfit (BagCharacterPreview; a sideways drag turns it) + `Edit look ›` (the dressing room)
 ##   identity    name, `City · Climate · Since Oct 2` (view.profile, SGODOT-228; a missing field hides its line)
 ##   skills      three UiSkillCards; tapping one opens the skill details
-##   farm        UiFarmCard: farm name, Level N, the farm's status line
+##   farm        UiFarmCard: farm name, Level N, the farm's status line, › to HOME-1
 ##   Collections Fish-dex and Cookbook pages as M count NEED-TILEs
 ## Emits back_pressed, edit_look_pressed, skill_pressed(skill), settings_pressed.
 
@@ -17,6 +17,8 @@ signal skill_pressed(skill: String)
 signal settings_pressed
 ## A Collections tile was tapped: "fish" (the Fish-dex, FISH-6) or "pages" (the Cookbook).
 signal collection_pressed(key: String)
+## The farm card was tapped: HOME-1 (§10.6.2, int11).
+signal farm_pressed
 
 const SKILLS := ["farming", "fishing", "cooking"]
 const _SKILL_ICONS := {"farming": "hoe", "fishing": "rod", "cooking": "pot"}
@@ -114,7 +116,10 @@ func refresh(view_: Dictionary) -> void:
 		card.pressed.connect(func(): skill_pressed.emit(key))
 		skills.add_child(card)
 	col.add_child(skills)
-	col.add_child(UiFarmCard.new(str(d.farm.name), str(d.farm.level_line), str(d.farm.status), load("res://assets/p0/art/homestead-thumb.jpg")))
+	var farm := UiFarmCard.new(str(d.farm.name), str(d.farm.level_line), str(d.farm.status), load("res://assets/p0/art/homestead-thumb.jpg"))
+	farm.chevron = true   # it opens HOME-1: no card that looks tappable and does nothing (int11, 不知火舞 on 225)
+	farm.pressed.connect(func(): farm_pressed.emit())
+	col.add_child(farm)
 	col.add_child(UiKit.label("Collections", UiTokens.STYLE_C11_XB))
 	var tiles := []
 	for c in d.collections:

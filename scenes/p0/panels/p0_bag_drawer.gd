@@ -339,9 +339,16 @@ func _build_gear() -> void:
 	first.add_child(badge)
 	_gear_box.add_child(first)
 	_gap(_gear_box, _ROW_GAP)
+	# Six slots spread edge to edge, five equal gaps, (width − 6 × slot) / 5 as the bag grid's columns (int11, 不知火舞 on
+	# 225 / 256 ④): equal expanding spacers between the slots share what the slots leave, so the row asks only for them.
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override(&"separation", int(UiTokens.SPACE_QUICK_BAR_GAP))
+	row.add_theme_constant_override(&"separation", 0)
 	for s in gear_slots(view):
+		if row.get_child_count() > 0:
+			var spacer := Control.new()
+			spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			row.add_child(spacer)
 		var cell := UiItemCell.new(UiItemCell.Density.GEAR)
 		cell.role = s.role
 		cell.title = s.name
