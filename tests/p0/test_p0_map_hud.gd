@@ -48,6 +48,7 @@ func test_recenter_brings_the_camera_home_and_keeps_the_zoom() -> void:
 	m.center_lng = m.home_lng + 0.02
 	m.zoom = 13.3
 	m._city_action("recenter")
+	await _landed(m)   # it flies (SGODOT-267)
 	assert_float(m.center_lat).is_equal_approx(m.home_lat, 1e-6)
 	assert_float(m.center_lng).is_equal_approx(m.home_lng, 1e-6)
 	assert_float(m.zoom).is_equal_approx(13.3, 1e-6)
@@ -120,6 +121,7 @@ func test_the_avatar_stands_where_the_player_is() -> void:
 	var item: Dictionary = m.home_set_items()[0]
 	assert_float(float(item.lat)).is_equal_approx(float(tea.lat), 1e-5)   # a Vector2 point
 	m._city_action("recenter")
+	await _landed(m)
 	assert_float(m.center_lat).is_equal_approx(float(tea.lat), 1e-6)
 	assert_float(m.center_lng).is_equal_approx(float(tea.lng), 1e-6)
 	rt.here = {"space": "pond", "place": "pond_shanghai_05"}
@@ -294,3 +296,7 @@ func _bag_view() -> Dictionary:
 		"items": {"seed_herb": {"kind": "seed"}}, "names": {"seed_herb": "Herb Seeds"},
 		"bag": {"capacity": 25, "free": 24, "slots": [{"id": "seed_herb", "qty": 5}]}, "plots": [],
 		"inbox": {"limit": 8, "badge": 0, "waiting": 0, "claim_slots": 0, "parcels": [], "updates": []}}
+
+func _landed(m: Node) -> void:   # the map's own flight (SGODOT-267) has landed, at most 2 s
+	var until := Time.get_ticks_msec() + 2000
+	while m._flight != null and m._flight.is_running() and Time.get_ticks_msec() < until: await get_tree().process_frame

@@ -30,6 +30,11 @@ func _back_with(target: String) -> void:
 	(map.get("rt") as P0Runtime).after_leave = target
 	map.call("resume")    # … and left for the map
 	for i in 3: await get_tree().process_frame
+	await _landed()   # it flies there (SGODOT-267)
+
+func _landed() -> void:   # the map's own flight has landed, at most 2 s
+	var until := Time.get_ticks_msec() + 2000
+	while map._flight != null and map._flight.is_running() and Time.get_ticks_msec() < until: await get_tree().process_frame
 
 func _at(lat: float, lng: float) -> void:
 	assert_float(map.get("center_lat")).is_equal_approx(lat, 1e-6)
@@ -78,13 +83,16 @@ func test_show_from_a_panel_on_the_map_flies_at_once() -> void:
 	assert_str(P0Ui.show_label("stove", "map", false)).is_equal("Show")
 	assert_str(P0Ui.show_label("map", "map", false)).is_equal("")
 	map.call("p0_show_spot", "outpost:post")
+	await _landed()
 	var post := P0Outposts.by_role("post")
 	_at(float(post.lat), float(post.lng))
 	map.call("p0_show_spot", "stove")
+	await _landed()
 	_at(float(map.get("home_lat")), float(map.get("home_lng")))
 	var rt: P0Runtime = map.get("rt")
 	rt.attach(map)
 	rt.ui.show_on_map.emit("outpost:tea")   # a NeedSource / Energy tile on the map: no trip through after_leave
+	await _landed()
 	var tea := P0Outposts.by_role("tea")
 	_at(float(tea.lat), float(tea.lng))
 	assert_str(rt.after_leave).is_equal("")
@@ -97,6 +105,8 @@ func test_a_fresh_map_takes_a_waiting_show() -> void:
 	var fresh: Node = (load(P0_MAP) as PackedScene).instantiate()
 	add_child(fresh)
 	for i in 5: await get_tree().process_frame
+	var until := Time.get_ticks_msec() + 2000   # it flies to the pin (SGODOT-267)
+	while fresh._flight != null and fresh._flight.is_running() and Time.get_ticks_msec() < until: await get_tree().process_frame
 	var pond := SystemPonds.location("pond_shanghai_05")
 	assert_float(fresh.get("center_lat")).is_equal_approx(float(pond.lat), 1e-6)
 	assert_float(fresh.get("center_lng")).is_equal_approx(float(pond.lng), 1e-6)

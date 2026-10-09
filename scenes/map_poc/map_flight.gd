@@ -47,8 +47,10 @@ static func plan(lat0: float, lng0: float, z0: float, lat1: float, lng1: float, 
 		f.length = absf(log(w1 / w0)) / RHO
 	return f
 
-func duration() -> float:
-	return clampf(length * 0.35, MIN_DURATION, MAX_DURATION)
+## 0.35 s per unit of path, between MIN_DURATION and `max_s` (a city's flight up to MAX_DURATION; a host may cap a short
+## one lower, P0's home key at 1.2 s).
+func duration(max_s := MAX_DURATION) -> float:
+	return clampf(length * 0.35, MIN_DURATION, max_s)
 
 ## t ∈ [0,1]（已缓动的进度）→ Vector3(lat, lng, zoom)。
 func sample(t: float) -> Vector3:
