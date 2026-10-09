@@ -1,7 +1,7 @@
 extends Node3D
 ## A map pond for P0 (ponds live at fixed map locations): the old polished pond world — daylight sky,
 ## PondScenery, the PR #4 water (FishingWater: caustics, foam, lilies, shore stones, reflection), the
-## pond nav grid — and the old fishing presentation (pose, rod, line, float, landing arc, close camera)
+## pond nav grid — and the old fishing presentation (pose, rod, line, float, landing arc; the pond camera frames it)
 ## driven by P0FishingPanel. Movement, HUD and results follow the new UI flow from P0Runtime.
 
 const FarmCamera = preload("res://modules/farm/farm_camera.gd")
@@ -31,16 +31,14 @@ var _pinch = ElasticZoom.new(0.8, 1.4)   # the farm's range, rubber band past 0.
 var _zoom_at := Vector2.INF            # the last pinch centre (screen)
 var _band := Rect2()                   # the last camera band seen with no panel up
 var _opening := true                   # the opening shot: framed low in the band until the first step or pinch
+var _parked := false                   # after a cast: the camera holds still, the meadow clamp waits (不知火舞)
+var _settling := false                 # … then eases back in once the safe box first moves the camera
 ## The farm's pitch (camera unification, 奕星 2026-10-09); the pond keeps its own yaw 0, looking straight up the pond.
 const PITCH_DEG := FarmCamera.PITCH_DEG
 const DISTANCE := 40.0
 ## The opening shot puts the player's feet this far above the band's bottom edge (不知火舞 on 231).
 const OPENING_LIFT := 40.0
 var _plan: Dictionary = {}
-# Camera blend from the fishing close-up back to the pond framing when the panel closes.
-var _blend_from := Transform3D.IDENTITY
-var _blend_size := 7.5
-var _blend_t := 1.0
 
 ## The catalog pond id: the session sends it with the entry read and every command from here (q(36)).
 func p0_place() -> String:
@@ -138,7 +136,9 @@ func p0_tap(screen: Vector2) -> void:
 		actor.mover.set_target_position(point)
 
 func p0_frame(v: Dictionary, dt: float) -> void:
-	if panel.visible: return   # the fishing presentation owns rig and camera
+	if panel.visible:   # the fishing presentation owns the rig; the camera only pans to frame the cast
+		_frame_fishing(dt)
+		return
 	actor.step(dt)
 	# Walking to the cast origin finished: open the panel and cast.
 	if not _plan.is_empty() and not actor.mover.is_moving():
@@ -147,11 +147,6 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 		if _at(plan.origin): _open_panel(plan)
 	_follow(dt)
 	rt.ui.player_screen = cam.unproject_position(actor.position + Vector3(0, 0.9, 0))   # the radial fans out from here
-	if _blend_t < 1.0:
-		_blend_t = minf(1.0, _blend_t + dt / 0.45)
-		var k := ease(_blend_t, -2.0)
-		cam.global_transform = _blend_from.interpolate_with(cam.global_transform, k)
-		cam.size = lerpf(_blend_size, cam.size, k)
 	rt.ui.set_action(_action_state(v))
 	# At the pond: "Your creel is your bag…" (§14.2 minute 5–9); "Casting uses 5 Energy" comes with the first cast (P0Guide).
 	if not rt.ui.has_modal(): rt.ui.teach("creel")
@@ -195,17 +190,22 @@ func _begin_fishing(_id: String) -> void:
 	actor.lock(true)
 	rt.ui.set_surface("busy")
 	view = FishingPresentation.new()
+	view.close_up = false   # camera unification: no side close-up, the pond camera pans (用户 via 奕星, 不知火舞)
+	view.float_scale = FLOAT_SCALE   # the float, its ring and the line read at the walking scale (不知火舞)
+	view.float_ring = true
+	view.line_px = LINE_PX
+	view.line_color = LINE_INK
 	add_child(view)
 	view.configure(panel, actor, actor.rig, cam, [])
+	_opening = false
 
 func _end_fishing() -> void:
 	if is_instance_valid(view):
-		var close_up := cam.global_transform
-		var close_size := cam.size
-		view.finish()   # puts the pond camera back at once …
-		_blend_from = close_up   # … so ease out of the close-up instead of cutting
-		_blend_size = close_size
-		_blend_t = 0.0
+		view.finish()
+		# The cast's framing stays (不知火舞 on #143): the camera holds until the safe box moves it, and only then does
+		# the walking band's clamp come back — eased, as from the far bank it can sit about 2 m off (苏烈 on #143).
+		_cam_follow.hold()
+		_parked = true
 	view = null
 	if actor: actor.lock(false)
 	if rt and rt.world == self: rt.ui.set_surface("pond")
@@ -240,21 +240,32 @@ func _settle(ev: Dictionary, delay: float, first_xp: int) -> void:
 
 # ---------------------------------------------------------------- camera (old pond framing + safe box)
 func _follow(_dt: float) -> void:
+	var before := _focus
 	_focus = _cam_follow.step(cam, _focus, actor.position, actor.mover.is_moving(), _dt)
 	if not _cam_follow.held: _opening = false   # walking: the safe box follows from where the opening left it
+	if _parked and not _focus.is_equal_approx(before):   # the safe box moved the camera: the clamp comes back, eased
+		_parked = false
+		_settling = true
 	if _pinch.step(_dt): _set_zoom(_pinch.value)   # springing back from past a limit, about the same point
-	else: _update_camera()
+	else: _update_camera(_dt)
 
 ## Camera unification (用户 via 奕星, 2026-10-09, as the mine in #129): the farm's size and pitch, and the screen kept on
 ## the decorated meadow (不知火舞 on 231) — flush with its sides, and the band between the HUD's second row and the
 ## quick bar / key on it; along an axis the meadow can't fill the band holds the middle.
-func _update_camera() -> void:
+## `dt` < 0 (a pinch step): the clamp applies at once.
+func _update_camera(dt := -1.0) -> void:
 	var view := get_viewport().get_visible_rect().size
 	cam.size = view_size(view, _zoom)
 	var band := _camera_band(rt.ui if rt != null else null)
-	if band.has_area():
+	if band.has_area() and not _parked:
 		if _opening: _focus = opening_focus(actor.position, cam.size, view, band)
-		_focus = clamp_focus(_focus, cam.size, view, band, PondScenery.MEADOW)
+		var target := clamp_focus(_focus, cam.size, view, band, PondScenery.MEADOW)
+		if _settling and dt >= 0.0:
+			_focus = _focus.lerp(target, 1.0 - exp(-dt * FISH_EASE))
+			_settling = _focus.distance_to(target) > 0.005
+		else:
+			_focus = target
+			_settling = false
 	place(cam, _focus)
 
 static func view_size(view: Vector2, zoom: float) -> float:
@@ -267,6 +278,65 @@ static func opening_focus(player: Vector3, size: float, view: Vector2, band: Rec
 	var px := view.x / size
 	var nearer := (band.end.y - OPENING_LIFT - view.y * 0.5) / px / sin(deg_to_rad(PITCH_DEG))   # ground metres below the centre row
 	return Vector3(player.x, player.y, player.z - nearer)
+
+## While fishing (camera unification, 不知火舞 on 231): the walking camera pans so the point midway between the player
+## and the float sits in the middle of the fishing band — under the bite notice, above the guide line over the Hook
+## key — with FLOAT_ROOM px left on the reel gauge's side of the float and FLOAT_EDGE on the other, then the meadow
+## clamps it. Size, pitch and yaw stay as walking; the pan eases at the old close-up's rate.
+const FLOAT_ROOM := 100.0
+const FLOAT_EDGE := 24.0
+const FISH_EASE := 7.0
+const PLAYER_HALF_M := 0.3   # the player's box on screen: feet to head (HEAD_M), this far either side
+const HEAD_M := 1.8
+const FLOAT_SCALE := 1.6
+const LINE_PX := 1.5
+const LINE_INK := Color("#2F3A33B3")   # ink, 70 %
+static func fishing_focus(player: Vector3, landing: Vector3, focus_y: float, size: float, view: Vector2, band: Rect2) -> Vector3:
+	var px := view.x / size
+	var pitch := deg_to_rad(PITCH_DEG)
+	var mid := (player + landing) * 0.5
+	var c := band.get_center()
+	var x := mid.x - (c.x - view.x * 0.5) / px
+	var float_x := view.x * 0.5 + (landing.x - x) * px   # screen x with that focus (yaw 0: x maps straight across)
+	var body_x := view.x * 0.5 + (player.x - x) * px
+	var body := Rect2(body_x - PLAYER_HALF_M * px, 0.0, PLAYER_HALF_M * px * 2.0, 1.0)
+	var lo := FLOAT_EDGE
+	var hi := view.x - FLOAT_EDGE
+	if P0FishingPanel.gauge_side(float_x, body, view.x) > 0: hi = view.x - FLOAT_ROOM
+	else: lo = FLOAT_ROOM
+	x -= (clampf(float_x, lo, hi) - float_x) / px
+	var up := (view.y * 0.5 - c.y) / px   # the band's middle above the screen's, on the camera's up axis
+	var z := mid.z + (up - (mid.y - focus_y) * cos(pitch)) / sin(pitch)
+	return Vector3(x, focus_y, z)
+
+## The player's box on screen, feet to head, for the reel gauge to keep clear of.
+static func player_box(camera: Camera3D, player: Vector3, view: Vector2) -> Rect2:
+	var feet := camera.unproject_position(player)
+	var head := camera.unproject_position(player + Vector3.UP * HEAD_M)
+	var half := PLAYER_HALF_M * view.x / camera.size
+	var r := Rect2(feet, Vector2.ZERO).expand(head)
+	return Rect2(r.position.x - half, r.position.y, r.size.x + half * 2.0, r.size.y)
+
+## The band under the bite notice at its two-line height (the reel prompt): the notice grows from one line to two at the
+## bite, and the cast's framing must not drift with it.
+const NOTICE_H := 68.0
+func _fishing_band() -> Rect2:
+	var top: Control = panel._message_card
+	var bottom: Control = panel._guide
+	var view := get_viewport().get_visible_rect().size
+	if top == null or bottom == null: return Rect2(Vector2.ZERO, view)
+	var notice := top.get_global_rect()
+	var y0 := notice.position.y + maxf(notice.size.y, NOTICE_H)
+	return Rect2(0.0, y0, view.x, bottom.get_global_rect().position.y - y0)
+
+func _frame_fishing(dt: float) -> void:
+	var view := get_viewport().get_visible_rect().size
+	var band := _fishing_band()
+	var target := fishing_focus(actor.position, panel.landing, _focus.y, cam.size, view, band)
+	target = clamp_focus(target, cam.size, view, band, PondScenery.MEADOW)
+	_focus = _focus.lerp(target, 1.0 - exp(-dt * FISH_EASE))
+	place(cam, _focus)
+	panel.player_rect = player_box(cam, actor.position, view)
 
 static func place(camera: Camera3D, focus: Vector3) -> void:
 	var pitch := deg_to_rad(PITCH_DEG)
@@ -303,13 +373,18 @@ func _set_zoom(value: float) -> void:
 	_zoom = value
 	if cam == null or not is_inside_tree(): return   # not placed yet: the next frame frames it
 	var before = ElasticZoom.ground_at(cam, _zoom_at, _focus.y)
-	_update_camera()
+	var dt := get_process_delta_time() if _settling else -1.0   # still easing back after a cast: keep easing
+	_update_camera(dt)
 	var d := ElasticZoom.shift(before, ElasticZoom.ground_at(cam, _zoom_at, _focus.y))
 	if d != Vector3.ZERO:
 		_focus += d
-		_update_camera()
+		_update_camera(dt)
 
 func p0_zoom(f: float, at := Vector2.INF) -> void:
+	if panel.visible: return   # the cast's framing holds while fishing
+	if _parked:   # a pinch after a cast brings the walking band's clamp back, eased like a step (不知火舞 on #143)
+		_parked = false
+		_settling = true
 	_zoom_at = at
 	_pinch.pinch(f)
 	_cam_follow.hold()   # the pinched framing stays until the player walks
@@ -370,6 +445,7 @@ func p0_dev(step: PackedStringArray) -> bool:
 ## A teleport frames like the opening shot.
 func _reopen() -> void:
 	_opening = true
+	_parked = false
 	_cam_follow.hold()
 
 func p0_until(name: String) -> bool:

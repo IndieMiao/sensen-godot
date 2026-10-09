@@ -3,6 +3,19 @@ extends Node3D
 ## Shared local/remote pose rendering; only server-confirmed state can show a catch.
 
 var remote := false
+## The side close-up from cast to result (Journey's pond and street). False: the camera stays with its owner, which
+## frames the cast itself (P0 pond, camera unification: the walking camera's size, pitch and yaw, panned only).
+var close_up := true
+## The P0 pond's float and line at the walking scale (不知火舞 on 231, 2026-10-09): the float 1.6× (about 12 px), with
+## a ring of RING_PX ink drawn over everything (it reads through the player's head), and a line of a fixed screen
+## width in ink. Defaults keep Journey's float and its 12 mm cream line.
+var float_scale := 1.0
+var float_ring := false
+var line_px := 0.0   # 0: the line is 12 mm wide in the world
+var line_color := Color("f5e9c9")
+const RING_PX := 1.5
+const RING_GAP_PX := 1.5
+const RING_INK := Color("#2F3A33CC")   # ink, 80 %
 var remote_state: Dictionary = {}
 var panel: FishingPanel
 var actor: Node3D
@@ -33,6 +46,8 @@ var _line := ImmediateMesh.new()
 var _rod_material: StandardMaterial3D
 var _line_material: StandardMaterial3D
 var _bobber: Node3D
+var _ring: MeshInstance3D
+var _ring_material: ShaderMaterial
 var _reel: Node3D
 var _crank: Node3D
 var _crank_angle := 0.0
@@ -108,7 +123,8 @@ func _build() -> void:
 	_rod_material.roughness = 0.65
 	_line_material = StandardMaterial3D.new()
 	_line_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	_line_material.albedo_color = Color("f5e9c9")
+	_line_material.albedo_color = line_color
+	if line_color.a < 1.0: _line_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	_line_material.cull_mode = BaseMaterial3D.CULL_DISABLED
 	for spec in [[_rod, _rod_material, "Rod"], [_line, _line_material, "FishingLine"]]:
 		var mesh := MeshInstance3D.new()
@@ -122,6 +138,21 @@ func _build() -> void:
 	add_child(_bobber)
 	_oval(_bobber, Vector3(0.07, 0.11, 0.07), Vector3.ZERO, Color("fff2d1"))
 	_oval(_bobber, Vector3(0.055, 0.06, 0.055), Vector3(0, 0.075, 0), Color("db654f"))
+	_bobber.scale = Vector3.ONE * float_scale
+	if float_ring:
+		_ring = MeshInstance3D.new()
+		_ring.name = "FloatRing"
+		var quad := QuadMesh.new()
+		quad.size = Vector2.ONE
+		_ring.mesh = quad
+		_ring_material = ShaderMaterial.new()
+		_ring_material.shader = preload("res://modules/fishing/fishing_float_ring.gdshader")
+		_ring_material.render_priority = Material.RENDER_PRIORITY_MAX
+		_ring_material.set_shader_parameter("width_px", RING_PX)
+		_ring_material.set_shader_parameter("ink", RING_INK)
+		_ring.material_override = _ring_material
+		_ring.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		add_child(_ring)
 	_reel = Node3D.new()
 	_reel.name = "FishingReel"
 	add_child(_reel)
@@ -250,7 +281,9 @@ func step(dt: float) -> void:
 		_catch_material.albedo_color = [Color("a7c1a5"), Color("71aaba"), Color("e4ba63"), Color("bcb8df")][clampi(tier - 1, 0, 3)]
 	_catch.visible = landed and _phase_age < 1.25
 	_bobber.visible = active_float and not _catch.visible
-	_bobber.global_position = bobber_position
+	# A larger float floats as high: the same share of it stays under the water line.
+	_bobber.global_position = bobber_position + Vector3.UP * 0.055 * (float_scale - 1.0)
+	if _ring != null: _place_ring()
 	if not active_float: bobber_position = rod_tip - Vector3.UP * 0.3
 	_draw_line(rod_tip, bobber_position, 0.025 if pull > 0.5 else 0.22)
 	_splash.visible = _splash_age < 0.75 and active_float
@@ -343,6 +376,27 @@ func _draw_rod(points: PackedVector3Array) -> void:
 				_rod.surface_add_vertex(to_local(vertex))
 	_rod.surface_end()
 
+## The ring hugs the float's outline on screen: its top, both sides and where it meets the water, plus the gap.
+func _place_ring() -> void:
+	_ring.visible = _bobber.visible and camera.projection == Camera3D.PROJECTION_ORTHOGONAL
+	if not _ring.visible: return
+	var s := float_scale
+	var at := _bobber.global_position
+	var r := camera.global_basis.x * 0.07 * s
+	var toward := Vector3(camera.global_basis.z.x, 0, camera.global_basis.z.z).normalized() * 0.07 * s
+	var water := Vector3(at.x, minf(at.y, 0.055), at.z)
+	var box := Rect2(camera.unproject_position(at + Vector3.UP * 0.135 * s), Vector2.ZERO)
+	for p in [at + r, at - r, water + toward, water - toward, water + r, water - r]: box = box.expand(camera.unproject_position(p))
+	var radii := box.size * 0.5 + Vector2.ONE * (RING_GAP_PX + RING_PX * 0.5)
+	var quad := radii * 2.0 + Vector2.ONE * 4.0
+	var px := get_viewport().get_visible_rect().size.x / camera.size   # ortho, KEEP_WIDTH
+	var centre := box.get_center() - camera.unproject_position(at)
+	var b := camera.global_basis
+	_ring.global_basis = Basis(b.x * (quad.x / px), b.y * (quad.y / px), b.z)
+	_ring.global_position = at + camera.global_basis.x * (centre.x / px) - camera.global_basis.y * (centre.y / px)
+	_ring_material.set_shader_parameter("radii_px", radii)
+	_ring_material.set_shader_parameter("quad_px", quad)
+
 func _draw_line(from: Vector3, to: Vector3, slack: float) -> void:
 	line_points.clear()
 	for i in 21:
@@ -352,13 +406,19 @@ func _draw_line(from: Vector3, to: Vector3, slack: float) -> void:
 	_line.surface_begin(Mesh.PRIMITIVE_TRIANGLES)
 	for i in line_points.size() - 1:
 		var direction := (line_points[i + 1] - line_points[i]).normalized()
-		var edge := direction.cross(camera.global_position - line_points[i]).normalized() * 0.006
+		var toward := camera.global_basis.z if line_px > 0.0 and camera.projection == Camera3D.PROJECTION_ORTHOGONAL else camera.global_position - line_points[i]
+		var edge := direction.cross(toward).normalized() * _line_half()
 		for vertex in [line_points[i] - edge, line_points[i] + edge, line_points[i + 1] + edge, line_points[i] - edge, line_points[i + 1] + edge, line_points[i + 1] - edge]:
 			_line.surface_add_vertex(to_local(vertex))
 	_line.surface_end()
 
+## Half the line's width in metres: 6 mm, or line_px on screen (an orthographic camera's metres per pixel).
+func _line_half() -> float:
+	if line_px <= 0.0 or camera.projection != Camera3D.PROJECTION_ORTHOGONAL: return 0.006
+	return line_px * 0.5 * camera.size / maxf(1.0, get_viewport().get_visible_rect().size.x)
+
 func _frame_camera(blend: float) -> void:
-	if remote: return
+	if remote or not close_up: return
 	if not is_instance_valid(camera): return
 	var focus := actor.global_position.lerp(_landing, 0.43) + Vector3.UP * 0.58
 	var target := Transform3D(Basis.IDENTITY, focus - _forward * 2.6 + _side * 7.6 + Vector3.UP * 6.8).looking_at(focus)
@@ -379,7 +439,7 @@ func finish() -> void:
 		if is_instance_valid(_skeleton):
 			for index in _poses.size(): _skeleton.set_bone_pose(index, _poses[index])
 		rig.play_motion("idle")
-	if not remote and is_instance_valid(camera):
+	if not remote and close_up and is_instance_valid(camera):
 		camera.transform = _camera_transform
 		camera.size = _camera_size
 		camera.v_offset = _camera_offset
