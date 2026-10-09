@@ -982,7 +982,10 @@ func _layout_wanted() -> bool:
 	var fm = host.get("farm_markers")
 	var own := []
 	if fm != null and fm.has_method("blocker_rects"):
-		own = [fm.blocker_rects(), fm.self_label_rect() if fm.has_method("self_label_rect") else Rect2(), fm.global_position]
+		# blocker_rects(true) as well: a space pin gives way to the bodies with their names while shown, and whether the
+		# player's own name shows is the last layout's own yield (亚瑟 on #189, SGODOT-269).
+		own = [fm.blocker_rects(), fm.blocker_rects(true), fm.self_label_rect() if fm.has_method("self_label_rect") else Rect2(),
+			fm.global_position]
 	# The 3D anchor (the billboards' world points) moves only with the centre today (MapPoc._maybe_reanchor): compared too,
 	# so a re-anchor on its own would never leave them where they were (刘邦 on #181).
 	var values := [host.center_lat, host.center_lng, host.zoom, host.get("_zoom_elastic"), host.bearing, host.pitch,
