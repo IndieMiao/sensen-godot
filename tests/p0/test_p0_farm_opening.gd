@@ -59,3 +59,22 @@ func test_the_shift_stops_before_the_feet_reach_the_quick_bar() -> void:
 	assert_float(P0Farm.opening_shift(170.0, 572.0, area)).is_equal(0.0)     # clear already
 	assert_float(P0Farm.opening_shift(100.0, 680.0, area)).is_equal(12.0)    # room 708 − 16 − 680 = 12 < 60 needed
 	assert_float(P0Farm.opening_shift(100.0, 700.0, area)).is_equal(0.0)     # no room at all: left as it is
+
+## The opening fits the area as it is with the HUD and the quick bar up, so a panel open on arrival (hiding both) leaves
+## nothing to catch up on when it closes (后裔 on #166).
+func test_the_open_marker_area_is_the_marker_area_with_the_hud_up() -> void:
+	var ui := P0Ui.new()
+	ui.quick_store = "user://test_p0_farm_opening.json"
+	add_child(auto_free(ui))
+	await get_tree().process_frame
+	ui.hud.visible = true   # a bare UI starts with its HUD hidden; a world's set_mode shows it
+	ui._bar.visible = true
+	await get_tree().process_frame
+	var shown := ui._marker_area()
+	assert_bool(shown.has_area()).is_true()
+	assert_that(ui.open_marker_area()).is_equal(shown)
+	ui.hud.visible = false
+	ui._bar.visible = false
+	assert_float(ui._marker_area().position.y).is_equal(0.0)   # covered: the live area changes …
+	assert_that(ui.open_marker_area()).is_equal(shown)         # … the opening's does not
+	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_p0_farm_opening.json"))

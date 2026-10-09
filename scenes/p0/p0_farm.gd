@@ -280,9 +280,10 @@ func _place_camera() -> void:
 
 ## The opening shot keeps the farmhouse's mark clear of the HUD (李元芳 int12-pre on 256): framed from the walk-in point
 ## alone, a phone's status-bar inset brought the HUD down over the roof, and the mark — hidden there, as every mark
-## outside P0Ui.marker_area — only showed after a few steps. Once the HUD is up with no panel over it, the picture moves
-## down just enough for the mark to sit MARK_ROOM inside the area, never bringing the player's feet within FEET_ROOM of
-## the quick bar. Once: a later panel, step, pinch or Show leaves the framing alone.
+## outside the HUD's marker area — only showed after a few steps. Once the HUD has laid out, the picture moves down just
+## enough for the mark to sit MARK_ROOM inside that area as it is with the HUD up (P0Ui.open_marker_area: a panel open
+## on arrival changes nothing when it closes, 后裔 on #166), never bringing the player's feet within FEET_ROOM of the
+## quick bar. Once: a later step, pinch or Show leaves the framing alone.
 const HOME_MARK := Vector3(0, 2.6, 0.4)   # the farmhouse prompt's anchor (world_prompt "home")
 const MARK_ROOM := 24.0   # half the near icon disc (28 × 1.1) and the 8 px edge gap prompts keep
 const FEET_ROOM := 16.0
@@ -291,10 +292,12 @@ func _fit_opening() -> void:
 	if not _cam_follow.held:   # walking already: the safe box has the camera
 		_opening = false
 		return
-	if rt == null or not rt.ui.is_node_ready() or rt.ui.has_modal() or not rt.ui.hud.visible: return
+	if rt == null or not rt.ui.is_node_ready(): return
+	var area := rt.ui.open_marker_area()
+	if not area.has_area(): return   # the HUD has not laid out yet
 	_opening = false
 	_place_camera()
-	_focus = opening_focus(cam, _focus, _house + HOME_MARK, actor.position, rt.ui.marker_area())
+	_focus = opening_focus(cam, _focus, _house + HOME_MARK, actor.position, area)
 	_place_camera()
 
 ## `focus` moved along the ground, away from the camera, by as much as the mark needs to sit MARK_ROOM below the area's

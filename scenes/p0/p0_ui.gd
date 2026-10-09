@@ -957,13 +957,18 @@ func _keep_off_sides(c: Control, drawn: Rect2) -> void:
 ## Only Bag at the bottom (a room: no quick bar slots, no main key; 不知火舞 on #127): the room frames lower.
 func bag_only() -> bool: return _bar != null and _bar.visible and _bar.bag_only and not _keys.visible
 
+## The marker area (_marker_area) as it is with the HUD and the quick bar up, whatever covers them right now: what a
+## world's opening shot frames for, so a panel open on arrival doesn't move the shot when it closes (int12-pre; 后裔 on
+## #166). Empty until the HUD has laid out.
+func open_marker_area() -> Rect2:
+	if _kit == null or _kit.size.y <= 0.0: return Rect2()
+	var top := UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H + safe_top()
+	var bottom := minf(_kit.size.y, _bar.position.y) if _bar != null else _kit.size.y
+	return Rect2(0.0, top, _kit.size.x, maxf(0.0, bottom - top))
+
 ## Where world markers may sit (LOCK-07): below the two-row HUD and above the quick bar. A finger card is passive, so
 ## one lying under a HUD chip lost its tap to the chip (int5 hand test 8: the Homestead card slid under Energy and
 ## opened the Energy panel); a card clamps into this band instead, a badge outside it hides.
-## The screen area world marks live in (below the HUD's second row and its safe inset, above the quick bar); a mark whose
-## anchor falls outside it is hidden. A world frames its opening shot by it (the farm's farmhouse mark, int12-pre).
-func marker_area() -> Rect2: return _marker_area()
-
 func _marker_area() -> Rect2:
 	var top := 0.0
 	if hud and hud.visible: top = UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H + safe_top()
