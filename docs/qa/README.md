@@ -4,6 +4,6 @@
 
 本目录其他记录按标题日期保留事实、测试范围、构建身份、设备与数据完整性证据。历史设计被移除后，相应文档链接指向清理前的固定 Git 版本；这不表示旧验收使用了新规则。生产发布和设备状态须查对应版本记录，不把旧文件中的“最新”理解为今天。
 
-P0 Demo 的版本与更新内容见 [P0 Demo 版本记录](p0-demo-releases.md)。
+P0 Demo 的版本与更新内容见 [P0 Demo 版本记录](../release/release-log.md)。
 
 当前工具流程：[Android](../../tools/android/README.md)、[iOS](../../tools/ios/README.md)、[发布手册](release-playbook-android-ios.md)。文档清理详情见 [处理清单](../design-cleanup-2026-10-05.md)。

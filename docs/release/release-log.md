@@ -1,6 +1,6 @@
 # P0 Demo 版本与更新记录
 
-内部演示包 `com.sensen.p0demo`（显示名 P0 Demo）的版本、内容和发布证据，最新的在最上面。每发一版就在这里加一节。构建方法见 [P0 演示包构建](p0-demo-apk-2026-10-08.md)。
+内部演示包 `com.sensen.p0demo`（显示名 P0 Demo）的版本、内容和发布证据，最新的在最上面。每发一版就在这里加一节。构建方法见 [P0 演示包构建](../qa/p0-demo-apk-2026-10-08.md)。
 
 - 服务端：香港 P0（`server/deploy/p0/deploy-hk.sh`），运维记录在各次部署的 Plane 评论。
 - 下载：OSS 不可变目录 `https://oss.sensenjoy.cn/p0/demo/releases/<目录>/`，同目录有 `release.json` 和 `SHA256SUMS`。

@@ -17,6 +17,7 @@
 | [architecture](architecture/online-spaces.md) | 既有实现的协议、持久化和恢复机制，不代表 v2 功能已完成 |
 | [reference](reference/mapbox-water-research-2026-09-24.md) | 从旧方案中保留的独立技术调研 |
 | [superpowers](superpowers/README.md) | 沿用的 Avatar / 地图 / 移动端技术资料与历史交接 |
+| [release](release/release-log.md) | P0 Demo 各版本的内容、构建身份与发布记录 |
 | [qa](qa/README.md) | 按日期的实际检查、发布、设备与数据完整性证据 |
 
 开发与发布工具见 [服务端](../server/README.md)、[Android](../tools/android/README.md)、[iOS](../tools/ios/README.md)。这些技术资料不能覆盖 v2 的玩法与分期，也不能把历史安装结果解释为当前设备状态。
