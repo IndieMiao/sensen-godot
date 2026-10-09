@@ -1,7 +1,7 @@
 extends GdUnitTestSuite
 ## int6 C30 (李元芳): at the city overview the outpost pins were packed away — behind ponds, landmarks and the
 ## player's own avatar — so the Travel Post could only be found by zooming in. q(72): P0 does not aggregate; every
-## outpost keeps one pin at every zoom, `Lotus Tea House · 3 online` (just the name with no one in). The packing
+## outpost keeps one pin at every zoom, `Oak Tea House · 3 online` (just the name with no one in). The packing
 ## order is the selected pin, a pin wearing a map marker (q(48)), outposts, then the rest (蒙恬 on C30), and a tap
 ## on an outpost pin drawn over the player's avatar opens the outpost (SGODOT-224).
 
@@ -136,8 +136,8 @@ func test_an_outpost_pin_says_who_is_in() -> void:
 	var m := _map()
 	for i in 3: await get_tree().process_frame
 	var city: CityMapView = m.city_map
-	assert_str(city._label_text(P0Outposts.place_entry(tea, 3))).is_equal("Lotus Tea House · 3 online")
-	assert_str(city._label_text(P0Outposts.place_entry(tea, 0))).is_equal("Lotus Tea House")
+	assert_str(city._label_text(P0Outposts.place_entry(tea, 3))).is_equal("%s · 3 online" % tea.name)   # Oak Tea House (SGODOT-270)
+	assert_str(city._label_text(P0Outposts.place_entry(tea, 0))).is_equal(str(tea.name))
 
 ## An outpost pin drawn over the player's avatar takes the tap (蒙恬 on C30): it is selected, not the avatar. Since 269
 ## only the pins always in stay on an avatar: at the Lotus Tea House the avatar stands beside its pin (where the player
@@ -224,7 +224,7 @@ func test_an_outpost_label_is_whole_and_shows_when_selected() -> void:
 		var o := P0Outposts.find(id)
 		_look_fresh(m, Vector2(float(o.lat), float(o.lng)), 16.0)
 		var pin: UiMapDestination = _labels(m)[id]
-		assert_str(pin.text).is_equal("Lotus Tea House · 3 online" if id == "sh_tea_1" else "Xuhui Market Square")
+		assert_str(pin.text).is_equal(("%s · 3 online" % o.name) if id == "sh_tea_1" else str(o.name))
 		assert_float(pin.label_size().x).is_greater_equal(UiMapDestination.label_size_for(pin.text).x)   # the whole name
 	# At the city level the one by home gives way (to the avatar, a pin or a nearer outpost); selected, it shows named.
 	var home := Vector2(m.home_lat, m.home_lng)
