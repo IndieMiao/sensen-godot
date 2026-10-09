@@ -77,7 +77,7 @@ describe('P0 farming loop (§5.3 / §5.4.1)', () => {
     expect(r.events).toContainEqual({ kind: 'first', what: 'harvest:crop_radish', xp: 10 });
   });
 
-  it('first-session bed: 20 radishes reach Farming Lv2 with +50 Energy and 5 carrot seeds (§4.5, §5.3)', () => {
+  it('first-session bed: 20 radishes reach Farming Lv2 with 5 carrot seeds and no Energy (§4.5, §5.3, q(101))', () => {
     let s = fresh();
     for (let i = 0; i < 20; i++) { s = run(s, { type: 'sow', plot: i, seed: 'seed_radish' }); s = run(s, { type: 'water', plot: i }); }
     expect(s.energy.value).toBe(160);
@@ -89,7 +89,8 @@ describe('P0 farming loop (§5.3 / §5.4.1)', () => {
       levelEvent ??= r.events.find(e => e.kind === 'level');
     }
     expect(s.skills.farming).toBe(50);
-    expect(levelEvent).toMatchObject({ kind: 'level', skill: 'farming', level: 2, energy: 50 });
+    expect(levelEvent).toMatchObject({ kind: 'level', skill: 'farming', level: 2, energy: 0 });
+    expect(s.energy.value).toBe(200);   // regenerated to full over the 4 h; the level added nothing (q(101))
     expect(count(s.bag, 'seed_carrot')).toBe(5);
     expect(count(s.bag, 'crop_radish')).toBe(20);
   });

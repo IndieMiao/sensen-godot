@@ -79,8 +79,8 @@
     ]
   },
   "level_up_energy": {
-    "first": 50,
-    "later": 30
+    "first": 0,
+    "later": 0
   },
   "level_gifts": {
     "farming:2": [

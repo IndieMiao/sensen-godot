@@ -158,14 +158,15 @@ describe('first-session report (§14.2 director table; SGODOT-232 S7)', () => {
       rec(10, { type: 'reel' }, [{ kind: 'catch', fish: 'fish_crucian', result: 'landed' }], [175, 175]),
       rec(15, { type: 'collect' }, [{ kind: 'dish', dish: 'dish_grilled_crucian', quality: 1 }], [150, 150]),
       rec(16, { type: 'eat' }, [{ kind: 'meal', gain: 25 }, { kind: 'energy', delta: 25, reason: 'eat' }], [151, 176]),
-      rec(21, { type: 'reel' }, [{ kind: 'level', skill: 'fishing', level: 2, energy: 50 }], [148, 198]),
-      rec(27, { type: 'collect' }, [{ kind: 'level', skill: 'cooking', level: 2, energy: 0 }], [213, 213]),
-      rec(28, { type: 'sell' }, [], [213, 213], 'not_sellable'),
+      rec(21, { type: 'reel' }, [{ kind: 'level', skill: 'fishing', level: 2, energy: 0 }], [146, 146]),   // q(101)
+      rec(27, { type: 'collect' }, [{ kind: 'level', skill: 'cooking', level: 2, energy: 0 }], [165, 165]),
+      rec(27, { type: 'eat' }, [{ kind: 'meal', gain: 35 }, { kind: 'energy', delta: 35, reason: 'eat' }], [165, 200]),
+      rec(28, { type: 'sell' }, [], [200, 200], 'not_sellable'),
       rec(200, { type: 'harvest' }, [], [200, 200]),   // a later session
     ];
     const [p] = sessionReport(records);
     expect(p).toMatchObject({ player: 'p1', sessions: 2, first: {
-      minutes: 28, end_energy: 213, refusals: { not_sellable: 1 },
+      minutes: 28, end_energy: 200, refusals: { not_sellable: 1 },
       milestones: { first_sow: 1, first_cast: 9, first_catch: 10, first_dish: 15, first_meal: 16, fishing_lv2: 21, cooking_lv2: 27 },
     } });
     expect(p.first.spends).toEqual([{ minute: 1, type: 'sow', src: 'hold', energy: 2 }, { minute: 9, type: 'cast', src: 'tap', energy: 5 }]);
