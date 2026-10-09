@@ -76,6 +76,10 @@ export function matchRecipe(c: P0Content, items: string[]): Recipe | null {
 export function ingredientsFor(c: P0Content, s: P0State, recipe: Recipe): string[] | null {
   const left = ingredientStock(c, s);
   const priceOf = (id: string) => fishById(c, id)?.price ?? c.crops.find(cr => cr.id === id)?.price ?? 0;
+  // q(99): a tag slot takes last what another known page names (Pond Crucian for Grilled Crucian) or an accepted
+  // request wants handed in (the tutorial included); with nothing else left it still takes them and cooks this page.
+  const kept = keptForLater(c, s, recipe);
+  const later = (id: string) => (kept(id) ? 1 : 0);
   // Specific tokens first so a tag never eats the item a named slot needs.
   const order = [...recipe.in].sort((a, b) => Number(TAG.test(a)) - Number(TAG.test(b)));
   const out: string[] = [];
@@ -86,7 +90,8 @@ export function ingredientsFor(c: P0Content, s: P0State, recipe: Recipe): string
       if (!fallback) fallback = [...out];
       return matchRecipe(c, out)?.id === recipe.id ? [...out] : null;
     }
-    const options = [...left.entries()].filter(([id, n]) => n > 0 && tokenMatches(c, order[i], id)).sort((a, b) => priceOf(a[0]) - priceOf(b[0]));
+    const options = [...left.entries()].filter(([id, n]) => n > 0 && tokenMatches(c, order[i], id))
+      .sort((a, b) => later(a[0]) - later(b[0]) || priceOf(a[0]) - priceOf(b[0]));
     for (const [id, n] of options) {
       if (++tries > 200) break;   // pages have at most three slots; this only bounds a pathological stock
       left.set(id, n - 1); out.push(id);
@@ -97,6 +102,29 @@ export function ingredientsFor(c: P0Content, s: P0State, recipe: Recipe): string
     return null;
   };
   return pick(0) ?? fallback;
+}
+
+/**
+ * q(99) (李元芳 int12-pre): ingredients a page's tag slots pick last — those another known page names (its specific
+ * tokens) and those an accepted request wants: board requests' fixed items (the Stall Board's tutorial included) and
+ * residents' needs (a named item, else any of its kind and rarity). Sow requests want nothing from the bag.
+ */
+function keptForLater(c: P0Content, s: P0State, recipe: Recipe): (id: string) => boolean {
+  const ids = new Set<string>();
+  for (const r of c.cooking.recipes) {
+    if (r.id === recipe.id || !s.cookbook.includes(r.id)) continue;
+    for (const t of r.in) if (!TAG.test(t)) ids.add(t);
+  }
+  for (const slot of [...s.boards.stall, ...s.boards.market]) {
+    if (slot.req?.status === 'accepted') for (const id of slot.req.items) ids.add(id);
+  }
+  const needs: { kind: string; rarity?: number }[] = [];
+  for (const [rid, r] of Object.entries(s.residents)) {
+    const q = r.req ? c.residents[rid]?.requests.find(x => x.id === r.req!.id) : undefined;
+    if (!q || q.need.kind === 'sow') continue;
+    if (q.need.id) ids.add(q.need.id); else needs.push(q.need);
+  }
+  return id => ids.has(id) || needs.some(n => itemKind(id) === n.kind && (n.rarity === undefined || (fishById(c, id)?.rarity ?? 0) === n.rarity));
 }
 
 export function startPot(c: P0Content, s: P0State, cmd: { items?: unknown; recipe?: unknown }, now: number, events: P0Event[]): Refusal | null {

@@ -85,6 +85,8 @@ func test_tip_queue_waits_for_moments_and_shows_each_tip_once() -> void:
 func test_first_session_rows_follow_the_director_table() -> void:
 	var v := _view({"plots": _plots(["growing"])})
 	assert_that(_lines(Guide.lead_rows(v))).is_equal(["Catch 2 Pond Crucian · Reed Pond", "Cook it: Grilled Crucian"])
+	assert_str(Guide.lead_rows(v)[1].get("page", "")).is_equal("dish_grilled_crucian")   # its Show opens the drawer on it (q(99))
+	assert_str(Guide.lead_rows(v)[0].get("page", "")).is_equal("")
 	assert_str(Guide.lead_rows(v)[0].go).is_equal("pond:pond_shanghai_05")   # Show on map (q(31)); the stall's "!" takes it
 	v.stall.board.requests[0].status = "accepted"
 	assert_str(Guide.lead_rows(v)[0].go).is_equal("pond:pond_shanghai_05")   # Show on map at Reed Pond
@@ -144,6 +146,7 @@ func test_new_recipe_and_third_slot_rows() -> void:
 	v.cooking.cookbook[1].known = true
 	v.cooking.cookbook[1].can_cook = true
 	assert_that(_lines(Guide.lead_rows(v))).is_equal(["Cook: Herb Grilled Fish · new recipe"])
+	assert_str(Guide.lead_rows(v)[0].get("page", "")).is_equal("dish_herb_grilled_fish")   # q(99)
 	v.cooking.slots = 3   # Cooking Lv4 (q(46))
 	assert_that(_lines(Guide.lead_rows(v))).is_equal(["3rd slot open · try Fine fish + Potato + Rock Salt", "Cook: Herb Grilled Fish · new recipe"])
 	v.cooking.cookbook[2].cooked = true

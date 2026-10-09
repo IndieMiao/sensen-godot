@@ -2117,6 +2117,10 @@ func open_radial() -> void:
 	_radial.selected = bar_mode
 	_radial.open()   # around the screen centre (247, LOCK-03 v2)
 
+## q(99) (李元芳 int12-pre): the page a Today cook row's Show pointed at (`Cook it: Grilled Crucian`). The stove
+## drawer's next opening selects it and spends it (P0Kitchen.open); leaving home drops it (P0Runtime.attach).
+var cook_page_from_today := ""
+
 ## Today panel (§14.5, LOCK-06): at most three rows right under the HUD chips; Show only moves the camera.
 ## rows: Today's own (P0Logic.today_rows) unless given, e.g. P0Guide.free_now after the Energy card's Free to do now.
 ## Show / Show on map by show_label (#37): "pond:<id>", "outpost:<role>" and "map" open the map on that pin.
@@ -2133,7 +2137,14 @@ func open_today(given: Array = []) -> void:
 	panel.show_pressed.connect(func(i: int):
 		close_modal()
 		var go := str(rows[i].go)
-		if show_label(go, space_here(), spot_reachable()) == "Show": show_spot.emit(go)
+		if show_label(go, space_here(), spot_reachable()) == "Show":
+			# Only a row that asks to cook a page (Cook it: …, Cook: … · new recipe) names one, and only while the stove is
+			# free: a pot cooking or a dish waiting there is watched or collected, the drawer does not open, and the page
+			# would wait for a later tap and skip its Cook Again (刘邦 / 奕星 on #170).
+			var page := str(rows[i].get("page", ""))
+			var stove_free := P0KitchenLogic.stove(view) == null and P0KitchenLogic.stove_left(view).is_empty()
+			if go == "stove" and page != "" and stove_free and str(rows[i].get("state", "")) != "done": cook_page_from_today = page
+			show_spot.emit(go)
 		else: show_on_map.emit(map_target(go)))
 	_open_modal(panel, 0.0)
 	modal_kind = "today"

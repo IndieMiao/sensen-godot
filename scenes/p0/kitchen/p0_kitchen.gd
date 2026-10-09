@@ -128,9 +128,12 @@ func open_again(page_id: String) -> void:
 	_hide_player(true)
 	room.focus("cam_stove", {band = room.band_below_hud(1.0 - CookAgainSheet.HEIGHT / 800.0 - 0.02), size = room.view_size() * FOCUS_SIZE, release_on_move = false})
 
-## Opens the cooking drawer on `tab` (Cookbook / Experiment) with the camera on the stove.
+## Opens the cooking drawer on `tab` (Cookbook / Experiment) with the camera on the stove. A page Today's cook row
+## pointed at (P0Ui.cook_page_from_today, q(99)) is the Cookbook's selection this once, unless a page is given.
 func open(tab := "cookbook", page_id := "") -> void:
 	if rt == null or phase in ["watch", "serve"]: return
+	if page_id == "" and tab == "cookbook": page_id = rt.ui.cook_page_from_today
+	rt.ui.cook_page_from_today = ""   # spent by any opening of the drawer
 	pot.clear()
 	stage.clear_ingredients()
 	stage.clear_ghosts()

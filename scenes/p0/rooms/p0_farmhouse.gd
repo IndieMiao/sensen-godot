@@ -112,7 +112,9 @@ func open_stove(tab := "cookbook", tapped := false) -> void:
 	var v := rt.session.current()
 	var st = P0KitchenLogic.stove(v)
 	var left := P0KitchenLogic.stove_left(v)
-	if st == null and tapped and kitchen.last_page != "" and P0KitchenLogic.cook_again_on(v): kitchen.open_again(kitchen.last_page)
+	# Sent from a Today cook row (q(99)): the drawer opens on that page, not on Cook Again's last one.
+	if st == null and tapped and kitchen.last_page != "" and P0KitchenLogic.cook_again_on(v) and rt.ui.cook_page_from_today == "":
+		kitchen.open_again(kitchen.last_page)
 	elif st == null: kitchen.open(tab)
 	elif not left.is_empty(): kitchen.show_left(str(left[0]))
 	elif float(st.get("ready_in", 0)) <= 0.0: kitchen.serve([], true)

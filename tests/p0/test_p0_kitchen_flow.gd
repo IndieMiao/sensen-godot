@@ -748,3 +748,68 @@ func test_a_ring_gone_by_floats_missed_in_secondary_ink() -> void:
 	assert_int(missed.size()).is_equal(1)
 	assert_int((missed[0] as UiFloatText).tone).is_equal(UiFloatText.Tone.MUTED)
 	assert_object(UiFloatText.TONE_COLORS[UiFloatText.Tone.MUTED]).is_equal(UiTokens.COLOR_SECONDARY)
+
+## q(99) (李元芳 int12-pre): Today said `Cook it: Grilled Crucian` while the drawer opened on a newer page.
+func _today_panel() -> UiTodayPanel:
+	for c in rt.ui.find_children("*", "Control", true, false):
+		if c is UiTodayPanel: return c
+	return null
+
+func _two_page_view() -> Dictionary:
+	var v := _view()
+	v.cooking.cookbook = [
+		{"id": "dish_herb_grilled_fish", "name": "Herb Grilled Fish", "rarity": 2, "in": ["W1", "S1"], "known": true, "cooked": false,
+			"can_cook": true, "slots": 2},
+		v.cooking.cookbook[0]]
+	return v
+
+func test_a_today_cook_rows_show_opens_the_stove_drawer_on_its_page_once() -> void:
+	_set_view(_two_page_view())
+	var r := await _farmhouse()
+	var k: P0Kitchen = r.get("kitchen")
+	rt.ui.can_show_spot = func() -> bool: return true
+	rt.ui.open_today([{"line": "Cook it: Grilled Crucian", "icon": "dish_grilled_crucian", "go": "stove", "state": "default",
+		"tail": "", "focus": true, "page": "dish_grilled_crucian"}])
+	_today_panel().show_pressed.emit(0)
+	assert_str(rt.ui.cook_page_from_today).is_equal("dish_grilled_crucian")
+	k.last_page = "dish_herb_grilled_fish"   # Cook Again would offer this one on a tap
+	r.open_stove("cookbook", true)   # tapped: Today's page wins over Cook Again's last one too
+	assert_str(k.phase).is_equal("compose")
+	assert_str(k.drawer.selected_page).is_equal("dish_grilled_crucian")
+	assert_str(rt.ui.cook_page_from_today).is_equal("")   # spent
+	rt.ui.close_modal()
+	await get_tree().process_frame
+	k.open("cookbook")   # a later opening: the drawer's own first page again
+	assert_str(k.drawer.selected_page).is_equal("dish_herb_grilled_fish")
+	rt.ui.close_modal()
+	await get_tree().process_frame
+
+func test_leaving_home_drops_todays_stove_page_and_a_done_row_sets_none() -> void:
+	_set_view(_two_page_view())
+	rt.ui.can_show_spot = func() -> bool: return true
+	rt.ui.open_today([{"line": "Cook it: Grilled Crucian", "icon": "dish_grilled_crucian", "go": "stove", "state": "done",
+		"tail": "", "focus": false, "page": "dish_grilled_crucian"}])
+	_today_panel().show_pressed.emit(0)
+	assert_str(rt.ui.cook_page_from_today).is_equal("")   # a ticked row points at nothing to cook
+	# 刘邦 on #170: a dish ready on the stove is collected there; its row names no page to open the drawer on.
+	rt.ui.open_today([{"line": "Grilled Crucian ready at the stove", "icon": "dish_grilled_crucian", "go": "stove", "state": "default",
+		"tail": "", "focus": true}])
+	_today_panel().show_pressed.emit(0)
+	assert_str(rt.ui.cook_page_from_today).is_equal("")
+	# … and a Cook it row names none while a pot is on the stove: the tap watches it, the drawer does not open (#170).
+	var busy := _two_page_view()
+	busy.cooking.stove = {"id": 7, "dish": "dish_herb_grilled_fish", "ms": 15000, "elapsed": 1000, "ready_in": 14000, "heats": []}
+	_set_view(busy)
+	rt.ui.view = busy
+	rt.ui.open_today([{"line": "Cook it: Grilled Crucian", "icon": "dish_grilled_crucian", "go": "stove", "state": "default",
+		"tail": "", "focus": true, "page": "dish_grilled_crucian"}])
+	_today_panel().show_pressed.emit(0)
+	assert_str(rt.ui.cook_page_from_today).is_equal("")
+	rt.ui.cook_page_from_today = "dish_grilled_crucian"
+	rt.attach(auto_free(_FakeWorld.new("map")))   # off to the map: left home
+	assert_str(rt.ui.cook_page_from_today).is_equal("")
+
+class _FakeWorld extends Node:
+	var _surface := ""
+	func _init(surface: String) -> void: _surface = surface
+	func p0_surface() -> String: return _surface

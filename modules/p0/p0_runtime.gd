@@ -148,6 +148,7 @@ func attach(w: Node) -> void:
 	ui.end_stick()
 	world = w
 	session.space = space_of(w)   # before the read below, which tells the server where the player is
+	if session.space in ["map", "pond", "outpost"]: ui.cook_page_from_today = ""   # left home: Today's stove page goes (q(99))
 	if session.space != "map": return_to = route_of(w)
 	# On the map the chip still names where the player is; the farmhouse and the mine are the homestead (MAP-1).
 	elif return_to == "farm": ui.set_place(HOME_PLACE)
@@ -987,6 +988,12 @@ func _dev_shot(dt: float) -> void:
 				if ui._bag != null and is_instance_valid(ui._bag) and not ui._bag.grid.shown_items().is_empty():
 					ui._bag.grid.select(step[1] if step.size() > 1 else str(ui._bag.grid.shown_items().back().id))
 			"energy": ui.open_energy_card(3, "Sow ×1")
+			"todayshow":   # todayshow:<i | go> — Today opened and Show pressed on row i, or on the row going there (q(99) shots)
+				var want := step[1] if step.size() > 1 else "0"
+				var i := int(want) if want.is_valid_int() else P0Logic.today_rows(ui.view).map(func(r): return str(r.go)).find(want)
+				ui.open_today()
+				for c in ui.find_children("*", "Control", true, false):
+					if c is UiTodayPanel and i >= 0: (c as UiTodayPanel).show_pressed.emit(i)
 			"close": ui.close_modal()
 			"auto":
 				P0FishingPanel.auto_play = true
