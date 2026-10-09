@@ -63,6 +63,12 @@ static func _mine_entry_action(view: Dictionary) -> Dictionary:
 		return _key("pickaxe", "Enter mine", "Need %d Energy" % fee, {"type": "energy_card"}, true, true, fee)
 	return _key("pickaxe", "Enter mine", "%d Energy" % fee, {"type": "mine_enter"}, true, false, fee)
 
+## Today's runs are used up and none is left unfinished: the mouth's tap opens MINE-P0-8 (不知火舞 on 231, int11 ②).
+static func mine_runs_spent(view: Dictionary) -> bool:
+	var mine: Dictionary = view.get("mine", {})
+	var runs: Dictionary = mine.get("runs", {})
+	return mine.get("run", null) == null and int(runs.get("used", 0)) >= int(runs.get("limit", 2))
+
 ## The EntryCard over the mine mouth (MINE-P0-5): only with an unfinished run; a secondary text button to start over.
 ## {show, label, line2, enabled, amber, cmd}; line2 is empty when unavailable (the reason is the label).
 static func mine_entry_card(view: Dictionary) -> Dictionary:
