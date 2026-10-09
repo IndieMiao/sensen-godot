@@ -369,22 +369,41 @@ func _on_presence(result: int, code: int, _h: PackedStringArray, body: PackedByt
 ## (不知火舞 on 234); outfit and city switching are not in P0 (their buttons are gone with the old chrome).
 func _city_action(action: String) -> void:
 	match action:
-		"recenter":
+		"recenter":   # back to the player, the zoom kept, nothing selected (LOCK-24; flies since SGODOT-267)
 			var at := _origin()
-			fly_to(at.x, at.y)
+			_fly("recenter", at.x, at.y, zoom)
 		"home": go_home_view()
 		"outfit": rt.ui.toast("Outfits come later")
 		"city": rt.ui.toast("P0 is set in Shanghai")
 		_: super._city_action(action)
 
 ## The home key (SGODOT-261, the user's call; 不知火舞 keeps 197): from anywhere — at a pond or an outpost the camera
-## follows the player there and the homestead is lost among the pins — the camera flies back to the homestead and
-## selects it, as a tap on its pin does away (its card: Homestead · Go home · Free) and on the avatar at home.
+## follows the player there and the homestead is lost among the pins — the camera flies back to the homestead and, on
+## landing, selects it, as a tap on its pin does away (its card: Homestead · Go home · Free) and on the avatar at home.
 func go_home_view() -> void:
 	if city_map == null or rt == null: return
-	show_place("home")
-	if away(): city_map.select(home_entry())
-	else: _own_pin_pressed()
+	_fly("home", home_lat, home_lng, SHOW_ZOOM, func():
+		if away(): city_map.select(home_entry())
+		else: _own_pin_pressed())
+
+## The map's own camera moves fly (SGODOT-267, the user's call; 197 LOCK-24 / LOCK-08 updated by 不知火舞): the home
+## key, the recenter key and Show on map share one flight, the city's (MapFlight, cubic in-out) capped at FLIGHT_MAX_S,
+## each with what it does on landing (`land`). A touch on the map stops it where it is with nothing landing (MapPoc
+## kills the flight on a press); the same move asked again while it flies is ignored, another one takes over.
+const FLIGHT_MAX_S := 1.2   # a same-city flight longer than this feels like waiting; MapFlight's 3 s is a city's
+var _flight: Tween
+var _flight_kind := ""
+
+func _fly(kind: String, lat: float, lng: float, to_zoom: float, land := Callable()) -> void:
+	if _flight != null and _flight.is_running() and kind == _flight_kind: return
+	_flight_kind = kind
+	# Already there (to about a centimetre: is_equal_approx's relative tolerance is some 35 m at this latitude).
+	if absf(center_lat - lat) < 1e-7 and absf(center_lng - lng) < 1e-7 and absf(zoom - to_zoom) < 1e-3:
+		if _flight != null: _flight.kill()   # a flight elsewhere gives way
+		if land.is_valid(): land.call()   # already there: nothing to fly
+		return
+	_fly_to(lat, lng, to_zoom, city_bearing, land, FLIGHT_MAX_S)
+	_flight = _focus_tween
 
 ## MapLocateButton 1793:103795 (LOCK-24): the recenter key as a 44 round button styled like Close (color/surface,
 ## 1 px color/border) with a light shadow, the 22 i-locate in its own colours. The home key wears the same with i-home.
@@ -627,12 +646,9 @@ func show_place(target: String) -> void:
 	if city_map == null: return
 	var entry := place_for(target)
 	if entry.is_empty(): return
-	_reset_gesture()
-	_city_bounds()   # city-wide pan bounds, else the homestead's 450 m box pulls the camera back
-	fly_to(float(entry.lat), float(entry.lng))
-	_set_zoom(SHOW_ZOOM)
-	_camera_dirty = true
-	if target != "home": city_map.select(entry)
+	# Flies since SGODOT-267 (_fly sets the city-wide pan bounds, else the homestead's 450 m box pulls the camera back);
+	# the pin is selected on landing.
+	_fly("show:" + target, float(entry.lat), float(entry.lng), SHOW_ZOOM, func(): if target != "home": city_map.select(entry))
 
 ## Show from a panel opened on the map (Today, the Energy card, a NeedSource): every target is a pin here; a homestead
 ## target (plots, stall, stove …) is the homestead's.
@@ -762,6 +778,17 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"tapself": _own_pin_pressed()   # a tap on the player's own avatar: the card of where the player is
 		"recenter": _city_action("recenter")   # the MapLocateButton: back to the player, the zoom kept
 		"homekey": _city_action("home")   # the home key over it: back to the homestead, selected (SGODOT-261)
+		"maptouch":   # maptouch:180:300[:1.15] — a finger down and up on the map there, after that many seconds (steps
+			# run 0.8 s apart: a delay lands it inside the next step's flight); it stops a flight (SGODOT-267)
+			var at := Vector2(float(step[1]), float(step[2]))
+			var tap := func():
+				for down in [true, false]:
+					var touch := InputEventScreenTouch.new()
+					touch.position = at
+					touch.pressed = down
+					_unhandled_input(touch)
+			if step.size() > 3: get_tree().create_timer(float(step[3])).timeout.connect(tap)
+			else: tap.call()
 		"center":   # center:31.228:121.478 (the city overview) — where the camera looks, for shots
 			center_lat = float(step[1])
 			center_lng = float(step[2])
