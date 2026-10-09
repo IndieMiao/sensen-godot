@@ -40,3 +40,18 @@ func test_no_p0_script_spells_the_city_out() -> void:
 func test_the_loading_cover_names_the_city() -> void:
 	assert_str(P0LoadingLayer.destination("res://scenes/p0/p0_farm.tscn", {})).is_equal(P0City.chip("Homestead"))
 	assert_str(P0LoadingLayer.destination("res://scenes/p0/p0_mine.tscn", {"floor": 2})).is_equal(P0City.chip("Mine · Floor 2"))
+
+## With profile.chip_city set (李白 5965ec02: SF on every chip), the homestead, a room and the loading cover all write it.
+func test_every_chip_writes_chip_city_when_the_content_sets_it() -> void:
+	var profile: Dictionary = P0Logic.content().profile
+	var had = profile.get("chip_city", null)
+	profile["chip_city"] = "XY"
+	assert_str(P0City.chip("Homestead")).is_equal("XY · Homestead")
+	assert_str(P0LoadingLayer.destination("res://scenes/p0/p0_farm.tscn", {})).is_equal("XY · Homestead")
+	assert_str(P0LoadingLayer.destination("res://scenes/p0/p0_outpost.tscn", {"outpost_id": "sh_tea_1"})) \
+		.is_equal("XY · " + str(P0Outposts.find("sh_tea_1").name))
+	var room := FileAccess.get_file_as_string("res://scenes/p0/rooms/p0_room.gd")
+	assert_bool(room.contains("set_place(P0City.chip(place_name))")).is_true()   # the rooms' chip goes through P0City too
+	assert_bool(room.contains('" · " + place_name')).is_false()
+	if had == null: profile.erase("chip_city")
+	else: profile["chip_city"] = had
