@@ -135,7 +135,7 @@ func test_an_outpost_room_is_left_while_a_card_is_up_and_joined_again_after() ->
 # ---------------------------------------------------------------- resume and scene loading
 func test_a_slow_read_on_return_gets_a_cover_over_the_place() -> void:
 	rt.session.view = _view()
-	rt.ui.set_place("SF · Fern Pond")
+	rt.ui.set_place("San Francisco · Fern Pond")
 	rt._on_resumed()
 	assert_array(asked).contains(["/p0/state"])
 	rt._tick_screens(0.0)
@@ -143,16 +143,17 @@ func test_a_slow_read_on_return_gets_a_cover_over_the_place() -> void:
 	rt._resume_ms -= UiTokens.MOTION_PENDING_DELAY_MS
 	rt._tick_screens(0.0)
 	assert_int(rt.ui.screen_kind()).is_equal(K.SCENE)
-	assert_str(rt.ui.screen()._place.text).is_equal("SF · Fern Pond")
+	assert_str(rt.ui.screen()._place.text).is_equal("San Francisco · Fern Pond")
 	_state()
 	assert_int(rt.ui.screen_kind()).is_equal(-1)
 
 func test_opening_a_p0_world_names_where_the_player_is_going() -> void:
 	var pond := rt._scene_overlay("res://scenes/p0/p0_pond.tscn", {"pond_id": "pond_san_francisco_03"}) as P0LoadingLayer
 	assert_object(pond).is_not_null()
-	assert_str(pond.screen._place.text).is_equal("SF · Fern Pond")   # the chip writes SF (q(106))
-	assert_str(P0LoadingLayer.destination("res://scenes/p0/p0_mine.tscn", {"floor": 3})).is_equal("SF · Mine · Floor 3")
-	assert_str(P0LoadingLayer.destination("res://scenes/p0/p0_farm.tscn", {})).is_equal("SF · Homestead")
+	# the city in full (q(107): the Today icon leaves the place chip 300 wide, so SF is no longer needed)
+	assert_str(pond.screen._place.text).is_equal("San Francisco · Fern Pond")
+	assert_str(P0LoadingLayer.destination("res://scenes/p0/p0_mine.tscn", {"floor": 3})).is_equal("San Francisco · Mine · Floor 3")
+	assert_str(P0LoadingLayer.destination("res://scenes/p0/p0_farm.tscn", {})).is_equal("San Francisco · Homestead")
 	assert_object(rt._scene_overlay("res://scenes/farm/farm.tscn", {})).is_null()   # not a P0 world: AppRouter's own
 	pond.free()
 

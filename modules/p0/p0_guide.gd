@@ -119,16 +119,18 @@ static func lead_rows(view: Dictionary) -> Array:
 	if not t.is_empty():
 		var qty := int(t.get("qty", 2))
 		var fish := P0Logic.item_name(view, str(t.item))   # fish names take no plural s
-		if int(t.get("have", 0)) >= qty: rows.append(_row("Deliver %d %s · Stall" % [qty, fish], str(t.item), "stall"))
+		if int(t.get("have", 0)) >= qty: rows.append(_row("Deliver %d %s · Stall" % [qty, fish], str(t.item), "stall", "deliver:" + TUTORIAL))
 		else: rows.append(_row("Catch %d %s · %s" % [qty, fish, _place_name(view, BEGINNER_POND)], str(t.item),
-			"pond:" + BEGINNER_POND))   # the pond is elsewhere: Show on map (q(31)); the stall's "!" asks to take it
+			"pond:" + BEGINNER_POND, "catch:" + TUTORIAL))   # the pond is elsewhere: Show on map (q(31)); the stall's "!" asks to take it
 	elif first:
 		var done := _row("Deliver 2 %s · Stall" % P0Logic.item_name(view, "fish_crucian"), "fish_crucian", "stall")
 		done.state = "done"
 		rows.append(done)
 	# Cook it: Grilled Crucian — through the first session (ticked once cooked), and after it until the first dish is made
 	if not grill.is_empty() and (first or not grill.get("cooked", false)):
-		var cook := _row("Cook it: %s" % str(grill.get("name", "Grilled Crucian")), "dish_grilled_crucian", "stove")
+		# It lights the red dot once the stove can make it (the Pond Catch handed in, fish in the bag), like a new recipe.
+		var cook := _row("Cook it: %s" % str(grill.get("name", "Grilled Crucian")), "dish_grilled_crucian", "stove",
+			"cook:dish_grilled_crucian" if grill.get("can_cook", false) else "")
 		cook.page = "dish_grilled_crucian"   # Show opens the stove drawer on it (q(99))
 		if grill.get("cooked", false): cook.state = "done"
 		rows.append(cook)
@@ -154,7 +156,7 @@ static func focus_first(rows: Array) -> Array:
 static func new_recipe_row(view: Dictionary) -> Dictionary:
 	for p in view.get("cooking", {}).get("cookbook", []):
 		if p.get("known", false) and not p.get("cooked", false) and p.get("can_cook", false) and str(p.id) != "dish_grilled_crucian":
-			var fresh := _row("Cook: %s · new recipe" % str(p.get("name", "")), str(p.id), "stove")
+			var fresh := _row("Cook: %s · new recipe" % str(p.get("name", "")), str(p.id), "stove", "recipe:" + str(p.id))
 			fresh.page = str(p.id)   # Show opens the stove drawer on it (q(99))
 			return fresh
 	return {}
@@ -164,7 +166,7 @@ static func third_slot_row(view: Dictionary) -> Dictionary:
 	if int(view.get("cooking", {}).get("slots", 2)) < 3: return {}
 	for p in view.get("cooking", {}).get("cookbook", []):
 		if int(p.get("slots", 0)) >= 3 and p.get("cooked", false): return {}
-	return _row("3rd slot open · try Fine fish + Potato + Rock Salt", "pot", "stove")
+	return _row("3rd slot open · try Fine fish + Potato + Rock Salt", "pot", "stove", "slot3")
 
 ## `Sow 10 Lettuce · 20 Energy` (§14.2 minute 16): seeds in the bag and free beds (wild ones till for free). Short of
 ## Energy the row stays, with `needs 20 Energy · +8 in 21m` (§14.5). Before the first sow P0Logic has its own row.
@@ -183,7 +185,7 @@ static func sow_row(view: Dictionary) -> Dictionary:
 		var n := mini(int(s.get("qty", 0)), free)
 		if n <= 0: continue
 		var cost := n * int(crop.get("energy", 2))
-		var r := _row("Sow %d %s · %d Energy" % [n, crop_count_name(view, str(crop.id), n), cost], seed, "plots")
+		var r := _row("Sow %d %s · %d Energy" % [n, crop_count_name(view, str(crop.id), n), cost], seed, "plots", "sow:" + seed)
 		var e: Dictionary = view.get("energy", {})
 		var gap := cost - int(e.get("value", 0))
 		if gap > 0:
@@ -308,8 +310,9 @@ static func new_items(before: Dictionary, after: Dictionary) -> Array:
 
 # ---------------------------------------------------------------- helpers
 
-static func _row(line: String, icon_id: String, go: String) -> Dictionary:
-	return {"line": line, "icon": icon_id, "go": go, "state": "default", "tail": "", "focus": false}
+## `dot`: the row's key for the Today icon's red dot (P0Logic.today_dots, q(107)); "" lights nothing.
+static func _row(line: String, icon_id: String, go: String, dot := "") -> Dictionary:
+	return {"line": line, "icon": icon_id, "go": go, "state": "default", "tail": "", "focus": false, "dot": dot}
 
 static func _place_name(view: Dictionary, place: String) -> String:
 	var p = view.get("fishing", {}).get("places", {}).get(place, null)

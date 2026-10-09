@@ -85,7 +85,9 @@ var near_resident := Callable()
 ## the runtime on every attach. "" without a runtime (tests, the gallery): space_here() then goes by the surface.
 var space := ""
 var _hud_hash := 0       # last state given to hud.apply
-var _today_key = null    # the Today chip's focus row (P0Logic.today_chip_key); null before the first view
+var _today_key = null    # the Today icon's focus row (P0Logic.today_chip_key); null before the first view
+var _dot_keys = null     # the Today rows' red-dot keys last seen (P0Logic.today_dots); null before the first view
+var _dot_lit := false
 var _hud_need := -1      # main action's Energy need last seen by the HUD
 var _pending := {}   # surface / place / mode set before the HUD exists (the runtime attaches early)
 var _dev_box: Control
@@ -156,7 +158,9 @@ func _build_hud() -> void:
 	hud.avatar_pressed.connect(open_profile)   # LOCK-06: the avatar opens Profile (SGODOT-225)
 	hud.energy_pressed.connect(open_energy_panel)
 	hud.inbox_pressed.connect(open_inbox)
-	hud.today_pressed.connect(open_today)
+	hud.today_pressed.connect(func():   # the icon opens Today and, open, closes it (不知火舞 76ebeaad)
+		if modal_kind == "today": close_modal()
+		else: open_today())
 	hud.place_pressed.connect(func(): place_pressed.emit())   # the location chip is the way back to the map
 	root.add_child(hud)
 	# CreelBadge 1126:79349 (FISH-1 / FISH-4; 不知火舞 on 235 B1, q(83)): under the two-row HUD, left; full, its tap says
@@ -282,6 +286,12 @@ func _refresh_hud() -> void:
 	if view.is_empty(): return
 	var place := P0Logic.place_info(_place_text, "Farmhouse" if modal_kind == "kitchen" else "")
 	var state := P0Logic.hud_state(view, {"next_cost": int(fab_state().get("need", 0)), "place": place})
+	var dots: Array = state.get("today_dots", [])
+	state.erase("today_dots")
+	if dots != _dot_keys:   # only when the rows change: the seen keys are a file
+		_dot_keys = dots.duplicate()
+		_dot_lit = _today_unseen(dots)
+	state["today_dot"] = _dot_lit
 	var h := state.hash()
 	if h == _hud_hash: return   # set_view runs every frame: apply only what changed (the countdown, once a second)
 	_hud_hash = h
@@ -2176,6 +2186,7 @@ var cook_page_from_today := ""
 ## Show / Show on map by show_label (#37): "pond:<id>", "outpost:<role>" and "map" open the map on that pin.
 func open_today(given: Array = []) -> void:
 	var rows := given if not given.is_empty() else P0Logic.today_rows(view)
+	if given.is_empty(): _see_today(P0Logic.today_dots(rows))
 	var shown := rows.map(func(r):
 		var d: Dictionary = r.duplicate()
 		d.icon = P0Logic.icon(str(r.icon))
@@ -2842,6 +2853,27 @@ func _load_tips() -> void:
 func _save_tips() -> void:
 	var f := FileAccess.open(tips_path, FileAccess.WRITE)
 	if f: f.store_string(JSON.stringify(_taught))
+
+## The Today icon's red dot (q(107), SGODOT-271): lit while a row that can be done now has a key this device has not
+## seen. Opening Today sees every such row; a key that has left the rows is forgotten, so the same thing coming back
+## (the fish eaten and caught again, another crop ready) lights it again. Kept with the teaching tips (tips_path):
+## on the device, not in the save.
+const TODAY_SEEN := "today:"
+func _today_unseen(keys: Array) -> bool:
+	_load_tips()
+	var gone := _taught.keys().filter(func(k): return str(k).begins_with(TODAY_SEEN) and not keys.has(str(k).trim_prefix(TODAY_SEEN)))
+	for k in gone: _taught.erase(k)
+	if not gone.is_empty(): _save_tips()
+	return keys.any(func(k): return not _taught.has(TODAY_SEEN + str(k)))
+
+func _see_today(keys: Array) -> void:
+	if keys.is_empty() or not _dot_lit: return
+	_load_tips()
+	for k in keys: _taught[TODAY_SEEN + str(k)] = true
+	_save_tips()
+	_dot_lit = false
+	_hud_hash = 0
+	_refresh_hud()
 
 ## FISH-6 Fish-dex (SGODOT-233, P0FishDex): from the creel badge, the profile's Fish tile and the catch cards. A cell
 ## opens the gate card for a silhouette its level or rod holds back (q(57)), else the fish card; either comes back to

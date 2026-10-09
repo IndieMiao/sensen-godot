@@ -127,23 +127,29 @@ func test_skill_ring_halves_fill_from_twelve_with_4_degree_gaps_and_5_percent_st
 	assert_float(full.farming.y).is_equal_approx(86.0, 0.01)
 	assert_float(full.fishing.y).is_equal_approx(-266.0, 0.01)
 
-func test_hud_rows_read_today_and_the_actual_place() -> void:
+## q(107) / SGODOT-271: Today is an icon with no words, its red dot on or off; the place chip reads the actual place.
+func test_hud_rows_read_the_today_dot_and_the_actual_place() -> void:
 	var hud: UiHud = _host(UiHud.new())
-	hud.apply({today = "", place = {city = "Shanghai", space = "Farmhouse"}})
+	hud.apply({today_dot = false, place = {city = "Shanghai", space = "Farmhouse"}})
 	await _settle()
 	var texts := _labels(hud)
-	assert_array(texts).contains(["Today · All caught up", "Shanghai · ", "Farmhouse"])
-	hud.apply({today = "Radishes ready in 1h 12m", place = {city = "Tokyo", space = "Arrived", kind = UiHud.PlaceKind.FOREIGN, day_pass = "23h"}})
+	assert_array(texts).contains(["Shanghai · ", "Farmhouse"])
+	assert_array(texts.filter(func(t): return str(t).begins_with("Today"))).is_empty()
+	assert_bool(hud.today_dot_shown()).is_false()
+	# The place chip is 300 wide with the icon (SGODOT-271): a space long enough to be cut there.
+	const LONG := "Sumida Riverside Ferry Pier Fishing Steps"
+	hud.apply({today_dot = true, place = {city = "Tokyo", space = LONG, kind = UiHud.PlaceKind.FOREIGN, day_pass = "23h"}})
 	await _settle()
-	assert_array(_labels(hud)).contains(["Today · Radishes ready in 1h 12m", "Tokyo · ", " · Day Pass 23h"])
-	assert_str(UiHud.place_text(hud.data.place)).is_equal("Tokyo · Arrived · Day Pass 23h")
+	assert_bool(hud.today_dot_shown()).is_true()
+	assert_array(_labels(hud)).contains(["Tokyo · ", " · Day Pass 23h"])
+	assert_str(UiHud.place_text(hud.data.place)).is_equal("Tokyo · %s · Day Pass 23h" % LONG)
 	# LOCK-06 v1.9: Helping wins over the pass; an expired pass leaves no third segment
 	assert_str(UiHud.place_text({city = "Tokyo", space = "Mia's Farm", day_pass = "3h", helping = true})).is_equal("Tokyo · Mia's Farm · Helping")
 	assert_str(UiHud.place_text({city = "Tokyo", space = "Sumida Pond", day_pass = ""})).is_equal("Tokyo · Sumida Pond")
 	# the space is truncated first and always shows its "…" (Godot alone only adds it once 6 letters fit)
 	var space: Label = hud._place_space
 	assert_str(space.text).ends_with("…")
-	assert_bool("Arrived".begins_with(space.text.trim_suffix("…"))).is_true()
+	assert_bool(LONG.begins_with(space.text.trim_suffix("…"))).is_true()
 	assert_int(space.text.length()).is_greater(1)
 	var fs := space.get_theme_font_size(&"font_size")
 	assert_float(space.get_theme_font(&"font").get_string_size(space.text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x).is_less_equal(space.size.x)
@@ -191,8 +197,21 @@ func test_hud_sits_at_the_main_position_and_exposes_chip_rects() -> void:
 	assert_vector(energy.size).is_equal(Vector2(UiTokens.SIZE_ENERGY_CHIP_W, UiTokens.SIZE_ENERGY_CHIP_H))
 	assert_float(hud._energy_chip.size.y).is_equal(float(UiTokens.SIZE_TOUCH))   # content fits the 42 box
 	assert_float(energy.position.y).is_equal_approx(UiTokens.SIZE_HUD_TOP + 24 + 2, 0.5)
-	assert_float(hud.today_chip_rect().size.y).is_equal(float(UiTokens.SIZE_HUD_ROW2_H))
-	assert_float(hud.today_chip_rect().size.x).is_equal(float(UiTokens.SIZE_TODAY_CHIP_W))
+	# SGODOT-271 (不知火舞 76ebeaad): the Today icon is a 32 x 24 pill where the chip began, its hit area 44 x 44; the
+	# place chip takes the rest, 340 − 32 − 8 = 300; the 8 px dot stands 2 past the pill's right and top edges.
+	var today := hud.today_chip_rect()
+	assert_vector(today.size).is_equal(Vector2(UiTokens.SIZE_TODAY_ICON_W, UiTokens.SIZE_HUD_ROW2_H))
+	assert_float(today.position.x).is_equal_approx(UiTokens.SIZE_HUD_X + 2.0, 0.5)
+	assert_vector(hud._today_chip.size).is_equal(Vector2(UiTokens.SIZE_TOUCH, UiTokens.SIZE_TOUCH))
+	var place := hud.place_chip_rect()
+	assert_float(place.position.x - today.end.x).is_equal_approx(float(UiTokens.SPACE_HUD_ROW_GAP), 0.5)
+	assert_float(place.size.x).is_equal_approx(300.0, 0.5)
+	assert_float(place.position.y).is_equal_approx(today.position.y, 0.5)
+	hud.apply({today_dot = true})
+	var dot := hud._today_dot.get_global_rect()
+	assert_vector(dot.size).is_equal(Vector2(8, 8))
+	assert_float(dot.end.x - today.end.x).is_equal_approx(2.0, 0.01)
+	assert_float(today.position.y - dot.position.y).is_equal_approx(2.0, 0.01)
 
 # ---------------------------------------------------------------- Today panel
 

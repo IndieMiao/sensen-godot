@@ -311,17 +311,18 @@ func test_a_ready_harvest_that_levels_is_followed_by_its_info_row() -> void:
 	assert_int(at).is_greater_equal(0)
 	assert_str(str(lines[at + 1])).is_equal("Farming Lv2 with this harvest")
 
-func test_the_today_chip_names_the_first_row_still_to_do_not_a_ticked_one() -> void:
-	# rc0 on 232: after handing in the Pond Catch the chip still read "Deliver 2 Pond Crucian · Stall" (ticked).
+func test_the_today_focus_is_the_first_row_still_to_do_not_a_ticked_one() -> void:
+	# rc0 on 232: after handing in the Pond Catch the chip still read "Deliver 2 Pond Crucian · Stall" (ticked). The chip
+	# is an icon now (q(107)); the focus row still decides its pulse.
 	var v := _view({"plots": _plots(["growing"]), "req_done": ["req_pond_catch"]})
 	v.stall.board.requests = []
 	v.bag.slots = [{"id": "fish_crucian", "qty": 1}]
 	var rows := P0Logic.today_rows(v)
 	assert_str(str(rows[0].state)).is_equal("done")                     # the ticked Deliver row still leads the panel
-	assert_str(P0Logic.today_chip_line(rows)).is_equal("Cook it: Grilled Crucian")
+	assert_that([rows[0].focus, rows[1].line, rows[1].focus]).is_equal([false, "Cook it: Grilled Crucian", true])
 	for sk in v.skills.values(): sk.floor = 0   # hud_state's skill bars read it
-	assert_str(str(P0Logic.hud_state(v).today)).is_equal("Cook it: Grilled Crucian")
-	assert_str(P0Logic.today_chip_line([{"line": "Deliver 2 Pond Crucian · Stall", "state": "done"}])).is_equal("")
+	assert_str(str(P0Logic.hud_state(v).today_key)).is_equal("stove|dish_grilled_crucian")
+	assert_str(P0Logic.today_chip_key([{"line": "Deliver 2 Pond Crucian · Stall", "state": "done"}])).is_equal("")
 
 func test_the_today_chip_key_follows_the_focus_row_not_its_countdown() -> void:
 	var v := _view({"plots": _plots(["growing"]), "req_done": ["req_pond_catch"]})

@@ -624,7 +624,7 @@ static func hud_state(view: Dictionary, ctx: Dictionary = {}) -> Dictionary:
 		"energy": have, "energy_max": mx, "regen": regen, "next_cost": int(ctx.get("next_cost", 0)),
 		"skills": {"farming": skill_progress(sk.get("farming", {})), "fishing": skill_progress(sk.get("fishing", {}))},
 		"coins": int(view.get("coins", 0)), "unread": int(ctx.get("unread", P0Inbox.badge(view))), "buff": {},
-		"today": today_chip_line(rows),
+		"today_dots": today_dots(rows),
 		"today_key": today_chip_key(rows),
 	}
 	if ctx.has("place"): out["place"] = ctx.place
@@ -980,15 +980,19 @@ static func next_line(view: Dictionary, skill: String, level: int) -> String:
 			if level == 4: return "Next: Lv4 · 3rd ingredient slot"
 	return "Next: Lv%d · more XP from every new page" % level if skill == "cooking" else "Next: Lv%d" % level
 
-## The Today chip names the row with the focus, the first still to do (q(58)): a ticked guide row (Deliver after the
-## Pond Catch is handed in) stays in the panel with its ✓ but no longer heads the chip. "" when nothing is left to do.
-static func today_chip_line(rows: Array) -> String:
+## The keys of the rows that light the Today icon's red dot (q(107)): something to do now — a request to hand in, a
+## harvest, a dish at the stove, a new recipe or slot, the first session's Sow / Catch / Deliver / Cook. Never a
+## countdown, an info row, a request still short, `N fish · the stove is free` or `Water N sown plots · Free` (their
+## `dot` is ""), nor a row ticked done or short of Energy. A key is the kind and its object, e.g. `deliver:<request>`.
+static func today_dots(rows: Array) -> Array:
+	var out: Array = []
 	for r in rows:
-		if str(r.get("state", "")) != "done": return str(r.line)
-	return ""
+		var key := str(r.get("dot", ""))
+		if key != "" and not str(r.get("state", "")) in ["done", "short"] and not out.has(key): out.append(key)
+	return out
 
-## Which row the chip names, independent of its countdown text: the chip pulses when this changes (不知火舞 on 232),
-## not when "Radishes ready in 3h 48m" ticks to 3h 47m.
+## The row with the focus, the first still to do (q(58)), independent of its countdown text: the Today icon pulses when
+## this changes (不知火舞 on 232), not when "Radishes ready in 3h 48m" ticks to 3h 47m.
 static func today_chip_key(rows: Array) -> String:
 	for r in rows:
 		if str(r.get("state", "")) != "done": return "%s|%s" % [str(r.get("go", "")), str(r.get("icon", ""))]
@@ -1010,7 +1014,10 @@ static func today_rows(view: Dictionary) -> Array:
 	var guided_stove := lead.any(func(r): return str(r.go) == "stove" and str(r.state) != "done")
 	var farmed := (view.get("firsts", []) as Array).any(func(f): return str(f).begins_with("harvest:")) \
 		or (view.get("plots", []) as Array).any(func(p): return str(p.get("state", "")) in ["sown", "growing", "ready"])
-	if not farmed: now_rows.append(_first_sow_row(view))
+	if not farmed:
+		var first_sow := _first_sow_row(view)
+		first_sow.dot = "sow:first"   # the fallback row at the end (nothing else to say) lights nothing
+		now_rows.append(first_sow)
 	now_rows.append_array(lead)
 	# Taken requests (q(104), 李白 4ac4a4e7): the Stall Board's, the Market Board's and the residents'; untaken ones stay
 	# on their boards. One ready to hand in can be done now and leads; one still short follows what else can be done now,
@@ -1019,7 +1026,7 @@ static func today_rows(view: Dictionary) -> Array:
 	if not P0Guide.first_phase(view):
 		var deliveries: Array = []
 		for r in PinReason.taken(view):
-			if bool(r.ready): deliveries.append(_row("%s · %s" % [str(r.title), str(r.deliver)], "board", str(r.deliver_go)))
+			if bool(r.ready): deliveries.append(_row("%s · %s" % [str(r.title), str(r.deliver)], "board", str(r.deliver_go), "deliver:" + str(r.id)))
 			else: progress.append(_request_row(view, r))
 		now_rows = deliveries + now_rows
 	var ready := {}
@@ -1034,11 +1041,13 @@ static func today_rows(view: Dictionary) -> Array:
 	var level := P0Guide.harvest_level(view)
 	if ready.size() == 1:
 		var c: String = ready.keys()[0]
-		now_rows.append(_row("Harvest %d %s" % [int(ready[c]), plural(item_name(view, c)) if int(ready[c]) > 1 else item_name(view, c)], c, "plots"))
+		now_rows.append(_row("Harvest %d %s" % [int(ready[c]), plural(item_name(view, c)) if int(ready[c]) > 1 else item_name(view, c)], c, "plots", "harvest:" + c))
 	elif ready.size() > 1:
 		var n := 0
 		for c in ready: n += int(ready[c])
-		now_rows.append(_row("Harvest %d crops" % n, str(ready.keys()[0]), "plots"))
+		var crops: Array = ready.keys()
+		crops.sort()
+		now_rows.append(_row("Harvest %d crops" % n, str(ready.keys()[0]), "plots", "harvest:" + "+".join(crops)))
 	if not ready.is_empty() and bool(level.get("now", false)):
 		now_rows.append(_row("Farming Lv%d with this harvest" % int(level.level), "hoe", ""))
 	if sown > 0: now_rows.append(_row("Water %d sown plot%s · Free" % [sown, "" if sown == 1 else "s"], "water", "plots"))
@@ -1049,7 +1058,7 @@ static func today_rows(view: Dictionary) -> Array:
 	if stove is Dictionary:
 		var dish := item_name(view, str(stove.dish)) if stove.get("dish", null) != null else "Your dish"
 		var dish_icon := str(stove.dish) if stove.get("dish", null) != null else "pot"
-		if float(stove.get("ready_in", 0)) <= 0.0: now_rows.append(_row("%s ready at the stove" % dish, dish_icon, "stove"))
+		if float(stove.get("ready_in", 0)) <= 0.0: now_rows.append(_row("%s ready at the stove" % dish, dish_icon, "stove", "stove:" + dish_icon))
 		else: timed.append([float(stove.ready_in), _row("%s · %s left at the stove" % [dish, duration(float(stove.ready_in))], dish_icon, "stove")])
 	else:
 		var fish := 0
@@ -1097,8 +1106,9 @@ static func today_rows(view: Dictionary) -> Array:
 	if rows.is_empty(): rows.append(_first_sow_row(view))
 	return P0Guide.focus_first(rows.slice(0, 3))
 
-static func _row(line: String, icon_id: String, go: String) -> Dictionary:
-	return {"line": line, "icon": icon_id, "go": go, "state": "default", "tail": "", "focus": false}
+## `dot`: the row's key for the Today icon's red dot (q(107)), "" for a row that never lights it.
+static func _row(line: String, icon_id: String, go: String, dot := "") -> Dictionary:
+	return {"line": line, "icon": icon_id, "go": go, "state": "default", "tail": "", "focus": false, "dot": dot}
 
 ## A taken request still short (李白 4ac4a4e7): `An Old Man's Catch · Rare fish 0/1`, what it takes as its card says it.
 ## A fish one shows on the map the pond its ! hangs on; one the player cannot land yet (q(104)) has no Show, a small line
