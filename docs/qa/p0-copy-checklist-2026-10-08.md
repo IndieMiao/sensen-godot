@@ -8,6 +8,7 @@
 
 | 规则 | 说明 |
 |---|---|
+| P0 家城旧金山 ★ | q(106)：本清单里 P0 场景的上海名称一律按对照表读——`Shanghai` → `San Francisco`、`Xuhui Tackle Shop` → `Mission Tackle Shop`、`Lotus Tea House` → `Oak Tea House`、`Xuhui Market Square` → `Mission Market Square`、`Huangpu Travel Post` → `Union Square Travel Post`、新手塘 `Reed Pond` → `Fern Pond`、`Shanghai Postcard` → `San Francisco Postcard`；位置芯片 `San Francisco · Homestead`，放不下时 `SF · Homestead`（不截断空间名）；掌柜 Ama / Finn / Mei / Sigrid 不变 |
 | 一律英文 | 玩家可见文案不出现中文（LOCK-23）；物品名 ≤ 18 字符 |
 | Energy，不写 Stamina | 体力一律 `Energy` |
 | 分隔符 | 半角空格 + `·` + 半角空格：`Cast · 5 Energy` |
