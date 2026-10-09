@@ -102,6 +102,21 @@ func test_past_the_limit_the_spring_back_comes_first() -> void:
 	assert_bool(mine._cam_follow.held).is_false()
 	assert_bool(_in_box(mine)).is_true()
 
+## Lifted past 1.4, then the fingers come down again while it is still springing back (苏烈 on #177): with fingers down
+## the zoom no longer steps, which must not count as settled — the camera holds, with no ease back.
+func test_a_new_pinch_during_the_spring_back_holds() -> void:
+	var mine := _mine(Vector3(5.0, 0, -3.6))
+	mine.p0_zoom(0.8 / 1.9, Vector2(4, 400))
+	mine.p0_zoom_end()
+	_run(mine, DT)                                 # one frame of the spring back
+	assert_bool(mine._pinch.is_held()).is_false()
+	mine.p0_zoom(1.0, Vector2(4, 400))            # fingers down again, not moved
+	assert_bool(_in_box(mine)).is_false()
+	var cam := mine.cam.global_position
+	_run(mine, 1.0)
+	assert_bool(mine._cam_follow.held).is_true()
+	assert_bool(mine.cam.global_position.is_equal_approx(cam)).is_true()
+
 ## Fingers still down: the stretch and the framing stay however long they rest.
 func test_nothing_eases_while_the_fingers_are_down() -> void:
 	var mine := _mine(Vector3(5.0, 0, -3.6))
