@@ -157,3 +157,25 @@ func test_the_icon_opens_today_and_closes_it() -> void:
 	ui.hud.today_pressed.emit()
 	await await_idle_frame()
 	assert_bool(ui.has_modal()).is_false()
+
+## 奕星 / 李白 on #201: the first dish's row lights it once the stove can make it; seen, the fish eaten (it cannot be
+## cooked, the key leaves) and caught again, it lights again.
+func test_cook_it_lights_again_after_the_fish_is_eaten_and_caught_again() -> void:
+	var v := _view()
+	v.erase("firsts")
+	v["plots"] = [{"state": "growing", "crop": "crop_radish", "ready_in": 3600000}]
+	v["req_done"] = [P0Guide.TUTORIAL]
+	v["cooking"] = {"cookbook": [{"id": "dish_grilled_crucian", "name": "Grilled Crucian", "known": true, "cooked": false,
+		"can_cook": true}]}
+	assert_array(_dots(v)).is_equal(["cook:dish_grilled_crucian"])
+	var ui := await _ui(v)
+	assert_bool(ui.hud.today_dot_shown()).is_true()
+	ui.open_today()
+	ui.close_modal()
+	assert_bool(ui.hud.today_dot_shown()).is_false()
+	var eaten := v.duplicate(true)
+	eaten.cooking.cookbook[0].can_cook = false   # the fish eaten: Cook it stays, lighting nothing
+	ui.set_view(eaten)
+	assert_bool(ui.hud.today_dot_shown()).is_false()
+	ui.set_view(v)                                # caught again
+	assert_bool(ui.hud.today_dot_shown()).is_true()
