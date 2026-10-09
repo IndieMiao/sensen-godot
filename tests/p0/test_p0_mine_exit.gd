@@ -71,3 +71,24 @@ func test_the_whole_model_takes_the_tap() -> void:
 	assert_bool(box.has_point(cam.unproject_position(Vector3(0, 1.6, 0)))).is_true()   # high on the arch
 	assert_bool(box.has_point(cam.unproject_position(Vector3(0, 0.1, 0)))).is_true()   # at its foot
 	assert_bool(box.has_point(cam.unproject_position(Vector3(6, 0, 0)))).is_false()    # well beside it
+
+## At the mouth the key pulses once, its ring 3 px from 80 % (不知火舞 on #156: the main's 2 px read faint there).
+func test_the_key_pulse_is_the_thicker_ring() -> void:
+	var store := "user://test_p0_mine_exit.json"
+	var ui := P0Ui.new()
+	ui.quick_store = store
+	add_child(auto_free(ui))
+	await await_idle_frame()
+	ui.set_view({"energy": {"value": 200, "max": 200, "next_in": null, "regen_ms": 240000}, "bag": {"capacity": 25, "free": 25,
+		"slots": []}, "plots": [], "coins": 40, "skills": {}, "rest": {"used": 0, "limit": 1, "resets_in": 1},
+		"inbox": {"parcels": [], "letters": []}})
+	ui.set_mode("farm")
+	ui.set_surface("farm")
+	await await_idle_frame()
+	var pulse := ui.pulse_key()
+	assert_object(pulse).is_not_null()
+	assert_int(ui.key_pulses).is_equal(1)
+	assert_float(pulse.stroke).is_equal(P0Ui.KEY_PULSE_RING)
+	assert_float(pulse.start_alpha).is_equal(P0Ui.KEY_PULSE_ALPHA)
+	assert_float(P0Ui.KEY_PULSE_RING).is_equal(3.0)
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(store))
