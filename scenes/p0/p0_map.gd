@@ -75,6 +75,7 @@ func _install_city_map() -> void:
 		city_map.pond_action = "Go"
 		city_map.destination_style = _destination_style
 		city_map.host_card = _own_card
+		city_map.kept_pin = _kept_pin   # where the player is keeps its pin; the rest give way (SGODOT-269)
 		_style_locate(city_map.recenter)
 		_style_locate(city_map.home_key, "home")   # the home key over it: the same key, i-home (SGODOT-261)
 		city_map.home_key.visible = true
@@ -150,6 +151,15 @@ func _open_pond_card(entry: Dictionary, info: Dictionary) -> void:
 		func():
 			if not to_fish[0] and city_map and str(city_map.selected.get("id", "")) == id: city_map.clear_selection(),
 		"pond_card")
+
+## The pin of the place the player is at (a pond or an outpost): away from home the avatar stands beside it, so it never
+## gives way to the avatar or to a pin packed before it (SGODOT-269). Its changes reach the map's layout with the
+## entries _sync_here replaces (CityMapView._layout_wanted).
+func _kept_pin(entry: Dictionary) -> bool:
+	match str(entry.get("kind", "")):
+		"pond": return is_here("pond", str(entry.get("id", "")))
+		"place": return is_here("outpost", str(entry.get("id", "")))
+	return false
 
 ## Whether the player is at this place now (the place chip's place, P0Runtime.here): q(80)'s Back to <name>.
 func is_here(space: String, place: String) -> bool:
@@ -484,8 +494,53 @@ func frame_home_set() -> void:
 			view = more
 	framed = chosen
 	if view.is_empty(): _look(_origin(), FRAME_ZOOM_MIN)
-	else: _look(view.at, float(view.z))
+	else:
+		view = _part_pins(chosen, view, safe)
+		_look(view.at, float(view.z))
 	_update_cameras()   # the trials moved only the Godot camera: now the map, pawns and markers follow
+
+## 不知火舞 on 269: space pins give way to the pins packed before them, so the opening view zooms in a tenth at a time,
+## up to z16, while that brings more of the pins it holds into view untouched (the first session's Tackle Shop by Reed
+## Pond). The must set (the avatar, the marked pins) stays in the frame, centred on the whole set and, where that pushes
+## it out, on the must set. It takes the first view that shows more of them; where none does before z16 or before the
+## must set stops fitting, the opening view stays as it was rather than zooming in for nothing and losing farther pins,
+## and the packing folds the touching ones. Trials move the Godot camera only.
+func _part_pins(items: Array, view: Dictionary, safe: Rect2) -> Dictionary:
+	var must := frame_must()
+	_look(view.at, float(view.z))
+	var base := _pins_shown(items, safe)
+	if base == items.filter(func(it): return not it.get("self_pin", false)).size(): return view   # all shown already
+	var z := float(view.z)
+	while z < FRAME_ZOOM_MAX - 0.001:
+		z = minf(FRAME_ZOOM_MAX, z + 0.1)
+		_look(Vector2(center_lat, center_lng), z)
+		_centre_on(items, safe)
+		if not safe.encloses(_frame_box(must)): _centre_on(must, safe)
+		if not safe.encloses(_frame_box(must)): break   # closer would push the avatar or a marked pin out
+		if _pins_shown(items, safe) > base: return {"at": Vector2(center_lat, center_lng), "z": z}
+	return view
+
+## Pans the trial camera so `items` sit centred in `safe` (with the map's pitch their middle is not the screen's).
+func _centre_on(items: Array, safe: Rect2) -> void:
+	for k in 4:
+		var shift := safe.get_center() - _frame_box(items).get_center()
+		if shift.length() < 1.0: break
+		_pan_by(shift)
+
+## How many space pins of `items` this trial view would show: in the frame, and clear by the packing's margin of those
+## counted before them (in their order: the marked pins first, then the nearest), a marked pin always (their discs over
+## their points, MapDestination; CityMapView._place_candidate decides on the map).
+func _pins_shown(items: Array, safe: Rect2) -> int:
+	var placed: Array = []
+	var d := UiMapDestination.DISC
+	for it in items:
+		if it.get("self_pin", false): continue
+		var p = geo_to_screen(float(it.lat), float(it.lng))
+		if p == null or not safe.has_point(p): continue
+		var disc := Rect2((p as Vector2) - Vector2(d * 0.5, d), Vector2(d, d))
+		if str(it.get("marker", "")) == "" and placed.any(func(r): return (r as Rect2).intersects(disc.grow(CityMapView.PACK_MARGIN))): continue
+		placed.append(disc)
+	return placed.size()
 
 ## The smallest view in z13.5–16 holding `items` inside `safe`, centred on them: {at, z}; {} when z13.5 does not hold
 ## them. Trials move the Godot camera only (刘邦 on #92).

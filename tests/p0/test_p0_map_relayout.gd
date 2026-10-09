@@ -219,6 +219,18 @@ func test_a_city_switch_lays_the_pins_out() -> void:
 func test_the_players_own_pin_moving_lays_the_pins_out() -> void:
 	assert_bool(await _lays_out(func(): map.set_self_at(map.center_lat + 0.0003, map.center_lng), 3)).is_true()
 
+## The player's own name shows or folds with the map still (its own yield, the last layout's): space pins give way to
+## the body with its name while shown (SGODOT-269), so the pins are laid out again (亚瑟 on #189).
+func test_the_players_own_name_folding_lays_the_pins_out() -> void:
+	var fm: FarmMarkers = map.farm_markers
+	_look(map.home_lat, map.home_lng)   # the avatar and its name on screen
+	await _settle()
+	assert_bool((fm._buttons["self"] as Control).visible).is_true()
+	for i in 40: await get_tree().process_frame   # its name pops in, scaled by the zoom boost, for some 30 frames
+	assert_bool(await _lays_out(func(): pass)).is_false()   # settled: nothing to lay out
+	assert_bool(await _lays_out(func(): fm.yield_self_label(true))).is_true()
+	fm.yield_self_label(false)
+
 # ---------------------------------------------------------------- A1: the packing order
 
 ## Each candidate's key is made once: the order is the one the comparison made, with a selection, marks and pins shown

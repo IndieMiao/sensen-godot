@@ -102,6 +102,9 @@ var host_chrome := false: set = set_host_chrome
 var destination_style := Callable()
 ## func(entry) -> bool: the host shows its own card for this pin (P0PlaceSheet), so selecting it opens no info panel.
 var host_card := Callable()
+## func(entry) -> bool: a pin the host keeps whatever it would cover (P0: the place the player is at, the avatar standing
+## beside it); every other pin gives way when it would cover one packed before it or an avatar (SGODOT-269).
+var kept_pin := Callable()
 
 func _destination(entry: Dictionary) -> Dictionary:
 	return destination_style.call(entry) if destination_style.is_valid() else {}
@@ -979,7 +982,10 @@ func _layout_wanted() -> bool:
 	var fm = host.get("farm_markers")
 	var own := []
 	if fm != null and fm.has_method("blocker_rects"):
-		own = [fm.blocker_rects(), fm.self_label_rect() if fm.has_method("self_label_rect") else Rect2(), fm.global_position]
+		# blocker_rects(true) as well: a space pin gives way to the bodies with their names while shown, and whether the
+		# player's own name shows is the last layout's own yield (亚瑟 on #189, SGODOT-269).
+		own = [fm.blocker_rects(), fm.blocker_rects(true), fm.self_label_rect() if fm.has_method("self_label_rect") else Rect2(),
+			fm.global_position]
 	# The 3D anchor (the billboards' world points) moves only with the centre today (MapPoc._maybe_reanchor): compared too,
 	# so a re-anchor on its own would never leave them where they were (刘邦 on #181).
 	var values := [host.center_lat, host.center_lng, host.zoom, host.get("_zoom_elastic"), host.bearing, host.pitch,
@@ -1056,6 +1062,7 @@ func _update_markers() -> void:
 	# incumbency (anti-flicker), source rank and id — fully deterministic.
 	_pack_order(candidates)
 	var blockers := _player_blockers()
+	var bodies := _player_blockers(true)   # what a space pin gives way to: the avatars' bodies (SGODOT-269)
 	var now := Time.get_ticks_msec()
 	var occupied: Array = []
 	# Dining quota: deferred dining candidates fill whatever space remains after
@@ -1066,10 +1073,10 @@ func _update_markers() -> void:
 		if filter != "food" and c.entry.kind == "poi" and dining >= DINING_QUOTA and str(c.art) in DINING_ARTS:
 			deferred.append(c)
 			continue
-		if _place_candidate(c, occupied, blockers, now) and c.entry.kind == "poi" and str(c.art) in DINING_ARTS:
+		if _place_candidate(c, occupied, blockers, now, bodies) and c.entry.kind == "poi" and str(c.art) in DINING_ARTS:
 			dining += 1
 	for c in deferred:
-		_place_candidate(c, occupied, blockers, now)
+		_place_candidate(c, occupied, blockers, now, bodies)
 	_yield_own_label()
 	var shown := displayed.map(func(m): return str(m.entry.id))
 	var shown_now := {}
@@ -1109,7 +1116,7 @@ func _show_selected_art() -> void:
 ## One placement attempt. Anchors never move: on success the marker is laid out
 ## in place, on failure it stays hidden this frame. Dead-zone margins plus the
 ## reappear cooldown keep boundary oscillation from flickering markers.
-func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int) -> bool:
+func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int, bodies: Array = []) -> bool:
 	var entry: Dictionary = c.entry
 	var id: String = c.id
 	var is_selected: bool = selected.get("id", null) == entry.get("id")
@@ -1118,10 +1125,16 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int)
 	if not is_selected:
 		if not incumbent and now < int(_hidden_until.get(id, 0)): return false
 		var probe: Rect2 = c.bounds.grow(-PACK_MARGIN if incumbent else PACK_MARGIN)
-		# 地标相互之间也做遮挡剔除，但不给玩家 pin 让位；其余标记两者都让。宿主的地点（P0 据点）从不让位：
-		# 城市级也每处一枚（q(72)），只是名牌和已放下的标记相撞时先收起。
-		# A pin wearing a marker is always shown too (不知火舞 on 234 A2: the avatar and the marked pins always go in).
-		var blocked: bool = entry.kind != "place" and _marker_of(entry) == "" and (_hits(occupied, probe) or (entry.kind != "landmark" and not _over_avatar(entry) and _hits(blockers, probe)))
+		# 地标相互之间也做遮挡剔除，但不给玩家 pin 让位；其余标记两者都让。
+		# Space pins (P0's outposts, the Homestead pin, ponds) give way as every POI does (用户 via SGODOT-269, 不知火舞:
+		# they piled up by home at the city level): to the pins packed before them and to the players' avatars, with the
+		# same cooldown and margins. They still pack first (_pack_key), so an outpost yields only to the selected pin, a
+		# marked one or an outpost nearer home. Always in: a pin wearing a marker (a task: 不知火舞 on 234 A2) and the
+		# host's kept pin (P0: where the player is, the avatar beside it).
+		# A space pin keeps clear of the avatar's body only (不知火舞 on 269); a POI's tall artwork, of the margin over it.
+		var kept := _marker_of(entry) != "" or (kept_pin.is_valid() and bool(kept_pin.call(entry)))
+		var avatars := bodies if not _destination(entry).is_empty() else blockers
+		var blocked: bool = not kept and (_hits(occupied, probe) or (entry.kind != "landmark" and _hits(avatars, probe)))
 		if blocked:
 			if incumbent: _hidden_until[id] = now + REAPPEAR_COOLDOWN_MS
 			return false
@@ -1150,12 +1163,14 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int)
 		# priority), and comes back once zooming in parts them or the pin is selected (不知火舞 on C30). Any MapDestination
 		# likewise, marked or not: the selected pin packs first, so its name always shows and the names it touches fold
 		# until the card closes (不知火舞 on 234 A2).
-		label_fits = is_selected or not _hits(occupied, label_rect)
+		# A space pin's name keeps clear of the avatars' bodies too, as of the pins (不知火舞 on 269): under, then over.
+		var name_bodies := bodies if not _destination(entry).is_empty() else []
+		label_fits = is_selected or not (_hits(occupied, label_rect) or _hits(name_bodies, label_rect))
 		if not label_fits and not _destination(entry).is_empty():
 			# A MapDestination's name tries over its disc before folding (不知火舞 on 234 A2): the order stays C30's,
 			# no outpost gets a privilege, but the second place often clears a neighbour's name (the market's at home).
 			var over := Rect2(label_rect.position.x, c.point.y - UiMapDestination.DISC - above_gap - c.label_h, c.label_w, c.label_h)
-			if not _hits(occupied, over):
+			if not _hits(occupied, over) and not _hits(name_bodies, over):
 				label_rect = over
 				label_above = true
 				label_fits = true
@@ -1336,8 +1351,9 @@ func _pack_key(c: Dictionary) -> Array:
 func _marker_of(entry: Dictionary) -> String:
 	return str(entry.get("marker", _pin_markers.get(str(entry.get("id", "")), "")))
 
-## Outposts and pins wearing a marker draw over the player's own 3D avatar (no depth test) and never give way to it:
-## both pack before everything but the selected pin (不知火舞 / 蒙恬 on C30).
+## Outposts and pins wearing a marker draw over the player's own 3D avatar (no depth test): both pack before everything
+## but the selected pin (不知火舞 / 蒙恬 on C30). Only a marked pin, the selected one and the host's kept pin stay on an
+## avatar; the rest give way to it (_place_candidate, SGODOT-269).
 func _over_avatar(entry: Dictionary) -> bool:
 	# A destination pin too: away from home the player's own avatar stands beside the place they are at (P0 MAP-1).
 	return entry.get("kind") == "place" or _marker_of(entry) != "" or not _destination(entry).is_empty()
@@ -1397,11 +1413,11 @@ func _yield_own_label() -> void:
 	own.position += fm.global_position - global_position
 	fm.yield_self_label(own.has_area() and _hits(_place_labels, own))
 
-func _player_blockers() -> Array:
+func _player_blockers(body_only := false) -> Array:
 	var result: Array = []
 	var fm = host.get("farm_markers")
 	if fm == null or not fm.has_method("blocker_rects"): return result
-	for r in fm.blocker_rects():
+	for r in fm.blocker_rects(body_only):
 		result.append(Rect2((r as Rect2).position + fm.global_position - global_position, (r as Rect2).size))
 	return result
 
