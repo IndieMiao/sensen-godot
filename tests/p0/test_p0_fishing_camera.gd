@@ -96,6 +96,7 @@ func test_the_presentation_leaves_the_camera_and_reads_at_the_walking_scale() ->
 	var view := FishingPresentation.new()
 	view.close_up = false
 	view.float_scale = P0Pond.FLOAT_SCALE
+	view.float_ring = P0Pond.FLOAT_RING
 	view.line_px = P0Pond.LINE_PX
 	view.line_color = P0Pond.LINE_INK
 	root.add_child(view)
@@ -106,7 +107,8 @@ func test_the_presentation_leaves_the_camera_and_reads_at_the_walking_scale() ->
 	assert_that(cam.global_transform).is_equal(before)
 	assert_float(cam.size).is_equal_approx(6.72, 0.001)
 	assert_vector(view._bobber.scale).is_equal_approx(Vector3.ONE * 1.6, Vector3.ONE * 0.0001)
-	assert_object(view._ring).is_null()   # no ink ring: the user read it as a black ring (SGODOT-263 ①)
+	assert_bool(P0Pond.FLOAT_RING).is_false()   # no ink ring: the user read it as a black ring (SGODOT-263 ①)
+	assert_object(view._ring).is_null()
 	assert_float(view._line_half() * 2.0 * PHONE.x / cam.size).is_equal_approx(1.5, 0.0001)   # 1.5 px on screen
 	assert_that(view._line_material.albedo_color).is_equal(P0Pond.LINE_INK)
 	view.finish()
