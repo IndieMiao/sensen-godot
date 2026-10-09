@@ -25,7 +25,7 @@
 - 组件和 0.1.1 逐项一致（5 个 .so、Mapbox 55 个条目、LiveKit、token `744e223b`、4 个插件、dex 7、证书 `38771d94…`）；客户端 tests/p0 和 ui_kit 共 1132 个用例全过。
 - 冒烟：模拟器连 devserver 上的临时服（c4811381，空数据，没碰香港存档）。看到 Today 图标与红点（打开后灭，出现交付行后又亮）；位置芯片写全称，`San Francisco · Union Square Travel Post` 不截断；Sigrid 柜台抽屉的把手露在店主条上方；首会话走通（种地 → Fern Pond 钓 3 条 → 交付 +14 → 做 Grilled Crucian）。
 - 发给 Joey：Slack 2026-10-10 00:47:05，飞书 00:47:09，都已回读（授权见 pm/demo-0.1.2/authorization.md）。原消息把 Today 图标的位置写成了「右上角」，00:47 两边都补发了更正：在顶部第二行最左边、位置标签左侧。
-- 装到用户手机：由韩信覆盖安装，待装。
+- 装到用户手机：2026-10-10 00:50:21，韩信 install -r 覆盖安装（确认页由用户自己点），存档保留（firstInstallTime 仍是 2026-10-09 16:33:27）；手机上 base.apk 的 SHA-256 与产物一致，证书 `38771d94…`。记录：pm/demo-0.1.2/hx/install-record.md。
 
 内容（自 0.1.1，#201–#204）：
 
