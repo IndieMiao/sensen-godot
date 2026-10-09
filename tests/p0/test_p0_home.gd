@@ -265,6 +265,10 @@ func test_a_refused_upgrade_says_where_and_what_is_missing() -> void:
 	rt.session.view.homestead.next.materials[0].have = 16                        # the view has no gap left
 	rt._on_refused("need_material", {"item": "wood", "need": 16, "have": 15}, {"type": "homestead_upgrade"})
 	assert_str(rt.ui.toast_text()).is_equal("Need 1 more Timber")
+	rt._on_refused("skills_short", {"need": 5, "have": 4}, {"type": "homestead_upgrade"})
+	assert_str(rt.ui.toast_text()).is_equal("Skills total 5 needed · now 4")   # never "Can't do that (skills_short)"
+	rt._on_refused("max_level", {"level": 3}, {"type": "homestead_upgrade"})
+	assert_str(rt.ui.toast_text()).is_equal("Highest level for now")
 
 func test_the_sign_prompt_reads_its_level_and_lights_ready() -> void:
 	# WORLD-HINT-5 (228 64c75e54, SGODOT-250): the house mark, Ready once the Needs are met; open: `Homestead LvN`.
