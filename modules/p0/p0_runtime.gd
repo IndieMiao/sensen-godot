@@ -969,6 +969,7 @@ func _dev_shot(dt: float) -> void:
 			"gear": ui.open_gear()
 			"skills": ui.open_skills()
 			"profile": ui.open_profile()
+			"editlook": ui.edit_look()   # the profile's Edit look ›: the dressing room above the current world (KEEP-P0-2)
 			"resident": ui.open_resident(step[1] if step.size() > 1 else "res_pip")   # SGODOT-225 dialogue bar
 			"creel":   # creel:0 — the creel badge's states for shots: the bag's free slots set locally (235 B1)
 				var cv: Dictionary = session.view.duplicate(true)
