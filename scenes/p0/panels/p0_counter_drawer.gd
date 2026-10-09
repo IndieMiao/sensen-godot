@@ -14,8 +14,8 @@ extends UiDrawer
 ##   specialty  the market's City Specialty shelf (MARKET-SPECIALTY 1394:92801, 李白 q(48)): its own short sheet,
 ##              `City Specialty` and the postcard row, no keeper bar, no tabs, no bag; the P0 UI floats Close above it.
 ##   drinks     the tea house and the post desk (NPC-6 482:133, NPC-7-P0 1507:97237, TEA-DONE / NEARFULL / BLOCKED):
-##              keeper bar with the shared-cups note, `Drinks left today · 3 of 3`, the next cup's line and one
-##              command (`Hot Tea · +30 Energy`, or the grey reason). A shorter drawer (top at y 534), no bag.
+##              keeper bar with the shared-cups note, `Cups used · 0/3`, the next cup's line and one
+##              command (`Hot Tea · +30 Energy`, or the grey reason). The cups are counted once, used / limit (q(98) ③). A shorter drawer (top at y 534), no bag.
 ## Everything shown comes from the server view (view.shops[role], view.quotas, view.keepers) through P0ItemInfo /
 ## P0Logic; names and places come from the outpost's ctx. Buttons only report (`action_requested`); the P0 UI sends
 ## the command with the shop.
@@ -37,7 +37,7 @@ static func specialty_height(rows: int) -> float: return 79.0 + 58.0 * maxi(1, r
 const DRINK_ROLES := ["tea", "post"]
 ## KeeperBar notes on the drink counters (NPC-6, NPC-7-P0): one daily cup count across both.
 const DRINK_NOTES := {"tea": "Counts across all tea houses · %d cups a day", "post": "Shares the %d cups a day with tea"}
-## The drink's short name in the sold-out reason (TEA-BLOCKED `Tea 3/3 today · back tomorrow`).
+## The drink's short name in the sold-out reason (TEA-BLOCKED `Tea 3/3 today · Resets in 9h 12m`, q(98) ③).
 const DRINK_SHORT := {"tea": "Tea", "post": "Coffee"}
 const SHELF_ROWS := 4           # FARM-6: four product rows, then the divider at y 428
 const _ROW_H := 58.0
@@ -48,7 +48,7 @@ const _SMALL := 4.0
 const _TRACK := Vector2(110, 3) # Compact/Shop Bag capacity track
 const _SCOPE_H := 36.0
 const _DRINK_INSET := 12.0      # NPC-6: fact / line / command at x 24
-const _DRINK_GAP := 6.0         # keeper bar (with its note) to `Drinks left today`
+const _DRINK_GAP := 6.0         # keeper bar (with its note) to `Cups used`
 ## Shop titles over the keeper's place (KeeperBar Titled: `Finn's Tackle`, `Mei's Stall`, `Ama's Tea`, `Sigrid's Desk`).
 const SHOP_NOUN := {"tackle": "Tackle", "market": "Stall", "tea": "Tea", "post": "Desk"}
 ## Keeper role and P0 name when the opener passes no ctx (assets/p0/p0_outposts.json keeper, SGODOT-227).
@@ -351,14 +351,18 @@ func _fill_drinks() -> void:
 	var gain := int(d.get("gain", 0))
 	var energy := gain if gain > 0 and gain < int(d.get("energy", 30)) else int(d.get("energy", 30))   # TEA-NEARFULL: +12
 	if keeper_bar: keeper_bar.note = str(DRINK_NOTES.get(role, "%d")) % limit
-	_drinks.add_child(UiFactRow.new("Drinks left today", "%d of %d" % [left, limit]))
+	# q(98) ③: the cups are counted in one place, used / limit like the Energy card's Tea tile `0/3 today`; the price
+	# line no longer says which cup it is.
+	_drinks.add_child(UiFactRow.new("Cups used", "%d/%d" % [int(d.get("used", limit - left)), limit]))
 	_gap(_drinks, _SMALL)
 	var line := "%s · +%d Energy" % [name, energy]
-	if left > 0: line += " · %d coins (%d/%d)" % [int(d.get("price", 0)), int(d.get("used", 0)) + 1, limit]
+	if left > 0: line += " · %d coins" % int(d.get("price", 0))
 	_drinks.add_child(UiKit.label(line, UiTokens.STYLE_C12_XB))
 	_gap(_drinks, _SMALL)
 	var reason := ""
-	if left <= 0: reason = "%s %d/%d today · back tomorrow" % [str(DRINK_SHORT.get(role, name)), limit, limit]
+	if left <= 0:   # the home-day reset (04:00), not "tomorrow"; the keeper still says `Come back tomorrow.` (q(98) ③)
+		var resets := float(d.get("resets_in", view.get("rest", {}).get("resets_in", 0)))
+		reason = "%s %d/%d today · Resets in %s" % [str(DRINK_SHORT.get(role, name)), limit, limit, P0Logic.span(resets)]
 	elif bool(d.get("full", false)): reason = "Energy full"
 	elif int(view.get("coins", 0)) < int(d.get("need", d.get("price", 0))):
 		reason = "Need %d more coins" % (int(d.get("need", d.get("price", 0))) - int(view.get("coins", 0)))

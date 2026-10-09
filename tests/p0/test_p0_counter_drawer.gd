@@ -99,14 +99,26 @@ func test_tea_page_states() -> void:
 	await _settle()
 	assert_str(d.keeper_bar.note).is_equal("Counts across all tea houses · 3 cups a day")
 	var labels := d._drinks.find_children("*", "Label", true, false).map(func(l): return (l as Label).text)
-	assert_array(labels).contains(["Drinks left today", "3 of 3", "Hot Tea · +30 Energy · 40 coins (1/3)"])
+	assert_array(labels).contains(["Cups used", "0/3", "Hot Tea · +30 Energy · 40 coins"])   # q(98) ③: counted once
 	var b: UiCommandButton = d._drinks.find_children("*", "UiCommandButton", true, false)[0]
 	assert_str(b.label).is_equal("Hot Tea · +30 Energy")
+	v.drinks.used = 1
+	v.drinks.left = 2
+	d.refresh(v, true)
+	await _settle()
+	labels = d._drinks.find_children("*", "Label", true, false).filter(func(l): return l.is_visible_in_tree()).map(func(l): return (l as Label).text)
+	assert_array(labels).contains(["1/3", "Hot Tea · +30 Energy · 40 coins"])
+	v.drinks.used = 3
 	v.drinks.left = 0
 	d.refresh(v, true)
 	await _settle()
 	b = d._drinks.find_children("*", "UiCommandButton", true, false).filter(func(x): return x.visible)[0]
-	assert_str(b.reason).is_equal("Tea 3/3 today · back tomorrow")   # TEA-BLOCKED
+	assert_str(b.reason).is_equal("Tea 3/3 today · Resets in 11h")   # TEA-BLOCKED: the home-day reset, not tomorrow (q(98) ③)
+	v.drinks.resets_in = 2520000
+	d.refresh(v, true)
+	await _settle()
+	b = d._drinks.find_children("*", "UiCommandButton", true, false).filter(func(x): return x.visible)[0]
+	assert_str(b.reason).is_equal("Tea 3/3 today · Resets in 42m")   # q(97)
 
 func test_post_desk_note_and_keeper() -> void:
 	var d := _drawer("post", {"keeper": "Sigrid", "place": "Huangpu Travel Post"})
