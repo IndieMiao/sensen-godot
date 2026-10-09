@@ -56,7 +56,8 @@ func test_page_facts_count_the_day_and_the_next_request() -> void:
 	# … after it, its slot refills in 4 h and that is the line (whole hours, q(97)); the held slot still doesn't count.
 	v.boards.stall.slots[0] = {"empty": true, "refill_in": 4 * 3600000}
 	assert_array(P0Board.facts(v, "stall")).is_equal([["Requests today", "4/6"], ["Next request", "4h"], ["Bonus today", "20/100"]])
-	assert_str(P0Board.hours(14280000)).is_equal("3h 58m")
+	assert_str(P0Logic.span(14280000)).is_equal("3h 58m")
+	assert_str(P0Logic.span(780000)).is_equal("13m")   # q(97): not `13:00`
 
 func test_a_delivered_slot_shows_its_row_done() -> void:
 	var v := _view()

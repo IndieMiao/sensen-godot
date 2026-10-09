@@ -197,16 +197,11 @@ static func crop_count_name(view: Dictionary, crop_id: String, n: int) -> String
 	var name := P0Logic.item_name(view, crop_id)
 	return name if n == 1 else P0Logic.plural(name)   # q(58)'s exceptions live in P0Logic.PLURALS (q(98))
 
-## ` · +8 in 21m`: the Energy still missing and when natural recovery brings it.
+## ` · +8 in 20:41`: the Energy still missing and when natural recovery brings it.
 static func _gain_in(e: Dictionary, gap: int) -> String:
 	if e.get("next_in", null) == null: return ""
 	var ms := float(e.next_in) + float(gap - 1) * float(e.get("regen_ms", 240000))
-	return " · +%d in %s" % [gap, _short(ms)]
-
-## `21m`, `1h 05m`: Today's tail is one short line.
-static func _short(ms: float) -> String:
-	var minutes := maxi(1, ceili(ms / 60000.0))
-	return "%dm" % minutes if minutes < 60 else "%dh %02dm" % [minutes / 60, minutes % 60]
+	return " · +%d in %s" % [gap, P0Logic.duration(ms)]   # Energy regen ticks each second: `+2 in 7:41` (q(97) ①)
 
 ## ` · Farming Lv2 at first harvest` (§14.2 end): what the growing beds' locked XP and first-harvest bonuses reach.
 static func harvest_level_tail(view: Dictionary) -> String:

@@ -324,16 +324,16 @@ static func tokens(view: Dictionary, item_id: String, context: StringName, opts 
 		meal = str(int(it.get("meal", 0))) if kind == "dish" else "",
 		eat_label = str(P0Logic.eat_button(view, item_id).get("text", "")) if kind == "dish" else "",
 		gifted_line = "Gifted · can't be sold · can eat · can gift to a Resident" if stack.get("gifted", false) else "",
-		expires_line = ("Expires in " + P0Logic.duration(float(stack.expires_in))) if stack.has("expires_in") else "",
+		expires_line = ("Expires in " + P0Logic.span(float(stack.expires_in))) if stack.has("expires_in") else "",
 		affinity_line = "",
 		gift_label = ("Gift · +%d" % int(opts.target.preview)) if opts.get("target", {}).has("preview") else "Gift",
 		gift_near_label = ("Gift to %s" % str(opts.near.name)) if str(opts.get("near", {}).get("name", "")) != "" else "",
 		sell_all_label = _sell_all_label(count, sellable, here),
-		quota_resets_in = P0Logic.duration(float(quota.get("resets_in", 0))) if quota.has("resets_in") else "",
+		quota_resets_in = P0Logic.span(float(quota.get("resets_in", 0))) if quota.has("resets_in") else "",
 		stock_line = NEW_FOR_YOU if _new_offer(item_id, opts) else _stock_line(offer, count),
 		gate_text = ("%s Lv%d needed" % [str(offer.get("skill", "")).capitalize(), int(offer.get("gate", 0))]) if offer.has("gate") else "",
 		# Daily stock comes back at the day's rollover, the same moment as Rest (view.rest.resets_in).
-		restock_in = P0Logic.duration(float(view.get("rest", {}).get("resets_in", 0))) if view.get("rest", {}).has("resets_in") else "",
+		restock_in = P0Logic.span(float(view.get("rest", {}).get("resets_in", 0))) if view.get("rest", {}).has("resets_in") else "",
 		coins_short = str(maxi(0, int(offer.get("need", int(offer.get("price", 0)))) + int(offer.get("price", 0)) * (maxi(1, int(opts.get("qty", 1))) - 1) - int(view.get("coins", 0)))),
 		rod_effect = _rod_effect(view, rod),
 		# A buy row has room for the reach only (NPC-2-2 `Lands up to Rare fish`); the card says the bite window too.
@@ -458,5 +458,5 @@ static func _quota_line(quota: Dictionary, kind: String, role: String) -> Dictio
 	var text := ("%s buy-back today %d/%d" % [str(q.get("label", "")), int(q.get("used", 0)), int(q.get("cap", 0))]).strip_edges()
 	text = text.left(1).to_upper() + text.substr(1)
 	var note := str(q.get("scope", ""))
-	if q.has("resets_in"): note = SEP.join(PackedStringArray([note, "resets in " + P0Logic.duration(float(q.resets_in))])).trim_prefix(SEP)
+	if q.has("resets_in"): note = SEP.join(PackedStringArray([note, "resets in " + P0Logic.span(float(q.resets_in))])).trim_prefix(SEP)
 	return {text = text, note = note, have = int(q.get("used", 0)), total = int(q.get("cap", 0))}

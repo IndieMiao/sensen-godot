@@ -25,7 +25,7 @@ static func facts(view: Dictionary, board: String) -> Array:
 		if sl.get("empty", false) and sl.has("refill_in"):
 			var t := float(sl.refill_in)
 			soonest = t if soonest < 0.0 else minf(soonest, t)
-	if soonest >= 0.0: out.append(["Next request", hours(soonest)])
+	if soonest >= 0.0: out.append(["Next request", P0Logic.span(soonest)])
 	var bonus: Dictionary = q.get("request_bonus", {})
 	if int(bonus.get("used", 0)) > 0: out.append(["Bonus today", "%d/%d" % [int(bonus.used), int(bonus.get("cap", 0))]])
 	return out
@@ -132,7 +132,7 @@ static func detail(view: Dictionary, board: String, id: String) -> Dictionary:
 		for j in slots.size():
 			var other: Dictionary = slots[j]
 			if j != i and other.get("empty", false) and other.has("refill_in"):
-				d.next = {slot = "%s board slot" % ["First", "Second", "Third"][mini(j, 2)], within = hours(float(other.refill_in))}
+				d.next = {slot = "%s board slot" % ["First", "Second", "Third"][mini(j, 2)], within = P0Logic.span(float(other.refill_in))}
 				break
 		return d
 	return {}
@@ -153,12 +153,6 @@ static func _noun(view: Dictionary, r: Dictionary) -> String:
 	var items: Array = r.get("items", [])
 	if kind == "material" and items.size() == 1: return P0Logic.item_name(view, str(items[0])).to_lower()
 	return {"fish": "fish", "crop": "crops", "dish": "dishes", "material": "materials"}.get(kind, "items")
-
-## "72h", "8h", "3h 58m", "12:30" — whole hours without the minutes (BOARD-1 `Available in 72h`).
-static func hours(ms: float) -> String:
-	var minutes := maxi(0, ceili(ms / 60000.0))
-	if minutes >= 60 and minutes % 60 == 0: return "%dh" % (minutes / 60)
-	return P0Logic.duration(ms)
 
 ## The wait after dropping a request (content requests.drop_refill_h, BOARD-3 `Next request after drop 8h`).
 static func drop_wait() -> String:

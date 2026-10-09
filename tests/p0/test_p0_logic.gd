@@ -14,6 +14,40 @@ func test_durations_are_countdowns() -> void:
 	assert_str(P0Logic.duration(4320000)).is_equal("1h 12m")
 	assert_str(P0Logic.duration(0)).is_equal("0:00")
 
+## A duration inside a sentence (q(97) ②) says `42m` under an hour, never `42:00`: whole minutes rounded up, at least
+## `1m`, `2h` on the hour, `9h 12m` otherwise — the Inbox's `42m left` without ` left`.
+func test_sentence_durations_say_minutes_under_an_hour() -> void:
+	assert_str(P0Logic.span(2520000)).is_equal("42m")
+	assert_str(P0Logic.span(2519001)).is_equal("42m")
+	assert_str(P0Logic.span(161000)).is_equal("3m")
+	assert_str(P0Logic.span(30000)).is_equal("1m")
+	assert_str(P0Logic.span(0)).is_equal("1m")
+	assert_str(P0Logic.span(3570000)).is_equal("1h")   # rounded up first, then sorted: never `60m`
+	assert_str(P0Logic.span(7200000)).is_equal("2h")
+	assert_str(P0Logic.span(7200001)).is_equal("2h 1m")
+	assert_str(P0Logic.span(4320000)).is_equal("1h 12m")
+	assert_str(P0Logic.span(33120000)).is_equal("9h 12m")
+	assert_str(P0Inbox.left_text(2520000)).is_equal("42m left")   # the Inbox writes the same, plus ` left`
+
+## The sentences around the farm switch; the timers that tick in front of the player keep m:ss.
+func test_sentences_say_minutes_and_ticking_timers_keep_seconds() -> void:
+	var v := _view()
+	v.energy = {"value": 190, "max": 200, "next_in": 161000, "regen_ms": 240000}
+	var card := P0Logic.energy_card(v, 2, "Sow ×1")
+	assert_str(str(card.title)).is_equal("Energy 190/200 · +1 in 2:41")
+	assert_str(str(card.regen)).is_equal("+1 in 2:41")
+	assert_str(str(card.wait)).is_equal("Wait · Full in 39m")   # 2:41 + 9 × 4:00
+	v.plots = [{"state": "growing", "crop": "crop_radish", "ready_in": 2520000}]
+	assert_str(P0Logic.today_line(v)).is_equal("Radishes ready in 42m")
+	assert_str(str(P0Logic.main_action(v, v.plots[0], "").sub)).is_equal("Ready in 42m")
+	v["cooking"] = {"stove": {"dish": "dish_grilled_crucian", "ready_in": 42000}}
+	v.names["dish_grilled_crucian"] = "Grilled Crucian"
+	assert_str(P0Logic.today_line(v)).is_equal("Grilled Crucian · 0:42 left at the stove")
+	v["meals"] = {"cap": 200, "used": 200, "resets_in": 2520000}
+	v.energy.value = 100
+	v["items"] = {"dish_grilled_crucian": {"meal": 30}}
+	assert_str(str(P0Logic.eat_button(v, "dish_grilled_crucian").text)).is_equal("Full belly · Meals reset in 42m")
+
 func test_main_action_follows_the_plot_in_front() -> void:
 	var v := _view()
 	assert_str(str(P0Logic.main_action(v, {"id": 3, "state": "wild"}, "").verb)).is_equal("Till")
@@ -44,7 +78,7 @@ func test_short_energy_turns_amber_and_opens_the_card() -> void:
 	var card := P0Logic.energy_card(v, 3, "Sow ×1")
 	assert_str(str(card.title)).is_equal("Energy 2/200 · +1 in 2:41")
 	assert_str(str(card.subtitle)).is_equal("Sow ×1 needs 3 Energy · you have 2")
-	assert_str(str(card.wait)).is_equal("Wait · Full in 13h 10m")
+	assert_str(str(card.wait)).is_equal("Wait · Full in 13h 11m")   # 790.7 min, rounded up (q(97))
 	assert_str(str(card.tiles[0].fact)).is_equal("No dishes in bag")
 	v.energy.value = 0
 	assert_str(str(P0Logic.energy_card(v, 3, "Sow ×1").subtitle)).is_equal("Recover or do something free")

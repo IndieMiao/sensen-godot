@@ -72,12 +72,9 @@ const EXPIRY_NOTE := "If not claimed: sellable items turn into coins at 80% · g
 
 static func expiry_note(_view: Dictionary) -> String: return EXPIRY_NOTE
 
-## `42m left` under an hour, `23h 40m left` from one hour, `22h left` on the hour.
+## `42m left` under an hour, `23h 40m left` from one hour, `22h left` on the hour (P0Logic.span, q(97)).
 static func left_text(ms: float) -> String:
-	var minutes := maxi(1, ceili(ms / 60000.0))
-	if minutes < 60: return "%dm left" % minutes
-	if minutes % 60 == 0: return "%dh left" % (minutes / 60)
-	return "%dh %dm left" % [minutes / 60, minutes % 60]
+	return P0Logic.span(ms) + " left"
 
 ## `Just now`, `12m ago`, `2h ago`, `1d ago`.
 static func ago_text(at_ms: float, now_ms: float) -> String:

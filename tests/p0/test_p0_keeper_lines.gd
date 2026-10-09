@@ -74,3 +74,5 @@ func test_market_square() -> void:
 	assert_str(l.greet).is_equal("The Market Board has 0 requests today.")
 	assert_str(l.counter).is_equal(l.greet)
 	assert_str(l.answer).is_equal("Board's empty. Next request in 3h 58m.")
+	v.keepers.market.refill_in = 2520000
+	assert_str(P0Logic.keeper_lines(v, "market").answer).is_equal("Board's empty. Next request in 42m.")

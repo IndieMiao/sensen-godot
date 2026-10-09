@@ -274,12 +274,23 @@ static func icon(id: String) -> Texture2D:
 	var path := ICON_DIR % str(ICON_ALIAS.get(id, id))
 	return load(path) if ResourceLoader.exists(path) else load(ICON_DIR % "field")
 
-## "m:ss" under an hour, "1h 12m" from one hour (state-icons rule: durations, never clock times).
+## "m:ss" under an hour, "1h 12m" from one hour (state-icons rule: durations, never clock times). For the timers that
+## tick in front of the player (q(97) ①): the stove and cooking (`Cooking 0:42`, `The stove is busy · 0:22 left`),
+## the badge capsules (`0:22`) and Energy regen (`+1 in 2:41`, `+2 in 7:41`). A duration inside a sentence is span().
 static func duration(ms: float) -> String:
 	var total := maxi(0, ceili(ms / 1000.0))
 	if total < 3600:
 		return "%d:%02d" % [total / 60, total % 60]
 	var minutes := total / 60
+	return "%dh %dm" % [minutes / 60, minutes % 60]
+
+## A duration inside a sentence (q(97) ②): whole minutes rounded up, at least `1m`, then `42m` under an hour, `2h` on
+## the hour, `9h 12m` otherwise — never `60m`. `Available again in`, `… to go`, `Ready in`, `Resets in`,
+## `Meals reset in`, `Next request in`, `Expires in`; the Inbox's `42m left` is the same (P0Inbox.left_text).
+static func span(ms: float) -> String:
+	var minutes := maxi(1, ceili(ms / 60000.0))
+	if minutes < 60: return "%dm" % minutes
+	if minutes % 60 == 0: return "%dh" % (minutes / 60)
 	return "%dh %dm" % [minutes / 60, minutes % 60]
 
 static func crop(view: Dictionary, crop_id: String) -> Dictionary:
@@ -367,7 +378,7 @@ static func main_action(view: Dictionary, plot: Dictionary, seed_id: String, row
 		"sown":
 			return {"icon": "water", "verb": "Water", "sub": "Free", "enabled": true, "amber": false, "cmd": {"type": "water", "plot": plot_id}, "need": 0}
 		"growing":
-			return {"icon": "clock", "verb": "Growing", "sub": "Ready in " + duration(float(plot.get("ready_in", 0))), "enabled": false, "amber": false, "cmd": {}, "need": 0}
+			return {"icon": "clock", "verb": "Growing", "sub": "Ready in " + span(float(plot.get("ready_in", 0))), "enabled": false, "amber": false, "cmd": {}, "need": 0}
 		"ready":
 			return {"icon": "hoe", "verb": "Harvest", "sub": "Free", "enabled": true, "amber": false, "cmd": {"type": "harvest", "plot": plot_id}, "need": 0}
 	return a
@@ -439,7 +450,7 @@ static func today_line(view: Dictionary) -> String:
 	for st in view.get("bag", {}).get("slots", []):
 		if str(st.get("id", "")).begins_with("fish_") and item(view, str(st.id)).get("cook", true): fish += int(st.get("qty", 0))
 	if fish > 0: return "%d fish · the stove is free" % fish
-	if best_crop != "": return "%s ready in %s" % [plural(item_name(view, best_crop)), duration(best_ms)]
+	if best_crop != "": return "%s ready in %s" % [plural(item_name(view, best_crop)), span(best_ms)]
 	if any_sown: return "Water what you sowed"
 	return "Sow your first plot"
 
@@ -487,7 +498,7 @@ static func energy_card(view: Dictionary, need: int, verb: String, at_home := tr
 			rest_tile.fact = "After %dh away" % int(rest.get("away_h", 2))
 			rest_tile.on = false
 		elif float(away) > 0.0:
-			rest_tile.fact = "Ready in %s" % duration(float(away))
+			rest_tile.fact = "Ready in %s" % span(float(away))
 			rest_tile.on = false
 	if rest_tile.on and str(rs.get("state", "")) == "full":   # nothing to gain: no "+0 Energy" tile (亚瑟 on #37)
 		rest_tile.fact = "Energy full"
@@ -501,7 +512,7 @@ static func energy_card(view: Dictionary, need: int, verb: String, at_home := tr
 		"have": have, "max": mx, "regen": "" if next_in == null else "+1 in %s" % duration(float(next_in)),
 		"zero": have <= 0,
 		"subtitle": subtitle, "fact": subtitle,
-		"wait": "Wait · Full in %s" % duration(full_ms) if next_in != null else "Wait · Full now",
+		"wait": "Wait · Full in %s" % span(full_ms) if next_in != null else "Wait · Full now",
 		"tiles": [
 			{"icon": "dish_grilled_fish", "label": "Eat", "fact": "%d dish%s in bag" % [dishes, "" if dishes == 1 else "es"] if dishes > 0 else "No dishes in bag", "guide": "Open bag", "go": "bag", "on": dishes > 0},
 			cook,
@@ -672,7 +683,7 @@ static func gift_meal_notice(view: Dictionary, ev: Dictionary, events: Array) ->
 	if parcel.is_empty():
 		var rows := P0Inbox.parcels(view).filter(func(p): return p.get("gift", null) != null and str(p.get("id", "")) == dish)
 		left = float(rows[0].get("left", -1)) if not rows.is_empty() else -1.0
-	var expiry := ("Expires in " + P0Inbox.left_text(left).trim_suffix(" left")) if left > 0.0 else ""
+	var expiry := ("Expires in " + span(left)) if left > 0.0 else ""
 	var tail := "Claim a parcel first" if waiting else expiry
 	var from := "From %s" % who if who != "" else ""
 	return {title = "Inbox full · waiting" if waiting else "Sent to Inbox", item = item_name(view, dish), quantity = "×1",
@@ -743,7 +754,7 @@ static func eat_button(view: Dictionary, id: String) -> Dictionary:
 	var m: Dictionary = view.get("meals", {})
 	var left := maxi(0, int(m.get("cap", 200)) - int(m.get("used", 0)))
 	if have >= mx: return {"text": "Energy full · eat later", "enabled": false, "confirm": ""}
-	if left <= 0: return {"text": "Full belly · Meals reset in " + duration(float(m.get("resets_in", 0))), "enabled": true, "confirm": "", "gain": 0}
+	if left <= 0: return {"text": "Full belly · Meals reset in " + span(float(m.get("resets_in", 0))), "enabled": true, "confirm": "", "gain": 0}
 	var counted := mini(value, left)
 	var gain := mini(counted, mx - have)
 	if value == 0: return {"text": "Same dish · no Energy today", "enabled": true, "confirm": "", "gain": 0}
@@ -987,7 +998,7 @@ static func today_rows(view: Dictionary) -> Array:
 		var st := str(p.get("state", ""))
 		if st == "ready": ready[str(p.crop)] = int(ready.get(str(p.crop), 0)) + 1
 		elif st == "sown": sown += 1
-		elif st == "growing": timed.append([float(p.get("ready_in", 0)), _row("%s ready in %s" % [plural(item_name(view, str(p.crop))), duration(float(p.get("ready_in", 0)))], str(p.crop), "plots")])
+		elif st == "growing": timed.append([float(p.get("ready_in", 0)), _row("%s ready in %s" % [plural(item_name(view, str(p.crop))), span(float(p.get("ready_in", 0)))], str(p.crop), "plots")])
 	# One harvest row (q(69)): `Harvest 20 Radishes` for one crop, `Harvest 30 crops` for several; the level it brings
 	# follows it as an info row (`Farming Lv2 with this harvest`, no button — §14.5's exception: it goes with its source).
 	var level := P0Guide.harvest_level(view)
@@ -1093,7 +1104,7 @@ static func resident_bar(view: Dictionary, id: String) -> Dictionary:
 			if req.get("ready", false): cmd = {"type": "deliver", "request": str(req.id)}
 			else: reason = _request_gap(req)
 		"wait":
-			reason = "Next request in " + duration(float(r.get("next_in", 0)))
+			reason = "Next request in " + span(float(r.get("next_in", 0)))
 		"stage":
 			reason = "Next request at " + str(r.get("need_stage", ""))
 		_:
@@ -1188,7 +1199,7 @@ static func keeper_lines(view: Dictionary, role: String, ctx := {}) -> Dictionar
 				_: greet = "Coffee's fresh. %d %s left today." % [int(k.get("cups_left", 0)), "cup" if int(k.get("cups_left", 0)) == 1 else "cups"]
 			if pip != "": answer = "%s has a request for you." % pip
 			elif int(k.get("board_open", 0)) > 0: answer = _board_count(int(k.board_open))
-			else: answer = "All quiet." + ("" if k.get("refill_in", null) == null else " The Market Board refills in %s." % duration(float(k.refill_in)))
+			else: answer = "All quiet." + ("" if k.get("refill_in", null) == null else " The Market Board refills in %s." % span(float(k.refill_in)))
 		"tackle":
 			if str(k.get("greet", "")) == "reed_rod":
 				var rod := _rod_offer(view, "rod_reed")
@@ -1213,7 +1224,7 @@ static func keeper_lines(view: Dictionary, role: String, ctx := {}) -> Dictionar
 			var titles: Array = k.get("board_templates", []).map(func(t): return str(content().get("requests", {}).get("templates", {}).get(str(t), {}).get("title", "")))
 			titles = titles.filter(func(t): return t != "")
 			if not titles.is_empty(): answer = "Fresh off the board: %s." % " and ".join(PackedStringArray(titles))
-			else: answer = "Board's empty." + ("" if k.get("refill_in", null) == null else " Next request in %s." % duration(float(k.refill_in)))
+			else: answer = "Board's empty." + ("" if k.get("refill_in", null) == null else " Next request in %s." % span(float(k.refill_in)))
 	var place := str(ctx.get("place", ""))
 	return {
 		"line": ("%s · %s" % [str(copy.get("does", "")), place]) if place != "" else str(copy.get("does", "")),
@@ -1267,13 +1278,14 @@ static func rest_state(view: Dictionary) -> Dictionary:
 	if used:
 		out.merge({"state": "used", "badge": "used_today", "sheet_state": "Used today", "effect": "",
 			"fact": "Uses", "fact_value": "%d/%d" % [int(r.get("used", 0)), int(r.get("limit", 1))], "button": "", "can_rest": false,
-			"close": "Close", "note": "Available again in " + duration(float(r.get("resets_in", 0)))}, true)
+			"close": "Close", "note": "Available again in " + span(float(r.get("resets_in", 0)))}, true)
 	elif away == null or float(away) > 0.0:
 		# q(41) / q(70): Rest opens 2 h after leaving the homestead. A new account that never left has no leave time
 		# (away_ready_in null): no countdown at all, just "after 2h away"; after the first leave the time to go.
-		var left := "" if away == null else duration(float(away))
+		# The caption is the capsule under the bench's badge (m:ss under an hour); the sentences say `42m`.
+		var left := "" if away == null else span(float(away))
 		var back := "Rest · back after %dh away" % int(r.get("away_h", 2))
-		out.merge({"state": "away", "badge": "countdown", "caption": left, "effect": "",
+		out.merge({"state": "away", "badge": "countdown", "caption": "" if away == null else duration(float(away)), "effect": "",
 			"sheet_state": back if away == null else "%s · %s to go" % [back, left],
 			"wait": "after %dh away" % int(r.get("away_h", 2)) if away == null else "in " + left,
 			"reason": "Not yet", "can_rest": false, "close": "Close"}, true)
