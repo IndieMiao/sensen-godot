@@ -129,7 +129,7 @@ func test_today_panel_orders_now_then_countdown_then_skill() -> void:
 	var v := _view()
 	v["stall"] = {"board": {"requests": [{"title": "Pond Catch", "item": "fish_crucian", "qty": 2, "have": 0, "status": "open"}]}}
 	v.names["fish_crucian"] = "Pond Crucian"
-	assert_that(P0Logic.today_lines(v)).is_equal(["Sow your first plot", "Pond Catch · 2 Pond Crucian · Stall Board"])
+	assert_that(P0Logic.today_lines(v)).is_equal(["Sow your first plot"])   # untaken: on its board, not in Today (q(104))
 	v.stall.board.requests.clear()
 	v["skills"] = {"farming": {"level": 1, "xp": 20, "next": 50}, "fishing": {"level": 1, "xp": 60, "next": 70}}
 	v.plots = [{"state": "growing", "crop": "crop_radish", "ready_in": 4320000}, {"state": "sown", "crop": "crop_carrot"}]

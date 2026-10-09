@@ -13,7 +13,7 @@ extends RefCounted
 const HOME := "home"
 const REED_POND := "pond_shanghai_05"   # the beginner pond, where the server points Pond Catch too
 const STATES := {"deliver": "deliverable", "request": "request", "new": "new"}
-const NOUNS := {"fish": "fish", "crop": "crops", "dish": "dishes", "material": "materials"}
+const NOUNS := {"fish": "fish", "crop": "crops", "dish": "dishes", "material": "materials", "sow": "plots"}
 
 ## The marks the map draws: [{place, kind, why, more?}], strongest first.
 static func markers(view: Dictionary) -> Array:
@@ -104,6 +104,51 @@ static func request_of(view: Dictionary, id: String) -> Dictionary:
 			"have": int(q.get("have", 0)), "qty": int(q.get("qty", 1)), "ready": bool(q.get("ready", false)),
 			"tracked": str(rv.get("request_state", "")) == "accepted", "deliver": "Deliver to %s" % resident_name(str(rid))}
 	return {}
+
+## The requests the player has taken (q(104), 李白 4ac4a4e7: they all go to Today): the Stall Board's, the Market
+## Board's and the residents', in that order; the first session's Pond Catch is the guide's own row and is left out. Each
+## {id, title, kind, items, rarity, need_name, have, qty, ready, deliver, deliver_go} — `deliver` as request_of writes
+## it, `deliver_go` the pin it is handed in at (the stall, the market square, the resident's outpost).
+static func taken(view: Dictionary) -> Array:
+	var out: Array = []
+	var boards: Dictionary = view.get("boards", {})
+	var stall: Array = []
+	if boards.has("stall"): stall = boards.stall.get("slots", [])
+	else:   # an older view: stall.board.requests, one item each
+		for r in view.get("stall", {}).get("board", {}).get("requests", []):
+			if r is Dictionary: stall.append((r as Dictionary).merged({"items": [str(r.get("item", ""))] if str(r.get("item", "")) != "" else []}))
+	for board in ["stall", "market"]:
+		for r in (stall if board == "stall" else boards.get("market", {}).get("slots", [])):
+			if not (r is Dictionary) or r.get("empty", false) or str(r.get("status", "")) != "accepted": continue
+			if str(r.get("id", "")) == P0Guide.TUTORIAL: continue
+			var items: Array = r.get("items", [])
+			out.append({"id": str(r.get("id", "")), "title": str(r.get("title", "")), "kind": str(r.get("kind", "fish" if items.any(func(i): return str(i).begins_with("fish_")) else "")),
+				"items": items, "rarity": r.get("rarity", null),
+				"need_name": _need_name(view, str(r.get("kind", "")), items, r.get("rarity", null)),
+				"have": int(r.get("have", 0)), "qty": int(r.get("qty", 1)),
+				"ready": bool(r.get("ready", int(r.get("have", 0)) >= int(r.get("qty", 1)))),
+				"deliver": "Deliver at the Stall" if board == "stall" else "Deliver at %s" % _outpost_name("market"),
+				"deliver_go": "stall" if board == "stall" else "outpost:market"})
+	var residents: Dictionary = P0Logic.content().get("residents", {})
+	for rid in view.get("residents", {}):
+		var rv: Dictionary = view.residents[rid] if view.residents[rid] is Dictionary else {}
+		var q = rv.get("request", null)
+		if not (q is Dictionary) or str(rv.get("request_state", "")) != "accepted": continue
+		var r := request_of(view, str(q.get("id", "")))
+		if r.is_empty(): continue
+		var def: Dictionary = {}
+		for d in residents.get(rid, {}).get("requests", []):
+			if str(d.get("id", "")) == str(r.id): def = d
+		var need: Dictionary = def.get("need", {})
+		out.append(r.merged({"kind": str(q.get("kind", need.get("kind", ""))), "items": [str(r.item)] if str(r.item) != "" else [],
+			"rarity": q.get("rarity", need.get("rarity", null)), "deliver_go": "outpost:" + _resident_role(str(rid))}))
+	return out
+
+## The role of the outpost a resident lives at (p0_outposts.json residents): Old Kai at the Tackle Shop, Pip at the post.
+static func _resident_role(rid: String) -> String:
+	for o in P0Outposts.all():
+		if (o.get("residents", []) as Array).has(rid): return str(o.get("role", ""))
+	return ""
 
 ## The Market Board's requests nobody has taken yet.
 static func market_open(view: Dictionary) -> int:

@@ -5,9 +5,11 @@ extends PanelContainer
 ## never over the quick bar or main key; the host closes it on a tap outside.
 ## A row is {icon, line, tail?, action?, state?}: icon + one sentence + an optional Show pill that only moves
 ## the camera (LOCK-08). state "done" = tick, faded, secondary ink; "short" = grey tail line with the Energy
-## it needs and when it comes back. Emits `show_pressed(index)`.
+## it needs and when it comes back. Emits `show_pressed(index)`. A row with `tap` and no Show (q(104): a request whose
+## fish the player cannot land yet, its tail `Fishing Lv4 needed`) takes a tap on the whole row: `row_pressed(index)`.
 
 signal show_pressed(index: int)
+signal row_pressed(index: int)
 
 const MAX_ROWS := 3
 const CHECK_GLYPH := preload("res://assets/ui/kit_icons/check.svg")
@@ -90,4 +92,14 @@ func _row(r: Dictionary, index: int) -> HBoxContainer:
 		var pill := UiShowPill.new(str(r.action), UiShowPill.Kind.TODAY)   # 55 × 28 like the main, 44 to the touch
 		pill.pressed.connect(func(): show_pressed.emit(index))
 		row.add_child(pill)
+	elif bool(r.get("tap", false)):
+		row.mouse_filter = Control.MOUSE_FILTER_STOP
+		var down := [Vector2.INF]
+		row.gui_input.connect(func(e: InputEvent):   # a tap, not a drag (touch arrives as the emulated mouse)
+			if not (e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT): return
+			row.accept_event()
+			if e.pressed: down[0] = e.position
+			elif down[0] != Vector2.INF and e.position.distance_to(down[0]) <= GestureArbiter.TAP_SLOP:
+				down[0] = Vector2.INF
+				row_pressed.emit(index))
 	return row
