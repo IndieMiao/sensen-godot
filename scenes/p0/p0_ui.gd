@@ -1037,7 +1037,7 @@ func _float_floor(x: float, half_w: float) -> float:
 
 # ---------------------------------------------------------------- one reply's floats (q(49) ①, §4.8.6)
 ## The order of one reply's lines: Energy → XP → items → coins → affinity (q(49) ①).
-const FLOAT_ORDER := ["energy", "xp", "first", "item", "coins", "affinity"]
+const FLOAT_ORDER := ["energy", "xp", "first", "item", "request", "coins", "affinity"]   # request: `Pond Catch 1/2` (q(103))
 ## Kinds a later reply adds into while their line is up: XP (`+40 XP · 20 plants`, §4.8.3 XP 入账). Items, Energy and
 ## coins float per reply (each plot's `+1 Radish`, each bed's `−2 Energy`).
 const FLOAT_MERGE_KINDS := ["xp"]
@@ -1434,16 +1434,27 @@ func close_modal() -> void:
 ## last bait goes at the reel's settlement, while the panel still shows the landing (int5b hand test 10). Shown at
 ## once when nothing covers the UI, else held until the world is back from "busy" and no card is open or queued.
 var _held_toast := ""
+var _held_success := false   # the held toast is a Success one (toast_success_when_clear)
 
 func toast_when_clear(text: String) -> void:
 	_held_toast = text
+	_held_success = false
+	_flush_held_toast()
+
+## The same for a Success toast: the pond's `Pond Catch · 2/2 · Deliver at the Stall` waits for the Caught! card and
+## a level banner of the same catch (q(103)). One slot: the latest held toast wins, as a new toast replaces a shown one.
+func toast_success_when_clear(text: String) -> void:
+	_held_toast = text
+	_held_success = true
 	_flush_held_toast()
 
 func _flush_held_toast() -> void:
 	if _held_toast == "" or not is_node_ready(): return
 	if surface == "busy" or _modal != null or not _card_queue.is_empty(): return
-	toast(_held_toast)
+	if _held_success: toast_success(_held_toast)
+	else: toast(_held_toast)
 	_held_toast = ""
+	_held_success = false
 
 ## InboxNotice (BAG-5-2 / FARM-LV2-2, LOCK-14, q(87) / q(88); SGODOT-234): rewards that did not fit the bag went to the
 ## Inbox. The card hangs under the bell, its right edge on the bell's (top: _notice_top), for MOTION_TOAST_BASE_MS
@@ -2580,6 +2591,10 @@ func teach(key: String, _text := "") -> void:
 	_load_tips()
 	if tips == null: tips = P0Guide.TipQueue.new(_taught)
 	tips.request(key)
+
+## A TipCard is on screen or waits its turn: the pond's arrival toast comes after it (q(103), q(49)).
+func tip_pending() -> bool:
+	return tips != null and (tips.showing != "" or not tips.waiting.is_empty())
 
 ## The player did what the tip on screen teaches (sow / cast / cook / heat): it closes now.
 func tip_did(action: String) -> void:
