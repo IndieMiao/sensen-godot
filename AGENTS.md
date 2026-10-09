@@ -1151,11 +1151,22 @@
   materials before reviewing.
 - The Plane MCP can only attach files from public URLs. Upload local files with
   the shared script (Plane REST; credentials read from ../plane.env, never
-  printed):
+  printed; it signs both the attachments and the comment with your id):
   `uv run --with requests python3 /Volumes/ACASIS/tmp/gensen-ui-review/tools/plane_upload.py <work_item_uuid> <your_virtual_user_id> <file> [<file> ...] [--comment "<html>"]`.
   Get the card UUID with the MCP `retrieve_work_item_by_identifier`
   (e.g. SGODOT-231); prefix file names with the card number; virtual user ids
   are in /Volumes/ACASIS/tmp/gensen-ui-review/pm/virtual-users.md.
+- Rule adopted on 2026-10-09 after the Plane upgrade (migration 0126): sign
+  every Plane write with your own virtual_user_id, not only comments. Pass it to
+  create_work_item (and subtasks), update_work_item, manage_work_item_assignee,
+  manage_work_item_label, create_work_item_comment, attachment upload/delete,
+  link create/update/delete and create_page / update_page / rename_page (Pages
+  also need an explicit project_id). Signing does not assign; set assignees
+  separately. Archive, restore and delete of cards or pages are not signable and
+  stay on the real account. Custom REST scripts put "virtual_user_id" in the
+  JSON body (attachments: both the upload request and the is_uploaded confirm);
+  never write created_by or actor directly. Reference: Plane page "Zili Plane
+  API 更新与 Agent 接入指南" (page 2fe96f61-9b3c-42ea-abef-f6ce11ca2490).
 - Never upload the user's private screens: phone home screen, other apps,
   photos, notifications or system settings captured during device tests stay
   local only; say in the comment that they were withheld. Upload only frames of
