@@ -82,6 +82,14 @@ static func place(marker_size: Vector2, point: Vector2, view: Rect2, margin: flo
 	r.position.y = clampf(r.position.y, inner.position.y, inner.end.y - r.size.y)
 	return r
 
+## A card over a facility kept off the player (不知火舞 on #190, the body box of SGODOT-269): when `r` — the whole marker,
+## pointer included — comes within `gap` of `body`, it moves straight up until it clears it by `gap`, but never above
+## `min_y`. Only y changes, so its pointer still aims at the facility across.
+static func lift_clear(r: Rect2, body: Rect2, gap: float, min_y: float) -> Rect2:
+	if not r.intersects(body.grow(gap)): return r
+	r.position.y = maxf(min_y, minf(r.position.y, body.position.y - gap - r.size.y))
+	return r
+
 ## Greedy de-overlap: markers are settled in priority order (then top to bottom); each later marker moves
 ## up above any settled marker it overlaps. Returns the new rects in the input order.
 static func resolve_overlaps(rects: Array, priorities: Array, gap: float) -> Array:

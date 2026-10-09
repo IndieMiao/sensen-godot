@@ -956,6 +956,15 @@ func open_marker_area() -> Rect2:
 	var bottom := _kit.size.y - UiTokens.SIZE_QUICK_BAR_BOTTOM - safe_bottom() - UiTokens.SIZE_QUICK_BAR_H
 	return Rect2(0.0, top, _kit.size.x, maxf(0.0, bottom - top))
 
+## The player's body on screen, for a card that keeps off it (SGODOT-266, 不知火舞 on #190): SGODOT-269's 70 × 130 box
+## standing on `feet` (this UI's coordinates; P0 worlds draw no name plate over the player).
+const PLAYER_BODY := Vector2(70, 130)
+func player_body(feet: Vector2) -> Rect2: return Rect2(feet - Vector2(PLAYER_BODY.x * 0.5, PLAYER_BODY.y), PLAYER_BODY)
+
+## The highest such a card lifts: 8 px under the HUD's second row.
+const CARD_UNDER_HUD := 8.0
+func card_top() -> float: return UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H + safe_top() + CARD_UNDER_HUD
+
 ## Where world markers may sit (LOCK-07): below the two-row HUD and above the quick bar. A finger card is passive, so
 ## one lying under a HUD chip lost its tap to the chip (int5 hand test 8: the Homestead card slid under Energy and
 ## opened the Energy panel); a card clamps into this band instead, a badge outside it hides.

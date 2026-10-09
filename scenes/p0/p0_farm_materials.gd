@@ -9,6 +9,7 @@ const P0_MINE := "res://scenes/p0/p0_mine.tscn"
 const MOUTH_REACH := 2.4        # m: the mouth's strip opens, a tapped walk ends, its EntryCard stays
 const MOUTH_MARK := Vector3(0, 1.9, 0)   # the mouth's badge / world prompt sits here …
 const MOUTH_HIT := Vector3(0, 0.8, 0)    # … and a tap on it is a tap on the gate
+const BODY_GAP := 4.0           # px: a card lifted off the player clears its body by this much
 const NOTICE_S := 2.0           # "Run ended at daily reset" float (q(44))
 const SPOT_REACH := 3.0         # m: finger cards show and taps gather only this close (Arthur, 231)
 const SPOTS := ["spot_grove", "spot_rock_pile", "spot_reed_bank", "spot_clay_bank", "spot_herb_patch"]
@@ -87,16 +88,11 @@ func frame(v: Dictionary, card := "") -> void:
 		if near: _at_mouth()
 	if _card_open and (not near or P0MaterialLogic.mine_runs_spent(v)): _card_open = false   # walked off: the card folds
 	var top := cam.unproject_position(mouth + Vector3(0, 1.9, 0))
-	# With an unfinished run the mouth keeps its Run 1/2 badge near and far (MINE-P0-5, LOCK-11: a state over the plain
-	# icon); without one it is a world prompt like the other facilities — the pickaxe button within 8 m, the strip
-	# `The mine · Runs today 0/2` when it holds the farm's card (不知火舞 on 235). Never both. Once tapped and walked up
-	# to, its EntryCard takes the strip's place, the name on the card's title row (SGODOT-266).
-	var running: bool = v.get("mine", {}).get("run", null) != null
+	# A world prompt like the other facilities, with or without an unfinished run (Figma MINE-P0-5, 不知火舞 on #190: the
+	# Run 1/2 badge is gone): the pickaxe button within 8 m, the strip `The mine · Runs today 1/2` when it holds the
+	# farm's card. Once tapped and walked up to, its EntryCard takes the strip's place, the name on the card's title row.
 	var open := _card_open and not rt.ui.has_modal()
-	rt.ui.badge("mine", UiStatusBadge.State.AVAILABLE, top, running and not rt.ui.has_modal(), P0MaterialLogic.mine_badge(v),
-		P0Logic.icon("pickaxe"))
-	farm.world_prompt("mine", P0WorldPrompts.mine(v), mouth, MOUTH_MARK, MOUTH_HIT, not running and not open)
-	if running: top.y -= rt.ui.badge_height("mine")
+	farm.world_prompt("mine", P0WorldPrompts.mine(v), mouth, MOUTH_MARK, MOUTH_HIT, not open)
 	if _ensure_entry(): _entry.visible = open
 	if is_instance_valid(_entry) and _entry.visible:
 		_entry_card = P0MaterialLogic.mine_mouth_card(v)
@@ -105,6 +101,8 @@ func frame(v: Dictionary, card := "") -> void:
 		var size := _entry.get_combined_minimum_size()
 		var area := Rect2(Vector2.ZERO, rt.ui.root.size)
 		var r := WorldAnchor.place(size, top - Vector2(0, UiTokens.SPACE_WITHIN), area, UiTokens.SPACE_WITHIN, true)
+		# Never over the player: lifted clear of the body by 4, no higher than under the HUD (不知火舞 on #190).
+		r = WorldAnchor.lift_clear(r, rt.ui.player_body(cam.unproject_position(farm.actor.position)), BODY_GAP, rt.ui.card_top())
 		_entry.size = size
 		_entry.position = r.position
 		_entry.point_at(top.x - r.position.x)

@@ -141,13 +141,6 @@ static func reset_notice(view: Dictionary, shown_at: float) -> String:
 	if ended == null or float(ended.get("at", 0)) <= shown_at: return ""
 	return "Run ended at daily reset"
 
-## The mine mouth's world badge (MAT-1 / MINE-P0-5): "Explore" with no run, "Run 1/2" with one.
-static func mine_badge(view: Dictionary) -> String:
-	var mine: Dictionary = view.get("mine", {})
-	if mine.get("run", null) == null: return "Explore"
-	var runs: Dictionary = mine.get("runs", {})
-	return "Run %d/%d" % [int(runs.get("used", 0)), int(runs.get("limit", 2))]
-
 ## "The mine" sheet from tapping the mouth (MINE-P0-1 / P0-8): {title, subtitle, line, facts: [[k, v]], button}.
 ## button {label, enabled}: only when no run is possible today (Mine runs today 2/2 · Resets in 9h 12m, grey).
 static func mine_sheet(view: Dictionary) -> Dictionary:

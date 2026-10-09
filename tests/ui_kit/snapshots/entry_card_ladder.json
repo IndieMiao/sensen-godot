@@ -4,7 +4,7 @@
     0,
     0,
     328,
-    554
+    522
   ],
   "children": [
     {
@@ -35,7 +35,7 @@
         0,
         52,
         328,
-        502
+        470
       ],
       "children": [
         {
@@ -44,118 +44,98 @@
             0,
             52,
             328,
-            169
+            173
           ],
           "children": [
             {
               "type": "UiEntryCard",
               "rect": [
-                64,
+                44,
                 52,
-                200,
-                149
+                240,
+                153
               ],
               "children": [
                 {
                   "type": "PanelContainer",
                   "rect": [
-                    64,
+                    44,
                     52,
-                    200,
-                    142
+                    240,
+                    146
                   ],
                   "children": [
                     {
                       "type": "VBoxContainer",
                       "rect": [
-                        76,
+                        56,
                         64,
-                        176,
-                        118
+                        216,
+                        122
                       ],
                       "children": [
                         {
                           "type": "HBoxContainer",
                           "rect": [
-                            76,
+                            56,
                             64,
-                            176,
+                            216,
                             18
                           ],
                           "children": [
                             {
                               "type": "Label",
                               "rect": [
-                                90,
+                                89,
                                 64,
-                                52,
+                                53,
                                 18
                               ],
-                              "variation": "C12B",
+                              "variation": "C12XB",
                               "text": "The mine"
                             },
                             {
                               "type": "Label",
                               "rect": [
-                                142,
+                                146,
                                 64,
-                                10,
+                                93,
                                 18
                               ],
-                              "variation": "C12B",
-                              "text": " · "
-                            },
-                            {
-                              "type": "Label",
-                              "rect": [
-                                152,
-                                64,
-                                85,
-                                18
-                              ],
-                              "variation": "C12B",
-                              "text": "Runs today 1/2"
+                              "variation": "C12XB",
+                              "text": "· Runs today 1/2"
                             }
-                          ]
-                        },
-                        {
-                          "type": "Control",
-                          "rect": [
-                            76,
-                            82,
-                            176,
-                            8
                           ]
                         },
                         {
                           "type": "Button",
                           "rect": [
-                            76,
+                            56,
                             90,
-                            176,
-                            48
+                            216,
+                            44
                           ],
                           "variation": "CmdPrimary",
                           "text": "Continue run · Free"
                         },
                         {
-                          "type": "VBoxContainer",
+                          "type": "CenterContainer",
                           "rect": [
-                            76,
-                            138,
-                            176,
+                            56,
+                            142,
+                            216,
                             44
                           ],
                           "children": [
                             {
                               "type": "Label",
                               "rect": [
-                                76,
-                                151,
-                                176,
-                                18
+                                66,
+                                153,
+                                195,
+                                22
                               ],
-                              "variation": "C12B",
+                              "variation": "ButtonB15",
                               "text": "New run · Clear Floor 2 first"
                             }
                           ]
@@ -168,7 +148,7 @@
                   "type": "UiPointer",
                   "rect": [
                     157,
-                    194,
+                    198,
                     14,
                     7
                   ]
@@ -179,7 +159,7 @@
               "type": "Label",
               "rect": [
                 0,
-                207,
+                211,
                 328,
                 14
               ],
@@ -192,45 +172,45 @@
           "type": "VBoxContainer",
           "rect": [
             0,
-            233,
+            237,
             328,
-            99
+            87
           ],
           "children": [
             {
               "type": "UiEntryCard",
               "rect": [
-                64,
-                233,
-                200,
-                79
+                44,
+                237,
+                240,
+                67
               ],
               "children": [
                 {
                   "type": "PanelContainer",
                   "rect": [
-                    64,
-                    233,
-                    200,
-                    72
+                    44,
+                    237,
+                    240,
+                    60
                   ],
                   "children": [
                     {
                       "type": "VBoxContainer",
                       "rect": [
-                        76,
+                        52,
                         245,
-                        176,
-                        48
+                        224,
+                        44
                       ],
                       "children": [
                         {
                           "type": "Button",
                           "rect": [
-                            76,
+                            52,
                             245,
-                            176,
-                            48
+                            224,
+                            44
                           ],
                           "variation": "CmdPrimary",
                           "text": "Floor 2 · 2 Energy"
@@ -243,7 +223,7 @@
                   "type": "UiPointer",
                   "rect": [
                     157,
-                    305,
+                    297,
                     14,
                     7
                   ]
@@ -254,7 +234,7 @@
               "type": "Label",
               "rect": [
                 0,
-                318,
+                310,
                 328,
                 14
               ],
@@ -267,45 +247,45 @@
           "type": "VBoxContainer",
           "rect": [
             0,
-            344,
+            336,
             328,
-            99
+            87
           ],
           "children": [
             {
               "type": "UiEntryCard",
               "rect": [
-                52,
-                344,
-                224,
-                79
+                44,
+                336,
+                240,
+                67
               ],
               "children": [
                 {
                   "type": "PanelContainer",
                   "rect": [
-                    52,
-                    344,
-                    224,
-                    72
+                    44,
+                    336,
+                    240,
+                    60
                   ],
                   "children": [
                     {
                       "type": "VBoxContainer",
                       "rect": [
-                        64,
-                        356,
-                        200,
-                        48
+                        52,
+                        344,
+                        224,
+                        44
                       ],
                       "children": [
                         {
                           "type": "Button",
                           "rect": [
-                            64,
-                            356,
-                            200,
-                            48
+                            52,
+                            344,
+                            224,
+                            44
                           ],
                           "variation": "CmdPrimary",
                           "text": "Floor 2 · Need 2 Energy"
@@ -318,7 +298,7 @@
                   "type": "UiPointer",
                   "rect": [
                     157,
-                    416,
+                    396,
                     14,
                     7
                   ]
@@ -329,7 +309,7 @@
               "type": "Label",
               "rect": [
                 0,
-                429,
+                409,
                 328,
                 14
               ],
@@ -342,45 +322,45 @@
           "type": "VBoxContainer",
           "rect": [
             0,
-            455,
+            435,
             328,
-            99
+            87
           ],
           "children": [
             {
               "type": "UiEntryCard",
               "rect": [
-                41,
-                455,
-                246,
-                79
+                44,
+                435,
+                240,
+                67
               ],
               "children": [
                 {
                   "type": "PanelContainer",
                   "rect": [
-                    41,
-                    455,
-                    246,
-                    72
+                    44,
+                    435,
+                    240,
+                    60
                   ],
                   "children": [
                     {
                       "type": "VBoxContainer",
                       "rect": [
-                        53,
-                        467,
-                        222,
-                        48
+                        52,
+                        443,
+                        224,
+                        44
                       ],
                       "children": [
                         {
                           "type": "Button",
                           "rect": [
-                            53,
-                            467,
-                            222,
-                            48
+                            52,
+                            443,
+                            224,
+                            44
                           ],
                           "variation": "CmdBlocked",
                           "text": "Floor 2 · Clear Floor 1 first"
@@ -392,8 +372,8 @@
                 {
                   "type": "UiPointer",
                   "rect": [
-                    252,
-                    527,
+                    249,
+                    495,
                     14,
                     7
                   ]
@@ -404,7 +384,7 @@
               "type": "Label",
               "rect": [
                 0,
-                540,
+                508,
                 328,
                 14
               ],

@@ -78,6 +78,11 @@ func test_the_ladder_down_walks_up_then_asks_for_the_fee() -> void:
 	assert_array(_sent("mine_floor")).is_empty()   # the tap spent nothing
 	assert_str(mine.card_entry().main_text()).is_equal("Floor 2 · 2 Energy")
 	assert_bool(mine.card_entry()._title_row.visible).is_false()   # a ladder's card has no title
+	# Kept off the player (不知火舞 on #190): clear of the body by 4, unless already as high as it may go.
+	await get_tree().process_frame
+	var body: Rect2 = rt.ui.player_body(mine.cam.unproject_position(mine.actor.position))
+	var card := Rect2(mine.card_entry().position, mine.card_entry().size)
+	assert_bool(not card.intersects(body.grow(3.9)) or is_equal_approx(card.position.y, rt.ui.card_top())).is_true()
 	mine.p0_dev(PackedStringArray(["cardtap"]))
 	assert_array(_sent("mine_floor")).is_equal([{"type": "mine_floor", "floor": 2}])
 	assert_bool(mine.card_shown()).is_false()

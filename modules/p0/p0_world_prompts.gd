@@ -81,9 +81,9 @@ static func mailbox(view: Dictionary) -> Dictionary:
 static func workbench() -> Dictionary:
 	return _p("workbench", "Workbench")
 
-## The mine mouth with no unfinished run (231, 不知火舞 on 235; MINE-P0-1 copy): the plain pickaxe button within RANGE,
-## open: `The mine` · `Runs today 0/2` (`2/2` once used up). With an unfinished run the mouth keeps its Run 1/2 badge
-## and the EntryCard instead (LOCK-11 / LOCK-21), so the farm does not show this prompt then.
+## The mine mouth (231, 不知火舞 on 235; MINE-P0-1 / P0-5 copy): the plain pickaxe button within RANGE, open:
+## `The mine` · `Runs today 0/2` (`1/2` with a run, `2/2` once used up) — with or without an unfinished run (SGODOT-266,
+## 不知火舞 on #190: no Run 1/2 badge). Its EntryCard takes the strip's place once tapped and walked up to.
 static func mine(view: Dictionary) -> Dictionary:
 	var runs: Dictionary = view.get("mine", {}).get("runs", {})
 	return _p("pickaxe", "The mine", "Runs today %d/%d" % [int(runs.get("used", 0)), int(runs.get("limit", 2))])

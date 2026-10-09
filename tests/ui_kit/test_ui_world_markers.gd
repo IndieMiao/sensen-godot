@@ -85,8 +85,9 @@ func test_caption_pill_hangs_under_the_badge() -> void:
 	assert_bool(b._pill.visible).is_false()
 	assert_vector(b.get_combined_minimum_size()).is_equal(Vector2(28, 28))
 
-## SGODOT-266 (不知火舞 9ce583a8): the mouth's card — title row with the fact in secondary, the map card's Go as the main
-## button across the card, New run as a secondary text button 44 high and its note right under it.
+## SGODOT-266, Figma EntryCard 1468:94344 Kind=Gate run (不知火舞 on #190): 240 wide, padding 12, items 8 apart; the
+## title row in C12 ExtraBold with the fact in secondary, the 44 high pill button across the card, New run as a 44 high
+## Dismiss-style text button and its C10 note under it.
 func test_entry_card_reads_title_main_then_second() -> void:
 	var c := _host(UiEntryCard.new("Continue run · Free")) as UiEntryCard
 	c.title = "The mine"
@@ -97,14 +98,19 @@ func test_entry_card_reads_title_main_then_second() -> void:
 	assert_bool(c._title_row.visible).is_true()
 	assert_object(c._title.get_theme_color(&"font_color")).is_equal(UiTokens.COLOR_TEXT)
 	assert_object(c._title_fact.get_theme_color(&"font_color")).is_equal(UiTokens.COLOR_SECONDARY)
+	assert_str(c._title_fact.text).is_equal("· Runs today 1/2")
+	assert_str(str(c._title.theme_type_variation)).is_equal(str(UiTokens.STYLE_C12_XB))
 	assert_str(c.main_text()).is_equal("Continue run · Free")
 	assert_str(str(c._main.theme_type_variation)).is_equal(str(UiTokens.BUTTON_CMD_PRIMARY))
-	assert_float(c._main.size.x).is_equal_approx(c._card.size.x - 24.0, 0.5)   # across the card, 12 in from each side
-	assert_float(c._main.size.y).is_equal(float(UiTokens.SIZE_COMMAND))
-	assert_float(c.second_rect().size.y).is_greater_equal(float(UiTokens.SIZE_TOUCH))
+	assert_float(c._card.size.x).is_equal(UiEntryCard.WIDTH)
+	assert_float(c._main.size.x).is_equal_approx(UiEntryCard.WIDTH - 24.0, 0.5)   # across the card, 12 in from each side
+	assert_float(c._main.size.y).is_equal(44.0)
+	var pill := c._main.get_theme_stylebox(&"normal") as UiStyleBox
+	assert_vector(pill.corner_radius).is_equal(Vector4.ONE * 22.0)
+	assert_float(c.second_rect().size.y).is_equal(float(UiTokens.SIZE_TOUCH))
+	assert_str(str(c._second.theme_type_variation)).is_equal(str(UiTokens.STYLE_BUTTON_B15))
 	assert_bool(c.note_shown()).is_true()
-	assert_float(c._note.get_global_rect().position.y).is_less(c.second_rect().end.y)   # inside the second's 44
-	assert_float(c._card.size.x).is_greater_equal(UiEntryCard.MIN_WIDTH)
+	assert_float(c._note.get_global_rect().position.y).is_equal_approx(c.second_rect().end.y + 8.0, 0.5)   # 8 under it
 	assert_float(c.pointer_tip_x()).is_equal_approx(c._card.size.x * 0.5, 0.5)
 	assert_float(c.get_combined_minimum_size().y).is_equal(c._card.size.y + UiTokens.SIZE_POINTER_H)
 
@@ -114,7 +120,8 @@ func test_a_ladder_card_is_one_button_without_a_title() -> void:
 	await _settle()
 	assert_bool(c._title_row.visible).is_false()
 	assert_bool(c.second_shown()).is_false()
-	assert_float(c._card.size.y).is_equal_approx(float(UiTokens.SIZE_COMMAND) + 24.0, 0.5)
+	assert_float(c._card.size.y).is_equal_approx(44.0 + 16.0, 0.5)   # Kind=Ladder: padding 8, one 44 button
+	assert_float(c._card.size.x).is_equal(UiEntryCard.WIDTH)
 
 ## LOCK-10: grey is CmdBlocked with the reason and still takes the tap; amber (short of Energy) keeps the whole line.
 func test_unavailable_and_amber_main() -> void:
@@ -133,13 +140,13 @@ func test_unavailable_and_amber_main() -> void:
 	await _settle()
 	assert_bool(c.is_amber()).is_true()
 	assert_str(c.main_text()).is_equal("Floor 2 · Need 2 Energy")
-	var box := c._main.get_theme_stylebox(&"normal")
-	assert_object(box.get(&"bg_color")).is_equal(UiTokens.COLOR_AMBER)
-	assert_object(c._main.get_theme_color(&"font_color")).is_equal(UiTokens.COLOR_TEXT)
+	var box := c._main.get_theme_stylebox(&"normal")   # CommandButton Kind=need-energy (1987:132665)
+	assert_object(box.get(&"bg_color")).is_equal(UiTokens.COLOR_WARNING_TINT)
+	assert_object(c._main.get_theme_color(&"font_color")).is_equal(UiTokens.COLOR_WARNING)
 	c.amber = false
 	assert_bool(c.is_amber()).is_false()
 
-## The second: secondary ink, amber short of Energy, grey with its reason and then no note.
+## The second: secondary ink, warning short of Energy; when it can't, its reason, still secondary, and no note.
 func test_second_states_and_note() -> void:
 	var c := _host(UiEntryCard.new("Continue run · Free")) as UiEntryCard
 	c.second = "New run · 2 Energy"
@@ -151,7 +158,7 @@ func test_second_states_and_note() -> void:
 	assert_bool(c.note_shown()).is_true()   # short of Energy keeps the consequence (不知火舞 on #45)
 	c.second = "New run · Clear Floor 2 first"
 	c.second_state = UiEntryCard.State.UNAVAILABLE
-	assert_object(c._second.get_theme_color(&"font_color")).is_equal(UiTokens.COLOR_DISABLED_INK)
+	assert_object(c._second.get_theme_color(&"font_color")).is_equal(UiTokens.COLOR_SECONDARY)
 	assert_bool(c.note_shown()).is_false()
 
 func test_entry_card_pointer_right_sits_21_px_in() -> void:
@@ -203,3 +210,15 @@ func test_entry_card_setters_skip_unchanged_values() -> void:
 	assert_bool(c._second.has_theme_color_override(&"font_color")).is_false()
 	c.state = UiEntryCard.State.UNAVAILABLE
 	assert_str(str(c._main.theme_type_variation)).is_equal(str(UiTokens.BUTTON_CMD_BLOCKED))
+
+## Kept off the player (不知火舞 on #190): a card over the body moves straight up until it clears it by 4, not above the
+## top limit; one already clear stays.
+func test_lift_clear_moves_a_card_off_the_body() -> void:
+	var body := Rect2(150, 300, 70, 130)
+	var card := Rect2(100, 260, 240, 80)
+	assert_that(WorldAnchor.lift_clear(card, body, 4.0, 0.0)).is_equal(Rect2(100, 216, 240, 80))
+	assert_that(WorldAnchor.lift_clear(card, body, 4.0, 240.0)).is_equal(Rect2(100, 240, 240, 80))   # no higher than the limit
+	var clear := Rect2(100, 100, 240, 80)
+	assert_that(WorldAnchor.lift_clear(clear, body, 4.0, 0.0)).is_equal(clear)
+	var beside := Rect2(222, 300, 100, 60)
+	assert_that(WorldAnchor.lift_clear(beside, body, 4.0, 0.0)).is_equal(Rect2(222, 236, 100, 60))   # 2 px beside: within the 4 gap

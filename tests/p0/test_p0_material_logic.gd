@@ -234,9 +234,10 @@ func test_mining_quick_bar_holds_torches_only() -> void:
 	v.bag.slots = [{"id": "torch", "qty": 3}, {"id": "seed_radish", "qty": 20}]
 	assert_array(P0MaterialLogic.mine_candidates(v)).is_equal(["torch"])
 
-func test_mine_mouth_badge_sheet_and_status() -> void:
-	assert_str(P0MaterialLogic.mine_badge(_view())).is_equal("Explore")
-	assert_str(P0MaterialLogic.mine_badge(_view(_run([_floor(1), _floor(2, false)]), 200, 1))).is_equal("Run 1/2")
+## No Run 1/2 badge any more (SGODOT-266, 不知火舞 on #190): the mouth's strip says the runs, with a run too.
+func test_mine_mouth_strip_sheet_and_status() -> void:
+	assert_str(str(P0WorldPrompts.mine(_view()).fact)).is_equal("Runs today 0/2")
+	assert_str(str(P0WorldPrompts.mine(_view(_run([_floor(1), _floor(2, false)]), 200, 1)).fact)).is_equal("Runs today 1/2")
 	var sheet := P0MaterialLogic.mine_sheet(_view())
 	assert_str(str(sheet.line)).is_equal("Explore two floors and gather materials.")
 	assert_that(sheet.facts).is_equal([["Runs today", "0/2"]])
