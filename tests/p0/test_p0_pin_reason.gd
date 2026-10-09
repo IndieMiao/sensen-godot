@@ -5,7 +5,7 @@ extends GdUnitTestSuite
 
 const PinReason := preload("res://modules/p0/p0_pin_reason.gd")
 const P0Map := preload("res://scenes/p0/p0_map.gd")
-const REED := "pond_shanghai_05"
+const REED := "pond_san_francisco_03"   # Fern Pond, the beginner pond (SGODOT-270; the name kept for the history)
 
 const NAMES := {"fish_crucian": "Pond Crucian", "rod_reed": "Reed Rod", "bait_worm": "Worm Bait"}
 
@@ -22,11 +22,11 @@ func _tutorial(status: String, have: int) -> Dictionary:
 func test_an_untaken_pond_catch_marks_no_pond() -> void:
 	var v := _tutorial("open", 0)
 	assert_array(PinReason.markers(v)).is_empty()
-	assert_array(P0Map.pin_marks(v)).is_empty()            # was Reed Pond's ! before q(103)
+	assert_array(P0Map.pin_marks(v)).is_empty()            # was the beginner pond's ! before q(103)
 	assert_str(P0Map.home_mark(v)).is_empty()
 	assert_dict(PinReason.reason(v, REED)).is_empty()
 
-func test_a_taken_pond_catch_marks_reed_pond_until_the_fish_are_in_the_bag() -> void:
+func test_a_taken_pond_catch_marks_the_beginner_pond_until_the_fish_are_in_the_bag() -> void:
 	var v := _tutorial("accepted", 0)
 	assert_array(P0Map.pin_marks(v)).is_equal([{"id": REED, "state": "request"}])
 	var why := PinReason.reason(v, REED)
@@ -118,7 +118,7 @@ func test_requests_say_how_far_along_they_are_and_where_they_go() -> void:
 	assert_bool(bool(t.tracked)).is_true()
 	var market := PinReason.request_of(v, "mk_2")
 	assert_str(PinReason.progress_text(market)).is_equal("Fine Catch · Fine fish 1/4")
-	assert_str(str(market.deliver)).is_equal("Deliver at Xuhui Market Square")
+	assert_str(str(market.deliver)).is_equal("Deliver at Mission Market Square")
 	var pip := PinReason.request_of(v, "req_res_pip_1")
 	assert_str(PinReason.progress_text(pip)).is_equal("Pip's First Fish · Common fish 3/3")
 	assert_str(str(pip.deliver)).is_equal("Deliver to Pip")

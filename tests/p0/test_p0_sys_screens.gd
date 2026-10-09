@@ -135,7 +135,7 @@ func test_an_outpost_room_is_left_while_a_card_is_up_and_joined_again_after() ->
 # ---------------------------------------------------------------- resume and scene loading
 func test_a_slow_read_on_return_gets_a_cover_over_the_place() -> void:
 	rt.session.view = _view()
-	rt.ui.set_place("Shanghai · Reed Pond")
+	rt.ui.set_place("SF · Fern Pond")
 	rt._on_resumed()
 	assert_array(asked).contains(["/p0/state"])
 	rt._tick_screens(0.0)
@@ -143,21 +143,21 @@ func test_a_slow_read_on_return_gets_a_cover_over_the_place() -> void:
 	rt._resume_ms -= UiTokens.MOTION_PENDING_DELAY_MS
 	rt._tick_screens(0.0)
 	assert_int(rt.ui.screen_kind()).is_equal(K.SCENE)
-	assert_str(rt.ui.screen()._place.text).is_equal("Shanghai · Reed Pond")
+	assert_str(rt.ui.screen()._place.text).is_equal("SF · Fern Pond")
 	_state()
 	assert_int(rt.ui.screen_kind()).is_equal(-1)
 
 func test_opening_a_p0_world_names_where_the_player_is_going() -> void:
-	var pond := rt._scene_overlay("res://scenes/p0/p0_pond.tscn", {"pond_id": "pond_shanghai_05"}) as P0LoadingLayer
+	var pond := rt._scene_overlay("res://scenes/p0/p0_pond.tscn", {"pond_id": "pond_san_francisco_03"}) as P0LoadingLayer
 	assert_object(pond).is_not_null()
-	assert_str(pond.screen._place.text).is_equal("Shanghai · " + str(SystemPonds.location("pond_shanghai_05").name))
-	assert_str(P0LoadingLayer.destination("res://scenes/p0/p0_mine.tscn", {"floor": 3})).is_equal("Shanghai · Mine · Floor 3")
-	assert_str(P0LoadingLayer.destination("res://scenes/p0/p0_farm.tscn", {})).is_equal("Shanghai · Homestead")
+	assert_str(pond.screen._place.text).is_equal("SF · Fern Pond")   # the chip writes SF (q(106))
+	assert_str(P0LoadingLayer.destination("res://scenes/p0/p0_mine.tscn", {"floor": 3})).is_equal("SF · Mine · Floor 3")
+	assert_str(P0LoadingLayer.destination("res://scenes/p0/p0_farm.tscn", {})).is_equal("SF · Homestead")
 	assert_object(rt._scene_overlay("res://scenes/farm/farm.tscn", {})).is_null()   # not a P0 world: AppRouter's own
 	pond.free()
 
 func test_the_scene_cover_shows_after_the_pending_delay_and_backs_out_only_after_a_failure() -> void:
-	var layer := P0LoadingLayer.new("Shanghai · Reed Pond")
+	var layer := P0LoadingLayer.new("SF · Fern Pond")
 	add_child(auto_free(layer))
 	assert_float(layer.screen.modulate.a).is_equal(0.0)
 	assert_bool(layer.close_button.visible).is_false()   # AppRouter's Back reads it
@@ -192,7 +192,7 @@ func test_the_outpost_handshake_carries_the_version() -> void:
 ## no wordmark); Can't connect's card plus Go back. Retry opens the same place again; Go back (and Back) stays put.
 func test_a_failed_place_offers_retry_and_the_way_back() -> void:
 	var shot := ImageTexture.create_from_image(Image.create(4, 4, false, Image.FORMAT_RGB8))
-	var layer := P0LoadingLayer.new("Shanghai · Reed Pond", shot, "res://scenes/p0/p0_pond.tscn", {"pond_id": "pond_shanghai_05"})
+	var layer := P0LoadingLayer.new("SF · Fern Pond", shot, "res://scenes/p0/p0_pond.tscn", {"pond_id": "pond_san_francisco_03"})
 	var opened := []
 	layer.reopen = func(p, a): opened.append([p, a])
 	add_child(auto_free(layer))
@@ -208,12 +208,12 @@ func test_a_failed_place_offers_retry_and_the_way_back() -> void:
 	s.card.primary.pressed.emit()   # Retry
 	await get_tree().process_frame
 	assert_int(cleared[0]).is_equal(1)   # AppRouter's transition is cleared first …
-	assert_that(opened).is_equal([["res://scenes/p0/p0_pond.tscn", {"pond_id": "pond_shanghai_05"}]])   # … then the same place
+	assert_that(opened).is_equal([["res://scenes/p0/p0_pond.tscn", {"pond_id": "pond_san_francisco_03"}]])   # … then the same place
 
 # ---------------------------------------------------------------- getting there (q(78))
 func _arrive_at_pond() -> Node:
 	rt.session.view = _view()
-	rt._scene_overlay("res://scenes/p0/p0_pond.tscn", {"pond_id": "pond_shanghai_05"}).free()
+	rt._scene_overlay("res://scenes/p0/p0_pond.tscn", {"pond_id": "pond_san_francisco_03"}).free()
 	var w := auto_free(Node.new()) as Node
 	w.scene_file_path = "res://scenes/p0/p0_pond.tscn"
 	add_child(w)
