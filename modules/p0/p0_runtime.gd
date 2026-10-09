@@ -1031,6 +1031,15 @@ func _dev_shot(dt: float) -> void:
 				ui.set_view(session.current())
 				ui.set_action(P0Logic.fish_action(session.current(), ""))
 			"creeltap": ui._creel.pressed.emit()   # a tap on the creel badge
+			"restcard":   # restcard[:used] — the bench sheet (FARM-7-2); `used` marks today's rest taken, locally (q(96) shots)
+				if step.size() > 1 and step[1] == "used":
+					var rv: Dictionary = session.view.duplicate(true)
+					rv["rest"] = rv.get("rest", {}).duplicate()
+					rv.rest["used"] = int(rv.rest.get("limit", 1))
+					session.view = rv
+					session.busy = true   # dev only: no answer replaces the made-up rest
+					ui.set_view(session.current())
+				ui.open_rest_card()
 			"stage":   # stage:res_pip:Trusted — a resident's affinity stage set locally from the content table (225 tone shots)
 				var sv: Dictionary = session.view.duplicate(true)
 				var stages: Array = P0Logic.content().get("affinity", {}).get("stages", [])
