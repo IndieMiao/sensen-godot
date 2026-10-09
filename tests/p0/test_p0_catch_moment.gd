@@ -128,6 +128,17 @@ func test_an_escape_and_a_catch_the_world_does_not_show_float_at_once() -> void:
 	assert_array(rt.catch_floats).is_empty()
 	assert_array(_floats(rt.ui).map(func(f): return f.text)).contains(["+25 XP", "Pond Crucian ×1"])
 
+## 刘邦 on #154: a player who leaves the pond mid-arc never lets the held floats rise; the next catch — an escape here —
+## must not float the last fish's `+25 XP`.
+func test_floats_held_for_a_fish_never_landed_do_not_leak_into_the_next_catch() -> void:
+	var rt: P0Runtime = await _runtime()
+	rt.world = auto_free(_Shows.new())
+	rt._on_state(rt.session.view, [{"kind": "xp", "skill": "fishing", "amount": 25, "percent": 100},
+		{"kind": "catch", "result": "landed", "fish": "fish_crucian", "rarity": 1}])
+	assert_array(rt.catch_floats).is_not_empty()   # held, and the pond is left before the hand: nobody takes them
+	rt._on_state(rt.session.view, [{"kind": "catch", "result": "escaped", "fish": "fish_crucian", "rarity": 1}])
+	assert_array(rt.take_catch_floats()).is_empty()
+
 func test_a_first_catchs_card_comes_after_its_floats() -> void:
 	var rt: P0Runtime = await _runtime()
 	rt.last_first_catch_xp = 20

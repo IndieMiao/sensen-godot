@@ -523,9 +523,10 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				ui.queue_card(func(): HomePanel.moment(ui, home))   # one moment at a time (q(49) ④)
 	# After the loop, so it is queued behind the level-up banner (itself deferred) even when the parcel came first.
 	if not parcel_notice.is_empty(): ui.inbox_notice_when_clear.call_deferred(parcel_notice)
-	if world_lands:
-		catch_floats = floats
-		floats = []
+	# Any catch resets what is held: a player who left the pond mid-arc never let the last fish's floats rise, and an
+	# escape after that must not float them (刘邦 on #154).
+	if settles_catch: catch_floats = floats if world_lands else []
+	if world_lands: floats = []
 	ui.queue_floats(floats, at)   # with the world's own lines of this reply, at the end of the frame
 	if ui.modal_kind == "counter" and events.size() > 0:
 		ui.set_view(session.current())   # the counter drawer follows the view; floats say what changed
