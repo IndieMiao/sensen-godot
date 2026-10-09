@@ -4,7 +4,7 @@ extends Control
 ## parts as PROFILE-1, with the blocks P0 has no data for left out (title, ID, bio, relations, Edit, Medals /
 ## Guestbook / Second Home, the Crops and Cities collections). Full screen on the cream surface:
 ##   top bar     back + Profile (+ gear for Settings: hidden until P0 has a Settings page)
-##   look        the saved outfit (BagCharacterPreview) + `Edit look ›` (the dressing room)
+##   look        the saved outfit (BagCharacterPreview; a sideways drag turns it) + `Edit look ›` (the dressing room)
 ##   identity    name, `City · Climate · Since Oct 2` (view.profile, SGODOT-228; a missing field hides its line)
 ##   skills      three UiSkillCards; tapping one opens the skill details
 ##   farm        UiFarmCard: farm name, Level N, the farm's status line
@@ -33,6 +33,8 @@ var view := {}
 var safe_top := 0.0
 var top_bar: UiProfileTopBar
 var preview: BagCharacterPreview
+## A sideways drag over the outfit area turns the figure (int10c 256 ⑦), as in the dressing room.
+var spin: _Spin
 
 var _body: VBoxContainer
 var _refreshed_ms := 0
@@ -188,6 +190,10 @@ func _look() -> Control:
 	preview.offset_top = -_FIGURE.y * 0.5
 	preview.offset_bottom = _FIGURE.y * 0.5
 	area.add_child(preview)
+	spin = _Spin.new()
+	spin.preview = preview
+	spin.set_anchors_preset(Control.PRESET_FULL_RECT)
+	area.add_child(spin)   # under `Edit look`, which stays a button
 	var edit := UiNavButton.new("Edit look", true)
 	edit.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
 	edit.grow_horizontal = Control.GROW_DIRECTION_BEGIN
@@ -202,3 +208,33 @@ func _gap(h: float) -> void:
 	g.custom_minimum_size.y = h
 	g.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_body.add_child(g)
+
+## Drag sideways over the outfit to turn the figure, 0.01 rad a pixel as in the dressing room (int10c 256 ⑦). A press
+## is left to the page; once the drag goes past the tap slop and more sideways than up or down, it turns the figure
+## and keeps the motion, so an upward drag still scrolls the page. Mouse events only: touch arrives as the emulated
+## left button (P0Ui.is_tap), so handling both would turn twice.
+class _Spin extends Control:
+	const RAD_PER_PX := 0.01
+	var preview: BagCharacterPreview
+	var _down := false
+	var _travel := Vector2.ZERO
+	var _turning := false
+
+	func _init() -> void:
+		mouse_filter = Control.MOUSE_FILTER_PASS
+
+	func turning() -> bool: return _turning
+
+	func _gui_input(e: InputEvent) -> void:
+		if e is InputEventMouseButton and (e as InputEventMouseButton).button_index == MOUSE_BUTTON_LEFT:
+			_down = e.pressed
+			_travel = Vector2.ZERO
+			_turning = false
+		elif e is InputEventMouseMotion and _down:
+			var rel := (e as InputEventMouseMotion).relative
+			_travel += rel
+			if not _turning and absf(_travel.x) > GestureArbiter.TAP_SLOP and absf(_travel.x) > absf(_travel.y):
+				_turning = true
+			if _turning:
+				if preview != null: preview.turn_by(-rel.x * RAD_PER_PX)
+				accept_event()
