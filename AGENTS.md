@@ -1149,3 +1149,10 @@
   only a local path. Text reports may be pasted as the comment body when a file
   cannot be attached. Walkthroughs should ask the author to upload missing
   materials before reviewing.
+- The Plane MCP can only attach files from public URLs. Upload local files with
+  the shared script (Plane REST; credentials read from ../plane.env, never
+  printed):
+  `uv run --with requests python3 /Volumes/ACASIS/tmp/gensen-ui-review/tools/plane_upload.py <work_item_uuid> <your_virtual_user_id> <file> [<file> ...] [--comment "<html>"]`.
+  Get the card UUID with the MCP `retrieve_work_item_by_identifier`
+  (e.g. SGODOT-231); prefix file names with the card number; virtual user ids
+  are in /Volumes/ACASIS/tmp/gensen-ui-review/pm/virtual-users.md.
