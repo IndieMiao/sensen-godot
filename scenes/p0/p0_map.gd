@@ -99,10 +99,13 @@ func _origin() -> Vector2:
 			if not p.is_empty(): return Vector2(float(p.lat), float(p.lng))
 	return Vector2(home_lat, home_lng)
 
+## The map asks for a pond's info for its pin's name every frame (pin_tag, through CityMapView._label_text): it reads
+## the received view as it is — the card needs no timers — never session.current(), which copies the whole view each
+## call (int11 / int12 hand test: the map ran hot and slow with a few copies per pond pin per frame).
 func _pond_info(entry: Dictionary) -> Dictionary:
-	if rt == null: return {}
+	if rt == null or rt.session == null: return {}
 	var km := P0PlaceSheet.km_between(_origin(), Vector2(float(entry.lat), float(entry.lng)))
-	return PondCard.info(rt.session.current(), str(entry.id), km)
+	return PondCard.info(rt.session.view, str(entry.id), km)
 
 ## "Reed Pond · Beginner pond · 0.8 km" (q(48)); outposts keep their "· N online" tag.
 func _pin_tag(entry: Dictionary) -> String:
@@ -683,7 +686,7 @@ static func tutorial_marks(view: Dictionary) -> Array:
 
 ## CityMapView asks once per update (#83): the same marks by pin id, the first (highest) mark per pin.
 func city_pin_markers() -> Dictionary:
-	var v: Dictionary = rt.session.current() if rt != null and rt.session != null else {}
+	var v: Dictionary = rt.session.view if rt != null and rt.session != null else {}   # every frame: no copy (_pond_info)
 	var out := {}
 	var list := pin_marks(v)
 	if away() and home_mark(v) != "": list.push_front({"id": HOME_PIN, "state": home_mark(v)})

@@ -98,8 +98,12 @@ func set_name_shown(v: bool) -> void:
 	_label_box.visible = text != "" and v
 	_layout()
 
+## The map sets every pin's fields each frame (CityMapView._place_candidate): only a change restyles or lays out.
+var _plate_on := -1   # the plate last drawn (-1: none yet)
 func set_plate(v: bool) -> void:
 	plate = v
+	if _plate_on == int(v): return   # a new style box per frame restyled and relaid every pin (int12 map frame cost)
+	_plate_on = int(v)
 	var box := UiStyleBox.make(UiTokens.COLOR_SURFACE if v else Color.TRANSPARENT, _PLATE_RADIUS)
 	_label_box.add_theme_stylebox_override(&"panel", box.with_margins(_LABEL_PAD_X, _LABEL_PAD_Y, _LABEL_PAD_X, _LABEL_PAD_Y))
 	_layout()
@@ -138,24 +142,32 @@ func set_label_shift(v: float) -> void:
 	_layout()
 
 func set_focus(v: float) -> void:
+	if v == focus and _pin.scale.x == maxf(0.001, v): return
 	focus = v
 	_pin.pivot_offset = Vector2(DISC * 0.5, DISC)
 	_pin.scale = Vector2.ONE * maxf(0.001, v)
 
 func set_count(v: String) -> void:
+	if v == count and _count_label.text == v: return
 	count = v
 	_count_label.text = v
 	_count.visible = v != ""
 
 ## The name plate's size for `text` before any pin exists (the city map packs pins by it): Compact/10 Bold, 6 / 2
 ## padding, never cut. Matches label_size() of a built pin.
+## Measured once per name: the city map asks for every pin it packs, every frame.
 static func label_size_for(text: String) -> Vector2:
 	if text == "": return Vector2.ZERO
+	if _label_sizes.has(text): return _label_sizes[text]
 	var th := UiKit.theme()   # the name's own style, STYLE_C10_B (the city map gives the pin this theme)
 	var f := th.get_font(&"font", UiTokens.STYLE_C10_B)
 	var fs := th.get_font_size(&"font_size", UiTokens.STYLE_C10_B)
-	return Vector2(ceilf(f.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x) + _LABEL_PAD_X * 2.0,
+	var size := Vector2(ceilf(f.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x) + _LABEL_PAD_X * 2.0,
 		ceilf(f.get_height(fs)) + _LABEL_PAD_Y * 2.0)
+	if _label_sizes.size() >= 512: _label_sizes.clear()   # names come from a fixed catalogue; a bound all the same
+	_label_sizes[text] = size
+	return size
+static var _label_sizes := {}
 
 ## The name's plate size (0 when there is no name).
 func label_size() -> Vector2:
