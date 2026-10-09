@@ -83,6 +83,52 @@ func test_tapping_a_cell_opens_the_bag_card_and_a_blank_cell_folds_it() -> void:
 	assert_bool(d.sheet.is_open()).is_false()
 	assert_bool(d._hint.visible).is_true()
 
+## int10c 256 ②: River Perch → Lettuce → Radish left the card tall (its new lines measure tall before they have a
+## width, its minimum ended where it was, so the drawer never fitted it again): medallion centred out of sight, the
+## bottom edge under the grid. The card fits its content after every switch.
+func test_switching_items_keeps_the_card_fitted_to_its_content() -> void:
+	var v := {"bag": {"capacity": 25, "slots": [{"id": "fish_perch", "qty": 2}, {"id": "crop_lettuce", "qty": 2},
+		{"id": "crop_radish", "qty": 2}]},
+		"items": {"fish_perch": {"rarity": 2, "sell": 9}, "crop_lettuce": {"sell": 4}, "crop_radish": {"sell": 5}},
+		"names": {"fish_perch": "River Perch", "crop_lettuce": "Lettuce", "crop_radish": "Radish"}}
+	var d := P0BagDrawer.new(v, "bag")
+	d.animate = false
+	d.persist = false
+	var host := Control.new()
+	host.theme = UiKit.theme()
+	host.size = Vector2(360, 800)
+	add_child(auto_free(host))
+	host.add_child(d)
+	for i in 3: await get_tree().process_frame
+	for id in ["fish_perch", "crop_lettuce", "crop_radish"]:
+		d.grid.select(id)
+		for i in 4: await get_tree().process_frame
+		assert_float(d.sheet.size.y).override_failure_message(id).is_equal(d.sheet.get_combined_minimum_size().y)
+		assert_float(d.sheet.get_rect().end.y).is_less_equal(d.grid.position.y)
+		assert_float(d.sheet._medallion.get_global_rect().end.y).is_less_equal(d.sheet.get_global_rect().end.y)
+
+## int10c 256 ③ (不知火舞): the Bag side's header on both sides; switching back and forth moves neither the switch
+## nor where the content starts.
+func test_switching_bag_and_gear_moves_nothing() -> void:
+	var d := _drawer()
+	for i in 3: await get_tree().process_frame
+	var tabs_y := d.header.tabs().global_position.y
+	var content_y := d._bag_box.global_position.y
+	var strip := d._chips.get_parent() as Control
+	var chips_mid := strip.get_global_rect().get_center().y
+	for i in 10:
+		var seg: BaseButton = d.header.tabs().tabs()[(i + 1) % 2]
+		seg.pressed.emit()
+		seg.button_pressed = true
+		for f in 2: await get_tree().process_frame
+		var box: Control = d._gear_box if d.side == "gear" else d._bag_box
+		assert_str(d.side).is_equal("gear" if i % 2 == 0 else "bag")
+		assert_float(d.header.tabs().global_position.y).is_equal(tabs_y)
+		assert_float(box.global_position.y).is_equal(content_y)
+		if d.side == "gear":   # the first lines share a centre line: the chips' row and `✓ Equipped`
+			var badge := d._gear_box.find_children("*", "PanelContainer", true, false)[0] as Control
+			assert_float(badge.get_global_rect().get_center().y).is_equal(chips_mid)
+
 func test_category_chip_and_sort_change_what_the_grid_lists() -> void:
 	var d := _drawer()
 	await get_tree().process_frame
@@ -190,6 +236,52 @@ func test_profile_page_emits_back_edit_look_and_skill() -> void:
 	(page.find_children("*", "UiSkillCard", true, false)[1] as UiSkillCard).pressed.emit()
 	assert_array(got).is_equal(["back", "look", "fishing"])
 	assert_float(page.top_bar.right_button().modulate.a).is_equal(0.0)   # no Settings page in P0 yet
+
+func _mouse(down: bool) -> InputEventMouseButton:
+	var m := InputEventMouseButton.new()
+	m.button_index = MOUSE_BUTTON_LEFT
+	m.pressed = down
+	return m
+
+func _motion(rel: Vector2, held := true) -> InputEventMouseMotion:
+	var m := InputEventMouseMotion.new()
+	m.relative = rel
+	m.button_mask = MOUSE_BUTTON_MASK_LEFT if held else 0
+	return m
+
+## int10c 256 ⑦: a sideways drag over the outfit turns the figure (0.01 rad a pixel, as in the dressing room) once it
+## is past the tap slop; an upward drag is left to the page's scroll; nothing turns before the press.
+func test_a_sideways_drag_on_the_outfit_turns_the_figure() -> void:
+	var page := P0ProfilePage.new(_view())
+	var host := Control.new()
+	host.theme = UiKit.theme()
+	host.size = Vector2(360, 800)
+	add_child(auto_free(host))
+	host.add_child(page)
+	await get_tree().process_frame
+	var spin := page.spin
+	spin._gui_input(_motion(Vector2(40, 0), false))   # no button held: no turn
+	assert_float(page.preview.yaw()).is_equal(0.0)
+	spin._gui_input(_mouse(true))
+	spin._gui_input(_motion(Vector2(10, 0)))   # within the tap slop: not yet
+	assert_bool(spin.turning()).is_false()
+	spin._gui_input(_motion(Vector2(10, 2)))   # past it, sideways: turning from here
+	assert_bool(spin.turning()).is_true()
+	spin._gui_input(_motion(Vector2(20, 0)))
+	assert_float(page.preview.yaw()).is_equal_approx(-0.3, 0.0001)
+	spin._gui_input(_mouse(false))
+	assert_bool(spin.turning()).is_false()
+	var before := page.preview.yaw()
+	spin._gui_input(_mouse(true))
+	spin._gui_input(_motion(Vector2(30, 0)))
+	spin._gui_input(_motion(Vector2(30, 0), false))   # the release went missing: a hover after it turns nothing
+	assert_bool(spin.turning()).is_false()
+	assert_float(page.preview.yaw()).is_equal_approx(before - 0.3, 0.0001)
+	before = page.preview.yaw()
+	spin._gui_input(_mouse(true))
+	for i in 4: spin._gui_input(_motion(Vector2(2, -12)))   # mostly upward: the page scrolls, the figure stays
+	spin._gui_input(_mouse(false))
+	assert_float(page.preview.yaw()).is_equal(before)
 
 # ---------------------------------------------------------------- Farm Storage (§10.4.8)
 

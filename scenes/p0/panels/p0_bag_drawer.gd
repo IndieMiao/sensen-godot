@@ -329,8 +329,15 @@ func _build_bag() -> void:
 
 func _build_gear() -> void:
 	for c in _gear_box.get_children(): c.queue_free()
-	_gap(_gear_box, _ROW_GAP)
-	_gear_box.add_child(UiGearRow.equipped_badge())
+	# The first row as the Bag side's chip row: 4 under the header, a 44 touch row with the badge centred in it, so
+	# both sides' first lines share a centre line (int10c 256 ③, 不知火舞).
+	_gap(_gear_box, _SMALL_GAP)
+	var first := HBoxContainer.new()
+	first.custom_minimum_size.y = UiTokens.SIZE_TOUCH
+	var badge := UiGearRow.equipped_badge()
+	badge.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	first.add_child(badge)
+	_gear_box.add_child(first)
 	_gap(_gear_box, _ROW_GAP)
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override(&"separation", int(UiTokens.SPACE_QUICK_BAR_GAP))

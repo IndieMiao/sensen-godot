@@ -13,6 +13,7 @@ var _pending_outfit: AvatarConfig
 var _outfit_dirty := true
 var _application_paused := false
 var _visibility_sources: Array[Node] = []
+var _yaw := 0.0   # a turn the player gave the figure (radians, around its own up axis), kept across rig rebuilds
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -86,10 +87,19 @@ func _ensure_rig() -> void:
 	rig = Avatar.create_rig()
 	rig.name = "SavedCharacter"
 	rig.rotation_degrees.y = 12
+	rig.rotate_y(_yaw)
 	viewport.add_child(rig)
 	rig.config_applied.connect(func(_config):
 		rig.play_motion("idle")
 		_sync_visibility())
+
+## Turn the figure by `angle` radians around its up axis (the profile's drag, int10c 256 ⑦).
+func turn_by(angle: float) -> void:
+	_yaw += angle
+	if rig != null: rig.rotate_y(angle)
+
+## How far the figure has been turned from its resting pose, radians.
+func yaw() -> float: return _yaw
 
 func _outfit_changed(config: AvatarConfig) -> void:
 	_pending_outfit = config.duplicate_config()

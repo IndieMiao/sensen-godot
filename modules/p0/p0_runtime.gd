@@ -948,9 +948,9 @@ func _dev_shot(dt: float) -> void:
 			"counterpick":  # counterpick[:id] selects a stack in the counter's bag half: its Sell card shows (q(16) shots)
 				if ui._counter != null and is_instance_valid(ui._counter) and ui._counter.grid != null and not ui._counter.grid.shown_items().is_empty():
 					ui._counter.grid.select(step[1] if step.size() > 1 else str(ui._counter.grid.shown_items().front().id))
-			"bagpick":  # tap the first listed item of the open bag drawer
+			"bagpick":  # bagpick[:id] taps that item of the open bag drawer (none named: the last listed)
 				if ui._bag != null and is_instance_valid(ui._bag) and not ui._bag.grid.shown_items().is_empty():
-					ui._bag.grid.select(str(ui._bag.grid.shown_items().back().id))
+					ui._bag.grid.select(step[1] if step.size() > 1 else str(ui._bag.grid.shown_items().back().id))
 			"energy": ui.open_energy_card(3, "Sow ×1")
 			"close": ui.close_modal()
 			"auto":
@@ -969,6 +969,26 @@ func _dev_shot(dt: float) -> void:
 			"gear": ui.open_gear()
 			"skills": ui.open_skills()
 			"profile": ui.open_profile()
+			"editlook": ui.edit_look()   # the profile's Edit look ›: the dressing room above the current world (KEEP-P0-2)
+			# 256 ⑦⑧ shots: profskill:farming / profdex tap the profile's skill card / Fish tile; profspin:120 drags
+			# the outfit 120 px sideways (the spin's own gesture: press, past the slop, release).
+			"profskill": if ui._profile: ui._profile.skill_pressed.emit(step[1] if step.size() > 1 else "farming")
+			"profdex": if ui._profile: ui._profile.collection_pressed.emit("fish")
+			"profspin":
+				if ui._profile:
+					var sp := ui._profile.spin
+					var press := InputEventMouseButton.new()
+					press.button_index = MOUSE_BUTTON_LEFT
+					press.pressed = true
+					sp._gui_input(press)
+					for i in 12:
+						var m := InputEventMouseMotion.new()
+						m.button_mask = MOUSE_BUTTON_MASK_LEFT
+						m.relative = Vector2(float(step[1] if step.size() > 1 else "120") / 12.0, 0)
+						sp._gui_input(m)
+					press = press.duplicate()
+					press.pressed = false
+					sp._gui_input(press)
 			"resident": ui.open_resident(step[1] if step.size() > 1 else "res_pip")   # SGODOT-225 dialogue bar
 			"creel":   # creel:0 — the creel badge's states for shots: the bag's free slots set locally (235 B1)
 				var cv: Dictionary = session.view.duplicate(true)

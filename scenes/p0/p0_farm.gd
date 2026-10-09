@@ -97,20 +97,35 @@ func is_back_navigation_locked() -> bool:
 ## ours over as well: the viewport uses the first WorldEnvironment in the tree, so the farmhouse otherwise lit with the
 ## farm's cool ambient and green backdrop (SGODOT-249; farm.gd and P0Room.suspend() do the same). The canvas layers
 ## go too: FarmBackground (layer −1) is the farm's backdrop only under its BG_CANVAS environment; under the room's
-## colour background it would cover the room, and hiding the farm does not hide a CanvasLayer.
+## colour background it would cover the room, and hiding the farm does not hide a CanvasLayer. They leave the tree
+## while we are suspended: hidden is not enough — a hidden CanvasLayer at −1 still took part in the dressing room's
+## canvas background (BG_CANVAS, max layer −1), which then drew its backdrop over its 3D character (SGODOT-256 ⑥).
+var _held_layers: Array = []   # [CanvasLayer, its index], out of the tree while suspended
+
 func suspend() -> void:
 	set_process(false)
 	visible = false
 	if world_env.environment: _saved_env = world_env.environment
 	world_env.environment = null
-	for c in get_children():
-		if c is CanvasLayer: c.visible = false
+	if _held_layers.is_empty():
+		for c in get_children():
+			if c is CanvasLayer: _held_layers.append([c, c.get_index()])
+		for held in _held_layers: remove_child(held[0])
+
+## Freed while suspended (the root swapped away under the dressing room): the layers out of the tree go with us.
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_PREDELETE:
+		for held in _held_layers:
+			if is_instance_valid(held[0]): (held[0] as Node).free()
+		_held_layers.clear()
 
 func resume() -> void:
 	get_viewport().transparent_bg = false
 	if _saved_env: world_env.environment = _saved_env
-	for c in get_children():
-		if c is CanvasLayer: c.visible = true
+	for held in _held_layers:   # back in their places, in the order they were taken
+		add_child(held[0])
+		move_child(held[0], mini(int(held[1]), get_child_count() - 1))
+	_held_layers.clear()
 	visible = true
 	set_process(true)
 	cam.make_current()

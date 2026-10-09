@@ -558,7 +558,7 @@ static func _bag_items() -> Array:
 
 static func _sample_grid(sell := false) -> UiInventoryGrid:
 	var g := UiInventoryGrid.new()
-	g.custom_minimum_size.y = UiTokens.SIZE_INVENTORY_CELL * 2.0 + UiTokens.SPACE_WITHIN
+	g.custom_minimum_size.y = UiTokens.SIZE_INVENTORY_CELL * 2.0 + UiInventoryGrid.ROW_GAP   # two whole rows (亚瑟 on #133)
 	g.capacity = 25
 	g.items = _bag_items()
 	if sell:

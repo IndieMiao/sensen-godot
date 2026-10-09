@@ -18,10 +18,16 @@ class Sample extends "res://scenes/p0/p0_outpost.gd":
 		arrived[n] = actor.position
 		super._on_facility(n)
 
-func _room(id: String) -> Sample:
+func _room(id: String, phone := false) -> Sample:
 	var r := Sample.new()
 	r.setup({"outpost_id": id})
-	add_child(r)
+	if phone:   # a 360 × 800 SubViewport: tests about the framing see a phone's portrait screen (headless roots are 640 × 640)
+		var vp := SubViewport.new()
+		vp.size = Vector2i(360, 800)
+		add_child(auto_free(vp))
+		vp.add_child(r)
+	else:
+		add_child(r)
 	auto_free(r)
 	return r
 
@@ -69,7 +75,9 @@ func test_near_resident_is_a_resident_within_card_reach_never_the_keeper() -> vo
 	var r := _room("sh_tackle_1")
 	r.actor.position = r.anchor("npc_keeper").global_position
 	assert_str(r.p0_near_resident()).is_not_equal(str(r.npcs.npc_keeper.id))   # Finn keeps the shop: never a gift target (Kai may be in reach)
-	r.actor.position = r.anchor("npc_keeper").global_position + Vector3(1.5, 0, 0)   # only Finn within a card's reach
+	# Only Finn within a card's reach: along the counter, away from Kai (Finn at its left end is 1.9 m from him).
+	r.actor.position = r.anchor("npc_keeper").global_position + Vector3(2.3, 0, 0)
+	assert_float(P0Room._flat_distance(r.actor.position, r.anchor("npc_keeper").global_position)).is_less(P0Room.CARD_NEAR_M)
 	assert_float(P0Room._flat_distance(r.actor.position, r.anchor("npc_kai").global_position)).is_greater(P0Room.CARD_NEAR_M)
 	assert_str(r.p0_near_resident()).is_equal("")
 	var kai := r.anchor("npc_kai").global_position
@@ -353,6 +361,8 @@ func test_a_tap_on_an_npc_name_tag_is_that_npc() -> void:
 		r.rt = rt
 		for n in r.npcs:
 			r.actor.position = r.anchor(n).global_position + Vector3(0.6, 0, 0.6)   # beside them: no strip open over the tags
+			r._focus = r.actor.position   # walked there: the view came along (a room taller than the band follows down too)
+			r._update_camera()
 			r._markers({})
 			var tag: UiNpcNameTag = rt.ui._npc_tags.get("room:" + n)
 			assert_bool(tag != null and tag.visible and not bool(tag.get_meta("covered", false))) \
@@ -550,7 +560,7 @@ func test_every_outpost_opens_on_its_kit() -> void:
 	var kits := {"sh_tackle_1": "farm_tools_store", "sh_tea_1": "coffee_shop", "sh_post_1": "post_office", "sh_market_1": "fruit_shop"}
 	for id in kits:
 		var o := P0Outposts.find(id)
-		var r := _room(id)
+		var r := _room(id, true)
 		assert_str(str(o.art)).is_equal(kits[id])
 		assert_str(r.layout_path).override_failure_message(id).is_equal("res://assets/rooms/%s/layout.json" % kits[id])
 		for a in P0RoomAnchors.read_json(str(o.anchors)).anchors:

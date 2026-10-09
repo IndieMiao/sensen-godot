@@ -232,9 +232,8 @@ const COUNTER_TAG_PX := 28.0       # the keeper's name tag, highlighted, over NA
 var _counter_top := -1.0           # the drawer top (UI px) the shot is framed for; -1 none
 
 func _counter_shot() -> void:
-	var drawer: Control = null
-	if rt and rt.ui.modal_kind in P0Ui._COUNTER_FLOW and is_instance_valid(rt.ui._counter): drawer = rt.ui._counter
-	var top := rt.ui.root.size.y - float(drawer.get("height")) if drawer != null else -1.0
+	var drawer: P0CounterDrawer = rt.ui.counter_drawer() if rt else null
+	var top := rt.ui.root.size.y - drawer.height if drawer != null else -1.0
 	if is_equal_approx(top, _counter_top): return
 	_counter_top = top
 	var shot := counter_shot(top) if top >= 0.0 else {}
@@ -404,6 +403,9 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"sit": _go_sit(step[1] if step.size() > 1 else "seat_table1_")
 		"stand": _stand_up()
 		"nomarks": _dev_no_marks = true   # acceptance shots: finger cards off, name tags stay
+		"zoom":   # zoom:0.8 — a pinch to that zoom about the screen's centre (acceptance shots)
+			_zoom_at = _view() * 0.5
+			_set_zoom(float(step[1]) if step.size() > 1 else 1.0)
 		_: return super.p0_dev(step)
 	return true
 
