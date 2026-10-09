@@ -983,6 +983,7 @@ func _dev_shot(dt: float) -> void:
 					sp._gui_input(press)
 					for i in 12:
 						var m := InputEventMouseMotion.new()
+						m.button_mask = MOUSE_BUTTON_MASK_LEFT
 						m.relative = Vector2(float(step[1] if step.size() > 1 else "120") / 12.0, 0)
 						sp._gui_input(m)
 					press = press.duplicate()

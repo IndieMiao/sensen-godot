@@ -216,7 +216,6 @@ func _gap(h: float) -> void:
 class _Spin extends Control:
 	const RAD_PER_PX := 0.01
 	var preview: BagCharacterPreview
-	var _down := false
 	var _travel := Vector2.ZERO
 	var _turning := false
 
@@ -227,10 +226,14 @@ class _Spin extends Control:
 
 	func _gui_input(e: InputEvent) -> void:
 		if e is InputEventMouseButton and (e as InputEventMouseButton).button_index == MOUSE_BUTTON_LEFT:
-			_down = e.pressed
 			_travel = Vector2.ZERO
 			_turning = false
-		elif e is InputEventMouseMotion and _down:
+		elif e is InputEventMouseMotion:
+			# Held or not by the motion's own button mask: a release lost on the way can't leave a hover turning it
+			# (亚瑟 on #136).
+			if (e as InputEventMouseMotion).button_mask & MOUSE_BUTTON_MASK_LEFT == 0:
+				_turning = false
+				return
 			var rel := (e as InputEventMouseMotion).relative
 			_travel += rel
 			if not _turning and absf(_travel.x) > GestureArbiter.TAP_SLOP and absf(_travel.x) > absf(_travel.y):

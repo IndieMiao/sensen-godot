@@ -243,9 +243,10 @@ func _mouse(down: bool) -> InputEventMouseButton:
 	m.pressed = down
 	return m
 
-func _motion(rel: Vector2) -> InputEventMouseMotion:
+func _motion(rel: Vector2, held := true) -> InputEventMouseMotion:
 	var m := InputEventMouseMotion.new()
 	m.relative = rel
+	m.button_mask = MOUSE_BUTTON_MASK_LEFT if held else 0
 	return m
 
 ## int10c 256 ⑦: a sideways drag over the outfit turns the figure (0.01 rad a pixel, as in the dressing room) once it
@@ -259,7 +260,7 @@ func test_a_sideways_drag_on_the_outfit_turns_the_figure() -> void:
 	host.add_child(page)
 	await get_tree().process_frame
 	var spin := page.spin
-	spin._gui_input(_motion(Vector2(40, 0)))   # no press: no turn
+	spin._gui_input(_motion(Vector2(40, 0), false))   # no button held: no turn
 	assert_float(page.preview.yaw()).is_equal(0.0)
 	spin._gui_input(_mouse(true))
 	spin._gui_input(_motion(Vector2(10, 0)))   # within the tap slop: not yet
@@ -271,6 +272,12 @@ func test_a_sideways_drag_on_the_outfit_turns_the_figure() -> void:
 	spin._gui_input(_mouse(false))
 	assert_bool(spin.turning()).is_false()
 	var before := page.preview.yaw()
+	spin._gui_input(_mouse(true))
+	spin._gui_input(_motion(Vector2(30, 0)))
+	spin._gui_input(_motion(Vector2(30, 0), false))   # the release went missing: a hover after it turns nothing
+	assert_bool(spin.turning()).is_false()
+	assert_float(page.preview.yaw()).is_equal_approx(before - 0.3, 0.0001)
+	before = page.preview.yaw()
 	spin._gui_input(_mouse(true))
 	for i in 4: spin._gui_input(_motion(Vector2(2, -12)))   # mostly upward: the page scrolls, the figure stays
 	spin._gui_input(_mouse(false))
