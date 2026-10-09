@@ -20,6 +20,7 @@
 | 径向菜单无字 | 四瓣环在屏幕中央，瓣上只有图标，不写行动名与原因；点灰瓣才在环心出单行气泡 `No water nearby` / `Enter the mine` / `Mine floors 3–5`（LOCK-03 v2，q(62)） |
 | 快满写实得 | `Eat · +12 Energy`、`Hot Tea · +12 Energy · 40 coins`、`Rest · +25 Energy`（q(26)）。热茶（茶馆）与咖啡（驿站）同价同效：标称都是 +30，当天第 1 / 2 / 3 杯 40 / 50 / 60 coins、两种共用 3 杯；柜台快满时写实得，如差 3 满时 `Coffee · +3 Energy · 40 coins`，不是数值错（§3.4.4） |
 | XP 飘字 | 全额 `+10 XP`；等级差减额写实际百分比 `+7 XP · 75%`（不画箭头、不做长按）；Cooking 带轨名与品质星 `+10 Cooking XP ★`，同页第 2 锅 `+5 Cooking XP ★ · 2nd today`（不叠百分比），第 3 锅起 `No XP · 3rd today`（q(55)、q(94)） |
+| 倒计时 | 秒级实时计时写 m:ss：`Cooking 0:42`、`9:28 remaining`、`The stove is busy · 0:22 left`、徽标胶囊 `0:22`、体力回复 `+1 in 2:41`；句子里的倒计时按分钟向上取整（最少 `1m`），不足 1 小时写 `42m`、整点 `2h`、其余 `9h 12m`：`Available again in 42m`、`Ready in 42m`、`Expires in 59m`、`Resets in 9h 12m`；不出现 `Available again in 42:00` 这类像钟点的写法，也不出现 `60m`（q(97)） |
 
 ## 1. HUD 与体力卡（LOCK-06、LOCK-09）
 
