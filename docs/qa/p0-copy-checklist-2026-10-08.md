@@ -33,7 +33,7 @@
 | RECOVER 瓦片 · Cook | `4 fish in creel` · `Show kitchen ›` / 离家灰 `At home` |
 | RECOVER 瓦片 · Tea ★ | `0/3 today · 40 coins` → `1/3 today · 50 coins` → `2/3 today · 60 coins` / 灰 `Need 15 more coins` / `3/3 today` / `Energy full`；引导 `Show on map ›`（q(46)、q(48)） |
 | RECOVER 瓦片 · Rest ★ | `Available` / 灰 `Rested today` / `Ready in 1h 12m` / `After 2h away` / 离家 `At home`；引导 `Show bench ›`（q(46)） |
-| 体力不足（主行动键琥珀） | `Sow ×1 · Need 2 Energy` / `Cast · Need 5 Energy` / `Mine · Need 2 Energy` / `Enter mine · Need 2 Energy` |
+| 体力不足（主行动键琥珀） | `Sow ×1 · Need 2 Energy` / `Cast · Need 5 Energy` / `Mine · Need 2 Energy`；矿口入口卡 `Enter mine · Need 2 Energy` 与下行梯小卡 `Floor 2 · Need 2 Energy` 同样琥珀、按下弹 Energy 卡（主行动键不显示，q(102)） |
 
 ## 2. 农场、驿站、长椅、工作台、采集点
 
@@ -83,10 +83,10 @@
 
 | 位置 | 应出现 |
 |---|---|
-| 矿口 | `Enter mine · 2 Energy` / `Continue run · Free` / 次级 `New run · 2 Energy` + `Current run will end · Runs today 1/2` / 灰 `New run · Clear Floor 2 first` |
-| 矿口用尽 ★ | 键面 `Enter mine · No runs left`；按下 toast `Mine runs today 2/2 · Resets in 9h 12m`（q(44)） |
+| 矿口 | 点击触发，主行动键不显示矿口动词（q(102)）；名字条 `The mine · Runs today 0/2`；入口卡 `Enter mine · 2 Energy` / `Continue run · Free` / 次级 `New run · 2 Energy` + `Current run will end · Runs today 1/2` / 灰 `New run · Clear Floor 2 first` |
+| 矿口用尽 ★ | 点矿口直接开 MINE-P0-8，灰按钮 `Mine runs today 2/2 · Resets in 9h 12m`；不出 `Enter mine · No runs left`（q(102)） |
 | 满包 ★ | `Enter mine · Bag full` / `Floor 2 · Bag full`（不扣体力，q(48)）；岩石灰 `Bag full · free a slot to mine`；主行动键 `Mine · Bag full` |
-| 楼梯与电梯 ★ | `Floor 2 · 2 Energy` / 灰 `Floor 2 · Clear Floor 1`（q(44)）/ 第 2 层上行 `Floor 1 · Free` / 出口 `Exit mine · Free` / `Elevator · Free`；面板 `Entrance · Free` / `Floor 1 · Free` / `Floor 2 · Here`（P0 没有 Express） |
+| 楼梯与电梯 ★ | 点击触发，主行动键不显示（q(102)）：下行梯名字条 `Floor 2 · 2 Energy`（到过只写 `Floor 2`），去没到过的层出小卡按钮 `Floor 2 · 2 Energy`；灰 `Floor 2 · Clear Floor 1 first`；上行梯名字条写目的地：第 1 层 `Farm`、第 2 层 `Floor 1`；电梯名字条 `Elevator`；面板 `Entrance · Free` / `Floor 1 · Free` / `Floor 2 · Here`（P0 没有 Express） |
 | 飘字 | `Floor 2 · −2 Energy` / `Floor 2 cleared · Elevator stop` / `Run ended at daily reset`；P0 没有 `Run complete`；MINE-P0-7 不写 `Unmined rocks on Floor 2 are lost`（q(46)） |
 | 火把 | `Light Torch · Free` / `Lit · this floor` |
 
