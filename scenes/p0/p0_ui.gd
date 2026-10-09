@@ -1278,6 +1278,13 @@ func _aim_toast() -> void:
 		if area != null: _toasts.anchor_above(area)
 		else: _toasts.anchor_bottom(root.size.y - _TOAST_DRAWER_FOOT - safe_bottom(), ToastLayer.NARROW_WIDTH)
 		return
+	# A sheet that is not a UiDrawer names its fixed decision area itself (meta "toast_above", e.g. HOME-1's button):
+	# the same q(16) rule — the toast sits over it (不知火舞 on #150).
+	if content != null and content.is_visible_in_tree() and content.has_meta(&"toast_above"):
+		var dock = content.get_meta(&"toast_above")
+		if dock is Control and is_instance_valid(dock) and (dock as Control).is_visible_in_tree():
+			_toasts.anchor_above(dock)
+			return
 	if content != null and content.is_visible_in_tree():
 		var top := content.get_global_rect().position.y - root.global_position.y
 		var hud_bottom := _marker_area().position.y + _kit.global_position.y - root.global_position.y

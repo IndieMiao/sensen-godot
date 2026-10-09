@@ -10,7 +10,9 @@ const MOMENT_TOP := 108.0
 const MOMENT_S := 3.0           # the first Homestead upgrade: 3 s; later ones MOMENT_LATER_S (§8.1.2 ②); tap to skip
 const MOMENT_LATER_S := 1.5
 
-## HOME-1 over the farm. at_home false (e.g. from the Profile farm card) puts "Go home to upgrade" on the button.
+## HOME-1 over the farm. at_home false (the Profile farm card away from home: ui.space != "home") greys the button
+## with `At home` and a tap says `Upgrade at home · Going home is free`; the tiles, What changes and the sources still
+## read (the view carries homestead.next anywhere).
 static func open(ui: P0Ui, at_home := true) -> void:
 	var model := P0Logic.home_panel(ui.view, at_home)
 	var panel := PanelContainer.new()
@@ -68,8 +70,10 @@ static func open(ui: P0Ui, at_home := true) -> void:
 	button.sends = true   # homestead_upgrade: Offline while offline (§10.7.1)
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	button.activated.connect(func(): ui.command.emit({"type": "homestead_upgrade"}))
-	button.unavailable_pressed.connect(func(reason: String): ui.toast(reason))
+	var tap := str(model.get("tap", ""))   # away from home: `Upgrade at home · Going home is free`, else the gap itself
+	button.unavailable_pressed.connect(func(reason: String): ui.toast(tap if tap != "" else reason))
 	col.add_child(button)
+	panel.set_meta(&"toast_above", button)   # q(16): a toast over the sheet's fixed decision area, 8 above the button
 	if not bool(model.max):
 		var foot := UiKit.label(str(model.footer), UiTokens.STYLE_C11_B, UiTokens.COLOR_SECONDARY)
 		foot.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
