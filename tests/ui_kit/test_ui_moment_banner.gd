@@ -11,7 +11,7 @@ func _banner() -> UiMomentBanner:
 func test_level_up_shows_its_parts_and_hides_the_empty_ones() -> void:
 	var b := _banner()
 	b.level = "2"
-	b.title = "Fishing Lv 2"
+	b.title = "Fishing Lv2"
 	b.subtitle = "Fine fish now stay on the hook"
 	b.rewards = [UiFloatText.pill("+50 Energy", UiFloatText.Tone.ENERGY_GAIN)]
 	await get_tree().process_frame

@@ -70,7 +70,9 @@ static func rod_for(view: Dictionary, rarity: int) -> Dictionary:
 const CAST_XP := [2.7, 3.8, 4.9, 5.1, 6.7, 6.7, 5.2, 3.8, 3.2, 2.1]
 const GATE_SKILL_ICONS := {"farming": "hoe", "fishing": "rod", "cooking": "pot"}
 ## Crop names that read the same in the plural ("harvest 30 corn").
-const _SAME_PLURAL := ["chamomile", "corn", "lettuce", "chili"]
+## q(58): crop names that keep their form in the plural, or take another; every plural reads it (Today, the chip, the
+## waiting line, harvest amounts; 李白 q(98): `Lettuces ready in` was written where Lettuce stays Lettuce).
+const PLURALS := {"Lettuce": "Lettuce", "Chamomile": "Chamomile", "Corn": "Corn", "Chili": "Chilies"}
 
 ## The four things on the gate card (§4.8.7): what is locked, which level, how far, what crossing it does. One sheet
 ## spec for UiInfoSheet (SKILL-2 482:169): the title with the lock, `Locked` (or the rarity), the lead line
@@ -258,7 +260,9 @@ static func and_list(names: Array) -> String:
 ## A crop name in an action amount: "1 radish", "9 radishes", "14 carrots", "30 tomatoes", "12 chamomile".
 static func crop_plural(name: String, n: int) -> String:
 	var w := name.to_lower()
-	if n == 1 or w in _SAME_PLURAL: return w
+	if n == 1: return w
+	for k in PLURALS:
+		if str(k).to_lower() == w: return str(PLURALS[k]).to_lower()
 	if w.ends_with("sh") or w.ends_with("ch") or w.ends_with("s") or w.ends_with("x") or w.ends_with("o"): return w + "es"
 	if w.ends_with("y") and not (w.length() > 1 and w[-2] in "aeiou"): return w.substr(0, w.length() - 1) + "ies"
 	return w + "s"
@@ -440,10 +444,14 @@ static func today_line(view: Dictionary) -> String:
 	return "Sow your first plot"
 
 static func plural(name: String) -> String:
+	if PLURALS.has(name): return str(PLURALS[name])
 	if name.ends_with("ss") or name.ends_with("sh") or name.ends_with("ch") or name.ends_with("x") or name.ends_with("o"): return name + "es"
 	if name.ends_with("s"): return name
 	if name.ends_with("y"): return name.substr(0, name.length() - 1) + "ies"
 	return name + "s"
+
+## A name that is the same in the plural (Lettuce, Chamomile, Corn): `when lettuce is ready`, not `are` (q(98)).
+static func uncountable(name: String) -> bool: return str(PLURALS.get(name, "")) == name
 
 ## Energy Card facts (§3.7.2 / §3.7.3, LOCK-09): one card for short and zero; only facts, tiles only guide.
 ## Away from home (the pond, later the mine) Cook and Rest are greyed with `At home` (q(6)).
@@ -825,7 +833,7 @@ const DAY_CHANGES := {"cooking:4": "Today changes: 3-ingredient dishes", "farmin
 static func level_banner(view: Dictionary, ev: Dictionary, first := false) -> Dictionary:
 	var skill := str(ev.get("skill", "farming"))
 	var lv := int(ev.get("level", 2))
-	var title := "%s Lv %d" % [skill.capitalize(), lv]
+	var title := "%s Lv%d" % [skill.capitalize(), lv]
 	var rewards: Array = []
 	if int(ev.get("energy", 0)) > 0:
 		rewards.append({text = "+%d Energy" % int(ev.energy), tone = UiFloatText.Tone.ENERGY_GAIN})
@@ -991,7 +999,7 @@ static func today_rows(view: Dictionary) -> Array:
 		for c in ready: n += int(ready[c])
 		now_rows.append(_row("Harvest %d crops" % n, str(ready.keys()[0]), "plots"))
 	if not ready.is_empty() and bool(level.get("now", false)):
-		now_rows.append(_row("Farming Lv %d with this harvest" % int(level.level), "hoe", ""))
+		now_rows.append(_row("Farming Lv%d with this harvest" % int(level.level), "hoe", ""))
 	if sown > 0: now_rows.append(_row("Water %d sown plot%s · Free" % [sown, "" if sown == 1 else "s"], "water", "plots"))
 	# A known recipe waiting on one crop in the ground (A3 / q(95)) keeps the fish it needs: the stove-free line counts
 	# only the rest, and none when the soup takes them all.
@@ -1018,12 +1026,13 @@ static func today_rows(view: Dictionary) -> Array:
 		var at := -1
 		for i in rows.size():
 			if str(rows[i].go) == "plots" and at < 0: at = i
-		if at >= 0: rows.insert(at + 1, _row("Farming Lv %d at your first harvest" % int(level.level), "hoe", ""))
+		if at >= 0: rows.insert(at + 1, _row("Farming Lv%d at your first harvest" % int(level.level), "hoe", ""))
 	# The waiting recipe's line (§14.2 end, §14.5; 李白 A3 / q(95)): `Fresh Fish Soup · when radishes are ready`, the first
 	# session's closing hook. Like the level's info row it goes with its source (q(69)): right after its crop's countdown
 	# and that crop's level row, so it is the third line at the end of the first session.
 	if not wait.is_empty():
-		var line := "%s · when %s are ready" % [str(wait.name), plural(item_name(view, str(wait.crop))).to_lower()]
+		var crop_name := item_name(view, str(wait.crop))
+		var line := "%s · when %s %s ready" % [str(wait.name), plural(crop_name).to_lower(), "is" if uncountable(crop_name) else "are"]
 		if not rows.any(func(r): return r.line == line):
 			var at := -1
 			for i in rows.size():
@@ -1041,7 +1050,7 @@ static func today_rows(view: Dictionary) -> Array:
 		var gap := int(sk.next) - int(sk.get("xp", 0))
 		if gap < best_gap:
 			best_gap = gap
-			best = "%s Lv %d · %d XP to go" % [key.capitalize(), int(sk.get("level", 1)) + 1, gap]   # q(69)
+			best = "%s Lv%d · %d XP to go" % [key.capitalize(), int(sk.get("level", 1)) + 1, gap]   # q(69)
 	if rows.size() < 3 and best != "": rows.append(_row(best, "xp", ""))
 	if rows.is_empty(): rows.append(_first_sow_row(view))
 	return P0Guide.focus_first(rows.slice(0, 3))
@@ -1360,5 +1369,5 @@ static func home_moment(view: Dictionary, ev: Dictionary) -> Dictionary:
 			"clay_bank": lines.append("Clay Bank opened")   # gathering spot (SGODOT-231, q(45))
 			"warming_cabinet": lines.append("Warming Cabinet")
 			"bag_upgrade_1": lines.append("Bag Upgrade I for sale · 150 coins")
-	return {"level": str(level), "title": "Homestead Lv %d" % level, "subtitle": "Max Energy %d · Energy full" % max_e,
+	return {"level": str(level), "title": "Homestead Lv%d" % level, "subtitle": "Max Energy %d · Energy full" % max_e,
 		"detail": "\n".join(lines)}

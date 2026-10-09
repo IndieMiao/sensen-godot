@@ -1373,7 +1373,7 @@ static func _moment_banners() -> Control:
 	var v := _column()
 	var first := UiMomentBanner.new()
 	first.level = "2"
-	first.title = "Fishing Lv 2"
+	first.title = "Fishing Lv2"
 	first.subtitle = "Fine fish now stay on the hook"
 	first.rewards = [UiFloatText.pill("+50 Energy", UiFloatText.Tone.ENERGY_GAIN), UiFloatText.pill("+3 Worm Bait", UiFloatText.Tone.ITEM, _tex("bait_worm")),
 		UiFloatText.pill("+3 Wild Herb", UiFloatText.Tone.ITEM, _tex("crop_herb"))]
@@ -1383,7 +1383,7 @@ static func _moment_banners() -> Control:
 	v.add_child(_captioned(first, "LevelUp · SKILL-3, the account's first (≤ 3 s)"))
 	var later := UiMomentBanner.new()
 	later.level = "2"
-	later.title = "Farming Lv 2"
+	later.title = "Farming Lv2"
 	later.subtitle = "New for you · Carrot Seeds, Herb Seeds"
 	later.rewards = [UiFloatText.pill("+30 Energy", UiFloatText.Tone.ENERGY_GAIN), UiFloatText.pill("+5 Carrot Seeds", UiFloatText.Tone.ITEM, _tex("seed_carrot"))]
 	later.tip = "Next Lv3 · 150 XP"

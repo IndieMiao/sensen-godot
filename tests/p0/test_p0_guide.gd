@@ -156,7 +156,7 @@ func test_harvest_tail_says_when_the_first_harvest_levels_farming() -> void:
 	var twenty: Array = []
 	for i in 20: twenty.append("growing")
 	v.plots = _plots(twenty)                    # 20 radishes: 40 + 10 = 50 → Farming Lv 2 (§14.2.2)
-	assert_str(Guide.harvest_level_tail(v)).is_equal(" · Farming Lv 2 at first harvest")
+	assert_str(Guide.harvest_level_tail(v)).is_equal(" · Farming Lv2 at first harvest")
 
 # ---------------------------------------------------------------- badges and Free to do now
 
@@ -219,7 +219,7 @@ func test_after_the_first_session_the_crop_timer_says_what_the_harvest_does() ->
 	v.stall.board.requests = []
 	v.cooking.cookbook[0].cooked = true
 	var rows := P0Logic.today_rows(v)
-	assert_that(_lines(rows).slice(0, 2)).is_equal(["Radishes ready in 3h 53m", "Farming Lv 2 at your first harvest"])
+	assert_that(_lines(rows).slice(0, 2)).is_equal(["Radishes ready in 3h 53m", "Farming Lv2 at your first harvest"])
 	assert_str(str(rows[1].go)).is_equal("")   # an info row: no Show
 
 ## §14.2 end / §14.5 (李白 A3): a known recipe short only of crops in the ground hooks the next session —
@@ -247,7 +247,7 @@ func _soup(v: Dictionary, fish: int) -> Dictionary:
 func test_the_waiting_recipe_is_the_third_line_and_keeps_its_fish() -> void:
 	# As many crucian as the soup needs (1): they are kept for it, no stove-free line; the soup line is the third.
 	var rows := P0Logic.today_rows(_soup(_session_end(), 1))
-	assert_that(_lines(rows)).is_equal(["Radishes ready in 3h 32m", "Farming Lv 2 at your first harvest",
+	assert_that(_lines(rows)).is_equal(["Radishes ready in 3h 32m", "Farming Lv2 at your first harvest",
 		"Fresh Fish Soup · when radishes are ready"])
 	assert_str(str(rows[2].go)).is_equal("plots")   # Show: the radishes, its source
 	assert_str(str(rows[2].icon)).is_equal("dish_fish_soup")
@@ -258,7 +258,7 @@ func test_the_waiting_recipe_is_the_third_line_and_keeps_its_fish() -> void:
 	# Fewer (none): the soup is short of a fish and a crop, two kinds — no waiting line; the lettuce comes back.
 	var none := _lines(P0Logic.today_rows(_soup(_session_end(), 0)))
 	assert_bool(none.any(func(l): return str(l).contains("Fresh Fish Soup"))).is_false()
-	assert_that(none).is_equal(["Radishes ready in 3h 32m", "Farming Lv 2 at your first harvest", "Lettuces ready in 7h 46m"])
+	assert_that(none).is_equal(["Radishes ready in 3h 32m", "Farming Lv2 at your first harvest", "Lettuce ready in 7h 46m"])
 
 func test_two_kinds_short_no_line_and_of_two_waiting_the_first_ripe() -> void:
 	var v := _soup(_session_end(), 1)
@@ -280,6 +280,22 @@ func test_the_waiting_line_goes_once_its_crop_is_ripe_and_the_stove_line_comes_b
 	v.cooking.cookbook[-1].can_cook = true
 	assert_bool(_lines(P0Logic.today_rows(v)).any(func(l): return str(l).contains("· when "))).is_false()   # it can cook
 
+## q(98): q(58)'s plurals everywhere (Lettuce, Chamomile, Corn stay; Chili → Chilies) and `is` for a crop that stays.
+func test_q58_plurals_and_an_uncountable_crop_is_ready() -> void:
+	for pair in [["Lettuce", "Lettuce"], ["Chamomile", "Chamomile"], ["Corn", "Corn"], ["Chili", "Chilies"], ["Radish", "Radishes"],
+			["Carrot", "Carrots"], ["Tomato", "Tomatoes"]]:
+		assert_str(P0Logic.plural(pair[0])).is_equal(pair[1])
+	assert_str(P0Logic.crop_plural("Chili", 12)).is_equal("chilies")
+	assert_str(P0Logic.crop_plural("Lettuce", 10)).is_equal("lettuce")
+	var v := _soup(_session_end(), 1)
+	v.cooking.cookbook[-1].known = false
+	v.cooking.cookbook.append({"id": "dish_lettuce_fish", "name": "Lettuce Fish", "known": true, "cooked": false,
+		"can_cook": false, "in": ["W1", "crop_lettuce"]})
+	v.plots = v.plots.filter(func(p): return str(p.crop) == "crop_lettuce")   # only lettuce in the ground
+	var lines := _lines(P0Logic.today_rows(v))
+	assert_bool(lines.has("Lettuce Fish · when lettuce is ready")).is_true()
+	assert_bool(lines.has("Lettuce ready in 7h 46m")).is_true()   # its source row, before it
+
 ## RETURN-SESSION (q(69)): ready plots that reach the level — `Harvest 20 Radishes` then `Farming Lv 2 with this harvest`.
 func test_a_ready_harvest_that_levels_is_followed_by_its_info_row() -> void:
 	var twenty: Array = []
@@ -290,7 +306,7 @@ func test_a_ready_harvest_that_levels_is_followed_by_its_info_row() -> void:
 	var lines := _lines(P0Logic.today_rows(v))
 	var at := lines.find("Harvest 20 Radishes")
 	assert_int(at).is_greater_equal(0)
-	assert_str(str(lines[at + 1])).is_equal("Farming Lv 2 with this harvest")
+	assert_str(str(lines[at + 1])).is_equal("Farming Lv2 with this harvest")
 
 func test_the_today_chip_names_the_first_row_still_to_do_not_a_ticked_one() -> void:
 	# rc0 on 232: after handing in the Pond Catch the chip still read "Deliver 2 Pond Crucian · Stall" (ticked).

@@ -190,11 +190,9 @@ static func sow_row(view: Dictionary) -> Dictionary:
 
 ## Crop plurals for counts (q(58)): Lettuce, Chamomile and Corn stay as they are; Chili → Chilies; the rest by
 ## P0Logic.plural (Radishes, Herbs, Carrots, Potatoes, Tomatoes, Cabbages, Cucumbers). Fish names never take an s.
-const CROP_PLURALS := {"Lettuce": "Lettuce", "Chamomile": "Chamomile", "Corn": "Corn", "Chili": "Chilies"}
 static func crop_count_name(view: Dictionary, crop_id: String, n: int) -> String:
 	var name := P0Logic.item_name(view, crop_id)
-	if n == 1: return name
-	return str(CROP_PLURALS.get(name, P0Logic.plural(name)))
+	return name if n == 1 else P0Logic.plural(name)   # q(58)'s exceptions live in P0Logic.PLURALS (q(98))
 
 ## ` · +8 in 21m`: the Energy still missing and when natural recovery brings it.
 static func _gain_in(e: Dictionary, gap: int) -> String:
@@ -210,7 +208,7 @@ static func _short(ms: float) -> String:
 ## ` · Farming Lv 2 at first harvest` (§14.2 end): what the growing beds' locked XP and first-harvest bonuses reach.
 static func harvest_level_tail(view: Dictionary) -> String:
 	var h := harvest_level(view)
-	return " · Farming Lv %d at first harvest" % int(h.level) if not h.is_empty() else ""
+	return " · Farming Lv%d at first harvest" % int(h.level) if not h.is_empty() else ""
 
 ## Whether harvesting reaches the next Farming level (q(69), RETURN-SESSION): {level, now: true} when the plots ready
 ## now are enough (`Farming Lv 2 with this harvest`); {level, now: false} when it takes the growing ones too and no crop
