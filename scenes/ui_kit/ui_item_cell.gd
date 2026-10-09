@@ -32,8 +32,10 @@ enum State { DEFAULT, SELECTED, EMPTY, LIFTED, DROP_TARGET, ZERO, GHOST, UNCOLLE
 ##   HIDDEN       unknown page: grey dish silhouette + ingredient family dots, never the real dish art
 ##   CLUED        unknown page with a known slot: the silhouette and the family row with that slot lit
 ##   (both draw one dot per slot from `families`, a lit slot from `clues`; `might_have` adds State=mightHave's ring)
-##   TASTED       half-colour icon + `Tasted` chip inside the cell
-##   MASTERED     gold star at the bottom right (Cooked ×10); the can-cook check keeps the top right; no quantity
+##   TASTED       known, not cooked yet: half-colour icon + `Try it` tag centred at the bottom (primary; SGODOT-256 ⑨,
+##                q(92)); the tag goes after the first cook. The word Tasted is not shown to the player.
+##   MASTERED     gold star at the bottom right (Cooked ×10); no quantity
+## Kitchen cells carry no check mark (⑨: Show mark retired; can cook is the Can cook chip, the order and the button).
 ##   LOCKED       3-slot page before Cooking Lv4: silhouette + `Lv4` lock tag (text from `status`, else Lv4)
 ##   IN_POT       Experiment: in the pot (selected stroke, icon raised); `In pot` only once none is left (no quantity),
 ##                otherwise the remaining quantity (COOK-2b / P0-2 instances: Show state off while ×N shows)
@@ -43,7 +45,6 @@ enum KitchenState { DEFAULT, HIDDEN, CLUED, TASTED, MASTERED, LOCKED, IN_POT, NO
 const RARITY_COLORS := [UiTokens.COLOR_RARITY_COMMON, UiTokens.COLOR_RARITY_FINE, UiTokens.COLOR_RARITY_RARE,
 	UiTokens.COLOR_RARITY_LEGENDARY]
 const PIN_GLYPH := preload("res://assets/ui/kit_icons/pin.svg")
-const CHECK_GLYPH := preload("res://assets/ui/kit_icons/check.svg")
 const STAR_GLYPH := preload("res://assets/ui/kit_icons/star.svg")
 const LOCK_GLYPH := preload("res://assets/ui/kit_icons/lock.svg")
 const SILHOUETTE := preload("res://assets/ui/kit_icons/kitchen/dish_silhouette.svg")
@@ -66,7 +67,6 @@ const _KITCHEN_DOT_INSET := 4.0
 const _KITCHEN_LABEL_TOP := 31.0  # "Cell state label" 52×25 at y 31, radius 5, text 13 high at y 1
 const _KITCHEN_LABEL_H := 25.0
 const _KITCHEN_LABEL_RADIUS := 5.0
-const _KITCHEN_MARK_OUT := 2.0    # mark 13×13 at (41, -2): overhangs the top-right corner by 2
 const _KITCHEN_SILHOUETTE := Rect2(10.4, 9.4, 30, 22)   # hidden / clued / locked
 const _KITCHEN_FAMILY_TOP := 37.4   # Ingredient family dots: centred, top at y 38 of the main; dots 5, 3 apart,
 const _KITCHEN_FAMILY_DOT := 5.0     # a lit slot 10 (the row is then 10 high and the dots sit on its middle)
@@ -76,14 +76,14 @@ const _KITCHEN_GLOW_SPREAD := 2.0    # State=mightHave 1726:32864: ring outside 
 const _KITCHEN_GLOW_BLUR := 4.0      # color/new at 50 %, still
 const _KITCHEN_GLOW_ALPHA := 0.5
 const _KITCHEN_STAR := Rect2(36.4, 36.4, 12, 12)       # State=mastered 1228:105954 (C28, 226 f5523358): bottom right,
-const _KITCHEN_STAR_GLYPH := 7.7                        # clear of the can-cook check at the top right
+const _KITCHEN_STAR_GLYPH := 7.7
 const _KITCHEN_TAG := Vector2(1.4, 1.4)                 # Lv4 lock tag: 3 px side padding, radius 5
 const _KITCHEN_TAG_PAD := 3.0
 const _KITCHEN_TAG_RADIUS := 5.0
 const _KITCHEN_TAG_GLYPH := 8.0
 const _KITCHEN_RACK_STROKE := 0.6                        # Rack tag (Show rack, 226 e8e5617a): surface, 0.6 border
-const _KITCHEN_CHIP := Vector2(6.4, 35.4)               # Tasted chip: 4 px side padding, radius 6
-const _KITCHEN_CHIP_PAD := 4.0
+const _KITCHEN_CHIP_ROW := Vector2(36, 15)              # Try it row 1919:32860: y 36, 15 high, the tag centred in it;
+const _KITCHEN_CHIP_PAD := 4.0                          # surface-raised tag, 1 px border, 4 px side padding, radius 6
 const _KITCHEN_CHIP_RADIUS := 6.0
 const _KITCHEN_TASTED_ALPHA := 0.5                      # "half colour"
 const _KITCHEN_RAISED_ICON_TOP := 1.5                   # inPot / notForCooking: icon at y 1.5 / 2.4
@@ -113,11 +113,9 @@ var rarity := 0: set = set_rarity
 var pinned := false: set = set_pinned
 ## GearSlot role above the slot, e.g. "Fishing".
 var role := "": set = set_role
-## Kitchen state label over the lower part of the cell, e.g. "Tasted"; "" hides it.
+## Kitchen state label over the lower part of the cell, e.g. "Shop"; "" hides it.
 var status := "": set = set_status
-## Kitchen check mark for a cooked dish; SELECTED shows it too ("Selected or cooked mark").
-var marked := false: set = set_marked
-## KITCHEN only; DEFAULT keeps the plain behaviour above (status label, mark when selected or marked).
+## KITCHEN only; DEFAULT keeps the plain behaviour above (status label).
 var kitchen_state: KitchenState = KitchenState.DEFAULT: set = set_kitchen_state
 ## KITCHEN only: a seasoning held on the Spice Rack (Show rack): a `Rack` tag top-left where the Lv4 lock sits, and
 ## no rarity dot (q(46); An Qi La, 226 e8e5617a). The quantity is the stored count. In the pot it keeps the tag
@@ -147,7 +145,6 @@ var _pill: Panel
 var _dot: Panel
 var _role: Label
 var _status: Panel
-var _mark: Panel
 var _strip: Panel
 var _new_ring: Panel   # QuickSlot State=new (1663:101150): the color/new ring of a first-time item
 var _badge: Panel
@@ -158,7 +155,7 @@ var _star: Panel
 var _tag: PanelContainer
 var _rack_tag: PanelContainer
 var _tag_label: Label
-var _chip: PanelContainer
+var _chip: HBoxContainer
 var _chip_label: Label
 var _home: TextureRect
 
@@ -187,7 +184,6 @@ func set_rarity(v: int) -> void: rarity = v; _refresh()
 func set_pinned(v: bool) -> void: pinned = v; _refresh()
 func set_role(v: String) -> void: role = v; _refresh()
 func set_status(v: String) -> void: status = v; _refresh()
-func set_marked(v: bool) -> void: marked = v; _refresh()
 func set_kitchen_state(v: KitchenState) -> void: kitchen_state = v; _refresh()
 func set_rack(v: bool) -> void: rack = v; _refresh()
 func set_stored(v: bool) -> void: stored = v; _refresh()
@@ -347,15 +343,6 @@ func _build_cell() -> void:
 	_status.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_SURFACE, _KITCHEN_LABEL_RADIUS))
 	_name = _band_label(_status, UiTokens.STYLE_C10_B, 0.0, UiTokens.SIZE_QTY_PILL_H)
 	_name.add_theme_color_override(&"font_color", UiTokens.COLOR_SECONDARY)
-	var m := UiTokens.SIZE_KITCHEN_CHECK
-	_mark = _box(self)
-	_place(_mark, 1.0, _KITCHEN_MARK_OUT - m, -_KITCHEN_MARK_OUT, m, m)
-	_mark.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_PRIMARY, m * 0.5))
-	var check := UiKit.icon(CHECK_GLYPH, UiTokens.SIZE_KITCHEN_CHECK_ICON)
-	check.self_modulate = UiTokens.COLOR_SURFACE_RAISED
-	_place(check, 0.5, -UiTokens.SIZE_KITCHEN_CHECK_ICON * 0.5, (m - UiTokens.SIZE_KITCHEN_CHECK_ICON) * 0.5,
-		UiTokens.SIZE_KITCHEN_CHECK_ICON, UiTokens.SIZE_KITCHEN_CHECK_ICON)
-	_mark.add_child(check)
 	_build_kitchen_extras()
 
 ## The Cookbook / Experiment marks of the Kitchen/Cell main (hidden, clued, tasted, mastered, locked).
@@ -408,10 +395,17 @@ func _build_kitchen_extras() -> void:
 	_rack_tag.position = _KITCHEN_TAG
 	_rack_tag.add_child(UiKit.label("Rack", UiTokens.STYLE_C9_B, UiTokens.COLOR_SECONDARY))
 	_surface.add_child(_rack_tag)
-	_chip = _pill_tag(UiTokens.COLOR_SURFACE_RAISED, UiTokens.COLOR_BORDER, _KITCHEN_CHIP_RADIUS, _KITCHEN_CHIP_PAD)
-	_chip.position = _KITCHEN_CHIP
-	_chip_label = UiKit.label("Tasted", UiTokens.STYLE_C9_B, UiTokens.COLOR_SECONDARY)
-	_chip.add_child(_chip_label)
+	_chip = HBoxContainer.new()   # the row across the cell; the tag, as wide as its word, in its middle
+	_chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_chip.alignment = BoxContainer.ALIGNMENT_CENTER
+	_chip.anchor_right = 1.0
+	_chip.offset_top = _KITCHEN_CHIP_ROW.x
+	_chip.offset_bottom = _KITCHEN_CHIP_ROW.x + _KITCHEN_CHIP_ROW.y
+	var tag := _pill_tag(UiTokens.COLOR_SURFACE_RAISED, UiTokens.COLOR_BORDER, _KITCHEN_CHIP_RADIUS, _KITCHEN_CHIP_PAD)
+	tag.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_chip_label = UiKit.label("Try it", UiTokens.STYLE_C10_B, UiTokens.COLOR_PRIMARY)
+	tag.add_child(_chip_label)
+	_chip.add_child(tag)
 	_surface.add_child(_chip)
 
 ## One 5 px dot per slot in its family colour; a slot with a clue is its 10 px icon instead, the dots centred on it.
@@ -505,9 +499,9 @@ func _refresh() -> void:
 				_dot.add_theme_stylebox_override(&"panel", UiStyleBox.make(RARITY_COLORS[clampi(rarity - 1, 0, 3)], UiTokens.SIZE_RARITY_DOT * 0.5))
 			if density == Density.KITCHEN: _refresh_kitchen(s, empty)
 
-## Kitchen/Cell: DEFAULT keeps the plain cell (status label, mark when selected or marked); the other
+## Kitchen/Cell: DEFAULT keeps the plain cell (status label); the other
 ## kitchen states draw the main's marks and their own labels.
-func _refresh_kitchen(s: State, empty: bool) -> void:
+func _refresh_kitchen(_s: State, empty: bool) -> void:
 	var k := KitchenState.DEFAULT if empty else kitchen_state
 	var unknown := k in [KitchenState.HIDDEN, KitchenState.CLUED, KitchenState.LOCKED]
 	_surface.modulate.a = UiTokens.OPACITY_KITCHEN_EMPTY if empty else 1.0
@@ -544,7 +538,6 @@ func _refresh_kitchen(s: State, empty: bool) -> void:
 			_status.visible = status != "" and not empty and k in [KitchenState.DEFAULT, KitchenState.MASTERED]
 			_name.text = status
 	_name.offset_bottom = _status.offset_bottom - _status.offset_top if k == KitchenState.NOT_FOR_COOKING else UiTokens.SIZE_QTY_PILL_H
-	_mark.visible = (marked or s == State.SELECTED or in_pot) and not empty and k != KitchenState.NOT_FOR_COOKING
 
 ## InventoryCell / Kitchen Cell / GearSlot surface: hairline border, 1.5 primary when selected, dashed when empty;
 ## a lifted InventoryCell keeps the default look under the QuickSlot lift shadow (1641:34159).

@@ -184,7 +184,16 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"queue": kitchen.open_queue()   # Queue next › on the watch sheet (shots)
 		"heattap": kitchen.dev_heat_tap()   # a heat tap now: until:gold first (shots)
 		"heatband": kitchen.dev_band_press()   # a press on the queue drawer's pot band (shots)
-		"page": if kitchen.drawer: kitchen.drawer.select_page(step[1])   # a Cookbook page's card (shots)
+		"page":   # a Cookbook page picked, as a tap on its cell (its card, ghosts and pot card; shots)
+			if kitchen.drawer:
+				kitchen.drawer.select_page(step[1])
+				kitchen._on_page(kitchen.drawer.page(step[1]))
+		"slottap": kitchen.dev_slot_tap(int(step[1]))   # a tap on the pot card's slot i (shots)
+		"again": kitchen.open_again(step[1])   # Cook Again on a page, as after a pot of it (shots)
+		"againlock":   # a tap on the Cook Again sheet's locked slot (shots)
+			for sl in rt.ui.root.find_children("*", "Control", true, false):
+				if sl is UiPotSlot and (sl as UiPotSlot).state == UiPotSlot.State.LOCKED: (sl as UiPotSlot).locked_tapped.emit()
+		"rects": print("P0_KITCHEN_RECTS ", JSON.stringify(kitchen.dev_rects().merged({hud = HUD_BOTTOM, view = [get_viewport().get_visible_rect().size.x, get_viewport().get_visible_rect().size.y]})))   # shots
 		"put":
 			if kitchen.phase != "compose": kitchen.open("experiment")
 			if kitchen.drawer and kitchen.drawer.tab != "experiment": kitchen.drawer.tab = "experiment"

@@ -2,8 +2,8 @@ class_name P0Kitchen
 extends Node
 ## The farmhouse stove corner's cooking flow (SGODOT-226, LOCK-20 v5; plan §7.2.2 / §7.2.4 / §7.2.7):
 ##   compose  the cooking drawer (P0KitchenDrawer, 60 %) opens with the camera pushed onto the stove in the band
-##            above it; the slot bar and the preview capsule sit just above the drawer (COOK-2a / 2b); picks fly
-##            into the 3D pot (P0KitchenStage); Cookbook pages show their ingredients as ghosts.
+##            above it; the pot card (slots and the result line, UiPotCard, 256 ⑤ A') sits just above the drawer
+##            (COOK-2a / 2b); picks fly into the 3D pot (P0KitchenStage); Cookbook pages show their ingredients as ghosts.
 ##   watch    Cook closes the drawer; the ingredients sink into the pot, the stove steams, the heat ring sits on
 ##            the pot and the bottom sheet counts down (COOK-3 / COOK-P0-3). A tap anywhere on the scene is the heat
 ##            tap (the whole pot is the target, §7.2.4), sent at once as `heat`. Walking away or × stops watching:
@@ -19,11 +19,12 @@ extends Node
 
 const BAND_TOP_DRAWER := 0.29     # engineering default, WP7 v2: pot band ends above the slot bar
 const BAND_TOP_WATCH := 0.40      # COOK-3: the pot sits high, under the HUD, above the watch sheet
+## The queue drawer (Queue next ›) keeps the heat ring over the pot: the pot sits this much lower than in the cooking
+## drawer, so HUD + 8 ≤ the ring's top, its foot + 8 ≤ the pot card and the card + 8 ≤ the drawer (不知火舞 on #142).
+const QUEUE_DROP := 14.0
 const FOCUS_SIZE := 0.42          # pushed-in view: 42 % of the room's accepted width
 const WATCH_FOCUS_SIZE := 0.34    # COOK-3 pushes in further on the pot (approved kitchen camera ×1.85)
-const OVERLAY_GAP := 6.0          # preview above the drawer top, slot bar above the preview
-const SLOT_BAR_GAP := 3.0
-const SLOT_GAP := 8.0
+const OVERLAY_GAP := 8.0          # the pot card's foot above the drawer top (row 53: 326 → 334)
 const WATCH_SHEET_H := 196.0      # COOK-3 sheet: dish, Cooking, m:ss remaining, the heat hint
 const CLOSE_GAP := 6.0            # × sits this far above the sheet's top edge (COOK-3: 554 → 604)
 const QUEUE_BADGE_AT := Vector2(59, 33)   # COOK-QUEUE-1c 1758:103247: the next pot's dish beside the pot (design px)
@@ -56,8 +57,8 @@ var last_page := ""
 
 var _wrap: Control
 var _overlay: Control
-var _slots: HBoxContainer
-var _preview: UiKitchenPreview
+var _pot_card: UiPotCard
+var _point_at_remove := false      # the pot is full and a bag cell was tapped: ✕ wears its gold-brown ring (q(64))
 var _ring: UiHeatRing
 var _stove: Dictionary = {}
 var _start_ms := 0
@@ -156,7 +157,9 @@ func open(tab := "cookbook", page_id := "") -> void:
 	phase = "compose"
 	rt.ui.teach("cook")   # U6: "Tap Cook to grill your first fish" the first time the drawer opens (§14.2)
 	_hide_player(true)
-	room.focus("cam_stove", {band = room.band_below_hud(BAND_TOP_DRAWER), size = room.view_size() * FOCUS_SIZE, release_on_move = false})
+	var band := room.band_below_hud(BAND_TOP_DRAWER)
+	if _queue_mode: band.position.y += QUEUE_DROP / maxf(room.get_viewport().get_visible_rect().size.y, 1.0)
+	room.focus("cam_stove", {band = band, size = room.view_size() * FOCUS_SIZE, release_on_move = false})
 	if page_id != "" and not drawer.page(page_id).is_empty(): drawer.select_page(page_id)
 	if tab == "cookbook" and drawer.selected_page != "": _on_page(drawer.page(drawer.selected_page))
 	_refresh_overlay()
@@ -232,6 +235,21 @@ func ring_at(lead_ms: float, from: float, to: float) -> bool:
 ## Shots: the heat tap a player's finger makes now (on the watched pot or the queue drawer's pot band).
 func dev_heat_tap() -> void: _judge_tap()
 
+## Shots: where the heat ring, the pot card and the drawer sit (screen px), to check their gaps.
+func dev_rects() -> Dictionary:
+	var out := {}
+	if _ring: out.ring = [_ring_center().y - UiHeatRing.OUTER * _ring.scale.y, _ring_center().y + UiHeatRing.OUTER * _ring.scale.y]
+	if is_instance_valid(_pot_card): out.card = [_pot_card.get_global_rect().position.y, _pot_card.get_global_rect().end.y]
+	if drawer: out.drawer = drawer.top_y()
+	return out
+
+## Shots: a tap on the pot card's slot `i` (a filled one goes back to the bag, the lock says what opens it).
+func dev_slot_tap(i: int) -> void:
+	if not is_instance_valid(_pot_card) or i < 0 or i >= _pot_card.slots().size(): return
+	var s: UiPotSlot = _pot_card.slots()[i]
+	if s.state == UiPotSlot.State.LOCKED: s.locked_tapped.emit()
+	elif s.removable: s.tapped.emit()
+
 ## Shots: a press on the queue drawer's pot band, as a finger makes it.
 func dev_band_press() -> void:
 	if _band == null or not is_instance_valid(_band): return
@@ -261,61 +279,59 @@ func _build_overlay() -> Control:
 	var o := Control.new()
 	o.set_anchors_preset(Control.PRESET_FULL_RECT)
 	o.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_slots = HBoxContainer.new()
-	_slots.add_theme_constant_override(&"separation", int(SLOT_GAP))
-	_slots.alignment = BoxContainer.ALIGNMENT_CENTER
-	o.add_child(_slots)
-	_preview = UiKitchenPreview.new()
-	o.add_child(_preview)
+	_pot_card = UiPotCard.new()
+	o.add_child(_pot_card)
 	o.resized.connect(_place_overlay)
 	return o
 
+## The pot card centred on the pot axis, its foot OVERLAY_GAP above the drawer.
 func _place_overlay() -> void:
 	if _overlay == null or drawer == null: return
 	var top := _overlay.size.y - drawer.height - drawer.safe_bottom
-	_preview.position = Vector2((_overlay.size.x - _preview.custom_minimum_size.x) * 0.5, top - OVERLAY_GAP - _preview.custom_minimum_size.y)
-	var bar := _slots.get_combined_minimum_size()
-	_slots.size = bar
-	_slots.position = Vector2((_overlay.size.x - bar.x) * 0.5, _preview.position.y - SLOT_BAR_GAP - bar.y)
+	var card := _pot_card.get_combined_minimum_size()
+	_pot_card.size = card
+	_pot_card.position = Vector2((_overlay.size.x - card.x) * 0.5, top - OVERLAY_GAP - card.y)
 
-## Slot bar and preview: Experiment shows the pot (filled slots, empty ones, the locked 3rd); Cookbook shows the
-## selected page's ingredients.
+## The pot card (256 ⑤ A'): Experiment shows the pot — filled slots with ✕, empty ones, the 3rd locked before
+## Cooking Lv4 (a tap says what opens it) — and what it makes; Cookbook shows the selected page's ingredients and dish.
 func _refresh_overlay() -> void:
 	if _overlay == null: return
 	var v := rt.session.current()
-	for c in _slots.get_children(): c.queue_free()
-	_slots.get_children().map(func(c): _slots.remove_child(c))
+	var slots: Array = []
+	var result := {title = "", rarity = 0, time = ""}
 	if drawer.tab == "experiment":
 		var open := P0KitchenLogic.slots(v)
 		for i in maxi(open, 3):
-			var s := UiKitchenSlot.new()
+			var s := UiPotSlot.new()
 			if i < pot.size():
-				s.state = UiKitchenSlot.State.FILLED
+				s.state = UiPotSlot.State.FILLED
 				s.icon = P0Logic.icon(str(pot[i]))
-				s.title = P0Logic.item_name(v, str(pot[i]))
 				s.quantity = "×1"
+				s.removable = true
+				s.point_at_remove = _point_at_remove
 				var index := i
 				s.tapped.connect(func(): _take_out(index, s.ring_center()))
 			elif i < open:
-				s.state = UiKitchenSlot.State.EMPTY
-				s.title = "Add ingredient"
+				s.state = UiPotSlot.State.EMPTY
 			else:
-				s.state = UiKitchenSlot.State.LOCKED
-				s.title = P0KitchenLogic.locked_slot_label(v)
-			_slots.add_child(s)
-		var p := P0KitchenLogic.preview(v, pot)
-		_preview.show_facts(p.title, p.state, p.time)
+				s.state = UiPotSlot.State.LOCKED
+				s.locked_tapped.connect(func(): rt.ui.toast(P0KitchenLogic.locked_slot_toast(rt.session.current())))
+			slots.append(s)
+		result = P0KitchenLogic.preview(v, pot)
 	else:
 		var page := drawer.page(drawer.selected_page)
 		for ing in P0KitchenLogic.page_ingredients(v, page):
-			var s := UiKitchenSlot.new(UiKitchenSlot.State.FILLED)
-			s.icon = ing.icon
-			s.title = ing.name
+			var s := UiPotSlot.new(UiPotSlot.State.FILLED)
+			# No names under the slots now (256 ⑤ A'): a family slot (W1, Any Common fish) shows its family icon,
+			# as a clue does on the Cookbook cell, not the `?` of a slot nobody knows yet.
+			var t := str(ing.id)
+			s.icon = UiItemCell.family_icon(t[0]) if t.length() == 2 and t[1].is_valid_int() else ing.icon
 			s.quantity = "×1"
-			s.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			_slots.add_child(s)
-		var pp := P0KitchenLogic.page_preview(v, page, _queue_mode) if not page.is_empty() else {title = "", state = "", time = ""}
-		_preview.show_facts(pp.title, pp.state, pp.time)
+			slots.append(s)
+		if not page.is_empty(): result = P0KitchenLogic.page_preview(v, page)
+	_pot_card.set_slots(slots)
+	_pot_card.show_result(result.title, result.rarity, result.time)
+	_pot_card.visible = not slots.is_empty()
 	_place_overlay.call_deferred()
 
 func _on_tab(tab: String) -> void:
@@ -343,12 +359,27 @@ func _on_ingredient(id: String, from_screen: Vector2) -> void:
 	# §7.2.7: a tap on a bag cell always puts one more in (Carrot Cake, Salted Potatoes and the two-radish trials need
 	# the same ingredient twice); taking one back is the slot bar's tap / ✕ (李元芳, int6).
 	if pot.size() >= P0KitchenLogic.slots(v):
-		rt.ui.toast("The pot is full · tap ✕ above to take one out")   # q(64): the slot bar sits above the bag
+		_point_at(true)
+		rt.ui.toast(POT_FULL)   # q(64): the pot card sits above the bag
 		return
 	if not P0KitchenLogic.can_add(v, pot, id): return
 	pot.append(id)
 	stage.add_ingredient(id, P0Logic.icon(id), from_screen)
 	_after_pot_change()
+
+## q(64): with the pot full a bag cell's tap points at ✕ — a gold-brown ring round each one while the toast shows.
+const POT_FULL := "The pot is full · tap ✕ above to take one out"
+var _point_serial := 0
+func _point_at(on: bool) -> void:
+	_point_serial += 1
+	_point_at_remove = on
+	if not is_instance_valid(_pot_card): return
+	for s in _pot_card.slots(): (s as UiPotSlot).point_at_remove = on and (s as UiPotSlot).removable
+	if not on: return
+	get_tree().create_timer(ToastLayer.duration_ms(POT_FULL) / 1000.0).timeout.connect(_point_done.bind(_point_serial))
+
+func _point_done(serial: int) -> void:
+	if serial == _point_serial: _point_at(false)
 
 func _take_out(index: int, to_screen: Vector2) -> void:
 	if index < 0 or index >= pot.size(): return
@@ -358,6 +389,8 @@ func _take_out(index: int, to_screen: Vector2) -> void:
 	_after_pot_change()
 
 func _after_pot_change() -> void:
+	_point_at_remove = false   # the pot changed: the ring has done its job
+	_point_serial += 1
 	drawer.pot = pot
 	drawer.refresh()
 	_refresh_overlay()

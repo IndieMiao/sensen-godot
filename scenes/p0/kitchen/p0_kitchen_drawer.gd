@@ -275,6 +275,12 @@ func _layout_recipe() -> void:
 	_recipe.size = Vector2(_RECIPE.x, h)
 	_recipe_wrap.custom_minimum_size = Vector2(_RECIPE.x, h)
 
+## The card is first laid out in _init, before the drawer has its theme (the fact lines measured in the default font
+## size read wider, and a long one, Fine · First cook +20 XP, sent Cook to a row of its own): lay it out again once the
+## theme is there.
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_THEME_CHANGED and _recipe_wrap != null and _recipe.visible: _layout_recipe.call_deferred()
+
 ## How wide a clipped label's text really is (clip_text makes its minimum width 0).
 static func _text_width(l: Label) -> float:
 	return l.get_theme_font(&"font").get_string_size(l.text, HORIZONTAL_ALIGNMENT_LEFT, -1, l.get_theme_font_size(&"font_size")).x

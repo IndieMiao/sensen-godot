@@ -13,7 +13,7 @@ signal unavailable(reason: String)
 const HEIGHT := 595.0          # COOK-P0-7 sheet 205 → 800
 const CLOSE_GAP := 6.0
 const _INSET := 4.0            # the drawer's 12 + 4 = 16 (Kitchen content x 16)
-const _SLOT_GAP := 8.0
+const _SLOT_GAP := 20.0          # PotSlot44 in COOK-P0-7 / P0-8 784:77585 (256 ⑤ A'): 20 apart, centred
 
 var facts: Dictionary = {}
 var safe_bottom := 0.0
@@ -70,7 +70,8 @@ func _ready() -> void:
 	resized.connect(_place_close)
 	_place_close.call_deferred()
 
-## The page's slots, filled with what Cook Again will use, and the locked 3rd slot before Cooking Lv4.
+## The page's slots, filled with what Cook Again will use, and the locked 3rd slot before Cooking Lv4: PotSlot44 as
+## under the pot (256 ⑤ A', 刘邦 on #142), icons and ×1 with no names; a tap on the lock says what opens it.
 func _slot_bar() -> Control:
 	var bar := HBoxContainer.new()
 	bar.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -78,16 +79,13 @@ func _slot_bar() -> Control:
 	var tiles: Array = facts.tiles
 	for t in tiles:
 		for i in int(t.need):
-			var s := UiKitchenSlot.new(UiKitchenSlot.State.FILLED)
+			var s := UiPotSlot.new(UiPotSlot.State.FILLED)
 			s.icon = t.icon
-			s.title = str(t.name)
 			s.quantity = "×1"
-			s.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			bar.add_child(s)
 	if bool(facts.get("locked", false)):
-		var lock := UiKitchenSlot.new(UiKitchenSlot.State.LOCKED)
-		lock.title = "Cooking Lv%d" % P0KitchenLogic.LOCKED_SLOT_LEVEL
-		lock.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var lock := UiPotSlot.new(UiPotSlot.State.LOCKED)
+		lock.locked_tapped.connect(func(): unavailable.emit(str(facts.get("lock_note", ""))))
 		bar.add_child(lock)
 	return bar
 

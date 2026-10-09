@@ -111,8 +111,8 @@ static func _kept_way(e: Dictionary) -> bool:
 		"item": return str(e.get("id", "")).begins_with("dish_") and int(e.get("delta", 0)) > 0
 	return false
 
-## "Lv4 · 60 XP to go" for the locked 3rd slot (SGODOT-203: the 90 px label holds the short form); "Lv4" when
-## the cooking thresholds are unknown.
+## "Lv4 · 60 XP to go" for the locked 3rd slot; "Lv4" when the cooking thresholds are unknown. The slot itself shows
+## only its lock: a tap on it says `Cooking Lv4 · 60 XP to go` in a toast (locked_slot_toast, SGODOT-256 ⑤ A').
 static func locked_slot_label(view: Dictionary) -> String:
 	var third = cooking(view).get("third_slot", null)   # S5: {level, xp_to_go} from the server
 	if third is Dictionary: return "Lv%d · %d XP to go" % [int(third.get("level", LOCKED_SLOT_LEVEL)), int(third.get("xp_to_go", 0))]
@@ -120,6 +120,8 @@ static func locked_slot_label(view: Dictionary) -> String:
 	var xp := int(view.get("skills", {}).get("cooking", {}).get("xp", 0))
 	if thresholds.size() < LOCKED_SLOT_LEVEL: return "Lv%d" % LOCKED_SLOT_LEVEL
 	return "Lv%d · %d XP to go" % [LOCKED_SLOT_LEVEL, maxi(0, int(thresholds[LOCKED_SLOT_LEVEL - 1]) - xp)]
+
+static func locked_slot_toast(view: Dictionary) -> String: return "Cooking " + locked_slot_label(view)
 
 # ---------------------------------------------------------------- Cookbook
 static func pages(view: Dictionary) -> Array: return cooking(view).get("cookbook", [])
@@ -156,10 +158,11 @@ static func _chip_keeps(view: Dictionary, p: Dictionary, chip: String) -> bool:
 	var rarity := COOKBOOK_CHIPS.find(chip) - 1   # Common = 1 …
 	return int(p.get("rarity", 0)) == rarity
 
-## One Cookbook page as a kitchen cell (Compact/Kitchen/Cell states).
+## One Cookbook page as a kitchen cell (Compact/Kitchen/Cell states). No can-cook check (SGODOT-256 ⑨, q(92)): the
+## Can cook chip, the order and the Cook / Need button say it; a known page not cooked yet is half colour with Try it.
 static func page_cell(view: Dictionary, p: Dictionary) -> Dictionary:
 	var K := UiItemCell.KitchenState
-	var cell := {id = str(p.id), rarity = int(p.get("rarity", 1)), kitchen_state = K.DEFAULT, marked = false, status = ""}
+	var cell := {id = str(p.id), rarity = int(p.get("rarity", 1)), kitchen_state = K.DEFAULT, status = ""}
 	if p.has("state"): return _page_cell_s5(view, p, cell)
 	if not p.get("known", false):
 		cell.kitchen_state = K.LOCKED if int(p.get("slots", 1)) > slots(view) else K.HIDDEN
@@ -167,7 +170,6 @@ static func page_cell(view: Dictionary, p: Dictionary) -> Dictionary:
 		return cell
 	cell.icon = P0Logic.icon(str(p.id))
 	if not p.get("cooked", false): cell.kitchen_state = K.TASTED
-	cell.marked = bool(p.get("can_cook", false))
 	return cell
 
 ## S5 pages carry their state (hidden / clued / tasted / discovered / mastered) and the 3rd-slot lock.
@@ -187,7 +189,6 @@ static func _page_cell_s5(_view: Dictionary, p: Dictionary, cell: Dictionary) ->
 		"tasted": cell.kitchen_state = K.TASTED
 		"mastered": cell.kitchen_state = K.MASTERED
 	cell.icon = P0Logic.icon(str(p.id))
-	cell.marked = bool(p.get("can_cook", false))
 	return cell
 
 const MAYBE_LINE := "You might have what it takes"
@@ -222,11 +223,17 @@ static func page_card(view: Dictionary, p: Dictionary) -> Dictionary:
 	card.title = str(p.get("name", ""))
 	card.icon = P0Logic.icon(str(p.id))
 	var made := int(p.get("cooked_total", 0))
-	card.state = "%s · %s" % [P0Logic.rarity_name(view, rarity), ("Cooked ×%d" % made if made > 1 else "Cooked") if p.get("cooked", false) else ("Tasted" if str(p.get("state", "")) == "tasted" else "Discovered")]
+	card.state = "%s · %s" % [P0Logic.rarity_name(view, rarity), ("Cooked ×%d" % made if made > 1 else "Cooked") if p.get("cooked", false) else first_cook_line(rarity)]
 	if p.get("can_cook", false): card.button = "Cook"
 	elif locked: card.reason = "Cooking Lv%d · 3rd slot" % LOCKED_SLOT_LEVEL
 	else: card.reason = missing_reason(view, p)
 	return card
+
+## A known page not cooked yet (SGODOT-256 ⑨, q(92)): `First cook +20 XP` after its rarity, the one-off first-cook XP of
+## its tier (10 / 20 / 40 / 80), as the pot's `First cooked · +20 Cooking XP` gives it. The word Tasted is not shown.
+static func first_cook_line(rarity: int) -> String:
+	var tier: Dictionary = P0Logic.content().get("cooking", {}).get("tiers", {}).get(str(rarity), {})
+	return "First cook +%d XP" % int(tier.get("first_xp", 0))
 
 ## "Need Wild Herb ×1": the first ingredient the bag is short of (§7.2.7 button four states).
 static func missing_reason(view: Dictionary, p: Dictionary) -> String:
@@ -284,7 +291,7 @@ static func experiment_items(view_: Dictionary, pot: Array, chip := "All") -> Ar
 		var in_pot := pot.count(id)
 		out.append({id = id, icon = P0Logic.icon(id), qty = int(totals[id]) - in_pot, rarity = int(info.get("rarity", 1)),
 			kitchen_state = K.NOT_FOR_COOKING if ornamental else (K.IN_POT if in_pot > 0 else K.DEFAULT),
-			marked = in_pot > 0, cookable = cookable, rack = racked.has(id)})
+			cookable = cookable, rack = racked.has(id)})
 	return out
 
 ## Whether one more `id` can go in the pot: a free slot and one left in the bag.
@@ -298,19 +305,19 @@ static func can_add(view_: Dictionary, pot: Array, id: String) -> bool:
 static func slots_used_line(view: Dictionary, pot: Array) -> String:
 	return "%d / %d slots used" % [pot.size(), slots(view)]
 
-## Preview capsule facts (Compact/Kitchen/Preview: title · rarity · time; §7.2.7 facts only).
+## The pot card's result line (PotResultLine, SGODOT-256 ⑤ A'): {title, rarity, time}. An empty pot has none (title
+## ""; the card shrinks to its slots); seasonings alone read `?` with no dot or time (the button says Needs a main
+## ingredient); otherwise the dish, `Unknown dish` or `Tried before`, its rarity (a dot, no word) and the cooking time.
 static func preview(view_: Dictionary, pot: Array) -> Dictionary:
 	var view := with_rack(view_)
-	if pot.is_empty(): return {title = "Add up to %d ingredients" % slots(view), state = "", time = ""}
+	if pot.is_empty(): return {title = "", rarity = 0, time = ""}
+	if not has_main(view, pot): return {title = "?", rarity = 0, time = ""}
 	var fams := {}
 	var top := 1
-	var mains := 0
 	for id in pot:
 		var info := P0Logic.item(view, str(id))
 		fams[str(info.get("family", "W"))] = true
 		top = maxi(top, int(info.get("rarity", 1)))
-		if str(info.get("family", "")) != "S": mains += 1
-	if mains == 0: return {title = "Needs a main ingredient", state = "", time = ""}
 	var known := P0Logic.match_known(view, pot)
 	var rarity: int
 	if not known.is_empty(): rarity = int(known.rarity)
@@ -319,7 +326,14 @@ static func preview(view_: Dictionary, pot: Array) -> Dictionary:
 		rarity = int(derive[clampi(top - 1, 0, derive.size() - 1)][clampi(fams.size(), 1, 3) - 1])
 	var t: Dictionary = cooking(view).get("tiers", {}).get(str(rarity), {})
 	var title := str(known.name) if not known.is_empty() else ("Tried before" if tried(view, pot) else "Unknown dish")
-	return {title = title, state = P0Logic.rarity_name(view, rarity), time = "%d s" % (int(t.get("ms", 5000)) / 1000)}
+	return {title = title, rarity = rarity, time = "%d s" % (int(t.get("ms", 5000)) / 1000)}
+
+## At least one main ingredient (field, orchard or water) besides the seasonings (§7.2.7).
+static func has_main(view_: Dictionary, pot: Array) -> bool:
+	var view := with_rack(view_)
+	for id in pot:
+		if str(P0Logic.item(view, str(id)).get("family", "")) != "S": return true
+	return false
 
 ## This exact mix already failed (S5 Kitchen Mishaps, §7.2.7): the capsule's title reads Tried before and a line above
 ## the Cook row says "Tried before · not a recipe" (q(56): while the blessing still refunds, a failed pot gives no
@@ -343,20 +357,19 @@ static func pot_energy(view_: Dictionary, pot: Array) -> String:
 	var t: Dictionary = cooking(view).get("tiers", {}).get(str(int(known.rarity)), {})
 	return "+%d Energy" % int(t.get("energy", 0))
 
-## Preview for a Cookbook page: COOK-2a writes `Ready to cook` when the page can cook now; `Ready to queue` in the drawer
-## opened from Queue next › (q(84): only that word changes).
-static func page_preview(view: Dictionary, p: Dictionary, queue := false) -> Dictionary:
+## The result line for a Cookbook page: its name (`Unknown dish` before it is known), rarity and time. Whether it can
+## cook is the Cook / Queue button's (`Ready to cook` / `Ready to queue` retired, SGODOT-256 ⑤ A', q(92)).
+static func page_preview(view: Dictionary, p: Dictionary) -> Dictionary:
 	var rarity := int(p.get("rarity", 1))
 	var t: Dictionary = cooking(view).get("tiers", {}).get(str(rarity), {})
-	var title := "Unknown dish"
-	if p.get("known", false): title = ("Ready to queue" if queue else "Ready to cook") if p.get("can_cook", false) else str(p.get("name", ""))
-	return {title = title, state = P0Logic.rarity_name(view, rarity), time = "%d s" % (int(t.get("ms", 5000)) / 1000)}
+	var title := str(p.get("name", "")) if p.get("known", false) else "Unknown dish"
+	return {title = title, rarity = rarity, time = "%d s" % (int(t.get("ms", 5000)) / 1000)}
 
 ## Experiment's Cook button: the gap when it cannot cook (LOCK-10), else "Cook" (never "Free", §7.2.7). In the drawer
 ## opened from Queue next › the pot on the stove is the point: the button reads Queue, never Stove busy (q(71)).
 static func experiment_reason(view: Dictionary, pot: Array, queue := false) -> String:
 	if pot.is_empty(): return "Add an ingredient"
-	if preview(view, pot).title == "Needs a main ingredient": return "Needs a main ingredient"
+	if not has_main(view, pot): return "Needs a main ingredient"
 	if stove(view) != null and not queue: return "Stove busy"
 	return ""
 
@@ -603,7 +616,7 @@ static func cook_again(view: Dictionary, page_id: String) -> Dictionary:
 	return {title = str(p.get("name", "")), state = "Can cook again" if short.is_empty() else "Materials short",
 		effect = "Repeat this recipe with the shown ingredients." if short.is_empty() else "Add %s to cook this recipe again." % str(first.get("name", "")).to_lower(),
 		facts = facts, section = "Ingredients · %d/%d" % [met, p.get("in", []).size()],
-		slots = p.get("in", []).size(), locked = slots(view) < 3,
+		slots = p.get("in", []).size(), locked = slots(view) < 3, lock_note = locked_slot_toast(view),
 		tiles = tiles, button = "Cook Again",
 		reason = "" if short.is_empty() else "Need %d more %s" % [int(first.need) - int(first.have), str(first.gap)],
 		command = {"type": "cook", "recipe": page_id}}
