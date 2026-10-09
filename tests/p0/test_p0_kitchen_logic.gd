@@ -38,6 +38,7 @@ func test_heading_reads_stove_level_state_in_that_order() -> void:
 	v.cooking.stove = {"ready_in": 0}
 	assert_str(P0KitchenLogic.header(v).state).is_equal("Ready")
 	assert_str(P0KitchenLogic.locked_slot_label(v)).is_equal("Lv4 · 60 XP to go")   # 220 − 160
+	assert_str(P0KitchenLogic.locked_slot_toast(v)).is_equal("Cooking Lv4 · 60 XP to go")   # 256 ⑤ A': a tap on the lock
 	assert_str(P0KitchenLogic.cookbook_count(v)).is_equal("3/5")
 
 func test_page_cells_follow_the_kitchen_cell_states() -> void:
@@ -45,7 +46,7 @@ func test_page_cells_follow_the_kitchen_cell_states() -> void:
 	var pages := P0KitchenLogic.pages(v)
 	var can := P0KitchenLogic.page_cell(v, pages[0])
 	assert_int(can.kitchen_state).is_equal(K.DEFAULT)
-	assert_bool(can.marked).is_true()   # can-cook = green check (WP1b B1-02)
+	assert_bool(can.has("marked")).is_false()   # 256 ⑨: no can-cook check; the chip, the order and Cook say it
 	assert_int(P0KitchenLogic.page_cell(v, pages[1]).kitchen_state).is_equal(K.TASTED)   # known, never cooked
 	assert_int(P0KitchenLogic.page_cell(v, pages[3]).kitchen_state).is_equal(K.HIDDEN)
 	var locked := P0KitchenLogic.page_cell(v, pages[4])
@@ -67,6 +68,9 @@ func test_page_cards_put_the_gap_on_the_button() -> void:
 	assert_str(a.effect).is_equal("+20 Energy")
 	assert_str(a.button).is_equal("Cook")
 	assert_str(P0KitchenLogic.page_card(v, pages[1]).reason).is_equal("Need Lettuce ×1")
+	# 256 ⑨ / q(92): known, not cooked yet — the one-off first-cook XP of its tier, never the word Tasted.
+	assert_str(P0KitchenLogic.page_card(v, pages[1]).state).is_equal("Common · First cook +10 XP")
+	assert_str(P0KitchenLogic.first_cook_line(4)).is_equal("First cook +80 XP")
 	assert_str(P0KitchenLogic.page_card(v, pages[2]).reason).is_equal("Need River Perch ×1")
 	var unknown := P0KitchenLogic.page_card(v, pages[3])
 	assert_str(unknown.title).is_equal("Unknown dish")
@@ -95,13 +99,15 @@ func test_pot_rules_slots_and_preview() -> void:
 	assert_bool(P0KitchenLogic.can_add(v, ["fish_crucian", "fish_crucian"], "crop_herb")).is_false()   # 2 slots
 	assert_bool(P0KitchenLogic.can_add(v, ["crop_herb"], "crop_herb")).is_false()   # only one herb
 	assert_str(P0KitchenLogic.slots_used_line(v, ["fish_crucian"])).is_equal("1 / 2 slots used")
-	assert_dict(P0KitchenLogic.preview(v, ["fish_crucian"])).is_equal({title = "Grilled Crucian", state = "Common", time = "5 s"})
-	assert_dict(P0KitchenLogic.preview(v, ["fish_crucian", "crop_herb"])).is_equal({title = "Unknown dish", state = "Fine", time = "15 s"})
-	assert_str(P0KitchenLogic.preview(v, ["crop_herb"]).title).is_equal("Needs a main ingredient")
+	# 256 ⑤ A': the result line — dish, rarity (a dot) and time; `?` alone with only seasonings; nothing for an empty pot.
+	assert_dict(P0KitchenLogic.preview(v, ["fish_crucian"])).is_equal({title = "Grilled Crucian", rarity = 1, time = "5 s"})
+	assert_dict(P0KitchenLogic.preview(v, ["fish_crucian", "crop_herb"])).is_equal({title = "Unknown dish", rarity = 2, time = "15 s"})
+	assert_dict(P0KitchenLogic.preview(v, ["crop_herb"])).is_equal({title = "?", rarity = 0, time = ""})
+	assert_dict(P0KitchenLogic.preview(v, [])).is_equal({title = "", rarity = 0, time = ""})
 	assert_str(P0KitchenLogic.experiment_reason(v, [])).is_equal("Add an ingredient")
 	assert_str(P0KitchenLogic.experiment_reason(v, ["crop_herb"])).is_equal("Needs a main ingredient")
 	assert_str(P0KitchenLogic.experiment_reason(v, ["fish_crucian"])).is_equal("")
-	assert_dict(P0KitchenLogic.page_preview(v, P0KitchenLogic.pages(v)[0])).is_equal({title = "Ready to cook", state = "Common", time = "5 s"})
+	assert_dict(P0KitchenLogic.page_preview(v, P0KitchenLogic.pages(v)[0])).is_equal({title = "Grilled Crucian", rarity = 1, time = "5 s"})
 
 func test_the_stove_reads_the_queue_list_when_the_server_sends_one() -> void:
 	var v := _view()
@@ -255,7 +261,6 @@ func test_s5_page_states_drive_the_cells_order_and_counts() -> void:
 	var K := UiItemCell.KitchenState
 	var states := P0KitchenLogic.pages(v).map(func(p): return P0KitchenLogic.page_cell(v, p).kitchen_state)
 	assert_array(states).is_equal([K.MASTERED, K.HIDDEN, K.TASTED, K.CLUED, K.LOCKED])
-	assert_bool(P0KitchenLogic.page_cell(v, P0KitchenLogic.pages(v)[0]).marked).is_true()   # mastered and can cook
 	assert_array(P0KitchenLogic.cookbook_order(v).map(func(p): return p.id)).is_equal(
 		["dish_grilled_crucian", "dish_radish_salad", "dish_veggie_plate", "dish_grilled_fish", "dish_fisher_stew"])
 	assert_str(P0KitchenLogic.cookbook_count(v)).is_equal("2/48")
@@ -320,6 +325,24 @@ func test_cook_again_lists_facts_tiles_and_the_command() -> void:
 	assert_str(a.reason).is_equal("")
 	assert_dict(a.command).is_equal({"type": "cook", "recipe": "dish_herb_grilled_fish"})
 
+func test_cook_again_sheet_uses_the_pot_slots_and_its_lock_says_what_opens_it() -> void:
+	# 刘邦 on #142: COOK-P0-7 / P0-8 (784:77585) take PotSlot44 too — icons and ×1, no names, 20 apart; the lock alone.
+	var v := _again_view()
+	var a := P0KitchenLogic.cook_again(v, "dish_herb_grilled_fish")
+	var sheet: Control = auto_free(preload("res://scenes/p0/kitchen/p0_cook_again_sheet.gd").new(a))
+	var bar: HBoxContainer = sheet.call("_slot_bar")
+	auto_free(bar)
+	var slots := bar.get_children()
+	assert_int(bar.get_theme_constant(&"separation")).is_equal(20)
+	assert_array(slots.map(func(sl): return (sl as UiPotSlot).state)).is_equal(
+		[UiPotSlot.State.FILLED, UiPotSlot.State.FILLED, UiPotSlot.State.LOCKED])
+	assert_bool(slots.all(func(sl): return not (sl as UiPotSlot).removable)).is_true()
+	var said := []
+	sheet.connect("unavailable", func(r: String): said.append(r))
+	(slots[2] as UiPotSlot).locked_tapped.emit()
+	assert_array(said).is_equal([P0KitchenLogic.locked_slot_toast(v)])
+	assert_str(str(said[0])).starts_with("Cooking Lv4")
+
 func test_cook_again_short_names_the_gap_and_drops_the_time() -> void:
 	var v := _again_view()
 	v.bag.slots = []
@@ -354,7 +377,7 @@ func test_experiment_lists_the_spice_racks_stored_seasonings() -> void:
 func test_a_stored_seasoning_counts_as_a_seasoning_in_the_preview() -> void:
 	var v := _view()
 	v.cooking["rack"] = {"on": true, "items": [{"id": "rock_salt", "name": "Rock Salt", "qty": 12}]}
-	assert_str(P0KitchenLogic.preview(v, ["rock_salt"]).title).is_equal("Needs a main ingredient")   # not a main
+	assert_str(P0KitchenLogic.preview(v, ["rock_salt"]).title).is_equal("?")   # not a main: the button says why
 	assert_str(P0KitchenLogic.experiment_reason(v, ["rock_salt"])).is_equal("Needs a main ingredient")
 	assert_str(P0KitchenLogic.pot_energy(v, ["fish_perch", "rock_salt"])).is_equal("+40 Energy")   # Herb Baked Perch [fish_perch, S1]
 
@@ -404,14 +427,13 @@ func test_queue_two_entry_state_line_and_turn_over_toast() -> void:
 	assert_str(P0KitchenLogic.rotation_line(v, none, "dish_herb_grilled_fish")).is_equal("Ingredients back · Herb Grilled Fish cooking")
 	assert_str(P0KitchenLogic.rotation_line(v, none, null)).is_equal("Ingredients back · Unknown dish cooking")
 
-func test_queue_mode_reads_ready_to_queue_and_never_stove_busy() -> void:
-	# q(84): only `Ready to cook` becomes `Ready to queue`; q(71): the Experiment button in the drawer opened from Queue
-	# next › is not stopped by the pot on the stove — that pot is why the drawer is open.
+func test_the_result_line_names_the_dish_and_queue_mode_never_reads_stove_busy() -> void:
+	# 256 ⑤ A' / q(92): `Ready to cook` / `Ready to queue` (q(84)) are retired: the line names the dish, can cook or not;
+	# q(71): the Experiment button in the drawer opened from Queue next › is not stopped by the pot on the stove — that
+	# pot is why the drawer is open.
 	var v := _view()
-	var page: Dictionary = P0KitchenLogic.pages(v)[0]   # Grilled Crucian, can cook
-	assert_str(P0KitchenLogic.page_preview(v, page).title).is_equal("Ready to cook")
-	assert_str(P0KitchenLogic.page_preview(v, page, true).title).is_equal("Ready to queue")
-	assert_str(P0KitchenLogic.page_preview(v, P0KitchenLogic.pages(v)[1], true).title).is_equal("Radish Salad")   # short: the name, as before
+	assert_str(P0KitchenLogic.page_preview(v, P0KitchenLogic.pages(v)[0]).title).is_equal("Grilled Crucian")   # can cook
+	assert_str(P0KitchenLogic.page_preview(v, P0KitchenLogic.pages(v)[1]).title).is_equal("Radish Salad")   # short
 	v.cooking.stove = {"id": 3, "ms": 15000, "ready_in": 9000, "heats": []}
 	assert_str(P0KitchenLogic.experiment_reason(v, ["fish_crucian"])).is_equal("Stove busy")
 	assert_str(P0KitchenLogic.experiment_reason(v, ["fish_crucian"], true)).is_equal("")

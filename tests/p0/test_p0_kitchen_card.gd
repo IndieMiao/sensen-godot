@@ -77,3 +77,24 @@ func test_the_might_have_line_sits_under_the_facts() -> void:
 	d.select_page("dish_veggie_plate")   # clued, no maybe
 	await _settle()
 	assert_bool(maybe.is_visible_in_tree()).is_false()
+
+func test_the_first_page_keeps_cook_in_the_corner_once_the_drawer_has_its_theme() -> void:
+	# 256 ⑨: the card is laid out in _init before the theme reaches it; measured in the default font size, the long fact
+	# line of a page not cooked yet (Common · First cook +10 XP) sent Cook to a row of its own until another page was
+	# picked. It is laid out again once the theme is there.
+	var v: Dictionary = auto_free(KL.new())._s5_view()
+	var pages: Array = v.cooking.cookbook
+	pages[0].can_cook = false
+	pages[2].can_cook = true   # Radish Salad, known, never cooked: first in the grid, the page the drawer opens on
+	var host := Control.new()
+	host.theme = UiKit.theme()
+	host.size = Vector2(360, 800)
+	add_child(auto_free(host))
+	var d := P0KitchenDrawer.new(v)
+	host.add_child(d)
+	await _settle()
+	assert_str(d.selected_page).is_equal("dish_radish_salad")
+	assert_str((d.get("_recipe_state") as Label).text).is_equal("Common · First cook +10 XP")
+	var b: UiCommandButton = d.get("_recipe_button")
+	assert_float(b.size.x).is_equal(90.0)
+	assert_float(b.position.x + b.size.x).is_equal(328.0)

@@ -139,23 +139,17 @@ func test_inventory_cell_quantity_pill_and_rarity_dot() -> void:
 	assert_array(_visible_named(c, "Label")).is_empty()
 	assert_array(_visible_named(c, "TextureRect")).is_empty()
 
-func test_kitchen_mark_shows_when_selected_or_cooked() -> void:
+func test_kitchen_cells_never_draw_a_check() -> void:
+	# SGODOT-256 ⑨: Show mark is retired; selected keeps its outline, can cook is the chip, the order and the button.
 	var c: UiItemCell = _host(UiItemCell.new(UiItemCell.Density.KITCHEN))
 	c.icon = load("res://assets/p0/icons/dish_fish_soup.svg")
-	await _settle()
+	var check := load("res://assets/ui/kit_icons/check.svg")
 	var mark := func() -> bool:
-		return _visible_named(c, "TextureRect").any(func(t): return (t as TextureRect).texture == UiItemCell.CHECK_GLYPH)
-	assert_bool(mark.call()).is_false()
-	c.state = UiItemCell.State.SELECTED
-	await _settle()
-	assert_bool(mark.call()).is_true()
-	c.state = UiItemCell.State.DEFAULT
-	c.marked = true
-	await _settle()
-	assert_bool(mark.call()).is_true()
-	c.state = UiItemCell.State.EMPTY
-	await _settle()
-	assert_bool(mark.call()).is_false()
+		return _visible_named(c, "TextureRect").any(func(t): return (t as TextureRect).texture == check)
+	for st in [UiItemCell.State.DEFAULT, UiItemCell.State.SELECTED]:
+		c.state = st
+		await _settle()
+		assert_bool(mark.call()).is_false()
 
 # Touches fed straight into a cell with a fake clock (SGODOT-212 review: a touch is exactly one outcome).
 func _record(c: UiItemCell) -> Dictionary:

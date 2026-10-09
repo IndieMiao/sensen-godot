@@ -3,6 +3,8 @@ extends GdUnitTestSuite
 ## inPot / notForCooking from 223): what each state shows, and that DEFAULT keeps the plain cell.
 
 const K := UiItemCell.KitchenState
+## The retired can-cook / selected / in-pot check (SGODOT-256 ⑨): no kitchen cell draws it any more.
+const CHECK := preload("res://assets/ui/kit_icons/check.svg")
 
 func _cell(fields: Dictionary) -> UiItemCell:
 	var host := Control.new()
@@ -42,37 +44,39 @@ func test_tasted_mastered_in_pot_and_not_for_cooking() -> void:
 	var fish := load("res://assets/p0/icons/fish_crucian.svg")
 	var tasted := _cell({icon = fish, kitchen_state = K.TASTED})
 	await _settle()
-	assert_array(_texts(tasted)).contains(["Tasted"])
+	assert_array(_texts(tasted)).contains(["Try it"])   # 256 ⑨ A: known, not cooked yet; the word Tasted is gone
+	assert_array(_texts(tasted)).not_contains(["Tasted"])
 	assert_bool(_shows(tasted, UiItemCell.STAR_GLYPH)).is_false()
-	var mastered := _cell({icon = fish, quantity = "×3", marked = true, kitchen_state = K.MASTERED})
+	var mastered := _cell({icon = fish, quantity = "×3", kitchen_state = K.MASTERED})
 	await _settle()
 	assert_bool(_shows(mastered, UiItemCell.STAR_GLYPH)).is_true()
-	# C28 (1228:105954): the star sits at the bottom right, the can-cook check keeps the top right; no quantity.
+	# C28 (1228:105954): the star sits at the bottom right; no quantity, no check.
 	var star: Panel = mastered.get("_star")
-	var mark: Panel = mastered.get("_mark")
 	assert_float(star.position.x).is_greater(26.0)
 	assert_float(star.position.y).is_greater(26.0)
 	assert_vector(star.size).is_equal(Vector2(12, 12))
 	assert_object((star.get_theme_stylebox(&"panel") as UiStyleBox).bg_color).is_equal(UiTokens.COLOR_GOLD_DEEP)   # color/goldDeep
-	assert_bool(mark.is_visible_in_tree()).is_true()
-	assert_bool(star.get_global_rect().intersects(mark.get_global_rect())).is_false()
+	assert_bool(_shows(mastered, CHECK)).is_false()
 	assert_array(_texts(mastered)).not_contains(["×3"])
 	var in_pot := _cell({icon = fish, quantity = "×2", kitchen_state = K.IN_POT})
 	await _settle()
 	assert_array(_texts(in_pot)).contains(["×2"])   # some left: the count, no label (COOK-2b / P0-2)
 	assert_array(_texts(in_pot)).not_contains(["In pot"])
-	assert_bool(_shows(in_pot, UiItemCell.CHECK_GLYPH)).is_true()
+	assert_bool(_shows(in_pot, CHECK)).is_false()   # inPot 1405:92963: the primary stroke, no check
 	var nfc := _cell({icon = fish, quantity = "×1", kitchen_state = K.NOT_FOR_COOKING})
 	await _settle()
 	assert_array(_texts(nfc)).contains(["Not for\ncooking"])
 	assert_array(_texts(nfc)).not_contains(["×1"])
-	assert_bool(_shows(nfc, UiItemCell.CHECK_GLYPH)).is_false()
+	assert_bool(_shows(nfc, CHECK)).is_false()
 
-func test_default_keeps_the_plain_status_label_and_mark() -> void:
-	var c := _cell({icon = load("res://assets/p0/icons/dish_fish_soup.svg"), status = "Shop", marked = true})
+func test_default_keeps_the_plain_status_label() -> void:
+	var c := _cell({icon = load("res://assets/p0/icons/dish_fish_soup.svg"), status = "Shop"})
 	await _settle()
 	assert_array(_texts(c)).contains(["Shop"])
-	assert_bool(_shows(c, UiItemCell.CHECK_GLYPH)).is_true()
+	c.state = UiItemCell.State.SELECTED   # the selected outline only: the check is retired (256 ⑨)
+	await _settle()
+	assert_bool(_shows(c, CHECK)).is_false()
+	c.state = UiItemCell.State.DEFAULT
 	assert_bool(_shows(c, UiItemCell.SILHOUETTE)).is_false()
 	c.kitchen_state = K.HIDDEN
 	c.kitchen_state = K.DEFAULT
@@ -169,3 +173,23 @@ func test_might_have_rings_the_cell_in_color_new() -> void:
 	c.might_have = false
 	await _settle()
 	assert_bool(glow.is_visible_in_tree()).is_false()
+
+## SGODOT-256 ⑨ A (1919:32860): `Try it` in primary, 10 Bold, on a surface-raised tag with a border, centred across the
+## cell at y 35.4; the icon stays half colour.
+func test_try_it_tag_sits_centred_in_primary_on_a_half_colour_icon() -> void:
+	var fish := load("res://assets/p0/icons/dish_fish_soup.svg")
+	var c := _cell({icon = fish, kitchen_state = K.TASTED})
+	await _settle()
+	var label: Label = c.get("_chip_label")
+	assert_str(label.text).is_equal("Try it")
+	assert_object(label.get_theme_color(&"font_color")).is_equal(UiTokens.COLOR_PRIMARY)
+	var tag := label.get_parent() as Control
+	var cell := c.get_global_rect()
+	assert_float(absf(tag.get_global_rect().get_center().x - cell.get_center().x)).is_less_equal(0.6)
+	assert_float(tag.get_global_rect().position.y - cell.position.y).is_between(35.0, 38.0)
+	var icon: TextureRect = c.get("_icon")
+	assert_float(icon.modulate.a).is_equal(0.5)
+	c.kitchen_state = K.DEFAULT   # cooked once: full colour, no tag
+	await _settle()
+	assert_bool(label.is_visible_in_tree()).is_false()
+	assert_float(icon.modulate.a).is_equal(1.0)
