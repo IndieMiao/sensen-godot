@@ -8,7 +8,7 @@ import { loadP0Content, type P0Content } from '../../src/p0/content.js';
 import { applyP0, type P0Command } from '../../src/p0/reducer.js';
 import { freshState } from '../../src/p0/state.js';
 import { clusterOf } from '../../src/p0/travel.js';
-import { applyOverrides, cityPlaces, clusterPopulation, generateCity, km, placeOf, pondCount, tierOf,
+import { applyOverrides, applyWater, cityPlaces, clusterPopulation, generateCity, km, placeOf, pondCount, tierOf, waterTable,
   type CityPlaces, type PlaceFix, type WorldContent } from '../../src/p0/world.js';
 
 const c: P0Content = loadP0Content();
@@ -260,6 +260,31 @@ describe('global generation (SGODOT-280)', () => {
     applyOverrides({ ...w, overrides: { [pond.id]: { name: 'Koi Pond', lat: 1 } } }, tokyo.ponds, tokyo.outposts);
     expect(pond).toMatchObject({ name: 'Koi Pond', ...at });
     expect(shop.nearest?.name).toBe('Koi Pond');
+  });
+
+  it('lays the water table (q(126)) under the hand fixes: every entry is this world\'s, a short move, never a hand-fixed place', () => {
+    const table = waterTable();
+    expect(table, 'server/data/world_water.json (tools/world_water_batch.ts)').not.toBeNull();
+    expect([table!.seed, table!.revision]).toEqual([w.seed, w.revision]);
+    const hand = new Set(Object.keys(w.overrides ?? {}).filter(k => !k.startsWith('_')));
+    const byCity = new Map<string, string[]>();
+    for (const id of Object.keys(table!.fixes)) byCity.set(id.slice(0, id.indexOf('~')), [...(byCity.get(id.slice(0, id.indexOf('~'))) ?? []), id]);
+    expect(Object.keys(table!.fixes).length).toBeGreaterThan(1000);
+    for (const [cluster, ids] of byCity) {
+      const bare = generateCity(c, clusters.get(cluster)!, { water: false }), city = cityPlaces(c, cluster)!;
+      const all = (x: CityPlaces) => [...x.detail.ponds, ...x.detail.outposts];
+      for (const id of ids) {
+        const [lat, lng, fromLat, fromLng] = table!.fixes[id];
+        expect(hand.has(id), `${id} has a hand fix`).toBe(false);
+        const was = all(bare).find(p => p.id === id);
+        expect(was && [was.lat, was.lng], `${id}: rerun tools/world_water_batch.ts`).toEqual([fromLat, fromLng]);
+        expect(all(city).find(p => p.id === id)).toMatchObject({ lat, lng });
+        // 3 km, or 8 km where nothing within 3 km kept the rules (the batch's --retry wide --search 8000)
+        expect(km({ lat, lng }, { lat: fromLat, lng: fromLng })).toBeLessThanOrEqual(8);
+      }
+    }
+    // a table made for another world is an error, never quietly used
+    expect(() => applyWater({ ...w, revision: w.revision + 1 }, [], [], table)).toThrow(/rerun tools\/world_water_batch/);
   });
 
   it('a player with a pass to Tokyo casts in its generated beginner pond', () => {
