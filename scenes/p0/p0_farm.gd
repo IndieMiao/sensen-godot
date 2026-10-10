@@ -1005,6 +1005,10 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"factap":
 			for f in rt.session.current().get("facilities", []):
 				if int(f.get("id", 0)) == int(step[1]): _facilities.open_card(f)
+		"binpick":   # binpick:<item> — the Compost Bin's drawer selects that crop (COMPOST-BIN shots)
+			if rt.ui.compost_bin() != null: rt.ui.compost_bin().select(step[1])
+		"bincompost":   # bincompost:<item>:<qty> — the drawer's Compost, sent as its buttons send it
+			rt.session.send({"type": "compost", "item": step[1], "qty": int(step[2]) if step.size() > 2 else 1})
 		"near":   # near:<id> — stand 1.2 m in front of a facility, so its name strip opens (250 review shots)
 			for c in _card_candidates():
 				if str(c[0]) == step[1]:

@@ -14,9 +14,11 @@ import type { Refusal } from './fishing.js';
 import { coinsNeeded, stepAt } from './homestead.js';
 import { homeClimate } from './travel.js';
 import type { P0Event } from './progress.js';
-import { skillLevel } from './rules.js';
+import { skillLevel, untilRollover } from './rules.js';
 import type { Facility, P0State, Plot } from './state.js';
-import { add, room } from './bag.js';
+import { add, count, room, take } from './bag.js';
+import { yardBlock } from './decor.js';
+import { cropById } from './content.js';
 import { missing, putInStorage, takeStorageFirst } from './storage.js';
 
 /** [col, row] of a plot on the garden grid, or null for an id the grid does not have. */
@@ -46,6 +48,12 @@ export function coverOf(c: P0Content, kind: string, plot: number, count = c.gard
 }
 
 const isBlock = (c: P0Content, kind: string) => c.facilities.kinds[kind]?.cover === 'block';
+const isYard = (c: P0Content, kind: string) => c.facilities.kinds[kind]?.cover === 'yard';
+/** A yard facility's cell from a command's x, y (the yard grid: P0Garden's cells, decor.yard). */
+function yardCell(cmd: { x?: unknown; y?: unknown }): [number, number] | null {
+  const x = Number(cmd.x), y = Number(cmd.y);
+  return Number.isInteger(x) && Number.isInteger(y) ? [x, y] : null;
+}
 
 const coverNow = (c: P0Content, s: P0State, f: Facility) => coverOf(c, f.kind, f.plot, s.plots.length);
 
@@ -206,34 +214,50 @@ function waterCovered(c: P0Content, s: P0State, now: number, grow: (id: string, 
   return started;
 }
 
-export function place(c: P0Content, s: P0State, cmd: { recipe?: unknown; plot?: unknown; space?: string }, now: number,
+/** Build a facility in place (q(22)): on a plot, over a block of plots (greenhouse), or on a yard cell (x, y: the
+ * Compost Bin, q(118) ③ — the decor yard's rules, never on the field). */
+export function place(c: P0Content, s: P0State, cmd: { recipe?: unknown; plot?: unknown; x?: unknown; y?: unknown; space?: string }, now: number,
     events: P0Event[], grow: (id: string, plot: Plot) => number): Refusal | null {
   if (cmd.space !== undefined && cmd.space !== 'home') return { code: 'not_home' };
   const r = c.workbench.recipes.find(x => x.id === String(cmd.recipe ?? '') && x.to === 'field');
   if (!r || !r.facility || !c.facilities.kinds[r.facility]) return { code: 'bad_recipe' };
-  const block = placeBlock(c, s, r) ?? spotBlock(c, s, cmd.plot, undefined, r.facility);
+  const cell = isYard(c, r.facility) ? yardCell(cmd) : null;
+  if (isYard(c, r.facility) && !cell) return { code: 'bad_spot' };
+  const block = placeBlock(c, s, r)
+    ?? (cell ? yardBlock(c, s, [cell], { x: cell[0], y: cell[1] }) : spotBlock(c, s, cmd.plot, undefined, r.facility));
   if (block) return block;
   for (const [item, qty] of r.cost) { takeStorageFirst(s, item, qty); events.push({ kind: 'item', id: item, delta: -qty }); }
   if (r.coins) { s.coins -= r.coins; events.push({ kind: 'coins', delta: -r.coins }); }
   s.facilities ??= [];
   s.facility_count = (s.facility_count ?? 0) + 1;
-  const plot = Number(cmd.plot);
-  const f: Facility = { id: s.facility_count, kind: r.facility, plot, ...(isBlock(c, r.facility) ? {} : { under: underOf(s, plot) }) };
+  const plot = cell ? -1 : Number(cmd.plot);
+  const f: Facility = { id: s.facility_count, kind: r.facility, plot,
+    ...(cell ? { cell } : isBlock(c, r.facility) ? {} : { under: underOf(s, plot) }) };
   s.facilities.push(f);
   tillUnder(c, s, f);
   const started = waterCovered(c, s, now, grow);
   events.push({ kind: 'facility', action: 'placed', facility: f.id, facility_kind: f.kind, plot,
-    covered: coverNow(c, s, f).length, started });
+    covered: coverNow(c, s, f).length, started, ...(cell ? { x: cell[0], y: cell[1] } : {}) });
   return null;
 }
 
 /** Move a facility to another empty plot for free; the old plot is tilled ground again. Crops already growing keep
  * their time (it was locked when they started); sown plots the new spot covers start growing. */
-export function moveFacility(c: P0Content, s: P0State, cmd: { facility?: unknown; plot?: unknown; space?: string }, now: number,
+export function moveFacility(c: P0Content, s: P0State, cmd: { facility?: unknown; plot?: unknown; x?: unknown; y?: unknown; space?: string }, now: number,
     events: P0Event[], grow: (id: string, plot: Plot) => number): Refusal | null {
   if (cmd.space !== undefined && cmd.space !== 'home') return { code: 'not_home' };
   const f = (s.facilities ?? []).find(x => x.id === Number(cmd.facility));
   if (!f) return { code: 'bad_facility' };
+  if (f.cell) {   // a yard facility moves to another yard cell (the Compost Bin)
+    const cell = yardCell(cmd);
+    if (!cell) return { code: 'bad_spot' };
+    if (cell[0] === f.cell[0] && cell[1] === f.cell[1]) return { code: 'same_plot' };
+    const block = yardBlock(c, s, [cell], { x: cell[0], y: cell[1] }, { facility: f.id });
+    if (block) return block;
+    f.cell = cell;
+    events.push({ kind: 'facility', action: 'moved', facility: f.id, facility_kind: f.kind, plot: -1, x: cell[0], y: cell[1], covered: 0, started: [] });
+    return null;
+  }
   if (f.plot === Number(cmd.plot)) return { code: 'same_plot' };
   if (isBlock(c, f.kind)) {   // a greenhouse moves only while nothing grows under it (`Move · Harvest first`)
     const growing = coverNow(c, s, f).filter(id => { const q = s.plots.find(x => x.id === id)!; return q.crop || q.state === 'sown' || q.state === 'growing'; });
@@ -255,7 +279,43 @@ export function moveFacility(c: P0Content, s: P0State, cmd: { facility?: unknown
 
 /** The view's facts: each facility with what it covers; per field recipe the cap, how many stand and the first block. */
 export function facilitiesView(c: P0Content, s: P0State) {
-  return (s.facilities ?? []).map(f => ({ id: f.id, kind: f.kind, plot: f.plot, covers: coverNow(c, s, f) }));
+  return (s.facilities ?? []).map(f => ({ id: f.id, kind: f.kind, plot: f.plot, covers: coverNow(c, s, f), ...(f.cell ? { cell: f.cell } : {}) }));
+}
+
+/** The Compost Bin (q(118) ③, §5.7): any crop in the bag — regional ones and fruit too — becomes Compost 1:1 at once,
+ * up to the bin's daily (5) a player day; at home, with a bin standing. The crops leave before the Compost goes in, so
+ * a stack turned whole makes its own room. */
+export function compost(c: P0Content, s: P0State, cmd: { item?: unknown; qty?: unknown; space?: string }, now: number,
+    events: P0Event[]): Refusal | null {
+  if (cmd.space !== undefined && cmd.space !== 'home') return { code: 'not_home' };
+  const bin = (s.facilities ?? []).find(f => c.facilities.kinds[f.kind]?.daily);
+  if (!bin) return { code: 'no_compost_bin' };
+  const cap = c.facilities.kinds[bin.kind].daily!;
+  const item = String(cmd.item ?? ''), qty = Number(cmd.qty ?? 1);
+  if (!cropById(c, item)) return { code: 'not_a_crop', detail: { item } };
+  if (!Number.isInteger(qty) || qty < 1) return { code: 'bad_qty' };
+  const used = s.day.compost ?? 0;
+  if (used + qty > cap) return { code: 'limit_reached', detail: { used, cap, resets_in: untilRollover(c, now) } };
+  const have = count(s.bag, item, 'skip');
+  if (have < qty) return { code: 'not_enough', detail: { item, have, need: qty } };
+  const out = 'fert_compost';
+  const trial = { bag: structuredClone(s.bag), bag_cap: s.bag_cap };
+  take(trial.bag, item, qty, 'skip');
+  if (room(c, trial, out) < qty) return { code: 'bag_full', detail: { need: qty } };
+  take(s.bag, item, qty, 'skip');
+  add(c, s, out, qty);
+  s.day.compost = used + qty;
+  events.push({ kind: 'item', id: item, delta: -qty }, { kind: 'item', id: out, delta: qty },
+    { kind: 'compost', item, qty, used: used + qty, cap });
+  return null;
+}
+
+/** The view's Compost Bin quota (its drawer's `Compost today 2/5` / `resets in 9h 12m`); null without a bin. */
+export function compostView(c: P0Content, s: P0State, now: number) {
+  const bin = (s.facilities ?? []).find(f => c.facilities.kinds[f.kind]?.daily);
+  if (!bin) return null;
+  const cap = c.facilities.kinds[bin.kind].daily!, used = s.day.compost ?? 0;
+  return { cap, used, left: Math.max(0, cap - used), resets_in: untilRollover(c, now) };
 }
 
 export function fieldRecipeView(c: P0Content, s: P0State, r: WorkbenchRecipe) {

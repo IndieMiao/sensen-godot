@@ -21,6 +21,7 @@ const ROOF_ALPHA := 0.25
 const ROOF_INSIDE := 0.10
 const ROOF_H := 1.45
 const GREENHOUSE_TAP_PX := 90.0
+const ElasticZoom = preload("res://modules/p0/p0_elastic_zoom.gd")   # ground_at: the yard cell under a finger
 
 var farm: Node3D                # p0_farm.gd: bp, cam, actor
 var rt: P0Runtime
@@ -35,6 +36,7 @@ var _highlight := -1            # a tapped sprinkler: its covered plots show unt
 var _finger := Vector2.INF      # placement: where the finger holds (the farm's edge pan), INF when lifted
 var _roofs := {}                # greenhouse id → its roof material (the fade under it)
 var _glass: Array = []          # greenhouse plots' outlines, reused
+var _solid := {}                # "x,y" → cell: yard cells a facility (the Compost Bin) made solid, switched back as it moves
 
 func setup(farm_node: Node3D) -> P0FarmFacilities:
 	farm = farm_node
@@ -77,17 +79,79 @@ func _sync_art(list: Array) -> void:
 			node.queue_free()   # a moved greenhouse is rebuilt over its new block
 			node = null
 		if node == null:
-			node = _greenhouse_art(f.get("covers", [])) if is_block(kind) else _sprinkler_art()
+			node = _greenhouse_art(f.get("covers", [])) if is_block(kind) else (_bin_art() if is_yard(kind) else _sprinkler_art())
 			node.set_meta("plot", int(f.get("plot", 0)))
 			farm.add_child(node)
 			_art[id] = node
 			if is_block(kind): _roofs[id] = node.get_meta("roof")
-		if not is_block(kind): node.position = _bed_top(int(f.get("plot", 0)))
+		if is_yard(kind): node.position = _cell_ground(cell_of(f))
+		elif not is_block(kind): node.position = _bed_top(int(f.get("plot", 0)))
 	for id in _art.keys():
 		if not keep.has(id):
 			(_art[id] as Node3D).queue_free()
 			_art.erase(id)
 			_roofs.erase(id)
+	_sync_solid(list)
+
+## A yard facility is solid like a decor piece (49b11f91 ③): only cells the yard lets one walk on are switched, and back.
+func _sync_solid(list: Array) -> void:
+	var now := {}
+	for f in list:
+		if f.get("cell", null) is Array: now["%d,%d" % [int(f.cell[0]), int(f.cell[1])]] = cell_of(f)
+	for k in _solid.keys():
+		if not now.has(k):
+			farm.grid.set_solid(_solid[k], false)
+			_solid.erase(k)
+	for k in now:
+		if _solid.has(k) or not farm.bp.is_walkable(now[k]): continue
+		farm.grid.set_solid(now[k], true)
+		_solid[k] = now[k]
+
+## A yard facility's cell (the view's `cell`: [x, y]); P0Decor.NONE for one on the field.
+static func cell_of(f: Dictionary) -> Vector2i:
+	var c = f.get("cell", null)
+	return Vector2i(int(c[0]), int(c[1])) if c is Array and (c as Array).size() == 2 else P0Decor.NONE
+
+func _cell_ground(cell: Vector2i) -> Vector3:
+	return (farm.bp as FarmBlueprint).cell_to_world(cell)
+
+## Placeholder Compost Bin (FARM-5: a compost bin with an open lid): a slatted wooden crate, dark compost inside, its lid
+## propped open behind it; 0.55 m across, within its one yard cell.
+static func _bin_art() -> Node3D:
+	var root := Node3D.new()
+	root.name = "CompostBin"
+	var wood := _mat(Color(0.55, 0.38, 0.22))
+	var box := MeshInstance3D.new()
+	var bm := BoxMesh.new()
+	bm.size = Vector3(0.55, 0.42, 0.55)
+	box.mesh = bm
+	box.position = Vector3(0, 0.21, 0)
+	box.material_override = wood
+	root.add_child(box)
+	for y in [0.12, 0.28]:   # two darker slats round the crate
+		var slat := MeshInstance3D.new()
+		var sm := BoxMesh.new()
+		sm.size = Vector3(0.57, 0.04, 0.57)
+		slat.mesh = sm
+		slat.position = Vector3(0, y, 0)
+		slat.material_override = _mat(Color(0.42, 0.28, 0.16))
+		root.add_child(slat)
+	var soil := MeshInstance3D.new()
+	var pm := PlaneMesh.new()
+	pm.size = Vector2(0.48, 0.48)
+	soil.mesh = pm
+	soil.position = Vector3(0, 0.425, 0)
+	soil.material_override = _mat(Color(0.24, 0.17, 0.10))
+	root.add_child(soil)
+	var lid := MeshInstance3D.new()
+	var lm := BoxMesh.new()
+	lm.size = Vector3(0.58, 0.04, 0.5)
+	lid.mesh = lm
+	lid.position = Vector3(0, 0.55, -0.36)
+	lid.rotation = Vector3(deg_to_rad(-62.0), 0, 0)
+	lid.material_override = wood
+	root.add_child(lid)
+	return root
 
 ## Placeholder greenhouse over its plots: four corner posts and a gable glass roof (no walls: walkable from any side).
 ## `roof` false: the posts alone (the placement preview: seen from straight above, the glass would wash out the green /
@@ -200,6 +264,36 @@ static func kind_of(recipe: String) -> String:
 		if str(r.get("id", "")) == recipe: return str(r.get("facility", "sprinkler"))
 	return "sprinkler"
 
+## A yard facility (cover yard: the Compost Bin, q(118) ③) stands on a yard cell, never a plot.
+static func is_yard(kind: String) -> bool:
+	return str(P0Logic.content().get("facilities", {}).get("kinds", {}).get(kind, {}).get("cover", "")) == "yard"
+
+## "" when a yard facility may stand on `cell`, else the bar's reason: the decor yard's rules and words (P0Decor,
+## the server's yardBlock); the one being moved leaves its own cell.
+static func yard_reason(view: Dictionary, cell: Vector2i, moving := -1) -> String:
+	if cell == P0Decor.NONE: return P0Decor.REASONS.decor_outside
+	var t := P0Decor.taken(view)
+	for f in view.get("facilities", []):
+		if int(f.get("id", 0)) == moving and cell_of(f) != P0Decor.NONE: t.erase("%d,%d" % [cell_of(f).x, cell_of(f).y])
+	return P0Decor.reason_cells(view, [cell], t)
+
+## The legal yard cell nearest `from` (the preview starts there: beside the workbench, q(118) ③); NONE when none is.
+## `span`: cells either side of `from` that count as its footprint (the workbench's three: 1). Beside it comes first,
+## then in front; behind it last, where the 43° view would hide a low box behind the bench.
+static func nearest_yard_cell(view: Dictionary, from: Vector2i, moving := -1, span := 0) -> Vector2i:
+	var walk = P0Decor.yard().get("walk", [0, 0, 0, 0])
+	var best := P0Decor.NONE
+	var best_d := INF
+	for y in range(int(walk[1]), int(walk[1]) + int(walk[3])):
+		for x in range(int(walk[0]), int(walk[0]) + int(walk[2])):
+			var dx := maxi(0, absi(x - from.x) - span)
+			var dy := y - from.y
+			var d := float(dx * dx + dy * dy) + (0.25 if dy != 0 else 0.0) + (0.5 if dy > 0 else 0.0)
+			if d >= best_d or yard_reason(view, Vector2i(x, y), moving) != "": continue
+			best_d = d
+			best = Vector2i(x, y)
+	return best
+
 static func is_block(kind: String) -> bool:
 	return str(P0Logic.content().get("facilities", {}).get("kinds", {}).get(kind, {}).get("cover", "")) == "block"
 
@@ -254,6 +348,8 @@ static func spot_reason(view: Dictionary, plot: int, moving := -1, kind := "spri
 	return "Outside your fields"
 
 static func caption(view: Dictionary, plot: int, kind := "sprinkler") -> String:
+	if is_yard(kind):   # `Compost Bin · 1×1` (不知火舞 on 241)
+		return "%s · 1×1" % str(P0Logic.content().get("facilities", {}).get("kinds", {}).get(kind, {}).get("name", kind))
 	if is_block(kind):
 		var size := block_size(kind)
 		return "%s · %d×%d" % [str(P0Logic.content().get("facilities", {}).get("kinds", {}).get(kind, {}).get("name", kind)), size.x, size.y]
@@ -274,6 +370,9 @@ func begin_move(facility: int) -> void:
 func _begin(p: Dictionary) -> void:
 	var v := rt.session.view
 	placing = p
+	if is_yard(str(p.kind)):
+		_begin_yard(v)
+		return
 	placing.plot = nearest_spot(v, farm.actor.position, int(p.facility), str(p.kind))
 	_preview = _greenhouse_art(cover_of(v, maxi(0, int(placing.plot)), str(p.kind)), false) if is_block(str(p.kind)) else _sprinkler_art()
 	_preview.name = "PlacementPreview"
@@ -282,6 +381,33 @@ func _begin(p: Dictionary) -> void:
 	if int(placing.plot) >= 0: farm.placement_camera_begin(_spot_center(v, int(placing.plot)))
 	else: farm.placement_camera_begin(farm.actor.position)
 	_show_spot(v, int(placing.plot))
+
+## A yard facility: the preview starts on the free cell nearest the workbench (a moved one: nearest where it stands).
+func _begin_yard(v: Dictionary) -> void:
+	var from := P0Decor.NONE
+	var span := 0
+	for f in v.get("facilities", []): if int(f.get("id", 0)) == int(placing.facility): from = cell_of(f)
+	if from == P0Decor.NONE:   # a new one: beside the workbench, whose anchor is the middle of its three cells
+		for c in farm._materials.card_candidates(): if str(c[0]) == "workbench": from = farm.bp.world_to_cell(c[1])
+		span = 1
+	placing.plot = -1
+	placing.cell = nearest_yard_cell(v, from, int(placing.facility), span)
+	_preview = _bin_art()
+	_preview.name = "PlacementPreview"
+	farm.add_child(_preview)
+	rt.ui.begin_placement({"confirm": placing.confirm})
+	farm.placement_camera_begin(_cell_ground(placing.cell) if placing.cell != P0Decor.NONE else farm.actor.position)
+	_show_yard(v, placing.cell)
+
+func _show_yard(v: Dictionary, cell: Vector2i) -> void:
+	var reason := yard_reason(v, cell, int(placing.facility))
+	placing.ok = reason == ""
+	_preview.visible = cell != P0Decor.NONE
+	var at := _cell_ground(cell) if cell != P0Decor.NONE else Vector3.INF
+	if cell != P0Decor.NONE: _preview.position = at
+	farm.placement_grid(at)
+	_paint_tints([[at, BAD_TINT if reason != "" else OK_TINT]] if cell != P0Decor.NONE else [])
+	rt.ui.set_placement({"caption": caption(v, -1, str(placing.kind)), "reason": reason})   # two keys: the reason on Done
 
 ## Where a spot's preview stands: the bed top, or the middle of a greenhouse's block.
 func _spot_center(v: Dictionary, plot: int) -> Vector3:
@@ -313,6 +439,13 @@ func _on_point(screen: Vector2, phase: String) -> void:
 
 func _snap(screen: Vector2) -> void:
 	var v := rt.session.view
+	if is_yard(str(placing.kind)):   # the yard cell under the finger
+		var g = ElasticZoom.ground_at(farm.cam, screen, 0.0)
+		var cell: Vector2i = farm.bp.world_to_cell(g) if g is Vector3 else P0Decor.NONE
+		if cell == placing.get("cell", P0Decor.NONE): return
+		placing.cell = cell
+		_show_yard(v, cell)
+		return
 	var id := plot_at_screen(v, screen)
 	if is_block(str(placing.kind)) and id >= 0: id = _anchor_for(v, id, str(placing.kind))
 	if id == int(placing.plot): return
@@ -375,6 +508,13 @@ func _on_done(ok: bool) -> void:
 	if placing.is_empty(): return
 	var p := placing
 	var go := ok and bool(p.get("ok", false))
+	if is_yard(str(p.kind)):   # a solid Compost Bin: the player comes back off its cell
+		_end([p.cell] if go else [])
+		if not go: return
+		var at: Vector2i = p.cell
+		if int(p.facility) >= 0: rt.session.send({"type": "move_facility", "facility": int(p.facility), "x": at.x, "y": at.y, "space": "home"})
+		else: rt.session.send({"type": "place", "recipe": str(p.recipe), "x": at.x, "y": at.y, "space": "home"})
+		return
 	# the player steps off the bed a sprinkler takes; a greenhouse is walked into, so they come back where they stood
 	_end([P0Garden.cell_of(int(p.plot))] if go and not is_block(str(p.kind)) else [])
 	if not go: return
@@ -401,15 +541,23 @@ func _paint_tints(pairs: Array) -> void:
 		var q := _square()
 		farm.add_child(q)
 		_cells.append(q)
-	for i in pairs.size(): _place_square(_cells[i], int(pairs[i][0]), pairs[i][1])
+	for i in pairs.size():
+		if pairs[i][0] is Vector3: _place_square_at(_cells[i], pairs[i][0], pairs[i][1], float(farm.bp.cell_m) * 0.94)   # a yard cell
+		else: _place_square(_cells[i], int(pairs[i][0]), pairs[i][1])
 	for k in range(pairs.size(), _cells.size()): (_cells[k] as MeshInstance3D).visible = false
 
 ## A square on a bed: `tint` filled; the spot underfoot also wears a 2 px edge of its own colour, green or red
 ## (不知火舞 on #261, 284 v2 §2: the fill alone read only as a darker bed); coverage squares have none.
 func _place_square(q: MeshInstance3D, id: int, tint: Color) -> void:
+	_place_square_at(q, _bed_top(id), tint, 0.9)
+
+## The same square at a ground point, `size` metres across (a bed's 0.9, a yard cell's own size).
+func _place_square_at(q: MeshInstance3D, at: Vector3, tint: Color, size: float) -> void:
 	q.visible = true
-	q.position = _bed_top(id) + Vector3(0, 0.014, 0)
+	q.position = at + Vector3(0, 0.014, 0)
+	(q.mesh as PlaneMesh).size = Vector2(size, size)
 	var m := q.material_override as ShaderMaterial
+	m.set_shader_parameter("size_m", size)
 	m.set_shader_parameter("fill", tint)
 	var edge := Color(0, 0, 0, 0)
 	if tint == OK_TINT: edge = UiTokens.COLOR_PRIMARY
@@ -475,6 +623,10 @@ static func _ring() -> MeshInstance3D:
 func tap(screen: Vector2) -> bool:
 	var v := rt.session.view
 	for f in v.get("facilities", []):
+		if is_yard(str(f.get("kind", ""))):   # the Compost Bin: a tap on it opens its drawer
+			if farm.cam.unproject_position(_cell_ground(cell_of(f)) + BIN_HIT).distance_to(screen) > TAP_PX: continue
+			open_bin(f)
+			return true
 		if is_block(str(f.get("kind", ""))):   # a greenhouse: a tap near its roof's middle
 			var c := _block_rect(f.get("covers", [])).get_center()
 			if farm.cam.unproject_position(Vector3(c.x, P0Garden.BED_H + ROOF_H, c.y)).distance_to(screen) > GREENHOUSE_TAP_PX: continue
@@ -488,11 +640,18 @@ func tap(screen: Vector2) -> bool:
 ## back-left post; shown by the farm's rules (its icon button within range, the strip when it is the nearest facility in
 ## reach, LOCK-07 v2). A tap on the button, the strip or the greenhouse opens its card.
 const STRIP_MARK := Vector3(0, ROOF_H + 0.3, 0)
+## The Compost Bin's strip `Compost Bin · 2/5` (today's / the day's, 不知火舞 on 241) over its lid; the same rules.
+const BIN_MARK := Vector3(0, 0.95, 0)
+const BIN_HIT := Vector3(0, 0.35, 0)
+const BIN_REACH := 1.6
 
 ## [id, position, reach m] for the farm's one-strip pick: the block's middle, reach half its diagonal and a step.
 func card_candidates() -> Array:
 	var out: Array = []
 	for f in rt.session.view.get("facilities", []):
+		if is_yard(str(f.get("kind", ""))):
+			out.append(["bin_%d" % int(f.get("id", 0)), _cell_ground(cell_of(f)), BIN_REACH])
+			continue
 		if not is_block(str(f.get("kind", ""))): continue
 		var r := _block_rect(f.get("covers", []))
 		out.append(["gh_%d" % int(f.get("id", 0)), Vector3(r.get_center().x, 0, r.get_center().y), r.size.length() * 0.5 + 0.8])
@@ -501,6 +660,9 @@ func card_candidates() -> Array:
 ## Each frame on the farm: every greenhouse's button or strip, through the farm's world_prompt.
 func prompts(v: Dictionary) -> void:
 	for f in v.get("facilities", []):
+		if is_yard(str(f.get("kind", ""))):
+			farm.world_prompt("bin_%d" % int(f.get("id", 0)), bin_prompt(v, f), _cell_ground(cell_of(f)), BIN_MARK, BIN_HIT)
+			continue
 		if not is_block(str(f.get("kind", ""))): continue
 		var r := _block_rect(f.get("covers", []))
 		var corner := Vector3(r.position.x, P0Garden.BED_H, r.position.y)
@@ -512,13 +674,27 @@ static func greenhouse_prompt(f: Dictionary) -> Dictionary:
 	return {icon = P0Logic.icon("facility_greenhouse"), text = "Greenhouse", fact = "−%d%%" % cut, status = -1, dimmed = false,
 		button = true, count = ""}
 
-## A greenhouse's button or strip tapped (the farm's _tap_card by id): its card.
+## `Compost Bin · 2/5`: today's crops in, of the day's (`5/5` at the cap).
+static func bin_prompt(view: Dictionary, f: Dictionary) -> Dictionary:
+	var q = view.get("compost", null)
+	var name := str(P0Logic.content().get("facilities", {}).get("kinds", {}).get(str(f.get("kind", "")), {}).get("name", "Compost Bin"))
+	var fact := "%d/%d" % [int(q.get("used", 0)), int(q.get("cap", 5))] if q is Dictionary else ""
+	return {icon = P0Logic.icon("facility_" + str(f.get("kind", "compost_bin"))), text = name, fact = fact, status = -1,
+		dimmed = false, button = true, count = ""}
+
+## A greenhouse's or the Compost Bin's button or strip tapped (the farm's _tap_card by id): its card, or the bin's drawer.
 func tap_card(id: String) -> bool:
-	if not id.begins_with("gh_"): return false
+	if not (id.begins_with("gh_") or id.begins_with("bin_")): return false
 	if rt.ui.has_modal(): return true
 	for f in rt.session.view.get("facilities", []):
 		if "gh_%d" % int(f.get("id", 0)) == id: open_card(f)
+		elif "bin_%d" % int(f.get("id", 0)) == id: open_bin(f)
 	return true
+
+## The Compost Bin's drawer (COMPOST-BIN): the player turns to it; Move is Decorate's (不知火舞 on 241).
+func open_bin(f: Dictionary) -> void:
+	farm.actor.face(_cell_ground(cell_of(f)))
+	rt.ui.open_compost_bin()
 
 ## A greenhouse's status card (李白): `Greenhouse` / `16 plots · −25%` / `Move`; crops under it grey Move with
 ## `Move · Harvest first`. The view's ids are JSON numbers (floats): compared as ints.
@@ -533,6 +709,9 @@ static func greenhouse_card(view: Dictionary, f: Dictionary) -> Dictionary:
 		"button": "Move", "reason": "Move · Harvest first" if growing else ""}
 
 func open_card(f: Dictionary) -> void:
+	if is_yard(str(f.get("kind", ""))):   # the Compost Bin has a drawer, not a card
+		open_bin(f)
+		return
 	_highlight = int(f.get("id", 0))
 	var n := (f.get("covers", []) as Array).size()
 	if is_block(str(f.get("kind", ""))):
