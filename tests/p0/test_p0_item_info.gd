@@ -346,3 +346,14 @@ func test_a_good_dish_reads_as_the_dish_with_a_star() -> void:
 	assert_str(P0Logic.item_name(v, "dish_grilled_crucian@perfect")).is_equal("Grilled Crucian")   # no names / items entry
 	assert_str(P0Logic.item_name(v, "fish_unknown")).is_equal("fish_unknown")   # other ids as before
 	assert_str(P0Logic.base_id("dish_grilled_crucian@good")).is_equal("dish_grilled_crucian")
+	# the card's state line: the stars together, as dish_label (不知火舞 on #263)
+	var host := Control.new()
+	host.theme = UiKit.theme()
+	host.size = Vector2(336, 400)
+	add_child(auto_free(host))
+	var sheet := UiInfoSheet.new()
+	host.add_child(sheet)
+	sheet.rules = func(id: String, ctx: StringName, opts: Dictionary) -> Dictionary:
+		return {id = id, title = "Herb Grilled Fish", rarity_text = "Fine", quality = 2, facts = [], buttons = []}
+	sheet.open("dish_herb_grilled_fish@perfect", &"bag")
+	assert_str(sheet._state.text).is_equal("Fine ★★")

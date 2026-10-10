@@ -215,7 +215,8 @@ func refresh() -> void:
 	glyph.self_modulate = UiTokens.COLOR_TEXT if locked else UiTokens.COLOR_SECONDARY
 	(_lock.get_node("Hit") as Control).mouse_filter = Control.MOUSE_FILTER_STOP if bool(lock.get("shown", false)) else Control.MOUSE_FILTER_IGNORE
 	_chevron.visible = bool(_spec.get("info", false))
-	var stars := " ★".repeat(int(_spec.get("quality", 0)))
+	var q := int(_spec.get("quality", 0))
+	var stars := (" " + "★".repeat(q)) if q > 0 else ""   # `Fine ★★`, the stars together as dish_label (不知火舞 on #263)
 	_state.text = str(_spec.get("rarity_text", "")) + stars
 	_state.visible = _state.text != ""
 	_build_blocks()
