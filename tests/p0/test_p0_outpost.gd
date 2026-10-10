@@ -450,8 +450,10 @@ func test_an_open_counter_pushes_in_on_the_keeper_above_the_drawer() -> void:
 		if d.is_short(): await d.fitted
 		r._room_frame({}, 1.0 / 30.0)
 		var shot := r.counter_shot(rt.ui.root.size.y - d.height)
-		if id == "sh_tackle_1":
-			assert_bool(shot.is_empty()).override_failure_message("the tackle shop's counter + bag").is_true()
+		# the tackle shop's and the market's counter + bag half (the market buys regional goods back, SGODOT-284):
+		# the full drawer leaves no band above it, so no push-in
+		if id in ["sh_tackle_1", "sh_market_1"]:
+			assert_bool(shot.is_empty()).override_failure_message(id + ": counter + bag").is_true()
 			assert_bool(r.is_focused()).is_false()
 		else:
 			assert_bool(shot.is_empty()).override_failure_message(id).is_false()

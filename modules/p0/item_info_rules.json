@@ -114,7 +114,7 @@
       },
       {
         "id": "limit",
-        "label": "Limit reached · {quota_resets_in}",
+        "label": "{limit_label}",
         "kind": "unavailable",
         "when": "sold_here & !quota_left & !locked"
       },
@@ -198,7 +198,7 @@
       },
       {
         "id": "limit",
-        "label": "Limit reached · {quota_resets_in}",
+        "label": "{limit_label}",
         "kind": "unavailable",
         "when": "sold_here & !quota_left & !locked"
       },
@@ -316,7 +316,7 @@
       },
       {
         "id": "limit",
-        "label": "Limit reached · {quota_resets_in}",
+        "label": "{limit_label}",
         "kind": "unavailable",
         "when": "sold_here & !quota_left & !locked & !never_sold"
       },
@@ -520,7 +520,7 @@
       },
       {
         "id": "limit",
-        "label": "Limit reached · {quota_resets_in}",
+        "label": "{limit_label}",
         "kind": "unavailable",
         "when": "recyclable & sold_here & !quota_left & !locked"
       },
