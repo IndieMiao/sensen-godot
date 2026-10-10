@@ -376,11 +376,8 @@ static func crop_plural(name: String, n: int) -> String:
 
 ## Items that share an existing icon until they get their own (SGODOT-228 content).
 ## SGODOT-282: P1 pages without an icon of their own yet borrow the nearest P0 dish by main ingredient and style
-## (never the field sprout, int6 C7). Remove each line once 安其拉's icon lands (不知火舞 540d59df: the first six first).
-const DISH_STANDIN := {"dish_rock_salt_soup": "dish_fish_soup", "dish_charcoal_fish": "dish_grilled_fish",
-	"dish_fruit_platter": "dish_fruit_tea", "dish_harvest_roast": "dish_roast_veggies", "dish_salt_mackerel": "dish_salt_grilled_fish",
-	"dish_legend_sashimi": "dish_smoked_trout",
-	# the pages #214's crops and fish opened (after the first six)
+## (never the field sprout, int6 C7). Remove each line once 安其拉's icon lands (the first six landed: 283 / 0d45e4a1).
+const DISH_STANDIN := {
 	"dish_cabbage_stew": "dish_veggie_plate", "dish_travel_biscuits": "dish_carrot_cake", "dish_tilapia_wraps": "dish_pan_fried_fish",
 	"dish_crispy_smelt": "dish_salt_grilled_fish", "dish_cucumber_salad": "dish_radish_salad", "dish_apple_tea": "dish_fruit_tea",
 	"dish_corn_cake": "dish_carrot_cake", "dish_grass_carp_soup": "dish_fish_soup", "dish_char_chowder": "dish_fisher_stew",
