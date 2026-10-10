@@ -2,6 +2,8 @@ extends GdUnitTestSuite
 ## P1 facilities on the client (q(59) §1.4–1.5 / §5, SGODOT-241): the spot rules the placement preview shares with the
 ## server's place command, the Facilities card's buttons, and the shared placement shell on P0Ui.
 
+const FARM := preload("res://scenes/p0/p0_farm.gd")   # the shared placement edge pan (placement_edge / edge_push)
+
 static func _store() -> String: return "user://test_p1_facilities_bar_%d.json" % OS.get_process_id()
 static func _tips() -> String: return "user://test_p1_facilities_tips_%d.json" % OS.get_process_id()
 
@@ -107,6 +109,31 @@ func test_placement_mode_takes_the_screen_and_gives_it_back() -> void:
 	assert_bool(ui._keys.visible).is_true()
 	assert_bool(ui.hud._row2.visible).is_true()
 
+## Decorate's 2×1 / 3×2 decor (不知火舞 on 284 ee15926a): spec.secondary adds a middle key in the secondary look,
+## Cancel · Rotate · Place equally wide; it says placement_secondary. Without it the bar keeps its two keys.
+func test_the_bar_takes_an_optional_middle_key() -> void:
+	var ui := await _ui()
+	var turned := []
+	ui.placement_secondary.connect(func(): turned.append(true))
+	ui.begin_placement({"confirm": "Build"})
+	await await_idle_frame()
+	assert_bool(ui._place_bar._second.visible).is_false()
+	assert_float(ui._place_bar._ok.size.x).is_greater(ui._place_bar._cancel.size.x)   # the sprinkler's two-key bar
+	ui.end_placement()
+	ui.begin_placement({"confirm": "Place", "secondary": "Rotate"})
+	await await_idle_frame()
+	await await_idle_frame()
+	var bar: UiPlaceBar = ui._place_bar
+	assert_bool(bar._second.visible).is_true()
+	assert_str(bar._second.label).is_equal("Rotate")
+	assert_int(bar._second.kind).is_equal(UiCommandButton.Kind.SECONDARY)
+	assert_float(bar._ok.size.x).is_equal_approx(bar._cancel.size.x, 1.0)
+	assert_float(bar._second.size.x).is_equal_approx(bar._cancel.size.x, 1.0)
+	bar._second.activated.emit()
+	assert_array(turned).is_equal([true])
+	ui.set_placement({"secondary": ""})   # a square piece selected next: back to two keys
+	assert_bool(bar._second.visible).is_false()
+
 ## A press on the scene in placement mode moves the preview (placement_point) and summons no stick.
 func test_placement_presses_move_the_preview_not_the_player() -> void:
 	var ui := await _ui()
@@ -148,11 +175,11 @@ static func _motion(at: Vector2) -> InputEventMouseMotion:
 # ---------------------------------------------------------------- placement camera (不知火舞 on 241)
 ## A finger within 48 px of an edge pushes that way, harder nearer the edge; elsewhere nothing.
 func test_edge_push_grows_toward_the_edge() -> void:
-	assert_float(P0FarmFacilities.edge_push(180.0, 0.0, 360.0)).is_equal(0.0)
-	assert_float(P0FarmFacilities.edge_push(48.0, 0.0, 360.0)).is_equal(0.0)
-	assert_float(P0FarmFacilities.edge_push(24.0, 0.0, 360.0)).is_equal_approx(-0.5, 0.001)
-	assert_float(P0FarmFacilities.edge_push(0.0, 0.0, 360.0)).is_equal_approx(-1.0, 0.001)
-	assert_float(P0FarmFacilities.edge_push(348.0, 0.0, 360.0)).is_equal_approx(0.75, 0.001)
+	assert_float(FARM.edge_push(180.0, 0.0, 360.0)).is_equal(0.0)
+	assert_float(FARM.edge_push(48.0, 0.0, 360.0)).is_equal(0.0)
+	assert_float(FARM.edge_push(24.0, 0.0, 360.0)).is_equal_approx(-0.5, 0.001)
+	assert_float(FARM.edge_push(0.0, 0.0, 360.0)).is_equal_approx(-1.0, 0.001)
+	assert_float(FARM.edge_push(348.0, 0.0, 360.0)).is_equal_approx(0.75, 0.001)
 
 ## Two fingers in placement mode pan (placement_pan) and pinch (zoom); the preview does not move with them.
 func test_two_fingers_pan_and_pinch_and_leave_the_preview() -> void:
