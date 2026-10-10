@@ -769,6 +769,11 @@ func p0_harvest_wave(events: Array) -> float:
 	_harvest_flights(plots, crop_of, events, wave)
 	return wave
 
+## The Harvest ×N sent last was refused as a whole (the bag took not one plot): its wave will not come, so a single
+## harvest within WAVE_KEEP_MS is not read as the row's reply (哪吒 on #291).
+func p0_harvest_refused() -> void:
+	_wave = {}
+
 ## One crop's pop: up to ×1.25, then shrinking and fading out, `delay` after the wave starts.
 func _pop(g: Node3D, delay: float) -> void:
 	var tw := g.create_tween()
@@ -780,25 +785,35 @@ func _pop(g: Node3D, delay: float) -> void:
 	tw.tween_callback(g.queue_free)
 
 ## As the wave ends: each crop kind of the row (in the order they were taken) and Seed Saver's seeds fly to the Bag,
-## ×N, FLY_STEP_S apart, from where that kind's first plot stood; the Bag bumps as each lands. No Bag on screen, no
+## ×N, FLY_STEP_S apart, from where that kind's first plot stood; the Bag bumps as each lands. ×N is what the reply put
+## in the bag, as the `+3 Radish` float says (a plot may yield more than one, 哪吒 on #291). No Bag on screen, no
 ## flight (UiItemFly.launch).
 func _harvest_flights(plots: Array, crop_of: Dictionary, events: Array, after: float) -> void:
-	var kinds: Array = []   # [id, count, plot]
-	for id in plots:
-		var crop := str(crop_of.get(int(id), ""))
-		var k := kinds.map(func(x): return x[0]).find(crop)
-		if k < 0: kinds.append([crop, 1, int(id)])
-		else: kinds[k][1] += 1
-	for e in events:
-		if str(e.get("kind", "")) != "seed_saved": continue
-		var k := kinds.map(func(x): return x[0]).find(str(e.id))
-		if k < 0: kinds.append([str(e.id), 1, int(e.get("plot", plots[0]))])
-		else: kinds[k][1] += 1
+	var kinds := row_flights(plots, crop_of, events)
 	var bag: Control = rt.ui.bag_target()
 	for i in mini(kinds.size(), UiItemFly.MAX_PER_BATCH):
 		var from := cam.unproject_position(bp.cell_to_world(P0Garden.cell_of(int(kinds[i][2]))) + Vector3(0, P0Garden.BED_H + 0.3, 0))
 		UiItemFly.launch(rt.ui.root, from, bag, P0Logic.icon(str(kinds[i][0])), int(kinds[i][1]), after + i * FLY_STEP_S,
 			func(): UiItemFly.bump(bag))
+
+## The row's flights: [id, ×N, plot it flies from] per crop kind in the order the row took them (×N: what the reply's
+## items put in the bag), then Seed Saver's seeds (one each).
+static func row_flights(plots: Array, crop_of: Dictionary, events: Array) -> Array:
+	var kinds: Array = []
+	for id in plots:
+		var crop := str(crop_of.get(int(id), ""))
+		if crop != "" and not kinds.any(func(x): return x[0] == crop): kinds.append([crop, 0, int(id)])
+	for e in events:
+		if str(e.get("kind", "")) != "item" or int(e.get("delta", 0)) <= 0: continue
+		var k := kinds.map(func(x): return x[0]).find(str(e.get("id", "")))
+		if k >= 0: kinds[k][1] += int(e.delta)
+	kinds = kinds.filter(func(x): return int(x[1]) > 0)
+	for e in events:
+		if str(e.get("kind", "")) != "seed_saved": continue
+		var k := kinds.map(func(x): return x[0]).find(str(e.id))
+		if k < 0: kinds.append([str(e.id), 1, int(e.get("plot", plots[0]))])
+		else: kinds[k][1] += 1
+	return kinds
 
 ## Row Hoe's three beds: a few seeds (sow) or drops (water) fall on each, one WAVE_STEP_S after the other.
 func row_drops(row: Array, type: String) -> void:

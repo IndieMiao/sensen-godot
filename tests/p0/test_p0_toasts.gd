@@ -249,6 +249,16 @@ func test_a_rows_first_harvest_and_row_hoes_beds_say_so_in_one_line() -> void:
 	assert_array(texts).contains(["+16 XP · 3 plants · First harvest", "+3 Radish"])
 	assert_bool(texts.any(func(t): return t.begins_with("First harvest!"))).is_false()
 	for f in rt.ui.root.get_children(): if f is UiFloatText: f.free()
+	# a row whose own XP is 0 (crops far under the level) has no XP line to ride on: the first harvest says itself (哪吒 on #291)
+	events = []
+	for i in 3: events.append_array([{"kind": "item", "id": "crop_radish", "delta": 1}, {"kind": "xp", "skill": "farming", "amount": 0, "percent": -1}])
+	events.insert(2, {"kind": "first", "what": "harvest:crop_radish", "xp": 10})
+	events.insert(3, {"kind": "xp", "skill": "farming", "amount": 10, "percent": 100})
+	rt._on_state(v, events)
+	await get_tree().process_frame
+	texts = rt.ui.root.get_children().filter(func(c): return c is UiFloatText and not c.is_queued_for_deletion()).map(func(f): return f.text)
+	assert_array(texts).contains(["First harvest! +10 XP · Radish", "+3 Radish"])
+	for f in rt.ui.root.get_children(): if f is UiFloatText: f.free()
 	rt._on_state(v, [{"kind": "energy", "delta": -6, "reason": "sow"}, {"kind": "item", "id": "seed_radish", "delta": -3}])
 	await get_tree().process_frame
 	texts = rt.ui.root.get_children().filter(func(c): return c is UiFloatText and not c.is_queued_for_deletion()).map(func(f): return f.text)
