@@ -93,6 +93,7 @@
 | 矿口用尽 ★ | 点矿口直接开 MINE-P0-8，灰按钮 `Mine runs today 2/2 · Resets in 9h 12m`；不出 `Enter mine · No runs left`（q(102)） |
 | 满包 ★ | `Enter mine · Bag full` / `Floor 2 · Bag full`（不扣体力，q(48)）；岩石灰 `Bag full · free a slot to mine`；主行动键 `Mine · Bag full` |
 | 楼梯与电梯 ★ | 点击触发，主行动键不显示（q(102)）：下行梯名字条 `Floor 2 · 2 Energy`（到过只写 `Floor 2`），去没到过的层出小卡按钮 `Floor 2 · 2 Energy`；灰 `Floor 2 · Clear Floor 1 first`；上行梯名字条写目的地：第 1 层 `Farm`、第 2 层 `Floor 1`；电梯名字条 `Elevator`；面板 `Entrance · Free` / `Floor 1 · Free` / `Floor 2 · Here`（P0 没有 Express） |
+| 矿口 Express ★ | 入口卡次级按钮 `Floor 5 · Express · Free`；有未完成局时与 `New run · 2 Energy` 上下排，下面只写一次 `Current run will end · Runs today 1/2`；没有未完成局不加小字；用尽只剩灰按钮 `Mine runs today 2/2 · Resets in 9h 12m`；电梯面板的 Express 不加小字（q(108)） |
 | 飘字 | `Floor 2 · −2 Energy` / `Floor 2 cleared · Elevator stop` / `Run ended at daily reset`；P0 没有 `Run complete`；MINE-P0-7 不写 `Unmined rocks on Floor 2 are lost`（q(46)） |
 | 火把 | `Light Torch · Free` / `Lit · this floor` |
 
@@ -122,6 +123,7 @@
 | 据点卡 ★ | `Oak Tea House` / `Tea house · Hot tea`（其他：`Tackle shop · Rods and bait` / `Market square · Requests` / `Travel post · Coffee`）/ `Distance 0.8 km` / `Online now 3`（0 人整行不显示）/ `Go`（q(80)） |
 | 据点 pin | `Oak Tea House · 3 online`；没人在时只写名字 `Oak Tea House`；P0 城市级不聚合，每处一枚 pin，不出 `×N`（q(72)）；和 POI 一样会让位收起，选中的、带标记的、玩家所在地的图钉始终显示（q(105)） |
 | 标记 | P0 只有绿 ✓ / 金 ! / 青 ◆，没有 🔒 与 ★（q(48)） |
+| 外城到达与回家 ★ | 首访 `Welcome to Tokyo` + `+10 Energy`；再访只飘 `Welcome back`；回家落地 `Welcome home`（不盖章、不加体力）；外城位置芯片 `Tokyo · Arrived` / `Tokyo · Sumida Pond`，免费版不写 `Day Pass`（q(108)） |
 
 ## 8. 背包、Gear、个人页、收件箱
 
