@@ -381,6 +381,29 @@ static func trap_parts(v: Dictionary, got: Array) -> Array:
 	return got.map(func(f): return {kind = "item", key = "trap:" + str(f.id), text = "%s ×%d" % [P0Logic.item_name(v, str(f.id)), int(f.count)],
 		tone = UiFloatText.Tone.ITEM, icon = P0Logic.icon(str(f.id))})
 
+## q(134): a taken request's grown count (the server's request_progress) in words — {float: `Fresh Greens 3/5`} while it
+## is short (a basket's item `Market Basket · Carrot 5/6`, a resident's plots `Five Little Plots · Plots 3/5`), {toast:
+## `Fresh Greens · 5/5` / `Deliver at the Stall`, two lines as a check-in's} on the one that fills it; {} for a request
+## the view no longer has.
+static func progress_said(v: Dictionary, ev: Dictionary) -> Dictionary:
+	var id := str(ev.get("id", ""))
+	var r := P0Logic.PinReason.request_of(v, id)
+	if r.is_empty(): return {}
+	var title := str(r.get("title", ""))
+	var qty := int(ev.get("qty", r.get("qty", 1)))
+	if bool(ev.get("done", false)): return {toast = "%s · %d/%d\n%s" % [title, qty, qty, str(r.get("deliver", ""))]}
+	var have := int(ev.get("have", 0))
+	var item := str(ev.get("item", ""))
+	if item != "": return {float = "%s · %s %d/%d" % [title, P0Logic.item_name(v, item), have, qty]}
+	var taken: Array = P0Logic.PinReason.taken(v).filter(func(t): return str(t.get("id", "")) == id)
+	if not taken.is_empty() and str(taken[0].get("kind", "")) == "sow":
+		return {float = "%s · %s %d/%d" % [title, str(r.get("need_name", "Plots")), have, qty]}
+	return {float = "%s %d/%d" % [title, have, qty]}
+
+## A filled request's toast comes after the reply's cards (q(134) ⑤): a catch's Caught! card is queued this much after
+## its floats (P0Pond.CARD_AFTER_FLOATS_S) and a level-up's banner is deferred; held, it then waits for them to close.
+const REQUEST_TOAST_AFTER_S := 0.55
+
 ## The floats a landed catch's reply held for the world (catch_floats), handed over once: the world lets them rise.
 func take_catch_floats() -> Array:
 	var held := catch_floats
@@ -605,6 +628,14 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				if str(ev.get("from", "")) == "taught":
 					ui.resident_affinity({"resident": str(ev.get("resident", "")), "delta": 0}, "Let me show you a dish.")
 				ui.toast_success(("Recipe Card · %s" if str(ev.get("from", "")) == "card" else "Learned · %s") % page)
+			"request_progress":   # q(134): a taken request's count grew — its line over the items, or the toast when full
+				var said := progress_said(v, ev)
+				if said.has("float"):
+					floats.append({kind = "request", key = "request:%s:%s" % [str(ev.get("id", "")), str(ev.get("item", ""))],
+						text = str(said.float), tone = UiFloatText.Tone.ITEM})
+				elif said.has("toast"):
+					# bound to the UI (哪吒 on #188): a world left within the wait still gets it; after a TipCard too
+					get_tree().create_timer(REQUEST_TOAST_AFTER_S).timeout.connect(ui.toast_success_when_clear.bind(str(said.toast), false, true))
 			"visit":   # Stamp Run checked in (不知火舞 / 李白 on #224): once, after the entry's cover and a keeper's greeting
 				ui.toast_success_when_clear(P0Logic.visit_toast(v, str(ev.get("id", ""))))
 			"title":   # a story request's title (§9.4.4 Trusted)

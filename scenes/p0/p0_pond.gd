@@ -60,8 +60,6 @@ var _trap_open := false
 const COLLECT_HIDE_MS := 1400
 var _trap_hidden_s := 0.0   # what is left of it, in game time (frames, not the wall clock: a recording keeps it too)
 var _trap_mark := Vector2.INF   # the cage's point on screen this frame (its strip's, its floats' and flights' start)
-var _hint_req := ""     # the request this pond's ! is for (q(103)): its progress floats and its completion toast
-var _hint_have := -1    # that request's count before the next catch
 
 ## The pond id (P0Ponds): the session sends it with the entry read and every command from here (q(36)).
 func p0_place() -> String:
@@ -272,9 +270,7 @@ func _settle(ev: Dictionary, delay: float, first_xp: int) -> void:
 	if panel.visible: panel.close()
 	var at := cam.unproject_position(land) if not cam.is_position_behind(land) else Vector2.INF
 	var floats := rt.take_catch_floats()
-	if str(ev.get("result", "")) == "landed":
-		at = over_head()
-		floats.append_array(_request_progress())
+	if str(ev.get("result", "")) == "landed": at = over_head()   # a request's progress is among the reply's floats (q(134))
 	rt.ui.queue_floats(floats, at)
 	rt.last_first_catch_xp = first_xp
 	rt._on_catch(ev, rt.last_xp_lines, at, CARD_AFTER_FLOATS_S if not floats.is_empty() else 0.0)
@@ -289,11 +285,8 @@ func _arrival_hint() -> void:
 	# Straight into a pond (a dev boot, a cold start back in place) the first view may not have come yet.
 	if rt.session.current().is_empty(): await rt.session.state_changed
 	if not is_inside_tree(): return
-	# The request and its count are taken at once, so a fish landed while the tip is still up counts too.
 	var why := PinReason.reason(rt.session.current(), p0_place())
 	if str(why.get("state", "")) != "request": return
-	_hint_req = str(why.get("request", ""))
-	_hint_have = int(PinReason.request_of(rt.session.current(), _hint_req).get("have", -1)) if _hint_req != "" else -1
 	await get_tree().create_timer(ARRIVAL_HINT_DELAY_S).timeout
 	var waited := 0.0
 	while is_inside_tree() and rt.ui.tip_pending() and waited < ARRIVAL_HINT_WAIT_S:
@@ -302,31 +295,6 @@ func _arrival_hint() -> void:
 	if not is_inside_tree(): return
 	why = PinReason.reason(rt.session.current(), p0_place())   # still worn: a fish landed meanwhile may have completed it
 	if str(why.get("state", "")) == "request" and str(why.get("text", "")) != "": rt.ui.toast(str(why.text), 0.0, true)
-
-## What a landed fish did to that request: a progress float under `Pond Crucian ×1` (`Pond Catch 1/2`, ink, no
-## icon) while it is short; on the catch that completes it, a Success toast instead (`Pond Catch · 2/2 · Deliver at
-## the Stall`), after the catch's Caught! card and level banner. Nothing for a fish it does not take, or past the count.
-func _request_progress() -> Array:
-	if _hint_req == "": return []
-	var r := PinReason.request_of(rt.session.current(), _hint_req)
-	var said := request_progress(r, _hint_have)
-	_hint_have = int(r.get("have", _hint_have))
-	if said.has("float"):
-		return [{kind = "request", key = "request:" + _hint_req, text = str(said.float), tone = UiFloatText.Tone.ITEM}]
-	if said.has("toast"):
-		# Bound to the UI, not this pond (哪吒 on #188): a player who leaves within the wait still gets the toast.
-		get_tree().create_timer(CARD_AFTER_FLOATS_S + 0.05).timeout.connect(rt.ui.toast_success_when_clear.bind(str(said.toast), true))
-	return []
-
-## r = PinReason.request_of after a landed fish, before = the request's count before it: {float: `Pond Catch 1/2`}
-## while it is still short, {toast: `Pond Catch · 2/2 · Deliver at the Stall`} on the catch that completes it, else {}.
-static func request_progress(r: Dictionary, before: int) -> Dictionary:
-	var have := int(r.get("have", -1))
-	var qty := int(r.get("qty", 0))
-	if r.is_empty() or have <= before or before >= qty: return {}
-	var title := str(r.get("title", ""))
-	if have < qty: return {float = "%s %d/%d" % [title, have, qty]}
-	return {toast = "%s · %d/%d · %s" % [title, have, qty, str(r.get("deliver", ""))]}
 
 ## Where a landed fish's floats rise (不知火舞 on 231): FLOAT_OVER_HEAD_PX above the top of the player's head on screen
 ## (the top of the outfit — hair or hat — at the middle of the figure).
