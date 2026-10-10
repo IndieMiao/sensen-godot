@@ -8,6 +8,7 @@ extends "res://scenes/map_poc/map_poc.gd"
 
 const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
 const P0Clusters := preload("res://modules/p0/p0_clusters.gd")   # every city cluster (SGODOT-275)
+const P0Travel := preload("res://modules/p0/p0_travel.gd")   # where the player is in the world (SGODOT-275)
 const P0_FARM := "res://scenes/p0/p0_farm.tscn"
 const P0_POND := "res://scenes/p0/p0_pond.tscn"
 static var P0_REGION := P0City.region()   # the home city's map region (SGODOT-270: from content, san_francisco)
@@ -57,6 +58,7 @@ func _server_has_no_farm() -> bool:
 
 func _open_my_farm() -> void:
 	if AppRouter.top_instance() != null or AppRouter._navigation_pending: return
+	_return_home()
 	_clear_farm_selection()
 	_reset_gesture()
 	P0Runtime.nav_started()
@@ -106,6 +108,9 @@ func _install_city_map() -> void:
 ## Where Distance is measured from: the place the player last was (the place chip), home by default.
 func _origin() -> Vector2:
 	var here: Dictionary = rt.here if rt else {}
+	if P0Travel.away(_view()):   # arrived in another city: the player stands at its centre (its places come with 280)
+		var c := P0Clusters.get_cluster(P0Travel.here(_view()))
+		if not c.is_empty(): return Vector2(float(c.lat), float(c.lng))
 	match str(here.get("space", "home")):
 		"outpost":
 			var o := P0Outposts.find(str(here.get("place", "")))
@@ -290,7 +295,8 @@ func _destination_style_of(entry: Dictionary) -> Dictionary:
 ## Whether the player is away from the homestead — at a pond or an outpost (the place chip's place). At home, in the
 ## farmhouse or the mine, the avatar is the homestead's mark and no Homestead pin is drawn (不知火舞 on 234).
 func away() -> bool:
-	return rt != null and str(rt.here.get("space", "home")) in ["pond", "outpost"]
+	if rt == null: return false
+	return str(rt.here.get("space", "home")) in ["pond", "outpost"] or P0Travel.away(_view())
 
 func avatar_shift() -> Vector2:
 	return AVATAR_BESIDE if away() else Vector2.ZERO
@@ -307,7 +313,7 @@ func home_entry() -> Dictionary:
 func _sync_here() -> void:
 	if rt == null or city_map == null: return
 	var at := _origin()
-	var sig := "%s|%s|%.7f|%.7f" % [rt.here.get("space", ""), rt.here.get("place", ""), home_lat, home_lng]
+	var sig := "%s|%s|%s|%.7f|%.7f" % [rt.here.get("space", ""), rt.here.get("place", ""), P0Travel.here(_view()), home_lat, home_lng]
 	if sig == _here_sig: return
 	_here_sig = sig
 	set_self_at(at.x, at.y)
@@ -669,6 +675,63 @@ func _exit_tree() -> void:
 	CityMapData.set_region_provider(Callable())
 	super._exit_tree()
 
+# ---------------------------------------------------------------- travel (SGODOT-275, §11.8; the free first version)
+## The travel card (MAP-5 in the place-sheet layout until its frame comes): the city, how far and which Trip, what it
+## costs (nothing in the first version: Free), whether it is a first visit, and that going home is always free. Fly
+## sends `travel`; the server's arrival event flies the camera there (on_arrival). From a city bubble, and from a
+## pond / outpost of that city refused with pass_required / trip_expired (the server's preview then names it).
+func open_travel(cluster: String, preview := {}) -> void:
+	var c := P0Clusters.get_cluster(cluster)
+	if c.is_empty() or rt == null: return
+	var trip := P0Travel.trip(_view(), cluster)
+	if not preview.is_empty(): trip = {km = int(preview.get("km", trip.get("km", 0))), trip = int(preview.get("trip", trip.get("trip", 1))),
+		name = str(preview.get("trip_name", trip.get("name", "")))}
+	var first := P0Travel.fog(_view(), cluster) == "unexplored"
+	var spec := {
+		"title": "%s, %s" % [str(c.name), str(c.country)] if str(c.country) != "" else str(c.name),
+		"subtitle": "Unexplored" if first else "Visited ×%d" % P0Travel.visits(_view(), cluster),
+		"line": P0Travel.trip_line(trip),
+		"facts": [["Cost", "Free"], ["Visit", "First visit · stamp + 10 Energy" if first else "Return visit"]],
+		"primary": "Fly",
+	}
+	P0PlaceSheet.open(rt.ui, spec, func():
+		rt.ui.close_modal()
+		_origin_before = _origin()
+		rt.session.send({"type": "travel", "to": cluster}), Callable(), Callable(), "travel_card")
+
+var _origin_before := Vector2.ZERO   # where the player stood when Fly was pressed: the arrival flight starts there
+
+## The server's arrival (events {kind: "arrival"}): the camera flies to the city's overview (3–5 s by Trip, §11.8.4)
+## and lands with the welcome (q(108): a first visit is stamped, its +10 Energy floats as Energy does; a return only
+## floats Welcome back). The avatar stands there from now on (_sync_here reads view.travel).
+func on_arrival(ev: Dictionary) -> void:
+	var cluster := str(ev.get("cluster", ""))
+	var c := P0Clusters.get_cluster(cluster)
+	if c.is_empty(): return
+	var r := P0Clusters.region(cluster)
+	var overview: Dictionary = CityMapData.city(str(r.get("id", ""))).get("overview", {})
+	# §11.8.4: from where the player was (the homestead, or the last city) up and along to the city's overview.
+	var from := _origin_before
+	_origin_before = Vector2.ZERO   # one arrival per Fly: a later arrival (another device) starts from where it lands
+	_here_sig = ""
+	_sync_here()
+	if from != Vector2.ZERO:
+		center_lat = from.x
+		center_lng = from.y
+	var welcome := ("Welcome to %s · Stamp collected" % str(c.name)) if bool(ev.get("first", false)) else "Welcome back"
+	_switch_city(r)
+	_fly_to(float(overview.get("lat", c.lat)), float(overview.get("lng", c.lng)), float(overview.get("zoom", 11.0)),
+		float(overview.get("bearing", 0.0)), func(): rt.ui.toast(welcome), P0Travel.flight_s(int(ev.get("trip", 1))))
+	_flight = _focus_tween
+	_flight_kind = "travel"
+
+## Going home from another city (q(108)): free and instant — `return_home`, then the farm as ever. Welcome home
+## floats; no stamp, no Energy. At home it does nothing.
+func _return_home() -> void:
+	if rt == null or not P0Travel.away(_view()): return
+	rt.session.send({"type": "return_home"})
+	rt.ui.toast("Welcome home")
+
 # ---------------------------------------------------------------- browsing every city (SGODOT-275, §11.8.1)
 ## The camera city switches as the camera goes over a city (map_poc._update_active_city) and a bubble flies to its
 ## city (fly_to_city): both are Browse. Only the camera's city and the map's title change; the old app's saved city
@@ -691,6 +754,11 @@ func fly_to_city(id: String) -> void:
 	super.fly_to_city(str(r.id))
 	_asked = {}
 	_regions_key = ""
+	var cluster := P0Clusters.cluster_of_region(str(r.id))
+	if cluster == "" or cluster == P0Travel.here(_view()) or rt == null: return
+	# Home is never a trip (q(108)): from another city the home city's bubble goes home, as the homestead's Go home.
+	if cluster == P0Travel.home(_view()): _return_home()
+	else: open_travel(cluster)
 
 ## At most this many city bubbles, at least this far apart on screen (px), most populous first.
 const CITY_BUBBLES := 30

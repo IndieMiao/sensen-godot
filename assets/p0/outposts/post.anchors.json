@@ -9,6 +9,8 @@
     {"name": "npc_pip", "position": [2.3, 0.08, 0.8], "yaw_degrees": 90},
     {"name": "stand_pip", "position": [1.65, 0.08, 0.6], "yaw_degrees": -90},
     {"name": "use_stamp_desk", "position": [0.31, 1.1, 1.64], "module": "packing_table"},
+    {"name": "npc_sam", "position": [1.2, 0.08, -1.5], "yaw_degrees": 180},
+    {"name": "stand_sam", "position": [1.2, 0.08, -0.8], "yaw_degrees": 0},
     {"name": "spawn", "position": [-2.6, 0.08, 1.29], "yaw_degrees": -90},
     {"name": "exit", "position": [-3.3, 0.08, 1.29]},
     {"name": "badge_exit", "position": [-3.2, 2.45, 1.29]}

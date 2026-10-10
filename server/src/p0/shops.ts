@@ -30,7 +30,7 @@ export function catalog(c: P0Content, shop: ShopId): string[] {
 export interface Offer {
   price: number; skill: Skill | null; gate: number; daily: number;
   to: 'bag' | 'gear' | 'storage' | 'bag_cap'; once: boolean; floor: boolean;
-  homestead?: number; materials?: [string, number][]; capacity?: number;
+  homestead?: number; materials?: [string, number][]; capacity?: number; requires?: string;
 }
 
 export function offerOf(c: P0Content, id: string): Offer | null {
@@ -43,7 +43,7 @@ export function offerOf(c: P0Content, id: string): Offer | null {
   const g = c.goods[id];
   if (g) return { price: g.price, skill: g.skill, gate: g.gate, daily: g.daily, to: 'bag', once: false, floor: true };
   const up = c.bag_upgrades.find(u => u.id === id);
-  if (up) return { price: up.price, skill: null, gate: 0, daily: 0, to: 'bag_cap', once: true, floor: true, homestead: up.homestead, materials: up.materials, capacity: up.capacity };
+  if (up) return { price: up.price, skill: null, gate: 0, daily: 0, to: 'bag_cap', once: true, floor: true, homestead: up.homestead, materials: up.materials, capacity: up.capacity, requires: up.requires };
   const sp = c.specialty[id];
   if (sp) return { price: sp.price, skill: null, gate: 0, daily: 0, to: 'storage', once: true, floor: true };
   return null;
@@ -71,6 +71,7 @@ export function buyItem(c: P0Content, s: P0State, cmd: { item?: unknown; qty?: u
   if (offer.homestead && s.homestead.level < offer.homestead) return { code: 'homestead_level', detail: { need: offer.homestead } };
   if (offer.once && qty !== 1) return { code: 'bad_qty' };
   if (offer.once && owns(c, s, id)) return { code: 'owned' };
+  if (offer.requires && !owns(c, s, offer.requires)) return { code: 'needs_previous', detail: { item: offer.requires } };   // Bag Upgrade II after I
   const bought = s.day.bought[id] ?? 0;
   if (offer.daily && bought + qty > offer.daily) return { code: 'sold_out', detail: { left: Math.max(0, offer.daily - bought) } };
   const need = walletNeed(c, offer, qty);

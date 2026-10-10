@@ -35,7 +35,7 @@ function ready(level: 2 | 3): P0State {
 describe('Homestead Lv1–3 (§8.1–8.3)', () => {
   it('a new homestead is Lv1: 200 Energy, 200 meals, 2 Stall Board slots, nothing unlocked', () => {
     const v = viewOf(c, fresh(), T0);
-    expect(v.homestead).toMatchObject({ level: 1, max: 3, unlocks: { spice_rack: false, warming_cabinet: false, bag_upgrade_1: 'locked', board_slots: 2 } });
+    expect(v.homestead).toMatchObject({ level: 1, max: 10, unlocks: { spice_rack: false, warming_cabinet: false, bag_upgrade_1: 'locked', board_slots: 2, stoves: 1, cabinet: 0 } });
     expect(v.energy.max).toBe(200);
     expect(v.meals.cap).toBe(200);
     expect(v.bag.capacity).toBe(25);
@@ -63,9 +63,9 @@ describe('Homestead Lv1–3 (§8.1–8.3)', () => {
     expect(s.homestead.level).toBe(3);
     expect(maxEnergy(c, s)).toBe(220);
     const v = viewOf(c, s, T0);
-    expect(v.homestead.unlocks).toEqual({ spice_rack: true, warming_cabinet: true, bag_upgrade_1: 'for_sale', board_slots: 3, fence: true, clay_bank: true });
-    expect(v.homestead.next).toBeNull();
-    expect(applyP0(c, s, { type: 'homestead_upgrade' }, T0)).toMatchObject({ ok: false, code: 'max_level' });
+    expect(v.homestead.unlocks).toEqual({ spice_rack: true, warming_cabinet: true, bag_upgrade_1: 'for_sale', board_slots: 3, fence: true, clay_bank: true,
+      stoves: 1, big_pot: false, notice_board: false, chefs_sign: false, cabinet: 6, bag_upgrade_2: 'locked', bag_upgrade_3: 'locked' });
+    expect(v.homestead.next).toMatchObject({ level: 4, unlocks: ['second_stove', 'long_haul_ticket'] });   // P1: Lv4–10 (SGODOT-282)
   });
 
   it('refuses with the first gap in button order: skills, then materials, then coins (40-coin floor included)', () => {

@@ -7,6 +7,7 @@
  */
 import type { P0Content, WorkbenchRecipe } from './content.js';
 import type { Refusal } from './fishing.js';
+import { stepAt } from './homestead.js';
 import type { P0Event } from './progress.js';
 import { skillLevel } from './rules.js';
 import type { Facility, P0State, Plot } from './state.js';
@@ -51,10 +52,10 @@ export function growMs(c: P0Content, s: P0State, plot: Plot, grow_h: number): nu
   return Math.round(grow_h * 3_600_000 * (1 - Math.min(cut, c.facilities.grow_cut_cap)));
 }
 
-/** Plots the current Homestead level has: P0's 30, 40 from Homestead Lv3 (q(59) §1.1). */
+/** Plots the current Homestead level has (homestead.plots: Lv1 30, Lv3 40, q(59) §1.1), at most the garden grid's. */
 export function plotCount(c: P0Content, s: P0State): number {
-  const extra = c.garden?.extra;
-  return extra && s.homestead.level >= extra.homestead ? extra.from + extra.count : c.start.tilled_plots + c.start.wild_plots;
+  const p0 = c.start.tilled_plots + c.start.wild_plots;
+  return Math.min(stepAt(c.homestead.plots, s.homestead.level, p0), c.garden?.plots.length ?? p0);
 }
 
 /** Add the plots the Homestead level brings and does not have yet, as wild; the ids added (an upgrade, or a save
@@ -68,9 +69,17 @@ export function addPlots(c: P0Content, s: P0State): number[] {
   return added;
 }
 
-export function facilityCap(c: P0Content, s: P0State, kind: string): number {
-  const f = c.facilities.kinds[kind];
-  return f ? f.cap_base + f.cap_per_homestead * s.homestead.level : 0;
+/** How many of a facility may stand at a Homestead level: homestead.<kind>_max, base + per_level × level up to max
+ * (sprinkler_max: Lv1 4 … Lv7 on 10). */
+export function facilityCap(c: P0Content, s: P0State, kind: string, level = s.homestead.level): number {
+  const m = (c.homestead as Record<string, unknown>)[`${kind}_max`] as { base: number; per_level: number; max: number } | undefined;
+  return c.facilities.kinds[kind] && m ? Math.min(m.max, m.base + m.per_level * level) : 0;
+}
+
+/** The next Homestead level that lets one more stand, or null when the cap no longer grows. */
+function capNext(c: P0Content, s: P0State, kind: string): number | null {
+  const next = s.homestead.level + 1;
+  return next <= c.homestead.max_level && facilityCap(c, s, kind, next) > facilityCap(c, s, kind) ? next : null;
 }
 
 /** Why a field recipe can't be placed at all right now, in button order: level gate, cap, materials. */
@@ -82,10 +91,7 @@ export function placeBlock(c: P0Content, s: P0State, r: WorkbenchRecipe): Refusa
       return { code: 'skill_level_required', detail: { skill, level, xp_to_go: Math.max(0, c.skills[skill][level - 1] - s.skills[skill]) } };
   }
   const cap = facilityCap(c, s, kind), used = (s.facilities ?? []).filter(f => f.kind === kind).length;
-  if (used >= cap) {
-    const higher = c.homestead.max_level > s.homestead.level;
-    return { code: 'facility_cap', detail: { cap, used, homestead_next: higher ? s.homestead.level + 1 : null } };
-  }
+  if (used >= cap) return { code: 'facility_cap', detail: { cap, used, homestead_next: capNext(c, s, kind) } };
   const gap = missing(s, r.cost);
   if (gap) return { code: 'missing_materials', detail: gap };
   return null;
@@ -165,5 +171,5 @@ export function facilitiesView(c: P0Content, s: P0State) {
 export function fieldRecipeView(c: P0Content, s: P0State, r: WorkbenchRecipe) {
   const kind = r.facility ?? '';
   return { facility: kind, cap: facilityCap(c, s, kind), used: (s.facilities ?? []).filter(f => f.kind === kind).length,
-    homestead_next: c.homestead.max_level > s.homestead.level ? s.homestead.level + 1 : null };
+    homestead_next: capNext(c, s, kind) };
 }

@@ -672,15 +672,50 @@
       "hearty_mishap": 3,
       "steady_hand_1": 5,
       "queue_two": 5,
-      "quick_fire": 6
+      "quick_fire": 6,
+      "steady_hand_2": 7,
+      "fast_mastery": 7,
+      "cook_all": 8,
+      "provisions_plus": 8,
+      "chefs_touch": 9,
+      "title_chef": 10,
+      "lucky_double": 10
     },
     "gold_cap": 0.6,
     "steady_hand_gold": 0.05,
     "mastered": {
       "cooked": 10,
-      "gold": 0.1
+      "gold": 0.1,
+      "fast": 7
     },
     "quick_fire": 0.8,
+    "lucky_double": 0.1,
+    "cook_all_per_page": 2,
+    "milestones": [
+      {
+        "id": "line_cook",
+        "title": "Line Cook",
+        "discovered": 20,
+        "coins": 100,
+        "decor": "recipe_stand"
+      },
+      {
+        "id": "head_chef",
+        "title": "Head Chef",
+        "discovered": 36,
+        "cabinet": 4
+      },
+      {
+        "id": "master_chef",
+        "title": "Master Chef",
+        "discovered": 48
+      },
+      {
+        "id": "muscle_memory",
+        "title": "Muscle Memory",
+        "mastered": 10
+      }
+    ],
     "trial_refunds": 10,
     "recipes": [
       {
@@ -1706,7 +1741,8 @@
   },
   "wallet_floor": 40,
   "homestead": {
-    "max_level": 3,
+    "_p1": "SGODOT-282: Lv1–10 from Li Bai's P1 table (docs/product/p1-content-2026-10-10/homestead.json, 337d72f9; plan §8.2.1 / §8.3). Ladders are [from level, value].",
+    "max_level": 10,
     "warming_cabinet": 6,
     "per_level": {
       "energy": 10,
@@ -1722,6 +1758,92 @@
         3
       ]
     ],
+    "stoves": [
+      [
+        1,
+        1
+      ],
+      [
+        4,
+        2
+      ],
+      [
+        8,
+        3
+      ]
+    ],
+    "warming_cabinet_by_level": [
+      [
+        3,
+        6
+      ],
+      [
+        8,
+        12
+      ]
+    ],
+    "perennial_slots": {
+      "base": 1,
+      "per_level": 1,
+      "max": 8
+    },
+    "sprinkler_max": {
+      "base": 3,
+      "per_level": 1,
+      "max": 10
+    },
+    "decor_max": {
+      "base": 20,
+      "per_level": 4
+    },
+    "plots": [
+      [
+        1,
+        30
+      ],
+      [
+        3,
+        40
+      ]
+    ],
+    "_plots_note": "P1 紧凑农场：Lv1–2 30 格、Lv3 起 40 格（p1-step1 §1.1）；Lv4–10 的田数随 P1 第 3 步复跑后重定，在那之前仍 40。§8.3.2 的 200 → 600 是地理农场尺度，不用。",
+    "rooms": [
+      [
+        1,
+        "basic"
+      ],
+      [
+        5,
+        "standard"
+      ],
+      [
+        10,
+        "deluxe"
+      ]
+    ],
+    "exterior_stages": [
+      [
+        1,
+        0
+      ],
+      [
+        3,
+        1
+      ],
+      [
+        5,
+        2
+      ],
+      [
+        8,
+        3
+      ],
+      [
+        10,
+        4
+      ]
+    ],
+    "chefs_sign_gold": 0.05,
     "levels": [
       {
         "level": 2,
@@ -1780,10 +1902,295 @@
           "warming_cabinet",
           "bag_upgrade_1",
           "board_slot_3",
-          "fence"
+          "fence",
+          "old_tree",
+          "plots_40"
+        ]
+      },
+      {
+        "level": 4,
+        "coins": 550,
+        "skills": 7,
+        "materials": [
+          [
+            "wood",
+            20
+          ],
+          [
+            "stone",
+            16
+          ],
+          [
+            "fiber",
+            10
+          ],
+          [
+            "copper_ore",
+            6
+          ],
+          [
+            "clay",
+            6
+          ],
+          [
+            "rock_salt",
+            4
+          ]
+        ],
+        "unlocks": [
+          "second_stove",
+          "long_haul_ticket"
+        ]
+      },
+      {
+        "level": 5,
+        "coins": 750,
+        "skills": 9,
+        "materials": [
+          [
+            "wood",
+            20
+          ],
+          [
+            "stone",
+            16
+          ],
+          [
+            "fiber",
+            12
+          ],
+          [
+            "copper_ore",
+            10
+          ],
+          [
+            "clay",
+            8
+          ],
+          [
+            "quartz",
+            2
+          ],
+          [
+            "rock_salt",
+            4
+          ]
+        ],
+        "unlocks": [
+          "notice_board",
+          "trip_7",
+          "porch",
+          "standard_room"
+        ]
+      },
+      {
+        "level": 6,
+        "coins": 1000,
+        "skills": 11,
+        "materials": [
+          [
+            "wood",
+            20
+          ],
+          [
+            "stone",
+            18
+          ],
+          [
+            "fiber",
+            12
+          ],
+          [
+            "copper_ore",
+            10
+          ],
+          [
+            "clay",
+            8
+          ],
+          [
+            "quartz",
+            3
+          ],
+          [
+            "hardwood",
+            3
+          ]
+        ],
+        "unlocks": [
+          "big_pot",
+          "bag_upgrade_2"
+        ]
+      },
+      {
+        "level": 7,
+        "coins": 1450,
+        "skills": 13,
+        "materials": [
+          [
+            "wood",
+            20
+          ],
+          [
+            "stone",
+            20
+          ],
+          [
+            "fiber",
+            10
+          ],
+          [
+            "copper_ore",
+            12
+          ],
+          [
+            "clay",
+            8
+          ],
+          [
+            "quartz",
+            4
+          ],
+          [
+            "hardwood",
+            4
+          ]
+        ],
+        "unlocks": []
+      },
+      {
+        "level": 8,
+        "coins": 1800,
+        "skills": 15,
+        "materials": [
+          [
+            "wood",
+            18
+          ],
+          [
+            "stone",
+            18
+          ],
+          [
+            "fiber",
+            8
+          ],
+          [
+            "copper_ore",
+            12
+          ],
+          [
+            "clay",
+            8
+          ],
+          [
+            "quartz",
+            4
+          ],
+          [
+            "hardwood",
+            6
+          ]
+        ],
+        "unlocks": [
+          "third_stove",
+          "warming_cabinet_12",
+          "stall_upgrade",
+          "kitchen_extension"
+        ]
+      },
+      {
+        "level": 9,
+        "coins": 2250,
+        "skills": 17,
+        "materials": [
+          [
+            "wood",
+            14
+          ],
+          [
+            "stone",
+            16
+          ],
+          [
+            "fiber",
+            6
+          ],
+          [
+            "copper_ore",
+            12
+          ],
+          [
+            "clay",
+            4
+          ],
+          [
+            "quartz",
+            4
+          ],
+          [
+            "hardwood",
+            7
+          ]
+        ],
+        "unlocks": [
+          "bag_upgrade_3"
+        ]
+      },
+      {
+        "level": 10,
+        "coins": 2850,
+        "skills": 19,
+        "materials": [
+          [
+            "wood",
+            10
+          ],
+          [
+            "stone",
+            16
+          ],
+          [
+            "fiber",
+            6
+          ],
+          [
+            "copper_ore",
+            13
+          ],
+          [
+            "clay",
+            4
+          ],
+          [
+            "quartz",
+            5
+          ],
+          [
+            "hardwood",
+            8
+          ]
+        ],
+        "unlocks": [
+          "chefs_sign",
+          "master_farmhouse",
+          "deluxe_room",
+          "title_homestead_master"
         ]
       }
-    ]
+    ],
+    "_p2_only": {
+      "second_home_slots": "1 + ⌊Lv ÷ 2⌋，封顶 5（P2 第二版）",
+      "close_friend_slots": "1 + Lv，封顶 8（P2 社交）",
+      "helpers": "Lv1–3 1 / Lv4–7 2 / Lv8–10 3（P2 社交）"
+    },
+    "_unlock_notes": {
+      "long_haul_ticket": "P2 第二版（收费旅行）才生效；P1 免费版只显示资格",
+      "trip_7": "同上",
+      "porch": "阶段 2 外观（a / b 二选一卡随布置模式）",
+      "kitchen_extension": "阶段 3 外观",
+      "master_farmhouse": "阶段 4 外观"
+    }
   },
   "bag_upgrades": [
     {
@@ -1802,6 +2209,50 @@
         ]
       ],
       "capacity": 30
+    },
+    {
+      "id": "bag_upgrade_2",
+      "name": "Bag Upgrade II",
+      "homestead": 6,
+      "price": 400,
+      "materials": [
+        [
+          "hardwood",
+          4
+        ],
+        [
+          "clay",
+          6
+        ],
+        [
+          "copper_ore",
+          4
+        ]
+      ],
+      "capacity": 35,
+      "requires": "bag_upgrade_1"
+    },
+    {
+      "id": "bag_upgrade_3",
+      "name": "Bag Upgrade III",
+      "homestead": 9,
+      "price": 1000,
+      "materials": [
+        [
+          "hardwood",
+          8
+        ],
+        [
+          "quartz",
+          4
+        ],
+        [
+          "copper_ore",
+          8
+        ]
+      ],
+      "capacity": 40,
+      "requires": "bag_upgrade_2"
     }
   ],
   "drinks": {

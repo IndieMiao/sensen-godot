@@ -1,14 +1,15 @@
 /** Cooking and eating (plan §7.2–7.6, §7.17): pots cost no energy; quality comes from heat taps judged on the server. */
 import { dishId, dishParts, fishById, ingredient, itemKind, recipeById, type CookTier, type P0Content, type Recipe } from './content.js';
 import { add, room } from './bag.js';
-import { fireSpeed, giveClue, goldWidth, hasConvenience, noteMishap, triedBefore, trialRefundsLeft } from './cookbook.js';
+import { fireSpeed, giveClue, goldWidth, hasConvenience, noteMilestones, noteMishap, triedBefore, trialRefundsLeft } from './cookbook.js';
 import { isSeasoning } from './gathering.js';
+import { bigPot, stoveCount } from './homestead.js';
 import { cabinetCap, dishesFit, eatFrom, haveDish, haveIngredient, ingredientStock, rackOn, routeDish, takeIngredient } from './kitchen_storage.js';
 import { grantItems } from './parcels.js';
 import { firstXp, gainEnergy, gainXp, grantOnce, type P0Event } from './progress.js';
 import { draw, foodCap, scaledXp, skillLevel, xpPercent } from './rules.js';
 import { putInStorage } from './storage.js';
-import type { Heat, P0State, Pot } from './state.js';
+import type { Burner, Heat, P0State, Pot } from './state.js';
 import type { Refusal } from './fishing.js';
 
 const TAG = /^([WFOS])(\d)$/;
@@ -18,6 +19,32 @@ export function cookSlots(c: P0Content, s: P0State): number {
   let slots = 1;
   for (const [at, n] of c.cooking.slots) if (level >= at) slots = n;
   return slots;
+}
+
+/** Stove i (0-based): stove 1 is the state's own stove / queue, stoves 2–3 live in s.burners (SGODOT-282). Reading a
+ * stove that has never cooked gives an empty one without touching the state. */
+export function burner(s: P0State, i: number): Burner {
+  if (i === 0) return s as unknown as Burner;
+  return s.burners?.[i - 1] ?? { stove: null, queue: null };
+}
+
+/** The kitchen's stoves in order, as many as the Homestead level gives (§8.3.2). */
+export function burners(c: P0Content, s: P0State): Burner[] {
+  return Array.from({ length: stoveCount(c, s) }, (_, i) => burner(s, i));
+}
+
+/** The stove holding the pot `pot` names (on it or waiting behind it); stove 1 without a name. -1 when none has it. */
+export function burnerOf(c: P0Content, s: P0State, pot: unknown): number {
+  if (pot === undefined || pot === null) return 0;
+  return burners(c, s).findIndex(b => (b.stove?.id ?? null) === pot || (b.queue?.id ?? null) === pot);
+}
+
+/** A stove a new pot may go on: writable from here on (s.burners grows when stove 2 or 3 is first used). */
+function claimBurner(s: P0State, i: number): Burner {
+  if (i === 0) return s as unknown as Burner;
+  s.burners ??= [];
+  while (s.burners.length < i) s.burners.push({ stove: null, queue: null });
+  return s.burners[i - 1];
 }
 
 /** One token of a recipe: a specific id or a family × rarity tag such as W1 ("Any Common fish"). */
@@ -127,12 +154,28 @@ function keptForLater(c: P0Content, s: P0State, recipe: Recipe): (id: string) =>
   return id => ids.has(id) || needs.some(n => itemKind(id) === n.kind && (n.rarity === undefined || (fishById(c, id)?.rarity ?? 0) === n.rarity));
 }
 
-export function startPot(c: P0Content, s: P0State, cmd: { items?: unknown; recipe?: unknown }, now: number, events: P0Event[]): Refusal | null {
-  // Queue ×2 (Cooking Lv5): with a pot on and none waiting, the new pot waits behind it; plates left on the stove block both.
-  const queueing = !!s.stove && !s.stove.left && !s.queue && hasConvenience(c, s, 'queue_two');
-  if (s.stove && !queueing) {
-    return { code: 'stove_busy', detail: { ready_in: Math.max(0, s.stove.started_at + s.stove.ms - now), queued: !!s.queue, left: !!s.stove.left } };
+export function startPot(c: P0Content, s: P0State, cmd: { items?: unknown; recipe?: unknown; stove?: unknown; double?: unknown }, now: number, events: P0Event[]): Refusal | null {
+  // Which stove: the one asked for, else the first empty one, else the first that can queue (Queue ×2, Cooking Lv5);
+  // plates left on a stove block it. One stove (Lv1–3) behaves as before.
+  const count = stoveCount(c, s);
+  const canQueue = (b: Burner) => !!b.stove && !b.stove.left && !b.queue && hasConvenience(c, s, 'queue_two');
+  let at: number;
+  if (cmd.stove !== undefined && cmd.stove !== null) {
+    at = Number(cmd.stove);
+    if (!Number.isInteger(at) || at < 0 || at >= count) return { code: 'bad_stove', detail: { stoves: count } };
+  } else {
+    at = burners(c, s).findIndex(b => !b.stove);
+    if (at < 0) at = Math.max(0, burners(c, s).findIndex(canQueue));
   }
+  const b = burner(s, at);
+  const queueing = canQueue(b);
+  if (b.stove && !queueing) {
+    return { code: 'stove_busy', detail: { stove: at, ready_in: Math.max(0, b.stove.started_at + b.stove.ms - now), queued: !!b.queue, left: !!b.stove.left } };
+  }
+  // Big Pot (Homestead Lv6, §7.7): Double takes every ingredient twice for two portions, one round of heat. Never for
+  // Legendary, and only for a mix that makes a page (a Mystery Dish has no Double).
+  const double = cmd.double === true;
+  if (double && !bigPot(c, s)) return { code: 'locked', detail: { unlock: 'big_pot' } };
   let items: string[];
   // A page the player chose (Cookbook Cook, Cook Again) cooks that page; only free slots go through matchRecipe (q(67)).
   let chosen: Recipe | null = null;
@@ -156,14 +199,20 @@ export function startPot(c: P0Content, s: P0State, cmd: { items?: unknown; recip
     if (!ing) return { code: itemKind(id) === 'fish' && fishById(c, id) ? 'not_for_cooking' : 'not_cookable', detail: { item: id } };
     parts.push(ing);
   }
+  const times = double ? 2 : 1;
+  if (double) {
+    const page = chosen ?? matchRecipe(c, items);
+    if (!page) return { code: 'no_double', detail: { reason: 'unknown' } };
+    if (recipeRarity(c, page) >= 4) return { code: 'no_double', detail: { reason: 'legendary' } };
+  }
   for (const id of new Set(items)) {
-    const need = items.filter(x => x === id).length;
+    const need = items.filter(x => x === id).length * times;
     const have = haveIngredient(c, s, id);
     if (have < need) return { code: 'not_enough', detail: { item: id, need, have } };
   }
   if (parts.every(p => p.family === 'S')) return { code: 'needs_main' };
   for (const id of new Set(items)) {
-    const need = items.filter(x => x === id).length;
+    const need = items.filter(x => x === id).length * times;
     takeIngredient(c, s, id, need, events);
   }
   const recipe = chosen ?? matchRecipe(c, items);
@@ -179,12 +228,41 @@ export function startPot(c: P0Content, s: P0State, cmd: { items?: unknown; recip
   const pot: Pot = {
     dish: recipe?.id ?? c.cooking.mystery.id, rarity, started_at: now, ms, heats,
     xp_pct: xpPercent(c, skillLevel(c, s, 'cooking'), tier.level), mystery: !recipe, items, id: s.fires,
+    ...(double ? { double: true } : {}),
   };
-  if (queueing) s.queue = pot; else s.stove = pot;
+  const put = claimBurner(s, at);
+  if (queueing) put.queue = pot; else put.stove = pot;
   // tried is on every pot: true only for a combination already in Kitchen Mishaps, which the player has seen fail.
   events.push({ kind: 'pot', id: pot.id, dish: recipe && s.cookbook.includes(recipe.id) ? recipe.id : null, rarity, ms,
-    tried: triedBefore(s, items), ...(queueing ? { queued: true } : {}) });
+    tried: triedBefore(s, items), stove: at, ...(queueing ? { queued: true } : {}), ...(double ? { double: true } : {}) });
   return null;
+}
+
+/**
+ * Cook All (Cooking Lv8, §4.6.3 / q(4)): every known page whose ingredients are there, rarest first (Cookbook order
+ * within a rarity), fills the free stoves and then their queues; never Legendary, at most cook_all_per_page pots of a
+ * page. Each pot is an ordinary cook (its own pot event); stops when no stove can take another.
+ */
+export function cookAll(c: P0Content, s: P0State, now: number, events: P0Event[]): Refusal | null {
+  if (!hasConvenience(c, s, 'cook_all')) return { code: 'locked', detail: { convenience: 'cook_all' } };
+  const most = c.cooking.cook_all_per_page ?? 2;
+  const pages = c.cooking.recipes.filter(r => s.cookbook.includes(r.id) && recipeRarity(c, r) < 4)
+    .sort((a, b) => recipeRarity(c, b) - recipeRarity(c, a) || (a.n ?? 99) - (b.n ?? 99));
+  let placed = 0;
+  for (const page of pages) {
+    for (let k = 0; k < most; k++) {
+      if (!ingredientsFor(c, s, page)) break;
+      const scratch: P0Event[] = [];
+      const refusal = startPot(c, s, { recipe: page.id }, now, scratch);
+      if (refusal) {
+        if (refusal.code === 'stove_busy') return placed ? null : refusal;
+        break;
+      }
+      events.push(...scratch);
+      placed += 1;
+    }
+  }
+  return placed ? null : { code: 'nothing_to_cook' };
 }
 
 /** First tap inside each ring's lifetime is judged; gold arc ± tolerance is a hit (§7.2.4). */
@@ -205,23 +283,30 @@ export function heatHits(c: P0Content, heats: Heat[], taps: number[]): number {
  * eating (§7.2.6). Portions with no place stay on the stove as `left` (Bag full · dish left on the stove); the
  * stove can't start a pot until a later collect takes them (Li Bai, 226 comment 250e4ef1). Never to the Inbox. */
 export function collectPot(c: P0Content, s: P0State, cmd: { taps?: unknown; eat?: unknown; pot?: unknown }, now: number, events: P0Event[], max: number): Refusal | null {
-  const pot = s.stove;
+  const at = aimedBurner(c, s, cmd);
+  const b = burner(s, at), pot = b.stove;
   if (!pot) return { code: 'stove_empty' };
   if (!aimsAt(cmd, pot)) return { code: 'stale_pot', detail: { pot: pot.id ?? null } };
   const eat = cmd.eat === true;
   if (eat && s.energy.value >= max && !(pot.mystery && !pot.left && noDish(c, s, pot, now))) return { code: 'energy_full' };
   if (pot.left) {
-    const refusal = collectLeft(c, s, pot, eat, now, events);
-    if (!refusal) startQueued(c, s, now, events);
+    const refusal = collectLeft(c, s, b, pot, eat, now, events);
+    if (!refusal) startQueued(c, s, b, now, events);
     return refusal;
   }
   const left = pot.started_at + pot.ms - now;
   if (left > 0) return { code: 'not_ready', detail: { ready_in: left } };
   // The waiting pot fires when this one was done, as settleStove would have done it, unless it had no place then.
   const onTime = !pot.no_room && potFits(c, s, pot, now);
-  finishPot(c, s, pot, [...(pot.taps ?? []), ...readTaps(cmd.taps)], eat, now, events);
-  startQueued(c, s, onTime ? pot.started_at + pot.ms : now, events);
+  finishPot(c, s, b, pot, [...(pot.taps ?? []), ...readTaps(cmd.taps)], eat, now, events);
+  startQueued(c, s, b, onTime ? pot.started_at + pot.ms : now, events);
   return null;
+}
+
+/** The stove a heat / collect means: the one holding the pot it names (a queued pot names its stove too, and is then
+ * refused as stale_pot), else stove 1. A name no stove has falls back to stove 1, which refuses it as stale. */
+function aimedBurner(c: P0Content, s: P0State, cmd: { pot?: unknown }): number {
+  return Math.max(0, burnerOf(c, s, cmd.pot));
 }
 
 /** heat / collect name their pot (`pot`: the id from the pot event or view.cooking.stove.id); without one, the pot on the stove. */
@@ -242,7 +327,7 @@ function noDish(c: P0Content, s: P0State, pot: Pot, now: number): boolean {
 
 /** Whether the pot, kept automatically, finds a place (a pot that makes no dish always does). */
 function potFits(c: P0Content, s: P0State, pot: Pot, now: number): boolean {
-  return noDish(c, s, pot, now) || dishesFit(c, s, [[dishId(pot.dish, autoQuality(c, pot)), 1]]);
+  return noDish(c, s, pot, now) || dishesFit(c, s, [[dishId(pot.dish, autoQuality(c, pot)), pot.double ? 2 : 1]]);
 }
 
 const readTaps = (taps: unknown): number[] => (Array.isArray(taps) ? taps.slice(0, 20).map(Number).filter(Number.isFinite) : []);
@@ -251,8 +336,8 @@ const readTaps = (taps: unknown): number[] => (Array.isArray(taps) ? taps.slice(
  * Heat taps sent as they happen (SGODOT-232 S5): the first tap per ring is kept on the pot, so a pot that is kept
  * automatically (Queue ×2) is judged on what the player really did. collect may still send taps itself.
  */
-export function recordHeat(s: P0State, cmd: { taps?: unknown; pot?: unknown }): Refusal | null {
-  const pot = s.stove;
+export function recordHeat(c: P0Content, s: P0State, cmd: { taps?: unknown; pot?: unknown }): Refusal | null {
+  const pot = burner(s, aimedBurner(c, s, cmd)).stove;
   if (!pot || pot.left) return { code: 'stove_empty' };
   if (!aimsAt(cmd, pot)) return { code: 'stale_pot', detail: { pot: pot.id ?? null } };
   const taps = readTaps(cmd.taps).filter(t => t >= 0 && t <= pot.ms);
@@ -267,40 +352,50 @@ export function recordHeat(s: P0State, cmd: { taps?: unknown; pot?: unknown }): 
  * room or the player takes it. The view runs this too, so it shows what the next command will find. The reducer runs
  * it before every command (except heat / collect aimed at the pot on the stove, which bring its taps) and again after.
  */
-export function settleStove(c: P0Content, s: P0State, now: number, events: P0Event[]): void {
-  const pot = s.stove, next = s.queue;
+export function settleStove(c: P0Content, s: P0State, now: number, events: P0Event[], skip?: number): void {
+  // Every stove settles on its own (SGODOT-282); skip = the stove a heat / collect brings taps for.
+  burners(c, s).forEach((b, i) => { if (i !== skip) settleBurner(c, s, b, now, events); });
+}
+
+function settleBurner(c: P0Content, s: P0State, b: Burner, now: number, events: P0Event[]): void {
+  const pot = b.stove, next = b.queue;
   if (!pot || !next || pot.left) return;
   const readyAt = pot.started_at + pot.ms;
   if (now < readyAt) return;
   if (!potFits(c, s, pot, now)) { pot.no_room = true; return; }
   const late = !!pot.no_room;
-  finishPot(c, s, pot, pot.taps ?? [], false, now, events, true);
-  startQueued(c, s, late ? now : readyAt, events);
+  finishPot(c, s, b, pot, pot.taps ?? [], false, now, events, true);
+  startQueued(c, s, b, late ? now : readyAt, events);
 }
 
 /** The waiting pot fires once the stove is clear (no pot, no plates left on it), never before it was queued. */
-function startQueued(c: P0Content, s: P0State, at: number, events: P0Event[]): void {
-  if (s.stove || !s.queue) return;
-  const from = Math.max(at, s.queue.started_at);
-  s.stove = { ...s.queue, started_at: from };
-  s.queue = null;
-  events.push({ kind: 'queue', id: s.stove.id, dish: s.cookbook.includes(s.stove.dish) && !s.stove.mystery ? s.stove.dish : null, started_at: from, ms: s.stove.ms });
+function startQueued(c: P0Content, s: P0State, b: Burner, at: number, events: P0Event[]): void {
+  if (b.stove || !b.queue) return;
+  const from = Math.max(at, b.queue.started_at);
+  b.stove = { ...b.queue, started_at: from };
+  b.queue = null;
+  events.push({ kind: 'queue', id: b.stove.id, dish: s.cookbook.includes(b.stove.dish) && !b.stove.mystery ? b.stove.dish : null, started_at: from, ms: b.stove.ms });
 }
 
 /** Judge a done pot and pay it out: portions the Keep way (or eaten), Cookbook, first-time rewards and XP.
  * auto: kept on its own (Queue ×2), so the client shows the Keep toast instead of the COOK-4 card. */
-function finishPot(c: P0Content, s: P0State, pot: Pot, taps: number[], eat: boolean, now: number, events: P0Event[], auto = false): void {
+function finishPot(c: P0Content, s: P0State, b: Burner, pot: Pot, taps: number[], eat: boolean, now: number, events: P0Event[], auto = false): void {
   const hits = pot.mystery ? 0 : heatHits(c, pot.heats, taps);
   const quality = Math.min(hits, 2);
   const main = dishId(pot.dish, quality);
   const extra = quality === 2 ? 1 : 0; // Perfect: a second, Plain portion (§7.2.5)
   const none = noDish(c, s, pot, now);
-  const portions = none ? [] : extra ? [main, pot.dish] : [main];
-  keepOrLeave(c, s, pot, eat ? portions.slice(1) : portions, events);
+  // Big Pot Double: two portions of the judged quality; Perfect's Plain extra comes once (§7.7). Lucky Double
+  // (Cooking Lv10): 10% one more Plain portion, not for Legendary, not with Double (§4.6.3); drawn only from Lv10.
+  const mains = pot.double ? [main, main] : [main];
+  const lucky = !none && !pot.mystery && !pot.double && pot.rarity < 4 && hasConvenience(c, s, 'lucky_double')
+    && draw(s) < (c.cooking.lucky_double ?? 0);
+  const portions = none ? [] : [...mains, ...(extra ? [pot.dish] : []), ...(lucky ? [pot.dish] : [])];
+  keepOrLeave(c, s, b, pot, eat ? portions.slice(1) : portions, events);
   const firstKey = `cook:${pot.dish}`;
   const first = !s.firsts.includes(firstKey);
   if (first) s.firsts.push(firstKey);
-  events.push({ kind: 'dish', pot: pot.id, dish: pot.dish, quality, qty: portions.length, first, mystery: pot.mystery, hits,
+  events.push({ kind: 'dish', pot: pot.id, dish: pot.dish, quality, qty: portions.length, first, mystery: pot.mystery, hits, ...(lucky ? { lucky: true as const } : {}),
     ...(none ? { none: true as const, trial_left: Math.max(0, (trialRefundsLeft(c, s, now) ?? 0) - 1) } : {}), ...(auto ? { auto: true as const } : {}) });
   if (eat && !none) eatMeal(c, s, main, now, events);
   if (pot.mystery) { failedPot(c, s, pot.items ?? [], pot.started_at, now, events); return; }
@@ -313,6 +408,7 @@ function finishPot(c: P0Content, s: P0State, pot: Pot, taps: number[], eat: bool
     const cooked = s.firsts.filter(f => f.startsWith('cook:') && f !== `cook:${c.cooking.mystery.id}`).length;
     for (const [n, energy] of c.rewards.cookbook) if (cooked >= n) grantOnce(c, s, now, `cookbook_${n}`, energy, events);
   }
+  noteMilestones(c, s, events);   // Line Cook / Head Chef / Master Chef / Muscle Memory (§7.6.1)
   const tier = c.cooking.tiers[String(pot.rarity)];
   const before = s.day.cooked[pot.dish] ?? 0;
   s.day.cooked[pot.dish] = before + 1;
@@ -355,23 +451,23 @@ function giveBack(c: P0Content, s: P0State, id: string, key: string, now: number
 }
 
 /** Portions already judged and waiting on the stove: Eat takes the first, the rest go the Keep way again. */
-function collectLeft(c: P0Content, s: P0State, pot: Pot, eat: boolean, now: number, events: P0Event[]): Refusal | null {
+function collectLeft(c: P0Content, s: P0State, b: Burner, pot: Pot, eat: boolean, now: number, events: P0Event[]): Refusal | null {
   const ids = [...pot.left!];
   if (!eat && !ids.some(id => dishesFit(c, s, [[id, 1]]))) return { code: 'bag_full', detail: { cabinet: cabinetCap(c, s) > 0, left: ids.length } };
   const eaten = eat ? ids.shift()! : null;
-  keepOrLeave(c, s, pot, ids, events);
+  keepOrLeave(c, s, b, pot, ids, events);
   if (eaten) eatMeal(c, s, eaten, now, events);
   return null;
 }
 
 /** Keep each portion that has a place; the others stay on the stove (a `plate` event says which). */
-function keepOrLeave(c: P0Content, s: P0State, pot: Pot, ids: string[], events: P0Event[]): void {
+function keepOrLeave(c: P0Content, s: P0State, b: Burner, pot: Pot, ids: string[], events: P0Event[]): void {
   const left: string[] = [];
   for (const id of ids) {
     if (dishesFit(c, s, [[id, 1]])) routeDish(c, s, id, 1, events);
     else left.push(id);
   }
-  s.stove = left.length ? { ...pot, left } : null;
+  b.stove = left.length ? { ...pot, left } : null;
   if (left.length) events.push({ kind: 'plate', ids: left, cabinet: cabinetCap(c, s) > 0 });
 }
 
