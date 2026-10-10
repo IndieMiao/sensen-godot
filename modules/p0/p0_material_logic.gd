@@ -449,6 +449,7 @@ const EFFECTS := {
 	"gather_gloves": "+1 at every gathering spot",
 	"torch": "See what rocks hold",
 	"fert_compost": "Crops ready 20% sooner",
+	"facility_sprinkler": "Waters 8 plots for you",   # P1 FARM-5 v5 (q(59) §5)
 }
 
 ## Cards for one tab ("tools" | "supplies"): icon, name, effect, NEED-TILE costs, Supplies yield/have, one button.
@@ -478,12 +479,23 @@ static func _craft_button(r: Dictionary) -> Dictionary:
 			return {"label": "Equip", "kind": "secondary", "cmd": {"type": "equip", "item": str(r.get("item", ""))}}
 		return {"label": "Owned · always on", "kind": "done", "cmd": {}}   # Gather Gloves (B2-06 GLOVES-DONE)
 	var block = r.get("block", null)
-	if block == null: return {"label": "Craft", "kind": "primary", "cmd": {"type": "craft", "recipe": str(r.get("id", ""))}}
+	# P1 Facilities (SGODOT-241): Build opens placement mode (place_start, handled by the world); the place command is
+	# sent from there, with the plot.
+	var field := str(r.get("to", "")) == "field"
+	if block == null:
+		if field: return {"label": "Build", "kind": "primary", "cmd": {"type": "place_start", "recipe": str(r.get("id", ""))}}
+		return {"label": "Craft", "kind": "primary", "cmd": {"type": "craft", "recipe": str(r.get("id", ""))}}
 	var d: Dictionary = block.get("detail", {})
 	match str(block.get("code", "")):
 		"locked":
 			return {"label": "%s Lv%d" % [str(d.get("skill", "")).capitalize(), int(d.get("level", 1))], "kind": "unavailable", "cmd": {}}
-		"need_material":
+		"skill_level_required":   # q(59) §5: `Farming Lv6 needed`
+			return {"label": "%s Lv%d needed" % [str(d.get("skill", "")).capitalize(), int(d.get("level", 1))], "kind": "unavailable", "cmd": {}}
+		"facility_cap":   # q(59) §5: `Sprinklers 6/6 · Homestead Lv4 adds 1`; with no higher level, only the count
+			var label := "%ss %d/%d" % [str(r.get("name", "")), int(d.get("used", 0)), int(d.get("cap", 0))]
+			if d.get("homestead_next", null) != null: label += " · Homestead Lv%d adds 1" % int(d.homestead_next)
+			return {"label": label, "kind": "unavailable", "cmd": {}}
+		"need_material", "missing_materials":
 			var short := int(d.get("need", 0)) - int(d.get("have", 0))
 			var cost_name := str(d.get("item", ""))
 			for c in r.get("cost", []):
@@ -491,4 +503,4 @@ static func _craft_button(r: Dictionary) -> Dictionary:
 			return {"label": "Need %d more %s" % [short, cost_name], "kind": "unavailable", "cmd": {}}
 		"bag_full":
 			return {"label": "No room · free a slot first", "kind": "unavailable", "cmd": {}}
-	return {"label": "Craft", "kind": "unavailable", "cmd": {}}
+	return {"label": "Build" if field else "Craft", "kind": "unavailable", "cmd": {}}

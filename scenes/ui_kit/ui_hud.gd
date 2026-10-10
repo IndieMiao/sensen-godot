@@ -80,6 +80,7 @@ var _badge: PanelContainer
 var _badge_count: Label
 var _today_chip: _Chip
 var _today_dot: Panel
+var _row2: HBoxContainer
 var _place_chip: _Chip
 var _place_icon: TextureRect
 var _place_city: Label
@@ -159,6 +160,10 @@ func set_show_balances(v: bool) -> void:
 	if _balances == null: return
 	_balances.modulate.a = 1.0 if v else 0.0   # keeps its place, so a docked close button can use balances_rect()
 	_inbox.mouse_filter = Control.MOUSE_FILTER_STOP if v else Control.MOUSE_FILTER_IGNORE
+
+## Placement mode keeps only the first row (P1 q(23), SGODOT-241): Today and the place chip step aside.
+func set_row2_shown(on: bool) -> void:
+	if _row2 != null: _row2.visible = on
 
 func energy_chip_rect() -> Rect2: return _energy_chip.visual_rect()
 func balances_rect() -> Rect2: return _balances.get_global_rect()
@@ -290,6 +295,7 @@ func _build_row2() -> void:
 	row.position = Vector2(-_ROW1_X * 2.0 - overhang, _ROW2_Y - (UiTokens.SIZE_TOUCH - h) * 0.5)
 	row.size = Vector2(UiTokens.SIZE_HUD_W + _ROW1_X * 4.0 + overhang, UiTokens.SIZE_TOUCH)
 	_frame.add_child(row)
+	_row2 = row
 	_today_chip = _Chip.new(UiTokens.RADIUS_HUD_CHIP, h, UiTokens.SIZE_TODAY_ICON_W)
 	_today_chip.custom_minimum_size = Vector2(UiTokens.SIZE_TOUCH, UiTokens.SIZE_TOUCH)
 	_today_chip.pressed.connect(func(): today_pressed.emit())

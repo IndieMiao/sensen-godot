@@ -2,7 +2,7 @@ class_name P0WorkbenchDrawer
 extends UiDrawer
 ## The workbench drawer (SGODOT-231, B2-06 seven states; page 14 row 45, frames 1434:126236 …): a 630 Sheet with
 ## `Workbench`, `Uses Farm Storage first, then your bag`, a Tools | Supplies switch (P0 has no Facilities tab,
-## q(31)) and one BlueprintCard per recipe. Everything shown comes from P0MaterialLogic.workbench_model over the
+## q(31); P1 adds it when the view lists it, SGODOT-241) and one BlueprintCard per recipe. Everything shown comes from P0MaterialLogic.workbench_model over the
 ## server view; the drawer only reports back:
 ##   command_requested(cmd)            Craft / Equip
 ##   unavailable_requested(reason)     a grey button (LOCK-10: Need 1 more Copper Ore, No room · free a slot first …)
@@ -19,7 +19,8 @@ signal source_requested(tile: Control, item_id: String)
 signal tab_changed(tab: String)
 
 const HEIGHT := 630.0         # B2-06: the Sheet's top at y 170 of 800
-const TABS := ["tools", "supplies"]
+const TABS := ["tools", "supplies", "facilities"]   # Facilities from P1 (SGODOT-241), shown when the view lists it
+const _TAB_LABELS := {"tools": "Tools", "supplies": "Supplies", "facilities": "Facilities"}
 const _GAP := 10              # Workbench content: gap 10
 const _TITLE_SIZE := 22       # title 22 ExtraBold: Title XB20 one step up (UiTokens.PENDING "blueprintCard", as P0HomePanel._big)
 const _KINDS := {"primary": UiBlueprintCard.Kind.PRIMARY, "secondary": UiBlueprintCard.Kind.SECONDARY}
@@ -27,6 +28,7 @@ const _KINDS := {"primary": UiBlueprintCard.Kind.PRIMARY, "secondary": UiBluepri
 var view := {}
 var tab := "tools"
 var _tabs: UiSegmentTab
+var _shown_tabs: Array = []   # the view's workbench.tabs this drawer knows (P0 servers: Tools | Supplies)
 var sheet: UiInfoSheet
 var _scroll: TouchScrollContainer
 var _list: VBoxContainer
@@ -42,10 +44,12 @@ func _init(view_: Dictionary = {}, tab_ := "tools") -> void:
 	title.add_theme_font_size_override(&"font_size", _TITLE_SIZE)
 	body.add_child(title)
 	body.add_child(UiKit.label("Uses Farm Storage first, then your bag", UiTokens.STYLE_C13_B, UiTokens.COLOR_SECONDARY))
-	tab = tab_ if tab_ in TABS else "tools"
-	_tabs = UiSegmentTab.new([{label = "Tools"}, {label = "Supplies"}], TABS.find(tab))
+	_shown_tabs = (view_.get("workbench", {}).get("tabs", ["tools", "supplies"]) as Array).filter(func(t): return t in TABS)
+	if _shown_tabs.is_empty(): _shown_tabs = ["tools", "supplies"]
+	tab = tab_ if tab_ in _shown_tabs else "tools"
+	_tabs = UiSegmentTab.new(_shown_tabs.map(func(t): return {label = _TAB_LABELS[t]}), _shown_tabs.find(tab))
 	_tabs.changed.connect(func(i: int):
-		tab = TABS[i]
+		tab = _shown_tabs[i]
 		sheet.close()
 		_key = 0
 		refresh(view)

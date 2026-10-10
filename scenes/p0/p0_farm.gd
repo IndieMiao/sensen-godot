@@ -49,6 +49,7 @@ var _stall := Vector3.ZERO   # the Homestead Stall (unattended, p(6)); the seed 
 var _mine := Vector3.ZERO
 var _bench := Vector3.ZERO   # the rest bench by the farmhouse (FARM-7, q(30)): Basic Room's bench.glb
 var _materials: P0FarmMaterials   # SGODOT-231: mine mouth, gathering spots and the workbench
+var _facilities: P0FarmFacilities   # P1 SGODOT-241: sprinklers, placement mode, Coverage
 var _card := ""   # LOCK-07 v2: the one facility whose name strip is open this frame (P0Garden.pick_card)
 var _strip_side := UiWorldNameBar.Dir.RIGHT   # the side the strip opens to: the way the character faces on screen
 var _focus := Vector3.ZERO
@@ -384,6 +385,11 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 	rt.ui.player_screen = cam.unproject_position(actor.position + Vector3(0, 0.9, 0))   # the radial fans out from here
 	_sync_plots(v, dt)
 	_fence.sync(v)
+	if _facilities == null and bp != null and cam != null and actor != null:
+		_facilities = P0FarmFacilities.new().setup(self)
+		add_child(_facilities)
+	_facilities.frame(v)
+	if not _facilities.placing.is_empty(): return   # placement mode: no bed, key, card or prompt (q(23))
 	_pick_front(v)
 	# The key is Farming here even at the mine mouth: the mouth is tapped like any facility (SGODOT-266, user on 263 ③).
 	rt.ui.set_action(P0Logic.main_action(v, _front, rt.ui.selected_seed, _row))
@@ -424,7 +430,10 @@ func _pick_front(v: Dictionary) -> void:
 	var best := -1
 	var best_score := -INF
 	var f := actor.facing()
+	var taken := {}   # P1: a plot with a facility is no bed to work (the key shows no farming verb there)
+	for p in v.get("plots", []): if p.get("facility", null) != null: taken[int(p.id)] = true
 	for id in P0Garden.plot_count(v):
+		if taken.has(id): continue
 		var c := bp.cell_to_world(P0Garden.cell_of(id))
 		var to := Vector2(c.x - actor.position.x, c.z - actor.position.z)
 		var dist := to.length()
@@ -499,6 +508,7 @@ func p0_tap(screen: Vector2) -> void:
 	if card == "" and _materials.tap_entry(screen): return
 	if card != "": _materials.close_card()
 	if _tap_card(card): return
+	if _facilities != null and _facilities.tap(screen): return   # P1: a sprinkler's status card (SGODOT-241)
 	if _sign_hit(screen):
 		actor.face(_sign)
 		HomePanel.open(rt.ui)
@@ -673,6 +683,15 @@ func p0_dev(step: PackedStringArray) -> bool:
 			var e: UiEntryCard = _materials._entry if _materials.card_open() else null
 			if e != null: p0_tap((e.main_rect() if step[0] == "cardtap" else e.second_rect()).get_center() - rt.ui.root.global_position)
 		"zoomto": _zoom = clampf(float(step[1]), 0.8, 1.4)   # zoomto:0.8 (widest) … 1.4 (closest)
+		# P1 placement (SGODOT-241): build:<recipe> opens it as the Facilities card's Build does; placeat:<plot> moves
+		# the preview as a finger on that bed would; placeok / placecancel press the bar; factap:<id> taps a sprinkler.
+		"build": _facilities.begin_build(step[1] if step.size() > 1 else "craft_sprinkler")
+		"placeat": rt.ui.placement_point.emit(cam.unproject_position(bp.cell_to_world(P0Garden.cell_of(int(step[1]))) + Vector3(0, P0Garden.BED_H, 0)), "drag")
+		"placeok": rt.ui.placement_done.emit(true)
+		"placecancel": rt.ui.placement_done.emit(false)
+		"factap":
+			for f in rt.session.current().get("facilities", []):
+				if int(f.get("id", 0)) == int(step[1]): _facilities.open_card(f)
 		"near":   # near:<id> — stand 1.2 m in front of a facility, so its name strip opens (250 review shots)
 			for c in _card_candidates():
 				if str(c[0]) == step[1]:
