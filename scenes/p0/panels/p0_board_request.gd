@@ -2,7 +2,7 @@ class_name P0BoardRequest
 extends RefCounted
 ## One board request's sheet (SGODOT-224; 不知火舞 on 224): opened from a board row's title ›.
 ##   BOARD-1 482:284        ObjectHeader (title · Open / Tracked / Ready to deliver · what to bring where), NeedTiles,
-##                          Reward, the other slot's wait (Next request · Second board slot · Available in 72h),
+##                          Delivery, the other slot's wait (Next request · Second board slot · Available in 72h),
 ##                          Show / Show on map (where the items come from), Drop request › (tracked only: an open
 ##                          request swaps itself after 72 h), Details › (the item), Back to the list.
 ##   BOARD-3 482:288        Drop request: what dropping does, Next request after drop 8h, Details ›, your items stay
@@ -35,7 +35,7 @@ static func open(ui: P0Ui, role: String, id: String) -> void:
 		tile.pressed.connect(func(): ui._show_need_source(tile, item))
 		tiles.append(tile)
 	if not tiles.is_empty(): col.add_child(UiNeedTile.group(tiles))
-	col.add_child(UiFactRow.new("Reward", str(d.delivery)))   # the frames' word, as the list card's (不知火舞 on #285)
+	col.add_child(UiFactRow.new("Delivery", str(d.delivery)))   # the sheet's word (BOARD-1, TUT-3); the list card's is Reward
 	if not (d.next as Dictionary).is_empty():
 		col.add_child(UiItemRow.new({icon = P0Logic.icon("clock"), title = "Next request", effect = str(d.next.slot)}))
 		col.add_child(UiFactRow.new("Available in", str(d.next.within)))
