@@ -398,7 +398,7 @@ static func sow_count(view: Dictionary) -> int:
 	return 1
 
 ## The plots a Row Hoe sows from the bed in front: that bed, then tilled beds next to it in the same row, the
-## walking direction first (dir +1 / −1 along the row), up to sow_count. Plot ids run row by row, `columns` a row.
+## walking direction first (dir +1 / −1 along the row), up to sow_count, along the garden grid's row (P0Garden).
 static func row_plots(view: Dictionary, front: Dictionary, columns: int, dir: int) -> Array:
 	var out: Array = []
 	if front.is_empty() or str(front.get("state", "")) != "tilled": return out
@@ -406,13 +406,16 @@ static func row_plots(view: Dictionary, front: Dictionary, columns: int, dir: in
 	var most := sow_count(view)
 	var by_id := {}
 	for p in view.get("plots", []): by_id[int(p.get("id", -1))] = p
-	var id := int(front.get("id", -1))
-	var row := id / columns
+	# Along the row on the garden grid (P1: plots 30–39 continue P0's rows on the right, so plot 5's neighbour is 30, not
+	# 6 — T15, a Row Hoe sow across the old and new plots). `columns` is P0's row length, kept for callers.
+	var at := P0Garden.grid_of(int(front.get("id", -1)))
 	for side in [dir if dir != 0 else 1, -(dir if dir != 0 else 1)]:
-		var next: int = id + side
-		while out.size() < most and next >= 0 and next / columns == row and by_id.has(next) and str(by_id[next].get("state", "")) == "tilled":
+		var g := at + Vector2i(side, 0)
+		var next := P0Garden.id_of(P0Garden.PLOT_ORIGIN + g * 2)
+		while out.size() < most and next >= 0 and by_id.has(next) and str(by_id[next].get("state", "")) == "tilled":
 			out.append(by_id[next])
-			next += side
+			g += Vector2i(side, 0)
+			next = P0Garden.id_of(P0Garden.PLOT_ORIGIN + g * 2)
 	return out
 
 ## Main action button for the plot in front of the player (Farming).

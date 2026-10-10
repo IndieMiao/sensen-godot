@@ -30,6 +30,16 @@ func test_row_hoe_sows_three_plots_of_the_row_walking_way_first() -> void:
 	assert_array(P0Logic.row_plots(v, _plot(v, 5), 6, 1).map(func(p): return int(p.id))).is_equal([5, 4, 3])
 	assert_array(P0Logic.row_plots(v, _plot(v, 4), 6, -1).map(func(p): return int(p.id))).is_equal([4, 3, 2])
 
+## P1 (q(59) T15): with 40 plots the rows run on into plots 30–39 on the right (plot 5 → 30 → 31), and never past them.
+func test_row_hoe_crosses_into_the_new_columns_without_running_off_the_row() -> void:
+	var v := _view()
+	for id in [30, 31, 32]: v.plots.append({"id": id, "state": "tilled"})
+	assert_array(P0Logic.row_plots(v, _plot(v, 4), 6, 1).map(func(p): return int(p.id))).is_equal([4, 5, 30])
+	assert_array(P0Logic.row_plots(v, _plot(v, 31), 6, 1).map(func(p): return int(p.id))).is_equal([31, 30, 5])
+	assert_array(P0Logic.row_plots(v, _plot(v, 30), 6, -1).map(func(p): return int(p.id))).is_equal([30, 5, 4])
+	# row 1 ends at 11 before the new plots: 32 is its neighbour, not 12
+	assert_array(P0Logic.row_plots(v, _plot(v, 11), 6, 1).map(func(p): return int(p.id))).is_equal([11, 32, 10])
+
 func test_row_hoe_skips_plots_that_are_not_tilled_and_trims_to_seeds_and_energy() -> void:
 	var v := _view()
 	_plot(v, 2).state = "sown"
