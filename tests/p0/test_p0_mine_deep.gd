@@ -181,3 +181,46 @@ func Layout_bp() -> FarmBlueprint:
 	var nodes: Array = []
 	for i in L.FALLBACK_POSITIONS.size(): nodes.append({"id": str(i), "position": L.FALLBACK_POSITIONS[i]})
 	return L._navigation(nodes, nodes.map(func(n): return n.id))
+
+# ---- a slime's hit never sticks (苏烈 on #223)
+
+## The hit command's end — ok with no hurt event (the server's 1 s window), refused, or a failed request — frees the
+## next hit; another command's end does not. A reply that never comes frees it after HURT_STALE_MS.
+func test_a_quiet_reply_still_frees_the_next_hit() -> void:
+	var P0Mine = load("res://scenes/p0/p0_mine.gd")
+	var mine = auto_free(P0Mine.new())
+	for end in [[true, ""], [false, "tempo"], [false, "network"]]:
+		mine._hurt_pending = true
+		mine._on_settled("{\"type\":\"mine_rock\"}", end[0], end[1])
+		assert_bool(mine._hurt_pending).is_true()
+		mine._on_settled(P0Mine.HURT_KEY, end[0], end[1])
+		assert_bool(mine._hurt_pending).is_false()
+
+func test_a_hit_with_no_reply_at_all_is_freed_after_the_stale_time() -> void:
+	var rt: P0Runtime = auto_free(P0Runtime.new())
+	add_child(rt)
+	await get_tree().process_frame
+	var P0Mine = load("res://scenes/p0/p0_mine.gd")
+	var mine = auto_free(P0Mine.new())   # not in the tree: only its contact
+	mine.rt = rt
+	rt.session.busy = true   # nothing is sent: only the pending flag is under test
+	mine._hurt_pending = true
+	mine._hurt_sent_ms = Time.get_ticks_msec() - 1000
+	mine._on_contact("slime_1")
+	assert_bool(mine._hurt_pending).is_true()
+	mine._hurt_sent_ms = Time.get_ticks_msec() - P0Mine.HURT_STALE_MS - 1
+	mine._on_contact("slime_1")
+	assert_bool(mine._hurt_pending).is_false()
+	rt.session.busy = false
+
+## The swing waits a little past the server's tempo (0.5 s for speed 2), so jitter never has a shown swing refused.
+func test_the_swing_waits_past_the_servers_tempo() -> void:
+	var Combat = load("res://modules/mining/p0_mine_combat.gd")
+	var bp := Layout_bp()
+	var mover := PlayerMover.new(bp, BlueprintGrid.new(bp))
+	var c: Node3D = auto_free(Combat.new())
+	add_child(c)
+	var v := _view(_run(_five([true, true, true, true, true])))
+	v.mine["weapon"] = {"attack": 3, "speed": 2.0}
+	c.sync_p0(v, 4, mover)
+	assert_float(1.0 / float(c.weapon({}).speed)).is_equal_approx(0.5 + Combat.TEMPO_MARGIN_S, 0.0001)

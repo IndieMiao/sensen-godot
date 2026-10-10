@@ -32,6 +32,11 @@ var objects: Node3D
 var backdrop: Node3D   # the underground backdrop (SGODOT-257), outside scenery / objects
 var combat: Node3D     # Combat (p0_mine_combat.gd): this floor's slimes, their moves and the swing (SGODOT-288)
 var _hurt_pending := false   # a hit sent, its reply not yet in: the next hit waits (the server's 1 s window)
+var _hurt_sent_ms := 0
+## The slime-hit command's key: its settle (ok with or without a hurt event, refused, or a failed request) frees the next
+## hit, so one quiet reply can never leave the player unhittable for the rest of the visit (苏烈 on #223).
+const HURT_KEY := "mine_hurt"
+const HURT_STALE_MS := 4000   # and a reply that never comes at all frees it after this
 var _completing := false     # Run complete: the banner, then out to the mouth
 var _rocks := {}            # rock index → Node3D (gone once broken)
 var _previews := {}         # rock index → Sprite3D torch preview
@@ -87,6 +92,7 @@ func _ready() -> void:
 	rt.ui.actions_here = P0MaterialLogic.mine_actions(floor_n)
 	rt.ui.set_place(PLACE % floor_n)
 	rt.session.state_changed.connect(_on_state)
+	rt.session.command_settled.connect(_on_settled)
 
 func _exit_tree() -> void:
 	if is_instance_valid(_entry): _entry.queue_free()
@@ -94,6 +100,7 @@ func _exit_tree() -> void:
 		rt.ui.actions_here = []
 		rt.ui.set_hp(-1, 0)
 		if rt.session.state_changed.is_connected(_on_state): rt.session.state_changed.disconnect(_on_state)
+		if rt.session.command_settled.is_connected(_on_settled): rt.session.command_settled.disconnect(_on_settled)
 		rt.detach(self)
 
 func p0_surface() -> String: return "mine"
@@ -320,9 +327,15 @@ func _fight(v: Dictionary, dt: float) -> void:
 
 ## A slime's leap reached the player (MineCombat.contact): the server settles the hit (the 1 s window there too).
 func _on_contact(id: String) -> void:
+	if _hurt_pending and Time.get_ticks_msec() - _hurt_sent_ms > HURT_STALE_MS: _hurt_pending = false
 	if _hurt_pending or _completing or rt.session.busy: return
+	if not rt.session.send({"type": "mine_attack", "floor": floor_n, "hurt_by": Combat.mob_index(id)}, HURT_KEY): return
 	_hurt_pending = true
-	rt.session.send({"type": "mine_attack", "floor": floor_n, "hurt_by": Combat.mob_index(id)})
+	_hurt_sent_ms = Time.get_ticks_msec()
+
+## Any end of the hit command frees the next one (see HURT_KEY).
+func _on_settled(key: String, _ok: bool, _code: String) -> void:
+	if key == HURT_KEY: _hurt_pending = false
 
 ## Attack (Combat's key): one swing — the arc, the stun and the knockback here; the server settles who was hit.
 func _swing() -> void:

@@ -11,6 +11,9 @@ const KINDS := {"mob_slime": "slime", "mob_elite_slime": "elite_slime"}
 ## old shortsword's, as the mine has always felt (assets/farm/data/items.json rusty_sword).
 const REACH := 1.65
 const KNOCKBACK := 0.7
+## The swing waits this much longer than the server's tempo (1 / speed), as the rock beat does (0.95 s for 0.9 s), so a
+## little network jitter never has the server refuse a swing the client already showed (苏烈 on #223).
+const TEMPO_MARGIN_S := 0.05
 
 var _weapon := {"damage": 3, "speed": 2.0, "range": REACH, "knockback": KNOCKBACK}
 
@@ -23,7 +26,8 @@ func weapon(_state: Dictionary) -> Dictionary:
 func sync_p0(view: Dictionary, n: int, player_mover: PlayerMover) -> void:
 	var mine: Dictionary = view.get("mine", {})
 	var w: Dictionary = mine.get("weapon", {})
-	_weapon = {"damage": int(w.get("attack", 3)), "speed": float(w.get("speed", 2.0)), "range": REACH, "knockback": KNOCKBACK}
+	var speed := 1.0 / (1.0 / maxf(0.1, float(w.get("speed", 2.0))) + TEMPO_MARGIN_S)
+	_weapon = {"damage": int(w.get("attack", 3)), "speed": speed, "range": REACH, "knockback": KNOCKBACK}
 	var run = mine.get("run", null)
 	var floor := {}
 	if run is Dictionary:
