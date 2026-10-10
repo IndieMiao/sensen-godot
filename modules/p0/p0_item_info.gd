@@ -322,9 +322,10 @@ static func tokens(view: Dictionary, item_id: String, context: StringName, opts 
 		take_some = "Take %d" % _TAKE_SOME,
 		homestead_gate = ("Homestead Lv%d needed" % int(offer.homestead)) if offer.get("homestead", null) != null else "",
 		xp_hint = "",
+		fert_use = fert_use(item_id) if kind == "fert" else "",   # the bag card's line 1 (NPC-2)
 		# A buy row's line 2 (FARM-6 482:46): what the item does, in a few words.
 		use = {"seed": _seed_use(crop), "bait": "Bites come faster",
-			"fert": "Grows faster"}.get(kind, _offer_use(view, offer)),
+			"fert": fert_use(item_id)}.get(kind, _offer_use(view, offer)),
 		region_line = "",
 		pin_verb = "Unpin" if opts.get("pinned", false) else "Pin",
 		dex = _dex(view),
@@ -447,6 +448,14 @@ static func _new_offer(item_id: String, opts: Dictionary) -> bool:
 
 ## A seed row's line 2: how long it takes on this farm. A regional crop away from its climate zone ripens ×1.5 there
 ## (the view's grow_h is already that time) and says so (§5.2.3, glossary off_zone_penalty `not native`).
+## What a fertiliser does, the words of Figma NPC-2 (不知火舞): Compost `Crops ready 20% sooner` (q(46)), Orchard Feed
+## `Next regrow time −50%` — no hours: trees regrow at their own pace and the card does not know which one it feeds.
+static func fert_use(item_id: String) -> String:
+	var g: Dictionary = P0Logic.content().get("goods", {}).get(item_id, {})
+	if g.has("regrow_mult"): return "Next regrow time −%d%%" % roundi((1.0 - float(g.regrow_mult)) * 100.0)
+	if g.has("grow_mult"): return "Crops ready %d%% sooner" % roundi((1.0 - float(g.grow_mult)) * 100.0)
+	return "Grows faster"
+
 static func _seed_use(crop: Dictionary) -> String:
 	if not crop.has("grow_h"): return ""
 	var line := "Ready in " + hours(float(crop.grow_h))

@@ -538,6 +538,7 @@
   },
   "fert/bag": {
     "facts": [
+      "{fert_use}",
       "{count}"
     ],
     "buttons": [

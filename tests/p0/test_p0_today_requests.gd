@@ -50,7 +50,7 @@ func test_a_request_ready_to_hand_in_leads() -> void:
 	v["plots"] = [{"state": "sown", "crop": "crop_radish"}]
 	var rows := P0Logic.today_rows(v)
 	assert_that([rows[0].line, rows[0].go]).is_equal(["An Old Man's Catch · Deliver to Old Kai", "outpost:tackle"])
-	assert_str(rows[1].line).is_equal("Water 1 sown plot · Free")
+	assert_str(rows[1].line).is_equal("Water 1 sown plot")
 
 ## The Market Board's taken requests too (a rarity: `Fine fish`), handed in at the market square; the Stall Board's at
 ## the stall; untaken ones are not in Today.
@@ -74,7 +74,7 @@ func test_a_short_request_follows_the_now_rows_and_precedes_the_countdowns() -> 
 	v.residents["res_pip"] = {"request": {"id": "req_res_pip_2", "kind": "sow", "have": 3, "qty": 5, "ready": false}, "request_state": "accepted"}
 	v.residents.erase("res_old_kai")
 	v["plots"] = [{"state": "sown", "crop": "crop_radish"}, {"state": "growing", "crop": "crop_radish", "ready_in": 3600000}]
-	assert_array(_lines(v)).is_equal(["Water 1 sown plot · Free", "Five Little Plots · Plots 3/5", "Radishes ready in 1h"])
+	assert_array(_lines(v)).is_equal(["Water 1 sown plot", "Five Little Plots · Plots 3/5", "Radishes ready in 1h"])
 
 ## The first session shows its tutorial request alone (the guide's own row).
 func test_the_first_session_keeps_its_tutorial_request_alone() -> void:
