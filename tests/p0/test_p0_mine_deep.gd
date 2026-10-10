@@ -431,7 +431,7 @@ func test_the_slashes_alternate_and_start_again_after_a_pause() -> void:
 	press.call(0.9)    # paused: the chop again
 	press.call(0.53)
 	assert_array(played).is_equal(["attack_slash", "attack_slash_b", "attack_slash", "attack_slash", "attack_slash_b"])
-	assert_float(mine.combat.fx_delay).is_equal(0.30)   # the sweep's peak
+	assert_float(mine.combat.fx_delay).is_equal_approx(0.27, 0.0001)   # the sweep's peak (0.30 s), the arc 0.03 s early
 	# within the tempo nothing swings and no clip starts
 	mine.combat.cooldown = 0.2
 	var before: int = mine._slash
@@ -450,7 +450,10 @@ func test_the_sword_is_in_hand_from_the_peak_to_the_end_of_the_slash() -> void:
 	mine._hold_sword("sword_wooden")
 	assert_bool(mine.actor.attacking()).is_true()
 	assert_bool(mine.sword_shown()).is_false()          # the wind-up: not yet
-	mine._slash_t = 0.25                                # past attack_slash's peak (0.22 s)
+	mine._slash_t = 0.17                                # just before its strike (0.22 − 0.03 s)
+	mine._hold_sword("sword_wooden")
+	assert_bool(mine.sword_shown()).is_false()
+	mine._slash_t = 0.20                                # its strike
 	mine._hold_sword("sword_wooden")
 	assert_bool(mine.sword_shown()).is_true()
 	var sk: Skeleton3D = mine.actor.rig.skeleton
