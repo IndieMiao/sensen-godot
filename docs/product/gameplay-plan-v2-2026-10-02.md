@@ -8033,7 +8033,7 @@ flowchart LR
 |---|---|
 | 作物 | 剩余 12 种（卷心菜、玉米、黄瓜、草莓、甜瓜、4 种地区作物、苹果树、柑橘树、葡萄藤）；果木肥；洒水器、堆肥箱、温室（可免费移动、不可拆除，q(22)）；Plot Marks（q(44) 移出 P0）、Sow Again、Coverage Overlay、Harvest All（按「不做一键执行」定形态，q(23)）、Seed Saver；多年生槽位 |
 | 钓鱼 | 剩余 12 种（鲇鱼、海鲈、银鲟、河鳗 + 8 种地区鱼）；Coast 模板；碳素竿；亮片；鱼笼 1 → 3；时段 / 天气加成与 3-day Forecast；渔情板；Fish-dex 里程碑与路标 |
-| 料理 | 剩余 34 页（含 8 页 Legendary、6 道地区菜、Travel Biscuits；Buff 效果留 P3，页上先显示 "Buff · coming later"）；配方卡（驿站每日 2 张、Market 地区卡）；居民教学；大锅、第三口灶、名厨招牌；Cooking Lv7–10 便利（Steady Hand II、Fast Mastery、Cook All、Bigger Provisions、Chef's Touch、Lucky Double、称号 Chef；Lv5 的 Steady Hand I、Queue ×2 已在 P0；Lv6 Quick Fire 是 P0 末位，P0 砍掉时随 P1（q(38)、q(47)））；Cookbook 里程碑四级；Gift Clues |
+| 料理 | 剩余 34 页（含 8 页 Legendary、7 道地区菜（#13、#14、#36、#45–48，按 §7.13 第 12 条；2026-10-10 用户确认，原写 6 道）、Travel Biscuits；Buff 效果留 P3，页上先显示 "Buff · coming later"）；配方卡（驿站每日 2 张、Market 地区卡）；居民教学；大锅、第三口灶、名厨招牌；Cooking Lv7–10 便利（Steady Hand II、Fast Mastery、Cook All、Bigger Provisions、Chef's Touch、Lucky Double、称号 Chef；Lv5 的 Steady Hand I、Queue ×2 已在 P0；Lv6 Quick Fire 是 P0 末位，P0 砍掉时随 P1（q(38)、q(47)））；Cookbook 里程碑四级；Gift Clues |
 | Homestead | Lv4–10 全表；外观四次换装（含 Lv3 篱笆与信箱的 a / b 两套与二选一卡）；布置模式 Decorate（与设施放置模式共用一个壳，入口在农舍门牌或 HOME-1，q(24)）；布告栏；扩容 II / III；特产换料入口 |
 | NPC 与经济 | 据点按城市簇六档全球生成、每岗位一处（茶馆 = 档数 1–6、渔具铺跟鱼塘、集市广场 1–3、驿站 1–2，与建成区面积档取大；S 档与荒野 0.5° 格每格 1 间小木屋；集市广场 1 距新手塘 ≤ 800 m、同类据点两两 ≥ 3 km、落点可参考 POI 密度）；掌柜 5 岗位 × 4 气候带 × 3 变体；日额度按账号或账号 × 城市簇共享）；Travel Post 柜台（费用预览与护照服务先做为只读）；真实 POI 名片层与紫 ★ 运营接口；其余 10 个角色 NPC 按顺位安置到据点（按职业）、住址规则、好感五阶段、个人委托 3–6 条 / 角色；委托模板 30 条；系统委托每日 6 份与完成奖日上限；金币去向表全部项目；茶桌共做委托（按 q(2) 归 P1，q(31)） |
 | 材料 | 石英、硬木；矿洞 3–5 层、史莱姆与精英（第 5 层精英每日只掉一次石英）、电梯（本局 0 体力 + 清过第 4 层后 Express 直达第 5 层 0 体力）；特产换料 2 : 1 |
