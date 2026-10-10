@@ -672,15 +672,25 @@
       "hearty_mishap": 3,
       "steady_hand_1": 5,
       "queue_two": 5,
-      "quick_fire": 6
+      "quick_fire": 6,
+      "steady_hand_2": 7,
+      "fast_mastery": 7,
+      "cook_all": 8,
+      "provisions_plus": 8,
+      "chefs_touch": 9,
+      "title_chef": 10,
+      "lucky_double": 10
     },
     "gold_cap": 0.6,
     "steady_hand_gold": 0.05,
     "mastered": {
       "cooked": 10,
-      "gold": 0.1
+      "gold": 0.1,
+      "fast": 7
     },
     "quick_fire": 0.8,
+    "lucky_double": 0.1,
+    "cook_all_per_page": 2,
     "trial_refunds": 10,
     "recipes": [
       {

@@ -12,7 +12,13 @@ import type { P0State } from './state.js';
 export type PageState = 'hidden' | 'clued' | 'tasted' | 'discovered' | 'mastered';
 
 export function hasConvenience(c: P0Content, s: P0State, id: Convenience): boolean {
-  return skillLevel(c, s, 'cooking') >= c.cooking.conveniences[id];
+  const at = c.cooking.conveniences[id];
+  return at !== undefined && skillLevel(c, s, 'cooking') >= at;
+}
+
+/** Pots a page needs to be Mastered: 10, or 7 with Fast Mastery (Cooking Lv7, §4.6.3). */
+export function masteredAt(c: P0Content, s: P0State): number {
+  return hasConvenience(c, s, 'fast_mastery') ? (c.cooking.mastered.fast ?? c.cooking.mastered.cooked) : c.cooking.mastered.cooked;
 }
 
 export function conveniences(c: P0Content, s: P0State): Convenience[] {
@@ -21,7 +27,7 @@ export function conveniences(c: P0Content, s: P0State): Convenience[] {
 
 /** §7.5.1: Discovered once cooked (Mastered at 10 pots); Tasted when known but never cooked; Clued with a clue. */
 export function pageState(c: P0Content, s: P0State, id: string): PageState {
-  if (s.firsts.includes(`cook:${id}`)) return (s.book.cooked[id] ?? 0) >= c.cooking.mastered.cooked ? 'mastered' : 'discovered';
+  if (s.firsts.includes(`cook:${id}`)) return (s.book.cooked[id] ?? 0) >= masteredAt(c, s) ? 'mastered' : 'discovered';
   if (s.cookbook.includes(id)) return 'tasted';
   return (s.book.clues[id] ?? []).length > 0 ? 'clued' : 'hidden';
 }
@@ -95,6 +101,7 @@ export function mightHave(c: P0Content, r: Recipe, stock: Map<string, number>): 
 export function goldWidth(c: P0Content, s: P0State, page: string | null, base: number): number {
   let width = base;
   if (hasConvenience(c, s, 'steady_hand_1')) width += c.cooking.steady_hand_gold;
+  if (hasConvenience(c, s, 'steady_hand_2')) width += c.cooking.steady_hand_gold;   // Lv7: another +5, same cap
   if (page && pageState(c, s, page) === 'mastered') width += c.cooking.mastered.gold;
   // Chef's Sign (Homestead Lv10, §7.7): +5 points on every dish, on top of the cap the skills reach.
   return Math.min(c.cooking.gold_cap + chefSignGold(c, s), Math.round((width + chefSignGold(c, s)) * 1000) / 1000);

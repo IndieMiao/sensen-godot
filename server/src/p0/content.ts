@@ -33,7 +33,9 @@ export interface CookTier {
  * recipe card, experiment, card = a stall recipe card, market = a Market card, taught = a resident, buy = bought. */
 export type Learn = 'start' | 'gift' | 'experiment' | 'card' | 'market' | 'taught' | 'buy';
 /** Cooking conveniences in P0 (§4.6.3, q(38)). */
-export type Convenience = 'cook_again' | 'clue_double' | 'hearty_mishap' | 'steady_hand_1' | 'queue_two' | 'quick_fire';
+export type Convenience = 'cook_again' | 'clue_double' | 'hearty_mishap' | 'steady_hand_1' | 'queue_two' | 'quick_fire'
+  // P1 (SGODOT-282, §4.6.3 Lv7–10)
+  | 'steady_hand_2' | 'fast_mastery' | 'cook_all' | 'provisions_plus' | 'chefs_touch' | 'title_chef' | 'lucky_double';
 /** A P0 Cookbook page that can be cooked (§7.14.0); n = its page number in the 48-page Cookbook. */
 export interface Recipe { n?: number; id: string; name: string; in: string[]; known?: boolean; style?: string; learn?: Learn[] }
 /** A page outside P0 (§7.14.1–7.14.4): only its silhouette shows, slots = the family of each slot. */
@@ -175,9 +177,11 @@ export interface P0Content {
     derive: number[][];
     mystery: { id: string; name: string; energy: number; hearty: number };   // hearty: from Cooking Lv3 (Hearty Mishap)
     food_cap: number;
-    conveniences: Record<Convenience, number>;   // the Cooking level each P0 convenience comes at (q(38))
+    conveniences: Partial<Record<Convenience, number>>;   // the Cooking level each convenience comes at (q(38)); absent = not in this build
     gold_cap: number; steady_hand_gold: number;  // gold arc share: bonuses stop at gold_cap; Steady Hand I adds steady_hand_gold
-    mastered: { cooked: number; gold: number };  // a page cooked this often is Mastered and its gold arc is wider (§7.5.1)
+    mastered: { cooked: number; gold: number; fast?: number };  // Mastered at `cooked` pots (`fast` with Fast Mastery, Lv7); its gold arc is wider (§7.5.1)
+    lucky_double?: number;                        // Lucky Double (Lv10): chance of one more Plain portion (not Legendary, not with Double)
+    cook_all_per_page?: number;                   // Cook All (Lv8): at most this many pots of one page (q(4))
     quick_fire: number;                          // Quick Fire: cooking time and heat times × this (§4.6.3 Lv6)
     trial_refunds: number;                       // failed pots a day that refund their ingredients in the blessing (§7.5.2)
     recipes: Recipe[];

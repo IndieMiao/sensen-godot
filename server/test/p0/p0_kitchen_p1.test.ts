@@ -157,6 +157,65 @@ describe('Kitchen facilities by Homestead level (§7.7 / §8.3.2)', () => {
   });
 });
 
+describe('Cooking Lv7–10 conveniences (§4.6.3)', () => {
+  const XP = c.skills.cooking;   // cumulative XP per level
+  const cook = (lv: number, home = 1): P0State => { const s = at(home); s.skills.cooking = XP[lv - 1]; return s; };
+  const firstWidth = (s: P0State) => {
+    s.bag.push({ id: 'fish_crucian', qty: 1 });
+    return step(s, { type: 'cook', items: ['fish_crucian'] }).s.stove!.heats[0].width;
+  };
+
+  it('Steady Hand II (Lv7) adds another 5 points to the gold zone', () => {
+    expect(Math.round((firstWidth(cook(7)) - firstWidth(cook(6))) * 1000) / 1000).toBe(0.05);
+  });
+
+  it('Fast Mastery (Lv7): a page is Mastered after 7 pots instead of 10', () => {
+    const page = (s: P0State) => viewOf(c, s, T0).cooking.cookbook.find(p => p.id === 'dish_grilled_crucian')!;
+    const s = cook(6);
+    s.firsts.push('cook:dish_grilled_crucian');
+    s.book.cooked.dish_grilled_crucian = 7;
+    expect(page(s).state).toBe('discovered');
+    s.skills.cooking = XP[6];
+    expect(page(s).state).toBe('mastered');
+  });
+
+  it('Cook All (Lv8) fills every free stove with known pages, rarest first, at most 2 pots a page', () => {
+    expect(refusal(cook(7, 8), { type: 'cook_all' })).toMatchObject({ code: 'locked' });
+    const s = cook(8, 8);
+    s.cookbook.push('dish_herb_grilled_fish');
+    s.bag.push({ id: 'fish_crucian', qty: 5 }, { id: 'wild_herb', qty: 3 });
+    const r = step(s, { type: 'cook_all' });
+    const pots = r.ev.filter(e => e.kind === 'pot');
+    expect(pots.map(e => [e.dish, (e as { stove?: number }).stove])).toEqual([
+      ['dish_herb_grilled_fish', 0], ['dish_herb_grilled_fish', 1], ['dish_grilled_crucian', 2],
+      ['dish_grilled_crucian', 0]]);   // Queue ×2 takes the fourth behind stove 1
+    expect(r.s.queue).toMatchObject({ dish: 'dish_grilled_crucian' });
+    const bare = cook(8, 8);
+    bare.bag = [];
+    expect(refusal(bare, { type: 'cook_all' })?.code).toBe('nothing_to_cook');
+  });
+
+  it('Lucky Double (Lv10): sometimes one more Plain portion; never with Double', () => {
+    const lucky = { ...c, cooking: { ...c.cooking, lucky_double: 1 } };   // always, to see it
+    const s = cook(10, 3);
+    s.bag.push({ id: 'fish_crucian', qty: 1 });
+    const started = applyP0(lucky, s, { type: 'cook', items: ['fish_crucian'] }, T0);
+    if (!started.ok) throw new Error(started.code);
+    const done = applyP0(lucky, started.state, { type: 'collect' }, T0 + started.state.stove!.ms + S);
+    if (!done.ok) throw new Error(done.code);
+    expect(done.events.find(e => e.kind === 'dish')).toMatchObject({ qty: 2, lucky: true });
+    const never = { ...c, cooking: { ...c.cooking, lucky_double: 0 } };
+    const plain = applyP0(never, started.state, { type: 'collect' }, T0 + started.state.stove!.ms + S);
+    expect(plain.ok && plain.events.find(e => e.kind === 'dish')).toMatchObject({ qty: 1 });
+  });
+
+  it('the view lists the Lv7–10 conveniences once reached', () => {
+    expect(viewOf(c, cook(10), T0).cooking.conveniences).toEqual(expect.arrayContaining(
+      ['steady_hand_2', 'fast_mastery', 'cook_all', 'provisions_plus', 'chefs_touch', 'title_chef', 'lucky_double']));
+    expect(viewOf(c, cook(6), T0).cooking.conveniences).not.toContain('steady_hand_2');
+  });
+});
+
 describe('Bag Upgrade II / III (§9.11, §8.3.2)', () => {
   const stall = (id: string): P0Command => ({ type: 'buy', item: id, qty: 1, shop: 'homestead' });
   it('II goes on sale at Lv6 and needs Upgrade I first; III at Lv9 after II', () => {

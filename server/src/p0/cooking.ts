@@ -238,6 +238,33 @@ export function startPot(c: P0Content, s: P0State, cmd: { items?: unknown; recip
   return null;
 }
 
+/**
+ * Cook All (Cooking Lv8, §4.6.3 / q(4)): every known page whose ingredients are there, rarest first (Cookbook order
+ * within a rarity), fills the free stoves and then their queues; never Legendary, at most cook_all_per_page pots of a
+ * page. Each pot is an ordinary cook (its own pot event); stops when no stove can take another.
+ */
+export function cookAll(c: P0Content, s: P0State, now: number, events: P0Event[]): Refusal | null {
+  if (!hasConvenience(c, s, 'cook_all')) return { code: 'locked', detail: { convenience: 'cook_all' } };
+  const most = c.cooking.cook_all_per_page ?? 2;
+  const pages = c.cooking.recipes.filter(r => s.cookbook.includes(r.id) && recipeRarity(c, r) < 4)
+    .sort((a, b) => recipeRarity(c, b) - recipeRarity(c, a) || (a.n ?? 99) - (b.n ?? 99));
+  let placed = 0;
+  for (const page of pages) {
+    for (let k = 0; k < most; k++) {
+      if (!ingredientsFor(c, s, page)) break;
+      const scratch: P0Event[] = [];
+      const refusal = startPot(c, s, { recipe: page.id }, now, scratch);
+      if (refusal) {
+        if (refusal.code === 'stove_busy') return placed ? null : refusal;
+        break;
+      }
+      events.push(...scratch);
+      placed += 1;
+    }
+  }
+  return placed ? null : { code: 'nothing_to_cook' };
+}
+
 /** First tap inside each ring's lifetime is judged; gold arc ± tolerance is a hit (§7.2.4). */
 export function heatHits(c: P0Content, heats: Heat[], taps: number[]): number {
   let hits = 0;
@@ -358,14 +385,17 @@ function finishPot(c: P0Content, s: P0State, b: Burner, pot: Pot, taps: number[]
   const main = dishId(pot.dish, quality);
   const extra = quality === 2 ? 1 : 0; // Perfect: a second, Plain portion (§7.2.5)
   const none = noDish(c, s, pot, now);
-  // Big Pot Double: two portions of the judged quality; Perfect's Plain extra comes once (§7.7).
+  // Big Pot Double: two portions of the judged quality; Perfect's Plain extra comes once (§7.7). Lucky Double
+  // (Cooking Lv10): 10% one more Plain portion, not for Legendary, not with Double (§4.6.3); drawn only from Lv10.
   const mains = pot.double ? [main, main] : [main];
-  const portions = none ? [] : extra ? [...mains, pot.dish] : mains;
+  const lucky = !none && !pot.mystery && !pot.double && pot.rarity < 4 && hasConvenience(c, s, 'lucky_double')
+    && draw(s) < (c.cooking.lucky_double ?? 0);
+  const portions = none ? [] : [...mains, ...(extra ? [pot.dish] : []), ...(lucky ? [pot.dish] : [])];
   keepOrLeave(c, s, b, pot, eat ? portions.slice(1) : portions, events);
   const firstKey = `cook:${pot.dish}`;
   const first = !s.firsts.includes(firstKey);
   if (first) s.firsts.push(firstKey);
-  events.push({ kind: 'dish', pot: pot.id, dish: pot.dish, quality, qty: portions.length, first, mystery: pot.mystery, hits,
+  events.push({ kind: 'dish', pot: pot.id, dish: pot.dish, quality, qty: portions.length, first, mystery: pot.mystery, hits, ...(lucky ? { lucky: true as const } : {}),
     ...(none ? { none: true as const, trial_left: Math.max(0, (trialRefundsLeft(c, s, now) ?? 0) - 1) } : {}), ...(auto ? { auto: true as const } : {}) });
   if (eat && !none) eatMeal(c, s, main, now, events);
   if (pot.mystery) { failedPot(c, s, pot.items ?? [], pot.started_at, now, events); return; }
