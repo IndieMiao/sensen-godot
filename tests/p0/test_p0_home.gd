@@ -47,6 +47,20 @@ func test_the_button_carries_the_first_gap_in_tile_order() -> void:
 	assert_array(away.tiles).has_size(ready.tiles.size())     # the Needs still read away from home
 	assert_array(away.changes).has_size(ready.changes.size())
 
+## SGODOT-282: Lv4–10 kitchen and bag unlocks read as §8.7 copy; ids for other lines (travel, looks, rooms) add no row.
+func test_p1_levels_list_the_kitchen_and_bag_unlocks() -> void:
+	var v := _view(5)
+	v.homestead.next.level = 6
+	v.homestead.next.unlocks = ["big_pot", "bag_upgrade_2"]
+	var p := P0Logic.home_panel(v)
+	assert_str(str(p.title)).is_equal("Homestead Lv5 → Lv6")
+	assert_array(p.changes.slice(1).map(func(c): return "%s · %s" % [c.text, c.note])).is_equal(
+		["Big Pot · Double · two portions, one round of heat", "Bag Upgrade II for sale · 400 coins · Bag 30 → 35"])
+	v.homestead.next.unlocks = ["stove_2", "long_haul_ticket"]
+	assert_array(P0Logic.home_panel(v).changes.slice(1).map(func(c): return str(c.text))).is_equal(["Second Stove"])
+	var m := P0Logic.home_moment(v, {"level": 10, "unlocks": ["chef_sign", "look_4", "deluxe_room", "title_homestead_master"]})
+	assert_str(str(m.detail)).is_equal("Chef's Sign\nHomestead Master")
+
 func test_lv1_to_lv2_lists_the_spice_rack_and_no_look_line() -> void:
 	var v := _view(1)
 	v.homestead.next.level = 2

@@ -44,7 +44,12 @@ export interface Pot {
   left?: string[];   // collected (judged, XP paid) but no place to keep: these portions wait on the stove (§7.2.6)
   id?: number;       // which pot this is (s.fires when it was put on), so heat / collect name the pot they mean (Queue ×2)
   no_room?: boolean; // done but found no place to keep it: the waiting pot fires when it is taken, not when it was done
+  double?: boolean;  // Big Pot Double (Homestead Lv6): ingredients ×2, two portions, one round of heat
 }
+
+/** One stove and the pot waiting behind it (Queue ×2). Stove 1 is s.stove / s.queue; stoves 2–3 (Homestead Lv4 / Lv8,
+ * SGODOT-282) are s.burners[0..1]. Each stove cooks, queues and keeps its own pot. */
+export interface Burner { stove: Pot | null; queue: Pot | null }
 
 /** The Cookbook beyond the known pages (§7.5, SGODOT-232 S5). */
 export interface CookbookBook {
@@ -152,6 +157,7 @@ export interface P0State {
   cast: Cast | null;
   stove: Pot | null;
   queue: Pot | null;             // Queue ×2 (Cooking Lv5): the pot waiting behind the one on the stove
+  burners: Burner[];             // stoves 2 and 3 (Homestead Lv4 / Lv8); [] until a pot goes on one
   cabinet: { id: string; qty: number }[];   // Warming Cabinet portions (Homestead Lv3, §7.7); stacks by dish id
   cookbook: string[];            // known recipe pages (Tasted or Discovered)
   book: CookbookBook;
@@ -190,7 +196,7 @@ export function freshState(c: P0Content, player: string, now: number, seed = has
     firsts: [], rewards: [],
     day: emptyDay(),
     fishing: { casts: 0, bites: 0, caught: {}, seen: [] },
-    cast: null, stove: null, queue: null, cabinet: [],
+    cast: null, stove: null, queue: null, burners: [], cabinet: [],
     cookbook: c.cooking.recipes.filter(r => r.known).map(r => r.id), book: emptyBook(),
     requests: [{ ...c.requests.tutorial, status: 'open' }],
     gear: { rods: [c.tools.fishing], rod: c.tools.fishing, hoes: [c.tools.farming], hoe: c.tools.farming, picks: [c.tools.mining], pick: c.tools.mining },
@@ -276,6 +282,7 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
   s.req_done ??= [];
   s.cabinet ??= [];
   s.queue ??= null;
+  s.burners ??= [];   // SGODOT-282: older saves have stove 1 only
   if (!s.book) {   // SGODOT-232 S5: pages already cooked count once, with no date (no version of their own)
     s.book = emptyBook();
     for (const f of s.firsts) if (f.startsWith('cook:') && f !== `cook:${c.cooking.mystery.id}`) s.book.cooked[f.slice(5)] = 1;

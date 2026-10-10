@@ -1,7 +1,7 @@
 /** What the client receives: the settled state plus everything it would otherwise have to re-derive. */
 import { cropBySeed, dishId, fishById, ingredient, itemKind, itemName, QUALITIES, rodById, SHOPS, SKILLS, type BoardId, type P0Content, type QuotaId, type ShopId } from './content.js';
 import { count, freeSlots } from './bag.js';
-import { cookSlots, mealValue, recipeRarity, settleStove } from './cooking.js';
+import { burners, cookSlots, mealValue, recipeRarity, settleStove } from './cooking.js';
 import { sellPrice, stallOffer } from './reducer.js';
 import { blessed, dayKey, foodCap, maxEnergy, nextTickIn, regenMs, settleEnergy, skillLevel, untilRollover } from './rules.js';
 import { emptyDay, type P0State } from './state.js';
@@ -9,8 +9,8 @@ import { catalog, drinkPrice, offerOf, owns, walletNeed } from './shops.js';
 import { BOARDS, handIn, heldSlot, lockedTemplate, payout, settleBoards, slotCount } from './boards.js';
 import { expireGiftMeals, lessonState, progressOf, requestOpensIn, requestState, residentState, stageIndex } from './residents.js';
 import { floorPrice, haveFor, matches } from './requests.js';
-import type { BoardRequest } from './state.js';
-import { boardSlots, coinsNeeded, nextLevel, skillsTotal, unlocked, upgradeBlock } from './homestead.js';
+import type { BoardRequest, Pot } from './state.js';
+import { bigPot, boardSlots, chefSignGold, coinsNeeded, nextLevel, skillsTotal, stoveCount, unlocked, upgradeBlock } from './homestead.js';
 import { cabinetCap, cabinetCount, rackOn, rackStock } from './kitchen_storage.js';
 import { haveTotal, stored } from './storage.js';
 import { mineView, settleMine } from './mine.js';
@@ -106,18 +106,12 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     },
     cooking: {
       slots: cookSlots(c, s),
-      stove: s.stove ? {
-        id: s.stove.id ?? null,   // send it back as `pot` on heat / collect
-        dish: s.cookbook.includes(s.stove.dish) && !s.stove.mystery ? s.stove.dish : null, rarity: s.stove.rarity,
-        ms: s.stove.ms, elapsed: Math.max(0, now - s.stove.started_at), ready_in: Math.max(0, s.stove.started_at + s.stove.ms - now),
-        heats: s.stove.heats,
-        left: s.stove.left ?? null,   // portions waiting on the stove after a collect with no room (§7.2.6)
-      } : null,
-      // Queue ×2 (Cooking Lv5): the pot waiting behind the stove's; it fires when that one is kept (starts_in from now).
-      // null when it waits on the player: plates left on the stove, or a done pot with no place to keep it.
-      queued: s.queue ? { id: s.queue.id ?? null, dish: s.cookbook.includes(s.queue.dish) && !s.queue.mystery ? s.queue.dish : null,
-        rarity: s.queue.rarity, ms: s.queue.ms,
-        starts_in: s.stove && !s.stove.left && s.stove.started_at + s.stove.ms > now ? s.stove.started_at + s.stove.ms - now : null } : null,
+      // Stove 1 (stove / queued) as before; stoves = every stove the Homestead level gives (Lv4 2, Lv8 3, SGODOT-282),
+      // each its pot view (with that stove's queued pot) or null when empty. big_pot: Double is offered (Lv6).
+      stove: potView(s, s.stove, now),
+      queued: queuedView(s, s.stove, s.queue, now),
+      stoves: burners(c, s).map(b => b.stove ? { ...potView(s, b.stove, now), queued: queuedView(s, b.stove, b.queue, now) } : null),
+      big_pot: bigPot(c, s),
       first_fire: s.fires === 0,
       // Spice Rack (Homestead Lv2, q(46)): stored seasonings the stove reaches; Experiment shows them with a Rack badge.
       rack: { on: rackOn(c, s), items: [...rackStock(c, s)].map(([id, qty]) => ({ id, name: itemName(c, id), qty })) },
@@ -200,10 +194,31 @@ function itemInfo(c: P0Content, s: P0State, id: string) {
   return info;
 }
 
+/** A pot as the cooking drawer shows it; send `id` back as `pot` on heat / collect. */
+function potView(s: P0State, pot: Pot | null, now: number) {
+  return pot ? {
+    id: pot.id ?? null,
+    dish: s.cookbook.includes(pot.dish) && !pot.mystery ? pot.dish : null, rarity: pot.rarity,
+    ms: pot.ms, elapsed: Math.max(0, now - pot.started_at), ready_in: Math.max(0, pot.started_at + pot.ms - now),
+    heats: pot.heats,
+    left: pot.left ?? null,   // portions waiting on the stove after a collect with no room (§7.2.6)
+    double: pot.double ?? false,
+  } : null;
+}
+
+/** Queue ×2 (Cooking Lv5): the pot waiting behind a stove's; it fires when that one is kept (starts_in from now).
+ * null when it waits on the player: plates left on the stove, or a done pot with no place to keep it. */
+function queuedView(s: P0State, stove: Pot | null, queue: Pot | null, now: number) {
+  return queue ? { id: queue.id ?? null, dish: s.cookbook.includes(queue.dish) && !queue.mystery ? queue.dish : null,
+    rarity: queue.rarity, ms: queue.ms,
+    starts_in: stove && !stove.left && stove.started_at + stove.ms > now ? stove.started_at + stove.ms - now : null } : null;
+}
+
 /** HOME-1 facts (§8.6.1): what the next level needs, what the player has (storage and bag apart) and what is unlocked. */
 function homesteadView(c: P0Content, s: P0State) {
   const next = nextLevel(c, s);
   const upgrade = c.bag_upgrades[0];
+  const bagTier = (id: string) => s.owned.includes(id) ? 'owned' : unlocked(c, s, id) ? 'for_sale' : 'locked';
   return {
     level: s.homestead.level, max: c.homestead.max_level, plaque: s.homestead.plaque,
     next: next && {
@@ -220,10 +235,14 @@ function homesteadView(c: P0Content, s: P0State) {
     unlocks: {
       spice_rack: unlocked(c, s, 'spice_rack'),
       warming_cabinet: unlocked(c, s, 'warming_cabinet'),
-      bag_upgrade_1: s.owned.includes(upgrade.id) ? 'owned' : unlocked(c, s, upgrade.id) ? 'for_sale' : 'locked',
+      bag_upgrade_1: bagTier(upgrade.id),
       board_slots: boardSlots(c, s),
       fence: unlocked(c, s, 'fence'),
       clay_bank: unlocked(c, s, 'clay_bank'),
+      // P1 (SGODOT-282, §8.3.1): stoves 1 / 2 / 3, Big Pot, Notice Board, Chef's Sign (gold +5 points), Bag II / III.
+      stoves: stoveCount(c, s), big_pot: bigPot(c, s), notice_board: unlocked(c, s, 'notice_board'),
+      chef_sign: chefSignGold(c, s) > 0, cabinet: cabinetCap(c, s),
+      ...Object.fromEntries(c.bag_upgrades.slice(1).map(u => [u.id, bagTier(u.id)])),
     },
   };
 }

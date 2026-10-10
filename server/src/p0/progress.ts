@@ -22,7 +22,7 @@ export type P0Event =
   | { kind: 'cast'; bite_in: number; rarity: number; breaks: 'level' | 'rod' | null; bait: string | null }
   | { kind: 'catch'; fish: string; rarity: number; result: 'landed' | 'escaped' | 'broke_free' | 'cancelled'; refund: number;
       need_level?: number; protected_left?: number }
-  | { kind: 'pot'; id?: number; dish: string | null; rarity: number; ms: number; tried?: boolean; queued?: boolean }   // tried: this combination failed before; queued: waits (Queue ×2)
+  | { kind: 'pot'; id?: number; dish: string | null; rarity: number; ms: number; tried?: boolean; queued?: boolean; stove?: number; double?: boolean }   // tried: this combination failed before; queued: waits (Queue ×2)
   | { kind: 'queue'; id?: number; dish: string | null; started_at: number; ms: number }   // the waiting pot fired (Queue ×2)
   // A Mystery Dish (§7.5.2): tried = not new (no clue); refund = ingredients given back; clue = slots turned on a Hidden page.
   | { kind: 'mishap'; items: string[]; tried: boolean; refund: string[]; trial_left: number | null; clue: { page: string; slots: number[] } | null }

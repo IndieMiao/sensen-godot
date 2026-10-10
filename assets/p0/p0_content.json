@@ -1706,8 +1706,34 @@
   },
   "wallet_floor": 40,
   "homestead": {
-    "max_level": 3,
+    "max_level": 10,
     "warming_cabinet": 6,
+    "_p1": "SGODOT-282: Lv4–10 numbers are plan §8.2.1 (coins / skills total / materials) and §8.3.1 (unlocks) until Li Bai's P1 data (SGODOT-281) replaces them. Ladders [from level, value]: stoves 1 / 2 / 3 (§8.3.2), Warming Cabinet 6 / 12 (§7.7), Chef's Sign +5 gold points (§7.7). Quartz and Hardwood come with the mine and Old Tree line (SGODOT-275).",
+    "stoves": [
+      [
+        1,
+        1
+      ],
+      [
+        4,
+        2
+      ],
+      [
+        8,
+        3
+      ]
+    ],
+    "cabinet_steps": [
+      [
+        3,
+        6
+      ],
+      [
+        8,
+        12
+      ]
+    ],
+    "chef_sign_gold": 0.05,
     "per_level": {
       "energy": 10,
       "meals": 10
@@ -1782,6 +1808,275 @@
           "board_slot_3",
           "fence"
         ]
+      },
+      {
+        "level": 4,
+        "coins": 550,
+        "skills": 7,
+        "materials": [
+          [
+            "wood",
+            20
+          ],
+          [
+            "stone",
+            16
+          ],
+          [
+            "fiber",
+            10
+          ],
+          [
+            "copper_ore",
+            6
+          ],
+          [
+            "clay",
+            6
+          ],
+          [
+            "rock_salt",
+            4
+          ]
+        ],
+        "unlocks": [
+          "stove_2",
+          "long_haul_ticket"
+        ]
+      },
+      {
+        "level": 5,
+        "coins": 750,
+        "skills": 9,
+        "materials": [
+          [
+            "wood",
+            20
+          ],
+          [
+            "stone",
+            16
+          ],
+          [
+            "fiber",
+            12
+          ],
+          [
+            "copper_ore",
+            10
+          ],
+          [
+            "clay",
+            8
+          ],
+          [
+            "quartz",
+            2
+          ],
+          [
+            "rock_salt",
+            4
+          ]
+        ],
+        "unlocks": [
+          "notice_board",
+          "trip_7",
+          "look_2",
+          "standard_room"
+        ]
+      },
+      {
+        "level": 6,
+        "coins": 1000,
+        "skills": 11,
+        "materials": [
+          [
+            "wood",
+            20
+          ],
+          [
+            "stone",
+            18
+          ],
+          [
+            "fiber",
+            12
+          ],
+          [
+            "copper_ore",
+            10
+          ],
+          [
+            "clay",
+            8
+          ],
+          [
+            "quartz",
+            3
+          ],
+          [
+            "hardwood",
+            3
+          ]
+        ],
+        "unlocks": [
+          "big_pot",
+          "bag_upgrade_2"
+        ]
+      },
+      {
+        "level": 7,
+        "coins": 1450,
+        "skills": 13,
+        "materials": [
+          [
+            "wood",
+            20
+          ],
+          [
+            "stone",
+            20
+          ],
+          [
+            "fiber",
+            10
+          ],
+          [
+            "copper_ore",
+            12
+          ],
+          [
+            "clay",
+            8
+          ],
+          [
+            "quartz",
+            4
+          ],
+          [
+            "hardwood",
+            4
+          ]
+        ],
+        "unlocks": []
+      },
+      {
+        "level": 8,
+        "coins": 1800,
+        "skills": 15,
+        "materials": [
+          [
+            "wood",
+            18
+          ],
+          [
+            "stone",
+            18
+          ],
+          [
+            "fiber",
+            8
+          ],
+          [
+            "copper_ore",
+            12
+          ],
+          [
+            "clay",
+            8
+          ],
+          [
+            "quartz",
+            4
+          ],
+          [
+            "hardwood",
+            6
+          ]
+        ],
+        "unlocks": [
+          "stove_3",
+          "look_3"
+        ]
+      },
+      {
+        "level": 9,
+        "coins": 2250,
+        "skills": 17,
+        "materials": [
+          [
+            "wood",
+            14
+          ],
+          [
+            "stone",
+            16
+          ],
+          [
+            "fiber",
+            6
+          ],
+          [
+            "copper_ore",
+            12
+          ],
+          [
+            "clay",
+            4
+          ],
+          [
+            "quartz",
+            4
+          ],
+          [
+            "hardwood",
+            7
+          ]
+        ],
+        "unlocks": [
+          "bag_upgrade_3"
+        ]
+      },
+      {
+        "level": 10,
+        "coins": 2850,
+        "skills": 19,
+        "materials": [
+          [
+            "wood",
+            10
+          ],
+          [
+            "stone",
+            16
+          ],
+          [
+            "fiber",
+            6
+          ],
+          [
+            "copper_ore",
+            13
+          ],
+          [
+            "clay",
+            4
+          ],
+          [
+            "quartz",
+            5
+          ],
+          [
+            "hardwood",
+            8
+          ]
+        ],
+        "unlocks": [
+          "chef_sign",
+          "look_4",
+          "deluxe_room",
+          "title_homestead_master"
+        ]
       }
     ]
   },
@@ -1802,6 +2097,50 @@
         ]
       ],
       "capacity": 30
+    },
+    {
+      "id": "bag_upgrade_2",
+      "name": "Bag Upgrade II",
+      "homestead": 6,
+      "price": 400,
+      "materials": [
+        [
+          "hardwood",
+          4
+        ],
+        [
+          "clay",
+          6
+        ],
+        [
+          "copper_ore",
+          4
+        ]
+      ],
+      "capacity": 35,
+      "requires": "bag_upgrade_1"
+    },
+    {
+      "id": "bag_upgrade_3",
+      "name": "Bag Upgrade III",
+      "homestead": 9,
+      "price": 1000,
+      "materials": [
+        [
+          "hardwood",
+          8
+        ],
+        [
+          "quartz",
+          4
+        ],
+        [
+          "copper_ore",
+          8
+        ]
+      ],
+      "capacity": 40,
+      "requires": "bag_upgrade_2"
     }
   ],
   "drinks": {

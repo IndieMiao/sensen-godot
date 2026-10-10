@@ -4,6 +4,7 @@
  */
 import { cropById, fishById, ingredient, type Convenience, type P0Content, type Recipe } from './content.js';
 import { cookSlots, ingredientsFor, recipeRarity, tokenInfo, tokenMatches } from './cooking.js';
+import { chefSignGold } from './homestead.js';
 import { ingredientStock } from './kitchen_storage.js';
 import { blessed, skillLevel, xpPercent } from './rules.js';
 import type { P0State } from './state.js';
@@ -95,7 +96,8 @@ export function goldWidth(c: P0Content, s: P0State, page: string | null, base: n
   let width = base;
   if (hasConvenience(c, s, 'steady_hand_1')) width += c.cooking.steady_hand_gold;
   if (page && pageState(c, s, page) === 'mastered') width += c.cooking.mastered.gold;
-  return Math.min(c.cooking.gold_cap, Math.round(width * 1000) / 1000);
+  // Chef's Sign (Homestead Lv10, §7.7): +5 points on every dish, on top of the cap the skills reach.
+  return Math.min(c.cooking.gold_cap + chefSignGold(c, s), Math.round((width + chefSignGold(c, s)) * 1000) / 1000);
 }
 
 /** Cooking time and heat times: × quick_fire from Cooking Lv6 (Quick Fire); the needle speed stays the same. */

@@ -1,7 +1,7 @@
 /** P0 command reducer: one command → new state + events, or a typed refusal. Never mutates the input. */
 import { cropById, cropBySeed, rodById, type P0Content } from './content.js';
 import { add, count, room, take } from './bag.js';
-import { collectPot, eatDish, startPot, recordHeat, settleStove } from './cooking.js';
+import { burners, collectPot, eatDish, startPot, recordHeat, settleStove } from './cooking.js';
 import { boardCommand, settleBoards, tracked } from './boards.js';
 import { expireGiftMeals, giftResident, learn, noteSown, residentRequestCommand, talk } from './residents.js';
 import { castLine, reelLine, type FishCommand } from './fishing.js';
@@ -38,7 +38,7 @@ type P0CommandBody =
   | { type: 'store' | 'take_out'; item: string; qty: number | 'all' }
   | { type: 'rest' }
   | FishCommand
-  | { type: 'cook'; items?: string[]; recipe?: string }
+  | { type: 'cook'; items?: string[]; recipe?: string; stove?: number; double?: boolean }   // stove: 0-based (Lv4 / Lv8); double: Big Pot
   | { type: 'collect'; taps?: number[]; eat?: boolean; pot?: number }   // eat: COOK-4 Eat, the main portion straight from the pot
   | { type: 'heat'; taps: number[]; pot?: number }   // heat taps as they happen, kept on the pot (Queue ×2 keeps a pot on its own)
   // pot: the pot's id (pot / queue events, view.cooking.stove.id). With Queue ×2 send it on every heat and collect:
@@ -76,8 +76,10 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
   settleBoards(c, s, now);
   // Queue ×2: a done pot makes way for the waiting one, as the view shows; heat / collect naming the pot on the stove
   // bring its taps first, and the settle after the command keeps it if it is done.
-  const aimed = (cmd.type === 'heat' || cmd.type === 'collect') && cmd.pot !== undefined && s.stove !== null && cmd.pot === (s.stove.id ?? null);
-  if (!aimed) settleStove(c, s, now, events);
+  // With several stoves (SGODOT-282) only the stove holding that pot waits; the others settle as usual.
+  const aimed = (cmd.type === 'heat' || cmd.type === 'collect') && cmd.pot !== undefined && cmd.pot !== null
+    ? burners(c, s).findIndex(b => b.stove !== null && cmd.pot === (b.stove.id ?? null)) : -1;
+  settleStove(c, s, now, events, aimed < 0 ? undefined : aimed);
   settleMine(c, s, now);
   settleParcels(c, s, now);
   // v5: a pond or outpost needs a pass for its city (home always); nothing changes when it is refused.
@@ -240,7 +242,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       break;
     }
     case 'heat': {
-      const refusal = recordHeat(s, cmd);
+      const refusal = recordHeat(c, s, cmd);
       if (refusal) return fail(refusal.code, refusal.detail);
       break;
     }
