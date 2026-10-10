@@ -1028,6 +1028,8 @@ static func level_banner(view: Dictionary, ev: Dictionary, first := false) -> Di
 
 ## What a skill level opens this season: Farming — the crops of that gate (main ingredients first), then other stall
 ## goods and tools (Compost, Row Hoe); Fishing — the fish of that level; Cooking — the conveniences of that level.
+const FARMING_CONVENIENCE_NAMES := {"seed_saver": "Seed Saver"}   # §4.6.1 / glossary (Plot Marks, Sow Again … come later)
+
 static func level_unlocks(view: Dictionary, skill: String, level: int) -> Array:
 	var out: Array = []
 	match skill:
@@ -1040,6 +1042,10 @@ static func level_unlocks(view: Dictionary, skill: String, level: int) -> Array:
 				out.append(item_name(view, id))
 			var hoe: Dictionary = content().get("tools", {}).get("row_hoe", {})
 			if int(hoe.get("gate", 0)) == level: out.append(item_name(view, str(hoe.get("id", ""))))
+			# P1 conveniences (content farming.conveniences: Seed Saver at Lv10, §4.6.1)
+			var conv: Dictionary = content().get("farming", {}).get("conveniences", {})
+			for k in conv:
+				if int(conv[k]) == level: out.append(str(FARMING_CONVENIENCE_NAMES.get(k, k)))
 			# P1 facilities a level opens at the workbench (q(59) §1.6: `New for you · Cucumber, Sprinkler`)
 			for r in content().get("workbench", {}).get("recipes", []):
 				var gate: Array = r.get("gate", [])

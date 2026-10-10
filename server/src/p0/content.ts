@@ -247,6 +247,9 @@ export interface P0Content {
   /** P1 (SGODOT-239, content/farm_garden.json): plot id → [col, row] on the garden grid; how many of them the homestead has
    * is homestead.plots (the ids past P0's 30 come as wild). */
   garden: { plots: [number, number][] };
+  /** P1 (content/farm_garden.json): the Farming level each convenience comes at (§4.6.1: seed_saver 10) and Seed
+   * Saver's chance per harvest. Absent = not in this build. */
+  farming?: { conveniences?: Partial<Record<string, number>>; seed_saver_chance?: number };
   /** P1 (SGODOT-239): facilities by kind; grow_cut_cap caps a facility's cut and Compost's together. */
   facilities: { grow_cut_cap: number; kinds: Record<string, FacilityDef> };
 }

@@ -5,6 +5,7 @@
  * by 15% — with Compost's 20% capped at 35% together — locked when it starts growing. Built in one step with `place`
  * (q(22): no stock of built-but-unplaced facilities), moved for free with `move_facility`, never removed.
  */
+import { createHash } from 'node:crypto';
 import type { Crop, P0Content, WorkbenchRecipe } from './content.js';
 import type { Refusal } from './fishing.js';
 import { stepAt } from './homestead.js';
@@ -12,7 +13,8 @@ import { homeClimate } from './travel.js';
 import type { P0Event } from './progress.js';
 import { skillLevel } from './rules.js';
 import type { Facility, P0State, Plot } from './state.js';
-import { missing, takeStorageFirst } from './storage.js';
+import { add, room } from './bag.js';
+import { missing, putInStorage, takeStorageFirst } from './storage.js';
 
 /** [col, row] of a plot on the garden grid, or null for an id the grid does not have. */
 export function plotCell(c: P0Content, id: number): [number, number] | null {
@@ -49,6 +51,20 @@ export function facilityAt(s: P0State, plot: number): Facility | undefined {
  * §5.2.3 "not native"; the greenhouse lifts it later). The farm is always at home, wherever the player is. */
 export function cropGrowH(c: P0Content, s: P0State, crop: Crop): number {
   return crop.regional && crop.zone !== homeClimate(c, s) && crop.off_zone_grow_h ? crop.off_zone_grow_h : crop.grow_h;
+}
+
+/** Seed Saver (Farming Lv10, §4.6.1): a harvest of a general annual — not a regional crop, not a perennial — gives back
+ * 1 seed of its kind with farming.seed_saver_chance (5%). The roll is sha256(player:plot:ready_at), never the save's rng,
+ * so it shifts no fishing or cooking roll; the seed goes to the bag, or to Farm Storage when the bag has no room. */
+export function seedSaver(c: P0Content, s: P0State, crop: Crop, plot: Plot, events: P0Event[]): void {
+  const at = c.farming?.conveniences?.seed_saver, chance = c.farming?.seed_saver_chance ?? 0;
+  if (at === undefined || skillLevel(c, s, 'farming') < at || crop.regional || (crop as { perennial?: unknown }).perennial) return;
+  const roll = createHash('sha256').update(`${s.player}:seed_saver:${plot.id}:${plot.ready_at}`).digest().readUInt32BE(0) / 0x1_0000_0000;
+  if (roll >= chance) return;
+  if (room(c, s, crop.seed) >= 1) add(c, s, crop.seed, 1);
+  else putInStorage(s, crop.seed, 1);
+  events.push({ kind: 'item', id: crop.seed, delta: 1 });
+  events.push({ kind: 'seed_saved', id: crop.seed, plot: plot.id });
 }
 
 /** Ripening time in ms for a crop that starts growing now on `plot` (§5.7 / §5.5: covered −15%, Compost −20%, ≤ −35%). */

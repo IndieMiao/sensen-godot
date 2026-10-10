@@ -15,7 +15,7 @@ import { notePresence, restReadyIn } from './presence.js';
 import { isMineCommand, mineCommand, settleMine, type MineCommand } from './mine.js';
 import { gather, storeMaterials } from './gathering.js';
 import { craft } from './workbench.js';
-import { coveredPlots, cropGrowH, facilityAt, growMs, moveFacility, place } from './garden.js';
+import { coveredPlots, cropGrowH, facilityAt, growMs, moveFacility, place, seedSaver } from './garden.js';
 import { claimParcel, PARCEL_LIMIT, settleParcels } from './parcels.js';
 import { dayKey, maxEnergy, scaledXp, settleEnergy, skillLevel, xpPercent } from './rules.js';
 import { buyback, buyItem, drink, moveStorage, offerOf, sellItem, setLock } from './shops.js';
@@ -198,6 +198,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       add(c, s, crop.id, crop.yield);
       events.push({ kind: 'item', id: crop.id, delta: crop.yield });
       gainXp(c, s, now, 'farming', scaledXp(s, crop.xp, plot.xp_pct ?? 100), plot.xp_pct ?? 100, events);
+      seedSaver(c, s, crop, plot, events);
       const first = `harvest:${crop.id}`;
       if (!s.firsts.includes(first)) {
         s.firsts.push(first);
