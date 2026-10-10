@@ -55,6 +55,17 @@ describe('the template pool (§9.6.3: 30 at the prototype stage)', () => {
     }
   });
 
+  it('Hardwood Beams and Quartz Glass pay their shadow price per piece (#208: Hardwood 4, Quartz 5) plus 40', () => {
+    for (const [tpl, item, floor] of [['req_sys_material_hardwood', 'hardwood', 4], ['req_sys_material_quartz', 'quartz', 5]] as const) {
+      let s = put(fresh(), 'market', { template: tpl, kind: 'material', items: [item], qty: 3, bonus: 40 });
+      s.storage[item] = 3;
+      const r = step(s, { type: 'deliver', request: 'r1' });
+      expect(r.ev.find(e => e.kind === 'request' && e.status === 'done'), tpl).toMatchObject({ coins: floor * 3 + 40, bonus: 40 });
+      s = r.s;
+      expect(s.storage[item] ?? 0).toBe(0);
+    }
+  });
+
   it('a Homestead gate opens with the Homestead level (Clay for Pots: Lv2)', () => {
     const s = fresh();
     expect(eligible(c, s, 'stall')).not.toContain('req_sys_material_clay');
