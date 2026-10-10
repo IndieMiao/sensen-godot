@@ -32,7 +32,7 @@ func test_each_track_says_its_level_what_is_next_and_its_xp() -> void:
 		["Lv2 · Carrot, Herb", "done", ""], ["Lv3 · Potato, Chamomile, Compost", "next", "90 XP to go"],
 		["Lv4 · Tomato, Chili, Row Hoe", "locked", ""], ["Lv5 · Cabbage, Corn, Regional seeds", "locked", ""],
 		["Lv6 · Cucumber, Sprinkler", "locked", ""], ["Lv7 · Apple Sapling", "locked", ""], ["Lv8 · Strawberry", "locked", ""],
-		["Lv9 · Melon, Citrus Sapling, Grapevine Cutting", "locked", ""]])
+		["Lv9 · Melon, Citrus Sapling, Grapevine Cutting", "locked", ""], ["Lv10 · Seed Saver", "locked", ""]])
 	var fishing: Dictionary = d.tracks[1]
 	assert_str(fishing.next).is_equal("Next: River Perch, Largemouth Bass, Rainbow Trout, Mackerel and Worm Bait")
 	# This season's waters only — Coast from P1 (Clover Pond, SGODOT-283), so Mackerel and Sea Bass are in; the regional
@@ -45,8 +45,8 @@ func test_each_track_says_its_level_what_is_next_and_its_xp() -> void:
 	var v := _view()
 	v.skills.farming = {"level": 4, "xp": 412}
 	assert_str(P0SkillsDrawer.skills_data(v).tracks[0].next).is_equal("Next: Cabbage, Corn and Regional seeds")
-	v.skills.farming = {"level": 9, "xp": 2100}   # nothing after Lv9 in this build's content
-	assert_str(P0SkillsDrawer.skills_data(v).tracks[0].next).is_equal("Next: Lv10 · 700 XP to go")
+	v.skills.farming = {"level": 9, "xp": 2100}   # Lv10 brings Seed Saver (content farming.conveniences, §4.6.1)
+	assert_str(P0SkillsDrawer.skills_data(v).tracks[0].next).is_equal("Next: Seed Saver")
 
 func test_first_times_count_this_seasons_things() -> void:
 	var d := P0SkillsDrawer.skills_data(_view())

@@ -474,6 +474,10 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				if int(ev.delta) > 0 and (claimed or (not crafted and not iid.begins_with("seed_") and not iid.begins_with("dish_") and not iid.begins_with("fish_"))):
 					floats.append({kind = "item", key = iid, amount = int(ev.delta), fmt = "%s " + P0Logic.item_name(v, iid),
 						tone = UiFloatText.Tone.ITEM, icon = P0Logic.icon(iid)})
+			"seed_saved":   # Seed Saver (Farming Lv10, §4.6.1): a seed back from this harvest — said, as seeds otherwise float nothing
+				var sid := str(ev.id)
+				floats.append({kind = "item", key = "saved:" + sid, amount = 1, fmt = "%s " + P0Logic.item_name(v, sid),
+					tone = UiFloatText.Tone.ITEM, icon = P0Logic.icon(sid)})
 			"coins":
 				# A request delivered from the counter drawer: its row floats the coins from its button (BOARD-DONE).
 				if ui.modal_kind == "counter" and events.any(func(e): return str(e.get("kind", "")) == "request" and str(e.get("status", "")) == "done"): continue

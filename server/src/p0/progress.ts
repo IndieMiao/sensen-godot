@@ -52,6 +52,7 @@ export type P0Event =
   // P1 (SGODOT-239): a facility placed or moved; started = sown plots it now waters (they began growing)
   | { kind: 'facility'; action: 'placed' | 'moved'; facility: number; facility_kind: string; plot: number; from?: number; covered: number; started: number[] }
   | { kind: 'plots_added'; plots: number[]; reason: 'homestead' }   // the Homestead unlock's new plots (client drops them in)
+  | { kind: 'seed_saved'; id: string; plot: number }   // Seed Saver gave back a seed on this harvest (Farming Lv10)
   | { kind: 'stored'; items: [string, number][]; reason: 'home' | 'spice_rack' };
 
 export function energyDetail(c: P0Content, s: P0State, now: number, need: number) {
