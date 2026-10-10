@@ -15,6 +15,8 @@ signal ingredient_tapped(id: String, from_screen: Vector2)
 signal cook_requested(cmd: Dictionary)
 signal tab_changed(tab: String)
 signal info_requested
+## The heading's `Stove 2/3 ›` pill (SGODOT-282, b84a5e01 ②): the next stove, 3 back to 1.
+signal stove_cycle_requested
 
 const HEIGHT := 480.0
 const _HEAD_H := 18.0
@@ -42,6 +44,9 @@ var pot: Array = []
 ## Queue ×2 (Cooking Lv5, q(71)): opened from the watch sheet's Queue next ›, the primary buttons read `Queue`; the
 ## same cook command goes out and the server puts the pot behind the one on the stove.
 var queue_mode := false: set = set_queue_mode
+## Which stove this drawer is for (0-based; the heading, Stove busy and the pot all read it).
+var stove_index := 0: set = set_stove_index
+var _stove_pill: PanelContainer
 
 var _stove: Label
 var _level: Label
@@ -93,7 +98,7 @@ func set_queue_mode(v: bool) -> void:
 	queue_mode = v
 	if _cook:
 		_cook.label = _verb()
-		_cook.reason = P0KitchenLogic.experiment_reason(view, pot, queue_mode)
+		_cook.reason = P0KitchenLogic.experiment_reason(view, pot, queue_mode, stove_index)
 	if _recipe_button and selected_page != "": _show_page(selected_page)   # relabel and lay the card out again
 
 func _verb() -> String: return "Queue" if queue_mode else "Cook"
@@ -109,14 +114,26 @@ func set_tab(v: String) -> void:
 
 ## Redraw from `view` and `pot`; selections and scroll positions survive.
 func refresh() -> void:
-	var h := P0KitchenLogic.header(view)
-	_stove.text = h.stove
+	var h := P0KitchenLogic.header(view, stove_index)
+	var several := P0KitchenLogic.stove_count(view) > 1
+	_stove.text = h.stove + (" ›" if several else "")
+	if _stove_pill:   # a pill only when there is another stove to go to (COOK-STOVES 2152:33518)
+		_stove_pill.mouse_filter = Control.MOUSE_FILTER_STOP if several else Control.MOUSE_FILTER_IGNORE
+		(_stove_pill.get_theme_stylebox(&"panel") as UiStyleBox).border_color = UiTokens.COLOR_BORDER if several else Color.TRANSPARENT
+		(_stove_pill.get_theme_stylebox(&"panel") as UiStyleBox).bg_color = UiTokens.COLOR_SURFACE if several else Color.TRANSPARENT
 	_level.text = h.level
 	_state.text = h.state
 	var count: Label = _modes.tabs()[0].find_child("Count", true, false)
 	if count: count.text = P0KitchenLogic.cookbook_count(view)
 	_refresh_cookbook()
 	_refresh_experiment()
+
+func set_stove_index(v: int) -> void:
+	stove_index = v
+	if _stove != null: refresh()
+
+## Where the heading's stove pill sits on screen (shots, tests).
+func stove_pill_rect() -> Rect2: return _stove_pill.get_global_rect() if _stove_pill else Rect2()
 
 func page(id: String) -> Dictionary:
 	for p in P0KitchenLogic.pages(view):
@@ -130,9 +147,19 @@ func _heading() -> Control:
 	_stove = UiKit.label("", UiTokens.STYLE_C14_XB)
 	_level = UiKit.label("", UiTokens.STYLE_C11_B, UiTokens.COLOR_SECONDARY)
 	_state = UiKit.label("", UiTokens.STYLE_C11_B, UiTokens.COLOR_SECONDARY)
+	# `Stove 2/3 ›` is a tappable pill once there are several stoves (white, 1 px outline); with one it reads as before.
+	_stove_pill = PanelContainer.new()
+	var pill := UiStyleBox.make(Color.TRANSPARENT, UiTokens.RADIUS_PILL, Color.TRANSPARENT, UiTokens.STROKE_DEFAULT)
+	pill.content_margin_left = 0.0
+	pill.content_margin_right = 0.0
+	_stove_pill.add_theme_stylebox_override(&"panel", pill)
+	_stove_pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_stove_pill.gui_input.connect(func(e: InputEvent): if P0Ui.is_tap(e): stove_cycle_requested.emit())
+	_stove_pill.add_child(_stove)
+	row.add_child(_stove_pill)
 	for l in [_stove, _level, _state]:
 		(l as Label).vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		row.add_child(l)
+		if l != _stove: row.add_child(l)
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(spacer)
@@ -415,7 +442,7 @@ func _refresh_experiment() -> void:
 	var items := P0KitchenLogic.experiment_items(view, pot, experiment_chip)
 	_bag.capacity = maxi(10, ceili(items.size() / 5.0) * 5)
 	_bag.items = items
-	_cook.reason = P0KitchenLogic.experiment_reason(view, pot, queue_mode)
+	_cook.reason = P0KitchenLogic.experiment_reason(view, pot, queue_mode, stove_index)
 	_pot_energy.text = P0KitchenLogic.pot_energy(view, pot)
 	_tried.visible = P0KitchenLogic.tried(view, pot)
 

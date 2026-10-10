@@ -9,6 +9,8 @@ extends P0Room
 ## placeholder props from the anchors file until farmhouse_lv1; tapping either opens its sheet (COOK-P0-5 / 6).
 
 const STOVE := "use_stove_1"
+## Stoves 2 and 3 (Homestead Lv4 / Lv8, SGODOT-282): their own pot spots on the hearth, each tapped and named alone.
+const STOVES := ["use_stove_1", "use_stove_2", "use_stove_3"]
 const RACK := "use_spice_rack"
 const CABINET := "use_warming_cabinet"
 const CABINET_GLOW := Color("ffb87a")   # the cabinet's warm inner light (placeholder; the art brings its own)
@@ -25,6 +27,36 @@ func _init() -> void:
 	# The stove is its body and pot only; the shelf on the wall beside it and the cabinet under that are their own,
 	# and where they overlap the smaller takes the tap (int6 C8). The final farmhouse_lv1 art renames these nodes.
 	hit_nodes = {STOVE: "hearth", RACK: "spice_rack", CABINET: "warming_cabinet"}
+
+## Stove i for a use_stove_N anchor, -1 for anything else.
+static func stove_of(n: String) -> int: return STOVES.find(n)
+
+## The stoves the view has (1 before Homestead Lv4): the others' anchors are not tappable.
+func _stove_count() -> int:
+	return P0KitchenLogic.stove_count(rt.session.current()) if rt else 1
+
+func _tappable() -> PackedStringArray:
+	var out := PackedStringArray()
+	var n := _stove_count()
+	for a in super():
+		var i := stove_of(a)
+		if i < 0 or i < n: out.append(a)
+	return out
+
+## The hearth's box takes the tap for every stove on it (int6 C8): with several, the pot nearest the finger wins.
+func pick(screen: Vector2) -> String:
+	var n := super(screen)
+	if stove_of(n) < 0 or _stove_count() < 2: return n
+	var best := n
+	var best_d := INF
+	for i in _stove_count():
+		var m := anchor(STOVES[i])
+		if m == null: continue
+		var d := cam.unproject_position(m.global_position).distance_to(screen)
+		if d < best_d:
+			best_d = d
+			best = STOVES[i]
+	return best
 
 ## The space commands are sent from (SGODOT-228 PR #16, Rest needs ≥ 2 h away, q(41)): the farmhouse is home.
 func p0_space() -> String: return "home"
@@ -58,12 +90,14 @@ func _marker(n: String, v: Dictionary) -> Dictionary:
 	if n == CABINET:   # i-cabinet 1265:89122; from afar its button hangs the count, 4/6 or Full, none when empty (C21, q(31))
 		return {kind = "facility", icon = P0Logic.icon("cabinet"), name = "Warming Cabinet", fact = P0KitchenLogic.cabinet_badge(v),
 			count = P0KitchenLogic.cabinet_count(v)}
-	if n != STOVE: return super(n, v)
+	var i := stove_of(n)
+	if i < 0: return super(n, v)
 	# i-pot (250 walkthrough). Up close the strip keeps the pot: the state is the far button's badge and the fact
-	# (Cooking 0:22 / the dish), as on the bench (不知火舞 on #104, 1760:103708).
-	var stove := {kind = "facility", icon = P0Logic.icon("pot"), name = "Stove 1/1", strip_badge = false}
-	if P0KitchenLogic.queued(v) != null: stove.count = "+1"   # Queue ×2: a pot waits behind this one (q(71), 1760:103578)
-	var st = P0KitchenLogic.stove(v)
+	# (Cooking 0:22 / the dish), as on the bench (不知火舞 on #104, 1760:103708). One per stove: `Stove 2/3 · Empty`
+	# (b84a5e01 ②), hung over its own pot.
+	var stove := {kind = "facility", icon = P0Logic.icon("pot"), name = P0KitchenLogic.stove_label(v, i), strip_badge = false}
+	if P0KitchenLogic.queued(v, i) != null: stove.count = "+1"   # Queue ×2: a pot waits behind this one (q(71), 1760:103578)
+	var st = P0KitchenLogic.stove(v, i)
 	if st == null: return stove.merged({fact = "Empty"})
 	var left := float(st.get("ready_in", 0))
 	if left <= 0.0:   # the ready mark takes the icon's place; the strip names the dish
@@ -72,7 +106,8 @@ func _marker(n: String, v: Dictionary) -> Dictionary:
 	return stove.merged({fact = "Cooking " + P0Logic.duration(left), badge = "countdown"})
 
 func _on_facility(n: String) -> void:
-	if n == STOVE:
+	if stove_of(n) >= 0:
+		if kitchen and not kitchen.busy(): kitchen.select_stove(stove_of(n))
 		# Sent here with a tab (the rack's Open Experiment ›, the Energy card's Cook): open on it,
 		# not on Cookbook or Cook Again (PR #54 review). A plain tap on the stove has none.
 		var tab := _pending_tab
@@ -110,8 +145,8 @@ func open_sheet(kind: String) -> void:
 func open_stove(tab := "cookbook", tapped := false) -> void:
 	if rt == null or kitchen == null or kitchen.busy(): return
 	var v := rt.session.current()
-	var st = P0KitchenLogic.stove(v)
-	var left := P0KitchenLogic.stove_left(v)
+	var st = P0KitchenLogic.stove(v, kitchen.stove_index)
+	var left := P0KitchenLogic.stove_left(v, kitchen.stove_index)
 	# Sent from a Today cook row (q(99)): the drawer opens on that page, not on Cook Again's last one.
 	if st == null and tapped and kitchen.last_page != "" and P0KitchenLogic.cook_again_on(v) and rt.ui.cook_page_from_today == "":
 		kitchen.open_again(kitchen.last_page)
@@ -124,7 +159,7 @@ func open_stove(tab := "cookbook", tapped := false) -> void:
 ## runs _on_facility, which opens the drawer on this tab; any other tap or the stick drops it.
 func p0_open_kitchen(tab := "cookbook") -> void:
 	_pending_tab = tab if tab != "" else "cookbook"
-	walk_to(STOVE)
+	walk_to(STOVES[P0KitchenLogic.free_stove(rt.session.current()) if rt else 0])   # the first free stove (§7.2.3)
 
 ## Returns true when the kitchen shows the result itself (the runtime then skips its old dish card).
 ## Floats rise over the plate while the pot's result is on screen (COOK-4: the XP chip above the plate), else over
@@ -146,7 +181,8 @@ func p0_event(ev: Dictionary, v: Dictionary) -> bool:
 	if kitchen == null: return false
 	match str(ev.get("kind", "")):
 		"pot":
-			var st = P0KitchenLogic.stove(v)
+			if ev.has("stove") and not kitchen.busy(): kitchen.select_stove(int(ev.stove))
+			var st = P0KitchenLogic.stove(v, kitchen.stove_index)
 			if bool(ev.get("queued", false)): kitchen.on_queued()   # Queue ×2: in behind the pot cooking (q(71))
 			elif st is Dictionary: kitchen.on_pot(st)
 			return false
@@ -156,7 +192,7 @@ func _room_frame(v: Dictionary, _dt: float) -> void:
 	if _sheet and rt and rt.session.view.get("seq", -1) != _sheet.view.get("seq", -2): _sheet.refresh(rt.session.current())
 	if kitchen == null: return
 	kitchen.sync_view(v)
-	var st = P0KitchenLogic.stove(v)
+	var st = P0KitchenLogic.stove(v, kitchen.stove_index)
 	var cooking: bool = st != null and float(st.get("ready_in", 0)) > 0.0
 	if kitchen.phase == "idle" and kitchen.stage.is_cooking() != cooking: kitchen.stage.set_cooking(cooking)
 	if kitchen.phase == "serve" and st == null and kitchen.waiting_events(): kitchen.on_collected()   # refused as empty
@@ -182,6 +218,10 @@ func is_back_navigation_locked() -> bool:
 func p0_dev(step: PackedStringArray) -> bool:
 	match step[0]:
 		"stove": open_stove(step[1] if step.size() > 1 else "cookbook")
+		"stoveat":   # stoveat:<i> — a tap on stove i (0-based): walk there and open it (SGODOT-282 shots)
+			_pending_tab = ""
+			walk_to(STOVES[int(step[1])])
+		"cyclestove": if kitchen.drawer: kitchen.drawer.stove_cycle_requested.emit()   # the drawer's Stove n/N › pill
 		"kitchen": p0_open_kitchen(step[1] if step.size() > 1 else "cookbook")
 		"queue": kitchen.open_queue()   # Queue next › on the watch sheet (shots)
 		"heattap": kitchen.dev_heat_tap()   # a heat tap now: until:gold first (shots)
@@ -213,7 +253,7 @@ func p0_dev(step: PackedStringArray) -> bool:
 func p0_until(n: String) -> bool:
 	match n:
 		"cooking": return kitchen != null and kitchen.phase == "watch"
-		"turned": return kitchen != null and kitchen.phase == "watch" and P0KitchenLogic.queued(rt.session.current()) == null   # Queue ×2 turned over
+		"turned": return kitchen != null and kitchen.phase == "watch" and P0KitchenLogic.queued(rt.session.current(), kitchen.stove_index) == null   # Queue ×2 turned over
 		"card": return kitchen != null and kitchen.phase == "card"
 		"floating": return rt != null and not rt.ui.root.find_children("*", "UiFloatText", true, false).is_empty()   # a float is up (shots)
 		"compose": return kitchen != null and kitchen.phase == "compose"

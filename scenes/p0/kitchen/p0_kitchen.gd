@@ -61,6 +61,10 @@ var _pot_card: UiPotCard
 var _point_at_remove := false      # the pot is full and a bag cell was tapped: ✕ wears its gold-brown ring (q(64))
 var _ring: UiHeatRing
 var _stove: Dictionary = {}
+## The stove this kitchen works (SGODOT-282: Homestead Lv4 / Lv8 bring stoves 2 and 3), 0-based. The drawer, the
+## watch, serve and the 3D stage all follow it; P0Farmhouse picks it when a stove is tapped.
+var stove_index := 0
+const STOVE_PAN_S := 0.25   # the camera's pan from one pot to the next (b84a5e01 ②, ease-out)
 var _start_ms := 0
 var _taps: Array = []
 var _judged := {}
@@ -92,11 +96,26 @@ func _ready() -> void:
 	stage.cam = room.cam
 	stage.glow_light = room.room.find_child("HearthGlow", true, false)
 	stage.fire_fx = room.art.get("fire") as Node if "fire" in room.art else null
-	var mouth := room.anchor("drop_pot_1")
+	var mouth := room.anchor(drop_name())
 	if mouth: mouth.add_child(stage)
 	else: room.add_child(stage)
 
 func busy() -> bool: return phase != "idle"
+
+## Anchor names for the working stove: stove 1 keeps the P0 names (drop_pot_1, cam_stove); 2 and 3 have their own.
+func drop_name() -> String: return "drop_pot_%d" % (stove_index + 1)
+func cam_name() -> String: return "cam_stove" if stove_index == 0 or room.anchor("cam_stove_%d" % (stove_index + 1)) == null else "cam_stove_%d" % (stove_index + 1)
+
+## Switch the stove this kitchen works (a stove tapped, the drawer's Stove n/N pill): the 3D stage moves to that pot.
+## Only while nothing is in flight on the current one (idle, or the drawer composing).
+func select_stove(i: int) -> void:
+	var n := P0KitchenLogic.stove_count(rt.session.current()) if rt else 1
+	i = clampi(i, 0, maxi(0, n - 1))
+	if i == stove_index: return
+	stove_index = i
+	var mouth := room.anchor(drop_name())
+	if mouth and stage.get_parent() != mouth: stage.reparent(mouth, false)
+	stage.set_cooking(P0KitchenLogic.stove(rt.session.current(), stove_index) != null if rt else false)
 
 # ---------------------------------------------------------------- compose
 ## COOK-P0-7 / P0-8: the last known page again (Cooking Lv2 Cook Again). Choose recipe › and Details › go to its
@@ -111,7 +130,9 @@ func open_again(page_id: String) -> void:
 	sheet.safe_bottom = rt.ui.safe_bottom()
 	sheet.close_requested.connect(func(): rt.ui.close_modal())
 	sheet.unavailable.connect(func(r: String): rt.ui.toast(r))
-	sheet.cook.connect(func(cmd: Dictionary): rt.session.send(cmd, P0Session.ui_key(cmd)))
+	sheet.cook.connect(func(cmd: Dictionary):
+		cmd = with_stove(cmd)
+		rt.session.send(cmd, P0Session.ui_key(cmd)))
 	var to_page := func():
 		rt.ui.close_modal()
 		open("cookbook", page_id)
@@ -126,7 +147,7 @@ func open_again(page_id: String) -> void:
 		room.release_focus()
 		_hide_player(false))
 	_hide_player(true)
-	room.focus("cam_stove", {band = room.band_below_hud(1.0 - CookAgainSheet.HEIGHT / 800.0 - 0.02), size = room.view_size() * FOCUS_SIZE, release_on_move = false})
+	room.focus(cam_name(), {band = room.band_below_hud(1.0 - CookAgainSheet.HEIGHT / 800.0 - 0.02), size = room.view_size() * FOCUS_SIZE, release_on_move = false})
 
 ## Opens the cooking drawer on `tab` (Cookbook / Experiment) with the camera on the stove. A page Today's cook row
 ## pointed at (P0Ui.cook_page_from_today, q(99)) is the Cookbook's selection this once, unless a page is given.
@@ -144,6 +165,8 @@ func open(tab := "cookbook", page_id := "") -> void:
 	_wrap.theme = UiKit.theme()
 	drawer = P0KitchenDrawer.new(rt.session.current(), tab)
 	drawer.queue_mode = _queue_mode
+	drawer.stove_index = stove_index
+	drawer.stove_cycle_requested.connect(_cycle_stove)
 	drawer.safe_bottom = rt.ui.safe_bottom()
 	drawer.close_requested.connect(func(): rt.ui.close_modal())
 	drawer.page_selected.connect(_on_page)
@@ -162,7 +185,7 @@ func open(tab := "cookbook", page_id := "") -> void:
 	_hide_player(true)
 	var band := room.band_below_hud(BAND_TOP_DRAWER)
 	if _queue_mode: band.position.y += QUEUE_DROP / maxf(room.get_viewport().get_visible_rect().size.y, 1.0)
-	room.focus("cam_stove", {band = band, size = room.view_size() * FOCUS_SIZE, release_on_move = false})
+	room.focus(cam_name(), {band = band, size = room.view_size() * FOCUS_SIZE, release_on_move = false})
 	if page_id != "" and not drawer.page(page_id).is_empty(): drawer.select_page(page_id)
 	if tab == "cookbook" and drawer.selected_page != "": _on_page(drawer.page(drawer.selected_page))
 	_refresh_overlay()
@@ -177,7 +200,7 @@ func _on_closed() -> void:
 	stage.clear_ghosts()
 	if _queue_mode:   # opened from Queue next ›: back to the pot on the stove, whether a pot was queued or not (q(71))
 		_queue_mode = false
-		var st = P0KitchenLogic.stove(rt.session.current())
+		var st = P0KitchenLogic.stove(rt.session.current(), stove_index)
 		if st != null:
 			watch(st)
 			return
@@ -185,12 +208,38 @@ func _on_closed() -> void:
 	room.release_focus()
 	_hide_player(false)
 
+## The drawer's `Stove 2/3 ›` (b84a5e01 ②): the next stove, 3 back to 1; the camera pans to its pot in 0.25 s and
+## the drawer shows that stove. A stove that is cooking or waiting to be collected closes the drawer and shows its pot
+## the way a tap on it does (only an empty stove composes).
+func _cycle_stove() -> void:
+	if phase != "compose" or _queue_mode: return
+	var v := rt.session.current()
+	var n := P0KitchenLogic.stove_count(v)
+	if n < 2: return
+	var next := (stove_index + 1) % n
+	pot.clear()
+	stage.clear_ingredients()
+	stage.clear_ghosts()
+	select_stove(next)
+	if P0KitchenLogic.stove(v, next) != null:
+		phase = "idle"   # the drawer's close must not undo the switch
+		rt.ui.close_modal()
+		drawer = null
+		_overlay = null
+		room.call("open_stove", "cookbook", false)
+		return
+	drawer.stove_index = next
+	drawer.refresh()
+	_refresh_overlay()
+	var band := room.band_below_hud(BAND_TOP_DRAWER)
+	room.focus(cam_name(), {band = band, size = room.view_size() * FOCUS_SIZE, release_on_move = false, ease_s = STOVE_PAN_S})
+
 ## Queue next › (q(71)): the cooking drawer over the pot being watched, its Cook reading Queue. The watch resumes when
 ## the drawer closes. The queue drawer is not leaving the pot (§7.2.3; 不知火舞 on 226): the heat rings go on over the
 ## pot in the band above it, drawn over the slot bar and the preview, and a tap on that band inside a ring's window
 ## judges it with its float, the drawer staying open; rings judged meanwhile stand when the watch resumes.
 func open_queue() -> void:
-	if phase != "watch" or not P0KitchenLogic.can_queue(rt.session.current()): return
+	if phase != "watch" or not P0KitchenLogic.can_queue(rt.session.current(), stove_index): return
 	_hide_sheet()
 	phase = "idle"
 	_queue_mode = true
@@ -402,7 +451,13 @@ func _after_pot_change() -> void:
 func _on_cook(cmd: Dictionary) -> void:
 	if _cook_sent: return
 	_cook_sent = true
+	cmd = with_stove(cmd)
 	rt.session.send(cmd, P0Session.ui_key(cmd))
+
+## A cook names its stove when the kitchen has more than one (the server otherwise takes the first free one).
+func with_stove(cmd: Dictionary) -> Dictionary:
+	if P0KitchenLogic.stove_count(rt.session.current()) > 1: cmd["stove"] = stove_index
+	return cmd
 
 ## The drawer redraws from the latest view while it is open (a collect or a sale changes the bag under it); the watch
 ## sheet follows the queue (Queued 1, Queue next ›).
@@ -448,7 +503,7 @@ func watch(stove: Dictionary) -> void:
 	phase = "watch"
 	_hide_player(true)
 	stage.set_cooking(true)
-	room.focus("cam_stove", {band = room.band_below_hud(BAND_TOP_WATCH), size = room.view_size() * WATCH_FOCUS_SIZE, release_on_move = false})
+	room.focus(cam_name(), {band = room.band_below_hud(BAND_TOP_WATCH), size = room.view_size() * WATCH_FOCUS_SIZE, release_on_move = false})
 	if _ring == null:
 		_ring = UiHeatRing.new()
 		_ring.theme = UiKit.theme()
@@ -493,9 +548,9 @@ func _show_sheet(stove: Dictionary) -> void:
 ## Queue next › only when Queue ×2 is open and nothing waits (Lv1–4 or a full queue: no button at all).
 func _refresh_watch(v: Dictionary) -> void:
 	if _sheet == null: return
-	_sheet_header.state = P0KitchenLogic.watch_state(v)
-	_queue_next.visible = P0KitchenLogic.can_queue(v)
-	var q = P0KitchenLogic.queued(v)
+	_sheet_header.state = P0KitchenLogic.watch_state(v, stove_index)
+	_queue_next.visible = P0KitchenLogic.can_queue(v, stove_index)
+	var q = P0KitchenLogic.queued(v, stove_index)
 	if _queue_badge:
 		_queue_badge.visible = q != null
 		if q != null:
@@ -587,7 +642,7 @@ func ring_center() -> Vector2: return _ring_center()
 
 ## The ring sits on the pot (COOK-3: the whole pot is the target, §7.2.4).
 func _ring_center() -> Vector2:
-	var mouth := room.anchor("drop_pot_1")
+	var mouth := room.anchor(drop_name())
 	if mouth == null: return room.get_viewport().get_visible_rect().size * 0.5
 	return room.cam.unproject_position(mouth.global_position)
 
@@ -627,7 +682,7 @@ func _process(_dt: float) -> void:
 func serve(taps: Array, from_stove := false) -> void:
 	if phase == "serve" or phase == "card": return
 	var v := rt.session.current()
-	var st = P0KitchenLogic.stove(v)
+	var st = P0KitchenLogic.stove(v, stove_index)
 	# Watching: serve the pot being watched. Gone from the stove: nothing to collect here, so the watch ends instead of
 	# waiting (PR #54 review). Another pot on it now: the view already shows Queue ×2's turn-over (it settles the
 	# stove as the next command will), so collect the watched pot to land it now with its toast, then watch the next
@@ -640,7 +695,7 @@ func serve(taps: Array, from_stove := false) -> void:
 		on_collected()
 		return
 	# Queue ×2: the watched pot is done and another waits. The stove turns over: no plate, no card (q(71)).
-	if phase == "watch" and P0KitchenLogic.queued(v) != null:
+	if phase == "watch" and P0KitchenLogic.queued(v, stove_index) != null:
 		_rotate(taps)
 		return
 	if st == null:
@@ -697,7 +752,7 @@ func on_event(ev: Dictionary) -> bool:
 						# stale_pot after a command kept the watched pot: the next one is on, watch it. Anything else
 						# (no network, the same pot, an empty stove) recovers as a failed serve does: camera and player
 						# back, no automatic resend; a tap on the stove serves or watches it again (后裔 on #104).
-						var st = P0KitchenLogic.stove(rt.session.current())
+						var st = P0KitchenLogic.stove(rt.session.current(), stove_index)
 						if st != null and st.get("id", null) != null and st.get("id", null) != _stove.get("id", null) and float(st.get("ready_in", 1)) > 0.0:
 							phase = "idle"
 							watch(st)
@@ -722,7 +777,7 @@ func on_event(ev: Dictionary) -> bool:
 ## the player return, taps and Back work again; the stove shows its state and a tap serves or watches it again.
 func _recover() -> void:
 	on_collected()
-	stage.set_cooking(P0KitchenLogic.stove(rt.session.current()) != null)
+	stage.set_cooking(P0KitchenLogic.stove(rt.session.current(), stove_index) != null)
 
 ## The server settled the pot without a card (refused as empty): back to idle, the plate goes away.
 func on_collected() -> void:
@@ -771,7 +826,7 @@ func show_left(id: String) -> void:
 	_card_where = "stove"
 	_left_card = true
 	_hide_player(true)
-	room.focus("cam_stove", {band = room.band_below_hud(BAND_TOP_WATCH), size = room.view_size() * FOCUS_SIZE, release_on_move = false})
+	room.focus(cam_name(), {band = room.band_below_hud(BAND_TOP_WATCH), size = room.view_size() * FOCUS_SIZE, release_on_move = false})
 	_open_card(fields)
 
 func _open_card(fields: Dictionary) -> void:
@@ -911,7 +966,7 @@ func _after_kept(ev: Dictionary, events: Array) -> void:
 		var line := P0KitchenLogic.kept_line(v, ev, events)
 		if not line.is_empty(): rt.ui.toast(str(line.text))
 	if phase in ["rotate", "watch"]:
-		var st = P0KitchenLogic.stove(v)
+		var st = P0KitchenLogic.stove(v, stove_index)
 		if st != null and float(st.get("ready_in", 1)) > 0.0: watch(st)
 		elif phase == "rotate":
 			phase = "watch"
