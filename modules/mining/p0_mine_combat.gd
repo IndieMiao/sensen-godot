@@ -138,6 +138,28 @@ const TURN_MARGIN := 0.35   # the old mine's turn margin (mine_combat.swing), no
 ## spot (edge 1.67–1.74 m) is, at its recovery spot (1.85 m) a step in is still needed.
 const HIT_SLACK := 0.15
 
+## A lunge stops where its body meets the player's (不知火舞 288 ce070cd7: the elite ran on through the player, who sank into
+## it to the head): never closer than its radius + PLAYER_RADIUS centre to centre, a hair inside the dash's hit test
+## (mine_combat: radius + 0.35) so the touch still lands. Already touching, it may move away but never further in; a lunge
+## that passes the player by runs its length (the band shows that whole reach).
+const PLAYER_RADIUS := 0.35
+const CONTACT_INSIDE := 0.02
+
+func _dash_step(enemy: Dictionary, player: PlayerMover, offset: Vector3) -> Vector3:
+	var contact := float(enemy.spec.get("radius", 0.0)) + PLAYER_RADIUS - CONTACT_INSIDE
+	var from: Vector3 = (enemy.mover as PlayerMover).position - player.position
+	from.y = 0
+	var flat := Vector3(offset.x, 0, offset.z)
+	var a := flat.length_squared()
+	if a < 1e-9: return offset
+	var b := 2.0 * from.dot(flat)
+	var c := from.length_squared() - contact * contact
+	if c <= 0.0: return offset if b >= 0.0 else Vector3.ZERO
+	var disc := b * b - 4.0 * a * c
+	if disc < 0.0: return offset
+	var t := (-b - sqrt(disc)) / (2.0 * a)   # where |from + t·flat| first reaches contact
+	return offset * t if t >= 0.0 and t <= 1.0 else offset
+
 ## Flat distance from `at` to a monster's body edge (its spec radius), 0 inside it.
 static func edge_distance(at: Vector3, enemy: Dictionary) -> float:
 	var off: Vector3 = enemy.node.position - at
