@@ -27,7 +27,7 @@ func test_a_dish_card_shows_every_part_it_is_given() -> void:
 		primary = "Eat · +45 Energy", secondary = "Keep", note = "Gift later from your bag"})
 	await _settle()
 	var t := _texts(r)
-	for s in ["New recipe!", "Herb Grilled Fish", "Fine", "★ Good", "First cooked · +20 Cooking XP · Cookbook 2/48", "Gift later from your bag"]:
+	for s in ["New recipe!", "Herb Grilled Fish", "Fine", "★ Good", "First cooked · +20\u00a0Cooking XP\nCookbook 2/48", "Gift later from your bag"]:
 		assert_bool(t.has(s)).override_failure_message("missing %s in %s" % [s, t]).is_true()
 	assert_array(_buttons(r).map(func(b): return b.text)).contains_exactly(["Eat · +45 Energy", "Keep"])
 	assert_float(r.size.x).is_equal(UiRewardMoment.WIDTH)
@@ -119,3 +119,22 @@ func test_a_fact_line_without_rarity_shows_under_the_name_without_a_dot() -> voi
 	assert_bool(r._dot.visible).is_false()
 	var rarity: Label = r.find_children("*", "Label", true, false).filter(func(l): return (l as Label).text == "9 left today")[0]
 	assert_float(rarity.size.x).is_greater_equal(rarity.get_minimum_size().x)   # not cut
+
+## The one-time strip breaks between its rewards, never inside one (不知火舞 on 289 73b6029e: `+10` / `XP` split across
+## lines): whole rewards a line, no line ending in « ·», a number held to its unit; the strip property keeps its text.
+func test_the_strip_breaks_between_its_rewards() -> void:
+	var r := _card({event = "In your trap!", item_name = "River Perch", rarity = 2, rarity_word = "Fine",
+		strip = "First catch! +30 XP · New city! +10 XP", strip_icon = P0Logic.icon("star")})
+	await _settle()
+	var shown: String = (r.get("_strip_text") as Label).text
+	assert_str(shown).is_equal("First catch! +30 XP\nNew city! +10 XP")
+	assert_str(r.strip).is_equal("First catch! +30 XP · New city! +10 XP")
+	var short := _card({event = "Caught!", item_name = "Pond Crucian", strip = "First catch! +15 XP", strip_icon = P0Logic.icon("star")})
+	await _settle()
+	assert_str((short.get("_strip_text") as Label).text).is_equal("First catch! +15 XP")
+	var font := (r.get("_strip_text") as Label).get_theme_font(&"font")
+	for w in [60.0, 140.0, 400.0]:
+		var lines := UiRewardMoment.strip_lines("First cooked · +20 Cooking XP · Cookbook 2/48", font, 12, w).split("\n")
+		for l in lines: assert_bool(l.ends_with("·") or l.begins_with("·")).is_false()
+		assert_str(" · ".join(lines)).is_equal("First cooked · +20 Cooking XP · Cookbook 2/48")
+	assert_str(UiRewardMoment.strip_lines("a · b", null, 12, 100.0)).is_equal("a · b")

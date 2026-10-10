@@ -270,7 +270,7 @@ func test_profile_page_emits_back_edit_look_and_skill() -> void:
 	(page.find_children("*", "UiNavButton", true, false)[0] as UiNavButton).pressed.emit()
 	(page.find_children("*", "UiSkillCard", true, false)[1] as UiSkillCard).pressed.emit()
 	assert_array(got).is_equal(["back", "look", "fishing"])
-	assert_float(page.top_bar.right_button().modulate.a).is_equal(0.0)   # no Settings page in P0 yet
+	assert_float(page.top_bar.right_button().modulate.a).is_equal(1.0)   # the gear opens Settings (q(129); 197 8d0d8212)
 
 func _mouse(down: bool) -> InputEventMouseButton:
 	var m := InputEventMouseButton.new()

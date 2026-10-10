@@ -226,13 +226,15 @@ func _headers() -> PackedStringArray:
 static func is_demo_build() -> bool:
 	return FileAccess.file_exists(DEMO_CONFIG)
 
-## The demo build's baked server: {"url": "https://…/v1", "key": "…"}; {} when absent or malformed.
+## The demo build's baked server: {"url": "https://…/v1", "key": "…", "version": versionCode, "name": versionName};
+## {} when absent or malformed.
 static func demo_config(text: String) -> Dictionary:
 	var parsed = JSON.parse_string(text) if text != "" else null
 	if not parsed is Dictionary: return {}
 	var url := str(parsed.get("url", "")).strip_edges().trim_suffix("/")
 	if not (url.begins_with("http://") or url.begins_with("https://")): url = ""
-	return {"url": url, "key": str(parsed.get("key", "")).strip_edges(), "version": int(parsed.get("version", 0))}
+	return {"url": url, "key": str(parsed.get("key", "")).strip_edges(), "version": int(parsed.get("version", 0)),
+		"name": str(parsed.get("name", "")).strip_edges()}   # the version name, for Settings › Version (q(129))
 
 static func _read_line(path: String, fallback: String) -> String:
 	if FileAccess.file_exists(path):

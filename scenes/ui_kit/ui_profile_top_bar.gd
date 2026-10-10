@@ -3,7 +3,7 @@ extends HBoxContainer
 ## Profile top bar (SGODOT-225; ProfileTopBar 1233:107734, LOCK-22). One profile design only:
 ##   SELF   back + `Profile` + gear (Settings)
 ##   OTHER  back + their name + ··· (UiProfileMoreMenu: Unfollow / Block / Report, flows in WP5)
-## `show_settings = false` hides the gear while P0 has no Settings page (TODO in the P0 page).
+## `show_settings = false` hides the gear (P0 shows it: Settings › Legal › Licenses, q(129)).
 ## Emits back_pressed, settings_pressed, more_pressed(anchor: Rect2, global).
 
 signal back_pressed

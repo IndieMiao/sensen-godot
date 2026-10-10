@@ -382,6 +382,8 @@ func set_hp(hp: int, maximum: int, elite := {}) -> void:
 func hp_bar() -> UiHpBar: return _hp
 ## The creel badge (where a trap's fish fly to, SGODOT-289).
 func creel_badge() -> Control: return _creel
+## The quick bar's Bag, where a row's harvest flies (SGODOT-289); null without a bar.
+func bag_target() -> Control: return quick_bar_node().bag_end() if quick_bar_node() != null else null
 ## A trap's fish still flying to the badge ([{id, count}]): it counts each in as it lands (creel_landed).
 var creel_in_flight: Array = []
 func creel_flying(got: Array) -> void:
@@ -1103,12 +1105,12 @@ func _make_float(text: String, tone: int, icon: Texture2D) -> UiFloatText:
 ## is pushed down until its top line, at the top of its rise, still clears the HUD rows by FLOAT_HUD_GAP. `top_index`
 ## = that line's stack index (the group's lines minus one).
 const FLOAT_HUD_GAP := 8.0
-func _float_start(screen: Vector2, lines: Array, top_index: int) -> Vector2:
+func _float_start(screen: Vector2, lines: Array, top_index: int, top_rise := -1.0) -> Vector2:
 	var hud_bottom := _marker_area().position.y + _kit.global_position.y - root.global_position.y
 	var h := 0.0
 	for f in lines: h = maxf(h, (f as UiFloatText).shown_size().y)
 	var lowest := hud_bottom + FLOAT_HUD_GAP + h + UiFloatText._RISE \
-		+ UiFloatText._STACK_RISE * clampi(top_index, 0, UiFloatText._STACK_MAX - 1)
+		+ (UiFloatText._STACK_RISE * clampi(top_index, 0, UiFloatText._STACK_MAX - 1) if top_rise < 0.0 else top_rise)
 	# …and never past the screen's sides: a wide line from near an edge (a trap's three fish by the bank, SGODOT-289)
 	# moves in until it is SPACE_PAGE clear of both (each line's own bounds also keep its pop inside them).
 	var half := 0.0
@@ -1144,6 +1146,9 @@ const FLOAT_MAX_LINES := 3
 ## a line's end, within FLOAT_MAX_LINES). Cook All's costs and a row's crops read the same way.
 const FLOAT_SPLIT_KINDS := ["item"]
 const FLOAT_ITEMS_PER_LINE := 2
+## The lines one item group splits into pop together as one block, each its own height and this far apart, so they
+## never meet, rising or at rest (不知火舞 on #289: Cook All's `−5 Pond Crucian · −2 Wild Herb` / `−2 Radish`).
+const FLOAT_GROUP_GAP := 4.0
 ## A line of a kind still up — before its fade starts (UiFloatText 650 ms) — takes the next reply's amount in place;
 ## while the action key is held (a held harvest, a labour beat apart) for as long as the line is still there.
 const _FLOAT_MERGE_MS := 650
@@ -1169,7 +1174,11 @@ func float_lines(parts: Array, at: Vector2) -> Array:
 	var rows: Array = []   # [{kind, parts}] from the bottom: a kind's line, or an item line's pair (FLOAT_ITEMS_PER_LINE)
 	for k in order:
 		var all: Dictionary = kinds[k]
-		if not (k in FLOAT_SPLIT_KINDS and all.size() > FLOAT_ITEMS_PER_LINE):
+		# split only while the lines still fit the cap of three; past it the kind stays one line in its own order and joins
+		# the cap's last line as any overflow does (q(49) ①, q(124) ①)
+		var lines_after := order.size() - order.find(k) - 1
+		var split_lines := ceili(float(all.size()) / FLOAT_ITEMS_PER_LINE)
+		if not (k in FLOAT_SPLIT_KINDS and all.size() > FLOAT_ITEMS_PER_LINE) or rows.size() + split_lines + lines_after > FLOAT_MAX_LINES:
 			rows.append({kind = k, parts = all})
 			continue
 		var keys: Array = all.keys()
@@ -1177,7 +1186,7 @@ func float_lines(parts: Array, at: Vector2) -> Array:
 		for j in range(0, keys.size(), FLOAT_ITEMS_PER_LINE):
 			var pair := {}
 			for key in keys.slice(j, j + FLOAT_ITEMS_PER_LINE): pair[key] = all[key]
-			pairs.append({kind = k, parts = pair})
+			pairs.append({kind = k, parts = pair, group = k})
 		pairs.reverse()   # the first pair reads on top
 		rows.append_array(pairs)
 	var shown: Array = []
@@ -1205,11 +1214,35 @@ func float_lines(parts: Array, at: Vector2) -> Array:
 		# Energy is coloured by what it adds up to; a line of text parts only (a floor fee) keeps its own tone.
 		if k == "energy" and merged.values().any(func(p): return p.has("fmt")):
 			tone = UiFloatText.Tone.ENERGY_COST if _float_sum(merged) < 0 else UiFloatText.Tone.ENERGY_GAIN
-		fresh.append({kind = k, text = text, tone = tone, icon = first.get("icon", null), merged = merged, overflow = not extra.is_empty()})
+		fresh.append({kind = k, text = text, tone = tone, icon = first.get("icon", null), merged = merged, overflow = not extra.is_empty(),
+			group = str(rows[i].get("group", ""))})
 	if fresh.is_empty(): return shown
 	var base := shown.size()   # lines bumped in place keep the lower places
 	var nodes: Array = fresh.map(func(l): return _make_float(l.text, l.tone, l.icon))
-	var start := _float_start(at, nodes, base + nodes.size() - 1)
+	# Each line's place: 28 above the one below (q(49)), but a split item group's lines stack by their own height and
+	# FLOAT_GROUP_GAP and start together, growing from the group's lowest line (not one 60 ms after the other).
+	var places: Array = []   # [rise of the line's group base, the line above that base, its start slot]
+	var rise := UiFloatText._STACK_RISE * base
+	var slot := base
+	var group_base := rise
+	for j in nodes.size():
+		var joins: bool = j > 0 and str(fresh[j].group) != "" and str(fresh[j].group) == str(fresh[j - 1].group)
+		if j > 0:
+			rise += (float((nodes[j - 1] as UiFloatText).shown_size().y) + FLOAT_GROUP_GAP) if joins else UiFloatText._STACK_RISE
+			if not joins: slot += 1
+		if not joins: group_base = rise
+		places.append([group_base, rise - group_base, slot])
+	# …and pop to one peak: the lowest of the group's lines (a wide line's is capped), the same for each line
+	var j0 := 0
+	while j0 < nodes.size():
+		var j1 := j0 + 1
+		while j1 < nodes.size() and float(places[j1][1]) > 0.0: j1 += 1
+		if j1 - j0 > 1:
+			var low := INF
+			for k in range(j0, j1): low = minf(low, (nodes[k] as UiFloatText).peak())
+			for k in range(j0, j1): (nodes[k] as UiFloatText).peak_cap = low
+		j0 = j1
+	var start := _float_start(at, nodes, base + nodes.size() - 1, rise)
 	var half_w := 0.0
 	for n in nodes: half_w = maxf(half_w, (n as UiFloatText).shown_size().x * 0.5)
 	if nodes.size() > 1 and start.y > at.y and start.y > _float_floor(at.x, half_w):
@@ -1224,7 +1257,13 @@ func float_lines(parts: Array, at: Vector2) -> Array:
 		start = _float_start(at, nodes, base)
 	for j in nodes.size():
 		var f: UiFloatText = nodes[j]
-		f.play(start, base + j)
+		if places.size() == nodes.size():
+			f.group_rise = float(places[j][1])
+			if f.group_rise > 0.0:   # rests on the line below as that one's font settles
+				f.rest_gap = FLOAT_GROUP_GAP
+				f.rests_on = nodes[j - 1]
+			f.play(start, int(places[j][2]), float(places[j][0]))
+		else: f.play(start, base + j)   # pushed down under the HUD: the group joined into one line
 		var l: Dictionary = fresh[j]
 		if not l.overflow: _live_floats[l.kind] = {node = f, parts = (l.merged as Dictionary).duplicate(true), at = at, ms = now}
 		shown.append(f)
@@ -1266,6 +1305,7 @@ static func _float_line_text(parts: Dictionary) -> String:
 		var line := str(p.fmt) % (("+%d" % a) if a >= 0 else ("−%d" % -a))
 		# A held harvest's XP counts its plants once more than one went into it: `+40 XP · 20 plants`.
 		if str(p.get("unit", "")) != "" and int(p.get("count", 1)) > 1: line += " · %d %s" % [int(p.count), str(p.unit)]
+		if str(p.get("tail", "")) != "": line += " · " + str(p.tail)   # Harvest ×N's `· First harvest` (q(124) ②)
 		return line))
 
 # ---------------------------------------------------------------- system states (SGODOT-233, WP6, §10.7.1)
@@ -2770,9 +2810,43 @@ func open_profile(look_saved := false) -> void:
 	page.farm_pressed.connect(func():
 		_over_profile = true
 		open_home_panel(func(): open_profile()))
+	page.settings_pressed.connect(func(): open_settings(func(): open_profile()))
 	_open_modal(page, 0.0, true)
 	_profile = page
 	modal_kind = "profile"
+
+## Settings (q(129); P0: Legal · Licenses and Version) from the profile's gear, full screen; ‹ goes back where it came
+## from (`back`), as each page under it does to the one before.
+func open_settings(back := Callable()) -> void:
+	var page := P0SettingsPage.settings(P0Legal.version_line(P0Session.demo_config(
+		FileAccess.get_file_as_string(P0Session.DEMO_CONFIG) if FileAccess.file_exists(P0Session.DEMO_CONFIG) else "")),
+		safe_top(), safe_bottom())
+	page.theme = UiKit.theme()
+	page.back_pressed.connect(back_modal)
+	page.open_pressed.connect(func(_what: String): open_licenses(func(): open_settings(back)))
+	_open_modal(page, 0.0, true)
+	modal_kind = "settings"
+	_modal_back = back
+
+## SET-LICENSES: the credits (P0Legal); a row opens its full text, whose ‹ comes back here.
+func open_licenses(back := Callable()) -> void:
+	var page := P0SettingsPage.licenses(P0Legal.groups(), safe_top(), safe_bottom())
+	page.theme = UiKit.theme()
+	page.back_pressed.connect(back_modal)
+	page.open_pressed.connect(func(id: String): open_license_text(id, func(): open_licenses(back)))
+	_open_modal(page, 0.0, true)
+	modal_kind = "licenses"
+	_modal_back = back
+
+## A credit's full text under its title (no frame; 不知火舞 on the Licenses brief).
+func open_license_text(id: String, back := Callable()) -> void:
+	var r := P0Legal.row(id)
+	var page := P0SettingsPage.text(str(r.get("title", "")), P0Legal.full_text(r), safe_top(), safe_bottom())
+	page.theme = UiKit.theme()
+	page.back_pressed.connect(back_modal)
+	_open_modal(page, 0.0, true)
+	modal_kind = "license_text"
+	_modal_back = back
 
 ## Close on a layer of the profile chain (Skills, the Fish-dex, HOME-1 opened from the profile) closes that layer only,
 ## back to what is under it, as the system Back does; only the profile's own ‹ goes out to the world. Opened from the
@@ -2936,11 +3010,12 @@ func show_banner(spec: Dictionary, on_action := Callable()) -> UiMomentBanner:
 
 ## FISH-3 · the first catch of a species (§4.8.6): `Caught!` / the fish · rarity / `Fish-dex 3/N`; the one-time strip
 ## `First catch! +15 XP` (and `New city! +10 XP`); a first Fine / Rare fish adds its Energy as a pill. No buttons.
-## extras: {city_xp, energy} from the same response (P0Runtime).
-func show_catch(fish_id: String, rarity: int, first_xp: int, extras := {}) -> void:
+## extras: {city_xp, energy} from the same response (P0Runtime). A kind first got from a Fish Trap: `In your trap!`, the
+## rest the same (q(124) ①).
+func show_catch(fish_id: String, rarity: int, first_xp: int, extras := {}, event := "Caught!") -> void:
 	var m := UiRewardMoment.new()
 	m.tone = UiRewardMoment.Tone.REWARD
-	m.event = "Caught!"
+	m.event = event
 	m.icon = P0Logic.icon(fish_id)
 	m.item_name = P0Logic.item_name(view, fish_id)
 	m.rarity = rarity
@@ -2953,7 +3028,8 @@ func show_catch(fish_id: String, rarity: int, first_xp: int, extras := {}) -> vo
 	if int(extras.get("energy", 0)) > 0:
 		m.rewards = [UiFloatText.pill("+%d Energy" % int(extras.energy), UiFloatText.Tone.ENERGY_GAIN)]
 	var dex: Array = view.get("fishing", {}).get("dex", [])
-	m.note = "Fish-dex %d/%d" % [dex.filter(func(d): return int(d.get("caught", 0)) > 0).size(), dex.size()]
+	# a trap's cards come one after another from one reply: each counts the kinds up to its own (extras.dex_back)
+	m.note = "Fish-dex %d/%d" % [dex.filter(func(d): return int(d.get("caught", 0)) > 0).size() - int(extras.get("dex_back", 0)), dex.size()]
 	show_moment(m)
 
 ## FISH-5 / 5-2 · a gate fish broke free, once per species (§4.8.6, q(55) / q(57)): `Too strong` (Fishing level) or
