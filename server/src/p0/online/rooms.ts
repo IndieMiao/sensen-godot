@@ -41,14 +41,27 @@ export class OutpostRooms {
   private byPlayer = new Map<string, Occupant>();
   private recent = new Map<string, { outpost: string; room: number; until: number }>();
 
-  constructor(specs: OutpostSpec[], private now: () => number = Date.now) {
+  /** Generated outposts (SGODOT-280, `gn-…~market0`) are not in the table: `resolve` gives their spec on first join, and
+   * it is dropped again once their last room empties, so only places someone is in are kept (12,490 cities). */
+  private fixed = new Set<string>();
+  constructor(specs: OutpostSpec[], private now: () => number = Date.now, private resolve?: (outpost: string) => OutpostSpec | undefined) {
     for (const spec of specs) {
       if (!Number.isInteger(spec.capacity) || spec.capacity < 1) throw new Error('BAD_CAPACITY');
       this.specs.set(spec.id, spec);
+      this.fixed.add(spec.id);
     }
   }
 
   spec(outpost: string): OutpostSpec | undefined { return this.specs.get(outpost); }
+
+  private specFor(outpost: string): OutpostSpec | undefined {
+    const known = this.specs.get(outpost);
+    if (known || !this.resolve) return known;
+    const made = this.resolve(outpost);
+    if (!made || made.id !== outpost || !Number.isInteger(made.capacity) || made.capacity < 1) return undefined;
+    this.specs.set(outpost, made);
+    return made;
+  }
   occupant(player: string): Occupant | undefined { return this.byPlayer.get(player); }
 
   /** Occupants of one instance, for rosters and snapshot frames. */
@@ -58,7 +71,7 @@ export class OutpostRooms {
 
   /** Lowest-numbered instance with a free place, or the one this player just left. */
   join(player: string, outpost: string, at: [number, number] = [0, 0]): Placement {
-    const spec = this.specs.get(outpost);
+    const spec = this.specFor(outpost);
     if (!spec) throw new Error('UNKNOWN_OUTPOST');
     this.leave(player, false);
     const rooms = this.rooms.get(outpost) ?? new Map<number, Map<string, Occupant>>();
@@ -92,6 +105,7 @@ export class OutpostRooms {
     members.delete(player);
     if (!members.size) rooms.delete(o.room);
     if (remember) this.recent.set(player, { outpost: o.outpost, room: o.room, until: this.now() + REJOIN_MS });
+    if (!rooms.size && !this.fixed.has(o.outpost)) { this.rooms.delete(o.outpost); this.specs.delete(o.outpost); }   // made again on the next join
     return o;
   }
 
@@ -134,7 +148,8 @@ export class OutpostRooms {
     if (o?.seat) { o.seat = ''; o.action = 'idle'; }
   }
 
-  /** Online count per outpost across its instances, for the map pins ("Lotus Tea House · 5 online"). */
+  /** Online count per outpost across its instances, for the map pins ("Lotus Tea House · 5 online"): every
+   * hand-written outpost, and a generated one while someone is in it. */
   presence(): Record<string, { online: number; rooms: number }> {
     const out: Record<string, { online: number; rooms: number }> = {};
     for (const id of this.specs.keys()) {
