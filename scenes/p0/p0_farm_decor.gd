@@ -251,7 +251,9 @@ static func _model(id: String, rot: int, cell: float) -> Node3D:
 			var sails := _part(spec, k, Vector3(0, top - 0.06 * k, 0.1 * k), false)
 			sails.name = "Sails"
 			body.add_child(sails)
-			sails.tree_entered.connect(func() -> void:
+			sails.tree_entered.connect(func() -> void:   # once: back in the tree, the turn it has goes on (周瑜 on #276)
+				if sails.has_meta("turning"): return
+				sails.set_meta("turning", true)
 				sails.create_tween().set_loops().tween_property(sails, "rotation:z", -TAU, SAIL_TURN_S).from(0.0))
 		_:
 			body.add_child(_part(spec, k))
