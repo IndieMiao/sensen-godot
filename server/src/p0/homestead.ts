@@ -27,9 +27,12 @@ export function stepAt(steps: [number, number][] | undefined, level: number, fal
   return v;
 }
 
+/** The most stoves a kitchen has (§8.3.2: the Third Stove is the last); content can never give more. */
+export const MAX_STOVES = 3;
+
 /** Stoves in the kitchen (§8.3.2): Lv1–3 1, Lv4–7 2, Lv8 on 3. */
 export function stoveCount(c: P0Content, s: P0State): number {
-  return Math.max(1, stepAt(c.homestead.stoves, s.homestead.level, 1));
+  return Math.min(MAX_STOVES, Math.max(1, stepAt(c.homestead.stoves, s.homestead.level, 1)));
 }
 
 /** Big Pot (Lv6, §7.7): any stove may cook Double. Chef's Sign (Lv10): the gold zone bonus, 0 before. */
