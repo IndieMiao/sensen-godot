@@ -10,6 +10,10 @@
     {"name": "stand_market_board", "position": [-2.2, 0.05, 1.75], "yaw_degrees": 90},
     {"name": "use_specialty_shelf", "position": [0.85, 0.7, 1.3], "module": "floor_fig_crate"},
     {"name": "stand_specialty_shelf", "position": [0.1, 0.05, 1.3], "yaw_degrees": -90},
+    {"name": "npc_nadia", "position": [0.3, 0.05, -0.4], "yaw_degrees": 180},
+    {"name": "stand_nadia", "position": [0.3, 0.05, 0.3], "yaw_degrees": 0},
+    {"name": "npc_theo", "position": [2.4, 0.05, 0.6], "yaw_degrees": 90},
+    {"name": "stand_theo", "position": [1.7, 0.05, 0.6], "yaw_degrees": -90},
     {"name": "spawn", "position": [0.15, 0.05, 2.05], "yaw_degrees": 0},
     {"name": "exit", "position": [0.15, 0.05, 2.65]},
     {"name": "badge_exit", "position": [0.15, 0.0, 3.4]}
