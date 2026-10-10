@@ -230,6 +230,7 @@ func _remind_heat(v: Dictionary) -> void:
 		var key := "%s:%d" % [str(st.get("id", i)), k]
 		if _reminded.has(key): continue
 		_reminded[key] = true
+		if OS.get_environment("P0_SHOT") != "": print("P0_HEAT_REMIND stove=", i, " ring=", k, " focused=", is_focused())
 		if rt: rt.ui.pulse_marker("room:" + STOVES[i])
 		if OS.has_feature("mobile"): Input.vibrate_handheld(BUZZ_MS)
 		if is_focused(): _show_edge(i)
