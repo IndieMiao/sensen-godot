@@ -1,5 +1,5 @@
 {
-  "_note": "P1 新增系统委托模板 23 条（李白，SGODOT-281/284；方案 §9.6）。形状照 #212 的 RequestTemplate：type 为 output / regional / explore / together，climate 首字母大写与 profile.climate 一致，text 为委托卡两句文案。enabled:false 的有两种：①type 为 regional / explore / together，按 #212 等旅行上线再开；②need 需要 #212 Need 还不支持的条件，完整意图写在 p1_need（family 族、where 塘类型或外城、trail Trail 菜、scale 量 ×1.5、regional zone/city/other_zone、max_rarity、visit 签到、floor 不回收材料的委托地板价），引擎支持后去掉 p1_need 并打开。board 是该模板上哪块板；放进 requests.boards 的列表由苏烈在主文件里改（数组片段不追加）。 苏烈 (SGODOT-284): the engine now also takes need.family (Orchard Basket), a list of styles (Packed Lunches) and scale (Wholesale Order, Fish Market Crate), so those four are on; board is not a template field — the ids are listed in p0_content.json requests.boards (a list without ids cannot be appended by a fragment). Still off: River Run / Far Pond (a fish's water is not kept in the bag), Hardwood Beams / Quartz Glass (until the mine line gives them a floor price), and every regional / explore / together template (travel, live rooms).",
+  "_note": "P1 新增系统委托模板 23 条（李白，SGODOT-281/284；方案 §9.6）。形状照 #212 的 RequestTemplate：type 为 output / regional / explore / together，climate 首字母大写与 profile.climate 一致，text 为委托卡两句文案。enabled:false 的有两种：①type 为 regional / explore / together，按 #212 等旅行上线再开；②need 需要 #212 Need 还不支持的条件，完整意图写在 p1_need（family 族、where 塘类型或外城、trail Trail 菜、scale 量 ×1.5、regional zone/city/other_zone、max_rarity、visit 签到、floor 不回收材料的委托地板价），引擎支持后去掉 p1_need 并打开。board 是该模板上哪块板；放进 requests.boards 的列表由苏烈在主文件里改（数组片段不追加）。 苏烈 (SGODOT-284): the engine now also takes need.family (Orchard Basket), a list of styles (Packed Lunches) and scale (Wholesale Order, Fish Market Crate), so those four are on; board is not a template field — the ids are listed in p0_content.json requests.boards (a list without ids cannot be appended by a fragment). Still off: River Run / Far Pond (a fish's water is not kept in the bag), and every regional / explore / together template (travel, live rooms).",
   "requests": {
     "templates": {
       "req_sys_material_fiber": {
@@ -208,11 +208,7 @@
         ],
         "bonus": 40,
         "type": "output",
-        "text": "The square needs a new stage. Hardwood from the old tree.",
-        "enabled": false,
-        "p1_need": {
-          "floor": 4
-        }
+        "text": "The square needs a new stage. Hardwood from the old tree."
       },
       "req_sys_material_quartz": {
         "title": "Quartz Glass",
@@ -229,11 +225,7 @@
         ],
         "bonus": 40,
         "type": "output",
-        "text": "A glassblower is in town. Quartz from the mine.",
-        "enabled": false,
-        "p1_need": {
-          "floor": 5
-        }
+        "text": "A glassblower is in town. Quartz from the mine."
       },
       "req_sys_regional_crop": {
         "title": "Taste of Home",
