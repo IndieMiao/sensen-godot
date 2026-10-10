@@ -1,0 +1,807 @@
+{
+	"adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+	"assets": [
+		{
+			"bounds_max": [
+				0.279999941587448,
+				0.427056640386581,
+				0.279999941587448
+			],
+			"bounds_min": [
+				-0.280000001192093,
+				0.0,
+				-0.280000001192093
+			],
+			"id": "deco_planter",
+			"sockets": {},
+			"surfaces": 1,
+			"triangles": 1676
+		},
+		{
+			"bounds_max": [
+				0.225208148360252,
+				1.1599999666214,
+				0.120208144187927
+			],
+			"bounds_min": [
+				-0.227500006556511,
+				0.0,
+				-0.120208144187927
+			],
+			"id": "deco_lantern",
+			"sockets": {
+				"glow": {
+					"front": "+Z",
+					"position": [
+						0.105,
+						0.848,
+						0.0
+					]
+				}
+			},
+			"surfaces": 1,
+			"triangles": 452
+		},
+		{
+			"bounds_max": [
+				0.267999976873398,
+				0.0329999998211861,
+				0.247133195400238
+			],
+			"bounds_min": [
+				-0.279645830392838,
+				0.0,
+				-0.232962429523468
+			],
+			"id": "deco_path",
+			"sockets": {},
+			"surfaces": 1,
+			"triangles": 92
+		},
+		{
+			"bounds_max": [
+				0.555000126361847,
+				1.04834401607513,
+				0.275000035762787
+			],
+			"bounds_min": [
+				-0.555000007152557,
+				0.0,
+				-0.288850605487823
+			],
+			"id": "deco_bench",
+			"sockets": {
+				"seat_0": {
+					"front": "+Z",
+					"position": [
+						-0.275,
+						0.67,
+						0.035
+					]
+				},
+				"seat_1": {
+					"front": "+Z",
+					"position": [
+						0.275,
+						0.67,
+						0.035
+					]
+				}
+			},
+			"surfaces": 1,
+			"triangles": 792
+		},
+		{
+			"bounds_max": [
+				0.398333340883255,
+				1.49500000476837,
+				0.187719985842705
+			],
+			"bounds_min": [
+				-0.398333340883255,
+				0.0,
+				-0.187719985842705
+			],
+			"id": "deco_scarecrow",
+			"sockets": {},
+			"surfaces": 1,
+			"triangles": 1240
+		},
+		{
+			"bounds_max": [
+				0.324999988079071,
+				0.589999973773956,
+				0.0450000017881393
+			],
+			"bounds_min": [
+				-0.324999988079071,
+				0.0,
+				-0.0450000017881393
+			],
+			"id": "deco_fence",
+			"sockets": {},
+			"surfaces": 1,
+			"triangles": 296
+		},
+		{
+			"bounds_max": [
+				0.289000004529953,
+				0.839999973773956,
+				0.289000004529953
+			],
+			"bounds_min": [
+				-0.289000004529953,
+				0.0,
+				-0.289000004529953
+			],
+			"id": "deco_birdbath",
+			"sockets": {},
+			"surfaces": 1,
+			"triangles": 1402
+		},
+		{
+			"bounds_max": [
+				0.400000005960464,
+				1.33249998092651,
+				0.39999994635582
+			],
+			"bounds_min": [
+				-0.400000005960464,
+				0.0,
+				-0.400000005960464
+			],
+			"id": "deco_windmill",
+			"sockets": {
+				"rotor": {
+					"front": "+Z",
+					"position": [
+						0.0,
+						0.985,
+						0.273
+					]
+				}
+			},
+			"surfaces": 1,
+			"triangles": 1188
+		},
+		{
+			"bounds_max": [
+				0.602999985218048,
+				0.994000017642975,
+				0.602999985218048
+			],
+			"bounds_min": [
+				-0.602999985218048,
+				0.0,
+				-0.602999985218048
+			],
+			"id": "deco_fountain",
+			"sockets": {},
+			"surfaces": 1,
+			"triangles": 2076
+		},
+		{
+			"bounds_max": [
+				0.939999997615814,
+				2.397465467453,
+				0.61783242225647
+			],
+			"bounds_min": [
+				-0.939999997615814,
+				0.0,
+				-0.615000009536743
+			],
+			"id": "deco_pergola",
+			"sockets": {},
+			"surfaces": 1,
+			"triangles": 1908
+		},
+		{
+			"bounds_max": [
+				0.476236462593079,
+				0.476236402988434,
+				0.0520000234246254
+			],
+			"bounds_min": [
+				-0.476236462593079,
+				-0.476236522197723,
+				-0.0290000271052122
+			],
+			"id": "deco_windmill_sails",
+			"sockets": {},
+			"surfaces": 1,
+			"triangles": 1496
+		}
+	],
+	"basic_room_seat_height": 0.670000016689301,
+	"captures": [
+		{
+			"id": "overview-43deg",
+			"size": [
+				4400,
+				1200
+			]
+		},
+		{
+			"id": "overview-top",
+			"size": [
+				4400,
+				1200
+			]
+		},
+		{
+			"id": "deco_planter-detail",
+			"size": [
+				1100,
+				1000
+			]
+		},
+		{
+			"id": "deco_lantern-detail",
+			"size": [
+				1100,
+				1000
+			]
+		},
+		{
+			"id": "deco_path-detail",
+			"size": [
+				1100,
+				1000
+			]
+		},
+		{
+			"id": "deco_bench-detail",
+			"size": [
+				1100,
+				1000
+			]
+		},
+		{
+			"id": "deco_scarecrow-detail",
+			"size": [
+				1100,
+				1000
+			]
+		},
+		{
+			"id": "deco_fence-detail",
+			"size": [
+				1100,
+				1000
+			]
+		},
+		{
+			"id": "deco_birdbath-detail",
+			"size": [
+				1100,
+				1000
+			]
+		},
+		{
+			"id": "deco_windmill-detail",
+			"size": [
+				1100,
+				1000
+			]
+		},
+		{
+			"id": "deco_fountain-detail",
+			"size": [
+				1100,
+				1000
+			]
+		},
+		{
+			"id": "deco_pergola-detail",
+			"size": [
+				1100,
+				1000
+			]
+		},
+		{
+			"id": "fence-three-segments",
+			"size": [
+				1100,
+				1000
+			]
+		}
+	],
+	"checks": [
+		{
+			"check": "deco_planter: exactly one MeshInstance3D",
+			"passed": true
+		},
+		{
+			"check": "deco_planter: FarmArt mesh_for / one surface",
+			"passed": true
+		},
+		{
+			"check": "deco_planter: triangle budget / manifest",
+			"passed": true
+		},
+		{
+			"check": "deco_planter: scene root identity",
+			"passed": true
+		},
+		{
+			"check": "deco_planter: mesh baked at origin",
+			"passed": true
+		},
+		{
+			"check": "deco_planter: grounded or axle pivot",
+			"passed": true
+		},
+		{
+			"check": "deco_planter: opaque vertex colors",
+			"passed": true
+		},
+		{
+			"check": "deco_planter: cell footprint with 3 cm margin",
+			"passed": true
+		},
+		{
+			"check": "deco_lantern: exactly one MeshInstance3D",
+			"passed": true
+		},
+		{
+			"check": "deco_lantern: FarmArt mesh_for / one surface",
+			"passed": true
+		},
+		{
+			"check": "deco_lantern: triangle budget / manifest",
+			"passed": true
+		},
+		{
+			"check": "deco_lantern: scene root identity",
+			"passed": true
+		},
+		{
+			"check": "deco_lantern: mesh baked at origin",
+			"passed": true
+		},
+		{
+			"check": "deco_lantern: grounded or axle pivot",
+			"passed": true
+		},
+		{
+			"check": "deco_lantern: opaque vertex colors",
+			"passed": true
+		},
+		{
+			"check": "deco_lantern: socket glow exists",
+			"passed": true
+		},
+		{
+			"check": "deco_lantern: socket glow position",
+			"passed": true
+		},
+		{
+			"check": "deco_lantern: socket glow +Z orientation",
+			"passed": true
+		},
+		{
+			"check": "deco_lantern: cell footprint with 3 cm margin",
+			"passed": true
+		},
+		{
+			"check": "deco_path: exactly one MeshInstance3D",
+			"passed": true
+		},
+		{
+			"check": "deco_path: FarmArt mesh_for / one surface",
+			"passed": true
+		},
+		{
+			"check": "deco_path: triangle budget / manifest",
+			"passed": true
+		},
+		{
+			"check": "deco_path: scene root identity",
+			"passed": true
+		},
+		{
+			"check": "deco_path: mesh baked at origin",
+			"passed": true
+		},
+		{
+			"check": "deco_path: grounded or axle pivot",
+			"passed": true
+		},
+		{
+			"check": "deco_path: opaque vertex colors",
+			"passed": true
+		},
+		{
+			"check": "deco_path: cell footprint with 3 cm margin",
+			"passed": true
+		},
+		{
+			"check": "deco_bench: exactly one MeshInstance3D",
+			"passed": true
+		},
+		{
+			"check": "deco_bench: FarmArt mesh_for / one surface",
+			"passed": true
+		},
+		{
+			"check": "deco_bench: triangle budget / manifest",
+			"passed": true
+		},
+		{
+			"check": "deco_bench: scene root identity",
+			"passed": true
+		},
+		{
+			"check": "deco_bench: mesh baked at origin",
+			"passed": true
+		},
+		{
+			"check": "deco_bench: grounded or axle pivot",
+			"passed": true
+		},
+		{
+			"check": "deco_bench: opaque vertex colors",
+			"passed": true
+		},
+		{
+			"check": "deco_bench: socket seat_0 exists",
+			"passed": true
+		},
+		{
+			"check": "deco_bench: socket seat_0 position",
+			"passed": true
+		},
+		{
+			"check": "deco_bench: socket seat_0 +Z orientation",
+			"passed": true
+		},
+		{
+			"check": "deco_bench: socket seat_1 exists",
+			"passed": true
+		},
+		{
+			"check": "deco_bench: socket seat_1 position",
+			"passed": true
+		},
+		{
+			"check": "deco_bench: socket seat_1 +Z orientation",
+			"passed": true
+		},
+		{
+			"check": "deco_bench: cell footprint with 3 cm margin",
+			"passed": true
+		},
+		{
+			"check": "deco_scarecrow: exactly one MeshInstance3D",
+			"passed": true
+		},
+		{
+			"check": "deco_scarecrow: FarmArt mesh_for / one surface",
+			"passed": true
+		},
+		{
+			"check": "deco_scarecrow: triangle budget / manifest",
+			"passed": true
+		},
+		{
+			"check": "deco_scarecrow: scene root identity",
+			"passed": true
+		},
+		{
+			"check": "deco_scarecrow: mesh baked at origin",
+			"passed": true
+		},
+		{
+			"check": "deco_scarecrow: grounded or axle pivot",
+			"passed": true
+		},
+		{
+			"check": "deco_scarecrow: opaque vertex colors",
+			"passed": true
+		},
+		{
+			"check": "deco_fence: exactly one MeshInstance3D",
+			"passed": true
+		},
+		{
+			"check": "deco_fence: FarmArt mesh_for / one surface",
+			"passed": true
+		},
+		{
+			"check": "deco_fence: triangle budget / manifest",
+			"passed": true
+		},
+		{
+			"check": "deco_fence: scene root identity",
+			"passed": true
+		},
+		{
+			"check": "deco_fence: mesh baked at origin",
+			"passed": true
+		},
+		{
+			"check": "deco_fence: grounded or axle pivot",
+			"passed": true
+		},
+		{
+			"check": "deco_fence: opaque vertex colors",
+			"passed": true
+		},
+		{
+			"check": "deco_birdbath: exactly one MeshInstance3D",
+			"passed": true
+		},
+		{
+			"check": "deco_birdbath: FarmArt mesh_for / one surface",
+			"passed": true
+		},
+		{
+			"check": "deco_birdbath: triangle budget / manifest",
+			"passed": true
+		},
+		{
+			"check": "deco_birdbath: scene root identity",
+			"passed": true
+		},
+		{
+			"check": "deco_birdbath: mesh baked at origin",
+			"passed": true
+		},
+		{
+			"check": "deco_birdbath: grounded or axle pivot",
+			"passed": true
+		},
+		{
+			"check": "deco_birdbath: opaque vertex colors",
+			"passed": true
+		},
+		{
+			"check": "deco_birdbath: cell footprint with 3 cm margin",
+			"passed": true
+		},
+		{
+			"check": "deco_windmill: exactly one MeshInstance3D",
+			"passed": true
+		},
+		{
+			"check": "deco_windmill: FarmArt mesh_for / one surface",
+			"passed": true
+		},
+		{
+			"check": "deco_windmill: triangle budget / manifest",
+			"passed": true
+		},
+		{
+			"check": "deco_windmill: scene root identity",
+			"passed": true
+		},
+		{
+			"check": "deco_windmill: mesh baked at origin",
+			"passed": true
+		},
+		{
+			"check": "deco_windmill: grounded or axle pivot",
+			"passed": true
+		},
+		{
+			"check": "deco_windmill: opaque vertex colors",
+			"passed": true
+		},
+		{
+			"check": "deco_windmill: socket rotor exists",
+			"passed": true
+		},
+		{
+			"check": "deco_windmill: socket rotor position",
+			"passed": true
+		},
+		{
+			"check": "deco_windmill: socket rotor +Z orientation",
+			"passed": true
+		},
+		{
+			"check": "deco_windmill: cell footprint with 3 cm margin",
+			"passed": true
+		},
+		{
+			"check": "deco_fountain: exactly one MeshInstance3D",
+			"passed": true
+		},
+		{
+			"check": "deco_fountain: FarmArt mesh_for / one surface",
+			"passed": true
+		},
+		{
+			"check": "deco_fountain: triangle budget / manifest",
+			"passed": true
+		},
+		{
+			"check": "deco_fountain: scene root identity",
+			"passed": true
+		},
+		{
+			"check": "deco_fountain: mesh baked at origin",
+			"passed": true
+		},
+		{
+			"check": "deco_fountain: grounded or axle pivot",
+			"passed": true
+		},
+		{
+			"check": "deco_fountain: opaque vertex colors",
+			"passed": true
+		},
+		{
+			"check": "deco_fountain: cell footprint with 3 cm margin",
+			"passed": true
+		},
+		{
+			"check": "deco_pergola: exactly one MeshInstance3D",
+			"passed": true
+		},
+		{
+			"check": "deco_pergola: FarmArt mesh_for / one surface",
+			"passed": true
+		},
+		{
+			"check": "deco_pergola: triangle budget / manifest",
+			"passed": true
+		},
+		{
+			"check": "deco_pergola: scene root identity",
+			"passed": true
+		},
+		{
+			"check": "deco_pergola: mesh baked at origin",
+			"passed": true
+		},
+		{
+			"check": "deco_pergola: grounded or axle pivot",
+			"passed": true
+		},
+		{
+			"check": "deco_pergola: opaque vertex colors",
+			"passed": true
+		},
+		{
+			"check": "deco_pergola: cell footprint with 3 cm margin",
+			"passed": true
+		},
+		{
+			"check": "deco_windmill_sails: exactly one MeshInstance3D",
+			"passed": true
+		},
+		{
+			"check": "deco_windmill_sails: FarmArt mesh_for / one surface",
+			"passed": true
+		},
+		{
+			"check": "deco_windmill_sails: triangle budget / manifest",
+			"passed": true
+		},
+		{
+			"check": "deco_windmill_sails: scene root identity",
+			"passed": true
+		},
+		{
+			"check": "deco_windmill_sails: mesh baked at origin",
+			"passed": true
+		},
+		{
+			"check": "deco_windmill_sails: grounded or axle pivot",
+			"passed": true
+		},
+		{
+			"check": "deco_windmill_sails: opaque vertex colors",
+			"passed": true
+		},
+		{
+			"check": "Unmodified FarmArt shared vertex material",
+			"passed": true
+		},
+		{
+			"check": "Stone path thickness <= 4 cm",
+			"passed": true
+		},
+		{
+			"check": "Scarecrow hands <= 85 cm",
+			"passed": true
+		},
+		{
+			"check": "Fence repeats every 65 cm",
+			"passed": true
+		},
+		{
+			"check": "Pergola four post colliders only",
+			"passed": true
+		},
+		{
+			"check": "Seat height matches actual Basic Room bench mesh",
+			"passed": true
+		},
+		{
+			"check": "Bench back rises 0.35-0.40 m above the unchanged seat",
+			"passed": true
+		},
+		{
+			"check": "Reclining bench fits within 1.24 by 0.59 m",
+			"passed": true
+		},
+		{
+			"check": "Bench seat_0 remains at its R1 position and orientation",
+			"passed": true
+		},
+		{
+			"check": "Bench seat_1 remains at its R1 position and orientation",
+			"passed": true
+		},
+		{
+			"check": "Windmill full rotation swept diameter <= 1.24 m",
+			"passed": true
+		},
+		{
+			"check": "Windmill body + sails <= 4000 triangles",
+			"passed": true
+		},
+		{
+			"check": "Scale avatar assembled",
+			"passed": true
+		},
+		{
+			"check": "Capture saved: overview-43deg",
+			"passed": true
+		},
+		{
+			"check": "Capture saved: overview-top",
+			"passed": true
+		},
+		{
+			"check": "Capture saved: deco_planter-detail",
+			"passed": true
+		},
+		{
+			"check": "Capture saved: deco_lantern-detail",
+			"passed": true
+		},
+		{
+			"check": "Capture saved: deco_path-detail",
+			"passed": true
+		},
+		{
+			"check": "Capture saved: deco_bench-detail",
+			"passed": true
+		},
+		{
+			"check": "Capture saved: deco_scarecrow-detail",
+			"passed": true
+		},
+		{
+			"check": "Capture saved: deco_fence-detail",
+			"passed": true
+		},
+		{
+			"check": "Capture saved: deco_birdbath-detail",
+			"passed": true
+		},
+		{
+			"check": "Capture saved: deco_windmill-detail",
+			"passed": true
+		},
+		{
+			"check": "Capture saved: deco_fountain-detail",
+			"passed": true
+		},
+		{
+			"check": "Capture saved: deco_pergola-detail",
+			"passed": true
+		},
+		{
+			"check": "Capture saved: fence-three-segments",
+			"passed": true
+		}
+	],
+	"failures": [],
+	"renderer": "mobile",
+	"rotor_swept_diameter": 1.18837785720825
+}

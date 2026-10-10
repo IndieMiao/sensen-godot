@@ -1,0 +1,86 @@
+{
+  "original_manifest_entries": 24,
+  "original_entries_unchanged": true,
+  "added_entries": [
+    "deco_bench",
+    "deco_birdbath",
+    "deco_fence",
+    "deco_fountain",
+    "deco_lantern",
+    "deco_path",
+    "deco_pergola",
+    "deco_planter",
+    "deco_scarecrow",
+    "deco_windmill",
+    "deco_windmill_sails"
+  ],
+  "assets": {
+    "deco_bench": {
+      "sha256": "51618bd43aa6c45be1b13a23587589a44cffd4da14e42f4ce0cb8b5b76217599",
+      "no_images_or_textures": true,
+      "one_surface": true,
+      "bytes": 68504
+    },
+    "deco_birdbath": {
+      "sha256": "2372a9eeccd20c6304513978934698b51167119b6909aa4bb1a8272461c93010",
+      "no_images_or_textures": true,
+      "one_surface": true,
+      "bytes": 36020
+    },
+    "deco_fence": {
+      "sha256": "4e1ad4403ec5520e15b632735fb92c7268c3932d49112a701767216382657276",
+      "no_images_or_textures": true,
+      "one_surface": true,
+      "bytes": 25536
+    },
+    "deco_fountain": {
+      "sha256": "38357c007890ac81b39587bac073d43d441cc05e13d92ea0f42fa6d5484561be",
+      "no_images_or_textures": true,
+      "one_surface": true,
+      "bytes": 51712
+    },
+    "deco_lantern": {
+      "sha256": "28984ebd5ddb9f0766d45af71dffabc8daa66bedfb5409ca453da4bc4a88830a",
+      "no_images_or_textures": true,
+      "one_surface": true,
+      "bytes": 36472
+    },
+    "deco_path": {
+      "sha256": "460dcbdfb94f4d3a363a07790a9e1bb8caeb97b6a34c3d27a1338a7cd06414c4",
+      "no_images_or_textures": true,
+      "one_surface": true,
+      "bytes": 7980
+    },
+    "deco_pergola": {
+      "sha256": "52688e3ae1ee33de34bff061e35009da1f518d46286ad4db2b3dc28be12a0b62",
+      "no_images_or_textures": true,
+      "one_surface": true,
+      "bytes": 87468
+    },
+    "deco_planter": {
+      "sha256": "c62d2a4a005e7d707ef1f22e20483250b7ab1db377821f1e749ad74f1a1bce0f",
+      "no_images_or_textures": true,
+      "one_surface": true,
+      "bytes": 79528
+    },
+    "deco_scarecrow": {
+      "sha256": "0fbb1ef580cee30ae7e0793a83bd76d478e946464d41df39e2c18ebbb35f850f",
+      "no_images_or_textures": true,
+      "one_surface": true,
+      "bytes": 44872
+    },
+    "deco_windmill": {
+      "sha256": "50cd18920cda4a2505b75a3f3dfc1e41ade1cd73cfb99740d52f632d9edfd345",
+      "no_images_or_textures": true,
+      "one_surface": true,
+      "bytes": 95108
+    },
+    "deco_windmill_sails": {
+      "sha256": "57d14191f2cc714b9ed1d389e68194c84b22c75c36d894e8af0cf41f4a518baf",
+      "no_images_or_textures": true,
+      "one_surface": true,
+      "bytes": 122608
+    }
+  },
+  "existing_farm_files_unchanged": true
+}
