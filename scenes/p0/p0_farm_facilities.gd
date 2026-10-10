@@ -10,8 +10,9 @@ extends Node
 const TAP_PX := 40.0            # a tap this close to a sprinkler's head opens its card
 const HEAD := Vector3(0, 0.55, 0)
 const SNAP_PX := 70.0           # a finger this close to a bed's centre on screen points at that bed
-const COVER_TINT := Color(0.55, 0.78, 0.95, 0.55)   # Coverage: light blue (q(59) §1.5)
-const BAD_TINT := Color(0.86, 0.36, 0.30, 0.65)
+const COVER_TINT := Color(0.55, 0.78, 0.95, 0.55)   # Coverage: light blue (q(59) §1.5; water, 284 v2 §2)
+const OK_TINT := Color(UiTokens.COLOR_PRIMARY, 0.30)  # the spot underfoot when it may stand there (284 v2 §2)
+const BAD_TINT := Color(UiTokens.COLOR_DANGER, 0.35)  # … when it may not
 
 var farm: Node3D                # p0_farm.gd: bp, cam, actor
 var rt: P0Runtime
@@ -198,6 +199,7 @@ func _show_spot(v: Dictionary, id: int) -> void:
 	var reason := spot_reason(v, id, int(placing.facility))
 	placing.ok = reason == ""
 	_preview.visible = id >= 0
+	farm.placement_grid(_bed_top(id) if id >= 0 else Vector3.INF)   # the shell's fading cell lines around it
 	if id >= 0: _preview.position = _bed_top(id)
 	_paint([id] if id >= 0 else [], cover_of(v, id) if reason == "" else [], reason != "")
 	rt.ui.set_placement({"caption": caption(v, id) if reason == "" else "", "reason": reason})
@@ -205,15 +207,16 @@ func _show_spot(v: Dictionary, id: int) -> void:
 func _on_done(ok: bool) -> void:
 	if placing.is_empty(): return
 	var p := placing
-	_end()
-	if not ok or not bool(p.get("ok", false)): return
+	var go := ok and bool(p.get("ok", false))
+	_end([P0Garden.cell_of(int(p.plot))] if go else [])   # the player steps off the bed the sprinkler takes
+	if not go: return
 	if int(p.facility) >= 0: rt.session.send({"type": "move_facility", "facility": int(p.facility), "plot": int(p.plot), "space": "home"})
 	else: rt.session.send({"type": "place", "recipe": str(p.recipe), "plot": int(p.plot), "space": "home"})
 
-func _end() -> void:
+func _end(taken: Array = []) -> void:
 	placing = {}
 	_finger = Vector2.INF
-	farm.placement_camera_end()
+	farm.placement_camera_end(taken)
 	if is_instance_valid(_preview): _preview.queue_free()
 	_preview = null
 	_paint([], [], false)
@@ -229,24 +232,34 @@ func _paint(centre: Array, cover: Array, bad: bool) -> void:
 		_cells.append(q)
 	var i := 0
 	for id in centre:
-		_place_square(_cells[i], id, BAD_TINT if bad else COVER_TINT.lightened(0.3))
+		_place_square(_cells[i], id, BAD_TINT if bad else OK_TINT)
 		i += 1
 	for id in cover:
 		_place_square(_cells[i], id, COVER_TINT)
 		i += 1
 	for k in range(i, _cells.size()): (_cells[k] as MeshInstance3D).visible = false
 
+## A square on a bed: `tint` filled; the spot underfoot also wears a 2 px edge of its own colour, green or red
+## (不知火舞 on #261, 284 v2 §2: the fill alone read only as a darker bed); coverage squares have none.
 func _place_square(q: MeshInstance3D, id: int, tint: Color) -> void:
 	q.visible = true
 	q.position = _bed_top(id) + Vector3(0, 0.014, 0)
-	(q.material_override as StandardMaterial3D).albedo_color = tint
+	var m := q.material_override as ShaderMaterial
+	m.set_shader_parameter("fill", tint)
+	var edge := Color(0, 0, 0, 0)
+	if tint == OK_TINT: edge = UiTokens.COLOR_PRIMARY
+	elif tint == BAD_TINT: edge = UiTokens.COLOR_DANGER
+	m.set_shader_parameter("edge", edge)
 
 static func _square() -> MeshInstance3D:
 	var q := MeshInstance3D.new()
 	var m := PlaneMesh.new()
 	m.size = Vector2(0.9, 0.9)
 	q.mesh = m
-	q.material_override = _mat(COVER_TINT, true)
+	var mat := ShaderMaterial.new()
+	mat.shader = preload("res://scenes/p0/p0_place_cell.gdshader")
+	mat.set_shader_parameter("fill", COVER_TINT)
+	q.material_override = mat
 	q.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	return q
 
