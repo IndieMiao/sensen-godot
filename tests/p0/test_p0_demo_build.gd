@@ -27,3 +27,27 @@ func test_the_demo_preset_asks_for_internet_and_vibrate() -> void:
 	assert_str(section).is_not_empty()
 	assert_bool(bool(cfg.get_value(section + ".options", "permissions/internet", false))).is_true()
 	assert_bool(bool(cfg.get_value(section + ".options", "permissions/vibrate", false))).is_true()
+
+## Settings › Legal › Licenses (q(129)): licenses.json and every text a row opens are plain files, which the export
+## takes only through the demo preset's include_filter; one left out reads blank on the phone (a QA export, 10-11).
+## The build script checks the APK as well (build.json legal_ok).
+func test_the_demo_preset_ships_every_license_text() -> void:
+	var cfg := ConfigFile.new()
+	assert_int(cfg.load("res://export_presets.cfg")).is_equal(OK)
+	var filters: Array[String] = []
+	for s in cfg.get_sections():
+		if str(cfg.get_value(s, "name", "")) == "Android P0":
+			for f in str(cfg.get_value(s, "include_filter", "")).split(","):
+				if f.strip_edges() != "": filters.append(f.strip_edges())
+	assert_array(filters).is_not_empty()
+	var files: Array[String] = [P0Legal.DATA]
+	for g in P0Legal.groups():
+		for r in g.get("rows", []):
+			var t := str(r.get("text", ""))
+			if t.begins_with("res://"): files.append(t)
+	assert_int(files.size()).is_greater(1)
+	for path in files:
+		assert_bool(FileAccess.file_exists(path)).override_failure_message("%s is not in the repository" % path).is_true()
+		var rel := path.trim_prefix("res://")
+		var shipped := filters.any(func(f: String) -> bool: return rel.matchn(f.trim_prefix("res://")) or rel.get_file().matchn(f))
+		assert_bool(shipped).override_failure_message("%s is not in the Android P0 include_filter" % rel).is_true()
