@@ -18,6 +18,9 @@ signal show_spot(where: String)
 ## A target in another space (TodayRow `Show on map`): leave for the map and point at its pin ("home",
 ## "pond:<id>", "tackle").
 signal show_on_map(target: String)
+## Go on a pond card opened away from the map (the Bite Board's, SGODOT-283): leave this world and walk into that pond,
+## as the map card's Go does (P0Runtime._leave_then("go:pond:<id>")).
+signal go_pond(id: String)
 ## A panel this UI does not own was asked for (the gate card's Cookbook, the Fish-dex's Cookbook tab): the host
 ## opens it if it can (LOCK-08: never by travelling).
 signal panel_requested(panel: String)
@@ -299,6 +302,7 @@ func set_view(v: Dictionary) -> void:
 	if _profile != null and is_instance_valid(_profile) and modal_kind == "profile": _profile.update(v)
 	if workbench() != null: _workbench.refresh(v)
 	if inbox() != null: _inbox.refresh(v)
+	if bite_board() != null: _bite_board.refresh(v)
 	_refresh_hud()
 	_refresh_bar()
 
@@ -2327,6 +2331,47 @@ func open_inbox(tab := "") -> P0InboxDrawer:
 	_inbox = d
 	modal_kind = "inbox"
 	return d
+
+## The Tackle Shop's Bite Board (SGODOT-283; plan §6.9.3, 不知火舞 e61cda10 ③): the room's board facility opens it for
+## the outpost the player stands in. It follows the view while open. A pond row opens that pond's card over the room
+## (open_board_pond): nothing moves by itself (LOCK: no auto-jumps).
+const BiteBoardDrawer := preload("res://scenes/p0/panels/p0_bite_board_drawer.gd")
+const PondCardLogic := preload("res://modules/p0/p0_pond_card.gd")
+const PondsLogic := preload("res://modules/p0/p0_ponds.gd")
+var _bite_board: UiDrawer
+
+func open_bite_board(outpost: Dictionary) -> UiDrawer:
+	var d: UiDrawer = BiteBoardDrawer.new(view, outpost)
+	d.theme = UiKit.theme()
+	d.safe_bottom = safe_bottom()
+	d.close_requested.connect(close_modal)
+	d.connect(&"pond_pressed", func(id: String): open_board_pond(outpost, id))
+	_open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
+	_close_above(d, _CLOSE_ABOVE_SHEET, UiTokens.SPACE_PAGE)
+	_bite_board = d
+	modal_kind = "bite_board"
+	return d
+
+## The open Bite Board, or null.
+func bite_board() -> UiDrawer:
+	return _bite_board if is_instance_valid(_bite_board) and modal_kind == "bite_board" else null
+
+## A pond's card from the Bite Board (the map's card: P0PondCard.info, P0PlaceSheet), its Distance from this shop. Go
+## leaves the room for that pond (go_pond); Details › lists its fish; Back and a tap outside return to the board, ×
+## closes both.
+func open_board_pond(outpost: Dictionary, id: String) -> void:
+	var pond := PondsLogic.location(id)
+	if pond.is_empty(): return
+	var km := P0PlaceSheet.km_between(Vector2(float(outpost.get("lat", 0.0)), float(outpost.get("lng", 0.0))), Vector2(float(pond.lat), float(pond.lng)))
+	var info := PondCardLogic.info(view, id, km)
+	if info.is_empty(): return
+	P0PlaceSheet.open(self, P0PlaceSheet.for_here(info, false),
+		func():
+			close_modal()
+			go_pond.emit(id),
+		func(): PondCardLogic.open_fish(self, id, info, func(): open_board_pond(outpost, id)),
+		Callable(), "pond_card")
+	_modal_back = func(): open_bite_board(outpost)   # set after the sheet's _open_modal, which clears it
 
 ## The open Inbox drawer, or null.
 func inbox() -> P0InboxDrawer:

@@ -188,72 +188,17 @@ func _kept_pin(entry: Dictionary) -> bool:
 func is_here(space: String, place: String) -> bool:
 	return rt != null and str(rt.here.get("space", "")) == space and str(rt.here.get("place", "")) == place
 
-## Details ›: the pond's fish list (q(48) c): caught fish in colour with their name, the rest as a silhouette with
-## the Fishing level they need. ×, Back and a tap outside all go back to the pond card (P0Ui.back_modal, the layered
-## Where the Details sheet may reach up to: below the HUD's two rows and the place chip (SGODOT-283).
-const FISH_SHEET_TOP := 150.0
-
-## way back of 亚瑟 on #37; 哪吒 on #95); from the card they close it.
+## Details ›: the pond's fish list (P0PondCard.open_fish). ×, Back and a tap outside all go back to the pond card (P0Ui.
+## back_modal, the layered way back of 亚瑟 on #37; 哪吒 on #95); from the card they close it.
 func _open_pond_fish(entry: Dictionary) -> void:
-	var ui := rt.ui
 	var info := _pond_info(entry)
-	var holder := Control.new()
-	holder.theme = UiKit.theme()
-	holder.set_anchors_preset(Control.PRESET_FULL_RECT)
-	holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var panel := PanelContainer.new()
-	panel.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-	panel.grow_vertical = Control.GROW_DIRECTION_BEGIN
-	panel.mouse_filter = Control.MOUSE_FILTER_STOP
-	var sheet := UiStyleBox.make(UiTokens.COLOR_SURFACE, UiTokens.RADIUS_SHEET, UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT)
-	panel.add_theme_stylebox_override(&"panel", sheet.with_margins(16, 18, 16, 20 + ui.safe_bottom()))
-	var col := VBoxContainer.new()
-	col.add_theme_constant_override(&"separation", 12)
-	panel.add_child(col)
-	col.add_child(UiObjectHeader.new({"title": str(info.get("title", "")), "state": "%s fish" % ("Pond" if str(info.get("subtitle", "")) == "Beginner" else str(info.get("subtitle", "")))}))
-	# From P1 a pond lists up to ten fish (its regional and night ones, SGODOT-283): the rows scroll under the header and
-	# the sheet stops below the HUD, instead of growing past it.
-	var scroll := TouchScrollContainer.new()
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	scroll.name = "FishList"
-	col.add_child(scroll)
-	var rows := VBoxContainer.new()
-	rows.add_theme_constant_override(&"separation", 12)
-	rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	scroll.add_child(rows)
-	for f in PondCard.fish_rows(ui.view, str(entry.id)):
-		var row := HBoxContainer.new()
-		row.add_theme_constant_override(&"separation", 12)
-		var icon := UiKit.icon(P0Logic.icon(str(f.id)), 32)
-		icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		if not f.caught: icon.modulate = Color(0.13, 0.15, 0.14)   # silhouette
-		row.add_child(icon)
-		var text := VBoxContainer.new()
-		text.add_theme_constant_override(&"separation", 2)
-		text.add_child(UiKit.label(str(f.name), UiTokens.STYLE_C14_XB))
-		if not f.caught: text.add_child(UiKit.label(PondCard.locked_line(f), UiTokens.STYLE_C12_XB, UiTokens.COLOR_SECONDARY))
-		row.add_child(text)
-		rows.add_child(row)
-	# the list's height: all of it when it fits, else what is left between the HUD and the bottom (row 44 + gap 12)
-	var room := maxf(160.0, ui.root.size.y - ui.safe_top() - FISH_SHEET_TOP - 18 - 20 - ui.safe_bottom() - 12 - 56)
-	scroll.custom_minimum_size.y = minf(room, rows.get_combined_minimum_size().y)
-	holder.add_child(panel)
 	var back := [false]   # lambdas capture locals by value: share the flag through an array
-	var close := UiCloseButton.new()
-	close.pressed.connect(func():
+	var id := str(entry.id)
+	var holder := PondCard.open_fish(rt.ui, id, info, func():
 		back[0] = true
 		_open_pond_card(entry, info))
-	holder.add_child(close)
-	panel.resized.connect(func():
-		close.position = Vector2(panel.size.x - 16 - UiTokens.SIZE_CLOSE, panel.position.y - 6 - UiTokens.SIZE_CLOSE))
-	var id := str(entry.id)
 	holder.tree_exiting.connect(func():
 		if not back[0] and city_map and str(city_map.selected.get("id", "")) == id: city_map.clear_selection())
-	ui._open_modal(holder, 0.0, false)
-	ui.modal_kind = "pond_fish"
-	ui._modal_back = func():   # set after _open_modal, which clears it
-		back[0] = true
-		_open_pond_card(entry, info)
 
 func _prewarm_pond(id: String) -> void:
 	var pond := P0Ponds.location(id)
@@ -1052,6 +997,11 @@ func _take_after_leave() -> bool:
 	rt.after_leave = ""
 	if next.begins_with("travel:"):   # a room that refused the player (no pass, SGODOT-280): that city's travel card
 		open_travel.call_deferred(next.trim_prefix("travel:"))
+		return true
+	if next.begins_with("go:pond:"):   # Go on the Bite Board's pond card (SGODOT-283): into that pond, as this map's card
+		var pond := P0Ponds.location(next.trim_prefix("go:pond:"))
+		if pond.is_empty(): return false
+		_on_city_pond_requested.call_deferred(pond)
 		return true
 	match next:
 		"farm": _open_my_farm.call_deferred()      # FISH-4 Go home · Free

@@ -44,7 +44,7 @@ func _init(template := "pond", size_ := ROW, fish := "") -> void:
 	add_child(_border)
 	_badge = Panel.new()
 	_badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_badge.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_SURFACE, BADGE * 0.5, UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT))
+	_badge.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_SURFACE_RAISED, BADGE * 0.5, UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT))
 	_badge.size = Vector2(BADGE, BADGE)
 	add_child(_badge)
 	_badge_icon = TextureRect.new()

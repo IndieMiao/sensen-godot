@@ -144,13 +144,15 @@ static func pond_row(id: String, place: Dictionary, km_text: String, level: int,
 	var weather := str(place.get("weather", ""))
 	var p := pick(place.get("fish", []), weather, level)
 	var row := {"id": id, "name": str(place.get("name", id)), "sub": "%s · %s" % [str(place.get("template", "Pond")), km_text],
-		"template": str(place.get("site", "pond")), "fish": "", "line": ""}
+		"template": str(place.get("site", "pond")), "fish": "", "fish_name": "", "tags": "", "line": ""}
 	if p.is_empty() or float(p.factor) <= 1.0: return row
 	var f: Dictionary = p.fish
 	var hide := bool(f.get("regional", false)) and int(caught.get(str(f.id), 0)) <= 0
 	var tag := tags(f, weather if bool(p.weather_match) else "-")
 	row.fish = str(f.id)
-	row.line = ("?" if hide else str(f.get("name", f.id))) + (" · " + tag if tag != "" else "")
+	row.fish_name = "?" if hide else str(f.get("name", f.id))   # ink; the tags after it in secondary (2255:33551)
+	row.tags = " · " + tag if tag != "" else ""
+	row.line = row.fish_name + row.tags
 	return row
 
 ## Details' second line (C): caught — the tags only ("" for a fish with none); not caught — `Fishing Lv9 · Night only ·
@@ -165,3 +167,76 @@ static func details_line(f: Dictionary, caught: bool) -> String:
 static func dim_now(f: Dictionary, place: Dictionary) -> bool:
 	var part := part_now(place)
 	return not FishWorld.bites_at(f, part)
+
+# ---------------------------------------------------------------- the drawer (Figma BITE-BOARD-V2 2255:32861 / -LV2 2255:33188)
+const Ponds := preload("res://modules/p0/p0_ponds.gd")
+const FORECAST_FISH := 2
+
+## A Forecast card's fish (2255:33482): of the fish the city's ponds give that the player can land, those that bite more
+## in that day's weather, best first (its weather factor, then the higher level, then the id; the time of day is not
+## known ahead), at most two names; an uncaught regional fish `?`.
+static func forecast_fish(fish_ids: Array, weather: String, level: int, caught: Dictionary) -> Array:
+	var rows: Array = []
+	for id in fish_ids:
+		var f := FishWorld._fish(str(id))
+		if f.is_empty() or int(f.get("level", 1)) > level: continue
+		var k := float(f.get("weather", {}).get(weather, 1.0))
+		if k > 1.0: rows.append({"f": f, "k": k})
+	rows.sort_custom(func(a, b):
+		if not is_equal_approx(float(a.k), float(b.k)): return float(a.k) > float(b.k)
+		var la := int(a.f.get("level", 1)); var lb := int(b.f.get("level", 1))
+		return la > lb if la != lb else str(a.f.id) < str(b.f.id))
+	return rows.slice(0, FORECAST_FISH).map(func(r):
+		return "?" if bool(r.f.get("regional", false)) and int(caught.get(str(r.f.id), 0)) <= 0 else str(r.f.get("name", r.f.id)))
+
+## Everything the drawer shows, for the outpost the player stands in (its city, its name, its keeper):
+##   title `Bite Board · Mission Tackle Shop`, conditions (the city's time and weather now), line (the keeper's, quoted),
+##   ponds (pond_row + km, nearest first from this shop: the player is here), regional ([{id, name, sub, caught}]: an
+##   uncaught one `?` over `Fishing Lv8`), forecast (Fishing Lv3+: [{day, icon, word, fish}] × 3, else []).
+## The city's ponds are the content's fishing places that view.fishing.places describes and P0Ponds puts in its cluster
+## (its region_id).
+static func model(view: Dictionary, outpost: Dictionary) -> Dictionary:
+	var cluster := str(outpost.get("cluster", ""))
+	var level := int(view.get("skills", {}).get("fishing", {}).get("level", 1))
+	var caught: Dictionary = view.get("fishing", {}).get("caught", {})
+	var places: Dictionary = view.get("fishing", {}).get("places", {})
+	var here := Vector2(float(outpost.get("lat", 0.0)), float(outpost.get("lng", 0.0)))
+	var ponds: Array = []
+	var all_fish := {}
+	var today := {}
+	for p in Ponds.all():
+		var id := str(p.get("id", ""))
+		if str(p.get("region_id", p.get("cluster", ""))) != cluster or not places.has(id): continue   # SystemPonds keeps region_id
+		var place: Dictionary = places[id]
+		var km := P0PlaceSheet.km_between(here, Vector2(float(p.lat), float(p.lng)))
+		var row := pond_row(id, place, P0PlaceSheet.distance_text(km), level, caught)
+		row["km"] = km
+		ponds.append(row)
+		for f in place.get("fish", []): all_fish[str(f)] = true
+		if today.is_empty(): today = place
+	ponds.sort_custom(func(a, b): return float(a.km) < float(b.km) if not is_equal_approx(float(a.km), float(b.km)) else str(a.id) < str(b.id))
+	var fish := all_fish.keys()
+	var weather := str(today.get("weather", ""))
+	var regional: Array = []
+	for id in FishWorld.regional_fish(cluster):
+		var f := FishWorld._fish(str(id))
+		if f.is_empty(): continue
+		var got := int(caught.get(str(id), 0)) > 0
+		regional.append({"id": str(id), "name": str(f.get("name", id)) if got else "?",
+			"sub": "" if got else "Fishing Lv%d" % int(f.get("level", 1)), "caught": got})
+	var days: Array = []
+	if level >= FORECAST_LEVEL:
+		for d in today.get("forecast", []):
+			var w := str(d.get("weather", ""))
+			days.append({"day": str(d.get("day", "")), "icon": str(WEATHER_ICON.get(w, "clear")), "word": str(WEATHER_WORD.get(w, w)),
+				"fish": forecast_fish(fish, w, level, caught)})
+	var keeper := str(outpost.get("keeper", {}).get("name", ""))
+	return {
+		"title": "Bite Board · %s" % str(outpost.get("name", "")),
+		"conditions": conditions(today),
+		"line": quoted(line(fish, weather, level, caught), keeper) if keeper != "" else line(fish, weather, level, caught),
+		"titles": titles(level),
+		"ponds": ponds,
+		"regional": regional,
+		"forecast": days,
+	}
