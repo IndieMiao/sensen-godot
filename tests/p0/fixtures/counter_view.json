@@ -667,7 +667,31 @@
      "in_bag": 0
     }
    ],
-   "sell": []
+   "sell": [
+    {
+     "kind": "crop",
+     "rate": 0.8,
+     "quota": "regional_market",
+     "regional": true,
+     "items": [
+      "crop_pumpkin"
+     ]
+    },
+    {
+     "kind": "fish",
+     "rate": 0.8,
+     "quota": "regional_market",
+     "regional": true,
+     "items": [
+      "fish_smelt",
+      "fish_grass_carp",
+      "fish_arctic_char",
+      "fish_snakehead",
+      "fish_pike",
+      "fish_salmon"
+     ]
+    }
+   ]
   },
   "tea": {
    "buy": [],
@@ -708,6 +732,12 @@
    "cap": 6,
    "resets_in": 39600000,
    "scope": "Stall Board and Market Board"
+  },
+  "regional_market": {
+   "used": 0,
+   "cap": 60,
+   "resets_in": 39600000,
+   "scope": "this city"
   }
  },
  "storage": {

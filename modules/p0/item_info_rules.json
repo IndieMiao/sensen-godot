@@ -89,7 +89,7 @@
   },
   "crop/counter_sell": {
     "facts": [
-      "{count} · {region_line}",
+      "{region_line}",
       "{sell_here} each"
     ],
     "quota": true,
@@ -114,7 +114,7 @@
       },
       {
         "id": "limit",
-        "label": "Limit reached · {quota_resets_in}",
+        "label": "Limit reached \u00b7 {quota_resets_in}",
         "kind": "unavailable",
         "when": "sold_here & !quota_left & !locked"
       },
@@ -173,7 +173,7 @@
   },
   "fish/counter_sell": {
     "facts": [
-      "{count} · {region_line}",
+      "{region_line}",
       "{sell_here} each"
     ],
     "quota": true,
@@ -198,7 +198,7 @@
       },
       {
         "id": "limit",
-        "label": "Limit reached · {quota_resets_in}",
+        "label": "Limit reached \u00b7 {quota_resets_in}",
         "kind": "unavailable",
         "when": "sold_here & !quota_left & !locked"
       },
@@ -316,7 +316,7 @@
       },
       {
         "id": "limit",
-        "label": "Limit reached · {quota_resets_in}",
+        "label": "Limit reached \u00b7 {quota_resets_in}",
         "kind": "unavailable",
         "when": "sold_here & !quota_left & !locked & !never_sold"
       },
@@ -520,7 +520,7 @@
       },
       {
         "id": "limit",
-        "label": "Limit reached · {quota_resets_in}",
+        "label": "Limit reached \u00b7 {quota_resets_in}",
         "kind": "unavailable",
         "when": "recyclable & sold_here & !quota_left & !locked"
       },

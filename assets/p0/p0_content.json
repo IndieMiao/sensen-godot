@@ -2695,7 +2695,18 @@
     },
     "market": {
       "sells": "market",
-      "buys": {}
+      "buys": {
+        "crop": {
+          "rate": 0.8,
+          "quota": "regional_market",
+          "regional": true
+        },
+        "fish": {
+          "rate": 0.8,
+          "quota": "regional_market",
+          "regional": true
+        }
+      }
     },
     "tea": {
       "sells": "drinks",
@@ -2734,6 +2745,11 @@
     "sys_requests": {
       "cap": 6,
       "scope": "Stall Board and Market Board"
+    },
+    "regional_market": {
+      "cap": 60,
+      "scope": "this city",
+      "per_city": true
     }
   },
   "affinity": {

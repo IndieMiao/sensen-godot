@@ -60,10 +60,37 @@ func test_tackle_counter_is_one_page_with_the_keeper_bar_and_fish_only() -> void
 	assert_array(d.grid.shown_items().map(func(it): return it.id)).contains_exactly_in_any_order(["fish_crucian", "fish_carp"])
 	assert_str(d._quota.text).starts_with("Fish buy-back today 0/80\nany Tackle Shop · resets in ")
 
-func test_market_buys_nothing_so_it_has_no_bag_half_and_specialty_is_its_own_shelf() -> void:
+## The Market Square buys this city's climate's regional crops and fish back (SGODOT-284, 不知火舞 on 240): a bag half
+## like the Tackle Shop's, listing only those (LOCK-15), with the city's 60-coin allowance.
+func _market_view() -> Dictionary:
+	var v := _view()
+	v.items["crop_pumpkin"] = {"name": "Pumpkin", "kind": "crop", "sell": 22, "rarity": 1}
+	v.items["fish_salmon"] = {"name": "Salmon", "kind": "fish", "sell": 32, "rarity": 2}
+	v.bag.slots.append({"id": "crop_pumpkin", "qty": 3})
+	v.bag.slots.append({"id": "fish_salmon", "qty": 1})
+	return v
+
+func test_market_lists_only_its_regional_goods_with_the_city_allowance() -> void:
+	var d := _drawer("market", {"keeper": "Mei", "place": "Mission Market Square"}, "buy", _market_view())
+	await _settle()
+	assert_bool(d._bag_half.visible).is_true()
+	assert_bool(d.is_short()).is_false()
+	assert_float(d.height).is_equal(P0CounterDrawer.HEIGHT)
+	assert_bool(d.grid.sell_mode).is_true()
+	assert_array(d.grid.shown_items().map(func(it): return it.id)).contains_exactly_in_any_order(["crop_pumpkin", "fish_salmon"])
+	assert_str(d._quota.text).starts_with("Regional buy-back today 0/60\nthis city · resets in ")
+	d.select("crop_pumpkin")
+	assert_bool(d.sheet.is_open()).is_true()
+
+func test_market_without_regional_goods_shows_an_empty_sell_half() -> void:
 	var d := _drawer("market", {"keeper": "Mei", "place": "Mission Market Square"})
 	await _settle()
-	assert_bool(d._bag_half.visible).is_false()
+	assert_bool(d._bag_half.visible).is_true()
+	assert_array(d.grid.shown_items()).is_empty()   # radishes, crucians and timber are not regional here
+
+func test_market_keeper_line_and_board_and_specialty_is_its_own_shelf() -> void:
+	var d := _drawer("market", {"keeper": "Mei", "place": "Mission Market Square"})
+	await _settle()
 	assert_str(d.keeper_bar.line).is_equal("Row Hoe's 240 coins. Farming Lv4 to use.")   # a counter line, not the card's question (#56)
 	assert_array(_row_ids(d)).is_equal(["tool_row_hoe"])
 	d.set_section("board")
@@ -203,6 +230,7 @@ func test_the_market_drawer_is_as_tall_as_its_taller_page_and_keeps_it_across_ta
 	var ui := _ui()
 	await await_idle_frame()
 	var v := _view()
+	v.shops.market.sell = []   # a market that buys nothing back (before SGODOT-284's regional buy-back)
 	v["boards"]["market"]["slots"] = [{"id": "req_m1", "title": "Market Basket", "kind": "crop", "items": ["crop_radish"],
 		"icon": "crop_radish", "qty": 6, "have": 2, "coins": 30, "status": "open"},
 		{"id": "req_m2", "title": "Dusk Haul", "kind": "fish", "items": [], "rarity": 2, "icon": "fish_crucian", "qty": 3,
@@ -243,7 +271,9 @@ func test_a_drawer_resized_while_sliding_in_lands_at_the_new_height() -> void:
 func test_a_market_drawer_closed_mid_measure_stops_quietly() -> void:
 	var ui := _ui()
 	await await_idle_frame()
-	ui.set_view(_view())
+	var v := _view()
+	v.shops.market.sell = []   # a market with no bag half measures itself
+	ui.set_view(v)
 	ui.open_counter("market", {"ctx": {"keeper": "Mei", "place": "Mission Market Square"}})
 	var d := ui._counter
 	assert_float(d.board.modulate.a).is_equal(0.0)   # Buy in front, the board measured behind it
