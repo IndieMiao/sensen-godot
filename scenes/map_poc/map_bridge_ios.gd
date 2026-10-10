@@ -43,9 +43,14 @@ func set_language(locale: String) -> void:
 func get_pixel_ratio() -> float:
 	return _ratio
 
+func has_mapbox() -> bool:
+	return _got_ready   # the map is up (周瑜 on #309)
+
 func poll() -> void:
 	_frames += 1
-	if _frames % CREATE_RESEND_FRAMES == 0: _send("LANG|" + _locale)
+	if _frames % CREATE_RESEND_FRAMES == 0:
+		_send("LANG|" + _locale)
+		_send(MapUsage.telem_packet())   # Map data's switch, again: a TELEM sent before the listener was up is lost (周瑜 on #309)
 	if not _got_ready and not _pending_create.is_empty() \
 			and _frames % CREATE_RESEND_FRAMES == 0:
 		_send(_pending_create)
@@ -56,6 +61,7 @@ func poll() -> void:
 		elif s.begins_with("READY|"):
 			_ratio = maxf(float(s.get_slice("|", 1)), 1.0)
 			_got_ready = true
+			_send(MapUsage.telem_packet())
 			map_ready.emit()
 
 func request_pois(request_id: int) -> void:

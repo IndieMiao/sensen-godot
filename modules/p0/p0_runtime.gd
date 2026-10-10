@@ -1369,6 +1369,7 @@ func _dev_shot(dt: float) -> void:
 			# rows do (‹ back to the profile); pagebottom scrolls the open page to its foot (SET-LICENSES-2-2).
 			"settings": ui.open_settings(func(): ui.open_profile())
 			"licenses": ui.open_licenses(func(): ui.open_settings(func(): ui.open_profile()))
+			"mapdata": ui.open_map_data(func(): ui.open_licenses(func(): ui.open_settings(func(): ui.open_profile())))   # q(133) v3
 			"licensetext": ui.open_license_text(step[1] if step.size() > 1 else "worldcover",
 				func(): ui.open_licenses(func(): ui.open_settings(func(): ui.open_profile())))
 			"pagebottom":

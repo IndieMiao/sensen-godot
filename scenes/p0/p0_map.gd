@@ -107,6 +107,8 @@ func _install_city_map() -> void:
 		# A pond's bank is generated off the main thread while its card is read, so Go is quick.
 		city_map.entry_selected.connect(func(e: Dictionary): if str(e.get("kind", "")) == "pond": _prewarm_pond(str(e.id)))
 		city_map.entry_selected.connect(_on_entry_selected)
+		# the map's credit line keeps above the card open over it, and is not drawn under a page (q(133) v3)
+		city_map.credits_floor = func() -> float: return rt.ui.modal_top() if rt != null else INF
 		get_tree().create_timer(2.0).timeout.connect(_prewarm_pond.bind(NEAREST_POND))
 
 # ---------------------------------------------------------------- pond card (TUT-3-04, q(48))
@@ -1128,6 +1130,7 @@ func is_back_navigation_locked() -> bool:
 ## city_pin_markers), so a badge and its pin never disagree (亚瑟 on 234).
 func p0_frame(view: Dictionary, _dt: float) -> void:
 	if city_map == null: return
+	MapUsage.last_view = Vector3(center_lat, center_lng, zoom)   # Licenses › Mapbox › Improve this map (q(133) v3)
 	_sync_here()
 	# The recenter key gives way to an open sheet (不知火舞 on 234 A2: it showed under the card's ×).
 	var key_shown := not rt.ui.has_modal()

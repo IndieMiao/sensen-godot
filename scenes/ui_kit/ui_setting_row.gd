@@ -6,12 +6,23 @@ extends PanelContainer
 ##          credit (SET-LICENSES) has its attribution under the title, word for word and wrapping, and its licence 6
 ##          below it as its own line (q(129): so it never reads as the attribution's last line).
 ##   VALUE  title and its value on the right (Bold 14 secondary), read-only without › (`Version` · `0.2.1 (…)`).
+##   TOGGLE title, an optional line, the 48 × 28 Toggle on the right (Gensen Refactor/Toggle 1236:107861: green track
+##          on, neutral off); the whole row switches it (q(133) v3 `Share anonymous map usage`).
 ## group(rows) puts rows in a 16-radius card, 1 apart on the border colour (SettingRow's Group).
-## Emits pressed (LINK only).
+## Emits pressed (LINK), toggled(on) (TOGGLE).
 
 signal pressed
+signal toggled(on: bool)
 
-enum Kind { LINK, VALUE }
+enum Kind { LINK, VALUE, TOGGLE }
+
+const _TOGGLE_SIZE := Vector2(48, 28)
+const _TOGGLE_ON := "res://assets/ui/kit_icons/toggle_on.svg"
+const _TOGGLE_OFF := "res://assets/ui/kit_icons/toggle_off.svg"
+
+## TOGGLE: whether it is on. Setting it redraws the switch; a tap on the row flips it and emits toggled.
+var on := false: set = set_on
+var _switch: TextureRect
 
 const _MIN_H := 52.0
 const _PAD_X := 16
@@ -67,20 +78,39 @@ func _init(kind_ := Kind.LINK, title := "", line := "", value := "", credit := "
 		v.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		row.add_child(v)
 		return
-	var chevron := UiKit.label("›", UiTokens.STYLE_ROW_TITLE_XB15, UiTokens.COLOR_SECONDARY)
-	chevron.name = "Chevron"
-	chevron.add_theme_font_size_override(&"font_size", _CHEVRON_SIZE)
-	chevron.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	chevron.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	row.add_child(chevron)
+	if kind == Kind.TOGGLE:
+		_switch = TextureRect.new()
+		_switch.name = "Toggle"
+		_switch.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_switch.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		_switch.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		_switch.custom_minimum_size = _TOGGLE_SIZE
+		_switch.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		row.add_child(_switch)
+		set_on(on)
+	else:
+		var chevron := UiKit.label("›", UiTokens.STYLE_ROW_TITLE_XB15, UiTokens.COLOR_SECONDARY)
+		chevron.name = "Chevron"
+		chevron.add_theme_font_size_override(&"font_size", _CHEVRON_SIZE)
+		chevron.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		chevron.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		row.add_child(chevron)
 	# The whole row is the target, edge to edge: a flat button over the content (a drag in a TouchScrollContainer cancels it).
 	var hit := Button.new()
 	hit.name = "Hit"
 	hit.flat = true
 	hit.focus_mode = Control.FOCUS_NONE
 	for st in [&"normal", &"hover", &"pressed", &"hover_pressed", &"focus", &"disabled"]: hit.add_theme_stylebox_override(st, StyleBoxEmpty.new())
-	hit.pressed.connect(func(): pressed.emit())
+	hit.pressed.connect(func():
+		if kind == Kind.TOGGLE:
+			on = not on
+			toggled.emit(on)
+		else: pressed.emit())
 	add_child(hit)
+
+func set_on(v: bool) -> void:
+	on = v
+	if _switch != null: _switch.texture = load(_TOGGLE_ON if v else _TOGGLE_OFF)
 
 static func _text(name_: String, text: String, style: StringName, color: Color) -> Label:
 	var l := UiKit.label(text, style, color)

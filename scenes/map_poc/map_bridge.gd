@@ -31,6 +31,10 @@ func set_language(_locale: String) -> void:
 func get_pixel_ratio() -> float:
 	return 1.0
 
+## Whether this platform has a Mapbox map, so the game draws its credit line (q(133) v3): not on the desktop.
+func has_mapbox() -> bool:
+	return false
+
 func camera_info() -> String:
 	return ""
 

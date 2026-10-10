@@ -4,11 +4,14 @@
 //      正式化时迁 GDExtension/插件）。
 // 协议（UTF-8 文本，'|' 分隔）：
 //   Godot → 本层：CREATE|token|lat|lng|zoom ／ CAM|lat|lng|zoom|bearing|pitch ／ VIS|0/1 ／ LANG|locale ／ POIS|request_id
+//                 ／ TELEM|0/1（Licenses › Mapbox › Share anonymous map usage, q(133) v3）
 //   本层 → Godot：POIS|request_id|part|parts|{"features":[...]}（一次查询拆成多包，每包不超过约 7 KB；Godot 收齐再拼）
 //   本层 → Godot：READY|pixelRatio（样式加载完成后，答复 CREATE 的来源端口）
 import UIKit
 import Network
-import MapboxMaps
+// The ornaments' visibility is Mapbox's restricted API (q(133) v3: the logo and ⓘ off for the demo, user's call;
+// SPI is outside Mapbox's compatibility promise, so an SDK update may rename it).
+@_spi(Restricted) import MapboxMaps
 
 @objc(MapUnderlay)
 class MapUnderlay: NSObject {
@@ -179,6 +182,13 @@ class MapUnderlay: NSObject {
         case "POIS" where p.count >= 2:
             replyConn = conn
             queryCityPois(requestId: p[1])
+        case "TELEM" where p.count >= 2:
+            // The SDK reads this key (EventsManager) and passes it on to Mapbox Common's telemetry; it keeps the choice.
+            // Sent again with LANG's repeats: only a change is written.
+            let on = p[1] != "0"
+            if UserDefaults.standard.object(forKey: "MGLMapboxMetricsEnabled") as? Bool != on {
+                UserDefaults.standard.set(on, forKey: "MGLMapboxMetricsEnabled")
+            }
         default:
             NSLog("[MapUnderlay] unknown command: \(p.first ?? "")")
         }
@@ -300,9 +310,12 @@ class MapUnderlay: NSObject {
         mv.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         // The game drives the camera every frame, so "adaptive" ornaments never hide:
         // the scale bar sat over the city title and the compass over the task button.
-        // The game has its own north/zoom controls; keep the logo and attribution.
+        // The game has its own north/zoom controls, and one credit line of its own (q(133) v3): no logo or ⓘ, which
+        // under the Godot view could not be tapped anyway.
         mv.ornaments.options.scaleBar.visibility = .hidden
         mv.ornaments.options.compass.visibility = .hidden
+        mv.ornaments.options.logo.visibility = .hidden
+        mv.ornaments.options.attributionButton.visibility = .hidden
         window.insertSubview(mv, at: 0) // 垫底：Godot 透明视图之下
         mapView = mv
         mv.mapboxMap.onStyleLoaded.observe { [weak self] _ in

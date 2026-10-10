@@ -104,6 +104,9 @@ var host_chrome := false: set = set_host_chrome
 var destination_style := Callable()
 ## func(entry) -> bool: the host shows its own card for this pin (P0PlaceSheet), so selecting it opens no info panel.
 var host_card := Callable()
+## () -> float (screen px): the top of the card the host has open over the map, INF with none, 0 for a page that covers
+## it (P0: P0Ui.modal_top). With host_chrome the map's credit line keeps above it (q(133) v3).
+var credits_floor := Callable()
 ## func(entry) -> bool: a pin the host keeps whatever it would cover (P0: the place the player is at, the avatar standing
 ## beside it); every other pin gives way when it would cover one packed before it or an avatar (SGODOT-269).
 var kept_pin := Callable()
@@ -459,6 +462,11 @@ func set_host_chrome(v: bool) -> void:
 			get_node("MapZoom_plus"), get_node("MapZoom_minus")]:
 		(n as CanvasItem).visible = not v
 	status.position.y = CONTENT_TOP if v else 94.0   # under the host's HUD
+	# q(133) v3: the credit line left-aligned in #2F3A33 at 55 %, Regular, no outline
+	var credits: Label = get_node("MapCredits")
+	credits.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT if v else HORIZONTAL_ALIGNMENT_CENTER
+	credits.add_theme_color_override(&"font_color", Color(UiTokens.COLOR_TEXT, CREDITS_ALPHA) if v else MUTED)
+	credits.add_theme_constant_override(&"outline_size", 0)
 	_layout()
 
 ## The lowest y the map's own content uses: the dock's top, or the host's bottom row with host_chrome.
@@ -476,8 +484,9 @@ func _layout() -> void:
 	dock.size = Vector2(dock_width, 48)
 	# With the host's chrome the bottom edge is the host's row (P0's Bag), not the dock.
 	var floor_y := content_bottom()
-	get_node("MapCredits").position = Vector2(0, size.y - 4)
-	get_node("MapCredits").size = Vector2(size.x, 12)
+	if not host_chrome:   # Journey's centred line; P0's is laid out each frame (_update_credits, q(133) v3)
+		get_node("MapCredits").position = Vector2(0, size.y - 4)
+		get_node("MapCredits").size = Vector2(size.x, 12)
 	var info_height := maxf(72, info.get_combined_minimum_size().y)
 	info.position = Vector2(0, floor_y - 8 - info_height)
 	info.size = Vector2(size.x, info_height)
@@ -900,7 +909,40 @@ func tick(dt: float) -> void:
 	else: _show_selected_art()   # a portrait drawn while the map is still
 	_update_bubbles()
 	_update_fog()
+	_update_credits()
 	_update_header()
+
+## q(133) v3 (Q133-V3-MAP 2416:128683): with host_chrome the map's credit is one quiet line at the bottom-left —
+## `© Mapbox © OpenStreetMap`, 9 pt Regular #2F3A33 at 55 %, no outline or plate, 16 pt from the left and 6 pt over the
+## safe area's bottom (pt / dp: converted by the screen's density) — riding 6 pt above a card the host has open, hidden
+## under a full-screen page and where there is no Mapbox map (the desktop). Without host_chrome (Journey) it stays as
+## it was, centred at the bottom.
+const CREDITS_ALPHA := 0.55
+const CREDITS_PT := 9.0
+const CREDITS_LEFT_PT := 16.0
+const CREDITS_GAP_PT := 6.0
+func _update_credits() -> void:
+	var credits: Label = get_node("MapCredits")
+	if not host_chrome: return
+	var mapbox := _attached_bridge != null and _attached_bridge.has_mapbox()
+	var floor_y: float = float(credits_floor.call()) if credits_floor.is_valid() else INF
+	credits.visible = mapbox and floor_y > 1.0
+	if not credits.visible: return
+	var k := _px_per_pt()
+	var font := maxi(1, roundi(CREDITS_PT * k))
+	if credits.get_theme_font_size(&"font_size") != font: credits.add_theme_font_size_override(&"font_size", font)
+	var h := credits.get_combined_minimum_size().y
+	var bottom := size.y - CREDITS_GAP_PT * k
+	if floor_y < INF: bottom = minf(bottom, floor_y - global_position.y - CREDITS_GAP_PT * k)
+	credits.position = Vector2(CREDITS_LEFT_PT * k, bottom - h)
+	credits.size = Vector2(size.x, h)
+
+## Godot px per pt / dp on this screen (q(133) v3 sizes are in pt / dp): the view's width over the screen's in pt.
+func _px_per_pt() -> float:
+	var ratio := _attached_bridge.get_pixel_ratio() if _attached_bridge != null else 1.0
+	var screen_px := float(DisplayServer.window_get_size().x)
+	if screen_px <= 0.0 or ratio <= 0.0: return 1.0
+	return get_viewport_rect().size.x / (screen_px / ratio)
 
 func _on_pois(id: int, payload: String) -> void:
 	if id != _request: return
