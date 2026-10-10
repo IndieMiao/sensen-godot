@@ -310,11 +310,20 @@ static func skill_unlocks(view: Dictionary, skill: String, level: int) -> Array:
 	var out: Array = []
 	match skill:
 		"farming":
-			# Main ingredients before seasonings, as §4.8.7 reads them (Carrot and Herb, Potato and Chamomile).
+			# Main ingredients before seasonings, as §4.8.7 reads them (Carrot and Herb, Potato and Chamomile). P1 (李白
+			# on #214, §5.2.3 / §4.5): the regional crops are one item, `Regional seeds`, at their level (Lv5 opens buying
+			# them; which one sells at home depends on the city); a perennial is named by what is bought and planted,
+			# its sapling (`Apple Sapling`, `Grapevine Cutting`).
 			var crops: Array = content().get("crops", []).filter(func(c): return int(c.get("gate", 1)) == level)
+			var regional := false
 			for main in [true, false]:
 				for c in crops:
-					if (str(c.get("ingr", ["F"])[0]) == "F") == main: out.append(str(c.name))
+					if bool(c.get("regional", false)):
+						regional = true
+						continue
+					if (str(c.get("ingr", ["F"])[0]) == "F") != main: continue
+					out.append(str(c.get("seed_name", c.name)) if c.get("perennial", null) != null else str(c.name))
+			if regional: out.append(REGIONAL_SEEDS)
 		"fishing":
 			# This season's waters only (the fishing sites the content has: Pond and River until Coast lands), and the
 			# regional fish as one item, `Regional fish`, at the level the first of them can be landed (李白 on #214, §14
@@ -328,6 +337,7 @@ static func skill_unlocks(view: Dictionary, skill: String, level: int) -> Array:
 	return out
 
 const REGIONAL_FISH := "Regional fish"
+const REGIONAL_SEEDS := "Regional seeds"
 
 ## The level `Regional fish` is written at: the first level past Lv1 that opens a regional fish (Lv3: Grass Carp and
 ## Arctic Char; §14's `Next Lv3 · Reed Rod, Regional fish`). Lv1 ones (Tilapia, Smelt) are there from the start, which

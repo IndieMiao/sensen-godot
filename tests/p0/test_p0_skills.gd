@@ -25,9 +25,13 @@ func test_each_track_says_its_level_what_is_next_and_its_xp() -> void:
 	var farming: Dictionary = d.tracks[0]
 	assert_that([farming.name, farming.level, farming.next, farming.xp, farming.need]).is_equal(
 		["Farming", 2, "Next: Potato, Chamomile and Compost", 60, 150])
+	# P1 (李白 on #214, §5.2.3 / §4.5): the regional crops are one item at Lv5, `Regional seeds`; perennials go by their
+	# sapling (`Apple Sapling`, `Grapevine Cutting`).
 	assert_array(farming.milestones.map(func(m): return [m.line, m.mark, m.fact])).is_equal([
 		["Lv2 · Carrot, Herb", "done", ""], ["Lv3 · Potato, Chamomile, Compost", "next", "90 XP to go"],
-		["Lv4 · Tomato, Chili, Row Hoe", "locked", ""]])
+		["Lv4 · Tomato, Chili, Row Hoe", "locked", ""], ["Lv5 · Cabbage, Corn, Regional seeds", "locked", ""],
+		["Lv6 · Cucumber", "locked", ""], ["Lv7 · Apple Sapling", "locked", ""], ["Lv8 · Strawberry", "locked", ""],
+		["Lv9 · Melon, Citrus Sapling, Grapevine Cutting", "locked", ""]])
 	var fishing: Dictionary = d.tracks[1]
 	assert_str(fishing.next).is_equal("Next: River Perch, Largemouth Bass, Rainbow Trout and Worm Bait")   # no coast fish yet
 	# This season's waters only (Sea Bass and Mackerel wait for Coast); the regional fish as one item at Lv3, after the
@@ -37,14 +41,18 @@ func test_each_track_says_its_level_what_is_next_and_its_xp() -> void:
 		"Lv4 · Golden Koi, Catfish", "Lv7 · Silver Sturgeon", "Lv9 · River Eel"])
 	assert_str(d.tracks[2].next).is_equal("Next: third ingredient slot")
 	var v := _view()
-	v.skills.farming = {"level": 4, "xp": 412}   # nothing after Lv4 in this build's content
-	assert_str(P0SkillsDrawer.skills_data(v).tracks[0].next).is_equal("Next: Lv5 · 88 XP to go")
+	v.skills.farming = {"level": 4, "xp": 412}
+	assert_str(P0SkillsDrawer.skills_data(v).tracks[0].next).is_equal("Next: Cabbage, Corn and Regional seeds")
+	v.skills.farming = {"level": 9, "xp": 2100}   # nothing after Lv9 in this build's content
+	assert_str(P0SkillsDrawer.skills_data(v).tracks[0].next).is_equal("Next: Lv10 · 700 XP to go")
 
 func test_first_times_count_this_seasons_things() -> void:
 	var d := P0SkillsDrawer.skills_data(_view())
 	var rows: Array = d.firsts.map(func(f): return [f.name, f.have, f.need])
 	assert_array(rows.map(func(r): return r[0])).is_equal(["Crops", "Fish", "Dishes"])
-	assert_array(rows[0]).is_equal(["Crops", 2, 8])
+	# Crops first-harvested n/20: the whole table, regional and perennial ones too (李白 on #214, §4.8 / SKILL-1)
+	assert_array(rows[0]).is_equal(["Crops", 2, P0Logic.content().get("crops", []).size()])
+	assert_int(rows[0][2]).is_equal(20)
 	# Fish first-caught n/20: the whole table (李白 on #214, §4.8 / SKILL-1), Coast's Mackerel counts once caught
 	assert_array(rows[1]).is_equal(["Fish", 2, P0Logic.content().get("fish", []).size()])
 	assert_int(rows[1][2]).is_equal(20)
