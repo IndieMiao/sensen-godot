@@ -1228,6 +1228,16 @@ func float_lines(parts: Array, at: Vector2) -> Array:
 			if not joins: slot += 1
 		if not joins: group_base = rise
 		places.append([group_base, rise - group_base, slot])
+	# …and pop to one peak: the lowest of the group's lines (a wide line's is capped), the same for each line
+	var j0 := 0
+	while j0 < nodes.size():
+		var j1 := j0 + 1
+		while j1 < nodes.size() and float(places[j1][1]) > 0.0: j1 += 1
+		if j1 - j0 > 1:
+			var low := INF
+			for k in range(j0, j1): low = minf(low, (nodes[k] as UiFloatText).peak())
+			for k in range(j0, j1): (nodes[k] as UiFloatText).peak_cap = low
+		j0 = j1
 	var start := _float_start(at, nodes, base + nodes.size() - 1, rise)
 	var half_w := 0.0
 	for n in nodes: half_w = maxf(half_w, (n as UiFloatText).shown_size().x * 0.5)
