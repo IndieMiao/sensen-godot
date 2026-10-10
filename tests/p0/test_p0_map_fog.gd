@@ -182,3 +182,33 @@ func test_a_pin_of_a_city_without_a_pass_opens_its_city_card() -> void:
 	rt.session.view.travel.passes = {TOKYO: {kind = "day", from = 1.0, until = 2_000_000_000.0}}
 	assert_bool(m._travel_first({"kind": "pond", "id": TOKYO + "~pond0"})).is_false()   # a pass: go in
 	rt.session.view = saved
+
+## 不知火舞 on 279 (6c0377f7): the veil is the design's COLOR_SECONDARY at 40 % (the light blue-grey washed out on the
+## phone); and a city bubble under the HUD rows, the right-hand keys or the quick bar is not drawn — its dot stays.
+func test_the_veil_is_the_secondary_ink_at_40_percent() -> void:
+	var FogLayer := load("res://modules/map/map_fog_layer.gd")
+	assert_that(FogLayer.FOG).is_equal(Color(UiTokens.COLOR_SECONDARY, 0.40))
+
+func test_a_bubble_under_the_hud_is_not_drawn_but_its_dot_is() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	_look(m, 37.2, -121.2, 6.5)
+	var rects: Array = m.bubble_clear_rects()
+	assert_int(rects.size()).is_greater_equal(2)
+	m.city_map.bubble_clear_rects = func(): return [Rect2(0, 0, 360, 800)]   # everything is in the way
+	m.city_map._update_bubbles()
+	var shown := 0
+	var dots := 0
+	for id in m.city_map.bubbles:
+		if m.city_map.bubbles[id].node.visible: shown += 1
+		if m.city_map.bubbles[id].dot.visible: dots += 1
+	assert_int(shown).is_equal(0)
+	assert_int(dots).is_greater(0)
+	m.city_map.bubble_clear_rects = m.bubble_clear_rects
+	m.city_map._update_bubbles()
+	for id in m.city_map.bubbles:
+		var b: Dictionary = m.city_map.bubbles[id]
+		if not b.node.visible: continue
+		var at := Rect2((b.node as Control).position + m.city_map.global_position, (b.node as Control).size)
+		for r in rects: assert_bool((r as Rect2).intersects(at)).override_failure_message("%s under the chrome" % id).is_false()

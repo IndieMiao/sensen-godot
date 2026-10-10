@@ -815,6 +815,7 @@ func _tap_card(id: String) -> bool:
 			actor.face(_mailbox)
 			rt.ui.open_inbox()
 		_:
+			if _facilities and _facilities.tap_card(id): return true   # P1: a greenhouse's strip or button
 			return _materials.tap_card(id)   # SGODOT-231: spot_* and workbench cards
 	return true
 
@@ -836,6 +837,7 @@ func _prompts(v: Dictionary) -> void:
 	world_prompt("plaque", P0WorldPrompts.plaque(v), _plaque, Vector3(0, 0.85, 0), Vector3(0, 0.35, 0), _plaque_node.visible)
 	world_prompt("bench", P0WorldPrompts.bench(v), _bench, Vector3(0, 0.95, 0), Vector3(0, 0.35, 0))
 	world_prompt("mailbox", P0WorldPrompts.mailbox(v), _mailbox, MAILBOX_MARK, MAILBOX_HIT)
+	if _facilities: _facilities.prompts(v)
 
 ## One facility's prompt at `at` + `mark` (the former finger card's / mark's anchor): its strip when it is the open
 ## one, else its icon button (P0WorldPrompts.show). The button and strip forward their taps to `at` + `hit` by id.
@@ -865,6 +867,7 @@ func _card_candidates() -> Array:
 		["mailbox", _mailbox, SIGN_NEAR]]
 	if _plaque_node.visible: out.append(["plaque", _plaque, SIGN_NEAR])
 	out.append_array(_materials.card_candidates())   # SGODOT-231: the five gathering spots and the workbench
+	if _facilities: out.append_array(_facilities.card_candidates())   # P1: greenhouses (`Greenhouse · −25%`)
 	return out
 
 ## Basic Room's bench (648 tris; q(30)) with the room's shared atlas material.

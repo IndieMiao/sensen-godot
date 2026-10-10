@@ -523,6 +523,9 @@ static func main_action(view: Dictionary, plot: Dictionary, seed_id: String, row
 			"cmd": {"type": "fertilize", "plot": plot_id, "item": seed_id}, "need": 0}
 	if tree: return _tree_action(view, plot)
 	if bool(crop_for_seed(view, seed_id).get("perennial", false)) and str(plot.get("state", "")) in ["tilled", "wild"]:
+		if plot.get("greenhouse", false):   # q(118) ②: no trees under glass (李白: `Outside only`, ≤ 80 px)
+			return {"icon": "sow", "verb": "Plant", "sub": "Outside only", "enabled": false, "amber": false, "cmd": {}, "need": 0,
+				"toast": "No trees in the greenhouse"}
 		return _plant_action(view, plot_id, seed_id)
 	if seed_id.begins_with("fert_"):
 		var ripe := str(plot.get("state", "")) == "ready"

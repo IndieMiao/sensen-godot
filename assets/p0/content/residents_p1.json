@@ -43,7 +43,10 @@
         }
       ],
       "teaches": [
-        "dish_carrot_cake"
+        "dish_carrot_cake",
+        "dish_corn_cake",
+        "dish_strawberry_tart",
+        "dish_melon_platter"
       ]
     },
     "res_old_kai": {
@@ -82,8 +85,12 @@
       ],
       "teaches": [
         "dish_grilled_fish",
-        "dish_salt_grilled_fish",
-        "dish_pan_fried_fish"
+        "dish_pan_fried_fish",
+        "dish_charcoal_fish",
+        "dish_herb_baked_perch",
+        "dish_smoked_trout",
+        "dish_sea_bass_salt",
+        "dish_herb_salmon"
       ]
     },
     "res_granny_wu": {
@@ -94,7 +101,10 @@
       "gift_meal": "dish_veggie_plate",
       "one_per_day": false,
       "teaches": [
-        "dish_fish_soup"
+        "dish_fish_soup",
+        "dish_rock_salt_soup",
+        "dish_char_chowder",
+        "dish_pumpkin_chowder"
       ],
       "lines": {
         "Stranger": "Sit by the fire, dear. Warm your hands.",
@@ -138,7 +148,10 @@
             "kind": "sow"
           },
           "qty": 6,
-          "coins": 40
+          "coins": 40,
+          "reward": {
+            "recipe": "dish_grass_carp_soup"
+          }
         },
         {
           "id": "req_res_wu_4",
@@ -152,7 +165,8 @@
           "qty": 3,
           "coins": 80,
           "reward": {
-            "title": "Granny's Favourite"
+            "title": "Granny's Favourite",
+            "recipe": "dish_beet_fish_soup"
           }
         }
       ]
@@ -165,9 +179,32 @@
       "gift_meal": "dish_grilled_fish",
       "one_per_day": false,
       "teaches": [
+        "dish_chili_snakehead",
+        "dish_pineapple_barra",
+        "dish_legend_sashimi",
+        "dish_pineapple_fish",
+        "dish_charcoal_fish",
+        "dish_fruit_platter",
+        "dish_harvest_roast",
+        "dish_herb_baked_perch",
         "dish_bass_tomato_stew",
         "dish_smoked_trout",
-        "dish_fisher_stew"
+        "dish_salt_mackerel",
+        "dish_grass_carp_soup",
+        "dish_char_chowder",
+        "dish_catfish_stew",
+        "dish_sea_bass_salt",
+        "dish_grilled_pike",
+        "dish_fisher_stew",
+        "dish_strawberry_tart",
+        "dish_melon_platter",
+        "dish_orchard_tea",
+        "dish_steamed_sturgeon",
+        "dish_eel_skewers",
+        "dish_herb_salmon",
+        "dish_sweet_potato_cakes",
+        "dish_pumpkin_chowder",
+        "dish_beet_fish_soup"
       ],
       "lines": {
         "Stranger": "New in town? So am I. I'm always new in town.",
@@ -228,7 +265,8 @@
       "one_per_day": false,
       "teaches": [
         "dish_fish_soup",
-        "dish_fisher_stew"
+        "dish_grass_carp_soup",
+        "dish_beet_fish_soup"
       ],
       "lines": {
         "Stranger": "Ahoy! River's calm today.",
@@ -273,7 +311,10 @@
             "style": "Soup"
           },
           "qty": 1,
-          "coins": 40
+          "coins": 40,
+          "reward": {
+            "recipe": "dish_catfish_stew"
+          }
         },
         {
           "id": "req_res_rafa_4",
@@ -287,7 +328,8 @@
           "qty": 3,
           "coins": 80,
           "reward": {
-            "title": "River Friend"
+            "title": "River Friend",
+            "recipe": "dish_fisher_stew"
           }
         }
       ]
@@ -301,7 +343,8 @@
       "one_per_day": false,
       "teaches": [
         "dish_salt_grilled_fish",
-        "dish_herb_grilled_fish"
+        "dish_salt_mackerel",
+        "dish_sea_bass_salt"
       ],
       "lines": {
         "Stranger": "Mind your head. Low ceilings down there.",
@@ -374,7 +417,10 @@
       "gift_meal": "dish_veggie_plate",
       "one_per_day": false,
       "teaches": [
-        "dish_fruit_tea"
+        "dish_corn_cake",
+        "dish_strawberry_tart",
+        "dish_melon_platter",
+        "dish_sweet_potato_cakes"
       ],
       "lines": {
         "Stranger": "Welcome in! Grab a seat anywhere.",
@@ -445,8 +491,9 @@
       "gift_meal": "dish_grilled_fish",
       "one_per_day": false,
       "teaches": [
-        "dish_grilled_fish",
-        "dish_pan_fried_fish"
+        "dish_carp_cakes",
+        "dish_mullet_skewers",
+        "dish_crispy_smelt"
       ],
       "lines": {
         "Stranger": "Trains run on time. So should you.",
@@ -506,7 +553,9 @@
       "gift_meal": "dish_grilled_crucian",
       "one_per_day": false,
       "teaches": [
-        "dish_fruit_tea"
+        "dish_fruit_tea",
+        "dish_apple_tea",
+        "dish_orchard_tea"
       ],
       "lines": {
         "Stranger": "The light's on. Come in from the wind.",
@@ -551,7 +600,10 @@
             "rarity": 2
           },
           "qty": 1,
-          "coins": 40
+          "coins": 40,
+          "reward": {
+            "recipe": "dish_grilled_pike"
+          }
         },
         {
           "id": "req_res_lena_4",
@@ -566,7 +618,8 @@
           "coins": 100,
           "need_line": "1 Rare fish · Golden Koi · Pond",
           "reward": {
-            "title": "Night Watch"
+            "title": "Night Watch",
+            "recipe": "dish_eel_skewers"
           }
         }
       ]
@@ -579,8 +632,9 @@
       "gift_meal": "dish_grilled_crucian",
       "one_per_day": false,
       "teaches": [
-        "dish_bass_tomato_stew",
-        "dish_fisher_stew"
+        "dish_orchard_tea",
+        "dish_legend_sashimi",
+        "dish_steamed_sturgeon"
       ],
       "lines": {
         "Stranger": "Oh! A visitor. Please, look around.",
@@ -641,7 +695,10 @@
       "gift_meal": "dish_radish_salad",
       "one_per_day": false,
       "teaches": [
-        "dish_veggie_plate"
+        "dish_veggie_plate",
+        "dish_tilapia_wraps",
+        "dish_cucumber_salad",
+        "dish_fruit_platter"
       ],
       "lines": {
         "Stranger": "Careful of the seedlings. Hello.",
@@ -712,8 +769,10 @@
       "gift_meal": "dish_veggie_plate",
       "one_per_day": false,
       "teaches": [
+        "dish_cabbage_stew",
         "dish_salted_potatoes",
         "dish_bass_tomato_stew",
+        "dish_catfish_stew",
         "dish_fisher_stew"
       ],
       "lines": {
@@ -758,7 +817,10 @@
             "kind": "crop"
           },
           "qty": 8,
-          "coins": 60
+          "coins": 60,
+          "reward": {
+            "recipe": "dish_roast_veggies"
+          }
         },
         {
           "id": "req_res_nadia_4",
@@ -772,7 +834,8 @@
           "qty": 2,
           "coins": 90,
           "reward": {
-            "title": "Market Family"
+            "title": "Market Family",
+            "recipe": "dish_harvest_roast"
           }
         }
       ]
