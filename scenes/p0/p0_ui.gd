@@ -305,7 +305,7 @@ func _refresh_hud() -> void:
 	# chips would still take taps.
 	hud.visible = not view.is_empty()
 	if view.is_empty(): return
-	var place := P0Travel.place(view, P0Logic.place_info(_place_text, "Farmhouse" if modal_kind == "kitchen" else ""))   # arrived in another city: Tokyo · Arrived (q(108))
+	var place := P0Travel.place(view, P0Logic.place_info(_place_text, "Farmhouse" if modal_kind == "kitchen" else ""), space)   # arrived in another city: Tokyo · Arrived (q(108))
 	var state := P0Logic.hud_state(view, {"next_cost": int(fab_state().get("need", 0)), "place": place})
 	var dots: Array = state.get("today_dots", [])
 	state.erase("today_dots")

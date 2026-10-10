@@ -737,7 +737,8 @@ func city_bubble(region_id: String) -> Dictionary:
 	if cluster == P0Travel.home(_view()):
 		var online := 0
 		for n in _online.values(): online += int(n)
-		return {text = "%d online" % online, icon = "house"}
+		# nobody online: the house alone, like an outpost pin's bare name (q(72): 0 tells nothing, only looks empty)
+		return {text = "%d online" % online if online > 0 else "", icon = "house"}
 	return {text = "Unexplored" if P0Travel.fog(_view(), cluster) == "unexplored" else "Visited"}
 
 ## The city a pin is in: its `cluster` (generated places, SGODOT-280: also the prefix of their id, `gn-1850147~pond0`),
@@ -792,7 +793,7 @@ func fog_holes() -> Array:
 func _return_home() -> void:
 	if rt == null or not P0Travel.away(_view()): return
 	rt.session.send({"type": "return_home"})
-	rt.ui.toast("Welcome home")
+	rt.toast_on_arrival("Welcome home")   # after the farm's loading cover when Go home opens it (司空震 on 286)
 
 # ---------------------------------------------------------------- browsing every city (SGODOT-275, §11.8.1)
 ## The camera city switches as the camera goes over a city (map_poc._update_active_city) and a bubble flies to its

@@ -113,7 +113,41 @@ func test_city_bubbles_say_their_state() -> void:
 	assert_dict(state.call(TOKYO)).is_equal({text = "Visited"})
 	assert_dict(state.call("los_angeles")).is_equal({text = "Visited"})   # a Second Home reads Visited this version
 	assert_dict(state.call("gn-1816670")).is_equal({text = "Unexplored"})
+	m._online = {}
+	assert_dict(state.call("san_francisco")).is_equal({text = "", icon = "house"})   # nobody online: the house alone (q(72))
+	# 不知火舞 on #238: the bubble keeps its size as the count comes and goes (the glyph alone keeps a text line's height)
+	_look(m, 37.55, -122.0, 7.0)
+	m.city_map._update_bubbles()
+	var node: Control = m.city_map.bubbles["san_francisco"].node
+	var empty_size := node.size
+	m._online = {"sh_tea_1": 1}
+	m.city_map._update_bubbles()
+	assert_float(node.size.y).is_equal_approx(empty_size.y, 0.5)
+	# … and is no taller than the text line itself: no bubble grows for it
+	var count: Label = m.city_map.bubbles["san_francisco"].count
+	assert_float((count.get_parent() as Control).custom_minimum_size.y).is_less_equal(count.get_minimum_size().y + 0.5)
 	rt.session.view = saved
+
+## 李元芳 / 司空震 (SGODOT-275): a bubble the last list had and this one does not is hidden with its dot, never left
+## frozen where it was drawn (Northern California's bubbles over Los Angeles after flying there).
+func test_bubbles_the_list_no_longer_has_hide() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	_look(m, 38.6, -121.5, 6.0)   # Northern California at the region zoom: Sacramento, Redding, Chico …
+	m.city_map._update_bubbles()
+	var north: Array = m.city_regions().map(func(r): return str(r.id))
+	assert_bool(north.has("gn-5389489")).is_true()   # Sacramento
+	assert_bool(m.city_map.bubbles["gn-5389489"].node.visible).is_true()
+	_look(m, 33.9, -118.2, 6.0)   # Los Angeles: a new list
+	m.city_map._update_bubbles()
+	var south: Array = m.city_regions().map(func(r): return str(r.id))
+	for id in m.city_map.bubbles:
+		if not south.has(id):
+			assert_bool(m.city_map.bubbles[id].node.visible).override_failure_message("%s left visible" % id).is_false()
+			assert_bool(m.city_map.bubbles[id].dot.visible).is_false()
+	assert_bool(south.has("los_angeles")).is_true()   # Los Angeles itself (its curated region)
+	assert_bool(m.city_map.bubbles["los_angeles"].node.visible).is_true()
 
 ## 不知火舞 on #216: a visited city has a bubble at any zoom, whatever its size (the population cutoff is for the rest).
 func test_a_visited_small_city_has_a_bubble_at_the_country_zoom() -> void:
