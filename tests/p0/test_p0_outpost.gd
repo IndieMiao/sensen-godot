@@ -58,7 +58,9 @@ func test_the_outpost_table_and_anchor_files_agree() -> void:
 	assert_str(str(P0Outposts.by_role("tea").name)).is_equal("Oak Tea House")
 
 func test_each_outpost_opens_with_its_keeper_and_residents() -> void:
-	var expected := {"sh_tackle_1": ["npc_keeper", "npc_kai"], "sh_tea_1": ["npc_keeper"], "sh_post_1": ["npc_keeper", "npc_pip"], "sh_market_1": ["npc_keeper"]}
+	# P1 (SGODOT-284): Sam with Pip at the post, Nadia and Theo at the market, Hana and Lena at the tea house (§9.4.3).
+	var expected := {"sh_tackle_1": ["npc_keeper", "npc_kai"], "sh_tea_1": ["npc_keeper", "npc_hana", "npc_lena"],
+		"sh_post_1": ["npc_keeper", "npc_pip", "npc_sam"], "sh_market_1": ["npc_keeper", "npc_nadia", "npc_theo"]}
 	for id in expected:
 		var r := _room(id)
 		assert_str(r.place_name).is_equal(str(P0Outposts.find(id).name))
@@ -85,7 +87,12 @@ func test_near_resident_is_a_resident_within_card_reach_never_the_keeper() -> vo
 	assert_str(r.p0_near_resident()).is_equal(str(r.npcs.npc_kai.id))
 	r.actor.position = kai + Vector3(P0Room.CARD_NEAR_M + 0.5, 0, 0)
 	assert_str(r.p0_near_resident()).is_equal("")
-	assert_str(_room("sh_tea_1").p0_near_resident()).is_equal("")   # no resident at the tea house
+	# P1: Hana and Lena live at the tea house (SGODOT-284); the nearer of the two within a card's reach.
+	var tea := _room("sh_tea_1")
+	tea.actor.position = tea.anchor("npc_lena").global_position + Vector3(-0.6, 0, 0.4)
+	assert_str(tea.p0_near_resident()).is_equal("res_lena")
+	tea.actor.position = tea.anchor("npc_hana").global_position + Vector3(0.3, 0, 0.6)
+	assert_str(tea.p0_near_resident()).is_equal("res_hana")
 
 func test_decor_is_not_tappable_and_counters_are() -> void:
 	var post := _room("sh_post_1")
@@ -386,7 +393,7 @@ func test_a_tap_on_an_npc_name_tag_is_that_npc() -> void:
 			assert_array(asked).override_failure_message("%s: a tap on %s's name" % [id, n]).is_equal([n])
 			tested += 1
 		for n in r.npcs: rt.ui.npc_tag("room:" + n, "", Vector2.ZERO, false)   # the next room's tags only
-	assert_int(tested).is_equal(6)   # four keepers, Pip and Old Kai
+	assert_int(tested).is_equal(11)   # four keepers, Pip, Old Kai and the five P1 residents (SGODOT-284)
 	# A tag faded under an open strip takes no tap: the tap is the world's (tapped_card stays ""). No stand point in the
 	# four outposts puts a strip over a tag (probed for #122; the earlier check only saw the previous room's door strip,
 	# 哪吒 on #122), so the tag is put in that state directly, as _yield_tag does under a strip.

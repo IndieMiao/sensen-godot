@@ -21,10 +21,9 @@ func test_home_panel_matches_the_page_14_sample() -> void:
 	assert_str(str(p.look)).is_equal("Lv3 look · Full fence")
 	assert_array(p.tiles.map(func(t): return str(t.name))).is_equal(["Timber", "Stone", "Reeds", "Clay", "Rock Salt", "Coins", "Skills"])
 	assert_int(int(p.tiles[5].need)).is_equal(440)   # price + the 40-coin floor (q(10))
-	# P1 (q(59) §1.1): Lv3 brings 10 more plots (content garden.extra), `Plots +10 · now 30`.
 	assert_array(p.changes.map(func(c): return str(c.text))).is_equal(
-		["Max Energy 220 · Meals 220 a day", "Warming Cabinet", "Bag Upgrade I for sale · 150 coins", "Stall Board · 3rd slot", "Plots +10"])
-	assert_array(p.changes.map(func(c): return str(c.note))).is_equal(["now 210", "keeps 6 dishes by the stove", "Bag 25 → 30", "now 2", "now 30"])
+		["Max Energy 220 · Meals 220 a day", "Warming Cabinet", "Bag Upgrade I for sale · 150 coins", "Stall Board · 3rd slot"])
+	assert_array(p.changes.map(func(c): return str(c.note))).is_equal(["now 210", "keeps 6 dishes by the stove", "Bag 25 → 30", "now 2"])
 	assert_str(str(p.reason)).is_equal("Need 6 more Timber")
 	assert_str(str(p.footer)).is_equal("Upgrading is free of Energy · fills Energy to the new max")
 
@@ -47,6 +46,23 @@ func test_the_button_carries_the_first_gap_in_tile_order() -> void:
 	assert_str(str(ready.tap)).is_empty()                     # at home a tap says the gap itself
 	assert_array(away.tiles).has_size(ready.tiles.size())     # the Needs still read away from home
 	assert_array(away.changes).has_size(ready.changes.size())
+
+## SGODOT-282: Lv4–10 kitchen and bag unlocks read as §8.7 copy; ids for other lines (travel, looks, rooms) add no row.
+func test_p1_levels_list_the_kitchen_and_bag_unlocks() -> void:
+	var v := _view(5)
+	v.homestead.next.level = 6
+	v.homestead.next.unlocks = ["big_pot", "bag_upgrade_2"]
+	var p := P0Logic.home_panel(v)
+	assert_str(str(p.title)).is_equal("Homestead Lv5 → Lv6")
+	assert_array(p.changes.slice(1).map(func(c): return "%s · %s" % [c.text, c.note])).is_equal(
+		["Big Pot · Double · two portions, one round of heat", "Bag Upgrade II for sale · 400 coins · Bag 30 → 35"])
+	v.homestead.next.unlocks = ["second_stove", "long_haul_ticket"]
+	assert_array(P0Logic.home_panel(v).changes.slice(1).map(func(c): return str(c.text))).is_equal(["Second Stove"])
+	v.homestead.next.level = 5
+	v.homestead.next.unlocks = ["notice_board", "trip_7", "porch", "standard_room"]
+	assert_str(str(P0Logic.home_panel(v).look)).is_equal("Lv5 look · Porch")
+	var m := P0Logic.home_moment(v, {"level": 10, "unlocks": ["chefs_sign", "master_farmhouse", "deluxe_room", "title_homestead_master"]})
+	assert_str(str(m.detail)).is_equal("Chef's Sign\nHomestead Master")
 
 func test_lv1_to_lv2_lists_the_spice_rack_and_no_look_line() -> void:
 	var v := _view(1)
@@ -71,10 +87,7 @@ func test_home_moment_matches_the_page_14_banner() -> void:
 	var m := P0Logic.home_moment({"energy": {"max": 220}}, {"kind": "homestead", "level": 3, "unlocks": ["warming_cabinet", "bag_upgrade_1", "board_slot_3", "fence"]})
 	assert_str(str(m.title)).is_equal("Homestead Lv3")
 	assert_str(str(m.subtitle)).is_equal("Max Energy 220 · Energy full")
-	assert_str(str(m.detail)).is_equal("Warming Cabinet\nBag Upgrade I for sale · 150 coins\nPlots +10")   # q(59) §1.1
-	# a Homestead table that announces the plots itself (plots_40, #209) is not said twice
-	var twice := P0Logic.home_moment({"energy": {"max": 220}}, {"kind": "homestead", "level": 3, "unlocks": ["plots_40"]})
-	assert_int(str(twice.detail).count("Plots")).is_less_equal(1)
+	assert_str(str(m.detail)).is_equal("Warming Cabinet\nBag Upgrade I for sale · 150 coins")
 
 func test_material_icons_exist() -> void:
 	for id in ["wood", "stone", "fiber", "clay", "rock_salt", "coin", "star", "energy", "kitchen", "bag", "board"]:

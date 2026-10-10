@@ -1480,8 +1480,28 @@ static func rest_state(view: Dictionary) -> Dictionary:
 ## HOME-1 away from home: the toast for a tap on the grey `At home` button, and for an upgrade refused not_home.
 const HOME_AWAY_TAP := "Upgrade at home · Going home is free"
 
+## HOME-1 "What changes" rows and the level-up banner lines for the P1 kitchen and Homestead unlocks (§8.3.1, §8.7
+## copy; SGODOT-282). Travel tiers, looks and room tiers are announced by their own lines, not here.
+const P1_UNLOCKS := {
+	"second_stove": {"icon": "kitchen", "text": "Second Stove", "note": "two dishes at once"},
+	"notice_board": {"icon": "board", "text": "Notice Board", "note": "by the farmhouse door"},
+	"big_pot": {"icon": "kitchen", "text": "Big Pot · Double", "note": "two portions, one round of heat"},
+	"bag_upgrade_2": {"icon": "bag", "text": "Bag Upgrade II for sale · 400 coins", "note": "Bag 30 → 35"},
+	"third_stove": {"icon": "kitchen", "text": "Third Stove", "note": "Warming Cabinet keeps 12"},
+	"bag_upgrade_3": {"icon": "bag", "text": "Bag Upgrade III for sale · 1,000 coins", "note": "Bag 35 → 40"},
+	"chefs_sign": {"icon": "kitchen", "text": "Chef's Sign", "note": "every dish's gold zone +5"},
+	"title_homestead_master": {"icon": "star", "text": "Homestead Master", "note": "title"},
+	"old_tree": {"icon": "wood", "text": "Old Tree", "note": "Hardwood · 1 per round"},
+	"plots_40": {"icon": "field", "text": "Plots 40", "note": "10 more to till"},
+	"warming_cabinet_12": {"icon": "kitchen", "text": "Warming Cabinet 12", "note": "keeps 12 dishes"},
+	"stall_upgrade": {"icon": "board", "text": "Homestead Stall upgraded", "note": "new look"},
+}
+
+## The farmhouse look each level brings (§8.3.1 stages 2–4), shown as HOME-1's look line.
+const LOOKS := {"porch": "Porch", "kitchen_extension": "Kitchen extension", "master_farmhouse": "Master farmhouse"}
+
 ## HOME-1 (Figma 482:152, §8.6.1, LOCK-10) from view.homestead facts: title, the look line, NEED-TILEs in order
-## materials → coins → skills, what changes, and the button (the first gap is written on it). P0 stops at Lv3.
+## materials → coins → skills, what changes, and the button (the first gap is written on it). Lv1–10 (P1, SGODOT-282).
 ## {title, look, tiles: [{id, name, have, need, icon}], changes: [{icon, text, note}], label, reason, tap, footer, max}
 static func home_panel(view: Dictionary, at_home := true) -> Dictionary:
 	var h: Dictionary = view.get("homestead", {})
@@ -1495,6 +1515,8 @@ static func home_panel(view: Dictionary, at_home := true) -> Dictionary:
 	out.title = "Homestead Lv%d → Lv%d" % [level, int(next.level)]
 	var unlocks: Array = next.get("unlocks", [])
 	if unlocks.has("fence"): out.look = "Lv%d look · Full fence" % int(next.level)
+	for u in LOOKS:   # §8.3.1 looks at Lv5 / 8 / 10; the A / B choice comes with Decorate (SGODOT-282)
+		if unlocks.has(u): out.look = "Lv%d look · %s" % [int(next.level), LOOKS[u]]
 	for m in next.get("materials", []):
 		out.tiles.append({"id": str(m.id), "name": str(m.name), "have": int(m.have), "need": int(m.need), "icon": str(m.id)})
 	out.tiles.append({"id": "coins", "name": "Coins", "have": int(next.coins.have), "need": int(next.coins.need), "icon": "coin"})
@@ -1512,9 +1534,9 @@ static func home_panel(view: Dictionary, at_home := true) -> Dictionary:
 				out.changes.append({"icon": "bag", "text": "Bag Upgrade I for sale · 150 coins",
 					"note": "Bag %d → %d" % [int(view.get("bag", {}).get("capacity", 25)), int(view.get("bag", {}).get("capacity", 25)) + 5]})
 			"board_slot_3": out.changes.append({"icon": "board", "text": "Stall Board · 3rd slot", "note": "now %d" % board_now})
-	# P1 (q(59) §1.1): the level that brings more plots says so (`Plots +10`), from content/farm_garden.json.
-	var more := plots_added_at(int(next.level)) if not unlocks.has("plots_40") else 0   # #209 may announce it itself
-	if more > 0: out.changes.append({"icon": "hoe", "text": "Plots +%d" % more, "note": "now %d" % P0Garden.plot_count(view)})
+			_:
+				var line := P1_UNLOCKS.get(str(u), {}) as Dictionary
+				if not line.is_empty(): out.changes.append(line.duplicate())
 	# The first gap in tile order goes on the button (LOCK-10). Away from home (HOME-1 from the Profile farm card,
 	# §10.6.2) the button is grey with `At home`, as the Energy card's Cook / Rest tiles (q(6)); a tap says
 	# `Upgrade at home · Going home is free` and sends nothing. Going home is the place chip / the map, not a button
@@ -1558,11 +1580,6 @@ static func plaque_lines(view: Dictionary, bias_min := 999999) -> Array:
 
 ## HOME-2 MomentBanner (Figma 482:154 / 1228:108620) from the server's homestead event: level disc, title,
 ## what changed (Energy refilled to the new max) and one line of consequences.
-## Plots a Homestead level adds (content garden.extra, P1 q(59) §1.1: +10 at Lv3); 0 for any other level.
-static func plots_added_at(level: int) -> int:
-	var extra: Dictionary = content().get("garden", {}).get("extra", {})
-	return int(extra.get("count", 0)) if not extra.is_empty() and int(extra.get("homestead", 0)) == level else 0
-
 static func home_moment(view: Dictionary, ev: Dictionary) -> Dictionary:
 	var level := int(ev.get("level", 1))
 	var max_e := int(view.get("energy", {}).get("max", 0))
@@ -1573,7 +1590,8 @@ static func home_moment(view: Dictionary, ev: Dictionary) -> Dictionary:
 			"clay_bank": lines.append("Clay Bank opened")   # gathering spot (SGODOT-231, q(45))
 			"warming_cabinet": lines.append("Warming Cabinet")
 			"bag_upgrade_1": lines.append("Bag Upgrade I for sale · 150 coins")
-	if plots_added_at(level) > 0 and not (ev.get("unlocks", []) as Array).has("plots_40"):   # P1 HOME-2 (q(59) §1.1)
-		lines.append("Plots +%d" % plots_added_at(level))
+			_:
+				var line := P1_UNLOCKS.get(str(u), {}) as Dictionary
+				if not line.is_empty(): lines.append(str(line.text))
 	return {"level": str(level), "title": "Homestead Lv%d" % level, "subtitle": "Max Energy %d · Energy full" % max_e,
 		"detail": "\n".join(lines)}
