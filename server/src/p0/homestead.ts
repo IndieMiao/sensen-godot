@@ -20,6 +20,24 @@ export function unlocked(c: P0Content, s: P0State, what: string): boolean {
   return c.homestead.levels.some(l => l.level <= s.homestead.level && l.unlocks.includes(what));
 }
 
+/** The value of a [from level, value] ladder at the current Homestead level, or fallback below its first step. */
+export function stepAt(steps: [number, number][] | undefined, level: number, fallback: number): number {
+  let v = fallback;
+  for (const [from, n] of steps ?? []) if (level >= from) v = n;
+  return v;
+}
+
+/** Stoves in the kitchen (§8.3.2): Lv1–3 1, Lv4–7 2, Lv8 on 3. */
+export function stoveCount(c: P0Content, s: P0State): number {
+  return Math.max(1, stepAt(c.homestead.stoves, s.homestead.level, 1));
+}
+
+/** Big Pot (Lv6, §7.7): any stove may cook Double. Chef's Sign (Lv10): the gold zone bonus, 0 before. */
+export function bigPot(c: P0Content, s: P0State): boolean { return unlocked(c, s, 'big_pot'); }
+export function chefSignGold(c: P0Content, s: P0State): number {
+  return unlocked(c, s, 'chefs_sign') ? (c.homestead.chefs_sign_gold ?? 0) : 0;
+}
+
 export function boardSlots(c: P0Content, s: P0State): number {
   let slots = 0;
   for (const [from, n] of c.homestead.board_slots) if (s.homestead.level >= from) slots = n;

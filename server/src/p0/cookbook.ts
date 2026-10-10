@@ -4,14 +4,49 @@
  */
 import { cropById, fishById, ingredient, type Convenience, type P0Content, type Recipe } from './content.js';
 import { cookSlots, ingredientsFor, recipeRarity, tokenInfo, tokenMatches } from './cooking.js';
+import { chefSignGold } from './homestead.js';
 import { ingredientStock } from './kitchen_storage.js';
 import { blessed, skillLevel, xpPercent } from './rules.js';
+import type { P0Event } from './progress.js';
 import type { P0State } from './state.js';
 
 export type PageState = 'hidden' | 'clued' | 'tasted' | 'discovered' | 'mastered';
 
 export function hasConvenience(c: P0Content, s: P0State, id: Convenience): boolean {
-  return skillLevel(c, s, 'cooking') >= c.cooking.conveniences[id];
+  const at = c.cooking.conveniences[id];
+  return at !== undefined && skillLevel(c, s, 'cooking') >= at;
+}
+
+/** Pages cooked at least once (Discovered or Mastered); the Mystery Dish is not a page. */
+export function discoveredCount(c: P0Content, s: P0State): number {
+  return s.firsts.filter(f => f.startsWith('cook:') && f !== `cook:${c.cooking.mystery.id}`).length;
+}
+
+export function masteredCount(c: P0Content, s: P0State): number {
+  return c.cooking.recipes.filter(r => pageState(c, s, r.id) === 'mastered').length;
+}
+
+/** Cookbook milestones reached and not yet paid (§7.6.1): each once, its coins now; titles and the cabinet stay. */
+export function noteMilestones(c: P0Content, s: P0State, events: P0Event[]): void {
+  const discovered = discoveredCount(c, s), mastered = masteredCount(c, s);
+  for (const m of c.cooking.milestones ?? []) {
+    const key = `milestone:${m.id}`;
+    if (s.firsts.includes(key)) continue;
+    if (!((m.discovered !== undefined && discovered >= m.discovered) || (m.mastered !== undefined && mastered >= m.mastered))) continue;
+    s.firsts.push(key);
+    if (m.coins) { s.coins += m.coins; events.push({ kind: 'coins', delta: m.coins }); }
+    events.push({ kind: 'milestone', id: m.id, title: m.title, coins: m.coins ?? 0, cabinet: m.cabinet ?? 0, decor: m.decor ?? null });
+  }
+}
+
+/** Warming Cabinet portions the milestones add (Head Chef +4). */
+export function milestoneCabinet(c: P0Content, s: P0State): number {
+  return (c.cooking.milestones ?? []).filter(m => s.firsts.includes(`milestone:${m.id}`)).reduce((n, m) => n + (m.cabinet ?? 0), 0);
+}
+
+/** Pots a page needs to be Mastered: 10, or 7 with Fast Mastery (Cooking Lv7, §4.6.3). */
+export function masteredAt(c: P0Content, s: P0State): number {
+  return hasConvenience(c, s, 'fast_mastery') ? (c.cooking.mastered.fast ?? c.cooking.mastered.cooked) : c.cooking.mastered.cooked;
 }
 
 export function conveniences(c: P0Content, s: P0State): Convenience[] {
@@ -20,7 +55,7 @@ export function conveniences(c: P0Content, s: P0State): Convenience[] {
 
 /** §7.5.1: Discovered once cooked (Mastered at 10 pots); Tasted when known but never cooked; Clued with a clue. */
 export function pageState(c: P0Content, s: P0State, id: string): PageState {
-  if (s.firsts.includes(`cook:${id}`)) return (s.book.cooked[id] ?? 0) >= c.cooking.mastered.cooked ? 'mastered' : 'discovered';
+  if (s.firsts.includes(`cook:${id}`)) return (s.book.cooked[id] ?? 0) >= masteredAt(c, s) ? 'mastered' : 'discovered';
   if (s.cookbook.includes(id)) return 'tasted';
   return (s.book.clues[id] ?? []).length > 0 ? 'clued' : 'hidden';
 }
@@ -94,8 +129,10 @@ export function mightHave(c: P0Content, r: Recipe, stock: Map<string, number>): 
 export function goldWidth(c: P0Content, s: P0State, page: string | null, base: number): number {
   let width = base;
   if (hasConvenience(c, s, 'steady_hand_1')) width += c.cooking.steady_hand_gold;
+  if (hasConvenience(c, s, 'steady_hand_2')) width += c.cooking.steady_hand_gold;   // Lv7: another +5, same cap
   if (page && pageState(c, s, page) === 'mastered') width += c.cooking.mastered.gold;
-  return Math.min(c.cooking.gold_cap, Math.round(width * 1000) / 1000);
+  // Chef's Sign (Homestead Lv10, §7.7): +5 points on every dish, on top of the cap the skills reach.
+  return Math.min(c.cooking.gold_cap + chefSignGold(c, s), Math.round((width + chefSignGold(c, s)) * 1000) / 1000);
 }
 
 /** Cooking time and heat times: × quick_fire from Cooking Lv6 (Quick Fire); the needle speed stays the same. */
