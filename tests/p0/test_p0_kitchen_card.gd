@@ -118,3 +118,35 @@ func test_the_effect_line_runs_up_to_the_button_and_drops_the_style_then_the_tim
 	assert_str(effect.text).is_equal("+70 Energy · 30 s")
 	d.call("_fit_effect", 70.0)
 	assert_str(effect.text).is_equal("+70 Energy")
+
+## SGODOT-282 (不知火舞 540d59df): a Legendary page shows the empty Buff slot as a capsule at the end of the state line,
+## inside the card and clear of the button; other pages do not.
+func test_a_legendary_page_shows_the_buff_capsule_on_the_state_line() -> void:
+	var d := _drawer()
+	d.view.cooking.tiers["4"] = {"energy": 70, "ms": 60000, "first_xp": 80}
+	d.view.cooking.cookbook.append({"id": "dish_legend_sashimi", "name": "Legend Sashimi", "rarity": 4, "slots": 1, "state": "tasted",
+		"known": true, "in": ["W4"], "cooked": false, "can_cook": false, "lock": null, "buff": "buff_bite_window"})
+	d.refresh()
+	await _settle()
+	var cap: Control = d.get("_recipe_buff")
+	var state: Label = d.get("_recipe_state")
+	var b: UiCommandButton = d.get("_recipe_button")
+	d.select_page("dish_grilled_crucian")
+	await _settle()
+	assert_bool(cap.visible).is_false()
+	d.select_page("dish_legend_sashimi")
+	await _settle()
+	assert_bool(cap.visible).is_true()
+	assert_str((cap.find_child("buff_text", true, false) as Label).text).is_equal("Buff · coming later")
+	assert_int(cap.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
+	assert_bool(_card(d).encloses(cap.get_global_rect())).is_true()
+	# The state line is never cut to make room: the capsule follows it on the line, or takes a row under it.
+	assert_float(state.size.x).is_greater_equal(P0KitchenDrawer._text_width(state) - 0.5)
+	var same_line := absf(cap.get_global_rect().get_center().y - state.get_global_rect().get_center().y) < 2.0
+	if same_line: assert_float(cap.position.x).is_greater_equal(state.position.x + state.size.x)
+	else: assert_float(cap.position.y).is_greater_equal(state.position.y + state.size.y - 1.0)
+	var effect: Label = d.get("_recipe_effect")
+	assert_bool(cap.get_global_rect().intersects(effect.get_global_rect())).is_false()
+	var nav: Control = d.get("_recipe_nav")
+	for other in [b, nav]:
+		if (other as Control).visible: assert_bool(cap.get_global_rect().intersects((other as Control).get_global_rect())).is_false()

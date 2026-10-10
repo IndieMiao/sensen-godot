@@ -55,6 +55,7 @@ var _recipe_maybe: Label
 var _recipe_icon: TextureRect
 var _recipe_title: Label
 var _recipe_state: Label
+var _recipe_buff: PanelContainer   # Legendary pages: the empty Buff slot at the end of the state line (不知火舞 540d59df)
 var _recipe_effect: Label
 var _effect_parts: Array = []   # `+40 Energy`, `15 s`, `Soup`: as many as fit the effect line (_fit_effect)
 var _recipe_button: UiCommandButton
@@ -183,6 +184,8 @@ func _build_recipe() -> Control:
 	_recipe_title = _text(_recipe, UiTokens.STYLE_C14_XB, UiTokens.COLOR_TEXT, Rect2(57.4, 8.4, 180, 18))
 	_recipe_state = _text(_recipe, UiTokens.STYLE_C10_B, UiTokens.COLOR_SECONDARY, Rect2(57.4, 28.4, 150, 13))
 	_recipe_effect = _text(_recipe, UiTokens.STYLE_C12_XB, UiTokens.COLOR_TEXT, Rect2(57.4, 48.4, 142, 15))
+	_recipe_buff = _buff_capsule()
+	_recipe.add_child(_recipe_buff)
 	_recipe_maybe = UiKit.label("", UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_NEW_INK)
 	_recipe_maybe.position = Vector2(57.4, _RECIPE_MAYBE_TOP)
 	_recipe_maybe.visible = false
@@ -201,6 +204,45 @@ func _build_recipe() -> Control:
 	_recipe_nav.pressed.connect(func(): set_tab("experiment"))
 	wrap.add_child(_recipe_nav)
 	return wrap
+
+## SGODOT-282 / §7.14.4 (不知火舞 540d59df): Legendary pages (41–48) show their Buff slot as a display-only capsule:
+## secondary C10 Bold `Buff · coming later`, a 1 px dashed outline, no fill, a 12 px hollow gold star on the left
+## (P3 brings the Buffs). Not a button: it never takes a tap.
+class _HollowStar extends Control:
+	func _init() -> void:
+		custom_minimum_size = Vector2(12, 12)
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+	func _draw() -> void:
+		var c := size * 0.5
+		var outer := minf(size.x, size.y) * 0.5 - 0.75
+		var pts := PackedVector2Array()
+		for i in 11:
+			var a := -PI * 0.5 + float(i) * PI / 5.0
+			pts.append(c + Vector2(cos(a), sin(a)) * (outer if i % 2 == 0 else outer * 0.45))
+		draw_polyline(pts, UiTokens.COLOR_GOLD_DEEP, 1.2, true)
+
+static func _buff_capsule() -> PanelContainer:
+	var cap := PanelContainer.new()
+	cap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var box := UiStyleBox.make(Color.TRANSPARENT, UiTokens.RADIUS_PILL, UiTokens.COLOR_SECONDARY, UiTokens.STROKE_DEFAULT)
+	box.dashed = true
+	box.dash = UiTokens.DASH_KITCHEN[0]
+	box.gap = UiTokens.DASH_KITCHEN[1]
+	box.content_margin_left = 5.0
+	box.content_margin_right = 6.0
+	cap.add_theme_stylebox_override(&"panel", box)
+	var row := HBoxContainer.new()
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_theme_constant_override(&"separation", 2)
+	var star := _HollowStar.new()
+	star.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(star)
+	var text := UiKit.label(P0KitchenLogic.BUFF_LATER, UiTokens.STYLE_C10_B, UiTokens.COLOR_SECONDARY)
+	text.name = "buff_text"
+	row.add_child(text)
+	cap.add_child(row)
+	cap.visible = false
+	return cap
 
 static func _text(parent: Control, style: StringName, color: Color, r: Rect2) -> Label:
 	var l := UiKit.label("", style, color)
@@ -243,6 +285,7 @@ func _show_page(id: String) -> void:
 	_recipe_icon.self_modulate = Color.WHITE if card.icon != null else UiTokens.COLOR_DISABLED
 	_recipe_title.text = card.title
 	_recipe_state.text = card.state
+	_recipe_buff.visible = str(card.get("buff", "")) != ""
 	_effect_parts = card.effect_parts
 	_recipe_maybe.text = card.maybe
 	_recipe_maybe.visible = card.maybe != ""
@@ -258,23 +301,37 @@ func _show_page(id: String) -> void:
 ## down; the button keeps the bottom-right corner, right-aligned at 328 and as wide as its text, and when that
 ## text would run into the facts it takes a full-width row of its own under them. Text never shrinks or wraps.
 func _layout_recipe() -> void:
-	var extra := _recipe_maybe.get_combined_minimum_size().y + 2.0 if _recipe_maybe.visible else 0.0
-	_recipe_effect.position.y = 48.4 + extra
-	var h := _RECIPE.y + extra
-	_recipe_nav.position = Vector2(_RECIPE.x - 150, _RECIPE_BUTTON_AT.y + extra)
 	var b := _recipe_button
 	var w := maxf(_RECIPE_BUTTON.x, b.get_combined_minimum_size().x)
 	var right := _RECIPE.x - _RECIPE_PAD
 	# The fact lines run up to 8 px short of what sits in the corner (不知火舞, 256 follow-up: not the 142 of the text box).
-	var beside := (right - w if b.visible else _recipe_nav.position.x) - _RECIPE_PAD - _FACTS_X
+	var beside := (right - w if b.visible else _RECIPE.x - 150.0) - _RECIPE_PAD - _FACTS_X
 	_fit_effect(beside)
-	_recipe_state.size.x = beside
-	if not b.visible or (_text_width(_recipe_state) <= beside and _text_width(_recipe_effect) <= beside):
+	var corner := not b.visible or (_text_width(_recipe_state) <= beside and _text_width(_recipe_effect) <= beside)
+	var room := beside if corner else right - _FACTS_X
+	# The Buff capsule (Legendary) ends the state line when both fit; otherwise it takes a row of its own under it.
+	var cap := _recipe_buff.get_combined_minimum_size() if _recipe_buff.visible else Vector2.ZERO
+	var inline := cap.x > 0.0 and _text_width(_recipe_state) + 4.0 + cap.x <= room
+	var buff_h := cap.y + 2.0 if cap.x > 0.0 and not inline else 0.0
+	_recipe_maybe.position.y = _RECIPE_MAYBE_TOP + buff_h
+	var extra := buff_h + (_recipe_maybe.get_combined_minimum_size().y + 2.0 if _recipe_maybe.visible else 0.0)
+	_recipe_effect.position.y = 48.4 + extra
+	var h := _RECIPE.y + extra
+	_recipe_nav.position = Vector2(_RECIPE.x - 150, _RECIPE_BUTTON_AT.y + extra)
+	_recipe_state.size.x = room
+	if cap.x > 0.0:
+		_recipe_buff.size = cap
+		if inline:
+			var text_w := _text_width(_recipe_state)
+			_recipe_state.size.x = text_w
+			_recipe_buff.position = Vector2(_FACTS_X + text_w + 4.0, _recipe_state.position.y + (_recipe_state.size.y - cap.y) * 0.5)
+		else:
+			_recipe_buff.position = Vector2(_FACTS_X, _RECIPE_MAYBE_TOP)
+	if corner:
 		b.position = Vector2(right - w, _RECIPE_BUTTON_AT.y + extra)
 		b.size = Vector2(w, _RECIPE_BUTTON.y)
 	else:   # a row of its own under the facts; the facts take the card's width
 		_fit_effect(right - _FACTS_X)
-		_recipe_state.size.x = right - _FACTS_X
 		var top := _recipe_effect.position.y + _recipe_effect.size.y + _RECIPE_ROW_GAP
 		b.position = Vector2(_RECIPE_PAD, top)
 		b.size = Vector2(_RECIPE.x - _RECIPE_PAD * 2.0, _RECIPE_BUTTON.y)

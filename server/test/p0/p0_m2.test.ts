@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { loadP0Content, recipeById } from '../../src/p0/content.js';
-import { cookable, cookablePages, deriveRarity, heatHits, matchRecipe, recipeRarity } from '../../src/p0/cooking.js';
+import { cookable, cookablePages, deriveRarity, heatHits, matchRecipe, recipeRarity, tokenInfo } from '../../src/p0/cooking.js';
 import { applyP0, count, type P0Command, type P0Event } from '../../src/p0/reducer.js';
 import { freshState, type P0State } from '../../src/p0/state.js';
 import { viewOf } from '../../src/p0/view.js';
@@ -368,5 +368,14 @@ describe('P0 Reed Rod and Tools & Gear (§6.4.1)', () => {
     s = step(s, { type: 'equip', item: 'rod_starter' }).s;
     expect(viewOf(c, s, T0).fishing.rod).toBe('Starter Rod');
     expect(applyP0(c, s, { type: 'equip', item: 'rod_carbon' }, T0)).toMatchObject({ ok: false, code: 'not_owned' });
+  });
+});
+
+describe('P1 pages (SGODOT-282)', () => {
+  it('each page\'s families field matches the families its ingredients give, wherever they are all in this build', () => {
+    for (const r of c.cooking.recipes) {
+      if (!r.families || !cookable(c, r)) continue;
+      expect([r.id, r.in.map(t => tokenInfo(c, t)!.family)]).toEqual([r.id, r.families]);
+    }
   });
 });
