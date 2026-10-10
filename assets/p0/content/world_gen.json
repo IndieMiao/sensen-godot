@@ -625,14 +625,14 @@
     "why": "Fortaleza · Mangrove Tackle Shop: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (-3.702313, -38.525896); moved 2196 m with its group (pond, tackle shop, Market Square 1) to land 65 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
    },
    "gn-1248991~pond1": {
-    "lat": 6.958037,
-    "lng": 79.853803,
-    "why": "Colombo · Mangrove Creek: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (6.957942, 79.853598); moved 25 m with its group (pond, tackle shop, Market Square 1) to land 28 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+    "lat": 6.960264,
+    "lng": 79.859968,
+    "why": "Colombo · Mangrove Creek: moved 724 m from (6.958037, 79.853803) to land 300 m from water with its group, every placement rule kept and no pin within 100 m of a pond — off the container port onto the streets by Seram Gate (port drawn as an area no place may take: land to WorldCover, not where a player looks for a shop) (tools/world_water_groups.ts, map-checked, 2026-10-11)."
    },
    "gn-1248991~tackle1": {
-    "lat": 6.958735,
-    "lng": 79.856425,
-    "why": "Colombo · Mangrove Tackle Shop: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (6.959149, 79.852340); moved 453 m with its group (pond, tackle shop, Market Square 1) to land 65 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+    "lat": 6.961387,
+    "lng": 79.859968,
+    "why": "Colombo · Mangrove Tackle Shop: moved 490 m from (6.958735, 79.856425) to land 182 m from water with its group, every placement rule kept and no pin within 100 m of a pond — off the container port onto the streets by Seram Gate (port drawn as an area no place may take: land to WorldCover, not where a player looks for a shop) (tools/world_water_groups.ts, map-checked, 2026-10-11)."
    },
    "gn-1869012~pond0": {
     "lat": 39.427293,
@@ -680,19 +680,19 @@
     "why": "Dagupan · Palm Market Square: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (16.055134, 120.319377); moved 1794 m with its group (pond, tackle shop, Market Square 1) to land 65 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
    },
    "gn-1886762~pond0": {
-    "lat": 29.968474,
-    "lng": 122.204624,
-    "why": "Zhoushan · Yuzu Pond: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (29.967304, 122.196965); moved 749 m with its group (pond, tackle shop, Market Square 1) to land 46 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+    "lat": 29.977984,
+    "lng": 122.20656,
+    "why": "Zhoushan · Yuzu Pond: moved 1074 m from (29.968474, 122.204624) to land 87 m from water with its group, every placement rule kept and no pin within 100 m of a pond — off the tidal flats and the bridge into the shore park north of Binhai Avenue (the flats drawn as an area no place may take) (tools/world_water_groups.ts, map-checked, 2026-10-11)."
    },
    "gn-1886762~tackle0": {
-    "lat": 29.970682,
-    "lng": 122.206408,
-    "why": "Zhoushan · Yuzu Tackle Shop: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (29.969094, 122.196783); moved 944 m with its group (pond, tackle shop, Market Square 1) to land 61 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+    "lat": 29.979107,
+    "lng": 122.20656,
+    "why": "Zhoushan · Yuzu Tackle Shop: moved 937 m from (29.970682, 122.206408) to land 206 m from water with its group, every placement rule kept and no pin within 100 m of a pond — off the tidal flats and the bridge into the shore park north of Binhai Avenue (the flats drawn as an area no place may take) (tools/world_water_groups.ts, map-checked, 2026-10-11)."
    },
    "gn-1886762~market0": {
-    "lat": 29.971437,
-    "lng": 122.209508,
-    "why": "Zhoushan · Pagoda Market Square: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (29.971605, 122.198557); moved 1055 m with its group (pond, tackle shop, Market Square 1) to land 96 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+    "lat": 29.977403,
+    "lng": 122.209064,
+    "why": "Zhoushan · Pagoda Market Square: moved 665 m from (29.971437, 122.209508) to land 105 m from water with its group, every placement rule kept and no pin within 100 m of a pond — off the tidal flats and the bridge into the shore park north of Binhai Avenue (the flats drawn as an area no place may take) (tools/world_water_groups.ts, map-checked, 2026-10-11)."
    },
    "gn-2346229~pond0": {
     "lat": 4.97434,
@@ -783,6 +783,61 @@
     "lat": 41.001644,
     "lng": 28.972623,
     "why": "Istanbul · Mallard Tackle Shop: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (40.992710, 28.962474); moved 1309 m with its group (pond, tackle shop, Market Square 1) to land 63 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-1248991~tea0": {
+    "lat": 6.949212,
+    "lng": 79.856891,
+    "why": "Colombo · Breeze Tea House: moved 1348 m from (6.951318, 79.844860) to land 402 m from water with its group, every placement rule kept and no pin within 100 m of a pond — off the container port onto the streets by Seram Gate (port drawn as an area no place may take: land to WorldCover, not where a player looks for a shop) (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-2274895~tackle1": {
+    "lat": 6.31322,
+    "lng": -10.816273,
+    "why": "Monrovia · Macaw Tackle Shop: moved 284 m from (6.310936, -10.815133) to land 175 m from water with its group, every placement rule kept and no pin within 100 m of a pond — the beginner group had no spot within 10 km while other tackle shops kept their 3 km, so those groups moved out to make room (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-2274895~pond2": {
+    "lat": 6.288705,
+    "lng": -10.769609,
+    "why": "Monrovia · Firefly Creek: moved 2139 m from (6.307480, -10.773804) to land 660 m from water with its group, every placement rule kept and no pin within 100 m of a pond — the beginner group had no spot within 10 km while other tackle shops kept their 3 km, so those groups moved out to make room (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-2274895~tackle2": {
+    "lat": 6.288705,
+    "lng": -10.767576,
+    "why": "Monrovia · Firefly Tackle Shop: moved 2129 m from (6.306670, -10.774230) to land 662 m from water with its group, every placement rule kept and no pin within 100 m of a pond — the beginner group had no spot within 10 km while other tackle shops kept their 3 km, so those groups moved out to make room (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-2274895~pond0": {
+    "lat": 6.29327,
+    "lng": -10.79319,
+    "why": "Monrovia · Hummingbird Pond: moved 1748 m from (6.278085, -10.797283) to land 37 m from water with its group, every placement rule kept and no pin within 100 m of a pond — the beginner group had no spot within 10 km while other tackle shops kept their 3 km, so those groups moved out to make room (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-2274895~tackle0": {
+    "lat": 6.294223,
+    "lng": -10.794149,
+    "why": "Monrovia · Hummingbird Tackle Shop: moved 2021 m from (6.276293, -10.797153) to land 71 m from water with its group, every placement rule kept and no pin within 100 m of a pond — the beginner group had no spot within 10 km while other tackle shops kept their 3 km, so those groups moved out to make room (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-2274895~market0": {
+    "lat": 6.293133,
+    "lng": -10.791614,
+    "why": "Monrovia · Banyan Market Square: moved 1324 m from (6.282601, -10.797206) to land 68 m from water with its group, every placement rule kept and no pin within 100 m of a pond — the beginner group had no spot within 10 km while other tackle shops kept their 3 km, so those groups moved out to make room (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-3492908~tackle1": {
+    "lat": 18.479393,
+    "lng": -69.917103,
+    "why": "Santo Domingo · Turtle Tackle Shop: moved 286 m from (18.480193, -69.914523) to land 2562 m from water with its group, every placement rule kept and no pin within 100 m of a pond — the beginner group had no spot within 10 km while Turtle Tackle Shop kept its 3 km, so it moved out to make room (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-3492908~pond0": {
+    "lat": 18.464535,
+    "lng": -69.8926,
+    "why": "Santo Domingo · Jackfruit Pond: moved 1723 m from (18.449974, -69.887013) to land 41 m from water with its group, every placement rule kept and no pin within 100 m of a pond — the beginner group had no spot within 10 km while Turtle Tackle Shop kept its 3 km, so it moved out to make room (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-3492908~tackle0": {
+    "lat": 18.465658,
+    "lng": -69.8926,
+    "why": "Santo Domingo · Jackfruit Tackle Shop: moved 1646 m from (18.451517, -69.887983) to land 89 m from water with its group, every placement rule kept and no pin within 100 m of a pond — the beginner group had no spot within 10 km while Turtle Tackle Shop kept its 3 km, so it moved out to make room (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-3492908~market0": {
+    "lat": 18.463605,
+    "lng": -69.896259,
+    "why": "Santo Domingo · Palm Market Square: moved 1341 m from (18.454376, -69.888080) to land 78 m from water with its group, every placement rule kept and no pin within 100 m of a pond — the beginner group had no spot within 10 km while Turtle Tackle Shop kept its 3 km, so it moved out to make room (tools/world_water_groups.ts, map-checked, 2026-10-11)."
    }
   },
   "room": {
