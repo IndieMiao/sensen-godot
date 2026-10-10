@@ -44,4 +44,4 @@ func test_the_repo_fragments_merge_cleanly_in_name_order() -> void:
 	assert_bool(c.is_empty()).is_false()
 	assert_array(P0Logic.content_errors).is_empty()
 	assert_bool(c.has("_note")).is_true()   # the main table's own note; a fragment's _note never lands
-	assert_str(str(c._note)).does_not_contain("Content fragments (SGODOT-275")
+	assert_str(str(c._note)).not_contains("Content fragments (SGODOT-275")
