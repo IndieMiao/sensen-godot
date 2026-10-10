@@ -185,3 +185,19 @@ func test_every_sold_piece_has_its_icon() -> void:
 		var tex := P0Logic.icon(str(id))
 		assert_object(tex).override_failure_message(str(id)).is_not_null()
 		assert_str(tex.resource_path).override_failure_message(str(id)).is_equal("res://assets/p0/icons/%s.svg" % id)
+
+## A piece put on the player's cell: they come back on the nearest free cell by walking (不知火舞 on 284), not the
+## nearest in a straight line over a fence.
+func test_the_player_steps_off_a_piece_by_walking_distance() -> void:
+	# x = 3 is a fence from y 0 to 3; the player stood at (2, 1) under a 2 × 1 piece on (1, 1)–(2, 1); (4, 1) is the
+	# nearest in a straight line, but over the fence: the walk comes out at (2, 0) / (2, 2) first.
+	var fence := func(c: Vector2i) -> bool: return c.x == 3 and c.y <= 3
+	var piece := func(c: Vector2i) -> bool: return c == Vector2i(1, 1) or c == Vector2i(2, 1)
+	var passable := func(c: Vector2i) -> bool: return c.x >= 0 and c.y >= 0 and c.x < 8 and c.y < 8 and not fence.call(c)
+	var free := func(c: Vector2i) -> bool: return not piece.call(c)
+	var to := P0FarmDecor.nearest_free(Vector2i(2, 1), passable, free)
+	assert_bool(to in [Vector2i(2, 0), Vector2i(2, 2)]).override_failure_message(str(to)).is_true()
+	# boxed in by the fence and the yard's edge on three sides: out through the piece's own cells
+	var tight := func(c: Vector2i) -> bool: return c.x >= 1 and c.y == 1 and c.x <= 2 or c == Vector2i(0, 1)
+	assert_that(P0FarmDecor.nearest_free(Vector2i(2, 1), tight, free)).is_equal(Vector2i(0, 1))
+	assert_that(P0FarmDecor.nearest_free(Vector2i(2, 1), func(c): return piece.call(c), free)).is_equal(Vector2i(-1, -1))

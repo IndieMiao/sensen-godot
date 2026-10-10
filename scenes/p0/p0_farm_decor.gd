@@ -122,21 +122,30 @@ func _sync(list: Array) -> void:
 		_solid[k] = cells[k]
 	_step_off()
 
-## A piece put down where the player stands: they step to the nearest free cell rather than stand inside it.
+## A piece put down where the player stands: they come back on the nearest free cell by walking distance (不知火舞 on
+## 284: as the navigation goes, never over a fence), not inside the piece.
 func _step_off() -> void:
 	var here: Vector2i = farm.bp.world_to_cell(farm.actor.position)
 	if not _solid.has("%d,%d" % [here.x, here.y]): return
-	var best := Vector2i(-1, -1)
-	var best_d := INF
-	for dy in range(-3, 4):
-		for dx in range(-3, 4):
-			var c := here + Vector2i(dx, dy)
-			if not farm.bp.in_bounds(c) or farm.grid.astar.is_point_solid(c) or not farm.bp.is_walkable(c): continue
-			var d := Vector2(dx, dy).length_squared()
-			if d < best_d:
-				best_d = d
-				best = c
-	if best.x >= 0: farm.actor.teleport(farm.bp.cell_to_world(best))
+	var to := nearest_free(here,
+		func(c: Vector2i) -> bool: return farm.bp.in_bounds(c) and farm.bp.is_walkable(c),   # through pieces, never a fence
+		func(c: Vector2i) -> bool: return not farm.grid.astar.is_point_solid(c))
+	if to.x >= 0: farm.actor.teleport(farm.bp.cell_to_world(to))
+
+## Breadth-first from `start` over 4-neighbours (the navigation's steps): through cells `passable` allows (the yard's
+## walkable ones, pieces included), the first that is `free`; (-1, -1) when none within `limit` cells.
+static func nearest_free(start: Vector2i, passable: Callable, free: Callable, limit := 400) -> Vector2i:
+	var seen := {start: true}
+	var queue: Array[Vector2i] = [start]
+	while not queue.is_empty() and seen.size() <= limit:
+		var c: Vector2i = queue.pop_front()
+		if c != start and bool(free.call(c)): return c
+		for d in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+			var n: Vector2i = c + d
+			if seen.has(n) or not bool(passable.call(n)): continue
+			seen[n] = true
+			queue.append(n)
+	return Vector2i(-1, -1)
 
 ## The middle of a piece's cells on the ground.
 func centre(id: String, at: Vector2i, rot: int) -> Vector3:
