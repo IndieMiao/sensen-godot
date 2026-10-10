@@ -1,5 +1,5 @@
 {
-  "_note": "P1 step 1 farming (刘邦, SGODOT-239, q(59) §1.1 / §1.4). garden.plots: plot id → [col, row] on the garden grid, shared by the server (sprinkler coverage) and the client (P0Garden places plot [col, row] at PLOT_ORIGIN + 2 × [col, row]); 0–29 are P0's 6 × 5 and never move, 30–39 the two new columns on the right, row by row. garden.extra: from that Homestead level the homestead has `count` more plots from id `from`, added as wild (Homestead Lv4+ stays at 40 until step 3). facilities.kinds.sprinkler: stands on one empty plot, waters the ring of 8 around it on the grid (diagonals included, fewer at the edge), so a covered plot grows as it is sown; ripening there is cut by grow_cut, with Compost's 20% capped at grow_cut_cap together; at most cap_base + cap_per_homestead × Homestead level. workbench.recipes: the Sprinkler blueprint (to: field, built in place by the place command, never crafted; the Facilities tab comes from its tab, workbench belongs to 周瑜's line).",
+  "_note": "P1 step 1 farming (刘邦, SGODOT-239, q(59) §1.1 / §1.4). garden.plots: plot id → [col, row] on the garden grid, shared by the server (sprinkler coverage) and the client (P0Garden places plot [col, row] at PLOT_ORIGIN + 2 × [col, row]); 0–29 are P0's 6 × 5 and never move, 30–39 the two new columns on the right, row by row. How many of them the homestead has is 哪吒's homestead.plots (Lv1 30, Lv3 40; ids past 30 come as wild). facilities.kinds.sprinkler: stands on one empty plot, waters the ring of 8 around it on the grid (diagonals included, fewer at the edge), so a covered plot grows as it is sown; ripening there is cut by grow_cut, with Compost's 20% capped at grow_cut_cap together; how many may stand is homestead.sprinkler_max (3 + Homestead level, at most 10). workbench.recipes: the Sprinkler blueprint (to: field, built in place by the place command, never crafted; the Facilities tab comes from its tab, workbench belongs to 周瑜's line).",
   "garden": {
     "plots": [
       [
@@ -162,12 +162,7 @@
         7,
         4
       ]
-    ],
-    "extra": {
-      "homestead": 3,
-      "from": 30,
-      "count": 10
-    }
+    ]
   },
   "facilities": {
     "grow_cut_cap": 0.35,
@@ -175,9 +170,7 @@
       "sprinkler": {
         "name": "Sprinkler",
         "cover": "ring8",
-        "grow_cut": 0.15,
-        "cap_base": 3,
-        "cap_per_homestead": 1
+        "grow_cut": 0.15
       }
     }
   },

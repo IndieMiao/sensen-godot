@@ -17,10 +17,14 @@ function step(s: P0State, cmd: P0Command, now = T0): P0State {
 // a first command rolls the player day in, as any real save has (resident requests wait on it)
 const fresh = () => step(freshState(c, 'markers-player-01', T0), { type: 'read_inbox', keys: [] });
 /** Pond Catch handed in: the first session is over. */
+/** The P1 residents in the San Francisco outposts (SGODOT-284), out of requests so these P0 cases see only Pip and Old Kai. */
+const P1_SF = ['res_sam', 'res_nadia', 'res_theo', 'res_hana', 'res_lena'];
 function afterTutorial(): P0State {
   const s = step(fresh(), { type: 'accept', request: 'req_pond_catch' });
   s.bag.push({ id: 'fish_crucian', qty: 2 });
-  return step(s, { type: 'deliver', request: 'req_pond_catch' });
+  const out = step(s, { type: 'deliver', request: 'req_pond_catch' });
+  for (const id of P1_SF) out.residents[id] = { affinity: 0, chat_day: '', gift_day: '', next: 99, req: null, done_day: '' };
+  return out;
 }
 
 describe('map pin markers (§9.5.2, q(48); SGODOT-232)', () => {
@@ -57,6 +61,14 @@ describe('map pin markers (§9.5.2, q(48); SGODOT-232)', () => {
     expect(at(s)).toContain('request:sh_post_1');
     s.bag.push({ id: 'fish_crucian', qty: 1 });   // Pip ①: a Common fish
     expect(at(s)).toContain('deliver:sh_post_1');
+  });
+
+  it('a P1 resident in an outpost lights it with their open request (Sam at the post, Theo at the market; SGODOT-284)', () => {
+    const s = afterTutorial();
+    s.residents.res_pip = { affinity: 0, chat_day: '', gift_day: '', next: 99, req: null, done_day: '' };
+    for (const id of ['res_sam', 'res_theo']) s.residents[id].next = 0;
+    expect(mapMarkers(c, s, T0).find(m => m.place === 'sh_post_1')).toMatchObject({ kind: 'request', why: { resident: 'res_sam' } });
+    expect(mapMarkers(c, s, T0).find(m => m.place === 'sh_market_1')).toMatchObject({ kind: 'request', why: { resident: 'res_theo' } });
   });
 
   it('Old Kai\'s Rare fish request lights the tackle shop only from Fishing Lv4 (Golden Koi)', () => {

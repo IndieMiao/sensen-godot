@@ -17,17 +17,18 @@ export type P0Event =
   | { kind: 'plate'; ids: string[]; cabinet: boolean }
   | { kind: 'parcel'; id: string; qty: number; key: string; waiting: boolean; expires_in?: number; gift?: true }   // a reward that did not fit the bag (§10.4.8)
   | { kind: 'coins'; delta: number }
+  | { kind: 'milestone'; id: string; title: string; coins: number; cabinet: number; decor: string | null }   // Cookbook milestone (§7.6.1)
   | { kind: 'first'; what: string; xp: number; name?: string }   // name: the city of a fishing_city first (v5 keys are cluster ids)
   | { kind: 'level'; skill: Skill; level: number; energy: number; gifts: [string, number][] }
   | { kind: 'cast'; bite_in: number; rarity: number; breaks: 'level' | 'rod' | null; bait: string | null }
   | { kind: 'catch'; fish: string; rarity: number; result: 'landed' | 'escaped' | 'broke_free' | 'cancelled'; refund: number;
       need_level?: number; protected_left?: number }
-  | { kind: 'pot'; id?: number; dish: string | null; rarity: number; ms: number; tried?: boolean; queued?: boolean }   // tried: this combination failed before; queued: waits (Queue ×2)
+  | { kind: 'pot'; id?: number; dish: string | null; rarity: number; ms: number; tried?: boolean; queued?: boolean; stove?: number; double?: boolean }   // tried: this combination failed before; queued: waits (Queue ×2)
   | { kind: 'queue'; id?: number; dish: string | null; started_at: number; ms: number }   // the waiting pot fired (Queue ×2)
   // A Mystery Dish (§7.5.2): tried = not new (no clue); refund = ingredients given back; clue = slots turned on a Hidden page.
   | { kind: 'mishap'; items: string[]; tried: boolean; refund: string[]; trial_left: number | null; clue: { page: string; slots: number[] } | null }
   // auto: kept by Queue ×2; none: a failed pot with its ingredients back (Newcomer Blessing) made no Mystery Dish (qty 0)
-  | { kind: 'dish'; pot?: number; dish: string; quality: number; qty: number; first: boolean; mystery: boolean; hits: number; auto?: true; none?: true; trial_left?: number }
+  | { kind: 'dish'; pot?: number; dish: string; quality: number; qty: number; first: boolean; mystery: boolean; hits: number; auto?: true; none?: true; trial_left?: number; lucky?: true }
   | { kind: 'meal'; dish: string; nominal: number; counted: number; gain: number; meals: number; cap: number }
   | { kind: 'reward'; id: string; energy: number }
   | { kind: 'arrival'; cluster: string; first: boolean; stamp: import('./travel.js').TravelStamp | null; energy: number; pass_until: number; km: number; trip: number }

@@ -62,6 +62,13 @@ describe('the garden grid and 40 plots (q(59) §1.1)', () => {
     expect(viewOf(c, after, T0).garden).toEqual({ plots: 40 });
   });
 
+  it('the plot count is the Homestead table\'s (homestead.plots), never past the garden grid', () => {
+    expect(c.homestead.plots).toEqual([[1, 30], [3, 40]]);
+    for (const [level, n] of [[1, 30], [2, 30], [3, 40], [10, 40]]) expect(plotCount(c, { ...fresh(), homestead: { level, plaque: [] } })).toBe(n);
+    const big = { ...c, homestead: { ...c.homestead, plots: [[1, 30], [3, 60]] as [number, number][] } };
+    expect(plotCount(big, { ...fresh(), homestead: { level: 3, plaque: [] } })).toBe(40);
+  });
+
   it('a save already at Lv3 gets its 10 plots when it loads (T14), once', () => {
     const old = { ...fresh(), homestead: { level: 3, plaque: [] } } as P0State;
     delete (old as Partial<P0State>).facilities;
@@ -166,12 +173,20 @@ describe('sprinklers (q(59) §1.4)', () => {
     s.storage = { wood: 80, stone: 80, copper_ore: 80 };
     for (const id of [0, 3, 18, 21, 30, 38]) s = step(s, { type: 'place', recipe: 'craft_sprinkler', plot: id }).s;
     expect(refused(s, { type: 'place', recipe: 'craft_sprinkler', plot: 10 })).toMatchObject({
-      code: 'facility_cap', detail: { cap: 6, used: 6, homestead_next: null } });
+      code: 'facility_cap', detail: { cap: 6, used: 6, homestead_next: 4 } });   // Homestead goes to Lv10 since #209 (SGODOT-282)
     const card = viewOf(c, s, T0).workbench.recipes.find(r => r.id === 'craft_sprinkler')!;
     expect(card).toMatchObject({ tab: 'facilities', cap: 6, used: 6, can_craft: false, block: { code: 'facility_cap' } });
     // Lv2: 5
     const two = { ...f6(), homestead: { level: 2, plaque: [] } };
     expect(viewOf(c, two, T0).workbench.recipes.find(r => r.id === 'craft_sprinkler')).toMatchObject({ cap: 5, used: 0, homestead_next: 3 });
+  });
+
+  it('stop growing with the Homestead at 10 (homestead.sprinkler_max): Lv6 9 → Lv7, Lv7 and on 10 with nothing next', () => {
+    const at = (level: number) => ({ ...f6(), homestead: { level, plaque: [] } });
+    const card = (level: number) => viewOf(c, at(level), T0).workbench.recipes.find(r => r.id === 'craft_sprinkler')!;
+    expect(card(6)).toMatchObject({ cap: 9, homestead_next: 7 });
+    expect(card(7)).toMatchObject({ cap: 10, homestead_next: null });
+    expect(card(10)).toMatchObject({ cap: 10, homestead_next: null });
   });
 
   it('are never crafted into the bag: craft says place_only', () => {
