@@ -77,6 +77,16 @@ function tile(name: string) {
 }
 const tileName = (s: number, w: number) => `${s < 0 ? 'S' : 'N'}${String(Math.abs(s)).padStart(2, '0')}${w < 0 ? 'W' : 'E'}${String(Math.abs(w)).padStart(3, '0')}`;
 
+/** The WorldCover class at a point (10 tree … 50 built-up, 60 bare, 80 water …), 0 where there is no tile. */
+export async function landClass(lat: number, lng: number): Promise<number> {
+  const image = await tile(tileName(Math.floor(lat / 3) * 3, Math.floor(lng / 3) * 3));
+  if (!image) return 0;
+  const [ox, oy] = image.getOrigin();
+  const x = Math.floor((lng - ox) / DEG), y = Math.floor((oy - lat) / DEG);
+  const v = await image.readRasters({ window: [x, y, x + 1, y + 1], samples: [0], interleave: true }) as Uint8Array;
+  return v[0];
+}
+
 /** 1-D squared distance transform (Felzenszwalb–Huttenlocher) with sample spacing `h`. */
 function edt1(f: Float64Array, n: number, h: number, d: Float64Array, v: Int32Array, z: Float64Array) {
   let k = 0; v[0] = 0; z[0] = -Infinity; z[1] = Infinity;
