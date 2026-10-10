@@ -18,7 +18,7 @@ import { claimParcel, PARCEL_LIMIT, settleParcels } from './parcels.js';
 import { dayKey, maxEnergy, scaledXp, settleEnergy, skillLevel, xpPercent } from './rules.js';
 import { buyback, buyItem, drink, moveStorage, offerOf, sellItem, setLock } from './shops.js';
 import { emptyDay, type P0State, type Plot } from './state.js';
-import { noteDelivery, noteEntered, requirePass, returnHome, settleExplorer, travel } from './travel.js';
+import { noteDelivery, noteEntered, requirePass, returnHome, settleExplorer, settleHere, travel } from './travel.js';
 
 export type { P0Event } from './progress.js';
 
@@ -97,6 +97,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
   if (refused) return fail(refused.code, refused.detail);
   notePresence(c, s, cmd.space, now, events, cmd.place);   // before the command: a session gap of ≥ 2 h already counts as having left
   noteEntered(s, cmd.space, cmd.place);
+  settleHere(c, s, castAt ? castAt[0] : cmd.space, castAt ? castAt[1] : cmd.place, now);   // the city the player stands in
   noteVisit(s, cmd.space, cmd.place, events);   // a tracked explore request checks in where the player is (§9.6.3)
   settleExplorer(c, s, now, events);   // a stamp counted from today on (2 a day) earns its medal today
   const plotOf = (id: unknown) => (Number.isInteger(id) ? s.plots.find(p => p.id === id) : undefined);
