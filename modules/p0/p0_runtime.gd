@@ -1238,6 +1238,8 @@ func _dev_shot(dt: float) -> void:
 				session.send(cmd)
 			"drag":   # drag:x:y:dx:dy[:ms[:hold ms]] — a touch at (x, y), held, moved by (dx, dy) over ms, lifted (SGODOT-265)
 				if not _shot_drag_step(step): return
+			"lvbanner":   # lvbanner:<skill>:<level> — that level-up's MomentBanner (review shots, P1 SGODOT-240)
+				ui.show_level_up({"skill": step[1], "level": int(step[2]), "gifts": []})
 			"wait":
 				if _shot_t < 2.0 + float(step[1]): return
 			"until":
