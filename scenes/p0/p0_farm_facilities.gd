@@ -672,7 +672,7 @@ func prompts(v: Dictionary) -> void:
 			UiWorldNameBar.Dir.RIGHT)
 
 static func greenhouse_prompt(f: Dictionary) -> Dictionary:
-	var cut := int(round(float(P0Logic.content().get("facilities", {}).get("kinds", {}).get(str(f.get("kind", "")), {}).get("grow_cut", 0.25)) * 100.0))
+	var cut := cut_percent(str(f.get("kind", "")))
 	return {icon = P0Logic.icon("facility_greenhouse"), text = "Greenhouse", fact = "−%d%%" % cut, status = -1, dimmed = false,
 		button = true, count = ""}
 
@@ -706,20 +706,27 @@ static func greenhouse_card(view: Dictionary, f: Dictionary) -> Dictionary:
 	for p in view.get("plots", []):
 		if under.has(int(p.get("id", -1))) and (p.get("crop", null) != null or str(p.get("state", "")) in ["sown", "growing", "ready"]):
 			growing = true
-	var cut := int(round(float(P0Logic.content().get("facilities", {}).get("kinds", {}).get(str(f.get("kind", "")), {}).get("grow_cut", 0.25)) * 100.0))
+	var cut := cut_percent(str(f.get("kind", "")))
 	return {"title": "Greenhouse", "lead": "%d plots · −%d%%" % [under.size(), cut], "icon": P0Logic.icon("facility_greenhouse"),
 		"button": "Move", "reason": "Move · Harvest first" if growing else ""}
+
+## A sprinkler's status card (q(136), FAC-STATUS 2116:32993): `Sprinkler` / `Waters 8 plots · −15%` — the greenhouse's
+## `16 plots · −25%` form — and `Move`, the card's one action, as the green primary key.
+static func sprinkler_card(f: Dictionary) -> Dictionary:
+	var n := (f.get("covers", []) as Array).size()
+	return {"title": "Sprinkler", "lead": "Waters %d plot%s · −%d%%" % [n, "" if n == 1 else "s", cut_percent(str(f.get("kind", "")))],
+		"icon": P0Logic.icon("facility_sprinkler"), "button": "Move", "kind": &"primary"}
+
+## A facility kind's grow time cut as a whole percent (content facilities.kinds[kind].grow_cut: sprinkler 15, greenhouse 25).
+static func cut_percent(kind: String) -> int:
+	return int(round(float(P0Logic.content().get("facilities", {}).get("kinds", {}).get(kind, {}).get("grow_cut", 0.0)) * 100.0))
 
 func open_card(f: Dictionary) -> void:
 	if is_yard(str(f.get("kind", ""))):   # the Compost Bin has a drawer, not a card
 		open_bin(f)
 		return
 	_highlight = int(f.get("id", 0))
-	var n := (f.get("covers", []) as Array).size()
 	if is_block(str(f.get("kind", ""))):
 		rt.ui.open_facility_card(greenhouse_card(rt.session.view, f), func(): begin_move(int(f.get("id", 0))))
 		return
-	rt.ui.open_facility_card({
-		"title": "Sprinkler", "lead": "Waters %d plot%s" % [n, "" if n == 1 else "s"],
-		"icon": P0Logic.icon("facility_sprinkler"), "button": "Move"},
-		func(): begin_move(int(f.get("id", 0))))
+	rt.ui.open_facility_card(sprinkler_card(f), func(): begin_move(int(f.get("id", 0))))
