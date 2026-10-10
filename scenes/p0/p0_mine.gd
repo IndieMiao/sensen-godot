@@ -354,7 +354,7 @@ func _on_settled(key: String, _ok: bool, _code: String) -> void:
 
 ## Attack (Combat's key): one swing — the arc, the stun and the knockback here; the server settles who was hit.
 func _swing() -> void:
-	if combat == null or _ko_waiting: return   # a fall is waiting on the swings already out: no new one delays it (苏烈 on #253)
+	if combat == null or _ko_waiting or _ko: return   # a fall waits on the swings out / the knock-out moment: no new swing (苏烈 on #253, #255)
 	var hit: Array = combat.swing({}, actor.mover)
 	actor.labour("clear", actor.position + actor.facing())   # the old mine's swing beat
 	if hit.is_empty(): return

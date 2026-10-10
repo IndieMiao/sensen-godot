@@ -377,6 +377,7 @@ func test_the_knock_out_moment_holds_the_fight_at_zero() -> void:
 	assert_str(fight).contains("(0 if _ko else")
 	var contact := src.substr(src.find("func _on_contact("), 300)
 	assert_str(contact).contains("_ko or")
+	assert_str(src.substr(src.find("func _swing()"), 160)).contains("or _ko:")
 	var P0Mine = load("res://scenes/p0/p0_mine.gd")
 	var mine = auto_free(P0Mine.new())
 	mine._completing = true
