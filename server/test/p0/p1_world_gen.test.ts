@@ -1,6 +1,7 @@
 /** SGODOT-280: global generation — a city cluster's ponds and outposts from the world seed and the cluster id (plan v2
  * §9.3.2 outposts, §6.3.3 ponds), the same every time; the home city keeps its hand-written tables. */
 import { describe, expect, it } from 'vitest';
+import { everFish } from '../../src/p0/fishing_world.js';
 import type { CityCluster } from '../../src/p0/clusters.js';
 import { loadP0Content, type P0Content } from '../../src/p0/content.js';
 import { applyP0, type P0Command } from '../../src/p0/reducer.js';
@@ -58,7 +59,7 @@ describe('global generation (SGODOT-280)', () => {
       expect(new Set(city.detail.ponds.map(p => p.name)).size).toBe(city.detail.ponds.length);
       for (const p of city.detail.ponds) expect(['crescent', 'gourd', 'meander']).toContain(p.template_id);
       // the crucian is always in the beginner pond
-      expect(c.fishing.sites[first.site].fish).toContain('fish_crucian');
+      expect(everFish(c, c.fishing.sites[first.site], id).map(f => f.id)).toContain('fish_crucian');   // pools by habitat (SGODOT-283)
     }
   });
 

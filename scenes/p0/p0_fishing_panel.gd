@@ -147,8 +147,9 @@ func on_refused() -> void:
 
 func _p0_hook() -> void:
 	var tier: Dictionary = (FishingModel.data().tiers[str(_rarity)] as Dictionary).duplicate()
-	var bonus := float(rt.session.current().get("fishing", {}).get("band_bonus", 0.0))
-	tier["bar_size"] = minf(0.45, float(tier.bar_size) + bonus)   # Reed Rod +3 points (§6.5.2)
+	var fishing: Dictionary = rt.session.current().get("fishing", {})
+	tier["bar_size"] = minf(0.45, float(tier.bar_size) + float(fishing.get("band_bonus", 0.0)))   # Reed +3 / Carbon +5 points (§6.5.2)
+	tier["loss"] = maxf(0.04, float(tier.loss) * float(fishing.get("loss_mult", 1.0)))   # Carbon Rod −10%, floor 4 % / s
 	set_meta("tier", tier)
 	model = FishingModel.initial(randi())
 	inputs = ""

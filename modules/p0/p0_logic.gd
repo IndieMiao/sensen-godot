@@ -5,6 +5,8 @@ extends RefCounted
 ## §7.2.4 heat ring, §7.17.1 eating). Pure and static: tested headless.
 
 const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
+const P0Clusters := preload("res://modules/p0/p0_clusters.gd")
+const P0FishWorld := preload("res://modules/p0/p0_fish_world.gd")   # a pond's fish, time of day and weather (SGODOT-283)
 const ICON_DIR := "res://assets/p0/icons/%s.svg"
 const PinReason := preload("res://modules/p0/p0_pin_reason.gd")   # the taken requests and the pins they mark (q(104))
 
@@ -202,6 +204,21 @@ static func fish_gate(view: Dictionary, fish_id: String) -> Dictionary:
 ## The Fishing level a fish request still waits for (q(104)): of the fish it takes — the named ones, else every P0 fish
 ## of its rarity that a pond or river holds — the lowest level, when the player is below it; 0 once one can be landed
 ## (the server's landable, #185). A taken request then marks no pond and its button reads `Fishing Lv4 needed`.
+## Every fish id a pond can give (SGODOT-283): the view's list for that pond (fishing.places[id].fish), else worked out
+## from its template and the home city (P0FishWorld). place "" = all the ponds the content knows.
+static func pond_fish(view: Dictionary, place: String) -> Array:
+	var c := content()
+	var places: Dictionary = c.get("fishing", {}).get("places", {})
+	var seen := {}
+	for id in places:
+		if place != "" and id != place: continue
+		var v: Dictionary = view.get("fishing", {}).get("places", {}).get(id, {})
+		var ids: Array = v.get("fish", []) if v.has("fish") else P0FishWorld.ever_fish(
+			str(c.get("fishing", {}).get("sites", {}).get(str(places[id].get("site", "pond")), {}).get("template", "Pond")),
+			P0Clusters.cluster_of_region(P0City.region())).map(func(f): return str(f.id))
+		for f in ids: seen[str(f)] = true
+	return seen.keys()
+
 static func fish_level_short(view: Dictionary, items: Array, rarity) -> int:
 	return int(fish_level_gate(view, items, rarity).get("level", 0))
 
@@ -209,9 +226,8 @@ static func fish_level_short(view: Dictionary, items: Array, rarity) -> int:
 ## player's Fishing is below it, else {}. Today's request row opens its gate card (the Fish-dex silhouette's, q(104)).
 static func fish_level_gate(view: Dictionary, items: Array, rarity) -> Dictionary:
 	var c := content()
-	var held := {}
-	for site in c.get("fishing", {}).get("sites", {}).values():
-		for id in site.get("fish", []): held[str(id)] = true
+	var held := {}   # every fish some pond gives (SGODOT-283: by habitat and the city's regional fish, not a list per site)
+	for id in pond_fish(view, ""): held[str(id)] = true
 	var lowest := {}
 	for f in c.get("fish", []):
 		var id := str(f.get("id", ""))
@@ -325,7 +341,7 @@ static func skill_unlocks(view: Dictionary, skill: String, level: int) -> Array:
 					out.append(str(c.get("seed_name", c.name)) if c.get("perennial", null) != null else str(c.name))
 			if regional: out.append(REGIONAL_SEEDS)
 		"fishing":
-			# This season's waters only (the fishing sites the content has: Pond and River until Coast lands), and the
+			# This season's waters only (the fishing sites the content has: Pond, River and Coast from P1), and the
 			# regional fish as one item, `Regional fish`, at the level the first of them can be landed (李白 on #214, §14
 			# minutes 28–30: `Next Lv3 · Reed Rod, Regional fish`): which two a city has depends on the city.
 			var sites: Array = content().get("fishing", {}).get("sites", {}).keys()
@@ -391,7 +407,9 @@ const ICON_ALIAS := {"fert_compost": "compost", "tool_row_hoe": "hoe", "bag_upgr
 
 static func icon(id: String) -> Texture2D:
 	var path := ICON_DIR % str(ICON_ALIAS.get(id, DISH_STANDIN.get(id, id)))
-	return load(path) if ResourceLoader.exists(path) else load(ICON_DIR % "field")
+	if ResourceLoader.exists(path): return load(path)
+	# a fish without its own art yet (P1's twelve, SGODOT-283) shows the fish silhouette, not the sprout (不知火舞 69310899)
+	return load(ICON_DIR % ("fish_sil" if id.begins_with("fish_") else "field"))
 
 ## "m:ss" under an hour, "1h 12m" from one hour (state-icons rule: durations, never clock times). For the timers that
 ## tick in front of the player (q(97) ①): the stove and cooking (`Cooking 0:42`, `The stove is busy · 0:22 left`),
@@ -1029,6 +1047,12 @@ static func level_unlocks(view: Dictionary, skill: String, level: int) -> Array:
 			out.erase(REGIONAL_FISH)
 			for o in view.get("stall", {}).get("buy", []):
 				if str(o.get("skill", "")) == "fishing" and int(o.get("gate", 1)) == level: out.append(item_name(view, str(o.get("id", ""))))
+			# and the Tackle Shop's goods the stall does not sell (the Spinner Lure at Lv5, SGODOT-283)
+			var goods: Dictionary = content().get("goods", {})
+			for id in content().get("tackle", {}).get("buy", []):
+				var g: Dictionary = goods.get(str(id), {})
+				var name := item_name(view, str(id))
+				if str(g.get("skill", "")) == "fishing" and int(g.get("gate", 1)) == level and not out.has(name): out.append(name)
 			for r in content().get("fishing", {}).get("rods", []):
 				if int(r.get("level", 1)) == level and int(r.get("price", 0)) > 0: out.append(str(r.get("name", "")))
 			if regional: out.append(REGIONAL_FISH)

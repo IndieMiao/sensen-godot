@@ -1130,6 +1130,10 @@ func _dev_shot(dt: float) -> void:
 			"tackle": ui.open_tackle()
 			"gear": ui.open_gear()
 			"skills": ui.open_skills()
+			"skillsopen":   # skillsopen:fishing — the Skills drawer with that track's milestones unfolded (SGODOT-283 shots)
+				ui.open_skills()
+				for n in ui.find_children("*", "", true, false):
+					if n.has_method("unfold"): n.unfold(step[1] if step.size() > 1 else "fishing", true)
 			"profile": ui.open_profile()
 			"editlook": ui.edit_look()   # the profile's Edit look ›: the dressing room above the current world (KEEP-P0-2)
 			# 256 ⑦⑧ shots: profskill:farming / profdex tap the profile's skill card / Fish tile; profspin:120 drags

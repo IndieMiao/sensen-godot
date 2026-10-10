@@ -16,6 +16,7 @@ import { createHash } from 'node:crypto';
 import type { CityCluster, Climate } from './clusters.js';
 import type { FishPlace, P0Content } from './content.js';
 import { homeCluster } from './travel.js';
+import { regionalFish as pondRegionalFish } from './fishing_world.js';
 
 export type Tier = 'S' | 'M1' | 'M2' | 'L1' | 'L2' | 'L3';
 export type Role = 'tea' | 'tackle' | 'market' | 'post';
@@ -245,20 +246,12 @@ export function nameKeepers(w: WorldContent, cl: CityCluster, outposts: GenOutpo
   }
 }
 
-/** §6.2.5: two regional fish per cluster — the first from the climate's low group, the second from the rest. */
+/** §6.2.5: the cluster's two regional fish with the level each needs — the same pair the cluster's ponds hold
+ * (fishing_world.ts regionalFish: hand-picked cities, else hashed, the first able to bite in a Pond all day, q(109)),
+ * so the city card never names a fish its ponds do not give (SGODOT-283). */
 export function regionalFish(c: P0Content, cl: CityCluster): { fish: string; level: number }[] {
-  const reg = (c.fishing as { regional?: { groups: Record<string, { low: string[]; high: string[] }>; curated?: Record<string, string[]> } }).regional;
-  if (!reg) return [];
   const level = (id: string) => c.fish.find(f => f.id === id)?.level ?? 1;
-  const curated = reg.curated?.[cl.name.toLowerCase()];
-  if (curated) return curated.map(f => ({ fish: f, level: level(f) }));
-  const g = reg.groups[CLIMATE_KEY[cl.climate]];
-  if (!g) return [];
-  const seed = worldOf(c)?.seed ?? '';
-  const first = g.low[hash32(seed, cl.id, 'fish-low') % g.low.length];
-  const rest = [...g.low, ...g.high].filter(f => f !== first);
-  const second = rest[hash32(seed, cl.id, 'fish-second') % rest.length];
-  return [first, second].map(f => ({ fish: f, level: level(f) }));
+  return pondRegionalFish(c, cl.id).map(f => ({ fish: f, level: level(f) }));
 }
 
 const worldOf = (c: P0Content) => (c as P0Content & { world?: WorldContent }).world;

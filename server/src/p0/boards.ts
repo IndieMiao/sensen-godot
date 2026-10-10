@@ -6,6 +6,7 @@
  * stream seeded by player, board, slot and time, so they never shift the fishing or cooking rolls.
  */
 import { dishParts, type BoardId, type Need, type P0Content, type RequestTemplate } from './content.js';
+import { pondFishIds } from './fishing_world.js';
 import type { Refusal } from './fishing.js';
 import { boardSlots } from './homestead.js';
 import type { P0Event } from './progress.js';
@@ -53,7 +54,7 @@ export function obtainable(c: P0Content, id: string): boolean {
     const seed = c.crops.find(cr => cr.id === id)?.seed;
     return !!seed && (['homestead', 'tackle', 'market'] as const).some(shop => catalog(c, shop).includes(seed));
   }
-  if (id.startsWith('fish_')) return Object.values(c.fishing.sites).some(site => site.fish.includes(id));
+  if (id.startsWith('fish_')) return pondFishIds(c).has(id);   // some pond gives it (habitat × the city's regional fish, SGODOT-283)
   if (id.startsWith('dish_')) return c.cooking.recipes.some(r => r.id === id) && c.cooking.recipes.find(r => r.id === id)!.in.every(x => !/^(crop|fish)_/.test(x) || obtainable(c, x));
   return true;
 }
