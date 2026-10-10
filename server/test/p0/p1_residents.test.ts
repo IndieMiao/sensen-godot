@@ -4,6 +4,7 @@ import { applyP0, count, type P0Command, type P0Event } from '../../src/p0/reduc
 import { freshState, type P0State } from '../../src/p0/state.js';
 import { viewOf } from '../../src/p0/view.js';
 import { pageState } from '../../src/p0/cookbook.js';
+import { likesDish } from '../../src/p0/residents.js';
 
 // P1 residents (SGODOT-284): the other ten of §9.4.3, the 24 h request gap (§9.6.1), lessons (§7.5.3), story rewards.
 const content = loadP0Content();
@@ -106,6 +107,17 @@ describe('a P1 resident request line (§9.6.1)', () => {
     expect(r.s.rewards).toContain('title:On Schedule');
     expect(viewOf(c, r.s, T0 + 2 * DAY).residents.res_sam.request_state).toBe('none');
   });
+
+  it('a request line can hand over a Cookbook page (§7.16.3 bracketed pages): Tasted, said as a lesson', () => {
+    let s = at(fresh(), 'res_rafa', 20);
+    s.residents.res_rafa.next = 2;
+    s = step(s, { type: 'accept', request: 'req_res_rafa_3' }).s;
+    s.bag.push({ id: 'dish_fish_soup', qty: 9 });
+    const r = step(s, { type: 'deliver', request: 'req_res_rafa_3' });
+    expect(r.ev).toContainEqual({ kind: 'recipe', page: 'dish_catfish_stew', from: 'request', resident: 'res_rafa' });
+    expect(pageState(c, r.s, 'dish_catfish_stew')).toBe('tasted');
+    expect(count(r.s.bag, 'recipe:dish_catfish_stew')).toBe(0);
+  });
 });
 
 describe('likes by rarity (§7.16.3: Hana Fine+, Mira and Tomo Rare+)', () => {
@@ -121,24 +133,60 @@ describe('likes by rarity (§7.16.3: Hana Fine+, Mira and Tomo Rare+)', () => {
 });
 
 describe('Recipe lesson (§7.5.3 Taught)', () => {
+  const page = (id: string) => recipeById(c, id)!.n;
+  const pages = (id: string) => (c.residents[id].teaches ?? []).map(page);
+  // §7.16.3 by Cookbook page; Mira: any Rare / Legendary, these four first. Request lines give the bracketed pages as cards.
+  const plan: Record<string, number[]> = {
+    res_pip: [7, 22, 38, 39], res_granny_wu: [12, 16, 31, 47], res_mira: [34, 36, 41, 45], res_old_kai: [2, 15, 23, 26, 28, 33, 44],
+    res_theo: [6, 13, 18, 24], res_hana: [22, 38, 39, 46], res_sam: [3, 4, 14], res_lena: [19, 20, 40], res_nadia: [8, 17, 27, 32, 37],
+    res_ivo: [11, 29, 33], res_tomo: [40, 41, 42], res_rafa: [12, 30, 48],
+  };
+  const line: Record<string, number[]> = { res_granny_wu: [30, 48], res_lena: [35, 43], res_nadia: [21, 25], res_rafa: [32, 37] };
+
+  it('each resident teaches the pages of §7.16.3, all in the style they like', () => {
+    for (const [id, want] of Object.entries(plan)) {
+      const def = c.residents[id];
+      if (id === 'res_mira') {
+        expect(pages(id).slice(0, 4), id).toEqual(want);
+        const rarePlus = c.cooking.recipes.filter(r => (r.rarity ?? 0) >= 3).map(r => r.n);
+        expect([...pages(id)].sort((a, b) => a! - b!), id).toEqual(rarePlus);
+      } else expect(pages(id), id).toEqual(want);
+      for (const p of def.teaches ?? []) {
+        const r = recipeById(c, p)!;
+        expect(likesDish(c, def, r.style, r.rarity ?? 1), `${id} likes #${r.n} ${r.style}`).toBe(true);
+      }
+    }
+  });
+
+  it('the bracketed pages come with the request line: Acquainted request 3, then the Trusted one', () => {
+    for (const [id, want] of Object.entries(line)) {
+      const got = c.residents[id].requests.map(q => q.reward?.recipe).filter((p): p is string => !!p).map(page);
+      expect(got, id).toEqual(want);
+    }
+  });
+
   it('from Familiar, one page a week the player does not have yet; Tasted, not Discovered', () => {
+    const [first, second] = c.residents.res_old_kai.teaches!;
     let s = fresh();
     expect(viewOf(c, s, T0).residents.res_old_kai.lesson).toMatchObject({ state: 'stage', need_stage: 'Familiar' });
     expect(refuse(s, { type: 'learn', resident: 'res_old_kai' })).toMatchObject({ ok: false, code: 'lesson_stage' });
     s = at(s, 'res_old_kai', 45);
-    expect(viewOf(c, s, T0).residents.res_old_kai.lesson).toMatchObject({ state: 'ready', recipe: 'dish_grilled_fish' });
+    expect(viewOf(c, s, T0).residents.res_old_kai.lesson).toMatchObject({ state: 'ready', recipe: first });
     const r = step(s, { type: 'learn', resident: 'res_old_kai' });
-    expect(r.ev).toContainEqual({ kind: 'recipe', page: 'dish_grilled_fish', from: 'taught', resident: 'res_old_kai' });
-    expect(r.s.cookbook).toContain('dish_grilled_fish');
-    expect(pageState(c, r.s, 'dish_grilled_fish')).toBe('tasted');
+    expect(r.ev).toContainEqual({ kind: 'recipe', page: first, from: 'taught', resident: 'res_old_kai' });
+    expect(r.s.cookbook).toContain(first);
+    expect(pageState(c, r.s, first)).toBe('tasted');
     expect(refuse(r.s, { type: 'learn', resident: 'res_old_kai' }, T0 + 6 * DAY)).toMatchObject({ ok: false, code: 'lesson_wait', detail: { next_in: DAY } });
-    expect(viewOf(c, r.s, T0 + 7 * DAY).residents.res_old_kai.lesson).toMatchObject({ state: 'ready', recipe: 'dish_salt_grilled_fish' });
+    expect(viewOf(c, r.s, T0 + 7 * DAY).residents.res_old_kai.lesson).toMatchObject({ state: 'ready', recipe: second });
   });
 
   it('a page the player already has is skipped; none left means no lesson', () => {
+    const lena = c.residents.res_lena.teaches!;
     const s = at(fresh(), 'res_lena', 60);
-    expect(viewOf(c, s, T0).residents.res_lena.lesson).toMatchObject({ state: 'ready', recipe: 'dish_fruit_tea' });
-    s.cookbook.push('dish_fruit_tea');
+    expect(viewOf(c, s, T0).residents.res_lena.lesson).toMatchObject({ state: 'ready', recipe: lena[0] });
+    s.cookbook.push(...lena.slice(0, -1));
+    expect(viewOf(c, s, T0).residents.res_lena.lesson).toMatchObject({ state: 'ready', recipe: lena.at(-1) });
+    s.cookbook.push(lena.at(-1)!);
     expect(viewOf(c, s, T0).residents.res_lena.lesson).toMatchObject({ state: 'none', recipe: null });
     expect(refuse(s, { type: 'learn', resident: 'res_lena' })).toMatchObject({ ok: false, code: 'no_lesson' });
   });
