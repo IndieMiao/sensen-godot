@@ -140,7 +140,17 @@
     "Lani",
     "Ravi",
     "Sefa",
-    "Ines"
+    "Ines",
+    "Kemi",
+    "Malia",
+    "Dayo",
+    "Luana",
+    "Arjun",
+    "Siti",
+    "Koa",
+    "Esi",
+    "Tala",
+    "Bayu"
    ],
    "Subtropical": [
     "Mei",
@@ -150,7 +160,17 @@
     "Hiro",
     "Ana",
     "Wen",
-    "Bao"
+    "Bao",
+    "Kenji",
+    "Lucia",
+    "Hao",
+    "Sora",
+    "Pablo",
+    "Yuki",
+    "Min",
+    "Ren",
+    "Tao",
+    "Selin"
    ],
    "Temperate": [
     "Ola",
@@ -160,7 +180,17 @@
     "Ida",
     "Noor",
     "Tom",
-    "Elsa"
+    "Elsa",
+    "Hugo",
+    "Clara",
+    "Jonas",
+    "Greta",
+    "Milo",
+    "Felix",
+    "Ezra",
+    "Otto",
+    "Iris",
+    "Bea"
    ],
    "Cool": [
     "Sigrid",
@@ -170,7 +200,17 @@
     "Maren",
     "Ivar",
     "Lumi",
-    "Sven"
+    "Sven",
+    "Astrid",
+    "Leif",
+    "Ingrid",
+    "Aksel",
+    "Freya",
+    "Olav",
+    "Saga",
+    "Nils",
+    "Katya",
+    "Rune"
    ]
   },
   "keeper_frozen": {
@@ -240,12 +280,28 @@
    ]
   },
   "area_tier": {
-   "_note": "Built-up area has no data source yet: the tier is the population tier, raised to these for the cities the plan names as L3 by area (§9.3.2: Los Angeles, Tokyo–Yokohama). Keyed by cluster id.",
+   "_note": "Built-up area has no data source yet: the population tier is raised to these (q(114) ②, 李白 on 280 79c3ecbd; LA and Tokyo by the plan's §9.3.2 examples). Keyed by cluster id.",
    "gn-5368361": "L3",
-   "gn-1850147": "L3"
+   "gn-1850147": "L3",
+   "gn-5128581": "L3",
+   "gn-4887398": "L3",
+   "gn-4180439": "L3",
+   "gn-4930956": "L3",
+   "gn-4560349": "L3",
+   "gn-4699066": "L3",
+   "gn-4684888": "L3",
+   "gn-4140963": "L3",
+   "gn-4164138": "L3",
+   "gn-4990729": "L3",
+   "gn-2988507": "L2",
+   "gn-5809844": "L2",
+   "gn-5308655": "L2",
+   "gn-5037649": "L2",
+   "gn-6167865": "L2",
+   "gn-2158177": "L2"
   },
   "coastal": {
-   "_note": "Coastline within 20 km of the cluster centre (§6.3.3) and the residents' city traits (§9.4.3: coast, big river, highland). No geodata source offline yet: listed by hand for the acceptance cities and the plan's examples; any other cluster has none.",
+   "_note": "Coastline within 20 km of the centre (§6.3.3) and the residents' city traits (§9.4.3: coast, river, highland), by hand until there is geodata: the acceptance cities and q(114) ③'s list (London river, Denver highland, Honolulu and Tromsø coast). Any other cluster has none.",
    "gn-5391959": [
     "coast"
    ],
@@ -264,6 +320,18 @@
    "gn-1850147": [
     "coast",
     "river"
+   ],
+   "gn-2643743": [
+    "river"
+   ],
+   "gn-5419384": [
+    "highland"
+   ],
+   "gn-5856195": [
+    "coast"
+   ],
+   "gn-3133895": [
+    "coast"
    ]
   },
   "room": {
@@ -299,6 +367,334 @@
    "tackle": "Tackle Keeper",
    "market": "Market Keeper",
    "post": "Post Clerk"
+  },
+  "residents": {
+   "_note": "§9.4.3: each outpost holds 0–2 residents beside its keeper; a city holds at most as many fixed residents as outposts. Fixed: Pip at every travel post and every trading post; Sam at Travel Post 1 (M and up); Nadia at Market Square 1 (M and up). The rest by rank, skipping one whose traits the city lacks or who is already placed; each goes to the outpost its trade fits, and is dropped when that outpost is full. Ivo's Mine Hut and Lena's Lighthouse Room are not built yet: Ivo stays out, Lena takes the tea house (the plan's M-tier rule) in every tier for now. Mira's weekly route is not part of placement. S tier: the trading post holds Pip + the first eligible of s_order.",
+   "per_outpost": 2,
+   "rank": [
+    {
+     "id": "res_old_kai",
+     "needs": [
+      "coast"
+     ],
+     "at": "tackle:beginner"
+    },
+    {
+     "id": "res_rafa",
+     "needs": [
+      "river"
+     ],
+     "at": "tackle:river"
+    },
+    {
+     "id": "res_ivo",
+     "needs": [
+      "highland"
+     ],
+     "at": "mine_hut"
+    },
+    {
+     "id": "res_hana",
+     "tier_min": "M1",
+     "at": "tea:0"
+    },
+    {
+     "id": "res_sam",
+     "tier_min": "M1",
+     "at": "post:0"
+    },
+    {
+     "id": "res_lena",
+     "needs": [
+      "coast"
+     ],
+     "tier_min": "M1",
+     "at": "tea:sea"
+    },
+    {
+     "id": "res_tomo",
+     "tier_min": "L1",
+     "at": "market:1"
+    },
+    {
+     "id": "res_theo",
+     "at": "market:0"
+    }
+   ],
+   "fixed": {
+    "post": "res_pip",
+    "market:0": "res_nadia"
+   },
+   "s_order": [
+    {
+     "id": "res_granny_wu",
+     "pop_max": 100000
+    },
+    {
+     "id": "res_old_kai",
+     "needs": [
+      "coast"
+     ]
+    },
+    {
+     "id": "res_rafa",
+     "needs": [
+      "river"
+     ]
+    },
+    {
+     "id": "res_ivo",
+     "needs": [
+      "highland"
+     ]
+    },
+    {
+     "id": "res_theo"
+    }
+   ]
+  },
+  "keeper_looks": {
+   "tea_tropical_0": {
+    "hairHat": "hairhat20",
+    "cloth": "cloth0",
+    "shoes": "shoes0"
+   },
+   "tea_tropical_1": {
+    "hairHat": "hairhat51",
+    "cloth": "cloth1",
+    "shoes": "shoes2"
+   },
+   "tea_tropical_2": {
+    "hairHat": "hairhat20",
+    "cloth": "cloth1_1",
+    "shoes": "shoes4"
+   },
+   "tea_subtropical_0": {
+    "hairHat": "hairhat41",
+    "cloth": "cloth1_1",
+    "shoes": "shoes1"
+   },
+   "tea_subtropical_1": {
+    "hairHat": "hairhat70",
+    "cloth": "cloth11",
+    "shoes": "shoes3"
+   },
+   "tea_subtropical_2": {
+    "hairHat": "hairhat41",
+    "cloth": "cloth28",
+    "shoes": "shoes5"
+   },
+   "tea_temperate_0": {
+    "hairHat": "hairhat43",
+    "cloth": "cloth28",
+    "shoes": "shoes2"
+   },
+   "tea_temperate_1": {
+    "hairHat": "hairhat0",
+    "cloth": "cloth42",
+    "shoes": "shoes4"
+   },
+   "tea_temperate_2": {
+    "hairHat": "hairhat43",
+    "cloth": "cloth0",
+    "shoes": "shoes0"
+   },
+   "tea_cool_0": {
+    "hairHat": "hairhat51",
+    "cloth": "cloth0",
+    "shoes": "shoes3"
+   },
+   "tea_cool_1": {
+    "hairHat": "hairhat20",
+    "cloth": "cloth1",
+    "shoes": "shoes5"
+   },
+   "tea_cool_2": {
+    "hairHat": "hairhat51",
+    "cloth": "cloth1_1",
+    "shoes": "shoes1"
+   },
+   "tackle_tropical_0": {
+    "hairHat": "hairhat43",
+    "cloth": "cloth1",
+    "shoes": "shoes3"
+   },
+   "tackle_tropical_1": {
+    "hairHat": "hairhat0",
+    "cloth": "cloth1_1",
+    "shoes": "shoes5"
+   },
+   "tackle_tropical_2": {
+    "hairHat": "hairhat43",
+    "cloth": "cloth11",
+    "shoes": "shoes1"
+   },
+   "tackle_subtropical_0": {
+    "hairHat": "hairhat51",
+    "cloth": "cloth11",
+    "shoes": "shoes4"
+   },
+   "tackle_subtropical_1": {
+    "hairHat": "hairhat20",
+    "cloth": "cloth28",
+    "shoes": "shoes0"
+   },
+   "tackle_subtropical_2": {
+    "hairHat": "hairhat51",
+    "cloth": "cloth42",
+    "shoes": "shoes2"
+   },
+   "tackle_temperate_0": {
+    "hairHat": "hairhat70",
+    "cloth": "cloth42",
+    "shoes": "shoes5"
+   },
+   "tackle_temperate_1": {
+    "hairHat": "hairhat41",
+    "cloth": "cloth0",
+    "shoes": "shoes1"
+   },
+   "tackle_temperate_2": {
+    "hairHat": "hairhat70",
+    "cloth": "cloth1",
+    "shoes": "shoes3"
+   },
+   "tackle_cool_0": {
+    "hairHat": "hairhat0",
+    "cloth": "cloth1",
+    "shoes": "shoes0"
+   },
+   "tackle_cool_1": {
+    "hairHat": "hairhat43",
+    "cloth": "cloth1_1",
+    "shoes": "shoes2"
+   },
+   "tackle_cool_2": {
+    "hairHat": "hairhat0",
+    "cloth": "cloth11",
+    "shoes": "shoes4"
+   },
+   "market_tropical_0": {
+    "hairHat": "hairhat70",
+    "cloth": "cloth1_1",
+    "shoes": "shoes0"
+   },
+   "market_tropical_1": {
+    "hairHat": "hairhat41",
+    "cloth": "cloth11",
+    "shoes": "shoes2"
+   },
+   "market_tropical_2": {
+    "hairHat": "hairhat70",
+    "cloth": "cloth28",
+    "shoes": "shoes4"
+   },
+   "market_subtropical_0": {
+    "hairHat": "hairhat0",
+    "cloth": "cloth28",
+    "shoes": "shoes1"
+   },
+   "market_subtropical_1": {
+    "hairHat": "hairhat43",
+    "cloth": "cloth42",
+    "shoes": "shoes3"
+   },
+   "market_subtropical_2": {
+    "hairHat": "hairhat0",
+    "cloth": "cloth0",
+    "shoes": "shoes5"
+   },
+   "market_temperate_0": {
+    "hairHat": "hairhat20",
+    "cloth": "cloth0",
+    "shoes": "shoes2"
+   },
+   "market_temperate_1": {
+    "hairHat": "hairhat51",
+    "cloth": "cloth1",
+    "shoes": "shoes4"
+   },
+   "market_temperate_2": {
+    "hairHat": "hairhat20",
+    "cloth": "cloth1_1",
+    "shoes": "shoes0"
+   },
+   "market_cool_0": {
+    "hairHat": "hairhat41",
+    "cloth": "cloth1_1",
+    "shoes": "shoes3"
+   },
+   "market_cool_1": {
+    "hairHat": "hairhat70",
+    "cloth": "cloth11",
+    "shoes": "shoes5"
+   },
+   "market_cool_2": {
+    "hairHat": "hairhat41",
+    "cloth": "cloth28",
+    "shoes": "shoes1"
+   },
+   "post_tropical_0": {
+    "hairHat": "hairhat20",
+    "cloth": "cloth11",
+    "shoes": "shoes3"
+   },
+   "post_tropical_1": {
+    "hairHat": "hairhat51",
+    "cloth": "cloth28",
+    "shoes": "shoes5"
+   },
+   "post_tropical_2": {
+    "hairHat": "hairhat20",
+    "cloth": "cloth42",
+    "shoes": "shoes1"
+   },
+   "post_subtropical_0": {
+    "hairHat": "hairhat41",
+    "cloth": "cloth42",
+    "shoes": "shoes4"
+   },
+   "post_subtropical_1": {
+    "hairHat": "hairhat70",
+    "cloth": "cloth0",
+    "shoes": "shoes0"
+   },
+   "post_subtropical_2": {
+    "hairHat": "hairhat41",
+    "cloth": "cloth1",
+    "shoes": "shoes2"
+   },
+   "post_temperate_0": {
+    "hairHat": "hairhat43",
+    "cloth": "cloth1",
+    "shoes": "shoes5"
+   },
+   "post_temperate_1": {
+    "hairHat": "hairhat0",
+    "cloth": "cloth1_1",
+    "shoes": "shoes1"
+   },
+   "post_temperate_2": {
+    "hairHat": "hairhat43",
+    "cloth": "cloth11",
+    "shoes": "shoes3"
+   },
+   "post_cool_0": {
+    "hairHat": "hairhat51",
+    "cloth": "cloth11",
+    "shoes": "shoes0"
+   },
+   "post_cool_1": {
+    "hairHat": "hairhat20",
+    "cloth": "cloth28",
+    "shoes": "shoes2"
+   },
+   "post_cool_2": {
+    "hairHat": "hairhat51",
+    "cloth": "cloth42",
+    "shoes": "shoes4"
+   },
+   "_note": "Placeholder keeper looks (§9.3.2: 4 roles × 4 climates × 3 variants) from the public parts only — the named P0 keepers and residents keep their NPC-only parts. 上官婉儿 replaces these with designed sets; the keys stay."
   }
  }
 }
