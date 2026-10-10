@@ -412,6 +412,517 @@
         ]
       ]
     },
+    "deco_planter": {
+      "triangles": 1676,
+      "surfaces": 1,
+      "bytes": 79528,
+      "bounds_blender": [
+        [
+          -0.28,
+          -0.28,
+          0.0
+        ],
+        [
+          0.28,
+          0.28,
+          0.427057
+        ]
+      ],
+      "bounds": [
+        [
+          -0.28,
+          0.0,
+          -0.28
+        ],
+        [
+          0.28,
+          0.427057,
+          0.28
+        ]
+      ],
+      "generator": "tools/art/build_decor_assets.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 2000,
+      "pivot": "floor / footprint centre",
+      "sockets": {}
+    },
+    "deco_lantern": {
+      "triangles": 452,
+      "surfaces": 1,
+      "bytes": 36472,
+      "bounds_blender": [
+        [
+          -0.2275,
+          -0.120208,
+          0.0
+        ],
+        [
+          0.225208,
+          0.120208,
+          1.16
+        ]
+      ],
+      "bounds": [
+        [
+          -0.2275,
+          0.0,
+          -0.120208
+        ],
+        [
+          0.225208,
+          1.16,
+          0.120208
+        ]
+      ],
+      "generator": "tools/art/build_decor_assets.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 2000,
+      "pivot": "floor / footprint centre",
+      "sockets": {
+        "glow": {
+          "position": [
+            0.105,
+            0.848,
+            0
+          ],
+          "front": "+Z"
+        }
+      }
+    },
+    "deco_path": {
+      "triangles": 92,
+      "surfaces": 1,
+      "bytes": 7980,
+      "bounds_blender": [
+        [
+          -0.279646,
+          -0.247133,
+          0.0
+        ],
+        [
+          0.268,
+          0.232962,
+          0.033
+        ]
+      ],
+      "bounds": [
+        [
+          -0.279646,
+          0.0,
+          -0.232962
+        ],
+        [
+          0.268,
+          0.033,
+          0.247133
+        ]
+      ],
+      "generator": "tools/art/build_decor_assets.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 500,
+      "pivot": "floor / footprint centre",
+      "sockets": {},
+      "purchase_instances": 5
+    },
+    "deco_bench": {
+      "triangles": 792,
+      "surfaces": 1,
+      "bytes": 68504,
+      "bounds_blender": [
+        [
+          -0.555,
+          -0.275,
+          0.0
+        ],
+        [
+          0.555,
+          0.288851,
+          1.048344
+        ]
+      ],
+      "bounds": [
+        [
+          -0.555,
+          0.0,
+          -0.288851
+        ],
+        [
+          0.555,
+          1.048344,
+          0.275
+        ]
+      ],
+      "generator": "tools/art/build_decor_assets.py",
+      "footprint_cells": [
+        2,
+        1
+      ],
+      "triangle_limit": 2000,
+      "pivot": "floor / footprint centre",
+      "sockets": {
+        "seat_0": {
+          "position": [
+            -0.275,
+            0.67,
+            0.035
+          ],
+          "front": "+Z"
+        },
+        "seat_1": {
+          "position": [
+            0.275,
+            0.67,
+            0.035
+          ],
+          "front": "+Z"
+        }
+      },
+      "seat_height": 0.67,
+      "backrest_recline_degrees": 10,
+      "backrest_top_target": 1.05
+    },
+    "deco_scarecrow": {
+      "triangles": 1240,
+      "surfaces": 1,
+      "bytes": 44872,
+      "bounds_blender": [
+        [
+          -0.398333,
+          -0.18772,
+          0.0
+        ],
+        [
+          0.398333,
+          0.18772,
+          1.495
+        ]
+      ],
+      "bounds": [
+        [
+          -0.398333,
+          0.0,
+          -0.18772
+        ],
+        [
+          0.398333,
+          1.495,
+          0.18772
+        ]
+      ],
+      "generator": "tools/art/build_decor_assets.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 2000,
+      "pivot": "floor / footprint centre",
+      "sockets": {},
+      "silhouette_exception": "hands may reach 0.85 m; actual width in bounds"
+    },
+    "deco_fence": {
+      "triangles": 296,
+      "surfaces": 1,
+      "bytes": 25536,
+      "bounds_blender": [
+        [
+          -0.325,
+          -0.045,
+          0.0
+        ],
+        [
+          0.325,
+          0.045,
+          0.59
+        ]
+      ],
+      "bounds": [
+        [
+          -0.325,
+          0.0,
+          -0.045
+        ],
+        [
+          0.325,
+          0.59,
+          0.045
+        ]
+      ],
+      "generator": "tools/art/build_decor_assets.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 500,
+      "pivot": "floor / footprint centre",
+      "sockets": {},
+      "purchase_instances": 6,
+      "seam_axis": "X",
+      "repeat_step": 0.65
+    },
+    "deco_birdbath": {
+      "triangles": 1402,
+      "surfaces": 1,
+      "bytes": 36020,
+      "bounds_blender": [
+        [
+          -0.289,
+          -0.289,
+          0.0
+        ],
+        [
+          0.289,
+          0.289,
+          0.84
+        ]
+      ],
+      "bounds": [
+        [
+          -0.289,
+          0.0,
+          -0.289
+        ],
+        [
+          0.289,
+          0.84,
+          0.289
+        ]
+      ],
+      "generator": "tools/art/build_decor_assets.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 2000,
+      "pivot": "floor / footprint centre",
+      "sockets": {}
+    },
+    "deco_windmill": {
+      "triangles": 1188,
+      "surfaces": 1,
+      "bytes": 95108,
+      "bounds_blender": [
+        [
+          -0.4,
+          -0.4,
+          0.0
+        ],
+        [
+          0.4,
+          0.4,
+          1.3325
+        ]
+      ],
+      "bounds": [
+        [
+          -0.4,
+          0.0,
+          -0.4
+        ],
+        [
+          0.4,
+          1.3325,
+          0.4
+        ]
+      ],
+      "generator": "tools/art/build_decor_assets.py",
+      "footprint_cells": [
+        2,
+        2
+      ],
+      "triangle_limit": 4000,
+      "pivot": "floor / footprint centre",
+      "sockets": {
+        "rotor": {
+          "position": [
+            0,
+            0.985,
+            0.273
+          ],
+          "front": "+Z"
+        }
+      },
+      "rotor_asset": "deco_windmill_sails",
+      "rotor_position": [
+        0,
+        0.985,
+        0.273
+      ],
+      "rotor_axis": "+Z"
+    },
+    "deco_windmill_sails": {
+      "triangles": 1496,
+      "surfaces": 1,
+      "bytes": 122608,
+      "bounds_blender": [
+        [
+          -0.476236,
+          -0.052,
+          -0.476237
+        ],
+        [
+          0.476236,
+          0.029,
+          0.476236
+        ]
+      ],
+      "bounds": [
+        [
+          -0.476236,
+          -0.476237,
+          -0.029
+        ],
+        [
+          0.476236,
+          0.476236,
+          0.052
+        ]
+      ],
+      "generator": "tools/art/build_decor_assets.py",
+      "footprint_cells": [
+        2,
+        2
+      ],
+      "triangle_limit": 4000,
+      "pivot": "rotor axle",
+      "sockets": {},
+      "rotation_axis": "+Z",
+      "maximum_swept_diameter": 1.24
+    },
+    "deco_fountain": {
+      "triangles": 2076,
+      "surfaces": 1,
+      "bytes": 51712,
+      "bounds_blender": [
+        [
+          -0.603,
+          -0.603,
+          0.0
+        ],
+        [
+          0.603,
+          0.603,
+          0.994
+        ]
+      ],
+      "bounds": [
+        [
+          -0.603,
+          0.0,
+          -0.603
+        ],
+        [
+          0.603,
+          0.994,
+          0.603
+        ]
+      ],
+      "generator": "tools/art/build_decor_assets.py",
+      "footprint_cells": [
+        2,
+        2
+      ],
+      "triangle_limit": 4000,
+      "pivot": "floor / footprint centre",
+      "sockets": {}
+    },
+    "deco_pergola": {
+      "triangles": 1908,
+      "surfaces": 1,
+      "bytes": 87468,
+      "bounds_blender": [
+        [
+          -0.94,
+          -0.617832,
+          0.0
+        ],
+        [
+          0.94,
+          0.615,
+          2.397465
+        ]
+      ],
+      "bounds": [
+        [
+          -0.94,
+          0.0,
+          -0.615
+        ],
+        [
+          0.94,
+          2.397465,
+          0.617832
+        ]
+      ],
+      "generator": "tools/art/build_decor_assets.py",
+      "footprint_cells": [
+        3,
+        2
+      ],
+      "triangle_limit": 2000,
+      "pivot": "floor / footprint centre",
+      "sockets": {},
+      "clearance_height": 2.14,
+      "colliders": [
+        {
+          "at": [
+            -0.79,
+            1.105,
+            -0.49
+          ],
+          "size": [
+            0.13,
+            2.21,
+            0.13
+          ]
+        },
+        {
+          "at": [
+            -0.79,
+            1.105,
+            0.49
+          ],
+          "size": [
+            0.13,
+            2.21,
+            0.13
+          ]
+        },
+        {
+          "at": [
+            0.79,
+            1.105,
+            -0.49
+          ],
+          "size": [
+            0.13,
+            2.21,
+            0.13
+          ]
+        },
+        {
+          "at": [
+            0.79,
+            1.105,
+            0.49
+          ],
+          "size": [
+            0.13,
+            2.21,
+            0.13
+          ]
+        }
+      ],
+      "collision_note": "Four posts only; open passage. No bounding-box collider."
+    },
     "greenhouse_base": {
       "triangles": 1284,
       "surfaces": 1,

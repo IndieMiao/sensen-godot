@@ -39,8 +39,9 @@ the base asset plus the grid fixture; no roof, glass, avatar or crop fixture.
 43 structural/capture checks passed, including actual imported bounds, one mesh
 and surface per export, opaque vertex alpha, outward glass normals, common origin,
 roof socket and all four central entry clearances. Rebuilding twice produced
-byte-identical GLBs. The original 24 manifest entries and 81 existing farm art
-files are unchanged relative to `4f5d8364`. This is desktop art/structure validation;
+byte-identical GLBs. The current target's 35 manifest entries and 103 existing farm art
+files are unchanged relative to `04b50480` (which merged decoration PR #283
+while this greenhouse was being prepared). This is desktop art/structure validation;
 no Android or physical-phone performance result is claimed.
 
 ## Runtime parts and dimensions

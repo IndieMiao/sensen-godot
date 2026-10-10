@@ -1,6 +1,6 @@
 {
-  "baseline_commit": "4f5d8364bc2c33bf6a28a1b9176bdd66ae8ed7f0",
-  "original_manifest_entries": 24,
+  "baseline_commit": "04b50480778a328ef528103b92570a68423b46fa",
+  "original_manifest_entries": 35,
   "original_entries_unchanged": true,
   "added_entries": [
     "greenhouse_base",
@@ -8,7 +8,7 @@
     "greenhouse_roof"
   ],
   "existing_farm_files_unchanged": true,
-  "retained_farm_file_count": 81,
+  "retained_farm_file_count": 103,
   "assets": {
     "greenhouse_base": {
       "sha256": "d856da1b07cafc25affbc0d37135260692378b13395879bbe3c0543e1548bb4f",

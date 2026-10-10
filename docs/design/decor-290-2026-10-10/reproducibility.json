@@ -1,0 +1,22 @@
+{
+  "revision": "SGODOT-290 R2",
+  "identical_glb_rebuild": true,
+  "rebuild_scope": [
+    "deco_bench"
+  ],
+  "other_decorations_retained": true,
+  "changed": [],
+  "sha256": {
+    "deco_planter.glb": "c62d2a4a005e7d707ef1f22e20483250b7ab1db377821f1e749ad74f1a1bce0f",
+    "deco_bench.glb": "51618bd43aa6c45be1b13a23587589a44cffd4da14e42f4ce0cb8b5b76217599",
+    "deco_windmill.glb": "50cd18920cda4a2505b75a3f3dfc1e41ade1cd73cfb99740d52f632d9edfd345",
+    "deco_pergola.glb": "52688e3ae1ee33de34bff061e35009da1f518d46286ad4db2b3dc28be12a0b62",
+    "deco_fountain.glb": "38357c007890ac81b39587bac073d43d441cc05e13d92ea0f42fa6d5484561be",
+    "deco_scarecrow.glb": "0fbb1ef580cee30ae7e0793a83bd76d478e946464d41df39e2c18ebbb35f850f",
+    "deco_birdbath.glb": "2372a9eeccd20c6304513978934698b51167119b6909aa4bb1a8272461c93010",
+    "deco_windmill_sails.glb": "57d14191f2cc714b9ed1d389e68194c84b22c75c36d894e8af0cf41f4a518baf",
+    "deco_path.glb": "460dcbdfb94f4d3a363a07790a9e1bb8caeb97b6a34c3d27a1338a7cd06414c4",
+    "deco_fence.glb": "4e1ad4403ec5520e15b632735fb92c7268c3932d49112a701767216382657276",
+    "deco_lantern.glb": "28984ebd5ddb9f0766d45af71dffabc8daa66bedfb5409ca453da4bc4a88830a"
+  }
+}
