@@ -1,0 +1,38 @@
+{
+  "baseline_commit": "4f5d8364bc2c33bf6a28a1b9176bdd66ae8ed7f0",
+  "original_manifest_entries": 24,
+  "original_entries_unchanged": true,
+  "added_entries": [
+    "greenhouse_base",
+    "greenhouse_glass",
+    "greenhouse_roof"
+  ],
+  "existing_farm_files_unchanged": true,
+  "retained_farm_file_count": 81,
+  "assets": {
+    "greenhouse_base": {
+      "sha256": "d856da1b07cafc25affbc0d37135260692378b13395879bbe3c0543e1548bb4f",
+      "bytes": 78156,
+      "one_surface": true,
+      "no_textures": true,
+      "opaque_source_material": true,
+      "single_sided_source_material": true
+    },
+    "greenhouse_glass": {
+      "sha256": "4eeda6746cd16b027138051e56fc499fb5efbc6144ca38af1ff54fd73b2a9f46",
+      "bytes": 1832,
+      "one_surface": true,
+      "no_textures": true,
+      "opaque_source_material": true,
+      "single_sided_source_material": true
+    },
+    "greenhouse_roof": {
+      "sha256": "d79a845275c9a947227dfa2ee8500a5e400846e9290d8df1e6035efd89d8059b",
+      "bytes": 52368,
+      "one_surface": true,
+      "no_textures": true,
+      "opaque_source_material": true,
+      "single_sided_source_material": true
+    }
+  }
+}

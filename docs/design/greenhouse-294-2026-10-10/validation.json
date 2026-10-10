@@ -1,0 +1,263 @@
+{
+	"adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+	"assets": [
+		{
+			"bounds_max": [
+				2.27500009536743,
+				1.91999995708466,
+				2.27500009536743
+			],
+			"bounds_min": [
+				-2.27500009536743,
+				0.0,
+				-2.27500009536743
+			],
+			"id": "greenhouse_base",
+			"surfaces": 1,
+			"triangles": 1284
+		},
+		{
+			"bounds_max": [
+				2.19161009788513,
+				2.75,
+				2.27500009536743
+			],
+			"bounds_min": [
+				-2.19161009788513,
+				1.85946094989777,
+				-2.27500009536743
+			],
+			"id": "greenhouse_roof",
+			"surfaces": 1,
+			"triangles": 572
+		},
+		{
+			"bounds_max": [
+				2.1800000667572,
+				2.69000005722046,
+				2.10999989509583
+			],
+			"bounds_min": [
+				-2.1800000667572,
+				1.89800000190735,
+				-2.10999989509583
+			],
+			"id": "greenhouse_glass",
+			"surfaces": 1,
+			"triangles": 6
+		}
+	],
+	"captures": [
+		{
+			"glass_alpha": 0.25,
+			"id": "greenhouse-43deg-normal",
+			"pitch_degrees": 42.9999961853027,
+			"roof_visible": true,
+			"size": [
+				1800,
+				1500
+			]
+		},
+		{
+			"glass_alpha": 0.100000001490116,
+			"id": "greenhouse-43deg-glass10",
+			"pitch_degrees": 42.9999961853027,
+			"roof_visible": true,
+			"size": [
+				1800,
+				1500
+			]
+		},
+		{
+			"glass_alpha": 0.100000001490116,
+			"id": "greenhouse-top-base",
+			"pitch_degrees": 90.0,
+			"roof_visible": false,
+			"size": [
+				1800,
+				1500
+			]
+		}
+	],
+	"checks": [
+		{
+			"check": "greenhouse_base: one merged mesh",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_base: one surface",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_base: triangle budget and manifest",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_base: shared ground origin, root transform identity",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_base: mesh local transform identity",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_base: 4.55 m square footprint",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_base: opaque vertex colors, runtime controls opacity",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_base: no texture coordinates",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_base: bounds match manifest",
+			"passed": true
+		},
+		{
+			"check": "roof_center exists on base",
+			"passed": true
+		},
+		{
+			"check": "roof_center position and +Z orientation",
+			"passed": true
+		},
+		{
+			"check": "Base sits on y=0",
+			"passed": true
+		},
+		{
+			"check": "Base contains no ridge or rafters above the eave",
+			"passed": true
+		},
+		{
+			"check": "All four central 1.3 m entry strips have no low geometry or ground beams",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_roof: one merged mesh",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_roof: one surface",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_roof: triangle budget and manifest",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_roof: shared ground origin, root transform identity",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_roof: mesh local transform identity",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_roof: 4.55 m square footprint",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_roof: opaque vertex colors, runtime controls opacity",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_roof: no texture coordinates",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_roof: bounds match manifest",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_glass: one merged mesh",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_glass: one surface",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_glass: triangle budget and manifest",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_glass: shared ground origin, root transform identity",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_glass: mesh local transform identity",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_glass: 4.55 m square footprint",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_glass: opaque vertex colors, runtime controls opacity",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_glass: no texture coordinates",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_glass: bounds match manifest",
+			"passed": true
+		},
+		{
+			"check": "Exactly four single-thickness glass panels: 2 quads and 2 triangles",
+			"passed": true
+		},
+		{
+			"check": "Glass front faces point outward/upward",
+			"passed": true
+		},
+		{
+			"check": "Combined triangle budget <= 3000",
+			"passed": true
+		},
+		{
+			"check": "Four central 1.3 m entrances have at least 1.80 m geometric clearance",
+			"passed": true
+		},
+		{
+			"check": "FarmArt shared vertex-color material",
+			"passed": true
+		},
+		{
+			"check": "Base and roof share unmodified FarmArt.material()",
+			"passed": true
+		},
+		{
+			"check": "Glass material duplication does not change shared farm material",
+			"passed": true
+		},
+		{
+			"check": "Existing scale avatar assembled",
+			"passed": true
+		},
+		{
+			"check": "Capture saved: greenhouse-43deg-normal",
+			"passed": true
+		},
+		{
+			"check": "Capture saved: greenhouse-43deg-glass10",
+			"passed": true
+		},
+		{
+			"check": "Capture saved: greenhouse-top-base",
+			"passed": true
+		}
+	],
+	"clearance_margin_m": 0.0549999523162841,
+	"eave_underside_m": 1.8,
+	"failures": [],
+	"minimum_mid_entry_clearance_m": 1.79999995231628,
+	"renderer": "mobile",
+	"scale_avatar_height_m": 1.745,
+	"total_triangles": 1862
+}
