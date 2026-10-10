@@ -18,7 +18,7 @@ import { gatherView } from './gathering.js';
 import { workbenchView } from './workbench.js';
 import { restReadyIn } from './presence.js';
 import { inboxView, settleParcels } from './parcels.js';
-import { cookbookView } from './cookbook.js';
+import { cookbookView, masteredCount } from './cookbook.js';
 import { mapMarkers } from './markers.js';
 
 /** opts.online: players in the P0 outpost rooms right now (SGODOT-227), for the Tea Host's answer; null when not known. */
@@ -123,7 +123,11 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
       ...(() => {
         const book = cookbookView(c, s, now);
         return { cookbook: book.pages, pages_total: book.total, discovered: book.discovered, mishaps: book.mishaps,
-          conveniences: book.conveniences, third_slot: book.third_slot, trial_refunds: book.trial_refunds };
+          conveniences: book.conveniences, third_slot: book.third_slot, trial_refunds: book.trial_refunds,
+          // Cookbook milestones (§7.6.1): each title, what it counts (Discovered or Mastered), the need and whether reached.
+          milestones: (c.cooking.milestones ?? []).map(m => ({ id: m.id, title: m.title, counts: m.mastered !== undefined ? 'mastered' : 'discovered',
+            need: m.mastered ?? m.discovered ?? 0, reached: s.firsts.includes(`milestone:${m.id}`) })),
+          mastered_count: masteredCount(c, s) };
       })(),
       derive: c.cooking.derive,
       tiers: Object.fromEntries(Object.entries(c.cooking.tiers).map(([k, t]) => [k, { energy: t.energy, ms: t.ms, bonus: t.bonus }])),

@@ -216,6 +216,52 @@ describe('Cooking Lv7–10 conveniences (§4.6.3)', () => {
   });
 });
 
+describe('Cookbook milestones (§7.6.1)', () => {
+  it('ships Line Cook 20 (100 coins + Recipe Stand), Head Chef 36 (+4 cabinet), Master Chef 48, Muscle Memory 10 Mastered', () => {
+    expect(c.cooking.milestones).toEqual([
+      { id: 'line_cook', title: 'Line Cook', discovered: 20, coins: 100, decor: 'recipe_stand' },
+      { id: 'head_chef', title: 'Head Chef', discovered: 36, cabinet: 4 },
+      { id: 'master_chef', title: 'Master Chef', discovered: 48 },
+      { id: 'muscle_memory', title: 'Muscle Memory', mastered: 10 },
+    ]);
+  });
+
+  // Thresholds scaled down so the 14 cookable pages reach them.
+  const small = { ...c, cooking: { ...c.cooking, milestones: [
+    { id: 'line_cook', title: 'Line Cook', discovered: 2, coins: 100, decor: 'recipe_stand' },
+    { id: 'head_chef', title: 'Head Chef', discovered: 3, cabinet: 4 },
+    { id: 'muscle_memory', title: 'Muscle Memory', mastered: 1 },
+  ] } };
+  const run = (s: P0State, cmd: P0Command, t: number) => {
+    const r = applyP0(small, s, cmd, t);
+    if (!r.ok) throw new Error(`${cmd.type}: ${r.code}`);
+    return { s: r.state, ev: r.events };
+  };
+  const cookIt = (s: P0State, items: string[], t: number) => {
+    const started = run(s, { type: 'cook', items }, t);
+    return run(started.s, { type: 'collect' }, t + started.s.stove!.ms + S);
+  };
+
+  it('pays each milestone once when the count is reached; Head Chef adds 4 cabinet portions', () => {
+    let s = at(3);
+    s.bag.push({ id: 'fish_crucian', qty: 11 }, { id: 'crop_radish', qty: 1 }, { id: 'crop_lettuce', qty: 1 });
+    s = cookIt(s, ['fish_crucian'], T0).s;
+    const second = cookIt(s, ['crop_radish', 'crop_lettuce'], T0 + 60 * S);
+    expect(second.ev.find(e => e.kind === 'milestone')).toEqual({ kind: 'milestone', id: 'line_cook', title: 'Line Cook', coins: 100, cabinet: 0, decor: 'recipe_stand' });
+    expect(second.s.coins).toBe(s.coins + 100);
+    s = second.s;
+    s.cabinet = [];
+    for (let i = 0; i < 9; i++) s = cookIt(s, ['fish_crucian'], T0 + (120 + i * 20) * S).s;   // 10 crucian pots: Mastered
+    expect(viewOf(small, s, T0 + 400 * S).cooking).toMatchObject({ mastered_count: 1,
+      milestones: [{ id: 'line_cook', reached: true }, { id: 'head_chef', reached: false, need: 3 }, { id: 'muscle_memory', counts: 'mastered', reached: true }] });
+    const again = cookIt(s, ['fish_crucian'], T0 + 500 * S);
+    expect(again.ev.filter(e => e.kind === 'milestone')).toEqual([]);   // once each
+    expect(viewOf(small, s, T0).cooking.cabinet!.cap).toBe(6);
+    s.firsts.push('milestone:head_chef');
+    expect(viewOf(small, s, T0).cooking.cabinet!.cap).toBe(10);
+  });
+});
+
 describe('Bag Upgrade II / III (§9.11, §8.3.2)', () => {
   const stall = (id: string): P0Command => ({ type: 'buy', item: id, qty: 1, shop: 'homestead' });
   it('II goes on sale at Lv6 and needs Upgrade I first; III at Lv9 after II', () => {

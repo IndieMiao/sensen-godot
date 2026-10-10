@@ -7,6 +7,7 @@ import { cookSlots, ingredientsFor, recipeRarity, tokenInfo, tokenMatches } from
 import { chefSignGold } from './homestead.js';
 import { ingredientStock } from './kitchen_storage.js';
 import { blessed, skillLevel, xpPercent } from './rules.js';
+import type { P0Event } from './progress.js';
 import type { P0State } from './state.js';
 
 export type PageState = 'hidden' | 'clued' | 'tasted' | 'discovered' | 'mastered';
@@ -14,6 +15,33 @@ export type PageState = 'hidden' | 'clued' | 'tasted' | 'discovered' | 'mastered
 export function hasConvenience(c: P0Content, s: P0State, id: Convenience): boolean {
   const at = c.cooking.conveniences[id];
   return at !== undefined && skillLevel(c, s, 'cooking') >= at;
+}
+
+/** Pages cooked at least once (Discovered or Mastered); the Mystery Dish is not a page. */
+export function discoveredCount(c: P0Content, s: P0State): number {
+  return s.firsts.filter(f => f.startsWith('cook:') && f !== `cook:${c.cooking.mystery.id}`).length;
+}
+
+export function masteredCount(c: P0Content, s: P0State): number {
+  return c.cooking.recipes.filter(r => pageState(c, s, r.id) === 'mastered').length;
+}
+
+/** Cookbook milestones reached and not yet paid (§7.6.1): each once, its coins now; titles and the cabinet stay. */
+export function noteMilestones(c: P0Content, s: P0State, events: P0Event[]): void {
+  const discovered = discoveredCount(c, s), mastered = masteredCount(c, s);
+  for (const m of c.cooking.milestones ?? []) {
+    const key = `milestone:${m.id}`;
+    if (s.firsts.includes(key)) continue;
+    if (!((m.discovered !== undefined && discovered >= m.discovered) || (m.mastered !== undefined && mastered >= m.mastered))) continue;
+    s.firsts.push(key);
+    if (m.coins) { s.coins += m.coins; events.push({ kind: 'coins', delta: m.coins }); }
+    events.push({ kind: 'milestone', id: m.id, title: m.title, coins: m.coins ?? 0, cabinet: m.cabinet ?? 0, decor: m.decor ?? null });
+  }
+}
+
+/** Warming Cabinet portions the milestones add (Head Chef +4). */
+export function milestoneCabinet(c: P0Content, s: P0State): number {
+  return (c.cooking.milestones ?? []).filter(m => s.firsts.includes(`milestone:${m.id}`)).reduce((n, m) => n + (m.cabinet ?? 0), 0);
 }
 
 /** Pots a page needs to be Mastered: 10, or 7 with Fast Mastery (Cooking Lv7, §4.6.3). */

@@ -182,6 +182,9 @@ export interface P0Content {
     mastered: { cooked: number; gold: number; fast?: number };  // Mastered at `cooked` pots (`fast` with Fast Mastery, Lv7); its gold arc is wider (§7.5.1)
     lucky_double?: number;                        // Lucky Double (Lv10): chance of one more Plain portion (not Legendary, not with Double)
     cook_all_per_page?: number;                   // Cook All (Lv8): at most this many pots of one page (q(4))
+    // Cookbook milestones past Home Cook (§7.6.1, SGODOT-282): titles at Discovered / Mastered counts, once each;
+    // coins paid, cabinet = Warming Cabinet portions added, decor = the yard piece it gives (placed with Decorate).
+    milestones?: { id: string; title: string; discovered?: number; mastered?: number; coins?: number; cabinet?: number; decor?: string }[];
     quick_fire: number;                          // Quick Fire: cooking time and heat times × this (§4.6.3 Lv6)
     trial_refunds: number;                       // failed pots a day that refund their ingredients in the blessing (§7.5.2)
     recipes: Recipe[];

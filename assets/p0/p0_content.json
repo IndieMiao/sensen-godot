@@ -691,6 +691,31 @@
     "quick_fire": 0.8,
     "lucky_double": 0.1,
     "cook_all_per_page": 2,
+    "milestones": [
+      {
+        "id": "line_cook",
+        "title": "Line Cook",
+        "discovered": 20,
+        "coins": 100,
+        "decor": "recipe_stand"
+      },
+      {
+        "id": "head_chef",
+        "title": "Head Chef",
+        "discovered": 36,
+        "cabinet": 4
+      },
+      {
+        "id": "master_chef",
+        "title": "Master Chef",
+        "discovered": 48
+      },
+      {
+        "id": "muscle_memory",
+        "title": "Muscle Memory",
+        "mastered": 10
+      }
+    ],
     "trial_refunds": 10,
     "recipes": [
       {

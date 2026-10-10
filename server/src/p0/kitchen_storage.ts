@@ -9,6 +9,7 @@
 import type { P0Content } from './content.js';
 import { add, count, room, take } from './bag.js';
 import { isSeasoning } from './gathering.js';
+import { milestoneCabinet } from './cookbook.js';
 import { stepAt, unlocked } from './homestead.js';
 import type { P0Event } from './progress.js';
 import type { Refusal } from './fishing.js';
@@ -54,7 +55,7 @@ export function takeIngredient(c: P0Content, s: P0State, id: string, qty: number
 
 /** Warming Cabinet portions once unlocked, else 0: 6 from Lv3, 12 from Lv8 (§7.7, homestead.cabinet_steps). */
 export function cabinetCap(c: P0Content, s: P0State): number {
-  return unlocked(c, s, 'warming_cabinet') ? stepAt(c.homestead.cabinet_steps, s.homestead.level, c.homestead.warming_cabinet) : 0;
+  return unlocked(c, s, 'warming_cabinet') ? stepAt(c.homestead.cabinet_steps, s.homestead.level, c.homestead.warming_cabinet) + milestoneCabinet(c, s) : 0;
 }
 
 export function cabinetCount(s: P0State, id?: string): number {

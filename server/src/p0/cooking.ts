@@ -1,7 +1,7 @@
 /** Cooking and eating (plan §7.2–7.6, §7.17): pots cost no energy; quality comes from heat taps judged on the server. */
 import { dishId, dishParts, fishById, ingredient, itemKind, recipeById, type CookTier, type P0Content, type Recipe } from './content.js';
 import { add, room } from './bag.js';
-import { fireSpeed, giveClue, goldWidth, hasConvenience, noteMishap, triedBefore, trialRefundsLeft } from './cookbook.js';
+import { fireSpeed, giveClue, goldWidth, hasConvenience, noteMilestones, noteMishap, triedBefore, trialRefundsLeft } from './cookbook.js';
 import { isSeasoning } from './gathering.js';
 import { bigPot, stoveCount } from './homestead.js';
 import { cabinetCap, dishesFit, eatFrom, haveDish, haveIngredient, ingredientStock, rackOn, routeDish, takeIngredient } from './kitchen_storage.js';
@@ -408,6 +408,7 @@ function finishPot(c: P0Content, s: P0State, b: Burner, pot: Pot, taps: number[]
     const cooked = s.firsts.filter(f => f.startsWith('cook:') && f !== `cook:${c.cooking.mystery.id}`).length;
     for (const [n, energy] of c.rewards.cookbook) if (cooked >= n) grantOnce(c, s, now, `cookbook_${n}`, energy, events);
   }
+  noteMilestones(c, s, events);   // Line Cook / Head Chef / Master Chef / Muscle Memory (§7.6.1)
   const tier = c.cooking.tiers[String(pot.rarity)];
   const before = s.day.cooked[pot.dish] ?? 0;
   s.day.cooked[pot.dish] = before + 1;
