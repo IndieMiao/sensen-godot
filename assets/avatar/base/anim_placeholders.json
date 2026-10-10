@@ -97,6 +97,8 @@
     "sit_idle",
     "sit_up",
     "sit_talk",
-    "drink_stand"
+    "drink_stand",
+    "attack_slash",
+    "attack_slash_b"
   ]
 }

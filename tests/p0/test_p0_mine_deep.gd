@@ -396,30 +396,148 @@ func test_the_old_tree_stands_in_the_left_column_off_the_beds() -> void:
 	var yard: Dictionary = P0Logic.content().get("decor", {}).get("yard", {})
 	assert_bool((yard.get("objects", []) as Array).any(func(r): return Rect2i(int(r[0]), int(r[1]), int(r[2]), int(r[3])).has_point(cell))).is_true()
 
-## B (奕星 on 288, after the user's hand test: the swing looked like digging): the swing plays no labour clip; the Combat
-## slot's sword shows in hand only while the swing arc does, as the old mine did (09-15 R4).
-func test_the_swing_shows_the_sword_and_plays_no_labour() -> void:
+## The slash (SGODOT-291, 不知火舞 on 291 72917be2): the swing plays attack_slash, then attack_slash_b while Attack is
+## pressed on, back to attack_slash after a pause over 0.8 s; no labour clip. The sword is in the right hand only from the
+## slash's wrist peak to its end, gripped on the hand bone as the clip poses it.
+func _slashing_mine() -> Node:
+	var P0Mine = load("res://scenes/p0/p0_mine.gd")
+	var mine = auto_free(P0Mine.new())
+	var bp := Layout_bp()
+	var actor: P0Actor = auto_free(P0Actor.new())
+	add_child(actor)
+	actor.setup(bp, BlueprintGrid.new(bp), null, load("res://modules/mining/mine_layout.gd").SPAWN)
+	mine.actor = actor
+	mine.combat = auto_free(load("res://modules/mining/p0_mine_combat.gd").new())
+	return mine
+
+func test_the_slashes_alternate_and_start_again_after_a_pause() -> void:
 	var src := FileAccess.get_file_as_string("res://scenes/p0/p0_mine.gd")
 	var at := src.find("func _swing()")
 	var swing := src.substr(at, src.find("\nfunc ", at + 1) - at)   # the body up to the next func (苏烈 on #270)
-	assert_str(swing).contains("combat.swing(")                      # it is the swing's body
+	assert_str(swing).contains("combat.swing(")
 	assert_str(swing).not_contains("labour(")
-	var P0Mine = load("res://scenes/p0/p0_mine.gd")
-	var mine = auto_free(P0Mine.new())
-	mine.actor = auto_free(P0Actor.new())
-	mine.combat = auto_free(load("res://modules/mining/p0_mine_combat.gd").new())
+	var mine = _slashing_mine()
+	await get_tree().process_frame
+	var played := []
+	var press := func(after: float) -> void:
+		mine._slash_t += after
+		mine.combat.cooldown = 0.0
+		mine.actor._attack_left = 0.0
+		mine._swing()
+		played.append(mine.SLASHES[mine._slash][0])
+	press.call(0.0)
+	press.call(0.53)   # held at the weapon's tempo
+	press.call(0.53)
+	press.call(0.9)    # paused: the chop again
+	press.call(0.53)
+	assert_array(played).is_equal(["attack_slash", "attack_slash_b", "attack_slash", "attack_slash", "attack_slash_b"])
+	assert_float(mine.combat.fx_delay).is_equal_approx(0.27, 0.0001)   # the sweep's peak (0.30 s), the arc 0.03 s early
+	# within the tempo nothing swings and no clip starts
+	mine.combat.cooldown = 0.2
+	var before: int = mine._slash
+	mine._slash_t = 0.1
+	mine._swing()
+	assert_int(mine._slash).is_equal(before)
+	assert_float(mine._slash_t).is_equal(0.1)
+
+func test_the_sword_is_in_hand_for_the_whole_slash() -> void:
+	var mine = _slashing_mine()
+	await get_tree().process_frame
 	mine._hold_sword("sword_wooden")
-	assert_object(mine._sword).is_not_null()
 	assert_object(mine._sword.get_parent()).is_same(mine.actor)
-	assert_bool(mine.sword_shown()).is_false()        # between swings: not in hand
-	mine.combat._swing_left = 0.16                    # a swing's arc shows
+	assert_bool(mine.sword_shown()).is_false()          # between swings
+	mine._swing()
 	mine._hold_sword("sword_wooden")
-	assert_bool(mine.sword_shown()).is_true()
-	mine.combat._swing_left = 0.0
+	assert_bool(mine.actor.attacking()).is_true()
+	assert_bool(mine.sword_shown()).is_true()           # B (不知火舞 on 291): in hand from the wind-up
+	var sk: Skeleton3D = mine.actor.rig.skeleton
+	if sk and sk.find_bone(mine.HAND_BONE) >= 0:         # on the hand: its grip within a hand's length of the wrist
+		var wrist: Vector3 = (sk.global_transform * sk.get_bone_global_pose(sk.find_bone(mine.HAND_BONE))).origin
+		var grip: Vector3 = mine._sword.global_transform * Vector3(0, mine.SWORD_GRIP_Y, 0)
+		assert_float(grip.distance_to(wrist)).is_less(0.15)
+	mine.actor._attack_left = 0.0                       # the clip is over
 	mine._hold_sword("sword_wooden")
 	assert_bool(mine.sword_shown()).is_false()
-	mine._hold_sword("")                              # no Combat slot weapon: no sword
+	mine._hold_sword("")                                # no Combat slot weapon: no sword
 	assert_object(mine._sword).is_null()
+
+## On the move (不知火舞 on 291): the slash holds the body still to its strike (the chop 0.22 s, the sweep 0.30 s)
+## whatever the stick says; past it the stick cancels the follow-through and the body moves at once, while with the stick
+## let go the clip plays out.
+func test_a_slash_holds_still_to_its_strike_then_the_stick_cancels_it() -> void:
+	var mine = _slashing_mine()
+	var cam := Camera3D.new()
+	add_child(auto_free(cam))
+	cam.look_at_from_position(Vector3(0, 10, 10), Vector3.ZERO)
+	mine.actor.cam = cam
+	await get_tree().process_frame
+	mine.actor.set_input(Vector2(1, 0))
+	for i in 10: mine.actor.step(1.0 / 30.0)
+	assert_bool(mine.actor.mover.is_moving()).is_true()   # walking
+	mine._swing()
+	var at: Vector3 = mine.actor.mover.position
+	for i in 6: mine.actor.step(1.0 / 30.0)            # 0.2 s: before the chop's strike
+	assert_vector(mine.actor.mover.position).is_equal(at)
+	assert_bool(mine.actor.attacking()).is_true()
+	for i in 2: mine.actor.step(1.0 / 30.0)            # past 0.22 s, the stick still pushed: moving again
+	assert_bool(mine.actor.mover.is_moving()).is_true()
+	assert_bool(mine.actor.attacking()).is_false()
+	# the stick let go: the clip plays out
+	mine.actor.set_input(Vector2.ZERO)
+	for i in 4: mine.actor.step(1.0 / 30.0)
+	mine.combat.cooldown = 0.0
+	mine._swing()                                       # the sweep (0.30 s to its strike)
+	for i in 12: mine.actor.step(1.0 / 30.0)            # 0.4 s
+	assert_bool(mine.actor.attacking()).is_true()
+	assert_bool(mine.actor.mover.is_moving()).is_false()
+	# a walk tapped during the hold (a ladder's) is kept and goes once the strike is past (苏烈 on #299)
+	mine.actor._attack_left = 0.0
+	mine.combat.cooldown = 0.0
+	mine._slash_t = 1.0
+	mine._swing()                                       # the chop: held 0.22 s
+	var held: Vector3 = mine.actor.mover.position
+	var goal := held + Vector3(-1.3, 0, 0)
+	assert_bool(mine.actor.mover.set_target_position(goal)).is_true()
+	for i in 5: mine.actor.step(1.0 / 30.0)
+	assert_vector(mine.actor.mover.position).is_equal(held)   # still held
+	assert_bool(mine.actor.attacking()).is_true()
+	for i in 20: mine.actor.step(1.0 / 30.0)
+	assert_float(mine.actor.mover.position.distance_to(held)).is_greater(0.3)   # walked on after the strike
+
+## The strike shows at the wrist's peak: the arc, the slime's flash and knockback wait fx_delay; who was hit and its
+## stun come at the press (the command and the server's tempo as before).
+func test_the_strike_shows_at_the_peak_the_hit_counts_at_the_press() -> void:
+	var Combat = load("res://modules/mining/p0_mine_combat.gd")
+	var bp := Layout_bp()
+	var mover := PlayerMover.new(bp, BlueprintGrid.new(bp))
+	mover.position = load("res://modules/mining/mine_layout.gd").SPAWN
+	var c: Node3D = auto_free(Combat.new())
+	add_child(c)
+	c.sync_p0(_view(_run(_five([true, true, true, true, true]))), 4, mover)
+	c.grace = 0.0
+	var id: String = c.enemies.keys()[0]
+	var e: Dictionary = c.enemies[id]
+	(e.mover as PlayerMover).position = mover.position + Vector3(0, 0, -1.2)   # open floor north of the spawn
+	e.node.position = e.mover.position
+	mover.facing = Vector3(0, 0, -1)
+	var at: Vector3 = e.node.position
+	c.fx_delay = 0.22
+	var hit: Array = c.swing({}, mover)
+	assert_array(hit).contains([id])                    # judged at the press
+	assert_str(str(e.phase)).is_equal("stunned")
+	assert_bool(is_instance_valid(c._swing)).is_false()  # no arc yet
+	assert_vector(e.node.position).is_equal(at)          # not knocked back yet
+	assert_float(float(e.flash)).is_equal(0.0)
+	for i in 10: c.step(0.016, mover, false)            # 0.16 s
+	assert_bool(is_instance_valid(c._swing)).is_false()
+	for i in 5: c.step(0.016, mover, false)             # past 0.22 s
+	assert_bool(is_instance_valid(c._swing) and c._swing.visible).is_true()
+	assert_float(e.node.position.distance_to(mover.position)).is_greater(at.distance_to(mover.position))
+	c.fx_delay = 0.0                                     # without a clip: at once, as before
+	c.cooldown = 0.0
+	var arc = c._swing
+	c.swing({}, mover)
+	assert_bool(c._swing != arc).is_true()
 
 ## The swing measures to a monster's body (不知火舞 on 288, measured 10-10): the elite (0.65 m) waits 2.4 m centre to
 ## centre behind the player before its lunge; the player turns to it and the swing reaches its body's edge.

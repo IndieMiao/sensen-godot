@@ -1,20 +1,94 @@
 {
   "format": 1,
-  "_note": "Mixamo Y Bot 源动画 → dt 骨架。key 与 anim_placeholders.json 占位条目的 clip_id 一致。picking_up 原片 9.6s，0.6~5.2s 才是弯腰拾取；其余整段循环。sit_* / drink_stand 为 SGODOT-227 据点座位（2026-10-08 用户上传，SGODOT-230）；sit_down / sit_up 是一次性过渡。",
+  "_note": "Mixamo Y Bot 源动画 → dt 骨架。key 与 anim_placeholders.json 占位条目的 clip_id 一致。picking_up 原片 9.6s，0.6~5.2s 才是弯腰拾取；其余整段循环。sit_* / drink_stand 为 SGODOT-227 据点座位（2026-10-08 用户上传，SGODOT-230）；sit_down / sit_up 是一次性过渡。 attack_slash / attack_slash_b（SGODOT-291，用户 10-10 上传的 Mixamo 剑盾挥砍，不知火舞挑定）：attack_slash = Sword And Shield Slash2 截 0.38–0.90 s（举刀过头斜劈，起手约 0.22 s）；attack_slash_b = Sword And Shield Slash 截 0.53–1.13 s（横扫）。连按时 a、b 交替，停手超过 0.8 s 回到 a。",
   "fps": 30,
   "clips": {
-    "labour_till":    {"file": "digging.fbx",        "loop": true,  "in_place": true},
-    "labour_clear":   {"file": "digging.fbx",        "loop": true,  "in_place": true, "speed": 1.25},
-    "labour_sow":     {"file": "plant_a_plant.fbx",  "loop": true,  "in_place": true},
-    "labour_water":   {"file": "crouching_idle.fbx", "loop": true,  "in_place": true},
-    "labour_drain":   {"file": "picking_up.fbx",     "loop": true,  "in_place": true, "start": 0.6, "end": 5.2},
-    "labour_shelter": {"file": "picking_up.fbx",     "loop": true,  "in_place": true, "start": 0.6, "end": 5.2},
-    "labour_harvest": {"file": "picking_up.fbx",     "loop": true,  "in_place": true, "start": 0.6, "end": 5.2},
-    "emote_wave":     {"file": "waving.fbx",         "loop": true,  "in_place": true},
-    "sit_down":       {"file": "stand_to_sit.fbx",   "loop": false, "in_place": true},
-    "sit_idle":       {"file": "sitting_idle.fbx",   "loop": true,  "in_place": true},
-    "sit_up":         {"file": "sit_to_stand.fbx",   "loop": false, "in_place": true},
-    "sit_talk":       {"file": "sitting_talking.fbx", "loop": true, "in_place": true, "end": 8.0},
-    "drink_stand":    {"file": "drinking.fbx",       "loop": true,  "in_place": true}
+    "labour_till": {
+      "file": "digging.fbx",
+      "loop": true,
+      "in_place": true
+    },
+    "labour_clear": {
+      "file": "digging.fbx",
+      "loop": true,
+      "in_place": true,
+      "speed": 1.25
+    },
+    "labour_sow": {
+      "file": "plant_a_plant.fbx",
+      "loop": true,
+      "in_place": true
+    },
+    "labour_water": {
+      "file": "crouching_idle.fbx",
+      "loop": true,
+      "in_place": true
+    },
+    "labour_drain": {
+      "file": "picking_up.fbx",
+      "loop": true,
+      "in_place": true,
+      "start": 0.6,
+      "end": 5.2
+    },
+    "labour_shelter": {
+      "file": "picking_up.fbx",
+      "loop": true,
+      "in_place": true,
+      "start": 0.6,
+      "end": 5.2
+    },
+    "labour_harvest": {
+      "file": "picking_up.fbx",
+      "loop": true,
+      "in_place": true,
+      "start": 0.6,
+      "end": 5.2
+    },
+    "emote_wave": {
+      "file": "waving.fbx",
+      "loop": true,
+      "in_place": true
+    },
+    "sit_down": {
+      "file": "stand_to_sit.fbx",
+      "loop": false,
+      "in_place": true
+    },
+    "sit_idle": {
+      "file": "sitting_idle.fbx",
+      "loop": true,
+      "in_place": true
+    },
+    "sit_up": {
+      "file": "sit_to_stand.fbx",
+      "loop": false,
+      "in_place": true
+    },
+    "sit_talk": {
+      "file": "sitting_talking.fbx",
+      "loop": true,
+      "in_place": true,
+      "end": 8.0
+    },
+    "drink_stand": {
+      "file": "drinking.fbx",
+      "loop": true,
+      "in_place": true
+    },
+    "attack_slash": {
+      "file": "sword_and_shield_slash_2.fbx",
+      "loop": false,
+      "in_place": true,
+      "start": 0.38,
+      "end": 0.9
+    },
+    "attack_slash_b": {
+      "file": "sword_and_shield_slash.fbx",
+      "loop": false,
+      "in_place": true,
+      "start": 0.53,
+      "end": 1.13
+    }
   }
 }

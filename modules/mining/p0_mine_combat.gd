@@ -63,6 +63,7 @@ func sync_p0(view: Dictionary, n: int, player_mover: PlayerMover) -> void:
 		for enemy in _actors.values(): enemy.node.queue_free()
 		enemies.clear()
 		_actors.clear()
+		_fx.clear()   # a strike from the last floor never lands on this one
 		grace = LANDING_GRACE_S
 		for i in mobs.size():
 			var kind := str(KINDS.get(str(mobs[i].get("kind", "")), "slime"))
@@ -183,7 +184,7 @@ func swing(state: Dictionary, mover: PlayerMover, target_id := "") -> Array[Stri
 		to.y = 0
 		if to.length() > 0.01: mover.facing = to.normalized()
 	cooldown = 1.0 / float(spec.speed)
-	_show_swing(mover.position, mover.facing, float(spec.range))
+	var fx := {"left": fx_delay, "origin": mover.position, "facing": mover.facing, "reach": float(spec.range), "hits": []}
 	for id in enemies:
 		var enemy: Dictionary = enemies[id]
 		var reach := float(spec.range) + HIT_SLACK + float(enemy.spec.get("radius", 0.0))   # to the body's edge
@@ -194,11 +195,28 @@ func swing(state: Dictionary, mover: PlayerMover, target_id := "") -> Array[Stri
 			enemy.phase = "stunned"
 			enemy.timer = float(_config.hit_stun_seconds)
 			enemy.mover.stop()
+		fx.hits.append(id)
+	if fx_delay > 0.0: _fx.append(fx)
+	else: _strike(fx, mover)
+	return hit
+
+## Seconds from a swing's press to its visible strike (the slash clip's wrist peak; P0Mine sets it per swing, SGODOT-291):
+## the arc, the struck slimes' flash and their knockback wait that long. Who was hit, their stun and the command to the
+## server do not — they stay at the press, so the server's tempo and the fight's timing are as before.
+var fx_delay := 0.0
+var _fx: Array = []   # strikes waiting for their peak: {left, origin, facing, reach, hits}
+
+## The visible strike: the arc where the swing was aimed, and each struck slime still up flashing and knocked back from
+## where the player stands now.
+func _strike(fx: Dictionary, mover: PlayerMover) -> void:
+	_show_swing(fx.origin, fx.facing, float(fx.reach))
+	for id in fx.hits:
+		if not enemies.has(id): continue   # gone meanwhile (the swing's reply took it down)
+		var enemy: Dictionary = enemies[id]
 		enemy.flash = 0.18
 		var direction: Vector3 = (enemy.node.position - mover.position).normalized()
-		_slide(enemy.mover, direction * float(spec.knockback) * (1.0 - float(enemy.spec.knockback_resistance)))
+		_slide(enemy.mover, direction * float(_weapon.knockback) * (1.0 - float(enemy.spec.knockback_resistance)))
 		enemy.node.position = enemy.mover.position
-	return hit
 
 
 ## One wind-up's band: a flat strip on the ground under the slime's root, out of Body's squash, hidden until a wind-up.
@@ -242,6 +260,12 @@ func _band(spec: Dictionary, elite: bool) -> Node3D:
 ## The base step, then the wind-up's look: the band sweeping out along the locked direction, Body squashed with a
 ## shake at the end, the rebound on the leap, and a short buzz when a wind-up starts.
 func step(delta: float, mover: PlayerMover, paused: bool) -> void:
+	if not paused:
+		for fx in _fx.duplicate():
+			fx.left = float(fx.left) - clampf(delta, 0, 0.1)
+			if fx.left <= 0.0:
+				_fx.erase(fx)
+				_strike(fx, mover)
 	var before := {}
 	for id in enemies: before[id] = str(enemies[id].phase)
 	super.step(delta, mover, paused)

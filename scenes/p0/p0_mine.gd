@@ -43,12 +43,24 @@ const HURT_STALE_MS := 4000   # and a reply that never comes at all frees it aft
 const SWING_KEY := "mine_swing_%d"
 var _swings := 0
 var _swings_out := {}
-## The held sword (B, 奕星 on 288 after the user's hand test: the body did a digging beat): as the old mine did (09-15 R4),
-## the body keeps walking or standing, and the Combat slot's sword shows in hand only while a swing's arc shows (0.16 s).
-## A real slash clip comes from 3D later (attack_slash); until then there is no labour clip on a swing.
+## The slash (SGODOT-291; 不知火舞 on 291 72917be2): attack_slash, a raised slanted chop, and attack_slash_b, a sweep,
+## alternate while Attack is pressed on; a pause over SLASH_RESET_S starts again with the chop. [clip, its length, the
+## right wrist's speed peak from its start (上官婉儿's measure on the bones)]: the arc, the struck slime's flash and
+## knockback come ARC_LEAD_S before the peak (P0MineCombat.fx_delay); who was hit is judged and sent at the press, as
+## before. The body holds still until the peak — on the move too — and past it the stick cancels the follow-through
+## (P0Actor.attack; 不知火舞 on 291: 0.22 s for the chop, 0.30 s for the sweep).
+const SLASHES := [["attack_slash", 0.52, 0.22], ["attack_slash_b", 0.60, 0.30]]
+const SLASH_RESET_S := 0.8
+const ARC_LEAD_S := 0.03
+var _slash := -1          # the last slash's place in SLASHES
+var _slash_t := INF       # seconds since it began
+## The Combat slot's sword in the right hand for the whole slash (不知火舞 on 291: B, in hand from the wind-up): each frame its grip on the hand bone as
+## the clip poses it — the blade across the knuckles to the thumb side (the bone's +Y), its edge along the fingers (+X).
 const CombatArt := preload("res://modules/mining/combat_art.gd")
-const SWORD_AT := Vector3(-0.26, 0.6, 0.05)   # the old mine's hold (scenes/mine/mine.gd), on the player node
-const SWORD_TILT := -65.0
+const HAND_BONE := "Wrist_R"
+const GRIP_ALONG := 0.085   # the grip's centre from the wrist toward the fingers (m)
+const GRIP_PALM := -0.02    # … and toward the palm (the bone's −Z)
+const SWORD_GRIP_Y := 0.17  # the sword model's grip centre over its origin (combat_art: handle 0.045–0.295)
 const SWORD_SCALE := 0.65
 var _sword: MeshInstance3D
 var _sword_id := ""
@@ -341,13 +353,14 @@ func _fight(v: Dictionary, dt: float) -> void:
 	# Knocked out: the fight holds still until the player is out (the server has already refilled HP for the run, so
 	# the bar keeps 0 % for the moment instead of jumping to 100 % — 不知火舞 on 288 78d0f863)
 	combat.step(dt, actor.mover, rt.ui.has_modal() or _completing or _ko)
+	_slash_t += dt
 	_hold_sword(str(v.get("mine", {}).get("weapon", {}).get("id", "")))
 	var run: Dictionary = v.get("mine", {}).get("run", {})
 	var fighting := floor_n >= 3 and run is Dictionary and not run.is_empty()
 	rt.ui.set_hp((0 if _ko else int(run.get("hp", -1))) if fighting else -1, int(v.get("mine", {}).get("hp_max", 100)),
 		combat.elite_hp().merged({"name": "Elite Slime"}) if fighting and not combat.elite_hp().is_empty() else {})
 
-## The Combat slot's sword on the player (its model from the view's mine.weapon.id), shown only while the swing arc does.
+## The Combat slot's sword (its model from the view's mine.weapon.id), in the right hand from the slash's peak to its end.
 func _hold_sword(id: String) -> void:
 	if id != _sword_id:
 		_sword_id = id
@@ -356,11 +369,28 @@ func _hold_sword(id: String) -> void:
 		if id != "":
 			_sword = CombatArt.model(id)
 			_sword.name = "HeldSword"
-			_sword.position = SWORD_AT
-			_sword.rotation_degrees.x = SWORD_TILT
 			_sword.scale = Vector3.ONE * SWORD_SCALE
 			actor.add_child(_sword)
-	if is_instance_valid(_sword): _sword.visible = combat._swing_left > 0.0 and not _ko
+	if not is_instance_valid(_sword): return
+	_sword.visible = sword_due() and not _ko
+	if _sword.visible: _grip_sword()
+
+## Whether a slash clip plays (the sword's time in hand).
+func sword_due() -> bool:
+	return _slash >= 0 and actor.attacking()
+
+## Seconds from a slash's press to its strike: its wrist peak, ARC_LEAD_S early.
+func strike_at(i: int) -> float: return maxf(0.0, float(SLASHES[i][2]) - ARC_LEAD_S)
+
+## The sword's grip on the right hand as the clip poses it now.
+func _grip_sword() -> void:
+	var sk: Skeleton3D = actor.rig.skeleton if actor.rig else null
+	var bone := sk.find_bone(HAND_BONE) if sk else -1
+	if bone < 0: return
+	var hand := sk.global_transform * sk.get_bone_global_pose(bone)
+	var b := hand.basis.orthonormalized()
+	var grip := hand.origin + b.x * GRIP_ALONG + b.z * GRIP_PALM
+	_sword.global_transform = Transform3D(b.scaled(Vector3.ONE * SWORD_SCALE), grip - b.y * SWORD_GRIP_Y * SWORD_SCALE)
 
 ## Whether the sword is in hand now (tests and shots).
 func sword_shown() -> bool: return is_instance_valid(_sword) and _sword.visible
@@ -383,8 +413,14 @@ func _on_settled(key: String, _ok: bool, _code: String) -> void:
 ## Attack (Combat's key): one swing — the arc, the stun and the knockback here; the server settles who was hit.
 func _swing() -> void:
 	if combat == null or _ko_waiting or _ko: return   # a fall waits on the swings out / the knock-out moment: no new swing (苏烈 on #253, #255)
+	if combat.cooldown > 0.0: return   # within the weapon's tempo: no swing, no clip
+	_slash = 0 if _slash < 0 or _slash_t > SLASH_RESET_S else 1 - _slash
+	_slash_t = 0.0
+	var slash: Array = SLASHES[_slash]
+	combat.fx_delay = strike_at(_slash)
 	var hit: Array = combat.swing({}, actor.mover)
-	actor.face(actor.position + actor.mover.facing)   # turned to the slime it swung at; no labour clip (B, 288)
+	actor.face(actor.position + actor.mover.facing)   # turned to the slime it swung at
+	actor.attack(str(slash[0]), float(slash[1]), float(slash[2]))   # held still to the wrist's peak
 	_hold_sword(_sword_id)
 	if hit.is_empty(): return
 	var cmd := {"type": "mine_attack", "floor": floor_n, "targets": hit.map(func(id): return Combat.mob_index(str(id)))}
@@ -926,6 +962,9 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"floor": _go_floor(int(step[1]))
 		"combat": rt.ui.set_mode("combat" if step.size() < 2 or step[1] != "0" else "mine")   # combat[:0] — the radial's pick
 		"attack": _swing()   # one Attack (Combat's key)
+		"attacks":   # attacks:n:ms[:delay ms] — n presses of Attack ms apart in game time (shots of the slash, SGODOT-291)
+			var after := float(step[3]) / 1000.0 if step.size() > 3 else 0.0
+			for i in int(step[1]): get_tree().create_timer(after + float(step[2]) / 1000.0 * i, false).timeout.connect(_swing)
 		"near":   # near:i — stand next to monster i (the screenshots' fight)
 			var e: Dictionary = combat.enemies.get(Combat.mob_id(int(step[1])), {}) if combat else {}
 			if not e.is_empty():
