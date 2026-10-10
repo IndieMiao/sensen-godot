@@ -33,7 +33,7 @@ func test_ties_go_to_weather_then_level_then_id() -> void:
 	assert_str(str(Board.pick(["fish_bass", "fish_trout"], "rain", 4).fish.id)).is_equal("fish_trout")
 
 func test_quoted_with_the_keeper() -> void:
-	assert_str(Board.quoted("Rainbow Trout bite in the rain. Bring worms.", "Finn")).is_equal("“Rainbow Trout bite in the rain. Bring worms.” — Finn")
+	assert_str(Board.quoted("Rainbow Trout bite in the rain. Bring worms.", "Finn")).is_equal("“Rainbow Trout bite in the rain. Bring worms.” —\u00a0Finn")
 
 const FERN := {"name": "Fern Pond", "site": "pond", "template": "Pond", "time": "Dusk", "weather": "rain",
 	"fish": ["fish_crucian", "fish_carp", "fish_perch", "fish_bass", "fish_koi", "fish_catfish", "fish_arctic_char", "fish_sturgeon", "fish_eel"],
@@ -76,3 +76,13 @@ func test_details_lines_and_the_45_percent() -> void:
 	assert_str(Board.details_line(Board.FishWorld._fish("fish_salmon"), false)).is_equal("Fishing Lv8 · Regional")
 	assert_bool(Board.dim_now(eel, FERN)).is_true()
 	assert_bool(Board.dim_now(eel, FERN.merged({"time": "Night"}, true))).is_false()
+
+func test_the_time_words_only_for_a_raising_window() -> void:
+	# a window under ×1 never reads as "bite at night"; an unknown window adds no words (苏烈 on #262)
+	assert_str(Board.line(["fish_crucian"], "sun", 1, {})).is_equal("Pond Crucians bite. Bring worms.")
+	var shy := {"id": "fish_test_shy", "name": "Shy Fish", "level": 1, "time": {"night": 0.5, "noon": 3.0}}
+	var c: Dictionary = P0Logic.content()
+	(c.fish as Array).append(shy)
+	var got := Board.line(["fish_test_shy"], "sun", 1, {})
+	(c.fish as Array).erase(shy)
+	assert_str(got).is_equal("Shy Fish bite. Bring worms.")

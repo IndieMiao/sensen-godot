@@ -243,7 +243,11 @@ describe('the card\'s words: Dawn / Dusk apart, and the 3-day forecast (283 e61c
   it('the next three days in the pond\'s city, from its 04:00, today left out', () => {
     const f = forecast(c, SF, 'America/Los_Angeles', SF_DAY);   // Sat 10 Oct 2026, 13:00
     expect(f.map(d => d.day)).toEqual(['Sun', 'Mon', 'Tue']);
-    expect(f[0].weather).toBe(weatherOn(c, SF, '2026-10-11'));
+    // each day its own date's weather (不知火舞 on #262: Sun / Mon / Tue all Rain is this seed's 11–13 Oct, not one day thrice)
+    expect(f.map(d => d.weather)).toEqual(['2026-10-11', '2026-10-12', '2026-10-13'].map(d => weatherOn(c, SF, d)));
+    expect(forecast(c, SF, 'America/Los_Angeles', SF_DAY + 2 * 86_400_000).map(d => d.weather))
+      .toEqual(['2026-10-13', '2026-10-14', '2026-10-15'].map(d => weatherOn(c, SF, d)));
+    expect(new Set(['2026-10-13', '2026-10-14', '2026-10-15'].map(d => weatherOn(c, SF, d))).size).toBeGreaterThan(1);
     expect(forecast(c, SF, 'America/Los_Angeles', Date.UTC(2026, 9, 11, 10)).map(d => d.day)).toEqual(['Sun', 'Mon', 'Tue']);   // 03:00 Sun is still Sat
   });
 });

@@ -31,7 +31,7 @@ func test_board_lv5_matches_the_frames() -> void:
 	var m := _model(5, {"fish_arctic_char": 1})
 	assert_str(str(m.title)).is_equal("Bite Board · Mission Tackle Shop")
 	assert_array(m.conditions).is_equal([["dawn_dusk", "Dusk"], ["rain", "Rain"]])
-	assert_str(str(m.line)).is_equal("“Catfish bite at night in the rain. Bring worms.” — Finn")
+	assert_str(str(m.line)).is_equal("“Catfish bite at night in the rain. Bring worms.” —\u00a0Finn")
 	assert_array(m.titles).is_equal(["Ponds", "Regional fish", "Forecast"])
 	var by_id := {}
 	for r in m.ponds: by_id[str(r.id)] = r
@@ -53,7 +53,7 @@ func test_board_lv2_has_no_forecast_and_clover_no_fish() -> void:
 	var m := _model(2)
 	assert_array(m.titles).is_equal(["Ponds", "Regional fish"])
 	assert_array(m.forecast).is_empty()
-	assert_str(str(m.line)).is_equal("“Rainbow Trout bite in the rain. Bring worms.” — Finn")
+	assert_str(str(m.line)).is_equal("“Rainbow Trout bite in the rain. Bring worms.” —\u00a0Finn")
 	var by_id := {}
 	for r in m.ponds: by_id[str(r.id)] = r
 	assert_str(str(by_id[FERN].line)).is_equal("Largemouth Bass · Dawn & dusk ×2")   # 2370cb2a

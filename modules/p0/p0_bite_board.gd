@@ -60,19 +60,21 @@ static func line(fish_ids: Array, weather: String, level: int, caught: Dictionar
 		parts.append("only bite " + str(TIME_WORDS.get(str(t).trim_suffix("_only"), "")))
 	else:
 		parts.append("bite")
+		# its best window, named only when it raises the bite (over ×1) and is one the line has words for (苏烈 on #262)
 		if t is Dictionary and not t.is_empty():
 			var key := ""
-			var top := 0.0
+			var top := 1.0
 			for k in t:
-				if float(t[k]) > top: top = float(t[k]); key = str(k)
-			parts.append(str(TIME_WORDS.get(key, "")))
-	if bool(p.weather_match): parts.append(str(WEATHER_WORDS.get(weather, "")))
+				if float(t[k]) > top and TIME_WORDS.has(str(k)): top = float(t[k]); key = str(k)
+			if key != "": parts.append(str(TIME_WORDS[key]))
+	if bool(p.weather_match) and WEATHER_WORDS.has(weather): parts.append(str(WEATHER_WORDS[weather]))
 	var bait := "Try a Spinner Lure." if regional and level >= LURE_LEVEL else "Bring worms."
 	return " ".join(parts) + ". " + bait
 
-## As shown, in curly quotes (the frames' 2255:32861): `“Rainbow Trout bite in the rain. Bring worms.” — Finn`.
+## As shown, in curly quotes (the frames' 2255:32861): `“Rainbow Trout bite in the rain. Bring worms.” — Finn`. The space
+## after the dash does not break, so a line that wraps keeps `— Finn` together (不知火舞 on #262).
 static func quoted(text: String, keeper: String) -> String:
-	return "“%s” — %s" % [text, keeper]
+	return "“%s” —\u00a0%s" % [text, keeper]
 
 # ---------------------------------------------------------------- the conditions on the cards (283 e61cda10 / 1e21c014)
 const WEATHER_WORD := {"sun": "Clear", "rain": "Rain", "wind": "Windy"}
