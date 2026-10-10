@@ -6,7 +6,8 @@ extends PanelContainer
 ##   line 1  event: Caught! / New recipe! / Dish ready / Mystery Dish / Home Cook (tone colours it)
 ##   line 2  the item: icon disc, name, rarity dot + word, ★ quality badge (Plain shows none)
 ##   rewards repeat rewards as float pills (UiFloatText.pill controls built by the caller), at most two
-##   strip   a one-time reward: First catch! +15 XP · First cooked · +20 Cooking XP · Cookbook 2/48
+##   strip   a one-time reward: First catch! +15 XP · First cooked · +20 Cooking XP · Cookbook 2/48; a strip too long
+##           for a line breaks between its rewards at « · », never inside one (strip_lines)
 ##   actions primary (Eat · +45 Energy) / secondary (Keep) / grey note (Gift later from your bag)
 ## Every empty field hides its part (Figma Show* switches). Catch cards have no buttons and fold away after 1.5 s:
 ## the caller times that. Tapping outside a dish card is Keep: the caller's scrim decides.
@@ -211,7 +212,33 @@ func set_rewards(v: Array) -> void:
 	_rewards.visible = not keep.is_empty()
 
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_THEME_CHANGED: _fit_name()
+	if what == NOTIFICATION_THEME_CHANGED:
+		_fit_name()
+		_fit_strip.call_deferred()   # the strip label's own font settles after this card's notification: measure with it
+
+## The strip as shown (不知火舞 on 289 73b6029e, the floats' rule): its rewards, `a · b · c`, as many whole ones on a
+## line as fit `width`, the next on a line of its own — no line ends in « ·» — and a number holds to its unit with a
+## no-break space (`+10 XP` never splits). Without a font the rewards stay on one line.
+static func strip_lines(text: String, font: Font, size: int, width: float) -> String:
+	var number := RegEx.create_from_string("([+−-]?\\d[\\d,./%]*) (?=\\S)")
+	var items: Array = Array(text.split(" · ")).map(func(s): return number.sub(str(s), "$1\u00a0", true))
+	if font == null or width <= 0.0: return " · ".join(items)
+	var lines: Array = []
+	var line := ""
+	for it in items:
+		var joined: String = it if line == "" else line + " · " + it
+		if line != "" and font.get_string_size(joined, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x > width:
+			lines.append(line)
+			line = it
+		else: line = joined
+	if line != "": lines.append(line)
+	return "\n".join(lines)
+
+## The strip's text inside the card: its inner width less the strip's padding and, with one, the icon and its gap.
+func _fit_strip() -> void:
+	if _strip_text == null: return
+	var width := WIDTH - _PAD_X * 2.0 - _STRIP_PAD.x - _STRIP_PAD.z - ((_STRIP_ICON + _STRIP_GAP) if strip_icon != null else 0.0)
+	_strip_text.text = strip_lines(strip, _strip_text.get_theme_font(&"font"), _strip_text.get_theme_font_size(&"font_size"), width)
 
 ## A clipped label has no natural width, so give the name its text width up to NAME_MAX_W (then …): short names
 ## stay centred with their icon, long ones never push the card past 280.
@@ -243,7 +270,7 @@ func _refresh() -> void:
 	_rarity.visible = rarity_word != ""
 	_badge.quality = quality
 	_strip.visible = strip != ""
-	_strip_text.text = strip
+	_fit_strip()
 	_strip_icon.texture = strip_icon
 	_strip_icon.visible = strip_icon != null
 	_actions.visible = primary != "" or secondary != "" or note != ""
