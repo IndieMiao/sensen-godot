@@ -118,7 +118,8 @@ export function requirePass(c: P0Content, s: P0State, space: unknown, place: unk
   const cluster = clusterOf(c, place);
   if (!cluster || covers(s, cluster, now)) return null;
   if (kind === 'reel' && s.cast) return null;
-  if (kind !== undefined && kind !== 'cast' && s.presence.entered === place) return null;
+  // Already in that place (entered with a pass): its commands and the client's refresh reads pass; a new cast does not.
+  if (kind !== 'cast' && s.presence.entered === place) return null;
   const expired = !!s.travel.passes[cluster];
   return { code: expired ? 'trip_expired' : 'pass_required',
     detail: { message: expired ? 'Trip expired' : 'Pass required', preview: preview(c, s, cluster) } };
@@ -159,15 +160,22 @@ export function travel(c: P0Content, s: P0State, to: unknown, now: number, event
     stamp = { cluster: to, kind: (c as WithClusters).landmarks?.[to] ? 'landmark' : 'climate', at: now, counted_on: on };
     t.stamps.push(stamp);
     if (on === today) energy = gainEnergy(c, s, now, FIRST_VISIT_ENERGY, events, 'first_visit', maxEnergy(c, s) + c.rewards.max_over);
-    const counted = t.stamps.filter(x => x.counted_on <= today).length;
-    for (const [n, e] of EXPLORER) {
-      if (counted < n || t.explorer >= n) continue;
-      t.explorer = n;
-      grantOnce(c, s, now, `explorer_${n}`, e, events);
-    }
+    settleExplorer(c, s, now, events);
   }
   events.push({ kind: 'arrival', cluster: to, first, stamp, energy, pass_until: t.passes[to].until, km: d, trip });
   return null;
+}
+
+/** Explorer medals (§11.9.2) by the stamps counted up to today: after travel, and on any command, so a stamp
+ * pushed to tomorrow earns its medal tomorrow without another trip (亚瑟 on #206). */
+export function settleExplorer(c: P0Content, s: P0State, now: number, events: P0Event[]): void {
+  const today = dayKey(c, now);
+  const counted = s.travel.stamps.filter(x => x.counted_on <= today).length;
+  for (const [n, e] of EXPLORER) {
+    if (counted < n || s.travel.explorer >= n) continue;
+    s.travel.explorer = n;
+    grantOnce(c, s, now, `explorer_${n}`, e, events);
+  }
 }
 
 /** return_home {}: free, instant, needs no pass; passes are kept. */

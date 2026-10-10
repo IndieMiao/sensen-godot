@@ -80,6 +80,17 @@ describe('travel (SGODOT-278)', () => {
     expect(r.state.rewards.filter(x => x === 'explorer_3')).toHaveLength(1);
   });
 
+  it('a medal for a stamp counted tomorrow comes with tomorrow\'s first command, not only the next trip', () => {
+    let s = fresh();
+    s = step(s, { type: 'travel', to: TOKYO }).state;
+    s = step(s, { type: 'travel', to: NYC }, T + 1).state;
+    s = step(s, { type: 'travel', to: LDN }, T + 2).state;   // third stamp counts 2026-10-11
+    expect(s.travel.explorer).toBe(0);
+    const r = step(s, { type: 'return_home' }, T + DAY);
+    expect(r.state.travel.explorer).toBe(3);
+    expect(r.events).toContainEqual(expect.objectContaining({ kind: 'reward', id: 'explorer_3' }));
+  });
+
   it('home is always free; an unknown city is refused', () => {
     expect(step(fresh(), { type: 'travel', to: SF }).state.travel.here).toBe(SF);
     expect(run(fresh(), { type: 'travel', to: 'gn-1' })).toMatchObject({ ok: false, code: 'unknown_city' });
@@ -111,8 +122,26 @@ describe('requirePass (SGODOT-278)', () => {
     noteEntered(s, 'outpost', outpost);   // what GET state ?space=outpost&place= does once the pass is checked
     expect(s.presence.entered).toBe(outpost);
     expect(requirePass(c, s, 'outpost', outpost, T + DAY + 5, 'sell')).toBeNull();
+    expect(requirePass(c, s, 'outpost', outpost, T + DAY + 5)).toBeNull();   // the refresh read there too
+    noteEntered(s, 'farm', null);   // left
     expect(requirePass(c, s, 'outpost', outpost, T + DAY + 5)?.code).toBe('trip_expired');
     expect(requirePass(c, s, 'outpost', `${TOKYO}~tea1`, T + DAY + 5, 'buy')?.code).toBe('trip_expired');
+  });
+
+  it('the 30 s refresh of the pond the player is in passes after the pass runs out; a new entry does not (亚瑟 on #206)', async () => {
+    const app = Fastify();
+    const store = new P0Store(c);
+    let now = T;
+    registerP0Routes(app, { content: c, store, now: () => now, dev: false });
+    const headers = { 'x-p0-player': 'travel-route-2' };
+    const at = `/v1/p0/state?space=pond&place=${encodeURIComponent(TOKYO_POND)}`;
+    await app.inject({ method: 'POST', url: '/v1/p0/commands', headers, payload: { type: 'travel', to: TOKYO } });
+    expect((await app.inject({ method: 'GET', url: at, headers })).json().ok).toBe(true);
+    now = T + 25 * 3_600_000;
+    expect((await app.inject({ method: 'GET', url: at, headers })).json().ok).toBe(true);   // still in the pond
+    await app.inject({ method: 'GET', url: '/v1/p0/state?space=farm', headers });             // went home
+    expect((await app.inject({ method: 'GET', url: at, headers })).json()).toMatchObject({ ok: false, code: 'trip_expired' });
+    await app.close();
   });
 
   it('home places never need a pass', () => {
