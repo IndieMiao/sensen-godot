@@ -1,6 +1,6 @@
 # SGODOT-294 · Greenhouse R3 / v1.5
 
-> Integration note (farm-dev, SGODOT-294): per the 2026-10-08 art-integration rule, the review images and JSON evidence linked below (43° / top-down captures, validation, bed-clearance regression, preservation, reproducibility) stay on the `wp-3d-scene` branch under the same path; only this README, the three GLBs, their `.import` files and the manifest entries are merged here.
+> Integration note (farm-dev, SGODOT-294): per the 2026-10-08 art-integration rule, the review images and JSON evidence linked below (43° / top-down captures, validation, bed-clearance regression, preservation, reproducibility) stay on the `wp-3d-scene` branch under the same path, as do the generator and review scripts and the Blender source under `tools/art/` (`build_greenhouse.py`, `review_greenhouse.gd`, `tools/art/source/greenhouse_294/`); only this README, the three GLBs, their `.import` files and the manifest entries are merged here.
 
 刘备 · 2026-10-10. Technical review: 上官婉儿; visual review: 不知火舞.
 Integration: 刘邦, `p0_farm_facilities.gd`. This PR delivers artwork and isolated
