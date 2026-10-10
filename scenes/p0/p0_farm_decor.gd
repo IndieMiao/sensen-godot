@@ -234,15 +234,34 @@ func begin_decorate() -> void:
 	placing = {mode = "idle"}
 	_start()
 
+## The top-down camera (刘邦's shell, #261; spec v2 §1): Decorate opens on the whole yard (YARD_PX a cell) with nothing
+## picked, on the piece (PICK_PX) with one; picking one up from the yard view comes in to it in 0.3 s; the next piece
+## of a multi-piece one is followed without changing the zoom; putting one down or cancelling keeps the zoom.
+const YARD_PX := 17.0
+const PICK_PX := 36.0
+var _held := false   # the camera came in to a piece (PICK_PX) this session
+
 func _start() -> void:
 	var first := not rt.ui.placing()
 	var spec := _bar()
 	if first: rt.ui.begin_placement(spec)
 	else: rt.ui.set_placement(spec)
+	var idle := str(placing.mode) == "idle"
+	var at: Vector3 = yard_centre() if idle or placing.at == P0Decor.NONE else centre(str(placing.id), placing.at, int(placing.rot))
 	if first:
-		var at: Vector3 = centre(str(placing.id), placing.at, int(placing.rot)) if str(placing.mode) != "idle" and placing.at != P0Decor.NONE else farm.actor.position
-		farm.placement_camera_begin(at)
+		farm.placement_camera_begin(at, YARD_PX if idle else PICK_PX)
+		_held = not idle
+	elif not idle:
+		farm.placement_camera_focus(at, 0.0 if _held else PICK_PX)   # into the piece once; then follow it at this zoom
+		_held = true
 	_show()
+
+## The middle of the yard (the walk rect), where Decorate with nothing picked looks from.
+func yard_centre() -> Vector3:
+	var w: Array = P0Decor.yard().get("walk", [0, 0, 1, 1])
+	var a: Vector3 = farm.bp.cell_to_world(Vector2i(int(w[0]), int(w[1])))
+	var b: Vector3 = farm.bp.cell_to_world(Vector2i(int(w[0]) + int(w[2]) - 1, int(w[1]) + int(w[3]) - 1))
+	return (a + b) * 0.5
 
 ## The bar for the mode: Cancel · (Rotate) · Place / Move, or one Done with its caption.
 func _bar() -> Dictionary:
@@ -313,6 +332,7 @@ func _on_done(ok: bool) -> void:
 
 func _end() -> void:
 	placing = {}
+	_held = false
 	_finger = Vector2.INF
 	_press = Vector2.INF
 	farm.placement_camera_end()
