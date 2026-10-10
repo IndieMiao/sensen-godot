@@ -43,7 +43,8 @@ func test_every_p0_preset_ships_every_license_text() -> void:
 	assert_int(files.size()).is_greater(1)
 	var p0_presets := 0
 	for s in cfg.get_sections():
-		if s.ends_with(".options") or not ("p0" in str(cfg.get_value(s, "custom_features", "")).split(",")): continue
+		var features := Array(str(cfg.get_value(s, "custom_features", "")).split(",")).map(func(f: String) -> String: return f.strip_edges())
+		if s.ends_with(".options") or not ("p0" in features): continue
 		p0_presets += 1
 		var name := str(cfg.get_value(s, "name", s))
 		var filters: Array[String] = []
