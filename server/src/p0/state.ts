@@ -73,6 +73,7 @@ export interface Request { id: string; title: string; item: string; qty: number;
 export interface BoardRequest {
   id: string; template: string; items: string[]; rarity?: number; style?: string | string[]; family?: Family; kind: 'crop' | 'fish' | 'dish' | 'material' | 'visit';
   visit?: { place: string; done: boolean };   // explore (Stamp Run): the outpost to check in at, and whether the player has
+  where?: 'not_home';   // Far Pond (q(128)): fish the home city's ponds don't have (boards.ts farFish)
   qty: number; bonus: number; drawn_at: number; status: 'open' | 'accepted';
 }
 /** A board slot: a request, or empty until refill_at. */

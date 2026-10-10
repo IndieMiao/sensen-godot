@@ -1383,6 +1383,13 @@ static func _row(line: String, icon_id: String, go: String, dot := "") -> Dictio
 ## A fish one shows on the map the pond its ! hangs on; one the player cannot land yet (q(104)) has no Show, a small line
 ## `Fishing Lv4 needed`, and the whole row opens that fish's gate card (`gate`: the Fish-dex silhouette's, P0Ui).
 static func _request_row(view: Dictionary, r: Dictionary) -> Dictionary:
+	# q(128) cross-city: before the check-in `Tea Trail · Shanghai`, Show on map to that outpost's pin (亚瑟's #279 loads
+	# the city); Far Pond `Far Pond · 1/3 fish` — fish the home city's ponds don't have, no pin.
+	var v = r.get("visit", null)
+	if v is Dictionary and str(v.get("city", "")) != "":
+		return _row("%s · %s" % [str(r.title), str(v.city)], "pin", "outpost:" + str(v.get("place", "")))
+	if str(r.get("where", "")) == "not_home":
+		return _row("%s · %d/%d fish" % [str(r.title), int(r.have), int(r.qty)], "fish", "")
 	var items: Array = r.get("items", [])
 	var kind := str(r.get("kind", ""))
 	var icon_id := str(items[0]) if items.size() == 1 else str({"fish": "fish", "sow": "seed_radish", "crop": "seed_radish", "dish": "pot"}.get(kind, "board"))

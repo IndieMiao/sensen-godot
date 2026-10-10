@@ -65,6 +65,28 @@ function farmPoint(c: P0Content): { lat: number; lng: number } | null {
   return h ? { lat: h.lat, lng: h.lng } : null;
 }
 
+const ranks = new WeakMap<CityClusters, Map<string, { id: string; km: number; trip: number }[]>>();
+/**
+ * The cities a cross-city request may send the player to (q(128), SGODOT-284): clusters of ≥ 100,000 people outside
+ * home, nearest first, each with its trip tier as the travel preview gives it (the save's frozen fallback included).
+ * Cached per home and fallback; empty without the clusters table.
+ */
+export function rankedCities(c: P0Content, s: P0State): { id: string; km: number; trip: number }[] {
+  const at = farmPoint(c), cl = clusters(c);
+  if (!at || !cl) return [];
+  let byHome = ranks.get(cl);
+  if (!byHome) ranks.set(cl, byHome = new Map());
+  const fb = s.travel.fallback;
+  const key = `${s.travel.home}|${at.lat},${at.lng}|${fb.near3.join(',')}|${fb.near10.join(',')}`;
+  let list = byHome.get(key);
+  if (!list) {
+    list = cl.ranked(s.travel.home, at, fb);
+    if (byHome.size > 32) byHome.delete(byHome.keys().next().value!);
+    byHome.set(key, list);
+  }
+  return list;
+}
+
 /** §11.2.3: frozen into the save when the block is made (CityClusters.fallback); empty without the table. */
 export function fallbackOf(c: P0Content): { near3: string[]; near10: string[] } {
   const at = farmPoint(c), cl = clusters(c);
@@ -235,10 +257,11 @@ export function settleHere(c: P0Content, s: P0State, space: unknown, place: unkn
 /** return_home {}: free, instant, needs no pass; passes are kept. */
 export function returnHome(s: P0State): void { s.travel.here = s.travel.home; }
 
-/** §11.9.1: a delivery away from home counts once per cluster per day toward Regular. */
-export function noteDelivery(c: P0Content, s: P0State, now: number): void {
-  const here = s.travel.here, v = s.travel.visits[here];
-  if (here === s.travel.home || !v || !covers(s, here, now)) return;
+/** §11.9.1: a delivery away from home counts once per cluster per day toward Regular — in `city`, the player's
+ * current one, or a cross-city check-in's outpost city (q(128)). */
+export function noteDelivery(c: P0Content, s: P0State, now: number, city: string = s.travel.here): void {
+  const v = s.travel.visits[city];
+  if (city === s.travel.home || !v || !covers(s, city, now)) return;
   const today = dayKey(c, now);
   if (v.delivered_day === today) return;
   v.delivered_day = today; v.deliveries += 1;

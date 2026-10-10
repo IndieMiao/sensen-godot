@@ -5,7 +5,8 @@ extends VBoxContainer
 ## (amber only marks a gap, on the NeedTile). Top to bottom, 3 apart:
 ##   title    C12 ExtraBold ink; with `info` a › after it, and a tap on the line opens the request (BOARD-1)
 ##   status   C10 Bold secondary: Open / Tracked / Ready to deliver / Done
-##   facts    C11 Bold secondary, one line each: "4 Fine fish · any kind", "3 crops · 6 each"
+##   facts    C11 Bold secondary, one line each: "4 Fine fish · any kind", "3 crops · 6 each"; with `fact_icon` the first
+##            line has it in front, 12 square, 4 apart (q(128): a place, `Lotus Tea House · Shanghai`)
 ##   Reward   C10 Bold secondary (70) + C11 ExtraBold ink, right-aligned (78), 152 wide
 ##   needs    UiNeedTile S in a wrap (gap 10 / 12), 4 above and below
 ##   command  one Compact/Command 152 wide: Deliver / Track, or unavailable with the gap (LOCK-10,
@@ -24,6 +25,8 @@ const _REWARD_VALUE_W := 78.0
 const _REWARD_GAP := 4
 const _COMMAND_W := 152.0
 const _NEEDS_PAD := 4
+const _FACT_ICON := 12.0
+const _FACT_ICON_GAP := 4
 
 var request_id := ""
 
@@ -86,7 +89,8 @@ func _init() -> void:
 	_command.unavailable_pressed.connect(func(r: String): unavailable_pressed.emit(r))
 	add_child(_command)
 
-## Draw one request. `d`: {id, title, info (bool), status, facts (Array[String]), reward ("36 coins"), needs
+## Draw one request. `d`: {id, title, info (bool), status, facts (Array[String]), fact_icon (Texture2D, optional),
+## reward ("36 coins"), needs
 ## (Array of {id, name, have, need, icon}), command (label, "" for none), reason (the gap; "" when it can go),
 ## done (bool: delivered — status Done, no needs, no command)}.
 func show_request(d: Dictionary) -> void:
@@ -100,7 +104,25 @@ func show_request(d: Dictionary) -> void:
 		_facts.remove_child(c)
 		c.free()   # out of the tree and nothing points at it: no orphan left until the next frame
 	for f in d.get("facts", []):
-		if str(f) != "": _facts.add_child(UiKit.label(str(f), UiTokens.STYLE_C11_B, UiTokens.COLOR_SECONDARY))
+		if str(f) == "": continue
+		var line := UiKit.label(str(f), UiTokens.STYLE_C11_B, UiTokens.COLOR_SECONDARY)
+		if _facts.get_child_count() == 0 and d.get("fact_icon", null) is Texture2D:
+			var row := HBoxContainer.new()
+			row.add_theme_constant_override(&"separation", _FACT_ICON_GAP)
+			row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			var icon := TextureRect.new()
+			icon.name = "FactIcon"
+			icon.texture = d.fact_icon
+			icon.custom_minimum_size = Vector2(_FACT_ICON, _FACT_ICON)
+			icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+			icon.modulate = UiTokens.COLOR_SECONDARY
+			icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			row.add_child(icon)
+			row.add_child(line)
+			_facts.add_child(row)
+		else: _facts.add_child(line)
 	_facts.visible = _facts.get_child_count() > 0
 	_reward.text = str(d.get("reward", ""))
 	_reward_row.visible = _reward.text != ""

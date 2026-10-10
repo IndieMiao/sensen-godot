@@ -303,3 +303,75 @@ func test_p1_reward_line_shows_the_bonus_cap_and_the_check_in_toast() -> void:
 	var fish := {"coins": 36, "bonus": 20}   # Dusk Haul: the floor part is paid in full
 	assert_str(P0Board.reward_line(v, fish)).is_equal("16 coins · Bonus resets in 9h 12m")
 	assert_str(P0Logic.visit_toast(v, "v1")).is_equal("Stamp Run · Checked in\nDeliver at Mission Market Square")
+
+## q(128) cross-city (李白 / 不知火舞, bbe6cf92): the requirement line is the place and its city with a place icon, no 1/1
+## count; the gap names the outpost; Show on map goes to that pin (亚瑟's #279 loads the city); Today says where before the
+## check-in, then the hand-in at home.
+func test_p1_cross_city_card_and_today_say_where() -> void:
+	var v := _view()
+	v.boards.market.slots = [{"id": "x1", "title": "Tea Trail", "kind": "visit", "items": [], "rarity": null, "style": null,
+		"family": null, "visit": {"place": "gn-1796236~tea0", "done": false, "name": "Lotus Tea House", "city": "Shanghai",
+		"cluster": "gn-1796236", "lat": 31.2, "lng": 121.5}, "icon": null, "qty": 1, "have": 0, "ready": false,
+		"coins": 40, "status": "accepted"}]
+	var row: Dictionary = P0Board.cards(v, "market")[0]
+	assert_array(row.facts).is_equal(["Lotus Tea House · Shanghai"])
+	assert_object(row.get("fact_icon", null)).is_not_null()
+	assert_array(row.needs).is_empty()
+	assert_array([row.command, row.reason]).is_equal(["Deliver", "Visit Lotus Tea House first"])
+	var d := P0Board.detail(v, "market", "x1")
+	assert_str(str(d.effect)).is_equal("Visit Lotus Tea House in Shanghai, then come back to any San Francisco market.")
+	assert_str(str(d.go)).is_equal("outpost:gn-1796236~tea0")
+	var taken: Array = P0Logic.PinReason.taken(v)
+	assert_array([P0Logic._request_row(v, taken[0]).line, P0Logic._request_row(v, taken[0]).go]).is_equal(["Tea Trail · Shanghai", "outpost:gn-1796236~tea0"])
+	v.boards.market.slots[0].visit.done = true   # checked in: handed in at home, as Stamp Run
+	v.boards.market.slots[0].ready = true
+	row = P0Board.cards(v, "market")[0]
+	assert_array([row.status, row.command, row.reason]).is_equal(["Ready to deliver", "Deliver", ""])
+	assert_str(str(P0Logic.PinReason.taken(v)[0].deliver)).is_equal("Deliver at Mission Market Square")
+	# one line of about 40: a long name is cut, the city kept
+	var cut := P0Board.place_line("The Old Riverside Botanical Tea Pavilion", "Shanghai")
+	assert_int(cut.length()).is_less_equal(P0Board.LINE_CHARS)
+	assert_bool(cut.ends_with("… · Shanghai")).is_true()
+	assert_str(P0Board.place_line("Lotus Tea House", "Shanghai")).is_equal("Lotus Tea House · Shanghai")
+
+## Far Pond (q(128) 甲): fish the home city's ponds don't have, as the bag holds them; the count and the fish to try are
+## the server's.
+func test_p1_far_pond_reads_not_found_at_home() -> void:
+	var v := _view()
+	v.names.merge({"fish_tilapia": "Tilapia", "fish_smelt": "Smelt", "fish_mullet": "Grey Mullet"})
+	v.boards.market.slots = [{"id": "f1", "title": "Far Pond", "kind": "fish", "items": [], "rarity": null, "style": null,
+		"family": null, "where": "not_home", "visit": null, "icon": "fish_tilapia", "qty": 3, "have": 1, "ready": false,
+		"coins": 29, "status": "accepted", "tries": ["fish_tilapia", "fish_smelt", "fish_mullet"]}]
+	var row: Dictionary = P0Board.cards(v, "market")[0]
+	assert_array(row.facts).is_equal(["3 fish not found in San Francisco"])
+	assert_object(row.get("fact_icon", null)).is_same(P0Logic.icon("fish"))
+	assert_str(str(row.reward)).is_equal("29 coins")
+	assert_array(row.needs.map(func(n): return [n.have, n.need])).is_equal([[1, 3]])
+	assert_str(str(row.reason)).is_equal("Need 2 more fish")
+	var d := P0Board.detail(v, "market", "f1")
+	assert_str(str(d.effect)).is_equal("Bring 3 fish that San Francisco's ponds don't have to any San Francisco market.")
+	assert_str(str(d.example)).is_equal("Try Tilapia, Smelt or Grey Mullet")
+	assert_str(str(d.go)).is_equal("")   # no one place: no Show on map (不知火舞 on #285)
+	var r := P0Logic._request_row(v, P0Logic.PinReason.taken(v)[0])
+	assert_array([r.line, r.go]).is_equal(["Far Pond · 1/3 fish", ""])
+	# two to try, one, none (the server names them at the level now)
+	v.boards.market.slots[0].tries = ["fish_smelt", "fish_tilapia"]
+	assert_str(P0Board.far_tries(v, v.boards.market.slots[0])).is_equal("Try Smelt or Tilapia")
+	v.boards.market.slots[0].tries = ["fish_smelt"]
+	assert_str(P0Board.far_tries(v, v.boards.market.slots[0])).is_equal("Try Smelt")
+	v.boards.market.slots[0].tries = []
+	assert_str(str(P0Board.detail(v, "market", "f1").example)).is_equal("")
+	# any other request has no example line
+	v.boards.market.slots[0].where = null
+	assert_str(str(P0Board.detail(v, "market", "f1").example)).is_equal("")
+
+## The board card's place line: the icon in front of the first fact only when the row has one (q(128)).
+func test_p1_board_card_fact_icon() -> void:
+	var card: UiBoardCard = auto_free(UiBoardCard.new())
+	add_child(card)
+	card.show_request({"id": "x1", "title": "Tea Trail", "status": "Tracked", "facts": ["Lotus Tea House · Shanghai"],
+		"fact_icon": P0Logic.icon("pin"), "reward": "40 coins", "needs": [], "command": "Deliver", "reason": "Visit Lotus Tea House first"})
+	assert_object(card.find_child("FactIcon", true, false)).is_not_null()
+	card.show_request({"id": "m1", "title": "Dusk Haul", "status": "Open", "facts": ["4 Fine fish · any kind"], "reward": "36 coins",
+		"needs": [], "command": "Track", "reason": ""})
+	assert_object(card.find_child("FactIcon", true, false)).is_null()

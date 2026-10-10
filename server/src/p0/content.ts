@@ -85,8 +85,12 @@ export interface Need {
   /** §9.6.3 regional templates: the home climate's regional items (zone), the home city's 2 regional fish (city), or
    * regional items of another climate (other_zone). One such item is drawn; max_rarity caps it (Local Flavor: Fine). */
   regional?: 'zone' | 'city' | 'other_zone'; max_rarity?: number;
-  /** §9.6.3 explore templates (kind visit): check in at another outpost of the home city than the board's own (Stamp Run). */
-  visit?: { role?: string; where: 'same_city' };
+  /** §9.6.3 explore templates (kind visit): check in at another outpost of the home city than the board's own (Stamp Run);
+   * or, cross-city (q(128), SGODOT-284), at the first `role` outpost (a small city's Trading Post) of a city of one of
+   * the `trip` tiers (Tea Trail 1–2, Postcard Trip 2–3), or of the nearest city in another climate zone (New Climate). */
+  visit?: { role?: 'market' | 'tea'; where: 'same_city' | 'other_city' | 'other_zone'; trip?: [number, number] };
+  /** Far Pond (q(128)): fish the home city's ponds don't have, wherever they were caught (boards.ts farFish). */
+  where?: 'not_home';
 }
 /**
  * A system request template (§9.6.3). climate narrows it to the home climate (regional templates, `Temperate`);

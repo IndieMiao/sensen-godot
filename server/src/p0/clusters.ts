@@ -79,6 +79,24 @@ export class CityClusters {
   }
 
   /**
+   * Every cluster of ≥ minPop people outside home with its distance from the farm and its trip tier as trip() gives it
+   * (fallback included), nearest first (ties by id): the pool the cross-city requests draw their city from (SGODOT-284,
+   * 亚瑟: the same TRIP_KM bounds as tripOf and the travel preview). The caller caches it per home.
+   */
+  ranked(home: string, farm: Point, fallback: { near3: string[]; near10: string[] }, minPop = FALLBACK_MIN_POP): { id: string; km: number; trip: number }[] {
+    return [...this.byId.values()]
+      .filter(c => c.id !== home && c.population >= minPop)
+      .map(c => {
+        const km = distanceKm(farm, c);
+        let trip = tripByKm(km);
+        if (fallback.near3.includes(c.id)) trip = 1;
+        else if (fallback.near10.includes(c.id)) trip = Math.min(trip, 2);
+        return { id: c.id, km, trip };
+      })
+      .sort((a, b) => a.km - b.km || (a.id < b.id ? -1 : 1));
+  }
+
+  /**
    * The trip tier to a cluster from the home farm (§11.2.1 + §11.2.3): by distance, then the lower of that and the
    * fallback tier (nearest 3 → Trip 1, nearest 10 → at most Trip 2). The home cluster is Trip 1.
    */

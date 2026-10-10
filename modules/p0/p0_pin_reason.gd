@@ -129,6 +129,7 @@ static func taken(view: Dictionary) -> Array:
 			var items: Array = r.get("items", [])
 			out.append({"id": str(r.get("id", "")), "title": str(r.get("title", "")), "kind": str(r.get("kind", "fish" if items.any(func(i): return str(i).begins_with("fish_")) else "")),
 				"items": items, "rarity": r.get("rarity", null),
+				"visit": r.get("visit", null), "where": r.get("where", null),   # cross-city (q(128)): the Today row says where
 				"need_name": _need_name(view, str(r.get("kind", "")), items, r.get("rarity", null)),
 				"have": int(r.get("have", 0)), "qty": int(r.get("qty", 1)),
 				"ready": bool(r.get("ready", int(r.get("have", 0)) >= int(r.get("qty", 1)))),
