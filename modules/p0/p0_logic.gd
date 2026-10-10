@@ -9,13 +9,65 @@ const ICON_DIR := "res://assets/p0/icons/%s.svg"
 const PinReason := preload("res://modules/p0/p0_pin_reason.gd")   # the taken requests and the pins they mark (q(104))
 
 static var _content: Dictionary = {}
+## Problems found merging the content fragments (tests read it; the server refuses to start on the same ones).
+static var content_errors: Array = []
 
-## The bundled content table (shared with the server) for display-only lookups the view doesn't carry.
+const CONTENT_DIR := "res://assets/p0/content/"
+
+## The bundled content table (shared with the server) for display-only lookups the view doesn't carry, with the
+## content fragments merged in (SGODOT-275, see merge_content).
 static func content() -> Dictionary:
 	if _content.is_empty():
 		var parsed = JSON.parse_string(FileAccess.get_file_as_string("res://assets/p0/p0_content.json"))
-		if parsed is Dictionary: _content = parsed
+		if parsed is Dictionary:
+			_content = parsed
+			content_errors = merge_content_dir(_content, CONTENT_DIR)
 	return _content
+
+## Content fragments (SGODOT-275, 亚瑟's cross-city plan §6), as the server's mergeContentDir: assets/p0/content/
+## <line>_<topic>.json, shaped like the main table, merged in name order. Objects merge key by key, arrays of objects
+## with an `id` append by id; a key, an id or a scalar already there is not applied and comes back as an error naming
+## the file and the path. Keys starting with `_` are skipped. Returns the errors (empty when all merged).
+static func merge_content_dir(base: Dictionary, dir: String) -> Array:
+	var errors: Array = []
+	if not DirAccess.dir_exists_absolute(dir): return errors
+	var files: Array = []
+	for f in DirAccess.get_files_at(dir):   # an exported pack may list a file under its .remap name
+		var name := str(f).trim_suffix(".remap")
+		if name.ends_with(".json") and not files.has(name): files.append(name)
+	files.sort()
+	for f in files:
+		var add = JSON.parse_string(FileAccess.get_file_as_string(dir.path_join(f)))
+		if add is Dictionary: errors.append_array(merge_content(base, add, f))
+		else: errors.append("p0 content: %s: not a JSON object" % f)
+	return errors
+
+static func merge_content(base: Dictionary, add: Dictionary, file: String, at := "") -> Array:
+	var errors: Array = []
+	for k in add:
+		if at == "" and str(k).begins_with("_"): continue
+		var where := str(k) if at == "" else "%s.%s" % [at, k]
+		if not base.has(k):
+			base[k] = add[k]
+			continue
+		var have = base[k]
+		var v = add[k]
+		if have is Dictionary and v is Dictionary:
+			errors.append_array(merge_content(have, v, file, where))
+		elif have is Array and v is Array and _all_with_id(have) and _all_with_id(v):
+			var ids := {}
+			for e in have: ids[str(e.id)] = true
+			for e in v:
+				if ids.has(str(e.id)): errors.append("p0 content: %s: %s already has id %s" % [file, where, e.id])
+				else:
+					ids[str(e.id)] = true
+					have.append(e)
+		else:
+			errors.append("p0 content: %s: %s is already set (fragments add, they never change an entry)" % [file, where])
+	return errors
+
+static func _all_with_id(list: Array) -> bool:
+	return list.all(func(e): return e is Dictionary and e.has("id"))
 
 ## FISH-5 line 1 for a level gate: "Fishing Lv2 · 3 XP to go" one level up, else "Fishing Lv4 needed · about 30 casts"
 ## (Common catches at today's level; the estimate ignores first-catch bonuses).

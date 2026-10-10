@@ -7,6 +7,7 @@
 !packages/blueprint-core/**
 !server/**
 !assets/p0/p0_content.json
+!assets/p0/content/**
 !assets/p0/p0_outposts.json
 !assets/p0/p0_ponds.json
 !assets/ponds/catalog.json
