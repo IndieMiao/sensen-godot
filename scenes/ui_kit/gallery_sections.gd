@@ -1109,6 +1109,7 @@ static func _scene_actions() -> Control:
 	row.add_child(_captioned(_scene_action("Sow ×1", "2 Energy", S.HOLDING, 0.6), "holding"))
 	row.add_child(_captioned(_scene_action("Cast", "5 Energy", S.PENDING), "pending"))
 	row.add_child(_captioned(_scene_action("Till", "", S.DEFAULT), "0 Energy: no price"))
+	row.add_child(_captioned(_scene_action("Light Torch", "", S.DEFAULT), "0 Energy: two lines"))
 	return row
 
 static func _action_keys() -> Control:

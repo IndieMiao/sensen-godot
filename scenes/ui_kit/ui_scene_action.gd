@@ -10,7 +10,9 @@ extends Control
 ## Like the shipped key (LOCK-24 feel) it fires on touch-down: `pressed_down` on contact, `released` when the
 ## finger lifts, so the owner can repeat while it is held. On touchscreens it reads ScreenTouch of any finger
 ## (the right thumb is often the second finger, which Godot does not emulate as a mouse); on desktop the mouse.
-## Zero-Energy actions carry no price (LOCK-02 "0 体力的动作不写价"): pass "" as `cost`.
+## Zero-Energy actions carry no price (LOCK-02 "0 体力的动作不写价"): pass "" as `cost`. With no second line the verb
+## sits in the middle of the key; a verb wider than VERB_ALONE_MAX breaks at a space onto two centred lines at its own
+## size (`Light` / `Torch`; q(122), 不知火舞 on #264, the frames of row 67).
 ## Both lines keep the full copy: text wider than the 80 px box steps its font size down (to _MIN_FONT) instead of
 ## being clipped or ellipsised ("Need 2 Energy", "Ready in 3h 59m").
 
@@ -28,6 +30,8 @@ const _COST_H := 16.0
 const _SPIN_TURN_S := 1.0          # one spinner turn per second (engineering default, WP7-B F-08)
 const _SPIN_SWEEP := PI * 0.5      # Pending spinner arc: -90° to 0° in the main
 const _MIN_FONT := 10              # smallest step for copy that does not fit (engineering default)
+## A verb alone wider than this breaks at a space onto two lines (Light Torch is 80 at 15 ExtraBold).
+const VERB_ALONE_MAX := 72.0
 
 var verb := "": set = set_verb
 ## The second line: "2 Energy", "Need 2 Energy" or the reason; "" hides it.
@@ -91,9 +95,10 @@ func _text(style: StringName, top: float, h: float) -> Label:
 func _refresh() -> void:
 	if _verb == null: return
 	var s := drawn_state()
-	_verb.text = verb
+	_verb.text = _verb_lines()
 	_cost.text = cost
 	_cost.visible = cost != ""
+	_place_verb()
 	_fit(_verb)
 	_fit(_cost)
 	var grey := s == State.UNAVAILABLE
@@ -102,7 +107,34 @@ func _refresh() -> void:
 	modulate.a = UiTokens.OPACITY_SCENE_ACTION_PENDING if s == State.PENDING else 1.0
 	queue_redraw()
 
-## Steps the label's font size down until its text fits the box width; resets when it fits at the style size.
+## The verb as drawn: alone on the key and wider than VERB_ALONE_MAX, broken at the space that leaves the narrower
+## longest line (`Light\nTorch`); otherwise as it is. Needs the theme's font (in the tree).
+func _verb_lines() -> String:
+	if cost != "" or not verb.contains(" ") or not _verb.is_inside_tree(): return verb
+	var font := _verb.get_theme_font(&"font")
+	var fs := _verb.get_theme_font_size(&"font_size")
+	var w := func(t: String) -> float: return font.get_string_size(t, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+	if float(w.call(verb)) <= VERB_ALONE_MAX: return verb
+	var words := verb.split(" ")
+	var best := verb
+	var widest := INF
+	for i in range(1, words.size()):
+		var a := " ".join(words.slice(0, i))
+		var b := " ".join(words.slice(i))
+		var m := maxf(float(w.call(a)), float(w.call(b)))
+		if m < widest:
+			widest = m
+			best = a + "\n" + b
+	return best
+
+## The verb's box: over the cost (the frame's 23–43) with a second line, else centred on the key, one or two lines tall.
+func _place_verb() -> void:
+	var lines := _verb.text.count("\n") + 1
+	var top := _VERB_TOP if cost != "" else (UiTokens.SIZE_SCENE_ACTION - _VERB_H * lines) * 0.5
+	_verb.offset_top = top
+	_verb.offset_bottom = top + _VERB_H * lines
+
+## Steps the label's font size down until its widest line fits the box width; resets when it fits at the style size.
 func _fit(l: Label) -> void:
 	l.remove_theme_font_size_override(&"font_size")
 	if not l.is_inside_tree() or l.text == "": return
@@ -110,7 +142,11 @@ func _fit(l: Label) -> void:
 	var fs := l.get_theme_font_size(&"font_size")
 	var room := UiTokens.SIZE_SCENE_ACTION - _TEXT_INSET * 2.0
 	var base := fs
-	while fs > _MIN_FONT and font.get_string_size(l.text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > room: fs -= 1
+	var widest := func(size: int) -> float:
+		var m := 0.0
+		for line in l.text.split("\n"): m = maxf(m, font.get_string_size(line, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x)
+		return m
+	while fs > _MIN_FONT and float(widest.call(fs)) > room: fs -= 1
 	if fs != base: l.add_theme_font_size_override(&"font_size", fs)
 
 func _notification(what: int) -> void:

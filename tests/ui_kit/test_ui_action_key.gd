@@ -40,6 +40,28 @@ func test_key_is_88_and_hides_an_empty_price() -> void:
 	k.cost = "2 Energy"
 	assert_bool(k._cost.visible).is_true()
 
+func test_a_verb_alone_sits_in_the_middle_and_breaks_at_a_space() -> void:
+	# q(122), 不知火舞 on #264: no second line — the verb centred on the key; over 72 px, two centred lines, same size
+	var k := _host(UiSceneAction.new()) as UiSceneAction
+	await _settle()
+	var mid := UiTokens.SIZE_SCENE_ACTION * 0.5
+	k.verb = "Attack"
+	k.cost = ""
+	assert_str(k._verb.text).is_equal("Attack")
+	assert_float(k._verb.get_rect().get_center().y).is_equal_approx(mid, 0.5)
+	k.verb = "Light Torch"
+	assert_str(k._verb.text).is_equal("Light\nTorch")
+	assert_float(k._verb.get_rect().get_center().y).is_equal_approx(mid, 0.5)
+	assert_int(k._verb.get_line_count()).is_equal(2)
+	assert_bool(k._verb.has_theme_font_size_override(&"font_size")).is_false()   # not shrunk
+	k.verb = "Set Trap"   # fits on one line
+	assert_str(k._verb.text).is_equal("Set Trap")
+	# with a second line the verb keeps its place over it and is never broken
+	k.verb = "Light Torch"
+	k.cost = "2 Energy"
+	assert_str(k._verb.text).is_equal("Light Torch")
+	assert_float(k._verb.offset_top).is_equal(UiSceneAction._VERB_TOP)
+
 func test_long_copy_steps_its_font_down_instead_of_clipping() -> void:
 	var k := _host(UiSceneAction.new()) as UiSceneAction
 	await _settle()
