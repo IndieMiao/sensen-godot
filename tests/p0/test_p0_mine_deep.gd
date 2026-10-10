@@ -420,3 +420,31 @@ func test_the_swing_shows_the_sword_and_plays_no_labour() -> void:
 	assert_bool(mine.sword_shown()).is_false()
 	mine._hold_sword("")                              # no Combat slot weapon: no sword
 	assert_object(mine._sword).is_null()
+
+## The swing measures to a monster's body (不知火舞 on 288, measured 10-10): the elite (0.65 m) waits 2.4 m centre to
+## centre behind the player before its lunge; the player turns to it and the swing reaches its body's edge.
+func test_the_swing_turns_to_the_elite_and_reaches_its_body() -> void:
+	var Combat = load("res://modules/mining/p0_mine_combat.gd")
+	var bp := Layout_bp()
+	var mover := PlayerMover.new(bp, BlueprintGrid.new(bp))
+	var c: Node3D = auto_free(Combat.new())
+	add_child(c)
+	c.sync_p0(_view(_run(_five([true, true, true, true, true]))), 5, mover)
+	var elite: Dictionary = c.enemies.values()[0]
+	assert_float(float(elite.spec.radius)).is_equal(0.65)
+	var at := Vector3(4.75, 0, -0.55)
+	mover.position = at
+	mover.facing = Vector3(0, 0, 1)                         # facing the camera, the elite behind
+	elite.node.position = at + Vector3(0, 0, -2.39)          # its wind-up spot (the 10-10 run)
+	elite.mover.position = elite.node.position
+	assert_float(Combat.edge_distance(at, elite)).is_equal_approx(1.74, 0.001)
+	c.cooldown = 0.0
+	var hit: Array = c.swing({}, mover)
+	assert_vector(mover.facing).is_equal_approx(Vector3(0, 0, -1), Vector3.ONE * 0.001)   # turned to it
+	assert_array(hit).is_empty()                           # 0.09 m short of its body: a step in reaches it
+	elite.node.position = at + Vector3(0, 0, -2.2)          # edge 1.55 m: within REACH 1.65 of the body
+	elite.mover.position = elite.node.position
+	c.cooldown = 0.0
+	assert_array(c.swing({}, mover)).has_size(1)
+	# the legacy centre test would have missed it there (2.2 > 1.65)
+	assert_bool(Combat.within_swing(at, mover.facing, elite.node.position, Combat.REACH, 120.0)).is_false()
