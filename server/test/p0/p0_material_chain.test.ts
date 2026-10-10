@@ -1,4 +1,5 @@
-/** SGODOT-231: gathering spots, mine floors 1–2, the workbench, coming home and Timber Run from storage. */
+/** SGODOT-231: gathering spots, mine floors 1–2, the workbench, coming home and Timber Run from storage (floors 3–5,
+ * combat, Express, quartz and the Old Tree: SGODOT-275, p0_mine_deep.test.ts). */
 import { describe, expect, it } from 'vitest';
 import { add, count } from '../../src/p0/bag.js';
 import { loadP0Content } from '../../src/p0/content.js';
@@ -59,7 +60,7 @@ describe('mine floors 1–2 (§13.3, LOCK-21)', () => {
     cleared = clearFloor(s, 2, t); s = cleared.s; spent += cleared.spent;
     expect(spent).toBe(28);
     expect(count(s.bag, 'stone')).toBe(12);
-    expect(s.mine.run!.floors.every(f => f.broken.length === 6)).toBe(true);
+    expect(s.mine.run!.floors.slice(0, 2).every(f => f.broken.length === 6)).toBe(true);
   });
 
   it('every rock is 2 Energy and gives Stone (1 with the Starter Pickaxe) plus its derived drop; a broken rock is gone', () => {
@@ -92,7 +93,8 @@ describe('mine floors 1–2 (§13.3, LOCK-21)', () => {
     expect(energySpent(r.ev)).toBe(0);
     r = step(r.s, { type: 'mine_floor', floor: 2 }, t += STEP);
     expect(energySpent(r.ev)).toBe(0);
-    expect(refuse(r.s, { type: 'mine_rock', floor: 3, rock: 0 }, t + STEP).code).toBe('bad_floor');
+    expect(refuse(r.s, { type: 'mine_rock', floor: 3, rock: 0 }, t + STEP).code).toBe('floor_not_paid');
+    expect(refuse(r.s, { type: 'mine_rock', floor: 6, rock: 0 }, t + STEP).code).toBe('bad_floor');
   });
 
   it('a floor clears with its sixth rock (Floor 1 cleared · Elevator stop)', () => {
@@ -113,7 +115,7 @@ describe('mine floors 1–2 (§13.3, LOCK-21)', () => {
     const r = step(s, { type: 'mine_new_run' }, t += STEP);
     expect(energySpent(r.ev)).toBe(2);
     expect(r.s.mine.run!.id).toBe(2);
-    expect(r.s.mine.run!.floors.map(f => f.paid)).toEqual([true, false]);
+    expect(r.s.mine.run!.floors.map(f => f.paid)).toEqual([true, false, false, false, false]);
     expect(r.s.day.mine_runs).toBe(2);
     s = r.s;
     ({ s, t } = clearFloor(s, 1, t));
@@ -154,11 +156,10 @@ describe('mine floors 1–2 (§13.3, LOCK-21)', () => {
     const run = s.mine.run!;
     const floor2 = new Set(Array.from({ length: 400 }, (_, i) => rockDrop(c, s, { ...run, seed: i }, 2, i % 6)));
     expect(floor2.has('clay')).toBe(false);
-    expect(floor2.has('quartz')).toBe(false);
-    expect([...floor2].sort()).toEqual(['copper_ore', 'rock_salt', null].sort());
+    expect([...floor2].sort()).toEqual(['copper_ore', 'quartz', 'rock_salt', null].sort());
   });
 
-  it('floor 2 drops in P0 are copper 30 / rock salt 35 / none 35 (quartz folded into salt, knob A, q(47)); floor 1 is unchanged', () => {
+  it('P1 restores floor 2\'s quartz: copper 30 / rock salt 20 / quartz 15 / none 35 (§13.3.3; P0 had folded it into salt, q(47)); floor 1 is unchanged', () => {
     const { s } = step(fresh(), { type: 'mine_enter' });
     const run = s.mine.run!;
     const share = (floor: number) => {
@@ -170,9 +171,10 @@ describe('mine floors 1–2 (§13.3, LOCK-21)', () => {
       return Object.fromEntries(Object.entries(n).map(([k, v]) => [k, Math.round(v / 30)]));   // percent
     };
     const f2 = share(2);
-    expect(Object.keys(f2).sort()).toEqual(['copper_ore', 'null', 'rock_salt']);
+    expect(Object.keys(f2).sort()).toEqual(['copper_ore', 'null', 'quartz', 'rock_salt']);
     expect(Math.abs(f2.copper_ore - 30)).toBeLessThanOrEqual(3);
-    expect(Math.abs(f2.rock_salt - 35)).toBeLessThanOrEqual(3);
+    expect(Math.abs(f2.rock_salt - 20)).toBeLessThanOrEqual(3);
+    expect(Math.abs(f2.quartz - 15)).toBeLessThanOrEqual(3);
     expect(Math.abs(f2.null - 35)).toBeLessThanOrEqual(3);
     expect(c.mine.floors[0].drops).toEqual([['copper_ore', 35], ['rock_salt', 25], ['clay', 15], [null, 25]]);
   });
@@ -300,13 +302,17 @@ describe('gathering spots (§13.2, q(44))', () => {
     expect(count(lv2.s.bag, 'wild_herb')).toBe(0);
   });
 
-  it('the Clay Bank opens at Homestead Lv2; there is no Old Tree in P0', () => {
+  it('the Clay Bank opens at Homestead Lv2, the Old Tree at Lv3 with 1 Hardwood a round (P1, §13.2.1)', () => {
     const s = fresh();
     expect(refuse(s, { type: 'gather', spot: 'spot_clay_bank' })).toEqual({ code: 'homestead_level', detail: { need: 2 } });
     s.homestead.level = 2;
     expect(step(s, { type: 'gather', spot: 'spot_clay_bank' }).s.storage.clay).toBe(2);
-    expect(refuse(s, { type: 'gather', spot: 'spot_old_tree' }).code).toBe('bad_spot');
-    expect(viewOf(c, fresh(), T0).gather.spots.map(sp => sp.id)).toEqual(['spot_grove', 'spot_rock_pile', 'spot_reed_bank', 'spot_herb_patch', 'spot_clay_bank']);
+    expect(refuse(s, { type: 'gather', spot: 'spot_old_tree' }, T0 + STEP)).toEqual({ code: 'homestead_level', detail: { need: 3 } });
+    s.homestead.level = 3;
+    const tree = step(s, { type: 'gather', spot: 'spot_old_tree' }, T0 + STEP).s;
+    expect(tree.storage.hardwood).toBe(1);
+    expect(refuse(tree, { type: 'gather', spot: 'spot_old_tree' }, T0 + 2 * STEP).code).toBe('not_ready');
+    expect(viewOf(c, fresh(), T0).gather.spots.map(sp => sp.id)).toEqual(['spot_grove', 'spot_rock_pile', 'spot_reed_bank', 'spot_herb_patch', 'spot_clay_bank', 'spot_old_tree']);
   });
 
   it('taps faster than 0.9 s are refused as tempo; gathering from away is not_home', () => {
