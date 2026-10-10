@@ -1,7 +1,8 @@
 /** P0 content (assets/p0/p0_content.json), shared with the Godot client. */
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { CityClusters } from './clusters.js';
 
 export type Skill = 'farming' | 'fishing' | 'cooking';
 export const SKILLS: readonly Skill[] = ['farming', 'fishing', 'cooking'];
@@ -43,13 +44,32 @@ export const SHOPS: readonly ShopId[] = ['homestead', 'tackle', 'market', 'tea',
 export type QuotaId = 'fish_tackle' | 'dish' | 'material' | 'request_bonus' | 'sys_requests';
 export type BoardId = 'stall' | 'market';
 
-/** What a request asks for: a kind, optionally narrowed to one id, one rarity, the same item or N distinct items. */
-export interface Need { kind: 'crop' | 'fish' | 'dish' | 'material' | 'sow'; id?: string; rarity?: number; same?: boolean; distinct?: number }
-export interface RequestTemplate { title: string; need: Need; skill: Skill; gate: [Skill, number][]; bonus: number; enabled?: boolean }
+/**
+ * What a request asks for: a kind, optionally narrowed to one id, one rarity, a dish style or styles (§9.6.3 P1: `Soup`
+ * for Granny Wu, Grilled or Dessert for Packed Lunches), a crop family (`O` for the Orchard Basket), the same item or N
+ * distinct items.
+ */
+export interface Need {
+  kind: 'crop' | 'fish' | 'dish' | 'material' | 'sow'; id?: string; rarity?: number; style?: string | string[];
+  family?: Family; same?: boolean; distinct?: number;
+}
+/**
+ * A system request template (§9.6.3). climate narrows it to the home climate (regional templates, `Temperate`);
+ * type is the card's family (output by default; regional / explore / together wait for travel, so they ship disabled).
+ */
+export interface RequestTemplate {
+  title: string; need: Need; skill: Skill; gate: [Skill | 'homestead', number][]; bonus: number; enabled?: boolean;
+  climate?: string[]; type?: 'output' | 'regional' | 'explore' | 'together'; text?: string;
+  /** Quantity × scale, rounded up (李白's Wholesale Order and Fish Market Crate: 1.5). */
+  scale?: number;
+}
+/** A personal request's one-time reward beyond coins and +5 (§9.6.1, Trusted story requests): an item, a recipe page Tasted, a title. */
+export interface ResidentReward { item?: [string, number]; recipe?: string; title?: string }
 export interface ResidentRequest {
   id: string; title: string; text: string; stage: string; need: Need; qty: number; coins: number;
   /** The request card's need line when the rule alone would mislead (q(46): the only P0 Rare fish is the Pond koi). */
   need_line?: string;
+  reward?: ResidentReward;
 }
 /** §13.2 gathering spot (SGODOT-231): the first yield is the spot's material (Farm Storage, +1 with gloves). */
 export interface GatherSpot { name: string; yield: [string, number][]; homestead: number }
@@ -64,6 +84,8 @@ export interface WorkbenchRecipe {
 export interface ResidentDef {
   name: string; role: string; portrait: string; likes: string; gift_meal: string; one_per_day: boolean;
   lines: Record<string, string>; requests: ResidentRequest[];
+  /** §7.5.3 / §7.16.3: the pages this resident teaches from Familiar, one a week; empty = none of their style yet. */
+  teaches?: string[];
 }
 
 export interface P0Content {
@@ -115,6 +137,10 @@ export interface P0Content {
   quotas: Record<QuotaId, { cap: number; scope: string }>;
   affinity: {
     stages: [string, number][]; first_chat: number; request: number; gift_meal_stage: string;
+    /** §7.5.3 Taught: from this stage, every `every_days` days, one page the player has not got yet. */
+    lesson?: { stage: string; every_days: number };
+    /** §9.6.1: a resident's next request opens this long after the last one is done (24 h; P0's one_per_day = the player day). */
+    next_request_h?: number;
     gift: { loved_fine: number; liked: number; any: number; perfect: number; cap: number; mystery: number; chef_touch: { cooking: number; bonus: number; cap: number } };
     mystery_line: string;
   };
@@ -174,11 +200,16 @@ export const DEFAULT_P0_CONTENT = path.resolve(path.dirname(fileURLToPath(import
 export function loadP0Content(file = DEFAULT_P0_CONTENT): P0Content {
   const c = JSON.parse(readFileSync(file, 'utf8')) as P0Content;
   const dir = path.dirname(file);
+  mergeContentDir(c as unknown as Record<string, unknown>, path.join(dir, 'content'));
   const outposts = path.join(dir, 'p0_outposts.json');
   if (existsSync(outposts)) {
     c.outposts = (JSON.parse(readFileSync(outposts, 'utf8')).outposts as { id: string; role: string; residents?: string[] }[])
       .map(o => ({ id: o.id, role: o.role, residents: o.residents ?? [] }));
   }
+  // v5 (SGODOT-278): the frozen city clusters beside the content (亚瑟's build_clusters.mjs), with the server's member table.
+  const clusters = path.join(dir, 'city_clusters.json');
+  // Not enumerable: a structuredClone of the content (tests) leaves it out instead of copying a class without methods.
+  if (existsSync(clusters)) Object.defineProperty(c, 'clusters', { value: CityClusters.load(clusters), enumerable: false, writable: true, configurable: true });
   const ponds = path.join(dir, 'p0_ponds.json');
   if (existsSync(ponds)) {
     for (const l of JSON.parse(readFileSync(ponds, 'utf8')).locations as { id: string; lat: number; lng: number }[]) {
@@ -187,6 +218,49 @@ export function loadP0Content(file = DEFAULT_P0_CONTENT): P0Content {
     }
   }
   return c;
+}
+
+/**
+ * Content fragments (SGODOT-275, 亚瑟's cross-city plan §6): from P1 on each line adds its data in its own file,
+ * assets/p0/content/<line>_<topic>.json, shaped like the main table (the same top-level keys). The files are merged
+ * in name order into the main table, never over it: objects merge key by key, arrays of objects with an `id` append
+ * by id; a key, an id or a scalar that is already there is an error naming the file and the path. So two lines can
+ * never change the same entry, and a clash shows up in the tests rather than as one line's data silently winning.
+ * Keys starting with `_` (a fragment's own `_note`) are skipped. The Godot client merges the same way (P0Logic).
+ */
+export const CONTENT_FRAGMENT = /^[a-z][a-z0-9]*(_[a-z0-9]+)*\.json$/;
+
+export function mergeContentDir(base: Record<string, unknown>, dir: string): string[] {
+  if (!existsSync(dir)) return [];
+  const files = readdirSync(dir).filter(f => f.endsWith('.json')).sort();
+  for (const f of files) {
+    if (!CONTENT_FRAGMENT.test(f)) throw new Error(`p0 content: ${f}: name must be <line>_<topic>.json in lower case`);
+    mergeContent(base, JSON.parse(readFileSync(path.join(dir, f), 'utf8')) as Record<string, unknown>, f);
+  }
+  return files;
+}
+
+const isObject = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v);
+const withId = (v: unknown): v is { id: string } => isObject(v) && typeof v.id === 'string';
+
+export function mergeContent(base: Record<string, unknown>, add: Record<string, unknown>, file: string, at = ''): void {
+  for (const [k, v] of Object.entries(add)) {
+    if (at === '' && k.startsWith('_')) continue;
+    const where = at === '' ? k : `${at}.${k}`;
+    if (!(k in base)) { base[k] = v; continue; }
+    const have = base[k];
+    if (isObject(have) && isObject(v)) { mergeContent(have, v, file, where); continue; }
+    if (Array.isArray(have) && Array.isArray(v) && have.every(withId) && v.every(withId)) {
+      const ids = new Set(have.map(e => e.id));
+      for (const e of v) {
+        if (ids.has(e.id)) throw new Error(`p0 content: ${file}: ${where} already has id ${e.id}`);
+        ids.add(e.id);
+        have.push(e);
+      }
+      continue;
+    }
+    throw new Error(`p0 content: ${file}: ${where} is already set (fragments add, they never change an entry)`);
+  }
 }
 
 export function cropById(c: P0Content, id: string): Crop | undefined { return c.crops.find(crop => crop.id === id); }

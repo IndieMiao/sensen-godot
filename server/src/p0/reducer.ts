@@ -3,7 +3,7 @@ import { cropById, cropBySeed, rodById, type P0Content } from './content.js';
 import { add, count, room, take } from './bag.js';
 import { collectPot, eatDish, startPot, recordHeat, settleStove } from './cooking.js';
 import { boardCommand, settleBoards, tracked } from './boards.js';
-import { expireGiftMeals, giftResident, noteSown, residentRequestCommand, talk } from './residents.js';
+import { expireGiftMeals, giftResident, learn, noteSown, residentRequestCommand, talk } from './residents.js';
 import { castLine, reelLine, type FishCommand } from './fishing.js';
 import { upgradeHomestead } from './homestead.js';
 import { takeFromCabinet } from './kitchen_storage.js';
@@ -16,6 +16,7 @@ import { claimParcel, PARCEL_LIMIT, settleParcels } from './parcels.js';
 import { dayKey, maxEnergy, scaledXp, settleEnergy, skillLevel, xpPercent } from './rules.js';
 import { buyback, buyItem, drink, moveStorage, offerOf, sellItem, setLock } from './shops.js';
 import { emptyDay, type P0State, type Plot } from './state.js';
+import { noteDelivery, noteEntered, requirePass, returnHome, settleExplorer, travel } from './travel.js';
 
 export type { P0Event } from './progress.js';
 
@@ -48,12 +49,15 @@ type P0CommandBody =
   | { type: 'homestead_upgrade' }
   | { type: 'talk'; resident: string }
   | { type: 'gift'; resident: string; item: string }
+  | { type: 'learn'; resident: string }   // Recipe lesson on the dialogue bar (§7.5.3)
   | MineCommand
   | { type: 'gather'; spot: string }
   | { type: 'craft'; recipe: string }
   | { type: 'claim_parcel'; key: string }
   | { type: 'claim_parcels'; keys: string[] }   // Claim all: the keys on screen, so a retry never takes a newer parcel
-  | { type: 'read_inbox'; keys: string[] };
+  | { type: 'read_inbox'; keys: string[] }
+  | { type: 'travel'; to: string }   // v5 (SGODOT-278): free in the first version, a 24 h Day Pass
+  | { type: 'return_home' };
 
 export type P0Result =
   | { ok: true; state: P0State; events: P0Event[] }
@@ -76,7 +80,14 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
   if (!aimed) settleStove(c, s, now, events);
   settleMine(c, s, now);
   settleParcels(c, s, now);
+  // v5: a pond or outpost needs a pass for its city (home always); nothing changes when it is refused.
+  // A cast without a place fishes the remembered pond: a new cast there is checked as well (the pass may have run out).
+  const castAt = cmd.type === 'cast' && !cmd.place && s.presence.place ? ['pond', s.presence.place] as const : null;
+  const refused = requirePass(c, s, castAt ? castAt[0] : cmd.space, castAt ? castAt[1] : cmd.place, now, cmd.type);
+  if (refused) return fail(refused.code, refused.detail);
   notePresence(c, s, cmd.space, now, events, cmd.place);   // before the command: a session gap of ≥ 2 h already counts as having left
+  noteEntered(s, cmd.space, cmd.place);
+  settleExplorer(c, s, now, events);   // a stamp counted from today on (2 a day) earns its medal today
   const plotOf = (id: unknown) => (Number.isInteger(id) ? s.plots.find(p => p.id === id) : undefined);
 
   switch (cmd.type) {
@@ -201,10 +212,12 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       const refusal = id.startsWith('req_res_') ? residentRequestCommand(c, s, cmd.type, id, now, events, tracked(s))
         : boardCommand(c, s, cmd.type, id, now, events);
       if (refusal) return fail(refusal.code, refusal.detail);
+      if (cmd.type === 'deliver') noteDelivery(c, s, now);   // toward Regular in the city the player is in (§11.9.1)
       break;
     }
-    case 'talk': case 'gift': {
-      const refusal = cmd.type === 'talk' ? talk(c, s, cmd, now, events) : giftResident(c, s, cmd, events);
+    case 'talk': case 'gift': case 'learn': {
+      const refusal = cmd.type === 'talk' ? talk(c, s, cmd, now, events) : cmd.type === 'learn' ? learn(c, s, cmd, now, events)
+        : giftResident(c, s, cmd, events);
       if (refusal) return fail(refusal.code, refusal.detail);
       break;
     }
@@ -254,6 +267,15 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
         if (s.inbox.parcels.some(p => p.key === key) && !claimParcel(c, s, now, key, events)) took += 1;
       }
       if (took === 0 && s.inbox.parcels.some(p => cmd.keys.includes(p.key))) return fail('bag_full', { slots: 1 });
+      break;
+    }
+    case 'travel': {
+      const r = travel(c, s, cmd.to, now, events);
+      if (r) return fail(r.code);
+      break;
+    }
+    case 'return_home': {
+      returnHome(s);
       break;
     }
     case 'read_inbox': {

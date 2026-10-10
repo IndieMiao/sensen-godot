@@ -10,14 +10,35 @@ const SHOP_MAKI := ["grocery", "shop", "clothing-store", "convenience", "superma
 ## 测试开关：为没有城市配置的城市保留的旧附近列表 UI 写测试时置 true。
 static var force_legacy := false
 
+## A host's own cities (P0, SGODOT-275: every city cluster): region_id → region dict ({} when not its city), asked after
+## the authored files. Unset in Journey, which keeps its cached server cities. Generated cities are kept per id.
+static var region_provider := Callable()
+static var _provided: Dictionary = {}
+
+static func set_region_provider(provider: Callable) -> void:
+	region_provider = provider
+	_provided = {}
+
+static func _provided_region(region_id: String) -> Dictionary:
+	if not region_provider.is_valid(): return {}
+	return region_provider.call(region_id)
+
 static func has_city(region_id: String) -> bool:
 	if force_legacy or region_id.is_empty(): return false
-	return FileAccess.file_exists(CITY_DIR + region_id + ".json") or not FarmRegions.cached_region(region_id).is_empty()
+	if FileAccess.file_exists(CITY_DIR + region_id + ".json"): return true
+	if region_provider.is_valid(): return not _provided_region(region_id).is_empty()
+	return not FarmRegions.cached_region(region_id).is_empty()
 
 static func city(region_id: String) -> Dictionary:
 	if not has_city(region_id): return {}
-	if not FileAccess.file_exists(CITY_DIR + region_id + ".json"): return generated_city(FarmRegions.cached_region(region_id))
+	if not FileAccess.file_exists(CITY_DIR + region_id + ".json"):
+		if region_provider.is_valid():   # asked every frame by the city bubbles: generate once per city
+			if not _provided.has(region_id): _provided[region_id] = generated_city(_provided_region(region_id))
+			return _provided[region_id]
+		return generated_city(FarmRegions.cached_region(region_id))
+	if region_provider.is_valid() and _provided.has(region_id): return _provided[region_id]
 	var data = JSON.parse_string(FileAccess.get_file_as_string(CITY_DIR + region_id + ".json"))
+	if region_provider.is_valid() and data is Dictionary: _provided[region_id] = data
 	return data if data is Dictionary else {}
 
 ## 没有人工配置的全球城市（SGODOT-136）：概览视角按城市半径取，无人工地标，

@@ -7,7 +7,7 @@ import { blessed, dayKey, foodCap, maxEnergy, nextTickIn, regenMs, settleEnergy,
 import { emptyDay, type P0State } from './state.js';
 import { catalog, drinkPrice, offerOf, owns, walletNeed } from './shops.js';
 import { BOARDS, handIn, heldSlot, lockedTemplate, payout, settleBoards, slotCount } from './boards.js';
-import { expireGiftMeals, progressOf, requestState, residentState, stageIndex } from './residents.js';
+import { expireGiftMeals, lessonState, progressOf, requestOpensIn, requestState, residentState, stageIndex } from './residents.js';
 import { floorPrice, haveFor, matches } from './requests.js';
 import type { BoardRequest } from './state.js';
 import { boardSlots, coinsNeeded, nextLevel, skillsTotal, unlocked, upgradeBlock } from './homestead.js';
@@ -44,7 +44,9 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     coins: s.coins,
     inbox: inboxView(s, now),   // §10.4.8 parcels; the Inbox panel comes with stage 4, the bell reads `badge`
     // Map pin markers (§9.5.2, q(48)): one per place, deliver > request > new; the map draws the first five on screen
-    map_markers: mapMarkers(c, s),
+    map_markers: mapMarkers(c, s, now),
+    // Cross-city (v5, SGODOT-278, note 0fc0bc5e §2): home / here / passes / visits / stamps / fallback / explorer
+    travel: s.travel,
     skills,
     plots: s.plots.map(p => ({
       id: p.id, state: p.state === 'growing' && (p.ready_at ?? Infinity) <= now ? 'ready' : p.state,
@@ -267,19 +269,22 @@ function shopView(c: P0Content, s: P0State, shop: ShopId) {
 function candidates(c: P0Content, r: BoardRequest): string[] {
   if (r.items.length) return r.items;
   const ids = r.kind === 'fish' ? c.fish.map(f => f.id) : r.kind === 'dish' ? c.cooking.recipes.map(x => x.id) : c.crops.map(x => x.id);
-  return ids.filter(id => matches(c, { kind: r.kind, rarity: r.rarity }, [], id)).sort((a, b) => floorPrice(c, a) - floorPrice(c, b));
+  return ids.filter(id => matches(c, { kind: r.kind, rarity: r.rarity, style: r.style, family: r.family }, [], id)).sort((a, b) => floorPrice(c, a) - floorPrice(c, b));
 }
 
 /** One request as facts (§9.6.5): what it takes, what the bag holds for it, and what delivering now would pay. */
 function requestView(c: P0Content, s: P0State, r: BoardRequest, now: number) {
   const parts = handIn(c, s, r);
-  const each = r.items.length > 1 ? Math.min(...r.items.map(i => haveFor(c, s, { kind: r.kind }, [i]))) : haveFor(c, s, { kind: r.kind, rarity: r.rarity }, r.items);
+  const each = r.items.length > 1 ? Math.min(...r.items.map(i => haveFor(c, s, { kind: r.kind }, [i])))
+    : haveFor(c, s, { kind: r.kind, rarity: r.rarity, style: r.style, family: r.family }, r.items);
   const cheapest = candidates(c, r)[0];
   const estimate = parts ? payout(c, r, parts)
     : { base: r.items.length > 1 ? r.items.reduce((n, i) => n + floorPrice(c, i) * r.qty, 0) : (cheapest ? floorPrice(c, cheapest) : 0) * r.qty, bonus: r.bonus };
   return {
     id: r.id, template: r.template, title: c.requests.templates[r.template]?.title ?? r.template, kind: r.kind,
     items: r.items, rarity: r.rarity ?? null, icon: r.items[0] ?? cheapest ?? null,
+    // P1: dishes of a style (`Soup`, or several), crops of a family (`O`); the client names them
+    style: r.style === undefined ? null : Array.isArray(r.style) ? r.style : [r.style], family: r.family ?? null,
     qty: r.qty, have: Math.min(each, r.qty), ready: parts !== null,
     coins: estimate.base + estimate.bonus, base: estimate.base, bonus: estimate.bonus,
     status: r.status,
@@ -319,7 +324,7 @@ function legacyBoard(c: P0Content, s: P0State, now: number) {
 /** A resident as facts (§9.4.4, LOCK-18): names, lines and request copy stay in the content table the client reads. */
 function residentView(c: P0Content, s: P0State, id: string, now: number) {
   const r = structuredClone(residentState(s, id)), stages = c.affinity.stages;
-  const i = stageIndex(c, r.affinity), st = requestState(c, s, id);
+  const i = stageIndex(c, r.affinity), st = requestState(c, s, id, now), lesson = lessonState(c, s, id, now);
   const meal = s.day.gift_meal === id ? 'given'
     : s.day.gift_meal ? 'none'
     : i < stages.findIndex(([n]) => n === c.affinity.gift_meal_stage) ? 'none'
@@ -331,12 +336,15 @@ function residentView(c: P0Content, s: P0State, id: string, now: number) {
     meal,   // ready = the next talk gives today's gift meal (into the Inbox when the bag is full)
     request: st.req && {
       id: st.req.id, kind: st.req.need.kind, rarity: st.req.need.rarity ?? null, qty: st.req.qty, coins: st.req.coins,
+      item: st.req.need.id ?? null, style: st.req.need.style ?? null,   // P1: one named item, or dishes of one style
       have: Math.min(st.req.qty, progressOf(c, s, id, st.req)),
       ready: st.state === 'accepted' && progressOf(c, s, id, st.req) >= st.req.qty,
     },
     request_state: st.state,   // open | accepted | wait (next player day) | stage (need_stage) | none
     need_stage: st.need_stage ?? null,
-    next_in: st.state === 'wait' ? untilRollover(c, now) : null,
+    next_in: st.state === 'wait' ? requestOpensIn(c, s, id, now) : null,
+    // §7.5.3 Recipe lesson: ready = `learn` teaches `recipe` now; wait = next_in ms; stage = from need_stage; none
+    lesson: { state: lesson.state, recipe: lesson.recipe ?? null, next_in: lesson.next_in ?? null, need_stage: lesson.need_stage ?? null },
   };
 }
 
@@ -346,7 +354,7 @@ function keepersView(c: P0Content, s: P0State, now: number, online: number | nul
   const market = boardView(c, s, 'market', now).slots;
   const marketOpen = market.filter(x => 'id' in x) as { template: string }[];
   const refills = s.boards.market.filter(sl => !sl.req).map(sl => Math.max(0, sl.refill_at - now));
-  const pip = requestState(c, s, 'res_pip').state;
+  const pip = requestState(c, s, 'res_pip', now).state;
   const fishing = skillLevel(c, s, 'fishing');
   const reed = c.fishing.rods.find(r => r.id === 'rod_reed');
   const nextFish = Object.fromEntries(Object.entries(c.fishing.sites).map(([site, def]) => {

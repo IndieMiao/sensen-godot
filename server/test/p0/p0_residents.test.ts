@@ -28,7 +28,7 @@ describe('affinity (§9.4.4)', () => {
     expect(aff(r.ev)).toBeUndefined();
     expect(aff(step(r.s, { type: 'talk', resident: 'res_old_kai' }).ev)).toMatchObject({ resident: 'res_old_kai', delta: 2 });
     expect(aff(step(r.s, { type: 'talk', resident: 'res_pip' }, T0 + DAY).ev)).toMatchObject({ total: 4 });
-    expect(refuse(r.s, { type: 'talk', resident: 'res_mira' })).toMatchObject({ ok: false, code: 'bad_resident' });
+    expect(refuse(r.s, { type: 'talk', resident: 'res_nobody' })).toMatchObject({ ok: false, code: 'bad_resident' });
   });
 
   it('gifts: liked style and ≥ Fine +3, liked +2, any dish +1, Perfect +1 (cap 4), once a day; crops are not gifts', () => {
@@ -148,7 +148,9 @@ describe('Pip and Old Kai requests (§9.4.3; Li Bai b7d8b665, 719ce953)', () => 
     expect(refuse(s, { type: 'deliver', request: 'req_res_pip_3' }, day3)).toMatchObject({ ok: false, code: 'not_enough' });
     s.bag.push({ id: 'dish_radish_salad', qty: 1 });
     r = step(s, { type: 'deliver', request: 'req_res_pip_3' }, day3);
-    expect(pip(r.s, day3 + DAY)).toMatchObject({ request_state: 'none', request: null });
+    // P1 (SGODOT-284): three requests make 15, Acquainted, so the fourth (Sweet Delivery) opens the next player day
+    expect(r.s.residents.res_pip.affinity).toBe(15);
+    expect(pip(r.s, day3 + DAY)).toMatchObject({ request_state: 'open', request: { id: 'req_res_pip_4', kind: 'dish', style: 'Dessert' } });
     expect(refuse(r.s, { type: 'deliver', request: 'req_res_pip_3' }, day3)).toMatchObject({ ok: false, code: 'request_done' });
   });
 
@@ -164,7 +166,8 @@ describe('Pip and Old Kai requests (§9.4.3; Li Bai b7d8b665, 719ce953)', () => 
     const spent = structuredClone(s);
     spent.day.bonus = 100;
     expect(step(spent, { type: 'deliver', request: 'req_res_kai_1' }).ev).toContainEqual({ kind: 'request', id: 'req_res_kai_1', status: 'done', coins: 10, bonus: 0 });
-    expect(viewOf(c, r.s, T0 + DAY).residents.res_old_kai.request_state).toBe('none');
+    // P1: his next one (Dusk Supper) waits for Acquainted
+    expect(viewOf(c, r.s, T0 + DAY).residents.res_old_kai).toMatchObject({ request_state: 'stage', need_stage: 'Acquainted' });
     expect(refuse(r.s, { type: 'drop', request: 'req_res_kai_1' })).toMatchObject({ ok: false, code: 'cannot_drop' });
   });
 

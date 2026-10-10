@@ -9,13 +9,65 @@ const ICON_DIR := "res://assets/p0/icons/%s.svg"
 const PinReason := preload("res://modules/p0/p0_pin_reason.gd")   # the taken requests and the pins they mark (q(104))
 
 static var _content: Dictionary = {}
+## Problems found merging the content fragments (tests read it; the server refuses to start on the same ones).
+static var content_errors: Array = []
 
-## The bundled content table (shared with the server) for display-only lookups the view doesn't carry.
+const CONTENT_DIR := "res://assets/p0/content/"
+
+## The bundled content table (shared with the server) for display-only lookups the view doesn't carry, with the
+## content fragments merged in (SGODOT-275, see merge_content).
 static func content() -> Dictionary:
 	if _content.is_empty():
 		var parsed = JSON.parse_string(FileAccess.get_file_as_string("res://assets/p0/p0_content.json"))
-		if parsed is Dictionary: _content = parsed
+		if parsed is Dictionary:
+			_content = parsed
+			content_errors = merge_content_dir(_content, CONTENT_DIR)
 	return _content
+
+## Content fragments (SGODOT-275, 亚瑟's cross-city plan §6), as the server's mergeContentDir: assets/p0/content/
+## <line>_<topic>.json, shaped like the main table, merged in name order. Objects merge key by key, arrays of objects
+## with an `id` append by id; a key, an id or a scalar already there is not applied and comes back as an error naming
+## the file and the path. Keys starting with `_` are skipped. Returns the errors (empty when all merged).
+static func merge_content_dir(base: Dictionary, dir: String) -> Array:
+	var errors: Array = []
+	if not DirAccess.dir_exists_absolute(dir): return errors
+	var files: Array = []
+	for f in DirAccess.get_files_at(dir):   # an exported pack may list a file under its .remap name
+		var name := str(f).trim_suffix(".remap")
+		if name.ends_with(".json") and not files.has(name): files.append(name)
+	files.sort()
+	for f in files:
+		var add = JSON.parse_string(FileAccess.get_file_as_string(dir.path_join(f)))
+		if add is Dictionary: errors.append_array(merge_content(base, add, f))
+		else: errors.append("p0 content: %s: not a JSON object" % f)
+	return errors
+
+static func merge_content(base: Dictionary, add: Dictionary, file: String, at := "") -> Array:
+	var errors: Array = []
+	for k in add:
+		if at == "" and str(k).begins_with("_"): continue
+		var where := str(k) if at == "" else "%s.%s" % [at, k]
+		if not base.has(k):
+			base[k] = add[k]
+			continue
+		var have = base[k]
+		var v = add[k]
+		if have is Dictionary and v is Dictionary:
+			errors.append_array(merge_content(have, v, file, where))
+		elif have is Array and v is Array and _all_with_id(have) and _all_with_id(v):
+			var ids := {}
+			for e in have: ids[str(e.id)] = true
+			for e in v:
+				if ids.has(str(e.id)): errors.append("p0 content: %s: %s already has id %s" % [file, where, e.id])
+				else:
+					ids[str(e.id)] = true
+					have.append(e)
+		else:
+			errors.append("p0 content: %s: %s is already set (fragments add, they never change an entry)" % [file, where])
+	return errors
+
+static func _all_with_id(list: Array) -> bool:
+	return list.all(func(e): return e is Dictionary and e.has("id"))
 
 ## FISH-5 line 1 for a level gate: "Fishing Lv2 · 3 XP to go" one level up, else "Fishing Lv4 needed · about 30 casts"
 ## (Common catches at today's level; the estimate ignores first-catch bonuses).
@@ -1202,8 +1254,15 @@ static func resident_bar(view: Dictionary, id: String) -> Dictionary:
 		"next": str(r.get("next_stage", "")) if r.get("next_stage", null) != null else "",
 		"line": line, "gift_reason": gift_reason,
 		"request_label": label, "request_reason": reason, "request_cmd": cmd,
-		"meal": meal == "given" and not gift_meal(view, id).is_empty(), "meal_note": note, "lesson": false,
+		"meal": meal == "given" and not gift_meal(view, id).is_empty(), "meal_note": note,
+		# §7.5.3 Taught: Recipe lesson shows only when one is ready now; the server picks the page.
+		"lesson": str(r.get("lesson", {}).get("state", "none")) == "ready" if r.get("lesson", null) is Dictionary else false,
 	}
+
+## A resident's favourite as words (§7.16.3): a style stays as it is (`Dessert`); a rarity and up reads
+## `Fine dishes and up` (Hana; Mira and Tomo `Rare dishes and up`).
+static func likes_text(likes: String) -> String:
+	return ("%s dishes and up" % likes.trim_suffix("+")) if likes.ends_with("+") else likes
 
 ## The affinity stage's place in content affinity.stages (Stranger 0 … Kindred 4; 0 for a name it does not know): the
 ## stage label's tone follows it (用户 on 225 验收, 不知火舞's palette).
@@ -1237,11 +1296,21 @@ static func _has_dish(view: Dictionary) -> bool:
 ## land yet says the level first, `Fishing Lv4 needed` (q(104)), not `Need 1 more Rare fish`.
 static func _request_gap(view: Dictionary, req: Dictionary) -> String:
 	var left := maxi(0, int(req.get("qty", 0)) - int(req.get("have", 0)))
+	var item := str(req.get("item", "")) if req.get("item", null) != null else ""
 	match str(req.get("kind", "")):
 		"sow": return "Plant %d more plot%s" % [left, "" if left == 1 else "s"]
-		"dish": return "Need %d more dish%s" % [left, "" if left == 1 else "es"]
+		"dish":
+			if item != "": return "Need %d more %s" % [left, item_name(view, item)]
+			var style := str(req.get("style", "")) if req.get("style", null) != null else ""
+			if style != "": return "Need %d more %s dish%s" % [left, style, "" if left == 1 else "es"]
+			return "Need %d more dish%s" % [left, "" if left == 1 else "es"]
+		"crop", "material":
+			if item != "": return "Need %d more %s" % [left, plural(item_name(view, item)) if left > 1 else item_name(view, item)]
+			return "Need %d more %s" % [left, "crops" if str(req.kind) == "crop" else "materials"]
 		"fish":
-			var short := fish_level_short(view, [], req.get("rarity", null))
+			var short := fish_level_short(view, [item] if item != "" else [], req.get("rarity", null))
+			if short > 0: return "Fishing Lv%d needed" % short
+			if item != "": return "Need %d more %s" % [left, item_name(view, item)]
 			if short > 0: return "Fishing Lv%d needed" % short
 			var rarity := int(req.get("rarity", 0)) if req.get("rarity", null) != null else 0
 			var names: Array = content().get("rarity_names", [])

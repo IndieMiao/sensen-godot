@@ -1,0 +1,481 @@
+{
+  "_note": "P1 新增系统委托模板 23 条（李白，SGODOT-281/284；方案 §9.6）。形状照 #212 的 RequestTemplate：type 为 output / regional / explore / together，climate 首字母大写与 profile.climate 一致，text 为委托卡两句文案。enabled:false 的有两种：①type 为 regional / explore / together，按 #212 等旅行上线再开；②need 需要 #212 Need 还不支持的条件，完整意图写在 p1_need（family 族、where 塘类型或外城、trail Trail 菜、scale 量 ×1.5、regional zone/city/other_zone、max_rarity、visit 签到、floor 不回收材料的委托地板价），引擎支持后去掉 p1_need 并打开。board 是该模板上哪块板；放进 requests.boards 的列表由苏烈在主文件里改（数组片段不追加）。 苏烈 (SGODOT-284): the engine now also takes need.family (Orchard Basket), a list of styles (Packed Lunches) and scale (Wholesale Order, Fish Market Crate), so those four are on; board is not a template field — the ids are listed in p0_content.json requests.boards (a list without ids cannot be appended by a fragment). Still off: River Run / Far Pond (a fish's water is not kept in the bag), Hardwood Beams / Quartz Glass (until the mine line gives them a floor price), and every regional / explore / together template (travel, live rooms).",
+  "requests": {
+    "templates": {
+      "req_sys_material_fiber": {
+        "title": "Reed Bundle",
+        "need": {
+          "kind": "material",
+          "id": "fiber"
+        },
+        "skill": "farming",
+        "gate": [],
+        "bonus": 10,
+        "type": "output",
+        "text": "Baskets don't weave themselves. Reeds from the bank."
+      },
+      "req_sys_material_clay": {
+        "title": "Clay for Pots",
+        "need": {
+          "kind": "material",
+          "id": "clay"
+        },
+        "skill": "farming",
+        "gate": [
+          [
+            "homestead",
+            2
+          ]
+        ],
+        "bonus": 10,
+        "type": "output",
+        "text": "New pots for the stall. Clay from the creek."
+      },
+      "req_sys_crop_fine": {
+        "title": "Fine Produce",
+        "need": {
+          "kind": "crop",
+          "rarity": 2
+        },
+        "skill": "farming",
+        "gate": [
+          [
+            "farming",
+            4
+          ]
+        ],
+        "bonus": 20,
+        "type": "output",
+        "text": "The good stuff, for once. Any Fine crop."
+      },
+      "req_sys_fish_river": {
+        "title": "River Run",
+        "need": {
+          "kind": "fish",
+          "rarity": 2
+        },
+        "skill": "fishing",
+        "gate": [
+          [
+            "fishing",
+            2
+          ]
+        ],
+        "bonus": 20,
+        "type": "output",
+        "text": "Something from moving water. Any Fine river fish.",
+        "enabled": false,
+        "p1_need": {
+          "where": "river"
+        }
+      },
+      "req_sys_dish_soup": {
+        "title": "Soup Day",
+        "need": {
+          "kind": "dish",
+          "style": "Soup"
+        },
+        "skill": "cooking",
+        "gate": [
+          [
+            "cooking",
+            2
+          ]
+        ],
+        "bonus": 20,
+        "type": "output",
+        "text": "It's a soup kind of day. Any soup."
+      },
+      "req_sys_material_copper": {
+        "title": "Copper Order",
+        "need": {
+          "kind": "material",
+          "id": "copper_ore"
+        },
+        "skill": "farming",
+        "gate": [
+          [
+            "homestead",
+            4
+          ]
+        ],
+        "bonus": 20,
+        "type": "output",
+        "text": "Tools wear out. Copper ore from the mine."
+      },
+      "req_sys_fruit_basket": {
+        "title": "Orchard Basket",
+        "need": {
+          "kind": "crop",
+          "family": "O"
+        },
+        "skill": "farming",
+        "gate": [
+          [
+            "farming",
+            7
+          ]
+        ],
+        "bonus": 40,
+        "type": "output",
+        "text": "Fruit for the market crowd. Any fruit."
+      },
+      "req_sys_crop_bulk": {
+        "title": "Wholesale Order",
+        "need": {
+          "kind": "crop",
+          "same": true
+        },
+        "skill": "farming",
+        "gate": [
+          [
+            "farming",
+            6
+          ]
+        ],
+        "bonus": 40,
+        "type": "output",
+        "text": "A restaurant is buying in bulk. Same kind, a big crate.",
+        "scale": 1.5
+      },
+      "req_sys_fish_bulk": {
+        "title": "Fish Market Crate",
+        "need": {
+          "kind": "fish",
+          "rarity": 2
+        },
+        "skill": "fishing",
+        "gate": [
+          [
+            "fishing",
+            6
+          ]
+        ],
+        "bonus": 40,
+        "type": "output",
+        "text": "The fishmonger is short today. A crate of Fine fish.",
+        "scale": 1.5
+      },
+      "req_sys_dish_trail": {
+        "title": "Packed Lunches",
+        "need": {
+          "kind": "dish",
+          "style": [
+            "Grilled",
+            "Dessert"
+          ]
+        },
+        "skill": "cooking",
+        "gate": [
+          [
+            "cooking",
+            4
+          ]
+        ],
+        "bonus": 20,
+        "type": "output",
+        "text": "Travellers need something to carry. Any Grilled dish or Dessert."
+      },
+      "req_sys_dish_tea": {
+        "title": "Afternoon Tea",
+        "need": {
+          "kind": "dish",
+          "style": "Tea"
+        },
+        "skill": "cooking",
+        "gate": [
+          [
+            "farming",
+            3
+          ]
+        ],
+        "bonus": 20,
+        "type": "output",
+        "text": "Tea for the market stalls. Any tea."
+      },
+      "req_sys_material_hardwood": {
+        "title": "Hardwood Beams",
+        "need": {
+          "kind": "material",
+          "id": "hardwood"
+        },
+        "skill": "farming",
+        "gate": [
+          [
+            "homestead",
+            3
+          ]
+        ],
+        "bonus": 40,
+        "type": "output",
+        "text": "The square needs a new stage. Hardwood from the old tree.",
+        "enabled": false,
+        "p1_need": {
+          "floor": 4
+        }
+      },
+      "req_sys_material_quartz": {
+        "title": "Quartz Glass",
+        "need": {
+          "kind": "material",
+          "id": "quartz"
+        },
+        "skill": "farming",
+        "gate": [
+          [
+            "homestead",
+            5
+          ]
+        ],
+        "bonus": 40,
+        "type": "output",
+        "text": "A glassblower is in town. Quartz from the mine.",
+        "enabled": false,
+        "p1_need": {
+          "floor": 5
+        }
+      },
+      "req_sys_regional_crop": {
+        "title": "Taste of Home",
+        "need": {
+          "kind": "crop"
+        },
+        "skill": "farming",
+        "gate": [
+          [
+            "farming",
+            5
+          ]
+        ],
+        "bonus": 20,
+        "type": "regional",
+        "text": "Grown the local way. This climate's regional crop.",
+        "stamp": 1,
+        "enabled": false,
+        "p1_need": {
+          "regional": "zone"
+        }
+      },
+      "req_sys_regional_fish": {
+        "title": "Local Waters",
+        "need": {
+          "kind": "fish"
+        },
+        "skill": "fishing",
+        "gate": [
+          [
+            "fishing",
+            3
+          ]
+        ],
+        "bonus": 20,
+        "type": "regional",
+        "text": "Fish only these waters give. One of this city's regional fish.",
+        "stamp": 1,
+        "enabled": false,
+        "p1_need": {
+          "regional": "city"
+        }
+      },
+      "req_sys_regional_dish": {
+        "title": "Local Flavor",
+        "need": {
+          "kind": "dish"
+        },
+        "skill": "cooking",
+        "gate": [
+          [
+            "cooking",
+            3
+          ]
+        ],
+        "bonus": 20,
+        "type": "regional",
+        "text": "A dish people here grew up on. This climate's regional dish.",
+        "stamp": 1,
+        "enabled": false,
+        "p1_need": {
+          "regional": "zone",
+          "max_rarity": 2
+        }
+      },
+      "req_sys_regional_far_fish": {
+        "title": "Visitor's Catch",
+        "need": {
+          "kind": "fish"
+        },
+        "skill": "fishing",
+        "gate": [
+          [
+            "fishing",
+            3
+          ]
+        ],
+        "bonus": 40,
+        "type": "regional",
+        "text": "Something you won't find here. A regional fish from another climate.",
+        "stamp": 1,
+        "enabled": false,
+        "p1_need": {
+          "regional": "other_zone"
+        }
+      },
+      "req_sys_regional_far_crop": {
+        "title": "Seeds from Afar",
+        "need": {
+          "kind": "crop"
+        },
+        "skill": "farming",
+        "gate": [
+          [
+            "farming",
+            5
+          ]
+        ],
+        "bonus": 40,
+        "type": "regional",
+        "text": "A crop that came a long way. A regional crop from another climate.",
+        "stamp": 1,
+        "enabled": false,
+        "p1_need": {
+          "regional": "other_zone"
+        }
+      },
+      "req_sys_explore_outpost": {
+        "title": "Stamp Run",
+        "need": {
+          "kind": "material",
+          "id": "wood"
+        },
+        "skill": "farming",
+        "gate": [],
+        "bonus": 40,
+        "type": "explore",
+        "text": "Say hello across town. Check in at another outpost.",
+        "stamp": 1,
+        "coins": 40,
+        "enabled": false,
+        "p1_need": {
+          "target": "outpost",
+          "where": "other_in_city_or_neighbour",
+          "kind": "visit"
+        }
+      },
+      "req_sys_explore_city": {
+        "title": "Postcard Trip",
+        "need": {
+          "kind": "material",
+          "id": "wood"
+        },
+        "skill": "farming",
+        "gate": [
+          [
+            "homestead",
+            2
+          ]
+        ],
+        "bonus": 60,
+        "type": "explore",
+        "text": "Send us a postcard. Check in at a Market in another city.",
+        "stamp": 1,
+        "coins": 60,
+        "enabled": false,
+        "p1_need": {
+          "target": "market",
+          "trip": [
+            2,
+            3
+          ],
+          "kind": "visit"
+        }
+      },
+      "req_sys_explore_pond": {
+        "title": "Far Pond",
+        "need": {
+          "kind": "fish"
+        },
+        "skill": "fishing",
+        "gate": [
+          [
+            "fishing",
+            2
+          ]
+        ],
+        "bonus": 20,
+        "type": "explore",
+        "text": "Fish somewhere new. Any fish caught in another city.",
+        "stamp": 1,
+        "enabled": false,
+        "p1_need": {
+          "where": "other_city"
+        }
+      },
+      "req_sys_explore_tea": {
+        "title": "Tea Trail",
+        "need": {
+          "kind": "material",
+          "id": "wood"
+        },
+        "skill": "farming",
+        "gate": [],
+        "bonus": 40,
+        "type": "explore",
+        "text": "Try someone else's tea. Check in at a Tea House in another city.",
+        "stamp": 1,
+        "coins": 40,
+        "enabled": false,
+        "p1_need": {
+          "target": "tea",
+          "where": "other_city",
+          "kind": "visit"
+        }
+      },
+      "req_sys_explore_zone": {
+        "title": "New Climate",
+        "need": {
+          "kind": "material",
+          "id": "wood"
+        },
+        "skill": "farming",
+        "gate": [
+          [
+            "homestead",
+            3
+          ]
+        ],
+        "bonus": 80,
+        "type": "explore",
+        "text": "Somewhere the weather is different. Check in at an outpost in another climate.",
+        "stamp": 1,
+        "coins": 80,
+        "enabled": false,
+        "p1_need": {
+          "target": "outpost",
+          "where": "other_zone",
+          "kind": "visit"
+        }
+      },
+      "req_sys_party_basket": {
+        "title": "Harvest Together",
+        "need": {
+          "kind": "crop"
+        },
+        "skill": "farming",
+        "gate": [
+          [
+            "farming",
+            2
+          ]
+        ],
+        "bonus": 20,
+        "type": "together",
+        "text": "Many hands, one basket. Bring crops with friends.",
+        "enabled": false,
+        "p1_need": {
+          "party": 0.8
+        },
+        "phase": "P2"
+      }
+    }
+  }
+}

@@ -1,0 +1,781 @@
+{
+  "_note": "Residents line, P1 (SGODOT-284; 苏烈, copy is a draft for 李白). The other ten residents of §9.4.3 with lines for every stage, 3–4 personal requests each, a Common gift meal and a teaching pool (§7.16.3; P0 pages until the 48-page table lands); two more requests each for Pip and Old Kai; affinity.lesson = §7.5.3 Taught (one page a week from Familiar), affinity.next_request_h = §9.6.1 (the next personal request 24 h after the last; Pip and Old Kai keep one_per_day). likes may be a rarity and up (Fine+ / Rare+). Requests may carry reward {item, recipe, title}.",
+  "affinity": {
+    "lesson": {
+      "stage": "Familiar",
+      "every_days": 7
+    },
+    "next_request_h": 24
+  },
+  "residents": {
+    "res_pip": {
+      "lines": {
+        "Trusted": "You're on my route now. Every day!",
+        "Kindred": "Best friend on the whole route. Don't tell the pigeons."
+      },
+      "requests": [
+        {
+          "id": "req_res_pip_4",
+          "title": "Sweet Delivery",
+          "text": "Can you bake me something sweet? I'll run it across town!",
+          "stage": "Acquainted",
+          "need": {
+            "kind": "dish",
+            "style": "Dessert"
+          },
+          "qty": 1,
+          "coins": 30
+        },
+        {
+          "id": "req_res_pip_5",
+          "title": "Pip's Big Route",
+          "text": "Ten letters, ten towns. I need fuel. Two sweets, please?",
+          "stage": "Trusted",
+          "need": {
+            "kind": "dish",
+            "style": "Dessert"
+          },
+          "qty": 2,
+          "coins": 60,
+          "reward": {
+            "title": "Route Buddy"
+          }
+        }
+      ],
+      "teaches": [
+        "dish_carrot_cake"
+      ]
+    },
+    "res_old_kai": {
+      "lines": {
+        "Trusted": "You read the water well now.",
+        "Kindred": "Take the good stool. You've earned it."
+      },
+      "requests": [
+        {
+          "id": "req_res_kai_2",
+          "title": "Dusk Supper",
+          "text": "Grill me something. Fish, of course.",
+          "stage": "Acquainted",
+          "need": {
+            "kind": "dish",
+            "style": "Grilled"
+          },
+          "qty": 1,
+          "coins": 40
+        },
+        {
+          "id": "req_res_kai_3",
+          "title": "The Smoker's Secret",
+          "text": "Smoked trout, the old way. Bring me one and I'll tell you a secret.",
+          "stage": "Trusted",
+          "need": {
+            "kind": "dish",
+            "id": "dish_smoked_trout"
+          },
+          "qty": 1,
+          "coins": 80,
+          "reward": {
+            "title": "Harbour Hand"
+          }
+        }
+      ],
+      "teaches": [
+        "dish_grilled_fish",
+        "dish_salt_grilled_fish",
+        "dish_pan_fried_fish"
+      ]
+    },
+    "res_granny_wu": {
+      "name": "Granny Wu",
+      "role": "Campfire Elder",
+      "portrait": "granny_wu",
+      "likes": "Soup",
+      "gift_meal": "dish_veggie_plate",
+      "one_per_day": false,
+      "teaches": [
+        "dish_fish_soup"
+      ],
+      "lines": {
+        "Stranger": "Sit by the fire, dear. Warm your hands.",
+        "Acquainted": "Even a failed dish teaches you something.",
+        "Familiar": "I made too much again. Take some.",
+        "Trusted": "You remind me of my grandson. He never sat still either.",
+        "Kindred": "This fire will always be here for you.",
+        "mystery": "Oh… well, I've eaten worse."
+      },
+      "requests": [
+        {
+          "id": "req_res_wu_1",
+          "title": "Kindling",
+          "text": "Bring me some wood for the fire, would you?",
+          "stage": "Stranger",
+          "need": {
+            "kind": "material",
+            "id": "wood"
+          },
+          "qty": 6,
+          "coins": 30
+        },
+        {
+          "id": "req_res_wu_2",
+          "title": "Something Warm",
+          "text": "A bowl of soup would warm these old bones.",
+          "stage": "Acquainted",
+          "need": {
+            "kind": "dish",
+            "style": "Soup"
+          },
+          "qty": 1,
+          "coins": 40
+        },
+        {
+          "id": "req_res_wu_3",
+          "title": "Grandma's Garden",
+          "text": "Plant a few plots for me. I like to watch things grow.",
+          "stage": "Acquainted",
+          "need": {
+            "kind": "sow"
+          },
+          "qty": 6,
+          "coins": 40
+        },
+        {
+          "id": "req_res_wu_4",
+          "title": "The Old Recipe",
+          "text": "Bring me three soups and I'll write down my mother's recipe.",
+          "stage": "Trusted",
+          "need": {
+            "kind": "dish",
+            "style": "Soup"
+          },
+          "qty": 3,
+          "coins": 80,
+          "reward": {
+            "title": "Granny's Favourite"
+          }
+        }
+      ]
+    },
+    "res_mira": {
+      "name": "Mira",
+      "role": "Travelling Trader",
+      "portrait": "mira",
+      "likes": "Rare+",
+      "gift_meal": "dish_grilled_fish",
+      "one_per_day": false,
+      "teaches": [
+        "dish_bass_tomato_stew",
+        "dish_smoked_trout",
+        "dish_fisher_stew"
+      ],
+      "lines": {
+        "Stranger": "New in town? So am I. I'm always new in town.",
+        "Acquainted": "I've seen markets you wouldn't believe.",
+        "Familiar": "Here, from the road. Don't ask where.",
+        "Trusted": "Long trips need the right papers. I'll show you how.",
+        "Kindred": "Wherever you go, I've probably been. Ask me anything.",
+        "mystery": "Interesting. I'll… trade it on."
+      },
+      "requests": [
+        {
+          "id": "req_res_mira_1",
+          "title": "Road Snack",
+          "text": "Anything to eat on the road? I leave tomorrow.",
+          "stage": "Stranger",
+          "need": {
+            "kind": "dish"
+          },
+          "qty": 1,
+          "coins": 30
+        },
+        {
+          "id": "req_res_mira_2",
+          "title": "Rare Goods",
+          "text": "A Rare fish sells well three towns over. Find me one?",
+          "stage": "Acquainted",
+          "need": {
+            "kind": "fish",
+            "rarity": 3
+          },
+          "qty": 1,
+          "coins": 60,
+          "need_line": "1 Rare fish · Golden Koi · Pond"
+        },
+        {
+          "id": "req_res_mira_3",
+          "title": "Trader's Feast",
+          "text": "A Rare dish. I want to see what you can really do.",
+          "stage": "Trusted",
+          "need": {
+            "kind": "dish",
+            "rarity": 3
+          },
+          "qty": 1,
+          "coins": 100,
+          "reward": {
+            "title": "Well Travelled"
+          }
+        }
+      ]
+    },
+    "res_rafa": {
+      "name": "Rafa",
+      "role": "Ferryman",
+      "portrait": "rafa",
+      "likes": "Soup",
+      "gift_meal": "dish_grilled_fish",
+      "one_per_day": false,
+      "teaches": [
+        "dish_fish_soup",
+        "dish_fisher_stew"
+      ],
+      "lines": {
+        "Stranger": "Ahoy! River's calm today.",
+        "Acquainted": "Neighbour towns are cheaper by the river road, you know.",
+        "Familiar": "Sing with me! No? Then eat with me.",
+        "Trusted": "The river tells stories, if you listen.",
+        "Kindred": "Any time you need a crossing, my friend.",
+        "mystery": "Ha! Brave cooking. The fish would be proud."
+      },
+      "requests": [
+        {
+          "id": "req_res_rafa_1",
+          "title": "River Catch",
+          "text": "Bring me two fish. Any kind, river or pond.",
+          "stage": "Stranger",
+          "need": {
+            "kind": "fish",
+            "rarity": 1
+          },
+          "qty": 2,
+          "coins": 30
+        },
+        {
+          "id": "req_res_rafa_2",
+          "title": "Fine Waters",
+          "text": "The good river fish, a Fine one. Can you?",
+          "stage": "Acquainted",
+          "need": {
+            "kind": "fish",
+            "rarity": 2
+          },
+          "qty": 2,
+          "coins": 50
+        },
+        {
+          "id": "req_res_rafa_3",
+          "title": "Ferryman's Stew",
+          "text": "A good soup for a long crossing.",
+          "stage": "Acquainted",
+          "need": {
+            "kind": "dish",
+            "style": "Soup"
+          },
+          "qty": 1,
+          "coins": 40
+        },
+        {
+          "id": "req_res_rafa_4",
+          "title": "The Long Crossing",
+          "text": "Three Fine fish for the boat. I pay the river toll.",
+          "stage": "Trusted",
+          "need": {
+            "kind": "fish",
+            "rarity": 2
+          },
+          "qty": 3,
+          "coins": 80,
+          "reward": {
+            "title": "River Friend"
+          }
+        }
+      ]
+    },
+    "res_ivo": {
+      "name": "Ivo",
+      "role": "Old Miner",
+      "portrait": "ivo",
+      "likes": "Grilled",
+      "gift_meal": "dish_grilled_fish",
+      "one_per_day": false,
+      "teaches": [
+        "dish_salt_grilled_fish",
+        "dish_herb_grilled_fish"
+      ],
+      "lines": {
+        "Stranger": "Mind your head. Low ceilings down there.",
+        "Acquainted": "Copper runs in the second floor. Look for the green.",
+        "Familiar": "Salt-grilled. The miner's lunch.",
+        "Trusted": "Forty years down there. You're the first I'd take along.",
+        "Kindred": "The mine's yours as much as mine now.",
+        "mystery": "Hrm. Tastes like the bottom of a cart."
+      },
+      "requests": [
+        {
+          "id": "req_res_ivo_1",
+          "title": "Stone Count",
+          "text": "Eight stones for the shaft wall. Don't dawdle.",
+          "stage": "Stranger",
+          "need": {
+            "kind": "material",
+            "id": "stone"
+          },
+          "qty": 8,
+          "coins": 30
+        },
+        {
+          "id": "req_res_ivo_2",
+          "title": "Copper Run",
+          "text": "Copper ore. Four pieces.",
+          "stage": "Acquainted",
+          "need": {
+            "kind": "material",
+            "id": "copper_ore"
+          },
+          "qty": 4,
+          "coins": 50
+        },
+        {
+          "id": "req_res_ivo_3",
+          "title": "Rock Salt",
+          "text": "Rock salt for the grill. Three.",
+          "stage": "Acquainted",
+          "need": {
+            "kind": "material",
+            "id": "rock_salt"
+          },
+          "qty": 3,
+          "coins": 40
+        },
+        {
+          "id": "req_res_ivo_4",
+          "title": "Miner's Lunch",
+          "text": "A grilled dish. Fine or better. I have standards.",
+          "stage": "Trusted",
+          "need": {
+            "kind": "dish",
+            "style": "Grilled",
+            "rarity": 2
+          },
+          "qty": 1,
+          "coins": 80,
+          "reward": {
+            "title": "Tunnel Rat"
+          }
+        }
+      ]
+    },
+    "res_hana": {
+      "name": "Hana",
+      "role": "Café Owner",
+      "portrait": "hana",
+      "likes": "Fine+",
+      "gift_meal": "dish_veggie_plate",
+      "one_per_day": false,
+      "teaches": [
+        "dish_fruit_tea"
+      ],
+      "lines": {
+        "Stranger": "Welcome in! Grab a seat anywhere.",
+        "Acquainted": "You look like you need a proper meal.",
+        "Familiar": "Veggie plate, on the house. Eat!",
+        "Trusted": "Weekend cooking at the tea table. You should come.",
+        "Kindred": "My kitchen is your kitchen.",
+        "mystery": "Oh! Um. I'll… display it?"
+      },
+      "requests": [
+        {
+          "id": "req_res_hana_1",
+          "title": "Fresh for the Café",
+          "text": "Two fresh crops for the menu, please.",
+          "stage": "Stranger",
+          "need": {
+            "kind": "crop"
+          },
+          "qty": 2,
+          "coins": 30
+        },
+        {
+          "id": "req_res_hana_2",
+          "title": "A Proper Plate",
+          "text": "A Fine dish for the regulars.",
+          "stage": "Acquainted",
+          "need": {
+            "kind": "dish",
+            "rarity": 2
+          },
+          "qty": 1,
+          "coins": 50
+        },
+        {
+          "id": "req_res_hana_3",
+          "title": "Tea Time",
+          "text": "A pot of fruit tea for the afternoon crowd.",
+          "stage": "Acquainted",
+          "need": {
+            "kind": "dish",
+            "id": "dish_fruit_tea"
+          },
+          "qty": 2,
+          "coins": 50
+        },
+        {
+          "id": "req_res_hana_4",
+          "title": "The Café's Special",
+          "text": "Two Fine dishes. I want a new special.",
+          "stage": "Trusted",
+          "need": {
+            "kind": "dish",
+            "rarity": 2
+          },
+          "qty": 2,
+          "coins": 90,
+          "reward": {
+            "title": "Café Regular"
+          }
+        }
+      ]
+    },
+    "res_sam": {
+      "name": "Sam",
+      "role": "Station Master",
+      "portrait": "sam",
+      "likes": "Grilled",
+      "gift_meal": "dish_grilled_fish",
+      "one_per_day": false,
+      "teaches": [
+        "dish_grilled_fish",
+        "dish_pan_fried_fish"
+      ],
+      "lines": {
+        "Stranger": "Trains run on time. So should you.",
+        "Acquainted": "Permits and tickets: the materials are all out there.",
+        "Familiar": "Grilled skewers. Station lunch.",
+        "Trusted": "I'll stamp anything you bring me. Almost.",
+        "Kindred": "First class, for you. Always.",
+        "mystery": "This is… not on the timetable."
+      },
+      "requests": [
+        {
+          "id": "req_res_sam_1",
+          "title": "Station Master's Lunch",
+          "text": "A grilled dish, please. On time.",
+          "stage": "Stranger",
+          "need": {
+            "kind": "dish",
+            "style": "Grilled"
+          },
+          "qty": 1,
+          "coins": 30
+        },
+        {
+          "id": "req_res_sam_2",
+          "title": "Timber for the Platform",
+          "text": "Ten wood for the platform. By evening.",
+          "stage": "Acquainted",
+          "need": {
+            "kind": "material",
+            "id": "wood"
+          },
+          "qty": 10,
+          "coins": 50
+        },
+        {
+          "id": "req_res_sam_3",
+          "title": "Bento Run",
+          "text": "Two grilled dishes for the night shift.",
+          "stage": "Trusted",
+          "need": {
+            "kind": "dish",
+            "style": "Grilled"
+          },
+          "qty": 2,
+          "coins": 80,
+          "reward": {
+            "title": "On Schedule"
+          }
+        }
+      ]
+    },
+    "res_lena": {
+      "name": "Lena",
+      "role": "Lighthouse Keeper",
+      "portrait": "lena",
+      "likes": "Tea",
+      "gift_meal": "dish_grilled_crucian",
+      "one_per_day": false,
+      "teaches": [
+        "dish_fruit_tea"
+      ],
+      "lines": {
+        "Stranger": "The light's on. Come in from the wind.",
+        "Acquainted": "Fish bite better after rain. Watch the sky.",
+        "Familiar": "Tea's warm. Sit with me a while.",
+        "Trusted": "Some nights you can see the big ones' shadows.",
+        "Kindred": "The stars look better with company.",
+        "mystery": "Hm. The gulls might like it."
+      },
+      "requests": [
+        {
+          "id": "req_res_lena_1",
+          "title": "Night Catch",
+          "text": "Two fish for the lamp-room supper.",
+          "stage": "Stranger",
+          "need": {
+            "kind": "fish",
+            "rarity": 1
+          },
+          "qty": 2,
+          "coins": 30
+        },
+        {
+          "id": "req_res_lena_2",
+          "title": "A Pot of Tea",
+          "text": "Something to drink on a long watch.",
+          "stage": "Acquainted",
+          "need": {
+            "kind": "dish",
+            "style": "Tea"
+          },
+          "qty": 1,
+          "coins": 40
+        },
+        {
+          "id": "req_res_lena_3",
+          "title": "Fine Sight",
+          "text": "A Fine fish. I like to sketch them.",
+          "stage": "Acquainted",
+          "need": {
+            "kind": "fish",
+            "rarity": 2
+          },
+          "qty": 1,
+          "coins": 40
+        },
+        {
+          "id": "req_res_lena_4",
+          "title": "Shadow in the Water",
+          "text": "Something Rare is down there. Bring it to me.",
+          "stage": "Trusted",
+          "need": {
+            "kind": "fish",
+            "rarity": 3
+          },
+          "qty": 1,
+          "coins": 100,
+          "need_line": "1 Rare fish · Golden Koi · Pond",
+          "reward": {
+            "title": "Night Watch"
+          }
+        }
+      ]
+    },
+    "res_tomo": {
+      "name": "Tomo",
+      "role": "Curator",
+      "portrait": "tomo",
+      "likes": "Rare+",
+      "gift_meal": "dish_grilled_crucian",
+      "one_per_day": false,
+      "teaches": [
+        "dish_bass_tomato_stew",
+        "dish_fisher_stew"
+      ],
+      "lines": {
+        "Stranger": "Oh! A visitor. Please, look around.",
+        "Acquainted": "Every stamp tells where someone has been.",
+        "Familiar": "I catalogued your last gift. It was delicious.",
+        "Trusted": "I'd like your help with a special exhibit.",
+        "Kindred": "Your name is in the founders' book now.",
+        "mystery": "I'll… label it 'experimental'."
+      },
+      "requests": [
+        {
+          "id": "req_res_tomo_1",
+          "title": "For the Display",
+          "text": "A Fine fish for the display case, please.",
+          "stage": "Stranger",
+          "need": {
+            "kind": "fish",
+            "rarity": 2
+          },
+          "qty": 1,
+          "coins": 40
+        },
+        {
+          "id": "req_res_tomo_2",
+          "title": "Clay Samples",
+          "text": "Four clay samples for the archive.",
+          "stage": "Acquainted",
+          "need": {
+            "kind": "material",
+            "id": "clay"
+          },
+          "qty": 4,
+          "coins": 50
+        },
+        {
+          "id": "req_res_tomo_3",
+          "title": "The Rare Exhibit",
+          "text": "A Rare fish. The centrepiece.",
+          "stage": "Trusted",
+          "need": {
+            "kind": "fish",
+            "rarity": 3
+          },
+          "qty": 1,
+          "coins": 100,
+          "need_line": "1 Rare fish · Golden Koi · Pond",
+          "reward": {
+            "title": "Curator's Friend"
+          }
+        }
+      ]
+    },
+    "res_theo": {
+      "name": "Theo",
+      "role": "Gardener",
+      "portrait": "theo",
+      "likes": "Salad",
+      "gift_meal": "dish_radish_salad",
+      "one_per_day": false,
+      "teaches": [
+        "dish_veggie_plate"
+      ],
+      "lines": {
+        "Stranger": "Careful of the seedlings. Hello.",
+        "Acquainted": "Compost early, water late. That's the trick.",
+        "Familiar": "A salad from the nursery corner.",
+        "Trusted": "I'll show you how the regional seeds like their soil.",
+        "Kindred": "Half of this garden is yours now.",
+        "mystery": "I'll put it in the compost. Lovingly."
+      },
+      "requests": [
+        {
+          "id": "req_res_theo_1",
+          "title": "Seedling Help",
+          "text": "Plant five plots. The soil is ready.",
+          "stage": "Stranger",
+          "need": {
+            "kind": "sow"
+          },
+          "qty": 5,
+          "coins": 30
+        },
+        {
+          "id": "req_res_theo_2",
+          "title": "Carrot Count",
+          "text": "Four carrots for the nursery.",
+          "stage": "Acquainted",
+          "need": {
+            "kind": "crop",
+            "id": "crop_carrot"
+          },
+          "qty": 4,
+          "coins": 40
+        },
+        {
+          "id": "req_res_theo_3",
+          "title": "A Salad Bowl",
+          "text": "A salad, please. Fresh as you like.",
+          "stage": "Acquainted",
+          "need": {
+            "kind": "dish",
+            "style": "Salad"
+          },
+          "qty": 1,
+          "coins": 40
+        },
+        {
+          "id": "req_res_theo_4",
+          "title": "Gardener's Show",
+          "text": "Six tomatoes for the show bench.",
+          "stage": "Trusted",
+          "need": {
+            "kind": "crop",
+            "id": "crop_tomato"
+          },
+          "qty": 6,
+          "coins": 80,
+          "reward": {
+            "title": "Green Thumb"
+          }
+        }
+      ]
+    },
+    "res_nadia": {
+      "name": "Nadia",
+      "role": "Market Baker",
+      "portrait": "nadia",
+      "likes": "Stew",
+      "gift_meal": "dish_veggie_plate",
+      "one_per_day": false,
+      "teaches": [
+        "dish_salted_potatoes",
+        "dish_bass_tomato_stew",
+        "dish_fisher_stew"
+      ],
+      "lines": {
+        "Stranger": "FRESH BREAD! Oh — hello, didn't see you there.",
+        "Acquainted": "Weekend market's the best. You'll see.",
+        "Familiar": "Took this off the stove for you. Eat while it's hot!",
+        "Trusted": "Big orders this weekend. I need a partner.",
+        "Kindred": "You're market family now!",
+        "mystery": "HA! Well, it's food. Probably."
+      },
+      "requests": [
+        {
+          "id": "req_res_nadia_1",
+          "title": "Potatoes, Please",
+          "text": "Six potatoes for the bread ovens.",
+          "stage": "Stranger",
+          "need": {
+            "kind": "crop",
+            "id": "crop_potato"
+          },
+          "qty": 6,
+          "coins": 30
+        },
+        {
+          "id": "req_res_nadia_2",
+          "title": "Stew for the Stall",
+          "text": "A stew for the market crowd.",
+          "stage": "Acquainted",
+          "need": {
+            "kind": "dish",
+            "style": "Stew"
+          },
+          "qty": 1,
+          "coins": 40
+        },
+        {
+          "id": "req_res_nadia_3",
+          "title": "The Big Basket",
+          "text": "Eight crops, any kind. Market day is coming.",
+          "stage": "Acquainted",
+          "need": {
+            "kind": "crop"
+          },
+          "qty": 8,
+          "coins": 60
+        },
+        {
+          "id": "req_res_nadia_4",
+          "title": "Weekend Market",
+          "text": "Two stews. The whole square will be here.",
+          "stage": "Trusted",
+          "need": {
+            "kind": "dish",
+            "style": "Stew"
+          },
+          "qty": 2,
+          "coins": 90,
+          "reward": {
+            "title": "Market Family"
+          }
+        }
+      ]
+    }
+  }
+}

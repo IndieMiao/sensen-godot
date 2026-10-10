@@ -216,8 +216,9 @@ func test_a_filter_lays_the_pins_out() -> void:
 ## A city switch (Journey; P0 stays in Shanghai, P0Map._switch_city): the city view's entries are the new city's.
 func test_a_city_switch_lays_the_pins_out() -> void:
 	var saved: Dictionary = map.region
-	var other: Array = map.city_regions().filter(func(r): return str(r.get("id", "")) != str(saved.get("id", "")))
-	assert_array(other).is_not_empty()
+	# Another city (since SGODOT-275 the city list is the one around the camera, so name one).
+	var other: Array = [FarmRegions.load_default().region("los_angeles")]
+	assert_str(str(other[0].get("id", ""))).is_not_equal(str(saved.get("id", "")))
 	assert_bool(await _lays_out(func(): map.region = other[0]; city.region_changed())).is_true()
 	map.region = saved
 	city.region_changed()

@@ -1,6 +1,7 @@
 /** P0 player state (one homestead per player; no compatibility with the old farm state). */
-import type { P0Content, Skill } from './content.js';
+import type { Family, P0Content, Skill } from './content.js';
 import { maxEnergy } from './rules.js';
+import { clusterOf, clusterOfCityName, freshTravel, homeCluster, type TravelState } from './travel.js';
 
 export type PlotState = 'wild' | 'tilled' | 'sown' | 'growing';
 export interface Plot {
@@ -60,7 +61,7 @@ export interface Request { id: string; title: string; item: string; qty: number;
 
 /** A drawn system request (§9.6): items are fixed when drawn; coins are paid from what is handed in. */
 export interface BoardRequest {
-  id: string; template: string; items: string[]; rarity?: number; kind: 'crop' | 'fish' | 'dish' | 'material';
+  id: string; template: string; items: string[]; rarity?: number; style?: string | string[]; family?: Family; kind: 'crop' | 'fish' | 'dish' | 'material';
   qty: number; bonus: number; drawn_at: number; status: 'open' | 'accepted';
 }
 /** A board slot: a request, or empty until refill_at. */
@@ -74,6 +75,8 @@ export interface ResidentState {
   next: number;                  // index of the next request in the resident's list
   req: { id: string; at: number; progress: number } | null;   // accepted request; progress counts sow for sow requests
   done_day: string;              // player day the last request was completed (one a day)
+  done_at?: number;              // when the last request was completed (P1: the next one opens next_request_h later)
+  lesson_at?: number;            // when they last taught a page (§7.5.3: one a week from Familiar)
 }
 
 export interface Homestead { level: number; plaque: { level: number; at: number }[] }
@@ -92,7 +95,9 @@ export interface MineState {
 
 /** Where the player's commands come from (q(41)): when they last left the homestead, for Rest's 2 h rule. */
 /** place: the catalog pond the player is at, only while in a pond space (cast reads its template from it, q(36)). */
-export interface Presence { left_at: number | null; last_at: number; space: string | null; place?: string | null }
+export interface Presence { left_at: number | null; last_at: number; space: string | null; place?: string | null;
+  entered?: string | null;   // the pond / outpost entered with a valid pass (v5): commands there are not re-checked
+}
 
 export interface P0Day {
   key: string; rest: number;
@@ -111,8 +116,11 @@ export interface P0Day {
   mishaps: number;                      // failed pots today (the blessing's first 10 refund their ingredients, §7.5.2)
 }
 
+/** The save version this server writes. Older saves are brought up to it at load (upgradeState). */
+export const SAVE_VERSION = 5;
+
 export interface P0State {
-  v: 4;
+  v: 5;
   player: string;
   created_at: number;
   clock_ms: number;              // dev-only clock offset (time skip)
@@ -146,6 +154,7 @@ export interface P0State {
   gather: { ready_at: Record<string, number>; last_at: number };   // §13.2: when each spot can be gathered again; last tap (tempo)
   mine: MineState;
   storage_auto: { at: number; items: [string, number][] } | null;   // last auto-store on coming home (q(40)), floated once by the client
+  travel: TravelState;           // home / current city, visited cities, stamps, Day Pass (v5, SGODOT-275)
   seen?: string[];   // map markers' ◆ already looked at: item:<id> / talk:<resident> (SGODOT-232, q(48))
   fires: number;                 // pots ever started (first fire is the tutorial ring)
   rng: number;
@@ -161,7 +170,7 @@ export function freshState(c: P0Content, player: string, now: number, seed = has
   for (let i = 0; i < c.start.tilled_plots; i++) plots.push({ id: i, state: 'tilled' });
   for (let i = 0; i < c.start.wild_plots; i++) plots.push({ id: c.start.tilled_plots + i, state: 'wild' });
   return {
-    v: 4, player, created_at: now, clock_ms: 0,
+    v: 5, player, created_at: now, clock_ms: 0,
     energy: { value: c.energy.max_base, tick_ms: now },
     coins: c.start.coins,
     skills: { farming: 0, fishing: 0, cooking: 0 },
@@ -182,6 +191,7 @@ export function freshState(c: P0Content, player: string, now: number, seed = has
     gather: { ready_at: {}, last_at: 0 },
     mine: freshMine(),
     storage_auto: null,
+    travel: freshTravel(c),
     seen: [],
     fires: 0,
     rng: seed, seq: 0,
@@ -196,7 +206,7 @@ export function tutorialRequest(c: P0Content, now: number): BoardRequest {
 }
 
 /**
- * Bring a stored playtest save up to the current shape (v1 M1 → v2 M2 → v3 SGODOT-228 → v4 SGODOT-231). The prototype promises no
+ * Bring a stored playtest save up to the current shape (v1 M1 → v2 M2 → v3 SGODOT-228 → v4 SGODOT-231 → v5 SGODOT-275). The prototype promises no
  * compatibility, but filling defaults keeps local saves playable: v3 adds Homestead Lv1, an empty farm storage and
  * the boards, moving the old tutorial request into Stall Board slot 1 with its status.
  */
@@ -236,6 +246,27 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
     s.mine ??= freshMine();
     s.storage_auto ??= null;
   }
+  if (s.v < 5) {   // SGODOT-275: cross-city travel. Everyone starts at home, nothing visited, no stamps, no pass
+    s.travel ??= freshTravel(c);
+    // The first-catch-in-a-city key moves from the city name to its cluster, so San Francisco's is not paid again.
+    s.firsts = s.firsts.map(f => {
+      if (!f.startsWith('fishing_city:') || f.startsWith('fishing_city:gn-')) return f;
+      const id = clusterOfCityName(c, f.slice('fishing_city:'.length));
+      return id ? `fishing_city:${id}` : f;
+    });
+    s.firsts = [...new Set(s.firsts)];
+  }
+  s.travel ??= freshTravel(c);   // a v5 save from a build without the block cannot exist, but never read one without it
+  // Until players choose a home (P2 second version), everyone's home is the content's city: a moved home moves saves
+  // home too (as SGODOT-270 did), and the frozen fallback list is made again for it (§11.2.3 "换城后重算一次").
+  if (s.travel.home !== homeCluster(c)) {
+    const fresh = freshTravel(c);
+    s.travel.home = fresh.home; s.travel.here = fresh.home; s.travel.fallback = fresh.fallback;
+  }
+  if (!s.travel.fallback.near10.length) {   // made before the cluster table was there: fill it once it is (§11.2.3)
+    const f = freshTravel(c).fallback;
+    if (f.near10.length) s.travel.fallback = f;
+  }
   s.req_done ??= [];
   s.cabinet ??= [];
   s.queue ??= null;
@@ -249,7 +280,8 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
   // from the map, or left in another city, as notePlace judges) is let go when the save loads: the place is forgotten,
   // and a cast still out there comes in as a line in before the bite would — the Energy back, no fish, no XP, an unused
   // teaching pin returned. Old casts without a place are left alone.
-  const home = (id: string) => c.fishing.places[id]?.city === c.profile.city.toLowerCase();
+  // v5: "the home city's" becomes "a city the player holds a pass for" (home, or a Day Pass bought before).
+  const home = (id: string) => { const k = c.fishing.places[id] ? clusterOf(c, id) : null; return !!k && (k === s.travel.home || !!s.travel.passes[k]); };
   if (s.presence.place && !home(s.presence.place)) s.presence.place = null;
   const cast = s.cast;
   if (cast?.place && !home(cast.place)) {
@@ -261,7 +293,7 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
   s.inbox ??= emptyInbox();   // SGODOT-232: filled for v3 and v4 saves alike, without a version of its own
   s.seen ??= [];   // SGODOT-232 map markers, the same way
   s.day = { ...emptyDay(s.day?.key ?? ''), ...s.day };
-  s.v = 4;
+  s.v = SAVE_VERSION;
   return s;
 }
 
