@@ -381,6 +381,8 @@ func set_hp(hp: int, maximum: int, elite := {}) -> void:
 func hp_bar() -> UiHpBar: return _hp
 ## The creel badge (where a trap's fish fly to, SGODOT-289).
 func creel_badge() -> Control: return _creel
+## The quick bar's Bag, where a row's harvest flies (SGODOT-289); null without a bar.
+func bag_target() -> Control: return quick_bar_node().bag_end() if quick_bar_node() != null else null
 ## A trap's fish still flying to the badge ([{id, count}]): it counts each in as it lands (creel_landed).
 var creel_in_flight: Array = []
 func creel_flying(got: Array) -> void:
@@ -1265,6 +1267,7 @@ static func _float_line_text(parts: Dictionary) -> String:
 		var line := str(p.fmt) % (("+%d" % a) if a >= 0 else ("−%d" % -a))
 		# A held harvest's XP counts its plants once more than one went into it: `+40 XP · 20 plants`.
 		if str(p.get("unit", "")) != "" and int(p.get("count", 1)) > 1: line += " · %d %s" % [int(p.count), str(p.unit)]
+		if str(p.get("tail", "")) != "": line += " · " + str(p.tail)   # Harvest ×N's `· First harvest` (q(124) ②)
 		return line))
 
 # ---------------------------------------------------------------- system states (SGODOT-233, WP6, §10.7.1)
