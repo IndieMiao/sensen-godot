@@ -24,7 +24,9 @@ func test_every_footprint_and_plot_of_the_garden_is_off_the_yard() -> void:
 		var c := P0Garden.PLOT_ORIGIN + grid * 2
 		assert_bool(_in("field", c)).override_failure_message("plot %d at %s" % [id, str(c)]).is_true()
 	var walk: Array = _yard().get("walk", [])
-	assert_that(Rect2i(int(walk[0]), int(walk[1]), int(walk[2]), int(walk[3]))).is_equal(P0Garden.WALK_RECT)
+	# the player's walk rect less the row and the column the fence ring stands on and behind (test below)
+	assert_that(Rect2i(int(walk[0]), int(walk[1]), int(walk[2]), int(walk[3]))).is_equal(
+		Rect2i(P0Garden.WALK_RECT.position, P0Garden.WALK_RECT.size - Vector2i.ONE))
 	var bp := P0Garden.blueprint()   # the front fence, the sign, the plaque and the mailbox are objects too
 	for p in P0Garden.fence_block_points(bp) + [P0Garden.sign_point(bp), P0Garden.plaque_point(bp), P0Garden.mailbox_point(bp)]:
 		var c := bp.world_to_cell(p)
@@ -54,7 +56,8 @@ func test_a_spot_is_judged_as_the_server_does() -> void:
 	v.decor.placed = [{"uid": 1, "id": "deco_bench", "x": 6, "y": 18, "rot": 0}]   # 2 × 1: cells 6–7, 18
 	assert_str(P0Decor.reason(v, "deco_planter", Vector2i(7, 18))).is_equal("Space taken")
 	assert_str(P0Decor.reason(v, "deco_bench", Vector2i(7, 18), 0, 1)).is_equal("")   # moving the bench itself
-	assert_str(P0Decor.reason(v, "deco_pergola", Vector2i(4, 17), 1)).is_equal("")    # turned: 2 wide, 3 tall
+	assert_str(P0Decor.reason(v, "deco_pergola", Vector2i(1, 16), 1)).is_equal("")    # turned: 2 wide, 3 tall
+	assert_str(P0Decor.reason(v, "deco_pergola", Vector2i(4, 17), 1)).is_equal("Outside your yard")   # its third row: behind the back fence
 	assert_str(P0Decor.reason(v, "deco_pergola", Vector2i(4, 17), 0)).is_equal("Space taken")   # 3 × 2 reaches the tree at (6, 17)
 	assert_that(P0Decor.piece_at(v, Vector2i(7, 18)).get("uid")).is_equal(1)
 	assert_that(P0Decor.nearest_spot(v, "deco_planter", 0, Vector2i(9, 1))).is_not_equal(P0Decor.NONE)
@@ -364,3 +367,24 @@ func test_a_placed_fountain_ripples_on_both_basins() -> void:
 	var preview := P0FarmDecor.art("deco_fountain")
 	assert_array(preview.find_children("Ripple*", "MeshInstance3D", true, false)).is_empty()
 	for n in [a, b, preview]: n.free()
+
+## 李元芳's 0.2.1 smoke (d83191bb): a Fountain was offered — green — on the yard's back wall. The Homestead fence ring
+## (Lv3, a Stone Wall with look b) runs between rows 18 and 19 and through column 19; every cell a piece may take lies
+## inside it, so nothing stands on or behind the fence, whichever look.
+func test_no_piece_stands_on_or_behind_the_fence_ring() -> void:
+	var bp := P0Garden.blueprint()
+	var r: Dictionary = P0Garden.FENCE_RING
+	var walk: Array = _yard().get("walk", [])
+	var yard := Rect2i(int(walk[0]), int(walk[1]), int(walk[2]), int(walk[3]))
+	var half := bp.cell_m * 0.5
+	for y in range(yard.position.y, yard.end.y):
+		for x in range(yard.position.x, yard.end.x):
+			var p := bp.cell_to_world(Vector2i(x, y))
+			var inside := p.x - half >= float(r.west) - 0.001 and p.x + half <= float(r.east) + 0.001 \
+				and p.z - half >= float(r.back) - 0.001 and p.z + half <= float(r.front) + 0.001
+			assert_bool(inside).override_failure_message("cell %d,%d is on or past the fence" % [x, y]).is_true()
+	var v := {"decor": {"placed": []}, "facilities": []}
+	for x in range(1, 20): assert_str(P0Decor.reason(v, "deco_planter", Vector2i(x, 19))).is_equal(P0Decor.REASONS.decor_outside)
+	for y in range(0, 20): assert_str(P0Decor.reason(v, "deco_planter", Vector2i(19, y))).is_equal(P0Decor.REASONS.decor_outside)
+	assert_str(P0Decor.reason(v, "deco_fountain", Vector2i(5, 18))).is_equal(P0Decor.REASONS.decor_outside)   # the smoke's spot
+	assert_str(P0Decor.reason(v, "deco_fountain", Vector2i(13, 17))).is_equal("")   # just inside the wall is fine

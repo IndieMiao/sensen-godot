@@ -87,7 +87,11 @@ describe('placing in the yard', () => {
     expect(refuse(s, { type: 'place_decor', item: 'deco_lantern', x: 4, y: 18, ...HOME })).toMatchObject({ ok: false, code: 'not_stored' });
     expect(refuse(s, { type: 'place_decor', item: 'deco_planter', x: 4, y: 18, space: 'mine' })).toMatchObject({ ok: false, code: 'not_home' });
     // a rotated piece takes h × w: the 3 × 2 pergola turned stands 2 wide and 3 tall
-    expect(spotBlock(c, s, 'deco_pergola', 4, 17, 1)).toBeNull();
+    expect(spotBlock(c, s, 'deco_pergola', 1, 16, 1)).toBeNull();
+    // its third row would be row 19, behind the Homestead fence ring (李元芳's 0.2.1 smoke d83191bb)
+    expect(spotBlock(c, s, 'deco_pergola', 4, 17, 1)).toMatchObject({ code: 'decor_outside' });
+    expect(spotBlock(c, s, 'deco_fountain', 5, 18, 0)).toMatchObject({ code: 'decor_outside' });   // on the back wall
+    expect(spotBlock(c, s, 'deco_planter', 19, 14, 0)).toMatchObject({ code: 'decor_outside' });   // on the east wall
     expect(spotBlock(c, s, 'deco_pergola', 4, 17, 0)).toMatchObject({ code: 'decor_overlap' });   // 3 × 2 would reach the tree at (6, 17)
     // the garden's own dressing is taken (不知火舞 on 290): the sign by the gate, a bush, a tree, a rock
     for (const [x, y, what] of [[7, 1, 'sign'], [1, 0, 'bush'], [12, 18, 'tree'], [16, 18, 'rock']] as const)
