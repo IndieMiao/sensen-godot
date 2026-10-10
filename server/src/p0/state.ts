@@ -81,16 +81,22 @@ export interface ResidentState {
 
 export interface Homestead { level: number; plaque: { level: number; at: number }[] }
 
-/** One mine run on floors 1–2 (§13.3, SGODOT-231): floors[i] is floor i + 1; drops derive from the run seed. */
+/** One mine run (§13.3, SGODOT-231; floors 3–5 SGODOT-275): floors[i] is floor i + 1; drops derive from the run seed.
+ * mobs: each monster's HP left on that floor (content order); hp: the player's HP in the mine; express: started by Floor 5 ·
+ * Express (it counts as having cleared floor 2). Runs saved before SGODOT-275 lack the newer fields (see mine.ts). */
 export interface MineRun {
   id: number; seed: number; day: string;    // day = the player day it started; 04:00 ends it
-  floors: { paid: boolean; broken: number[]; lit: boolean }[];
+  floors: { paid: boolean; broken: number[]; lit: boolean; mobs?: number[] }[];
+  hp?: number; express?: boolean; attack_at?: number; hurt_at?: number;
 }
 export interface MineState {
   run: MineRun | null;
   count: number;                            // runs ever started (run ids)
   ended: { reason: 'reset'; at: number } | null;   // an unfinished run the 04:00 rollover ended (shown once at the mine mouth)
   swing_at: number;                         // last rock, for the 0.9 s anti-script tempo
+  express?: boolean;                        // the account has cleared floor 4 once: Floor 5 · Express (SGODOT-275)
+  elite?: { day: string; kills: number };   // elite kills this player day: its quartz drops on the first only (§13.3.4)
+  completed?: { run: number; at: number } | null;   // the last run its elite ended (Run complete, shown once)
 }
 
 /** Where the player's commands come from (q(41)): when they last left the homestead, for Rest's 2 h rule. */
@@ -292,6 +298,10 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
   }
   s.inbox ??= emptyInbox();   // SGODOT-232: filled for v3 and v4 saves alike, without a version of its own
   s.seen ??= [];   // SGODOT-232 map markers, the same way
+  // SGODOT-275: floors 3–5. A run saved with floors 1–2 gets the deeper floors unpaid (their monsters are met at full HP
+  // by mine.floorMobs); its HP starts full (mine.runHp). No version of its own: the fields are additive.
+  const run = s.mine?.run;
+  if (run) while (run.floors.length < c.mine.floors.length) run.floors.push({ paid: false, broken: [], lit: false });
   s.day = { ...emptyDay(s.day?.key ?? ''), ...s.day };
   s.v = SAVE_VERSION;
   return s;

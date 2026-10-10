@@ -73,8 +73,11 @@ export interface ResidentRequest {
 }
 /** §13.2 gathering spot (SGODOT-231): the first yield is the spot's material (Farm Storage, +1 with gloves). */
 export interface GatherSpot { name: string; yield: [string, number][]; homestead: number }
-/** §13.3.3 one mine floor: weighted extra drop per rock, null = nothing extra. */
-export interface MineFloorDef { floor: number; drops: [string | null, number][] }
+/** §13.3.3 one mine floor: weighted extra drop per rock (null = nothing extra), its rock count (default mine.rocks; floor 5
+ * has none) and its monsters by id (§13.3.4, SGODOT-275). */
+export interface MineFloorDef { floor: number; drops: [string | null, number][]; rocks?: number; mobs?: string[] }
+/** §13.3.4 a mine monster: loot as [item, qty, weight]; once_a_day = an item it gives a player at most once a player day. */
+export interface MineMonster { name: string; hp: number; damage: number; loot: [string, number, number][]; once_a_day?: string }
 /** §13.4 workbench recipe: out goes to the bag, Gear (equipped) or the owned list (passive tools). */
 export interface WorkbenchRecipe {
   id: string; tab: string; out: string; qty: number; to: 'bag' | 'gear' | 'owned';
@@ -120,7 +123,7 @@ export interface P0Content {
     farming: string; fishing: string; mining: string; combat: string; names: Record<string, string>;
     row_hoe: { id: string; price: number; skill: Skill; gate: number; sow: number };
   };
-  materials: Record<string, { name: string; price: number | null; ingr?: [Family, number] }>;   // ingr: seasonings (§7.3.1)
+  materials: Record<string, { name: string; price: number | null; floor?: number; ingr?: [Family, number] }>;   // ingr: seasonings (§7.3.1); floor: a request's price for one with no buyback (quartz, hardwood)
   wallet_floor: number;                       // §8.1.1 / q(32): every coin spend except seeds keeps this much
   homestead: {
     max_level: number;
@@ -180,10 +183,14 @@ export interface P0Content {
   supplies: Record<string, { name: string }>;
   /** §13.2 (SGODOT-231): spot regrow, anti-script tempo between taps, the gloves and their bonus. */
   gather: { regen_h: number; tempo_ms: number; gloves: string; gloves_bonus: number; spots: Record<string, GatherSpot> };
-  /** §13.3 floors 1–2 (SGODOT-231, LOCK-21). picks: Stone per rock by pickaxe. */
+  /** §13.3 floors 1–5 (SGODOT-231, LOCK-21; 3–5 SGODOT-275). picks: Stone per rock by pickaxe; combat: the mine's HP and the
+   * Combat slot's weapons; express_unlock_floor: the floor whose first clear opens Floor 5 · Express for the account. */
   mine: {
     runs_per_day: number; floor_energy: number; rock_energy: number; rocks: number; restart_floor: number; tempo_ms: number;
     floors: MineFloorDef[]; picks: Record<string, { stone: number }>;
+    monsters: Record<string, MineMonster>;
+    combat: { hp: number; invulnerability_ms: number; weapons: Record<string, { attack: number; speed: number }> };
+    express_unlock_floor: number;
   };
   /** §13.4 P0 workbench: Tools / Supplies (SGODOT-231). */
   workbench: { tabs: string[]; recipes: WorkbenchRecipe[] };

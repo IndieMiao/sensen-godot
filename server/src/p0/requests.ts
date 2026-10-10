@@ -39,7 +39,8 @@ export function floorPrice(c: P0Content, id: string): number {
   if (kind === 'crop') return Math.floor((cropById(c, id)?.price ?? 0) * c.requests.floor_rate + 1e-9);
   if (kind === 'fish') return Math.floor((fishById(c, id)?.price ?? 0) * c.requests.floor_rate + 1e-9);
   if (kind === 'dish') return dishBuyback(c, id) ?? 0;
-  return c.materials[id]?.price ?? 0;
+  // A material with no buyback (price null) is paid at its shadow price (floor: Quartz 5, Hardwood 4; §8.4.1).
+  return c.materials[id]?.floor ?? c.materials[id]?.price ?? 0;
 }
 
 /**
