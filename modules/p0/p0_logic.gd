@@ -6,8 +6,8 @@ extends RefCounted
 
 const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
 const P0Clusters := preload("res://modules/p0/p0_clusters.gd")
-const P0FishWorld := preload("res://modules/p0/p0_fish_world.gd")
-const P0Trap := preload("res://modules/p0/p0_trap.gd")   # Fish Trap (SGODOT-283)   # a pond's fish, time of day and weather (SGODOT-283)
+const P0FishWorld := preload("res://modules/p0/p0_fish_world.gd")   # a pond's fish, time of day and weather (SGODOT-283)
+const P0Trap := preload("res://modules/p0/p0_trap.gd")   # Fish Trap (SGODOT-283)
 const ICON_DIR := "res://assets/p0/icons/%s.svg"
 const PinReason := preload("res://modules/p0/p0_pin_reason.gd")   # the taken requests and the pins they mark (q(104))
 

@@ -141,6 +141,20 @@ describe('collecting (q(109) ⑦)', () => {
     expect(refuse(r.s, { type: 'collect_trap', ...at(FERN) }, now)).toEqual({ code: 'creel_full', detail: { fish: 2 } });
   });
 
+  it('a fish that does not fit is skipped and the next still taken; the view counts it the same way (苏烈 on #249)', () => {
+    const { s, now } = full();
+    settleTrap(c, s, s.traps![0], now);
+    s.traps![0].fish = ['fish_pike', 'fish_crucian'];   // no free slot; a part stack of Crucian takes the second only
+    s.bag = Array.from({ length: s.bag_cap - 1 }, (_, i) => ({ id: `seed_test_${i}`, qty: 1 }));
+    s.bag.push({ id: 'fish_crucian', qty: 5 });
+    expect(viewOf(c, s, now).fishing.trap.traps[0]).toMatchObject({ fish: 2, fits: 1, all_fit: false });
+    const r = step(s, { type: 'collect_trap', ...at(FERN) }, now);
+    expect(r.ev).toContainEqual(expect.objectContaining({ kind: 'trap', action: 'collected', fish: 1, left: 1 }));
+    expect(r.s.traps![0].fish).toEqual(['fish_pike']);
+    expect(viewOf(c, r.s, now).fishing.trap.traps[0]).toMatchObject({ fish: 1, fits: 0 });
+    expect(refuse(r.s, { type: 'collect_trap', ...at(FERN) }, now)).toEqual({ code: 'creel_full', detail: { fish: 1 } });
+  });
+
   it('Take back empties the trap into the creel and the trap into the bag; only when everything fits', () => {
     const { s, now } = full();
     const r = step(s, { type: 'collect_trap', take_back: true, ...at(FERN) }, now);

@@ -107,7 +107,7 @@ export function collectTrap(c: P0Content, s: P0State, cmd: { take_back?: unknown
   // Collect needs room for one at least (`Collect · Creel full`).
   if (back && !fitsAll(c, s, t.fish)) return { code: 'collect_first', detail: { fish: t.fish.length } };
   if (back && !fitsAll(c, s, [...t.fish, TRAP])) return { code: 'bag_full' };
-  if (!back && t.fish.length && room(c, s, t.fish[0]) < 1 && !t.fish.some(id => room(c, s, id) > 0)) return { code: 'creel_full', detail: { fish: t.fish.length } };
+  if (!back && t.fish.length && fitsCount(c, s, t.fish) < 1) return { code: 'creel_full', detail: { fish: t.fish.length } };
   const r = rules(c), level = skillLevel(c, s, 'fishing'), was = t.fish.length;
   const kept: string[] = [];
   const got: string[] = [];
@@ -133,10 +133,16 @@ export function collectTrap(c: P0Content, s: P0State, cmd: { take_back?: unknown
   return null;
 }
 
-/** How many of these, taken in order, fit in the bag now (as collect_trap takes them). */
+/** How many of these Collect would take now: each fish in turn onto a matching stack or a free slot, one that does not
+ * fit skipped and the rest still tried — collectTrap's own walk, on a copy of the bag (苏烈 on #249). */
 function fitsCount(c: P0Content, s: P0State, ids: string[]): number {
+  const bag = { bag: s.bag.map(b => ({ ...b })), bag_cap: s.bag_cap };
   let n = 0;
-  for (let i = 1; i <= ids.length; i++) if (fitsAll(c, s, ids.slice(0, i))) n = i; else break;
+  for (const id of ids) {
+    if (room(c, bag, id) < 1) continue;
+    add(c, bag, id, 1);
+    n += 1;
+  }
   return n;
 }
 
