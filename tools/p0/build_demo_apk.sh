@@ -52,12 +52,25 @@ DIRTY="$(git status --porcelain --untracked-files=no | head -1)"
 export P0_UNTRACKED="$(git ls-files --others --exclude-standard)"
 export ADB_SERVER_SOCKET="tcp:localhost:${P0_ADB_PORT:-5071}" ANDROID_ADB_SERVER_PORT="${P0_ADB_PORT:-5071}"
 GODOT="${GODOT_BIN:-godot}"
-SDK="${ANDROID_HOME:-$HOME/Library/Android/sdk}"
-# apksigner needs a JDK; use the one the Godot editor exports with (Android Studio's) unless JAVA_HOME is set.
-export JAVA_HOME="${JAVA_HOME:-/Applications/Android Studio.app/Contents/jbr/Contents/Home}"
+# Defaults per OS when ANDROID_HOME / JAVA_HOME are not set. macOS: Android Studio's SDK and its bundled JDK (the one
+# the Godot editor exports with). Linux: Android Studio's ~/Android/Sdk and the JDK that `java` on PATH belongs to.
+if [[ "$(uname -s)" == Darwin ]]; then
+  SDK="${ANDROID_HOME:-$HOME/Library/Android/sdk}"
+  # apksigner needs a JDK.
+  export JAVA_HOME="${JAVA_HOME:-/Applications/Android Studio.app/Contents/jbr/Contents/Home}"
+else
+  SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-$HOME/Android/Sdk}}"
+  if [[ -z "${JAVA_HOME:-}" ]] && command -v java > /dev/null; then
+    JAVA_HOME="$(dirname "$(dirname "$(readlink -f "$(command -v java)")")")"
+  fi
+  export JAVA_HOME="${JAVA_HOME:-}"
+fi
+[[ -d "$SDK/build-tools" ]] || { echo "no Android SDK at $SDK (set ANDROID_HOME)" >&2; exit 2; }
+[[ -x "$JAVA_HOME/bin/java" ]] || { echo "no JDK at '$JAVA_HOME' (set JAVA_HOME)" >&2; exit 2; }
 LOGS=output/p0-demo
 CFG=assets/p0/demo_server.json
-BACKUP="$(mktemp -t p0demo_presets)"
+# A full template: BSD mktemp -t takes a prefix, GNU mktemp -t needs X's, so neither form of -t works on both.
+BACKUP="$(mktemp "${TMPDIR:-/tmp}/p0demo_presets.XXXXXX")"
 cp export_presets.cfg "$BACKUP"
 restore() { cp "$BACKUP" export_presets.cfg; rm -f "$BACKUP" "$CFG"; }
 trap restore EXIT
