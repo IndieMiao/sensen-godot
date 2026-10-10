@@ -1,7 +1,7 @@
 /** P0 command reducer: one command → new state + events, or a typed refusal. Never mutates the input. */
 import { cropById, cropBySeed, rodById, type P0Content } from './content.js';
 import { add, count, room, take } from './bag.js';
-import { collectPot, eatDish, startPot, recordHeat, settleStove } from './cooking.js';
+import { burners, collectPot, cookAll, eatDish, startPot, recordHeat, settleStove } from './cooking.js';
 import { boardCommand, noteVisit, settleBoards, tracked } from './boards.js';
 import { expireGiftMeals, giftResident, learn, noteSown, residentRequestCommand, talk } from './residents.js';
 import { castLine, reelLine, type FishCommand } from './fishing.js';
@@ -12,6 +12,7 @@ import { notePresence, restReadyIn } from './presence.js';
 import { isMineCommand, mineCommand, settleMine, type MineCommand } from './mine.js';
 import { gather, storeMaterials } from './gathering.js';
 import { craft } from './workbench.js';
+import { coveredPlots, facilityAt, growMs, moveFacility, place } from './garden.js';
 import { claimParcel, PARCEL_LIMIT, settleParcels } from './parcels.js';
 import { dayKey, maxEnergy, scaledXp, settleEnergy, skillLevel, xpPercent } from './rules.js';
 import { buyback, buyItem, drink, moveStorage, offerOf, sellItem, setLock } from './shops.js';
@@ -38,8 +39,9 @@ type P0CommandBody =
   | { type: 'store' | 'take_out'; item: string; qty: number | 'all' }
   | { type: 'rest' }
   | FishCommand
-  | { type: 'cook'; items?: string[]; recipe?: string }
+  | { type: 'cook'; items?: string[]; recipe?: string; stove?: number; double?: boolean }   // stove: 0-based (Lv4 / Lv8); double: Big Pot
   | { type: 'collect'; taps?: number[]; eat?: boolean; pot?: number }   // eat: COOK-4 Eat, the main portion straight from the pot
+  | { type: 'cook_all' }   // Cook All (Cooking Lv8): fill every free stove and queue with known pages
   | { type: 'heat'; taps: number[]; pot?: number }   // heat taps as they happen, kept on the pot (Queue ×2 keeps a pot on its own)
   // pot: the pot's id (pot / queue events, view.cooking.stove.id). With Queue ×2 send it on every heat and collect:
   // a different pot is refused as stale_pot instead of taking taps meant for another one.
@@ -53,6 +55,8 @@ type P0CommandBody =
   | MineCommand
   | { type: 'gather'; spot: string }
   | { type: 'craft'; recipe: string }
+  | { type: 'place'; recipe: string; plot: number }          // P1: build a facility in place (one step, q(22))
+  | { type: 'move_facility'; facility: number; plot: number }   // P1: free, never removed
   | { type: 'claim_parcel'; key: string }
   | { type: 'claim_parcels'; keys: string[] }   // Claim all: the keys on screen, so a retry never takes a newer parcel
   | { type: 'read_inbox'; keys: string[] }
@@ -76,8 +80,10 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
   settleBoards(c, s, now);
   // Queue ×2: a done pot makes way for the waiting one, as the view shows; heat / collect naming the pot on the stove
   // bring its taps first, and the settle after the command keeps it if it is done.
-  const aimed = (cmd.type === 'heat' || cmd.type === 'collect') && cmd.pot !== undefined && s.stove !== null && cmd.pot === (s.stove.id ?? null);
-  if (!aimed) settleStove(c, s, now, events);
+  // With several stoves (SGODOT-282) only the stove holding that pot waits; the others settle as usual.
+  const aimed = (cmd.type === 'heat' || cmd.type === 'collect') && cmd.pot !== undefined && cmd.pot !== null
+    ? burners(c, s).findIndex(b => b.stove !== null && cmd.pot === (b.stove.id ?? null)) : -1;
+  settleStove(c, s, now, events, aimed < 0 ? undefined : aimed);
   settleMine(c, s, now);
   settleParcels(c, s, now);
   // v5: a pond or outpost needs a pass for its city (home always); nothing changes when it is refused.
@@ -90,11 +96,19 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
   noteVisit(s, cmd.space, cmd.place, events);   // a tracked explore request checks in where the player is (§9.6.3)
   settleExplorer(c, s, now, events);   // a stamp counted from today on (2 a day) earns its medal today
   const plotOf = (id: unknown) => (Number.isInteger(id) ? s.plots.find(p => p.id === id) : undefined);
+  // P1 (SGODOT-239): a plot with a facility on it is no field — nothing is tilled, sown, fed or harvested there.
+  const occupied = (id: unknown) => {
+    const f = Number.isInteger(id) ? facilityAt(s, id as number) : undefined;
+    return f ? fail('plot_occupied', { plot: id, facility: f.kind }) : null;
+  };
+  const growH = (crop: string) => cropById(c, crop)?.grow_h ?? 0;
 
   switch (cmd.type) {
     case 'till': {
       const plot = plotOf(cmd.plot);
       if (!plot) return fail('bad_plot');
+      const taken = occupied(cmd.plot);
+      if (taken) return taken;
       if (plot.state !== 'wild') return fail('wrong_state', { state: plot.state });
       plot.state = 'tilled';
       break;
@@ -106,6 +120,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       if (ids.length < 1 || ids.length > most || new Set(ids).size !== ids.length) return fail('bad_plot', { most });
       const plots = ids.map(plotOf);
       if (plots.some(p => !p)) return fail('bad_plot');
+      for (const id of ids) { const taken = occupied(id); if (taken) return taken; }
       const wrong = plots.find(p => p!.state !== 'tilled');
       if (wrong) return fail('wrong_state', { plot: wrong.id, state: wrong.state });
       const crop = cropBySeed(c, String(cmd.seed));
@@ -119,11 +134,14 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       // §4.2.1: the level difference is locked at the moment the player pays.
       const pct = xpPercent(c, skillLevel(c, s, 'farming'), crop.level);
       noteSown(c, s, n);
+      const watered = coveredPlots(c, s);
       for (const plot of plots as Plot[]) {
         plot.state = 'sown';
         plot.crop = crop.id;
         plot.xp_pct = pct;
         delete plot.ready_at; delete plot.fert;
+        // §5.7: under a sprinkler it grows as it is sown (−15%, locked now), no Water step.
+        if (watered.has(plot.id)) { plot.state = 'growing'; plot.ready_at = now + growMs(c, s, plot, crop.grow_h); }
       }
       break;
     }
@@ -131,6 +149,8 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       // §5.5: one Compost per plot, any time after sowing and before it is ripe; 0 Energy; never stacks.
       const plot = plotOf(cmd.plot);
       if (!plot) return fail('bad_plot');
+      const taken = occupied(cmd.plot);
+      if (taken) return taken;
       const ripe = plot.state === 'growing' && (plot.ready_at ?? Infinity) <= now;
       if ((plot.state !== 'sown' && plot.state !== 'growing') || ripe || !plot.crop) return fail('wrong_state', { state: ripe ? 'ready' : plot.state });
       if (plot.fert) return fail('fertilized');
@@ -149,15 +169,19 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
     case 'water': {
       const plot = plotOf(cmd.plot);
       if (!plot) return fail('bad_plot');
+      // A covered plot was never waiting for water (q(59) §3): an older client's Water is refused as already growing.
+      if (plot.state === 'growing' && coveredPlots(c, s).has(plot.id)) return fail('already_growing');
       if (plot.state !== 'sown' || !plot.crop) return fail('wrong_state', { state: plot.state });
       const crop = cropById(c, plot.crop)!;
       plot.state = 'growing';
-      plot.ready_at = now + Math.round(crop.grow_h * 3_600_000 * (plot.fert ? c.goods.fert_compost.grow_mult ?? 1 : 1));
+      plot.ready_at = now + growMs(c, s, plot, crop.grow_h);
       break;
     }
     case 'harvest': {
       const plot = plotOf(cmd.plot);
       if (!plot) return fail('bad_plot');
+      const taken = occupied(cmd.plot);
+      if (taken) return taken;
       if (plot.state !== 'growing' || !plot.crop || (plot.ready_at ?? Infinity) > now)
         return fail('not_ready', { ready_in: plot.ready_at ? plot.ready_at - now : null });
       const crop = cropById(c, plot.crop)!;
@@ -235,13 +259,18 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       if (c.homestead.levels.find(l => l.level === s.homestead.level)?.unlocks.includes('spice_rack')) storeMaterials(c, s, now, events, 'spice_rack');
       break;
     }
+    case 'place': case 'move_facility': {
+      const refusal = cmd.type === 'place' ? place(c, s, cmd, now, events, growH) : moveFacility(c, s, cmd, now, events, growH);
+      if (refusal) return fail(refusal.code, refusal.detail);
+      break;
+    }
     case 'gather': case 'craft': {
       const refusal = cmd.type === 'gather' ? gather(c, s, cmd, now, events) : craft(c, s, cmd, events);
       if (refusal) return fail(refusal.code, refusal.detail);
       break;
     }
     case 'heat': {
-      const refusal = recordHeat(s, cmd);
+      const refusal = recordHeat(c, s, cmd);
       if (refusal) return fail(refusal.code, refusal.detail);
       break;
     }
@@ -252,6 +281,11 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
         : cmd.type === 'cook' ? startPot(c, s, cmd, now, events)
         : cmd.type === 'collect' ? collectPot(c, s, cmd, now, events, maxEnergy(c, s))
         : eatDish(c, s, cmd, now, events, maxEnergy(c, s));
+      if (refusal) return fail(refusal.code, refusal.detail);
+      break;
+    }
+    case 'cook_all': {
+      const refusal = cookAll(c, s, now, events);
       if (refusal) return fail(refusal.code, refusal.detail);
       break;
     }

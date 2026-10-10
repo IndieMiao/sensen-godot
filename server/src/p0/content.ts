@@ -37,7 +37,9 @@ export interface CookTier {
  * recipe card, experiment, card = a stall recipe card, market = a Market card, taught = a resident, buy = bought. */
 export type Learn = 'start' | 'gift' | 'experiment' | 'card' | 'market' | 'taught' | 'buy';
 /** Cooking conveniences in P0 (§4.6.3, q(38)). */
-export type Convenience = 'cook_again' | 'clue_double' | 'hearty_mishap' | 'steady_hand_1' | 'queue_two' | 'quick_fire';
+export type Convenience = 'cook_again' | 'clue_double' | 'hearty_mishap' | 'steady_hand_1' | 'queue_two' | 'quick_fire'
+  // P1 (SGODOT-282, §4.6.3 Lv7–10)
+  | 'steady_hand_2' | 'fast_mastery' | 'cook_all' | 'provisions_plus' | 'chefs_touch' | 'title_chef' | 'lucky_double';
 /** A P0 Cookbook page that can be cooked (§7.14.0); n = its page number in the 48-page Cookbook. */
 export interface Recipe { n?: number; id: string; name: string; in: string[]; known?: boolean; style?: string; learn?: Learn[]; regional?: boolean; card_zone?: string; card_zones?: string[] }
 /** A page outside P0 (§7.14.1–7.14.4): only its silhouette shows, slots = the family of each slot. */
@@ -89,9 +91,12 @@ export interface MineFloorDef { floor: number; drops: [string | null, number][];
 export interface MineMonster { name: string; hp: number; damage: number; loot: [string, number, number][]; once_a_day?: string }
 /** §13.4 workbench recipe: out goes to the bag, Gear (equipped) or the owned list (passive tools). */
 export interface WorkbenchRecipe {
-  id: string; tab: string; out: string; qty: number; to: 'bag' | 'gear' | 'owned';
+  id: string; tab: string; out: string; qty: number; to: 'bag' | 'gear' | 'owned' | 'field';
   cost: [string, number][]; gate?: [Skill, number];
+  facility?: string;   // to: field (P1, SGODOT-239): the facility it builds in place (place command), never crafted
 }
+/** P1 step 1 (q(59) §1.4): a facility on one plot; a sprinkler waters the ring of 8 around it and cuts ripening. */
+export interface FacilityDef { name: string; cover: 'ring8'; grow_cut: number; cap_base: number; cap_per_homestead: number }
 
 export interface ResidentDef {
   name: string; role: string; portrait: string; likes: string; gift_meal: string; one_per_day: boolean;
@@ -136,12 +141,16 @@ export interface P0Content {
   wallet_floor: number;                       // §8.1.1 / q(32): every coin spend except seeds keeps this much
   homestead: {
     max_level: number;
-    warming_cabinet: number;                  // portions once unlocked (Lv3; 12 from Lv8 is P1, §7.7)
+    warming_cabinet: number;                  // portions once unlocked (Lv3, §7.7)
+    // P1 (SGODOT-282, §7.7 / §8.3.2): kitchen facilities by Homestead level, each [from level, value] ascending.
+    stoves?: [number, number][];              // stoves in the kitchen: Lv1 1, Lv4 2, Lv8 3 (absent = 1)
+    warming_cabinet_by_level?: [number, number][];   // Warming Cabinet portions: Lv3 6, Lv8 12 (absent = warming_cabinet)
+    chefs_sign_gold?: number;                 // Chef's Sign (Lv10): every dish's gold zone + this (0.05 = 5 points)
     per_level: { energy: number; meals: number };
     board_slots: [number, number][];          // [from Homestead level, Stall Board slots]
     levels: { level: number; coins: number; skills: number; materials: [string, number][]; unlocks: string[] }[];
   };
-  bag_upgrades: { id: string; name: string; homestead: number; price: number; materials: [string, number][]; capacity: number }[];
+  bag_upgrades: { id: string; name: string; homestead: number; price: number; materials: [string, number][]; capacity: number; requires?: string }[];   // requires: the tier before (II after I)
   drinks: { energy: number; prices: number[]; daily: number; items: Record<string, { name: string; shop: ShopId }> };
   specialty: Record<string, { name: string; price: number; shop: ShopId; to: 'storage' }>;
   shops: Record<ShopId, { sells: string; buys: Record<string, { rate: number; quota: QuotaId | null }> }>;
@@ -180,9 +189,14 @@ export interface P0Content {
     derive: number[][];
     mystery: { id: string; name: string; energy: number; hearty: number };   // hearty: from Cooking Lv3 (Hearty Mishap)
     food_cap: number;
-    conveniences: Record<Convenience, number>;   // the Cooking level each P0 convenience comes at (q(38))
+    conveniences: Partial<Record<Convenience, number>>;   // the Cooking level each convenience comes at (q(38)); absent = not in this build
     gold_cap: number; steady_hand_gold: number;  // gold arc share: bonuses stop at gold_cap; Steady Hand I adds steady_hand_gold
-    mastered: { cooked: number; gold: number };  // a page cooked this often is Mastered and its gold arc is wider (§7.5.1)
+    mastered: { cooked: number; gold: number; fast?: number };  // Mastered at `cooked` pots (`fast` with Fast Mastery, Lv7); its gold arc is wider (§7.5.1)
+    lucky_double?: number;                        // Lucky Double (Lv10): chance of one more Plain portion (not Legendary, not with Double)
+    cook_all_per_page?: number;                   // Cook All (Lv8): at most this many pots of one page (q(4))
+    // Cookbook milestones past Home Cook (§7.6.1, SGODOT-282): titles at Discovered / Mastered counts, once each;
+    // coins paid, cabinet = Warming Cabinet portions added, decor = the yard piece it gives (placed with Decorate).
+    milestones?: { id: string; title: string; discovered?: number; mastered?: number; coins?: number; cabinet?: number; decor?: string }[];
     quick_fire: number;                          // Quick Fire: cooking time and heat times × this (§4.6.3 Lv6)
     trial_refunds: number;                       // failed pots a day that refund their ingredients in the blessing (§7.5.2)
     recipes: Recipe[];
@@ -201,8 +215,13 @@ export interface P0Content {
     combat: { hp: number; invulnerability_ms: number; weapons: Record<string, { attack: number; speed: number }> };
     express_unlock_floor: number;
   };
-  /** §13.4 P0 workbench: Tools / Supplies (SGODOT-231). */
+  /** §13.4 P0 workbench: Tools / Supplies (SGODOT-231), Facilities from P1. */
   workbench: { tabs: string[]; recipes: WorkbenchRecipe[] };
+  /** P1 (SGODOT-239, content/farm_garden.json): plot id → [col, row] on the garden grid; from Homestead level `extra.homestead`
+   * the homestead has `count` more plots from id `from`, added as wild. */
+  garden: { plots: [number, number][]; extra: { homestead: number; from: number; count: number } };
+  /** P1 (SGODOT-239): facilities by kind; grow_cut_cap caps a facility's cut and Compost's together. */
+  facilities: { grow_cut_cap: number; kinds: Record<string, FacilityDef> };
 }
 
 export const DEFAULT_P0_CONTENT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../assets/p0/p0_content.json');
@@ -324,6 +343,7 @@ export function itemName(c: P0Content, id: string): string {
   if (c.drinks.items[id]) return c.drinks.items[id].name;
   if (c.specialty[id]) return c.specialty[id].name;
   if (c.supplies[id]) return c.supplies[id].name;
+  if (id.startsWith('facility_') && c.facilities?.kinds[id.slice(9)]) return c.facilities.kinds[id.slice(9)].name;
   const upgrade = c.bag_upgrades.find(u => u.id === id);
   if (upgrade) return upgrade.name;
   if (itemKind(id) === 'dish') {

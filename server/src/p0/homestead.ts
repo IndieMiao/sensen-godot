@@ -4,6 +4,7 @@ import { gainEnergy, type P0Event } from './progress.js';
 import { maxEnergy, skillLevel } from './rules.js';
 import type { P0State } from './state.js';
 import { missing, takeStorageFirst } from './storage.js';
+import { addPlots } from './garden.js';
 import type { Refusal } from './fishing.js';
 
 export function nextLevel(c: P0Content, s: P0State) {
@@ -17,6 +18,24 @@ export function skillsTotal(c: P0Content, s: P0State): number {
 /** Unlocks granted at or below the current level (spice_rack, warming_cabinet, bag_upgrade_1, board_slot_3, fence). */
 export function unlocked(c: P0Content, s: P0State, what: string): boolean {
   return c.homestead.levels.some(l => l.level <= s.homestead.level && l.unlocks.includes(what));
+}
+
+/** The value of a [from level, value] ladder at the current Homestead level, or fallback below its first step. */
+export function stepAt(steps: [number, number][] | undefined, level: number, fallback: number): number {
+  let v = fallback;
+  for (const [from, n] of steps ?? []) if (level >= from) v = n;
+  return v;
+}
+
+/** Stoves in the kitchen (§8.3.2): Lv1–3 1, Lv4–7 2, Lv8 on 3. */
+export function stoveCount(c: P0Content, s: P0State): number {
+  return Math.max(1, stepAt(c.homestead.stoves, s.homestead.level, 1));
+}
+
+/** Big Pot (Lv6, §7.7): any stove may cook Double. Chef's Sign (Lv10): the gold zone bonus, 0 before. */
+export function bigPot(c: P0Content, s: P0State): boolean { return unlocked(c, s, 'big_pot'); }
+export function chefSignGold(c: P0Content, s: P0State): number {
+  return unlocked(c, s, 'chefs_sign') ? (c.homestead.chefs_sign_gold ?? 0) : 0;
 }
 
 export function boardSlots(c: P0Content, s: P0State): number {
@@ -59,5 +78,8 @@ export function upgradeHomestead(c: P0Content, s: P0State, now: number, events: 
   const max = maxEnergy(c, s);
   const gain = gainEnergy(c, s, now, max - s.energy.value, events, 'homestead');
   events.push({ kind: 'homestead', level: next.level, energy: gain, unlocks: next.unlocks });
+  // P1 (q(59) §1.1): Lv3 brings 10 wild plots (30–39), dropped in with the fence (HOME-2 `Plots +10`).
+  const added = addPlots(c, s);
+  if (added.length > 0) events.push({ kind: 'plots_added', plots: added, reason: 'homestead' });
   return null;
 }

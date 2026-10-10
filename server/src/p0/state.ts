@@ -1,6 +1,7 @@
 /** P0 player state (one homestead per player; no compatibility with the old farm state). */
 import type { Family, P0Content, Skill } from './content.js';
 import { maxEnergy } from './rules.js';
+import { addPlots } from './garden.js';
 import { clusterOf, clusterOfCityName, freshTravel, homeCluster, type TravelState } from './travel.js';
 
 export type PlotState = 'wild' | 'tilled' | 'sown' | 'growing';
@@ -9,6 +10,8 @@ export interface Plot {
   crop?: string; xp_pct?: number; ready_at?: number;
   fert?: boolean;                 // compost this round (§5.5): −20% of the ripening time, once, gone at harvest
 }
+/** A facility standing on a plot (P1, SGODOT-239): a sprinkler waters the ring of 8 around it. Never removed (q(22)). */
+export interface Facility { id: number; kind: string; plot: number; under?: 'wild' | 'tilled' }   // under: the plot as it was, back when it moves
 /** One bag slot. A resident's gift meal is its own stack (gift), never merged with bought or cooked ones (§3.4.5). */
 export interface BagStack { id: string; qty: number; gift?: { from: string; day: string } }
 
@@ -44,7 +47,12 @@ export interface Pot {
   left?: string[];   // collected (judged, XP paid) but no place to keep: these portions wait on the stove (§7.2.6)
   id?: number;       // which pot this is (s.fires when it was put on), so heat / collect name the pot they mean (Queue ×2)
   no_room?: boolean; // done but found no place to keep it: the waiting pot fires when it is taken, not when it was done
+  double?: boolean;  // Big Pot Double (Homestead Lv6): ingredients ×2, two portions, one round of heat
 }
+
+/** One stove and the pot waiting behind it (Queue ×2). Stove 1 is s.stove / s.queue; stoves 2–3 (Homestead Lv4 / Lv8,
+ * SGODOT-282) are s.burners[0..1]. Each stove cooks, queues and keeps its own pot. */
+export interface Burner { stove: Pot | null; queue: Pot | null }
 
 /** The Cookbook beyond the known pages (§7.5, SGODOT-232 S5). */
 export interface CookbookBook {
@@ -153,6 +161,7 @@ export interface P0State {
   cast: Cast | null;
   stove: Pot | null;
   queue: Pot | null;             // Queue ×2 (Cooking Lv5): the pot waiting behind the one on the stove
+  burners: Burner[];             // stoves 2 and 3 (Homestead Lv4 / Lv8); [] until a pot goes on one
   cabinet: { id: string; qty: number }[];   // Warming Cabinet portions (Homestead Lv3, §7.7); stacks by dish id
   cookbook: string[];            // known recipe pages (Tasted or Discovered)
   book: CookbookBook;
@@ -163,6 +172,8 @@ export interface P0State {
   storage_auto: { at: number; items: [string, number][] } | null;   // last auto-store on coming home (q(40)), floated once by the client
   travel: TravelState;           // home / current city, visited cities, stamps, Day Pass (v5, SGODOT-275)
   seen?: string[];   // map markers' ◆ already looked at: item:<id> / talk:<resident> (SGODOT-232, q(48))
+  facilities?: Facility[];       // P1 (SGODOT-239): facilities on plots
+  facility_count?: number;       // facilities ever built (their ids)
   fires: number;                 // pots ever started (first fire is the tutorial ring)
   rng: number;
   seq: number;
@@ -191,7 +202,7 @@ export function freshState(c: P0Content, player: string, now: number, seed = has
     firsts: [], rewards: [],
     day: emptyDay(),
     fishing: { casts: 0, bites: 0, caught: {}, seen: [] },
-    cast: null, stove: null, queue: null, cabinet: [],
+    cast: null, stove: null, queue: null, burners: [], cabinet: [],
     cookbook: c.cooking.recipes.filter(r => r.known).map(r => r.id), book: emptyBook(),
     requests: [{ ...c.requests.tutorial, status: 'open' }],
     gear: { rods: [c.tools.fishing], rod: c.tools.fishing, hoes: [c.tools.farming], hoe: c.tools.farming, picks: [c.tools.mining], pick: c.tools.mining },
@@ -200,6 +211,7 @@ export function freshState(c: P0Content, player: string, now: number, seed = has
     storage_auto: null,
     travel: freshTravel(c),
     seen: [],
+    facilities: [], facility_count: 0,
     fires: 0,
     rng: seed, seq: 0,
   };
@@ -277,6 +289,7 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
   s.req_done ??= [];
   s.cabinet ??= [];
   s.queue ??= null;
+  s.burners ??= [];   // SGODOT-282: older saves have stove 1 only
   if (!s.book) {   // SGODOT-232 S5: pages already cooked count once, with no date (no version of their own)
     s.book = emptyBook();
     for (const f of s.firsts) if (f.startsWith('cook:') && f !== `cook:${c.cooking.mystery.id}`) s.book.cooked[f.slice(5)] = 1;
@@ -299,6 +312,11 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
   }
   s.inbox ??= emptyInbox();   // SGODOT-232: filled for v3 and v4 saves alike, without a version of its own
   s.seen ??= [];   // SGODOT-232 map markers, the same way
+  // P1 (SGODOT-239, q(59) §1.1): facilities, and the 10 plots a save already at Homestead Lv3 has from this version on
+  // (30–39, wild; 0–29 never move). No version of their own, like the inbox: a fill beside v5's travel block.
+  s.facilities ??= [];
+  s.facility_count ??= s.facilities.reduce((m, f) => Math.max(m, f.id), 0);
+  addPlots(c, s);
   // SGODOT-275: floors 3–5. A run saved with floors 1–2 gets the deeper floors unpaid (their monsters are met at full HP
   // by mine.floorMobs); its HP starts full (mine.runHp). No version of its own: the fields are additive.
   const run = s.mine?.run;
