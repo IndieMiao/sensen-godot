@@ -60,6 +60,61 @@ the phone's current Wireless debugging page, connect through that authorized
 endpoint, and enable TCP mode again. This does not configure persistent/root
 settings or require changing the game or its data.
 
+## Linux x86_64 emulator (gs66)
+
+Verified on 2026-10-10 on gs66-ubuntu (SGODOT-276): Pixel_API_36, Android 16 x86_64, P0 QA package. Mapbox
+(Core Maps 11.29) and LiveKit load from `lib/x86_64`, the map renders, and the app reaches a local P0 server.
+This is an emulator for map and UI tests only. It never touches a USB or remote phone, and it does not replace
+phone acceptance.
+
+**Display and GPU.** A shell over SSH has no display: `-gpu host` fails with `Failed to get EGL display`, and
+SwiftShader is too slow for P0. Someone must stay logged in to a desktop session on the machine
+(`loginctl list-sessions` shows a `wayland` session on a seat). Borrow its display:
+
+```sh
+export DISPLAY=:0 WAYLAND_DISPLAY=wayland-0 XDG_RUNTIME_DIR=/run/user/$(id -u)
+export XAUTHORITY="$(ls /run/user/$(id -u)/.mutter-Xwaylandauth.* | head -1)"   # without it -gpu host fails
+```
+
+**Guest Vulkan must be off.** With the guest's Vulkan on, Godot's render thread blocks in
+`vkAcquireNextImageKHR` after a few `Couldn't present to Vulkan queue (VkResult error 5)`. The main loop stops,
+so `HTTPRequest` connects and then never sends (`Can't reach the farm server`). A bare Godot 4.7.2 project
+does the same, so this is not game code. `-feature -Vulkan` makes Godot fall back to GLES3 Compatibility on
+the host GPU:
+
+```sh
+export ANDROID_ADB_SERVER_PORT=5071   # a private adb server; leave 5037 and other sessions' servers alone
+nohup ~/Android/Sdk/emulator/emulator -avd Pixel_API_36 -port 5594 -no-window -no-audio -no-boot-anim \
+  -no-snapshot-save -gpu host -feature -Vulkan -memory 4096 -cores 4 > /tmp/emu-5594.log 2>&1 &
+adb -P 5071 start-server
+adb -P 5071 -s emulator-5594 shell dumpsys SurfaceFlinger | grep -m1 GLES:   # expect the host GPU, not SwiftShader
+adb -P 5071 -s emulator-5594 shell settings put secure immersive_mode_confirmations confirmed
+```
+
+Record the qemu PID. Stop the emulator with `adb -P 5071 -s emulator-5594 emu kill` (its data is kept), then
+`adb -P 5071 kill-server`. Godot's Android export stops "its" adb server on exit, so restart the private one
+after every export.
+
+**QA package.** The P0 presets build arm64 only. For the emulator, export `Android P0` with `x86_64` turned on
+in a temporary copy of `export_presets.cfg`, and restore the file afterwards, as `tools/p0/build_demo_apk.sh`
+does. Use a package of its own, e.g. `com.sensen.p0demo.gs66qa`, never `com.sensen.p0demo` or the Journey
+package. Sign it with the machine's own debug keystore (Godot editor settings), never the release certificate.
+`mapbox_token.txt` must be in the repo root (git-ignored).
+
+**Server address.** Run the local P0 server (`cd server && node --import tsx tools/p0_server.ts`, port 3110)
+and point the app at the host through the emulator's NAT. `files/p0_scene` = `map` opens the map directly:
+
+```sh
+P=com.sensen.p0demo.gs66qa
+adb -P 5071 -s emulator-5594 shell "run-as $P sh -c 'echo http://10.0.2.2:3110/v1 > files/p0_server.txt'"
+adb -P 5071 -s emulator-5594 shell "run-as $P sh -c 'echo map > files/p0_scene'"
+```
+
+Delete both files afterwards. `adb reverse tcp:3110 tcp:3110` with `127.0.0.1` was unreliable here.
+
+Known on this emulator: a cold start straight into the farm takes about 9 s to its first frame. That exceeds
+the 8 s request timeout, so the app shows one `Can't reach`, then recovers on the next refresh (SGODOT-276).
+
 ## In-app WebView (voice-match H5)
 
 After `setup_android_build.sh` (and `prepare_voice_plugin.py`), run
