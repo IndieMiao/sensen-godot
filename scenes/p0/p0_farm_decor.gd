@@ -51,6 +51,9 @@ var _edges: Array = []          # … and their 2 px edge
 var _halo: Array = []           # grid lines round it
 var _sand: Array = []           # path cells
 var _dashes: Array = []         # the yard's dashed edge
+var _sel: Array = []            # the piece whose card is open: a 2 px white edge …
+var _glow: Array = []           # … and a faint glow round it, so it reads at the whole-yard zoom
+const GLOW := Color(1, 1, 1, 0.22)
 static var _outline: ImageTexture
 var _finger := Vector2.INF
 var _press := Vector2.INF
@@ -317,6 +320,7 @@ func _end() -> void:
 	_preview = null
 	_paint([], false)
 	_paint_idle(false)
+	_select({})
 	rt.ui.end_placement()
 
 ## In idle Decorate: a tap on a piece opens its card (DECOR-CARD: name, `1×1 · Glows at night`, Move, Store); on a
@@ -368,10 +372,18 @@ func _screen_rect(id: String, at: Vector2i, rot: int) -> Rect2:
 func open_card(p: Dictionary) -> void:
 	var uid := int(p.get("uid", 0))
 	var id := str(p.get("id", ""))
-	rt.ui.open_facility_card({"title": P0Decor.name_of(id), "lead": P0Decor.line(id), "icon": P0Logic.icon(id),
+	_select(p)
+	var card := rt.ui.open_facility_card({"title": P0Decor.name_of(id), "lead": P0Decor.line(id), "icon": P0Logic.icon(id),
 		"button": "Move", "kind": &"primary", "second": "Store", "close": true},
 		func(): begin_move(uid, true),
 		func(): rt.session.send({"type": "store_decor", "uid": uid, "space": "home"}))
+	card.tree_exited.connect(func(): if is_inside_tree(): _select({}))
+
+## The piece whose card is open, marked on the ground (不知火舞 on 284: a 2 px white edge and a faint glow); {} clears.
+func _select(p: Dictionary) -> void:
+	var cs: Array = [] if p.is_empty() else P0Decor.cells(str(p.id), Vector2i(int(p.x), int(p.y)), int(p.get("rot", 0)))
+	_squares(_glow, cs.map(func(c): return [c, GLOW]), false, 0.034, 1.25)
+	_squares(_sel, cs.map(func(c): return [c, Color.WHITE]), true, 0.036)
 
 # ---------------------------------------------------------------- the preview
 func _show() -> void:
@@ -408,29 +420,34 @@ func _show() -> void:
 
 ## A piece picked: its cells filled green or red with their edge, grid lines round it fading out, paths in reach sand.
 func _paint(cells: Array, bad: bool) -> void:
-	var fills: Array = []
-	var near := {}   # "x,y" → [cell, distance in cells]
+	var fills: Array = cells.map(func(c): return [c, BAD_FILL if bad else OK_FILL])
+	var lines: Array = []
+	var sand: Array = []
+	for h in halo_cells(_view(), cells):
+		lines.append([h[0], Color(1, 1, 1, HALO_A * (1.0 - float(int(h[1]) - 1) / float(HALO_R)))])
+		if bool(h[2]): sand.append([h[0], SAND])
+	_squares(_cells, fills, false, 0.030)
+	_squares(_edges, fills.map(func(f): return [f[0], Color(f[1], 1.0)]), true, 0.032)
+	_squares(_halo, lines, true, 0.026)
+	_squares(_sand, sand, false, 0.024)
+
+## The yard's cells within HALO_R of the piece's, [cell, distance, on a path]: only where a piece could stand and the
+## paths — never the field, the house, facilities or spots (不知火舞 on 284: the grid is the yard's).
+static func halo_cells(view: Dictionary, cells: Array, r := HALO_R) -> Array:
+	var near := {}
 	for c in cells:
-		fills.append([c, BAD_FILL if bad else OK_FILL])
-		for dy in range(-HALO_R, HALO_R + 1):
-			for dx in range(-HALO_R, HALO_R + 1):
+		for dy in range(-r, r + 1):
+			for dx in range(-r, r + 1):
 				var n: Vector2i = c + Vector2i(dx, dy)
 				var d := maxi(absi(dx), absi(dy))
 				var k := "%d,%d" % [n.x, n.y]
 				if cells.has(n) or (near.has(k) and int(near[k][1]) <= d): continue
 				near[k] = [n, d]
-	var lines: Array = []
-	var sand: Array = []
+	var out: Array = []
 	for k in near:
-		var n: Vector2i = near[k][0]
-		if not farm.bp.in_bounds(n): continue
-		var a := HALO_A * (1.0 - float(int(near[k][1]) - 1) / float(HALO_R))
-		lines.append([n, Color(1, 1, 1, a)])
-		if P0Decor.reason(_view(), "deco_planter", n) == P0Decor.REASONS.decor_path: sand.append([n, SAND])
-	_squares(_cells, fills, false, 0.030)
-	_squares(_edges, fills.map(func(f): return [f[0], Color(f[1], 1.0)]), true, 0.032)
-	_squares(_halo, lines, true, 0.026)
-	_squares(_sand, sand, false, 0.024)
+		var why := P0Decor.reason(view, "deco_planter", near[k][0])
+		if why == "" or why == P0Decor.REASONS.decor_path: out.append([near[k][0], near[k][1], why != ""])
+	return out
 
 ## Nothing picked: the paths in faint sand and the yard's edge dashed (spec v2); `on` false clears them.
 func _paint_idle(on: bool) -> void:
@@ -475,9 +492,9 @@ static func yard_dashes(bp: FarmBlueprint, walk: Array) -> Array:
 	return out
 
 ## Squares on cells, pooled: a plain fill, or (outline) the cell's edge.
-func _squares(pool: Array, list: Array, outline: bool, lift: float) -> void:
+func _squares(pool: Array, list: Array, outline: bool, lift: float, grow := 1.0) -> void:
 	while pool.size() < list.size():
-		var q := _quad(Vector2(farm.bp.cell_m, farm.bp.cell_m) * (1.0 if outline else 0.96))
+		var q := _quad(Vector2(farm.bp.cell_m, farm.bp.cell_m) * (1.0 if outline else 0.96) * grow)
 		if outline: (q.material_override as StandardMaterial3D).albedo_texture = outline_texture()
 		farm.add_child(q)
 		pool.append(q)

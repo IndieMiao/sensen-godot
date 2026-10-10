@@ -164,3 +164,16 @@ func test_the_yard_edge_is_dashed_round_the_walk_rect() -> void:
 	assert_float(xs.min()).is_equal_approx(bp.cell_to_world(Vector2i(1, 0)).x - bp.cell_m * 0.5, 0.001)
 	assert_float(xs.max()).is_equal_approx(bp.cell_to_world(Vector2i(19, 0)).x + bp.cell_m * 0.5, 0.001)
 	for d in dashes: assert_float(maxf((d[1] as Vector2).x, (d[1] as Vector2).y)).is_less_equal(P0FarmDecor.DASH_M + 0.001)
+
+## The grid round a picked piece is the yard's (不知火舞 on 284): where a piece could stand and the paths, never the field.
+func test_the_grid_round_a_piece_is_the_yard_only() -> void:
+	var v := {"decor": {"placed": [], "cap": 20, "stored": {}}}
+	var halo := P0FarmDecor.halo_cells(v, [Vector2i(12, 1), Vector2i(13, 1)])
+	assert_int(halo.size()).is_greater(10)
+	for h in halo:
+		var c: Vector2i = h[0]
+		assert_str(P0Decor.reason(v, "deco_planter", c)).override_failure_message(str(c)).is_not_equal("Outside your yard")
+		assert_str(P0Decor.reason(v, "deco_planter", c)).override_failure_message(str(c)).is_not_equal("Space taken")
+		assert_int(maxi(absi(c.x - 12), absi(c.y - 1))).is_less_equal(4)
+	assert_bool(halo.any(func(h): return (h[0] as Vector2i).y >= 2)).is_false()   # rows 2+ are the field there
+	assert_bool(halo.any(func(h): return bool(h[2]))).is_true()                   # the exit path at x 9–10 is in reach
