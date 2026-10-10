@@ -10,7 +10,7 @@ export interface Plot {
   fert?: boolean;                 // compost this round (§5.5): −20% of the ripening time, once, gone at harvest
 }
 /** A facility standing on a plot (P1, SGODOT-239): a sprinkler waters the ring of 8 around it. Never removed (q(22)). */
-export interface Facility { id: number; kind: string; plot: number }
+export interface Facility { id: number; kind: string; plot: number; under?: 'wild' | 'tilled' }   // under: the plot as it was, back when it moves
 /** One bag slot. A resident's gift meal is its own stack (gift), never merged with bought or cooked ones (§3.4.5). */
 export interface BagStack { id: string; qty: number; gift?: { from: string; day: string } }
 

@@ -104,7 +104,7 @@ describe('sprinklers (q(59) §1.4)', () => {
     let s = sow(sow(f6(), 1), 13);   // two sown plots, not yet watered, in plot 7's ring
     const { s: after, ev } = step(s, { type: 'place', recipe: 'craft_sprinkler', plot: 7, space: 'home' });
     expect(after.storage).toEqual({ wood: 12, stone: 14, copper_ore: 4 });
-    expect(after.facilities).toEqual([{ id: 1, kind: 'sprinkler', plot: 7 }]);
+    expect(after.facilities).toEqual([{ id: 1, kind: 'sprinkler', plot: 7, under: 'tilled' }]);
     expect(ev).toContainEqual({ kind: 'facility', action: 'placed', facility: 1, facility_kind: 'sprinkler', plot: 7, covered: 8, started: [1, 13] });
     // the two sown plots started growing at once, 15% sooner
     for (const id of [1, 13]) {
@@ -186,7 +186,7 @@ describe('sprinklers (q(59) §1.4)', () => {
     const storage = { ...s.storage };
     const { s: after, ev } = step(s, { type: 'move_facility', facility: 1, plot: 28 });
     expect(after.storage).toEqual(storage);
-    expect(after.facilities).toEqual([{ id: 1, kind: 'sprinkler', plot: 28 }]);
+    expect(after.facilities).toEqual([{ id: 1, kind: 'sprinkler', plot: 28, under: 'wild' }]);   // 28 is one of P0's wild ten
     expect(plot(after, 7).state).toBe('tilled');
     expect(plot(after, 0).ready_at).toBe(growing);
     expect(plot(after, 22)).toMatchObject({ state: 'growing', ready_at: T0 + Math.round(4 * H * 0.85) });
@@ -194,6 +194,18 @@ describe('sprinklers (q(59) §1.4)', () => {
     expect(refused(after, { type: 'move_facility', facility: 1, plot: 0 }).code).toBe('plot_occupied');
     expect(refused(after, { type: 'move_facility', facility: 9, plot: 10 }).code).toBe('bad_facility');
     expect(refused(after, { type: 'move_facility', facility: 1, plot: 28 }).code).toBe('same_plot');
+  });
+
+  it('leave wild ground wild when they move off it (亚瑟 on #207)', () => {
+    let s = step(f6(), { type: 'place', recipe: 'craft_sprinkler', plot: 31 }).s;   // 31 is wild
+    expect(plot(s, 31).state).toBe('wild');
+    s = step(s, { type: 'move_facility', facility: 1, plot: 33 }).s;
+    expect(plot(s, 31).state).toBe('wild');
+    expect(s.facilities?.[0]).toMatchObject({ plot: 33, under: 'wild' });
+    s = step(s, { type: 'move_facility', facility: 1, plot: 7 }).s;   // onto tilled ground, then away again
+    expect(plot(s, 33).state).toBe('wild');
+    s = step(s, { type: 'move_facility', facility: 1, plot: 3 }).s;
+    expect(plot(s, 7).state).toBe('tilled');
   });
 
   it('are built and moved only at home', () => {

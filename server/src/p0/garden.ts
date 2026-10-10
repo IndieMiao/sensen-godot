@@ -102,6 +102,8 @@ export function spotBlock(c: P0Content, s: P0State, plot: unknown, moving?: Faci
   return null;
 }
 
+const underOf = (s: P0State, plot: number): 'wild' | 'tilled' => s.plots.find(p => p.id === plot)?.state === 'wild' ? 'wild' : 'tilled';
+
 /** Sown, not yet watered plots a facility now covers start growing (§5.7: watered as the sprinkler goes down). */
 function waterCovered(c: P0Content, s: P0State, now: number, grow: (id: string) => number): number[] {
   const started: number[] = [];
@@ -126,7 +128,7 @@ export function place(c: P0Content, s: P0State, cmd: { recipe?: unknown; plot?: 
   s.facilities ??= [];
   s.facility_count = (s.facility_count ?? 0) + 1;
   const plot = Number(cmd.plot);
-  const f: Facility = { id: s.facility_count, kind: r.facility, plot };
+  const f: Facility = { id: s.facility_count, kind: r.facility, plot, under: underOf(s, plot) };
   s.facilities.push(f);
   const started = waterCovered(c, s, now, grow);
   events.push({ kind: 'facility', action: 'placed', facility: f.id, facility_kind: f.kind, plot,
@@ -146,8 +148,9 @@ export function moveFacility(c: P0Content, s: P0State, cmd: { facility?: unknown
   if (block) return block;
   const from = f.plot;
   const old = s.plots.find(p => p.id === from);
-  if (old) old.state = 'tilled';
+  if (old) old.state = f.under ?? 'tilled';   // wild ground stays wild (亚瑟 on #207): moving never tills for free
   f.plot = Number(cmd.plot);
+  f.under = underOf(s, f.plot);
   const started = waterCovered(c, s, now, grow);
   events.push({ kind: 'facility', action: 'moved', facility: f.id, facility_kind: f.kind, plot: f.plot, from,
     covered: coverNow(c, s, f).length, started });
