@@ -9,6 +9,7 @@
 import type { Crop, P0Content } from './content.js';
 import { cropById } from './content.js';
 import { add, count, room, take } from './bag.js';
+import { greenhousePlots } from './garden.js';
 import type { Refusal } from './fishing.js';
 import { energyDetail, firstXp, gainXp, spendEnergy, type P0Event } from './progress.js';
 import { scaledXp, skillLevel, xpPercent } from './rules.js';
@@ -44,6 +45,7 @@ export function plantTree(c: P0Content, s: P0State, ids: unknown[], crop: Crop, 
   if (ids.length !== 1) return { code: 'bad_plot', detail: { most: 1 } };   // one tree at a time (q(118))
   const plot = s.plots.find(p => p.id === ids[0])!;
   if (plot.state !== 'tilled' && plot.state !== 'wild') return { code: 'wrong_state', detail: { plot: plot.id, state: plot.state } };
+  if (greenhousePlots(c, s).has(plot.id)) return { code: 'greenhouse_no_trees', detail: { plot: plot.id } };   // q(118) ②
   if (count(s.bag, crop.seed) < 1) return { code: 'no_seed', detail: { seed: crop.seed, need: 1, have: 0 } };
   const used = orchardUsed(c, s), cap = orchardCap(c, s);
   if (used >= cap) return { code: 'orchard_full', detail: { used, cap, homestead_next: orchardNext(c, s) } };

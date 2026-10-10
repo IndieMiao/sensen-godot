@@ -140,7 +140,7 @@
                       ]
                     },
                     {
-                      "type": "HBoxContainer",
+                      "type": "VBoxContainer",
                       "rect": [
                         14,
                         118,
@@ -149,16 +149,16 @@
                       ],
                       "children": [
                         {
-                          "type": "UiNeedTile",
+                          "type": "HBoxContainer",
                           "rect": [
                             14,
                             118,
-                            88,
+                            300,
                             71
                           ],
                           "children": [
                             {
-                              "type": "VBoxContainer",
+                              "type": "UiNeedTile",
                               "rect": [
                                 14,
                                 118,
@@ -167,95 +167,95 @@
                               ],
                               "children": [
                                 {
-                                  "type": "Control",
-                                  "rect": [
-                                    34,
-                                    118,
-                                    48,
-                                    48
-                                  ],
-                                  "children": [
-                                    {
-                                      "type": "TextureRect",
-                                      "rect": [
-                                        45,
-                                        129,
-                                        26,
-                                        26
-                                      ]
-                                    }
-                                  ]
-                                },
-                                {
-                                  "type": "HBoxContainer",
+                                  "type": "VBoxContainer",
                                   "rect": [
                                     14,
-                                    171,
+                                    118,
                                     88,
-                                    18
+                                    71
                                   ],
                                   "children": [
                                     {
-                                      "type": "Label",
+                                      "type": "Control",
                                       "rect": [
-                                        14,
-                                        171,
-                                        66,
-                                        18
+                                        34,
+                                        118,
+                                        48,
+                                        48
                                       ],
-                                      "variation": "CaptionXB12",
-                                      "text": "Copper Ore"
+                                      "children": [
+                                        {
+                                          "type": "TextureRect",
+                                          "rect": [
+                                            45,
+                                            129,
+                                            26,
+                                            26
+                                          ]
+                                        }
+                                      ]
                                     },
                                     {
                                       "type": "HBoxContainer",
                                       "rect": [
-                                        83,
+                                        14,
                                         171,
-                                        19,
+                                        88,
                                         18
                                       ],
                                       "children": [
                                         {
                                           "type": "Label",
                                           "rect": [
-                                            83,
+                                            14,
                                             171,
-                                            8,
+                                            66,
                                             18
                                           ],
                                           "variation": "CaptionXB12",
-                                          "text": "4"
+                                          "text": "Copper Ore"
                                         },
                                         {
-                                          "type": "Label",
+                                          "type": "HBoxContainer",
                                           "rect": [
-                                            91,
+                                            83,
                                             171,
-                                            11,
+                                            19,
                                             18
                                           ],
-                                          "variation": "CaptionB12",
-                                          "text": "/5"
+                                          "children": [
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                83,
+                                                171,
+                                                8,
+                                                18
+                                              ],
+                                              "variation": "CaptionXB12",
+                                              "text": "4"
+                                            },
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                91,
+                                                171,
+                                                11,
+                                                18
+                                              ],
+                                              "variation": "CaptionB12",
+                                              "text": "/5"
+                                            }
+                                          ]
                                         }
                                       ]
                                     }
                                   ]
                                 }
                               ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": "UiNeedTile",
-                          "rect": [
-                            110,
-                            118,
-                            70,
-                            71
-                          ],
-                          "children": [
+                            },
                             {
-                              "type": "VBoxContainer",
+                              "type": "UiNeedTile",
                               "rect": [
                                 110,
                                 118,
@@ -264,75 +264,86 @@
                               ],
                               "children": [
                                 {
-                                  "type": "Control",
-                                  "rect": [
-                                    121,
-                                    118,
-                                    48,
-                                    48
-                                  ],
-                                  "children": [
-                                    {
-                                      "type": "TextureRect",
-                                      "rect": [
-                                        132,
-                                        129,
-                                        26,
-                                        26
-                                      ]
-                                    }
-                                  ]
-                                },
-                                {
-                                  "type": "HBoxContainer",
+                                  "type": "VBoxContainer",
                                   "rect": [
                                     110,
-                                    171,
+                                    118,
                                     70,
-                                    18
+                                    71
                                   ],
                                   "children": [
                                     {
-                                      "type": "Label",
+                                      "type": "Control",
                                       "rect": [
-                                        110,
-                                        171,
-                                        41,
-                                        18
+                                        121,
+                                        118,
+                                        48,
+                                        48
                                       ],
-                                      "variation": "CaptionXB12",
-                                      "text": "Timber"
+                                      "children": [
+                                        {
+                                          "type": "TextureRect",
+                                          "rect": [
+                                            132,
+                                            129,
+                                            26,
+                                            26
+                                          ]
+                                        }
+                                      ]
                                     },
                                     {
                                       "type": "HBoxContainer",
                                       "rect": [
-                                        154,
+                                        110,
                                         171,
-                                        26,
+                                        70,
                                         18
                                       ],
                                       "children": [
                                         {
                                           "type": "Label",
                                           "rect": [
-                                            154,
+                                            110,
                                             171,
-                                            15,
+                                            41,
                                             18
                                           ],
                                           "variation": "CaptionXB12",
-                                          "text": "17"
+                                          "text": "Timber"
                                         },
                                         {
-                                          "type": "Label",
+                                          "type": "HBoxContainer",
                                           "rect": [
-                                            169,
+                                            154,
                                             171,
-                                            11,
+                                            26,
                                             18
                                           ],
-                                          "variation": "CaptionB12",
-                                          "text": "/4"
+                                          "children": [
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                154,
+                                                171,
+                                                15,
+                                                18
+                                              ],
+                                              "variation": "CaptionXB12",
+                                              "text": "17"
+                                            },
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                169,
+                                                171,
+                                                11,
+                                                18
+                                              ],
+                                              "variation": "CaptionB12",
+                                              "text": "/4"
+                                            }
+                                          ]
                                         }
                                       ]
                                     }
@@ -496,7 +507,7 @@
                       ]
                     },
                     {
-                      "type": "HBoxContainer",
+                      "type": "VBoxContainer",
                       "rect": [
                         14,
                         351,
@@ -505,16 +516,16 @@
                       ],
                       "children": [
                         {
-                          "type": "UiNeedTile",
+                          "type": "HBoxContainer",
                           "rect": [
                             14,
                             351,
-                            57,
+                            300,
                             71
                           ],
                           "children": [
                             {
-                              "type": "VBoxContainer",
+                              "type": "UiNeedTile",
                               "rect": [
                                 14,
                                 351,
@@ -523,95 +534,95 @@
                               ],
                               "children": [
                                 {
-                                  "type": "Control",
-                                  "rect": [
-                                    18,
-                                    351,
-                                    48,
-                                    48
-                                  ],
-                                  "children": [
-                                    {
-                                      "type": "TextureRect",
-                                      "rect": [
-                                        29,
-                                        362,
-                                        26,
-                                        26
-                                      ]
-                                    }
-                                  ]
-                                },
-                                {
-                                  "type": "HBoxContainer",
+                                  "type": "VBoxContainer",
                                   "rect": [
                                     14,
-                                    404,
+                                    351,
                                     57,
-                                    18
+                                    71
                                   ],
                                   "children": [
                                     {
-                                      "type": "Label",
+                                      "type": "Control",
                                       "rect": [
-                                        14,
-                                        404,
-                                        35,
-                                        18
+                                        18,
+                                        351,
+                                        48,
+                                        48
                                       ],
-                                      "variation": "CaptionXB12",
-                                      "text": "Reeds"
+                                      "children": [
+                                        {
+                                          "type": "TextureRect",
+                                          "rect": [
+                                            29,
+                                            362,
+                                            26,
+                                            26
+                                          ]
+                                        }
+                                      ]
                                     },
                                     {
                                       "type": "HBoxContainer",
                                       "rect": [
-                                        52,
+                                        14,
                                         404,
-                                        19,
+                                        57,
                                         18
                                       ],
                                       "children": [
                                         {
                                           "type": "Label",
                                           "rect": [
-                                            52,
+                                            14,
                                             404,
-                                            8,
+                                            35,
                                             18
                                           ],
                                           "variation": "CaptionXB12",
-                                          "text": "8"
+                                          "text": "Reeds"
                                         },
                                         {
-                                          "type": "Label",
+                                          "type": "HBoxContainer",
                                           "rect": [
-                                            60,
+                                            52,
                                             404,
-                                            11,
+                                            19,
                                             18
                                           ],
-                                          "variation": "CaptionB12",
-                                          "text": "/8"
+                                          "children": [
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                52,
+                                                404,
+                                                8,
+                                                18
+                                              ],
+                                              "variation": "CaptionXB12",
+                                              "text": "8"
+                                            },
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                60,
+                                                404,
+                                                11,
+                                                18
+                                              ],
+                                              "variation": "CaptionB12",
+                                              "text": "/8"
+                                            }
+                                          ]
                                         }
                                       ]
                                     }
                                   ]
                                 }
                               ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": "UiNeedTile",
-                          "rect": [
-                            79,
-                            351,
-                            70,
-                            71
-                          ],
-                          "children": [
+                            },
                             {
-                              "type": "VBoxContainer",
+                              "type": "UiNeedTile",
                               "rect": [
                                 79,
                                 351,
@@ -620,75 +631,86 @@
                               ],
                               "children": [
                                 {
-                                  "type": "Control",
-                                  "rect": [
-                                    90,
-                                    351,
-                                    48,
-                                    48
-                                  ],
-                                  "children": [
-                                    {
-                                      "type": "TextureRect",
-                                      "rect": [
-                                        101,
-                                        362,
-                                        26,
-                                        26
-                                      ]
-                                    }
-                                  ]
-                                },
-                                {
-                                  "type": "HBoxContainer",
+                                  "type": "VBoxContainer",
                                   "rect": [
                                     79,
-                                    404,
+                                    351,
                                     70,
-                                    18
+                                    71
                                   ],
                                   "children": [
                                     {
-                                      "type": "Label",
+                                      "type": "Control",
                                       "rect": [
-                                        79,
-                                        404,
-                                        41,
-                                        18
+                                        90,
+                                        351,
+                                        48,
+                                        48
                                       ],
-                                      "variation": "CaptionXB12",
-                                      "text": "Timber"
+                                      "children": [
+                                        {
+                                          "type": "TextureRect",
+                                          "rect": [
+                                            101,
+                                            362,
+                                            26,
+                                            26
+                                          ]
+                                        }
+                                      ]
                                     },
                                     {
                                       "type": "HBoxContainer",
                                       "rect": [
-                                        123,
+                                        79,
                                         404,
-                                        26,
+                                        70,
                                         18
                                       ],
                                       "children": [
                                         {
                                           "type": "Label",
                                           "rect": [
-                                            123,
+                                            79,
                                             404,
-                                            15,
+                                            41,
                                             18
                                           ],
                                           "variation": "CaptionXB12",
-                                          "text": "17"
+                                          "text": "Timber"
                                         },
                                         {
-                                          "type": "Label",
+                                          "type": "HBoxContainer",
                                           "rect": [
-                                            138,
+                                            123,
                                             404,
-                                            11,
+                                            26,
                                             18
                                           ],
-                                          "variation": "CaptionB12",
-                                          "text": "/4"
+                                          "children": [
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                123,
+                                                404,
+                                                15,
+                                                18
+                                              ],
+                                              "variation": "CaptionXB12",
+                                              "text": "17"
+                                            },
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                138,
+                                                404,
+                                                11,
+                                                18
+                                              ],
+                                              "variation": "CaptionB12",
+                                              "text": "/4"
+                                            }
+                                          ]
                                         }
                                       ]
                                     }
@@ -1316,7 +1338,7 @@
                       ]
                     },
                     {
-                      "type": "HBoxContainer",
+                      "type": "VBoxContainer",
                       "rect": [
                         14,
                         1040,
@@ -1325,16 +1347,16 @@
                       ],
                       "children": [
                         {
-                          "type": "UiNeedTile",
+                          "type": "HBoxContainer",
                           "rect": [
                             14,
                             1040,
-                            70,
+                            300,
                             71
                           ],
                           "children": [
                             {
-                              "type": "VBoxContainer",
+                              "type": "UiNeedTile",
                               "rect": [
                                 14,
                                 1040,
@@ -1343,95 +1365,95 @@
                               ],
                               "children": [
                                 {
-                                  "type": "Control",
-                                  "rect": [
-                                    25,
-                                    1040,
-                                    48,
-                                    48
-                                  ],
-                                  "children": [
-                                    {
-                                      "type": "TextureRect",
-                                      "rect": [
-                                        36,
-                                        1051,
-                                        26,
-                                        26
-                                      ]
-                                    }
-                                  ]
-                                },
-                                {
-                                  "type": "HBoxContainer",
+                                  "type": "VBoxContainer",
                                   "rect": [
                                     14,
-                                    1093,
+                                    1040,
                                     70,
-                                    18
+                                    71
                                   ],
                                   "children": [
                                     {
-                                      "type": "Label",
+                                      "type": "Control",
                                       "rect": [
-                                        14,
-                                        1093,
-                                        41,
-                                        18
+                                        25,
+                                        1040,
+                                        48,
+                                        48
                                       ],
-                                      "variation": "CaptionXB12",
-                                      "text": "Timber"
+                                      "children": [
+                                        {
+                                          "type": "TextureRect",
+                                          "rect": [
+                                            36,
+                                            1051,
+                                            26,
+                                            26
+                                          ]
+                                        }
+                                      ]
                                     },
                                     {
                                       "type": "HBoxContainer",
                                       "rect": [
-                                        58,
+                                        14,
                                         1093,
-                                        26,
+                                        70,
                                         18
                                       ],
                                       "children": [
                                         {
                                           "type": "Label",
                                           "rect": [
-                                            58,
+                                            14,
                                             1093,
-                                            15,
+                                            41,
                                             18
                                           ],
                                           "variation": "CaptionXB12",
-                                          "text": "17"
+                                          "text": "Timber"
                                         },
                                         {
-                                          "type": "Label",
+                                          "type": "HBoxContainer",
                                           "rect": [
-                                            73,
+                                            58,
                                             1093,
-                                            11,
+                                            26,
                                             18
                                           ],
-                                          "variation": "CaptionB12",
-                                          "text": "/1"
+                                          "children": [
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                58,
+                                                1093,
+                                                15,
+                                                18
+                                              ],
+                                              "variation": "CaptionXB12",
+                                              "text": "17"
+                                            },
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                73,
+                                                1093,
+                                                11,
+                                                18
+                                              ],
+                                              "variation": "CaptionB12",
+                                              "text": "/1"
+                                            }
+                                          ]
                                         }
                                       ]
                                     }
                                   ]
                                 }
                               ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": "UiNeedTile",
-                          "rect": [
-                            92,
-                            1040,
-                            57,
-                            71
-                          ],
-                          "children": [
+                            },
                             {
-                              "type": "VBoxContainer",
+                              "type": "UiNeedTile",
                               "rect": [
                                 92,
                                 1040,
@@ -1440,75 +1462,86 @@
                               ],
                               "children": [
                                 {
-                                  "type": "Control",
-                                  "rect": [
-                                    96,
-                                    1040,
-                                    48,
-                                    48
-                                  ],
-                                  "children": [
-                                    {
-                                      "type": "TextureRect",
-                                      "rect": [
-                                        107,
-                                        1051,
-                                        26,
-                                        26
-                                      ]
-                                    }
-                                  ]
-                                },
-                                {
-                                  "type": "HBoxContainer",
+                                  "type": "VBoxContainer",
                                   "rect": [
                                     92,
-                                    1093,
+                                    1040,
                                     57,
-                                    18
+                                    71
                                   ],
                                   "children": [
                                     {
-                                      "type": "Label",
+                                      "type": "Control",
                                       "rect": [
-                                        92,
-                                        1093,
-                                        35,
-                                        18
+                                        96,
+                                        1040,
+                                        48,
+                                        48
                                       ],
-                                      "variation": "CaptionXB12",
-                                      "text": "Reeds"
+                                      "children": [
+                                        {
+                                          "type": "TextureRect",
+                                          "rect": [
+                                            107,
+                                            1051,
+                                            26,
+                                            26
+                                          ]
+                                        }
+                                      ]
                                     },
                                     {
                                       "type": "HBoxContainer",
                                       "rect": [
-                                        130,
+                                        92,
                                         1093,
-                                        19,
+                                        57,
                                         18
                                       ],
                                       "children": [
                                         {
                                           "type": "Label",
                                           "rect": [
-                                            130,
+                                            92,
                                             1093,
-                                            8,
+                                            35,
                                             18
                                           ],
                                           "variation": "CaptionXB12",
-                                          "text": "8"
+                                          "text": "Reeds"
                                         },
                                         {
-                                          "type": "Label",
+                                          "type": "HBoxContainer",
                                           "rect": [
-                                            138,
+                                            130,
                                             1093,
-                                            11,
+                                            19,
                                             18
                                           ],
-                                          "variation": "CaptionB12",
-                                          "text": "/1"
+                                          "children": [
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                130,
+                                                1093,
+                                                8,
+                                                18
+                                              ],
+                                              "variation": "CaptionXB12",
+                                              "text": "8"
+                                            },
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                138,
+                                                1093,
+                                                11,
+                                                18
+                                              ],
+                                              "variation": "CaptionB12",
+                                              "text": "/1"
+                                            }
+                                          ]
                                         }
                                       ]
                                     }
@@ -1683,7 +1716,7 @@
                       ]
                     },
                     {
-                      "type": "HBoxContainer",
+                      "type": "VBoxContainer",
                       "rect": [
                         14,
                         1273,
@@ -1692,16 +1725,16 @@
                       ],
                       "children": [
                         {
-                          "type": "UiNeedTile",
+                          "type": "HBoxContainer",
                           "rect": [
                             14,
                             1273,
-                            70,
+                            300,
                             71
                           ],
                           "children": [
                             {
-                              "type": "VBoxContainer",
+                              "type": "UiNeedTile",
                               "rect": [
                                 14,
                                 1273,
@@ -1710,95 +1743,95 @@
                               ],
                               "children": [
                                 {
-                                  "type": "Control",
-                                  "rect": [
-                                    25,
-                                    1273,
-                                    48,
-                                    48
-                                  ],
-                                  "children": [
-                                    {
-                                      "type": "TextureRect",
-                                      "rect": [
-                                        36,
-                                        1284,
-                                        26,
-                                        26
-                                      ]
-                                    }
-                                  ]
-                                },
-                                {
-                                  "type": "HBoxContainer",
+                                  "type": "VBoxContainer",
                                   "rect": [
                                     14,
-                                    1326,
+                                    1273,
                                     70,
-                                    18
+                                    71
                                   ],
                                   "children": [
                                     {
-                                      "type": "Label",
+                                      "type": "Control",
                                       "rect": [
-                                        14,
-                                        1326,
-                                        41,
-                                        18
+                                        25,
+                                        1273,
+                                        48,
+                                        48
                                       ],
-                                      "variation": "CaptionXB12",
-                                      "text": "Timber"
+                                      "children": [
+                                        {
+                                          "type": "TextureRect",
+                                          "rect": [
+                                            36,
+                                            1284,
+                                            26,
+                                            26
+                                          ]
+                                        }
+                                      ]
                                     },
                                     {
                                       "type": "HBoxContainer",
                                       "rect": [
-                                        58,
+                                        14,
                                         1326,
-                                        26,
+                                        70,
                                         18
                                       ],
                                       "children": [
                                         {
                                           "type": "Label",
                                           "rect": [
-                                            58,
+                                            14,
                                             1326,
-                                            15,
+                                            41,
                                             18
                                           ],
                                           "variation": "CaptionXB12",
-                                          "text": "17"
+                                          "text": "Timber"
                                         },
                                         {
-                                          "type": "Label",
+                                          "type": "HBoxContainer",
                                           "rect": [
-                                            73,
+                                            58,
                                             1326,
-                                            11,
+                                            26,
                                             18
                                           ],
-                                          "variation": "CaptionB12",
-                                          "text": "/1"
+                                          "children": [
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                58,
+                                                1326,
+                                                15,
+                                                18
+                                              ],
+                                              "variation": "CaptionXB12",
+                                              "text": "17"
+                                            },
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                73,
+                                                1326,
+                                                11,
+                                                18
+                                              ],
+                                              "variation": "CaptionB12",
+                                              "text": "/1"
+                                            }
+                                          ]
                                         }
                                       ]
                                     }
                                   ]
                                 }
                               ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": "UiNeedTile",
-                          "rect": [
-                            92,
-                            1273,
-                            57,
-                            71
-                          ],
-                          "children": [
+                            },
                             {
-                              "type": "VBoxContainer",
+                              "type": "UiNeedTile",
                               "rect": [
                                 92,
                                 1273,
@@ -1807,75 +1840,86 @@
                               ],
                               "children": [
                                 {
-                                  "type": "Control",
-                                  "rect": [
-                                    96,
-                                    1273,
-                                    48,
-                                    48
-                                  ],
-                                  "children": [
-                                    {
-                                      "type": "TextureRect",
-                                      "rect": [
-                                        107,
-                                        1284,
-                                        26,
-                                        26
-                                      ]
-                                    }
-                                  ]
-                                },
-                                {
-                                  "type": "HBoxContainer",
+                                  "type": "VBoxContainer",
                                   "rect": [
                                     92,
-                                    1326,
+                                    1273,
                                     57,
-                                    18
+                                    71
                                   ],
                                   "children": [
                                     {
-                                      "type": "Label",
+                                      "type": "Control",
                                       "rect": [
-                                        92,
-                                        1326,
-                                        35,
-                                        18
+                                        96,
+                                        1273,
+                                        48,
+                                        48
                                       ],
-                                      "variation": "CaptionXB12",
-                                      "text": "Reeds"
+                                      "children": [
+                                        {
+                                          "type": "TextureRect",
+                                          "rect": [
+                                            107,
+                                            1284,
+                                            26,
+                                            26
+                                          ]
+                                        }
+                                      ]
                                     },
                                     {
                                       "type": "HBoxContainer",
                                       "rect": [
-                                        130,
+                                        92,
                                         1326,
-                                        19,
+                                        57,
                                         18
                                       ],
                                       "children": [
                                         {
                                           "type": "Label",
                                           "rect": [
-                                            130,
+                                            92,
                                             1326,
-                                            8,
+                                            35,
                                             18
                                           ],
                                           "variation": "CaptionXB12",
-                                          "text": "8"
+                                          "text": "Reeds"
                                         },
                                         {
-                                          "type": "Label",
+                                          "type": "HBoxContainer",
                                           "rect": [
-                                            138,
+                                            130,
                                             1326,
-                                            11,
+                                            19,
                                             18
                                           ],
-                                          "variation": "CaptionB12",
-                                          "text": "/1"
+                                          "children": [
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                130,
+                                                1326,
+                                                8,
+                                                18
+                                              ],
+                                              "variation": "CaptionXB12",
+                                              "text": "8"
+                                            },
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                138,
+                                                1326,
+                                                11,
+                                                18
+                                              ],
+                                              "variation": "CaptionB12",
+                                              "text": "/1"
+                                            }
+                                          ]
                                         }
                                       ]
                                     }
@@ -2050,7 +2094,7 @@
                       ]
                     },
                     {
-                      "type": "HBoxContainer",
+                      "type": "VBoxContainer",
                       "rect": [
                         14,
                         1506,
@@ -2059,16 +2103,16 @@
                       ],
                       "children": [
                         {
-                          "type": "UiNeedTile",
+                          "type": "HBoxContainer",
                           "rect": [
                             14,
                             1506,
-                            57,
+                            300,
                             71
                           ],
                           "children": [
                             {
-                              "type": "VBoxContainer",
+                              "type": "UiNeedTile",
                               "rect": [
                                 14,
                                 1506,
@@ -2077,95 +2121,95 @@
                               ],
                               "children": [
                                 {
-                                  "type": "Control",
-                                  "rect": [
-                                    18,
-                                    1506,
-                                    48,
-                                    48
-                                  ],
-                                  "children": [
-                                    {
-                                      "type": "TextureRect",
-                                      "rect": [
-                                        29,
-                                        1517,
-                                        26,
-                                        26
-                                      ]
-                                    }
-                                  ]
-                                },
-                                {
-                                  "type": "HBoxContainer",
+                                  "type": "VBoxContainer",
                                   "rect": [
                                     14,
-                                    1559,
+                                    1506,
                                     57,
-                                    18
+                                    71
                                   ],
                                   "children": [
                                     {
-                                      "type": "Label",
+                                      "type": "Control",
                                       "rect": [
-                                        14,
-                                        1559,
-                                        35,
-                                        18
+                                        18,
+                                        1506,
+                                        48,
+                                        48
                                       ],
-                                      "variation": "CaptionXB12",
-                                      "text": "Reeds"
+                                      "children": [
+                                        {
+                                          "type": "TextureRect",
+                                          "rect": [
+                                            29,
+                                            1517,
+                                            26,
+                                            26
+                                          ]
+                                        }
+                                      ]
                                     },
                                     {
                                       "type": "HBoxContainer",
                                       "rect": [
-                                        52,
+                                        14,
                                         1559,
-                                        19,
+                                        57,
                                         18
                                       ],
                                       "children": [
                                         {
                                           "type": "Label",
                                           "rect": [
-                                            52,
+                                            14,
                                             1559,
-                                            8,
+                                            35,
                                             18
                                           ],
                                           "variation": "CaptionXB12",
-                                          "text": "8"
+                                          "text": "Reeds"
                                         },
                                         {
-                                          "type": "Label",
+                                          "type": "HBoxContainer",
                                           "rect": [
-                                            60,
+                                            52,
                                             1559,
-                                            11,
+                                            19,
                                             18
                                           ],
-                                          "variation": "CaptionB12",
-                                          "text": "/2"
+                                          "children": [
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                52,
+                                                1559,
+                                                8,
+                                                18
+                                              ],
+                                              "variation": "CaptionXB12",
+                                              "text": "8"
+                                            },
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                60,
+                                                1559,
+                                                11,
+                                                18
+                                              ],
+                                              "variation": "CaptionB12",
+                                              "text": "/2"
+                                            }
+                                          ]
                                         }
                                       ]
                                     }
                                   ]
                                 }
                               ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": "UiNeedTile",
-                          "rect": [
-                            79,
-                            1506,
-                            70,
-                            71
-                          ],
-                          "children": [
+                            },
                             {
-                              "type": "VBoxContainer",
+                              "type": "UiNeedTile",
                               "rect": [
                                 79,
                                 1506,
@@ -2174,75 +2218,86 @@
                               ],
                               "children": [
                                 {
-                                  "type": "Control",
-                                  "rect": [
-                                    90,
-                                    1506,
-                                    48,
-                                    48
-                                  ],
-                                  "children": [
-                                    {
-                                      "type": "TextureRect",
-                                      "rect": [
-                                        101,
-                                        1517,
-                                        26,
-                                        26
-                                      ]
-                                    }
-                                  ]
-                                },
-                                {
-                                  "type": "HBoxContainer",
+                                  "type": "VBoxContainer",
                                   "rect": [
                                     79,
-                                    1559,
+                                    1506,
                                     70,
-                                    18
+                                    71
                                   ],
                                   "children": [
                                     {
-                                      "type": "Label",
+                                      "type": "Control",
                                       "rect": [
-                                        79,
-                                        1559,
-                                        41,
-                                        18
+                                        90,
+                                        1506,
+                                        48,
+                                        48
                                       ],
-                                      "variation": "CaptionXB12",
-                                      "text": "Timber"
+                                      "children": [
+                                        {
+                                          "type": "TextureRect",
+                                          "rect": [
+                                            101,
+                                            1517,
+                                            26,
+                                            26
+                                          ]
+                                        }
+                                      ]
                                     },
                                     {
                                       "type": "HBoxContainer",
                                       "rect": [
-                                        123,
+                                        79,
                                         1559,
-                                        26,
+                                        70,
                                         18
                                       ],
                                       "children": [
                                         {
                                           "type": "Label",
                                           "rect": [
-                                            123,
+                                            79,
                                             1559,
-                                            15,
+                                            41,
                                             18
                                           ],
                                           "variation": "CaptionXB12",
-                                          "text": "17"
+                                          "text": "Timber"
                                         },
                                         {
-                                          "type": "Label",
+                                          "type": "HBoxContainer",
                                           "rect": [
-                                            138,
+                                            123,
                                             1559,
-                                            11,
+                                            26,
                                             18
                                           ],
-                                          "variation": "CaptionB12",
-                                          "text": "/1"
+                                          "children": [
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                123,
+                                                1559,
+                                                15,
+                                                18
+                                              ],
+                                              "variation": "CaptionXB12",
+                                              "text": "17"
+                                            },
+                                            {
+                                              "type": "Label",
+                                              "rect": [
+                                                138,
+                                                1559,
+                                                11,
+                                                18
+                                              ],
+                                              "variation": "CaptionB12",
+                                              "text": "/1"
+                                            }
+                                          ]
                                         }
                                       ]
                                     }

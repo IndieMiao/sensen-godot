@@ -70,3 +70,24 @@ func test_the_icon_tile_asks_for_the_items_info() -> void:
 	var hit: Button = c.find_children("*", "Button", true, false).filter(func(b): return b.flat)[0]
 	hit.pressed.emit()
 	assert_int(asked[0]).is_equal(1)
+
+## FAC-GH 482:380 (不知火舞 on 241, 4e7d1119): at most three NEED-TILEs a row — the greenhouse's fourth, Coins, wraps to
+## a second row, left-aligned, the row gap the tile gap; the card stays within the drawer's width, its tiles their size.
+func test_a_fourth_material_wraps_to_a_second_row() -> void:
+	var d := {"name": "Greenhouse", "effect": "16 plots · −25%", "button": {"label": "Build", "kind": UiBlueprintCard.Kind.PRIMARY},
+		"materials": [{"name": "Timber", "have": 60, "need": 20}, {"name": "Stone", "have": 40, "need": 12},
+			{"name": "Copper Ore", "have": 20, "need": 8}, {"name": "Coins", "have": 600, "need": 300}]}
+	var c := _host(UiBlueprintCard.new(d)) as UiBlueprintCard
+	c.size.x = 332.0
+	await await_idle_frame()
+	var rows := c._materials.get_children()
+	assert_int(rows.size()).is_equal(2)
+	assert_int(rows[0].get_child_count()).is_equal(3)
+	assert_str((rows[1].get_child(0) as UiNeedTile).item_name).is_equal("Coins")
+	var t := c.tiles()
+	assert_float(t[3].global_position.x).is_equal_approx(t[0].global_position.x, 0.5)   # left-aligned under Timber
+	assert_float(t[3].global_position.y - t[0].get_global_rect().end.y).is_equal_approx(8.0, 0.5)   # the tile gap
+	assert_float(c.get_combined_minimum_size().x).is_less_equal(332.0)   # no wider than the drawer's card
+	c.set_data(d)   # set again: the rows are rebuilt, not added to
+	await await_idle_frame()
+	assert_int(c._materials.get_child_count()).is_equal(2)
