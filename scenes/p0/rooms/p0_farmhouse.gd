@@ -267,6 +267,9 @@ func p0_event(ev: Dictionary, v: Dictionary) -> bool:
 	if kitchen == null: return false
 	match str(ev.get("kind", "")):
 		"pot":
+			if kitchen.cook_all_pending:   # Cook All's pots catch one after another, the Cookbook stays (q(124))
+				kitchen.on_cook_all_pot(ev)
+				return false
 			if ev.has("stove") and not kitchen.busy(): kitchen.select_stove(int(ev.stove))
 			var st = P0KitchenLogic.stove(v, kitchen.stove_index)
 			if bool(ev.get("queued", false)): kitchen.on_queued()   # Queue ×2: in behind the pot cooking (q(71))
@@ -437,6 +440,23 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"doubleon":   # the Double toggle on, as a tap on it (282 shots)
 			if kitchen.drawer: kitchen.drawer.dev_double(true)
 		"kitchen": p0_open_kitchen(step[1] if step.size() > 1 else "cookbook")
+		"cookall":   # the Cookbook strip's Cook All, as a tap on it (282 shots)
+			if kitchen.drawer: (kitchen.drawer.get("_cook_all") as UiCommandButton).pressed.emit()
+		"cookallgo":   # the sheet's `Cook All · N pots`, as a tap on it (282 shots)
+			if is_instance_valid(kitchen.cook_all_sheet) and kitchen.cook_all_sheet.cook_button: kitchen.cook_all_sheet.cook_button.pressed.emit()
+		"cookallrects":   # Cook All's sheet, its ×, the strip button and the floats on screen (282 shots: layout by numbers)
+			var out := {}
+			if kitchen.drawer: out["strip button"] = (kitchen.drawer.get("_cook_all") as Control).get_global_rect()
+			if kitchen.drawer:
+				out["drawer top"] = kitchen.drawer.top_y()
+				out["drawer"] = kitchen.drawer.get_global_rect()
+				for n in ["_stove_pill", "_level", "_state"]: out[n] = (kitchen.drawer.get(n) as Control).get_global_rect()
+			if is_instance_valid(kitchen.cook_all_sheet): out["sheet"] = kitchen.cook_all_sheet.get_global_rect()
+			var x = kitchen.get("_cook_all_close")
+			if is_instance_valid(x): out["close"] = (x as Control).get_global_rect()
+			for f in rt.ui.root.find_children("*", "UiFloatText", true, false): out["float " + (f as UiFloatText).text] = (f as Control).get_global_rect()
+			out["screen"] = rt.ui.root.size
+			print("P0_COOKALL_RECTS ", out)
 		"queue": kitchen.open_queue()   # Queue next › on the watch sheet (shots)
 		"heattap": kitchen.dev_heat_tap()   # a heat tap now: until:gold first (shots)
 		"heatband": kitchen.dev_band_press()   # a press on the queue drawer's pot band (shots)

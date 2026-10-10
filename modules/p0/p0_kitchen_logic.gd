@@ -786,3 +786,48 @@ static func cook_again(view: Dictionary, page_id: String) -> Dictionary:
 		tiles = tiles, button = "Cook Again",
 		reason = "" if short.is_empty() else "Need %d more %s" % [int(first.need) - int(first.have), str(first.gap)],
 		command = {"type": "cook", "recipe": page_id}}
+
+# ---------------------------------------------------------------- Cook All (Cooking Lv8, COOK-P1-4 / COOK-EMPTY)
+const COOK_ALL_RULE := "Rare → Fine → Common · up to 2 of a dish · no Legendary"
+const COOK_ALL_GAP := "Nothing to cook"
+
+## Cook All as the Cookbook strip and its sheet read it, from the server's preview (view.cooking.cook_all: the pots
+## cook_all would start, worked out by running it on a copy, so the sheet and the cook never disagree). {} before
+## Cooking Lv8. button: "" when it can go, else the gap greyed on the strip (`Nothing to cook`, D-10 / LOCK-10: no
+## empty sheet); empty: every stove and queue is taken (COOK-EMPTY: `No space`); rows: [{dish, icon, name, rarity,
+## rarity_word, where}] in firing order (`Stove 1 · now` / `Stove 1 · next`); uses: [{token, name, icon, have, need}]
+## (the planned pages' slots summed, a tag without its `Any`); body, label; stoves / facts for COOK-EMPTY.
+static func cook_all(view: Dictionary) -> Dictionary:
+	var plan = cooking(view).get("cook_all", null)
+	if not plan is Dictionary: return {}
+	var reason := str(plan.get("reason", "")) if plan.get("reason", null) != null else ""
+	var out := {"button": COOK_ALL_GAP if reason == "nothing_to_cook" else "", "empty": reason == "no_space",
+		"rows": [], "uses": [], "rule": COOK_ALL_RULE, "stoves": [], "facts": []}
+	for p in plan.get("pots", []):
+		var dish := str(p.get("dish", ""))
+		var r := int(p.get("rarity", 1))
+		out.rows.append({"dish": dish, "icon": P0Logic.icon(dish), "name": P0Logic.item_name(view, dish), "rarity": r,
+			"rarity_word": P0Logic.rarity_name(view, r),
+			"where": "Stove %d · %s" % [int(p.get("stove", 0)) + 1, "next" if str(p.get("when", "")) == "next" else "now"]})
+	for u in plan.get("uses", []):
+		var token := str(u.get("token", ""))
+		var family = UiItemCell.family_icon(token.left(1)) if token.length() == 1 or (token.length() == 2 and token[1].is_valid_int()) else null
+		var name := need_label(view, token)
+		out.uses.append({"token": token, "name": name.left(1).to_upper() + name.substr(1),
+			"icon": family if family != null else P0Logic.icon(token),
+			"have": int(u.get("have", 0)), "need": int(u.get("need", 0))})
+	var n: int = out.rows.size()
+	var on := int(plan.get("stoves", 0))
+	out.body = "%d pot%s on %d stove%s · ingredients come out of your Bag now" % [n, "" if n == 1 else "s", on, "" if on == 1 else "s"]
+	out.label = "Cook All · %d pot%s" % [n, "" if n == 1 else "s"]
+	# COOK-EMPTY: each stove Busy (Queue full when one waits behind it), Stoves n/n · Queues q/n
+	var count := stove_count(view)
+	var queues := 0
+	for i in count:
+		var q = queued(view, i) != null
+		if q: queues += 1
+		out.stoves.append({"title": "Stove %d" % (i + 1), "state": "Busy" if stove(view, i) != null else "Free",
+			"detail": "Queue full" if q else ""})
+	out.facts = [["Stoves", "%d/%d" % [count - out.stoves.filter(func(s): return s.state == "Free").size(), count]],
+		["Queues", "%d/%d" % [queues, count]]]
+	return out
