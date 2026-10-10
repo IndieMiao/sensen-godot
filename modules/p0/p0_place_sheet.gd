@@ -11,8 +11,13 @@ const REASON_ICON := 18.0
 const REASON_GAP := 6
 
 ## "0.8 km" on a card or pin tag; 0.1 km at the least.
+## Every distance the map writes (pin cards, pond cards, the Bite Board, city cards; 李白 / 不知火舞 2026-10-10): under
+## 10 km one decimal (`0.8 km`, `3.6 km`), from 10 km whole km with thousands commas (`12 km`, `8,269 km`); rounded,
+## never under `0.1 km` (q(132)). Where the player is shows no Distance at all (q(80), for_here).
 static func distance_text(km: float) -> String:
-	return "%.1f km" % maxf(0.1, km)
+	var tenths := roundf(maxf(0.1, km) * 10.0) / 10.0
+	if tenths < 10.0: return "%.1f km" % maxf(0.1, tenths)
+	return "%s km" % load("res://modules/p0/p0_travel.gd").grouped(roundi(km))
 
 ## Great-circle distance in km between two (lat, lng) points.
 static func km_between(a: Vector2, b: Vector2) -> float:

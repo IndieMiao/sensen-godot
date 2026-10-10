@@ -543,6 +543,7 @@ const EFFECTS := {
 	"fert_compost": "Crops ready 20% sooner",
 	"facility_sprinkler": "Waters 8 plots for you",   # P1 FARM-5 v5 (q(59) §5)
 	"facility_greenhouse": "16 plots · −25%",          # q(118) ② (李白: the status card's line)
+	"facility_compost_bin": "5 crops → 5 Compost a day",   # q(118) ③ (不知火舞 on 241, FARM-5-FAC 2109:133018)
 }
 
 ## Cards for one tab ("tools" | "supplies"): icon, name, effect, NEED-TILE costs, Supplies yield/have, one button.
@@ -566,6 +567,11 @@ static func workbench_model(view: Dictionary, tab: String) -> Array:
 		elif r.get("coins_need", null) != null:
 			card.cost.append({"id": "coin", "name": "Coins", "have": int(r.get("coins_have", 0)), "need": int(r.coins_need)})
 		card.button = _craft_button(r)
+		# a facility says its level first, locked or not (FARM-5-FAC 2109:133018: `Farming Lv6 · Waters 8 plots for you`,
+		# `Farming Lv7 · 5 crops → 5 Compost a day`; 不知火舞 on 241 ba9359df)
+		var gate = r.get("gate", null)
+		if str(r.get("to", "")) == "field" and gate is Dictionary:
+			card.effect = "%s Lv%d · %s" % [str(gate.get("skill", "")).capitalize(), int(gate.get("level", 1)), card.effect]
 		out.append(card)
 	return out
 

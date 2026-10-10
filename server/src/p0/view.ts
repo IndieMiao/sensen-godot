@@ -18,7 +18,7 @@ import { haveTotal, stored } from './storage.js';
 import { mineView, settleMine } from './mine.js';
 import { gatherView } from './gathering.js';
 import { workbenchView } from './workbench.js';
-import { coveredPlots, cropGrowH, facilitiesView, facilityAt, greenhousePlots, plotCount } from './garden.js';
+import { compostView, coveredPlots, cropGrowH, facilitiesView, facilityAt, greenhousePlots, plotCount } from './garden.js';
 import { climateAt, homeClimate } from './travel.js';
 import { orchardView, treeOf } from './orchard.js';
 import { restReadyIn } from './presence.js';
@@ -69,6 +69,7 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     })),
     orchard: orchardView(c, s),
     facilities: facilitiesView(c, s),
+    compost: compostView(c, s, now),   // the Compost Bin's quota (q(118) ③); null without a bin
     garden: { plots: plotCount(c, s) },
     bag: {
       capacity: s.bag_cap, free: freeSlots(s),

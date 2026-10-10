@@ -303,6 +303,7 @@ func set_view(v: Dictionary) -> void:
 		if was == "board" or _counter.is_short(): _fill_board(_counter)   # board rows follow Accept / Deliver (only on change)
 	if _profile != null and is_instance_valid(_profile) and modal_kind == "profile": _profile.update(v)
 	if workbench() != null: _workbench.refresh(v)
+	if compost_bin() != null: _compost.refresh(v)
 	if inbox() != null: _inbox.refresh(v)
 	if bite_board() != null: _bite_board.refresh(v)
 	_refresh_hud()
@@ -2567,6 +2568,27 @@ func open_workbench(tab := "") -> P0WorkbenchDrawer:
 	_workbench = d
 	modal_kind = _WORKBENCH_KIND
 	return d
+
+## The Compost Bin's drawer (q(118) ③, COMPOST-BIN 2231:122380): Compost 1 / Compost All send the compost command;
+## a grey button toasts its words.
+const _COMPOST_KIND := "compost"
+var _compost: P0CompostDrawer
+
+func open_compost_bin() -> P0CompostDrawer:
+	var d := P0CompostDrawer.new(view)
+	d.theme = UiKit.theme()
+	d.safe_bottom = safe_bottom()
+	d.close_requested.connect(close_modal)
+	d.compost_requested.connect(func(id: String, qty: int): command.emit({"type": "compost", "item": id, "qty": qty}))
+	d.unavailable_requested.connect(func(reason: String): toast(reason))
+	_open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
+	_compost = d
+	modal_kind = _COMPOST_KIND
+	return d
+
+## The open Compost Bin drawer, or null.
+func compost_bin() -> P0CompostDrawer:
+	return _compost if is_instance_valid(_compost) and modal_kind == _COMPOST_KIND else null
 
 ## The open workbench drawer, or null.
 func workbench() -> P0WorkbenchDrawer:

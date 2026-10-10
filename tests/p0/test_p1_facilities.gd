@@ -43,7 +43,7 @@ func test_cover_and_caption_count_the_ring_of_eight() -> void:
 func _recipe(block = null, extra := {}) -> Dictionary:
 	var r := {"id": "craft_sprinkler", "tab": "facilities", "item": "facility_sprinkler", "name": "Sprinkler", "to": "field",
 		"cost": [{"id": "wood", "name": "Timber", "need": 8, "have": 8}, {"id": "copper_ore", "name": "Copper Ore", "need": 3, "have": 1}],
-		"block": block, "cap": 4, "used": 0}
+		"block": block, "cap": 4, "used": 0, "gate": {"skill": "farming", "level": 6, "ok": true}}
 	r.merge(extra, true)
 	return r
 
@@ -60,7 +60,7 @@ func test_the_sprinkler_card_writes_its_state_on_the_button() -> void:
 	b = P0MaterialLogic._craft_button(_recipe({"code": "missing_materials", "detail": {"item": "copper_ore", "need": 3, "have": 1}}))
 	assert_str(b.label).is_equal("Need 2 more Copper Ore")
 	var card: Dictionary = P0MaterialLogic.workbench_model({"workbench": {"recipes": [_recipe()]}}, "facilities")[0]
-	assert_str(str(card.effect)).is_equal("Waters 8 plots for you")
+	assert_str(str(card.effect)).is_equal("Farming Lv6 · Waters 8 plots for you")   # FARM-5-FAC: the level first, unlocked too
 
 ## The drawer shows the tabs the view lists: Tools | Supplies on a P0 server, Facilities when P1 sends it.
 func test_the_workbench_shows_facilities_when_the_view_lists_it() -> void:

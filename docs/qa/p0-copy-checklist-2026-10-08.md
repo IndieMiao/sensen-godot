@@ -13,6 +13,7 @@
 | Energy，不写 Stamina | 体力一律 `Energy` |
 | 分隔符 | 半角空格 + `·` + 半角空格：`Cast · 5 Energy` |
 | x/y = 已用 / 上限 | `Meals today 60/300`、`Mine runs today 1/2`、`0/3 today · 40 coins`（茶：已喝杯数，价格写下一杯，q(48)） |
+| 距离 ★ | 10 km 以内一位小数 `0.8 km`；10 km 及以上取整加千分位 `8,269 km`；四舍五入，最小 `0.1 km`；人在该地点时不显示 Distance 行（q(132)） |
 | 主行动键 | 第一行动词，第二行体力价或原因；第二行 ≤ 80 px（约 16 字符），长原因进按下后的 toast（q(44)）；0 体力的移动写 `· Free` |
 | 不写 Got it | Toast、TipCard、四件事卡都不写 `Got it`；点卡外 / 返回键关闭（q(26)、q(49)） |
 | 缺口写在按钮上 | 中性灰不可用态，如 `Need 6 more Timber`、`Farming Lv3`、`No room · free a slot first`（LOCK-10） |
@@ -165,6 +166,7 @@
 | 世界动作失败 | P0 只出横幅 `Didn't go through · try again`，**不出** toast `3 plots not sown · Energy returned`（P0 世界动作没有本地投影，那句 toast 留给以后有投影的版本，q(75)） |
 | 去重与 stale_state | 不出任何提示 |
 | 启动与账号 | `When were you born?` / `Pick your birthday` / `Continue` / `Before you start` / `Agree to continue` / `Terms of Service ›` / `Privacy Policy ›` / `Continue with Apple` / `Continue with Google` / `Continue with Email` / `Taking longer than usual…` / `Can't connect` / `That name isn't allowed` / `Try another name`（WP6，SGODOT-206） |
+| 设置 · Licenses ★ | `Licenses` / `Software` / `Map data` / `OpenStreetMap` / `© OpenStreetMap contributors` / `ODbL 1.0` / `GeoNames` / `Contains data from GeoNames (geonames.org)` / `ESA WorldCover` / `© ESA WorldCover project 2021 / Contains modified Copernicus Sentinel data (2021) processed by ESA WorldCover consortium` / `CC BY 4.0`（署名一字不改、可折行；许可名与署名空 6 px 单独成段）（q(129)，帧 SET-LICENSES） |
 
 ## 11. 方案内已统一的写法（巡检时以右列为准）
 

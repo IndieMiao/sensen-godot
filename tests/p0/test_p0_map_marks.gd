@@ -69,6 +69,10 @@ func test_the_fish_list_is_easiest_first_with_caught_ones_marked() -> void:
 	assert_bool(rows.filter(func(r): return r.id == "fish_koi")[0].caught).is_false()
 	assert_float(P0PlaceSheet.km_between(Vector2(31.2, 121.4), Vector2(31.2, 121.4))).is_equal(0.0)
 	assert_str(P0PlaceSheet.distance_text(0.0)).is_equal("0.1 km")
+	# 李白 / 不知火舞 2026-10-10: one decimal under 10 km, whole km with thousands commas from 10 km, rounded
+	for pair in [[0.04, "0.1 km"], [0.84, "0.8 km"], [3.56, "3.6 km"], [9.94, "9.9 km"], [9.96, "10 km"], [12.4, "12 km"],
+			[1758.4, "1,758 km"], [8269.3, "8,269 km"]]:
+		assert_str(P0PlaceSheet.distance_text(float(pair[0]))).override_failure_message(str(pair)).is_equal(str(pair[1]))
 
 func test_the_homestead_mark_hangs_on_the_farm_pin() -> void:
 	assert_str(P0Map.home_mark({"map_markers": [{"place": "sh_market_1", "kind": "request"}, {"place": "home", "kind": "deliver"}]})).is_equal("deliverable")
