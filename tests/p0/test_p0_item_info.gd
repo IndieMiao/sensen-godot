@@ -331,3 +331,29 @@ func test_bag_tabs_follow_the_plan() -> void:
 	assert_dict(tabs).is_equal({"seed_radish": &"seeds", "fert_compost": &"seeds", "crop_radish": &"produce", "fish_crucian": &"fish",
 		"dish_grilled_crucian": &"dishes", "bait_worm": &"tackle", "rod_reed": &"tackle", "timber": &"materials", "torch": &"materials"})
 	assert_str(P0ItemInfo.tab_of(v, "postcard_san_francisco")).is_empty()   # keepsakes: All only
+
+## A dish stack with its quality (`dish_x@good`, §7.2.5; 李元芳 on 286 5d27bd93): the card names the dish and shows its
+## art, never the raw id or the sprout; the quality is the state line's stars (`Common ★`).
+func test_a_good_dish_reads_as_the_dish_with_a_star() -> void:
+	var v := _view()
+	v.items["dish_grilled_crucian@good"] = {"kind": "dish", "sell": null, "rarity": 1, "quality": 1, "meal": 45, "full": 50}
+	v.bag.slots.append({"id": "dish_grilled_crucian@good", "qty": 2})
+	var s := P0ItemInfo.spec(v, "dish_grilled_crucian@good", &"bag")
+	assert_str(str(s.title)).is_equal("Grilled Crucian")
+	assert_object(s.icon).is_same(P0Logic.icon("dish_grilled_crucian"))
+	assert_int(int(s.quality)).is_equal(1)
+	assert_str(P0Logic.dish_label(v, "dish_grilled_crucian@good")).is_equal("Grilled Crucian ★")
+	assert_str(P0Logic.item_name(v, "dish_grilled_crucian@perfect")).is_equal("Grilled Crucian")   # no names / items entry
+	assert_str(P0Logic.item_name(v, "fish_unknown")).is_equal("fish_unknown")   # other ids as before
+	assert_str(P0Logic.base_id("dish_grilled_crucian@good")).is_equal("dish_grilled_crucian")
+	# the card's state line: the stars together, as dish_label (不知火舞 on #263)
+	var host := Control.new()
+	host.theme = UiKit.theme()
+	host.size = Vector2(336, 400)
+	add_child(auto_free(host))
+	var sheet := UiInfoSheet.new()
+	host.add_child(sheet)
+	sheet.rules = func(id: String, ctx: StringName, opts: Dictionary) -> Dictionary:
+		return {id = id, title = "Herb Grilled Fish", rarity_text = "Fine", quality = 2, facts = [], buttons = []}
+	sheet.open("dish_herb_grilled_fish@perfect", &"bag")
+	assert_str(sheet._state.text).is_equal("Fine ★★")
