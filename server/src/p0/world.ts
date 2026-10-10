@@ -93,6 +93,8 @@ export function km(a: { lat: number; lng: number }, b: { lat: number; lng: numbe
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 let memberPop: Map<string, number> | null = null;
+/** A cluster's satellite towns (its member cities other than the seed): name and point, for q(32) place names. */
+let satellites: Map<string, { name: string; lat: number; lng: number }[]> = new Map();
 /**
  * q(114) ①: a cluster's population is the sum of its member cities (server/data/city_cluster_members.tsv over
  * server/data/cities.tsv). The cluster table keeps its seed city's own figure (Miami 487,014 alone, 780,231 with its
@@ -103,10 +105,19 @@ export function clusterPopulation(cl: CityCluster): number {
     memberPop = new Map();
     try {
       const rows = (f: string) => readFileSync(path.join(ROOT, f), 'utf8').split('\n').filter(l => l && !l.startsWith('#')).map(l => l.split('\t'));
-      const pop = new Map(rows('server/data/cities.tsv').map(r => [r[0], Number(r[7]) || 0] as [string, number]));
-      for (const [city, cluster] of rows('server/data/city_cluster_members.tsv')) memberPop.set(cluster, (memberPop.get(cluster) ?? 0) + (pop.get(city) ?? 0));
+      const cities = new Map(rows('server/data/cities.tsv').map(r => [r[0], r] as [string, string[]]));
+      for (const [city, cluster] of rows('server/data/city_cluster_members.tsv')) {
+        const row = cities.get(city);
+        memberPop.set(cluster, (memberPop.get(cluster) ?? 0) + (Number(row?.[7]) || 0));
+        if (row && city !== cluster) {
+          const list = satellites.get(cluster) ?? [];
+          list.push({ name: row[1], lat: Number(row[2]), lng: Number(row[3]) });
+          satellites.set(cluster, list);
+        }
+      }
     } catch {
       memberPop.clear();   // the files missing (a stripped image): every cluster keeps its own figure, never a 500 (哪吒 on #244)
+      satellites = new Map();
     }
   }
   return Math.max(cl.population, memberPop.get(cl.id) ?? 0);
@@ -168,12 +179,33 @@ function placeWord(w: WorldContent, cl: CityCluster, used: Set<string>, salt: st
   return pool[hash32(w.seed, cl.id, salt) % pool.length];
 }
 
-/** Names ≤ 24 characters, no numbers (§9.3.2 name rules). The place name is the city's when it fits, else the word
- * pool's (no district data yet: the plan's order is district → quarter → satellite town → word pool). */
-function named(w: WorldContent, cl: CityCluster, used: Set<string>, kind: string, salt: string, max = 24): string {
-  const own = `${cl.name} ${kind}`;
-  if (own.length <= max && !/[0-9]/.test(own) && !used.has(own)) { used.add(own); return own; }
-  return `${placeWord(w, cl, used, salt)} ${kind}`;
+/**
+ * q(32): a tackle shop, market square or travel post is `<place> <kind>`, the place being the district, then the
+ * quarter, then a coarser area, then the satellite town it stands in, else the word pool — never the cluster's own
+ * city name (the chip would read `Tokyo · Tokyo Market Square`). There is no district or quarter data offline yet, so:
+ * the satellite town when the outpost is nearer to it than to the seed city (Oakland's side of San Francisco), else
+ * the word pool. ≤ 24 characters, no numbers, never twice in a city.
+ */
+function named(w: WorldContent, cl: CityCluster, used: Set<string>, kind: string, salt: string, at: { lat: number; lng: number }, max = 24): string {
+  clusterPopulation(cl);   // loads the member cities once
+  const towns = satellites.get(cl.id) ?? [];
+  let best: { name: string; lat: number; lng: number } | null = null;
+  let bestKm = km(cl, at);
+  for (const t of towns) { const d = km(t, at); if (d < bestKm) { best = t; bestKm = d; } }
+  if (best) {
+    const own = `${best.name} ${kind}`;
+    if (own.length <= max && !/[0-9]/.test(own) && !used.has(own)) { used.add(own); return own; }
+  }
+  // The word pool: a word not yet in this city's names of this kind (tea houses and other kinds share the pool, so
+  // `Magnolia Tea House` and `Magnolia Travel Post` may both stand; two `Magnolia Travel Post`s may not).
+  const pool = w.tea_words[CLIMATE_KEY[cl.climate]] ?? w.tea_words.Temperate;
+  const start = hash32(w.seed, cl.id, salt);
+  for (let k = 0; k < pool.length; k++) {
+    const word = pool[(start + k) % pool.length];
+    const name = `${word} ${kind}`;
+    if (word !== cl.name && !used.has(name)) { used.add(name); return name; }   // a town called Mango never gets Mango
+  }
+  return `${pool[start % pool.length]} ${kind}`;
 }
 
 /** Counts per role for a tier (§9.3.2 table, 李白's tiers row): tackle follows the ponds, at least one. */
@@ -215,19 +247,22 @@ export function genOutposts(w: WorldContent, cl: CityCluster, tier: Tier, ponds:
   const turn = (topic: string) => unit(seed, cl.id, topic) * 360;
 
   if (tier === 'S') {
-    put('post', 0, offset(cl.lat, cl.lng, 0.6, turn('cabin')), named(w, cl, used, 'Trading Post', 'cabin-word'), { cabin: true });
+    const at = offset(cl.lat, cl.lng, 0.6, turn('cabin'));
+    put('post', 0, at, named(w, cl, used, 'Trading Post', 'cabin-word', at), { cabin: true });
     return out;
   }
   const n = outpostCounts(w, tier, ponds.length);
   const beginner = ponds.find(p => p.beginner)!;
 
   // Travel Post 1: within 1 km of the centre.
-  put('post', 0, offset(cl.lat, cl.lng, Math.min(0.6, pl.travel_1.from_centre_max_km), turn('post0')), named(w, cl, used, 'Travel Post', 'post-word:0'));
+  const post0 = offset(cl.lat, cl.lng, Math.min(0.6, pl.travel_1.from_centre_max_km), turn('post0'));
+  put('post', 0, post0, named(w, cl, used, 'Travel Post', 'post-word:0', post0));
   // Market Square 1: 1–2 km from the centre and ≤ 800 m from the beginner pond — on the line to the pond, 2 km out
   // of a 2.5 km ring pond is 500 m from it.
   const toPond = (Math.atan2((beginner.lng - cl.lng) * Math.cos((cl.lat * Math.PI) / 180), beginner.lat - cl.lat) * 180) / Math.PI;
   const m1Km = Math.min(pl.market_1.from_centre_km[1], Math.max(pl.market_1.from_centre_km[0], km(cl, beginner) - 0.5));
-  put('market', 0, offset(cl.lat, cl.lng, m1Km, toPond), named(w, cl, used, 'Market Square', 'market-word:0'));
+  const market0 = offset(cl.lat, cl.lng, m1Km, toPond);
+  put('market', 0, market0, named(w, cl, used, 'Market Square', 'market-word:0', market0));
   // Tackle shops: one per pond, the beginner pond's first, 200 m off its shore, skipping a pond whose shop would sit
   // within 3 km of another (tackle follows ponds, up to the tier's count).
   for (const p of [...ponds].sort((a, b) => Number(b.beginner) - Number(a.beginner))) {
@@ -245,12 +280,12 @@ export function genOutposts(w: WorldContent, cl: CityCluster, tier: Tier, ponds:
   // Further market squares: ≥ 5 km from Market Square 1, spread round the centre.
   for (let i = 1; i < n.market; i++) {
     const at = spot('market', Math.max(pl.market_n.from_market_1_min_km, 5) + 1.5 * (i - 1), toPond + 180 + (i - 1) * 90);
-    put('market', i, at, `${placeWord(w, cl, used, `market-word:${i}`)} Market Square`);
+    put('market', i, at, named(w, cl, used, 'Market Square', `market-word:${i}`, at));
   }
   // Travel Post 2 (M2 and up): opposite Travel Post 1, on the far side of the city.
   for (let i = 1; i < n.post; i++) {
     const at = spot('post', 6 + 2 * (i - 1), turn('post0') + 180);
-    put('post', i, at, `${placeWord(w, cl, used, `post-word:${i}`)} Travel Post`);
+    put('post', i, at, named(w, cl, used, 'Travel Post', `post-word:${i}`, at));
   }
   return out;
 }
