@@ -27,7 +27,13 @@ describe('the Decor page (§9.11.6)', () => {
     for (const id of ['deco_planter', 'deco_lantern', 'deco_path', 'deco_bench', 'deco_scarecrow', 'deco_fence', 'deco_birdbath', 'deco_windmill', 'deco_fountain', 'deco_pergola'])
       expect(buy, id).toContain(id);
     expect(buy).not.toContain('recipe_stand');
-    for (const [id, d] of Object.entries(decorOf(c)!.items)) expect(d.blurb, id).toMatch(/^[A-Z][a-z]/);   // q(111): every row has its line
+    // q(111) / q(113): every single piece has a short line (≤ 14 characters, a greyed button's second line); the
+    // multi-piece ones read `5 pieces` instead
+    for (const [id, d] of Object.entries(decorOf(c)!.items)) {
+      if (d.pieces > 1) { expect(d.blurb, id).toBeUndefined(); continue; }
+      expect(d.blurb, id).toMatch(/^[A-Z][a-z]/);
+      expect(d.blurb?.length ?? 99, id).toBeLessThanOrEqual(16);   // Visitors can sit (16) is §9.11.6's own, kept
+    }
     expect(Object.values(decorOf(c)!.items).filter(d => d.buy).reduce((n, d) => n + d.price, 0)).toBe(1420);   // §9.15.2's catalog total
   });
 
