@@ -9,6 +9,8 @@ extends RefCounted
 ## The bar's words for a spot the server would refuse (decor.ts codes).
 const REASONS := {"decor_outside": "Outside your yard", "decor_overlap": "Space taken", "decor_path": "Keep the path clear"}
 const NONE := Vector2i(-1, -1)
+## "Ignore no piece": the server numbers pieces from 1, and the client's pending ones are negative (#265).
+const NO_PIECE := 0
 const MAX_LEVEL := 10
 
 static func items() -> Dictionary: return P0Logic.content().get("decor", {}).get("items", {})
@@ -44,7 +46,7 @@ static func _in_any(cell: Vector2i, rects: Array) -> bool:
 static func placed(view: Dictionary) -> Array: return view.get("decor", {}).get("placed", []) if view.get("decor", null) is Dictionary else []
 
 ## Cells the yard's pieces take ("x,y" → uid), but the one being moved.
-static func taken(view: Dictionary, ignore := -1) -> Dictionary:
+static func taken(view: Dictionary, ignore := NO_PIECE) -> Dictionary:
 	var out := {}
 	for p in placed(view):
 		if int(p.get("uid", 0)) == ignore: continue
@@ -52,12 +54,12 @@ static func taken(view: Dictionary, ignore := -1) -> Dictionary:
 	return out
 
 ## "" when the piece may stand with its top-left cell at `at`, else the bar's reason (decor.ts spotBlock, same order).
-static func reason(view: Dictionary, id: String, at: Vector2i, rot := 0, ignore := -1) -> String:
+static func reason(view: Dictionary, id: String, at: Vector2i, rot := 0, ignore := NO_PIECE, taken_cells = null) -> String:
 	var y := yard()
 	var cs := cells(id, at, rot)
 	for c in cs:
 		if not _rect(y.get("walk", [0, 0, 0, 0])).has_point(c) or _in_any(c, y.get("field", [])): return REASONS.decor_outside
-	var t := taken(view, ignore)
+	var t: Dictionary = taken_cells if taken_cells is Dictionary else taken(view, ignore)   # nearest_spot passes it once
 	for c in cs:
 		if _in_any(c, y.get("objects", [])) or t.has("%d,%d" % [c.x, c.y]): return REASONS.decor_overlap
 	for c in cs:
@@ -65,15 +67,16 @@ static func reason(view: Dictionary, id: String, at: Vector2i, rot := 0, ignore 
 	return ""
 
 ## The legal top-left cell nearest `from` (the preview starts there, q(59) §4 as the sprinkler), NONE when none is.
-static func nearest_spot(view: Dictionary, id: String, rot: int, from: Vector2i, ignore := -1) -> Vector2i:
+static func nearest_spot(view: Dictionary, id: String, rot: int, from: Vector2i, ignore := NO_PIECE) -> Vector2i:
 	var walk := _rect(yard().get("walk", [0, 0, 0, 0]))
+	var t := taken(view, ignore)
 	var best := NONE
 	var best_d := INF
 	for y in range(walk.position.y, walk.end.y):
 		for x in range(walk.position.x, walk.end.x):
 			var at := Vector2i(x, y)
 			var d := Vector2(at - from).length_squared()
-			if d >= best_d or reason(view, id, at, rot, ignore) != "": continue
+			if d >= best_d or reason(view, id, at, rot, ignore, t) != "": continue
 			best_d = d
 			best = at
 	return best

@@ -185,3 +185,23 @@ func test_every_sold_piece_has_its_icon() -> void:
 		var tex := P0Logic.icon(str(id))
 		assert_object(tex).override_failure_message(str(id)).is_not_null()
 		assert_str(tex.resource_path).override_failure_message(str(id)).is_equal("res://assets/p0/icons/%s.svg" % id)
+
+## A multi-piece one sent piece by piece (周瑜 on #265): a sent piece stays pending until the view places it, so the next
+## spot avoids it; one refused, failed or older than PENDING_MS goes.
+func test_a_sent_piece_stays_pending_until_the_view_places_it() -> void:
+	var a := {"uid": -1, "id": "deco_path", "x": 12, "y": 0, "rot": 0, "sent": 1000}
+	var b := {"uid": -2, "id": "deco_path", "x": 13, "y": 0, "rot": 0, "sent": 1200}
+	var placed := [{"uid": 7, "id": "deco_path", "x": 12, "y": 0, "rot": 0}]   # A came back, B not yet
+	assert_array(P0FarmDecor.settle_pending([a, b], placed, 1500)).is_equal([b])
+	assert_array(P0FarmDecor.settle_pending([a, b], [], 1500)).is_equal([a, b])
+	assert_array(P0FarmDecor.settle_pending([a, b], [], 1200 + P0FarmDecor.PENDING_MS + 1)).is_empty()   # stale: gone
+	var moved := [{"uid": 7, "id": "deco_path", "x": 12, "y": 0, "rot": 1}]   # same cell, another turn: not this one
+	assert_array(P0FarmDecor.settle_pending([a], moved, 1500)).is_equal([a])
+
+## A pending piece is negative and "ignore no piece" is 0 (#265): the first piece sent of a multi-piece one counts as taken
+## for the next spot and the preview, it is never mistaken for the piece being moved.
+func test_the_first_pending_piece_is_taken_for_the_next_spot() -> void:
+	var v := {"decor": {"placed": [{"uid": -1, "id": "deco_path", "x": 8, "y": 1, "rot": 0}], "cap": 20, "stored": {}}}
+	assert_str(P0Decor.reason(v, "deco_path", Vector2i(8, 1))).is_equal("Space taken")
+	assert_that(P0Decor.nearest_spot(v, "deco_path", 0, Vector2i(9, 1))).is_not_equal(Vector2i(8, 1))
+	assert_str(P0Decor.reason(v, "deco_path", Vector2i(8, 1), 0, -1)).is_equal("")   # moving that very piece

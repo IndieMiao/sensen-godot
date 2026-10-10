@@ -44,7 +44,7 @@ var placing := {}
 var _art := {}                  # uid → Node3D
 var _looks := {}                # uid → "id:rot" the art was built for
 var _solid := {}                # "x,y" → cell this file made solid
-var _sig := ""
+var _sig := 0
 var _preview: Node3D
 var _cells: Array = []          # the piece's cells: fill
 var _edges: Array = []          # … and their 2 px edge
@@ -57,7 +57,10 @@ const GLOW := Color(1, 1, 1, 0.22)
 static var _outline: ImageTexture
 var _finger := Vector2.INF
 var _press := Vector2.INF
-var _pending: Array = []        # pieces sent and not yet in the view (a multi-piece's next spot avoids them)
+## Pieces sent and not yet in the view, {uid (< 0), id, x, y, rot, sent (ms)}: a multi-piece's next spot and its `N left`
+## count them. Each goes when the view shows it, when its command is refused or fails, or after PENDING_MS (周瑜 on #265).
+var _pending: Array = []
+const PENDING_MS := 10000
 
 func setup(farm_node: Node3D) -> P0FarmDecor:
 	farm = farm_node
@@ -70,21 +73,23 @@ func _ready() -> void:
 	rt.ui.placement_done.connect(_on_done)
 	rt.ui.placement_pan.connect(_on_pan)
 	rt.ui.placement_secondary.connect(_on_rotate)
+	rt.session.refused.connect(_on_refused)
+	rt.session.connection_failed.connect(_on_failed)
 
 func _exit_tree() -> void:
 	if rt == null: return
 	for s in [[rt.ui.placement_point, _on_point], [rt.ui.placement_done, _on_done], [rt.ui.placement_pan, _on_pan],
-			[rt.ui.placement_secondary, _on_rotate]]:
+			[rt.ui.placement_secondary, _on_rotate], [rt.session.refused, _on_refused], [rt.session.connection_failed, _on_failed]]:
 		if (s[0] as Signal).is_connected(s[1]): (s[0] as Signal).disconnect(s[1])
 	if not placing.is_empty(): rt.ui.end_placement()
 
 # ---------------------------------------------------------------- the view → art and solid cells
 func frame(v: Dictionary, dt := 0.0) -> void:
 	var list := P0Decor.placed(v)
-	var sig := str(list)
+	var sig := list.hash()
 	if sig != _sig:
 		_sig = sig
-		_pending.clear()
+		_pending = settle_pending(_pending, list, Time.get_ticks_msec())
 		_sync(list)
 	if not placing.is_empty() and str(placing.mode) != "idle" and farm.placement_edge(_finger, dt): _snap(_finger)
 
@@ -104,7 +109,7 @@ func _sync(list: Array) -> void:
 			farm.add_child(_art[uid])
 			_looks[uid] = look
 		(_art[uid] as Node3D).position = centre(id, at, rot)
-		(_art[uid] as Node3D).visible = not (str(placing.get("mode", "")) == "move" and int(placing.get("uid", -1)) == uid)
+		(_art[uid] as Node3D).visible = not (str(placing.get("mode", "")) == "move" and int(placing.get("uid", P0Decor.NO_PIECE)) == uid)
 		for c in P0Decor.cells(id, at, rot): cells["%d,%d" % [c.x, c.y]] = c
 	for uid in _art.keys():
 		if not keep.has(uid):
@@ -205,7 +210,7 @@ func begin_place(id: String, stay := false) -> bool:
 		return false
 	if P0Decor.stored(v, id) - _pending_of(id) < 1: return false
 	var rot := 0
-	placing = {mode = "place", id = id, uid = -1, rot = rot, stay = stay,
+	placing = {mode = "place", id = id, uid = P0Decor.NO_PIECE, rot = rot, stay = stay,
 		at = P0Decor.nearest_spot(v, id, rot, farm.bp.world_to_cell(farm.actor.position))}
 	_start()
 	return true
@@ -313,7 +318,8 @@ func _on_done(ok: bool) -> void:
 			rt.session.send({"type": "move_decor", "uid": int(p.uid), "x": p.at.x, "y": p.at.y, "rot": int(p.rot), "space": "home"})
 		else:
 			rt.session.send({"type": "place_decor", "item": str(p.id), "x": p.at.x, "y": p.at.y, "rot": int(p.rot), "space": "home"})
-			_pending.append({"uid": -1 - _pending.size(), "id": str(p.id), "x": p.at.x, "y": p.at.y, "rot": int(p.rot)})
+			_pending.append({"uid": -1 - _pending.size(), "id": str(p.id), "x": p.at.x, "y": p.at.y, "rot": int(p.rot),
+				"sent": Time.get_ticks_msec()})
 			# a multi-piece one goes on: the next piece on the nearest free spot (49b11f91 ④)
 			if int(P0Decor.item(str(p.id)).get("pieces", 1)) > 1 and begin_place(str(p.id), bool(p.stay)): return
 	if str(p.mode) == "move" and _art.has(int(p.uid)): (_art[int(p.uid)] as Node3D).visible = true   # the view moves it
@@ -550,6 +556,26 @@ func _view() -> Dictionary:
 	d.placed = (d.get("placed", []) as Array) + _pending
 	out.decor = d
 	return out
+
+## The pending pieces still on their way: those the view now places are gone, and any older than PENDING_MS.
+static func settle_pending(pending: Array, placed: Array, now_ms: int) -> Array:
+	return pending.filter(func(q):
+		if now_ms - int(q.get("sent", now_ms)) > PENDING_MS: return false
+		for p in placed:
+			if str(p.get("id", "")) == str(q.id) and int(p.get("x", 0)) == int(q.x) and int(p.get("y", 0)) == int(q.y) \
+					and int(p.get("rot", 0)) == int(q.rot): return false
+		return true)
+
+## A place the server refused, or a send that failed: that piece is not on its way any more.
+func _on_refused(_code: String, _detail: Dictionary, cmd: Dictionary) -> void: _drop_pending(cmd)
+func _on_failed(_message: String, cmd: Dictionary) -> void: _drop_pending(cmd)
+
+func _drop_pending(cmd: Dictionary) -> void:
+	if str(cmd.get("type", "")) != "place_decor": return
+	var before := _pending.size()
+	_pending = _pending.filter(func(q): return not (str(q.id) == str(cmd.get("item", "")) and int(q.x) == int(cmd.get("x", -1))
+		and int(q.y) == int(cmd.get("y", -1)) and int(q.rot) == int(cmd.get("rot", 0))))
+	if _pending.size() != before and not placing.is_empty() and str(placing.mode) != "idle": _show()
 
 func _pending_of(id: String) -> int:
 	return _pending.filter(func(p): return str(p.id) == id).size()

@@ -641,6 +641,14 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 		session.send({"type": "reel", "outcome": "escaped"})
 		ui.toast_error("Creel full · the fish slipped away")
 		return
+	# Decorate (SGODOT-284): a spot the server would not take says why in the bar's words; the cap, the cap line.
+	if str(cmd.get("type", "")) in ["place_decor", "move_decor"]:
+		if P0Decor.REASONS.has(code):
+			ui.toast_error(str(P0Decor.REASONS[code]))
+			return
+		if code == "decor_cap":
+			ui.toast(P0Decor.cap_line(session.view))
+			return
 	var trap_said = P0Logic.P0Trap.refusal_text(cmd, code, detail)   # Fish Trap (SGODOT-283)
 	if trap_said != null:
 		if str(trap_said) != "": ui.toast_error(str(trap_said))
