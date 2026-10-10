@@ -45,6 +45,9 @@ export type P0Event =
       mob?: number; mob_kind?: string; hp?: number; damage?: number; loot?: [string, number] | null; quartz_spent?: boolean }
   | { kind: 'gather'; spot: string; items: [string, number, 'storage' | 'bag'][]; ready_in: number }
   | { kind: 'craft'; recipe: string; item: string; qty: number; to: 'bag' | 'gear' | 'owned' }
+  // P1 (SGODOT-239): a facility placed or moved; started = sown plots it now waters (they began growing)
+  | { kind: 'facility'; action: 'placed' | 'moved'; facility: number; facility_kind: string; plot: number; from?: number; covered: number; started: number[] }
+  | { kind: 'plots_added'; plots: number[]; reason: 'homestead' }   // the Homestead unlock's new plots (client drops them in)
   | { kind: 'stored'; items: [string, number][]; reason: 'home' | 'spice_rack' };
 
 export function energyDetail(c: P0Content, s: P0State, now: number, need: number) {

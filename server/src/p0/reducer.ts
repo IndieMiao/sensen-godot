@@ -12,6 +12,7 @@ import { notePresence, restReadyIn } from './presence.js';
 import { isMineCommand, mineCommand, settleMine, type MineCommand } from './mine.js';
 import { gather, storeMaterials } from './gathering.js';
 import { craft } from './workbench.js';
+import { coveredPlots, facilityAt, growMs, moveFacility, place } from './garden.js';
 import { claimParcel, PARCEL_LIMIT, settleParcels } from './parcels.js';
 import { dayKey, maxEnergy, scaledXp, settleEnergy, skillLevel, xpPercent } from './rules.js';
 import { buyback, buyItem, drink, moveStorage, offerOf, sellItem, setLock } from './shops.js';
@@ -53,6 +54,8 @@ type P0CommandBody =
   | MineCommand
   | { type: 'gather'; spot: string }
   | { type: 'craft'; recipe: string }
+  | { type: 'place'; recipe: string; plot: number }          // P1: build a facility in place (one step, q(22))
+  | { type: 'move_facility'; facility: number; plot: number }   // P1: free, never removed
   | { type: 'claim_parcel'; key: string }
   | { type: 'claim_parcels'; keys: string[] }   // Claim all: the keys on screen, so a retry never takes a newer parcel
   | { type: 'read_inbox'; keys: string[] }
@@ -89,11 +92,19 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
   noteEntered(s, cmd.space, cmd.place);
   settleExplorer(c, s, now, events);   // a stamp counted from today on (2 a day) earns its medal today
   const plotOf = (id: unknown) => (Number.isInteger(id) ? s.plots.find(p => p.id === id) : undefined);
+  // P1 (SGODOT-239): a plot with a facility on it is no field — nothing is tilled, sown, fed or harvested there.
+  const occupied = (id: unknown) => {
+    const f = Number.isInteger(id) ? facilityAt(s, id as number) : undefined;
+    return f ? fail('plot_occupied', { plot: id, facility: f.kind }) : null;
+  };
+  const growH = (crop: string) => cropById(c, crop)?.grow_h ?? 0;
 
   switch (cmd.type) {
     case 'till': {
       const plot = plotOf(cmd.plot);
       if (!plot) return fail('bad_plot');
+      const taken = occupied(cmd.plot);
+      if (taken) return taken;
       if (plot.state !== 'wild') return fail('wrong_state', { state: plot.state });
       plot.state = 'tilled';
       break;
@@ -105,6 +116,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       if (ids.length < 1 || ids.length > most || new Set(ids).size !== ids.length) return fail('bad_plot', { most });
       const plots = ids.map(plotOf);
       if (plots.some(p => !p)) return fail('bad_plot');
+      for (const id of ids) { const taken = occupied(id); if (taken) return taken; }
       const wrong = plots.find(p => p!.state !== 'tilled');
       if (wrong) return fail('wrong_state', { plot: wrong.id, state: wrong.state });
       const crop = cropBySeed(c, String(cmd.seed));
@@ -118,11 +130,14 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       // §4.2.1: the level difference is locked at the moment the player pays.
       const pct = xpPercent(c, skillLevel(c, s, 'farming'), crop.level);
       noteSown(c, s, n);
+      const watered = coveredPlots(c, s);
       for (const plot of plots as Plot[]) {
         plot.state = 'sown';
         plot.crop = crop.id;
         plot.xp_pct = pct;
         delete plot.ready_at; delete plot.fert;
+        // §5.7: under a sprinkler it grows as it is sown (−15%, locked now), no Water step.
+        if (watered.has(plot.id)) { plot.state = 'growing'; plot.ready_at = now + growMs(c, s, plot, crop.grow_h); }
       }
       break;
     }
@@ -130,6 +145,8 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       // §5.5: one Compost per plot, any time after sowing and before it is ripe; 0 Energy; never stacks.
       const plot = plotOf(cmd.plot);
       if (!plot) return fail('bad_plot');
+      const taken = occupied(cmd.plot);
+      if (taken) return taken;
       const ripe = plot.state === 'growing' && (plot.ready_at ?? Infinity) <= now;
       if ((plot.state !== 'sown' && plot.state !== 'growing') || ripe || !plot.crop) return fail('wrong_state', { state: ripe ? 'ready' : plot.state });
       if (plot.fert) return fail('fertilized');
@@ -148,15 +165,19 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
     case 'water': {
       const plot = plotOf(cmd.plot);
       if (!plot) return fail('bad_plot');
+      // A covered plot was never waiting for water (q(59) §3): an older client's Water is refused as already growing.
+      if (plot.state === 'growing' && coveredPlots(c, s).has(plot.id)) return fail('already_growing');
       if (plot.state !== 'sown' || !plot.crop) return fail('wrong_state', { state: plot.state });
       const crop = cropById(c, plot.crop)!;
       plot.state = 'growing';
-      plot.ready_at = now + Math.round(crop.grow_h * 3_600_000 * (plot.fert ? c.goods.fert_compost.grow_mult ?? 1 : 1));
+      plot.ready_at = now + growMs(c, s, plot, crop.grow_h);
       break;
     }
     case 'harvest': {
       const plot = plotOf(cmd.plot);
       if (!plot) return fail('bad_plot');
+      const taken = occupied(cmd.plot);
+      if (taken) return taken;
       if (plot.state !== 'growing' || !plot.crop || (plot.ready_at ?? Infinity) > now)
         return fail('not_ready', { ready_in: plot.ready_at ? plot.ready_at - now : null });
       const crop = cropById(c, plot.crop)!;
@@ -232,6 +253,11 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       if (refusal) return fail(refusal.code, refusal.detail);
       // q(46): the Spice Rack takes the bag's seasonings (Spice Rack · seasonings off your bag); from now on they are stored.
       if (c.homestead.levels.find(l => l.level === s.homestead.level)?.unlocks.includes('spice_rack')) storeMaterials(c, s, now, events, 'spice_rack');
+      break;
+    }
+    case 'place': case 'move_facility': {
+      const refusal = cmd.type === 'place' ? place(c, s, cmd, now, events, growH) : moveFacility(c, s, cmd, now, events, growH);
+      if (refusal) return fail(refusal.code, refusal.detail);
       break;
     }
     case 'gather': case 'craft': {

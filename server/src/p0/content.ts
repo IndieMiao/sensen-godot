@@ -80,9 +80,12 @@ export interface MineFloorDef { floor: number; drops: [string | null, number][];
 export interface MineMonster { name: string; hp: number; damage: number; loot: [string, number, number][]; once_a_day?: string }
 /** §13.4 workbench recipe: out goes to the bag, Gear (equipped) or the owned list (passive tools). */
 export interface WorkbenchRecipe {
-  id: string; tab: string; out: string; qty: number; to: 'bag' | 'gear' | 'owned';
+  id: string; tab: string; out: string; qty: number; to: 'bag' | 'gear' | 'owned' | 'field';
   cost: [string, number][]; gate?: [Skill, number];
+  facility?: string;   // to: field (P1, SGODOT-239): the facility it builds in place (place command), never crafted
 }
+/** P1 step 1 (q(59) §1.4): a facility on one plot; a sprinkler waters the ring of 8 around it and cuts ripening. */
+export interface FacilityDef { name: string; cover: 'ring8'; grow_cut: number; cap_base: number; cap_per_homestead: number }
 
 export interface ResidentDef {
   name: string; role: string; portrait: string; likes: string; gift_meal: string; one_per_day: boolean;
@@ -192,8 +195,13 @@ export interface P0Content {
     combat: { hp: number; invulnerability_ms: number; weapons: Record<string, { attack: number; speed: number }> };
     express_unlock_floor: number;
   };
-  /** §13.4 P0 workbench: Tools / Supplies (SGODOT-231). */
+  /** §13.4 P0 workbench: Tools / Supplies (SGODOT-231), Facilities from P1. */
   workbench: { tabs: string[]; recipes: WorkbenchRecipe[] };
+  /** P1 (SGODOT-239, content/farm_garden.json): plot id → [col, row] on the garden grid; from Homestead level `extra.homestead`
+   * the homestead has `count` more plots from id `from`, added as wild. */
+  garden: { plots: [number, number][]; extra: { homestead: number; from: number; count: number } };
+  /** P1 (SGODOT-239): facilities by kind; grow_cut_cap caps a facility's cut and Compost's together. */
+  facilities: { grow_cut_cap: number; kinds: Record<string, FacilityDef> };
 }
 
 export const DEFAULT_P0_CONTENT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../assets/p0/p0_content.json');
@@ -315,6 +323,7 @@ export function itemName(c: P0Content, id: string): string {
   if (c.drinks.items[id]) return c.drinks.items[id].name;
   if (c.specialty[id]) return c.specialty[id].name;
   if (c.supplies[id]) return c.supplies[id].name;
+  if (id.startsWith('facility_') && c.facilities?.kinds[id.slice(9)]) return c.facilities.kinds[id.slice(9)].name;
   const upgrade = c.bag_upgrades.find(u => u.id === id);
   if (upgrade) return upgrade.name;
   if (itemKind(id) === 'dish') {
