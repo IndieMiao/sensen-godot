@@ -390,7 +390,7 @@
                   "type": "Label",
                   "rect": [
                     4,
-                    314,
+                    325,
                     80,
                     22
                   ],
@@ -409,6 +409,50 @@
               ],
               "variation": "C9B",
               "text": "0 Energy: no price"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            100,
+            292,
+            88,
+            108
+          ],
+          "children": [
+            {
+              "type": "UiSceneAction",
+              "rect": [
+                100,
+                292,
+                88,
+                88
+              ],
+              "children": [
+                {
+                  "type": "Label",
+                  "rect": [
+                    104,
+                    314,
+                    80,
+                    44
+                  ],
+                  "variation": "ButtonXB15",
+                  "text": "Light\nTorch"
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                100,
+                386,
+                88,
+                14
+              ],
+              "variation": "C9B",
+              "text": "0 Energy: two lines"
             }
           ]
         }

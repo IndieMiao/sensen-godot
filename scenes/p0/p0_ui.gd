@@ -721,9 +721,9 @@ func set_action(a: Dictionary) -> void:
 	var k := _keys.key()
 	k.verb = str(a.get("verb", ""))
 	var sub := str(a.get("sub", ""))
-	# Zero-Energy actions carry no price (LOCK-02 "0 体力的动作不写价"); reasons and costs stay.
-	# Mining's free moves keep it (show_free: LOCK-21 `Elevator · Free`, SGODOT-231).
-	k.cost = "" if int(a.get("need", 0)) == 0 and sub == "Free" and not a.get("show_free", false) else sub
+	# Zero-Energy actions carry no price (LOCK-02 "0 体力的动作不写价", q(122): the verb alone, centred on the key — Set Trap,
+	# Light Torch too); reasons and costs stay. Free stays only beside a paid choice (LOCK-21's rows), never on the key.
+	k.cost = "" if int(a.get("need", 0)) == 0 and sub == "Free" else sub
 	if a.get("amber", false): k.state = UiSceneAction.State.INSUFFICIENT
 	elif not a.get("enabled", false): k.state = UiSceneAction.State.UNAVAILABLE
 	else: k.state = UiSceneAction.State.DEFAULT

@@ -89,9 +89,14 @@ func test_a_key_without_tool_shows_the_actions_own_tool() -> void:
 	ui.set_action({"verb": "Sow ×1", "sub": "2 Energy", "enabled": true, "amber": false, "cmd": {"type": "sow"}, "need": 2})
 	assert_object(ui._keys.tool_icon).is_equal(P0Logic.icon("hoe"))
 
-func test_mining_free_moves_keep_free_on_the_key() -> void:
+func test_zero_energy_keys_show_the_verb_alone() -> void:
+	# q(122): `Light Torch` and `Set Trap`, no Free on the key (Free stays beside a paid choice: LOCK-21's rows, not keys)
 	ui.set_action(P0MaterialLogic._key("torch", "Light Torch", "Free", {"type": "mine_torch", "floor": 1}))
-	assert_str(ui._keys.key().cost).is_equal("Free")   # §13.3.8 Light Torch · Free (the elevator is a facility, SGODOT-266)
+	assert_str(ui._keys.key().verb).is_equal("Light Torch")
+	assert_str(ui._keys.key().cost).is_empty()
+	ui.set_action(P0Logic.P0Trap.set_key({"fishing": {"trap": {"traps": [], "slots": 1}}}, "pond_san_francisco_03"))
+	assert_str(ui._keys.key().verb).is_equal("Set Trap")
+	assert_str(ui._keys.key().cost).is_empty()
 	ui.set_action({"verb": "Till", "sub": "Free", "enabled": true, "amber": false, "cmd": {"type": "till"}, "need": 0})
 	assert_str(ui._keys.key().cost).is_empty()         # LOCK-02 elsewhere: 0 Energy carries no price
 
