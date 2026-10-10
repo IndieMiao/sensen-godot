@@ -43,6 +43,15 @@ const HURT_STALE_MS := 4000   # and a reply that never comes at all frees it aft
 const SWING_KEY := "mine_swing_%d"
 var _swings := 0
 var _swings_out := {}
+## The held sword (B, 奕星 on 288 after the user's hand test: the body did a digging beat): as the old mine did (09-15 R4),
+## the body keeps walking or standing, and the Combat slot's sword shows in hand only while a swing's arc shows (0.16 s).
+## A real slash clip comes from 3D later (attack_slash); until then there is no labour clip on a swing.
+const CombatArt := preload("res://modules/mining/combat_art.gd")
+const SWORD_AT := Vector3(-0.26, 0.6, 0.05)   # the old mine's hold (scenes/mine/mine.gd), on the player node
+const SWORD_TILT := -65.0
+const SWORD_SCALE := 0.65
+var _sword: MeshInstance3D
+var _sword_id := ""
 var _ko_waiting := false
 var _ko := false   # knocked out: the moment before leaving — the fight frozen, the bar at 0 %
 var _completing := false     # Run complete: the banner, then out to the mouth
@@ -332,10 +341,29 @@ func _fight(v: Dictionary, dt: float) -> void:
 	# Knocked out: the fight holds still until the player is out (the server has already refilled HP for the run, so
 	# the bar keeps 0 % for the moment instead of jumping to 100 % — 不知火舞 on 288 78d0f863)
 	combat.step(dt, actor.mover, rt.ui.has_modal() or _completing or _ko)
+	_hold_sword(str(v.get("mine", {}).get("weapon", {}).get("id", "")))
 	var run: Dictionary = v.get("mine", {}).get("run", {})
 	var fighting := floor_n >= 3 and run is Dictionary and not run.is_empty()
 	rt.ui.set_hp((0 if _ko else int(run.get("hp", -1))) if fighting else -1, int(v.get("mine", {}).get("hp_max", 100)),
 		combat.elite_hp().merged({"name": "Elite Slime"}) if fighting and not combat.elite_hp().is_empty() else {})
+
+## The Combat slot's sword on the player (its model from the view's mine.weapon.id), shown only while the swing arc does.
+func _hold_sword(id: String) -> void:
+	if id != _sword_id:
+		_sword_id = id
+		if is_instance_valid(_sword): _sword.queue_free()
+		_sword = null
+		if id != "":
+			_sword = CombatArt.model(id)
+			_sword.name = "HeldSword"
+			_sword.position = SWORD_AT
+			_sword.rotation_degrees.x = SWORD_TILT
+			_sword.scale = Vector3.ONE * SWORD_SCALE
+			actor.add_child(_sword)
+	if is_instance_valid(_sword): _sword.visible = combat._swing_left > 0.0 and not _ko
+
+## Whether the sword is in hand now (tests and shots).
+func sword_shown() -> bool: return is_instance_valid(_sword) and _sword.visible
 
 ## A slime's leap reached the player (MineCombat.contact): the server settles the hit (the 1 s window there too).
 func _on_contact(id: String) -> void:
@@ -356,7 +384,8 @@ func _on_settled(key: String, _ok: bool, _code: String) -> void:
 func _swing() -> void:
 	if combat == null or _ko_waiting or _ko: return   # a fall waits on the swings out / the knock-out moment: no new swing (苏烈 on #253, #255)
 	var hit: Array = combat.swing({}, actor.mover)
-	actor.labour("clear", actor.position + actor.facing())   # the old mine's swing beat
+	actor.face(actor.position + actor.mover.facing)   # turned to the slime it swung at; no labour clip (B, 288)
+	_hold_sword(_sword_id)
 	if hit.is_empty(): return
 	var cmd := {"type": "mine_attack", "floor": floor_n, "targets": hit.map(func(id): return Combat.mob_index(str(id)))}
 	if rt.session.send(cmd, SWING_KEY % _swings): _swings_out[SWING_KEY % _swings] = true

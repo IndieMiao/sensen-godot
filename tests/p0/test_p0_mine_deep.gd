@@ -395,3 +395,26 @@ func test_the_old_tree_stands_in_the_left_column_off_the_beds() -> void:
 	assert_int(absi(cell.y - (P0Garden.ANCHORS["spot_clay_bank"] as Vector2i).y)).is_greater_equal(3)
 	var yard: Dictionary = P0Logic.content().get("decor", {}).get("yard", {})
 	assert_bool((yard.get("blocked", []) as Array).any(func(r): return Rect2i(int(r[0]), int(r[1]), int(r[2]), int(r[3])).has_point(cell))).is_true()
+
+## B (奕星 on 288, after the user's hand test: the swing looked like digging): the swing plays no labour clip; the Combat
+## slot's sword shows in hand only while the swing arc does, as the old mine did (09-15 R4).
+func test_the_swing_shows_the_sword_and_plays_no_labour() -> void:
+	var src := FileAccess.get_file_as_string("res://scenes/p0/p0_mine.gd")
+	var swing := src.substr(src.find("func _swing()"), src.find("## The Combat slot's sword on the player") - src.find("func _swing()"))
+	assert_str(swing).not_contains("labour(")
+	var P0Mine = load("res://scenes/p0/p0_mine.gd")
+	var mine = auto_free(P0Mine.new())
+	mine.actor = auto_free(P0Actor.new())
+	mine.combat = auto_free(load("res://modules/mining/p0_mine_combat.gd").new())
+	mine._hold_sword("sword_wooden")
+	assert_object(mine._sword).is_not_null()
+	assert_object(mine._sword.get_parent()).is_same(mine.actor)
+	assert_bool(mine.sword_shown()).is_false()        # between swings: not in hand
+	mine.combat._swing_left = 0.16                    # a swing's arc shows
+	mine._hold_sword("sword_wooden")
+	assert_bool(mine.sword_shown()).is_true()
+	mine.combat._swing_left = 0.0
+	mine._hold_sword("sword_wooden")
+	assert_bool(mine.sword_shown()).is_false()
+	mine._hold_sword("")                              # no Combat slot weapon: no sword
+	assert_object(mine._sword).is_null()
