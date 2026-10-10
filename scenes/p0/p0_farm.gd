@@ -282,14 +282,7 @@ func _place_camera() -> void:
 	cam.keep_aspect = Camera3D.KEEP_WIDTH   # the old farm frames by width (portrait phones)
 	cam.size = FarmCamera.close_view_size(vp) * FarmCamera.P0_VIEW_K / _zoom
 	FarmCamera.place(cam, _focus + Vector3.UP * 0.7)
-	if _top > 0.0:   # placement's top-down view, or the 0.35 s turn into / out of it (284 v2 6a751a9a)
-		var k := _top_ease()
-		var pitch := deg_to_rad(lerpf(FarmCamera.PITCH_DEG, 90.0, k))
-		var yaw := deg_to_rad(lerpf(FarmCamera.YAW_DEG, 0.0, k))
-		var c := _focus + Vector3.UP * 0.7 * (1.0 - k)
-		cam.rotation = Vector3(-pitch, yaw, 0.0)
-		cam.position = c + cam.basis.z * FarmCamera.DISTANCE
-		cam.size = lerpf(cam.size, vp.x / _top_cell_px * bp.cell_m, k)   # KEEP_WIDTH: the size is the width in metres
+	if _top > 0.0: place_top(cam, _focus, _top_ease(), _top_cell_px, bp.cell_m)   # placement's top-down view (284 v2)
 	if _dev_yaw >= 0.0:   # P0_SHOT yaw comparison only (style doc asks 35–45°, the old farm uses 14.5°)
 		var c := _focus + Vector3.UP * 0.7
 		var pitch := deg_to_rad(FarmCamera.PITCH_DEG)
@@ -428,6 +421,21 @@ func _turn(to: float) -> void:
 
 func _top_ease() -> float: return smoothstep(0.0, 1.0, _top)
 
+## The camera `k` of the way (0 the farm's 43° / 14.5°, 1 straight down with no yaw) to the top-down view over `focus`,
+## at `cell_px` pixels a `cell_m` cell when there: set from its Euler angles, so straight down needs no look_at up.
+static func place_top(camera: Camera3D, focus: Vector3, k: float, cell_px: float, cell_m: float) -> void:
+	var pitch := deg_to_rad(lerpf(FarmCamera.PITCH_DEG, 90.0, k))
+	var yaw := deg_to_rad(lerpf(FarmCamera.YAW_DEG, 0.0, k))
+	var c := focus + Vector3.UP * 0.7 * (1.0 - k)
+	camera.rotation = Vector3(-pitch, yaw, 0.0)
+	camera.position = c + camera.basis.z * FarmCamera.DISTANCE
+	var width := camera.get_viewport().get_visible_rect().size.x
+	camera.size = lerpf(camera.size, width / cell_px * cell_m, k)   # KEEP_WIDTH: the size is the width in metres
+
+## Pixels a cell after a pinch by `f` (< 1 fingers apart, zoom in), kept to 17–56.
+static func top_cell_after(cell_px: float, f: float) -> float:
+	return clampf(cell_px / maxf(f, 0.01), TOP_CELL_MIN, TOP_CELL_MAX)
+
 ## The placement grid on the ground (284 v2 §2): white cell lines within `radius` cells of `at`, fading out from 50%;
 ## Vector3.INF hides it. The shell's, so the sprinkler, the greenhouse and Decorate draw the same.
 const GRID_RADIUS := 3
@@ -504,7 +512,7 @@ func _yard_clamp(f: Vector3) -> Vector3:
 func p0_zoom(f: float, at := Vector2.INF) -> void:
 	if _placing_cam:   # top-down: pixels a cell, 17–56, about the fingers (the ground under them stays put)
 		var before = ElasticZoom.ground_at(cam, at, _focus.y)
-		_top_cell_px = clampf(_top_cell_px / maxf(f, 0.01), TOP_CELL_MIN, TOP_CELL_MAX)
+		_top_cell_px = top_cell_after(_top_cell_px, f)
 		_place_camera()
 		var d := ElasticZoom.shift(before, ElasticZoom.ground_at(cam, at, _focus.y))
 		if d != Vector3.ZERO: _focus = _yard_clamp(_focus + d)
@@ -561,7 +569,9 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 		_facilities = P0FarmFacilities.new().setup(self)
 		add_child(_facilities)
 	_facilities.frame(v, dt)
-	if not _facilities.placing.is_empty(): return   # placement mode: no bed, key, card or prompt (q(23))
+	if not _facilities.placing.is_empty():   # placement mode: no bed, key, card or prompt (q(23))
+		_hi.visible = false   # the preview's green / red square is the one outline on a bed meanwhile
+		return
 	_pick_front(v)
 	# The key is Farming here even at the mine mouth: the mouth is tapped like any facility (SGODOT-266, user on 263 ③).
 	rt.ui.set_action(P0Logic.main_action(v, _front, rt.ui.selected_seed, _row))
@@ -909,7 +919,8 @@ func p0_dev(step: PackedStringArray) -> bool:
 		# the preview as a finger on that bed would; placeok / placecancel press the bar; placesecond:<label> shows its
 		# middle key, placereason:<text> / placeconfirm:<verb> set its reason and main key; factap:<id> taps a sprinkler.
 		"build": _facilities.begin_build(step[1] if step.size() > 1 else "craft_sprinkler")
-		"placeat": rt.ui.placement_point.emit(cam.unproject_position(bp.cell_to_world(P0Garden.cell_of(int(step[1]))) + Vector3(0, P0Garden.BED_H, 0)), "drag")
+		# a finger lifted there (release): a held one near a screen edge would keep panning the camera
+		"placeat": rt.ui.placement_point.emit(cam.unproject_position(bp.cell_to_world(P0Garden.cell_of(int(step[1]))) + Vector3(0, P0Garden.BED_H, 0)), "release")
 		"placeok": rt.ui.placement_done.emit(true)
 		"placecancel": rt.ui.placement_done.emit(false)
 		"placesecond": rt.ui.set_placement({"secondary": step[1] if step.size() > 1 else ""})   # the bar's middle key (Decorate's Rotate)
