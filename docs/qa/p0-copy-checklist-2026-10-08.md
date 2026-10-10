@@ -76,7 +76,7 @@
 |---|---|
 | 灶台 | 名字条 `Stove 1/1 · Empty`（q(62)）；顶栏 `Stove 1/1 · Cooking Lv2 · Empty`；待收 `Stove · Ready · Grilled Crucian` |
 | Cookbook 页格与详情卡 ★ | 页格不打勾（能做看 `Can cook` 筛选、排序与详情卡按钮）；已知未做的页半彩 + 底部角签 `Try it`（primary 绿），做过的页全彩不标，未知页不挂签；详情卡第二行 `Fine · First cook +20 XP`（稀有度 · 状态）；玩家界面不出现 `Tasted`（q(92)） |
-| Cookbook 按钮四态 | `Cook` / 灰 `Need Wild Herb ×1` / 灰 `Cooking Lv4 · 3rd slot` / `Try in Experiment ›` |
+| Cookbook 按钮四态 | `Cook` / 灰 `Need Wild Herb ×1（标签原料去 Any：`Need Legendary fish ×1`，q(112)）` / 灰 `Cooking Lv4 · 3rd slot` / `Try in Experiment ›` |
 | Experiment | `From your bag` + 右侧 `2 / 2 slots used`（q(94)）；调味料格带 `Rack` 角标、写仓库实数（如 `Rock Salt 12`，不写 /30，q(46)）；`Not for cooking`（金锦鲤）；`In pot`（q(94)）；锅下槽位卡不写原料名，结果行只写菜名 / `Unknown dish` / `Tried before` / `?` + 色点 + 时长，不出 `Ready to cook` / `Ready to queue`；按钮灰显原因 `Add an ingredient` / `Needs a main ingredient` / `Stove busy`；点锁 toast `Cooking Lv4 · 60 XP to go`（q(92)） |
 | 火候 | `Tap when the needle hits gold!` / `Nice heat! ★` / `Missed · still cooking` / `Perfect! ★★ · Extra portion` |
 | 出锅卡 COOK-4 ★ | 首做 `New recipe!` + 奖励条 `First cooked · +10 Cooking XP · Cookbook 1/48`（只放首做 XP；本锅 XP 照常飘 `+5 Cooking XP ★`，q(55)）/ 重复 `Dish ready`（从灶上收时条 `Collected from Stove 1`，q(94)） / 失败 `Mystery Dish` + `Hmm… not a dish` + `A clue was added to your Cookbook` + 灰字 `Can't be sold or delivered`（q(55)）/ 退料 `No dish this time` + 名字行 `Ingredients back` + 第二行 `9 left today` + `OK`（q(66)）；按钮只有 `Eat · +45 Energy` / `Keep`，Gift 在 P0 只是卡底灰字 `Gift later from your bag`（q(94)）；没有 Cook Again 按钮（q(46)、q(48)、q(49)） |
@@ -85,6 +85,8 @@
 | 保温柜 | 名字条 `Warming Cabinet 4/6`（q(62)）/ `Take one` / `Kept · Warming Cabinet 5/6` / `Cabinet full · Herb Grilled Fish sent to bag` / `Cabinet and bag full · dish left on the stove` / `Bag full · dish left on the stove` |
 | Cooking Lv4 之后 Today ★ | `3rd slot open · try Fine fish + Potato + Rock Salt`（q(46)） |
 | 钓鱼第二段 ★ | 亮片 `Spinner Lure`（`bait_lure`，账号每日 10 枚）；鱼笼 `Fish Trap`（`trap_fish`，放下后不占背包格），主行动键 `Set Trap · Free`（满 `Traps 1/1 · Fishing Lv8 adds 1`、本塘已有 `Trap already here`）；浮标 `Fish Trap · 2/3` / `· 3/3 · Full`；EntryCard `Collect 2 · Free` / `Take back`（`Collect · Creel full`、`Take back · Collect first`、`1 left in the trap`、`Fish Trap back in your bag`）；Today `Collect 3 fish · Fern Pond`；旧金山地区鱼 Arctic Char + Atlantic Salmon；Clover Pond 卡片写 `Coast`（q(109)） |
+| 布置模式 Decorate ★ | 驿站 Decor 页 `Decor 12/24 · Goes to Farm Storage` / `Bought today · 9h 12m` / `Homestead Lv5 needed · 1 level to go`；toast `Flower Planter · in Farm Storage` + `Place now ›`；底栏 `Cancel` · `Rotate` · `Place`（移动 `Move`），原因 `Outside your yard` / `Space taken` / `Decor 24/24 · Homestead Lv6 adds 4`；小卡 `Move` / `Store`；`Stone Path · 3 left`；Today `Place Flower Planter · in storage`（q(111)） |
+| Homestead 外观二选一 ★ | 标题 `Lv5 look · Porch`；副标题 `Pick one · free to change later`；按钮 `Use Timber Porch`；外观名 `Timber Fence` / `Stone Wall`、`Timber Porch` / `Stone Porch`、`Timber Kitchen Wing` / `Stone Kitchen Wing`、`Timber Lodge` / `Stone Manor`（暂定）；HOME-1 `Looks` 段 `Porch` … `Stone Porch ›`，未到灰 `Homestead Lv8`（q(112)） |
 
 ## 5. 矿洞
 
@@ -97,6 +99,7 @@
 | 矿口 Express ★ | 入口卡次级按钮 `Floor 5 · Express · Free`；有未完成局时与 `New run · 2 Energy` 上下排，下面只写一次 `Current run will end · Runs today 1/2`；没有未完成局不加小字；用尽只剩灰按钮 `Mine runs today 2/2 · Resets in 9h 12m`；电梯面板的 Express 不加小字（q(108)） |
 | 飘字 | `Floor 2 · −2 Energy` / `Floor 2 cleared · Elevator stop` / `Run ended at daily reset`；P0 没有 `Run complete`；MINE-P0-7 不写 `Unmined rocks on Floor 2 are lost`（q(46)） |
 | 火把 | `Light Torch · Free` / `Lit · this floor` |
+| 矿洞说明页 ★ | `Mine five floors. Slimes from Floor 3.`（P1，q(110)） |
 
 ## 6. 据点（家一套）与居民
 
@@ -113,6 +116,7 @@
 | 集市委托板 ★ | `Dusk Haul · Market Board` / `4 Fine fish · any kind` / `36 coins`（P0 不写 `+1 city stamp`）；`Market Basket` / `3 crops · 6 each`（q(46)） |
 | 居民 ★ | 头顶名字条只写名字 `Pip` / `Old Kai`（q(62)）；Pip `Could you catch me a fish? Any kind is fine.`（对话条与委托卡同句）；Old Kai 需求行 `Rare fish · Golden Koi · Pond 0/1`；奖励行 `+5 Friendship · 20 coins` / `+5 Friendship · 50 coins`（q(46)）；赠餐 toast `Pip gave you Carrot Cake · in your bag`（菜进背包、没有吃，不写体力，q(94)）；好感进度 `52/90 · next Trusted`，最高档 Kindred 只写 `157`、进度条满格，资料卡 Friendship 行同样 `157`（q(91)） |
 | 饮品满体力 ★ | 灰 `Energy full`（q(48)） |
+| Stamp Run 与奖励上限 ★ | 签到 toast `Stamp Run · Checked in` / `Deliver at Mission Market Square`；完成奖上限用完时卡上奖励行 `0 coins · Bonus resets in 9h 12m`，板角 `Bonus today 100/100`（q(110)） |
 
 ## 7. 地图
 
@@ -125,6 +129,7 @@
 | 据点 pin | `Oak Tea House · 3 online`；没人在时只写名字 `Oak Tea House`；P0 城市级不聚合，每处一枚 pin，不出 `×N`（q(72)）；和 POI 一样会让位收起，选中的、带标记的、玩家所在地的图钉始终显示（q(105)） |
 | 标记 | P0 只有绿 ✓ / 金 ! / 青 ◆，没有 🔒 与 ★（q(48)） |
 | 外城到达与回家 ★ | 首访 `Welcome to Tokyo` + `+10 Energy`；再访只飘 `Welcome back`；回家落地 `Welcome home`（不盖章、不加体力）；外城位置芯片 `Tokyo · Arrived` / `Tokyo · Sumida Pond`，免费版不写 `Day Pass`（q(108)） |
+| 城市卡进度 ★ | `Regular` · `Visits 2/5 · Deliveries 1/3`；`Local` · `Visits 2/10 · Fish 0/2 · Recipe 0/1`；整档达成 `Regular ✓`（q(110)） |
 
 ## 8. 背包、Gear、个人页、收件箱
 

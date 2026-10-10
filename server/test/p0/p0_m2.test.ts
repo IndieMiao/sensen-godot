@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { loadP0Content, recipeById } from '../../src/p0/content.js';
-import { deriveRarity, heatHits, matchRecipe, recipeRarity } from '../../src/p0/cooking.js';
+import { cookable, cookablePages, deriveRarity, heatHits, matchRecipe, recipeRarity, tokenInfo } from '../../src/p0/cooking.js';
 import { applyP0, count, type P0Command, type P0Event } from '../../src/p0/reducer.js';
 import { freshState, type P0State } from '../../src/p0/state.js';
 import { viewOf } from '../../src/p0/view.js';
@@ -132,14 +132,16 @@ describe('P0 fishing (§6.1–6.7)', () => {
 describe('P0 recipes (§7.2.3 / §7.4.1)', () => {
   it('derives page rarity from ingredient rarity × families', () => {
     // §7.14.0 (q(39)): the 14 P0 pages, Common 5 / Fine 6 / Rare 3, in Cookbook order.
-    expect(c.cooking.recipes.map(r => [r.n, r.id, recipeRarity(c, r)])).toEqual([
-      [1, 'dish_grilled_crucian', 1], [2, 'dish_grilled_fish', 1], [5, 'dish_radish_salad', 1], [6, 'dish_veggie_plate', 1],
-      [7, 'dish_carrot_cake', 1], [10, 'dish_herb_grilled_fish', 2], [11, 'dish_salt_grilled_fish', 2], [12, 'dish_fish_soup', 2],
-      [15, 'dish_pan_fried_fish', 2], [17, 'dish_salted_potatoes', 2], [19, 'dish_fruit_tea', 2], [27, 'dish_bass_tomato_stew', 3],
-      [28, 'dish_smoked_trout', 3], [37, 'dish_fisher_stew', 3]]);
-    expect(c.cooking.recipes.filter(r => r.in.length === 3).every(r => r.in.includes('rock_salt'))).toBe(true);
-    expect([...c.cooking.recipes.map(r => r.n), ...c.cooking.pages.map(p => p.n)].sort((a, b) => a! - b!)).toEqual(
-      Array.from({ length: 48 }, (_, i) => i + 1));
+    // SGODOT-282: all 48 pages are recipes (Li Bai's P1 table); with the P1 crops and fish (#214) every page but #9
+    // cooks. Every page's derived rarity matches the table's.
+    expect(c.cooking.recipes.map(r => r.n)).toEqual(Array.from({ length: 48 }, (_, i) => i + 1));
+    expect(c.cooking.recipes.filter(r => r.rarity !== undefined && cookable(c, r)).every(r => recipeRarity(c, r) === r.rarity)).toBe(true);
+    expect(cookablePages(c).map(r => r.n)).toEqual(Array.from({ length: 48 }, (_, i) => i + 1).filter(n => n !== 9));
+    expect(cookablePages(c).slice(0, 8).map(r => [r.n, r.id, recipeRarity(c, r)])).toEqual([
+      [1, 'dish_grilled_crucian', 1], [2, 'dish_grilled_fish', 1], [3, 'dish_carp_cakes', 1], [4, 'dish_mullet_skewers', 1],
+      [5, 'dish_radish_salad', 1], [6, 'dish_veggie_plate', 1], [7, 'dish_carrot_cake', 1], [8, 'dish_cabbage_stew', 1]]);
+    expect(cookablePages(c).filter(r => recipeRarity(c, r) === 4).map(r => r.n)).toEqual([41, 42, 43, 44, 45, 46, 47, 48]);
+    expect(cookable(c, c.cooking.recipes[8])).toBe(false);   // #9 Travel Biscuits: bought, never cooked
     expect(deriveRarity(c, [{ family: 'W', rarity: 1 }, { family: 'F', rarity: 1 }, { family: 'S', rarity: 1 }])).toBe(3);
   });
   it('specific pages beat tag pages, fewest wildcards win, otherwise a Mystery Dish', () => {
@@ -151,8 +153,9 @@ describe('P0 recipes (§7.2.3 / §7.4.1)', () => {
     expect(matchRecipe(c, ['fish_trout', 'crop_potato', 'rock_salt'])?.id).toBe('dish_fisher_stew');
     expect(matchRecipe(c, ['fish_trout', 'wild_herb', 'rock_salt'])?.id).toBe('dish_smoked_trout');
     expect(matchRecipe(c, ['fish_trout', 'crop_herb', 'rock_salt'])).toBeNull();                   // Smoked Trout takes Wild Herb only
-    expect(matchRecipe(c, ['fish_carp', 'fish_carp'])).toBeNull();                                  // Carp Fish Cakes is P1
-    expect(matchRecipe(c, ['crop_tomato'])).toBeNull();                                             // so is Roast Veggies
+    expect(matchRecipe(c, ['fish_carp', 'fish_carp'])?.id).toBe('dish_carp_cakes');                // P1 page, P0 fish
+    expect(matchRecipe(c, ['crop_tomato'])?.id).toBe('dish_roast_veggies');                         // SGODOT-242: the fallback page
+    expect(matchRecipe(c, ['crop_corn'])?.id).toBe('dish_roast_veggies');                          // any lone Common produce
     expect(matchRecipe(c, ['crop_radish', 'crop_carrot'])).toBeNull();
   });
 });
@@ -363,5 +366,14 @@ describe('P0 Reed Rod and Tools & Gear (§6.4.1)', () => {
     s = step(s, { type: 'equip', item: 'rod_starter' }).s;
     expect(viewOf(c, s, T0).fishing.rod).toBe('Starter Rod');
     expect(applyP0(c, s, { type: 'equip', item: 'rod_carbon' }, T0)).toMatchObject({ ok: false, code: 'not_owned' });
+  });
+});
+
+describe('P1 pages (SGODOT-282)', () => {
+  it('each page\'s families field matches the families its ingredients give, wherever they are all in this build', () => {
+    for (const r of c.cooking.recipes) {
+      if (!r.families || !cookable(c, r)) continue;
+      expect([r.id, r.in.map(t => tokenInfo(c, t)!.family)]).toEqual([r.id, r.families]);
+    }
   });
 });

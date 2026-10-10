@@ -1,0 +1,255 @@
+{
+  "_note": "Decorate, shops line (SGODOT-284; plan §9.11.6, §8.3 decor cap, q(24), q(29); 苏烈). decor.items: the Homestead Stall's Decor page — blurb (how it looks in the yard; the row reads `1×1 · Lights up at night`, a multi-piece one `5 pieces · Lay them in a line`, q(111); §9.11.6's three and 李白's eight), price, footprint [w, h] in garden cells (0.65 m), pieces per purchase (Stone Path 5, Fence Set 6), the Homestead level it opens at; buy = sold at the stall (recipe_stand is the Line Cook milestone's, never sold). Bought decor goes straight to Farm Storage (q(29)), is never sold back or gifted; placing it from storage counts against homestead.decor_max. decor.yard: where decor may stand on the garden grid (P0Garden): inside walk, outside every blocked rect (field incl. the P1 columns, the house and its door path, the facilities and gathering spots) and off the spawn / exit cells. Rects are [x, y, w, h]. The blocked list holds the facilities and spots both where farm-dev has them and where #215 moves them (well, grove, rock pile), so it holds before and after that merges; a gdUnit test checks P0Garden.FOOTPRINTS against it.",
+  "decor": {
+    "items": {
+      "deco_planter": {
+        "name": "Flower Planter",
+        "blurb": "Flowers all year",
+        "price": 30,
+        "size": [
+          1,
+          1
+        ],
+        "pieces": 1,
+        "homestead": 1,
+        "buy": true
+      },
+      "deco_lantern": {
+        "name": "Garden Lantern",
+        "blurb": "Lights up at night",
+        "price": 40,
+        "size": [
+          1,
+          1
+        ],
+        "pieces": 1,
+        "homestead": 1,
+        "buy": true
+      },
+      "deco_path": {
+        "name": "Stone Path",
+        "blurb": "Lay them in a line",
+        "price": 50,
+        "size": [
+          1,
+          1
+        ],
+        "pieces": 5,
+        "homestead": 1,
+        "buy": true
+      },
+      "deco_bench": {
+        "name": "Wooden Bench",
+        "blurb": "Visitors can sit",
+        "price": 60,
+        "size": [
+          2,
+          1
+        ],
+        "pieces": 1,
+        "homestead": 1,
+        "buy": true
+      },
+      "deco_scarecrow": {
+        "name": "Scarecrow",
+        "blurb": "Keeps the crows guessing",
+        "price": 80,
+        "size": [
+          1,
+          1
+        ],
+        "pieces": 1,
+        "homestead": 1,
+        "buy": true
+      },
+      "deco_fence": {
+        "name": "Fence Set",
+        "blurb": "Joins up end to end",
+        "price": 90,
+        "size": [
+          1,
+          1
+        ],
+        "pieces": 6,
+        "homestead": 1,
+        "buy": true
+      },
+      "deco_birdbath": {
+        "name": "Birdbath",
+        "blurb": "Birds visit now and then",
+        "price": 120,
+        "size": [
+          1,
+          1
+        ],
+        "pieces": 1,
+        "homestead": 1,
+        "buy": true
+      },
+      "deco_windmill": {
+        "name": "Windmill",
+        "blurb": "Turns in the breeze",
+        "price": 250,
+        "size": [
+          2,
+          2
+        ],
+        "pieces": 1,
+        "homestead": 3,
+        "buy": true
+      },
+      "deco_fountain": {
+        "name": "Fountain",
+        "blurb": "Sparkles in the sun",
+        "price": 300,
+        "size": [
+          2,
+          2
+        ],
+        "pieces": 1,
+        "homestead": 5,
+        "buy": true
+      },
+      "deco_pergola": {
+        "name": "Pergola",
+        "blurb": "Shade under the vines",
+        "price": 400,
+        "size": [
+          3,
+          2
+        ],
+        "pieces": 1,
+        "homestead": 8,
+        "buy": true
+      },
+      "recipe_stand": {
+        "name": "Recipe Stand",
+        "blurb": "Line Cook reward",
+        "price": 0,
+        "size": [
+          1,
+          1
+        ],
+        "pieces": 1,
+        "homestead": 1,
+        "buy": false
+      }
+    },
+    "yard": {
+      "walk": [
+        1,
+        0,
+        19,
+        20
+      ],
+      "blocked": [
+        [
+          3,
+          2,
+          17,
+          11
+        ],
+        [
+          8,
+          15,
+          4,
+          3
+        ],
+        [
+          9,
+          13,
+          1,
+          2
+        ],
+        [
+          14,
+          15,
+          1,
+          1
+        ],
+        [
+          1,
+          13,
+          2,
+          2
+        ],
+        [
+          5,
+          16,
+          2,
+          1
+        ],
+        [
+          16,
+          16,
+          3,
+          1
+        ],
+        [
+          15,
+          13,
+          1,
+          1
+        ],
+        [
+          17,
+          8,
+          1,
+          1
+        ],
+        [
+          16,
+          1,
+          1,
+          1
+        ],
+        [
+          17,
+          12,
+          1,
+          1
+        ],
+        [
+          18,
+          13,
+          1,
+          1
+        ],
+        [
+          18,
+          4,
+          1,
+          1
+        ],
+        [
+          2,
+          4,
+          1,
+          1
+        ],
+        [
+          2,
+          7,
+          1,
+          1
+        ],
+        [
+          3,
+          17,
+          1,
+          1
+        ]
+      ],
+      "keep_clear": [
+        [
+          9,
+          0
+        ],
+        [
+          9,
+          1
+        ]
+      ]
+    }
+  }
+}

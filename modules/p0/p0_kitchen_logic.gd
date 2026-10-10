@@ -223,11 +223,16 @@ static func cook_time(view: Dictionary, rarity: int) -> String:
 ## dish style first, then the time, when the line does not fit; the energy always stays); an unknown page's energy only.
 ## button "Cook" when it can cook; otherwise `reason` says the first gap (LOCK-10: the gap on the button);
 ## unknown pages only guide to Experiment (`nav`, never puts anything in the pot); `maybe` is their might-have line.
+const BUFF_LATER := "Buff · coming later"
+
 static func page_card(view: Dictionary, p: Dictionary) -> Dictionary:
 	var rarity := int(p.get("rarity", 1))
 	var tier: Dictionary = cooking(view).get("tiers", {}).get(str(rarity), {})
 	var energy := "+%d Energy" % int(tier.get("energy", 0))
-	var card := {icon = null, effect = energy, effect_parts = [energy], button = "", reason = "", nav = "", maybe = ""}
+	# buff: a Legendary page's Buff slot, empty until P3 (§7.14.4: "Buff · coming later"); "" otherwise. Where the
+	# line sits on the locked page card is 不知火舞's call (LOCK-20 v5), so the drawer does not draw it yet.
+	var card := {icon = null, effect = energy, effect_parts = [energy], button = "", reason = "", nav = "", maybe = "",
+		buff = BUFF_LATER if rarity == 4 else ""}
 	var locked: bool = p.get("lock", null) is Dictionary or (not p.has("state") and int(p.get("slots", 1)) > slots(view))
 	if not p.get("known", false):
 		card.title = "Unknown dish"

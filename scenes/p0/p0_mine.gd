@@ -88,7 +88,7 @@ func _ready() -> void:
 	_entered_ms = Time.get_ticks_msec()
 	rt = P0Runtime.ensure()
 	rt.attach(self)
-	rt.ui.set_mode("mine")
+	rt.ui.set_mode(P0MaterialLogic.landing_mode(rt.session.current(), floor_n))
 	rt.ui.actions_here = P0MaterialLogic.mine_actions(floor_n)
 	rt.ui.set_place(PLACE % floor_n)
 	rt.session.state_changed.connect(_on_state)
@@ -231,7 +231,9 @@ func _go_floor(n: int, by_elevator := false) -> void:
 	_cam_follow.hold()
 	rt.ui.set_place(PLACE % n)
 	rt.ui.actions_here = P0MaterialLogic.mine_actions(n)
-	if n < 3 and rt.ui.bar_mode == "combat": rt.ui.set_mode("mine")   # no Combat on floors 1–2 (§13.3.8)
+	# Land ready to fight where a monster is up (李元芳 R5: Express to Floor 5 met the elite on `Mine · No rocks here`);
+	# no Combat on floors 1–2 (§13.3.8)
+	rt.ui.set_mode(P0MaterialLogic.landing_mode(rt.session.current(), n))
 	_entered_ms = Time.get_ticks_msec()
 
 # ---------------------------------------------------------------- frame
@@ -584,6 +586,9 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				_elevator_to = -1
 			"hurt": combat.hurt(actor.mover, Combat.mob_id(int(e.get("mob", 0))), int(e.get("damage", 0)))
 			"defeat":
+				# the last one down on a floor with rocks left: back to Mining (Floor 3–4); Floor 5 completes the run
+				if rt.ui.bar_mode == "combat" and P0MaterialLogic.mobs_up(v, floor_n) == 0 and rock_count(floor_n) > 0:
+					rt.ui.set_mode("mine")
 				if bool(e.get("quartz_spent", false)):
 					rt.ui.queue_floats([{kind = "item", key = P0MaterialLogic.QUARTZ_ONCE, text = P0MaterialLogic.QUARTZ_ONCE,
 						tone = UiFloatText.Tone.ITEM}], rt.anchor())

@@ -92,8 +92,7 @@ func _install_city_map() -> void:
 		city_map.host_card = _own_card
 		city_map.kept_pin = _kept_pin   # where the player is keeps its pin; the rest give way (SGODOT-269)
 		city_map.fog_holes = fog_holes   # §11.7: the world greyed but for the cities explored (SGODOT-275)
-		city_map.bubble_state = func(region_id: String) -> String:
-			return P0Travel.fog(_view(), P0Clusters.cluster_of_region(region_id))
+		city_map.bubble_state = city_bubble
 		_style_locate(city_map.recenter)
 		_style_locate(city_map.home_key, "home")   # the home key over it: the same key, i-home (SGODOT-261)
 		city_map.home_key.visible = true
@@ -747,6 +746,17 @@ func on_arrival(ev: Dictionary) -> void:
 	_flight = _focus_tween
 	_flight_kind = "travel"
 
+## A city bubble's line (不知火舞 on #227): the home city its players online with a house; an explored city Visited;
+## the rest Unexplored. Second Home is not shown in this version (it comes with the paid second version).
+func city_bubble(region_id: String) -> Dictionary:
+	var cluster := P0Clusters.cluster_of_region(region_id)
+	if cluster == P0Travel.home(_view()):
+		var online := 0
+		for n in _online.values(): online += int(n)
+		# nobody online: the house alone, like an outpost pin's bare name (q(72): 0 tells nothing, only looks empty)
+		return {text = "%d online" % online if online > 0 else "", icon = "house"}
+	return {text = "Unexplored" if P0Travel.fog(_view(), cluster) == "unexplored" else "Visited"}
+
 ## The city a pin is in: its `cluster` (generated places, SGODOT-280: also the prefix of their id, `gn-1850147~pond0`),
 ## else the home city (P0's hand-written places).
 static func cluster_of_entry(entry: Dictionary, home: String) -> String:
@@ -799,7 +809,7 @@ func fog_holes() -> Array:
 func _return_home() -> void:
 	if rt == null or not P0Travel.away(_view()): return
 	rt.session.send({"type": "return_home"})
-	rt.ui.toast("Welcome home")
+	rt.toast_on_arrival("Welcome home")   # after the farm's loading cover when Go home opens it (司空震 on 286)
 
 # ---------------------------------------------------------------- browsing every city (SGODOT-275, §11.8.1)
 ## The camera city switches as the camera goes over a city (map_poc._update_active_city) and a bubble flies to its
@@ -843,11 +853,13 @@ func city_regions() -> Array:
 	var vp := get_viewport().get_visible_rect().size if is_inside_tree() else Vector2(360, 800)
 	var z := zoom + _zoom_elastic
 	var step := 360.0 / pow(2.0, z) / 4.0   # a quarter of a 512 px tile's width in degrees
-	var key := "%.1f|%d|%d|%s|%dx%d" % [z, roundi(center_lat / step), roundi(center_lng / step), str(region.get("id", "")), vp.x, vp.y]
+	var key := "%.1f|%d|%d|%s|%dx%d|%d" % [z, roundi(center_lat / step), roundi(center_lng / step), str(region.get("id", "")), vp.x, vp.y,
+		P0Travel.explored(_view()).hash()]
 	if key == _regions_key: return _regions
 	_regions_key = key
 	var out: Array = []
 	var ids := {}
+	var placed: Array = []
 	var add := func(r: Dictionary) -> void:
 		if r.is_empty() or ids.has(str(r.id)): return
 		ids[str(r.id)] = true
@@ -855,8 +867,16 @@ func city_regions() -> Array:
 	add.call(P0Clusters.region(P0Clusters.cluster_of_region(P0_REGION)))
 	if not region.is_empty(): add.call(region)
 	add.call(_asked)
+	# Visited cities at any zoom, whatever their size (不知火舞 on #216): the player's own map of where they have been.
+	for cluster in P0Travel.explored(_view()):
+		if out.size() >= CITY_BUBBLES: break
+		var c := P0Clusters.get_cluster(cluster)
+		if c.is_empty(): continue
+		var p = geo_to_screen(float(c.lat), float(c.lng))
+		if p == null or not Rect2(Vector2.ZERO, vp).grow(60).has_point((p as Vector2) - (city_map.global_position if city_map else Vector2.ZERO)): continue
+		placed.append(p)
+		add.call(P0Clusters.region(cluster))
 	var box := _view_box(vp, z)
-	var placed: Array = []
 	for c in P0Clusters.in_box(box.x, box.y, box.z, box.w, city_min_population(z), 200):
 		if out.size() >= CITY_BUBBLES: break
 		var p = geo_to_screen(float(c.lat), float(c.lng))

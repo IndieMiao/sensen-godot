@@ -391,10 +391,22 @@ static func crop_plural(name: String, n: int) -> String:
 	return w + "s"
 
 ## Items that share an existing icon until they get their own (SGODOT-228 content).
+## SGODOT-282: P1 pages without an icon of their own yet borrow the nearest P0 dish by main ingredient and style
+## (never the field sprout, int6 C7). Remove each line once 安其拉's icon lands (the first six landed: 283 / 0d45e4a1).
+const DISH_STANDIN := {
+	"dish_cabbage_stew": "dish_veggie_plate", "dish_travel_biscuits": "dish_carrot_cake", "dish_tilapia_wraps": "dish_pan_fried_fish",
+	"dish_crispy_smelt": "dish_salt_grilled_fish", "dish_cucumber_salad": "dish_radish_salad", "dish_apple_tea": "dish_fruit_tea",
+	"dish_corn_cake": "dish_carrot_cake", "dish_grass_carp_soup": "dish_fish_soup", "dish_char_chowder": "dish_fisher_stew",
+	"dish_catfish_stew": "dish_fisher_stew", "dish_sea_bass_salt": "dish_salt_grilled_fish", "dish_chili_snakehead": "dish_herb_grilled_fish",
+	"dish_grilled_pike": "dish_herb_baked_perch", "dish_pineapple_barra": "dish_pan_fried_fish", "dish_strawberry_tart": "dish_carrot_cake",
+	"dish_melon_platter": "dish_fruit_tea", "dish_orchard_tea": "dish_fruit_tea", "dish_steamed_sturgeon": "dish_smoked_trout",
+	"dish_eel_skewers": "dish_mullet_skewers", "dish_herb_salmon": "dish_herb_baked_perch", "dish_pineapple_fish": "dish_bass_tomato_stew",
+	"dish_sweet_potato_cakes": "dish_carrot_cake", "dish_pumpkin_chowder": "dish_fisher_stew", "dish_beet_fish_soup": "dish_fish_soup"}
+
 const ICON_ALIAS := {"fert_compost": "compost", "tool_row_hoe": "hoe", "bag_upgrade_1": "bag", "postcard_san_francisco": "postcard", "postcard_shanghai": "postcard", "wild_herb": "crop_herb", "drink_hot_tea": "dish_fruit_tea", "drink_coffee": "dish_fruit_tea"}
 
 static func icon(id: String) -> Texture2D:
-	var path := ICON_DIR % str(ICON_ALIAS.get(id, id))
+	var path := ICON_DIR % str(ICON_ALIAS.get(id, DISH_STANDIN.get(id, id)))
 	if ResourceLoader.exists(path): return load(path)
 	# a fish without its own art yet (P1's twelve, SGODOT-283) shows the fish silhouette, not the sprout (不知火舞 69310899)
 	return load(ICON_DIR % ("fish_sil" if id.begins_with("fish_") else "field"))

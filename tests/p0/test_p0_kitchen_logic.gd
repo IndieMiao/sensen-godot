@@ -120,6 +120,14 @@ func test_the_stove_reads_the_queue_list_when_the_server_sends_one() -> void:
 	v.cooking.stoves = [{"dish": null, "ready_in": null, "queued": null}]
 	assert_object(P0KitchenLogic.stove(v)).is_null()
 
+## SGODOT-282: a Legendary page carries the empty Buff slot (§7.14.4); other rarities none.
+func test_a_legendary_page_card_names_the_buff_slot() -> void:
+	var v := _view()
+	v.cooking.tiers["4"] = {"energy": 70, "ms": 60000}
+	var legend := {"id": "dish_legend_sashimi", "name": "Legend Sashimi", "rarity": 4, "known": true, "slots": 1, "can_cook": true}
+	assert_str(str(P0KitchenLogic.page_card(v, legend).buff)).is_equal("Buff · coming later")
+	assert_str(str(P0KitchenLogic.page_card(v, P0KitchenLogic.pages(v)[0]).buff)).is_equal("")
+
 # ---------------------------------------------------------------- the dish comes out (COOK-4 / 6 / P0-9, COOK-7-2)
 func _eat_view(energy: int, used: int, meal: int) -> Dictionary:
 	var v := _view()
@@ -391,12 +399,29 @@ func test_a_mix_that_failed_before_says_tried_before() -> void:
 	assert_str(P0KitchenLogic.preview(v, ["crop_radish", "fish_koi"]).title).is_equal("Unknown dish")
 
 
-func test_every_p0_dish_has_its_own_icon() -> void:
+func test_every_cookable_dish_has_an_icon() -> void:
 	# int6 C7: four P0 dishes had no file, so P0Logic.icon fell back to the field sprout (a plate that looks like
 	# seeds) on the page cell, the detail card, COOK-4 and the plate in the scene. 安其拉 drew them (226 d4d629f7).
-	for r in P0Logic.content().get("cooking", {}).get("recipes", []):
+	# SGODOT-282: all 48 pages are recipes; every page that cooks in this build (every ingredient exists, not buy-only)
+	# has its own icon or a P0 dish standing in (P0Logic.DISH_STANDIN) until its own is drawn.
+	var content := P0Logic.content()
+	var known := {}
+	for f in content.get("fish", []): known[str(f.id)] = true
+	for c in content.get("crops", []): known[str(c.id)] = true
+	for m in content.get("materials", {}): known[str(m)] = true
+	var tag := RegEx.create_from_string("^[WFOS][1-4]$")
+	var cooks := 0
+	for r in content.get("cooking", {}).get("recipes", []):
+		var ins: Array = r.get("in", [])
+		if r.get("cookable", true) == false or ins.is_empty() or ins.any(func(t): return tag.search(str(t)) == null and not known.has(str(t))): continue
+		cooks += 1
 		var id := str(r.id)
-		assert_bool(ResourceLoader.exists(P0Logic.ICON_DIR % id)).override_failure_message(id + " has no icon").is_true()
+		var own := ResourceLoader.exists(P0Logic.ICON_DIR % id)
+		var stand := P0Logic.DISH_STANDIN.has(id) and ResourceLoader.exists(P0Logic.ICON_DIR % P0Logic.DISH_STANDIN[id])
+		assert_bool(own or stand).override_failure_message(id + " has no icon").is_true()
+	assert_int(cooks).is_equal(47)   # every page but #9 Travel Biscuits (bought) once #214's crops and fish are in
+	# #9 is never cooked, but its page and the Travel Post show it: it has an icon too.
+	assert_bool(ResourceLoader.exists(P0Logic.ICON_DIR % P0Logic.DISH_STANDIN.get("dish_travel_biscuits", "dish_travel_biscuits"))).is_true()
 
 func test_queue_two_entry_state_line_and_turn_over_toast() -> void:
 	# q(71) / q(82): Queue next › only from Cooking Lv5 with a pot cooking and none waiting; the watch sheet says

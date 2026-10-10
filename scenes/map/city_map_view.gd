@@ -110,8 +110,8 @@ var kept_pin := Callable()
 var fog_holes := Callable()
 const MapFogLayer := preload("res://modules/map/map_fog_layer.gd")
 var fog: ColorRect
-## P0 fog state of a city bubble (§11.7.1): region id → "unexplored" / "explored" / "second_home", shown under its name
-## (Unexplored / Visited / Second Home, the last with an outline); unset = farm counts as before (Journey).
+## P0 city bubbles (§11.7.1): region id → {text (the line under the name), icon (a small glyph before it, "" none),
+## outline (a green ring)}; unset = farm counts as before (Journey).
 var bubble_state := Callable()
 
 func _destination(entry: Dictionary) -> Dictionary:
@@ -1535,13 +1535,22 @@ func _update_fog() -> void:
 	if fog == null: return
 	if fog.get_index() != 0: move_child(fog, 0)   # under the bubbles and pins added at 0 since
 	var on := fog_holes.is_valid()
-	fog.apply(fog_holes.call() if on else [], float(host.zoom) + float(host._zoom_elastic), on)
+	# The view sits inside the HUD's safe-area margins; the veil spans the whole screen, edge to edge, so it is placed
+	# at the screen origin and the holes (this view's px) are shifted by the same offset.
+	var at := -global_position
+	if fog.position != at or fog.size != get_viewport_rect().size:
+		fog.set_anchors_preset(Control.PRESET_TOP_LEFT)
+		fog.position = at
+		fog.size = get_viewport_rect().size
+	fog.apply(fog_holes.call() if on else [], float(host.zoom) + float(host._zoom_elastic), on, -at)
 
 func _update_bubbles() -> void:
 	var detail: bool = host.city_detail_visible()
 	var area := Rect2(-global_position, get_viewport_rect().size).grow(60)
+	var listed := {}
 	for r in host.city_regions():
 		var id := str(r.id)
+		listed[id] = true
 		if not bubbles.has(id): bubbles[id] = _make_bubble(id)
 		var bubble: Dictionary = bubbles[id]
 		var overview: Dictionary = CityMapData.city(id).get("overview", {})
@@ -1552,13 +1561,22 @@ func _update_bubbles() -> void:
 		if not node.visible: continue
 		bubble.name.text = L10n.text(str(r.get("name", id)))
 		if bubble_state.is_valid():
-			var st := str(bubble_state.call(id))
-			bubble.count.text = {"unexplored": "Unexplored", "explored": "Visited", "second_home": "Second Home"}.get(st, "")
+			var st: Dictionary = bubble_state.call(id)
+			bubble.count.text = str(st.get("text", ""))
 			bubble.count.visible = bubble.count.text != ""
+			# The line keeps a text line's height with the glyph alone (P0's home city at 0 online), so the bubble's
+			# bottom does not move as the count comes and goes (不知火舞 on #238). Measured here, in the tree, with the
+			# label's own theme font.
+			var line := bubble.count.get_parent() as Control
+			var text_h: float = bubble.count.get_theme_font("font").get_height(bubble.count.get_theme_font_size("font_size"))
+			if line.custom_minimum_size.y != text_h: line.custom_minimum_size.y = text_h
+			var glyph := str(st.get("icon", ""))
+			bubble.icon.visible = glyph != ""
+			if glyph != "": bubble.icon.texture = GameUi.icon(glyph)
 			var box := node.get_theme_stylebox("panel") as StyleBoxFlat
 			if box != null:
 				box.border_color = Color("609f28")
-				box.set_border_width_all(2 if st == "second_home" else 0)
+				box.set_border_width_all(2 if bool(st.get("outline", false)) else 0)
 		else:
 			var count := int(host.city_farm_counts.get(id, -1))
 			bubble.count.text = L10n.count_text("%d farm", "%d farms", count) if count >= 0 else ""
@@ -1568,7 +1586,10 @@ func _update_bubbles() -> void:
 		node.position = point + Vector2(-node.size.x * 0.5, 6)
 		bubble.dot.position = point - Vector2(5, 5)
 		bubble.dot.visible = true
+	# A bubble built for an earlier list (another zoom, another camera city) that this one no longer has hides with its
+	# dot; left visible it would stay frozen where it was drawn, over the new city (李元芳 / 司空震, SGODOT-275).
 	for id in bubbles:
+		if not listed.has(id): bubbles[id].node.visible = false
 		if not bubbles[id].node.visible: bubbles[id].dot.visible = false
 
 func _make_bubble(id: String) -> Dictionary:
@@ -1590,7 +1611,15 @@ func _make_bubble(id: String) -> Dictionary:
 	column.add_child(name_label)
 	var count_label := GameUi.label("", 9, MUTED)
 	count_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	column.add_child(count_label)
+	var line := HBoxContainer.new()   # a host's glyph before the line (P0: the home city's house)
+	line.alignment = BoxContainer.ALIGNMENT_CENTER
+	line.add_theme_constant_override("separation", 3)
+	line.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var glyph := GameUi.picture(GameUi.icon("house"), 10)
+	glyph.visible = false
+	line.add_child(glyph)
+	line.add_child(count_label)
+	column.add_child(line)
 	add_child(node)
 	move_child(node, 0)
 	var dot := Panel.new()
@@ -1605,7 +1634,7 @@ func _make_bubble(id: String) -> Dictionary:
 	dot.add_theme_stylebox_override("panel", dot_style)
 	add_child(dot)
 	move_child(dot, 0)
-	return {"node": node, "name": name_label, "count": count_label, "dot": dot}
+	return {"node": node, "name": name_label, "count": count_label, "icon": glyph, "dot": dot}
 
 func _build_city_panel() -> void:
 	city_panel = PanelContainer.new()

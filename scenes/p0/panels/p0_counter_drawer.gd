@@ -258,7 +258,9 @@ func refresh(view_: Dictionary, force := false) -> void:
 ## The offers on the current page: the Buy shelf, or the market's City Specialty shelf (content market.specialty).
 func offers() -> Array:
 	var all: Array = view.get("shops", {}).get(role, {}).get("buy", [])
-	if role != "market": return all
+	# Decor (SGODOT-284) is on the stall's own Decor page once it is drawn (不知火舞); until then not on the Buy shelf.
+	var decor: Dictionary = P0Logic.content().get("decor", {}).get("items", {})
+	if role != "market": return all.filter(func(o): return not decor.has(str(o.get("id", ""))))
 	var listed: Array = P0Logic.content().get("market", {}).get("specialty" if section == "specialty" else "buy", [])
 	return all.filter(func(o): return listed.has(str(o.get("id", ""))))
 
