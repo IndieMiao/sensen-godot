@@ -44,6 +44,14 @@ describe('Harvest All (Farming Lv9)', () => {
     expect(full.plots[6].state).toBe('growing');   // nothing was taken
   });
 
+  it('leaves trees out: a row with a ripe tree in it is refused, the tree is picked alone', () => {
+    const s = farmer(9, [6, 7]);
+    s.plots[8] = { id: 8, state: 'growing', crop: 'crop_apple', ready_at: T0 + 4 * H, xp_pct: 100, picks: 1 };
+    expect(run(s, all([6, 7, 8]))).toMatchObject({ ok: false, code: 'not_ready', detail: { plot: 8, tree: true } });
+    const pick = run(s, { type: 'harvest', plot: 8 } as P0Command);
+    expect(pick.ok && pick.state.plots[8]).toMatchObject({ state: 'growing', crop: 'crop_apple', picks: 2 });
+  });
+
   it('still harvests a single plot the old way at any level', () => {
     const r = run(farmer(1, [3]), { type: 'harvest', plot: 3 } as P0Command);
     expect(r.ok).toBe(true);
