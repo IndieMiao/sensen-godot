@@ -2146,6 +2146,7 @@ func show_level_up(ev: Dictionary, first := false) -> void:
 
 func _banner_action(id: String) -> void:
 	match id:
+		"show_workbench": show_spot.emit("workbench")   # Farming Lv6 (q(59) §1.6): moves the camera, opens nothing
 		"use_bait":   # puts the gift bait on the hook, in place (the quick bar's bait slot, q(44))
 			for s in _bag_slots():
 				var bait := str(s.get("id", ""))

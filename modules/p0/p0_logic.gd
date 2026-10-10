@@ -940,6 +940,8 @@ const CONVENIENCE_NAMES := {"cook_again": "Cook Again", "clue_double": "Double C
 const LEVEL_TIP := "Levels unlock gear, fish and seeds. Basics never lock."
 ## Levels that change the day say so on the banner's Tip instead of the next level (§4.8.3, q(69)).
 const DAY_CHANGES := {"cooking:4": "Today changes: 3-ingredient dishes", "farming:6": "Today changes: no more watering"}
+## The day-changing level's action (q(59) §1.6): [label, banner action id].
+const DAY_ACTIONS := {"farming:6": ["Show Workbench", "show_workbench"]}
 
 ## The MomentBanner for a skill level-up (§4.8.3 / §4.8.6; ev = the server's {skill, level, energy, gifts}). Fields as
 ## the accepted FARM-LV2 (1368:91797), content and timing as §4.8.6 (不知火舞 233, 10-08):
@@ -976,9 +978,17 @@ static func level_banner(view: Dictionary, ev: Dictionary, first := false) -> Di
 	var detail := ("New recipe: " + ", ".join(recipes)) if not recipes.is_empty() else ""
 	# Tip: the next level, except the account's first (the teaching line) and a level that changes the day (q(69)).
 	var tip := LEVEL_TIP if first else str(DAY_CHANGES.get("%s:%d" % [skill, lv], next_level_line(view, skill, lv)))
+	var action := "Use bait" if first and bait != "" else ""
+	var action_id := "use_bait" if first and bait != "" else ""
+	# A level that changes the day is the full banner, up to 3 s (q(69)); Farming Lv6 points at the workbench, where
+	# the Sprinkler is built (q(59) §1.6: `Show Workbench`, the camera only, LOCK-08).
+	var day := DAY_CHANGES.has("%s:%d" % [skill, lv])
+	if not first and DAY_ACTIONS.has("%s:%d" % [skill, lv]):
+		var a: Array = DAY_ACTIONS["%s:%d" % [skill, lv]]
+		action = str(a[0])
+		action_id = str(a[1])
 	return {kind = "level_up", level = str(lv), title = title, subtitle = subtitle, rewards = rewards, detail = detail,
-		tip = tip, action = "Use bait" if first and bait != "" else "", action_id = "use_bait" if first and bait != "" else "",
-		seconds = 3.0 if first else 1.5}
+		tip = tip, action = action, action_id = action_id, seconds = 3.0 if first or day else 1.5}
 
 ## What a skill level opens this season: Farming — the crops of that gate (main ingredients first), then other stall
 ## goods and tools (Compost, Row Hoe); Fishing — the fish of that level; Cooking — the conveniences of that level.
@@ -994,6 +1004,11 @@ static func level_unlocks(view: Dictionary, skill: String, level: int) -> Array:
 				out.append(item_name(view, id))
 			var hoe: Dictionary = content().get("tools", {}).get("row_hoe", {})
 			if int(hoe.get("gate", 0)) == level: out.append(item_name(view, str(hoe.get("id", ""))))
+			# P1 facilities a level opens at the workbench (q(59) §1.6: `New for you · Cucumber, Sprinkler`)
+			for r in content().get("workbench", {}).get("recipes", []):
+				var gate: Array = r.get("gate", [])
+				if str(r.get("to", "")) == "field" and gate.size() == 2 and str(gate[0]) == "farming" and int(gate[1]) == level:
+					out.append(str(content().get("facilities", {}).get("kinds", {}).get(str(r.get("facility", "")), {}).get("name", r.get("id", ""))))
 		"fishing":
 			# The fish, then gear and goods the level opens (Worm Bait at Lv2, the Reed Rod at Lv3), then `Regional fish`
 			# last, as §14 writes it (`Next Lv3 · Reed Rod, Regional fish`).
