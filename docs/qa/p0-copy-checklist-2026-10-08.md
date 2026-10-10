@@ -49,7 +49,7 @@
 | 工作台效果句 ★ | `Copper Pickaxe · 2 Stone per rock`（LOCK-29）/ `Gather Gloves · +1 at every gathering spot`（q(45)）/ 堆肥 `Crops ready 20% sooner`（q(46)） |
 | 采集点 ★ | 名字条 `Timber Grove`（其他写名字，如 `Reed Bank`）/ 没好 `Timber Grove · Ready in 2h 10m` / 未开 `Clay Bank · Homestead Lv2`（q(46)、q(62)）；P0 共 5 处，没有 Old Tree（q(43)） |
 | 采集与入库飘字 ★ | 进仓库 `+6 Timber · Stored` / 进背包 `+2 Worm Bait` / 回家入库 `Stored · 12 Stone · 3 Copper Ore`（数字在前、不带 ×，q(46)） |
-| 农舍门牌 / 升级面板 ★ | 名字条：农舍 `Farmhouse`、门牌 `Homestead Lv1`、木牌 `Upgrade Plaque`（q(62)）；标题 `Homestead Lv1 → Lv2`；What changes `Max Energy 210 · Meals 210 a day` / `Spice Rack · seasonings off your bag` / `Clay Bank · Clay next to the Reed Bank`；满级 `Highest level for now`（q(46)）；横幅 `Homestead Lv2` / `Clay Bank opened`；不在家（从个人页远程打开）时升级按钮灰显 `At home`，点它出 toast `Upgrade at home · Going home is free`，不写 `Go home to upgrade · Free`（q(93)） |
+| 农舍门牌 / 升级面板 ★ | 名字条：农舍 `Farmhouse`、门牌 `Homestead Lv1`、木牌 `Upgrade Plaque`（q(62)）；标题 `Homestead Lv1 → Lv2`；What changes `Max Energy 210 · Meals 210 a day` / `Spice Rack · seasonings off your bag` / `Clay Bank · Clay next to the Reed Bank`；满级 `Highest level for now`（q(46)，P0 临时封顶）；Lv10 满级标题下 `Max level · Homestead Master`（q(115)）；横幅 `Homestead Lv2` / `Clay Bank opened`；不在家（从个人页远程打开）时升级按钮灰显 `At home`，点它出 toast `Upgrade at home · Going home is free`，不写 `Go home to upgrade · Free`（q(93)） |
 | 信箱 ★ | 名字条 `Mailbox`；有在列包裹时小牌 `Parcel`，背包满也挂（q(50)、q(62)、q(79)） |
 
 ## 3. 鱼塘与钓鱼
@@ -86,7 +86,7 @@
 | Cooking Lv4 之后 Today ★ | `3rd slot open · try Fine fish + Potato + Rock Salt`（q(46)） |
 | 钓鱼第二段 ★ | 亮片 `Spinner Lure`（`bait_lure`，账号每日 10 枚）；鱼笼 `Fish Trap`（`trap_fish`，放下后不占背包格），主行动键 `Set Trap · Free`（满 `Traps 1/1 · Fishing Lv8 adds 1`、本塘已有 `Trap already here`）；浮标 `Fish Trap · 2/3` / `· 3/3 · Full`；EntryCard `Collect 2 · Free` / `Take back`（`Collect · Creel full`、`Take back · Collect first`、`1 left in the trap`、`Fish Trap back in your bag`）；Today `Collect 3 fish · Fern Pond`；旧金山地区鱼 Arctic Char + Atlantic Salmon；Clover Pond 卡片写 `Coast`（q(109)） |
 | 布置模式 Decorate ★ | 驿站 Decor 页 `Decor 12/24 · Goes to Farm Storage` / `Bought today · 9h 12m` / `Homestead Lv5 needed · 1 level to go`；toast `Flower Planter · in Farm Storage` + `Place now ›`；底栏 `Cancel` · `Rotate` · `Place`（移动 `Move`），原因 `Outside your yard` / `Space taken` / `Decor 24/24 · Homestead Lv3 adds 4`（当前 + 1 级；封顶 `Decor 56/56 · Store one to place this`；三键底栏原因写在小标、主键灰写 `Place`，q(113)）；小卡 `Move` / `Store`；`Stone Path · 3 left`；Today `Place Flower Planter · in storage`（q(111)） |
-| Homestead 外观二选一 ★ | 标题 `Lv5 look · Porch`；副标题 `Pick one · free to change later`；按钮 `Use Timber Porch`；外观名 `Timber Fence` / `Stone Wall`、`Timber Porch` / `Stone Porch`、`Timber Kitchen Wing` / `Stone Kitchen Wing`、`Timber Lodge` / `Stone Manor`（暂定）；HOME-1 `Looks` 段 `Porch` … `Stone Porch ›`，未到灰 `Homestead Lv8`（q(112)） |
+| Homestead 外观二选一 ★ | 标题 `Lv5 look · Porch`；副标题 `Pick one · free to change later`；按钮 `Use Timber Porch`；外观名 `Timber Fence` / `Stone Wall`、`Timber Porch` / `Stone Porch`、`Timber Kitchen Wing` / `Stone Kitchen Wing`、`Timber Lodge` / `Stone Manor`（暂定）；HOME-1 `Looks` 段 `Porch` … `Stone Porch ›`，未到灰 `Homestead Lv8`（q(112)）；升级前 What changes 外观行 `Porch · Timber or Stone` / `pick when you upgrade`（Lv3 `Fence & Mailbox`、Lv8 `Kitchen Wing`、Lv10 `Master Farmhouse` 同格式），不写 Look A / B（q(115)） |
 
 ## 5. 矿洞
 
