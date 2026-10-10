@@ -20,12 +20,14 @@ const LANDING_GRACE_S := 2.0
 
 ## The lunge band (不知火舞 288 785a6a5b, 上官婉儿 c8a7507a, 李白 on 288): from the wind-up's first frame a strip on the
 ## ground from the slime's feet along the locked lunge, as long as the lunge reaches (dash speed × time + the hit
-## radius) and as wide as the hit; it sweeps from the feet to its far end over the wind-up and the slime leaps when
-## it is full. Orange-red #E8603C, fill 30 % / edge 70 %; the elite's in full, a slime's paler. The direction is the
-## one the wind-up locked (mine_combat sets enemy.direction once): the lunge follows the band, never re-aims.
+## radius) and as wide as the hit, its far end round; it sweeps from the feet to its far end over the wind-up, the
+## slime leaps when it is full, the band stays through the lunge and fades over 0.15 s after it (不知火舞 7d4f0231).
+## Orange-red #E8603C at 30 %; the elite's in full, a slime's paler (the 70 % edge did not read on the ground and is
+## gone). The direction is the one the wind-up locked (mine_combat sets enemy.direction once): the lunge follows the
+## band, never re-aims.
 const BAND_COLOR := Color("e8603c")
 const BAND_FILL := 0.30
-const BAND_EDGE := 0.70
+const BAND_FADE_S := 0.15
 const BAND_PALE := 0.6       # a common slime's band, against the elite's
 const BAND_Y := 0.03
 ## The wind-up squash on Body only (pivot at its feet, so they stay on the ground), a small shake of its position over
@@ -133,22 +135,35 @@ func _band(spec: Dictionary, elite: bool) -> Node3D:
 	band.visible = false
 	var reach := float(spec.dash_speed) * float(spec.dash_seconds) + float(spec.radius) + 0.35
 	var width := (float(spec.radius) + 0.35) * 2.0
-	var alpha := 1.0 if elite else BAND_PALE
-	for part in [["Fill", BAND_FILL, width, 0.0], ["Edge", BAND_EDGE, width + 0.08, -0.004]]:
-		var quad := PlaneMesh.new()
-		quad.size = Vector2(part[2], 1.0)
-		var mesh := MeshInstance3D.new()
-		mesh.name = str(part[0])
-		mesh.mesh = quad
-		var m := StandardMaterial3D.new()
-		m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-		m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-		m.albedo_color = Color(BAND_COLOR, float(part[1]) * alpha)
-		m.no_depth_test = false
-		mesh.material_override = m
-		mesh.position.y = BAND_Y + float(part[3])
-		band.add_child(mesh)
+	var m := StandardMaterial3D.new()
+	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	m.albedo_color = Color(BAND_COLOR, BAND_FILL * (1.0 if elite else BAND_PALE))
+	# The strip (unit length, scaled along z as it sweeps) and its round far end (a disc the strip's width, moved to
+	# the tip), one material so the overlap reads as one shape
+	var strip := MeshInstance3D.new()
+	strip.name = "Strip"
+	var quad := PlaneMesh.new()
+	quad.size = Vector2(width, 1.0)
+	strip.mesh = quad
+	strip.material_override = m
+	strip.position.y = BAND_Y
+	band.add_child(strip)
+	var cap := MeshInstance3D.new()
+	cap.name = "Cap"
+	var disc := CylinderMesh.new()
+	disc.top_radius = width * 0.5
+	disc.bottom_radius = width * 0.5
+	disc.height = 0.001
+	disc.radial_segments = 24
+	disc.rings = 1
+	cap.mesh = disc
+	cap.material_override = m
+	cap.position.y = BAND_Y
+	band.add_child(cap)
 	band.set_meta("reach", reach)
+	band.set_meta("width", width)
+	band.set_meta("alpha", m.albedo_color.a)
 	return band
 
 ## The base step, then the wind-up's look: the band sweeping out along the locked direction, Body squashed with a
@@ -168,8 +183,12 @@ func step(delta: float, mover: PlayerMover, paused: bool) -> void:
 			if HAPTIC_MS > 0 and OS.has_feature("mobile"): Input.vibrate_handheld(HAPTIC_MS)
 		if phase == "dash" and before.get(id, "") == "windup": e["rebound"] = REBOUND_S
 		if band:
-			band.visible = phase == "windup"
-			if band.visible: _lay_band(band, e)
+			# shown through the wind-up and the lunge, then fading out (不知火舞 7d4f0231)
+			if phase in ["windup", "dash"]: e["band_fade"] = BAND_FADE_S
+			else: e["band_fade"] = maxf(0.0, float(e.get("band_fade", 0.0)) - clampf(delta, 0, 0.1))
+			var fade := 1.0 if phase in ["windup", "dash"] else float(e.band_fade) / BAND_FADE_S
+			band.visible = fade > 0.0
+			if band.visible: _lay_band(band, e, fade)
 		node.get_node("Warning").visible = false   # the band says it now
 		if phase == "windup":
 			body.scale = SQUASH
@@ -183,19 +202,33 @@ func step(delta: float, mover: PlayerMover, paused: bool) -> void:
 				var k := r / REBOUND_S
 				body.scale = Vector3(1.0 - 0.08 * k, 1.0 + 0.14 * k, 1.0 - 0.08 * k)
 
-## The band from the slime's feet along the locked direction, swept out over the wind-up (full when it leaps).
-func _lay_band(band: Node3D, e: Dictionary) -> void:
+## The band from the slime's feet along the locked direction, swept out over the wind-up (full from the leap on), its
+## round end at the tip, at `fade` of its opacity.
+func _lay_band(band: Node3D, e: Dictionary, fade := 1.0) -> void:
 	var dir: Vector3 = e.get("band_dir", e.direction)
 	if dir.length() < 0.01: dir = Vector3.FORWARD
-	var total := float(e.spec.windup_seconds)
-	var done := clampf(1.0 - float(e.timer) / maxf(0.01, total), 0.0, 1.0)
+	var done := 1.0
+	if str(e.phase) == "windup":
+		done = clampf(1.0 - float(e.timer) / maxf(0.01, float(e.spec.windup_seconds)), 0.0, 1.0)
 	var reach := float(band.get_meta("reach", 2.0))
-	var length := maxf(0.05, reach * done)
+	var half := float(band.get_meta("width", 1.0)) * 0.5
+	var tip := maxf(0.05, reach * done)
+	# the strip runs to where the round end's centre sits, so the disc rounds the tip exactly at the reach
+	var strip_len := maxf(0.01, tip - half)
 	band.rotation = Vector3(0, atan2(dir.x, dir.z), 0)
-	for part in band.get_children():
-		var mesh := part as MeshInstance3D
-		mesh.scale = Vector3(1, 1, length)
-		mesh.position.z = length * 0.5
+	# the band stays where the wind-up laid it while the slime lunges along it
+	band.global_position = e.get("band_from", band.global_position) if str(e.phase) != "windup" else (band.get_parent() as Node3D).global_position
+	if str(e.phase) == "windup": e["band_from"] = band.global_position
+	var strip := band.get_node("Strip") as MeshInstance3D
+	strip.scale = Vector3(1, 1, strip_len)
+	strip.position.z = strip_len * 0.5
+	strip.visible = tip > half
+	var cap := band.get_node("Cap") as MeshInstance3D
+	cap.position.z = maxf(0.0, tip - half)
+	var cap_scale := minf(1.0, tip / maxf(0.01, half * 2.0)) if tip < half * 2.0 else 1.0
+	cap.scale = Vector3(cap_scale, 1, cap_scale)
+	var m := strip.material_override as StandardMaterial3D
+	m.albedo_color.a = float(band.get_meta("alpha", BAND_FILL)) * fade
 
 ## The band's reach and width for a kind (tests, the 288 report).
 func band_of(kind: String) -> Dictionary:

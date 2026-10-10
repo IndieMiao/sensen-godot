@@ -274,13 +274,23 @@ func test_a_wind_up_lays_the_band_along_the_locked_lunge() -> void:
 	assert_vector(e.band_dir).is_equal_approx(Vector3(0, 0, 1), Vector3(0.01, 0.01, 0.01))   # towards the player
 	assert_vector((e.node.get_node("Body") as Node3D).scale).is_equal(Combat.SQUASH)
 	assert_vector(e.node.scale).is_equal(Vector3.ONE)
-	var early: float = (band.get_child(0) as Node3D).scale.z
+	var early: float = (band.get_node("Strip") as Node3D).scale.z
+	# the band itself points at the player, not only band_dir (苏烈 on #239): its local +z, in the world, is the lunge
+	var along: Vector3 = band.global_transform.basis.z.normalized()
+	assert_vector(along).is_equal_approx(Vector3(0, 0, 1), Vector3(0.01, 0.01, 0.01))
 	mover.position += Vector3(3, 0, 0)   # the player steps aside: the band keeps its line
 	for i in 30: c.step(0.016, mover, false)
 	assert_vector(e.band_dir).is_equal_approx(Vector3(0, 0, 1), Vector3(0.01, 0.01, 0.01))
-	assert_float((band.get_child(0) as Node3D).scale.z).is_greater(early)
-	for i in 30: c.step(0.016, mover, false)
-	assert_str(str(e.phase)).is_not_equal("windup")
+	assert_float((band.get_node("Strip") as Node3D).scale.z).is_greater(early)
+	assert_vector(band.global_transform.basis.z.normalized()).is_equal_approx(Vector3(0, 0, 1), Vector3(0.01, 0.01, 0.01))
+	while str(e.phase) == "windup": c.step(0.016, mover, false)
+	assert_str(str(e.phase)).is_equal("dash")
+	assert_bool(band.visible).is_true()   # through the lunge (不知火舞 7d4f0231)
+	var laid: Vector3 = band.global_position
+	while str(e.phase) == "dash": c.step(0.016, mover, false)
+	assert_vector(band.global_position).is_equal_approx(laid, Vector3(0.001, 0.001, 0.001))   # where the wind-up laid it
+	assert_bool(band.visible).is_true()   # fading
+	for i in 12: c.step(0.016, mover, false)   # past the 0.15 s fade
 	assert_bool(band.visible).is_false()
 
 func test_the_band_reaches_as_far_as_the_lunge_hits() -> void:
@@ -312,3 +322,21 @@ func test_continue_run_lands_like_express() -> void:
 	c.sync_p0(v, 5, mover)   # the same floor's later frames keep counting down
 	assert_float(c.grace).is_equal(0.5)
 	assert_str(P0MaterialLogic.landing_mode(v, 5)).is_equal("combat")
+
+## A lunge across the room: the band points where the player stood when the wind-up began, whichever way that is.
+func test_the_band_points_along_the_lunge_in_any_direction() -> void:
+	var Combat = load("res://modules/mining/p0_mine_combat.gd")
+	var bp := Layout_bp()
+	var mover := PlayerMover.new(bp, BlueprintGrid.new(bp))
+	var c: Node3D = auto_free(Combat.new())
+	add_child(c)
+	c.sync_p0(_view(_run(_five([true, true, true, true, true]))), 5, mover)
+	c.grace = 0.0
+	var e: Dictionary = c.enemies.values()[0]
+	mover.position = load("res://modules/mining/mine_layout.gd").SPAWN
+	(e.mover as PlayerMover).position = mover.position + Vector3(1.4, 0, -1.4)   # diagonal to the player, inside the room
+	e.node.position = e.mover.position
+	c.step(0.016, mover, false)
+	assert_str(str(e.phase)).is_equal("windup")
+	var want: Vector3 = (mover.position - (e.node as Node3D).position).normalized()
+	assert_vector(e.node.get_node("Band").global_transform.basis.z.normalized()).is_equal_approx(want, Vector3(0.02, 0.02, 0.02))
