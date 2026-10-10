@@ -15,12 +15,12 @@ from mathutils import Vector
 ROOT=Path(__file__).resolve().parents[2]
 OUT=ROOT/'assets/farm/art'
 SOURCE=ROOT/'tools/art/source/greenhouse_294'
-FOOTPRINT=4.95  # v1.4: nominal frame span, measured between post centres.
-COVERED_BLOCK=4.55
+FOOTPRINT=5.20  # v1.5: post-centre span around the unscaled 0.94 m plot.glb.
+COVERED_BLOCK=4.84
 EAVE=1.92  # User-approved clearance correction: underside 1.80 m.
 RIDGE=2.75  # v1.3: keep a readable gable after raising the eave.
 POST=FOOTPRINT/2
-FOOT=.30
+FOOT=.26
 FRAME_SPAN=FOOTPRINT+.16  # Beam ends flush with the outside of the posts.
 ROOF_HALF=POST+.07
 PALETTE={
@@ -41,7 +41,7 @@ def begin(name,budget,**metadata):
     META[name]={'generator':'tools/art/build_greenhouse.py','triangle_limit':budget,
                 'footprint':[FOOTPRINT,FOOTPRINT],'footprint_m':[FOOTPRINT,FOOTPRINT],
                 'covered_plots':[4,4],'covered_block_m':COVERED_BLOCK,
-                'footprint_note':'Nominal post-centre span; use bounds for physical extents (5.25 m including feet).',
+                'footprint_note':'Nominal post-centre span; use bounds for physical extents (5.46 m including feet).',
                 'eave_height':EAVE,'ridge_height':RIDGE,
                 'pivot':'ground / footprint centre; common to all three parts',
                 'front':'+Z','sockets':{},**metadata}
@@ -126,9 +126,9 @@ def rod(name, a, b, radius, color, segments=6, top=None):
     return obj
 
 
-def lathe(name, profile, color, segments=20, at=(0, 0, 0)):
+def lathe(name, profile, color, segments=20, at=(0, 0, 0), depth_ratio=1):
     verts = [(at[0]+r*math.cos(i*math.tau/segments), at[1]+y,
-              at[2]+r*math.sin(i*math.tau/segments)) for r, y in profile for i in range(segments)]
+              at[2]+depth_ratio*r*math.sin(i*math.tau/segments)) for r, y in profile for i in range(segments)]
     faces = []
     for j in range(len(profile)-1):
         for i in range(segments):
@@ -297,8 +297,9 @@ def greenhouse_base():
                  ['leaf','leaf_dark','leaf_light'][(i+(s==1))%3],s*.62,math.pi/2)
     # Follow the expanded corner; keep the entire can outside the covered beds.
     at=(POST-.33,EAVE-.64,POST)
+    # 0.2465 m depth fits the real 0.36 m walkway with >0.05 m on both sides.
     lathe('Hollow watering can body',[(.10,0),(.14,.025),(.145,.205),(.129,.24),
-           (.109,.24),(.109,.208),(.108,.06),(0,.06)],'metal',8,at)
+           (.109,.24),(.109,.208),(.108,.06),(0,.06)],'metal',8,at,depth_ratio=.85)
     rod('Watering can rising spout',(at[0]-.10,at[1]+.08,at[2]),(at[0]-.28,at[1]+.20,at[2]),.040,'metal',8,top=.031)
     rod('Watering can rose nozzle',(at[0]-.28,at[1]+.20,at[2]),(at[0]-.325,at[1]+.235,at[2]),.033,'metal_light',8,top=.064)
     pts=[(at[0]+.12*math.cos(math.pi*i/6),at[1]+.20+.17*math.sin(math.pi*i/6),at[2]) for i in range(7)]

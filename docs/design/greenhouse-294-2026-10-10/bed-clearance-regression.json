@@ -1,0 +1,37 @@
+{
+  "description": "The same validator measures the actual unscaled plot.glb instances in both runs. Old v1.4 fails; v1.5 passes. Overlap counts are conservative projected triangle AABB candidates, not an intersection-volume metric.",
+  "plot_fixture": {
+    "adjacent_bed_edge_m": 2.78000000119209,
+    "centre_spacing_m": 1.3,
+    "covered_bounds_xz": [
+      -2.42000007629395,
+      -2.42000007629395,
+      2.42000007629395,
+      2.42000007629395
+    ],
+    "instance_scale": 1.0,
+    "instances": 16,
+    "mesh_size_xz_m": [
+      0.939999997615814,
+      0.939999997615814
+    ],
+    "source": "res://assets/farm/art/plot.glb"
+  },
+  "before": {
+    "model_commit": "6b99899b226b02066d2e3d4e841f4828eaa3f485",
+    "base_glb_sha256": "ff6db912aef6153d4f77e553293b3bbba2220c4871efdfe54b175a3ce23a2286",
+    "bed_projection_overlap_candidates": 386,
+    "covered_envelope_overlap_candidates": 266,
+    "minimum_foot_inner_axis_gap_m": -0.0950000286102295,
+    "clearance_checks_failed": true
+  },
+  "after": {
+    "base_glb_sha256": "6716b7af19456b79ea0c43571755836b8a10b2ae1c0dc3e40e0d694a424e9642",
+    "bed_projection_overlap_candidates": 0,
+    "covered_envelope_overlap_candidates": 0,
+    "minimum_foot_inner_axis_gap_m": 0.0499999523162842,
+    "minimum_foot_outer_axis_gap_m": 0.0499999821186066,
+    "all_checks_passed": true,
+    "rendered_check_count": 85
+  }
+}

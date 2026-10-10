@@ -926,47 +926,47 @@
     "greenhouse_base": {
       "triangles": 1284,
       "surfaces": 1,
-      "bytes": 78464,
+      "bytes": 78228,
       "bounds_blender": [
         [
-          -2.625,
-          -2.625,
+          -2.73,
+          -2.73,
           0.0
         ],
         [
-          2.625,
-          2.625,
+          2.73,
+          2.73,
           1.92
         ]
       ],
       "bounds": [
         [
-          -2.625,
+          -2.73,
           0.0,
-          -2.625
+          -2.73
         ],
         [
-          2.625,
+          2.73,
           1.92,
-          2.625
+          2.73
         ]
       ],
       "generator": "tools/art/build_greenhouse.py",
       "triangle_limit": 1500,
       "footprint": [
-        4.95,
-        4.95
+        5.2,
+        5.2
       ],
       "footprint_m": [
-        4.95,
-        4.95
+        5.2,
+        5.2
       ],
       "covered_plots": [
         4,
         4
       ],
-      "covered_block_m": 4.55,
-      "footprint_note": "Nominal post-centre span; use bounds for physical extents (5.25 m including feet).",
+      "covered_block_m": 4.84,
+      "footprint_note": "Nominal post-centre span; use bounds for physical extents (5.46 m including feet).",
       "eave_height": 1.92,
       "ridge_height": 2.75,
       "pivot": "ground / footprint centre; common to all three parts",
@@ -988,73 +988,73 @@
       "verified_mid_entry_width_m": 1.3,
       "post_centres_xz": [
         [
-          -2.475,
-          -2.475
+          -2.6,
+          -2.6
         ],
         [
-          -2.475,
-          2.475
+          -2.6,
+          2.6
         ],
         [
-          2.475,
-          -2.475
+          2.6,
+          -2.6
         ],
         [
-          2.475,
-          2.475
+          2.6,
+          2.6
         ]
       ],
       "post_section_m": 0.16,
       "foot_projection_m": [
-        0.3,
-        0.3
+        0.26,
+        0.26
       ],
       "collision_note": "Four corner feet/posts only; no whole-building AABB collider."
     },
     "greenhouse_roof": {
       "triangles": 572,
       "surfaces": 1,
-      "bytes": 51284,
+      "bytes": 49628,
       "bounds_blender": [
         [
-          -2.555103,
-          -2.555,
-          1.858301
+          -2.679669,
+          -2.68,
+          1.857986
         ],
         [
-          2.555103,
-          2.555,
+          2.679669,
+          2.68,
           2.75
         ]
       ],
       "bounds": [
         [
-          -2.555103,
-          1.858301,
-          -2.555
+          -2.679669,
+          1.857986,
+          -2.68
         ],
         [
-          2.555103,
+          2.679669,
           2.75,
-          2.555
+          2.68
         ]
       ],
       "generator": "tools/art/build_greenhouse.py",
       "triangle_limit": 1000,
       "footprint": [
-        4.95,
-        4.95
+        5.2,
+        5.2
       ],
       "footprint_m": [
-        4.95,
-        4.95
+        5.2,
+        5.2
       ],
       "covered_plots": [
         4,
         4
       ],
-      "covered_block_m": 4.55,
-      "footprint_note": "Nominal post-centre span; use bounds for physical extents (5.25 m including feet).",
+      "covered_block_m": 4.84,
+      "footprint_note": "Nominal post-centre span; use bounds for physical extents (5.46 m including feet).",
       "eave_height": 1.92,
       "ridge_height": 2.75,
       "pivot": "ground / footprint centre; common to all three parts",
@@ -1069,44 +1069,44 @@
       "bytes": 1836,
       "bounds_blender": [
         [
-          -2.545,
-          -2.475,
+          -2.67,
+          -2.6,
           1.898
         ],
         [
-          2.545,
-          2.475,
+          2.67,
+          2.6,
           2.69
         ]
       ],
       "bounds": [
         [
-          -2.545,
+          -2.67,
           1.898,
-          -2.475
+          -2.6
         ],
         [
-          2.545,
+          2.67,
           2.69,
-          2.475
+          2.6
         ]
       ],
       "generator": "tools/art/build_greenhouse.py",
       "triangle_limit": 500,
       "footprint": [
-        4.95,
-        4.95
+        5.2,
+        5.2
       ],
       "footprint_m": [
-        4.95,
-        4.95
+        5.2,
+        5.2
       ],
       "covered_plots": [
         4,
         4
       ],
-      "covered_block_m": 4.55,
-      "footprint_note": "Nominal post-centre span; use bounds for physical extents (5.25 m including feet).",
+      "covered_block_m": 4.84,
+      "footprint_note": "Nominal post-centre span; use bounds for physical extents (5.46 m including feet).",
       "eave_height": 1.92,
       "ridge_height": 2.75,
       "pivot": "ground / footprint centre; common to all three parts",

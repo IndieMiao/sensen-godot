@@ -6,7 +6,11 @@ review `ab8d4bde-92fe-4d73-998e-0b5dc64a76ad`.
 
 The retained [original brief](spec-v1.1.md) is amended by the later approved
 [clearance, ridge and branch decisions](spec-amendments-v1.3.md), then by the
-[v1.4 post positions and bed clearances](spec-amendments-v1.4.md). Dimensions
+[v1.4 post positions](spec-amendments-v1.4.md), superseded by the
+**[v1.5 correction and approved plan A](spec-v1.5.md)** at the end of the current
+brief: real plot.glb is 0.94 m wide at scale 1, on 1.30 m centres. Frame span
+is 5.20 m, post centres ±2.60 m, feet 0.26 m, covered block 4.84 m. The v1.4
+clearance claims used undersized fixture beds and are no longer valid. Dimensions
 come from those specifications, not measurements of the concept image.
 
 ```sh
