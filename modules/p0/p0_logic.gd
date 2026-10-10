@@ -310,16 +310,44 @@ static func skill_unlocks(view: Dictionary, skill: String, level: int) -> Array:
 	var out: Array = []
 	match skill:
 		"farming":
-			# Main ingredients before seasonings, as §4.8.7 reads them (Carrot and Herb, Potato and Chamomile).
+			# Main ingredients before seasonings, as §4.8.7 reads them (Carrot and Herb, Potato and Chamomile). P1 (李白
+			# on #214, §5.2.3 / §4.5): the regional crops are one item, `Regional seeds`, at their level (Lv5 opens buying
+			# them; which one sells at home depends on the city); a perennial is named by what is bought and planted,
+			# its sapling (`Apple Sapling`, `Grapevine Cutting`).
 			var crops: Array = content().get("crops", []).filter(func(c): return int(c.get("gate", 1)) == level)
+			var regional := false
 			for main in [true, false]:
 				for c in crops:
-					if (str(c.get("ingr", ["F"])[0]) == "F") == main: out.append(str(c.name))
-		"fishing":   # this season's waters: ponds and rivers (no coast in P0)
+					if bool(c.get("regional", false)):
+						regional = true
+						continue
+					if (str(c.get("ingr", ["F"])[0]) == "F") != main: continue
+					out.append(str(c.get("seed_name", c.name)) if c.get("perennial", null) != null else str(c.name))
+			if regional: out.append(REGIONAL_SEEDS)
+		"fishing":
+			# This season's waters only (the fishing sites the content has: Pond and River until Coast lands), and the
+			# regional fish as one item, `Regional fish`, at the level the first of them can be landed (李白 on #214, §14
+			# minutes 28–30: `Next Lv3 · Reed Rod, Regional fish`): which two a city has depends on the city.
+			var sites: Array = content().get("fishing", {}).get("sites", {}).keys()
+			var fished := func(f): return (f.get("where", ["pond"]) as Array).any(func(w): return sites.has(w))
 			for f in content().get("fish", []):
-				var where: Array = f.get("where", ["pond"])
-				if int(f.get("level", 1)) == level and (where.has("pond") or where.has("river")): out.append(item_name(view, str(f.id)))
+				if fished.call(f) and not bool(f.get("regional", false)) and int(f.get("level", 1)) == level:
+					out.append(item_name(view, str(f.id)))
+			if level == regional_fish_level(): out.append(REGIONAL_FISH)
 	return out
+
+const REGIONAL_FISH := "Regional fish"
+const REGIONAL_SEEDS := "Regional seeds"
+
+## The level `Regional fish` is written at: the first level past Lv1 that opens a regional fish (Lv3: Grass Carp and
+## Arctic Char; §14's `Next Lv3 · Reed Rod, Regional fish`). Lv1 ones (Tilapia, Smelt) are there from the start, which
+## no milestone row names. 0 with no such fish in the content.
+static func regional_fish_level() -> int:
+	var lowest := 0
+	for f in content().get("fish", []):
+		var lv := int(f.get("level", 1))
+		if bool(f.get("regional", false)) and lv >= 2: lowest = lv if lowest == 0 else mini(lowest, lv)
+	return lowest
 
 ## The level-up gift of a skill level as the gate card's info row ("Carrot Seeds ×5" / "Level-up gift" / "At Lv2"),
 ## or {} when that level brings none. Recipes are not counted items: the first other item names the row.
@@ -964,12 +992,16 @@ static func level_unlocks(view: Dictionary, skill: String, level: int) -> Array:
 			var hoe: Dictionary = content().get("tools", {}).get("row_hoe", {})
 			if int(hoe.get("gate", 0)) == level: out.append(item_name(view, str(hoe.get("id", ""))))
 		"fishing":
-			# The fish, then gear and goods the level opens (Worm Bait at Lv2, the Reed Rod at Lv3).
+			# The fish, then gear and goods the level opens (Worm Bait at Lv2, the Reed Rod at Lv3), then `Regional fish`
+			# last, as §14 writes it (`Next Lv3 · Reed Rod, Regional fish`).
 			out = skill_unlocks(view, "fishing", level)
+			var regional := out.has(REGIONAL_FISH)
+			out.erase(REGIONAL_FISH)
 			for o in view.get("stall", {}).get("buy", []):
 				if str(o.get("skill", "")) == "fishing" and int(o.get("gate", 1)) == level: out.append(item_name(view, str(o.get("id", ""))))
 			for r in content().get("fishing", {}).get("rods", []):
 				if int(r.get("level", 1)) == level and int(r.get("price", 0)) > 0: out.append(str(r.get("name", "")))
+			if regional: out.append(REGIONAL_FISH)
 		"cooking":
 			var conv: Dictionary = content().get("cooking", {}).get("conveniences", {})
 			for k in conv:

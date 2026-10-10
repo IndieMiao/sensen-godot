@@ -84,9 +84,9 @@ static func skills_data(view: Dictionary) -> Dictionary:
 				fact = ("%d XP to go" % maxi(0, int(th[l - 1]) - xp)) if mark == "next" else ""})
 		tracks.append({key = key, name = key.capitalize(), level = lv, next = next, xp = xp, need = need, milestones = rows})
 	var firsts: Array = view.get("firsts", [])
-	var fish: Array = P0Logic.content().get("fish", []).filter(func(f):
-		var where: Array = f.get("where", ["pond"])
-		return where.has("pond") or where.has("river"))
+	# Fish first-caught n/20 (李白 on #214, §4.8 / SKILL-1): the whole fish table, Coast's and the regional ones too —
+	# collecting them is what travel is for.
+	var fish: Array = P0Logic.content().get("fish", [])
 	var caught := (view.get("fishing", {}).get("dex", []) as Array).filter(func(f):
 		return int(f.get("caught", 0)) > 0 and fish.any(func(c): return str(c.id) == str(f.id))).size()
 	var pages: Array = (view.get("cooking", {}).get("cookbook", []) as Array).filter(func(p): return bool(p.get("p0", false)))
