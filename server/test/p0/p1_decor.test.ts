@@ -31,8 +31,8 @@ describe('the Decor page (§9.11.6)', () => {
     // multi-piece ones read `5 pieces` instead
     for (const [id, d] of Object.entries(decorOf(c)!.items)) {
       if (d.pieces > 1) { expect(d.blurb, id).toBeUndefined(); continue; }
-      expect(d.blurb, id).toMatch(/^[A-Z][a-z]/);
-      expect(d.blurb?.length ?? 99, id).toBeLessThanOrEqual(16);   // Visitors can sit (16) is §9.11.6's own, kept
+      expect(d.blurb, id).toMatch(/^[A-Z][a-z ]/);   // sentence case (`A sunny seat`, q(131))
+      expect(d.blurb?.length ?? 99, id).toBeLessThanOrEqual(14);   // q(131): the four rewritten ones fit 14 too (Bluebird perch)
     }
     expect(Object.values(decorOf(c)!.items).filter(d => d.buy).reduce((n, d) => n + d.price, 0)).toBe(1420);   // §9.15.2's catalog total
   });

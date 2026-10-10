@@ -105,7 +105,7 @@ static func footprint(id: String) -> String:
 	var s := size_of(id)
 	return "%d×%d" % [s.x, s.y]
 
-## The row's and the card's second line (q(111) / q(113)): `1×1 · Glows at night`; a multi-piece one `5 pieces`.
+## The row's and the card's second line (q(111) / q(113)): `1×1 · Classic lamp`; a multi-piece one `5 pieces`.
 static func line(id: String) -> String:
 	var it := item(id)
 	if int(it.get("pieces", 1)) > 1: return "%d pieces" % int(it.pieces)

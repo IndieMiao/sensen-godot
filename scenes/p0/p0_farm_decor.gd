@@ -2,7 +2,7 @@ class_name P0FarmDecor
 extends Node
 ## Decorate in the yard (P1, SGODOT-284; plan §9.11.6, q(24) / q(111) / q(113) / q(120); 不知火舞 on 284 ee15926a,
 ## 49b11f91; Figma row 62 DECOR-PLACE / -TAKEN / -CARD). The pieces the yard holds (view.decor.placed) stand as
-## placeholder art (simple meshes, no new asset: 3D waits for 上官婉儿) and are solid, as the facilities are. Decorate is
+## their own models (SGODOT-290, 刘备's kit; one draw per kind) and are solid, as the facilities are. Decorate is
 ## the shared placement mode (P0Ui.begin_placement, 刘邦's SGODOT-241):
 ##   place   a piece from Farm Storage (its Place, the stall toast's Place now): `Cancel · Rotate · Place`, Rotate only
 ##           for a piece that isn't square; a multi-piece one goes on piece by piece, `Stone Path · 3 left`.
@@ -16,6 +16,7 @@ extends Node
 ## it fading out over HALO_R cells, its cells filled green (primary 30 %) or red (danger 35 %) with a 2 px edge, paths
 ## in reach still sand.
 
+const FarmArt = preload("res://modules/farm/farm_art.gd")
 const TAP_SLOP := 12.0
 const OK_FILL := Color(UiTokens.COLOR_PRIMARY, 0.30)   # spec v2: the piece's cells, may stand
 const BAD_FILL := Color(UiTokens.COLOR_DANGER, 0.35)   # … may not
@@ -36,13 +37,22 @@ const LOOKS := {
 	"deco_fountain": [Color(0.6, 0.76, 0.86), 0.5, "pot"], "deco_pergola": [Color(0.7, 0.5, 0.32), 1.9, "frame"],
 	"recipe_stand": [Color(0.86, 0.66, 0.46), 0.8, "box"],
 }
+## The decor's own models (SGODOT-290; 刘备's kit, docs/design/decor-290-2026-10-10): assets/farm/art/deco_<id>.glb,
+## one mesh each in the farm's vertex paint, its floor pivot at the footprint's middle, +Z forward, one cell 0.65 m. The
+## Windmill's sails are their own file on its `rotor` socket (manifest sockets), turning about their axle. A piece with
+## no model yet keeps its LOOKS shape (the Recipe Stand).
+const SAILS := "deco_windmill_sails"
+const SAIL_TURN_S := 9.0                                   # one turn of the sails
+static var _sockets := {}                                  # "id:name" → position, from the farm art manifest
 
 var farm: Node3D                # p0_farm.gd: bp, cam, actor, grid
 var rt: P0Runtime
 ## {mode: "idle" | "place" | "move", id, uid, rot, at (top-left cell), ok, stay (back to idle when done)}; {} = not placing.
 var placing := {}
-var _art := {}                  # uid → Node3D
-var _looks := {}                # uid → "id:rot" the art was built for
+var _list: Array = []           # the view's placed pieces, as last drawn
+var _hidden := P0Decor.NO_PIECE # the piece a Move has lifted: out of its kind's draw until the view moves it
+var _batches := {}              # id → MultiMeshInstance3D: every placed piece of a kind in one draw (上官婉儿 on #276)
+var _singles := {}              # "uid:id:x:y:rot" → Node3D: what does not batch — a Windmill's turning sails, a shape
 var _solid := {}                # "x,y" → cell this file made solid
 var _sig := 0
 var _preview: Node3D
@@ -100,28 +110,12 @@ func frame(v: Dictionary, dt := 0.0) -> void:
 	if not placing.is_empty() and str(placing.mode) != "idle" and farm.placement_edge(_finger, dt): _snap(_finger)
 
 func _sync(list: Array) -> void:
-	var keep := {}
+	_list = list
+	_draw_pieces()
 	var cells := {}
 	for p in list:
-		var uid := int(p.get("uid", 0))
-		var id := str(p.get("id", ""))
-		var at := Vector2i(int(p.get("x", 0)), int(p.get("y", 0)))
-		var rot := int(p.get("rot", 0))
-		keep[uid] = true
-		var look := "%s:%d" % [id, rot]
-		if _looks.get(uid, "") != look:
-			if _art.has(uid): (_art[uid] as Node3D).queue_free()
-			_art[uid] = art(id, rot, farm.bp.cell_m)
-			farm.add_child(_art[uid])
-			_looks[uid] = look
-		(_art[uid] as Node3D).position = centre(id, at, rot)
-		(_art[uid] as Node3D).visible = not (str(placing.get("mode", "")) == "move" and int(placing.get("uid", P0Decor.NO_PIECE)) == uid)
-		for c in P0Decor.cells(id, at, rot): cells["%d,%d" % [c.x, c.y]] = c
-	for uid in _art.keys():
-		if not keep.has(uid):
-			(_art[uid] as Node3D).queue_free()
-			_art.erase(uid)
-			_looks.erase(uid)
+		for c in P0Decor.cells(str(p.get("id", "")), Vector2i(int(p.get("x", 0)), int(p.get("y", 0))), int(p.get("rot", 0))):
+			cells["%d,%d" % [c.x, c.y]] = c
 	# Solid like a facility (49b11f91 ③): only cells the yard's mask lets one walk on are switched, and back.
 	for k in _solid.keys():
 		if not cells.has(k):
@@ -131,6 +125,48 @@ func _sync(list: Array) -> void:
 		if _solid.has(k) or not farm.bp.is_walkable(cells[k]): continue
 		farm.grid.set_solid(cells[k], true)
 		_solid[k] = cells[k]
+
+## The placed pieces drawn: one MultiMesh per kind with a model (the lifted one left out), and one node each for the
+## Windmills' sails and the pieces still shapes. Rebuilt when the view's pieces or the lifted one change.
+func _draw_pieces() -> void:
+	for n in _batches.values(): (n as Node3D).queue_free()
+	_batches.clear()
+	var groups := batch_transforms(_list, _hidden, farm.bp.cell_m, centre)
+	for id in groups:
+		_batches[id] = FarmArt.batch(id, groups[id])
+		(_batches[id] as Node3D).name = "Decor_" + str(id)
+		farm.add_child(_batches[id])
+	var keep := {}
+	for p in _list:
+		var uid := int(p.get("uid", 0))
+		var id := str(p.get("id", ""))
+		if uid == _hidden or (has_model(id) and id != "deco_windmill"): continue
+		var at := Vector2i(int(p.get("x", 0)), int(p.get("y", 0)))
+		var rot := int(p.get("rot", 0))
+		var key := "%d:%s:%d:%d:%d" % [uid, id, at.x, at.y, rot]
+		keep[key] = true
+		if _singles.has(key): continue   # the sails keep turning through a rebuild of the batches
+		var node := _sails_on(id, rot, farm.bp.cell_m) if id == "deco_windmill" else art(id, rot, farm.bp.cell_m)
+		node.position = centre(id, at, rot)
+		farm.add_child(node)
+		_singles[key] = node
+	for key in _singles.keys():
+		if not keep.has(key):
+			(_singles[key] as Node3D).queue_free()
+			_singles.erase(key)
+
+## Every placed piece with a model as its kind's instance transforms: its footprint's middle, turned a quarter per rot
+## (as art()), the lifted one left out.
+static func batch_transforms(list: Array, hidden: int, cell: float, centre_of: Callable) -> Dictionary:
+	var out := {}
+	for p in list:
+		var id := str(p.get("id", ""))
+		if int(p.get("uid", 0)) == hidden or not has_model(id): continue
+		var at := Vector2i(int(p.get("x", 0)), int(p.get("y", 0)))
+		var rot := int(p.get("rot", 0))
+		var basis := Basis(Vector3.UP, -rot * PI / 2.0).scaled(Vector3.ONE * cell / 0.65)
+		(out.get_or_add(id, []) as Array).append(Transform3D(basis, centre_of.call(id, at, rot)))
+	return out
 
 ## The cells the yard's pieces take (the sent ones too): the shell brings the player back off them when Decorate ends,
 ## on the nearest free cell by walking (刘邦's P0Farm.free_cell_near, #261; 不知火舞 on 284).
@@ -146,8 +182,10 @@ func centre(id: String, at: Vector2i, rot: int) -> Vector3:
 	for c in cs: sum += farm.bp.cell_to_world(c)
 	return sum / maxf(1.0, float(cs.size()))
 
-## Placeholder piece: a shape of its colour sized to its footprint (LOOKS), facing +z; turned pieces swap w and h.
+## A piece's art, facing +z at rot 0: its model (has_model) turned a quarter per rot, else a shape of its colour
+## sized to its footprint (LOOKS; turned pieces swap w and h).
 static func art(id: String, rot := 0, cell := 0.65) -> Node3D:
+	if has_model(id): return _model(id, rot, cell)
 	var look: Array = LOOKS.get(id, [Color(0.7, 0.7, 0.7), 0.4, "box"])
 	var size := P0Decor.size_of(id, rot)
 	var w := size.x * cell * 0.8
@@ -199,6 +237,64 @@ static func art(id: String, rot := 0, cell := 0.65) -> Node3D:
 			add.call(b, Vector3(0, h * 0.5, 0), look[0])
 	return root
 
+static func has_model(id: String) -> bool:
+	return id.begins_with("deco_") and ResourceLoader.exists(FarmArt.ROOT + id + ".glb")
+
+static func _model(id: String, rot: int, cell: float) -> Node3D:
+	var root := Node3D.new()
+	root.name = "Decor_" + id
+	var body := Node3D.new()
+	body.rotation.y = -rot * PI / 2.0
+	body.scale = Vector3.ONE * cell / 0.65
+	root.add_child(body)
+	body.add_child(FarmArt.instance(id))
+	if id == "deco_windmill": body.add_child(_sails(socket(id, "rotor")))
+	return root
+
+## A Windmill's sails alone, where a placed one's body is drawn in its kind's batch.
+static func _sails_on(id: String, rot: int, cell: float) -> Node3D:
+	var root := Node3D.new()
+	root.name = "Sails_" + id
+	var body := Node3D.new()
+	body.rotation.y = -rot * PI / 2.0
+	body.scale = Vector3.ONE * cell / 0.65
+	root.add_child(body)
+	body.add_child(_sails(socket(id, "rotor")))
+	return root
+
+## The sails on the rotor socket, turning about their axle (local +Z) once a SAIL_TURN_S; one tween however often they
+## re-enter the tree (周瑜 on #276).
+static func _sails(at: Vector3) -> Node3D:
+	var sails := FarmArt.instance(SAILS, at)
+	sails.name = "Sails"
+	sails.tree_entered.connect(func() -> void:
+		if sails.has_meta("turning"): return
+		sails.set_meta("turning", true)
+		sails.create_tween().set_loops().tween_property(sails, "rotation:z", -TAU, SAIL_TURN_S).from(0.0))
+	return sails
+
+## A model's socket (the farm art manifest's `sockets`: the Windmill's rotor, the Bench's seats, the Lantern's glow).
+static func socket(id: String, name: String) -> Vector3:
+	if _sockets.is_empty():
+		var m = JSON.parse_string(FileAccess.get_file_as_string(FarmArt.ROOT + "manifest.json"))
+		for a in (m.get("assets", {}) as Dictionary if m is Dictionary else {}):
+			var s = m.assets[a].get("sockets", {})
+			for k in (s as Dictionary if s is Dictionary else {}):
+				var v: Array = s[k].get("position", [0, 0, 0])
+				_sockets["%s:%s" % [a, k]] = Vector3(float(v[0]), float(v[1]), float(v[2]))
+	return _sockets.get("%s:%s" % [id, name], Vector3.ZERO)
+
+## The placement preview: see-through, so the cells' green / red under it reads. Its own copies of the shared
+## materials (the placed pieces keep theirs: the farm's one vertex-paint material).
+static func ghost(node: Node3D) -> void:
+	for m in node.find_children("*", "MeshInstance3D", true, false):
+		var mi := m as MeshInstance3D
+		var mat := mi.material_override as StandardMaterial3D
+		mat = mat.duplicate() if mat != null else _mat(Color.WHITE)
+		mat.albedo_color.a = 0.6
+		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		mi.material_override = mat
+
 static func _mat(c: Color, unshaded := false) -> StandardMaterial3D:
 	var m := StandardMaterial3D.new()
 	m.albedo_color = c
@@ -227,7 +323,8 @@ func begin_move(uid: int, stay := true) -> void:
 	if p.is_empty(): return
 	placing = {mode = "move", id = str(p.id), uid = uid, rot = int(p.get("rot", 0)), stay = stay,
 		at = Vector2i(int(p.x), int(p.y))}
-	if _art.has(uid): (_art[uid] as Node3D).visible = false
+	_hidden = uid
+	_draw_pieces()
 	_start()
 
 ## HOME-1's Decorate ›: the mode with nothing picked.
@@ -329,7 +426,9 @@ func _on_done(ok: bool) -> void:
 				"sent": Time.get_ticks_msec()})
 			# a multi-piece one goes on: the next piece on the nearest free spot (49b11f91 ④)
 			if int(P0Decor.item(str(p.id)).get("pieces", 1)) > 1 and begin_place(str(p.id), bool(p.stay)): return
-	if str(p.mode) == "move" and _art.has(int(p.uid)): (_art[int(p.uid)] as Node3D).visible = true   # the view moves it
+	if str(p.mode) == "move" and _hidden != P0Decor.NO_PIECE:   # back in its kind's draw; the view moves it
+		_hidden = P0Decor.NO_PIECE
+		_draw_pieces()
 	if bool(p.get("stay", false)): begin_decorate()
 	else: _end()
 
@@ -346,7 +445,7 @@ func _end() -> void:
 	_select({})
 	rt.ui.end_placement()
 
-## In idle Decorate: a tap on a piece opens its card (DECOR-CARD: name, `1×1 · Glows at night`, Move, Store); on the
+## In idle Decorate: a tap on a piece opens its card (DECOR-CARD: name, `1×1 · Classic lamp`, Move, Store); on the
 ## Compost Bin's cell its card (Move only, 刘邦); on a sprinkler its own card (Move, no Store: facilities stay, q(22)).
 func tap(screen: Vector2) -> bool:
 	var v := _view()
@@ -462,10 +561,7 @@ func _show() -> void:
 		_preview = null
 	if _preview == null:
 		_preview = art(id, int(placing.rot), farm.bp.cell_m)
-		for m in _preview.get_children():   # see-through, so the cells' blue / red under it reads
-			var mat := (m as MeshInstance3D).material_override as StandardMaterial3D
-			mat.albedo_color.a = 0.6
-			mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		ghost(_preview)
 		_preview.name = "DecorPreview"
 		_preview.set_meta("look", "%s:%d" % [id, int(placing.rot)])
 		farm.add_child(_preview)
