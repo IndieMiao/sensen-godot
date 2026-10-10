@@ -1017,7 +1017,7 @@
         "card_price": 80,
         "card_zones": [
           "Temperate",
-          "Cold Temperate"
+          "Cool"
         ],
         "teach": [
           "Sam"
@@ -1802,7 +1802,7 @@
         ],
         "rarity": 4,
         "card_price": 500,
-        "card_zone": "Cold Temperate",
+        "card_zone": "Cool",
         "teach": [
           "Rafa"
         ],

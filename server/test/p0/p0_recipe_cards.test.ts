@@ -34,7 +34,7 @@ describe('Recipe cards (§7.16.1)', () => {
   });
 
   it('only Temperate homes see page 14 and only tropical ones page 13; Market sells its climate card', () => {
-    expect(c.cooking.recipes.find(r => r.n === 14)).toMatchObject({ card_price: 80, card_zones: ['Temperate', 'Cold Temperate'] });
+    expect(c.cooking.recipes.find(r => r.n === 14)).toMatchObject({ card_price: 80, card_zones: ['Temperate', 'Cool'] });
     expect(c.cooking.recipes.find(r => r.n === 47)).toMatchObject({ card_price: 500, card_zone: 'Temperate' });
     const s = fresh();
     s.cookbook = c.cooking.recipes.map(r => r.id);   // every cookable page known: nothing left to shelve
