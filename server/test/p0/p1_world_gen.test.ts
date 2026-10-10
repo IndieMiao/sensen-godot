@@ -215,13 +215,15 @@ describe('global generation (SGODOT-280)', () => {
       const was = all(bare).find(p => p.id === id), now = all(city).find(p => p.id === id);
       expect(was, `${id} is a place the generator makes`).toBeDefined();
       if (fix.lat !== undefined) expect(now).toMatchObject({ lat: fix.lat, lng: fix.lng });
-      expect(km(was!, now!)).toBeLessThanOrEqual(1);   // a nudge to the shore, not across town (nor a swapped lat / lng)
+      expect(km(was!, now!)).toBeLessThanOrEqual(3);   // to the nearest land that keeps the rules, not across town (nor a swapped lat / lng)
       const tackle = city.detail.outposts.find(o => o.id === id && o.role === 'tackle');
       if (tackle) expect(km(tackle, city.detail.ponds.find(p => p.name === tackle.nearest!.name)!) * 1000).toBeLessThanOrEqual(300);
       expect(all(city).filter(p => !fixed.has(p.id))).toEqual(all(bare).filter(p => !fixed.has(p.id)));
     }
     expect(cityPlaces(c, LA)!.detail.outposts.find(o => o.id === `${LA}~tackle2`))
       .toMatchObject({ name: 'Clover Tackle Shop', lat: 34.040844, lng: -118.219243, nearest: { name: 'Clover Cove' } });
+    // New York's beginner pond, its shop and Market Square 1 came off the Hudson together (司空震, 286 16ffaf67)
+    expect(placeOf(c, `${NYC}~pond0`)).toMatchObject({ beginner: true, at: [40.729478, -74.013998] });
     // A renamed pond (before the freeze) keeps its tackle shop pointing at it; a point without both lat and lng is ignored.
     const tokyo = structuredClone(generateCity(c, clusters.get(TOKYO)!).detail);
     const [pond, shop] = [tokyo.ponds[0], tokyo.outposts.find(o => o.id === `${TOKYO}~tackle0`)!];
