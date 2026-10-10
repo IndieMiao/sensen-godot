@@ -18,6 +18,7 @@
  * fish (Old Kai's Rare fish: Golden Koi, Fishing Lv4); it can still be taken in the shop before that.
  */
 import { BOARDS, handIn, slotCount } from './boards.js';
+import { pondFishIds } from './fishing_world.js';
 import type { Need, OutpostDef, P0Content, ShopId } from './content.js';
 import { matches } from './requests.js';
 import { progressOf, requestState, stageIndex } from './residents.js';
@@ -73,7 +74,7 @@ function fishFor(c: P0Content, items: string[], need: Pick<Need, 'kind' | 'rarit
 export function pondFor(c: P0Content, fish: string[]): string | null {
   const city = c.profile.city.toLowerCase();
   const fits = Object.entries(c.fishing.places)
-    .filter(([, p]) => p.city === city && fish.some(f => c.fishing.sites[p.site]?.fish.includes(f)));
+    .filter(([id, p]) => p.city === city && fish.some(f => pondFishIds(c, id).has(f)));
   const beginner = fits.find(([, p]) => p.beginner);
   if (beginner) return beginner[0];
   const farm = c.profile.farm_at;
@@ -83,10 +84,10 @@ export function pondFor(c: P0Content, fish: string[]): string | null {
 
 /** Of these fish, the ones the player can land now somewhere in P0 (its level reached, a pond or river has it). */
 function landable(c: P0Content, s: P0State, fish: string[]): string[] {
-  const sites = Object.values(c.fishing.sites), level = skillLevel(c, s, 'fishing');
+  const held = pondFishIds(c), level = skillLevel(c, s, 'fishing');
   return fish.filter(id => {
     const f = c.fish.find(x => x.id === id);
-    return !!f && f.level <= level && sites.some(site => site.fish.includes(id));
+    return !!f && f.level <= level && held.has(id);
   });
 }
 

@@ -125,7 +125,8 @@ describe('map pin markers (§9.5.2, q(48); SGODOT-232)', () => {
     expect(pondFor(c, ['fish_crucian'])).toBe('pond_san_francisco_03');   // Fern Pond (beginner, Pond template)
     expect(pondFor(c, ['fish_koi'])).toBe('pond_san_francisco_03');       // Golden Koi lives in Pond only
     expect(pondFor(c, ['fish_trout'])).toBe('pond_san_francisco_06');     // River only: Blossom Pond is the nearest River pond (1.46 km)
-    expect(pondFor(c, ['fish_mackerel'])).toBeNull();                // Coast: no such pond in P0
+    expect(pondFor(c, ['fish_mackerel'])).toBe('pond_san_francisco_02');   // Coast only: Clover Pond, Coast from P1 (q(109))
+    expect(pondFor(c, ['fish_tilapia'])).toBeNull();                 // another climate's regional fish: no pond here
   });
 
   it('one marker per place, deliver before request before new; old saves get an empty seen list', () => {

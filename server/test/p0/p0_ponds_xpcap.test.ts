@@ -23,14 +23,14 @@ function step(s: P0State, cmd: P0Command, at = T) {
 }
 
 describe('pond templates by point and the cast check (q(36), SGODOT-232 S6)', () => {
-  it('maps the six San Francisco ponds (SGODOT-270): Fern is the beginner pond; Fern, Willow and Reed are Pond, the others River', () => {
+  it('maps the six San Francisco ponds (SGODOT-270): Fern is the beginner pond; Fern, Willow and Reed are Pond, Clover Coast (P1, 李白 q(109)), the others River', () => {
     const t = (id: string) => c.fishing.sites[c.fishing.places[id].site].template;
     expect(Object.keys(c.fishing.places)).toHaveLength(6);
     expect(['pond_san_francisco_03', 'pond_san_francisco_01', 'pond_san_francisco_05'].map(t)).toEqual(['Pond', 'Pond', 'Pond']);
-    expect(['pond_san_francisco_06', 'pond_san_francisco_02', 'pond_san_francisco_04'].map(t)).toEqual(['River', 'River', 'River']);
+    expect(['pond_san_francisco_06', 'pond_san_francisco_02', 'pond_san_francisco_04'].map(t)).toEqual(['River', 'Coast', 'River']);
     expect(Object.entries(c.fishing.places).filter(([, p]) => p.beginner).map(([id]) => id)).toEqual([FERN]);
     const v = viewOf(c, fresh(), T);
-    expect(v.fishing.places[FERN]).toEqual({ name: 'Fern Pond', site: 'pond', template: 'Pond', beginner: true });
+    expect(v.fishing.places[FERN]).toMatchObject({ name: 'Fern Pond', site: 'pond', template: 'Pond', beginner: true });   // + daypart, weather, fish (SGODOT-283)
     expect(v.fishing.place).toBeNull();
   });
 

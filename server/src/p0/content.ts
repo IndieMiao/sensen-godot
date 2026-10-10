@@ -21,10 +21,18 @@ export interface Crop {
 
 export interface Fish {
   id: string; name: string; rarity: number; level: number; price: number; cook?: boolean; where: string[];
-  regional?: boolean; zones?: string[];   // P1 regional fish (§6.2.3): the climates they live in
+  // P1 (§6.2.1, SGODOT-283): a time multiplier per window or a window it only bites in, weather multipliers, and the
+  // regional fish's climates (fishing_world.ts reads them)
+  time?: Partial<Record<'dawn_dusk' | 'night', number>> | 'night_only' | 'dawn_dusk_only';
+  weather?: Partial<Record<'sun' | 'rain' | 'wind', number>>;
+  regional?: boolean; zones?: string[];
 }
-export interface Rod { id: string; name: string; reach: number; level: number; price: number; hook_bonus_ms: number; band_bonus: number }
-export interface FishSite { name: string; template: string; weights: number[]; fish: string[] }
+/** loss_mult: the minigame's out-of-band loss (Carbon Rod 0.9, §6.5.2); bite_spread_ms: the bite wait's random span
+ * (Carbon Rod 1800 instead of fishing.bite_spread_ms). */
+export interface Rod { id: string; name: string; reach: number; level: number; price: number; hook_bonus_ms: number; band_bonus: number; loss_mult?: number; bite_spread_ms?: number }
+/** A fishing template (Pond / River / Coast). Its fish come from the fish table by habitat (fishing_world.ts poolAt),
+ * not from a list here (SGODOT-283). */
+export interface FishSite { name: string; template: string; weights: number[] }
 /** A pond on the map (assets/p0/p0_ponds.json id): its fishing template follows the point, not its shape (q(36)). */
 export interface FishPlace { name: string; site: string; city: string; cluster?: string; beginner?: boolean; at?: [number, number] }   // at: the pond list's point; cluster: SGODOT-280
 /** An outpost on the P0 map (assets/p0/p0_outposts.json, SGODOT-227): its role and the residents who live there. */
@@ -135,9 +143,9 @@ export interface P0Content {
     bite_min_ms: number; bite_spread_ms: number; hook_window_ms: number; stale_ms: number;
     catch_xp: number[]; first_xp: number[]; first_cast_xp: number; first_landed_xp: number; first_city_xp: number;
     rods: Rod[];
-    sites: Record<string, FishSite>;      // templates: pond (Pond) / river (River)
+    sites: Record<string, FishSite>;      // templates: pond (Pond) / river (River) / coast (Coast, P1)
     places: Record<string, FishPlace>;
-    baits: Record<string, { shift: number[]; wait: number }>;
+    baits: Record<string, { shift: number[]; wait: number; regional_mult?: number }>;   // regional_mult: Spinner Lure 2 (§6.4.2)
   };
   goods: Record<string, { name: string; price: number; skill: Skill; gate: number; daily: number; grow_mult?: number }>;
   blessing: { days: number; regen_mult: number; food_bonus: number };

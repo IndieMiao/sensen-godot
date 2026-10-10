@@ -341,7 +341,8 @@
       "where": [
         "pond",
         "river"
-      ]
+      ],
+      "weather": {"rain": 1.5}
     },
     {
       "id": "fish_mullet",
@@ -374,7 +375,8 @@
       "where": [
         "pond",
         "river"
-      ]
+      ],
+      "time": {"dawn_dusk": 2}
     },
     {
       "id": "fish_trout",
@@ -384,7 +386,8 @@
       "price": 8,
       "where": [
         "river"
-      ]
+      ],
+      "weather": {"rain": 2}
     },
     {
       "id": "fish_mackerel",
@@ -394,7 +397,8 @@
       "price": 8,
       "where": [
         "coast"
-      ]
+      ],
+      "weather": {"wind": 2}
     },
     {
       "id": "fish_koi",
@@ -405,7 +409,8 @@
       "cook": false,
       "where": [
         "pond"
-      ]
+      ],
+      "weather": {"sun": 1.5}
     }
   ],
   "fishing": {
@@ -452,13 +457,6 @@
           30,
           9,
           1
-        ],
-        "fish": [
-          "fish_crucian",
-          "fish_carp",
-          "fish_perch",
-          "fish_bass",
-          "fish_koi"
         ]
       },
       "river": {
@@ -469,14 +467,6 @@
           40,
           20,
           5
-        ],
-        "fish": [
-          "fish_crucian",
-          "fish_carp",
-          "fish_mullet",
-          "fish_perch",
-          "fish_bass",
-          "fish_trout"
         ]
       }
     },
@@ -494,7 +484,7 @@
       },
       "pond_san_francisco_02": {
         "name": "Clover Pond",
-        "site": "river",
+        "site": "coast",
         "city": "san francisco", "cluster": "gn-5391959"
       },
       "pond_san_francisco_01": {
@@ -2045,7 +2035,9 @@
     },
     "buy": [
       "rod_reed",
-      "bait_worm"
+      "rod_carbon",
+      "bait_worm",
+      "bait_lure"
     ]
   },
   "tools": {

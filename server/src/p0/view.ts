@@ -23,6 +23,8 @@ import { restReadyIn } from './presence.js';
 import { inboxView, settleParcels } from './parcels.js';
 import { cookbookView, masteredCount } from './cookbook.js';
 import { mapMarkers } from './markers.js';
+import { everFish, pondAt, pondFishIds } from './fishing_world.js';
+import { homeCluster } from './travel.js';
 import { decorView } from './decor.js';
 
 /** opts.online: players in the P0 outpost rooms right now (SGODOT-227), for the Tea Host's answer; null when not known. */
@@ -99,11 +101,17 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     fishing: {
       sites: Object.fromEntries(Object.entries(f.sites).map(([id, site]) => [id, { name: site.name, template: site.template }])),
       // q(36): every catalog pond with its template; place = the pond the player is at (null away from ponds).
-      places: Object.fromEntries(Object.entries(f.places).map(([id, p]) => [id, {
-        name: p.name, site: p.site, template: f.sites[p.site]?.template ?? '', beginner: p.beginner === true }])),
+      // SGODOT-283: and what that pond is like now — its time of day and today's weather in its city — and every fish
+      // it can ever give there (habitat × the city's regional fish), for the pond card and its Details list.
+      places: Object.fromEntries(Object.entries(f.places).map(([id, p]) => {
+        const pond = pondAt(c, id, now);
+        return [id, { name: p.name, site: p.site, template: f.sites[p.site]?.template ?? '', beginner: p.beginner === true,
+          daypart: pond.part, weather: pond.weather, fish: [...pondFishIds(c, id)] }];
+      })),
       place: s.presence.place ?? null,
       rod: (rodById(c, s.gear.rod) ?? f.rods[0]).name, rod_reach: (rodById(c, s.gear.rod) ?? f.rods[0]).reach,
       hook_bonus_ms: (rodById(c, s.gear.rod) ?? f.rods[0]).hook_bonus_ms, band_bonus: (rodById(c, s.gear.rod) ?? f.rods[0]).band_bonus,
+      loss_mult: (rodById(c, s.gear.rod) ?? f.rods[0]).loss_mult ?? 1,   // Carbon Rod 0.9: the minigame's out-of-band loss
       cast_energy: f.cast_energy,
       cast: s.cast ? { rarity: fishById(c, s.cast.fish)!.rarity, site: s.cast.site, bite_in: Math.max(0, s.cast.at + s.cast.bite_ms - now),
         hook_ms: f.hook_window_ms + (rodById(c, s.gear.rod)?.hook_bonus_ms ?? 0), breaks: s.cast.breaks, bait: s.cast.bait } : null,
@@ -405,7 +413,7 @@ function keepersView(c: P0Content, s: P0State, now: number, online: number | nul
   const fishing = skillLevel(c, s, 'fishing');
   const reed = c.fishing.rods.find(r => r.id === 'rod_reed');
   const nextFish = Object.fromEntries(Object.entries(c.fishing.sites).map(([site, def]) => {
-    const above = def.fish.map(f => fishById(c, f)!).filter(f => f.level > fishing).sort((a, b) => a.level - b.level)[0];
+    const above = everFish(c, def, homeCluster(c)).filter(f => f.level > fishing).sort((a, b) => a.level - b.level)[0];
     return [site, above ? { id: above.id, level: above.level } : null];
   }));
   const tea = { cups_left: left, full, greet: left <= 0 ? 'cups_out' : full ? 'full' : 'cups_left', online };
