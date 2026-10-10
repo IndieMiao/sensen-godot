@@ -542,7 +542,7 @@ const EFFECTS := {
 	"torch": "See what rocks hold",
 	"fert_compost": "Crops ready 20% sooner",
 	"facility_sprinkler": "Waters 8 plots for you",   # P1 FARM-5 v5 (q(59) §5)
-	"facility_greenhouse": "16 plots · −25%",          # q(118) ② (李白: the status card's line)
+	"facility_greenhouse": "Any seed grows inside",     # FARM-5 (不知火舞 on 241 e3141c25; `16 plots · −25%` is the status card's)
 	"facility_compost_bin": "5 crops → 5 Compost a day",   # q(118) ③ (不知火舞 on 241, FARM-5-FAC 2109:133018)
 }
 
@@ -594,12 +594,13 @@ static func _craft_button(r: Dictionary) -> Dictionary:
 			return {"label": "%s Lv%d" % [str(d.get("skill", "")).capitalize(), int(d.get("level", 1))], "kind": "unavailable", "cmd": {}}
 		"skill_level_required":   # q(59) §5: `Farming Lv6 needed`
 			return {"label": "%s Lv%d needed" % [str(d.get("skill", "")).capitalize(), int(d.get("level", 1))], "kind": "unavailable", "cmd": {}}
-		"facility_cap":   # q(59) §5: `Sprinklers 6/6 · Homestead Lv4 adds 1`; with no higher level, only the count
+		"facility_cap":   # q(130) ①: the grey key only counts, `Sprinklers 6/6`; a tap's Info toast says what adds one,
+			# `Sprinklers 6/6 · Homestead Lv4 adds 1` / `Greenhouses 1/1 · Farming Lv10 adds 1`; at the top both only count
 			var label := "%ss %d/%d" % [str(r.get("name", "")), int(d.get("used", 0)), int(d.get("cap", 0))]
-			if d.get("homestead_next", null) != null: label += " · Homestead Lv%d adds 1" % int(d.homestead_next)
-			# the greenhouse's cap goes by Farming (Lv8 1, Lv10 2; 李白): `Greenhouses 1/1 · Farming Lv10 adds 1`
-			if d.get("farming_next", null) != null: label += " · Farming Lv%d adds 1" % int(d.farming_next)
-			return {"label": label, "kind": "unavailable", "cmd": {}}
+			var toast := label
+			if d.get("homestead_next", null) != null: toast += " · Homestead Lv%d adds 1" % int(d.homestead_next)
+			if d.get("farming_next", null) != null: toast += " · Farming Lv%d adds 1" % int(d.farming_next)
+			return {"label": label, "kind": "unavailable", "cmd": {}, "toast": toast}
 		"no_coins":   # LOCK-10 (the greenhouse's 300 coins with the 40 floor)
 			return {"label": "Need %d more coins" % int(d.get("need", 0)), "kind": "unavailable", "cmd": {}}
 		"need_material", "missing_materials":

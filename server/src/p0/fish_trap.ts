@@ -5,13 +5,14 @@
  * it catches one fish of that pond's Common / Fine pool — regional fish and the time of day included, at the moment that
  * fish came in — up to 3 kept; from Fishing Lv9 one in ten is Rare. Nothing runs on a timer: the fish are worked out
  * when the player looks or collects (as Energy regen is). Collecting needs the player at that pond, costs nothing,
- * gives half the fish's catch XP (with the level gap) and leaves in the trap what the creel cannot hold.
+ * gives half the fish's catch XP (with the level gap) and leaves in the trap what the creel cannot hold. A kind first
+ * got from a trap gets the catch's one-time firsts as a rod's would (q(124) ①: `In your trap!`, firstCatch).
  */
 import { createHash } from 'node:crypto';
 import { add, count, room, stackLimit, take } from './bag.js';
 import { fishById, type Fish, type P0Content } from './content.js';
 import { pondAt, poolAt } from './fishing_world.js';
-import { noteFishdex } from './fishing.js';
+import { firstCatch, noteFishdex } from './fishing.js';
 import { gainXp, type P0Event } from './progress.js';
 import { scaledXp, skillLevel, xpPercent } from './rules.js';
 import type { P0State } from './state.js';
@@ -120,6 +121,7 @@ export function collectTrap(c: P0Content, s: P0State, cmd: { take_back?: unknown
     events.push({ kind: 'item', id, delta: 1 });
     const pct = xpPercent(c, level, f.level);
     gainXp(c, s, now, 'fishing', scaledXp(s, Math.round(c.fishing.catch_xp[f.rarity - 1] * r.xp_pct / 100), pct), pct, events);
+    firstCatch(c, s, now, f, place, events, false);   // given once, rod or trap, whichever comes first (q(124) ①)
   }
   if (got.length) noteFishdex(c, s, now, events);   // a trapped fish fills the Fish-dex as a rod's does
   if (was >= r.keep && kept.length < r.keep) t.from = now;   // it was full: the next fish counts from now

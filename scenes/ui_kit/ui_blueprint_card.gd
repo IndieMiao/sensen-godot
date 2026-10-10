@@ -123,6 +123,7 @@ func set_data(d: Dictionary) -> void:
 	_materials.visible = not mats.is_empty()   # an owned tool turns its materials off (Show materials, main)
 	var b: Dictionary = d.get("button", {})
 	button.label = str(b.get("label", ""))
+	button.reason_beside = false
 	match int(b.get("kind", Kind.PRIMARY)):
 		Kind.PRIMARY:
 			button.kind = UiCommandButton.Kind.PRIMARY
@@ -132,6 +133,11 @@ func set_data(d: Dictionary) -> void:
 			button.reason = ""
 		_:
 			button.reason = button.label   # LOCK-10: the label is the reason, the button stays tappable
+			# a longer toast than the key (q(130) ①: the key `Greenhouses 1/1`, the tap's toast what adds one)
+			var toast := str(b.get("toast", ""))
+			if toast != "" and toast != button.label:
+				button.reason = toast
+				button.reason_beside = true
 
 func tiles() -> Array[UiNeedTile]: return _tiles
 

@@ -360,7 +360,7 @@ static func tokens(view: Dictionary, item_id: String, context: StringName, opts 
 		# A workbench item (SGODOT-231 B2-06): its effect line, then In Gear for an owned pickaxe or the gloves' passive note.
 		craft_effect = str(P0MaterialLogic.EFFECTS.get(item_id, "")),
 		craft_note = _craft_note(view, item_id),
-		# Decorate (SGODOT-284, q(111) / q(113)): a piece's footprint, its row line (`1×1 · Glows at night` /
+		# Decorate (SGODOT-284, q(111) / q(113)): a piece's footprint, its row line (`1×1 · Classic lamp` /
 		# `5 pieces`) and the row's third line — the levels still to go while it is locked, else `In storage ×2`.
 		footprint = P0Decor.footprint(item_id) if kind == "decor" else "",
 		decor_line = P0Decor.line(item_id) if kind == "decor" else "",

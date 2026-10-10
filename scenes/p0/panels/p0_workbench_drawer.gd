@@ -105,7 +105,7 @@ static func _card_data(m: Dictionary) -> Dictionary:
 	return {
 		"icon": P0Logic.icon(str(m.item)), "name": m.name, "effect": m.effect, "yield": m.yield, "have": m.have,
 		"materials": (m.cost as Array).map(func(c): return {"icon": P0Logic.icon(str(c.id)), "name": c.name, "have": c.have, "need": c.need}),
-		"button": {"label": b.label, "kind": _KINDS.get(str(b.kind), UiBlueprintCard.Kind.UNAVAILABLE)},
+		"button": {"label": b.label, "kind": _KINDS.get(str(b.kind), UiBlueprintCard.Kind.UNAVAILABLE), "toast": str(b.get("toast", ""))},
 	}
 
 func card(recipe_id: String) -> UiBlueprintCard: return _cards.get(recipe_id)

@@ -91,3 +91,15 @@ func test_a_fourth_material_wraps_to_a_second_row() -> void:
 	c.set_data(d)   # set again: the rows are rebuilt, not added to
 	await await_idle_frame()
 	assert_int(c._materials.get_child_count()).is_equal(2)
+
+## q(130) ①: a grey key with a longer toast shows its count and says the whole line when tapped.
+func test_a_grey_key_counts_and_its_tap_says_the_rest() -> void:
+	var c := _host(UiBlueprintCard.new(_data({"label": "Greenhouses 1/1", "kind": UiBlueprintCard.Kind.UNAVAILABLE,
+		"toast": "Greenhouses 1/1 · Farming Lv10 adds 1"}))) as UiBlueprintCard
+	assert_str(c.button.text).is_equal("Greenhouses 1/1")
+	var said := []
+	c.unavailable_pressed.connect(func(r): said.append(r))
+	c.button.pressed.emit()
+	assert_array(said).is_equal(["Greenhouses 1/1 · Farming Lv10 adds 1"])
+	c.set_data(_data({"label": "Need 2 more Copper Ore", "kind": UiBlueprintCard.Kind.UNAVAILABLE}))   # no toast: the key says it
+	assert_str(c.button.text).is_equal("Need 2 more Copper Ore")

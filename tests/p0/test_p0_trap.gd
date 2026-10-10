@@ -112,3 +112,77 @@ func test_the_creel_counts_each_fish_in_as_it_lands() -> void:
 	var flying := [{"id": "fish_crucian", "count": 2}, {"id": "fish_carp", "count": 1}]
 	assert_str(P0Logic.creel_line(v, flying)).is_equal("Creel 0 · 19 free")      # both stacks came with this catch
 	assert_str(P0Logic.creel_line(v, flying.slice(1))).is_equal("Creel 2 · 18 free")   # the crucians landed (TRAP-COLLECT-2)
+
+## q(124) ①: a kind first got from a trap gets the landed fish's first card, titled `In your trap!` — one a new kind in
+## the server's order; the reply's New city! XP on the first card, a first Fine's Energy on the first Fine's.
+const FIRST_EVENTS := [
+	{"kind": "item", "id": "fish_crucian", "delta": 1}, {"kind": "xp", "skill": "fishing", "amount": 2, "percent": 100},
+	{"kind": "first", "what": "catch:fish_crucian", "xp": 15}, {"kind": "xp", "skill": "fishing", "amount": 15, "percent": 100},
+	{"kind": "first", "what": "fishing_city:gn-5391959", "xp": 10, "name": "San Francisco"}, {"kind": "xp", "skill": "fishing", "amount": 10, "percent": 100},
+	{"kind": "item", "id": "fish_perch", "delta": 1}, {"kind": "xp", "skill": "fishing", "amount": 3, "percent": 100},
+	{"kind": "first", "what": "catch:fish_perch", "xp": 30}, {"kind": "xp", "skill": "fishing", "amount": 30, "percent": 100},
+	{"kind": "energy", "delta": 20, "reason": "reward"}, {"kind": "reward", "id": "first_fish_2", "energy": 20},
+	{"kind": "trap", "action": "collected", "place": FERN, "fish": 2, "left": 0}]
+
+func _first_view() -> Dictionary:
+	return {"energy": {"value": 140, "max": 200}, "coins": 52, "bag": {"capacity": 25, "free": 23, "slots": [
+		{"id": "fish_crucian", "qty": 1}, {"id": "fish_perch", "qty": 1}]}, "skills": {"fishing": {"level": 5}},
+		"items": {"fish_crucian": {"rarity": 1}, "fish_perch": {"rarity": 2}},
+		"names": {"fish_crucian": "Pond Crucian", "fish_perch": "River Perch"},
+		"fishing": {"dex": range(20).map(func(n): return {"id": "f%d" % n, "caught": 1 if n < 2 else 0})}}
+
+func test_a_trap_s_first_kind_gets_its_in_your_trap_card() -> void:
+	assert_array(P0Runtime.trap_cards(_first_view(), FIRST_EVENTS)).is_equal([
+		{"fish": "fish_crucian", "rarity": 1, "xp": 15, "extras": {"city_xp": 10, "dex_back": 1}},
+		{"fish": "fish_perch", "rarity": 2, "xp": 30, "extras": {"energy": 20}}])
+	var plain := FIRST_EVENTS.filter(func(e): return str(e.kind) not in ["first", "reward"])
+	assert_array(P0Runtime.trap_cards(_first_view(), plain)).is_empty()   # kinds it had: no card
+	assert_array(P0Runtime.trap_cards(_first_view(), FIRST_EVENTS.slice(0, 10))).is_empty()   # no trap event: a rod's
+
+## The collect's own XP float stays the trap's (§6.8: `+5 XP` here), the firsts' XP is on the cards, which come one at a
+## time once the fish are in the creel.
+func test_the_trap_cards_come_after_the_flights_and_keep_their_xp_off_the_float() -> void:
+	var rt: P0Runtime = auto_free(P0Runtime.new())
+	add_child(rt)
+	await get_tree().process_frame
+	var v := _first_view()
+	rt.session.view = v
+	rt.ui.set_view(v)
+	rt._on_state(v, FIRST_EVENTS)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var texts: Array = rt.ui.root.get_children().filter(func(c): return c is UiFloatText).map(func(f): return f.text)
+	assert_array(texts).contains(["+5 XP", "Pond Crucian ×1 · River Perch ×1"])
+	assert_array(texts).not_contains(["+20 Energy"])   # the first Fine's Energy is on its card
+	assert_array(texts.filter(func(t): return str(t).contains("15") or str(t).contains("30") or str(t).contains("+10 XP"))).is_empty()
+	assert_array(rt.ui.find_children("*", "UiRewardMoment", true, false)).is_empty()   # not while the fish fly
+	await get_tree().create_timer(UiItemFly.FLIGHT_S + UiItemFly.DELAY_STEP_S + P0Runtime.TRAP_CARD_AFTER_S + 0.1).timeout
+	var cards := rt.ui.find_children("*", "UiRewardMoment", true, false)
+	assert_int(cards.size()).is_equal(1)   # one at a time
+	var first: UiRewardMoment = cards[0]
+	assert_array([first.event, first.item_name, first.strip, first.note]).is_equal(["In your trap!", "Pond Crucian", "First catch! +15 XP · New city! +10 XP", "Fish-dex 1/20"])
+	rt.ui.close_modal()
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var second: UiRewardMoment = rt.ui.find_children("*", "UiRewardMoment", true, false).filter(func(m): return not m.is_queued_for_deletion()).front()
+	assert_array([second.event, second.item_name, second.strip, second.note]).is_equal(["In your trap!", "River Perch", "First catch! +30 XP", "Fish-dex 2/20"])
+	assert_int(second.rewards.size()).is_equal(1)   # the first Fine's +20 Energy
+
+## No new kind but the city's first fish (a trap set in Tokyo, collected before any rod catch there; 苏烈 on #290): no
+## card, so New city!'s XP is not hidden — it counts in the collect's `+N XP`, as on a rod's catch of a known kind.
+func test_a_new_city_without_a_new_kind_keeps_its_xp_in_the_float() -> void:
+	var rt: P0Runtime = auto_free(P0Runtime.new())
+	add_child(rt)
+	await get_tree().process_frame
+	var v := _first_view()
+	rt.session.view = v
+	rt.ui.set_view(v)
+	var events := [{"kind": "item", "id": "fish_crucian", "delta": 1}, {"kind": "xp", "skill": "fishing", "amount": 2, "percent": 100},
+		{"kind": "first", "what": "fishing_city:gn-1850147", "xp": 10, "name": "Tokyo"}, {"kind": "xp", "skill": "fishing", "amount": 10, "percent": 100},
+		{"kind": "trap", "action": "collected", "place": "gn-1850147~pond0", "fish": 1, "left": 0}]
+	assert_array(P0Runtime.trap_cards(v, events)).is_empty()
+	rt._on_state(v, events)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var texts: Array = rt.ui.root.get_children().filter(func(c): return c is UiFloatText).map(func(f): return f.text)
+	assert_array(texts).contains(["+12 XP"])

@@ -1,5 +1,5 @@
 {
-  "_note": "Decorate, shops line (SGODOT-284; plan §9.11.6, §8.3 decor cap, q(24), q(29); 苏烈). decor.items: the Homestead Stall's Decor page — blurb (how it looks in the yard, ≤ 14 characters so a greyed button's second line holds it: the row reads `1×1 · Glows at night`; a multi-piece one has no blurb and reads `5 pieces`, q(111) / q(113)), price, footprint [w, h] in garden cells (0.65 m), pieces per purchase (Stone Path 5, Fence Set 6), the Homestead level it opens at; buy = sold at the stall (recipe_stand is the Line Cook milestone's, never sold). Bought decor goes straight to Farm Storage (q(29)), is never sold back or gifted; placing it from storage counts against homestead.decor_max. decor.yard: where decor may stand on the garden grid (P0Garden): inside walk and off the field (`Outside your yard`), off every object (the house, facilities, gathering spots, the front fence, sign, plaque and mailbox: `Space taken`, as another piece), and off the paths (`Keep the path clear`, q(120) / 不知火舞 284 49b11f91: two cells wide to the map exit, the farmhouse door, the stall, the mine mouth and the workbench, so pieces — solid, like the facilities — never wall a place off). Rects are [x, y, w, h]. objects holds the facilities and spots both where farm-dev has them and where #215 moved them; gdUnit tests check P0Garden.FOOTPRINTS against it and walk a yard filled with pieces.",
+  "_note": "Decorate, shops line (SGODOT-284; plan §9.11.6, §8.3 decor cap, q(24), q(29); 苏烈). decor.items: the Homestead Stall's Decor page — blurb (how it looks in the yard, ≤ 14 characters so a greyed button's second line holds it: the row reads `1×1 · Classic lamp`; a blurb says only what the yard really shows, q(131); a multi-piece one has no blurb and reads `5 pieces`, q(111) / q(113)), price, footprint [w, h] in garden cells (0.65 m), pieces per purchase (Stone Path 5, Fence Set 6), the Homestead level it opens at; buy = sold at the stall (recipe_stand is the Line Cook milestone's, never sold). Bought decor goes straight to Farm Storage (q(29)), is never sold back or gifted; placing it from storage counts against homestead.decor_max. decor.yard: where decor may stand on the garden grid (P0Garden): inside walk and off the field (`Outside your yard`), off every object (the house, facilities, gathering spots, the front fence, sign, plaque and mailbox: `Space taken`, as another piece), and off the paths (`Keep the path clear`, q(120) / 不知火舞 284 49b11f91: two cells wide to the map exit, the farmhouse door, the stall, the mine mouth and the workbench, so pieces — solid, like the facilities — never wall a place off). Rects are [x, y, w, h]. objects holds the facilities and spots both where farm-dev has them and where #215 moved them; gdUnit tests check P0Garden.FOOTPRINTS against it and walk a yard filled with pieces.",
   "decor": {
     "items": {
       "deco_planter": {
@@ -16,7 +16,7 @@
       },
       "deco_lantern": {
         "name": "Garden Lantern",
-        "blurb": "Glows at night",
+        "blurb": "Classic lamp",
         "price": 40,
         "size": [
           1,
@@ -39,7 +39,7 @@
       },
       "deco_bench": {
         "name": "Wooden Bench",
-        "blurb": "Visitors can sit",
+        "blurb": "A sunny seat",
         "price": 60,
         "size": [
           2,
@@ -51,7 +51,7 @@
       },
       "deco_scarecrow": {
         "name": "Scarecrow",
-        "blurb": "Shoos crows",
+        "blurb": "Keeps watch",
         "price": 80,
         "size": [
           1,
@@ -74,7 +74,7 @@
       },
       "deco_birdbath": {
         "name": "Birdbath",
-        "blurb": "Birds drop by",
+        "blurb": "Bluebird perch",
         "price": 120,
         "size": [
           1,

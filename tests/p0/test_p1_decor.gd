@@ -61,8 +61,8 @@ func test_a_spot_is_judged_as_the_server_does() -> void:
 	assert_str(P0Decor.reason(v, "deco_planter", P0Decor.nearest_spot(v, "deco_planter", 0, Vector2i(9, 1)))).is_equal("")
 
 func test_rows_cards_and_lines_read_like_q111_and_q113() -> void:
-	assert_str(P0Decor.line("deco_lantern")).is_equal("1×1 · Glows at night")
-	assert_str(P0Decor.line("deco_bench")).is_equal("2×1 · Visitors can sit")
+	assert_str(P0Decor.line("deco_lantern")).is_equal("1×1 · Classic lamp")
+	assert_str(P0Decor.line("deco_bench")).is_equal("2×1 · A sunny seat")
 	assert_str(P0Decor.line("deco_path")).is_equal("5 pieces")
 	assert_bool(P0Decor.turns("deco_bench")).is_true()
 	assert_bool(P0Decor.turns("deco_windmill")).is_false()
@@ -139,9 +139,9 @@ func test_the_stall_decor_page_lists_the_pieces_in_their_states() -> void:
 	var row := func(id: String) -> Array:
 		var s := P0ItemInfo.spec(v, id, &"counter_buy", {counter = "homestead"})
 		return [s.facts, (s.buttons as Array).map(func(b): return "%s:%s" % [b.kind, b.label])]
-	assert_array(row.call("deco_scarecrow")).is_equal([["1×1 · Shoos crows"], ["secondary:Buy"]])
+	assert_array(row.call("deco_scarecrow")).is_equal([["1×1 · Keeps watch"], ["secondary:Buy"]])
 	assert_array(row.call("deco_fence")).is_equal([["6 pieces", "In storage ×6"], ["unavailable:Bought today · 9h 12m"]])
-	assert_array(row.call("deco_birdbath")).is_equal([["1×1 · Birds drop by"], ["unavailable:Need 40 more coins"]])
+	assert_array(row.call("deco_birdbath")).is_equal([["1×1 · Bluebird perch"], ["unavailable:Need 40 more coins"]])
 	assert_array(row.call("deco_windmill")).is_equal([["2×2 · Spins in wind", "1 level to go"], ["unavailable:Homestead Lv3 needed"]])
 
 ## Spec v2 (284 6a751a9a): a piece taps as at least 44 × 44 at any zoom (the whole yard is about 17 px a cell); the nearest
@@ -205,6 +205,106 @@ func test_the_first_pending_piece_is_taken_for_the_next_spot() -> void:
 	assert_str(P0Decor.reason(v, "deco_path", Vector2i(8, 1))).is_equal("Space taken")
 	assert_that(P0Decor.nearest_spot(v, "deco_path", 0, Vector2i(9, 1))).is_not_equal(Vector2i(8, 1))
 	assert_str(P0Decor.reason(v, "deco_path", Vector2i(8, 1), 0, -1)).is_equal("")   # moving that very piece
+
+## SGODOT-290: every piece sold has 刘备's model (the Recipe Stand, a reward, keeps its shape). Each stands on its
+## footprint's middle, feet on the ground, inside its cells (the kit's two exceptions: the Fence's half posts meet at
+## the seam, the Scarecrow's hands reach 0.85), turned with rot, within the brief's triangle budget.
+func _bounds(root: Node3D) -> AABB:
+	var out := AABB()
+	var first := true
+	for m in root.find_children("*", "MeshInstance3D", true, false):
+		var xf := Transform3D.IDENTITY
+		var n: Node = m
+		while n != root:
+			xf = (n as Node3D).transform * xf
+			n = n.get_parent()
+		var b: AABB = xf * (m as MeshInstance3D).mesh.get_aabb()
+		out = b if first else out.merge(b)
+		first = false
+	return out
+
+func _tris(root: Node3D) -> int:
+	var n := 0
+	for m in root.find_children("*", "MeshInstance3D", true, false):
+		var mesh: Mesh = (m as MeshInstance3D).mesh
+		for s in mesh.get_surface_count():
+			var a := mesh.surface_get_arrays(s)
+			n += (a[Mesh.ARRAY_INDEX] as PackedInt32Array).size() / 3 if a[Mesh.ARRAY_INDEX] != null else (a[Mesh.ARRAY_VERTEX] as PackedVector3Array).size() / 3
+	return n
+
+const BUDGET := {"deco_fence": 500, "deco_path": 500, "deco_fountain": 4000, "deco_windmill": 4000}   # else 2000
+
+func test_every_piece_has_its_model_in_its_cells() -> void:
+	var sold: Array = (P0Logic.content().get("decor", {}).get("items", {}) as Dictionary).keys().filter(func(id): return str(id).begins_with("deco_"))
+	assert_int(sold.size()).is_equal(10)
+	assert_bool(P0FarmDecor.has_model("recipe_stand")).is_false()
+	for id in sold:
+		assert_bool(P0FarmDecor.has_model(id)).override_failure_message(id).is_true()
+		for rot in 2:
+			var a: Node3D = auto_free(P0FarmDecor.art(id, rot, 0.65))
+			var size := P0Decor.size_of(id, rot)
+			var b := _bounds(a)
+			var reach := 0.85 if id == "deco_scarecrow" else size.x * 0.65   # the hands' allowed reach (the kit's README)
+			var deep := 0.85 if id == "deco_scarecrow" else size.y * 0.65
+			assert_float(b.position.y).override_failure_message(id).is_between(-0.01, 0.01)       # feet on the ground
+			assert_float(b.size.x).override_failure_message("%s %d" % [id, rot]).is_less_equal(reach + 0.001)
+			assert_float(b.size.z).override_failure_message("%s %d" % [id, rot]).is_less_equal(deep + 0.001)
+			assert_float(absf(b.get_center().x)).override_failure_message(id).is_less(0.08)
+			assert_float(absf(b.get_center().z)).override_failure_message(id).is_less(0.08)
+			assert_int(_tris(a)).override_failure_message(id).is_less_equal(int(BUDGET.get(id, 2000)))
+	var bench: Node3D = auto_free(P0FarmDecor.art("deco_bench", 0))
+	var turned: Node3D = auto_free(P0FarmDecor.art("deco_bench", 1))
+	assert_float(_bounds(bench).size.x).is_greater(_bounds(bench).size.z)   # 2×1 runs along x …
+	assert_float(_bounds(turned).size.z).is_greater(_bounds(turned).size.x)   # … and along z once turned
+	var stand: Node3D = auto_free(P0FarmDecor.art("recipe_stand"))
+	assert_bool(stand.find_children("*", "MeshInstance3D", true, false).all(func(m): return (m as MeshInstance3D).mesh is PrimitiveMesh)).is_true()
+	# the sails sit on the body's rotor socket (manifest), the whole sweep inside the 2 × 2 cells
+	assert_vector(P0FarmDecor.socket("deco_windmill", "rotor")).is_equal_approx(Vector3(0, 0.985, 0.273), Vector3.ONE * 0.001)
+	var mill: Node3D = auto_free(P0FarmDecor.art("deco_windmill"))
+	assert_vector((mill.find_child("Sails", true, false) as Node3D).position).is_equal_approx(Vector3(0, 0.985, 0.273), Vector3.ONE * 0.001)
+
+func test_the_preview_ghosts_its_own_materials() -> void:
+	var placed: Node3D = auto_free(P0FarmDecor.art("deco_fountain"))
+	var preview: Node3D = auto_free(P0FarmDecor.art("deco_fountain"))
+	P0FarmDecor.ghost(preview)
+	for m in preview.find_children("*", "MeshInstance3D", true, false):
+		var mat := (m as MeshInstance3D).material_override as StandardMaterial3D
+		assert_object(mat).is_not_null()
+		assert_float(mat.albedo_color.a).is_equal_approx(0.6, 0.001)
+	var body: MeshInstance3D = placed.find_children("*", "MeshInstance3D", true, false)[0]
+	assert_object(body.material_override).is_same(P0FarmDecor.FarmArt.material())   # the shared one untouched
+	assert_float((body.material_override as StandardMaterial3D).albedo_color.a).is_equal(1.0)
+
+## The windmill's sails turn once a SAIL_TURN_S, one tween however often the piece re-enters the tree (周瑜 on #276).
+func test_the_sails_turn_with_one_tween() -> void:
+	var running := func() -> int: return get_tree().get_processed_tweens().filter(func(tw: Tween): return tw.is_valid() and tw.is_running()).size()
+	var before: int = running.call()   # other tweens in the scene don't count (周瑜 on #276)
+	var mill: Node3D = P0FarmDecor.art("deco_windmill")
+	add_child(mill)
+	var sails := mill.find_child("Sails", true, false) as Node3D
+	remove_child(mill)
+	add_child(mill)
+	assert_bool(sails.get_meta("turning", false)).is_true()
+	assert_int(running.call() - before).is_equal(1)
+	var was := sails.rotation.z
+	await get_tree().create_timer(0.3).timeout
+	assert_float(absf(sails.rotation.z - was)).is_greater(0.01)   # it turns
+	mill.free()
+
+## 上官婉儿 on #276: every placed piece of a kind is one draw — its instances at their footprints' middles, turned as
+## art() turns them; the piece a Move lifted is left out; a piece without a model is not batched.
+func test_placed_pieces_batch_by_kind() -> void:
+	var list := [{"uid": 1, "id": "deco_fence", "x": 3, "y": 18, "rot": 0}, {"uid": 2, "id": "deco_fence", "x": 4, "y": 18, "rot": 1},
+		{"uid": 3, "id": "deco_path", "x": 5, "y": 18, "rot": 0}, {"uid": 4, "id": "recipe_stand", "x": 6, "y": 18, "rot": 0},
+		{"uid": 5, "id": "deco_path", "x": 7, "y": 18, "rot": 0}]
+	var at := func(id: String, cell: Vector2i, _rot: int) -> Vector3: return Vector3(cell.x, 0, cell.y)
+	var g := P0FarmDecor.batch_transforms(list, 5, 0.65, at)
+	assert_array(g.keys()).contains_exactly_in_any_order(["deco_fence", "deco_path"])
+	assert_int((g.deco_fence as Array).size()).is_equal(2)
+	assert_int((g.deco_path as Array).size()).is_equal(1)   # uid 5 lifted
+	var turned: Transform3D = g.deco_fence[1]
+	assert_vector(turned.origin).is_equal(Vector3(4, 0, 18))
+	assert_vector(turned.basis.x).is_equal_approx(Vector3(0, 0, 1), Vector3.ONE * 0.001)   # a quarter turn, as art()
 
 ## 不知火舞 on 290 (993a560e): the garden's own dressing stands on no cell a piece may take — the sign by the gate, the
 ## bushes, the stepping stones and the scattered rocks (solid) are the yard's objects too, or a piece would stand through

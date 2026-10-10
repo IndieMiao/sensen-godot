@@ -228,6 +228,21 @@ func test_three_items_make_two_lines_of_their_own() -> void:
 	assert_float(float(heights[1])).is_equal_approx(float(heights[2]), 0.5)   # one line each, the same height
 	assert_bool((lines[2] as UiFloatText).text.ends_with("·")).is_false()
 
+## Split item lines would pass the cap of three (an Energy line too): the items stay one line in their own order and
+## join as q(49)'s overflow does, never reordered by the split.
+func test_items_past_the_cap_stay_one_line_in_their_order() -> void:
+	var ui := P0Ui.new()
+	ui.quick_store = STORE
+	add_child(auto_free(ui))
+	await get_tree().process_frame
+	ui.set_view({"energy": {"value": 140, "max": 200}, "coins": 52, "bag": {"capacity": 25, "slots": []}, "skills": {}})
+	ui.set_surface("pond")
+	var parts := [{kind = "energy", key = "energy", amount = 20, fmt = "%s Energy"},
+		{kind = "xp", key = "trap_xp", amount = 7, fmt = "%s XP", tone = UiFloatText.Tone.XP}]
+	for n in ["River Perch ×1", "Common Carp ×1", "Arctic Char ×1"]: parts.append({kind = "item", key = n, text = n})
+	var lines: Array = ui.float_lines(parts, Vector2(180, 420))
+	assert_array(lines.map(func(f): return (f as UiFloatText).text)).is_equal(["+20 Energy", "+7 XP", "River Perch ×1 · Common Carp ×1 · Arctic Char ×1"])
+
 ## The lines a split item group makes pop as one block (不知火舞 on #289, Cook All's `−5 Pond Crucian · −2 Wild Herb` /
 ## `−2 Radish`): they start together, each its own height and FLOAT_GROUP_GAP apart, growing from the lowest line, so
 ## they never meet — at the pop's peak or at rest — and neither shows up after the other.
@@ -239,17 +254,21 @@ func test_a_split_item_group_pops_together_and_its_lines_never_meet() -> void:
 	ui.set_view({"energy": {"value": 140, "max": 200}, "coins": 52, "bag": {"capacity": 25, "slots": []}, "skills": {}})
 	ui.set_surface("pond")
 	var parts := [{kind = "xp", key = "trap_xp", amount = 7, fmt = "%s XP", tone = UiFloatText.Tone.XP}]
-	for n in ["River Perch ×1", "Common Carp ×1", "Arctic Char ×1"]: parts.append({kind = "item", key = n, text = n})
+	# a wide top line: its peak alone would be capped (336 px) below the short line's ×1.3 (苏烈 on #289)
+	for n in ["Largemouth Bass ×12", "Walleye ×9", "Arctic Char ×1"]: parts.append({kind = "item", key = n, text = n})
 	var lines: Array = ui.float_lines(parts, Vector2(180, 420))
 	var low: UiFloatText = lines[1]
 	var high: UiFloatText = lines[2]
+	assert_int(high.layout).is_equal(UiFloatText.Layout.HUG)   # one line, as wide as it reads
+	assert_float(high.peak_cap).is_less(UiFloatText._PEAK)   # the wide line's cap is the group's
+	assert_float(low.peak_cap).is_equal(high.peak_cap)
 	for i in 16:
 		await get_tree().create_timer(0.05).timeout
 		assert_float(low.group_rise).is_equal(0.0)   # the lower line rests where it is played; the upper one on it
 		assert_float(high.group_rise).is_equal_approx(low.shown_size().y + P0Ui.FLOAT_GROUP_GAP, 0.1)
-		# one start: they fade in and scale together (a wide line's peak may be capped a little lower, 336 px)
+		# one start and one peak: they fade in and scale together, the wide line's cap shared by the group
 		assert_float(high.modulate.a).is_equal_approx(low.modulate.a, 0.001)
-		assert_float(high.scale.y).is_equal_approx(low.scale.y, 0.01)
+		assert_float(high.scale.y).is_equal_approx(low.scale.y, 0.001)
 		var low_pill := low.get_child(0) as Control
 		var high_pill := high.get_child(0) as Control
 		var low_top := (low_pill.get_global_transform() * Vector2.ZERO).y

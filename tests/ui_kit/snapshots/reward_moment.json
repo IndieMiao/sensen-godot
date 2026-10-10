@@ -218,7 +218,7 @@
                                 36
                               ],
                               "variation": "CaptionXB12",
-                              "text": "First cooked · +20 Cooking XP · Cookbook 2/48"
+                              "text": "First cooked · +20 Cooking XP\nCookbook 2/48"
                             }
                           ]
                         }
@@ -996,7 +996,7 @@
                                 18
                               ],
                               "variation": "CaptionXB12",
-                              "text": "Title · +50 Energy"
+                              "text": "Title · +50 Energy"
                             }
                           ]
                         }
