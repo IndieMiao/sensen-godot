@@ -65,6 +65,20 @@ describe('Harvest All (Farming Lv9)', () => {
     expect(roomy.ok && roomy.events.some((e: P0Event) => e.kind === 'harvest_short')).toBe(false);
   });
 
+  it('counts a seed Seed Saver put in for the plots after it: a crop is never cleared from its plot and lost (哪吒 on #269)', () => {
+    const lucky = { ...c, farming: { ...c.farming!, seed_saver_chance: 1 } };   // every harvest gives a seed back
+    const s = farmer(10, [6]);
+    s.plots[7] = { id: 7, state: 'growing', crop: 'crop_carrot', ready_at: T0 + 4 * H, xp_pct: 100 };
+    s.bag = Array.from({ length: s.bag_cap - 2 }, (_, i) => ({ id: `fish_filler_${i}`, qty: 1 }));   // two slots free
+    const r = applyP0(lucky, s, all([6, 7]), T0 + 5 * H);
+    if (!r.ok) throw new Error(r.code);
+    // the radish and its seed take the two slots: the carrot stays ripe on its plot, and the reply says so
+    expect(r.state.bag.filter(b => !b.id.startsWith('fish_filler_'))).toEqual([{ id: 'crop_radish', qty: 1 }, { id: 'seed_radish', qty: 1 }]);
+    expect(r.state.plots[7]).toMatchObject({ state: 'growing', crop: 'crop_carrot' });
+    expect(r.events).toContainEqual({ kind: 'harvest_short', got: 1, of: 2, plot: 7 });
+    expect(r.events.some((e: P0Event) => e.kind === 'item' && e.id === 'crop_carrot')).toBe(false);
+  });
+
   it('leaves trees out: a row with a ripe tree in it is refused, the tree is picked alone', () => {
     const s = farmer(9, [6, 7]);
     s.plots[8] = { id: 8, state: 'growing', crop: 'crop_apple', ready_at: T0 + 4 * H, xp_pct: 100, picks: 1 };
