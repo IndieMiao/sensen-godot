@@ -1090,6 +1090,8 @@ func float_text(text: String, screen: Vector2, tone: UiFloatText.Tone = UiFloatT
 func _make_float(text: String, tone: int, icon: Texture2D) -> UiFloatText:
 	var f := UiFloatText.new(text, tone, icon, UiFloatText.Layout.WRAP if text.length() > _FLOAT_HUG_CHARS else UiFloatText.Layout.HUG)
 	f.theme = UiKit.theme()
+	# Inside the screen's side margins all the way through the pop, not only at rest (不知火舞 on #284, 289 46e61588)
+	if root: f.bounds = Vector2(UiTokens.SPACE_PAGE, root.size.x - UiTokens.SPACE_PAGE)
 	root.add_child(f)
 	# A result moment on screen stays readable: the floats rise under its card, not over its rewards (李元芳 int7:
 	# `+5 XP` across the level banner's `+3 Wild Herb`). In a drawer they stay on top (BOARD-DONE floats from a row).
@@ -1107,7 +1109,7 @@ func _float_start(screen: Vector2, lines: Array, top_index: int) -> Vector2:
 	var lowest := hud_bottom + FLOAT_HUD_GAP + h + UiFloatText._RISE \
 		+ UiFloatText._STACK_RISE * clampi(top_index, 0, UiFloatText._STACK_MAX - 1)
 	# …and never past the screen's sides: a wide line from near an edge (a trap's three fish by the bank, SGODOT-289)
-	# moves in until it is SPACE_PAGE clear of both.
+	# moves in until it is SPACE_PAGE clear of both (each line's own bounds also keep its pop inside them).
 	var half := 0.0
 	for f in lines: half = maxf(half, (f as UiFloatText).shown_size().x * 0.5)
 	var x := screen.x

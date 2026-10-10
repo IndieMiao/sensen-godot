@@ -847,6 +847,33 @@ func test_float_text_stacks_and_caps_the_peak_width() -> void:
 	assert_float(wide.shown_size().x).is_less_equal(320.0 + 0.5)
 	assert_float(wide.shown_size().x * wide._peak).is_less_equal(336.0 + 0.5)
 
+## With bounds (the screen's side margins; 不知火舞 on #284, 289 46e61588) a wide pill from near a side moves in at rest
+## and stays inside them through the pop: at ×0.5, ×1.0 and the peak, and its peak no wider than the span. Without
+## bounds it grows from its bottom centre as before.
+func test_float_text_stays_inside_its_bounds_through_the_pop() -> void:
+	for at_x in [345.0, 15.0, 180.0]:
+		var f: UiFloatText = _host(UiFloatText.new("River Perch ×1 · Common Carp ×1", UiFloatText.Tone.ITEM))
+		f.bounds = Vector2(16, 344)
+		await _settle()
+		f.play(Vector2(at_x, 400))
+		var w := f.shown_size().x
+		for k in [0.5, 1.0, f._peak]:
+			f.scale = Vector2.ONE * k / 1.3
+			var left: float = f.position.x + f.pivot_offset.x * (1.0 - k / 1.3)
+			assert_float(left).is_greater_equal(16.0 - 0.5)
+			assert_float(left + f.size.x * k / 1.3).is_less_equal(344.0 + 0.5)
+		f.scale = Vector2.ONE / 1.3   # at rest: pushed against a side, it sits on it
+		var rest_left := f.position.x + f.pivot_offset.x * (1.0 - 1.0 / 1.3)
+		if at_x > 300.0: assert_float(rest_left + w).is_equal_approx(344.0, 0.5)
+		elif at_x < 50.0: assert_float(rest_left).is_equal_approx(16.0, 0.5)
+		else: assert_float(rest_left + w * 0.5).is_equal_approx(180.0, 0.5)
+		assert_float(w * f._peak).is_less_equal(328.0 + 0.5)
+	var free: UiFloatText = _host(UiFloatText.new("River Perch ×1 · Common Carp ×1", UiFloatText.Tone.ITEM))
+	await _settle()
+	free.play(Vector2(345, 400))
+	assert_float(free.pivot_offset.x).is_equal_approx(free.size.x * 0.5, 0.01)
+	assert_vector(free.position + free.pivot_offset).is_equal(Vector2(345, 400))
+
 func test_float_text_bump_updates_in_place() -> void:
 	var f: UiFloatText = _host(UiFloatText.new("+12 XP", UiFloatText.Tone.XP))
 	await _settle()

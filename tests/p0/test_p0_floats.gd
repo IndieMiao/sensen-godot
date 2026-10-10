@@ -203,10 +203,11 @@ func test_a_wide_float_stays_inside_the_screen() -> void:
 	var lines := ui.float_lines([{kind = "item", key = "trap_fish", text = "River Perch ×1 · Common Carp ×1 · Arctic Char ×1",
 		tone = UiFloatText.Tone.ITEM}], Vector2(ui.root.size.x - 40, 420))
 	var f: UiFloatText = lines[0]
-	var half := f.shown_size().x * 0.5
-	var centre_x := f.position.x + f.pivot_offset.x
-	assert_float(centre_x + half).is_less_equal(ui.root.size.x - UiTokens.SPACE_PAGE + 0.5)
-	assert_float(centre_x - half).is_greater_equal(UiTokens.SPACE_PAGE - 0.5)
+	# its sides at rest (×1.0) and at the peak, the pill grown from its pivot (不知火舞 on #284: inside 16–344 throughout)
+	for k in [1.0, f._peak]:
+		var left: float = f.position.x + f.pivot_offset.x * (1.0 - k / 1.3)
+		assert_float(left + f.size.x * k / 1.3).is_less_equal(ui.root.size.x - UiTokens.SPACE_PAGE + 0.5)
+		assert_float(left).is_greater_equal(UiTokens.SPACE_PAGE - 0.5)
 	var mid: UiFloatText = ui.float_lines([{kind = "coins", key = "coins", amount = 5, fmt = "%s coins"}], Vector2(180, 420))[0]
 	assert_float(mid.position.x + mid.pivot_offset.x).is_equal_approx(180.0, 0.5)
 
