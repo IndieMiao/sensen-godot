@@ -1,5 +1,5 @@
 /** P0 content (assets/p0/p0_content.json), shared with the Godot client. */
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { CityClusters } from './clusters.js';
@@ -175,6 +175,7 @@ export const DEFAULT_P0_CONTENT = path.resolve(path.dirname(fileURLToPath(import
 export function loadP0Content(file = DEFAULT_P0_CONTENT): P0Content {
   const c = JSON.parse(readFileSync(file, 'utf8')) as P0Content;
   const dir = path.dirname(file);
+  mergeContentDir(c as unknown as Record<string, unknown>, path.join(dir, 'content'));
   const outposts = path.join(dir, 'p0_outposts.json');
   if (existsSync(outposts)) {
     c.outposts = (JSON.parse(readFileSync(outposts, 'utf8')).outposts as { id: string; role: string; residents?: string[] }[])
@@ -192,6 +193,49 @@ export function loadP0Content(file = DEFAULT_P0_CONTENT): P0Content {
     }
   }
   return c;
+}
+
+/**
+ * Content fragments (SGODOT-275, 亚瑟's cross-city plan §6): from P1 on each line adds its data in its own file,
+ * assets/p0/content/<line>_<topic>.json, shaped like the main table (the same top-level keys). The files are merged
+ * in name order into the main table, never over it: objects merge key by key, arrays of objects with an `id` append
+ * by id; a key, an id or a scalar that is already there is an error naming the file and the path. So two lines can
+ * never change the same entry, and a clash shows up in the tests rather than as one line's data silently winning.
+ * Keys starting with `_` (a fragment's own `_note`) are skipped. The Godot client merges the same way (P0Logic).
+ */
+export const CONTENT_FRAGMENT = /^[a-z][a-z0-9]*(_[a-z0-9]+)*\.json$/;
+
+export function mergeContentDir(base: Record<string, unknown>, dir: string): string[] {
+  if (!existsSync(dir)) return [];
+  const files = readdirSync(dir).filter(f => f.endsWith('.json')).sort();
+  for (const f of files) {
+    if (!CONTENT_FRAGMENT.test(f)) throw new Error(`p0 content: ${f}: name must be <line>_<topic>.json in lower case`);
+    mergeContent(base, JSON.parse(readFileSync(path.join(dir, f), 'utf8')) as Record<string, unknown>, f);
+  }
+  return files;
+}
+
+const isObject = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v);
+const withId = (v: unknown): v is { id: string } => isObject(v) && typeof v.id === 'string';
+
+export function mergeContent(base: Record<string, unknown>, add: Record<string, unknown>, file: string, at = ''): void {
+  for (const [k, v] of Object.entries(add)) {
+    if (at === '' && k.startsWith('_')) continue;
+    const where = at === '' ? k : `${at}.${k}`;
+    if (!(k in base)) { base[k] = v; continue; }
+    const have = base[k];
+    if (isObject(have) && isObject(v)) { mergeContent(have, v, file, where); continue; }
+    if (Array.isArray(have) && Array.isArray(v) && have.every(withId) && v.every(withId)) {
+      const ids = new Set(have.map(e => e.id));
+      for (const e of v) {
+        if (ids.has(e.id)) throw new Error(`p0 content: ${file}: ${where} already has id ${e.id}`);
+        ids.add(e.id);
+        have.push(e);
+      }
+      continue;
+    }
+    throw new Error(`p0 content: ${file}: ${where} is already set (fragments add, they never change an entry)`);
+  }
 }
 
 export function cropById(c: P0Content, id: string): Crop | undefined { return c.crops.find(crop => crop.id === id); }
