@@ -2,7 +2,7 @@ class_name P0FarmDecor
 extends Node
 ## Decorate in the yard (P1, SGODOT-284; plan §9.11.6, q(24) / q(111) / q(113) / q(120); 不知火舞 on 284 ee15926a,
 ## 49b11f91; Figma row 62 DECOR-PLACE / -TAKEN / -CARD). The pieces the yard holds (view.decor.placed) stand as
-## placeholder art (simple meshes, no new asset: 3D waits for 上官婉儿) and are solid, as the facilities are. Decorate is
+## stand-in art (existing models, SGODOT-290, until the decor's own 3D lands; the rest simple meshes) and are solid, as the facilities are. Decorate is
 ## the shared placement mode (P0Ui.begin_placement, 刘邦's SGODOT-241):
 ##   place   a piece from Farm Storage (its Place, the stall toast's Place now): `Cancel · Rotate · Place`, Rotate only
 ##           for a piece that isn't square; a multi-piece one goes on piece by piece, `Stone Path · 3 left`.
@@ -16,6 +16,7 @@ extends Node
 ## it fading out over HALO_R cells, its cells filled green (primary 30 %) or red (danger 35 %) with a 2 px edge, paths
 ## in reach still sand.
 
+const FarmArt = preload("res://modules/farm/farm_art.gd")
 const TAP_SLOP := 12.0
 const OK_FILL := Color(UiTokens.COLOR_PRIMARY, 0.30)   # spec v2: the piece's cells, may stand
 const BAD_FILL := Color(UiTokens.COLOR_DANGER, 0.35)   # … may not
@@ -36,6 +37,26 @@ const LOOKS := {
 	"deco_fountain": [Color(0.6, 0.76, 0.86), 0.5, "pot"], "deco_pergola": [Color(0.7, 0.5, 0.32), 1.9, "frame"],
 	"recipe_stand": [Color(0.86, 0.66, 0.46), 0.8, "box"],
 }
+## Stand-ins until the decor's own models land (SGODOT-290; 上官婉儿's list decor-placeholders-284): existing models
+## picked by id, the files untouched, each stood on its footprint's middle with its feet at y 0. [file, scale, look]:
+## look "atlas:<room>" = that room's shared atlas, "paint" = baked vertex paint (the farm kit, the landmarks). The
+## Scarecrow, Pergola and Recipe Stand keep their LOOKS shapes (no model to borrow yet).
+const MODELS := {
+	"deco_planter": ["res://assets/rooms/coffee_shop/small_planter.glb", 1.45, "atlas:coffee_shop"],
+	"deco_lantern": ["res://assets/landmarks/griffith_observatory/lamp.glb", 0.7, "paint"],
+	"deco_path": ["res://assets/farm/art/stepping_stone.glb", 1.1, "paint"],
+	"deco_bench": ["res://assets/rooms/basic_room/bench.glb", 1.0, "atlas:basic_room"],
+	"deco_fence": ["res://assets/farm/art/fence.glb", 1.0, "paint"],
+	"deco_birdbath": ["res://assets/landmarks/griffith_observatory/fountain_0.glb", 0.55, "paint"],
+	"deco_fountain": ["res://assets/landmarks/griffith_observatory/fountain_0.glb", 1.1, "paint"],
+	"deco_windmill": ["res://assets/farm/art/windmill_sails.glb", 0.62, "paint"],
+}
+const PATH_STONES := [[-0.11, -0.12, 0.35], [0.12, 0.0, -0.45], [-0.05, 0.13, 1.0]]   # x, z (m), yaw: three in a cell
+const FOUNTAIN_WATER := [[0.235, 0.45], [0.645, 0.2145]]   # fountain_0's basin and top bowl: height over its foot, radius (Griffith's layout)
+const WINDMILL_POST := ["res://assets/landmarks/griffith_observatory/fence_post.glb", Vector3(1.4, 2.0, 1.4)]
+const SAIL_TURN_S := 9.0                                   # one turn of the sails
+static var _meshes := {}                                   # file → [Mesh, AABB]
+static var _looks_mat := {}                                # look / water radius → material
 
 var farm: Node3D                # p0_farm.gd: bp, cam, actor, grid
 var rt: P0Runtime
@@ -146,8 +167,10 @@ func centre(id: String, at: Vector2i, rot: int) -> Vector3:
 	for c in cs: sum += farm.bp.cell_to_world(c)
 	return sum / maxf(1.0, float(cs.size()))
 
-## Placeholder piece: a shape of its colour sized to its footprint (LOOKS), facing +z; turned pieces swap w and h.
+## A piece's art, facing +z at rot 0: its stand-in model (MODELS) turned a quarter per rot, else a shape of its colour
+## sized to its footprint (LOOKS; turned pieces swap w and h).
 static func art(id: String, rot := 0, cell := 0.65) -> Node3D:
+	if MODELS.has(id): return _model(id, rot, cell)
 	var look: Array = LOOKS.get(id, [Color(0.7, 0.7, 0.7), 0.4, "box"])
 	var size := P0Decor.size_of(id, rot)
 	var w := size.x * cell * 0.8
@@ -198,6 +221,108 @@ static func art(id: String, rot := 0, cell := 0.65) -> Node3D:
 			b.size = Vector3(w, h, d)
 			add.call(b, Vector3(0, h * 0.5, 0), look[0])
 	return root
+
+static func _model(id: String, rot: int, cell: float) -> Node3D:
+	var spec: Array = MODELS[id]
+	var k := float(spec[1]) * cell / 0.65
+	var root := Node3D.new()
+	root.name = "Decor_" + id
+	var body := Node3D.new()
+	body.rotation.y = -rot * PI / 2.0
+	root.add_child(body)
+	match id:
+		"deco_path":
+			for s in PATH_STONES:
+				var stone := _part(spec, k, Vector3(s[0], 0.0, s[1]) * cell / 0.65)
+				stone.rotation.y = float(s[2])
+				body.add_child(stone)
+		"deco_fence":   # fence.glb runs 1.37 m along x: one cell's length, its height kept (the yard's own fence)
+			var f := _part(spec, k)
+			f.scale.x *= 0.98 * cell / (_shape(str(spec[0]))[1] as AABB).size.x / k
+			body.add_child(f)
+		"deco_birdbath", "deco_fountain":
+			body.add_child(_part(spec, k))
+			for w in FOUNTAIN_WATER: body.add_child(_water(float(w[1]) * k, float(w[0]) * k))
+		"deco_windmill":   # a post and the farm windmill's sails on it, turning slowly
+			var post := _part([WINDMILL_POST[0], 1.0, "paint"], 1.0)
+			post.scale = WINDMILL_POST[1] * cell / 0.65
+			body.add_child(post)
+			var top := (_shape(str(WINDMILL_POST[0]))[1] as AABB).size.y * post.scale.y
+			var sails := _part(spec, k, Vector3(0, top - 0.06 * k, 0.1 * k), false)
+			sails.name = "Sails"
+			body.add_child(sails)
+			sails.tree_entered.connect(func() -> void:
+				sails.create_tween().set_loops().tween_property(sails, "rotation:z", -TAU, SAIL_TURN_S).from(0.0))
+		_:
+			body.add_child(_part(spec, k))
+	return root
+
+## One model of a MODELS spec at scale k: its footprint's middle on `at`, its feet on the ground (the landmark fountain
+## sits off its file's origin); `grounded` false keeps the file's own pivot (the sails turn round their hub).
+static func _part(spec: Array, k: float, at := Vector3.ZERO, grounded := true) -> MeshInstance3D:
+	var shape: Array = _shape(str(spec[0]))
+	var box: AABB = shape[1]
+	var m := MeshInstance3D.new()
+	m.name = str(spec[0]).get_file().get_basename().to_pascal_case()
+	m.mesh = shape[0]
+	m.scale = Vector3.ONE * k
+	m.position = at - (Vector3(box.get_center().x, box.position.y, box.get_center().z) * k if grounded else Vector3.ZERO)
+	m.material_override = _look_mat(str(spec[2]))
+	return m
+
+## A model file's one mesh and its bounds, loaded once.
+static func _shape(file: String) -> Array:
+	if not _meshes.has(file):
+		var root := (load(file) as PackedScene).instantiate()
+		var found := root.find_children("*", "MeshInstance3D", true, false)
+		if root is MeshInstance3D: found.push_front(root)
+		var mesh: Mesh = (found[0] as MeshInstance3D).mesh
+		_meshes[file] = [mesh, mesh.get_aabb()]
+		root.free()
+	return _meshes[file]
+
+## Shared materials: a room's atlas (as its room draws it; the P0 bench's), or the farm kit's vertex paint.
+static func _look_mat(look: String) -> Material:
+	if look == "paint": return FarmArt.material()
+	if not _looks_mat.has(look):
+		var m := StandardMaterial3D.new()
+		m.albedo_texture = load("res://assets/rooms/%s/room_albedo_ao.png" % look.trim_prefix("atlas:"))
+		m.roughness = 0.8
+		m.metallic_specular = 0.28
+		_looks_mat[look] = m
+	return _looks_mat[look]
+
+## A fountain's water: the landmark's rippling water disc (Griffith's), one material per radius.
+static func _water(radius: float, height: float) -> MeshInstance3D:
+	var key := "water:%.3f" % radius
+	if not _looks_mat.has(key):
+		var mat := ShaderMaterial.new()
+		mat.shader = preload("res://modules/landmark/shaders/landmark_water.gdshader")
+		mat.set_shader_parameter("radius", radius)
+		_looks_mat[key] = mat
+	var disc := CylinderMesh.new()
+	disc.top_radius = radius
+	disc.bottom_radius = radius
+	disc.height = 0.02
+	disc.radial_segments = 24
+	var m := MeshInstance3D.new()
+	m.name = "Water"
+	m.mesh = disc
+	m.position.y = height
+	m.material_override = _looks_mat[key]
+	m.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	return m
+
+## The placement preview: see-through, so the cells' green / red under it reads. Its own copies of the shared
+## materials (the placed pieces keep theirs); the water as a pale see-through blue.
+static func ghost(node: Node3D) -> void:
+	for m in node.find_children("*", "MeshInstance3D", true, false):
+		var mi := m as MeshInstance3D
+		var mat := mi.material_override as StandardMaterial3D
+		mat = mat.duplicate() if mat != null else _mat(Color(0.52, 0.8, 0.94))
+		mat.albedo_color.a = 0.6
+		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		mi.material_override = mat
 
 static func _mat(c: Color, unshaded := false) -> StandardMaterial3D:
 	var m := StandardMaterial3D.new()
@@ -427,10 +552,7 @@ func _show() -> void:
 		_preview = null
 	if _preview == null:
 		_preview = art(id, int(placing.rot), farm.bp.cell_m)
-		for m in _preview.get_children():   # see-through, so the cells' blue / red under it reads
-			var mat := (m as MeshInstance3D).material_override as StandardMaterial3D
-			mat.albedo_color.a = 0.6
-			mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		ghost(_preview)
 		_preview.name = "DecorPreview"
 		_preview.set_meta("look", "%s:%d" % [id, int(placing.rot)])
 		farm.add_child(_preview)

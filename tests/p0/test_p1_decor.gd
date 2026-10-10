@@ -205,3 +205,61 @@ func test_the_first_pending_piece_is_taken_for_the_next_spot() -> void:
 	assert_str(P0Decor.reason(v, "deco_path", Vector2i(8, 1))).is_equal("Space taken")
 	assert_that(P0Decor.nearest_spot(v, "deco_path", 0, Vector2i(9, 1))).is_not_equal(Vector2i(8, 1))
 	assert_str(P0Decor.reason(v, "deco_path", Vector2i(8, 1), 0, -1)).is_equal("")   # moving that very piece
+
+## SGODOT-290 stand-ins (上官婉儿's list): eight pieces borrow an existing model, the Scarecrow / Pergola / Recipe Stand
+## keep their shapes. Each stands on its footprint's middle, feet on the ground, inside its cells, turned with rot.
+func _bounds(root: Node3D) -> AABB:
+	var out := AABB()
+	var first := true
+	for m in root.find_children("*", "MeshInstance3D", true, false):
+		var xf := Transform3D.IDENTITY
+		var n: Node = m
+		while n != root:
+			xf = (n as Node3D).transform * xf
+			n = n.get_parent()
+		var b: AABB = xf * (m as MeshInstance3D).mesh.get_aabb()
+		out = b if first else out.merge(b)
+		first = false
+	return out
+
+func _tris(root: Node3D) -> int:
+	var n := 0
+	for m in root.find_children("*", "MeshInstance3D", true, false):
+		var mesh: Mesh = (m as MeshInstance3D).mesh
+		for s in mesh.get_surface_count():
+			var a := mesh.surface_get_arrays(s)
+			n += (a[Mesh.ARRAY_INDEX] as PackedInt32Array).size() / 3 if a[Mesh.ARRAY_INDEX] != null else (a[Mesh.ARRAY_VERTEX] as PackedVector3Array).size() / 3
+	return n
+
+func test_stand_in_models_stand_in_their_cells() -> void:
+	assert_array(P0FarmDecor.MODELS.keys()).contains_exactly_in_any_order(["deco_planter", "deco_lantern", "deco_path",
+		"deco_bench", "deco_fence", "deco_birdbath", "deco_fountain", "deco_windmill"])
+	for id in P0FarmDecor.MODELS:
+		for rot in 2:
+			var a: Node3D = auto_free(P0FarmDecor.art(id, rot, 0.65))
+			var size := P0Decor.size_of(id, rot)
+			var b := _bounds(a)
+			assert_float(b.position.y).is_between(-0.02, 0.02)                                   # feet on the ground
+			assert_float(b.size.x).is_less_equal(size.x * 0.65 + 0.01)                             # inside its cells …
+			assert_float(b.size.z).is_less_equal(size.y * 0.65 + 0.01)
+			assert_float(absf(b.get_center().x)).is_less(0.08)                                    # … round their middle
+			assert_float(absf(b.get_center().z)).is_less(0.08)
+			assert_int(_tris(a)).is_less_equal(4000 if id in ["deco_fountain", "deco_windmill"] else 2000)   # 290's budget
+	var bench: Node3D = auto_free(P0FarmDecor.art("deco_bench", 0))
+	var turned: Node3D = auto_free(P0FarmDecor.art("deco_bench", 1))
+	assert_float(_bounds(bench).size.x).is_greater(_bounds(bench).size.z)   # 2×1 runs along x …
+	assert_float(_bounds(turned).size.z).is_greater(_bounds(turned).size.x)   # … and along z once turned
+	var crow: Node3D = auto_free(P0FarmDecor.art("deco_scarecrow"))
+	assert_bool(crow.find_children("*", "MeshInstance3D", true, false).all(func(m): return (m as MeshInstance3D).mesh is PrimitiveMesh)).is_true()
+
+func test_the_preview_ghosts_its_own_materials() -> void:
+	var placed: Node3D = auto_free(P0FarmDecor.art("deco_fountain"))
+	var preview: Node3D = auto_free(P0FarmDecor.art("deco_fountain"))
+	P0FarmDecor.ghost(preview)
+	for m in preview.find_children("*", "MeshInstance3D", true, false):
+		var mat := (m as MeshInstance3D).material_override as StandardMaterial3D
+		assert_object(mat).is_not_null()
+		assert_float(mat.albedo_color.a).is_equal_approx(0.6, 0.001)
+	var body := placed.find_children("*", "MeshInstance3D", true, false).filter(func(m): return m.name != "Water")
+	assert_float(((body[0] as MeshInstance3D).material_override as StandardMaterial3D).albedo_color.a).is_equal(1.0)   # the shared one untouched
+	assert_object((body[0] as MeshInstance3D).material_override).is_same(P0FarmDecor.FarmArt.material())
