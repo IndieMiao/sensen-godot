@@ -243,7 +243,8 @@ export function noteVisit(c: P0Content, s: P0State, space: unknown, place: unkno
     if (r?.kind !== 'visit' || r.status !== 'accepted' || !r.visit || r.visit.done || r.visit.place !== place) continue;
     r.visit.done = true;
     events.push({ kind: 'visit', id: r.id, place });
-    if (clusterOf(c, place) !== s.travel.home) noteDelivery(c, s, now);
+    const city = clusterOf(c, place);
+    if (city && city !== s.travel.home) noteDelivery(c, s, now, city);   // that city, whatever `here` says yet (周瑜 on #285: the entry read settles here after)
   }
 }
 

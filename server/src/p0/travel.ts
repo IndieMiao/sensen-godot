@@ -257,10 +257,11 @@ export function settleHere(c: P0Content, s: P0State, space: unknown, place: unkn
 /** return_home {}: free, instant, needs no pass; passes are kept. */
 export function returnHome(s: P0State): void { s.travel.here = s.travel.home; }
 
-/** §11.9.1: a delivery away from home counts once per cluster per day toward Regular. */
-export function noteDelivery(c: P0Content, s: P0State, now: number): void {
-  const here = s.travel.here, v = s.travel.visits[here];
-  if (here === s.travel.home || !v || !covers(s, here, now)) return;
+/** §11.9.1: a delivery away from home counts once per cluster per day toward Regular — in `city`, the player's
+ * current one, or a cross-city check-in's outpost city (q(128)). */
+export function noteDelivery(c: P0Content, s: P0State, now: number, city: string = s.travel.here): void {
+  const v = s.travel.visits[city];
+  if (city === s.travel.home || !v || !covers(s, city, now)) return;
   const today = dayKey(c, now);
   if (v.delivered_day === today) return;
   v.delivered_day = today; v.deliveries += 1;

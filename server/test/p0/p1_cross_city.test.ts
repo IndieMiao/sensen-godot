@@ -104,6 +104,30 @@ describe('the check-in and the hand-in', () => {
     expect(done.state.travel.visits[city].deliveries).toBe(1);   // the hand-in at home adds none (q(128) ④)
     await app.close();
   });
+  // 周瑜 on #285: the entry read checks in before it settles `here`; a pass bought earlier, home again, then straight into
+  // that outpost still counts that city, not wherever `here` pointed
+  it('a check-in counts its own city\'s Deliveries, whatever city the player was in before', async () => {
+    const c = only('req_sys_explore_city');
+    const app = Fastify();
+    const store = new P0Store(c);
+    registerP0Routes(app, { content: c, store, now: () => T, dev: false });
+    const player = 'cross-city-order';
+    let s = store.get(player, T);
+    s.homestead.level = 2;
+    settleBoards(c, s, T);
+    const r = req(s), city = clusterOf(c, r.visit!.place)!;
+    s = step(c, s, { type: 'accept', request: r.id }).state;
+    s = step(c, s, { type: 'travel', to: city }).state;   // the pass
+    s = step(c, s, { type: 'travel', to: SF }).state;     // home again, the pass kept
+    store.put(s);
+    const entered = await app.inject({ method: 'GET', url: `/v1/p0/state?space=outpost&place=${encodeURIComponent(r.visit!.place)}`,
+      headers: { 'x-p0-player': player } });
+    expect(entered.json().ok).toBe(true);
+    s = store.get(player, T);
+    expect(req(s).visit!.done).toBe(true);
+    expect(s.travel.visits[city].deliveries).toBe(1);
+    await app.close();
+  });
 });
 
 describe('Far Pond (q(128))', () => {
