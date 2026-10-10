@@ -382,6 +382,8 @@ func set_hp(hp: int, maximum: int, elite := {}) -> void:
 func hp_bar() -> UiHpBar: return _hp
 ## The creel badge (where a trap's fish fly to, SGODOT-289).
 func creel_badge() -> Control: return _creel
+## The quick bar's Bag, where a row's harvest flies (SGODOT-289); null without a bar.
+func bag_target() -> Control: return quick_bar_node().bag_end() if quick_bar_node() != null else null
 ## A trap's fish still flying to the badge ([{id, count}]): it counts each in as it lands (creel_landed).
 var creel_in_flight: Array = []
 func creel_flying(got: Array) -> void:
@@ -1293,6 +1295,7 @@ static func _float_line_text(parts: Dictionary) -> String:
 		var line := str(p.fmt) % (("+%d" % a) if a >= 0 else ("−%d" % -a))
 		# A held harvest's XP counts its plants once more than one went into it: `+40 XP · 20 plants`.
 		if str(p.get("unit", "")) != "" and int(p.get("count", 1)) > 1: line += " · %d %s" % [int(p.count), str(p.unit)]
+		if str(p.get("tail", "")) != "": line += " · " + str(p.tail)   # Harvest ×N's `· First harvest` (q(124) ②)
 		return line))
 
 # ---------------------------------------------------------------- system states (SGODOT-233, WP6, §10.7.1)
@@ -2797,9 +2800,43 @@ func open_profile(look_saved := false) -> void:
 	page.farm_pressed.connect(func():
 		_over_profile = true
 		open_home_panel(func(): open_profile()))
+	page.settings_pressed.connect(func(): open_settings(func(): open_profile()))
 	_open_modal(page, 0.0, true)
 	_profile = page
 	modal_kind = "profile"
+
+## Settings (q(129); P0: Legal · Licenses and Version) from the profile's gear, full screen; ‹ goes back where it came
+## from (`back`), as each page under it does to the one before.
+func open_settings(back := Callable()) -> void:
+	var page := P0SettingsPage.settings(P0Legal.version_line(P0Session.demo_config(
+		FileAccess.get_file_as_string(P0Session.DEMO_CONFIG) if FileAccess.file_exists(P0Session.DEMO_CONFIG) else "")),
+		safe_top(), safe_bottom())
+	page.theme = UiKit.theme()
+	page.back_pressed.connect(back_modal)
+	page.open_pressed.connect(func(_what: String): open_licenses(func(): open_settings(back)))
+	_open_modal(page, 0.0, true)
+	modal_kind = "settings"
+	_modal_back = back
+
+## SET-LICENSES: the credits (P0Legal); a row opens its full text, whose ‹ comes back here.
+func open_licenses(back := Callable()) -> void:
+	var page := P0SettingsPage.licenses(P0Legal.groups(), safe_top(), safe_bottom())
+	page.theme = UiKit.theme()
+	page.back_pressed.connect(back_modal)
+	page.open_pressed.connect(func(id: String): open_license_text(id, func(): open_licenses(back)))
+	_open_modal(page, 0.0, true)
+	modal_kind = "licenses"
+	_modal_back = back
+
+## A credit's full text under its title (no frame; 不知火舞 on the Licenses brief).
+func open_license_text(id: String, back := Callable()) -> void:
+	var r := P0Legal.row(id)
+	var page := P0SettingsPage.text(str(r.get("title", "")), P0Legal.full_text(r), safe_top(), safe_bottom())
+	page.theme = UiKit.theme()
+	page.back_pressed.connect(back_modal)
+	_open_modal(page, 0.0, true)
+	modal_kind = "license_text"
+	_modal_back = back
 
 ## Close on a layer of the profile chain (Skills, the Fish-dex, HOME-1 opened from the profile) closes that layer only,
 ## back to what is under it, as the system Back does; only the profile's own ‹ goes out to the world. Opened from the
