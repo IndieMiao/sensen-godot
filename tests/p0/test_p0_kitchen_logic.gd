@@ -128,6 +128,30 @@ func test_a_legendary_page_card_names_the_buff_slot() -> void:
 	assert_str(str(P0KitchenLogic.page_card(v, legend).buff)).is_equal("Buff · coming later")
 	assert_str(str(P0KitchenLogic.page_card(v, P0KitchenLogic.pages(v)[0]).buff)).is_equal("")
 
+## SGODOT-282: Homestead Lv4 / Lv8 bring stoves 2 and 3. The server sends one entry per stove (null when empty); each
+## reads its own pot, queue and `Stove n/N`; a cook with no stove named goes to the first free one.
+func test_several_stoves_each_read_their_own_pot_and_queue() -> void:
+	var v := _view()
+	v.cooking.conveniences = ["queue_two"]
+	v.cooking.stoves = [{"id": 1, "ms": 5000, "ready_in": 2000, "queued": null}, null, null]
+	assert_int(P0KitchenLogic.stove_count(v)).is_equal(3)
+	assert_dict(P0KitchenLogic.header(v, 1)).is_equal({stove = "Stove 2/3", level = "Cooking Lv1", state = "Empty"})
+	assert_str(P0KitchenLogic.header(v, 0).state).is_equal("Cooking 0:02")
+	assert_object(P0KitchenLogic.stove(v, 2)).is_null()
+	assert_int(P0KitchenLogic.free_stove(v)).is_equal(1)
+	v.cooking.stoves[1] = {"id": 2, "ms": 5000, "ready_in": 4000, "queued": {"id": 4, "dish": null}}
+	v.cooking.stoves[2] = {"id": 3, "ms": 5000, "ready_in": 0, "left": ["dish_grilled_crucian"], "queued": null}
+	assert_str(P0KitchenLogic.stove_state(v, 1)).is_equal("Cooking 0:04 · Queued 1")
+	assert_bool(P0KitchenLogic.can_queue(v, 1)).is_false()
+	assert_bool(P0KitchenLogic.can_queue(v, 0)).is_true()
+	assert_int(P0KitchenLogic.free_stove(v)).is_equal(0)   # none empty: the first that can still queue
+	assert_array(P0KitchenLogic.stove_left(v, 2)).is_equal(["dish_grilled_crucian"])
+	assert_str(P0KitchenLogic.experiment_reason(v, ["fish_crucian"], false, 1)).is_equal("Stove busy")
+	# a Lv1–3 view without the list still reads as one stove
+	var one := _view()
+	assert_str(P0KitchenLogic.stove_label(one)).is_equal("Stove 1/1")
+	assert_bool(P0KitchenLogic.big_pot(one)).is_false()
+
 # ---------------------------------------------------------------- the dish comes out (COOK-4 / 6 / P0-9, COOK-7-2)
 func _eat_view(energy: int, used: int, meal: int) -> Dictionary:
 	var v := _view()
