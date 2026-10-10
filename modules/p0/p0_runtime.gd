@@ -1156,6 +1156,7 @@ func _dev_shot(dt: float) -> void:
 			"tackle": ui.open_tackle()
 			"gear": ui.open_gear()
 			"skills": ui.open_skills()
+			"seedsel": ui.selected_seed = step[1]   # seedsel:<id> — the quick bar's selected item (P1 tree review shots)
 			"skillsopen":   # skillsopen:fishing — the Skills drawer with that track's milestones unfolded (SGODOT-283 shots)
 				ui.open_skills()
 				for n in ui.find_children("*", "", true, false):

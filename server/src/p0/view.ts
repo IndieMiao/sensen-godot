@@ -20,6 +20,7 @@ import { gatherView } from './gathering.js';
 import { workbenchView } from './workbench.js';
 import { coveredPlots, cropGrowH, facilitiesView, facilityAt, plotCount } from './garden.js';
 import { climateAt, homeClimate } from './travel.js';
+import { orchardView, treeOf } from './orchard.js';
 import { restReadyIn } from './presence.js';
 import { inboxView, settleParcels } from './parcels.js';
 import { cookbookView, masteredCount } from './cookbook.js';
@@ -63,7 +64,9 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
       crop: p.crop ?? null, ready_in: p.state === 'growing' && p.ready_at ? Math.max(0, p.ready_at - now) : null,
       xp_pct: p.xp_pct ?? null, fert: !!p.fert,
       covered: covered.has(p.id), facility: facilityAt(s, p.id)?.id ?? null,   // P1: watered by a sprinkler / one stands here
+      ...(treeOf(c, p) ? { tree: true, picks: p.picks ?? 0 } : {}),            // P1: a tree stands here (q(118))
     })),
+    orchard: orchardView(c, s),
     facilities: facilitiesView(c, s),
     garden: { plots: plotCount(c, s) },
     bag: {
@@ -188,7 +191,8 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
       ...Object.entries(c.supplies).map(([id, x]) => [id, x.name])]),
     // grow_h is this farm's: a regional crop away from its zone ripens in off_zone_grow_h (§5.2.3, `native` false).
     crops: c.crops.map(crop => ({ id: crop.id, seed: crop.seed, energy: crop.energy, grow_h: cropGrowH(c, s, crop), level: crop.level,
-      ...(crop.regional ? { zone: crop.zone, native: crop.zone === homeClimate(c, s) } : {}) })),
+      ...(crop.regional ? { zone: crop.zone, native: crop.zone === homeClimate(c, s) } : {}),
+      ...(crop.perennial ? { perennial: true, regrow_h: crop.perennial.regrow_h, pick_energy: crop.perennial.harvest_energy } : {}) })),
     firsts: s.firsts,
     req_done: s.req_done,   // requests handed in (newest last, ≤ 20): the first session's Deliver row ticks on Pond Catch (q(58))
   };

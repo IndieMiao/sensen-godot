@@ -17,6 +17,7 @@ import { isMineCommand, mineCommand, settleMine, type MineCommand } from './mine
 import { gather, storeMaterials } from './gathering.js';
 import { craft } from './workbench.js';
 import { coveredPlots, cropGrowH, facilityAt, growMs, moveFacility, place, seedSaver } from './garden.js';
+import { chopTree, feedTree, pickTree, plantTree, treeOf } from './orchard.js';
 import { claimParcel, PARCEL_LIMIT, settleParcels } from './parcels.js';
 import { dayKey, maxEnergy, scaledXp, settleEnergy, skillLevel, xpPercent } from './rules.js';
 import { buyback, buyItem, drink, moveStorage, offerOf, sellItem, setLock } from './shops.js';
@@ -67,6 +68,7 @@ type P0CommandBody =
   | { type: 'craft'; recipe: string }
   | { type: 'place'; recipe: string; plot: number }          // P1: build a facility in place (one step, q(22))
   | { type: 'move_facility'; facility: number; plot: number }   // P1: free, never removed
+  | { type: 'chop'; plot: number }                              // P1: a tree is gone, its plot tilled again (FARM-4, q(118))
   | { type: 'claim_parcel'; key: string }
   | { type: 'claim_parcels'; keys: string[] }   // Claim all: the keys on screen, so a retry never takes a newer parcel
   | { type: 'read_inbox'; keys: string[] }
@@ -133,6 +135,13 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       const plots = ids.map(plotOf);
       if (plots.some(p => !p)) return fail('bad_plot');
       for (const id of ids) { const taken = occupied(id); if (taken) return taken; }
+      // P1 (q(118)): a sapling plants a tree on one empty plot, tilled or wild (the orchard's own rules).
+      const tree = cropBySeed(c, String(cmd.seed));
+      if (tree?.perennial) {
+        const refusal = plantTree(c, s, ids, tree, now, events);
+        if (refusal) return fail(refusal.code, refusal.detail);
+        break;
+      }
       const wrong = plots.find(p => p!.state !== 'tilled');
       if (wrong) return fail('wrong_state', { plot: wrong.id, state: wrong.state });
       const crop = cropBySeed(c, String(cmd.seed));
@@ -165,9 +174,15 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       if (taken) return taken;
       const ripe = plot.state === 'growing' && (plot.ready_at ?? Infinity) <= now;
       if ((plot.state !== 'sown' && plot.state !== 'growing') || ripe || !plot.crop) return fail('wrong_state', { state: ripe ? 'ready' : plot.state });
-      if (plot.fert) return fail('fertilized');
       const item = String(cmd.item ?? 'fert_compost'), fert = c.goods[item];
-      if (!fert?.grow_mult) return fail('bad_item');
+      const tree = treeOf(c, plot);   // P1: a tree takes Orchard Feed, an annual Compost (§5.5)
+      if (tree) {
+        const refusal = feedTree(c, s, plot, tree, item, now, events);
+        if (refusal) return fail(refusal.code, refusal.detail);
+        break;
+      }
+      if (plot.fert) return fail('fertilized');
+      if (!fert?.grow_mult) return fail(fert?.regrow_mult ? 'trees_only' : 'bad_item');
       if (count(s.bag, item) < 1) return fail('no_item', { item });
       take(s.bag, item, 1);
       events.push({ kind: 'item', id: item, delta: -1 });
@@ -197,6 +212,11 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       if (plot.state !== 'growing' || !plot.crop || (plot.ready_at ?? Infinity) > now)
         return fail('not_ready', { ready_in: plot.ready_at ? plot.ready_at - now : null });
       const crop = cropById(c, plot.crop)!;
+      if (crop.perennial) {   // P1: a tree is picked and grows again (q(118))
+        const refusal = pickTree(c, s, plot, crop, now, events);
+        if (refusal) return fail(refusal.code, refusal.detail);
+        break;
+      }
       if (room(c, s, crop.id) < crop.yield) return fail('bag_full', { need: crop.yield });
       add(c, s, crop.id, crop.yield);
       events.push({ kind: 'item', id: crop.id, delta: crop.yield });
@@ -277,6 +297,11 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       if (refusal) return fail(refusal.code, refusal.detail);
       // q(46): the Spice Rack takes the bag's seasonings (Spice Rack · seasonings off your bag); from now on they are stored.
       if (c.homestead.levels.find(l => l.level === s.homestead.level)?.unlocks.includes('spice_rack')) storeMaterials(c, s, now, events, 'spice_rack');
+      break;
+    }
+    case 'chop': {
+      const refusal = chopTree(c, s, cmd, events);
+      if (refusal) return fail(refusal.code, refusal.detail);
       break;
     }
     case 'set_look': {
