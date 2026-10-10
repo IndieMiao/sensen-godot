@@ -7,7 +7,7 @@ import { burners, cookSlots, mealValue, recipeRarity, settleStove } from './cook
 import { sellPrice, stallOffer } from './reducer.js';
 import { blessed, dayKey, foodCap, maxEnergy, nextTickIn, regenMs, settleEnergy, skillLevel, untilRollover } from './rules.js';
 import { emptyDay, type P0State } from './state.js';
-import { catalog, drinkPrice, offerOf, owns, walletNeed } from './shops.js';
+import { catalog, drinkPrice, offerOf, owns, quotaKey, regionalOf, walletNeed } from './shops.js';
 import { BOARDS, handIn, heldSlot, lockedTemplate, payout, settleBoards, slotCount } from './boards.js';
 import { expireGiftMeals, lessonState, progressOf, requestOpensIn, requestState, residentState, stageIndex } from './residents.js';
 import { floorPrice, haveFor, matches } from './requests.js';
@@ -19,13 +19,14 @@ import { mineView, settleMine } from './mine.js';
 import { gatherView } from './gathering.js';
 import { workbenchView } from './workbench.js';
 import { coveredPlots, cropGrowH, facilitiesView, facilityAt, plotCount } from './garden.js';
-import { homeClimate } from './travel.js';
+import { climateAt, homeClimate } from './travel.js';
 import { orchardView, treeOf } from './orchard.js';
 import { restReadyIn } from './presence.js';
 import { inboxView, settleParcels } from './parcels.js';
 import { cookbookView, masteredCount } from './cookbook.js';
 import { mapMarkers } from './markers.js';
 import { everFish, pondAt, pondFishIds } from './fishing_world.js';
+import { trapsView } from './fish_trap.js';
 import { homeCluster } from './travel.js';
 import { decorView } from './decor.js';
 
@@ -124,6 +125,7 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
       dex: c.fish.map(fish => ({ id: fish.id, rarity: fish.rarity, level: fish.level, where: fish.where, caught: s.fishing.caught[fish.id] ?? 0,
         seen: s.fishing.seen.includes(fish.id), cook: fish.cook !== false })),
       baits: Object.keys(f.baits).map(id => ({ id, have: count(s.bag, id) })),
+      trap: trapsView(c, s, now),   // Fish Traps (SGODOT-283): {traps [{place, fish, keep, next_in}], slots, next_level, have, here}
     },
     cooking: {
       slots: cookSlots(c, s),
@@ -287,7 +289,9 @@ function drinksView(c: P0Content, s: P0State, now: number) {
 }
 
 function quotaView(c: P0Content, s: P0State, q: QuotaId, now: number) {
-  const used = q === 'request_bonus' ? s.day.bonus : q === 'sys_requests' ? s.day.sys_done : s.day.quota[q] ?? 0;
+  // a per-city quota shows the city the player is in (§11.7.3: one count per account × city cluster)
+  const used = q === 'request_bonus' ? s.day.bonus : q === 'sys_requests' ? s.day.sys_done
+    : s.day.quota[quotaKey(c, q, s.travel?.here ?? homeCluster(c))] ?? 0;
   return { used, cap: c.quotas[q].cap, resets_in: untilRollover(c, now), scope: c.quotas[q].scope };
 }
 
@@ -308,7 +312,9 @@ function shopView(c: P0Content, s: P0State, shop: ShopId) {
         in_bag: count(s.bag, id),
       };
     }),
-    sell: Object.entries(c.shops[shop].buys).map(([kind, r]) => ({ kind, rate: r.rate, quota: r.quota })),
+    // regional: only this climate's regional items (`items` lists them), as the Market Square takes them (§9.13.1)
+    sell: Object.entries(c.shops[shop].buys).map(([kind, r]) => ({ kind, rate: r.rate, quota: r.quota,
+      ...(r.regional ? { regional: true, items: regionalItems(c, kind, climateAt(c, s)) } : {}) })),
     // Barter at the Market Square keeper (§8.4.5): give n regional items for 1 mineral; room = how many more of each
     // the next level lets come by barter.
     barter: shop === 'market' && c.homestead.barter ? {
@@ -435,4 +441,10 @@ function keepersView(c: P0Content, s: P0State, now: number, online: number | nul
       board_open: marketOpen.length, board_templates: marketOpen.map(x => x.template),
       refill_in: refills.length ? Math.min(...refills) : null },
   };
+}
+
+/** The regional items of a kind a counter of this climate takes (crops by zone, fish by zones). */
+function regionalItems(c: P0Content, kind: string, zone: string): string[] {
+  const ids = kind === 'crop' ? c.crops.map(x => x.id) : kind === 'fish' ? c.fish.map(x => x.id) : [];
+  return ids.filter(id => regionalOf(c, id, zone));
 }

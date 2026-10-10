@@ -41,7 +41,7 @@ extends RefCounted
 
 const CONTEXTS: Array[StringName] = [&"bag", &"gear", &"counter_buy", &"counter_sell", &"gift", &"storage", &"workbench"]
 const RULES_PATH := "res://modules/p0/item_info_rules.json"
-const KINDS := ["seed", "crop", "fish", "dish", "bait", "rod", "pick", "tool"]
+const KINDS := ["seed", "crop", "fish", "dish", "bait", "rod", "pick", "tool", "trap"]
 const SEP := " · "
 const _MYSTERY := "dish_mystery"
 const _TAKE_SOME := 10   # F-07 storage: Take 10 + Take all
@@ -70,7 +70,7 @@ static func tab_of(view: Dictionary, item_id: String) -> StringName:
 	var k := str(P0Logic.item(view, item_id).get("kind", ""))
 	if k == "": k = item_id.split("_")[0]
 	var tab = {"seed": &"seeds", "fert": &"seeds", "fish": &"fish", "crop": &"produce", "dish": &"dishes", "bait": &"tackle",
-		"rod": &"tackle", "pick": &"tackle", "material": &"materials", "torch": &"materials"}.get(k, null)
+		"trap": &"tackle", "rod": &"tackle", "pick": &"tackle", "material": &"materials", "torch": &"materials"}.get(k, null)
 	if tab != null: return tab
 	return &"materials" if P0Logic.content().get("materials", {}).has(item_id) else &""
 
@@ -207,12 +207,15 @@ static func _offer(view: Dictionary, item_id: String, opts: Dictionary) -> Dicti
 
 ## This counter's buy-back entry for the item's kind ({kind, rate, quota}), {} when it doesn't take the kind.
 ## view.shops[role].sell (SGODOT-228); without it the Homestead Stall takes crops and fish at full price.
+## A regional entry (the Market Square, §9.13.1) takes only the ids it lists: this city's climate's regional items.
 static func _buyback(view: Dictionary, item_id: String, opts: Dictionary) -> Dictionary:
 	var kind := kind_of(view, item_id)
 	var shop: Dictionary = view.get("shops", {}).get(_counter(opts), {})
 	if shop.has("sell"):
 		for e in shop.sell:
-			if str(e.get("kind", "")) == kind: return e
+			if str(e.get("kind", "")) != kind: continue
+			if bool(e.get("regional", false)) and not (e.get("items", []) as Array).has(item_id.split("@")[0]): return {}
+			return e
 		return {}
 	return {kind = kind, rate = 1.0, quota = null} if _counter(opts) == "homestead" and kind in ["crop", "fish"] else {}
 
@@ -263,7 +266,8 @@ static func flags(view: Dictionary, item_id: String, context: StringName, opts :
 		mystery = item_id.split("@")[0] == _MYSTERY,
 		never_sold = gifted or item_id.split("@")[0] in [_MYSTERY, "dish_travel_biscuits"],
 		sold_here = _sell_here(view, item_id, opts) >= 0,
-		quota_left = quota.is_empty() or int(quota.get("used", 0)) < int(quota.get("cap", 0)),
+		# the server sells ⌊left / unit⌋ (0 = limit_reached), so the allowance must still fit one at this price
+		quota_left = quota.is_empty() or int(quota.get("cap", 0)) - int(quota.get("used", 0)) >= maxi(1, _sell_here(view, item_id, opts)),
 		energy_full = int(e.get("value", 0)) >= int(e.get("max", 200)),
 		unlocked = bool(offer.get("unlocked", true)),
 		homestead_ok = bool(offer.get("homestead_ok", true)),
@@ -300,7 +304,8 @@ static func tokens(view: Dictionary, item_id: String, context: StringName, opts 
 	var here := _sell_here(view, item_id, opts)
 	var quota := _quota_of(view, item_id, opts)
 	var sellable := count
-	if not quota.is_empty(): sellable = mini(count, maxi(0, int(quota.get("cap", 0)) - int(quota.get("used", 0))))
+	# the allowance is in coins: Sell All takes as many as the rest of it pays for (server: ⌊left / unit⌋)
+	if not quota.is_empty(): sellable = mini(count, maxi(0, int(quota.get("cap", 0)) - int(quota.get("used", 0))) / maxi(1, here))
 	var rod := _rod(view, item_id)
 	var t := {
 		count = str(count) if count > 0 else "",
@@ -445,15 +450,19 @@ static func _price(view: Dictionary, item_id: String, opts: Dictionary) -> Dicti
 	return {each = each, total = each * qty, text = "%d coins" % (each * qty), line = ("%d × %d coins" % [qty, each]) if qty > 1 else ""}
 
 static func _quota(view: Dictionary, item_id: String, kind: String, opts: Dictionary) -> Dictionary:
-	return _quota_line(_quota_of(view, item_id, opts), kind, _counter(opts))
+	return _quota_line(_quota_of(view, item_id, opts), "regional" if _regional(view, item_id, opts) else kind, _counter(opts))
+
+## Whether this counter buys the item back as one of the city's regional goods (the Market Square).
+static func _regional(view: Dictionary, item_id: String, opts: Dictionary) -> bool:
+	return bool(_buyback(view, item_id, opts).get("regional", false))
 
 ## The counter's own allowance line with nothing selected (the counter drawer's scope row): the first kind it counts
 ## against a quota, or "Crops & fish · no daily limit" at the Homestead Stall (FARM-6).
 static func counter_quota(view: Dictionary, role: String) -> Dictionary:
 	if role != "homestead":
 		for e in view.get("shops", {}).get(role, {}).get("sell", []):
-			if e.get("quota", null) != null:
-				return _quota_line(view.get("quotas", {}).get(str(e.quota), {}), str(e.get("kind", "")), role)
+			if e.get("quota", null) != null:   # "Regional buy-back today 20/60" over "this city · resets in 9h 12m"
+				return _quota_line(view.get("quotas", {}).get(str(e.quota), {}), "regional" if e.get("regional", false) else str(e.get("kind", "")), role)
 	return _quota_line({}, "", role)
 
 static func _quota_line(quota: Dictionary, kind: String, role: String) -> Dictionary:

@@ -87,6 +87,16 @@ func attach_online(o: P0Online) -> void:
 	add_child(o)
 	o.joined.connect(_on_joined)
 	o.result.connect(_on_result)
+	o.failed.connect(_on_online_failed)
+
+## The room refused the join (SGODOT-280, 蒙恬 #243): a generated outpost of a city without a pass (PASS_REQUIRED) or
+## whose pass ran out before the player came in (TRIP_EXPIRED). Back to the map, where the city's free travel card opens
+## (q(108)), as the entry read's refusal does.
+func _on_online_failed(code: String) -> void:
+	if not code in ["PASS_REQUIRED", "TRIP_EXPIRED"] or rt == null: return
+	var cluster := str(outpost.get("cluster", ""))
+	rt.after_leave = "travel:" + cluster if cluster != "" else ""
+	rt.leave_room()
 
 ## Room 2 and later say so once; Room 1 and a reconnect to the same room say nothing (SGODOT-227 28c0580b).
 func _on_joined(info: Dictionary) -> void:

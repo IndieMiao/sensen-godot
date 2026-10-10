@@ -59,6 +59,12 @@ func test_an_uncaught_regional_fish_keeps_its_name_back() -> void:
 	assert_str(str(P0PondCard.fish_rows(caught, "pond_san_francisco_03").filter(func(r): return r.id == "fish_arctic_char")[0].name)).is_equal("Arctic Char")
 
 func test_a_fish_without_art_shows_the_silhouette() -> void:
-	assert_str(P0Logic.icon("fish_catfish").resource_path).ends_with("fish_sil.svg")
+	assert_str(P0Logic.icon("fish_not_drawn_yet").resource_path).ends_with("fish_sil.svg")
+	# P1's fish, gear and conditions have their art (不知火舞 accepted on 283): 12 fish, Carbon Rod, Spinner Lure, Fish
+	# Trap, and the time-of-day / weather icons
+	for id in ["fish_catfish", "fish_seabass", "fish_sturgeon", "fish_eel", "fish_tilapia", "fish_smelt", "fish_grass_carp",
+			"fish_arctic_char", "fish_snakehead", "fish_pike", "fish_barramundi", "fish_salmon", "rod_carbon", "bait_lure",
+			"trap_fish", "dawn_dusk", "day", "night", "clear", "rain", "windy"]:
+		assert_str(P0Logic.icon(id).resource_path).override_failure_message(id).is_equal("res://assets/p0/icons/%s.svg" % id)
 	assert_str(P0Logic.icon("fish_carp").resource_path).ends_with("fish_carp.svg")
 	assert_str(P0Logic.icon("nothing_here").resource_path).ends_with("field.svg")

@@ -7,6 +7,7 @@ extends RefCounted
 const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
 const P0Clusters := preload("res://modules/p0/p0_clusters.gd")
 const P0FishWorld := preload("res://modules/p0/p0_fish_world.gd")   # a pond's fish, time of day and weather (SGODOT-283)
+const P0Trap := preload("res://modules/p0/p0_trap.gd")   # Fish Trap (SGODOT-283)
 const ICON_DIR := "res://assets/p0/icons/%s.svg"
 const PinReason := preload("res://modules/p0/p0_pin_reason.gd")   # the taken requests and the pins they mark (q(104))
 
@@ -217,6 +218,14 @@ static func pond_fish(view: Dictionary, place: String) -> Array:
 			str(c.get("fishing", {}).get("sites", {}).get(str(places[id].get("site", "pond")), {}).get("template", "Pond")),
 			P0Clusters.cluster_of_region(P0City.region())).map(func(f): return str(f.id))
 		for f in ids: seen[str(f)] = true
+	if seen.is_empty() and place.find("~") > 0:   # a generated pond of another city (SGODOT-280): its site there
+		var g: Dictionary = load("res://modules/p0/p0_city_places.gd").pond(place)
+		if not g.is_empty():
+			var v: Dictionary = view.get("fishing", {}).get("places", {}).get(place, {})
+			var ids: Array = v.get("fish", []) if v.has("fish") else P0FishWorld.ever_fish(
+				str(c.get("fishing", {}).get("sites", {}).get(str(g.get("site", "pond")), {}).get("template", "Pond")),
+				str(g.cluster)).map(func(f): return str(f.id))
+			for f in ids: seen[str(f)] = true
 	return seen.keys()
 
 static func fish_level_short(view: Dictionary, items: Array, rarity) -> int:
@@ -571,7 +580,7 @@ static func _tree_action(view: Dictionary, plot: Dictionary) -> Dictionary:
 ## (`removed`) are not refilled until pinned again (§10.3.4 "从栏上移除，物品仍在背包").
 ## What each action's quick bar holds (§10.3.2): Farming seeds and fertiliser, Fishing bait. Anything in the pool
 ## stays where it was put or pinned; the bar fills its free end only with the first family (seeds / bait).
-const BAR_POOL := {"farm": ["seed_", "fert_"], "fish": ["bait_"]}
+const BAR_POOL := {"farm": ["seed_", "fert_"], "fish": ["bait_", "trap_"]}   # trap_fish: P1's Fish Trap (SGODOT-283)
 
 ## The action whose bar takes this item ("farm" / "fish"), or "" when no bar does.
 static func bar_action_of(id: String) -> String:
@@ -597,7 +606,9 @@ static func quick_bar(view: Dictionary, previous: Array, mode := "farm", pinned:
 		var hole := bar.find("")   # pinning again (Undo, a drop from the Bag) takes the first gap
 		if hole >= 0: bar[hole] = id
 		elif bar.size() < 5: bar.append(id)
-	var rest: Array = counts.keys().filter(func(id): return str(id).begins_with(prefix) and not bar.has(id) and not removed.has(id))
+	# the free end fills with the first family, and on Fishing with the Fish Trap too (the pond's design shows it, §6.8)
+	var fill := func(id): return str(id).begins_with(prefix) or (mode == "fish" and str(id).begins_with("trap_"))
+	var rest: Array = counts.keys().filter(func(id): return fill.call(id) and not bar.has(id) and not removed.has(id))
 	rest.sort_custom(func(a, b): return counts[a] > counts[b] if counts[a] != counts[b] else str(a) < str(b))
 	for id in rest:
 		if bar.size() < 5: bar.append(id)
@@ -900,7 +911,9 @@ static func dish_label(view: Dictionary, id: String) -> String:
 	return str(info.get("name", item_name(view, id))) + ("" if q == 0 else " " + "★".repeat(q))
 
 ## Main action at the pond (§6.6.1): Cast pre-pays 5; creel full / short energy say why.
-static func fish_action(view: Dictionary, bait: String, site := "pond") -> Dictionary:
+static func fish_action(view: Dictionary, bait: String, site := "pond", place := "") -> Dictionary:
+	# The Fish Trap selected on the bar (SGODOT-283): the key sets it here instead of casting
+	if bait == P0Trap.ID: return P0Trap.set_key(view, place if place != "" else str(view.get("fishing", {}).get("place", "")))
 	# Bait is optional (不知火舞 on PR #12): a pinned bait at 0 stays on the bar, and the cast just goes without it.
 	if bait != "" and bag_count(view, bait) <= 0: bait = ""
 	var f: Dictionary = view.get("fishing", {})
@@ -1259,6 +1272,8 @@ static func today_rows(view: Dictionary) -> Array:
 			if str(st.get("id", "")).begins_with("fish_") and item(view, str(st.id)).get("cook", true): fish += int(st.get("qty", 0))
 		fish -= int(wait.get("fish", 0))
 		if fish > 0 and not guided_stove: now_rows.append(_row("%d fish · the stove is free" % fish, "pot", "stove"))
+	var trap := P0Trap.today_row(view)   # full Fish Traps (SGODOT-283): a harvestable row with the red dot (q(107))
+	if not trap.is_empty(): now_rows.append(_row(str(trap.line), str(trap.icon), str(trap.go), str(trap.dot)))
 	now_rows.append_array(progress)
 	timed.sort_custom(func(a, b): return float(a[0]) < float(b[0]))
 	var rows: Array = now_rows.duplicate()

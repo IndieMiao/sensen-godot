@@ -116,12 +116,13 @@ func test_quota_short_of_the_stack_and_used_up() -> void:
 	# Server shapes (SGODOT-228): shops[role].sell = [{kind, rate, quota}], view.quotas[id] = {used, cap, resets_in, scope}.
 	var v := _view()
 	v["shops"] = {"tackle": {"sell": [{"kind": "fish", "rate": 0.8, "quota": "fish_tackle"}]}}
-	v["quotas"] = {"fish_tackle": {"used": 78, "cap": 80, "resets_in": 33120000, "scope": "any Tackle Shop"}}
+	v["quotas"] = {"fish_tackle": {"used": 70, "cap": 80, "resets_in": 33120000, "scope": "any Tackle Shop"}}
 	var s := P0ItemInfo.spec(v, "fish_crucian", &"counter_sell", {counter = "tackle"})
-	assert_array(_labels(s)).is_equal(["secondary:Sell", "primary:Sell 2 · 8 coins"])   # 2 of 3 fit, ⌊6 × 0.8⌋ = 4 each
-	assert_str(s.quota.text).is_equal("Fish buy-back today 78/80")
+	# the allowance is coins (server ⌊left / unit⌋): 10 left at ⌊6 × 0.8⌋ = 4 each takes 2 of 3
+	assert_array(_labels(s)).is_equal(["secondary:Sell", "primary:Sell 2 · 8 coins"])
+	assert_str(s.quota.text).is_equal("Fish buy-back today 70/80")
 	assert_str(s.quota.note).is_equal("any Tackle Shop · resets in 9h 12m")
-	v.quotas.fish_tackle.used = 80
+	v.quotas.fish_tackle.used = 77   # 3 coins left can't pay for one at 4: the server says limit_reached
 	s = P0ItemInfo.spec(v, "fish_crucian", &"counter_sell", {counter = "tackle"})
 	assert_array(_labels(s)).is_equal(["unavailable:Limit reached · 9h 12m"])
 	v.shops["market"] = {"sell": []}   # P0 markets take nothing
@@ -130,10 +131,38 @@ func test_quota_short_of_the_stack_and_used_up() -> void:
 func test_a_market_quota_short_of_the_stack_sells_what_fits() -> void:
 	var v := _view()
 	v["shops"] = {"market": {"sell": [{"kind": "crop", "rate": 0.8, "quota": "crop_market"}]}}
-	v["quotas"] = {"crop_market": {"used": 55, "cap": 60, "resets_in": 33120000, "scope": "all San Francisco markets"}}
+	v["quotas"] = {"crop_market": {"used": 40, "cap": 60, "resets_in": 33120000, "scope": "all San Francisco markets"}}
 	var s := P0ItemInfo.spec(v, "crop_radish", &"counter_sell", {counter = "market"})
-	assert_array(_labels(s)).is_equal(["secondary:Sell", "primary:Sell 5 · 20 coins"])   # 5 of 12 fit, ⌊5 × 0.8⌋ = 4 each
+	assert_array(_labels(s)).is_equal(["secondary:Sell", "primary:Sell 5 · 20 coins"])   # 20 coins left at ⌊5 × 0.8⌋ = 4: 5 of 12
 	assert_str(s.quota.note).is_equal("all San Francisco markets · resets in 9h 12m")
+
+## The Market Square (SGODOT-284, 不知火舞 on 240): this city's climate's regional crops and fish at 0.8, 60 coins a
+## day for the city; it lists only what it takes (LOCK-15), says Regional on its line and Limit reached when spent.
+func _market_view(used: int) -> Dictionary:
+	var v := _view()
+	v.items["crop_pumpkin"] = {"name": "Pumpkin", "kind": "crop", "sell": 22, "rarity": 1}
+	v.items["fish_salmon"] = {"name": "Salmon", "kind": "fish", "sell": 32, "rarity": 2}
+	v.bag.slots.append({"id": "crop_pumpkin", "qty": 4})
+	v.bag.slots.append({"id": "fish_salmon", "qty": 1})
+	v["shops"] = {"market": {"sell": [{"kind": "crop", "rate": 0.8, "quota": "regional_market", "regional": true, "items": ["crop_pumpkin"]},
+		{"kind": "fish", "rate": 0.8, "quota": "regional_market", "regional": true, "items": ["fish_salmon", "fish_arctic_char"]}]}}
+	v["quotas"] = {"regional_market": {"used": used, "cap": 60, "resets_in": 33120000, "scope": "this city"}}
+	return v
+
+func test_the_market_buys_only_its_regional_crops_and_fish() -> void:
+	var v := _market_view(20)
+	var s := P0ItemInfo.spec(v, "crop_pumpkin", &"counter_sell", {counter = "market"})
+	assert_array(s.facts).is_equal(["17 each"])   # ⌊22 × 0.8⌋; no count line, the corner says ×4 (不知火舞 on 246)
+	assert_array(_labels(s)).is_equal(["secondary:Sell", "primary:Sell 2 · 34 coins"])   # 40 coins left: 2 of 4
+	assert_str(s.quota.text).is_equal("Regional buy-back today 20/60")
+	assert_str(s.quota.note).is_equal("this city · resets in 9h 12m")
+	assert_bool(P0ItemInfo.flags(v, "fish_salmon", &"counter_sell", {counter = "market"}).sold_here).is_true()
+	for id in ["crop_radish", "fish_crucian", "timber"]:   # not regional here: not listed in the Sell here grid
+		assert_bool(P0ItemInfo.flags(v, id, &"counter_sell", {counter = "market"}).sold_here).is_false()
+	assert_str(P0CounterDrawer.quota_text(v, "market")).is_equal("Regional buy-back today 20/60\nthis city · resets in 9h 12m")
+	v = _market_view(50)   # 10 coins left can't pay for a 17-coin Pumpkin
+	assert_array(_labels(P0ItemInfo.spec(v, "crop_pumpkin", &"counter_sell", {counter = "market"}))).is_equal(["unavailable:Limit reached · 9h 12m"])
+	assert_array(_labels(P0ItemInfo.spec(v, "fish_salmon", &"counter_sell", {counter = "market"}))).is_equal(["unavailable:Limit reached · 9h 12m"])
 
 func test_locked_stack_shows_locked_and_unlock_only() -> void:
 	var v := _view()

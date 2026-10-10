@@ -68,7 +68,7 @@ export interface SilhouettePage { n: number; id: string; name: string; rarity: n
 
 export type ShopId = 'homestead' | 'tackle' | 'market' | 'tea' | 'post';
 export const SHOPS: readonly ShopId[] = ['homestead', 'tackle', 'market', 'tea', 'post'];
-export type QuotaId = 'fish_tackle' | 'dish' | 'material' | 'request_bonus' | 'sys_requests';
+export type QuotaId = 'fish_tackle' | 'dish' | 'material' | 'request_bonus' | 'sys_requests' | 'regional_market';
 export type BoardId = 'stall' | 'market';
 
 /**
@@ -181,9 +181,11 @@ export interface P0Content {
   bag_upgrades: { id: string; name: string; homestead: number; price: number; materials: [string, number][]; capacity: number; requires?: string }[];   // requires: the tier before (II after I)
   drinks: { energy: number; prices: number[]; daily: number; items: Record<string, { name: string; shop: ShopId }> };
   specialty: Record<string, { name: string; price: number; shop: ShopId; to: 'storage' }>;
-  shops: Record<ShopId, { sells: string; buys: Record<string, { rate: number; quota: QuotaId | null }> }>;
+  /** A counter's buy-back by item kind; regional: only the regional items of the counter's own climate (§9.13.1: the
+   * Market Square takes its climate's regional crops and fish), their quota counted per city (per_city, §11.7.3). */
+  shops: Record<ShopId, { sells: string; buys: Record<string, { rate: number; quota: QuotaId | null; regional?: boolean }> }>;
   market: { buy: string[]; specialty: string[] };
-  quotas: Record<QuotaId, { cap: number; scope: string }>;
+  quotas: Record<QuotaId, { cap: number; scope: string; per_city?: boolean }>;   // per_city: one count per account × city cluster (§11.7.3)
   affinity: {
     stages: [string, number][]; first_chat: number; request: number; gift_meal_stage: string;
     /** §7.5.3 Taught: from this stage, every `every_days` days, one page the player has not got yet. */
@@ -343,7 +345,7 @@ export function recipeById(c: P0Content, id: string): Recipe | undefined { retur
 /** Bag kind from the id prefix: seed_*, crop_*, fish_*, dish_*, bait_*, fert_*, torch (stacks of 20, §13.1.2), anything else is a material. */
 export function itemKind(id: string): string {
   const head = id.split('_')[0];
-  return ['seed', 'crop', 'fish', 'dish', 'bait', 'rod', 'fert', 'torch'].includes(head) ? head : 'material';
+  return ['seed', 'crop', 'fish', 'dish', 'bait', 'rod', 'fert', 'torch', 'trap'].includes(head) ? head : 'material';   // trap_fish: P1
 }
 
 /** Dish stacks carry their quality in the id: dish_x (Plain), dish_x@good, dish_x@perfect (§7.2.5). */

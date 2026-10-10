@@ -42,6 +42,18 @@ const DISTANCE := 40.0
 ## The opening shot puts the player's feet this far above the band's bottom edge (不知火舞 on 231).
 const OPENING_LIFT := 40.0
 var _plan: Dictionary = {}
+# Fish Trap (SGODOT-283, q(109) ⑦): the player's trap here is a float on the water at a fixed spot; its prompt follows
+# the facility rules (icon button, the strip near it, Ready with fish), a tap walks to its bank spot and opens its
+# EntryCard (Collect / Take back).
+const P0Trap := preload("res://modules/p0/p0_trap.gd")
+const TRAP_ID := "trap_fish"
+const TRAP_REACH := 1.6   # how near (flat) to the trap's bank spot its card opens / stays
+var _trap_spot: Dictionary = {}   # {origin (bank), target (water)}, worked out once per pond
+var _trap_float: Node3D
+var _trap_walk := false
+var _trap_card: UiEntryCard
+var _trap_data: Dictionary = {}
+var _trap_open := false
 var _hint_req := ""     # the request this pond's ! is for (q(103)): its progress floats and its completion toast
 var _hint_have := -1    # that request's count before the next catch
 
@@ -111,11 +123,12 @@ func _ready() -> void:
 	_update_camera()
 	rt = P0Runtime.ensure()
 	rt.attach(self)
-	rt.ui.set_mode("fish", P0City.chip(str(entry.get("name", "Pond"))))
+	rt.ui.set_mode("fish", P0City.chip_for(str(entry.get("name", "Pond")), str(entry.get("id", ""))))
 	_arrival_hint()
 
 func _exit_tree() -> void:
 	_end_fishing()
+	if is_instance_valid(_trap_card): _trap_card.queue_free()
 	if rt: rt.detach(self)
 
 func p0_surface() -> String: return "pond"
@@ -128,6 +141,7 @@ func p0_joystick(v: Vector2) -> void:
 ## Old pond taps: water → walk to the nearest bank spot and cast there; grass → walk there.
 func p0_tap(screen: Vector2) -> void:
 	if panel.visible: return
+	if _trap_tap(screen): return
 	var origin := cam.project_ray_origin(screen)
 	var dir := cam.project_ray_normal(screen)
 	if absf(dir.y) < 0.001: return
@@ -154,12 +168,13 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 	_follow(dt)
 	rt.ui.player_screen = cam.unproject_position(actor.position + Vector3(0, 0.9, 0))   # the radial fans out from here
 	rt.ui.set_action(_action_state(v))
+	_trap_frame(v)
 	# At the pond: "Your creel is your bag…" (§14.2 minute 5–9); "Casting uses 5 Energy" comes with the first cast (P0Guide).
 	if not rt.ui.has_modal(): rt.ui.teach("creel")
 
 ## Away from the bank the key still casts: it walks to the nearest bank spot first (the old Go fishing).
 func _action_state(v: Dictionary) -> Dictionary:
-	var a := P0Logic.fish_action(v, rt.ui.selected_bait, site)
+	var a := P0Logic.fish_action(v, rt.ui.selected_bait, site, p0_place())
 	# On the way to the shore (李白 q(44) ②): pressing again does nothing; not greyed (不知火舞, PR #12), no auto-cast.
 	if not _plan.is_empty(): return {"icon": "rod", "verb": "Cast", "sub": "On the way", "enabled": true, "amber": false, "cmd": {}, "need": 0}
 	if not a.get("enabled", false) or str(a.cmd.get("type", "")) != "cast": return a
@@ -167,7 +182,9 @@ func _action_state(v: Dictionary) -> Dictionary:
 	return a
 
 func p0_action(cmd: Dictionary) -> void:
-	if str(cmd.get("type", "")) == "cast": _go_cast(Vector3.INF)
+	match str(cmd.get("type", "")):
+		"cast": _go_cast(Vector3.INF)
+		"set_trap", "collect_trap": rt.session.send(cmd, P0Session.ui_key(cmd))
 
 func _go_cast(point: Vector3) -> void:
 	var plan := FishingModel.plan(str(entry.id), actor.position, point, grid, site_spec)
@@ -190,7 +207,7 @@ func p0_energy_verb() -> String: return "Cast"
 
 func _open_panel(plan: Dictionary) -> void:
 	actor.face(plan.target)
-	panel.open_p0(rt, str(entry.id), site_spec, plan.target, site, P0City.chip(str(entry.get("name", "Pond"))))
+	panel.open_p0(rt, str(entry.id), site_spec, plan.target, site, P0City.chip_for(str(entry.get("name", "Pond")), str(entry.id)))
 
 func _begin_fishing(_id: String) -> void:
 	actor.lock(true)
@@ -232,6 +249,9 @@ func p0_event(ev: Dictionary, _v: Dictionary) -> bool:
 			if panel.visible: panel.on_abort()
 		"send_failed":
 			if panel.visible: panel.on_send_failed(ev.cmd)
+		"trap":
+			if str(ev.get("action", "")) == "set" and rt.ui.selected_bait == TRAP_ID: rt.ui.selected_bait = ""   # one use
+			if str(ev.get("action", "")) == "taken_back": _close_trap_card()
 	return false
 
 ## After the landing arc (or the ripples), close the panel and let the runtime show the result card or float (FISH-3 /
@@ -484,6 +504,7 @@ func is_back_navigation_locked() -> bool:
 
 func suspend() -> void:
 	_end_fishing()
+	_close_trap_card()
 	panel.hide()
 	process_mode = Node.PROCESS_MODE_DISABLED
 	hide()
@@ -513,6 +534,18 @@ func p0_dev(step: PackedStringArray) -> bool:
 				_reopen()
 		"cast": _go_cast(Vector3.INF)
 		"castat": _go_cast(Vector3(float(step[1]), 0, float(step[2])))   # castat:x:z — a cast at that water point
+		# Fish Trap shots (SGODOT-283): picktrap selects it on the bar; settrap sets it; traptap walks to it and opens
+		# its card; trapcard opens the card where the player stands
+		"picktrap": rt.ui.selected_bait = TRAP_ID
+		"settrap": p0_action({"type": "set_trap"})
+		"traptap": _walk_to_trap()
+		"trapcard":
+			_trap_open = true
+			_trap_frame(rt.session.current())
+		"trapmain", "trapback":   # a real tap on the open card's Collect / Take back
+			if is_instance_valid(_trap_card) and _trap_card.visible:
+				var r := _trap_card.main_rect() if step[0] == "trapmain" else _trap_card.second_rect()
+				p0_tap(r.get_center() - rt.ui.root.global_position)
 		"zoom":   # zoom:0.8 — a pinch to that zoom, fingers lifted (the whole-pond shot)
 			p0_zoom(_pinch.value / float(step[1]))
 			p0_zoom_end()
@@ -531,4 +564,129 @@ func p0_until(name: String) -> bool:
 		"reel": return panel.visible and panel.phase == "playing"
 		"result": return panel.visible and panel.phase == "result"
 		"idle": return not panel.visible
+		"trapcard": return _trap_open and is_instance_valid(_trap_card) and _trap_card.visible
 	return false
+
+# ---------------------------------------------------------------- Fish Trap (SGODOT-283)
+## The trap's spot: a fixed bank point and the water in front of it (the cast plan from the pond's stand), so the float
+## is in the same place every visit; null-safe when the pond has no bank to plan from.
+func _trap_at() -> Dictionary:
+	if _trap_spot.is_empty():
+		_trap_spot = FishingModel.plan(str(entry.id), FishingModel.stand(str(entry.id), site_spec), Vector3.INF, grid, site_spec)
+	return _trap_spot
+
+## The float while the player's trap is here, its prompt, and its card.
+func _trap_frame(v: Dictionary) -> void:
+	var t := P0Trap.at(v, p0_place())
+	var spot := _trap_at()
+	if t.is_empty() or spot.is_empty():
+		if is_instance_valid(_trap_float): _trap_float.visible = false
+		_close_trap_card()
+		rt.ui.world_icon(TRAP_ID, null, Vector2.ZERO, false)
+		return
+	if not is_instance_valid(_trap_float):
+		_trap_float = _make_trap_float()
+		add_child(_trap_float)
+	_trap_float.visible = true
+	_trap_float.position = Vector3(spot.target.x, 0.055 + sin(Time.get_ticks_msec() * 0.003) * 0.012, spot.target.z)
+	# walking there: the card opens on arrival
+	if _trap_walk and not actor.mover.is_moving():
+		_trap_walk = false
+		if _near_trap(): _trap_open = true
+	if _trap_open and not _near_trap(): _close_trap_card()
+	var p := P0Trap.prompt(v, p0_place())
+	var mark := cam.unproject_position(_trap_float.position + Vector3(0, 0.6, 0))
+	var status := UiStatusBadge.State.READY if bool(p.ready) else -1
+	var show := not rt.ui.has_modal() and not _trap_open
+	if show and _near_trap():
+		rt.ui.name_bar(TRAP_ID, P0Logic.icon(TRAP_ID), str(p.text), str(p.fact), mark, true, -1, false, status, mark)
+	else:
+		rt.ui.world_icon(TRAP_ID, P0Logic.icon(TRAP_ID), mark, show, false, status, mark)
+	_show_trap_card(v, mark)
+
+func _near_trap() -> bool:
+	var spot := _trap_at()
+	return not spot.is_empty() and Vector2(actor.position.x - spot.origin.x, actor.position.z - spot.origin.z).length() <= TRAP_REACH
+
+## A tap on the trap's button / strip, or on its open card. True when it was the trap's.
+func _trap_tap(screen: Vector2) -> bool:
+	if str(rt.ui.tapped_card) == TRAP_ID:
+		if _near_trap(): _trap_open = true
+		else: _walk_to_trap()
+		return true
+	if is_instance_valid(_trap_card) and _trap_card.visible:
+		var hit := _trap_card.tap_at(screen + rt.ui.root.global_position)
+		if hit != "": return true
+		_close_trap_card()
+	return false
+
+func _walk_to_trap() -> void:
+	var spot := _trap_at()
+	if spot.is_empty(): return
+	_plan = {}
+	if _near_trap():
+		_trap_open = true
+	elif actor.mover.set_target_position(spot.origin):
+		_trap_walk = true
+
+func _show_trap_card(v: Dictionary, mark: Vector2) -> void:
+	_trap_data = P0Trap.card(v, p0_place())
+	if not _trap_open or _trap_data.is_empty() or rt.ui.has_modal():
+		if is_instance_valid(_trap_card): _trap_card.visible = false
+		return
+	if not is_instance_valid(_trap_card):
+		if rt.ui.root == null: return
+		_trap_card = UiEntryCard.new()
+		_trap_card.theme = UiKit.theme()
+		_trap_card.passive = true   # a drag on it is the joystick; p0_tap resolves the real tap (as the mine's card)
+		_trap_card.pressed.connect(func(): _press_trap(_trap_data.get("main", {})))
+		_trap_card.second_pressed.connect(func(): _press_trap(_trap_data.get("second", {})))
+		rt.ui.root.add_child(_trap_card)
+	var main: Dictionary = _trap_data.main
+	var second: Dictionary = _trap_data.second
+	_trap_card.visible = true
+	_trap_card.title = str(_trap_data.title)
+	_trap_card.title_fact = str(_trap_data.fact)
+	_trap_card.action = str(main.label)
+	_trap_card.state = UiEntryCard.State.AVAILABLE if bool(main.enabled) else UiEntryCard.State.UNAVAILABLE
+	_trap_card.second = str(second.label)
+	_trap_card.second_state = UiEntryCard.State.AVAILABLE if bool(second.enabled) else UiEntryCard.State.UNAVAILABLE
+	var size := _trap_card.get_combined_minimum_size()
+	var r := WorldAnchor.place(size, mark - Vector2(0, UiTokens.SPACE_WITHIN), Rect2(Vector2.ZERO, rt.ui.root.size), UiTokens.SPACE_WITHIN, true)
+	r = WorldAnchor.lift_clear(r, actor.screen_box(cam), P0FarmMaterials.BODY_GAP, rt.ui.card_top())
+	_trap_card.size = size
+	_trap_card.position = r.position
+	_trap_card.point_at(mark.x - r.position.x)
+
+## A card button: grey says why (LOCK-10), else its command.
+func _press_trap(b: Dictionary) -> void:
+	if not bool(b.get("enabled", false)):
+		if str(b.get("toast", "")) != "": rt.ui.toast(str(b.toast))
+		return
+	p0_action(b.get("cmd", {}))
+
+func _close_trap_card() -> void:
+	_trap_open = false
+	if is_instance_valid(_trap_card): _trap_card.visible = false
+
+## The trap's float: a small wicker cage top and its bobber, at the water's height.
+func _make_trap_float() -> Node3D:
+	var root := Node3D.new()
+	root.name = "FishTrap"
+	for part in [[Vector3(0.22, 0.07, 0.22), Vector3.ZERO, Color("b98a52")], [Vector3(0.07, 0.11, 0.07), Vector3(0, 0.1, 0), Color("fff2d1")],
+			[Vector3(0.055, 0.06, 0.055), Vector3(0, 0.18, 0), Color("db654f")]]:
+		var mesh := MeshInstance3D.new()
+		var sphere := SphereMesh.new()
+		sphere.radius = 1
+		sphere.height = 2
+		mesh.mesh = sphere
+		mesh.scale = part[0]
+		mesh.position = part[1]
+		var m := StandardMaterial3D.new()
+		m.albedo_color = part[2]
+		m.roughness = 0.6
+		mesh.material_override = m
+		mesh.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		root.add_child(mesh)
+	root.scale = Vector3.ONE * FLOAT_SCALE
+	return root

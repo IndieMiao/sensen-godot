@@ -20,6 +20,8 @@ const P0_OUTPOST := "res://scenes/p0/p0_outpost.tscn"
 static var NEAREST_POND := P0City.beginner_pond()   # the beginner pond, the closest to home (SGODOT-270: from content)
 const PondCard := preload("res://modules/p0/p0_pond_card.gd")
 const P0Ponds := preload("res://modules/p0/p0_ponds.gd")   # P0's own ponds: San Francisco (SGODOT-270)
+const P0CityPlaces := preload("res://modules/p0/p0_city_places.gd")   # other cities' places (SGODOT-280)
+const P0ArrivalCard := preload("res://modules/p0/p0_arrival_card.gd")   # MAP-7-FREE, the first visit's three things
 const PinReason := preload("res://modules/p0/p0_pin_reason.gd")   # why a pin wears its mark (q(103))
 ## Online counts on the outpost pins (GET /p0/presence), refreshed while the map is on top.
 const PRESENCE_S := 15.0
@@ -259,6 +261,11 @@ func _prewarm_pond(id: String) -> void:
 
 func _set_outpost_places() -> void:
 	var places: Array = P0Outposts.all().map(func(o): return P0Outposts.place_entry(o, int(_online.get(str(o.id), 0))))
+	for cluster in _shown_cities:   # other cities' outposts (SGODOT-280), once their places are in
+		for o in P0CityPlaces.city(cluster).get("outposts", []):
+			var e := P0Outposts.place_entry(o, int(_online.get(str(o.id), 0)))
+			e["cluster"] = cluster
+			places.append(e)
 	if away(): places.append(home_entry())   # away from home the farm wears its Homestead pin (不知火舞 on 234)
 	city_map.set_places(places)
 
@@ -739,12 +746,49 @@ func on_arrival(ev: Dictionary) -> void:
 	if from != Vector2.ZERO:
 		center_lat = from.x
 		center_lng = from.y
-	var welcome := ("Welcome to %s · Stamp collected" % str(c.name)) if bool(ev.get("first", false)) else "Welcome back"
+	var first := bool(ev.get("first", false))
+	var welcome := ("Welcome to %s · Stamp collected" % str(c.name)) if first else "Welcome back"
 	_switch_city(r)
+	_load_city_places(cluster)   # its ponds and outposts, read while the camera flies
 	_fly_to(float(overview.get("lat", c.lat)), float(overview.get("lng", c.lng)), float(overview.get("zoom", 11.0)),
-		float(overview.get("bearing", 0.0)), func(): rt.ui.toast(welcome), P0Travel.flight_s(int(ev.get("trip", 1))))
+		float(overview.get("bearing", 0.0)), func():
+			rt.ui.toast(welcome)
+			if first: open_arrival_card(cluster), P0Travel.flight_s(int(ev.get("trip", 1))))
 	_flight = _focus_tween
 	_flight_kind = "travel"
+
+## MAP-7-FREE (§11.8.4 step 7, Figma 482:412): a first visit lands on "3 things to do here" — the local pond, an
+## outpost and the new stamp. Show local pond only moves the camera to the beginner pond's pin (LOCK-08, the player taps
+## Go); Visit the outpost goes into the city's market square (an outpost room, its pass just issued). Waits for the
+## city's places when they are still on their way.
+func open_arrival_card(cluster: String) -> void:
+	if rt == null: return
+	if not P0CityPlaces.has_city(cluster):
+		P0CityPlaces.fetch(rt.session, cluster, func(_c): open_arrival_card(cluster))
+		return
+	var c := P0Clusters.get_cluster(cluster)
+	var pond := P0CityPlaces.beginner_pond(cluster)
+	var outpost := P0CityPlaces.first_outpost(cluster)
+	var climate := str(c.get("climate", "")).capitalize()   # the table's "temperate" → "Temperate" (§11.9.3 bands)
+	var spec := {
+		"title": str(c.get("name", "")), "state": "Nearby", "effect": "Choose your first local activity.",
+		"rows": [
+			{"icon": P0Logic.icon("pond"), "title": "Local pond", "effect": "Pond Crucian for every level"},
+			{"icon": P0Logic.icon("home"), "title": "Outpost", "effect": ("%s seeds and local requests" % climate) if climate != "" else "Local requests"},
+			{"icon": P0Logic.icon("stamp"), "title": "%s stamp" % str(c.get("name", "")), "state": "New", "effect": "View it in your Passport"},
+		],
+		"links": [] if pond.is_empty() else [["Show local pond", func():
+			rt.ui.close_modal()
+			_show_generated(pond.merged({"kind": "pond"}))]],
+		"primary": "Visit the outpost" if not outpost.is_empty() else "",
+	}
+	P0ArrivalCard.open(rt.ui, spec, func():
+		rt.ui.close_modal()
+		if not outpost.is_empty(): _open_outpost(str(outpost.id)))
+
+## The camera flies to another city's pin and selects it (Show, LOCK-08: nothing is entered).
+func _show_generated(entry: Dictionary) -> void:
+	_fly("show:" + str(entry.get("id", "")), float(entry.lat), float(entry.lng), SHOW_ZOOM, func(): city_map.select(entry))
 
 ## A city bubble's line (不知火舞 on #227): the home city its players online with a house; an explored city Visited;
 ## the rest Unexplored. Second Home is not shown in this version (it comes with the paid second version).
@@ -822,6 +866,24 @@ func _switch_city(r: Dictionary) -> void:
 	region = r
 	city_map.region_changed()
 	_refresh_nearby()
+	_load_city_places(P0Clusters.cluster_of_region(str(r.get("id", ""))))
+
+## Another city's ponds and outposts (SGODOT-280, the server's generator): read once per city when the camera city
+## becomes it (or the player arrives there), then pinned like the home city's. A pin of a city without a pass still
+## opens its travel card (_travel_first). The home city keeps its hand-written pins.
+var _shown_cities: Array = []
+const SHOWN_CITIES := 6   # the cities whose pins stay on the map, the latest last
+
+func _load_city_places(cluster: String) -> void:
+	if cluster == "" or rt == null or cluster == P0Travel.home(_view()): return
+	P0CityPlaces.fetch(rt.session, cluster, _show_city_places.bind(cluster))
+
+func _show_city_places(_city: Dictionary, cluster: String) -> void:
+	if not city_map or _shown_cities.has(cluster): return
+	_shown_cities.append(cluster)
+	if _shown_cities.size() > SHOWN_CITIES: _shown_cities.pop_front()
+	city_map.preload_ponds(P0CityPlaces.city(cluster).get("ponds", []))
+	_set_outpost_places()
 
 ## Any city by its region or cluster id, not only those around the camera (a bubble, later the destination lists):
 ## map_poc.fly_to_city looks it up in city_regions(), so it is in the list while it does.
@@ -935,6 +997,9 @@ func _take_after_leave() -> bool:
 	if rt == null: return false
 	var next := rt.after_leave
 	rt.after_leave = ""
+	if next.begins_with("travel:"):   # a room that refused the player (no pass, SGODOT-280): that city's travel card
+		open_travel.call_deferred(next.trim_prefix("travel:"))
+		return true
 	match next:
 		"farm": _open_my_farm.call_deferred()      # FISH-4 Go home · Free
 		"tackle": show_place.call_deferred("outpost:tackle")   # FISH-5 Tackle Shop: the camera goes to Old Kai's pin
@@ -965,7 +1030,8 @@ func p0_show_spot(where: String) -> void:
 func place_for(target: String) -> Dictionary:
 	if target == "home": return {"lat": home_lat, "lng": home_lng}
 	if target.begins_with("outpost:"):
-		var o := P0Outposts.by_role(target.trim_prefix("outpost:"))
+		var key := target.trim_prefix("outpost:")
+		var o := P0Outposts.find(key) if key.find("~") > 0 else P0Outposts.by_role(key)   # another city's by id (SGODOT-280)
 		return {} if o.is_empty() else P0Outposts.place_entry(o, int(_online.get(str(o.id), 0)))
 	if target.begins_with("pond:"): return P0Ponds.location(target.trim_prefix("pond:"))
 	return {}
@@ -1098,6 +1164,14 @@ func p0_dev(step: PackedStringArray) -> bool:
 					_unhandled_input(touch)
 			if step.size() > 3: get_tree().create_timer(float(step[3])).timeout.connect(tap)
 			else: tap.call()
+		"fly":   # fly:gn-1850147 — the travel card's Fly for that city (review shots, SGODOT-280): travel, then the arrival
+			_origin_before = _origin()
+			rt.session.send({"type": "travel", "to": step[1]})
+		"arrivalcard":   # arrivalcard:gn-1850147 — the first visit's card (MAP-7-FREE) for that city
+			open_arrival_card(step[1])
+		"arrivalgo":   # the arrival card's Visit the outpost, as a tap on it
+			var b := rt.ui.root.find_child("Primary", true, false)
+			if b is UiCommandButton: (b as UiCommandButton).activated.emit()
 		"center":   # center:31.228:121.478 (the city overview) — where the camera looks, for shots
 			center_lat = float(step[1])
 			center_lng = float(step[2])

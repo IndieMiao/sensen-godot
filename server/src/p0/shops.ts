@@ -13,6 +13,7 @@ import { maxEnergy, skillLevel, untilRollover } from './rules.js';
 import type { P0State } from './state.js';
 import { missing, putInStorage, stored, takeStorageFirst } from './storage.js';
 import type { Refusal } from './fishing.js';
+import { clusterOf, homeCluster } from './travel.js';
 import { decorOf, isDecor } from './decor.js';
 import { climateAt } from './travel.js';
 
@@ -140,17 +141,37 @@ export function drink(c: P0Content, s: P0State, cmd: { item?: unknown; shop?: un
 }
 
 /** Buyback for one id at one counter: per-unit coins and the quota it counts against, or why it can't be sold here. */
-export function buyback(c: P0Content, shop: ShopId, id: string): { unit: number; quota: QuotaId | null } | { code: 'not_sellable' | 'not_sellable_here' } {
+export function buyback(c: P0Content, shop: ShopId, id: string, zone = c.profile.climate): { unit: number; quota: QuotaId | null } | { code: 'not_sellable' | 'not_sellable_here' } {
   const kind = itemKind(id), base = sellPriceOf(c, id);
   const anywhere = base !== null && base > 0 && SHOPS.some(sh => c.shops[sh].buys[kind]);
   if (!anywhere || (kind === 'dish' && dishParts(id).base === c.cooking.mystery.id)) return { code: 'not_sellable' };
   const rule = c.shops[shop].buys[kind];
   if (!rule) return { code: 'not_sellable_here' };
+  // §9.13.1: a Market Square takes only its own climate's regional crops and fish
+  if (rule.regional && !regionalOf(c, id, zone)) return { code: 'not_sellable_here' };
   return { unit: Math.max(1, Math.floor(base! * rule.rate + 1e-9)), quota: rule.quota };
 }
 
-export function quotaLeft(c: P0Content, s: P0State, q: QuotaId): number {
-  return Math.max(0, c.quotas[q].cap - (s.day.quota[q] ?? 0));
+/** A regional crop or fish of this climate (crop.zone, fish.zones). */
+export function regionalOf(c: P0Content, id: string, zone: string): boolean {
+  const crop = c.crops.find(x => x.id === id) as { regional?: boolean; zone?: string } | undefined;
+  if (crop) return !!crop.regional && crop.zone === zone;
+  const fish = c.fish.find(x => x.id === id) as { regional?: boolean; zones?: string[] } | undefined;
+  return !!fish?.regional && !!fish.zones?.includes(zone);
+}
+
+/** The day's count key of a quota: per_city ones (§11.7.3) count per account × city cluster, `regional_market@gn-…`. */
+export function quotaKey(c: P0Content, q: QuotaId, cluster: string): string {
+  return c.quotas[q].per_city ? `${q}@${cluster}` : q;
+}
+
+/** The city a counter command is at: its place's cluster, else the city the player is in (home before v5 travel). */
+export function counterCity(c: P0Content, s: P0State, place: unknown): string {
+  return (typeof place === 'string' && place !== '' ? clusterOf(c, place) : null) ?? s.travel?.here ?? homeCluster(c);
+}
+
+export function quotaLeft(c: P0Content, s: P0State, q: QuotaId, cluster = homeCluster(c)): number {
+  return Math.max(0, c.quotas[q].cap - (s.day.quota[quotaKey(c, q, cluster)] ?? 0));
 }
 
 /** §9.6.4: items a tracked request names are kept back from Sell All. */
@@ -163,13 +184,14 @@ export function protectedQty(s: P0State, id: string): number {
   return n;
 }
 
-export function sellItem(c: P0Content, s: P0State, cmd: { item?: unknown; qty?: unknown; shop?: unknown }, now: number, events: P0Event[]): Refusal | null {
+export function sellItem(c: P0Content, s: P0State, cmd: { item?: unknown; qty?: unknown; shop?: unknown; place?: unknown }, now: number, events: P0Event[]): Refusal | null {
   const shop = shopOf(cmd.shop), id = String(cmd.item ?? '');
   if (!shop) return { code: 'bad_shop' };
   const all = cmd.qty === 'all';
   const qty = all ? 0 : Number(cmd.qty);
   if (!all && (!Number.isInteger(qty) || qty < 1)) return { code: 'bad_qty' };
-  const price = buyback(c, shop, id);
+  const city = counterCity(c, s, cmd.place);
+  const price = buyback(c, shop, id, climateAt(c, s, cmd.place));
   if ('code' in price) return { code: price.code };
   if (all && s.locked.includes(id)) return { code: 'locked_item' };
   const have = count(s.bag, id, 'skip');
@@ -178,13 +200,13 @@ export function sellItem(c: P0Content, s: P0State, cmd: { item?: unknown; qty?: 
   if (want < 1 || have < want) return { code: 'not_enough', detail: { have, protected: all ? have - want : 0 } };
   let n = want;
   if (price.quota) {
-    n = Math.min(want, Math.floor(quotaLeft(c, s, price.quota) / price.unit));
+    n = Math.min(want, Math.floor(quotaLeft(c, s, price.quota, city) / price.unit));
     if (n < 1) return { code: 'limit_reached', detail: { quota: price.quota, resets_in: untilRollover(c, now) } };
   }
   const coins = n * price.unit;
   take(s.bag, id, n, 'skip');
   s.coins += coins;
-  if (price.quota) s.day.quota[price.quota] = (s.day.quota[price.quota] ?? 0) + coins;
+  if (price.quota) { const k = quotaKey(c, price.quota, city); s.day.quota[k] = (s.day.quota[k] ?? 0) + coins; }
   events.push({ kind: 'item', id, delta: -n }, { kind: 'coins', delta: coins },
     { kind: 'sale', item: id, qty: n, asked: want, coins, shop, quota: price.quota });
   return null;
