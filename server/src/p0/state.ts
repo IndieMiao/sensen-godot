@@ -1,6 +1,7 @@
 /** P0 player state (one homestead per player; no compatibility with the old farm state). */
 import type { P0Content, Skill } from './content.js';
 import { maxEnergy } from './rules.js';
+import { freshTravel, type TravelState } from './travel.js';
 
 export type PlotState = 'wild' | 'tilled' | 'sown' | 'growing';
 export interface Plot {
@@ -111,8 +112,11 @@ export interface P0Day {
   mishaps: number;                      // failed pots today (the blessing's first 10 refund their ingredients, §7.5.2)
 }
 
+/** The save version this server writes. Older saves are brought up to it at load (upgradeState). */
+export const SAVE_VERSION = 5;
+
 export interface P0State {
-  v: 4;
+  v: 5;
   player: string;
   created_at: number;
   clock_ms: number;              // dev-only clock offset (time skip)
@@ -146,6 +150,7 @@ export interface P0State {
   gather: { ready_at: Record<string, number>; last_at: number };   // §13.2: when each spot can be gathered again; last tap (tempo)
   mine: MineState;
   storage_auto: { at: number; items: [string, number][] } | null;   // last auto-store on coming home (q(40)), floated once by the client
+  travel: TravelState;           // home / current city, visited cities, stamps, Day Pass (v5, SGODOT-275)
   seen?: string[];   // map markers' ◆ already looked at: item:<id> / talk:<resident> (SGODOT-232, q(48))
   fires: number;                 // pots ever started (first fire is the tutorial ring)
   rng: number;
@@ -161,7 +166,7 @@ export function freshState(c: P0Content, player: string, now: number, seed = has
   for (let i = 0; i < c.start.tilled_plots; i++) plots.push({ id: i, state: 'tilled' });
   for (let i = 0; i < c.start.wild_plots; i++) plots.push({ id: c.start.tilled_plots + i, state: 'wild' });
   return {
-    v: 4, player, created_at: now, clock_ms: 0,
+    v: 5, player, created_at: now, clock_ms: 0,
     energy: { value: c.energy.max_base, tick_ms: now },
     coins: c.start.coins,
     skills: { farming: 0, fishing: 0, cooking: 0 },
@@ -182,6 +187,7 @@ export function freshState(c: P0Content, player: string, now: number, seed = has
     gather: { ready_at: {}, last_at: 0 },
     mine: freshMine(),
     storage_auto: null,
+    travel: freshTravel(c),
     seen: [],
     fires: 0,
     rng: seed, seq: 0,
@@ -196,7 +202,7 @@ export function tutorialRequest(c: P0Content, now: number): BoardRequest {
 }
 
 /**
- * Bring a stored playtest save up to the current shape (v1 M1 → v2 M2 → v3 SGODOT-228 → v4 SGODOT-231). The prototype promises no
+ * Bring a stored playtest save up to the current shape (v1 M1 → v2 M2 → v3 SGODOT-228 → v4 SGODOT-231 → v5 SGODOT-275). The prototype promises no
  * compatibility, but filling defaults keeps local saves playable: v3 adds Homestead Lv1, an empty farm storage and
  * the boards, moving the old tutorial request into Stall Board slot 1 with its status.
  */
@@ -236,6 +242,9 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
     s.mine ??= freshMine();
     s.storage_auto ??= null;
   }
+  if (s.v < 5) {   // SGODOT-275: cross-city travel. Everyone starts at home, nothing visited, no stamps, no pass
+    s.travel ??= freshTravel(c);
+  }
   s.req_done ??= [];
   s.cabinet ??= [];
   s.queue ??= null;
@@ -261,7 +270,7 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
   s.inbox ??= emptyInbox();   // SGODOT-232: filled for v3 and v4 saves alike, without a version of its own
   s.seen ??= [];   // SGODOT-232 map markers, the same way
   s.day = { ...emptyDay(s.day?.key ?? ''), ...s.day };
-  s.v = 4;
+  s.v = SAVE_VERSION;
   return s;
 }
 

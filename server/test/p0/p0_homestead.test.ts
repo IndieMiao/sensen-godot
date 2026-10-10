@@ -151,7 +151,7 @@ describe('Homestead Lv1–3 (§8.1–8.3)', () => {
     (old.requests as { status: string }[])[0].status = 'accepted';
     (old.gear as Record<string, unknown>).hoes = undefined;
     const s = upgradeState(c, old as unknown as P0State, T0);
-    expect(s.v).toBe(4);
+    expect(s.v).toBe(5);
     expect(s.homestead.level).toBe(1);
     expect(s.bag_cap).toBe(25);
     expect(s.boards.stall[0].req).toMatchObject({ id: 'req_pond_catch', status: 'accepted', qty: 2, drawn_at: old.created_at });

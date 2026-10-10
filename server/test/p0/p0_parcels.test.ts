@@ -147,7 +147,7 @@ describe('P0 passive rewards (§10.4.8, q(45); SGODOT-232 S1, rescued from SGODO
     s.skills.fishing = 70;
     const v4 = JSON.parse(JSON.stringify(s)); delete v4.inbox;
     const v3 = JSON.parse(JSON.stringify(v4)); v3.v = 3; delete v3.mine; delete v3.gather;
-    expect(upgradeState(c, v3)).toMatchObject({ v: 4, inbox: { granted: [], parcels: [], waiting: [], updates: [] } });
+    expect(upgradeState(c, v3)).toMatchObject({ v: 5, inbox: { granted: [], parcels: [], waiting: [], updates: [] } });
     const upgraded = upgradeState(c, v4);
     expect(upgraded.inbox).toEqual({ granted: [], parcels: [], waiting: [], updates: [] });
     expect(upgraded.bag).toEqual(s.bag);

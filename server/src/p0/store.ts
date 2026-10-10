@@ -1,14 +1,21 @@
 /** In-memory P0 state store with an optional JSON file for local / emulator playtests. */
-import { existsSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import type { P0Content } from './content.js';
-import { freshState, upgradeState, type P0State } from './state.js';
+import { freshState, SAVE_VERSION, upgradeState, type P0State } from './state.js';
 import { settleParcels } from './parcels.js';
 
 export class P0Store {
   private players = new Map<string, P0State>();
+  /** Saves brought up from an older version when the file was loaded (the server logs it at start). */
+  readonly migrated: number = 0;
   constructor(private c: P0Content, private file?: string) {
     if (file && existsSync(file)) {
       const saved = JSON.parse(readFileSync(file, 'utf8')) as Record<string, P0State>;
+      const older = Object.values(saved).filter(s => (s.v as number) < SAVE_VERSION).length;
+      // The next write replaces the whole file in the new shape: keep the file as it was, once per version step.
+      const keep = `${file}.v${Math.min(...Object.values(saved).map(s => s.v as number))}.bak`;
+      if (older && !existsSync(keep)) copyFileSync(file, keep);
+      this.migrated = older;
       for (const [id, state] of Object.entries(saved)) this.players.set(id, upgradeState(c, state));
     }
   }

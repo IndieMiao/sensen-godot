@@ -16,6 +16,7 @@ import { loadOutposts } from '../src/p0/online/outposts.js';
 import { OutpostRooms } from '../src/p0/online/rooms.js';
 import { registerP0Routes } from '../src/p0/routes.js';
 import { P0Store } from '../src/p0/store.js';
+import { SAVE_VERSION } from '../src/p0/state.js';
 import { AppearanceCatalog } from '../src/realtime/appearance.js';
 import { guardOptionsFromEnv, registerP0Guard, snapshotState, trustProxyFromEnv } from '../src/p0/guard.js';
 import { registerP0Admin } from '../src/p0/admin.js';
@@ -27,6 +28,7 @@ const stateFile = process.env.P0_STATE_FILE ?? path.join(root, 'output/p0/p0-sta
 mkdirSync(path.dirname(stateFile), { recursive: true });   // only the save's own folder (the image's /repo is read-only to it)
 const content = loadP0Content();
 const store = new P0Store(content, stateFile);
+if (store.migrated) console.log(JSON.stringify({ migrated: store.migrated, to: SAVE_VERSION, kept: `${stateFile}.v<old>.bak` }));
 // SGODOT-232 D1: a 32 KB body limit, the demo key and request limits (P0_ACCESS_KEYS, P0_RATE_PER_MINUTE, P0_RATE_PER_IP;
 // P0_TRUST_PROXY=1 behind Caddy) and hourly save snapshots (P0_SNAPSHOT_DIR, 48 kept). A deployed server runs with
 // P0_DEV=0 so no dev route is registered.
