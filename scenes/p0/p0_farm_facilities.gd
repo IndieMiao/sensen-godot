@@ -698,8 +698,9 @@ func open_bin(f: Dictionary) -> void:
 	farm.actor.face(_cell_ground(cell_of(f)))
 	rt.ui.open_compost_bin()
 
-## A greenhouse's status card (李白): `Greenhouse` / `16 plots · −25%` / `Move`; crops under it grey Move with
-## `Move · Harvest first`. The view's ids are JSON numbers (floats): compared as ints.
+## A greenhouse's status card (李白): `Greenhouse` / `16 plots · −25%` / `Move`, the green primary key while it can move;
+## crops under it grey Move with `Move · Harvest first` (q(139): a facility card's one action is the primary key when it
+## works, the grey key with its reason when it does not). The view's ids are JSON numbers (floats): compared as ints.
 static func greenhouse_card(view: Dictionary, f: Dictionary) -> Dictionary:
 	var under := (f.get("covers", []) as Array).map(func(x): return int(x))
 	var growing := false
@@ -708,7 +709,7 @@ static func greenhouse_card(view: Dictionary, f: Dictionary) -> Dictionary:
 			growing = true
 	var cut := cut_percent(str(f.get("kind", "")))
 	return {"title": "Greenhouse", "lead": "%d plots · −%d%%" % [under.size(), cut], "icon": P0Logic.icon("facility_greenhouse"),
-		"button": "Move", "reason": "Move · Harvest first" if growing else ""}
+		"button": "Move", "kind": &"primary", "reason": "Move · Harvest first" if growing else ""}
 
 ## A sprinkler's status card (q(136), FAC-STATUS 2116:32993): `Sprinkler` / `Waters 8 plots · −15%` — the greenhouse's
 ## `16 plots · −25%` form — and `Move`, the card's one action, as the green primary key.

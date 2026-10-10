@@ -56,9 +56,32 @@ func test_the_card_greys_move_while_something_grows_under_glass() -> void:
 	var f := {"id": 4.0, "kind": "greenhouse", "plot": 0.0, "covers": covers}
 	var v := {"plots": [{"id": 13.0, "state": "tilled", "crop": null}, {"id": 16.0, "state": "growing", "crop": "crop_radish"}]}
 	var card := P0FarmFacilities.greenhouse_card(v, f)
-	assert_that([card.title, card.lead, card.button, card.reason]).is_equal(["Greenhouse", "16 plots · −25%", "Move", ""])
+	assert_that([card.title, card.lead, card.button, card.kind, card.reason]).is_equal(["Greenhouse", "16 plots · −25%", "Move", &"primary", ""])
 	v.plots[0] = {"id": 13.0, "state": "growing", "crop": "crop_radish"}
 	assert_str(str(P0FarmFacilities.greenhouse_card(v, f).reason)).is_equal("Move · Harvest first")
+
+## q(139): the card's one action is the green primary key while the greenhouse can move, the grey key with its reason
+## while something grows under the glass.
+func test_the_cards_move_is_primary_when_it_works_and_grey_when_it_does_not() -> void:
+	var covers := [0.0, 1.0, 2.0, 3.0, 6.0, 7.0, 8.0, 9.0, 12.0, 13.0, 14.0, 15.0, 18.0, 19.0, 20.0, 21.0]
+	var f := {"id": 4.0, "kind": "greenhouse", "plot": 0.0, "covers": covers}
+	var ui := P0Ui.new()
+	ui.quick_store = "user://test_p1_greenhouse_quick.json"
+	ui.tips_path = "user://test_p1_greenhouse_tips.json"
+	add_child(auto_free(ui))
+	await await_idle_frame()
+	for growing in [false, true]:
+		var v := {"plots": [{"id": 13.0, "state": "growing" if growing else "tilled", "crop": "crop_radish" if growing else null}]}
+		var sheet := ui.open_facility_card(P0FarmFacilities.greenhouse_card(v, f), func(): pass)
+		await await_idle_frame()
+		var keys := sheet.find_children("*", "UiCommandButton", true, false).filter(func(b): return b.visible)
+		assert_int(keys.size()).is_equal(1)
+		var key := keys[0] as UiCommandButton
+		if growing: assert_that([key.label, key.reason]).is_equal(["Move · Harvest first", "Move · Harvest first"])
+		else: assert_that([key.label, key.kind, key.reason]).is_equal(["Move", UiCommandButton.Kind.PRIMARY, ""])
+		ui.close_modal()
+		await await_idle_frame()
+	for path in [ui.quick_store, ui.tips_path]: DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 
 ## Moving a greenhouse: its own plots are not in the way, with the view's ids as the JSON floats they are.
 func test_a_greenhouse_moved_over_its_own_plots_is_not_in_its_own_way() -> void:
