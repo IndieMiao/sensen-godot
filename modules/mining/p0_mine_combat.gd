@@ -18,6 +18,26 @@ const TEMPO_MARGIN_S := 0.05
 ## Express lands right by the elite (李元芳 R5 on SGODOT-288). With the key already on Attack, that is time to swing.
 const LANDING_GRACE_S := 2.0
 
+## The lunge band (不知火舞 288 785a6a5b, 上官婉儿 c8a7507a, 李白 on 288): from the wind-up's first frame a strip on the
+## ground from the slime's feet along the locked lunge, as long as the lunge reaches (dash speed × time + the hit
+## radius) and as wide as the hit, its far end round; it sweeps from the feet to its far end over the wind-up, the
+## slime leaps when it is full, the band stays through the lunge and fades over 0.15 s after it (不知火舞 7d4f0231).
+## Orange-red #E8603C at 30 %; the elite's in full, a slime's paler (the 70 % edge did not read on the ground and is
+## gone). The direction is the one the wind-up locked (mine_combat sets enemy.direction once): the lunge follows the
+## band, never re-aims.
+const BAND_COLOR := Color("e8603c")
+const BAND_FILL := 0.30
+const BAND_FADE_S := 0.15
+const BAND_PALE := 0.6       # a common slime's band, against the elite's
+const BAND_Y := 0.03
+## The wind-up squash on Body only (pivot at its feet, so they stay on the ground), a small shake of its position over
+## the last 0.2 s, and a 0.08 s rebound as it leaps (上官婉儿 c8a7507a).
+const SQUASH := Vector3(1.18, 0.78, 1.18)
+const SHAKE_S := 0.2
+const SHAKE_M := 0.03
+const REBOUND_S := 0.08
+const HAPTIC_MS := 20
+
 var _weapon := {"damage": 3, "speed": 2.0, "range": REACH, "knockback": KNOCKBACK}
 
 ## The weapon from the view (mine.weapon {attack, speed}); damage feeds the floating number only.
@@ -55,6 +75,7 @@ func sync_p0(view: Dictionary, n: int, player_mover: PlayerMover) -> void:
 			movement.position = point
 			movement.speed = float(spec.move_speed)
 			var node := _slime(spec, kind == "elite_slime")
+			node.add_child(_band(spec, kind == "elite_slime"))
 			add_child(node)
 			node.position = point
 			(node.get_node("Health") as Label3D).visible = false   # the bar only (EnemyHP Kind=Mob, COMBAT-1)
@@ -105,3 +126,112 @@ func in_reach(at: Vector3) -> String:
 			best_d = d
 			best = id
 	return best
+
+
+## One wind-up's band: a flat strip on the ground under the slime's root, out of Body's squash, hidden until a wind-up.
+func _band(spec: Dictionary, elite: bool) -> Node3D:
+	var band := Node3D.new()
+	band.name = "Band"
+	band.visible = false
+	var reach := float(spec.dash_speed) * float(spec.dash_seconds) + float(spec.radius) + 0.35
+	var width := (float(spec.radius) + 0.35) * 2.0
+	var m := StandardMaterial3D.new()
+	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	m.albedo_color = Color(BAND_COLOR, BAND_FILL * (1.0 if elite else BAND_PALE))
+	# The strip (unit length, scaled along z as it sweeps) and its round far end (a disc the strip's width, moved to
+	# the tip), one material so the overlap reads as one shape
+	var strip := MeshInstance3D.new()
+	strip.name = "Strip"
+	var quad := PlaneMesh.new()
+	quad.size = Vector2(width, 1.0)
+	strip.mesh = quad
+	strip.material_override = m
+	strip.position.y = BAND_Y
+	band.add_child(strip)
+	var cap := MeshInstance3D.new()
+	cap.name = "Cap"
+	var disc := CylinderMesh.new()
+	disc.top_radius = width * 0.5
+	disc.bottom_radius = width * 0.5
+	disc.height = 0.001
+	disc.radial_segments = 24
+	disc.rings = 1
+	cap.mesh = disc
+	cap.material_override = m
+	cap.position.y = BAND_Y
+	band.add_child(cap)
+	band.set_meta("reach", reach)
+	band.set_meta("width", width)
+	band.set_meta("alpha", m.albedo_color.a)
+	return band
+
+## The base step, then the wind-up's look: the band sweeping out along the locked direction, Body squashed with a
+## shake at the end, the rebound on the leap, and a short buzz when a wind-up starts.
+func step(delta: float, mover: PlayerMover, paused: bool) -> void:
+	var before := {}
+	for id in enemies: before[id] = str(enemies[id].phase)
+	super.step(delta, mover, paused)
+	for id in enemies:
+		var e: Dictionary = enemies[id]
+		var node: Node3D = e.node
+		var band := node.get_node_or_null("Band") as Node3D
+		var body := node.get_node("Body") as Node3D
+		var phase := str(e.phase)
+		if phase == "windup" and before.get(id, "") != "windup":
+			e["band_dir"] = Vector3(e.direction)
+			if HAPTIC_MS > 0 and OS.has_feature("mobile"): Input.vibrate_handheld(HAPTIC_MS)
+		if phase == "dash" and before.get(id, "") == "windup": e["rebound"] = REBOUND_S
+		if band:
+			# shown through the wind-up and the lunge, then fading out (不知火舞 7d4f0231)
+			if phase in ["windup", "dash"]: e["band_fade"] = BAND_FADE_S
+			else: e["band_fade"] = maxf(0.0, float(e.get("band_fade", 0.0)) - clampf(delta, 0, 0.1))
+			var fade := 1.0 if phase in ["windup", "dash"] else float(e.band_fade) / BAND_FADE_S
+			band.visible = fade > 0.0
+			if band.visible: _lay_band(band, e, fade)
+		node.get_node("Warning").visible = false   # the band says it now
+		if phase == "windup":
+			body.scale = SQUASH
+			var left := float(e.timer)
+			body.position = Vector3(sin(_elapsed * 70.0), 0, cos(_elapsed * 55.0)) * SHAKE_M if left <= SHAKE_S else Vector3.ZERO
+		else:
+			body.position = Vector3.ZERO
+			var r := float(e.get("rebound", 0.0))
+			if r > 0:
+				e["rebound"] = maxf(0.0, r - clampf(delta, 0, 0.1))
+				var k := r / REBOUND_S
+				body.scale = Vector3(1.0 - 0.08 * k, 1.0 + 0.14 * k, 1.0 - 0.08 * k)
+
+## The band from the slime's feet along the locked direction, swept out over the wind-up (full from the leap on), its
+## round end at the tip, at `fade` of its opacity.
+func _lay_band(band: Node3D, e: Dictionary, fade := 1.0) -> void:
+	var dir: Vector3 = e.get("band_dir", e.direction)
+	if dir.length() < 0.01: dir = Vector3.FORWARD
+	var done := 1.0
+	if str(e.phase) == "windup":
+		done = clampf(1.0 - float(e.timer) / maxf(0.01, float(e.spec.windup_seconds)), 0.0, 1.0)
+	var reach := float(band.get_meta("reach", 2.0))
+	var half := float(band.get_meta("width", 1.0)) * 0.5
+	var tip := maxf(0.05, reach * done)
+	# the strip runs to where the round end's centre sits, so the disc rounds the tip exactly at the reach
+	var strip_len := maxf(0.01, tip - half)
+	band.rotation = Vector3(0, atan2(dir.x, dir.z), 0)
+	# the band stays where the wind-up laid it while the slime lunges along it
+	band.global_position = e.get("band_from", band.global_position) if str(e.phase) != "windup" else (band.get_parent() as Node3D).global_position
+	if str(e.phase) == "windup": e["band_from"] = band.global_position
+	var strip := band.get_node("Strip") as MeshInstance3D
+	strip.scale = Vector3(1, 1, strip_len)
+	strip.position.z = strip_len * 0.5
+	strip.visible = tip > half
+	var cap := band.get_node("Cap") as MeshInstance3D
+	cap.position.z = maxf(0.0, tip - half)
+	var cap_scale := minf(1.0, tip / maxf(0.01, half * 2.0)) if tip < half * 2.0 else 1.0
+	cap.scale = Vector3(cap_scale, 1, cap_scale)
+	var m := strip.material_override as StandardMaterial3D
+	m.albedo_color.a = float(band.get_meta("alpha", BAND_FILL)) * fade
+
+## The band's reach and width for a kind (tests, the 288 report).
+func band_of(kind: String) -> Dictionary:
+	var spec: Dictionary = _config.monsters[kind]
+	return {"reach": float(spec.dash_speed) * float(spec.dash_seconds) + float(spec.radius) + 0.35,
+		"width": (float(spec.radius) + 0.35) * 2.0, "windup": float(spec.windup_seconds)}
