@@ -492,6 +492,10 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				else: _on_catch(ev, xp_lines)
 			"cast", "pot", "cabinet", "plate", "first", "mishap", "queue":
 				_call("p0_event", [ev, v])
+			"trap":   # Fish Trap (SGODOT-283): the pond redraws its float; set / some left / taken back say so
+				_call("p0_event", [ev, v])
+				var said := P0Logic.P0Trap.event_toast(ev)
+				if said != "": ui.toast_success(said)
 			"dish":
 				# The farmhouse stove shows its own result card (COOK-4 / 6 / P0-9) or toast. Anywhere else no card pops
 				# up (§7.2.7 step 7, q(46)). A pot Queue ×2 kept on its own says nothing away from the kitchen (§7.2.7,
@@ -612,6 +616,10 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 		_call("p0_event", [{"kind": "fish_abort"}, session.view])
 		session.send({"type": "reel", "outcome": "escaped"})
 		ui.toast_error("Creel full · the fish slipped away")
+		return
+	var trap_said = P0Logic.P0Trap.refusal_text(cmd, code, detail)   # Fish Trap (SGODOT-283)
+	if trap_said != null:
+		if str(trap_said) != "": ui.toast_error(str(trap_said))
 		return
 	# Mine and gathering refusals (SGODOT-231): races stay quiet, the rest say why in their own words.
 	var said = P0MaterialLogic.refusal_text(code, detail, cmd)

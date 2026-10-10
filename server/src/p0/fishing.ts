@@ -121,13 +121,31 @@ export function reelLine(c: P0Content, s: P0State, cmd: { outcome?: string }, no
       firstXp(c, s, now, 'fishing', key, xp, events, key.startsWith('fishing_city:') ? cityName : undefined);
     }
     grantOnce(c, s, now, `first_fish_${fish.rarity}`, c.rewards.first_fish[fish.rarity - 1] ?? 0, events);
-    const kinds = Object.keys(s.fishing.caught).length;
-    for (const [n, energy] of c.rewards.fishdex) if (kinds >= n) grantOnce(c, s, now, `fishdex_${n}`, energy, events);
+    noteFishdex(c, s, now, events);
     return null;
   }
   if (!['cancel', 'escaped', 'landed'].includes(outcome)) return { code: 'bad_outcome' };
   settleFailure(c, s, now, events, outcome === 'landed' ? 'broke_free' : 'escaped');
   return null;
+}
+
+/**
+ * Fish-dex milestones (§6.9.2, SGODOT-283): 10 kinds +30 Energy and 100 coins, 20 kinds +50 Energy, 300 coins and the
+ * `Fish-dex complete` badge — each once, from any catch (a rod or a Fish Trap). The Energy part is P0's
+ * rewards.fishdex; the coins and badge come from fishing.dex_milestones (content/fishing_p1.json).
+ */
+export function noteFishdex(c: P0Content, s: P0State, now: number, events: P0Event[]): void {
+  const kinds = Object.keys(s.fishing.caught).length;
+  const extra = (c.fishing as { dex_milestones?: { kinds: number; coins: number; badge?: string }[] }).dex_milestones ?? [];
+  for (const [n, energy] of c.rewards.fishdex) {
+    if (kinds < n) continue;
+    grantOnce(c, s, now, `fishdex_${n}`, energy, events);
+    const m = extra.find(x => x.kinds === n);
+    if (!m || s.firsts.includes(`dex:${n}`)) continue;
+    s.firsts.push(`dex:${n}`);
+    if (m.coins) { s.coins += m.coins; events.push({ kind: 'coins', delta: m.coins }); }
+    events.push({ kind: 'milestone', id: `fishdex_${n}`, title: m.badge ?? '', coins: m.coins, cabinet: 0, decor: null });
+  }
 }
 
 /** Got away / broke free share one price: refund 3, or 5 for the first 10 failures a day while Fishing Lv1–3 (§6.1.3). */
