@@ -1741,34 +1741,9 @@
   },
   "wallet_floor": 40,
   "homestead": {
+    "_p1": "SGODOT-282: Lv1–10 from Li Bai's P1 table (docs/product/p1-content-2026-10-10/homestead.json, 337d72f9; plan §8.2.1 / §8.3). Ladders are [from level, value].",
     "max_level": 10,
     "warming_cabinet": 6,
-    "_p1": "SGODOT-282: Lv4–10 numbers are plan §8.2.1 (coins / skills total / materials) and §8.3.1 (unlocks) until Li Bai's P1 data (SGODOT-281) replaces them. Ladders [from level, value]: stoves 1 / 2 / 3 (§8.3.2), Warming Cabinet 6 / 12 (§7.7), Chef's Sign +5 gold points (§7.7). Quartz and Hardwood come with the mine and Old Tree line (SGODOT-275).",
-    "stoves": [
-      [
-        1,
-        1
-      ],
-      [
-        4,
-        2
-      ],
-      [
-        8,
-        3
-      ]
-    ],
-    "cabinet_steps": [
-      [
-        3,
-        6
-      ],
-      [
-        8,
-        12
-      ]
-    ],
-    "chef_sign_gold": 0.05,
     "per_level": {
       "energy": 10,
       "meals": 10
@@ -1783,6 +1758,92 @@
         3
       ]
     ],
+    "stoves": [
+      [
+        1,
+        1
+      ],
+      [
+        4,
+        2
+      ],
+      [
+        8,
+        3
+      ]
+    ],
+    "warming_cabinet_by_level": [
+      [
+        3,
+        6
+      ],
+      [
+        8,
+        12
+      ]
+    ],
+    "perennial_slots": {
+      "base": 1,
+      "per_level": 1,
+      "max": 8
+    },
+    "sprinkler_max": {
+      "base": 3,
+      "per_level": 1,
+      "max": 10
+    },
+    "decor_max": {
+      "base": 20,
+      "per_level": 4
+    },
+    "plots": [
+      [
+        1,
+        30
+      ],
+      [
+        3,
+        40
+      ]
+    ],
+    "_plots_note": "P1 紧凑农场：Lv1–2 30 格、Lv3 起 40 格（p1-step1 §1.1）；Lv4–10 的田数随 P1 第 3 步复跑后重定，在那之前仍 40。§8.3.2 的 200 → 600 是地理农场尺度，不用。",
+    "rooms": [
+      [
+        1,
+        "basic"
+      ],
+      [
+        5,
+        "standard"
+      ],
+      [
+        10,
+        "deluxe"
+      ]
+    ],
+    "exterior_stages": [
+      [
+        1,
+        0
+      ],
+      [
+        3,
+        1
+      ],
+      [
+        5,
+        2
+      ],
+      [
+        8,
+        3
+      ],
+      [
+        10,
+        4
+      ]
+    ],
+    "chefs_sign_gold": 0.05,
     "levels": [
       {
         "level": 2,
@@ -1841,7 +1902,9 @@
           "warming_cabinet",
           "bag_upgrade_1",
           "board_slot_3",
-          "fence"
+          "fence",
+          "old_tree",
+          "plots_40"
         ]
       },
       {
@@ -1875,7 +1938,7 @@
           ]
         ],
         "unlocks": [
-          "stove_2",
+          "second_stove",
           "long_haul_ticket"
         ]
       },
@@ -1916,7 +1979,7 @@
         "unlocks": [
           "notice_board",
           "trip_7",
-          "look_2",
+          "porch",
           "standard_room"
         ]
       },
@@ -2030,8 +2093,10 @@
           ]
         ],
         "unlocks": [
-          "stove_3",
-          "look_3"
+          "third_stove",
+          "warming_cabinet_12",
+          "stall_upgrade",
+          "kitchen_extension"
         ]
       },
       {
@@ -2107,13 +2172,25 @@
           ]
         ],
         "unlocks": [
-          "chef_sign",
-          "look_4",
+          "chefs_sign",
+          "master_farmhouse",
           "deluxe_room",
           "title_homestead_master"
         ]
       }
-    ]
+    ],
+    "_p2_only": {
+      "second_home_slots": "1 + ⌊Lv ÷ 2⌋，封顶 5（P2 第二版）",
+      "close_friend_slots": "1 + Lv，封顶 8（P2 社交）",
+      "helpers": "Lv1–3 1 / Lv4–7 2 / Lv8–10 3（P2 社交）"
+    },
+    "_unlock_notes": {
+      "long_haul_ticket": "P2 第二版（收费旅行）才生效；P1 免费版只显示资格",
+      "trip_7": "同上",
+      "porch": "阶段 2 外观（a / b 二选一卡随布置模式）",
+      "kitchen_extension": "阶段 3 外观",
+      "master_farmhouse": "阶段 4 外观"
+    }
   },
   "bag_upgrades": [
     {

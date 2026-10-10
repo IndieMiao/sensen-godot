@@ -153,7 +153,7 @@ describe('Kitchen facilities by Homestead level (§7.7 / §8.3.2)', () => {
       return step(s, { type: 'cook', items: ['fish_crucian'] }).s.stove!.heats[0].width;
     };
     expect(Math.round((width(10) - width(9)) * 1000) / 1000).toBe(0.05);
-    expect(viewOf(c, at(10), T0).homestead.unlocks).toMatchObject({ chef_sign: true, stoves: 3, cabinet: 12, big_pot: true, notice_board: true });
+    expect(viewOf(c, at(10), T0).homestead.unlocks).toMatchObject({ chefs_sign: true, stoves: 3, cabinet: 12, big_pot: true, notice_board: true });
   });
 });
 

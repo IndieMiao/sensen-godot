@@ -1465,15 +1465,22 @@ const HOME_AWAY_TAP := "Upgrade at home · Going home is free"
 ## HOME-1 "What changes" rows and the level-up banner lines for the P1 kitchen and Homestead unlocks (§8.3.1, §8.7
 ## copy; SGODOT-282). Travel tiers, looks and room tiers are announced by their own lines, not here.
 const P1_UNLOCKS := {
-	"stove_2": {"icon": "kitchen", "text": "Second Stove", "note": "two dishes at once"},
+	"second_stove": {"icon": "kitchen", "text": "Second Stove", "note": "two dishes at once"},
 	"notice_board": {"icon": "board", "text": "Notice Board", "note": "by the farmhouse door"},
 	"big_pot": {"icon": "kitchen", "text": "Big Pot · Double", "note": "two portions, one round of heat"},
 	"bag_upgrade_2": {"icon": "bag", "text": "Bag Upgrade II for sale · 400 coins", "note": "Bag 30 → 35"},
-	"stove_3": {"icon": "kitchen", "text": "Third Stove", "note": "Warming Cabinet keeps 12"},
+	"third_stove": {"icon": "kitchen", "text": "Third Stove", "note": "Warming Cabinet keeps 12"},
 	"bag_upgrade_3": {"icon": "bag", "text": "Bag Upgrade III for sale · 1,000 coins", "note": "Bag 35 → 40"},
-	"chef_sign": {"icon": "kitchen", "text": "Chef's Sign", "note": "every dish's gold zone +5"},
+	"chefs_sign": {"icon": "kitchen", "text": "Chef's Sign", "note": "every dish's gold zone +5"},
 	"title_homestead_master": {"icon": "star", "text": "Homestead Master", "note": "title"},
+	"old_tree": {"icon": "wood", "text": "Old Tree", "note": "Hardwood · 1 per round"},
+	"plots_40": {"icon": "field", "text": "Plots 40", "note": "10 more to till"},
+	"warming_cabinet_12": {"icon": "kitchen", "text": "Warming Cabinet 12", "note": "keeps 12 dishes"},
+	"stall_upgrade": {"icon": "board", "text": "Homestead Stall upgraded", "note": "new look"},
 }
+
+## The farmhouse look each level brings (§8.3.1 stages 2–4), shown as HOME-1's look line.
+const LOOKS := {"porch": "Porch", "kitchen_extension": "Kitchen extension", "master_farmhouse": "Master farmhouse"}
 
 ## HOME-1 (Figma 482:152, §8.6.1, LOCK-10) from view.homestead facts: title, the look line, NEED-TILEs in order
 ## materials → coins → skills, what changes, and the button (the first gap is written on it). Lv1–10 (P1, SGODOT-282).
@@ -1490,6 +1497,8 @@ static func home_panel(view: Dictionary, at_home := true) -> Dictionary:
 	out.title = "Homestead Lv%d → Lv%d" % [level, int(next.level)]
 	var unlocks: Array = next.get("unlocks", [])
 	if unlocks.has("fence"): out.look = "Lv%d look · Full fence" % int(next.level)
+	for u in LOOKS:   # §8.3.1 looks at Lv5 / 8 / 10; the A / B choice comes with Decorate (SGODOT-282)
+		if unlocks.has(u): out.look = "Lv%d look · %s" % [int(next.level), LOOKS[u]]
 	for m in next.get("materials", []):
 		out.tiles.append({"id": str(m.id), "name": str(m.name), "have": int(m.have), "need": int(m.need), "icon": str(m.id)})
 	out.tiles.append({"id": "coins", "name": "Coins", "have": int(next.coins.have), "need": int(next.coins.need), "icon": "coin"})

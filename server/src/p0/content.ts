@@ -132,8 +132,8 @@ export interface P0Content {
     warming_cabinet: number;                  // portions once unlocked (Lv3, §7.7)
     // P1 (SGODOT-282, §7.7 / §8.3.2): kitchen facilities by Homestead level, each [from level, value] ascending.
     stoves?: [number, number][];              // stoves in the kitchen: Lv1 1, Lv4 2, Lv8 3 (absent = 1)
-    cabinet_steps?: [number, number][];       // Warming Cabinet portions: Lv3 6, Lv8 12 (absent = warming_cabinet)
-    chef_sign_gold?: number;                  // Chef's Sign (Lv10): every dish's gold zone + this (0.05 = 5 points)
+    warming_cabinet_by_level?: [number, number][];   // Warming Cabinet portions: Lv3 6, Lv8 12 (absent = warming_cabinet)
+    chefs_sign_gold?: number;                 // Chef's Sign (Lv10): every dish's gold zone + this (0.05 = 5 points)
     per_level: { energy: number; meals: number };
     board_slots: [number, number][];          // [from Homestead level, Stall Board slots]
     levels: { level: number; coins: number; skills: number; materials: [string, number][]; unlocks: string[] }[];

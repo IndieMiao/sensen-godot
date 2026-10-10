@@ -34,7 +34,7 @@ export function stoveCount(c: P0Content, s: P0State): number {
 /** Big Pot (Lv6, §7.7): any stove may cook Double. Chef's Sign (Lv10): the gold zone bonus, 0 before. */
 export function bigPot(c: P0Content, s: P0State): boolean { return unlocked(c, s, 'big_pot'); }
 export function chefSignGold(c: P0Content, s: P0State): number {
-  return unlocked(c, s, 'chef_sign') ? (c.homestead.chef_sign_gold ?? 0) : 0;
+  return unlocked(c, s, 'chefs_sign') ? (c.homestead.chefs_sign_gold ?? 0) : 0;
 }
 
 export function boardSlots(c: P0Content, s: P0State): number {

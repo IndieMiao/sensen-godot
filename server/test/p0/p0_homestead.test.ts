@@ -64,8 +64,8 @@ describe('Homestead Lv1–3 (§8.1–8.3)', () => {
     expect(maxEnergy(c, s)).toBe(220);
     const v = viewOf(c, s, T0);
     expect(v.homestead.unlocks).toEqual({ spice_rack: true, warming_cabinet: true, bag_upgrade_1: 'for_sale', board_slots: 3, fence: true, clay_bank: true,
-      stoves: 1, big_pot: false, notice_board: false, chef_sign: false, cabinet: 6, bag_upgrade_2: 'locked', bag_upgrade_3: 'locked' });
-    expect(v.homestead.next).toMatchObject({ level: 4, unlocks: ['stove_2', 'long_haul_ticket'] });   // P1: Lv4–10 (SGODOT-282)
+      stoves: 1, big_pot: false, notice_board: false, chefs_sign: false, cabinet: 6, bag_upgrade_2: 'locked', bag_upgrade_3: 'locked' });
+    expect(v.homestead.next).toMatchObject({ level: 4, unlocks: ['second_stove', 'long_haul_ticket'] });   // P1: Lv4–10 (SGODOT-282)
   });
 
   it('refuses with the first gap in button order: skills, then materials, then coins (40-coin floor included)', () => {
