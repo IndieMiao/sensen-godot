@@ -1813,6 +1813,19 @@
     "_p1": "SGODOT-282: Lv1–10 from Li Bai's P1 table (docs/product/p1-content-2026-10-10/homestead.json, 337d72f9; plan §8.2.1 / §8.3). Ladders are [from level, value].",
     "max_level": 10,
     "warming_cabinet": 6,
+    "barter": {
+      "give": 2,
+      "minerals": [
+        "stone",
+        "clay",
+        "copper_ore",
+        "quartz"
+      ],
+      "level_share": 0.5,
+      "daily": 6,
+      "_items": "climate → regional crops and fish that can be bartered; filled with Li Bai's regional data (SGODOT-281)",
+      "items": {}
+    },
     "per_level": {
       "energy": 10,
       "meals": 10

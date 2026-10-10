@@ -148,6 +148,9 @@ export interface P0Content {
     chefs_sign_gold?: number;                 // Chef's Sign (Lv10): every dish's gold zone + this (0.05 = 5 points)
     plots?: [number, number][];               // plots the homestead has: Lv1 30, Lv3 40 (P1 q(59) §1.1; absent = P0's start)
     sprinkler_max?: { base: number; per_level: number; max: number };   // sprinklers that may stand: 3 + level, at most max
+    // Barter (§8.4.5, SGODOT-282): at the Market Square keeper, `give` of this climate's regional crops or fish for 1
+    // mineral; a mineral at most `level_share` of the next level's need by barter; at most `daily` a day.
+    barter?: { give: number; minerals: string[]; level_share: number; daily: number; items: Record<string, string[]> };   // items: climate → ids
     per_level: { energy: number; meals: number };
     board_slots: [number, number][];          // [from Homestead level, Stall Board slots]
     levels: { level: number; coins: number; skills: number; materials: [string, number][]; unlocks: string[] }[];

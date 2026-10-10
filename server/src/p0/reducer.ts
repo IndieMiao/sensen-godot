@@ -1,6 +1,7 @@
 /** P0 command reducer: one command → new state + events, or a typed refusal. Never mutates the input. */
 import { cropById, cropBySeed, rodById, type P0Content } from './content.js';
 import { add, count, room, take } from './bag.js';
+import { barter } from './barter.js';
 import { settleCards } from './cards.js';
 import { burners, collectPot, cookAll, eatDish, startPot, recordHeat, settleStove } from './cooking.js';
 import { boardCommand, noteVisit, settleBoards, tracked } from './boards.js';
@@ -42,6 +43,7 @@ type P0CommandBody =
   | FishCommand
   | { type: 'cook'; items?: string[]; recipe?: string; stove?: number; double?: boolean }   // stove: 0-based (Lv4 / Lv8); double: Big Pot
   | { type: 'collect'; taps?: number[]; eat?: boolean; pot?: number }   // eat: COOK-4 Eat, the main portion straight from the pot
+  | { type: 'barter'; item: string; mineral: string; shop?: string }   // Market Square barter (§8.4.5)
   | { type: 'cook_all' }   // Cook All (Cooking Lv8): fill every free stove and queue with known pages
   | { type: 'heat'; taps: number[]; pot?: number }   // heat taps as they happen, kept on the pot (Queue ×2 keeps a pot on its own)
   // pot: the pot's id (pot / queue events, view.cooking.stove.id). With Queue ×2 send it on every heat and collect:
@@ -283,6 +285,11 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
         : cmd.type === 'cook' ? startPot(c, s, cmd, now, events)
         : cmd.type === 'collect' ? collectPot(c, s, cmd, now, events, maxEnergy(c, s))
         : eatDish(c, s, cmd, now, events, maxEnergy(c, s));
+      if (refusal) return fail(refusal.code, refusal.detail);
+      break;
+    }
+    case 'barter': {
+      const refusal = barter(c, s, cmd, events);
       if (refusal) return fail(refusal.code, refusal.detail);
       break;
     }
