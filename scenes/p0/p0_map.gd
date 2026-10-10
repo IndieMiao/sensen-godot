@@ -730,12 +730,13 @@ func city_regions() -> Array:
 	_regions = out
 	return out
 
-## The lat/lng box the map shows, a fifth wider each way (south, west, north, east), from the Web Mercator scale
-## geo_to_screen draws with.
+## The lat/lng box the map shows, a fifth wider each way and at least a city's radius (0.5°) beyond the edges, so a
+## city whose centre is just off screen is still the camera city (south, west, north, east); from the Web Mercator
+## scale geo_to_screen draws with.
 func _view_box(vp: Vector2, z: float) -> Vector4:
 	var scale := vp.y / _map_logical_height() * 512.0 * pow(2.0, z)
-	var half_w := minf(180.0, vp.x / scale * 360.0 * 0.6)
-	var half_h := minf(85.0, vp.y / scale * 360.0 * 0.6 * cos(deg_to_rad(clampf(center_lat, -80.0, 80.0))))
+	var half_w := minf(180.0, vp.x / scale * 360.0 * 0.6 + 0.5)
+	var half_h := minf(85.0, vp.y / scale * 360.0 * 0.6 * cos(deg_to_rad(clampf(center_lat, -80.0, 80.0))) + 0.5)
 	var west := wrapf(center_lng - half_w, -180.0, 180.0)
 	var east := wrapf(center_lng + half_w, -180.0, 180.0)
 	if half_w >= 180.0:
