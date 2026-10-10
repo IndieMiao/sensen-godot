@@ -19,11 +19,12 @@ export function rarityOf(c: P0Content, id: string): number {
 }
 
 /** Does one bag id satisfy a need? items narrows to fixed ids chosen when the request was drawn. */
-export function matches(c: P0Content, need: Pick<Need, 'kind' | 'rarity'>, items: string[], id: string): boolean {
+export function matches(c: P0Content, need: Pick<Need, 'kind' | 'rarity' | 'style'>, items: string[], id: string): boolean {
   if (need.kind === 'sow' || itemKind(id) !== need.kind) return false;
   if (items.length) return items.includes(id);
   if (need.kind === 'dish') {
     const r = rarityOf(c, id);
+    if (need.style !== undefined && recipeById(c, dishParts(id).base)?.style !== need.style) return false;
     return r > 0 && (need.rarity === undefined || r === need.rarity);
   }
   return need.rarity === undefined || rarityOf(c, id) === need.rarity;
@@ -42,7 +43,7 @@ export function floorPrice(c: P0Content, id: string): number {
  * Units to hand in for one id list / need: plain bag stacks (materials also Farm Storage), cheapest first (dishes: lowest quality first).
  * Returns [id, qty][] or null when the bag can't cover it.
  */
-export function pick(c: P0Content, s: P0State, need: Pick<Need, 'kind' | 'rarity'>, items: string[], qty: number): [string, number][] | null {
+export function pick(c: P0Content, s: P0State, need: Pick<Need, 'kind' | 'rarity' | 'style'>, items: string[], qty: number): [string, number][] | null {
   const have = new Map<string, number>();
   for (const b of s.bag) if (!b.gift && matches(c, need, items, b.id)) have.set(b.id, (have.get(b.id) ?? 0) + b.qty);
   if (need.kind === 'material') for (const [id, n] of Object.entries(s.storage)) if (matches(c, need, items, id)) have.set(id, (have.get(id) ?? 0) + n);
@@ -58,7 +59,7 @@ export function pick(c: P0Content, s: P0State, need: Pick<Need, 'kind' | 'rarity
   return left === 0 ? out : null;
 }
 
-export function haveFor(c: P0Content, s: P0State, need: Pick<Need, 'kind' | 'rarity'>, items: string[]): number {
+export function haveFor(c: P0Content, s: P0State, need: Pick<Need, 'kind' | 'rarity' | 'style'>, items: string[]): number {
   const bag = s.bag.filter(b => !b.gift && matches(c, need, items, b.id)).reduce((n, b) => n + b.qty, 0);
   if (need.kind !== 'material') return bag;
   return bag + Object.entries(s.storage).filter(([id]) => matches(c, need, items, id)).reduce((n, [, q]) => n + q, 0);

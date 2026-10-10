@@ -3,7 +3,7 @@ import { cropById, cropBySeed, rodById, type P0Content } from './content.js';
 import { add, count, room, take } from './bag.js';
 import { collectPot, eatDish, startPot, recordHeat, settleStove } from './cooking.js';
 import { boardCommand, settleBoards, tracked } from './boards.js';
-import { expireGiftMeals, giftResident, noteSown, residentRequestCommand, talk } from './residents.js';
+import { expireGiftMeals, giftResident, learn, noteSown, residentRequestCommand, talk } from './residents.js';
 import { castLine, reelLine, type FishCommand } from './fishing.js';
 import { upgradeHomestead } from './homestead.js';
 import { takeFromCabinet } from './kitchen_storage.js';
@@ -48,6 +48,7 @@ type P0CommandBody =
   | { type: 'homestead_upgrade' }
   | { type: 'talk'; resident: string }
   | { type: 'gift'; resident: string; item: string }
+  | { type: 'learn'; resident: string }   // Recipe lesson on the dialogue bar (§7.5.3)
   | MineCommand
   | { type: 'gather'; spot: string }
   | { type: 'craft'; recipe: string }
@@ -203,8 +204,9 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       if (refusal) return fail(refusal.code, refusal.detail);
       break;
     }
-    case 'talk': case 'gift': {
-      const refusal = cmd.type === 'talk' ? talk(c, s, cmd, now, events) : giftResident(c, s, cmd, events);
+    case 'talk': case 'gift': case 'learn': {
+      const refusal = cmd.type === 'talk' ? talk(c, s, cmd, now, events) : cmd.type === 'learn' ? learn(c, s, cmd, now, events)
+        : giftResident(c, s, cmd, events);
       if (refusal) return fail(refusal.code, refusal.detail);
       break;
     }

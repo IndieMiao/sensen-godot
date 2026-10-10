@@ -533,6 +533,13 @@ func _on_state(v: Dictionary, events: Array) -> void:
 					if levelled: parcel_notice = meal
 					else: ui.inbox_notice_when_clear(meal)
 				elif bool(ev.get("given", false)): ui.toast_success("%s gave you %s · in your bag" % [who, P0Logic.item_name(v, str(ev.get("dish", "")))])
+			"lesson":   # §7.5.3 Taught (SGODOT-284): the page is Tasted; cooking it once makes it the player's own
+				# Appendix wording: `Learned · Herb Grilled Fish`; on the open bar the resident says the lesson's line.
+				if str(ev.get("from", "")) == "lesson":
+					ui.resident_affinity({"resident": str(ev.get("resident", "")), "delta": 0}, "Let me show you a dish.")
+				ui.toast_success("Learned · %s" % P0Logic.item_name(v, str(ev.get("recipe", ""))))
+			"title":   # a story request's title (§9.4.4 Trusted)
+				ui.toast_success("New title · %s" % str(ev.get("id", "")))
 			"homestead":
 				# HOME-2 (SGODOT-228): HOME-1 closes, the MomentBanner says what changed; the farm swaps the fence.
 				if ui.modal_kind == "homestead": ui.close_modal()
