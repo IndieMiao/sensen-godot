@@ -265,7 +265,8 @@ func test_a_marked_pins_card_says_why_under_its_subtitle() -> void:
 	assert_str((row.get_node("Text") as Label).text).is_equal("Pond Catch · Pond Crucian 0/2")
 	assert_int((row.get_node("Mark").get_child(0) as UiStatusBadge).state).is_equal(UiStatusBadge.State.REQUEST)
 	var col := row.get_parent()
-	assert_object(col.get_child(0)).is_instanceof(UiObjectHeader)   # title / Beginner, then the reason …
+	assert_object(col.get_child(0).get_node("Thumb")).is_instanceof(UiPondThumb)   # the pond's thumbnail by its title (283) …
+	assert_object(col.get_child(0).get_child(1)).is_instanceof(UiObjectHeader)   # … title / Beginner, then the reason …
 	assert_int(row.get_index()).is_equal(1)
 	assert_str((col.get_child(2) as Label).text).is_equal(PondCard.BEGINNER_LINE)   # … above the description line
 	await _close(rt)

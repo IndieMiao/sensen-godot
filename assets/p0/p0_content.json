@@ -324,6 +324,7 @@
     {
       "id": "fish_crucian",
       "name": "Pond Crucian",
+      "plural": "Pond Crucians",
       "rarity": 1,
       "level": 1,
       "price": 3,
