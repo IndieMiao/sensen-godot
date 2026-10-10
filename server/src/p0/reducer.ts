@@ -35,7 +35,7 @@ type P0CommandBody =
   | { type: 'sow'; plot?: number; plots?: number[]; seed: string }   // plots: up to 3 with the Row Hoe (§9.11.2)
   | { type: 'fertilize'; plot: number; item?: string }
   | { type: 'water'; plot: number }
-  | { type: 'harvest'; plot: number }
+  | { type: 'harvest'; plot: number; plots?: number[] }   // plots: Harvest All (Farming Lv9), one garden row
   | { type: 'buy'; item: string; qty: number; shop?: string }
   | { type: 'equip'; item: string }
   | { type: 'sell'; item: string; qty: number | 'all'; shop?: string }
@@ -189,25 +189,44 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       break;
     }
     case 'harvest': {
-      const plot = plotOf(cmd.plot);
-      if (!plot) return fail('bad_plot');
-      const taken = occupied(cmd.plot);
-      if (taken) return taken;
-      if (plot.state !== 'growing' || !plot.crop || (plot.ready_at ?? Infinity) > now)
-        return fail('not_ready', { ready_in: plot.ready_at ? plot.ready_at - now : null });
-      const crop = cropById(c, plot.crop)!;
-      if (room(c, s, crop.id) < crop.yield) return fail('bag_full', { need: crop.yield });
-      add(c, s, crop.id, crop.yield);
-      events.push({ kind: 'item', id: crop.id, delta: crop.yield });
-      gainXp(c, s, now, 'farming', scaledXp(s, crop.xp, plot.xp_pct ?? 100), plot.xp_pct ?? 100, events);
-      seedSaver(c, s, crop, plot, events);
-      const first = `harvest:${crop.id}`;
-      if (!s.firsts.includes(first)) {
-        s.firsts.push(first);
-        firstXp(c, s, now, 'farming', first, crop.first_xp, events);
+      // One plot, or Harvest All (Farming Lv9, q(118) ④): every ripe annual of one garden row, 0 Energy, all or none.
+      const ids: unknown[] = Array.isArray(cmd.plots) ? cmd.plots : [cmd.plot];
+      if (ids.length > 1) {
+        const at = c.farming?.conveniences?.harvest_all;
+        if (at === undefined || skillLevel(c, s, 'farming') < at) return fail('harvest_all_locked', { level: at ?? null });
+        const rows = new Set(ids.map(id => c.garden.plots[Number(id)]?.[1] ?? -1));
+        if (new Set(ids).size !== ids.length || rows.size !== 1 || rows.has(-1)) return fail('bad_plot', { row: true });
       }
-      plot.state = 'tilled';
-      delete plot.crop; delete plot.xp_pct; delete plot.ready_at; delete plot.fert;
+      const plots = ids.map(plotOf);
+      if (plots.some(p => !p)) return fail('bad_plot');
+      for (const id of ids) { const taken = occupied(id); if (taken) return taken; }
+      for (const plot of plots as Plot[]) {
+        if (plot.state !== 'growing' || !plot.crop || (plot.ready_at ?? Infinity) > now)
+          return fail('not_ready', { plot: plot.id, ready_in: plot.ready_at ? plot.ready_at - now : null });
+        if (ids.length > 1 && (cropById(c, plot.crop) as { perennial?: unknown } | undefined)?.perennial)
+          return fail('not_ready', { plot: plot.id, tree: true });   // trees are picked one by one (Pick · 2 Energy)
+      }
+      // Everything must fit before anything is taken (a trial bag, the same add / room rules).
+      const trial = { ...s, bag: structuredClone(s.bag) };
+      for (const plot of plots as Plot[]) {
+        const crop = cropById(c, plot.crop!)!;
+        if (room(c, trial, crop.id) < crop.yield) return fail('bag_full', { need: crop.yield, plot: plot.id });
+        add(c, trial, crop.id, crop.yield);
+      }
+      for (const plot of plots as Plot[]) {
+        const crop = cropById(c, plot.crop!)!;
+        add(c, s, crop.id, crop.yield);
+        events.push({ kind: 'item', id: crop.id, delta: crop.yield });
+        gainXp(c, s, now, 'farming', scaledXp(s, crop.xp, plot.xp_pct ?? 100), plot.xp_pct ?? 100, events);
+        seedSaver(c, s, crop, plot, events);
+        const first = `harvest:${crop.id}`;
+        if (!s.firsts.includes(first)) {
+          s.firsts.push(first);
+          firstXp(c, s, now, 'farming', first, crop.first_xp, events);
+        }
+        plot.state = 'tilled';
+        delete plot.crop; delete plot.xp_pct; delete plot.ready_at; delete plot.fert;
+      }
       break;
     }
     case 'buy': case 'sell': case 'drink': case 'lock': case 'unlock': case 'store': case 'take_out': {

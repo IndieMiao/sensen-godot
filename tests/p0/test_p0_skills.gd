@@ -32,7 +32,7 @@ func test_each_track_says_its_level_what_is_next_and_its_xp() -> void:
 		["Lv2 · Carrot, Herb", "done", ""], ["Lv3 · Potato, Chamomile, Compost", "next", "90 XP to go"],
 		["Lv4 · Tomato, Chili, Row Hoe", "locked", ""], ["Lv5 · Cabbage, Corn, Regional seeds", "locked", ""],
 		["Lv6 · Cucumber, Sprinkler", "locked", ""], ["Lv7 · Apple Sapling", "locked", ""], ["Lv8 · Strawberry", "locked", ""],
-		["Lv9 · Melon, Citrus Sapling, Grapevine Cutting", "locked", ""], ["Lv10 · Seed Saver", "locked", ""]])
+		["Lv9 · Melon, Citrus Sapling, Grapevine Cutting, Harvest All", "locked", ""], ["Lv10 · Seed Saver", "locked", ""]])
 	var fishing: Dictionary = d.tracks[1]
 	assert_str(fishing.next).is_equal("Next: River Perch, Largemouth Bass, Rainbow Trout, Mackerel and Worm Bait")
 	# This season's waters only — Coast from P1 (Clover Pond, SGODOT-283), so Mackerel and Sea Bass are in; the regional

@@ -439,6 +439,12 @@ static func span(ms: float) -> String:
 	if minutes % 60 == 0: return "%dh" % (minutes / 60)
 	return "%dh %dm" % [minutes / 60, minutes % 60]
 
+## The main key's second line for a growing plot (≤ 80 px, q(44); 不知火舞 on 241): `Ready in 48h` with one unit, just
+## `19h 58m` with two (`Ready in 19h 58m` is about 101 px and ran off the round key).
+static func key_ready(ms: float) -> String:
+	var t := span(ms)
+	return t if t.contains(" ") else "Ready in " + t
+
 static func crop(view: Dictionary, crop_id: String) -> Dictionary:
 	for c in view.get("crops", []):
 		if str(c.get("id", "")) == crop_id: return c
@@ -527,10 +533,29 @@ static func main_action(view: Dictionary, plot: Dictionary, seed_id: String, row
 		"sown":
 			return {"icon": "water", "verb": "Water", "sub": "Free", "enabled": true, "amber": false, "cmd": {"type": "water", "plot": plot_id}, "need": 0}
 		"growing":
-			return {"icon": "clock", "verb": "Growing", "sub": "Ready in " + span(float(plot.get("ready_in", 0))), "enabled": false, "amber": false, "cmd": {}, "need": 0}
+			return {"icon": "clock", "verb": "Growing", "sub": key_ready(float(plot.get("ready_in", 0))), "enabled": false, "amber": false, "cmd": {}, "need": 0}
 		"ready":
+			# Harvest All (Farming Lv9, q(118) ④): the ripe annuals of the garden row underfoot, this one first.
+			var whole := harvest_row(view, plot)
+			if whole.size() > 1:
+				return {"icon": "hoe", "verb": "Harvest ×%d" % whole.size(), "sub": "Free", "enabled": true, "amber": false,
+					"cmd": {"type": "harvest", "plot": plot_id, "plots": whole}, "need": 0}
 			return {"icon": "hoe", "verb": "Harvest", "sub": "Free", "enabled": true, "amber": false, "cmd": {"type": "harvest", "plot": plot_id}, "need": 0}
 	return a
+
+## Harvest All's row (q(118) ④): from Farming Lv9 (content farming.conveniences), the plot in front and every other ripe
+## annual on its garden row (trees are picked one by one); [] below that level.
+static func harvest_row(view: Dictionary, front: Dictionary) -> Array:
+	var at = content().get("farming", {}).get("conveniences", {}).get("harvest_all", null)
+	if at == null or int(view.get("skills", {}).get("farming", {}).get("level", 1)) < int(at): return []
+	var id := int(front.get("id", -1))
+	var row_y := P0Garden.grid_of(id).y
+	var out := [id]
+	for p in view.get("plots", []):
+		var pid := int(p.get("id", -1))
+		if pid == id or pid < 0 or pid >= P0Garden.plot_count(view) or P0Garden.grid_of(pid).y != row_y: continue
+		if str(p.get("state", "")) == "ready" and not bool(p.get("tree", false)) and p.get("facility", null) == null: out.append(pid)
+	return out
 
 ## Five candidates for the current action — Farming: seeds, Fishing: bait — kept order: previously shown → most plentiful (§10.3.3).
 ## Pinned ids always stay on the bar, also at 0 left (LOCK-05, §10.3.3 归零); ids the player dragged off the bar
@@ -1041,7 +1066,7 @@ static func level_banner(view: Dictionary, ev: Dictionary, first := false) -> Di
 
 ## What a skill level opens this season: Farming — the crops of that gate (main ingredients first), then other stall
 ## goods and tools (Compost, Row Hoe); Fishing — the fish of that level; Cooking — the conveniences of that level.
-const FARMING_CONVENIENCE_NAMES := {"seed_saver": "Seed Saver"}   # §4.6.1 / glossary (Plot Marks, Sow Again … come later)
+const FARMING_CONVENIENCE_NAMES := {"harvest_all": "Harvest All", "seed_saver": "Seed Saver"}   # §4.6.1 / glossary (Plot Marks, Sow Again … come later)
 
 static func level_unlocks(view: Dictionary, skill: String, level: int) -> Array:
 	var out: Array = []
