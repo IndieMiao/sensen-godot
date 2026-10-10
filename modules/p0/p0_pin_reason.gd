@@ -78,8 +78,10 @@ static func request_of(view: Dictionary, id: String) -> Dictionary:
 		for r in boards.get(board, {}).get("slots", []):
 			if not (r is Dictionary) or r.get("empty", false) or str(r.get("id", "")) != id: continue
 			var items: Array = r.get("items", [])
+			var styles: Array = r.get("style", []) if r.get("style", null) is Array else []
 			return {"id": id, "title": str(r.get("title", "")), "item": str(items[0]) if items.size() == 1 else "",
-				"need_name": _need_name(view, str(r.get("kind", "")), items, r.get("rarity", null)),
+				"need_name": ("%s dishes" % " or ".join(styles)) if not styles.is_empty() and items.is_empty()
+					else _need_name(view, str(r.get("kind", "")), items, r.get("rarity", null)),
 				"have": int(r.get("have", 0)), "qty": int(r.get("qty", 1)), "ready": bool(r.get("ready", false)),
 				"tracked": str(r.get("status", "")) == "accepted",
 				"deliver": "Deliver at the Stall" if board == "stall" else "Deliver at %s" % _outpost_name("market")}
@@ -100,8 +102,10 @@ static func request_of(view: Dictionary, id: String) -> Dictionary:
 			if str(d.get("id", "")) == id: def = d
 		var need: Dictionary = def.get("need", {})
 		var item := str(need.get("id", ""))
+		var style := str(need.get("style", ""))
 		return {"id": id, "title": str(def.get("title", id)), "item": item,
-			"need_name": _need_name(view, str(q.get("kind", need.get("kind", ""))), [item] if item != "" else [], q.get("rarity", null)),
+			"need_name": ("%s dishes" % style) if style != "" and item == ""
+				else _need_name(view, str(q.get("kind", need.get("kind", ""))), [item] if item != "" else [], q.get("rarity", null)),
 			"have": int(q.get("have", 0)), "qty": int(q.get("qty", 1)), "ready": bool(q.get("ready", false)),
 			"tracked": str(rv.get("request_state", "")) == "accepted", "deliver": "Deliver to %s" % resident_name(str(rid))}
 	return {}

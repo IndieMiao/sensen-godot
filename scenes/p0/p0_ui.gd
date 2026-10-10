@@ -2339,7 +2339,8 @@ func _show_resident(d: Dictionary) -> void:
 	bar.gift_pressed.connect(func(): open_gift(id))
 	bar.request_pressed.connect(func(): open_resident_request(id))
 	bar.identity_pressed.connect(func(): open_resident_profile(id))
-	bar.meal_pressed.connect(func(): _open_todays_meal(id))   # lesson_pressed: P0 has no lessons (lesson is always false)
+	bar.meal_pressed.connect(func(): _open_todays_meal(id))
+	bar.lesson_pressed.connect(func(): command.emit({"type": "learn", "resident": id}))   # §7.5.3: the server picks the page
 	_open_modal(bar, 0.0, true)
 	_close_above(bar, _CLOSE_ABOVE_CARD)
 	modal_kind = "resident"
@@ -2427,7 +2428,7 @@ static func resident_profile_data(view_: Dictionary, id: String) -> Dictionary:
 	return {"face": resident_face(str(def.get("portrait", ""))),
 		"name": str(bar.name), "role": str(bar.role), "stage": str(bar.stage), "stage_index": int(bar.get("stage_index", 0)),
 		"friendship": ("%d/%d" % [int(bar.have), int(bar.need)]) if str(bar.get("next", "")) != "" else str(int(bar.have)),
-		"likes": likes, "likes_icon": P0Logic.icon(dish) if dish != "" else null, "details": false}
+		"likes": P0Logic.likes_text(likes), "likes_icon": P0Logic.icon(dish) if dish != "" else null, "details": false}
 
 ## A 44 Close above a bottom card or sheet, right-aligned `inset` in from its right edge and `gap` above its top
 ## (Close · 44 px: 6 above a sheet, 8 above the dialogue bar). It follows the content as it slides and resizes.
@@ -2499,6 +2500,8 @@ static func _request_card_data(view_: Dictionary, id: String, bar: Dictionary) -
 			text = str(q.get("text", ""))
 			need_line = str(q.get("need_line", ""))
 	var kind := str(req.get("kind", ""))
+	var item := str(req.get("item", "")) if req.get("item", null) != null else ""
+	var style := str(req.get("style", "")) if req.get("style", null) != null else ""
 	var need := {"name": "", "have": int(req.get("have", 0)), "need": int(req.get("qty", 1)), "icon": null}
 	match kind:
 		"fish":
@@ -2506,11 +2509,20 @@ static func _request_card_data(view_: Dictionary, id: String, bar: Dictionary) -
 			need.name = (P0Logic.rarity_name(view_, rarity) + " fish") if rarity > 0 else "Fish"
 			need.icon = P0Logic.icon("fish_crucian")
 		"dish":
-			need.name = "Any dish"
+			need.name = ("%s dish" % style) if style != "" else "Any dish"
 			need.icon = P0Logic.icon("pot")
 		"sow":
 			need.name = "Plots sown"
 			need.icon = P0Logic.icon("sow")
+		"crop":
+			need.name = "Any crop"
+			need.icon = P0Logic.icon("crop_radish")
+		"material":
+			need.name = "Materials"
+	# P1: a request naming one item shows that item (Ivo's Clay, Theo's Carrots).
+	if item != "":
+		need.name = P0Logic.item_name(view_, item)
+		need.icon = P0Logic.icon(item)
 	# Li Bai q(46): a request's own need line wins (`1 Rare fish · Golden Koi · Pond`); the tile shows the count itself.
 	if need_line != "": need.name = need_line.trim_prefix("%d " % int(need.need))
 	var reward := []
@@ -2530,7 +2542,7 @@ func open_gift(id: String, item := "") -> void:
 	var likes := str(def.get("likes", ""))
 	var d := P0BagDrawer.new(view, "bag", item, {"kind": "resident", "id": id, "name": str(def.get("name", "")),
 		"gifted_today": bool(view.get("residents", {}).get(id, {}).get("gift_today", false)),
-		"likes": ("Likes %s · 1 gift a day" % likes) if likes != "" else "1 gift a day"})
+		"likes": ("Likes %s · 1 gift a day" % P0Logic.likes_text(likes)) if likes != "" else "1 gift a day"})
 	d.theme = UiKit.theme()
 	d.safe_bottom = safe_bottom()
 	d.close_requested.connect(func(): open_resident(id))

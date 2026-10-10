@@ -222,7 +222,10 @@ func _build_world() -> void:
 	actor = P0Actor.new()
 	add_child(actor)
 	actor.setup(bp, grid, cam)
-	actor.ground_height = func(p: Vector3) -> float: return P0Garden.BED_H if P0Garden.on_bed(bp, p, rt.session.current()) else 0.0
+	# The beds the homestead has (garden.plots, 30 or 40): read from the session's last view, never current() — that
+	# copies the whole view, and this runs every frame (亚瑟 on #215; the map's heat in 260 was the same copy).
+	actor.ground_height = func(p: Vector3) -> float:
+		return P0Garden.BED_H if P0Garden.on_bed(bp, p, rt.session.view if rt != null and rt.session != null else null) else 0.0
 	# Opening shot like the polished farm: cottage on top, beds below, the player at the front edge.
 	_focus = actor.position.lerp(_house, 0.42)
 	_cam_follow.hold()   # the opening shot stays until the player first moves
@@ -421,7 +424,7 @@ func _sync_plots(v: Dictionary, dt: float) -> void:
 ## Middle of the plot beds, for camera-only "Show" from the Today panel and NeedSource (LOCK-08).
 func _plots_center() -> Vector3:
 	var sum := Vector3.ZERO
-	var n := P0Garden.plot_count(rt.session.current() if rt != null and rt.session != null else null)
+	var n := P0Garden.plot_count(rt.session.view if rt != null and rt.session != null else null)
 	for id in n: sum += bp.cell_to_world(P0Garden.cell_of(id))
 	return sum / maxf(1.0, float(n))
 

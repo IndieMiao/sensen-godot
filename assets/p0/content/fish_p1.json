@@ -1,0 +1,324 @@
+{
+  "_note": "P1 新增鱼 12 种（李白，SGODOT-281；方案 §6.2.2–6.2.5）：全球 4（鲇鱼、海鲈、银鲟、河鳗）、地区 8。新字段 time（{dawn_dusk:2} / {night:2} 是权重倍率，night_only / dawn_dusk_only 是窗口外不进池）、weather（sun / rain / wind 倍率）、zones + regional（合格气候带，首字母大写，同 profile.climate）；fishing.regional 是地区鱼分配规则（每城 2 种、精品城手工指定、时段窗口）。P0 的 8 种不改；它们的 time / weather 补字段（鲤鱼雨 ×1.5、大口黑鲈晨昏 ×2、虹鳟雨 ×2、鲭鱼风 ×2、金锦鲤晴 ×1.5）属于修改已有条目，归钓鱼线（周瑜）在 p0_content.json 里改。",
+  "fish": [
+    {
+      "id": "fish_catfish",
+      "name": "Catfish",
+      "rarity": 3,
+      "level": 4,
+      "price": 14,
+      "where": [
+        "river",
+        "pond"
+      ],
+      "time": {
+        "night": 2
+      },
+      "weather": {
+        "rain": 1.5
+      }
+    },
+    {
+      "id": "fish_seabass",
+      "name": "Sea Bass",
+      "rarity": 3,
+      "level": 5,
+      "price": 14,
+      "where": [
+        "coast"
+      ],
+      "time": {
+        "dawn_dusk": 2
+      },
+      "weather": {
+        "wind": 1.5
+      }
+    },
+    {
+      "id": "fish_sturgeon",
+      "name": "Silver Sturgeon",
+      "rarity": 4,
+      "level": 7,
+      "price": 28,
+      "where": [
+        "pond",
+        "river",
+        "coast"
+      ]
+    },
+    {
+      "id": "fish_eel",
+      "name": "River Eel",
+      "rarity": 4,
+      "level": 9,
+      "price": 30,
+      "where": [
+        "river",
+        "pond"
+      ],
+      "time": "night_only",
+      "weather": {
+        "rain": 2
+      }
+    },
+    {
+      "id": "fish_tilapia",
+      "name": "Tilapia",
+      "rarity": 1,
+      "level": 1,
+      "price": 4,
+      "where": [
+        "pond",
+        "river"
+      ],
+      "weather": {
+        "sun": 1.5
+      },
+      "zones": [
+        "Tropical",
+        "Subtropical"
+      ],
+      "regional": true
+    },
+    {
+      "id": "fish_smelt",
+      "name": "Smelt",
+      "rarity": 1,
+      "level": 1,
+      "price": 4,
+      "where": [
+        "coast",
+        "river"
+      ],
+      "time": "dawn_dusk_only",
+      "zones": [
+        "Temperate",
+        "Cool"
+      ],
+      "regional": true
+    },
+    {
+      "id": "fish_grass_carp",
+      "name": "Grass Carp",
+      "rarity": 2,
+      "level": 3,
+      "price": 8,
+      "where": [
+        "pond",
+        "river"
+      ],
+      "zones": [
+        "Tropical",
+        "Subtropical",
+        "Temperate"
+      ],
+      "regional": true
+    },
+    {
+      "id": "fish_arctic_char",
+      "name": "Arctic Char",
+      "rarity": 2,
+      "level": 3,
+      "price": 9,
+      "where": [
+        "pond",
+        "river"
+      ],
+      "time": {
+        "dawn_dusk": 2
+      },
+      "zones": [
+        "Temperate",
+        "Cool"
+      ],
+      "regional": true
+    },
+    {
+      "id": "fish_snakehead",
+      "name": "Snakehead",
+      "rarity": 3,
+      "level": 5,
+      "price": 14,
+      "where": [
+        "pond",
+        "river"
+      ],
+      "time": {
+        "night": 2
+      },
+      "weather": {
+        "rain": 2
+      },
+      "zones": [
+        "Tropical",
+        "Subtropical",
+        "Temperate"
+      ],
+      "regional": true
+    },
+    {
+      "id": "fish_pike",
+      "name": "Northern Pike",
+      "rarity": 3,
+      "level": 5,
+      "price": 14,
+      "where": [
+        "pond",
+        "river"
+      ],
+      "time": {
+        "dawn_dusk": 2
+      },
+      "weather": {
+        "wind": 1.5
+      },
+      "zones": [
+        "Temperate",
+        "Cool"
+      ],
+      "regional": true
+    },
+    {
+      "id": "fish_barramundi",
+      "name": "Barramundi",
+      "rarity": 3,
+      "level": 6,
+      "price": 15,
+      "where": [
+        "coast",
+        "river"
+      ],
+      "time": "night_only",
+      "zones": [
+        "Tropical",
+        "Subtropical"
+      ],
+      "regional": true
+    },
+    {
+      "id": "fish_salmon",
+      "name": "Atlantic Salmon",
+      "rarity": 4,
+      "level": 8,
+      "price": 32,
+      "where": [
+        "river",
+        "coast"
+      ],
+      "time": {
+        "dawn_dusk": 2
+      },
+      "weather": {
+        "rain": 2
+      },
+      "zones": [
+        "Temperate",
+        "Cool"
+      ],
+      "regional": true
+    }
+  ],
+  "fishing": {
+    "regional": {
+      "_note": "§6.2.5：每城 2 种地区鱼。第 1 种取低档组（Common / Fine），第 2 种从去掉第 1 种后的全部候选取；全服种子 + 城市簇 id 哈希，确定性。内陆簇抽到含 coast 的鱼由其 river 栖息承接。地区鱼落袋记录钓到时的气候带，同种不同带分堆。",
+      "groups": {
+        "Tropical": {
+          "low": [
+            "fish_tilapia",
+            "fish_grass_carp"
+          ],
+          "high": [
+            "fish_snakehead",
+            "fish_barramundi"
+          ]
+        },
+        "Subtropical": {
+          "low": [
+            "fish_tilapia",
+            "fish_grass_carp"
+          ],
+          "high": [
+            "fish_snakehead",
+            "fish_barramundi"
+          ]
+        },
+        "Temperate": {
+          "low": [
+            "fish_smelt",
+            "fish_grass_carp",
+            "fish_arctic_char"
+          ],
+          "high": [
+            "fish_snakehead",
+            "fish_pike",
+            "fish_salmon"
+          ]
+        },
+        "Cool": {
+          "low": [
+            "fish_smelt",
+            "fish_arctic_char"
+          ],
+          "high": [
+            "fish_pike",
+            "fish_salmon"
+          ]
+        }
+      },
+      "curated": {
+        "san francisco": [
+          "fish_smelt",
+          "fish_salmon"
+        ],
+        "shanghai": [
+          "fish_grass_carp",
+          "fish_snakehead"
+        ],
+        "los angeles": [
+          "fish_tilapia",
+          "fish_grass_carp"
+        ]
+      },
+      "zone_by_lat": [
+        [
+          23.5,
+          "Tropical"
+        ],
+        [
+          35,
+          "Subtropical"
+        ],
+        [
+          55,
+          "Temperate"
+        ],
+        [
+          90,
+          "Cool"
+        ]
+      ],
+      "time_windows": {
+        "dawn_dusk": [
+          [
+            5,
+            8
+          ],
+          [
+            17,
+            20
+          ]
+        ],
+        "night": [
+          [
+            20,
+            24
+          ],
+          [
+            0,
+            5
+          ]
+        ]
+      }
+    }
+  }
+}

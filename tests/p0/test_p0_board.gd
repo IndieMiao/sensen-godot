@@ -253,3 +253,19 @@ func test_a_counter_delivery_floats_its_coins_once() -> void:
 	await get_tree().process_frame
 	var coins := rt.ui.root.get_children().filter(func(c): return c is UiFloatText and str(c.text).contains("+36 coins"))
 	assert_int(coins.size()).is_equal(1)
+
+## SGODOT-284 P1 templates: a style list and a crop family name what an any-of-a-kind request takes.
+func test_p1_rows_name_styles_and_families() -> void:
+	var v := _view()
+	v.boards.market.slots = [
+		{"id": "m3", "title": "Packed Lunches", "kind": "dish", "items": [], "rarity": null, "style": ["Grilled", "Dessert"],
+			"family": null, "icon": "dish_grilled_fish", "qty": 3, "have": 1, "ready": false, "coins": 30, "status": "accepted"},
+		{"id": "m4", "title": "Orchard Basket", "kind": "crop", "items": [], "rarity": null, "style": null, "family": "O",
+			"icon": "crop_chamomile", "qty": 4, "have": 0, "ready": false, "coins": 50, "status": "open"},
+		{"id": "m5", "title": "Fine Produce", "kind": "crop", "items": [], "rarity": 2, "style": null, "family": null,
+			"icon": "crop_tomato", "qty": 4, "have": 0, "ready": false, "coins": 40, "status": "open"}]
+	var rows := P0Board.cards(v, "market")
+	assert_array(rows[0].facts).is_equal(["3 Grilled or Dessert dishes · any kind"])
+	assert_str(str(rows[0].reason)).is_equal("Need 2 more Grilled or Dessert dishes")
+	assert_array(rows[1].facts).is_equal(["4 Orchard crops · any kind"])
+	assert_array(rows[2].facts).is_equal(["4 Fine crops · any kind"])

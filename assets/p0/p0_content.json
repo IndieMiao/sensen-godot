@@ -1496,7 +1496,14 @@
           "req_sys_crop_basic",
           "req_sys_fish_common",
           "req_sys_dish_common",
-          "req_sys_material_wood"
+          "req_sys_material_wood",
+          "req_sys_material_fiber",
+          "req_sys_material_clay",
+          "req_sys_crop_fine",
+          "req_sys_fish_river",
+          "req_sys_dish_soup",
+          "req_sys_material_copper",
+          "req_sys_fruit_basket"
         ]
       },
       "market": {
@@ -1505,7 +1512,24 @@
         "templates": [
           "req_sys_crop_mixed",
           "req_sys_fish_fine",
-          "req_sys_dish_fine"
+          "req_sys_dish_fine",
+          "req_sys_crop_bulk",
+          "req_sys_fish_bulk",
+          "req_sys_dish_trail",
+          "req_sys_dish_tea",
+          "req_sys_material_hardwood",
+          "req_sys_material_quartz",
+          "req_sys_regional_crop",
+          "req_sys_regional_fish",
+          "req_sys_regional_dish",
+          "req_sys_regional_far_fish",
+          "req_sys_regional_far_crop",
+          "req_sys_explore_outpost",
+          "req_sys_explore_city",
+          "req_sys_explore_pond",
+          "req_sys_explore_tea",
+          "req_sys_explore_zone",
+          "req_sys_party_basket"
         ]
       }
     },
@@ -2094,7 +2118,7 @@
     }
   },
   "mine": {
-    "_note": "SGODOT-231 §13.3 / LOCK-21, floors 1–2: 2 Energy the first time a run reaches a floor, 2 per rock, ≤ 2 runs a player day, a new run needs floor 2 cleared, 04:00 ends an unfinished run. Each rock: Stone by the pickaxe, plus one weighted extra drop derived from the run, floor and rock. Floor 2 quartz (15) is folded into Rock Salt for P0 (copper 30 / salt 35 / none 35; user, knob A, q(47)); P1 restores quartz. Fee-paying entrances (a new run, an unpaid floor) refuse when the floor's worst case doesn't fit (q(48)).",
+    "_note": "SGODOT-231 / SGODOT-275 §13.3 / LOCK-21, floors 1–5: 2 Energy the first time a run reaches a floor, 2 per rock, ≤ 2 runs a player day, a new run needs floor 2 cleared (an Express run counts as having it), 04:00 ends an unfinished run. Each rock: Stone by the pickaxe, plus one weighted extra drop derived from the run, floor and rock (§13.3.3; P1 restores floor 2's quartz, q(47) folded it into Rock Salt for P0). Floors 1–4 clear when their 6 rocks are broken (monsters may be left); floor 5 has no rocks and clears when its elite is beaten, which ends the run. Monsters (§13.3.4): attacking, being hit and kills are 0 Energy; the Wooden Sword's 3 damage takes a slime in 3 swings and the elite in 12. The elite drops quartz once a player day: a second kill shares quartz's weight out over the others. Express (§13.3.1): once the account has cleared floor 4, the mouth and every elevator offer Floor 5 · Express · Free (no floor 5 fee; from the mouth it starts a run). HP counts only inside the mine: 0 sends the player back to the mine mouth with the run kept; entering the mine refills it.",
     "runs_per_day": 2,
     "floor_energy": 2,
     "rock_energy": 2,
@@ -2132,12 +2156,74 @@
           ],
           [
             "rock_salt",
-            35
+            20
+          ],
+          [
+            "quartz",
+            15
           ],
           [
             null,
             35
           ]
+        ]
+      },
+      {
+        "floor": 3,
+        "drops": [
+          [
+            "copper_ore",
+            35
+          ],
+          [
+            "rock_salt",
+            20
+          ],
+          [
+            "quartz",
+            15
+          ],
+          [
+            null,
+            30
+          ]
+        ],
+        "mobs": [
+          "mob_slime"
+        ]
+      },
+      {
+        "floor": 4,
+        "drops": [
+          [
+            "copper_ore",
+            35
+          ],
+          [
+            "rock_salt",
+            15
+          ],
+          [
+            "quartz",
+            20
+          ],
+          [
+            null,
+            30
+          ]
+        ],
+        "mobs": [
+          "mob_slime",
+          "mob_slime",
+          "mob_slime"
+        ]
+      },
+      {
+        "floor": 5,
+        "drops": [],
+        "rocks": 0,
+        "mobs": [
+          "mob_elite_slime"
         ]
       }
     ],

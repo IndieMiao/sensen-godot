@@ -32,7 +32,9 @@ export const LIMITS = {
 interface Conn { ws: WebSocket; player: string; epoch: number; appearance: Appearance; tokens: number; tokenAt: number; lastSeen: number; dressedAt: number }
 /** keys: the demo access keys (P0_ACCESS_KEYS, SGODOT-232 D1). The upgrade is not a Fastify request, so the
  * guard's onRequest hook never sees it: the hub checks x-p0-key itself. Empty or absent = no key (local playtests). */
-export interface P0OnlineDeps { rooms: OutpostRooms; appearances?: AppearanceCatalog; now?: () => number; keys?: string[]; gate?: P0Gate }
+/** pass: v5 (SGODOT-278) — may this player join this outpost? An error code (PASS_REQUIRED / TRIP_EXPIRED) when not. */
+export interface P0OnlineDeps { rooms: OutpostRooms; appearances?: AppearanceCatalog; now?: () => number; keys?: string[]; gate?: P0Gate;
+  pass?: (player: string, outpost: string) => string | null }
 
 export class P0OnlineHub {
   readonly conns = new Set<Conn>();
@@ -120,6 +122,9 @@ export class P0OnlineHub {
     const at = Array.isArray(b.at) && b.at.length === 2 && b.at.every(v => typeof v === 'number' && Number.isFinite(v))
       ? b.at as [number, number] : undefined;
     if (b.appearance !== undefined) c.appearance = this.parseAppearance(b.appearance);
+    // A rejoin of the room the player is already in is never refused (a pass running out does not kick, §11.5.1).
+    const refused = this.deps.rooms.occupant(c.player)?.outpost === b.outpost ? null : this.deps.pass?.(c.player, b.outpost);
+    if (refused) throw new Error(refused);
     this.depart(c, false);
     const placed = this.deps.rooms.join(c.player, b.outpost, at);
     const me = this.deps.rooms.occupant(c.player)!;

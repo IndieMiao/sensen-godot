@@ -17,7 +17,7 @@ export type P0Event =
   | { kind: 'plate'; ids: string[]; cabinet: boolean }
   | { kind: 'parcel'; id: string; qty: number; key: string; waiting: boolean; expires_in?: number; gift?: true }   // a reward that did not fit the bag (§10.4.8)
   | { kind: 'coins'; delta: number }
-  | { kind: 'first'; what: string; xp: number }
+  | { kind: 'first'; what: string; xp: number; name?: string }   // name: the city of a fishing_city first (v5 keys are cluster ids)
   | { kind: 'level'; skill: Skill; level: number; energy: number; gifts: [string, number][] }
   | { kind: 'cast'; bite_in: number; rarity: number; breaks: 'level' | 'rod' | null; bait: string | null }
   | { kind: 'catch'; fish: string; rarity: number; result: 'landed' | 'escaped' | 'broke_free' | 'cancelled'; refund: number;
@@ -30,14 +30,19 @@ export type P0Event =
   | { kind: 'dish'; pot?: number; dish: string; quality: number; qty: number; first: boolean; mystery: boolean; hits: number; auto?: true; none?: true; trial_left?: number }
   | { kind: 'meal'; dish: string; nominal: number; counted: number; gain: number; meals: number; cap: number }
   | { kind: 'reward'; id: string; energy: number }
+  | { kind: 'arrival'; cluster: string; first: boolean; stamp: import('./travel.js').TravelStamp | null; energy: number; pass_until: number; km: number; trip: number }
   | { kind: 'request'; id: string; status: 'accepted' | 'done' | 'dropped'; coins: number; bonus?: number }
   | { kind: 'homestead'; level: number; energy: number; unlocks: string[] }
   | { kind: 'drink'; item: string; gain: number; price: number; left: number }
   | { kind: 'affinity'; resident: string; delta: number; total: number; stage: string; reason: string; verdict?: string }
   | { kind: 'gift_meal'; resident: string; dish: string; given: boolean; to?: 'parcel' }   // to: the bag was full, so it waits in the Inbox
+  | { kind: 'recipe'; page: string; from: 'taught' | 'request' | 'card'; resident?: string }   // a page turned Tasted (§7.5.3; 哪吒's shape, card = Recipe Card)
+  | { kind: 'title'; id: string; resident: string }   // a story request's title (§9.4.4 Trusted)
   | { kind: 'sale'; item: string; qty: number; asked: number; coins: number; shop: string; quota: string | null }
-  | { kind: 'mine'; action: 'enter' | 'continue' | 'floor' | 'torch' | 'rock' | 'cleared'; run: number; floor: number; cost: number;
-      rock?: number; drop?: string | null }
+  | { kind: 'mine'; action: 'enter' | 'continue' | 'floor' | 'torch' | 'rock' | 'cleared' | 'express' | 'express_unlocked'
+      | 'hit' | 'defeat' | 'hurt' | 'knocked_out' | 'complete'; run: number; floor: number; cost: number;
+      rock?: number; drop?: string | null;
+      mob?: number; mob_kind?: string; hp?: number; damage?: number; loot?: [string, number] | null; quartz_spent?: boolean }
   | { kind: 'gather'; spot: string; items: [string, number, 'storage' | 'bag'][]; ready_in: number }
   | { kind: 'craft'; recipe: string; item: string; qty: number; to: 'bag' | 'gear' | 'owned' }
   // P1 (SGODOT-239): a facility placed or moved; started = sown plots it now waters (they began growing)
@@ -110,9 +115,9 @@ export function gainXp(c: P0Content, s: P0State, now: number, skill: Skill, amou
  * A first-time XP bonus (first cast, first catch of a species, first harvest, first pot of a page): the `first` event
  * says what it paid after the daily cap, and is left out when the cap took it all.
  */
-export function firstXp(c: P0Content, s: P0State, now: number, skill: Skill, what: string, xp: number, events: P0Event[]): void {
+export function firstXp(c: P0Content, s: P0State, now: number, skill: Skill, what: string, xp: number, events: P0Event[], name?: string): void {
   const paid = Math.max(0, Math.min(xp, c.skill_daily_cap - (s.day.xp[skill] ?? 0)));
-  if (paid > 0) events.push({ kind: 'first', what, xp: paid });
+  if (paid > 0) events.push({ kind: 'first', what, xp: paid, ...(name ? { name } : {}) });
   gainXp(c, s, now, skill, xp, 100, events);
 }
 

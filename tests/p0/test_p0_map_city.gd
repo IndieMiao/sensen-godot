@@ -2,8 +2,8 @@ extends GdUnitTestSuite
 ## SGODOT-270 (q(106)): P0's one home city moves from Shanghai to San Francisco, a data change read through P0City. The
 ## map opens there: its region and city data (regions.json, assets/map/cities/san_francisco.json with the four San
 ## Francisco landmarks), the homestead at its farm point (sh_a placed in Noe Valley, in the region), the home city's
-## bubble at the farthest zoom, another city's bubble saying where P0 is set (不知火舞 on 270), and the first session's
-## opening view holding the homestead, Fern Pond with its ! and the Tackle Shop.
+## bubble at the farthest zoom, and the first session's opening view holding the homestead, Fern Pond with its ! and the
+## Tackle Shop. Another city's bubble browses there since SGODOT-275 (test_p0_map_browse).
 
 const P0City := preload("res://modules/p0/p0_city.gd")
 const P0_MAP := "res://scenes/p0/p0_map.tscn"
@@ -47,19 +47,6 @@ func test_the_map_opens_on_the_homestead_in_san_francisco() -> void:
 	var bp := FarmBlueprint.load_choice(m._resolve_farm_choice())
 	assert_str(bp.region_id).is_equal("san_francisco")
 	assert_array(m.city_regions().map(func(r): return str(r.id))).contains(["san_francisco"])
-
-## At the farthest zoom another city's bubble says where P0 is set; the home city's flies there (不知火舞 on 270).
-func test_another_citys_bubble_says_where_p0_is_set() -> void:
-	var m := _map()
-	for i in 3: await get_tree().process_frame
-	m.set_process(false)
-	var rt: P0Runtime = m.rt
-	rt.ui.clear_toast()
-	m.fly_to_city("los_angeles")
-	assert_str(rt.ui.toast_text()).is_equal("P0 is set in San Francisco")
-	rt.ui.clear_toast()
-	m.fly_to_city("san_francisco")
-	assert_str(rt.ui.toast_text()).is_empty()
 
 ## The first session's opening view (Pond Catch taken: Fern Pond wears its !) holds the homestead, Fern Pond and the
 ## Tackle Shop 250 m from it — in the frame; the Tackle Shop's pin may give way to Fern Pond's (269, 不知火舞 on 270).
