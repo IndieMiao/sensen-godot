@@ -5,7 +5,14 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
-TEMPLATE_ZIP="$HOME/Library/Application Support/Godot/export_templates/4.7.2.stable/android_source.zip"
+# Godot 的数据目录：macOS 在 Application Support，Linux 走 XDG（~/.local/share/godot）。GODOT_TEMPLATES_DIR 可覆盖。
+if [ "$(uname -s)" = "Darwin" ]; then
+    GODOT_DATA="$HOME/Library/Application Support/Godot"
+else
+    GODOT_DATA="${XDG_DATA_HOME:-$HOME/.local/share}/godot"
+fi
+TEMPLATE_DIR="${GODOT_TEMPLATES_DIR:-$GODOT_DATA/export_templates/4.7.2.stable}"
+TEMPLATE_ZIP="$TEMPLATE_DIR/android_source.zip"
 BUILD_DIR="$REPO_ROOT/android/build"
 OVERLAY="$REPO_ROOT/tools/android/overlay"
 
