@@ -55,6 +55,9 @@ static func card(view: Dictionary, r: Dictionary, slot := 0) -> Dictionary:
 	if ready:
 		d.command = "Deliver"
 		d.cmd = {"type": "deliver", "request": d.id}
+	elif tracked and _visit_place(r) != "":
+		d.command = "Deliver"
+		d.reason = "Visit %s first" % _visit_place(r)   # Stamp Run: the check-in is the gap (LOCK-10)
 	elif tracked:
 		d.command = "Deliver"
 		for n in needs:
@@ -67,8 +70,15 @@ static func card(view: Dictionary, r: Dictionary, slot := 0) -> Dictionary:
 	if qty <= 0: d.command = ""
 	return d
 
-## "2 Pond Crucian", "4 Fine fish · any kind", "3 crops · 6 each".
+## An explore request's outpost by name (Stamp Run, view `visit: {place, done}`); "" for any other request.
+static func _visit_place(r: Dictionary) -> String:
+	var v = r.get("visit", null)
+	if not (v is Dictionary): return ""
+	return str(P0Outposts.find(str(v.get("place", ""))).get("name", str(v.get("place", ""))))
+
+## "2 Pond Crucian", "4 Fine fish · any kind", "3 crops · 6 each", "Visit Oak Tea House".
 static func _what(view: Dictionary, r: Dictionary) -> String:
+	if _visit_place(r) != "": return "Visit %s" % _visit_place(r)
 	var items: Array = r.get("items", [])
 	var qty := int(r.get("qty", 1))
 	var kind := str(r.get("kind", ""))
@@ -78,6 +88,8 @@ static func _what(view: Dictionary, r: Dictionary) -> String:
 
 ## One NeedTile per item a request takes (each item's own count in the bag), or one for "any Fine fish".
 static func _needs(view: Dictionary, r: Dictionary) -> Array:
+	if _visit_place(r) != "":   # a check-in, not items: one tile, done or not
+		return [{id = "", name = _visit_place(r), have = 1 if bool(r.visit.get("done", false)) else 0, need = 1, icon = P0Logic.icon("pin")}]
 	var items: Array = r.get("items", [])
 	var qty := int(r.get("qty", 1))
 	var out: Array = []
@@ -134,6 +146,8 @@ static func detail(view: Dictionary, board: String, id: String) -> Dictionary:
 		var d := {title = c.title, state = c.status, needs = c.needs, delivery = c.reward, next = {}, item = item,
 			tracked = str(r.get("status", "")) == "accepted", noun = noun, go = _go(view, r, str(items[0]) if not items.is_empty() else ""),
 			effect = "Bring the required %s to %s." % [noun, where]}
+		if _visit_place(r) != "":   # Stamp Run: walk in once, then come back to this board
+			d.effect = "Visit %s, then come back to %s." % [_visit_place(r), where]
 		for j in slots.size():
 			var other: Dictionary = slots[j]
 			if j != i and other.get("empty", false) and other.has("refill_in"):
@@ -145,6 +159,8 @@ static func detail(view: Dictionary, board: String, id: String) -> Dictionary:
 ## Where the items of a request come from: the beginner pond for fish (Reed Pond, q(32)), the plots for crops, the
 ## stove for dishes, a material's own spot.
 static func _go(view: Dictionary, r: Dictionary, item: String) -> String:
+	if r.get("visit", null) is Dictionary:   # Stamp Run: the outpost's pin, by role as Today's deliver_go
+		return "outpost:" + str(P0Outposts.find(str(r.visit.get("place", ""))).get("role", ""))
 	match str(r.get("kind", "")):
 		"fish": return "pond:" + P0Guide.BEGINNER_POND
 		"crop": return "plots"

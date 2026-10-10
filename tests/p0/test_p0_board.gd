@@ -269,3 +269,21 @@ func test_p1_rows_name_styles_and_families() -> void:
 	assert_str(str(rows[0].reason)).is_equal("Need 2 more Grilled or Dessert dishes")
 	assert_array(rows[1].facts).is_equal(["4 Orchard crops · any kind"])
 	assert_array(rows[2].facts).is_equal(["4 Fine crops · any kind"])
+
+## SGODOT-284 Stamp Run: a check-in, not items — the row says where, the gap until the player has been there.
+func test_p1_stamp_run_reads_visit_and_the_gap_is_the_check_in() -> void:
+	var v := _view()
+	v.boards.market.slots = [{"id": "v1", "title": "Stamp Run", "kind": "visit", "items": [], "rarity": null, "style": null,
+		"family": null, "visit": {"place": "sh_tea_1", "done": false}, "icon": null, "qty": 1, "have": 0, "ready": false,
+		"coins": 40, "status": "accepted"}]
+	var row: Dictionary = P0Board.cards(v, "market")[0]
+	assert_array(row.facts).is_equal(["Visit Oak Tea House"])
+	assert_str(str(row.reason)).is_equal("Visit Oak Tea House first")
+	assert_array(row.needs.map(func(n): return [n.name, n.have, n.need])).is_equal([["Oak Tea House", 0, 1]])
+	var d := P0Board.detail(v, "market", "v1")
+	assert_str(str(d.effect)).is_equal("Visit Oak Tea House, then come back to any San Francisco market.")
+	assert_str(str(d.go)).is_equal("outpost:tea")
+	v.boards.market.slots[0].visit.done = true
+	v.boards.market.slots[0].ready = true
+	row = P0Board.cards(v, "market")[0]
+	assert_array([row.status, row.command, row.reason]).is_equal(["Ready to deliver", "Deliver", ""])
