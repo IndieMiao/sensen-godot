@@ -114,7 +114,7 @@
       },
       {
         "id": "limit",
-        "label": "Limit reached \u00b7 {quota_resets_in}",
+        "label": "Limit reached · {quota_resets_in}",
         "kind": "unavailable",
         "when": "sold_here & !quota_left & !locked"
       },
@@ -198,7 +198,7 @@
       },
       {
         "id": "limit",
-        "label": "Limit reached \u00b7 {quota_resets_in}",
+        "label": "Limit reached · {quota_resets_in}",
         "kind": "unavailable",
         "when": "sold_here & !quota_left & !locked"
       },
@@ -315,7 +315,7 @@
       },
       {
         "id": "limit",
-        "label": "Limit reached \u00b7 {quota_resets_in}",
+        "label": "Limit reached · {quota_resets_in}",
         "kind": "unavailable",
         "when": "sold_here & !quota_left & !locked & !never_sold"
       },
@@ -518,7 +518,7 @@
       },
       {
         "id": "limit",
-        "label": "Limit reached \u00b7 {quota_resets_in}",
+        "label": "Limit reached · {quota_resets_in}",
         "kind": "unavailable",
         "when": "recyclable & sold_here & !quota_left & !locked"
       },
@@ -723,6 +723,52 @@
           {
             "when": "!can_afford",
             "label": "Need {coins_short} more coins"
+          }
+        ]
+      }
+    ]
+  },
+  "decor/counter_buy": {
+    "facts": [
+      "{decor_line}",
+      "{decor_third}"
+    ],
+    "price": true,
+    "buttons": [
+      {
+        "id": "buy",
+        "label": "Buy",
+        "kind": "secondary",
+        "unless": [
+          {
+            "when": "!homestead_ok",
+            "label": "{homestead_gate}"
+          },
+          {
+            "when": "sold_out",
+            "label": "Bought today · {restock_in}"
+          },
+          {
+            "when": "!can_afford",
+            "label": "Need {coins_short} more coins"
+          }
+        ]
+      }
+    ]
+  },
+  "decor/storage": {
+    "facts": [
+      "Farm Storage · {footprint}"
+    ],
+    "buttons": [
+      {
+        "id": "place",
+        "label": "Place",
+        "kind": "primary",
+        "unless": [
+          {
+            "when": "!at_home",
+            "label": "At home only"
           }
         ]
       }

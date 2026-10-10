@@ -57,6 +57,7 @@ static func rules() -> Dictionary:
 	return _rules
 
 static func kind_of(view: Dictionary, item_id: String) -> String:
+	if P0Decor.is_decor(item_id): return "decor"   # Decorate (SGODOT-284): yard pieces live in Farm Storage
 	var k := str(P0Logic.item(view, item_id).get("kind", ""))
 	if k == "":
 		var head := item_id.split("_")[0]
@@ -67,6 +68,7 @@ static func kind_of(view: Dictionary, item_id: String) -> String:
 ## Tackle, torches and the rest on Materials (周瑜 / 刘邦).
 ## Kinds the plan doesn't put on a Tab (postcards, décor; §10.4.8 keepsakes go to storage) get &"": All only (刘邦).
 static func tab_of(view: Dictionary, item_id: String) -> StringName:
+	if P0Decor.is_decor(item_id): return &"decor"   # STORE-DECOR (Figma 2189:33113): Farm Storage's own Decor tab
 	var k := str(P0Logic.item(view, item_id).get("kind", ""))
 	if k == "": k = item_id.split("_")[0]
 	var tab = {"seed": &"seeds", "fert": &"seeds", "fish": &"fish", "crop": &"produce", "dish": &"dishes", "bait": &"tackle",
@@ -93,7 +95,7 @@ static func spec(view: Dictionary, item_id: String, context: StringName, opts :=
 		kind = kind,
 		icon = P0Logic.icon(item_id),
 		title = P0Logic.item_name(view, item_id),
-		quantity = P0Logic.bag_count(view, item_id),
+		quantity = _stored(view, item_id) if kind == "decor" else P0Logic.bag_count(view, item_id),
 		info = context != &"workbench",   # no item page for a workbench item in P0: no dead-end ›
 		rarity = rarity,
 		rarity_text = P0Logic.rarity_name(view, rarity) if rarity > 0 else "",
@@ -357,10 +359,24 @@ static func tokens(view: Dictionary, item_id: String, context: StringName, opts 
 		# A workbench item (SGODOT-231 B2-06): its effect line, then In Gear for an owned pickaxe or the gloves' passive note.
 		craft_effect = str(P0MaterialLogic.EFFECTS.get(item_id, "")),
 		craft_note = _craft_note(view, item_id),
+		# Decorate (SGODOT-284, q(111) / q(113)): a piece's footprint, its row line (`1×1 · Glows at night` /
+		# `5 pieces`) and the row's third line — the levels still to go while it is locked, else `In storage ×2`.
+		footprint = P0Decor.footprint(item_id) if kind == "decor" else "",
+		decor_line = P0Decor.line(item_id) if kind == "decor" else "",
+		decor_third = _decor_third(view, item_id, offer) if kind == "decor" else "",
 	}
 	var src := str(t.source)
 	t.count_source = ("%s · %s" % [t.count, src]) if src != "" and t.count != "" else ""
 	return t
+
+## A Decor row's third line (FARM-6-DECOR): `1 level to go` / `3 levels to go` while the stall holds it back, else
+## `In storage ×2` with some in Farm Storage, else nothing.
+static func _decor_third(view: Dictionary, item_id: String, offer: Dictionary) -> String:
+	if not bool(offer.get("homestead_ok", true)) and offer.get("homestead", null) != null:
+		var n := maxi(1, int(offer.homestead) - int(view.get("homestead", {}).get("level", 1)))
+		return "%d level%s to go" % [n, "" if n == 1 else "s"]
+	var n := P0Decor.stored(view, item_id)
+	return "In storage ×%d" % n if n > 0 else ""
 
 ## The workbench card's second line: an owned pickaxe is In Gear, the Gather Gloves work without a slot (GLOVES-DONE copy).
 static func _craft_note(view: Dictionary, item_id: String) -> String:

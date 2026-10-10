@@ -40,7 +40,22 @@ func test_categories_map_onto_the_item_kinds() -> void:
 	var counts := {}
 	for cat in P0BagDrawer.CATEGORIES:
 		counts[cat] = P0BagDrawer.bag_items(v).filter(func(it): return P0BagDrawer.in_category(it, cat)).size()
-	assert_that(counts).is_equal({"All": 5, "Seeds": 1, "Fish": 1, "Produce": 1, "Dishes": 1, "Materials": 0, "Tackle": 1})
+	assert_that(counts).is_equal({"All": 5, "Seeds": 1, "Fish": 1, "Produce": 1, "Dishes": 1, "Materials": 0, "Tackle": 1, "Decor": 0})
+
+## STORE-DECOR (SGODOT-284, Figma 2189:33113): pieces only ever wait in Farm Storage, on their own tab, at home.
+func test_decor_waits_in_farm_storage_on_its_own_tab() -> void:
+	var v := _view()
+	v["storage"] = {"items": [{"id": "deco_bench", "qty": 1}, {"id": "deco_planter", "qty": 2}, {"id": "wood", "qty": 4}]}
+	v["decor"] = {"placed": [], "cap": 24, "used": 0, "stored": {"deco_bench": 1, "deco_planter": 2}}
+	var decor := P0BagDrawer.storage_items(v, "Decor", "home")
+	assert_array(decor.map(func(it): return it.item)).contains_exactly(["deco_bench", "deco_planter"])
+	assert_array(P0BagDrawer.storage_items(v, "Decor", "outpost")).is_empty()
+	assert_str(P0BagDrawer.hint_for("Decor", true)).is_equal("At home · no slot limit")
+	var s := P0ItemInfo.spec(v, "deco_bench", &"storage", {place = "home"})
+	assert_str(str(s.title)).is_equal("Wooden Bench")
+	assert_int(int(s.quantity)).is_equal(1)
+	assert_array(s.facts).is_equal(["Farm Storage · 2×1"])
+	assert_array(s.buttons.map(func(b): return "%s:%s" % [b.kind, b.label])).is_equal(["primary:Place"])
 
 func test_gear_has_six_slots_and_rod_candidates_follow_the_rules() -> void:
 	var v := _view()

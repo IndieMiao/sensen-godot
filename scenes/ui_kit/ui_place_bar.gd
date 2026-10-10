@@ -10,6 +10,8 @@ extends Control
 ##                ee15926a): Cancel · Rotate · Place share the width equally; "" = the two-key bar (sprinklers).
 ##                Three keys leave no room for a reason on the main key (fcbd30a7): it greys keeping its verb and the
 ##                reason takes the caption pill's place until the spot is valid again
+##   cancel       the left key's word; "" leaves the main key alone across the bar (Decorate with nothing picked:
+##                one `Done`, 不知火舞 on 284 49b11f91)
 ## Signals: confirmed (the main key on a valid spot), cancelled, secondary_pressed; a tap on a blocked main key says
 ## why (unavailable).
 
@@ -26,6 +28,7 @@ var caption := "": set = set_caption
 var confirm := "Build": set = set_confirm
 var reason := "": set = set_reason
 var secondary := "": set = set_secondary
+var cancel := "Cancel": set = set_cancel
 var safe_bottom := 0.0: set = set_safe_bottom
 
 var _pill: PanelContainer
@@ -110,6 +113,12 @@ func set_secondary(v: String) -> void:
 	_ok.size_flags_stretch_ratio = 1.0 if v != "" else _MAIN_RATIO
 	_ok.reason_beside = v != ""
 	_show_caption()
+
+func set_cancel(v: String) -> void:
+	cancel = v
+	if _cancel == null: return
+	_cancel.label = v
+	_cancel.visible = v != ""
 
 func set_safe_bottom(v: float) -> void:
 	safe_bottom = v

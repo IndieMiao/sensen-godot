@@ -19,10 +19,10 @@ signal side_changed(side: String)
 signal gear_slot_changed(key: String)
 
 const HEIGHT := 546.0   # drawer top at y 254 of 800 (BAG-2-2)
-const CATEGORIES := ["All", "Seeds", "Fish", "Produce", "Dishes", "Materials", "Tackle"]
+const CATEGORIES := ["All", "Seeds", "Fish", "Produce", "Dishes", "Materials", "Tackle", "Decor"]   # Decor: P1 (STORE-DECOR)
 const GEAR_SLOTS := ["farming", "fishing", "mining", "combat", "ring", "charm"]
 ## Tabs that also list Farm Storage stacks, after the bag's, while at home (§10.4.8, BAG-2-2; SGODOT-228 / 231).
-const STORAGE_TABS := ["Seeds", "Materials", "Tackle"]
+const STORAGE_TABS := ["Seeds", "Materials", "Tackle", "Decor"]   # Decor lives only in Farm Storage (q(29), SGODOT-284)
 const _ROW_GAP := 8.0      # Bag layout spacers: 8 under the quick bar, under the header, above the grid
 const _SMALL_GAP := 4.0
 const _SLOT_LIST_GAP := 12.0
@@ -216,6 +216,7 @@ static func bag_full_text(view: Dictionary) -> String:
 
 ## The line above the grid: `Materials · Bag first, then Farm Storage` when storage stacks follow.
 static func hint_for(cat: String, has_storage: bool) -> String:
+	if cat == "Decor": return "At home · no slot limit"   # STORE-DECOR: pieces only ever wait in Farm Storage
 	return "%s · Bag first, then Farm Storage" % cat if has_storage else "Select an item to see its details."
 
 static func bag_items(view: Dictionary, sort_by := "Type") -> Array:

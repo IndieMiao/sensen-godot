@@ -394,13 +394,15 @@ func test_the_old_tree_stands_in_the_left_column_off_the_beds() -> void:
 	assert_bool(cell.x < 4).is_true()   # left of the beds
 	assert_int(absi(cell.y - (P0Garden.ANCHORS["spot_clay_bank"] as Vector2i).y)).is_greater_equal(3)
 	var yard: Dictionary = P0Logic.content().get("decor", {}).get("yard", {})
-	assert_bool((yard.get("blocked", []) as Array).any(func(r): return Rect2i(int(r[0]), int(r[1]), int(r[2]), int(r[3])).has_point(cell))).is_true()
+	assert_bool((yard.get("objects", []) as Array).any(func(r): return Rect2i(int(r[0]), int(r[1]), int(r[2]), int(r[3])).has_point(cell))).is_true()
 
 ## B (奕星 on 288, after the user's hand test: the swing looked like digging): the swing plays no labour clip; the Combat
 ## slot's sword shows in hand only while the swing arc does, as the old mine did (09-15 R4).
 func test_the_swing_shows_the_sword_and_plays_no_labour() -> void:
 	var src := FileAccess.get_file_as_string("res://scenes/p0/p0_mine.gd")
-	var swing := src.substr(src.find("func _swing()"), src.find("## The Combat slot's sword on the player") - src.find("func _swing()"))
+	var at := src.find("func _swing()")
+	var swing := src.substr(at, src.find("\nfunc ", at + 1) - at)   # the body up to the next func (苏烈 on #270)
+	assert_str(swing).contains("combat.swing(")                      # it is the swing's body
 	assert_str(swing).not_contains("labour(")
 	var P0Mine = load("res://scenes/p0/p0_mine.gd")
 	var mine = auto_free(P0Mine.new())

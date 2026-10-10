@@ -54,8 +54,9 @@ const SHOP_NOUN := {"tackle": "Tackle", "market": "Stall", "tea": "Tea", "post":
 ## Keeper role and P0 name when the opener passes no ctx (assets/p0/p0_outposts.json keeper, SGODOT-227).
 const KEEPERS := {"tackle": ["Tackle Keeper", "Finn"], "market": ["Market Keeper", "Mei"], "tea": ["Tea Host", "Ama"],
 	"post": ["Post Clerk", "Sigrid"]}
-## Page tabs: the stall's board and the market's board (FARM-6 / NPC-2); one page shows no tab row.
-const SECTIONS := {"homestead": [["buy", "Buy"], ["board", "Stall Board"]], "market": [["buy", "Buy"], ["board", "Market Board"]]}
+## Page tabs: the stall's board and the market's board (FARM-6 / NPC-2); one page shows no tab row. The stall's Decor
+## page (P1, SGODOT-284; FARM-6-DECOR, Figma 2187:33369, q(111)): the yard pieces, into Farm Storage.
+const SECTIONS := {"homestead": [["buy", "Buy"], ["decor", "Decor"], ["board", "Stall Board"]], "market": [["buy", "Buy"], ["board", "Market Board"]]}
 
 var view := {}
 var role := "homestead"
@@ -78,6 +79,8 @@ var _bag_half: VBoxContainer
 var _count: Label
 var _cap_track: _Track
 var _quota: Label
+var _scope: HBoxContainer        # the scope chip and buy-back line (none on the Decor page: nothing is sold there)
+var _decor_line: Label           # the Decor page's fact line under the stall's title (`Decor 12/24 · Goes to Farm Storage`)
 var _drinks: VBoxContainer
 var _rows := {}   # item id -> UiShopRow
 var _qty := {}    # item id -> stepper count
@@ -140,9 +143,16 @@ func _sections() -> Array: return SECTIONS.get(role, [])
 func _build_head() -> void:
 	if role == "homestead":
 		var h := HBoxContainer.new()
+		var titles := VBoxContainer.new()
+		titles.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		titles.alignment = BoxContainer.ALIGNMENT_CENTER
+		titles.add_theme_constant_override(&"separation", 0)
 		var title := UiKit.label("Homestead Stall", UiTokens.STYLE_C14_XB)
-		title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		h.add_child(title)
+		titles.add_child(title)
+		_decor_line = UiKit.label("", UiTokens.STYLE_C10_B, UiTokens.COLOR_SECONDARY)
+		_decor_line.visible = false
+		titles.add_child(_decor_line)
+		h.add_child(titles)
 		var close := UiCloseButton.new()
 		close.pressed.connect(func(): close_requested.emit())
 		h.add_child(close)
@@ -194,6 +204,7 @@ func _build_bag_half() -> void:
 	_bag_half.add_child(cap)
 	_gap(_bag_half, 2.0)
 	var scope := HBoxContainer.new()
+	_scope = scope
 	scope.custom_minimum_size.y = _SCOPE_H
 	scope.add_theme_constant_override(&"separation", 12)
 	var chip := UiFilterChip.new("All" if role == "homestead" else "Sell here", true)
@@ -218,7 +229,7 @@ func _build_bag_half() -> void:
 	grid.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	grid.sell_mode = role != "homestead"
 	grid.can_sell = func(it: Dictionary) -> bool: return P0ItemInfo.flags(view, str(it.id), &"counter_sell", _opts()).sold_here
-	grid.on_select = func(it: Dictionary): select(str(it.id))
+	grid.on_select = func(it: Dictionary): if section != "decor": select(str(it.id))   # Decor: the bag only shows
 	grid.selection_cleared.connect(func(): sheet.close())
 	_bag_half.add_child(grid)
 
@@ -229,7 +240,8 @@ func _opts(qty := 1) -> Dictionary: return {counter = role, place = place, qty =
 ## stay. Called every frame by the P0 UI, so a view that changes nothing shown here is skipped.
 func refresh(view_: Dictionary, force := false) -> void:
 	var key := [view_.get("shops", {}).get(role, {}), view_.get("quotas", {}), view_.get("bag", {}), view_.get("gear", {}),
-		int(view_.get("coins", 0)), view_.get("keepers", {}).get(role, {}), section, _qty].hash()
+		int(view_.get("coins", 0)), view_.get("keepers", {}).get(role, {}), section, _qty, view_.get("decor", {}),
+		view_.get("homestead", {}).get("level", 1)].hash()
 	view = view_
 	if key == _key and not force: return
 	_key = key
@@ -241,9 +253,17 @@ func refresh(view_: Dictionary, force := false) -> void:
 	_shelf_box.visible = shows_shelf
 	board.visible = not shows_shelf
 	_fill_shelf()
+	if _decor_line:
+		_decor_line.visible = section == "decor"
+		_decor_line.text = P0Decor.header_line(view) if section == "decor" else ""
 	var buys := has_bag_half(view, role)
 	_bag_half.visible = buys and shows_shelf
 	if not _bag_half.visible: return
+	# The Decor page sells nothing back: the bag below only shows (no scope, no Sell card; 不知火舞 on 284 263ca1d6 ②).
+	_scope.visible = section != "decor"
+	if section == "decor" and sheet.is_open():
+		sheet.close()
+		grid.clear_selection()
 	var bag: Dictionary = view.get("bag", {})
 	var used := (bag.get("slots", []) as Array).size()
 	var capacity := int(bag.get("capacity", 25))
@@ -259,9 +279,12 @@ func refresh(view_: Dictionary, force := false) -> void:
 ## everything else the server lists, which on a Market includes its city's regional seed (P1 §5.2.3).
 func offers() -> Array:
 	var all: Array = view.get("shops", {}).get(role, {}).get("buy", [])
-	# Decor (SGODOT-284) is on the stall's own Decor page once it is drawn (不知火舞); until then not on the Buy shelf.
-	var decor: Dictionary = P0Logic.content().get("decor", {}).get("items", {})
-	if role != "market": return all.filter(func(o): return not decor.has(str(o.get("id", ""))))
+	# Decor (SGODOT-284) is on the stall's own Decor page (FARM-6-DECOR), cheapest first; never on the Buy shelf.
+	if role == "homestead" and section == "decor":
+		var pieces := all.filter(func(o): return P0Decor.is_decor(str(o.get("id", ""))))
+		pieces.sort_custom(func(a, b): return int(a.get("price", 0)) < int(b.get("price", 0)))
+		return pieces
+	if role != "market": return all.filter(func(o): return not P0Decor.is_decor(str(o.get("id", ""))))
 	var specialty: Array = P0Logic.content().get("market", {}).get("specialty", [])
 	var want := section == "specialty"
 	return all.filter(func(o): return specialty.has(str(o.get("id", ""))) == want)
@@ -292,7 +315,7 @@ func _show_row(id: String) -> void:
 	if o.is_empty() or not _rows.has(id): return
 	var qty := int(_qty.get(id, 1))
 	var spec := P0ItemInfo.spec(view, id, &"counter_buy", _opts(qty))
-	var once := bool(o.get("once", false)) or str(o.get("to", "")) in ["gear", "bag_cap"]
+	var once := bool(o.get("once", false)) or str(o.get("to", "")) in ["gear", "bag_cap"] or P0Decor.is_decor(id)   # decor: 1 a day, no stepper
 	(_rows[id] as UiShopRow).show_spec(spec, once, int(o.left) if o.get("left", null) != null else 99)
 
 ## The P0 market's drawer (no bag half, q(48)): as tall as its content, not the fixed 420.
