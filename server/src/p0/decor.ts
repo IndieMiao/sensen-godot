@@ -42,13 +42,20 @@ const inRect = ([x, y]: [number, number], [rx, ry, rw, rh]: Rect) => x >= rx && 
 /** Why a piece can't stand there — `Outside your yard` (decor_outside), `Space taken` (decor_overlap: an object or
  * another piece), `Keep the path clear` (decor_path, q(120)) — or null when it can. */
 export function spotBlock(c: P0Content, s: P0State, id: string, x: number, y: number, rot: number, ignore?: number): Refusal | null {
+  return yardBlock(c, s, cellsOf(c, id, x, y, rot), { x, y }, { uid: ignore });
+}
+
+/** The same judgement for any cells in the yard: decor pieces and the yard's facilities (the Compost Bin, 刘邦,
+ * q(118) ③) keep out of each other's cells; `ignore` leaves out the one being moved. */
+export function yardBlock(c: P0Content, s: P0State, cells: [number, number][], at: { x: number; y: number },
+    ignore: { uid?: number; facility?: number } = {}): Refusal | null {
   const yard = decorOf(c)!.yard;
-  const cells = cellsOf(c, id, x, y, rot);
-  if (cells.some(cell => !inRect(cell, yard.walk) || yard.field.some(r => inRect(cell, r)))) return { code: 'decor_outside', detail: { x, y } };
+  if (cells.some(cell => !inRect(cell, yard.walk) || yard.field.some(r => inRect(cell, r)))) return { code: 'decor_outside', detail: at };
   const taken = new Set<string>();
-  for (const p of s.decor?.placed ?? []) if (p.uid !== ignore) for (const [px, py] of cellsOf(c, p.id, p.x, p.y, p.rot)) taken.add(`${px},${py}`);
-  if (cells.some(cell => yard.objects.some(r => inRect(cell, r)) || taken.has(`${cell[0]},${cell[1]}`))) return { code: 'decor_overlap', detail: { x, y } };
-  if (cells.some(cell => yard.paths.some(r => inRect(cell, r)))) return { code: 'decor_path', detail: { x, y } };
+  for (const p of s.decor?.placed ?? []) if (p.uid !== ignore.uid) for (const [px, py] of cellsOf(c, p.id, p.x, p.y, p.rot)) taken.add(`${px},${py}`);
+  for (const f of s.facilities ?? []) if (f.cell && f.id !== ignore.facility) taken.add(`${f.cell[0]},${f.cell[1]}`);
+  if (cells.some(cell => yard.objects.some(r => inRect(cell, r)) || taken.has(`${cell[0]},${cell[1]}`))) return { code: 'decor_overlap', detail: at };
+  if (cells.some(cell => yard.paths.some(r => inRect(cell, r)))) return { code: 'decor_path', detail: at };
   return null;
 }
 

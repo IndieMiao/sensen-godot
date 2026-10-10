@@ -727,7 +727,118 @@ func p0_action(cmd: Dictionary) -> void:
 	if LABOUR_CLIP.has(type) and target >= 0:
 		actor.labour(LABOUR_CLIP[type], bp.cell_to_world(P0Garden.cell_of(target)))
 		_hold_until = Time.get_ticks_msec() + P0Actor.LABOUR_S * 1000.0
+	var row: Array = cmd.get("plots", [])
+	if row.size() > 1:   # one labour beat for the whole row (289): the row shows it
+		if type == "harvest": _record_wave(row)
+		elif type in ["sow", "water"]: row_drops(row, type)
 	rt.session.send(cmd)
+
+# ---------------------------------------------------------------- a row in one press (SGODOT-289 914bcfea §三 / §四)
+## Harvest ×N: the character labours once and the crops pop along the row instead — from the plot in front outward,
+## one every WAVE_STEP_S, each up and then shrinking out (程序, no new art); the camera stays. The reply's floats and
+## the crops' flights to the Bag wait for the wave (P0Runtime asks p0_harvest_wave). Row Hoe's Sow ×3 / water 3:
+## the seeds or the water fall on the three beds one WAVE_STEP_S apart.
+const WAVE_STEP_S := 0.08
+const WAVE_POP_S := 0.08
+const WAVE_OUT_S := 0.2
+const WAVE_KEEP_MS := 4000     # a sent row the server refused (bag full) is forgotten after this
+const FLY_STEP_S := 0.1        # 289: the crops' ItemFlies, one kind after another
+var _wave := {}   # the Harvest ×N sent last: {plots (near to far), crops: {plot: crop id}, at}
+
+func _record_wave(row: Array) -> void:
+	var crop_of := {}
+	for p in rt.session.view.get("plots", []): crop_of[int(p.get("id", -1))] = str(p.get("crop", "")) if p.get("crop", null) != null else ""
+	_wave = {"plots": row.map(func(x): return int(x)), "crops": crop_of, "at": Time.get_ticks_msec()}
+
+## The reply to the Harvest ×N sent last: the wave over the plots it took (all, or up to where the bag filled,
+## q(123)) and, as it ends, one ×N flight per kind to the Bag (crops, then Seed Saver's seeds; at most
+## UiItemFly.MAX_PER_BATCH). Returns how long the wave plays, for the reply's floats to wait; 0 when it is not one.
+func p0_harvest_wave(events: Array) -> float:
+	if _wave.is_empty() or Time.get_ticks_msec() - int(_wave.at) > WAVE_KEEP_MS: return 0.0
+	var short := events.filter(func(e): return str(e.get("kind", "")) == "harvest_short")
+	var got := int(short[0].get("got", 0)) if not short.is_empty() else events.filter(func(e):
+		return str(e.get("kind", "")) == "item" and str(e.get("id", "")).begins_with("crop_") and int(e.get("delta", 0)) > 0).size()
+	if got <= 0: return 0.0   # another reply (a refresh): the row's is still to come
+	var plots: Array = (_wave.plots as Array).slice(0, got)
+	var crop_of: Dictionary = _wave.crops
+	_wave = {}
+	for i in plots.size():
+		var code := str(P0Garden.CROP_CODES.get(str(crop_of.get(int(plots[i]), "")), ""))
+		if code != "": _pop(crops.ghost(P0Garden.cell_of(int(plots[i])), code), i * WAVE_STEP_S)
+	var wave := (plots.size() - 1) * WAVE_STEP_S + WAVE_POP_S + WAVE_OUT_S
+	_harvest_flights(plots, crop_of, events, wave)
+	return wave
+
+## The Harvest ×N sent last was refused as a whole (the bag took not one plot): its wave will not come, so a single
+## harvest within WAVE_KEEP_MS is not read as the row's reply (哪吒 on #291).
+func p0_harvest_refused() -> void:
+	_wave = {}
+
+## One crop's pop: up to ×1.25, then shrinking and fading out, `delay` after the wave starts.
+func _pop(g: Node3D, delay: float) -> void:
+	var tw := g.create_tween()
+	if delay > 0.0: tw.tween_interval(delay)
+	tw.tween_property(g, "scale", Vector3.ONE * 1.25, WAVE_POP_S).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tw.tween_property(g, "scale", Vector3.ONE * 0.3, WAVE_OUT_S).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tw.parallel().tween_method(func(k: float):
+		for m in g.get_children(): (m as GeometryInstance3D).transparency = k, 0.0, 1.0, WAVE_OUT_S)
+	tw.tween_callback(g.queue_free)
+
+## As the wave ends: each crop kind of the row (in the order they were taken) and Seed Saver's seeds fly to the Bag,
+## ×N, FLY_STEP_S apart, from where that kind's first plot stood; the Bag bumps as each lands. ×N is what the reply put
+## in the bag, as the `+3 Radish` float says (a plot may yield more than one, 哪吒 on #291). No Bag on screen, no
+## flight (UiItemFly.launch).
+func _harvest_flights(plots: Array, crop_of: Dictionary, events: Array, after: float) -> void:
+	var kinds := row_flights(plots, crop_of, events)
+	var bag: Control = rt.ui.bag_target()
+	for i in mini(kinds.size(), UiItemFly.MAX_PER_BATCH):
+		var from := cam.unproject_position(bp.cell_to_world(P0Garden.cell_of(int(kinds[i][2]))) + Vector3(0, P0Garden.BED_H + 0.3, 0))
+		UiItemFly.launch(rt.ui.root, from, bag, P0Logic.icon(str(kinds[i][0])), int(kinds[i][1]), after + i * FLY_STEP_S,
+			func(): UiItemFly.bump(bag))
+
+## The row's flights: [id, ×N, plot it flies from] per crop kind in the order the row took them (×N: what the reply's
+## items put in the bag), then Seed Saver's seeds (one each).
+static func row_flights(plots: Array, crop_of: Dictionary, events: Array) -> Array:
+	var kinds: Array = []
+	for id in plots:
+		var crop := str(crop_of.get(int(id), ""))
+		if crop != "" and not kinds.any(func(x): return x[0] == crop): kinds.append([crop, 0, int(id)])
+	for e in events:
+		if str(e.get("kind", "")) != "item" or int(e.get("delta", 0)) <= 0: continue
+		var k := kinds.map(func(x): return x[0]).find(str(e.get("id", "")))
+		if k >= 0: kinds[k][1] += int(e.delta)
+	kinds = kinds.filter(func(x): return int(x[1]) > 0)
+	for e in events:
+		if str(e.get("kind", "")) != "seed_saved": continue
+		var k := kinds.map(func(x): return x[0]).find(str(e.id))
+		if k < 0: kinds.append([str(e.id), 1, int(e.get("plot", plots[0]))])
+		else: kinds[k][1] += 1
+	return kinds
+
+## Row Hoe's three beds: a few seeds (sow) or drops (water) fall on each, one WAVE_STEP_S after the other.
+func row_drops(row: Array, type: String) -> void:
+	var color := Color(0.42, 0.3, 0.16) if type == "sow" else Color(0.45, 0.72, 0.95)
+	for i in row.size():
+		var top := bp.cell_to_world(P0Garden.cell_of(int(row[i]))) + Vector3(0, P0Garden.BED_H, 0)
+		for d in [Vector3(-0.12, 0, -0.08), Vector3(0.1, 0, 0.0), Vector3(-0.02, 0, 0.12)]:
+			var drop := MeshInstance3D.new()
+			var m := SphereMesh.new()
+			m.radius = 0.035 if type == "sow" else 0.045
+			m.height = m.radius * (2.0 if type == "sow" else 2.6)
+			drop.mesh = m
+			var mat := StandardMaterial3D.new()
+			mat.albedo_color = color
+			mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+			drop.material_override = mat
+			drop.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			drop.position = top + d + Vector3(0, 0.7, 0)
+			drop.visible = false
+			add_child(drop)
+			var tw := drop.create_tween()
+			tw.tween_interval(i * WAVE_STEP_S)
+			tw.tween_callback(func(): drop.visible = true)
+			tw.tween_property(drop, "position", top + d, 0.22).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+			tw.tween_callback(drop.queue_free)
 
 ## Into the farmhouse (its stove corner is the kitchen); the farm waits suspended underneath.
 func enter_farmhouse() -> void:
@@ -841,13 +952,15 @@ func _prompts(v: Dictionary) -> void:
 
 ## One facility's prompt at `at` + `mark` (the former finger card's / mark's anchor): its strip when it is the open
 ## one, else its icon button (P0WorldPrompts.show). The button and strip forward their taps to `at` + `hit` by id.
-func world_prompt(id: String, prompt: Dictionary, at: Vector3, mark: Vector3, hit: Vector3, present := true) -> void:
+## `side`: the strip's way, the character's facing when −1; a facility strip opens right, its icon on the left, as
+## the Fish Trap's (不知火舞 on 241 ba9359df).
+func world_prompt(id: String, prompt: Dictionary, at: Vector3, mark: Vector3, hit: Vector3, present := true, side := -1) -> void:
 	var screen := cam.unproject_position(at + mark)
 	var tap := cam.unproject_position(at + hit)
 	var show := P0WorldPrompts.show(id, _card, P0FarmMaterials.flat(actor.position, at), prompt) \
 		if present and not rt.ui.has_modal() else P0WorldPrompts.Show.NONE
 	if show == P0WorldPrompts.Show.BAR:
-		rt.ui.name_bar(id, prompt.icon, str(prompt.text), str(prompt.fact), screen, true, _strip_side, bool(prompt.dimmed),
+		rt.ui.name_bar(id, prompt.icon, str(prompt.text), str(prompt.fact), screen, true, _strip_side if side < 0 else side, bool(prompt.dimmed),
 			int(prompt.status), tap)
 	else:
 		rt.ui.world_icon(id, prompt.icon, screen, show == P0WorldPrompts.Show.ICON, false, int(prompt.status), tap,
@@ -1005,6 +1118,10 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"factap":
 			for f in rt.session.current().get("facilities", []):
 				if int(f.get("id", 0)) == int(step[1]): _facilities.open_card(f)
+		"binpick":   # binpick:<item> — the Compost Bin's drawer selects that crop (COMPOST-BIN shots)
+			if rt.ui.compost_bin() != null: rt.ui.compost_bin().select(step[1])
+		"bincompost":   # bincompost:<item>:<qty> — the drawer's Compost, sent as its buttons send it
+			rt.session.send({"type": "compost", "item": step[1], "qty": int(step[2]) if step.size() > 2 else 1})
 		"near":   # near:<id> — stand 1.2 m in front of a facility, so its name strip opens (250 review shots)
 			for c in _card_candidates():
 				if str(c[0]) == step[1]:

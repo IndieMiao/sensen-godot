@@ -201,6 +201,42 @@ describe('Cooking Lv7–10 conveniences (§4.6.3)', () => {
     expect(refusal(bare, { type: 'cook_all' })?.code).toBe('nothing_to_cook');
   });
 
+  it("Cook All's preview (COOK-P1-4) is what cook_all then does: the same pots on the same stoves, nothing taken", () => {
+    expect(viewOf(c, cook(7, 8), T0).cooking.cook_all).toBeNull();   // before Cooking Lv8
+    const s = cook(8, 8);
+    s.cookbook.push('dish_herb_grilled_fish');
+    s.bag.push({ id: 'fish_crucian', qty: 5 }, { id: 'wild_herb', qty: 3 });
+    const bag = structuredClone(s.bag);
+    const plan = viewOf(c, s, T0).cooking.cook_all!;
+    expect(s.bag).toEqual(bag);   // the preview runs on a copy
+    expect(plan.reason).toBeNull();
+    expect(plan.stoves).toBe(3);
+    expect(plan.pots.map(p => [p.dish, p.stove, p.when])).toEqual([
+      ['dish_herb_grilled_fish', 0, 'now'], ['dish_herb_grilled_fish', 1, 'now'], ['dish_grilled_crucian', 2, 'now'],
+      ['dish_grilled_crucian', 0, 'next']]);
+    const done = step(s, { type: 'cook_all' }).ev.filter(e => e.kind === 'pot');
+    expect(done.map(e => [e.dish, (e as { stove?: number }).stove, !!(e as { queued?: boolean }).queued]))
+      .toEqual(plan.pots.map(p => [p.dish, p.stove, p.when === 'next']));
+    // Uses: the planned pages' slots summed by token, against what the player holds
+    const uses = Object.fromEntries(plan.uses.map(u => [u.token, [u.need, u.have]]));
+    const slots = (id: string) => c.cooking.recipes.find(r => r.id === id)!.in;
+    const want = new Map<string, number>();
+    for (const p of plan.pots) for (const t of slots(p.dish)) want.set(t, (want.get(t) ?? 0) + 1);
+    expect(Object.fromEntries([...want].map(([t, n]) => [t, uses[t][0]]))).toEqual(Object.fromEntries(want));
+    for (const u of plan.uses) expect(u.have).toBeGreaterThanOrEqual(u.need);
+  });
+
+  it("Cook All's preview says why nothing would start: nothing to cook, or no stove or queue free", () => {
+    const bare = cook(8, 8);
+    bare.bag = [];
+    expect(viewOf(c, bare, T0).cooking.cook_all).toMatchObject({ pots: [], reason: 'nothing_to_cook' });
+    let full = cook(8, 8);
+    full.bag.push({ id: 'fish_crucian', qty: 12 });
+    for (let k = 0; k < 3; k++) full = step(full, { type: 'cook_all' }, T0 + k * S).s;   // 2 pots a page each time: 6 = three stoves and their queues
+    expect([full.stove, ...full.burners.map(b => b.stove)].every(Boolean) && [full.queue, ...full.burners.map(b => b.queue)].every(Boolean)).toBe(true);
+    expect(viewOf(c, full, T0 + 3 * S).cooking.cook_all).toMatchObject({ pots: [], reason: 'no_space' });
+  });
+
   it('Lucky Double (Lv10): sometimes one more Plain portion; never with Double', () => {
     const lucky = { ...c, cooking: { ...c.cooking, lucky_double: 1 } };   // always, to see it
     const s = cook(10, 3);

@@ -282,6 +282,29 @@ export function cookAll(c: P0Content, s: P0State, now: number, events: P0Event[]
   return placed ? null : { code: 'nothing_to_cook' };
 }
 
+/**
+ * Cook All's preview (COOK-P1-4, q(124); null before Cooking Lv8): what the button would do now, worked out by running
+ * cookAll itself on a copy of the save, so the drawer and the cook never disagree. pots: in firing order, each
+ * {dish, rarity, stove (0-based), when: now | next (Queue ×2)}; uses: the planned pages' slots summed by token (a dish
+ * or a tag such as Any Common fish), with what the player holds for each (bag and Spice Rack); reason when nothing
+ * would start: nothing_to_cook (no known page has its ingredients) or no_space (every stove and queue is taken).
+ */
+export function cookAllPlan(c: P0Content, s: P0State, now: number) {
+  if (!hasConvenience(c, s, 'cook_all')) return null;
+  const copy = structuredClone(s);
+  const events: P0Event[] = [];
+  const refusal = cookAll(c, copy, now, events);
+  if (refusal) return { pots: [], uses: [], stoves: 0, reason: refusal.code === 'stove_busy' ? 'no_space' : refusal.code };
+  const pots = events.flatMap(e => e.kind === 'pot' && e.dish
+    ? [{ dish: e.dish, rarity: e.rarity, stove: e.stove ?? 0, when: e.queued ? 'next' : 'now' }] : []);
+  const need = new Map<string, number>();
+  for (const p of pots) for (const t of recipeById(c, p.dish)?.in ?? []) need.set(t, (need.get(t) ?? 0) + 1);
+  const stock = ingredientStock(c, s);
+  const have = (t: string) => [...stock].reduce((n, [id, q]) => n + (tokenMatches(c, t, id) ? q : 0), 0);
+  return { pots, uses: [...need].map(([token, n]) => ({ token, need: n, have: have(token) })),
+    stoves: new Set(pots.map(p => p.stove)).size, reason: null };
+}
+
 /** First tap inside each ring's lifetime is judged; gold arc ± tolerance is a hit (§7.2.4). */
 export function heatHits(c: P0Content, heats: Heat[], taps: number[]): number {
   let hits = 0;

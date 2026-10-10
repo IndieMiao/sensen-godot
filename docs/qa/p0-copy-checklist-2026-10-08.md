@@ -13,6 +13,7 @@
 | Energy，不写 Stamina | 体力一律 `Energy` |
 | 分隔符 | 半角空格 + `·` + 半角空格：`Cast · 5 Energy` |
 | x/y = 已用 / 上限 | `Meals today 60/300`、`Mine runs today 1/2`、`0/3 today · 40 coins`（茶：已喝杯数，价格写下一杯，q(48)） |
+| 距离 ★ | 10 km 以内一位小数 `0.8 km`；10 km 及以上取整加千分位 `8,269 km`；四舍五入，最小 `0.1 km`；人在该地点时不显示 Distance 行（q(132)） |
 | 主行动键 | 第一行动词，第二行体力价或原因；第二行 ≤ 80 px（约 16 字符），长原因进按下后的 toast（q(44)）；0 体力的移动写 `· Free` |
 | 不写 Got it | Toast、TipCard、四件事卡都不写 `Got it`；点卡外 / 返回键关闭（q(26)、q(49)） |
 | 缺口写在按钮上 | 中性灰不可用态，如 `Need 6 more Timber`、`Farming Lv3`、`No room · free a slot first`（LOCK-10） |
@@ -65,7 +66,7 @@
 | 挣脱 ★ | 卡 `Too strong` / `Fishing Lv4 needed · You: Lv3 · 30 XP to go` / `+3 Energy back`，无按钮；末行写实退：保护期内 `Energy refunded (8 left today)`，保护期外 `+3 Energy back`（q(55)）；第二次起飘字 `Got away · Lv4 · Energy refunded (8 left today)` / `Got away · Lv4 · 3 Energy back`（q(50)）；鱼竿不够 `Too heavy for your rod` / `Reed Rod · Fishing Lv3 · 80 coins` |
 | 鱼塘 pin 与卡 ★ | `Fern Pond · Beginner pond · 0.8 km` / 其他 `Pebble Pond · River · 2.3 km`；卡 `Beginner pond` + `A nearby pond for your first catch.`（仅 Fern Pond）/ `Distance 0.8 km` / `Recommended Lv1–3`（River `Lv4–5`）/ `Details ›` / `Go`；鱼表剪影写名字 + `Fishing Lv N`（q(48)） |
 | 图钉卡原因行 ★ | 图钉挂标记时副标题下一行：鱼塘 `Pond Catch · Pond Crucian 0/2`（只在已接下、鱼不够时）/ 集市 `Market Board · 2 requests`（1 条 `Market Board · 1 request`）/ 居民据点 `Pip · New request` / 交付点 `Pond Catch · Ready to deliver` / 据点 ◆ `New for you · Reed Rod` / 居民新对话 ◆ `Pip · New chat`；几件同时写一件加 ` · +1 more`（q(103)） |
-| 进塘与凑齐 ★ | 进挂 ! 的塘 Info toast `Pond Catch · Pond Crucian 0/2`（教学卡之后）；钓到要的鱼飘字 `Pond Catch 1/2`；凑够 Success toast `Pond Catch · 2/2 · Deliver at the Stall`，鱼塘 ! 消失、家图钉 ✓（q(103)） |
+| 进塘与凑齐 ★ | 进挂 ! 的塘 Info toast `Pond Catch · Pond Crucian 0/2`（教学卡之后）；钓到要的鱼飘字 `Pond Catch 1/2`；凑够两行 Success toast `Pond Catch · 2/2` / `Deliver at the Stall`（q(134)），鱼塘 ! 消失、家图钉 ✓（q(103)） |
 | 委托的鱼还钓不上 ★ | 已接下但鱼的等级高于玩家 Fishing 等级：鱼塘不挂 !；Today 委托行小字 `Fishing Lv4 needed`，点开是鱼图鉴剪影那张门禁卡 `Fishing Lv4 keeps Golden Koi on the hook` / 需求格 `Fishing XP 70/300` · `230 XP to go`（不另写一句）；委托卡交付按钮缺口 `Fishing Lv4 needed`（不写 `Need 1 more Rare fish`）（q(104)） |
 | Today 委托行 ★ | 已接下的驿站板、集市、居民委托都进 Today（没接的不进；教学委托例外，开局未接也显示引导行 `Catch 2 Pond Crucian · Fern Pond`）：进度 `Fresh Greens · Radish 1/4` / `Dusk Haul · Fine fish 1/4` / `An Old Man's Catch · Rare fish 0/1`（只限稀有度写 `<稀有度> fish`，与原因行一致）；交付 `Pond Catch · Deliver at the Stall` / `Dusk Haul · Deliver at Mission Market Square` / `An Old Man's Catch · Deliver to Old Kai`（q(104) 补） |
 | Today 芯片 ★ | 只留图标 + 红点，不写字、不写数字；点开是原 Today 面板（q(107)）。红点亮：可交付 / 可收获 / 出锅 / 新解锁的行出现且没看过；打开一次面板即灭 |
@@ -165,6 +166,7 @@
 | 世界动作失败 | P0 只出横幅 `Didn't go through · try again`，**不出** toast `3 plots not sown · Energy returned`（P0 世界动作没有本地投影，那句 toast 留给以后有投影的版本，q(75)） |
 | 去重与 stale_state | 不出任何提示 |
 | 启动与账号 | `When were you born?` / `Pick your birthday` / `Continue` / `Before you start` / `Agree to continue` / `Terms of Service ›` / `Privacy Policy ›` / `Continue with Apple` / `Continue with Google` / `Continue with Email` / `Taking longer than usual…` / `Can't connect` / `That name isn't allowed` / `Try another name`（WP6，SGODOT-206） |
+| 设置 · Licenses ★ | `Licenses` / `Software` / `Map data` / `OpenStreetMap` / `© OpenStreetMap contributors` / `ODbL 1.0` / `GeoNames` / `Contains data from GeoNames (geonames.org)` / `ESA WorldCover` / `© ESA WorldCover project 2021 / Contains modified Copernicus Sentinel data (2021) processed by ESA WorldCover consortium` / `CC BY 4.0`（署名一字不改、可折行；许可名与署名空 6 px 单独成段）（q(129)，帧 SET-LICENSES） |
 
 ## 11. 方案内已统一的写法（巡检时以右列为准）
 

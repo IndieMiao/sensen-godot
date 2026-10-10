@@ -240,6 +240,7 @@ const PIN_ICONS := {"tea": "pot", "tackle": "rod", "market": "board", "post": "t
 const AVATAR_BESIDE := Vector2(-44, 0)
 var _here_sig := ""
 var _dest_styles := {}   # "kind:id" -> a pond's / place's style: asked several times per pin per frame (刘邦 on #100)
+var _styles_explored := ""   # home and the count of cities visited the styles were made for: a city explored drops its silhouettes
 
 ## Ponds P0 knows, outposts and the homestead open P0PlaceSheet, not the city view's info panel; landmarks and POIs
 ## keep that name card.
@@ -254,17 +255,27 @@ func _own_card(entry: Dictionary) -> bool:
 func _destination_style(entry: Dictionary) -> Dictionary:
 	if not str(entry.get("kind", "")) in ["pond", "place"]: return {}   # landmarks and POIs: none, and not cached
 	var key := "%s:%s" % [entry.get("kind", ""), entry.get("id", "")]
+	# cheap per pin per frame: visits only grow, so their count and the home say when the explored list changed
+	var t: Dictionary = _view().get("travel", {})
+	var explored := "%s|%d" % [str(t.get("home", "")), (t.get("visits", {}) as Dictionary).size()]
+	if explored != _styles_explored:
+		_styles_explored = explored
+		_dest_styles.clear()
 	if not _dest_styles.has(key): _dest_styles[key] = _destination_style_of(entry)
 	return _dest_styles[key]
 
 func _destination_style_of(entry: Dictionary) -> Dictionary:
+	var style := {}
 	match str(entry.get("kind", "")):
-		"pond": return {"icon": P0Logic.icon("pond")}
+		"pond": style = {"icon": P0Logic.icon("pond")}
 		"place":
 			if str(entry.get("id", "")) == HOME_PIN: return {"icon": P0Logic.icon("home"), "plate": true}
 			var o := P0Outposts.find(str(entry.get("id", "")))
-			if not o.is_empty(): return {"icon": P0Logic.icon(str(PIN_ICONS.get(str(o.role), "travel")))}
-	return {}
+			if not o.is_empty(): style = {"icon": P0Logic.icon(str(PIN_ICONS.get(str(o.role), "travel")))}
+	# A place of a city the fog covers (MAP-2 2107:32861, 不知火舞 on #281): its silhouette until the city is explored
+	if not style.is_empty() and P0Travel.fog(_view(), cluster_of_entry(entry, P0Travel.home(_view()))) == "unexplored":
+		style["silhouette"] = true
+	return style
 
 ## Whether the player is away from the homestead — at a pond or an outpost (the place chip's place). At home, in the
 ## farmhouse or the mine, the avatar is the homestead's mark and no Homestead pin is drawn (不知火舞 on 234).
@@ -685,11 +696,13 @@ var _card_city := ""
 
 func _fill_city_card(cluster: String) -> void:
 	if rt.ui.modal_kind == "city_card": rt.ui.close_modal()
-	P0ArrivalCard.open(rt.ui, city_card(_view(), cluster, P0CityPlaces.city(cluster)), func(): pass, "city_card")
-	var link := rt.ui.root.find_child("Link_Travel_details", true, false)
-	if link: (link as Button).pressed.connect(func():
+	# Travel details' action rides in the spec: looked up by name, the card closed for the refill was still in the tree
+	# this frame and took it, so the first card's link did nothing (李元芳, 279 fd340f21).
+	var spec := city_card(_view(), cluster, P0CityPlaces.city(cluster))
+	spec["links"] = [["Travel details", func():
 		rt.ui.close_modal()
-		open_travel(cluster, P0CityPlaces.city(cluster).get("preview", {})))
+		open_travel(cluster, P0CityPlaces.city(cluster).get("preview", {}))]]
+	P0ArrivalCard.open(rt.ui, spec, func(): pass, "city_card")
 
 ## "Trip 6 · Intercontinental": a city's trip tier, the server's (its preview) when it is in, else the client's.
 static func trip_state(view: Dictionary, cluster: String, city: Dictionary) -> String:
@@ -1049,9 +1062,7 @@ func show_place(target: String) -> void:
 	if cluster != "" and not P0CityPlaces.has_city(cluster) and rt != null:
 		P0CityPlaces.fetch(rt.session, cluster, func(city):
 			_show_city_places(city, cluster)
-			show_place(target),
-			# the read failed: the player asked for this, so say so (不知火舞 on #279), as any command that did not go through
-			func(): rt.ui.show_sys(UiSysBanner.Kind.CMD_FAIL, "Didn't go through · try again", P0Runtime.CMD_FAIL_S))
+			show_place(target), _show_failed)
 		return
 	if cluster != "" and not _shown_cities.has(cluster): _show_city_places(P0CityPlaces.city(cluster), cluster)
 	var entry := place_for(target)
@@ -1059,6 +1070,12 @@ func show_place(target: String) -> void:
 	# Flies since SGODOT-267 (_fly sets the city-wide pan bounds, else the homestead's 450 m box pulls the camera back);
 	# the pin is selected on landing.
 	_fly("show:" + target, float(entry.lat), float(entry.lng), SHOW_ZOOM, func(): if target != "home": city_map.select(entry))
+
+## Show on map's city read failed: the player asked for this, so say so (不知火舞 on #279), as any command that did not go
+## through — only while the map is still where they are (不知火舞 on #282: not once they have left it).
+func _show_failed() -> void:
+	if rt == null or rt.world != self or not is_visible_in_tree(): return
+	rt.ui.show_sys(UiSysBanner.Kind.CMD_FAIL, "Didn't go through · try again", P0Runtime.CMD_FAIL_S)
 
 ## Show from a panel opened on the map (Today, the Energy card, a NeedSource): every target is a pin here; a homestead
 ## target (plots, stall, stove …) is the homestead's.

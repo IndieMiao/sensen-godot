@@ -49,6 +49,9 @@ var slots: Array = []: set = set_slots
 var selected := "": set = set_selected
 ## No action chosen: the five slots fold into the handle (§10.3.1 收起态).
 var collapsed := false: set = set_collapsed
+## The Bag end (its cell on the bar): where an ItemFly lands (SGODOT-289).
+func bag_end() -> Control: return _end
+
 ## The bag drawer is open: the end reads Close (LOCK-04).
 var bag_open := false: set = set_bag_open
 ## Bag at ≥ 90% capacity: amber dot on the end (§10.3.1).

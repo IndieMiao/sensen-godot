@@ -173,7 +173,7 @@ func step(delta: float, mover: PlayerMover, paused: bool) -> void:
 					enemy.phase = "dash"
 					enemy.timer = float(spec.dash_seconds)
 			"dash":
-				_slide(movement, enemy.direction * float(spec.dash_speed) * dt)
+				_slide(movement, _dash_step(enemy, mover, enemy.direction * float(spec.dash_speed) * dt))
 				if not enemy.did_hit and invulnerability <= 0 and movement.position.distance_to(mover.position) <= float(spec.radius) + 0.35 and movement.grid.segment_walkable(movement.position, mover.position):
 					enemy.did_hit = true
 					invulnerability = float(_config.invulnerability_ms) / 1000.0
@@ -189,6 +189,11 @@ func step(delta: float, mover: PlayerMover, paused: bool) -> void:
 		material.albedo_color = Color("fff3bd") if enemy.flash > 0 else (Color("f38870") if enemy.phase == "windup" else enemy.node.get_meta("color"))
 		body.scale = Vector3(1.12, 0.7, 1.12) if enemy.phase == "windup" else Vector3(1, 1 + sin(_elapsed * 7) * 0.04, 1)
 		enemy.node.get_node("Warning").visible = enemy.phase == "windup"
+
+## One frame of a lunge along its locked direction; the legacy mine lets it run its whole length (P0MineCombat stops it
+## at the player's body).
+func _dash_step(_enemy: Dictionary, _player: PlayerMover, offset: Vector3) -> Vector3:
+	return offset
 
 func _slide(mover: PlayerMover, offset: Vector3) -> void:
 	# Small collision steps keep knockback and lunges from crossing narrow rocks.

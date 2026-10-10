@@ -163,24 +163,56 @@ func _fill(mmi: MultiMeshInstance3D, items: Array, layer: String) -> void:
 	mm.instance_count = items.size() * per
 	var n := 0
 	for item in items:
-		var base: Vector3 = bp.cell_to_world(item.cell, world_scale)
-		var unit := bp.cell_m * world_scale * plant_scale
-		var size: Vector3
-		match layer:
-			"weed": size = WEED_SIZE * unit
-			"soil": size = SOIL_SIZE * unit
-			_: size = STAGE_SIZE[item.stage] * unit
 		var color := _stage_color(layer, item.stage)
-		for k in per:
-			var dx := 0.0 if per == 1 else (-1.0 if k % 2 == 0 else 1.0) * JITTER * unit
-			var dz := 0.0 if per == 1 else (-1.0 if k < 2 else 1.0) * JITTER * unit
-			# 从畦面顶部往上长，而不是从世界原点：否则矮的东西全埋在畦面盒子里
-			var angle := float(posmod(item.cell.x * 7 + item.cell.y * 11 + k * 5, 16)) * TAU / 16.0
-			var rotation := Basis.IDENTITY if layer == "soil" else Basis(Vector3.UP, angle)
-			var t := Transform3D(rotation * Basis.from_scale(size), base + Vector3(dx, ground_y + size.y * 0.5, dz))
+		for t in _cell_instances(item.cell, layer, item.stage, bp.cell_to_world(item.cell, world_scale)):
 			mm.set_instance_transform(n, t)
 			mm.set_instance_color(n, color)
 			n += 1
+
+## One cell's instance transforms around `base` (the cell's world point; zero for a copy standing at the cell).
+func _cell_instances(cell: Vector2i, layer: String, stage: int, base: Vector3) -> Array[Transform3D]:
+	var out: Array[Transform3D] = []
+	var per := per_cell(layer)
+	var unit := bp.cell_m * world_scale * plant_scale
+	var size: Vector3
+	match layer:
+		"weed": size = WEED_SIZE * unit
+		"soil": size = SOIL_SIZE * unit
+		_: size = STAGE_SIZE[stage] * unit
+	for k in per:
+		var dx := 0.0 if per == 1 else (-1.0 if k % 2 == 0 else 1.0) * JITTER * unit
+		var dz := 0.0 if per == 1 else (-1.0 if k < 2 else 1.0) * JITTER * unit
+		# 从畦面顶部往上长，而不是从世界原点：否则矮的东西全埋在畦面盒子里
+		var angle := float(posmod(cell.x * 7 + cell.y * 11 + k * 5, 16)) * TAU / 16.0
+		var rotation := Basis.IDENTITY if layer == "soil" else Basis(Vector3.UP, angle)
+		out.append(Transform3D(rotation * Basis.from_scale(size), base + Vector3(dx, ground_y + size.y * 0.5, dz)))
+	return out
+
+## A stand-alone copy of one cell's crop as the field draws it, standing at the cell (a child of this field): a
+## harvest's pop plays on the copy while the field has already dropped the crop (SGODOT-289, Harvest ×N's wave).
+## Its detail layer comes along at the stages that have one; same meshes and materials.
+func ghost(cell: Vector2i, layer: String, stage := STAGES - 1) -> Node3D:
+	var root := Node3D.new()
+	root.position = bp.cell_to_world(cell, world_scale)
+	if not _mm.has(layer): return root
+	var srcs: Array = [_mm[layer]]
+	if _detail_mm.has(layer) and stage >= int(DETAIL_STAGE[layer]): srcs.append(_detail_mm[layer])
+	var ts := _cell_instances(cell, layer, stage, Vector3.ZERO)
+	for src in srcs:
+		var m := MultiMeshInstance3D.new()
+		var mm := MultiMesh.new()
+		mm.transform_format = MultiMesh.TRANSFORM_3D
+		mm.use_colors = true
+		mm.mesh = (src as MultiMeshInstance3D).multimesh.mesh
+		mm.instance_count = ts.size()
+		for i in ts.size():
+			mm.set_instance_transform(i, ts[i])
+			mm.set_instance_color(i, _stage_color(layer, stage))
+		m.multimesh = mm
+		m.material_override = (src as MultiMeshInstance3D).material_override
+		root.add_child(m)
+	add_child(root)
+	return root
 
 static func _stage_color(layer: String, stage: int) -> Color:
 	if layer == "weed":
