@@ -375,11 +375,20 @@ static func crop_plural(name: String, n: int) -> String:
 	return w + "s"
 
 ## Items that share an existing icon until they get their own (SGODOT-228 content).
-## SGODOT-282: P1 pages that already cook with P0 ingredients but have no icon of their own yet borrow the nearest P0
-## dish (never the field sprout, int6 C7). Remove each line once 安其拉's icon lands.
+## SGODOT-282: P1 pages without an icon of their own yet borrow the nearest P0 dish by main ingredient and style
+## (never the field sprout, int6 C7). Remove each line once 安其拉's icon lands (不知火舞 540d59df: the first six first).
 const DISH_STANDIN := {"dish_rock_salt_soup": "dish_fish_soup", "dish_charcoal_fish": "dish_grilled_fish",
 	"dish_fruit_platter": "dish_fruit_tea", "dish_harvest_roast": "dish_roast_veggies", "dish_salt_mackerel": "dish_salt_grilled_fish",
-	"dish_legend_sashimi": "dish_smoked_trout"}
+	"dish_legend_sashimi": "dish_smoked_trout",
+	# the pages #214's crops and fish opened (after the first six)
+	"dish_cabbage_stew": "dish_veggie_plate", "dish_travel_biscuits": "dish_carrot_cake", "dish_tilapia_wraps": "dish_pan_fried_fish",
+	"dish_crispy_smelt": "dish_salt_grilled_fish", "dish_cucumber_salad": "dish_radish_salad", "dish_apple_tea": "dish_fruit_tea",
+	"dish_corn_cake": "dish_carrot_cake", "dish_grass_carp_soup": "dish_fish_soup", "dish_char_chowder": "dish_fisher_stew",
+	"dish_catfish_stew": "dish_fisher_stew", "dish_sea_bass_salt": "dish_salt_grilled_fish", "dish_chili_snakehead": "dish_herb_grilled_fish",
+	"dish_grilled_pike": "dish_herb_baked_perch", "dish_pineapple_barra": "dish_pan_fried_fish", "dish_strawberry_tart": "dish_carrot_cake",
+	"dish_melon_platter": "dish_fruit_tea", "dish_orchard_tea": "dish_fruit_tea", "dish_steamed_sturgeon": "dish_smoked_trout",
+	"dish_eel_skewers": "dish_mullet_skewers", "dish_herb_salmon": "dish_herb_baked_perch", "dish_pineapple_fish": "dish_bass_tomato_stew",
+	"dish_sweet_potato_cakes": "dish_carrot_cake", "dish_pumpkin_chowder": "dish_fisher_stew", "dish_beet_fish_soup": "dish_fish_soup"}
 
 const ICON_ALIAS := {"fert_compost": "compost", "tool_row_hoe": "hoe", "bag_upgrade_1": "bag", "postcard_san_francisco": "postcard", "postcard_shanghai": "postcard", "wild_herb": "crop_herb", "drink_hot_tea": "dish_fruit_tea", "drink_coffee": "dish_fruit_tea"}
 

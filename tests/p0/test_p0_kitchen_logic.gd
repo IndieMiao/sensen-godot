@@ -419,7 +419,9 @@ func test_every_cookable_dish_has_an_icon() -> void:
 		var own := ResourceLoader.exists(P0Logic.ICON_DIR % id)
 		var stand := P0Logic.DISH_STANDIN.has(id) and ResourceLoader.exists(P0Logic.ICON_DIR % P0Logic.DISH_STANDIN[id])
 		assert_bool(own or stand).override_failure_message(id + " has no icon").is_true()
-	assert_int(cooks).is_equal(24)
+	assert_int(cooks).is_equal(47)   # every page but #9 Travel Biscuits (bought) once #214's crops and fish are in
+	# #9 is never cooked, but its page and the Travel Post show it: it has an icon too.
+	assert_bool(ResourceLoader.exists(P0Logic.ICON_DIR % P0Logic.DISH_STANDIN.get("dish_travel_biscuits", "dish_travel_biscuits"))).is_true()
 
 func test_queue_two_entry_state_line_and_turn_over_toast() -> void:
 	# q(71) / q(82): Queue next › only from Cooking Lv5 with a pot cooking and none waiting; the watch sheet says

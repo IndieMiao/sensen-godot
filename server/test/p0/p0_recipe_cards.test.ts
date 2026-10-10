@@ -34,12 +34,15 @@ describe('Recipe cards (§7.16.1)', () => {
   });
 
   it('only Temperate homes see page 14 and only tropical ones page 13; Market sells its climate card', () => {
+    const temperate = viewOf(c, { ...fresh(), cookbook: c.cooking.recipes.map(r => r.id).filter(id => !['dish_tilapia_wraps', 'dish_crispy_smelt'].includes(id)) }, T0);
+    expect(temperate.shops.homestead.cards.map(x => x.page)).toEqual(['dish_crispy_smelt']);
     expect(c.cooking.recipes.find(r => r.n === 14)).toMatchObject({ card_price: 80, card_zones: ['Temperate', 'Cool'] });
     expect(c.cooking.recipes.find(r => r.n === 47)).toMatchObject({ card_price: 500, card_zone: 'Temperate' });
     const s = fresh();
     s.cookbook = c.cooking.recipes.map(r => r.id);   // every cookable page known: nothing left to shelve
     expect(shelf(s)).toEqual([]);   // the silhouettes (13, 14, …) join once they are recipes (SGODOT-281)
-    expect(viewOf(c, fresh(), T0).shops.market.cards).toEqual([]);   // page 47 (Pumpkin Chowder) waits for pumpkins
+    expect(viewOf(c, fresh(), T0).shops.market.cards).toEqual([   // San Francisco is Temperate: page 47
+      { id: 'recipe_card_dish_pumpkin_chowder', page: 'dish_pumpkin_chowder', name: 'Pumpkin Chowder', rarity: 4, price: 500, need: 540, owned: false }]);
   });
 
   it('buying one puts the page in the Cookbook as Tasted, charges the price and leaves it off the shelf', () => {
