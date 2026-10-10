@@ -3,7 +3,7 @@ extends Control
 ## Own profile, P0 subset (SGODOT-225; PROFILE-1-P0, LOCK-22). One profile design: the same structure and kit
 ## parts as PROFILE-1, with the blocks P0 has no data for left out (title, ID, bio, relations, Edit, Medals /
 ## Guestbook / Second Home, the Crops and Cities collections). Full screen on the cream surface:
-##   top bar     back + Profile (+ gear for Settings: hidden until P0 has a Settings page)
+##   top bar     back + Profile + gear (Settings: Legal › Licenses and Version, q(129); 197 8d0d8212)
 ##   look        the saved outfit (BagCharacterPreview; a sideways drag turns it) + `Edit look ›` (the dressing room)
 ##   identity    name, `City · Climate · Since Oct 2` (view.profile, SGODOT-228; a missing field hides its line)
 ##   skills      three UiSkillCards; tapping one opens the skill details
@@ -70,9 +70,8 @@ func _init(view_: Dictionary = {}, safe_top_ := 0.0, look_saved_ := false) -> vo
 	_body.add_theme_constant_override(&"separation", 0)
 	pad.add_child(_body)
 	top_bar = UiProfileTopBar.new(UiProfileTopBar.Kind.SELF, "Profile")
-	# TODO(LOCK-22): P0 has no Settings page (cut from the demo, 2026-10-08); show the gear again when first-run /
-	# Settings come back.
-	top_bar.show_settings = false
+	# The gear is back with the P0 Settings page (q(129): Legal › Licenses; not a reopening of LOCK-22, 197 8d0d8212).
+	# Own profile only: another player's top bar has ··· there (UiProfileTopBar.Kind.OTHER).
 	top_bar.back_pressed.connect(func(): back_pressed.emit())
 	top_bar.settings_pressed.connect(func(): settings_pressed.emit())
 	_body.add_child(top_bar)
