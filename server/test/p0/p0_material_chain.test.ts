@@ -394,7 +394,7 @@ describe('workbench (§13.4, q(31) / q(44))', () => {
     s.storage = { copper_ore: 4, wood: 2 };
     add(c, s, 'wood', 2);
     const w = viewOf(c, s, T0).workbench;
-    expect(w.tabs).toEqual(['tools', 'supplies']);
+    expect(w.tabs).toEqual(['tools', 'supplies', 'facilities']);   // P1 adds Facilities (SGODOT-239); the P0 client keeps its own two
     const pick = w.recipes.find(r => r.id === 'craft_copper_pickaxe')!;
     expect(pick).toMatchObject({ tab: 'tools', item: 'pick_copper', name: 'Copper Pickaxe', to: 'gear', have: null, owned: false, can_craft: false,
       block: { code: 'need_material', detail: { item: 'copper_ore', need: 5, have: 4 } } });

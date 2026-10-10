@@ -12,6 +12,7 @@ import type { P0Event } from './progress.js';
 import { skillLevel } from './rules.js';
 import type { P0State } from './state.js';
 import { haveTotal, missing, stored, takeStorageFirst } from './storage.js';
+import { fieldRecipeView, placeBlock } from './garden.js';
 
 export function owned(s: P0State, r: WorkbenchRecipe): boolean {
   return r.to === 'gear' ? s.gear.picks.includes(r.out) : r.to === 'owned' ? s.owned.includes(r.out) : false;
@@ -19,6 +20,7 @@ export function owned(s: P0State, r: WorkbenchRecipe): boolean {
 
 /** Why a recipe can't be made now, in button order: owned, level gate, materials, bag room. */
 export function craftBlock(c: P0Content, s: P0State, r: WorkbenchRecipe): Refusal | null {
+  if (r.to === 'field') return placeBlock(c, s, r);   // P1: built in place (the place command), never crafted
   if (owned(s, r)) return { code: 'owned' };
   if (r.gate) {
     const [skill, level] = r.gate;
@@ -35,12 +37,13 @@ export function craft(c: P0Content, s: P0State, cmd: { recipe?: unknown; space?:
   if (cmd.space !== undefined && cmd.space !== 'home') return { code: 'not_home' };
   const r = c.workbench.recipes.find(x => x.id === String(cmd.recipe ?? ''));
   if (!r) return { code: 'bad_recipe' };
+  if (r.to === 'field') return { code: 'place_only' };   // a facility is built where it stands: place {recipe, plot}
   const block = craftBlock(c, s, r);
   if (block) return block;
   for (const [item, qty] of r.cost) { takeStorageFirst(s, item, qty); events.push({ kind: 'item', id: item, delta: -qty }); }
   if (r.to === 'bag') { add(c, s, r.out, r.qty); events.push({ kind: 'item', id: r.out, delta: r.qty }); }
   else if (r.to === 'gear') s.gear.picks.push(r.out);   // §13.1.3: equipped with Equip at the workbench or in Gear (PICKAXE-DONE)
-  else s.owned.push(r.out);
+  else if (r.to === 'owned') s.owned.push(r.out);
   events.push({ kind: 'craft', recipe: r.id, item: r.out, qty: r.qty, to: r.to });
   return null;
 }
@@ -59,6 +62,7 @@ export function workbenchView(c: P0Content, s: P0State) {
           xp_to_go: Math.max(0, c.skills[r.gate[0]][r.gate[1] - 1] - s.skills[r.gate[0]]) } : null,
         owned: owned(s, r), equipped: r.to === 'gear' && s.gear.pick === r.out,
         can_craft: block === null, block,
+        ...(r.to === 'field' ? fieldRecipeView(c, s, r) : {}),   // P1 Facilities: Sprinklers 4/6 on the button
       };
     }),
   };

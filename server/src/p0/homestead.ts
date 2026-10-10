@@ -4,6 +4,7 @@ import { gainEnergy, type P0Event } from './progress.js';
 import { maxEnergy, skillLevel } from './rules.js';
 import type { P0State } from './state.js';
 import { missing, takeStorageFirst } from './storage.js';
+import { addPlots } from './garden.js';
 import type { Refusal } from './fishing.js';
 
 export function nextLevel(c: P0Content, s: P0State) {
@@ -59,5 +60,8 @@ export function upgradeHomestead(c: P0Content, s: P0State, now: number, events: 
   const max = maxEnergy(c, s);
   const gain = gainEnergy(c, s, now, max - s.energy.value, events, 'homestead');
   events.push({ kind: 'homestead', level: next.level, energy: gain, unlocks: next.unlocks });
+  // P1 (q(59) §1.1): Lv3 brings 10 wild plots (30–39), dropped in with the fence (HOME-2 `Plots +10`).
+  const added = addPlots(c, s);
+  if (added.length > 0) events.push({ kind: 'plots_added', plots: added, reason: 'homestead' });
   return null;
 }
