@@ -97,15 +97,8 @@ func frame(v: Dictionary, card := "") -> void:
 	if is_instance_valid(_entry) and _entry.visible:
 		_entry_card = P0MaterialLogic.mine_mouth_card(v)
 		_show_card(_entry, _entry_card)
-		# Placed as TapCard: the pointer tip on the gate, kept inside the screen, the pointer still on the gate.
-		var size := _entry.get_combined_minimum_size()
-		var area := Rect2(Vector2.ZERO, rt.ui.root.size)
-		var r := WorldAnchor.place(size, top - Vector2(0, UiTokens.SPACE_WITHIN), area, UiTokens.SPACE_WITHIN, true)
-		# Never over the player: lifted clear of the body by 4, no higher than under the HUD (不知火舞 on #190).
-		r = WorldAnchor.lift_clear(r, farm.actor.screen_box(cam), BODY_GAP, rt.ui.card_top())
-		_entry.size = size
-		_entry.position = r.position
-		_entry.point_at(top.x - r.position.x)
+		# Placed as TapCard: the pointer on the gate, under the HUD, never over the player (不知火舞 on #190).
+		rt.ui.place_card(_entry, top, farm.actor.screen_box(cam), BODY_GAP)
 	if near:
 		var notice := P0MaterialLogic.reset_notice(v, _reset_shown)
 		if notice != "":
