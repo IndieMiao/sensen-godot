@@ -97,6 +97,7 @@
 | 矿口 Express ★ | 入口卡次级按钮 `Floor 5 · Express · Free`；有未完成局时与 `New run · 2 Energy` 上下排，下面只写一次 `Current run will end · Runs today 1/2`；没有未完成局不加小字；用尽只剩灰按钮 `Mine runs today 2/2 · Resets in 9h 12m`；电梯面板的 Express 不加小字（q(108)） |
 | 飘字 | `Floor 2 · −2 Energy` / `Floor 2 cleared · Elevator stop` / `Run ended at daily reset`；P0 没有 `Run complete`；MINE-P0-7 不写 `Unmined rocks on Floor 2 are lost`（q(46)） |
 | 火把 | `Light Torch · Free` / `Lit · this floor` |
+| 矿洞说明页 ★ | `Mine five floors. Slimes from Floor 3.`（P1，q(110)） |
 
 ## 6. 据点（家一套）与居民
 
@@ -113,6 +114,7 @@
 | 集市委托板 ★ | `Dusk Haul · Market Board` / `4 Fine fish · any kind` / `36 coins`（P0 不写 `+1 city stamp`）；`Market Basket` / `3 crops · 6 each`（q(46)） |
 | 居民 ★ | 头顶名字条只写名字 `Pip` / `Old Kai`（q(62)）；Pip `Could you catch me a fish? Any kind is fine.`（对话条与委托卡同句）；Old Kai 需求行 `Rare fish · Golden Koi · Pond 0/1`；奖励行 `+5 Friendship · 20 coins` / `+5 Friendship · 50 coins`（q(46)）；赠餐 toast `Pip gave you Carrot Cake · in your bag`（菜进背包、没有吃，不写体力，q(94)）；好感进度 `52/90 · next Trusted`，最高档 Kindred 只写 `157`、进度条满格，资料卡 Friendship 行同样 `157`（q(91)） |
 | 饮品满体力 ★ | 灰 `Energy full`（q(48)） |
+| Stamp Run 与奖励上限 ★ | 签到 toast `Stamp Run · Checked in` / `Deliver at Mission Market Square`；完成奖上限用完时卡上奖励行 `0 coins · Bonus resets in 9h 12m`，板角 `Bonus today 100/100`（q(110)） |
 
 ## 7. 地图
 
@@ -125,6 +127,7 @@
 | 据点 pin | `Oak Tea House · 3 online`；没人在时只写名字 `Oak Tea House`；P0 城市级不聚合，每处一枚 pin，不出 `×N`（q(72)）；和 POI 一样会让位收起，选中的、带标记的、玩家所在地的图钉始终显示（q(105)） |
 | 标记 | P0 只有绿 ✓ / 金 ! / 青 ◆，没有 🔒 与 ★（q(48)） |
 | 外城到达与回家 ★ | 首访 `Welcome to Tokyo` + `+10 Energy`；再访只飘 `Welcome back`；回家落地 `Welcome home`（不盖章、不加体力）；外城位置芯片 `Tokyo · Arrived` / `Tokyo · Sumida Pond`，免费版不写 `Day Pass`（q(108)） |
+| 城市卡进度 ★ | `Regular` · `Visits 2/5 · Deliveries 1/3`；`Local` · `Visits 2/10 · Fish 0/2 · Recipe 0/1`；整档达成 `Regular ✓`（q(110)） |
 
 ## 8. 背包、Gear、个人页、收件箱
 
