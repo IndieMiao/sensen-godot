@@ -128,6 +128,78 @@ func test_a_legendary_page_card_names_the_buff_slot() -> void:
 	assert_str(str(P0KitchenLogic.page_card(v, legend).buff)).is_equal("Buff · coming later")
 	assert_str(str(P0KitchenLogic.page_card(v, P0KitchenLogic.pages(v)[0]).buff)).is_equal("")
 
+## SGODOT-282: Homestead Lv4 / Lv8 bring stoves 2 and 3. The server sends one entry per stove (null when empty); each
+## reads its own pot, queue and `Stove n/N`; a cook with no stove named goes to the first free one.
+func test_several_stoves_each_read_their_own_pot_and_queue() -> void:
+	var v := _view()
+	v.cooking.conveniences = ["queue_two"]
+	v.cooking.stoves = [{"id": 1, "ms": 5000, "ready_in": 2000, "queued": null}, null, null]
+	assert_int(P0KitchenLogic.stove_count(v)).is_equal(3)
+	assert_dict(P0KitchenLogic.header(v, 1)).is_equal({stove = "Stove 2/3", level = "Cooking Lv1", state = "Empty"})
+	assert_str(P0KitchenLogic.header(v, 0).state).is_equal("Cooking 0:02")
+	assert_object(P0KitchenLogic.stove(v, 2)).is_null()
+	assert_int(P0KitchenLogic.free_stove(v)).is_equal(1)
+	v.cooking.stoves[1] = {"id": 2, "ms": 5000, "ready_in": 4000, "queued": {"id": 4, "dish": null}}
+	v.cooking.stoves[2] = {"id": 3, "ms": 5000, "ready_in": 0, "left": ["dish_grilled_crucian"], "queued": null}
+	assert_str(P0KitchenLogic.stove_state(v, 1)).is_equal("Cooking 0:04 · Queued 1")
+	assert_bool(P0KitchenLogic.can_queue(v, 1)).is_false()
+	assert_bool(P0KitchenLogic.can_queue(v, 0)).is_true()
+	assert_int(P0KitchenLogic.free_stove(v)).is_equal(0)   # none empty: the first that can still queue
+	assert_array(P0KitchenLogic.stove_left(v, 2)).is_equal(["dish_grilled_crucian"])
+	assert_str(P0KitchenLogic.experiment_reason(v, ["fish_crucian"], false, 1)).is_equal("Stove busy")
+	# a Lv1–3 view without the list still reads as one stove
+	var one := _view()
+	assert_str(P0KitchenLogic.stove_label(one)).is_equal("Stove 1/1")
+	assert_bool(P0KitchenLogic.big_pot(one)).is_false()
+
+## SGODOT-282: the client clock ages stoves 2 and 3 too (P0Logic.project), so their countdowns and heat rings run.
+func test_projection_ages_every_stove() -> void:
+	var v := _view()
+	v.cooking.stove = {"id": 1, "ms": 5000, "elapsed": 1000, "ready_in": 4000}
+	v.cooking.stoves = [{"id": 1, "ms": 5000, "elapsed": 1000, "ready_in": 4000}, {"id": 2, "ms": 15000, "elapsed": 0, "ready_in": 15000}, null]
+	var p := P0Logic.project(v, 2000.0)
+	assert_float(float(p.cooking.stove.ready_in)).is_equal(2000.0)
+	assert_float(float(p.cooking.stoves[0].ready_in)).is_equal(2000.0)
+	assert_float(float(p.cooking.stoves[1].ready_in)).is_equal(13000.0)
+	assert_float(float(p.cooking.stoves[1].elapsed)).is_equal(2000.0)
+	assert_str(P0KitchenLogic.stove_state(p, 1)).is_equal("Cooking 0:13")
+
+## Heat reminder (b84a5e01 ④): a ring is "soon" in the second before it grows in (it grows a second before its turn).
+func test_ring_soon_is_the_second_before_a_ring_grows_in() -> void:
+	var st := {"ms": 30000, "elapsed": 7600.0, "heats": [{"at": 9000, "spin": 2000}, {"at": 20000, "spin": 2000}]}
+	assert_int(P0KitchenLogic.ring_soon(st, 1000.0)).is_equal(0)    # grows in at 8000: 400 ms away
+	st.elapsed = 6500.0
+	assert_int(P0KitchenLogic.ring_soon(st, 1000.0)).is_equal(-1)   # 1.5 s away
+	st.elapsed = 8200.0
+	assert_int(P0KitchenLogic.ring_soon(st, 1000.0)).is_equal(-1)   # already growing: no reminder now
+	st.elapsed = 18500.0
+	assert_int(P0KitchenLogic.ring_soon(st, 1000.0)).is_equal(1)
+
+## q(112): a missing tag ingredient on the button drops "Any" (Need Legendary fish ×1); the column keeps it.
+func test_a_missing_tag_ingredient_reads_without_any() -> void:
+	var v := _view()
+	assert_str(P0KitchenLogic.missing_reason(v, {"in": ["W4"]})).is_equal("Need Legendary fish ×1")
+	assert_str(P0KitchenLogic.missing_reason(v, {"in": ["fish_crucian", "fish_crucian", "fish_crucian"]})).is_equal("Need Pond Crucian ×1")
+	assert_str(P0KitchenLogic.need_label(v, "S1")).is_equal("seasoning")
+	assert_str(P0Logic.ingredient_label(v, "W4")).is_equal("Any Legendary fish")
+
+## Big Pot Double (b84a5e01 ③): hidden before Lv6; grey for Legendary, unknown mixes and seasonings alone; the main key
+## says `Cook ×2`, or the gap for two portions.
+func test_double_toggle_states_and_the_gap_for_two() -> void:
+	var v := _view()
+	var crucian: Dictionary = P0KitchenLogic.pages(v)[0]
+	assert_bool(bool(P0KitchenLogic.double_state(v, crucian).shown)).is_false()   # Lv1–5: not shown at all
+	v.cooking.big_pot = true
+	assert_dict(P0KitchenLogic.double_state(v, crucian)).is_equal({shown = true, enabled = true, toast = ""})
+	assert_dict(P0KitchenLogic.double_state(v, {"known": true, "rarity": 4})).is_equal({shown = true, enabled = false, toast = "Double · not for Legendary dishes"})
+	assert_dict(P0KitchenLogic.double_state(v, {"known": false, "rarity": 1})).is_equal({shown = true, enabled = false, toast = "Double · known recipes only"})
+	assert_dict(P0KitchenLogic.double_state(v, {}, ["crop_herb"])).is_equal({shown = true, enabled = false, toast = "Double · known recipes only"})
+	# the bag has 2 crucian (two stacks): two portions fit; Radish Salad has no lettuce at all
+	assert_str(P0KitchenLogic.double_gap(v, ["fish_crucian"])).is_equal("")
+	assert_str(P0KitchenLogic.double_gap(v, ["fish_crucian", "fish_crucian"])).is_equal("Need 2 more Pond Crucian")
+	assert_str(P0KitchenLogic.double_label()).is_equal("Cook ×2")
+	assert_str(P0KitchenLogic.double_label(true)).is_equal("Queue ×2")
+
 # ---------------------------------------------------------------- the dish comes out (COOK-4 / 6 / P0-9, COOK-7-2)
 func _eat_view(energy: int, used: int, meal: int) -> Dictionary:
 	var v := _view()

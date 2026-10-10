@@ -72,6 +72,12 @@ describe('Kitchen facilities by Homestead level (§7.7 / §8.3.2)', () => {
     expect(facts).toEqual([[1, 1, 0], [3, 1, 6], [4, 2, 6], [7, 2, 6], [8, 3, 12], [10, 3, 12]]);
   });
 
+  it('never more than three stoves, whatever the content says (亚瑟 on #209)', () => {
+    const many = { ...c, homestead: { ...c.homestead, stoves: [[1, 1], [4, 9]] as [number, number][] } };
+    expect(viewOf(many, at(10), T0).cooking.stoves).toHaveLength(3);
+    expect(refusal(at(10), { type: 'cook', items: ['fish_crucian'], stove: 3 })).toMatchObject({ code: 'bad_stove', detail: { stoves: 3 } });
+  });
+
   it('an old save with stove 1 only reads as empty stoves 2 and 3', () => {
     const { burners: _gone, ...old } = at(8);
     const up = upgradeState(c, { ...old, v: 4 } as unknown as P0State, T0);

@@ -9,12 +9,19 @@ extends P0Room
 ## placeholder props from the anchors file until farmhouse_lv1; tapping either opens its sheet (COOK-P0-5 / 6).
 
 const STOVE := "use_stove_1"
+## Stoves 2 and 3 (Homestead Lv4 / Lv8, SGODOT-282): their own pot spots on the hearth, each tapped and named alone.
+const STOVES := ["use_stove_1", "use_stove_2", "use_stove_3"]
 const RACK := "use_spice_rack"
 const CABINET := "use_warming_cabinet"
 const CABINET_GLOW := Color("ffb87a")   # the cabinet's warm inner light (placeholder; the art brings its own)
 const CABINET_GLOW_AT := Vector3(-2.13, 0.75, -1.69)   # in front of the cabinet door
 
 var kitchen: P0Kitchen
+## Heat reminders already given (pot id → ring index): once per ring (b84a5e01 ④).
+var _reminded := {}
+var _edge: Control   # the stage's edge arrow toward the stove whose ring is coming (camera on another pot)
+const REMIND_MS := 1000.0   # the reminder comes a second before another stove's ring
+const BUZZ_MS := 30
 var _sheet: P0StorageSheet
 var _pending_tab := ""   # the drawer tab p0_open_kitchen walked to the stove for (see _on_facility)
 
@@ -25,6 +32,111 @@ func _init() -> void:
 	# The stove is its body and pot only; the shelf on the wall beside it and the cabinet under that are their own,
 	# and where they overlap the smaller takes the tap (int6 C8). The final farmhouse_lv1 art renames these nodes.
 	hit_nodes = {STOVE: "hearth", RACK: "spice_rack", CABINET: "warming_cabinet"}
+
+## Stove i for a use_stove_N anchor, -1 for anything else.
+static func stove_of(n: String) -> int: return STOVES.find(n)
+
+## The stoves the view has (1 before Homestead Lv4): the others' anchors are not tappable.
+func _stove_count() -> int:
+	return P0KitchenLogic.stove_count(rt.session.current()) if rt else 1
+
+func _tappable() -> PackedStringArray:
+	var out := PackedStringArray()
+	var n := _stove_count()
+	for a in super():
+		var i := stove_of(a)
+		if i < 0 or i < n: out.append(a)
+	return out
+
+## The stoves share one place to stand, and stove 3 sits behind 1 and 2, so the nearest pot would always be the same
+## one: by the hearth the strip that opens is the stove being worked (the last tapped, or the drawer's Stove n/N), one
+## at a time (LOCK-07 v2). Away from the hearth the room's own pick applies.
+func card_pick(marks: Dictionary) -> String:
+	var n := super(marks)
+	if kitchen == null or stove_of(n) < 0: return n
+	var mine: String = STOVES[kitchen.stove_index]
+	if marks.has(mine):
+		_card = mine
+		return mine
+	return n
+
+## 不知火舞 02ad95bc ① / 6e798a27 ②: stove buttons closer than 44 px (centre to centre) overlap, and an open strip covers
+## the others. Folded, they go in one row above the hearth, 1 / 2 / 3 left to right, 44 apart, kept 44 from the Spice Rack
+## and Warming Cabinet buttons; with a strip open it stays at its own pot and the other stoves' buttons line up above it.
+const STOVE_ROW_GAP := 44.0
+func _marker_spots(spots: Dictionary) -> Dictionary:
+	var shown: Array = []
+	for i in STOVES.size(): if spots.has(STOVES[i]): shown.append(i)
+	if shown.size() < 2: return spots
+	var open := STOVES.find(_card) if stove_of(_card) >= 0 else -1
+	var strip := _strip_rect if open >= 0 and shown.has(open) else Rect2()
+	var crowded := false
+	for a in shown.size():
+		for b in range(a + 1, shown.size()):
+			if (spots[STOVES[shown[a]]] as Vector2).distance_to(spots[STOVES[shown[b]]]) < STOVE_ROW_GAP: crowded = true
+	for i in shown:   # an open strip over another stove's button
+		if i != open and strip.has_area() and strip.grow(STOVE_BUTTON * 0.5).has_point(spots[STOVES[i]]): crowded = true
+	if not crowded: return spots
+	var avoid: Array = []
+	for n in [RACK, CABINET]: if spots.has(n): avoid.append(spots[n])
+	return stove_row(spots, shown, open, strip, get_viewport().get_visible_rect().size.x, avoid)
+
+var _strip_rect := Rect2()   # the open stove strip on screen last frame (the other stoves line up above it)
+
+## The row (pure, tested). Folded: 1 / 2 / 3 left to right, 44 apart, centred on the stoves' mean x at their highest
+## y, kept on screen, then moved right as a whole until every button is 44 or more from each `avoid` spot (the Spice
+## Rack and Warming Cabinet buttons). With stove `open`'s strip showing (`strip`, its rect last frame): that stove keeps
+## its own spot, and the others, in order, are centred over the strip, 44 apart, 6 px above its top edge (before the
+## strip has a rect, its first frame, the open stove still keeps its spot and the rest take their folded places).
+const ROW_MARGIN := 22.0
+const ABOVE_STRIP := 6.0
+const STOVE_BUTTON := 28.0   # UiWorldIconButton's disc
+static func stove_row(spots: Dictionary, shown: Array, open: int, strip: Rect2, screen_w: float, avoid := []) -> Dictionary:
+	var out := spots.duplicate()
+	var row: Array = shown.filter(func(i): return i != open) if open >= 0 and strip.has_area() else shown.duplicate()
+	var cx := 0.0
+	var y := INF
+	if row.size() < shown.size():
+		cx = strip.get_center().x
+		y = strip.position.y - ABOVE_STRIP - STOVE_BUTTON * 0.5
+	else:
+		for i in row:
+			cx += (spots[STOVES[i]] as Vector2).x
+			y = minf(y, (spots[STOVES[i]] as Vector2).y)
+		cx /= float(row.size())
+	var xs: Array = []
+	for k in row.size(): xs.append(cx + (float(k) - float(row.size() - 1) * 0.5) * STOVE_ROW_GAP)
+	var shift := 0.0
+	if xs.min() < ROW_MARGIN: shift = ROW_MARGIN - xs.min()
+	elif xs.max() > screen_w - ROW_MARGIN: shift = screen_w - ROW_MARGIN - xs.max()
+	if row.size() == shown.size():
+		for _pass in 8:   # right, as a whole, past whichever of the rack / cabinet a button is too close to
+			var more := 0.0
+			for x in xs:
+				for a in avoid:
+					var dy := absf(y - (a as Vector2).y)
+					if dy >= STOVE_ROW_GAP or Vector2(x + shift, y).distance_to(a) >= STOVE_ROW_GAP - 0.01: continue
+					more = maxf(more, (a as Vector2).x + sqrt(STOVE_ROW_GAP * STOVE_ROW_GAP - dy * dy) - (x + shift))
+			if more <= 0.0: break
+			shift += more
+	for k in row.size(): out[STOVES[row[k]]] = Vector2(xs[k] + shift, y)
+	if shown.has(open): out[STOVES[open]] = spots[STOVES[open]]   # the open strip never moves (its first frame too)
+	return out
+
+## The hearth's box takes the tap for every stove on it (int6 C8): with several, the pot nearest the finger wins.
+func pick(screen: Vector2) -> String:
+	var n := super(screen)
+	if stove_of(n) < 0 or _stove_count() < 2: return n
+	var best := n
+	var best_d := INF
+	for i in _stove_count():
+		var m := anchor(STOVES[i])
+		if m == null: continue
+		var d := cam.unproject_position(m.global_position).distance_to(screen)
+		if d < best_d:
+			best_d = d
+			best = STOVES[i]
+	return best
 
 ## The space commands are sent from (SGODOT-228 PR #16, Rest needs ≥ 2 h away, q(41)): the farmhouse is home.
 func p0_space() -> String: return "home"
@@ -58,21 +170,28 @@ func _marker(n: String, v: Dictionary) -> Dictionary:
 	if n == CABINET:   # i-cabinet 1265:89122; from afar its button hangs the count, 4/6 or Full, none when empty (C21, q(31))
 		return {kind = "facility", icon = P0Logic.icon("cabinet"), name = "Warming Cabinet", fact = P0KitchenLogic.cabinet_badge(v),
 			count = P0KitchenLogic.cabinet_count(v)}
-	if n != STOVE: return super(n, v)
-	# i-pot (250 walkthrough). Up close the strip keeps the pot: the state is the far button's badge and the fact
-	# (Cooking 0:22 / the dish), as on the bench (不知火舞 on #104, 1760:103708).
-	var stove := {kind = "facility", icon = P0Logic.icon("pot"), name = "Stove 1/1", strip_badge = false}
-	if P0KitchenLogic.queued(v) != null: stove.count = "+1"   # Queue ×2: a pot waits behind this one (q(71), 1760:103578)
-	var st = P0KitchenLogic.stove(v)
+	var i := stove_of(n)
+	if i < 0: return super(n, v)
+	return stove_marker(v, i)
+
+## One stove's world prompt (pure, tested): i-pot (250 walkthrough). Up close the strip keeps the pot: the state is the
+## far button's badge and the fact (Cooking 0:22 / the dish), as on the bench (不知火舞 on #104, 1760:103708); Ready
+## alone puts its badge in the strip too (02ad95bc ③). One per stove: `Stove 2/3 · Empty` (b84a5e01 ②), over its pot.
+static func stove_marker(v: Dictionary, i: int) -> Dictionary:
+	var stove := {kind = "facility", icon = P0Logic.icon("pot"), name = P0KitchenLogic.stove_label(v, i), strip_badge = false}
+	if P0KitchenLogic.queued(v, i) != null: stove.count = "+1"   # Queue ×2: a pot waits behind this one (q(71), 1760:103578)
+	var st = P0KitchenLogic.stove(v, i)
 	if st == null: return stove.merged({fact = "Empty"})
 	var left := float(st.get("ready_in", 0))
 	if left <= 0.0:   # the ready mark takes the icon's place; the strip names the dish
 		var dish = st.get("dish", null)
-		return stove.merged({fact = P0Logic.item_name(v, str(dish)) if dish != null else "Unknown dish", badge = "ready"})
+		# Ready to collect: the strip shows the Ready StatusBadge (22) in the pot's place (LOCK-07 v2, 不知火舞 02ad95bc ③).
+		return stove.merged({fact = P0Logic.item_name(v, str(dish)) if dish != null else "Unknown dish", badge = "ready", strip_badge = true}, true)
 	return stove.merged({fact = "Cooking " + P0Logic.duration(left), badge = "countdown"})
 
 func _on_facility(n: String) -> void:
-	if n == STOVE:
+	if stove_of(n) >= 0:
+		if kitchen and not kitchen.busy(): kitchen.select_stove(stove_of(n))
 		# Sent here with a tab (the rack's Open Experiment ›, the Energy card's Cook): open on it,
 		# not on Cookbook or Cook Again (PR #54 review). A plain tap on the stove has none.
 		var tab := _pending_tab
@@ -110,8 +229,8 @@ func open_sheet(kind: String) -> void:
 func open_stove(tab := "cookbook", tapped := false) -> void:
 	if rt == null or kitchen == null or kitchen.busy(): return
 	var v := rt.session.current()
-	var st = P0KitchenLogic.stove(v)
-	var left := P0KitchenLogic.stove_left(v)
+	var st = P0KitchenLogic.stove(v, kitchen.stove_index)
+	var left := P0KitchenLogic.stove_left(v, kitchen.stove_index)
 	# Sent from a Today cook row (q(99)): the drawer opens on that page, not on Cook Again's last one.
 	if st == null and tapped and kitchen.last_page != "" and P0KitchenLogic.cook_again_on(v) and rt.ui.cook_page_from_today == "":
 		kitchen.open_again(kitchen.last_page)
@@ -124,7 +243,7 @@ func open_stove(tab := "cookbook", tapped := false) -> void:
 ## runs _on_facility, which opens the drawer on this tab; any other tap or the stick drops it.
 func p0_open_kitchen(tab := "cookbook") -> void:
 	_pending_tab = tab if tab != "" else "cookbook"
-	walk_to(STOVE)
+	walk_to(STOVES[P0KitchenLogic.free_stove(rt.session.current()) if rt else 0])   # the first free stove (§7.2.3)
 
 ## Returns true when the kitchen shows the result itself (the runtime then skips its old dish card).
 ## Floats rise over the plate while the pot's result is on screen (COOK-4: the XP chip above the plate), else over
@@ -146,7 +265,8 @@ func p0_event(ev: Dictionary, v: Dictionary) -> bool:
 	if kitchen == null: return false
 	match str(ev.get("kind", "")):
 		"pot":
-			var st = P0KitchenLogic.stove(v)
+			if ev.has("stove") and not kitchen.busy(): kitchen.select_stove(int(ev.stove))
+			var st = P0KitchenLogic.stove(v, kitchen.stove_index)
 			if bool(ev.get("queued", false)): kitchen.on_queued()   # Queue ×2: in behind the pot cooking (q(71))
 			elif st is Dictionary: kitchen.on_pot(st)
 			return false
@@ -156,10 +276,103 @@ func _room_frame(v: Dictionary, _dt: float) -> void:
 	if _sheet and rt and rt.session.view.get("seq", -1) != _sheet.view.get("seq", -2): _sheet.refresh(rt.session.current())
 	if kitchen == null: return
 	kitchen.sync_view(v)
-	var st = P0KitchenLogic.stove(v)
+	var st = P0KitchenLogic.stove(v, kitchen.stove_index)
 	var cooking: bool = st != null and float(st.get("ready_in", 0)) > 0.0
 	if kitchen.phase == "idle" and kitchen.stage.is_cooking() != cooking: kitchen.stage.set_cooking(cooking)
 	if kitchen.phase == "serve" and st == null and kitchen.waiting_events(): kitchen.on_collected()   # refused as empty
+	_remind_heat(v)
+	_strip_rect = Rect2()
+	if rt and stove_of(_card) >= 0:   # the open strip on screen, for the row's next layout (①)
+		var bar = rt.ui._name_bars.get("room:" + _card)
+		if bar != null and (bar as Control).visible:
+			_strip_rect = (bar as UiWorldNameBar).full_rect()
+
+## Several stoves (b84a5e01 ④): a second before a ring comes up on a stove the player is not working, that stove's
+## prompt grows 1.15× and back and the phone buzzes once; with the camera pushed in on another pot an arrow with an
+## i-pot shows at the stage's edge toward it, a tap switching there. The ring itself is judged only on its own pot.
+func _remind_heat(v: Dictionary) -> void:
+	var n := P0KitchenLogic.stove_count(v)
+	if n < 2: return
+	for i in n:
+		if i == kitchen.stove_index and kitchen.phase in ["watch", "compose"]: continue
+		var st = P0KitchenLogic.stove(v, i)
+		if st == null: continue
+		var k := P0KitchenLogic.ring_soon(st, REMIND_MS)
+		if k < 0: continue
+		var key := "%s:%d" % [str(st.get("id", i)), k]
+		if _reminded.has(key): continue
+		_reminded[key] = true
+		if OS.get_environment("P0_SHOT") != "": print("P0_HEAT_REMIND stove=", i, " ring=", k, " focused=", is_focused())
+		if rt: rt.ui.pulse_marker("room:" + STOVES[i])
+		if OS.has_feature("mobile"): Input.vibrate_handheld(BUZZ_MS)
+		if is_focused(): _show_edge(i)
+
+func _show_edge(i: int) -> void:
+	var from := anchor(STOVES[kitchen.stove_index])
+	var to := anchor(STOVES[i])
+	if from == null or to == null or rt == null: return
+	var left := cam.unproject_position(to.global_position).x < cam.unproject_position(from.global_position).x
+	if _edge and is_instance_valid(_edge): _edge.queue_free()
+	var y := cam.unproject_position(to.global_position).y   # at that stove's height on screen (不知火舞 02ad95bc ⑤)
+	_edge = _EdgeHint.new(left, P0Logic.icon("pot"), y)
+	_edge.theme = UiKit.theme()
+	rt.ui.root.add_child(_edge)
+	rt.ui.root.move_child(_edge, -1)   # over the watch sheet and the heat ring
+	(_edge as _EdgeHint).tapped.connect(func(): _switch_to(i))
+
+## A tap on the edge arrow: that stove, the way its own prompt opens it.
+func _switch_to(i: int) -> void:
+	if kitchen.phase == "watch": kitchen.stop_watching()
+	if kitchen.phase == "compose": rt.ui.close_modal()
+	_pending_tab = ""
+	kitchen.select_stove(i)
+	open_stove("cookbook", true)
+
+class _EdgeHint extends Control:
+	## 不知火舞 02ad95bc ⑤: a 36 px solid round button (1 px edge, the world icon button's shadow) with the i-pot and a
+	## chevron toward that stove, 8 px in from the stage's edge, at the stove's height; it pulses once, then fades.
+	signal tapped
+	const SIZE := 36.0
+	const INSET := 8.0
+	var _left := false
+	var _y := 0.0
+	func _init(left: bool, icon: Texture2D, y: float) -> void:
+		_left = left
+		_y = y
+		set_anchors_preset(Control.PRESET_FULL_RECT)
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var b := Panel.new()
+		b.name = "EdgeButton"
+		b.mouse_filter = Control.MOUSE_FILTER_STOP
+		b.size = Vector2(SIZE, SIZE)
+		b.pivot_offset = b.size * 0.5
+		var box := UiStyleBox.make(UiTokens.COLOR_SURFACE, SIZE * 0.5, UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT)
+		box.shadow_color = UiTokens.COLOR_SHADOW_FLOAT
+		box.shadow_size = UiTokens.SIZE_SHADOW_FLOAT_RADIUS
+		box.shadow_offset = Vector2(0, UiTokens.SIZE_SHADOW_FLOAT_OFFSET_Y)
+		b.add_theme_stylebox_override(&"panel", box)
+		var ic := UiKit.icon(icon, 18.0)
+		ic.position = Vector2(SIZE * 0.5 - 9.0 + (2.0 if left else -2.0), SIZE * 0.5 - 9.0)
+		ic.size = Vector2(18, 18)
+		ic.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		b.add_child(ic)
+		var chev := UiKit.label("‹" if left else "›", UiTokens.STYLE_C12_B, UiTokens.COLOR_SECONDARY)
+		chev.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		chev.position = Vector2(2.0 if left else SIZE - 10.0, SIZE * 0.5 - 9.0)
+		b.add_child(chev)
+		add_child(b)
+		b.gui_input.connect(func(e: InputEvent):
+			if P0Ui.is_tap(e):
+				tapped.emit()
+				queue_free())
+		resized.connect(func():
+			b.position = Vector2(INSET if _left else size.x - SIZE - INSET, clampf(_y - SIZE * 0.5, INSET, size.y - SIZE - INSET)))
+		var t := create_tween()
+		t.tween_property(b, "scale", Vector2.ONE * 1.15, 0.12)
+		t.tween_property(b, "scale", Vector2.ONE, 0.2)
+		t.tween_interval(2.4)
+		t.tween_property(b, "modulate:a", 0.0, 0.3)
+		t.tween_callback(queue_free)
 
 func p0_tap(screen: Vector2) -> void:
 	if kitchen and kitchen.tap(): return
@@ -182,6 +395,45 @@ func is_back_navigation_locked() -> bool:
 func p0_dev(step: PackedStringArray) -> bool:
 	match step[0]:
 		"stove": open_stove(step[1] if step.size() > 1 else "cookbook")
+		"stoveat":   # stoveat:<i> — a tap on stove i (0-based): walk there and open it (SGODOT-282 shots)
+			_pending_tab = ""
+			walk_to(STOVES[int(step[1])])
+		"cyclestove": if kitchen.drawer: kitchen.drawer.stove_cycle_requested.emit()   # the drawer's Stove n/N › pill
+		"near":   # near:<anchor> — stand where that facility is used, facing it, so its strip opens (282 shots)
+			var stand := P0RoomAnchors.stand_for(step[1], _anchors.keys())
+			var m := anchor(stand) if stand != "" else null
+			var target := anchor(step[1])
+			if m and target:
+				var at := m.global_position
+				if stove_of(step[1]) > 0: at = Vector3(target.global_position.x, at.y, at.z)   # in front of that pot
+				actor.teleport(Vector3(at.x, floor_y, at.z))
+				actor.face(target.global_position)
+		"stoveprobe":   # where each stove's anchor and badge land on screen and whether its prompt shows (282 shots)
+			for i in _stove_count():
+				var m := anchor(STOVES[i])
+				var bdg := anchor("badge_stove_%d" % (i + 1))
+				print("P0_STOVE ", i, " anchor=", m != null, " screen=", cam.unproject_position(bdg.global_position) if bdg else Vector2.INF,
+					" tappable=", _tappable().has(STOVES[i]), " card=", _card, " marker=", JSON.stringify(_marker(STOVES[i], rt.session.current()).keys()))
+		"uirects":   # world prompts, the pot card's tag and the edge button on screen (282 shots: check layout numerically)
+			var out := {}
+			for id in rt.ui._icons: if (rt.ui._icons[id] as Control).visible: out["icon " + str(id)] = [(rt.ui._icons[id] as Control).get_global_rect().get_center(), (rt.ui._icons[id] as UiWorldIconButton).status]
+			for id in rt.ui._name_bars: if (rt.ui._name_bars[id] as Control).visible: out["strip " + str(id)] = [(rt.ui._name_bars[id] as Control).get_global_rect(), (rt.ui._name_bars[id] as UiWorldNameBar).status]
+			var top := get_tree().root
+			for c in top.find_children("Tag", "Label", true, false): if (c as Control).is_visible_in_tree(): out["tag " + (c as Label).text] = (c as Control).get_global_rect()
+			for c in top.find_children("EdgeButton", "Panel", true, false): if (c as Control).is_visible_in_tree(): out["edge"] = (c as Control).get_global_rect()
+			for c in top.find_children("*", "UiPotSlot", true, false): if (c as Control).is_visible_in_tree(): out["slot " + str((c as UiPotSlot).quantity)] = (c as Control).get_global_rect()
+			for c in rt.ui.root.find_children("*", "UiStatusBadge", true, false): if (c as Control).is_visible_in_tree(): out["badge " + str(c.get_path()).get_file()] = (c as Control).get_global_rect()
+			print("P0_UI_RECTS ", out)
+		"uitexts":   # print every visible label / button text on screen (282 shots: check frames without looking)
+			var out: Array = []
+			for c in rt.ui.root.find_children("*", "Control", true, false):
+				if not (c as Control).is_visible_in_tree(): continue
+				if c is Label and (c as Label).text != "": out.append((c as Label).text)
+				elif c is Button and (c as Button).text != "": out.append("[" + (c as Button).text + "]")
+			print("P0_UI_TEXTS ", JSON.stringify(out))
+		"pickstove": if kitchen and not kitchen.busy(): kitchen.select_stove(int(step[1]))   # pickstove:<i> (282 shots)
+		"doubleon":   # the Double toggle on, as a tap on it (282 shots)
+			if kitchen.drawer: kitchen.drawer.dev_double(true)
 		"kitchen": p0_open_kitchen(step[1] if step.size() > 1 else "cookbook")
 		"queue": kitchen.open_queue()   # Queue next › on the watch sheet (shots)
 		"heattap": kitchen.dev_heat_tap()   # a heat tap now: until:gold first (shots)
@@ -213,7 +465,7 @@ func p0_dev(step: PackedStringArray) -> bool:
 func p0_until(n: String) -> bool:
 	match n:
 		"cooking": return kitchen != null and kitchen.phase == "watch"
-		"turned": return kitchen != null and kitchen.phase == "watch" and P0KitchenLogic.queued(rt.session.current()) == null   # Queue ×2 turned over
+		"turned": return kitchen != null and kitchen.phase == "watch" and P0KitchenLogic.queued(rt.session.current(), kitchen.stove_index) == null   # Queue ×2 turned over
 		"card": return kitchen != null and kitchen.phase == "card"
 		"floating": return rt != null and not rt.ui.root.find_children("*", "UiFloatText", true, false).is_empty()   # a float is up (shots)
 		"compose": return kitchen != null and kitchen.phase == "compose"

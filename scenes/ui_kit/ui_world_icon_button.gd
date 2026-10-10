@@ -25,6 +25,9 @@ var near := false: set = set_near
 var status := -1: set = set_status
 ## The count tag's text, e.g. "4/6" or "Full"; "" hides it (an empty cabinet hangs none).
 var count := "": set = set_count
+## A one-off nudge on top of the near scale (the kitchen's heat reminder, b84a5e01 ④): pulse() animates it.
+var pulse_k := 1.0: set = set_pulse_k
+var _pulse_tween: Tween
 
 var _disc: Panel
 var _glyph: TextureRect
@@ -75,6 +78,23 @@ func set_count(v: String) -> void:
 	if v == count: return
 	count = v; _refresh()
 
+func set_pulse_k(v: float) -> void:
+	pulse_k = v
+	_apply_scale()
+
+func _apply_scale() -> void:
+	pivot_offset = size * 0.5
+	scale = Vector2.ONE * (_NEAR_SCALE if near else 1.0) * pulse_k
+
+## 1.15× in 0.12 s, held 0.6 s, back in 0.2 s (b84a5e01 ④: another stove's heat ring is a second away).
+func pulse(peak := 1.15) -> void:
+	if _pulse_tween and _pulse_tween.is_valid(): _pulse_tween.kill()
+	if not is_inside_tree(): return
+	_pulse_tween = create_tween()
+	_pulse_tween.tween_property(self, "pulse_k", peak, 0.12).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	_pulse_tween.tween_interval(0.6)
+	_pulse_tween.tween_property(self, "pulse_k", 1.0, 0.2).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
+
 ## The 44 px touch area in global coordinates (the host's _tap_at tests it).
 func hit_rect() -> Rect2: return get_global_rect()
 
@@ -107,7 +127,7 @@ func _refresh() -> void:
 	_count.visible = count != ""
 	_count_label.text = count
 	_fit_count()
-	scale = Vector2.ONE * (_NEAR_SCALE if near else 1.0)
+	_apply_scale()
 	var badged := status >= 0
 	# A state takes the disc's place; a count stays on it (Queue ×2: the cooking stove's countdown with +1, q(71)), so
 	# the disc then stays in the tree drawing nothing itself and the badge goes under it.

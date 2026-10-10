@@ -15,6 +15,8 @@ signal ingredient_tapped(id: String, from_screen: Vector2)
 signal cook_requested(cmd: Dictionary)
 signal tab_changed(tab: String)
 signal info_requested
+## The heading's `Stove 2/3 ›` pill (SGODOT-282, b84a5e01 ②): the next stove, 3 back to 1.
+signal stove_cycle_requested
 
 const HEIGHT := 480.0
 const _HEAD_H := 18.0
@@ -42,6 +44,22 @@ var pot: Array = []
 ## Queue ×2 (Cooking Lv5, q(71)): opened from the watch sheet's Queue next ›, the primary buttons read `Queue`; the
 ## same cook command goes out and the server puts the pot behind the one on the stove.
 var queue_mode := false: set = set_queue_mode
+## Which stove this drawer is for (0-based; the heading, Stove busy and the pot all read it).
+var stove_index := 0: set = set_stove_index
+var _stove_pill: PanelContainer
+const _PILL_H := 28.0                    # Stove n/N › pill (Figma 2152:33666): 28 high, 10 / 8 side padding, radius 12
+const _PILL_PAD := Vector2(10.0, 8.0)
+const _PILL_RADIUS := 12.0
+const _PILL_EDGE := Color("E1DAC8")
+## Big Pot Double (Homestead Lv6, b84a5e01 ③; COOK-DOUBLE-BOOK-ON 2149:136516): remembered per stove; the Cookbook card
+## has it under Cook (right-aligned, its own row), Experiment left of Cook on the cook row.
+var doubles := {}   # stove index → on
+var _book_double: _DoubleToggle
+var _exp_double: _DoubleToggle
+const _DOUBLE_ROW := 32.0
+signal unavailable(reason: String)
+## Double was switched (the pot card above the drawer shows ×2 on its slots and its corner tag).
+signal double_changed(on: bool)
 
 var _stove: Label
 var _level: Label
@@ -93,7 +111,7 @@ func set_queue_mode(v: bool) -> void:
 	queue_mode = v
 	if _cook:
 		_cook.label = _verb()
-		_cook.reason = P0KitchenLogic.experiment_reason(view, pot, queue_mode)
+		_cook.reason = P0KitchenLogic.experiment_reason(view, pot, queue_mode, stove_index)
 	if _recipe_button and selected_page != "": _show_page(selected_page)   # relabel and lay the card out again
 
 func _verb() -> String: return "Queue" if queue_mode else "Cook"
@@ -109,14 +127,34 @@ func set_tab(v: String) -> void:
 
 ## Redraw from `view` and `pot`; selections and scroll positions survive.
 func refresh() -> void:
-	var h := P0KitchenLogic.header(view)
-	_stove.text = h.stove
+	var h := P0KitchenLogic.header(view, stove_index)
+	var several := P0KitchenLogic.stove_count(view) > 1
+	_stove.text = h.stove + (" ›" if several else "")
+	if _stove_pill:   # a pill only when there is another stove to go to (COOK-STOVES 2152:33518; 不知火舞 02ad95bc ②)
+		_stove_pill.mouse_filter = Control.MOUSE_FILTER_STOP if several else Control.MOUSE_FILTER_IGNORE
+		var box := _stove_pill.get_theme_stylebox(&"panel") as UiStyleBox
+		box.border_color = _PILL_EDGE if several else Color.TRANSPARENT
+		box.bg_color = UiTokens.COLOR_SURFACE if several else Color.TRANSPARENT
+		box.content_margin_left = _PILL_PAD.x if several else 0.0
+		box.content_margin_right = _PILL_PAD.y if several else 0.0
+		_stove_pill.custom_minimum_size.y = _PILL_H if several else 0.0
 	_level.text = h.level
 	_state.text = h.state
 	var count: Label = _modes.tabs()[0].find_child("Count", true, false)
 	if count: count.text = P0KitchenLogic.cookbook_count(view)
 	_refresh_cookbook()
 	_refresh_experiment()
+
+func _doubled(cmd: Dictionary, t: _DoubleToggle) -> Dictionary:
+	if t.visible and t.enabled and is_double(): cmd["double"] = true
+	return cmd
+
+func set_stove_index(v: int) -> void:
+	stove_index = v
+	if _stove != null: refresh()
+
+## Where the heading's stove pill sits on screen (shots, tests).
+func stove_pill_rect() -> Rect2: return _stove_pill.get_global_rect() if _stove_pill else Rect2()
 
 func page(id: String) -> Dictionary:
 	for p in P0KitchenLogic.pages(view):
@@ -130,9 +168,18 @@ func _heading() -> Control:
 	_stove = UiKit.label("", UiTokens.STYLE_C14_XB)
 	_level = UiKit.label("", UiTokens.STYLE_C11_B, UiTokens.COLOR_SECONDARY)
 	_state = UiKit.label("", UiTokens.STYLE_C11_B, UiTokens.COLOR_SECONDARY)
+	# `Stove 2/3 ›` is a tappable pill once there are several stoves (white, 1 px outline); with one it reads as before.
+	_stove_pill = PanelContainer.new()
+	var pill := UiStyleBox.make(Color.TRANSPARENT, _PILL_RADIUS, Color.TRANSPARENT, UiTokens.STROKE_DEFAULT)
+	_stove_pill.add_theme_stylebox_override(&"panel", pill)
+	_stove_pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_stove_pill.size_flags_vertical = Control.SIZE_SHRINK_CENTER   # 28 high, centred in the heading row (2152:33666)
+	_stove_pill.gui_input.connect(func(e: InputEvent): if P0Ui.is_tap(e): stove_cycle_requested.emit())
+	_stove_pill.add_child(_stove)
+	row.add_child(_stove_pill)
 	for l in [_stove, _level, _state]:
 		(l as Label).vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		row.add_child(l)
+		if l != _stove: row.add_child(l)
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(spacer)
@@ -196,8 +243,10 @@ func _build_recipe() -> Control:
 	_recipe_button.size = _RECIPE_BUTTON
 	_recipe_button.activated.connect(func():
 		var p := page(selected_page)
-		if not p.is_empty(): cook_requested.emit({"type": "cook", "recipe": str(p.id)}))
+		if not p.is_empty(): cook_requested.emit(_doubled({"type": "cook", "recipe": str(p.id)}, _book_double)))
 	wrap.add_child(_recipe_button)
+	_book_double = _make_double()
+	wrap.add_child(_book_double)
 	_recipe_nav = UiNavButton.new("Try in Experiment", true)
 	_recipe_nav.position = Vector2(_RECIPE.x - 150, _RECIPE_BUTTON_AT.y)
 	_recipe_nav.size = Vector2(146, _RECIPE_BUTTON.y)
@@ -295,6 +344,8 @@ func _show_page(id: String) -> void:
 		_recipe_button.visible = true
 		_recipe_button.reason = card.reason
 		_recipe_button.label = _verb()
+	_apply_double(_book_double, _recipe_button, P0KitchenLogic.double_state(view, p) if card.nav == "" else {shown = false, enabled = false, toast = ""},
+		p.get("in", []))
 	_layout_recipe()
 
 ## The card grows with what it says (int6 C3 / C41, 不知火舞 on 226): the might-have line pushes the effect line
@@ -336,6 +387,11 @@ func _layout_recipe() -> void:
 		b.position = Vector2(_RECIPE_PAD, top)
 		b.size = Vector2(_RECIPE.x - _RECIPE_PAD * 2.0, _RECIPE_BUTTON.y)
 		h = top + _RECIPE_BUTTON.y + _RECIPE_ROW_GAP
+	if _book_double.visible:   # Double under Cook, right-aligned, a row of its own (COOK-DOUBLE-BOOK-ON)
+		var dw := _book_double.get_combined_minimum_size().x
+		_book_double.size = Vector2(dw, _DOUBLE_ROW)
+		_book_double.position = Vector2(right - dw, h)
+		h += _DOUBLE_ROW + _RECIPE_ROW_GAP
 	_recipe.size = Vector2(_RECIPE.x, h)
 	_recipe_wrap.custom_minimum_size = Vector2(_RECIPE.x, h)
 
@@ -399,10 +455,12 @@ func _build_experiment() -> VBoxContainer:
 	var info := UiNavButton.new("Info", true)
 	info.pressed.connect(func(): info_requested.emit())
 	foot.add_child(info)
+	_exp_double = _make_double()
+	foot.add_child(_exp_double)
 	_cook = UiCommandButton.new("Cook", UiCommandButton.Kind.PRIMARY, true)
 	_cook.sends = true   # cook (§10.7.1 Offline)
 	_cook.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_cook.activated.connect(func(): if not pot.is_empty(): cook_requested.emit({"type": "cook", "items": pot.duplicate()}))
+	_cook.activated.connect(func(): if not pot.is_empty(): cook_requested.emit(_doubled({"type": "cook", "items": pot.duplicate()}, _exp_double)))
 	var cook_box := MarginContainer.new()   # the button resets its own minimum size; the box holds the 164 width
 	cook_box.custom_minimum_size.x = _COOK_W
 	cook_box.add_child(_cook)
@@ -415,7 +473,9 @@ func _refresh_experiment() -> void:
 	var items := P0KitchenLogic.experiment_items(view, pot, experiment_chip)
 	_bag.capacity = maxi(10, ceili(items.size() / 5.0) * 5)
 	_bag.items = items
-	_cook.reason = P0KitchenLogic.experiment_reason(view, pot, queue_mode)
+	_cook.reason = P0KitchenLogic.experiment_reason(view, pot, queue_mode, stove_index)
+	_cook.label = _verb()
+	_apply_double(_exp_double, _cook, P0KitchenLogic.double_state(view, {}, pot), pot)
 	_pot_energy.text = P0KitchenLogic.pot_energy(view, pot)
 	_tried.visible = P0KitchenLogic.tried(view, pot)
 
@@ -429,3 +489,87 @@ func _chips(labels: Array, picked: Callable) -> Control:
 ## The drawer's top edge in screen pixels (the slot bar and preview sit above it).
 func top_y() -> float:
 	return get_global_rect().position.y
+
+# ---------------------------------------------------------------- Big Pot Double (b84a5e01 ③)
+func is_double() -> bool: return bool(doubles.get(stove_index, false))
+## Whether the Double the player sees is on and usable for what is selected (the pot card's ×2 follows it).
+## Shots / tests: the Double toggle switched as a tap does (the pot card follows through double_changed).
+func dev_double(on: bool) -> void:
+	var t := _book_double if tab == "cookbook" else _exp_double
+	if t == null or not t.visible or not t.enabled: return
+	t.on = on
+	t.toggled.emit(on)
+
+func big_pot_shown() -> bool:
+	var t := _book_double if tab == "cookbook" else _exp_double
+	return t != null and t.visible and t.enabled
+
+## `Double` + a switch (placeholder from kit parts until the Toggle main, 1236:107861, is in the kit). Grey: a tap says
+## why (`toast`), it never flips.
+class _DoubleToggle extends HBoxContainer:
+	signal toggled(on: bool)
+	signal refused(reason: String)
+	var on := false: set = set_on
+	var enabled := true: set = set_enabled
+	var toast := ""
+	var _track: Panel
+	var _knob: Panel
+	var _label: Label
+	func _init() -> void:
+		add_theme_constant_override(&"separation", 6)
+		mouse_filter = Control.MOUSE_FILTER_STOP
+		custom_minimum_size.y = 32.0
+		_label = UiKit.label("Double", UiTokens.STYLE_C12_B)
+		_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		add_child(_label)
+		_track = Panel.new()
+		_track.custom_minimum_size = Vector2(36, 20)
+		_track.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		_track.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(_track)
+		_knob = Panel.new()
+		_knob.size = Vector2(16, 16)
+		_knob.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_knob.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_SURFACE, 8.0))
+		_track.add_child(_knob)
+		gui_input.connect(func(e: InputEvent):
+			if not P0Ui.is_tap(e): return
+			if not enabled:
+				refused.emit(toast)
+				return
+			on = not on
+			toggled.emit(on))
+		_restyle()
+	func set_on(v: bool) -> void:
+		on = v
+		_restyle()
+	func set_enabled(v: bool) -> void:
+		enabled = v
+		_restyle()
+	func _restyle() -> void:
+		if _track == null: return
+		var lit := on and enabled
+		_track.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_PRIMARY if lit else UiTokens.COLOR_DISABLED, 10.0))
+		_knob.position = Vector2(18 if lit else 2, 2)
+		_label.add_theme_color_override(&"font_color", UiTokens.COLOR_TEXT if enabled else UiTokens.COLOR_DISABLED)
+
+func _make_double() -> _DoubleToggle:
+	var t := _DoubleToggle.new()
+	t.visible = false
+	t.toggled.connect(func(on: bool):
+		doubles[stove_index] = on
+		refresh()
+		double_changed.emit(on))
+	t.refused.connect(func(r: String): unavailable.emit(r))
+	return t
+
+## Show the toggle for what is selected and set the main key: `Cook ×2` / `Queue ×2`, or the gap for two portions.
+func _apply_double(t: _DoubleToggle, b: UiCommandButton, st: Dictionary, tokens: Array) -> void:
+	t.visible = bool(st.shown)
+	t.enabled = bool(st.enabled)
+	t.toast = str(st.toast)
+	t.on = is_double()
+	if not (st.shown and st.enabled and is_double()) or b.reason != "": return
+	var gap := P0KitchenLogic.double_gap(view, tokens)
+	if gap != "": b.reason = gap
+	else: b.label = P0KitchenLogic.double_label(queue_mode)
