@@ -359,8 +359,10 @@ func set_place(text: String) -> void:
 ## One status line under the HUD where the creel sits while fishing (SGODOT-231: the mine's "Rocks 2/6", "Run 1/2
 ## today" for its first 3 s). "" hides it; changing action clears it.
 ## SGODOT-288 (COMBAT-1 / COMBAT-ELITE): the player's mine HP over the status line's spot, which then sits to its right
-## (x 187 of 360, MINE-3); hp < 0 hides it. The elite's card under it while one fights ({} hides it).
-const _STATUS_RIGHT_OF_HP := 187.0
+## (5 clear of the HP card, which is 194 wide with its heart: x 209 of 360); hp < 0 hides it. The elite's card under it
+## while one fights ({} hides it); the status line (`Elite Slime` on Floor 5) hides with it — the card names the elite
+## and would cover half of it (不知火舞 on 288; COMBAT-ELITE 1228:111690 has no such line).
+const _STATUS_RIGHT_OF_HP := 209.0
 func set_hp(hp: int, maximum: int, elite := {}) -> void:
 	if not is_node_ready(): return
 	var on := hp >= 0 and surface in ACTION_SURFACES
@@ -369,6 +371,7 @@ func set_hp(hp: int, maximum: int, elite := {}) -> void:
 	_status.position.x = _STATUS_RIGHT_OF_HP if on else _creel.position.x
 	var boss := on and not elite.is_empty()
 	_elite_hp.visible = boss
+	_status.visible = _status_text.text != "" and surface in ACTION_SURFACES and not boss
 	if boss:
 		_elite_hp.title = str(elite.get("name", "Elite Slime"))
 		_elite_hp.set_hp(int(elite.get("hp", 0)), int(elite.get("max", 1)))
@@ -383,7 +386,7 @@ func set_status_line(text: String) -> void:
 		_pending["status"] = text   # the mine sets it on its first frame, maybe before the HUD exists (苏烈, #39)
 		return
 	if _status_text.text != text: _status_text.text = text
-	_status.visible = text != "" and surface in ACTION_SURFACES
+	_status.visible = text != "" and surface in ACTION_SURFACES and not _elite_hp.visible
 
 ## Which world the HUD sits on (§10.2.4): action spaces show everything; rooms are facility spaces
 ## (no quick bar, main action or switch key); the map shows only toasts and cards.
