@@ -2,8 +2,9 @@ class_name UiHpBar
 extends PanelContainer
 ## HPBar (Figma 14 · Gensen Refactor/HPBar, COMBAT-1 482:562; SGODOT-288) and EnemyHP Kind=Elite (COMBAT-ELITE
 ## 1228:111690): the mine's HP, shown only where it counts (mine floors 3–5, §13.3.1).
-##   Kind PLAYER  card 28 high, surface, 1 px border, radius 12: a heart, a 120 × 10 bar (track border, fill primary)
-##                and the percent (ExtraBold 12); under 30 % the fill and the percent turn danger.
+##   Kind PLAYER  card 28 high, surface, 1 px border, radius 12, padding 10 / 5: the 14 × 13 heart in its own coral
+##                (HPBar 1124:79402, assets/p0/icons/heart.svg), a 120 × 10 bar (track border, fill primary) and the
+##                percent (ExtraBold 12), 6 apart; under 30 % the fill and the percent turn danger.
 ##   Kind ELITE   card 328 × 55 under the player's: the name (ExtraBold 14) and its percent (Bold 12) on one row, a
 ##                302 × 12 bar under them (track ink at 12 %, fill danger); shown for the whole fight.
 ## Attack is not on the HUD (COMBAT-1).
@@ -27,7 +28,7 @@ func _init(kind_ := Kind.PLAYER) -> void:
 	kind = kind_
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var box := UiStyleBox.make(UiTokens.COLOR_SURFACE, 12 if kind == Kind.PLAYER else 14, UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT)
-	if kind == Kind.PLAYER: box.with_margins(8, 4, 10, 4)
+	if kind == Kind.PLAYER: box.with_margins(10, 4, 10, 4)
 	else: box.with_margins(13, 9, 13, 10)
 	add_theme_stylebox_override(&"panel", box)
 	var bar_size := _PLAYER_BAR if kind == Kind.PLAYER else _ELITE_BAR
@@ -52,12 +53,12 @@ func _init(kind_ := Kind.PLAYER) -> void:
 		var heart := TextureRect.new()
 		heart.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		heart.texture = P0Logic.icon("heart") if ResourceLoader.exists("res://assets/p0/icons/heart.svg") else null
-		heart.custom_minimum_size = Vector2(14, 14)
+		heart.name = "Heart"
+		heart.custom_minimum_size = Vector2(14, 13)
 		heart.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		heart.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		heart.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		heart.modulate = UiTokens.COLOR_DANGER
-		heart.visible = heart.texture != null
+		heart.visible = heart.texture != null   # the icon carries its own coral (#E07A5F), no tint
 		row.add_child(heart)
 		row.add_child(_track)
 		row.add_child(_percent)
