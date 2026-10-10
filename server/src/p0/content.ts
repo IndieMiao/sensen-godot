@@ -87,7 +87,7 @@ export interface WorkbenchRecipe {
   facility?: string;   // to: field (P1, SGODOT-239): the facility it builds in place (place command), never crafted
 }
 /** P1 step 1 (q(59) §1.4): a facility on one plot; a sprinkler waters the ring of 8 around it and cuts ripening. */
-export interface FacilityDef { name: string; cover: 'ring8'; grow_cut: number; cap_base: number; cap_per_homestead: number }
+export interface FacilityDef { name: string; cover: 'ring8'; grow_cut: number }
 
 export interface ResidentDef {
   name: string; role: string; portrait: string; likes: string; gift_meal: string; one_per_day: boolean;
@@ -137,6 +137,8 @@ export interface P0Content {
     stoves?: [number, number][];              // stoves in the kitchen: Lv1 1, Lv4 2, Lv8 3 (absent = 1)
     warming_cabinet_by_level?: [number, number][];   // Warming Cabinet portions: Lv3 6, Lv8 12 (absent = warming_cabinet)
     chefs_sign_gold?: number;                 // Chef's Sign (Lv10): every dish's gold zone + this (0.05 = 5 points)
+    plots?: [number, number][];               // plots the homestead has: Lv1 30, Lv3 40 (P1 q(59) §1.1; absent = P0's start)
+    sprinkler_max?: { base: number; per_level: number; max: number };   // sprinklers that may stand: 3 + level, at most max
     per_level: { energy: number; meals: number };
     board_slots: [number, number][];          // [from Homestead level, Stall Board slots]
     levels: { level: number; coins: number; skills: number; materials: [string, number][]; unlocks: string[] }[];
@@ -208,9 +210,9 @@ export interface P0Content {
   };
   /** §13.4 P0 workbench: Tools / Supplies (SGODOT-231), Facilities from P1. */
   workbench: { tabs: string[]; recipes: WorkbenchRecipe[] };
-  /** P1 (SGODOT-239, content/farm_garden.json): plot id → [col, row] on the garden grid; from Homestead level `extra.homestead`
-   * the homestead has `count` more plots from id `from`, added as wild. */
-  garden: { plots: [number, number][]; extra: { homestead: number; from: number; count: number } };
+  /** P1 (SGODOT-239, content/farm_garden.json): plot id → [col, row] on the garden grid; how many of them the homestead has
+   * is homestead.plots (the ids past P0's 30 come as wild). */
+  garden: { plots: [number, number][] };
   /** P1 (SGODOT-239): facilities by kind; grow_cut_cap caps a facility's cut and Compost's together. */
   facilities: { grow_cut_cap: number; kinds: Record<string, FacilityDef> };
 }

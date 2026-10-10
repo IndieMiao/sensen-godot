@@ -207,6 +207,7 @@ func _build_world() -> void:
 		xfs.append(Transform3D(Basis.IDENTITY, bp.cell_to_world(P0Garden.cell_of(id))))
 		tints.append(Color.WHITE)
 	beds = FarmArt.batch("plot", xfs, true, tints)
+	beds.multimesh.visible_instance_count = P0Garden.P0_PLOTS   # all 40 laid out; the view's garden.plots shows them
 	beds.name = "Beds"
 	add_child(beds)
 	crops = CropField.new(bp)
@@ -220,7 +221,10 @@ func _build_world() -> void:
 	actor = P0Actor.new()
 	add_child(actor)
 	actor.setup(bp, grid, cam)
-	actor.ground_height = func(p: Vector3) -> float: return P0Garden.BED_H if P0Garden.on_bed(bp, p) else 0.0
+	# The beds the homestead has (garden.plots, 30 or 40): read from the session's last view, never current() — that
+	# copies the whole view, and this runs every frame (亚瑟 on #215; the map's heat in 260 was the same copy).
+	actor.ground_height = func(p: Vector3) -> float:
+		return P0Garden.BED_H if P0Garden.on_bed(bp, p, rt.session.view if rt != null and rt.session != null else null) else 0.0
 	# Opening shot like the polished farm: cottage on top, beds below, the player at the front edge.
 	_focus = actor.position.lerp(_house, 0.42)
 	_cam_follow.hold()   # the opening shot stays until the player first moves
@@ -407,20 +411,23 @@ func _sync_plots(v: Dictionary, dt: float) -> void:
 	crops.sync(P0Garden.cells(v, now), now)
 	for p in v.get("plots", []):
 		var id := int(p.get("id", -1))
-		if id >= 0 and id < P0Garden.plot_count(): beds.multimesh.set_instance_color(id, P0Garden.bed_tint(str(p.get("state", ""))))
+		if id >= 0 and id < P0Garden.plot_count(v): beds.multimesh.set_instance_color(id, P0Garden.bed_tint(str(p.get("state", ""))))
+	# P1 (q(59) §1.1): beds 30–39 stand from Homestead Lv3 (the view's garden.plots); before that the batch draws 30.
+	beds.multimesh.visible_instance_count = P0Garden.plot_count(v)
 
 ## Middle of the plot beds, for camera-only "Show" from the Today panel and NeedSource (LOCK-08).
 func _plots_center() -> Vector3:
 	var sum := Vector3.ZERO
-	for id in P0Garden.plot_count(): sum += bp.cell_to_world(P0Garden.cell_of(id))
-	return sum / maxf(1.0, float(P0Garden.plot_count()))
+	var n := P0Garden.plot_count(rt.session.view if rt != null and rt.session != null else null)
+	for id in n: sum += bp.cell_to_world(P0Garden.cell_of(id))
+	return sum / maxf(1.0, float(n))
 
 ## The bed the player faces from the walkway: nearest bed ahead within reach.
 func _pick_front(v: Dictionary) -> void:
 	var best := -1
 	var best_score := -INF
 	var f := actor.facing()
-	for id in P0Garden.plot_count():
+	for id in P0Garden.plot_count(v):
 		var c := bp.cell_to_world(P0Garden.cell_of(id))
 		var to := Vector2(c.x - actor.position.x, c.z - actor.position.z)
 		var dist := to.length()
