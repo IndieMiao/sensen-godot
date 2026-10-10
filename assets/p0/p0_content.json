@@ -2749,7 +2749,7 @@
     },
     "regional_market": {
       "cap": 60,
-      "scope": "this city",
+      "scope": "all {city} markets",
       "per_city": true
     }
   },

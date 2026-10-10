@@ -7,7 +7,7 @@ import { burners, cookSlots, mealValue, recipeRarity, settleStove } from './cook
 import { sellPrice, stallOffer } from './reducer.js';
 import { blessed, dayKey, foodCap, maxEnergy, nextTickIn, regenMs, settleEnergy, skillLevel, untilRollover } from './rules.js';
 import { emptyDay, type P0State } from './state.js';
-import { catalog, drinkPrice, offerOf, owns, quotaKey, regionalOf, walletNeed } from './shops.js';
+import { catalog, drinkPrice, offerOf, owns, quotaKey, quotaScope, regionalOf, walletNeed } from './shops.js';
 import { BOARDS, handIn, heldSlot, lockedTemplate, payout, settleBoards, slotCount } from './boards.js';
 import { expireGiftMeals, lessonState, progressOf, requestOpensIn, requestState, residentState, stageIndex } from './residents.js';
 import { floorPrice, haveFor, matches } from './requests.js';
@@ -292,10 +292,12 @@ function drinksView(c: P0Content, s: P0State, now: number) {
 }
 
 function quotaView(c: P0Content, s: P0State, q: QuotaId, now: number) {
-  // a per-city quota shows the city the player is in (§11.7.3: one count per account × city cluster)
+  // a per-city quota shows the city the player is in (§11.7.3: one count per account × city cluster), and its scope
+  // names it (NPC-3 482:120: `all San Francisco markets`)
+  const city = s.travel?.here ?? homeCluster(c);
   const used = q === 'request_bonus' ? s.day.bonus : q === 'sys_requests' ? s.day.sys_done
-    : s.day.quota[quotaKey(c, q, s.travel?.here ?? homeCluster(c))] ?? 0;
-  return { used, cap: c.quotas[q].cap, resets_in: untilRollover(c, now), scope: c.quotas[q].scope };
+    : s.day.quota[quotaKey(c, q, city)] ?? 0;
+  return { used, cap: c.quotas[q].cap, resets_in: untilRollover(c, now), scope: quotaScope(c, q, city) };
 }
 
 /** One counter (§9.11): what it sells with every gate as a fact, and which kinds it buys back at what rate / quota. */

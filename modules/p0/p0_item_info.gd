@@ -450,7 +450,7 @@ static func _price(view: Dictionary, item_id: String, opts: Dictionary) -> Dicti
 	return {each = each, total = each * qty, text = "%d coins" % (each * qty), line = ("%d × %d coins" % [qty, each]) if qty > 1 else ""}
 
 static func _quota(view: Dictionary, item_id: String, kind: String, opts: Dictionary) -> Dictionary:
-	return _quota_line(_quota_of(view, item_id, opts), "regional" if _regional(view, item_id, opts) else kind, _counter(opts))
+	return _quota_line(_quota_of(view, item_id, opts), "" if _regional(view, item_id, opts) else kind, _counter(opts))
 
 ## Whether this counter buys the item back as one of the city's regional goods (the Market Square).
 static func _regional(view: Dictionary, item_id: String, opts: Dictionary) -> bool:
@@ -461,8 +461,8 @@ static func _regional(view: Dictionary, item_id: String, opts: Dictionary) -> bo
 static func counter_quota(view: Dictionary, role: String) -> Dictionary:
 	if role != "homestead":
 		for e in view.get("shops", {}).get(role, {}).get("sell", []):
-			if e.get("quota", null) != null:   # "Regional buy-back today 20/60" over "this city · resets in 9h 12m"
-				return _quota_line(view.get("quotas", {}).get(str(e.quota), {}), "regional" if e.get("regional", false) else str(e.get("kind", "")), role)
+			if e.get("quota", null) != null:   # the market (NPC-3 482:120): "Buy-back today 30/60" over "all San Francisco markets · resets in 9h 12m"
+				return _quota_line(view.get("quotas", {}).get(str(e.quota), {}), "" if e.get("regional", false) else str(e.get("kind", "")), role)
 	return _quota_line({}, "", role)
 
 static func _quota_line(quota: Dictionary, kind: String, role: String) -> Dictionary:
