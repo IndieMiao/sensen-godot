@@ -37,6 +37,9 @@ var quick_store := "user://p0_quickbar.json"   # per-action pins / removals (tes
 const _KEY_ABOVE_BAR := 40.0        # BAR-1 482:18: ActionKey bottom at y 668, quick bar top at 708
 const _BADGE_CARD_GAP := 4.0        # a card over a facility that also shows a badge sits this far above it (the mine's EntryCard)
 const ACTION_SURFACES := ["farm", "pond", "mine"]   # spaces with the action key group (SGODOT-231: the mine, Mining)
+## The actions the world also offers on the switch key besides the current one (SGODOT-288: mine floors 3–5 offer
+## Mining and Combat; the world sets it, P0Mine._go_floor). Empty: only the current action.
+var actions_here: Array = []
 ## A-08 ghost slot per action: [id prefix of the family, ghost icon, noun] (q(44): Seeds / Bait / Torch in P0).
 const GHOST_FAMILY := {
 	"farm": ["seed_", "seed_radish", "Seeds"],
@@ -94,6 +97,8 @@ var _dev_box: Control
 var _creel: UiCreelBadge
 var _status: PanelContainer     # SGODOT-231 mine status line (Rocks 2/6), where the creel sits while fishing
 var _status_text: Label
+var _hp: UiHpBar                # SGODOT-288 HPBar on mine floors 3–5, where the status line sits (it moves right)
+var _elite_hp: UiHpBar          # EnemyHP Kind=Elite under it while the elite fights (COMBAT-ELITE)
 var player_screen := Vector2(180, 320)   # set by the farm / pond each frame (mid-body): the radial fans out from it
 var _modal: Control
 var modal_kind := ""            # "stall", "bag", "inbox", "card", ... — which drawer is open
@@ -203,6 +208,13 @@ func _build_bar() -> void:
 	_status.add_child(_status_text)
 	_status.hide()
 	_kit.add_child(_status)   # kit theme for the C11XB type style
+	_hp = UiHpBar.new(UiHpBar.Kind.PLAYER)
+	_hp.position = _creel.position
+	_hp.hide()
+	_kit.add_child(_hp)
+	_elite_hp = UiHpBar.new(UiHpBar.Kind.ELITE)
+	_elite_hp.hide()
+	_kit.add_child(_elite_hp)
 
 func _build_fab() -> void:
 	_keys = UiActionKey.new()
@@ -325,6 +337,26 @@ func set_place(text: String) -> void:
 
 ## One status line under the HUD where the creel sits while fishing (SGODOT-231: the mine's "Rocks 2/6", "Run 1/2
 ## today" for its first 3 s). "" hides it; changing action clears it.
+## SGODOT-288 (COMBAT-1 / COMBAT-ELITE): the player's mine HP over the status line's spot, which then sits to its right
+## (x 187 of 360, MINE-3); hp < 0 hides it. The elite's card under it while one fights ({} hides it).
+const _STATUS_RIGHT_OF_HP := 187.0
+func set_hp(hp: int, maximum: int, elite := {}) -> void:
+	if not is_node_ready(): return
+	var on := hp >= 0 and surface in ACTION_SURFACES
+	_hp.visible = on
+	if on: _hp.set_hp(hp, maximum)
+	_status.position.x = _STATUS_RIGHT_OF_HP if on else _creel.position.x
+	var boss := on and not elite.is_empty()
+	_elite_hp.visible = boss
+	if boss:
+		_elite_hp.title = str(elite.get("name", "Elite Slime"))
+		_elite_hp.set_hp(int(elite.get("hp", 0)), int(elite.get("max", 1)))
+		_elite_hp.position = Vector2(roundf((root.size.x - _elite_hp.get_combined_minimum_size().x) * 0.5) if root else 16.0,
+			_creel.position.y + _hp.get_combined_minimum_size().y + UiTokens.SPACE_WITHIN)
+
+func hp_bar() -> UiHpBar: return _hp
+func elite_bar() -> UiHpBar: return _elite_hp
+
 func set_status_line(text: String) -> void:
 	if not is_node_ready():
 		_pending["status"] = text   # the mine sets it on its first frame, maybe before the HUD exists (苏烈, #39)
@@ -377,7 +409,7 @@ func set_mode(mode: String, place := "") -> void:
 	_bar_sig = []
 	_auto_pick = true
 	# SGODOT-231: the mine shows the pickaxe; set_action's `tool` swaps in the equipped one.
-	_mode_tool = P0Logic.icon("rod" if mode == "fish" else "pickaxe" if mode == "mine" else "hoe")
+	_mode_tool = P0Logic.icon("rod" if mode == "fish" else "pickaxe" if mode == "mine" else "sword" if mode == "combat" else "hoe")
 	_keys.tool_icon = _mode_tool
 	_creel.visible = mode == "fish"
 	set_status_line("")
@@ -386,7 +418,9 @@ func set_mode(mode: String, place := "") -> void:
 func _refresh_bar() -> void:
 	var store := _quick_for(bar_mode)
 	# SGODOT-231: Mining's bar holds only what helps underground (a torch); seeds and bait never show there.
+	# Combat's bar holds Healing Potions (§13.3.8), which P1 does not have yet: empty, and no ghost (GHOST_FAMILY).
 	var ids := P0MaterialLogic.mine_bar(view, _bar_ids, store.pins, store.removed) if bar_mode == "mine" \
+		else ([] as Array) if bar_mode == "combat" \
 		else P0Logic.quick_bar(view, _bar_ids, bar_mode, store.pins, store.removed)
 	if bar_mode == "fish":
 		if selected_bait != "" and not ids.has(selected_bait): selected_bait = ""
@@ -428,7 +462,7 @@ func _refresh_bar() -> void:
 	# takes it (LOCK-05 v1.10), else the free end; five occupied slots leave no room, so no ghost. A tap opens the Bag
 	# (ghost_tapped). TODO(SGODOT-225 bag drawer): open on the family tab (Seeds → Seeds, Bait → Tackle).
 	var family: Array = GHOST_FAMILY.get(bar_mode, GHOST_FAMILY.farm)   # q(44): Seeds / Bait / Torch
-	if not counts.any(func(n): return int(n) > 0):
+	if not counts.any(func(n): return int(n) > 0) and bar_mode != "combat":
 		var ghost := {ghost = true, icon = P0Logic.icon(family[1]), title = family[2]}
 		var gap := slots.find({})
 		if gap >= 0: slots[gap] = ghost
@@ -2161,7 +2195,8 @@ func open_radial() -> void:
 	var options := []
 	for it in [["farm", "hoe", "Farming", "No plots here"], ["fish", "fish", "Fishing", "No water nearby"],
 			["mine", "pickaxe", "Mining", "Enter the mine"], ["combat", "sword", "Combat", "Mine floors 3–5"]]:
-		options.append({id = it[0], name = it[2], icon = P0Logic.icon(it[1]), available = it[0] == bar_mode, reason = it[3]})
+		options.append({id = it[0], name = it[2], icon = P0Logic.icon(it[1]),
+			available = it[0] == bar_mode or actions_here.has(it[0]), reason = it[3]})
 	_radial.options = options
 	_radial.selected = bar_mode
 	_radial.open()   # around the screen centre (247, LOCK-03 v2)
