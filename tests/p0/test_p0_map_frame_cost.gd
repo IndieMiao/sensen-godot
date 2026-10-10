@@ -36,7 +36,7 @@ func test_the_maps_per_frame_paths_copy_no_view() -> void:
 	var city: CityMapView = map.get("city_map")
 	var ponds: Array = city.entries.filter(func(e): return str(e.get("kind", "")) == "pond")
 	assert_array(ponds).is_not_empty()
-	for e in ponds: assert_str(city._label_text(e)).contains(" · ")   # a pond pin's name still carries its tag
+	for e in ponds: assert_str(city._dest_text(e)).is_not_empty()   # a pond pin's short name (q(137)), from its style
 	city._update_markers()
 	map.call("city_pin_markers")
 	assert_int(counting.copies).is_equal(0)
@@ -55,4 +55,7 @@ func test_a_destination_pin_restyles_only_on_a_change() -> void:
 	assert_object(pin._label_box.get_theme_stylebox(&"panel")).is_not_same(box)
 	var size := UiMapDestination.label_size_for("Tea House")
 	assert_vector(UiMapDestination.label_size_for("Tea House")).is_equal(size)
-	assert_bool(UiMapDestination._label_sizes.has("Tea House")).is_true()
+	assert_bool(UiMapDestination._label_sizes.has("Tea House|p")).is_true()
+	# a short name is measured once too (q(137)), apart from the plate's
+	assert_vector(UiMapDestination.label_size_for("Tea House", false)).is_equal(UiMapDestination.label_size_for("Tea House", false))
+	assert_bool(UiMapDestination._label_sizes.has("Tea House|s")).is_true()

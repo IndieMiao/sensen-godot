@@ -128,7 +128,9 @@ func test_the_avatar_stands_where_the_player_is() -> void:
 	rt.here = {"space": "pond", "place": "pond_san_francisco_03"}
 	m._sync_here()
 	var reed := preload("res://modules/p0/p0_ponds.gd").location("pond_san_francisco_03").merged({"kind": "pond"})
-	assert_str(m._pin_tag(reed)).is_equal("Beginner pond")   # no distance at the pond the player is at (q(80))
+	# its pin: the short name, no type or distance (q(137) ①④), and always in — the player is there
+	assert_str(m.city_map._dest_text(reed)).is_equal("Fern")
+	assert_bool(bool(m._kept_pin(reed))).is_true()
 	rt.here = {"space": "mine", "place": ""}   # the mine is the homestead
 	m._sync_here()
 	assert_that(fm.anchor_of("self")).is_equal(fm.points.self.center)

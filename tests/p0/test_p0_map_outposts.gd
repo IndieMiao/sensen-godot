@@ -6,6 +6,7 @@ extends GdUnitTestSuite
 ## on an outpost pin drawn over the player's avatar opens the outpost (SGODOT-224).
 
 const P0_MAP := "res://scenes/p0/p0_map.tscn"
+const P0Map := preload("res://scenes/p0/p0_map.gd")
 const NEAREST_POND := "pond_san_francisco_03"   # Fern Pond, the beginner pond (P0City.beginner_pond(), SGODOT-270)
 
 func before_test() -> void:
@@ -35,10 +36,10 @@ func _look(m: Node, at: Vector2, zoom: float, bearing := 18.0) -> Array:
 
 func _outposts() -> Array: return P0Outposts.all().map(func(o): return str(o.id))
 
-## SGODOT-269 (用户 via 263-6; 不知火舞): space pins give way as every POI does — none covers another or an avatar's body —
-## except the ones always in: the selected pin, a marked one and the pin of where the player is. Outposts still pack
-## first (C30), so one gives way only to those, an outpost nearer home or the avatar; zooming in parts them and they
-## come back. The packing margin is the fresh one here (no incumbents).
+## SGODOT-269 (用户 via 263-6; 不知火舞) and q(137) ⑤: space pins give way — no two discs nearer than 36 px, none on an
+## avatar's body — except the ones always in: the selected pin, a marked one and the pin of where the player is. They
+## pack by a fixed rank (beginner pond, ponds, market, tea house, post, tackle shop, silhouette), so one gives way only
+## to a higher-ranked pin or the avatar; zooming in parts them and they come back. Fresh here (no incumbents).
 func _look_fresh(m: Node, at: Vector2, zoom: float) -> Array:
 	(m.city_map as CityMapView)._shown_last.clear()
 	(m.city_map as CityMapView)._hidden_until.clear()
@@ -60,7 +61,8 @@ static func _kept(m: Node, id: String) -> bool:
 	var found: Array = city.entries.filter(func(e): return str(e.get("id", "")) == id)
 	return not found.is_empty() and (city._marker_of(found[0]) != "" or bool(m._kept_pin(found[0])))
 
-## No space pin that gives way covers another space pin or an avatar's body.
+## No space pin that gives way covers an avatar's body, and no two discs shown are nearer than 36 px centre to centre
+## unless both are always in (q(137) ⑤; fresh, no incumbents).
 func _assert_clear(m: Node, why: String) -> void:
 	var city: CityMapView = m.city_map
 	var discs := _discs(city)
@@ -71,9 +73,10 @@ func _assert_clear(m: Node, why: String) -> void:
 		assert_bool(bodies.any(func(b): return (b as Rect2).intersects(discs[ids[i]]))).append_failure_message(
 			"%s: %s on an avatar" % [why, ids[i]]).is_false()
 		for j in ids.size():
-			if j == i or _kept(m, ids[j]): continue
-			assert_bool((discs[ids[i]] as Rect2).intersects(discs[ids[j]])).append_failure_message(
-				"%s: %s on %s" % [why, ids[i], ids[j]]).is_false()
+			if j == i: continue
+			var apart := (discs[ids[i]] as Rect2).get_center().distance_to((discs[ids[j]] as Rect2).get_center())
+			assert_float(apart).append_failure_message("%s: %s by %s" % [why, ids[i], ids[j]]) \
+				.is_greater_equal(CityMapView.DEST_NEAR - 0.01)
 
 func test_space_pins_never_cover_one_another_or_the_avatar() -> void:
 	var m := _map()
@@ -130,14 +133,39 @@ func test_a_pin_wearing_a_marker_packs_first() -> void:
 	city._shown_last.clear()
 	assert_array(_look(m, at, 15.0)).contains_exactly(["a_shop"])   # without it the id order decides
 
-## q(72): the name with the people in, just the name with no one.
+## q(137) ①–③: the pin says the short name, the people in are its top-right count (none at 0); a tackle shop says no
+## name (it is always its pond's), and the card keeps the whole name and Online now.
 func test_an_outpost_pin_says_who_is_in() -> void:
 	var tea := P0Outposts.by_role("tea")
 	var m := _map()
 	for i in 3: await get_tree().process_frame
+	m.set_process(false)
 	var city: CityMapView = m.city_map
-	assert_str(city._label_text(P0Outposts.place_entry(tea, 3))).is_equal("%s · 3 online" % tea.name)   # Oak Tea House (SGODOT-270)
-	assert_str(city._label_text(P0Outposts.place_entry(tea, 0))).is_equal(str(tea.name))
+	assert_str(city._dest_text(P0Outposts.place_entry(tea, 3))).is_equal("Oak")   # Oak Tea House (SGODOT-270)
+	assert_str(city._dest_text(P0Outposts.place_entry(P0Outposts.by_role("tackle"), 0))).is_equal("")
+	assert_str(city._dest_text(P0Outposts.place_entry(P0Outposts.by_role("post"), 0))).is_equal("Union Square")
+	assert_str(city._dest_text(P0Outposts.place_entry(P0Outposts.by_role("market"), 0))).is_equal("Mission")
+	m._online = {str(tea.id): 3}
+	m._set_outpost_places()
+	_look_fresh(m, Vector2(float(tea.lat), float(tea.lng)), 16.0)
+	var pin: UiMapDestination = city.markers[str(tea.id)].dest
+	assert_int(pin.online).is_equal(3)
+	assert_bool(pin._count.visible).is_true()
+	assert_str(pin.text).is_equal("Oak")
+	var card: Dictionary = m.place_card(P0Outposts.place_entry(tea, 3))
+	assert_str(card.title).is_equal(str(tea.name))
+	assert_array(card.facts).contains([["Online now", "3"]])
+	m._online = {}
+	m._set_outpost_places()
+	_look_fresh(m, Vector2(float(tea.lat), float(tea.lng)), 16.0)
+	assert_bool(pin._count.visible).is_false()
+
+## q(137) ①: the short name drops the type word; a name that is only one stays whole.
+func test_a_short_name_is_the_place_without_its_type() -> void:
+	for pair in [["Willow Pond", "Willow"], ["Reed Creek", "Reed"], ["Elm Cove", "Elm"], ["Maple Market Square", "Maple"],
+			["Oak Tea House", "Oak"], ["Tundra Trading Post", "Tundra"], ["Union Square Travel Post", "Union Square"],
+			["Mission Tackle Shop", "Mission"], ["Homestead", "Homestead"], ["Pond", "Pond"]]:
+		assert_str(P0Map.short_name(pair[0])).is_equal(pair[1])
 
 ## An outpost pin drawn over the player's avatar takes the tap (蒙恬 on C30): it is selected, not the avatar. Since 269
 ## only the pins always in stay on an avatar: at the Oak Tea House the avatar stands beside its pin (where the player
@@ -167,7 +195,7 @@ func test_a_tap_on_an_outpost_over_the_avatar_opens_the_outpost() -> void:
 func _labels(m: Node) -> Dictionary:   # outpost id -> its pin (MapDestination: its name under the disc), on screen
 	var out := {}
 	for mk in (m.city_map as CityMapView).displayed:
-		if mk.entry.kind == "place": out[str(mk.entry.id)] = mk.get("dest", mk.label)
+		if mk.entry.kind == "place" or mk.has("dest"): out[str(mk.entry.id)] = mk.get("dest", mk.label)
 	return out
 
 static func _dest_label_rect(marker: Dictionary) -> Rect2:   # a MapDestination's name, in the city view, as drawn
@@ -202,19 +230,29 @@ func test_outpost_labels_never_overlap_and_keep_clear_of_the_avatar() -> void:
 			assert_bool(bodies.any(func(b): return (b as Rect2).intersects(rects[i]))).append_failure_message("zoom %s" % zoom).is_false()
 			for j in range(i + 1, rects.size()):
 				assert_bool((rects[i] as Rect2).intersects(rects[j])).append_failure_message("zoom %s" % zoom).is_false()
+		# q(137) ⑤: no name shown covers the disc of a pin packed before it (a higher rank)
+		var order: Array = city.displayed.filter(func(mk): return mk.has("dest"))
+		for i in order.size():
+			if not (order[i].dest as UiMapDestination).name_shown: continue
+			var name_rect := _dest_label_rect(order[i])
+			for j in i:
+				var disc := Rect2((order[j].anchor as Vector2) - Vector2(20.0, 40.0), Vector2(40.0, 40.0))
+				assert_bool(name_rect.intersects(disc)).append_failure_message("zoom %s: %s's name on %s" % [zoom,
+					order[i].entry.id, order[j].entry.id]).is_false()
 		assert_int(rects.size()).is_equal(labels.values().filter(func(l): return _shown(l)).size())
 		shown_at[zoom] = labels.values().filter(func(l): return _shown(l)).size()
-	# At the city level not all of the three by home say their names; closer in, around each, its name is back.
-	assert_int(int(shown_at[11.5])).is_less(3)
+	# Closer in, around each of the three by home, its pin is there and its name with it — the tackle shop's pin without
+	# one (q(137) ②).
 	for id in ["sh_tea_1", "sh_market_1", "sh_tackle_1"]:
 		var o := P0Outposts.find(id)
 		_look_fresh(m, Vector2(float(o.lat), float(o.lng)), 16.0)
-		assert_bool(_labels(m).has(id) and _shown(_labels(m)[id])).append_failure_message(id).is_true()
+		assert_bool(_labels(m).has(id)).append_failure_message(id).is_true()
+		assert_bool(_shown(_labels(m)[id])).append_failure_message(id).is_equal(id != "sh_tackle_1")
 	rt.session.view = saved
 
-## q(72) / 不知火舞 on C30: the whole name and who is in, never cut; a selected outpost shows with its label always,
-## even where it would give way (269).
-func test_an_outpost_label_is_whole_and_shows_when_selected() -> void:
+## q(137) ①④: the short name, never more than one line of 96 px; a selected pin shows even where it would give way
+## (269), its name hidden — the card says it whole.
+func test_an_outpost_name_is_short_and_hides_when_selected() -> void:
 	var m := _map()
 	for i in 3: await get_tree().process_frame
 	m.set_process(false)
@@ -224,16 +262,18 @@ func test_an_outpost_label_is_whole_and_shows_when_selected() -> void:
 		var o := P0Outposts.find(id)
 		_look_fresh(m, Vector2(float(o.lat), float(o.lng)), 16.0)
 		var pin: UiMapDestination = _labels(m)[id]
-		assert_str(pin.text).is_equal(("%s · 3 online" % o.name) if id == "sh_tea_1" else str(o.name))
-		assert_float(pin.label_size().x).is_greater_equal(UiMapDestination.label_size_for(pin.text).x)   # the whole name
-	# At the city level the one by home gives way (to the avatar, a pin or a nearer outpost); selected, it shows named.
+		assert_str(pin.text).is_equal(P0Map.short_name(str(o.name)))
+		assert_float(pin.label_size().x).is_equal(UiMapDestination.label_size_for(pin.text, false).x)
+		assert_float(pin.label_size().x).is_less_equal(UiMapDestination.SHORT_MAX_W)
+	# At the city level the one by home gives way (to the avatar, a pin or a higher-ranked one); selected, it shows,
+	# without its name.
 	var home := Vector2(m.home_lat, m.home_lng)
 	var city_level := _look_fresh(m, home, 12.2)
 	var gone: Array = ["sh_tea_1", "sh_market_1", "sh_tackle_1"].filter(func(id): return not city_level.has(id))
 	assert_bool(gone.is_empty()).is_false()
 	city.selected = city.entries.filter(func(e): return str(e.id) == str(gone[0]))[0]
-	_look_fresh(m, home, 12.2)
-	assert_bool(_shown(_labels(m)[str(gone[0])])).is_true()
+	assert_array(_look_fresh(m, home, 12.2)).contains([str(gone[0])])
+	assert_bool(_shown(_labels(m)[str(gone[0])])).is_false()
 	city.selected = {}
 
 ## 不知火舞 on C30 / 234: outpost and pond pins draw in front of the player's own 3D avatar — MapDestination is 2D over
@@ -319,10 +359,10 @@ func test_the_beginner_pond_shows_at_the_city_level_until_pond_catch_is_handed_i
 	city._update_markers()
 	# A MapDestination (SGODOT-234 A2): 2D over the map, so over the player's avatar.
 	var reed: UiMapDestination = city.markers[NEAREST_POND].dest
-	# Its name is written whole: the first session finds its way by it.
+	# Its short name shows (q(137)): the first session finds its way by it.
 	assert_bool(reed.name_shown).is_true()
-	assert_str(reed.text).is_equal(city._label_text(city.markers[NEAREST_POND].entry))
-	assert_float(reed.label_size().x).is_greater_equal(UiMapDestination.label_size_for(reed.text).x)
+	assert_str(reed.text).is_equal("Fern")
+	assert_float(reed.label_size().x).is_equal(UiMapDestination.label_size_for(reed.text, false).x)
 	# My Farm's label never sits on it, measured as drawn — scaled about its pivot by the zoom boost (1.21 at z12.2), the
 	# 5 px 不知火舞 saw past its unscaled rect on the overview. Home at z12.2 and the opening view, both on screen.
 	for zoom in [12.2, m.zoom]:
@@ -337,18 +377,16 @@ func test_the_beginner_pond_shows_at_the_city_level_until_pond_catch_is_handed_i
 		own.position += fm.global_position - city.global_position
 		var reed_label := _dest_label_rect(city.markers[NEAREST_POND])
 		assert_bool(label.visible and own.intersects(reed_label)).append_failure_message("z%.1f" % zoom).is_false()
-	# Both fish in the bag (the target is now the stall), or handed in: no marker, a pond like any other — it gives way
-	# like one (to the Tackle Shop 200 m away, which packs before it).
+	# Both fish in the bag (the target is now the stall), or handed in: no marker, the beginner pond by its rank — the
+	# Tackle Shop 200 m away, ranked last but the silhouettes, gives way to it where they touch (q(137) ⑤).
 	for gone in [_board(2), _board(-1)]:
 		rt.session.view = gone
 		assert_dict(m.city_pin_markers()).is_empty()
 		var tackle := P0Outposts.find("sh_tackle_1")
-		var shown := _look_fresh(m, Vector2(float(tackle.lat), float(tackle.lng)), 12.2)
-		assert_array(shown).contains(["sh_tackle_1"]).not_contains([NEAREST_POND])
-		_assert_clear(m, "no marker")
-		# Drawn like any pond when it shows again: a MapDestination over the avatar, its name whole (LOCK-24).
+		_look_fresh(m, Vector2(float(tackle.lat), float(tackle.lng)), 12.2)
+		assert_int(city._dest_rank(city.markers[NEAREST_POND].entry)).is_less(city._dest_rank(P0Outposts.place_entry(tackle)))
+		_assert_clear(m, "no marker")   # no longer always in: it gives way to the avatar by home, the shop to it
 		assert_bool(city._over_avatar(city.markers[NEAREST_POND].entry)).is_true()
-		assert_bool(city._whole_label(city.markers[NEAREST_POND].entry)).is_true()
 	rt.session.view = saved
 
 ## Once the server sends map_markers (蒙恬, SGODOT-232 U6), the pins pack by them, not by the client's tutorial mark.
@@ -482,15 +520,15 @@ func test_the_selected_pin_draws_over_pins_made_after_it() -> void:
 	assert_int((city.markers["sh_market_1"].node as Node).get_index()).is_equal(top)
 	city.selected = {}
 
-## 不知火舞 on 234 A2: the selected pin's name always shows and the names it touches fold — a marked pin's too — until
-## the card closes; every pin stays.
-func test_a_selected_name_folds_the_names_it_touches() -> void:
+## q(137) ④⑤: the selected pin shows with its name hidden (its card says it whole); a marked pin is always in and so is
+## its name, under its disc; a pin they touch gives way. Every pin stays on its point.
+func test_a_selected_pin_hides_its_name_and_a_marked_one_keeps_its() -> void:
 	var m := _map()
 	for i in 3: await get_tree().process_frame
 	m.set_process(false)
 	var rt: P0Runtime = m.rt
 	var saved: Dictionary = rt.session.view
-	rt.session.view = _board(0)   # Reed Pond wears the !
+	rt.session.view = _board(0)   # Fern Pond wears the !
 	var city: CityMapView = m.city_map
 	var reed := SystemPonds.location(NEAREST_POND)
 	var at := Vector2(float(reed.lat), float(reed.lng))
@@ -499,19 +537,50 @@ func test_a_selected_name_folds_the_names_it_touches() -> void:
 	_look_fresh(m, at, 15.0)
 	var reed_pin: UiMapDestination = city.markers[NEAREST_POND].dest
 	assert_bool(reed_pin.name_shown).is_true()    # nothing selected: the marked pin packs first
-	assert_array(city.displayed.map(func(mk): return str(mk.entry.id))).not_contains(["home"])   # it gives way (269)
+	assert_array(city.displayed.map(func(mk): return str(mk.entry.id))).not_contains(["home"])   # under 36 px: it gives way
 	city.selected = city.entries.filter(func(e): return str(e.get("id", "")) == "home")[0]
 	_look_fresh(m, at, 15.0)
 	var home_pin: UiMapDestination = city.markers["home"].dest
-	assert_bool(home_pin.name_shown).is_true()
-	# The marked one's name, touched under its disc, goes over it (不知火舞 on 234 A2: under, then over, then folded).
-	assert_bool(reed_pin.name_shown and reed_pin.label_above).is_true()
-	assert_float(reed_pin.above_gap).is_equal(UiMapDestination.above_gap_for(true))   # clear of its ! (刘邦 on #111)
-	assert_bool(_dest_label_rect(city.markers[NEAREST_POND]).intersects(_dest_label_rect(city.markers["home"]))).is_false()
 	assert_array(city.displayed.map(func(mk): return str(mk.entry.id))).contains([NEAREST_POND, "home"])
+	assert_bool(home_pin.name_shown).is_false()   # selected: the card says Homestead
+	assert_bool(reed_pin.name_shown).is_true()    # marked: its name never gives way
+	assert_bool(reed_pin.label_above).is_false()  # under its disc only (q(137) ①)
 	city.selected = {}
 	_look_fresh(m, at, 15.0)
 	assert_bool(reed_pin.name_shown).is_true()
+	m._set_outpost_places()
+	rt.session.view = saved
+
+## q(137) ⑤: a name that would cover a higher-ranked disc or name hides and its pin stays; a pin shown last pass holds
+## until 4 px more overlap, so a pan on the edge does not flicker; the order is the rank, whatever the id says.
+func test_names_give_way_before_pins_by_rank_and_hold_by_4_px() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved: Dictionary = rt.session.view
+	rt.session.view = _board(-1)   # no marks
+	var city: CityMapView = m.city_map
+	var at := Vector2(m.home_lat + 0.03, m.home_lng + 0.03)   # clear of home and the outposts
+	var tea := P0Outposts.place_entry(P0Outposts.by_role("tea"))
+	var market := P0Outposts.place_entry(P0Outposts.by_role("market"))
+	_look_fresh(m, at, 15.0)
+	# The market (rank 3) left of the tea house (rank 4), the tea house's id first: 30 px apart they cannot both show
+	var p0 = m.geo_to_screen(at.x, at.y)
+	var p1 = m.geo_to_screen(at.x, at.y + 0.0001)
+	var per := 0.0001 / maxf(0.001, absf((p1 as Vector2).x - (p0 as Vector2).x))   # degrees of longitude per view px
+	var place := func(e: Dictionary, dx: float) -> Dictionary: return e.merged({"lat": at.x, "lng": at.y + dx * per}, true)
+	city.set_places([place.call(market, 0.0), place.call(tea, 30.0)])
+	var shown := _look_fresh(m, at, 15.0)
+	assert_array(shown).contains([str(market.id)]).not_contains([str(tea.id)])
+	# 38 px apart both show; the tea house's name, under its disc, does not cover the market's — both say theirs
+	city.set_places([place.call(market, 0.0), place.call(tea, 38.0)])
+	shown = _look_fresh(m, at, 15.0)
+	assert_array(shown).contains([str(market.id), str(tea.id)])
+	# shown last pass at 38, it holds down to 32 px (4 px more), fresh it would not at 34
+	city.set_places([place.call(market, 0.0), place.call(tea, 34.0)])
+	assert_array(_look(m, at, 15.0, 0.0)).contains([str(tea.id)])
+	assert_array(_look_fresh(m, at, 15.0)).not_contains([str(tea.id)])
 	m._set_outpost_places()
 	rt.session.view = saved
 
@@ -519,27 +588,27 @@ func test_a_selected_name_folds_the_names_it_touches() -> void:
 func after() -> void:
 	P0Runtime.free_instance_for_tests()
 
-## int9 (韩信): a selected outpost by the left edge kept its name partly off screen. A MapDestination's name now slides
-## in to LABEL_EDGE from the screen's sides, its disc staying over the point; the hit rect follows the name.
+## int9 (韩信): an outpost by the left edge kept its name partly off screen. A MapDestination's name slides in to
+## LABEL_EDGE from the screen's sides, its disc staying over the point; the hit rect follows the name.
 func test_a_name_by_the_edge_stays_on_screen() -> void:
 	var m := _map()
 	for i in 3: await get_tree().process_frame
 	m.set_process(false)
 	var city: CityMapView = m.city_map
-	var tackle := P0Outposts.place_entry(P0Outposts.by_role("tackle"), 3)
-	var at := Vector2(float(tackle.lat), float(tackle.lng))
+	var tea := P0Outposts.place_entry(P0Outposts.by_role("tea"), 3)
+	var at := Vector2(float(tea.lat), float(tea.lng))
 	_look(m, at, 15.0, 0.0)
 	var p: Vector2 = m.geo_to_screen(at.x, at.y)
 	m._pan_by(Vector2(18.0 - p.x, 0.0))   # the pin 18 px from the left edge
 	m._update_cameras()
 	m._sync_farm_markers()
-	city.selected = city.entries.filter(func(e): return str(e.get("id", "")) == "sh_tackle_1")[0]
+	city._shown_last.clear()
 	city._update_markers()
-	var mk: Dictionary = city.markers["sh_tackle_1"]
+	var mk: Dictionary = city.markers["sh_tea_1"]
 	if mk.get("pop_tween") is Tween: (mk.pop_tween as Tween).kill()
 	mk.pop = 1.0
-	mk.focus = CityMapView.FOCUS_SCALE   # at its selected size (SGODOT-261): the drawn name is the scaled one
 	city._apply_marker_scale(mk)
+	assert_bool((mk.dest as UiMapDestination).name_shown).is_true()
 	var name_rect := _dest_label_rect(mk)
 	var on_screen := Rect2(name_rect.position + city.global_position, name_rect.size)   # in the screen's coordinates
 	assert_float(on_screen.position.x).is_greater_equal(CityMapView.LABEL_EDGE - 0.5)
@@ -554,15 +623,14 @@ func test_a_name_by_the_edge_stays_on_screen() -> void:
 	m._update_cameras()
 	m._sync_farm_markers()
 	city._update_markers()
-	assert_float((city.markers["sh_tackle_1"].anchor as Vector2).x + city.global_position.x).is_less(0.0)
-	city.selected = {}   # (a selected pin is packed first wherever it is)
-	city._update_markers()
-	assert_bool((city.markers["sh_tackle_1"].dest as UiMapDestination).name_shown).is_false()   # no name without its disc
-	city.selected = {}
+	if city.markers.has("sh_tea_1") and city.displayed.has(city.markers["sh_tea_1"]):
+		assert_float((city.markers["sh_tea_1"].anchor as Vector2).x + city.global_position.x).is_less(0.0)
+		assert_bool((city.markers["sh_tea_1"].dest as UiMapDestination).name_shown).is_false()   # no name without its disc
 
-## 不知火舞 on 234 A2: a name touching another tries over its disc before folding, in C30's order (no outpost has a
-## privilege). In the first session's opening view the market's name, under its disc against the tea house's, goes over.
-func test_a_name_goes_over_its_disc_before_it_folds() -> void:
+## q(137) ①⑤: a name sits only under its disc — no second place over it (234 A2's) — and hides where it would cover a
+## higher-ranked disc or name. In the first session's opening view no two names lie on each other and none is over its
+## disc.
+func test_a_name_sits_under_its_disc_or_hides() -> void:
 	var m := _map()
 	for i in 3: await get_tree().process_frame
 	m.set_process(false)
@@ -573,9 +641,8 @@ func test_a_name_goes_over_its_disc_before_it_folds() -> void:
 	m._sync_farm_markers()
 	var city: CityMapView = m.city_map
 	city._update_markers()
-	var market: UiMapDestination = city.markers["sh_market_1"].dest
-	assert_bool(market.name_shown).is_true()
-	assert_bool(market.label_above).is_true()
+	for mk in city.displayed:
+		if mk.has("dest"): assert_bool((mk.dest as UiMapDestination).label_above).append_failure_message(str(mk.entry.id)).is_false()
 	var rects: Array = city._place_labels
 	for i in rects.size():
 		for j in range(i + 1, rects.size()):

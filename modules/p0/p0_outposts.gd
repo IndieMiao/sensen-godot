@@ -33,10 +33,10 @@ static func by_role(role: String) -> Dictionary:
 		if str(o.role) == role: return o
 	return {}
 
-## A city-map place pin; `online` > 0 adds "· N online" to its label (all rooms together).
+## A city-map place pin; `online` (all rooms together) is its pin's top-right count, none at 0 (q(137) ③).
 static func place_entry(o: Dictionary, online := 0) -> Dictionary:
 	var role := str(o.role)
 	return {"id": str(o.id), "kind": "place", "name": str(o.name), "category": str(o.category),
 		"lat": float(o.lat), "lng": float(o.lng), "art_path": str(PIN_ART.get(role, PIN_ART.tackle)),
 		"action": "Go", "action_icon": "footprints", "filter": "pond",
-		"tag": ("%d online" % online) if online > 0 else ""}
+		"online": online}   # who is in: the pin's top-right count (q(137) ③), the card's Online now

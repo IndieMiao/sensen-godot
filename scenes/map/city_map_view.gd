@@ -97,8 +97,10 @@ var dock: PanelContainer
 ## the Map / Farm / Me dock and the zoom buttons give way. The pin card and the recenter key sit above `bottom_inset`
 ## (the host's bottom row). Journey leaves it off.
 var host_chrome := false: set = set_host_chrome
-## Pins the host draws as MapDestination (P0 MAP-1, LOCK-24): (entry) -> {icon: Texture2D, plate: bool}, {} to keep
-## the art pin. The disc sits over the geographic point, the whole name under it; a map mark goes on the pin itself.
+## Pins the host draws as MapDestination (P0 MAP-1, LOCK-24): (entry) -> {icon: Texture2D, plate: bool, silhouette:
+## bool, label: String (the name under the disc; q(137): P0's short name, "" for none; absent = the whole label),
+## rank: int (the fixed packing order, q(137): lower packs first)}, {} to keep the art pin. The disc sits over the
+## geographic point, the name under it; a map mark goes on the pin itself.
 var destination_style := Callable()
 ## func(entry) -> bool: the host shows its own card for this pin (P0PlaceSheet), so selecting it opens no info panel.
 var host_card := Callable()
@@ -147,6 +149,17 @@ var _art_root: Node3D
 ## Ids displayed last frame: ties in screen-space packing keep the incumbent,
 ## so pan/zoom never flickers between two equally-ranked neighbours.
 var _shown_last: Dictionary = {}
+## MapDestination packing (q(137)): the discs' centres, discs and names placed this pass (all of a higher rank than
+## the pin being placed), and the names shown last pass (they keep their place until 4 px more overlap).
+var _dest_centres: Array = []
+var _dest_discs: Array = []
+var _dest_names: Array = []
+var _dest_names_last: Dictionary = {}
+var _dest_names_now: Dictionary = {}
+## Two discs nearer than this (centre to centre, px) cannot both show: the lower-ranked one hides (q(137)). A pin or
+## name shown last pass hides only at DEST_HOLD px more overlap (no flicker on the edge while panning and zooming).
+const DEST_NEAR := 36.0
+const DEST_HOLD := 4.0
 ## id -> ticks_msec before which a culled marker may not reappear.
 var _hidden_until: Dictionary = {}
 ## The pins are laid out again only when something _update_markers reads has changed since the last layout
@@ -948,7 +961,7 @@ func _make_marker(entry: Dictionary) -> Dictionary:
 	var result := {"node": node, "entry": entry, "rect": Rect2(), "on": false, "pop": 0.0, "focus": 1.0}
 	var dest := _destination(entry)
 	if not dest.is_empty():
-		var pin := UiMapDestination.new(dest.get("icon", null), _label_text(entry), bool(dest.get("plate", false)))
+		var pin := UiMapDestination.new(dest.get("icon", null), _dest_text(entry), bool(dest.get("plate", false)))
 		pin.theme = UiKit.theme()
 		node.add_child(pin)
 		result.dest = pin
@@ -1075,6 +1088,10 @@ func _update_markers() -> void:
 	# or yields entirely. Order: selected, landmarks, residents, then POIs by
 	# incumbency (anti-flicker), source rank and id — fully deterministic.
 	_pack_order(candidates)
+	_dest_centres.clear()
+	_dest_discs.clear()
+	_dest_names.clear()
+	_dest_names_now.clear()
 	var blockers := _player_blockers()
 	var bodies := _player_blockers(true)   # what a space pin gives way to: the avatars' bodies (SGODOT-269)
 	var now := Time.get_ticks_msec()
@@ -1092,6 +1109,7 @@ func _update_markers() -> void:
 	for c in deferred:
 		_place_candidate(c, occupied, blockers, now, bodies)
 	_yield_own_label()
+	_dest_names_last = _dest_names_now.duplicate()
 	var shown := displayed.map(func(m): return str(m.entry.id))
 	var shown_now := {}
 	for id in shown: shown_now[id] = true
@@ -1136,7 +1154,20 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int,
 	var is_selected: bool = selected.get("id", null) == entry.get("id")
 	var incumbent: bool = _shown_last.has(id)
 	var label_fits := true
-	if not is_selected:
+	var dest_pin := not _destination(entry).is_empty()
+	# A MapDestination's three always-in kinds (q(105) / q(137)): the selected pin, a marked one and where the player
+	# is. Nothing hides them, nor their names.
+	var always := is_selected or _marker_of(entry) != "" or (kept_pin.is_valid() and bool(kept_pin.call(entry)))
+	if dest_pin and not always:
+		# q(137): the pins stay on their points and pack by a fixed rank (_pack_key), so every pass gives the same
+		# answer. A disc whose centre is nearer than 36 px to a higher-ranked one shown hides; one shown last pass holds
+		# until 4 px nearer. The avatars' bodies keep their claim (SGODOT-269).
+		var near := DEST_NEAR - (DEST_HOLD if incumbent else 0.0)
+		var centre := _disc_centre(c)
+		for other in _dest_centres:
+			if centre.distance_to(other) < near: return false
+		if _hits(bodies, c.bounds.grow(-PACK_MARGIN if incumbent else PACK_MARGIN)): return false
+	elif not is_selected and not dest_pin:
 		if not incumbent and now < int(_hidden_until.get(id, 0)): return false
 		var probe: Rect2 = c.bounds.grow(-PACK_MARGIN if incumbent else PACK_MARGIN)
 		# 地标相互之间也做遮挡剔除，但不给玩家 pin 让位；其余标记两者都让。
@@ -1170,31 +1201,37 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int,
 				maxf(lo, screen_x0 + screen_w - LABEL_EDGE - c.label_w * c.k))
 			label_rect.position.x = c.point.x + (drawn_x - c.point.x) / c.k
 		else: disc_off_screen = true
-	if entry.kind == "landmark":
+	if dest_pin:
+		# q(137): the short name under the disc only. The selected pin's card says its whole name, so it shows none; a
+		# name that would cover a higher-ranked disc or name hides (the pin stays), one shown last pass at 4 px more.
+		# The always-in kinds keep theirs.
+		var held := label_rect.grow(-DEST_HOLD * 0.5) if _dest_names_last.has(id) else label_rect
+		label_fits = not is_selected and c.label_w > 0.0 and (always or not (_hits(_dest_discs, held)
+			or _hits(_dest_names, held) or _hits(bodies, held)))
+	elif entry.kind == "landmark":
 		label_fits = is_selected or not _hits(occupied, Rect2(c.point - Vector2(c.width * 0.5, -3), Vector2(c.width, 20)))
-	elif entry.kind == "place" or not _destination(entry).is_empty():
-		# An outpost keeps its pin; its label shows unless it would cover a pin or a label placed before it (higher
-		# priority), and comes back once zooming in parts them or the pin is selected (不知火舞 on C30). Any MapDestination
-		# likewise, marked or not: the selected pin packs first, so its name always shows and the names it touches fold
-		# until the card closes (不知火舞 on 234 A2).
-		# A space pin's name keeps clear of the avatars' bodies too, as of the pins (不知火舞 on 269): under, then over.
-		var name_bodies := bodies if not _destination(entry).is_empty() else []
-		label_fits = is_selected or not (_hits(occupied, label_rect) or _hits(name_bodies, label_rect))
-		if not label_fits and not _destination(entry).is_empty():
-			# A MapDestination's name tries over its disc before folding (不知火舞 on 234 A2): the order stays C30's,
-			# no outpost gets a privilege, but the second place often clears a neighbour's name (the market's at home).
-			var over := Rect2(label_rect.position.x, c.point.y - UiMapDestination.DISC - above_gap - c.label_h, c.label_w, c.label_h)
-			if not _hits(occupied, over) and not _hits(name_bodies, over):
-				label_rect = over
-				label_above = true
-				label_fits = true
+	elif entry.kind == "place":
+		# An art place pin (a host without destination_style) keeps its pin; its label shows unless it would cover a
+		# pin or a label placed before it, and comes back once zooming in parts them or the pin is selected (C30).
+		label_fits = is_selected or not _hits(occupied, label_rect)
 	if disc_off_screen: label_fits = false   # no name without its pin on screen
 	# The pin lays its name out unscaled (label_shift); a selected one draws it scaled about its point like every pin's
 	# art (k, SGODOT-261): what packs after it and the taps keep to where it is drawn.
 	var label_shift: float = label_rect.position.x - (c.point.x - c.label_w * 0.5)
 	if not _destination(entry).is_empty() and c.k != 1.0:
 		label_rect = Rect2(c.point + (label_rect.position - c.point) * c.k, label_rect.size * c.k)
-	if entry.kind == "place":
+	if dest_pin:
+		# Its disc (scaled when selected) and its name, if shown: the lower-ranked pins and every POI after it keep
+		# clear of them, and My Farm's label gives way to the name (不知火舞 on #83).
+		occupied.append(c.bounds)
+		_dest_discs.append(c.bounds)
+		_dest_centres.append(_disc_centre(c))
+		if label_fits:
+			occupied.append(label_rect)
+			_dest_names.append(label_rect)
+			_place_labels.append(label_rect)
+			_dest_names_now[id] = true
+	elif entry.kind == "place":
 		occupied.append(Rect2(c.point - Vector2(c.art_w * 0.5, c.art_h), Vector2(c.art_w, c.art_h)))
 		if label_fits:
 			occupied.append(label_rect)
@@ -1203,13 +1240,9 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int,
 		occupied.append(c.bounds)
 		# A marked pin's whole label reaches past its bounds: what comes after keeps clear of it too, and My Farm's label
 		# gives way to it as to an outpost's (不知火舞 on #83).
-		var dest_name := not _destination(entry).is_empty()
-		if _marker_of(entry) != "" and (label_fits or not dest_name):
+		if _marker_of(entry) != "":
 			occupied.append(label_rect)
 			if entry.kind != "poi" or is_selected or host.zoom >= 16: _place_labels.append(label_rect)
-		elif dest_name and label_fits:
-			occupied.append(label_rect)   # a MapDestination's whole name: what comes after keeps clear of it
-			if is_selected: _place_labels.append(label_rect)
 	if not markers.has(id):
 		markers[id] = _make_marker(entry)
 		# Selected before its pin was made (Show on map flies, then selects): the same jelly a tap plays (SGODOT-261).
@@ -1230,7 +1263,8 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int,
 		pin.icon = dest.get("icon", null)
 		pin.plate = bool(dest.get("plate", false))
 		pin.silhouette = bool(dest.get("silhouette", false))   # a fogged city's place: the glyph alone (MAP-2)
-		pin.text = _label_text(entry)
+		pin.text = _dest_text(entry)
+		pin.online = int(entry.get("online", 0))   # who is in: the top-right count, none at 0 (q(137))
 		pin.name_shown = label_fits
 		pin.above_gap = above_gap
 		pin.label_above = label_above
@@ -1351,16 +1385,35 @@ func _pack_order(candidates: Array) -> void:
 	candidates.sort_custom(func(a, b): return a.key < b.key)
 
 func _pack_key(c: Dictionary) -> Array:
+	var sel := 0 if selected.get("id", null) == c.entry.get("id") else 1
+	# MapDestinations (P0's places and ponds) pack before every other pin, by a fixed rank and then id (q(137)), so
+	# every pass gives the same answer: the always-in kinds, then the host's rank (beginner pond … silhouette).
+	if not _destination(c.entry).is_empty(): return [sel, 0, _dest_rank(c.entry), c.id]
 	# A host place (P0 outpost) goes before everything but the selected pin and a pin wearing a map marker (蒙恬 on
 	# C30): the city level shows every outpost (q(72)). Journey has no place pins, so its order is unchanged.
 	# Outposts among themselves: nearest home first, then id (不知火舞 on C30) — geography, so panning never reorders them.
-	return [0 if selected.get("id", null) == c.entry.get("id") else 1,
+	return [sel, 1,
 		int(MARKER_ORDER.get(_marker_of(c.entry), MARKER_ORDER.size())),
 		KIND_ORDER.get(c.entry.kind, 3),
 		_home_distance(c.entry) if c.entry.kind == "place" else 0.0,
 		0 if _shown_last.has(c.id) else 1,
 		float(c.entry.get("rank", 5)),
 		c.id]
+
+## A MapDestination's packing rank (q(137)): 0 for the always-in kinds (a marked pin, where the player is), else its
+## style's (P0: 1 beginner pond … 7 silhouette), 1 when it gives none.
+func _dest_rank(entry: Dictionary) -> int:
+	if _marker_of(entry) != "" or (kept_pin.is_valid() and bool(kept_pin.call(entry))): return 0
+	return int(_destination(entry).get("rank", 1))
+
+## A MapDestination's name: its style's (P0's short name, q(137)) or the whole label.
+func _dest_text(entry: Dictionary) -> String:
+	var d := _destination(entry)
+	return str(d.label) if d.has("label") else _label_text(entry)
+
+## The centre of a MapDestination's disc as packed (its bounds: the disc, scaled when selected).
+static func _disc_centre(c: Dictionary) -> Vector2:
+	return (c.bounds as Rect2).get_center()
 
 ## The map marker a pin wears (q(48): "deliverable" / "request" / "new"), "" for none.
 func _marker_of(entry: Dictionary) -> String:
@@ -1378,7 +1431,8 @@ func _over_avatar(entry: Dictionary) -> bool:
 func _pin_metrics(entry: Dictionary, is_sel := false) -> Dictionary:
 	if not _destination(entry).is_empty():
 		# a silhouette pin has no name: nothing of it packs under the disc
-		var ls := Vector2.ZERO if bool(_destination(entry).get("silhouette", false)) else UiMapDestination.label_size_for(_label_text(entry))
+		var d := _destination(entry)
+		var ls := Vector2.ZERO if bool(d.get("silhouette", false)) else UiMapDestination.label_size_for(_dest_text(entry), bool(d.get("plate", false)))
 		return {width = UiMapDestination.DISC, art_side = UiMapDestination.DISC, top = UiMapDestination.DISC,
 			label_h = ls.y, label_w = ls.x, art_w = UiMapDestination.DISC}
 	var width := 82.0 if entry.kind == "landmark" else 78.0 if entry.kind == "resident" else 48.0
