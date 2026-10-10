@@ -172,3 +172,27 @@ func test_a_card_asking_while_the_maps_read_is_out_still_fills_in() -> void:
 	assert_array(counts.call()).is_equal(["2", "2", "9"])
 	assert_array(m.city_map.extra_places.map(func(e): return str(e.id))).contains(["gn-1850147~market0"])   # the map's too
 	rt.ui.close_modal()
+
+## A cross-city request's Show on map (苏烈, SGODOT-284): `outpost:gn-…~market0` of a city not read yet reads it, pins
+## it, then flies there; the same from another scene through after_leave.
+func test_show_on_map_reads_another_city_then_flies_to_its_pin() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var asked: Array = []
+	rt.session.transport = func(_m: int, path: String, _b: Dictionary, cmd: Dictionary):
+		if str(cmd.get("type", "")) == "city": asked.append(path)
+	assert_dict(m.place_for("outpost:gn-1850147~market0")).is_empty()   # not read: no pin known
+	m.show_place("outpost:gn-1850147~market0")
+	assert_array(asked).is_equal(["/p0/city/gn-1850147"])
+	P0CityPlaces.accept(TOKYO, CITY)   # the answer: pinned, then the flight
+	assert_array(m.city_map.extra_places.map(func(e): return str(e.id))).contains(["gn-1850147~market0"])
+	assert_float(float(m.place_for("outpost:gn-1850147~market0").lat)).is_equal_approx(35.684175, 0.000001)
+	assert_str(str(m.place_for("pond:gn-1850147~pond0").name)).is_equal("Willow Pond")
+	m.show_place("outpost:gn-1850147~market0")   # read: no second request
+	assert_int(asked.size()).is_equal(1)
+	# from another scene: after_leave carries it to the map, which accepts the unread target
+	P0CityPlaces.clear()
+	rt.after_leave = "show:outpost:gn-1850147~post0"
+	assert_bool(m._take_after_leave()).is_true()
