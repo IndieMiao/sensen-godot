@@ -493,6 +493,13 @@ func top_y() -> float:
 # ---------------------------------------------------------------- Big Pot Double (b84a5e01 ③)
 func is_double() -> bool: return bool(doubles.get(stove_index, false))
 ## Whether the Double the player sees is on and usable for what is selected (the pot card's ×2 follows it).
+## Shots / tests: the Double toggle switched as a tap does (the pot card follows through double_changed).
+func dev_double(on: bool) -> void:
+	var t := _book_double if tab == "cookbook" else _exp_double
+	if t == null or not t.visible or not t.enabled: return
+	t.on = on
+	t.toggled.emit(on)
+
 func big_pot_shown() -> bool:
 	var t := _book_double if tab == "cookbook" else _exp_double
 	return t != null and t.visible and t.enabled

@@ -151,19 +151,29 @@ func test_a_legendary_page_shows_the_buff_capsule_on_the_state_line() -> void:
 	for other in [b, nav]:
 		if (other as Control).visible: assert_bool(cap.get_global_rect().intersects((other as Control).get_global_rect())).is_false()
 
-## 不知火舞 02ad95bc ①: stove buttons that crowd (< 44 px apart) go in a row 1 / 2 / 3, 44 apart, centred; the open
-## strip's neighbours step out past half its width.
+## 不知火舞 02ad95bc ①: stove buttons that crowd (< 44 px apart) go in a row 1 / 2 / 3, 44 apart, centred; with a strip
+## open, the buttons before its stove step left of the strip and those after it right of it, all kept on screen.
 func test_crowded_stove_buttons_go_in_a_row() -> void:
 	var FH := preload("res://scenes/p0/rooms/p0_farmhouse.gd")
 	var spots := {"use_stove_1": Vector2(92, 309), "use_stove_2": Vector2(105, 317), "use_stove_3": Vector2(115, 300)}
-	var row: Dictionary = FH.stove_row(spots, [0, 1, 2], -1, 0.0)
+	var row: Dictionary = FH.stove_row(spots, [0, 1, 2], -1, Rect2(), 540.0)
 	assert_float(row.use_stove_1.y).is_equal(300.0)
 	assert_float(row.use_stove_2.x - row.use_stove_1.x).is_equal(44.0)
 	assert_float(row.use_stove_3.x - row.use_stove_2.x).is_equal(44.0)
 	assert_float((row.use_stove_1.x + row.use_stove_3.x) * 0.5).is_equal_approx((92.0 + 105.0 + 115.0) / 3.0, 0.01)
-	var open: Dictionary = FH.stove_row(spots, [0, 1, 2], 1, 160.0)   # stove 2's strip is 160 wide
-	assert_float(open.use_stove_2.x - open.use_stove_1.x).is_equal(106.0)   # 80 + 22 + 4
-	assert_float(open.use_stove_3.x - open.use_stove_2.x).is_equal(106.0)
+	# stove 2's strip open to the right, 188 wide from its button
+	var strip := Rect2(row.use_stove_2.x - 19.0, 284, 188, 32)
+	var open: Dictionary = FH.stove_row(spots, [0, 1, 2], 1, strip, 540.0, 19.0)
+	var s2_left: float = open.use_stove_2.x - 19.0
+	assert_float(open.use_stove_1.x + 22.0).is_less_equal(s2_left)
+	assert_float(open.use_stove_3.x - 22.0).is_greater_equal(s2_left + 188.0)
+	# stove 3's strip (210 wide) near the left edge: the block moves right so 1 and 2 fit before it, none under it
+	var s3 := Rect2(12, 284, 210, 32)
+	var shifted: Dictionary = FH.stove_row(spots, [0, 1, 2], 2, s3, 540.0, 19.0)
+	assert_float(shifted.use_stove_1.x).is_greater_equal(22.0)
+	var strip_left: float = shifted.use_stove_3.x - 19.0
+	assert_float(shifted.use_stove_2.x + 22.0).is_less_equal(strip_left)
+	assert_float(strip_left + 210.0).is_less_equal(540.0 - 22.0 + 22.0)
 
 ## ④: the pot card's corner tag (`×2` with Double on) shows in its top right and takes no layout room.
 func test_pot_card_tag_sits_in_the_corner() -> void:
