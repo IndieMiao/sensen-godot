@@ -96,6 +96,11 @@ case "$step" in
     say "docker build p0-server:$sha on the devserver"
     dev "cd ~/$dir && docker build -f server/deploy/p0/Dockerfile -t p0-server:$sha ." 2>&1 | tail -5
     dev "docker images p0-server:$sha --format '{{.Repository}}:{{.Tag}} {{.Size}} {{.ID}}'" | tee "$out/image.txt"
+    # Every file the server reads at start is in the image and the content loads with its city clusters: a missing
+    # member table ends the process at start (李元芳, 0.2.0), so it stops the build here, not on Hong Kong.
+    say "start-up data in the image (tools/p0_image_check.ts)"
+    dev "docker run --rm --entrypoint ./node_modules/.bin/tsx p0-server:$sha tools/p0_image_check.ts" | tee -a "$out/image.txt" \
+      || { echo "image check failed: see $out/image.txt" >&2; exit 1; }
     echo "$sha" > "$out/sha.txt"
     ;;
   transfer)
