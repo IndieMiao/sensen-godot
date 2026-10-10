@@ -481,6 +481,9 @@ func _on_state(v: Dictionary, events: Array) -> void:
 					floats.append(part)
 			"item":
 				var iid := str(ev.id)
+				if P0Decor.is_decor(iid) and int(ev.delta) > 0:   # bought at the stall, into Farm Storage (SGODOT-284)
+					ui.toast_decor_bought(iid)
+					continue
 				if iid.begins_with("dish_"): _call("p0_event", [ev, v])   # where a collected dish went (the kitchen's Keep toast)
 				if int(ev.delta) > 0 and (claimed or (not crafted and not iid.begins_with("seed_") and not iid.begins_with("dish_") and not iid.begins_with("fish_"))):
 					floats.append({kind = "item", key = iid, amount = int(ev.delta), fmt = "%s " + P0Logic.item_name(v, iid),

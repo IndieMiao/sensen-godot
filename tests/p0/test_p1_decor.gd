@@ -115,3 +115,31 @@ func test_a_yard_full_of_decor_walls_nothing_off() -> void:
 	assert_bool(reach.call(cell.call(P0Garden.ANCHORS.mine) + Vector3(-0.3, 0, 0.3), P0FarmMaterials.MOUTH_REACH)).override_failure_message("the mine mouth").is_true()
 	for id in ["spot_grove", "spot_rock_pile", "spot_reed_bank", "spot_clay_bank", "spot_herb_patch", "workbench"]:
 		assert_bool(reach.call(cell.call(P0Garden.ANCHORS[id]), P0FarmMaterials.SPOT_REACH - 0.3)).override_failure_message(id).is_true()
+
+## FARM-6-DECOR (Figma 2187:33369): the stall's Decor page — its tab, its fact line, the rows' four states.
+func test_the_stall_decor_page_lists_the_pieces_in_their_states() -> void:
+	var v := {"coins": 80, "homestead": {"level": 2}, "rest": {"resets_in": 33120000},
+		"decor": {"placed": [], "cap": 24, "used": 0, "stored": {"deco_fence": 6}},
+		"shops": {"homestead": {"buy": [
+			{"id": "seed_radish", "price": 4},
+			{"id": "deco_scarecrow", "price": 80, "need": 80, "homestead": 1, "homestead_ok": true, "left": 1, "daily": 1},
+			{"id": "deco_fence", "price": 90, "need": 90, "homestead": 1, "homestead_ok": true, "left": 0, "daily": 1},
+			{"id": "deco_birdbath", "price": 120, "need": 120, "homestead": 1, "homestead_ok": true, "left": 1, "daily": 1},
+			{"id": "deco_windmill", "price": 250, "need": 250, "homestead": 3, "homestead_ok": false, "left": 1, "daily": 1}]}}}
+	for i in 12: v.decor.placed.append({"uid": i + 1, "id": "deco_planter", "x": 99, "y": i, "rot": 0})
+	var d := P0CounterDrawer.new(v, "homestead", {}, "decor")
+	assert_array(d.offers().map(func(o): return str(o.id))).is_equal(["deco_scarecrow", "deco_fence", "deco_birdbath", "deco_windmill"])
+	assert_str(d._decor_line.text).is_equal("Decor 12/24 · Goes to Farm Storage")
+	assert_bool(d._decor_line.visible).is_true()
+	assert_bool(d._scope.visible).is_false()   # nothing is sold on this page
+	d.set_section("buy")
+	assert_array(d.offers().map(func(o): return str(o.id))).is_equal(["seed_radish"])
+	assert_bool(d._decor_line.visible).is_false()
+	d.free()
+	var row := func(id: String) -> Array:
+		var s := P0ItemInfo.spec(v, id, &"counter_buy", {counter = "homestead"})
+		return [s.facts, (s.buttons as Array).map(func(b): return "%s:%s" % [b.kind, b.label])]
+	assert_array(row.call("deco_scarecrow")).is_equal([["1×1 · Shoos crows"], ["secondary:Buy"]])
+	assert_array(row.call("deco_fence")).is_equal([["6 pieces", "In storage ×6"], ["unavailable:Bought today · 9h 12m"]])
+	assert_array(row.call("deco_birdbath")).is_equal([["1×1 · Birds drop by"], ["unavailable:Need 40 more coins"]])
+	assert_array(row.call("deco_windmill")).is_equal([["2×2 · Spins in wind", "1 level to go"], ["unavailable:Homestead Lv3 needed"]])

@@ -50,6 +50,7 @@ var _mine := Vector3.ZERO
 var _bench := Vector3.ZERO   # the rest bench by the farmhouse (FARM-7, q(30)): Basic Room's bench.glb
 var _materials: P0FarmMaterials   # SGODOT-231: mine mouth, gathering spots and the workbench
 var _facilities: P0FarmFacilities   # P1 SGODOT-241: sprinklers, placement mode, Coverage
+var _decor: P0FarmDecor             # P1 SGODOT-284: the yard's decor, Decorate
 var _card := ""   # LOCK-07 v2: the one facility whose name strip is open this frame (P0Garden.pick_card)
 var _strip_side := UiWorldNameBar.Dir.RIGHT   # the side the strip opens to: the way the character faces on screen
 var _focus := Vector3.ZERO
@@ -373,6 +374,12 @@ func _fly(to: Vector3) -> void:
 	_fly_to = to
 	_fly_left = PLACE_FLY_S
 
+## Decorate's entries (SGODOT-284): Farm Storage's Place and the stall toast's Place now pick a piece; HOME-1's
+## Decorate › ("") opens the mode with nothing picked.
+func _on_decor_requested(item: String) -> void:
+	if item == "": _decor.begin_decorate()
+	else: _decor.begin_place(item)
+
 ## Move the focus by a ground delta (edge pan, two-finger pan), kept in the yard.
 func placement_pan(d: Vector3) -> void:
 	if not _placing_cam or _fly_left > 0.0: return
@@ -469,7 +476,12 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 		_facilities = P0FarmFacilities.new().setup(self)
 		add_child(_facilities)
 	_facilities.frame(v, dt)
-	if not _facilities.placing.is_empty(): return   # placement mode: no bed, key, card or prompt (q(23))
+	if _decor == null and bp != null and cam != null and actor != null:
+		_decor = P0FarmDecor.new().setup(self)
+		add_child(_decor)
+		rt.ui.decor_requested.connect(_on_decor_requested)
+	_decor.frame(v, dt)
+	if not _facilities.placing.is_empty() or not _decor.placing.is_empty(): return   # placement mode: no bed, key, card or prompt (q(23))
 	_pick_front(v)
 	# The key is Farming here even at the mine mouth: the mouth is tapped like any facility (SGODOT-266, user on 263 ③).
 	rt.ui.set_action(P0Logic.main_action(v, _front, rt.ui.selected_seed, _row))
@@ -774,6 +786,18 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"placesecond": rt.ui.set_placement({"secondary": step[1] if step.size() > 1 else ""})   # the bar's middle key (Decorate's Rotate)
 		"placereason": rt.ui.set_placement({"reason": step[1] if step.size() > 1 else ""})   # a refusal as Decorate's would read
 		"placeconfirm": rt.ui.set_placement({"confirm": step[1]})
+		# P1 Decorate (SGODOT-284): decor:<item> picks a piece from storage, decorate opens the mode with nothing picked,
+		# decorat:<x>:<y> moves the preview to a cell as a finger would, decortap:<x>:<y> taps a cell in Decorate,
+		# decorrot presses Rotate.
+		"decor": rt.ui.decor_requested.emit(step[1] if step.size() > 1 else "deco_planter")
+		"decorate": rt.ui.decor_requested.emit("")
+		"decorat", "decortap":
+			var at := cam.unproject_position(bp.cell_to_world(Vector2i(int(step[1]), int(step[2]))))
+			if step[0] == "decorat": rt.ui.placement_point.emit(at, "drag")
+			else:
+				rt.ui.placement_point.emit(at, "press")
+				rt.ui.placement_point.emit(at, "release")
+		"decorrot": rt.ui.placement_secondary.emit()
 		"factap":
 			for f in rt.session.current().get("facilities", []):
 				if int(f.get("id", 0)) == int(step[1]): _facilities.open_card(f)
