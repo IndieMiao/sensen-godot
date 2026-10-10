@@ -100,8 +100,10 @@ static func request_of(view: Dictionary, id: String) -> Dictionary:
 			if str(d.get("id", "")) == id: def = d
 		var need: Dictionary = def.get("need", {})
 		var item := str(need.get("id", ""))
+		var style := str(need.get("style", ""))
 		return {"id": id, "title": str(def.get("title", id)), "item": item,
-			"need_name": _need_name(view, str(q.get("kind", need.get("kind", ""))), [item] if item != "" else [], q.get("rarity", null)),
+			"need_name": ("%s dishes" % style) if style != "" and item == ""
+				else _need_name(view, str(q.get("kind", need.get("kind", ""))), [item] if item != "" else [], q.get("rarity", null)),
 			"have": int(q.get("have", 0)), "qty": int(q.get("qty", 1)), "ready": bool(q.get("ready", false)),
 			"tracked": str(rv.get("request_state", "")) == "accepted", "deliver": "Deliver to %s" % resident_name(str(rid))}
 	return {}

@@ -1,7 +1,9 @@
 /**
- * Residents Pip and Old Kai (plan §9.4.3–9.4.4, §3.4.5, §7.6.3; Li Bai on SGODOT-228 b7d8b665 / 719ce953 / 4be9eb7d):
- * affinity in five stages (P0 counts and shows them), a first chat a day, one gift a day, the day's single gift meal
- * across all residents, and each resident's request line. Requests pay coins against the daily bonus cap, never XP.
+ * Residents (plan §9.4.3–9.4.4, §3.4.5, §7.5.3, §7.6.3; Li Bai on SGODOT-228 b7d8b665 / 719ce953 / 4be9eb7d; P1
+ * SGODOT-284): affinity in five stages, a first chat a day, one gift a day, the day's single gift meal across all
+ * residents, a weekly lesson from Familiar and each resident's request line. Requests pay coins against the daily bonus
+ * cap and may carry a one-time reward (an item, a recipe page, a title), never XP. Everything counts per resident, in
+ * whichever city or outpost the player meets them.
  */
 import { count, take } from './bag.js';
 import { dishParts, itemKind, recipeById, type P0Content, type ResidentDef, type ResidentRequest } from './content.js';
@@ -38,14 +40,26 @@ function addAffinity(c: P0Content, s: P0State, id: string, delta: number, reason
 }
 
 /** The resident's next request, or why there is none: done for today, a stage away, or none left. */
-export function requestState(c: P0Content, s: P0State, id: string): { req: ResidentRequest | null; state: 'open' | 'accepted' | 'wait' | 'stage' | 'none'; need_stage?: string } {
+export function requestState(c: P0Content, s: P0State, id: string, now?: number): { req: ResidentRequest | null; state: 'open' | 'accepted' | 'wait' | 'stage' | 'none'; need_stage?: string } {
   const def = residentDef(c, id)!, r = residentState(s, id);
   if (r.req) return { req: def.requests.find(q => q.id === r.req!.id) ?? null, state: 'accepted' };
   const next = def.requests[r.next];
   if (!next) return { req: null, state: 'none' };
   if (def.one_per_day && r.done_day === s.day.key) return { req: next, state: 'wait' };
+  if (!def.one_per_day && r.done_at !== undefined && now !== undefined && now < r.done_at + nextGap(c)) return { req: next, state: 'wait' };
   if (stageIndex(c, r.affinity) < stageAt(c, next.stage)) return { req: next, state: 'stage', need_stage: next.stage };
   return { req: next, state: 'open' };
+}
+
+const H = 3_600_000, DAY = 24 * H;
+/** §9.6.1: the next personal request opens 24 h after the last one is done (P0's Pip and Old Kai: the next player day). */
+const nextGap = (c: P0Content) => (c.affinity.next_request_h ?? 24) * H;
+
+/** When the resident's next request opens (state wait), in ms from now. */
+export function requestOpensIn(c: P0Content, s: P0State, id: string, now: number): number {
+  const def = residentDef(c, id)!, r = residentState(s, id);
+  if (def.one_per_day || r.done_at === undefined) return untilRollover(c, now);
+  return Math.max(0, r.done_at + nextGap(c) - now);
 }
 
 /** Units the bag holds for a resident request (sow requests count plots sown since accepting). */
@@ -85,12 +99,22 @@ export function talk(c: P0Content, s: P0State, cmd: { resident?: unknown }, now:
   return null;
 }
 
+/**
+ * Does the resident like this dish (§7.16.3)? `likes` is a style (`Soup`) or a rarity and up (`Fine+`: Hana, `Rare+`:
+ * Mira and Tomo, by rarity_names).
+ */
+export function likesDish(c: P0Content, def: ResidentDef, style: string | undefined, rarity: number): boolean {
+  if (!def.likes.endsWith('+')) return style === def.likes;
+  const floor = c.rarity_names.indexOf(def.likes.slice(0, -1)) + 1;
+  return floor > 0 && rarity >= floor;
+}
+
 /** §7.6.3 / §9.4.4: liked style and ≥ Fine +3, liked +2, any dish +1; Perfect +1 (cap 4); Cooking Lv9 +1 (cap 5); Mystery Dish −2. */
 export function giftPoints(c: P0Content, s: P0State, def: ResidentDef, item: string): { delta: number; verdict: string } {
   const g = c.affinity.gift, { base, quality } = dishParts(item);
   if (base === c.cooking.mystery.id) return { delta: g.mystery, verdict: 'not_a_fan' };
   const recipe = recipeById(c, base)!;
-  const liked = recipe.style === def.likes;
+  const liked = likesDish(c, def, recipe.style, recipeRarity(c, recipe));
   let delta = liked && recipeRarity(c, recipe) >= 2 ? g.loved_fine : liked ? g.liked : g.any;
   const verdict = delta === g.loved_fine ? 'loved' : delta === g.liked ? 'liked' : 'received';
   let cap = g.cap;
@@ -123,11 +147,11 @@ export function residentRequestCommand(c: P0Content, s: P0State, type: 'accept' 
   const owner = Object.keys(c.residents).find(id => c.residents[id].requests.some(q => q.id === reqId));
   if (!owner) return { code: s.req_done.includes(reqId) ? 'request_done' : 'bad_request' };
   if (type === 'drop') return { code: 'cannot_drop' };
-  const st = requestState(c, s, owner), r = residentState(s, owner);
+  const st = requestState(c, s, owner, now), r = residentState(s, owner);
   if (st.req?.id !== reqId) return { code: s.req_done.includes(reqId) ? 'request_done' : 'not_available' };
   if (type === 'accept') {
     if (st.state === 'accepted') return { code: 'already_accepted' };
-    if (st.state === 'wait') return { code: 'request_wait', detail: { next_in: untilRollover(c, now) } };
+    if (st.state === 'wait') return { code: 'request_wait', detail: { next_in: requestOpensIn(c, s, owner, now) } };
     if (st.state === 'stage') return { code: 'request_stage', detail: { stage: st.need_stage } };
     if (trackedCount >= c.requests.track_max) return { code: 'track_limit', detail: { max: c.requests.track_max } };
     r.req = { id: reqId, at: now, progress: 0 };
@@ -155,9 +179,57 @@ export function residentRequestCommand(c: P0Content, s: P0State, type: 'accept' 
   r.req = null;
   r.next += 1;
   r.done_day = s.day.key;
+  r.done_at = now;
   noteDone(s, reqId);
   events.push({ kind: 'coins', delta: coins }, { kind: 'request', id: reqId, status: 'done', coins, bonus });
   addAffinity(c, s, owner, c.affinity.request, 'request', events);
+  if (q.reward) grantReward(c, s, owner, q, now, events);
+  return null;
+}
+
+/**
+ * A story request's one-time reward (§9.6.1, §9.4.4 Trusted): the item goes to the bag (or the Inbox when full), a
+ * recipe page turns Tasted, a title is kept with the one-time rewards. Granted once per request id.
+ */
+function grantReward(c: P0Content, s: P0State, owner: string, q: ResidentRequest, now: number, events: P0Event[]): void {
+  const rw = q.reward!, def = residentDef(c, owner)!;
+  const items: [string, number][] = [];
+  if (rw.item) items.push(rw.item);
+  if (rw.recipe && !s.cookbook.includes(rw.recipe)) {
+    items.push([`recipe:${rw.recipe}`, 1]);
+    events.push({ kind: 'lesson', resident: owner, recipe: rw.recipe, from: 'request' });
+  }
+  const bagged = grantItems(c, s, now, `req:${q.id}`, `${def.name}'s thanks`, items, events);
+  if (bagged) for (const [id, n] of Object.entries(bagged)) events.push({ kind: 'item', id, delta: n });
+  if (rw.title && !s.rewards.includes(`title:${rw.title}`)) {
+    s.rewards.push(`title:${rw.title}`);
+    events.push({ kind: 'title', id: rw.title, resident: owner });
+  }
+}
+
+/** The lesson the resident could teach now (§7.5.3 Taught), or why not. */
+export function lessonState(c: P0Content, s: P0State, id: string, now: number): { state: 'ready' | 'wait' | 'stage' | 'none'; recipe?: string; next_in?: number; need_stage?: string } {
+  const def = residentDef(c, id)!, l = c.affinity.lesson;
+  if (!l || !def.teaches?.length) return { state: 'none' };
+  const pages = def.teaches.filter(p => recipeById(c, p) && !s.cookbook.includes(p));
+  if (!pages.length) return { state: 'none' };
+  if (stageIndex(c, residentState(s, id).affinity) < stageAt(c, l.stage)) return { state: 'stage', need_stage: l.stage };
+  const at = residentState(s, id).lesson_at;
+  if (at !== undefined && now < at + l.every_days * DAY) return { state: 'wait', next_in: at + l.every_days * DAY - now };
+  return { state: 'ready', recipe: pages[0] };
+}
+
+/** `learn`: the resident shows the player one page of their style (Tasted, never Discovered: cooking it is still theirs to do). */
+export function learn(c: P0Content, s: P0State, cmd: { resident?: unknown }, now: number, events: P0Event[]): Refusal | null {
+  const id = String(cmd.resident ?? '');
+  if (!residentDef(c, id)) return { code: 'bad_resident' };
+  const st = lessonState(c, s, id, now);
+  if (st.state === 'none') return { code: 'no_lesson' };
+  if (st.state === 'stage') return { code: 'lesson_stage', detail: { stage: st.need_stage } };
+  if (st.state === 'wait') return { code: 'lesson_wait', detail: { next_in: st.next_in } };
+  s.cookbook.push(st.recipe!);
+  residentState(s, id).lesson_at = now;
+  events.push({ kind: 'lesson', resident: id, recipe: st.recipe!, from: 'lesson' });
   return null;
 }
 

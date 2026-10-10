@@ -1232,8 +1232,15 @@ static func resident_bar(view: Dictionary, id: String) -> Dictionary:
 		"next": str(r.get("next_stage", "")) if r.get("next_stage", null) != null else "",
 		"line": line, "gift_reason": gift_reason,
 		"request_label": label, "request_reason": reason, "request_cmd": cmd,
-		"meal": meal == "given" and not gift_meal(view, id).is_empty(), "meal_note": note, "lesson": false,
+		"meal": meal == "given" and not gift_meal(view, id).is_empty(), "meal_note": note,
+		# §7.5.3 Taught: Recipe lesson shows only when one is ready now; the server picks the page.
+		"lesson": str(r.get("lesson", {}).get("state", "none")) == "ready" if r.get("lesson", null) is Dictionary else false,
 	}
+
+## A resident's favourite as words (§7.16.3): a style stays as it is (`Dessert`); a rarity and up reads
+## `Fine dishes and up` (Hana; Mira and Tomo `Rare dishes and up`).
+static func likes_text(likes: String) -> String:
+	return ("%s dishes and up" % likes.trim_suffix("+")) if likes.ends_with("+") else likes
 
 ## The affinity stage's place in content affinity.stages (Stranger 0 … Kindred 4; 0 for a name it does not know): the
 ## stage label's tone follows it (用户 on 225 验收, 不知火舞's palette).
@@ -1267,11 +1274,21 @@ static func _has_dish(view: Dictionary) -> bool:
 ## land yet says the level first, `Fishing Lv4 needed` (q(104)), not `Need 1 more Rare fish`.
 static func _request_gap(view: Dictionary, req: Dictionary) -> String:
 	var left := maxi(0, int(req.get("qty", 0)) - int(req.get("have", 0)))
+	var item := str(req.get("item", "")) if req.get("item", null) != null else ""
 	match str(req.get("kind", "")):
 		"sow": return "Plant %d more plot%s" % [left, "" if left == 1 else "s"]
-		"dish": return "Need %d more dish%s" % [left, "" if left == 1 else "es"]
+		"dish":
+			if item != "": return "Need %d more %s" % [left, item_name(view, item)]
+			var style := str(req.get("style", "")) if req.get("style", null) != null else ""
+			if style != "": return "Need %d more %s dish%s" % [left, style, "" if left == 1 else "es"]
+			return "Need %d more dish%s" % [left, "" if left == 1 else "es"]
+		"crop", "material":
+			if item != "": return "Need %d more %s" % [left, plural(item_name(view, item)) if left > 1 else item_name(view, item)]
+			return "Need %d more %s" % [left, "crops" if str(req.kind) == "crop" else "materials"]
 		"fish":
-			var short := fish_level_short(view, [], req.get("rarity", null))
+			var short := fish_level_short(view, [item] if item != "" else [], req.get("rarity", null))
+			if short > 0: return "Fishing Lv%d needed" % short
+			if item != "": return "Need %d more %s" % [left, item_name(view, item)]
 			if short > 0: return "Fishing Lv%d needed" % short
 			var rarity := int(req.get("rarity", 0)) if req.get("rarity", null) != null else 0
 			var names: Array = content().get("rarity_names", [])

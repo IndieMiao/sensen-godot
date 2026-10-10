@@ -146,3 +146,30 @@ func test_resident_bar_gift_and_meal() -> void:
 	assert_bool(bool(P0Logic.resident_bar(given, "res_pip").meal)).is_true()
 	assert_str(P0Logic.resident_reply("res_old_kai", "not_a_fan")).is_equal("Hm. That's… a choice.")
 	assert_str(P0Logic.resident_reply("res_pip", "loved")).is_equal("")
+
+## SGODOT-284 P1: requests naming one item or a dish style write it on the button and the card (Granny Wu's Wood,
+## her Soup; Theo's Carrots), and Recipe lesson shows only when the server says one is ready.
+func test_p1_request_gaps_name_the_item_or_the_style() -> void:
+	var v := _res({})
+	var wu: Dictionary = (v.residents.res_pip as Dictionary).duplicate(true)
+	wu.merge({"request": {"id": "req_res_wu_1", "kind": "material", "item": "wood", "qty": 6, "have": 2, "ready": false}, "request_state": "accepted"}, true)
+	v.residents["res_granny_wu"] = wu
+	var b := P0Logic.resident_bar(v, "res_granny_wu")
+	assert_str(str(b.name)).is_equal("Granny Wu")
+	assert_str(str(b.request_reason)).is_equal("Need 4 more %s" % P0Logic.plural(P0Logic.item_name(v, "wood")))
+	var card := P0Ui._request_card_data(v, "res_granny_wu", b)
+	assert_str(str(card.needs[0].name)).is_equal(P0Logic.item_name(v, "wood"))
+	wu.request = {"id": "req_res_wu_2", "kind": "dish", "style": "Soup", "qty": 1, "have": 0, "ready": false}
+	assert_str(str(P0Logic.resident_bar(v, "res_granny_wu").request_reason)).is_equal("Need 1 more Soup dish")
+	assert_str(str(P0Ui._request_card_data(v, "res_granny_wu", P0Logic.resident_bar(v, "res_granny_wu")).needs[0].name)).is_equal("Soup dish")
+	wu.request = {"id": "req_res_wu_2", "kind": "dish", "style": "Soup", "qty": 3, "have": 1, "ready": false}
+	assert_str(str(P0Logic.resident_bar(v, "res_granny_wu").request_reason)).is_equal("Need 2 more Soup dishes")
+
+func test_p1_recipe_lesson_and_likes_by_rarity() -> void:
+	var v := _res({"lesson": {"state": "ready", "recipe": "dish_carrot_cake", "next_in": null, "need_stage": null}})
+	assert_bool(bool(P0Logic.resident_bar(v, "res_pip").lesson)).is_true()
+	v.residents.res_pip.lesson.state = "wait"
+	assert_bool(bool(P0Logic.resident_bar(v, "res_pip").lesson)).is_false()
+	assert_str(P0Logic.likes_text("Dessert")).is_equal("Dessert")
+	assert_str(P0Logic.likes_text("Fine+")).is_equal("Fine dishes and up")
+	assert_str(P0Logic.likes_text("Rare+")).is_equal("Rare dishes and up")

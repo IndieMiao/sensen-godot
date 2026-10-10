@@ -61,7 +61,7 @@ export interface Request { id: string; title: string; item: string; qty: number;
 
 /** A drawn system request (§9.6): items are fixed when drawn; coins are paid from what is handed in. */
 export interface BoardRequest {
-  id: string; template: string; items: string[]; rarity?: number; kind: 'crop' | 'fish' | 'dish' | 'material';
+  id: string; template: string; items: string[]; rarity?: number; style?: string; kind: 'crop' | 'fish' | 'dish' | 'material';
   qty: number; bonus: number; drawn_at: number; status: 'open' | 'accepted';
 }
 /** A board slot: a request, or empty until refill_at. */
@@ -75,6 +75,8 @@ export interface ResidentState {
   next: number;                  // index of the next request in the resident's list
   req: { id: string; at: number; progress: number } | null;   // accepted request; progress counts sow for sow requests
   done_day: string;              // player day the last request was completed (one a day)
+  done_at?: number;              // when the last request was completed (P1: the next one opens next_request_h later)
+  lesson_at?: number;            // when they last taught a page (§7.5.3: one a week from Familiar)
 }
 
 export interface Homestead { level: number; plaque: { level: number; at: number }[] }

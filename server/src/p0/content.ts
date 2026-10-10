@@ -44,13 +44,26 @@ export const SHOPS: readonly ShopId[] = ['homestead', 'tackle', 'market', 'tea',
 export type QuotaId = 'fish_tackle' | 'dish' | 'material' | 'request_bonus' | 'sys_requests';
 export type BoardId = 'stall' | 'market';
 
-/** What a request asks for: a kind, optionally narrowed to one id, one rarity, the same item or N distinct items. */
-export interface Need { kind: 'crop' | 'fish' | 'dish' | 'material' | 'sow'; id?: string; rarity?: number; same?: boolean; distinct?: number }
-export interface RequestTemplate { title: string; need: Need; skill: Skill; gate: [Skill, number][]; bonus: number; enabled?: boolean }
+/**
+ * What a request asks for: a kind, optionally narrowed to one id, one rarity, one dish style (§9.6.3 P1: `Soup` for
+ * Granny Wu), the same item or N distinct items.
+ */
+export interface Need { kind: 'crop' | 'fish' | 'dish' | 'material' | 'sow'; id?: string; rarity?: number; style?: string; same?: boolean; distinct?: number }
+/**
+ * A system request template (§9.6.3). climate narrows it to the home climate (regional templates, `Temperate`);
+ * type is the card's family (output by default; regional / explore / together wait for travel, so they ship disabled).
+ */
+export interface RequestTemplate {
+  title: string; need: Need; skill: Skill; gate: [Skill, number][]; bonus: number; enabled?: boolean;
+  climate?: string[]; type?: 'output' | 'regional' | 'explore' | 'together'; text?: string;
+}
+/** A personal request's one-time reward beyond coins and +5 (§9.6.1, Trusted story requests): an item, a recipe page Tasted, a title. */
+export interface ResidentReward { item?: [string, number]; recipe?: string; title?: string }
 export interface ResidentRequest {
   id: string; title: string; text: string; stage: string; need: Need; qty: number; coins: number;
   /** The request card's need line when the rule alone would mislead (q(46): the only P0 Rare fish is the Pond koi). */
   need_line?: string;
+  reward?: ResidentReward;
 }
 /** §13.2 gathering spot (SGODOT-231): the first yield is the spot's material (Farm Storage, +1 with gloves). */
 export interface GatherSpot { name: string; yield: [string, number][]; homestead: number }
@@ -65,6 +78,8 @@ export interface WorkbenchRecipe {
 export interface ResidentDef {
   name: string; role: string; portrait: string; likes: string; gift_meal: string; one_per_day: boolean;
   lines: Record<string, string>; requests: ResidentRequest[];
+  /** §7.5.3 / §7.16.3: the pages this resident teaches from Familiar, one a week; empty = none of their style yet. */
+  teaches?: string[];
 }
 
 export interface P0Content {
@@ -116,6 +131,10 @@ export interface P0Content {
   quotas: Record<QuotaId, { cap: number; scope: string }>;
   affinity: {
     stages: [string, number][]; first_chat: number; request: number; gift_meal_stage: string;
+    /** §7.5.3 Taught: from this stage, every `every_days` days, one page the player has not got yet. */
+    lesson?: { stage: string; every_days: number };
+    /** §9.6.1: a resident's next request opens this long after the last one is done (24 h; P0's one_per_day = the player day). */
+    next_request_h?: number;
     gift: { loved_fine: number; liked: number; any: number; perfect: number; cap: number; mystery: number; chef_touch: { cooking: number; bonus: number; cap: number } };
     mystery_line: string;
   };

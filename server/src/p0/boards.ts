@@ -24,10 +24,15 @@ function gateMet(c: P0Content, s: P0State, t: RequestTemplate): boolean {
   return t.gate.length === 0 || t.gate.some(([skill, level]) => skillLevel(c, s, skill) >= level);
 }
 
+/** §9.6.1: regional templates are drawn only where their climate is (P1: the home climate until travel lands). */
+function climateMet(c: P0Content, t: RequestTemplate): boolean {
+  return !t.climate?.length || t.climate.includes(c.profile.climate);
+}
+
 export function eligible(c: P0Content, s: P0State, board: BoardId): string[] {
   return c.requests.boards[board].templates.filter(id => {
     const t = c.requests.templates[id];
-    return t.enabled !== false && gateMet(c, s, t);
+    return t.enabled !== false && gateMet(c, s, t) && climateMet(c, t);
   });
 }
 
@@ -79,14 +84,15 @@ function drawRequest(c: P0Content, s: P0State, board: BoardId, slot: number, at:
   const template = pool[Math.floor(draw() * pool.length)];
   const t = c.requests.templates[template];
   let items: string[] = [];
-  if (t.need.kind === 'crop') {
+  if (t.need.id) items = [t.need.id];   // a template naming one crop, fish or material asks for exactly that
+  else if (t.need.kind === 'crop') {
     const crops = growable(c, s);
     for (let i = crops.length - 1; i > 0; i--) { const j = Math.floor(draw() * (i + 1)); [crops[i], crops[j]] = [crops[j], crops[i]]; }
     items = crops.slice(0, t.need.distinct ?? 1);
   }
-  if (t.need.kind === 'material' && t.need.id) items = [t.need.id];
   return {
-    id: `${template}-${board}${slot}-${at.toString(36)}`, template, items, rarity: t.need.rarity, kind: t.need.kind as BoardRequest['kind'],
+    id: `${template}-${board}${slot}-${at.toString(36)}`, template, items, rarity: t.need.rarity,
+    ...(t.need.style ? { style: t.need.style } : {}), kind: t.need.kind as BoardRequest['kind'],
     qty: qtyFor(c, s, t, draw), bonus: t.bonus, drawn_at: at, status: 'open',
   };
 }
@@ -95,7 +101,9 @@ function drawRequest(c: P0Content, s: P0State, board: BoardId, slot: number, at:
 export function settleBoards(c: P0Content, s: P0State, now: number): void {
   for (const board of BOARDS) {
     const slots = s.boards[board];
-    // §14.1.2: Stall Board slot 2 stays empty for the first 72 h (the first session has one request); later slots fill at once.
+    // §14.1.2: a Stall Board slot added in the account's first 72 h (slot 2 at creation, slot 3 from a Homestead Lv3
+    // reached that early) stays empty until created_at + refill_h, so the first session has one request; a slot added
+    // later fills at once.
     while (slots.length < slotCount(c, s, board))
       slots.push({ req: null, refill_at: board === 'stall' ? s.created_at + c.requests.refill_h * H : s.created_at });
     slots.forEach((sl: BoardSlot, i) => {
@@ -111,8 +119,9 @@ export function settleBoards(c: P0Content, s: P0State, now: number): void {
 }
 
 /**
- * §14.1.2: a new account's Stall Board slot 2 stays empty for refill_h (72 h) from creation. Until it fills it is a held
- * slot (q(99), 李白 / 不知火舞): the view draws it as a plain empty slot with no countdown and leaves it out of
+ * §14.1.2: a Stall Board slot added in the account's first refill_h (72 h) stays empty until created_at + refill_h —
+ * slot 2 at creation, and any slot a Homestead upgrade adds in that time. Until it fills it is a held slot (q(99),
+ * 李白 / 不知火舞; wording 周瑜 on #168): the view draws it as a plain empty slot with no countdown and leaves it out of
  * `Next request`, which counts only slots refilling after a delivery or a drop. The rule itself is unchanged.
  */
 export function heldSlot(c: P0Content, s: P0State, board: BoardId, sl: BoardSlot): boolean {
@@ -140,7 +149,7 @@ export function handIn(c: P0Content, s: P0State, r: BoardRequest): [string, numb
     }
     return out;
   }
-  return pick(c, s, { kind: r.kind, rarity: r.rarity }, r.items, r.qty);
+  return pick(c, s, { kind: r.kind, rarity: r.rarity, style: r.style }, r.items, r.qty);
 }
 
 /** Coins for a hand-in: floor prices, a dish quality bonus on the whole request (lowest quality handed in), the bonus capped daily. */
@@ -175,7 +184,7 @@ export function boardCommand(c: P0Content, s: P0State, type: 'accept' | 'deliver
     const short = r.items.length > 1 ? r.items.find(item => haveFor(c, s, { kind: r.kind }, [item]) < r.qty)! : null;
     return { code: 'not_enough', detail: short
       ? { item: short, need: r.qty, have: haveFor(c, s, { kind: r.kind }, [short]) }
-      : { item: r.items[0] ?? null, need: r.qty, have: haveFor(c, s, { kind: r.kind, rarity: r.rarity }, r.items) } };
+      : { item: r.items[0] ?? null, need: r.qty, have: haveFor(c, s, { kind: r.kind, rarity: r.rarity, style: r.style }, r.items) } };
   }
   for (const [item, n] of parts) { handOver(c, s, item, n); events.push({ kind: 'item', id: item, delta: -n }); }
   const pay = payout(c, r, parts);
