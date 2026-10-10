@@ -63,6 +63,20 @@ func test_the_sprinkler_card_writes_its_state_on_the_button() -> void:
 	assert_str(str(card.effect)).is_equal("Farming Lv6 · Waters 8 plots for you")   # FARM-5-FAC: the level first, unlocked too
 
 ## The drawer shows the tabs the view lists: Tools | Supplies on a P0 server, Facilities when P1 sends it.
+## q(136) (FAC-STATUS 2116:32993): a sprinkler's status card reads `Waters 8 plots · −15%`, the greenhouse's
+## `16 plots · −25%` form, and Move — the card's one action — is the green primary key (it was the outlined secondary).
+func test_the_sprinkler_status_card_reads_its_cut_and_moves_on_the_primary_key() -> void:
+	var f := {"id": 5.0, "kind": "sprinkler", "plot": 8.0, "covers": [1.0, 2.0, 3.0, 7.0, 9.0, 13.0, 14.0, 15.0]}
+	var card := P0FarmFacilities.sprinkler_card(f)
+	assert_that([card.title, card.lead, card.button, card.kind]).is_equal(["Sprinkler", "Waters 8 plots · −15%", "Move", &"primary"])
+	assert_str(str(P0FarmFacilities.sprinkler_card({"kind": "sprinkler", "covers": [1.0]}).lead)).is_equal("Waters 1 plot · −15%")
+	var ui := await _ui()
+	var sheet := ui.open_facility_card(card, func(): pass)
+	await await_idle_frame()
+	var keys := sheet.find_children("*", "UiCommandButton", true, false).filter(func(b): return b.visible)
+	assert_int(keys.size()).is_equal(1)
+	assert_that([(keys[0] as UiCommandButton).label, (keys[0] as UiCommandButton).kind]).is_equal(["Move", UiCommandButton.Kind.PRIMARY])
+
 func test_the_workbench_shows_facilities_when_the_view_lists_it() -> void:
 	var p0 := P0WorkbenchDrawer.new({"workbench": {"tabs": ["tools", "supplies"], "recipes": []}})
 	add_child(auto_free(p0))
