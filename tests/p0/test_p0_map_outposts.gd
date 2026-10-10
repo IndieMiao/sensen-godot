@@ -584,6 +584,74 @@ func test_names_give_way_before_pins_by_rank_and_hold_by_4_px() -> void:
 	m._set_outpost_places()
 	rt.session.view = saved
 
+## q(141): of the pins on screen with one short name only the highest-ranked says it; the always-in kinds keep theirs.
+func test_one_name_on_screen_is_said_once() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved: Dictionary = rt.session.view
+	rt.session.view = _board(-1)   # no marks
+	var city: CityMapView = m.city_map
+	var at := Vector2(m.home_lat + 0.03, m.home_lng + 0.03)   # clear of home and the outposts
+	_look_fresh(m, at, 15.0)
+	var p0 = m.geo_to_screen(at.x, at.y)
+	var p1 = m.geo_to_screen(at.x, at.y + 0.0001)
+	var per := 0.0001 / maxf(0.001, absf((p1 as Vector2).x - (p0 as Vector2).x))   # degrees of longitude per view px
+	var market := P0Outposts.place_entry(P0Outposts.by_role("market")).merged({"name": "Echo Market Square", "lat": at.x,
+		"lng": at.y - 60.0 * per}, true)
+	var tea := P0Outposts.place_entry(P0Outposts.by_role("tea")).merged({"name": "Echo Tea House", "lat": at.x,
+		"lng": at.y + 60.0 * per}, true)
+	m._dest_styles.clear()
+	city.set_places([market, tea])
+	_look_fresh(m, at, 15.0)
+	var market_pin: UiMapDestination = city.markers[str(market.id)].dest
+	var tea_pin: UiMapDestination = city.markers[str(tea.id)].dest
+	assert_array(city.displayed.map(func(mk): return str(mk.entry.id))).contains([str(market.id), str(tea.id)])
+	assert_bool(market_pin.name_shown).is_true()   # the market ranks above the tea house: it says Echo
+	assert_str(market_pin.text).is_equal("Echo")
+	assert_bool(tea_pin.name_shown).is_false()     # the tea house only its icon
+	# both always in (marked): both say it
+	city.set_places([market.merged({"marker": "request"}, true), tea.merged({"marker": "new"}, true)])
+	_look_fresh(m, at, 15.0)
+	assert_bool((city.markers[str(market.id)].dest as UiMapDestination).name_shown).is_true()
+	assert_bool((city.markers[str(tea.id)].dest as UiMapDestination).name_shown).is_true()
+	# the market off screen: the tea house says its name
+	city.set_places([market.merged({"lng": at.y - 400.0 * per}, true), tea])
+	_look_fresh(m, at, 15.0)
+	assert_bool((city.markers[str(tea.id)].dest as UiMapDestination).name_shown).is_true()
+	m._dest_styles.clear()
+	m._set_outpost_places()
+	rt.session.view = saved
+
+## 周瑜 on #306: an always-in pin's name never gives way, so a lower-ranked disc that would sit on it hides.
+func test_no_disc_sits_on_an_always_in_name() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved: Dictionary = rt.session.view
+	rt.session.view = _board(-1)
+	var city: CityMapView = m.city_map
+	var at := Vector2(m.home_lat + 0.03, m.home_lng + 0.03)
+	_look_fresh(m, at, 15.0)
+	var p0 = m.geo_to_screen(at.x, at.y)
+	var p1 = m.geo_to_screen(at.x - 0.0001, at.y)
+	var per := 0.0001 / maxf(0.001, absf((p1 as Vector2).y - (p0 as Vector2).y))   # degrees of latitude per view px
+	# the tea house marked (always in) and the market 40 px under it: its disc would sit on the tea house's name
+	var tea := P0Outposts.place_entry(P0Outposts.by_role("tea")).merged({"lat": at.x, "lng": at.y, "marker": "request"}, true)
+	var market := P0Outposts.place_entry(P0Outposts.by_role("market")).merged({"lat": at.x - 40.0 * per, "lng": at.y}, true)
+	city.set_places([tea, market])
+	var shown := _look_fresh(m, at, 15.0)
+	assert_array(shown).contains([str(tea.id)]).not_contains([str(market.id)])
+	assert_bool((city.markers[str(tea.id)].dest as UiMapDestination).name_shown).is_true()
+	# unmarked, the tea house (rank 4) gives way to the market (rank 3) by the 36 px rule instead: 40 px apart both show
+	city.set_places([tea.merged({"marker": ""}, true), market])
+	shown = _look_fresh(m, at, 15.0)
+	assert_array(shown).contains([str(tea.id), str(market.id)])
+	m._set_outpost_places()
+	rt.session.view = saved
+
 ## The P0Runtime singleton the map brought up goes with the suite (P0Runtime.free_instance_for_tests).
 func after() -> void:
 	P0Runtime.free_instance_for_tests()

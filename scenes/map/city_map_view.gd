@@ -156,6 +156,10 @@ var _dest_discs: Array = []
 var _dest_names: Array = []
 var _dest_names_last: Dictionary = {}
 var _dest_names_now: Dictionary = {}
+## The short names of the MapDestinations on screen this pass (q(141)): a lower-ranked pin of the same name says none.
+var _dest_texts: Dictionary = {}
+## The names of the always-in MapDestinations this pass (q(137) ⑤: they never give way, so no disc sits on them).
+var _dest_kept_names: Array = []
 ## Two discs nearer than this (centre to centre, px) cannot both show: the lower-ranked one hides (q(137)). A pin or
 ## name shown last pass hides only at DEST_HOLD px more overlap (no flicker on the edge while panning and zooming).
 const DEST_NEAR := 36.0
@@ -1092,6 +1096,8 @@ func _update_markers() -> void:
 	_dest_discs.clear()
 	_dest_names.clear()
 	_dest_names_now.clear()
+	_dest_texts.clear()
+	_dest_kept_names.clear()
 	var blockers := _player_blockers()
 	var bodies := _player_blockers(true)   # what a space pin gives way to: the avatars' bodies (SGODOT-269)
 	var now := Time.get_ticks_msec()
@@ -1166,6 +1172,8 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int,
 		var centre := _disc_centre(c)
 		for other in _dest_centres:
 			if centre.distance_to(other) < near: return false
+		# nor on an always-in pin's name, which never gives way (周瑜 on #306): a disc right under one hides
+		if _hits(_dest_kept_names, c.bounds.grow(-DEST_HOLD * 0.5) if incumbent else c.bounds): return false
 		if _hits(bodies, c.bounds.grow(-PACK_MARGIN if incumbent else PACK_MARGIN)): return false
 	elif not is_selected and not dest_pin:
 		if not incumbent and now < int(_hidden_until.get(id, 0)): return false
@@ -1205,8 +1213,11 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int,
 		# q(137): the short name under the disc only. The selected pin's card says its whole name, so it shows none; a
 		# name that would cover a higher-ranked disc or name hides (the pin stays), one shown last pass at 4 px more.
 		# The always-in kinds keep theirs.
+		# q(141): of the pins on screen with one short name only the highest-ranked says it (the always-in kinds keep
+		# theirs); the card says each whole.
 		var held := label_rect.grow(-DEST_HOLD * 0.5) if _dest_names_last.has(id) else label_rect
-		label_fits = not is_selected and c.label_w > 0.0 and (always or not (_hits(_dest_discs, held)
+		var same_name := _dest_texts.has(_dest_text(entry))
+		label_fits = not is_selected and c.label_w > 0.0 and (always or not (same_name or _hits(_dest_discs, held)
 			or _hits(_dest_names, held) or _hits(bodies, held)))
 	elif entry.kind == "landmark":
 		label_fits = is_selected or not _hits(occupied, Rect2(c.point - Vector2(c.width * 0.5, -3), Vector2(c.width, 20)))
@@ -1226,11 +1237,14 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int,
 		occupied.append(c.bounds)
 		_dest_discs.append(c.bounds)
 		_dest_centres.append(_disc_centre(c))
+		var text := _dest_text(entry)
+		if text != "" and not disc_off_screen: _dest_texts[text] = true   # on screen, named or not: it has this name
 		if label_fits:
 			occupied.append(label_rect)
 			_dest_names.append(label_rect)
 			_place_labels.append(label_rect)
 			_dest_names_now[id] = true
+			if always: _dest_kept_names.append(label_rect)
 	elif entry.kind == "place":
 		occupied.append(Rect2(c.point - Vector2(c.art_w * 0.5, c.art_h), Vector2(c.art_w, c.art_h)))
 		if label_fits:
