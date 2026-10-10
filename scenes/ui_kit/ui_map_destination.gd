@@ -23,6 +23,9 @@ const SHORT_MAX_W := 96.0
 const _SHORT_HALO := 4
 const _PERSON := "res://assets/ui/kit_icons/count_person.svg"
 const _PERSON_SIDE := 9.0
+## The name's draw layer: over every pin's disc on the map, so a lower-ranked disc beside it never covers it (不知火舞
+## on #306). Packing keeps a shown name off any higher-ranked disc (q(137) ⑤), so only the lower ones go under it.
+const NAME_Z := 1
 
 var icon: Texture2D: set = set_icon
 var text := "": set = set_text
@@ -93,6 +96,7 @@ func _init(icon_: Texture2D = null, text_ := "", plate_ := false) -> void:
 	_pin.add_child(_count)
 	_label_box = PanelContainer.new()
 	_label_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_label_box.z_index = NAME_Z
 	add_child(_label_box)
 	_label = UiKit.label("", UiTokens.STYLE_C10_B, UiTokens.COLOR_TEXT)
 	_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
