@@ -69,6 +69,13 @@ var _tween: Tween
 var _fade: Tween
 var _base_y := 0.0
 var _pivot_frac := 0.5          # where along the width the pill grows from (bounds may move it off the middle)
+## A line above the lowest of a group that pops as one (an item line split in two, q(124) ①; 不知火舞 on #289): its
+## pill rests this many screen px above the point it is played at, which it still grows from, so the group's lines
+## scale together and never meet. The pill moves inside the float; the float's place and tweens stay as they are.
+var group_rise := 0.0: set = set_group_rise
+## The group's line right below this one, and the gap kept over it: this line rests on it as its height settles.
+var rests_on: UiFloatText: set = set_rests_on
+var rest_gap := 0.0
 var _centre_x := NAN            # the bottom centre asked for at rest; NAN until play()
 
 func _init(text_: String = "", tone_: Tone = Tone.XP, icon_: Texture2D = null, layout_: Layout = Layout.HUG) -> void:
@@ -110,6 +117,22 @@ static func _compose(tone_: Tone, icon_: Texture2D, k: float) -> PanelContainer:
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	row.add_child(l)
 	return p
+
+func set_group_rise(v: float) -> void:
+	group_rise = v
+	if _pill != null: _pill.position.y = -v / _unit
+
+func set_rests_on(v: UiFloatText) -> void:
+	rests_on = v
+	set_process(v != null)
+
+## A lower line settles a frame late (fonts): this one moves to rest on it again, still growing from the same point.
+func _process(_delta: float) -> void:
+	if not is_instance_valid(rests_on):
+		set_process(false)
+		return
+	var want := rests_on.group_rise + rests_on.shown_size().y + rest_gap
+	if absf(want - group_rise) > 0.01: group_rise = want
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_THEME_CHANGED: _relayout()
@@ -170,11 +193,13 @@ func _hold() -> void:
 	position.x = p - pivot_offset.x
 
 ## Shows the float with its bottom centre at `at` (in the parent's space), the `stack_index`th line of one moment.
-func play(at: Vector2, stack_index := 0) -> void:
+## `rise`: how far above `at` it starts instead of 28 a line (a line of a group: the group's lowest line's place; the
+## line itself rests group_rise higher), the stack_index still setting when it starts.
+func play(at: Vector2, stack_index := 0, rise := -1.0) -> void:
 	_centre_x = at.x
 	_relayout()
 	var n := clampi(stack_index, 0, _STACK_MAX - 1)
-	position = at - pivot_offset - Vector2(0, _STACK_RISE * n)
+	position = at - pivot_offset - Vector2(0, _STACK_RISE * n if rise < 0.0 else rise)
 	_hold()
 	_base_y = position.y
 	scale = Vector2.ONE * _unit * _START
