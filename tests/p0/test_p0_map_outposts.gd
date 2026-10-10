@@ -652,6 +652,24 @@ func test_no_disc_sits_on_an_always_in_name() -> void:
 	m._set_outpost_places()
 	rt.session.view = saved
 
+## 不知火舞 on #306: a pin's name draws over every disc (a lower-ranked disc beside it never covers it); the view's own
+## controls (keys, credit line) draw over the names.
+func test_names_draw_over_discs_and_the_keys_over_names() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var city: CityMapView = m.city_map
+	_look_fresh(m, Vector2(m.home_lat, m.home_lng), 14.0)
+	var pins: Array = city.displayed.filter(func(mk): return mk.has("dest"))
+	assert_array(pins).is_not_empty()
+	for mk in pins:
+		var pin: UiMapDestination = mk.dest
+		assert_int(pin._label_box.z_index).is_equal(UiMapDestination.NAME_Z)
+		assert_int(pin._disc.z_index).is_equal(0)
+		assert_int((mk.node as Control).z_index).is_equal(0)
+	for n in [city.recenter, city.home_key, city.get_node("MapCredits")]:
+		assert_int((n as Control).z_index).is_greater(UiMapDestination.NAME_Z)
+
 ## The P0Runtime singleton the map brought up goes with the suite (P0Runtime.free_instance_for_tests).
 func after() -> void:
 	P0Runtime.free_instance_for_tests()

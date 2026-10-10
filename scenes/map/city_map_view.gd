@@ -163,6 +163,8 @@ var _dest_names_now: Dictionary = {}
 var _dest_texts: Dictionary = {}
 ## The names of the always-in MapDestinations this pass (q(137) ⑤: they never give way, so no disc sits on them).
 var _dest_kept_names: Array = []
+## The view's own controls draw over the pins' names (UiMapDestination.NAME_Z): the keys, credit line and cards.
+const CHROME_Z := 2
 ## Two discs nearer than this (centre to centre, px) cannot both show: the lower-ranked one hides (q(137)). A pin or
 ## name shown last pass hides only at DEST_HOLD px more overlap (no flicker on the edge while panning and zooming).
 const DEST_NEAR := 36.0
@@ -392,6 +394,10 @@ func _ready() -> void:
 		compact_round_button(b)
 		b.pressed.connect(func(): host._tween_zoom(host.zoom + spec[1]))
 		add_child(b)
+	# A pin's name draws over every disc (UiMapDestination.NAME_Z, 不知火舞 on #306): the view's own controls (keys,
+	# credit line, cards, panels) draw over the names. The fog stays under everything.
+	for c in get_children():
+		if c is Control and c != fog: (c as Control).z_index = CHROME_Z
 	resized.connect(_layout)
 	_layout()
 	set_filter("all")
