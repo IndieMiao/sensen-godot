@@ -13,12 +13,10 @@ const ENTRANCE := 0
 static func _energy(view: Dictionary) -> int:
 	return int(view.get("energy", {}).get("value", 0))
 
-## Mining's free moves keep "Free" on the key: LOCK-21 and its 10-08 LOCK-02 clarification write `Elevator · Free`,
-## q(46) `Exit mine · Free` / `Floor 1 · Free`, §13.3.8 `Light Torch · Free` (P0Ui drops "Free" elsewhere).
+## A key's sub "Free" is not shown (q(122): a 0-Energy action shows its verb alone, P0Ui drops it); Free stays only where
+## a paid choice sits beside it — the elevator rows, Express and the mouth card's Continue run (LOCK-21), not keys.
 static func _key(icon: String, verb: String, sub: String, cmd := {}, enabled := true, amber := false, need := 0) -> Dictionary:
-	var k := {"icon": icon, "verb": verb, "sub": sub, "enabled": enabled, "amber": amber, "cmd": cmd, "need": need}
-	if sub == "Free": k["show_free"] = true
-	return k
+	return {"icon": icon, "verb": verb, "sub": sub, "enabled": enabled, "amber": amber, "cmd": cmd, "need": need}
 
 ## A grey key whose press toasts `reason`.
 static func _unavailable(icon: String, verb: String, sub: String, reason: String) -> Dictionary:
@@ -215,7 +213,7 @@ static func mine_status(view: Dictionary, n: int, just_entered := false) -> Stri
 ## Main action key in the mine: Mining itself only (SGODOT-266, user on 263 ③). ctx: {floor: int, target: "rock" | "",
 ## rock: int, item: String} where item is the quick-bar selection ("torch" or ""). Rocks never respond to taps (LOCK-02);
 ## the ladders and the elevator are tapped like any facility (mine_facility), so the key never names them.
-## A 0-Energy move reads "· Free" (Light Torch · Free; Li Bai q(46)).
+## A 0-Energy move shows its verb alone (`Light Torch`, q(122); was `Light Torch · Free`, q(46)).
 static func mine_action(view: Dictionary, ctx: Dictionary) -> Dictionary:
 	return _with_pick(view, _mine_action(view, ctx))
 
