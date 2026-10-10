@@ -131,6 +131,11 @@ func test_porch_and_kitchen_parts_keep_off_the_door_path() -> void:
 			for p in parts:
 				if str(p.asset) == "path_tile": continue   # the landing is the door path itself
 				assert_float(absf((p.pos as Vector3).x - door.x)).override_failure_message("%s %s %s" % [stage, look, p.asset]).is_greater(0.6)
+	# every part stands on the ground: nothing set on another's top, where it would float (不知火舞 on #250, Lv8 b)
+	for stage in ["porch", "kitchen_extension"]:
+		for look in ["a", "b"]:
+			for p in P0Garden.look_parts(bp, stage, look):
+				assert_float((p.pos as Vector3).y).override_failure_message("%s %s %s" % [stage, look, p.asset]).is_less(0.01)
 	assert_str(P0Garden.look_house("a")).is_equal("house_barn")
 	assert_str(P0Garden.look_house("b")).is_equal("house_dome")
 	assert_str(P0Garden.look_house("")).is_equal("house_cottage")
@@ -164,6 +169,8 @@ func test_the_farm_shows_the_views_looks_and_the_cards_preview() -> void:
 	fence.preview = "b"
 	fence.sync(used)
 	assert_str(fence.look).is_equal("b")   # Stone Wall
+	var ring: MultiMeshInstance3D = fence.find_child("Ring", true, false)   # one batch, one draw (上官婉儿 on #250)
+	assert_int(ring.multimesh.instance_count).is_equal(P0Garden.fence_ring(bp).size() * P0Garden.STONE_PER_SEG)
 	var lv10 := _view(10, {"master_farmhouse": "b"})
 	looks.sync(lv10)
 	assert_object(house.mesh).is_not_same(cottage)

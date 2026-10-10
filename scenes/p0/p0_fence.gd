@@ -16,6 +16,7 @@ const POP_S := 0.3          # a look swapped in: 0 → full size, a little past 
 var _ring: Array[Node3D] = []
 var _front: Node3D          # the timber stretch in front of the farmhouse (always, until a Stone Wall takes it)
 var _stone: Node3D          # the Stone Wall (front and ring), built when first shown
+var _ring_dust: Array = []  # a few points along the Stone Wall's ring for the swap's dust
 var _seen := false        # a view has been read (the first one decides "already Lv3")
 var _shown := false
 var look := "a"           # the Fence & Mailbox look on show
@@ -59,18 +60,30 @@ func set_look(v: String, animate := true) -> void:
 	_front.visible = not stone
 	for m in _ring: m.visible = _shown and not stone
 	if _stone: _stone.visible = stone
-	# The timber front is one batch about the world origin: it just shows; the ring's and the wall's pieces pop.
-	if animate: pop_in(self, (_stone if stone else self).get_children().filter(func(n): return n is MeshInstance3D and (n as Node3D).visible))
+	# Batches (the timber front, the Stone Wall's ring) sit about the world origin: they just show; single pieces pop.
+	if not animate: return
+	pop_in(self, (_stone if stone else self).get_children().filter(func(n): return n is MeshInstance3D and (n as Node3D).visible))
+	if stone: for at in _ring_dust: dust(self, at)
 
+## The Stone Wall: the ring's rocks as one batch (one draw, ~120 rocks; 上官婉儿 on #250), the front stretch's few as
+## their own pieces, so the swap pops those by the door and puffs dust along the ring.
 func _build_stone() -> Node3D:
 	var root := Node3D.new()
 	root.name = "StoneWall"
 	add_child(root)
-	for p in P0Garden.stone_wall(P0Garden.fence_front(_bp) + P0Garden.fence_ring(_bp)):
+	for p in P0Garden.stone_wall(P0Garden.fence_front(_bp)):
 		var m := FarmArt.instance(str(p.asset))
-		m.transform = Transform3D(Basis(Vector3.UP, float(p.yaw)) * Basis.from_scale(p.scale), p.pos)
+		m.transform = _part_xf(p)
 		root.add_child(m)
+	var ring := P0Garden.stone_wall(P0Garden.fence_ring(_bp))
+	var batch := FarmArt.batch("rock", ring.map(_part_xf))
+	batch.name = "Ring"
+	root.add_child(batch)
+	for i in range(0, ring.size(), 12): _ring_dust.append(ring[i].pos)
 	return root
+
+static func _part_xf(p: Dictionary) -> Transform3D:
+	return Transform3D(Basis(Vector3.UP, float(p.yaw)) * Basis.from_scale(p.scale), p.pos)
 
 ## LOOK-PICK's swap (49498df6): each part grows in over POP_S with a touch of overshoot, a little dust under every third.
 static func pop_in(host: Node3D, parts: Array) -> void:

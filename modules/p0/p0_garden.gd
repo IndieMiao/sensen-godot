@@ -157,8 +157,9 @@ static func _fence_run(a: Vector2, b: Vector2, gaps: Array) -> Array:
 
 ## Homestead looks (LOOK-PICK, SGODOT-282; 上官婉儿 e4d03424): Lv3 / 5 / 8 are standalone parts beside the farmhouse,
 ## Lv10 swaps the whole house. P1 builds them from placeholder models — a (timber) from the wooden pieces (fence, storage),
-## b (stone) from rock / path_tile — until the designed ones replace them. Each part is {asset, pos, yaw, scale: Vector3};
-## none is solid (they stand off the door path and the walkways). The house front is HOUSE_FRONT in front of its anchor.
+## b (stone) from rock / path_tile — until the designed ones replace them. Each part is {asset, pos, yaw, scale: Vector3},
+## standing on the ground (y 0; a paving tile just above it); none is solid (they stand off the door path and the
+## walkways). The house front is HOUSE_FRONT in front of its anchor.
 const HOUSE_FRONT := 1.13            # house_cottage's front wall from its anchor (m, toward the field)
 const STONE_PER_SEG := 3             # rocks along one fence segment's length (Stone Wall)
 const STONE_SCALE := Vector3(1.15, 1.3, 1.0)   # rock.glb 0.41 × 0.36: three make a low wall 1.24 long, 0.46 high
@@ -196,7 +197,9 @@ static func look_parts(bp: FarmBlueprint, stage: String, look: String) -> Array:
 		["kitchen_extension", "b"]:   # Stone Kitchen Wing: a stone room with a chimney stack
 			return [{"asset": "path_tile", "pos": Vector3(house.x - HOUSE_FRONT - 0.5, 0.004, house.z - 0.75), "yaw": 0.0, "scale": Vector3(0.8, 1, 0.75)},
 				{"asset": "rock", "pos": Vector3(house.x - HOUSE_FRONT - 0.5, 0, house.z - 0.75), "yaw": 0.2, "scale": Vector3(2.4, 2.2, 2.6)},
-				{"asset": "rock", "pos": Vector3(house.x - HOUSE_FRONT - 0.6, 0.7, house.z - 0.95), "yaw": 1.1, "scale": Vector3(1.1, 1.8, 1.1)}]
+				# the chimney: a tall rock standing on the ground at the room's back corner, sunk into it (never stacked:
+				# a rock set on another's rounded top floats, 不知火舞 on #250)
+				{"asset": "rock", "pos": Vector3(house.x - HOUSE_FRONT - 0.85, 0, house.z - 1.0), "yaw": 1.1, "scale": Vector3(1.1, 3.0, 1.1)}]
 	return []
 
 ## Master Farmhouse (Lv10): the house model, a Timber Lodge (house_barn) or a Stone Manor (house_dome); before Lv10 the

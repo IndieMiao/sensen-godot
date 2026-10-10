@@ -297,6 +297,13 @@ func _place_camera() -> void:
 ## on arrival changes nothing when it closes, 后裔 on #166), never bringing the player's feet within FEET_ROOM of the
 ## quick bar. Once: a later step, pinch or Show leaves the framing alone.
 const HOME_MARK := Vector3(0, 2.6, 0.4)   # the farmhouse prompt's anchor (world_prompt "home")
+const HOME_MARK_OVER_ROOF := 0.5           # … that is, 0.5 m over the cottage's 2.1 m roof
+
+## The prompt's anchor over the house on show: the Lv10 Timber Lodge (house_barn) is 0.36 m taller than the cottage,
+## and its prompt rises with the roof instead of sitting on its ridge (上官婉儿 on #250).
+func home_mark() -> Vector3:
+	var mesh: Mesh = _looks._house.mesh if _looks and _looks._house else null
+	return HOME_MARK if mesh == null else Vector3(HOME_MARK.x, maxf(HOME_MARK.y, mesh.get_aabb().end.y + HOME_MARK_OVER_ROOF), HOME_MARK.z)
 const MARK_ROOM := 24.0   # half the near icon disc (28 × 1.1) and the 8 px edge gap prompts keep
 const FEET_ROOM := 16.0
 func _fit_opening() -> void:
@@ -309,7 +316,7 @@ func _fit_opening() -> void:
 	if not area.has_area(): return   # the HUD has not laid out yet
 	_opening = false
 	_place_camera()
-	_focus = opening_focus(cam, _focus, _house + HOME_MARK, actor.position, area)
+	_focus = opening_focus(cam, _focus, _house + home_mark(), actor.position, area)
 	_place_camera()
 
 ## `focus` moved along the ground, away from the camera, by as much as the mark needs to sit MARK_ROOM below the area's
@@ -656,7 +663,7 @@ func _sign_hit(screen: Vector2) -> bool:
 func _prompts(v: Dictionary) -> void:
 	_strip_side = _facing_side()
 	world_prompt("stall", P0WorldPrompts.stall(v, rt.ui.stall_has_new()), _stall, Vector3(0, 1.05, 0), Vector3(0, 0.4, 0))
-	world_prompt("home", P0WorldPrompts.farmhouse(v), _house, HOME_MARK, Vector3(0, 1.0, 0.6))
+	world_prompt("home", P0WorldPrompts.farmhouse(v), _house, home_mark(), Vector3(0, 1.0, 0.6))
 	world_prompt("sign", P0WorldPrompts.sign(v), _sign, SIGN_BADGE, Vector3(0, 0.45, 0))
 	_plaque_node.visible = not v.get("homestead", {}).get("plaque", []).is_empty()
 	world_prompt("plaque", P0WorldPrompts.plaque(v), _plaque, Vector3(0, 0.85, 0), Vector3(0, 0.35, 0), _plaque_node.visible)
@@ -786,6 +793,14 @@ func p0_dev(step: PackedStringArray) -> bool:
 			var out := {"fence": _fence.look, "house": str(_looks._house.mesh.resource_path) if _looks._house.mesh else ""}
 			for st in _looks.STAGES: out[st] = [_looks.shown(st), (_looks.parts(st) as Array).map(func(n): return [str(n.name), cam.unproject_position((n as Node3D).global_position)])]
 			out["house_screen"] = cam.unproject_position(_house + Vector3(0, 1.0, 0))
+			# Lv10 checks (上官婉儿 on #250): the door path, the sign, the roof top and the farmhouse prompt on screen
+			var top := (_looks._house.mesh as Mesh).get_aabb().end.y if _looks._house.mesh else 0.0
+			out["door_path"] = cam.unproject_position(_door)
+			out["sign"] = cam.unproject_position(_sign + Vector3(0, 0.6, 0))
+			out["roof_top"] = [top, cam.unproject_position(_house + Vector3(0, top, 0))]
+			out["home_mark"] = cam.unproject_position(_house + home_mark())
+			var b: UiWorldIconButton = rt.ui._icons.get("home")
+			if b and b.visible: out["home_button"] = b.get_global_rect()
 			print("P0_LOOKS ", out)
 		# P1 placement (SGODOT-241): build:<recipe> opens it as the Facilities card's Build does; placeat:<plot> moves
 		# the preview as a finger on that bed would; placeok / placecancel press the bar; placesecond:<label> shows its
