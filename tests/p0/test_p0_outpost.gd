@@ -99,7 +99,11 @@ func test_decor_is_not_tappable_and_counters_are() -> void:
 	var taps := post._tappable()
 	for n in ["use_stamp_desk", "use_fee_board", "use_coffee_pot"]: assert_bool(taps.has(n)).override_failure_message(n).is_false()
 	for n in ["use_counter", "npc_keeper", "npc_pip", "exit"]: assert_bool(taps.has(n)).override_failure_message(n).is_true()
-	assert_bool(_room("sh_tackle_1")._tappable().has("use_fish_board")).is_false()
+	# the tackle shop's board is the Bite Board since P1 (SGODOT-283): a facility with its icon and name, not decor
+	var tackle := _room("sh_tackle_1")
+	assert_bool(tackle._tappable().has("use_fish_board")).is_true()
+	var mark: Dictionary = tackle._marker("use_fish_board", {})
+	assert_that([mark.get("kind"), mark.get("name")]).is_equal(["facility", "Bite Board"])
 
 func test_tapping_the_counter_walks_there_and_reaches_the_keeper_entry() -> void:
 	var r := _room("sh_tackle_1")

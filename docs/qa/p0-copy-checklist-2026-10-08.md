@@ -40,7 +40,7 @@
 
 | 位置 | 应出现 |
 |---|---|
-| 主行动键 · Farming | `Sow ×1 · 2 Energy`（档 2–4：3 / 4 / 6）/ Row Hoe `Sow ×3 · 6 Energy` / 灰 `Sow · Pick a seed`（种子用完自动回到这一态，q(44)）/ `Till · Free` / `Water · Free` / `Harvest · Free` / `Fertilize · Free`；选中堆肥时只有已播未熟、未施过的格写 `Fertilize · Free`，其他格按格子状态走（同选中种子），P0 不出 `Fertilize · Nothing to feed`（q(94)） |
+| 主行动键 · Farming | `Sow ×1 · 2 Energy`（档 2–4：3 / 4 / 6）/ Row Hoe `Sow ×3 · 6 Energy` / 灰 `Sow · Pick a seed`（种子用完自动回到这一态，q(44)）/ `Till` / `Water` / `Harvest` / `Fertilize`；选中堆肥时只有已播未熟、未施过的格写 `Fertilize`，其他格按格子状态走（同选中种子），P0 不出 `Fertilize · Nothing to feed`（q(94)） |
 | 快捷栏幽灵格 ★ | `Seeds` / `Bait` / `Torch`（只写名词，q(44)）；钉住格归零写 `0` + `Buy at Homestead Stall` |
 | 驿站棚（无人值守，LOCK-17） | 名字条 `Homestead Stall`（q(62)）；抽屉标题 `Homestead Stall`；Tab `Buy / Stall Board`；挂委托板的 `!` 时点棚停在 Stall Board 页（q(44)）；Buy 页新上架的行写 `◆ New for you`，棚上同时只挂一枚徽标，委托在时不挂 ◆（q(76)） |
 | 驿站委托板 | `Pond Catch · 2 Pond Crucian · 14 coins` / `Track` / `Tracked` / `Ready to deliver` / `Deliver` / `Requests today 4/6`（q(55)）；新号交教学委托前不显示 `Next request`，交完显示 `Next request 4h`；保留期里的空槽画成普通空槽，不带倒计时（q(99)） |
@@ -57,7 +57,7 @@
 | 位置 | 应出现 |
 |---|---|
 | 主行动键 · Fishing ★ | `Cast · 5 Energy`（离岸远也是这句，q(44)）/ 途中 `Cast · On the way`（不灰显）/ 灰 `Cast · Creel full` / 灰 `Fishing · No water nearby` |
-| 鱼篓角标 | `Creel 7 · 6 free` / 满 `Creel full · 0 free slots · Sell or cook first`（只在角标与 toast）；满时点角标出 toast + `Open bag ›`，不满时点角标直接开背包 Fish 页；满篓**没有** `Open Bag` / `Go home · Free` 次按钮，回家用位置芯片（q(83)） |
+| 鱼篓角标 | `Creel 7 · 6 free` / 满 `Creel full · 0 free slots · Sell or cook first`（只在角标与 toast）；满时点角标出 toast + `Open bag ›`，不满时点角标直接开背包 Fish 页；满篓**没有** `Open Bag` / `Go home` 次按钮，回家用位置芯片（q(83)） |
 | 鱼饵用完 ★ | toast `Out of Worm Bait · no bait on the hook`（q(44)） |
 | 挂上 / 取下鱼饵 ★ | 点快捷栏饵格 toast `Worm Bait on the hook · used at the bite`，再点取下 `No bait`；首次升级横幅按 `Use bait` 也出挂上那句（在水边选中饵格并闪一次，不在水边只挂上留到下一竿），不跳转（q(77)） |
 | 钓获卡（首次） | `Caught!` / `Pond Crucian · Common` / `Fish-dex 3/N` / `First catch! +15 XP` / `New city! +10 XP` |
@@ -84,7 +84,7 @@
 | Cook Again ★ | 收走后点灶台：`Cook Again` / `Choose recipe ›`，第 2 锅 `Cooks today 2nd` / `Cooking XP Half`（q(48)） |
 | 保温柜 | 名字条 `Warming Cabinet 4/6`（q(62)）/ `Take one` / `Kept · Warming Cabinet 5/6` / `Cabinet full · Herb Grilled Fish sent to bag` / `Cabinet and bag full · dish left on the stove` / `Bag full · dish left on the stove` |
 | Cooking Lv4 之后 Today ★ | `3rd slot open · try Fine fish + Potato + Rock Salt`（q(46)） |
-| 钓鱼第二段 ★ | 亮片 `Spinner Lure`（`bait_lure`，账号每日 10 枚）；鱼笼 `Fish Trap`（`trap_fish`，放下后不占背包格），主行动键 `Set Trap · Free`（满 `Traps 1/1 · Fishing Lv8 adds 1`、本塘已有 `Trap already here`）；浮标 `Fish Trap · 2/3` / `· 3/3 · Full`；EntryCard `Collect 2 · Free` / `Take back`（`Collect · Creel full`、`Take back · Collect first`、`1 left in the trap`、`Fish Trap back in your bag`）；Today `Collect 3 fish · Fern Pond`；旧金山地区鱼 Arctic Char + Atlantic Salmon；Clover Pond 卡片写 `Coast`（q(109)） |
+| 钓鱼第二段 ★ | 亮片 `Spinner Lure`（`bait_lure`，账号每日 10 枚）；鱼笼 `Fish Trap`（`trap_fish`，放下后不占背包格），主行动键 `Set Trap`（满 `Traps 1/1 · Fishing Lv8 adds 1`、本塘已有 `Trap already here`）；浮标 `Fish Trap · 2/3` / `· 3/3 · Full`；EntryCard `Collect 2` / `Take back`（`Collect · Creel full`、`Take back · Collect first`、`1 left in the trap`、`Fish Trap back in your bag`）；Today `Collect 3 fish · Fern Pond`；旧金山地区鱼 Arctic Char + Atlantic Salmon；Clover Pond 卡片写 `Coast`（q(109)） |
 | 布置模式 Decorate ★ | 驿站 Decor 页 `Decor 12/24 · Goes to Farm Storage` / `Bought today · 9h 12m` / `Homestead Lv5 needed · 1 level to go`；toast `Flower Planter · in Farm Storage` + `Place now ›`；底栏 `Cancel` · `Rotate` · `Place`（移动 `Move`），原因 `Outside your yard` / `Space taken` / `Decor 24/24 · Homestead Lv3 adds 4`（当前 + 1 级；封顶 `Decor 56/56 · Store one to place this`；三键底栏原因写在小标、主键灰写 `Place`，q(113)）；小卡 `Move` / `Store`；`Stone Path · 3 left`；Today `Place Flower Planter · in storage`（q(111)） |
 | Homestead 外观二选一 ★ | 标题 `Lv5 look · Porch`；副标题 `Pick one · free to change later`；按钮 `Use Timber Porch`；外观名 `Timber Fence` / `Stone Wall`、`Timber Porch` / `Stone Porch`、`Timber Kitchen Wing` / `Stone Kitchen Wing`、`Timber Lodge` / `Stone Manor`（暂定）；HOME-1 `Looks` 段 `Porch` … `Stone Porch ›`，未到灰 `Homestead Lv8`（q(112)）；升级前 What changes 外观行 `Porch · Timber or Stone` / `pick one`（q(117)；Lv3 `Fence & Mailbox`、Lv8 `Kitchen Wing`、Lv10 `Master Farmhouse` 同格式），不写 Look A / B（q(115)） |
 
@@ -98,7 +98,7 @@
 | 楼梯与电梯 ★ | 点击触发，主行动键不显示（q(102)）：下行梯名字条 `Floor 2 · 2 Energy`（到过只写 `Floor 2`），去没到过的层出小卡按钮 `Floor 2 · 2 Energy`；灰 `Floor 2 · Clear Floor 1 first`；上行梯名字条写目的地：第 1 层 `Farm`、第 2 层 `Floor 1`；电梯名字条 `Elevator`；面板 `Entrance · Free` / `Floor 1 · Free` / `Floor 2 · Here`（P0 没有 Express） |
 | 矿口 Express ★ | 入口卡次级按钮 `Floor 5 · Express · Free`；有未完成局时与 `New run · 2 Energy` 上下排，下面只写一次 `Current run will end · Runs today 1/2`；没有未完成局不加小字；用尽只剩灰按钮 `Mine runs today 2/2 · Resets in 9h 12m`；电梯面板的 Express 不加小字（q(108)） |
 | 飘字 | `Floor 2 · −2 Energy` / `Floor 2 cleared · Elevator stop` / `Run ended at daily reset`；P0 没有 `Run complete`；MINE-P0-7 不写 `Unmined rocks on Floor 2 are lost`（q(46)） |
-| 火把 | `Light Torch · Free` / `Lit · this floor` |
+| 火把 | `Light Torch` / `Lit · this floor` |
 | 矿洞说明页 ★ | `Mine five floors. Slimes from Floor 3.`（P1，q(110)） |
 
 ## 6. 据点（家一套）与居民
@@ -123,7 +123,7 @@
 | 位置 | 应出现 |
 |---|---|
 | HUD ★ | 两行 HUD 常驻，底部只有 `Bag`；没有旧底栏 `Map / Farm / Me`；P0 不显示 `Nearby Cities`（q(50)） |
-| pin 卡按钮 ★ | 农场 `Go home · Free`；据点与鱼塘 `Go`；玩家就在这里时改 `Back to Homestead` / `Back to Oak Tea House` / `Back to Fern Pond`，并且不显示 Distance 行（q(80)） |
+| pin 卡按钮 ★ | 农场 `Go home`；据点与鱼塘 `Go`；玩家就在这里时改 `Back to Homestead` / `Back to Oak Tea House` / `Back to Fern Pond`，并且不显示 Distance 行（q(80)） |
 | 家的 pin 与卡 ★ | 名牌 `Homestead`（不再写 `My Farm`）；卡 `Homestead` / `Your farm` / `Distance 0.8 km`（q(80)） |
 | 据点卡 ★ | `Oak Tea House` / `Tea house · Hot tea`（其他：`Tackle shop · Rods and bait` / `Market square · Requests` / `Travel post · Coffee`）/ `Distance 0.8 km` / `Online now 3`（0 人整行不显示）/ `Go`（q(80)） |
 | 据点 pin | `Oak Tea House · 3 online`；没人在时只写名字 `Oak Tea House`；P0 城市级不聚合，每处一枚 pin，不出 `×N`（q(72)）；和 POI 一样会让位收起，选中的、带标记的、玩家所在地的图钉始终显示（q(105)） |

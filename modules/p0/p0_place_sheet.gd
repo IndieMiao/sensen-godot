@@ -25,8 +25,9 @@ static func km_between(a: Vector2, b: Vector2) -> float:
 	return 2.0 * r * asin(minf(1.0, sqrt(h)))
 
 ## The card spec for where the player is (q(80)): `here` drops the Distance fact and sets primary "Back to <title>";
-## elsewhere the primary is spec.primary, else "Go". spec: {title, subtitle, reason? (PinReason.reason), line?, facts:
-## [[label, value]], primary?}.
+## elsewhere the primary is spec.primary, else "Go". spec: {title, subtitle, thumb? (a pond's template, UiPondThumb),
+## conditions? ([[icon, word]]: the condition line), reason? (PinReason.reason), line?, facts: [[label, value]] (a value
+## that is an Array of [day, icon] draws the Forecast row), primary?}.
 static func for_here(spec: Dictionary, here: bool) -> Dictionary:
 	var out := spec.duplicate(true)
 	if here:
@@ -64,6 +65,50 @@ static func reason_row(why: Dictionary) -> Control:
 	row.add_child(text)
 	return row
 
+## The condition line (283 e61cda10 ①, 2255:143071): 16 px icons and C12 bold secondary words, 4 apart, ` · ` between
+## — `[i-dawn-dusk] Dusk · [i-windy] Windy`. The pond card and the Bite Board's title share it.
+static func conditions_row(parts: Array) -> HBoxContainer:
+	var row := HBoxContainer.new()
+	row.name = "Conditions"
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_theme_constant_override(&"separation", 4)
+	for i in parts.size():
+		if i > 0: row.add_child(UiKit.label("·", UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_SECONDARY))
+		var icon := UiKit.icon(P0Logic.icon(str(parts[i][0])), 16)
+		icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		row.add_child(icon)
+		row.add_child(UiKit.label(str(parts[i][1]), UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_SECONDARY))
+	return row
+
+## The Forecast fact (Fishing Lv3+, 2255:143080): the label, then `Sat [i-rain] · Sun [i-windy] · Mon [i-clear]` on the
+## right — day names body XB14 ink, 16 px weather icons, secondary ` · `, 4 apart; padded as a Fact row.
+static func forecast_row(label: String, days: Array) -> MarginContainer:
+	var box := MarginContainer.new()
+	box.name = "Forecast"
+	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	box.add_theme_constant_override(&"margin_top", int(UiTokens.SPACE_WITHIN))
+	box.add_theme_constant_override(&"margin_bottom", int(UiTokens.SPACE_WITHIN))
+	var row := HBoxContainer.new()
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_theme_constant_override(&"separation", int(UiTokens.SPACE_OVERLAY_BODY))
+	box.add_child(row)
+	var name_ := UiKit.label(label, UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_SECONDARY)
+	name_.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	name_.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(name_)
+	var right := HBoxContainer.new()
+	right.name = "Days"
+	right.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	right.add_theme_constant_override(&"separation", 4)
+	for i in days.size():
+		if i > 0: right.add_child(UiKit.label("·", UiTokens.STYLE_BODY_XB14, UiTokens.COLOR_SECONDARY))
+		right.add_child(UiKit.label(str(days[i][0]), UiTokens.STYLE_BODY_XB14))
+		var icon := UiKit.icon(P0Logic.icon(str(days[i][1])), 16)
+		icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		right.add_child(icon)
+	row.add_child(right)
+	return box
+
 ## Opens the sheet as `ui`'s modal (modal_kind = kind). go: the primary's action (the sheet does not close itself;
 ## the caller decides); details: Details › (none when empty); closed: called once the sheet leaves the tree.
 ## Returns the holder.
@@ -81,11 +126,28 @@ static func open(ui: P0Ui, spec: Dictionary, go: Callable, details := Callable()
 	var col := VBoxContainer.new()
 	col.add_theme_constant_override(&"separation", 8)
 	panel.add_child(col)
-	col.add_child(UiObjectHeader.new({"title": str(spec.get("title", "")), "state": str(spec.get("subtitle", ""))}))
+	var header := UiObjectHeader.new({"title": str(spec.get("title", "")), "state": str(spec.get("subtitle", ""))})
+	if str(spec.get("thumb", "")) != "":   # a pond: its thumbnail left of the title, 12 apart (2255:143162)
+		var top := HBoxContainer.new()
+		top.name = "Header"
+		top.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		top.add_theme_constant_override(&"separation", 12)
+		var thumb := UiPondThumb.new(str(spec.thumb), UiPondThumb.CARD)
+		thumb.name = "Thumb"
+		thumb.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		top.add_child(thumb)
+		header.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		top.add_child(header)
+		col.add_child(top)
+	else:
+		col.add_child(header)
+	var now: Array = spec.get("conditions", [])
+	if not now.is_empty(): col.add_child(conditions_row(now))
 	var why: Dictionary = spec.get("reason", {}) if spec.get("reason", {}) is Dictionary else {}
 	if not why.is_empty(): col.add_child(reason_row(why))
 	if str(spec.get("line", "")) != "": col.add_child(UiKit.label(str(spec.line), UiTokens.STYLE_C14_B))
-	for f in spec.get("facts", []): col.add_child(UiFactRow.new(str(f[0]), str(f[1])))
+	for f in spec.get("facts", []):
+		col.add_child(forecast_row(str(f[0]), f[1]) if f[1] is Array else UiFactRow.new(str(f[0]), str(f[1])))
 	if details.is_valid():
 		var link := Button.new()
 		link.name = "Details"

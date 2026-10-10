@@ -9,7 +9,8 @@ extends P0Room
 const OnlineCrowd = preload("res://modules/net/online_crowd.gd")
 const NPCS_PATH := "res://assets/p0/outpost_npcs.json"
 ## Drawn in the art but without a P0 use: no finger card, no tap (§17.2.1; SGODOT-227 5a63a8ec).
-const DECOR := ["use_fish_board", "use_fee_board", "use_stamp_desk", "use_coffee_pot"]
+## The Tackle Shop's board is the Bite Board since P1 (SGODOT-283): a facility, not decor.
+const DECOR := ["use_fee_board", "use_stamp_desk", "use_coffee_pot"]
 ## Tapping the counter is tapping the keeper (LOCK-15 / 16).
 const COUNTERS := ["use_counter", "use_stall_1", "npc_keeper"]
 ## Furniture that seats: its seat_ anchors are seat_<group>_<n>.
@@ -191,6 +192,7 @@ func _on_facility(n: String) -> void:
 	# Boards and shelves are facilities, not keepers: they open the market counter directly (LOCK-16 / 07).
 	elif n == "use_market_board": _open_entry("open_counter", ["market", counter_opts("board")], "Market Board")
 	elif n == "use_specialty_shelf": _open_entry("open_counter", ["market", counter_opts("specialty")], "City Specialty")
+	elif n == "use_fish_board": _open_entry("open_bite_board", [outpost], "Bite Board")   # SGODOT-283 e61cda10 ③
 
 ## LOCK-16: keepers greet first, Trade opens the counter (SGODOT-224's open_keeper_greeting(role, ctx)).
 func _open_keeper() -> void:
@@ -319,6 +321,7 @@ func _marker(n: String, view: Dictionary) -> Dictionary:
 		var open := int(view.get("keepers", {}).get("market", {}).get("board_open", 0))
 		return {kind = "facility", icon = P0Logic.icon("board"), name = "Market Board", badge = "request" if open > 0 else ""}
 	if n == "use_specialty_shelf": return {kind = "facility", icon = P0Logic.icon("postcard"), name = "City Specialty"}
+	if n == "use_fish_board": return {kind = "facility", icon = P0Logic.icon("board"), name = "Bite Board"}
 	return super._marker(n, view)
 
 # ---------------------------------------------------------------- seats (茶桌 / 长椅, LOCK-30: the card says Sit)
@@ -438,6 +441,10 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"sit": _go_sit(step[1] if step.size() > 1 else "seat_table1_")
 		"stand": _stand_up()
 		"nomarks": _dev_no_marks = true   # acceptance shots: finger cards off, name tags stay
+		"biteboard": if rt: rt.ui.open_bite_board(outpost)   # the Bite Board as after tapping the board (SGODOT-283 shots)
+		"bitepond": if rt: rt.ui.open_board_pond(outpost, step[1])   # bitepond:<pond id> — a row's pond card
+		"bitescroll":   # bitescroll — the open board scrolled to its end
+			if rt and rt.ui.bite_board(): (rt.ui.bite_board().find_child("Scroll", true, false) as ScrollContainer).scroll_vertical = 100000
 		"zoom":   # zoom:0.8 — a pinch to that zoom about the screen's centre (acceptance shots)
 			_zoom_at = _view() * 0.5
 			_set_zoom(float(step[1]) if step.size() > 1 else 1.0)

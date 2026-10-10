@@ -123,6 +123,7 @@ func _init() -> void:
 		return str(world.call("p0_near_resident")) if is_instance_valid(world) and world.has_method("p0_near_resident") else ""
 	ui.place_pressed.connect(_on_place_pressed)
 	ui.tackle_requested.connect(func(): _leave_then("tackle"))
+	ui.go_pond.connect(func(id: String): _leave_then("go:pond:" + id))   # the Bite Board's pond card: Go (SGODOT-283)
 	session.state_changed.connect(func(_v, _e): _net_ok())   # any answer ends a run of failures (and offline)
 	session.state_changed.connect(_on_state)
 	# U6: doing what the TipCard on screen teaches closes it (sow / cast / cook / heat are command types).
