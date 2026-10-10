@@ -45,6 +45,7 @@ signal look_previewed(stage: String, look: String)
 
 const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
 const P0Travel := preload("res://modules/p0/p0_travel.gd")   # where the player is in the world (SGODOT-275)
+const P0Clusters := preload("res://modules/p0/p0_clusters.gd")   # the home city's centre for Improve this map (q(133) v3)
 const P0ArrivalCard := preload("res://modules/p0/p0_arrival_card.gd")   # the sheet the Passport and city pages use
 const _RESIDENT_SHEET_H := 443.0   # RES-PIP: Sheet 443 of 800
 const _CLOSE_ABOVE_SHEET := 6.0    # RES-PIP: Close · 44 px sits 6 above the sheet, 16 in from the right
@@ -1600,6 +1601,21 @@ func end_stick() -> void:
 
 func has_modal() -> bool: return _modal != null or (_radial != null and _radial.is_open())
 
+## The top (UI px) of the card open over the world, for what keeps above it (the map's credit line, q(133) v3): INF
+## with none, 0 for a page that covers the world (a page or drawer that takes the touch over the whole screen).
+func modal_top() -> float:
+	if _modal == null or not is_instance_valid(_modal) or _modal.get_child_count() == 0: return INF
+	var content := _modal.get_child(_modal.get_child_count() - 1) as Control
+	if content == null: return INF
+	if content.mouse_filter == Control.MOUSE_FILTER_STOP: return content.get_global_rect().position.y
+	var top := INF
+	var wide := root.get_viewport_rect().size.x * 0.5
+	for c in content.get_children():   # a card: a holder over the whole screen, its panel low in it (its × over it is not)
+		if not (c is Control) or not (c as Control).visible or (c as Control).mouse_filter != Control.MOUSE_FILTER_STOP: continue
+		var r := (c as Control).get_global_rect()
+		if r.size.x >= wide: top = minf(top, r.position.y)
+	return top if top < INF else 0.0
+
 ## Who speaks in the open modal (NPC-G1, #57): "keeper" under a keeper's greeting card, the resident's id under their
 ## dialogue bar, "" under anything else. Read from the modal itself, so a bar reached any way counts — a dish card's
 ## `Gift to <Name>` drawer goes back to that resident's bar without the room ever having been tapped (韩信 int9).
@@ -2846,10 +2862,34 @@ func open_licenses(back := Callable()) -> void:
 	var page := P0SettingsPage.licenses(P0Legal.groups(), safe_top(), safe_bottom())
 	page.theme = UiKit.theme()
 	page.back_pressed.connect(back_modal)
-	page.open_pressed.connect(func(id: String): open_license_text(id, func(): open_licenses(back)))
+	page.open_pressed.connect(func(id: String):
+		# Mapbox (q(133) v3) opens Map data; every other row its full text
+		if str(P0Legal.row(id).get("page", "")) == "map_data": open_map_data(func(): open_licenses(back))
+		else: open_license_text(id, func(): open_licenses(back)))
 	_open_modal(page, 0.0, true)
 	modal_kind = "licenses"
 	_modal_back = back
+
+## Licenses › Mapbox › Map data (q(133) v3): the credits and Improve this map open in the browser; the switch is the
+## map SDK's telemetry (MapUsage), on at once. Improve this map goes to the map's last view, else the home city's.
+func open_map_data(back := Callable()) -> void:
+	var page := P0SettingsPage.map_data(MapUsage.enabled(), safe_top(), safe_bottom())
+	page.theme = UiKit.theme()
+	page.back_pressed.connect(back_modal)
+	page.open_pressed.connect(_open_map_data_row)
+	page.toggled.connect(func(what: String, on: bool): if what == "telemetry": MapUsage.set_enabled(on))
+	_open_modal(page, 0.0, true)
+	modal_kind = "map_data"
+	_modal_back = back
+
+## A Map data row's address, opened in the browser: the two credits and Mapbox's feedback page.
+func _open_map_data_row(what: String) -> void:
+	match what:
+		"mapbox_site": OS.shell_open(MapUsage.MAPBOX_CREDIT)
+		"osm_site": OS.shell_open(MapUsage.OSM_CREDIT)
+		"improve":
+			var c := P0Clusters.get_cluster(P0Travel.home(view))
+			OS.shell_open(MapUsage.feedback_url(Vector3(float(c.get("lat", 0.0)), float(c.get("lng", 0.0)), 12.0)))
 
 ## A credit's full text under its title (no frame; 不知火舞 on the Licenses brief).
 func open_license_text(id: String, back := Callable()) -> void:

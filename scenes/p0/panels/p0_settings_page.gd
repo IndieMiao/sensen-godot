@@ -9,12 +9,17 @@ extends Control
 ##   LICENSES  (SET-LICENSES 1254:88796) P0Legal's groups (Software, Map data), each row › to its text.
 ##   TEXT      no frame: the row's title in the header, its full text below — Regular 13 secondary, 16 in, paragraphs
 ##             8 apart (不知火舞: long legal text is too heavy in bold), the hard-wrapped lines joined (P0Legal).
-## Emits back_pressed, open_pressed(what): "licenses" or a row id.
+##   MAP_DATA  (q(133) v3, Q133-V3-MAPDATA 2425:129113) from Licenses › Mapbox: `Credits` — `© Mapbox ›`,
+##             `© OpenStreetMap contributors ›` — then an untitled group: `Improve this map ›` and the switch `Share
+##             anonymous map usage` (`Helps Mapbox improve its maps`).
+## Emits back_pressed, open_pressed(what): "licenses", a row id, or a Map data row ("mapbox_site", "osm_site",
+## "improve"); toggled(what, on): "telemetry".
 
 signal back_pressed
 signal open_pressed(what: String)
+signal toggled(what: String, on: bool)
 
-enum Kind { SETTINGS, LICENSES, TEXT }
+enum Kind { SETTINGS, LICENSES, TEXT, MAP_DATA }
 
 const _HEADER_X := UiTokens.SIZE_QUICK_BAR_X   # the profile's top bar's x
 const _HEADER_H := 48.0
@@ -96,6 +101,26 @@ static func licenses(groups: Array, safe_top := 0.0, safe_bottom := 0.0) -> P0Se
 		page._group(str(g.get("title", "")), rows)
 	return page
 
+## MAP_DATA (q(133) v3): Mapbox's credits, the feedback page and the telemetry switch (`sharing`: its state now).
+static func map_data(sharing: bool, safe_top := 0.0, safe_bottom := 0.0) -> P0SettingsPage:
+	var page := P0SettingsPage.new(Kind.MAP_DATA, "Map data", safe_top, safe_bottom)
+	var credits: Array = []
+	for spec in [["mapbox_site", "© Mapbox"], ["osm_site", "© OpenStreetMap contributors"]]:
+		var row := UiSettingRow.new(UiSettingRow.Kind.LINK, spec[1])
+		row.name = spec[0]
+		row.pressed.connect(func(): page.open_pressed.emit(spec[0]))
+		credits.append(row)
+	page._group("Credits", credits)
+	var improve := UiSettingRow.new(UiSettingRow.Kind.LINK, "Improve this map")
+	improve.name = "improve"
+	improve.pressed.connect(func(): page.open_pressed.emit("improve"))
+	var share := UiSettingRow.new(UiSettingRow.Kind.TOGGLE, "Share anonymous map usage", "Helps Mapbox improve its maps")
+	share.name = "telemetry"
+	share.on = sharing
+	share.toggled.connect(func(on: bool): page.toggled.emit("telemetry", on))
+	page._group("", [improve, share])
+	return page
+
 ## TEXT: a credit's full text under its title.
 static func text(title: String, full_text: String, safe_top := 0.0, safe_bottom := 0.0) -> P0SettingsPage:
 	var page := P0SettingsPage.new(Kind.TEXT, title, safe_top, safe_bottom)
@@ -122,9 +147,17 @@ func _add_paragraphs(n: int) -> void:
 ## TEXT: every paragraph is on the page (the batches done).
 func complete() -> bool: return _to_add.is_empty()
 
-## A group title (SETTINGS-1's: Bold 12 secondary) and its rows in one card.
+## A group title (SETTINGS-1's: Bold 12 secondary) and its rows in one card. An untitled group keeps 8 more apart from
+## the card above it (Q133-V3-MAPDATA: 24 between the two cards).
 func _group(title: String, rows: Array) -> void:
-	var t := UiKit.label(title, UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_SECONDARY)
-	t.name = "Group " + title
-	body.add_child(t)
+	if title != "":
+		var t := UiKit.label(title, UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_SECONDARY)
+		t.name = "Group " + title
+		body.add_child(t)
+	elif body.get_child_count() > 0:
+		var gap := Control.new()
+		gap.name = "Gap"
+		gap.custom_minimum_size.y = _GROUP_GAP
+		gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		body.add_child(gap)
 	body.add_child(UiSettingRow.group(rows))

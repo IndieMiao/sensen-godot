@@ -20,11 +20,14 @@ func test_the_credits_are_the_frame_and_q129_word_for_word() -> void:
 	assert_array(g[0].rows.map(func(r): return [r.title, r.license])).is_equal([["Godot Engine", "MIT License"],
 		["Nunito", "SIL Open Font License 1.1"], ["Phosphor Icons", "MIT License"], ["Mapbox Maps SDK", "Mapbox Terms of Service"]])
 	assert_array(g[1].rows.map(func(r): return [r.title, r.credit, r.license])).is_equal([
+		["Mapbox", "© Mapbox", "Mapbox Terms of Service"],   # q(133) v3: first in Map data, its › to the Map data page
 		["OpenStreetMap", "© OpenStreetMap contributors", "ODbL 1.0"],
 		["GeoNames", "Contains data from GeoNames (geonames.org)", "CC BY 4.0"],
 		["ESA WorldCover", WORLDCOVER, "CC BY 4.0"]])
+	assert_str(str(P0Legal.row("mapbox_data").get("page", ""))).is_equal("map_data")
 	for grp in g:
-		for r in grp.rows:   # every › opens a text that ships with the package
+		for r in grp.rows:   # every other › opens a text that ships with the package
+			if r.has("page"): continue
 			assert_int(P0Legal.full_text(r).length()).override_failure_message(str(r.id)).is_greater(50)
 	assert_str(P0Legal.full_text(P0Legal.row("godot"))).contains("Third-party components")
 	assert_str(P0Legal.full_text(P0Legal.row("osm"))).contains("Open Database License")
@@ -130,6 +133,62 @@ func test_the_gear_opens_settings_and_back_goes_one_page_at_a_time() -> void:
 		(ui._modal.find_children("*", "P0SettingsPage", true, false)[0] as P0SettingsPage).back_pressed.emit()
 		await await_idle_frame()
 		assert_str(ui.modal_kind).is_equal(kind)
+	# q(133) v3: Licenses › Mapbox opens Map data, and its ‹ comes back to Licenses
+	ui.open_licenses(func(): ui.open_settings())
+	await await_idle_frame()
+	(ui._modal.find_child("mapbox_data", true, false).find_child("Hit", true, false) as Button).pressed.emit()
+	await await_idle_frame()
+	assert_str(ui.modal_kind).is_equal("map_data")
+	assert_float(ui.modal_top()).is_equal(0.0)   # a page over the world: the map's credit line is not drawn
+	(ui._modal.find_children("*", "P0SettingsPage", true, false)[0] as P0SettingsPage).back_pressed.emit()
+	await await_idle_frame()
+	assert_str(ui.modal_kind).is_equal("licenses")
+	ui.close_modal()
+	assert_float(ui.modal_top()).is_equal(INF)
+
+## q(133) v3 (Q133-V3-MAPDATA 2425:129113): `Credits` — © Mapbox ›, © OpenStreetMap contributors › — then an untitled
+## group 24 under it: Improve this map › and the switch Share anonymous map usage, its line under it; a tap anywhere on
+## the row flips the switch.
+func test_map_data_holds_the_credits_feedback_and_the_switch() -> void:
+	var page: P0SettingsPage = auto_free(P0SettingsPage.map_data(true))
+	add_child(page)
+	await await_idle_frame()
+	assert_str(page.header.title).is_equal("Map data")
+	assert_array(_labels(page.body).filter(func(t): return t in ["Credits", "© Mapbox", "© OpenStreetMap contributors",
+		"Improve this map", "Share anonymous map usage", "Helps Mapbox improve its maps"])).is_equal(["Credits", "© Mapbox",
+		"© OpenStreetMap contributors", "Improve this map", "Share anonymous map usage", "Helps Mapbox improve its maps"])
+	var cards: Array = page.body.get_children().filter(func(c): return c is PanelContainer)
+	assert_int(cards.size()).is_equal(2)
+	assert_float((cards[1] as Control).position.y - (cards[0] as Control).get_rect().end.y).is_equal_approx(24.0, 0.5)
+	var said := []
+	page.open_pressed.connect(func(w): said.append(w))
+	var switched := []
+	page.toggled.connect(func(w, on): switched.append([w, on]))
+	for id in ["mapbox_site", "osm_site", "improve"]:
+		(page.body.find_child(id, true, false).find_child("Hit", true, false) as Button).pressed.emit()
+	assert_array(said).is_equal(["mapbox_site", "osm_site", "improve"])
+	var share := page.body.find_child("telemetry", true, false) as UiSettingRow
+	assert_bool(share.on).is_true()   # on by default
+	assert_vector((share.find_child("Toggle", true, false) as Control).size).is_equal(Vector2(48, 28))
+	(share.find_child("Hit", true, false) as Button).pressed.emit()
+	assert_bool(share.on).is_false()
+	assert_array(switched).is_equal([["telemetry", false]])
+
+## q(133) v3: the switch is the SDK's (Android: the map plugin), with the game's own copy where it cannot ask (here:
+## the desktop); Improve this map goes to the map's last view, else to the fallback (the home city's centre).
+func test_map_usage_keeps_the_choice_and_builds_the_feedback_address() -> void:
+	var was := MapUsage.enabled()
+	MapUsage.set_enabled(false)
+	assert_bool(MapUsage.enabled()).is_false()
+	MapUsage.set_enabled(true)
+	assert_bool(MapUsage.enabled()).is_true()
+	MapUsage.set_enabled(was)
+	var saved := MapUsage.last_view
+	MapUsage.last_view = Vector3.ZERO
+	assert_str(MapUsage.feedback_url(Vector3(37.7749, -122.4194, 12.0))).is_equal("https://apps.mapbox.com/feedback/#/-122.41940/37.77490/12.00")
+	MapUsage.last_view = Vector3(35.6842, 139.7128, 14.0)
+	assert_str(MapUsage.feedback_url(Vector3(37.7749, -122.4194, 12.0))).is_equal("https://apps.mapbox.com/feedback/#/139.71280/35.68420/14.00")
+	MapUsage.last_view = saved
 
 ## 不知火舞 on #292: Settings, Licenses and a text page are pages of one path from the profile: the header's back sits
 ## exactly on the profile top bar's back (the safe area too), so it never jumps.

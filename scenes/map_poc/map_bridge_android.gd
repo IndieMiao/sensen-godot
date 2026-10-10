@@ -57,6 +57,9 @@ func set_language(locale: String) -> void:
 	if _supports("setLanguage"):
 		_plugin.setLanguage(locale)
 
+func has_mapbox() -> bool:
+	return is_instance_valid(_plugin)
+
 func _supports(method: String) -> bool:
 	if not is_instance_valid(_plugin): return false
 	# Android singletons are JavaObject wrappers; Object.has_method sees only the wrapper.

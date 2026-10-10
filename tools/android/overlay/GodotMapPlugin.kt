@@ -18,6 +18,7 @@ import org.json.JSONObject
 import com.mapbox.bindgen.Value
 import com.mapbox.maps.SourceQueryOptions
 import com.mapbox.common.MapboxOptions
+import com.mapbox.common.TelemetryUtils
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.MapView
@@ -172,6 +173,11 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
                     FrameLayout.LayoutParams.MATCH_PARENT
                 )
             )
+            // q(133) v3: no logo or ⓘ on the map (under the Godot surface they were punched out and their taps went to
+            // Godot); the game draws one credit line, and its Licenses › Mapbox page holds the credits and the telemetry
+            // switch (setTelemetryEnabled).
+            mv.logo.enabled = false
+            mv.attribution.enabled = false
             mv.mapboxMap.setCamera(
                 CameraOptions.Builder()
                     .center(Point.fromLngLat(lng, lat))
@@ -371,10 +377,31 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
         mapSceneVisible = visible
         // Removing the SurfaceView reveals the launcher while Godot submits its first opaque frame.
         // onStop pauses rendering without removing that surface from Android's compositor.
-        mv.logo.enabled = visible
-        mv.attribution.enabled = visible
-        mv.compass.enabled = visible
+        mv.compass.enabled = visible   // the logo and ⓘ stay off: the game draws its own credit line (q(133) v3)
         if (visible) mv.onStart() else mv.onStop()
+    }
+
+    /**
+     * Licenses › Mapbox › Share anonymous map usage (q(133) v3): Mapbox's telemetry, through Mapbox Common's public
+     * TelemetryUtils (no map view needed). The SDK keeps the choice.
+     */
+    @UsedByGodot
+    fun setTelemetryEnabled(enabled: Boolean) {
+        try {
+            TelemetryUtils.setEventsCollectionState(enabled) { }
+        } catch (e: Throwable) {
+            Log.e(TAG, "telemetry switch failed", e)
+        }
+    }
+
+    @UsedByGodot
+    fun isTelemetryEnabled(): Boolean {
+        return try {
+            TelemetryUtils.getEventsCollectionState()
+        } catch (e: Throwable) {
+            Log.e(TAG, "telemetry state unreadable", e)
+            true
+        }
     }
 
     /** Android 根页返回遵循系统语义：任务进入后台并保留热启动状态。 */

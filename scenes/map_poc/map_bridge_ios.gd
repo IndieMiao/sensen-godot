@@ -43,6 +43,9 @@ func set_language(locale: String) -> void:
 func get_pixel_ratio() -> float:
 	return _ratio
 
+func has_mapbox() -> bool:
+	return true
+
 func poll() -> void:
 	_frames += 1
 	if _frames % CREATE_RESEND_FRAMES == 0: _send("LANG|" + _locale)
