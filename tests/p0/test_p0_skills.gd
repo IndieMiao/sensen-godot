@@ -10,7 +10,8 @@ func _view() -> Dictionary:
 		"skills": {"farming": {"level": 2, "xp": 60}, "fishing": {"level": 1, "xp": 20}, "cooking": {"level": 3, "xp": 120}},
 		"names": {"fert_compost": "Compost", "tool_row_hoe": "Row Hoe", "bait_worm": "Worm Bait", "fish_perch": "River Perch",
 			"fish_bass": "Largemouth Bass", "fish_trout": "Rainbow Trout", "fish_koi": "Golden Koi", "fish_catfish": "Catfish",
-			"fish_sturgeon": "Silver Sturgeon", "fish_eel": "River Eel"},
+			"fish_sturgeon": "Silver Sturgeon", "fish_eel": "River Eel", "fish_mackerel": "Mackerel", "fish_seabass": "Sea Bass",
+			"rod_carbon": "Carbon Rod", "bait_lure": "Spinner Lure"},
 		"stall": {"buy": [{"id": "fert_compost", "skill": "farming", "gate": 3}, {"id": "bait_worm", "skill": "fishing", "gate": 2}]},
 		"firsts": ["harvest:crop_radish", "harvest:crop_carrot", "catch:fish_crucian"],
 		"fishing": {"dex": [{"id": "fish_crucian", "caught": 3}, {"id": "fish_mackerel", "caught": 1}]},
@@ -33,12 +34,13 @@ func test_each_track_says_its_level_what_is_next_and_its_xp() -> void:
 		["Lv6 · Cucumber", "locked", ""], ["Lv7 · Apple Sapling", "locked", ""], ["Lv8 · Strawberry", "locked", ""],
 		["Lv9 · Melon, Citrus Sapling, Grapevine Cutting", "locked", ""]])
 	var fishing: Dictionary = d.tracks[1]
-	assert_str(fishing.next).is_equal("Next: River Perch, Largemouth Bass, Rainbow Trout and Worm Bait")   # no coast fish yet
-	# This season's waters only (Sea Bass and Mackerel wait for Coast); the regional fish as one item at Lv3, after the
-	# gear (李白 on #214, §14 `Next Lv3 · Reed Rod, Regional fish`).
+	assert_str(fishing.next).is_equal("Next: River Perch, Largemouth Bass, Rainbow Trout, Mackerel and Worm Bait")
+	# This season's waters only — Coast from P1 (Clover Pond, SGODOT-283), so Mackerel and Sea Bass are in; the regional
+	# fish as one item at Lv3, after the gear (李白 on #214, §14 `Next Lv3 · Reed Rod, Regional fish`); the Carbon Rod
+	# and the Spinner Lure where they open (§6.4).
 	assert_array(fishing.milestones.map(func(m): return m.line)).is_equal([
-		"Lv2 · River Perch, Largemouth Bass, Rainbow Trout, Worm Bait", "Lv3 · Reed Rod, Regional fish",
-		"Lv4 · Golden Koi, Catfish", "Lv7 · Silver Sturgeon", "Lv9 · River Eel"])
+		"Lv2 · River Perch, Largemouth Bass, Rainbow Trout, Mackerel, Worm Bait", "Lv3 · Reed Rod, Regional fish",
+		"Lv4 · Golden Koi, Catfish", "Lv5 · Sea Bass, Spinner Lure", "Lv6 · Carbon Rod", "Lv7 · Silver Sturgeon", "Lv9 · River Eel"])
 	assert_str(d.tracks[2].next).is_equal("Next: third ingredient slot")
 	var v := _view()
 	v.skills.farming = {"level": 4, "xp": 412}
