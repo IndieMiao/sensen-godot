@@ -38,7 +38,7 @@
 | 田数 | Homestead Lv1–2 **30 格**（同 P0）；**Lv3 起 40 格**。升到 Lv3 那一刻多出 10 格**荒地**（翻地 0 体力，同 P0 的 10 格荒地） |
 | 编号 | 0–29 的编号与位置**不动**（存档里的作物不搬家）；新 10 格编号 30–39 |
 | 位置 | 建议：在现有 6 列 × 5 行的右边加两列（P0Garden 的 x = 16、18，y = 3…11），整块变 8 列 × 5 行；井（17, 8）会落进田里，挪到田外或由客户端与美术总监另定。周瑜 231 的采集点也压在这两列上：Rock Pile (18, 4) 会卡在新田的走道里，Timber Grove (17, 12) 的树干格 (18, 11) 压到一格新田；左侧（芦苇、黏土、矿口）与前排（出生点、出口）没有空位，所以保留右侧两列，把 Rock Pile、Timber Grove 挪到院子右上 / 右下角，用 PR-B 的「占地不重叠、不压田、不出院子」测试兜住，请不知火舞复核（周瑜 2026-10-08）；Timber Grove 挪到 (17, 12) 后树冠仍压到最后一行新田，一起挪开。Lv3 整圈篱笆东边在 12.95 m，新列东沿约 12.50 m，包得住，篱笆不用改（苏烈核过）。最终位置由客户端按 `P0Garden.FOOTPRINTS` 排，不得挡驿站棚、工作台、矿口与出入口的路 |
-| 升级时刻 | HOME-2 的 Lv3 后果飘字加一行 `Plots +10`，新 10 格随篱笆一起从上方落位；HOME-1 的 Lv3「升了会怎样」加 `Plots +10`（方案原写 `Plots +40` 是地理农场的尺度） |
+| 升级时刻 | HOME-2 的 Lv3 后果飘字加一行 `Plots 40`，新 10 格随篱笆一起从上方落位；HOME-1 的 Lv3「升了会怎样」加 `Plots 40 · 10 more to till`（方案原写 `Plots +40` 是地理农场的尺度；2026-10-10 q(110) 改为总数写法，原 `Plots +10` 作废） |
 | 田数显示 | 紧凑农场的每一格都在画面里，**不做** `Plots 32/40` 一类的计数角标 |
 | 已是 Lv3 的存档 | 版本更新后立即补上 30–39 号荒地（服务端迁移） |
 | Lv4 以后 | 方案 §8 的开垦上限列（Lv1 200 → Lv10 600）是地理农场的尺度，P1 紧凑农场不用；Lv4–10 的田数随第 3 步重算（要连同 §4.4、§15 重度全种的上界一起复跑）。在那之前 Lv4 以上仍为 40 格 |
@@ -152,7 +152,7 @@
 | 主行动键 | 覆盖内的格播种后不再出 `Water · Free`；有洒水器的格键面不出劳作动词（与站在设施前相同） | — |
 | 驿站 | 三种种子的货架行与锁态（现有 `_buy_row` 的 `Farming Lv%d · %d XP to go` 胶囊） | — |
 | 横幅 | Farming Lv5（1.5 秒）、Lv6（全幅 ≤ 3 秒 + `Show Workbench`） | 233 MomentBanner |
-| HOME-1 / HOME-2 | Lv3 后果行 `Plots +10`；升级时刻新 10 格随篱笆落位 | 苏烈 HOME 面板 |
+| HOME-1 / HOME-2 | Lv3 后果行 HOME-1 `Plots 40 · 10 more to till`、HOME-2 `Plots 40`；升级时刻新 10 格随篱笆落位 | 苏烈 HOME 面板 |
 | Cookbook | 4 页从剪影变可发现；`Dishes first-cooked n/18` | 哪吒厨房 |
 
 ## 5. 英文文案（附录 B.5 同步）
@@ -165,7 +165,7 @@
 | 蓝图卡 | Sprinkler / Farming Lv6 / Waters 8 plots for you / Timber 8/8 · Stone 6/6 · Copper Ore 1/3 / Need 2 more Copper Ore / Farming Lv6 needed / Build / Sprinklers 4/4 · Homestead Lv2 adds 1 |
 | 放置模式 | Coverage preview · 8 plots / Build / Cancel / Plot occupied / Outside your fields |
 | 状态卡 | Sprinkler · Waters 8 plots / Move |
-| Homestead Lv3 | Plots +10 |
+| Homestead Lv3 | Plots 40 · 10 more to till（HOME-1）/ Plots 40（HOME-2） |
 | 门禁卡 | Cabbage Seeds · Farming Lv5 · 120 XP to go · harvest 30 tomatoes · Unlocks Cabbage, Corn / Cucumber Seeds · Farming Lv6 · Unlocks Cucumber / Sprinkler · Farming Lv6 · Waters 8 plots for you |
 | 技能页 | Next: Lv5 · Cabbage, Corn · 200 XP / Next: Lv6 · Cucumber, Sprinkler · 250 XP / Next: Lv7 · 300 XP / Crops first-harvested 9/11 / Dishes first-cooked 12/18 |
 
@@ -205,7 +205,7 @@
 | T2 | 前置 F4。收番茄跨过 Lv5 | 横幅 `Farming Lv 5` / `New for you · Cabbage, Corn` / `+30 Energy` / Tip `Next Lv6 · Cucumber, Sprinkler · 250 XP`；驿站卷心菜、玉米变可买 |
 | T3 | 前置 F5。买卷心菜种子 5、玉米 5，播种，等成熟收获 | 播种每格 −3 / −4 体力；收获卷心菜每株 +3 XP、首收 +15；玉米每株产 3 根、+4 XP、首收 +20；图鉴 `Crops first-harvested n/11` |
 | T4 | 前置 F5。Experiment 放卷心菜 + 土豆；玉米 ×2；只放 1 个番茄；只放 1 根玉米 | 依次做出 Cabbage Stew（Common）、Corn Cake（Fine）、Roast Veggies（Fine）、Roast Veggies；没有 Mystery Dish；Cookbook 4 页点亮，技能页 `Dishes first-cooked n/18` |
-| T5 | 前置 H2→3。升 Homestead Lv3 | 后果飘字含 `Plots +10`；新 10 格荒地随篱笆落位，位置连着原来的田；能翻地（0 体力），能播种；原 0–29 格的作物不动 |
+| T5 | 前置 H2→3。升 Homestead Lv3 | 后果飘字含 `Plots 40`；新 10 格荒地随篱笆落位，位置连着原来的田；能翻地（0 体力），能播种；原 0–29 格的作物不动 |
 | T6 | 前置 F6（差 0 到 Lv6）。收任意作物跨过 Lv6 | 全幅横幅 ≤ 3 秒 `Farming Lv 6` / `New for you · Cucumber, Sprinkler` / `+30 Energy` / `Today changes: no more watering`；点 `Show Workbench` 只移动相机到工作台，不打开抽屉 |
 | T7 | 前置 F6。点工作台 → Facilities | Sprinkler 蓝图卡：`Waters 8 plots for you`、材料格 `Timber 20/8 · Stone 20/6 · Copper Ore 7/3`、按钮 `Build` |
 | T8 | P7 后按 `Build` | 进放置模式：摇杆不出、快捷栏与主行动键隐藏；预览落在最近的空田，3 × 3 浅蓝 + `Coverage preview · 8 plots`；拖到有作物的格 → 中心格红、按钮 `Plot occupied`；拖到田外 → `Outside your fields`；按 `Cancel` → 材料没扣 |

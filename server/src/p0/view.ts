@@ -297,7 +297,7 @@ function shopView(c: P0Content, s: P0State, shop: ShopId) {
 
 /** Ids a request could take, cheapest floor first: the fixed items, or every crop / fish / dish that fits its kind and rarity. */
 function candidates(c: P0Content, r: BoardRequest): string[] {
-  if (r.items.length) return r.items;
+  if (r.items.length || r.kind === 'visit') return r.items;
   const ids = r.kind === 'fish' ? c.fish.map(f => f.id) : r.kind === 'dish' ? c.cooking.recipes.map(x => x.id) : c.crops.map(x => x.id);
   return ids.filter(id => matches(c, { kind: r.kind, rarity: r.rarity, style: r.style, family: r.family }, [], id)).sort((a, b) => floorPrice(c, a) - floorPrice(c, b));
 }
@@ -305,7 +305,8 @@ function candidates(c: P0Content, r: BoardRequest): string[] {
 /** One request as facts (§9.6.5): what it takes, what the bag holds for it, and what delivering now would pay. */
 function requestView(c: P0Content, s: P0State, r: BoardRequest, now: number) {
   const parts = handIn(c, s, r);
-  const each = r.items.length > 1 ? Math.min(...r.items.map(i => haveFor(c, s, { kind: r.kind }, [i])))
+  const each = r.kind === 'visit' ? (r.visit?.done ? 1 : 0)
+    : r.items.length > 1 ? Math.min(...r.items.map(i => haveFor(c, s, { kind: r.kind as 'crop' }, [i])))
     : haveFor(c, s, { kind: r.kind, rarity: r.rarity, style: r.style, family: r.family }, r.items);
   const cheapest = candidates(c, r)[0];
   const estimate = parts ? payout(c, r, parts)
@@ -315,6 +316,7 @@ function requestView(c: P0Content, s: P0State, r: BoardRequest, now: number) {
     items: r.items, rarity: r.rarity ?? null, icon: r.items[0] ?? cheapest ?? null,
     // P1: dishes of a style (`Soup`, or several), crops of a family (`O`); the client names them
     style: r.style === undefined ? null : Array.isArray(r.style) ? r.style : [r.style], family: r.family ?? null,
+    visit: r.visit ?? null,   // explore (Stamp Run): {place: outpost id, done}; the client names the outpost
     qty: r.qty, have: Math.min(each, r.qty), ready: parts !== null,
     coins: estimate.base + estimate.bonus, base: estimate.base, bonus: estimate.bonus,
     status: r.status,

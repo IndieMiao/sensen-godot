@@ -20,7 +20,10 @@ export interface Crop {
   sold_at?: 'stall' | 'market'; regional?: boolean; zone?: string; off_zone_grow_h?: number; seed_daily?: number;
 }
 
-export interface Fish { id: string; name: string; rarity: number; level: number; price: number; cook?: boolean; where: string[] }
+export interface Fish {
+  id: string; name: string; rarity: number; level: number; price: number; cook?: boolean; where: string[];
+  regional?: boolean; zones?: string[];   // P1 regional fish (§6.2.3): the climates they live in
+}
 export interface Rod { id: string; name: string; reach: number; level: number; price: number; hook_bonus_ms: number; band_bonus: number }
 export interface FishSite { name: string; template: string; weights: number[]; fish: string[] }
 /** A pond on the map (assets/p0/p0_ponds.json id): its fishing template follows the point, not its shape (q(36)). */
@@ -40,7 +43,7 @@ export type Convenience = 'cook_again' | 'clue_double' | 'hearty_mishap' | 'stea
   // P1 (SGODOT-282, §4.6.3 Lv7–10)
   | 'steady_hand_2' | 'fast_mastery' | 'cook_all' | 'provisions_plus' | 'chefs_touch' | 'title_chef' | 'lucky_double';
 /** A P0 Cookbook page that can be cooked (§7.14.0); n = its page number in the 48-page Cookbook. */
-export interface Recipe { n?: number; id: string; name: string; in: string[]; known?: boolean; style?: string; learn?: Learn[] }
+export interface Recipe { n?: number; id: string; name: string; in: string[]; known?: boolean; style?: string; learn?: Learn[]; regional?: boolean; card_zone?: string; card_zones?: string[] }
 /** A page outside P0 (§7.14.1–7.14.4): only its silhouette shows, slots = the family of each slot. */
 export interface SilhouettePage { n: number; id: string; name: string; rarity: number; slots: string[]; style: string; learn: Learn[] }
 
@@ -55,8 +58,13 @@ export type BoardId = 'stall' | 'market';
  * distinct items.
  */
 export interface Need {
-  kind: 'crop' | 'fish' | 'dish' | 'material' | 'sow'; id?: string; rarity?: number; style?: string | string[];
+  kind: 'crop' | 'fish' | 'dish' | 'material' | 'sow' | 'visit'; id?: string; rarity?: number; style?: string | string[];
   family?: Family; same?: boolean; distinct?: number;
+  /** §9.6.3 regional templates: the home climate's regional items (zone), the home city's 2 regional fish (city), or
+   * regional items of another climate (other_zone). One such item is drawn; max_rarity caps it (Local Flavor: Fine). */
+  regional?: 'zone' | 'city' | 'other_zone'; max_rarity?: number;
+  /** §9.6.3 explore templates (kind visit): check in at another outpost of the home city than the board's own (Stamp Run). */
+  visit?: { role?: string; where: 'same_city' };
 }
 /**
  * A system request template (§9.6.3). climate narrows it to the home climate (regional templates, `Temperate`);

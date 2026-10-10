@@ -11,6 +11,7 @@ import { itemName } from './content.js';
 import { putInStorage } from './storage.js';
 import { notePresence } from './presence.js';
 import { cityInfo, clusterById, homeCluster, noteEntered, preview, requirePass } from './travel.js';
+import { noteVisit } from './boards.js';
 import { commandFields, uiEvent, type P0EventLog } from './telemetry.js';
 
 /** presence: players in the outpost rooms right now (SGODOT-227 OutpostRooms.total()); log: the observation log (S7). */
@@ -40,6 +41,7 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
       if (refused) return reply.send({ ok: false, code: refused.code, detail: refused.detail, state: view(s, clock(s.clock_ms)) });
       notePresence(c, s, space, clock(s.clock_ms), null, place);
       noteEntered(s, space, place);
+      noteVisit(s, space, place, []);   // the entry read checks in an explore request too (as noteSeenAt marks)
       store.put(s);
     }
     return reply.send({ ok: true, state: view(s, clock(s.clock_ms)) });

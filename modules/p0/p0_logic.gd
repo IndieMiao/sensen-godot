@@ -1287,6 +1287,14 @@ static func resident_bar(view: Dictionary, id: String) -> Dictionary:
 		"lesson": str(r.get("lesson", {}).get("state", "none")) == "ready" if r.get("lesson", null) is Dictionary else false,
 	}
 
+## Stamp Run's check-in toast (不知火舞 / 李白 on #224): `Stamp Run · Checked in` over `Deliver at Mission Market Square`
+## (where its board takes it, as request_of writes it, the pin that lights ✓). Two lines always, as the spec has them.
+static func visit_toast(view: Dictionary, id: String) -> String:
+	var r := PinReason.request_of(view, id)
+	var title := str(r.get("title", "Stamp Run")) if not r.is_empty() else "Stamp Run"
+	var deliver := str(r.get("deliver", "")) if not r.is_empty() else ""
+	return "%s · Checked in" % title + ("\n" + deliver if deliver != "" else "")
+
 ## A resident's favourite as words (§7.16.3): a style stays as it is (`Dessert`); a rarity and up reads
 ## `Fine dishes and up` (Hana; Mira and Tomo `Rare dishes and up`).
 static func likes_text(likes: String) -> String:
