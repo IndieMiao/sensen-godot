@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { loadP0Content } from '../../src/p0/content.js';
 import { eligible, settleBoards } from '../../src/p0/boards.js';
+import { matches } from '../../src/p0/requests.js';
 import { applyP0, type P0Command, type P0Event } from '../../src/p0/reducer.js';
 import { freshState, type BoardRequest, type P0State } from '../../src/p0/state.js';
 import { viewOf } from '../../src/p0/view.js';
@@ -36,6 +37,21 @@ describe('the template pool (§9.6.3: 30 at the prototype stage)', () => {
     for (const [id, t] of Object.entries(c.requests.templates)) {
       if (t.type && t.type !== 'output') expect(t.enabled, id).toBe(false);
       for (const z of t.climate ?? []) expect(z[0], id).toBe(z[0].toUpperCase());
+    }
+  });
+
+  // 周瑜 on #219: every template that is on can be met by something the player can get at its gate.
+  it('every template that is on has at least one deliverable item at its gate level', () => {
+    for (const [id, t] of Object.entries(c.requests.templates)) {
+      if (t.enabled === false) continue;
+      const lv = (skill: string) => Math.max(1, ...t.gate.filter(([g]) => g === skill).map(([, n]) => n));
+      const n = t.need;
+      const pool = n.kind === 'crop' ? c.crops.filter(x => x.gate <= lv('farming')).map(x => x.id)
+        : n.kind === 'fish' ? c.fish.filter(x => x.level <= lv('fishing')).map(x => x.id)
+        : n.kind === 'dish' ? c.cooking.recipes.map(x => x.id)
+        : Object.keys(c.materials);
+      const ok = pool.filter(item => matches(c, n, n.id ? [n.id] : [], item));
+      expect(ok.length, id).toBeGreaterThanOrEqual(n.distinct ?? 1);
     }
   });
 
