@@ -1,5 +1,6 @@
 /** SGODOT-280: global generation — a city cluster's ponds and outposts from the world seed and the cluster id (plan v2
  * §9.3.2 outposts, §6.3.3 ponds), the same every time; the home city keeps its hand-written tables. */
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { everFish } from '../../src/p0/fishing_world.js';
 import type { CityCluster } from '../../src/p0/clusters.js';
@@ -122,6 +123,32 @@ describe('global generation (SGODOT-280)', () => {
     }
   });
 
+  it('names ponds from their climate\'s forty-word pool (q(125)): cities of one band differ, no word in two pools', () => {
+    const pools = w.ponds.words as Record<string, string[]>;
+    const bands = ['Tropical', 'Subtropical', 'Temperate', 'Cool'];
+    const all = bands.flatMap(b => pools[b]);
+    for (const b of bands) expect(pools[b]).toHaveLength(40);
+    expect(new Set(all).size).toBe(all.length);
+    const tea = Object.values(w.tea_words).flat(), keepers = Object.values(w.keeper_names).flat();
+    const fishWords = c.fish.flatMap(f => String((f as { name?: string }).name ?? '').split(' '));
+    // never a city's name (Plum and Aurora are towns): a pond word reads as a place, not as another city
+    const cityNames = new Set(readFileSync(new URL('../../data/cities.tsv', import.meta.url), 'utf8').split('\n')
+      .filter(l => l && !l.startsWith('#')).map(l => l.split('\t')[1]?.toLowerCase()));
+    for (const word of all) {
+      for (const taken of [tea, keepers, fishWords]) expect(taken).not.toContain(word);   // no Willow Tea House by Willow Pond
+      expect(cityNames.has(word.toLowerCase()), `${word} is a city`).toBe(false);
+      expect(`${word} Creek`.length).toBeLessThanOrEqual(18);
+      expect(`${word} Tackle Shop`.length).toBeLessThanOrEqual(24);
+    }
+    const band = (id: string) => pools[{ tropical: 'Tropical', subtropical: 'Subtropical', temperate: 'Temperate', cool: 'Cool' }[cityPlaces(c, id)!.climate]];
+    for (const id of [TOKYO, NYC, BEIJING, SHANGHAI, LA, 'gn-463835']) {
+      for (const p of cityPlaces(c, id)!.detail.ponds) expect(band(id)).toContain(p.name.split(' ')[0]);
+    }
+    // Tokyo, New York and Beijing (all temperate, six ponds each) no longer share one set of names
+    const set = (id: string) => cityPlaces(c, id)!.detail.ponds.map(p => p.name.split(' ')[0]).sort().join();
+    expect(new Set([TOKYO, NYC, BEIJING].map(set)).size).toBe(3);
+  });
+
   it('names keepers from the climate pool, never a resident name, and tea houses from the climate words', () => {
     const tokyo = cityPlaces(c, TOKYO)!;
     const temperate = w.keeper_names.Temperate;
@@ -220,8 +247,10 @@ describe('global generation (SGODOT-280)', () => {
       if (tackle) expect(km(tackle, city.detail.ponds.find(p => p.name === tackle.nearest!.name)!) * 1000).toBeLessThanOrEqual(300);
       expect(all(city).filter(p => !fixed.has(p.id))).toEqual(all(bare).filter(p => !fixed.has(p.id)));
     }
-    expect(cityPlaces(c, LA)!.detail.outposts.find(o => o.id === `${LA}~tackle2`))
-      .toMatchObject({ name: 'Clover Tackle Shop', lat: 34.040844, lng: -118.219243, nearest: { name: 'Clover Cove' } });
+    // the tackle shop found on Hollenbeck Lake (Clover Tackle Shop then; named after its Cove since q(125))
+    const la = cityPlaces(c, LA)!.detail;
+    expect(la.outposts.find(o => o.id === `${LA}~tackle2`))
+      .toMatchObject({ lat: 34.040844, lng: -118.219243, nearest: { name: la.ponds[2].name } });
     // New York's beginner pond, its shop and Market Square 1 came off the Hudson together (司空震, 286 16ffaf67)
     expect(placeOf(c, `${NYC}~pond0`)).toMatchObject({ beginner: true, at: [40.729478, -74.013998] });
     // A renamed pond (before the freeze) keeps its tackle shop pointing at it; a point without both lat and lng is ignored.

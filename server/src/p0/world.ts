@@ -52,7 +52,7 @@ export interface WorldContent {
   rooms: { indoor_cap: number; market_cap: number };
   tea_words: Record<string, string[]>;
   keeper_names: Record<string, string[]>;
-  ponds: { base: number; per_pop: number; max: number; ring_km: [number, number]; words: string[]; suffix: Record<Site, string>; templates: string[] };
+  ponds: { base: number; per_pop: number; max: number; ring_km: [number, number]; words: Record<string, string[] | string>; suffix: Record<Site, string>; templates: string[] };
   area_tier: Record<string, Tier>;
   coastal: Record<string, string[]>;
   /** q(114) ⑤: hand fixes by place id (`_note` aside), see applyOverrides. */
@@ -146,8 +146,8 @@ export function pondCount(w: WorldContent, cl: CityCluster): number {
 /**
  * Ponds (§6.3.3): pond 0 is the beginner Pond on the 2.5 km ring nearest the centre, 1 a River, 2 a Coast for a
  * coastal cluster (else River), 3–5 by hash with at least one Pond kept. Ponds 0–2 sit at 0° / 120° / 240° of the
- * ring turned by the cluster's hash, 3–5 on the 5 km ring between them. Names from the word pool, never repeated
- * in a city, with the site's suffix (Pond / Creek / Cove).
+ * ring turned by the cluster's hash, 3–5 on the 5 km ring between them. Names from the climate's word pool (q(125):
+ * forty a band, so cities differ), never repeated in a city, with the site's suffix (Pond / Creek / Cove).
  */
 export function genPonds(w: WorldContent, cl: CityCluster, sites: Set<string>): GenPond[] {
   const n = pondCount(w, cl), seed = w.seed, coastal = (w.coastal[cl.id] ?? []).includes('coast');
@@ -158,7 +158,8 @@ export function genPonds(w: WorldContent, cl: CityCluster, sites: Set<string>): 
     const pick = (['pond', 'river', 'coast'] as Site[])[hash32(seed, cl.id, `pond-kind:${i}`) % 3];
     kinds.push(pick === 'coast' && !coastal ? 'river' : has(pick));
   }
-  const words = [...w.ponds.words];
+  const pool = w.ponds.words[CLIMATE_KEY[cl.climate]] ?? w.ponds.words.Temperate;
+  const words = [...(pool as string[])];
   const out: GenPond[] = [];
   for (let i = 0; i < n; i++) {
     const ring = i < 3 ? w.ponds.ring_km[0] : w.ponds.ring_km[1];
