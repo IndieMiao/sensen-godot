@@ -219,3 +219,18 @@ describe('Stamp Run (§9.6.3 explore: check in at another outpost)', () => {
     } finally { await app.close(); }
   });
 });
+
+describe('River Run (李白 q(109))', () => {
+  it('asks for Rainbow Trout, the one Fine fish found only in River, and takes no other Fine fish', () => {
+    const t = c.requests.templates.req_sys_fish_river;
+    expect(t.enabled).not.toBe(false);
+    expect(t.need).toEqual({ kind: 'fish', id: 'fish_trout' });
+    expect(c.fishing.sites.river.fish).toContain('fish_trout');
+    expect(c.fishing.sites.pond.fish).not.toContain('fish_trout');
+    const s = put(fresh(), 'stall', { template: 'req_sys_fish_river', kind: 'fish', items: ['fish_trout'], rarity: undefined, qty: 2 });
+    s.bag.push({ id: 'fish_bass', qty: 2 });
+    expect(refuse(s, { type: 'deliver', request: 'r1' })).toMatchObject({ ok: false, code: 'not_enough' });
+    s.bag.push({ id: 'fish_trout', qty: 2 });
+    expect(step(s, { type: 'deliver', request: 'r1' }).s.bag.some(b => b.id === 'fish_trout')).toBe(false);
+  });
+});
