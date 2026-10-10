@@ -86,6 +86,23 @@ func test_harvest_all_takes_the_row_underfoot_from_lv9() -> void:
 	assert_str(str(P0Logic.main_action(v, v.plots[1], "").verb)).is_equal("Harvest")
 	assert_array(P0Logic.level_unlocks({"stall": {"buy": []}}, "farming", 9)).contains(["Harvest All"])
 
+## q(123): the row goes near to far from the plot in front, so a bag that fills keeps what is nearest; equally near on
+## both sides, the left one first.
+func test_harvest_all_goes_near_to_far_from_the_plot_in_front() -> void:
+	var v := {"skills": {"farming": {"level": 9}}, "garden": {"plots": 30}, "energy": {"value": 100}, "plots": []}
+	for id in [6, 7, 8, 9, 10, 11]: v.plots.append({"id": id, "state": "ready", "crop": "crop_radish"})
+	assert_array(P0Logic.harvest_row(v, v.plots[5])).is_equal([11, 10, 9, 8, 7, 6])   # from the right end
+	assert_array(P0Logic.harvest_row(v, v.plots[0])).is_equal([6, 7, 8, 9, 10, 11])   # from the left end
+	assert_array(P0Logic.harvest_row(v, v.plots[2])).is_equal([8, 7, 9, 6, 10, 11])   # from the middle: 7 before 9
+
+## A fertiliser's bag card and buy row say what it does, NPC-2's words (不知火舞), not just how many.
+func test_fertiliser_cards_say_what_they_do() -> void:
+	assert_str(P0ItemInfo.fert_use("fert_orchard")).is_equal("Next regrow time −50%")
+	assert_str(P0ItemInfo.fert_use("fert_compost")).is_equal("Crops ready 20% sooner")
+	var v := {"bag": {"capacity": 25, "slots": [{"id": "fert_orchard", "qty": 2}]}, "names": {"fert_orchard": "Orchard Feed"}}
+	assert_array(P0ItemInfo.spec(v, "fert_orchard", &"bag").facts).is_equal(["Next regrow time −50%", "2"])
+	assert_str(str(P0ItemInfo.tokens(v, "fert_compost", &"counter_buy").use)).is_equal("Crops ready 20% sooner")
+
 ## The Growing key's second line fits its 80 px (不知火舞 on 241): two units drop `Ready in`, one keeps it.
 func test_growing_key_drops_ready_in_for_two_units() -> void:
 	assert_str(P0Logic.key_ready(48 * 3600000.0)).is_equal("Ready in 48h")

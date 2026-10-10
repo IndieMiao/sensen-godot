@@ -190,7 +190,7 @@ func test_free_to_do_now_lists_free_things_in_order_with_the_map_as_fallback() -
 	assert_that(_lines(Guide.free_now(v))).is_equal(["Harvest 2 ready", "Cook · 4 fish in creel", "Sell 12 at Homestead Stall"])
 	v.cooking.stove = {"dish": "dish_grilled_crucian", "ready_in": 3000}   # the stove is busy
 	v.mine.run = {"id": 1}
-	assert_that(_lines(Guide.free_now(v))).is_equal(["Harvest 2 ready", "Sell 12 at Homestead Stall", "Mine run · Continue · Free"])
+	assert_that(_lines(Guide.free_now(v))).is_equal(["Harvest 2 ready", "Sell 12 at Homestead Stall", "Mine run · Continue"])
 
 func test_new_bag_items_flash_once() -> void:
 	var before := {"bag": {"slots": [{"id": "seed_radish", "qty": 19}]}}

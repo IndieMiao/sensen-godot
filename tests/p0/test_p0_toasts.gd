@@ -170,6 +170,36 @@ func test_the_counter_and_kitchen_name_their_decision_areas() -> void:
 	assert_object(c.action_area()).is_null()
 	c.free()
 
+## q(123): Harvest All's row the bag took in part — three lines, the result over the crops and the XP (`Harvest 3 of 5 ·
+## bag full` / `+3 Radish` / `+6 XP · 3 plants`; 不知火舞 on #269), the Error toast to the stall with Open bag, the hold stops.
+func test_a_harvest_all_row_the_bag_took_in_part_says_how_far_it_got() -> void:
+	var rt: P0Runtime = auto_free(P0Runtime.new())
+	rt.ui.quick_store = STORE
+	add_child(rt)
+	await get_tree().process_frame
+	var slots := []
+	for i in 25: slots.append({"id": "crop_radish", "qty": 50})
+	var v := {"energy": {"value": 140, "max": 200}, "coins": 52, "bag": {"capacity": 25, "slots": slots},
+		"skills": {"farming": {"level": 9, "xp": 2100}}, "names": {"crop_radish": "Radish"}, "plots": []}
+	for c in rt.session.connection_failed.get_connections(): rt.session.connection_failed.disconnect(c.callable)   # no server here
+	rt.session.view = v
+	rt.ui.set_view(v)
+	rt.ui.fab_held = true
+	var events := []
+	for i in 3: events.append_array([{"kind": "item", "id": "crop_radish", "delta": 1}, {"kind": "xp", "skill": "farming", "amount": 2, "percent": 100}])
+	events.append({"kind": "harvest_short", "got": 3, "of": 5, "plot": 8})
+	rt._on_state(v, events)
+	await get_tree().process_frame
+	var texts := rt.ui.root.get_children().filter(func(c): return c is UiFloatText and not c.is_queued_for_deletion()).map(func(f): return f.text)
+	assert_array(texts).contains(["Harvest 3 of 5 · bag full", "+3 Radish"])
+	var lines := rt.ui.root.get_children().filter(func(c): return c is UiFloatText and not c.is_queued_for_deletion())
+	var top: UiFloatText = lines.reduce(func(a, b): return a if a.position.y < b.position.y else b)
+	assert_str(top.text).is_equal("Harvest 3 of 5 · bag full")   # the result is the top line
+	assert_array(texts).contains(["+6 XP · 3 plants"])   # one plant per XP event, not the reply's three each
+	assert_str(rt.ui.toast_text()).is_equal("Bag 25/25 · Sell at Homestead Stall")
+	assert_str(rt.ui._toasts.current_action()).is_equal("Open bag")
+	assert_bool(rt.ui.fab_held).is_false()
+
 ## E-04 FARM-3-RESULT-2: the bag fills mid-harvest — the run's count floats, the Error toast points at the stall with
 ## Open bag, and the hold stops.
 func test_a_harvest_that_fills_the_bag_says_how_far_it_got() -> void:
