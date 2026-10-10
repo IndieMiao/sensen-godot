@@ -42,6 +42,9 @@ export interface FishPlace { name: string; site: string; city: string; cluster?:
 /** An outpost on the P0 map (assets/p0/p0_outposts.json, SGODOT-227): its role and the residents who live there. */
 export interface OutpostDef { id: string; role: string; residents: string[]; cluster?: string }
 
+/** A Homestead look stage (LOOK-PICK, SGODOT-282): picked at `level`, a (timber) or b (stone). */
+export interface HomesteadLook { id: string; level: number; name: string; a: string; b: string }
+
 export interface CookTier {
   energy: number; ms: number; heats: number[]; gold: number; spin_ms: number;
   first_xp: number; xp: number; level: number; bonus: number[];
@@ -177,6 +180,8 @@ export interface P0Content {
     per_level: { energy: number; meals: number };
     board_slots: [number, number][];          // [from Homestead level, Stall Board slots]
     levels: { level: number; coins: number; skills: number; materials: [string, number][]; unlocks: string[] }[];
+    /** Looks (content/homestead_looks.json, §8.3.1, q(112)): a stage per look level, its id the level's unlock id. */
+    looks?: HomesteadLook[];
   };
   bag_upgrades: { id: string; name: string; homestead: number; price: number; materials: [string, number][]; capacity: number; requires?: string }[];   // requires: the tier before (II after I)
   drinks: { energy: number; prices: number[]; daily: number; items: Record<string, { name: string; shop: ShopId }> };

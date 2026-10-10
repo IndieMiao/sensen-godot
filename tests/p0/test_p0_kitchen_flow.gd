@@ -461,9 +461,9 @@ func test_a_turn_over_that_finds_no_room_falls_back_to_the_result_card() -> void
 	rt.ui.close_modal()
 	await get_tree().process_frame
 
-func test_up_close_the_stove_strip_keeps_the_pot_and_the_far_button_the_countdown() -> void:
-	# 不知火舞 on #104 (1760:103708): the strip near the stove is i-pot + `Stove 1/1 · Cooking 0:22`, like the bench's
-	# strip; the countdown stays on the button seen from afar.
+func test_up_close_the_stove_strip_and_the_far_button_both_show_the_countdown() -> void:
+	# 不知火舞 on #231 (after #104's i-pot strip, 1760:103708): folded and open read the same — the strip near the stove
+	# is the clock badge + `Stove 1/1 · Cooking 0:22`, the button seen from afar the clock.
 	var v := _view()
 	v.cooking.stove = {"id": 3, "dish": "dish_grilled_crucian", "ms": 30000, "elapsed": 8000, "ready_in": 22000, "heats": []}
 	_set_view(v)
@@ -472,8 +472,7 @@ func test_up_close_the_stove_strip_keeps_the_pot_and_the_far_button_the_countdow
 	for i in 3: r.p0_frame(rt.session.current(), 1.0 / 30.0)
 	var bar: UiWorldNameBar = rt.ui._name_bars.get("room:use_stove_1")
 	assert_object(bar).is_not_null()
-	assert_int(bar.status).is_equal(-1)
-	assert_object(bar.icon).is_same(P0Logic.icon("pot"))
+	assert_int(bar.status).is_equal(UiStatusBadge.State.COUNTDOWN)
 	assert_str(bar.fact).is_equal("Cooking 0:22")
 	r.p0_dev(PackedStringArray(["at", "exit"]))   # walk away: the stove folds back into its button
 	for i in 3: r.p0_frame(rt.session.current(), 1.0 / 30.0)

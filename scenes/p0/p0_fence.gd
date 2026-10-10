@@ -3,21 +3,33 @@ extends Node3D
 ## in front of the farmhouse is always there; Homestead Lv3 completes the ring. When Lv3 is reached in this
 ## session the ring drops in from above with a little dust within the HOME-2 banner's 3 s; a save that is
 ## already Lv3 shows it at once. Layout data lives in P0Garden (fence_front / fence_ring).
+## From Lv3 the whole fence is the Fence & Mailbox look (LOOK-PICK, SGODOT-282): a = this timber fence, b = a Stone Wall
+## on the same run (P0Garden.stone_wall); a change pops the new one in with dust (pop_in, as the other looks).
 
 const FarmArt = preload("res://modules/farm/farm_art.gd")
 const DROP_H := 1.4
 const DROP_S := 0.45
 const SPREAD_S := 1.8     # last segment lands by SPREAD_S + DROP_S < 3 s
 
+const POP_S := 0.3          # a look swapped in: 0 → full size, a little past it and back
+
 var _ring: Array[Node3D] = []
+var _front: Node3D          # the timber stretch in front of the farmhouse (always, until a Stone Wall takes it)
+var _stone: Node3D          # the Stone Wall (front and ring), built when first shown
+var _ring_dust: Array = []  # a few points along the Stone Wall's ring for the swap's dust
 var _seen := false        # a view has been read (the first one decides "already Lv3")
 var _shown := false
+var look := "a"           # the Fence & Mailbox look on show
+var preview := ""         # LOOK-PICK's preview ("" = the view's look)
+var _bp: FarmBlueprint
 
 func build(bp: FarmBlueprint) -> void:
 	name = "Fence"
+	_bp = bp
 	var front: Array = []
 	for seg in P0Garden.fence_front(bp): front.append(_xf(seg))
-	add_child(FarmArt.batch("fence", front))
+	_front = FarmArt.batch("fence", front)
+	add_child(_front)
 	for seg in P0Garden.fence_ring(bp):
 		var m := FarmArt.instance("fence")
 		m.transform = _xf(seg)
@@ -25,7 +37,7 @@ func build(bp: FarmBlueprint) -> void:
 		add_child(m)
 		_ring.append(m)
 
-## Call every frame with the projected view (cheap until the unlock flips).
+## Call every frame with the projected view (cheap until the unlock or the look flips).
 func sync(view: Dictionary) -> void:
 	var on := bool(view.get("homestead", {}).get("unlocks", {}).get("fence", false))
 	if on and not _shown:
@@ -33,8 +45,55 @@ func sync(view: Dictionary) -> void:
 		if _seen: drop_in()
 		else: for m in _ring: m.visible = true
 	_seen = true
+	var have := P0Logic.look_of(view, "fence") if on else "a"
+	if preview == have: preview = ""   # the card's Use landed, or a preview of what is there already
+	var want := preview if preview != "" else have
+	if want != "" and want != look: set_look(want, _shown)
 
 func ring_shown() -> bool: return _shown
+
+## a: the timber fence; b: the Stone Wall in its place (front stretch and ring). animate: pop in with dust.
+func set_look(v: String, animate := true) -> void:
+	look = v
+	var stone := v == "b"
+	if stone and _stone == null: _stone = _build_stone()
+	_front.visible = not stone
+	for m in _ring: m.visible = _shown and not stone
+	if _stone: _stone.visible = stone
+	# Batches (the timber front, the Stone Wall's ring) sit about the world origin: they just show; single pieces pop.
+	if not animate: return
+	pop_in(self, (_stone if stone else self).get_children().filter(func(n): return n is MeshInstance3D and (n as Node3D).visible))
+	if stone: for at in _ring_dust: dust(self, at)
+
+## The Stone Wall: the ring's rocks as one batch (one draw, ~120 rocks; 上官婉儿 on #250), the front stretch's few as
+## their own pieces, so the swap pops those by the door and puffs dust along the ring.
+func _build_stone() -> Node3D:
+	var root := Node3D.new()
+	root.name = "StoneWall"
+	add_child(root)
+	for p in P0Garden.stone_wall(P0Garden.fence_front(_bp)):
+		var m := FarmArt.instance(str(p.asset))
+		m.transform = _part_xf(p)
+		root.add_child(m)
+	var ring := P0Garden.stone_wall(P0Garden.fence_ring(_bp))
+	var batch := FarmArt.batch("rock", ring.map(_part_xf))
+	batch.name = "Ring"
+	root.add_child(batch)
+	for i in range(0, ring.size(), 12): _ring_dust.append(ring[i].pos)
+	return root
+
+static func _part_xf(p: Dictionary) -> Transform3D:
+	return Transform3D(Basis(Vector3.UP, float(p.yaw)) * Basis.from_scale(p.scale), p.pos)
+
+## LOOK-PICK's swap (49498df6): each part grows in over POP_S with a touch of overshoot, a little dust under every third.
+static func pop_in(host: Node3D, parts: Array) -> void:
+	for i in parts.size():
+		var n: Node3D = parts[i]
+		var full := n.scale
+		n.scale = full * 0.01
+		var tw := n.create_tween()
+		tw.tween_property(n, "scale", full, POP_S).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		if i % 3 == 0: dust(host, n.global_position - host.global_position)
 
 func drop_in() -> void:
 	var n := _ring.size()
@@ -46,9 +105,11 @@ func drop_in() -> void:
 		var tw := create_tween()
 		tw.tween_interval(SPREAD_S * float(i) / maxf(1.0, float(n - 1)))
 		tw.tween_property(m, "position", rest, DROP_S).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-		tw.tween_callback(_dust.bind(rest))
+		tw.tween_callback(dust.bind(self, rest))
 
-func _dust(at: Vector3) -> void:
+## A small puff of dust at `at` (host's space), gone in a second: the fence landing, a look swapped in.
+static func dust(host: Node3D, at: Vector3) -> void:
+	if not host.is_inside_tree(): return
 	var p := CPUParticles3D.new()
 	p.one_shot = true
 	p.amount = 10
@@ -71,9 +132,9 @@ func _dust(at: Vector3) -> void:
 	mesh.material = mat
 	p.mesh = mesh
 	p.position = at + Vector3(0, 0.05, 0)
-	add_child(p)
+	host.add_child(p)
 	p.emitting = true
-	get_tree().create_timer(1.0).timeout.connect(p.queue_free)
+	host.get_tree().create_timer(1.0).timeout.connect(p.queue_free)
 
 static func _xf(seg: Dictionary) -> Transform3D:
 	var basis := Basis(Vector3.UP, float(seg.yaw)) * Basis.from_scale(Vector3(float(seg.get("stretch", 1.0)), 1, 1))

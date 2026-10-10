@@ -12,7 +12,7 @@ import { BOARDS, handIn, heldSlot, lockedTemplate, payout, settleBoards, slotCou
 import { expireGiftMeals, lessonState, progressOf, requestOpensIn, requestState, residentState, stageIndex } from './residents.js';
 import { floorPrice, haveFor, matches } from './requests.js';
 import type { BoardRequest, Pot } from './state.js';
-import { bigPot, boardSlots, chefSignGold, coinsNeeded, nextLevel, skillsTotal, stoveCount, unlocked, upgradeBlock } from './homestead.js';
+import { bigPot, boardSlots, chefSignGold, coinsNeeded, lookOf, nextLevel, skillsTotal, stoveCount, unlocked, upgradeBlock } from './homestead.js';
 import { cabinetCap, cabinetCount, rackOn, rackStock } from './kitchen_storage.js';
 import { haveTotal, stored } from './storage.js';
 import { mineView, settleMine } from './mine.js';
@@ -274,6 +274,9 @@ function homesteadView(c: P0Content, s: P0State) {
       chefs_sign: chefSignGold(c, s) > 0, cabinet: cabinetCap(c, s),
       ...Object.fromEntries(c.bag_upgrades.slice(1).map(u => [u.id, bagTier(u.id)])),
     },
+    // LOOK-PICK / HOME-1 Looks (SGODOT-282, q(112)): every stage in level order; look is null until the stage is reached.
+    looks: (c.homestead.looks ?? []).map(l => ({ id: l.id, level: l.level, name: l.name, a: l.a, b: l.b,
+      look: s.homestead.level >= l.level ? lookOf(s, l.id) : null })),
   };
 }
 

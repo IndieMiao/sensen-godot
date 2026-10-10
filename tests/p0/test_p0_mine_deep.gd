@@ -340,3 +340,30 @@ func test_the_band_points_along_the_lunge_in_any_direction() -> void:
 	assert_str(str(e.phase)).is_equal("windup")
 	var want: Vector3 = (mover.position - (e.node as Node3D).position).normalized()
 	assert_vector(e.node.get_node("Band").global_transform.basis.z.normalized()).is_equal_approx(want, Vector3(0.02, 0.02, 0.02))
+
+## q(116): the second elite of the day says `Quartz · first kill each day`; a reply with both the elite's fall (complete)
+## and the player's (knocked_out) is a win — the scene only handles knocked_out without a complete beside it.
+func test_quartz_line_and_the_win_over_a_fall() -> void:
+	assert_str(P0MaterialLogic.QUARTZ_ONCE).is_equal("Quartz · first kill each day")
+	var src := FileAccess.get_file_as_string("res://scenes/p0/p0_mine.gd")
+	var at := src.find("\"knocked_out\":   # the elite's last blow", src.find("func _on_state("))
+	assert_int(at).is_greater(0)
+	assert_str(src.substr(at, 240)).contains("\"complete\"")
+
+## q(116) ③ on the client: a fall while a swing is still in flight waits for it; the swing that completes the run makes
+## the fall a win (no Knocked out); a fall after Run complete started is ignored.
+func test_a_fall_waits_for_a_swing_in_flight_and_loses_to_run_complete() -> void:
+	var P0Mine = load("res://scenes/p0/p0_mine.gd")
+	var mine = auto_free(P0Mine.new())
+	mine._swings_out["mine_swing_0"] = true
+	mine._knocked_out()
+	assert_bool(mine._ko_waiting).is_true()   # held: nothing left the mine yet
+	mine._completing = true                    # that swing's reply carried complete
+	mine._on_settled("mine_swing_0", true, "")
+	assert_bool(mine._ko_waiting).is_false()
+	assert_bool(mine._leaving).is_false()      # no Knocked out after Run complete
+	mine._knocked_out()                        # and a late fall is ignored
+	assert_bool(mine._ko_waiting).is_false()
+	var src := FileAccess.get_file_as_string("res://scenes/p0/p0_mine.gd")   # no new swing while a fall waits
+	var at := src.find("func _swing()")
+	assert_str(src.substr(at, 120)).contains("_ko_waiting")
