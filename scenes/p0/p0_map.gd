@@ -1018,8 +1018,11 @@ func _take_after_leave() -> bool:
 		_:
 			# Show on map (SGODOT-225): P0Runtime._leave_then("show:<target>") from Today, NeedSource, the Energy card.
 			# Browse the map (show:map) and unknown targets point nowhere: a fresh map frames its opening view (亚瑟 on #96).
-			if not next.begins_with("show:") or place_for(next.trim_prefix("show:")).is_empty(): return false
-			show_place.call_deferred(next.trim_prefix("show:"))
+			if not next.begins_with("show:"): return false
+			var target := next.trim_prefix("show:")
+			# another city's place not read yet: show_place reads it first (its pin is not known before)
+			if place_for(target).is_empty() and P0CityPlaces.cluster_of(target.trim_prefix("outpost:").trim_prefix("pond:")) == "": return false
+			show_place.call_deferred(target)
 	return true
 
 ## Show on map (SGODOT-225; LOCK-08, guidance only, nothing is entered): the camera flies to the target's pin and
@@ -1027,6 +1030,15 @@ func _take_after_leave() -> bool:
 ## would offer Enter). "map" (Browse the map) and unknown targets leave the camera where the player left it.
 func show_place(target: String) -> void:
 	if city_map == null: return
+	# Another city's place (a cross-city request's `outpost:gn-…~market0`, 苏烈 SGODOT-284): its city is read and pinned
+	# first, then the camera flies there as to any pin.
+	var cluster := P0CityPlaces.cluster_of(target.trim_prefix("outpost:").trim_prefix("pond:"))
+	if cluster != "" and not P0CityPlaces.has_city(cluster) and rt != null:
+		P0CityPlaces.fetch(rt.session, cluster, func(city):
+			_show_city_places(city, cluster)
+			show_place(target))
+		return
+	if cluster != "" and not _shown_cities.has(cluster): _show_city_places(P0CityPlaces.city(cluster), cluster)
 	var entry := place_for(target)
 	if entry.is_empty(): return
 	# Flies since SGODOT-267 (_fly sets the city-wide pan bounds, else the homestead's 450 m box pulls the camera back);
@@ -1045,7 +1057,12 @@ func place_for(target: String) -> Dictionary:
 		var key := target.trim_prefix("outpost:")
 		var o := P0Outposts.find(key) if key.find("~") > 0 else P0Outposts.by_role(key)   # another city's by id (SGODOT-280)
 		return {} if o.is_empty() else P0Outposts.place_entry(o, int(_online.get(str(o.id), 0)))
-	if target.begins_with("pond:"): return P0Ponds.location(target.trim_prefix("pond:"))
+	if target.begins_with("pond:"):
+		var id := target.trim_prefix("pond:")
+		if id.find("~") > 0:   # another city's pond: its pin entry (P0CityPlaces registered it with SystemPonds)
+			var p := P0CityPlaces.pond(id)
+			return {} if p.is_empty() else p.merged({"kind": "pond"})
+		return P0Ponds.location(id)
 	return {}
 
 func p0_surface() -> String: return "map"
