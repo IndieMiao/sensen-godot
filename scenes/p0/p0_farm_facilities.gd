@@ -10,8 +10,9 @@ extends Node
 const TAP_PX := 40.0            # a tap this close to a sprinkler's head opens its card
 const HEAD := Vector3(0, 0.55, 0)
 const SNAP_PX := 70.0           # a finger this close to a bed's centre on screen points at that bed
-const COVER_TINT := Color(0.55, 0.78, 0.95, 0.55)   # Coverage: light blue (q(59) §1.5)
-const BAD_TINT := Color(0.86, 0.36, 0.30, 0.65)
+const COVER_TINT := Color(0.55, 0.78, 0.95, 0.55)   # Coverage: light blue (q(59) §1.5; water, 284 v2 §2)
+const OK_TINT := Color(UiTokens.COLOR_PRIMARY, 0.30)  # the spot underfoot when it may stand there (284 v2 §2)
+const BAD_TINT := Color(UiTokens.COLOR_DANGER, 0.35)  # … when it may not
 
 var farm: Node3D                # p0_farm.gd: bp, cam, actor
 var rt: P0Runtime
@@ -198,6 +199,7 @@ func _show_spot(v: Dictionary, id: int) -> void:
 	var reason := spot_reason(v, id, int(placing.facility))
 	placing.ok = reason == ""
 	_preview.visible = id >= 0
+	farm.placement_grid(_bed_top(id) if id >= 0 else Vector3.INF)   # the shell's fading cell lines around it
 	if id >= 0: _preview.position = _bed_top(id)
 	_paint([id] if id >= 0 else [], cover_of(v, id) if reason == "" else [], reason != "")
 	rt.ui.set_placement({"caption": caption(v, id) if reason == "" else "", "reason": reason})
@@ -229,7 +231,7 @@ func _paint(centre: Array, cover: Array, bad: bool) -> void:
 		_cells.append(q)
 	var i := 0
 	for id in centre:
-		_place_square(_cells[i], id, BAD_TINT if bad else COVER_TINT.lightened(0.3))
+		_place_square(_cells[i], id, BAD_TINT if bad else OK_TINT)
 		i += 1
 	for id in cover:
 		_place_square(_cells[i], id, COVER_TINT)

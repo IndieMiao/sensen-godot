@@ -282,6 +282,14 @@ func _place_camera() -> void:
 	cam.keep_aspect = Camera3D.KEEP_WIDTH   # the old farm frames by width (portrait phones)
 	cam.size = FarmCamera.close_view_size(vp) * FarmCamera.P0_VIEW_K / _zoom
 	FarmCamera.place(cam, _focus + Vector3.UP * 0.7)
+	if _top > 0.0:   # placement's top-down view, or the 0.35 s turn into / out of it (284 v2 6a751a9a)
+		var k := _top_ease()
+		var pitch := deg_to_rad(lerpf(FarmCamera.PITCH_DEG, 90.0, k))
+		var yaw := deg_to_rad(lerpf(FarmCamera.YAW_DEG, 0.0, k))
+		var c := _focus + Vector3.UP * 0.7 * (1.0 - k)
+		cam.rotation = Vector3(-pitch, yaw, 0.0)
+		cam.position = c + cam.basis.z * FarmCamera.DISTANCE
+		cam.size = lerpf(cam.size, vp.x / _top_cell_px * bp.cell_m, k)   # KEEP_WIDTH: the size is the width in metres
 	if _dev_yaw >= 0.0:   # P0_SHOT yaw comparison only (style doc asks 35–45°, the old farm uses 14.5°)
 		var c := _focus + Vector3.UP * 0.7
 		var pitch := deg_to_rad(FarmCamera.PITCH_DEG)
@@ -338,9 +346,12 @@ static func opening_shift(mark_y: float, feet_y: float, area: Rect2) -> float:
 
 func _follow(dt: float) -> void:
 	_fit_opening()
+	if _top_left > 0.0:   # turning into / out of the top-down view
+		_top_left = maxf(0.0, _top_left - dt)
+		_top = _top_to if _top_left == 0.0 else lerpf(_top_from, _top_to, 1.0 - _top_left / PLACE_TURN_S)
 	if _fly_left > 0.0:   # placement's 0.3 s camera moves (不知火舞 on 241)
 		_fly_left = maxf(0.0, _fly_left - dt)
-		var k := smoothstep(0.0, 1.0, 1.0 - _fly_left / PLACE_FLY_S)
+		var k := smoothstep(0.0, 1.0, 1.0 - _fly_left / _fly_dur)
 		_focus = _fly_from.lerp(_fly_to if _fly_to != Vector3.INF else Vector3(actor.position.x, _focus.y, actor.position.z), k)
 		if _fly_left == 0.0 and _fly_to == Vector3.INF: _cam_follow.held = false   # back to following the player
 	elif _placing_cam: _focus = _yard_clamp(_focus)   # placement: the camera is the player's to pan, in the yard
@@ -359,32 +370,92 @@ func _set_zoom(value: float) -> void:
 		_focus += d
 		_place_camera()
 
-# ---------------------------------------------------------------- placement camera (SGODOT-241, 不知火舞 on 241)
-## Entering: the camera holds; if the spot is off screen it moves there in 0.3 s first. Panning: edge pan and two
-## fingers move the focus, inside the yard (the Lv3 fence plus one cell). Leaving: back to following in 0.3 s.
-const PLACE_FLY_S := 0.3
+# ---------------------------------------------------------------- placement camera (SGODOT-241; top-down, 用户 on 284 058639c7)
+## The shell's camera for every placement — sprinkler, greenhouse, Decorate (不知火舞 284 v2 6a751a9a): entering, it
+## turns in 0.35 s (ease-in-out) to straight down with no yaw (cells square on screen, the farmhouse still at the top),
+## centred on the preview at about 36 px a cell; two fingers zoom (17–56 px a cell) and pan inside the yard plus one
+## cell, never rotate; a finger at a screen edge pans. Leaving (done or cancel), it turns back to 43° / 14.5° in 0.35 s
+## and follows the player again.
+const PLACE_FLY_S := 0.35
+const PLACE_TURN_S := 0.35
+const PICK_FLY_S := 0.3     # Decorate's pick-up of a piece (284 v2 §1)
+const TOP_CELL_PX := 36.0
+const TOP_CELL_MIN := 17.0
+const TOP_CELL_MAX := 56.0
 var _placing_cam := false
 var _fly_left := 0.0
 var _fly_from := Vector3.ZERO
 var _fly_to := Vector3.INF   # INF: fly back to the player
+var _fly_dur := PLACE_FLY_S
+var _top := 0.0              # 0 the farm's view … 1 straight down
+var _top_from := 0.0
+var _top_to := 0.0
+var _top_left := 0.0
+var _top_cell_px := TOP_CELL_PX
 
-func placement_camera_begin(spot: Vector3) -> void:
+## Into the top-down view, centred on `spot`, at `cell_px` pixels a cell (Decorate opens on the whole yard: 17).
+func placement_camera_begin(spot: Vector3, cell_px := TOP_CELL_PX) -> void:
 	_placing_cam = true
 	_opening = false
 	_cam_follow.hold()
-	var screen := cam.unproject_position(spot)
-	if not get_viewport().get_visible_rect().grow(-48.0).has_point(screen) or cam.is_position_behind(spot):
-		_fly(Vector3(spot.x, _focus.y, spot.z))
+	_top_cell_px = clampf(cell_px, TOP_CELL_MIN, TOP_CELL_MAX)
+	_turn(1.0)
+	_fly(Vector3(spot.x, _focus.y, spot.z))
+
+## Centre on `spot` (and zoom to `cell_px` when given) in 0.3 s while placing: Decorate's pick-up of a piece.
+func placement_camera_focus(spot: Vector3, cell_px := 0.0) -> void:
+	if not _placing_cam: return
+	if cell_px > 0.0: _top_cell_px = clampf(cell_px, TOP_CELL_MIN, TOP_CELL_MAX)
+	_fly(Vector3(spot.x, _focus.y, spot.z), PICK_FLY_S)
 
 func placement_camera_end() -> void:
 	if not _placing_cam: return
 	_placing_cam = false
+	_turn(0.0)
 	_fly(Vector3.INF)
+	placement_grid(Vector3.INF)
 
-func _fly(to: Vector3) -> void:
+func _fly(to: Vector3, dur := PLACE_FLY_S) -> void:
 	_fly_from = _focus
 	_fly_to = to
-	_fly_left = PLACE_FLY_S
+	_fly_dur = dur
+	_fly_left = dur
+
+func _turn(to: float) -> void:
+	_top_from = _top
+	_top_to = to
+	_top_left = PLACE_TURN_S
+
+func _top_ease() -> float: return smoothstep(0.0, 1.0, _top)
+
+## The placement grid on the ground (284 v2 §2): white cell lines within `radius` cells of `at`, fading out from 50%;
+## Vector3.INF hides it. The shell's, so the sprinkler, the greenhouse and Decorate draw the same.
+const GRID_RADIUS := 3
+var _grid: MeshInstance3D
+func placement_grid(at: Vector3, radius := GRID_RADIUS) -> void:
+	if at == Vector3.INF:
+		if _grid != null: _grid.visible = false
+		return
+	if _grid == null:
+		_grid = MeshInstance3D.new()
+		_grid.name = "PlacementGrid"
+		var m := PlaneMesh.new()
+		_grid.mesh = m
+		var mat := ShaderMaterial.new()
+		mat.shader = preload("res://scenes/p0/p0_placement_grid.gdshader")
+		_grid.material_override = mat
+		_grid.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		add_child(_grid)
+	var cell := float(bp.cell_m)
+	var c := bp.cell_to_world(bp.world_to_cell(at))   # a cell centre: the lines fall on cell edges
+	_grid.visible = true
+	_grid.position = Vector3(at.x, P0Garden.BED_H + 0.02, at.z)
+	(_grid.mesh as PlaneMesh).size = Vector2.ONE * cell * (radius * 2 + 2)
+	var mat := _grid.material_override as ShaderMaterial
+	mat.set_shader_parameter("cell", cell)
+	mat.set_shader_parameter("origin", Vector2(c.x, c.z))
+	mat.set_shader_parameter("centre", Vector2(at.x, at.z))
+	mat.set_shader_parameter("radius", cell * radius)
 
 ## Move the focus by a ground delta (edge pan, two-finger pan), kept in the yard.
 func placement_pan(d: Vector3) -> void:
@@ -431,6 +502,13 @@ func _yard_clamp(f: Vector3) -> Vector3:
 	return Vector3(clampf(f.x, r.west - pad, r.east + pad), f.y, clampf(f.z, r.back - pad, r.front + pad))
 
 func p0_zoom(f: float, at := Vector2.INF) -> void:
+	if _placing_cam:   # top-down: pixels a cell, 17–56, about the fingers (the ground under them stays put)
+		var before = ElasticZoom.ground_at(cam, at, _focus.y)
+		_top_cell_px = clampf(_top_cell_px / maxf(f, 0.01), TOP_CELL_MIN, TOP_CELL_MAX)
+		_place_camera()
+		var d := ElasticZoom.shift(before, ElasticZoom.ground_at(cam, at, _focus.y))
+		if d != Vector3.ZERO: _focus = _yard_clamp(_focus + d)
+		return
 	_opening = false
 	_zoom_at = at
 	_pinch.pinch(f)
