@@ -148,8 +148,8 @@ describe('Recipe lesson (§7.5.3 Taught)', () => {
       const def = c.residents[id];
       if (id === 'res_mira') {
         expect(pages(id).slice(0, 4), id).toEqual(want);
-        const rarePlus = c.cooking.recipes.filter(r => (r.rarity ?? 0) >= 3).map(r => r.n);
-        expect([...pages(id)].sort((a, b) => a! - b!), id).toEqual(rarePlus);
+        const rarePlus = c.cooking.recipes.filter(r => (r.rarity ?? 0) >= 3).map(r => r.n!);
+        expect(pages(id).slice(4), id).toEqual(rarePlus.filter(n => !want.includes(n)));   // the rest by page, the order she teaches
       } else expect(pages(id), id).toEqual(want);
       for (const p of def.teaches ?? []) {
         const r = recipeById(c, p)!;
