@@ -13,7 +13,7 @@ import { maxEnergy, skillLevel, untilRollover } from './rules.js';
 import type { P0State } from './state.js';
 import { missing, putInStorage, stored, takeStorageFirst } from './storage.js';
 import type { Refusal } from './fishing.js';
-import { clusterOf, homeCluster } from './travel.js';
+import { clusterById, clusterOf, homeCluster } from './travel.js';
 import { decorOf, isDecor } from './decor.js';
 import { climateAt } from './travel.js';
 
@@ -162,6 +162,11 @@ export function quotaKey(c: P0Content, q: QuotaId, cluster: string): string {
 /** The city a counter command is at: its place's cluster, else the city the player is in (home before v5 travel). */
 export function counterCity(c: P0Content, s: P0State, place: unknown): string {
   return (typeof place === 'string' && place !== '' ? clusterOf(c, place) : null) ?? s.travel?.here ?? homeCluster(c);
+}
+
+/** A quota's scope line, naming the city a per-city one counts (NPC-3 482:120: `all San Francisco markets`). */
+export function quotaScope(c: P0Content, q: QuotaId, cluster: string): string {
+  return c.quotas[q].scope.replace('{city}', cluster === homeCluster(c) ? c.profile.city : clusterById(c, cluster)?.name ?? c.profile.city);
 }
 
 export function quotaLeft(c: P0Content, s: P0State, q: QuotaId, cluster = homeCluster(c)): number {

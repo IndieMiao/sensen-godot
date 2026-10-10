@@ -131,9 +131,7 @@
     "buttons": [
       "unavailable:Sell at home"
     ],
-    "facts": [
-      "1"
-    ],
+    "facts": [],
     "lock": {
       "locked": false,
       "shown": false
@@ -398,7 +396,6 @@
       "primary:Sell All · 24 coins"
     ],
     "facts": [
-      "12",
       "2 each"
     ],
     "lock": {

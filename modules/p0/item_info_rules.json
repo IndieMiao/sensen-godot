@@ -291,7 +291,6 @@
   },
   "dish/counter_sell": {
     "facts": [
-      "{count}",
       "{sell_here} each"
     ],
     "quota": true,
@@ -495,7 +494,6 @@
   },
   "material/counter_sell": {
     "facts": [
-      "{count}",
       "{sell_here} each"
     ],
     "quota": true,

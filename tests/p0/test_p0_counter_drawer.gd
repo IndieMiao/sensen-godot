@@ -78,7 +78,7 @@ func test_market_lists_only_its_regional_goods_with_the_city_allowance() -> void
 	assert_float(d.height).is_equal(P0CounterDrawer.HEIGHT)
 	assert_bool(d.grid.sell_mode).is_true()
 	assert_array(d.grid.shown_items().map(func(it): return it.id)).contains_exactly_in_any_order(["crop_pumpkin", "fish_salmon"])
-	assert_str(d._quota.text).starts_with("Regional buy-back today 0/60\nthis city · resets in ")
+	assert_str(d._quota.text).starts_with("Buy-back today 0/60\nall San Francisco markets · resets in ")
 	d.select("crop_pumpkin")
 	assert_bool(d.sheet.is_open()).is_true()
 
