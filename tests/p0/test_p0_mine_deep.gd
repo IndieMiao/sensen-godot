@@ -394,4 +394,4 @@ func test_the_old_tree_stands_in_the_left_column_off_the_beds() -> void:
 	assert_bool(cell.x < 4).is_true()   # left of the beds
 	assert_int(absi(cell.y - (P0Garden.ANCHORS["spot_clay_bank"] as Vector2i).y)).is_greater_equal(3)
 	var yard: Dictionary = P0Logic.content().get("decor", {}).get("yard", {})
-	assert_bool((yard.get("blocked", []) as Array).any(func(r): return Rect2i(int(r[0]), int(r[1]), int(r[2]), int(r[3])).has_point(cell))).is_true()
+	assert_bool((yard.get("objects", []) as Array).any(func(r): return Rect2i(int(r[0]), int(r[1]), int(r[2]), int(r[3])).has_point(cell))).is_true()

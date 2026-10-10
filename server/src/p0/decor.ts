@@ -12,7 +12,9 @@ import type { P0State } from './state.js';
 import { putInStorage, stored } from './storage.js';
 
 export interface DecorItem { name: string; blurb?: string; price: number; size: [number, number]; pieces: number; homestead: number; buy: boolean }
-export interface DecorYard { walk: [number, number, number, number]; blocked: [number, number, number, number][]; keep_clear: [number, number][] }
+type Rect = [number, number, number, number];
+/** The yard on the garden grid: walk (the yard), field (not yard), objects (what stands there), paths (kept clear). */
+export interface DecorYard { walk: Rect; field: Rect[]; objects: Rect[]; paths: Rect[] }
 /** A placed piece: x, y = its top-left cell; rot 1 turns a w × h piece to h × w. */
 export interface PlacedDecor { uid: number; id: string; x: number; y: number; rot: 0 | 1 }
 
@@ -35,17 +37,18 @@ export function cellsOf(c: P0Content, id: string, x: number, y: number, rot: num
   return out;
 }
 
-const inRect = ([x, y]: [number, number], [rx, ry, rw, rh]: [number, number, number, number]) => x >= rx && y >= ry && x < rx + rw && y < ry + rh;
+const inRect = ([x, y]: [number, number], [rx, ry, rw, rh]: Rect) => x >= rx && y >= ry && x < rx + rw && y < ry + rh;
 
-/** Why a piece can't stand there, in the bar's words (`Outside the yard`, `Something is in the way`); null when it can. */
+/** Why a piece can't stand there — `Outside your yard` (decor_outside), `Space taken` (decor_overlap: an object or
+ * another piece), `Keep the path clear` (decor_path, q(120)) — or null when it can. */
 export function spotBlock(c: P0Content, s: P0State, id: string, x: number, y: number, rot: number, ignore?: number): Refusal | null {
   const yard = decorOf(c)!.yard;
   const cells = cellsOf(c, id, x, y, rot);
-  if (cells.some(cell => !inRect(cell, yard.walk) || yard.blocked.some(r => inRect(cell, r)) || yard.keep_clear.some(([kx, ky]) => kx === cell[0] && ky === cell[1])))
-    return { code: 'decor_outside', detail: { x, y } };
+  if (cells.some(cell => !inRect(cell, yard.walk) || yard.field.some(r => inRect(cell, r)))) return { code: 'decor_outside', detail: { x, y } };
   const taken = new Set<string>();
   for (const p of s.decor?.placed ?? []) if (p.uid !== ignore) for (const [px, py] of cellsOf(c, p.id, p.x, p.y, p.rot)) taken.add(`${px},${py}`);
-  if (cells.some(([cx, cy]) => taken.has(`${cx},${cy}`))) return { code: 'decor_overlap', detail: { x, y } };
+  if (cells.some(cell => yard.objects.some(r => inRect(cell, r)) || taken.has(`${cell[0]},${cell[1]}`))) return { code: 'decor_overlap', detail: { x, y } };
+  if (cells.some(cell => yard.paths.some(r => inRect(cell, r)))) return { code: 'decor_path', detail: { x, y } };
   return null;
 }
 

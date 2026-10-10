@@ -458,6 +458,7 @@ static func crop_for_seed(view: Dictionary, seed_id: String) -> Dictionary:
 
 static func item_name(view: Dictionary, id: String) -> String:
 	var names: Dictionary = view.get("names", {})
+	if not names.has(id) and P0Decor.is_decor(id): return P0Decor.name_of(id)   # Decorate's pieces (SGODOT-284)
 	if names.has(id) or base_id(id) == id: return str(names.get(id, id))
 	# A dish stack with its quality (`dish_x@good`, §7.2.5): the dish's name, never the raw id; the quality shows as stars
 	# beside it (the item card's state line, dish_label) — 李元芳 on 286 5d27bd93.
@@ -1302,6 +1303,9 @@ static func today_rows(view: Dictionary) -> Array:
 	if not ready.is_empty() and bool(level.get("now", false)):
 		now_rows.append(_row("Farming Lv%d with this harvest" % int(level.level), "hoe", ""))
 	if sown > 0: now_rows.append(_row("Water %d sown plot%s" % [sown, "" if sown == 1 else "s"], "water", "plots"))
+	# Decorate (SGODOT-284, q(111)): pieces waiting in Farm Storage, a free thing to do; never the red dot (q(107)).
+	var decor := P0Decor.today_row(view)
+	if not decor.is_empty(): now_rows.append(_row(str(decor.line), str(decor.icon), ""))
 	# A known recipe waiting on one crop in the ground (A3 / q(95)) keeps the fish it needs: the stove-free line counts
 	# only the rest, and none when the soup takes them all.
 	var wait := P0KitchenLogic.waiting_on_crops(view)

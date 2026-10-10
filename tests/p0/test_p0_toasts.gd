@@ -91,7 +91,7 @@ func test_the_creel_badge_and_the_greyed_cast_say_the_creel_is_full() -> void:
 	assert_bool(ui._creel.visible).is_true()
 	assert_int(ui._creel.state).is_equal(UiCreelBadge.State.FULL)
 	assert_str(ui._creel.text).is_equal("Creel 2 · 0 free")
-	assert_int(ui.find_children("*", "Button", true, false).filter(func(b): return (b as Button).text in ["Open Bag", "Go home · Free"]).size()).is_equal(0)
+	assert_int(ui.find_children("*", "Button", true, false).filter(func(b): return (b as Button).text in ["Open Bag", "Go home"]).size()).is_equal(0)
 	ui._creel.pressed.emit()
 	assert_str(ui.toast_text()).is_equal(P0Ui.CREEL_FULL)
 	assert_int(ui._toasts.current_severity()).is_equal(ToastLayer.Severity.ERROR)

@@ -33,6 +33,8 @@ signal placement_point(screen: Vector2, phase: String)
 signal placement_done(ok: bool)
 ## The placement bar's optional middle key (`Rotate`, Decorate's 2×1 / 3×2 decor; spec.secondary).
 signal placement_secondary
+## Decorate (SGODOT-284): Farm Storage's Place / the stall toast's Place now (an item), HOME-1's Decorate › ("").
+signal decor_requested(item: String)
 ## Two fingers in placement mode moved the picture by `px` (screen), about `at`: the world pans its camera.
 signal placement_pan(px: Vector2, at: Vector2)
 ## A field recipe's Build on the workbench (SGODOT-241): the world opens placement mode for it.
@@ -721,9 +723,9 @@ func set_action(a: Dictionary) -> void:
 	var k := _keys.key()
 	k.verb = str(a.get("verb", ""))
 	var sub := str(a.get("sub", ""))
-	# Zero-Energy actions carry no price (LOCK-02 "0 体力的动作不写价"); reasons and costs stay.
-	# Mining's free moves keep it (show_free: LOCK-21 `Elevator · Free`, SGODOT-231).
-	k.cost = "" if int(a.get("need", 0)) == 0 and sub == "Free" and not a.get("show_free", false) else sub
+	# Zero-Energy actions carry no price (LOCK-02 "0 体力的动作不写价", q(122): the verb alone, centred on the key — Set Trap,
+	# Light Torch too); reasons and costs stay. Free stays only beside a paid choice (LOCK-21's rows), never on the key.
+	k.cost = "" if int(a.get("need", 0)) == 0 and sub == "Free" else sub
 	if a.get("amber", false): k.state = UiSceneAction.State.INSUFFICIENT
 	elif not a.get("enabled", false): k.state = UiSceneAction.State.UNAVAILABLE
 	else: k.state = UiSceneAction.State.DEFAULT
@@ -1425,11 +1427,19 @@ func toast_creel_full() -> void:
 	toast_error(CREEL_FULL, "Open bag")
 	_toast_bag_tab = "Fish"
 
-## Done, worth saying once: a cleared mine floor, a resident's meal (§4.8.6 Toast Success).
-func toast_success(text: String, break_at_dot := false) -> void:
+## Done, worth saying once: a cleared mine floor, a resident's meal (§4.8.6 Toast Success). `action` adds its line
+## (`Place now ›` after a decor purchase).
+func toast_success(text: String, break_at_dot := false, action := "") -> void:
 	if not _toasts: return
 	_aim_toast()
-	_toasts.show_toast(_break_at_dot(text) if break_at_dot else text, ToastLayer.Severity.SUCCESS)
+	_toasts.show_toast(_break_at_dot(text) if break_at_dot else text, ToastLayer.Severity.SUCCESS, action)
+
+## DECOR-BOUGHT (Figma 2189:32861, q(111)): `Flower Planter` / `in Farm Storage` + `Place now ›`, which closes the drawer
+## and opens Decorate with that piece picked.
+var _toast_decor := ""
+func toast_decor_bought(id: String) -> void:
+	_toast_decor = id
+	toast_success("%s · in Farm Storage" % P0Decor.name_of(id), true, "Place now")
 
 ## What the toast says now ("" when none is up).
 func toast_text() -> String: return _toasts.current_text() if _toasts else ""
@@ -1441,6 +1451,10 @@ func clear_toast() -> void:
 func _on_toast_action(action: String) -> void:
 	match action:
 		"Open bag": open_bag("", "bag" if _toast_bag_tab != "" else "", _toast_bag_tab)
+		"Place now":
+			if _toast_decor == "" or space_here() != "home": return
+			close_modal()
+			decor_requested.emit(_toast_decor)
 
 # ---------------------------------------------------------------- modals
 ## Going to the background cancels a slot drag: the slot flies back, nothing changes (LOCK-04 v1.10).
@@ -1873,6 +1887,10 @@ func _bag_action(action: StringName, id: String, payload: Dictionary) -> void:
 			command.emit({"type": String(action), "item": id})
 		&"store":             # farm storage (SGODOT-228 store / take_out); the card shows Store only at home
 			if space_here() == "home": command.emit({"type": "store", "item": id, "qty": payload.get("qty", "all")})
+		&"place":             # a decor piece's card in Farm Storage (STORE-DECOR): the drawer goes, Decorate picks it
+			if space_here() == "home":
+				close_modal()
+				decor_requested.emit(id)
 		&"take_out":          # a Farm Storage stack's card: Take 10 / Take all (payload qty 10 or "all")
 			if space_here() == "home": command.emit({"type": "take_out", "item": id, "qty": payload.get("qty", "all")})
 		&"gift":   # a dish's `Gift to <Name>` (不知火舞 on 225): that resident's gift drawer with this dish selected
@@ -3206,6 +3224,7 @@ func set_placement(spec: Dictionary) -> void:
 	if spec.has("caption"): _place_bar.caption = str(spec.caption)
 	if spec.has("reason"): _place_bar.reason = str(spec.reason)
 	if spec.has("secondary"): _place_bar.secondary = str(spec.secondary)
+	if spec.has("cancel"): _place_bar.cancel = str(spec.cancel)
 
 ## Back to the world's controls (after the main key's command is sent, or Cancel).
 func end_placement() -> void:
@@ -3226,10 +3245,15 @@ func placement_bar_rect() -> Rect2:
 
 ## A facility's status card (P1, SGODOT-241; q(59) §4): `Sprinkler · Waters 8 plots` and one button (Move); the
 ## caller highlights what it covers while the card shows (modal_kind "facility"). Sits where the quick bar was.
-## spec = {title, lead, icon, button}; on_button runs after the card closes.
-func open_facility_card(spec: Dictionary, on_button: Callable) -> UiInfoSheet:
+## spec = {title, lead, icon, button, kind (&"secondary"), second, close}; on_button runs after the card closes. A placed
+## decor's card (DECOR-CARD, Figma 2191:33239) has a primary Move, the text button `Store` (spec.second, on_second) and
+## a ✕ over its corner (spec.close).
+## In placement mode the bar steps aside while the card shows and comes back when it closes.
+func open_facility_card(spec: Dictionary, on_button: Callable, on_second := Callable()) -> UiInfoSheet:
+	var buttons: Array = [{id = &"move", label = str(spec.get("button", "Move")), kind = StringName(spec.get("kind", &"secondary"))}]
+	if str(spec.get("second", "")) != "": buttons.append({id = &"second", label = str(spec.second), kind = &"nav", chevron = false})
 	var card := {id = "facility", title = str(spec.get("title", "")), lead = str(spec.get("lead", "")),
-		icon = spec.get("icon", null), facts = [], buttons = [{id = &"move", label = str(spec.get("button", "Move")), kind = &"secondary"}]}
+		icon = spec.get("icon", null), facts = [], buttons = buttons}
 	var sheet := UiInfoSheet.new()
 	sheet.theme = UiKit.theme()
 	sheet.rules = func(_id, _ctx, _o): return card
@@ -3238,10 +3262,26 @@ func open_facility_card(spec: Dictionary, on_button: Callable) -> UiInfoSheet:
 	sheet.offset_right = -UiTokens.SPACE_PAGE
 	sheet.offset_bottom = -bottom_pad()
 	sheet.grow_vertical = Control.GROW_DIRECTION_BEGIN
-	sheet.action_requested.connect(func(_action: StringName, _id: String, _payload: Dictionary):
+	sheet.action_requested.connect(func(action: StringName, _id: String, _payload: Dictionary):
 		close_modal()
-		on_button.call())
-	_open_modal(sheet, 0.0, true)
+		if action == &"second" and on_second.is_valid(): on_second.call()
+		elif action != &"second": on_button.call())
+	if placing():
+		_place_bar.visible = false
+		sheet.tree_exited.connect(func(): if placing(): _place_bar.visible = true)
+	var content: Control = sheet
+	if bool(spec.get("close", false)):   # DECOR-CARD: a ✕ 6 above the card's top-right corner (b706e141 ③)
+		var holder := Control.new()
+		holder.set_anchors_preset(Control.PRESET_FULL_RECT)
+		holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		holder.add_child(sheet)
+		var close := UiCloseButton.new()
+		close.pressed.connect(close_modal)
+		holder.add_child(close)
+		sheet.resized.connect(func():
+			close.position = Vector2(sheet.position.x + sheet.size.x - UiTokens.SIZE_CLOSE, sheet.position.y - 6 - UiTokens.SIZE_CLOSE))
+		content = holder
+	_open_modal(content, 0.0, true)
 	modal_kind = "facility"
 	sheet.open("facility", &"facility")
 	return sheet

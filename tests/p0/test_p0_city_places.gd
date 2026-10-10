@@ -100,7 +100,7 @@ func test_a_first_visit_lands_on_three_things_to_do() -> void:
 	m.open_arrival_card(TOKYO)
 	assert_str(rt.ui.modal_kind).is_equal("arrival_card")
 	var texts: Array = rt.ui.root.find_children("*", "Label", true, false).filter(func(l): return (l as Label).is_visible_in_tree()).map(func(l): return (l as Label).text)
-	for t in ["Tokyo", "Nearby", "Choose your first local activity.", "Local pond", "Pond Crucian for every level", "Outpost",
+	for t in ["Tokyo", "Trip 6 · Intercontinental", "Choose your first local activity.", "Local pond", "Pond Crucian for every level", "Outpost",
 			"Temperate seeds and local requests", "Tokyo stamp", "New", "View it in your Passport"]:
 		assert_array(texts).override_failure_message("missing " + t).contains([t])
 	var link := rt.ui.root.find_child("Link_Show_local_pond", true, false)
@@ -110,7 +110,7 @@ func test_a_first_visit_lands_on_three_things_to_do() -> void:
 	assert_object(rt.ui.root.find_child("Handle", true, false)).is_not_null()   # the sheet's grip (不知火舞 on #248)
 	rt.ui.close_modal()
 
-## The arrival card's Visit the outpost goes to the market square nearest where the player landed (Nearby, 不知火舞 on #248).
+## The arrival card's Visit the outpost goes to the market square nearest where the player landed (不知火舞 on #248).
 func test_visit_the_outpost_is_the_nearest_market_square() -> void:
 	var two: Dictionary = CITY.duplicate(true)
 	two.detail.outposts.append({"id": "gn-1850147~market2", "role": "market", "name": "Oak Market Square", "lat": 35.7453, "lng": 139.7130,
@@ -143,3 +143,32 @@ func test_the_passports_city_rows_open_their_pages_and_say_so() -> void:
 	assert_array(texts).contains(["2/10"])   # Local: Visits 2/10
 	rt.ui.close_modal()
 	rt.ui.view = saved
+
+## 李元芳 0.2.0 (286 5d27bd93): the map read the city first (its camera city), then the silhouette card asked while
+## that read was out — the card's callback was dropped and it stayed at "–". Every asker hears the one answer.
+func test_a_card_asking_while_the_maps_read_is_out_still_fills_in() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	rt.ui.close_modal()
+	var asked: Array = []
+	rt.session.transport = func(_m: int, path: String, _b: Dictionary, cmd: Dictionary):
+		if str(cmd.get("type", "")) == "city": asked.append(path)
+	m._switch_city(load("res://modules/p0/p0_clusters.gd").region(TOKYO))   # the map's read goes out
+	m.open_city_card(TOKYO)   # the card asks while it is out
+	assert_array(asked).is_equal(["/p0/city/gn-1850147"])   # one read, not two
+	assert_str(rt.ui.modal_kind).is_equal("city_card")
+	var counts := func() -> Array:
+		var rows: Array = rt.ui.root.find_children("*", "UiItemRow", true, false).filter(func(r): return (r as Control).is_visible_in_tree())
+		return rows.map(func(r): return str(r.quantity))
+	assert_array(counts.call()).is_equal(["–", "–", "–"])
+	var city: Dictionary = CITY.duplicate(true)
+	city.preview = {"cluster": TOKYO, "trip": 6, "km": 8278, "trip_name": "Intercontinental", "utc_offset_min": 540,
+		"counts": {"ponds": 2, "outposts": 2, "residents": 9}}
+	P0CityPlaces.accept(TOKYO, city)   # the answer
+	await get_tree().process_frame   # the card is rebuilt; the old one leaves at the end of the frame
+	assert_str(rt.ui.modal_kind).is_equal("city_card")
+	assert_array(counts.call()).is_equal(["2", "2", "9"])
+	assert_array(m.city_map.extra_places.map(func(e): return str(e.id))).contains(["gn-1850147~market0"])   # the map's too
+	rt.ui.close_modal()

@@ -70,11 +70,17 @@ describe('placing in the yard', () => {
     expect(r.s.storage.deco_planter).toBe(2);
   });
 
-  it('refuses the field, the house, other pieces, the spawn path and an empty storage; only at home', () => {
+  it('refuses the field and off the yard, objects and other pieces, the paths and an empty storage; only at home', () => {
     let s = stocked();
     expect(refuse(s, { type: 'place_decor', item: 'deco_planter', x: 6, y: 5, ...HOME })).toMatchObject({ ok: false, code: 'decor_outside' });   // the field
-    expect(refuse(s, { type: 'place_decor', item: 'deco_planter', x: 9, y: 16, ...HOME })).toMatchObject({ ok: false, code: 'decor_outside' });  // the house
-    expect(refuse(s, { type: 'place_decor', item: 'deco_planter', x: 9, y: 1, ...HOME })).toMatchObject({ ok: false, code: 'decor_outside' });   // spawn
+    expect(refuse(s, { type: 'place_decor', item: 'deco_planter', x: 9, y: 16, ...HOME })).toMatchObject({ ok: false, code: 'decor_overlap' });  // the house: Space taken
+    expect(refuse(s, { type: 'place_decor', item: 'deco_planter', x: 12, y: 16, ...HOME })).toMatchObject({ ok: false, code: 'decor_overlap' }); // the mailbox
+    expect(refuse(s, { type: 'place_decor', item: 'deco_planter', x: 6, y: 13, ...HOME })).toMatchObject({ ok: false, code: 'decor_overlap' });  // the front fence
+    // q(120): Keep the path clear — two cells wide to the map exit, the door, the stall, the mine mouth, the workbench
+    for (const [x, y, where] of [[9, 1, 'spawn'], [10, 0, 'exit'], [8, 14, 'door'], [10, 13, 'door'], [13, 14, 'stall'], [4, 13, 'mine'], [17, 15, 'workbench']] as const)
+      expect(refuse(s, { type: 'place_decor', item: 'deco_planter', x, y, ...HOME }), where).toMatchObject({ ok: false, code: 'decor_path' });
+    expect(refuse(s, { type: 'place_decor', item: 'deco_bench', x: 4, y: 15, ...HOME })).toMatchObject({ ok: true });   // just off the mine path
+    expect(refuse(s, { type: 'place_decor', item: 'deco_bench', x: 4, y: 14, ...HOME })).toMatchObject({ ok: false, code: 'decor_path' });   // one cell on it
     expect(refuse(s, { type: 'place_decor', item: 'deco_planter', x: 0, y: 18, ...HOME })).toMatchObject({ ok: false, code: 'decor_outside' });  // off the yard
     s = step(s, { type: 'place_decor', item: 'deco_bench', x: 6, y: 18, ...HOME }).s;   // 2 × 1: cells 6–7, 18
     expect(refuse(s, { type: 'place_decor', item: 'deco_planter', x: 7, y: 18, ...HOME })).toMatchObject({ ok: false, code: 'decor_overlap' });
@@ -82,7 +88,7 @@ describe('placing in the yard', () => {
     expect(refuse(s, { type: 'place_decor', item: 'deco_planter', x: 4, y: 18, space: 'mine' })).toMatchObject({ ok: false, code: 'not_home' });
     // a rotated piece takes h × w: the 3 × 2 pergola turned stands 2 wide and 3 tall
     expect(spotBlock(c, s, 'deco_pergola', 1, 17, 1)).toBeNull();
-    expect(spotBlock(c, s, 'deco_pergola', 1, 17, 0)).toMatchObject({ code: 'decor_outside' });   // 3 × 2 would reach the herb patch
+    expect(spotBlock(c, s, 'deco_pergola', 1, 17, 0)).toMatchObject({ code: 'decor_overlap' });   // 3 × 2 would reach the herb patch
   });
 
   it('the cap is 20 + 4 per Homestead level above 1 (§8.3.2)', () => {

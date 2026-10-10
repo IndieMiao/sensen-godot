@@ -2,7 +2,7 @@ extends GdUnitTestSuite
 ## MAP-1 (§10.6.1, SGODOT-234 A1; 不知火舞 on 234): on the map P0's two-row HUD and Bag replace the map's own chrome —
 ## no city title, filters, place list, compass, Map / Farm / Me dock or + / −; the recenter key sits right over Bag,
 ## 12 apart, and keeps the zoom. The place chip names where the player is and takes them back there. Pin cards: the
-## homestead's says Go home · Free, ponds and outposts Go, the place the player is at Back to <name> (q(80)).
+## homestead's says Go home, ponds and outposts Go, the place the player is at Back to <name> (q(80)).
 
 const P0_MAP := "res://scenes/p0/p0_map.tscn"
 const PondCard := preload("res://modules/p0/p0_pond_card.gd")
@@ -55,7 +55,7 @@ func test_recenter_brings_the_camera_home_and_keeps_the_zoom() -> void:
 	assert_float(m.zoom).is_equal_approx(13.3, 1e-6)
 
 ## q(80): the homestead's and the outposts' cards are P0PlaceSheet. At home the avatar is the homestead's mark: its card
-## reads Back to Homestead, no Distance. Away, the farm wears a Homestead pin whose card says Go home · Free with
+## reads Back to Homestead, no Distance. Away, the farm wears a Homestead pin whose card says Go home with
 ## Distance, and the avatar's card is the place the player is at. Online now shows only with someone in (q(72)).
 func test_place_cards_follow_q80() -> void:
 	var m := _map()
@@ -83,7 +83,7 @@ func test_place_cards_follow_q80() -> void:
 	assert_int(home.size()).is_equal(1)
 	city.select(home[0])
 	assert_bool(city.info.visible).is_false()   # the sheet is the card: no city info panel under it
-	assert_str(_primary(rt)).is_equal("Go home · Free")
+	assert_str(_primary(rt)).is_equal("Go home")
 	assert_array(_facts(rt)).is_equal(["Distance"])
 	await _close(rt)
 	assert_dict(city.selected).is_empty()   # closing the card clears the pin

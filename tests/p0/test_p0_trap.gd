@@ -30,10 +30,10 @@ func test_the_fishing_key_turns_into_set_trap_when_the_trap_is_picked() -> void:
 
 func test_the_card_collects_what_fits_and_takes_back_when_all_fit() -> void:
 	var c := P0Trap.card(_view([_trap(FERN, 2)]), FERN)
-	assert_that([c.title, c.fact, c.main.label, c.main.enabled, c.second.label]).is_equal(["Fish Trap", "2/3", "Collect 2 · Free", true, "Take back"])
+	assert_that([c.title, c.fact, c.main.label, c.main.enabled, c.second.label]).is_equal(["Fish Trap", "2/3", "Collect 2", true, "Take back"])   # q(122): no Free
 	assert_str(str(P0Trap.card(_view([_trap(FERN, 0)]), FERN).main.label)).is_equal("Empty · next in 5h 12m")
 	var some := P0Trap.card(_view([_trap(FERN, 3, {"fits": 1, "all_fit": false})]), FERN)
-	assert_that([some.main.label, some.second.label, some.second.enabled]).is_equal(["Collect 1 · Free", "Take back · Collect first", false])
+	assert_that([some.main.label, some.second.label, some.second.enabled]).is_equal(["Collect 1", "Take back · Collect first", false])
 	assert_str(str(P0Trap.card(_view([_trap(FERN, 3, {"fits": 0, "all_fit": false})]), FERN).main.label)).is_equal("Collect · Creel full")
 	assert_str(str(P0Trap.card(_view([_trap(FERN, 0, {"back_fits": false})]), FERN).second.label)).is_equal("Take back · Bag full")
 	assert_dict(P0Trap.card(_view([]), FERN)).is_empty()

@@ -15,7 +15,7 @@ static func at(view: Dictionary, place: String) -> Dictionary:
 		if str(t.get("place", "")) == place: return t
 	return {}
 
-## The main key with the trap selected on the Fishing bar (q(109) ⑦): `Set Trap · Free`, greyed `Trap already here`
+## The main key with the trap selected on the Fishing bar (q(109) ⑦, q(122)): `Set Trap`, greyed `Trap already here`
 ## or `Traps 1/1 · Fishing Lv8 adds 1` (`Traps 3/3` at the top).
 static func set_key(view: Dictionary, place: String) -> Dictionary:
 	var t := _t(view)
@@ -27,13 +27,13 @@ static func set_key(view: Dictionary, place: String) -> Dictionary:
 		var lv = t.get("next_level", null)
 		var why := "Traps %d/%d" % [used, slots] + (" · Fishing Lv%d adds 1" % int(lv) if lv != null else "")
 		return _grey("Set Trap", why)
-	return {"icon": ID, "verb": "Set Trap", "sub": "Free", "enabled": true, "amber": false, "show_free": true,
+	return {"icon": ID, "verb": "Set Trap", "sub": "Free", "enabled": true, "amber": false,
 		"cmd": {"type": "set_trap"}, "need": 0}
 
 static func _grey(verb: String, why: String) -> Dictionary:
 	return {"icon": ID, "verb": verb, "sub": why, "enabled": false, "amber": false, "cmd": {}, "need": 0, "toast": why}
 
-## The trap's EntryCard (q(109) ⑦): main `Collect 2 · Free` (empty `Empty · next in 5h 12m`, partial `Collect 1 · Free`,
+## The trap's EntryCard (q(109) ⑦, q(122)): main `Collect 2` (empty `Empty · next in 5h 12m`, partial `Collect 1`,
 ## none fits `Collect · Creel full`), second `Take back` (`Take back · Collect first` when not all fit, `Bag full`
 ## when the trap itself does not). Buttons {label, enabled, cmd, toast}.
 static func card(view: Dictionary, place: String) -> Dictionary:
@@ -49,7 +49,7 @@ static func card(view: Dictionary, place: String) -> Dictionary:
 	elif fits == 0:
 		main = {"label": "Collect · Creel full", "enabled": false, "cmd": {}, "toast": "Collect · Creel full"}
 	else:
-		main = {"label": "Collect %d · Free" % fits, "enabled": true, "cmd": {"type": "collect_trap"}, "toast": ""}
+		main = {"label": "Collect %d" % fits, "enabled": true, "cmd": {"type": "collect_trap"}, "toast": ""}
 	var second := {"label": "Take back", "enabled": true, "cmd": {"type": "collect_trap", "take_back": true}, "toast": ""}
 	if not bool(t.get("all_fit", true)):
 		second = {"label": "Take back · Collect first", "enabled": false, "cmd": {}, "toast": "Take back · Collect first"}
