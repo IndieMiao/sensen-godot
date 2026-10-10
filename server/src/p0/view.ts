@@ -25,7 +25,7 @@ import { restReadyIn } from './presence.js';
 import { inboxView, settleParcels } from './parcels.js';
 import { cookbookView, masteredCount } from './cookbook.js';
 import { mapMarkers } from './markers.js';
-import { everFish, pondAt, pondFishIds } from './fishing_world.js';
+import { everFish, forecast, pondAt, pondFishIds, timeWord } from './fishing_world.js';
 import { trapsView } from './fish_trap.js';
 import { homeCluster } from './travel.js';
 import { decorView } from './decor.js';
@@ -111,7 +111,9 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
       places: Object.fromEntries(Object.entries(f.places).map(([id, p]) => {
         const pond = pondAt(c, id, now);
         return [id, { name: p.name, site: p.site, template: f.sites[p.site]?.template ?? '', beginner: p.beginner === true,
-          daypart: pond.part, weather: pond.weather, fish: [...pondFishIds(c, id)] }];
+          daypart: pond.part, weather: pond.weather, fish: [...pondFishIds(c, id)],
+          // the card's and the Bite Board's words (283 e61cda10): Dawn / Day / Dusk / Night now, the next three days
+          time: timeWord(c, pond.tz, now), forecast: forecast(c, pond.cluster, pond.tz, now) }];
       })),
       place: s.presence.place ?? null,
       rod: (rodById(c, s.gear.rod) ?? f.rods[0]).name, rod_reach: (rodById(c, s.gear.rod) ?? f.rods[0]).reach,

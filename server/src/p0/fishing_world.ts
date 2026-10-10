@@ -180,3 +180,23 @@ export function pondFishIds(c: P0Content, place?: string): Set<string> {
   }
   return ids;
 }
+
+/** The hour words the UI writes (283 e61cda10): Dawn (morning dawn/dusk window), Dusk (evening one), Day, Night. */
+export function timeWord(c: P0Content, tz: string, at: number): 'Dawn' | 'Dusk' | 'Day' | 'Night' {
+  const part = daypart(c, tz, at);
+  if (part === 'night') return 'Night';
+  if (part === 'day') return 'Day';
+  return localClock(tz, at).h < 12 ? 'Dawn' : 'Dusk';
+}
+
+/** The next three days' weather in the pond's city (the Lv3 Forecast, 283 e61cda10): [{day: 'Sat', weather}], the days
+ * turning at 04:00 there, today excluded. */
+export function forecast(c: P0Content, cluster: string, tz: string, at: number): { day: string; weather: Weather }[] {
+  const today = weatherDate(c, tz, at);
+  const base = Date.parse(`${today}T12:00:00Z`);
+  return [1, 2, 3].map(n => {
+    const d = new Date(base + n * 86_400_000);
+    const date = d.toISOString().slice(0, 10);
+    return { day: d.toLocaleDateString('en-US', { weekday: 'short', timeZone: 'UTC' }), weather: weatherOn(c, cluster, date) };
+  });
+}
