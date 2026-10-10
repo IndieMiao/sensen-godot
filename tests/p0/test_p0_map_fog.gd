@@ -1,13 +1,13 @@
 extends GdUnitTestSuite
 ## SGODOT-275 fog (plan v2 §11.7, three states, the user's call 10-10): the world under a grey veil but for the explored
-## cities (home, visited; Second Home when the server sets one), city bubbles saying Unexplored / Visited / Second Home,
-## and a pond or outpost of a city without a pass opening its travel card instead of going in. Colour only: nothing is
-## hidden, and the veil clears at street zoom.
+## cities (home, visited; Second Home when the server sets one), city bubbles saying Unexplored / Visited and the home
+## city's players online with a house (不知火舞 on #227: no Second Home line this version), and a pond or outpost of a
+## city without a pass opening its travel card instead of going in. Colour only: nothing is hidden; the veil stays at
+## every zoom, so a neighbour city's pins never turn full colour up close.
 
 const P0_MAP := "res://scenes/p0/p0_map.tscn"
 const P0Map := preload("res://scenes/p0/p0_map.gd")
 const P0Travel := preload("res://modules/p0/p0_travel.gd")
-const MapFogLayer := preload("res://modules/map/map_fog_layer.gd")
 const SF := "gn-5391959"
 const TOKYO := "gn-1850147"
 const LA := "gn-5368361"
@@ -54,7 +54,7 @@ func test_three_states_from_the_travel_block() -> void:
 	assert_str(P0Travel.fog(v, "gn-1816670")).is_equal("unexplored")   # Beijing
 	assert_array(P0Travel.explored(v)).contains_exactly_in_any_order([SF, TOKYO, LA])
 
-func test_the_veil_holes_the_explored_cities_only_and_clears_at_street_zoom() -> void:
+func test_the_veil_holes_the_explored_cities_only_at_every_zoom() -> void:
 	var m := _map()
 	for i in 3: await get_tree().process_frame
 	m.set_process(false)
@@ -78,10 +78,21 @@ func test_the_veil_holes_the_explored_cities_only_and_clears_at_street_zoom() ->
 	assert_int(fog.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
 	_look(m, 37.7558, -122.4345, 15.0)
 	m.city_map._update_fog()
-	assert_bool(fog.visible).is_false()   # street zoom: no veil
-	assert_float(MapFogLayer.strength(11.0)).is_equal(1.0)
-	assert_float(MapFogLayer.strength(14.0)).is_equal(0.0)
+	assert_bool(fog.visible).is_true()   # street zoom too (不知火舞 on #227): the home city's hole covers the screen
+	var street: Array = m.fog_holes()
+	assert_int(street.size()).is_equal(1)
+	# the screen (its far corner included) lies inside the hole: the home city reads in full colour up close
+	var corner: Vector2 = Vector2(360, 800) - m.city_map.global_position
+	assert_float((street[0].at as Vector2).distance_to(Vector2.ZERO)).is_less(float(street[0].r))
+	assert_float((street[0].at as Vector2).distance_to(corner)).is_less(float(street[0].r))
+	_look(m, 37.80, -122.27, 15.0)   # still inside San Francisco's cluster (Oakland)
+	assert_int(m.fog_holes().size()).is_greater(0)
 	rt.session.view = saved
+
+func test_the_hole_edge_is_a_fixed_24_px() -> void:
+	var sh: Shader = load("res://modules/map/shaders/map_fog.gdshader")
+	assert_str(sh.code).contains("uniform float feather = 24.0")
+	assert_str(sh.code).contains("min(feather, max(1.0, h.z))")
 
 func test_city_bubbles_say_their_state() -> void:
 	var m := _map()
@@ -90,11 +101,28 @@ func test_city_bubbles_say_their_state() -> void:
 	var rt: P0Runtime = m.rt
 	var saved := _travel(rt, {home = SF, here = SF, visits = {TOKYO: {n = 1}}, second_homes = [LA], passes = {}, stamps = [],
 		fallback = {near3 = [], near10 = []}, explorer = 0})
+	m._online = {"sh_tea_1": 3, "sh_market_1": 2}
 	var state: Callable = m.city_map.bubble_state
-	assert_str(str(state.call("san_francisco"))).is_equal("explored")
-	assert_str(str(state.call(TOKYO))).is_equal("explored")
-	assert_str(str(state.call("los_angeles"))).is_equal("second_home")
-	assert_str(str(state.call("gn-1816670"))).is_equal("unexplored")
+	assert_dict(state.call("san_francisco")).is_equal({text = "5 online", icon = "house"})
+	assert_dict(state.call(TOKYO)).is_equal({text = "Visited"})
+	assert_dict(state.call("los_angeles")).is_equal({text = "Visited"})   # a Second Home reads Visited this version
+	assert_dict(state.call("gn-1816670")).is_equal({text = "Unexplored"})
+	rt.session.view = saved
+
+## 不知火舞 on #216: a visited city has a bubble at any zoom, whatever its size (the population cutoff is for the rest).
+func test_a_visited_small_city_has_a_bubble_at_the_country_zoom() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var small := ""
+	for c in load("res://modules/p0/p0_clusters.gd").in_box(36.0, -122.5, 39.5, -119.0, 0, 400):
+		if int(c.population) < 50000: small = str(c.id)
+	assert_str(small).is_not_empty()
+	var saved := _travel(rt, {home = SF, here = SF, visits = {small: {n = 1}}, passes = {}, stamps = [], fallback = {near3 = [], near10 = []}, explorer = 0})
+	_look(m, 37.5, -120.5, 4.0)   # cutoff 400,000 at this zoom
+	assert_int(P0Map.city_min_population(4.0)).is_greater(50000)
+	assert_array(m.city_regions().map(func(r): return str(r.id))).contains([small])
 	rt.session.view = saved
 
 func test_a_pin_of_a_city_without_a_pass_opens_its_travel_card() -> void:
