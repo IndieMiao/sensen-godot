@@ -5,12 +5,13 @@
  * never from the request's clock, so the id a client saw is the id the next command finds. Draws use their own
  * stream seeded by player, board, slot and time, so they never shift the fishing or cooking rolls.
  */
-import { dishParts, type BoardId, type P0Content, type RequestTemplate } from './content.js';
+import { dishParts, type BoardId, type Need, type P0Content, type RequestTemplate } from './content.js';
 import type { Refusal } from './fishing.js';
 import { boardSlots } from './homestead.js';
 import type { P0Event } from './progress.js';
-import { handOver, haveFor, floorPrice, noteDone, payBonus, pick } from './requests.js';
+import { handOver, haveFor, floorPrice, noteDone, payBonus, pick, rarityOf } from './requests.js';
 import { skillLevel, untilRollover } from './rules.js';
+import { catalog } from './shops.js';
 import type { BoardRequest, BoardSlot, P0State } from './state.js';
 
 const H = 3_600_000;
@@ -33,13 +34,62 @@ function climateMet(c: P0Content, t: RequestTemplate): boolean {
 export function eligible(c: P0Content, s: P0State, board: BoardId): string[] {
   return c.requests.boards[board].templates.filter(id => {
     const t = c.requests.templates[id];
-    return t.enabled !== false && gateMet(c, s, t) && climateMet(c, t);
+    return t.enabled !== false && gateMet(c, s, t) && climateMet(c, t)
+      && (!t.need.regional || regionalPool(c, t.need).length > 0) && (t.need.kind !== 'visit' || visitPlaces(c, board).length > 0);
   });
+}
+
+/** The home city's 2 regional fish (§6.2.5: content fishing.regional.curated by city name; generated cities come with 280). */
+function cityFish(c: P0Content): string[] {
+  const curated = (c.fishing as { regional?: { curated?: Record<string, string[]> } }).regional?.curated ?? {};
+  return curated[c.profile.city.toLowerCase()] ?? [];
+}
+
+/** Items a player can get somewhere today: a crop whose seed some counter sells, a fish some pond or river holds, a dish
+ * page (it is cooked from such items). A regional template is drawn only when one of its items can be got, so turning
+ * on the regional seeds (farm line) or the regional fish in the ponds (fishing line) opens it without another change. */
+export function obtainable(c: P0Content, id: string): boolean {
+  if (id.startsWith('crop_')) {
+    const seed = c.crops.find(cr => cr.id === id)?.seed;
+    return !!seed && (['homestead', 'tackle', 'market'] as const).some(shop => catalog(c, shop).includes(seed));
+  }
+  if (id.startsWith('fish_')) return Object.values(c.fishing.sites).some(site => site.fish.includes(id));
+  if (id.startsWith('dish_')) return c.cooking.recipes.some(r => r.id === id) && c.cooking.recipes.find(r => r.id === id)!.in.every(x => !/^(crop|fish)_/.test(x) || obtainable(c, x));
+  return true;
+}
+
+/** §9.6.3 regional: the items one regional template may ask for, home climate first; only those the player can get. */
+export function regionalPool(c: P0Content, need: Need): string[] {
+  const zone = c.profile.climate, rv = need.regional;
+  const inZone = (z: string | string[] | undefined) => (Array.isArray(z) ? z.includes(zone) : z === zone);
+  let ids: string[] = [];
+  if (need.kind === 'crop') ids = c.crops.filter(cr => cr.regional && (rv === 'other_zone' ? cr.zone && cr.zone !== zone : inZone(cr.zone))).map(cr => cr.id);
+  if (need.kind === 'fish') {
+    ids = rv === 'city' ? cityFish(c)
+      : c.fish.filter(f => f.regional && (rv === 'other_zone' ? !inZone(f.zones) : inZone(f.zones))).map(f => f.id);
+  }
+  if (need.kind === 'dish') {
+    ids = c.cooking.recipes.filter(r => r.regional && (rv === 'other_zone' ? !(inZone(r.card_zone) || inZone(r.card_zones)) : inZone(r.card_zone) || inZone(r.card_zones)))
+      .filter(r => need.max_rarity === undefined || rarityOf(c, r.id) <= need.max_rarity).map(r => r.id);
+  }
+  return ids.filter(id => obtainable(c, id));
+}
+
+/** §9.6.3 explore (Stamp Run): the home city's outposts a board request may send the player to — not the board's own
+ * (the Market Board hangs in the market square). */
+export function visitPlaces(c: P0Content, board: BoardId): string[] {
+  const own = board === 'market' ? 'market' : null;
+  return (c.outposts ?? []).filter(o => o.role !== own).map(o => o.id);
 }
 
 /** What an empty board shows while no template is open yet: the lowest gate (e.g. Market Basket · Farming Lv4). */
 export function lockedTemplate(c: P0Content, s: P0State, board: BoardId): { template: string; gate: [string, number][] } | null {
-  const closed = c.requests.boards[board].templates.filter(id => c.requests.templates[id].enabled !== false);
+  // The lowest skill gate (`Dusk Haul · Fishing Lv3`, the first session's Market Board): a regional / explore template
+  // that could not draw anything yet, or one gated by the Homestead level, is not named there.
+  const closed = c.requests.boards[board].templates.filter(id => {
+    const t = c.requests.templates[id];
+    return t.enabled !== false && !t.need.regional && t.need.kind !== 'visit' && !t.gate.some(([g]) => g === 'homestead');
+  });
   if (eligible(c, s, board).length || !closed.length) return null;
   const low = (id: string) => Math.min(...c.requests.templates[id].gate.map(g => g[1]));
   const template = [...closed].sort((a, b) => low(a) - low(b))[0];
@@ -85,7 +135,14 @@ function drawRequest(c: P0Content, s: P0State, board: BoardId, slot: number, at:
   const template = pool[Math.floor(draw() * pool.length)];
   const t = c.requests.templates[template];
   let items: string[] = [];
-  if (t.need.id) items = [t.need.id];   // a template naming one crop, fish or material asks for exactly that
+  let visit: BoardRequest['visit'];
+  if (t.need.kind === 'visit') {   // explore: one outpost to check in at, no items
+    const places = visitPlaces(c, board);
+    visit = { place: places[Math.floor(draw() * places.length)], done: false };
+  } else if (t.need.regional) {   // regional: one of the climate's / city's items
+    const pool = regionalPool(c, t.need);
+    items = [pool[Math.floor(draw() * pool.length)]];
+  } else if (t.need.id) items = [t.need.id];   // a template naming one crop, fish or material asks for exactly that
   // A crop request by rarity or family takes any such crop the player can grow (李白's Fine Produce, Orchard Basket).
   else if (t.need.kind === 'crop' && (t.need.rarity !== undefined || t.need.family !== undefined)) items = [];
   else if (t.need.kind === 'crop') {
@@ -96,7 +153,7 @@ function drawRequest(c: P0Content, s: P0State, board: BoardId, slot: number, at:
   return {
     id: `${template}-${board}${slot}-${at.toString(36)}`, template, items, rarity: t.need.rarity,
     ...(t.need.style ? { style: t.need.style } : {}), ...(t.need.family ? { family: t.need.family } : {}), kind: t.need.kind as BoardRequest['kind'],
-    qty: qtyFor(c, s, t, draw), bonus: t.bonus, drawn_at: at, status: 'open',
+    qty: visit ? 1 : qtyFor(c, s, t, draw), bonus: t.bonus, drawn_at: at, status: 'open', ...(visit ? { visit } : {}),
   };
 }
 
@@ -131,6 +188,17 @@ export function heldSlot(c: P0Content, s: P0State, board: BoardId, sl: BoardSlot
   return board === 'stall' && !sl.req && sl.refill_at === s.created_at + c.requests.refill_h * H;
 }
 
+/** Entering an outpost checks in a tracked explore request that sends the player there (§9.6.3 Stamp Run). */
+export function noteVisit(s: P0State, space: unknown, place: unknown, events: P0Event[]): void {
+  if (space !== 'outpost' || typeof place !== 'string') return;
+  for (const board of BOARDS) for (const sl of s.boards[board] ?? []) {
+    const r = sl.req;
+    if (r?.kind !== 'visit' || r.status !== 'accepted' || !r.visit || r.visit.done || r.visit.place !== place) continue;
+    r.visit.done = true;
+    events.push({ kind: 'visit', id: r.id, place });
+  }
+}
+
 export function findBoardRequest(s: P0State, id: string): { board: BoardId; slot: BoardSlot } | null {
   for (const board of BOARDS) for (const slot of s.boards[board]) if (slot.req?.id === id) return { board, slot };
   return null;
@@ -141,8 +209,9 @@ export function tracked(s: P0State): number {
     + Object.values(s.residents).filter(r => r.req).length;
 }
 
-/** The bag units a board request would take now, or null when short. */
+/** The bag units a board request would take now, or null when short. A visit takes nothing: it is ready once checked in. */
 export function handIn(c: P0Content, s: P0State, r: BoardRequest): [string, number][] | null {
+  if (r.kind === 'visit') return r.visit?.done ? [] : null;
   if (r.items.length > 1) {   // Market Basket: N of each of the drawn crops
     const out: [string, number][] = [];
     for (const item of r.items) {
@@ -183,6 +252,7 @@ export function boardCommand(c: P0Content, s: P0State, type: 'accept' | 'deliver
   if (s.day.sys_done >= c.quotas.sys_requests.cap)
     return { code: 'daily_limit', detail: { cap: c.quotas.sys_requests.cap, resets_in: untilRollover(c, now) } };
   const parts = handIn(c, s, r);
+  if (!parts && r.kind === 'visit') return { code: 'not_visited', detail: { place: r.visit?.place ?? null } };
   if (!parts) {
     const short = r.items.length > 1 ? r.items.find(item => haveFor(c, s, { kind: r.kind }, [item]) < r.qty)! : null;
     return { code: 'not_enough', detail: short
@@ -190,7 +260,8 @@ export function boardCommand(c: P0Content, s: P0State, type: 'accept' | 'deliver
       : { item: r.items[0] ?? null, need: r.qty, have: haveFor(c, s, { kind: r.kind, rarity: r.rarity, style: r.style, family: r.family }, r.items) } };
   }
   for (const [item, n] of parts) { handOver(c, s, item, n); events.push({ kind: 'item', id: item, delta: -n }); }
-  const pay = payout(c, r, parts);
+  // §9.13.2 explore: a fixed reward with no floor (40 for Stamp Run), all of it a completion bonus under the daily cap.
+  const pay = r.kind === 'visit' ? { base: 0, bonus: r.bonus } : payout(c, r, parts);
   const bonus = payBonus(c, s, pay.bonus);
   s.coins += pay.base + bonus;
   s.day.sys_done += 1;
