@@ -99,8 +99,9 @@ export function preview(c: P0Content, s: P0State, cluster: string) {
 
 /** A city's places for GET /v1/p0/city/:cluster and the silhouette card. Shell: home returns the hand-written tables;
  * generated cities come from 后裔's cityPlaces(cluster) (SGODOT-280) once it lands. */
-export function cityInfo(c: P0Content, cluster: string): { ponds: string[]; outposts: string[]; residents: number; fish: { fish: string; level: number }[] } {
-  const gen = (c as P0Content & { cityPlaces?: (id: string) => ReturnType<typeof cityInfo> }).cityPlaces;
+export interface CityInfo { ponds: string[]; outposts: string[]; residents: number; fish: { fish: string; level: number }[]; detail?: unknown }
+export function cityInfo(c: P0Content, cluster: string): CityInfo {
+  const gen = (c as P0Content & { cityPlaces?: (id: string) => CityInfo }).cityPlaces;
   if (cluster !== homeCluster(c) && gen) return gen(cluster);
   if (cluster !== homeCluster(c)) return { ponds: [], outposts: [], residents: 0, fish: [] };
   const ponds = Object.keys(c.fishing.places).filter(id => clusterOf(c, id) === cluster);
