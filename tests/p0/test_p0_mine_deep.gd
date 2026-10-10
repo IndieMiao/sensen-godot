@@ -224,3 +224,29 @@ func test_the_swing_waits_past_the_servers_tempo() -> void:
 	v.mine["weapon"] = {"attack": 3, "speed": 2.0}
 	c.sync_p0(v, 4, mover)
 	assert_float(1.0 / float(c.weapon({}).speed)).is_equal_approx(0.5 + Combat.TEMPO_MARGIN_S, 0.0001)
+
+# ---- landing on a floor with monsters (李元芳 R5 on SGODOT-288)
+
+## Express straight to Floor 5 met the elite with the key on `Mine · No rocks here`: a floor with a monster up lands on
+## Combat; a cleared one, and floors 1–2, on Mining.
+func test_a_floor_with_monsters_up_lands_on_combat() -> void:
+	var floors := _five([true, true, true, true, true])
+	assert_str(P0MaterialLogic.landing_mode(_view(_run(floors)), 5)).is_equal("combat")
+	assert_str(P0MaterialLogic.landing_mode(_view(_run(floors)), 3)).is_equal("combat")
+	assert_str(P0MaterialLogic.landing_mode(_view(_run(floors)), 2)).is_equal("mine")
+	floors[2].mobs = [{"kind": "mob_slime", "hp": 0, "max": 9}]
+	assert_str(P0MaterialLogic.landing_mode(_view(_run(floors)), 3)).is_equal("mine")
+	assert_int(P0MaterialLogic.mobs_up(_view(_run(floors)), 4)).is_equal(3)
+	assert_str(P0MaterialLogic.landing_mode(_view(null), 5)).is_equal("mine")   # no run: nothing to fight
+
+## The monsters hold still 2 s on arrival (the old mine's grace was 1.5 s).
+func test_monsters_hold_still_on_arrival() -> void:
+	var Combat = load("res://modules/mining/p0_mine_combat.gd")
+	var bp := Layout_bp()
+	var mover := PlayerMover.new(bp, BlueprintGrid.new(bp))
+	mover.position = load("res://modules/mining/mine_layout.gd").SPAWN
+	var c: Node3D = auto_free(Combat.new())
+	add_child(c)
+	c.sync_p0(_view(_run(_five([true, true, true, true, true]))), 5, mover)
+	assert_float(c.grace).is_equal(Combat.LANDING_GRACE_S)
+	assert_float(Combat.LANDING_GRACE_S).is_greater_equal(2.0)

@@ -14,6 +14,9 @@ const KNOCKBACK := 0.7
 ## The swing waits this much longer than the server's tempo (1 / speed), as the rock beat does (0.95 s for 0.9 s), so a
 ## little network jitter never has the server refuse a swing the client already showed (苏烈 on #223).
 const TEMPO_MARGIN_S := 0.05
+## On arriving at a floor the monsters hold still this long: the old mine's 1.5 s entry grace, a little longer since
+## Express lands right by the elite (李元芳 R5 on SGODOT-288). With the key already on Attack, that is time to swing.
+const LANDING_GRACE_S := 2.0
 
 var _weapon := {"damage": 3, "speed": 2.0, "range": REACH, "knockback": KNOCKBACK}
 
@@ -40,7 +43,7 @@ func sync_p0(view: Dictionary, n: int, player_mover: PlayerMover) -> void:
 		for enemy in _actors.values(): enemy.node.queue_free()
 		enemies.clear()
 		_actors.clear()
-		grace = float(_config.entry_grace_seconds)
+		grace = LANDING_GRACE_S
 		for i in mobs.size():
 			var kind := str(KINDS.get(str(mobs[i].get("kind", "")), "slime"))
 			var spec: Dictionary = _config.monsters[kind].duplicate()

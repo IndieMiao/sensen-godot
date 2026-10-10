@@ -251,6 +251,21 @@ static func combat_action(view: Dictionary, ctx: Dictionary) -> Dictionary:
 static func mine_actions(n: int) -> Array:
 	return ["mine", "combat"] if n >= 3 else ["mine"]
 
+## The main key's mode on landing on a floor (李元芳 R5 on 288: Express straight to Floor 5 met the elite with the key
+## still on `Mine · No rocks here`): Combat when a monster of this floor is still up, Mining otherwise; floors 1–2 never
+## fight (§13.3.8). Only on arrival — the player's own pick on the radial stays until the next floor.
+static func landing_mode(view: Dictionary, n: int) -> String:
+	if n < 3: return "mine"
+	return "combat" if mobs_up(view, n) > 0 else "mine"
+
+## Monsters of floor n still standing in the view's run.
+static func mobs_up(view: Dictionary, n: int) -> int:
+	var run = view.get("mine", {}).get("run", null)
+	if not (run is Dictionary): return 0
+	for f in run.get("floors", []):
+		if int(f.get("floor", 0)) == n: return (f.get("mobs", []) as Array).filter(func(m): return int(m.get("hp", 0)) > 0).size()
+	return 0
+
 ## The mine's facilities, tapped and walked to (SGODOT-266; 不知火舞's spec 2e580bed, 197 LOCK-21 复议 2026-10-09):
 ## kind "exit" (floor 1's up ladder), "up" (the up ladder below floor 1), "stairs" (the down ladder), "elevator".
 ## What arriving does: {card: false, cmd} goes at once — the free moves (Exit, Floor 1, a floor paid this run) and

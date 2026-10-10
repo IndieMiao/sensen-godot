@@ -731,9 +731,10 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"plaque": p0_tap(cam.unproject_position(_plaque + Vector3(0, 0.35, 0)))   # PLAQUE-READ
 		"mailbox": p0_tap(cam.unproject_position(_mailbox + MAILBOX_HIT))   # the Inbox through the Mailbox's own tap (234 C)
 		"mouth": p0_tap(cam.unproject_position(_mine + Vector3(0, 1.6, 0)))   # the mine mouth's model, high on the arch (int11 ②)
-		"cardtap", "cardnew":   # a real tap on the mouth's EntryCard: its main button / New run (SGODOT-266)
+		"cardtap", "cardnew", "cardexpress":   # a real tap on the mouth's EntryCard: main / New run / Express (SGODOT-266, 288)
 			var e: UiEntryCard = _materials._entry if _materials.card_open() else null
-			if e != null: p0_tap((e.main_rect() if step[0] == "cardtap" else e.second_rect()).get_center() - rt.ui.root.global_position)
+			var r: Rect2 = (e.main_rect() if step[0] == "cardtap" else e.second_rect() if step[0] == "cardnew" else e.third_rect()) if e != null else Rect2()
+			if e != null: p0_tap(r.get_center() - rt.ui.root.global_position)
 		"zoomto": _zoom = clampf(float(step[1]), 0.8, 1.4)   # zoomto:0.8 (widest) … 1.4 (closest)
 		# P1 placement (SGODOT-241): build:<recipe> opens it as the Facilities card's Build does; placeat:<plot> moves
 		# the preview as a finger on that bed would; placeok / placecancel press the bar; factap:<id> taps a sprinkler.
