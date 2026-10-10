@@ -1,5 +1,5 @@
 {
-  "_note": "P1 新增鱼 12 种（李白，SGODOT-281；方案 §6.2.2–6.2.5）：全球 4（鲇鱼、海鲈、银鲟、河鳗）、地区 8。新字段 time（{dawn_dusk:2} / {night:2} 是权重倍率，night_only / dawn_dusk_only 是窗口外不进池）、weather（sun / rain / wind 倍率）、zones + regional（合格气候带）；fishing.regional 是地区鱼分配规则（每城 2 种、精品城手工指定、时段窗口）。P0 的 8 种不改；它们的 time / weather 补字段（鲤鱼雨 ×1.5、大口黑鲈晨昏 ×2、虹鳟雨 ×2、鲭鱼风 ×2、金锦鲤晴 ×1.5）属于修改已有条目，归钓鱼线（周瑜）在 p0_content.json 里改。",
+  "_note": "P1 新增鱼 12 种（李白，SGODOT-281；方案 §6.2.2–6.2.5）：全球 4（鲇鱼、海鲈、银鲟、河鳗）、地区 8。新字段 time（{dawn_dusk:2} / {night:2} 是权重倍率，night_only / dawn_dusk_only 是窗口外不进池）、weather（sun / rain / wind 倍率）、zones + regional（合格气候带，首字母大写，同 profile.climate）；fishing.regional 是地区鱼分配规则（每城 2 种、精品城手工指定、时段窗口）。P0 的 8 种不改；它们的 time / weather 补字段（鲤鱼雨 ×1.5、大口黑鲈晨昏 ×2、虹鳟雨 ×2、鲭鱼风 ×2、金锦鲤晴 ×1.5）属于修改已有条目，归钓鱼线（周瑜）在 p0_content.json 里改。",
   "fish": [
     {
       "id": "fish_catfish",
@@ -75,8 +75,8 @@
         "sun": 1.5
       },
       "zones": [
-        "tropical",
-        "subtropical"
+        "Tropical",
+        "Subtropical"
       ],
       "regional": true
     },
@@ -92,8 +92,8 @@
       ],
       "time": "dawn_dusk_only",
       "zones": [
-        "temperate",
-        "cool"
+        "Temperate",
+        "Cool"
       ],
       "regional": true
     },
@@ -108,9 +108,9 @@
         "river"
       ],
       "zones": [
-        "tropical",
-        "subtropical",
-        "temperate"
+        "Tropical",
+        "Subtropical",
+        "Temperate"
       ],
       "regional": true
     },
@@ -128,8 +128,8 @@
         "dawn_dusk": 2
       },
       "zones": [
-        "temperate",
-        "cool"
+        "Temperate",
+        "Cool"
       ],
       "regional": true
     },
@@ -150,9 +150,9 @@
         "rain": 2
       },
       "zones": [
-        "tropical",
-        "subtropical",
-        "temperate"
+        "Tropical",
+        "Subtropical",
+        "Temperate"
       ],
       "regional": true
     },
@@ -173,8 +173,8 @@
         "wind": 1.5
       },
       "zones": [
-        "temperate",
-        "cool"
+        "Temperate",
+        "Cool"
       ],
       "regional": true
     },
@@ -190,8 +190,8 @@
       ],
       "time": "night_only",
       "zones": [
-        "tropical",
-        "subtropical"
+        "Tropical",
+        "Subtropical"
       ],
       "regional": true
     },
@@ -212,8 +212,8 @@
         "rain": 2
       },
       "zones": [
-        "temperate",
-        "cool"
+        "Temperate",
+        "Cool"
       ],
       "regional": true
     }
@@ -222,7 +222,7 @@
     "regional": {
       "_note": "§6.2.5：每城 2 种地区鱼。第 1 种取低档组（Common / Fine），第 2 种从去掉第 1 种后的全部候选取；全服种子 + 城市簇 id 哈希，确定性。内陆簇抽到含 coast 的鱼由其 river 栖息承接。地区鱼落袋记录钓到时的气候带，同种不同带分堆。",
       "groups": {
-        "tropical": {
+        "Tropical": {
           "low": [
             "fish_tilapia",
             "fish_grass_carp"
@@ -232,7 +232,7 @@
             "fish_barramundi"
           ]
         },
-        "subtropical": {
+        "Subtropical": {
           "low": [
             "fish_tilapia",
             "fish_grass_carp"
@@ -242,7 +242,7 @@
             "fish_barramundi"
           ]
         },
-        "temperate": {
+        "Temperate": {
           "low": [
             "fish_smelt",
             "fish_grass_carp",
@@ -254,7 +254,7 @@
             "fish_salmon"
           ]
         },
-        "cool": {
+        "Cool": {
           "low": [
             "fish_smelt",
             "fish_arctic_char"
@@ -282,19 +282,19 @@
       "zone_by_lat": [
         [
           23.5,
-          "tropical"
+          "Tropical"
         ],
         [
           35,
-          "subtropical"
+          "Subtropical"
         ],
         [
           55,
-          "temperate"
+          "Temperate"
         ],
         [
           90,
-          "cool"
+          "Cool"
         ]
       ],
       "time_windows": {

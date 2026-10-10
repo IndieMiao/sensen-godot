@@ -1,5 +1,5 @@
 {
-  "_note": "P1 新增作物 12 种（李白，SGODOT-281；方案 §5.2.2–5.2.4）：通用一年生 5（卷心菜、玉米、黄瓜、草莓、甜瓜）、地区 4（菠萝 / 甘薯 / 南瓜 / 甜菜根，只在本气候带 Market 卖、每人每气候带每日 10 枚、异带露天成熟 × 1.5）、多年生果实 3（苹果、柑橘、葡萄，perennial 写树苗与再生）。字段沿用 crops；新增 sold_at / zone / off_zone_grow_h / seed_daily / regional / perennial，由种田线（刘邦）接入。P0 的 8 种不在本文件（片段只增不改）。",
+  "_note": "P1 新增作物 12 种（李白，SGODOT-281；方案 §5.2.2–5.2.4）：通用一年生 5（卷心菜、玉米、黄瓜、草莓、甜瓜）、地区 4（菠萝 / 甘薯 / 南瓜 / 甜菜根，只在本气候带 Market 卖、每人每气候带每日 10 枚、异带露天成熟 × 1.5）、多年生果实 3（苹果、柑橘、葡萄，perennial 写树苗与再生）。字段沿用 crops；新增 sold_at / zone（首字母大写，同 profile.climate） / off_zone_grow_h / seed_daily / regional / perennial，由种田线（刘邦）接入。P0 的 8 种不在本文件（片段只增不改）。",
   "crops": [
     {
       "id": "crop_cabbage",
@@ -126,7 +126,7 @@
         3
       ],
       "sold_at": "market",
-      "zone": "tropical",
+      "zone": "Tropical",
       "off_zone_grow_h": 36,
       "seed_daily": 10,
       "regional": true
@@ -151,7 +151,7 @@
         3
       ],
       "sold_at": "market",
-      "zone": "subtropical",
+      "zone": "Subtropical",
       "off_zone_grow_h": 24,
       "seed_daily": 10,
       "regional": true
@@ -176,7 +176,7 @@
         3
       ],
       "sold_at": "market",
-      "zone": "temperate",
+      "zone": "Temperate",
       "off_zone_grow_h": 30,
       "seed_daily": 10,
       "regional": true
@@ -201,7 +201,7 @@
         3
       ],
       "sold_at": "market",
-      "zone": "cool",
+      "zone": "Cool",
       "off_zone_grow_h": 21,
       "seed_daily": 10,
       "regional": true
