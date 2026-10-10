@@ -196,3 +196,22 @@ func test_show_on_map_reads_another_city_then_flies_to_its_pin() -> void:
 	P0CityPlaces.clear()
 	rt.after_leave = "show:outpost:gn-1850147~post0"
 	assert_bool(m._take_after_leave()).is_true()
+
+## 不知火舞 on #279: Show on map to another city whose read fails says so — Didn't go through · try again — never silently
+## nothing; the next Show reads again.
+func test_show_on_map_says_when_the_citys_read_fails() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var asked: Array = []
+	rt.session.transport = func(_m: int, path: String, _b: Dictionary, cmd: Dictionary):
+		if str(cmd.get("type", "")) == "city": asked.append(path)
+	m.show_place("outpost:gn-1850147~market0")
+	m.open_city_card(TOKYO)   # a second asker without a failed callback: stays quiet
+	P0CityPlaces.fail(TOKYO)   # the read did not come back
+	assert_str(rt.ui.sys_text()).is_equal("Didn't go through · try again")
+	assert_bool(P0CityPlaces.has_city(TOKYO)).is_false()
+	m.show_place("outpost:gn-1850147~market0")   # tries again
+	assert_int(asked.size()).is_equal(2)
+	rt.ui.close_modal()

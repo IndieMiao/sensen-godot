@@ -1049,7 +1049,9 @@ func show_place(target: String) -> void:
 	if cluster != "" and not P0CityPlaces.has_city(cluster) and rt != null:
 		P0CityPlaces.fetch(rt.session, cluster, func(city):
 			_show_city_places(city, cluster)
-			show_place(target))
+			show_place(target),
+			# the read failed: the player asked for this, so say so (不知火舞 on #279), as any command that did not go through
+			func(): rt.ui.show_sys(UiSysBanner.Kind.CMD_FAIL, "Didn't go through · try again", P0Runtime.CMD_FAIL_S))
 		return
 	if cluster != "" and not _shown_cities.has(cluster): _show_city_places(P0CityPlaces.city(cluster), cluster)
 	var entry := place_for(target)
