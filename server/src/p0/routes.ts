@@ -10,7 +10,7 @@ import { add } from './bag.js';
 import { itemName } from './content.js';
 import { putInStorage } from './storage.js';
 import { notePresence } from './presence.js';
-import { cityInfo, clusterById, homeCluster, noteEntered, preview, requirePass } from './travel.js';
+import { cityInfo, clusterById, homeCluster, noteEntered, preview, requirePass, settleHere } from './travel.js';
 import { noteVisit } from './boards.js';
 import { commandFields, uiEvent, type P0EventLog } from './telemetry.js';
 
@@ -42,8 +42,9 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
       notePresence(c, s, space, clock(s.clock_ms), null, place);
       noteEntered(s, space, place);
       noteVisit(s, space, place, []);   // the entry read checks in an explore request too (as noteSeenAt marks)
+      settleHere(c, s, space, place, clock(s.clock_ms));
       store.put(s);
-    }
+    } else if (settleHere(c, s, space, place, clock(s.clock_ms))) store.put(s);   // a Day Pass ran out on the map: home
     return reply.send({ ok: true, state: view(s, clock(s.clock_ms)) });
   });
 

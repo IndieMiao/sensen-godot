@@ -144,6 +144,45 @@ describe('requirePass (SGODOT-278)', () => {
     await app.close();
   });
 
+  it('cold start in the farm while the server still had Tokyo: the farm read puts the player home (李元芳)', async () => {
+    const app = Fastify();
+    const store = new P0Store(c);
+    let now = T;
+    registerP0Routes(app, { content: c, store, now: () => now, dev: false });
+    const headers = { 'x-p0-player': 'travel-cold-1' };
+    await app.inject({ method: 'POST', url: '/v1/p0/commands', headers, payload: { type: 'travel', to: TOKYO } });
+    expect(store.get('travel-cold-1', now).travel.here).toBe(TOKYO);
+    const farm = await app.inject({ method: 'GET', url: '/v1/p0/state?space=home', headers });
+    expect(farm.json().state.travel.here).toBe(SF);
+    expect(farm.json().state.travel.passes[TOKYO]).toBeDefined();   // the pass is kept: Tokyo's places still open
+    await app.close();
+  });
+
+  it('on the map an expired Day Pass lets go (back home); a live one keeps the player there', async () => {
+    const app = Fastify();
+    const store = new P0Store(c);
+    let now = T;
+    registerP0Routes(app, { content: c, store, now: () => now, dev: false });
+    const headers = { 'x-p0-player': 'travel-cold-2' };
+    await app.inject({ method: 'POST', url: '/v1/p0/commands', headers, payload: { type: 'travel', to: TOKYO } });
+    expect((await app.inject({ method: 'GET', url: '/v1/p0/state?space=map', headers })).json().state.travel.here).toBe(TOKYO);
+    now = T + DAY + 1;
+    expect((await app.inject({ method: 'GET', url: '/v1/p0/state', headers })).json().state.travel.here).toBe(SF);
+    expect(store.get('travel-cold-2', now).travel.here).toBe(SF);   // saved
+    await app.close();
+  });
+
+  it('entering a place of a covered city puts the player there; an expired pass inside a place it was entered with does not move them', () => {
+    let s = step(fresh(), { type: 'travel', to: TOKYO }).state;
+    s = step(s, { type: 'return_home' }, T + 10).state;
+    s = step(s, { type: 'cast', space: 'pond', place: TOKYO_POND }, T + 20).state;   // back to Tokyo's pond, pass still on
+    expect(s.travel.here).toBe(TOKYO);
+    const late = step(s, { type: 'reel', outcome: 'cancel', space: 'pond', place: TOKYO_POND }, T + DAY + 5).state;
+    expect(late.travel.here).toBe(TOKYO);   // still in the pond it entered with the pass
+    const mine = step(late, { type: 'return_home', space: 'mine' } as P0Command, T + DAY + 10).state;
+    expect(mine.travel.here).toBe(SF);
+  });
+
   it('home places never need a pass', () => {
     expect(requirePass(c, fresh(), 'pond', 'pond_san_francisco_03', T)).toBeNull();
     expect(requirePass(c, fresh(), 'outpost', c.outposts![0].id, T)).toBeNull();

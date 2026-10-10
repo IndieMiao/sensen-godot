@@ -178,6 +178,29 @@ export function settleExplorer(c: P0Content, s: P0State, now: number, events: P0
   }
 }
 
+/**
+ * Where the player is follows what they do (李元芳's cold start, 2026-10-10): the city they stand in is the one their
+ * scene is in, not only the last `travel` / `return_home`. Called with every command and state read, after requirePass:
+ * - the homestead's spaces (home: the farm and its kitchen; mine) are the home city;
+ * - entering a pond or an outpost (its pass already checked) puts the player in that place's city;
+ * - otherwise (the map, a read without a space) a city whose Day Pass ran out lets go: back home, unless the player is
+ *   still in a place there they entered with the pass (never cut off, §11.5.1).
+ * Quiet: no event, no welcome (the client's own Go home says Welcome home). True when `here` changed.
+ */
+const HOMESTEAD_SPACES = new Set(['home', 'mine']);
+export function settleHere(c: P0Content, s: P0State, space: unknown, place: unknown, now: number): boolean {
+  const t = s.travel, was = t.here;
+  if (typeof space === 'string' && HOMESTEAD_SPACES.has(space)) t.here = t.home;
+  else if ((space === 'pond' || space === 'outpost') && typeof place === 'string' && place !== '') {
+    const cluster = clusterOf(c, place);
+    if (cluster && covers(s, cluster, now)) t.here = cluster;
+  } else if (t.here !== t.home && !covers(s, t.here, now)) {
+    const inside = s.presence.entered ? clusterOf(c, s.presence.entered) : null;
+    if (inside !== t.here) t.here = t.home;
+  }
+  return t.here !== was;
+}
+
 /** return_home {}: free, instant, needs no pass; passes are kept. */
 export function returnHome(s: P0State): void { s.travel.here = s.travel.home; }
 
