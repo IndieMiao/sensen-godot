@@ -344,6 +344,8 @@ export function itemName(c: P0Content, id: string): string {
   if (c.materials[id]) return c.materials[id].name;
   if (c.drinks.items[id]) return c.drinks.items[id].name;
   if (c.specialty[id]) return c.specialty[id].name;
+  const decor = (c as { decor?: { items: Record<string, { name: string }> } }).decor?.items[id];   // Decorate (SGODOT-284)
+  if (decor) return decor.name;
   if (c.supplies[id]) return c.supplies[id].name;
   if (id.startsWith('facility_') && c.facilities?.kinds[id.slice(9)]) return c.facilities.kinds[id.slice(9)].name;
   const upgrade = c.bag_upgrades.find(u => u.id === id);

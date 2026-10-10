@@ -3,6 +3,7 @@ import { cropById, cropBySeed, rodById, type P0Content } from './content.js';
 import { add, count, room, take } from './bag.js';
 import { burners, collectPot, cookAll, eatDish, startPot, recordHeat, settleStove } from './cooking.js';
 import { boardCommand, noteVisit, settleBoards, tracked } from './boards.js';
+import { moveDecor, placeDecor, storeDecor } from './decor.js';
 import { expireGiftMeals, giftResident, learn, noteSown, residentRequestCommand, talk } from './residents.js';
 import { castLine, reelLine, type FishCommand } from './fishing.js';
 import { upgradeHomestead } from './homestead.js';
@@ -49,6 +50,9 @@ type P0CommandBody =
   | { type: 'cabinet_take'; item: string }   // Warming Cabinet `Take one` (§7.7)
   | { type: 'accept' | 'deliver' | 'drop'; request: string }
   | { type: 'homestead_upgrade' }
+  | { type: 'place_decor'; item: string; x: number; y: number; rot?: number }   // Decorate (SGODOT-284)
+  | { type: 'move_decor'; uid: number; x: number; y: number; rot?: number }
+  | { type: 'store_decor'; uid: number }
   | { type: 'talk'; resident: string }
   | { type: 'gift'; resident: string; item: string }
   | { type: 'learn'; resident: string }   // Recipe lesson on the dialogue bar (§7.5.3)
@@ -249,6 +253,13 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
     case 'cabinet_take': {
       if (cmd.space !== undefined && cmd.space !== 'home') return fail('not_home');   // the cabinet is in the farmhouse
       const refusal = takeFromCabinet(c, s, cmd, events);
+      if (refusal) return fail(refusal.code, refusal.detail);
+      break;
+    }
+    case 'place_decor': case 'move_decor': case 'store_decor': {   // Decorate (SGODOT-284): at home only
+      if (cmd.space !== undefined && cmd.space !== 'home') return fail('not_home');
+      const refusal = cmd.type === 'place_decor' ? placeDecor(c, s, cmd, events) : cmd.type === 'move_decor' ? moveDecor(c, s, cmd, events)
+        : storeDecor(c, s, cmd, events);
       if (refusal) return fail(refusal.code, refusal.detail);
       break;
     }
