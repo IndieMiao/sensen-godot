@@ -440,7 +440,7 @@ func test_the_slashes_alternate_and_start_again_after_a_pause() -> void:
 	assert_int(mine._slash).is_equal(before)
 	assert_float(mine._slash_t).is_equal(0.1)
 
-func test_the_sword_is_in_hand_from_the_peak_to_the_end_of_the_slash() -> void:
+func test_the_sword_is_in_hand_for_the_whole_slash() -> void:
 	var mine = _slashing_mine()
 	await get_tree().process_frame
 	mine._hold_sword("sword_wooden")
@@ -449,13 +449,7 @@ func test_the_sword_is_in_hand_from_the_peak_to_the_end_of_the_slash() -> void:
 	mine._swing()
 	mine._hold_sword("sword_wooden")
 	assert_bool(mine.actor.attacking()).is_true()
-	assert_bool(mine.sword_shown()).is_false()          # the wind-up: not yet
-	mine._slash_t = 0.17                                # just before its strike (0.22 − 0.03 s)
-	mine._hold_sword("sword_wooden")
-	assert_bool(mine.sword_shown()).is_false()
-	mine._slash_t = 0.20                                # its strike
-	mine._hold_sword("sword_wooden")
-	assert_bool(mine.sword_shown()).is_true()
+	assert_bool(mine.sword_shown()).is_true()           # B (不知火舞 on 291): in hand from the wind-up
 	var sk: Skeleton3D = mine.actor.rig.skeleton
 	if sk and sk.find_bone(mine.HAND_BONE) >= 0:         # on the hand: its grip within a hand's length of the wrist
 		var wrist: Vector3 = (sk.global_transform * sk.get_bone_global_pose(sk.find_bone(mine.HAND_BONE))).origin
@@ -466,6 +460,36 @@ func test_the_sword_is_in_hand_from_the_peak_to_the_end_of_the_slash() -> void:
 	assert_bool(mine.sword_shown()).is_false()
 	mine._hold_sword("")                                # no Combat slot weapon: no sword
 	assert_object(mine._sword).is_null()
+
+## On the move (不知火舞 on 291): the slash holds the body still to its strike (the chop 0.22 s, the sweep 0.30 s)
+## whatever the stick says; past it the stick cancels the follow-through and the body moves at once, while with the stick
+## let go the clip plays out.
+func test_a_slash_holds_still_to_its_strike_then_the_stick_cancels_it() -> void:
+	var mine = _slashing_mine()
+	var cam := Camera3D.new()
+	add_child(auto_free(cam))
+	cam.look_at_from_position(Vector3(0, 10, 10), Vector3.ZERO)
+	mine.actor.cam = cam
+	await get_tree().process_frame
+	mine.actor.set_input(Vector2(1, 0))
+	for i in 10: mine.actor.step(1.0 / 30.0)
+	assert_bool(mine.actor.mover.is_moving()).is_true()   # walking
+	mine._swing()
+	var at: Vector3 = mine.actor.mover.position
+	for i in 6: mine.actor.step(1.0 / 30.0)            # 0.2 s: before the chop's strike
+	assert_vector(mine.actor.mover.position).is_equal(at)
+	assert_bool(mine.actor.attacking()).is_true()
+	for i in 2: mine.actor.step(1.0 / 30.0)            # past 0.22 s, the stick still pushed: moving again
+	assert_bool(mine.actor.mover.is_moving()).is_true()
+	assert_bool(mine.actor.attacking()).is_false()
+	# the stick let go: the clip plays out
+	mine.actor.set_input(Vector2.ZERO)
+	for i in 4: mine.actor.step(1.0 / 30.0)
+	mine.combat.cooldown = 0.0
+	mine._swing()                                       # the sweep (0.30 s to its strike)
+	for i in 12: mine.actor.step(1.0 / 30.0)            # 0.4 s
+	assert_bool(mine.actor.attacking()).is_true()
+	assert_bool(mine.actor.mover.is_moving()).is_false()
 
 ## The strike shows at the wrist's peak: the arc, the slime's flash and knockback wait fx_delay; who was hit and its
 ## stun come at the press (the command and the server's tempo as before).

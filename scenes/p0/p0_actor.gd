@@ -12,6 +12,7 @@ var state := "idle"
 var _clip := ""
 var _labour_left := 0.0
 var _attack_left := 0.0
+var _attack_lock := 0.0
 var _joy := Vector2.ZERO
 var cam: Camera3D
 ## Optional ground height under a point (the farm's raised beds); the rig steps up onto it.
@@ -46,10 +47,11 @@ func busy() -> bool:
 
 func step(dt: float) -> void:
 	_attack_left = maxf(0.0, _attack_left - dt)
+	_attack_lock = maxf(0.0, _attack_lock - dt)
 	if state == "labour":
 		_labour_left -= dt
 		if _labour_left <= 0.0: state = "idle"
-	if state in ["labour", "locked"] or cam == null:
+	if state in ["labour", "locked"] or cam == null or _attack_lock > 0.0:   # a slash holds still to its strike
 		mover.stop()
 	else:
 		var right := cam.global_basis.x
@@ -64,7 +66,7 @@ func step(dt: float) -> void:
 	if mover.is_moving():
 		look_at(position + mover.facing, Vector3.UP)
 		state = "move"
-		_attack_left = 0.0   # walking takes the body back from a slash at once
+		_attack_left = 0.0   # the stick past the strike takes the body back from the slash's follow-through
 		_play("run")
 	elif state == "move":
 		state = "idle"
@@ -81,11 +83,15 @@ func labour(verb: String, target: Vector3) -> void:
 	_labour_left = LABOUR_S
 	_play(AnimPlaceholders.clip_for(verb), true)
 
-## One swing of Combat's Attack (SGODOT-291): its slash clip over standing still, for `seconds`. Not a lock — walking
-## takes the body back to the run at once; the swing itself (its hit, its arc) is the combat's and stands either way.
-func attack(clip: String, seconds: float) -> void:
-	if state in ["labour", "locked"] or mover.is_moving(): return
+## One swing of Combat's Attack (SGODOT-291; 不知火舞 on 291): its slash clip for `seconds`, the body held still — even
+## on the move — until `lock` (its strike); past it the stick cancels the follow-through and the body moves at once,
+## while with the stick let go the clip plays out. The swing itself (its hit, its arc) is the combat's.
+func attack(clip: String, seconds: float, lock := 0.0) -> void:
+	if state in ["labour", "locked"]: return
+	mover.stop()
+	if state == "move": state = "idle"
 	_attack_left = seconds
+	_attack_lock = minf(lock, seconds)
 	_play(clip, true)
 
 ## A slash clip is playing (the sword shows in hand only then).

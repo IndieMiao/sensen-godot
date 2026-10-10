@@ -46,14 +46,15 @@ var _swings_out := {}
 ## The slash (SGODOT-291; 不知火舞 on 291 72917be2): attack_slash, a raised slanted chop, and attack_slash_b, a sweep,
 ## alternate while Attack is pressed on; a pause over SLASH_RESET_S starts again with the chop. [clip, its length, the
 ## right wrist's speed peak from its start (上官婉儿's measure on the bones)]: the arc, the struck slime's flash and
-## knockback and the sword in hand come ARC_LEAD_S before the peak (P0MineCombat.fx_delay); who was hit is judged and
-## sent at the press, as before. Walking takes the body back from the clip (P0Actor.attack); the swing stands.
+## knockback come ARC_LEAD_S before the peak (P0MineCombat.fx_delay); who was hit is judged and sent at the press, as
+## before. The body holds still until the peak — on the move too — and past it the stick cancels the follow-through
+## (P0Actor.attack; 不知火舞 on 291: 0.22 s for the chop, 0.30 s for the sweep).
 const SLASHES := [["attack_slash", 0.52, 0.22], ["attack_slash_b", 0.60, 0.30]]
 const SLASH_RESET_S := 0.8
 const ARC_LEAD_S := 0.03
 var _slash := -1          # the last slash's place in SLASHES
 var _slash_t := INF       # seconds since it began
-## The Combat slot's sword in the right hand, from the slash's strike to its end: each frame its grip on the hand bone as
+## The Combat slot's sword in the right hand for the whole slash (不知火舞 on 291: B, in hand from the wind-up): each frame its grip on the hand bone as
 ## the clip poses it — the blade across the knuckles to the thumb side (the bone's +Y), its edge along the fingers (+X).
 const CombatArt := preload("res://modules/mining/combat_art.gd")
 const HAND_BONE := "Wrist_R"
@@ -374,9 +375,9 @@ func _hold_sword(id: String) -> void:
 	_sword.visible = sword_due() and not _ko
 	if _sword.visible: _grip_sword()
 
-## Whether this slash has reached its peak and its clip still plays (the sword's time in hand).
+## Whether a slash clip plays (the sword's time in hand).
 func sword_due() -> bool:
-	return _slash >= 0 and actor.attacking() and _slash_t >= strike_at(_slash)
+	return _slash >= 0 and actor.attacking()
 
 ## Seconds from a slash's press to its strike: its wrist peak, ARC_LEAD_S early.
 func strike_at(i: int) -> float: return maxf(0.0, float(SLASHES[i][2]) - ARC_LEAD_S)
@@ -419,7 +420,7 @@ func _swing() -> void:
 	combat.fx_delay = strike_at(_slash)
 	var hit: Array = combat.swing({}, actor.mover)
 	actor.face(actor.position + actor.mover.facing)   # turned to the slime it swung at
-	actor.attack(str(slash[0]), float(slash[1]))
+	actor.attack(str(slash[0]), float(slash[1]), float(slash[2]))   # held still to the wrist's peak
 	_hold_sword(_sword_id)
 	if hit.is_empty(): return
 	var cmd := {"type": "mine_attack", "floor": floor_n, "targets": hit.map(func(id): return Combat.mob_index(str(id)))}
@@ -961,8 +962,9 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"floor": _go_floor(int(step[1]))
 		"combat": rt.ui.set_mode("combat" if step.size() < 2 or step[1] != "0" else "mine")   # combat[:0] — the radial's pick
 		"attack": _swing()   # one Attack (Combat's key)
-		"attacks":   # attacks:n:ms — n presses of Attack ms apart in game time (shots of the alternating slash, SGODOT-291)
-			for i in int(step[1]): get_tree().create_timer(float(step[2]) / 1000.0 * i, false).timeout.connect(_swing)
+		"attacks":   # attacks:n:ms[:delay ms] — n presses of Attack ms apart in game time (shots of the slash, SGODOT-291)
+			var after := float(step[3]) / 1000.0 if step.size() > 3 else 0.0
+			for i in int(step[1]): get_tree().create_timer(after + float(step[2]) / 1000.0 * i, false).timeout.connect(_swing)
 		"near":   # near:i — stand next to monster i (the screenshots' fight)
 			var e: Dictionary = combat.enemies.get(Combat.mob_id(int(step[1])), {}) if combat else {}
 			if not e.is_empty():
