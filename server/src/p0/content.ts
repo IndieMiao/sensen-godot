@@ -161,6 +161,9 @@ export interface P0Content {
   };
   materials: Record<string, { name: string; price: number | null; floor?: number; ingr?: [Family, number] }>;   // ingr: seasonings (§7.3.1); floor: a request's price for one with no buyback (quartz, hardwood)
   wallet_floor: number;                       // §8.1.1 / q(32): every coin spend except seeds keeps this much
+  /** Travel line data (content/travel_p2.json, SGODOT-275): landmark stamps by cluster (plan §11.9.3 表 11-18) and the
+   * display names of clusters whose seed city is not the one players look for (gn-3981609 → San Diego). */
+  travel?: { landmarks?: Record<string, { landmark: string; stamp: string }>; cluster_names?: Record<string, string> };
   homestead: {
     max_level: number;
     warming_cabinet: number;                  // portions once unlocked (Lv3, §7.7)
@@ -281,7 +284,12 @@ export function loadP0Content(file = DEFAULT_P0_CONTENT): P0Content {
   // v5 (SGODOT-278): the frozen city clusters beside the content (亚瑟's build_clusters.mjs), with the server's member table.
   const clusters = path.join(dir, 'city_clusters.json');
   // Not enumerable: a structuredClone of the content (tests) leaves it out instead of copying a class without methods.
-  if (existsSync(clusters)) Object.defineProperty(c, 'clusters', { value: CityClusters.load(clusters), enumerable: false, writable: true, configurable: true });
+  if (existsSync(clusters)) {
+    const table = CityClusters.load(clusters);
+    // A cluster's display name (travel.cluster_names): the id stays frozen, only the name players read changes.
+    for (const [id, name] of Object.entries(c.travel?.cluster_names ?? {})) { const cl = table.get(id); if (cl) cl.name = name; }
+    Object.defineProperty(c, 'clusters', { value: table, enumerable: false, writable: true, configurable: true });
+  }
   // SGODOT-280: generated cities for travel.ts cityInfo (GET /v1/p0/city/:cluster). Not enumerable, like clusters.
   Object.defineProperty(c, 'cityPlaces', { value: (id: string) => cityPlaces(c, id), enumerable: false, writable: true, configurable: true });
   const ponds = path.join(dir, 'p0_ponds.json');

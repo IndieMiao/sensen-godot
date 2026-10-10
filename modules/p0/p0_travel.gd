@@ -106,3 +106,69 @@ static func flight_s(trip: int) -> float:
 ## The trip tier to a cluster from the home farm, for browsing (the server's preview is authoritative).
 static func trip(view: Dictionary, cluster: String) -> Dictionary:
 	return P0Clusters.trip(cluster, home(view), P0City.farm_at(), view.get("travel", {}).get("fallback", {}))
+
+# ---------------------------------------------------------------- Passport (PASS-1) and a city's page (PASS-2)
+## §11.9.1 three tiers by cluster: Visited (a first visit), Regular (≥ 5 visits and ≥ 3 local deliveries), Local (≥ 10
+## visits, both regional fish caught, a regional recipe learned). The server counts visits and deliveries (visits[c]).
+const REGULAR_VISITS := 5
+const REGULAR_TRADES := 3
+const LOCAL_VISITS := 10
+const FIRST_VISITS_PER_DAY := 2
+
+## "Visited" / "Regular" / "Local" by the counts the client has ("" for a city never reached). Local also needs the
+## regional fish and recipe, which this version does not track: it stops at Regular.
+static func tier(view: Dictionary, cluster: String) -> String:
+	var v: Dictionary = view.get("travel", {}).get("visits", {}).get(cluster, {})
+	if v.is_empty(): return ""
+	if int(v.get("n", 0)) >= REGULAR_VISITS and int(v.get("deliveries", 0)) >= REGULAR_TRADES: return "Regular"
+	return "Visited"
+
+## Stamps counted on the server's today (two a day count, §11.9.2): the Passport's "First visits today 1/2".
+static func first_visits_today(view: Dictionary) -> int:
+	var today := str(view.get("travel", {}).get("today", ""))
+	if today == "": return 0
+	return stamps(view).filter(func(s): return str(s.get("counted_on", "")) == today).size()
+
+## PASS-1 (Figma 482:429): {title, state, effect, facts, rows: home first, then the visited cities newest first}.
+## Each row: {cluster, icon, title, state, effect}; the stamp art is the landmark's (travel.landmarks) when there is one.
+static func passport(view: Dictionary) -> Dictionary:
+	var h := home(view)
+	var visits: Dictionary = view.get("travel", {}).get("visits", {})
+	var order: Array = visits.keys()
+	order.sort_custom(func(a, b): return float(visits[a].get("first_at", 0)) > float(visits[b].get("first_at", 0)))
+	var rows: Array = [{cluster = h, icon = "home", title = str(P0Clusters.get_cluster(h).get("name", "")), state = "Home",
+		effect = "Your home city"}]
+	for c in order:
+		if c == h: continue
+		var t := tier(view, c)
+		rows.append({cluster = c, icon = "stamp", stamp = landmark_stamp(c),   # PASS-1: i-stamp (431:318), the landmark art when it has one
+			title = str(P0Clusters.get_cluster(c).get("name", "")), state = t,
+			effect = "A new connection" if t == "Visited" else "A regular here"})
+	return {title = "Passport", state = "Collection", effect = "Browse your visited cities and stamps.",
+		facts = [["Cities visited", str(rows.size())], ["First visits today", "%d/%d" % [first_visits_today(view), FIRST_VISITS_PER_DAY]]],
+		rows = rows}
+
+## The landmark stamp's art for a cluster (content travel.landmarks: res://assets/p0/stamps/<stamp>.png), "" for a
+## climate stamp.
+static func landmark_stamp(cluster: String) -> String:
+	var l: Dictionary = P0Logic.content().get("travel", {}).get("landmarks", {}).get(cluster, {})
+	return "res://assets/p0/stamps/%s.png" % str(l.stamp) if l.has("stamp") else ""
+
+## PASS-2 (Figma 482:431): a visited city's three tiers — Visited (Complete), Regular (visits 1/5, local trades 0/3),
+## Local (visits needed 10).
+static func city_page(view: Dictionary, cluster: String) -> Dictionary:
+	var v: Dictionary = view.get("travel", {}).get("visits", {}).get(cluster, {})
+	var n := int(v.get("n", 0))
+	var trades := int(v.get("deliveries", 0))
+	var regular := tier(view, cluster) == "Regular"
+	return {title = str(P0Clusters.get_cluster(cluster).get("name", "")), state = tier(view, cluster) if not v.is_empty() else "Unexplored",
+		effect = "Build your connection with this city.",
+		facts = [["Visits", "%d/%d" % [mini(n, REGULAR_VISITS), REGULAR_VISITS]], ["Local trades", "%d/%d" % [mini(trades, REGULAR_TRADES), REGULAR_TRADES]]],
+		rows = [
+			{icon = "stamp", stamp = landmark_stamp(cluster), title = "Visited", state = "Complete" if not v.is_empty() else "",
+				effect = "Your stamp has been collected" if not v.is_empty() else "Travel here to collect its stamp"},
+			{icon = "home", title = "Regular", state = "Complete" if regular else "", effect = "Keep visiting and trading",
+				facts = [] if regular else [["Visits", "%d/%d" % [mini(n, REGULAR_VISITS), REGULAR_VISITS]], ["Local trades", "%d/%d" % [mini(trades, REGULAR_TRADES), REGULAR_TRADES]]]},
+			{icon = "fish", title = "Local", state = "", effect = "Catch both regional fish and learn a regional recipe",
+				facts = [["Visits needed", str(LOCAL_VISITS)]]},
+		]}

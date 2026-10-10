@@ -708,6 +708,58 @@ func _exit_tree() -> void:
 ## costs (nothing in the first version: Free), whether it is a first visit, and that going home is always free. Fly
 ## sends `travel`; the server's arrival event flies the camera there (on_arrival). From a city bubble, and from a
 ## pond / outpost of that city refused with pass_required / trip_expired (the server's preview then names it).
+## MAP-3-FREE (§11.8.3, Figma 482:403): an unexplored city's silhouette card — climate, trip, local time, and its ponds,
+## outposts and residents from the server (GET /p0/city/:cluster: the counts and the local time come with its preview).
+## Travel details › opens the free travel card (Fly); Keep browsing closes it. A visited city goes straight to its
+## travel card. While the city's places are on their way the card opens on what the client knows and fills in.
+func open_city_card(cluster: String) -> void:
+	var c := P0Clusters.get_cluster(cluster)
+	if c.is_empty() or rt == null: return
+	if P0Travel.fog(_view(), cluster) != "unexplored":
+		open_travel(cluster)
+		return
+	P0CityPlaces.fetch(rt.session, cluster, func(_city):
+		if rt.ui.modal_kind == "city_card" and _card_city == cluster: _fill_city_card(cluster))
+	_card_city = cluster
+	_fill_city_card(cluster)
+
+var _card_city := ""
+
+func _fill_city_card(cluster: String) -> void:
+	if rt.ui.modal_kind == "city_card": rt.ui.close_modal()
+	P0ArrivalCard.open(rt.ui, city_card(_view(), cluster, P0CityPlaces.city(cluster)), func(): pass, "city_card")
+	var link := rt.ui.root.find_child("Link_Travel_details", true, false)
+	if link: (link as Button).pressed.connect(func():
+		rt.ui.close_modal()
+		open_travel(cluster, P0CityPlaces.city(cluster).get("preview", {})))
+
+## The silhouette card's spec (pure, tested): `city` = P0CityPlaces.city (its preview carries the server's counts and UTC
+## offset), {} before it is in. Counts and local time stay "–" until then.
+static func city_card(view: Dictionary, cluster: String, city: Dictionary) -> Dictionary:
+	var c := P0Clusters.get_cluster(cluster)
+	var pv: Dictionary = city.get("preview", {}) if city.get("preview") is Dictionary else {}
+	var trip := P0Travel.trip(view, cluster)
+	if pv.has("trip"): trip = {km = int(pv.get("km", trip.get("km", 0))), trip = int(pv.trip), name = str(pv.get("trip_name", trip.get("name", "")))}
+	var counts: Dictionary = pv.get("counts", {})
+	var count := func(key: String) -> String: return str(int(counts[key])) if counts.has(key) else "–"
+	var offset = pv.get("utc_offset_min", null)
+	var local := "–"
+	if offset != null:
+		var t := Time.get_datetime_dict_from_unix_time(int(P0Travel.now_ms(view) / 1000.0) + int(offset) * 60)
+		local = "%02d:%02d" % [int(t.hour), int(t.minute)]
+	return {
+		"title": str(c.get("name", "")), "state": "Unexplored", "effect": "Preview the city before travelling.",
+		"facts": [["Climate", str(c.get("climate", "")).capitalize()], ["Trip", "%d · %s" % [int(trip.get("trip", 1)), str(trip.get("name", ""))]],
+			["Local time", local]],
+		"rows": [
+			{"icon": P0Logic.icon("pond"), "title": "Ponds", "effect": "Basic and regional fishing", "quantity": count.call("ponds"), "unit": "ponds"},
+			{"icon": P0Logic.icon("home"), "title": "Outposts", "effect": "Local shops and requests", "quantity": count.call("outposts"), "unit": "outposts"},
+			{"icon": P0Logic.icon("face_player"), "title": "Residents", "effect": "People to meet", "quantity": count.call("residents"), "unit": "residents"},
+		],
+		"links": [["Travel details", func(): pass]],
+		"primary": "", "dismiss": "Keep browsing",
+	}
+
 func open_travel(cluster: String, preview := {}) -> void:
 	var c := P0Clusters.get_cluster(cluster)
 	if c.is_empty() or rt == null: return
@@ -768,14 +820,15 @@ func open_arrival_card(cluster: String) -> void:
 		return
 	var c := P0Clusters.get_cluster(cluster)
 	var pond := P0CityPlaces.beginner_pond(cluster)
-	var outpost := P0CityPlaces.first_outpost(cluster)
+	# Nearby (不知火舞 on #248): the market square nearest to where the player stands (the city's overview on landing)
+	var outpost := P0CityPlaces.nearest_outpost(cluster, Vector2(center_lat, center_lng))
 	var climate := str(c.get("climate", "")).capitalize()   # the table's "temperate" → "Temperate" (§11.9.3 bands)
 	var spec := {
 		"title": str(c.get("name", "")), "state": "Nearby", "effect": "Choose your first local activity.",
 		"rows": [
 			{"icon": P0Logic.icon("pond"), "title": "Local pond", "effect": "Pond Crucian for every level"},
 			{"icon": P0Logic.icon("home"), "title": "Outpost", "effect": ("%s seeds and local requests" % climate) if climate != "" else "Local requests"},
-			{"icon": P0Logic.icon("stamp"), "title": "%s stamp" % str(c.get("name", "")), "state": "New", "effect": "View it in your Passport"},
+			{"icon": P0Logic.icon("passport"), "title": "%s stamp" % str(c.get("name", "")), "state": "New", "effect": "View it in your Passport"},
 		],
 		"links": [] if pond.is_empty() else [["Show local pond", func():
 			rt.ui.close_modal()
@@ -816,7 +869,7 @@ func _travel_first(entry: Dictionary) -> bool:
 	var cluster := cluster_of_entry(entry, P0Travel.home(_view()))
 	if P0Travel.covers(_view(), cluster): return false
 	if city_map: city_map.clear_selection()
-	open_travel(cluster)
+	open_city_card(cluster)   # unexplored: the silhouette card first (MAP-3-FREE); visited: its travel card
 	return true
 
 ## The fog's holes (§11.7.3): one round every explored city near the screen, a little wider than its radius, in the city
@@ -899,7 +952,7 @@ func fly_to_city(id: String) -> void:
 	if cluster == "" or cluster == P0Travel.here(_view()) or rt == null: return
 	# Home is never a trip (q(108)): from another city the home city's bubble goes home, as the homestead's Go home.
 	if cluster == P0Travel.home(_view()): _return_home()
-	else: open_travel(cluster)
+	else: open_city_card(cluster)
 
 ## At most this many city bubbles, at least this far apart on screen (px), most populous first.
 const CITY_BUBBLES := 30
@@ -1167,6 +1220,8 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"fly":   # fly:gn-1850147 — the travel card's Fly for that city (review shots, SGODOT-280): travel, then the arrival
 			_origin_before = _origin()
 			rt.session.send({"type": "travel", "to": step[1]})
+		"citycard":   # citycard:gn-1850147 — that city's silhouette card (MAP-3-FREE), as a tap on its bubble
+			open_city_card(step[1])
 		"arrivalcard":   # arrivalcard:gn-1850147 — the first visit's card (MAP-7-FREE) for that city
 			open_arrival_card(step[1])
 		"arrivalgo":   # the arrival card's Visit the outpost, as a tap on it

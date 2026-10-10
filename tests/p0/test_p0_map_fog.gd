@@ -165,7 +165,7 @@ func test_a_visited_small_city_has_a_bubble_at_the_country_zoom() -> void:
 	assert_array(m.city_regions().map(func(r): return str(r.id))).contains([small])
 	rt.session.view = saved
 
-func test_a_pin_of_a_city_without_a_pass_opens_its_travel_card() -> void:
+func test_a_pin_of_a_city_without_a_pass_opens_its_city_card() -> void:
 	var m := _map()
 	for i in 3: await get_tree().process_frame
 	m.set_process(false)
@@ -175,7 +175,7 @@ func test_a_pin_of_a_city_without_a_pass_opens_its_travel_card() -> void:
 	assert_str(P0Map.cluster_of_entry({"id": TOKYO + "~pond0"}, SF)).is_equal(TOKYO)
 	assert_str(P0Map.cluster_of_entry({"id": "pond_san_francisco_01"}, SF)).is_equal(SF)
 	assert_bool(m._travel_first({"kind": "pond", "id": TOKYO + "~pond0"})).is_true()
-	assert_str(rt.ui.modal_kind).is_equal("travel_card")
+	assert_str(rt.ui.modal_kind).is_equal("city_card")   # unexplored: its silhouette card (MAP-3-FREE), then Travel details
 	rt.ui.close_modal()
 	assert_bool(m._travel_first({"kind": "pond", "id": "pond_san_francisco_01"})).is_false()   # the home city's: as ever
 	assert_bool(m._travel_first({"kind": "place", "id": "home"})).is_false()

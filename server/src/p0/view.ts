@@ -55,7 +55,7 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     // Map pin markers (§9.5.2, q(48)): one per place, deliver > request > new; the map draws the first five on screen
     map_markers: mapMarkers(c, s, now),
     // Cross-city (v5, SGODOT-278, note 0fc0bc5e §2): home / here / passes / visits / stamps / fallback / explorer
-    travel: s.travel,
+    travel: { ...s.travel, today: dayKey(c, now) },   // today: the day key stamps count on (Passport: first visits today 1/2)
     decor: decorView(c, s),   // Decorate (SGODOT-284): {placed, cap, used, stored}; catalog and yard are in the content
     skills,
     plots: s.plots.map(p => ({

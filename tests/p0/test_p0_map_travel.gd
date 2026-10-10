@@ -6,6 +6,7 @@ extends GdUnitTestSuite
 
 const P0_MAP := "res://scenes/p0/p0_map.tscn"
 const P0Clusters := preload("res://modules/p0/p0_clusters.gd")
+const P0Map := preload("res://scenes/p0/p0_map.gd")
 const SF := "gn-5391959"
 const TOKYO := "gn-1850147"
 
@@ -49,7 +50,7 @@ func _toast_within(ui: P0Ui, secs: float) -> String:
 func _texts(node: Node) -> Array:
 	return node.find_children("*", "Label", true, false).map(func(l): return str((l as Label).text))
 
-func test_another_citys_bubble_opens_its_free_travel_card_and_fly_sends_travel() -> void:
+func test_another_citys_bubble_opens_its_silhouette_card_then_its_free_travel_card_and_fly_sends_travel() -> void:
 	var m := _map()
 	for i in 3: await get_tree().process_frame
 	m.set_process(false)
@@ -57,6 +58,9 @@ func test_another_citys_bubble_opens_its_free_travel_card_and_fly_sends_travel()
 	var sent: Array = []
 	rt.session.sent.connect(func(cmd): sent.append(cmd))
 	m.fly_to_city(TOKYO)
+	# an unexplored city opens its silhouette card first (MAP-3-FREE); Travel details › opens the free travel card
+	assert_str(rt.ui.modal_kind).is_equal("city_card")
+	(rt.ui.root.find_child("Link_Travel_details", true, false) as Button).pressed.emit()
 	assert_str(rt.ui.modal_kind).is_equal("travel_card")
 	var texts := _texts(rt.ui.root)
 	assert_array(texts).contains(["Tokyo, Japan", "Unexplored", "Free", "First visit · stamp + 10 Energy"])
@@ -170,4 +174,36 @@ func test_away_the_home_citys_bubble_goes_home_not_a_trip() -> void:
 	assert_str(rt.ui.modal_kind).is_not_equal("travel_card")
 	assert_array(sent.map(func(c): return str(c.get("type", "")))).is_equal(["return_home"])
 	assert_str(await _toast_within(rt.ui, 1.0)).is_equal("Welcome home")
+	rt.session.view = saved
+
+## MAP-3-FREE (§11.8.3, Figma 482:403): climate, trip and local time, then the city's ponds / outposts / residents from
+## the server's generator (its preview), "–" until they are in; Keep browsing closes it.
+func test_the_silhouette_card_reads_the_city_and_fills_in_its_places() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved := _with_travel(rt, {home = SF, here = SF, passes = {}, visits = {}, stamps = [], fallback = {near3 = [], near10 = []}, explorer = 0})
+	var empty: Dictionary = P0Map.city_card(rt.session.view, TOKYO, {})
+	assert_str(str(empty.title)).is_equal("Tokyo")
+	assert_str(str(empty.state)).is_equal("Unexplored")
+	assert_str(str(empty.effect)).is_equal("Preview the city before travelling.")
+	assert_array(empty.facts.map(func(f): return str(f[0]))).is_equal(["Climate", "Trip", "Local time"])
+	assert_str(str(empty.facts[0][1])).is_equal("Temperate")
+	assert_str(str(empty.facts[1][1])).is_equal("6 · Intercontinental")
+	assert_str(str(empty.facts[2][1])).is_equal("–")
+	assert_array(empty.rows.map(func(r): return str(r.quantity))).is_equal(["–", "–", "–"])
+	var city := {"preview": {"cluster": TOKYO, "trip": 6, "km": 8278, "trip_name": "Intercontinental", "utc_offset_min": 540,
+		"counts": {"ponds": 4, "outposts": 9, "residents": 9}}}
+	var full: Dictionary = P0Map.city_card(rt.session.view, TOKYO, city)
+	assert_array(full.rows.map(func(r): return "%s %s" % [r.quantity, r.unit])).is_equal(["4 ponds", "9 outposts", "9 residents"])
+	# local time = the view's clock + the city's offset: 1_000_000_000 ms (1970-01-12 13:46:40 UTC) + 9 h
+	assert_str(str(full.facts[2][1])).is_equal("22:46")
+	assert_str(str(full.dismiss)).is_equal("Keep browsing")
+	rt.ui.close_modal()
+	m.open_city_card(TOKYO)
+	assert_str(rt.ui.modal_kind).is_equal("city_card")
+	(rt.ui.root.find_child("Dismiss", true, false) as Button).pressed.emit()
+	assert_str(rt.ui.modal_kind).is_empty()
+	rt.ui.close_modal()
 	rt.session.view = saved

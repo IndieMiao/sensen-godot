@@ -21,11 +21,14 @@ static func _load() -> void:
 	var f: Array = table.get("fields", [])
 	var col := {}
 	for i in f.size(): col[f[i]] = i
+	# A cluster's display name (content travel.cluster_names, as the server's loader): the id stays frozen
+	var names: Dictionary = (P0Logic.content().get("travel", {}) as Dictionary).get("cluster_names", {})
 	for r in table.get("rows", []):
 		var c := {}
 		for k in col: c[k] = r[col[k]]
 		c.population = int(c.population)
 		c.members = int(c.members)
+		if names.has(c.id): c.name = str(names[c.id])
 		_by_id[c.id] = c
 		_list.append(c)
 		var k := _cell(float(c.lat), float(c.lng))

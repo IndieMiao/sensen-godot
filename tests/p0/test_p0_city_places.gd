@@ -107,4 +107,15 @@ func test_a_first_visit_lands_on_three_things_to_do() -> void:
 	assert_str(str(link.get("label"))).is_equal("Show local pond")   # a NavigationRow (its text is the Button's)
 	var primary := rt.ui.root.find_child("Primary", true, false)
 	assert_str(str(primary.get("label"))).is_equal("Visit the outpost")
+	assert_object(rt.ui.root.find_child("Handle", true, false)).is_not_null()   # the sheet's grip (不知火舞 on #248)
 	rt.ui.close_modal()
+
+## The arrival card's Visit the outpost goes to the market square nearest where the player landed (Nearby, 不知火舞 on #248).
+func test_visit_the_outpost_is_the_nearest_market_square() -> void:
+	var two: Dictionary = CITY.duplicate(true)
+	two.detail.outposts.append({"id": "gn-1850147~market2", "role": "market", "name": "Oak Market Square", "lat": 35.7453, "lng": 139.7130,
+		"category": "Market square · Requests", "keeper": {"role": "Market Keeper", "name": "Ivy", "look": "market_temperate_0"},
+		"residents": [], "art": "fruit_shop", "anchors": "res://assets/p0/outposts/market.anchors.json", "capacity": 30})
+	P0CityPlaces.accept(TOKYO, two)
+	assert_str(str(P0CityPlaces.nearest_outpost(TOKYO, Vector2(35.745, 139.713)).id)).is_equal("gn-1850147~market2")
+	assert_str(str(P0CityPlaces.nearest_outpost(TOKYO, Vector2(35.684, 139.712)).id)).is_equal("gn-1850147~market0")
