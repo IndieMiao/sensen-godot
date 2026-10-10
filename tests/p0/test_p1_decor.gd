@@ -143,3 +143,24 @@ func test_the_stall_decor_page_lists_the_pieces_in_their_states() -> void:
 	assert_array(row.call("deco_fence")).is_equal([["6 pieces", "In storage ×6"], ["unavailable:Bought today · 9h 12m"]])
 	assert_array(row.call("deco_birdbath")).is_equal([["1×1 · Birds drop by"], ["unavailable:Need 40 more coins"]])
 	assert_array(row.call("deco_windmill")).is_equal([["2×2 · Spins in wind", "1 level to go"], ["unavailable:Homestead Lv3 needed"]])
+
+## Spec v2 (284 6a751a9a): a piece taps as at least 44 × 44 at any zoom (the whole yard is about 17 px a cell); the nearest
+## centre wins where two grown boxes overlap.
+func test_a_small_piece_taps_as_44_px() -> void:
+	var boxes := [Rect2(100, 100, 17, 17), Rect2(125, 100, 34, 17)]   # two pieces side by side at the whole-yard zoom
+	assert_int(P0FarmDecor.pick_near(boxes, Vector2(108, 108))).is_equal(0)
+	assert_int(P0FarmDecor.pick_near(boxes, Vector2(90, 100))).is_equal(0)    # 10 px off a 17 px piece: inside 44
+	assert_int(P0FarmDecor.pick_near(boxes, Vector2(80, 100))).is_equal(-1)   # 20 px off: outside
+	assert_int(P0FarmDecor.pick_near(boxes, Vector2(122, 108))).is_equal(0)   # in both grown boxes: the nearer centre
+	assert_int(P0FarmDecor.pick_near(boxes, Vector2(128, 108))).is_equal(1)
+	assert_int(P0FarmDecor.pick_near([Rect2(0, 0, 80, 80)], Vector2(85, 40))).is_equal(-1)   # a big piece is not grown
+
+## The yard's dashed edge goes round the walk rect's outer cell edges, dashes no longer than DASH_M.
+func test_the_yard_edge_is_dashed_round_the_walk_rect() -> void:
+	var bp := P0Garden.blueprint()
+	var dashes := P0FarmDecor.yard_dashes(bp, [1, 0, 19, 20])
+	assert_int(dashes.size()).is_greater(40)
+	var xs := dashes.map(func(d): return (d[0] as Vector3).x)
+	assert_float(xs.min()).is_equal_approx(bp.cell_to_world(Vector2i(1, 0)).x - bp.cell_m * 0.5, 0.001)
+	assert_float(xs.max()).is_equal_approx(bp.cell_to_world(Vector2i(19, 0)).x + bp.cell_m * 0.5, 0.001)
+	for d in dashes: assert_float(maxf((d[1] as Vector2).x, (d[1] as Vector2).y)).is_less_equal(P0FarmDecor.DASH_M + 0.001)

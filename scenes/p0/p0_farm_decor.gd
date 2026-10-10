@@ -11,10 +11,21 @@ extends Node
 ##           card (Move / Store), a tap on a sprinkler its own card; after a Move or Store the mode stays (the next).
 ## Outside the mode a piece isn't tappable (49b11f91 ②). Spots are judged with P0Decor (the server's rules), so a Place
 ## the bar allows is one the server accepts. One child node of the farm, like P0FarmFacilities.
+## The ground (不知火舞's spec v2, 284 6a751a9a, for the top-down view the placement shell turns to — 刘邦's, 058639c7):
+## nothing picked, the yard's edge in a faint dashed line and the paths in faint sand; a piece picked, grid lines round
+## it fading out over HALO_R cells, its cells filled green (primary 30 %) or red (danger 35 %) with a 2 px edge, paths
+## in reach still sand.
 
 const TAP_SLOP := 12.0
-const OK_TINT := Color(0.55, 0.78, 0.95, 0.8)   # DECOR-PLACE: the cells light blue (family/water)
-const BAD_TINT := Color(0.86, 0.36, 0.30, 0.85)  # DECOR-PLACE-TAKEN: red
+const OK_FILL := Color(UiTokens.COLOR_PRIMARY, 0.30)   # spec v2: the piece's cells, may stand
+const BAD_FILL := Color(UiTokens.COLOR_DANGER, 0.35)   # … may not
+const HALO_R := 3                                      # grid lines this many cells round the piece, 50 % → 0
+const HALO_A := 0.5
+const SAND := Color(0.86, 0.74, 0.50, 0.30)            # a path cell (Keep the path clear), faint
+const EDGE := Color(1, 1, 1, 0.55)                     # the yard's dashed edge
+const DASH_M := 0.3
+const GAP_M := 0.2
+const TAP_MIN_PX := 44.0                               # a piece taps as at least 44 × 44 at any zoom (spec v2)
 const IDLE_CAPTION := "Tap decor to move or store it"   # 李白 q(120)
 ## Placeholder looks: colour, height (m) and what stands on the footprint, per piece.
 const LOOKS := {
@@ -35,7 +46,12 @@ var _looks := {}                # uid → "id:rot" the art was built for
 var _solid := {}                # "x,y" → cell this file made solid
 var _sig := ""
 var _preview: Node3D
-var _cells: Array = []
+var _cells: Array = []          # the piece's cells: fill
+var _edges: Array = []          # … and their 2 px edge
+var _halo: Array = []           # grid lines round it
+var _sand: Array = []           # path cells
+var _dashes: Array = []         # the yard's dashed edge
+static var _outline: ImageTexture
 var _finger := Vector2.INF
 var _press := Vector2.INF
 var _pending: Array = []        # pieces sent and not yet in the view (a multi-piece's next spot avoids them)
@@ -300,16 +316,18 @@ func _end() -> void:
 	if is_instance_valid(_preview): _preview.queue_free()
 	_preview = null
 	_paint([], false)
+	_paint_idle(false)
 	rt.ui.end_placement()
 
 ## In idle Decorate: a tap on a piece opens its card (DECOR-CARD: name, `1×1 · Glows at night`, Move, Store); on a
 ## sprinkler its own card (Move, no Store: facilities stay, q(22)).
 func tap(screen: Vector2) -> bool:
 	var v := _view()
-	var cell := cell_at_screen(screen)
-	var p := P0Decor.piece_at(v, cell) if cell != P0Decor.NONE else {}
-	if not p.is_empty():
-		open_card(p)
+	var hits: Array = []
+	for p in P0Decor.placed(v): hits.append([p, _screen_rect(str(p.id), Vector2i(int(p.x), int(p.y)), int(p.get("rot", 0)))])
+	var i := pick_near(hits.map(func(h): return h[1]), screen)
+	if i >= 0:
+		open_card(hits[i][0])
 		return true
 	if farm._facilities != null:
 		for f in v.get("facilities", []):
@@ -319,11 +337,39 @@ func tap(screen: Vector2) -> bool:
 			return true
 	return false
 
+## The piece whose screen box — grown to TAP_MIN_PX where it is smaller (the whole yard is 17 px a cell) — holds the
+## point, the nearest centre first; -1 for none.
+static func pick_near(boxes: Array, at: Vector2, min_px := TAP_MIN_PX) -> int:
+	var best := -1
+	var best_d := INF
+	for i in boxes.size():
+		var r: Rect2 = boxes[i]
+		var grown := r.grow_individual(maxf(0.0, (min_px - r.size.x) * 0.5), maxf(0.0, (min_px - r.size.y) * 0.5),
+			maxf(0.0, (min_px - r.size.x) * 0.5), maxf(0.0, (min_px - r.size.y) * 0.5))
+		if not grown.has_point(at): continue
+		var d := r.get_center().distance_to(at)
+		if d < best_d:
+			best_d = d
+			best = i
+	return best
+
+## A piece's cells on screen: the box round its footprint's corners.
+func _screen_rect(id: String, at: Vector2i, rot: int) -> Rect2:
+	var half: float = farm.bp.cell_m * 0.5
+	var box := Rect2()
+	var first := true
+	for c in P0Decor.cells(id, at, rot):
+		for corner in [Vector3(-half, 0, -half), Vector3(half, 0, -half), Vector3(-half, 0, half), Vector3(half, 0, half)]:
+			var sp: Vector2 = farm.cam.unproject_position(farm.bp.cell_to_world(c) + corner)
+			box = Rect2(sp, Vector2.ZERO) if first else box.expand(sp)
+			first = false
+	return box
+
 func open_card(p: Dictionary) -> void:
 	var uid := int(p.get("uid", 0))
 	var id := str(p.get("id", ""))
 	rt.ui.open_facility_card({"title": P0Decor.name_of(id), "lead": P0Decor.line(id), "icon": P0Logic.icon(id),
-		"button": "Move", "kind": &"primary", "second": "Store"},
+		"button": "Move", "kind": &"primary", "second": "Store", "close": true},
 		func(): begin_move(uid, true),
 		func(): rt.session.send({"type": "store_decor", "uid": uid, "space": "home"}))
 
@@ -333,8 +379,10 @@ func _show() -> void:
 		if is_instance_valid(_preview): _preview.queue_free()
 		_preview = null
 		_paint([], false)
+		_paint_idle(true)
 		rt.ui.set_placement(_bar())
 		return
+	_paint_idle(false)
 	var id := str(placing.id)
 	var at: Vector2i = placing.at
 	var reason := "Outside your yard" if at == P0Decor.NONE else P0Decor.reason(_view(), id, at, int(placing.rot), int(placing.uid))
@@ -358,23 +406,112 @@ func _show() -> void:
 	spec.reason = reason
 	rt.ui.set_placement(spec)
 
-## The footprint's squares on the ground: light blue, red where the spot is refused.
+## A piece picked: its cells filled green or red with their edge, grid lines round it fading out, paths in reach sand.
 func _paint(cells: Array, bad: bool) -> void:
-	while _cells.size() < cells.size():
-		var q := MeshInstance3D.new()
-		var m := PlaneMesh.new()
-		m.size = Vector2(farm.bp.cell_m * 0.98, farm.bp.cell_m * 0.98)
-		q.mesh = m
-		q.material_override = _mat(OK_TINT, true)
-		q.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	var fills: Array = []
+	var near := {}   # "x,y" → [cell, distance in cells]
+	for c in cells:
+		fills.append([c, BAD_FILL if bad else OK_FILL])
+		for dy in range(-HALO_R, HALO_R + 1):
+			for dx in range(-HALO_R, HALO_R + 1):
+				var n: Vector2i = c + Vector2i(dx, dy)
+				var d := maxi(absi(dx), absi(dy))
+				var k := "%d,%d" % [n.x, n.y]
+				if cells.has(n) or (near.has(k) and int(near[k][1]) <= d): continue
+				near[k] = [n, d]
+	var lines: Array = []
+	var sand: Array = []
+	for k in near:
+		var n: Vector2i = near[k][0]
+		if not farm.bp.in_bounds(n): continue
+		var a := HALO_A * (1.0 - float(int(near[k][1]) - 1) / float(HALO_R))
+		lines.append([n, Color(1, 1, 1, a)])
+		if P0Decor.reason(_view(), "deco_planter", n) == P0Decor.REASONS.decor_path: sand.append([n, SAND])
+	_squares(_cells, fills, false, 0.030)
+	_squares(_edges, fills.map(func(f): return [f[0], Color(f[1], 1.0)]), true, 0.032)
+	_squares(_halo, lines, true, 0.026)
+	_squares(_sand, sand, false, 0.024)
+
+## Nothing picked: the paths in faint sand and the yard's edge dashed (spec v2); `on` false clears them.
+func _paint_idle(on: bool) -> void:
+	var sand: Array = []
+	var y := P0Decor.yard()
+	if on:
+		for r in y.get("paths", []):
+			for dy in int(r[3]):
+				for dx in int(r[2]): sand.append([Vector2i(int(r[0]) + dx, int(r[1]) + dy), SAND])
+	if on or not placing.is_empty(): _squares(_sand, sand, false, 0.024)
+	var segs: Array = yard_dashes(farm.bp, y.get("walk", [0, 0, 0, 0])) if on else []
+	while _dashes.size() < segs.size():
+		var q := _quad(Vector2.ONE)
 		farm.add_child(q)
-		_cells.append(q)
-	for i in _cells.size():
-		var q: MeshInstance3D = _cells[i]
-		q.visible = i < cells.size()
+		_dashes.append(q)
+	for i in _dashes.size():
+		var q: MeshInstance3D = _dashes[i]
+		q.visible = i < segs.size()
 		if not q.visible: continue
-		q.position = farm.bp.cell_to_world(cells[i]) + Vector3(0, 0.03, 0)
-		(q.material_override as StandardMaterial3D).albedo_color = BAD_TINT if bad else OK_TINT
+		q.position = segs[i][0]
+		(q.mesh as PlaneMesh).size = segs[i][1]
+		(q.material_override as StandardMaterial3D).albedo_color = EDGE
+
+## The yard's edge as dashes on the ground: [centre, size] per dash, round the walk rect's outer cell edges.
+static func yard_dashes(bp: FarmBlueprint, walk: Array) -> Array:
+	var half := bp.cell_m * 0.5
+	var a: Vector3 = bp.cell_to_world(Vector2i(int(walk[0]), int(walk[1]))) + Vector3(-half, 0.028, half)
+	var b: Vector3 = bp.cell_to_world(Vector2i(int(walk[0]) + int(walk[2]) - 1, int(walk[1]) + int(walk[3]) - 1)) + Vector3(half, 0.028, -half)
+	var out: Array = []
+	var width := 0.05
+	for side in [[a, Vector3(b.x, a.y, a.z)], [Vector3(a.x, a.y, b.z), b], [a, Vector3(a.x, a.y, b.z)], [Vector3(b.x, a.y, a.z), b]]:
+		var from: Vector3 = side[0]
+		var to: Vector3 = side[1]
+		var length := from.distance_to(to)
+		var dir := (to - from) / maxf(length, 0.001)
+		var t := 0.0
+		while t < length:
+			var l := minf(DASH_M, length - t)
+			var c := from + dir * (t + l * 0.5)
+			out.append([c, Vector2(l, width) if absf(dir.x) > 0.5 else Vector2(width, l)])
+			t += DASH_M + GAP_M
+	return out
+
+## Squares on cells, pooled: a plain fill, or (outline) the cell's edge.
+func _squares(pool: Array, list: Array, outline: bool, lift: float) -> void:
+	while pool.size() < list.size():
+		var q := _quad(Vector2(farm.bp.cell_m, farm.bp.cell_m) * (1.0 if outline else 0.96))
+		if outline: (q.material_override as StandardMaterial3D).albedo_texture = outline_texture()
+		farm.add_child(q)
+		pool.append(q)
+	for i in pool.size():
+		var q: MeshInstance3D = pool[i]
+		q.visible = i < list.size()
+		if not q.visible: continue
+		q.position = farm.bp.cell_to_world(list[i][0]) + Vector3(0, lift, 0)
+		(q.material_override as StandardMaterial3D).albedo_color = list[i][1]
+
+static func _quad(size: Vector2) -> MeshInstance3D:
+	var q := MeshInstance3D.new()
+	var m := PlaneMesh.new()
+	m.size = size
+	q.mesh = m
+	q.material_override = _mat(Color.WHITE, true)
+	(q.material_override as StandardMaterial3D).transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	q.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	return q
+
+## A cell's edge: white border, clear inside (tinted per use); about 2 px at 36 px a cell.
+static func outline_texture() -> ImageTexture:
+	if _outline != null: return _outline
+	var n := 36
+	var img := Image.create(n, n, false, Image.FORMAT_RGBA8)
+	img.fill(Color(1, 1, 1, 0))
+	for i in n:
+		for w in 2:
+			img.set_pixel(i, w, Color.WHITE)
+			img.set_pixel(i, n - 1 - w, Color.WHITE)
+			img.set_pixel(w, i, Color.WHITE)
+			img.set_pixel(n - 1 - w, i, Color.WHITE)
+	_outline = ImageTexture.create_from_image(img)
+	return _outline
 
 # ---------------------------------------------------------------- helpers
 ## The session's view with the pieces sent but not yet back (a multi-piece's next spot and count avoid them).

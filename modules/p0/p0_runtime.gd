@@ -506,6 +506,8 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				else: _on_catch(ev, xp_lines)
 			"cast", "pot", "cabinet", "plate", "first", "mishap", "queue":
 				_call("p0_event", [ev, v])
+			"decor":   # Decorate (SGODOT-284, b706e141 ④): a piece stored says where it went, as a purchase does
+				if str(ev.get("action", "")) == "stored": ui.toast_success("%s · back in Farm Storage" % P0Decor.name_of(str(ev.get("item", ""))), true)
 			"trap":   # Fish Trap (SGODOT-283): the pond redraws its float; set / some left / taken back say so
 				_call("p0_event", [ev, v])
 				var said := P0Logic.P0Trap.event_toast(ev)

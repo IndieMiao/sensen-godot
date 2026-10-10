@@ -3174,8 +3174,9 @@ func placement_bar_rect() -> Rect2:
 
 ## A facility's status card (P1, SGODOT-241; q(59) §4): `Sprinkler · Waters 8 plots` and one button (Move); the
 ## caller highlights what it covers while the card shows (modal_kind "facility"). Sits where the quick bar was.
-## spec = {title, lead, icon, button, kind (&"secondary"), second}; on_button runs after the card closes. A placed
-## decor's card (DECOR-CARD, Figma 2191:33239) has a primary Move and the text button `Store` (spec.second, on_second).
+## spec = {title, lead, icon, button, kind (&"secondary"), second, close}; on_button runs after the card closes. A placed
+## decor's card (DECOR-CARD, Figma 2191:33239) has a primary Move, the text button `Store` (spec.second, on_second) and
+## a ✕ over its corner (spec.close).
 ## In placement mode the bar steps aside while the card shows and comes back when it closes.
 func open_facility_card(spec: Dictionary, on_button: Callable, on_second := Callable()) -> UiInfoSheet:
 	var buttons: Array = [{id = &"move", label = str(spec.get("button", "Move")), kind = StringName(spec.get("kind", &"secondary"))}]
@@ -3197,7 +3198,19 @@ func open_facility_card(spec: Dictionary, on_button: Callable, on_second := Call
 	if placing():
 		_place_bar.visible = false
 		sheet.tree_exited.connect(func(): if placing(): _place_bar.visible = true)
-	_open_modal(sheet, 0.0, true)
+	var content: Control = sheet
+	if bool(spec.get("close", false)):   # DECOR-CARD: a ✕ 6 above the card's top-right corner (b706e141 ③)
+		var holder := Control.new()
+		holder.set_anchors_preset(Control.PRESET_FULL_RECT)
+		holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		holder.add_child(sheet)
+		var close := UiCloseButton.new()
+		close.pressed.connect(close_modal)
+		holder.add_child(close)
+		sheet.resized.connect(func():
+			close.position = Vector2(sheet.position.x + sheet.size.x - UiTokens.SIZE_CLOSE, sheet.position.y - 6 - UiTokens.SIZE_CLOSE))
+		content = holder
+	_open_modal(content, 0.0, true)
 	modal_kind = "facility"
 	sheet.open("facility", &"facility")
 	return sheet
