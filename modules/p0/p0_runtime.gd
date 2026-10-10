@@ -350,6 +350,17 @@ func energy_card(need: int, verb: String) -> void:
 	ui.open_energy_card(need, verb)
 	session.report({"kind": "energy_card", "need": need})
 
+## Seed Saver's float part for one reply's `seed_saved` events ({} when none): one kind names it, several count seeds.
+static func seed_saver_line(v: Dictionary, saved: Array) -> Dictionary:
+	if saved.is_empty(): return {}
+	var kinds := {}
+	for e in saved: kinds[str(e.id)] = int(kinds.get(str(e.id), 0)) + 1
+	var one := kinds.size() == 1
+	var sid: String = kinds.keys()[0]
+	var what := P0Logic.item_name(v, sid) if one else "seeds"
+	return {kind = "saved", key = "seed_saver", text = "Seed Saver · +%d %s" % [saved.size(), what],
+		tone = UiFloatText.Tone.ITEM, icon = P0Logic.icon(sid if one else "seed_radish")}
+
 ## The floats a landed catch's reply held for the world (catch_floats), handed over once: the world lets them rise.
 func take_catch_floats() -> Array:
 	var held := catch_floats
@@ -474,10 +485,6 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				if int(ev.delta) > 0 and (claimed or (not crafted and not iid.begins_with("seed_") and not iid.begins_with("dish_") and not iid.begins_with("fish_"))):
 					floats.append({kind = "item", key = iid, amount = int(ev.delta), fmt = "%s " + P0Logic.item_name(v, iid),
 						tone = UiFloatText.Tone.ITEM, icon = P0Logic.icon(iid)})
-			"seed_saved":   # Seed Saver (Farming Lv10, §4.6.1): a seed back from this harvest — said, as seeds otherwise float nothing
-				var sid := str(ev.id)
-				floats.append({kind = "item", key = "saved:" + sid, amount = 1, fmt = "%s " + P0Logic.item_name(v, sid),
-					tone = UiFloatText.Tone.ITEM, icon = P0Logic.icon(sid)})
 			"coins":
 				# A request delivered from the counter drawer: its row floats the coins from its button (BOARD-DONE).
 				if ui.modal_kind == "counter" and events.any(func(e): return str(e.get("kind", "")) == "request" and str(e.get("status", "")) == "done"): continue
@@ -560,6 +567,10 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				ui.queue_card(func(): HomePanel.moment(ui, home))   # one moment at a time (q(49) ④)
 	# After the loop, so it is queued behind the level-up banner (itself deferred) even when the parcel came first.
 	if not parcel_notice.is_empty(): ui.inbox_notice_when_clear.call_deferred(parcel_notice)
+	# Seed Saver (Farming Lv10, q(118)): the seeds this reply gave back, on a line of their own after the harvest's items
+	# (seeds otherwise float nothing): `Seed Saver · +1 Radish Seeds`, or `Seed Saver · +2 seeds` for different kinds.
+	var saved := seed_saver_line(v, events.filter(func(e): return str(e.get("kind", "")) == "seed_saved" and not hushed.call(e)))
+	if not saved.is_empty(): floats.append(saved)
 	# Any catch resets what is held: a player who left the pond mid-arc never let the last fish's floats rise, and an
 	# escape after that must not float them (刘邦 on #154).
 	if settles_catch: catch_floats = floats if world_lands else []

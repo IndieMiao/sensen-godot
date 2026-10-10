@@ -64,5 +64,9 @@ func test_seed_saver_is_lv10_and_floats_the_seed_it_gives_back() -> void:
 		{"kind": "item", "id": "seed_radish", "delta": 1}, {"kind": "seed_saved", "id": "seed_radish", "plot": 0}])
 	await get_tree().process_frame
 	var texts: Array = rt.ui.root.get_children().filter(func(c): return c is UiFloatText and not c.is_queued_for_deletion()).map(func(f): return f.text)
-	# one reply's item floats share a line (`+1 Radish · +1 Radish Seeds`); the saved seed is said once
-	assert_int(texts.filter(func(t): return str(t).contains("+1 Radish Seeds")).size()).is_equal(1)
+	# its own line after the harvest's items (李白 q(118)): `Seed Saver · +1 Radish Seeds`, not joined to `+1 Radish`
+	assert_array(texts).contains(["+1 Radish", "Seed Saver · +1 Radish Seeds"])
+	var many := P0Runtime.seed_saver_line(v, [{"kind": "seed_saved", "id": "seed_radish"}, {"kind": "seed_saved", "id": "seed_radish"}])
+	assert_str(str(many.text)).is_equal("Seed Saver · +2 Radish Seeds")
+	var mixed := P0Runtime.seed_saver_line(v, [{"kind": "seed_saved", "id": "seed_radish"}, {"kind": "seed_saved", "id": "seed_carrot"}])
+	assert_str(str(mixed.text)).is_equal("Seed Saver · +2 seeds")
