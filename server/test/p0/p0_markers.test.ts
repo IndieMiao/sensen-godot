@@ -8,7 +8,7 @@ import { viewOf } from '../../src/p0/view.js';
 
 const c = loadP0Content();
 const T0 = Date.UTC(2026, 9, 8, 2);
-const at = (s: P0State) => mapMarkers(c, s).map(m => `${m.kind}:${m.place}${m.why.tracked ? ':tracked' : ''}`);
+const at = (s: P0State) => mapMarkers(c, s, T0).map(m => `${m.kind}:${m.place}${m.why.tracked ? ':tracked' : ''}`);
 function step(s: P0State, cmd: P0Command, now = T0): P0State {
   const r = applyP0(c, s, cmd, now);
   if (!r.ok) throw new Error(`${cmd.type}: ${r.code}`);
@@ -63,24 +63,24 @@ describe('map pin markers (§9.5.2, q(48); SGODOT-232)', () => {
     const s = afterTutorial();
     s.residents.res_pip = { affinity: 0, chat_day: '', gift_day: '', next: 99, req: null, done_day: '' };
     s.skills.fishing = 220;   // Lv3: no Rare fish yet; the Reed Rod's ◆ shows instead
-    expect(mapMarkers(c, s).find(m => m.place === 'sh_tackle_1')?.kind).toBe('new');
+    expect(mapMarkers(c, s, T0).find(m => m.place === 'sh_tackle_1')?.kind).toBe('new');
     s.seen = ['item:rod_reed', 'item:bait_worm'];
-    expect(mapMarkers(c, s).find(m => m.place === 'sh_tackle_1')).toBeUndefined();
+    expect(mapMarkers(c, s, T0).find(m => m.place === 'sh_tackle_1')).toBeUndefined();
     s.skills.fishing = 480;   // Lv4
-    expect(mapMarkers(c, s).find(m => m.place === 'sh_tackle_1')).toMatchObject({ kind: 'request', why: { resident: 'res_old_kai' } });
+    expect(mapMarkers(c, s, T0).find(m => m.place === 'sh_tackle_1')).toMatchObject({ kind: 'request', why: { resident: 'res_old_kai' } });
   });
 
   it('a new level-gated good lights its outpost once; walking in marks it seen', () => {
     let s = afterTutorial();
     s.residents.res_old_kai = { ...(s.residents.res_old_kai ?? {}), next: 99 } as never;   // Old Kai out of requests: only ◆ can show there
     s.skills.fishing = 70;   // Fishing Lv2: Worm Bait on the tackle counter
-    expect(mapMarkers(c, s).find(m => m.place === 'sh_tackle_1')).toEqual({ place: 'sh_tackle_1', kind: 'new', why: { item: 'bait_worm' } });
+    expect(mapMarkers(c, s, T0).find(m => m.place === 'sh_tackle_1')).toEqual({ place: 'sh_tackle_1', kind: 'new', why: { item: 'bait_worm' } });
     s = step(s, { type: 'read_inbox', keys: [], space: 'outpost', place: 'sh_tackle_1' }, T0 + 60_000);
-    expect(mapMarkers(c, s).some(m => m.place === 'sh_tackle_1')).toBe(false);
+    expect(mapMarkers(c, s, T0).some(m => m.place === 'sh_tackle_1')).toBe(false);
     s.skills.fishing = 220;   // Lv3: the Reed Rod is new again
-    expect(mapMarkers(c, s).find(m => m.place === 'sh_tackle_1')?.why).toEqual({ item: 'rod_reed' });
+    expect(mapMarkers(c, s, T0).find(m => m.place === 'sh_tackle_1')?.why).toEqual({ item: 'rod_reed' });
     s.skills.farming = 300;   // Farming Lv4: the Row Hoe at the market square
-    expect(mapMarkers(c, s).find(m => m.place === 'sh_market_1')?.why).toEqual({ item: 'tool_row_hoe' });
+    expect(mapMarkers(c, s, T0).find(m => m.place === 'sh_market_1')?.why).toEqual({ item: 'tool_row_hoe' });
   });
 
   it('the entry read of an outpost also marks it seen', async () => {
@@ -106,7 +106,7 @@ describe('map pin markers (§9.5.2, q(48); SGODOT-232)', () => {
   it('a resident at Acquainted opens a second page of talk: ◆ at their outpost', () => {
     const s = afterTutorial();
     s.residents.res_pip = { ...(s.residents.res_pip ?? {}), affinity: 15, next: 99 } as never;
-    expect(mapMarkers(c, s).find(m => m.place === 'sh_post_1')).toEqual({ place: 'sh_post_1', kind: 'new', why: { resident: 'res_pip' } });
+    expect(mapMarkers(c, s, T0).find(m => m.place === 'sh_post_1')).toEqual({ place: 'sh_post_1', kind: 'new', why: { resident: 'res_pip' } });
   });
 
   it('picks the beginner pond when its template has the fish, else the pond nearest the farm', () => {
@@ -119,9 +119,9 @@ describe('map pin markers (§9.5.2, q(48); SGODOT-232)', () => {
   it('one marker per place, deliver before request before new; old saves get an empty seen list', () => {
     let s = fresh();
     s = step(s, { type: 'accept', request: 'req_pond_catch' });
-    const kinds = mapMarkers(c, s).map(m => m.kind);
+    const kinds = mapMarkers(c, s, T0).map(m => m.kind);
     expect([...kinds].sort((a, b) => ['deliver', 'request', 'new'].indexOf(a) - ['deliver', 'request', 'new'].indexOf(b))).toEqual(kinds);
-    expect(new Set(mapMarkers(c, s).map(m => m.place)).size).toBe(mapMarkers(c, s).length);
+    expect(new Set(mapMarkers(c, s, T0).map(m => m.place)).size).toBe(mapMarkers(c, s, T0).length);
     const old = structuredClone(fresh());
     delete old.seen;
     expect(upgradeState(c, old, T0).seen).toEqual([]);
@@ -131,31 +131,31 @@ describe('map pin markers (§9.5.2, q(48); SGODOT-232)', () => {
     const s = afterTutorial();
     // Pip at Acquainted (a second page of talk, ◆) with his first request still open (!): two reasons at the post
     s.residents.res_pip = { affinity: 15, chat_day: '', gift_day: '', next: 0, req: null, done_day: '' };
-    expect(mapMarkers(c, s).find(m => m.place === 'sh_post_1')).toMatchObject({ kind: 'request', why: { resident: 'res_pip' }, more: 1 });
+    expect(mapMarkers(c, s, T0).find(m => m.place === 'sh_post_1')).toMatchObject({ kind: 'request', why: { resident: 'res_pip' }, more: 1 });
     const open = (id: string): BoardRequest => ({ id, template: 'req_sys_fish_fine', items: ['fish_trout'], rarity: 2, kind: 'fish', qty: 2, bonus: 20, drawn_at: T0, status: 'open' });
     s.boards.market = [{ req: open('m1'), refill_at: 0 }, { req: open('m2'), refill_at: 0 }];
-    const market = () => mapMarkers(c, s).find(m => m.place === 'sh_market_1');
+    const market = () => mapMarkers(c, s, T0).find(m => m.place === 'sh_market_1');
     expect(market()).toMatchObject({ kind: 'request', why: { request: 'm1' } });
     expect(market()?.more).toBeUndefined();   // two open slots: one reason, the card writes `Market Board · 2 requests`
     s.skills.farming = 300;   // Farming Lv4: the Row Hoe is new at the market square
     expect(market()).toMatchObject({ kind: 'request', more: 1 });
     expect(viewOf(c, s, T0).map_markers.find(m => m.place === 'sh_post_1')?.more).toBe(1);
-    expect(mapMarkers(c, afterTutorial()).every(m => m.more === undefined || m.more > 0)).toBe(true);   // never 0
+    expect(mapMarkers(c, afterTutorial(), T0).every(m => m.more === undefined || m.more > 0)).toBe(true);   // never 0
   });
 
   it('first session: other reasons at the tracked place do not count toward more', () => {
     let s = step(fresh(), { type: 'accept', request: 'req_pond_catch' });
     s.bag.push({ id: 'fish_crucian', qty: 2 });
-    expect(mapMarkers(c, s)).toEqual([{ place: 'home', kind: 'deliver', why: { request: 'req_pond_catch', tracked: true } }]);
+    expect(mapMarkers(c, s, T0)).toEqual([{ place: 'home', kind: 'deliver', why: { request: 'req_pond_catch', tracked: true } }]);
   });
 
   it('a taken fish request marks a pond only once the player can land that fish (q(104): Old Kai\'s Golden Koi from Fishing Lv4)', () => {
     let s = afterTutorial();
     s.skills.fishing = 160;   // Lv2, like Joey's save on 10-09: the Rare Golden Koi needs Lv4
     s = step(s, { type: 'accept', request: 'req_res_kai_1' });   // taken in the shop before Lv4 (allowed)
-    expect(mapMarkers(c, s).filter(m => m.why.request === 'req_res_kai_1')).toEqual([]);   // no ! on a pond it can't be caught at
+    expect(mapMarkers(c, s, T0).filter(m => m.why.request === 'req_res_kai_1')).toEqual([]);   // no ! on a pond it can't be caught at
     s.skills.fishing = 480;   // Lv4
-    expect(mapMarkers(c, s).find(m => m.why.request === 'req_res_kai_1'))
+    expect(mapMarkers(c, s, T0).find(m => m.why.request === 'req_res_kai_1'))
       .toEqual({ place: 'pond_san_francisco_03', kind: 'request', why: { request: 'req_res_kai_1', resident: 'res_old_kai', tracked: true } });
   });
 });

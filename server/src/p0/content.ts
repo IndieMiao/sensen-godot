@@ -2,6 +2,7 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { CityClusters } from './clusters.js';
 
 export type Skill = 'farming' | 'fishing' | 'cooking';
 export const SKILLS: readonly Skill[] = ['farming', 'fishing', 'cooking'];
@@ -43,18 +44,40 @@ export const SHOPS: readonly ShopId[] = ['homestead', 'tackle', 'market', 'tea',
 export type QuotaId = 'fish_tackle' | 'dish' | 'material' | 'request_bonus' | 'sys_requests';
 export type BoardId = 'stall' | 'market';
 
-/** What a request asks for: a kind, optionally narrowed to one id, one rarity, the same item or N distinct items. */
-export interface Need { kind: 'crop' | 'fish' | 'dish' | 'material' | 'sow'; id?: string; rarity?: number; same?: boolean; distinct?: number }
-export interface RequestTemplate { title: string; need: Need; skill: Skill; gate: [Skill, number][]; bonus: number; enabled?: boolean }
+/**
+ * What a request asks for: a kind, optionally narrowed to one id, one rarity, a dish style or styles (§9.6.3 P1: `Soup`
+ * for Granny Wu, Grilled or Dessert for Packed Lunches), a crop family (`O` for the Orchard Basket), the same item or N
+ * distinct items.
+ */
+export interface Need {
+  kind: 'crop' | 'fish' | 'dish' | 'material' | 'sow'; id?: string; rarity?: number; style?: string | string[];
+  family?: Family; same?: boolean; distinct?: number;
+}
+/**
+ * A system request template (§9.6.3). climate narrows it to the home climate (regional templates, `Temperate`);
+ * type is the card's family (output by default; regional / explore / together wait for travel, so they ship disabled).
+ */
+export interface RequestTemplate {
+  title: string; need: Need; skill: Skill; gate: [Skill | 'homestead', number][]; bonus: number; enabled?: boolean;
+  climate?: string[]; type?: 'output' | 'regional' | 'explore' | 'together'; text?: string;
+  /** Quantity × scale, rounded up (李白's Wholesale Order and Fish Market Crate: 1.5). */
+  scale?: number;
+}
+/** A personal request's one-time reward beyond coins and +5 (§9.6.1, Trusted story requests): an item, a recipe page Tasted, a title. */
+export interface ResidentReward { item?: [string, number]; recipe?: string; title?: string }
 export interface ResidentRequest {
   id: string; title: string; text: string; stage: string; need: Need; qty: number; coins: number;
   /** The request card's need line when the rule alone would mislead (q(46): the only P0 Rare fish is the Pond koi). */
   need_line?: string;
+  reward?: ResidentReward;
 }
 /** §13.2 gathering spot (SGODOT-231): the first yield is the spot's material (Farm Storage, +1 with gloves). */
 export interface GatherSpot { name: string; yield: [string, number][]; homestead: number }
-/** §13.3.3 one mine floor: weighted extra drop per rock, null = nothing extra. */
-export interface MineFloorDef { floor: number; drops: [string | null, number][] }
+/** §13.3.3 one mine floor: weighted extra drop per rock (null = nothing extra), its rock count (default mine.rocks; floor 5
+ * has none) and its monsters by id (§13.3.4, SGODOT-275). */
+export interface MineFloorDef { floor: number; drops: [string | null, number][]; rocks?: number; mobs?: string[] }
+/** §13.3.4 a mine monster: loot as [item, qty, weight]; once_a_day = an item it gives a player at most once a player day. */
+export interface MineMonster { name: string; hp: number; damage: number; loot: [string, number, number][]; once_a_day?: string }
 /** §13.4 workbench recipe: out goes to the bag, Gear (equipped) or the owned list (passive tools). */
 export interface WorkbenchRecipe {
   id: string; tab: string; out: string; qty: number; to: 'bag' | 'gear' | 'owned' | 'field';
@@ -67,6 +90,8 @@ export interface FacilityDef { name: string; cover: 'ring8'; grow_cut: number; c
 export interface ResidentDef {
   name: string; role: string; portrait: string; likes: string; gift_meal: string; one_per_day: boolean;
   lines: Record<string, string>; requests: ResidentRequest[];
+  /** §7.5.3 / §7.16.3: the pages this resident teaches from Familiar, one a week; empty = none of their style yet. */
+  teaches?: string[];
 }
 
 export interface P0Content {
@@ -101,7 +126,7 @@ export interface P0Content {
     farming: string; fishing: string; mining: string; combat: string; names: Record<string, string>;
     row_hoe: { id: string; price: number; skill: Skill; gate: number; sow: number };
   };
-  materials: Record<string, { name: string; price: number | null; ingr?: [Family, number] }>;   // ingr: seasonings (§7.3.1)
+  materials: Record<string, { name: string; price: number | null; floor?: number; ingr?: [Family, number] }>;   // ingr: seasonings (§7.3.1); floor: a request's price for one with no buyback (quartz, hardwood)
   wallet_floor: number;                       // §8.1.1 / q(32): every coin spend except seeds keeps this much
   homestead: {
     max_level: number;
@@ -118,6 +143,10 @@ export interface P0Content {
   quotas: Record<QuotaId, { cap: number; scope: string }>;
   affinity: {
     stages: [string, number][]; first_chat: number; request: number; gift_meal_stage: string;
+    /** §7.5.3 Taught: from this stage, every `every_days` days, one page the player has not got yet. */
+    lesson?: { stage: string; every_days: number };
+    /** §9.6.1: a resident's next request opens this long after the last one is done (24 h; P0's one_per_day = the player day). */
+    next_request_h?: number;
     gift: { loved_fine: number; liked: number; any: number; perfect: number; cap: number; mystery: number; chef_touch: { cooking: number; bonus: number; cap: number } };
     mystery_line: string;
   };
@@ -157,10 +186,14 @@ export interface P0Content {
   supplies: Record<string, { name: string }>;
   /** §13.2 (SGODOT-231): spot regrow, anti-script tempo between taps, the gloves and their bonus. */
   gather: { regen_h: number; tempo_ms: number; gloves: string; gloves_bonus: number; spots: Record<string, GatherSpot> };
-  /** §13.3 floors 1–2 (SGODOT-231, LOCK-21). picks: Stone per rock by pickaxe. */
+  /** §13.3 floors 1–5 (SGODOT-231, LOCK-21; 3–5 SGODOT-275). picks: Stone per rock by pickaxe; combat: the mine's HP and the
+   * Combat slot's weapons; express_unlock_floor: the floor whose first clear opens Floor 5 · Express for the account. */
   mine: {
     runs_per_day: number; floor_energy: number; rock_energy: number; rocks: number; restart_floor: number; tempo_ms: number;
     floors: MineFloorDef[]; picks: Record<string, { stone: number }>;
+    monsters: Record<string, MineMonster>;
+    combat: { hp: number; invulnerability_ms: number; weapons: Record<string, { attack: number; speed: number }> };
+    express_unlock_floor: number;
   };
   /** §13.4 P0 workbench: Tools / Supplies (SGODOT-231), Facilities from P1. */
   workbench: { tabs: string[]; recipes: WorkbenchRecipe[] };
@@ -188,6 +221,10 @@ export function loadP0Content(file = DEFAULT_P0_CONTENT): P0Content {
     c.outposts = (JSON.parse(readFileSync(outposts, 'utf8')).outposts as { id: string; role: string; residents?: string[] }[])
       .map(o => ({ id: o.id, role: o.role, residents: o.residents ?? [] }));
   }
+  // v5 (SGODOT-278): the frozen city clusters beside the content (亚瑟's build_clusters.mjs), with the server's member table.
+  const clusters = path.join(dir, 'city_clusters.json');
+  // Not enumerable: a structuredClone of the content (tests) leaves it out instead of copying a class without methods.
+  if (existsSync(clusters)) Object.defineProperty(c, 'clusters', { value: CityClusters.load(clusters), enumerable: false, writable: true, configurable: true });
   const ponds = path.join(dir, 'p0_ponds.json');
   if (existsSync(ponds)) {
     for (const l of JSON.parse(readFileSync(ponds, 'utf8')).locations as { id: string; lat: number; lng: number }[]) {

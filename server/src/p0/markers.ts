@@ -93,7 +93,7 @@ function landable(c: P0Content, s: P0State, fish: string[]): string[] {
 /** The tutorial request is still on the Stall Board: the first session, one goal on the map. */
 const firstSession = (c: P0Content, s: P0State) => (s.boards.stall ?? []).some(sl => sl.req?.id === c.requests.tutorial.id);
 
-export function mapMarkers(c: P0Content, s: P0State): MapMarker[] {
+export function mapMarkers(c: P0Content, s: P0State, now: number): MapMarker[] {
   const all: MapMarker[] = [];
   const reason = new Map<MapMarker, string>();   // what counts as one reason for `more`: the Market Board's open slots share one
   for (const board of BOARDS) {
@@ -115,7 +115,7 @@ export function mapMarkers(c: P0Content, s: P0State): MapMarker[] {
   }
   for (const id of Object.keys(c.residents)) {
     const place = residentHome(c, id);
-    const st = requestState(c, s, id);
+    const st = requestState(c, s, id, now);
     if (!place || !st.req || (st.state !== 'open' && st.state !== 'accepted')) continue;
     const q = st.req, tracked = st.state === 'accepted';
     const ready = q.need.kind !== 'sow' || tracked ? progressOf(c, s, id, q) >= q.qty : false;

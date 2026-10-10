@@ -10,6 +10,7 @@ import { add } from './bag.js';
 import { itemName } from './content.js';
 import { putInStorage } from './storage.js';
 import { notePresence } from './presence.js';
+import { cityInfo, clusterById, homeCluster, noteEntered, preview, requirePass } from './travel.js';
 import { commandFields, uiEvent, type P0EventLog } from './telemetry.js';
 
 /** presence: players in the outpost rooms right now (SGODOT-227 OutpostRooms.total()); log: the observation log (S7). */
@@ -34,10 +35,24 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
     const s = store.get(player, deps.now());
     const { space, place } = (req.query ?? {}) as { space?: unknown; place?: unknown };
     if (typeof space === 'string' && space !== '') {   // the read a client makes on entering a space (q(41))
+      // v5: entering a pond or outpost in a city without a pass is refused, with the confirm panel's preview.
+      const refused = requirePass(c, s, space, place, clock(s.clock_ms));
+      if (refused) return reply.send({ ok: false, code: refused.code, detail: refused.detail, state: view(s, clock(s.clock_ms)) });
       notePresence(c, s, space, clock(s.clock_ms), null, place);
+      noteEntered(s, space, place);
       store.put(s);
     }
     return reply.send({ ok: true, state: view(s, clock(s.clock_ms)) });
+  });
+
+  /** A city's places and silhouette card (note §4): home returns the hand-written tables; others come from the generator. */
+  app.get('/v1/p0/city/:cluster', async (req, reply) => {
+    const player = playerOf(req.headers);
+    if (!player) return reply.code(400).send({ ok: false, code: 'bad_player' });
+    const cluster = String((req.params as { cluster?: unknown }).cluster ?? '');
+    if (!/^gn-\d{1,12}$/.test(cluster) || (!clusterById(c, cluster) && cluster !== homeCluster(c))) return reply.code(404).send({ ok: false, code: 'unknown_city' });
+    const s = store.get(player, deps.now());
+    return reply.send({ ok: true, city: { ...cityInfo(c, cluster), preview: preview(c, s, cluster) } });
   });
 
   app.post('/v1/p0/commands', async (req, reply) => {

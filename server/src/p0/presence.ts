@@ -9,6 +9,7 @@ import { storeMaterials } from './gathering.js';
 import type { P0Event } from './progress.js';
 import type { P0State } from './state.js';
 import { noteSeenAt } from './markers.js';
+import { clusterOf } from './travel.js';
 
 const AWAY = new Set(['pond', 'outpost', 'mine']);
 
@@ -39,7 +40,8 @@ export function notePresence(c: P0Content, s: P0State, space: unknown, now: numb
 }
 
 /**
- * Which pond the player is at (q(36)): kept only while in a pond space and only for a known pond in the home city,
+ * Which pond the player is at (q(36)): kept only while in a pond space and only for a known pond in a city the player
+ * holds a pass for (home, or a Day Pass, v5),
  * so a cast takes its template from the server's point table. Any other space clears it, and so does a place the
  * server does not accept (苏烈, PR #19) so a wrong id never fishes the last pond; a pond command without a place keeps
  * the last one (older clients send the space only).
@@ -49,8 +51,10 @@ export function notePlace(c: P0Content, s: P0State, space: unknown, place: unkno
   if (space === 'outpost' && typeof place === 'string') noteSeenAt(c, s, place);   // the map's ◆ there is seen (q(48))
   if (space !== 'pond') { s.presence.place = null; return; }
   if (place === undefined || place === null || place === '') return;
+  // v5: a known pond in a city the player's pass covers (home always); the pass itself is checked by requirePass.
   const p = typeof place === 'string' ? c.fishing.places[place] : undefined;
-  s.presence.place = p && p.city === c.profile.city.toLowerCase() ? place as string : null;
+  const cluster = p ? clusterOf(c, place as string) : null;
+  s.presence.place = p && cluster && (cluster === s.travel.home || s.travel.passes[cluster]) ? place as string : null;
 }
 
 /** ms until Rest opens by the away rule; 0 = open; null = the player has not left yet. */
