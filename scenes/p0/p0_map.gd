@@ -712,6 +712,7 @@ func on_arrival(ev: Dictionary) -> void:
 	var overview: Dictionary = CityMapData.city(str(r.get("id", ""))).get("overview", {})
 	# §11.8.4: from where the player was (the homestead, or the last city) up and along to the city's overview.
 	var from := _origin_before
+	_origin_before = Vector2.ZERO   # one arrival per Fly: a later arrival (another device) starts from where it lands
 	_here_sig = ""
 	_sync_here()
 	if from != Vector2.ZERO:
@@ -754,7 +755,10 @@ func fly_to_city(id: String) -> void:
 	_asked = {}
 	_regions_key = ""
 	var cluster := P0Clusters.cluster_of_region(str(r.id))
-	if cluster != "" and cluster != P0Travel.here(_view()) and rt != null: open_travel(cluster)
+	if cluster == "" or cluster == P0Travel.here(_view()) or rt == null: return
+	# Home is never a trip (q(108)): from another city the home city's bubble goes home, as the homestead's Go home.
+	if cluster == P0Travel.home(_view()): _return_home()
+	else: open_travel(cluster)
 
 ## At most this many city bubbles, at least this far apart on screen (px), most populous first.
 const CITY_BUBBLES := 30

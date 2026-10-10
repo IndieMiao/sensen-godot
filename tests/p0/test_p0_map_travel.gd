@@ -124,6 +124,7 @@ func test_a_place_refused_without_a_pass_opens_that_citys_travel_card() -> void:
 	rt.ui.close_modal()
 	rt._on_refused("trip_expired", {"preview": {"cluster": TOKYO}}, {})
 	assert_str(rt.ui.modal_kind).is_equal("travel_card")
+	rt.ui.close_modal()
 
 func test_going_home_from_another_city_sends_return_home_and_welcomes_home() -> void:
 	var m := _map()
@@ -143,3 +144,21 @@ func test_going_home_from_another_city_sends_return_home_and_welcomes_home() -> 
 	m._return_home()   # at home: nothing
 	assert_array(sent).is_empty()
 	assert_str(rt.ui.toast_text()).is_empty()
+
+## 蒙恬 on #220: away in another city, the home city's bubble is going home (return_home, Welcome home), not a trip.
+func test_away_the_home_citys_bubble_goes_home_not_a_trip() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var sent: Array = []
+	rt.session.sent.connect(func(cmd): sent.append(cmd))
+	rt.ui.close_modal()   # the runtime's UI is shared across the suite: no card left from another test
+	rt.ui.clear_toast()
+	var saved := _with_travel(rt, {home = SF, here = TOKYO, passes = {}, visits = {TOKYO: {n = 1}}, stamps = [],
+		fallback = {near3 = [], near10 = []}, explorer = 0})
+	m.fly_to_city("san_francisco")
+	assert_str(rt.ui.modal_kind).is_not_equal("travel_card")
+	assert_array(sent.map(func(c): return str(c.get("type", "")))).is_equal(["return_home"])
+	assert_str(rt.ui.toast_text()).is_equal("Welcome home")
+	rt.session.view = saved
