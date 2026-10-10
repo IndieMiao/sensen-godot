@@ -38,7 +38,8 @@ func test_the_card_buttons_say_the_cap_and_the_coins() -> void:
 	var r := {"id": "craft_greenhouse", "tab": "facilities", "item": "facility_greenhouse", "name": "Greenhouse", "to": "field",
 		"cost": [], "cap": 1, "used": 1}
 	r.block = {"code": "facility_cap", "detail": {"cap": 1, "used": 1, "farming_next": 10}}
-	assert_str(str(P0MaterialLogic._craft_button(r).label)).is_equal("Greenhouses 1/1 · Farming Lv10 adds 1")
+	var b := P0MaterialLogic._craft_button(r)
+	assert_that([b.label, b.toast]).is_equal(["Greenhouses 1/1", "Greenhouses 1/1 · Farming Lv10 adds 1"])   # q(130) ①
 	r.block = {"code": "facility_cap", "detail": {"cap": 2, "used": 2, "farming_next": null}}
 	assert_str(str(P0MaterialLogic._craft_button(r).label)).is_equal("Greenhouses 2/2")
 	r.block = {"code": "no_coins", "detail": {"need": 120}}
@@ -46,7 +47,7 @@ func test_the_card_buttons_say_the_cap_and_the_coins() -> void:
 	var card: Dictionary = P0MaterialLogic.workbench_model({"workbench": {"recipes": [{"id": "craft_greenhouse", "tab": "facilities",
 		"item": "facility_greenhouse", "name": "Greenhouse", "to": "field", "cost": [], "block": null, "coins_need": 340, "coins_have": 230,
 		"gate": {"skill": "farming", "level": 8, "ok": true}}]}}, "facilities")[0]
-	assert_that([card.effect, card.cost[-1].name, card.cost[-1].have, card.cost[-1].need]).is_equal(["Farming Lv8 · 16 plots · −25%", "Coins", 230, 340])
+	assert_that([card.effect, card.cost[-1].name, card.cost[-1].have, card.cost[-1].need]).is_equal(["Farming Lv8 · Any seed grows inside", "Coins", 230, 340])
 
 ## The status card (李白): its plots and cut; crops under it grey Move with `Move · Harvest first`. The view's numbers are
 ## JSON floats, as the server sends them: a crop on 13.0 is found under covers of floats.

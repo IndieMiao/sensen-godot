@@ -840,6 +840,8 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 			ui.toast_error("Missing ingredients")
 		"sold_out":
 			ui.toast_error("Sold out today · %d left" % int(detail.get("left", 0)))
+		"limit_reached":   # a day's allowance used (the Compost Bin, a counter's buy-back): q(121)'s words (哪吒 on #286)
+			ui.toast_error("Limit reached · %s" % P0Logic.span(float(detail.get("resets_in", 0))))
 		"wrong_state", "bad_plot":
 			pass   # the plot changed under a held repeat; the next frame shows its new state
 		"stale_state":
