@@ -6,24 +6,33 @@ extends Control
 ##   caption      "Coverage preview · 8 plots" (the pill hides when "")
 ##   confirm      the main key's verb, "Build" / "Move" / "Place"
 ##   reason       non-empty = the spot is not valid: the main key shows it in the blocked look ("Plot occupied")
-## Signals: confirmed (the main key on a valid spot), cancelled; a tap on a blocked main key says why (unavailable).
+##   secondary    an optional middle key in the secondary look ("Rotate" for 2×1 / 3×2 decor, 不知火舞 on 284
+##                ee15926a): Cancel · Rotate · Place share the width equally; "" = the two-key bar (sprinklers).
+##                Three keys leave no room for a reason on the main key (fcbd30a7): it greys keeping its verb and the
+##                reason takes the caption pill's place until the spot is valid again
+## Signals: confirmed (the main key on a valid spot), cancelled, secondary_pressed; a tap on a blocked main key says
+## why (unavailable).
 
 signal confirmed
 signal cancelled
+signal secondary_pressed
 signal unavailable(reason: String)
 
 const BAR_H := 76.0                 # card: 12 + 48 button + 16 over the safe bottom
 const _GAP := 8.0
+const _MAIN_RATIO := 1.4             # the two-key bar's main key is wider; with a middle key all three are equal
 
 var caption := "": set = set_caption
 var confirm := "Build": set = set_confirm
 var reason := "": set = set_reason
+var secondary := "": set = set_secondary
 var safe_bottom := 0.0: set = set_safe_bottom
 
 var _pill: PanelContainer
 var _caption: Label
 var _card: PanelContainer
 var _cancel: UiCommandButton
+var _second: UiCommandButton
 var _ok: UiCommandButton
 
 func _init() -> void:
@@ -41,9 +50,14 @@ func _init() -> void:
 	_cancel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_cancel.activated.connect(func(): cancelled.emit())
 	row.add_child(_cancel)
+	_second = UiCommandButton.new("", UiCommandButton.Kind.SECONDARY)
+	_second.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_second.activated.connect(func(): secondary_pressed.emit())
+	_second.visible = false
+	row.add_child(_second)
 	_ok = UiCommandButton.new(confirm, UiCommandButton.Kind.PRIMARY)
 	_ok.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_ok.size_flags_stretch_ratio = 1.4
+	_ok.size_flags_stretch_ratio = _MAIN_RATIO
 	_ok.activated.connect(func(): confirmed.emit())
 	_ok.unavailable_pressed.connect(func(r: String): unavailable.emit(r))
 	row.add_child(_ok)
@@ -69,9 +83,14 @@ func _layout() -> void:
 
 func set_caption(v: String) -> void:
 	caption = v
+	_show_caption()
+
+## The pill: the caption, or with three keys the reason the spot is not valid.
+func _show_caption() -> void:
 	if _caption == null: return
-	_caption.text = v
-	_pill.visible = v != ""
+	var t := reason if secondary != "" and reason != "" else caption
+	_caption.text = t
+	_pill.visible = t != ""
 	_layout()
 
 func set_confirm(v: String) -> void:
@@ -81,6 +100,16 @@ func set_confirm(v: String) -> void:
 func set_reason(v: String) -> void:
 	reason = v
 	if _ok != null: _ok.reason = v
+	_show_caption()
+
+func set_secondary(v: String) -> void:
+	secondary = v
+	if _second == null: return
+	_second.label = v
+	_second.visible = v != ""
+	_ok.size_flags_stretch_ratio = 1.0 if v != "" else _MAIN_RATIO
+	_ok.reason_beside = v != ""
+	_show_caption()
 
 func set_safe_bottom(v: float) -> void:
 	safe_bottom = v
