@@ -2,9 +2,12 @@ extends "res://scenes/map_poc/map_poc.gd"
 ## The P0 map: the old map scene and city view as they are (Mapbox tiles, 3D landmarks, POI
 ## declutter, pond pins and their info card, the farm miniature), with only the entry points
 ## rewired to P0. The home city is fixed (P0City), the homestead sits at its farm point, pond pins come from P0's
-## pond list (P0Ponds), and nothing here talks to the old farm server or writes the old app's choices.
+## pond list (P0Ponds), and nothing here talks to the old farm server or writes the old app's choices. Every city
+## cluster can be browsed (SGODOT-275, plan §11.8.1): its bubble at the country zoom, the camera city switching as
+## the camera goes over it. Browsing moves only the camera; where the player is (the place chip) never changes.
 
 const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
+const P0Clusters := preload("res://modules/p0/p0_clusters.gd")   # every city cluster (SGODOT-275)
 const P0_FARM := "res://scenes/p0/p0_farm.tscn"
 const P0_POND := "res://scenes/p0/p0_pond.tscn"
 static var P0_REGION := P0City.region()   # the home city's map region (SGODOT-270: from content, san_francisco)
@@ -33,6 +36,7 @@ func _initial_region_id() -> String:
 func _ready() -> void:
 	rt = P0Runtime.ensure()
 	own_farm_name = "Homestead"   # the player's own pin (不知火舞 on 234: My Farm → Homestead)
+	CityMapData.set_region_provider(P0Clusters.region)   # every cluster is a city of the map (SGODOT-275)
 	super._ready()
 	rt.attach(self)
 	for child in $HUD/SafeArea/Root.get_children():
@@ -384,7 +388,7 @@ func _on_presence(result: int, code: int, _h: PackedStringArray, body: PackedByt
 	_set_outpost_places()
 
 ## The city view's own controls: the recenter key brings the camera back to the player without changing the zoom
-## (不知火舞 on 234); outfit and city switching are not in P0 (their buttons are gone with the old chrome).
+## (不知火舞 on 234); outfits are not in P0 (their button is gone with the old chrome).
 func _city_action(action: String) -> void:
 	match action:
 		"recenter":   # back to the player, the zoom kept, nothing selected (LOCK-24; flies since SGODOT-267)
@@ -392,7 +396,6 @@ func _city_action(action: String) -> void:
 			_fly("recenter", at.x, at.y, zoom)
 		"home": go_home_view()
 		"outfit": rt.ui.toast("Outfits come later")
-		"city": rt.ui.toast("P0 is set in %s" % P0City.city_name())
 		_: super._city_action(action)
 
 ## The home key (SGODOT-261, the user's call; 不知火舞 keeps 197): from anywhere — at a pond or an outpost the camera
@@ -662,12 +665,80 @@ func _map_logical_height() -> float:
 		if h > 0.0: return h
 	return super._map_logical_height()
 
-func _switch_city(r: Dictionary) -> void:
-	if str(r.get("id", "")) == P0_REGION: super._switch_city(r)
+func _exit_tree() -> void:
+	CityMapData.set_region_provider(Callable())
+	super._exit_tree()
 
-func fly_to_city(id: String) -> void:
-	if id == P0_REGION: super.fly_to_city(id)
-	else: _city_action("city")   # another city's bubble at the farthest zoom says where P0 is set (不知火舞 on 270)
+# ---------------------------------------------------------------- browsing every city (SGODOT-275, §11.8.1)
+## The camera city switches as the camera goes over a city (map_poc._update_active_city) and a bubble flies to its
+## city (fly_to_city): both are Browse. Only the camera's city and the map's title change; the old app's saved city
+## choice is not written, the homestead and the place chip stay where the player is.
+func _switch_city(r: Dictionary) -> void:
+	if not city_map or str(r.get("id", "")) == str(region.get("id", "")): return
+	_clear_farm_selection()
+	city_map.dismiss_overlays()
+	region = r
+	city_map.region_changed()
+	_refresh_nearby()
+
+## At most this many city bubbles, at least this far apart on screen (px), most populous first.
+const CITY_BUBBLES := 30
+const BUBBLE_GAP := 72.0
+var _regions_key := ""
+var _regions: Array = []
+
+## The cities around the camera (map_poc asks for its bubbles, the title and the camera city): the home city, the
+## camera's city, and the most populous clusters in view, fewer the farther out (city_min_population) and kept
+## apart on screen. Rebuilt only when the camera has moved enough to change them.
+func city_regions() -> Array:
+	var vp := get_viewport().get_visible_rect().size if is_inside_tree() else Vector2(360, 800)
+	var z := zoom + _zoom_elastic
+	var step := 360.0 / pow(2.0, z) / 4.0   # a quarter of a 512 px tile's width in degrees
+	var key := "%.1f|%d|%d|%s|%dx%d" % [z, roundi(center_lat / step), roundi(center_lng / step), str(region.get("id", "")), vp.x, vp.y]
+	if key == _regions_key: return _regions
+	_regions_key = key
+	var out: Array = []
+	var ids := {}
+	var add := func(r: Dictionary) -> void:
+		if r.is_empty() or ids.has(str(r.id)): return
+		ids[str(r.id)] = true
+		out.append(r)
+	add.call(P0Clusters.region(P0Clusters.cluster_of_region(P0_REGION)))
+	if not region.is_empty(): add.call(region)
+	var box := _view_box(vp, z)
+	var placed: Array = []
+	for c in P0Clusters.in_box(box.x, box.y, box.z, box.w, city_min_population(z), 200):
+		if out.size() >= CITY_BUBBLES: break
+		var p = geo_to_screen(float(c.lat), float(c.lng))
+		if p == null: continue
+		if placed.any(func(q: Vector2): return q.distance_to(p) < BUBBLE_GAP): continue
+		placed.append(p)
+		add.call(P0Clusters.region(str(c.id)))
+	_regions = out
+	return out
+
+## The lat/lng box the map shows, a fifth wider each way (south, west, north, east), from the Web Mercator scale
+## geo_to_screen draws with.
+func _view_box(vp: Vector2, z: float) -> Vector4:
+	var scale := vp.y / _map_logical_height() * 512.0 * pow(2.0, z)
+	var half_w := minf(180.0, vp.x / scale * 360.0 * 0.6)
+	var half_h := minf(85.0, vp.y / scale * 360.0 * 0.6 * cos(deg_to_rad(clampf(center_lat, -80.0, 80.0))))
+	var west := wrapf(center_lng - half_w, -180.0, 180.0)
+	var east := wrapf(center_lng + half_w, -180.0, 180.0)
+	if half_w >= 180.0:
+		west = -180.0
+		east = 180.0
+	return Vector4(maxf(-85.0, center_lat - half_h), west, minf(85.0, center_lat + half_h), east)
+
+## Fewer cities the farther out: at the country zoom only the large ones get a bubble, near the city zoom (where the
+## camera city switches, map_poc.AUTO_SWITCH_ZOOM) every cluster counts, so the title follows the camera anywhere.
+static func city_min_population(z: float) -> int:
+	if z < 3.0: return 3000000
+	if z < 4.0: return 1000000
+	if z < 5.0: return 400000
+	if z < 6.0: return 150000
+	if z < 7.0: return 50000
+	return 0
 
 # ---------------------------------------------------------------- old server / account hooks off
 func _on_net_booted(_ok: bool) -> void: pass
