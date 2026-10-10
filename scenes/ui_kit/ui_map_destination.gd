@@ -119,16 +119,23 @@ func set_silhouette(v: bool) -> void:
 	_icon.size = Vector2(side, side)
 	_icon.position = Vector2.ONE * (DISC - side) * 0.5
 	_icon.material = _ink() if v else null   # the glyph as a one-colour silhouette
-	modulate.a = SILHOUETTE_ALPHA if v else 1.0
+	modulate.a = SILHOUETTE_ALPHA if v else 1.0   # the whole pin, its glyph and mark too (不知火舞 on #287)
+	if _badge: _badge.position = _mark_at()
 	_label_box.visible = text != "" and name_shown and not v
 	_layout()
 
-## A canvas material drawing a texture's shape in color/secondary (its alpha kept): the silhouette's glyph.
+## A mark's badge over the disc's top-left corner: a silhouette's smaller disc moves the corner in (蒙恬 on #287).
+func _mark_at() -> Vector2:
+	return _MARK_AT + Vector2.ONE * ((DISC - SILHOUETTE_DISC) * 0.5 if silhouette else 0.0)
+
+## A canvas material drawing a texture's shape in color/secondary: the silhouette's glyph. The incoming COLOR's alpha
+## (the texture's, times the node's modulate) is kept, so the pin's 55 % fades the glyph with the disc (不知火舞 on
+## #287: written over, the glyph stayed at full opacity).
 static var _ink_mat: ShaderMaterial
 static func _ink() -> ShaderMaterial:
 	if _ink_mat == null:
 		var sh := Shader.new()
-		sh.code = "shader_type canvas_item;\nuniform vec4 ink : source_color;\nvoid fragment() { COLOR = vec4(ink.rgb, texture(TEXTURE, UV).a * ink.a); }"
+		sh.code = "shader_type canvas_item;\nuniform vec4 ink : source_color;\nvoid fragment() { COLOR = vec4(ink.rgb, COLOR.a * ink.a); }"
 		_ink_mat = ShaderMaterial.new()
 		_ink_mat.shader = sh
 		_ink_mat.set_shader_parameter("ink", UiTokens.COLOR_SECONDARY)
@@ -153,7 +160,7 @@ func set_mark(v: String) -> void:
 		return
 	if _badge == null:
 		_badge = UiStatusBadge.new(i, UiStatusBadge.Size.WORLD)
-		_badge.position = _MARK_AT
+		_badge.position = _mark_at()
 		_pin.add_child(_badge)
 	_badge.state = i
 	_badge.visible = true

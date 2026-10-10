@@ -224,8 +224,9 @@ func test_show_on_map_says_when_the_citys_read_fails() -> void:
 	rt.world = m
 	rt.ui.close_modal()
 
-## MAP-2 (2107:32861, 不知火舞 on #281): a place of a city the fog covers is its silhouette — no disc, no name, the 18 px
-## glyph in color/secondary at 55 %; it takes the tap (its silhouette card) and turns full colour once the city is explored.
+## MAP-2 (2107:32861, pin 2107:33077, 不知火舞 on #281 / #287): a place of a city the fog covers is its silhouette — a
+## 32 px surface disc with a border edge, the 18 px glyph in color/secondary, no name, the whole pin (glyph and mark too)
+## at 55 %; it takes the tap (its silhouette card) and turns full colour once the city is explored.
 func test_a_fogged_citys_places_are_silhouettes_until_explored() -> void:
 	var m := _map()
 	for i in 3: await get_tree().process_frame
@@ -255,7 +256,13 @@ func test_a_fogged_citys_places_are_silhouettes_until_explored() -> void:
 	await get_tree().process_frame
 	assert_vector(pin._icon.size).is_equal(Vector2(18, 18))
 	assert_object(pin._icon.material).is_not_null()
+	# the glyph's ink keeps the incoming alpha (the node's modulate in it): written over, it stayed at 100 % (#287)
+	var ink: String = ((pin._icon.material as ShaderMaterial).shader as Shader).code
+	assert_str(ink).contains("COLOR.a")
+	pin.mark = "request"   # a mark sits on the smaller disc's corner (蒙恬 on #287)
+	assert_vector(pin._badge.position).is_equal(UiMapDestination._MARK_AT + Vector2(4, 4))
 	pin.silhouette = false   # explored: the pin as ever
+	assert_vector(pin._badge.position).is_equal(UiMapDestination._MARK_AT)
 	assert_vector(pin._disc.size).is_equal(Vector2(40, 40))
 	assert_object(pin._icon.material).is_null()
 	assert_float(pin.modulate.a).is_equal(1.0)
