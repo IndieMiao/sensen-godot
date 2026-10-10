@@ -1,9 +1,11 @@
 class_name UiMapDestination
 extends Control
 ## MapDestination 1795:103793 (LOCK-24, MAP-1; SGODOT-234 A2): a destination pin on the city map — a 40 disc
-## (color/surface, 1 px color/primary edge) with a 24 icon, the name under it (10 Bold, whole text, never cut). The
-## homestead's name sits on a surface plate (`plate`); the others are plain text. `mark` hangs a StatusBadge World over
-## the disc's top-left corner (q(48): request / deliverable / new); `count` is the ×N corner of a P1 cluster.
+## (color/surface, 1 px color/primary edge) with a 24 icon and a name under it. The homestead's name sits on a surface
+## plate (`plate`: 10 Bold, whole text). The others take Label=Short (q(137), 2391:127664): the place's short name,
+## 11 Bold dark with a cream outline, no plate, one line at most 96 px. `mark` hangs a StatusBadge World over the
+## disc's top-left corner (q(48): request / deliverable / new); `online` is the top-right count (a person and the
+## number, none at 0, q(137)); `count` the ×N corner of a P1 cluster.
 ## Display only: the city map takes the tap. The geographic point is under the disc (anchor_offset()).
 
 const DISC := 40.0
@@ -16,6 +18,11 @@ const _MARK_AT := Vector2(-8.0, -8.0)    # StatusBadge World 28 over the disc's 
 ## How far a mark's badge pokes over the disc's top: a name over a marked disc clears it (刘邦 on #111).
 const MARK_OVERHANG := 8.0
 const _COUNT_AT := Vector2(26.0, -4.0)   # ×N, top-right (P1)
+## Label=Short (q(137)): 11 Bold, a 2 px cream outline (Godot's outline_size is the stroke's whole width), at most 96.
+const SHORT_MAX_W := 96.0
+const _SHORT_HALO := 4
+const _PERSON := "res://assets/ui/kit_icons/count_person.svg"
+const _PERSON_SIDE := 9.0
 
 var icon: Texture2D: set = set_icon
 var text := "": set = set_text
@@ -23,6 +30,8 @@ var plate := false: set = set_plate
 ## A UiStatusBadge state key ("request", "deliverable", "new" …); "" for none.
 var mark := "": set = set_mark
 var count := "": set = set_count
+## Players in this place now (q(137)): the top-right count, a person and the number; 0 shows none.
+var online := 0: set = set_online
 ## The name under the disc; the city map folds it when it would overlap another (C30 / q(72)) — the pin stays.
 var name_shown := true: set = set_name_shown
 ## The disc's own scale about its geographic point (a Show on map pulse); the name keeps its size.
@@ -48,6 +57,7 @@ var _icon: TextureRect
 var _badge: UiStatusBadge
 var _count: PanelContainer
 var _count_label: Label
+var _count_person: TextureRect
 var _label_box: PanelContainer
 var _label: Label
 
@@ -69,8 +79,16 @@ func _init(icon_: Texture2D = null, text_ := "", plate_ := false) -> void:
 	_count.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_count.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_PRIMARY, 8.0).with_margins(4.0, 1.0, 4.0, 1.0))
 	_count.position = _COUNT_AT
+	var count_row := HBoxContainer.new()
+	count_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	count_row.add_theme_constant_override(&"separation", 2)
+	_count.add_child(count_row)
+	_count_person = UiKit.icon(null, _PERSON_SIDE)
+	_count_person.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_count_person.visible = false
+	count_row.add_child(_count_person)
 	_count_label = UiKit.label("", UiTokens.STYLE_C10_XB, UiTokens.COLOR_SURFACE_RAISED)
-	_count.add_child(_count_label)
+	count_row.add_child(_count_label)
 	_count.visible = false
 	_pin.add_child(_count)
 	_label_box = PanelContainer.new()
@@ -78,6 +96,7 @@ func _init(icon_: Texture2D = null, text_ := "", plate_ := false) -> void:
 	add_child(_label_box)
 	_label = UiKit.label("", UiTokens.STYLE_C10_B, UiTokens.COLOR_TEXT)
 	_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_label.add_theme_color_override(&"font_outline_color", UiTokens.COLOR_SURFACE)
 	_label_box.add_child(_label)
 	_label_box.minimum_size_changed.connect(_layout)
 	icon = icon_
@@ -96,6 +115,7 @@ func set_text(v: String) -> void:
 	text = v
 	_label.text = v
 	_label_box.visible = v != "" and name_shown
+	_fit_short()
 	_layout()
 
 func set_name_shown(v: bool) -> void:
@@ -148,8 +168,19 @@ func set_plate(v: bool) -> void:
 	if _plate_on == int(v): return   # a new style box per frame restyled and relaid every pin (int12 map frame cost)
 	_plate_on = int(v)
 	var box := UiStyleBox.make(UiTokens.COLOR_SURFACE if v else Color.TRANSPARENT, _PLATE_RADIUS)
-	_label_box.add_theme_stylebox_override(&"panel", box.with_margins(_LABEL_PAD_X, _LABEL_PAD_Y, _LABEL_PAD_X, _LABEL_PAD_Y))
+	# The homestead's plate keeps its 6 / 2 padding (10 Bold); a short name is the text alone, 2 over and under.
+	var pad_x := _LABEL_PAD_X if v else 0.0
+	_label_box.add_theme_stylebox_override(&"panel", box.with_margins(pad_x, _LABEL_PAD_Y, pad_x, _LABEL_PAD_Y))
+	_label.theme_type_variation = UiTokens.STYLE_C10_B if v else UiTokens.STYLE_C11_B
+	_label.add_theme_constant_override(&"outline_size", 0 if v else _SHORT_HALO)
+	_label.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING if v else TextServer.OVERRUN_TRIM_ELLIPSIS
+	_fit_short()
 	_layout()
+
+## A short name keeps to one line of at most 96 px, cut with an ellipsis past it (q(137)); a plate's name is whole.
+func _fit_short() -> void:
+	if _plate_on < 0: return
+	_label.custom_minimum_size.x = 0.0 if plate else label_size_for(text, false).x
 
 func set_mark(v: String) -> void:
 	if v == mark: return
@@ -194,21 +225,35 @@ func set_count(v: String) -> void:
 	if v == count and _count_label.text == v: return
 	count = v
 	_count_label.text = v
+	_count_person.visible = false
 	_count.visible = v != ""
 
-## The name plate's size for `text` before any pin exists (the city map packs pins by it): Compact/10 Bold, 6 / 2
-## padding, never cut. Matches label_size() of a built pin.
-## Measured once per name: the city map asks for every pin it packs, every frame.
-static func label_size_for(text: String) -> Vector2:
+func set_online(v: int) -> void:
+	if v == online and (_count.visible == (v > 0)): return
+	online = v
+	if v <= 0:
+		if count == "": _count.visible = false
+		return
+	if _count_person.texture == null: _count_person.texture = load(_PERSON)
+	_count_person.visible = true
+	_count_label.text = str(v)
+	_count.visible = true
+
+## The name's size for `text` before any pin exists (the city map packs pins by it). A plate's: Compact/10 Bold, 6 / 2
+## padding, never cut. A short name's (q(137)): 11 Bold, 2 over and under, at most 96 wide. Matches label_size() of a
+## built pin. Measured once per name: the city map asks for every pin it packs, every frame.
+static func label_size_for(text: String, plated := true) -> Vector2:
 	if text == "": return Vector2.ZERO
-	if _label_sizes.has(text): return _label_sizes[text]
-	var th := UiKit.theme()   # the name's own style, STYLE_C10_B (the city map gives the pin this theme)
-	var f := th.get_font(&"font", UiTokens.STYLE_C10_B)
-	var fs := th.get_font_size(&"font_size", UiTokens.STYLE_C10_B)
-	var size := Vector2(ceilf(f.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x) + _LABEL_PAD_X * 2.0,
-		ceilf(f.get_height(fs)) + _LABEL_PAD_Y * 2.0)
+	var key := text + ("|p" if plated else "|s")
+	if _label_sizes.has(key): return _label_sizes[key]
+	var style := UiTokens.STYLE_C10_B if plated else UiTokens.STYLE_C11_B
+	var th := UiKit.theme()   # the name's own style (the city map gives the pin this theme)
+	var f := th.get_font(&"font", style)
+	var fs := th.get_font_size(&"font_size", style)
+	var w := ceilf(f.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x)
+	var size := Vector2(w + _LABEL_PAD_X * 2.0 if plated else minf(w, SHORT_MAX_W), ceilf(f.get_height(fs)) + _LABEL_PAD_Y * 2.0)
 	if _label_sizes.size() >= 512: _label_sizes.clear()   # names come from a fixed catalogue; a bound all the same
-	_label_sizes[text] = size
+	_label_sizes[key] = size
 	return size
 static var _label_sizes := {}
 

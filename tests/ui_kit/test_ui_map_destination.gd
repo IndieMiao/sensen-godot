@@ -1,6 +1,7 @@
 extends GdUnitTestSuite
-## MapDestination 1795:103793 (LOCK-24, SGODOT-234 A2): 40 disc with a 24 icon, the whole name under it (a plate only
-## for the homestead), a StatusBadge over the disc's top-left for a map mark, ×N top-right (P1).
+## MapDestination 1795:103793 (LOCK-24, SGODOT-234 A2; Label=Short 2391:127664, q(137)): 40 disc with a 24 icon, the
+## name under it — the homestead's whole on a plate, the others the short name (11 Bold, cream outline, at most 96) —
+## a StatusBadge over the disc's top-left for a map mark, the online count (a person and the number) top-right.
 
 func _pin(text := "Oak Tea House", plate := false) -> UiMapDestination:
 	var d := UiMapDestination.new(P0Logic.icon("pot"), text, plate)
@@ -8,14 +9,26 @@ func _pin(text := "Oak Tea House", plate := false) -> UiMapDestination:
 	add_child(auto_free(d))
 	return d
 
-func test_disc_icon_and_the_whole_name_under_it() -> void:
-	var d := _pin()
+func test_disc_icon_and_the_short_name_under_it() -> void:
+	var d := _pin("Oak")
+	var home := _pin("Homestead", true)
 	await get_tree().process_frame
 	assert_that(d._disc.size).is_equal(Vector2(40, 40))
 	assert_that(d._icon.size).is_equal(Vector2(24, 24))
 	assert_that(d._icon.position).is_equal(Vector2(8, 8))
-	assert_str(d._label.text).is_equal("Oak Tea House")
-	assert_int(d._label.text_overrun_behavior).is_equal(TextServer.OVERRUN_NO_TRIMMING)
+	assert_str(d._label.text).is_equal("Oak")
+	# Label=Short (q(137)): 11 Bold dark, a cream outline, no plate, one line cut with an ellipsis past 96 px
+	assert_str(d._label.theme_type_variation).is_equal(UiTokens.STYLE_C11_B)
+	assert_that(d._label.get_theme_color(&"font_outline_color")).is_equal(UiTokens.COLOR_SURFACE)
+	assert_int(d._label.get_theme_constant(&"outline_size")).is_equal(UiMapDestination._SHORT_HALO)
+	assert_int(d._label.text_overrun_behavior).is_equal(TextServer.OVERRUN_TRIM_ELLIPSIS)
+	# the homestead keeps its plate, 10 Bold and its whole name
+	assert_str(home._label.theme_type_variation).is_equal(UiTokens.STYLE_C10_B)
+	assert_int(home._label.get_theme_constant(&"outline_size")).is_equal(0)
+	assert_int(home._label.text_overrun_behavior).is_equal(TextServer.OVERRUN_NO_TRIMMING)
+	var long := _pin("Hummingbird Kingfisher Frangipani")
+	await get_tree().process_frame
+	assert_float(long.label_size().x).is_equal(UiMapDestination.SHORT_MAX_W)
 	var l := d.label_size()
 	assert_float(d.size.x).is_equal_approx(maxf(40.0, l.x), 0.5)   # a long name widens it, the disc stays centred
 	assert_float(d._pin.position.x + 20.0).is_equal_approx(d.size.x * 0.5, 0.5)
@@ -46,15 +59,28 @@ func test_a_mark_hangs_a_status_badge_on_the_top_left() -> void:
 	assert_that(d._count.position).is_equal(Vector2(26, -4))
 
 ## The city map packs pins by label_size_for before any pin exists: it measures what a built pin draws, in its own
-## style token (STYLE_C10_B) and plate padding (刘邦 on #100).
+## style token and padding (刘邦 on #100): the homestead's plate, the others' short name (q(137)).
 func test_the_static_name_size_is_the_built_one() -> void:
-	var names := ["Homestead", "Oak Tea House · 3 online", "Reed Pond · Beginner pond · 1.2 km", "Mission Tackle Shop"]
+	var names := ["Homestead", "Oak", "Union Square", "Hummingbird Kingfisher Frangipani"]
 	var pins: Array = names.map(func(n): return _pin(n, n == "Homestead"))
 	await get_tree().process_frame
 	for i in names.size():
 		assert_that((pins[i] as UiMapDestination).label_size()).append_failure_message(names[i]) \
-			.is_equal(UiMapDestination.label_size_for(names[i]))
+			.is_equal(UiMapDestination.label_size_for(names[i], names[i] == "Homestead"))
 	assert_that(UiMapDestination.label_size_for("")).is_equal(Vector2.ZERO)
+
+## q(137) ③: who is in is the top-right count, a person and the number; none at 0.
+func test_the_online_count_is_a_person_and_the_number() -> void:
+	var d := _pin("Oak")
+	assert_bool(d._count.visible).is_false()
+	d.online = 3
+	assert_bool(d._count.visible).is_true()
+	assert_bool(d._count_person.visible).is_true()
+	assert_object(d._count_person.texture).is_not_null()
+	assert_str(d._count_label.text).is_equal("3")
+	assert_that(d._count.position).is_equal(UiMapDestination._COUNT_AT)
+	d.online = 0
+	assert_bool(d._count.visible).is_false()
 
 ## int9: a name near the screen edge slides in; the disc keeps its place over the point.
 func test_a_shifted_name_moves_only_the_name() -> void:

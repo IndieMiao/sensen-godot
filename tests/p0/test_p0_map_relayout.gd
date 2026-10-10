@@ -198,10 +198,11 @@ func test_a_server_reply_that_marks_a_pin_lays_the_pins_out() -> void:
 	assert_bool(city._shown_last.has(poi)).override_failure_message("the marked pin is still packed away").is_true()
 	rt.session.view = saved
 
-## The outposts' online counts (P0 presence): their pins are replaced (set_places) and say the new count.
+## The outposts' online counts (P0 presence): their pins are replaced (set_places) and their count says the new one
+## (q(137) ③: the top-right count).
 func test_new_online_counts_lay_the_pins_out() -> void:
 	assert_bool(await _lays_out(func(): map._online[TEA] = 3; map._set_outpost_places())).is_true()
-	assert_str((city.markers[TEA].dest as UiMapDestination).text).contains("3 online")
+	assert_int((city.markers[TEA].dest as UiMapDestination).online).is_equal(3)
 	map._online.erase(TEA)
 	map._set_outpost_places()
 
