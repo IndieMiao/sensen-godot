@@ -1564,6 +1564,12 @@ func _update_bubbles() -> void:
 			var st: Dictionary = bubble_state.call(id)
 			bubble.count.text = str(st.get("text", ""))
 			bubble.count.visible = bubble.count.text != ""
+			# The line keeps a text line's height with the glyph alone (P0's home city at 0 online), so the bubble's
+			# bottom does not move as the count comes and goes (不知火舞 on #238). Measured here, in the tree, with the
+			# label's own theme font.
+			var line := bubble.count.get_parent() as Control
+			var text_h: float = bubble.count.get_theme_font("font").get_height(bubble.count.get_theme_font_size("font_size"))
+			if line.custom_minimum_size.y != text_h: line.custom_minimum_size.y = text_h
 			var glyph := str(st.get("icon", ""))
 			bubble.icon.visible = glyph != ""
 			if glyph != "": bubble.icon.texture = GameUi.icon(glyph)

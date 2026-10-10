@@ -115,6 +115,17 @@ func test_city_bubbles_say_their_state() -> void:
 	assert_dict(state.call("gn-1816670")).is_equal({text = "Unexplored"})
 	m._online = {}
 	assert_dict(state.call("san_francisco")).is_equal({text = "", icon = "house"})   # nobody online: the house alone (q(72))
+	# 不知火舞 on #238: the bubble keeps its size as the count comes and goes (the glyph alone keeps a text line's height)
+	_look(m, 37.55, -122.0, 7.0)
+	m.city_map._update_bubbles()
+	var node: Control = m.city_map.bubbles["san_francisco"].node
+	var empty_size := node.size
+	m._online = {"sh_tea_1": 1}
+	m.city_map._update_bubbles()
+	assert_float(node.size.y).is_equal_approx(empty_size.y, 0.5)
+	# … and is no taller than the text line itself: no bubble grows for it
+	var count: Label = m.city_map.bubbles["san_francisco"].count
+	assert_float((count.get_parent() as Control).custom_minimum_size.y).is_less_equal(count.get_minimum_size().y + 0.5)
 	rt.session.view = saved
 
 ## 李元芳 / 司空震 (SGODOT-275): a bubble the last list had and this one does not is hidden with its dot, never left
