@@ -2,7 +2,9 @@ class_name UiBlueprintCard
 extends PanelContainer
 ## BlueprintCard 1434:93844 (SGODOT-231 B2-06, 安其拉 · WP4): one workbench recipe per card.
 ##   header    icon tile (44, icon 32) · name + effect · yield (`You get 2`, Supplies only)
-##   materials NEED-TILE M per cost (LOCK-10: short = amber ring and number); hidden once a tool is owned
+##   materials NEED-TILE M per cost (LOCK-10: short = amber ring and number); hidden once a tool is owned. At most
+##             three a row: the fourth wraps, left-aligned, the row gap the tile gap, the card grows (FAC-GH 482:380,
+##             the greenhouse's Timber · Stone · Copper Ore / Coins; 不知火舞 on 241 4e7d1119) — never wider than the drawer
 ##   footer    have (`You have 6`, Supplies only) · one Compact/Command button: Craft (primary), Equip (secondary),
 ##             or the reason / done state in the neutral look (`Need 1 more Copper Ore`, `No room · free a slot
 ##             first`, `Farming Lv3`, `Equipped`, `Owned · always on`) — those still take the tap (LOCK-10).
@@ -27,13 +29,14 @@ const _TILE := 44.0           # icon tile 44, icon 32
 const _ICON := 32
 const _TEXT_GAP := 2
 const _MATERIAL_GAP := 8
+const _ROW_MAX := 3            # NEED-TILEs a materials row holds before it wraps
 const _NAME_SIZE := 16        # name 16 ExtraBold: Row Title XB15 one step up (no type token yet)
 
 var _icon: TextureRect
 var _name: Label
 var _effect: Label
 var _yield: Label
-var _materials: HBoxContainer
+var _materials: VBoxContainer  # rows of at most _ROW_MAX tiles
 var _have: Label
 var button: UiCommandButton
 var _tiles: Array[UiNeedTile] = []
@@ -75,7 +78,7 @@ func _init(data := {}) -> void:
 	text.add_child(_effect)
 	_yield = UiKit.label("", UiTokens.STYLE_C12_B, UiTokens.COLOR_SECONDARY)
 	head.add_child(_yield)
-	_materials = HBoxContainer.new()
+	_materials = VBoxContainer.new()
 	_materials.add_theme_constant_override(&"separation", _MATERIAL_GAP)
 	col.add_child(_materials)
 	var foot := HBoxContainer.new()
@@ -100,15 +103,22 @@ func set_data(d: Dictionary) -> void:
 	_yield.text = str(d.get("yield", ""))
 	_yield.visible = _yield.text != ""
 	_have.text = str(d.get("have", ""))
-	for t in _tiles: t.queue_free()
+	for r in _materials.get_children():   # the rows, their tiles with them; hidden, they take no room until freed
+		r.visible = false
+		r.queue_free()
 	_tiles.clear()
 	var mats: Array = d.get("materials", [])
+	var row: HBoxContainer = null
 	for i in mats.size():
+		if i % _ROW_MAX == 0:
+			row = HBoxContainer.new()
+			row.add_theme_constant_override(&"separation", _MATERIAL_GAP)
+			_materials.add_child(row)
 		var m: Dictionary = mats[i]
 		var t := UiNeedTile.new(str(m.get("name", "")), int(m.get("have", 0)), int(m.get("need", 1)), UiNeedTile.Size.M,
 			m.get("icon", null))
 		t.pressed.connect(func(): material_pressed.emit(i, t))
-		_materials.add_child(t)
+		row.add_child(t)
 		_tiles.append(t)
 	_materials.visible = not mats.is_empty()   # an owned tool turns its materials off (Show materials, main)
 	var b: Dictionary = d.get("button", {})

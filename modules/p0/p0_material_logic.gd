@@ -542,6 +542,7 @@ const EFFECTS := {
 	"torch": "See what rocks hold",
 	"fert_compost": "Crops ready 20% sooner",
 	"facility_sprinkler": "Waters 8 plots for you",   # P1 FARM-5 v5 (q(59) §5)
+	"facility_greenhouse": "16 plots · −25%",          # q(118) ② (李白: the status card's line)
 }
 
 ## Cards for one tab ("tools" | "supplies"): icon, name, effect, NEED-TILE costs, Supplies yield/have, one button.
@@ -560,6 +561,10 @@ static func workbench_model(view: Dictionary, tab: String) -> Array:
 			card.yield = "You get %d" % int(r.get("qty", 1))
 			card.have = "You have %d" % int(r.get("have", 0))   # bag + Farm Storage (server, B2-06)
 		if r.get("owned", false): card.cost = []   # an owned tool turns its materials row off (BlueprintCard main)
+		# a facility paid in coins too (the greenhouse's 300): a Coins tile after the materials, the 40 floor in its
+		# denominator so the tile and the button agree (q(10): `Coins 230/340`)
+		elif r.get("coins_need", null) != null:
+			card.cost.append({"id": "coin", "name": "Coins", "have": int(r.get("coins_have", 0)), "need": int(r.coins_need)})
 		card.button = _craft_button(r)
 		out.append(card)
 	return out
@@ -586,7 +591,11 @@ static func _craft_button(r: Dictionary) -> Dictionary:
 		"facility_cap":   # q(59) §5: `Sprinklers 6/6 · Homestead Lv4 adds 1`; with no higher level, only the count
 			var label := "%ss %d/%d" % [str(r.get("name", "")), int(d.get("used", 0)), int(d.get("cap", 0))]
 			if d.get("homestead_next", null) != null: label += " · Homestead Lv%d adds 1" % int(d.homestead_next)
+			# the greenhouse's cap goes by Farming (Lv8 1, Lv10 2; 李白): `Greenhouses 1/1 · Farming Lv10 adds 1`
+			if d.get("farming_next", null) != null: label += " · Farming Lv%d adds 1" % int(d.farming_next)
 			return {"label": label, "kind": "unavailable", "cmd": {}}
+		"no_coins":   # LOCK-10 (the greenhouse's 300 coins with the 40 floor)
+			return {"label": "Need %d more coins" % int(d.get("need", 0)), "kind": "unavailable", "cmd": {}}
 		"need_material", "missing_materials":
 			var short := int(d.get("need", 0)) - int(d.get("have", 0))
 			var cost_name := str(d.get("item", ""))

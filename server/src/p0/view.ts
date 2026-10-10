@@ -18,7 +18,7 @@ import { haveTotal, stored } from './storage.js';
 import { mineView, settleMine } from './mine.js';
 import { gatherView } from './gathering.js';
 import { workbenchView } from './workbench.js';
-import { coveredPlots, cropGrowH, facilitiesView, facilityAt, plotCount } from './garden.js';
+import { coveredPlots, cropGrowH, facilitiesView, facilityAt, greenhousePlots, plotCount } from './garden.js';
 import { climateAt, homeClimate } from './travel.js';
 import { orchardView, treeOf } from './orchard.js';
 import { restReadyIn } from './presence.js';
@@ -46,7 +46,7 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
   }));
   const fishingLevel = skillLevel(c, s, 'fishing');
   const f = c.fishing;
-  const covered = coveredPlots(c, s);
+  const covered = coveredPlots(c, s), greenhouse = greenhousePlots(c, s);
   return {
     now, content_version: c.version, seq: s.seq,
     energy: { value: s.energy.value, max: maxEnergy(c, s), next_in: nextTickIn(c, s, now), regen_ms: regenMs(c, s, now) },
@@ -63,7 +63,8 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
       id: p.id, state: p.state === 'growing' && (p.ready_at ?? Infinity) <= now ? 'ready' : p.state,
       crop: p.crop ?? null, ready_in: p.state === 'growing' && p.ready_at ? Math.max(0, p.ready_at - now) : null,
       xp_pct: p.xp_pct ?? null, fert: !!p.fert,
-      covered: covered.has(p.id), facility: facilityAt(s, p.id)?.id ?? null,   // P1: watered by a sprinkler / one stands here
+      covered: covered.has(p.id), facility: facilityAt(c, s, p.id)?.id ?? null,   // P1: watered by a sprinkler / one stands here
+      greenhouse: greenhouse.has(p.id),                                         // P1: under a greenhouse's glass (q(118) ②)
       ...(treeOf(c, p) ? { tree: true, picks: p.picks ?? 0 } : {}),            // P1: a tree stands here (q(118))
     })),
     orchard: orchardView(c, s),
