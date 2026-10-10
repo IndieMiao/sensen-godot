@@ -51,8 +51,10 @@ func step(dt: float) -> void:
 	if state == "labour":
 		_labour_left -= dt
 		if _labour_left <= 0.0: state = "idle"
-	if state in ["labour", "locked"] or cam == null or _attack_lock > 0.0:   # a slash holds still to its strike
+	if state in ["labour", "locked"] or cam == null:
 		mover.stop()
+	elif _attack_lock > 0.0:
+		pass   # a slash holds still to its strike; a walk tapped meanwhile keeps its path and goes after it (苏烈 on #299)
 	else:
 		var right := cam.global_basis.x
 		right.y = 0
@@ -63,7 +65,7 @@ func step(dt: float) -> void:
 		mover.step(dt)
 	var y := float(ground_height.call(mover.position)) if ground_height.is_valid() else 0.0
 	position = Vector3(mover.position.x, lerpf(position.y, y, clampf(dt * 14.0, 0, 1)), mover.position.z)
-	if mover.is_moving():
+	if mover.is_moving() and _attack_lock <= 0.0:
 		look_at(position + mover.facing, Vector3.UP)
 		state = "move"
 		_attack_left = 0.0   # the stick past the strike takes the body back from the slash's follow-through

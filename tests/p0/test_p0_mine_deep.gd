@@ -490,6 +490,19 @@ func test_a_slash_holds_still_to_its_strike_then_the_stick_cancels_it() -> void:
 	for i in 12: mine.actor.step(1.0 / 30.0)            # 0.4 s
 	assert_bool(mine.actor.attacking()).is_true()
 	assert_bool(mine.actor.mover.is_moving()).is_false()
+	# a walk tapped during the hold (a ladder's) is kept and goes once the strike is past (苏烈 on #299)
+	mine.actor._attack_left = 0.0
+	mine.combat.cooldown = 0.0
+	mine._slash_t = 1.0
+	mine._swing()                                       # the chop: held 0.22 s
+	var held: Vector3 = mine.actor.mover.position
+	var goal := held + Vector3(-1.3, 0, 0)
+	assert_bool(mine.actor.mover.set_target_position(goal)).is_true()
+	for i in 5: mine.actor.step(1.0 / 30.0)
+	assert_vector(mine.actor.mover.position).is_equal(held)   # still held
+	assert_bool(mine.actor.attacking()).is_true()
+	for i in 20: mine.actor.step(1.0 / 30.0)
+	assert_float(mine.actor.mover.position.distance_to(held)).is_greater(0.3)   # walked on after the strike
 
 ## The strike shows at the wrist's peak: the arc, the slime's flash and knockback wait fx_delay; who was hit and its
 ## stun come at the press (the command and the server's tempo as before).
