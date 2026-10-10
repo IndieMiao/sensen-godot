@@ -113,6 +113,9 @@ var fog: ColorRect
 ## P0 city bubbles (§11.7.1): region id → {text (the line under the name), icon (a small glyph before it, "" none),
 ## outline (a green ring)}; unset = farm counts as before (Journey).
 var bubble_state := Callable()
+## () -> Array[Rect2] (screen px): what a city bubble must not overlap (P0: the two HUD rows, the right-hand keys, the
+## quick bar). A bubble there, or not wholly on screen, is not drawn — its dot stays — never half of it (不知火舞 on 279).
+var bubble_clear_rects := Callable()
 
 func _destination(entry: Dictionary) -> Dictionary:
 	return destination_style.call(entry) if destination_style.is_valid() else {}
@@ -1558,6 +1561,7 @@ func _update_bubbles() -> void:
 		var point: Vector2 = (projected as Vector2) - global_position if projected != null else Vector2(-1e6, -1e6)
 		var node: Control = bubble.node
 		node.visible = not detail and area.has_point(point)
+		bubble.dot.visible = false
 		if not node.visible: continue
 		bubble.name.text = L10n.text(str(r.get("name", id)))
 		if bubble_state.is_valid():
@@ -1586,11 +1590,18 @@ func _update_bubbles() -> void:
 		node.position = point + Vector2(-node.size.x * 0.5, 6)
 		bubble.dot.position = point - Vector2(5, 5)
 		bubble.dot.visible = true
+		if bubble_clear_rects.is_valid():
+			var at := Rect2(node.position + global_position, node.size)   # screen px
+			var screen := Rect2(Vector2.ZERO, get_viewport_rect().size)
+			if not screen.encloses(at) or (bubble_clear_rects.call() as Array).any(func(r): return (r as Rect2).intersects(at)):
+				node.visible = false   # the dot stays: the city is still there
 	# A bubble built for an earlier list (another zoom, another camera city) that this one no longer has hides with its
 	# dot; left visible it would stay frozen where it was drawn, over the new city (李元芳 / 司空震, SGODOT-275).
 	for id in bubbles:
-		if not listed.has(id): bubbles[id].node.visible = false
-		if not bubbles[id].node.visible: bubbles[id].dot.visible = false
+		if not listed.has(id):
+			bubbles[id].node.visible = false
+			bubbles[id].dot.visible = false
+		elif not bubbles[id].node.visible and not bubble_clear_rects.is_valid(): bubbles[id].dot.visible = false   # Journey: as before
 
 func _make_bubble(id: String) -> Dictionary:
 	var node := PanelContainer.new()

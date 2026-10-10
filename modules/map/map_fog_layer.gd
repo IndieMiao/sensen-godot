@@ -8,7 +8,9 @@ extends ColorRect
 
 const SHADER := preload("res://modules/map/shaders/map_fog.gdshader")
 const MAX_HOLES := 64
-const FOG := Color(0.62, 0.65, 0.68, 0.42)
+## The design's veil (不知火舞 on 279 6c0377f7): COLOR_SECONDARY at 40 %; the earlier light blue-grey washed out over the
+## pale Mapbox base on the phone. On the device only the opacity is tuned (35–45 %), never the colour.
+const FOG := Color(UiTokens.COLOR_SECONDARY, 0.40)
 
 var holes: Array = []
 var _mat: ShaderMaterial

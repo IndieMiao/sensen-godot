@@ -6,7 +6,7 @@ shader_type canvas_item;
 const int MAX_HOLES = 64;
 uniform vec4 holes[MAX_HOLES];
 uniform int count = 0;
-uniform vec4 fog_color : source_color = vec4(0.62, 0.65, 0.68, 0.42);
+uniform vec4 fog_color : source_color = vec4(0.365, 0.416, 0.384, 0.40);   // MapFogLayer.FOG (#5D6A62 at 40 %)
 uniform float feather = 24.0;
 uniform vec2 size = vec2(360.0, 800.0);
 
