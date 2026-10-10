@@ -30,7 +30,7 @@ func test_each_track_says_its_level_what_is_next_and_its_xp() -> void:
 	assert_array(farming.milestones.map(func(m): return [m.line, m.mark, m.fact])).is_equal([
 		["Lv2 · Carrot, Herb", "done", ""], ["Lv3 · Potato, Chamomile, Compost", "next", "90 XP to go"],
 		["Lv4 · Tomato, Chili, Row Hoe", "locked", ""], ["Lv5 · Cabbage, Corn, Regional seeds", "locked", ""],
-		["Lv6 · Cucumber", "locked", ""], ["Lv7 · Apple Sapling", "locked", ""], ["Lv8 · Strawberry", "locked", ""],
+		["Lv6 · Cucumber, Sprinkler", "locked", ""], ["Lv7 · Apple Sapling", "locked", ""], ["Lv8 · Strawberry", "locked", ""],
 		["Lv9 · Melon, Citrus Sapling, Grapevine Cutting", "locked", ""]])
 	var fishing: Dictionary = d.tracks[1]
 	assert_str(fishing.next).is_equal("Next: River Perch, Largemouth Bass, Rainbow Trout and Worm Bait")   # no coast fish yet

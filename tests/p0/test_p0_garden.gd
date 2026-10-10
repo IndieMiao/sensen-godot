@@ -10,7 +10,37 @@ func test_plot_ids_and_cells_are_a_bijection_on_spaced_beds() -> void:
 		# beds stand two cells apart, so every bed has a walkway beside it
 		assert_int(P0Garden.id_of(c + Vector2i(1, 0))).is_equal(-1)
 		assert_int(P0Garden.id_of(c + Vector2i(0, 1))).is_equal(-1)
-	assert_int(seen.size()).is_equal(30)
+	assert_int(seen.size()).is_equal(40)   # P1: all 40 laid out; the view's garden.plots shows 30 or 40
+
+## P1 (q(59) §1.1): the client grid is the server's (content.garden.plots: the sprinkler's coverage is judged there).
+## 0–29 keep their P0 cells; 30–39 are two columns right of the field, row by row.
+func test_the_garden_grid_matches_the_content_table() -> void:
+	var table: Array = P0Logic.content().garden.plots   # content/farm_garden.json, merged in (SGODOT-275)
+	assert_array(P0Logic.content_errors).is_empty()
+	assert_int(table.size()).is_equal(P0Garden.MAX_PLOTS)
+	for id in table.size():
+		assert_vector(P0Garden.grid_of(id)).override_failure_message("plot %d" % id).is_equal(Vector2i(int(table[id][0]), int(table[id][1])))
+	for id in 30: assert_vector(P0Garden.cell_of(id)).is_equal(P0Garden.PLOT_ORIGIN + Vector2i((id % 6) * 2, (id / 6) * 2))
+	assert_vector(P0Garden.cell_of(30)).is_equal(P0Garden.cell_of(5) + Vector2i(2, 0))
+	assert_vector(P0Garden.cell_of(39)).is_equal(P0Garden.cell_of(29) + Vector2i(4, 0))
+
+## At Homestead Lv1–2 the place of beds 30–39 is plain ground: walking there never steps up onto a bed (哪吒 on #215).
+func test_no_bed_to_step_on_where_the_homestead_has_none_yet() -> void:
+	var bp := P0Garden.blueprint()
+	var at := bp.cell_to_world(P0Garden.cell_of(31))
+	assert_bool(P0Garden.on_bed(bp, at, {"garden": {"plots": 30}})).is_false()
+	assert_bool(P0Garden.on_bed(bp, at, {"garden": {"plots": 40}})).is_true()
+	assert_bool(P0Garden.on_bed(bp, bp.cell_to_world(P0Garden.cell_of(29)), {"garden": {"plots": 30}})).is_true()
+
+## The view's garden.plots decides how many beds the homestead has (30 before Homestead Lv3, 40 from it).
+func test_plot_count_follows_the_view() -> void:
+	assert_int(P0Garden.plot_count({})).is_equal(30)
+	assert_int(P0Garden.plot_count({"garden": {"plots": 40}})).is_equal(40)
+	assert_int(P0Garden.plot_count({"garden": {"plots": 99}})).is_equal(P0Garden.MAX_PLOTS)
+	var view := {"plots": [{"id": 31, "state": "wild"}], "garden": {"plots": 30}}
+	assert_bool(P0Garden.cells(view, 0).is_empty()).is_true()   # a plot the view does not have yet is not drawn
+	view.garden.plots = 40
+	assert_bool(P0Garden.cells(view, 0).has(P0Garden.cell_id(P0Garden.cell_of(31)))).is_true()
 
 func test_beds_can_be_walked_on_but_facilities_and_rocks_block() -> void:
 	# 2026-10-05 device review: crops don't collide; trees (yard edge), rocks and facilities do.

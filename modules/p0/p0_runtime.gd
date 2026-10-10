@@ -542,6 +542,8 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				if str(ev.get("from", "")) == "taught":
 					ui.resident_affinity({"resident": str(ev.get("resident", "")), "delta": 0}, "Let me show you a dish.")
 				ui.toast_success(("Recipe Card · %s" if str(ev.get("from", "")) == "card" else "Learned · %s") % page)
+			"visit":   # Stamp Run checked in (不知火舞 / 李白 on #224): once, after the entry's cover and a keeper's greeting
+				ui.toast_success_when_clear(P0Logic.visit_toast(v, str(ev.get("id", ""))))
 			"title":   # a story request's title (§9.4.4 Trusted)
 				ui.toast_success("New title · %s" % str(ev.get("id", "")))
 			"homestead":
@@ -1244,6 +1246,8 @@ func _dev_shot(dt: float) -> void:
 				session.send(cmd)
 			"drag":   # drag:x:y:dx:dy[:ms[:hold ms]] — a touch at (x, y), held, moved by (dx, dy) over ms, lifted (SGODOT-265)
 				if not _shot_drag_step(step): return
+			"lvbanner":   # lvbanner:<skill>:<level> — that level-up's MomentBanner (review shots, P1 SGODOT-240)
+				ui.show_level_up({"skill": step[1], "level": int(step[2]), "gifts": []})
 			"wait":
 				if _shot_t < 2.0 + float(step[1]): return
 			"until":

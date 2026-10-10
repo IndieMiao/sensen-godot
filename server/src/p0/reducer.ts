@@ -2,7 +2,7 @@
 import { cropById, cropBySeed, rodById, type P0Content } from './content.js';
 import { add, count, room, take } from './bag.js';
 import { burners, collectPot, cookAll, eatDish, startPot, recordHeat, settleStove } from './cooking.js';
-import { boardCommand, settleBoards, tracked } from './boards.js';
+import { boardCommand, noteVisit, settleBoards, tracked } from './boards.js';
 import { moveDecor, placeDecor, storeDecor } from './decor.js';
 import { expireGiftMeals, giftResident, learn, noteSown, residentRequestCommand, talk } from './residents.js';
 import { castLine, reelLine, type FishCommand } from './fishing.js';
@@ -97,6 +97,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
   if (refused) return fail(refused.code, refused.detail);
   notePresence(c, s, cmd.space, now, events, cmd.place);   // before the command: a session gap of ≥ 2 h already counts as having left
   noteEntered(s, cmd.space, cmd.place);
+  noteVisit(s, cmd.space, cmd.place, events);   // a tracked explore request checks in where the player is (§9.6.3)
   settleExplorer(c, s, now, events);   // a stamp counted from today on (2 a day) earns its medal today
   const plotOf = (id: unknown) => (Number.isInteger(id) ? s.plots.find(p => p.id === id) : undefined);
   // P1 (SGODOT-239): a plot with a facility on it is no field — nothing is tilled, sown, fed or harvested there.

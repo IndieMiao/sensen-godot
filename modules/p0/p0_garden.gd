@@ -2,13 +2,17 @@ class_name P0Garden
 extends RefCounted
 ## The P0 homestead garden: the earlier fixed-plot layout (git c3b4204 FarmInterior) — 0.65 m cells,
 ## every plot its own thick soil bed (plot.glb) two cells apart so beds have walkways between them —
-## grown to the 30 plots of plan §14.1.2 (6 columns × 5 rows). Plots and facilities are solid; the
-## player works a bed from the walkway beside it. Pure data: no nodes, unit-tested.
+## grown to the 30 plots of plan §14.1.2 (6 columns × 5 rows), and from Homestead Lv3 to 40 (P1, q(59) §1.1): two more
+## columns on the right, plots 30–39 row by row, the same grid as content.garden.plots (the server's sprinkler coverage).
+## Plots and facilities are solid; the player works a bed from the walkway beside it. Pure data: no nodes, unit-tested.
 
 const CELL_MM := 650
 const GRID := Vector2i(22, 22)
-const COLUMNS := 6
+const COLUMNS := 6                    # P0's field; plots 0–29
 const ROWS := 5
+const EXTRA_COLUMNS := 2              # P1 (q(59)): plots 30–39, right of the field, from Homestead Lv3
+const P0_PLOTS := COLUMNS * ROWS
+const MAX_PLOTS := (COLUMNS + EXTRA_COLUMNS) * ROWS
 const PLOT_ORIGIN := Vector2i(4, 3)   # plot 0 sits nearest the camera, on the left
 const BED_H := 0.15                   # soil bed thickness (plot.glb top), crops grow from here
 
@@ -17,17 +21,20 @@ const BED_H := 0.15                   # soil bed thickness (plot.glb top), crops
 const ANCHORS := {
 	"spawn": Vector2i(9, 1), "exit": Vector2i(9, 0),
 	"house": Vector2i(9, 16), "storage": Vector2i(14, 15),
-	"well": Vector2i(17, 8), "mine": Vector2i(2, 14), "bench": Vector2i(5, 16),
+	"well": Vector2i(15, 13), "mine": Vector2i(2, 14), "bench": Vector2i(5, 16),
 	# SGODOT-231 / q(45): five gathering spots on the farm edge (no Old Tree in P0) and the workbench on the house's
 	# right past the stall (SGODOT-224's rest bench takes the left, Vector2i(5, 16)).
-	"spot_grove": Vector2i(17, 12), "spot_rock_pile": Vector2i(18, 4), "spot_reed_bank": Vector2i(2, 4),
+	# P1 (q(59) §1.1): the two new columns take x 16–18 (rows 3–11) and x 19 straddles the Lv3 fence (12.95 m), so the well
+	# moves to the yard row between the field and the house, the Rock Pile to the back right corner and the Timber Grove
+	# to the front right corner, clear of the beds and of the way to the workbench (不知火舞 checks the places).
+	"spot_grove": Vector2i(16, 1), "spot_rock_pile": Vector2i(18, 13), "spot_reed_bank": Vector2i(2, 4),
 	"spot_clay_bank": Vector2i(2, 7), "spot_herb_patch": Vector2i(3, 17), "workbench": Vector2i(17, 16),
 }
 ## Solid footprints beyond the plots (inclusive rects: x, y, w, h).
 const FOOTPRINTS := {
 	"house": Rect2i(8, 15, 4, 3), "storage": Rect2i(14, 15, 1, 1),
-	"well": Rect2i(17, 8, 1, 1), "mine": Rect2i(1, 13, 2, 2), "bench": Rect2i(5, 16, 2, 1),
-	"spot_grove": Rect2i(17, 12, 1, 1), "spot_rock_pile": Rect2i(18, 4, 1, 1), "spot_reed_bank": Rect2i(2, 4, 1, 1),
+	"well": Rect2i(15, 13, 1, 1), "mine": Rect2i(1, 13, 2, 2), "bench": Rect2i(5, 16, 2, 1),
+	"spot_grove": Rect2i(16, 1, 1, 1), "spot_rock_pile": Rect2i(18, 13, 1, 1), "spot_reed_bank": Rect2i(2, 4, 1, 1),
 	"spot_clay_bank": Rect2i(2, 7, 1, 1), "spot_herb_patch": Rect2i(3, 17, 1, 1), "workbench": Rect2i(16, 16, 3, 1),
 }
 ## Scenery trees stand outside the walkable yard, so they are not footprints.
@@ -35,12 +42,27 @@ const WALK_RECT := Rect2i(1, 0, 19, 20)
 const CROP_CODES := {
 	"crop_radish": "R", "crop_lettuce": "L", "crop_carrot": "C", "crop_chamomile": "H",
 	"crop_herb": "B", "crop_potato": "P", "crop_chili": "I", "crop_tomato": "M",
+	# P1 (SGODOT-240, content/farm_crops.json): placeholder plants from the closest existing one until their own
+	# (q(59) §4: leafy heads, tall stalks, vines; today reuses old models, 275). Fruit trees grow as the old woody crop.
+	"crop_cabbage": "L", "crop_cucumber": "L", "crop_corn": "H", "crop_strawberry": "M", "crop_melon": "M",
+	"crop_pumpkin": "M", "crop_pineapple": "B", "crop_sweet_potato": "P", "crop_beet": "C",
+	"crop_apple": "T", "crop_citrus": "T", "crop_grape": "B",
 }
 
-static func plot_count() -> int: return COLUMNS * ROWS
+## Plots the homestead has now: the view's garden.plots (30, 40 from Homestead Lv3); MAX_PLOTS with no view (the beds,
+## the walk mask and the scenery are laid out for all 40, and the farm shows only the ones the view has).
+static func plot_count(view = null) -> int:
+	if view is Dictionary: return clampi(int((view as Dictionary).get("garden", {}).get("plots", P0_PLOTS)), 0, MAX_PLOTS)
+	return MAX_PLOTS
+
+## [col, row] of a plot on the garden grid: content.garden.plots[id].
+static func grid_of(plot_id: int) -> Vector2i:
+	if plot_id < P0_PLOTS: return Vector2i(plot_id % COLUMNS, plot_id / COLUMNS)
+	var k := plot_id - P0_PLOTS
+	return Vector2i(COLUMNS + k % EXTRA_COLUMNS, k / EXTRA_COLUMNS)
 
 static func cell_of(plot_id: int) -> Vector2i:
-	return PLOT_ORIGIN + Vector2i((plot_id % COLUMNS) * 2, (plot_id / COLUMNS) * 2)
+	return PLOT_ORIGIN + grid_of(plot_id) * 2
 
 ## -1 when the cell is not a plot.
 static func id_of(cell: Vector2i) -> int:
@@ -48,8 +70,10 @@ static func id_of(cell: Vector2i) -> int:
 	if d.x < 0 or d.y < 0 or d.x % 2 != 0 or d.y % 2 != 0: return -1
 	var col := d.x / 2
 	var row := d.y / 2
-	if col >= COLUMNS or row >= ROWS: return -1
-	return row * COLUMNS + col
+	if row >= ROWS: return -1
+	if col < COLUMNS: return row * COLUMNS + col
+	if col < COLUMNS + EXTRA_COLUMNS: return P0_PLOTS + row * EXTRA_COLUMNS + col - COLUMNS
+	return -1
 
 static func cell_id(cell: Vector2i) -> String:
 	return "%d,%d" % [cell.x, cell.y]
@@ -69,6 +93,7 @@ static func blueprint() -> FarmBlueprint:
 	for row in ROWS:
 		var cells: Array = []
 		for col in COLUMNS: cells.append(cell_of(row * COLUMNS + col))
+		for col in EXTRA_COLUMNS: cells.append(cell_of(P0_PLOTS + row * EXTRA_COLUMNS + col))
 		beds.append({"id": "row%d" % row, "cells": cells})
 	bp.anchors["beds"] = beds
 	for key in FarmBlueprint.MASK_NAMES: bp.masks[key] = []
@@ -185,10 +210,12 @@ static func block_points(bp: FarmBlueprint, points: Array) -> void:
 		var row: String = bp.masks.walkable[c.y]
 		bp.masks.walkable[c.y] = row.substr(0, c.x) + "0" + row.substr(c.x + 1)
 
-## True when a world point stands on a bed (the player steps up onto it).
-static func on_bed(bp: FarmBlueprint, p: Vector3) -> bool:
+## True when a world point stands on a bed (the player steps up onto it): one of the beds the view has (哪吒 on #215:
+## at Homestead Lv1–2 the place of 30–39 is plain ground, no step up); no view = any of the 40.
+static func on_bed(bp: FarmBlueprint, p: Vector3, view = null) -> bool:
 	var c := bp.world_to_cell(p)
-	if id_of(c) < 0: return false
+	var id := id_of(c)
+	if id < 0 or id >= plot_count(view): return false
 	var centre := bp.cell_to_world(c)
 	return absf(p.x - centre.x) < 0.47 and absf(p.z - centre.z) < 0.47   # plot.glb is 0.94 m across
 
@@ -206,7 +233,7 @@ static func cells(view: Dictionary, now_ms: int) -> Dictionary:
 	var out := {}
 	for p in view.get("plots", []):
 		var id := int(p.get("id", -1))
-		if id < 0 or id >= plot_count(): continue
+		if id < 0 or id >= plot_count(view): continue
 		var st := str(p.get("state", ""))
 		var crop := str(p.get("crop", "")) if p.get("crop", null) != null else ""
 		var code := str(CROP_CODES.get(crop, ""))

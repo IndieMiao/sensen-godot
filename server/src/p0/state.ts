@@ -69,7 +69,8 @@ export interface Request { id: string; title: string; item: string; qty: number;
 
 /** A drawn system request (§9.6): items are fixed when drawn; coins are paid from what is handed in. */
 export interface BoardRequest {
-  id: string; template: string; items: string[]; rarity?: number; style?: string | string[]; family?: Family; kind: 'crop' | 'fish' | 'dish' | 'material';
+  id: string; template: string; items: string[]; rarity?: number; style?: string | string[]; family?: Family; kind: 'crop' | 'fish' | 'dish' | 'material' | 'visit';
+  visit?: { place: string; done: boolean };   // explore (Stamp Run): the outpost to check in at, and whether the player has
   qty: number; bonus: number; drawn_at: number; status: 'open' | 'accepted';
 }
 /** A board slot: a request, or empty until refill_at. */

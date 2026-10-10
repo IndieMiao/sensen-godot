@@ -426,7 +426,7 @@ static func sow_count(view: Dictionary) -> int:
 	return 1
 
 ## The plots a Row Hoe sows from the bed in front: that bed, then tilled beds next to it in the same row, the
-## walking direction first (dir +1 / −1 along the row), up to sow_count. Plot ids run row by row, `columns` a row.
+## walking direction first (dir +1 / −1 along the row), up to sow_count, along the garden grid's row (P0Garden).
 static func row_plots(view: Dictionary, front: Dictionary, columns: int, dir: int) -> Array:
 	var out: Array = []
 	if front.is_empty() or str(front.get("state", "")) != "tilled": return out
@@ -434,13 +434,16 @@ static func row_plots(view: Dictionary, front: Dictionary, columns: int, dir: in
 	var most := sow_count(view)
 	var by_id := {}
 	for p in view.get("plots", []): by_id[int(p.get("id", -1))] = p
-	var id := int(front.get("id", -1))
-	var row := id / columns
+	# Along the row on the garden grid (P1: plots 30–39 continue P0's rows on the right, so plot 5's neighbour is 30, not
+	# 6 — T15, a Row Hoe sow across the old and new plots). `columns` is P0's row length, kept for callers.
+	var at := P0Garden.grid_of(int(front.get("id", -1)))
 	for side in [dir if dir != 0 else 1, -(dir if dir != 0 else 1)]:
-		var next: int = id + side
-		while out.size() < most and next >= 0 and next / columns == row and by_id.has(next) and str(by_id[next].get("state", "")) == "tilled":
+		var g := at + Vector2i(side, 0)
+		var next := P0Garden.id_of(P0Garden.PLOT_ORIGIN + g * 2)
+		while out.size() < most and next >= 0 and by_id.has(next) and str(by_id[next].get("state", "")) == "tilled":
 			out.append(by_id[next])
-			next += side
+			g += Vector2i(side, 0)
+			next = P0Garden.id_of(P0Garden.PLOT_ORIGIN + g * 2)
 	return out
 
 ## Main action button for the plot in front of the player (Farming).
@@ -937,6 +940,8 @@ const CONVENIENCE_NAMES := {"cook_again": "Cook Again", "clue_double": "Double C
 const LEVEL_TIP := "Levels unlock gear, fish and seeds. Basics never lock."
 ## Levels that change the day say so on the banner's Tip instead of the next level (§4.8.3, q(69)).
 const DAY_CHANGES := {"cooking:4": "Today changes: 3-ingredient dishes", "farming:6": "Today changes: no more watering"}
+## The day-changing level's action (q(59) §1.6): [label, banner action id].
+const DAY_ACTIONS := {"farming:6": ["Show Workbench", "show_workbench"]}
 
 ## The MomentBanner for a skill level-up (§4.8.3 / §4.8.6; ev = the server's {skill, level, energy, gifts}). Fields as
 ## the accepted FARM-LV2 (1368:91797), content and timing as §4.8.6 (不知火舞 233, 10-08):
@@ -973,9 +978,17 @@ static func level_banner(view: Dictionary, ev: Dictionary, first := false) -> Di
 	var detail := ("New recipe: " + ", ".join(recipes)) if not recipes.is_empty() else ""
 	# Tip: the next level, except the account's first (the teaching line) and a level that changes the day (q(69)).
 	var tip := LEVEL_TIP if first else str(DAY_CHANGES.get("%s:%d" % [skill, lv], next_level_line(view, skill, lv)))
+	var action := "Use bait" if first and bait != "" else ""
+	var action_id := "use_bait" if first and bait != "" else ""
+	# Farming Lv6 changes the day with an action (q(59) §1.6): the full banner up to 3 s and `Show Workbench` (the
+	# camera only, LOCK-08). Cooking Lv4's banner keeps its accepted 1.5 s (q(69)).
+	var day := DAY_ACTIONS.has("%s:%d" % [skill, lv])
+	if not first and day:
+		var a: Array = DAY_ACTIONS["%s:%d" % [skill, lv]]
+		action = str(a[0])
+		action_id = str(a[1])
 	return {kind = "level_up", level = str(lv), title = title, subtitle = subtitle, rewards = rewards, detail = detail,
-		tip = tip, action = "Use bait" if first and bait != "" else "", action_id = "use_bait" if first and bait != "" else "",
-		seconds = 3.0 if first else 1.5}
+		tip = tip, action = action, action_id = action_id, seconds = 3.0 if first or day else 1.5}
 
 ## What a skill level opens this season: Farming — the crops of that gate (main ingredients first), then other stall
 ## goods and tools (Compost, Row Hoe); Fishing — the fish of that level; Cooking — the conveniences of that level.
@@ -991,6 +1004,11 @@ static func level_unlocks(view: Dictionary, skill: String, level: int) -> Array:
 				out.append(item_name(view, id))
 			var hoe: Dictionary = content().get("tools", {}).get("row_hoe", {})
 			if int(hoe.get("gate", 0)) == level: out.append(item_name(view, str(hoe.get("id", ""))))
+			# P1 facilities a level opens at the workbench (q(59) §1.6: `New for you · Cucumber, Sprinkler`)
+			for r in content().get("workbench", {}).get("recipes", []):
+				var gate: Array = r.get("gate", [])
+				if str(r.get("to", "")) == "field" and gate.size() == 2 and str(gate[0]) == "farming" and int(gate[1]) == level:
+					out.append(str(content().get("facilities", {}).get("kinds", {}).get(str(r.get("facility", "")), {}).get("name", r.get("id", ""))))
 		"fishing":
 			# The fish, then gear and goods the level opens (Worm Bait at Lv2, the Reed Rod at Lv3), then `Regional fish`
 			# last, as §14 writes it (`Next Lv3 · Reed Rod, Regional fish`).
@@ -1268,6 +1286,14 @@ static func resident_bar(view: Dictionary, id: String) -> Dictionary:
 		# §7.5.3 Taught: Recipe lesson shows only when one is ready now; the server picks the page.
 		"lesson": str(r.get("lesson", {}).get("state", "none")) == "ready" if r.get("lesson", null) is Dictionary else false,
 	}
+
+## Stamp Run's check-in toast (不知火舞 / 李白 on #224): `Stamp Run · Checked in` over `Deliver at Mission Market Square`
+## (where its board takes it, as request_of writes it, the pin that lights ✓). Two lines always, as the spec has them.
+static func visit_toast(view: Dictionary, id: String) -> String:
+	var r := PinReason.request_of(view, id)
+	var title := str(r.get("title", "Stamp Run")) if not r.is_empty() else "Stamp Run"
+	var deliver := str(r.get("deliver", "")) if not r.is_empty() else ""
+	return "%s · Checked in" % title + ("\n" + deliver if deliver != "" else "")
 
 ## A resident's favourite as words (§7.16.3): a style stays as it is (`Dessert`); a rarity and up reads
 ## `Fine dishes and up` (Hana; Mira and Tomo `Rare dishes and up`).

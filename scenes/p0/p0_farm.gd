@@ -49,6 +49,7 @@ var _stall := Vector3.ZERO   # the Homestead Stall (unattended, p(6)); the seed 
 var _mine := Vector3.ZERO
 var _bench := Vector3.ZERO   # the rest bench by the farmhouse (FARM-7, q(30)): Basic Room's bench.glb
 var _materials: P0FarmMaterials   # SGODOT-231: mine mouth, gathering spots and the workbench
+var _facilities: P0FarmFacilities   # P1 SGODOT-241: sprinklers, placement mode, Coverage
 var _card := ""   # LOCK-07 v2: the one facility whose name strip is open this frame (P0Garden.pick_card)
 var _strip_side := UiWorldNameBar.Dir.RIGHT   # the side the strip opens to: the way the character faces on screen
 var _focus := Vector3.ZERO
@@ -207,6 +208,7 @@ func _build_world() -> void:
 		xfs.append(Transform3D(Basis.IDENTITY, bp.cell_to_world(P0Garden.cell_of(id))))
 		tints.append(Color.WHITE)
 	beds = FarmArt.batch("plot", xfs, true, tints)
+	beds.multimesh.visible_instance_count = P0Garden.P0_PLOTS   # all 40 laid out; the view's garden.plots shows them
 	beds.name = "Beds"
 	add_child(beds)
 	crops = CropField.new(bp)
@@ -220,7 +222,10 @@ func _build_world() -> void:
 	actor = P0Actor.new()
 	add_child(actor)
 	actor.setup(bp, grid, cam)
-	actor.ground_height = func(p: Vector3) -> float: return P0Garden.BED_H if P0Garden.on_bed(bp, p) else 0.0
+	# The beds the homestead has (garden.plots, 30 or 40): read from the session's last view, never current() — that
+	# copies the whole view, and this runs every frame (亚瑟 on #215; the map's heat in 260 was the same copy).
+	actor.ground_height = func(p: Vector3) -> float:
+		return P0Garden.BED_H if P0Garden.on_bed(bp, p, rt.session.view if rt != null and rt.session != null else null) else 0.0
 	# Opening shot like the polished farm: cottage on top, beds below, the player at the front edge.
 	_focus = actor.position.lerp(_house, 0.42)
 	_cam_follow.hold()   # the opening shot stays until the player first moves
@@ -320,7 +325,13 @@ static func opening_shift(mark_y: float, feet_y: float, area: Rect2) -> float:
 
 func _follow(dt: float) -> void:
 	_fit_opening()
-	_focus = _cam_follow.step(cam, _focus, actor.position, actor.mover.is_moving(), dt)
+	if _fly_left > 0.0:   # placement's 0.3 s camera moves (不知火舞 on 241)
+		_fly_left = maxf(0.0, _fly_left - dt)
+		var k := smoothstep(0.0, 1.0, 1.0 - _fly_left / PLACE_FLY_S)
+		_focus = _fly_from.lerp(_fly_to if _fly_to != Vector3.INF else Vector3(actor.position.x, _focus.y, actor.position.z), k)
+		if _fly_left == 0.0 and _fly_to == Vector3.INF: _cam_follow.held = false   # back to following the player
+	elif _placing_cam: _focus = _yard_clamp(_focus)   # placement: the camera is the player's to pan, in the yard
+	else: _focus = _cam_follow.step(cam, _focus, actor.position, actor.mover.is_moving(), dt)
 	if _pinch.step(dt): _set_zoom(_pinch.value)   # springing back from past a limit, about the same point
 	else: _place_camera()
 
@@ -334,6 +345,49 @@ func _set_zoom(value: float) -> void:
 	if d != Vector3.ZERO:
 		_focus += d
 		_place_camera()
+
+# ---------------------------------------------------------------- placement camera (SGODOT-241, 不知火舞 on 241)
+## Entering: the camera holds; if the spot is off screen it moves there in 0.3 s first. Panning: edge pan and two
+## fingers move the focus, inside the yard (the Lv3 fence plus one cell). Leaving: back to following in 0.3 s.
+const PLACE_FLY_S := 0.3
+var _placing_cam := false
+var _fly_left := 0.0
+var _fly_from := Vector3.ZERO
+var _fly_to := Vector3.INF   # INF: fly back to the player
+
+func placement_camera_begin(spot: Vector3) -> void:
+	_placing_cam = true
+	_opening = false
+	_cam_follow.hold()
+	var screen := cam.unproject_position(spot)
+	if not get_viewport().get_visible_rect().grow(-48.0).has_point(screen) or cam.is_position_behind(spot):
+		_fly(Vector3(spot.x, _focus.y, spot.z))
+
+func placement_camera_end() -> void:
+	if not _placing_cam: return
+	_placing_cam = false
+	_fly(Vector3.INF)
+
+func _fly(to: Vector3) -> void:
+	_fly_from = _focus
+	_fly_to = to
+	_fly_left = PLACE_FLY_S
+
+## Move the focus by a ground delta (edge pan, two-finger pan), kept in the yard.
+func placement_pan(d: Vector3) -> void:
+	if not _placing_cam or _fly_left > 0.0: return
+	_focus = _yard_clamp(_focus + Vector3(d.x, 0, d.z))
+
+## The ground shift that moves the picture by `px` on screen (a two-finger drag): the ground under the old point.
+func placement_drag(px: Vector2, at: Vector2) -> void:
+	var a = ElasticZoom.ground_at(cam, at, _focus.y)
+	var b = ElasticZoom.ground_at(cam, at + px, _focus.y)
+	if a is Vector3 and b is Vector3: placement_pan(a - b)
+
+func _yard_clamp(f: Vector3) -> Vector3:
+	var r := P0Garden.FENCE_RING
+	var pad := bp.cell_m
+	return Vector3(clampf(f.x, r.west - pad, r.east + pad), f.y, clampf(f.z, r.back - pad, r.front + pad))
 
 func p0_zoom(f: float, at := Vector2.INF) -> void:
 	_opening = false
@@ -383,6 +437,11 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 	rt.ui.player_screen = cam.unproject_position(actor.position + Vector3(0, 0.9, 0))   # the radial fans out from here
 	_sync_plots(v, dt)
 	_fence.sync(v)
+	if _facilities == null and bp != null and cam != null and actor != null:
+		_facilities = P0FarmFacilities.new().setup(self)
+		add_child(_facilities)
+	_facilities.frame(v, dt)
+	if not _facilities.placing.is_empty(): return   # placement mode: no bed, key, card or prompt (q(23))
 	_pick_front(v)
 	# The key is Farming here even at the mine mouth: the mouth is tapped like any facility (SGODOT-266, user on 263 ③).
 	rt.ui.set_action(P0Logic.main_action(v, _front, rt.ui.selected_seed, _row))
@@ -407,20 +466,26 @@ func _sync_plots(v: Dictionary, dt: float) -> void:
 	crops.sync(P0Garden.cells(v, now), now)
 	for p in v.get("plots", []):
 		var id := int(p.get("id", -1))
-		if id >= 0 and id < P0Garden.plot_count(): beds.multimesh.set_instance_color(id, P0Garden.bed_tint(str(p.get("state", ""))))
+		if id >= 0 and id < P0Garden.plot_count(v): beds.multimesh.set_instance_color(id, P0Garden.bed_tint(str(p.get("state", ""))))
+	# P1 (q(59) §1.1): beds 30–39 stand from Homestead Lv3 (the view's garden.plots); before that the batch draws 30.
+	beds.multimesh.visible_instance_count = P0Garden.plot_count(v)
 
 ## Middle of the plot beds, for camera-only "Show" from the Today panel and NeedSource (LOCK-08).
 func _plots_center() -> Vector3:
 	var sum := Vector3.ZERO
-	for id in P0Garden.plot_count(): sum += bp.cell_to_world(P0Garden.cell_of(id))
-	return sum / maxf(1.0, float(P0Garden.plot_count()))
+	var n := P0Garden.plot_count(rt.session.view if rt != null and rt.session != null else null)
+	for id in n: sum += bp.cell_to_world(P0Garden.cell_of(id))
+	return sum / maxf(1.0, float(n))
 
 ## The bed the player faces from the walkway: nearest bed ahead within reach.
 func _pick_front(v: Dictionary) -> void:
 	var best := -1
 	var best_score := -INF
 	var f := actor.facing()
-	for id in P0Garden.plot_count():
+	var taken := {}   # P1: a plot with a facility is no bed to work (the key shows no farming verb there)
+	for p in v.get("plots", []): if p.get("facility", null) != null: taken[int(p.id)] = true
+	for id in P0Garden.plot_count(v):
+		if taken.has(id): continue
 		var c := bp.cell_to_world(P0Garden.cell_of(id))
 		var to := Vector2(c.x - actor.position.x, c.z - actor.position.z)
 		var dist := to.length()
@@ -495,6 +560,7 @@ func p0_tap(screen: Vector2) -> void:
 	if card == "" and _materials.tap_entry(screen): return
 	if card != "": _materials.close_card()
 	if _tap_card(card): return
+	if _facilities != null and _facilities.tap(screen): return   # P1: a sprinkler's status card (SGODOT-241)
 	if _sign_hit(screen):
 		actor.face(_sign)
 		HomePanel.open(rt.ui)
@@ -669,6 +735,15 @@ func p0_dev(step: PackedStringArray) -> bool:
 			var e: UiEntryCard = _materials._entry if _materials.card_open() else null
 			if e != null: p0_tap((e.main_rect() if step[0] == "cardtap" else e.second_rect()).get_center() - rt.ui.root.global_position)
 		"zoomto": _zoom = clampf(float(step[1]), 0.8, 1.4)   # zoomto:0.8 (widest) … 1.4 (closest)
+		# P1 placement (SGODOT-241): build:<recipe> opens it as the Facilities card's Build does; placeat:<plot> moves
+		# the preview as a finger on that bed would; placeok / placecancel press the bar; factap:<id> taps a sprinkler.
+		"build": _facilities.begin_build(step[1] if step.size() > 1 else "craft_sprinkler")
+		"placeat": rt.ui.placement_point.emit(cam.unproject_position(bp.cell_to_world(P0Garden.cell_of(int(step[1]))) + Vector3(0, P0Garden.BED_H, 0)), "drag")
+		"placeok": rt.ui.placement_done.emit(true)
+		"placecancel": rt.ui.placement_done.emit(false)
+		"factap":
+			for f in rt.session.current().get("facilities", []):
+				if int(f.get("id", 0)) == int(step[1]): _facilities.open_card(f)
 		"near":   # near:<id> — stand 1.2 m in front of a facility, so its name strip opens (250 review shots)
 			for c in _card_candidates():
 				if str(c[0]) == step[1]:
