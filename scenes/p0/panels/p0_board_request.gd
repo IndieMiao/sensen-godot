@@ -23,6 +23,11 @@ static func open(ui: P0Ui, role: String, id: String) -> void:
 	var back := func(): ui.open_counter(role, {"section": "board"})
 	var col := _sheet(ui, "board_request", "Back", back)
 	col.add_child(UiObjectHeader.new({title = d.title, state = d.state, effect = d.effect}))
+	if str(d.get("example", "")) != "":   # Far Pond (q(128)): the fish to try, nearest first, at the player's level now
+		var example := UiKit.label(str(d.example), UiTokens.STYLE_CAPTION_R12, UiTokens.COLOR_SECONDARY)
+		example.name = "Example"
+		example.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		col.add_child(example)
 	var tiles: Array = []
 	for n in d.needs:
 		var tile := UiNeedTile.new(str(n.name), int(n.have), int(n.need), UiNeedTile.Size.S, n.icon)

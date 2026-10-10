@@ -1,17 +1,17 @@
 /**
  * Cross-city requests (q(128), 李白; SGODOT-284): Tea Trail / Postcard Trip / New Climate send the player to an outpost
  * in another city — checked in on entering, handed in at the home Market Board, the check-in counting that city's
- * Deliveries — and Far Pond takes the kinds of fish landed in another city after it was taken.
+ * Deliveries — and Far Pond takes fish the home city's ponds don't have, as the bag holds them.
  */
 import Fastify from 'fastify';
 import { describe, expect, it } from 'vitest';
 import { loadP0Content, type P0Content } from '../../src/p0/content.js';
 import { applyP0, type P0Command, type P0Result } from '../../src/p0/reducer.js';
-import type { P0Event } from '../../src/p0/progress.js';
 import { registerP0Routes } from '../../src/p0/routes.js';
 import { freshState, type P0State } from '../../src/p0/state.js';
 import { P0Store } from '../../src/p0/store.js';
-import { settleBoards, crossCities, noteCatchAbroad, handIn } from '../../src/p0/boards.js';
+import { settleBoards, crossCities, farFish, farTries, handIn } from '../../src/p0/boards.js';
+import { floorPrice } from '../../src/p0/requests.js';
 import { clusterById, clusterOf, rankedCities, tripOf } from '../../src/p0/travel.js';
 import { cityPlaces } from '../../src/p0/world.js';
 import { viewOf } from '../../src/p0/view.js';
@@ -131,102 +131,74 @@ describe('the check-in and the hand-in', () => {
   });
 });
 
-describe('Far Pond (q(128))', () => {
-  const landAt = (c: P0Content, s: P0State, space: string, place: string, at: number): { s: P0State; fish: string; progress: number[] } => {
-    s = step(c, s, { type: 'cast', space, place }, at).state;
-    s.cast!.breaks = null;
-    const fish = s.cast!.fish;
-    const r = step(c, s, { type: 'reel', outcome: 'landed', space, place }, s.cast!.at + s.cast!.bite_ms + 1);
-    const progress = r.events.filter(e => e.kind === 'request_progress').map(e => (e as { have: number }).have);
-    return { s: r.state, fish, progress };
-  };
+describe('Far Pond (q(128) 甲)', () => {
+  const slot = (c: P0Content, s: P0State) => viewOf(c, s, T).boards.market.slots[0] as { have: number; coins: number; tries?: string[]; where: string };
 
-  it('takes only the kinds landed in another city after it was taken', () => {
+  it('takes the fish the home city\'s ponds don\'t have — what is in the bag, wherever it was caught', () => {
     const c = only('req_sys_explore_pond');
-    const tokyoPond = `${TOKYO}~pond0`;
-    c.fishing.places[tokyoPond] = { ...c.fishing.places.pond_san_francisco_03, city: 'tokyo' } as never;
     let s = fresh(c);
-    s.energy.value = 100;
-    const r = req(s);
-    expect(r).toMatchObject({ kind: 'fish', where: 'other_city', abroad: [], items: [] });
-    // landed at home before and after taking it: none count
-    let home = landAt(c, s, 'pond', 'pond_san_francisco_03', T + 1000);
-    s = step(c, home.s, { type: 'accept', request: r.id }, T + 2000).state;
-    home = landAt(c, s, 'pond', 'pond_san_francisco_03', T + 3000);
-    s = home.s;
-    expect(req(s).abroad).toEqual([]);
-    expect(home.progress).toEqual([]);   // nothing to say at home
-    expect(handIn(c, s, req(s))).toBeNull();
-    expect((viewOf(c, s, T + 4000).boards.market.slots[0] as { have: number }).have).toBe(0);
-    // in Tokyo: each landed kind is noted; the hand-in takes those kinds, at floor + 20
-    s = step(c, s, { type: 'travel', to: TOKYO }, T + 5000).state;
-    let at = T + 6000;
-    const said: number[] = [];
-    while ((viewOf(c, s, at).boards.market.slots[0] as { have: number }).have < req(s).qty) {
-      const got = landAt(c, s, 'pond', tokyoPond, at);
-      s = got.s;
-      expect(req(s).abroad).toContain(got.fish);
-      said.push(...got.progress);
-      at += 60_000;
-    }
-    // each fish it took said the count (`Far Pond 2/3`), rising, the last one the full count (the client toasts that one);
-    // a kind already in the bag from home counts at once (q(128) ③: the bag keeps no water)
-    expect(said.length).toBeGreaterThan(0);
-    expect(said.every((n, i) => i === 0 || n > said[i - 1])).toBe(true);
-    expect(said.at(-1)).toBe(req(s).qty);
+    const r = req(s), qty = r.qty;
+    expect(r).toMatchObject({ kind: 'fish', where: 'not_home', items: [] });
+    expect(r).not.toHaveProperty('abroad');
+    // San Francisco: other cities' regional fish; not its own 2 (Arctic Char, Salmon), nor what its 6 ponds give — Clover
+    // Pond is a Coast pond, so Grey Mullet and Mackerel are home fish
+    const far = farFish(c);
+    expect(far).toEqual(expect.arrayContaining(['fish_tilapia', 'fish_smelt']));
+    for (const id of ['fish_crucian', 'fish_mullet', 'fish_mackerel', 'fish_seabass', 'fish_arctic_char', 'fish_salmon']) expect(far).not.toContain(id);
+    // the card estimates at the cheapest of them (Tilapia / Smelt, floor 3): 3 × 3 + 20 = 29 for three
+    const cheapest = Math.min(...far.map(id => floorPrice(c, id)));
+    expect(cheapest).toBe(3);
+    expect(slot(c, s).coins).toBe(qty * cheapest + 20);
+    s.bag.push({ id: 'fish_crucian', qty: 9 }, { id: 'fish_mullet', qty: 4 });
+    expect(slot(c, s).have).toBe(0);
+    expect(handIn(c, s, r)).toBeNull();
+    s = step(c, s, { type: 'accept', request: r.id }).state;
+    // caught anywhere, collected from a trap, or before it was taken: the bag is what counts
+    s.bag.push({ id: 'fish_smelt', qty: qty - 1 });
+    expect(slot(c, s).have).toBe(qty - 1);
+    expect(run(c, s, { type: 'deliver', request: r.id })).toMatchObject({ ok: false, code: 'not_enough', detail: { need: qty, have: qty - 1 } });
+    s.bag.push({ id: 'fish_tilapia', qty: 2 });
+    expect(slot(c, s).have).toBe(qty);
+    // sold or eaten, the count goes down with it
+    const less = structuredClone(s);
+    less.bag = less.bag.filter(b => b.id !== 'fish_tilapia');
+    expect(slot(c, less).have).toBe(qty - 1);
+    // the hand-in takes those kinds only, cheapest first, at floor + 20; no city's Deliveries count it
+    const visits = structuredClone(s.travel.visits);
     const parts = handIn(c, s, req(s))!;
-    expect(parts.every(([id]) => req(s).abroad!.includes(id))).toBe(true);
-    s = step(c, s, { type: 'travel', to: SF }, at).state;
-    const done = step(c, s, { type: 'deliver', request: r.id }, at + 1000);
-    expect(done.events).toContainEqual(expect.objectContaining({ kind: 'request', id: r.id, status: 'done' }));
+    expect(parts.every(([id]) => far.includes(id))).toBe(true);
+    const done = step(c, s, { type: 'deliver', request: r.id });
+    const floor = parts.reduce((n, [id, k]) => n + floorPrice(c, id) * k, 0);
+    expect(done.events).toContainEqual(expect.objectContaining({ kind: 'request', id: r.id, status: 'done', coins: floor + 20 }));
+    expect(done.state.bag.filter(b => b.id === 'fish_crucian' || b.id === 'fish_mullet').reduce((n, b) => n + b.qty, 0)).toBe(13);
+    expect(done.state.travel.visits).toEqual(visits);
   });
 
-  it('a request not taken notes nothing; a place in the home city is home', () => {
+  it('is drawn only when one is landable within Trip 3 at the player\'s Fishing level; that list is its example line', () => {
     const c = only('req_sys_explore_pond');
     const s = fresh(c);
-    noteCatchAbroad(c, s, 'fish_crucian', `${TOKYO}~pond0`, []);
-    expect(req(s).abroad).toEqual([]);
-    req(s).status = 'accepted';
-    noteCatchAbroad(c, s, 'fish_crucian', 'pond_san_francisco_03', []);
-    noteCatchAbroad(c, s, 'fish_crucian', undefined, []);
-    expect(req(s).abroad).toEqual([]);
-    noteCatchAbroad(c, s, 'fish_crucian', `${TOKYO}~pond0`, []);
-    noteCatchAbroad(c, s, 'fish_crucian', `${TOKYO}~pond0`, []);
-    expect(req(s).abroad).toEqual(['fish_crucian']);
+    const tries = farTries(c, s), far = farFish(c);
+    expect(tries.length).toBeGreaterThanOrEqual(1);
+    expect(tries.length).toBeLessThanOrEqual(3);
+    for (const id of tries) {
+      expect(far).toContain(id);
+      expect(c.fish.find(f => f.id === id)!.level).toBeLessThanOrEqual(1);
+    }
+    expect(slot(c, s).tries).toEqual(tries);   // the view sends it with the card, at the level now
+    // a higher level opens more (Grass Carp, Fishing Lv3): the list follows the level, each one cached
+    const higher = structuredClone(s);
+    higher.skills.fishing = 100_000;
+    expect(farTries(c, higher).some(id => c.fish.find(f => f.id === id)!.level > 1)).toBe(true);
+    expect(farTries(c, s)).toBe(tries);
+    // nothing landable at this level within Trip 3: no Far Pond on the board
+    const none = only('req_sys_explore_pond');
+    for (const f of none.fish) if (farFish(none).includes(f.id)) f.level = 11;
+    const blank = fresh(none);
+    expect(farTries(none, blank)).toEqual([]);
+    expect(blank.boards.market[0].req).toBeNull();
   });
 
-  it('a trap\'s catch there counts too (李白 c2421353): one progress event for the kind, while it was short', () => {
-    const c = only('req_sys_explore_pond');
-    const s = fresh(c);
-    req(s).status = 'accepted';
-    const qty = req(s).qty;
-    s.bag.push({ id: 'fish_crucian', qty: 2 });   // collected: in the bag first
-    const ev: P0Event[] = [];
-    noteCatchAbroad(c, s, 'fish_crucian', `${TOKYO}~pond0`, ev, 2);
-    expect(ev).toEqual([{ kind: 'request_progress', id: req(s).id, have: Math.min(2, qty), qty }]);
-    s.bag.push({ id: 'fish_crucian', qty: 5 });
-    const late: P0Event[] = [];
-    noteCatchAbroad(c, s, 'fish_crucian', `${TOKYO}~pond0`, late, 5);   // short before these five: still said
-    expect(late).toEqual([{ kind: 'request_progress', id: req(s).id, have: qty, qty }]);
-    const more: P0Event[] = [];
-    s.bag.push({ id: 'fish_crucian', qty: 1 });
-    noteCatchAbroad(c, s, 'fish_crucian', `${TOKYO}~pond0`, more, 1);   // already full: nothing more to say
-    expect(more).toEqual([]);
-  });
-
-  it('a kind new to it brings its fish from home in at once, and says so (周瑜 on #285)', () => {
-    const c = only('req_sys_explore_pond');
-    const s = fresh(c);
-    req(s).status = 'accepted';
-    const qty = req(s).qty;
-    s.bag.push({ id: 'fish_crucian', qty: qty });   // caught at home before
-    s.bag.push({ id: 'fish_crucian', qty: 1 });     // and one landed in Tokyo
-    const ev: P0Event[] = [];
-    noteCatchAbroad(c, s, 'fish_crucian', `${TOKYO}~pond0`, ev);
-    expect(ev).toEqual([{ kind: 'request_progress', id: req(s).id, have: qty, qty }]);   // 0 → full: the toast
-  });
-
-  it('no pin on a home pond for it (any pond elsewhere)', () => {
+  it('no pin on a pond for it (a pond in another city, the player\'s choice)', () => {
     const c = only('req_sys_explore_pond');
     const s = fresh(c);
     req(s).status = 'accepted';

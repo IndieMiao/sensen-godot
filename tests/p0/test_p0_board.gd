@@ -334,22 +334,36 @@ func test_p1_cross_city_card_and_today_say_where() -> void:
 	assert_bool(cut.ends_with("… · Shanghai")).is_true()
 	assert_str(P0Board.place_line("Lotus Tea House", "Shanghai")).is_equal("Lotus Tea House · Shanghai")
 
-## Far Pond (q(128)): fish landed outside the home city; the count is the server's (only the kinds caught there).
-func test_p1_far_pond_reads_outside_home() -> void:
+## Far Pond (q(128) 甲): fish the home city's ponds don't have, as the bag holds them; the count and the fish to try are
+## the server's.
+func test_p1_far_pond_reads_not_found_at_home() -> void:
 	var v := _view()
+	v.names.merge({"fish_tilapia": "Tilapia", "fish_smelt": "Smelt", "fish_mullet": "Grey Mullet"})
 	v.boards.market.slots = [{"id": "f1", "title": "Far Pond", "kind": "fish", "items": [], "rarity": null, "style": null,
-		"family": null, "where": "other_city", "visit": null, "icon": "fish_crucian", "qty": 3, "have": 1, "ready": false,
-		"coins": 50, "status": "accepted"}]
+		"family": null, "where": "not_home", "visit": null, "icon": "fish_tilapia", "qty": 3, "have": 1, "ready": false,
+		"coins": 29, "status": "accepted", "tries": ["fish_tilapia", "fish_smelt", "fish_mullet"]}]
 	var row: Dictionary = P0Board.cards(v, "market")[0]
-	assert_array(row.facts).is_equal(["3 fish · outside San Francisco"])
-	assert_object(row.get("fact_icon", null)).is_not_null()
+	assert_array(row.facts).is_equal(["3 fish not found in San Francisco"])
+	assert_object(row.get("fact_icon", null)).is_same(P0Logic.icon("fish"))
+	assert_str(str(row.reward)).is_equal("29 coins")
 	assert_array(row.needs.map(func(n): return [n.have, n.need])).is_equal([[1, 3]])
 	assert_str(str(row.reason)).is_equal("Need 2 more fish")
 	var d := P0Board.detail(v, "market", "f1")
-	assert_str(str(d.effect)).is_equal("Catch 3 fish outside San Francisco, then bring them to any San Francisco market.")
+	assert_str(str(d.effect)).is_equal("Bring 3 fish that San Francisco's ponds don't have to any San Francisco market.")
+	assert_str(str(d.example)).is_equal("Try Tilapia, Smelt or Grey Mullet")
 	assert_str(str(d.go)).is_equal("map")
 	var r := P0Logic._request_row(v, P0Logic.PinReason.taken(v)[0])
 	assert_array([r.line, r.go]).is_equal(["Far Pond · 1/3 fish", ""])
+	# two to try, one, none (the server names them at the level now)
+	v.boards.market.slots[0].tries = ["fish_smelt", "fish_tilapia"]
+	assert_str(P0Board.far_tries(v, v.boards.market.slots[0])).is_equal("Try Smelt or Tilapia")
+	v.boards.market.slots[0].tries = ["fish_smelt"]
+	assert_str(P0Board.far_tries(v, v.boards.market.slots[0])).is_equal("Try Smelt")
+	v.boards.market.slots[0].tries = []
+	assert_str(str(P0Board.detail(v, "market", "f1").example)).is_equal("")
+	# any other request has no example line
+	v.boards.market.slots[0].where = null
+	assert_str(str(P0Board.detail(v, "market", "f1").example)).is_equal("")
 
 ## The board card's place line: the icon in front of the first fact only when the row has one (q(128)).
 func test_p1_board_card_fact_icon() -> void:
@@ -361,15 +375,3 @@ func test_p1_board_card_fact_icon() -> void:
 	card.show_request({"id": "m1", "title": "Dusk Haul", "status": "Open", "facts": ["4 Fine fish · any kind"], "reward": "36 coins",
 		"needs": [], "command": "Track", "reason": ""})
 	assert_object(card.find_child("FactIcon", true, false)).is_null()
-
-## Far Pond counts a fish (q(128): landed or from a trap in another city): `Far Pond 2/3` floats while it is short, the
-## one that completes it toasts where to hand it in, as a pond's request does.
-func test_p1_far_pond_progress_is_said_like_a_pond_request() -> void:
-	var v := _view()
-	v.boards.market.slots = [{"id": "f1", "title": "Far Pond", "kind": "fish", "items": [], "rarity": null, "style": null,
-		"family": null, "where": "other_city", "visit": null, "icon": "fish_crucian", "qty": 3, "have": 2, "ready": false,
-		"coins": 50, "status": "accepted"}]
-	assert_dict(P0Runtime.progress_said(v, {"kind": "request_progress", "id": "f1", "have": 2, "qty": 3})).is_equal({"float": "Far Pond 2/3"})
-	assert_dict(P0Runtime.progress_said(v, {"kind": "request_progress", "id": "f1", "have": 3, "qty": 3})) \
-		.is_equal({"toast": "Far Pond · 3/3 · Deliver at Mission Market Square"})
-	assert_dict(P0Runtime.progress_said(v, {"kind": "request_progress", "id": "gone", "have": 1, "qty": 3})).is_empty()

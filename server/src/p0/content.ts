@@ -89,8 +89,8 @@ export interface Need {
    * or, cross-city (q(128), SGODOT-284), at the first `role` outpost (a small city's Trading Post) of a city of one of
    * the `trip` tiers (Tea Trail 1–2, Postcard Trip 2–3), or of the nearest city in another climate zone (New Climate). */
   visit?: { role?: 'market' | 'tea'; where: 'same_city' | 'other_city' | 'other_zone'; trip?: [number, number] };
-  /** Far Pond (q(128)): fish caught in another city after the request is taken. */
-  where?: 'other_city';
+  /** Far Pond (q(128)): fish the home city's ponds don't have, wherever they were caught (boards.ts farFish). */
+  where?: 'not_home';
 }
 /**
  * A system request template (§9.6.3). climate narrows it to the home climate (regional templates, `Temperate`);

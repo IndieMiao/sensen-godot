@@ -8,7 +8,7 @@ import { sellPrice, stallOffer } from './reducer.js';
 import { blessed, dayKey, foodCap, maxEnergy, nextTickIn, regenMs, settleEnergy, skillLevel, untilRollover } from './rules.js';
 import { emptyDay, type P0State } from './state.js';
 import { catalog, drinkPrice, offerOf, owns, quotaKey, quotaScope, regionalOf, walletNeed } from './shops.js';
-import { BOARDS, handIn, haveForRequest, heldSlot, lockedTemplate, payout, settleBoards, slotCount } from './boards.js';
+import { BOARDS, farFish, farTries, handIn, haveForRequest, heldSlot, lockedTemplate, payout, settleBoards, slotCount } from './boards.js';
 import { expireGiftMeals, lessonState, progressOf, requestOpensIn, requestState, residentState, stageIndex } from './residents.js';
 import { floorPrice, haveFor, matches } from './requests.js';
 import type { BoardRequest, Pot } from './state.js';
@@ -343,6 +343,7 @@ function shopView(c: P0Content, s: P0State, shop: ShopId) {
 /** Ids a request could take, cheapest floor first: the fixed items, or every crop / fish / dish that fits its kind and rarity. */
 function candidates(c: P0Content, r: BoardRequest): string[] {
   if (r.items.length || r.kind === 'visit') return r.items;
+  if (r.where === 'not_home') return [...farFish(c)].sort((a, b) => floorPrice(c, a) - floorPrice(c, b));   // Far Pond: q(128) estimates at the cheapest
   const ids = r.kind === 'fish' ? c.fish.map(f => f.id) : r.kind === 'dish' ? c.cooking.recipes.map(x => x.id) : c.crops.map(x => x.id);
   return ids.filter(id => matches(c, { kind: r.kind, rarity: r.rarity, style: r.style, family: r.family }, [], id)).sort((a, b) => floorPrice(c, a) - floorPrice(c, b));
 }
@@ -375,7 +376,8 @@ function requestView(c: P0Content, s: P0State, r: BoardRequest, now: number) {
     // P1: dishes of a style (`Soup`, or several), crops of a family (`O`); the client names them
     style: r.style === undefined ? null : Array.isArray(r.style) ? r.style : [r.style], family: r.family ?? null,
     visit: visitView(c, s, r),   // explore: {place: outpost id, done}; in another city also its name, city and point
-    where: r.where ?? null,     // Far Pond (q(128)): `other_city`, fish caught outside the home city since it was taken
+    where: r.where ?? null,     // Far Pond (q(128)): `not_home`, fish the home city's ponds don't have
+    ...(r.where === 'not_home' ? { tries: farTries(c, s) } : {}),   // its example line, at the player's level now
     qty: r.qty, have: Math.min(each, r.qty), ready: parts !== null,
     coins: estimate.base + estimate.bonus, base: estimate.base, bonus: estimate.bonus,
     status: r.status,

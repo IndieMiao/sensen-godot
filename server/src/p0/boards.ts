@@ -6,7 +6,7 @@
  * stream seeded by player, board, slot and time, so they never shift the fishing or cooking rolls.
  */
 import { dishParts, type BoardId, type Need, type P0Content, type RequestTemplate } from './content.js';
-import { pondFishIds } from './fishing_world.js';
+import { everFish, pondCity, pondFishIds, regionalFish as pondRegional } from './fishing_world.js';
 import type { Refusal } from './fishing.js';
 import { boardSlots } from './homestead.js';
 import type { P0Event } from './progress.js';
@@ -14,8 +14,8 @@ import { handOver, haveFor, floorPrice, noteDone, payBonus, pick, rarityOf } fro
 import { skillLevel, untilRollover } from './rules.js';
 import { catalog } from './shops.js';
 import type { BoardRequest, BoardSlot, P0State } from './state.js';
-import { clusterById, clusterOf, noteDelivery, rankedCities } from './travel.js';
-import { cityPlaces } from './world.js';
+import { clusterById, clusterOf, homeCluster, noteDelivery, rankedCities } from './travel.js';
+import { cityPlaces, genPonds, type WorldContent } from './world.js';
 
 const H = 3_600_000;
 export const BOARDS: readonly BoardId[] = ['stall', 'market'];
@@ -38,7 +38,8 @@ export function eligible(c: P0Content, s: P0State, board: BoardId): string[] {
   return c.requests.boards[board].templates.filter(id => {
     const t = c.requests.templates[id];
     return t.enabled !== false && gateMet(c, s, t) && climateMet(c, t)
-      && (!t.need.regional || regionalPool(c, t.need).length > 0) && (t.need.kind !== 'visit' || visitOpen(c, s, board, t.need));
+      && (!t.need.regional || regionalPool(c, t.need).length > 0) && (t.need.kind !== 'visit' || visitOpen(c, s, board, t.need))
+      && (t.need.where !== 'not_home' || farTries(c, s).length > 0);
   });
 }
 
@@ -196,7 +197,7 @@ function drawRequest(c: P0Content, s: P0State, board: BoardId, slot: number, at:
     id: `${template}-${board}${slot}-${at.toString(36)}`, template, items, rarity: t.need.rarity,
     ...(t.need.style ? { style: t.need.style } : {}), ...(t.need.family ? { family: t.need.family } : {}), kind: t.need.kind as BoardRequest['kind'],
     qty: visit ? 1 : qtyFor(c, s, t, draw), bonus: t.bonus, drawn_at: at, status: 'open', ...(visit ? { visit } : {}),
-    ...(t.need.where ? { where: t.need.where, abroad: [] } : {}),
+    ...(t.need.where ? { where: t.need.where } : {}),
   };
 }
 
@@ -248,32 +249,61 @@ export function noteVisit(c: P0Content, s: P0State, space: unknown, place: unkno
   }
 }
 
+const farCache = new WeakMap<P0Content, string[]>();
 /**
- * Far Pond (q(128)): `n` fish of a kind come into the bag in another city — landed, or collected from a trap there
- * (李白 c2421353) — after it was taken: the kind is noted (those kinds are what it takes) and, while it was still
- * short, a progress event says the count (`Far Pond 2/3`, like a pond's request; the client toasts the one that
- * completes it). Call it once the bag holds them.
+ * Far Pond (q(128) 甲; the user, 2026-10-10: what is in the bag counts, wherever and whenever it was caught): every fish
+ * the home city's ponds don't have — neither one its ponds can ever give (each site's habitat × the city's regional
+ * fish) nor one of its 2 regional fish. San Francisco: other cities' regional fish, and the Coast fish (no Coast site).
  */
-export function noteCatchAbroad(c: P0Content, s: P0State, fish: string, place: string | undefined, events: P0Event[], n = 1): void {
-  const city = place ? clusterOf(c, place) : null;
-  if (!city || city === s.travel.home) return;
-  for (const board of BOARDS) for (const sl of s.boards[board] ?? []) {
-    const r = sl.req;
-    if (r?.where !== 'other_city' || r.status !== 'accepted') continue;
-    r.abroad ??= [];
-    // what it held before this catch: a kind new to it brought its fish from home in too (周瑜 on #285), so count it
-    // without the kind; a kind it had already, without these n
-    const known = r.abroad.includes(fish);
-    const before = haveForRequest(c, s, r) - (known ? n : 0);
-    if (!known) r.abroad.push(fish);
-    const have = haveForRequest(c, s, r);
-    if (before < r.qty) events.push({ kind: 'request_progress', id: r.id, have: Math.min(have, r.qty), qty: r.qty });
+export function farFish(c: P0Content): string[] {
+  let ids = farCache.get(c);
+  if (!ids) {
+    const home = homeCluster(c), pool = new Set(pondRegional(c, home));
+    for (const [id, p] of Object.entries(c.fishing.places)) {
+      const site = c.fishing.sites[p.site];
+      if (site && pondCity(c, id).cluster === home) for (const f of everFish(c, site, home)) pool.add(f.id);
+    }
+    farCache.set(c, ids = c.fish.map(f => f.id).filter(id => !pool.has(id)));
   }
+  return ids;
 }
 
-/** The units a request's need counts in the bag now (its card's have): Far Pond only its abroad kinds. */
+/** How many fish Far Pond's example line names (q(128): `Try Tilapia, Smelt or Grey Mullet`). */
+export const FAR_TRIES = 3;
+const tryCache = new WeakMap<P0Content, WeakMap<object, Map<number, string[]>>>();
+/**
+ * Far Pond's draw check and its example line, one computation (q(128)): the Trip 1–3 cities nearest first and, of each,
+ * the fish its ponds can give (any time, any weather) that Far Pond takes and the player can land at this Fishing level
+ * — its regional fish first, then by level — up to FAR_TRIES. Empty: none within Trip 3 at this level, so Far Pond is
+ * not drawn. Cached per home (rankedCities' list) and level; generating only the cities' ponds, it stops at the third.
+ */
+export function farTries(c: P0Content, s: P0State): string[] {
+  const ranked = rankedCities(c, s), level = skillLevel(c, s, 'fishing');
+  let byHome = tryCache.get(c);
+  if (!byHome) tryCache.set(c, byHome = new WeakMap());
+  let byLevel = byHome.get(ranked);
+  if (!byLevel) byHome.set(ranked, byLevel = new Map());
+  let out = byLevel.get(level);
+  if (out) return out;
+  out = [];
+  const w = (c as P0Content & { world?: WorldContent }).world, far = new Set(farFish(c)), sites = new Set(Object.keys(c.fishing.sites));
+  for (const city of ranked) {
+    if (out.length >= FAR_TRIES || !w) break;
+    const cl = clusterById(c, city.id);
+    if (city.trip > 3 || !cl) continue;
+    const here = new Set<string>(), regional = pondRegional(c, city.id);
+    for (const p of genPonds(w, cl, sites)) for (const f of everFish(c, c.fishing.sites[p.site], city.id)) here.add(f.id);
+    const fish = c.fish.filter(f => here.has(f.id) && far.has(f.id) && f.level <= level && !out!.includes(f.id))
+      .sort((a, b) => Number(regional.includes(b.id)) - Number(regional.includes(a.id)) || a.level - b.level);
+    out.push(...fish.slice(0, FAR_TRIES - out.length).map(f => f.id));
+  }
+  byLevel.set(level, out);
+  return out;
+}
+
+/** The units a request's need counts in the bag now (its card's have): Far Pond the fish its home city's ponds don't have. */
 export function haveForRequest(c: P0Content, s: P0State, r: BoardRequest): number {
-  if (r.where === 'other_city') return r.abroad?.length ? haveFor(c, s, { kind: 'fish' }, r.abroad) : 0;
+  if (r.where === 'not_home') return farFish(c).length ? haveFor(c, s, { kind: 'fish' }, farFish(c)) : 0;
   return haveFor(c, s, { kind: r.kind, rarity: r.rarity, style: r.style, family: r.family }, r.items);
 }
 
@@ -290,7 +320,7 @@ export function tracked(s: P0State): number {
 /** The bag units a board request would take now, or null when short. A visit takes nothing: it is ready once checked in. */
 export function handIn(c: P0Content, s: P0State, r: BoardRequest): [string, number][] | null {
   if (r.kind === 'visit') return r.visit?.done ? [] : null;
-  if (r.where === 'other_city') return r.abroad?.length ? pick(c, s, { kind: 'fish' }, r.abroad, r.qty) : null;   // Far Pond
+  if (r.where === 'not_home') return farFish(c).length ? pick(c, s, { kind: 'fish' }, farFish(c), r.qty) : null;   // Far Pond: cheapest first
   if (r.items.length > 1) {   // Market Basket: N of each of the drawn crops
     const out: [string, number][] = [];
     for (const item of r.items) {

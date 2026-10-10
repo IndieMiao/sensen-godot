@@ -44,7 +44,6 @@ export type P0Event =
   | { kind: 'gift_meal'; resident: string; dish: string; given: boolean; to?: 'parcel' }   // to: the bag was full, so it waits in the Inbox
   | { kind: 'recipe'; page: string; from: 'taught' | 'request' | 'card'; resident?: string }   // a page turned Tasted (§7.5.3; 哪吒's shape, card = Recipe Card)
   | { kind: 'visit'; id: string; place: string }   // an explore request checked in at its outpost (§9.6.3)
-  | { kind: 'request_progress'; id: string; have: number; qty: number }   // Far Pond counted a fish (q(128): `Far Pond 2/3`)
   | { kind: 'decor'; action: 'placed' | 'moved' | 'stored'; uid: number; item: string; x: number; y: number; rot: number }   // Decorate (SGODOT-284)
   | { kind: 'title'; id: string; resident: string }   // a story request's title (§9.4.4 Trusted)
   | { kind: 'sale'; item: string; qty: number; asked: number; coins: number; shop: string; quota: string | null }
