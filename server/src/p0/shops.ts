@@ -13,7 +13,7 @@ import { maxEnergy, skillLevel, untilRollover } from './rules.js';
 import type { P0State } from './state.js';
 import { missing, putInStorage, stored, takeStorageFirst } from './storage.js';
 import type { Refusal } from './fishing.js';
-import { clusterById, clusterOf, homeCluster } from './travel.js';
+import { clusterOf, homeCluster } from './travel.js';
 import { decorOf, isDecor } from './decor.js';
 import { climateAt } from './travel.js';
 
@@ -164,13 +164,6 @@ export function counterCity(c: P0Content, s: P0State, place: unknown): string {
   return (typeof place === 'string' && place !== '' ? clusterOf(c, place) : null) ?? s.travel?.here ?? homeCluster(c);
 }
 
-/** That city's climate, as content writes it (`Temperate`): the cluster table's, the home profile's at home. */
-export function cityClimate(c: P0Content, cluster: string): string {
-  if (cluster === homeCluster(c)) return c.profile.climate;
-  const z = clusterById(c, cluster)?.climate ?? '';
-  return z ? z[0].toUpperCase() + z.slice(1).toLowerCase() : c.profile.climate;
-}
-
 export function quotaLeft(c: P0Content, s: P0State, q: QuotaId, cluster = homeCluster(c)): number {
   return Math.max(0, c.quotas[q].cap - (s.day.quota[quotaKey(c, q, cluster)] ?? 0));
 }
@@ -192,7 +185,7 @@ export function sellItem(c: P0Content, s: P0State, cmd: { item?: unknown; qty?: 
   const qty = all ? 0 : Number(cmd.qty);
   if (!all && (!Number.isInteger(qty) || qty < 1)) return { code: 'bad_qty' };
   const city = counterCity(c, s, cmd.place);
-  const price = buyback(c, shop, id, cityClimate(c, city));
+  const price = buyback(c, shop, id, climateAt(c, s, cmd.place));
   if ('code' in price) return { code: price.code };
   if (all && s.locked.includes(id)) return { code: 'locked_item' };
   const have = count(s.bag, id, 'skip');
