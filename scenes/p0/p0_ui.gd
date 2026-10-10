@@ -1174,7 +1174,11 @@ func float_lines(parts: Array, at: Vector2) -> Array:
 	var rows: Array = []   # [{kind, parts}] from the bottom: a kind's line, or an item line's pair (FLOAT_ITEMS_PER_LINE)
 	for k in order:
 		var all: Dictionary = kinds[k]
-		if not (k in FLOAT_SPLIT_KINDS and all.size() > FLOAT_ITEMS_PER_LINE):
+		# split only while the lines still fit the cap of three; past it the kind stays one line in its own order and joins
+		# the cap's last line as any overflow does (q(49) ①, q(124) ①)
+		var lines_after := order.size() - order.find(k) - 1
+		var split_lines := ceili(float(all.size()) / FLOAT_ITEMS_PER_LINE)
+		if not (k in FLOAT_SPLIT_KINDS and all.size() > FLOAT_ITEMS_PER_LINE) or rows.size() + split_lines + lines_after > FLOAT_MAX_LINES:
 			rows.append({kind = k, parts = all})
 			continue
 		var keys: Array = all.keys()
@@ -2996,11 +3000,12 @@ func show_banner(spec: Dictionary, on_action := Callable()) -> UiMomentBanner:
 
 ## FISH-3 · the first catch of a species (§4.8.6): `Caught!` / the fish · rarity / `Fish-dex 3/N`; the one-time strip
 ## `First catch! +15 XP` (and `New city! +10 XP`); a first Fine / Rare fish adds its Energy as a pill. No buttons.
-## extras: {city_xp, energy} from the same response (P0Runtime).
-func show_catch(fish_id: String, rarity: int, first_xp: int, extras := {}) -> void:
+## extras: {city_xp, energy} from the same response (P0Runtime). A kind first got from a Fish Trap: `In your trap!`, the
+## rest the same (q(124) ①).
+func show_catch(fish_id: String, rarity: int, first_xp: int, extras := {}, event := "Caught!") -> void:
 	var m := UiRewardMoment.new()
 	m.tone = UiRewardMoment.Tone.REWARD
-	m.event = "Caught!"
+	m.event = event
 	m.icon = P0Logic.icon(fish_id)
 	m.item_name = P0Logic.item_name(view, fish_id)
 	m.rarity = rarity
@@ -3013,7 +3018,8 @@ func show_catch(fish_id: String, rarity: int, first_xp: int, extras := {}) -> vo
 	if int(extras.get("energy", 0)) > 0:
 		m.rewards = [UiFloatText.pill("+%d Energy" % int(extras.energy), UiFloatText.Tone.ENERGY_GAIN)]
 	var dex: Array = view.get("fishing", {}).get("dex", [])
-	m.note = "Fish-dex %d/%d" % [dex.filter(func(d): return int(d.get("caught", 0)) > 0).size(), dex.size()]
+	# a trap's cards come one after another from one reply: each counts the kinds up to its own (extras.dex_back)
+	m.note = "Fish-dex %d/%d" % [dex.filter(func(d): return int(d.get("caught", 0)) > 0).size() - int(extras.get("dex_back", 0)), dex.size()]
 	show_moment(m)
 
 ## FISH-5 / 5-2 · a gate fish broke free, once per species (§4.8.6, q(55) / q(57)): `Too strong` (Fishing level) or

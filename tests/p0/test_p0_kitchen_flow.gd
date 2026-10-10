@@ -556,7 +556,8 @@ func test_a_new_recipe_turn_over_with_no_room_falls_back_to_the_card_with_its_fi
 		{"kind": "xp", "skill": "cooking", "amount": 5, "percent": 100}])
 	for i in 3: await get_tree().process_frame
 	assert_str(rt.ui.modal_kind).is_equal("kitchen_card")
-	var texts: Array = rt.ui.root.find_children("*", "Label", true, false).map(func(l): return (l as Label).text)
+	# (the strip holds a number to its unit with a no-break space and breaks between rewards: UiRewardMoment.strip_lines)
+	var texts: Array = rt.ui.root.find_children("*", "Label", true, false).map(func(l): return (l as Label).text.replace("\u00a0", " "))
 	assert_bool(texts.any(func(t): return str(t).contains("+10 Cooking XP") and str(t).contains("First cooked"))).override_failure_message(str(texts.filter(func(t): return str(t).contains("First")))).is_true()
 	var floats: Array = rt.ui.root.find_children("*", "UiFloatText", true, false).map(func(f): return (f as UiFloatText).text)
 	assert_bool(floats.any(func(t): return str(t).begins_with("First cooked"))).is_false()   # on the card's strip only

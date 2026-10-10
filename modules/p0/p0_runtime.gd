@@ -39,6 +39,8 @@ var last_first_catch_xp := 0
 ## A landed catch the world shows itself (the P0 pond's arc to the hand) keeps its reply's floats here until the fish is
 ## in the hand; the world lets them rise then (take_catch_floats; 不知火舞 on 231: `+25 XP` crossed the fish in flight).
 var catch_floats: Array = []
+const TRAP_CARD_TITLE := "In your trap!"   # q(124) ①: a landed fish's card is `Caught!`
+const TRAP_CARD_AFTER_S := 0.3              # after the last fish lands in the creel
 var last_catch_extras := {}   # the same response's New city XP and first-fish Energy, for the Caught! card
 ## What to do once the map is back on top (FISH-4 Go home, FISH-5 Tackle Shop): "farm" / "tackle".
 var after_leave := ""
@@ -381,6 +383,33 @@ static func trap_parts(v: Dictionary, got: Array) -> Array:
 	return got.map(func(f): return {kind = "item", key = "trap:" + str(f.id), text = "%s ×%d" % [P0Logic.item_name(v, str(f.id)), int(f.count)],
 		tone = UiFloatText.Tone.ITEM, icon = P0Logic.icon(str(f.id))})
 
+## A trap's first of a kind (q(124) ①): the Fish-dex first card as a landed fish's, titled `In your trap!`, one a new
+## kind in the order the server gave them (q(49): one card at a time). The reply's `New city!` XP goes on the first card,
+## a first Fine / Rare's Energy on the first card of that rarity; each card's Fish-dex count is the one it brought
+## (`dex_back`: the new kinds still to come, 1/20 → 2/20 → 3/20). [{fish, rarity, xp, extras}]; [] for no new kind.
+static func trap_cards(v: Dictionary, events: Array) -> Array:
+	if trap_fish(events).is_empty(): return []
+	var cards: Array = []
+	var city_xp := 0
+	var energy := {}   # rarity → Energy
+	for e in events:
+		match str(e.get("kind", "")):
+			"first":
+				var what := str(e.get("what", ""))
+				if what.begins_with("catch:"):
+					var fid := what.trim_prefix("catch:")
+					cards.append({fish = fid, rarity = int(P0Logic.item(v, fid).get("rarity", 1)), xp = int(e.get("xp", 0)), extras = {}})
+				elif what.begins_with("fishing_city:"): city_xp = int(e.get("xp", 0))
+			"reward":
+				if str(e.get("id", "")).begins_with("first_fish_"): energy[int(str(e.id).trim_prefix("first_fish_"))] = int(e.get("energy", 0))
+	if not cards.is_empty() and city_xp > 0: cards[0].extras["city_xp"] = city_xp
+	for j in cards.size():
+		if j < cards.size() - 1: cards[j].extras["dex_back"] = cards.size() - 1 - j
+	for r in energy:
+		var hit: Array = cards.filter(func(k): return int(k.rarity) == int(r))
+		if not hit.is_empty() and int(energy[r]) > 0: hit[0].extras["energy"] = int(energy[r])
+	return cards
+
 ## The floats a landed catch's reply held for the world (catch_floats), handed over once: the world lets them rise.
 func take_catch_floats() -> Array:
 	var held := catch_floats
@@ -405,6 +434,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	# `Pond Crucian ×2 · Common Carp ×1`, any XP under it as one `+N XP` (§6.8: half the catch XP, often 0 — then none;
 	# 李白 on 289), and each kind flies into the creel badge (trap_flights). Nothing per fish.
 	var trap_got := trap_fish(events)
+	var trap_cards_now := trap_cards(v, events)   # its new kinds' In your trap! cards (q(124) ①), shown once they land
 	if not trap_got.is_empty():
 		var mark = _call("p0_trap_anchor", [])
 		if mark is Vector2: at = mark
@@ -423,6 +453,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	# A first's bonus XP is said by its own line, not added into the XP float: the first cook's and catch's on their
 	# card's strip (Li Bai, int6 C11), the first harvest's as `First harvest! +10 XP · Radish` (§4.8.6).
 	var first_cook_xp: Array = []
+	var card_energy: Array = []   # a trap's first-fish Energy events its card says (q(124) ①)
 	# Harvest ×N's first harvest goes into its XP line (`+20 XP · 5 plants · First harvest`, q(124) ②), no line of its own.
 	var folded_first: Array = []   # those firsts' xp events
 	# …the first cook's only when that card comes (a normal serve at the stove); a Queue ×2 turn-over or a pot kept on its
@@ -450,7 +481,10 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				# The server emits a first-time bonus as `first` immediately followed by its `xp`.
 				var bonus: bool = i > 0 and str(events[i - 1].get("kind", "")) == "first" and int(events[i - 1].xp) == int(ev.amount)
 				var what := str(events[i - 1].get("what", "")) if bonus else ""
-				if bonus and (str(ev.skill) == "cooking" or what.begins_with("catch:") or what.begins_with("harvest:")):
+				# (a trap's New city! too when a card says it, not the trap's `+N XP`, q(124) ①; with no new kind there is no
+				# card, so it stays in that XP, as a rod's catch of a known kind does — 苏烈 on #290)
+				if bonus and (str(ev.skill) == "cooking" or what.begins_with("catch:") or what.begins_with("harvest:") \
+						or (not trap_cards_now.is_empty() and what.begins_with("fishing_city:"))):
 					first_cook_xp.append(ev)
 				if what.begins_with("cook:") and not cook_card:
 					floats.append({kind = "first", key = what, text = "First cooked · +%d Cooking XP" % int(ev.amount), tone = UiFloatText.Tone.XP})
@@ -463,6 +497,11 @@ func _on_state(v: Dictionary, events: Array) -> void:
 					xp_lines.append("+%d %s XP" % [int(ev.amount), str(ev.skill).capitalize()] + ("" if int(ev.percent) >= 100 else " · %d%%" % int(ev.percent)))
 			"reward":
 				if int(ev.energy) > 0: xp_lines.append(P0Logic.reward_line(str(ev.id), int(ev.energy)))
+				# a trap's first Fine / Rare: its Energy is on its In your trap! card, not floated too (the float group stays in
+				# q(49)'s three lines: the trap's XP and its fish)
+				if str(ev.id).begins_with("first_fish_") and i > 0 and str(events[i - 1].get("kind", "")) == "energy" \
+						and trap_cards_now.any(func(k): return int(k.extras.get("energy", 0)) > 0):
+					card_energy.append(events[i - 1])
 				if str(ev.id).begins_with("first_fish_"): last_catch_extras["energy"] = int(ev.energy)
 			"first":
 				var what := str(ev.what)
@@ -489,6 +528,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 		match str(ev.get("kind", "")):
 			"arrival": _call("on_arrival", [ev])   # SGODOT-275: the map flies there and welcomes (q(108))
 			"energy":
+				if card_energy.any(func(x): return is_same(x, ev)): continue
 				var dlt := int(ev.delta)
 				# A catch's refund is said by its own float or card ("3 Energy back"), not twice.
 				if settles_catch and str(ev.get("reason", "")) in ["refund", "line_in"]: continue
@@ -507,7 +547,9 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				if cook and nth >= 3 and int(ev.amount) <= 0:   # the 3rd pot of a page on: no XP, and the float says why
 					floats.append({kind = "xp", key = "cook_nth", text = "No XP · %s today" % P0KitchenLogic.ordinal(nth), tone = UiFloatText.Tone.MUTED})
 				elif int(ev.amount) > 0 and not trap_got.is_empty() and str(ev.skill) == "fishing":
-					floats.append({kind = "xp", key = "trap_xp", amount = int(ev.amount), fmt = "%s XP", tone = UiFloatText.Tone.XP})
+					# the collect's own XP (§6.8); a first's bonus is on its In your trap! card (q(124) ①)
+					if not first_cook_xp.any(func(x): return is_same(x, ev)):
+						floats.append({kind = "xp", key = "trap_xp", amount = int(ev.amount), fmt = "%s XP", tone = UiFloatText.Tone.XP})
 				elif int(ev.amount) > 0 and not first_cook_xp.any(func(x): return is_same(x, ev)):
 					# A pot's own XP names its track and a Good / Perfect pot's star: +5 Cooking XP ★ (§4.8.6 / §7.2.2);
 					# the 2nd pot of a page today says so instead of a percentage: +10 Cooking XP ★ · 2nd today (q(94)).
@@ -654,6 +696,12 @@ func _on_state(v: Dictionary, events: Array) -> void:
 			var left := P0Logic.P0Trap.left_line(e) if str(e.get("kind", "")) == "trap" else ""
 			if left != "": floats.append({kind = "result", key = "trap_left", text = left, tone = UiFloatText.Tone.ITEM})
 		_call("p0_trap_flights", [trap_got.slice(0, UiItemFly.MAX_PER_BATCH)])
+		# a new kind's In your trap! card once its fish are in the creel (the flights' length), one at a time (q(49))
+		var cards := trap_cards_now
+		if not cards.is_empty():
+			var landed_s := UiItemFly.FLIGHT_S + UiItemFly.DELAY_STEP_S * (mini(trap_got.size(), UiItemFly.MAX_PER_BATCH) - 1)
+			get_tree().create_timer(landed_s + TRAP_CARD_AFTER_S).timeout.connect(func() -> void:
+				for k in cards: ui.queue_card(ui.show_catch.bind(str(k.fish), int(k.rarity), int(k.xp), k.extras, TRAP_CARD_TITLE)))
 	# Any catch resets what is held: a player who left the pond mid-arc never let the last fish's floats rise, and an
 	# escape after that must not float them (刘邦 on #154).
 	if settles_catch: catch_floats = floats if world_lands else []
