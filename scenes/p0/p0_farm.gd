@@ -451,8 +451,9 @@ func _step_actor_fade(dt: float) -> void:
 		gi.cast_shadow = _actor_shadows[id] if _actor_fade < 0.5 else GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	if _actor_fade == 0.0: _actor_shadows.clear()
 
-## The free cell nearest `from` by walking (4-way, like the paths): solid cells are walls, `taken` ones can be crossed
-## (the player walks out of the piece) but not stood on; `from` itself when it is free or nothing free is in reach.
+## The free cell nearest `from` by walking (4-way, like the paths): solid cells are walls (fences, the house), `taken`
+## ones can be crossed even when solid (Decorate's pieces are, 苏烈 on #261: the player walks out of the piece) but not
+## stood on; `from` itself when it is free or nothing free is in reach.
 static func free_cell_near(g: BlueprintGrid, from: Vector2i, taken: Array, limit := 4096) -> Vector2i:
 	var seen := {from: true}
 	var queue: Array[Vector2i] = [from]
@@ -463,7 +464,7 @@ static func free_cell_near(g: BlueprintGrid, from: Vector2i, taken: Array, limit
 		if not taken.has(c) and not g.astar.is_point_solid(c): return c
 		for d in [Vector2i.RIGHT, Vector2i.LEFT, Vector2i.DOWN, Vector2i.UP]:
 			var n: Vector2i = c + d
-			if seen.has(n) or not g.bp.in_bounds(n) or g.astar.is_point_solid(n): continue
+			if seen.has(n) or not g.bp.in_bounds(n) or (g.astar.is_point_solid(n) and not taken.has(n)): continue
 			seen[n] = true
 			queue.append(n)
 	return from
