@@ -39,6 +39,16 @@ static func free_stove(view: Dictionary) -> int:
 		if can_queue(view, i): return i
 	return 0
 
+## Another stove's heat reminder (b84a5e01 ④): the index of the ring that comes up within `lead_ms` from now on this
+## pot (its rings grow in RING_EARLY before their turn, so "comes up" is that moment), else -1.
+static func ring_soon(st: Dictionary, lead_ms: float, early_ms := 1000.0) -> int:
+	var e := float(st.get("elapsed", float(st.get("ms", 0)) - float(st.get("ready_in", 0))))
+	var heats: Array = st.get("heats", [])
+	for i in heats.size():
+		var up := float(heats[i].get("at", 0)) - early_ms
+		if up > e and up - e <= lead_ms: return i
+	return -1
+
 ## Big Pot (Homestead Lv6): the drawer offers Double.
 static func big_pot(view: Dictionary) -> bool: return bool(cooking(view).get("big_pot", false))
 

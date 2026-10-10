@@ -765,9 +765,15 @@ static func project(view: Dictionary, elapsed_ms: float) -> Dictionary:
 			p["ready_in"] = maxf(0.0, float(p["ready_in"]) - elapsed_ms)
 			if float(p["ready_in"]) <= 0.0: p["state"] = "ready"
 	var stove = v.get("cooking", {}).get("stove", null)
-	if stove is Dictionary:
-		stove["elapsed"] = float(stove.get("elapsed", 0)) + elapsed_ms
-		stove["ready_in"] = maxf(0.0, float(stove.get("ready_in", 0)) - elapsed_ms)
+	var pots: Array = [stove] if stove is Dictionary else []
+	# Every stove ages (SGODOT-282: stoves 2 and 3 are in cooking.stoves; stove 1 is the same pot as cooking.stove,
+	# which may be the same dictionary after the deep copy above, so each pot is aged once).
+	for st in v.get("cooking", {}).get("stoves", []):
+		if st is Dictionary and not pots.any(func(q): return is_same(q, st)): pots.append(st)
+	for st in pots:
+		if not st.has("ms") and not st.has("ready_in"): continue
+		st["elapsed"] = float(st.get("elapsed", 0)) + elapsed_ms
+		st["ready_in"] = maxf(0.0, float(st.get("ready_in", 0)) - elapsed_ms)
 	var cast = v.get("fishing", {}).get("cast", null)
 	if cast is Dictionary: cast["bite_in"] = maxf(0.0, float(cast.get("bite_in", 0)) - elapsed_ms)
 	for parcel in v.get("inbox", {}).get("parcels", []):

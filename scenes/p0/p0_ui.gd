@@ -768,6 +768,19 @@ func world_icon(id: String, icon: Texture2D, screen: Vector2, show: bool, near :
 ## spot in 160 ms — icon + `text` + at most one `fact` ("" for none). `side` UiWorldNameBar.Dir (the way the
 ## character faces), -1 = right; either way it flips at a screen edge. `dimmed`: used today (Rested today). With
 ## show false (or a world_icon call for the same id) it folds back, then the icon button returns.
+## Nudge a world prompt (its icon button, or its open name strip): 1.15× and back (b84a5e01 ④, the kitchen's heat
+## reminder for another stove). Nothing when it is not on screen.
+func pulse_marker(id: String) -> void:
+	var b: UiWorldIconButton = _icons.get(id)
+	if b != null and b.visible: b.pulse()
+	var bar: UiWorldNameBar = _name_bars.get(id)
+	if bar != null and bar.visible:
+		bar.pivot_offset = bar.size * 0.5
+		var t := bar.create_tween()
+		t.tween_property(bar, "scale", Vector2.ONE * 1.15, 0.12).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		t.tween_interval(0.6)
+		t.tween_property(bar, "scale", Vector2.ONE, 0.2).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
+
 func name_bar(id: String, icon: Texture2D, text: String, fact: String, screen: Vector2, show: bool, side := -1, dimmed := false, status := -1, hit := Vector2.INF) -> void:
 	var bar: UiWorldNameBar = _name_bars.get(id)
 	if bar == null:

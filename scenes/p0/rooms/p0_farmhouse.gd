@@ -17,6 +17,11 @@ const CABINET_GLOW := Color("ffb87a")   # the cabinet's warm inner light (placeh
 const CABINET_GLOW_AT := Vector3(-2.13, 0.75, -1.69)   # in front of the cabinet door
 
 var kitchen: P0Kitchen
+## Heat reminders already given (pot id → ring index): once per ring (b84a5e01 ④).
+var _reminded := {}
+var _edge: Control   # the stage's edge arrow toward the stove whose ring is coming (camera on another pot)
+const REMIND_MS := 1000.0   # the reminder comes a second before another stove's ring
+const BUZZ_MS := 30
 var _sheet: P0StorageSheet
 var _pending_tab := ""   # the drawer tab p0_open_kitchen walked to the stove for (see _on_facility)
 
@@ -196,6 +201,82 @@ func _room_frame(v: Dictionary, _dt: float) -> void:
 	var cooking: bool = st != null and float(st.get("ready_in", 0)) > 0.0
 	if kitchen.phase == "idle" and kitchen.stage.is_cooking() != cooking: kitchen.stage.set_cooking(cooking)
 	if kitchen.phase == "serve" and st == null and kitchen.waiting_events(): kitchen.on_collected()   # refused as empty
+	_remind_heat(v)
+
+## Several stoves (b84a5e01 ④): a second before a ring comes up on a stove the player is not working, that stove's
+## prompt grows 1.15× and back and the phone buzzes once; with the camera pushed in on another pot an arrow with an
+## i-pot shows at the stage's edge toward it, a tap switching there. The ring itself is judged only on its own pot.
+func _remind_heat(v: Dictionary) -> void:
+	var n := P0KitchenLogic.stove_count(v)
+	if n < 2: return
+	for i in n:
+		if i == kitchen.stove_index and kitchen.phase in ["watch", "compose"]: continue
+		var st = P0KitchenLogic.stove(v, i)
+		if st == null: continue
+		var k := P0KitchenLogic.ring_soon(st, REMIND_MS)
+		if k < 0: continue
+		var key := "%s:%d" % [str(st.get("id", i)), k]
+		if _reminded.has(key): continue
+		_reminded[key] = true
+		if rt: rt.ui.pulse_marker("room:" + STOVES[i])
+		if OS.has_feature("mobile"): Input.vibrate_handheld(BUZZ_MS)
+		if is_focused(): _show_edge(i)
+
+func _show_edge(i: int) -> void:
+	var from := anchor(STOVES[kitchen.stove_index])
+	var to := anchor(STOVES[i])
+	if from == null or to == null or rt == null: return
+	var left := cam.unproject_position(to.global_position).x < cam.unproject_position(from.global_position).x
+	if _edge and is_instance_valid(_edge): _edge.queue_free()
+	_edge = _EdgeHint.new(left, P0Logic.icon("pot"))
+	_edge.theme = UiKit.theme()
+	rt.ui.root.add_child(_edge)
+	(_edge as _EdgeHint).tapped.connect(func(): _switch_to(i))
+
+## A tap on the edge arrow: that stove, the way its own prompt opens it.
+func _switch_to(i: int) -> void:
+	if kitchen.phase == "watch": kitchen.stop_watching()
+	if kitchen.phase == "compose": rt.ui.close_modal()
+	_pending_tab = ""
+	kitchen.select_stove(i)
+	open_stove("cookbook", true)
+
+class _EdgeHint extends Control:
+	signal tapped
+	var _left := false
+	func _init(left: bool, icon: Texture2D) -> void:
+		_left = left
+		set_anchors_preset(Control.PRESET_FULL_RECT)
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var b := PanelContainer.new()
+		b.mouse_filter = Control.MOUSE_FILTER_STOP
+		b.modulate.a = 0.85
+		b.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_SURFACE, UiTokens.RADIUS_PILL).with_margins(8, 6, 8, 6))
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override(&"separation", 2)
+		row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var arrow := UiKit.label("‹" if left else "›", UiTokens.STYLE_C14_XB)
+		var ic := UiKit.icon(icon, 20.0)
+		if left:
+			row.add_child(arrow); row.add_child(ic)
+		else:
+			row.add_child(ic); row.add_child(arrow)
+		b.add_child(row)
+		add_child(b)
+		b.gui_input.connect(func(e: InputEvent):
+			if P0Ui.is_tap(e):
+				tapped.emit()
+				queue_free())
+		resized.connect(func():
+			var m := b.get_combined_minimum_size()
+			b.size = m
+			b.position = Vector2(UiTokens.SPACE_PAGE if _left else size.x - m.x - UiTokens.SPACE_PAGE, size.y * 0.32 - m.y * 0.5))
+		var t := create_tween()
+		t.tween_property(b, "scale", Vector2.ONE * 1.15, 0.12)
+		t.tween_property(b, "scale", Vector2.ONE, 0.2)
+		t.tween_interval(2.4)
+		t.tween_property(b, "modulate:a", 0.0, 0.3)
+		t.tween_callback(queue_free)
 
 func p0_tap(screen: Vector2) -> void:
 	if kitchen and kitchen.tap(): return

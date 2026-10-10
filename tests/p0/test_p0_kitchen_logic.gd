@@ -152,6 +152,29 @@ func test_several_stoves_each_read_their_own_pot_and_queue() -> void:
 	assert_str(P0KitchenLogic.stove_label(one)).is_equal("Stove 1/1")
 	assert_bool(P0KitchenLogic.big_pot(one)).is_false()
 
+## SGODOT-282: the client clock ages stoves 2 and 3 too (P0Logic.project), so their countdowns and heat rings run.
+func test_projection_ages_every_stove() -> void:
+	var v := _view()
+	v.cooking.stove = {"id": 1, "ms": 5000, "elapsed": 1000, "ready_in": 4000}
+	v.cooking.stoves = [{"id": 1, "ms": 5000, "elapsed": 1000, "ready_in": 4000}, {"id": 2, "ms": 15000, "elapsed": 0, "ready_in": 15000}, null]
+	var p := P0Logic.project(v, 2000.0)
+	assert_float(float(p.cooking.stove.ready_in)).is_equal(2000.0)
+	assert_float(float(p.cooking.stoves[0].ready_in)).is_equal(2000.0)
+	assert_float(float(p.cooking.stoves[1].ready_in)).is_equal(13000.0)
+	assert_float(float(p.cooking.stoves[1].elapsed)).is_equal(2000.0)
+	assert_str(P0KitchenLogic.stove_state(p, 1)).is_equal("Cooking 0:13")
+
+## Heat reminder (b84a5e01 ④): a ring is "soon" in the second before it grows in (it grows a second before its turn).
+func test_ring_soon_is_the_second_before_a_ring_grows_in() -> void:
+	var st := {"ms": 30000, "elapsed": 7600.0, "heats": [{"at": 9000, "spin": 2000}, {"at": 20000, "spin": 2000}]}
+	assert_int(P0KitchenLogic.ring_soon(st, 1000.0)).is_equal(0)    # grows in at 8000: 400 ms away
+	st.elapsed = 6500.0
+	assert_int(P0KitchenLogic.ring_soon(st, 1000.0)).is_equal(-1)   # 1.5 s away
+	st.elapsed = 8200.0
+	assert_int(P0KitchenLogic.ring_soon(st, 1000.0)).is_equal(-1)   # already growing: no reminder now
+	st.elapsed = 18500.0
+	assert_int(P0KitchenLogic.ring_soon(st, 1000.0)).is_equal(1)
+
 ## Big Pot Double (b84a5e01 ③): hidden before Lv6; grey for Legendary, unknown mixes and seasonings alone; the main key
 ## says `Cook ×2`, or the gap for two portions.
 func test_double_toggle_states_and_the_gap_for_two() -> void:
