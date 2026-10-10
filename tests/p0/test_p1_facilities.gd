@@ -54,7 +54,7 @@ func test_the_sprinkler_card_writes_its_state_on_the_button() -> void:
 	b = P0MaterialLogic._craft_button(_recipe({"code": "skill_level_required", "detail": {"skill": "farming", "level": 6}}))
 	assert_str(b.label).is_equal("Farming Lv6 needed")
 	b = P0MaterialLogic._craft_button(_recipe({"code": "facility_cap", "detail": {"cap": 4, "used": 4, "homestead_next": 2}}))
-	assert_str(b.label).is_equal("Sprinklers 4/4 · Homestead Lv2 adds 1")
+	assert_that([b.label, b.toast]).is_equal(["Sprinklers 4/4", "Sprinklers 4/4 · Homestead Lv2 adds 1"])   # q(130) ①
 	b = P0MaterialLogic._craft_button(_recipe({"code": "facility_cap", "detail": {"cap": 6, "used": 6, "homestead_next": null}}))
 	assert_str(b.label).is_equal("Sprinklers 6/6")
 	b = P0MaterialLogic._craft_button(_recipe({"code": "missing_materials", "detail": {"item": "copper_ore", "need": 3, "have": 1}}))

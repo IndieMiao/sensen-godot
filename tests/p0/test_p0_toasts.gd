@@ -263,3 +263,13 @@ func test_a_rows_first_harvest_and_row_hoes_beds_say_so_in_one_line() -> void:
 	await get_tree().process_frame
 	texts = rt.ui.root.get_children().filter(func(c): return c is UiFloatText and not c.is_queued_for_deletion()).map(func(f): return f.text)
 	assert_array(texts).contains(["−6 Energy · 3 plots"])
+
+## A day's allowance used (a Compost All pressed twice, 哪吒 on #286): q(121)'s `Limit reached · 9h 12m`, not the code.
+func test_a_refused_compost_at_its_limit_says_when_it_resets() -> void:
+	var rt: P0Runtime = auto_free(P0Runtime.new())
+	rt.ui.quick_store = STORE
+	add_child(rt)
+	await get_tree().process_frame
+	for c in rt.session.connection_failed.get_connections(): rt.session.connection_failed.disconnect(c.callable)   # no server here
+	rt._on_refused("limit_reached", {"used": 5, "cap": 5, "resets_in": 9 * 3600000 + 12 * 60000}, {"type": "compost", "item": "crop_radish", "qty": 1})
+	assert_str(rt.ui.toast_text()).is_equal("Limit reached · 9h 12m")
