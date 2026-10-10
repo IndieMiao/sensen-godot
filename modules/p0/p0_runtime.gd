@@ -362,6 +362,17 @@ static func seed_saver_line(v: Dictionary, saved: Array) -> Dictionary:
 	return {kind = "saved", key = "seed_saver", text = "Seed Saver · +%d %s" % [saved.size(), what],
 		tone = UiFloatText.Tone.ITEM, icon = P0Logic.icon(sid if one else "seed_radish")}
 
+## A request's progress event (Far Pond, q(128)) in a pond request's words (P0Pond.request_progress): `Far Pond 2/3` as
+## a float while it is short, `Far Pond · 3/3 · Deliver at Mission Market Square` as a Success toast on the one that
+## completes it; {} for a request the view no longer has.
+static func progress_said(v: Dictionary, ev: Dictionary) -> Dictionary:
+	var r := P0Logic.PinReason.request_of(v, str(ev.get("id", "")))
+	if r.is_empty(): return {}
+	var have := int(ev.get("have", 0))
+	var qty := int(ev.get("qty", 0))
+	if have < qty: return {float = "%s %d/%d" % [str(r.title), have, qty]}
+	return {toast = "%s · %d/%d · %s" % [str(r.title), have, qty, str(r.deliver)]}
+
 ## The floats a landed catch's reply held for the world (catch_floats), handed over once: the world lets them rise.
 func take_catch_floats() -> Array:
 	var held := catch_floats
@@ -490,6 +501,11 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				if int(ev.delta) > 0 and (claimed or (not crafted and not iid.begins_with("seed_") and not iid.begins_with("dish_") and not iid.begins_with("fish_"))):
 					floats.append({kind = "item", key = iid, amount = int(ev.delta), fmt = "%s " + P0Logic.item_name(v, iid),
 						tone = UiFloatText.Tone.ITEM, icon = P0Logic.icon(iid)})
+			"request_progress":   # Far Pond counted a fish (q(128), landed or from a trap): as a pond's request says it
+				var said := progress_said(v, ev)
+				if said.has("float"):
+					floats.append({kind = "request", key = "request:" + str(ev.get("id", "")), text = str(said.float), tone = UiFloatText.Tone.ITEM})
+				elif said.has("toast"): ui.toast_success_when_clear(str(said.toast), true)
 			"coins":
 				# A request delivered from the counter drawer: its row floats the coins from its button (BOARD-DONE).
 				if ui.modal_kind == "counter" and events.any(func(e): return str(e.get("kind", "")) == "request" and str(e.get("status", "")) == "done"): continue

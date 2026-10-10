@@ -109,7 +109,7 @@ export function reelLine(c: P0Content, s: P0State, cmd: { outcome?: string }, no
     s.fishing.caught[fish.id] = (s.fishing.caught[fish.id] ?? 0) + 1;
     events.push({ kind: 'item', id: fish.id, delta: 1 });
     events.push({ kind: 'catch', fish: fish.id, rarity: fish.rarity, result: 'landed', refund: 0 });
-    noteCatchAbroad(c, s, fish.id, cast.place);   // Far Pond (q(128)): a fish landed in another city
+    noteCatchAbroad(c, s, fish.id, cast.place, events);   // Far Pond (q(128)): a fish landed in another city
     gainXp(c, s, now, 'fishing', scaledXp(s, c.fishing.catch_xp[fish.rarity - 1], cast.xp_pct), cast.xp_pct, events);
     // q(37): the first catch in a city counts the site's city from the server's table, never a city the client names.
     // v5: keyed by the place's city cluster (fishing_city:gn-5391959); the event names the city for the client.

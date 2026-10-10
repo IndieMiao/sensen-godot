@@ -361,3 +361,15 @@ func test_p1_board_card_fact_icon() -> void:
 	card.show_request({"id": "m1", "title": "Dusk Haul", "status": "Open", "facts": ["4 Fine fish · any kind"], "reward": "36 coins",
 		"needs": [], "command": "Track", "reason": ""})
 	assert_object(card.find_child("FactIcon", true, false)).is_null()
+
+## Far Pond counts a fish (q(128): landed or from a trap in another city): `Far Pond 2/3` floats while it is short, the
+## one that completes it toasts where to hand it in, as a pond's request does.
+func test_p1_far_pond_progress_is_said_like_a_pond_request() -> void:
+	var v := _view()
+	v.boards.market.slots = [{"id": "f1", "title": "Far Pond", "kind": "fish", "items": [], "rarity": null, "style": null,
+		"family": null, "where": "other_city", "visit": null, "icon": "fish_crucian", "qty": 3, "have": 2, "ready": false,
+		"coins": 50, "status": "accepted"}]
+	assert_dict(P0Runtime.progress_said(v, {"kind": "request_progress", "id": "f1", "have": 2, "qty": 3})).is_equal({"float": "Far Pond 2/3"})
+	assert_dict(P0Runtime.progress_said(v, {"kind": "request_progress", "id": "f1", "have": 3, "qty": 3})) \
+		.is_equal({"toast": "Far Pond · 3/3 · Deliver at Mission Market Square"})
+	assert_dict(P0Runtime.progress_said(v, {"kind": "request_progress", "id": "gone", "have": 1, "qty": 3})).is_empty()

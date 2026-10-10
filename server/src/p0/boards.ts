@@ -248,8 +248,13 @@ export function noteVisit(c: P0Content, s: P0State, space: unknown, place: unkno
   }
 }
 
-/** Far Pond (q(128)): a fish landed in another city is noted on each taken such request; those kinds are what it takes. */
-export function noteCatchAbroad(c: P0Content, s: P0State, fish: string, place: string | undefined): void {
+/**
+ * Far Pond (q(128)): `n` fish of a kind come into the bag in another city — landed, or collected from a trap there
+ * (李白 c2421353) — after it was taken: the kind is noted (those kinds are what it takes) and, while it was still
+ * short, a progress event says the count (`Far Pond 2/3`, like a pond's request; the client toasts the one that
+ * completes it). Call it once the bag holds them.
+ */
+export function noteCatchAbroad(c: P0Content, s: P0State, fish: string, place: string | undefined, events: P0Event[], n = 1): void {
   const city = place ? clusterOf(c, place) : null;
   if (!city || city === s.travel.home) return;
   for (const board of BOARDS) for (const sl of s.boards[board] ?? []) {
@@ -257,6 +262,8 @@ export function noteCatchAbroad(c: P0Content, s: P0State, fish: string, place: s
     if (r?.where !== 'other_city' || r.status !== 'accepted') continue;
     r.abroad ??= [];
     if (!r.abroad.includes(fish)) r.abroad.push(fish);
+    const have = haveForRequest(c, s, r);
+    if (have - n < r.qty) events.push({ kind: 'request_progress', id: r.id, have: Math.min(have, r.qty), qty: r.qty });
   }
 }
 
