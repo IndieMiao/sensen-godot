@@ -339,6 +339,7 @@ static func opening_shift(mark_y: float, feet_y: float, area: Rect2) -> float:
 
 func _follow(dt: float) -> void:
 	_fit_opening()
+	_step_actor_fade(dt)
 	if _top_left > 0.0:   # turning into / out of the top-down view
 		_top_left = maxf(0.0, _top_left - dt)
 		_top = _top_to if _top_left == 0.0 else lerpf(_top_from, _top_to, 1.0 - _top_left / PLACE_TURN_S)
@@ -391,6 +392,7 @@ func placement_camera_begin(spot: Vector3, cell_px := TOP_CELL_PX) -> void:
 	_placing_cam = true
 	_opening = false
 	_cam_follow.hold()
+	_actor_fade_to = 1.0   # no character while placing (user on 284 14e11a67): 0.2 s out, back on Done or Cancel
 	_top_cell_px = clampf(cell_px, TOP_CELL_MIN, TOP_CELL_MAX)
 	_turn(1.0)
 	_fly(Vector3(spot.x, _focus.y, spot.z))
@@ -401,9 +403,17 @@ func placement_camera_focus(spot: Vector3, cell_px := 0.0) -> void:
 	if cell_px > 0.0: _top_cell_px = clampf(cell_px, TOP_CELL_MIN, TOP_CELL_MAX)
 	_fly(Vector3(spot.x, _focus.y, spot.z), PICK_FLY_S)
 
-func placement_camera_end() -> void:
+## Done or Cancel. `taken`: the grid cells the piece just placed covers (none on Cancel); the player fades back in
+## where they stood, or on the nearest free cell by walking when it is one of those or now solid (不知火舞 on #261).
+func placement_camera_end(taken: Array = []) -> void:
 	if not _placing_cam: return
 	_placing_cam = false
+	var here := bp.world_to_cell(actor.position)
+	var to := free_cell_near(grid, here, taken)
+	if to != here:
+		var w := bp.cell_to_world(to)
+		actor.teleport(Vector3(w.x, actor.position.y, w.z))
+	_actor_fade_to = 0.0
 	_turn(0.0)
 	_fly(Vector3.INF)
 	placement_grid(Vector3.INF)
@@ -420,6 +430,42 @@ func _turn(to: float) -> void:
 	_top_left = PLACE_TURN_S
 
 func _top_ease() -> float: return smoothstep(0.0, 1.0, _top)
+
+## The player while placing (user on 284 14e11a67; 不知火舞 on #261): out in 0.2 s with its shadow, not drawn while
+## placing, in again in 0.2 s on leaving. A real-time shadow cannot be half there: it goes at the half-way point.
+const ACTOR_FADE_S := 0.2
+var _actor_fade := 0.0      # 0 shown … 1 gone
+var _actor_fade_to := 0.0
+var _actor_shadows := {}    # its meshes' own cast_shadow while faded, restored when it is whole again
+
+func _step_actor_fade(dt: float) -> void:
+	if _actor_fade == _actor_fade_to: return
+	_actor_fade = move_toward(_actor_fade, _actor_fade_to, dt / ACTOR_FADE_S)
+	actor.visible = _actor_fade < 1.0
+	for g in actor.find_children("*", "GeometryInstance3D", true, false):
+		var gi := g as GeometryInstance3D
+		var id := gi.get_instance_id()
+		if not _actor_shadows.has(id): _actor_shadows[id] = gi.cast_shadow
+		gi.transparency = _actor_fade   # 0 again leaves the transparent pipeline
+		gi.cast_shadow = _actor_shadows[id] if _actor_fade < 0.5 else GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	if _actor_fade == 0.0: _actor_shadows.clear()
+
+## The free cell nearest `from` by walking (4-way, like the paths): solid cells are walls, `taken` ones can be crossed
+## (the player walks out of the piece) but not stood on; `from` itself when it is free or nothing free is in reach.
+static func free_cell_near(g: BlueprintGrid, from: Vector2i, taken: Array, limit := 4096) -> Vector2i:
+	var seen := {from: true}
+	var queue: Array[Vector2i] = [from]
+	var i := 0
+	while i < queue.size() and i < limit:
+		var c := queue[i]
+		i += 1
+		if not taken.has(c) and not g.astar.is_point_solid(c): return c
+		for d in [Vector2i.RIGHT, Vector2i.LEFT, Vector2i.DOWN, Vector2i.UP]:
+			var n: Vector2i = c + d
+			if seen.has(n) or not g.bp.in_bounds(n) or g.astar.is_point_solid(n): continue
+			seen[n] = true
+			queue.append(n)
+	return from
 
 ## The camera `k` of the way (0 the farm's 43° / 14.5°, 1 straight down with no yaw) to the top-down view over `focus`,
 ## at `cell_px` pixels a `cell_m` cell when there: set from its Euler angles, so straight down needs no look_at up.
