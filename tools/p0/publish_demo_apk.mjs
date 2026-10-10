@@ -44,6 +44,8 @@ assert.equal(build.signer_sha256, CERTIFICATE, 'demo updates must keep the same 
 assert.equal(build.server, API, 'the APK must point at the Hong Kong P0 server');
 assert.equal(build.key_baked, true, 'the demo key is missing from the APK');
 assert.equal(build.version_baked, build.version_code, 'x-p0-version must equal the versionCode');
+assert.equal(build.native_ok, true, 'Mapbox / LiveKit / the token are missing from the APK: ' + (build.native_missing ?? []).join(', '));
+assert.equal(build.legal_ok, true, 'license texts are missing from the APK: ' + (build.legal_missing ?? ['(built before the check)']).join(', '));
 assert.match(build.version_name, /^\d+\.\d+\.\d+$/, 'versionName like 0.1.0');
 const code = String(build.version_code);
 assert.match(code, /^20\d{6}\d{2}$/, 'versionCode YYYYMMDDNN');

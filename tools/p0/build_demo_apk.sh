@@ -122,6 +122,15 @@ with zipfile.ZipFile(apk) as z:
 NATIVE = ["lib/arm64-v8a/libmapbox-maps.so", "lib/arm64-v8a/libmapbox-common.so",
           "lib/arm64-v8a/liblkjingle_peerconnection_so.so", "assets/mapbox_token.txt"]
 native_missing = [n for n in NATIVE if n not in entries]
+# Settings › Legal › Licenses (q(129)): licenses.json and every file a row opens. They are plain files the export takes
+# only through the preset's include_filter; one left out reads blank on the phone (a QA export, 10-11).
+LEGAL = "assets/assets/p0/legal/licenses.json"
+legal_missing = [] if LEGAL in entries else [LEGAL]
+if LEGAL in entries:
+    with zipfile.ZipFile(apk) as z:
+        index = json.loads(z.read(LEGAL))
+    texts = [str(r.get("text", "")) for g in index.get("groups", []) for r in g.get("rows", [])]
+    legal_missing += ["assets/" + t[len("res://"):] for t in texts if t.startswith("res://") and "assets/" + t[len("res://"):] not in entries]
 result = {
     "apk": apk, "sha256": hashlib.sha256(open(apk, "rb").read()).hexdigest(),
     "package": pkg.group(1) if pkg else None, "version_code": int(pkg.group(2)) if pkg else None,
@@ -132,11 +141,12 @@ result = {
     "version_baked": baked.get("version") if baked else None,
     "source_commit": commit, "source_dirty": dirty != "",
     "native_ok": not native_missing, "native_missing": native_missing,
+    "legal_ok": not legal_missing, "legal_missing": legal_missing,
     "untracked_exported": untracked[:200], "untracked_exported_count": len(untracked),
 }
 json.dump(result, open(f"{logs}/build.json", "w"), indent=2)
 print(json.dumps(result, indent=2))
 ok = result["package"] == "com.sensen.p0demo" and result["server_matches"] and result["version_baked"] == result["version_code"] \
-    and result["native_ok"]
+    and result["native_ok"] and result["legal_ok"]
 sys.exit(0 if ok else 1)
 PY
