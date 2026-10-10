@@ -567,11 +567,11 @@ static func workbench_model(view: Dictionary, tab: String) -> Array:
 		elif r.get("coins_need", null) != null:
 			card.cost.append({"id": "coin", "name": "Coins", "have": int(r.get("coins_have", 0)), "need": int(r.coins_need)})
 		card.button = _craft_button(r)
-		# a facility still locked says its level first (FARM-5-FAC: `Farming Lv7 · 5 crops → 5 Compost a day`, 不知火舞)
-		var block = r.get("block", null)
-		if str(r.get("to", "")) == "field" and block is Dictionary and str(block.get("code", "")) == "skill_level_required":
-			var d: Dictionary = block.get("detail", {})
-			card.effect = "%s Lv%d · %s" % [str(d.get("skill", "")).capitalize(), int(d.get("level", 1)), card.effect]
+		# a facility says its level first, locked or not (FARM-5-FAC 2109:133018: `Farming Lv6 · Waters 8 plots for you`,
+		# `Farming Lv7 · 5 crops → 5 Compost a day`; 不知火舞 on 241 ba9359df)
+		var gate = r.get("gate", null)
+		if str(r.get("to", "")) == "field" and gate is Dictionary:
+			card.effect = "%s Lv%d · %s" % [str(gate.get("skill", "")).capitalize(), int(gate.get("level", 1)), card.effect]
 		out.append(card)
 	return out
 

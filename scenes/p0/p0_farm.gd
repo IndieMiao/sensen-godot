@@ -841,13 +841,15 @@ func _prompts(v: Dictionary) -> void:
 
 ## One facility's prompt at `at` + `mark` (the former finger card's / mark's anchor): its strip when it is the open
 ## one, else its icon button (P0WorldPrompts.show). The button and strip forward their taps to `at` + `hit` by id.
-func world_prompt(id: String, prompt: Dictionary, at: Vector3, mark: Vector3, hit: Vector3, present := true) -> void:
+## `side`: the strip's way, the character's facing when −1; a facility strip opens right, its icon on the left, as
+## the Fish Trap's (不知火舞 on 241 ba9359df).
+func world_prompt(id: String, prompt: Dictionary, at: Vector3, mark: Vector3, hit: Vector3, present := true, side := -1) -> void:
 	var screen := cam.unproject_position(at + mark)
 	var tap := cam.unproject_position(at + hit)
 	var show := P0WorldPrompts.show(id, _card, P0FarmMaterials.flat(actor.position, at), prompt) \
 		if present and not rt.ui.has_modal() else P0WorldPrompts.Show.NONE
 	if show == P0WorldPrompts.Show.BAR:
-		rt.ui.name_bar(id, prompt.icon, str(prompt.text), str(prompt.fact), screen, true, _strip_side, bool(prompt.dimmed),
+		rt.ui.name_bar(id, prompt.icon, str(prompt.text), str(prompt.fact), screen, true, _strip_side if side < 0 else side, bool(prompt.dimmed),
 			int(prompt.status), tap)
 	else:
 		rt.ui.world_icon(id, prompt.icon, screen, show == P0WorldPrompts.Show.ICON, false, int(prompt.status), tap,

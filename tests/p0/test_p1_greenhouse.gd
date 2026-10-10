@@ -44,8 +44,9 @@ func test_the_card_buttons_say_the_cap_and_the_coins() -> void:
 	r.block = {"code": "no_coins", "detail": {"need": 120}}
 	assert_str(str(P0MaterialLogic._craft_button(r).label)).is_equal("Need 120 more coins")
 	var card: Dictionary = P0MaterialLogic.workbench_model({"workbench": {"recipes": [{"id": "craft_greenhouse", "tab": "facilities",
-		"item": "facility_greenhouse", "name": "Greenhouse", "to": "field", "cost": [], "block": null, "coins_need": 340, "coins_have": 230}]}}, "facilities")[0]
-	assert_that([card.effect, card.cost[-1].name, card.cost[-1].have, card.cost[-1].need]).is_equal(["16 plots · −25%", "Coins", 230, 340])
+		"item": "facility_greenhouse", "name": "Greenhouse", "to": "field", "cost": [], "block": null, "coins_need": 340, "coins_have": 230,
+		"gate": {"skill": "farming", "level": 8, "ok": true}}]}}, "facilities")[0]
+	assert_that([card.effect, card.cost[-1].name, card.cost[-1].have, card.cost[-1].need]).is_equal(["Farming Lv8 · 16 plots · −25%", "Coins", 230, 340])
 
 ## The status card (李白): its plots and cut; crops under it grey Move with `Move · Harvest first`. The view's numbers are
 ## JSON floats, as the server sends them: a crop on 13.0 is found under covers of floats.

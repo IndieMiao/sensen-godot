@@ -37,7 +37,8 @@ func test_the_nearest_free_yard_cell() -> void:
 	assert_str(P0FarmFacilities.yard_reason(v, c)).is_empty()
 	assert_float(Vector2(c - Vector2i(5, 14)).length()).is_equal(1.0)   # one cell over
 	assert_that(P0FarmFacilities.nearest_yard_cell(v, Vector2i(5, 14), 3)).is_equal(Vector2i(5, 14))   # moving: where it is
-	# a new one beside the workbench's three cells (anchor 17, 16), not behind it where the bench would hide it
+	# a new one beside the workbench's three cells (anchor 17, 16; its right side is scenery, #280), not behind it
+	# where the bench would hide it
 	assert_that(P0FarmFacilities.nearest_yard_cell({"facilities": [], "decor": {"placed": []}}, Vector2i(17, 16), -1, 1)).is_equal(Vector2i(15, 16))
 
 ## COMPOST-BIN: `Compost today 2/5` / `resets in 9h 12m`; at the cap red `Limit reached` (q(121)).
@@ -81,13 +82,14 @@ func test_the_strip_reads_todays_count() -> void:
 	var p := P0FarmFacilities.bin_prompt(_view(), {"id": 3.0, "kind": "compost_bin"})
 	assert_that([p.text, p.fact]).is_equal(["Compost Bin", "2/5"])
 
-## FARM-5-FAC: the blueprint card's line, the level first while it is locked; at the cap `Compost Bins 1/1`.
+## FARM-5-FAC: the blueprint card's line, the level first, locked or not (不知火舞 ba9359df); at the cap `Compost Bins 1/1`.
 func test_the_blueprint_card() -> void:
 	var r := {"id": "craft_compost_bin", "tab": "facilities", "item": "facility_compost_bin", "name": "Compost Bin", "to": "field",
 		"cost": [{"id": "wood", "name": "Timber", "need": 6, "have": 12}, {"id": "stone", "name": "Stone", "need": 4, "have": 14}],
-		"block": {"code": "skill_level_required", "detail": {"skill": "farming", "level": 7}}}
+		"block": {"code": "skill_level_required", "detail": {"skill": "farming", "level": 7}},
+		"gate": {"skill": "farming", "level": 7, "ok": false}}
 	var card: Dictionary = P0MaterialLogic.workbench_model({"workbench": {"recipes": [r]}}, "facilities")[0]
 	assert_that([card.effect, card.button.label]).is_equal(["Farming Lv7 · 5 crops → 5 Compost a day", "Farming Lv7 needed"])
 	r.block = {"code": "facility_cap", "detail": {"cap": 1, "used": 1, "farming_next": null}}
 	card = P0MaterialLogic.workbench_model({"workbench": {"recipes": [r]}}, "facilities")[0]
-	assert_that([card.effect, card.button.label]).is_equal(["5 crops → 5 Compost a day", "Compost Bins 1/1"])
+	assert_that([card.effect, card.button.label]).is_equal(["Farming Lv7 · 5 crops → 5 Compost a day", "Compost Bins 1/1"])

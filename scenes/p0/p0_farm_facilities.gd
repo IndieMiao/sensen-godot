@@ -661,13 +661,15 @@ func card_candidates() -> Array:
 func prompts(v: Dictionary) -> void:
 	for f in v.get("facilities", []):
 		if is_yard(str(f.get("kind", ""))):
-			farm.world_prompt("bin_%d" % int(f.get("id", 0)), bin_prompt(v, f), _cell_ground(cell_of(f)), BIN_MARK, BIN_HIT)
+			farm.world_prompt("bin_%d" % int(f.get("id", 0)), bin_prompt(v, f), _cell_ground(cell_of(f)), BIN_MARK, BIN_HIT, true,
+				UiWorldNameBar.Dir.RIGHT)
 			continue
 		if not is_block(str(f.get("kind", ""))): continue
 		var r := _block_rect(f.get("covers", []))
 		var corner := Vector3(r.position.x, P0Garden.BED_H, r.position.y)
 		var middle := Vector3(r.get_center().x, P0Garden.BED_H + ROOF_H, r.get_center().y)
-		farm.world_prompt("gh_%d" % int(f.get("id", 0)), greenhouse_prompt(f), corner, STRIP_MARK, middle - corner)
+		farm.world_prompt("gh_%d" % int(f.get("id", 0)), greenhouse_prompt(f), corner, STRIP_MARK, middle - corner, true,
+			UiWorldNameBar.Dir.RIGHT)
 
 static func greenhouse_prompt(f: Dictionary) -> Dictionary:
 	var cut := int(round(float(P0Logic.content().get("facilities", {}).get("kinds", {}).get(str(f.get("kind", "")), {}).get("grow_cut", 0.25)) * 100.0))
