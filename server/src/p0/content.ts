@@ -41,7 +41,15 @@ export type Convenience = 'cook_again' | 'clue_double' | 'hearty_mishap' | 'stea
   // P1 (SGODOT-282, §4.6.3 Lv7–10)
   | 'steady_hand_2' | 'fast_mastery' | 'cook_all' | 'provisions_plus' | 'chefs_touch' | 'title_chef' | 'lucky_double';
 /** A P0 Cookbook page that can be cooked (§7.14.0); n = its page number in the 48-page Cookbook. */
-export interface Recipe { n?: number; id: string; name: string; in: string[]; known?: boolean; style?: string; learn?: Learn[]; regional?: boolean; card_zone?: string; card_zones?: string[] }
+export interface Recipe {
+  n?: number; id: string; name: string; in: string[]; known?: boolean; style?: string; learn?: Learn[];
+  // P1 (SGODOT-282, Li Bai's 48 pages): rarity as the plan's table (used when an ingredient is not in this build);
+  // families = each slot's family for the silhouette; cookable: false = buy-only (#9 Travel Biscuits).
+  rarity?: number; families?: string[]; cookable?: boolean; buy?: { at: string; price: number; daily: number };
+  card_price?: number; card_zone?: string; card_zones?: string[];   // recipe cards (§7.16.1): Market climate / Stall home climates
+  teach?: string[]; buff?: string; regional?: boolean;              // residents who teach it (§7.16.3); Legendary Buff (P3)
+  no_gift?: boolean; no_request?: boolean; no_buyback?: boolean;
+}
 /** A page outside P0 (§7.14.1–7.14.4): only its silhouette shows, slots = the family of each slot. */
 export interface SilhouettePage { n: number; id: string; name: string; rarity: number; slots: string[]; style: string; learn: Learn[] }
 
@@ -203,7 +211,7 @@ export interface P0Content {
     // coins paid, cabinet = Warming Cabinet portions added, decor = the yard piece it gives (placed with Decorate).
     // Recipe cards (§7.16.1, SGODOT-282): a card makes a page Tasted. The Homestead Stall shows `stall_daily` cards a
     // day from `stall` (pages not yet in the Cookbook); Market sells `market` cards of its climate. Prices by rarity.
-    cards?: { prices: Record<string, number>; stall_daily: number; stall: (string | { page: string; climates: string[] })[]; market: { page: string; climate: string }[] };   // a stall entry with climates shows only for those home climates
+    cards?: { prices?: Record<string, number>; stall_daily: number };   // the pool and prices are on the recipes (card_price / card_zone / card_zones)
     milestones?: { id: string; title: string; discovered?: number; mastered?: number; coins?: number; cabinet?: number; decor?: string }[];
     quick_fire: number;                          // Quick Fire: cooking time and heat times × this (§4.6.3 Lv6)
     trial_refunds: number;                       // failed pots a day that refund their ingredients in the blessing (§7.5.2)

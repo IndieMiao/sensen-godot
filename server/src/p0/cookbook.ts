@@ -3,7 +3,7 @@
  * what it takes" hint, and the P0 Cooking conveniences (Lv1–6, q(38); Lv7–10 come with P1).
  */
 import { cropById, fishById, ingredient, type Convenience, type P0Content, type Recipe } from './content.js';
-import { cookSlots, ingredientsFor, recipeRarity, tokenInfo, tokenMatches } from './cooking.js';
+import { cookSlots, cookable, ingredientsFor, recipeRarity, tokenInfo, tokenMatches } from './cooking.js';
 import { chefSignGold } from './homestead.js';
 import { ingredientStock } from './kitchen_storage.js';
 import { blessed, skillLevel, xpPercent } from './rules.js';
@@ -153,24 +153,30 @@ export function cookbookView(c: P0Content, s: P0State, now: number) {
   const pages = [
     ...c.cooking.recipes.map(r => {
       const state = pageState(c, s, r.id), rarity = recipeRarity(c, r), known = s.cookbook.includes(r.id);
+      // p0 = cookable in this build (every ingredient exists, not buy-only); the rest show as silhouettes with their
+      // slot families (SGODOT-282: all 48 pages are recipes, P1 crops and fish arrive with their lines).
+      const cooks = cookable(c, r);
       const clues = s.book.clues[r.id] ?? [];
       const open = state === 'tasted' || state === 'discovered' || state === 'mastered';
       return {
         n: r.n ?? 0, id: r.id, name: known ? r.name : null, rarity, slots: r.in.length,
-        families: r.in.map(t => tokenInfo(c, t)?.family ?? '?'), style: r.style ?? '', learn: r.learn ?? [],
+        families: r.in.map((t, i) => tokenInfo(c, t)?.family ?? r.families?.[i] ?? '?'), style: r.style ?? '', learn: r.learn ?? [],
         state, known, in: r.in.map((t, i) => (open || clues.includes(i) ? t : '?')),
         cooked: s.firsts.includes(`cook:${r.id}`), cooked_total: s.book.cooked[r.id] ?? 0, best: s.book.best[r.id] ?? null,
         first_at: s.book.first_at[r.id] ?? null, mastered: state === 'mastered',
-        can_cook: known && r.in.length <= slots && ingredientsFor(c, s, r) !== null,
-        maybe: (state === 'hidden' || state === 'clued') && r.in.length <= slots && mightHave(c, r, stock),
+        can_cook: cooks && known && r.in.length <= slots && ingredientsFor(c, s, r) !== null,
+        maybe: cooks && (state === 'hidden' || state === 'clued') && r.in.length <= slots && mightHave(c, r, stock),
         lock: lock(r.in.length), today: s.day.cooked[r.id] ?? 0,
-        xp_pct: xpPercent(c, level, c.cooking.tiers[String(rarity)].level), p0: true,
+        xp_pct: xpPercent(c, level, c.cooking.tiers[String(rarity)].level), p0: cooks,
+        buff: rarity === 4 ? (r.buff ?? null) : null,   // Legendary: the Buff slot, empty until P3 ("Buff · coming later")
+        buy: r.buy ?? null, regional: r.regional ?? false,
       };
     }),
     ...c.cooking.pages.map(p => ({
       n: p.n, id: p.id, name: null, rarity: p.rarity, slots: p.slots.length, families: p.slots, style: p.style, learn: p.learn,
       state: 'hidden' as PageState, known: false, in: p.slots.map(() => '?'), cooked: false, cooked_total: 0, best: null,
       first_at: null, mastered: false, can_cook: false, maybe: false, lock: lock(p.slots.length), today: 0, xp_pct: 100, p0: false,
+      buff: null, buy: null, regional: false,
     })),
   ].sort((a, b) => a.n - b.n);
   return {

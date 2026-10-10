@@ -375,10 +375,16 @@ static func crop_plural(name: String, n: int) -> String:
 	return w + "s"
 
 ## Items that share an existing icon until they get their own (SGODOT-228 content).
+## SGODOT-282: P1 pages that already cook with P0 ingredients but have no icon of their own yet borrow the nearest P0
+## dish (never the field sprout, int6 C7). Remove each line once 安其拉's icon lands.
+const DISH_STANDIN := {"dish_rock_salt_soup": "dish_fish_soup", "dish_charcoal_fish": "dish_grilled_fish",
+	"dish_fruit_platter": "dish_fruit_tea", "dish_harvest_roast": "dish_roast_veggies", "dish_salt_mackerel": "dish_salt_grilled_fish",
+	"dish_legend_sashimi": "dish_smoked_trout"}
+
 const ICON_ALIAS := {"fert_compost": "compost", "tool_row_hoe": "hoe", "bag_upgrade_1": "bag", "postcard_san_francisco": "postcard", "postcard_shanghai": "postcard", "wild_herb": "crop_herb", "drink_hot_tea": "dish_fruit_tea", "drink_coffee": "dish_fruit_tea"}
 
 static func icon(id: String) -> Texture2D:
-	var path := ICON_DIR % str(ICON_ALIAS.get(id, id))
+	var path := ICON_DIR % str(ICON_ALIAS.get(id, DISH_STANDIN.get(id, id)))
 	return load(path) if ResourceLoader.exists(path) else load(ICON_DIR % "field")
 
 ## "m:ss" under an hour, "1h 12m" from one hour (state-icons rule: durations, never clock times). For the timers that

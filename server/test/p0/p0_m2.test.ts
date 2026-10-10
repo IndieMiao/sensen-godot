@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { loadP0Content, recipeById } from '../../src/p0/content.js';
-import { deriveRarity, heatHits, matchRecipe, recipeRarity } from '../../src/p0/cooking.js';
+import { cookable, cookablePages, deriveRarity, heatHits, matchRecipe, recipeRarity } from '../../src/p0/cooking.js';
 import { applyP0, count, type P0Command, type P0Event } from '../../src/p0/reducer.js';
 import { freshState, type P0State } from '../../src/p0/state.js';
 import { viewOf } from '../../src/p0/view.js';
@@ -132,14 +132,18 @@ describe('P0 fishing (§6.1–6.7)', () => {
 describe('P0 recipes (§7.2.3 / §7.4.1)', () => {
   it('derives page rarity from ingredient rarity × families', () => {
     // §7.14.0 (q(39)): the 14 P0 pages, Common 5 / Fine 6 / Rare 3, in Cookbook order.
-    expect(c.cooking.recipes.map(r => [r.n, r.id, recipeRarity(c, r)])).toEqual([
-      [1, 'dish_grilled_crucian', 1], [2, 'dish_grilled_fish', 1], [5, 'dish_radish_salad', 1], [6, 'dish_veggie_plate', 1],
-      [7, 'dish_carrot_cake', 1], [10, 'dish_herb_grilled_fish', 2], [11, 'dish_salt_grilled_fish', 2], [12, 'dish_fish_soup', 2],
-      [15, 'dish_pan_fried_fish', 2], [17, 'dish_salted_potatoes', 2], [19, 'dish_fruit_tea', 2], [27, 'dish_bass_tomato_stew', 3],
-      [28, 'dish_smoked_trout', 3], [37, 'dish_fisher_stew', 3]]);
-    expect(c.cooking.recipes.filter(r => r.in.length === 3).every(r => r.in.includes('rock_salt'))).toBe(true);
-    expect([...c.cooking.recipes.map(r => r.n), ...c.cooking.pages.map(p => p.n)].sort((a, b) => a! - b!)).toEqual(
-      Array.from({ length: 48 }, (_, i) => i + 1));
+    // SGODOT-282: all 48 pages are recipes (Li Bai's P1 table); 24 cook with the P0 crops and fish, the others wait
+    // for theirs. Every page's derived rarity matches the table's.
+    expect(c.cooking.recipes.map(r => r.n)).toEqual(Array.from({ length: 48 }, (_, i) => i + 1));
+    expect(c.cooking.recipes.filter(r => r.rarity !== undefined && cookable(c, r)).every(r => recipeRarity(c, r) === r.rarity)).toBe(true);
+    expect(cookablePages(c).map(r => [r.n, r.id, recipeRarity(c, r)])).toEqual([
+      [1, 'dish_grilled_crucian', 1], [2, 'dish_grilled_fish', 1], [3, 'dish_carp_cakes', 1], [4, 'dish_mullet_skewers', 1],
+      [5, 'dish_radish_salad', 1], [6, 'dish_veggie_plate', 1], [7, 'dish_carrot_cake', 1], [10, 'dish_herb_grilled_fish', 2],
+      [11, 'dish_salt_grilled_fish', 2], [12, 'dish_fish_soup', 2], [15, 'dish_pan_fried_fish', 2], [16, 'dish_rock_salt_soup', 2],
+      [17, 'dish_salted_potatoes', 2], [19, 'dish_fruit_tea', 2], [21, 'dish_roast_veggies', 2], [23, 'dish_charcoal_fish', 3],
+      [24, 'dish_fruit_platter', 3], [25, 'dish_harvest_roast', 3], [26, 'dish_herb_baked_perch', 3], [27, 'dish_bass_tomato_stew', 3],
+      [28, 'dish_smoked_trout', 3], [29, 'dish_salt_mackerel', 3], [37, 'dish_fisher_stew', 3], [41, 'dish_legend_sashimi', 4]]);
+    expect(cookable(c, c.cooking.recipes[8])).toBe(false);   // #9 Travel Biscuits: bought, never cooked
     expect(deriveRarity(c, [{ family: 'W', rarity: 1 }, { family: 'F', rarity: 1 }, { family: 'S', rarity: 1 }])).toBe(3);
   });
   it('specific pages beat tag pages, fewest wildcards win, otherwise a Mystery Dish', () => {
@@ -151,8 +155,9 @@ describe('P0 recipes (§7.2.3 / §7.4.1)', () => {
     expect(matchRecipe(c, ['fish_trout', 'crop_potato', 'rock_salt'])?.id).toBe('dish_fisher_stew');
     expect(matchRecipe(c, ['fish_trout', 'wild_herb', 'rock_salt'])?.id).toBe('dish_smoked_trout');
     expect(matchRecipe(c, ['fish_trout', 'crop_herb', 'rock_salt'])).toBeNull();                   // Smoked Trout takes Wild Herb only
-    expect(matchRecipe(c, ['fish_carp', 'fish_carp'])).toBeNull();                                  // Carp Fish Cakes is P1
-    expect(matchRecipe(c, ['crop_tomato'])).toBeNull();                                             // so is Roast Veggies
+    expect(matchRecipe(c, ['fish_carp', 'fish_carp'])?.id).toBe('dish_carp_cakes');                // P1 page, P0 fish
+    expect(matchRecipe(c, ['crop_tomato'])?.id).toBe('dish_roast_veggies');                         // SGODOT-242: the fallback page
+    expect(matchRecipe(c, ['crop_corn'])).toBeNull();                                               // corn is not in this build yet
     expect(matchRecipe(c, ['crop_radish', 'crop_carrot'])).toBeNull();
   });
 });

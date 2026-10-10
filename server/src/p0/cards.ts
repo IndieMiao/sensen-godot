@@ -1,10 +1,11 @@
 /** Recipe cards (plan §7.16.1, SGODOT-282). A card is bought once and turns its page Tasted (into the Cookbook);
- * the first cook still makes it Discovered and pays first-cook XP. The Homestead Stall shelves `stall_daily` cards
- * a day, drawn from pages not yet in the Cookbook and fixed for the day; Market sells its climate's cards. */
-import { recipeById, type P0Content } from './content.js';
+ * the first cook still makes it Discovered and pays first-cook XP. The pool is on the recipes (Li Bai's 48 pages):
+ * card_price, card_zone (Market, that climate) or card_zones (Stall, only those home climates). The Homestead Stall
+ * shelves `stall_daily` cards a day, drawn from pages not yet in the Cookbook and fixed for the day. */
+import { recipeById, type P0Content, type Recipe } from './content.js';
 import { coinsNeeded } from './homestead.js';
 import type { P0Event } from './progress.js';
-import { recipeRarity } from './cooking.js';
+import { cookable } from './cooking.js';
 import type { P0State } from './state.js';
 import type { Refusal } from './fishing.js';
 
@@ -12,12 +13,14 @@ export const CARD = 'recipe_card_';
 export const isCard = (id: string) => id.startsWith(CARD);
 export const cardPage = (id: string) => id.slice(CARD.length);
 
-/** A card's price: by its page's rarity (Common 30, Fine 80, Rare 200, Legendary 500). */
+/** A card's price (Stall 30 / 80, Market 200 / 500), or null for a page with no card. */
 export function cardPrice(c: P0Content, id: string): number | null {
-  const recipe = recipeById(c, cardPage(id));
-  if (!recipe || !c.cooking.cards) return null;
-  return c.cooking.cards.prices[String(recipeRarity(c, recipe))] ?? null;
+  return recipeById(c, cardPage(id))?.card_price ?? null;
 }
+
+/** Pages that can carry a card now: priced, and cookable in this build (a card for a page with no ingredients yet
+ * would teach a dish nobody can make). */
+const carded = (c: P0Content) => c.cooking.recipes.filter((r): r is Recipe & { card_price: number } => r.card_price !== undefined && cookable(c, r));
 
 const mix = (h: number, text: string) => {
   for (let i = 0; i < text.length; i++) h = Math.imul(h ^ text.charCodeAt(i), 16777619);
@@ -30,8 +33,8 @@ export function stallCards(c: P0Content, s: P0State): string[] {
   const cards = c.cooking.cards;
   if (!cards) return [];
   if (s.day.cards) return s.day.cards;
-  const open = cards.stall.flatMap(e => typeof e === 'string' ? [e] : e.climates.includes(c.profile.climate) ? [e.page] : [])
-    .filter(page => recipeById(c, page) && !s.cookbook.includes(page));
+  const open = carded(c).filter(r => r.card_zone === undefined && (!r.card_zones || r.card_zones.includes(c.profile.climate)))
+    .map(r => r.id).filter(page => !s.cookbook.includes(page));
   const seed = mix(2166136261, `${s.player}:${s.day.key}`);
   return open.map(page => ({ page, k: mix(seed, page) })).sort((a, b) => a.k - b.k)
     .slice(0, cards.stall_daily).map(x => CARD + x.page);
@@ -44,7 +47,7 @@ export function settleCards(c: P0Content, s: P0State): void {
 
 /** Market cards for this climate (Rare / Legendary regional pages). */
 export function marketCards(c: P0Content, climate: string): string[] {
-  return (c.cooking.cards?.market ?? []).filter(m => m.climate === climate && recipeById(c, m.page)).map(m => CARD + m.page);
+  return c.cooking.cards ? carded(c).filter(r => r.card_zone === climate).map(r => CARD + r.id) : [];
 }
 
 /** Buy a card at the counter that shelves it: the page goes into the Cookbook (Tasted). */

@@ -34,12 +34,12 @@ describe('Recipe cards (§7.16.1)', () => {
   });
 
   it('only Temperate homes see page 14 and only tropical ones page 13; Market sells its climate card', () => {
-    const pool = c.cooking.cards!.stall;
-    expect(pool).toContainEqual({ page: 'dish_crispy_smelt', climates: ['Temperate', 'Cold Temperate'] });
+    expect(c.cooking.recipes.find(r => r.n === 14)).toMatchObject({ card_price: 80, card_zones: ['Temperate', 'Cold Temperate'] });
+    expect(c.cooking.recipes.find(r => r.n === 47)).toMatchObject({ card_price: 500, card_zone: 'Temperate' });
     const s = fresh();
     s.cookbook = c.cooking.recipes.map(r => r.id);   // every cookable page known: nothing left to shelve
     expect(shelf(s)).toEqual([]);   // the silhouettes (13, 14, …) join once they are recipes (SGODOT-281)
-    expect(viewOf(c, fresh(), T0).shops.market.cards).toEqual([]);   // page 47 waits for the P1 pages
+    expect(viewOf(c, fresh(), T0).shops.market.cards).toEqual([]);   // page 47 (Pumpkin Chowder) waits for pumpkins
   });
 
   it('buying one puts the page in the Cookbook as Tasted, charges the price and leaves it off the shelf', () => {
@@ -58,8 +58,8 @@ describe('Recipe cards (§7.16.1)', () => {
   it('refuses a card not on today\'s shelf, more than one at a time, and short coins (40 floor)', () => {
     const s = fresh();
     const today = shelf(s).map(x => x.id);
-    const off = c.cooking.cards!.stall.map(e => `recipe_card_${typeof e === 'string' ? e : e.page}`)
-      .find(id => !today.includes(id) && c.cooking.recipes.some(r => `recipe_card_${r.id}` === id) && !s.cookbook.includes(id.slice(12)))!;
+    const off = c.cooking.recipes.filter(r => r.card_price && !r.card_zone && !r.card_zones && r.n! <= 7 && !s.cookbook.includes(r.id))
+      .map(r => `recipe_card_${r.id}`).find(id => !today.includes(id))!;
     expect(applyP0(c, s, buy(off), T0)).toMatchObject({ ok: false, code: 'bad_item' });
     expect(applyP0(c, s, { type: 'buy', item: today[0], qty: 2, shop: 'homestead' }, T0)).toMatchObject({ ok: false, code: 'bad_qty' });
     const poor = { ...fresh(), coins: 60 };

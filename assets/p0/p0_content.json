@@ -696,7 +696,7 @@
     "quick_fire": 0.8,
     "lucky_double": 0.1,
     "cook_all_per_page": 2,
-    "_cards": "Recipe cards §7.16.1 (SGODOT-282): Stall pool = pages 2–4, 6–8, 11–22 (13 only for Tropical / Subtropical homes, 14 for Temperate / Cold Temperate), 2 a day; Market = 36, 45–48 by climate. Only pages that are cookable recipes show; the silhouettes join when Li Bai's P1 pages (SGODOT-281) make them recipes.",
+    "_cards": "Recipe cards §7.16.1 (SGODOT-282): from each recipe's card_price — Homestead Stall pages have no card_zone (card_zones = which home climates shelve it), Market pages have card_zone. 2 a day at the Stall, from pages not yet in the Cookbook.",
     "cards": {
       "prices": {
         "1": 30,
@@ -704,61 +704,7 @@
         "3": 200,
         "4": 500
       },
-      "stall_daily": 2,
-      "stall": [
-        "dish_grilled_fish",
-        "dish_carp_cakes",
-        "dish_mullet_skewers",
-        "dish_veggie_plate",
-        "dish_carrot_cake",
-        "dish_cabbage_stew",
-        "dish_salt_grilled_fish",
-        "dish_fish_soup",
-        {
-          "page": "dish_tilapia_wraps",
-          "climates": [
-            "Tropical",
-            "Subtropical"
-          ]
-        },
-        {
-          "page": "dish_crispy_smelt",
-          "climates": [
-            "Temperate",
-            "Cold Temperate"
-          ]
-        },
-        "dish_pan_fried_fish",
-        "dish_rock_salt_soup",
-        "dish_salted_potatoes",
-        "dish_cucumber_salad",
-        "dish_fruit_tea",
-        "dish_apple_tea",
-        "dish_roast_veggies",
-        "dish_corn_cake"
-      ],
-      "market": [
-        {
-          "page": "dish_pineapple_barra",
-          "climate": "Tropical"
-        },
-        {
-          "page": "dish_pineapple_fish",
-          "climate": "Tropical"
-        },
-        {
-          "page": "dish_sweet_potato_cakes",
-          "climate": "Subtropical"
-        },
-        {
-          "page": "dish_pumpkin_chowder",
-          "climate": "Temperate"
-        },
-        {
-          "page": "dish_beet_fish_soup",
-          "climate": "Cold Temperate"
-        }
-      ]
+      "stall_daily": 2
     },
     "milestones": [
       {
@@ -798,7 +744,8 @@
         "style": "Grilled",
         "learn": [
           "start"
-        ]
+        ],
+        "rarity": 1
       },
       {
         "n": 2,
@@ -812,6 +759,59 @@
           "experiment",
           "card",
           "taught"
+        ],
+        "rarity": 1,
+        "card_price": 30,
+        "teach": [
+          "Old Kai"
+        ]
+      },
+      {
+        "n": 3,
+        "id": "dish_carp_cakes",
+        "name": "Carp Fish Cakes",
+        "in": [
+          "fish_carp",
+          "fish_carp"
+        ],
+        "style": "Grilled",
+        "learn": [
+          "experiment",
+          "card",
+          "taught"
+        ],
+        "rarity": 1,
+        "card_price": 30,
+        "teach": [
+          "Sam"
+        ],
+        "families": [
+          "W",
+          "W"
+        ]
+      },
+      {
+        "n": 4,
+        "id": "dish_mullet_skewers",
+        "name": "Mullet Skewers",
+        "in": [
+          "fish_mullet",
+          "fish_mullet"
+        ],
+        "style": "Grilled",
+        "learn": [
+          "experiment",
+          "card",
+          "taught"
+        ],
+        "rarity": 1,
+        "card_price": 30,
+        "teach": [
+          "Sam"
+        ],
+        "families": [
+          "W",
+          "W"
         ]
       },
       {
@@ -826,7 +826,8 @@
         "style": "Salad",
         "learn": [
           "start"
-        ]
+        ],
+        "rarity": 1
       },
       {
         "n": 6,
@@ -840,6 +841,11 @@
           "experiment",
           "card",
           "taught"
+        ],
+        "rarity": 1,
+        "card_price": 30,
+        "teach": [
+          "Theo"
         ]
       },
       {
@@ -855,7 +861,57 @@
           "experiment",
           "card",
           "taught"
+        ],
+        "rarity": 1,
+        "card_price": 30,
+        "teach": [
+          "Pip"
         ]
+      },
+      {
+        "n": 8,
+        "id": "dish_cabbage_stew",
+        "name": "Cabbage Stew",
+        "in": [
+          "crop_cabbage",
+          "crop_potato"
+        ],
+        "style": "Stew",
+        "learn": [
+          "experiment",
+          "card",
+          "taught"
+        ],
+        "rarity": 1,
+        "card_price": 30,
+        "teach": [
+          "Nadia"
+        ],
+        "families": [
+          "F",
+          "F"
+        ]
+      },
+      {
+        "n": 9,
+        "id": "dish_travel_biscuits",
+        "name": "Travel Biscuits",
+        "in": [],
+        "style": "Dessert",
+        "learn": [
+          "buy"
+        ],
+        "rarity": 1,
+        "buy": {
+          "at": "travel_post",
+          "price": 40,
+          "daily": 3
+        },
+        "cookable": false,
+        "no_gift": true,
+        "no_request": true,
+        "no_buyback": true,
+        "families": []
       },
       {
         "n": 10,
@@ -869,7 +925,8 @@
         "learn": [
           "gift",
           "experiment"
-        ]
+        ],
+        "rarity": 2
       },
       {
         "n": 11,
@@ -884,6 +941,11 @@
           "experiment",
           "card",
           "taught"
+        ],
+        "rarity": 2,
+        "card_price": 80,
+        "teach": [
+          "Ivo"
         ]
       },
       {
@@ -900,6 +962,70 @@
           "experiment",
           "card",
           "taught"
+        ],
+        "rarity": 2,
+        "card_price": 80,
+        "teach": [
+          "Rafa",
+          "Granny Wu"
+        ]
+      },
+      {
+        "n": 13,
+        "id": "dish_tilapia_wraps",
+        "name": "Tilapia Wraps",
+        "in": [
+          "fish_tilapia",
+          "crop_lettuce"
+        ],
+        "style": "Salad",
+        "learn": [
+          "experiment",
+          "card",
+          "taught"
+        ],
+        "rarity": 2,
+        "card_price": 80,
+        "card_zones": [
+          "Tropical",
+          "Subtropical"
+        ],
+        "teach": [
+          "Theo"
+        ],
+        "regional": true,
+        "families": [
+          "W",
+          "F"
+        ]
+      },
+      {
+        "n": 14,
+        "id": "dish_crispy_smelt",
+        "name": "Crispy Smelt",
+        "in": [
+          "fish_smelt",
+          "rock_salt"
+        ],
+        "style": "Grilled",
+        "learn": [
+          "experiment",
+          "card",
+          "taught"
+        ],
+        "rarity": 2,
+        "card_price": 80,
+        "card_zones": [
+          "Temperate",
+          "Cold Temperate"
+        ],
+        "teach": [
+          "Sam"
+        ],
+        "regional": true,
+        "families": [
+          "W",
+          "S"
         ]
       },
       {
@@ -914,6 +1040,35 @@
           "experiment",
           "card",
           "taught"
+        ],
+        "rarity": 2,
+        "card_price": 80,
+        "teach": [
+          "Old Kai"
+        ]
+      },
+      {
+        "n": 16,
+        "id": "dish_rock_salt_soup",
+        "name": "Rock-Salt Soup",
+        "in": [
+          "F1",
+          "rock_salt"
+        ],
+        "style": "Soup",
+        "learn": [
+          "experiment",
+          "card",
+          "taught"
+        ],
+        "rarity": 2,
+        "card_price": 80,
+        "teach": [
+          "Granny Wu"
+        ],
+        "families": [
+          "F",
+          "S"
         ]
       },
       {
@@ -930,6 +1085,35 @@
           "experiment",
           "card",
           "taught"
+        ],
+        "rarity": 2,
+        "card_price": 80,
+        "teach": [
+          "Nadia"
+        ]
+      },
+      {
+        "n": 18,
+        "id": "dish_cucumber_salad",
+        "name": "Cucumber Salad",
+        "in": [
+          "crop_cucumber",
+          "crop_herb"
+        ],
+        "style": "Salad",
+        "learn": [
+          "experiment",
+          "card",
+          "taught"
+        ],
+        "rarity": 2,
+        "card_price": 80,
+        "teach": [
+          "Theo"
+        ],
+        "families": [
+          "F",
+          "S"
         ]
       },
       {
@@ -944,6 +1128,166 @@
           "experiment",
           "card",
           "taught"
+        ],
+        "rarity": 2,
+        "card_price": 80,
+        "teach": [
+          "Lena"
+        ]
+      },
+      {
+        "n": 20,
+        "id": "dish_apple_tea",
+        "name": "Apple Tea",
+        "in": [
+          "crop_chamomile",
+          "crop_apple",
+          "crop_apple"
+        ],
+        "style": "Tea",
+        "learn": [
+          "experiment",
+          "card",
+          "taught"
+        ],
+        "rarity": 2,
+        "card_price": 80,
+        "teach": [
+          "Lena"
+        ],
+        "families": [
+          "O",
+          "O",
+          "O"
+        ]
+      },
+      {
+        "n": 21,
+        "id": "dish_roast_veggies",
+        "name": "Roast Veggies",
+        "in": [
+          "F2"
+        ],
+        "style": "Grilled",
+        "learn": [
+          "experiment",
+          "card",
+          "taught"
+        ],
+        "rarity": 2,
+        "card_price": 80,
+        "teach": [
+          "Nadia"
+        ],
+        "families": [
+          "F"
+        ]
+      },
+      {
+        "n": 22,
+        "id": "dish_corn_cake",
+        "name": "Corn Cake",
+        "in": [
+          "crop_corn",
+          "crop_corn"
+        ],
+        "style": "Dessert",
+        "learn": [
+          "experiment",
+          "card",
+          "taught"
+        ],
+        "rarity": 2,
+        "card_price": 80,
+        "teach": [
+          "Pip",
+          "Hana"
+        ],
+        "families": [
+          "F",
+          "F"
+        ]
+      },
+      {
+        "n": 23,
+        "id": "dish_charcoal_fish",
+        "name": "Charcoal Fish",
+        "in": [
+          "W3"
+        ],
+        "style": "Grilled",
+        "learn": [
+          "experiment",
+          "taught"
+        ],
+        "rarity": 3,
+        "teach": [
+          "Old Kai"
+        ],
+        "families": [
+          "W"
+        ]
+      },
+      {
+        "n": 24,
+        "id": "dish_fruit_platter",
+        "name": "Fruit Platter",
+        "in": [
+          "O3"
+        ],
+        "style": "Salad",
+        "learn": [
+          "experiment",
+          "taught"
+        ],
+        "rarity": 3,
+        "teach": [
+          "Theo"
+        ],
+        "families": [
+          "O"
+        ]
+      },
+      {
+        "n": 25,
+        "id": "dish_harvest_roast",
+        "name": "Harvest Roast",
+        "in": [
+          "F3"
+        ],
+        "style": "Grilled",
+        "learn": [
+          "experiment",
+          "taught"
+        ],
+        "rarity": 3,
+        "teach": [
+          "Nadia"
+        ],
+        "families": [
+          "F"
+        ]
+      },
+      {
+        "n": 26,
+        "id": "dish_herb_baked_perch",
+        "name": "Herb Baked Perch",
+        "in": [
+          "fish_perch",
+          "crop_herb"
+        ],
+        "style": "Grilled",
+        "learn": [
+          "experiment",
+          "taught"
+        ],
+        "rarity": 3,
+        "teach": [
+          "Old Kai"
+        ],
+        "families": [
+          "W",
+          "S"
         ]
       },
       {
@@ -958,6 +1302,10 @@
         "learn": [
           "experiment",
           "taught"
+        ],
+        "rarity": 3,
+        "teach": [
+          "Nadia"
         ]
       },
       {
@@ -973,6 +1321,193 @@
         "learn": [
           "experiment",
           "taught"
+        ],
+        "rarity": 3,
+        "teach": [
+          "Old Kai",
+          "Lena"
+        ]
+      },
+      {
+        "n": 29,
+        "id": "dish_salt_mackerel",
+        "name": "Salt Mackerel",
+        "in": [
+          "fish_mackerel",
+          "rock_salt"
+        ],
+        "style": "Grilled",
+        "learn": [
+          "experiment",
+          "taught"
+        ],
+        "rarity": 3,
+        "teach": [
+          "Ivo"
+        ],
+        "families": [
+          "W",
+          "S"
+        ]
+      },
+      {
+        "n": 30,
+        "id": "dish_grass_carp_soup",
+        "name": "Grass Carp Soup",
+        "in": [
+          "fish_grass_carp",
+          "crop_radish"
+        ],
+        "style": "Soup",
+        "learn": [
+          "experiment",
+          "taught"
+        ],
+        "rarity": 3,
+        "teach": [
+          "Rafa"
+        ],
+        "families": [
+          "W",
+          "F"
+        ]
+      },
+      {
+        "n": 31,
+        "id": "dish_char_chowder",
+        "name": "Char Chowder",
+        "in": [
+          "fish_arctic_char",
+          "crop_potato"
+        ],
+        "style": "Soup",
+        "learn": [
+          "experiment",
+          "taught"
+        ],
+        "rarity": 3,
+        "teach": [
+          "Granny Wu"
+        ],
+        "families": [
+          "W",
+          "F"
+        ]
+      },
+      {
+        "n": 32,
+        "id": "dish_catfish_stew",
+        "name": "Catfish Stew",
+        "in": [
+          "fish_catfish",
+          "crop_potato"
+        ],
+        "style": "Stew",
+        "learn": [
+          "experiment",
+          "taught"
+        ],
+        "rarity": 3,
+        "teach": [
+          "Nadia",
+          "Rafa"
+        ],
+        "families": [
+          "W",
+          "F"
+        ]
+      },
+      {
+        "n": 33,
+        "id": "dish_sea_bass_salt",
+        "name": "Sea Bass in Salt",
+        "in": [
+          "fish_seabass",
+          "rock_salt"
+        ],
+        "style": "Grilled",
+        "learn": [
+          "experiment",
+          "taught"
+        ],
+        "rarity": 3,
+        "teach": [
+          "Ivo",
+          "Old Kai"
+        ],
+        "families": [
+          "W",
+          "S"
+        ]
+      },
+      {
+        "n": 34,
+        "id": "dish_chili_snakehead",
+        "name": "Chili Snakehead",
+        "in": [
+          "fish_snakehead",
+          "crop_chili"
+        ],
+        "style": "Stew",
+        "learn": [
+          "experiment",
+          "taught"
+        ],
+        "rarity": 3,
+        "teach": [
+          "Mira"
+        ],
+        "families": [
+          "W",
+          "S"
+        ]
+      },
+      {
+        "n": 35,
+        "id": "dish_grilled_pike",
+        "name": "Grilled Pike",
+        "in": [
+          "fish_pike",
+          "wild_herb"
+        ],
+        "style": "Grilled",
+        "learn": [
+          "experiment",
+          "taught"
+        ],
+        "rarity": 3,
+        "teach": [
+          "Lena"
+        ],
+        "families": [
+          "W",
+          "S"
+        ]
+      },
+      {
+        "n": 36,
+        "id": "dish_pineapple_barra",
+        "name": "Pineapple Barra",
+        "in": [
+          "fish_barramundi",
+          "crop_pineapple"
+        ],
+        "style": "Grilled",
+        "learn": [
+          "experiment",
+          "market",
+          "taught"
+        ],
+        "rarity": 3,
+        "card_price": 200,
+        "card_zone": "Tropical",
+        "teach": [
+          "Mira"
+        ],
+        "regional": true,
+        "families": [
+          "W",
+          "O"
         ]
       },
       {
@@ -988,536 +1523,300 @@
         "learn": [
           "experiment",
           "taught"
-        ]
-      }
-    ],
-    "pages": [
-      {
-        "n": 3,
-        "id": "dish_carp_cakes",
-        "name": "Carp Fish Cakes",
-        "rarity": 1,
-        "slots": [
-          "W",
-          "W"
         ],
-        "style": "Grilled",
-        "learn": [
-          "experiment",
-          "card",
-          "taught"
-        ]
-      },
-      {
-        "n": 4,
-        "id": "dish_mullet_skewers",
-        "name": "Mullet Skewers",
-        "rarity": 1,
-        "slots": [
-          "W",
-          "W"
-        ],
-        "style": "Grilled",
-        "learn": [
-          "experiment",
-          "card",
-          "taught"
-        ]
-      },
-      {
-        "n": 8,
-        "id": "dish_cabbage_stew",
-        "name": "Cabbage Stew",
-        "rarity": 1,
-        "slots": [
-          "F",
-          "F"
-        ],
-        "style": "Stew",
-        "learn": [
-          "experiment",
-          "card",
-          "taught"
-        ]
-      },
-      {
-        "n": 9,
-        "id": "dish_travel_biscuits",
-        "name": "Travel Biscuits",
-        "rarity": 1,
-        "slots": [],
-        "style": "Dessert",
-        "learn": [
-          "buy"
-        ]
-      },
-      {
-        "n": 13,
-        "id": "dish_tilapia_wraps",
-        "name": "Tilapia Wraps",
-        "rarity": 2,
-        "slots": [
-          "W",
-          "F"
-        ],
-        "style": "Salad",
-        "learn": [
-          "experiment",
-          "card",
-          "taught"
-        ]
-      },
-      {
-        "n": 14,
-        "id": "dish_crispy_smelt",
-        "name": "Crispy Smelt",
-        "rarity": 2,
-        "slots": [
-          "W",
-          "S"
-        ],
-        "style": "Grilled",
-        "learn": [
-          "experiment",
-          "card",
-          "taught"
-        ]
-      },
-      {
-        "n": 16,
-        "id": "dish_rock_salt_soup",
-        "name": "Rock-Salt Soup",
-        "rarity": 2,
-        "slots": [
-          "F",
-          "S"
-        ],
-        "style": "Soup",
-        "learn": [
-          "experiment",
-          "card",
-          "taught"
-        ]
-      },
-      {
-        "n": 18,
-        "id": "dish_cucumber_salad",
-        "name": "Cucumber Salad",
-        "rarity": 2,
-        "slots": [
-          "F",
-          "S"
-        ],
-        "style": "Salad",
-        "learn": [
-          "experiment",
-          "card",
-          "taught"
-        ]
-      },
-      {
-        "n": 20,
-        "id": "dish_apple_tea",
-        "name": "Apple Tea",
-        "rarity": 2,
-        "slots": [
-          "O",
-          "O",
-          "O"
-        ],
-        "style": "Tea",
-        "learn": [
-          "experiment",
-          "card",
-          "taught"
-        ]
-      },
-      {
-        "n": 21,
-        "id": "dish_roast_veggies",
-        "name": "Roast Veggies",
-        "rarity": 2,
-        "slots": [
-          "F"
-        ],
-        "style": "Grilled",
-        "learn": [
-          "experiment",
-          "card",
-          "taught"
-        ]
-      },
-      {
-        "n": 22,
-        "id": "dish_corn_cake",
-        "name": "Corn Cake",
-        "rarity": 2,
-        "slots": [
-          "F",
-          "F"
-        ],
-        "style": "Dessert",
-        "learn": [
-          "experiment",
-          "card",
-          "taught"
-        ]
-      },
-      {
-        "n": 23,
-        "id": "dish_charcoal_fish",
-        "name": "Charcoal Fish",
         "rarity": 3,
-        "slots": [
-          "W"
-        ],
-        "style": "Grilled",
-        "learn": [
-          "experiment",
-          "taught"
-        ]
-      },
-      {
-        "n": 24,
-        "id": "dish_fruit_platter",
-        "name": "Fruit Platter",
-        "rarity": 3,
-        "slots": [
-          "O"
-        ],
-        "style": "Salad",
-        "learn": [
-          "experiment",
-          "taught"
-        ]
-      },
-      {
-        "n": 25,
-        "id": "dish_harvest_roast",
-        "name": "Harvest Roast",
-        "rarity": 3,
-        "slots": [
-          "F"
-        ],
-        "style": "Grilled",
-        "learn": [
-          "experiment",
-          "taught"
-        ]
-      },
-      {
-        "n": 26,
-        "id": "dish_herb_baked_perch",
-        "name": "Herb Baked Perch",
-        "rarity": 3,
-        "slots": [
-          "W",
-          "S"
-        ],
-        "style": "Grilled",
-        "learn": [
-          "experiment",
-          "taught"
-        ]
-      },
-      {
-        "n": 29,
-        "id": "dish_salt_mackerel",
-        "name": "Salt Mackerel",
-        "rarity": 3,
-        "slots": [
-          "W",
-          "S"
-        ],
-        "style": "Grilled",
-        "learn": [
-          "experiment",
-          "taught"
-        ]
-      },
-      {
-        "n": 30,
-        "id": "dish_grass_carp_soup",
-        "name": "Grass Carp Soup",
-        "rarity": 3,
-        "slots": [
-          "W",
-          "F"
-        ],
-        "style": "Soup",
-        "learn": [
-          "experiment",
-          "taught"
-        ]
-      },
-      {
-        "n": 31,
-        "id": "dish_char_chowder",
-        "name": "Char Chowder",
-        "rarity": 3,
-        "slots": [
-          "W",
-          "F"
-        ],
-        "style": "Soup",
-        "learn": [
-          "experiment",
-          "taught"
-        ]
-      },
-      {
-        "n": 32,
-        "id": "dish_catfish_stew",
-        "name": "Catfish Stew",
-        "rarity": 3,
-        "slots": [
-          "W",
-          "F"
-        ],
-        "style": "Stew",
-        "learn": [
-          "experiment",
-          "taught"
-        ]
-      },
-      {
-        "n": 33,
-        "id": "dish_sea_bass_salt",
-        "name": "Sea Bass in Salt",
-        "rarity": 3,
-        "slots": [
-          "W",
-          "S"
-        ],
-        "style": "Grilled",
-        "learn": [
-          "experiment",
-          "taught"
-        ]
-      },
-      {
-        "n": 34,
-        "id": "dish_chili_snakehead",
-        "name": "Chili Snakehead",
-        "rarity": 3,
-        "slots": [
-          "W",
-          "S"
-        ],
-        "style": "Stew",
-        "learn": [
-          "experiment",
-          "taught"
-        ]
-      },
-      {
-        "n": 35,
-        "id": "dish_grilled_pike",
-        "name": "Grilled Pike",
-        "rarity": 3,
-        "slots": [
-          "W",
-          "S"
-        ],
-        "style": "Grilled",
-        "learn": [
-          "experiment",
-          "taught"
-        ]
-      },
-      {
-        "n": 36,
-        "id": "dish_pineapple_barra",
-        "name": "Pineapple Barra",
-        "rarity": 3,
-        "slots": [
-          "W",
-          "O"
-        ],
-        "style": "Grilled",
-        "learn": [
-          "experiment",
-          "market",
-          "taught"
+        "teach": [
+          "Rafa",
+          "Nadia"
         ]
       },
       {
         "n": 38,
         "id": "dish_strawberry_tart",
         "name": "Strawberry Tart",
-        "rarity": 3,
-        "slots": [
-          "O",
-          "O",
-          "S"
+        "in": [
+          "crop_strawberry",
+          "crop_strawberry",
+          "crop_herb"
         ],
         "style": "Dessert",
         "learn": [
           "experiment",
           "taught"
+        ],
+        "rarity": 3,
+        "teach": [
+          "Pip",
+          "Hana"
+        ],
+        "families": [
+          "O",
+          "O",
+          "S"
         ]
       },
       {
         "n": 39,
         "id": "dish_melon_platter",
         "name": "Melon Platter",
-        "rarity": 3,
-        "slots": [
-          "O",
-          "O"
+        "in": [
+          "crop_melon",
+          "crop_strawberry"
         ],
         "style": "Dessert",
         "learn": [
           "experiment",
           "taught"
+        ],
+        "rarity": 3,
+        "teach": [
+          "Pip",
+          "Hana"
+        ],
+        "families": [
+          "O",
+          "O"
         ]
       },
       {
         "n": 40,
         "id": "dish_orchard_tea",
         "name": "Orchard Tea",
-        "rarity": 3,
-        "slots": [
-          "O",
-          "O",
-          "O"
+        "in": [
+          "crop_grape",
+          "crop_citrus",
+          "crop_chamomile"
         ],
         "style": "Tea",
         "learn": [
           "experiment",
           "taught"
+        ],
+        "rarity": 3,
+        "teach": [
+          "Lena",
+          "Tomo"
+        ],
+        "families": [
+          "O",
+          "O",
+          "O"
         ]
       },
       {
         "n": 41,
         "id": "dish_legend_sashimi",
         "name": "Legend Sashimi",
-        "rarity": 4,
-        "slots": [
-          "W"
+        "in": [
+          "W4"
         ],
         "style": "Salad",
         "learn": [
           "experiment",
           "taught"
+        ],
+        "rarity": 4,
+        "teach": [
+          "Mira",
+          "Tomo"
+        ],
+        "buff": "buff_bite_window",
+        "families": [
+          "W"
         ]
       },
       {
         "n": 42,
         "id": "dish_steamed_sturgeon",
         "name": "Steamed Sturgeon",
-        "rarity": 4,
-        "slots": [
-          "W",
-          "S",
-          "S"
+        "in": [
+          "fish_sturgeon",
+          "crop_herb",
+          "rock_salt"
         ],
         "style": "Stew",
         "learn": [
           "experiment",
           "taught"
+        ],
+        "rarity": 4,
+        "teach": [
+          "Tomo"
+        ],
+        "buff": "buff_travel_time",
+        "families": [
+          "W",
+          "S",
+          "S"
         ]
       },
       {
         "n": 43,
         "id": "dish_eel_skewers",
         "name": "Eel Skewers",
-        "rarity": 4,
-        "slots": [
-          "W",
-          "S",
-          "S"
+        "in": [
+          "fish_eel",
+          "crop_chili",
+          "rock_salt"
         ],
         "style": "Grilled",
         "learn": [
           "experiment",
           "taught"
+        ],
+        "rarity": 4,
+        "teach": [
+          "Lena"
+        ],
+        "buff": "buff_fish_xp",
+        "families": [
+          "W",
+          "S",
+          "S"
         ]
       },
       {
         "n": 44,
         "id": "dish_herb_salmon",
         "name": "Herb Salmon",
-        "rarity": 4,
-        "slots": [
-          "W",
-          "S"
+        "in": [
+          "fish_salmon",
+          "crop_herb"
         ],
         "style": "Grilled",
         "learn": [
           "experiment",
           "taught"
+        ],
+        "rarity": 4,
+        "teach": [
+          "Old Kai"
+        ],
+        "buff": "buff_creel",
+        "families": [
+          "W",
+          "S"
         ]
       },
       {
         "n": 45,
         "id": "dish_pineapple_fish",
         "name": "Pineapple Fish",
-        "rarity": 4,
-        "slots": [
-          "O",
-          "W",
-          "S"
+        "in": [
+          "crop_pineapple",
+          "W1",
+          "crop_chili"
         ],
         "style": "Grilled",
         "learn": [
           "market",
           "experiment",
           "taught"
+        ],
+        "rarity": 4,
+        "card_price": 500,
+        "card_zone": "Tropical",
+        "teach": [
+          "Mira"
+        ],
+        "buff": "buff_bite_window",
+        "regional": true,
+        "families": [
+          "O",
+          "W",
+          "S"
         ]
       },
       {
         "n": 46,
         "id": "dish_sweet_potato_cakes",
         "name": "Sweet Potato Cakes",
-        "rarity": 4,
-        "slots": [
-          "F",
-          "W",
-          "S"
+        "in": [
+          "crop_sweet_potato",
+          "W1",
+          "crop_herb"
         ],
         "style": "Grilled",
         "learn": [
           "market",
           "experiment",
           "taught"
+        ],
+        "rarity": 4,
+        "card_price": 500,
+        "card_zone": "Subtropical",
+        "teach": [
+          "Hana"
+        ],
+        "buff": "buff_farm_xp",
+        "regional": true,
+        "families": [
+          "F",
+          "W",
+          "S"
         ]
       },
       {
         "n": 47,
         "id": "dish_pumpkin_chowder",
         "name": "Pumpkin Chowder",
-        "rarity": 4,
-        "slots": [
-          "F",
-          "W",
-          "S"
+        "in": [
+          "crop_pumpkin",
+          "W2",
+          "rock_salt"
         ],
         "style": "Soup",
         "learn": [
           "market",
           "experiment",
           "taught"
+        ],
+        "rarity": 4,
+        "card_price": 500,
+        "card_zone": "Temperate",
+        "teach": [
+          "Granny Wu"
+        ],
+        "buff": "buff_creel",
+        "regional": true,
+        "families": [
+          "F",
+          "W",
+          "S"
         ]
       },
       {
         "n": 48,
         "id": "dish_beet_fish_soup",
         "name": "Beet Fish Soup",
-        "rarity": 4,
-        "slots": [
-          "F",
-          "W",
-          "S"
+        "in": [
+          "crop_beet",
+          "W1",
+          "rock_salt"
         ],
         "style": "Soup",
         "learn": [
           "market",
           "experiment",
           "taught"
+        ],
+        "rarity": 4,
+        "card_price": 500,
+        "card_zone": "Cold Temperate",
+        "teach": [
+          "Rafa"
+        ],
+        "buff": "buff_travel_time",
+        "regional": true,
+        "families": [
+          "F",
+          "W",
+          "S"
         ]
       }
-    ]
+    ],
+    "pages": [],
+    "_pages": "SGODOT-282: all 48 pages are in recipes (Li Bai, docs/product/p1-content-2026-10-10/recipes.json, 1ebb6d61); pages stays empty. A page cooks only when every ingredient it names exists in this build (crops / fish arrive with the farming and fishing lines) and it is not buy-only (#9)."
   },
   "blessing": {
     "days": 7,
