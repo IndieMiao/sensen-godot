@@ -1,5 +1,5 @@
 {
-  "_note": "Decorate, shops line (SGODOT-284; plan §9.11.6, §8.3 decor cap, q(24), q(29); 苏烈). decor.items: the Homestead Stall's Decor page — blurb (how it looks in the yard, ≤ 14 characters so a greyed button's second line holds it: the row reads `1×1 · Glows at night`; a multi-piece one has no blurb and reads `5 pieces`, q(111) / q(113)), price, footprint [w, h] in garden cells (0.65 m), pieces per purchase (Stone Path 5, Fence Set 6), the Homestead level it opens at; buy = sold at the stall (recipe_stand is the Line Cook milestone's, never sold). Bought decor goes straight to Farm Storage (q(29)), is never sold back or gifted; placing it from storage counts against homestead.decor_max. decor.yard: where decor may stand on the garden grid (P0Garden): inside walk, outside every blocked rect (field incl. the P1 columns, the house and its door path, the facilities and gathering spots) and off the spawn / exit cells. Rects are [x, y, w, h]. The blocked list holds the facilities and spots both where farm-dev has them and where #215 moves them (well, grove, rock pile), so it holds before and after that merges; a gdUnit test checks P0Garden.FOOTPRINTS against it.",
+  "_note": "Decorate, shops line (SGODOT-284; plan §9.11.6, §8.3 decor cap, q(24), q(29); 苏烈). decor.items: the Homestead Stall's Decor page — blurb (how it looks in the yard, ≤ 14 characters so a greyed button's second line holds it: the row reads `1×1 · Glows at night`; a multi-piece one has no blurb and reads `5 pieces`, q(111) / q(113)), price, footprint [w, h] in garden cells (0.65 m), pieces per purchase (Stone Path 5, Fence Set 6), the Homestead level it opens at; buy = sold at the stall (recipe_stand is the Line Cook milestone's, never sold). Bought decor goes straight to Farm Storage (q(29)), is never sold back or gifted; placing it from storage counts against homestead.decor_max. decor.yard: where decor may stand on the garden grid (P0Garden): inside walk and off the field (`Outside your yard`), off every object (the house, facilities, gathering spots, the front fence, sign, plaque and mailbox: `Space taken`, as another piece), and off the paths (`Keep the path clear`, q(120) / 不知火舞 284 49b11f91: two cells wide to the map exit, the farmhouse door, the stall, the mine mouth and the workbench, so pieces — solid, like the facilities — never wall a place off). Rects are [x, y, w, h]. objects holds the facilities and spots both where farm-dev has them and where #215 moved them; gdUnit tests check P0Garden.FOOTPRINTS against it and walk a yard filled with pieces.",
   "decor": {
     "items": {
       "deco_planter": {
@@ -140,24 +140,20 @@
         19,
         20
       ],
-      "blocked": [
+      "field": [
         [
           3,
           2,
           17,
           11
-        ],
+        ]
+      ],
+      "objects": [
         [
           8,
           15,
           4,
           3
-        ],
-        [
-          9,
-          13,
-          1,
-          2
         ],
         [
           14,
@@ -238,20 +234,72 @@
           1
         ],
         [
+          6,
+          13,
+          2,
+          1
+        ],
+        [
+          11,
+          13,
+          2,
+          1
+        ],
+        [
+          11,
+          14,
+          1,
+          1
+        ],
+        [
+          7,
+          14,
+          1,
+          1
+        ],
+        [
+          12,
+          16,
+          1,
+          1
+        ],
+        [
           2,
           10,
           1,
           1
         ]
       ],
-      "keep_clear": [
+      "paths": [
         [
           9,
-          0
+          0,
+          2,
+          2
         ],
         [
-          9,
-          1
+          8,
+          13,
+          3,
+          2
+        ],
+        [
+          13,
+          13,
+          2,
+          2
+        ],
+        [
+          3,
+          13,
+          2,
+          2
+        ],
+        [
+          16,
+          13,
+          2,
+          3
         ]
       ]
     }

@@ -482,6 +482,9 @@ func _on_state(v: Dictionary, events: Array) -> void:
 					floats.append(part)
 			"item":
 				var iid := str(ev.id)
+				if P0Decor.is_decor(iid) and int(ev.delta) > 0:   # bought at the stall, into Farm Storage (SGODOT-284)
+					ui.toast_decor_bought(iid)
+					continue
 				if iid.begins_with("dish_"): _call("p0_event", [ev, v])   # where a collected dish went (the kitchen's Keep toast)
 				if int(ev.delta) > 0 and (claimed or (not crafted and not iid.begins_with("seed_") and not iid.begins_with("dish_") and not iid.begins_with("fish_"))):
 					floats.append({kind = "item", key = iid, amount = int(ev.delta), fmt = "%s " + P0Logic.item_name(v, iid),
@@ -504,6 +507,8 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				else: _on_catch(ev, xp_lines)
 			"cast", "pot", "cabinet", "plate", "first", "mishap", "queue":
 				_call("p0_event", [ev, v])
+			"decor":   # Decorate (SGODOT-284, b706e141 ④): a piece stored says where it went, as a purchase does
+				if str(ev.get("action", "")) == "stored": ui.toast_success("%s · back in Farm Storage" % P0Decor.name_of(str(ev.get("item", ""))), true)
 			"trap":   # Fish Trap (SGODOT-283): the pond redraws its float; set / some left / taken back say so
 				_call("p0_event", [ev, v])
 				var said := P0Logic.P0Trap.event_toast(ev)
@@ -636,6 +641,14 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 		session.send({"type": "reel", "outcome": "escaped"})
 		ui.toast_error("Creel full · the fish slipped away")
 		return
+	# Decorate (SGODOT-284): a spot the server would not take says why in the bar's words; the cap, the cap line.
+	if str(cmd.get("type", "")) in ["place_decor", "move_decor"]:
+		if P0Decor.REASONS.has(code):
+			ui.toast_error(str(P0Decor.REASONS[code]))
+			return
+		if code == "decor_cap":
+			ui.toast(P0Decor.cap_line(session.view))
+			return
 	var trap_said = P0Logic.P0Trap.refusal_text(cmd, code, detail)   # Fish Trap (SGODOT-283)
 	if trap_said != null:
 		if str(trap_said) != "": ui.toast_error(str(trap_said))

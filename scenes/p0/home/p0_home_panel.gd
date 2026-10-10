@@ -83,6 +83,15 @@ static func open(ui: P0Ui, at_home := true) -> void:
 		foot.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		foot.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		col.add_child(foot)
+	# HOME-1-DECORATE (Figma 2192:120523, q(111)): `Decorate ›` over Close, at home with the Decorate catalog in the
+	# content: Decorate with nothing picked, to move or store the yard's pieces (SGODOT-284).
+	if at_home and ui.space_here() == "home" and not P0Decor.items().is_empty():
+		var decorate := UiNavButton.new("Decorate", true)
+		decorate.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		decorate.pressed.connect(func():
+			ui.close_modal()
+			ui.decor_requested.emit(""))
+		col.add_child(decorate)
 	var close := UiDismissButton.new("Close")
 	close.pressed.connect(ui.close_layer)   # from the profile: back to it, as the system Back (int11); else the world
 	col.add_child(close)
