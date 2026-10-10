@@ -68,7 +68,7 @@
 | 图钉卡原因行 ★ | 图钉挂标记时副标题下一行：鱼塘 `Pond Catch · Pond Crucian 0/2`（只在已接下、鱼不够时）/ 集市 `Market Board · 2 requests`（1 条 `Market Board · 1 request`）/ 居民据点 `Pip · New request` / 交付点 `Pond Catch · Ready to deliver` / 据点 ◆ `New for you · Reed Rod` / 居民新对话 ◆ `Pip · New chat`；几件同时写一件加 ` · +1 more`（q(103)） |
 | 进塘与凑齐 ★ | 进挂 ! 的塘 Info toast `Pond Catch · Pond Crucian 0/2`（教学卡之后）；钓到要的鱼飘字 `Pond Catch 1/2`；凑够两行 Success toast `Pond Catch · 2/2` / `Deliver at the Stall`（q(134)），鱼塘 ! 消失、家图钉 ✓（q(103)） |
 | 委托的鱼还钓不上 ★ | 已接下但鱼的等级高于玩家 Fishing 等级：鱼塘不挂 !；Today 委托行小字 `Fishing Lv4 needed`，点开是鱼图鉴剪影那张门禁卡 `Fishing Lv4 keeps Golden Koi on the hook` / 需求格 `Fishing XP 70/300` · `230 XP to go`（不另写一句）；委托卡交付按钮缺口 `Fishing Lv4 needed`（不写 `Need 1 more Rare fish`）（q(104)） |
-| Today 委托行 ★ | 已接下的驿站板、集市、居民委托都进 Today（没接的不进；教学委托例外，开局未接也显示引导行 `Catch 2 Pond Crucian · Fern Pond`）：进度 `Fresh Greens · Radish 1/4` / `Dusk Haul · Fine fish 1/4` / `An Old Man's Catch · Rare fish 0/1`（只限稀有度写 `<稀有度> fish`，与原因行一致）；交付 `Pond Catch · Deliver at the Stall` / `Dusk Haul · Deliver at Mission Market Square` / `An Old Man's Catch · Deliver to Old Kai`（q(104) 补） |
+| Today 委托行 ★ | 已接下的驿站板、集市、居民委托都进 Today（没接的不进；教学委托例外，开局未接也显示引导行 `Catch 2 Pond Crucian · Fern Pond`）：进度 `Fresh Greens · Radish 1/4` / `Dusk Haul · Fine fish 1/4` / `An Old Man's Catch · Rare fish 0/1`（只限稀有度写 `<稀有度> fish`，与原因行一致）；交付 `Pond Catch · Deliver at the Stall` / `Dusk Haul · Deliver at Mission Market Square` / `An Old Man's Catch · Deliver to Old Kai`（q(104) 补）；接下时 toast `Tracking · it shows in Today`，最近接下、还没凑够的那条在 Today 保底占一行，排满时替换第 3 行（交付行不让，q(143)） |
 | Today 芯片 ★ | 只留图标 + 红点，不写字、不写数字；点开是原 Today 面板（q(107)）。红点亮：可交付 / 可收获 / 出锅 / 新解锁的行出现且没看过；打开一次面板即灭 |
 
 ## 4. 厨房与烹饪
