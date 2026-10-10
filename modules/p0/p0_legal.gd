@@ -29,18 +29,23 @@ static func full_text(r: Dictionary) -> String:
 	if src == ENGINE: return engine_text()
 	return FileAccess.get_file_as_string(src) if src != "" and FileAccess.file_exists(src) else ""
 
-## Godot's MIT license, then the components it is built from with their copyright and license (Engine's own lists).
+## Godot's MIT license, then the components it is built from with their copyright and license, then those licenses'
+## texts — the engine's own lists (Engine.get_copyright_info / get_license_info, 李白 on #292).
 static func engine_text() -> String:
 	var out := Engine.get_license_text().strip_edges() + "\n\nThird-party components"
 	for c in Engine.get_copyright_info():
 		for part in c.get("parts", []):
 			var who := ", ".join(Array(part.get("copyright", [])).map(func(x): return "© " + str(x)))
 			out += "\n\n%s: %s (%s)" % [str(c.get("name", "")), who, str(part.get("license", ""))]
+	var texts: Dictionary = Engine.get_license_info()
+	out += "\n\nLicenses"
+	for name in texts:
+		out += "\n\n%s\n\n%s" % [str(name), str(texts[name]).strip_edges()]
 	return out
 
 ## The text as paragraphs for a narrow page: blank lines part them; the hard-wrapped lines inside one join with a space
 ## (the files are wrapped at about 72 columns), or with none after a word broken at its hyphen (`CC-` / `licensed`); a
-## Markdown heading's #s and the ===== rules go. Not a character of the text is changed.
+## Markdown heading's #s and the ===== rules go, an HTML entity reads as its character. Nothing else of the text changes.
 static func paragraphs(text: String) -> Array:
 	var out: Array = []
 	for block in text.replace("\r\n", "\n").split("\n\n"):
@@ -49,12 +54,16 @@ static func paragraphs(text: String) -> Array:
 			var t := line.strip_edges()
 			if t == "" or t.replace("=", "") == "" or t.replace("-", "") == "": continue
 			while t.begins_with("#"): t = t.substr(1)
-			t = t.strip_edges()
+			t = _entities(t.strip_edges())
 			if joined == "": joined = t
 			elif _broken_at_hyphen(joined): joined += t
 			else: joined += " " + t
 		if joined != "": out.append(joined)
 	return out
+
+## The few HTML entities a Markdown licence file writes (Mapbox's `Copyright &copy; 2021 - 2026`) as their characters.
+static func _entities(line: String) -> String:
+	return line.replace("&copy;", "©").replace("&quot;", "\"").replace("&#39;", "'").replace("&lt;", "<").replace("&gt;", ">").replace("&amp;", "&")
 
 ## A line that ends in a word's own hyphen (`CC-`, not ` -` or the `--` dash).
 static func _broken_at_hyphen(line: String) -> bool:

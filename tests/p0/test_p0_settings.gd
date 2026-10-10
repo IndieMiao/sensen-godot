@@ -121,3 +121,48 @@ func test_the_gear_opens_settings_and_back_goes_one_page_at_a_time() -> void:
 		(ui._modal.find_children("*", "P0SettingsPage", true, false)[0] as P0SettingsPage).back_pressed.emit()
 		await await_idle_frame()
 		assert_str(ui.modal_kind).is_equal(kind)
+
+## 不知火舞 on #292: Settings, Licenses and a text page are pages of one path from the profile: the header's back sits
+## exactly on the profile top bar's back (the safe area too), so it never jumps.
+func test_the_back_sits_where_the_profile_back_is() -> void:
+	var profile: P0ProfilePage = auto_free(P0ProfilePage.new({"skills": {}}, 24.0))
+	var page: P0SettingsPage = auto_free(P0SettingsPage.settings("dev", 24.0))
+	for n in [profile, page]:
+		n.size = Vector2(360, 800)
+		add_child(n)
+	await await_idle_frame()
+	var a := (profile.top_bar.get_child(0) as Control).get_global_rect()
+	var b := (page.header.find_child("Back", true, false) as Control).get_global_rect()
+	assert_vector(b.position).is_equal_approx(a.position, Vector2.ONE * 0.5)
+	assert_vector(b.size).is_equal(a.size)
+
+## 李白 on #292: the Mapbox row's text is the packed SDK version's own LICENSE.md (its copyright, the TOS, the licenses
+## it bundles; tools/p0/update_mapbox_license.sh), not a sentence of ours; Godot's lists the engine's components and texts.
+func test_mapbox_and_godot_texts_come_from_the_sdk_and_the_engine() -> void:
+	var gradle := FileAccess.get_file_as_string("res://android/build/build.gradle")
+	var m := RegEx.create_from_string("com\\.mapbox\\.maps:android:([0-9.]+)").search(gradle)
+	assert_object(m).is_not_null()
+	var mapbox := P0Legal.full_text(P0Legal.row("mapbox"))
+	assert_str(mapbox).contains("Mapbox Maps for Android version %s" % m.get_string(1))   # bump the SDK: run the tool
+	assert_str(mapbox).contains("Additional Mapbox Maps Android licenses")
+	var first: String = P0Legal.paragraphs(mapbox).filter(func(p): return str(p).begins_with("Copyright"))[0]
+	assert_str(first).is_equal("Copyright © 2021 - 2026 Mapbox, Inc. All rights reserved.")   # &copy; reads as ©
+	var godot := P0Legal.full_text(P0Legal.row("godot"))
+	assert_str(godot).contains("Third-party components")
+	assert_str(godot).contains("\n\nLicenses\n\n")
+	for name in Engine.get_license_info(): assert_str(godot).contains(str(name))
+
+## A long text (Mapbox's 660 paragraphs) opens with its first screens and fills in the rest a batch a frame: all of it
+## ends up on the page, in order.
+func test_a_long_text_fills_in_over_frames() -> void:
+	var text := P0Legal.full_text(P0Legal.row("mapbox"))
+	var all := P0Legal.paragraphs(text)
+	var page: P0SettingsPage = auto_free(P0SettingsPage.text("Mapbox Maps SDK", text))
+	assert_int(page.body.get_child_count()).is_equal(P0SettingsPage._FIRST_PARAGRAPHS)
+	add_child(page)
+	for i in 100:
+		if page.complete(): break
+		await await_idle_frame()
+	assert_bool(page.complete()).is_true()
+	assert_int(page.body.get_child_count()).is_equal(all.size())
+	assert_str((page.body.get_child(all.size() - 1) as Label).text).is_equal(str(all[-1]))
