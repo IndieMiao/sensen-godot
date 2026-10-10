@@ -980,10 +980,10 @@ static func level_banner(view: Dictionary, ev: Dictionary, first := false) -> Di
 	var tip := LEVEL_TIP if first else str(DAY_CHANGES.get("%s:%d" % [skill, lv], next_level_line(view, skill, lv)))
 	var action := "Use bait" if first and bait != "" else ""
 	var action_id := "use_bait" if first and bait != "" else ""
-	# A level that changes the day is the full banner, up to 3 s (q(69)); Farming Lv6 points at the workbench, where
-	# the Sprinkler is built (q(59) §1.6: `Show Workbench`, the camera only, LOCK-08).
-	var day := DAY_CHANGES.has("%s:%d" % [skill, lv])
-	if not first and DAY_ACTIONS.has("%s:%d" % [skill, lv]):
+	# Farming Lv6 changes the day with an action (q(59) §1.6): the full banner up to 3 s and `Show Workbench` (the
+	# camera only, LOCK-08). Cooking Lv4's banner keeps its accepted 1.5 s (q(69)).
+	var day := DAY_ACTIONS.has("%s:%d" % [skill, lv])
+	if not first and day:
 		var a: Array = DAY_ACTIONS["%s:%d" % [skill, lv]]
 		action = str(a[0])
 		action_id = str(a[1])
