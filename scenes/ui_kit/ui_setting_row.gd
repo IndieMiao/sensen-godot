@@ -29,12 +29,19 @@ func _init(kind_ := Kind.LINK, title := "", line := "", value := "", credit := "
 	kind = kind_
 	custom_minimum_size.y = _MIN_H
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_SURFACE_RAISED, 0).with_margins(_PAD_X, _PAD_Y, _PAD_X, _PAD_Y))
+	# The padding is on a margin box inside, not on the panel's style: the panel would take it off Hit too (刘邦 on #292).
+	add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_SURFACE_RAISED, 0))
+	var pad := MarginContainer.new()
+	pad.name = "Pad"
+	pad.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	for side in [&"margin_left", &"margin_right"]: pad.add_theme_constant_override(side, _PAD_X)
+	for side in [&"margin_top", &"margin_bottom"]: pad.add_theme_constant_override(side, _PAD_Y)
+	add_child(pad)
 	var row := HBoxContainer.new()
 	row.name = "Row"
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	row.add_theme_constant_override(&"separation", _GAP)
-	add_child(row)
+	pad.add_child(row)
 	var texts := VBoxContainer.new()
 	texts.name = "Texts"
 	texts.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -66,7 +73,7 @@ func _init(kind_ := Kind.LINK, title := "", line := "", value := "", credit := "
 	chevron.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	chevron.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(chevron)
-	# The whole row is the target: a flat button over the content (a drag in a TouchScrollContainer cancels it).
+	# The whole row is the target, edge to edge: a flat button over the content (a drag in a TouchScrollContainer cancels it).
 	var hit := Button.new()
 	hit.name = "Hit"
 	hit.flat = true

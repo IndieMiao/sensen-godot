@@ -88,7 +88,9 @@ open(p, "w").write(head + seg)
 # old build to update (426). Always the code this export really uses: --code, else the preset's.
 version = int(re.search(r"version/code=(\d+)", seg).group(1))
 # Settings › Version (q(129)) shows the name too: `0.2.1 (2026101001)`.
-version_name = re.search(r'version/name="([^"]*)"', seg).group(1)
+named = re.search(r'version/name="([^"]*)"', seg)
+if not named: sys.exit('build_demo_apk: the "Android P0" preset has no version/name (Settings › Version reads it)')
+version_name = named.group(1)
 json.dump({"url": url.rstrip("/"), "key": key, "version": version, "name": version_name}, open("assets/p0/demo_server.json", "w"))
 PY
 

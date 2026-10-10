@@ -39,6 +39,8 @@ func test_paragraphs_join_the_hard_wraps_and_keep_every_word() -> void:
 		["Additional licenses", "Mapbox uses portions of it."])   # a heading stands alone, blank line or not
 	assert_array(P0Legal.paragraphs("other CC-\nlicensed material, any reason--for\nexample")).is_equal(
 		["other CC-licensed material, any reason--for example"])   # a word broken at its hyphen joins whole
+	assert_array(P0Legal.paragraphs("met:\n* Redistributions of source code must\n  retain the above notice.\n* Neither the name")).is_equal(
+		["met:", "* Redistributions of source code must retain the above notice.", "* Neither the name"])   # BSD's clauses, one each
 	# whole files: not a character lost or changed, only the line breaks, the #s and the ===== rules
 	var bare := func(t: String) -> String:
 		var lines := Array(t.split("\n")).filter(func(l): return l.strip_edges().replace("=", "") != "" and l.strip_edges().replace("-", "") != "")
@@ -61,7 +63,11 @@ func test_settings_holds_only_rows_that_work() -> void:
 	assert_array(_labels(page.body)).is_equal(["Legal", "Licenses", "›", "Version", "0.2.1 (2026101001)"])
 	var said := []
 	page.open_pressed.connect(func(w): said.append(w))
-	(page.body.find_child("Licenses", true, false).find_child("Hit", true, false) as Button).pressed.emit()
+	var licenses := page.body.find_child("Licenses", true, false) as UiSettingRow
+	var hit := licenses.find_child("Hit", true, false) as Button
+	assert_object(hit.get_global_rect()).is_equal(licenses.get_global_rect())   # the whole row, edge to edge (刘邦 on #292)
+	assert_float(hit.size.y).is_greater_equal(52.0)
+	hit.pressed.emit()
 	assert_array(said).is_equal(["licenses"])
 	assert_object(page.body.find_child("Version", true, false).find_child("Hit", true, false)).is_null()   # read-only
 
@@ -80,6 +86,7 @@ func test_licenses_lists_the_groups_and_a_credit_reads_as_three_parts() -> void:
 	assert_str(lic.text).is_equal("CC BY 4.0")
 	assert_float(lic.get_global_rect().position.y - att.get_global_rect().end.y).is_equal_approx(6.0, 0.5)   # its own line, 6 under
 	assert_float(row.size.y).is_greater(52.0)   # the row grows with the attribution
+	assert_object((row.find_child("Hit", true, false) as Button).get_global_rect()).is_equal(row.get_global_rect())   # tall rows too
 	var said := []
 	page.open_pressed.connect(func(w): said.append(w))
 	(page.body.find_child("osm", true, false).find_child("Hit", true, false) as Button).pressed.emit()
@@ -141,7 +148,8 @@ func test_the_back_sits_where_the_profile_back_is() -> void:
 ## 李白 on #292: the Mapbox row's text is the packed SDK version's own LICENSE.md (its copyright, the TOS, the licenses
 ## it bundles; tools/p0/update_mapbox_license.sh), not a sentence of ours; Godot's lists the engine's components and texts.
 func test_mapbox_and_godot_texts_come_from_the_sdk_and_the_engine() -> void:
-	var gradle := FileAccess.get_file_as_string("res://android/build/build.gradle")
+	# the tracked source of the Android build's Mapbox version (android/ is laid out from it and not in the repo; 刘邦 on #292)
+	var gradle := FileAccess.get_file_as_string("res://tools/android/overlay/build.gradle")
 	var m := RegEx.create_from_string("com\\.mapbox\\.maps:android:([0-9.]+)").search(gradle)
 	assert_object(m).is_not_null()
 	var mapbox := P0Legal.full_text(P0Legal.row("mapbox"))

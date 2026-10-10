@@ -46,7 +46,7 @@ static func engine_text() -> String:
 ## The text as paragraphs for a narrow page: blank lines part them; the hard-wrapped lines inside one join with a space
 ## (the files are wrapped at about 72 columns), or with none after a word broken at its hyphen (`CC-` / `licensed`); a
 ## Markdown heading's #s and the ===== rules go (a heading is a paragraph of its own, even with no blank line after it),
-## an HTML entity reads as its character. Nothing else of the text changes.
+## a list item (`* `, `- `) starts its own; an HTML entity reads as its character. Nothing else of the text changes.
 static func paragraphs(text: String) -> Array:
 	var out: Array = []
 	for block in text.replace("\r\n", "\n").split("\n\n"):
@@ -62,6 +62,9 @@ static func paragraphs(text: String) -> Array:
 				out.append(t)
 				joined = ""
 			elif joined == "": joined = t
+			elif t.begins_with("* ") or t.begins_with("- "):   # a list item starts its own (BSD's clauses; 刘邦 on #292)
+				out.append(joined)
+				joined = t
 			elif _broken_at_hyphen(joined): joined += t
 			else: joined += " " + t
 		if joined != "": out.append(joined)
