@@ -569,6 +569,9 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				if ui.modal_kind == "homestead": ui.close_modal()
 				var home := P0Logic.home_moment(v, ev)
 				ui.queue_card(func(): HomePanel.moment(ui, home))   # one moment at a time (q(49) ④)
+				# LOOK-PICK (SGODOT-282, 49498df6): a look level's two looks rise after the banner, over the farm.
+				var stage := str(ev.get("look", ""))
+				if stage != "": ui.queue_card(func(): P0LookPick.open(ui, stage, true))
 	# After the loop, so it is queued behind the level-up banner (itself deferred) even when the parcel came first.
 	if not parcel_notice.is_empty(): ui.inbox_notice_when_clear.call_deferred(parcel_notice)
 	# Seed Saver (Farming Lv10, q(118)): the seeds this reply gave back, on a line of their own after the harvest's items
@@ -1241,6 +1244,21 @@ func _dev_shot(dt: float) -> void:
 			"energypanel": ui.open_energy_panel()
 			"inbox": ui.open_inbox()
 			"inboxdemo": _dev_inbox(step[1] if step.size() > 1 else "parcels")   # inboxdemo:parcels|full|updates|todo (234)
+			"homepanel": ui.open_home_panel()   # HOME-1 at home (SGODOT-282 shots: the Looks rows)
+			"homebottom":   # scroll HOME-1 to its foot (the Looks section)
+				for sc in ui.root.find_children("*", "ScrollContainer", true, false): (sc as ScrollContainer).scroll_vertical = 100000
+			"lookui":   # LOOK-PICK / HOME-1 Looks on screen (282 shots: check the layout by numbers)
+				var out := {}
+				for c in ui.root.find_children("*", "P0LookPick", true, false):
+					var card := c as P0LookPick
+					out["sheet"] = card.get_global_rect()
+					for n in ["Title", "Subtitle"]: out[n] = [(card.find_child(n, true, false) as Label).text, (card.find_child(n, true, false) as Control).get_global_rect()]
+					for k in card.options: out["option " + k] = [(card.options[k] as UiLookOption).look_name, (card.options[k] as UiLookOption).selected, (card.options[k] as Control).get_global_rect()]
+					out["use"] = [card.use_button.label, card.use_button.get_global_rect()]
+				for r in ui.root.find_children("Look_*", "HBoxContainer", true, false):
+					var labels: Array = (r as Node).find_children("*", "Label", true, false).map(func(l): return (l as Label).text)
+					out[str(r.name)] = [labels, (r as Control).get_global_rect(), (r.get_child(1) as Label).get_theme_color(&"font_color").to_html(false)]
+				print("P0_LOOK_UI ", out)
 			"homeaway":   # HOME-1 from the Profile farm card away from home (At home); homeaway:tap also taps the grey button
 				HomePanel.open(ui, false)
 				if step.size() > 1 and ui._modal != null:

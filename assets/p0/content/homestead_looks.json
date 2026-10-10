@@ -1,0 +1,11 @@
+{
+  "_note": "Homestead looks (§8.3.1 stages 1–4, q(24) / q(112) / q(115), SGODOT-282 LOOK-PICK): at Lv3 / 5 / 8 / 10 the player picks a (timber) or b (stone), free to change later on HOME-1. id = the level's unlock id (homestead.levels[].unlocks). name: the stage (`Lv5 look · Porch`); a / b: the two looks' names (q(112), provisional until the design is final). Lv3 / 5 / 8 are standalone parts beside the farmhouse, Lv10 swaps the whole house (上官婉儿 e4d03424); P1 builds both from placeholder models.",
+  "homestead": {
+    "looks": [
+      { "id": "fence", "level": 3, "name": "Fence & Mailbox", "a": "Timber Fence", "b": "Stone Wall" },
+      { "id": "porch", "level": 5, "name": "Porch", "a": "Timber Porch", "b": "Stone Porch" },
+      { "id": "kitchen_extension", "level": 8, "name": "Kitchen Wing", "a": "Timber Kitchen Wing", "b": "Stone Kitchen Wing" },
+      { "id": "master_farmhouse", "level": 10, "name": "Master Farmhouse", "a": "Timber Lodge", "b": "Stone Manor" }
+    ]
+  }
+}

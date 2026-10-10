@@ -175,8 +175,9 @@ func _marker(n: String, v: Dictionary) -> Dictionary:
 	return stove_marker(v, i)
 
 ## One stove's world prompt (pure, tested): i-pot (250 walkthrough). Up close the strip keeps the pot: the state is the
-## far button's badge and the fact (Cooking 0:22 / the dish), as on the bench (不知火舞 on #104, 1760:103708); Ready
-## alone puts its badge in the strip too (02ad95bc ③). One per stove: `Stove 2/3 · Empty` (b84a5e01 ②), over its pot.
+## far button's badge and the fact (Cooking 0:22 / the dish), as on the bench (不知火舞 on #104, 1760:103708); Ready and
+## Cooking put their badge in the strip too (02ad95bc ③; on #231: the clock folded and open), Empty keeps the pot. One per
+## stove: `Stove 2/3 · Empty` (b84a5e01 ②), over its pot.
 static func stove_marker(v: Dictionary, i: int) -> Dictionary:
 	var stove := {kind = "facility", icon = P0Logic.icon("pot"), name = P0KitchenLogic.stove_label(v, i), strip_badge = false}
 	if P0KitchenLogic.queued(v, i) != null: stove.count = "+1"   # Queue ×2: a pot waits behind this one (q(71), 1760:103578)
@@ -187,7 +188,8 @@ static func stove_marker(v: Dictionary, i: int) -> Dictionary:
 		var dish = st.get("dish", null)
 		# Ready to collect: the strip shows the Ready StatusBadge (22) in the pot's place (LOCK-07 v2, 不知火舞 02ad95bc ③).
 		return stove.merged({fact = P0Logic.item_name(v, str(dish)) if dish != null else "Unknown dish", badge = "ready", strip_badge = true}, true)
-	return stove.merged({fact = "Cooking " + P0Logic.duration(left), badge = "countdown"})
+	# Cooking: the strip keeps the clock badge its button had, so folded and open read the same (不知火舞 on #231).
+	return stove.merged({fact = "Cooking " + P0Logic.duration(left), badge = "countdown", strip_badge = true}, true)
 
 func _on_facility(n: String) -> void:
 	if stove_of(n) >= 0:

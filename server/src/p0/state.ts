@@ -89,7 +89,11 @@ export interface ResidentState {
   lesson_at?: number;            // when they last taught a page (§7.5.3: one a week from Familiar)
 }
 
-export interface Homestead { level: number; plaque: { level: number; at: number }[]; bartered?: Record<string, number> }   // bartered: minerals got by barter toward the next level
+export interface Homestead {
+  level: number; plaque: { level: number; at: number }[];
+  bartered?: Record<string, number>;   // minerals got by barter toward the next level
+  looks?: Record<string, 'a' | 'b'>;   // LOOK-PICK (SGODOT-282): a stage's look once changed; absent = a (q(24): closing = a)
+}
 
 /** One mine run (§13.3, SGODOT-231; floors 3–5 SGODOT-275): floors[i] is floor i + 1; drops derive from the run seed.
  * mobs: each monster's HP left on that floor (content order); hp: the player's HP in the mine; express: started by Floor 5 ·
