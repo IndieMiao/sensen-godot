@@ -1448,6 +1448,9 @@ static func home_panel(view: Dictionary, at_home := true) -> Dictionary:
 				out.changes.append({"icon": "bag", "text": "Bag Upgrade I for sale · 150 coins",
 					"note": "Bag %d → %d" % [int(view.get("bag", {}).get("capacity", 25)), int(view.get("bag", {}).get("capacity", 25)) + 5]})
 			"board_slot_3": out.changes.append({"icon": "board", "text": "Stall Board · 3rd slot", "note": "now %d" % board_now})
+	# P1 (q(59) §1.1): the level that brings more plots says so (`Plots +10`), from content/farm_garden.json.
+	var more := plots_added_at(int(next.level))
+	if more > 0: out.changes.append({"icon": "hoe", "text": "Plots +%d" % more, "note": "now %d" % P0Garden.plot_count(view)})
 	# The first gap in tile order goes on the button (LOCK-10). Away from home (HOME-1 from the Profile farm card,
 	# §10.6.2) the button is grey with `At home`, as the Energy card's Cook / Rest tiles (q(6)); a tap says
 	# `Upgrade at home · Going home is free` and sends nothing. Going home is the place chip / the map, not a button
@@ -1491,6 +1494,11 @@ static func plaque_lines(view: Dictionary, bias_min := 999999) -> Array:
 
 ## HOME-2 MomentBanner (Figma 482:154 / 1228:108620) from the server's homestead event: level disc, title,
 ## what changed (Energy refilled to the new max) and one line of consequences.
+## Plots a Homestead level adds (content garden.extra, P1 q(59) §1.1: +10 at Lv3); 0 for any other level.
+static func plots_added_at(level: int) -> int:
+	var extra: Dictionary = content().get("garden", {}).get("extra", {})
+	return int(extra.get("count", 0)) if not extra.is_empty() and int(extra.get("homestead", 0)) == level else 0
+
 static func home_moment(view: Dictionary, ev: Dictionary) -> Dictionary:
 	var level := int(ev.get("level", 1))
 	var max_e := int(view.get("energy", {}).get("max", 0))
@@ -1501,5 +1509,6 @@ static func home_moment(view: Dictionary, ev: Dictionary) -> Dictionary:
 			"clay_bank": lines.append("Clay Bank opened")   # gathering spot (SGODOT-231, q(45))
 			"warming_cabinet": lines.append("Warming Cabinet")
 			"bag_upgrade_1": lines.append("Bag Upgrade I for sale · 150 coins")
+	if plots_added_at(level) > 0: lines.append("Plots +%d" % plots_added_at(level))   # P1 HOME-2 (q(59) §1.1)
 	return {"level": str(level), "title": "Homestead Lv%d" % level, "subtitle": "Max Energy %d · Energy full" % max_e,
 		"detail": "\n".join(lines)}

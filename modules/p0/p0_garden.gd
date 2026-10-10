@@ -42,6 +42,11 @@ const WALK_RECT := Rect2i(1, 0, 19, 20)
 const CROP_CODES := {
 	"crop_radish": "R", "crop_lettuce": "L", "crop_carrot": "C", "crop_chamomile": "H",
 	"crop_herb": "B", "crop_potato": "P", "crop_chili": "I", "crop_tomato": "M",
+	# P1 (SGODOT-240, content/farm_crops.json): placeholder plants from the closest existing one until their own
+	# (q(59) §4: leafy heads, tall stalks, vines; today reuses old models, 275). Fruit trees grow as the old woody crop.
+	"crop_cabbage": "L", "crop_cucumber": "L", "crop_corn": "H", "crop_strawberry": "M", "crop_melon": "M",
+	"crop_pumpkin": "M", "crop_pineapple": "B", "crop_sweet_potato": "P", "crop_beet": "C",
+	"crop_apple": "T", "crop_citrus": "T", "crop_grape": "B",
 }
 
 ## Plots the homestead has now: the view's garden.plots (30, 40 from Homestead Lv3); MAX_PLOTS with no view (the beds,

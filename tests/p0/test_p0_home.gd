@@ -21,9 +21,10 @@ func test_home_panel_matches_the_page_14_sample() -> void:
 	assert_str(str(p.look)).is_equal("Lv3 look · Full fence")
 	assert_array(p.tiles.map(func(t): return str(t.name))).is_equal(["Timber", "Stone", "Reeds", "Clay", "Rock Salt", "Coins", "Skills"])
 	assert_int(int(p.tiles[5].need)).is_equal(440)   # price + the 40-coin floor (q(10))
+	# P1 (q(59) §1.1): Lv3 brings 10 more plots (content garden.extra), `Plots +10 · now 30`.
 	assert_array(p.changes.map(func(c): return str(c.text))).is_equal(
-		["Max Energy 220 · Meals 220 a day", "Warming Cabinet", "Bag Upgrade I for sale · 150 coins", "Stall Board · 3rd slot"])
-	assert_array(p.changes.map(func(c): return str(c.note))).is_equal(["now 210", "keeps 6 dishes by the stove", "Bag 25 → 30", "now 2"])
+		["Max Energy 220 · Meals 220 a day", "Warming Cabinet", "Bag Upgrade I for sale · 150 coins", "Stall Board · 3rd slot", "Plots +10"])
+	assert_array(p.changes.map(func(c): return str(c.note))).is_equal(["now 210", "keeps 6 dishes by the stove", "Bag 25 → 30", "now 2", "now 30"])
 	assert_str(str(p.reason)).is_equal("Need 6 more Timber")
 	assert_str(str(p.footer)).is_equal("Upgrading is free of Energy · fills Energy to the new max")
 
@@ -70,7 +71,7 @@ func test_home_moment_matches_the_page_14_banner() -> void:
 	var m := P0Logic.home_moment({"energy": {"max": 220}}, {"kind": "homestead", "level": 3, "unlocks": ["warming_cabinet", "bag_upgrade_1", "board_slot_3", "fence"]})
 	assert_str(str(m.title)).is_equal("Homestead Lv3")
 	assert_str(str(m.subtitle)).is_equal("Max Energy 220 · Energy full")
-	assert_str(str(m.detail)).is_equal("Warming Cabinet\nBag Upgrade I for sale · 150 coins")
+	assert_str(str(m.detail)).is_equal("Warming Cabinet\nBag Upgrade I for sale · 150 coins\nPlots +10")   # q(59) §1.1
 
 func test_material_icons_exist() -> void:
 	for id in ["wood", "stone", "fiber", "clay", "rock_salt", "coin", "star", "energy", "kitchen", "bag", "board"]:
