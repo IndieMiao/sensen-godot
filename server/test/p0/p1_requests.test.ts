@@ -34,9 +34,11 @@ describe('the template pool (§9.6.3: 30 at the prototype stage)', () => {
     for (const id of listed) expect(c.requests.templates[id], id).toBeTruthy();
   });
 
-  it('explore templates other than Stamp Run and together stay off; climate is written as profile.climate is', () => {
+  it('together templates stay off (live rooms), explore ones are on behind Homestead Lv2+; climate is written as profile.climate is', () => {
     for (const [id, t] of Object.entries(c.requests.templates)) {
-      if (t.type === 'together' || (t.type === 'explore' && id !== 'req_sys_explore_outpost')) expect(t.enabled, id).toBe(false);
+      if (t.type === 'together') expect(t.enabled, id).toBe(false);
+      // q(128) cross-city and Stamp Run: never on the first session's Market Board (§14) — a Homestead gate, nothing else
+      if (t.type === 'explore') expect(t.enabled !== false && t.gate.length > 0 && t.gate.every(([g, n]) => g === 'homestead' && n >= 2), id).toBe(true);
       for (const z of t.climate ?? []) expect(z[0], id).toBe(z[0].toUpperCase());
     }
   });

@@ -65,6 +65,28 @@ function farmPoint(c: P0Content): { lat: number; lng: number } | null {
   return h ? { lat: h.lat, lng: h.lng } : null;
 }
 
+const ranks = new WeakMap<CityClusters, Map<string, { id: string; km: number; trip: number }[]>>();
+/**
+ * The cities a cross-city request may send the player to (q(128), SGODOT-284): clusters of ≥ 100,000 people outside
+ * home, nearest first, each with its trip tier as the travel preview gives it (the save's frozen fallback included).
+ * Cached per home and fallback; empty without the clusters table.
+ */
+export function rankedCities(c: P0Content, s: P0State): { id: string; km: number; trip: number }[] {
+  const at = farmPoint(c), cl = clusters(c);
+  if (!at || !cl) return [];
+  let byHome = ranks.get(cl);
+  if (!byHome) ranks.set(cl, byHome = new Map());
+  const fb = s.travel.fallback;
+  const key = `${s.travel.home}|${at.lat},${at.lng}|${fb.near3.join(',')}|${fb.near10.join(',')}`;
+  let list = byHome.get(key);
+  if (!list) {
+    list = cl.ranked(s.travel.home, at, fb);
+    if (byHome.size > 32) byHome.delete(byHome.keys().next().value!);
+    byHome.set(key, list);
+  }
+  return list;
+}
+
 /** §11.2.3: frozen into the save when the block is made (CityClusters.fallback); empty without the table. */
 export function fallbackOf(c: P0Content): { near3: string[]; near10: string[] } {
   const at = farmPoint(c), cl = clusters(c);

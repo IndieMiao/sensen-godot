@@ -8,7 +8,7 @@ import { sellPrice, stallOffer } from './reducer.js';
 import { blessed, dayKey, foodCap, maxEnergy, nextTickIn, regenMs, settleEnergy, skillLevel, untilRollover } from './rules.js';
 import { emptyDay, type P0State } from './state.js';
 import { catalog, drinkPrice, offerOf, owns, quotaKey, quotaScope, regionalOf, walletNeed } from './shops.js';
-import { BOARDS, handIn, heldSlot, lockedTemplate, payout, settleBoards, slotCount } from './boards.js';
+import { BOARDS, handIn, haveForRequest, heldSlot, lockedTemplate, payout, settleBoards, slotCount } from './boards.js';
 import { expireGiftMeals, lessonState, progressOf, requestOpensIn, requestState, residentState, stageIndex } from './residents.js';
 import { floorPrice, haveFor, matches } from './requests.js';
 import type { BoardRequest, Pot } from './state.js';
@@ -19,7 +19,8 @@ import { mineView, settleMine } from './mine.js';
 import { gatherView } from './gathering.js';
 import { workbenchView } from './workbench.js';
 import { coveredPlots, cropGrowH, facilitiesView, facilityAt, greenhousePlots, plotCount } from './garden.js';
-import { climateAt, homeClimate } from './travel.js';
+import { climateAt, clusterById, clusterOf, homeClimate } from './travel.js';
+import { cityPlaces } from './world.js';
 import { orchardView, treeOf } from './orchard.js';
 import { restReadyIn } from './presence.js';
 import { inboxView, settleParcels } from './parcels.js';
@@ -346,12 +347,25 @@ function candidates(c: P0Content, r: BoardRequest): string[] {
   return ids.filter(id => matches(c, { kind: r.kind, rarity: r.rarity, style: r.style, family: r.family }, [], id)).sort((a, b) => floorPrice(c, a) - floorPrice(c, b));
 }
 
+/**
+ * An explore request's check-in: {place, done} — the client names a home outpost itself (Stamp Run); one in another
+ * city (q(128)) also carries {name, city, cluster, lat, lng}, since that city's places are rarely loaded on the client
+ * when the card shows (亚瑟). Null for any other request.
+ */
+function visitView(c: P0Content, s: P0State, r: BoardRequest) {
+  if (!r.visit) return null;
+  const cluster = clusterOf(c, r.visit.place);
+  if (!cluster || cluster === s.travel.home) return r.visit;
+  const o = cityPlaces(c, cluster)?.detail.outposts.find(x => x.id === r.visit!.place);
+  return { ...r.visit, name: o?.name ?? '', city: clusterById(c, cluster)?.name ?? '', cluster, lat: o?.lat ?? null, lng: o?.lng ?? null };
+}
+
 /** One request as facts (§9.6.5): what it takes, what the bag holds for it, and what delivering now would pay. */
 function requestView(c: P0Content, s: P0State, r: BoardRequest, now: number) {
   const parts = handIn(c, s, r);
   const each = r.kind === 'visit' ? (r.visit?.done ? 1 : 0)
     : r.items.length > 1 ? Math.min(...r.items.map(i => haveFor(c, s, { kind: r.kind as 'crop' }, [i])))
-    : haveFor(c, s, { kind: r.kind, rarity: r.rarity, style: r.style, family: r.family }, r.items);
+    : haveForRequest(c, s, r);
   const cheapest = candidates(c, r)[0];
   const estimate = parts ? payout(c, r, parts)
     : { base: r.items.length > 1 ? r.items.reduce((n, i) => n + floorPrice(c, i) * r.qty, 0) : (cheapest ? floorPrice(c, cheapest) : 0) * r.qty, bonus: r.bonus };
@@ -360,7 +374,8 @@ function requestView(c: P0Content, s: P0State, r: BoardRequest, now: number) {
     items: r.items, rarity: r.rarity ?? null, icon: r.items[0] ?? cheapest ?? null,
     // P1: dishes of a style (`Soup`, or several), crops of a family (`O`); the client names them
     style: r.style === undefined ? null : Array.isArray(r.style) ? r.style : [r.style], family: r.family ?? null,
-    visit: r.visit ?? null,   // explore (Stamp Run): {place: outpost id, done}; the client names the outpost
+    visit: visitView(c, s, r),   // explore: {place: outpost id, done}; in another city also its name, city and point
+    where: r.where ?? null,     // Far Pond (q(128)): `other_city`, fish caught outside the home city since it was taken
     qty: r.qty, have: Math.min(each, r.qty), ready: parts !== null,
     coins: estimate.base + estimate.bonus, base: estimate.base, bonus: estimate.bonus,
     status: r.status,

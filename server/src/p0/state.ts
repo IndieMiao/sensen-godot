@@ -73,6 +73,9 @@ export interface Request { id: string; title: string; item: string; qty: number;
 export interface BoardRequest {
   id: string; template: string; items: string[]; rarity?: number; style?: string | string[]; family?: Family; kind: 'crop' | 'fish' | 'dish' | 'material' | 'visit';
   visit?: { place: string; done: boolean };   // explore (Stamp Run): the outpost to check in at, and whether the player has
+  // Far Pond (q(128)): fish caught in another city; abroad = the kinds landed there since the request was taken, the
+  // only ones it takes (a kind also caught at home counts the same: the bag keeps no water)
+  where?: 'other_city'; abroad?: string[];
   qty: number; bonus: number; drawn_at: number; status: 'open' | 'accepted';
 }
 /** A board slot: a request, or empty until refill_at. */

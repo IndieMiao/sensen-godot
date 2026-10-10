@@ -41,7 +41,7 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
       if (refused) return reply.send({ ok: false, code: refused.code, detail: refused.detail, state: view(s, clock(s.clock_ms)) });
       notePresence(c, s, space, clock(s.clock_ms), null, place);
       noteEntered(s, space, place);
-      noteVisit(s, space, place, []);   // the entry read checks in an explore request too (as noteSeenAt marks)
+      noteVisit(c, s, space, place, clock(s.clock_ms), []);   // the entry read checks in an explore request too (as noteSeenAt marks)
       settleHere(c, s, space, place, clock(s.clock_ms));
       store.put(s);
     } else if (settleHere(c, s, space, place, clock(s.clock_ms))) store.put(s);   // a Day Pass ran out on the map: home

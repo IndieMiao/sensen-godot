@@ -14,6 +14,8 @@ import { handOver, haveFor, floorPrice, noteDone, payBonus, pick, rarityOf } fro
 import { skillLevel, untilRollover } from './rules.js';
 import { catalog } from './shops.js';
 import type { BoardRequest, BoardSlot, P0State } from './state.js';
+import { clusterById, clusterOf, noteDelivery, rankedCities } from './travel.js';
+import { cityPlaces } from './world.js';
 
 const H = 3_600_000;
 export const BOARDS: readonly BoardId[] = ['stall', 'market'];
@@ -36,8 +38,38 @@ export function eligible(c: P0Content, s: P0State, board: BoardId): string[] {
   return c.requests.boards[board].templates.filter(id => {
     const t = c.requests.templates[id];
     return t.enabled !== false && gateMet(c, s, t) && climateMet(c, t)
-      && (!t.need.regional || regionalPool(c, t.need).length > 0) && (t.need.kind !== 'visit' || visitPlaces(c, board).length > 0);
+      && (!t.need.regional || regionalPool(c, t.need).length > 0) && (t.need.kind !== 'visit' || visitOpen(c, s, board, t.need));
   });
+}
+
+/** An explore template can be drawn: a home outpost to send the player to (Stamp Run), or a city elsewhere with one. */
+function visitOpen(c: P0Content, s: P0State, board: BoardId, need: Need): boolean {
+  const v = need.visit;
+  if (!v || v.where === 'same_city') return visitPlaces(c, board).length > 0;
+  return crossCities(c, s, v).some(id => crossTarget(c, id, v.role ?? 'market') !== null);
+}
+
+/**
+ * q(128) cross-city explore (李白; SGODOT-284): the cities a request may send the player to, nearest first — those of
+ * the template's trip tiers (Tea Trail 1–2, Postcard Trip 2–3; the tier as the travel preview has it), or every city in
+ * another climate zone than home's (New Climate takes the nearest that has an outpost).
+ */
+export function crossCities(c: P0Content, s: P0State, v: NonNullable<Need['visit']>): string[] {
+  const ranked = rankedCities(c, s);
+  if (v.where === 'other_zone') {
+    const zone = clusterById(c, s.travel.home)?.climate;
+    return ranked.filter(r => clusterById(c, r.id)?.climate !== zone).map(r => r.id);
+  }
+  const [lo, hi] = v.trip ?? [1, 7];
+  return ranked.filter(r => r.trip >= lo && r.trip <= hi).map(r => r.id);
+}
+
+/** The outpost a cross-city request checks in at: the city's first of that role (`~tea0`, `~market0`), or, in a small
+ * city, its Trading Post cabin (all four counters in one room). Null: the city has no places (no world content). */
+export function crossTarget(c: P0Content, cluster: string, role: string): string | null {
+  const outposts = cityPlaces(c, cluster)?.detail.outposts ?? [];
+  const first = outposts.find(o => o.id === `${cluster}~${role}0`) ?? outposts.find(o => o.role === role && !o.cabin);
+  return (first ?? outposts.find(o => o.cabin))?.id ?? null;
 }
 
 /** The home city's 2 regional fish (§6.2.5: content fishing.regional.curated by city name; generated cities come with 280). */
@@ -137,7 +169,16 @@ function drawRequest(c: P0Content, s: P0State, board: BoardId, slot: number, at:
   const t = c.requests.templates[template];
   let items: string[] = [];
   let visit: BoardRequest['visit'];
-  if (t.need.kind === 'visit') {   // explore: one outpost to check in at, no items
+  if (t.need.kind === 'visit' && t.need.visit && t.need.visit.where !== 'same_city') {   // cross-city: one city, its outpost
+    const v = t.need.visit, cities = crossCities(c, s, v);
+    // New Climate goes to the nearest such city; the trip-tier ones to any of their tier, from a drawn start
+    const start = v.where === 'other_zone' ? 0 : Math.floor(draw() * cities.length);
+    for (let k = 0; k < cities.length && !visit; k++) {
+      const place = crossTarget(c, cities[(start + k) % cities.length], v.role ?? 'market');
+      if (place) visit = { place, done: false };
+    }
+    if (!visit) return null;
+  } else if (t.need.kind === 'visit') {   // explore: one outpost to check in at, no items
     const places = visitPlaces(c, board);
     visit = { place: places[Math.floor(draw() * places.length)], done: false };
   } else if (t.need.regional) {   // regional: one of the climate's / city's items
@@ -155,6 +196,7 @@ function drawRequest(c: P0Content, s: P0State, board: BoardId, slot: number, at:
     id: `${template}-${board}${slot}-${at.toString(36)}`, template, items, rarity: t.need.rarity,
     ...(t.need.style ? { style: t.need.style } : {}), ...(t.need.family ? { family: t.need.family } : {}), kind: t.need.kind as BoardRequest['kind'],
     qty: visit ? 1 : qtyFor(c, s, t, draw), bonus: t.bonus, drawn_at: at, status: 'open', ...(visit ? { visit } : {}),
+    ...(t.need.where ? { where: t.need.where, abroad: [] } : {}),
   };
 }
 
@@ -189,15 +231,38 @@ export function heldSlot(c: P0Content, s: P0State, board: BoardId, sl: BoardSlot
   return board === 'stall' && !sl.req && sl.refill_at === s.created_at + c.requests.refill_h * H;
 }
 
-/** Entering an outpost checks in a tracked explore request that sends the player there (§9.6.3 Stamp Run). */
-export function noteVisit(s: P0State, space: unknown, place: unknown, events: P0Event[]): void {
+/**
+ * Entering an outpost checks in a tracked explore request that sends the player there (§9.6.3 Stamp Run). A check-in
+ * in another city counts as that city's delivery for its card (q(128): Deliveries +1 there, once a day; the hand-in at
+ * home adds none); getting in already took a pass there (requirePass runs first).
+ */
+export function noteVisit(c: P0Content, s: P0State, space: unknown, place: unknown, now: number, events: P0Event[]): void {
   if (space !== 'outpost' || typeof place !== 'string') return;
   for (const board of BOARDS) for (const sl of s.boards[board] ?? []) {
     const r = sl.req;
     if (r?.kind !== 'visit' || r.status !== 'accepted' || !r.visit || r.visit.done || r.visit.place !== place) continue;
     r.visit.done = true;
     events.push({ kind: 'visit', id: r.id, place });
+    if (clusterOf(c, place) !== s.travel.home) noteDelivery(c, s, now);
   }
+}
+
+/** Far Pond (q(128)): a fish landed in another city is noted on each taken such request; those kinds are what it takes. */
+export function noteCatchAbroad(c: P0Content, s: P0State, fish: string, place: string | undefined): void {
+  const city = place ? clusterOf(c, place) : null;
+  if (!city || city === s.travel.home) return;
+  for (const board of BOARDS) for (const sl of s.boards[board] ?? []) {
+    const r = sl.req;
+    if (r?.where !== 'other_city' || r.status !== 'accepted') continue;
+    r.abroad ??= [];
+    if (!r.abroad.includes(fish)) r.abroad.push(fish);
+  }
+}
+
+/** The units a request's need counts in the bag now (its card's have): Far Pond only its abroad kinds. */
+export function haveForRequest(c: P0Content, s: P0State, r: BoardRequest): number {
+  if (r.where === 'other_city') return r.abroad?.length ? haveFor(c, s, { kind: 'fish' }, r.abroad) : 0;
+  return haveFor(c, s, { kind: r.kind, rarity: r.rarity, style: r.style, family: r.family }, r.items);
 }
 
 export function findBoardRequest(s: P0State, id: string): { board: BoardId; slot: BoardSlot } | null {
@@ -213,6 +278,7 @@ export function tracked(s: P0State): number {
 /** The bag units a board request would take now, or null when short. A visit takes nothing: it is ready once checked in. */
 export function handIn(c: P0Content, s: P0State, r: BoardRequest): [string, number][] | null {
   if (r.kind === 'visit') return r.visit?.done ? [] : null;
+  if (r.where === 'other_city') return r.abroad?.length ? pick(c, s, { kind: 'fish' }, r.abroad, r.qty) : null;   // Far Pond
   if (r.items.length > 1) {   // Market Basket: N of each of the drawn crops
     const out: [string, number][] = [];
     for (const item of r.items) {
@@ -258,7 +324,7 @@ export function boardCommand(c: P0Content, s: P0State, type: 'accept' | 'deliver
     const short = r.items.length > 1 ? r.items.find(item => haveFor(c, s, { kind: r.kind }, [item]) < r.qty)! : null;
     return { code: 'not_enough', detail: short
       ? { item: short, need: r.qty, have: haveFor(c, s, { kind: r.kind }, [short]) }
-      : { item: r.items[0] ?? null, need: r.qty, have: haveFor(c, s, { kind: r.kind, rarity: r.rarity, style: r.style, family: r.family }, r.items) } };
+      : { item: r.items[0] ?? null, need: r.qty, have: haveForRequest(c, s, r) } };
   }
   for (const [item, n] of parts) { handOver(c, s, item, n); events.push({ kind: 'item', id: item, delta: -n }); }
   // §9.13.2 explore: a fixed reward with no floor (40 for Stamp Run), all of it a completion bonus under the daily cap.

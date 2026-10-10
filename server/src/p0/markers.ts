@@ -105,7 +105,7 @@ export function mapMarkers(c: P0Content, s: P0State, now: number): MapMarker[] {
       const tracked = r.status === 'accepted';
       if (handIn(c, s, r)) all.push({ place, kind: 'deliver', why: { request: r.id, ...(tracked ? { tracked: true as const } : {}) } });
       else if (tracked && r.kind === 'visit' && r.visit) all.push({ place: r.visit.place, kind: 'request', why: { request: r.id, tracked: true } });   // Stamp Run: go there
-      else if (tracked && r.kind === 'fish') {   // only the fish the player can land yet (q(104))
+      else if (tracked && r.kind === 'fish' && r.where !== 'other_city') {   // only the fish the player can land yet (q(104)); Far Pond: any pond elsewhere, no pin
         const pond = pondFor(c, landable(c, s, fishFor(c, r.items, { kind: 'fish', rarity: r.rarity })));
         if (pond) all.push({ place: pond, kind: 'request', why: { request: r.id, tracked: true } });
       } else if (!tracked && board === 'market') {
