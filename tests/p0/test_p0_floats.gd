@@ -190,3 +190,22 @@ func test_a_pots_xp_float_says_the_2nd_and_3rd_of_its_page_today() -> void:
 	assert_array(await said.call([{"kind": "xp", "skill": "cooking", "amount": 0, "percent": 100, "nth": 4}])).is_equal(["No XP · 4th today"])
 	assert_array(await said.call([{"kind": "xp", "skill": "cooking", "amount": 3, "percent": 75, "nth": 1}])).is_equal(["+3 Cooking XP · 75%"])
 	assert_array(await said.call([{"kind": "xp", "skill": "cooking", "amount": 0, "percent": 100}])).is_empty()   # no pot place: nothing, as before
+
+## A wide line from near a side moves in (SGODOT-289: a trap's three fish from the bank ran off the right edge): it stays
+## SPACE_PAGE clear of both sides; a line in the middle stays where it was asked.
+func test_a_wide_float_stays_inside_the_screen() -> void:
+	var ui := P0Ui.new()
+	ui.quick_store = STORE
+	add_child(auto_free(ui))
+	await get_tree().process_frame
+	ui.set_view({"energy": {"value": 140, "max": 200}, "coins": 52, "bag": {"capacity": 25, "slots": []}, "skills": {}})
+	ui.set_surface("pond")
+	var lines := ui.float_lines([{kind = "item", key = "trap_fish", text = "River Perch ×1 · Common Carp ×1 · Arctic Char ×1",
+		tone = UiFloatText.Tone.ITEM}], Vector2(ui.root.size.x - 40, 420))
+	var f: UiFloatText = lines[0]
+	var half := f.shown_size().x * 0.5
+	var centre_x := f.position.x + f.pivot_offset.x
+	assert_float(centre_x + half).is_less_equal(ui.root.size.x - UiTokens.SPACE_PAGE + 0.5)
+	assert_float(centre_x - half).is_greater_equal(UiTokens.SPACE_PAGE - 0.5)
+	var mid: UiFloatText = ui.float_lines([{kind = "coins", key = "coins", amount = 5, fmt = "%s coins"}], Vector2(180, 420))[0]
+	assert_float(mid.position.x + mid.pivot_offset.x).is_equal_approx(180.0, 0.5)

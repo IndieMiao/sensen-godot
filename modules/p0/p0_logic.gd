@@ -981,11 +981,20 @@ static func fish_action(view: Dictionary, bait: String, site := "pond", place :=
 	return a
 
 ## "Creel 7 · 6 free" — the bag is the creel (§6.6.3).
-static func creel_line(view: Dictionary) -> String:
+static func creel_line(view: Dictionary, flying: Array = []) -> String:
 	var fish := 0
+	var qty := {}
 	for s in view.get("bag", {}).get("slots", []):
-		if str(s.get("id", "")).begins_with("fish_"): fish += int(s.get("qty", 0))
-	return "Creel %d · %d free" % [fish, int(view.get("bag", {}).get("free", 0))]
+		if str(s.get("id", "")).begins_with("fish_"):
+			fish += int(s.get("qty", 0))
+			qty[str(s.id)] = int(qty.get(str(s.id), 0)) + int(s.get("qty", 0))
+	var free := int(view.get("bag", {}).get("free", 0))
+	# A trap's fish still flying in (TRAP-COLLECT-2: the badge counts each one as it lands): not in it yet, and a kind
+	# whose whole stack came with them leaves its slot free until then.
+	for f in flying:
+		fish -= int(f.get("count", 0))
+		if int(qty.get(str(f.get("id", "")), 0)) <= int(f.get("count", 0)): free += 1
+	return "Creel %d · %d free" % [fish, free]
 
 static func protection_line(view: Dictionary) -> String:
 	var left = view.get("fishing", {}).get("protection_left", null)

@@ -379,6 +379,16 @@ func set_hp(hp: int, maximum: int, elite := {}) -> void:
 			_creel.position.y + _hp.get_combined_minimum_size().y + UiTokens.SPACE_WITHIN)
 
 func hp_bar() -> UiHpBar: return _hp
+## The creel badge (where a trap's fish fly to, SGODOT-289).
+func creel_badge() -> Control: return _creel
+## A trap's fish still flying to the badge ([{id, count}]): it counts each in as it lands (creel_landed).
+var creel_in_flight: Array = []
+func creel_flying(got: Array) -> void:
+	creel_in_flight = got.duplicate(true)
+	if _creel: _creel.text = P0Logic.creel_line(view, creel_in_flight)
+func creel_landed(id: String) -> void:
+	creel_in_flight = creel_in_flight.filter(func(f): return str(f.id) != id)
+	if _creel: _creel.text = P0Logic.creel_line(view, creel_in_flight)
 func elite_bar() -> UiHpBar: return _elite_hp
 
 func set_status_line(text: String) -> void:
@@ -454,7 +464,7 @@ func _refresh_bar() -> void:
 			if not selected_bait.begins_with("trap_"):   # a Fish Trap set in the water leaves the bar quietly
 				toast_when_clear("Out of %s · no bait on the hook" % P0Logic.item_name(view, selected_bait))
 			selected_bait = ""
-		_creel.text = P0Logic.creel_line(view)
+		_creel.text = P0Logic.creel_line(view, creel_in_flight)
 		_creel.state = UiCreelBadge.state_for(int(view.get("bag", {}).get("free", 0)))
 	else:
 		if selected_seed != "" and not ids.has(selected_seed): selected_seed = ""
@@ -1096,7 +1106,13 @@ func _float_start(screen: Vector2, lines: Array, top_index: int) -> Vector2:
 	for f in lines: h = maxf(h, (f as UiFloatText).shown_size().y)
 	var lowest := hud_bottom + FLOAT_HUD_GAP + h + UiFloatText._RISE \
 		+ UiFloatText._STACK_RISE * clampi(top_index, 0, UiFloatText._STACK_MAX - 1)
-	return Vector2(screen.x, maxf(screen.y, lowest))
+	# …and never past the screen's sides: a wide line from near an edge (a trap's three fish by the bank, SGODOT-289)
+	# moves in until it is SPACE_PAGE clear of both.
+	var half := 0.0
+	for f in lines: half = maxf(half, (f as UiFloatText).shown_size().x * 0.5)
+	var x := screen.x
+	if root and half > 0.0: x = clampf(x, half + UiTokens.SPACE_PAGE, maxf(half + UiTokens.SPACE_PAGE, root.size.x - half - UiTokens.SPACE_PAGE))
+	return Vector2(x, maxf(screen.y, lowest))
 
 ## The lowest a pushed-down group may start (its bottom): above the quick bar, an open drawer, and the main action key
 ## when the group's width reaches over it (不知火舞 233), in this UI's root space.
