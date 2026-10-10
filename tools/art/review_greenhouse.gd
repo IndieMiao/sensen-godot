@@ -2,6 +2,10 @@ extends Node
 ## Offline art-only fixture. No p0_farm_facilities or production data dependency.
 const Art=preload("res://modules/farm/farm_art.gd")
 const IDS=["greenhouse_base","greenhouse_roof","greenhouse_glass"]
+const POST_CENTRE=2.475
+const BED_SIZE=.65
+const BED_PITCH=1.3
+const COVERED_BLOCK=4.55
 var vp:SubViewport
 var world:Node3D
 var cam:Camera3D
@@ -50,14 +54,15 @@ func _run():
 			var tri=AABB(all_faces[i],Vector3.ZERO).expand(all_faces[i+1]).expand(all_faces[i+2])
 			for axis in 2:
 				for side in [-1,1]:
-					var zone=AABB(Vector3(-.65,0,side*2.11-.10),Vector3(1.3,3,.20)) if axis==0 else AABB(Vector3(side*2.11-.10,0,-.65),Vector3(.20,3,1.3))
+					var zone=AABB(Vector3(-.65,0,side*POST_CENTRE-.10),Vector3(1.3,3,.20)) if axis==0 else AABB(Vector3(side*POST_CENTRE-.10,0,-.65),Vector3(.20,3,1.3))
 					if tri.intersects(zone):entry_clearance=minf(entry_clearance,tri.position.y)
 		check(nodes.size()==1,id+": one merged mesh")
 		check(mesh.get_surface_count()==1,id+": one surface")
 		check(triangles==int(entry.triangles) and triangles<=int(entry.triangle_limit),id+": triangle budget and manifest")
 		check(scene.transform.is_equal_approx(Transform3D.IDENTITY),id+": shared ground origin, root transform identity")
 		check(nodes[0].transform.is_equal_approx(Transform3D.IDENTITY),id+": mesh local transform identity")
-		check(box.position.x>=-2.27501 and box.end.x<=2.27501 and box.position.z>=-2.27501 and box.end.z<=2.27501,id+": 4.55 m square footprint")
+		check(box.position.x>=-2.62501 and box.end.x<=2.62501 and box.position.z>=-2.62501 and box.end.z<=2.62501,id+": physical bounds within 5.25 m including 0.30 m feet")
+		check(entry.footprint==[4.95,4.95] and is_equal_approx(entry.covered_block_m,COVERED_BLOCK),id+": nominal 4.95 m frame span and 4.55 m covered block")
 		var colors:PackedColorArray=mesh.surface_get_arrays(0)[Mesh.ARRAY_COLOR]
 		var opaque=not colors.is_empty()
 		for c in colors:opaque=opaque and is_equal_approx(c.a,1)
@@ -81,6 +86,7 @@ func _run():
 				if tri.position.x<.65 and tri.end.x>-.65:clear=false
 				if tri.position.z<.65 and tri.end.z>-.65:clear=false
 			check(clear,"All four central 1.3 m entry strips have no low geometry or ground beams")
+			check_bed_clearance(mesh)
 			report.eave_underside_m=entry.eave_underside
 		if id=="greenhouse_glass":
 			check(triangles==6,"Exactly four single-thickness glass panels: 2 quads and 2 triangles")
@@ -126,13 +132,13 @@ func _run():
 	for child in rig.get_children():
 		if child is RigActivity:child.free()
 	rig.assembler=AvatarAssemblerMerged.new();world.add_child(rig)
-	rig.position=Vector3(-3.05,0,.50);rig.apply_config(Avatar.slot_table.default_config())
+	rig.position=Vector3(-3.70,0,.65);rig.apply_config(Avatar.slot_table.default_config())
 	var ticks=0
 	while rig.is_busy() and ticks<900:await get_tree().process_frame;ticks+=1
 	check(not rig.is_busy(),"Existing scale avatar assembled")
 	rig.play_motion("idle");var ap=rig.get_node("AnimationPlayer");ap.seek(.3,true);ap.pause()
 	cam=Camera3D.new();cam.projection=Camera3D.PROJECTION_ORTHOGONAL;cam.keep_aspect=Camera3D.KEEP_WIDTH
-	cam.size=8.2;cam.near=.1;cam.far=70;cam.current=true;world.add_child(cam)
+	cam.size=9.2;cam.near=.1;cam.far=70;cam.current=true;world.add_child(cam)
 	var canvas=CanvasLayer.new();vp.add_child(canvas)
 	title=Label.new();title.position=Vector2(64,48);title.add_theme_font_size_override("font_size",35)
 	title.add_theme_color_override("font_color",Color("394532"));canvas.add_child(title)
@@ -140,15 +146,15 @@ func _run():
 	note.add_theme_color_override("font_color",Color("4a503f"));canvas.add_child(note)
 	cam.rotation_degrees=Vector3(-43,25,0);cam.position=Vector3(-.18,.75,0)+cam.basis.z*20
 	title.text="GREENHOUSE / 43 DEG / GLASS 25%"
-	note.text="SGODOT-294 | 4.55 m SQUARE | 1,862 TRIANGLES | GODOT MOBILE | AVATAR 1.745 m"
+	note.text="R2 v1.4 | FRAME SPAN 4.95 m / BEDS 4.55 m | 1,862 TRIS | GODOT MOBILE | AVATAR 1.745 m"
 	await capture("greenhouse-43deg-normal")
 	pane_material.albedo_color.a=.10
 	title.text="GREENHOUSE / 43 DEG / GLASS 10%"
 	await capture("greenhouse-43deg-glass10")
-	roof.visible=false;glass.visible=false;rig.visible=false;crop_stage.visible=false;soil_stage.visible=false;grid_stage.visible=true
-	cam.size=6.3;cam.rotation_degrees=Vector3(-90,0,0);cam.position=Vector3(0,20,0)
+	roof.visible=false;glass.visible=false;rig.visible=false;crop_stage.visible=false;soil_stage.visible=true;grid_stage.visible=true
+	cam.size=7.4;cam.rotation_degrees=Vector3(-90,0,0);cam.position=Vector3(0,20,0)
 	title.text="GREENHOUSE / TOP / BASE ONLY"
-	note.text="PREVIEW FIXTURE | 4 x 4 PLOTS | NO GROUND BEAMS | ROOF + GLASS HIDDEN"
+	note.text="4 x 4 BEDS + PLACEMENT COLOURS | POSTS AT +/-2.475 m | ROOF + GLASS HIDDEN"
 	await capture("greenhouse-top-base")
 	report.renderer=RenderingServer.get_current_rendering_method();report.adapter=RenderingServer.get_video_adapter_name()
 	report.failures=report.checks.filter(func(item):return not item.passed)
@@ -163,15 +169,56 @@ func make_plots():
 	var green=mat(Color("b6cc98"));var red=mat(Color("d3a299"))
 	for row in 4:
 		for col in 4:
-			var p=Vector3((col-1.5)*1.3,0,(row-1.5)*1.3)
-			var bed=Art.instance("plot",p,.65/.94);bed.material_override=soil;soil_stage.add_child(bed)
-			var cell=PlaneMesh.new();cell.size=Vector2(.65,.65)
-			solid(grid_stage,cell,p+Vector3(0,.012,0),red if row==1 and col==2 else green)
+			var p=Vector3((col-1.5)*BED_PITCH,0,(row-1.5)*BED_PITCH)
+			var bed=Art.instance("plot",p,BED_SIZE/.94);bed.material_override=soil;soil_stage.add_child(bed)
+			var cell=PlaneMesh.new();cell.size=Vector2(.51,.51)
+			solid(grid_stage,cell,p+Vector3(0,.110,0),red if row==1 and col==2 else green)
 			# Existing crops are outside this asset PR. Simple labeled fixture plants show transparency.
 			for i in 3:
 				var leaf=SphereMesh.new();leaf.radius=.09;leaf.height=.27;leaf.radial_segments=8;leaf.rings=3
 				var node=solid(crop_stage,leaf,p+Vector3(.08*cos(i*TAU/3),.23,.08*sin(i*TAU/3)),leaf_mat if (col+row)%2==0 else young_mat)
 				node.rotation=Vector3(.5*cos(i*TAU/3),0,.5*sin(i*TAU/3))
+
+func check_bed_clearance(mesh:Mesh):
+	# A disjoint projected triangle AABB guarantees no geometry over that bed.
+	# Include eaves, braces, vine and can, not only the posts and their plinths.
+	var faces=mesh.get_faces()
+	var overlaps=0
+	var minimum_gap=INF
+	for i in range(0,faces.size(),3):
+		var tri=AABB(faces[i],Vector3.ZERO).expand(faces[i+1]).expand(faces[i+2])
+		for row in 4:
+			for col in 4:
+				var centre=Vector2((col-1.5)*BED_PITCH,(row-1.5)*BED_PITCH)
+				var lower=centre-Vector2.ONE*BED_SIZE/2
+				var upper=centre+Vector2.ONE*BED_SIZE/2
+				var dx=maxf(0,maxf(lower.x-tri.end.x,tri.position.x-upper.x))
+				var dz=maxf(0,maxf(lower.y-tri.end.z,tri.position.z-upper.y))
+				minimum_gap=minf(minimum_gap,Vector2(dx,dz).length())
+				if dx==0 and dz==0:overlaps+=1
+	check(overlaps==0,"Base triangle projections clear all 16 beds, including eaves, vine and can")
+	check(minimum_gap>=.0499,"Every base triangle stays at least 0.05 m from covered beds in plan")
+	report.bed_projection_overlap_count=overlaps
+	report.minimum_projected_bed_gap_m=minimum_gap
+	report.corner_feet=[]
+	for sx in [-1,1]:
+		for sz in [-1,1]:
+			var points:PackedVector3Array=[]
+			for p in faces:
+				if p.y<.23 and p.x*sx>2.2 and p.z*sz>2.2:points.append(p)
+			check(not points.is_empty(),"Corner foot exists: %d,%d"%[sx,sz])
+			if points.is_empty():continue
+			var bounds=AABB(points[0],Vector3.ZERO)
+			for p in points:bounds=bounds.expand(p)
+			var centre=bounds.get_center()
+			# Retained Godot mesh compression quantizes some vertices by ~0.1 mm.
+			check(absf(centre.x-sx*POST_CENTRE)<.0001 and absf(centre.z-sz*POST_CENTRE)<.0001,"Corner foot centre matches +/-2.475 m within 0.1 mm: %d,%d"%[sx,sz])
+			check(bounds.size.x<=.30001 and bounds.size.z<=.30001,"Corner post and foot projection <= 0.30 m square: %d,%d"%[sx,sz])
+			report.corner_feet.append({"centre_xz":[centre.x,centre.z],"projection_m":[bounds.size.x,bounds.size.z]})
+	var box=mesh.get_aabb()
+	var adjacent_gap=2.925-maxf(maxf(absf(box.position.x),absf(box.end.x)),maxf(absf(box.position.z),absf(box.end.z)))
+	check(adjacent_gap>=.2999,"Base stays at least 0.30 m inside adjacent bed edges at +/-2.925 m")
+	report.adjacent_bed_edge_gap_m=adjacent_gap
 
 func capture(id:String):
 	for i in 8:await RenderingServer.frame_post_draw

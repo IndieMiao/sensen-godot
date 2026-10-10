@@ -15,10 +15,14 @@ from mathutils import Vector
 ROOT=Path(__file__).resolve().parents[2]
 OUT=ROOT/'assets/farm/art'
 SOURCE=ROOT/'tools/art/source/greenhouse_294'
-FOOTPRINT=4.55
+FOOTPRINT=4.95  # v1.4: nominal frame span, measured between post centres.
+COVERED_BLOCK=4.55
 EAVE=1.92  # User-approved clearance correction: underside 1.80 m.
 RIDGE=2.75  # v1.3: keep a readable gable after raising the eave.
-POST=2.11
+POST=FOOTPRINT/2
+FOOT=.30
+FRAME_SPAN=FOOTPRINT+.16  # Beam ends flush with the outside of the posts.
+ROOF_HALF=POST+.07
 PALETTE={
     'cream':'f5efda','cream_shade':'dbd5bf','cream_dark':'c4c0ad',
     'stone':'b4b4a5','stone_light':'d7d4c3',
@@ -36,7 +40,9 @@ def begin(name,budget,**metadata):
     ASSETS[name]=CURRENT
     META[name]={'generator':'tools/art/build_greenhouse.py','triangle_limit':budget,
                 'footprint':[FOOTPRINT,FOOTPRINT],'footprint_m':[FOOTPRINT,FOOTPRINT],
-                'covered_plots':[4,4],'eave_height':EAVE,'ridge_height':RIDGE,
+                'covered_plots':[4,4],'covered_block_m':COVERED_BLOCK,
+                'footprint_note':'Nominal post-centre span; use bounds for physical extents (5.25 m including feet).',
+                'eave_height':EAVE,'ridge_height':RIDGE,
                 'pivot':'ground / footprint centre; common to all three parts',
                 'front':'+Z','sockets':{},**metadata}
 
@@ -265,11 +271,13 @@ def curved_tube(name, points, radius, color, sides=6):
 def greenhouse_base():
     begin('greenhouse_base',1500,preview_part=True,post_count=4,ground_beams=False,
           eave_underside=round(EAVE-.12,6),verified_mid_entry_width_m=1.3,
+          post_centres_xz=[[sx*POST,sz*POST] for sx in [-1,1] for sz in [-1,1]],
+          post_section_m=.16,foot_projection_m=[FOOT,FOOT],
           collision_note='Four corner feet/posts only; no whole-building AABB collider.')
     for sx in [-1,1]:
         for sz in [-1,1]:
             x,z=sx*POST,sz*POST
-            foot=box('Corner stone plinth',(x,.11,z),(.33,.22,.33),'stone',.024)
+            foot=box('Corner stone plinth',(x,.11,z),(FOOT,.22,FOOT),'stone',.024)
             foot.data.materials.append(MATS['stone_light'])
             for face in foot.data.polygons:
                 if face.normal.z>.5:face.material_index=1
@@ -277,9 +285,9 @@ def greenhouse_base():
             # Short upper diagonal stays at the corner, clear of the middle of each side.
             beam('Corner knee brace',(x,EAVE-.39,z),(x-sx*.35,EAVE-.085,z),.08,'cream_shade',radius=.010)
     for z in [-POST,POST]:
-        box('Eave cross beam',(0,EAVE-.06,z),(FOOTPRINT,.12,.15),'cream',.014)
+        box('Eave cross beam',(0,EAVE-.06,z),(FRAME_SPAN,.12,.15),'cream',.014)
     for x in [-POST,POST]:
-        box('Eave longitudinal beam',(x,EAVE-.06,0),(.15,.12,FOOTPRINT),'cream',.014)
+        box('Eave longitudinal beam',(x,EAVE-.06,0),(.15,.12,FRAME_SPAN),'cream',.014)
     # One sparse climbing vine follows the left front post; not across the walkway.
     pts=[(-POST+.025*math.sin(i*1.35),.28+i*(EAVE-.53)/6,POST+.091) for i in range(7)]
     for i in range(len(pts)-1):rod('Vine woody stem',pts[i],pts[i+1],.009,'leaf_dark',5)
@@ -287,17 +295,17 @@ def greenhouse_base():
         for s in [-1,1]:
             leaf('Rounded vine leaf',(p[0]+s*.055,p[1]+(.04 if s>0 else 0),p[2]),.17,.095,
                  ['leaf','leaf_dark','leaf_light'][(i+(s==1))%3],s*.62,math.pi/2)
-    # Watering can hangs inward of the right front corner, never outside 4.55 m.
-    at=(1.78,EAVE-.64,2.02)
+    # Follow the expanded corner; keep the entire can outside the covered beds.
+    at=(POST-.33,EAVE-.64,POST)
     lathe('Hollow watering can body',[(.10,0),(.14,.025),(.145,.205),(.129,.24),
            (.109,.24),(.109,.208),(.108,.06),(0,.06)],'metal',8,at)
     rod('Watering can rising spout',(at[0]-.10,at[1]+.08,at[2]),(at[0]-.28,at[1]+.20,at[2]),.040,'metal',8,top=.031)
     rod('Watering can rose nozzle',(at[0]-.28,at[1]+.20,at[2]),(at[0]-.325,at[1]+.235,at[2]),.033,'metal_light',8,top=.064)
     pts=[(at[0]+.12*math.cos(math.pi*i/6),at[1]+.20+.17*math.sin(math.pi*i/6),at[2]) for i in range(7)]
     curved_tube('Watering can arch handle',pts,.017,'metal_dark')
-    rod('Wooden hanging peg',(POST-.025,EAVE-.19,POST),(1.78,EAVE-.19,POST),.030,'wood',6)
-    curved_tube('Hanging metal hook',[(1.79,EAVE-.19,POST),(1.79,EAVE-.24,2.10),
-                 (1.79,EAVE-.28,2.04),(1.79,EAVE-.26,2.01)],.011,'metal_dark',5)
+    rod('Wooden hanging peg',(POST-.025,EAVE-.19,POST),(at[0],EAVE-.19,POST+.09),.030,'wood',6)
+    curved_tube('Hanging metal hook',[(at[0]+.01,EAVE-.19,POST+.09),(at[0]+.01,EAVE-.24,POST+.08),
+                 (at[0]+.01,EAVE-.28,POST+.02),(at[0]+.01,EAVE-.26,POST-.01)],.011,'metal_dark',5)
     socket('roof_center',(0,RIDGE-.12,0))
 
 
@@ -305,12 +313,12 @@ def greenhouse_roof():
     begin('greenhouse_roof',1000,preview_part=False,optional_inside_opacity=.5)
     peak=RIDGE-.06
     edge=EAVE-.022
-    box('Ridge beam',(0,peak,0),(.12,.12,FOOTPRINT),'cream',.014)
+    box('Ridge beam',(0,peak,0),(.12,.12,FRAME_SPAN),'cream',.014)
     for z in [-POST,-POST/3,POST/3,POST]:
         for s in [-1,1]:
-            beam('Roof rafter',(s*2.18,edge,z),(0,peak,z),.085,'cream',depth=.09,radius=.011)
+            beam('Roof rafter',(s*ROOF_HALF,edge,z),(0,peak,z),.085,'cream',depth=.09,radius=.011)
     for s in [-1,1]:
-        box('Mid slope purlin',(s*1.09,(edge+peak)/2,0),(.070,.065,4.28),'cream_shade',.010)
+        box('Mid slope purlin',(s*ROOF_HALF/2,(edge+peak)/2,0),(.070,.065,FOOTPRINT+.06),'cream_shade',.010)
     for z in [-POST,POST]:
         beam('Gable king post',(0,edge,z),(0,peak,z),.075,'cream',depth=.08,radius=.010)
 
@@ -319,7 +327,7 @@ def greenhouse_glass():
     begin('greenhouse_glass',500,preview_part=False,panel_count=4,
           vertex_alpha=1.0,runtime_opacity_normal=.25,runtime_opacity_inside=.10,
           material_note='Duplicate FarmArt.material() for alpha at runtime; single-sided outward geometry. No baked transparency or reflection.')
-    edge=EAVE-.022;peak=RIDGE-.06;x=2.18;z=POST
+    edge=EAVE-.022;peak=RIDGE-.06;x=ROOF_HALF;z=POST
     verts=[(-x,edge,-z),(x,edge,-z),(-x,edge,z),(x,edge,z),(0,peak,-z),(0,peak,z)]
     # Four outward-facing panels only: 2 slope quads, 2 gable triangles, no bottom.
     mesh('Four single thickness mint glass panels',verts,[(0,2,5,4),(4,5,3,1),(0,4,1),(2,3,5)],'mint')

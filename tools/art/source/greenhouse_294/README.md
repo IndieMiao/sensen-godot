@@ -5,7 +5,8 @@ comment `8dd3e15a-46b7-44d4-ae6c-75c0b5c743fe`, with 不知火舞's annotated
 review `ab8d4bde-92fe-4d73-998e-0b5dc64a76ad`.
 
 The retained [original brief](spec-v1.1.md) is amended by the later approved
-[clearance, ridge and branch decisions](spec-amendments-v1.3.md). Dimensions
+[clearance, ridge and branch decisions](spec-amendments-v1.3.md), then by the
+[v1.4 post positions and bed clearances](spec-amendments-v1.4.md). Dimensions
 come from those specifications, not measurements of the concept image.
 
 ```sh

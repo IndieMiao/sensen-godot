@@ -1,16 +1,17 @@
 {
 	"adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+	"adjacent_bed_edge_gap_m": 0.3,
 	"assets": [
 		{
 			"bounds_max": [
-				2.27500009536743,
+				2.625,
 				1.91999995708466,
-				2.27500009536743
+				2.625
 			],
 			"bounds_min": [
-				-2.27500009536743,
+				-2.625,
 				0.0,
-				-2.27500009536743
+				-2.625
 			],
 			"id": "greenhouse_base",
 			"surfaces": 1,
@@ -18,14 +19,14 @@
 		},
 		{
 			"bounds_max": [
-				2.19161009788513,
+				2.55510306358337,
 				2.75,
-				2.27500009536743
+				2.5550000667572
 			],
 			"bounds_min": [
-				-2.19161009788513,
-				1.85946094989777,
-				-2.27500009536743
+				-2.55510306358337,
+				1.85830116271973,
+				-2.5550000667572
 			],
 			"id": "greenhouse_roof",
 			"surfaces": 1,
@@ -33,20 +34,21 @@
 		},
 		{
 			"bounds_max": [
-				2.1800000667572,
+				2.54500007629395,
 				2.69000005722046,
-				2.10999989509583
+				2.47499990463257
 			],
 			"bounds_min": [
-				-2.1800000667572,
+				-2.54500007629395,
 				1.89800000190735,
-				-2.10999989509583
+				-2.47499990463257
 			],
 			"id": "greenhouse_glass",
 			"surfaces": 1,
 			"triangles": 6
 		}
 	],
+	"bed_projection_overlap_count": 0,
 	"captures": [
 		{
 			"glass_alpha": 0.25,
@@ -101,7 +103,11 @@
 			"passed": true
 		},
 		{
-			"check": "greenhouse_base: 4.55 m square footprint",
+			"check": "greenhouse_base: physical bounds within 5.25 m including 0.30 m feet",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_base: nominal 4.95 m frame span and 4.55 m covered block",
 			"passed": true
 		},
 		{
@@ -137,6 +143,66 @@
 			"passed": true
 		},
 		{
+			"check": "Base triangle projections clear all 16 beds, including eaves, vine and can",
+			"passed": true
+		},
+		{
+			"check": "Every base triangle stays at least 0.05 m from covered beds in plan",
+			"passed": true
+		},
+		{
+			"check": "Corner foot exists: -1,-1",
+			"passed": true
+		},
+		{
+			"check": "Corner foot centre matches +/-2.475 m within 0.1 mm: -1,-1",
+			"passed": true
+		},
+		{
+			"check": "Corner post and foot projection <= 0.30 m square: -1,-1",
+			"passed": true
+		},
+		{
+			"check": "Corner foot exists: -1,1",
+			"passed": true
+		},
+		{
+			"check": "Corner foot centre matches +/-2.475 m within 0.1 mm: -1,1",
+			"passed": true
+		},
+		{
+			"check": "Corner post and foot projection <= 0.30 m square: -1,1",
+			"passed": true
+		},
+		{
+			"check": "Corner foot exists: 1,-1",
+			"passed": true
+		},
+		{
+			"check": "Corner foot centre matches +/-2.475 m within 0.1 mm: 1,-1",
+			"passed": true
+		},
+		{
+			"check": "Corner post and foot projection <= 0.30 m square: 1,-1",
+			"passed": true
+		},
+		{
+			"check": "Corner foot exists: 1,1",
+			"passed": true
+		},
+		{
+			"check": "Corner foot centre matches +/-2.475 m within 0.1 mm: 1,1",
+			"passed": true
+		},
+		{
+			"check": "Corner post and foot projection <= 0.30 m square: 1,1",
+			"passed": true
+		},
+		{
+			"check": "Base stays at least 0.30 m inside adjacent bed edges at +/-2.925 m",
+			"passed": true
+		},
+		{
 			"check": "greenhouse_roof: one merged mesh",
 			"passed": true
 		},
@@ -157,7 +223,11 @@
 			"passed": true
 		},
 		{
-			"check": "greenhouse_roof: 4.55 m square footprint",
+			"check": "greenhouse_roof: physical bounds within 5.25 m including 0.30 m feet",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_roof: nominal 4.95 m frame span and 4.55 m covered block",
 			"passed": true
 		},
 		{
@@ -193,7 +263,11 @@
 			"passed": true
 		},
 		{
-			"check": "greenhouse_glass: 4.55 m square footprint",
+			"check": "greenhouse_glass: physical bounds within 5.25 m including 0.30 m feet",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_glass: nominal 4.95 m frame span and 4.55 m covered block",
 			"passed": true
 		},
 		{
@@ -254,9 +328,52 @@
 		}
 	],
 	"clearance_margin_m": 0.0549999523162841,
+	"corner_feet": [
+		{
+			"centre_xz": [
+				-2.47504997253418,
+				-2.47504997253418
+			],
+			"projection_m": [
+				0.299900054931641,
+				0.299900054931641
+			]
+		},
+		{
+			"centre_xz": [
+				-2.47504997253418,
+				2.47499990463257
+			],
+			"projection_m": [
+				0.299900054931641,
+				0.299999952316284
+			]
+		},
+		{
+			"centre_xz": [
+				2.47499990463257,
+				-2.47504997253418
+			],
+			"projection_m": [
+				0.299999952316284,
+				0.299900054931641
+			]
+		},
+		{
+			"centre_xz": [
+				2.47499990463257,
+				2.47499990463257
+			],
+			"projection_m": [
+				0.299999952316284,
+				0.299999952316284
+			]
+		}
+	],
 	"eave_underside_m": 1.8,
 	"failures": [],
 	"minimum_mid_entry_clearance_m": 1.79999995231628,
+	"minimum_projected_bed_gap_m": 0.054999828338623,
 	"renderer": "mobile",
 	"scale_avatar_height_m": 1.745,
 	"total_triangles": 1862
