@@ -35,6 +35,8 @@ func test_paragraphs_join_the_hard_wraps_and_keep_every_word() -> void:
 	assert_array(P0Legal.paragraphs(src)).is_equal(["ODC Open Database",
 		"The Open Database License (ODbL) is a license agreement intended to allow users to freely share.",
 		"a. Adapted Material means material subject to Copyright."])
+	assert_array(P0Legal.paragraphs("## Additional licenses\nMapbox uses portions of it.")).is_equal(
+		["Additional licenses", "Mapbox uses portions of it."])   # a heading stands alone, blank line or not
 	assert_array(P0Legal.paragraphs("other CC-\nlicensed material, any reason--for\nexample")).is_equal(
 		["other CC-licensed material, any reason--for example"])   # a word broken at its hyphen joins whole
 	# whole files: not a character lost or changed, only the line breaks, the #s and the ===== rules
