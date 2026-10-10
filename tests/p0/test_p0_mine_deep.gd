@@ -364,3 +364,6 @@ func test_a_fall_waits_for_a_swing_in_flight_and_loses_to_run_complete() -> void
 	assert_bool(mine._leaving).is_false()      # no Knocked out after Run complete
 	mine._knocked_out()                        # and a late fall is ignored
 	assert_bool(mine._ko_waiting).is_false()
+	var src := FileAccess.get_file_as_string("res://scenes/p0/p0_mine.gd")   # no new swing while a fall waits
+	var at := src.find("func _swing()")
+	assert_str(src.substr(at, 120)).contains("_ko_waiting")
