@@ -11,6 +11,7 @@ const P0Outposts := preload("res://modules/p0/p0_outposts.gd")
 ## cluster → {ponds: [GenPond], outposts: [GenOutpost], fish, residents, tier, climate} as the server sent it.
 static var _cities: Dictionary = {}
 static var _pending: Dictionary = {}   # cluster → [done callables] while its read is out: every asker hears the answer
+static var _failing: Dictionary = {}   # cluster → [failed callables] of the same read
 ## generated id → its entry (ponds: a SystemPonds location; outposts: a p0_outposts-shaped entry).
 static var _ponds: Dictionary = {}
 static var _outposts: Dictionary = {}
@@ -24,7 +25,9 @@ static func has_city(cluster: String) -> bool: return _cities.has(cluster)
 static func city(cluster: String) -> Dictionary: return _cities.get(cluster, {})
 
 ## Ask the server for a city once (and again after a failure); `done` is called with the city when it is in.
-static func fetch(session: Node, cluster: String, done := Callable()) -> void:
+## `failed` (optional) is told when this read does not come back (a network failure, a refusal): a caller the player is
+## waiting on says so (Show on map, 不知火舞 on #279); the rest stay quiet and the next ask reads again.
+static func fetch(session: Node, cluster: String, done := Callable(), failed := Callable()) -> void:
 	if cluster == "" or session == null: return
 	if _cities.has(cluster):
 		if done.is_valid(): done.call(_cities[cluster])
@@ -33,8 +36,10 @@ static func fetch(session: Node, cluster: String, done := Callable()) -> void:
 	# callback (李元芳 0.2.0: the card stayed at "–" until opened again).
 	if _pending.has(cluster):
 		if done.is_valid(): (_pending[cluster] as Array).append(done)
+		if failed.is_valid(): (_failing.get_or_add(cluster, []) as Array).append(failed)
 		return
 	_pending[cluster] = [done] if done.is_valid() else []
+	_failing[cluster] = [failed] if failed.is_valid() else []
 	var path := "/p0/city/" + cluster.uri_encode()
 	var t: Variant = session.get("transport")
 	if t is Callable and (t as Callable).is_valid():   # tests answer with accept()
@@ -47,16 +52,24 @@ static func fetch(session: Node, cluster: String, done := Callable()) -> void:
 		http.queue_free()
 		var data = JSON.parse_string(body.get_string_from_utf8()) if result == HTTPRequest.RESULT_SUCCESS and code == 200 else null
 		if data is Dictionary and data.get("city") is Dictionary: accept(cluster, data.city)
-		else: _pending.erase(cluster))   # failed: the next ask reads again (its callers wait for that one)
+		else: fail(cluster))   # failed: the next ask reads again
 	if http.request(str(session.get("base_url")) + path, session.call("_headers")) != OK:
 		http.queue_free()
-		_pending.erase(cluster)
+		fail(cluster)
+
+## A city's read did not come back: those waiting with a `failed` hear it; nobody hears a later answer from this one.
+static func fail(cluster: String) -> void:
+	var told: Array = _failing.get(cluster, [])
+	_pending.erase(cluster)
+	_failing.erase(cluster)
+	for f in told: if (f as Callable).is_valid(): (f as Callable).call()
 
 ## A city's answer (the route's `city`: ponds / outposts ids, residents, fish, detail {ponds, outposts}, preview).
 ## Every caller waiting on it is told, in the order they asked.
 static func accept(cluster: String, city_: Dictionary) -> void:
 	var waiting: Array = _pending.get(cluster, [])
 	_pending.erase(cluster)
+	_failing.erase(cluster)
 	var detail: Dictionary = city_.get("detail", {}) if city_.get("detail") is Dictionary else {}
 	var out := {ponds = [], outposts = [], fish = city_.get("fish", []), residents = int(city_.get("residents", 0)),
 		tier = str(city_.get("tier", "")), climate = str(city_.get("climate", "")), preview = city_.get("preview", {})}
@@ -133,5 +146,6 @@ static func clear() -> void:
 	for id in _ponds: SystemPonds._remote.erase(id)
 	_cities.clear()
 	_pending.clear()
+	_failing.clear()
 	_ponds.clear()
 	_outposts.clear()
