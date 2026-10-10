@@ -96,6 +96,7 @@ static func within_swing(origin: Vector3, facing: Vector3, target: Vector3, reac
 	offset.y = 0
 	return offset.length() <= reach and (offset.length() < 0.05 or facing.normalized().dot(offset.normalized()) >= cos(deg_to_rad(arc * 0.5)))
 
+## The P0 mine overrides this (p0_mine_combat.gd swing: reach to the body's edge, SGODOT-288): keep the two in step.
 func swing(state: Dictionary, mover: PlayerMover, target_id := "") -> Array[String]:
 	var hit: Array[String] = []
 	var spec := weapon(state)

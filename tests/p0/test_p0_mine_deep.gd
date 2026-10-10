@@ -441,10 +441,11 @@ func test_the_swing_turns_to_the_elite_and_reaches_its_body() -> void:
 	c.cooldown = 0.0
 	var hit: Array = c.swing({}, mover)
 	assert_vector(mover.facing).is_equal_approx(Vector3(0, 0, -1), Vector3.ONE * 0.001)   # turned to it
-	assert_array(hit).is_empty()                           # 0.09 m short of its body: a step in reaches it
-	elite.node.position = at + Vector3(0, 0, -2.2)          # edge 1.55 m: within REACH 1.65 of the body
+	assert_array(hit).has_size(1)                          # B: the arc reaches its body there (1.74 ≤ 1.65 + 0.15)
+	assert_bool(Combat.within_swing(at, mover.facing, elite.node.position, Combat.REACH, 120.0)).is_false()   # the legacy centre test missed it
+	elite.node.position = at + Vector3(0, 0, -2.6)          # its recovery spot: edge 1.95 m
 	elite.mover.position = elite.node.position
+	mover.facing = Vector3(0, 0, 1)
 	c.cooldown = 0.0
-	assert_array(c.swing({}, mover)).has_size(1)
-	# the legacy centre test would have missed it there (2.2 > 1.65)
-	assert_bool(Combat.within_swing(at, mover.facing, elite.node.position, Combat.REACH, 120.0)).is_false()
+	assert_array(c.swing({}, mover)).is_empty()            # turned to it, a step in still needed
+	assert_vector(mover.facing).is_equal_approx(Vector3(0, 0, -1), Vector3.ONE * 0.001)

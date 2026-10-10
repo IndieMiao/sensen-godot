@@ -133,6 +133,10 @@ func in_reach(at: Vector3) -> String:
 ## turns to the nearest monster whose edge is within REACH + TURN_MARGIN and hits those whose edge is within REACH in the
 ## arc. A slime (0.4 m) gains as much as its size; the legacy mine's MineCombat keeps the centre test.
 const TURN_MARGIN := 0.35   # the old mine's turn margin (mine_combat.swing), now from the body's edge
+## A hit is where the drawn arc sweeps (不知火舞 on #275, B): the arc band is 0.12 m wide at REACH and a slime's dome
+## stands over its ground circle, so a body whose edge is within REACH + HIT_SLACK is hit — the elite at its wind-up
+## spot (edge 1.67–1.74 m) is, at its recovery spot (1.85 m) a step in is still needed.
+const HIT_SLACK := 0.15
 
 ## Flat distance from `at` to a monster's body edge (its spec radius), 0 inside it.
 static func edge_distance(at: Vector3, enemy: Dictionary) -> float:
@@ -160,7 +164,7 @@ func swing(state: Dictionary, mover: PlayerMover, target_id := "") -> Array[Stri
 	_show_swing(mover.position, mover.facing, float(spec.range))
 	for id in enemies:
 		var enemy: Dictionary = enemies[id]
-		var reach := float(spec.range) + float(enemy.spec.get("radius", 0.0))   # to the body's edge
+		var reach := float(spec.range) + HIT_SLACK + float(enemy.spec.get("radius", 0.0))   # to the body's edge
 		if not within_swing(mover.position, mover.facing, enemy.node.position, reach, float(_config.attack_arc_degrees)): continue
 		if not mover.grid.segment_walkable(mover.position, enemy.node.position): continue
 		hit.append(id)
