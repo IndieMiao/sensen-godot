@@ -36,7 +36,7 @@ describe('P0 first-session XP (q(37); SGODOT-232 S1, rescued from SGODOT-131)', 
   it('first crucian totals 50 XP; another pond template in the same city gives no second city bonus', () => {
     let s = catchFish(fresh());
     expect(s.skills.fishing).toBe(50);
-    expect(s.firsts).toContain('fishing_city:san francisco');
+    expect(s.firsts).toContain('fishing_city:gn-5391959');   // v5: keyed by the city cluster
     s = catchFish(s, BLOSSOM, T + 60_000);
     expect(s.skills.fishing).toBe(55);
   });
@@ -45,21 +45,22 @@ describe('P0 first-session XP (q(37); SGODOT-232 S1, rescued from SGODOT-131)', 
     let s = step(fresh(), { type: 'cast', space: 'pond', place: FERN, site: 'river', city: 'invented' } as P0Command);
     expect(s.cast).toMatchObject({ site: 'pond', place: FERN });
     s = step(s, { type: 'reel', outcome: 'landed' }, T + s.cast!.bite_ms + 10);
-    expect(s.firsts.filter(f => f.startsWith('fishing_city:'))).toEqual(['fishing_city:san francisco']);
+    expect(s.firsts.filter(f => f.startsWith('fishing_city:'))).toEqual(['fishing_city:gn-5391959']);
     const other = structuredClone(c);
-    other.fishing.places[BLOSSOM].city = 'test-other-city';
+    (other.fishing.places[BLOSSOM] as { cluster?: string }).cluster = 'gn-1850147';   // v5: a place's city is its cluster
     s.presence.place = BLOSSOM;   // entered before the table changed
+    s.travel.passes['gn-1850147'] = { kind: 'day', from: T, until: T + 86_400_000 };
     s = step(s, { type: 'cast' }, T + 60_000, other);
     s = step(s, { type: 'reel', outcome: 'landed' }, T + 60_000 + s.cast!.bite_ms + 10, other);
     expect(s.skills.fishing).toBe(65);
-    expect(s.firsts).toContain('fishing_city:test-other-city');
+    expect(s.firsts).toContain('fishing_city:gn-1850147');
   });
 
   it('cancel and escape do not grant city/landing XP; first-cast bonus cannot be repeated', () => {
     let s = step(fresh(), { type: 'cast', space: 'pond', place: FERN });
     s = step(s, { type: 'reel', outcome: 'cancel' }, T + 10);
     expect(s.skills.fishing).toBe(10);
-    expect(s.firsts).not.toContain('fishing_city:san francisco');
+    expect(s.firsts).not.toContain('fishing_city:gn-5391959');
     s = step(s, { type: 'cast' }, T + 100);
     s = step(s, { type: 'reel', outcome: 'escaped' }, T + 100 + s.cast!.bite_ms + 10);
     expect(s.skills.fishing).toBe(10);
