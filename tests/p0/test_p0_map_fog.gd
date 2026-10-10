@@ -212,3 +212,40 @@ func test_a_bubble_under_the_hud_is_not_drawn_but_its_dot_is() -> void:
 		if not b.node.visible: continue
 		var at := Rect2((b.node as Control).position + m.city_map.global_position, (b.node as Control).size)
 		for r in rects: assert_bool((r as Rect2).intersects(at)).override_failure_message("%s under the chrome" % id).is_false()
+
+## 李元芳 0.2.1 smoke (286 bfae88c7): at the country view a visited city right by home (Chico) has its bubble where the
+## player's avatar stands; the bubble draws over the avatar and takes the tap — the avatar no longer does.
+func test_a_city_bubble_over_the_avatar_takes_the_tap() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	rt.ui.close_modal()
+	var chico := ""
+	for c in load("res://modules/p0/p0_clusters.gd").in_box(39.5, -122.1, 39.9, -121.6, 0, 50):
+		if str(c.get("name", "")) == "Chico": chico = str(c.id)
+	assert_str(chico).is_not_empty()
+	var saved := _travel(rt, {home = SF, here = SF, visits = {chico: {n = 1}}, passes = {}, stamps = [],
+		fallback = {near3 = [], near10 = []}, explorer = 0})
+	_look(m, 38.9, -121.9, 4.6)
+	m._sync_farm_markers()
+	m.city_map._update_bubbles()
+	assert_bool(m.city_map.bubbles.has(chico) and m.city_map.bubbles[chico].node.visible).is_true()
+	var node: Control = m.city_map.bubbles[chico].node
+	var at: Vector2 = node.get_global_rect().get_center()
+	# the avatar's tap target over the bubble, as it stands by home at this zoom
+	var fm: FarmMarkers = m.farm_markers
+	var target: Control = fm._avatar_targets["self"]
+	target.global_position = at - target.size * 0.5
+	assert_bool(target.get_global_rect().has_point(at)).is_true()
+	var asked: Array = []
+	m.city_map.city_requested.connect(func(id): asked.append(str(id)))
+	for pressed in [true, false]:
+		var tap := InputEventScreenTouch.new()
+		tap.position = at
+		tap.pressed = pressed
+		m._unhandled_input(tap)
+	assert_array(asked).is_equal([chico])
+	assert_str(fm.selected_id).is_empty()   # the avatar was not selected
+	rt.ui.close_modal()
+	rt.session.view = saved

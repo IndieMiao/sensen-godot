@@ -640,6 +640,8 @@ func _unhandled_input(e: InputEvent) -> void:
 				_fling_vel = Vector3.ZERO
 				if city_map and not e.canceled and city_map.activate_place_at(e.position):
 					_last_tap_ms = 0   # an outpost pin over the player's avatar takes the tap (P0, 蒙恬 on C30)
+				elif city_map and not e.canceled and city_map.activate_bubble_at(e.position):
+					_last_tap_ms = 0   # so does a city bubble drawn over it (region and country views)
 				elif city_map and not e.canceled and farm_markers and farm_markers.activate_at(e.position):
 					_last_tap_ms = 0
 				elif city_map and not e.canceled and city_map.activate_at(e.position):

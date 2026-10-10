@@ -163,16 +163,24 @@ func test_a_card_asking_while_the_maps_read_is_out_still_fills_in() -> void:
 		var rows: Array = rt.ui.root.find_children("*", "UiItemRow", true, false).filter(func(r): return (r as Control).is_visible_in_tree())
 		return rows.map(func(r): return str(r.quantity))
 	assert_array(counts.call()).is_equal(["–", "–", "–"])
+	# the card and its link as the player sees them before the read comes back (the first time it takes a while)
+	var card: Control = rt.ui._modal
+	var link := rt.ui.root.find_child("Link_Travel_details", true, false) as Button
 	var city: Dictionary = CITY.duplicate(true)
 	city.preview = {"cluster": TOKYO, "trip": 6, "km": 8278, "trip_name": "Intercontinental", "utc_offset_min": 540,
 		"counts": {"ponds": 2, "outposts": 2, "residents": 9}}
 	P0CityPlaces.accept(TOKYO, city)   # the answer
-	await get_tree().process_frame   # the card is rebuilt; the old one leaves at the end of the frame
+	await get_tree().process_frame
 	assert_str(rt.ui.modal_kind).is_equal("city_card")
 	assert_array(counts.call()).is_equal(["2", "2", "9"])
 	assert_array(m.city_map.extra_places.map(func(e): return str(e.id))).contains(["gn-1850147~market0"])   # the map's too
-	# the refilled card's Travel details › works the first time (李元芳, 279 fd340f21: it went to the card closed for it)
-	(rt.ui.root.find_child("Link_Travel_details", true, false) as Button).pressed.emit()
+	# filled in where it is (李元芳 0.2.1 smoke, 286 bfae88c7): the same card, its local time in, and a tap on its
+	# Travel details › made in that moment still lands — the card is not closed and opened again
+	assert_object(rt.ui._modal).is_same(card)
+	assert_bool(is_instance_valid(link) and link.is_inside_tree()).is_true()
+	var local_time := (rt.ui.root.find_children("*", "UiFactRow", true, false) as Array).filter(func(f): return f.label == "Local time")
+	assert_str(str(local_time[0].value)).is_not_equal("–")
+	link.pressed.emit()
 	assert_str(rt.ui.modal_kind).is_equal("travel_card")
 	rt.ui.close_modal()
 

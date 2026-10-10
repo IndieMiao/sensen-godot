@@ -706,11 +706,12 @@ func open_city_card(cluster: String) -> void:
 		open_travel(cluster)
 		return
 	P0CityPlaces.fetch(rt.session, cluster, func(_city):
-		if rt.ui.modal_kind == "city_card" and _card_city == cluster: _fill_city_card(cluster))
+		if rt.ui.modal_kind == "city_card" and _card_city == cluster: _refresh_city_card(cluster))
 	_card_city = cluster
 	_fill_city_card(cluster)
 
 var _card_city := ""
+var _city_card: Control   # the silhouette card open now (its holder)
 
 func _fill_city_card(cluster: String) -> void:
 	if rt.ui.modal_kind == "city_card": rt.ui.close_modal()
@@ -720,7 +721,22 @@ func _fill_city_card(cluster: String) -> void:
 	spec["links"] = [["Travel details", func():
 		rt.ui.close_modal()
 		open_travel(cluster, P0CityPlaces.city(cluster).get("preview", {}))]]
-	P0ArrivalCard.open(rt.ui, spec, func(): pass, "city_card")
+	_city_card = P0ArrivalCard.open(rt.ui, spec, func(): pass, "city_card")
+
+## The city's read came in while its card is open: its local time and counts fill in where they are. The card is not
+## closed and opened again, so a tap on it in that moment (Travel details, the first time: the read takes a while on a
+## phone) still lands (李元芳 0.2.1 smoke, 286 bfae88c7).
+func _refresh_city_card(cluster: String) -> void:
+	if _city_card == null or not is_instance_valid(_city_card) or _city_card.is_queued_for_deletion():
+		_fill_city_card(cluster)
+		return
+	var spec := city_card(_view(), cluster, P0CityPlaces.city(cluster))
+	var facts: Array = _city_card.find_children("*", "UiFactRow", true, false)
+	for i in mini(facts.size(), (spec.facts as Array).size()): (facts[i] as UiFactRow).value = str(spec.facts[i][1])
+	var rows: Array = _city_card.find_children("*", "UiItemRow", true, false)
+	for i in mini(rows.size(), (spec.rows as Array).size()):
+		(rows[i] as UiItemRow).quantity = str(spec.rows[i].quantity)
+		(rows[i] as UiItemRow).quantity_label = str(spec.rows[i].unit)
 
 ## "Trip 6 · Intercontinental": a city's trip tier, the server's (its preview) when it is in, else the client's.
 static func trip_state(view: Dictionary, cluster: String, city: Dictionary) -> String:
