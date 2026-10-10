@@ -93,6 +93,8 @@ if (args[0] === 'run') {
   const expected = [...clusters.byId.keys()].filter(id => id !== homeCluster(c));
   const missing = expected.filter(id => !last.has(id) || last.get(id)!.error);
   const fixes: WaterTable['fixes'] = {};
+  // a place given a hand fix since the run is the hand's (as a rerun would skip it)
+  const handFixed = new Set(Object.keys(w.overrides ?? {}).filter(k => !k.startsWith('_')));
   const review: string[] = ['kind\tcluster\tcity\tid\tname\tmoved_m\tfrom\tto\twater_m'];
   let places = 0, moved = 0;
   for (const id of [...last.keys()].sort()) {
@@ -106,6 +108,7 @@ if (args[0] === 'run') {
     places += l.places ?? 0; moved += l.moved?.length ?? 0;
     const share = (l.moved?.length ?? 0) / Math.max(1, l.places ?? 1);
     for (const m of l.moved ?? []) {
+      if (handFixed.has(m.id)) continue;
       fixes[m.id] = [r6(m.to[0]), r6(m.to[1]), m.from[0], m.from[1], m.water_m];
       if (m.moved_m > 1000 || share >= 0.3) {
         review.push([m.moved_m > 1000 ? 'over_1km' : 'city_30pct', id, l.name, m.id, m.name, m.moved_m, m.from.join(','), m.to.map(r6).join(','), m.water_m].join('\t'));

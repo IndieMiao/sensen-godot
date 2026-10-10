@@ -242,7 +242,9 @@ describe('global generation (SGODOT-280)', () => {
       const was = all(bare).find(p => p.id === id), now = all(city).find(p => p.id === id);
       expect(was, `${id} is a place the generator makes`).toBeDefined();
       if (fix.lat !== undefined) expect(now).toMatchObject({ lat: fix.lat, lng: fix.lng });
-      expect(km(was!, now!)).toBeLessThanOrEqual(3);   // to the nearest land that keeps the rules, not across town (nor a swapped lat / lng)
+      // to the nearest land that keeps the rules, a stuck group (pond, shop, square) up to 8 km as the batch's wide search;
+      // never across the country (a swapped lat / lng)
+      expect(km(was!, now!)).toBeLessThanOrEqual(8);
       const tackle = city.detail.outposts.find(o => o.id === id && o.role === 'tackle');
       if (tackle) expect(km(tackle, city.detail.ponds.find(p => p.name === tackle.nearest!.name)!) * 1000).toBeLessThanOrEqual(300);
       expect(all(city).filter(p => !fixed.has(p.id))).toEqual(all(bare).filter(p => !fixed.has(p.id)));
