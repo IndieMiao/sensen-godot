@@ -415,6 +415,7 @@ const DISH_STANDIN := {
 const ICON_ALIAS := {"fert_compost": "compost", "tool_row_hoe": "hoe", "bag_upgrade_1": "bag", "postcard_san_francisco": "postcard", "postcard_shanghai": "postcard", "wild_herb": "crop_herb", "drink_hot_tea": "dish_fruit_tea", "drink_coffee": "dish_fruit_tea"}
 
 static func icon(id: String) -> Texture2D:
+	id = base_id(id)   # a dish's quality (`dish_x@good`) has the dish's own art; the stars say the quality (286 5d27bd93)
 	var path := ICON_DIR % str(ICON_ALIAS.get(id, DISH_STANDIN.get(id, id)))
 	if ResourceLoader.exists(path): return load(path)
 	# a fish without its own art yet (P1's twelve, SGODOT-283) shows the fish silhouette, not the sprout (不知火舞 69310899)
@@ -456,7 +457,16 @@ static func crop_for_seed(view: Dictionary, seed_id: String) -> Dictionary:
 	return {}
 
 static func item_name(view: Dictionary, id: String) -> String:
-	return str(view.get("names", {}).get(id, id))
+	var names: Dictionary = view.get("names", {})
+	if names.has(id) or base_id(id) == id: return str(names.get(id, id))
+	# A dish stack with its quality (`dish_x@good`, §7.2.5): the dish's name, never the raw id; the quality shows as stars
+	# beside it (the item card's state line, dish_label) — 李元芳 on 286 5d27bd93.
+	return str(names.get(base_id(id), item(view, id).get("name", base_id(id))))
+
+## An item id without a dish's quality suffix: `dish_x@good` → `dish_x` (other ids as they are).
+static func base_id(id: String) -> String:
+	var at := id.find("@")
+	return id.left(at) if at > 0 else id
 
 static func bag_count(view: Dictionary, id: String) -> int:
 	var n := 0
