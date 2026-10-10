@@ -326,3 +326,41 @@ func test_the_garden_dressing_is_off_the_placeable_cells() -> void:
 	assert_int(points.size()).is_greater(20)
 	var on: Array = points.map(func(p): return bp.world_to_cell(p)).filter(free)
 	assert_array(on).is_empty()
+
+## q(131) ②: a Pergola's posts stand on its four corner cells and its middle line is open — the player walks under it,
+## front to back (turned, side to side); placing still takes all six cells, so nothing stands under it.
+func test_the_pergola_lets_one_walk_through_its_middle() -> void:
+	var at := Vector2i(10, 4)
+	assert_array(P0Decor.solid_cells("deco_pergola", at, 0)).contains_exactly_in_any_order(
+		[Vector2i(10, 4), Vector2i(12, 4), Vector2i(10, 5), Vector2i(12, 5)])
+	assert_array(P0Decor.solid_cells("deco_pergola", at, 1)).contains_exactly_in_any_order(
+		[Vector2i(10, 4), Vector2i(11, 4), Vector2i(10, 6), Vector2i(11, 6)])
+	assert_int(P0Decor.cells("deco_pergola", at, 0).size()).is_equal(6)   # all of it is the piece's for placing
+	assert_array(P0Decor.solid_cells("deco_bench", at, 0)).is_equal(P0Decor.cells("deco_bench", at, 0))   # the rest stay solid
+	var v := {"decor": {"placed": [{"uid": 1, "id": "deco_pergola", "x": at.x, "y": at.y, "rot": 0}]}}
+	assert_bool(P0Decor.taken(v).has("11,4")).is_true()   # nothing goes under it
+	# on the walk grid: the middle line is open and leads through
+	var bp: FarmBlueprint = P0Garden.blueprint()
+	var grid := BlueprintGrid.new(bp)
+	for c in P0Decor.solid_cells("deco_pergola", at, 0): grid.set_solid(c, true)
+	assert_bool(grid.astar.is_point_solid(Vector2i(11, 4))).is_false()
+	assert_bool(grid.astar.is_point_solid(Vector2i(10, 4))).is_true()
+
+## q(131): a placed Fountain bubbles — a ring quad on each basin's water, on its own beside its kind's batch, sharing its
+## basin's material with every Fountain; the preview has none (ghost() makes its own materials).
+func test_a_placed_fountain_ripples_on_both_basins() -> void:
+	assert_bool(P0FarmDecor._has_extra("deco_fountain")).is_true()
+	assert_bool(P0FarmDecor._has_extra("deco_bench")).is_false()
+	var a := P0FarmDecor._ripples_on("deco_fountain", 0, 0.65)
+	var b := P0FarmDecor._ripples_on("deco_fountain", 1, 0.65)
+	var quads := a.find_children("Ripple*", "MeshInstance3D", true, false)
+	assert_int(quads.size()).is_equal(2)
+	assert_float((quads[0] as MeshInstance3D).position.y).is_equal_approx(0.729, 0.001)   # just over the upper water
+	assert_float((quads[1] as MeshInstance3D).position.y).is_equal_approx(0.259, 0.001)
+	assert_vector(((quads[1] as MeshInstance3D).mesh as PlaneMesh).size).is_equal_approx(Vector2(1.02, 1.02), Vector2.ONE * 0.001)
+	var other := b.find_children("Ripple*", "MeshInstance3D", true, false)
+	assert_object((other[0] as MeshInstance3D).material_override).is_same((quads[0] as MeshInstance3D).material_override)
+	assert_int((quads[0] as MeshInstance3D).cast_shadow).is_equal(GeometryInstance3D.SHADOW_CASTING_SETTING_OFF)
+	var preview := P0FarmDecor.art("deco_fountain")
+	assert_array(preview.find_children("Ripple*", "MeshInstance3D", true, false)).is_empty()
+	for n in [a, b, preview]: n.free()

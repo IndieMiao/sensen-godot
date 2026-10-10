@@ -36,6 +36,17 @@ static func cells(id: String, at: Vector2i, rot := 0) -> Array:
 		for dx in s.x: out.append(at + Vector2i(dx, dy))
 	return out
 
+## The cells a piece stands solid on (q(131) ②): its cells but those its item lets one walk through (`walk`, [dx, dy]
+## at rot 0, turned with it as its size is) — the Pergola's middle line, its four posts on the corners. Placing still
+## takes every cell (nothing stands under a Pergola); only the farm's walk grid and where Done sets the player down
+## read this.
+static func solid_cells(id: String, at: Vector2i, rot := 0) -> Array:
+	var walk: Array = item(id).get("walk", [])
+	if walk.is_empty(): return cells(id, at, rot)
+	var open := {}
+	for w in walk: open[at + (Vector2i(int(w[1]), int(w[0])) if rot else Vector2i(int(w[0]), int(w[1])))] = true
+	return cells(id, at, rot).filter(func(c): return not open.has(c))
+
 static func _rect(r) -> Rect2i: return Rect2i(int(r[0]), int(r[1]), int(r[2]), int(r[3]))
 
 static func _in_any(cell: Vector2i, rects: Array) -> bool:
