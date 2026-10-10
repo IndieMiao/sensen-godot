@@ -33,4 +33,46 @@ func test_ties_go_to_weather_then_level_then_id() -> void:
 	assert_str(str(Board.pick(["fish_bass", "fish_trout"], "rain", 4).fish.id)).is_equal("fish_trout")
 
 func test_quoted_with_the_keeper() -> void:
-	assert_str(Board.quoted("Rainbow Trout bite in the rain. Bring worms.", "Finn")).is_equal("\"Rainbow Trout bite in the rain. Bring worms.\" — Finn")
+	assert_str(Board.quoted("Rainbow Trout bite in the rain. Bring worms.", "Finn")).is_equal("“Rainbow Trout bite in the rain. Bring worms.” — Finn")
+
+const FERN := {"name": "Fern Pond", "site": "pond", "template": "Pond", "time": "Dusk", "weather": "rain",
+	"fish": ["fish_crucian", "fish_carp", "fish_perch", "fish_bass", "fish_koi", "fish_catfish", "fish_arctic_char", "fish_sturgeon", "fish_eel"],
+	"forecast": [{"day": "Sun", "weather": "rain"}, {"day": "Mon", "weather": "wind"}, {"day": "Tue", "weather": "sun"}]}
+
+func test_condition_line_and_tags() -> void:
+	assert_array(Board.conditions(FERN)).is_equal([["dawn_dusk", "Dusk"], ["rain", "Rain"]])
+	assert_str(Board.tags(Board.FishWorld._fish("fish_catfish"))).is_equal("Night ×2 · Rain ×1.5")
+	assert_str(Board.tags(Board.FishWorld._fish("fish_eel"))).is_equal("Night only · Rain ×2")
+	assert_str(Board.tags(Board.FishWorld._fish("fish_seabass"))).is_equal("Dawn & dusk ×2 · Windy ×1.5")
+	assert_str(Board.tags(Board.FishWorld._fish("fish_crucian"))).is_equal("")
+
+func test_biting_more_now_best_two_and_plus_n() -> void:
+	# Dusk in the rain at Lv9: Bass dusk 2, Trout no (not in a Pond), Carp rain 1.5, Char (regional) dusk 2, Catfish rain 1.5,
+	# Eel night only (out); Koi sun only (out)
+	assert_str(Board.biting_more(FERN, 9, {"fish_arctic_char": 1})).is_equal("Arctic Char ×2 · Largemouth Bass ×2 · +2")
+	assert_str(Board.biting_more(FERN, 9, {})).is_equal("? ×2 · Largemouth Bass ×2 · +2")
+	assert_str(Board.biting_more(FERN.merged({"time": "Day", "weather": "wind"}, true), 1, {})).is_equal("")
+
+func test_forecast_from_lv3() -> void:
+	assert_array(Board.forecast(FERN, 2)).is_empty()
+	assert_array(Board.forecast(FERN, 3)).is_equal([["Sun", "rain"], ["Mon", "windy"], ["Tue", "clear"]])
+
+func test_board_pond_row() -> void:
+	var r := Board.pond_row("pond_san_francisco_03", FERN, "0.8 km", 9, {})
+	# Catfish night 2 × rain 1.5 = 3 beats the Eel's rain 2 (2370cb2a: Blossom / Fern at Lv5 are Catfish too)
+	assert_that([r.name, r.sub, r.fish, r.line]).is_equal(["Fern Pond", "Pond · 0.8 km", "fish_catfish", "Catfish · Night ×2 · Rain ×1.5"])
+	# Lv2 in the rain: Largemouth Bass dawn & dusk 2 over the Carp's rain 1.5; the Bass's weather is not today's
+	var lv2 := Board.pond_row("pond_san_francisco_03", FERN, "0.8 km", 2, {})
+	assert_str(lv2.line).is_equal("Largemouth Bass · Dawn & dusk ×2")
+	var lv1 := Board.pond_row("pond_san_francisco_03", FERN.merged({"weather": "sun"}, true), "0.8 km", 1, {})
+	assert_that([lv1.fish, lv1.line]).is_equal(["", ""])   # nothing over ×1 today at Lv1: two lines, no badge
+
+func test_details_lines_and_the_45_percent() -> void:
+	var eel := Board.FishWorld._fish("fish_eel")
+	assert_str(Board.details_line(eel, false)).is_equal("Fishing Lv9 · Night only · Rain ×2")
+	assert_str(Board.details_line(eel, true)).is_equal("Night only · Rain ×2")
+	assert_str(Board.details_line(Board.FishWorld._fish("fish_mullet"), true)).is_equal("")
+	assert_str(Board.details_line(Board.FishWorld._fish("fish_sturgeon"), false)).is_equal("Fishing Lv7")
+	assert_str(Board.details_line(Board.FishWorld._fish("fish_salmon"), false)).is_equal("Fishing Lv8 · Regional")
+	assert_bool(Board.dim_now(eel, FERN)).is_true()
+	assert_bool(Board.dim_now(eel, FERN.merged({"time": "Night"}, true))).is_false()
