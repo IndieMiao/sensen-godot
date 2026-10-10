@@ -15,8 +15,8 @@ func test_plot_ids_and_cells_are_a_bijection_on_spaced_beds() -> void:
 ## P1 (q(59) §1.1): the client grid is the server's (content.garden.plots: the sprinkler's coverage is judged there).
 ## 0–29 keep their P0 cells; 30–39 are two columns right of the field, row by row.
 func test_the_garden_grid_matches_the_content_table() -> void:
-	var content = JSON.parse_string(FileAccess.get_file_as_string("res://assets/p0/p0_content.json"))
-	var table: Array = content.garden.plots
+	var table: Array = P0Logic.content().garden.plots   # content/farm_garden.json, merged in (SGODOT-275)
+	assert_array(P0Logic.content_errors).is_empty()
 	assert_int(table.size()).is_equal(P0Garden.MAX_PLOTS)
 	for id in table.size():
 		assert_vector(P0Garden.grid_of(id)).override_failure_message("plot %d" % id).is_equal(Vector2i(int(table[id][0]), int(table[id][1])))
