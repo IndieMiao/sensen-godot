@@ -3,8 +3,10 @@ extends GdUnitTestSuite
 
 func test_demo_config_takes_an_http_url_and_an_optional_key() -> void:
 	assert_that(P0Session.demo_config('{"url": "https://example.test/preview/p0/v1/", "key": " k1 "}')).is_equal(
-		{"url": "https://example.test/preview/p0/v1", "key": "k1", "version": 0})
-	assert_that(P0Session.demo_config('{"url": "ftp://nope"}')).is_equal({"url": "", "key": "", "version": 0})
+		{"url": "https://example.test/preview/p0/v1", "key": "k1", "version": 0, "name": ""})
+	assert_that(P0Session.demo_config('{"url": "ftp://nope"}')).is_equal({"url": "", "key": "", "version": 0, "name": ""})
+	# Settings › Version (q(129)): the build's versionName with its code
+	assert_str(str(P0Session.demo_config('{"url": "https://a.test/v1", "version": 2026101001, "name": " 0.2.1 "}').name)).is_equal("0.2.1")
 	# q(74): the build's versionCode goes out as x-p0-version (SGODOT-233)
 	assert_int(int(P0Session.demo_config('{"url": "https://a.test/v1", "version": 2026100901}').version)).is_equal(2026100901)
 	assert_that(P0Session.demo_config("not json")).is_equal({})

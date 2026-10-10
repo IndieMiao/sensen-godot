@@ -1232,6 +1232,14 @@ func _dev_shot(dt: float) -> void:
 				for n in ui.find_children("*", "", true, false):
 					if n.has_method("unfold"): n.unfold(step[1] if step.size() > 1 else "fishing", true)
 			"profile": ui.open_profile()
+			# Settings › Legal (q(129) shots): settings / licenses / licensetext:worldcover open them as the gear and the
+			# rows do (‹ back to the profile); pagebottom scrolls the open page to its foot (SET-LICENSES-2-2).
+			"settings": ui.open_settings(func(): ui.open_profile())
+			"licenses": ui.open_licenses(func(): ui.open_settings(func(): ui.open_profile()))
+			"licensetext": ui.open_license_text(step[1] if step.size() > 1 else "worldcover",
+				func(): ui.open_licenses(func(): ui.open_settings(func(): ui.open_profile())))
+			"pagebottom":
+				for sc in ui.root.find_children("*", "ScrollContainer", true, false): (sc as ScrollContainer).scroll_vertical = 100000
 			"editlook": ui.edit_look()   # the profile's Edit look ›: the dressing room above the current world (KEEP-P0-2)
 			# 256 ⑦⑧ shots: profskill:farming / profdex tap the profile's skill card / Fish tile; profspin:120 drags
 			# the outfit 120 px sideways (the spin's own gesture: press, past the slop, release).

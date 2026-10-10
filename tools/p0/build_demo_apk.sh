@@ -87,7 +87,11 @@ open(p, "w").write(head + seg)
 # SYS-UPDATE (SGODOT-232): the client sends this as x-p0-version, the APK's own versionCode, so the server can ask an
 # old build to update (426). Always the code this export really uses: --code, else the preset's.
 version = int(re.search(r"version/code=(\d+)", seg).group(1))
-json.dump({"url": url.rstrip("/"), "key": key, "version": version}, open("assets/p0/demo_server.json", "w"))
+# Settings › Version (q(129)) shows the name too: `0.2.1 (2026101001)`.
+named = re.search(r'version/name="([^"]*)"', seg)
+if not named: sys.exit('build_demo_apk: the "Android P0" preset has no version/name (Settings › Version reads it)')
+version_name = named.group(1)
+json.dump({"url": url.rstrip("/"), "key": key, "version": version, "name": version_name}, open("assets/p0/demo_server.json", "w"))
 PY
 
 "$GODOT" --headless --path . --import > "$LOGS/import.log" 2>&1 || true
