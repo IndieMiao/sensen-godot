@@ -54,8 +54,8 @@ func test_a_spot_is_judged_as_the_server_does() -> void:
 	v.decor.placed = [{"uid": 1, "id": "deco_bench", "x": 6, "y": 18, "rot": 0}]   # 2 × 1: cells 6–7, 18
 	assert_str(P0Decor.reason(v, "deco_planter", Vector2i(7, 18))).is_equal("Space taken")
 	assert_str(P0Decor.reason(v, "deco_bench", Vector2i(7, 18), 0, 1)).is_equal("")   # moving the bench itself
-	assert_str(P0Decor.reason(v, "deco_pergola", Vector2i(1, 17), 1)).is_equal("")    # turned: 2 wide, 3 tall
-	assert_str(P0Decor.reason(v, "deco_pergola", Vector2i(1, 17), 0)).is_equal("Space taken")   # 3 × 2 reaches the herb patch
+	assert_str(P0Decor.reason(v, "deco_pergola", Vector2i(4, 17), 1)).is_equal("")    # turned: 2 wide, 3 tall
+	assert_str(P0Decor.reason(v, "deco_pergola", Vector2i(4, 17), 0)).is_equal("Space taken")   # 3 × 2 reaches the tree at (6, 17)
 	assert_that(P0Decor.piece_at(v, Vector2i(7, 18)).get("uid")).is_equal(1)
 	assert_that(P0Decor.nearest_spot(v, "deco_planter", 0, Vector2i(9, 1))).is_not_equal(P0Decor.NONE)
 	assert_str(P0Decor.reason(v, "deco_planter", P0Decor.nearest_spot(v, "deco_planter", 0, Vector2i(9, 1)))).is_equal("")
@@ -205,3 +205,24 @@ func test_the_first_pending_piece_is_taken_for_the_next_spot() -> void:
 	assert_str(P0Decor.reason(v, "deco_path", Vector2i(8, 1))).is_equal("Space taken")
 	assert_that(P0Decor.nearest_spot(v, "deco_path", 0, Vector2i(9, 1))).is_not_equal(Vector2i(8, 1))
 	assert_str(P0Decor.reason(v, "deco_path", Vector2i(8, 1), 0, -1)).is_equal("")   # moving that very piece
+
+## 不知火舞 on 290 (993a560e): the garden's own dressing stands on no cell a piece may take — the sign by the gate, the
+## bushes, the stepping stones and the scattered rocks (solid) are the yard's objects too, or a piece would stand through
+## them. Ground cover (grass, daisies, flowers) may go under a piece.
+func test_the_garden_dressing_is_off_the_placeable_cells() -> void:
+	var bp: FarmBlueprint = P0Garden.blueprint()
+	var scenery: Node3D = auto_free(load("res://scenes/p0/p0_garden_scenery.gd").new())
+	add_child(scenery)
+	scenery.build(bp, "cottage")
+	var walk: Array = _yard().walk
+	var yard := Rect2i(int(walk[0]), int(walk[1]), int(walk[2]), int(walk[3]))
+	var free := func(c: Vector2i) -> bool: return yard.has_point(c) and not _in("field", c) and not _in("objects", c) and not _in("paths", c)
+	var points: Array = scenery.rock_points.duplicate()
+	for n in scenery.find_children("*", "", true, false):
+		if n is MultiMeshInstance3D and str(n.name) in ["Bush", "SteppingStone", "Tree0"]:
+			var mm: MultiMesh = n.multimesh
+			for i in mm.instance_count: points.append(mm.get_instance_transform(i).origin)
+		elif n is MeshInstance3D and n.name == "Sign": points.append(n.position)
+	assert_int(points.size()).is_greater(20)
+	var on: Array = points.map(func(p): return bp.world_to_cell(p)).filter(free)
+	assert_array(on).is_empty()
