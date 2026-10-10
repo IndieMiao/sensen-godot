@@ -95,6 +95,7 @@ func _install_city_map() -> void:
 		city_map.kept_pin = _kept_pin   # where the player is keeps its pin; the rest give way (SGODOT-269)
 		city_map.fog_holes = fog_holes   # §11.7: the world greyed but for the cities explored (SGODOT-275)
 		city_map.bubble_state = city_bubble
+		city_map.bubble_clear_rects = bubble_clear_rects   # no half bubble under the HUD, the keys or the bar (不知火舞 on 279)
 		_style_locate(city_map.recenter)
 		_style_locate(city_map.home_key, "home")   # the home key over it: the same key, i-home (SGODOT-261)
 		city_map.home_key.visible = true
@@ -580,6 +581,18 @@ func frame_optional() -> Array:
 ## Every pin the opening view may hold: frame_must, then frame_optional in the order they are tried.
 func home_set_items() -> Array:
 	return frame_must() + frame_optional()
+
+## Where a city bubble must not sit (screen px): the two HUD rows, the right-hand keys (home, recenter) and the quick
+## bar / Bag row. A bubble overlapping one is not drawn (its dot stays).
+func bubble_clear_rects() -> Array:
+	if rt == null: return []
+	var vp := get_viewport().get_visible_rect().size
+	var top := rt.ui.safe_top() + UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H
+	var bar := vp.y - rt.ui.safe_bottom() - UiTokens.SIZE_QUICK_BAR_BOTTOM - UiTokens.SIZE_QUICK_BAR_H
+	var out: Array = [Rect2(0, 0, vp.x, top), Rect2(0, bar, vp.x, vp.y - bar)]
+	for key in [city_map.recenter, city_map.home_key] if city_map else []:
+		if key and (key as Control).is_visible_in_tree(): out.append((key as Control).get_global_rect())
+	return out
 
 ## The safe frame in screen space: under the HUD's second row + 16, over Bag − 16, 16 from the sides.
 func frame_safe_rect() -> Rect2:
