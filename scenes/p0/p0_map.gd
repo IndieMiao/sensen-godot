@@ -681,11 +681,23 @@ func _switch_city(r: Dictionary) -> void:
 	city_map.region_changed()
 	_refresh_nearby()
 
+## Any city by its region or cluster id, not only those around the camera (a bubble, later the destination lists):
+## map_poc.fly_to_city looks it up in city_regions(), so it is in the list while it does.
+func fly_to_city(id: String) -> void:
+	var r := P0Clusters.region(P0Clusters.cluster_of_region(id))
+	if r.is_empty(): return
+	_asked = r
+	_regions_key = ""
+	super.fly_to_city(str(r.id))
+	_asked = {}
+	_regions_key = ""
+
 ## At most this many city bubbles, at least this far apart on screen (px), most populous first.
 const CITY_BUBBLES := 30
 const BUBBLE_GAP := 72.0
 var _regions_key := ""
 var _regions: Array = []
+var _asked := {}
 
 ## The cities around the camera (map_poc asks for its bubbles, the title and the camera city): the home city, the
 ## camera's city, and the most populous clusters in view, fewer the farther out (city_min_population) and kept
@@ -705,6 +717,7 @@ func city_regions() -> Array:
 		out.append(r)
 	add.call(P0Clusters.region(P0Clusters.cluster_of_region(P0_REGION)))
 	if not region.is_empty(): add.call(region)
+	add.call(_asked)
 	var box := _view_box(vp, z)
 	var placed: Array = []
 	for c in P0Clusters.in_box(box.x, box.y, box.z, box.w, city_min_population(z), 200):

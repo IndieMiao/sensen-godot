@@ -86,6 +86,9 @@ func test_another_citys_bubble_browses_there_and_moves_only_the_camera() -> void
 	assert_str(_choice()).is_equal(choice)           # the old app's saved city is not written
 	assert_float(float(m.home_lat)).is_equal(home.x)
 	assert_float(float(m.home_lng)).is_equal(home.y)
+	m.fly_to_city(TOKYO)   # a cluster with no city file of its own
+	assert_str(str(m.region.get("id", ""))).is_equal(TOKYO)
+	assert_dict(rt.here).is_equal(here)
 
 func test_the_camera_city_follows_the_camera_over_any_cluster() -> void:
 	var m := _map()
