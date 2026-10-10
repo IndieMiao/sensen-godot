@@ -359,8 +359,10 @@ func set_place(text: String) -> void:
 ## One status line under the HUD where the creel sits while fishing (SGODOT-231: the mine's "Rocks 2/6", "Run 1/2
 ## today" for its first 3 s). "" hides it; changing action clears it.
 ## SGODOT-288 (COMBAT-1 / COMBAT-ELITE): the player's mine HP over the status line's spot, which then sits to its right
-## (x 187 of 360, MINE-3); hp < 0 hides it. The elite's card under it while one fights ({} hides it).
-const _STATUS_RIGHT_OF_HP := 187.0
+## (5 clear of the HP card, which is 194 wide with its heart: x 209 of 360); hp < 0 hides it. The elite's card under it
+## while one fights ({} hides it); the status line (`Elite Slime` on Floor 5) hides with it — the card names the elite
+## and would cover half of it (不知火舞 on 288; COMBAT-ELITE 1228:111690 has no such line).
+const _STATUS_RIGHT_OF_HP := 209.0
 func set_hp(hp: int, maximum: int, elite := {}) -> void:
 	if not is_node_ready(): return
 	var on := hp >= 0 and surface in ACTION_SURFACES
@@ -369,6 +371,7 @@ func set_hp(hp: int, maximum: int, elite := {}) -> void:
 	_status.position.x = _STATUS_RIGHT_OF_HP if on else _creel.position.x
 	var boss := on and not elite.is_empty()
 	_elite_hp.visible = boss
+	_status.visible = _status_text.text != "" and surface in ACTION_SURFACES and not boss
 	if boss:
 		_elite_hp.title = str(elite.get("name", "Elite Slime"))
 		_elite_hp.set_hp(int(elite.get("hp", 0)), int(elite.get("max", 1)))
@@ -383,7 +386,7 @@ func set_status_line(text: String) -> void:
 		_pending["status"] = text   # the mine sets it on its first frame, maybe before the HUD exists (苏烈, #39)
 		return
 	if _status_text.text != text: _status_text.text = text
-	_status.visible = text != "" and surface in ACTION_SURFACES
+	_status.visible = text != "" and surface in ACTION_SURFACES and not _elite_hp.visible
 
 ## Which world the HUD sits on (§10.2.4): action spaces show everything; rooms are facility spaces
 ## (no quick bar, main action or switch key); the map shows only toasts and cards.
@@ -1112,7 +1115,7 @@ func _float_floor(x: float, half_w: float) -> float:
 
 # ---------------------------------------------------------------- one reply's floats (q(49) ①, §4.8.6)
 ## The order of one reply's lines: Energy → XP → items → coins → affinity (q(49) ①).
-const FLOAT_ORDER := ["energy", "xp", "first", "item", "saved", "request", "coins", "affinity"]   # request: `Pond Catch 1/2` (q(103)); saved: Seed Saver's own line after the harvest's items (q(118))
+const FLOAT_ORDER := ["energy", "xp", "first", "item", "saved", "request", "coins", "affinity", "result"]   # request: `Pond Catch 1/2` (q(103)); saved: Seed Saver's own line after the harvest's items (q(118)); result: a harvest the bag stopped, `Harvest 3 of 5 · bag full`, over its items (E-04, q(123))
 ## Kinds a later reply adds into while their line is up: XP (`+40 XP · 20 plants`, §4.8.3 XP 入账). Items, Energy and
 ## coins float per reply (each plot's `+1 Radish`, each bed's `−2 Energy`).
 const FLOAT_MERGE_KINDS := ["xp"]
@@ -3245,12 +3248,15 @@ func placement_bar_rect() -> Rect2:
 
 ## A facility's status card (P1, SGODOT-241; q(59) §4): `Sprinkler · Waters 8 plots` and one button (Move); the
 ## caller highlights what it covers while the card shows (modal_kind "facility"). Sits where the quick bar was.
-## spec = {title, lead, icon, button, kind (&"secondary"), second, close}; on_button runs after the card closes. A placed
-## decor's card (DECOR-CARD, Figma 2191:33239) has a primary Move, the text button `Store` (spec.second, on_second) and
-## a ✕ over its corner (spec.close).
+## spec = {title, lead, icon, button, kind (&"secondary"), second, close, reason}; on_button runs after the card closes.
+## A placed decor's card (DECOR-CARD, Figma 2191:33239) has a primary Move, the text button `Store` (spec.second,
+## on_second) and a ✕ over its corner (spec.close). spec.reason greys the main button with it, LOCK-10 (a greenhouse
+## with crops under it: `Move · Harvest first`, 李白); a tap says why.
 ## In placement mode the bar steps aside while the card shows and comes back when it closes.
 func open_facility_card(spec: Dictionary, on_button: Callable, on_second := Callable()) -> UiInfoSheet:
-	var buttons: Array = [{id = &"move", label = str(spec.get("button", "Move")), kind = StringName(spec.get("kind", &"secondary"))}]
+	var reason := str(spec.get("reason", ""))
+	var buttons: Array = [{id = &"move", label = reason if reason != "" else str(spec.get("button", "Move")),
+		kind = &"unavailable" if reason != "" else StringName(spec.get("kind", &"secondary"))}]
 	if str(spec.get("second", "")) != "": buttons.append({id = &"second", label = str(spec.second), kind = &"nav", chevron = false})
 	var card := {id = "facility", title = str(spec.get("title", "")), lead = str(spec.get("lead", "")),
 		icon = spec.get("icon", null), facts = [], buttons = buttons}
@@ -3266,6 +3272,7 @@ func open_facility_card(spec: Dictionary, on_button: Callable, on_second := Call
 		close_modal()
 		if action == &"second" and on_second.is_valid(): on_second.call()
 		elif action != &"second": on_button.call())
+	sheet.unavailable_requested.connect(func(_a: StringName, _id: String, r: String): toast(r))
 	if placing():
 		_place_bar.visible = false
 		sheet.tree_exited.connect(func(): if placing(): _place_bar.visible = true)

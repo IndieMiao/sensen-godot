@@ -146,3 +146,24 @@ func test_the_mouth_takes_the_card_when_nearest() -> void:
 	assert_str(P0Garden.pick_card(cands, Vector3(2.3, 0, -8.8), "")).is_equal("mine")
 	assert_str(P0Garden.pick_card(cands, Vector3(2.3, 0, -11.0), "")).is_equal("spot_herb_patch")
 	m.free()
+
+## COMBAT-ELITE (不知火舞 on 288): the HP card has its coral heart (HPBar 1124:79402); the status line sits clear of the
+## card on its right, and hides while the elite's card shows (the card names the elite and would cover half of it).
+func test_the_hp_card_has_its_heart_and_the_elite_card_hides_the_status_line() -> void:
+	ui.set_status_line("Elite Slime")
+	ui.set_hp(60, 100)
+	await await_idle_frame()
+	var heart := ui.hp_bar().find_child("Heart", true, false) as TextureRect
+	assert_bool(heart.visible).is_true()
+	assert_str(heart.texture.resource_path).is_equal("res://assets/p0/icons/heart.svg")
+	assert_object(heart.modulate).is_equal(Color.WHITE)   # its own coral, no tint
+	var hp_right := ui.hp_bar().position.x + ui.hp_bar().get_combined_minimum_size().x
+	assert_float(ui._status.position.x).is_greater(hp_right)   # beside the card, not under it
+	assert_bool(ui._status.visible).is_true()
+	ui.set_hp(60, 100, {"name": "Elite Slime", "hp": 21, "max": 36})
+	assert_bool(ui.elite_bar().visible).is_true()
+	assert_bool(ui._status.visible).is_false()
+	ui.set_status_line("Elite Slime")   # the mine sets it every frame: it stays hidden under the card
+	assert_bool(ui._status.visible).is_false()
+	ui.set_hp(60, 100)   # the elite down: the line is back
+	assert_bool(ui._status.visible).is_true()

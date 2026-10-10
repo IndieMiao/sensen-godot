@@ -395,3 +395,57 @@ func test_the_old_tree_stands_in_the_left_column_off_the_beds() -> void:
 	assert_int(absi(cell.y - (P0Garden.ANCHORS["spot_clay_bank"] as Vector2i).y)).is_greater_equal(3)
 	var yard: Dictionary = P0Logic.content().get("decor", {}).get("yard", {})
 	assert_bool((yard.get("objects", []) as Array).any(func(r): return Rect2i(int(r[0]), int(r[1]), int(r[2]), int(r[3])).has_point(cell))).is_true()
+
+## B (奕星 on 288, after the user's hand test: the swing looked like digging): the swing plays no labour clip; the Combat
+## slot's sword shows in hand only while the swing arc does, as the old mine did (09-15 R4).
+func test_the_swing_shows_the_sword_and_plays_no_labour() -> void:
+	var src := FileAccess.get_file_as_string("res://scenes/p0/p0_mine.gd")
+	var at := src.find("func _swing()")
+	var swing := src.substr(at, src.find("\nfunc ", at + 1) - at)   # the body up to the next func (苏烈 on #270)
+	assert_str(swing).contains("combat.swing(")                      # it is the swing's body
+	assert_str(swing).not_contains("labour(")
+	var P0Mine = load("res://scenes/p0/p0_mine.gd")
+	var mine = auto_free(P0Mine.new())
+	mine.actor = auto_free(P0Actor.new())
+	mine.combat = auto_free(load("res://modules/mining/p0_mine_combat.gd").new())
+	mine._hold_sword("sword_wooden")
+	assert_object(mine._sword).is_not_null()
+	assert_object(mine._sword.get_parent()).is_same(mine.actor)
+	assert_bool(mine.sword_shown()).is_false()        # between swings: not in hand
+	mine.combat._swing_left = 0.16                    # a swing's arc shows
+	mine._hold_sword("sword_wooden")
+	assert_bool(mine.sword_shown()).is_true()
+	mine.combat._swing_left = 0.0
+	mine._hold_sword("sword_wooden")
+	assert_bool(mine.sword_shown()).is_false()
+	mine._hold_sword("")                              # no Combat slot weapon: no sword
+	assert_object(mine._sword).is_null()
+
+## The swing measures to a monster's body (不知火舞 on 288, measured 10-10): the elite (0.65 m) waits 2.4 m centre to
+## centre behind the player before its lunge; the player turns to it and the swing reaches its body's edge.
+func test_the_swing_turns_to_the_elite_and_reaches_its_body() -> void:
+	var Combat = load("res://modules/mining/p0_mine_combat.gd")
+	var bp := Layout_bp()
+	var mover := PlayerMover.new(bp, BlueprintGrid.new(bp))
+	var c: Node3D = auto_free(Combat.new())
+	add_child(c)
+	c.sync_p0(_view(_run(_five([true, true, true, true, true]))), 5, mover)
+	var elite: Dictionary = c.enemies.values()[0]
+	assert_float(float(elite.spec.radius)).is_equal(0.65)
+	var at := Vector3(4.75, 0, -0.55)
+	mover.position = at
+	mover.facing = Vector3(0, 0, 1)                         # facing the camera, the elite behind
+	elite.node.position = at + Vector3(0, 0, -2.39)          # its wind-up spot (the 10-10 run)
+	elite.mover.position = elite.node.position
+	assert_float(Combat.edge_distance(at, elite)).is_equal_approx(1.74, 0.001)
+	c.cooldown = 0.0
+	var hit: Array = c.swing({}, mover)
+	assert_vector(mover.facing).is_equal_approx(Vector3(0, 0, -1), Vector3.ONE * 0.001)   # turned to it
+	assert_array(hit).has_size(1)                          # B: the arc reaches its body there (1.74 ≤ 1.65 + 0.15)
+	assert_bool(Combat.within_swing(at, mover.facing, elite.node.position, Combat.REACH, 120.0)).is_false()   # the legacy centre test missed it
+	elite.node.position = at + Vector3(0, 0, -2.6)          # its recovery spot: edge 1.95 m
+	elite.mover.position = elite.node.position
+	mover.facing = Vector3(0, 0, 1)
+	c.cooldown = 0.0
+	assert_array(c.swing({}, mover)).is_empty()            # turned to it, a step in still needed
+	assert_vector(mover.facing).is_equal_approx(Vector3(0, 0, -1), Vector3.ONE * 0.001)

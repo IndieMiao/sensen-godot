@@ -118,9 +118,14 @@ export interface WorkbenchRecipe {
   id: string; tab: string; out: string; qty: number; to: 'bag' | 'gear' | 'owned' | 'field';
   cost: [string, number][]; gate?: [Skill, number];
   facility?: string;   // to: field (P1, SGODOT-239): the facility it builds in place (place command), never crafted
+  coins?: number;      // coins paid as it is placed, on top of the materials (greenhouse 300, §5.7; the 40 floor kept)
 }
 /** P1 step 1 (q(59) §1.4): a facility on one plot; a sprinkler waters the ring of 8 around it and cuts ripening. */
-export interface FacilityDef { name: string; cover: 'ring8'; grow_cut: number }
+export interface FacilityDef {
+  name: string; cover: 'ring8' | 'block'; grow_cut: number;
+  size?: [number, number];                 // block: the plots it roofs (greenhouse 4 × 4, q(118) ②)
+  cap_by_farming?: [number, number][];     // how many may stand by Farming level (greenhouse: Lv8 1, Lv10 2)
+}
 
 export interface ResidentDef {
   name: string; role: string; portrait: string; likes: string; gift_meal: string; one_per_day: boolean;

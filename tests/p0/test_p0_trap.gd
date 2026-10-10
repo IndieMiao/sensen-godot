@@ -65,3 +65,26 @@ func test_the_trap_sits_on_the_fishing_bar_and_the_tackle_tab() -> void:
 	assert_array(P0Logic.quick_bar(v, [], "fish")).contains(["trap_fish", "bait_worm"])
 	assert_str(str(P0ItemInfo.tab_of({}, "trap_fish"))).is_equal("tackle")
 	assert_bool(P0ItemInfo.rules().has("trap/bag")).is_true()
+
+## Collect (不知火舞 on 289 b3a79614): the card goes at once and the trap's strip and button hide while the collect plays
+## (COLLECT_HIDE_MS), then come back (`Fish Trap · 0/3`). Take back keeps its own way (the trap leaves the water).
+func test_collect_closes_the_card_and_hides_the_strip_for_the_collect() -> void:
+	var stub := GDScript.new()
+	stub.source_code = "extends \"res://scenes/p0/p0_pond.gd\"\nvar sent := []\nfunc _ready() -> void: pass\nfunc p0_action(cmd: Dictionary) -> void: sent.append(cmd)\n"
+	stub.reload()
+	var pond: Node3D = auto_free(Node3D.new())
+	pond.set_script(stub)
+	pond._trap_open = true
+	pond._press_trap({"label": "Collect 3", "enabled": true, "cmd": {"type": "collect_trap"}})
+	assert_bool(pond._trap_open).is_false()           # the card went at once
+	assert_bool(pond.collecting_trap()).is_true()     # the strip and button hide while it plays
+	assert_array(pond.sent).is_equal([{"type": "collect_trap"}])
+	pond._trap_hidden_until = Time.get_ticks_msec() - 1
+	assert_bool(pond.collecting_trap()).is_false()    # … then back, as Fish Trap · 0/3
+	pond._trap_open = true
+	pond._press_trap({"label": "Take back", "enabled": true, "cmd": {"type": "collect_trap", "take_back": true}})
+	assert_bool(pond.collecting_trap()).is_false()    # Take back: no collect to play
+	pond._press_trap({"label": "Collect · Creel full", "enabled": false, "cmd": {}, "toast": ""})
+	assert_bool(pond.collecting_trap()).is_false()    # a grey Collect sends nothing and hides nothing
+	var src := FileAccess.get_file_as_string("res://scenes/p0/p0_pond.gd")
+	assert_str(src).contains("not _trap_open and not collecting_trap()")   # the strip / button's show

@@ -523,6 +523,9 @@ static func main_action(view: Dictionary, plot: Dictionary, seed_id: String, row
 			"cmd": {"type": "fertilize", "plot": plot_id, "item": seed_id}, "need": 0}
 	if tree: return _tree_action(view, plot)
 	if bool(crop_for_seed(view, seed_id).get("perennial", false)) and str(plot.get("state", "")) in ["tilled", "wild"]:
+		if plot.get("greenhouse", false):   # q(118) ②: no trees under glass (李白: `Outside only`, ≤ 80 px)
+			return {"icon": "sow", "verb": "Plant", "sub": "Outside only", "enabled": false, "amber": false, "cmd": {}, "need": 0,
+				"toast": "No trees in the greenhouse"}
 		return _plant_action(view, plot_id, seed_id)
 	if seed_id.begins_with("fert_"):
 		var ripe := str(plot.get("state", "")) == "ready"
@@ -579,7 +582,15 @@ static func harvest_row(view: Dictionary, front: Dictionary) -> Array:
 		var pid := int(p.get("id", -1))
 		if pid == id or pid < 0 or pid >= P0Garden.plot_count(view) or P0Garden.grid_of(pid).y != row_y: continue
 		if str(p.get("state", "")) == "ready" and not bool(p.get("tree", false)) and p.get("facility", null) == null: out.append(pid)
-	return out
+	# Near to far from the plot in front (q(123)): a bag that fills stops the server at the first that does not fit, so
+	# what the player gets is what is nearest; equally near on both sides, the left one first.
+	var x := P0Garden.grid_of(id).x
+	var rest := out.slice(1)
+	rest.sort_custom(func(a, b):
+		var da := absi(P0Garden.grid_of(a).x - x)
+		var db := absi(P0Garden.grid_of(b).x - x)
+		return da < db or (da == db and P0Garden.grid_of(a).x < P0Garden.grid_of(b).x))
+	return [id] + rest
 
 ## A sapling at an empty plot, tilled or wild (q(118) ①): `Plant` / `6 Energy`, one tree a press (never repeated while
 ## held, `once`); the orchard full greys it with `Orchard 5/5` and the whole reason as the toast (q(44) 80 px).
@@ -1226,7 +1237,7 @@ static func next_line(view: Dictionary, skill: String, level: int) -> String:
 
 ## The keys of the rows that light the Today icon's red dot (q(107)): something to do now — a request to hand in, a
 ## harvest, a dish at the stove, a new recipe or slot, the first session's Sow / Catch / Deliver / Cook. Never a
-## countdown, an info row, a request still short, `N fish · the stove is free` or `Water N sown plots · Free` (their
+## countdown, an info row, a request still short, `N fish · the stove is free` or `Water N sown plots` (their
 ## `dot` is ""), nor a row ticked done or short of Energy. A key is the kind and its object, e.g. `deliver:<request>`.
 static func today_dots(rows: Array) -> Array:
 	var out: Array = []
@@ -1294,7 +1305,7 @@ static func today_rows(view: Dictionary) -> Array:
 		now_rows.append(_row("Harvest %d crops" % n, str(ready.keys()[0]), "plots", "harvest:" + "+".join(crops)))
 	if not ready.is_empty() and bool(level.get("now", false)):
 		now_rows.append(_row("Farming Lv%d with this harvest" % int(level.level), "hoe", ""))
-	if sown > 0: now_rows.append(_row("Water %d sown plot%s · Free" % [sown, "" if sown == 1 else "s"], "water", "plots"))
+	if sown > 0: now_rows.append(_row("Water %d sown plot%s" % [sown, "" if sown == 1 else "s"], "water", "plots"))
 	# Decorate (SGODOT-284, q(111)): pieces waiting in Farm Storage, a free thing to do; never the red dot (q(107)).
 	var decor := P0Decor.today_row(view)
 	if not decor.is_empty(): now_rows.append(_row(str(decor.line), str(decor.icon), ""))

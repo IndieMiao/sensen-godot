@@ -119,13 +119,64 @@ func any_alive() -> bool: return not enemies.is_empty()
 ## The nearest live monster within the swing's reach, for the key's state; "" when none.
 func in_reach(at: Vector3) -> String:
 	var best := ""
-	var best_d := REACH + 0.35
+	var best_d := REACH + TURN_MARGIN
 	for id in enemies:
-		var d: float = at.distance_to(enemies[id].node.position)
+		var d := edge_distance(at, enemies[id])
 		if d < best_d:
 			best_d = d
 			best = id
 	return best
+
+## The swing measures to a monster's body, not its centre (不知火舞 on 288, 10-10: on Floor 5 the elite, 0.65 m round,
+## waited 2.4–2.6 m centre to centre behind the player — its lunge's range — and looked pressed against them, yet the
+## old centre test neither turned the player to it nor reached it; 7.7 s of Attack landed once, mid-lunge). The player
+## turns to the nearest monster whose edge is within REACH + TURN_MARGIN and hits those whose edge is within REACH in the
+## arc. A slime (0.4 m) gains as much as its size; the legacy mine's MineCombat keeps the centre test.
+const TURN_MARGIN := 0.35   # the old mine's turn margin (mine_combat.swing), now from the body's edge
+## A hit is where the drawn arc sweeps (不知火舞 on #275, B): the arc band is 0.12 m wide at REACH and a slime's dome
+## stands over its ground circle, so a body whose edge is within REACH + HIT_SLACK is hit — the elite at its wind-up
+## spot (edge 1.67–1.74 m) is, at its recovery spot (1.85 m) a step in is still needed.
+const HIT_SLACK := 0.15
+
+## Flat distance from `at` to a monster's body edge (its spec radius), 0 inside it.
+static func edge_distance(at: Vector3, enemy: Dictionary) -> float:
+	var off: Vector3 = enemy.node.position - at
+	off.y = 0
+	return maxf(0.0, off.length() - float(enemy.spec.get("radius", 0.0)))
+
+func swing(state: Dictionary, mover: PlayerMover, target_id := "") -> Array[String]:
+	var hit: Array[String] = []
+	var spec := weapon(state)
+	if cooldown > 0 or spec.is_empty(): return hit
+	var target: Dictionary = enemies.get(target_id, {})
+	if target.is_empty():
+		var nearest := float(spec.range) + TURN_MARGIN
+		for enemy in enemies.values():
+			var d := edge_distance(mover.position, enemy)
+			if d < nearest:
+				nearest = d
+				target = enemy
+	if not target.is_empty():
+		var to: Vector3 = target.node.position - mover.position
+		to.y = 0
+		if to.length() > 0.01: mover.facing = to.normalized()
+	cooldown = 1.0 / float(spec.speed)
+	_show_swing(mover.position, mover.facing, float(spec.range))
+	for id in enemies:
+		var enemy: Dictionary = enemies[id]
+		var reach := float(spec.range) + HIT_SLACK + float(enemy.spec.get("radius", 0.0))   # to the body's edge
+		if not within_swing(mover.position, mover.facing, enemy.node.position, reach, float(_config.attack_arc_degrees)): continue
+		if not mover.grid.segment_walkable(mover.position, enemy.node.position): continue
+		hit.append(id)
+		if not enemy.spec.stun_resistant:
+			enemy.phase = "stunned"
+			enemy.timer = float(_config.hit_stun_seconds)
+			enemy.mover.stop()
+		enemy.flash = 0.18
+		var direction: Vector3 = (enemy.node.position - mover.position).normalized()
+		_slide(enemy.mover, direction * float(spec.knockback) * (1.0 - float(enemy.spec.knockback_resistance)))
+		enemy.node.position = enemy.mover.position
+	return hit
 
 
 ## One wind-up's band: a flat strip on the ground under the slime's root, out of Body's squash, hidden until a wind-up.

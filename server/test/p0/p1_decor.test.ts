@@ -87,8 +87,11 @@ describe('placing in the yard', () => {
     expect(refuse(s, { type: 'place_decor', item: 'deco_lantern', x: 4, y: 18, ...HOME })).toMatchObject({ ok: false, code: 'not_stored' });
     expect(refuse(s, { type: 'place_decor', item: 'deco_planter', x: 4, y: 18, space: 'mine' })).toMatchObject({ ok: false, code: 'not_home' });
     // a rotated piece takes h × w: the 3 × 2 pergola turned stands 2 wide and 3 tall
-    expect(spotBlock(c, s, 'deco_pergola', 1, 17, 1)).toBeNull();
-    expect(spotBlock(c, s, 'deco_pergola', 1, 17, 0)).toMatchObject({ code: 'decor_overlap' });   // 3 × 2 would reach the herb patch
+    expect(spotBlock(c, s, 'deco_pergola', 4, 17, 1)).toBeNull();
+    expect(spotBlock(c, s, 'deco_pergola', 4, 17, 0)).toMatchObject({ code: 'decor_overlap' });   // 3 × 2 would reach the tree at (6, 17)
+    // the garden's own dressing is taken (不知火舞 on 290): the sign by the gate, a bush, a tree, a rock
+    for (const [x, y, what] of [[7, 1, 'sign'], [1, 0, 'bush'], [12, 18, 'tree'], [16, 18, 'rock']] as const)
+      expect(spotBlock(c, s, 'deco_planter', x, y, 0), what).toMatchObject({ code: 'decor_overlap' });
   });
 
   it('the cap is 20 + 4 per Homestead level above 1 (§8.3.2)', () => {
