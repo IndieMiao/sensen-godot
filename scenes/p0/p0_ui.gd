@@ -26,6 +26,7 @@ signal place_pressed()
 signal tackle_requested()      # FISH-5 rod variant "Tackle Shop"
 
 const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
+const P0Travel := preload("res://modules/p0/p0_travel.gd")   # where the player is in the world (SGODOT-275)
 const _RESIDENT_SHEET_H := 443.0   # RES-PIP: Sheet 443 of 800
 const _CLOSE_ABOVE_SHEET := 6.0    # RES-PIP: Close · 44 px sits 6 above the sheet, 16 in from the right
 const _CLOSE_ABOVE_SPECIALTY := 2.0   # MARKET-SPECIALTY: Close 44 at (300, 617), the sheet at y 663
@@ -284,7 +285,7 @@ func _refresh_hud() -> void:
 	# chips would still take taps.
 	hud.visible = not view.is_empty()
 	if view.is_empty(): return
-	var place := P0Logic.place_info(_place_text, "Farmhouse" if modal_kind == "kitchen" else "")
+	var place := P0Travel.place(view, P0Logic.place_info(_place_text, "Farmhouse" if modal_kind == "kitchen" else ""))   # arrived in another city: Tokyo · Arrived (q(108))
 	var state := P0Logic.hud_state(view, {"next_cost": int(fab_state().get("need", 0)), "place": place})
 	var dots: Array = state.get("today_dots", [])
 	state.erase("today_dots")

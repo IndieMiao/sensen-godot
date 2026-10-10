@@ -1,0 +1,93 @@
+extends RefCounted
+## Where the player is in the world and what their travel has left (SGODOT-275, plan v2 §11; 亚瑟's cross-city plan
+## on 275, v1.1): reads view.travel {home, here, passes, visits, stamps, fallback, explorer} as the server sends it.
+## A view without it (a server before v5) is at home in the home city. Pure and static: tested headless.
+
+const P0Clusters := preload("res://modules/p0/p0_clusters.gd")
+const P0City := preload("res://modules/p0/p0_city.gd")
+
+## The home cluster: the save's, else the content's home city (San Francisco).
+static func home(view: Dictionary) -> String:
+	var t: Dictionary = view.get("travel", {})
+	var h := str(t.get("home", ""))
+	return h if h != "" else P0Clusters.cluster_of_region(P0City.region())
+
+## The cluster the player is in (arrived there or at home).
+static func here(view: Dictionary) -> String:
+	var t: Dictionary = view.get("travel", {})
+	var h := str(t.get("here", ""))
+	return h if h != "" else home(view)
+
+static func away(view: Dictionary) -> bool:
+	return here(view) != home(view)
+
+## The server's clock for the view (ms), for pass countdowns.
+static func now_ms(view: Dictionary) -> float:
+	return float(view.get("now", Time.get_unix_time_from_system() * 1000.0))
+
+## ms left on the Day Pass for a cluster; 0 for the home city (it needs none) and for none or an expired one.
+static func pass_left_ms(view: Dictionary, cluster: String) -> float:
+	if cluster == home(view): return 0.0
+	var p: Dictionary = view.get("travel", {}).get("passes", {}).get(cluster, {})
+	return maxf(0.0, float(p.get("until", 0)) - now_ms(view))
+
+## Whether the player may go in there now: the home city, or a Day Pass still running (§11.7.3).
+static func covers(view: Dictionary, cluster: String) -> bool:
+	return cluster == home(view) or pass_left_ms(view, cluster) > 0.0
+
+## §11.7.1 fog: "explored" once visited (or the home city), else "unexplored" (Second Home is P2's second version).
+static func fog(view: Dictionary, cluster: String) -> String:
+	if cluster == home(view): return "explored"
+	return "explored" if view.get("travel", {}).get("visits", {}).has(cluster) else "unexplored"
+
+static func visits(view: Dictionary, cluster: String) -> int:
+	return int(view.get("travel", {}).get("visits", {}).get(cluster, {}).get("n", 0))
+
+static func stamps(view: Dictionary) -> Array:
+	return view.get("travel", {}).get("stamps", [])
+
+## The Day Pass on the place chip: "23h" / "47m" while it runs, "" otherwise (LOCK-06: Tokyo · Arrived · Day Pass 23h).
+static func pass_text(view: Dictionary, cluster: String) -> String:
+	var ms := pass_left_ms(view, cluster)
+	if ms <= 0.0: return ""
+	var minutes := ceili(ms / 60000.0)
+	return "%dh" % ceili(minutes / 60.0) if minutes >= 60 else "%dm" % minutes
+
+## The place chip while away (LOCK-06): the arrived city's name and Foreign (Tokyo · Arrived). The free first version
+## shows no Day Pass (q(108), pending the user: the server still issues one, an expired one only brings back the free
+## confirm panel); pass_text is kept for the paid version. At home the scene's own "City · Space" stands. `info` is
+## P0Logic.place_info's {city, space, kind, day_pass}.
+## A scene of the home city ("San Francisco · Homestead" on the map) is not where an arrived player is: away, the chip
+## reads "<City> · Arrived" until they go into a space of that city (whose own chip names its city).
+static func place(view: Dictionary, info: Dictionary) -> Dictionary:
+	if not away(view): return info
+	var c := P0Clusters.get_cluster(here(view))
+	var out := info.duplicate()
+	var city := str(c.name) if not c.is_empty() else str(info.get("city", ""))
+	if str(info.get("city", "")) != city: out["space"] = "Arrived"
+	out["city"] = city
+	out["kind"] = UiHud.PlaceKind.FOREIGN
+	out["day_pass"] = ""
+	return out
+
+## "1,758" (km on the travel card).
+static func grouped(n: int) -> String:
+	var s := str(absi(n))
+	var out := ""
+	while s.length() > 3:
+		out = "," + s.substr(s.length() - 3) + out
+		s = s.substr(0, s.length() - 3)
+	return ("-" if n < 0 else "") + s + out
+
+## "1,758 km · Trip 5 · Continental" (§11.8.2); the home city: "Your home city".
+static func trip_line(trip_info: Dictionary) -> String:
+	if trip_info.is_empty() or int(trip_info.get("km", 0)) == 0: return "Your home city"
+	return "%s km · Trip %d · %s" % [grouped(int(trip_info.km)), int(trip_info.trip), str(trip_info.name)]
+
+## The arrival flight's length by tier (§11.8.4: Trip 1–3 3 s, 4–5 4 s, 6–7 5 s).
+static func flight_s(trip: int) -> float:
+	return 3.0 if trip <= 3 else 4.0 if trip <= 5 else 5.0
+
+## The trip tier to a cluster from the home farm, for browsing (the server's preview is authoritative).
+static func trip(view: Dictionary, cluster: String) -> Dictionary:
+	return P0Clusters.trip(cluster, home(view), P0City.farm_at(), view.get("travel", {}).get("fallback", {}))

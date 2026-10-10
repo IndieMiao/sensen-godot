@@ -428,8 +428,9 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				elif what.begins_with("cook:"): xp_lines.append("New recipe! · First cooked · +%d Cooking XP" % int(ev.xp))
 				elif what == "landed": xp_lines.append("First fish landed · +%d XP" % int(ev.xp))
 				elif what == "cast": xp_lines.append("First cast · +%d XP" % int(ev.xp))
-				elif what.begins_with("fishing_city:"):
-					xp_lines.append("First catch in %s · +%d XP" % [what.trim_prefix("fishing_city:").capitalize(), int(ev.xp)])
+				elif what.begins_with("fishing_city:"):   # v5 keys are cluster ids: the event names the city (#206)
+					var city := str(ev.get("name", what.trim_prefix("fishing_city:").capitalize()))
+					xp_lines.append("First catch in %s · +%d XP" % [city, int(ev.xp)])
 					last_catch_extras["city_xp"] = int(ev.xp)
 	last_xp_lines = xp_lines
 	var parcels_said := false
@@ -442,6 +443,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	for ev in events:
 		if hushed.call(ev) and str(ev.get("kind", "")) not in ["level", "first", "mishap", "queue", "pot", "cabinet", "plate"]: continue
 		match str(ev.get("kind", "")):
+			"arrival": _call("on_arrival", [ev])   # SGODOT-275: the map flies there and welcomes (q(108))
 			"energy":
 				var dlt := int(ev.delta)
 				# A catch's refund is said by its own float or card ("3 Energy back"), not twice.
@@ -603,6 +605,10 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 		if str(said) != "": ui.toast_error(str(said))
 		return
 	match code:
+		"pass_required", "trip_expired":   # SGODOT-275: a place in a city without a pass — its free travel card (q(108))
+			var preview: Dictionary = detail.get("preview", {})
+			if is_instance_valid(world) and world.has_method("open_travel"): world.open_travel(str(preview.get("cluster", "")), preview)
+			else: ui.toast_error("Travel to %s first · free" % str(preview.get("name", "that city")))
 		"need_energy":
 			ui.open_energy_card(int(detail.get("need", 0)), "Cast" if str(cmd.get("type", "")) == "cast" else P0MaterialLogic.energy_verb(cmd, "Sow ×1"))
 			session.report({"kind": "energy_card", "need": int(detail.get("need", 0)), "refused": str(cmd.get("type", ""))})
