@@ -39,7 +39,7 @@ var role: Role = Role.TACKLE: set = set_role
 var portrait: Texture2D: set = set_portrait
 ## Shop title: `Finn's Tackle`.
 var title := "": set = set_title
-## Place after the title: `Xuhui Tackle Shop` (drawn as `· Xuhui Tackle Shop`).
+## Place after the title: `Mission Tackle Shop` (drawn as `· Mission Tackle Shop`).
 var place := "": set = set_place
 ## `Tackle Keeper · Finn`.
 var keeper := "": set = set_keeper

@@ -3,7 +3,7 @@ extends GdUnitTestSuite
 ## The view is a real P0 server view (tests/p0/fixtures/counter_view.json: fresh state, 300 coins, Energy 150,
 ## a bag of seeds, radishes, two fish and timber).
 
-const TACKLE_CTX := {"keeper": "Finn", "place": "Xuhui Tackle Shop", "nearest": {"name": "Reed Pond", "site": "pond"}}
+const TACKLE_CTX := {"keeper": "Finn", "place": "Mission Tackle Shop", "nearest": {"name": "Reed Pond", "site": "pond"}}
 
 func _view() -> Dictionary:
 	return JSON.parse_string(FileAccess.get_file_as_string("res://tests/p0/fixtures/counter_view.json"))
@@ -50,7 +50,7 @@ func test_tackle_counter_is_one_page_with_the_keeper_bar_and_fish_only() -> void
 	var d := _drawer("tackle", TACKLE_CTX)
 	await _settle()
 	assert_str(d.keeper_bar.title).is_equal("Finn's Tackle")
-	assert_str(d.keeper_bar.place).is_equal("Xuhui Tackle Shop")
+	assert_str(d.keeper_bar.place).is_equal("Mission Tackle Shop")
 	assert_str(d.keeper_bar.keeper).is_equal("Tackle Keeper · Finn")
 	assert_str(d.keeper_bar.line).is_equal("Worms are 2 coins. 30 left today.")
 	assert_array(d.find_children("*", "UiFilterChip", true, false).filter(func(c): return c.text == "Buy")).is_empty()   # no tab row
@@ -61,7 +61,7 @@ func test_tackle_counter_is_one_page_with_the_keeper_bar_and_fish_only() -> void
 	assert_str(d._quota.text).starts_with("Fish buy-back today 0/80\nany Tackle Shop · resets in ")
 
 func test_market_buys_nothing_so_it_has_no_bag_half_and_specialty_is_its_own_shelf() -> void:
-	var d := _drawer("market", {"keeper": "Mei", "place": "Xuhui Market Square"})
+	var d := _drawer("market", {"keeper": "Mei", "place": "Mission Market Square"})
 	await _settle()
 	assert_bool(d._bag_half.visible).is_false()
 	assert_str(d.keeper_bar.line).is_equal("Row Hoe's 240 coins. Farming Lv4 to use.")   # a counter line, not the card's question (#56)
@@ -95,7 +95,7 @@ func test_buy_reports_the_item_and_stepper_count() -> void:
 
 func test_tea_page_states() -> void:
 	var v := _view()
-	var d := _drawer("tea", {"keeper": "Ama", "place": "Lotus Tea House"}, "buy", v)
+	var d := _drawer("tea", {"keeper": "Ama", "place": "Oak Tea House"}, "buy", v)
 	await _settle()
 	assert_str(d.keeper_bar.note).is_equal("Counts across all tea houses · 3 cups a day")
 	var labels := d._drinks.find_children("*", "Label", true, false).map(func(l): return (l as Label).text)
@@ -121,7 +121,7 @@ func test_tea_page_states() -> void:
 	assert_str(b.reason).is_equal("Tea 3/3 today · Resets in 42m")   # q(97)
 
 func test_post_desk_note_and_keeper() -> void:
-	var d := _drawer("post", {"keeper": "Sigrid", "place": "Huangpu Travel Post"})
+	var d := _drawer("post", {"keeper": "Sigrid", "place": "Union Square Travel Post"})
 	await _settle()
 	assert_str(d.keeper_bar.title).is_equal("Sigrid's Desk")
 	assert_str(d.keeper_bar.note).is_equal("Shares the 3 cups a day with tea")
@@ -162,10 +162,10 @@ func test_keeper_greeting_passes_ctx_and_trade_opens_the_counter() -> void:
 	assert_str(ui.modal_kind).is_equal("greeting")
 	var card: UiDialogueCard = ui._modal.find_children("*", "UiDialogueCard", true, false)[0]
 	assert_str(card.title).is_equal("Tackle Keeper · Finn")
-	assert_str(card.place).is_equal("Minds the tackle · Xuhui Tackle Shop")
+	assert_str(card.place).is_equal("Minds the tackle · Mission Tackle Shop")
 	(card.content.get_child(0) as UiCommandButton).activated.emit()   # Trade · see the rods
 	assert_str(ui.modal_kind).is_equal("counter")
-	assert_str(ui._counter.keeper_bar.place).is_equal("Xuhui Tackle Shop")
+	assert_str(ui._counter.keeper_bar.place).is_equal("Mission Tackle Shop")
 
 func test_counter_commands_carry_the_shop_and_a_drink_changes_the_line() -> void:
 	var ui := _ui()
@@ -174,7 +174,7 @@ func test_counter_commands_carry_the_shop_and_a_drink_changes_the_line() -> void
 	ui.set_view(v)
 	var sent := []
 	ui.command.connect(func(c): sent.append(c))
-	ui.open_counter("tea", {"ctx": {"keeper": "Ama", "place": "Lotus Tea House"}})
+	ui.open_counter("tea", {"ctx": {"keeper": "Ama", "place": "Oak Tea House"}})
 	ui._counter.action_requested.emit(&"drink", "drink_hot_tea", {})
 	ui._counter_action("tackle", &"sell", "fish_crucian", {qty = "all"})
 	assert_array(sent).is_equal([{"type": "drink", "item": "drink_hot_tea", "shop": "tea"},
@@ -190,7 +190,7 @@ func test_counter_drawer_is_the_open_counter_only() -> void:
 	await await_idle_frame()
 	ui.set_view(_view())
 	assert_object(ui.counter_drawer()).is_null()
-	ui.open_counter("tea", {"ctx": {"keeper": "Ama", "place": "Lotus Tea House"}})
+	ui.open_counter("tea", {"ctx": {"keeper": "Ama", "place": "Oak Tea House"}})
 	assert_object(ui.counter_drawer()).is_same(ui._counter)
 	ui.modal_kind = "board_request"   # a Market Board sheet over the drawer keeps it
 	assert_object(ui.counter_drawer()).is_same(ui._counter)
@@ -208,7 +208,7 @@ func test_the_market_drawer_is_as_tall_as_its_taller_page_and_keeps_it_across_ta
 		{"id": "req_m2", "title": "Dusk Haul", "kind": "fish", "items": [], "rarity": 2, "icon": "fish_crucian", "qty": 3,
 		"have": 0, "coins": 45, "status": "open"}]
 	ui.set_view(v)
-	ui.open_counter("market", {"ctx": {"keeper": "Mei", "place": "Xuhui Market Square"}})
+	ui.open_counter("market", {"ctx": {"keeper": "Mei", "place": "Mission Market Square"}})
 	var d := ui._counter
 	await d.fitted
 	assert_bool(d.is_short()).is_true()
@@ -244,7 +244,7 @@ func test_a_market_drawer_closed_mid_measure_stops_quietly() -> void:
 	var ui := _ui()
 	await await_idle_frame()
 	ui.set_view(_view())
-	ui.open_counter("market", {"ctx": {"keeper": "Mei", "place": "Xuhui Market Square"}})
+	ui.open_counter("market", {"ctx": {"keeper": "Mei", "place": "Mission Market Square"}})
 	var d := ui._counter
 	assert_float(d.board.modulate.a).is_equal(0.0)   # Buy in front, the board measured behind it
 	assert_bool(d._shelf_box.visible and d.board.visible).is_true()

@@ -140,7 +140,7 @@ func test_an_outpost_pin_says_who_is_in() -> void:
 	assert_str(city._label_text(P0Outposts.place_entry(tea, 0))).is_equal(str(tea.name))
 
 ## An outpost pin drawn over the player's avatar takes the tap (蒙恬 on C30): it is selected, not the avatar. Since 269
-## only the pins always in stay on an avatar: at the Lotus Tea House the avatar stands beside its pin (where the player
+## only the pins always in stay on an avatar: at the Oak Tea House the avatar stands beside its pin (where the player
 ## is), and a tap on that pin selects it.
 func test_a_tap_on_an_outpost_over_the_avatar_opens_the_outpost() -> void:
 	var m := _map()

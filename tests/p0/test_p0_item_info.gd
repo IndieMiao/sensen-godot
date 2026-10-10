@@ -130,10 +130,10 @@ func test_quota_short_of_the_stack_and_used_up() -> void:
 func test_a_market_quota_short_of_the_stack_sells_what_fits() -> void:
 	var v := _view()
 	v["shops"] = {"market": {"sell": [{"kind": "crop", "rate": 0.8, "quota": "crop_market"}]}}
-	v["quotas"] = {"crop_market": {"used": 55, "cap": 60, "resets_in": 33120000, "scope": "all Shanghai markets"}}
+	v["quotas"] = {"crop_market": {"used": 55, "cap": 60, "resets_in": 33120000, "scope": "all San Francisco markets"}}
 	var s := P0ItemInfo.spec(v, "crop_radish", &"counter_sell", {counter = "market"})
 	assert_array(_labels(s)).is_equal(["secondary:Sell", "primary:Sell 5 · 20 coins"])   # 5 of 12 fit, ⌊5 × 0.8⌋ = 4 each
-	assert_str(s.quota.note).is_equal("all Shanghai markets · resets in 9h 12m")
+	assert_str(s.quota.note).is_equal("all San Francisco markets · resets in 9h 12m")
 
 func test_locked_stack_shows_locked_and_unlock_only() -> void:
 	var v := _view()

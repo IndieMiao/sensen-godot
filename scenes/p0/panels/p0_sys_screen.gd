@@ -8,7 +8,7 @@ extends Control
 ##   MAINT       SYS-MAINT 1245:87657 — `Down for maintenance` · `We'll be back around 14:30.` · Check again
 ##   UPDATE      SYS-UPDATE 1245:87698 — `Update to keep playing` · `This version is out of date.` · Update
 ##   SCENE       SYS-LOADING-SCENE 1245:87648 — the screen behind, blurred, under the modal scrim; the spinner and
-##               the destination (`Shanghai · Reed Pond`) in white; after 8 s `Taking longer than usual…`
+##               the destination (`San Francisco · Reed Pond`) in white; after 8 s `Taking longer than usual…`
 ##   PLACE_FAIL  SYS-LOADING-SCENE-FAIL 1780:103778 (q(78)): getting to a place failed, over the same blurred screen;
 ##               `Couldn't get there` · Retry (the same place again) · Go back (where the player came from; Back too)
 ## show_kind(kind, detail) draws one; `primary_pressed(kind)` is its card's button.

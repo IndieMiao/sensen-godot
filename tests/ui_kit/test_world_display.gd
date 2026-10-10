@@ -130,10 +130,10 @@ func test_skill_ring_halves_fill_from_twelve_with_4_degree_gaps_and_5_percent_st
 ## q(107) / SGODOT-271: Today is an icon with no words, its red dot on or off; the place chip reads the actual place.
 func test_hud_rows_read_the_today_dot_and_the_actual_place() -> void:
 	var hud: UiHud = _host(UiHud.new())
-	hud.apply({today_dot = false, place = {city = "Shanghai", space = "Farmhouse"}})
+	hud.apply({today_dot = false, place = {city = "San Francisco", space = "Farmhouse"}})
 	await _settle()
 	var texts := _labels(hud)
-	assert_array(texts).contains(["Shanghai · ", "Farmhouse"])
+	assert_array(texts).contains(["San Francisco · ", "Farmhouse"])
 	assert_array(texts.filter(func(t): return str(t).begins_with("Today"))).is_empty()
 	assert_bool(hud.today_dot_shown()).is_false()
 	# The place chip is 300 wide with the icon (SGODOT-271): a space long enough to be cut there.
@@ -154,10 +154,10 @@ func test_hud_rows_read_the_today_dot_and_the_actual_place() -> void:
 	var fs := space.get_theme_font_size(&"font_size")
 	assert_float(space.get_theme_font(&"font").get_string_size(space.text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x).is_less_equal(space.size.x)
 	assert_float(hud._place_suffix.get_global_rect().end.x).is_less_equal(hud.place_chip_rect().end.x)
-	hud.apply({place = {city = "Shanghai", space = "Farmhouse", kind = UiHud.PlaceKind.HOME, day_pass = ""}})
+	hud.apply({place = {city = "San Francisco", space = "Farmhouse", kind = UiHud.PlaceKind.HOME, day_pass = ""}})
 	await _settle()
 	assert_str(space.text).is_equal("Farmhouse")   # room again: the whole space comes back
-	assert_str(UiHud.place_text({city = "Shanghai", space = "Homestead"})).is_equal("Shanghai · Homestead")
+	assert_str(UiHud.place_text({city = "San Francisco", space = "Homestead"})).is_equal("San Francisco · Homestead")
 
 func test_hud_badge_buff_and_balances() -> void:
 	var hud: UiHud = _host(UiHud.new())

@@ -2,7 +2,7 @@ class_name P0CounterDrawer
 extends UiDrawer
 ## P0 counter drawer (SGODOT-224; LOCK-15 / 16; FARM-6 482:46, NPC-2 482:116, NPC-2-2 482:118). Top to bottom:
 ##   head       the unattended Homestead Stall: `Homestead Stall` + Close, then Buy | Stall Board (FARM-6);
-##              an outpost: UiKeeperBar (role tint, `Finn's Tackle · Xuhui Tackle Shop`, `Tackle Keeper · Finn`,
+##              an outpost: UiKeeperBar (role tint, `Finn's Tackle · Mission Tackle Shop`, `Tackle Keeper · Finn`,
 ##              the keeper's line), then Buy | Market Board at the market (NPC-2). The P0 tackle shop has one page,
 ##              so no tab row (李白 / 安其拉 q(46), NPC-2-2).
 ##   shelf      UiShopRow per offer (F-07 counter_buy: stepper + Buy, or the grey reason), four rows tall, scrolls.

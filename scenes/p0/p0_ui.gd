@@ -277,7 +277,7 @@ func set_view(v: Dictionary) -> void:
 
 
 ## HUD from the view, the next action's cost (Low = short of it) and where the player actually is: the
-## kitchen is the farmhouse's stove corner, so the chip reads "Shanghai · Farmhouse" there (LOCK-06).
+## kitchen is the farmhouse's stove corner, so the chip reads "San Francisco · Farmhouse" there (LOCK-06).
 func _refresh_hud() -> void:
 	if hud == null: return
 	# No HUD before the first server view: an empty view would read as 0 Energy (red) and 0 coins, and its
@@ -315,7 +315,7 @@ func place_chip_rect() -> Rect2: return hud.place_chip_rect() if hud else Rect2(
 func hud_corner_rect() -> Rect2: return hud.balances_rect() if hud else Rect2()
 
 ## Pond vs. plots: place chip, creel badge, fab badge and quick-bar contents follow where the player stands.
-## Full place chip text: "City · Space" (Shanghai · Homestead / Shanghai · Willow Pond / … · Kitchen).
+## Full place chip text: "City · Space" (San Francisco · Homestead / San Francisco · Willow Pond / … · Kitchen).
 func set_place(text: String) -> void:
 	if not is_node_ready():
 		_pending["place"] = text
@@ -1222,7 +1222,7 @@ func screen_kind() -> int: return _screen.kind if _screen != null else -1
 
 func screen() -> P0SysScreen: return _screen
 
-## The place chip's text (`Shanghai · Reed Pond`): the resume cover names where the player is.
+## The place chip's text (`San Francisco · Reed Pond`): the resume cover names where the player is.
 func place_text() -> String: return str(_pending.get("place", _place_text))
 
 ## The system line under the HUD (SysBanner, x 16 y 100): over the scene and over an open drawer (SYS-OFFLINE-3).

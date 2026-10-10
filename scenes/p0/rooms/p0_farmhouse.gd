@@ -1,6 +1,6 @@
 extends P0Room
 ## The farmhouse interior (plan §7.7 / q(14)): Homestead Lv1–4 live in the Basic Room, whose stove corner is the
-## P0 kitchen; the place chip reads "Shanghai · Farmhouse" (LOCK-06 K-1). Entered from the farm (the door card's
+## P0 kitchen; the place chip reads "San Francisco · Farmhouse" (LOCK-06 K-1). Entered from the farm (the door card's
 ## Kitchen row, or walking into the doorway); its door leaves back to the farm.
 ## Placeholder period: the accepted Basic Room art with assets/p0/rooms/farmhouse.anchors.json; the final
 ## farmhouse_lv1 (SGODOT-213) swaps the art and brings the anchors in its own layout.json.
