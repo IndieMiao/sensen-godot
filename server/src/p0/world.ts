@@ -101,9 +101,13 @@ let memberPop: Map<string, number> | null = null;
 export function clusterPopulation(cl: CityCluster): number {
   if (!memberPop) {
     memberPop = new Map();
-    const rows = (f: string) => readFileSync(path.join(ROOT, f), 'utf8').split('\n').filter(l => l && !l.startsWith('#')).map(l => l.split('\t'));
-    const pop = new Map(rows('server/data/cities.tsv').map(r => [r[0], Number(r[7]) || 0] as [string, number]));
-    for (const [city, cluster] of rows('server/data/city_cluster_members.tsv')) memberPop.set(cluster, (memberPop.get(cluster) ?? 0) + (pop.get(city) ?? 0));
+    try {
+      const rows = (f: string) => readFileSync(path.join(ROOT, f), 'utf8').split('\n').filter(l => l && !l.startsWith('#')).map(l => l.split('\t'));
+      const pop = new Map(rows('server/data/cities.tsv').map(r => [r[0], Number(r[7]) || 0] as [string, number]));
+      for (const [city, cluster] of rows('server/data/city_cluster_members.tsv')) memberPop.set(cluster, (memberPop.get(cluster) ?? 0) + (pop.get(city) ?? 0));
+    } catch {
+      memberPop.clear();   // the files missing (a stripped image): every cluster keeps its own figure, never a 500 (哪吒 on #244)
+    }
   }
   return Math.max(cl.population, memberPop.get(cl.id) ?? 0);
 }
