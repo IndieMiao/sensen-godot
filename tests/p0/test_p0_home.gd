@@ -110,6 +110,9 @@ func test_home_moment_matches_the_page_14_banner() -> void:
 func test_material_icons_exist() -> void:
 	for id in ["wood", "stone", "fiber", "clay", "rock_salt", "coin", "star", "energy", "kitchen", "bag", "board"]:
 		assert_bool(ResourceLoader.exists("res://assets/p0/icons/%s.svg" % id)).is_true()
+	# Lv4–10's materials have their own art on HOME-1's tiles, not the sprout (李元芳 on 286 5d27bd93; 安其拉 2bc8ed12)
+	for id in ["copper_ore", "quartz", "hardwood"]:
+		assert_str(P0Logic.icon(id).resource_path).override_failure_message(id).is_equal("res://assets/p0/icons/%s.svg" % id)
 
 # ---------------------------------------------------------------- HOME-1 sheet, HOME-2 banner, the sign
 
