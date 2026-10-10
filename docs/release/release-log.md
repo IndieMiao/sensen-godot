@@ -52,7 +52,7 @@
 - 源码 farm-dev `d76fb7d9`。纯客户端：服务端仍是 `p0-server:c4811381`，不部署，最低版本仍是 `2026100903`，0.1.1 照常能用。
 - 组件和 0.1.1 逐项一致（5 个 .so、Mapbox 55 个条目、LiveKit、token `744e223b`、4 个插件、dex 7、证书 `38771d94…`）；客户端 tests/p0 和 ui_kit 共 1132 个用例全过。
 - 冒烟：模拟器连 devserver 上的临时服（c4811381，空数据，没碰香港存档）。看到 Today 图标与红点（打开后灭，出现交付行后又亮）；位置芯片写全称，`San Francisco · Union Square Travel Post` 不截断；Sigrid 柜台抽屉的把手露在店主条上方；首会话走通（种地 → Fern Pond 钓 3 条 → 交付 +14 → 做 Grilled Crucian）。
-- 装到用户手机：2026-10-10 00:50:21，测试员 install -r 覆盖安装（确认页由用户自己点），存档保留（firstInstallTime 仍是 2026-10-09 16:33:27）；手机上 base.apk 的 SHA-256 与产物一致，证书 `38771d94…`。记录：pm/demo-0.1.2/hx/install-record.md。
+- 装到用户手机：2026-10-10 00:50:21，测试员 install -r 覆盖安装（确认页由用户自己点），存档保留（firstInstallTime 仍是 2026-10-09 16:33:27）；手机上 base.apk 的 SHA-256 与产物一致，证书 `38771d94…`。记录：内部安装记录。
 
 内容（自 0.1.1，#201–#204）：
 
