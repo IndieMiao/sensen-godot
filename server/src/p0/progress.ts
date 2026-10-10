@@ -17,6 +17,7 @@ export type P0Event =
   | { kind: 'plate'; ids: string[]; cabinet: boolean }
   | { kind: 'parcel'; id: string; qty: number; key: string; waiting: boolean; expires_in?: number; gift?: true }   // a reward that did not fit the bag (§10.4.8)
   | { kind: 'coins'; delta: number }
+  | { kind: 'recipe'; page: string; from: 'card' }   // a recipe card bought: the page is Tasted (§7.16.1)
   | { kind: 'milestone'; id: string; title: string; coins: number; cabinet: number; decor: string | null }   // Cookbook milestone (§7.6.1)
   | { kind: 'first'; what: string; xp: number; name?: string }   // name: the city of a fishing_city first (v5 keys are cluster ids)
   | { kind: 'level'; skill: Skill; level: number; energy: number; gifts: [string, number][] }

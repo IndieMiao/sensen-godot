@@ -1,6 +1,8 @@
 /** What the client receives: the settled state plus everything it would otherwise have to re-derive. */
-import { cropBySeed, dishId, fishById, ingredient, itemKind, itemName, QUALITIES, rodById, SHOPS, SKILLS, type BoardId, type P0Content, type QuotaId, type ShopId } from './content.js';
+import { cropBySeed, dishId, fishById, ingredient, itemKind, itemName, QUALITIES, rodById, SHOPS, SKILLS, type BoardId, type P0Content, type QuotaId, type ShopId, recipeById } from './content.js';
 import { count, freeSlots } from './bag.js';
+import { barterItems, barterRoom } from './barter.js';
+import { cardPage, cardPrice, marketCards, stallCards } from './cards.js';
 import { burners, cookSlots, mealValue, recipeRarity, settleStove } from './cooking.js';
 import { sellPrice, stallOffer } from './reducer.js';
 import { blessed, dayKey, foodCap, maxEnergy, nextTickIn, regenMs, settleEnergy, skillLevel, untilRollover } from './rules.js';
@@ -292,6 +294,19 @@ function shopView(c: P0Content, s: P0State, shop: ShopId) {
       };
     }),
     sell: Object.entries(c.shops[shop].buys).map(([kind, r]) => ({ kind, rate: r.rate, quota: r.quota })),
+    // Barter at the Market Square keeper (§8.4.5): give n regional items for 1 mineral; room = how many more of each
+    // the next level lets come by barter.
+    barter: shop === 'market' && c.homestead.barter ? {
+      give: c.homestead.barter.give, daily: c.homestead.barter.daily, left: Math.max(0, c.homestead.barter.daily - (s.day.barters ?? 0)),
+      items: barterItems(c).map(id => ({ id, name: itemName(c, id), have: count(s.bag, id) })),
+      minerals: c.homestead.barter.minerals.map(id => ({ id, name: itemName(c, id), room: barterRoom(c, s, id) })),
+    } : null,
+    // Recipe cards on this counter today (§7.16.1): the Stall's daily two, Market's climate cards. Bought = in the Cookbook.
+    cards: (shop === 'homestead' ? stallCards(c, s) : shop === 'market' ? marketCards(c, c.profile.climate) : []).map(id => {
+      const page = cardPage(id), price = cardPrice(c, id) ?? 0, recipe = recipeById(c, page);
+      return { id, page, name: recipe?.name ?? page, rarity: recipe ? recipeRarity(c, recipe) : 1, price, need: coinsNeeded(c, price),
+        owned: s.cookbook.includes(page) };
+    }),
   };
 }
 
