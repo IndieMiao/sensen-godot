@@ -11,7 +11,7 @@ import type { P0Event } from './progress.js';
 import type { P0State } from './state.js';
 import { putInStorage, stored } from './storage.js';
 
-export interface DecorItem { name: string; price: number; size: [number, number]; pieces: number; homestead: number; buy: boolean }
+export interface DecorItem { name: string; blurb: string; price: number; size: [number, number]; pieces: number; homestead: number; buy: boolean }
 export interface DecorYard { walk: [number, number, number, number]; blocked: [number, number, number, number][]; keep_clear: [number, number][] }
 /** A placed piece: x, y = its top-left cell; rot 1 turns a w × h piece to h × w. */
 export interface PlacedDecor { uid: number; id: string; x: number; y: number; rot: 0 | 1 }

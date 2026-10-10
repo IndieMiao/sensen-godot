@@ -27,6 +27,7 @@ describe('the Decor page (§9.11.6)', () => {
     for (const id of ['deco_planter', 'deco_lantern', 'deco_path', 'deco_bench', 'deco_scarecrow', 'deco_fence', 'deco_birdbath', 'deco_windmill', 'deco_fountain', 'deco_pergola'])
       expect(buy, id).toContain(id);
     expect(buy).not.toContain('recipe_stand');
+    for (const [id, d] of Object.entries(decorOf(c)!.items)) expect(d.blurb, id).toMatch(/^[A-Z][a-z]/);   // q(111): every row has its line
     expect(Object.values(decorOf(c)!.items).filter(d => d.buy).reduce((n, d) => n + d.price, 0)).toBe(1420);   // §9.15.2's catalog total
   });
 
