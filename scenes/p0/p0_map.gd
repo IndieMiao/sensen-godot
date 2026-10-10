@@ -751,12 +751,20 @@ func _travel_first(entry: Dictionary) -> bool:
 
 ## The fog's holes (§11.7.3): one round every explored city near the screen, a little wider than its radius, in the city
 ## view's pixels; the farthest at most MapFogLayer.MAX_HOLES. Asked each frame; projection only, no list work.
+## Rebuilt only when the camera or the explored list changes, so a still map costs nothing (SGODOT-260).
+var _fog_key := ""
+var _fog_holes: Array = []
+
 func fog_holes() -> Array:
 	if city_map == null: return []
 	var vp := get_viewport().get_visible_rect().size if is_inside_tree() else Vector2(360, 800)
+	var explored := P0Travel.explored(_view())
+	var key := "%.7f|%.7f|%.4f|%.2f|%.2f|%s|%d" % [center_lat, center_lng, zoom + _zoom_elastic, bearing, pitch, vp, explored.hash()]
+	if key == _fog_key: return _fog_holes
+	_fog_key = key
 	var scale := vp.y / _map_logical_height() * 512.0 * pow(2.0, zoom + _zoom_elastic)   # px per unit of Web Mercator
 	var out: Array = []
-	for cluster in P0Travel.explored(_view()):
+	for cluster in explored:
 		var c := P0Clusters.get_cluster(cluster)
 		if c.is_empty(): continue
 		var p = geo_to_screen(float(c.lat), float(c.lng))
@@ -767,6 +775,7 @@ func fog_holes() -> Array:
 		if not Rect2(Vector2.ZERO, vp).grow(r + 2.0).has_point(at): continue   # only holes that reach the screen
 		out.append({at = at, r = r})
 		if out.size() >= 64: break
+	_fog_holes = out
 	return out
 
 ## Going home from another city (q(108)): free and instant — `return_home`, then the farm as ever. Welcome home

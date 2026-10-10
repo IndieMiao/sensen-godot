@@ -30,12 +30,19 @@ func _ready() -> void:
 static func strength(zoom: float) -> float:
 	return clampf((CLEAR_ZOOM - zoom) / (CLEAR_ZOOM - FULL_ZOOM), 0.0, 1.0)
 
-## Holes in this layer's pixels and the zoom; hidden when the zoom clears it or the host has no fog.
+## Holes in this layer's pixels and the zoom; hidden when the zoom clears it or the host has no fog. The shader is only
+## fed when something changed (the same holes array, the same strength: nothing to do).
+var _applied: Array = []
+var _applied_k := -1.0
+
 func apply(new_holes: Array, zoom: float, enabled: bool) -> void:
-	holes = new_holes.slice(0, MAX_HOLES)
 	var k := strength(zoom) if enabled else 0.0
 	visible = k > 0.0
 	if not visible: return
+	if is_same(new_holes, _applied) and k == _applied_k and _mat.get_shader_parameter("size") == size: return
+	_applied = new_holes
+	_applied_k = k
+	holes = new_holes.slice(0, MAX_HOLES)
 	var packed: Array = []
 	for h in holes: packed.append(Vector4(h.at.x, h.at.y, float(h.r), 0.0))
 	while packed.size() < MAX_HOLES: packed.append(Vector4.ZERO)
