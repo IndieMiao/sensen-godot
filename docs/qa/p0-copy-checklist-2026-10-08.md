@@ -84,6 +84,7 @@
 | Cook Again ★ | 收走后点灶台：`Cook Again` / `Choose recipe ›`，第 2 锅 `Cooks today 2nd` / `Cooking XP Half`（q(48)） |
 | 保温柜 | 名字条 `Warming Cabinet 4/6`（q(62)）/ `Take one` / `Kept · Warming Cabinet 5/6` / `Cabinet full · Herb Grilled Fish sent to bag` / `Cabinet and bag full · dish left on the stove` / `Bag full · dish left on the stove` |
 | Cooking Lv4 之后 Today ★ | `3rd slot open · try Fine fish + Potato + Rock Salt`（q(46)） |
+| 钓鱼第二段 ★ | 亮片 `Spinner Lure`（`bait_lure`，账号每日 10 枚）；鱼笼 `Fish Trap`（`trap_fish`，放下后不占背包格），主行动键 `Set Trap · Free`（满 `Traps 1/1 · Fishing Lv8 adds 1`、本塘已有 `Trap already here`）；浮标 `Fish Trap · 2/3` / `· 3/3 · Full`；EntryCard `Collect 2 · Free` / `Take back`（`Collect · Creel full`、`Take back · Collect first`、`1 left in the trap`、`Fish Trap back in your bag`）；Today `Collect 3 fish · Fern Pond`；旧金山地区鱼 Arctic Char + Atlantic Salmon；Clover Pond 卡片写 `Coast`（q(109)） |
 
 ## 5. 矿洞
 
