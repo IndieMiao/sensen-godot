@@ -120,32 +120,13 @@ func _sync(list: Array) -> void:
 		if _solid.has(k) or not farm.bp.is_walkable(cells[k]): continue
 		farm.grid.set_solid(cells[k], true)
 		_solid[k] = cells[k]
-	_step_off()
 
-## A piece put down where the player stands: they come back on the nearest free cell by walking distance (不知火舞 on
-## 284: as the navigation goes, never over a fence), not inside the piece.
-func _step_off() -> void:
-	var here: Vector2i = farm.bp.world_to_cell(farm.actor.position)
-	if not _solid.has("%d,%d" % [here.x, here.y]): return
-	var to := nearest_free(here,
-		func(c: Vector2i) -> bool: return farm.bp.in_bounds(c) and farm.bp.is_walkable(c),   # through pieces, never a fence
-		func(c: Vector2i) -> bool: return not farm.grid.astar.is_point_solid(c))
-	if to.x >= 0: farm.actor.teleport(farm.bp.cell_to_world(to))
-
-## Breadth-first from `start` over 4-neighbours (the navigation's steps): through cells `passable` allows (the yard's
-## walkable ones, pieces included), the first that is `free`; (-1, -1) when none within `limit` cells.
-static func nearest_free(start: Vector2i, passable: Callable, free: Callable, limit := 400) -> Vector2i:
-	var seen := {start: true}
-	var queue: Array[Vector2i] = [start]
-	while not queue.is_empty() and seen.size() <= limit:
-		var c: Vector2i = queue.pop_front()
-		if c != start and bool(free.call(c)): return c
-		for d in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
-			var n: Vector2i = c + d
-			if seen.has(n) or not bool(passable.call(n)): continue
-			seen[n] = true
-			queue.append(n)
-	return Vector2i(-1, -1)
+## The cells the yard's pieces take (the sent ones too): the shell brings the player back off them when Decorate ends,
+## on the nearest free cell by walking (刘邦's P0Farm.free_cell_near, #261; 不知火舞 on 284).
+func taken_cells() -> Array:
+	var out: Array = []
+	for p in P0Decor.placed(_view()): out.append_array(P0Decor.cells(str(p.id), Vector2i(int(p.x), int(p.y)), int(p.get("rot", 0))))
+	return out
 
 ## The middle of a piece's cells on the ground.
 func centre(id: String, at: Vector2i, rot: int) -> Vector3:
@@ -344,7 +325,7 @@ func _end() -> void:
 	_held = false
 	_finger = Vector2.INF
 	_press = Vector2.INF
-	farm.placement_camera_end()
+	farm.placement_camera_end(taken_cells())   # the player fades back in off any piece (#261)
 	if is_instance_valid(_preview): _preview.queue_free()
 	_preview = null
 	_paint([], false)

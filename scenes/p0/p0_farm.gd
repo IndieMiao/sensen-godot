@@ -283,14 +283,7 @@ func _place_camera() -> void:
 	cam.keep_aspect = Camera3D.KEEP_WIDTH   # the old farm frames by width (portrait phones)
 	cam.size = FarmCamera.close_view_size(vp) * FarmCamera.P0_VIEW_K / _zoom
 	FarmCamera.place(cam, _focus + Vector3.UP * 0.7)
-	if _top > 0.0:   # placement's top-down view, or the 0.35 s turn into / out of it (284 v2 6a751a9a)
-		var k := _top_ease()
-		var pitch := deg_to_rad(lerpf(FarmCamera.PITCH_DEG, 90.0, k))
-		var yaw := deg_to_rad(lerpf(FarmCamera.YAW_DEG, 0.0, k))
-		var c := _focus + Vector3.UP * 0.7 * (1.0 - k)
-		cam.rotation = Vector3(-pitch, yaw, 0.0)
-		cam.position = c + cam.basis.z * FarmCamera.DISTANCE
-		cam.size = lerpf(cam.size, vp.x / _top_cell_px * bp.cell_m, k)   # KEEP_WIDTH: the size is the width in metres
+	if _top > 0.0: place_top(cam, _focus, _top_ease(), _top_cell_px, bp.cell_m)   # placement's top-down view (284 v2)
 	if _dev_yaw >= 0.0:   # P0_SHOT yaw comparison only (style doc asks 35–45°, the old farm uses 14.5°)
 		var c := _focus + Vector3.UP * 0.7
 		var pitch := deg_to_rad(FarmCamera.PITCH_DEG)
@@ -347,6 +340,7 @@ static func opening_shift(mark_y: float, feet_y: float, area: Rect2) -> float:
 
 func _follow(dt: float) -> void:
 	_fit_opening()
+	_step_actor_fade(dt)
 	if _top_left > 0.0:   # turning into / out of the top-down view
 		_top_left = maxf(0.0, _top_left - dt)
 		_top = _top_to if _top_left == 0.0 else lerpf(_top_from, _top_to, 1.0 - _top_left / PLACE_TURN_S)
@@ -399,6 +393,7 @@ func placement_camera_begin(spot: Vector3, cell_px := TOP_CELL_PX) -> void:
 	_placing_cam = true
 	_opening = false
 	_cam_follow.hold()
+	_actor_fade_to = 1.0   # no character while placing (user on 284 14e11a67): 0.2 s out, back on Done or Cancel
 	_top_cell_px = clampf(cell_px, TOP_CELL_MIN, TOP_CELL_MAX)
 	_turn(1.0)
 	_fly(Vector3(spot.x, _focus.y, spot.z))
@@ -409,9 +404,17 @@ func placement_camera_focus(spot: Vector3, cell_px := 0.0) -> void:
 	if cell_px > 0.0: _top_cell_px = clampf(cell_px, TOP_CELL_MIN, TOP_CELL_MAX)
 	_fly(Vector3(spot.x, _focus.y, spot.z), PICK_FLY_S)
 
-func placement_camera_end() -> void:
+## Done or Cancel. `taken`: the grid cells the piece just placed covers (none on Cancel); the player fades back in
+## where they stood, or on the nearest free cell by walking when it is one of those or now solid (不知火舞 on #261).
+func placement_camera_end(taken: Array = []) -> void:
 	if not _placing_cam: return
 	_placing_cam = false
+	var here := bp.world_to_cell(actor.position)
+	var to := free_cell_near(grid, here, taken)
+	if to != here:
+		var w := bp.cell_to_world(to)
+		actor.teleport(Vector3(w.x, actor.position.y, w.z))
+	_actor_fade_to = 0.0
 	_turn(0.0)
 	_fly(Vector3.INF)
 	placement_grid(Vector3.INF)
@@ -428,6 +431,57 @@ func _turn(to: float) -> void:
 	_top_left = PLACE_TURN_S
 
 func _top_ease() -> float: return smoothstep(0.0, 1.0, _top)
+
+## The player while placing (user on 284 14e11a67; 不知火舞 on #261): out in 0.2 s with its shadow, not drawn while
+## placing, in again in 0.2 s on leaving. A real-time shadow cannot be half there: it goes at the half-way point.
+const ACTOR_FADE_S := 0.2
+var _actor_fade := 0.0      # 0 shown … 1 gone
+var _actor_fade_to := 0.0
+var _actor_shadows := {}    # its meshes' own cast_shadow while faded, restored when it is whole again
+
+func _step_actor_fade(dt: float) -> void:
+	if _actor_fade == _actor_fade_to: return
+	_actor_fade = move_toward(_actor_fade, _actor_fade_to, dt / ACTOR_FADE_S)
+	actor.visible = _actor_fade < 1.0
+	for g in actor.find_children("*", "GeometryInstance3D", true, false):
+		var gi := g as GeometryInstance3D
+		var id := gi.get_instance_id()
+		if not _actor_shadows.has(id): _actor_shadows[id] = gi.cast_shadow
+		gi.transparency = _actor_fade   # 0 again leaves the transparent pipeline
+		gi.cast_shadow = _actor_shadows[id] if _actor_fade < 0.5 else GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	if _actor_fade == 0.0: _actor_shadows.clear()
+
+## The free cell nearest `from` by walking (4-way, like the paths): solid cells are walls, `taken` ones can be crossed
+## (the player walks out of the piece) but not stood on; `from` itself when it is free or nothing free is in reach.
+static func free_cell_near(g: BlueprintGrid, from: Vector2i, taken: Array, limit := 4096) -> Vector2i:
+	var seen := {from: true}
+	var queue: Array[Vector2i] = [from]
+	var i := 0
+	while i < queue.size() and i < limit:
+		var c := queue[i]
+		i += 1
+		if not taken.has(c) and not g.astar.is_point_solid(c): return c
+		for d in [Vector2i.RIGHT, Vector2i.LEFT, Vector2i.DOWN, Vector2i.UP]:
+			var n: Vector2i = c + d
+			if seen.has(n) or not g.bp.in_bounds(n) or g.astar.is_point_solid(n): continue
+			seen[n] = true
+			queue.append(n)
+	return from
+
+## The camera `k` of the way (0 the farm's 43° / 14.5°, 1 straight down with no yaw) to the top-down view over `focus`,
+## at `cell_px` pixels a `cell_m` cell when there: set from its Euler angles, so straight down needs no look_at up.
+static func place_top(camera: Camera3D, focus: Vector3, k: float, cell_px: float, cell_m: float) -> void:
+	var pitch := deg_to_rad(lerpf(FarmCamera.PITCH_DEG, 90.0, k))
+	var yaw := deg_to_rad(lerpf(FarmCamera.YAW_DEG, 0.0, k))
+	var c := focus + Vector3.UP * 0.7 * (1.0 - k)
+	camera.rotation = Vector3(-pitch, yaw, 0.0)
+	camera.position = c + camera.basis.z * FarmCamera.DISTANCE
+	var width := camera.get_viewport().get_visible_rect().size.x
+	camera.size = lerpf(camera.size, width / cell_px * cell_m, k)   # KEEP_WIDTH: the size is the width in metres
+
+## Pixels a cell after a pinch by `f` (< 1 fingers apart, zoom in), kept to 17–56.
+static func top_cell_after(cell_px: float, f: float) -> float:
+	return clampf(cell_px / maxf(f, 0.01), TOP_CELL_MIN, TOP_CELL_MAX)
 
 ## The placement grid on the ground (284 v2 §2): white cell lines within `radius` cells of `at`, fading out from 50%;
 ## Vector3.INF hides it. The shell's, so the sprinkler, the greenhouse and Decorate draw the same.
@@ -511,7 +565,7 @@ func _yard_clamp(f: Vector3) -> Vector3:
 func p0_zoom(f: float, at := Vector2.INF) -> void:
 	if _placing_cam:   # top-down: pixels a cell, 17–56, about the fingers (the ground under them stays put)
 		var before = ElasticZoom.ground_at(cam, at, _focus.y)
-		_top_cell_px = clampf(_top_cell_px / maxf(f, 0.01), TOP_CELL_MIN, TOP_CELL_MAX)
+		_top_cell_px = top_cell_after(_top_cell_px, f)
 		_place_camera()
 		var d := ElasticZoom.shift(before, ElasticZoom.ground_at(cam, at, _focus.y))
 		if d != Vector3.ZERO: _focus = _yard_clamp(_focus + d)
@@ -573,7 +627,9 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 		add_child(_decor)
 		rt.ui.decor_requested.connect(_on_decor_requested)
 	_decor.frame(v, dt)
-	if not _facilities.placing.is_empty() or not _decor.placing.is_empty(): return   # placement mode: no bed, key, card or prompt (q(23))
+	if not _facilities.placing.is_empty() or not _decor.placing.is_empty():   # placement mode: no bed, key, card or prompt (q(23))
+		_hi.visible = false   # the preview's green / red square is the one outline on a bed meanwhile
+		return
 	_pick_front(v)
 	# The key is Farming here even at the mine mouth: the mouth is tapped like any facility (SGODOT-266, user on 263 ③).
 	rt.ui.set_action(P0Logic.main_action(v, _front, rt.ui.selected_seed, _row))
@@ -921,7 +977,8 @@ func p0_dev(step: PackedStringArray) -> bool:
 		# the preview as a finger on that bed would; placeok / placecancel press the bar; placesecond:<label> shows its
 		# middle key, placereason:<text> / placeconfirm:<verb> set its reason and main key; factap:<id> taps a sprinkler.
 		"build": _facilities.begin_build(step[1] if step.size() > 1 else "craft_sprinkler")
-		"placeat": rt.ui.placement_point.emit(cam.unproject_position(bp.cell_to_world(P0Garden.cell_of(int(step[1]))) + Vector3(0, P0Garden.BED_H, 0)), "drag")
+		# a finger lifted there (release): a held one near a screen edge would keep panning the camera
+		"placeat": rt.ui.placement_point.emit(cam.unproject_position(bp.cell_to_world(P0Garden.cell_of(int(step[1]))) + Vector3(0, P0Garden.BED_H, 0)), "release")
 		"placeok": rt.ui.placement_done.emit(true)
 		"placecancel": rt.ui.placement_done.emit(false)
 		"placesecond": rt.ui.set_placement({"secondary": step[1] if step.size() > 1 else ""})   # the bar's middle key (Decorate's Rotate)

@@ -207,15 +207,16 @@ func _show_spot(v: Dictionary, id: int) -> void:
 func _on_done(ok: bool) -> void:
 	if placing.is_empty(): return
 	var p := placing
-	_end()
-	if not ok or not bool(p.get("ok", false)): return
+	var go := ok and bool(p.get("ok", false))
+	_end([P0Garden.cell_of(int(p.plot))] if go else [])   # the player steps off the bed the sprinkler takes
+	if not go: return
 	if int(p.facility) >= 0: rt.session.send({"type": "move_facility", "facility": int(p.facility), "plot": int(p.plot), "space": "home"})
 	else: rt.session.send({"type": "place", "recipe": str(p.recipe), "plot": int(p.plot), "space": "home"})
 
-func _end() -> void:
+func _end(taken: Array = []) -> void:
 	placing = {}
 	_finger = Vector2.INF
-	farm.placement_camera_end()
+	farm.placement_camera_end(taken)
 	if is_instance_valid(_preview): _preview.queue_free()
 	_preview = null
 	_paint([], [], false)
@@ -238,17 +239,27 @@ func _paint(centre: Array, cover: Array, bad: bool) -> void:
 		i += 1
 	for k in range(i, _cells.size()): (_cells[k] as MeshInstance3D).visible = false
 
+## A square on a bed: `tint` filled; the spot underfoot also wears a 2 px edge of its own colour, green or red
+## (不知火舞 on #261, 284 v2 §2: the fill alone read only as a darker bed); coverage squares have none.
 func _place_square(q: MeshInstance3D, id: int, tint: Color) -> void:
 	q.visible = true
 	q.position = _bed_top(id) + Vector3(0, 0.014, 0)
-	(q.material_override as StandardMaterial3D).albedo_color = tint
+	var m := q.material_override as ShaderMaterial
+	m.set_shader_parameter("fill", tint)
+	var edge := Color(0, 0, 0, 0)
+	if tint == OK_TINT: edge = UiTokens.COLOR_PRIMARY
+	elif tint == BAD_TINT: edge = UiTokens.COLOR_DANGER
+	m.set_shader_parameter("edge", edge)
 
 static func _square() -> MeshInstance3D:
 	var q := MeshInstance3D.new()
 	var m := PlaneMesh.new()
 	m.size = Vector2(0.9, 0.9)
 	q.mesh = m
-	q.material_override = _mat(COVER_TINT, true)
+	var mat := ShaderMaterial.new()
+	mat.shader = preload("res://scenes/p0/p0_place_cell.gdshader")
+	mat.set_shader_parameter("fill", COVER_TINT)
+	q.material_override = mat
 	q.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	return q
 
