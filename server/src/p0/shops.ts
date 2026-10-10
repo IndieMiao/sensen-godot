@@ -12,6 +12,7 @@ import { maxEnergy, skillLevel, untilRollover } from './rules.js';
 import type { P0State } from './state.js';
 import { missing, putInStorage, stored, takeStorageFirst } from './storage.js';
 import type { Refusal } from './fishing.js';
+import { climateAt } from './travel.js';
 
 /** The counter a command talks to; older clients send 'stall' or nothing for the Homestead Stall. */
 export function shopOf(raw: unknown): ShopId | null {
@@ -20,11 +21,19 @@ export function shopOf(raw: unknown): ShopId | null {
 }
 
 /** Everything a counter sells. */
-export function catalog(c: P0Content, shop: ShopId): string[] {
+/** What a counter sells. A Market also has the regional seed of its city's climate (§5.2.3: Pumpkin in San Francisco),
+ * between its goods and the City Specialty shelf: the place's city, else the one the player is in, else home. */
+export function catalog(c: P0Content, shop: ShopId, s?: P0State, place?: unknown): string[] {
   if (shop === 'homestead') return [...c.stall.buy, ...c.bag_upgrades.map(u => u.id)];
   if (shop === 'tackle') return c.tackle.buy;
-  if (shop === 'market') return [...c.market.buy, ...c.market.specialty];
+  if (shop === 'market') return [...c.market.buy, ...regionalSeeds(c, s, place), ...c.market.specialty];
   return [];
+}
+
+/** §5.2.3: a Market sells only its own climate's regional seed. */
+export function regionalSeeds(c: P0Content, s?: P0State, place?: unknown): string[] {
+  const zone = s ? climateAt(c, s, place) : c.profile.climate;
+  return c.crops.filter(x => x.regional && x.sold_at === 'market' && x.zone === zone).map(x => x.seed);
 }
 
 export interface Offer {
@@ -35,7 +44,7 @@ export interface Offer {
 
 export function offerOf(c: P0Content, id: string): Offer | null {
   const crop = cropBySeed(c, id);
-  if (crop) return { price: crop.seed_price, skill: 'farming', gate: crop.gate, daily: 0, to: 'bag', once: false, floor: false };
+  if (crop) return { price: crop.seed_price, skill: 'farming', gate: crop.gate, daily: crop.seed_daily ?? 0, to: 'bag', once: false, floor: false };
   const rod = rodById(c, id);
   if (rod) return { price: rod.price, skill: 'fishing', gate: rod.level, daily: 0, to: 'gear', once: true, floor: true };
   const hoe = c.tools.row_hoe;
@@ -61,10 +70,10 @@ export function walletNeed(c: P0Content, offer: { price: number; floor: boolean 
   return offer.floor ? coinsNeeded(c, cost) : cost;
 }
 
-export function buyItem(c: P0Content, s: P0State, cmd: { item?: unknown; qty?: unknown; shop?: unknown }, events: P0Event[]): Refusal | null {
+export function buyItem(c: P0Content, s: P0State, cmd: { item?: unknown; qty?: unknown; shop?: unknown; place?: unknown }, events: P0Event[]): Refusal | null {
   const shop = shopOf(cmd.shop), id = String(cmd.item ?? ''), qty = Number(cmd.qty ?? 1);
   if (!Number.isInteger(qty) || qty < 1 || qty > 99) return { code: 'bad_qty' };
-  if (!shop || !catalog(c, shop).includes(id)) return { code: 'bad_item' };
+  if (!shop || !catalog(c, shop, s, cmd.place).includes(id)) return { code: 'bad_item' };
   const offer = offerOf(c, id)!;
   if (offer.skill && skillLevel(c, s, offer.skill) < offer.gate)
     return { code: 'locked', detail: { skill: offer.skill, level: offer.gate, xp_to_go: c.skills[offer.skill][offer.gate - 1] - s.skills[offer.skill] } };

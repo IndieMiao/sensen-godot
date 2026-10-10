@@ -255,12 +255,14 @@ func refresh(view_: Dictionary, force := false) -> void:
 	if sheet.is_open(): sheet.refresh()
 	_quota.text = quota_text(view, role, grid.selected_id if sheet.is_open() else "")
 
-## The offers on the current page: the Buy shelf, or the market's City Specialty shelf (content market.specialty).
+## The offers on the current page: the market's City Specialty shelf (content market.specialty), or the Buy shelf —
+## everything else the server lists, which on a Market includes its city's regional seed (P1 §5.2.3).
 func offers() -> Array:
 	var all: Array = view.get("shops", {}).get(role, {}).get("buy", [])
 	if role != "market": return all
-	var listed: Array = P0Logic.content().get("market", {}).get("specialty" if section == "specialty" else "buy", [])
-	return all.filter(func(o): return listed.has(str(o.get("id", ""))))
+	var specialty: Array = P0Logic.content().get("market", {}).get("specialty", [])
+	var want := section == "specialty"
+	return all.filter(func(o): return specialty.has(str(o.get("id", ""))) == want)
 
 func _fill_shelf() -> void:
 	var list := offers()

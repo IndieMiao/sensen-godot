@@ -76,6 +76,14 @@ export const freshTravel = (c: P0Content): TravelState => {
   return { home, here: home, passes: {}, visits: {}, stamps: [], fallback: fallbackOf(c), explorer: 0 };
 };
 
+/** The climate zone (`Temperate`, as profile.climate) of a place's city, or of the city the player is in; home's when
+ * the clusters are absent. */
+export function climateAt(c: P0Content, s: P0State, place?: unknown): string {
+  const cluster = (typeof place === 'string' && place !== '' ? clusterOf(c, place) : null) ?? s.travel?.here;
+  const z = cluster ? clusterById(c, cluster)?.climate : undefined;
+  return z ? z[0].toUpperCase() + z.slice(1) : c.profile.climate;
+}
+
 /** Distance from the home farm and the Trip band, by CityClusters.trip (the same rule as the client's P0Clusters). */
 export function tripOf(c: P0Content, s: P0State, cluster: string): { km: number; trip: number; name: string } {
   const at = farmPoint(c), cl = clusters(c);

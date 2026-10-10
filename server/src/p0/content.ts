@@ -15,6 +15,9 @@ export interface Crop {
   tier: number; energy: number; level: number; gate: number;
   seed_price: number; grow_h: number; yield: number; price: number; xp: number; first_xp: number;
   ingr: [Family, number];
+  /** P1 (content/farm_crops.json, §5.2.3): where the seed is sold; a regional crop's climate zone (`Temperate`, as
+   * profile.climate), its open-field time away from that zone, and how many of its seeds one player may buy a day. */
+  sold_at?: 'stall' | 'market'; regional?: boolean; zone?: string; off_zone_grow_h?: number; seed_daily?: number;
 }
 
 export interface Fish { id: string; name: string; rarity: number; level: number; price: number; cook?: boolean; where: string[] }
