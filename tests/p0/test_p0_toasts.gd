@@ -170,8 +170,8 @@ func test_the_counter_and_kitchen_name_their_decision_areas() -> void:
 	assert_object(c.action_area()).is_null()
 	c.free()
 
-## q(123): Harvest All's row the bag took in part — the result line takes the crops' place (`Harvest 3 of 5 · bag full`,
-## no `+3 Radish` beside it), the XP stays, the Error toast points at the stall with Open bag, and the hold stops.
+## q(123): Harvest All's row the bag took in part — three lines, the result over the crops and the XP (`Harvest 3 of 5 ·
+## bag full` / `+3 Radish` / `+6 XP · 3 plants`; 不知火舞 on #269), the Error toast to the stall with Open bag, the hold stops.
 func test_a_harvest_all_row_the_bag_took_in_part_says_how_far_it_got() -> void:
 	var rt: P0Runtime = auto_free(P0Runtime.new())
 	rt.ui.quick_store = STORE
@@ -191,8 +191,10 @@ func test_a_harvest_all_row_the_bag_took_in_part_says_how_far_it_got() -> void:
 	rt._on_state(v, events)
 	await get_tree().process_frame
 	var texts := rt.ui.root.get_children().filter(func(c): return c is UiFloatText and not c.is_queued_for_deletion()).map(func(f): return f.text)
-	assert_array(texts).contains(["Harvest 3 of 5 · bag full"])
-	assert_bool(texts.any(func(t): return "Radish" in t)).is_false()
+	assert_array(texts).contains(["Harvest 3 of 5 · bag full", "+3 Radish"])
+	var lines := rt.ui.root.get_children().filter(func(c): return c is UiFloatText and not c.is_queued_for_deletion())
+	var top: UiFloatText = lines.reduce(func(a, b): return a if a.position.y < b.position.y else b)
+	assert_str(top.text).is_equal("Harvest 3 of 5 · bag full")   # the result is the top line
 	assert_array(texts).contains(["+6 XP · 3 plants"])   # one plant per XP event, not the reply's three each
 	assert_str(rt.ui.toast_text()).is_equal("Bag 25/25 · Sell at Homestead Stall")
 	assert_str(rt.ui._toasts.current_action()).is_equal("Open bag")

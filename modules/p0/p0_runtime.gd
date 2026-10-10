@@ -585,11 +585,11 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	# (seeds otherwise float nothing): `Seed Saver · +1 Radish Seeds`, or `Seed Saver · +2 seeds` for different kinds.
 	var saved := seed_saver_line(v, events.filter(func(e): return str(e.get("kind", "")) == "seed_saved" and not hushed.call(e)))
 	if not saved.is_empty(): floats.append(saved)
-	# Harvest All with a nearly full bag (q(123)): what fitted went in, the rest stays ripe. The row's result takes the
-	# place of its crops' line, as E-04's interrupted harvest reads (`Harvest 3 of 5 · bag full`), and the hold stops.
+	# Harvest All with a nearly full bag (q(123)): what fitted went in, the rest stays ripe. The row's result is a line
+	# of its own over the XP and the crops (`Harvest 3 of 5 · bag full` / `+3 Radish` / `+6 XP · 3 plants`, E-04 and
+	# 289 HARVEST-ROW-3; 不知火舞 on #269), and the hold stops.
 	var short: Array = events.filter(func(e): return str(e.get("kind", "")) == "harvest_short")
 	if not short.is_empty():
-		floats = floats.filter(func(p): return not (str(p.get("kind", "")) == "item" and str(p.get("key", "")).begins_with("crop_")))
 		floats.append(harvest_result(int(short[0].get("got", 0)), int(short[0].get("of", 0))))
 		_harvest_stopped(v)
 	# Any catch resets what is held: a player who left the pond mid-arc never let the last fish's floats rise, and an
@@ -757,7 +757,7 @@ func _harvest_bag_full() -> void:
 
 ## The harvest's result line when the bag filled: `Harvest 3 of 5 · bag full` (E-04; Harvest All's row, q(123)).
 static func harvest_result(got: int, of: int) -> Dictionary:
-	return {kind = "item", key = "bag_full", text = "Harvest %d of %d · bag full" % [got, of], tone = UiFloatText.Tone.ITEM}
+	return {kind = "result", key = "bag_full", text = "Harvest %d of %d · bag full" % [got, of], tone = UiFloatText.Tone.ITEM}
 
 ## The bag filled: the Error toast to the stall with `Open bag ›`, and the held key lets go.
 func _harvest_stopped(v: Dictionary) -> void:

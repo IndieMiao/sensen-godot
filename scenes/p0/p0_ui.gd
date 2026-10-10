@@ -1112,7 +1112,7 @@ func _float_floor(x: float, half_w: float) -> float:
 
 # ---------------------------------------------------------------- one reply's floats (q(49) ①, §4.8.6)
 ## The order of one reply's lines: Energy → XP → items → coins → affinity (q(49) ①).
-const FLOAT_ORDER := ["energy", "xp", "first", "item", "saved", "request", "coins", "affinity"]   # request: `Pond Catch 1/2` (q(103)); saved: Seed Saver's own line after the harvest's items (q(118))
+const FLOAT_ORDER := ["energy", "xp", "first", "item", "saved", "request", "coins", "affinity", "result"]   # request: `Pond Catch 1/2` (q(103)); saved: Seed Saver's own line after the harvest's items (q(118)); result: a harvest the bag stopped, `Harvest 3 of 5 · bag full`, over its items (E-04, q(123))
 ## Kinds a later reply adds into while their line is up: XP (`+40 XP · 20 plants`, §4.8.3 XP 入账). Items, Energy and
 ## coins float per reply (each plot's `+1 Radish`, each bed's `−2 Energy`).
 const FLOAT_MERGE_KINDS := ["xp"]
