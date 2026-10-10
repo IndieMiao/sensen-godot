@@ -60,6 +60,45 @@ func card_pick(marks: Dictionary) -> String:
 		return mine
 	return n
 
+## 不知火舞 02ad95bc ①: stove buttons closer than 44 px (centre to centre) overlap, and an open strip covers the others.
+## Then they go in one row above the hearth, 1 / 2 / 3 left to right, 44 apart, centred on their middle; the open
+## strip keeps its stove's place in the row and the buttons on either side step out past it.
+const STOVE_ROW_GAP := 44.0
+func _marker_spots(spots: Dictionary) -> Dictionary:
+	var shown: Array = []
+	for i in STOVES.size(): if spots.has(STOVES[i]): shown.append(i)
+	if shown.size() < 2: return spots
+	var crowded := false
+	for a in shown.size():
+		for b in range(a + 1, shown.size()):
+			if (spots[STOVES[shown[a]]] as Vector2).distance_to(spots[STOVES[shown[b]]]) < STOVE_ROW_GAP: crowded = true
+	if not crowded: return spots
+	return stove_row(spots, shown, STOVES.find(_card) if stove_of(_card) >= 0 else -1, _strip_w)
+
+var _strip_w := 0.0   # the open stove strip's width last frame (the row steps out past it)
+
+## The row (pure, tested): centred on the stoves' mean x, at their highest y; the open one's neighbours sit half the
+## strip's width plus a gap away from it.
+static func stove_row(spots: Dictionary, shown: Array, open: int, strip_w: float) -> Dictionary:
+	var out := spots.duplicate()
+	var cx := 0.0
+	var top := INF
+	for i in shown:
+		cx += (spots[STOVES[i]] as Vector2).x
+		top = minf(top, (spots[STOVES[i]] as Vector2).y)
+	cx /= float(shown.size())
+	var xs: Array = []
+	var x := 0.0
+	for k in shown.size():
+		if k > 0:
+			var step := STOVE_ROW_GAP
+			if shown[k - 1] == open or shown[k] == open: step = maxf(step, strip_w * 0.5 + STOVE_ROW_GAP * 0.5 + 4.0)
+			x += step
+		xs.append(x)
+	var mid: float = (xs[0] + xs[-1]) * 0.5
+	for k in shown.size(): out[STOVES[shown[k]]] = Vector2(cx + xs[k] - mid, top)
+	return out
+
 ## The hearth's box takes the tap for every stove on it (int6 C8): with several, the pot nearest the finger wins.
 func pick(screen: Vector2) -> String:
 	var n := super(screen)
@@ -119,7 +158,8 @@ func _marker(n: String, v: Dictionary) -> Dictionary:
 	var left := float(st.get("ready_in", 0))
 	if left <= 0.0:   # the ready mark takes the icon's place; the strip names the dish
 		var dish = st.get("dish", null)
-		return stove.merged({fact = P0Logic.item_name(v, str(dish)) if dish != null else "Unknown dish", badge = "ready"})
+		# Ready to collect: the strip shows the Ready StatusBadge (22) in the pot's place (LOCK-07 v2, 不知火舞 02ad95bc ③).
+		return stove.merged({fact = P0Logic.item_name(v, str(dish)) if dish != null else "Unknown dish", badge = "ready", strip_badge = true})
 	return stove.merged({fact = "Cooking " + P0Logic.duration(left), badge = "countdown"})
 
 func _on_facility(n: String) -> void:
@@ -214,6 +254,9 @@ func _room_frame(v: Dictionary, _dt: float) -> void:
 	if kitchen.phase == "idle" and kitchen.stage.is_cooking() != cooking: kitchen.stage.set_cooking(cooking)
 	if kitchen.phase == "serve" and st == null and kitchen.waiting_events(): kitchen.on_collected()   # refused as empty
 	_remind_heat(v)
+	if rt and stove_of(_card) >= 0:   # the open strip's width, for the row's next layout (①)
+		var bar = rt.ui._name_bars.get("room:" + _card)
+		_strip_w = (bar as Control).size.x if bar != null and (bar as Control).visible else 0.0
 
 ## Several stoves (b84a5e01 ④): a second before a ring comes up on a stove the player is not working, that stove's
 ## prompt grows 1.15× and back and the phone buzzes once; with the camera pushed in on another pot an arrow with an
@@ -241,7 +284,8 @@ func _show_edge(i: int) -> void:
 	if from == null or to == null or rt == null: return
 	var left := cam.unproject_position(to.global_position).x < cam.unproject_position(from.global_position).x
 	if _edge and is_instance_valid(_edge): _edge.queue_free()
-	_edge = _EdgeHint.new(left, P0Logic.icon("pot"))
+	var y := cam.unproject_position(to.global_position).y   # at that stove's height on screen (不知火舞 02ad95bc ⑤)
+	_edge = _EdgeHint.new(left, P0Logic.icon("pot"), y)
 	_edge.theme = UiKit.theme()
 	rt.ui.root.add_child(_edge)
 	(_edge as _EdgeHint).tapped.connect(func(): _switch_to(i))
@@ -255,35 +299,44 @@ func _switch_to(i: int) -> void:
 	open_stove("cookbook", true)
 
 class _EdgeHint extends Control:
+	## 不知火舞 02ad95bc ⑤: a 36 px solid round button (1 px edge, the world icon button's shadow) with the i-pot and a
+	## chevron toward that stove, 8 px in from the stage's edge, at the stove's height; it pulses once, then fades.
 	signal tapped
+	const SIZE := 36.0
+	const INSET := 8.0
 	var _left := false
-	func _init(left: bool, icon: Texture2D) -> void:
+	var _y := 0.0
+	func _init(left: bool, icon: Texture2D, y: float) -> void:
 		_left = left
+		_y = y
 		set_anchors_preset(Control.PRESET_FULL_RECT)
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
-		var b := PanelContainer.new()
+		var b := Panel.new()
+		b.name = "EdgeButton"
 		b.mouse_filter = Control.MOUSE_FILTER_STOP
-		b.modulate.a = 0.85
-		b.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_SURFACE, UiTokens.RADIUS_PILL).with_margins(8, 6, 8, 6))
-		var row := HBoxContainer.new()
-		row.add_theme_constant_override(&"separation", 2)
-		row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		var arrow := UiKit.label("‹" if left else "›", UiTokens.STYLE_C14_XB)
-		var ic := UiKit.icon(icon, 20.0)
-		if left:
-			row.add_child(arrow); row.add_child(ic)
-		else:
-			row.add_child(ic); row.add_child(arrow)
-		b.add_child(row)
+		b.size = Vector2(SIZE, SIZE)
+		b.pivot_offset = b.size * 0.5
+		var box := UiStyleBox.make(UiTokens.COLOR_SURFACE, SIZE * 0.5, UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT)
+		box.shadow_color = UiTokens.COLOR_SHADOW_FLOAT
+		box.shadow_size = UiTokens.SIZE_SHADOW_FLOAT_RADIUS
+		box.shadow_offset = Vector2(0, UiTokens.SIZE_SHADOW_FLOAT_OFFSET_Y)
+		b.add_theme_stylebox_override(&"panel", box)
+		var ic := UiKit.icon(icon, 18.0)
+		ic.position = Vector2(SIZE * 0.5 - 9.0 + (2.0 if left else -2.0), SIZE * 0.5 - 9.0)
+		ic.size = Vector2(18, 18)
+		ic.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		b.add_child(ic)
+		var chev := UiKit.label("‹" if left else "›", UiTokens.STYLE_C12_B, UiTokens.COLOR_SECONDARY)
+		chev.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		chev.position = Vector2(2.0 if left else SIZE - 10.0, SIZE * 0.5 - 9.0)
+		b.add_child(chev)
 		add_child(b)
 		b.gui_input.connect(func(e: InputEvent):
 			if P0Ui.is_tap(e):
 				tapped.emit()
 				queue_free())
 		resized.connect(func():
-			var m := b.get_combined_minimum_size()
-			b.size = m
-			b.position = Vector2(UiTokens.SPACE_PAGE if _left else size.x - m.x - UiTokens.SPACE_PAGE, size.y * 0.32 - m.y * 0.5))
+			b.position = Vector2(INSET if _left else size.x - SIZE - INSET, clampf(_y - SIZE * 0.5, INSET, size.y - SIZE - INSET)))
 		var t := create_tween()
 		t.tween_property(b, "scale", Vector2.ONE * 1.15, 0.12)
 		t.tween_property(b, "scale", Vector2.ONE, 0.2)

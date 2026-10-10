@@ -150,3 +150,37 @@ func test_a_legendary_page_shows_the_buff_capsule_on_the_state_line() -> void:
 	var nav: Control = d.get("_recipe_nav")
 	for other in [b, nav]:
 		if (other as Control).visible: assert_bool(cap.get_global_rect().intersects((other as Control).get_global_rect())).is_false()
+
+## 不知火舞 02ad95bc ①: stove buttons that crowd (< 44 px apart) go in a row 1 / 2 / 3, 44 apart, centred; the open
+## strip's neighbours step out past half its width.
+func test_crowded_stove_buttons_go_in_a_row() -> void:
+	var FH := preload("res://scenes/p0/rooms/p0_farmhouse.gd")
+	var spots := {"use_stove_1": Vector2(92, 309), "use_stove_2": Vector2(105, 317), "use_stove_3": Vector2(115, 300)}
+	var row: Dictionary = FH.stove_row(spots, [0, 1, 2], -1, 0.0)
+	assert_float(row.use_stove_1.y).is_equal(300.0)
+	assert_float(row.use_stove_2.x - row.use_stove_1.x).is_equal(44.0)
+	assert_float(row.use_stove_3.x - row.use_stove_2.x).is_equal(44.0)
+	assert_float((row.use_stove_1.x + row.use_stove_3.x) * 0.5).is_equal_approx((92.0 + 105.0 + 115.0) / 3.0, 0.01)
+	var open: Dictionary = FH.stove_row(spots, [0, 1, 2], 1, 160.0)   # stove 2's strip is 160 wide
+	assert_float(open.use_stove_2.x - open.use_stove_1.x).is_equal(106.0)   # 80 + 22 + 4
+	assert_float(open.use_stove_3.x - open.use_stove_2.x).is_equal(106.0)
+
+## ④: the pot card's corner tag (`×2` with Double on) shows in its top right and takes no layout room.
+func test_pot_card_tag_sits_in_the_corner() -> void:
+	var card := UiPotCard.new()
+	card.theme = UiKit.theme()
+	add_child(auto_free(card))
+	card.set_slots([UiPotSlot.new(UiPotSlot.State.FILLED)])
+	card.show_result("Grilled Crucian", 1, "4 s")
+	await _settle()
+	var before := card.get_combined_minimum_size()
+	card.tag = "×2"
+	await _settle()
+	assert_vector(card.get_combined_minimum_size()).is_equal(before)
+	var r := card.tag_rect()
+	assert_bool(r.has_area()).is_true()
+	assert_bool(Rect2(Vector2.ZERO, card.size).encloses(r)).is_true()
+	assert_float(r.end.x).is_greater(card.size.x - 20.0)
+	assert_float(r.position.y).is_less(10.0)
+	card.tag = ""
+	assert_bool(card.tag_rect().has_area()).is_false()

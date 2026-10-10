@@ -168,6 +168,7 @@ func open(tab := "cookbook", page_id := "") -> void:
 	drawer.stove_index = stove_index
 	drawer.stove_cycle_requested.connect(_cycle_stove)
 	drawer.unavailable.connect(func(r: String): rt.ui.toast(r))   # a grey Double says why (b84a5e01 ③)
+	drawer.double_changed.connect(func(_on: bool): _refresh_overlay())   # ×2 on the slots and the card (02ad95bc ④)
 	drawer.safe_bottom = rt.ui.safe_bottom()
 	drawer.close_requested.connect(func(): rt.ui.close_modal())
 	drawer.page_selected.connect(_on_page)
@@ -384,6 +385,7 @@ func _refresh_overlay() -> void:
 		if not page.is_empty(): result = P0KitchenLogic.page_preview(v, page)
 	_pot_card.set_slots(slots)
 	_pot_card.show_result(result.title, result.rarity, result.time)
+	_pot_card.tag = "×2" if drawer.is_double() and drawer.big_pot_shown() else ""
 	_pot_card.visible = not slots.is_empty()
 	_place_overlay.call_deferred()
 

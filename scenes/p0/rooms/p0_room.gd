@@ -888,12 +888,16 @@ func _markers(v: Dictionary) -> void:
 		var m := _marker(n, v)
 		if not m.is_empty(): marks[n] = m
 	card_pick(marks)
+	var spots := {}
+	for n in marks:
+		var at := anchor(n).global_position + _hit_lift(n) * 1.1
+		var badge_at := anchor("badge_" + (P0RoomAnchors.object_of(n) if P0RoomAnchors.object_of(n) != "" else n))   # badge_exit for the door
+		spots[n] = cam.unproject_position(badge_at.global_position if badge_at else at)
+	spots = _marker_spots(spots)
 	for n in marks:
 		var m: Dictionary = marks[n]
 		var id: String = "room:" + n
-		var at := anchor(n).global_position + _hit_lift(n) * 1.1
-		var badge_at := anchor("badge_" + (P0RoomAnchors.object_of(n) if P0RoomAnchors.object_of(n) != "" else n))   # badge_exit for the door
-		var screen := cam.unproject_position(badge_at.global_position if badge_at else at)
+		var screen: Vector2 = spots[n]
 		var state := badge_state(str(m.get("badge", "")))
 		var kind := str(m.get("kind", ""))
 		now[id] = kind
@@ -919,6 +923,9 @@ func _markers(v: Dictionary) -> void:
 			"npc": rt.ui.npc_tag(id, "", Vector2.ZERO, false)
 		if rt.ui.has_method("badge"): rt.ui.call("badge", id, 0, Vector2.ZERO, false)
 	_shown = now
+
+## Where each prompt sits on screen ({anchor name: point}); a room may spread prompts that crowd (the farmhouse's stoves).
+func _marker_spots(spots: Dictionary) -> Dictionary: return spots
 
 ## UiStatusBadge.State for a STATE-ICONS key, or -1 (unknown key, or the badge component is not in this build).
 static func badge_state(key: String) -> int:

@@ -47,6 +47,10 @@ var queue_mode := false: set = set_queue_mode
 ## Which stove this drawer is for (0-based; the heading, Stove busy and the pot all read it).
 var stove_index := 0: set = set_stove_index
 var _stove_pill: PanelContainer
+const _PILL_H := 28.0                    # Stove n/N › pill (Figma 2152:33666): 28 high, 10 / 8 side padding, radius 12
+const _PILL_PAD := Vector2(10.0, 8.0)
+const _PILL_RADIUS := 12.0
+const _PILL_EDGE := Color("E1DAC8")
 ## Big Pot Double (Homestead Lv6, b84a5e01 ③; COOK-DOUBLE-BOOK-ON 2149:136516): remembered per stove; the Cookbook card
 ## has it under Cook (right-aligned, its own row), Experiment left of Cook on the cook row.
 var doubles := {}   # stove index → on
@@ -54,6 +58,8 @@ var _book_double: _DoubleToggle
 var _exp_double: _DoubleToggle
 const _DOUBLE_ROW := 32.0
 signal unavailable(reason: String)
+## Double was switched (the pot card above the drawer shows ×2 on its slots and its corner tag).
+signal double_changed(on: bool)
 
 var _stove: Label
 var _level: Label
@@ -124,10 +130,14 @@ func refresh() -> void:
 	var h := P0KitchenLogic.header(view, stove_index)
 	var several := P0KitchenLogic.stove_count(view) > 1
 	_stove.text = h.stove + (" ›" if several else "")
-	if _stove_pill:   # a pill only when there is another stove to go to (COOK-STOVES 2152:33518)
+	if _stove_pill:   # a pill only when there is another stove to go to (COOK-STOVES 2152:33518; 不知火舞 02ad95bc ②)
 		_stove_pill.mouse_filter = Control.MOUSE_FILTER_STOP if several else Control.MOUSE_FILTER_IGNORE
-		(_stove_pill.get_theme_stylebox(&"panel") as UiStyleBox).border_color = UiTokens.COLOR_BORDER if several else Color.TRANSPARENT
-		(_stove_pill.get_theme_stylebox(&"panel") as UiStyleBox).bg_color = UiTokens.COLOR_SURFACE if several else Color.TRANSPARENT
+		var box := _stove_pill.get_theme_stylebox(&"panel") as UiStyleBox
+		box.border_color = _PILL_EDGE if several else Color.TRANSPARENT
+		box.bg_color = UiTokens.COLOR_SURFACE if several else Color.TRANSPARENT
+		box.content_margin_left = _PILL_PAD.x if several else 0.0
+		box.content_margin_right = _PILL_PAD.y if several else 0.0
+		_stove_pill.custom_minimum_size.y = _PILL_H if several else 0.0
 	_level.text = h.level
 	_state.text = h.state
 	var count: Label = _modes.tabs()[0].find_child("Count", true, false)
@@ -160,11 +170,10 @@ func _heading() -> Control:
 	_state = UiKit.label("", UiTokens.STYLE_C11_B, UiTokens.COLOR_SECONDARY)
 	# `Stove 2/3 ›` is a tappable pill once there are several stoves (white, 1 px outline); with one it reads as before.
 	_stove_pill = PanelContainer.new()
-	var pill := UiStyleBox.make(Color.TRANSPARENT, UiTokens.RADIUS_PILL, Color.TRANSPARENT, UiTokens.STROKE_DEFAULT)
-	pill.content_margin_left = 0.0
-	pill.content_margin_right = 0.0
+	var pill := UiStyleBox.make(Color.TRANSPARENT, _PILL_RADIUS, Color.TRANSPARENT, UiTokens.STROKE_DEFAULT)
 	_stove_pill.add_theme_stylebox_override(&"panel", pill)
 	_stove_pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_stove_pill.size_flags_vertical = Control.SIZE_SHRINK_CENTER   # 28 high, centred in the heading row (2152:33666)
 	_stove_pill.gui_input.connect(func(e: InputEvent): if P0Ui.is_tap(e): stove_cycle_requested.emit())
 	_stove_pill.add_child(_stove)
 	row.add_child(_stove_pill)
@@ -542,7 +551,8 @@ func _make_double() -> _DoubleToggle:
 	t.visible = false
 	t.toggled.connect(func(on: bool):
 		doubles[stove_index] = on
-		refresh())
+		refresh()
+		double_changed.emit(on))
 	t.refused.connect(func(r: String): unavailable.emit(r))
 	return t
 
