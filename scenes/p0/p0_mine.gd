@@ -57,7 +57,7 @@ var _slash_t := INF       # seconds since it began
 ## the clip poses it — the blade across the knuckles to the thumb side (the bone's +Y), its edge along the fingers (+X).
 const CombatArt := preload("res://modules/mining/combat_art.gd")
 const HAND_BONE := "Wrist_R"
-const GRIP_ALONG := 0.07    # the grip's centre from the wrist toward the fingers (m)
+const GRIP_ALONG := 0.085   # the grip's centre from the wrist toward the fingers (m)
 const GRIP_PALM := -0.02    # … and toward the palm (the bone's −Z)
 const SWORD_GRIP_Y := 0.17  # the sword model's grip centre over its origin (combat_art: handle 0.045–0.295)
 const SWORD_SCALE := 0.65
