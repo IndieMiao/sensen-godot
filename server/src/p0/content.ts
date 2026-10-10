@@ -164,8 +164,9 @@ export interface P0Content {
   };
   /** §13.4 P0 workbench: Tools / Supplies (SGODOT-231), Facilities from P1. */
   workbench: { tabs: string[]; recipes: WorkbenchRecipe[] };
-  /** P1 (SGODOT-239): plot id → [col, row] on the garden grid; `extra` plots come with a Homestead unlock, as wild. */
-  garden: { plots: [number, number][]; extra: { unlock: string; from: number; count: number } };
+  /** P1 (SGODOT-239, content/farm_garden.json): plot id → [col, row] on the garden grid; from Homestead level `extra.homestead`
+   * the homestead has `count` more plots from id `from`, added as wild. */
+  garden: { plots: [number, number][]; extra: { homestead: number; from: number; count: number } };
   /** P1 (SGODOT-239): facilities by kind; grow_cut_cap caps a facility's cut and Compost's together. */
   facilities: { grow_cut_cap: number; kinds: Record<string, FacilityDef> };
 }

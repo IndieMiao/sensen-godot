@@ -7,7 +7,6 @@
  */
 import type { P0Content, WorkbenchRecipe } from './content.js';
 import type { Refusal } from './fishing.js';
-import { unlocked } from './homestead.js';
 import type { P0Event } from './progress.js';
 import { skillLevel } from './rules.js';
 import type { Facility, P0State, Plot } from './state.js';
@@ -52,10 +51,10 @@ export function growMs(c: P0Content, s: P0State, plot: Plot, grow_h: number): nu
   return Math.round(grow_h * 3_600_000 * (1 - Math.min(cut, c.facilities.grow_cut_cap)));
 }
 
-/** Plots the current Homestead level has: P0's 30, 40 from the unlock (q(59) §1.1). */
+/** Plots the current Homestead level has: P0's 30, 40 from Homestead Lv3 (q(59) §1.1). */
 export function plotCount(c: P0Content, s: P0State): number {
-  const extra = c.garden.extra;
-  return unlocked(c, s, extra.unlock) ? extra.from + extra.count : c.start.tilled_plots + c.start.wild_plots;
+  const extra = c.garden?.extra;
+  return extra && s.homestead.level >= extra.homestead ? extra.from + extra.count : c.start.tilled_plots + c.start.wild_plots;
 }
 
 /** Add the plots the Homestead level brings and does not have yet, as wild; the ids added (an upgrade, or a save

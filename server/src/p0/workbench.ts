@@ -51,7 +51,9 @@ export function craft(c: P0Content, s: P0State, cmd: { recipe?: unknown; space?:
 /** B2-06 facts per recipe: costs with storage and bag apart, the gate, owned / equipped, and the first block. */
 export function workbenchView(c: P0Content, s: P0State) {
   return {
-    tabs: c.workbench.tabs,
+    // The tabs the recipes use, in order (P1: content/farm_garden.json's Sprinkler adds Facilities without changing the
+    // main table's list; fragments add, never change an entry, SGODOT-275).
+    tabs: [...new Set([...c.workbench.tabs, ...c.workbench.recipes.map(r => r.tab)])],
     recipes: c.workbench.recipes.map(r => {
       const block = craftBlock(c, s, r);
       return {

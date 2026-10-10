@@ -1756,8 +1756,7 @@
           "warming_cabinet",
           "bag_upgrade_1",
           "board_slot_3",
-          "fence",
-          "plots_40"
+          "fence"
         ]
       }
     ]
@@ -2152,11 +2151,10 @@
     }
   },
   "workbench": {
-    "_note": "SGODOT-231 §13.4, P0 tabs Tools / Supplies only (q(31)). Costs come from Farm Storage first, then the bag. Supplies go to the bag (no room → not crafted, q(44)); the Copper Pickaxe goes to Gear (Equip there); Gather Gloves work at once. Compost needs Farming Lv3 like the stall (q(44)). P1 (SGODOT-239): the Facilities tab; a `to: field` recipe is built in place (the place command: one step, q(22)), never crafted into the bag.",
+    "_note": "SGODOT-231 §13.4, P0 tabs Tools / Supplies only (q(31)). Costs come from Farm Storage first, then the bag. Supplies go to the bag (no room → not crafted, q(44)); the Copper Pickaxe goes to Gear (Equip there); Gather Gloves work at once. Compost needs Farming Lv3 like the stall (q(44)).",
     "tabs": [
       "tools",
-      "supplies",
-      "facilities"
+      "supplies"
     ],
     "recipes": [
       {
@@ -2230,216 +2228,7 @@
           "farming",
           3
         ]
-      },
-      {
-        "id": "craft_sprinkler",
-        "tab": "facilities",
-        "out": "facility_sprinkler",
-        "qty": 1,
-        "to": "field",
-        "cost": [
-          [
-            "wood",
-            8
-          ],
-          [
-            "stone",
-            6
-          ],
-          [
-            "copper_ore",
-            3
-          ]
-        ],
-        "gate": [
-          "farming",
-          6
-        ],
-        "facility": "sprinkler"
       }
     ]
-  },
-  "garden": {
-    "_note": "P1 step 1 (q(59), SGODOT-239): the plot grid, shared by the server (sprinkler coverage) and the client (P0Garden places plot [col, row] at PLOT_ORIGIN + 2 × [col, row]). 0–29 are P0's 6 × 5 and never move; 30–39 are the two new columns on the right, row by row. `extra` = the plots the Homestead unlock adds, as wild.",
-    "plots": [
-      [
-        0,
-        0
-      ],
-      [
-        1,
-        0
-      ],
-      [
-        2,
-        0
-      ],
-      [
-        3,
-        0
-      ],
-      [
-        4,
-        0
-      ],
-      [
-        5,
-        0
-      ],
-      [
-        0,
-        1
-      ],
-      [
-        1,
-        1
-      ],
-      [
-        2,
-        1
-      ],
-      [
-        3,
-        1
-      ],
-      [
-        4,
-        1
-      ],
-      [
-        5,
-        1
-      ],
-      [
-        0,
-        2
-      ],
-      [
-        1,
-        2
-      ],
-      [
-        2,
-        2
-      ],
-      [
-        3,
-        2
-      ],
-      [
-        4,
-        2
-      ],
-      [
-        5,
-        2
-      ],
-      [
-        0,
-        3
-      ],
-      [
-        1,
-        3
-      ],
-      [
-        2,
-        3
-      ],
-      [
-        3,
-        3
-      ],
-      [
-        4,
-        3
-      ],
-      [
-        5,
-        3
-      ],
-      [
-        0,
-        4
-      ],
-      [
-        1,
-        4
-      ],
-      [
-        2,
-        4
-      ],
-      [
-        3,
-        4
-      ],
-      [
-        4,
-        4
-      ],
-      [
-        5,
-        4
-      ],
-      [
-        6,
-        0
-      ],
-      [
-        7,
-        0
-      ],
-      [
-        6,
-        1
-      ],
-      [
-        7,
-        1
-      ],
-      [
-        6,
-        2
-      ],
-      [
-        7,
-        2
-      ],
-      [
-        6,
-        3
-      ],
-      [
-        7,
-        3
-      ],
-      [
-        6,
-        4
-      ],
-      [
-        7,
-        4
-      ]
-    ],
-    "extra": {
-      "unlock": "plots_40",
-      "from": 30,
-      "count": 10
-    }
-  },
-  "facilities": {
-    "_note": "P1 step 1 (q(59) §1.4, SGODOT-239): a facility stands on one empty plot. Sprinkler: waters the 8 plots around it on the garden grid (ring8, diagonals included; fewer at the edge), so a covered plot grows as it is sown; ripening there is cut by grow_cut, with Compost's 20% capped at grow_cut_cap together. At most cap_base + Homestead level.",
-    "grow_cut_cap": 0.35,
-    "kinds": {
-      "sprinkler": {
-        "name": "Sprinkler",
-        "cover": "ring8",
-        "grow_cut": 0.15,
-        "cap_base": 3,
-        "cap_per_homestead": 1
-      }
-    }
   }
 }
