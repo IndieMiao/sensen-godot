@@ -1678,14 +1678,6 @@
         "S",
         1
       ]
-    },
-    "quartz": {
-      "name": "Quartz",
-      "price": null
-    },
-    "hardwood": {
-      "name": "Hardwood",
-      "price": null
     }
   },
   "wallet_floor": 40,
@@ -2039,7 +2031,7 @@
     }
   },
   "gather": {
-    "_note": "SGODOT-231 §13.2 gathering spots: 0 Energy, one tap, each spot 8 h after it was gathered (ready at start). The first yield is the spot's material and goes to Farm Storage (+1 with Gather Gloves); worms go to the bag, any that do not fit go to storage (q(44)); seasonings (Rock Salt, Wild Herb) go to the bag and are not stored on coming home until the Spice Rack at Homestead Lv2, which puts them away (q(46)). P1 (SGODOT-275): the Old Tree opens at Homestead Lv3 and gives 1 Hardwood a round (§8.4, §13.2); with the 8 h regrow that is at most 3 rounds a day.",
+    "_note": "SGODOT-231 §13.2 gathering spots: 0 Energy, one tap, each spot 8 h after it was gathered (ready at start). The first yield is the spot's material and goes to Farm Storage (+1 with Gather Gloves); worms go to the bag, any that do not fit go to storage (q(44)); seasonings (Rock Salt, Wild Herb) go to the bag and are not stored on coming home until the Spice Rack at Homestead Lv2, which puts them away (q(46)). P0 has no Old Tree (hardwood is P1, q(44)).",
     "regen_h": 8,
     "tempo_ms": 900,
     "gloves": "gather_gloves",
@@ -2098,16 +2090,6 @@
           ]
         ],
         "homestead": 2
-      },
-      "spot_old_tree": {
-        "name": "Old Tree",
-        "yield": [
-          [
-            "hardwood",
-            1
-          ]
-        ],
-        "homestead": 3
       }
     }
   },
@@ -2228,72 +2210,7 @@
       "pick_copper": {
         "stone": 2
       }
-    },
-    "monsters": {
-      "_note": "§13.3.4 loot as [item, qty, weight]; once_a_day: an item a player gets from this monster at most once a player day (the elite's quartz).",
-      "mob_slime": {
-        "name": "Slime",
-        "hp": 9,
-        "damage": 10,
-        "loot": [
-          [
-            "copper_ore",
-            1,
-            35
-          ],
-          [
-            "rock_salt",
-            1,
-            25
-          ],
-          [
-            "bait_worm",
-            3,
-            40
-          ]
-        ]
-      },
-      "mob_elite_slime": {
-        "name": "Elite Slime",
-        "hp": 36,
-        "damage": 24,
-        "loot": [
-          [
-            "copper_ore",
-            4,
-            30
-          ],
-          [
-            "rock_salt",
-            3,
-            25
-          ],
-          [
-            "bait_worm",
-            3,
-            25
-          ],
-          [
-            "quartz",
-            2,
-            20
-          ]
-        ],
-        "once_a_day": "quartz"
-      }
-    },
-    "combat": {
-      "_note": "§13.3.8: the Combat slot's weapon; HP is the mine's own (full on entering, 0 = knocked out to the mine mouth). The client owns movement, the slimes' moves and the swing arc; the server settles damage, the swing cooldown, hits and loot (as the old mining combat did).",
-      "hp": 100,
-      "invulnerability_ms": 1000,
-      "weapons": {
-        "sword_wooden": {
-          "attack": 3,
-          "speed": 2.0
-        }
-      }
-    },
-    "express_unlock_floor": 4
+    }
   },
   "workbench": {
     "_note": "SGODOT-231 §13.4, P0 tabs Tools / Supplies only (q(31)). Costs come from Farm Storage first, then the bag. Supplies go to the bag (no room → not crafted, q(44)); the Copper Pickaxe goes to Gear (Equip there); Gather Gloves work at once. Compost needs Farming Lv3 like the stall (q(44)).",
