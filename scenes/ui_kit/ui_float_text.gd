@@ -76,6 +76,9 @@ var group_rise := 0.0: set = set_group_rise
 ## The group's line right below this one, and the gap kept over it: this line rests on it as its height settles.
 var rests_on: UiFloatText: set = set_rests_on
 var rest_gap := 0.0
+## A group's lines pop to one peak, the lowest of theirs (a wide line's is capped at 336 px or the bounds), so the
+## block scales as one whatever the widths (苏烈 on #289's test: two lines' scales parted by 3 %).
+var peak_cap := INF
 var _centre_x := NAN            # the bottom centre asked for at rest; NAN until play()
 
 func _init(text_: String = "", tone_: Tone = Tone.XP, icon_: Texture2D = null, layout_: Layout = Layout.HUG) -> void:
@@ -143,6 +146,11 @@ func set_text(v: String) -> void:
 		_label.text = v
 		_relayout()
 
+## The pop's peak for this text and these bounds, laid out now (×1.3 at most; lower for a wide line).
+func peak() -> float:
+	_relayout()
+	return _peak
+
 ## The pill at its ×1.0 size in screen px (it is laid out ×1.3 larger and scaled down).
 func shown_size() -> Vector2: return size * _unit
 
@@ -170,7 +178,7 @@ func _fit() -> void:
 	pivot_offset = Vector2(size.x * _pivot_frac, size.y)
 	if old != Vector2.ZERO: position += old - pivot_offset
 	# The pop's peak never makes the pill wider than 336 on screen, nor wider than its bounds.
-	_peak = minf(_PEAK, minf(_PEAK_MAX_W, bounds.y - bounds.x) / maxf(1.0, size.x * _unit))
+	_peak = minf(minf(_PEAK, peak_cap), minf(_PEAK_MAX_W, bounds.y - bounds.x) / maxf(1.0, size.x * _unit))
 	if not is_nan(_centre_x): _hold()
 
 ## Keeps the pill inside `bounds` at rest and at its largest (the peak, or a bump): the rest centre moves in until the
