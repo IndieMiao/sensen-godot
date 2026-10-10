@@ -31,7 +31,7 @@ var portrait_size := RESIDENT_PORTRAIT: set = set_portrait_size
 var title := "": set = set_title
 ## Shown after the name in the secondary colour: `· Café Owner`. Keepers put the role in `title` instead.
 var role := "": set = set_role
-## Keeper place line under the title: `Keeps the stall · Xuhui Market Square`.
+## Keeper place line under the title: `Keeps the stall · Mission Market Square`.
 var place := "": set = set_place
 var line := "": set = set_line
 var profile_link := false: set = set_profile_link

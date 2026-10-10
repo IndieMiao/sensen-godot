@@ -206,7 +206,7 @@ func test_profile_data_reads_the_view_and_hides_what_is_missing() -> void:
 	var v := _view()
 	v["skills"] = {"farming": {"level": 2, "xp": 70, "floor": 50, "next": 100}, "fishing": {"level": 1, "xp": 0, "floor": 0, "next": 40},
 		"cooking": {"level": 10, "xp": 999, "floor": 900, "next": null}}
-	v["profile"] = {"name": "Farmer", "city": "Shanghai", "climate": "Subtropical", "since_ms": 1791000000000.0,
+	v["profile"] = {"name": "Farmer", "city": "San Francisco", "climate": "Temperate", "since_ms": 1791000000000.0,
 		"farm": {"name": "Farmer's Homestead", "level": 1}}
 	v["plots"] = [{"state": "growing", "crop": "crop_radish", "ready_in": 12720000}, {"state": "tilled"}]
 	v["fishing"] = {"dex": [{"id": "fish_crucian", "caught": 2}, {"id": "fish_perch", "caught": 0}, {"id": "fish_bass", "caught": 1}]}
@@ -215,7 +215,7 @@ func test_profile_data_reads_the_view_and_hides_what_is_missing() -> void:
 		{"id": "b", "name": "Fresh Fish Soup", "state": "tasted"}, {"id": "c", "name": null}]}
 	var d := P0ProfilePage.profile_data(v)
 	assert_str(str(d.name)).is_equal("Farmer")
-	assert_str(str(d.home_line)).starts_with("Shanghai · Subtropical · Since ")
+	assert_str(str(d.home_line)).starts_with("San Francisco · Temperate · Since ")
 	assert_that(d.skills.map(func(s): return [s.key, s.level])).is_equal([["farming", 2], ["fishing", 1], ["cooking", 10]])
 	assert_float(float(d.skills[0].progress)).is_equal_approx(0.4, 0.0001)
 	assert_float(float(d.skills[2].progress)).is_equal(1.0)   # top level: full ring

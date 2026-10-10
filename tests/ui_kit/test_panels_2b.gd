@@ -539,9 +539,9 @@ func _click(c: Control, at: Vector2) -> void:
 func test_keeper_head_has_a_place_line_and_no_profile_link() -> void:
 	var c: UiDialogueCard = _host(UiDialogueCard.new(PIP, "Tackle Keeper · Finn", "", "Pick a rod, I'll string it."))
 	c.portrait_size = UiDialogueCard.KEEPER_PORTRAIT
-	c.place = "Rods and bait · Xuhui Tackle Shop"
+	c.place = "Rods and bait · Mission Tackle Shop"
 	await _settle()
-	assert_array(_texts(c)).contains(["Tackle Keeper · Finn", "Rods and bait · Xuhui Tackle Shop", "Pick a rod, I'll string it."])
+	assert_array(_texts(c)).contains(["Tackle Keeper · Finn", "Rods and bait · Mission Tackle Shop", "Pick a rod, I'll string it."])
 	assert_array(_texts(c)).not_contains(["›"])
 	assert_vector(c._portrait.size).is_equal(UiDialogueCard.KEEPER_PORTRAIT)
 	var hits := [0]

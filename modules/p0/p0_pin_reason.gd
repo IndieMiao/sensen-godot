@@ -70,7 +70,7 @@ static func progress_text(r: Dictionary) -> String:
 	return "%s · %s %d/%d" % [str(r.get("title", "")), str(r.get("need_name", "")), int(r.get("have", 0)), int(r.get("qty", 1))]
 
 ## A request by id from the Stall Board, the Market Board or a resident: {id, title, item, need_name, have, qty, ready,
-## tracked, deliver (`Deliver at the Stall` / `Deliver at Xuhui Market Square` / `Deliver to Pip`)}; {} when gone.
+## tracked, deliver (`Deliver at the Stall` / `Deliver at Mission Market Square` / `Deliver to Pip`)}; {} when gone.
 static func request_of(view: Dictionary, id: String) -> Dictionary:
 	if id == "": return {}
 	var boards: Dictionary = view.get("boards", {})

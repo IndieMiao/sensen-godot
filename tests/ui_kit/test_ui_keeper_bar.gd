@@ -18,7 +18,7 @@ func _settle() -> void:
 func _bar(role := UiKeeperBar.Role.TACKLE) -> UiKeeperBar:
 	var b := UiKeeperBar.new(role)
 	b.title = "Finn's Tackle"
-	b.place = "Xuhui Tackle Shop"
+	b.place = "Mission Tackle Shop"
 	b.keeper = "Tackle Keeper · Finn"
 	b.line = "Worms are 2 coins."
 	return _host(b) as UiKeeperBar
@@ -30,7 +30,7 @@ func test_titled_layout_matches_the_main() -> void:
 	assert_float(b._ring.get_global_rect().position.x - b.get_global_rect().position.x).is_equal(6.0)
 	assert_float(b._title.get_global_rect().position.x - b.get_global_rect().position.x).is_equal(54.0)
 	assert_float(b._bubble.get_global_rect().position.y - b.get_global_rect().position.y).is_equal(45.0)
-	assert_str(b._place.text).is_equal("· Xuhui Tackle Shop")
+	assert_str(b._place.text).is_equal("· Mission Tackle Shop")
 
 func test_role_colours_tint_the_bar_ring_and_keeper_line() -> void:
 	var b := _bar(UiKeeperBar.Role.TEA)

@@ -17,7 +17,7 @@ func _view() -> Dictionary:
 
 func test_hud_state_carries_energy_regen_skills_and_the_today_dots() -> void:
 	var v := _view()
-	var h := P0Logic.hud_state(v, {"next_cost": 2, "place": {"city": "Shanghai", "space": "Homestead"}})
+	var h := P0Logic.hud_state(v, {"next_cost": 2, "place": {"city": "San Francisco", "space": "Homestead"}})
 	assert_int(int(h.energy)).is_equal(142)
 	assert_str(str(h.regen)).is_equal("+1 in 2:40")
 	assert_int(int(h.next_cost)).is_equal(2)
@@ -35,11 +35,11 @@ func test_hud_state_carries_energy_regen_skills_and_the_today_dots() -> void:
 	assert_bool(P0Logic.hud_state(v).has("place")).is_false()   # unchanged unless the caller knows it
 
 func test_place_info_reads_the_scene_place_and_the_farmhouse_override() -> void:
-	var p := P0Logic.place_info("Shanghai · Willow Pond")
-	assert_str(str(p.city)).is_equal("Shanghai")
+	var p := P0Logic.place_info("San Francisco · Willow Pond")
+	assert_str(str(p.city)).is_equal("San Francisco")
 	assert_str(str(p.space)).is_equal("Willow Pond")
 	assert_int(int(p.kind)).is_equal(UiHud.PlaceKind.HOME)
-	assert_str(str(P0Logic.place_info("Shanghai · Homestead", "Farmhouse").space)).is_equal("Farmhouse")
+	assert_str(str(P0Logic.place_info("San Francisco · Homestead", "Farmhouse").space)).is_equal("Farmhouse")
 
 func test_today_rows_keep_the_lines_and_add_icons_and_show_targets() -> void:
 	var v := _view()

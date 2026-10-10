@@ -181,7 +181,7 @@ func _open_keeper() -> void:
 	rt.ui.open_keeper_greeting(role, keeper_ctx())
 
 ## What P0Logic.keeper_lines takes from the outpost data (names and places are data, not UI copy): the keeper's
-## name, the place ("Keeps the stall · Xuhui Market Square") and, for the tackle shop, the pond it names.
+## name, the place ("Keeps the stall · Mission Market Square") and, for the tackle shop, the pond it names.
 func keeper_ctx() -> Dictionary:
 	var ctx := {"keeper": str(keeper.get("name", "")), "place": place_name}
 	if outpost.has("nearest"): ctx["nearest"] = (outpost.nearest as Dictionary).duplicate()

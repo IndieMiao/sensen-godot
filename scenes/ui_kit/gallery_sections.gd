@@ -699,7 +699,7 @@ static func _dialogue_cards() -> Control:
 	var c := UiDialogueCard.new(load("res://assets/ui/kit_images/keeper_mei.jpg"), "Market Keeper · Mei", "",
 		"Morning! Row Hoes just came in — sows three plots at once, Farming Lv4. Anything I can get you?")
 	c.portrait_size = UiDialogueCard.KEEPER_PORTRAIT
-	c.place = "Keeps the stall · Xuhui Market Square"
+	c.place = "Keeps the stall · Mission Market Square"
 	c.content.add_child(UiCommandButton.new("Trade · open the stall"))
 	c.content.add_child(UiCommandButton.new("What's fresh today?", UiCommandButton.Kind.SECONDARY))
 	c.content.add_child(UiDismissButton.new("Just passing by"))
@@ -930,13 +930,13 @@ static func _board_card(d: Dictionary) -> UiBoardCard:
 static func _keeper_bars() -> Control:
 	var v := _column(UiTokens.SPACE_SECTION)
 	var samples := [
-		[UiKeeperBar.Role.TACKLE, "finn", "Finn's Tackle", "Xuhui Tackle Shop", "Tackle Keeper · Finn",
+		[UiKeeperBar.Role.TACKLE, "finn", "Finn's Tackle", "Mission Tackle Shop", "Tackle Keeper · Finn",
 			"Reed rods are in. Fishing Lv3 and Fine fish stop slipping the hook.", "", "tackle · the line wraps"],
-		[UiKeeperBar.Role.MARKET, "mei", "Mei's Stall", "Xuhui Market Square", "Market Keeper · Mei",
+		[UiKeeperBar.Role.MARKET, "mei", "Mei's Stall", "Mission Market Square", "Market Keeper · Mei",
 			"Row Hoe's 240 coins. Farming Lv4 to use.", "", "market"],
-		[UiKeeperBar.Role.TEA, "ama", "Ama's Tea", "Lotus Tea House", "Tea Host · Ama",
+		[UiKeeperBar.Role.TEA, "ama", "Ama's Tea", "Oak Tea House", "Tea Host · Ama",
 			"Sit a minute. Hot tea, 30 Energy a cup.", "Counts across all tea houses · 3 cups a day", "tea · with a note"],
-		[UiKeeperBar.Role.POST, "sigrid", "Sigrid's Desk", "Huangpu Travel Post", "Post Clerk · Sigrid",
+		[UiKeeperBar.Role.POST, "sigrid", "Sigrid's Desk", "Union Square Travel Post", "Post Clerk · Sigrid",
 			"Coffee's fresh. Pip's been asking for a hand.", "Shares the 3 cups a day with tea", "post · with a note"],
 	]
 	for s in samples:
