@@ -534,9 +534,9 @@
       "purchase_instances": 5
     },
     "deco_bench": {
-      "triangles": 704,
+      "triangles": 792,
       "surfaces": 1,
-      "bytes": 60980,
+      "bytes": 68504,
       "bounds_blender": [
         [
           -0.555,
@@ -545,19 +545,19 @@
         ],
         [
           0.555,
-          0.275,
-          0.875
+          0.288851,
+          1.048344
         ]
       ],
       "bounds": [
         [
           -0.555,
           0.0,
-          -0.275
+          -0.288851
         ],
         [
           0.555,
-          0.875,
+          1.048344,
           0.275
         ]
       ],
@@ -586,7 +586,9 @@
           "front": "+Z"
         }
       },
-      "seat_height": 0.67
+      "seat_height": 0.67,
+      "backrest_recline_degrees": 10,
+      "backrest_top_target": 1.05
     },
     "deco_scarecrow": {
       "triangles": 1240,

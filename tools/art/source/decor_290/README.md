@@ -11,8 +11,20 @@ Rebuild from the repository root with Blender 5.2:
 blender --background --factory-startup --python "$PWD/tools/art/build_decor_assets.py"
 ```
 
-This overwrites only this source file, the eleven `deco_*.glb` exports and their
-manifest entries. Existing farm kit entries and assets are retained. Each
+For the R2 bench revision, export only the bench and its manifest entry:
+
+```sh
+blender --background --factory-startup --python "$PWD/tools/art/build_decor_assets.py" -- --only deco_bench
+```
+
+`--only` accepts comma-separated decoration IDs. It still rebuilds the named
+editable source collections, but leaves all other runtime GLBs and manifest
+entries untouched. The R2 back has two upright boards reclining 10° backwards,
+with an actual top of 1.048344 m. The seat top remains 0.67 m and both seat
+sockets retain their R1 transforms; full depth is 0.563851 m inside the 2×1 cells.
+
+Without `--only`, this overwrites this source file, the eleven `deco_*.glb`
+exports and their manifest entries. Existing farm kit entries and assets are retained. Each
 collection is a decoration; components, leaves, petals and sockets have editable
 names. Source collections are laid out for inspection after export. Their
 `source_display_offset_blender` property records that display-only translation.

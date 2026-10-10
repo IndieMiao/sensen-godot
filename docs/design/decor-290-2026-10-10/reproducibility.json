@@ -1,9 +1,14 @@
 {
+  "revision": "SGODOT-290 R2",
   "identical_glb_rebuild": true,
+  "rebuild_scope": [
+    "deco_bench"
+  ],
+  "other_decorations_retained": true,
   "changed": [],
   "sha256": {
     "deco_planter.glb": "c62d2a4a005e7d707ef1f22e20483250b7ab1db377821f1e749ad74f1a1bce0f",
-    "deco_bench.glb": "a6f03c9a2114b6a17ea42e315d8508496de79709c1f3c66e2f8c4d21aadfc2c3",
+    "deco_bench.glb": "51618bd43aa6c45be1b13a23587589a44cffd4da14e42f4ce0cb8b5b76217599",
     "deco_windmill.glb": "50cd18920cda4a2505b75a3f3dfc1e41ade1cd73cfb99740d52f632d9edfd345",
     "deco_pergola.glb": "52688e3ae1ee33de34bff061e35009da1f518d46286ad4db2b3dc28be12a0b62",
     "deco_fountain.glb": "38357c007890ac81b39587bac073d43d441cc05e13d92ea0f42fa6d5484561be",

@@ -69,6 +69,16 @@ func _run():
 	check(absf(basic_seat_height-float(manifest.assets.deco_bench.seat_height))<.0001,"Seat height matches actual Basic Room bench mesh")
 	report.basic_room_seat_height=basic_seat_height
 	basic_bench.free()
+	var bench_bounds=Art.mesh_for("deco_bench").get_aabb()
+	var back_height=bench_bounds.end.y-basic_seat_height
+	check(back_height>=.35 and back_height<=.40,"Bench back rises 0.35-0.40 m above the unchanged seat")
+	check(bench_bounds.size.x<=1.24 and bench_bounds.size.z<=.59,"Reclining bench fits within 1.24 by 0.59 m")
+	var bench_scene=load("res://assets/farm/art/deco_bench.glb").instantiate()
+	for i in 2:
+		var seat=bench_scene.find_child("seat_%d"%i,true,false)
+		var expected=Transform3D(Basis.IDENTITY,Vector3(-.275 if i==0 else .275,.67,.035))
+		check(seat.transform.is_equal_approx(expected),"Bench seat_%d remains at its R1 position and orientation"%i)
+	bench_scene.free()
 	var rotor=Art.mesh_for("deco_windmill_sails")
 	var radius=0.0
 	for v in rotor.surface_get_arrays(0)[Mesh.ARRAY_VERTEX]: radius=maxf(radius,Vector2(v.x,v.y).length())

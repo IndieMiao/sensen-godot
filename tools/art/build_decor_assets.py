@@ -8,6 +8,7 @@ No existing farm models/materials are rebuilt. See source/decor_290/README.md.
 import json
 import math
 import struct
+import sys
 from pathlib import Path
 
 import bmesh
@@ -235,18 +236,24 @@ def path():
 
 
 def bench():
-    begin("deco_bench",[2,1],2000, seat_height=.67)
+    begin("deco_bench",[2,1],2000, seat_height=.67,
+          backrest_recline_degrees=10, backrest_top_target=1.05)
+    tilt=math.radians(10)
+    def back_z(y):
+        return -.20-(y-.67)*math.tan(tilt)
     for x in [-.49,.49]:
         for z in [-.22,.22]:
-            height=.84 if z<0 else .635
-            box("Bench rear upright" if z<0 else "Bench front leg",(x,height/2,z),(.09,height,.09),"wood")
+            box("Bench rear leg" if z<0 else "Bench front leg",(x,.635/2,z),(.09,.635,.09),"wood")
+        beam("Bench reclining back stile",(x,.61,back_z(.61)),
+             (x,1.03,back_z(1.03)),.065,"wood",depth=.048,radius=.010)
         box("Bench seat bearer",(x,.57,0),(.085,.08,.53),"wood_dark")
         box("Bench armrest",(x,.73,0),(.13,.07,.55),"wood_light")
         beam("Bench front arm support",(x,.62,.20),(x,.715,.20),.065,"wood",radius=.007)
     for z in [-.18,0,.18]:
         box("Bench seat plank",(0,.6325,z),(1.10,.075,.169),"wood_light",.014)
-    for y in [.744,.835]:
-        box("Bench broad back plank",(0,y,-.24),(1.10,.08,.055),"wood_light",.012)
+    for y in [.810,.97715]:
+        board=box("Bench broad upright back plank",(0,y,back_z(y)),(1.10,.14,.05),"wood_light",.012)
+        board.rotation_euler.x=-tilt
     box("Bench lower stretcher",(0,.25,-.05),(1.04,.065,.075),"wood",.011)
     socket("seat_0",(-.275,.67,.035))
     socket("seat_1",(.275,.67,.035))
@@ -530,7 +537,11 @@ def main():
     for build in [planter,lantern,path,bench,scarecrow,fence,birdbath,windmill,fountain,pergola]:
         build()
     manifest=json.loads((OUT/"manifest.json").read_text())
+    only=set(sys.argv[sys.argv.index("--only")+1].split(",")) if "--only" in sys.argv else set()
+    assert only.issubset(ASSETS), "Unknown decoration ID in --only"
     for name,collection in ASSETS.items():
+        if only and name not in only:
+            continue
         entry=export_asset(name,collection,material)
         manifest["assets"][name]=entry
         print("DECOR",name,entry["triangles"],entry["bounds"],flush=True)

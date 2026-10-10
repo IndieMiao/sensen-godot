@@ -9,9 +9,24 @@ They use the existing farm wood/leaf/red palette, two or three flat colours per
 material family, rounded silhouettes and opaque vertex colours. No wood grain,
 stone mottling, water jets, emissive glass, textures or new runtime material.
 
+## Bench R2
+
+The R1 back was too low to read at the 43° review angle. Only `deco_bench` is
+revised: two upright broad rails lean 10° backwards and reach 1.048344 m,
+0.378344 m above the unchanged 0.67 m seat. Armrests remain at 0.765 m.
+The width/depth is 1.110 × 0.563851 m (within 1.24 × 0.59 m); 792 triangles,
+one surface. Both seat transforms and the three seat planks are retained.
+
+The [bench 43° close-up](deco_bench-detail.png), both overviews and contact sheet
+show R2. [R2 preservation evidence](bench-r2-preservation.json) compares against
+R1 commit `bbe4d7b130708ef32ae0e0a49dd54aa171e8d2a4`: the other ten GLBs, all
+existing import settings and the other 34 manifest entries are unchanged.
+The [rebuild record](reproducibility.json) covers two identical bench exports.
+
 ## Godot review
 
 - [43° overview: ten pieces in one row, existing character beside them](overview-43deg.png)
+- [R2 bench at 43°](deco_bench-detail.png)
 - [Top-down overview: same placement and scale](overview-top.png)
 - [Individual views](contact-sheet.jpg)
 - [Three fence segments joined at 0.65 m intervals](fence-three-segments.png)
@@ -47,6 +62,7 @@ Do not expect FarmArt.instance to retain GLB empty nodes automatically.
   `seat_1 = (0.275, 0.67, 0.035)`, identity bases, +Z forward. Seat top 0.67 m
   matches the actual Basic Room bench mesh (`0.60 + 0.14 / 2`); do not add the
   Basic Room layout's raised room-floor placement to the local socket height.
+  The R2 backrest top is 1.048344 m and reclines 10° within the original cells.
 - **Windmill:** position `deco_windmill_sails` at the body's `rotor` empty,
   `(0, 0.985, 0.273)`, and rotate about local +Z. The full animated sweep is
   below 1.24 m diameter. Combined body/rotor cost is below 4,000 triangles.
@@ -82,6 +98,9 @@ godot --headless --path output/decor-290/project --editor --import
 godot --path output/decor-290/project
 ```
 
+For a bench-only GLB/manifest rebuild, append `-- --only deco_bench` to the
+Blender command. Other runtime decorations are left intact.
+
 The staging script copies existing fixture avatar dependencies and artwork into
 `output/decor-290/project`; it loads only Avatar, with the default fixture outfit.
 Captures and `validation.json` appear in `output/decor-290/captures`. Runtime
@@ -98,7 +117,7 @@ small authored silhouettes. Editable source: [decor_290.blend](../../../tools/ar
 | `deco_planter` | 1,676 | 2,000 | 0.560 × 0.427 × 0.560 |
 | `deco_lantern` | 452 | 2,000 | 0.453 × 1.160 × 0.240 |
 | `deco_path` | 92 | 500 | 0.548 × 0.033 × 0.480 |
-| `deco_bench` | 704 | 2,000 | 1.110 × 0.875 × 0.550 |
+| `deco_bench` | 792 | 2,000 | 1.110 × 1.048 × 0.564 |
 | `deco_scarecrow` | 1,240 | 2,000 | 0.797 × 1.495 × 0.375 |
 | `deco_fence` | 296 | 500 | 0.650 × 0.590 × 0.090 |
 | `deco_birdbath` | 1,402 | 2,000 | 0.578 × 0.840 × 0.578 |
@@ -107,6 +126,6 @@ small authored silhouettes. Editable source: [decor_290.blend](../../../tools/ar
 | `deco_pergola` | 1,908 | 2,000 | 1.880 × 2.397 × 1.233 |
 | `deco_windmill_sails` | 1,496 | 4,000 | 0.952 × 0.952 × 0.081 |
 
-Total **12,530 triangles**, 11 surfaces in 11 files. Windmill body + sails: **2,684 triangles**. The rotor bound is at its axle; fully assembled rotating height is about 1.59 m.
+Total **12,618 triangles**, 11 surfaces in 11 files. Windmill body + sails: **2,684 triangles**. The rotor bound is at its axle; fully assembled rotating height is about 1.59 m.
 
-Godot: **119 / 119 checks passed**. Full rotor swept diameter: **1.188378 m**. Original 24 farm manifest entries and existing assets retained; two consecutive rebuilds produced byte-identical GLBs.
+Godot R2: **123 / 123 checks passed**. Full rotor swept diameter: **1.188378 m**. Original 24 farm manifest entries and existing assets retained. Relative to R1, only the bench GLB/manifest entry changed; two consecutive bench exports were byte-identical.

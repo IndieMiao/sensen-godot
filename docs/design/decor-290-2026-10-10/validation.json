@@ -61,13 +61,13 @@
 		{
 			"bounds_max": [
 				0.555000126361847,
-				0.875,
-				0.275000005960464
+				1.04834401607513,
+				0.275000035762787
 			],
 			"bounds_min": [
 				-0.555000007152557,
 				0.0,
-				-0.275000005960464
+				-0.288850605487823
 			],
 			"id": "deco_bench",
 			"sockets": {
@@ -89,7 +89,7 @@
 				}
 			},
 			"surfaces": 1,
-			"triangles": 704
+			"triangles": 792
 		},
 		{
 			"bounds_max": [
@@ -718,6 +718,22 @@
 		},
 		{
 			"check": "Seat height matches actual Basic Room bench mesh",
+			"passed": true
+		},
+		{
+			"check": "Bench back rises 0.35-0.40 m above the unchanged seat",
+			"passed": true
+		},
+		{
+			"check": "Reclining bench fits within 1.24 by 0.59 m",
+			"passed": true
+		},
+		{
+			"check": "Bench seat_0 remains at its R1 position and orientation",
+			"passed": true
+		},
+		{
+			"check": "Bench seat_1 remains at its R1 position and orientation",
 			"passed": true
 		},
 		{
