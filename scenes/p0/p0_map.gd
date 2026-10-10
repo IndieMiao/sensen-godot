@@ -696,11 +696,13 @@ var _card_city := ""
 
 func _fill_city_card(cluster: String) -> void:
 	if rt.ui.modal_kind == "city_card": rt.ui.close_modal()
-	P0ArrivalCard.open(rt.ui, city_card(_view(), cluster, P0CityPlaces.city(cluster)), func(): pass, "city_card")
-	var link := rt.ui.root.find_child("Link_Travel_details", true, false)
-	if link: (link as Button).pressed.connect(func():
+	# Travel details' action rides in the spec: looked up by name, the card closed for the refill was still in the tree
+	# this frame and took it, so the first card's link did nothing (李元芳, 279 fd340f21).
+	var spec := city_card(_view(), cluster, P0CityPlaces.city(cluster))
+	spec["links"] = [["Travel details", func():
 		rt.ui.close_modal()
-		open_travel(cluster, P0CityPlaces.city(cluster).get("preview", {})))
+		open_travel(cluster, P0CityPlaces.city(cluster).get("preview", {}))]]
+	P0ArrivalCard.open(rt.ui, spec, func(): pass, "city_card")
 
 ## "Trip 6 · Intercontinental": a city's trip tier, the server's (its preview) when it is in, else the client's.
 static func trip_state(view: Dictionary, cluster: String, city: Dictionary) -> String:

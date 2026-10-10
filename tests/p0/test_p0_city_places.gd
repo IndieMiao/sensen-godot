@@ -171,6 +171,9 @@ func test_a_card_asking_while_the_maps_read_is_out_still_fills_in() -> void:
 	assert_str(rt.ui.modal_kind).is_equal("city_card")
 	assert_array(counts.call()).is_equal(["2", "2", "9"])
 	assert_array(m.city_map.extra_places.map(func(e): return str(e.id))).contains(["gn-1850147~market0"])   # the map's too
+	# the refilled card's Travel details › works the first time (李元芳, 279 fd340f21: it went to the card closed for it)
+	(rt.ui.root.find_child("Link_Travel_details", true, false) as Button).pressed.emit()
+	assert_str(rt.ui.modal_kind).is_equal("travel_card")
 	rt.ui.close_modal()
 
 ## A cross-city request's Show on map (苏烈, SGODOT-284): `outpost:gn-…~market0` of a city not read yet reads it, pins
