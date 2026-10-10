@@ -198,6 +198,9 @@ export interface P0Content {
     cook_all_per_page?: number;                   // Cook All (Lv8): at most this many pots of one page (q(4))
     // Cookbook milestones past Home Cook (§7.6.1, SGODOT-282): titles at Discovered / Mastered counts, once each;
     // coins paid, cabinet = Warming Cabinet portions added, decor = the yard piece it gives (placed with Decorate).
+    // Recipe cards (§7.16.1, SGODOT-282): a card makes a page Tasted. The Homestead Stall shows `stall_daily` cards a
+    // day from `stall` (pages not yet in the Cookbook); Market sells `market` cards of its climate. Prices by rarity.
+    cards?: { prices: Record<string, number>; stall_daily: number; stall: (string | { page: string; climates: string[] })[]; market: { page: string; climate: string }[] };   // a stall entry with climates shows only for those home climates
     milestones?: { id: string; title: string; discovered?: number; mastered?: number; coins?: number; cabinet?: number; decor?: string }[];
     quick_fire: number;                          // Quick Fire: cooking time and heat times × this (§4.6.3 Lv6)
     trial_refunds: number;                       // failed pots a day that refund their ingredients in the blessing (§7.5.2)

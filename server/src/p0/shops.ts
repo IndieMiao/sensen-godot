@@ -6,6 +6,7 @@
  */
 import { cropBySeed, dishParts, itemKind, rodById, sellPriceOf, SHOPS, type P0Content, type QuotaId, type ShopId, type Skill } from './content.js';
 import { add, count, room, take } from './bag.js';
+import { buyCard, isCard } from './cards.js';
 import { coinsNeeded } from './homestead.js';
 import { gainEnergy, type P0Event } from './progress.js';
 import { maxEnergy, skillLevel, untilRollover } from './rules.js';
@@ -63,6 +64,7 @@ export function walletNeed(c: P0Content, offer: { price: number; floor: boolean 
 
 export function buyItem(c: P0Content, s: P0State, cmd: { item?: unknown; qty?: unknown; shop?: unknown }, events: P0Event[]): Refusal | null {
   const shop = shopOf(cmd.shop), id = String(cmd.item ?? ''), qty = Number(cmd.qty ?? 1);
+  if (isCard(id)) return shop && qty === 1 ? buyCard(c, s, id, shop, events) : { code: shop ? 'bad_qty' : 'bad_item' };   // recipe cards (§7.16.1)
   if (!Number.isInteger(qty) || qty < 1 || qty > 99) return { code: 'bad_qty' };
   if (!shop || !catalog(c, shop).includes(id)) return { code: 'bad_item' };
   const offer = offerOf(c, id)!;

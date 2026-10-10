@@ -1,6 +1,7 @@
 /** P0 command reducer: one command → new state + events, or a typed refusal. Never mutates the input. */
 import { cropById, cropBySeed, rodById, type P0Content } from './content.js';
 import { add, count, room, take } from './bag.js';
+import { settleCards } from './cards.js';
 import { burners, collectPot, cookAll, eatDish, startPot, recordHeat, settleStove } from './cooking.js';
 import { boardCommand, noteVisit, settleBoards, tracked } from './boards.js';
 import { expireGiftMeals, giftResident, learn, noteSown, residentRequestCommand, talk } from './residents.js';
@@ -77,6 +78,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
   const events: P0Event[] = [];
   settleEnergy(c, s, now);
   rollDay(c, s, now);
+  settleCards(c, s);   // today's recipe cards are fixed on the first command of the day
   settleBoards(c, s, now);
   // Queue ×2: a done pot makes way for the waiting one, as the view shows; heat / collect naming the pot on the stove
   // bring its taps first, and the settle after the command keeps it if it is done.

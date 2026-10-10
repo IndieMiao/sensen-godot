@@ -696,6 +696,70 @@
     "quick_fire": 0.8,
     "lucky_double": 0.1,
     "cook_all_per_page": 2,
+    "_cards": "Recipe cards §7.16.1 (SGODOT-282): Stall pool = pages 2–4, 6–8, 11–22 (13 only for Tropical / Subtropical homes, 14 for Temperate / Cold Temperate), 2 a day; Market = 36, 45–48 by climate. Only pages that are cookable recipes show; the silhouettes join when Li Bai's P1 pages (SGODOT-281) make them recipes.",
+    "cards": {
+      "prices": {
+        "1": 30,
+        "2": 80,
+        "3": 200,
+        "4": 500
+      },
+      "stall_daily": 2,
+      "stall": [
+        "dish_grilled_fish",
+        "dish_carp_cakes",
+        "dish_mullet_skewers",
+        "dish_veggie_plate",
+        "dish_carrot_cake",
+        "dish_cabbage_stew",
+        "dish_salt_grilled_fish",
+        "dish_fish_soup",
+        {
+          "page": "dish_tilapia_wraps",
+          "climates": [
+            "Tropical",
+            "Subtropical"
+          ]
+        },
+        {
+          "page": "dish_crispy_smelt",
+          "climates": [
+            "Temperate",
+            "Cold Temperate"
+          ]
+        },
+        "dish_pan_fried_fish",
+        "dish_rock_salt_soup",
+        "dish_salted_potatoes",
+        "dish_cucumber_salad",
+        "dish_fruit_tea",
+        "dish_apple_tea",
+        "dish_roast_veggies",
+        "dish_corn_cake"
+      ],
+      "market": [
+        {
+          "page": "dish_pineapple_barra",
+          "climate": "Tropical"
+        },
+        {
+          "page": "dish_pineapple_fish",
+          "climate": "Tropical"
+        },
+        {
+          "page": "dish_sweet_potato_cakes",
+          "climate": "Subtropical"
+        },
+        {
+          "page": "dish_pumpkin_chowder",
+          "climate": "Temperate"
+        },
+        {
+          "page": "dish_beet_fish_soup",
+          "climate": "Cold Temperate"
+        }
+      ]
+    },
     "milestones": [
       {
         "id": "line_cook",
