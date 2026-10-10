@@ -5,9 +5,10 @@
  * by 15% — with Compost's 20% capped at 35% together — locked when it starts growing. Built in one step with `place`
  * (q(22): no stock of built-but-unplaced facilities), moved for free with `move_facility`, never removed.
  */
-import type { P0Content, WorkbenchRecipe } from './content.js';
+import type { Crop, P0Content, WorkbenchRecipe } from './content.js';
 import type { Refusal } from './fishing.js';
 import { stepAt } from './homestead.js';
+import { homeClimate } from './travel.js';
 import type { P0Event } from './progress.js';
 import { skillLevel } from './rules.js';
 import type { Facility, P0State, Plot } from './state.js';
@@ -42,6 +43,12 @@ export function coveredPlots(c: P0Content, s: P0State): Set<number> {
 
 export function facilityAt(s: P0State, plot: number): Facility | undefined {
   return (s.facilities ?? []).find(f => f.plot === plot);
+}
+
+/** A crop's open-field hours on this farm: a regional crop away from its climate zone takes off_zone_grow_h (×1.5,
+ * §5.2.3 "not native"; the greenhouse lifts it later). The farm is always at home, wherever the player is. */
+export function cropGrowH(c: P0Content, s: P0State, crop: Crop): number {
+  return crop.regional && crop.zone !== homeClimate(c, s) && crop.off_zone_grow_h ? crop.off_zone_grow_h : crop.grow_h;
 }
 
 /** Ripening time in ms for a crop that starts growing now on `plot` (§5.7 / §5.5: covered −15%, Compost −20%, ≤ −35%). */

@@ -88,6 +88,7 @@ var _framed := Vector3.ZERO   # the opening shot's centre
 var _fits := false            # the whole floor fits the opening shot: hold it instead of following
 var _shot := {}           # push-in: {center: Vector3, size: float, release_on_move: bool}
 var _shot_k := 0.0
+var _pan_tween: Tween   # a focused shot sliding to another anchor (opts.ease_s)
 var _shot_tween: Tween
 var _walk := {}           # {name, point: Vector3, done: Callable}
 var _shown := {}          # marker ids currently on screen
@@ -657,8 +658,19 @@ func focus(cam_anchor: String, opts := {}) -> void:
 	var visible_h := size * view.y / maxf(view.x, 1.0)
 	var forward := -_cam_dir
 	var up := (Vector3.UP - forward * forward.dot(Vector3.UP)).normalized()
-	_shot = {center = m.global_position + up * (band.get_center().y - 0.5) * visible_h, size = size,
-		release_on_move = bool(opts.get("release_on_move", true)), anchor = cam_anchor}
+	var to := m.global_position + up * (band.get_center().y - 0.5) * visible_h
+	# Already pushed in and asked to pan (opts.ease_s: the kitchen's stove switch, 0.25 s ease-out, SGODOT-282): the
+	# shot slides from where it is to the new pot instead of jumping.
+	var pan := float(opts.get("ease_s", 0.0))
+	var from: Vector3 = _shot.get("center", to) if pan > 0.0 and is_focused() else to
+	_shot = {center = from, size = size, release_on_move = bool(opts.get("release_on_move", true)), anchor = cam_anchor}
+	if from != to and is_inside_tree():
+		if _pan_tween and _pan_tween.is_valid(): _pan_tween.kill()
+		_pan_tween = create_tween()
+		_pan_tween.tween_method(func(c: Vector3): if not _shot.is_empty(): _shot.center = c, from, to, pan) \
+			.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	else:
+		_shot.center = to
 	_ease_shot(1.0)
 
 func release_focus() -> void:
@@ -876,12 +888,16 @@ func _markers(v: Dictionary) -> void:
 		var m := _marker(n, v)
 		if not m.is_empty(): marks[n] = m
 	card_pick(marks)
+	var spots := {}
+	for n in marks:
+		var at := anchor(n).global_position + _hit_lift(n) * 1.1
+		var badge_at := anchor("badge_" + (P0RoomAnchors.object_of(n) if P0RoomAnchors.object_of(n) != "" else n))   # badge_exit for the door
+		spots[n] = cam.unproject_position(badge_at.global_position if badge_at else at)
+	spots = _marker_spots(spots)
 	for n in marks:
 		var m: Dictionary = marks[n]
 		var id: String = "room:" + n
-		var at := anchor(n).global_position + _hit_lift(n) * 1.1
-		var badge_at := anchor("badge_" + (P0RoomAnchors.object_of(n) if P0RoomAnchors.object_of(n) != "" else n))   # badge_exit for the door
-		var screen := cam.unproject_position(badge_at.global_position if badge_at else at)
+		var screen: Vector2 = spots[n]
 		var state := badge_state(str(m.get("badge", "")))
 		var kind := str(m.get("kind", ""))
 		now[id] = kind
@@ -907,6 +923,9 @@ func _markers(v: Dictionary) -> void:
 			"npc": rt.ui.npc_tag(id, "", Vector2.ZERO, false)
 		if rt.ui.has_method("badge"): rt.ui.call("badge", id, 0, Vector2.ZERO, false)
 	_shown = now
+
+## Where each prompt sits on screen ({anchor name: point}); a room may spread prompts that crowd (the farmhouse's stoves).
+func _marker_spots(spots: Dictionary) -> Dictionary: return spots
 
 ## UiStatusBadge.State for a STATE-ICONS key, or -1 (unknown key, or the badge component is not in this build).
 static func badge_state(key: String) -> int:

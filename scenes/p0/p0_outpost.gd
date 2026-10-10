@@ -125,6 +125,13 @@ func _room_frame(_view: Dictionary, dt: float) -> void:
 func _spawn_npcs() -> void:
 	var data := P0RoomAnchors.read_json(NPCS_PATH).get("npcs", {}) as Dictionary
 	var cast := {"npc_keeper": str(keeper.get("name", "")).to_lower()}
+	# A generated city's keeper (SGODOT-280) is not in outpost_npcs.json: they wear their look preset (world.keeper_looks,
+	# role × climate × 3) under their name plate. The hand-written keepers (Finn, Ama, Sigrid, Mei) keep their own.
+	if not data.has(cast.npc_keeper) and keeper.has("look"):
+		var looks: Dictionary = P0Logic.content().get("world", {}).get("keeper_looks", {})
+		if looks.has(str(keeper.look)):
+			data = data.duplicate()
+			data[cast.npc_keeper] = {"name": str(keeper.get("name", "")), "scale": 1.0, "slots": looks[str(keeper.look)]}
 	for id in outpost.get("residents", []):
 		var def: Dictionary = data.get(str(id), {})
 		if def.has("anchor"): cast[str(def.anchor)] = str(id)

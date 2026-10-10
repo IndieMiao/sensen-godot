@@ -7,7 +7,7 @@ import { loadP0Content, type P0Content } from '../../src/p0/content.js';
 import { applyP0, type P0Command } from '../../src/p0/reducer.js';
 import { freshState } from '../../src/p0/state.js';
 import { clusterOf } from '../../src/p0/travel.js';
-import { cityPlaces, generateCity, km, placeOf, pondCount, tierOf, type WorldContent } from '../../src/p0/world.js';
+import { cityPlaces, clusterPopulation, generateCity, km, placeOf, pondCount, tierOf, type WorldContent } from '../../src/p0/world.js';
 
 const c: P0Content = loadP0Content();
 const w = (c as P0Content & { world: WorldContent }).world;
@@ -38,13 +38,17 @@ describe('global generation (SGODOT-280)', () => {
     expect(clusterOf(c, 'sh_tea_1')).toBe(SF);
   });
 
-  it('tiers by population (§9.3.2 thresholds), raised by the area list (Los Angeles and Tokyo reach L3)', () => {
+  it('tiers by the members\' summed population (q(114) ①), raised by the area list (q(114) ②)', () => {
     expect([400_000, 1_000_000, 2_000_000, 5_000_000, 10_000_000, 20_000_000].map(p => tierOf(w, fake(p))))
       .toEqual(['S', 'M1', 'M2', 'L1', 'L2', 'L3']);
     expect(tierOf(w, clusters.get(LA)!)).toBe('L3');      // 3.8 M people: L1 by population
     expect(tierOf(w, clusters.get(TOKYO)!)).toBe('L3');
     expect(tierOf(w, clusters.get(SHANGHAI)!)).toBe('L3');
-    expect(tierOf(w, clusters.get(NYC)!)).toBe('L2');
+    expect(tierOf(w, clusters.get(NYC)!)).toBe('L3');     // q(114) ② area list
+    // Miami: 487,014 alone, 780,231 with its members — an M1 metro by people, L3 by the area list, never an S-tier town
+    expect(clusterPopulation(clusters.get('gn-4164138')!)).toBe(780_231);
+    expect(tierOf(w, clusters.get('gn-4164138')!)).toBe('L3');
+    expect(clusterPopulation(clusters.get(SF)!)).toBeGreaterThan(clusters.get(SF)!.population);   // Oakland, Hayward
   });
 
   it('gives 3 ponds, one more per 500,000 people, at most 6; the first is the beginner Pond nearest the centre', () => {
@@ -107,7 +111,8 @@ describe('global generation (SGODOT-280)', () => {
   it('names keepers from the climate pool, never a resident name, and tea houses from the climate words', () => {
     const tokyo = cityPlaces(c, TOKYO)!;
     const temperate = w.keeper_names.Temperate;
-    expect(tokyo.detail.outposts.filter(o => temperate.includes(o.keeper.name)).length).toBe(temperate.length);   // own pool first
+    expect(temperate.length).toBeGreaterThanOrEqual(18);   // q(114) ④: 18 a band, enough for an L3 city's 17 counters
+    expect(tokyo.detail.outposts.every(o => temperate.includes(o.keeper.name))).toBe(true);   // no borrowing needed
     for (const o of tokyo.detail.outposts) {
       expect(['Pip', 'Kai', 'Wu', 'Mira', 'Rafa', 'Ivo', 'Hana', 'Sam', 'Lena', 'Tomo', 'Theo', 'Nadia']).not.toContain(o.keeper.name);
       expect(o.keeper.look).toMatch(/^(tea|tackle|market|post)_temperate_[0-2]$/);
@@ -140,6 +145,45 @@ describe('global generation (SGODOT-280)', () => {
     expect(info.outposts.length).toBeGreaterThan(0);
     expect(Object.keys(c)).not.toContain('cityPlaces');   // not enumerable: structuredClone(content) still works
     expect(() => structuredClone(c)).not.toThrow();
+  });
+
+  it('places residents by §9.4.3: Pip in every travel post, Sam and Nadia fixed, the rest by rank and city traits', () => {
+    const where = (id: string) => Object.fromEntries(cityPlaces(c, id)!.detail.outposts
+      .filter(o => o.residents.length).map(o => [o.id.split('~')[1], o.residents]));
+    // Shanghai (L3, coast + river): the plan's example allocation, Lena at a tea house until the Lighthouse Room exists
+    expect(where(SHANGHAI)).toEqual({ post0: ['res_pip', 'res_sam'], post1: ['res_pip'], market0: ['res_nadia', 'res_theo'],
+      market1: ['res_tomo'], tackle0: ['res_old_kai'], tackle1: ['res_rafa'], tea0: ['res_hana'], tea1: ['res_lena'] });
+    // Beijing (L3, no coast or river in the trait list): no Old Kai, Rafa or Lena
+    const bj = Object.values(where(BEIJING)).flat();
+    for (const r of ['res_old_kai', 'res_rafa', 'res_lena', 'res_ivo']) expect(bj).not.toContain(r);
+    // Old Kai keeps the beginner pond's tackle shop
+    const sh = cityPlaces(c, SHANGHAI)!;
+    expect(sh.detail.outposts.find(o => o.residents.includes('res_old_kai'))!.nearest?.name).toBe(sh.detail.ponds[0].name);
+    // S tier: the trading post holds Pip and Granny Wu under 100,000 people, else the next eligible (Theo)
+    expect(where('gn-498687')).toEqual({ cabin0: ['res_pip', 'res_granny_wu'] });   // Sarapul, 98,830
+    expect(where('gn-463835')).toEqual({ cabin0: ['res_pip', 'res_theo'] });         // Zelenodolsk, 157,600 with its members
+    for (const cl of clusters.byId.values()) {
+      const city = cityPlaces(c, cl.id);
+      if (!city) continue;
+      const fixed = city.detail.outposts.flatMap(o => o.residents);
+      expect(city.detail.outposts.every(o => o.residents.length <= 2)).toBe(true);
+      expect(new Set(fixed.filter(r => r !== 'res_pip')).size).toBe(fixed.filter(r => r !== 'res_pip').length);   // one place each
+      if (city.tier !== 'S') expect(new Set(fixed).size).toBeLessThanOrEqual(city.detail.outposts.length);   // the trading post holds 2 by rule
+      expect(fixed).not.toContain('res_ivo');   // no Mine Hut yet
+      for (const r of fixed) expect(Object.keys((c as P0Content & { residents: object }).residents)).toContain(r);
+    }
+  });
+
+  it('gives every keeper one of the 48 placeholder looks of their role and climate, made of public parts', () => {
+    const looks = w.keeper_looks!;
+    const npcOnly = ['mask16_npc_kai', 'hairhat71_npc_kai', 'hairhat12_npc_mei', 'cloth11_npc_mei', 'hairhat80_npc_ama',
+      'hairhat36_npc_sigrid', 'cloth36_npc_sigrid', 'cloth12_npc_finn', 'hairhat36_npc_pip'];
+    const keys = Object.keys(looks).filter(k => !k.startsWith('_'));
+    expect(keys).toHaveLength(48);
+    for (const k of keys) for (const part of Object.values(looks[k])) expect(npcOnly).not.toContain(part);
+    for (const id of [TOKYO, SHANGHAI, 'gn-463835']) {
+      for (const o of cityPlaces(c, id)!.detail.outposts) expect(looks[o.keeper.look]).toBeDefined();
+    }
   });
 
   it('a player with a pass to Tokyo casts in its generated beginner pond', () => {

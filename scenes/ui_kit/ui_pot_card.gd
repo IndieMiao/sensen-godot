@@ -23,6 +23,10 @@ var _title: Label
 var _dot: Panel
 var _sep: Label
 var _time: Label
+## A small secondary tag at the card's top right (`×2` while Big Pot Double is on, 不知火舞 02ad95bc ④); "" hides it.
+var tag := "": set = set_tag
+var _tag: Label
+var _tag_layer: Control
 
 func _init() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -61,6 +65,35 @@ func _init() -> void:
 	_time.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_line.add_child(_time)
 	show_result("")
+	# The panel fits its children to its content box; the tag lives on a plain layer there, placed by hand.
+	_tag_layer = Control.new()
+	_tag_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_tag_layer.visible = false   # only while a tag shows (the layout snapshots stay as they were)
+	add_child(_tag_layer)
+	_tag = UiKit.label("", UiTokens.STYLE_C10_B, UiTokens.COLOR_SECONDARY)
+	_tag.name = "Tag"
+	_tag.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_tag.visible = false
+	_tag_layer.add_child(_tag)
+	_tag_layer.resized.connect(_place_tag)
+
+func set_tag(v: String) -> void:
+	tag = v
+	if _tag == null: return
+	_tag.text = v
+	_tag.visible = v != ""
+	_tag_layer.visible = v != ""
+	_place_tag()
+
+## The tag sits in the card's top-right corner, over the 10 padding; it takes no layout room.
+func _place_tag() -> void:
+	if _tag == null or _tag_layer == null: return
+	var m := _tag.get_minimum_size()
+	_tag.size = m
+	_tag.position = Vector2(_tag_layer.size.x + PAD - m.x - 6.0, -PAD + 3.0)
+
+## The tag's rect in the card's coordinates (tests).
+func tag_rect() -> Rect2: return Rect2(_tag_layer.position + _tag.position, _tag.size) if _tag and _tag.visible else Rect2()
 
 ## Replaces the slots (UiPotSlot, built and wired by the owner).
 func set_slots(slots: Array) -> void:

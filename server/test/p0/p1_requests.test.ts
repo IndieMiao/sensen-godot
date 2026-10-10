@@ -125,22 +125,25 @@ describe('what the new templates take', () => {
 });
 
 describe('regional templates (§9.6.3; drawn only once one of their items can be got)', () => {
-  // A content copy where the farm line sells the regional seed at the market, as its PR will. The city's regional fish
-  // are in the ponds already (SGODOT-283: San Francisco's Arctic Char in Pond and River, Atlantic Salmon in River and
-  // Coast).
-  const opened = () => {
-    const k = structuredClone(c);
-    k.market.buy = [...k.market.buy, 'seed_pumpkin'];
-    return k;
-  };
+  // The real content now has both: the home Market sells Pumpkin Seeds (farm line, §5.2.3, #235) and the city's regional
+  // fish are in the ponds (SGODOT-283: San Francisco's Arctic Char in Pond and River, Atlantic Salmon in River and Coast).
+  const opened = () => structuredClone(c);
 
-  it('only what can be got draws: Local Waters (the city\'s fish swim here); no regional seed is on sale yet', () => {
+  it('only what can be got draws: Local Waters (the city\'s fish swim here) and Taste of Home (the home Market\'s Pumpkin)', () => {
     const s = fresh();
     s.skills.farming = 10_000; s.skills.fishing = 10_000; s.skills.cooking = 10_000; s.homestead.level = 5;
     const open = eligible(c, s, 'market');
-    expect(open).toContain('req_sys_regional_fish');
-    for (const id of ['req_sys_regional_crop', 'req_sys_regional_dish', 'req_sys_regional_far_fish', 'req_sys_regional_far_crop'])
+    expect(open).toEqual(expect.arrayContaining(['req_sys_regional_fish', 'req_sys_regional_crop']));
+    for (const id of ['req_sys_regional_dish', 'req_sys_regional_far_fish', 'req_sys_regional_far_crop'])
       expect(open, id).not.toContain(id);
+  });
+
+  it('a regional seed off sale keeps Taste of Home closed', () => {
+    const k = structuredClone(c);
+    for (const cr of k.crops) if (cr.regional) delete cr.sold_at;   // no Market sells a regional seed
+    const s = fresh();
+    s.skills.farming = 10_000; s.skills.fishing = 10_000; s.skills.cooking = 10_000; s.homestead.level = 5;
+    expect(eligible(k, s, 'market')).not.toContain('req_sys_regional_crop');
   });
 
   it('home climate, home city and other climates pick their own items', () => {

@@ -2,7 +2,8 @@ class_name P0KitchenLogic
 extends RefCounted
 ## What the cooking drawer and the stove stage show, from the P0 server view (SGODOT-226, LOCK-20 v5; plan
 ## §7.2.3 / §7.2.7; Figma COOK-2a / COOK-2b). Pure functions, unit-tested; the drawer and stage only draw them.
-## P0 has one stove (Stove 1/1). Pot contents are item ids, one entry per unit (the same id may fill two slots).
+## Stoves: 1 at Homestead Lv1–3, 2 from Lv4, 3 from Lv8 (§7.7, SGODOT-282); every stove function takes the stove's
+## 0-based index (default stove 1). Pot contents are item ids, one entry per unit (the same id may fill two slots).
 
 const FAMILY_OF_CHIP := {"Fish": "W", "Produce": "F", "Fruit": "O", "Seasoning": "S"}
 const COOKBOOK_CHIPS := ["All", "Can cook", "Common", "Fine", "Rare", "Legendary"]
@@ -11,42 +12,126 @@ const LOCKED_SLOT_LEVEL := 4   # the 3rd slot opens at Cooking Lv4 (§7.2.3)
 
 static func cooking(view: Dictionary) -> Dictionary: return view.get("cooking", {})
 
-## The P0 stove's pot, or null when empty. Reads cooking.stoves[0] when the server sends the stove list
-## (SGODOT-232, Queue ×2), else cooking.stove.
-static func stove(view: Dictionary):
+## Stove i's pot, or null when empty. Reads cooking.stoves[i] when the server sends the stove list (SGODOT-232,
+## Queue ×2; one entry per stove, null when empty, SGODOT-282), else cooking.stove for stove 1.
+static func stove(view: Dictionary, i := 0):
 	var list = cooking(view).get("stoves", null)
 	if list is Array:
-		if list.is_empty() or not (list[0] is Dictionary): return null
-		return list[0] if list[0].get("ms", list[0].get("ready_in", null)) != null else null
-	return cooking(view).get("stove", null)
+		if i >= list.size() or not (list[i] is Dictionary): return null
+		return list[i] if list[i].get("ms", list[i].get("ready_in", null)) != null else null
+	return cooking(view).get("stove", null) if i == 0 else null
+
+## How many stoves the kitchen has (the server's stove list, else 1).
+static func stove_count(view: Dictionary) -> int:
+	var list = cooking(view).get("stoves", null)
+	return maxi(1, list.size()) if list is Array else 1
+
+## `Stove 2/3`: the stove's number of the kitchen's stoves (q(31), §7.2.7).
+static func stove_label(view: Dictionary, i := 0) -> String:
+	return "Stove %d/%d" % [i + 1, stove_count(view)]
+
+## The stove a cook from the Energy card / a Today row goes to: the first empty one, else the first that can queue,
+## else stove 1 (§7.2.3: "the nearest free stove").
+static func free_stove(view: Dictionary) -> int:
+	for i in stove_count(view):
+		if stove(view, i) == null: return i
+	for i in stove_count(view):
+		if can_queue(view, i): return i
+	return 0
+
+## An ingredient as a button's gap names it (q(112), 李白): a tag slot without its leading "Any" (`Need Legendary fish
+## ×1`, `Need seasoning ×1`); the ingredient column keeps `Any Legendary fish`.
+static func need_label(view: Dictionary, token: String) -> String:
+	return P0Logic.ingredient_label(view, token).trim_prefix("Any ")
+
+## Another stove's heat reminder (b84a5e01 ④): the index of the ring that comes up within `lead_ms` from now on this
+## pot (its rings grow in RING_EARLY before their turn, so "comes up" is that moment), else -1.
+static func ring_soon(st: Dictionary, lead_ms: float, early_ms := 1000.0) -> int:
+	var e := float(st.get("elapsed", float(st.get("ms", 0)) - float(st.get("ready_in", 0))))
+	var heats: Array = st.get("heats", [])
+	for i in heats.size():
+		var up := float(heats[i].get("at", 0)) - early_ms
+		if up > e and up - e <= lead_ms: return i
+	return -1
+
+## Big Pot (Homestead Lv6): the drawer offers Double.
+static func big_pot(view: Dictionary) -> bool: return bool(cooking(view).get("big_pot", false))
+
+## The Double toggle (b84a5e01 ③) for the Cookbook's selected page (`page`) or Experiment's pot (`pot`):
+## {shown, enabled, toast}. Hidden before Homestead Lv6 (no locked look); grey for a Legendary dish, a mix that makes
+## no known page and seasonings alone, a tap on it saying why.
+static func double_state(view: Dictionary, page := {}, pot := []) -> Dictionary:
+	if not big_pot(view): return {shown = false, enabled = false, toast = ""}
+	var rarity := 0
+	var known := false
+	if not page.is_empty():
+		known = bool(page.get("known", false))
+		rarity = int(page.get("rarity", 1))
+	elif not pot.is_empty():
+		if not has_main(view, pot): return {shown = true, enabled = false, toast = DOUBLE_KNOWN_ONLY}
+		var pv := preview(view, pot)
+		known = str(pv.get("title", "")) != "Unknown dish" and str(pv.get("title", "")) != ""
+		rarity = int(pv.get("rarity", 1))
+	if not known: return {shown = true, enabled = false, toast = DOUBLE_KNOWN_ONLY}
+	if rarity >= 4: return {shown = true, enabled = false, toast = DOUBLE_NOT_LEGENDARY}
+	return {shown = true, enabled = true, toast = ""}
+
+const DOUBLE_NOT_LEGENDARY := "Double · not for Legendary dishes"
+const DOUBLE_KNOWN_ONLY := "Double · known recipes only"
+
+## Double's main key (b84a5e01 ③): `Cook ×2` / `Queue ×2`, or the first gap for two portions (LOCK-10, `Need 1 more
+## Pond Crucian`); "" when the stock covers two. `tokens`: the page's ingredients or the pot's items.
+static func double_gap(view_: Dictionary, tokens: Array) -> String:
+	var view := with_rack(view_)
+	var left := stock(view)
+	for round in 2:
+		for token in tokens:
+			var t := str(token)
+			var found := ""
+			for id in left:
+				if int(left[id]) > 0 and _matches(view, t, id):
+					found = id
+					break
+			if found == "":
+				var need := tokens.filter(func(x): return str(x) == t).size() * 2
+				var have := 0
+				for id in stock(view): if _matches(view, t, id): have += int(stock(view)[id])
+				return "Need %d more %s" % [maxi(1, need - have), need_label(view, t)]
+			left[found] = int(left[found]) - 1
+	return ""
+
+static func double_label(queue := false) -> String: return "Queue ×2" if queue else "Cook ×2"
 static func slots(view: Dictionary) -> int: return int(cooking(view).get("slots", 2))
 static func level(view: Dictionary) -> int: return int(view.get("skills", {}).get("cooking", {}).get("level", 1))
 
 # ---------------------------------------------------------------- drawer header (q(31): stove · level · state)
-static func header(view: Dictionary) -> Dictionary:
-	return {stove = "Stove 1/1", level = "Cooking Lv%d" % level(view), state = stove_state(view)}
+static func header(view: Dictionary, i := 0) -> Dictionary:
+	return {stove = stove_label(view, i), level = "Cooking Lv%d" % level(view), state = stove_state(view, i)}
 
-static func stove_state(view: Dictionary) -> String:
-	var st = stove(view)
+static func stove_state(view: Dictionary, i := 0) -> String:
+	var st = stove(view, i)
 	if st == null: return "Empty"
 	var left := float(st.get("ready_in", 0))
-	var queued := " · Queued 1" if cooking(view).get("queued", null) is Dictionary else ""   # S5 Queue ×2 (Lv5)
+	var queued := " · Queued 1" if queued(view, i) != null else ""   # S5 Queue ×2 (Lv5)
 	return ("Ready" if left <= 0.0 else "Cooking " + P0Logic.duration(left)) + queued
 
 # ---------------------------------------------------------------- Queue ×2 (Cooking Lv5, q(71))
 ## The pot waiting behind the one on the stove ({id, dish, rarity, ms, starts_in}), or null.
-static func queued(view: Dictionary):
-	var q = cooking(view).get("queued", null)
+static func queued(view: Dictionary, i := 0):
+	var list = cooking(view).get("stoves", null)
+	# The stove list carries each stove's queued pot; stove 1 also has the older top-level cooking.queued.
+	var q = list[i].get("queued", null) if list is Array and i < list.size() and list[i] is Dictionary else null
+	if q == null and i == 0: q = cooking(view).get("queued", null)
 	return q if q is Dictionary else null
 
 ## Whether the watch sheet offers `Queue next ›`: Queue ×2 is open (Cooking Lv5), a pot is cooking and none waits.
 ## Lv1–4 and a full queue show nothing, not a grey button (q(71)).
-static func can_queue(view: Dictionary) -> bool:
-	return cooking(view).get("conveniences", []).has("queue_two") and stove(view) != null and queued(view) == null
+static func can_queue(view: Dictionary, i := 0) -> bool:
+	return cooking(view).get("conveniences", []).has("queue_two") and stove(view, i) != null and queued(view, i) == null
 
 ## The watch sheet's state line: `Cooking`, or `Cooking · Queued 1` with a pot waiting (q(71) supplement).
-static func watch_state(view: Dictionary) -> String:
-	return "Cooking · Queued 1" if queued(view) != null else "Cooking"
+static func watch_state(view: Dictionary, i := 0) -> String:
+	return "Cooking · Queued 1" if queued(view, i) != null else "Cooking"
 
 ## The toast when the stove turns over to the waiting pot while the player is in the kitchen (q(71)):
 ## "Grilled Crucian kept · Herb Grilled Fish cooking". dish_ev = the kept pot's `dish` event; next_dish = the pot now
@@ -271,7 +356,7 @@ static func missing_reason(view: Dictionary, p: Dictionary) -> String:
 			if int(s.get("qty", 0)) - int(used.get(id, 0)) > 0 and P0Logic._token_matches(view, t, id):
 				found = id
 				break
-		if found == "": return "Need %s ×1" % P0Logic.ingredient_label(view, t)
+		if found == "": return "Need %s ×1" % need_label(view, t)
 		used[found] = int(used.get(found, 0)) + 1
 	return "Missing ingredients"
 
@@ -447,16 +532,16 @@ static func page_preview(view: Dictionary, p: Dictionary) -> Dictionary:
 
 ## Experiment's Cook button: the gap when it cannot cook (LOCK-10), else "Cook" (never "Free", §7.2.7). In the drawer
 ## opened from Queue next › the pot on the stove is the point: the button reads Queue, never Stove busy (q(71)).
-static func experiment_reason(view: Dictionary, pot: Array, queue := false) -> String:
+static func experiment_reason(view: Dictionary, pot: Array, queue := false, i := 0) -> String:
 	if pot.is_empty(): return "Add an ingredient"
 	if not has_main(view, pot): return "Needs a main ingredient"
-	if stove(view) != null and not queue: return "Stove busy"
+	if stove(view, i) != null and not queue: return "Stove busy"
 	return ""
 
 # ---------------------------------------------------------------- the dish comes out (COOK-4 / 6 / P0-9, COOK-7-2)
 ## Portions waiting on the stove after a collect with no room (§7.2.6, PR #20): [] when none.
-static func stove_left(view: Dictionary) -> Array:
-	var st = stove(view)
+static func stove_left(view: Dictionary, i := 0) -> Array:
+	var st = stove(view, i)
 	if not (st is Dictionary) or st.get("left", null) == null: return []
 	return st.left
 

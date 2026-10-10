@@ -13,6 +13,9 @@
  * list (world.area_tier), city traits come from world.coastal, and places are laid out by geometry alone.
  */
 import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import type { CityCluster, Climate } from './clusters.js';
 import type { FishPlace, P0Content } from './content.js';
 import { homeCluster } from './travel.js';
@@ -53,7 +56,12 @@ export interface WorldContent {
   coastal: Record<string, string[]>;
   room: Record<Role | 'cabin', { art: string; anchors: string; category: string }>;
   keeper_roles: Record<Role, string>;
+  keeper_looks?: Record<string, Record<string, string>>;
+  residents?: ResidentRules;
 }
+
+interface ResidentRule { id: string; needs?: string[]; tier_min?: Tier; pop_max?: number; at?: string }
+interface ResidentRules { per_outpost: number; rank: ResidentRule[]; fixed: Record<string, string>; s_order: ResidentRule[] }
 
 const TIERS: Tier[] = ['S', 'M1', 'M2', 'L1', 'L2', 'L3'];
 const CLIMATE_KEY: Record<Climate, string> = { tropical: 'Tropical', subtropical: 'Subtropical', temperate: 'Temperate', cool: 'Cool' };
@@ -83,9 +91,31 @@ export function km(a: { lat: number; lng: number }, b: { lat: number; lng: numbe
   return 2 * 6371 * Math.asin(Math.min(1, Math.sqrt(h)));
 }
 
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
+let memberPop: Map<string, number> | null = null;
+/**
+ * q(114) ①: a cluster's population is the sum of its member cities (server/data/city_cluster_members.tsv over
+ * server/data/cities.tsv). The cluster table keeps its seed city's own figure (Miami 487,014 alone, 780,231 with its
+ * members), which would make a metro area an S-tier town. Read once; a cluster missing from the files keeps its own.
+ */
+export function clusterPopulation(cl: CityCluster): number {
+  if (!memberPop) {
+    memberPop = new Map();
+    try {
+      const rows = (f: string) => readFileSync(path.join(ROOT, f), 'utf8').split('\n').filter(l => l && !l.startsWith('#')).map(l => l.split('\t'));
+      const pop = new Map(rows('server/data/cities.tsv').map(r => [r[0], Number(r[7]) || 0] as [string, number]));
+      for (const [city, cluster] of rows('server/data/city_cluster_members.tsv')) memberPop.set(cluster, (memberPop.get(cluster) ?? 0) + (pop.get(city) ?? 0));
+    } catch {
+      memberPop.clear();   // the files missing (a stripped image): every cluster keeps its own figure, never a 500 (哪吒 on #244)
+    }
+  }
+  return Math.max(cl.population, memberPop.get(cl.id) ?? 0);
+}
+
 /** §9.3.2: the larger of the population tier and the built-up-area tier (world.area_tier until there is area data). */
 export function tierOf(w: WorldContent, cl: CityCluster): Tier {
-  const byPop = w.tiers.find(t => t.pop_max === null || cl.population < t.pop_max)?.tier ?? 'L3';
+  const people = clusterPopulation(cl);
+  const byPop = w.tiers.find(t => t.pop_max === null || people < t.pop_max)?.tier ?? 'L3';
   const byArea = w.area_tier[cl.id];
   return byArea && TIERS.indexOf(byArea) > TIERS.indexOf(byPop) ? byArea : byPop;
 }
@@ -93,7 +123,7 @@ export function tierOf(w: WorldContent, cl: CityCluster): Tier {
 /** §6.3.3: 3 ponds from the first 500,000 people, +1 per 500,000 more, at most 6. */
 export function pondCount(w: WorldContent, cl: CityCluster): number {
   const p = w.ponds;
-  return Math.min(p.max, p.base + Math.max(0, Math.floor((cl.population - p.per_pop) / p.per_pop)));
+  return Math.min(p.max, p.base + Math.max(0, Math.floor((clusterPopulation(cl) - p.per_pop) / p.per_pop)));
 }
 
 /**
@@ -257,6 +287,51 @@ export function regionalFish(c: P0Content, cl: CityCluster): { fish: string; lev
 const worldOf = (c: P0Content) => (c as P0Content & { world?: WorldContent }).world;
 
 /** A cluster's generated places, from the content's world block and the frozen cluster table. Throws for an unknown cluster. */
+/**
+ * Residents (§9.4.3): Pip at every travel post and trading post; Nadia at Market Square 1 and Sam at Travel Post 1
+ * (M and up); then the rank list in order — a resident whose city traits (world.coastal: coast / river / highland) or
+ * tier the city lacks is skipped — each to the outpost of their trade, never more than per_outpost residents in one
+ * outpost, never more fixed residents than outposts in the city. S tier: the trading post holds Pip and the first
+ * eligible of s_order. Ivo's Mine Hut is not built yet (he waits for it); Lena takes the tea house nearest the sea
+ * (the plan's M-tier rule) until a Lighthouse Room exists.
+ */
+export function placeResidents(w: WorldContent, cl: CityCluster, tier: Tier, ponds: GenPond[], outposts: GenOutpost[], known: Set<string>): void {
+  const rules = w.residents;
+  if (!rules) return;
+  const traits = new Set(w.coastal[cl.id] ?? []);
+  const ok = (r: ResidentRule) => known.has(r.id) && (r.needs ?? []).every(t => traits.has(t))
+    && (!r.tier_min || TIERS.indexOf(tier) >= TIERS.indexOf(r.tier_min)) && (r.pop_max === undefined || clusterPopulation(cl) < r.pop_max);
+  const room = (o: GenOutpost | undefined) => !!o && o.residents.length < rules.per_outpost;
+  const put = (o: GenOutpost | undefined, id: string) => { if (o && room(o) && known.has(id) && !o.residents.includes(id)) o.residents.push(id); };
+  const placed = () => new Set(outposts.flatMap(o => o.residents));
+
+  if (tier === 'S') {
+    const cabin = outposts[0];
+    put(cabin, rules.fixed.post);
+    const first = rules.s_order.find(ok);
+    if (first) put(cabin, first.id);
+    return;
+  }
+  const byRole = (role: Role, n: number) => outposts.find(o => o.id === `${cl.id}~${role}${n}`);
+  for (const o of outposts.filter(x => x.role === 'post')) put(o, rules.fixed.post);   // Pip in every travel post
+  put(byRole('market', 0), rules.fixed['market:0']);
+  const beginner = ponds.find(p => p.beginner);
+  const tackleBy = (pond: GenPond | undefined) => outposts.find(o => o.role === 'tackle' && pond && o.nearest?.name === pond.name);
+  const where = (at: string): GenOutpost | undefined => {
+    if (at === 'tackle:beginner') return tackleBy(beginner);
+    if (at === 'tackle:river') return tackleBy(ponds.find(p => p.site === 'river' && tackleBy(p))) ?? byRole('tackle', 1);
+    if (at === 'tea:sea') return byRole('tea', 1) ?? byRole('tea', 0);   // no coastline geometry yet: the second tea house
+    const [role, n] = at.split(':');
+    return ['tea', 'tackle', 'market', 'post'].includes(role) ? byRole(role as Role, Number(n)) : undefined;
+  };
+  const cap = outposts.length;
+  for (const r of rules.rank) {
+    if (placed().size >= cap) break;
+    if (!ok(r) || placed().has(r.id) || !r.at) continue;
+    put(where(r.at), r.id);
+  }
+}
+
 export function generateCity(c: P0Content, cl: CityCluster): CityPlaces {
   const w = worldOf(c);
   if (!w) throw new Error('p0 world: no world block in the content (assets/p0/content/world_gen.json)');
@@ -264,6 +339,7 @@ export function generateCity(c: P0Content, cl: CityCluster): CityPlaces {
   const ponds = genPonds(w, cl, new Set(Object.keys(c.fishing.sites)));
   const outposts = genOutposts(w, cl, tier, ponds);
   nameKeepers(w, cl, outposts);
+  placeResidents(w, cl, tier, ponds, outposts, new Set(Object.keys((c as P0Content & { residents?: Record<string, unknown> }).residents ?? {})));
   return {
     cluster: cl.id, tier, climate: cl.climate,
     ponds: ponds.map(p => p.id), outposts: outposts.map(o => o.id),
