@@ -573,6 +573,216 @@
     "lat": -10.886138,
     "lng": -61.946701,
     "why": "Ji Paraná · Coral Trading Post stood 13 m from water (-10.886328, -61.946286; 司空震's six-city check, 286 16ffaf67, 2026-10-10). Moved 50 m to land 61 m from water by ESA WorldCover 2021 (tools/world_water_check.ts), keeping the placement rules."
+   },
+   "gn-1007311~pond3": {
+    "lat": -29.817692,
+    "lng": 31.039064,
+    "why": "Durban · Tortoise Creek: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (-29.826141, 31.065822); moved 2747 m with its group (pond, tackle shop, Market Square 1) to land 26 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-1007311~tackle3": {
+    "lat": -29.815446,
+    "lng": 31.039064,
+    "why": "Durban · Tortoise Tackle Shop: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (-29.827270, 31.064211); moved 2759 m with its group (pond, tackle shop, Market Square 1) to land 75 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-1797929~pond3": {
+    "lat": 36.070812,
+    "lng": 120.437121,
+    "why": "Qingdao · Hawthorn Creek: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (36.024134, 120.403800); moved 5993 m with its group (pond, tackle shop, Market Square 1) to land 341 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-1797929~tackle3": {
+    "lat": 36.072358,
+    "lng": 120.439852,
+    "why": "Qingdao · Hawthorn Tackle Shop: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (36.024643, 120.401670); moved 6319 m with its group (pond, tackle shop, Market Square 1) to land 212 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-2274895~pond3": {
+    "lat": 6.312003,
+    "lng": -10.817095,
+    "why": "Monrovia · Lorikeet Pond: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (6.278745, -10.836412); moved 4270 m with its group (pond, tackle shop, Market Square 1) to land 29 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-2521978~pond0": {
+    "lat": 38.345488,
+    "lng": -0.477319,
+    "why": "Alicante · Finch Pond: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (38.329833, -0.460573); moved 2272 m with its group (pond, tackle shop, Market Square 1) to land 38 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-2521978~tackle0": {
+    "lat": 38.347523,
+    "lng": -0.476109,
+    "why": "Alicante · Finch Tackle Shop: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (38.328038, -0.460467); moved 2560 m with its group (pond, tackle shop, Market Square 1) to land 109 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-2521978~market0": {
+    "lat": 38.349934,
+    "lng": -0.47165,
+    "why": "Alicante · Mill Market Square: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (38.332917, -0.464779); moved 1985 m with its group (pond, tackle shop, Market Square 1) to land 121 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-3399415~pond1": {
+    "lat": -3.718692,
+    "lng": -38.517173,
+    "why": "Fortaleza · Mangrove Creek: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (-3.701188, -38.527300); moved 2247 m with its group (pond, tackle shop, Market Square 1) to land 28 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-3399415~tackle1": {
+    "lat": -3.71923,
+    "lng": -38.515693,
+    "why": "Fortaleza · Mangrove Tackle Shop: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (-3.702313, -38.525896); moved 2196 m with its group (pond, tackle shop, Market Square 1) to land 65 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-1248991~pond1": {
+    "lat": 6.958037,
+    "lng": 79.853803,
+    "why": "Colombo · Mangrove Creek: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (6.957942, 79.853598); moved 25 m with its group (pond, tackle shop, Market Square 1) to land 28 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-1248991~tackle1": {
+    "lat": 6.958735,
+    "lng": 79.856425,
+    "why": "Colombo · Mangrove Tackle Shop: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (6.959149, 79.852340); moved 453 m with its group (pond, tackle shop, Market Square 1) to land 65 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-1869012~pond0": {
+    "lat": 39.427293,
+    "lng": 125.961379,
+    "why": "Sunch’ŏn · Fern Pond: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (39.427517, 125.961354); moved 25 m with its group (pond, tackle shop, Market Square 1) to land 188 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-1869012~market0": {
+    "lat": 39.4237,
+    "lng": 125.953322,
+    "why": "Sunch’ŏn · Meadow Market Square: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (39.428352, 125.955608); moved 553 m with its group (pond, tackle shop, Market Square 1) to land 62 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-2326016~market0": {
+    "lat": 6.1461,
+    "lng": 6.770513,
+    "why": "Onitsha · Mango Market Square: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (6.147340, 6.767813); moved 329 m with its group (pond, tackle shop, Market Square 1) to land 67 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-2523920~pond0": {
+    "lat": 38.13286,
+    "lng": 13.371438,
+    "why": "Palermo · Cowslip Pond: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (38.133604, 13.382246); moved 949 m with its group (pond, tackle shop, Market Square 1) to land 28 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-2523920~tackle0": {
+    "lat": 38.132782,
+    "lng": 13.3703,
+    "why": "Palermo · Cowslip Tackle Shop: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (38.132587, 13.380363); moved 880 m with its group (pond, tackle shop, Market Square 1) to land 61 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-2523920~market0": {
+    "lat": 38.131612,
+    "lng": 13.36244,
+    "why": "Palermo · Orchard Market Square: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (38.130183, 13.378495); moved 1413 m with its group (pond, tackle shop, Market Square 1) to land 65 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-1716198~pond0": {
+    "lat": 16.04405,
+    "lng": 120.328202,
+    "why": "Dagupan · Iguana Pond: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (16.058157, 120.315884); moved 2048 m with its group (pond, tackle shop, Market Square 1) to land 26 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-1716198~tackle0": {
+    "lat": 16.042573,
+    "lng": 120.327643,
+    "why": "Dagupan · Iguana Tackle Shop: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (16.058639, 120.314083); moved 2300 m with its group (pond, tackle shop, Market Square 1) to land 66 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-1716198~market0": {
+    "lat": 16.039749,
+    "lng": 120.324447,
+    "why": "Dagupan · Palm Market Square: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (16.055134, 120.319377); moved 1794 m with its group (pond, tackle shop, Market Square 1) to land 65 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-1886762~pond0": {
+    "lat": 29.968474,
+    "lng": 122.204624,
+    "why": "Zhoushan · Yuzu Pond: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (29.967304, 122.196965); moved 749 m with its group (pond, tackle shop, Market Square 1) to land 46 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-1886762~tackle0": {
+    "lat": 29.970682,
+    "lng": 122.206408,
+    "why": "Zhoushan · Yuzu Tackle Shop: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (29.969094, 122.196783); moved 944 m with its group (pond, tackle shop, Market Square 1) to land 61 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-1886762~market0": {
+    "lat": 29.971437,
+    "lng": 122.209508,
+    "why": "Zhoushan · Pagoda Market Square: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (29.971605, 122.198557); moved 1055 m with its group (pond, tackle shop, Market Square 1) to land 96 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-2346229~pond0": {
+    "lat": 4.97434,
+    "lng": 8.315799,
+    "why": "Calabar · Canoe Pond: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (4.973248, 8.309583); moved 699 m with its group (pond, tackle shop, Market Square 1) to land 33 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-2346229~tackle0": {
+    "lat": 4.974789,
+    "lng": 8.315799,
+    "why": "Calabar · Canoe Tackle Shop: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (4.975045, 8.309565); moved 691 m with its group (pond, tackle shop, Market Square 1) to land 76 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-2346229~market0": {
+    "lat": 4.970218,
+    "lng": 8.321708,
+    "why": "Calabar · Monsoon Market Square: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (4.970368, 8.313076); moved 956 m with its group (pond, tackle shop, Market Square 1) to land 67 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-2637487~market0": {
+    "lat": 50.888232,
+    "lng": -1.418072,
+    "why": "Southampton · Orchard Market Square: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (50.886242, -1.408848); moved 684 m with its group (pond, tackle shop, Market Square 1) to land 61 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-4641239~pond0": {
+    "lat": 35.151738,
+    "lng": -90.058577,
+    "why": "Memphis · Fern Pond: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (35.157812, -90.074510); moved 1598 m with its group (pond, tackle shop, Market Square 1) to land 32 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-4641239~tackle0": {
+    "lat": 35.149941,
+    "lng": -90.058577,
+    "why": "Memphis · Fern Tackle Shop: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (35.157790, -90.074465); moved 1688 m with its group (pond, tackle shop, Market Square 1) to land 69 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-4641239~market0": {
+    "lat": 35.155426,
+    "lng": -90.057368,
+    "why": "Memphis · Maple Market Square: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (35.156146, -90.069374); moved 1094 m with its group (pond, tackle shop, Market Square 1) to land 76 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-1793900~pond0": {
+    "lat": 30.528379,
+    "lng": 105.582356,
+    "why": "Suining · Mimosa Pond: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (30.529042, 105.582492); moved 75 m with its group (pond, tackle shop, Market Square 1) to land 225 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-1793900~market0": {
+    "lat": 30.522492,
+    "lng": 105.577571,
+    "why": "Suining · Bamboo Market Square: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (30.524814, 105.580647); moved 392 m with its group (pond, tackle shop, Market Square 1) to land 61 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-2210247~pond0": {
+    "lat": 32.907844,
+    "lng": 13.196458,
+    "why": "Tripoli · Ginkgo Pond: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (32.907376, 13.199619); moved 300 m with its group (pond, tackle shop, Market Square 1) to land 32 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-2210247~tackle0": {
+    "lat": 32.906705,
+    "lng": 13.193549,
+    "why": "Tripoli · Ginkgo Tackle Shop: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (32.909169, 13.199745); moved 640 m with its group (pond, tackle shop, Market Square 1) to land 66 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-2210247~pond2": {
+    "lat": 32.886489,
+    "lng": 13.160857,
+    "why": "Tripoli · Wagtail Creek: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (32.886394, 13.160615); moved 25 m with its group (pond, tackle shop, Market Square 1) to land 24 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-2422465~pond1": {
+    "lat": 9.507912,
+    "lng": -13.720006,
+    "why": "Conakry · Turtle Creek: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (9.516530, -13.670446); moved 5519 m with its group (pond, tackle shop, Market Square 1) to land 124 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-2422465~tackle1": {
+    "lat": 9.508834,
+    "lng": -13.722574,
+    "why": "Conakry · Turtle Tackle Shop: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (9.515990, -13.668708); moved 5961 m with its group (pond, tackle shop, Market Square 1) to land 75 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-3390760~pond1": {
+    "lat": -8.078109,
+    "lng": -34.875807,
+    "why": "Recife · Vanilla Creek: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (-8.067571, -34.863123); moved 1823 m with its group (pond, tackle shop, Market Square 1) to land 21 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-3390760~tackle1": {
+    "lat": -8.079665,
+    "lng": -34.876714,
+    "why": "Recife · Vanilla Tackle Shop: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (-8.067702, -34.864933); moved 1858 m with its group (pond, tackle shop, Market Square 1) to land 62 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-745044~pond2": {
+    "lat": 41.002335,
+    "lng": 28.97514,
+    "why": "Istanbul · Mallard Creek: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (40.992808, 28.960097); moved 1648 m with its group (pond, tackle shop, Market Square 1) to land 141 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-745044~tackle2": {
+    "lat": 41.001644,
+    "lng": 28.972623,
+    "why": "Istanbul · Mallard Tackle Shop: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (40.992710, 28.962474); moved 1309 m with its group (pond, tackle shop, Market Square 1) to land 63 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
    }
   },
   "room": {
