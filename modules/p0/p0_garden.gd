@@ -304,6 +304,9 @@ static func cells(view: Dictionary, now_ms: int) -> Dictionary:
 			"growing":
 				var ready_at := now_ms + int(float(p.get("ready_in", 0)))
 				slot = {"state": "growing", "crop": code, "ready_at": ready_at, "watered_at": ready_at - int(grow.get(crop, 3600000.0))}
+				# A picked tree regrowing (q(118)) stays a grown tree without fruit: the stage below ripe, not a sapling again.
+				if bool(p.get("tree", false)) and int(p.get("picks", 0)) > 0:
+					slot.watered_at = ready_at - int(maxf(1.0, float(p.get("ready_in", 0))) / 0.3)
 			"ready":
 				slot = {"state": "growing", "crop": code, "ready_at": now_ms, "watered_at": now_ms - int(grow.get(crop, 3600000.0))}
 		out[cell_id(cell_of(id))] = slot

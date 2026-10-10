@@ -13,7 +13,7 @@ import { maxEnergy, skillLevel, untilRollover } from './rules.js';
 import type { P0State } from './state.js';
 import { missing, putInStorage, stored, takeStorageFirst } from './storage.js';
 import type { Refusal } from './fishing.js';
-import { clusterOf, homeCluster } from './travel.js';
+import { clusterById, clusterOf, homeCluster } from './travel.js';
 import { decorOf, isDecor } from './decor.js';
 import { climateAt } from './travel.js';
 
@@ -30,8 +30,14 @@ export function catalog(c: P0Content, shop: ShopId, s?: P0State, place?: unknown
   if (shop === 'homestead') return [...c.stall.buy, ...c.bag_upgrades.map(u => u.id),
     ...Object.entries(decorOf(c)?.items ?? {}).filter(([, d]) => d.buy).map(([id]) => id)];
   if (shop === 'tackle') return c.tackle.buy;
-  if (shop === 'market') return [...c.market.buy, ...regionalSeeds(c, s, place), ...c.market.specialty];
+  if (shop === 'market') return [...c.market.buy, ...regionalSeeds(c, s, place), ...orchardShelf(c), ...c.market.specialty];
   return [];
+}
+
+/** §5.2.4 / §5.5: a Market sells the saplings (Lv7 / Lv9) and Orchard Feed (goods with shop: market) in every city. */
+export function orchardShelf(c: P0Content): string[] {
+  return [...c.crops.filter(x => x.perennial && x.sold_at === 'market').map(x => x.seed),
+    ...Object.entries(c.goods).filter(([, g]) => g.shop === 'market').map(([id]) => id)];
 }
 
 /** §5.2.3: a Market sells only its own climate's regional seed. */
@@ -162,6 +168,11 @@ export function quotaKey(c: P0Content, q: QuotaId, cluster: string): string {
 /** The city a counter command is at: its place's cluster, else the city the player is in (home before v5 travel). */
 export function counterCity(c: P0Content, s: P0State, place: unknown): string {
   return (typeof place === 'string' && place !== '' ? clusterOf(c, place) : null) ?? s.travel?.here ?? homeCluster(c);
+}
+
+/** A quota's scope line, naming the city a per-city one counts (NPC-3 482:120: `all San Francisco markets`). */
+export function quotaScope(c: P0Content, q: QuotaId, cluster: string): string {
+  return c.quotas[q].scope.replace('{city}', cluster === homeCluster(c) ? c.profile.city : clusterById(c, cluster)?.name ?? c.profile.city);
 }
 
 export function quotaLeft(c: P0Content, s: P0State, q: QuotaId, cluster = homeCluster(c)): number {

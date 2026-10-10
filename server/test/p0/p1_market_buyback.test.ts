@@ -3,7 +3,7 @@ import { loadP0Content } from '../../src/p0/content.js';
 import { applyP0, type P0Command, type P0Event } from '../../src/p0/reducer.js';
 import { freshState, type P0State } from '../../src/p0/state.js';
 import { viewOf } from '../../src/p0/view.js';
-import { buyback, quotaLeft } from '../../src/p0/shops.js';
+import { buyback, quotaLeft, quotaScope } from '../../src/p0/shops.js';
 
 // The Market Square's buy-back (§9.13.1): its own climate's regional crops and fish at 0.8, 60 coins a day per city
 // cluster, the city's market squares sharing one count (§11.7.3).
@@ -41,7 +41,7 @@ describe('the Market Square buys its climate\'s regional crops and fish (§9.13.
     expect(r.ev).toContainEqual({ kind: 'sale', item: 'crop_pumpkin', qty: 3, asked: 5, coins: 51, shop: 'market', quota: 'regional_market' });
     expect(r.s.day.quota[`regional_market@${SF}`]).toBe(51);
     expect(quotaLeft(c, r.s, 'regional_market', SF)).toBe(9);
-    expect(viewOf(c, r.s, T0).quotas.regional_market).toMatchObject({ used: 51, cap: 60, scope: 'this city' });
+    expect(viewOf(c, r.s, T0).quotas.regional_market).toMatchObject({ used: 51, cap: 60, scope: 'all San Francisco markets' });   // NPC-3 482:120
     expect(refuse(r.s, { type: 'sell', item: 'crop_pumpkin', qty: 1, ...AT_MARKET })).toMatchObject({ ok: false, code: 'limit_reached' });
     s = r.s;
     r = step(s, { type: 'sell', item: 'crop_pumpkin', qty: 1, ...AT_MARKET }, T0 + DAY);   // the next day
@@ -54,6 +54,8 @@ describe('the Market Square buys its climate\'s regional crops and fish (§9.13.
     s.day.quota[`regional_market@${SF}`] = 60;
     expect(quotaLeft(c, s, 'regional_market', SF)).toBe(0);
     expect(quotaLeft(c, s, 'regional_market', TOKYO)).toBe(60);
+    expect(quotaScope(content, 'regional_market', TOKYO)).toBe('all Tokyo markets');   // in Tokyo the line counts Tokyo's markets (the loaded content carries the clusters)
+    expect(quotaScope(content, 'regional_market', SF)).toBe('all San Francisco markets');
     s.day.quota.fish_tackle = 50;
     expect(quotaLeft(c, s, 'fish_tackle', TOKYO)).toBe(30);   // not per city
     expect(c.quotas.fish_tackle.per_city).toBeUndefined();

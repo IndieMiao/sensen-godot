@@ -368,6 +368,22 @@ func test_a_fall_waits_for_a_swing_in_flight_and_loses_to_run_complete() -> void
 	var at := src.find("func _swing()")
 	assert_str(src.substr(at, 120)).contains("_ko_waiting")
 
+## Knocked out (不知火舞 on 288 78d0f863): the server refills HP for the run at once, but the moment keeps the bar at 0 %,
+## the slimes still and no new hit sent until the player is out.
+func test_the_knock_out_moment_holds_the_fight_at_zero() -> void:
+	var src := FileAccess.get_file_as_string("res://scenes/p0/p0_mine.gd")
+	var fight := src.substr(src.find("func _fight("), 900)
+	assert_str(fight).contains("_completing or _ko)")
+	assert_str(fight).contains("(0 if _ko else")
+	var contact := src.substr(src.find("func _on_contact("), 300)
+	assert_str(contact).contains("_ko or")
+	assert_str(src.substr(src.find("func _swing()"), 160)).contains("or _ko:")
+	var P0Mine = load("res://scenes/p0/p0_mine.gd")
+	var mine = auto_free(P0Mine.new())
+	mine._completing = true
+	mine._knocked_out()
+	assert_bool(mine._ko).is_false()   # Run complete wins; no KO moment
+
 ## The Old Tree (§13.3.6, 刘邦 / 不知火舞 on 288): a farm gathering spot at (2, 10) — off the beds (x 4–18, rows 3–11),
 ## in the spots' left column, blocked for walking and for décor, three rows from the Clay Bank (their strips never meet).
 func test_the_old_tree_stands_in_the_left_column_off_the_beds() -> void:

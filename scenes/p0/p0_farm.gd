@@ -511,6 +511,26 @@ func _sync_plots(v: Dictionary, dt: float) -> void:
 		if id >= 0 and id < P0Garden.plot_count(v): beds.multimesh.set_instance_color(id, P0Garden.bed_tint(str(p.get("state", ""))))
 	# P1 (q(59) §1.1): beds 30–39 stand from Homestead Lv3 (the view's garden.plots); before that the batch draws 30.
 	beds.multimesh.visible_instance_count = P0Garden.plot_count(v)
+	_sync_trees(v)
+
+## P1 trees (q(118)): a tree's bed is solid (§5.6: not walkable, as the old woody crop); only the cells that change flip,
+## the path grid is never rebuilt for it. A tree planted on the bed the player stands on blocks once they step off it
+## (哪吒 on #252: never trap the player; the plot sync runs at least once a second).
+var _tree_cells := {}
+func _sync_trees(v: Dictionary) -> void:
+	if grid == null: return
+	var here := bp.world_to_cell(actor.position)
+	var now := {}
+	for p in v.get("plots", []): if p.get("tree", false): now[int(p.id)] = true
+	for id in now.keys():
+		if _tree_cells.has(id): continue
+		if P0Garden.cell_of(id) == here:
+			now.erase(id)   # not solid yet: try again next sync
+			_sync_t = minf(_sync_t, 0.25)
+			continue
+		grid.set_solid(P0Garden.cell_of(id), true)
+	for id in _tree_cells: if not now.has(id): grid.set_solid(P0Garden.cell_of(id), false)
+	_tree_cells = now
 
 ## Middle of the plot beds, for camera-only "Show" from the Today panel and NeedSource (LOCK-08).
 func _plots_center() -> Vector3:
@@ -585,7 +605,7 @@ func _hold_repeat() -> void:
 	if Time.get_ticks_msec() < _hold_until: return
 	var a: Dictionary = rt.ui.fab_state()
 	var cmd: Dictionary = a.get("cmd", {})
-	if not a.get("enabled", false) or cmd.is_empty() or str(cmd.get("type", "")) == "energy_card": return
+	if not a.get("enabled", false) or cmd.is_empty() or str(cmd.get("type", "")) == "energy_card" or a.get("once", false): return   # a tree is planted one press at a time (q(118))
 	if rt.ui.fab_verb == "": rt.ui.fab_verb = str(a.get("verb", ""))
 	if str(a.get("verb", "")) != rt.ui.fab_verb: return
 	rt.holding_repeat = true   # the observation log's "hold" (S7); the first press went out as a tap
@@ -747,6 +767,11 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"yaw": _dev_yaw = float(step[1])
 		"goto":
 			actor.teleport(Vector3(float(step[1]), 0, float(step[2])))
+			_focus = actor.position
+		"plotface":   # plotface:<id> — stand on the walkway in front of a plot, facing it (P1 tree review shots)
+			var bed := bp.cell_to_world(P0Garden.cell_of(int(step[1])))
+			actor.teleport(bp.cell_to_world(P0Garden.cell_of(int(step[1])) + Vector2i(0, 1)))
+			actor.face(bed)
 			_focus = actor.position
 		"gocell":
 			actor.teleport(bp.cell_to_world(Vector2i(int(step[1]), int(step[2]))))

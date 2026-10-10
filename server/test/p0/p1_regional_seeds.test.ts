@@ -39,7 +39,7 @@ describe('regional seeds at the Market (§5.2.3)', () => {
   it('the home Market sells only the home climate\'s seed, between the goods and the City Specialty', () => {
     expect(c.profile.climate).toBe('Temperate');
     const ids = marketIds(f5());
-    expect(ids).toEqual([...c.market.buy, 'seed_pumpkin', ...c.market.specialty]);
+    expect(ids).toEqual([...c.market.buy, 'seed_pumpkin', 'seed_apple', 'seed_citrus', 'seed_grape', 'fert_orchard', ...c.market.specialty]);
     for (const other of ['seed_pineapple', 'seed_sweet_potato', 'seed_beet']) expect(ids).not.toContain(other);
     expect(refused(f5(), buy('seed_pineapple')).code).toBe('bad_item');
     expect(c.stall.buy).not.toContain('seed_pumpkin');   // the Homestead Stall never has them
@@ -48,7 +48,8 @@ describe('regional seeds at the Market (§5.2.3)', () => {
   it('a city\'s Market sells that climate\'s seed: Singapore Pineapple, Los Angeles Sweet Potato, Tokyo Pumpkin', () => {
     for (const [cluster, seed] of [[SINGAPORE, 'seed_pineapple'], [LA, 'seed_sweet_potato'], [TOKYO, 'seed_pumpkin']]) {
       const s = { ...f5(), travel: { ...f5().travel, here: cluster } };
-      expect(catalog(c, 'market', s).filter(id => id.startsWith('seed_'))).toEqual([seed]);
+      const regional = new Set(c.crops.filter(x => x.regional).map(x => x.seed));
+      expect(catalog(c, 'market', s).filter(id => regional.has(id))).toEqual([seed]);
     }
     // a command at a named outpost uses that outpost's city, wherever the player was last
     expect(catalog(c, 'market', { ...f5(), travel: { ...f5().travel, here: SINGAPORE } }, `${LA}~market0`)).toContain('seed_sweet_potato');
