@@ -14,7 +14,8 @@ const VIEW_HOMESTEAD := "View homestead"   # MAT-3 NavigationRow (the row draws 
 const HomePanel := preload("res://scenes/p0/home/p0_home_panel.gd")
 const DECISION_GAP := 12         # the fixed decision area starts 12 below the content (Cost at y 12)
 const ELEVATOR_KINDS := {"here": UiElevatorPanel.State.HERE, "free": UiElevatorPanel.State.FREE,
-	"cost": UiElevatorPanel.State.COST, "locked": UiElevatorPanel.State.LOCKED, "short": UiElevatorPanel.State.SHORT}
+	"cost": UiElevatorPanel.State.COST, "locked": UiElevatorPanel.State.LOCKED, "short": UiElevatorPanel.State.SHORT,
+	"express": UiElevatorPanel.State.EXPRESS}
 
 ## MINE-P0-6: ElevatorPanel `Elevator · stops this run`, one row per stop (Here / Free / 2 Energy / Clear Floor 1 first /
 ## Need 2 Energy). No scrim (the frame keeps the scene, key and bar in view); a tap outside or Back closes it. `pick`

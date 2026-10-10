@@ -141,6 +141,9 @@ static func _show_card(e: UiEntryCard, c: Dictionary) -> void:
 	e.second = str(second.get("label", ""))
 	e.second_state = UiEntryCard.State.AVAILABLE if bool(second.get("enabled", false)) else UiEntryCard.State.UNAVAILABLE
 	e.second_amber = bool(second.get("amber", false))
+	var express: Dictionary = c.get("express", {})   # Floor 5 · Express · Free (P1), under New run when a run is open
+	e.third = str(express.get("label", ""))
+	e.third_state = UiEntryCard.State.AVAILABLE if bool(express.get("enabled", false)) else UiEntryCard.State.UNAVAILABLE
 	e.note = str(c.get("note", ""))
 
 ## A real tap with the EntryCard up (it is passive, so the scene layer's tap arrives here first from p0_tap): on it,
@@ -319,7 +322,7 @@ func _on_craft(v: Dictionary, e: Dictionary) -> void:
 ## Commands this helper owns; false lets the farm handle the rest.
 func act(cmd: Dictionary) -> bool:
 	match str(cmd.get("type", "")):
-		"mine_enter", "mine_new_run":
+		"mine_enter", "mine_new_run", "mine_express":
 			close_card()
 			rt.session.send(cmd)
 		"toast":
@@ -328,7 +331,8 @@ func act(cmd: Dictionary) -> bool:
 			return false
 	return true
 
-## A run starts or continues: open the mine on the floor the server landed it on (Continue run: the deepest paid).
+## A run starts or continues: open the mine on the floor the server landed it on (Continue run: the deepest paid;
+## Express: Floor 5).
 ## A gather floats what went to storage at the spot (the runtime floats what went to the bag).
 func _on_state(v: Dictionary, events: Array) -> void:
 	if rt.world != farm or _opening: return
@@ -340,7 +344,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 			rt.ui.queue_floats(P0MaterialLogic.gather_floats(v, e).map(func(line: String) -> Dictionary:
 				return {kind = "item", key = line, text = line, tone = UiFloatText.Tone.ITEM}), rt.anchor())
 	for e in events:
-		if str(e.get("kind", "")) == "mine" and str(e.get("action", "")) in ["enter", "continue"]:
+		if str(e.get("kind", "")) == "mine" and str(e.get("action", "")) in ["enter", "continue", "express"]:
 			_opening = true
 			AppRouter.open_instance(P0_MINE, {"floor": int(e.get("floor", 1))})
 			get_tree().create_timer(1.0).timeout.connect(func(): _opening = false)
@@ -364,6 +368,7 @@ func _build_entry_card() -> void:
 	_entry.passive = true          # a drag starting on it is the joystick; tap_entry() takes the real tap
 	_entry.pressed.connect(func(): _press(_entry_card.get("main", {})))
 	_entry.second_pressed.connect(func(): _press(_entry_card.get("second", {})))
+	_entry.third_pressed.connect(func(): _press(_entry_card.get("express", {})))
 	_entry.visible = false
 	rt.ui.root.add_child(_entry)
 
@@ -379,5 +384,10 @@ func _press(b: Dictionary) -> void:
 		"mine_enter": act(cmd)
 		"mine_new_run":
 			P0MaterialCards.open_new_run(rt.ui, rt.session.current(), func(c: Dictionary): act(c))
+		"mine_express":   # §13.3.9: from the mouth a new run; with one open it ends it, so it asks as New run does
+			var v := rt.session.current()
+			if v.get("mine", {}).get("run", null) != null:
+				P0MaterialCards.open_new_run(rt.ui, v, func(_c: Dictionary): act({"type": "mine_express", "space": "home"}))
+			else: act({"type": "mine_express", "space": "home"})
 		"energy_card":
 			rt.energy_card(int(b.get("need", 0)), str(b.get("verb", "")))

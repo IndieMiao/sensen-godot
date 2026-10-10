@@ -59,19 +59,37 @@ static func mine_mouth_card(view: Dictionary) -> Dictionary:
 	var runs: Dictionary = mine.get("runs", {})
 	var card := {"title": "The mine", "fact": "Runs today %d/%d" % [int(runs.get("used", 0)), int(runs.get("limit", 2))],
 		"main": {}, "second": {}, "note": ""}
+	card["express"] = {}
 	if mine.get("run", null) != null:
 		card.main = _button("Continue run · Free", {"type": "mine_enter"})
 		var e := mine_entry_card(view)
 		card.second = {"label": e.label, "enabled": e.enabled, "amber": e.amber, "cmd": e.cmd, "toast": e.get("toast", ""),
 			"need": fee, "verb": "New run"}
+		card.express = _express_button(mine, e)
 		card.note = str(e.line2)
+		# q(108) ①: New run and Express stack over one note, which names both: `Current run will end · Runs today 1/2`
+		if not card.express.is_empty() and card.note != "": card.note = "%s · %s" % [card.note, card.fact]
 	elif not mine.get("entry_bag_ok", true):   # q(48): no fee into a floor whose first rock wouldn't fit
 		card.main = _button("Enter mine · Bag full", {}, false)
+		card.express = _express_button(mine, {})
 	elif _energy(view) < fee:
 		card.main = _button("Enter mine · Need %d Energy" % fee, {"type": "energy_card"}, true, true, fee, "Enter mine")
+		card.express = _express_button(mine, {})
 	else:
 		card.main = _button("Enter mine · %d Energy" % fee, {"type": "mine_enter"}, true, false, fee, "Enter mine")
+		card.express = _express_button(mine, {})
 	return card
+
+const EXPRESS := "Floor 5 · Express · Free"
+
+## The mouth card's Express (§13.3.1, q(108)): only once the account has cleared Floor 4, 0 Energy, a run of the day.
+## With an unfinished run it ends that run as New run does, so it is greyed for the same reason (`entry` is
+## mine_entry_card); with none it starts a run straight on Floor 5 (no fee, so no Energy or bag gate).
+static func _express_button(mine: Dictionary, entry: Dictionary) -> Dictionary:
+	if not bool(mine.get("express", false)): return {}
+	if not entry.is_empty() and not bool(entry.get("enabled", false)):
+		return {"label": EXPRESS, "enabled": false, "amber": false, "cmd": {}, "toast": str(entry.get("toast", entry.get("label", "")))}
+	return {"label": EXPRESS, "enabled": true, "amber": false, "cmd": {"type": "mine_express"}, "toast": ""}
 
 ## One card button {label, enabled, amber, cmd, need, verb, toast}: verb names the action on the Energy card; a grey
 ## press toasts exactly its label (不知火舞 on 266, 5181bba0).
@@ -113,8 +131,13 @@ static func refusal_text(code: String, detail: Dictionary, cmd: Dictionary) -> V
 	var type := str(cmd.get("type", ""))
 	if not (type.begins_with("mine_") or type == "gather"): return null
 	match code:
-		"tempo", "rock_gone", "lit", "no_run", "floor_not_paid", "bad_floor", "not_in_mine", "stale_state", "bad_spot":
+		# mob_gone / bad_target: a swing racing a kill or the floor's change; the next frame shows it
+		"tempo", "rock_gone", "lit", "no_run", "floor_not_paid", "bad_floor", "not_in_mine", "stale_state", "bad_spot", "mob_gone", "bad_target":
 			return ""
+		"no_rocks":
+			return "No rocks here"
+		"express_locked":
+			return "Clear Floor %d first" % int(detail.get("floor", 4))
 		"bag_full":
 			return BAG_FULL if type.begins_with("mine_") else "Bag full · free a slot first"
 		"no_runs":
@@ -133,6 +156,7 @@ static func energy_verb(cmd: Dictionary, fallback: String) -> String:
 		"mine_rock": return "Mine"
 		"mine_enter", "mine_new_run": return "Enter mine"
 		"mine_floor": return "Floor %d" % int(cmd.get("floor", 2))
+		"mine_express": return "Express"
 	return fallback
 
 ## "Run ended at daily reset" once per ended run (q(44)): the text when the view's `ended.at` is newer than the last shown.
@@ -148,7 +172,7 @@ static func mine_sheet(view: Dictionary) -> Dictionary:
 	var runs: Dictionary = mine.get("runs", {})
 	var used := int(runs.get("used", 0))
 	var limit := int(runs.get("limit", 2))
-	var sheet := {"title": "The mine", "subtitle": "Entrance", "line": "Explore two floors and gather materials.",
+	var sheet := {"title": "The mine", "subtitle": "Entrance", "line": "Mine five floors. Slimes from Floor 3.",
 		"facts": [["Runs today", "%d/%d" % [used, limit]]], "button": {}}
 	if mine.get("run", null) == null and used >= limit:
 		sheet.subtitle = "No run · Runs today %d/%d" % [used, limit]
@@ -176,8 +200,15 @@ static func mine_status(view: Dictionary, n: int, just_entered := false) -> Stri
 		return "Run %d/%d today" % [int(runs.get("used", 0)), int(runs.get("limit", 2))]
 	var floor := _floor(view, n)
 	if floor.is_empty(): return ""
-	var rocks := int(mine.get("rocks", 6))
-	return "Rocks %d/%d" % [rocks - int(floor.get("left", rocks)), rocks]
+	var rocks := int(floor.get("rocks", mine.get("rocks", 6)))
+	var line := "Rocks %d/%d" % [rocks - int(floor.get("left", rocks)), rocks] if rocks > 0 else ""
+	# Floors 3–5 add the monsters still standing (MINE-3 `… · 1 Slime`): `Rocks 2/6 · 1 Slime`, Floor 5 `Elite Slime`.
+	var mobs: Array = (floor.get("mobs", []) as Array).filter(func(m): return int(m.get("hp", 0)) > 0)
+	if not mobs.is_empty():
+		var elite := mobs.any(func(m): return str(m.get("kind", "")) == "mob_elite_slime")
+		var word := "Elite Slime" if elite else ("%d Slime%s" % [mobs.size(), "" if mobs.size() == 1 else "s"])
+		line = word if line == "" else "%s · %s" % [line, word]
+	return line
 
 # --- Inside the mine ---
 
@@ -193,6 +224,7 @@ static func _mine_action(view: Dictionary, ctx: Dictionary) -> Dictionary:
 	var n := int(ctx.get("floor", 1))
 	var floor := _floor(view, n)
 	if floor.is_empty(): return _key("pickaxe", "Mine", "Run ended", {}, false)
+	if int(floor.get("rocks", mine.get("rocks", 6))) == 0: return _key("pickaxe", "Mine", "No rocks here", {}, false)   # §13.3.8 Floor 5
 	if str(ctx.get("item", "")) == "torch":
 		if floor.get("lit", false): return _key("torch", "Light Torch", "Lit", {}, false)
 		return _key("torch", "Light Torch", "Free", {"type": "mine_torch", "floor": n})
@@ -206,6 +238,18 @@ static func _mine_action(view: Dictionary, ctx: Dictionary) -> Dictionary:
 		return _key("pickaxe", "Mine", "%d Energy" % cost, {"type": "mine_rock", "floor": n, "rock": rock}, true, false, cost)
 	if int(floor.get("left", 0)) == 0: return _key("pickaxe", "Mine", "Floor cleared", {}, false)
 	return _key("pickaxe", "Mine", "Walk to a rock", {}, false)
+
+## Combat's main action key on mine floors 3–5 (§13.3.8, COMBAT-1): `Attack`, 0 Energy and no sub-line, the sword's
+## badge; a swing with nothing in reach still swings (the old mine's). ctx {floor}. Floors 1–2 have no Combat.
+static func combat_action(view: Dictionary, ctx: Dictionary) -> Dictionary:
+	var n := int(ctx.get("floor", 1))
+	var k := _key("sword", "Attack", "", {"type": "mine_swing", "floor": n}, not _floor(view, n).is_empty())
+	k["tool"] = "sword"
+	return k
+
+## Which actions a mine floor offers on the switch key (§13.3.2): Combat only where there are monsters (3–5).
+static func mine_actions(n: int) -> Array:
+	return ["mine", "combat"] if n >= 3 else ["mine"]
 
 ## The mine's facilities, tapped and walked to (SGODOT-266; 不知火舞's spec 2e580bed, 197 LOCK-21 复议 2026-10-09):
 ## kind "exit" (floor 1's up ladder), "up" (the up ladder below floor 1), "stairs" (the down ladder), "elevator".
@@ -271,7 +315,8 @@ static func elevator_rows(view: Dictionary, here: int) -> Array:
 		var parts := str(r.label).split(" · ", true, 1)
 		r["name"] = parts[0]
 		r["state"] = parts[1] if parts.size() > 1 else ""
-		if r.state == "Here": r["kind"] = "here"
+		if bool(r.get("express", false)): r["kind"] = "express"
+		elif r.state == "Here": r["kind"] = "here"
 		elif r.state == "Free": r["kind"] = "free"
 		elif r.amber: r["kind"] = "short"
 		elif r.enabled: r["kind"] = "cost"
@@ -299,6 +344,11 @@ static func _elevator_rows(view: Dictionary, here: int) -> Array:
 		elif _energy(view) < fee: row = {"label": "Floor %d · Need %d Energy" % [n, fee], "enabled": true, "amber": true,
 			"cmd": {"type": "energy_card", "need": fee, "verb": "Floor %d" % n}}
 		else: row = {"label": "Floor %d · %d Energy" % [n, fee], "enabled": true, "amber": false, "cmd": {"type": "mine_floor", "floor": n}}
+		# §13.3.1 Express: a free ride to Floor 5 from any stop once the account has cleared Floor 4, where Floor 5 would
+		# otherwise cost its fee or wait for Floor 4 (MINE-ELEV-EXPRESS, row 58: `Floor 5` · `Express · Free`).
+		if n == floors.size() and n != here and not f.get("paid", false) and bool(mine.get("express", false)):
+			row = {"label": "Floor %d · Express · Free" % n, "enabled": true, "amber": false, "express": true,
+				"cmd": {"type": "mine_express"}}
 		rows.append(row)
 	return rows
 
@@ -324,7 +374,36 @@ static func mine_event_text(e: Dictionary) -> String:
 			return "Floor %d · −%d Energy" % [int(e.get("floor", 1)), int(e.get("cost", 0))] if int(e.get("cost", 0)) > 0 else ""
 		"cleared":
 			return "Floor %d cleared · Elevator stop" % int(e.get("floor", 1))
+		"express_unlocked":   # MINE-4: in place of the cleared line on Floor 4's first clear
+			return "Floor %d cleared · Floor 5 Express unlocked" % int(e.get("floor", 4))
+		"knocked_out":
+			return "Knocked out · back at the entrance"
 	return ""
+
+## A cleared floor's float, with Floor 4's first clear naming Express instead (MINE-4): the events of one reply.
+static func mine_event_lines(events: Array) -> Array:
+	var unlocked := events.any(func(e): return str(e.get("kind", "")) == "mine" and str(e.get("action", "")) == "express_unlocked")
+	var out: Array = []
+	for e in events:
+		if str(e.get("kind", "")) != "mine": continue
+		var a := str(e.get("action", ""))
+		if a == "cleared" and (unlocked or int(e.get("floor", 0)) >= 5): continue   # Floor 5's clear is Run complete
+		var t := mine_event_text(e)
+		if t != "": out.append({"action": a, "text": t, "floor": int(e.get("floor", 0))})
+	return out
+
+## The Run complete banner (MINE-5, MomentBanner Kind=Complete): `Run complete` / `Elite Slime defeated`, the elite's
+## loot as one reward pill (`+2 Quartz`) and the day's runs. loot [item, qty] from the defeat event; null none.
+static func run_complete(view: Dictionary, loot) -> Dictionary:
+	var runs: Dictionary = view.get("mine", {}).get("runs", {})
+	var rewards: Array = []
+	if loot is Array and loot.size() == 2:
+		rewards.append({"text": "+%d %s" % [int(loot[1]), P0Logic.item_name(view, str(loot[0]))], "item": str(loot[0])})
+	return {"kind": "complete", "title": "Run complete", "subtitle": "Elite Slime defeated", "rewards": rewards,
+		"detail": "Mine runs today %d/%d" % [int(runs.get("used", 0)), int(runs.get("limit", 2))]}
+
+## The elite's second kill of the day drops no quartz (§13.3.4): the float that says so once.
+const QUARTZ_ONCE := "Quartz · once a day"
 
 # --- Gathering spots (farm) ---
 

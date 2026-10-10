@@ -10,12 +10,14 @@ const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGO
 const Art = preload("res://modules/mining/mine_art.gd")
 const Layout = preload("res://modules/mining/mine_layout.gd")
 const ElasticZoom = preload("res://modules/p0/p0_elastic_zoom.gd")
+const Combat = preload("res://modules/mining/p0_mine_combat.gd")
 const FarmCamera = preload("res://modules/farm/farm_camera.gd")
 var PLACE := P0City.chip("Mine · Floor %d")
 const REACH := 1.7          # m: a rock in front of the player within this distance; a facility used from this close
 const CARD_REACH := 2.4     # m: a facility's strip opens, its EntryCard stays (the farm's mouth reach)
 const BREAK_S := 0.45       # rock break: shake, shrink, chips
 const STATUS_INTRO_MS := 3000   # "Run 1/2 today" first, then "Rocks 2/6" (MINE-1 / P0-2)
+const FLOORS := 5               # §13.3.2 (SGODOT-288): floors 3–4 add slimes, floor 5 is the elite's alone
 
 var rt: P0Runtime
 var floor_n := 1
@@ -28,6 +30,14 @@ var grid: BlueprintGrid
 var scenery: Node3D
 var objects: Node3D
 var backdrop: Node3D   # the underground backdrop (SGODOT-257), outside scenery / objects
+var combat: Node3D     # Combat (p0_mine_combat.gd): this floor's slimes, their moves and the swing (SGODOT-288)
+var _hurt_pending := false   # a hit sent, its reply not yet in: the next hit waits (the server's 1 s window)
+var _hurt_sent_ms := 0
+## The slime-hit command's key: its settle (ok with or without a hurt event, refused, or a failed request) frees the next
+## hit, so one quiet reply can never leave the player unhittable for the rest of the visit (苏烈 on #223).
+const HURT_KEY := "mine_hurt"
+const HURT_STALE_MS := 4000   # and a reply that never comes at all frees it after this
+var _completing := false     # Run complete: the banner, then out to the mouth
 var _rocks := {}            # rock index → Node3D (gone once broken)
 var _previews := {}         # rock index → Sprite3D torch preview
 var _breaking := {}         # rock index → true while its break plays (the view may already say broken)
@@ -59,7 +69,7 @@ var _entry: UiEntryCard     # the fee card over a ladder (built on first use, on
 var _entry_data := {}       # P0MaterialLogic.mine_facility for _card_for
 
 func setup(args: Dictionary) -> void:
-	floor_n = clampi(int(args.get("floor", 1)), 1, 2)
+	floor_n = clampi(int(args.get("floor", 1)), 1, FLOORS)
 
 func _ready() -> void:
 	P0Runtime.mark("%s _ready start" % name)
@@ -70,19 +80,27 @@ func _ready() -> void:
 	add_child(actor)
 	_build_floor(floor_n)
 	actor.setup(bp, grid, cam, Layout.SPAWN)
+	combat = Combat.new()
+	add_child(combat)
+	combat.contact.connect(_on_contact)
 	_focus = actor.position
 	_update_camera()
 	_entered_ms = Time.get_ticks_msec()
 	rt = P0Runtime.ensure()
 	rt.attach(self)
 	rt.ui.set_mode("mine")
+	rt.ui.actions_here = P0MaterialLogic.mine_actions(floor_n)
 	rt.ui.set_place(PLACE % floor_n)
 	rt.session.state_changed.connect(_on_state)
+	rt.session.command_settled.connect(_on_settled)
 
 func _exit_tree() -> void:
 	if is_instance_valid(_entry): _entry.queue_free()
 	if rt:
+		rt.ui.actions_here = []
+		rt.ui.set_hp(-1, 0)
 		if rt.session.state_changed.is_connected(_on_state): rt.session.state_changed.disconnect(_on_state)
+		if rt.session.command_settled.is_connected(_on_settled): rt.session.command_settled.disconnect(_on_settled)
 		rt.detach(self)
 
 func p0_surface() -> String: return "mine"
@@ -118,8 +136,9 @@ func _build_light() -> void:
 	add_child(cam)
 	cam.make_current()
 
-## One chamber: B1 (floor 1) / B2 (floor 2) art, the six fixed rock positions (the server's rock index), the up ladder
-## (Exit mine on floor 1, Floor 1 on floor 2), the down ladder to floor 2 and an elevator on both floors (q(44)).
+## One chamber: B1–B5 art (MineArt), the fixed rock positions on floors 1–4 (the server's rock index; floor 5 has none),
+## the up ladder (Exit mine on floor 1, the floor above below it), the down ladder on floors 1–4 and an elevator on every
+## floor (q(44)); the floors' monsters come with MineCombat (SGODOT-288).
 func _build_floor(n: int) -> void:
 	floor_n = n
 	for node in [scenery, objects, backdrop]:
@@ -135,10 +154,10 @@ func _build_floor(n: int) -> void:
 	objects = Node3D.new()
 	objects.name = "MineObjects"
 	add_child(objects)
-	if n != 1: objects.add_child(Art.elevator(true))
-	if n < 2: objects.add_child(Art.ladder(Layout.DOWN, false))
+	if n not in [1, FLOORS]: objects.add_child(Art.elevator(true))   # MineArt puts one in floors 1 and 5 itself
+	if n < FLOORS: objects.add_child(Art.ladder(Layout.DOWN, false))
 	var broken := _broken(_view(), n)
-	for i in Layout.FALLBACK_POSITIONS.size():
+	for i in rock_count(n):
 		if broken[i]: continue
 		var rock := Art.rock(Layout.FALLBACK_POSITIONS[i], i, n)
 		rock.name = "Rock%d" % i
@@ -155,12 +174,16 @@ func _build_floor(n: int) -> void:
 	add_child(backdrop)
 	_rebuild_nav(broken)
 
+## Rocks on a floor (§13.3.2): the six fixed positions on floors 1–4, none on Floor 5.
+static func rock_count(n: int) -> int:
+	return 0 if n >= FLOORS else Layout.FALLBACK_POSITIONS.size()
+
 func _rebuild_nav(broken: Array) -> void:
 	var nodes: Array = []
 	var gone: Array = []
 	for i in Layout.FALLBACK_POSITIONS.size():
 		nodes.append({"id": str(i), "position": Layout.FALLBACK_POSITIONS[i]})
-		if broken[i]: gone.append(str(i))
+		if broken[i] or i >= rock_count(floor_n): gone.append(str(i))   # Floor 5: an open chamber for the elite fight
 	bp = Layout._navigation(nodes, gone)
 	grid = BlueprintGrid.new(bp)
 	if actor and actor.mover:
@@ -194,7 +217,7 @@ func _find_facilities(n: int) -> void:
 	close_card()
 	var up := scenery.find_child("UpLadder", true, false) as Node3D
 	_facilities["mine_up"] = {"kind": "exit" if n == 1 else "up", "at": Layout.UP, "node": up}
-	if n < 2: _facilities["mine_down"] = {"kind": "stairs", "at": Layout.DOWN, "node": objects.find_child("DownLadder", true, false)}
+	if n < FLOORS: _facilities["mine_down"] = {"kind": "stairs", "at": Layout.DOWN, "node": objects.find_child("DownLadder", true, false)}
 	var lift := scenery.find_child("MineElevator", true, false) as Node3D
 	if lift == null: lift = objects.find_child("MineElevator", true, false) as Node3D
 	_facilities["mine_elevator"] = {"kind": "elevator", "at": Layout.ELEVATOR, "node": lift}
@@ -207,6 +230,8 @@ func _go_floor(n: int, by_elevator := false) -> void:
 	_focus = actor.position
 	_cam_follow.hold()
 	rt.ui.set_place(PLACE % n)
+	rt.ui.actions_here = P0MaterialLogic.mine_actions(n)
+	if n < 3 and rt.ui.bar_mode == "combat": rt.ui.set_mode("mine")   # no Combat on floors 1–2 (§13.3.8)
 	_entered_ms = Time.get_ticks_msec()
 
 # ---------------------------------------------------------------- frame
@@ -269,6 +294,7 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 	if _leaving: return
 	if v.get("mine", {}).get("run", null) == null:
 		_kick_out()
+		if _completing: _follow(dt)   # the banner holds the floor in view; nothing else moves
 		return
 	actor.step(dt)
 	if not _walk.is_empty() and not actor.mover.is_moving():
@@ -278,13 +304,46 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 		if _leaving or not is_inside_tree(): return   # the way out popped the mine mid-frame (as P0Room's door)
 	_follow(dt)
 	_sync_rocks(v)
+	_fight(v, dt)
 	_pick_target()
 	var ctx := {"floor": floor_n, "target": str(_target.get("kind", "")), "rock": int(_target.get("rock", -1)),
 		"item": _selected_item()}
-	rt.ui.set_action(P0MaterialLogic.mine_action(v, ctx))
+	var combat_on := rt.ui.bar_mode == "combat"
+	rt.ui.set_action(P0MaterialLogic.combat_action(v, ctx) if combat_on else P0MaterialLogic.mine_action(v, ctx))
 	_hold_repeat()
 	_marks(v)
 	_prompts(v)
+
+## Floors 3–5 (SGODOT-288): the slimes from the view, their moves (paused while a panel is up or the player is busy
+## elsewhere), the player's HP and the elite's card. The HP shown is the server's (view.mine.run.hp).
+func _fight(v: Dictionary, dt: float) -> void:
+	if combat == null: return
+	combat.sync_p0(v, floor_n, actor.mover)
+	combat.step(dt, actor.mover, rt.ui.has_modal() or _completing)
+	var run: Dictionary = v.get("mine", {}).get("run", {})
+	var fighting := floor_n >= 3 and run is Dictionary and not run.is_empty()
+	rt.ui.set_hp(int(run.get("hp", -1)) if fighting else -1, int(v.get("mine", {}).get("hp_max", 100)),
+		combat.elite_hp().merged({"name": "Elite Slime"}) if fighting and not combat.elite_hp().is_empty() else {})
+
+## A slime's leap reached the player (MineCombat.contact): the server settles the hit (the 1 s window there too).
+func _on_contact(id: String) -> void:
+	if _hurt_pending and Time.get_ticks_msec() - _hurt_sent_ms > HURT_STALE_MS: _hurt_pending = false
+	if _hurt_pending or _completing or rt.session.busy: return
+	if not rt.session.send({"type": "mine_attack", "floor": floor_n, "hurt_by": Combat.mob_index(id)}, HURT_KEY): return
+	_hurt_pending = true
+	_hurt_sent_ms = Time.get_ticks_msec()
+
+## Any end of the hit command frees the next one (see HURT_KEY).
+func _on_settled(key: String, _ok: bool, _code: String) -> void:
+	if key == HURT_KEY: _hurt_pending = false
+
+## Attack (Combat's key): one swing — the arc, the stun and the knockback here; the server settles who was hit.
+func _swing() -> void:
+	if combat == null: return
+	var hit: Array = combat.swing({}, actor.mover)
+	actor.labour("clear", actor.position + actor.facing())   # the old mine's swing beat
+	if hit.is_empty(): return
+	rt.session.send({"type": "mine_attack", "floor": floor_n, "targets": hit.map(func(id): return Combat.mob_index(str(id)))})
 
 ## Rocks the server says are broken (another device, a reconnect) leave without the break animation.
 func _sync_rocks(v: Dictionary) -> void:
@@ -477,8 +536,10 @@ func p0_action(cmd: Dictionary) -> void:
 			if _rocks.has(i): actor.labour("till", Layout.FALLBACK_POSITIONS[i])   # the old mine's dig beat (user, 2026-10-08)
 			_hold_until = Time.get_ticks_msec() + int(maxf(P0Actor.LABOUR_S, 0.95) * 1000.0)   # server tempo 0.9 s
 			rt.session.send(cmd)
-		"mine_floor", "mine_torch":
+		"mine_floor", "mine_torch", "mine_express":
 			rt.session.send(cmd)
+		"mine_swing":
+			_swing()
 		"elevator":
 			P0MaterialCards.open_elevator(rt.ui, _view(), floor_n, _on_elevator_row)
 		"mine_exit", "mine_leave":
@@ -496,24 +557,39 @@ func _on_elevator_row(cmd: Dictionary) -> void:
 			if int(cmd.get("floor", 0)) == floor_n: return
 			_elevator_to = int(cmd.get("floor", 0))
 			rt.session.send(cmd)
+		"mine_express":   # inside a run: a free ride to Floor 5 (§13.3.9)
+			_elevator_to = FLOORS
+			rt.session.send(cmd.merged({"space": "mine"}))
 		"energy_card": rt.energy_card(int(cmd.get("need", 0)), str(cmd.get("verb", "")))
 
 ## Server results for this world: a rock breaks, a floor is reached or cleared, a torch lights the floor.
 func _on_state(v: Dictionary, events: Array) -> void:
 	if rt.world != self: return
+	if events.any(func(e): return str(e.get("kind", "")) == "mine" and str(e.get("action", "")) in ["hurt", "knocked_out"]):
+		_hurt_pending = false
+	for line in P0MaterialLogic.mine_event_lines(events):
+		var text := str(line.text)
+		match str(line.action):
+			"cleared", "express_unlocked": rt.ui.toast_success(text)   # MINE-P0-3 / MINE-4, §4.8.6 Toast Success
+			"knocked_out": pass   # the moment below says it
+			_:   # the floor fee `Floor 2 · −2 Energy` (q(46)): the Energy line of the reply's three (q(49) ①)
+				rt.ui.queue_floats([{kind = "energy", key = text, text = text, tone = UiFloatText.Tone.ENERGY_COST}], rt.anchor())
 	for e in events:
 		if str(e.get("kind", "")) != "mine": continue
-		var text := P0MaterialLogic.mine_event_text(e)
-		if text != "":
-			if str(e.get("action", "")) == "cleared": rt.ui.toast_success(text)   # MINE-P0-3 banner, §4.8.6 Toast Success
-			else:   # the floor fee `Floor 2 · −2 Energy` (q(46)): the Energy line of the reply's three (q(49) ①)
-				rt.ui.queue_floats([{kind = "energy", key = text, text = text, tone = UiFloatText.Tone.ENERGY_COST}], rt.anchor())
 		match str(e.get("action", "")):
 			"rock": _break_rock(int(e.get("rock", -1)), v)
-			"floor":
+			"floor", "express":
 				var n := int(e.get("floor", floor_n))
 				if n != floor_n: _go_floor(n, n == _elevator_to)
 				_elevator_to = -1
+			"hurt": combat.hurt(actor.mover, Combat.mob_id(int(e.get("mob", 0))), int(e.get("damage", 0)))
+			"defeat":
+				if bool(e.get("quartz_spent", false)):
+					rt.ui.queue_floats([{kind = "item", key = P0MaterialLogic.QUARTZ_ONCE, text = P0MaterialLogic.QUARTZ_ONCE,
+						tone = UiFloatText.Tone.ITEM}], rt.anchor())
+			"knocked_out": _knocked_out()
+			"complete": _run_complete(v, events)
+	if v.get("mine", {}).get("run", null) == null and not _completing: _hurt_pending = false
 
 ## The break the old mine never had: a short shake, shrink and stone chips, then only this rock goes (no floor rebuild).
 func _break_rock(i: int, v: Dictionary) -> void:
@@ -571,7 +647,33 @@ func _leave() -> void:
 
 ## 04:00 while inside: back outside the mouth, where the farm floats "Run ended at daily reset" once (q(44)).
 func _kick_out() -> void:
+	if _completing: return   # Run complete leaves by itself after its banner
 	_leave()
+
+## MINE-KO-MOMENT: HP 0 — input stops, `Knocked out` · `back at the entrance` over a scrim for 1.5 s, then out to the
+## mine mouth; the run is kept (Continue run · Free) and HP is full again outside (§13.3.1).
+const KO_S := 1.5
+func _knocked_out() -> void:
+	if _leaving: return
+	actor.set_input(Vector2.ZERO)
+	actor.lock(true)
+	rt.ui.toast(P0MaterialLogic.mine_event_text({"kind": "mine", "action": "knocked_out"}), KO_S)
+	get_tree().create_timer(KO_S).timeout.connect(func():
+		if is_inside_tree(): _leave())
+
+## MINE-5: the elite beaten ends the run — the Run complete banner, then out to the mine mouth.
+const COMPLETE_S := 2.5
+func _run_complete(v: Dictionary, events: Array) -> void:
+	_completing = true
+	var loot = null
+	for e in events:
+		if str(e.get("kind", "")) == "mine" and str(e.get("action", "")) == "defeat" and str(e.get("mob_kind", "")) == "mob_elite_slime":
+			loot = e.get("loot", null)
+	var spec := P0MaterialLogic.run_complete(v, loot)
+	spec.rewards = (spec.rewards as Array).map(func(r): return {"text": r.text, "tone": UiFloatText.Tone.ITEM, "icon": P0Logic.icon(str(r.item))})
+	rt.ui.show_banner(spec)
+	get_tree().create_timer(COMPLETE_S).timeout.connect(func():
+		if is_inside_tree(): _leave())
 
 # ---------------------------------------------------------------- camera (old mine framing + safe box)
 func _follow(dt: float) -> void:
@@ -768,6 +870,15 @@ func p0_dev(step: PackedStringArray) -> bool:
 			actor.face(Layout.FALLBACK_POSITIONS[i])
 			_focus = actor.position
 		"floor": _go_floor(int(step[1]))
+		"combat": rt.ui.set_mode("combat" if step.size() < 2 or step[1] != "0" else "mine")   # combat[:0] — the radial's pick
+		"attack": _swing()   # one Attack (Combat's key)
+		"near":   # near:i — stand next to monster i (the screenshots' fight)
+			var e: Dictionary = combat.enemies.get(Combat.mob_id(int(step[1])), {}) if combat else {}
+			if not e.is_empty():
+				actor.teleport((e.node as Node3D).position + Vector3(1.0, 0, 0.4))
+				actor.face((e.node as Node3D).position)
+				_focus = actor.position
+				_cam_follow.hold()
 		"elevator": p0_action({"type": "elevator"})
 		"tapfac":   # tapfac:mine_down — a tap on that facility's model (walk up, then use it; SGODOT-266)
 			p0_tap(cam.unproject_position((_facilities[step[1]].box as AABB).get_center()) if _facilities.has(step[1]) else Vector2(-1, -1))
