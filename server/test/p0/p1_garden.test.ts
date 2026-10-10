@@ -166,7 +166,7 @@ describe('sprinklers (q(59) §1.4)', () => {
     s.storage = { wood: 80, stone: 80, copper_ore: 80 };
     for (const id of [0, 3, 18, 21, 30, 38]) s = step(s, { type: 'place', recipe: 'craft_sprinkler', plot: id }).s;
     expect(refused(s, { type: 'place', recipe: 'craft_sprinkler', plot: 10 })).toMatchObject({
-      code: 'facility_cap', detail: { cap: 6, used: 6, homestead_next: null } });
+      code: 'facility_cap', detail: { cap: 6, used: 6, homestead_next: 4 } });   // Homestead goes to Lv10 since #209 (SGODOT-282)
     const card = viewOf(c, s, T0).workbench.recipes.find(r => r.id === 'craft_sprinkler')!;
     expect(card).toMatchObject({ tab: 'facilities', cap: 6, used: 6, can_craft: false, block: { code: 'facility_cap' } });
     // Lv2: 5
