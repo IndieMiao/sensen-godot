@@ -1,0 +1,59 @@
+import { describe, expect, it } from 'vitest';
+import { loadP0Content } from '../../src/p0/content.js';
+import { applyP0, type P0Command, type P0Event } from '../../src/p0/reducer.js';
+import { freshState, type P0State } from '../../src/p0/state.js';
+
+// P1 (q(118) ④, SGODOT-240): Harvest All at Farming Lv9 takes every ripe annual of one garden row at once, 0 Energy,
+// all or none; below Lv9, or across rows, it is refused.
+const c = loadP0Content();
+const T0 = Date.UTC(2026, 9, 10, 18, 0, 0);
+const H = 3_600_000;
+
+function run(s: P0State, cmd: P0Command, now = T0 + 5 * H) { return applyP0(c, s, cmd, now); }
+function farmer(level: number, ripe: number[]): P0State {
+  const s = freshState(c, 'player-harvest-all', T0, 7);
+  s.skills.farming = c.skills.farming[level - 1];
+  s.bag = [];
+  for (const id of ripe) s.plots[id] = { id, state: 'growing', crop: 'crop_radish', ready_at: T0 + 4 * H, xp_pct: 100 };
+  return s;
+}
+const all = (plots: number[]) => ({ type: 'harvest', plot: plots[0], plots }) as P0Command;
+
+describe('Harvest All (Farming Lv9)', () => {
+  it("takes a row's ripe annuals at once, for no Energy", () => {
+    const s = farmer(9, [6, 7, 9, 11]);   // row 1 of the garden grid: plots 6–11
+    const before = s.energy.value;
+    const r = run(s, all([6, 7, 9, 11]));
+    if (!r.ok) throw new Error(r.code);
+    expect(r.state.bag.find(b => b.id === 'crop_radish')?.qty).toBe(4);
+    expect([6, 7, 9, 11].map(id => r.state.plots[id].state)).toEqual(['tilled', 'tilled', 'tilled', 'tilled']);
+    expect(r.state.energy.value).toBeGreaterThanOrEqual(before);
+    expect(r.events.filter((e: P0Event) => e.kind === 'xp')).toHaveLength(4 + 1);   // each plant, and the first harvest once
+  });
+
+  it('is refused below Farming Lv9, across rows, on an unripe plot, and when the bag cannot take it all', () => {
+    expect(run(farmer(8, [6, 7]), all([6, 7]))).toMatchObject({ ok: false, code: 'harvest_all_locked', detail: { level: 9 } });
+    expect(run(farmer(9, [5, 6]), all([5, 6]))).toMatchObject({ ok: false, code: 'bad_plot' });   // 5 is row 0, 6 row 1
+    const s = farmer(9, [6, 7]);
+    s.plots[8] = { id: 8, state: 'growing', crop: 'crop_radish', ready_at: T0 + 9 * H, xp_pct: 100 };
+    expect(run(s, all([6, 7, 8]))).toMatchObject({ ok: false, code: 'not_ready', detail: { plot: 8 } });
+    const full = farmer(9, [6, 7]);
+    full.bag = Array.from({ length: full.bag_cap }, (_, i) => ({ id: `fish_filler_${i}`, qty: 1 }));
+    const r = run(full, all([6, 7]));
+    expect(r).toMatchObject({ ok: false, code: 'bag_full' });
+    expect(full.plots[6].state).toBe('growing');   // nothing was taken
+  });
+
+  it('leaves trees out: a row with a ripe tree in it is refused, the tree is picked alone', () => {
+    const s = farmer(9, [6, 7]);
+    s.plots[8] = { id: 8, state: 'growing', crop: 'crop_apple', ready_at: T0 + 4 * H, xp_pct: 100, picks: 1 };
+    expect(run(s, all([6, 7, 8]))).toMatchObject({ ok: false, code: 'not_ready', detail: { plot: 8, tree: true } });
+    const pick = run(s, { type: 'harvest', plot: 8 } as P0Command);
+    expect(pick.ok && pick.state.plots[8]).toMatchObject({ state: 'growing', crop: 'crop_apple', picks: 2 });
+  });
+
+  it('still harvests a single plot the old way at any level', () => {
+    const r = run(farmer(1, [3]), { type: 'harvest', plot: 3 } as P0Command);
+    expect(r.ok).toBe(true);
+  });
+});

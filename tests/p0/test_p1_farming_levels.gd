@@ -70,3 +70,27 @@ func test_seed_saver_is_lv10_and_floats_the_seed_it_gives_back() -> void:
 	assert_str(str(many.text)).is_equal("Seed Saver · +2 Radish Seeds")
 	var mixed := P0Runtime.seed_saver_line(v, [{"kind": "seed_saved", "id": "seed_radish"}, {"kind": "seed_saved", "id": "seed_carrot"}])
 	assert_str(str(mixed.text)).is_equal("Seed Saver · +2 seeds")
+
+## Harvest All (Farming Lv9, q(118) ④): the key takes the ripe annuals of the row underfoot, `Harvest ×3`, this plot
+## first; one ripe plot is still `Harvest`; below Lv9 always one.
+func test_harvest_all_takes_the_row_underfoot_from_lv9() -> void:
+	var v := {"skills": {"farming": {"level": 9}}, "garden": {"plots": 30}, "energy": {"value": 100}, "plots": [
+		{"id": 6, "state": "ready", "crop": "crop_radish"}, {"id": 8, "state": "ready", "crop": "crop_carrot"},
+		{"id": 9, "state": "growing", "crop": "crop_radish"}, {"id": 11, "state": "ready", "crop": "crop_radish"},
+		{"id": 12, "state": "ready", "crop": "crop_radish"}]}   # 6–11 are row 1; 12 is row 2
+	var a := P0Logic.main_action(v, v.plots[1], "")
+	assert_that([a.verb, a.cmd]).is_equal(["Harvest ×3", {"type": "harvest", "plot": 8, "plots": [8, 6, 11]}])
+	var one := P0Logic.main_action(v, v.plots[4], "")
+	assert_that([one.verb, one.cmd]).is_equal(["Harvest", {"type": "harvest", "plot": 12}])
+	v.skills.farming.level = 8
+	assert_str(str(P0Logic.main_action(v, v.plots[1], "").verb)).is_equal("Harvest")
+	assert_array(P0Logic.level_unlocks({"stall": {"buy": []}}, "farming", 9)).contains(["Harvest All"])
+
+## The Growing key's second line fits its 80 px (不知火舞 on 241): two units drop `Ready in`, one keeps it.
+func test_growing_key_drops_ready_in_for_two_units() -> void:
+	assert_str(P0Logic.key_ready(48 * 3600000.0)).is_equal("Ready in 48h")
+	assert_str(P0Logic.key_ready(42 * 60000.0)).is_equal("Ready in 42m")
+	assert_str(P0Logic.key_ready((19 * 60 + 58) * 60000.0)).is_equal("19h 58m")
+	var v := {"skills": {"farming": {"level": 1}}, "plots": []}
+	var a := P0Logic.main_action(v, {"id": 3, "state": "growing", "crop": "crop_radish", "ready_in": (3 * 60 + 5) * 60000}, "")
+	assert_that([a.verb, a.sub]).is_equal(["Growing", "3h 5m"])

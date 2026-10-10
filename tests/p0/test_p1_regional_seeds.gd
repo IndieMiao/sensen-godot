@@ -55,3 +55,9 @@ func test_a_seed_away_from_its_zone_says_not_native() -> void:
 	assert_str(use.call("seed_pumpkin")).is_equal("Ready in 20h")
 	assert_str(use.call("seed_pineapple")).is_equal("Ready in 36h · not native")
 	assert_str(use.call("seed_radish")).is_equal("Ready in 4h")   # a stall seed has no zone
+
+## The four regional crops and their seeds have their art (不知火舞 accepted on 241): no sprout placeholder.
+func test_regional_crops_and_seeds_have_their_icons() -> void:
+	for id in ["crop_pumpkin", "crop_pineapple", "crop_sweet_potato", "crop_beet", "seed_pumpkin", "seed_pineapple",
+			"seed_sweet_potato", "seed_beet", "fert_orchard"]:   # and Orchard Feed (不知火舞 on 240)
+		assert_str(P0Logic.icon(id).resource_path).override_failure_message(id).is_equal("res://assets/p0/icons/%s.svg" % id)
