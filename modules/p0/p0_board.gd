@@ -215,7 +215,7 @@ static func _go(view: Dictionary, r: Dictionary, item: String) -> String:
 		return "outpost:" + str(r.visit.get("place", ""))
 	if r.get("visit", null) is Dictionary:   # Stamp Run: the outpost's pin, by role as Today's deliver_go
 		return "outpost:" + str(P0Outposts.find(str(r.visit.get("place", ""))).get("role", ""))
-	if _far_pond(r): return "map"   # any pond in another city: the map, to choose one
+	if _far_pond(r): return ""   # no one place (不知火舞 on #285: no Show on map; the example line names the fish)
 	match str(r.get("kind", "")):
 		"fish": return "pond:" + P0Guide.BEGINNER_POND
 		"crop": return "plots"

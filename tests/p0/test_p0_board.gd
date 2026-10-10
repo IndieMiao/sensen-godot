@@ -351,7 +351,7 @@ func test_p1_far_pond_reads_not_found_at_home() -> void:
 	var d := P0Board.detail(v, "market", "f1")
 	assert_str(str(d.effect)).is_equal("Bring 3 fish that San Francisco's ponds don't have to any San Francisco market.")
 	assert_str(str(d.example)).is_equal("Try Tilapia, Smelt or Grey Mullet")
-	assert_str(str(d.go)).is_equal("map")
+	assert_str(str(d.go)).is_equal("")   # no one place: no Show on map (不知火舞 on #285)
 	var r := P0Logic._request_row(v, P0Logic.PinReason.taken(v)[0])
 	assert_array([r.line, r.go]).is_equal(["Far Pond · 1/3 fish", ""])
 	# two to try, one, none (the server names them at the level now)
