@@ -41,6 +41,51 @@ static func free_stove(view: Dictionary) -> int:
 
 ## Big Pot (Homestead Lv6): the drawer offers Double.
 static func big_pot(view: Dictionary) -> bool: return bool(cooking(view).get("big_pot", false))
+
+## The Double toggle (b84a5e01 ③) for the Cookbook's selected page (`page`) or Experiment's pot (`pot`):
+## {shown, enabled, toast}. Hidden before Homestead Lv6 (no locked look); grey for a Legendary dish, a mix that makes
+## no known page and seasonings alone, a tap on it saying why.
+static func double_state(view: Dictionary, page := {}, pot := []) -> Dictionary:
+	if not big_pot(view): return {shown = false, enabled = false, toast = ""}
+	var rarity := 0
+	var known := false
+	if not page.is_empty():
+		known = bool(page.get("known", false))
+		rarity = int(page.get("rarity", 1))
+	elif not pot.is_empty():
+		if not has_main(view, pot): return {shown = true, enabled = false, toast = DOUBLE_KNOWN_ONLY}
+		var pv := preview(view, pot)
+		known = str(pv.get("title", "")) != "Unknown dish" and str(pv.get("title", "")) != ""
+		rarity = int(pv.get("rarity", 1))
+	if not known: return {shown = true, enabled = false, toast = DOUBLE_KNOWN_ONLY}
+	if rarity >= 4: return {shown = true, enabled = false, toast = DOUBLE_NOT_LEGENDARY}
+	return {shown = true, enabled = true, toast = ""}
+
+const DOUBLE_NOT_LEGENDARY := "Double · not for Legendary dishes"
+const DOUBLE_KNOWN_ONLY := "Double · known recipes only"
+
+## Double's main key (b84a5e01 ③): `Cook ×2` / `Queue ×2`, or the first gap for two portions (LOCK-10, `Need 1 more
+## Pond Crucian`); "" when the stock covers two. `tokens`: the page's ingredients or the pot's items.
+static func double_gap(view_: Dictionary, tokens: Array) -> String:
+	var view := with_rack(view_)
+	var left := stock(view)
+	for round in 2:
+		for token in tokens:
+			var t := str(token)
+			var found := ""
+			for id in left:
+				if int(left[id]) > 0 and _matches(view, t, id):
+					found = id
+					break
+			if found == "":
+				var need := tokens.filter(func(x): return str(x) == t).size() * 2
+				var have := 0
+				for id in stock(view): if _matches(view, t, id): have += int(stock(view)[id])
+				return "Need %d more %s" % [maxi(1, need - have), P0Logic.ingredient_label(view, t)]
+			left[found] = int(left[found]) - 1
+	return ""
+
+static func double_label(queue := false) -> String: return "Queue ×2" if queue else "Cook ×2"
 static func slots(view: Dictionary) -> int: return int(cooking(view).get("slots", 2))
 static func level(view: Dictionary) -> int: return int(view.get("skills", {}).get("cooking", {}).get("level", 1))
 

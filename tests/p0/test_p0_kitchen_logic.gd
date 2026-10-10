@@ -152,6 +152,23 @@ func test_several_stoves_each_read_their_own_pot_and_queue() -> void:
 	assert_str(P0KitchenLogic.stove_label(one)).is_equal("Stove 1/1")
 	assert_bool(P0KitchenLogic.big_pot(one)).is_false()
 
+## Big Pot Double (b84a5e01 ③): hidden before Lv6; grey for Legendary, unknown mixes and seasonings alone; the main key
+## says `Cook ×2`, or the gap for two portions.
+func test_double_toggle_states_and_the_gap_for_two() -> void:
+	var v := _view()
+	var crucian: Dictionary = P0KitchenLogic.pages(v)[0]
+	assert_bool(bool(P0KitchenLogic.double_state(v, crucian).shown)).is_false()   # Lv1–5: not shown at all
+	v.cooking.big_pot = true
+	assert_dict(P0KitchenLogic.double_state(v, crucian)).is_equal({shown = true, enabled = true, toast = ""})
+	assert_dict(P0KitchenLogic.double_state(v, {"known": true, "rarity": 4})).is_equal({shown = true, enabled = false, toast = "Double · not for Legendary dishes"})
+	assert_dict(P0KitchenLogic.double_state(v, {"known": false, "rarity": 1})).is_equal({shown = true, enabled = false, toast = "Double · known recipes only"})
+	assert_dict(P0KitchenLogic.double_state(v, {}, ["crop_herb"])).is_equal({shown = true, enabled = false, toast = "Double · known recipes only"})
+	# the bag has 2 crucian (two stacks): two portions fit; Radish Salad has no lettuce at all
+	assert_str(P0KitchenLogic.double_gap(v, ["fish_crucian"])).is_equal("")
+	assert_str(P0KitchenLogic.double_gap(v, ["fish_crucian", "fish_crucian"])).is_equal("Need 2 more Pond Crucian")
+	assert_str(P0KitchenLogic.double_label()).is_equal("Cook ×2")
+	assert_str(P0KitchenLogic.double_label(true)).is_equal("Queue ×2")
+
 # ---------------------------------------------------------------- the dish comes out (COOK-4 / 6 / P0-9, COOK-7-2)
 func _eat_view(energy: int, used: int, meal: int) -> Dictionary:
 	var v := _view()

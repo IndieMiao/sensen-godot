@@ -167,6 +167,7 @@ func open(tab := "cookbook", page_id := "") -> void:
 	drawer.queue_mode = _queue_mode
 	drawer.stove_index = stove_index
 	drawer.stove_cycle_requested.connect(_cycle_stove)
+	drawer.unavailable.connect(func(r: String): rt.ui.toast(r))   # a grey Double says why (b84a5e01 ③)
 	drawer.safe_bottom = rt.ui.safe_bottom()
 	drawer.close_requested.connect(func(): rt.ui.close_modal())
 	drawer.page_selected.connect(_on_page)
@@ -358,7 +359,7 @@ func _refresh_overlay() -> void:
 			if i < pot.size():
 				s.state = UiPotSlot.State.FILLED
 				s.icon = P0Logic.icon(str(pot[i]))
-				s.quantity = "×1"
+				s.quantity = "×2" if drawer.is_double() and drawer.big_pot_shown() else "×1"   # Double doubles each slot (b84a5e01 ③)
 				s.removable = true
 				s.point_at_remove = _point_at_remove
 				var index := i
@@ -378,7 +379,7 @@ func _refresh_overlay() -> void:
 			# as a clue does on the Cookbook cell, not the `?` of a slot nobody knows yet.
 			var t := str(ing.id)
 			s.icon = UiItemCell.family_icon(t[0]) if t.length() == 2 and t[1].is_valid_int() else ing.icon
-			s.quantity = "×1"
+			s.quantity = "×2" if drawer.is_double() and drawer.big_pot_shown() else "×1"   # Double doubles each slot (b84a5e01 ③)
 			slots.append(s)
 		if not page.is_empty(): result = P0KitchenLogic.page_preview(v, page)
 	_pot_card.set_slots(slots)
