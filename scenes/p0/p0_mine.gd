@@ -44,6 +44,7 @@ const SWING_KEY := "mine_swing_%d"
 var _swings := 0
 var _swings_out := {}
 var _ko_waiting := false
+var _ko := false   # knocked out: the moment before leaving — the fight frozen, the bar at 0 %
 var _completing := false     # Run complete: the banner, then out to the mouth
 var _rocks := {}            # rock index → Node3D (gone once broken)
 var _previews := {}         # rock index → Sprite3D torch preview
@@ -328,16 +329,18 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 func _fight(v: Dictionary, dt: float) -> void:
 	if combat == null: return
 	combat.sync_p0(v, floor_n, actor.mover)
-	combat.step(dt, actor.mover, rt.ui.has_modal() or _completing)
+	# Knocked out: the fight holds still until the player is out (the server has already refilled HP for the run, so
+	# the bar keeps 0 % for the moment instead of jumping to 100 % — 不知火舞 on 288 78d0f863)
+	combat.step(dt, actor.mover, rt.ui.has_modal() or _completing or _ko)
 	var run: Dictionary = v.get("mine", {}).get("run", {})
 	var fighting := floor_n >= 3 and run is Dictionary and not run.is_empty()
-	rt.ui.set_hp(int(run.get("hp", -1)) if fighting else -1, int(v.get("mine", {}).get("hp_max", 100)),
+	rt.ui.set_hp((0 if _ko else int(run.get("hp", -1))) if fighting else -1, int(v.get("mine", {}).get("hp_max", 100)),
 		combat.elite_hp().merged({"name": "Elite Slime"}) if fighting and not combat.elite_hp().is_empty() else {})
 
 ## A slime's leap reached the player (MineCombat.contact): the server settles the hit (the 1 s window there too).
 func _on_contact(id: String) -> void:
 	if _hurt_pending and Time.get_ticks_msec() - _hurt_sent_ms > HURT_STALE_MS: _hurt_pending = false
-	if _hurt_pending or _completing or rt.session.busy: return
+	if _hurt_pending or _completing or _ko or rt.session.busy: return
 	if not rt.session.send({"type": "mine_attack", "floor": floor_n, "hurt_by": Combat.mob_index(id)}, HURT_KEY): return
 	_hurt_pending = true
 	_hurt_sent_ms = Time.get_ticks_msec()
@@ -351,7 +354,7 @@ func _on_settled(key: String, _ok: bool, _code: String) -> void:
 
 ## Attack (Combat's key): one swing — the arc, the stun and the knockback here; the server settles who was hit.
 func _swing() -> void:
-	if combat == null or _ko_waiting: return   # a fall is waiting on the swings already out: no new one delays it (苏烈 on #253)
+	if combat == null or _ko_waiting or _ko: return   # a fall waits on the swings out / the knock-out moment: no new swing (苏烈 on #253, #255)
 	var hit: Array = combat.swing({}, actor.mover)
 	actor.labour("clear", actor.position + actor.facing())   # the old mine's swing beat
 	if hit.is_empty(): return
@@ -676,6 +679,7 @@ func _knocked_out() -> void:
 	if not _swings_out.is_empty():   # a swing still on its way may beat the elite: wait for it
 		_ko_waiting = true
 		return
+	_ko = true
 	actor.set_input(Vector2.ZERO)
 	actor.lock(true)
 	rt.ui.toast(P0MaterialLogic.mine_event_text({"kind": "mine", "action": "knocked_out"}), KO_S)
