@@ -1,5 +1,5 @@
 /** Homestead Lv1–3 (plan §8.1–8.3): materials + coins + Farming + Fishing levels; upgrading refills Energy to the new max. */
-import type { P0Content } from './content.js';
+import type { HomesteadLook, P0Content } from './content.js';
 import { gainEnergy, type P0Event } from './progress.js';
 import { maxEnergy, skillLevel } from './rules.js';
 import type { P0State } from './state.js';
@@ -81,9 +81,35 @@ export function upgradeHomestead(c: P0Content, s: P0State, now: number, events: 
   // §8.1.1: Energy refills to the new max (200/200 → 210/210); a bonus-zone value above it is kept.
   const max = maxEnergy(c, s);
   const gain = gainEnergy(c, s, now, max - s.energy.value, events, 'homestead');
-  events.push({ kind: 'homestead', level: next.level, energy: gain, unlocks: next.unlocks });
+  // look: the stage this level opens (LOOK-PICK, SGODOT-282) — the client offers its two looks after HOME-2's banner.
+  const look = lookStageAt(c, next.level);
+  events.push({ kind: 'homestead', level: next.level, energy: gain, unlocks: next.unlocks, ...(look ? { look: look.id } : {}) });
   // P1 (q(59) §1.1): Lv3 brings 10 wild plots (30–39, homestead.plots), dropped in with the fence (HOME-2's plots_40 line).
   const added = addPlots(c, s);
   if (added.length > 0) events.push({ kind: 'plots_added', plots: added, reason: 'homestead' });
+  return null;
+}
+
+/** The look stage a Homestead level opens (Lv3 Fence & Mailbox, Lv5 Porch, Lv8 Kitchen Wing, Lv10 Master Farmhouse). */
+export function lookStageAt(c: P0Content, level: number): HomesteadLook | undefined {
+  return (c.homestead.looks ?? []).find(l => l.level === level);
+}
+
+/** A stage's look (§8.3.1, q(24) / q(112)): b (stone) once picked, else a (timber) — the default, and what closing the
+ * card leaves (q(24)), so a save from before P1 or a player who never picked reads a. */
+export function lookOf(s: P0State, stage: string): 'a' | 'b' {
+  return s.homestead.looks?.[stage] === 'b' ? 'b' : 'a';
+}
+
+/** set_look (LOOK-PICK, SGODOT-282): free, no Energy, at home (it is picked looking at the real farmhouse), for a stage
+ * the homestead has reached; changeable any time after (HOME-1 Looks). */
+export function setLook(c: P0Content, s: P0State, cmd: { stage?: unknown; look?: unknown }, events: P0Event[]): Refusal | null {
+  if (s.presence.space === 'away') return { code: 'not_home' };
+  const stage = (c.homestead.looks ?? []).find(l => l.id === cmd.stage);
+  if (!stage) return { code: 'bad_stage' };
+  if (cmd.look !== 'a' && cmd.look !== 'b') return { code: 'bad_look' };
+  if (s.homestead.level < stage.level) return { code: 'homestead_level', detail: { need: stage.level } };
+  s.homestead.looks = { ...(s.homestead.looks ?? {}), [stage.id]: cmd.look };
+  events.push({ kind: 'look', stage: stage.id, look: cmd.look });
   return null;
 }

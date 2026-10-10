@@ -11,6 +11,7 @@ const FarmArt = preload("res://modules/farm/farm_art.gd")
 const MineArt = preload("res://modules/mining/mine_art.gd")
 const GardenScenery = preload("res://scenes/p0/p0_garden_scenery.gd")
 const Fence = preload("res://scenes/p0/p0_fence.gd")
+const Looks = preload("res://scenes/p0/p0_looks.gd")
 const HomePanel = preload("res://scenes/p0/home/p0_home_panel.gd")
 const SIGN_BADGE := Vector3(0, 1.15, 0)   # the Homestead sign's mark, just above the board
 const SIGN_NEAR := 2.6                    # metres: the sign's and the plaque's finger cards show this close
@@ -67,6 +68,7 @@ var _front_cell := Vector2i(-1, -1)
 var _plot_sig := ""
 var _sync_t := 0.0
 var _fence: Node3D   # p0_fence.gd: front stretch always, the ring from Homestead Lv3
+var _looks: Node3D   # p0_looks.gd: Porch, Kitchen Wing and the Lv10 house by the view's looks
 var _sign := Vector3.ZERO   # Homestead sign right of the farmhouse door (WorldBadges · Farm 1135:79267): HOME-1
 var _plaque := Vector3.ZERO   # Upgrade Plaque left of the door (1510:97492), shown from the first upgrade: PLAQUE-READ
 var _plaque_node: Node3D
@@ -165,7 +167,8 @@ func _build_world() -> void:
 	var props := Node3D.new()
 	props.name = "Props"
 	add_child(props)
-	props.add_child(FarmProps.build("house", _house, 1.0, STYLE))
+	var house := FarmProps.build("house", _house, 1.0, STYLE)
+	props.add_child(house)
 	props.add_child(FarmProps.build("storage", bp.cell_to_world(bp.anchor("storage")), 1.0, STYLE))
 	props.add_child(FarmProps.build("well", bp.cell_to_world(bp.anchor("well")), 1.0, STYLE))
 	# The bench is two cells wide: its centre sits half a cell right of its anchor cell, facing the field (+z).
@@ -186,6 +189,9 @@ func _build_world() -> void:
 	add_child(_fence)
 	_fence.build(bp)
 	P0Garden.block_points(bp, P0Garden.fence_block_points(bp))   # the yard fence in front of the house collides
+	_looks = Looks.new()   # the Homestead looks beside and as the farmhouse (LOOK-PICK, SGODOT-282)
+	add_child(_looks)
+	_looks.build(bp, house, STYLE, _fence, P0Runtime.ensure().ui)   # before rt is set (_ready builds the world first)
 	# The Homestead sign: its own tap target beside the door, not the door (LOCK-11 / LOCK-07).
 	_sign = P0Garden.sign_point(bp)
 	props.add_child(FarmArt.instance("sign", _sign, 0.8))
@@ -291,6 +297,13 @@ func _place_camera() -> void:
 ## on arrival changes nothing when it closes, 后裔 on #166), never bringing the player's feet within FEET_ROOM of the
 ## quick bar. Once: a later step, pinch or Show leaves the framing alone.
 const HOME_MARK := Vector3(0, 2.6, 0.4)   # the farmhouse prompt's anchor (world_prompt "home")
+const HOME_MARK_OVER_ROOF := 0.5           # … that is, 0.5 m over the cottage's 2.1 m roof
+
+## The prompt's anchor over the house on show: the Lv10 Timber Lodge (house_barn) is 0.36 m taller than the cottage,
+## and its prompt rises with the roof instead of sitting on its ridge (上官婉儿 on #250).
+func home_mark() -> Vector3:
+	var mesh: Mesh = _looks._house.mesh if _looks and _looks._house else null
+	return HOME_MARK if mesh == null else Vector3(HOME_MARK.x, maxf(HOME_MARK.y, mesh.get_aabb().end.y + HOME_MARK_OVER_ROOF), HOME_MARK.z)
 const MARK_ROOM := 24.0   # half the near icon disc (28 × 1.1) and the 8 px edge gap prompts keep
 const FEET_ROOM := 16.0
 func _fit_opening() -> void:
@@ -303,7 +316,7 @@ func _fit_opening() -> void:
 	if not area.has_area(): return   # the HUD has not laid out yet
 	_opening = false
 	_place_camera()
-	_focus = opening_focus(cam, _focus, _house + HOME_MARK, actor.position, area)
+	_focus = opening_focus(cam, _focus, _house + home_mark(), actor.position, area)
 	_place_camera()
 
 ## `focus` moved along the ground, away from the camera, by as much as the mark needs to sit MARK_ROOM below the area's
@@ -465,6 +478,7 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 	rt.ui.player_screen = cam.unproject_position(actor.position + Vector3(0, 0.9, 0))   # the radial fans out from here
 	_sync_plots(v, dt)
 	_fence.sync(v)
+	_looks.sync(v)
 	if _facilities == null and bp != null and cam != null and actor != null:
 		_facilities = P0FarmFacilities.new().setup(self)
 		add_child(_facilities)
@@ -497,6 +511,26 @@ func _sync_plots(v: Dictionary, dt: float) -> void:
 		if id >= 0 and id < P0Garden.plot_count(v): beds.multimesh.set_instance_color(id, P0Garden.bed_tint(str(p.get("state", ""))))
 	# P1 (q(59) §1.1): beds 30–39 stand from Homestead Lv3 (the view's garden.plots); before that the batch draws 30.
 	beds.multimesh.visible_instance_count = P0Garden.plot_count(v)
+	_sync_trees(v)
+
+## P1 trees (q(118)): a tree's bed is solid (§5.6: not walkable, as the old woody crop); only the cells that change flip,
+## the path grid is never rebuilt for it. A tree planted on the bed the player stands on blocks once they step off it
+## (哪吒 on #252: never trap the player; the plot sync runs at least once a second).
+var _tree_cells := {}
+func _sync_trees(v: Dictionary) -> void:
+	if grid == null: return
+	var here := bp.world_to_cell(actor.position)
+	var now := {}
+	for p in v.get("plots", []): if p.get("tree", false): now[int(p.id)] = true
+	for id in now.keys():
+		if _tree_cells.has(id): continue
+		if P0Garden.cell_of(id) == here:
+			now.erase(id)   # not solid yet: try again next sync
+			_sync_t = minf(_sync_t, 0.25)
+			continue
+		grid.set_solid(P0Garden.cell_of(id), true)
+	for id in _tree_cells: if not now.has(id): grid.set_solid(P0Garden.cell_of(id), false)
+	_tree_cells = now
 
 ## Middle of the plot beds, for camera-only "Show" from the Today panel and NeedSource (LOCK-08).
 func _plots_center() -> Vector3:
@@ -571,7 +605,7 @@ func _hold_repeat() -> void:
 	if Time.get_ticks_msec() < _hold_until: return
 	var a: Dictionary = rt.ui.fab_state()
 	var cmd: Dictionary = a.get("cmd", {})
-	if not a.get("enabled", false) or cmd.is_empty() or str(cmd.get("type", "")) == "energy_card": return
+	if not a.get("enabled", false) or cmd.is_empty() or str(cmd.get("type", "")) == "energy_card" or a.get("once", false): return   # a tree is planted one press at a time (q(118))
 	if rt.ui.fab_verb == "": rt.ui.fab_verb = str(a.get("verb", ""))
 	if str(a.get("verb", "")) != rt.ui.fab_verb: return
 	rt.holding_repeat = true   # the observation log's "hold" (S7); the first press went out as a tap
@@ -649,7 +683,7 @@ func _sign_hit(screen: Vector2) -> bool:
 func _prompts(v: Dictionary) -> void:
 	_strip_side = _facing_side()
 	world_prompt("stall", P0WorldPrompts.stall(v, rt.ui.stall_has_new()), _stall, Vector3(0, 1.05, 0), Vector3(0, 0.4, 0))
-	world_prompt("home", P0WorldPrompts.farmhouse(v), _house, HOME_MARK, Vector3(0, 1.0, 0.6))
+	world_prompt("home", P0WorldPrompts.farmhouse(v), _house, home_mark(), Vector3(0, 1.0, 0.6))
 	world_prompt("sign", P0WorldPrompts.sign(v), _sign, SIGN_BADGE, Vector3(0, 0.45, 0))
 	_plaque_node.visible = not v.get("homestead", {}).get("plaque", []).is_empty()
 	world_prompt("plaque", P0WorldPrompts.plaque(v), _plaque, Vector3(0, 0.85, 0), Vector3(0, 0.35, 0), _plaque_node.visible)
@@ -734,6 +768,11 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"goto":
 			actor.teleport(Vector3(float(step[1]), 0, float(step[2])))
 			_focus = actor.position
+		"plotface":   # plotface:<id> — stand on the walkway in front of a plot, facing it (P1 tree review shots)
+			var bed := bp.cell_to_world(P0Garden.cell_of(int(step[1])))
+			actor.teleport(bp.cell_to_world(P0Garden.cell_of(int(step[1])) + Vector2i(0, 1)))
+			actor.face(bed)
+			_focus = actor.position
 		"gocell":
 			actor.teleport(bp.cell_to_world(Vector2i(int(step[1]), int(step[2]))))
 			_focus = actor.position
@@ -764,6 +803,30 @@ func p0_dev(step: PackedStringArray) -> bool:
 			var r: Rect2 = (e.main_rect() if step[0] == "cardtap" else e.second_rect() if step[0] == "cardnew" else e.third_rect()) if e != null else Rect2()
 			if e != null: p0_tap(r.get_center() - rt.ui.root.global_position)
 		"zoomto": _zoom = clampf(float(step[1]), 0.8, 1.4)   # zoomto:0.8 (widest) … 1.4 (closest)
+		# LOOK-PICK (SGODOT-282): lookpick:<stage>[:home] opens the card as after the level-up (or from HOME-1);
+		# lookpick-b / lookpick-a tap a card; lookuse presses Use; lookclose ✕; lookparts prints the stages' parts.
+		"lookpick": P0LookPick.open(rt.ui, step[1], not (step.size() > 2 and step[2] == "home"))
+		"lookpick-a", "lookpick-b":
+			var card := rt.ui.find_children("*", "P0LookPick", true, false)
+			if not card.is_empty(): (card[0] as P0LookPick).pick(step[0].right(1))
+		"lookuse", "lookclose":
+			var card := rt.ui.find_children("*", "P0LookPick", true, false)
+			if not card.is_empty():
+				if step[0] == "lookuse": (card[0] as P0LookPick).use()
+				else: (card[0] as P0LookPick).dismiss()
+		"lookparts":
+			var out := {"fence": _fence.look, "house": str(_looks._house.mesh.resource_path) if _looks._house.mesh else ""}
+			for st in _looks.STAGES: out[st] = [_looks.shown(st), (_looks.parts(st) as Array).map(func(n): return [str(n.name), cam.unproject_position((n as Node3D).global_position)])]
+			out["house_screen"] = cam.unproject_position(_house + Vector3(0, 1.0, 0))
+			# Lv10 checks (上官婉儿 on #250): the door path, the sign, the roof top and the farmhouse prompt on screen
+			var top := (_looks._house.mesh as Mesh).get_aabb().end.y if _looks._house.mesh else 0.0
+			out["door_path"] = cam.unproject_position(_door)
+			out["sign"] = cam.unproject_position(_sign + Vector3(0, 0.6, 0))
+			out["roof_top"] = [top, cam.unproject_position(_house + Vector3(0, top, 0))]
+			out["home_mark"] = cam.unproject_position(_house + home_mark())
+			var b: UiWorldIconButton = rt.ui._icons.get("home")
+			if b and b.visible: out["home_button"] = b.get_global_rect()
+			print("P0_LOOKS ", out)
 		# P1 placement (SGODOT-241): build:<recipe> opens it as the Facilities card's Build does; placeat:<plot> moves
 		# the preview as a finger on that bed would; placeok / placecancel press the bar; placesecond:<label> shows its
 		# middle key, placereason:<text> / placeconfirm:<verb> set its reason and main key; factap:<id> taps a sprinkler.

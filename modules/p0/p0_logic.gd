@@ -500,6 +500,19 @@ static func main_action(view: Dictionary, plot: Dictionary, seed_id: String, row
 		if seed_id == "": a.sub = "Pick a seed"
 		return a
 	var plot_id := int(plot.get("id", -1))
+	var tree := bool(plot.get("tree", false))
+	# P1 trees (q(118), 不知火舞 on 241): Orchard Feed feeds a picked tree, regrowing, not fed yet; any other tree goes by
+	# its state (ripe: Pick, its first ripening or fed: Growing — 哪吒 on #252); no tree underfoot greys the key with
+	# `No tree here`.
+	if seed_id == "fert_orchard" and not tree:
+		return {"icon": "compost", "verb": "Fertilize", "sub": "No tree here", "enabled": false, "amber": false, "cmd": {}, "need": 0,
+			"toast": "No tree here"}
+	if seed_id == "fert_orchard" and str(plot.get("state", "")) == "growing" and int(plot.get("picks", 0)) > 0 and not plot.get("fert", false):
+		return {"icon": "compost", "verb": "Fertilize", "sub": "Free", "enabled": true, "amber": false,
+			"cmd": {"type": "fertilize", "plot": plot_id, "item": seed_id}, "need": 0}
+	if tree: return _tree_action(view, plot)
+	if bool(crop_for_seed(view, seed_id).get("perennial", false)) and str(plot.get("state", "")) in ["tilled", "wild"]:
+		return _plant_action(view, plot_id, seed_id)
 	if seed_id.begins_with("fert_"):
 		var ripe := str(plot.get("state", "")) == "ready"
 		if str(plot.get("state", "")) in ["sown", "growing"] and not ripe and not plot.get("fert", false):
@@ -556,6 +569,38 @@ static func harvest_row(view: Dictionary, front: Dictionary) -> Array:
 		if pid == id or pid < 0 or pid >= P0Garden.plot_count(view) or P0Garden.grid_of(pid).y != row_y: continue
 		if str(p.get("state", "")) == "ready" and not bool(p.get("tree", false)) and p.get("facility", null) == null: out.append(pid)
 	return out
+
+## A sapling at an empty plot, tilled or wild (q(118) ①): `Plant` / `6 Energy`, one tree a press (never repeated while
+## held, `once`); the orchard full greys it with `Orchard 5/5` and the whole reason as the toast (q(44) 80 px).
+static func _plant_action(view: Dictionary, plot_id: int, seed_id: String) -> Dictionary:
+	if bag_count(view, seed_id) <= 0:
+		return {"icon": "sow", "verb": "Sow", "sub": "Pick a seed", "enabled": false, "amber": false, "cmd": {}, "need": 0}
+	var cost := int(crop_for_seed(view, seed_id).get("energy", 6))
+	var o: Dictionary = view.get("orchard", {})
+	var used := int(o.get("used", 0))
+	var cap := int(o.get("cap", 0))
+	if used >= cap:
+		var nxt = o.get("homestead_next", null)
+		return {"icon": "sow", "verb": "Plant", "sub": "Orchard %d/%d" % [used, cap], "enabled": false, "amber": false, "cmd": {},
+			"need": 0, "toast": "Orchard %d/%d" % [used, cap] + (" · Homestead Lv%d adds 1" % int(nxt) if nxt != null else "")}
+	if int(view.get("energy", {}).get("value", 0)) < cost:
+		return {"icon": "sow", "verb": "Plant", "sub": "Need %d Energy" % cost, "enabled": true, "amber": true,
+			"cmd": {"type": "energy_card"}, "need": cost}
+	return {"icon": "sow", "verb": "Plant", "sub": "%d Energy" % cost, "enabled": true, "amber": false, "once": true,
+		"cmd": {"type": "sow", "plot": plot_id, "seed": seed_id}, "need": cost}
+
+## A tree in front: ripe, `Pick` / `2 Energy` (a tree per press, §5.6); growing, how long until it is.
+static func _tree_action(view: Dictionary, plot: Dictionary) -> Dictionary:
+	var plot_id := int(plot.get("id", -1))
+	if str(plot.get("state", "")) != "ready":
+		return {"icon": "clock", "verb": "Growing", "sub": key_ready(float(plot.get("ready_in", 0))), "enabled": false, "amber": false, "cmd": {}, "need": 0}
+	var cost := 2
+	for c in view.get("crops", []): if str(c.get("id", "")) == str(plot.get("crop", "")): cost = int(c.get("pick_energy", 2))
+	if int(view.get("energy", {}).get("value", 0)) < cost:
+		return {"icon": "hoe", "verb": "Pick", "sub": "Need %d Energy" % cost, "enabled": true, "amber": true,
+			"cmd": {"type": "energy_card"}, "need": cost}
+	return {"icon": "hoe", "verb": "Pick", "sub": "%d Energy" % cost, "enabled": true, "amber": false,
+		"cmd": {"type": "harvest", "plot": plot_id}, "need": cost}
 
 ## Five candidates for the current action — Farming: seeds, Fishing: bait — kept order: previously shown → most plentiful (§10.3.3).
 ## Pinned ids always stay on the bar, also at 0 left (LOCK-05, §10.3.3 归零); ids the player dragged off the bar
@@ -1580,7 +1625,7 @@ const HOME_AWAY_TAP := "Upgrade at home · Going home is free"
 ## copy; SGODOT-282). Travel tiers, looks and room tiers are announced by their own lines, not here.
 const P1_UNLOCKS := {
 	"second_stove": {"icon": "kitchen", "text": "Second Stove", "note": "two dishes at once"},
-	"notice_board": {"icon": "board", "text": "Notice Board", "note": "by the farmhouse door"},
+	"notice_board": {"icon": "board", "text": "Notice Board", "note": "at the Homestead Stall"},   # §9: the stall's board (Figma HOME-1-LV5)
 	"big_pot": {"icon": "kitchen", "text": "Big Pot · Double", "note": "two portions, one round of heat"},
 	"bag_upgrade_2": {"icon": "bag", "text": "Bag Upgrade II for sale · 400 coins", "note": "Bag 30 → 35"},
 	"third_stove": {"icon": "kitchen", "text": "Third Stove", "note": "Warming Cabinet keeps 12"},
@@ -1593,8 +1638,43 @@ const P1_UNLOCKS := {
 	"stall_upgrade": {"icon": "board", "text": "Homestead Stall upgraded", "note": "new look"},
 }
 
-## The farmhouse look each level brings (§8.3.1 stages 2–4), shown as HOME-1's look line.
-const LOOKS := {"porch": "Porch", "kitchen_extension": "Kitchen extension", "master_farmhouse": "Master farmhouse"}
+## Homestead looks (§8.3.1, LOOK-PICK, SGODOT-282): content homestead.looks, one stage per look level, its id the
+## level's unlock id — {id, level, name, a, b}, a timber and b stone (q(112)). HOME-1's icon per stage (Figma 2201:33545).
+const LOOK_ICONS := {"fence": "mailbox", "porch": "door", "kitchen_extension": "kitchen", "master_farmhouse": "home"}
+## What changes' look row (q(115) ①): `Porch · Timber or Stone` with this note (q(117): `pick when you upgrade` ran past
+## the row at the frame's size).
+const LOOK_NOTE := "pick one"
+const MAX_LEVEL_LINE := "Max level · Homestead Master"   # Lv10's HOME-1, under the title (q(115) ②)
+
+static func look_stages() -> Array:
+	return content().get("homestead", {}).get("looks", [])
+
+static func look_stage(id: String) -> Dictionary:
+	for l in look_stages(): if str(l.get("id", "")) == id: return l
+	return {}
+
+## The look picked on a stage, from the view (homestead.looks[].look): "a" / "b", or "" while the stage is not reached.
+static func look_of(view: Dictionary, id: String) -> String:
+	var h: Dictionary = view.get("homestead", {})
+	for l in h.get("looks", []):
+		if str(l.get("id", "")) == id: return str(l.look) if l.get("look", null) != null else ""
+	var stage := look_stage(id)   # an older view without looks: a once reached (q(24))
+	return "a" if not stage.is_empty() and int(h.get("level", 1)) >= int(stage.level) else ""
+
+## HOME-1's Looks section (e2d76a7c, Figma 2201:33545): a row per stage in level order. Reached: the stage name and the
+## look on it with › (`Porch` … `Stone Porch ›`), a tap opens LOOK-PICK — at home only, where the farmhouse is in view;
+## away it reads without ›. Not reached: grey, `Homestead Lv8`, no ›. Empty until the first stage (Lv3).
+## [{id, icon, name, value, reached, open}]
+static func look_rows(view: Dictionary, at_home := true) -> Array:
+	var out: Array = []
+	for l in look_stages():
+		var id := str(l.id)
+		var look := look_of(view, id)
+		var reached := look != ""
+		out.append({"id": id, "icon": str(LOOK_ICONS.get(id, "home")), "name": str(l.name), "reached": reached,
+			"open": reached and at_home,
+			"value": (str(l.get(look, "")) + (" ›" if at_home else "")) if reached else "Homestead Lv%d" % int(l.level)})
+	return out if out.any(func(r): return bool(r.reached)) else []
 
 ## HOME-1 (Figma 482:152, §8.6.1, LOCK-10) from view.homestead facts: title, the look line, NEED-TILEs in order
 ## materials → coins → skills, what changes, and the button (the first gap is written on it). Lv1–10 (P1, SGODOT-282).
@@ -1604,15 +1684,21 @@ static func home_panel(view: Dictionary, at_home := true) -> Dictionary:
 	var level := int(h.get("level", 1))
 	var next = h.get("next", null)
 	var out := {"title": "Homestead Lv%d" % level, "look": "", "tiles": [], "changes": [], "label": "Upgrade",
-		"reason": "", "tap": "", "footer": "Upgrading is free of Energy · fills Energy to the new max", "max": next == null}
+		"reason": "", "tap": "", "footer": "Upgrading is free of Energy · fills Energy to the new max", "max": next == null,
+		"subtitle": "", "button": true, "looks": look_rows(view, at_home)}
 	if next == null:
-		out.reason = "Highest level for now"
+		# Lv10 (q(115) ②): `Max level · Homestead Master` under the title and no Upgrade; P0's cap keeps its grey button.
+		if level >= 10:
+			out.subtitle = MAX_LEVEL_LINE
+			out.button = false
+		else:
+			out.reason = "Highest level for now"
 		return out
 	out.title = "Homestead Lv%d → Lv%d" % [level, int(next.level)]
 	var unlocks: Array = next.get("unlocks", [])
-	if unlocks.has("fence"): out.look = "Lv%d look · Full fence" % int(next.level)
-	for u in LOOKS:   # §8.3.1 looks at Lv5 / 8 / 10; the A / B choice comes with Decorate (SGODOT-282)
-		if unlocks.has(u): out.look = "Lv%d look · %s" % [int(next.level), LOOKS[u]]
+	for u in unlocks:   # §8.3.1 looks at Lv3 / 5 / 8 / 10 (q(115): `Lv5 look · Porch`, never Look A / B)
+		var stage := look_stage(str(u))
+		if not stage.is_empty(): out.look = "Lv%d look · %s" % [int(next.level), str(stage.name)]
 	for m in next.get("materials", []):
 		out.tiles.append({"id": str(m.id), "name": str(m.name), "have": int(m.have), "need": int(m.need), "icon": str(m.id)})
 	out.tiles.append({"id": "coins", "name": "Coins", "have": int(next.coins.have), "need": int(next.coins.need), "icon": "coin"})
@@ -1630,6 +1716,8 @@ static func home_panel(view: Dictionary, at_home := true) -> Dictionary:
 				out.changes.append({"icon": "bag", "text": "Bag Upgrade I for sale · 150 coins",
 					"note": "Bag %d → %d" % [int(view.get("bag", {}).get("capacity", 25)), int(view.get("bag", {}).get("capacity", 25)) + 5]})
 			"board_slot_3": out.changes.append({"icon": "board", "text": "Stall Board · 3rd slot", "note": "now %d" % board_now})
+			_ when not look_stage(str(u)).is_empty():   # q(115) ①: `Porch · Timber or Stone` · pick one
+				out.changes.append({"icon": str(LOOK_ICONS.get(str(u), "home")), "text": "%s · Timber or Stone" % str(look_stage(str(u)).name), "note": LOOK_NOTE})
 			_:
 				var line := P1_UNLOCKS.get(str(u), {}) as Dictionary
 				if not line.is_empty(): out.changes.append(line.duplicate())

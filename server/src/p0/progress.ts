@@ -35,7 +35,8 @@ export type P0Event =
   | { kind: 'reward'; id: string; energy: number }
   | { kind: 'arrival'; cluster: string; first: boolean; stamp: import('./travel.js').TravelStamp | null; energy: number; pass_until: number; km: number; trip: number }
   | { kind: 'request'; id: string; status: 'accepted' | 'done' | 'dropped'; coins: number; bonus?: number }
-  | { kind: 'homestead'; level: number; energy: number; unlocks: string[] }
+  | { kind: 'homestead'; level: number; energy: number; unlocks: string[]; look?: string }   // look: the stage it opens
+  | { kind: 'look'; stage: string; look: 'a' | 'b' }   // LOOK-PICK (SGODOT-282)
   | { kind: 'drink'; item: string; gain: number; price: number; left: number }
   | { kind: 'affinity'; resident: string; delta: number; total: number; stage: string; reason: string; verdict?: string }
   | { kind: 'gift_meal'; resident: string; dish: string; given: boolean; to?: 'parcel' }   // to: the bag was full, so it waits in the Inbox
@@ -54,6 +55,7 @@ export type P0Event =
   | { kind: 'facility'; action: 'placed' | 'moved'; facility: number; facility_kind: string; plot: number; from?: number; covered: number; started: number[] }
   | { kind: 'plots_added'; plots: number[]; reason: 'homestead' }   // the Homestead unlock's new plots (client drops them in)
   | { kind: 'seed_saved'; id: string; plot: number }   // Seed Saver gave back a seed on this harvest (Farming Lv10)
+  | { kind: 'tree'; action: 'planted' | 'chopped'; plot: number; crop: string; used: number; cap: number }   // the orchard (q(118))
   | { kind: 'stored'; items: [string, number][]; reason: 'home' | 'spice_rack' };
 
 export function energyDetail(c: P0Content, s: P0State, now: number, need: number) {
