@@ -3,7 +3,7 @@
   "_note": "P0 home set, San Francisco (SGODOT-270, q(106); was Shanghai, SGODOT-227). Names per q(32) / q(106): Mission Tackle Shop (0.25 km from Fern Pond, the beginner pond), Mission Market Square (0.73 km from Fern Pond, 16th St Mission), Union Square Travel Post (city centre), Oak Tea House (temperate word pool, Duboce Triangle); different roles >= 300 m apart (closest 0.48 km), the homestead (37.7558, -122.4345) >= 300 m from all (closest 1.01 km). Ids, keepers (Ama / Finn / Mei / Sigrid) and residents are unchanged: ids are opaque (rooms, saves). All four use the Basic Room placeholder until wp-3d-scene lands (SGODOT-208). role = counter entry id (open_keeper_greeting(role), SGODOT-224). bounds = walkable box in room metres [min_x, max_x, min_z, max_z]; seats must match the seat_* anchors of the anchors file. nearest (tackle) = the pond the keeper names in \"Where are they biting?\" ({name, site}; site keys view.keepers.tackle.next_fish).",
   "outposts": [
     {
-      "id": "sh_tackle_1",
+      "id": "sh_tackle_1", "cluster": "gn-5391959",
       "role": "tackle",
       "name": "Mission Tackle Shop",
       "category": "Tackle shop · Rods and bait",
@@ -20,7 +20,7 @@
       "seats": []
     },
     {
-      "id": "sh_tea_1",
+      "id": "sh_tea_1", "cluster": "gn-5391959",
       "role": "tea",
       "name": "Oak Tea House",
       "category": "Tea house · Hot tea",
@@ -36,7 +36,7 @@
       "seats": ["seat_table1_1", "seat_table1_2", "seat_table2_1", "seat_table2_2"]
     },
     {
-      "id": "sh_post_1",
+      "id": "sh_post_1", "cluster": "gn-5391959",
       "role": "post",
       "name": "Union Square Travel Post",
       "category": "Travel post · Coffee",
@@ -52,7 +52,7 @@
       "seats": []
     },
     {
-      "id": "sh_market_1",
+      "id": "sh_market_1", "cluster": "gn-5391959",
       "role": "market",
       "name": "Mission Market Square",
       "category": "Market square · Requests",

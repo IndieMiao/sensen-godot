@@ -3,6 +3,7 @@ import type { Family, P0Content, Skill } from './content.js';
 import { maxEnergy } from './rules.js';
 import { addPlots } from './garden.js';
 import { clusterOf, clusterOfCityName, freshTravel, homeCluster, type TravelState } from './travel.js';
+import { placeOf } from './world.js';
 
 export type PlotState = 'wild' | 'tilled' | 'sown' | 'growing';
 export interface Plot {
@@ -304,7 +305,7 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
   // and a cast still out there comes in as a line in before the bite would — the Energy back, no fish, no XP, an unused
   // teaching pin returned. Old casts without a place are left alone.
   // v5: "the home city's" becomes "a city the player holds a pass for" (home, or a Day Pass bought before).
-  const home = (id: string) => { const k = c.fishing.places[id] ? clusterOf(c, id) : null; return !!k && (k === s.travel.home || !!s.travel.passes[k]); };
+  const home = (id: string) => { const k = placeOf(c, id) ? clusterOf(c, id) : null; return !!k && (k === s.travel.home || !!s.travel.passes[k]); };
   if (s.presence.place && !home(s.presence.place)) s.presence.place = null;
   const cast = s.cast;
   if (cast?.place && !home(cast.place)) {
