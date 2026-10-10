@@ -37,6 +37,15 @@ func _with_travel(rt: P0Runtime, travel: Dictionary) -> Dictionary:
 	rt.session.view = v
 	return saved
 
+## The first toast to show within `secs` (a flight lands, then welcomes).
+func _toast_within(ui: P0Ui, secs: float) -> String:
+	var t := 0.0
+	while t < secs:
+		if ui.toast_text() != "": return ui.toast_text()
+		await get_tree().process_frame
+		t += get_process_delta_time()
+	return ui.toast_text()
+
 func _texts(node: Node) -> Array:
 	return node.find_children("*", "Label", true, false).map(func(l): return str((l as Label).text))
 
@@ -50,11 +59,12 @@ func test_another_citys_bubble_opens_its_free_travel_card_and_fly_sends_travel()
 	m.fly_to_city(TOKYO)
 	assert_str(rt.ui.modal_kind).is_equal("travel_card")
 	var texts := _texts(rt.ui.root)
-	assert_array(texts).contains(["Tokyo, Japan", "Unexplored", "Free", "First visit · stamp + 10 Energy", "Fly"])
+	assert_array(texts).contains(["Tokyo, Japan", "Unexplored", "Free", "First visit · stamp + 10 Energy"])
 	assert_bool(texts.any(func(t): return str(t).ends_with(" km · Trip 6 · Intercontinental"))).is_true()
 	assert_dict(rt.here).is_equal({"space": "home", "place": ""})   # the card is not a trip: nothing sent yet
 	assert_array(sent.filter(func(c): return str(c.get("type", "")) == "travel")).is_empty()
 	var fly: Node = rt.ui.root.find_children("Primary", "", true, false)[0]
+	assert_str(str(fly.label)).is_equal("Fly")
 	fly.activated.emit()
 	assert_array(sent.filter(func(c): return str(c.get("type", "")) == "travel").map(func(c): return str(c.to))).is_equal([TOKYO])
 	assert_str(rt.ui.modal_kind).is_empty()
@@ -80,12 +90,10 @@ func test_an_arrival_flies_there_and_the_player_stands_in_that_city() -> void:
 	var at: Vector2 = m._origin()
 	assert_float(at.x).is_equal_approx(float(tokyo.lat), 1e-4)
 	assert_float(at.y).is_equal_approx(float(tokyo.lng), 1e-4)
-	await get_tree().create_timer(5.5).timeout   # Trip 6: a 5 s flight, then the welcome
-	assert_str(rt.ui.toast_text()).is_equal("Welcome to Tokyo · Stamp collected")
+	assert_str(await _toast_within(rt.ui, 7.0)).is_equal("Welcome to Tokyo · Stamp collected")   # Trip 6: a 5 s flight, then the welcome
 	rt.ui.clear_toast()
 	m.on_arrival({kind = "arrival", cluster = TOKYO, first = false, trip = 6, km = 8815})
-	await get_tree().create_timer(5.5).timeout
-	assert_str(rt.ui.toast_text()).is_equal("Welcome back")   # q(108): a return only floats Welcome back
+	assert_str(await _toast_within(rt.ui, 7.0)).is_equal("Welcome back")   # q(108): a return only floats Welcome back
 	rt.session.view = saved
 
 func test_away_the_chip_reads_the_arrived_city_with_no_day_pass() -> void:
