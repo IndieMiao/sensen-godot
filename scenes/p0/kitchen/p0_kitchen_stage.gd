@@ -214,6 +214,17 @@ func set_cooking(on: bool) -> void:
 
 func is_cooking() -> bool: return _cooking
 
+## Another stove's pot catches (Cook All, q(124)): a puff of steam at its mouth. The working stove's own pot uses
+## set_cooking (the hearth and the steaming).
+func puff_at(mouth: Node3D) -> void:
+	var p := _make_steam()
+	p.one_shot = true
+	p.amount = 10
+	p.lifetime = 0.7
+	mouth.add_child(p)   # in the tree first: emitting reads its global transform
+	p.emitting = true
+	get_tree().create_timer(1.0).timeout.connect(p.queue_free)
+
 func _puff() -> void:
 	var p := _make_steam()
 	p.one_shot = true

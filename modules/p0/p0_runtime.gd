@@ -556,7 +556,8 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				if P0Decor.is_decor(iid) and int(ev.delta) > 0:   # bought at the stall, into Farm Storage (SGODOT-284)
 					ui.toast_decor_bought(iid)
 					continue
-				if iid.begins_with("dish_"): _call("p0_event", [ev, v])   # where a collected dish went (the kitchen's Keep toast)
+				# where a collected dish went (the kitchen's Keep toast); what a pot took (Cook All floats it, q(124))
+				if iid.begins_with("dish_") or int(ev.delta) < 0: _call("p0_event", [ev, v])
 				if int(ev.delta) > 0 and (claimed or (not crafted and not iid.begins_with("seed_") and not iid.begins_with("dish_") and not iid.begins_with("fish_"))):
 					floats.append({kind = "item", key = iid, amount = int(ev.delta), fmt = "%s " + P0Logic.item_name(v, iid),
 						tone = UiFloatText.Tone.ITEM, icon = P0Logic.icon(iid)})
@@ -724,7 +725,7 @@ func _on_catch(ev: Dictionary, _xp_lines: Array, at := Vector2.INF, card_after :
 func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 	if str(cmd.get("type", "")).begins_with("claim_parcel"): ui.inbox_claim_done()   # no items come: none float from it (亚瑟 on #93)
 	# The farmhouse kitchen waits on cook / collect (its Cook buttons, the plate being served): let it recover.
-	if str(cmd.get("type", "")) in ["cook", "collect"]: _call("p0_event", [{"kind": "refused", "code": code, "cmd": cmd}, session.view])
+	if str(cmd.get("type", "")) in ["cook", "cook_all", "collect"]: _call("p0_event", [{"kind": "refused", "code": code, "cmd": cmd}, session.view])
 	if str(cmd.get("type", "")) == "cast": _call("p0_event", [{"kind": "cast_refused", "code": code}, session.view])
 	if code == "bag_full" and str(cmd.get("type", "")) == "reel":
 		_call("p0_event", [{"kind": "fish_abort"}, session.view])

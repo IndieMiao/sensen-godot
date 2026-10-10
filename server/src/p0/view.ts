@@ -3,7 +3,7 @@ import { cropBySeed, dishId, fishById, ingredient, itemKind, itemName, QUALITIES
 import { count, freeSlots } from './bag.js';
 import { barterItems, barterRoom } from './barter.js';
 import { cardPage, cardPrice, marketCards, stallCards } from './cards.js';
-import { burners, cookSlots, mealValue, recipeRarity, settleStove } from './cooking.js';
+import { burners, cookAllPlan, cookSlots, mealValue, recipeRarity, settleStove } from './cooking.js';
 import { sellPrice, stallOffer } from './reducer.js';
 import { blessed, dayKey, foodCap, maxEnergy, nextTickIn, regenMs, settleEnergy, skillLevel, untilRollover } from './rules.js';
 import { emptyDay, type P0State } from './state.js';
@@ -139,6 +139,7 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
       queued: queuedView(s, s.stove, s.queue, now),
       stoves: burners(c, s).map(b => b.stove ? { ...potView(s, b.stove, now), queued: queuedView(s, b.stove, b.queue, now) } : null),
       big_pot: bigPot(c, s),
+      cook_all: cookAllPlan(c, s, now),   // Cook All's preview (Cooking Lv8, COOK-P1-4): the pots it would start, or why none
       first_fire: s.fires === 0,
       // Spice Rack (Homestead Lv2, q(46)): stored seasonings the stove reaches; Experiment shows them with a Rack badge.
       rack: { on: rackOn(c, s), items: [...rackStock(c, s)].map(([id, qty]) => ({ id, name: itemName(c, id), qty })) },

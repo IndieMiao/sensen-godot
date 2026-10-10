@@ -242,3 +242,33 @@ func test_items_past_the_cap_stay_one_line_in_their_order() -> void:
 	for n in ["River Perch ×1", "Common Carp ×1", "Arctic Char ×1"]: parts.append({kind = "item", key = n, text = n})
 	var lines: Array = ui.float_lines(parts, Vector2(180, 420))
 	assert_array(lines.map(func(f): return (f as UiFloatText).text)).is_equal(["+20 Energy", "+7 XP", "River Perch ×1 · Common Carp ×1 · Arctic Char ×1"])
+
+## The lines a split item group makes pop as one block (不知火舞 on #289, Cook All's `−5 Pond Crucian · −2 Wild Herb` /
+## `−2 Radish`): they start together, each its own height and FLOAT_GROUP_GAP apart, growing from the lowest line, so
+## they never meet — at the pop's peak or at rest — and neither shows up after the other.
+func test_a_split_item_group_pops_together_and_its_lines_never_meet() -> void:
+	var ui := P0Ui.new()
+	ui.quick_store = STORE
+	add_child(auto_free(ui))
+	await get_tree().process_frame
+	ui.set_view({"energy": {"value": 140, "max": 200}, "coins": 52, "bag": {"capacity": 25, "slots": []}, "skills": {}})
+	ui.set_surface("pond")
+	var parts := [{kind = "xp", key = "trap_xp", amount = 7, fmt = "%s XP", tone = UiFloatText.Tone.XP}]
+	for n in ["River Perch ×1", "Common Carp ×1", "Arctic Char ×1"]: parts.append({kind = "item", key = n, text = n})
+	var lines: Array = ui.float_lines(parts, Vector2(180, 420))
+	var low: UiFloatText = lines[1]
+	var high: UiFloatText = lines[2]
+	for i in 16:
+		await get_tree().create_timer(0.05).timeout
+		assert_float(low.group_rise).is_equal(0.0)   # the lower line rests where it is played; the upper one on it
+		assert_float(high.group_rise).is_equal_approx(low.shown_size().y + P0Ui.FLOAT_GROUP_GAP, 0.1)
+		# one start: they fade in and scale together (a wide line's peak may be capped a little lower, 336 px)
+		assert_float(high.modulate.a).is_equal_approx(low.modulate.a, 0.001)
+		assert_float(high.scale.y).is_equal_approx(low.scale.y, 0.01)
+		var low_pill := low.get_child(0) as Control
+		var high_pill := high.get_child(0) as Control
+		var low_top := (low_pill.get_global_transform() * Vector2.ZERO).y
+		var high_bottom := (high_pill.get_global_transform() * Vector2(0, high_pill.size.y)).y
+		assert_float(high_bottom).is_less_equal(low_top + 0.01)   # never meet
+		if i == 15:   # at rest: FLOAT_GROUP_GAP apart
+			assert_float(low_top - high_bottom).is_equal_approx(P0Ui.FLOAT_GROUP_GAP, 0.1)

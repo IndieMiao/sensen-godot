@@ -38,13 +38,15 @@ export function ingredientStock(c: P0Content, s: P0State): Map<string, number> {
   return left;
 }
 
-/** Take qty of id (the caller checked haveIngredient): the rack (farm storage) first, then the bag.
- * Only the bag part is an item event; the rack is read from the view. */
+/** Take qty of id (the caller checked haveIngredient): the rack (farm storage) first, then the bag. Each part is an
+ * item event, the rack's marked from: storage — Cook All floats everything its pots took, the rack's seasonings too
+ * (不知火舞 on #289: the float and the sheet's Uses are one list of what really goes). */
 export function takeIngredient(c: P0Content, s: P0State, id: string, qty: number, events: P0Event[]): void {
   const fromRack = Math.min(qty, rackStock(c, s).get(id) ?? 0);
   if (fromRack > 0) {
     s.storage[id] -= fromRack;
     if (s.storage[id] === 0) delete s.storage[id];
+    events.push({ kind: 'item', id, delta: -fromRack, from: 'storage' });
   }
   const fromBag = qty - fromRack;
   if (fromBag > 0) {
