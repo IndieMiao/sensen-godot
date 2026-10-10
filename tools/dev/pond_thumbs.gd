@@ -2,8 +2,11 @@ extends SceneTree
 ## Bake the Bite Board's and the pond card's pond thumbnails (SGODOT-283; 不知火舞's spec on 283, 上官婉儿 on the
 ## cameras): one PNG per fishing template, assets/p0/ponds/pond_thumb_<pond|river|coast>.png, 144 × 112, from the same
 ## pond world the game builds (PondScenery + FishingWater on the pond's own template and decoration seed, the pond
-## scene's sky, light and sun), so a thumbnail always matches the pond the player walks into. Coast uses the existing
-## pond art until its own scene lands (不知火舞's P1 spec); when it does, re-run this with the same cameras:
+## scene's sky, light and sun), so a thumbnail always matches the pond the player walks into.
+## Until River and Coast have their own scenes (they are pond shapes today, and shrunk the three read alike), their PNGs
+## are 安其拉's flat placeholders from the PondThumb main component (Figma 2254:122909, the art frames 2254:122882 /
+## 2254:122896 at 2×; 不知火舞 on 283): this script bakes only the Pond until then (BAKE). When their scenes land, put
+## them back in BAKE and re-run with the same cameras:
 ##
 ##   godot --path . --script res://tools/dev/pond_thumbs.gd        (needs a window: it renders; not --headless)
 ##
@@ -17,6 +20,8 @@ const SIZE := Vector2i(144, 112)
 const FOV := 34.0
 ## The pond each template is shot at (San Francisco's: Fern Pond is the Pond, Blossom Pond a River, Clover Pond the Coast).
 const PONDS := {"pond": "pond_san_francisco_03", "river": "pond_san_francisco_06", "coast": "pond_san_francisco_02"}
+## The templates this run bakes: Pond only while River / Coast keep the Figma placeholders (see above).
+const BAKE := ["pond"]
 const CAMERAS := {
 	"pond": {"from": Vector3(6.0, 8.6, 2.6), "look_at": Vector3(6.0, 0.0, -8.2)},
 	"river": {"from": Vector3(6.0, 8.6, 2.8), "look_at": Vector3(6.0, 0.0, -7.8)},
@@ -29,7 +34,7 @@ func _initialize() -> void:
 
 func _bake() -> void:
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://assets/p0/ponds"))
-	for site in PONDS:
+	for site in BAKE:
 		var entry: Dictionary = P0Ponds.location(str(PONDS[site]))
 		var vp := SubViewport.new()
 		vp.size = SIZE
