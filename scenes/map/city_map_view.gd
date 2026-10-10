@@ -105,6 +105,14 @@ var host_card := Callable()
 ## func(entry) -> bool: a pin the host keeps whatever it would cover (P0: the place the player is at, the avatar standing
 ## beside it); every other pin gives way when it would cover one packed before it or an avatar (SGODOT-269).
 var kept_pin := Callable()
+## P0 fog (SGODOT-275, §11.7): host-given holes [{at: Vector2 (this view's px), r: px}] round explored cities, asked each
+## frame; unset = no fog (Journey). The veil draws under everything this view draws (pins, bubbles, names).
+var fog_holes := Callable()
+const MapFogLayer := preload("res://modules/map/map_fog_layer.gd")
+var fog: ColorRect
+## P0 fog state of a city bubble (§11.7.1): region id → "unexplored" / "explored" / "second_home", shown under its name
+## (Unexplored / Visited / Second Home, the last with an outline); unset = farm counts as before (Journey).
+var bubble_state := Callable()
 
 func _destination(entry: Dictionary) -> Dictionary:
 	return destination_style.call(entry) if destination_style.is_valid() else {}
@@ -225,6 +233,8 @@ func _ready() -> void:
 	name = "CityMap"
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	fog = MapFogLayer.new()
+	add_child(fog)
 	var city_name := str(host.region.get("name", "Los Angeles")) if host else "Los Angeles"
 	var city := flat_button("chevron-down", L10n.text(city_name), "MapCity")
 	city.alignment = HORIZONTAL_ALIGNMENT_LEFT
@@ -869,6 +879,7 @@ func tick(dt: float) -> void:
 	if _layout_wanted(): _update_markers()
 	else: _show_selected_art()   # a portrait drawn while the map is still
 	_update_bubbles()
+	_update_fog()
 	_update_header()
 
 func _on_pois(id: int, payload: String) -> void:
@@ -1520,6 +1531,12 @@ func _update_header() -> void:
 	city_button.size = Vector2(width, 44)
 	_underline.size.x = maxf(40.0, width - 22.0)
 
+func _update_fog() -> void:
+	if fog == null: return
+	if fog.get_index() != 0: move_child(fog, 0)   # under the bubbles and pins added at 0 since
+	var on := fog_holes.is_valid()
+	fog.apply(fog_holes.call() if on else [], float(host.zoom) + float(host._zoom_elastic), on)
+
 func _update_bubbles() -> void:
 	var detail: bool = host.city_detail_visible()
 	var area := Rect2(-global_position, get_viewport_rect().size).grow(60)
@@ -1534,9 +1551,18 @@ func _update_bubbles() -> void:
 		node.visible = not detail and area.has_point(point)
 		if not node.visible: continue
 		bubble.name.text = L10n.text(str(r.get("name", id)))
-		var count := int(host.city_farm_counts.get(id, -1))
-		bubble.count.text = L10n.count_text("%d farm", "%d farms", count) if count >= 0 else ""
-		bubble.count.visible = count >= 0
+		if bubble_state.is_valid():
+			var st := str(bubble_state.call(id))
+			bubble.count.text = {"unexplored": "Unexplored", "explored": "Visited", "second_home": "Second Home"}.get(st, "")
+			bubble.count.visible = bubble.count.text != ""
+			var box := node.get_theme_stylebox("panel") as StyleBoxFlat
+			if box != null:
+				box.border_color = Color("609f28")
+				box.set_border_width_all(2 if st == "second_home" else 0)
+		else:
+			var count := int(host.city_farm_counts.get(id, -1))
+			bubble.count.text = L10n.count_text("%d farm", "%d farms", count) if count >= 0 else ""
+			bubble.count.visible = count >= 0
 		node.size = node.get_combined_minimum_size()
 		# 气泡挂在城市点下方，自己的头像站在点上方，两者在同一城市也不互相遮挡。
 		node.position = point + Vector2(-node.size.x * 0.5, 6)

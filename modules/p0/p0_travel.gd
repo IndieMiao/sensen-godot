@@ -35,10 +35,20 @@ static func pass_left_ms(view: Dictionary, cluster: String) -> float:
 static func covers(view: Dictionary, cluster: String) -> bool:
 	return cluster == home(view) or pass_left_ms(view, cluster) > 0.0
 
-## §11.7.1 fog: "explored" once visited (or the home city), else "unexplored" (Second Home is P2's second version).
+## §11.7.1 fog's three states: "second_home" for a city set as one (travel.second_homes, P2's second version sets
+## them; the client already draws the state), "explored" once visited or the home city, else "unexplored".
 static func fog(view: Dictionary, cluster: String) -> String:
+	if (view.get("travel", {}).get("second_homes", []) as Array).has(cluster): return "second_home"
 	if cluster == home(view): return "explored"
 	return "explored" if view.get("travel", {}).get("visits", {}).has(cluster) else "unexplored"
+
+## Every city out of the fog: home, the visited and the second homes (no repeats).
+static func explored(view: Dictionary) -> Array:
+	var out: Array = [home(view)]
+	var t: Dictionary = view.get("travel", {})
+	for c in t.get("visits", {}).keys() + (t.get("second_homes", []) as Array):
+		if not out.has(str(c)): out.append(str(c))
+	return out
 
 static func visits(view: Dictionary, cluster: String) -> int:
 	return int(view.get("travel", {}).get("visits", {}).get(cluster, {}).get("n", 0))
