@@ -29,8 +29,14 @@ export function catalog(c: P0Content, shop: ShopId, s?: P0State, place?: unknown
   if (shop === 'homestead') return [...c.stall.buy, ...c.bag_upgrades.map(u => u.id),
     ...Object.entries(decorOf(c)?.items ?? {}).filter(([, d]) => d.buy).map(([id]) => id)];
   if (shop === 'tackle') return c.tackle.buy;
-  if (shop === 'market') return [...c.market.buy, ...regionalSeeds(c, s, place), ...c.market.specialty];
+  if (shop === 'market') return [...c.market.buy, ...regionalSeeds(c, s, place), ...orchardShelf(c), ...c.market.specialty];
   return [];
+}
+
+/** §5.2.4 / §5.5: a Market sells the saplings (Lv7 / Lv9) and Orchard Feed (goods with shop: market) in every city. */
+export function orchardShelf(c: P0Content): string[] {
+  return [...c.crops.filter(x => x.perennial && x.sold_at === 'market').map(x => x.seed),
+    ...Object.entries(c.goods).filter(([, g]) => g.shop === 'market').map(([id]) => id)];
 }
 
 /** §5.2.3: a Market sells only its own climate's regional seed. */

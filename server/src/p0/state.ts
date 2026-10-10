@@ -9,7 +9,8 @@ export type PlotState = 'wild' | 'tilled' | 'sown' | 'growing';
 export interface Plot {
   id: number; state: PlotState;
   crop?: string; xp_pct?: number; ready_at?: number;
-  fert?: boolean;                 // compost this round (§5.5): −20% of the ripening time, once, gone at harvest
+  fert?: boolean;                 // compost this round (§5.5): −20% of the ripening time, once, gone at harvest; on a tree, Orchard Feed
+  picks?: number;                 // a tree (P1, q(118)): times picked; 0 while it ripens the first time
 }
 /** A facility standing on a plot (P1, SGODOT-239): a sprinkler waters the ring of 8 around it. Never removed (q(22)). */
 export interface Facility { id: number; kind: string; plot: number; under?: 'wild' | 'tilled' }   // under: the plot as it was, back when it moves

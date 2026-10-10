@@ -485,6 +485,17 @@ static func main_action(view: Dictionary, plot: Dictionary, seed_id: String, row
 		if seed_id == "": a.sub = "Pick a seed"
 		return a
 	var plot_id := int(plot.get("id", -1))
+	var tree := bool(plot.get("tree", false))
+	# P1 trees (q(118), 不知火舞 on 241 7a42…/e7be829b): Orchard Feed only feeds a picked tree, regrowing, not fed yet.
+	if seed_id == "fert_orchard":
+		if tree and str(plot.get("state", "")) == "growing" and int(plot.get("picks", 0)) > 0 and not plot.get("fert", false):
+			return {"icon": "compost", "verb": "Fertilize", "sub": "Free", "enabled": true, "amber": false,
+				"cmd": {"type": "fertilize", "plot": plot_id, "item": seed_id}, "need": 0}
+		return {"icon": "compost", "verb": "Fertilize", "sub": "No tree here", "enabled": false, "amber": false, "cmd": {}, "need": 0,
+			"toast": "No tree here"}
+	if tree: return _tree_action(view, plot)
+	if bool(crop_for_seed(view, seed_id).get("perennial", false)) and str(plot.get("state", "")) in ["tilled", "wild"]:
+		return _plant_action(view, plot_id, seed_id)
 	if seed_id.begins_with("fert_"):
 		var ripe := str(plot.get("state", "")) == "ready"
 		if str(plot.get("state", "")) in ["sown", "growing"] and not ripe and not plot.get("fert", false):
@@ -522,6 +533,38 @@ static func main_action(view: Dictionary, plot: Dictionary, seed_id: String, row
 		"ready":
 			return {"icon": "hoe", "verb": "Harvest", "sub": "Free", "enabled": true, "amber": false, "cmd": {"type": "harvest", "plot": plot_id}, "need": 0}
 	return a
+
+## A sapling at an empty plot, tilled or wild (q(118) ①): `Plant` / `6 Energy`, one tree a press (never repeated while
+## held, `once`); the orchard full greys it with `Orchard 5/5` and the whole reason as the toast (q(44) 80 px).
+static func _plant_action(view: Dictionary, plot_id: int, seed_id: String) -> Dictionary:
+	if bag_count(view, seed_id) <= 0:
+		return {"icon": "sow", "verb": "Sow", "sub": "Pick a seed", "enabled": false, "amber": false, "cmd": {}, "need": 0}
+	var cost := int(crop_for_seed(view, seed_id).get("energy", 6))
+	var o: Dictionary = view.get("orchard", {})
+	var used := int(o.get("used", 0))
+	var cap := int(o.get("cap", 0))
+	if used >= cap:
+		var nxt = o.get("homestead_next", null)
+		return {"icon": "sow", "verb": "Plant", "sub": "Orchard %d/%d" % [used, cap], "enabled": false, "amber": false, "cmd": {},
+			"need": 0, "toast": "Orchard %d/%d" % [used, cap] + (" · Homestead Lv%d adds 1" % int(nxt) if nxt != null else "")}
+	if int(view.get("energy", {}).get("value", 0)) < cost:
+		return {"icon": "sow", "verb": "Plant", "sub": "Need %d Energy" % cost, "enabled": true, "amber": true,
+			"cmd": {"type": "energy_card"}, "need": cost}
+	return {"icon": "sow", "verb": "Plant", "sub": "%d Energy" % cost, "enabled": true, "amber": false, "once": true,
+		"cmd": {"type": "sow", "plot": plot_id, "seed": seed_id}, "need": cost}
+
+## A tree in front: ripe, `Pick` / `2 Energy` (a tree per press, §5.6); growing, how long until it is.
+static func _tree_action(view: Dictionary, plot: Dictionary) -> Dictionary:
+	var plot_id := int(plot.get("id", -1))
+	if str(plot.get("state", "")) != "ready":
+		return {"icon": "clock", "verb": "Growing", "sub": "Ready in " + span(float(plot.get("ready_in", 0))), "enabled": false, "amber": false, "cmd": {}, "need": 0}
+	var cost := 2
+	for c in view.get("crops", []): if str(c.get("id", "")) == str(plot.get("crop", "")): cost = int(c.get("pick_energy", 2))
+	if int(view.get("energy", {}).get("value", 0)) < cost:
+		return {"icon": "hoe", "verb": "Pick", "sub": "Need %d Energy" % cost, "enabled": true, "amber": true,
+			"cmd": {"type": "energy_card"}, "need": cost}
+	return {"icon": "hoe", "verb": "Pick", "sub": "%d Energy" % cost, "enabled": true, "amber": false,
+		"cmd": {"type": "harvest", "plot": plot_id}, "need": cost}
 
 ## Five candidates for the current action — Farming: seeds, Fishing: bait — kept order: previously shown → most plentiful (§10.3.3).
 ## Pinned ids always stay on the bar, also at 0 left (LOCK-05, §10.3.3 归零); ids the player dragged off the bar
