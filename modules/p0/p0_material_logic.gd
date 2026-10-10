@@ -172,7 +172,7 @@ static func mine_sheet(view: Dictionary) -> Dictionary:
 	var runs: Dictionary = mine.get("runs", {})
 	var used := int(runs.get("used", 0))
 	var limit := int(runs.get("limit", 2))
-	var sheet := {"title": "The mine", "subtitle": "Entrance", "line": "Explore two floors and gather materials.",
+	var sheet := {"title": "The mine", "subtitle": "Entrance", "line": "Mine five floors. Slimes from Floor 3.",
 		"facts": [["Runs today", "%d/%d" % [used, limit]]], "button": {}}
 	if mine.get("run", null) == null and used >= limit:
 		sheet.subtitle = "No run · Runs today %d/%d" % [used, limit]

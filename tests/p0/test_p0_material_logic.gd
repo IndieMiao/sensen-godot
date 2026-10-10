@@ -239,7 +239,7 @@ func test_mine_mouth_strip_sheet_and_status() -> void:
 	assert_str(str(P0WorldPrompts.mine(_view()).fact)).is_equal("Runs today 0/2")
 	assert_str(str(P0WorldPrompts.mine(_view(_run([_floor(1), _floor(2, false)]), 200, 1)).fact)).is_equal("Runs today 1/2")
 	var sheet := P0MaterialLogic.mine_sheet(_view())
-	assert_str(str(sheet.line)).is_equal("Explore two floors and gather materials.")
+	assert_str(str(sheet.line)).is_equal("Mine five floors. Slimes from Floor 3.")
 	assert_that(sheet.facts).is_equal([["Runs today", "0/2"]])
 	var spent := P0MaterialLogic.mine_sheet(_view(null, 200, 2))
 	assert_str(str(spent.subtitle)).is_equal("No run · Runs today 2/2")
