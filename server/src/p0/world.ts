@@ -10,8 +10,9 @@
  *
  * Numbers come from content.world (assets/p0/content/world_gen.json: 李白's tiers, placement, word and name pools).
  * There is no built-up-area, coastline or water data offline yet: the tier is the population tier raised by a hand
- * list (world.area_tier), city traits come from world.coastal, and places are laid out by geometry alone, with the
- * pins seen in the water moved to land by hand (world.overrides, q(114) ⑤).
+ * list (world.area_tier), city traits come from world.coastal, and places are laid out by geometry alone. Places that
+ * fell on water are moved to land by the offline water table (server/data/world_water.json from ESA WorldCover, q(126))
+ * and then by hand (world.overrides, q(114) ⑤), the hand fix winning.
  */
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
@@ -374,6 +375,36 @@ export function placeResidents(w: WorldContent, cl: CityCluster, tier: Tier, pon
   }
 }
 
+/** server/data/world_water.json (tools/world_water_batch.ts, q(126)): id → [lat, lng, generated lat, generated lng,
+ * metres from water], for the world seed and revision it was made for. */
+export interface WaterTable { seed: string; revision: number; fixes: Record<string, [number, number, number, number, number]> }
+let water: WaterTable | null | undefined;
+/** The water table, read once; null when the file is not there (tools/p0_image_check.ts refuses an image without it). */
+export function waterTable(): WaterTable | null {
+  if (water === undefined) {
+    try { water = JSON.parse(readFileSync(path.join(ROOT, 'server/data/world_water.json'), 'utf8')) as WaterTable; }
+    catch { water = null; }
+  }
+  return water;
+}
+
+/**
+ * q(126): the water table laid over a generated city, before the hand fixes. A table made for another seed or revision
+ * is an error (its points are another world's), never quietly used. An entry whose generated point is not this
+ * generator's point is skipped (p1_world_gen.test.ts fails on any such entry: rerun the batch after a placement change).
+ */
+export function applyWater(w: WorldContent, ponds: GenPond[], outposts: GenOutpost[], table = waterTable()): void {
+  if (!table) return;
+  if (table.seed !== w.seed || table.revision !== w.revision) {
+    throw new Error(`server/data/world_water.json is for seed ${table.seed} revision ${table.revision}, the world is ${w.seed} revision ${w.revision}: rerun tools/world_water_batch.ts`);
+  }
+  for (const p of [...ponds, ...outposts]) {
+    const f = table.fixes[p.id];
+    if (!f || Math.abs(p.lat - f[2]) > 1e-6 || Math.abs(p.lng - f[3]) > 1e-6) continue;
+    p.lat = f[0]; p.lng = f[1];
+  }
+}
+
 /**
  * q(114) ⑤: world.overrides laid over a generated city last, so a fix moves or renames that one place and nothing
  * else in the city (counts, names, keepers and residents were all chosen from the generated points). There is no water
@@ -404,7 +435,8 @@ export function applyOverrides(w: WorldContent, ponds: GenPond[], outposts: GenO
   }
 }
 
-export function generateCity(c: P0Content, cl: CityCluster): CityPlaces {
+/** `water: false` leaves the water table out (tools/world_water_batch.ts works from the generated points). */
+export function generateCity(c: P0Content, cl: CityCluster, opts: { water?: boolean } = {}): CityPlaces {
   const w = worldOf(c);
   if (!w) throw new Error('p0 world: no world block in the content (assets/p0/content/world_gen.json)');
   const tier = tierOf(w, cl);
@@ -412,6 +444,7 @@ export function generateCity(c: P0Content, cl: CityCluster): CityPlaces {
   const outposts = genOutposts(w, cl, tier, ponds);
   nameKeepers(w, cl, outposts);
   placeResidents(w, cl, tier, ponds, outposts, new Set(Object.keys((c as P0Content & { residents?: Record<string, unknown> }).residents ?? {})));
+  if (opts.water !== false) applyWater(w, ponds, outposts);
   applyOverrides(w, ponds, outposts);
   return {
     cluster: cl.id, tier, climate: cl.climate,
