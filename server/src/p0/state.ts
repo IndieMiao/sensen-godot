@@ -13,7 +13,7 @@ export interface Plot {
   picks?: number;                 // a tree (P1, q(118)): times picked; 0 while it ripens the first time
 }
 /** A facility standing on a plot (P1, SGODOT-239): a sprinkler waters the ring of 8 around it. Never removed (q(22)). */
-export interface Facility { id: number; kind: string; plot: number; under?: 'wild' | 'tilled' }   // under: the plot as it was, back when it moves
+export interface Facility { id: number; kind: string; plot: number; under?: 'wild' | 'tilled'; cell?: [number, number] }   // under: the plot as it was, back when it moves; cell: a yard facility's cell (plot −1)
 /** One bag slot. A resident's gift meal is its own stack (gift), never merged with bought or cooked ones (§3.4.5). */
 export interface BagStack { id: string; qty: number; gift?: { from: string; day: string } }
 
@@ -138,6 +138,7 @@ export interface P0Day {
   cards?: string[];                     // today's recipe cards on the Homestead Stall shelf, drawn once a day (§7.16.1, SGODOT-282)
   xp: Partial<Record<Skill, number>>;   // XP earned today per skill, for the anti-script cap (§4.3.4)
   mishaps: number;                      // failed pots today (the blessing's first 10 refund their ingredients, §7.5.2)
+  compost?: number;                     // crops turned into Compost at the Compost Bin today (q(118) ③, ≤ 5)
 }
 
 /** The save version this server writes. Older saves are brought up to it at load (upgradeState). */

@@ -449,3 +449,43 @@ func test_the_swing_turns_to_the_elite_and_reaches_its_body() -> void:
 	c.cooldown = 0.0
 	assert_array(c.swing({}, mover)).is_empty()            # turned to it, a step in still needed
 	assert_vector(mover.facing).is_equal_approx(Vector3(0, 0, -1), Vector3.ONE * 0.001)
+
+## The elite's lunge stops where its body meets the player's (不知火舞 288 ce070cd7: it ran on through, the player sank
+## into it to the head) and still lands its touch; a lunge the player stepped out of runs its whole length.
+func test_the_lunge_stops_at_the_players_body() -> void:
+	var Combat = load("res://modules/mining/p0_mine_combat.gd")
+	var bp := Layout_bp()
+	var mover := PlayerMover.new(bp, BlueprintGrid.new(bp))
+	mover.position = load("res://modules/mining/mine_layout.gd").SPAWN
+	var c: Node3D = auto_free(Combat.new())
+	add_child(c)
+	c.sync_p0(_view(_run(_five([true, true, true, true, true]))), 5, mover)
+	c.grace = 0.0
+	var touched: Array = []
+	c.contact.connect(func(id): touched.append(id))
+	var e: Dictionary = c.enemies.values()[0]
+	var radius := float(e.spec.radius)
+	(e.mover as PlayerMover).position = mover.position + Vector3(0, 0, -2.0)
+	e.node.position = e.mover.position
+	var closest := INF
+	c.step(0.016, mover, false)
+	while str(e.phase) in ["windup", "dash"]:
+		c.step(0.016, mover, false)
+		closest = minf(closest, Vector2(e.mover.position.x - mover.position.x, e.mover.position.z - mover.position.z).length())
+	assert_float(closest).is_between(radius + Combat.PLAYER_RADIUS - Combat.CONTACT_INSIDE - 0.005, radius + Combat.PLAYER_RADIUS)
+	assert_int(touched.size()).is_equal(1)   # it still lands
+	# stepped aside during the wind-up: the lunge runs on along its band, past where the player stood
+	var c2: Node3D = auto_free(Combat.new())
+	add_child(c2)
+	c2.sync_p0(_view(_run(_five([true, true, true, true, true]))), 5, mover)
+	c2.grace = 0.0
+	var e2: Dictionary = c2.enemies.values()[0]
+	var start := mover.position + Vector3(0, 0, -2.0)
+	(e2.mover as PlayerMover).position = start
+	e2.node.position = start
+	c2.step(0.016, mover, false)
+	var aside := mover.position
+	mover.position += Vector3(3, 0, 0)
+	while str(e2.phase) in ["windup", "dash"]: c2.step(0.016, mover, false)
+	assert_float((e2.mover.position as Vector3).z - start.z).is_greater(2.0)   # past where the player stood (stopped there: ~1.0)
+	mover.position = aside

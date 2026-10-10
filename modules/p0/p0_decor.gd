@@ -45,21 +45,27 @@ static func _in_any(cell: Vector2i, rects: Array) -> bool:
 
 static func placed(view: Dictionary) -> Array: return view.get("decor", {}).get("placed", []) if view.get("decor", null) is Dictionary else []
 
-## Cells the yard's pieces take ("x,y" → uid), but the one being moved.
+## Cells the yard's pieces take ("x,y" → uid), but the one being moved; and the yard's facilities' (the Compost
+## Bin, 刘邦, q(118) ③: "x,y" → −facility id), which pieces keep out of as the server's yardBlock does.
 static func taken(view: Dictionary, ignore := NO_PIECE) -> Dictionary:
 	var out := {}
 	for p in placed(view):
 		if int(p.get("uid", 0)) == ignore: continue
 		for c in cells(str(p.id), Vector2i(int(p.x), int(p.y)), int(p.get("rot", 0))): out["%d,%d" % [c.x, c.y]] = int(p.uid)
+	for f in view.get("facilities", []):
+		var at = f.get("cell", null)
+		if at is Array and (at as Array).size() == 2: out["%d,%d" % [int(at[0]), int(at[1])]] = -int(f.get("id", 0))
 	return out
 
 ## "" when the piece may stand with its top-left cell at `at`, else the bar's reason (decor.ts spotBlock, same order).
 static func reason(view: Dictionary, id: String, at: Vector2i, rot := 0, ignore := NO_PIECE, taken_cells = null) -> String:
+	return reason_cells(view, cells(id, at, rot), taken_cells if taken_cells is Dictionary else taken(view, ignore))
+
+## The same for any cells against `t` (taken()): what a yard facility (the Compost Bin) is judged by too.
+static func reason_cells(view: Dictionary, cs: Array, t: Dictionary) -> String:
 	var y := yard()
-	var cs := cells(id, at, rot)
 	for c in cs:
 		if not _rect(y.get("walk", [0, 0, 0, 0])).has_point(c) or _in_any(c, y.get("field", [])): return REASONS.decor_outside
-	var t: Dictionary = taken_cells if taken_cells is Dictionary else taken(view, ignore)   # nearest_spot passes it once
 	for c in cs:
 		if _in_any(c, y.get("objects", [])) or t.has("%d,%d" % [c.x, c.y]): return REASONS.decor_overlap
 	for c in cs:

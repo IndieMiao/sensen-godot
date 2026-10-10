@@ -16,7 +16,7 @@ import { notePresence, restReadyIn } from './presence.js';
 import { isMineCommand, mineCommand, settleMine, type MineCommand } from './mine.js';
 import { gather, storeMaterials } from './gathering.js';
 import { craft } from './workbench.js';
-import { cropGrowH, facilityAt, growMs, moveFacility, place, seedSaver, wateredPlots } from './garden.js';
+import { compost, cropGrowH, facilityAt, growMs, moveFacility, place, seedSaver, wateredPlots } from './garden.js';
 import { chopTree, feedTree, pickTree, plantTree, treeOf } from './orchard.js';
 import { claimParcel, PARCEL_LIMIT, settleParcels } from './parcels.js';
 import { dayKey, maxEnergy, scaledXp, settleEnergy, skillLevel, xpPercent } from './rules.js';
@@ -66,8 +66,9 @@ type P0CommandBody =
   | MineCommand
   | { type: 'gather'; spot: string }
   | { type: 'craft'; recipe: string }
-  | { type: 'place'; recipe: string; plot: number }          // P1: build a facility in place (one step, q(22))
-  | { type: 'move_facility'; facility: number; plot: number }   // P1: free, never removed
+  | { type: 'place'; recipe: string; plot?: number; x?: number; y?: number }   // P1: build a facility in place (one step, q(22)); x, y: on a yard cell
+  | { type: 'move_facility'; facility: number; plot?: number; x?: number; y?: number }   // P1: free, never removed
+  | { type: 'compost'; item: string; qty: number }   // P1: the Compost Bin, crops 1:1 into Compost (q(118) ③)
   | { type: 'chop'; plot: number }                              // P1: a tree is gone, its plot tilled again (FARM-4, q(118))
   | { type: 'claim_parcel'; key: string }
   | { type: 'claim_parcels'; keys: string[] }   // Claim all: the keys on screen, so a retry never takes a newer parcel
@@ -335,6 +336,11 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
     }
     case 'place': case 'move_facility': {
       const refusal = cmd.type === 'place' ? place(c, s, cmd, now, events, growH) : moveFacility(c, s, cmd, now, events, growH);
+      if (refusal) return fail(refusal.code, refusal.detail);
+      break;
+    }
+    case 'compost': {
+      const refusal = compost(c, s, cmd, now, events);
       if (refusal) return fail(refusal.code, refusal.detail);
       break;
     }

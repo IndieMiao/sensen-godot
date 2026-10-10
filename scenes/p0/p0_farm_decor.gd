@@ -346,8 +346,8 @@ func _end() -> void:
 	_select({})
 	rt.ui.end_placement()
 
-## In idle Decorate: a tap on a piece opens its card (DECOR-CARD: name, `1×1 · Glows at night`, Move, Store); on a
-## sprinkler its own card (Move, no Store: facilities stay, q(22)).
+## In idle Decorate: a tap on a piece opens its card (DECOR-CARD: name, `1×1 · Glows at night`, Move, Store); on the
+## Compost Bin's cell its card (Move only, 刘邦); on a sprinkler its own card (Move, no Store: facilities stay, q(22)).
 func tap(screen: Vector2) -> bool:
 	var v := _view()
 	var hits: Array = []
@@ -357,7 +357,13 @@ func tap(screen: Vector2) -> bool:
 		open_card(hits[i][0])
 		return true
 	if farm._facilities != null:
+		for f in v.get("facilities", []):   # a yard facility (the Compost Bin) by its cell, like a 1×1 piece
+			var cell := P0FarmFacilities.cell_of(f)
+			if cell != P0Decor.NONE and pick_near([_cell_rect(cell)], screen) == 0:
+				open_bin_card(f)
+				return true
 		for f in v.get("facilities", []):
+			if P0FarmFacilities.cell_of(f) != P0Decor.NONE: continue   # the yard's, above
 			if farm.cam.unproject_position(farm._facilities._bed_top(int(f.get("plot", 0))) + P0FarmFacilities.HEAD).distance_to(screen) > P0FarmFacilities.TAP_PX: continue
 			_end()   # the sprinkler's Move is its own placement
 			farm._facilities.open_card(f)
@@ -391,6 +397,35 @@ func _screen_rect(id: String, at: Vector2i, rot: int) -> Rect2:
 			box = Rect2(sp, Vector2.ZERO) if first else box.expand(sp)
 			first = false
 	return box
+
+## One yard cell on screen: the box round its corners.
+func _cell_rect(cell: Vector2i) -> Rect2:
+	var half: float = farm.bp.cell_m * 0.5
+	var box := Rect2()
+	var first := true
+	for corner in [Vector3(-half, 0, -half), Vector3(half, 0, -half), Vector3(-half, 0, half), Vector3(half, 0, half)]:
+		var sp: Vector2 = farm.cam.unproject_position(farm.bp.cell_to_world(cell) + corner)
+		box = Rect2(sp, Vector2.ZERO) if first else box.expand(sp)
+		first = false
+	return box
+
+## The Compost Bin in Decorate (不知火舞 on 241): its card is `Compost Bin` / `1×1` with Move only — no Store, a
+## facility stays (q(22)). Move hands it to the facility's own placement on the same top-down shell (刘邦's
+## P0FarmFacilities), as a sprinkler's does: Decorate ends and the bin's placement begins in one frame, so neither
+## the camera nor the hidden player moves between them.
+func open_bin_card(f: Dictionary) -> void:
+	var cell := P0FarmFacilities.cell_of(f)
+	var fid := int(f.get("id", 0))
+	var kind := str(f.get("kind", "compost_bin"))
+	_squares(_glow, [[cell, GLOW]], false, 0.034, 1.25)
+	_squares(_sel, [[cell, Color.WHITE]], true, 0.036)
+	var name := str(P0Logic.content().get("facilities", {}).get("kinds", {}).get(kind, {}).get("name", "Compost Bin"))
+	var card := rt.ui.open_facility_card({"title": name, "lead": "1×1", "icon": P0Logic.icon("facility_" + kind),
+		"button": "Move", "kind": &"primary", "close": true},
+		func():
+			_end()
+			farm._facilities.begin_move(fid))
+	card.tree_exited.connect(func(): if is_inside_tree(): _select({}))
 
 func open_card(p: Dictionary) -> void:
 	var uid := int(p.get("uid", 0))

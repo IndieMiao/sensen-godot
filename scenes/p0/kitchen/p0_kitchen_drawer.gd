@@ -60,6 +60,8 @@ const _DOUBLE_ROW := 32.0
 signal unavailable(reason: String)
 ## Double was switched (the pot card above the drawer shows ×2 on its slots and its corner tag).
 signal double_changed(on: bool)
+## Cook All on the Cookbook strip (Cooking Lv8, §16 COOK-1, q(124)): the kitchen opens its sheet.
+signal cook_all_requested
 
 var _stove: Label
 var _level: Label
@@ -79,6 +81,7 @@ var _effect_parts: Array = []   # `+40 Energy`, `15 s`, `Soup`: as many as fit t
 var _recipe_button: UiCommandButton
 var _recipe_nav: UiNavButton
 var _pages: UiInventoryGrid
+var _cook_all: UiCommandButton   # the Cookbook strip's right end, from Cooking Lv8 (P0KitchenLogic.cook_all)
 var _bag: UiInventoryGrid
 var _slots_used: Label
 var _cook: UiCommandButton
@@ -140,6 +143,7 @@ func refresh() -> void:
 		_stove_pill.custom_minimum_size.y = _PILL_H if several else 0.0
 	_level.text = h.level
 	_state.text = h.state
+	_fit_heading()
 	var count: Label = _modes.tabs()[0].find_child("Count", true, false)
 	if count: count.text = P0KitchenLogic.cookbook_count(view)
 	_refresh_cookbook()
@@ -183,6 +187,7 @@ func _heading() -> Control:
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(spacer)
+	row.resized.connect(_fit_heading)
 	var close := UiCloseButton.new()
 	close.pressed.connect(func(): close_requested.emit())
 	row.add_child(close)
@@ -193,14 +198,39 @@ func _heading() -> Control:
 	wrap.add_child(row)
 	return wrap
 
+## The heading never widens the drawer nor cuts its state: with `Stove 1/3 ›` and a long state (the Cookbook left open
+## on a stove Cook All lit) `Cooking LvN` steps aside, the state stays (不知火舞 on #289).
+func _fit_heading() -> void:
+	if _state == null or _stove_pill == null: return
+	var row := _state.get_parent() as Control
+	if row.size.x <= 0.0: return   # not laid out yet: the row's first resize fits it
+	var w := row.size.x
+	var sep := float(row.get_theme_constant(&"separation"))
+	var need := _stove_pill.get_combined_minimum_size().x + _level.get_minimum_size().x + _state.get_minimum_size().x \
+		+ UiTokens.SIZE_CLOSE + sep * 3.0
+	_level.visible = need <= w
+
 # ---------------------------------------------------------------- Cookbook
 func _build_cookbook() -> VBoxContainer:
 	var v := VBoxContainer.new()
 	v.add_theme_constant_override(&"separation", int(_GAP))
 	v.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	v.add_child(_chips(P0KitchenLogic.COOKBOOK_CHIPS, func(i: int):
+	# The filter chips, and Cook All at the strip's right end from Cooking Lv8 (§16 COOK-1): `Nothing to cook` greyed
+	# when no known page has its ingredients (D-10, LOCK-10: the gap on the button, no empty sheet).
+	var strip := HBoxContainer.new()
+	strip.add_theme_constant_override(&"separation", 8)
+	var chips := _chips(P0KitchenLogic.COOKBOOK_CHIPS, func(i: int):
 		cookbook_chip = P0KitchenLogic.COOKBOOK_CHIPS[i]
-		_refresh_cookbook()))
+		_refresh_cookbook())
+	chips.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	strip.add_child(chips)
+	_cook_all = UiCommandButton.new("Cook All", UiCommandButton.Kind.SECONDARY, true)
+	_cook_all.name = "CookAll"
+	_cook_all.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_cook_all.activated.connect(func(): cook_all_requested.emit())
+	_cook_all.unavailable_pressed.connect(func(r: String): unavailable.emit(r))
+	strip.add_child(_cook_all)
+	v.add_child(strip)
 	v.add_child(_build_recipe())
 	_pages = UiInventoryGrid.new()
 	_pages.density = UiItemCell.Density.KITCHEN
@@ -303,6 +333,9 @@ static func _text(parent: Control, style: StringName, color: Color, r: Rect2) ->
 	return l
 
 func _refresh_cookbook() -> void:
+	var all := P0KitchenLogic.cook_all(view)
+	_cook_all.visible = not all.is_empty() and not queue_mode
+	if _cook_all.visible: _cook_all.reason = str(all.button)
 	var order := P0KitchenLogic.cookbook_order(view, cookbook_chip)
 	_pages.capacity = order.size()
 	_pages.items = order.map(func(p): return P0KitchenLogic.page_cell(view, p))

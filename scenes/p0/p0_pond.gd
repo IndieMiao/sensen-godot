@@ -58,7 +58,8 @@ var _trap_open := false
 ## 1.4 s: the cage up, the fish to the creel, the float), then comes back as `Fish Trap · 0/3`. The cage and fish
 ## animation follows 安其拉's frames when they pass; the card and the strip are settled.
 const COLLECT_HIDE_MS := 1400
-var _trap_hidden_until := 0
+var _trap_hidden_s := 0.0   # what is left of it, in game time (frames, not the wall clock: a recording keeps it too)
+var _trap_mark := Vector2.INF   # the cage's point on screen this frame (its strip's, its floats' and flights' start)
 var _hint_req := ""     # the request this pond's ! is for (q(103)): its progress floats and its completion toast
 var _hint_have := -1    # that request's count before the next catch
 
@@ -161,6 +162,7 @@ func p0_tap(screen: Vector2) -> void:
 		actor.mover.set_target_position(point)
 
 func p0_frame(v: Dictionary, dt: float) -> void:
+	_trap_hidden_s = maxf(0.0, _trap_hidden_s - dt)
 	if panel.visible:   # the fishing presentation owns the rig; the camera only pans to frame the cast
 		_frame_fishing(dt)
 		return
@@ -601,6 +603,7 @@ func _trap_frame(v: Dictionary) -> void:
 	if _trap_open and not _near_trap(): _close_trap_card()
 	var p := P0Trap.prompt(v, p0_place())
 	var mark := cam.unproject_position(_trap_float.position + Vector3(0, 0.6, 0))
+	_trap_mark = mark
 	var status := UiStatusBadge.State.READY if bool(p.ready) else -1
 	var show := not rt.ui.has_modal() and not _trap_open and not collecting_trap()
 	if show and _near_trap():
@@ -671,11 +674,32 @@ func _press_trap(b: Dictionary) -> void:
 	var cmd: Dictionary = b.get("cmd", {})
 	if str(cmd.get("type", "")) == "collect_trap" and not bool(cmd.get("take_back", false)):
 		_close_trap_card()
-		_trap_hidden_until = Time.get_ticks_msec() + COLLECT_HIDE_MS
+		_trap_hidden_s = COLLECT_HIDE_MS / 1000.0
 	p0_action(cmd)
 
+## Where a trap's catch floats rise (P0Runtime: over the cage, TRAP-COLLECT-3), INF without a trap here.
+func p0_trap_anchor():
+	return _trap_mark if _trap_mark.is_finite() else null
+
+## TRAP-COLLECT-2 (289): each fish kind flies from the cage into the creel badge, ×N, one DELAY_STEP_S after the other;
+## the badge bumps as each lands. No badge on screen (another bar), no flight.
+func p0_trap_flights(got: Array) -> void:
+	if not _trap_mark.is_finite(): return
+	var creel: Control = rt.ui.creel_badge()
+	var flying: Array = []
+	for i in got.size():
+		var id := str(got[i].id)
+		var f := UiItemFly.launch(rt.ui.root, _trap_mark, creel, P0Logic.icon(id), int(got[i].count), i * UiItemFly.DELAY_STEP_S,
+			func():
+				rt.ui.creel_landed(id)   # the badge counts it in (Creel 2 · 18 free, then 3 · 17)
+				UiItemFly.bump(creel))
+		if f != null:
+			flying.append(got[i])
+			f.tree_exiting.connect(func(): rt.ui.creel_landed(id))   # gone some other way (the pond left): counted anyway
+	if not flying.is_empty(): rt.ui.creel_flying(flying)
+
 ## The collect playing (COLLECT_HIDE_MS after Collect): the trap shows no strip or button.
-func collecting_trap() -> bool: return Time.get_ticks_msec() < _trap_hidden_until
+func collecting_trap() -> bool: return _trap_hidden_s > 0.0
 
 func _close_trap_card() -> void:
 	_trap_open = false

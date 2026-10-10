@@ -303,6 +303,7 @@ func set_view(v: Dictionary) -> void:
 		if was == "board" or _counter.is_short(): _fill_board(_counter)   # board rows follow Accept / Deliver (only on change)
 	if _profile != null and is_instance_valid(_profile) and modal_kind == "profile": _profile.update(v)
 	if workbench() != null: _workbench.refresh(v)
+	if compost_bin() != null: _compost.refresh(v)
 	if inbox() != null: _inbox.refresh(v)
 	if bite_board() != null: _bite_board.refresh(v)
 	_refresh_hud()
@@ -379,6 +380,16 @@ func set_hp(hp: int, maximum: int, elite := {}) -> void:
 			_creel.position.y + _hp.get_combined_minimum_size().y + UiTokens.SPACE_WITHIN)
 
 func hp_bar() -> UiHpBar: return _hp
+## The creel badge (where a trap's fish fly to, SGODOT-289).
+func creel_badge() -> Control: return _creel
+## A trap's fish still flying to the badge ([{id, count}]): it counts each in as it lands (creel_landed).
+var creel_in_flight: Array = []
+func creel_flying(got: Array) -> void:
+	creel_in_flight = got.duplicate(true)
+	if _creel: _creel.text = P0Logic.creel_line(view, creel_in_flight)
+func creel_landed(id: String) -> void:
+	creel_in_flight = creel_in_flight.filter(func(f): return str(f.id) != id)
+	if _creel: _creel.text = P0Logic.creel_line(view, creel_in_flight)
 func elite_bar() -> UiHpBar: return _elite_hp
 
 func set_status_line(text: String) -> void:
@@ -454,7 +465,7 @@ func _refresh_bar() -> void:
 			if not selected_bait.begins_with("trap_"):   # a Fish Trap set in the water leaves the bar quietly
 				toast_when_clear("Out of %s · no bait on the hook" % P0Logic.item_name(view, selected_bait))
 			selected_bait = ""
-		_creel.text = P0Logic.creel_line(view)
+		_creel.text = P0Logic.creel_line(view, creel_in_flight)
 		_creel.state = UiCreelBadge.state_for(int(view.get("bag", {}).get("free", 0)))
 	else:
 		if selected_seed != "" and not ids.has(selected_seed): selected_seed = ""
@@ -1080,6 +1091,8 @@ func float_text(text: String, screen: Vector2, tone: UiFloatText.Tone = UiFloatT
 func _make_float(text: String, tone: int, icon: Texture2D) -> UiFloatText:
 	var f := UiFloatText.new(text, tone, icon, UiFloatText.Layout.WRAP if text.length() > _FLOAT_HUG_CHARS else UiFloatText.Layout.HUG)
 	f.theme = UiKit.theme()
+	# Inside the screen's side margins all the way through the pop, not only at rest (不知火舞 on #284, 289 46e61588)
+	if root: f.bounds = Vector2(UiTokens.SPACE_PAGE, root.size.x - UiTokens.SPACE_PAGE)
 	root.add_child(f)
 	# A result moment on screen stays readable: the floats rise under its card, not over its rewards (李元芳 int7:
 	# `+5 XP` across the level banner's `+3 Wild Herb`). In a drawer they stay on top (BOARD-DONE floats from a row).
@@ -1090,13 +1103,19 @@ func _make_float(text: String, tone: int, icon: Texture2D) -> UiFloatText:
 ## is pushed down until its top line, at the top of its rise, still clears the HUD rows by FLOAT_HUD_GAP. `top_index`
 ## = that line's stack index (the group's lines minus one).
 const FLOAT_HUD_GAP := 8.0
-func _float_start(screen: Vector2, lines: Array, top_index: int) -> Vector2:
+func _float_start(screen: Vector2, lines: Array, top_index: int, top_rise := -1.0) -> Vector2:
 	var hud_bottom := _marker_area().position.y + _kit.global_position.y - root.global_position.y
 	var h := 0.0
 	for f in lines: h = maxf(h, (f as UiFloatText).shown_size().y)
 	var lowest := hud_bottom + FLOAT_HUD_GAP + h + UiFloatText._RISE \
-		+ UiFloatText._STACK_RISE * clampi(top_index, 0, UiFloatText._STACK_MAX - 1)
-	return Vector2(screen.x, maxf(screen.y, lowest))
+		+ (UiFloatText._STACK_RISE * clampi(top_index, 0, UiFloatText._STACK_MAX - 1) if top_rise < 0.0 else top_rise)
+	# …and never past the screen's sides: a wide line from near an edge (a trap's three fish by the bank, SGODOT-289)
+	# moves in until it is SPACE_PAGE clear of both (each line's own bounds also keep its pop inside them).
+	var half := 0.0
+	for f in lines: half = maxf(half, (f as UiFloatText).shown_size().x * 0.5)
+	var x := screen.x
+	if root and half > 0.0: x = clampf(x, half + UiTokens.SPACE_PAGE, maxf(half + UiTokens.SPACE_PAGE, root.size.x - half - UiTokens.SPACE_PAGE))
+	return Vector2(x, maxf(screen.y, lowest))
 
 ## The lowest a pushed-down group may start (its bottom): above the quick bar, an open drawer, and the main action key
 ## when the group's width reaches over it (不知火舞 233), in this UI's root space.
@@ -1120,6 +1139,14 @@ const FLOAT_ORDER := ["energy", "xp", "first", "item", "saved", "request", "coin
 ## coins float per reply (each plot's `+1 Radish`, each bed's `−2 Energy`).
 const FLOAT_MERGE_KINDS := ["xp"]
 const FLOAT_MAX_LINES := 3
+## Item lines hold at most two items: more go on to another line of their own above (q(124) ①; 不知火舞 on #284 3b425f91:
+## `River Perch ×1 · Common Carp ×1` / `Arctic Char ×1`, every line its own float of the same height, no ` ·` left at
+## a line's end, within FLOAT_MAX_LINES). Cook All's costs and a row's crops read the same way.
+const FLOAT_SPLIT_KINDS := ["item"]
+const FLOAT_ITEMS_PER_LINE := 2
+## The lines one item group splits into pop together as one block, each its own height and this far apart, so they
+## never meet, rising or at rest (不知火舞 on #289: Cook All's `−5 Pond Crucian · −2 Wild Herb` / `−2 Radish`).
+const FLOAT_GROUP_GAP := 4.0
 ## A line of a kind still up — before its fade starts (UiFloatText 650 ms) — takes the next reply's amount in place;
 ## while the action key is held (a held harvest, a labour beat apart) for as long as the line is still there.
 const _FLOAT_MERGE_MS := 650
@@ -1142,13 +1169,27 @@ func float_lines(parts: Array, at: Vector2) -> Array:
 	var order: Array = FLOAT_ORDER.filter(func(k): return kinds.has(k))
 	for k in kinds:
 		if not order.has(k): order.append(k)
+	var rows: Array = []   # [{kind, parts}] from the bottom: a kind's line, or an item line's pair (FLOAT_ITEMS_PER_LINE)
+	for k in order:
+		var all: Dictionary = kinds[k]
+		if not (k in FLOAT_SPLIT_KINDS and all.size() > FLOAT_ITEMS_PER_LINE):
+			rows.append({kind = k, parts = all})
+			continue
+		var keys: Array = all.keys()
+		var pairs: Array = []
+		for j in range(0, keys.size(), FLOAT_ITEMS_PER_LINE):
+			var pair := {}
+			for key in keys.slice(j, j + FLOAT_ITEMS_PER_LINE): pair[key] = all[key]
+			pairs.append({kind = k, parts = pair, group = k})
+		pairs.reverse()   # the first pair reads on top
+		rows.append_array(pairs)
 	var shown: Array = []
 	var fresh: Array = []   # [{kind, text, tone, icon, merged, overflow}] lines that need a new float
 	var now := int(float_clock.call())
-	for i in mini(order.size(), FLOAT_MAX_LINES):
-		var k: String = order[i]
-		var merged: Dictionary = kinds[k]
-		var extra: Array = order.slice(FLOAT_MAX_LINES) if i == FLOAT_MAX_LINES - 1 else []
+	for i in mini(rows.size(), FLOAT_MAX_LINES):
+		var k: String = rows[i].kind
+		var merged: Dictionary = rows[i].parts
+		var extra: Array = rows.slice(FLOAT_MAX_LINES) if i == FLOAT_MAX_LINES - 1 else []
 		if extra.is_empty() and k in FLOAT_MERGE_KINDS:
 			var live: Dictionary = _live_floats.get(k, {})
 			var node: UiFloatText = live.get("node") if not live.is_empty() and is_instance_valid(live.get("node")) else null
@@ -1161,17 +1202,31 @@ func float_lines(parts: Array, at: Vector2) -> Array:
 				shown.append(live.node)
 				continue
 		var text := _float_line_text(merged)
-		for e in extra: text += " · " + _float_line_text(kinds[e])   # the overflow joins the last line
+		for e in extra: text += " · " + _float_line_text(e.parts)   # the overflow joins the last line
 		var first: Dictionary = merged.values()[0]
 		var tone: int = first.get("tone", UiFloatText.Tone.ITEM)
 		# Energy is coloured by what it adds up to; a line of text parts only (a floor fee) keeps its own tone.
 		if k == "energy" and merged.values().any(func(p): return p.has("fmt")):
 			tone = UiFloatText.Tone.ENERGY_COST if _float_sum(merged) < 0 else UiFloatText.Tone.ENERGY_GAIN
-		fresh.append({kind = k, text = text, tone = tone, icon = first.get("icon", null), merged = merged, overflow = not extra.is_empty()})
+		fresh.append({kind = k, text = text, tone = tone, icon = first.get("icon", null), merged = merged, overflow = not extra.is_empty(),
+			group = str(rows[i].get("group", ""))})
 	if fresh.is_empty(): return shown
 	var base := shown.size()   # lines bumped in place keep the lower places
 	var nodes: Array = fresh.map(func(l): return _make_float(l.text, l.tone, l.icon))
-	var start := _float_start(at, nodes, base + nodes.size() - 1)
+	# Each line's place: 28 above the one below (q(49)), but a split item group's lines stack by their own height and
+	# FLOAT_GROUP_GAP and start together, growing from the group's lowest line (not one 60 ms after the other).
+	var places: Array = []   # [rise of the line's group base, the line above that base, its start slot]
+	var rise := UiFloatText._STACK_RISE * base
+	var slot := base
+	var group_base := rise
+	for j in nodes.size():
+		var joins: bool = j > 0 and str(fresh[j].group) != "" and str(fresh[j].group) == str(fresh[j - 1].group)
+		if j > 0:
+			rise += (float((nodes[j - 1] as UiFloatText).shown_size().y) + FLOAT_GROUP_GAP) if joins else UiFloatText._STACK_RISE
+			if not joins: slot += 1
+		if not joins: group_base = rise
+		places.append([group_base, rise - group_base, slot])
+	var start := _float_start(at, nodes, base + nodes.size() - 1, rise)
 	var half_w := 0.0
 	for n in nodes: half_w = maxf(half_w, (n as UiFloatText).shown_size().x * 0.5)
 	if nodes.size() > 1 and start.y > at.y and start.y > _float_floor(at.x, half_w):
@@ -1186,7 +1241,13 @@ func float_lines(parts: Array, at: Vector2) -> Array:
 		start = _float_start(at, nodes, base)
 	for j in nodes.size():
 		var f: UiFloatText = nodes[j]
-		f.play(start, base + j)
+		if places.size() == nodes.size():
+			f.group_rise = float(places[j][1])
+			if f.group_rise > 0.0:   # rests on the line below as that one's font settles
+				f.rest_gap = FLOAT_GROUP_GAP
+				f.rests_on = nodes[j - 1]
+			f.play(start, int(places[j][2]), float(places[j][0]))
+		else: f.play(start, base + j)   # pushed down under the HUD: the group joined into one line
 		var l: Dictionary = fresh[j]
 		if not l.overflow: _live_floats[l.kind] = {node = f, parts = (l.merged as Dictionary).duplicate(true), at = at, ms = now}
 		shown.append(f)
@@ -2526,6 +2587,27 @@ func open_workbench(tab := "") -> P0WorkbenchDrawer:
 	_workbench = d
 	modal_kind = _WORKBENCH_KIND
 	return d
+
+## The Compost Bin's drawer (q(118) ③, COMPOST-BIN 2231:122380): Compost 1 / Compost All send the compost command;
+## a grey button toasts its words.
+const _COMPOST_KIND := "compost"
+var _compost: P0CompostDrawer
+
+func open_compost_bin() -> P0CompostDrawer:
+	var d := P0CompostDrawer.new(view)
+	d.theme = UiKit.theme()
+	d.safe_bottom = safe_bottom()
+	d.close_requested.connect(close_modal)
+	d.compost_requested.connect(func(id: String, qty: int): command.emit({"type": "compost", "item": id, "qty": qty}))
+	d.unavailable_requested.connect(func(reason: String): toast(reason))
+	_open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
+	_compost = d
+	modal_kind = _COMPOST_KIND
+	return d
+
+## The open Compost Bin drawer, or null.
+func compost_bin() -> P0CompostDrawer:
+	return _compost if is_instance_valid(_compost) and modal_kind == _COMPOST_KIND else null
 
 ## The open workbench drawer, or null.
 func workbench() -> P0WorkbenchDrawer:

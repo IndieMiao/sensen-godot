@@ -175,6 +175,7 @@ func open(tab := "cookbook", page_id := "") -> void:
 	drawer.tab_changed.connect(_on_tab)
 	drawer.ingredient_tapped.connect(_on_ingredient)
 	drawer.cook_requested.connect(_on_cook)
+	drawer.cook_all_requested.connect(open_cook_all)
 	drawer.info_requested.connect(func(): rt.ui.toast("Mix 1–%d ingredients · unknown mixes may become a Mystery Dish" % P0KitchenLogic.slots(rt.session.current())))
 	_wrap.add_child(drawer)
 	_overlay = _build_overlay()
@@ -194,6 +195,10 @@ func open(tab := "cookbook", page_id := "") -> void:
 
 func _on_closed() -> void:
 	if phase != "compose": return
+	if rt.ui._modal_back == Callable(self, "close_cook_all"): rt.ui._modal_back = Callable()   # the sheet went with the drawer
+	cook_all_sheet = null
+	_cook_all_close = null
+	_cook_all_back = Callable()
 	phase = "idle"
 	drawer = null
 	_overlay = null
@@ -456,6 +461,102 @@ func _on_cook(cmd: Dictionary) -> void:
 	_cook_sent = true
 	cmd = with_stove(cmd)
 	rt.session.send(cmd, P0Session.ui_key(cmd))
+
+# ---------------------------------------------------------------- Cook All (Cooking Lv8; COOK-P1-4 / COOK-EMPTY, q(124))
+## The Cookbook strip's Cook All opens its sheet over the drawer (P0CookAllSheet from the server's preview); ×, a drag
+## down, Back and `Kitchen` close it back to the Cookbook. `Cook All · N pots` sends cook_all and closes it
+## at once: the reply's pots catch one stove after another, COOK_ALL_FIRE_S apart, the camera staying put, and what
+## they took floats once over the pot card as one item group (`−3 Radish · −2 Pond Crucian`, two a line, q(124) ④).
+## Each pot then cooks and comes out on its own stove as Queue does; no card here.
+const COOK_ALL_FIRE_S := 0.15
+var cook_all_pending := false   # cook_all sent: the reply's pots are Cook All's, not one Cook's watch
+var cook_all_sheet: P0CookAllSheet
+var _cook_all_close: UiCloseButton
+var _cook_all_back := Callable()   # the kitchen's own Back while the sheet is over it
+var _cook_all_pots: Array = []
+var _cook_all_used := {}           # ingredient → how many this cook_all took (its negative item events)
+
+func open_cook_all() -> void:
+	if phase != "compose" or _wrap == null or is_instance_valid(cook_all_sheet): return
+	var model := P0KitchenLogic.cook_all(rt.session.current())
+	if model.is_empty() or str(model.button) != "": return
+	cook_all_sheet = P0CookAllSheet.new(model)
+	cook_all_sheet.theme = UiKit.theme()
+	cook_all_sheet.safe_bottom = rt.ui.safe_bottom()
+	cook_all_sheet.close_requested.connect(close_cook_all)
+	cook_all_sheet.back.connect(close_cook_all)
+	cook_all_sheet.unavailable.connect(func(r: String): rt.ui.toast(r))
+	cook_all_sheet.confirmed.connect(_send_cook_all)
+	_wrap.add_child(cook_all_sheet)
+	_cook_all_close = UiCloseButton.new()   # 6 above the sheet's top-right corner, 16 in (COOK-P1-4 Close · 44 px)
+	_cook_all_close.theme = UiKit.theme()
+	_cook_all_close.pressed.connect(close_cook_all)
+	_wrap.add_child(_cook_all_close)
+	var follow := func():
+		if is_instance_valid(_cook_all_close) and is_instance_valid(cook_all_sheet):
+			_cook_all_close.position = cook_all_sheet.position + Vector2(cook_all_sheet.size.x - UiTokens.SPACE_PAGE - UiTokens.SIZE_CLOSE, -6.0 - UiTokens.SIZE_CLOSE)
+	cook_all_sheet.item_rect_changed.connect(follow)
+	follow.call()
+	_cook_all_back = rt.ui._modal_back
+	rt.ui._modal_back = close_cook_all   # Back and a tap outside close this sheet first
+
+func close_cook_all() -> void:
+	if is_instance_valid(cook_all_sheet): cook_all_sheet.queue_free()
+	if is_instance_valid(_cook_all_close): _cook_all_close.queue_free()
+	cook_all_sheet = null
+	_cook_all_close = null
+	if rt: rt.ui._modal_back = _cook_all_back
+	_cook_all_back = Callable()
+
+func _send_cook_all() -> void:
+	if cook_all_pending: return
+	cook_all_pending = true
+	_cook_all_pots.clear()
+	_cook_all_used.clear()
+	var cmd := {"type": "cook_all"}
+	rt.session.send(cmd, P0Session.ui_key(cmd))
+	close_cook_all()
+
+## A pot of the cook_all reply (P0Farmhouse.p0_event): kept for the firing once the whole reply is in.
+func on_cook_all_pot(ev: Dictionary) -> void:
+	if _cook_all_pots.is_empty(): _cook_all_fire.call_deferred()
+	_cook_all_pots.append(ev)
+
+func _cook_all_fire() -> void:
+	cook_all_pending = false
+	var pots := _cook_all_pots.duplicate()
+	var used := _cook_all_used.duplicate()
+	_cook_all_pots.clear()
+	_cook_all_used.clear()
+	var lit := 0
+	for ev in pots:
+		if bool(ev.get("queued", false)): continue   # waits behind its stove's pot (Stove 1 · next): nothing catches yet
+		var i := int(ev.get("stove", 0))
+		get_tree().create_timer(COOK_ALL_FIRE_S * lit).timeout.connect(_catch.bind(i))
+		lit += 1
+	var v := rt.session.current()
+	var parts: Array = []
+	for id in used:
+		parts.append({kind = "item", key = "cook_all:" + str(id), amount = -int(used[id]), fmt = "%s " + P0Logic.item_name(v, str(id)),
+			tone = UiFloatText.Tone.ITEM, icon = P0Logic.icon(str(id))})
+	rt.ui.queue_floats(parts, cook_all_float_at())
+
+## One stove's pot catches: the working stove's hearth and steam (set_cooking), another stove a puff at its pot.
+func _catch(i: int) -> void:
+	if not is_inside_tree(): return
+	if i == stove_index:
+		stage.set_cooking(true)
+		return
+	var mouth := room.anchor("drop_pot_%d" % (i + 1))
+	if mouth: stage.puff_at(mouth)
+
+## Where Cook All's ingredients float (q(124) ④): over the Cookbook, at the stove — just above the pot card (else the
+## drawer), centred on the screen.
+func cook_all_float_at() -> Vector2:
+	var w := rt.ui.root.size.x if rt and rt.ui and rt.ui.root else 360.0
+	var top := drawer.top_y() if drawer else 400.0
+	if is_instance_valid(_pot_card) and _pot_card.is_visible_in_tree(): top = _pot_card.get_global_rect().position.y
+	return Vector2(w * 0.5, top - 8.0)
 
 ## A cook names its stove when the kitchen has more than one (the server otherwise takes the first free one).
 func with_stove(cmd: Dictionary) -> Dictionary:
@@ -748,6 +849,7 @@ func on_event(ev: Dictionary) -> bool:
 		"refused", "send_failed":   # a cook or collect that did not go through (the runtime toasts why)
 			match str(ev.get("cmd", {}).get("type", "")):
 				"cook": _cook_sent = false
+				"cook_all": cook_all_pending = false
 				"collect":
 					_retrying = false
 					if phase == "serve": _recover()
@@ -767,6 +869,10 @@ func on_event(ev: Dictionary) -> bool:
 			_queue_ev = ev
 			return false
 		"cabinet", "item", "plate", "first", "mishap":
+			# What a pot took: Cook All floats it once (q(124) ④); a single Cook's says nothing, as before.
+			if str(ev.kind) == "item" and int(ev.get("delta", 0)) < 0 and not str(ev.id).begins_with("dish_"):
+				if cook_all_pending: _cook_all_used[str(ev.id)] = int(_cook_all_used.get(str(ev.id), 0)) - int(ev.delta)
+				return false
 			if _retrying and str(ev.kind) in ["cabinet", "item", "plate"]:
 				_retrying = false
 				var r := P0KitchenLogic.routes([ev])

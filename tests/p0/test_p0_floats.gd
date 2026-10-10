@@ -190,3 +190,70 @@ func test_a_pots_xp_float_says_the_2nd_and_3rd_of_its_page_today() -> void:
 	assert_array(await said.call([{"kind": "xp", "skill": "cooking", "amount": 0, "percent": 100, "nth": 4}])).is_equal(["No XP · 4th today"])
 	assert_array(await said.call([{"kind": "xp", "skill": "cooking", "amount": 3, "percent": 75, "nth": 1}])).is_equal(["+3 Cooking XP · 75%"])
 	assert_array(await said.call([{"kind": "xp", "skill": "cooking", "amount": 0, "percent": 100}])).is_empty()   # no pot place: nothing, as before
+
+## A wide line from near a side moves in (SGODOT-289: a trap's three fish from the bank ran off the right edge): it stays
+## SPACE_PAGE clear of both sides; a line in the middle stays where it was asked.
+func test_a_wide_float_stays_inside_the_screen() -> void:
+	var ui := P0Ui.new()
+	ui.quick_store = STORE
+	add_child(auto_free(ui))
+	await get_tree().process_frame
+	ui.set_view({"energy": {"value": 140, "max": 200}, "coins": 52, "bag": {"capacity": 25, "slots": []}, "skills": {}})
+	ui.set_surface("pond")
+	var lines := ui.float_lines([{kind = "item", key = "trap_fish", text = "River Perch ×1 · Common Carp ×1 · Arctic Char ×1",
+		tone = UiFloatText.Tone.ITEM}], Vector2(ui.root.size.x - 40, 420))
+	var f: UiFloatText = lines[0]
+	# its sides at rest (×1.0) and at the peak, the pill grown from its pivot (不知火舞 on #284: inside 16–344 throughout)
+	for k in [1.0, f._peak]:
+		var left: float = f.position.x + f.pivot_offset.x * (1.0 - k / 1.3)
+		assert_float(left + f.size.x * k / 1.3).is_less_equal(ui.root.size.x - UiTokens.SPACE_PAGE + 0.5)
+		assert_float(left).is_greater_equal(UiTokens.SPACE_PAGE - 0.5)
+	var mid: UiFloatText = ui.float_lines([{kind = "coins", key = "coins", amount = 5, fmt = "%s coins"}], Vector2(180, 420))[0]
+	assert_float(mid.position.x + mid.pivot_offset.x).is_equal_approx(180.0, 0.5)
+
+## Item lines hold two items at most (q(124) ①; 不知火舞 on #284): a third goes on a float line of its own above, the
+## first pair on top, every line its own float; XP stays at the bottom and the lines count to the cap of three.
+func test_three_items_make_two_lines_of_their_own() -> void:
+	var ui := P0Ui.new()
+	ui.quick_store = STORE
+	add_child(auto_free(ui))
+	await get_tree().process_frame
+	ui.set_view({"energy": {"value": 140, "max": 200}, "coins": 52, "bag": {"capacity": 25, "slots": []}, "skills": {}})
+	ui.set_surface("pond")
+	var parts := [{kind = "xp", key = "trap_xp", amount = 7, fmt = "%s XP", tone = UiFloatText.Tone.XP}]
+	for n in ["River Perch ×1", "Common Carp ×1", "Arctic Char ×1"]: parts.append({kind = "item", key = n, text = n})
+	var lines: Array = ui.float_lines(parts, Vector2(180, 420))
+	assert_array(lines.map(func(f): return (f as UiFloatText).text)).is_equal(["+7 XP", "Arctic Char ×1", "River Perch ×1 · Common Carp ×1"])
+	var heights: Array = lines.map(func(f): return (f as UiFloatText).shown_size().y)
+	assert_float(float(heights[1])).is_equal_approx(float(heights[2]), 0.5)   # one line each, the same height
+	assert_bool((lines[2] as UiFloatText).text.ends_with("·")).is_false()
+
+## The lines a split item group makes pop as one block (不知火舞 on #289, Cook All's `−5 Pond Crucian · −2 Wild Herb` /
+## `−2 Radish`): they start together, each its own height and FLOAT_GROUP_GAP apart, growing from the lowest line, so
+## they never meet — at the pop's peak or at rest — and neither shows up after the other.
+func test_a_split_item_group_pops_together_and_its_lines_never_meet() -> void:
+	var ui := P0Ui.new()
+	ui.quick_store = STORE
+	add_child(auto_free(ui))
+	await get_tree().process_frame
+	ui.set_view({"energy": {"value": 140, "max": 200}, "coins": 52, "bag": {"capacity": 25, "slots": []}, "skills": {}})
+	ui.set_surface("pond")
+	var parts := [{kind = "xp", key = "trap_xp", amount = 7, fmt = "%s XP", tone = UiFloatText.Tone.XP}]
+	for n in ["River Perch ×1", "Common Carp ×1", "Arctic Char ×1"]: parts.append({kind = "item", key = n, text = n})
+	var lines: Array = ui.float_lines(parts, Vector2(180, 420))
+	var low: UiFloatText = lines[1]
+	var high: UiFloatText = lines[2]
+	for i in 16:
+		await get_tree().create_timer(0.05).timeout
+		assert_float(low.group_rise).is_equal(0.0)   # the lower line rests where it is played; the upper one on it
+		assert_float(high.group_rise).is_equal_approx(low.shown_size().y + P0Ui.FLOAT_GROUP_GAP, 0.1)
+		# one start: they fade in and scale together (a wide line's peak may be capped a little lower, 336 px)
+		assert_float(high.modulate.a).is_equal_approx(low.modulate.a, 0.001)
+		assert_float(high.scale.y).is_equal_approx(low.scale.y, 0.01)
+		var low_pill := low.get_child(0) as Control
+		var high_pill := high.get_child(0) as Control
+		var low_top := (low_pill.get_global_transform() * Vector2.ZERO).y
+		var high_bottom := (high_pill.get_global_transform() * Vector2(0, high_pill.size.y)).y
+		assert_float(high_bottom).is_less_equal(low_top + 0.01)   # never meet
+		if i == 15:   # at rest: FLOAT_GROUP_GAP apart
+			assert_float(low_top - high_bottom).is_equal_approx(P0Ui.FLOAT_GROUP_GAP, 0.1)

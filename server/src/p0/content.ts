@@ -126,7 +126,8 @@ export interface WorkbenchRecipe {
 }
 /** P1 step 1 (q(59) §1.4): a facility on one plot; a sprinkler waters the ring of 8 around it and cuts ripening. */
 export interface FacilityDef {
-  name: string; cover: 'ring8' | 'block'; grow_cut: number;
+  name: string; cover: 'ring8' | 'block' | 'yard'; grow_cut: number;   // yard: on a yard cell, never a plot (Compost Bin)
+  daily?: number;                          // Compost Bin: crops a player day it turns into Compost (q(118) ③, 5)
   size?: [number, number];                 // block: the plots it roofs (greenhouse 4 × 4, q(118) ②)
   cap_by_farming?: [number, number][];     // how many may stand by Farming level (greenhouse: Lv8 1, Lv10 2)
 }

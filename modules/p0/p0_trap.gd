@@ -89,9 +89,15 @@ static func pond_name(view: Dictionary, place: String) -> String:
 static func event_toast(e: Dictionary) -> String:
 	match str(e.get("action", "")):
 		"set": return "Fish Trap set · 1 fish every 8h"
-		"collected": return ("%d left in the trap" % int(e.get("left", 0))) if int(e.get("left", 0)) > 0 else ""
+		"collected": return ""   # what is left floats over the cage with the catch (left_line, q(124) ①)
 		"taken_back": return "Fish Trap back in your bag"
 	return ""
+
+## A collect that left fish in the trap (the creel had room for some): `1 left in the trap`, a line over the catch's
+## (q(124) ①; it was a toast, 7a06b0cf); "" when it emptied the trap.
+static func left_line(e: Dictionary) -> String:
+	var left := int(e.get("left", 0))
+	return "%d left in the trap" % left if str(e.get("action", "")) == "collected" and left > 0 else ""
 
 ## A refused set_trap / collect_trap in the card's words; null for anything else (the runtime's own handling).
 static func refusal_text(cmd: Dictionary, code: String, detail: Dictionary):
