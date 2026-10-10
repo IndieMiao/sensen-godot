@@ -93,7 +93,7 @@ function landable(c: P0Content, s: P0State, fish: string[]): string[] {
 /** The tutorial request is still on the Stall Board: the first session, one goal on the map. */
 const firstSession = (c: P0Content, s: P0State) => (s.boards.stall ?? []).some(sl => sl.req?.id === c.requests.tutorial.id);
 
-export function mapMarkers(c: P0Content, s: P0State, now?: number): MapMarker[] {
+export function mapMarkers(c: P0Content, s: P0State, now: number): MapMarker[] {
   const all: MapMarker[] = [];
   const reason = new Map<MapMarker, string>();   // what counts as one reason for `more`: the Market Board's open slots share one
   for (const board of BOARDS) {

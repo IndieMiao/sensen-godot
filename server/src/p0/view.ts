@@ -267,19 +267,22 @@ function shopView(c: P0Content, s: P0State, shop: ShopId) {
 function candidates(c: P0Content, r: BoardRequest): string[] {
   if (r.items.length) return r.items;
   const ids = r.kind === 'fish' ? c.fish.map(f => f.id) : r.kind === 'dish' ? c.cooking.recipes.map(x => x.id) : c.crops.map(x => x.id);
-  return ids.filter(id => matches(c, { kind: r.kind, rarity: r.rarity }, [], id)).sort((a, b) => floorPrice(c, a) - floorPrice(c, b));
+  return ids.filter(id => matches(c, { kind: r.kind, rarity: r.rarity, style: r.style, family: r.family }, [], id)).sort((a, b) => floorPrice(c, a) - floorPrice(c, b));
 }
 
 /** One request as facts (§9.6.5): what it takes, what the bag holds for it, and what delivering now would pay. */
 function requestView(c: P0Content, s: P0State, r: BoardRequest, now: number) {
   const parts = handIn(c, s, r);
-  const each = r.items.length > 1 ? Math.min(...r.items.map(i => haveFor(c, s, { kind: r.kind }, [i]))) : haveFor(c, s, { kind: r.kind, rarity: r.rarity }, r.items);
+  const each = r.items.length > 1 ? Math.min(...r.items.map(i => haveFor(c, s, { kind: r.kind }, [i])))
+    : haveFor(c, s, { kind: r.kind, rarity: r.rarity, style: r.style, family: r.family }, r.items);
   const cheapest = candidates(c, r)[0];
   const estimate = parts ? payout(c, r, parts)
     : { base: r.items.length > 1 ? r.items.reduce((n, i) => n + floorPrice(c, i) * r.qty, 0) : (cheapest ? floorPrice(c, cheapest) : 0) * r.qty, bonus: r.bonus };
   return {
     id: r.id, template: r.template, title: c.requests.templates[r.template]?.title ?? r.template, kind: r.kind,
     items: r.items, rarity: r.rarity ?? null, icon: r.items[0] ?? cheapest ?? null,
+    // P1: dishes of a style (`Soup`, or several), crops of a family (`O`); the client names them
+    style: r.style === undefined ? null : Array.isArray(r.style) ? r.style : [r.style], family: r.family ?? null,
     qty: r.qty, have: Math.min(each, r.qty), ready: parts !== null,
     coins: estimate.base + estimate.bonus, base: estimate.base, bonus: estimate.bonus,
     status: r.status,

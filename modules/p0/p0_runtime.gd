@@ -533,11 +533,13 @@ func _on_state(v: Dictionary, events: Array) -> void:
 					if levelled: parcel_notice = meal
 					else: ui.inbox_notice_when_clear(meal)
 				elif bool(ev.get("given", false)): ui.toast_success("%s gave you %s · in your bag" % [who, P0Logic.item_name(v, str(ev.get("dish", "")))])
-			"lesson":   # §7.5.3 Taught (SGODOT-284): the page is Tasted; cooking it once makes it the player's own
-				# Appendix wording: `Learned · Herb Grilled Fish`; on the open bar the resident says the lesson's line.
-				if str(ev.get("from", "")) == "lesson":
+			"recipe":   # a page turned Tasted (§7.5.3): a resident's lesson, a story request, a Recipe Card (哪吒's from: card)
+				# Appendix wording: `Learned · Herb Grilled Fish` / `Recipe Card · Pumpkin Fish Stew`; on the open bar the
+				# resident says the lesson's line. Cooking it once still makes it the player's own.
+				var page := P0Logic.item_name(v, str(ev.get("page", "")))
+				if str(ev.get("from", "")) == "taught":
 					ui.resident_affinity({"resident": str(ev.get("resident", "")), "delta": 0}, "Let me show you a dish.")
-				ui.toast_success("Learned · %s" % P0Logic.item_name(v, str(ev.get("recipe", ""))))
+				ui.toast_success(("Recipe Card · %s" if str(ev.get("from", "")) == "card" else "Learned · %s") % page)
 			"title":   # a story request's title (§9.4.4 Trusted)
 				ui.toast_success("New title · %s" % str(ev.get("id", "")))
 			"homestead":

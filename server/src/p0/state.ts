@@ -1,5 +1,5 @@
 /** P0 player state (one homestead per player; no compatibility with the old farm state). */
-import type { P0Content, Skill } from './content.js';
+import type { Family, P0Content, Skill } from './content.js';
 import { maxEnergy } from './rules.js';
 
 export type PlotState = 'wild' | 'tilled' | 'sown' | 'growing';
@@ -60,7 +60,7 @@ export interface Request { id: string; title: string; item: string; qty: number;
 
 /** A drawn system request (§9.6): items are fixed when drawn; coins are paid from what is handed in. */
 export interface BoardRequest {
-  id: string; template: string; items: string[]; rarity?: number; style?: string; kind: 'crop' | 'fish' | 'dish' | 'material';
+  id: string; template: string; items: string[]; rarity?: number; style?: string | string[]; family?: Family; kind: 'crop' | 'fish' | 'dish' | 'material';
   qty: number; bonus: number; drawn_at: number; status: 'open' | 'accepted';
 }
 /** A board slot: a request, or empty until refill_at. */

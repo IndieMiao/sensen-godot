@@ -20,8 +20,9 @@ export function slotCount(c: P0Content, s: P0State, board: BoardId): number {
   return board === 'stall' ? boardSlots(c, s) : c.requests.boards.market.slots ?? 2;
 }
 
+/** Any one gate opens it; a gate is a skill level or the Homestead level (李白's Clay for Pots: Homestead Lv2). */
 function gateMet(c: P0Content, s: P0State, t: RequestTemplate): boolean {
-  return t.gate.length === 0 || t.gate.some(([skill, level]) => skillLevel(c, s, skill) >= level);
+  return t.gate.length === 0 || t.gate.some(([what, level]) => (what === 'homestead' ? s.homestead.level : skillLevel(c, s, what)) >= level);
 }
 
 /** §9.6.1: regional templates are drawn only where their climate is (P1: the home climate until travel lands). */
@@ -65,7 +66,7 @@ function qtyFor(c: P0Content, s: P0State, t: RequestTemplate, draw: Rand): numbe
   const level = skillLevel(c, s, t.skill);
   let band = c.requests.qty[0];
   for (const row of c.requests.qty) if (level >= row[0]) band = row;
-  return band[1] + Math.floor(draw() * (band[2] - band[1] + 1));
+  return Math.ceil((band[1] + Math.floor(draw() * (band[2] - band[1] + 1))) * (t.scale ?? 1) - 1e-9);
 }
 
 /** Crops the player can already buy seeds for (§9.6.2: a request never asks for what can't be grown yet). */
@@ -85,6 +86,8 @@ function drawRequest(c: P0Content, s: P0State, board: BoardId, slot: number, at:
   const t = c.requests.templates[template];
   let items: string[] = [];
   if (t.need.id) items = [t.need.id];   // a template naming one crop, fish or material asks for exactly that
+  // A crop request by rarity or family takes any such crop the player can grow (李白's Fine Produce, Orchard Basket).
+  else if (t.need.kind === 'crop' && (t.need.rarity !== undefined || t.need.family !== undefined)) items = [];
   else if (t.need.kind === 'crop') {
     const crops = growable(c, s);
     for (let i = crops.length - 1; i > 0; i--) { const j = Math.floor(draw() * (i + 1)); [crops[i], crops[j]] = [crops[j], crops[i]]; }
@@ -92,7 +95,7 @@ function drawRequest(c: P0Content, s: P0State, board: BoardId, slot: number, at:
   }
   return {
     id: `${template}-${board}${slot}-${at.toString(36)}`, template, items, rarity: t.need.rarity,
-    ...(t.need.style ? { style: t.need.style } : {}), kind: t.need.kind as BoardRequest['kind'],
+    ...(t.need.style ? { style: t.need.style } : {}), ...(t.need.family ? { family: t.need.family } : {}), kind: t.need.kind as BoardRequest['kind'],
     qty: qtyFor(c, s, t, draw), bonus: t.bonus, drawn_at: at, status: 'open',
   };
 }
@@ -149,7 +152,7 @@ export function handIn(c: P0Content, s: P0State, r: BoardRequest): [string, numb
     }
     return out;
   }
-  return pick(c, s, { kind: r.kind, rarity: r.rarity, style: r.style }, r.items, r.qty);
+  return pick(c, s, { kind: r.kind, rarity: r.rarity, style: r.style, family: r.family }, r.items, r.qty);
 }
 
 /** Coins for a hand-in: floor prices, a dish quality bonus on the whole request (lowest quality handed in), the bonus capped daily. */
@@ -184,7 +187,7 @@ export function boardCommand(c: P0Content, s: P0State, type: 'accept' | 'deliver
     const short = r.items.length > 1 ? r.items.find(item => haveFor(c, s, { kind: r.kind }, [item]) < r.qty)! : null;
     return { code: 'not_enough', detail: short
       ? { item: short, need: r.qty, have: haveFor(c, s, { kind: r.kind }, [short]) }
-      : { item: r.items[0] ?? null, need: r.qty, have: haveFor(c, s, { kind: r.kind, rarity: r.rarity, style: r.style }, r.items) } };
+      : { item: r.items[0] ?? null, need: r.qty, have: haveFor(c, s, { kind: r.kind, rarity: r.rarity, style: r.style, family: r.family }, r.items) } };
   }
   for (const [item, n] of parts) { handOver(c, s, item, n); events.push({ kind: 'item', id: item, delta: -n }); }
   const pay = payout(c, r, parts);
