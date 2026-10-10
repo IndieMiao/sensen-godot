@@ -37,6 +37,13 @@ var _hurt_sent_ms := 0
 ## hit, so one quiet reply can never leave the player unhittable for the rest of the visit (苏烈 on #223).
 const HURT_KEY := "mine_hurt"
 const HURT_STALE_MS := 4000   # and a reply that never comes at all frees it after this
+## Swings sent and not yet answered (each its own key): a fall that comes in while one of them may still beat the elite
+## waits for it, and is dropped if that swing ends the run (q(116) ③: the elite down and the player down in the same
+## exchange is a win — Run complete only).
+const SWING_KEY := "mine_swing_%d"
+var _swings := 0
+var _swings_out := {}
+var _ko_waiting := false
 var _completing := false     # Run complete: the banner, then out to the mouth
 var _rocks := {}            # rock index → Node3D (gone once broken)
 var _previews := {}         # rock index → Sprite3D torch preview
@@ -338,6 +345,9 @@ func _on_contact(id: String) -> void:
 ## Any end of the hit command frees the next one (see HURT_KEY).
 func _on_settled(key: String, _ok: bool, _code: String) -> void:
 	if key == HURT_KEY: _hurt_pending = false
+	if _swings_out.erase(key) and _swings_out.is_empty() and _ko_waiting:
+		_ko_waiting = false
+		if not _completing: _knocked_out()   # the swings in flight did not end the run: the fall stands
 
 ## Attack (Combat's key): one swing — the arc, the stun and the knockback here; the server settles who was hit.
 func _swing() -> void:
@@ -345,7 +355,9 @@ func _swing() -> void:
 	var hit: Array = combat.swing({}, actor.mover)
 	actor.labour("clear", actor.position + actor.facing())   # the old mine's swing beat
 	if hit.is_empty(): return
-	rt.session.send({"type": "mine_attack", "floor": floor_n, "targets": hit.map(func(id): return Combat.mob_index(str(id)))})
+	var cmd := {"type": "mine_attack", "floor": floor_n, "targets": hit.map(func(id): return Combat.mob_index(str(id)))}
+	if rt.session.send(cmd, SWING_KEY % _swings): _swings_out[SWING_KEY % _swings] = true
+	_swings += 1
 
 ## Rocks the server says are broken (another device, a reconnect) leave without the break animation.
 func _sync_rocks(v: Dictionary) -> void:
@@ -592,7 +604,8 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				if bool(e.get("quartz_spent", false)):
 					rt.ui.queue_floats([{kind = "item", key = P0MaterialLogic.QUARTZ_ONCE, text = P0MaterialLogic.QUARTZ_ONCE,
 						tone = UiFloatText.Tone.ITEM}], rt.anchor())
-			"knocked_out": _knocked_out()
+			"knocked_out":   # the elite's last blow and the player's fall count as a win (q(116) ③): see _knocked_out
+				if not events.any(func(x): return str(x.get("kind", "")) == "mine" and str(x.get("action", "")) == "complete"): _knocked_out()
 			"complete": _run_complete(v, events)
 	if v.get("mine", {}).get("run", null) == null and not _completing: _hurt_pending = false
 
@@ -659,7 +672,10 @@ func _kick_out() -> void:
 ## mine mouth; the run is kept (Continue run · Free) and HP is full again outside (§13.3.1).
 const KO_S := 1.5
 func _knocked_out() -> void:
-	if _leaving: return
+	if _leaving or _completing: return   # the elite went down first (q(116) ③): Run complete only
+	if not _swings_out.is_empty():   # a swing still on its way may beat the elite: wait for it
+		_ko_waiting = true
+		return
 	actor.set_input(Vector2.ZERO)
 	actor.lock(true)
 	rt.ui.toast(P0MaterialLogic.mine_event_text({"kind": "mine", "action": "knocked_out"}), KO_S)
