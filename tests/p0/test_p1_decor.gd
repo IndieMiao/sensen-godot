@@ -177,3 +177,11 @@ func test_the_grid_round_a_piece_is_the_yard_only() -> void:
 		assert_int(maxi(absi(c.x - 12), absi(c.y - 1))).is_less_equal(4)
 	assert_bool(halo.any(func(h): return (h[0] as Vector2i).y >= 2)).is_false()   # rows 2+ are the field there
 	assert_bool(halo.any(func(h): return bool(h[2]))).is_true()                   # the exit path at x 9–10 is in reach
+
+## The stall's ten pieces have their own icons (安其拉, 284 2ab958d8), not the sprout stand-in.
+func test_every_sold_piece_has_its_icon() -> void:
+	for id in P0Decor.items():
+		if not bool(P0Decor.item(str(id)).get("buy", false)): continue
+		var tex := P0Logic.icon(str(id))
+		assert_object(tex).override_failure_message(str(id)).is_not_null()
+		assert_str(tex.resource_path).override_failure_message(str(id)).is_equal("res://assets/p0/icons/%s.svg" % id)
