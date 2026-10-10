@@ -445,7 +445,7 @@ func _end() -> void:
 	_select({})
 	rt.ui.end_placement()
 
-## In idle Decorate: a tap on a piece opens its card (DECOR-CARD: name, `1×1 · Glows at night`, Move, Store); on the
+## In idle Decorate: a tap on a piece opens its card (DECOR-CARD: name, `1×1 · Classic lamp`, Move, Store); on the
 ## Compost Bin's cell its card (Move only, 刘邦); on a sprinkler its own card (Move, no Store: facilities stay, q(22)).
 func tap(screen: Vector2) -> bool:
 	var v := _view()

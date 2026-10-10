@@ -61,8 +61,8 @@ func test_a_spot_is_judged_as_the_server_does() -> void:
 	assert_str(P0Decor.reason(v, "deco_planter", P0Decor.nearest_spot(v, "deco_planter", 0, Vector2i(9, 1)))).is_equal("")
 
 func test_rows_cards_and_lines_read_like_q111_and_q113() -> void:
-	assert_str(P0Decor.line("deco_lantern")).is_equal("1×1 · Glows at night")
-	assert_str(P0Decor.line("deco_bench")).is_equal("2×1 · Visitors can sit")
+	assert_str(P0Decor.line("deco_lantern")).is_equal("1×1 · Classic lamp")
+	assert_str(P0Decor.line("deco_bench")).is_equal("2×1 · A sunny seat")
 	assert_str(P0Decor.line("deco_path")).is_equal("5 pieces")
 	assert_bool(P0Decor.turns("deco_bench")).is_true()
 	assert_bool(P0Decor.turns("deco_windmill")).is_false()
@@ -139,9 +139,9 @@ func test_the_stall_decor_page_lists_the_pieces_in_their_states() -> void:
 	var row := func(id: String) -> Array:
 		var s := P0ItemInfo.spec(v, id, &"counter_buy", {counter = "homestead"})
 		return [s.facts, (s.buttons as Array).map(func(b): return "%s:%s" % [b.kind, b.label])]
-	assert_array(row.call("deco_scarecrow")).is_equal([["1×1 · Shoos crows"], ["secondary:Buy"]])
+	assert_array(row.call("deco_scarecrow")).is_equal([["1×1 · Keeps watch"], ["secondary:Buy"]])
 	assert_array(row.call("deco_fence")).is_equal([["6 pieces", "In storage ×6"], ["unavailable:Bought today · 9h 12m"]])
-	assert_array(row.call("deco_birdbath")).is_equal([["1×1 · Birds drop by"], ["unavailable:Need 40 more coins"]])
+	assert_array(row.call("deco_birdbath")).is_equal([["1×1 · Bluebird perch"], ["unavailable:Need 40 more coins"]])
 	assert_array(row.call("deco_windmill")).is_equal([["2×2 · Spins in wind", "1 level to go"], ["unavailable:Homestead Lv3 needed"]])
 
 ## Spec v2 (284 6a751a9a): a piece taps as at least 44 × 44 at any zoom (the whole yard is about 17 px a cell); the nearest

@@ -1066,6 +1066,7 @@ func p0_dev(step: PackedStringArray) -> bool:
 			var r: Rect2 = (e.main_rect() if step[0] == "cardtap" else e.second_rect() if step[0] == "cardnew" else e.third_rect()) if e != null else Rect2()
 			if e != null: p0_tap(r.get_center() - rt.ui.root.global_position)
 		"zoomto": _zoom = clampf(float(step[1]), 0.8, 1.4)   # zoomto:0.8 (widest) … 1.4 (closest)
+		"actorhide": _actor_fade_to = 1.0   # the yard's pieces alone, the player faded out (上官婉儿 on #276's shots)
 		# LOOK-PICK (SGODOT-282): lookpick:<stage>[:home] opens the card as after the level-up (or from HOME-1);
 		# lookpick-b / lookpick-a tap a card; lookuse presses Use; lookclose ✕; lookparts prints the stages' parts.
 		"lookpick": P0LookPick.open(rt.ui, step[1], not (step.size() > 2 and step[2] == "home"))
