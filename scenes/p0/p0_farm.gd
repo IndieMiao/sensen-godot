@@ -418,7 +418,7 @@ func _sync_plots(v: Dictionary, dt: float) -> void:
 ## Middle of the plot beds, for camera-only "Show" from the Today panel and NeedSource (LOCK-08).
 func _plots_center() -> Vector3:
 	var sum := Vector3.ZERO
-	var n := P0Garden.plot_count(rt.session.current() if rt != null and rt.session != null else null)
+	var n := P0Garden.plot_count(rt.session.view if rt != null and rt.session != null else null)
 	for id in n: sum += bp.cell_to_world(P0Garden.cell_of(id))
 	return sum / maxf(1.0, float(n))
 
