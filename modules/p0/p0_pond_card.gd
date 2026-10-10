@@ -11,7 +11,7 @@ const BEGINNER_LINE := "A nearby pond for your first catch."
 ## {} for a pond the content does not know (another city's pond).
 static func info(view: Dictionary, pond_id: String, km: float) -> Dictionary:
 	var fishing: Dictionary = P0Logic.content().get("fishing", {})
-	var place: Dictionary = fishing.get("places", {}).get(pond_id, {})
+	var place := place_of(pond_id)
 	if place.is_empty(): return {}
 	var site: Dictionary = fishing.get("sites", {}).get(str(place.get("site", "pond")), {})
 	var template := str(site.get("template", "Pond"))
@@ -45,8 +45,7 @@ static func outleveled(view: Dictionary, pond_id: String) -> bool:
 ## for global fish, which all P0 fish are; regional fish (P1) show only a silhouette and "?" until caught (q(48)).
 static func fish_rows(view: Dictionary, pond_id: String) -> Array:
 	var content := P0Logic.content()
-	var fishing: Dictionary = content.get("fishing", {})
-	var place: Dictionary = fishing.get("places", {}).get(pond_id, {})
+	var place := place_of(pond_id)
 	if place.is_empty(): return []
 	var caught := {}
 	for d in view.get("fishing", {}).get("dex", []): caught[str(d.get("id", ""))] = int(d.get("caught", 0)) > 0
@@ -66,3 +65,11 @@ static func fish_rows(view: Dictionary, pond_id: String) -> Array:
 ## A Details row's second line for a fish not yet caught: `Fishing Lv3`, a regional one `Fishing Lv3 · Regional`.
 static func locked_line(row: Dictionary) -> String:
 	return "Fishing Lv%d" % int(row.get("level", 1)) + (" · Regional" if bool(row.get("regional", false)) else "")
+
+## A pond's content place ({name, site, beginner}): the hand-written table, else a generated pond of a city already read
+## (P0CityPlaces, SGODOT-280: `gn-1850147~pond0`, its site and name from the server's generator).
+static func place_of(pond_id: String) -> Dictionary:
+	var own: Dictionary = P0Logic.content().get("fishing", {}).get("places", {}).get(pond_id, {})
+	if not own.is_empty(): return own
+	var gen: Dictionary = load("res://modules/p0/p0_city_places.gd").pond(pond_id)
+	return {} if gen.is_empty() else {"name": gen.name, "site": gen.site, "beginner": gen.beginner, "city": gen.cluster}

@@ -111,7 +111,7 @@ func _ready() -> void:
 	_update_camera()
 	rt = P0Runtime.ensure()
 	rt.attach(self)
-	rt.ui.set_mode("fish", P0City.chip(str(entry.get("name", "Pond"))))
+	rt.ui.set_mode("fish", P0City.chip_for(str(entry.get("name", "Pond")), str(entry.get("id", ""))))
 	_arrival_hint()
 
 func _exit_tree() -> void:
@@ -190,7 +190,7 @@ func p0_energy_verb() -> String: return "Cast"
 
 func _open_panel(plan: Dictionary) -> void:
 	actor.face(plan.target)
-	panel.open_p0(rt, str(entry.id), site_spec, plan.target, site, P0City.chip(str(entry.get("name", "Pond"))))
+	panel.open_p0(rt, str(entry.id), site_spec, plan.target, site, P0City.chip_for(str(entry.get("name", "Pond")), str(entry.id)))
 
 func _begin_fishing(_id: String) -> void:
 	actor.lock(true)

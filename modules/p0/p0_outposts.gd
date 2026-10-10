@@ -21,9 +21,11 @@ static func all() -> Array:
 		if parsed is Dictionary: _list = parsed.get("outposts", [])
 	return _list
 
+## An outpost by id: the home set, else a generated one of a city already read (P0CityPlaces, SGODOT-280).
 static func find(id: String) -> Dictionary:
 	for o in all():
 		if str(o.id) == id: return o
+	if id.find("~") > 0: return (load("res://modules/p0/p0_city_places.gd").outpost(id) as Dictionary)
 	return {}
 
 static func by_role(role: String) -> Dictionary:

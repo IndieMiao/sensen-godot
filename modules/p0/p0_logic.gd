@@ -217,6 +217,14 @@ static func pond_fish(view: Dictionary, place: String) -> Array:
 			str(c.get("fishing", {}).get("sites", {}).get(str(places[id].get("site", "pond")), {}).get("template", "Pond")),
 			P0Clusters.cluster_of_region(P0City.region())).map(func(f): return str(f.id))
 		for f in ids: seen[str(f)] = true
+	if seen.is_empty() and place.find("~") > 0:   # a generated pond of another city (SGODOT-280): its site there
+		var g: Dictionary = load("res://modules/p0/p0_city_places.gd").pond(place)
+		if not g.is_empty():
+			var v: Dictionary = view.get("fishing", {}).get("places", {}).get(place, {})
+			var ids: Array = v.get("fish", []) if v.has("fish") else P0FishWorld.ever_fish(
+				str(c.get("fishing", {}).get("sites", {}).get(str(g.get("site", "pond")), {}).get("template", "Pond")),
+				str(g.cluster)).map(func(f): return str(f.id))
+			for f in ids: seen[str(f)] = true
 	return seen.keys()
 
 static func fish_level_short(view: Dictionary, items: Array, rarity) -> int:
