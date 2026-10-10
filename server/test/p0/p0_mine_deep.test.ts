@@ -4,6 +4,8 @@ import { describe, expect, it } from 'vitest';
 import { add, count } from '../../src/p0/bag.js';
 import { loadP0Content } from '../../src/p0/content.js';
 import { floorCleared, mobLoot, rockDrop } from '../../src/p0/mine.js';
+import { floorPrice } from '../../src/p0/requests.js';
+import { buyback } from '../../src/p0/shops.js';
 import { applyP0, type P0Command, type P0Event } from '../../src/p0/reducer.js';
 import { freshState, upgradeState, type P0State } from '../../src/p0/state.js';
 import { dayKey } from '../../src/p0/rules.js';
@@ -300,5 +302,14 @@ describe('saves from before SGODOT-275', () => {
     expect(v.run!.hp).toBe(100);
     expect(v.run!.floors[3].mobs.map(m => m.hp)).toEqual([9, 9, 9]);
     expect(v.express).toBe(false);
+  });
+});
+
+describe('Quartz and Hardwood (§8.4.1, §13.3.6)', () => {
+  it('are never bought back, and a request pays their shadow price (Quartz 5, Hardwood 4)', () => {
+    for (const id of ['quartz', 'hardwood']) expect(buyback(c, 'homestead', id)).toEqual({ code: 'not_sellable' });
+    expect(floorPrice(c, 'quartz')).toBe(5);
+    expect(floorPrice(c, 'hardwood')).toBe(4);
+    expect(floorPrice(c, 'copper_ore')).toBe(4);   // a material with a buyback keeps its price
   });
 });

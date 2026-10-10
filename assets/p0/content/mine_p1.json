@@ -1,5 +1,5 @@
 {
-  "_note": "Mine line, P1 (SGODOT-275 / 288; 周瑜). New data for floors 3–5, fighting and Express (§13.3.1–13.3.4, §13.3.8): the monsters (§13.3.4 loot as [item, qty, weight]; once_a_day = an item a player gets from that monster at most once a player day), the mine's HP and the Combat slot's weapons, and the floor whose first clear opens Express. Quartz and Hardwood are new materials with no buyback (§13.3.6). The Old Tree opens at Homestead Lv3 with 1 Hardwood a round (§13.2.1); with the 8 h regrow that is at most 3 rounds a day. Floors 1–5 themselves (rocks, drops, monsters per floor) are edited in p0_content.json, which this line owns.",
+  "_note": "Mine line, P1 (SGODOT-275 / 288; 周瑜). New data for floors 3–5, fighting and Express (§13.3.1–13.3.4, §13.3.8): the monsters (§13.3.4 loot as [item, qty, weight]; once_a_day = an item a player gets from that monster at most once a player day), the mine's HP and the Combat slot's weapons, and the floor whose first clear opens Express. Quartz and Hardwood are new materials with no buyback (price null, §13.3.6); floor is their shadow price (5 / 4, §8.4.1), the floor a request pays for them. The Old Tree opens at Homestead Lv3 with 1 Hardwood a round (§13.2.1); with the 8 h regrow that is at most 3 rounds a day. Floors 1–5 themselves (rocks, drops, monsters per floor) are edited in p0_content.json, which this line owns.",
   "mine": {
     "monsters": {
       "mob_slime": {
@@ -68,11 +68,13 @@
   "materials": {
     "quartz": {
       "name": "Quartz",
-      "price": null
+      "price": null,
+      "floor": 5
     },
     "hardwood": {
       "name": "Hardwood",
-      "price": null
+      "price": null,
+      "floor": 4
     }
   },
   "gather": {
