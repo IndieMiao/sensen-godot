@@ -76,7 +76,7 @@
 |---|---|
 | 灶台 | 名字条 `Stove 1/1 · Empty`（q(62)）；顶栏 `Stove 1/1 · Cooking Lv2 · Empty`；待收 `Stove · Ready · Grilled Crucian` |
 | Cookbook 页格与详情卡 ★ | 页格不打勾（能做看 `Can cook` 筛选、排序与详情卡按钮）；已知未做的页半彩 + 底部角签 `Try it`（primary 绿），做过的页全彩不标，未知页不挂签；详情卡第二行 `Fine · First cook +20 XP`（稀有度 · 状态）；玩家界面不出现 `Tasted`（q(92)） |
-| Cookbook 按钮四态 | `Cook` / 灰 `Need Wild Herb ×1` / 灰 `Cooking Lv4 · 3rd slot` / `Try in Experiment ›` |
+| Cookbook 按钮四态 | `Cook` / 灰 `Need Wild Herb ×1（标签原料去 Any：`Need Legendary fish ×1`，q(112)）` / 灰 `Cooking Lv4 · 3rd slot` / `Try in Experiment ›` |
 | Experiment | `From your bag` + 右侧 `2 / 2 slots used`（q(94)）；调味料格带 `Rack` 角标、写仓库实数（如 `Rock Salt 12`，不写 /30，q(46)）；`Not for cooking`（金锦鲤）；`In pot`（q(94)）；锅下槽位卡不写原料名，结果行只写菜名 / `Unknown dish` / `Tried before` / `?` + 色点 + 时长，不出 `Ready to cook` / `Ready to queue`；按钮灰显原因 `Add an ingredient` / `Needs a main ingredient` / `Stove busy`；点锁 toast `Cooking Lv4 · 60 XP to go`（q(92)） |
 | 火候 | `Tap when the needle hits gold!` / `Nice heat! ★` / `Missed · still cooking` / `Perfect! ★★ · Extra portion` |
 | 出锅卡 COOK-4 ★ | 首做 `New recipe!` + 奖励条 `First cooked · +10 Cooking XP · Cookbook 1/48`（只放首做 XP；本锅 XP 照常飘 `+5 Cooking XP ★`，q(55)）/ 重复 `Dish ready`（从灶上收时条 `Collected from Stove 1`，q(94)） / 失败 `Mystery Dish` + `Hmm… not a dish` + `A clue was added to your Cookbook` + 灰字 `Can't be sold or delivered`（q(55)）/ 退料 `No dish this time` + 名字行 `Ingredients back` + 第二行 `9 left today` + `OK`（q(66)）；按钮只有 `Eat · +45 Energy` / `Keep`，Gift 在 P0 只是卡底灰字 `Gift later from your bag`（q(94)）；没有 Cook Again 按钮（q(46)、q(48)、q(49)） |
@@ -86,6 +86,7 @@
 | Cooking Lv4 之后 Today ★ | `3rd slot open · try Fine fish + Potato + Rock Salt`（q(46)） |
 | 钓鱼第二段 ★ | 亮片 `Spinner Lure`（`bait_lure`，账号每日 10 枚）；鱼笼 `Fish Trap`（`trap_fish`，放下后不占背包格），主行动键 `Set Trap · Free`（满 `Traps 1/1 · Fishing Lv8 adds 1`、本塘已有 `Trap already here`）；浮标 `Fish Trap · 2/3` / `· 3/3 · Full`；EntryCard `Collect 2 · Free` / `Take back`（`Collect · Creel full`、`Take back · Collect first`、`1 left in the trap`、`Fish Trap back in your bag`）；Today `Collect 3 fish · Fern Pond`；旧金山地区鱼 Arctic Char + Atlantic Salmon；Clover Pond 卡片写 `Coast`（q(109)） |
 | 布置模式 Decorate ★ | 驿站 Decor 页 `Decor 12/24 · Goes to Farm Storage` / `Bought today · 9h 12m` / `Homestead Lv5 needed · 1 level to go`；toast `Flower Planter · in Farm Storage` + `Place now ›`；底栏 `Cancel` · `Rotate` · `Place`（移动 `Move`），原因 `Outside your yard` / `Space taken` / `Decor 24/24 · Homestead Lv6 adds 4`；小卡 `Move` / `Store`；`Stone Path · 3 left`；Today `Place Flower Planter · in storage`（q(111)） |
+| Homestead 外观二选一 ★ | 标题 `Lv5 look · Porch`；副标题 `Pick one · free to change later`；按钮 `Use Timber Porch`；外观名 `Timber Fence` / `Stone Wall`、`Timber Porch` / `Stone Porch`、`Timber Kitchen Wing` / `Stone Kitchen Wing`、`Timber Lodge` / `Stone Manor`（暂定）；HOME-1 `Looks` 段 `Porch` … `Stone Porch ›`，未到灰 `Homestead Lv8`（q(112)） |
 
 ## 5. 矿洞
 
