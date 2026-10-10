@@ -325,7 +325,13 @@ static func opening_shift(mark_y: float, feet_y: float, area: Rect2) -> float:
 
 func _follow(dt: float) -> void:
 	_fit_opening()
-	_focus = _cam_follow.step(cam, _focus, actor.position, actor.mover.is_moving(), dt)
+	if _fly_left > 0.0:   # placement's 0.3 s camera moves (不知火舞 on 241)
+		_fly_left = maxf(0.0, _fly_left - dt)
+		var k := smoothstep(0.0, 1.0, 1.0 - _fly_left / PLACE_FLY_S)
+		_focus = _fly_from.lerp(_fly_to if _fly_to != Vector3.INF else Vector3(actor.position.x, _focus.y, actor.position.z), k)
+		if _fly_left == 0.0 and _fly_to == Vector3.INF: _cam_follow.held = false   # back to following the player
+	elif _placing_cam: _focus = _yard_clamp(_focus)   # placement: the camera is the player's to pan, in the yard
+	else: _focus = _cam_follow.step(cam, _focus, actor.position, actor.mover.is_moving(), dt)
 	if _pinch.step(dt): _set_zoom(_pinch.value)   # springing back from past a limit, about the same point
 	else: _place_camera()
 
@@ -339,6 +345,49 @@ func _set_zoom(value: float) -> void:
 	if d != Vector3.ZERO:
 		_focus += d
 		_place_camera()
+
+# ---------------------------------------------------------------- placement camera (SGODOT-241, 不知火舞 on 241)
+## Entering: the camera holds; if the spot is off screen it moves there in 0.3 s first. Panning: edge pan and two
+## fingers move the focus, inside the yard (the Lv3 fence plus one cell). Leaving: back to following in 0.3 s.
+const PLACE_FLY_S := 0.3
+var _placing_cam := false
+var _fly_left := 0.0
+var _fly_from := Vector3.ZERO
+var _fly_to := Vector3.INF   # INF: fly back to the player
+
+func placement_camera_begin(spot: Vector3) -> void:
+	_placing_cam = true
+	_opening = false
+	_cam_follow.hold()
+	var screen := cam.unproject_position(spot)
+	if not get_viewport().get_visible_rect().grow(-48.0).has_point(screen) or cam.is_position_behind(spot):
+		_fly(Vector3(spot.x, _focus.y, spot.z))
+
+func placement_camera_end() -> void:
+	if not _placing_cam: return
+	_placing_cam = false
+	_fly(Vector3.INF)
+
+func _fly(to: Vector3) -> void:
+	_fly_from = _focus
+	_fly_to = to
+	_fly_left = PLACE_FLY_S
+
+## Move the focus by a ground delta (edge pan, two-finger pan), kept in the yard.
+func placement_pan(d: Vector3) -> void:
+	if not _placing_cam or _fly_left > 0.0: return
+	_focus = _yard_clamp(_focus + Vector3(d.x, 0, d.z))
+
+## The ground shift that moves the picture by `px` on screen (a two-finger drag): the ground under the old point.
+func placement_drag(px: Vector2, at: Vector2) -> void:
+	var a = ElasticZoom.ground_at(cam, at, _focus.y)
+	var b = ElasticZoom.ground_at(cam, at + px, _focus.y)
+	if a is Vector3 and b is Vector3: placement_pan(a - b)
+
+func _yard_clamp(f: Vector3) -> Vector3:
+	var r := P0Garden.FENCE_RING
+	var pad := bp.cell_m
+	return Vector3(clampf(f.x, r.west - pad, r.east + pad), f.y, clampf(f.z, r.back - pad, r.front + pad))
 
 func p0_zoom(f: float, at := Vector2.INF) -> void:
 	_opening = false
@@ -391,7 +440,7 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 	if _facilities == null and bp != null and cam != null and actor != null:
 		_facilities = P0FarmFacilities.new().setup(self)
 		add_child(_facilities)
-	_facilities.frame(v)
+	_facilities.frame(v, dt)
 	if not _facilities.placing.is_empty(): return   # placement mode: no bed, key, card or prompt (q(23))
 	_pick_front(v)
 	# The key is Farming here even at the mine mouth: the mouth is tapped like any facility (SGODOT-266, user on 263 ③).

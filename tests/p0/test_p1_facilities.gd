@@ -144,3 +144,49 @@ static func _motion(at: Vector2) -> InputEventMouseMotion:
 	e.position = at
 	e.button_mask = MOUSE_BUTTON_MASK_LEFT
 	return e
+
+# ---------------------------------------------------------------- placement camera (不知火舞 on 241)
+## A finger within 48 px of an edge pushes that way, harder nearer the edge; elsewhere nothing.
+func test_edge_push_grows_toward_the_edge() -> void:
+	assert_float(P0FarmFacilities.edge_push(180.0, 0.0, 360.0)).is_equal(0.0)
+	assert_float(P0FarmFacilities.edge_push(48.0, 0.0, 360.0)).is_equal(0.0)
+	assert_float(P0FarmFacilities.edge_push(24.0, 0.0, 360.0)).is_equal_approx(-0.5, 0.001)
+	assert_float(P0FarmFacilities.edge_push(0.0, 0.0, 360.0)).is_equal_approx(-1.0, 0.001)
+	assert_float(P0FarmFacilities.edge_push(348.0, 0.0, 360.0)).is_equal_approx(0.75, 0.001)
+
+## Two fingers in placement mode pan (placement_pan) and pinch (zoom); the preview does not move with them.
+func test_two_fingers_pan_and_pinch_and_leave_the_preview() -> void:
+	var ui := await _ui()
+	var pans := []
+	var zooms := []
+	var points := []
+	ui.placement_pan.connect(func(px, _at): pans.append(px))
+	ui.zoom.connect(func(f, _at): zooms.append(f))
+	ui.placement_point.connect(func(_p, phase): points.append(phase))
+	ui.begin_placement({"confirm": "Build"})
+	var pad = ui.pad
+	pad._gui_input(_touch(0, Vector2(100, 400), true))
+	pad._gui_input(_touch(1, Vector2(200, 400), true))
+	pad._gui_input(_drag(1, Vector2(240, 420)))   # spread 100 → ~143, centre moves right and down
+	assert_int(pans.size()).is_equal(1)
+	assert_float((pans[0] as Vector2).x).is_greater(0.0)
+	assert_float(float(zooms[0])).is_less(1.0)   # fingers apart: zoom in
+	pad._gui_input(_button(Vector2(240, 420), false))   # the mouse twin's release
+	assert_array(points).is_empty()
+	pad._gui_input(_touch(1, Vector2(240, 420), false))
+	pad._gui_input(_touch(0, Vector2(100, 400), false))
+	pad._gui_input(_button(Vector2(150, 300), true))   # one finger again: the preview's
+	assert_array(points).is_equal(["press"])
+
+static func _touch(i: int, at: Vector2, down: bool) -> InputEventScreenTouch:
+	var e := InputEventScreenTouch.new()
+	e.index = i
+	e.position = at
+	e.pressed = down
+	return e
+
+static func _drag(i: int, at: Vector2) -> InputEventScreenDrag:
+	var e := InputEventScreenDrag.new()
+	e.index = i
+	e.position = at
+	return e

@@ -28,6 +28,8 @@ signal tackle_requested()      # FISH-5 rod variant "Tackle Shop"
 ## "release"); the world turns it into a spot. The bar's main key and Cancel come back as placement_done(ok).
 signal placement_point(screen: Vector2, phase: String)
 signal placement_done(ok: bool)
+## Two fingers in placement mode moved the picture by `px` (screen), about `at`: the world pans its camera.
+signal placement_pan(px: Vector2, at: Vector2)
 ## A field recipe's Build on the workbench (SGODOT-241): the world opens placement mode for it.
 signal placement_requested(recipe: String)
 
@@ -2965,11 +2967,7 @@ class _TouchPad extends Control:
 	func _gui_input(e: InputEvent) -> void:
 		# Placement mode (SGODOT-241): one finger moves the preview; no stick, no tap, no pinch.
 		if ui.placing():
-			var at: Vector2 = get_global_transform_with_canvas() * (e as InputEventMouse).position if e is InputEventMouse else Vector2.ZERO
-			if e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT:
-				ui.placement_point.emit(at, "press" if e.pressed else "release")
-			elif e is InputEventMouseMotion and (e.button_mask & MOUSE_BUTTON_MASK_LEFT) != 0:
-				ui.placement_point.emit(at, "drag")
+			_placement_input(e)
 			return
 		if e is InputEventMouseButton and e.pressed and e.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
 			ui.zoom.emit(0.9 if e.button_index == MOUSE_BUTTON_WHEEL_UP else 1.1, get_global_transform_with_canvas() * e.position)
@@ -2990,6 +2988,43 @@ class _TouchPad extends Control:
 				# two agree, so keep this pair in step if the layer ever moves (刘邦 on #47).
 				&"pinch": ui.zoom.emit(o.factor, get_global_transform_with_canvas() * o.center)
 				&"pinch_end": ui.zoom_end.emit()
+	# Placement mode (SGODOT-241; 不知火舞 on 241): one finger moves the preview (placement_point); two fingers pan and
+	# pinch the camera as in the world (placement_pan / zoom). Touch on a phone, its emulated mouse on a desktop.
+	var _place_touches := {}   # index → screen point, while placing
+	var _place_two := false     # two fingers down: the camera's, the preview stays
+	func _placement_input(e: InputEvent) -> void:
+		var xf := get_global_transform_with_canvas()
+		if e is InputEventScreenTouch:
+			if e.pressed: _place_touches[e.index] = xf * e.position
+			else: _place_touches.erase(e.index)
+			if _place_touches.size() >= 2: _place_two = true
+			elif _place_touches.is_empty():
+				if _place_two: ui.zoom_end.emit()
+				_place_two = false
+			return
+		if e is InputEventScreenDrag:
+			if not _place_touches.has(e.index) or _place_touches.size() < 2: return
+			var before := _centre_spread()
+			_place_touches[e.index] = xf * e.position
+			var after := _centre_spread()
+			ui.placement_pan.emit(after.centre - before.centre, after.centre)
+			if before.spread > 0.0 and after.spread > 0.0: ui.zoom.emit(before.spread / after.spread, after.centre)
+			return
+		if _place_two: return   # the mouse twin of a two-finger gesture moves nothing
+		if e is InputEventMouse:
+			var at: Vector2 = xf * (e as InputEventMouse).position
+			if e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT:
+				ui.placement_point.emit(at, "press" if e.pressed else "release")
+			elif e is InputEventMouseMotion and (e.button_mask & MOUSE_BUTTON_MASK_LEFT) != 0:
+				ui.placement_point.emit(at, "drag")
+			elif e is InputEventMouseButton and e.pressed and e.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
+				ui.zoom.emit(0.9 if e.button_index == MOUSE_BUTTON_WHEEL_UP else 1.1, at)
+				ui.zoom_end.emit()
+	func _centre_spread() -> Dictionary:
+		var pts: Array = _place_touches.values()
+		if pts.size() < 2: return {centre = Vector2.ZERO, spread = 0.0}
+		return {centre = ((pts[0] as Vector2) + (pts[1] as Vector2)) * 0.5, spread = (pts[0] as Vector2).distance_to(pts[1])}
+
 	func _draw() -> void:
 		var start := _arb.origin()
 		var now := _arb.position()
@@ -3042,6 +3077,8 @@ func set_placement(spec: Dictionary) -> void:
 ## Back to the world's controls (after the main key's command is sent, or Cancel).
 func end_placement() -> void:
 	if not placing(): return
+	(pad as _TouchPad)._place_touches.clear()
+	(pad as _TouchPad)._place_two = false
 	_place_bar.queue_free()
 	_place_bar = null
 	hud.set_row2_shown(true)

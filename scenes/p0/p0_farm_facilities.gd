@@ -12,6 +12,8 @@ const HEAD := Vector3(0, 0.55, 0)
 const SNAP_PX := 70.0           # a finger this close to a bed's centre on screen points at that bed
 const COVER_TINT := Color(0.55, 0.78, 0.95, 0.55)   # Coverage: light blue (q(59) §1.5)
 const BAD_TINT := Color(0.86, 0.36, 0.30, 0.65)
+const EDGE_PX := 48.0           # a finger this close to a screen edge pans the camera that way (不知火舞 on 241)
+const EDGE_SPEED := 6.0         # m/s at the very edge, less further in
 
 var farm: Node3D                # p0_farm.gd: bp, cam, actor
 var rt: P0Runtime
@@ -23,6 +25,7 @@ var _preview: Node3D
 var _cells: Array = []          # preview / highlight squares, reused
 var _overlay: Array = []        # Coverage Overlay outlines, reused
 var _highlight := -1            # a tapped sprinkler: its covered plots show until the card closes
+var _finger := Vector2.INF      # placement: where the finger holds (edge pan), INF when lifted
 
 func setup(farm_node: Node3D) -> P0FarmFacilities:
 	farm = farm_node
@@ -34,15 +37,18 @@ func _ready() -> void:
 	rt.ui.placement_point.connect(_on_point)
 	rt.ui.placement_done.connect(_on_done)
 	rt.ui.placement_requested.connect(begin_build)
+	rt.ui.placement_pan.connect(_on_pan)
 
 func _exit_tree() -> void:
 	if rt == null: return
-	for s in [[rt.ui.placement_point, _on_point], [rt.ui.placement_done, _on_done], [rt.ui.placement_requested, begin_build]]:
+	for s in [[rt.ui.placement_point, _on_point], [rt.ui.placement_done, _on_done], [rt.ui.placement_requested, begin_build],
+			[rt.ui.placement_pan, _on_pan]]:
 		if (s[0] as Signal).is_connected(s[1]): (s[0] as Signal).disconnect(s[1])
 	if not placing.is_empty(): rt.ui.end_placement()
 
 # ---------------------------------------------------------------- the view → art
-func frame(v: Dictionary) -> void:
+func frame(v: Dictionary, dt := 0.0) -> void:
+	_edge_pan(v, dt)
 	var list: Array = v.get("facilities", [])
 	var sig := str(list)
 	if sig != _sig:
@@ -133,13 +139,15 @@ func begin_move(facility: int) -> void:
 	_begin({"recipe": "", "facility": facility, "confirm": "Move"})
 
 func _begin(p: Dictionary) -> void:
-	var v := rt.session.current()
+	var v := rt.session.view
 	placing = p
 	placing.plot = nearest_spot(v, farm.actor.position, int(p.facility))
 	_preview = _sprinkler_art()
 	_preview.name = "PlacementPreview"
 	farm.add_child(_preview)
 	rt.ui.begin_placement({"confirm": p.confirm})
+	if int(placing.plot) >= 0: farm.placement_camera_begin(_bed_top(int(placing.plot)))
+	else: farm.placement_camera_begin(farm.actor.position)
 	_show_spot(v, int(placing.plot))
 
 ## The empty plot nearest the player (q(59) §4: the preview starts there); -1 when there is none.
@@ -154,10 +162,14 @@ func nearest_spot(v: Dictionary, at: Vector3, moving := -1) -> int:
 			best = id
 	return best
 
-func _on_point(screen: Vector2, _phase: String) -> void:
+func _on_point(screen: Vector2, phase: String) -> void:
 	if placing.is_empty(): return
+	_finger = Vector2.INF if phase == "release" else screen
 	if rt.ui.placement_bar_rect().has_point(screen): return
-	var v := rt.session.current()
+	_snap(screen)
+
+func _snap(screen: Vector2) -> void:
+	var v := rt.session.view
 	var id := plot_at_screen(v, screen)
 	if id == int(placing.plot): return
 	placing.plot = id
@@ -173,6 +185,33 @@ func plot_at_screen(v: Dictionary, screen: Vector2) -> int:
 			best_d = d
 			best = id
 	return best
+
+## Two fingers moved the picture: the camera follows them, in the yard.
+func _on_pan(px: Vector2, at: Vector2) -> void:
+	if not placing.is_empty(): farm.placement_drag(px, at)
+
+## A finger held within EDGE_PX of a screen edge pans the camera that way, faster nearer the edge (up to EDGE_SPEED);
+## the preview keeps snapping to the bed under the finger as the ground moves under it.
+func _edge_pan(v: Dictionary, dt: float) -> void:
+	if placing.is_empty() or _finger == Vector2.INF or dt <= 0.0: return
+	var size := farm.get_viewport().get_visible_rect().size
+	var bar := rt.ui.placement_bar_rect()
+	var bottom := bar.position.y if bar.has_area() else size.y
+	var push := Vector2(edge_push(_finger.x, 0.0, size.x), edge_push(_finger.y, 0.0, bottom))
+	if push == Vector2.ZERO: return
+	# Screen right / down as ground directions (the camera's own axes on the ground plane).
+	var right := (farm.cam as Camera3D).global_basis.x
+	var down := -(farm.cam as Camera3D).global_basis.y
+	right.y = 0.0
+	down.y = 0.0
+	farm.placement_pan((right.normalized() * push.x + down.normalized() * push.y) * EDGE_SPEED * dt)
+	_snap(_finger)
+
+## −1..1 toward the nearer edge of [lo, hi] for a finger within EDGE_PX of it, 0 elsewhere (0 at the band's inner side).
+static func edge_push(x: float, lo: float, hi: float) -> float:
+	if x < lo + EDGE_PX: return -clampf((lo + EDGE_PX - x) / EDGE_PX, 0.0, 1.0)
+	if x > hi - EDGE_PX: return clampf((x - (hi - EDGE_PX)) / EDGE_PX, 0.0, 1.0)
+	return 0.0
 
 func _show_spot(v: Dictionary, id: int) -> void:
 	var reason := spot_reason(v, id, int(placing.facility))
@@ -192,6 +231,8 @@ func _on_done(ok: bool) -> void:
 
 func _end() -> void:
 	placing = {}
+	_finger = Vector2.INF
+	farm.placement_camera_end()
 	if is_instance_valid(_preview): _preview.queue_free()
 	_preview = null
 	_paint([], [], false)
@@ -252,7 +293,7 @@ func _draw_overlay(v: Dictionary) -> void:
 ## In Farming and on a bed or within a step of one (q(59) §1.5: standing in the field).
 func _near_field(v: Dictionary) -> bool:
 	if rt.ui.bar_mode != "farm" or rt.ui.has_modal(): return false
-	if P0Garden.on_bed(farm.bp, farm.actor.position): return true
+	if P0Garden.on_bed(farm.bp, farm.actor.position, v): return true   # the beds the view has (亚瑟 on #217)
 	for id in P0Garden.plot_count(v):
 		if (farm.bp as FarmBlueprint).cell_to_world(P0Garden.cell_of(id)).distance_to((farm.actor as Node3D).position) < 1.2: return true
 	return false
@@ -273,7 +314,7 @@ static func _ring() -> MeshInstance3D:
 # ---------------------------------------------------------------- taps
 ## A tap on a sprinkler's head: its status card (`Sprinkler · Waters 8 plots`, Move) and its beds highlighted.
 func tap(screen: Vector2) -> bool:
-	var v := rt.session.current()
+	var v := rt.session.view
 	for f in v.get("facilities", []):
 		if farm.cam.unproject_position(_bed_top(int(f.get("plot", 0))) + HEAD).distance_to(screen) > TAP_PX: continue
 		open_card(f)
