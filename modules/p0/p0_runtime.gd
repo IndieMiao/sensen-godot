@@ -423,6 +423,8 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	# A first's bonus XP is said by its own line, not added into the XP float: the first cook's and catch's on their
 	# card's strip (Li Bai, int6 C11), the first harvest's as `First harvest! +10 XP · Radish` (§4.8.6).
 	var first_cook_xp: Array = []
+	# Harvest ×N's first harvest goes into its XP line (`+20 XP · 5 plants · First harvest`, q(124) ②), no line of its own.
+	var folded_first: Array = []   # those firsts' xp events
 	# …the first cook's only when that card comes (a normal serve at the stove); a Queue ×2 turn-over or a pot kept on its
 	# own has none, so it floats a line of its own, `First cooked · +20 Cooking XP` (q(85)). A world without the hook
 	# gives null.
@@ -452,7 +454,8 @@ func _on_state(v: Dictionary, events: Array) -> void:
 					first_cook_xp.append(ev)
 				if what.begins_with("cook:") and not cook_card:
 					floats.append({kind = "first", key = what, text = "First cooked · +%d Cooking XP" % int(ev.amount), tone = UiFloatText.Tone.XP})
-				if what.begins_with("harvest:"):
+				if what.begins_with("harvest:") and plants > 1: folded_first.append({amount = int(ev.amount), what = what})
+				elif what.begins_with("harvest:"):
 					var crop := what.trim_prefix("harvest:")
 					floats.append({kind = "first", key = what, text = "First harvest! +%d XP · %s" % [int(ev.amount),
 						P0Logic.item_name(v, crop)], tone = UiFloatText.Tone.XP})
@@ -491,7 +494,13 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				if settles_catch and str(ev.get("reason", "")) in ["refund", "line_in"]: continue
 				# Inside the mine a floor fee is said by the mine's own float ("Floor 2 · −2 Energy", q(46)), not twice.
 				if str(ev.get("reason", "")) == "mine_floor" and str(_call("p0_surface", [])) == "mine": continue
-				floats.append({kind = "energy", key = "energy", amount = dlt, fmt = "%s Energy"})
+				var part := {kind = "energy", key = "energy", amount = dlt, fmt = "%s Energy"}
+				# Row Hoe's Sow ×3 says its beds: `−6 Energy · 3 plots` (q(124) ③); the seeds it took count them
+				if str(ev.get("reason", "")) == "sow":
+					var beds: int = -events.filter(func(e): return str(e.get("kind", "")) == "item" and str(e.get("id", "")).begins_with("seed_")) \
+						.reduce(func(n, e): return n + mini(0, int(e.get("delta", 0))), 0)
+					if beds > 1: part.merge({unit = "plots", count = beds})
+				floats.append(part)
 			"xp":
 				var cook := str(ev.skill) == "cooking"
 				var nth := int(ev.get("nth", 0))   # a pot's place among today's pots of its page (q(94))
@@ -617,10 +626,28 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	# Harvest All with a nearly full bag (q(123)): what fitted went in, the rest stays ripe. The row's result is a line
 	# of its own over the XP and the crops (`Harvest 3 of 5 · bag full` / `+3 Radish` / `+6 XP · 3 plants`, E-04 and
 	# 289 HARVEST-ROW-3; 不知火舞 on #269), and the hold stops.
+	if not folded_first.is_empty():   # onto the row's first farming XP part, which the others merge into
+		var on = null
+		for p in floats:
+			if str(p.get("kind", "")) == "xp" and str(p.get("unit", "")) == "plants":
+				on = p
+				break
+		if on != null:
+			on.amount = int(on.amount) + folded_first.reduce(func(n, f): return n + int(f.amount), 0)
+			on.tail = "First harvest"
+		else:   # the row's own XP is 0 (crops far under the level): no line to ride on, so a single plot's line (哪吒 on #291)
+			for f in folded_first:
+				floats.append({kind = "first", key = f.what, text = "First harvest! +%d XP · %s" % [int(f.amount),
+					P0Logic.item_name(v, str(f.what).trim_prefix("harvest:"))], tone = UiFloatText.Tone.XP})
+	# Harvest ×N (289): the crops pop along the row first; its lines, its flights and the bag-full toast wait for that.
+	var wave_at = _call("p0_harvest_wave", [events])
+	var wave_s := float(wave_at) if wave_at != null else 0.0
 	var short: Array = events.filter(func(e): return str(e.get("kind", "")) == "harvest_short")
 	if not short.is_empty():
 		floats.append(harvest_result(int(short[0].get("got", 0)), int(short[0].get("of", 0))))
-		_harvest_stopped(v)
+		ui.fab_held = false
+		if wave_s > 0.0: get_tree().create_timer(wave_s).timeout.connect(func(): _harvest_stopped(session.view))
+		else: _harvest_stopped(v)
 	if not trap_got.is_empty():
 		floats.append_array(trap_parts(v, trap_got))
 		for e in events:   # a partial collect: `1 left in the trap` over it (q(124) ①; the result's place, q(124) ⑦)
@@ -631,7 +658,10 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	# escape after that must not float them (刘邦 on #154).
 	if settles_catch: catch_floats = floats if world_lands else []
 	if world_lands: floats = []
-	ui.queue_floats(floats, at)   # with the world's own lines of this reply, at the end of the frame
+	if wave_s > 0.0:
+		var lines := floats
+		get_tree().create_timer(wave_s).timeout.connect(func(): ui.queue_floats(lines, at))
+	else: ui.queue_floats(floats, at)   # with the world's own lines of this reply, at the end of the frame
 	if ui.modal_kind == "counter" and events.size() > 0:
 		ui.set_view(session.current())   # the counter drawer follows the view; floats say what changed
 		ui.counter_events(events)
@@ -679,6 +709,7 @@ func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 	# The farmhouse kitchen waits on cook / collect (its Cook buttons, the plate being served): let it recover.
 	if str(cmd.get("type", "")) in ["cook", "cook_all", "collect"]: _call("p0_event", [{"kind": "refused", "code": code, "cmd": cmd}, session.view])
 	if str(cmd.get("type", "")) == "cast": _call("p0_event", [{"kind": "cast_refused", "code": code}, session.view])
+	if str(cmd.get("type", "")) == "harvest": _call("p0_harvest_refused", [])   # a refused row: its wave never comes
 	if code == "bag_full" and str(cmd.get("type", "")) == "reel":
 		_call("p0_event", [{"kind": "fish_abort"}, session.view])
 		session.send({"type": "reel", "outcome": "escaped"})

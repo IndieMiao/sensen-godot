@@ -226,3 +226,40 @@ func test_a_harvest_that_fills_the_bag_says_how_far_it_got() -> void:
 	assert_str(rt.ui.toast_text()).is_equal("Bag 25/25 · Sell at Homestead Stall")
 	assert_str(rt.ui._toasts.current_action()).is_equal("Open bag")
 	assert_bool(rt.ui.fab_held).is_false()
+
+## q(124) ②③ (289): a row's first harvest is no line of its own but the XP line's tail, `+16 XP · 3 plants · First
+## harvest`; a single plot keeps `First harvest! +10 XP · Radish`. Row Hoe's Sow ×3 reads `−6 Energy · 3 plots`.
+func test_a_rows_first_harvest_and_row_hoes_beds_say_so_in_one_line() -> void:
+	var rt: P0Runtime = auto_free(P0Runtime.new())
+	rt.ui.quick_store = STORE
+	add_child(rt)
+	await get_tree().process_frame
+	var v := {"energy": {"value": 140, "max": 200}, "coins": 52, "bag": {"capacity": 25, "slots": []},
+		"skills": {"farming": {"level": 9, "xp": 2100}}, "names": {"crop_radish": "Radish"}, "plots": []}
+	for c in rt.session.connection_failed.get_connections(): rt.session.connection_failed.disconnect(c.callable)   # no server here
+	rt.session.view = v
+	rt.ui.set_view(v)
+	var events := []
+	for i in 3: events.append_array([{"kind": "item", "id": "crop_radish", "delta": 1}, {"kind": "xp", "skill": "farming", "amount": 2, "percent": 100}])
+	events.insert(2, {"kind": "first", "what": "harvest:crop_radish", "xp": 10})
+	events.insert(3, {"kind": "xp", "skill": "farming", "amount": 10, "percent": 100})
+	rt._on_state(v, events)
+	await get_tree().process_frame
+	var texts := rt.ui.root.get_children().filter(func(c): return c is UiFloatText and not c.is_queued_for_deletion()).map(func(f): return f.text)
+	assert_array(texts).contains(["+16 XP · 3 plants · First harvest", "+3 Radish"])
+	assert_bool(texts.any(func(t): return t.begins_with("First harvest!"))).is_false()
+	for f in rt.ui.root.get_children(): if f is UiFloatText: f.free()
+	# a row whose own XP is 0 (crops far under the level) has no XP line to ride on: the first harvest says itself (哪吒 on #291)
+	events = []
+	for i in 3: events.append_array([{"kind": "item", "id": "crop_radish", "delta": 1}, {"kind": "xp", "skill": "farming", "amount": 0, "percent": -1}])
+	events.insert(2, {"kind": "first", "what": "harvest:crop_radish", "xp": 10})
+	events.insert(3, {"kind": "xp", "skill": "farming", "amount": 10, "percent": 100})
+	rt._on_state(v, events)
+	await get_tree().process_frame
+	texts = rt.ui.root.get_children().filter(func(c): return c is UiFloatText and not c.is_queued_for_deletion()).map(func(f): return f.text)
+	assert_array(texts).contains(["First harvest! +10 XP · Radish", "+3 Radish"])
+	for f in rt.ui.root.get_children(): if f is UiFloatText: f.free()
+	rt._on_state(v, [{"kind": "energy", "delta": -6, "reason": "sow"}, {"kind": "item", "id": "seed_radish", "delta": -3}])
+	await get_tree().process_frame
+	texts = rt.ui.root.get_children().filter(func(c): return c is UiFloatText and not c.is_queued_for_deletion()).map(func(f): return f.text)
+	assert_array(texts).contains(["−6 Energy · 3 plots"])
