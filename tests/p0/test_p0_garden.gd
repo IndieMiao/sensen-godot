@@ -24,6 +24,14 @@ func test_the_garden_grid_matches_the_content_table() -> void:
 	assert_vector(P0Garden.cell_of(30)).is_equal(P0Garden.cell_of(5) + Vector2i(2, 0))
 	assert_vector(P0Garden.cell_of(39)).is_equal(P0Garden.cell_of(29) + Vector2i(4, 0))
 
+## At Homestead Lv1–2 the place of beds 30–39 is plain ground: walking there never steps up onto a bed (哪吒 on #215).
+func test_no_bed_to_step_on_where_the_homestead_has_none_yet() -> void:
+	var bp := P0Garden.blueprint()
+	var at := bp.cell_to_world(P0Garden.cell_of(31))
+	assert_bool(P0Garden.on_bed(bp, at, {"garden": {"plots": 30}})).is_false()
+	assert_bool(P0Garden.on_bed(bp, at, {"garden": {"plots": 40}})).is_true()
+	assert_bool(P0Garden.on_bed(bp, bp.cell_to_world(P0Garden.cell_of(29)), {"garden": {"plots": 30}})).is_true()
+
 ## The view's garden.plots decides how many beds the homestead has (30 before Homestead Lv3, 40 from it).
 func test_plot_count_follows_the_view() -> void:
 	assert_int(P0Garden.plot_count({})).is_equal(30)

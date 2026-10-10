@@ -72,6 +72,9 @@ func test_home_moment_matches_the_page_14_banner() -> void:
 	assert_str(str(m.title)).is_equal("Homestead Lv3")
 	assert_str(str(m.subtitle)).is_equal("Max Energy 220 · Energy full")
 	assert_str(str(m.detail)).is_equal("Warming Cabinet\nBag Upgrade I for sale · 150 coins\nPlots +10")   # q(59) §1.1
+	# a Homestead table that announces the plots itself (plots_40, #209) is not said twice
+	var twice := P0Logic.home_moment({"energy": {"max": 220}}, {"kind": "homestead", "level": 3, "unlocks": ["plots_40"]})
+	assert_int(str(twice.detail).count("Plots")).is_less_equal(1)
 
 func test_material_icons_exist() -> void:
 	for id in ["wood", "stone", "fiber", "clay", "rock_salt", "coin", "star", "energy", "kitchen", "bag", "board"]:

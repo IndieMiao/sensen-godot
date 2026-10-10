@@ -221,7 +221,7 @@ func _build_world() -> void:
 	actor = P0Actor.new()
 	add_child(actor)
 	actor.setup(bp, grid, cam)
-	actor.ground_height = func(p: Vector3) -> float: return P0Garden.BED_H if P0Garden.on_bed(bp, p) else 0.0
+	actor.ground_height = func(p: Vector3) -> float: return P0Garden.BED_H if P0Garden.on_bed(bp, p, rt.session.current()) else 0.0
 	# Opening shot like the polished farm: cottage on top, beds below, the player at the front edge.
 	_focus = actor.position.lerp(_house, 0.42)
 	_cam_follow.hold()   # the opening shot stays until the player first moves
