@@ -108,6 +108,19 @@ describe('global generation (SGODOT-280)', () => {
     expect(checked).toBe(clusters.byId.size - 1);   // every cluster but the home city
   });
 
+  it('never names an outpost after its own city (q(32)): Tokyo has no "Tokyo Market Square"', () => {
+    const tokyo = cityPlaces(c, TOKYO)!.detail.outposts;
+    expect(tokyo.find(o => o.id === `${TOKYO}~market0`)!.name).not.toMatch(/^Tokyo /);
+    expect(tokyo.find(o => o.id === `${TOKYO}~post0`)!.name).not.toMatch(/^Tokyo /);
+    for (const cl of clusters.byId.values()) {
+      const city = cityPlaces(c, cl.id);
+      if (!city) continue;
+      for (const o of city.detail.outposts) expect(o.name.startsWith(`${cl.name} `)).toBe(false);
+      const names = city.detail.outposts.map(o => o.name);
+      expect(new Set(names).size).toBe(names.length);   // the same kind never shares a name in a city
+    }
+  });
+
   it('names keepers from the climate pool, never a resident name, and tea houses from the climate words', () => {
     const tokyo = cityPlaces(c, TOKYO)!;
     const temperate = w.keeper_names.Temperate;
