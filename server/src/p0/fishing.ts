@@ -3,6 +3,7 @@ import { fishById, rodById, type Fish, type FishSite, type P0Content } from './c
 import { pondAt, poolAt, type Pond } from './fishing_world.js';
 import { add, count, freeSlots, room, take } from './bag.js';
 import { clusterById, clusterOf, homeCluster } from './travel.js';
+import { placeOf } from './world.js';
 import { firstXp, energyDetail, gainEnergy, gainXp, grantOnce, spendEnergy, type P0Event } from './progress.js';
 import { draw, maxEnergy, scaledXp, skillLevel, xpPercent } from './rules.js';
 import type { P0State } from './state.js';
@@ -53,7 +54,7 @@ export function castLine(c: P0Content, s: P0State, cmd: { bait?: string | null }
   const f = c.fishing;
   // q(36): the template comes from the server's table for the pond the player entered, not from the client.
   const place = s.presence.place ?? '';
-  const siteId = f.places[place]?.site ?? '';
+  const siteId = placeOf(c, place)?.site ?? '';   // a generated pond (gn-…~pond0) answers like a hand-written one
   const site = f.sites[siteId];
   if (!site) return { code: 'not_at_pond' };
   if (s.cast) {

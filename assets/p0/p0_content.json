@@ -474,33 +474,33 @@
       "pond_san_francisco_03": {
         "name": "Fern Pond",
         "site": "pond",
-        "city": "san francisco",
+        "city": "san francisco", "cluster": "gn-5391959",
         "beginner": true
       },
       "pond_san_francisco_06": {
         "name": "Blossom Pond",
         "site": "river",
-        "city": "san francisco"
+        "city": "san francisco", "cluster": "gn-5391959"
       },
       "pond_san_francisco_02": {
         "name": "Clover Pond",
         "site": "coast",
-        "city": "san francisco"
+        "city": "san francisco", "cluster": "gn-5391959"
       },
       "pond_san_francisco_01": {
         "name": "Willow Pond",
         "site": "pond",
-        "city": "san francisco"
+        "city": "san francisco", "cluster": "gn-5391959"
       },
       "pond_san_francisco_04": {
         "name": "Pebble Pond",
         "site": "river",
-        "city": "san francisco"
+        "city": "san francisco", "cluster": "gn-5391959"
       },
       "pond_san_francisco_05": {
         "name": "Reed Pond",
         "site": "pond",
-        "city": "san francisco"
+        "city": "san francisco", "cluster": "gn-5391959"
       }
     },
     "rods": [

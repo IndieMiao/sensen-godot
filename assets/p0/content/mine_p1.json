@@ -27,7 +27,7 @@
       "mob_elite_slime": {
         "name": "Elite Slime",
         "hp": 36,
-        "damage": 24,
+        "damage": 20,
         "loot": [
           [
             "copper_ore",
