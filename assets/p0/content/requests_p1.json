@@ -1,5 +1,5 @@
 {
-  "_note": "P1 新增系统委托模板 23 条（李白，SGODOT-281/284；方案 §9.6）。形状照 #212 的 RequestTemplate：type 为 output / regional / explore / together，climate 首字母大写与 profile.climate 一致，text 为委托卡两句文案。enabled:false 的有两种：①type 为 regional / explore / together，按 #212 等旅行上线再开；②need 需要 #212 Need 还不支持的条件，完整意图写在 p1_need（family 族、where 塘类型或外城、trail Trail 菜、scale 量 ×1.5、regional zone/city/other_zone、max_rarity、visit 签到、floor 不回收材料的委托地板价），引擎支持后去掉 p1_need 并打开。board 是该模板上哪块板；放进 requests.boards 的列表由苏烈在主文件里改（数组片段不追加）。 苏烈 (SGODOT-284): the engine now also takes need.family (Orchard Basket), a list of styles (Packed Lunches) and scale (Wholesale Order, Fish Market Crate), so those four are on; board is not a template field — the ids are listed in p0_content.json requests.boards (a list without ids cannot be appended by a fragment). Still off: River Run / Far Pond (a fish's water is not kept in the bag), and every regional / explore / together template (travel, live rooms).",
+  "_note": "P1 新增系统委托模板 23 条（李白，SGODOT-281/284；方案 §9.6）。形状照 #212 的 RequestTemplate：type 为 output / regional / explore / together，climate 首字母大写与 profile.climate 一致，text 为委托卡两句文案。enabled:false 的有两种：①type 为 regional / explore / together，按 #212 等旅行上线再开；②need 需要 #212 Need 还不支持的条件，完整意图写在 p1_need（family 族、where 塘类型或外城、trail Trail 菜、scale 量 ×1.5、regional zone/city/other_zone、max_rarity、visit 签到、floor 不回收材料的委托地板价），引擎支持后去掉 p1_need 并打开。board 是该模板上哪块板；放进 requests.boards 的列表由苏烈在主文件里改（数组片段不追加）。 苏烈 (SGODOT-284): the engine now also takes need.family (Orchard Basket), a list of styles (Packed Lunches) and scale (Wholesale Order, Fish Market Crate), so those four are on; board is not a template field — the ids are listed in p0_content.json requests.boards (a list without ids cannot be appended by a fragment). Regional and Stamp Run are on (苏烈, SGODOT-284): a regional template draws only once one of its items can be got (a regional seed on sale, a regional fish in a pond), so the farm and fishing lines open them by their data; Stamp Run checks in at another outpost of the home city. River Run names Rainbow Trout (李白 q(109): the only Fine fish found only in River). Still off: Far Pond (the bag keeps no water), Postcard Trip / Tea Trail / New Climate (other cities' outposts, SGODOT-280), Harvest Together (live rooms). Stamp Run is gated at Homestead Lv2 (as Postcard Trip) so the first session's Market Board stays as §14 has it; 李白 to confirm.",
   "requests": {
     "templates": {
       "req_sys_material_fiber": {
@@ -52,7 +52,7 @@
         "title": "River Run",
         "need": {
           "kind": "fish",
-          "rarity": 2
+          "id": "fish_trout"
         },
         "skill": "fishing",
         "gate": [
@@ -63,11 +63,7 @@
         ],
         "bonus": 20,
         "type": "output",
-        "text": "Something from moving water. Any Fine river fish.",
-        "enabled": false,
-        "p1_need": {
-          "where": "river"
-        }
+        "text": "Trout from moving water. Rainbow Trout only."
       },
       "req_sys_dish_soup": {
         "title": "Soup Day",
@@ -230,7 +226,8 @@
       "req_sys_regional_crop": {
         "title": "Taste of Home",
         "need": {
-          "kind": "crop"
+          "kind": "crop",
+          "regional": "zone"
         },
         "skill": "farming",
         "gate": [
@@ -242,16 +239,13 @@
         "bonus": 20,
         "type": "regional",
         "text": "Grown the local way. This climate's regional crop.",
-        "stamp": 1,
-        "enabled": false,
-        "p1_need": {
-          "regional": "zone"
-        }
+        "stamp": 1
       },
       "req_sys_regional_fish": {
         "title": "Local Waters",
         "need": {
-          "kind": "fish"
+          "kind": "fish",
+          "regional": "city"
         },
         "skill": "fishing",
         "gate": [
@@ -263,16 +257,14 @@
         "bonus": 20,
         "type": "regional",
         "text": "Fish only these waters give. One of this city's regional fish.",
-        "stamp": 1,
-        "enabled": false,
-        "p1_need": {
-          "regional": "city"
-        }
+        "stamp": 1
       },
       "req_sys_regional_dish": {
         "title": "Local Flavor",
         "need": {
-          "kind": "dish"
+          "kind": "dish",
+          "regional": "zone",
+          "max_rarity": 2
         },
         "skill": "cooking",
         "gate": [
@@ -284,17 +276,13 @@
         "bonus": 20,
         "type": "regional",
         "text": "A dish people here grew up on. This climate's regional dish.",
-        "stamp": 1,
-        "enabled": false,
-        "p1_need": {
-          "regional": "zone",
-          "max_rarity": 2
-        }
+        "stamp": 1
       },
       "req_sys_regional_far_fish": {
         "title": "Visitor's Catch",
         "need": {
-          "kind": "fish"
+          "kind": "fish",
+          "regional": "other_zone"
         },
         "skill": "fishing",
         "gate": [
@@ -306,16 +294,13 @@
         "bonus": 40,
         "type": "regional",
         "text": "Something you won't find here. A regional fish from another climate.",
-        "stamp": 1,
-        "enabled": false,
-        "p1_need": {
-          "regional": "other_zone"
-        }
+        "stamp": 1
       },
       "req_sys_regional_far_crop": {
         "title": "Seeds from Afar",
         "need": {
-          "kind": "crop"
+          "kind": "crop",
+          "regional": "other_zone"
         },
         "skill": "farming",
         "gate": [
@@ -327,31 +312,28 @@
         "bonus": 40,
         "type": "regional",
         "text": "A crop that came a long way. A regional crop from another climate.",
-        "stamp": 1,
-        "enabled": false,
-        "p1_need": {
-          "regional": "other_zone"
-        }
+        "stamp": 1
       },
       "req_sys_explore_outpost": {
         "title": "Stamp Run",
         "need": {
-          "kind": "material",
-          "id": "wood"
+          "kind": "visit",
+          "visit": {
+            "where": "same_city"
+          }
         },
         "skill": "farming",
-        "gate": [],
+        "gate": [
+          [
+            "homestead",
+            2
+          ]
+        ],
         "bonus": 40,
         "type": "explore",
         "text": "Say hello across town. Check in at another outpost.",
         "stamp": 1,
-        "coins": 40,
-        "enabled": false,
-        "p1_need": {
-          "target": "outpost",
-          "where": "other_in_city_or_neighbour",
-          "kind": "visit"
-        }
+        "coins": 40
       },
       "req_sys_explore_city": {
         "title": "Postcard Trip",

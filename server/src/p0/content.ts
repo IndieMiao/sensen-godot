@@ -15,6 +15,7 @@ export interface Crop {
   tier: number; energy: number; level: number; gate: number;
   seed_price: number; grow_h: number; yield: number; price: number; xp: number; first_xp: number;
   ingr: [Family, number];
+  regional?: boolean; zone?: string;   // P1 regional crops (§5.2.3): one climate each
 }
 
 export interface Fish {
@@ -48,7 +49,7 @@ export type Convenience = 'cook_again' | 'clue_double' | 'hearty_mishap' | 'stea
   // P1 (SGODOT-282, §4.6.3 Lv7–10)
   | 'steady_hand_2' | 'fast_mastery' | 'cook_all' | 'provisions_plus' | 'chefs_touch' | 'title_chef' | 'lucky_double';
 /** A P0 Cookbook page that can be cooked (§7.14.0); n = its page number in the 48-page Cookbook. */
-export interface Recipe { n?: number; id: string; name: string; in: string[]; known?: boolean; style?: string; learn?: Learn[] }
+export interface Recipe { n?: number; id: string; name: string; in: string[]; known?: boolean; style?: string; learn?: Learn[]; regional?: boolean; card_zone?: string; card_zones?: string[] }
 /** A page outside P0 (§7.14.1–7.14.4): only its silhouette shows, slots = the family of each slot. */
 export interface SilhouettePage { n: number; id: string; name: string; rarity: number; slots: string[]; style: string; learn: Learn[] }
 
@@ -63,8 +64,13 @@ export type BoardId = 'stall' | 'market';
  * distinct items.
  */
 export interface Need {
-  kind: 'crop' | 'fish' | 'dish' | 'material' | 'sow'; id?: string; rarity?: number; style?: string | string[];
+  kind: 'crop' | 'fish' | 'dish' | 'material' | 'sow' | 'visit'; id?: string; rarity?: number; style?: string | string[];
   family?: Family; same?: boolean; distinct?: number;
+  /** §9.6.3 regional templates: the home climate's regional items (zone), the home city's 2 regional fish (city), or
+   * regional items of another climate (other_zone). One such item is drawn; max_rarity caps it (Local Flavor: Fine). */
+  regional?: 'zone' | 'city' | 'other_zone'; max_rarity?: number;
+  /** §9.6.3 explore templates (kind visit): check in at another outpost of the home city than the board's own (Stamp Run). */
+  visit?: { role?: string; where: 'same_city' };
 }
 /**
  * A system request template (§9.6.3). climate narrows it to the home climate (regional templates, `Temperate`);

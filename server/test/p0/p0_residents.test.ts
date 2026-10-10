@@ -195,6 +195,7 @@ describe('keeper greeting facts (Li Bai b7d8b665 D, for SGODOT-224 keeper_lines)
     expect(k2.tackle.greet).toBe('reed_rod');
     expect(k2.post.greet).toBe('cups_out');
     expect(k2.tea.online).toBeNull();
-    expect(k2.market).toMatchObject({ board_open: 2, board_templates: ['req_sys_fish_fine', 'req_sys_fish_fine'] });
+    expect(k2.market).toMatchObject({ board_open: 2 });   // Dusk Haul or, from P1, Local Waters (SGODOT-283)
+    for (const t of k2.market.board_templates) expect(['req_sys_fish_fine', 'req_sys_regional_fish']).toContain(t);
   });
 });

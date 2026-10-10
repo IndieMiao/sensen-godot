@@ -111,8 +111,11 @@ describe('Market Board (§9.6.3, §9.13.2)', () => {
     const s = fresh();
     s.skills.fishing = 220; // Lv3
     const slots = viewOf(c, s, T0).boards.market.slots as { template: string; bonus: number; qty: number }[];
-    expect(slots.map(x => x.template)).toEqual(['req_sys_fish_fine', 'req_sys_fish_fine']);
-    for (const x of slots) { expect(x.bonus).toBe(20); expect(x.qty).toBeGreaterThanOrEqual(2); expect(x.qty).toBeLessThanOrEqual(3); }
+    // Lv3 opens Dusk Haul and, from P1, Local Waters (the city's regional fish swim in its ponds, SGODOT-283)
+    for (const x of slots) expect(['req_sys_fish_fine', 'req_sys_regional_fish']).toContain(x.template);
+    for (const x of slots.filter(x => x.template === 'req_sys_fish_fine')) {
+      expect(x.bonus).toBe(20); expect(x.qty).toBeGreaterThanOrEqual(2); expect(x.qty).toBeLessThanOrEqual(3);
+    }
   });
 
   it('Market Basket takes N of each of three crops; A Proper Meal pays the quality bonus on the whole request', () => {

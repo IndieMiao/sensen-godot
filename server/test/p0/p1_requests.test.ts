@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import { pondFishIds } from '../../src/p0/fishing_world.js';
 import { loadP0Content } from '../../src/p0/content.js';
-import { eligible, settleBoards } from '../../src/p0/boards.js';
+import { eligible, regionalPool, settleBoards, visitPlaces } from '../../src/p0/boards.js';
 import { matches } from '../../src/p0/requests.js';
 import { applyP0, type P0Command, type P0Event } from '../../src/p0/reducer.js';
 import { freshState, type BoardRequest, type P0State } from '../../src/p0/state.js';
@@ -33,9 +34,9 @@ describe('the template pool (§9.6.3: 30 at the prototype stage)', () => {
     for (const id of listed) expect(c.requests.templates[id], id).toBeTruthy();
   });
 
-  it('regional, explore and together templates stay off until travel; climate is written as profile.climate is', () => {
+  it('explore templates other than Stamp Run and together stay off; climate is written as profile.climate is', () => {
     for (const [id, t] of Object.entries(c.requests.templates)) {
-      if (t.type && t.type !== 'output') expect(t.enabled, id).toBe(false);
+      if (t.type === 'together' || (t.type === 'explore' && id !== 'req_sys_explore_outpost')) expect(t.enabled, id).toBe(false);
       for (const z of t.climate ?? []) expect(z[0], id).toBe(z[0].toUpperCase());
     }
   });
@@ -43,7 +44,7 @@ describe('the template pool (§9.6.3: 30 at the prototype stage)', () => {
   // 周瑜 on #219: every template that is on can be met by something the player can get at its gate.
   it('every template that is on has at least one deliverable item at its gate level', () => {
     for (const [id, t] of Object.entries(c.requests.templates)) {
-      if (t.enabled === false) continue;
+      if (t.enabled === false || t.need.regional || t.need.kind === 'visit') continue;   // these draw only when drawable (below)
       const lv = (skill: string) => Math.max(1, ...t.gate.filter(([g]) => g === skill).map(([, n]) => n));
       const n = t.need;
       const pool = n.kind === 'crop' ? c.crops.filter(x => x.gate <= lv('farming')).map(x => x.id)
@@ -120,5 +121,118 @@ describe('what the new templates take', () => {
     expect(Math.min(...qty)).toBeGreaterThanOrEqual(9);
     expect(Math.max(...qty)).toBeLessThanOrEqual(15);
     expect(Math.max(...qty)).toBeGreaterThan(10);   // more than the plain band ever gives
+  });
+});
+
+describe('regional templates (§9.6.3; drawn only once one of their items can be got)', () => {
+  // A content copy where the farm line sells the regional seed at the market, as its PR will. The city's regional fish
+  // are in the ponds already (SGODOT-283: San Francisco's Arctic Char in Pond and River, Atlantic Salmon in River and
+  // Coast).
+  const opened = () => {
+    const k = structuredClone(c);
+    k.market.buy = [...k.market.buy, 'seed_pumpkin'];
+    return k;
+  };
+
+  it('only what can be got draws: Local Waters (the city\'s fish swim here); no regional seed is on sale yet', () => {
+    const s = fresh();
+    s.skills.farming = 10_000; s.skills.fishing = 10_000; s.skills.cooking = 10_000; s.homestead.level = 5;
+    const open = eligible(c, s, 'market');
+    expect(open).toContain('req_sys_regional_fish');
+    for (const id of ['req_sys_regional_crop', 'req_sys_regional_dish', 'req_sys_regional_far_fish', 'req_sys_regional_far_crop'])
+      expect(open, id).not.toContain(id);
+  });
+
+  it('home climate, home city and other climates pick their own items', () => {
+    const k = opened();
+    const pools = (need: Parameters<typeof regionalPool>[1]) => regionalPool(k, need);
+    expect(pools({ kind: 'crop', regional: 'zone' })).toEqual(['crop_pumpkin']);   // San Francisco is Temperate
+    expect(pools({ kind: 'fish', regional: 'city' })).toEqual(['fish_arctic_char', 'fish_salmon']);   // San Francisco's two (q(109))
+    expect(pools({ kind: 'crop', regional: 'other_zone' })).toEqual([]);            // the other climates' seeds are not on sale here
+    expect(pools({ kind: 'fish', regional: 'other_zone' })).toEqual([]);
+    const s = fresh();
+    s.skills.farming = 10_000; s.skills.fishing = 10_000;
+    expect(eligible(k, s, 'market')).toEqual(expect.arrayContaining(['req_sys_regional_crop', 'req_sys_regional_fish']));
+  });
+
+  it('Taste of Home draws the climate crop and takes only that crop', () => {
+    const k = opened();
+    let s = fresh();
+    s.skills.farming = 10_000;
+    s.boards.market = [{ req: null, refill_at: T0 }, { req: null, refill_at: T0 }];
+    let found: BoardRequest | null = null;
+    for (let k2 = 0; k2 < 400 && !found; k2++) {
+      s.boards.market = [{ req: null, refill_at: T0 + k2 }, { req: null, refill_at: T0 + k2 }];
+      settleBoards(k, s, T0 + 400);
+      found = s.boards.market.map(sl => sl.req).find(r => r?.template === 'req_sys_regional_crop') ?? null;
+    }
+    expect(found).toMatchObject({ items: ['crop_pumpkin'], kind: 'crop' });
+  });
+});
+
+describe('Stamp Run (§9.6.3 explore: check in at another outpost)', () => {
+  const stamp = (place = 'sh_tea_1'): P0State => {
+    const s = fresh();
+    s.homestead.level = 2;
+    s.boards.market[0] = { req: { id: 'v1', template: 'req_sys_explore_outpost', items: [], kind: 'visit', qty: 1, bonus: 40, drawn_at: T0,
+      status: 'open', visit: { place, done: false } }, refill_at: 0 };
+    return s;
+  };
+
+  it('opens at Homestead Lv2 and sends the player to an outpost other than the market square', () => {
+    const s = fresh();
+    expect(eligible(c, s, 'market')).not.toContain('req_sys_explore_outpost');
+    s.homestead.level = 2;
+    expect(eligible(c, s, 'market')).toContain('req_sys_explore_outpost');
+    expect(visitPlaces(c, 'market')).not.toContain('sh_market_1');
+    expect(visitPlaces(c, 'market').length).toBe(3);
+  });
+
+  it('a tracked Stamp Run checks in when the player enters its outpost, then pays 40 at the board', () => {
+    let s = step(stamp(), { type: 'accept', request: 'v1' }).s;
+    expect(refuse(s, { type: 'deliver', request: 'v1' })).toMatchObject({ ok: false, code: 'not_visited', detail: { place: 'sh_tea_1' } });
+    expect(viewOf(c, s, T0).map_markers).toContainEqual({ place: 'sh_tea_1', kind: 'request', why: { request: 'v1', tracked: true } });
+    // entering another outpost does nothing; entering the tea house checks in
+    s = step(s, { type: 'read_inbox', keys: [], space: 'outpost', place: 'sh_post_1' }).s;
+    expect(s.boards.market[0].req?.visit?.done).toBe(false);
+    const r = step(s, { type: 'read_inbox', keys: [], space: 'outpost', place: 'sh_tea_1' });
+    expect(r.ev).toContainEqual({ kind: 'visit', id: 'v1', place: 'sh_tea_1' });
+    expect(viewOf(c, r.s, T0).boards.market.slots[0]).toMatchObject({ kind: 'visit', visit: { place: 'sh_tea_1', done: true }, have: 1, ready: true });
+    const d = step(r.s, { type: 'deliver', request: 'v1', space: 'outpost', place: 'sh_market_1' });
+    expect(d.ev.find(e => e.kind === 'request' && e.status === 'done')).toMatchObject({ coins: 40, bonus: 40 });
+  });
+
+  it('an untracked one does not check in; the entry read of the outpost checks in too', async () => {
+    let s = stamp();
+    s = step(s, { type: 'read_inbox', keys: [], space: 'outpost', place: 'sh_tea_1' }).s;
+    expect(s.boards.market[0].req?.visit?.done).toBe(false);
+    const { default: Fastify } = await import('fastify');
+    const { registerP0Routes } = await import('../../src/p0/routes.js');
+    const { P0Store } = await import('../../src/p0/store.js');
+    const store = new P0Store(c);
+    const app = Fastify();
+    registerP0Routes(app, { content: c, store, now: () => T0, dev: false });
+    try {
+      const t = store.get('p1-stamp-run', T0);
+      Object.assign(t, step(stamp(), { type: 'accept', request: 'v1' }).s, { player: 'p1-stamp-run' });
+      store.put(t);
+      await app.inject({ method: 'GET', url: '/v1/p0/state?space=outpost&place=sh_tea_1', headers: { 'x-p0-player': 'p1-stamp-run' } });
+      expect(store.get('p1-stamp-run', T0).boards.market[0].req?.visit?.done).toBe(true);
+    } finally { await app.close(); }
+  });
+});
+
+describe('River Run (李白 q(109))', () => {
+  it('asks for Rainbow Trout, the one Fine fish found only in River, and takes no other Fine fish', () => {
+    const t = c.requests.templates.req_sys_fish_river;
+    expect(t.enabled).not.toBe(false);
+    expect(t.need).toEqual({ kind: 'fish', id: 'fish_trout' });
+    expect(pondFishIds(c, 'pond_san_francisco_06')).toContain('fish_trout');   // Blossom Pond, a River
+    expect(pondFishIds(c, 'pond_san_francisco_03')).not.toContain('fish_trout'); // Fern Pond, a Pond
+    const s = put(fresh(), 'stall', { template: 'req_sys_fish_river', kind: 'fish', items: ['fish_trout'], rarity: undefined, qty: 2 });
+    s.bag.push({ id: 'fish_bass', qty: 2 });
+    expect(refuse(s, { type: 'deliver', request: 'r1' })).toMatchObject({ ok: false, code: 'not_enough' });
+    s.bag.push({ id: 'fish_trout', qty: 2 });
+    expect(step(s, { type: 'deliver', request: 'r1' }).s.bag.some(b => b.id === 'fish_trout')).toBe(false);
   });
 });
