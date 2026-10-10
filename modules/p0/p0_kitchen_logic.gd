@@ -39,6 +39,11 @@ static func free_stove(view: Dictionary) -> int:
 		if can_queue(view, i): return i
 	return 0
 
+## An ingredient as a button's gap names it (q(112), 李白): a tag slot without its leading "Any" (`Need Legendary fish
+## ×1`, `Need seasoning ×1`); the ingredient column keeps `Any Legendary fish`.
+static func need_label(view: Dictionary, token: String) -> String:
+	return P0Logic.ingredient_label(view, token).trim_prefix("Any ")
+
 ## Another stove's heat reminder (b84a5e01 ④): the index of the ring that comes up within `lead_ms` from now on this
 ## pot (its rings grow in RING_EARLY before their turn, so "comes up" is that moment), else -1.
 static func ring_soon(st: Dictionary, lead_ms: float, early_ms := 1000.0) -> int:
@@ -91,7 +96,7 @@ static func double_gap(view_: Dictionary, tokens: Array) -> String:
 				var need := tokens.filter(func(x): return str(x) == t).size() * 2
 				var have := 0
 				for id in stock(view): if _matches(view, t, id): have += int(stock(view)[id])
-				return "Need %d more %s" % [maxi(1, need - have), P0Logic.ingredient_label(view, t)]
+				return "Need %d more %s" % [maxi(1, need - have), need_label(view, t)]
 			left[found] = int(left[found]) - 1
 	return ""
 
@@ -351,7 +356,7 @@ static func missing_reason(view: Dictionary, p: Dictionary) -> String:
 			if int(s.get("qty", 0)) - int(used.get(id, 0)) > 0 and P0Logic._token_matches(view, t, id):
 				found = id
 				break
-		if found == "": return "Need %s ×1" % P0Logic.ingredient_label(view, t)
+		if found == "": return "Need %s ×1" % need_label(view, t)
 		used[found] = int(used.get(found, 0)) + 1
 	return "Missing ingredients"
 

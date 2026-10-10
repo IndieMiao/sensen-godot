@@ -175,6 +175,14 @@ func test_ring_soon_is_the_second_before_a_ring_grows_in() -> void:
 	st.elapsed = 18500.0
 	assert_int(P0KitchenLogic.ring_soon(st, 1000.0)).is_equal(1)
 
+## q(112): a missing tag ingredient on the button drops "Any" (Need Legendary fish ×1); the column keeps it.
+func test_a_missing_tag_ingredient_reads_without_any() -> void:
+	var v := _view()
+	assert_str(P0KitchenLogic.missing_reason(v, {"in": ["W4"]})).is_equal("Need Legendary fish ×1")
+	assert_str(P0KitchenLogic.missing_reason(v, {"in": ["fish_crucian", "fish_crucian", "fish_crucian"]})).is_equal("Need Pond Crucian ×1")
+	assert_str(P0KitchenLogic.need_label(v, "S1")).is_equal("seasoning")
+	assert_str(P0Logic.ingredient_label(v, "W4")).is_equal("Any Legendary fish")
+
 ## Big Pot Double (b84a5e01 ③): hidden before Lv6; grey for Legendary, unknown mixes and seasonings alone; the main key
 ## says `Cook ×2`, or the gap for two portions.
 func test_double_toggle_states_and_the_gap_for_two() -> void:
