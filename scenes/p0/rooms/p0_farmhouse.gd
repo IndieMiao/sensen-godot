@@ -48,6 +48,18 @@ func _tappable() -> PackedStringArray:
 		if i < 0 or i < n: out.append(a)
 	return out
 
+## The stoves share one place to stand, and stove 3 sits behind 1 and 2, so the nearest pot would always be the same
+## one: by the hearth the strip that opens is the stove being worked (the last tapped, or the drawer's Stove n/N), one
+## at a time (LOCK-07 v2). Away from the hearth the room's own pick applies.
+func card_pick(marks: Dictionary) -> String:
+	var n := super(marks)
+	if kitchen == null or stove_of(n) < 0: return n
+	var mine: String = STOVES[kitchen.stove_index]
+	if marks.has(mine):
+		_card = mine
+		return mine
+	return n
+
 ## The hearth's box takes the tap for every stove on it (int6 C8): with several, the pot nearest the finger wins.
 func pick(screen: Vector2) -> String:
 	var n := super(screen)
@@ -303,6 +315,33 @@ func p0_dev(step: PackedStringArray) -> bool:
 			_pending_tab = ""
 			walk_to(STOVES[int(step[1])])
 		"cyclestove": if kitchen.drawer: kitchen.drawer.stove_cycle_requested.emit()   # the drawer's Stove n/N › pill
+		"near":   # near:<anchor> — stand where that facility is used, facing it, so its strip opens (282 shots)
+			var stand := P0RoomAnchors.stand_for(step[1], _anchors.keys())
+			var m := anchor(stand) if stand != "" else null
+			var target := anchor(step[1])
+			if m and target:
+				var at := m.global_position
+				if stove_of(step[1]) > 0: at = Vector3(target.global_position.x, at.y, at.z)   # in front of that pot
+				actor.teleport(Vector3(at.x, floor_y, at.z))
+				actor.face(target.global_position)
+		"stoveprobe":   # where each stove's anchor and badge land on screen and whether its prompt shows (282 shots)
+			for i in _stove_count():
+				var m := anchor(STOVES[i])
+				var bdg := anchor("badge_stove_%d" % (i + 1))
+				print("P0_STOVE ", i, " anchor=", m != null, " screen=", cam.unproject_position(bdg.global_position) if bdg else Vector2.INF,
+					" tappable=", _tappable().has(STOVES[i]), " card=", _card, " marker=", JSON.stringify(_marker(STOVES[i], rt.session.current()).keys()))
+		"uitexts":   # print every visible label / button text on screen (282 shots: check frames without looking)
+			var out: Array = []
+			for c in rt.ui.root.find_children("*", "Control", true, false):
+				if not (c as Control).is_visible_in_tree(): continue
+				if c is Label and (c as Label).text != "": out.append((c as Label).text)
+				elif c is Button and (c as Button).text != "": out.append("[" + (c as Button).text + "]")
+			print("P0_UI_TEXTS ", JSON.stringify(out))
+		"pickstove": if kitchen and not kitchen.busy(): kitchen.select_stove(int(step[1]))   # pickstove:<i> (282 shots)
+		"doubleon":   # the Double toggle on, as a tap on it (282 shots)
+			if kitchen.drawer:
+				kitchen.drawer.doubles[kitchen.drawer.stove_index] = true
+				kitchen.drawer.refresh()
 		"kitchen": p0_open_kitchen(step[1] if step.size() > 1 else "cookbook")
 		"queue": kitchen.open_queue()   # Queue next › on the watch sheet (shots)
 		"heattap": kitchen.dev_heat_tap()   # a heat tap now: until:gold first (shots)
