@@ -4,12 +4,13 @@ extends UiDrawer
 ## strip's `Cook All` opens over the kitchen drawer, from P0KitchenLogic.cook_all (the server's preview).
 ##   plan   ObjectHeader `Cook All`; a row per pot in firing order — dish icon 24, name (12 ExtraBold), rarity dot and
 ##          word (10 Bold, secondary), `Stove 1 · now` / `Stove 1 · next` (10 Bold, secondary, right); the rule caption;
-##          `Uses` (11 ExtraBold) and the slots summed as NeedTiles S (have/need); `Details ›`. The fixed decision area:
+##          `Uses` (11 ExtraBold) and the slots summed as NeedTiles S (have/need). The fixed decision area:
 ##          `6 pots on 3 stoves · ingredients come out of your Bag now` (14 Bold) and `Cook All · 6 pots`.
 ##   empty  every stove and queue taken: `Cook All` / `No space` / `Wait for a stove or collect a ready dish.`, the stoves
-##          (Busy, Queue full), Stoves 3/3 · Queues 3/3, `Details ›`; a grey `All stoves busy` and `Kitchen` to go back.
+##          (Busy, Queue full), Stoves 3/3 · Queues 3/3; a grey `All stoves busy` and `Kitchen` to go back. No `Details ›`
+##          on either (不知火舞 on #289: Uses and the reason line already say it).
 ## Confirming sends nothing itself: `confirmed` goes to the kitchen, which sends cook_all and closes this sheet back to
-## the Cookbook. `Details ›` and `Kitchen` close it too (back to the Cookbook, where every page is).
+## the Cookbook. `Kitchen` closes it too.
 
 signal confirmed
 signal back
@@ -36,10 +37,6 @@ func _build() -> void:
 		"effect": "Wait for a stove or collect a ready dish." if empty else ""}))
 	if empty: _build_empty()
 	else: _build_plan()
-	var details := UiNavButton.new("Details")
-	details.name = "Details"
-	details.pressed.connect(func(): back.emit())
-	body.add_child(details)
 	var area := VBoxContainer.new()   # the fixed decision area, 8 apart, 12 under the content
 	area.add_theme_constant_override(&"separation", 8)
 	if empty:

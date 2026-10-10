@@ -10,7 +10,7 @@ export type P0Event =
   // capped: the day's anti-script limit cut it (§4.3.4); nth: a pot's place among today's pots of its Cookbook page (1st
   // full, 2nd half, 3rd on none, §7.6.2), so the float can say `· 2nd today` / `No XP · 3rd today` (q(94))
   | { kind: 'xp'; skill: Skill; amount: number; percent: number; capped?: true; nth?: number }
-  | { kind: 'item'; id: string; delta: number }
+  | { kind: 'item'; id: string; delta: number; from?: 'storage' }   // from: storage — farm storage, not the bag (the Spice Rack)
   // Harvest All stopped at `plot`, the first the bag could not take: `got` of the row's `of` went in (q(123))
   | { kind: 'harvest_short'; got: number; of: number; plot: number }
   // Warming Cabinet (§7.7): delta portions in (+) or out (−); to_bag = portions that went to the bag instead (cabinet full) or out to it (Take one).

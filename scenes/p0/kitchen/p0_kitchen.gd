@@ -464,7 +464,7 @@ func _on_cook(cmd: Dictionary) -> void:
 
 # ---------------------------------------------------------------- Cook All (Cooking Lv8; COOK-P1-4 / COOK-EMPTY, q(124))
 ## The Cookbook strip's Cook All opens its sheet over the drawer (P0CookAllSheet from the server's preview); ×, a drag
-## down, Back, `Details ›` and `Kitchen` close it back to the Cookbook. `Cook All · N pots` sends cook_all and closes it
+## down, Back and `Kitchen` close it back to the Cookbook. `Cook All · N pots` sends cook_all and closes it
 ## at once: the reply's pots catch one stove after another, COOK_ALL_FIRE_S apart, the camera staying put, and what
 ## they took floats once over the pot card as one item group (`−3 Radish · −2 Pond Crucian`, two a line, q(124) ④).
 ## Each pot then cooks and comes out on its own stove as Queue does; no card here.
@@ -544,7 +544,9 @@ func _cook_all_fire() -> void:
 ## One stove's pot catches: the working stove's hearth and steam (set_cooking), another stove a puff at its pot.
 func _catch(i: int) -> void:
 	if not is_inside_tree(): return
-	if i == stove_index: stage.set_cooking(true)
+	if i == stove_index:
+		stage.set_cooking(true)
+		return
 	var mouth := room.anchor("drop_pot_%d" % (i + 1))
 	if mouth: stage.puff_at(mouth)
 

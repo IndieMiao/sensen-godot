@@ -35,7 +35,7 @@ func _view(plan = _plan()) -> Dictionary:
 		"rarity_names": ["Common", "Fine", "Rare", "Legendary"],
 		"items": {"fish_crucian": {"name": "Pond Crucian", "kind": "fish", "family": "W", "rarity": 1, "cook": true},
 			"crop_radish": {"name": "Radish", "kind": "crop", "family": "F", "rarity": 1, "cook": true}},
-		"names": {"fish_crucian": "Pond Crucian", "crop_radish": "Radish", "dish_grilled_crucian": "Grilled Crucian",
+		"names": {"fish_crucian": "Pond Crucian", "crop_radish": "Radish", "rock_salt": "Rock Salt", "dish_grilled_crucian": "Grilled Crucian",
 			"dish_radish_salad": "Radish Salad"},
 		"cooking": {"slots": 3, "stoves": [{}, {}, {}], "conveniences": ["cook_again", "queue_two", "cook_all"],
 			"derive": [[1, 2, 3], [2, 3, 3], [3, 3, 4], [4, 4, 4]],
@@ -122,12 +122,11 @@ func test_the_plan_sheet_lists_each_pot_its_uses_and_the_decision() -> void:
 	assert_str((sheet.find_child("Body", true, false) as Label).text).is_equal("3 pots on 2 stoves · ingredients come out of your Bag now")
 	assert_str(sheet.cook_button.label).is_equal("Cook All · 3 pots")
 	assert_float(sheet.height).is_less_equal(P0CookAllSheet.HEIGHT_MAX)
+	assert_object(sheet.find_child("Details", true, false)).is_null()   # no Details › (不知火舞 on #289)
 	var said: Array = []
 	sheet.confirmed.connect(func(): said.append("confirmed"))
-	sheet.back.connect(func(): said.append("back"))
 	sheet.cook_button.pressed.emit()
-	(sheet.find_child("Details", true, false) as BaseButton).pressed.emit()
-	assert_array(said).is_equal(["confirmed", "back"])
+	assert_array(said).is_equal(["confirmed"])
 
 func test_the_empty_sheet_shows_the_stoves_and_a_grey_all_stoves_busy() -> void:
 	var sheet: P0CookAllSheet = auto_free(P0CookAllSheet.new(P0KitchenLogic.cook_all(_busy_view())))
@@ -139,8 +138,11 @@ func test_the_empty_sheet_shows_the_stoves_and_a_grey_all_stoves_busy() -> void:
 	assert_str(busy.text).is_equal("All stoves busy")
 	var said: Array = []
 	sheet.unavailable.connect(func(r: String): said.append(r))
+	sheet.back.connect(func(): said.append("back"))
 	busy.pressed.emit()
-	assert_array(said).is_equal(["All stoves busy"])
+	(sheet.find_children("*", "UiDismissButton", true, false)[0] as BaseButton).pressed.emit()   # `Kitchen`
+	assert_array(said).is_equal(["All stoves busy", "back"])
+	assert_object(sheet.find_child("Details", true, false)).is_null()
 
 # ---------------------------------------------------------------- the strip and the firing
 
@@ -189,13 +191,15 @@ func test_cook_all_sends_closes_the_sheet_and_fires_the_pots_one_after_another()
 		{"kind": "item", "id": "crop_radish", "delta": -1},
 		{"kind": "pot", "id": 8, "dish": "dish_radish_salad", "rarity": 1, "ms": 5000, "stove": 1},
 		{"kind": "item", "id": "crop_radish", "delta": -1},
+		{"kind": "item", "id": "rock_salt", "delta": -1, "from": "storage"},   # the Spice Rack's part is taken too
 		{"kind": "pot", "id": 9, "dish": "dish_radish_salad", "rarity": 1, "ms": 5000, "stove": 0, "queued": true}])
 	for i in 3: await get_tree().process_frame
 	assert_bool(k.cook_all_pending).is_false()
 	assert_str(k.phase).is_equal("compose")   # no watch, no card: the Cookbook stays
 	assert_bool(rt.ui.has_modal()).is_true()
 	var lines: Array = rt.ui.root.find_children("*", "UiFloatText", true, false).slice(floats_before).map(func(f): return (f as UiFloatText).text)
-	assert_array(lines).is_equal(["−1 Pond Crucian · −2 Radish"])   # one item group, what the pots took
+	# one item group, what the pots took — the rack's Rock Salt too — two a line (q(124) ①)
+	assert_array(lines).contains_exactly_in_any_order(["−1 Pond Crucian · −2 Radish", "−1 Rock Salt"])
 	assert_bool(k.stage.is_cooking()).is_true()   # stove 1 (the working stove) caught at once
 	await get_tree().create_timer(P0Kitchen.COOK_ALL_FIRE_S + 0.05).timeout   # stove 2 a beat later
 	rt.ui.close_modal()
@@ -235,3 +239,27 @@ func test_a_single_cooks_ingredients_say_nothing_and_do_not_reach_the_result_car
 	var k: P0Kitchen = r.get("kitchen")
 	assert_bool(k.on_event({"kind": "item", "id": "crop_radish", "delta": -1})).is_false()
 	assert_array(k.get("_events")).is_empty()
+
+func test_the_drawer_heading_leaves_out_the_queue_and_drops_the_level_before_cutting_the_state() -> void:
+	# 不知火舞 on #289: after Cook All the Cookbook stays on a stove that cooks with a pot queued behind it. The heading
+	# reads `Stove 1/3 › · Cooking Lv8 · Cooking 0:12` (no `· Queued 1`), never cut short, never wider than the screen;
+	# with the row still too long `Cooking Lv8` steps aside and the state stays.
+	var v := _view()
+	v.cooking.stoves = [{"id": 7, "dish": "dish_grilled_crucian", "ms": 15000, "elapsed": 3000, "ready_in": 12000, "heats": [],
+		"queued": {"id": 9, "dish": "dish_radish_salad", "rarity": 1, "ms": 5000}}, {}, {}]
+	_set_view(v)
+	var r := await _farmhouse()
+	var k: P0Kitchen = r.get("kitchen")
+	k.open("cookbook")
+	await get_tree().process_frame
+	var state: Label = k.drawer.get("_state")
+	var level: Label = k.drawer.get("_level")
+	assert_str(state.text).is_equal("Cooking 0:12")
+	assert_bool(level.visible).is_true()
+	assert_float(k.drawer.size.x).is_less_equal(rt.ui.root.size.x)
+	assert_int(state.text_overrun_behavior).is_equal(TextServer.OVERRUN_NO_TRIMMING)
+	state.text = "Cooking 59:59 " + "x".repeat(400)   # a state that leaves no room for the level, whatever the window
+	k.drawer.call("_fit_heading")
+	assert_bool(level.visible).is_false()
+	rt.ui.close_modal()
+	await get_tree().process_frame

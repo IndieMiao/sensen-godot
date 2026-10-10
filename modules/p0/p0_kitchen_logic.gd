@@ -105,14 +105,16 @@ static func slots(view: Dictionary) -> int: return int(cooking(view).get("slots"
 static func level(view: Dictionary) -> int: return int(view.get("skills", {}).get("cooking", {}).get("level", 1))
 
 # ---------------------------------------------------------------- drawer header (q(31): stove · level · state)
+## The drawer's heading leaves out `· Queued 1` (不知火舞 on #289: the stove's strip and sign say it; the heading never
+## cuts its state short, and drops `Cooking LvN` before the state when the row is still too long).
 static func header(view: Dictionary, i := 0) -> Dictionary:
-	return {stove = stove_label(view, i), level = "Cooking Lv%d" % level(view), state = stove_state(view, i)}
+	return {stove = stove_label(view, i), level = "Cooking Lv%d" % level(view), state = stove_state(view, i, false)}
 
-static func stove_state(view: Dictionary, i := 0) -> String:
+static func stove_state(view: Dictionary, i := 0, with_queue := true) -> String:
 	var st = stove(view, i)
 	if st == null: return "Empty"
 	var left := float(st.get("ready_in", 0))
-	var queued := " · Queued 1" if queued(view, i) != null else ""   # S5 Queue ×2 (Lv5)
+	var queued := " · Queued 1" if with_queue and queued(view, i) != null else ""   # S5 Queue ×2 (Lv5)
 	return ("Ready" if left <= 0.0 else "Cooking " + P0Logic.duration(left)) + queued
 
 # ---------------------------------------------------------------- Queue ×2 (Cooking Lv5, q(71))

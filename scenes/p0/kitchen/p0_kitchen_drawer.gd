@@ -143,6 +143,7 @@ func refresh() -> void:
 		_stove_pill.custom_minimum_size.y = _PILL_H if several else 0.0
 	_level.text = h.level
 	_state.text = h.state
+	_fit_heading()
 	var count: Label = _modes.tabs()[0].find_child("Count", true, false)
 	if count: count.text = P0KitchenLogic.cookbook_count(view)
 	_refresh_cookbook()
@@ -183,10 +184,10 @@ func _heading() -> Control:
 	for l in [_stove, _level, _state]:
 		(l as Label).vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		if l != _stove: row.add_child(l)
-	# The state takes what is left before ×: a long one (`Cooking 0:42 · Queued 1` beside `Stove 1/3 ›`, the Cookbook
-	# left open on a stove Cook All lit) is cut there, never widening the drawer past the screen.
-	_state.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_state.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	var spacer := Control.new()
+	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(spacer)
+	row.resized.connect(_fit_heading)
 	var close := UiCloseButton.new()
 	close.pressed.connect(func(): close_requested.emit())
 	row.add_child(close)
@@ -196,6 +197,18 @@ func _heading() -> Control:
 	wrap.add_theme_constant_override(&"margin_bottom", -int(_CLOSE_OVERHANG))
 	wrap.add_child(row)
 	return wrap
+
+## The heading never widens the drawer nor cuts its state: with `Stove 1/3 ›` and a long state (the Cookbook left open
+## on a stove Cook All lit) `Cooking LvN` steps aside, the state stays (不知火舞 on #289).
+func _fit_heading() -> void:
+	if _state == null or _stove_pill == null: return
+	var row := _state.get_parent() as Control
+	if row.size.x <= 0.0: return   # not laid out yet: the row's first resize fits it
+	var w := row.size.x
+	var sep := float(row.get_theme_constant(&"separation"))
+	var need := _stove_pill.get_combined_minimum_size().x + _level.get_minimum_size().x + _state.get_minimum_size().x \
+		+ UiTokens.SIZE_CLOSE + sep * 3.0
+	_level.visible = need <= w
 
 # ---------------------------------------------------------------- Cookbook
 func _build_cookbook() -> VBoxContainer:

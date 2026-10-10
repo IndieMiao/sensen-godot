@@ -1102,12 +1102,12 @@ func _make_float(text: String, tone: int, icon: Texture2D) -> UiFloatText:
 ## is pushed down until its top line, at the top of its rise, still clears the HUD rows by FLOAT_HUD_GAP. `top_index`
 ## = that line's stack index (the group's lines minus one).
 const FLOAT_HUD_GAP := 8.0
-func _float_start(screen: Vector2, lines: Array, top_index: int) -> Vector2:
+func _float_start(screen: Vector2, lines: Array, top_index: int, top_rise := -1.0) -> Vector2:
 	var hud_bottom := _marker_area().position.y + _kit.global_position.y - root.global_position.y
 	var h := 0.0
 	for f in lines: h = maxf(h, (f as UiFloatText).shown_size().y)
 	var lowest := hud_bottom + FLOAT_HUD_GAP + h + UiFloatText._RISE \
-		+ UiFloatText._STACK_RISE * clampi(top_index, 0, UiFloatText._STACK_MAX - 1)
+		+ (UiFloatText._STACK_RISE * clampi(top_index, 0, UiFloatText._STACK_MAX - 1) if top_rise < 0.0 else top_rise)
 	# …and never past the screen's sides: a wide line from near an edge (a trap's three fish by the bank, SGODOT-289)
 	# moves in until it is SPACE_PAGE clear of both (each line's own bounds also keep its pop inside them).
 	var half := 0.0
@@ -1143,6 +1143,9 @@ const FLOAT_MAX_LINES := 3
 ## a line's end, within FLOAT_MAX_LINES). Cook All's costs and a row's crops read the same way.
 const FLOAT_SPLIT_KINDS := ["item"]
 const FLOAT_ITEMS_PER_LINE := 2
+## The lines one item group splits into pop together as one block, each its own height and this far apart, so they
+## never meet, rising or at rest (不知火舞 on #289: Cook All's `−5 Pond Crucian · −2 Wild Herb` / `−2 Radish`).
+const FLOAT_GROUP_GAP := 4.0
 ## A line of a kind still up — before its fade starts (UiFloatText 650 ms) — takes the next reply's amount in place;
 ## while the action key is held (a held harvest, a labour beat apart) for as long as the line is still there.
 const _FLOAT_MERGE_MS := 650
@@ -1176,7 +1179,7 @@ func float_lines(parts: Array, at: Vector2) -> Array:
 		for j in range(0, keys.size(), FLOAT_ITEMS_PER_LINE):
 			var pair := {}
 			for key in keys.slice(j, j + FLOAT_ITEMS_PER_LINE): pair[key] = all[key]
-			pairs.append({kind = k, parts = pair})
+			pairs.append({kind = k, parts = pair, group = k})
 		pairs.reverse()   # the first pair reads on top
 		rows.append_array(pairs)
 	var shown: Array = []
@@ -1204,11 +1207,25 @@ func float_lines(parts: Array, at: Vector2) -> Array:
 		# Energy is coloured by what it adds up to; a line of text parts only (a floor fee) keeps its own tone.
 		if k == "energy" and merged.values().any(func(p): return p.has("fmt")):
 			tone = UiFloatText.Tone.ENERGY_COST if _float_sum(merged) < 0 else UiFloatText.Tone.ENERGY_GAIN
-		fresh.append({kind = k, text = text, tone = tone, icon = first.get("icon", null), merged = merged, overflow = not extra.is_empty()})
+		fresh.append({kind = k, text = text, tone = tone, icon = first.get("icon", null), merged = merged, overflow = not extra.is_empty(),
+			group = str(rows[i].get("group", ""))})
 	if fresh.is_empty(): return shown
 	var base := shown.size()   # lines bumped in place keep the lower places
 	var nodes: Array = fresh.map(func(l): return _make_float(l.text, l.tone, l.icon))
-	var start := _float_start(at, nodes, base + nodes.size() - 1)
+	# Each line's place: 28 above the one below (q(49)), but a split item group's lines stack by their own height and
+	# FLOAT_GROUP_GAP and start together, growing from the group's lowest line (not one 60 ms after the other).
+	var places: Array = []   # [rise of the line's group base, the line above that base, its start slot]
+	var rise := UiFloatText._STACK_RISE * base
+	var slot := base
+	var group_base := rise
+	for j in nodes.size():
+		var joins: bool = j > 0 and str(fresh[j].group) != "" and str(fresh[j].group) == str(fresh[j - 1].group)
+		if j > 0:
+			rise += (float((nodes[j - 1] as UiFloatText).shown_size().y) + FLOAT_GROUP_GAP) if joins else UiFloatText._STACK_RISE
+			if not joins: slot += 1
+		if not joins: group_base = rise
+		places.append([group_base, rise - group_base, slot])
+	var start := _float_start(at, nodes, base + nodes.size() - 1, rise)
 	var half_w := 0.0
 	for n in nodes: half_w = maxf(half_w, (n as UiFloatText).shown_size().x * 0.5)
 	if nodes.size() > 1 and start.y > at.y and start.y > _float_floor(at.x, half_w):
@@ -1223,7 +1240,13 @@ func float_lines(parts: Array, at: Vector2) -> Array:
 		start = _float_start(at, nodes, base)
 	for j in nodes.size():
 		var f: UiFloatText = nodes[j]
-		f.play(start, base + j)
+		if places.size() == nodes.size():
+			f.group_rise = float(places[j][1])
+			if f.group_rise > 0.0:   # rests on the line below as that one's font settles
+				f.rest_gap = FLOAT_GROUP_GAP
+				f.rests_on = nodes[j - 1]
+			f.play(start, int(places[j][2]), float(places[j][0]))
+		else: f.play(start, base + j)   # pushed down under the HUD: the group joined into one line
 		var l: Dictionary = fresh[j]
 		if not l.overflow: _live_floats[l.kind] = {node = f, parts = (l.merged as Dictionary).duplicate(true), at = at, ms = now}
 		shown.append(f)
