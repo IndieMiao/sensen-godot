@@ -367,3 +367,15 @@ func test_a_fall_waits_for_a_swing_in_flight_and_loses_to_run_complete() -> void
 	var src := FileAccess.get_file_as_string("res://scenes/p0/p0_mine.gd")   # no new swing while a fall waits
 	var at := src.find("func _swing()")
 	assert_str(src.substr(at, 120)).contains("_ko_waiting")
+
+## The Old Tree (§13.3.6, 刘邦 / 不知火舞 on 288): a farm gathering spot at (2, 10) — off the beds (x 4–18, rows 3–11),
+## in the spots' left column, blocked for walking and for décor, three rows from the Clay Bank (their strips never meet).
+func test_the_old_tree_stands_in_the_left_column_off_the_beds() -> void:
+	assert_bool(P0FarmMaterials.SPOTS.has("spot_old_tree")).is_true()
+	var cell: Vector2i = P0Garden.ANCHORS["spot_old_tree"]
+	assert_that(cell).is_equal(Vector2i(2, 10))
+	assert_that(P0Garden.FOOTPRINTS["spot_old_tree"]).is_equal(Rect2i(2, 10, 1, 1))
+	assert_bool(cell.x < 4).is_true()   # left of the beds
+	assert_int(absi(cell.y - (P0Garden.ANCHORS["spot_clay_bank"] as Vector2i).y)).is_greater_equal(3)
+	var yard: Dictionary = P0Logic.content().get("decor", {}).get("yard", {})
+	assert_bool((yard.get("blocked", []) as Array).any(func(r): return Rect2i(int(r[0]), int(r[1]), int(r[2]), int(r[3])).has_point(cell))).is_true()

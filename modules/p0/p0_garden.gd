@@ -29,6 +29,10 @@ const ANCHORS := {
 	# to the front right corner, clear of the beds and of the way to the workbench (不知火舞 checks the places).
 	"spot_grove": Vector2i(16, 1), "spot_rock_pile": Vector2i(18, 13), "spot_reed_bank": Vector2i(2, 4),
 	"spot_clay_bank": Vector2i(2, 7), "spot_herb_patch": Vector2i(3, 17), "workbench": Vector2i(17, 16),
+	# P1 (SGODOT-288, §13.3.6): the Old Tree (Hardwood, Homestead Lv3) on the left edge between the Clay Bank and the
+	# mine mouth, in the gathering spots' column, off the beds (x 4–18) and the ways to the mine and the workbench
+	# (刘邦 on 288; 不知火舞 checks the place)
+	"spot_old_tree": Vector2i(2, 10),
 }
 ## Solid footprints beyond the plots (inclusive rects: x, y, w, h).
 const FOOTPRINTS := {
@@ -36,6 +40,7 @@ const FOOTPRINTS := {
 	"well": Rect2i(15, 13, 1, 1), "mine": Rect2i(1, 13, 2, 2), "bench": Rect2i(5, 16, 2, 1),
 	"spot_grove": Rect2i(16, 1, 1, 1), "spot_rock_pile": Rect2i(18, 13, 1, 1), "spot_reed_bank": Rect2i(2, 4, 1, 1),
 	"spot_clay_bank": Rect2i(2, 7, 1, 1), "spot_herb_patch": Rect2i(3, 17, 1, 1), "workbench": Rect2i(16, 16, 3, 1),
+	"spot_old_tree": Rect2i(2, 10, 1, 1),
 }
 ## Scenery trees stand outside the walkable yard, so they are not footprints.
 const WALK_RECT := Rect2i(1, 0, 19, 20)

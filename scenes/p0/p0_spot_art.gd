@@ -30,6 +30,7 @@ static func build(spot: String, at: Vector3) -> Node3D:
 		"spot_herb_patch": _herb_patch(root)
 		"spot_reed_bank": _reed_bank(root)
 		"spot_clay_bank": _clay_bank(root)
+		"spot_old_tree": _old_tree(root)
 		"workbench": _workbench(root)
 	return root
 
@@ -48,6 +49,16 @@ static func _grove(root: Node3D) -> void:
 		var t := Art.instance(str(p[1]), p[0], float(p[2]))
 		t.rotation.y = float(p[0].x) * 2.1
 		root.add_child(t)
+
+## The Old Tree (P1, SGODOT-288): one of the farm's round trees (tree_0, unused elsewhere on the farm), larger and
+## leaning a little, its trunk on the spot's cell; the canopy stays left of the beds (x 4, 不知火舞 checks). P0 reuses
+## the old art (q(44)); its own model is 上官婉儿's call.
+const OLD_TREE_SCALE := 1.05
+
+static func _old_tree(root: Node3D) -> void:
+	var t := Art.instance("tree_0", Vector3(-0.1, 0, 0), OLD_TREE_SCALE)
+	t.rotation = Vector3(0, 0.6, deg_to_rad(3.0))
+	root.add_child(t)
 
 static func _rock_pile(root: Node3D) -> void:
 	for p in [[Vector3(0, 0, 0), 1.55, 0.0], [Vector3(0.38, 0, 0.22), 1.2, 1.7], [Vector3(-0.32, 0, 0.18), 1.05, 3.1],
