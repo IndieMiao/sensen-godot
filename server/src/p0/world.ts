@@ -10,7 +10,8 @@
  *
  * Numbers come from content.world (assets/p0/content/world_gen.json: 李白's tiers, placement, word and name pools).
  * There is no built-up-area, coastline or water data offline yet: the tier is the population tier raised by a hand
- * list (world.area_tier), city traits come from world.coastal, and places are laid out by geometry alone.
+ * list (world.area_tier), city traits come from world.coastal, and places are laid out by geometry alone, with the
+ * pins seen in the water moved to land by hand (world.overrides, q(114) ⑤).
  */
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
@@ -54,11 +55,16 @@ export interface WorldContent {
   ponds: { base: number; per_pop: number; max: number; ring_km: [number, number]; words: string[]; suffix: Record<Site, string>; templates: string[] };
   area_tier: Record<string, Tier>;
   coastal: Record<string, string[]>;
+  /** q(114) ⑤: hand fixes by place id (`_note` aside), see applyOverrides. */
+  overrides?: Record<string, PlaceFix | string>;
   room: Record<Role | 'cabin', { art: string; anchors: string; category: string }>;
   keeper_roles: Record<Role, string>;
   keeper_looks?: Record<string, Record<string, string>>;
   residents?: ResidentRules;
 }
+
+/** A hand fix to one generated place: a point on land for a pin that fell in the water, a rename before the freeze. */
+export interface PlaceFix { lat?: number; lng?: number; name?: string; why?: string }
 
 interface ResidentRule { id: string; needs?: string[]; tier_min?: Tier; pop_max?: number; at?: string }
 interface ResidentRules { per_outpost: number; rank: ResidentRule[]; fixed: Record<string, string>; s_order: ResidentRule[] }
@@ -367,6 +373,36 @@ export function placeResidents(w: WorldContent, cl: CityCluster, tier: Tier, pon
   }
 }
 
+/**
+ * q(114) ⑤: world.overrides laid over a generated city last, so a fix moves or renames that one place and nothing
+ * else in the city (counts, names, keepers and residents were all chosen from the generated points). There is no water
+ * data offline: a pin seen standing in the sea or a lake on the acceptance cities is given a point on land by hand,
+ * and the table is re-checked as a whole once water data arrives. A renamed pond keeps its tackle shop pointing at it.
+ */
+export function applyOverrides(w: WorldContent, ponds: GenPond[], outposts: GenOutpost[]): void {
+  const fixes = w.overrides;
+  if (!fixes) return;
+  const fixOf = (id: string) => { const f = fixes[id]; return f && typeof f === 'object' ? f : null; };
+  const move = (p: { lat: number; lng: number }, f: PlaceFix) => {
+    if (Number.isFinite(f.lat) && Number.isFinite(f.lng)) { p.lat = f.lat!; p.lng = f.lng!; }
+  };
+  for (const p of ponds) {
+    const f = fixOf(p.id);
+    if (!f) continue;
+    move(p, f);
+    if (f.name && f.name !== p.name) {
+      for (const o of outposts) if (o.nearest?.name === p.name) o.nearest = { ...o.nearest, name: f.name };
+      p.name = f.name;
+    }
+  }
+  for (const o of outposts) {
+    const f = fixOf(o.id);
+    if (!f) continue;
+    move(o, f);
+    if (f.name) o.name = f.name;
+  }
+}
+
 export function generateCity(c: P0Content, cl: CityCluster): CityPlaces {
   const w = worldOf(c);
   if (!w) throw new Error('p0 world: no world block in the content (assets/p0/content/world_gen.json)');
@@ -375,6 +411,7 @@ export function generateCity(c: P0Content, cl: CityCluster): CityPlaces {
   const outposts = genOutposts(w, cl, tier, ponds);
   nameKeepers(w, cl, outposts);
   placeResidents(w, cl, tier, ponds, outposts, new Set(Object.keys((c as P0Content & { residents?: Record<string, unknown> }).residents ?? {})));
+  applyOverrides(w, ponds, outposts);
   return {
     cluster: cl.id, tier, climate: cl.climate,
     ponds: ponds.map(p => p.id), outposts: outposts.map(o => o.id),

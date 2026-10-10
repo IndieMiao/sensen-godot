@@ -7,7 +7,8 @@ import { loadP0Content, type P0Content } from '../../src/p0/content.js';
 import { applyP0, type P0Command } from '../../src/p0/reducer.js';
 import { freshState } from '../../src/p0/state.js';
 import { clusterOf } from '../../src/p0/travel.js';
-import { cityPlaces, clusterPopulation, generateCity, km, placeOf, pondCount, tierOf, type WorldContent } from '../../src/p0/world.js';
+import { applyOverrides, cityPlaces, clusterPopulation, generateCity, km, placeOf, pondCount, tierOf,
+  type CityPlaces, type PlaceFix, type WorldContent } from '../../src/p0/world.js';
 
 const c: P0Content = loadP0Content();
 const w = (c as P0Content & { world: WorldContent }).world;
@@ -197,6 +198,37 @@ describe('global generation (SGODOT-280)', () => {
     for (const id of [TOKYO, SHANGHAI, 'gn-463835']) {
       for (const o of cityPlaces(c, id)!.detail.outposts) expect(looks[o.keeper.look]).toBeDefined();
     }
+  });
+
+  it('lays world.overrides over the generated city and moves nothing else (q(114) ⑤): LA\'s Clover Tackle Shop off Hollenbeck Lake', () => {
+    const fixes = Object.entries(w.overrides ?? {}).filter(([k]) => !k.startsWith('_')) as [string, PlaceFix][];
+    expect(fixes.length).toBeGreaterThan(0);
+    const fixed = new Set(fixes.map(([id]) => id));
+    const all = (x: CityPlaces) => [...x.detail.ponds, ...x.detail.outposts];
+    const saved = w.overrides;
+    for (const [id, fix] of fixes) {
+      const cluster = id.slice(0, id.indexOf('~'));
+      let bare: CityPlaces;
+      w.overrides = undefined;
+      try { bare = generateCity(c, clusters.get(cluster)!); } finally { w.overrides = saved; }
+      const city = cityPlaces(c, cluster)!;
+      const was = all(bare).find(p => p.id === id), now = all(city).find(p => p.id === id);
+      expect(was, `${id} is a place the generator makes`).toBeDefined();
+      if (fix.lat !== undefined) expect(now).toMatchObject({ lat: fix.lat, lng: fix.lng });
+      expect(km(was!, now!)).toBeLessThanOrEqual(1);   // a nudge to the shore, not across town (nor a swapped lat / lng)
+      const tackle = city.detail.outposts.find(o => o.id === id && o.role === 'tackle');
+      if (tackle) expect(km(tackle, city.detail.ponds.find(p => p.name === tackle.nearest!.name)!) * 1000).toBeLessThanOrEqual(300);
+      expect(all(city).filter(p => !fixed.has(p.id))).toEqual(all(bare).filter(p => !fixed.has(p.id)));
+    }
+    expect(cityPlaces(c, LA)!.detail.outposts.find(o => o.id === `${LA}~tackle2`))
+      .toMatchObject({ name: 'Clover Tackle Shop', lat: 34.040844, lng: -118.219243, nearest: { name: 'Clover Cove' } });
+    // A renamed pond (before the freeze) keeps its tackle shop pointing at it; a point without both lat and lng is ignored.
+    const tokyo = structuredClone(generateCity(c, clusters.get(TOKYO)!).detail);
+    const [pond, shop] = [tokyo.ponds[0], tokyo.outposts.find(o => o.id === `${TOKYO}~tackle0`)!];
+    const at = { lat: pond.lat, lng: pond.lng };
+    applyOverrides({ ...w, overrides: { [pond.id]: { name: 'Koi Pond', lat: 1 } } }, tokyo.ponds, tokyo.outposts);
+    expect(pond).toMatchObject({ name: 'Koi Pond', ...at });
+    expect(shop.nearest?.name).toBe('Koi Pond');
   });
 
   it('a player with a pass to Tokyo casts in its generated beginner pond', () => {

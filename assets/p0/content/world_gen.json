@@ -334,6 +334,14 @@
     "coast"
    ]
   },
+  "overrides": {
+   "_note": "q(114) ⑤: hand fixes by place id, laid over the generated city after everything else is placed, so nothing else in the city moves. A pin that landed in the sea or a lake gets a point on land at least 50 m from the water (a tackle shop within 300 m of its pond); before the freeze the same table takes a hand rename (`name`). `why`: what was wrong, who saw it, and the checks on the new point. Re-check the whole table once there is water data.",
+   "gn-5368361~tackle2": {
+    "lat": 34.040844,
+    "lng": -118.219243,
+    "why": "Los Angeles · Clover Tackle Shop stood on Hollenbeck Lake (34.040526, -118.21805; 司空震's six-city check on farm-dev 303ce619, 2026-10-10). Moved 116 m west to the houses across the Golden State Fwy between it and S Boyle Ave: 111 m from the lake (OSM relation 3244050), 94 m from Clover Cove, 40 m from the freeway."
+   }
+  },
   "room": {
    "_note": "Placeholder rooms until the five outpost layouts are designed (SGODOT-275 item 7): each role uses the P0 room of its kind; the S-tier trading post uses the tea house's.",
    "tea": {
