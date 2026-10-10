@@ -214,6 +214,18 @@ describe('Far Pond (q(128))', () => {
     expect(more).toEqual([]);
   });
 
+  it('a kind new to it brings its fish from home in at once, and says so (周瑜 on #285)', () => {
+    const c = only('req_sys_explore_pond');
+    const s = fresh(c);
+    req(s).status = 'accepted';
+    const qty = req(s).qty;
+    s.bag.push({ id: 'fish_crucian', qty: qty });   // caught at home before
+    s.bag.push({ id: 'fish_crucian', qty: 1 });     // and one landed in Tokyo
+    const ev: P0Event[] = [];
+    noteCatchAbroad(c, s, 'fish_crucian', `${TOKYO}~pond0`, ev);
+    expect(ev).toEqual([{ kind: 'request_progress', id: req(s).id, have: qty, qty }]);   // 0 → full: the toast
+  });
+
   it('no pin on a home pond for it (any pond elsewhere)', () => {
     const c = only('req_sys_explore_pond');
     const s = fresh(c);

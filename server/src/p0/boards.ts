@@ -261,9 +261,13 @@ export function noteCatchAbroad(c: P0Content, s: P0State, fish: string, place: s
     const r = sl.req;
     if (r?.where !== 'other_city' || r.status !== 'accepted') continue;
     r.abroad ??= [];
-    if (!r.abroad.includes(fish)) r.abroad.push(fish);
+    // what it held before this catch: a kind new to it brought its fish from home in too (周瑜 on #285), so count it
+    // without the kind; a kind it had already, without these n
+    const known = r.abroad.includes(fish);
+    const before = haveForRequest(c, s, r) - (known ? n : 0);
+    if (!known) r.abroad.push(fish);
     const have = haveForRequest(c, s, r);
-    if (have - n < r.qty) events.push({ kind: 'request_progress', id: r.id, have: Math.min(have, r.qty), qty: r.qty });
+    if (before < r.qty) events.push({ kind: 'request_progress', id: r.id, have: Math.min(have, r.qty), qty: r.qty });
   }
 }
 
