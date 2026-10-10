@@ -23,6 +23,7 @@ import { dayKey, maxEnergy, scaledXp, settleEnergy, skillLevel, xpPercent } from
 import { buyback, buyItem, drink, moveStorage, offerOf, sellItem, setLock } from './shops.js';
 import { emptyDay, type P0State, type Plot } from './state.js';
 import { noteDelivery, noteEntered, requirePass, returnHome, settleExplorer, settleHere, travel } from './travel.js';
+import { noteProgress, takenCounts } from './request_progress.js';
 
 export type { P0Event } from './progress.js';
 
@@ -88,6 +89,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
   }
   const s = structuredClone(input);
   const events: P0Event[] = [];
+  const counted = takenCounts(c, s);   // q(134): what each taken request counted before this command, settles included
   settleEnergy(c, s, now);
   rollDay(c, s, now);
   settleCards(c, s);   // today's recipe cards are fixed on the first command of the day
@@ -415,6 +417,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
     }
   }
   settleStove(c, s, now, events);   // a pot queued behind a done one, room just made, or heat taps just in
+  noteProgress(c, s, counted, events);   // q(134): `Fresh Greens 3/5`, the one that fills it `done`
   s.seq += 1;
   return { ok: true, state: s, events };
 }
