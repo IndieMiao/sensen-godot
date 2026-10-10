@@ -169,6 +169,7 @@ export interface P0State {
   gather: { ready_at: Record<string, number>; last_at: number };   // §13.2: when each spot can be gathered again; last tap (tempo)
   mine: MineState;
   storage_auto: { at: number; items: [string, number][] } | null;   // last auto-store on coming home (q(40)), floated once by the client
+  decor?: { placed: import('./decor.js').PlacedDecor[]; count: number };   // P1 Decorate (SGODOT-284): the yard's pieces and the uid counter
   travel: TravelState;           // home / current city, visited cities, stamps, Day Pass (v5, SGODOT-275)
   seen?: string[];   // map markers' ◆ already looked at: item:<id> / talk:<resident> (SGODOT-232, q(48))
   facilities?: Facility[];       // P1 (SGODOT-239): facilities on plots

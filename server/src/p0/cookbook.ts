@@ -8,6 +8,8 @@ import { chefSignGold } from './homestead.js';
 import { ingredientStock } from './kitchen_storage.js';
 import { blessed, skillLevel, xpPercent } from './rules.js';
 import type { P0Event } from './progress.js';
+import { isDecor } from './decor.js';
+import { putInStorage } from './storage.js';
 import type { P0State } from './state.js';
 
 export type PageState = 'hidden' | 'clued' | 'tasted' | 'discovered' | 'mastered';
@@ -35,6 +37,7 @@ export function noteMilestones(c: P0Content, s: P0State, events: P0Event[]): voi
     if (!((m.discovered !== undefined && discovered >= m.discovered) || (m.mastered !== undefined && mastered >= m.mastered))) continue;
     s.firsts.push(key);
     if (m.coins) { s.coins += m.coins; events.push({ kind: 'coins', delta: m.coins }); }
+    if (m.decor && isDecor(c, m.decor)) putInStorage(s, m.decor, 1);   // the yard piece it gives goes to Farm Storage (q(29), Decorate)
     events.push({ kind: 'milestone', id: m.id, title: m.title, coins: m.coins ?? 0, cabinet: m.cabinet ?? 0, decor: m.decor ?? null });
   }
 }

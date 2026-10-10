@@ -12,6 +12,7 @@ import { maxEnergy, skillLevel, untilRollover } from './rules.js';
 import type { P0State } from './state.js';
 import { missing, putInStorage, stored, takeStorageFirst } from './storage.js';
 import type { Refusal } from './fishing.js';
+import { decorOf, isDecor } from './decor.js';
 
 /** The counter a command talks to; older clients send 'stall' or nothing for the Homestead Stall. */
 export function shopOf(raw: unknown): ShopId | null {
@@ -21,7 +22,9 @@ export function shopOf(raw: unknown): ShopId | null {
 
 /** Everything a counter sells. */
 export function catalog(c: P0Content, shop: ShopId): string[] {
-  if (shop === 'homestead') return [...c.stall.buy, ...c.bag_upgrades.map(u => u.id)];
+  // The Decor page (§9.11.6): the pieces sold at the stall, after the goods and the bag upgrades.
+  if (shop === 'homestead') return [...c.stall.buy, ...c.bag_upgrades.map(u => u.id),
+    ...Object.entries(decorOf(c)?.items ?? {}).filter(([, d]) => d.buy).map(([id]) => id)];
   if (shop === 'tackle') return c.tackle.buy;
   if (shop === 'market') return [...c.market.buy, ...c.market.specialty];
   return [];
@@ -31,6 +34,7 @@ export interface Offer {
   price: number; skill: Skill | null; gate: number; daily: number;
   to: 'bag' | 'gear' | 'storage' | 'bag_cap'; once: boolean; floor: boolean;
   homestead?: number; materials?: [string, number][]; capacity?: number; requires?: string;
+  pieces?: number;   // decor: pieces into storage per purchase (Stone Path 5, Fence Set 6)
 }
 
 export function offerOf(c: P0Content, id: string): Offer | null {
@@ -44,6 +48,9 @@ export function offerOf(c: P0Content, id: string): Offer | null {
   if (g) return { price: g.price, skill: g.skill, gate: g.gate, daily: g.daily, to: 'bag', once: false, floor: true };
   const up = c.bag_upgrades.find(u => u.id === id);
   if (up) return { price: up.price, skill: null, gate: 0, daily: 0, to: 'bag_cap', once: true, floor: true, homestead: up.homestead, materials: up.materials, capacity: up.capacity, requires: up.requires };
+  // §9.11.1: decor 1 a day each, straight into Farm Storage (q(29)), from its Homestead level; never sold back.
+  const deco = decorOf(c)?.items[id];
+  if (deco) return { price: deco.price, skill: null, gate: 0, daily: 1, to: 'storage', once: false, floor: true, homestead: deco.homestead, pieces: deco.pieces };
   const sp = c.specialty[id];
   if (sp) return { price: sp.price, skill: null, gate: 0, daily: 0, to: 'storage', once: true, floor: true };
   return null;
@@ -85,12 +92,12 @@ export function buyItem(c: P0Content, s: P0State, cmd: { item?: unknown; qty?: u
   for (const [item, n] of offer.materials ?? []) { takeStorageFirst(s, item, n); events.push({ kind: 'item', id: item, delta: -n }); }
   if (offer.daily) s.day.bought[id] = bought + qty;
   if (offer.to === 'bag') add(c, s, id, qty);
-  else if (offer.to === 'storage') putInStorage(s, id, qty);
+  else if (offer.to === 'storage') putInStorage(s, id, qty * (offer.pieces ?? 1));
   else if (offer.to === 'bag_cap') s.bag_cap = Math.max(s.bag_cap, offer.capacity!);
   else if (rodById(c, id)) { s.gear.rods.push(id); s.gear.rod = id; }   // a new rod / hoe is equipped right away
   else { s.gear.hoes.push(id); s.gear.hoe = id; }
   if (offer.once && offer.to !== 'gear') s.owned.push(id);
-  events.push({ kind: 'item', id, delta: qty });
+  events.push({ kind: 'item', id, delta: qty * (offer.pieces ?? 1) });
   return null;
 }
 
@@ -179,7 +186,8 @@ export function setLock(c: P0Content, s: P0State, cmd: { item?: unknown }, lock:
 
 /** What the player can Store at home (§10.4.8, q(40)): materials, seeds, fertilizer, bait, torches; never produce, fish or dishes. */
 export function storable(c: P0Content, id: string): boolean {
-  return ['seed', 'fert', 'bait', 'torch', 'material'].includes(itemKind(id)) && !c.drinks.items[id];
+  // Decor stays in Farm Storage (q(29)): it is placed from there, never taken to the bag.
+  return ['seed', 'fert', 'bait', 'torch', 'material'].includes(itemKind(id)) && !c.drinks.items[id] && !isDecor(c, id);
 }
 
 /** Bag → farm storage (Store) and back (Take). TODO(P1): at home only; the client offers both at home. */
