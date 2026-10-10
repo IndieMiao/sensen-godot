@@ -60,62 +60,67 @@ func card_pick(marks: Dictionary) -> String:
 		return mine
 	return n
 
-## 不知火舞 02ad95bc ①: stove buttons closer than 44 px (centre to centre) overlap, and an open strip covers the others.
-## Then they go in one row above the hearth, 1 / 2 / 3 left to right, 44 apart, centred on their middle; the open
-## strip keeps its stove's place in the row and the buttons on either side step out past it.
+## 不知火舞 02ad95bc ① / 6e798a27 ②: stove buttons closer than 44 px (centre to centre) overlap, and an open strip covers
+## the others. Folded, they go in one row above the hearth, 1 / 2 / 3 left to right, 44 apart, kept 44 from the Spice Rack
+## and Warming Cabinet buttons; with a strip open it stays at its own pot and the other stoves' buttons line up above it.
 const STOVE_ROW_GAP := 44.0
 func _marker_spots(spots: Dictionary) -> Dictionary:
 	var shown: Array = []
 	for i in STOVES.size(): if spots.has(STOVES[i]): shown.append(i)
 	if shown.size() < 2: return spots
+	var open := STOVES.find(_card) if stove_of(_card) >= 0 else -1
+	var strip := _strip_rect if open >= 0 and shown.has(open) else Rect2()
 	var crowded := false
 	for a in shown.size():
 		for b in range(a + 1, shown.size()):
 			if (spots[STOVES[shown[a]]] as Vector2).distance_to(spots[STOVES[shown[b]]]) < STOVE_ROW_GAP: crowded = true
+	for i in shown:   # an open strip over another stove's button
+		if i != open and strip.has_area() and strip.grow(STOVE_BUTTON * 0.5).has_point(spots[STOVES[i]]): crowded = true
 	if not crowded: return spots
-	var w := get_viewport().get_visible_rect().size.x
-	_row_spots = stove_row(spots, shown, STOVES.find(_card) if stove_of(_card) >= 0 else -1, _strip_rect, w, _strip_off)
-	return _row_spots
+	var avoid: Array = []
+	for n in [RACK, CABINET]: if spots.has(n): avoid.append(spots[n])
+	return stove_row(spots, shown, open, strip, get_viewport().get_visible_rect().size.x, avoid)
 
-var _strip_rect := Rect2()   # the open stove strip on screen last frame (the row's other buttons step out past it)
-var _strip_off := 0.0        # its stove's spot minus the strip's left edge (the strip moves with the row)
-var _row_spots := {}
+var _strip_rect := Rect2()   # the open stove strip on screen last frame (the other stoves line up above it)
 
-## The row (pure, tested): 1 / 2 / 3 left to right, 44 apart, centred on the stoves' mean x at their highest y. With
-## a strip open (its rect last frame, `anchor_off` = its stove's spot minus the strip's left edge) the row is one block —
-## the buttons before that stove, its strip, the buttons after — 4 px apart, centred the same way and kept on screen;
-## the open stove's spot moves with its strip, so no button sits under it.
+## The row (pure, tested). Folded: 1 / 2 / 3 left to right, 44 apart, centred on the stoves' mean x at their highest
+## y, kept on screen, then moved right as a whole until every button is 44 or more from each `avoid` spot (the Spice
+## Rack and Warming Cabinet buttons). With stove `open`'s strip showing (`strip`, its rect last frame): that stove keeps
+## its own spot, and the others, in order, are centred over the strip, 44 apart, 6 px above its top edge (before the
+## strip has a rect, its first frame, the open stove still keeps its spot and the rest take their folded places).
 const ROW_MARGIN := 22.0
-static func stove_row(spots: Dictionary, shown: Array, open: int, strip: Rect2, screen_w: float, anchor_off := 0.0) -> Dictionary:
+const ABOVE_STRIP := 6.0
+const STOVE_BUTTON := 28.0   # UiWorldIconButton's disc
+static func stove_row(spots: Dictionary, shown: Array, open: int, strip: Rect2, screen_w: float, avoid := []) -> Dictionary:
 	var out := spots.duplicate()
+	var row: Array = shown.filter(func(i): return i != open) if open >= 0 and strip.has_area() else shown.duplicate()
 	var cx := 0.0
-	var top := INF
-	for i in shown:
-		cx += (spots[STOVES[i]] as Vector2).x
-		top = minf(top, (spots[STOVES[i]] as Vector2).y)
-	cx /= float(shown.size())
-	var at := shown.find(open)
-	var xs: Array = []
-	if at < 0 or not strip.has_area():
-		for k in shown.size(): xs.append(cx + (float(k) - float(shown.size() - 1) * 0.5) * STOVE_ROW_GAP)
+	var y := INF
+	if row.size() < shown.size():
+		cx = strip.get_center().x
+		y = strip.position.y - ABOVE_STRIP - STOVE_BUTTON * 0.5
 	else:
-		var before := float(at) * STOVE_ROW_GAP
-		var after := float(shown.size() - 1 - at) * STOVE_ROW_GAP
-		var width := before + (4.0 if at > 0 else 0.0) + strip.size.x + (4.0 if after > 0.0 else 0.0) + after
-		var left := clampf(cx - width * 0.5, ROW_MARGIN - STOVE_ROW_GAP * 0.5, screen_w - ROW_MARGIN + STOVE_ROW_GAP * 0.5 - width)
-		var strip_x := left + before + (4.0 if at > 0 else 0.0)
-		for k in shown.size():
-			if k < at: xs.append(left + STOVE_ROW_GAP * (float(k) + 0.5))
-			elif k == at: xs.append(strip_x + anchor_off)
-			else: xs.append(strip_x + strip.size.x + 4.0 + STOVE_ROW_GAP * (float(k - at - 1) + 0.5))
-		for k in shown.size(): out[STOVES[shown[k]]] = Vector2(xs[k], top)
-		return out
-	var lo: float = xs.min()
-	var hi: float = xs.max()
+		for i in row:
+			cx += (spots[STOVES[i]] as Vector2).x
+			y = minf(y, (spots[STOVES[i]] as Vector2).y)
+		cx /= float(row.size())
+	var xs: Array = []
+	for k in row.size(): xs.append(cx + (float(k) - float(row.size() - 1) * 0.5) * STOVE_ROW_GAP)
 	var shift := 0.0
-	if lo < ROW_MARGIN: shift = ROW_MARGIN - lo
-	elif hi > screen_w - ROW_MARGIN: shift = screen_w - ROW_MARGIN - hi
-	for k in shown.size(): out[STOVES[shown[k]]] = Vector2(xs[k] + shift, top)
+	if xs.min() < ROW_MARGIN: shift = ROW_MARGIN - xs.min()
+	elif xs.max() > screen_w - ROW_MARGIN: shift = screen_w - ROW_MARGIN - xs.max()
+	if row.size() == shown.size():
+		for _pass in 8:   # right, as a whole, past whichever of the rack / cabinet a button is too close to
+			var more := 0.0
+			for x in xs:
+				for a in avoid:
+					var dy := absf(y - (a as Vector2).y)
+					if dy >= STOVE_ROW_GAP or Vector2(x + shift, y).distance_to(a) >= STOVE_ROW_GAP - 0.01: continue
+					more = maxf(more, (a as Vector2).x + sqrt(STOVE_ROW_GAP * STOVE_ROW_GAP - dy * dy) - (x + shift))
+			if more <= 0.0: break
+			shift += more
+	for k in row.size(): out[STOVES[row[k]]] = Vector2(xs[k] + shift, y)
+	if shown.has(open): out[STOVES[open]] = spots[STOVES[open]]   # the open strip never moves (its first frame too)
 	return out
 
 ## The hearth's box takes the tap for every stove on it (int6 C8): with several, the pot nearest the finger wins.
@@ -167,9 +172,12 @@ func _marker(n: String, v: Dictionary) -> Dictionary:
 			count = P0KitchenLogic.cabinet_count(v)}
 	var i := stove_of(n)
 	if i < 0: return super(n, v)
-	# i-pot (250 walkthrough). Up close the strip keeps the pot: the state is the far button's badge and the fact
-	# (Cooking 0:22 / the dish), as on the bench (不知火舞 on #104, 1760:103708). One per stove: `Stove 2/3 · Empty`
-	# (b84a5e01 ②), hung over its own pot.
+	return stove_marker(v, i)
+
+## One stove's world prompt (pure, tested): i-pot (250 walkthrough). Up close the strip keeps the pot: the state is the
+## far button's badge and the fact (Cooking 0:22 / the dish), as on the bench (不知火舞 on #104, 1760:103708); Ready
+## alone puts its badge in the strip too (02ad95bc ③). One per stove: `Stove 2/3 · Empty` (b84a5e01 ②), over its pot.
+static func stove_marker(v: Dictionary, i: int) -> Dictionary:
 	var stove := {kind = "facility", icon = P0Logic.icon("pot"), name = P0KitchenLogic.stove_label(v, i), strip_badge = false}
 	if P0KitchenLogic.queued(v, i) != null: stove.count = "+1"   # Queue ×2: a pot waits behind this one (q(71), 1760:103578)
 	var st = P0KitchenLogic.stove(v, i)
@@ -178,7 +186,7 @@ func _marker(n: String, v: Dictionary) -> Dictionary:
 	if left <= 0.0:   # the ready mark takes the icon's place; the strip names the dish
 		var dish = st.get("dish", null)
 		# Ready to collect: the strip shows the Ready StatusBadge (22) in the pot's place (LOCK-07 v2, 不知火舞 02ad95bc ③).
-		return stove.merged({fact = P0Logic.item_name(v, str(dish)) if dish != null else "Unknown dish", badge = "ready", strip_badge = true})
+		return stove.merged({fact = P0Logic.item_name(v, str(dish)) if dish != null else "Unknown dish", badge = "ready", strip_badge = true}, true)
 	return stove.merged({fact = "Cooking " + P0Logic.duration(left), badge = "countdown"})
 
 func _on_facility(n: String) -> void:
@@ -278,7 +286,6 @@ func _room_frame(v: Dictionary, _dt: float) -> void:
 		var bar = rt.ui._name_bars.get("room:" + _card)
 		if bar != null and (bar as Control).visible:
 			_strip_rect = (bar as UiWorldNameBar).full_rect()
-			_strip_off = (_row_spots.get(_card, _strip_rect.position) as Vector2).x - _strip_rect.position.x
 
 ## Several stoves (b84a5e01 ④): a second before a ring comes up on a stove the player is not working, that stove's
 ## prompt grows 1.15× and back and the phone buzzes once; with the camera pushed in on another pot an arrow with an
@@ -410,7 +417,7 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"uirects":   # world prompts, the pot card's tag and the edge button on screen (282 shots: check layout numerically)
 			var out := {}
 			for id in rt.ui._icons: if (rt.ui._icons[id] as Control).visible: out["icon " + str(id)] = [(rt.ui._icons[id] as Control).get_global_rect().get_center(), (rt.ui._icons[id] as UiWorldIconButton).status]
-			for id in rt.ui._name_bars: if (rt.ui._name_bars[id] as Control).visible: out["strip " + str(id)] = (rt.ui._name_bars[id] as Control).get_global_rect()
+			for id in rt.ui._name_bars: if (rt.ui._name_bars[id] as Control).visible: out["strip " + str(id)] = [(rt.ui._name_bars[id] as Control).get_global_rect(), (rt.ui._name_bars[id] as UiWorldNameBar).status]
 			var top := get_tree().root
 			for c in top.find_children("Tag", "Label", true, false): if (c as Control).is_visible_in_tree(): out["tag " + (c as Label).text] = (c as Control).get_global_rect()
 			for c in top.find_children("EdgeButton", "Panel", true, false): if (c as Control).is_visible_in_tree(): out["edge"] = (c as Control).get_global_rect()

@@ -156,24 +156,55 @@ func test_a_legendary_page_shows_the_buff_capsule_on_the_state_line() -> void:
 func test_crowded_stove_buttons_go_in_a_row() -> void:
 	var FH := preload("res://scenes/p0/rooms/p0_farmhouse.gd")
 	var spots := {"use_stove_1": Vector2(92, 309), "use_stove_2": Vector2(105, 317), "use_stove_3": Vector2(115, 300)}
-	var row: Dictionary = FH.stove_row(spots, [0, 1, 2], -1, Rect2(), 540.0)
+	var row: Dictionary = FH.stove_row(spots, [0, 1, 2], -1, Rect2(), 360.0)
 	assert_float(row.use_stove_1.y).is_equal(300.0)
 	assert_float(row.use_stove_2.x - row.use_stove_1.x).is_equal(44.0)
 	assert_float(row.use_stove_3.x - row.use_stove_2.x).is_equal(44.0)
 	assert_float((row.use_stove_1.x + row.use_stove_3.x) * 0.5).is_equal_approx((92.0 + 105.0 + 115.0) / 3.0, 0.01)
-	# stove 2's strip open to the right, 188 wide from its button
-	var strip := Rect2(row.use_stove_2.x - 19.0, 284, 188, 32)
-	var open: Dictionary = FH.stove_row(spots, [0, 1, 2], 1, strip, 540.0, 19.0)
-	var s2_left: float = open.use_stove_2.x - 19.0
-	assert_float(open.use_stove_1.x + 22.0).is_less_equal(s2_left)
-	assert_float(open.use_stove_3.x - 22.0).is_greater_equal(s2_left + 188.0)
-	# stove 3's strip (210 wide) near the left edge: the block moves right so 1 and 2 fit before it, none under it
-	var s3 := Rect2(12, 284, 210, 32)
-	var shifted: Dictionary = FH.stove_row(spots, [0, 1, 2], 2, s3, 540.0, 19.0)
-	assert_float(shifted.use_stove_1.x).is_greater_equal(22.0)
-	var strip_left: float = shifted.use_stove_3.x - 19.0
-	assert_float(shifted.use_stove_2.x + 22.0).is_less_equal(strip_left)
-	assert_float(strip_left + 210.0).is_less_equal(540.0 - 22.0 + 22.0)
+	# 6e798a27 ②: the row keeps 44 from the Spice Rack and Warming Cabinet buttons, moving right as a whole
+	var rack := Vector2(35.4, 323.9)
+	var cabinet := Vector2(47.4, 356.7)
+	var clear: Dictionary = FH.stove_row(spots, [0, 1, 2], -1, Rect2(), 360.0, [rack, cabinet])
+	for n in ["use_stove_1", "use_stove_2", "use_stove_3"]:
+		for a in [rack, cabinet]: assert_float((clear[n] as Vector2).distance_to(a)).is_greater_equal(43.99)
+	assert_float(clear.use_stove_1.x).is_greater(row.use_stove_1.x)
+	assert_float(clear.use_stove_2.x - clear.use_stove_1.x).is_equal_approx(44.0, 0.01)
+	assert_float(clear.use_stove_3.x - clear.use_stove_2.x).is_equal_approx(44.0, 0.01)
+	assert_float(clear.use_stove_1.y).is_equal(300.0)
+	var far: Dictionary = FH.stove_row(spots, [0, 1, 2], -1, Rect2(), 360.0, [Vector2(300, 300)])
+	assert_vector(far.use_stove_1).is_equal(row.use_stove_1)
+	# stove 3's strip open: it stays at its own pot; 1 and 2, in order, centred over the strip, 44 apart, 6 above it
+	var s3 := Rect2(98, 284, 210, 32)
+	var open: Dictionary = FH.stove_row(spots, [0, 1, 2], 2, s3, 360.0, [rack, cabinet])
+	assert_vector(open.use_stove_3).is_equal(spots.use_stove_3)
+	assert_float(open.use_stove_1.y).is_equal(284.0 - 6.0 - 14.0)
+	assert_float(open.use_stove_2.y).is_equal(284.0 - 6.0 - 14.0)
+	assert_float(open.use_stove_2.x - open.use_stove_1.x).is_equal_approx(44.0, 0.01)
+	assert_float((open.use_stove_1.x + open.use_stove_2.x) * 0.5).is_equal_approx(s3.get_center().x, 0.01)
+	# stove 1 open: 2 and 3 above it the same way
+	var s1 := Rect2(70, 293, 180, 32)
+	var one: Dictionary = FH.stove_row(spots, [0, 1, 2], 0, s1, 360.0)
+	assert_vector(one.use_stove_1).is_equal(spots.use_stove_1)
+	assert_float(one.use_stove_3.x - one.use_stove_2.x).is_equal_approx(44.0, 0.01)
+	assert_float((one.use_stove_2.x + one.use_stove_3.x) * 0.5).is_equal_approx(s1.get_center().x, 0.01)
+	# the strip's first frame (no rect yet): the open stove still keeps its own spot
+	var first: Dictionary = FH.stove_row(spots, [0, 1, 2], 2, Rect2(), 360.0)
+	assert_vector(first.use_stove_3).is_equal(spots.use_stove_3)
+
+## 6e798a27 ① (02ad95bc ③): a Ready stove's strip shows the Ready badge in the pot's place; cooking and empty keep i-pot.
+func test_a_ready_stove_strip_shows_the_ready_badge() -> void:
+	var FH := preload("res://scenes/p0/rooms/p0_farmhouse.gd")
+	var pot := func(ready_in: float) -> Dictionary: return {"id": 1, "dish": "dish_grilled_crucian", "ready_in": ready_in}
+	var v := {"cooking": {"stoves": [pot.call(0.0), pot.call(12000.0), null]}}
+	var ready: Dictionary = FH.stove_marker(v, 0)
+	assert_str(str(ready.badge)).is_equal("ready")
+	assert_bool(bool(ready.strip_badge)).is_true()
+	var cooking: Dictionary = FH.stove_marker(v, 1)
+	assert_str(str(cooking.badge)).is_equal("countdown")
+	assert_bool(bool(cooking.strip_badge)).is_false()
+	var empty: Dictionary = FH.stove_marker(v, 2)
+	assert_bool(empty.has("badge")).is_false()
+	assert_str(str(empty.fact)).is_equal("Empty")
 
 ## ④: the pot card's corner tag (`×2` with Double on) shows in its top right and takes no layout room.
 func test_pot_card_tag_sits_in_the_corner() -> void:
