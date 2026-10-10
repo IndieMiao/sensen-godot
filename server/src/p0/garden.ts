@@ -19,21 +19,24 @@ export function plotCell(c: P0Content, id: number): [number, number] | null {
   return Number.isInteger(id) && at ? at : null;
 }
 
-/** The plots a facility on `plot` covers: ring8 = the neighbours on the grid that are plots. */
-export function coverOf(c: P0Content, kind: string, plot: number): number[] {
+/** The plots a facility on `plot` covers: ring8 = the neighbours on the grid that are plots, of the first `count`
+ * (the homestead's plots now: an edge sprinkler at Homestead Lv2 covers none of 30–39 before they exist). */
+export function coverOf(c: P0Content, kind: string, plot: number, count = c.garden.plots.length): number[] {
   const at = plotCell(c, plot);
   if (!at || c.facilities.kinds[kind]?.cover !== 'ring8') return [];
   const out: number[] = [];
   c.garden.plots.forEach(([x, y], id) => {
-    if (id !== plot && Math.abs(x - at[0]) <= 1 && Math.abs(y - at[1]) <= 1) out.push(id);
+    if (id < count && id !== plot && Math.abs(x - at[0]) <= 1 && Math.abs(y - at[1]) <= 1) out.push(id);
   });
   return out;
 }
 
+const coverNow = (c: P0Content, s: P0State, f: Facility) => coverOf(c, f.kind, f.plot, s.plots.length);
+
 /** Plot ids watered by a sprinkler now. */
 export function coveredPlots(c: P0Content, s: P0State): Set<number> {
   const out = new Set<number>();
-  for (const f of s.facilities ?? []) if (f.kind === 'sprinkler') for (const id of coverOf(c, f.kind, f.plot)) out.add(id);
+  for (const f of s.facilities ?? []) if (f.kind === 'sprinkler') for (const id of coverNow(c, s, f)) out.add(id);
   return out;
 }
 
@@ -124,10 +127,11 @@ export function place(c: P0Content, s: P0State, cmd: { recipe?: unknown; plot?: 
   s.facilities ??= [];
   s.facility_count = (s.facility_count ?? 0) + 1;
   const plot = Number(cmd.plot);
-  s.facilities.push({ id: s.facility_count, kind: r.facility, plot });
+  const f: Facility = { id: s.facility_count, kind: r.facility, plot };
+  s.facilities.push(f);
   const started = waterCovered(c, s, now, grow);
-  events.push({ kind: 'facility', action: 'placed', facility: s.facility_count, facility_kind: r.facility, plot,
-    covered: coverOf(c, r.facility, plot).length, started });
+  events.push({ kind: 'facility', action: 'placed', facility: f.id, facility_kind: f.kind, plot,
+    covered: coverNow(c, s, f).length, started });
   return null;
 }
 
@@ -147,13 +151,13 @@ export function moveFacility(c: P0Content, s: P0State, cmd: { facility?: unknown
   f.plot = Number(cmd.plot);
   const started = waterCovered(c, s, now, grow);
   events.push({ kind: 'facility', action: 'moved', facility: f.id, facility_kind: f.kind, plot: f.plot, from,
-    covered: coverOf(c, f.kind, f.plot).length, started });
+    covered: coverNow(c, s, f).length, started });
   return null;
 }
 
 /** The view's facts: each facility with what it covers; per field recipe the cap, how many stand and the first block. */
 export function facilitiesView(c: P0Content, s: P0State) {
-  return (s.facilities ?? []).map(f => ({ id: f.id, kind: f.kind, plot: f.plot, covers: coverOf(c, f.kind, f.plot) }));
+  return (s.facilities ?? []).map(f => ({ id: f.id, kind: f.kind, plot: f.plot, covers: coverNow(c, s, f) }));
 }
 
 export function fieldRecipeView(c: P0Content, s: P0State, r: WorkbenchRecipe) {

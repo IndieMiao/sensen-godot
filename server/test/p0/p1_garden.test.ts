@@ -92,6 +92,14 @@ describe('sprinklers (q(59) §1.4)', () => {
     expect(coverOf(c, 'sprinkler', 30).sort((a, b) => a - b)).toEqual([5, 11, 31, 32, 33]);
   });
 
+  it('cover only the plots the homestead has: an edge sprinkler at Lv2 waters none of 30–39', () => {
+    const s = { ...f6(), homestead: { level: 2, plaque: [] } } as P0State;
+    s.plots = s.plots.filter(p => p.id < 30);
+    const { s: after, ev } = step(s, { type: 'place', recipe: 'craft_sprinkler', plot: 5 });
+    expect(ev).toContainEqual(expect.objectContaining({ kind: 'facility', covered: 3 }));
+    expect(viewOf(c, after, T0).facilities[0].covers).toEqual([4, 10, 11]);
+  });
+
   it('are built in one step: place takes the materials from storage and stands on the plot (T9)', () => {
     let s = sow(sow(f6(), 1), 13);   // two sown plots, not yet watered, in plot 7's ring
     const { s: after, ev } = step(s, { type: 'place', recipe: 'craft_sprinkler', plot: 7, space: 'home' });
