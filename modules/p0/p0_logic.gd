@@ -395,7 +395,9 @@ const ICON_ALIAS := {"fert_compost": "compost", "tool_row_hoe": "hoe", "bag_upgr
 
 static func icon(id: String) -> Texture2D:
 	var path := ICON_DIR % str(ICON_ALIAS.get(id, id))
-	return load(path) if ResourceLoader.exists(path) else load(ICON_DIR % "field")
+	if ResourceLoader.exists(path): return load(path)
+	# a fish without its own art yet (P1's twelve, SGODOT-283) shows the fish silhouette, not the sprout (不知火舞 69310899)
+	return load(ICON_DIR % ("fish_sil" if id.begins_with("fish_") else "field"))
 
 ## "m:ss" under an hour, "1h 12m" from one hour (state-icons rule: durations, never clock times). For the timers that
 ## tick in front of the player (q(97) ①): the stove and cooking (`Cooking 0:42`, `The stove is busy · 0:22 left`),

@@ -230,7 +230,7 @@ func _open_pond_fish(entry: Dictionary) -> void:
 		var text := VBoxContainer.new()
 		text.add_theme_constant_override(&"separation", 2)
 		text.add_child(UiKit.label(str(f.name), UiTokens.STYLE_C14_XB))
-		if not f.caught: text.add_child(UiKit.label("Fishing Lv%d" % int(f.level), UiTokens.STYLE_C12_XB, UiTokens.COLOR_SECONDARY))
+		if not f.caught: text.add_child(UiKit.label(PondCard.locked_line(f), UiTokens.STYLE_C12_XB, UiTokens.COLOR_SECONDARY))
 		row.add_child(text)
 		rows.add_child(row)
 	# the list's height: all of it when it fits, else what is left between the HUD and the bottom (row 44 + gap 12)

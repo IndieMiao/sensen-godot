@@ -55,7 +55,14 @@ static func fish_rows(view: Dictionary, pond_id: String) -> Array:
 	var rows: Array = []
 	for id in P0Logic.pond_fish(view, pond_id):
 		var f: Dictionary = defs.get(str(id), {})
-		rows.append({"id": str(id), "name": str(f.get("name", id)), "level": int(f.get("level", 1)),
-			"rarity": int(f.get("rarity", 1)), "caught": bool(caught.get(str(id), false))})
+		var regional := bool(f.get("regional", false))
+		var got := bool(caught.get(str(id), false))
+		# A regional fish not yet caught keeps its name back (q(48), 不知火舞 69310899): `?` over `Fishing Lv3 · Regional`
+		rows.append({"id": str(id), "name": str(f.get("name", id)) if got or not regional else "?", "level": int(f.get("level", 1)),
+			"rarity": int(f.get("rarity", 1)), "caught": got, "regional": regional})
 	rows.sort_custom(func(a, b): return [a.level, a.rarity, a.id] < [b.level, b.rarity, b.id])
 	return rows
+
+## A Details row's second line for a fish not yet caught: `Fishing Lv3`, a regional one `Fishing Lv3 · Regional`.
+static func locked_line(row: Dictionary) -> String:
+	return "Fishing Lv%d" % int(row.get("level", 1)) + (" · Regional" if bool(row.get("regional", false)) else "")

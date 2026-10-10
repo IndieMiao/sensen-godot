@@ -44,3 +44,21 @@ func test_the_pond_card_lists_the_views_fish_else_works_them_out() -> void:
 func test_now_line() -> void:
 	assert_str(FishWorld.now_line({"daypart": "night", "weather": "rain"})).is_equal("Night · Rain")
 	assert_str(FishWorld.now_line({})).is_equal("")
+
+## 不知火舞 69310899: a regional fish not yet caught is `?` over `Fishing Lv3 · Regional`; a fish without its own icon
+## falls back to the fish silhouette, not the sprout.
+func test_an_uncaught_regional_fish_keeps_its_name_back() -> void:
+	var rows: Array = P0PondCard.fish_rows({}, "pond_san_francisco_03")
+	var char_row: Dictionary = rows.filter(func(r): return r.id == "fish_arctic_char")[0]
+	assert_str(str(char_row.name)).is_equal("?")
+	assert_str(P0PondCard.locked_line(char_row)).is_equal("Fishing Lv3 · Regional")
+	var koi: Dictionary = rows.filter(func(r): return r.id == "fish_koi")[0]
+	assert_str(str(koi.name)).is_equal("Golden Koi")
+	assert_str(P0PondCard.locked_line(koi)).is_equal("Fishing Lv4")
+	var caught := {"fishing": {"dex": [{"id": "fish_arctic_char", "caught": 1}]}}
+	assert_str(str(P0PondCard.fish_rows(caught, "pond_san_francisco_03").filter(func(r): return r.id == "fish_arctic_char")[0].name)).is_equal("Arctic Char")
+
+func test_a_fish_without_art_shows_the_silhouette() -> void:
+	assert_str(P0Logic.icon("fish_catfish").resource_path).ends_with("fish_sil.svg")
+	assert_str(P0Logic.icon("fish_carp").resource_path).ends_with("fish_carp.svg")
+	assert_str(P0Logic.icon("nothing_here").resource_path).ends_with("field.svg")
