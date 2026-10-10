@@ -155,6 +155,61 @@ static func _fence_run(a: Vector2, b: Vector2, gaps: Array) -> Array:
 		out.append({"pos": Vector3(p.x, 0, p.y), "yaw": 0.0 if along_x else PI * 0.5, "stretch": step / FENCE_SEG})
 	return out
 
+## Homestead looks (LOOK-PICK, SGODOT-282; 上官婉儿 e4d03424): Lv3 / 5 / 8 are standalone parts beside the farmhouse,
+## Lv10 swaps the whole house. P1 builds them from placeholder models — a (timber) from the wooden pieces (fence, storage),
+## b (stone) from rock / path_tile — until the designed ones replace them. Each part is {asset, pos, yaw, scale: Vector3},
+## standing on the ground (y 0; a paving tile just above it); none is solid (they stand off the door path and the
+## walkways). The house front is HOUSE_FRONT in front of its anchor.
+const HOUSE_FRONT := 1.13            # house_cottage's front wall from its anchor (m, toward the field)
+const STONE_PER_SEG := 3             # rocks along one fence segment's length (Stone Wall)
+const STONE_SCALE := Vector3(1.15, 1.3, 1.0)   # rock.glb 0.41 × 0.36: three make a low wall 1.24 long, 0.46 high
+
+## Fence & Mailbox b (Stone Wall): the fence's segments as rows of rocks, the same run and gaps.
+static func stone_wall(segments: Array) -> Array:
+	var out: Array = []
+	for i in segments.size():
+		var seg: Dictionary = segments[i]
+		var yaw := float(seg.yaw)
+		var along := Vector3(cos(yaw), 0, -sin(yaw))   # the segment's local +x in the world
+		var length := FENCE_SEG * float(seg.get("stretch", 1.0))
+		for k in STONE_PER_SEG:
+			var t := (float(k) + 0.5) / STONE_PER_SEG - 0.5
+			out.append({"asset": "rock", "pos": (seg.pos as Vector3) + along * (t * length),
+				"yaw": yaw + 0.35 * float((i * STONE_PER_SEG + k) % 3 - 1), "scale": STONE_SCALE})
+	return out
+
+## Porch (Lv5) and Kitchen Wing (Lv8) parts, a or b. The porch stands at the door between the house front and the
+## yard fence's front row (0.8 m), clear of the door path, the plaque and the sign; the kitchen wing on the house's
+## left behind the rest bench.
+static func look_parts(bp: FarmBlueprint, stage: String, look: String) -> Array:
+	var house := bp.cell_to_world(ANCHORS.house)
+	var porch_z := house.z + HOUSE_FRONT + 0.35
+	match [stage, look]:
+		["porch", "a"]:   # Timber Porch: two railings flanking the door
+			return [{"asset": "fence", "pos": Vector3(house.x - 0.85, 0, porch_z), "yaw": PI * 0.5, "scale": Vector3(0.55, 1, 1)},
+				{"asset": "fence", "pos": Vector3(house.x + 0.85, 0, porch_z), "yaw": PI * 0.5, "scale": Vector3(0.55, 1, 1)}]
+		["porch", "b"]:   # Stone Porch: a paved landing and two rocks either side
+			return [{"asset": "path_tile", "pos": Vector3(house.x, 0.004, porch_z), "yaw": 0.0, "scale": Vector3(1.1, 1, 0.6)},
+				{"asset": "rock", "pos": Vector3(house.x - 0.85, 0, porch_z), "yaw": 0.4, "scale": Vector3.ONE * 1.4},
+				{"asset": "rock", "pos": Vector3(house.x + 0.85, 0, porch_z), "yaw": -0.6, "scale": Vector3.ONE * 1.4}]
+		["kitchen_extension", "a"]:   # Timber Kitchen Wing: a wooden lean-to on the left
+			return [{"asset": "storage", "pos": Vector3(house.x - HOUSE_FRONT - 0.5, 0, house.z - 0.75), "yaw": PI * 0.5, "scale": Vector3.ONE * 1.6}]
+		["kitchen_extension", "b"]:   # Stone Kitchen Wing: a stone room with a chimney stack
+			return [{"asset": "path_tile", "pos": Vector3(house.x - HOUSE_FRONT - 0.5, 0.004, house.z - 0.75), "yaw": 0.0, "scale": Vector3(0.8, 1, 0.75)},
+				{"asset": "rock", "pos": Vector3(house.x - HOUSE_FRONT - 0.5, 0, house.z - 0.75), "yaw": 0.2, "scale": Vector3(2.4, 2.2, 2.6)},
+				# the chimney: a tall rock standing on the ground at the room's back corner, sunk into it (never stacked:
+				# a rock set on another's rounded top floats, 不知火舞 on #250)
+				{"asset": "rock", "pos": Vector3(house.x - HOUSE_FRONT - 0.85, 0, house.z - 1.0), "yaw": 1.1, "scale": Vector3(1.1, 3.0, 1.1)}]
+	return []
+
+## Master Farmhouse (Lv10): the house model, a Timber Lodge (house_barn) or a Stone Manor (house_dome); before Lv10 the
+## farm's own style (不知火舞 e6b93272: placeholders until Stark's design).
+static func look_house(look: String, style := "cottage") -> String:
+	match look:
+		"a": return "house_barn"
+		"b": return "house_dome"
+	return "house_" + style
+
 ## Points along the yard fence for block_points: the player walks round it, through the door opening.
 static func fence_block_points(bp: FarmBlueprint) -> Array:
 	var points: Array = []
@@ -244,6 +299,9 @@ static func cells(view: Dictionary, now_ms: int) -> Dictionary:
 			"growing":
 				var ready_at := now_ms + int(float(p.get("ready_in", 0)))
 				slot = {"state": "growing", "crop": code, "ready_at": ready_at, "watered_at": ready_at - int(grow.get(crop, 3600000.0))}
+				# A picked tree regrowing (q(118)) stays a grown tree without fruit: the stage below ripe, not a sapling again.
+				if bool(p.get("tree", false)) and int(p.get("picks", 0)) > 0:
+					slot.watered_at = ready_at - int(maxf(1.0, float(p.get("ready_in", 0))) / 0.3)
 			"ready":
 				slot = {"state": "growing", "crop": code, "ready_at": now_ms, "watered_at": now_ms - int(grow.get(crop, 3600000.0))}
 		out[cell_id(cell_of(id))] = slot

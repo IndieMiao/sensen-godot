@@ -418,7 +418,7 @@ static func run_complete(view: Dictionary, loot) -> Dictionary:
 		"detail": "Mine runs today %d/%d" % [int(runs.get("used", 0)), int(runs.get("limit", 2))]}
 
 ## The elite's second kill of the day drops no quartz (§13.3.4): the float that says so once.
-const QUARTZ_ONCE := "Quartz · once a day"
+const QUARTZ_ONCE := "Quartz · first kill each day"   # q(116) ②: shown from the day's second elite on
 
 # --- Gathering spots (farm) ---
 

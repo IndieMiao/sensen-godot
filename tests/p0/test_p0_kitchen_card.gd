@@ -191,7 +191,8 @@ func test_crowded_stove_buttons_go_in_a_row() -> void:
 	var first: Dictionary = FH.stove_row(spots, [0, 1, 2], 2, Rect2(), 360.0)
 	assert_vector(first.use_stove_3).is_equal(spots.use_stove_3)
 
-## 6e798a27 ① (02ad95bc ③): a Ready stove's strip shows the Ready badge in the pot's place; cooking and empty keep i-pot.
+## 6e798a27 ① (02ad95bc ③): a Ready stove's strip shows the Ready badge in the pot's place, a cooking one the clock;
+## empty keeps i-pot.
 func test_a_ready_stove_strip_shows_the_ready_badge() -> void:
 	var FH := preload("res://scenes/p0/rooms/p0_farmhouse.gd")
 	var pot := func(ready_in: float) -> Dictionary: return {"id": 1, "dish": "dish_grilled_crucian", "ready_in": ready_in}
@@ -201,7 +202,7 @@ func test_a_ready_stove_strip_shows_the_ready_badge() -> void:
 	assert_bool(bool(ready.strip_badge)).is_true()
 	var cooking: Dictionary = FH.stove_marker(v, 1)
 	assert_str(str(cooking.badge)).is_equal("countdown")
-	assert_bool(bool(cooking.strip_badge)).is_false()
+	assert_bool(bool(cooking.strip_badge)).is_true()   # the clock folded and open (不知火舞 on #231)
 	var empty: Dictionary = FH.stove_marker(v, 2)
 	assert_bool(empty.has("badge")).is_false()
 	assert_str(str(empty.fact)).is_equal("Empty")

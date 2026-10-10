@@ -19,6 +19,8 @@ export interface Crop {
   /** P1 (content/farm_crops.json, §5.2.3): where the seed is sold; a regional crop's climate zone (`Temperate`, as
    * profile.climate), its open-field time away from that zone, and how many of its seeds one player may buy a day. */
   sold_at?: 'stall' | 'market'; regional?: boolean; zone?: string; off_zone_grow_h?: number; seed_daily?: number;
+  /** A tree (§5.2.4): grow_h is its first ripening; then regrow_h after each pick, picked for harvest_energy. */
+  perennial?: { plant: string; plant_name: string; regrow_h: number; harvest_energy: number; harvest_xp: number; footprint: [number, number] };
 }
 
 export interface Fish {
@@ -39,6 +41,9 @@ export interface FishSite { name: string; template: string; weights: number[] }
 export interface FishPlace { name: string; site: string; city: string; cluster?: string; beginner?: boolean; at?: [number, number] }   // at: the pond list's point; cluster: SGODOT-280
 /** An outpost on the P0 map (assets/p0/p0_outposts.json, SGODOT-227): its role and the residents who live there. */
 export interface OutpostDef { id: string; role: string; residents: string[]; cluster?: string }
+
+/** A Homestead look stage (LOOK-PICK, SGODOT-282): picked at `level`, a (timber) or b (stone). */
+export interface HomesteadLook { id: string; level: number; name: string; a: string; b: string }
 
 export interface CookTier {
   energy: number; ms: number; heats: number[]; gold: number; spin_ms: number;
@@ -149,7 +154,8 @@ export interface P0Content {
     places: Record<string, FishPlace>;
     baits: Record<string, { shift: number[]; wait: number; regional_mult?: number }>;   // regional_mult: Spinner Lure 2 (§6.4.2)
   };
-  goods: Record<string, { name: string; price: number; skill: Skill; gate: number; daily: number; grow_mult?: number }>;
+  goods: Record<string, { name: string; price: number; skill: Skill; gate: number; daily: number; grow_mult?: number;
+    regrow_mult?: number; shop?: 'market' }>;   // P1: Orchard Feed halves a tree's regrowth; shop: sold at the Market
   blessing: { days: number; regen_mult: number; food_bonus: number };
   tackle: { keeper: { role: string; name: string }; buy: string[] };
   tools: {
@@ -166,6 +172,7 @@ export interface P0Content {
     warming_cabinet_by_level?: [number, number][];   // Warming Cabinet portions: Lv3 6, Lv8 12 (absent = warming_cabinet)
     chefs_sign_gold?: number;                 // Chef's Sign (Lv10): every dish's gold zone + this (0.05 = 5 points)
     plots?: [number, number][];               // plots the homestead has: Lv1 30, Lv3 40 (P1 q(59) §1.1; absent = P0's start)
+    perennial_slots?: { base: number; per_level: number; max: number };   // trees that may stand: 1 + level, at most 8
     sprinkler_max?: { base: number; per_level: number; max: number };   // sprinklers that may stand: 3 + level, at most max
     // Barter (§8.4.5, SGODOT-282): at the Market Square keeper, `give` of this climate's regional crops or fish for 1
     // mineral; a mineral at most `level_share` of the next level's need by barter; at most `daily` a day.
@@ -173,6 +180,8 @@ export interface P0Content {
     per_level: { energy: number; meals: number };
     board_slots: [number, number][];          // [from Homestead level, Stall Board slots]
     levels: { level: number; coins: number; skills: number; materials: [string, number][]; unlocks: string[] }[];
+    /** Looks (content/homestead_looks.json, §8.3.1, q(112)): a stage per look level, its id the level's unlock id. */
+    looks?: HomesteadLook[];
   };
   bag_upgrades: { id: string; name: string; homestead: number; price: number; materials: [string, number][]; capacity: number; requires?: string }[];   // requires: the tier before (II after I)
   drinks: { energy: number; prices: number[]; daily: number; items: Record<string, { name: string; shop: ShopId }> };
@@ -341,7 +350,7 @@ export function recipeById(c: P0Content, id: string): Recipe | undefined { retur
 /** Bag kind from the id prefix: seed_*, crop_*, fish_*, dish_*, bait_*, fert_*, torch (stacks of 20, §13.1.2), anything else is a material. */
 export function itemKind(id: string): string {
   const head = id.split('_')[0];
-  return ['seed', 'crop', 'fish', 'dish', 'bait', 'rod', 'fert', 'torch'].includes(head) ? head : 'material';
+  return ['seed', 'crop', 'fish', 'dish', 'bait', 'rod', 'fert', 'torch', 'trap'].includes(head) ? head : 'material';   // trap_fish: P1
 }
 
 /** Dish stacks carry their quality in the id: dish_x (Plain), dish_x@good, dish_x@perfect (§7.2.5). */

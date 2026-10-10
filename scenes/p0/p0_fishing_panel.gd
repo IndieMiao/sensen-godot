@@ -121,7 +121,8 @@ func _p0_cast() -> void:
 	_show_notice("Casting...")
 	cast_started.emit()
 	_refresh_button()
-	rt.session.send({"type": "cast", "bait": rt.ui.selected_bait if rt.ui.selected_bait != "" else null, "site": site_key})
+	var bait := rt.ui.selected_bait if rt.ui.selected_bait.begins_with("bait_") else ""   # the Fish Trap is not bait
+	rt.session.send({"type": "cast", "bait": bait if bait != "" else null, "site": site_key})
 
 ## Server accepted the cast (P0 `cast` event): the fish is drawn; we only know its rarity and gate.
 func on_cast(ev: Dictionary) -> void:

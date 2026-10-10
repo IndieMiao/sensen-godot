@@ -193,6 +193,18 @@ describe('the elite, Run complete and quartz once a day (§13.3.4)', () => {
     expect(mine(step(k.s, { type: 'mine_enter' }, k.t + STEP).ev, 'enter')).toHaveLength(1);
   });
 
+  it('a swing that beats the elite with the elite\'s blow in the same command is Run complete only (q(116) ③)', () => {
+    let { s, t } = descend(fresh(), 4, T0);
+    ({ s, t } = clear(s, 4, t));
+    s = step(s, { type: 'mine_floor', floor: 5, ...IN }, t += STEP).s;
+    while ((s.mine.run!.floors[4].mobs?.[0] ?? 0) > 3) s = step(s, { type: 'mine_attack', floor: 5, targets: [0], ...IN }, t += STEP).s;
+    s.mine.run!.hp = 1;   // one more hit would knock the player out
+    const r = step(s, { type: 'mine_attack', floor: 5, targets: [0], hurt_by: 0, ...IN }, t += STEP);
+    expect(mine(r.ev, 'complete')).toHaveLength(1);
+    expect(mine(r.ev, 'knocked_out')).toEqual([]);   // the lethal swing wins the clash with the monster it killed
+    expect(r.s.mine.run).toBeNull();
+  });
+
   it('its quartz drops on the day\'s first kill only; a second kill shares quartz\'s weight over the others', () => {
     const s = fresh();
     const run = step(s, { type: 'mine_enter' }, T0).s.mine.run!;

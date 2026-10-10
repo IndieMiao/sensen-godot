@@ -1,0 +1,67 @@
+extends GdUnitTestSuite
+## SGODOT-283 Fish Trap on the client (q(109) ⑦, 不知火舞's spec on 283): the Set Trap key, the card, the prompt, the
+## pond card's fact, Today's row, the toasts and the refusals — all from view.fishing.trap.
+
+const P0Trap := preload("res://modules/p0/p0_trap.gd")
+const FERN := "pond_san_francisco_03"
+const BLOSSOM := "pond_san_francisco_06"
+
+func _view(traps: Array, slots := 1, next_level = 8) -> Dictionary:
+	return {"fishing": {"place": FERN, "trap": {"traps": traps, "slots": slots, "next_level": next_level, "have": 1},
+		"places": {FERN: {"name": "Fern Pond"}, BLOSSOM: {"name": "Blossom Pond"}}}}
+
+func _trap(place: String, fish := 0, extra := {}) -> Dictionary:
+	return {"place": place, "fish": fish, "keep": 3, "next_in": 18720000 if fish < 3 else null, "fits": fish, "all_fit": true, "back_fits": true}.merged(extra, true)
+
+func test_the_key_sets_a_trap_or_says_why_not() -> void:
+	var k := P0Trap.set_key(_view([]), FERN)
+	assert_that([k.verb, k.sub, k.enabled, k.cmd]).is_equal(["Set Trap", "Free", true, {"type": "set_trap"}])
+	assert_str(str(P0Trap.set_key(_view([_trap(FERN)]), FERN).sub)).is_equal("Trap already here")
+	var full := P0Trap.set_key(_view([_trap(BLOSSOM)]), FERN)
+	assert_that([full.sub, full.enabled]).is_equal(["Traps 1/1 · Fishing Lv8 adds 1", false])
+	assert_str(str(P0Trap.set_key(_view([_trap(BLOSSOM), _trap("a"), _trap("b")], 3, null), FERN).sub)).is_equal("Traps 3/3")
+
+func test_the_fishing_key_turns_into_set_trap_when_the_trap_is_picked() -> void:
+	var v := _view([])
+	v["energy"] = {"value": 100}
+	v["bag"] = {"free": 5}
+	assert_str(str(P0Logic.fish_action(v, "trap_fish").verb)).is_equal("Set Trap")
+	assert_str(str(P0Logic.fish_action(v, "").verb)).is_equal("Cast")
+
+func test_the_card_collects_what_fits_and_takes_back_when_all_fit() -> void:
+	var c := P0Trap.card(_view([_trap(FERN, 2)]), FERN)
+	assert_that([c.title, c.fact, c.main.label, c.main.enabled, c.second.label]).is_equal(["Fish Trap", "2/3", "Collect 2 · Free", true, "Take back"])
+	assert_str(str(P0Trap.card(_view([_trap(FERN, 0)]), FERN).main.label)).is_equal("Empty · next in 5h 12m")
+	var some := P0Trap.card(_view([_trap(FERN, 3, {"fits": 1, "all_fit": false})]), FERN)
+	assert_that([some.main.label, some.second.label, some.second.enabled]).is_equal(["Collect 1 · Free", "Take back · Collect first", false])
+	assert_str(str(P0Trap.card(_view([_trap(FERN, 3, {"fits": 0, "all_fit": false})]), FERN).main.label)).is_equal("Collect · Creel full")
+	assert_str(str(P0Trap.card(_view([_trap(FERN, 0, {"back_fits": false})]), FERN).second.label)).is_equal("Take back · Bag full")
+	assert_dict(P0Trap.card(_view([]), FERN)).is_empty()
+
+func test_prompt_fact_and_today() -> void:
+	var p := P0Trap.prompt(_view([_trap(FERN, 2)]), FERN)
+	assert_that([p.text, p.fact, p.ready]).is_equal(["Fish Trap", "2/3", true])
+	assert_array(P0Trap.pond_fact(_view([_trap(FERN, 2)]), FERN)).is_equal(["Your trap", "2/3"])
+	assert_array(P0Trap.pond_fact(_view([]), FERN)).is_empty()
+	assert_dict(P0Trap.today_row(_view([_trap(FERN, 2)]))).is_empty()
+	var one := P0Trap.today_row(_view([_trap(FERN, 3)]))
+	assert_that([one.line, one.go]).is_equal(["Collect 3 fish · Fern Pond", "pond:" + FERN])
+	var two := P0Trap.today_row(_view([_trap(FERN, 3), _trap(BLOSSOM, 3)], 2))
+	assert_str(str(two.line)).is_equal("Collect 6 fish · 2 traps")
+	assert_str(str(two.dot)).is_equal("trap:%s,%s" % [FERN, BLOSSOM])
+
+func test_toasts_and_refusals() -> void:
+	assert_str(P0Trap.event_toast({"action": "set"})).is_equal("Fish Trap set · 1 fish every 8h")
+	assert_str(P0Trap.event_toast({"action": "collected", "left": 1})).is_equal("1 left in the trap")
+	assert_str(P0Trap.event_toast({"action": "collected", "left": 0})).is_equal("")
+	assert_str(P0Trap.event_toast({"action": "taken_back"})).is_equal("Fish Trap back in your bag")
+	assert_str(str(P0Trap.refusal_text({"type": "set_trap"}, "trap_slots", {"used": 1, "slots": 1, "next_level": 8}))).is_equal("Traps 1/1 · Fishing Lv8 adds 1")
+	assert_str(str(P0Trap.refusal_text({"type": "collect_trap"}, "collect_first", {}))).is_equal("Take back · Collect first")
+	assert_that(P0Trap.refusal_text({"type": "cast"}, "creel_full", {})).is_null()
+
+func test_the_trap_sits_on_the_fishing_bar_and_the_tackle_tab() -> void:
+	assert_str(P0Logic.bar_action_of("trap_fish")).is_equal("fish")
+	var v := {"bag": {"slots": [{"id": "bait_worm", "qty": 3}, {"id": "trap_fish", "qty": 1}]}}
+	assert_array(P0Logic.quick_bar(v, [], "fish")).contains(["trap_fish", "bait_worm"])
+	assert_str(str(P0ItemInfo.tab_of({}, "trap_fish"))).is_equal("tackle")
+	assert_bool(P0ItemInfo.rules().has("trap/bag")).is_true()

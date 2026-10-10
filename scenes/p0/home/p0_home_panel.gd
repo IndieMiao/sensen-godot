@@ -42,6 +42,8 @@ static func open(ui: P0Ui, at_home := true) -> void:
 		col.add_child(scroll)
 		scroll.add_child(body)
 	body.add_child(UiKit.label(str(model.title), UiTokens.STYLE_C14_XB))
+	if str(model.subtitle) != "":   # Lv10: `Max level · Homestead Master` (q(115) ②)
+		body.add_child(UiKit.label(str(model.subtitle), UiTokens.STYLE_C12_B, UiTokens.COLOR_SECONDARY))
 	if str(model.look) != "":
 		body.add_child(UiKit.label(str(model.look), UiTokens.STYLE_C11_B, UiTokens.COLOR_SECONDARY))
 	if not model.tiles.is_empty():
@@ -65,15 +67,17 @@ static func open(ui: P0Ui, at_home := true) -> void:
 		changes.add_child(UiKit.label("What changes", UiTokens.STYLE_C12_XB))
 		for c in model.changes: changes.add_child(_change_row(c))
 		body.add_child(changes)
-	var button := UiCommandButton.new(str(model.label))
-	button.reason = str(model.reason)
-	button.sends = true   # homestead_upgrade: Offline while offline (§10.7.1)
-	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	button.activated.connect(func(): ui.command.emit({"type": "homestead_upgrade"}))
-	var tap := str(model.get("tap", ""))   # away from home: `Upgrade at home · Going home is free`, else the gap itself
-	button.unavailable_pressed.connect(func(reason: String): ui.toast(tap if tap != "" else reason))
-	col.add_child(button)
-	panel.set_meta(&"toast_above", button)   # q(16): a toast over the sheet's fixed decision area, 8 above the button
+	if not model.looks.is_empty():   # LOOK-PICK (SGODOT-282, e2d76a7c): one row per stage, under What changes
+		var looks := VBoxContainer.new()
+		looks.name = "Looks"
+		looks.add_theme_constant_override(&"separation", 6)
+		var gap := Control.new()
+		gap.custom_minimum_size = Vector2(0, 4)
+		looks.add_child(gap)
+		looks.add_child(UiKit.label("Looks", UiTokens.STYLE_C12_XB))
+		for r in model.looks: looks.add_child(_look_row(ui, r))
+		body.add_child(looks)
+	if bool(model.button): _add_button(ui, col, panel, model)
 	if not bool(model.max):
 		var foot := UiKit.label(str(model.footer), UiTokens.STYLE_C11_B, UiTokens.COLOR_SECONDARY)
 		foot.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -94,6 +98,18 @@ static func open(ui: P0Ui, at_home := true) -> void:
 	ui._open_modal(panel, 0.3, true)
 	ui.modal_kind = "homestead"
 
+## The Upgrade button (the first gap on it, LOCK-10); none at Lv10 (q(115) ②).
+static func _add_button(ui: P0Ui, col: Control, panel: Control, model: Dictionary) -> void:
+	var button := UiCommandButton.new(str(model.label))
+	button.reason = str(model.reason)
+	button.sends = true   # homestead_upgrade: Offline while offline (§10.7.1)
+	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	button.activated.connect(func(): ui.command.emit({"type": "homestead_upgrade"}))
+	var tap := str(model.get("tap", ""))   # away from home: `Upgrade at home · Going home is free`, else the gap itself
+	button.unavailable_pressed.connect(func(reason: String): ui.toast(tap if tap != "" else reason))
+	col.add_child(button)
+	panel.set_meta(&"toast_above", button)   # q(16): a toast over the sheet's fixed decision area, 8 above the button
+
 ## One "What changes" row: icon 16 · what (fills) · the value it replaces, py 5.
 static func _change_row(c: Dictionary) -> Control:
 	var row := HBoxContainer.new()
@@ -110,6 +126,24 @@ static func _change_row(c: Dictionary) -> Control:
 	var note := UiKit.label(str(c.note), UiTokens.STYLE_C11_B, UiTokens.COLOR_SECONDARY)
 	note.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	row.add_child(note)
+	return row
+
+## One Looks row (Figma 2201:33545): as a What changes row — icon 16 · stage (12 ExtraBold) · the look on it with ›
+## (11 Bold, secondary). Not reached: disabled ink, icon 45 %, `Homestead Lv8`. A reached row at home opens LOOK-PICK
+## on that stage, the current look selected.
+static func _look_row(ui: P0Ui, r: Dictionary) -> Control:
+	var row := _change_row({"icon": r.icon, "text": r.name, "note": r.value})
+	row.name = "Look_" + str(r.id)
+	if not bool(r.reached):
+		var ink := UiTokens.COLOR_DISABLED_INK
+		(row.get_child(0) as Control).modulate.a = 0.45
+		(row.get_child(1) as Label).add_theme_color_override(&"font_color", ink)
+		(row.get_child(2) as Label).add_theme_color_override(&"font_color", ink)
+	if bool(r.open):
+		row.mouse_filter = Control.MOUSE_FILTER_STOP
+		var id := str(r.id)
+		row.gui_input.connect(func(e: InputEvent):
+			if e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT and not e.pressed: P0LookPick.open(ui, id))
 	return row
 
 ## A tapped tile: one source line above it; Show only moves the camera (LOCK-10 / LOCK-08).

@@ -18,12 +18,13 @@ func _view(level := 2) -> Dictionary:
 func test_home_panel_matches_the_page_14_sample() -> void:
 	var p := P0Logic.home_panel(_view())
 	assert_str(str(p.title)).is_equal("Homestead Lv2 → Lv3")
-	assert_str(str(p.look)).is_equal("Lv3 look · Full fence")
+	assert_str(str(p.look)).is_equal("Lv3 look · Fence & Mailbox")   # q(115): the stage's name, never Look A / B
 	assert_array(p.tiles.map(func(t): return str(t.name))).is_equal(["Timber", "Stone", "Reeds", "Clay", "Rock Salt", "Coins", "Skills"])
 	assert_int(int(p.tiles[5].need)).is_equal(440)   # price + the 40-coin floor (q(10))
 	assert_array(p.changes.map(func(c): return str(c.text))).is_equal(
-		["Max Energy 220 · Meals 220 a day", "Warming Cabinet", "Bag Upgrade I for sale · 150 coins", "Stall Board · 3rd slot"])
-	assert_array(p.changes.map(func(c): return str(c.note))).is_equal(["now 210", "keeps 6 dishes by the stove", "Bag 25 → 30", "now 2"])
+		["Max Energy 220 · Meals 220 a day", "Warming Cabinet", "Bag Upgrade I for sale · 150 coins", "Stall Board · 3rd slot",
+		"Fence & Mailbox · Timber or Stone"])
+	assert_array(p.changes.map(func(c): return str(c.note))).is_equal(["now 210", "keeps 6 dishes by the stove", "Bag 25 → 30", "now 2", "pick one"])
 	assert_str(str(p.reason)).is_equal("Need 6 more Timber")
 	assert_str(str(p.footer)).is_equal("Upgrading is free of Energy · fills Energy to the new max")
 
@@ -82,6 +83,23 @@ func test_p0_stops_at_lv3() -> void:
 	assert_bool(bool(p.max)).is_true()
 	assert_str(str(p.title)).is_equal("Homestead Lv3")
 	assert_array(p.tiles).is_empty()
+
+## q(115) ②: Lv10 has no next level: `Max level · Homestead Master` under the title, no Upgrade, and the Looks rows.
+func test_lv10_says_max_level_and_keeps_the_looks() -> void:
+	var v := _view(10)
+	v.homestead.next = null
+	v.homestead["looks"] = [{"id": "fence", "level": 3, "look": "a"}, {"id": "porch", "level": 5, "look": "b"},
+		{"id": "kitchen_extension", "level": 8, "look": "a"}, {"id": "master_farmhouse", "level": 10, "look": "b"}]
+	var p := P0Logic.home_panel(v)
+	assert_str(str(p.title)).is_equal("Homestead Lv10")
+	assert_str(str(p.subtitle)).is_equal("Max level · Homestead Master")
+	assert_bool(bool(p.button)).is_false()
+	assert_array(p.looks.map(func(r): return "%s … %s" % [r.name, r.value])).is_equal(
+		["Fence & Mailbox … Timber Fence ›", "Porch … Stone Porch ›", "Kitchen Wing … Timber Kitchen Wing ›", "Master Farmhouse … Stone Manor ›"])
+	var ui := _ui(v)
+	HomePanel.open(ui)
+	assert_array(ui.find_children("*", "UiCommandButton", true, false)).is_empty()
+	assert_int(ui.find_children("Look_*", "", true, false).size()).is_equal(4)
 
 func test_home_moment_matches_the_page_14_banner() -> void:
 	var m := P0Logic.home_moment({"energy": {"max": 220}}, {"kind": "homestead", "level": 3, "unlocks": ["warming_cabinet", "bag_upgrade_1", "board_slot_3", "fence"]})
@@ -151,7 +169,7 @@ func test_home_1_at_max_level_has_no_tiles_and_says_so() -> void:
 	assert_str((ui.find_children("*", "UiCommandButton", true, false)[0] as UiCommandButton).reason).is_equal("Highest level for now")
 	await get_tree().process_frame
 	var sheet: Control = ui.find_children("*", "PanelContainer", true, false).filter(func(p): return (p as Control).theme != null)[0]
-	assert_float(sheet.size.y).is_less(300.0)   # a short sheet, not the 606-high upgrade sheet
+	assert_float(sheet.size.y).is_less(400.0)   # a short sheet (title, Looks, button, Close), not the 606-high upgrade sheet
 
 func test_home_2_banner_sits_under_the_hud_and_a_tap_skips_it() -> void:
 	var ui := _ui(_view())

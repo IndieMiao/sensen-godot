@@ -773,5 +773,24 @@
         ]
       }
     ]
+  },
+  "trap/bag": {
+    "facts": [
+      "1 fish every 8h · keeps 3"
+    ],
+    "buttons": [
+      {
+        "id": "pin",
+        "label": "{pin_verb}",
+        "kind": "secondary",
+        "unless": [
+          {
+            "when": "bar_full",
+            "label": "Bar full · Unpin one first"
+          }
+        ]
+      }
+    ],
+    "lock": true
   }
 }

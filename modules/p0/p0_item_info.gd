@@ -41,7 +41,7 @@ extends RefCounted
 
 const CONTEXTS: Array[StringName] = [&"bag", &"gear", &"counter_buy", &"counter_sell", &"gift", &"storage", &"workbench"]
 const RULES_PATH := "res://modules/p0/item_info_rules.json"
-const KINDS := ["seed", "crop", "fish", "dish", "bait", "rod", "pick", "tool"]
+const KINDS := ["seed", "crop", "fish", "dish", "bait", "rod", "pick", "tool", "trap"]
 const SEP := " · "
 const _MYSTERY := "dish_mystery"
 const _TAKE_SOME := 10   # F-07 storage: Take 10 + Take all
@@ -72,7 +72,7 @@ static func tab_of(view: Dictionary, item_id: String) -> StringName:
 	var k := str(P0Logic.item(view, item_id).get("kind", ""))
 	if k == "": k = item_id.split("_")[0]
 	var tab = {"seed": &"seeds", "fert": &"seeds", "fish": &"fish", "crop": &"produce", "dish": &"dishes", "bait": &"tackle",
-		"rod": &"tackle", "pick": &"tackle", "material": &"materials", "torch": &"materials"}.get(k, null)
+		"trap": &"tackle", "rod": &"tackle", "pick": &"tackle", "material": &"materials", "torch": &"materials"}.get(k, null)
 	if tab != null: return tab
 	return &"materials" if P0Logic.content().get("materials", {}).has(item_id) else &""
 
@@ -466,7 +466,7 @@ static func _price(view: Dictionary, item_id: String, opts: Dictionary) -> Dicti
 	return {each = each, total = each * qty, text = "%d coins" % (each * qty), line = ("%d × %d coins" % [qty, each]) if qty > 1 else ""}
 
 static func _quota(view: Dictionary, item_id: String, kind: String, opts: Dictionary) -> Dictionary:
-	return _quota_line(_quota_of(view, item_id, opts), "regional" if _regional(view, item_id, opts) else kind, _counter(opts))
+	return _quota_line(_quota_of(view, item_id, opts), "" if _regional(view, item_id, opts) else kind, _counter(opts))
 
 ## Whether this counter buys the item back as one of the city's regional goods (the Market Square).
 static func _regional(view: Dictionary, item_id: String, opts: Dictionary) -> bool:
@@ -477,8 +477,8 @@ static func _regional(view: Dictionary, item_id: String, opts: Dictionary) -> bo
 static func counter_quota(view: Dictionary, role: String) -> Dictionary:
 	if role != "homestead":
 		for e in view.get("shops", {}).get(role, {}).get("sell", []):
-			if e.get("quota", null) != null:   # "Regional buy-back today 20/60" over "this city · resets in 9h 12m"
-				return _quota_line(view.get("quotas", {}).get(str(e.quota), {}), "regional" if e.get("regional", false) else str(e.get("kind", "")), role)
+			if e.get("quota", null) != null:   # the market (NPC-3 482:120): "Buy-back today 30/60" over "all San Francisco markets · resets in 9h 12m"
+				return _quota_line(view.get("quotas", {}).get(str(e.quota), {}), "" if e.get("regional", false) else str(e.get("kind", "")), role)
 	return _quota_line({}, "", role)
 
 static func _quota_line(quota: Dictionary, kind: String, role: String) -> Dictionary:

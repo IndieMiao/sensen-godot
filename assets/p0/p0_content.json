@@ -2037,7 +2037,8 @@
       "rod_reed",
       "rod_carbon",
       "bait_worm",
-      "bait_lure"
+      "bait_lure",
+      "trap_fish"
     ]
   },
   "tools": {
@@ -2748,7 +2749,7 @@
     },
     "regional_market": {
       "cap": 60,
-      "scope": "this city",
+      "scope": "all {city} markets",
       "per_city": true
     }
   },

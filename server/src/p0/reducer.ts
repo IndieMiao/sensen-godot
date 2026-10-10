@@ -1,5 +1,6 @@
 /** P0 command reducer: one command → new state + events, or a typed refusal. Never mutates the input. */
 import { cropById, cropBySeed, rodById, type P0Content } from './content.js';
+import { collectTrap, setTrap } from './fish_trap.js';
 import { add, count, room, take } from './bag.js';
 import { barter } from './barter.js';
 import { settleCards } from './cards.js';
@@ -8,7 +9,7 @@ import { boardCommand, noteVisit, settleBoards, tracked } from './boards.js';
 import { moveDecor, placeDecor, storeDecor } from './decor.js';
 import { expireGiftMeals, giftResident, learn, noteSown, residentRequestCommand, talk } from './residents.js';
 import { castLine, reelLine, type FishCommand } from './fishing.js';
-import { upgradeHomestead } from './homestead.js';
+import { setLook, upgradeHomestead } from './homestead.js';
 import { takeFromCabinet } from './kitchen_storage.js';
 import { firstXp, energyDetail, gainXp, spendEnergy, type P0Event } from './progress.js';
 import { notePresence, restReadyIn } from './presence.js';
@@ -16,6 +17,7 @@ import { isMineCommand, mineCommand, settleMine, type MineCommand } from './mine
 import { gather, storeMaterials } from './gathering.js';
 import { craft } from './workbench.js';
 import { coveredPlots, cropGrowH, facilityAt, growMs, moveFacility, place, seedSaver } from './garden.js';
+import { chopTree, feedTree, pickTree, plantTree, treeOf } from './orchard.js';
 import { claimParcel, PARCEL_LIMIT, settleParcels } from './parcels.js';
 import { dayKey, maxEnergy, scaledXp, settleEnergy, skillLevel, xpPercent } from './rules.js';
 import { buyback, buyItem, drink, moveStorage, offerOf, sellItem, setLock } from './shops.js';
@@ -29,6 +31,7 @@ export type { P0Event } from './progress.js';
 export type P0Command = P0CommandBody & { expect_seq?: number; space?: string; place?: string };
 
 type P0CommandBody =
+  | { type: 'set_trap' } | { type: 'collect_trap'; take_back?: boolean }   // Fish Trap (SGODOT-283), at the pond the player is at
   | { type: 'till'; plot: number }
   | { type: 'sow'; plot?: number; plots?: number[]; seed: string }   // plots: up to 3 with the Row Hoe (§9.11.2)
   | { type: 'fertilize'; plot: number; item?: string }
@@ -53,6 +56,7 @@ type P0CommandBody =
   | { type: 'cabinet_take'; item: string }   // Warming Cabinet `Take one` (§7.7)
   | { type: 'accept' | 'deliver' | 'drop'; request: string }
   | { type: 'homestead_upgrade' }
+  | { type: 'set_look'; stage: string; look: 'a' | 'b' }   // LOOK-PICK (SGODOT-282): a Homestead look stage, free
   | { type: 'place_decor'; item: string; x: number; y: number; rot?: number }   // Decorate (SGODOT-284)
   | { type: 'move_decor'; uid: number; x: number; y: number; rot?: number }
   | { type: 'store_decor'; uid: number }
@@ -64,6 +68,7 @@ type P0CommandBody =
   | { type: 'craft'; recipe: string }
   | { type: 'place'; recipe: string; plot: number }          // P1: build a facility in place (one step, q(22))
   | { type: 'move_facility'; facility: number; plot: number }   // P1: free, never removed
+  | { type: 'chop'; plot: number }                              // P1: a tree is gone, its plot tilled again (FARM-4, q(118))
   | { type: 'claim_parcel'; key: string }
   | { type: 'claim_parcels'; keys: string[] }   // Claim all: the keys on screen, so a retry never takes a newer parcel
   | { type: 'read_inbox'; keys: string[] }
@@ -130,6 +135,13 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       const plots = ids.map(plotOf);
       if (plots.some(p => !p)) return fail('bad_plot');
       for (const id of ids) { const taken = occupied(id); if (taken) return taken; }
+      // P1 (q(118)): a sapling plants a tree on one empty plot, tilled or wild (the orchard's own rules).
+      const tree = cropBySeed(c, String(cmd.seed));
+      if (tree?.perennial) {
+        const refusal = plantTree(c, s, ids, tree, now, events);
+        if (refusal) return fail(refusal.code, refusal.detail);
+        break;
+      }
       const wrong = plots.find(p => p!.state !== 'tilled');
       if (wrong) return fail('wrong_state', { plot: wrong.id, state: wrong.state });
       const crop = cropBySeed(c, String(cmd.seed));
@@ -162,9 +174,15 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       if (taken) return taken;
       const ripe = plot.state === 'growing' && (plot.ready_at ?? Infinity) <= now;
       if ((plot.state !== 'sown' && plot.state !== 'growing') || ripe || !plot.crop) return fail('wrong_state', { state: ripe ? 'ready' : plot.state });
-      if (plot.fert) return fail('fertilized');
       const item = String(cmd.item ?? 'fert_compost'), fert = c.goods[item];
-      if (!fert?.grow_mult) return fail('bad_item');
+      const tree = treeOf(c, plot);   // P1: a tree takes Orchard Feed, an annual Compost (§5.5)
+      if (tree) {
+        const refusal = feedTree(c, s, plot, tree, item, now, events);
+        if (refusal) return fail(refusal.code, refusal.detail);
+        break;
+      }
+      if (plot.fert) return fail('fertilized');
+      if (!fert?.grow_mult) return fail(fert?.regrow_mult ? 'trees_only' : 'bad_item');
       if (count(s.bag, item) < 1) return fail('no_item', { item });
       take(s.bag, item, 1);
       events.push({ kind: 'item', id: item, delta: -1 });
@@ -194,6 +212,11 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       if (plot.state !== 'growing' || !plot.crop || (plot.ready_at ?? Infinity) > now)
         return fail('not_ready', { ready_in: plot.ready_at ? plot.ready_at - now : null });
       const crop = cropById(c, plot.crop)!;
+      if (crop.perennial) {   // P1: a tree is picked and grows again (q(118))
+        const refusal = pickTree(c, s, plot, crop, now, events);
+        if (refusal) return fail(refusal.code, refusal.detail);
+        break;
+      }
       if (room(c, s, crop.id) < crop.yield) return fail('bag_full', { need: crop.yield });
       add(c, s, crop.id, crop.yield);
       events.push({ kind: 'item', id: crop.id, delta: crop.yield });
@@ -276,6 +299,16 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       if (c.homestead.levels.find(l => l.level === s.homestead.level)?.unlocks.includes('spice_rack')) storeMaterials(c, s, now, events, 'spice_rack');
       break;
     }
+    case 'chop': {
+      const refusal = chopTree(c, s, cmd, events);
+      if (refusal) return fail(refusal.code, refusal.detail);
+      break;
+    }
+    case 'set_look': {
+      const refusal = setLook(c, s, cmd, events);
+      if (refusal) return fail(refusal.code, refusal.detail);
+      break;
+    }
     case 'place': case 'move_facility': {
       const refusal = cmd.type === 'place' ? place(c, s, cmd, now, events, growH) : moveFacility(c, s, cmd, now, events, growH);
       if (refusal) return fail(refusal.code, refusal.detail);
@@ -288,6 +321,11 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
     }
     case 'heat': {
       const refusal = recordHeat(c, s, cmd);
+      if (refusal) return fail(refusal.code, refusal.detail);
+      break;
+    }
+    case 'set_trap': case 'collect_trap': {   // Fish Trap (SGODOT-283): at the pond the player is at
+      const refusal = cmd.type === 'set_trap' ? setTrap(c, s, now, events) : collectTrap(c, s, cmd, now, events);
       if (refusal) return fail(refusal.code, refusal.detail);
       break;
     }

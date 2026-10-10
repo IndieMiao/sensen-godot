@@ -9,7 +9,8 @@ export type PlotState = 'wild' | 'tilled' | 'sown' | 'growing';
 export interface Plot {
   id: number; state: PlotState;
   crop?: string; xp_pct?: number; ready_at?: number;
-  fert?: boolean;                 // compost this round (§5.5): −20% of the ripening time, once, gone at harvest
+  fert?: boolean;                 // compost this round (§5.5): −20% of the ripening time, once, gone at harvest; on a tree, Orchard Feed
+  picks?: number;                 // a tree (P1, q(118)): times picked; 0 while it ripens the first time
 }
 /** A facility standing on a plot (P1, SGODOT-239): a sprinkler waters the ring of 8 around it. Never removed (q(22)). */
 export interface Facility { id: number; kind: string; plot: number; under?: 'wild' | 'tilled' }   // under: the plot as it was, back when it moves
@@ -89,7 +90,11 @@ export interface ResidentState {
   lesson_at?: number;            // when they last taught a page (§7.5.3: one a week from Familiar)
 }
 
-export interface Homestead { level: number; plaque: { level: number; at: number }[]; bartered?: Record<string, number> }   // bartered: minerals got by barter toward the next level
+export interface Homestead {
+  level: number; plaque: { level: number; at: number }[];
+  bartered?: Record<string, number>;   // minerals got by barter toward the next level
+  looks?: Record<string, 'a' | 'b'>;   // LOOK-PICK (SGODOT-282): a stage's look once changed; absent = a (q(24): closing = a)
+}
 
 /** One mine run (§13.3, SGODOT-231; floors 3–5 SGODOT-275): floors[i] is floor i + 1; drops derive from the run seed.
  * mobs: each monster's HP left on that floor (content order); hp: the player's HP in the mine; express: started by Floor 5 ·
@@ -161,6 +166,7 @@ export interface P0State {
   rewards: string[];             // one-time rewards already granted
   day: P0Day;
   fishing: { casts: number; bites: number; caught: Record<string, number>; seen: string[] };
+  traps?: import('./fish_trap.js').Trap[];   // P1 Fish Traps in the water (SGODOT-283); absent on older saves
   cast: Cast | null;
   stove: Pot | null;
   queue: Pot | null;             // Queue ×2 (Cooking Lv5): the pot waiting behind the one on the stove
