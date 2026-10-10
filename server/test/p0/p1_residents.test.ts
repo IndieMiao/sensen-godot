@@ -128,7 +128,7 @@ describe('Recipe lesson (§7.5.3 Taught)', () => {
     s = at(s, 'res_old_kai', 45);
     expect(viewOf(c, s, T0).residents.res_old_kai.lesson).toMatchObject({ state: 'ready', recipe: 'dish_grilled_fish' });
     const r = step(s, { type: 'learn', resident: 'res_old_kai' });
-    expect(r.ev).toContainEqual({ kind: 'lesson', resident: 'res_old_kai', recipe: 'dish_grilled_fish', from: 'lesson' });
+    expect(r.ev).toContainEqual({ kind: 'recipe', page: 'dish_grilled_fish', from: 'taught', resident: 'res_old_kai' });
     expect(r.s.cookbook).toContain('dish_grilled_fish');
     expect(pageState(c, r.s, 'dish_grilled_fish')).toBe('tasted');
     expect(refuse(r.s, { type: 'learn', resident: 'res_old_kai' }, T0 + 6 * DAY)).toMatchObject({ ok: false, code: 'lesson_wait', detail: { next_in: DAY } });

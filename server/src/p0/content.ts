@@ -45,17 +45,23 @@ export type QuotaId = 'fish_tackle' | 'dish' | 'material' | 'request_bonus' | 's
 export type BoardId = 'stall' | 'market';
 
 /**
- * What a request asks for: a kind, optionally narrowed to one id, one rarity, one dish style (§9.6.3 P1: `Soup` for
- * Granny Wu), the same item or N distinct items.
+ * What a request asks for: a kind, optionally narrowed to one id, one rarity, a dish style or styles (§9.6.3 P1: `Soup`
+ * for Granny Wu, Grilled or Dessert for Packed Lunches), a crop family (`O` for the Orchard Basket), the same item or N
+ * distinct items.
  */
-export interface Need { kind: 'crop' | 'fish' | 'dish' | 'material' | 'sow'; id?: string; rarity?: number; style?: string; same?: boolean; distinct?: number }
+export interface Need {
+  kind: 'crop' | 'fish' | 'dish' | 'material' | 'sow'; id?: string; rarity?: number; style?: string | string[];
+  family?: Family; same?: boolean; distinct?: number;
+}
 /**
  * A system request template (§9.6.3). climate narrows it to the home climate (regional templates, `Temperate`);
  * type is the card's family (output by default; regional / explore / together wait for travel, so they ship disabled).
  */
 export interface RequestTemplate {
-  title: string; need: Need; skill: Skill; gate: [Skill, number][]; bonus: number; enabled?: boolean;
+  title: string; need: Need; skill: Skill; gate: [Skill | 'homestead', number][]; bonus: number; enabled?: boolean;
   climate?: string[]; type?: 'output' | 'regional' | 'explore' | 'together'; text?: string;
+  /** Quantity × scale, rounded up (李白's Wholesale Order and Fish Market Crate: 1.5). */
+  scale?: number;
 }
 /** A personal request's one-time reward beyond coins and +5 (§9.6.1, Trusted story requests): an item, a recipe page Tasted, a title. */
 export interface ResidentReward { item?: [string, number]; recipe?: string; title?: string }

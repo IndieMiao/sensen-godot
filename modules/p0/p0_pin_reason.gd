@@ -78,8 +78,10 @@ static func request_of(view: Dictionary, id: String) -> Dictionary:
 		for r in boards.get(board, {}).get("slots", []):
 			if not (r is Dictionary) or r.get("empty", false) or str(r.get("id", "")) != id: continue
 			var items: Array = r.get("items", [])
+			var styles: Array = r.get("style", []) if r.get("style", null) is Array else []
 			return {"id": id, "title": str(r.get("title", "")), "item": str(items[0]) if items.size() == 1 else "",
-				"need_name": _need_name(view, str(r.get("kind", "")), items, r.get("rarity", null)),
+				"need_name": ("%s dishes" % " or ".join(styles)) if not styles.is_empty() and items.is_empty()
+					else _need_name(view, str(r.get("kind", "")), items, r.get("rarity", null)),
 				"have": int(r.get("have", 0)), "qty": int(r.get("qty", 1)), "ready": bool(r.get("ready", false)),
 				"tracked": str(r.get("status", "")) == "accepted",
 				"deliver": "Deliver at the Stall" if board == "stall" else "Deliver at %s" % _outpost_name("market")}

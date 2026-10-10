@@ -40,13 +40,13 @@ function addAffinity(c: P0Content, s: P0State, id: string, delta: number, reason
 }
 
 /** The resident's next request, or why there is none: done for today, a stage away, or none left. */
-export function requestState(c: P0Content, s: P0State, id: string, now?: number): { req: ResidentRequest | null; state: 'open' | 'accepted' | 'wait' | 'stage' | 'none'; need_stage?: string } {
+export function requestState(c: P0Content, s: P0State, id: string, now: number): { req: ResidentRequest | null; state: 'open' | 'accepted' | 'wait' | 'stage' | 'none'; need_stage?: string } {
   const def = residentDef(c, id)!, r = residentState(s, id);
   if (r.req) return { req: def.requests.find(q => q.id === r.req!.id) ?? null, state: 'accepted' };
   const next = def.requests[r.next];
   if (!next) return { req: null, state: 'none' };
   if (def.one_per_day && r.done_day === s.day.key) return { req: next, state: 'wait' };
-  if (!def.one_per_day && r.done_at !== undefined && now !== undefined && now < r.done_at + nextGap(c)) return { req: next, state: 'wait' };
+  if (!def.one_per_day && r.done_at !== undefined && now < r.done_at + nextGap(c)) return { req: next, state: 'wait' };
   if (stageIndex(c, r.affinity) < stageAt(c, next.stage)) return { req: next, state: 'stage', need_stage: next.stage };
   return { req: next, state: 'open' };
 }
@@ -197,7 +197,7 @@ function grantReward(c: P0Content, s: P0State, owner: string, q: ResidentRequest
   if (rw.item) items.push(rw.item);
   if (rw.recipe && !s.cookbook.includes(rw.recipe)) {
     items.push([`recipe:${rw.recipe}`, 1]);
-    events.push({ kind: 'lesson', resident: owner, recipe: rw.recipe, from: 'request' });
+    events.push({ kind: 'recipe', page: rw.recipe, from: 'request', resident: owner });
   }
   const bagged = grantItems(c, s, now, `req:${q.id}`, `${def.name}'s thanks`, items, events);
   if (bagged) for (const [id, n] of Object.entries(bagged)) events.push({ kind: 'item', id, delta: n });
@@ -229,7 +229,7 @@ export function learn(c: P0Content, s: P0State, cmd: { resident?: unknown }, now
   if (st.state === 'wait') return { code: 'lesson_wait', detail: { next_in: st.next_in } };
   s.cookbook.push(st.recipe!);
   residentState(s, id).lesson_at = now;
-  events.push({ kind: 'lesson', resident: id, recipe: st.recipe!, from: 'lesson' });
+  events.push({ kind: 'recipe', page: st.recipe!, from: 'taught', resident: id });
   return null;
 }
 

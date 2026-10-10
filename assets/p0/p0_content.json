@@ -1496,7 +1496,14 @@
           "req_sys_crop_basic",
           "req_sys_fish_common",
           "req_sys_dish_common",
-          "req_sys_material_wood"
+          "req_sys_material_wood",
+          "req_sys_material_fiber",
+          "req_sys_material_clay",
+          "req_sys_crop_fine",
+          "req_sys_fish_river",
+          "req_sys_dish_soup",
+          "req_sys_material_copper",
+          "req_sys_fruit_basket"
         ]
       },
       "market": {
@@ -1505,7 +1512,24 @@
         "templates": [
           "req_sys_crop_mixed",
           "req_sys_fish_fine",
-          "req_sys_dish_fine"
+          "req_sys_dish_fine",
+          "req_sys_crop_bulk",
+          "req_sys_fish_bulk",
+          "req_sys_dish_trail",
+          "req_sys_dish_tea",
+          "req_sys_material_hardwood",
+          "req_sys_material_quartz",
+          "req_sys_regional_crop",
+          "req_sys_regional_fish",
+          "req_sys_regional_dish",
+          "req_sys_regional_far_fish",
+          "req_sys_regional_far_crop",
+          "req_sys_explore_outpost",
+          "req_sys_explore_city",
+          "req_sys_explore_pond",
+          "req_sys_explore_tea",
+          "req_sys_explore_zone",
+          "req_sys_party_basket"
         ]
       }
     },
