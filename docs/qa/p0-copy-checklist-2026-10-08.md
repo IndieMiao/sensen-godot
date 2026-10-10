@@ -13,6 +13,7 @@
 | Energy，不写 Stamina | 体力一律 `Energy` |
 | 分隔符 | 半角空格 + `·` + 半角空格：`Cast · 5 Energy` |
 | x/y = 已用 / 上限 | `Meals today 60/300`、`Mine runs today 1/2`、`0/3 today · 40 coins`（茶：已喝杯数，价格写下一杯，q(48)） |
+| 距离 ★ | 10 km 以内一位小数 `0.8 km`；10 km 及以上取整加千分位 `8,269 km`；四舍五入，最小 `0.1 km`；人在该地点时不显示 Distance 行（q(132)） |
 | 主行动键 | 第一行动词，第二行体力价或原因；第二行 ≤ 80 px（约 16 字符），长原因进按下后的 toast（q(44)）；0 体力的移动写 `· Free` |
 | 不写 Got it | Toast、TipCard、四件事卡都不写 `Got it`；点卡外 / 返回键关闭（q(26)、q(49)） |
 | 缺口写在按钮上 | 中性灰不可用态，如 `Need 6 more Timber`、`Farming Lv3`、`No room · free a slot first`（LOCK-10） |
