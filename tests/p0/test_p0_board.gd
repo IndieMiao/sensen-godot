@@ -287,3 +287,19 @@ func test_p1_stamp_run_reads_visit_and_the_gap_is_the_check_in() -> void:
 	v.boards.market.slots[0].ready = true
 	row = P0Board.cards(v, "market")[0]
 	assert_array([row.status, row.command, row.reason]).is_equal(["Ready to deliver", "Deliver", ""])
+
+## 李白 on #224: with today's completion-bonus cap nearly spent, the row says what delivering pays now and when the bonus
+## is back (every system request); the check-in toast names the request and where it is delivered.
+func test_p1_reward_line_shows_the_bonus_cap_and_the_check_in_toast() -> void:
+	var v := _view()
+	var r := {"id": "v1", "title": "Stamp Run", "kind": "visit", "items": [], "visit": {"place": "sh_tea_1", "done": true},
+		"qty": 1, "have": 1, "ready": true, "coins": 40, "bonus": 40, "status": "accepted"}
+	v.boards.market.slots = [r]
+	assert_str(P0Board.reward_line(v, r)).is_equal("40 coins")
+	v.quotas.request_bonus = {"used": 80, "cap": 100, "resets_in": 33120000}
+	assert_str(P0Board.reward_line(v, r)).is_equal("20 coins · Bonus resets in 9h 12m")
+	v.quotas.request_bonus.used = 100
+	assert_str(P0Board.reward_line(v, r)).is_equal("0 coins · Bonus resets in 9h 12m")
+	var fish := {"coins": 36, "bonus": 20}   # Dusk Haul: the floor part is paid in full
+	assert_str(P0Board.reward_line(v, fish)).is_equal("16 coins · Bonus resets in 9h 12m")
+	assert_str(P0Logic.visit_toast(v, "v1")).is_equal("Stamp Run · Checked in\nDeliver at Mission Market Square")

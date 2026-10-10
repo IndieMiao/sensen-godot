@@ -49,7 +49,7 @@ static func card(view: Dictionary, r: Dictionary, slot := 0) -> Dictionary:
 	var d := {
 		id = str(r.get("id", "")), slot = slot, title = str(r.get("title", "")), info = true,
 		status = "Ready to deliver" if ready else ("Tracked" if tracked else "Open"),
-		facts = [_what(view, r)], reward = "%d coins" % int(r.get("coins", 0)), needs = needs,
+		facts = [_what(view, r)], reward = reward_line(view, r), needs = needs,
 		command = "", reason = "", cmd = {}, done = false,
 	}
 	if ready:
@@ -69,6 +69,18 @@ static func card(view: Dictionary, r: Dictionary, slot := 0) -> Dictionary:
 		d.cmd = {"type": "accept", "request": d.id}
 	if qty <= 0: d.command = ""
 	return d
+
+## The row's coins (李白 on #224): the full amount; once today's completion-bonus cap (§9.13 quota_request_bonus,
+## 100) leaves less than the request's bonus, what delivering now actually pays and when the bonus is back —
+## `20 coins · Bonus resets in 9h 12m`, `0 coins · …`. Every system request, not only Stamp Run; the button is unchanged.
+static func reward_line(view: Dictionary, r: Dictionary) -> String:
+	var coins := int(r.get("coins", 0))
+	var bonus := int(r.get("bonus", 0))
+	var q: Dictionary = view.get("quotas", {}).get("request_bonus", {})
+	if q.is_empty() or bonus <= 0: return "%d coins" % coins
+	var left := maxi(0, int(q.get("cap", 0)) - int(q.get("used", 0)))
+	if left >= bonus: return "%d coins" % coins
+	return "%d coins · Bonus resets in %s" % [coins - bonus + left, P0Logic.span(float(q.get("resets_in", 0)))]
 
 ## An explore request's outpost by name (Stamp Run, view `visit: {place, done}`); "" for any other request.
 static func _visit_place(r: Dictionary) -> String:
