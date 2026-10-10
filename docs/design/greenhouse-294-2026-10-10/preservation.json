@@ -1,0 +1,97 @@
+{
+  "baseline_commit": "04b50480778a328ef528103b92570a68423b46fa",
+  "original_manifest_entries": 35,
+  "original_entries_unchanged": true,
+  "added_entries": [
+    "greenhouse_base",
+    "greenhouse_glass",
+    "greenhouse_roof"
+  ],
+  "existing_farm_files_unchanged": true,
+  "retained_farm_file_count": 103,
+  "assets": {
+    "greenhouse_base": {
+      "sha256": "6716b7af19456b79ea0c43571755836b8a10b2ae1c0dc3e40e0d694a424e9642",
+      "bytes": 78228,
+      "one_surface": true,
+      "no_textures": true,
+      "opaque_source_material": true,
+      "single_sided_source_material": true
+    },
+    "greenhouse_glass": {
+      "sha256": "f24994f7add7bd049534ba9286094033989294bf7f83922a5f4b472a0f684b62",
+      "bytes": 1836,
+      "one_surface": true,
+      "no_textures": true,
+      "opaque_source_material": true,
+      "single_sided_source_material": true
+    },
+    "greenhouse_roof": {
+      "sha256": "efefadd61c24ed5573d4132127a4cf4e396d8924bc199e64fb5dfe86e3ef0634",
+      "bytes": 49628,
+      "one_surface": true,
+      "no_textures": true,
+      "opaque_source_material": true,
+      "single_sided_source_material": true
+    }
+  },
+  "r3_vs_r2": {
+    "baseline_commit": "6b99899b226b02066d2e3d4e841f4828eaa3f485",
+    "assets": {
+      "greenhouse_base": {
+        "palette_unchanged": true,
+        "import_bytes_and_uid_unchanged": true,
+        "heights_sockets_budgets_unchanged": true,
+        "source_glb_feet": [
+          {
+            "xz": [
+              -2.5999999046325684,
+              -2.5999999046325684
+            ],
+            "foot_width": 0.26000022888183594,
+            "foot_depth": 0.26000022888183594
+          },
+          {
+            "xz": [
+              -2.5999999046325684,
+              2.5999999046325684
+            ],
+            "foot_width": 0.26000022888183594,
+            "foot_depth": 0.26000022888183594
+          },
+          {
+            "xz": [
+              2.5999999046325684,
+              -2.5999999046325684
+            ],
+            "foot_width": 0.26000022888183594,
+            "foot_depth": 0.26000022888183594
+          },
+          {
+            "xz": [
+              2.5999999046325684,
+              2.5999999046325684
+            ],
+            "foot_width": 0.26000022888183594,
+            "foot_depth": 0.26000022888183594
+          }
+        ]
+      },
+      "greenhouse_roof": {
+        "palette_unchanged": true,
+        "import_bytes_and_uid_unchanged": true,
+        "heights_sockets_budgets_unchanged": true
+      },
+      "greenhouse_glass": {
+        "palette_unchanged": true,
+        "import_bytes_and_uid_unchanged": true,
+        "heights_sockets_budgets_unchanged": true
+      }
+    }
+  },
+  "real_plot": {
+    "sha256": "e0b50452a57b18bd09f7ceae796bdea9b3ed5cf5536323e11fea9a47a3d5a609",
+    "source_unchanged": true,
+    "render_project_bytes_identical": true
+  }
+}

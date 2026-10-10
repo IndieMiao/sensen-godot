@@ -1,0 +1,4 @@
+id,triangles,limit,surfaces,width_m,height_extent_m,depth_m,min_y_m,max_y_m,eave_height_m,ridge_height_m
+greenhouse_base,1284,1500,1,5.460000,1.920000,5.460000,0.0,1.92,1.92,2.75
+greenhouse_roof,572,1000,1,5.359338,0.892014,5.360000,1.857986,2.75,1.92,2.75
+greenhouse_glass,6,500,1,5.340000,0.792000,5.200000,1.898,2.69,1.92,2.75

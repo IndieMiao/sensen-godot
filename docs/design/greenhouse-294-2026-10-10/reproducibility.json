@@ -1,0 +1,9 @@
+{
+  "identical_glb_rebuild": true,
+  "render_project_matches_runtime_files": true,
+  "sha256": {
+    "greenhouse_base.glb": "6716b7af19456b79ea0c43571755836b8a10b2ae1c0dc3e40e0d694a424e9642",
+    "greenhouse_glass.glb": "f24994f7add7bd049534ba9286094033989294bf7f83922a5f4b472a0f684b62",
+    "greenhouse_roof.glb": "efefadd61c24ed5573d4132127a4cf4e396d8924bc199e64fb5dfe86e3ef0634"
+  }
+}

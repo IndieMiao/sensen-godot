@@ -1,0 +1,502 @@
+{
+	"adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+	"adjacent_bed_edge_gap_m": 0.0499999821186066,
+	"assets": [
+		{
+			"bounds_max": [
+				2.73000001907349,
+				1.91999995708466,
+				2.73000001907349
+			],
+			"bounds_min": [
+				-2.73000001907349,
+				0.0,
+				-2.73000001907349
+			],
+			"id": "greenhouse_base",
+			"surfaces": 1,
+			"triangles": 1284
+		},
+		{
+			"bounds_max": [
+				2.67966890335083,
+				2.75,
+				2.6800000667572
+			],
+			"bounds_min": [
+				-2.67966890335083,
+				1.85798645019531,
+				-2.6800000667572
+			],
+			"id": "greenhouse_roof",
+			"surfaces": 1,
+			"triangles": 572
+		},
+		{
+			"bounds_max": [
+				2.67000007629395,
+				2.69000005722046,
+				2.59999990463257
+			],
+			"bounds_min": [
+				-2.67000007629395,
+				1.89800000190735,
+				-2.59999990463257
+			],
+			"id": "greenhouse_glass",
+			"surfaces": 1,
+			"triangles": 6
+		}
+	],
+	"bed_projection_overlap_count": 0,
+	"captures": [
+		{
+			"glass_alpha": 0.25,
+			"id": "greenhouse-43deg-normal",
+			"pitch_degrees": 42.9999961853027,
+			"roof_visible": true,
+			"size": [
+				1800,
+				1500
+			]
+		},
+		{
+			"glass_alpha": 0.100000001490116,
+			"id": "greenhouse-43deg-glass10",
+			"pitch_degrees": 42.9999961853027,
+			"roof_visible": true,
+			"size": [
+				1800,
+				1500
+			]
+		},
+		{
+			"glass_alpha": 0.100000001490116,
+			"id": "greenhouse-top-base",
+			"pitch_degrees": 90.0,
+			"roof_visible": false,
+			"size": [
+				1800,
+				1500
+			]
+		}
+	],
+	"checks": [
+		{
+			"check": "Real plot.glb measures 0.94 m square before placement",
+			"passed": true
+		},
+		{
+			"check": "Unscaled real plot mesh at row 0 column 0",
+			"passed": true
+		},
+		{
+			"check": "Unscaled real plot mesh at row 0 column 1",
+			"passed": true
+		},
+		{
+			"check": "Unscaled real plot mesh at row 0 column 2",
+			"passed": true
+		},
+		{
+			"check": "Unscaled real plot mesh at row 0 column 3",
+			"passed": true
+		},
+		{
+			"check": "Unscaled real plot mesh at row 1 column 0",
+			"passed": true
+		},
+		{
+			"check": "Unscaled real plot mesh at row 1 column 1",
+			"passed": true
+		},
+		{
+			"check": "Unscaled real plot mesh at row 1 column 2",
+			"passed": true
+		},
+		{
+			"check": "Unscaled real plot mesh at row 1 column 3",
+			"passed": true
+		},
+		{
+			"check": "Unscaled real plot mesh at row 2 column 0",
+			"passed": true
+		},
+		{
+			"check": "Unscaled real plot mesh at row 2 column 1",
+			"passed": true
+		},
+		{
+			"check": "Unscaled real plot mesh at row 2 column 2",
+			"passed": true
+		},
+		{
+			"check": "Unscaled real plot mesh at row 2 column 3",
+			"passed": true
+		},
+		{
+			"check": "Unscaled real plot mesh at row 3 column 0",
+			"passed": true
+		},
+		{
+			"check": "Unscaled real plot mesh at row 3 column 1",
+			"passed": true
+		},
+		{
+			"check": "Unscaled real plot mesh at row 3 column 2",
+			"passed": true
+		},
+		{
+			"check": "Unscaled real plot mesh at row 3 column 3",
+			"passed": true
+		},
+		{
+			"check": "Sixteen actual plot bounds form a 4.84 m block with edges at +/-2.42 m",
+			"passed": true
+		},
+		{
+			"check": "Next real plot row starts at 2.78 m",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_base: one merged mesh",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_base: one surface",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_base: triangle budget and manifest",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_base: shared ground origin, root transform identity",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_base: mesh local transform identity",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_base: physical bounds within 5.46 m including 0.26 m feet",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_base: nominal 5.20 m frame span and 4.84 m covered block",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_base: opaque vertex colors, runtime controls opacity",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_base: no texture coordinates",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_base: bounds match manifest",
+			"passed": true
+		},
+		{
+			"check": "roof_center exists on base",
+			"passed": true
+		},
+		{
+			"check": "roof_center position and +Z orientation",
+			"passed": true
+		},
+		{
+			"check": "Base sits on y=0",
+			"passed": true
+		},
+		{
+			"check": "Base contains no ridge or rafters above the eave",
+			"passed": true
+		},
+		{
+			"check": "All four central 1.3 m entry strips have no low geometry or ground beams",
+			"passed": true
+		},
+		{
+			"check": "Base triangle projections clear all 16 actual plot meshes, including eaves, vine and can",
+			"passed": true
+		},
+		{
+			"check": "Every base triangle lies outside the real covered block envelope +/-2.42 m",
+			"passed": true
+		},
+		{
+			"check": "Every base triangle stays at least 0.05 m from covered beds in plan",
+			"passed": true
+		},
+		{
+			"check": "Corner foot exists: -1,-1",
+			"passed": true
+		},
+		{
+			"check": "Corner foot centre matches +/-2.60 m within 0.1 mm: -1,-1",
+			"passed": true
+		},
+		{
+			"check": "Corner post and foot projection <= 0.26 m square: -1,-1",
+			"passed": true
+		},
+		{
+			"check": "Foot clears covered and adjacent real beds by at least 0.05 m on each axis: -1,-1",
+			"passed": true
+		},
+		{
+			"check": "Corner foot exists: -1,1",
+			"passed": true
+		},
+		{
+			"check": "Corner foot centre matches +/-2.60 m within 0.1 mm: -1,1",
+			"passed": true
+		},
+		{
+			"check": "Corner post and foot projection <= 0.26 m square: -1,1",
+			"passed": true
+		},
+		{
+			"check": "Foot clears covered and adjacent real beds by at least 0.05 m on each axis: -1,1",
+			"passed": true
+		},
+		{
+			"check": "Corner foot exists: 1,-1",
+			"passed": true
+		},
+		{
+			"check": "Corner foot centre matches +/-2.60 m within 0.1 mm: 1,-1",
+			"passed": true
+		},
+		{
+			"check": "Corner post and foot projection <= 0.26 m square: 1,-1",
+			"passed": true
+		},
+		{
+			"check": "Foot clears covered and adjacent real beds by at least 0.05 m on each axis: 1,-1",
+			"passed": true
+		},
+		{
+			"check": "Corner foot exists: 1,1",
+			"passed": true
+		},
+		{
+			"check": "Corner foot centre matches +/-2.60 m within 0.1 mm: 1,1",
+			"passed": true
+		},
+		{
+			"check": "Corner post and foot projection <= 0.26 m square: 1,1",
+			"passed": true
+		},
+		{
+			"check": "Foot clears covered and adjacent real beds by at least 0.05 m on each axis: 1,1",
+			"passed": true
+		},
+		{
+			"check": "Base stays at least 0.05 m inside adjacent real bed edges at +/-2.78 m",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_roof: one merged mesh",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_roof: one surface",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_roof: triangle budget and manifest",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_roof: shared ground origin, root transform identity",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_roof: mesh local transform identity",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_roof: physical bounds within 5.46 m including 0.26 m feet",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_roof: nominal 5.20 m frame span and 4.84 m covered block",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_roof: opaque vertex colors, runtime controls opacity",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_roof: no texture coordinates",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_roof: bounds match manifest",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_glass: one merged mesh",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_glass: one surface",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_glass: triangle budget and manifest",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_glass: shared ground origin, root transform identity",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_glass: mesh local transform identity",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_glass: physical bounds within 5.46 m including 0.26 m feet",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_glass: nominal 5.20 m frame span and 4.84 m covered block",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_glass: opaque vertex colors, runtime controls opacity",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_glass: no texture coordinates",
+			"passed": true
+		},
+		{
+			"check": "greenhouse_glass: bounds match manifest",
+			"passed": true
+		},
+		{
+			"check": "Exactly four single-thickness glass panels: 2 quads and 2 triangles",
+			"passed": true
+		},
+		{
+			"check": "Glass front faces point outward/upward",
+			"passed": true
+		},
+		{
+			"check": "Combined triangle budget <= 3000",
+			"passed": true
+		},
+		{
+			"check": "Four central 1.3 m entrances have at least 1.80 m geometric clearance",
+			"passed": true
+		},
+		{
+			"check": "FarmArt shared vertex-color material",
+			"passed": true
+		},
+		{
+			"check": "Base and roof share unmodified FarmArt.material()",
+			"passed": true
+		},
+		{
+			"check": "Glass material duplication does not change shared farm material",
+			"passed": true
+		},
+		{
+			"check": "Existing scale avatar assembled",
+			"passed": true
+		},
+		{
+			"check": "Capture saved: greenhouse-43deg-normal",
+			"passed": true
+		},
+		{
+			"check": "Capture saved: greenhouse-43deg-glass10",
+			"passed": true
+		},
+		{
+			"check": "Capture saved: greenhouse-top-base",
+			"passed": true
+		}
+	],
+	"clearance_margin_m": 0.0549999523162841,
+	"corner_feet": [
+		{
+			"centre_xz": [
+				-2.60004997253418,
+				-2.60004997253418
+			],
+			"inner_axis_gap_m": 0.0500998497009277,
+			"outer_axis_gap_m": 0.0499999821186066,
+			"projection_m": [
+				0.259900093078613,
+				0.259900093078613
+			]
+		},
+		{
+			"centre_xz": [
+				-2.60004997253418,
+				2.59999990463257
+			],
+			"inner_axis_gap_m": 0.0499999523162842,
+			"outer_axis_gap_m": 0.0499999821186066,
+			"projection_m": [
+				0.259900093078613,
+				0.259999990463257
+			]
+		},
+		{
+			"centre_xz": [
+				2.59999990463257,
+				-2.60004997253418
+			],
+			"inner_axis_gap_m": 0.0499999523162842,
+			"outer_axis_gap_m": 0.0499999821186066,
+			"projection_m": [
+				0.259999990463257,
+				0.259900093078613
+			]
+		},
+		{
+			"centre_xz": [
+				2.59999990463257,
+				2.59999990463257
+			],
+			"inner_axis_gap_m": 0.0499999523162842,
+			"outer_axis_gap_m": 0.0499999821186066,
+			"projection_m": [
+				0.259999990463257,
+				0.259999990463257
+			]
+		}
+	],
+	"covered_envelope_overlap_count": 0,
+	"eave_underside_m": 1.8,
+	"failures": [],
+	"minimum_mid_entry_clearance_m": 1.79999995231628,
+	"minimum_projected_bed_gap_m": 0.0566997528076172,
+	"plot_fixture": {
+		"adjacent_bed_edge_m": 2.78000000119209,
+		"centre_spacing_m": 1.3,
+		"covered_bounds_xz": [
+			-2.42000007629395,
+			-2.42000007629395,
+			2.42000007629395,
+			2.42000007629395
+		],
+		"instance_scale": 1.0,
+		"instances": 16,
+		"mesh_size_xz_m": [
+			0.939999997615814,
+			0.939999997615814
+		],
+		"source": "res://assets/farm/art/plot.glb"
+	},
+	"renderer": "mobile",
+	"scale_avatar_height_m": 1.745,
+	"total_triangles": 1862
+}
