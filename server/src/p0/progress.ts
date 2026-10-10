@@ -54,7 +54,9 @@ export type P0Event =
   | { kind: 'gather'; spot: string; items: [string, number, 'storage' | 'bag'][]; ready_in: number }
   | { kind: 'craft'; recipe: string; item: string; qty: number; to: 'bag' | 'gear' | 'owned' }
   // P1 (SGODOT-239): a facility placed or moved; started = sown plots it now waters (they began growing)
-  | { kind: 'facility'; action: 'placed' | 'moved'; facility: number; facility_kind: string; plot: number; from?: number; covered: number; started: number[] }
+  | { kind: 'facility'; action: 'placed' | 'moved'; facility: number; facility_kind: string; plot: number; from?: number; covered: number; started: number[];
+      x?: number; y?: number }   // x, y: a yard facility's cell (the Compost Bin); plot is −1 then
+  | { kind: 'compost'; item: string; qty: number; used: number; cap: number }   // the Compost Bin turned crops into Compost (q(118) ③)
   | { kind: 'plots_added'; plots: number[]; reason: 'homestead' }   // the Homestead unlock's new plots (client drops them in)
   | { kind: 'seed_saved'; id: string; plot: number }   // Seed Saver gave back a seed on this harvest (Farming Lv10)
   | { kind: 'tree'; action: 'planted' | 'chopped'; plot: number; crop: string; used: number; cap: number }   // the orchard (q(118))
