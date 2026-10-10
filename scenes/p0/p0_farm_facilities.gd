@@ -16,10 +16,15 @@ const SNAP_PX := 70.0           # a finger this close to a bed's centre on scree
 const COVER_TINT := Color(0.55, 0.78, 0.95, 0.55)   # Coverage: light blue (q(59) §1.5; water, 284 v2 §2)
 const OK_TINT := Color(UiTokens.COLOR_PRIMARY, 0.30)  # the spot underfoot when it may stand there (284 v2 §2)
 const BAD_TINT := Color(UiTokens.COLOR_DANGER, 0.35)  # … when it may not
-const GLASS := Color(0.80, 0.94, 0.98)            # the greenhouse's glass and its plots' outline
-const ROOF_ALPHA := 0.25
-const ROOF_INSIDE := 0.10
-const ROOF_H := 1.45
+const GLASS := Color(0.80, 0.94, 0.98)            # the greenhouse plots' outline
+const FarmArt = preload("res://modules/farm/farm_art.gd")
+## SGODOT-294's greenhouse (assets/farm/art/greenhouse_{base,roof,glass}.glb, their manifest entries): three parts on one
+## ground-centred origin, +Z to the camera, unit scale, standing on the ground (its posts are in the walkways).
+const GLASS_ALPHA := 0.25         # the glass panes' opacity (manifest runtime_opacity_normal) …
+const GLASS_INSIDE := 0.10        # … and while the player stands inside (runtime_opacity_inside)
+const GH_POST := 2.60             # post centres ±2.60 m on x and z (post_centres_xz): the walkway crossings at the corners
+const GH_EAVE := 1.92             # eave top (eave_height): the strip sits above the back-left post
+const GH_ROOF_CENTER := Vector3(0, 2.63, 0)   # sockets.roof_center: what a tap on the greenhouse aims at
 const GREENHOUSE_TAP_PX := 90.0
 const ElasticZoom = preload("res://modules/p0/p0_elastic_zoom.gd")   # ground_at: the yard cell under a finger
 
@@ -34,7 +39,7 @@ var _cells: Array = []          # preview / highlight squares, reused
 var _overlay: Array = []        # Coverage Overlay outlines, reused
 var _highlight := -1            # a tapped sprinkler: its covered plots show until the card closes
 var _finger := Vector2.INF      # placement: where the finger holds (the farm's edge pan), INF when lifted
-var _roofs := {}                # greenhouse id → its roof material (the fade under it)
+var _roofs := {}                # greenhouse id → its glass material (the fade under it)
 var _glass: Array = []          # greenhouse plots' outlines, reused
 var _solid := {}                # "x,y" → cell: yard cells a facility (the Compost Bin) made solid, switched back as it moves
 
@@ -83,7 +88,7 @@ func _sync_art(list: Array) -> void:
 			node.set_meta("plot", int(f.get("plot", 0)))
 			farm.add_child(node)
 			_art[id] = node
-			if is_block(kind): _roofs[id] = node.get_meta("roof")
+			if is_block(kind): _roofs[id] = node.get_meta("glass")
 		if is_yard(kind): node.position = _cell_ground(cell_of(f))
 		elif not is_block(kind): node.position = _bed_top(int(f.get("plot", 0)))
 	for id in _art.keys():
@@ -93,11 +98,14 @@ func _sync_art(list: Array) -> void:
 			_roofs.erase(id)
 	_sync_solid(list)
 
-## A yard facility is solid like a decor piece (49b11f91 ③): only cells the yard lets one walk on are switched, and back.
+## A yard facility is solid like a decor piece (49b11f91 ③), and so are a greenhouse's four posts (the walkway crossings at
+## its corners; its beds stay walkable, 不知火舞 on 294 c92e7e18): only cells the yard lets one walk on are switched, and back.
 func _sync_solid(list: Array) -> void:
 	var now := {}
 	for f in list:
 		if f.get("cell", null) is Array: now["%d,%d" % [int(f.cell[0]), int(f.cell[1])]] = cell_of(f)
+		elif is_block(str(f.get("kind", ""))):
+			for c in post_cells(farm.bp, f.get("covers", [])): now["%d,%d" % [c.x, c.y]] = c
 	for k in _solid.keys():
 		if not now.has(k):
 			farm.grid.set_solid(_solid[k], false)
@@ -106,6 +114,24 @@ func _sync_solid(list: Array) -> void:
 		if _solid.has(k) or not farm.bp.is_walkable(now[k]): continue
 		farm.grid.set_solid(now[k], true)
 		_solid[k] = now[k]
+
+## A greenhouse's four post cells: the walkway crossings ±GH_POST from its block's middle.
+static func post_cells(bp: FarmBlueprint, plots: Array) -> Array:
+	var c := block_middle(bp, plots)
+	var out: Array = []
+	for d in [Vector2(-1, -1), Vector2(1, -1), Vector2(-1, 1), Vector2(1, 1)]:
+		out.append(bp.world_to_cell(Vector3(c.x + d.x * GH_POST, 0.0, c.y + d.y * GH_POST)))
+	return out
+
+## The middle (x, z) of a block of plots: its beds' centres' middle.
+static func block_middle(bp: FarmBlueprint, plots: Array) -> Vector2:
+	var lo := Vector2.INF
+	var hi := -Vector2.INF
+	for id in plots:
+		var w := bp.cell_to_world(P0Garden.cell_of(int(id)))
+		lo = Vector2(minf(lo.x, w.x), minf(lo.y, w.z))
+		hi = Vector2(maxf(hi.x, w.x), maxf(hi.y, w.z))
+	return (lo + hi) * 0.5
 
 ## A yard facility's cell (the view's `cell`: [x, y]); P0Decor.NONE for one on the field.
 static func cell_of(f: Dictionary) -> Vector2i:
@@ -153,40 +179,31 @@ static func _bin_art() -> Node3D:
 	root.add_child(lid)
 	return root
 
-## Placeholder greenhouse over its plots: four corner posts and a gable glass roof (no walls: walkable from any side).
-## `roof` false: the posts alone (the placement preview: seen from straight above, the glass would wash out the green /
-## red squares under it).
+## The greenhouse over its plots (SGODOT-294): base (posts, plinths, eaves, braces, vine, can), roof frame and glass, one
+## origin at the block's middle on the ground. The glass wears its own copy of the farm material, alpha-blended at
+## GLASS_ALPHA, both faces drawn (single-sided panes seen from inside too), no shadow; the shared material stays opaque.
+## `roof` false: the base alone (the placement preview: seen from straight above, the roof and glass would wash out the
+## green / red squares under it; the eaves stay at the perimeter).
 func _greenhouse_art(plots: Array, roof := true) -> Node3D:
+	return greenhouse_art(farm.bp, plots, roof)
+
+static func greenhouse_art(bp: FarmBlueprint, plots: Array, roof := true) -> Node3D:
 	var root := Node3D.new()
 	root.name = "Greenhouse"
-	var r := _block_rect(plots)
-	var mid := Vector3(r.get_center().x, P0Garden.BED_H, r.get_center().y)
-	root.position = mid
-	var post_mat := _mat(Color(0.93, 0.93, 0.90))
-	for corner in [Vector2(r.position.x, r.position.y), Vector2(r.end.x, r.position.y), Vector2(r.position.x, r.end.y), r.end]:
-		var post := MeshInstance3D.new()
-		var pm := CylinderMesh.new()
-		pm.top_radius = 0.04
-		pm.bottom_radius = 0.05
-		pm.height = ROOF_H
-		post.mesh = pm
-		post.material_override = post_mat
-		post.position = Vector3(corner.x - mid.x, ROOF_H * 0.5, corner.y - mid.z)
-		root.add_child(post)
+	var c := block_middle(bp, plots)
+	root.position = Vector3(c.x, 0.0, c.y)
+	root.add_child(FarmArt.instance("greenhouse_base"))
 	if not roof: return root
-	var roof_mat := _mat(Color(GLASS, ROOF_ALPHA), true)
-	roof_mat.cull_mode = BaseMaterial3D.CULL_DISABLED
-	for side in [-1.0, 1.0]:   # two panes meeting at a ridge along x
-		var pane := MeshInstance3D.new()
-		var plane := PlaneMesh.new()
-		plane.size = Vector2(r.size.x + 0.2, r.size.y * 0.55)
-		pane.mesh = plane
-		pane.material_override = roof_mat
-		pane.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		pane.position = Vector3(0, ROOF_H + 0.22, side * r.size.y * 0.25)
-		pane.rotation = Vector3(side * deg_to_rad(-22.0), 0, 0)
-		root.add_child(pane)
-	root.set_meta("roof", roof_mat)
+	root.add_child(FarmArt.instance("greenhouse_roof"))
+	var glass := FarmArt.instance("greenhouse_glass")
+	var mat := FarmArt.material().duplicate() as StandardMaterial3D
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+	mat.albedo_color.a = GLASS_ALPHA
+	glass.material_override = mat
+	glass.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	root.add_child(glass)
+	root.set_meta("glass", mat)
 	return root
 
 ## The ground rect (x, z) a block of plots covers, bed edges included.
@@ -199,7 +216,7 @@ func _block_rect(plots: Array) -> Rect2:
 		r = bed if i == 0 else r.merge(bed)
 	return r
 
-## Greenhouses each frame: the roof fades while the player stands under it; their plots wear the glass outline.
+## Greenhouses each frame: the glass fades while the player stands inside; their plots wear the glass outline.
 func _draw_greenhouses(v: Dictionary) -> void:
 	var ids: Array = []
 	for f in v.get("facilities", []):
@@ -208,8 +225,9 @@ func _draw_greenhouses(v: Dictionary) -> void:
 		var mat: StandardMaterial3D = _roofs.get(int(f.get("id", 0)))
 		if mat != null:
 			var p: Vector3 = (farm.actor as Node3D).position
-			var inside := _block_rect(f.get("covers", [])).has_point(Vector2(p.x, p.z))
-			mat.albedo_color.a = ROOF_INSIDE if inside else ROOF_ALPHA
+			var c := _block_rect(f.get("covers", [])).get_center()
+			var inside := absf(p.x - c.x) < GH_POST and absf(p.z - c.y) < GH_POST   # between the posts
+			mat.albedo_color.a = GLASS_INSIDE if inside else GLASS_ALPHA
 	while _glass.size() < ids.size():
 		var o := _square()   # a faint glass outline: a light wash and a glass edge (the shell's placement square)
 		var m := o.material_override as ShaderMaterial
@@ -493,7 +511,7 @@ func _show_spot(v: Dictionary, id: int) -> void:
 		# the roof over the block; its 16 plots green underfoot, only the ones in the way red (284 v2 §2, 李白)
 		var block := cover_of(v, id, kind) if id >= 0 else []
 		var c := _block_rect(block).get_center() if not block.is_empty() else Vector2.ZERO
-		if id >= 0: _preview.position = Vector3(c.x, P0Garden.BED_H, c.y)
+		if id >= 0: _preview.position = Vector3(c.x, 0.0, c.y)   # the model stands on the ground
 		farm.placement_grid(Vector3(c.x, P0Garden.BED_H, c.y) if id >= 0 else Vector3.INF, 4)
 		var bad := blocked_of(v, id, kind, int(placing.facility)) if id >= 0 else []
 		_paint_tints(block.map(func(b): return [b, BAD_TINT if bad.has(b) else OK_TINT]))
@@ -515,8 +533,11 @@ func _on_done(ok: bool) -> void:
 		if int(p.facility) >= 0: rt.session.send({"type": "move_facility", "facility": int(p.facility), "x": at.x, "y": at.y, "space": "home"})
 		else: rt.session.send({"type": "place", "recipe": str(p.recipe), "x": at.x, "y": at.y, "space": "home"})
 		return
-	# the player steps off the bed a sprinkler takes; a greenhouse is walked into, so they come back where they stood
-	_end([P0Garden.cell_of(int(p.plot))] if go and not is_block(str(p.kind)) else [])
+	# the player steps off the bed a sprinkler takes; a greenhouse is walked into, so they come back where they stood,
+	# unless that is where one of its posts goes
+	var taken: Array = []
+	if go: taken = post_cells(farm.bp, cover_of(rt.session.view, int(p.plot), str(p.kind))) if is_block(str(p.kind)) else [P0Garden.cell_of(int(p.plot))]
+	_end(taken)
 	if not go: return
 	if int(p.facility) >= 0: rt.session.send({"type": "move_facility", "facility": int(p.facility), "plot": int(p.plot), "space": "home"})
 	else: rt.session.send({"type": "place", "recipe": str(p.recipe), "plot": int(p.plot), "space": "home"})
@@ -629,7 +650,7 @@ func tap(screen: Vector2) -> bool:
 			return true
 		if is_block(str(f.get("kind", ""))):   # a greenhouse: a tap near its roof's middle
 			var c := _block_rect(f.get("covers", [])).get_center()
-			if farm.cam.unproject_position(Vector3(c.x, P0Garden.BED_H + ROOF_H, c.y)).distance_to(screen) > GREENHOUSE_TAP_PX: continue
+			if farm.cam.unproject_position(Vector3(c.x, 0.0, c.y) + GH_ROOF_CENTER).distance_to(screen) > GREENHOUSE_TAP_PX: continue
 		elif farm.cam.unproject_position(_bed_top(int(f.get("plot", 0))) + HEAD).distance_to(screen) > TAP_PX: continue
 		open_card(f)
 		return true
@@ -639,7 +660,7 @@ func tap(screen: Vector2) -> bool:
 ## Its own name strip (不知火舞 on 241, 4e7d1119): `Greenhouse · −25%` on the strip Fish Trap uses, over the block's
 ## back-left post; shown by the farm's rules (its icon button within range, the strip when it is the nearest facility in
 ## reach, LOCK-07 v2). A tap on the button, the strip or the greenhouse opens its card.
-const STRIP_MARK := Vector3(0, ROOF_H + 0.3, 0)
+const STRIP_MARK := Vector3(0, GH_EAVE + 0.3, 0)
 ## The Compost Bin's strip `Compost Bin · 2/5` (today's / the day's, 不知火舞 on 241) over its lid; the same rules.
 const BIN_MARK := Vector3(0, 0.95, 0)
 const BIN_HIT := Vector3(0, 0.35, 0)
@@ -665,9 +686,9 @@ func prompts(v: Dictionary) -> void:
 				UiWorldNameBar.Dir.RIGHT)
 			continue
 		if not is_block(str(f.get("kind", ""))): continue
-		var r := _block_rect(f.get("covers", []))
-		var corner := Vector3(r.position.x, P0Garden.BED_H, r.position.y)
-		var middle := Vector3(r.get_center().x, P0Garden.BED_H + ROOF_H, r.get_center().y)
+		var c := _block_rect(f.get("covers", [])).get_center()
+		var corner := Vector3(c.x - GH_POST, 0.0, c.y - GH_POST)   # the back-left post
+		var middle := Vector3(c.x, 0.0, c.y) + GH_ROOF_CENTER
 		farm.world_prompt("gh_%d" % int(f.get("id", 0)), greenhouse_prompt(f), corner, STRIP_MARK, middle - corner, true,
 			UiWorldNameBar.Dir.RIGHT)
 
