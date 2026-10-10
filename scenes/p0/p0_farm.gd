@@ -793,7 +793,9 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"decorate": rt.ui.decor_requested.emit("")
 		"decorat", "decortap":
 			var at := cam.unproject_position(bp.cell_to_world(Vector2i(int(step[1]), int(step[2]))))
-			if step[0] == "decorat": rt.ui.placement_point.emit(at, "drag")
+			if step[0] == "decorat":   # a finger put there and lifted (held, the edge pan would carry the camera on)
+				rt.ui.placement_point.emit(at, "drag")
+				rt.ui.placement_point.emit(at, "release")
 			else:
 				rt.ui.placement_point.emit(at, "press")
 				rt.ui.placement_point.emit(at, "release")

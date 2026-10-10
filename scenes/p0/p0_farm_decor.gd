@@ -13,8 +13,8 @@ extends Node
 ## the bar allows is one the server accepts. One child node of the farm, like P0FarmFacilities.
 
 const TAP_SLOP := 12.0
-const OK_TINT := Color(0.55, 0.78, 0.95, 0.6)   # DECOR-PLACE: the cells light blue (family/water)
-const BAD_TINT := Color(0.86, 0.36, 0.30, 0.7)  # DECOR-PLACE-TAKEN: red
+const OK_TINT := Color(0.55, 0.78, 0.95, 0.8)   # DECOR-PLACE: the cells light blue (family/water)
+const BAD_TINT := Color(0.86, 0.36, 0.30, 0.85)  # DECOR-PLACE-TAKEN: red
 const IDLE_CAPTION := "Tap decor to move or store it"   # 李白 q(120)
 ## Placeholder looks: colour, height (m) and what stands on the footprint, per piece.
 const LOOKS := {
@@ -344,6 +344,10 @@ func _show() -> void:
 		_preview = null
 	if _preview == null:
 		_preview = art(id, int(placing.rot), farm.bp.cell_m)
+		for m in _preview.get_children():   # see-through, so the cells' blue / red under it reads
+			var mat := (m as MeshInstance3D).material_override as StandardMaterial3D
+			mat.albedo_color.a = 0.6
+			mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		_preview.name = "DecorPreview"
 		_preview.set_meta("look", "%s:%d" % [id, int(placing.rot)])
 		farm.add_child(_preview)
@@ -359,7 +363,7 @@ func _paint(cells: Array, bad: bool) -> void:
 	while _cells.size() < cells.size():
 		var q := MeshInstance3D.new()
 		var m := PlaneMesh.new()
-		m.size = Vector2(farm.bp.cell_m * 0.92, farm.bp.cell_m * 0.92)
+		m.size = Vector2(farm.bp.cell_m * 0.98, farm.bp.cell_m * 0.98)
 		q.mesh = m
 		q.material_override = _mat(OK_TINT, true)
 		q.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
@@ -369,7 +373,7 @@ func _paint(cells: Array, bad: bool) -> void:
 		var q: MeshInstance3D = _cells[i]
 		q.visible = i < cells.size()
 		if not q.visible: continue
-		q.position = farm.bp.cell_to_world(cells[i]) + Vector3(0, 0.02, 0)
+		q.position = farm.bp.cell_to_world(cells[i]) + Vector3(0, 0.03, 0)
 		(q.material_override as StandardMaterial3D).albedo_color = BAD_TINT if bad else OK_TINT
 
 # ---------------------------------------------------------------- helpers
