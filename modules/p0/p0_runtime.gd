@@ -478,7 +478,8 @@ func _on_state(v: Dictionary, events: Array) -> void:
 					if cook and nth == 2: fmt += " · 2nd today"
 					elif int(ev.percent) < 100: fmt += " · %d%%%%" % int(ev.percent)
 					var part := {kind = "xp", key = fmt, amount = int(ev.amount), fmt = fmt, tone = UiFloatText.Tone.XP}
-					if plants > 0 and str(ev.skill) == "farming": part.merge({unit = "plants", count = plants})
+					# one plant per farming XP event: Harvest All's reply has one a plant, and the parts add up (3, not 3 × 3)
+					if plants > 0 and str(ev.skill) == "farming": part.merge({unit = "plants", count = 1})
 					floats.append(part)
 			"item":
 				var iid := str(ev.id)
@@ -579,6 +580,13 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	# (seeds otherwise float nothing): `Seed Saver · +1 Radish Seeds`, or `Seed Saver · +2 seeds` for different kinds.
 	var saved := seed_saver_line(v, events.filter(func(e): return str(e.get("kind", "")) == "seed_saved" and not hushed.call(e)))
 	if not saved.is_empty(): floats.append(saved)
+	# Harvest All with a nearly full bag (q(123)): what fitted went in, the rest stays ripe. The row's result takes the
+	# place of its crops' line, as E-04's interrupted harvest reads (`Harvest 3 of 5 · bag full`), and the hold stops.
+	var short: Array = events.filter(func(e): return str(e.get("kind", "")) == "harvest_short")
+	if not short.is_empty():
+		floats = floats.filter(func(p): return not (str(p.get("kind", "")) == "item" and str(p.get("key", "")).begins_with("crop_")))
+		floats.append(harvest_result(int(short[0].get("got", 0)), int(short[0].get("of", 0))))
+		_harvest_stopped(v)
 	# Any catch resets what is held: a player who left the pond mid-arc never let the last fish's floats rise, and an
 	# escape after that must not float them (刘邦 on #154).
 	if settles_catch: catch_floats = floats if world_lands else []
@@ -731,9 +739,15 @@ static func _dev_ctx(role: String) -> Dictionary:
 func _harvest_bag_full() -> void:
 	var v := session.current()
 	var ready := (v.get("plots", []) as Array).filter(func(p): return str(p.get("state", "")) == "ready").size()
-	if _held_plants > 0:
-		ui.queue_floats([{kind = "item", key = "bag_full", text = "Harvest %d of %d · bag full" % [_held_plants, _held_plants + ready],
-			tone = UiFloatText.Tone.ITEM}], anchor())
+	if _held_plants > 0: ui.queue_floats([harvest_result(_held_plants, _held_plants + ready)], anchor())
+	_harvest_stopped(v)
+
+## The harvest's result line when the bag filled: `Harvest 3 of 5 · bag full` (E-04; Harvest All's row, q(123)).
+static func harvest_result(got: int, of: int) -> Dictionary:
+	return {kind = "item", key = "bag_full", text = "Harvest %d of %d · bag full" % [got, of], tone = UiFloatText.Tone.ITEM}
+
+## The bag filled: the Error toast to the stall with `Open bag ›`, and the held key lets go.
+func _harvest_stopped(v: Dictionary) -> void:
 	var bag: Dictionary = v.get("bag", {})
 	ui.toast_error("Bag %d/%d · Sell at Homestead Stall" % [(bag.get("slots", []) as Array).size(), int(bag.get("capacity", 25))], "Open bag")
 	ui.fab_held = false

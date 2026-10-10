@@ -2,7 +2,7 @@ extends GdUnitTestSuite
 ## q(107) / SGODOT-271: the Today chip is an icon with a red dot. It lights for a row that can be done now and that
 ## this device has not seen — a request to hand in, a harvest, a dish at the stove, a new recipe or slot, the first
 ## session's Sow / Catch / Deliver — never for a countdown, an info row, a request still short, `N fish · the stove is
-## free`, `Water N sown plots · Free`, a ticked row or one short of Energy. Opening Today sees them all; a key that leaves
+## free`, `Water N sown plots`, a ticked row or one short of Energy. Opening Today sees them all; a key that leaves
 ## the rows is forgotten, so the same thing coming back lights it again. Kept with the teaching tips, on the device.
 
 const KAI := "req_res_kai_1"
@@ -38,7 +38,7 @@ func test_a_delivery_and_a_harvest_light_it_watering_does_not() -> void:
 	var v := _kai(_view())
 	v["plots"] = [{"state": "ready", "crop": "crop_radish"}, {"state": "sown", "crop": "crop_radish"}]
 	var rows := P0Logic.today_rows(v)
-	assert_array(rows.map(func(r): return r.line)).contains(["Harvest 1 Radish", "Water 1 sown plot · Free"])
+	assert_array(rows.map(func(r): return r.line)).contains(["Harvest 1 Radish", "Water 1 sown plot"])
 	assert_array(_dots(v)).is_equal(["deliver:" + KAI, "harvest:crop_radish"])
 
 ## Several crops ready are one row, keyed by all of them: a new kind ripening is new.

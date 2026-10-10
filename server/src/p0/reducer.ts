@@ -205,7 +205,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       break;
     }
     case 'harvest': {
-      // One plot, or Harvest All (Farming Lv9, q(118) ④): every ripe annual of one garden row, 0 Energy, all or none.
+      // One plot, or Harvest All (Farming Lv9, q(118) ④): every ripe annual of one garden row, 0 Energy.
       const ids: unknown[] = Array.isArray(cmd.plots) ? cmd.plots : [cmd.plot];
       if (ids.length > 1) {
         const at = c.farming?.conveniences?.harvest_all;
@@ -228,14 +228,19 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
         if (refusal) return fail(refusal.code, refusal.detail);
         break;
       }
-      // Everything must fit before anything is taken (a trial bag, the same add / room rules).
+      // A nearly full bag takes what fits (q(123), as E-04's interrupted harvest): plot by plot in the order sent — the
+      // one in front, then outward along the row — up to the first the bag cannot take; the rest stays ripe. Measured
+      // on a trial bag with the same add / room rules; nothing fits → bag_full, as a single plot.
       const trial = { ...s, bag: structuredClone(s.bag) };
+      let fits = 0;
       for (const plot of plots as Plot[]) {
         const crop = cropById(c, plot.crop!)!;
-        if (room(c, trial, crop.id) < crop.yield) return fail('bag_full', { need: crop.yield, plot: plot.id });
+        if (room(c, trial, crop.id) < crop.yield) break;
         add(c, trial, crop.id, crop.yield);
+        fits++;
       }
-      for (const plot of plots as Plot[]) {
+      if (fits === 0) return fail('bag_full', { need: cropById(c, plots[0]!.crop!)!.yield, plot: plots[0]!.id });
+      for (const plot of (plots as Plot[]).slice(0, fits)) {
         const crop = cropById(c, plot.crop!)!;
         add(c, s, crop.id, crop.yield);
         events.push({ kind: 'item', id: crop.id, delta: crop.yield });
@@ -249,6 +254,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
         plot.state = 'tilled';
         delete plot.crop; delete plot.xp_pct; delete plot.ready_at; delete plot.fert;
       }
+      if (fits < plots.length) events.push({ kind: 'harvest_short', got: fits, of: plots.length, plot: plots[fits]!.id });
       break;
     }
     case 'buy': case 'sell': case 'drink': case 'lock': case 'unlock': case 'store': case 'take_out': {
