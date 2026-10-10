@@ -266,13 +266,15 @@ func test_the_preview_ghosts_its_own_materials() -> void:
 
 ## The windmill's sails turn once a SAIL_TURN_S, one tween however often the piece re-enters the tree (周瑜 on #276).
 func test_the_sails_turn_with_one_tween() -> void:
+	var running := func() -> int: return get_tree().get_processed_tweens().filter(func(tw: Tween): return tw.is_valid() and tw.is_running()).size()
+	var before: int = running.call()   # other tweens in the scene don't count (周瑜 on #276)
 	var mill: Node3D = P0FarmDecor.art("deco_windmill")
 	add_child(mill)
 	var sails := mill.find_child("Sails", true, false) as Node3D
 	remove_child(mill)
 	add_child(mill)
 	assert_bool(sails.get_meta("turning", false)).is_true()
-	assert_int(get_tree().get_processed_tweens().filter(func(tw: Tween): return tw.is_valid() and tw.is_running()).size()).is_equal(1)
+	assert_int(running.call() - before).is_equal(1)
 	var was := sails.rotation.z
 	await get_tree().create_timer(0.3).timeout
 	assert_float(absf(sails.rotation.z - was)).is_greater(0.01)   # it turns
