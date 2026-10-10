@@ -60,6 +60,7 @@ var _press := Vector2.INF
 ## Pieces sent and not yet in the view, {uid (< 0), id, x, y, rot, sent (ms)}: a multi-piece's next spot and its `N left`
 ## count them. Each goes when the view shows it, when its command is refused or fails, or after PENDING_MS (周瑜 on #265).
 var _pending: Array = []
+var _pending_uid := 0           # counts down: each sent piece its own uid, never one still on its way (周瑜 on #265)
 const PENDING_MS := 10000
 
 func setup(farm_node: Node3D) -> P0FarmDecor:
@@ -91,6 +92,11 @@ func frame(v: Dictionary, dt := 0.0) -> void:
 		_sig = sig
 		_pending = settle_pending(_pending, list, Time.get_ticks_msec())
 		_sync(list)
+	elif not _pending.is_empty():   # one lost on the way goes after PENDING_MS even when the view stays still
+		var left := settle_pending(_pending, list, Time.get_ticks_msec())
+		if left.size() != _pending.size():
+			_pending = left
+			if not placing.is_empty() and str(placing.mode) != "idle": _show()
 	if not placing.is_empty() and str(placing.mode) != "idle" and farm.placement_edge(_finger, dt): _snap(_finger)
 
 func _sync(list: Array) -> void:
@@ -318,7 +324,8 @@ func _on_done(ok: bool) -> void:
 			rt.session.send({"type": "move_decor", "uid": int(p.uid), "x": p.at.x, "y": p.at.y, "rot": int(p.rot), "space": "home"})
 		else:
 			rt.session.send({"type": "place_decor", "item": str(p.id), "x": p.at.x, "y": p.at.y, "rot": int(p.rot), "space": "home"})
-			_pending.append({"uid": -1 - _pending.size(), "id": str(p.id), "x": p.at.x, "y": p.at.y, "rot": int(p.rot),
+			_pending_uid -= 1
+			_pending.append({"uid": _pending_uid, "id": str(p.id), "x": p.at.x, "y": p.at.y, "rot": int(p.rot),
 				"sent": Time.get_ticks_msec()})
 			# a multi-piece one goes on: the next piece on the nearest free spot (49b11f91 ④)
 			if int(P0Decor.item(str(p.id)).get("pieces", 1)) > 1 and begin_place(str(p.id), bool(p.stay)): return
