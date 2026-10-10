@@ -1145,6 +1145,9 @@ const FLOAT_MAX_LINES := 3
 ## `River Perch ×1 · Common Carp ×1` / `Arctic Char ×1`, every line its own float of the same height, no ` ·` left at
 ## a line's end, within FLOAT_MAX_LINES). Cook All's costs and a row's crops read the same way.
 const FLOAT_SPLIT_KINDS := ["item"]
+## Kinds whose parts each take a line of their own: two taken requests moved by one reply read `Fresh Greens 3/5` and
+## `Market Basket · Carrot 5/6` on two lines (q(134) ④), within FLOAT_MAX_LINES like the rest.
+const FLOAT_LINE_EACH := ["request"]
 const FLOAT_ITEMS_PER_LINE := 2
 ## The lines one item group splits into pop together as one block, each its own height and this far apart, so they
 ## never meet, rising or at rest (不知火舞 on #289: Cook All's `−5 Pond Crucian · −2 Wild Herb` / `−2 Radish`).
@@ -1174,9 +1177,13 @@ func float_lines(parts: Array, at: Vector2) -> Array:
 	var rows: Array = []   # [{kind, parts}] from the bottom: a kind's line, or an item line's pair (FLOAT_ITEMS_PER_LINE)
 	for k in order:
 		var all: Dictionary = kinds[k]
+		if k in FLOAT_LINE_EACH:
+			for key in all: rows.append({kind = k, parts = {key: all[key]}})
+			continue
 		# split only while the lines still fit the cap of three; past it the kind stays one line in its own order and joins
 		# the cap's last line as any overflow does (q(49) ①, q(124) ①)
-		var lines_after := order.size() - order.find(k) - 1
+		var lines_after := 0   # the kinds above it, a request line each (FLOAT_LINE_EACH)
+		for later in order.slice(order.find(k) + 1): lines_after += (kinds[later] as Dictionary).size() if later in FLOAT_LINE_EACH else 1
 		var split_lines := ceili(float(all.size()) / FLOAT_ITEMS_PER_LINE)
 		if not (k in FLOAT_SPLIT_KINDS and all.size() > FLOAT_ITEMS_PER_LINE) or rows.size() + split_lines + lines_after > FLOAT_MAX_LINES:
 			rows.append({kind = k, parts = all})
@@ -1619,29 +1626,35 @@ func close_modal() -> void:
 var _held_toast := ""
 var _held_success := false   # the held toast is a Success one (toast_success_when_clear)
 var _held_break := false     # … and breaks its two lines at a " · " (_break_at_dot)
+var _held_after_tip := false # … and waits for a TipCard on screen to close (a request filled, q(134) ⑤)
 
 func toast_when_clear(text: String) -> void:
 	_held_toast = text
 	_held_success = false
 	_held_break = false
+	_held_after_tip = false
 	_flush_held_toast()
 
-## The same for a Success toast: the pond's `Pond Catch · 2/2 · Deliver at the Stall` waits for the Caught! card and
-## a level banner of the same catch (q(103)). One slot: the latest held toast wins, as a new toast replaces a shown one.
-func toast_success_when_clear(text: String, break_at_dot := false) -> void:
+## The same for a Success toast: a request filled (`Pond Catch · 2/2` / `Deliver at the Stall`, q(134)) waits for the
+## Caught! card and a level banner of the same catch; with after_tip also for a TipCard on screen. One slot: the latest
+## held toast wins, as a new toast replaces a shown one.
+func toast_success_when_clear(text: String, break_at_dot := false, after_tip := false) -> void:
 	_held_toast = text
 	_held_success = true
 	_held_break = break_at_dot
+	_held_after_tip = after_tip
 	_flush_held_toast()
 
 func _flush_held_toast() -> void:
 	if _held_toast == "" or not is_node_ready(): return
 	if surface == "busy" or _modal != null or not _card_queue.is_empty(): return
+	if _held_after_tip and _teach != null and _teach.visible: return   # _hide_tip lets it come
 	if _held_success: toast_success(_held_toast, _held_break)
 	else: toast(_held_toast, 0.0, _held_break)
 	_held_toast = ""
 	_held_success = false
 	_held_break = false
+	_held_after_tip = false
 
 ## InboxNotice (BAG-5-2 / FARM-LV2-2, LOCK-14, q(87) / q(88); SGODOT-234): rewards that did not fit the bag went to the
 ## Inbox. The card hangs under the bell, its right edge on the bell's (top: _notice_top), for MOTION_TOAST_BASE_MS
@@ -2922,6 +2935,7 @@ func _hide_tip(close_queue := true) -> void:
 	_teach_left = 0.0
 	if _teach: _teach.hide()
 	if close_queue and tips: tips.close()
+	_flush_held_toast.call_deferred()   # a filled request's toast waited for it (q(134) ⑤)
 
 ## Each tip's icon (P0Guide.TIPS keys) from the shared P0 icons, as the TUT-2 specimens (不知火舞 on 232 / 235-B2).
 const TIP_ICONS := {"sow": "seed_radish", "creel": "fish", "cast": "energy", "meal": "energy", "cook": "pot", "heat": "pot", "map": "map"}

@@ -39,6 +39,9 @@ var last_first_catch_xp := 0
 ## A landed catch the world shows itself (the P0 pond's arc to the hand) keeps its reply's floats here until the fish is
 ## in the hand; the world lets them rise then (take_catch_floats; 不知火舞 on 231: `+25 XP` crossed the fish in flight).
 var catch_floats: Array = []
+## …and the toast of a request that catch filled (q(134) ⑤; 周瑜 on #302): it waits for the same hand, then for the
+## catch's Caught! card (take_catch_toast).
+var catch_toast := ""
 const TRAP_CARD_TITLE := "In your trap!"   # q(124) ①: a landed fish's card is `Caught!`
 const TRAP_CARD_AFTER_S := 0.3              # after the last fish lands in the creel
 var last_catch_extras := {}   # the same response's New city XP and first-fish Energy, for the Caught! card
@@ -155,6 +158,8 @@ func attach(w: Node) -> void:
 	# The world being left stops where it is, and the stick ends: no walking on underneath (int5 hand test 035–039).
 	if is_instance_valid(world) and world != w: _call("p0_joystick", [Vector2.ZERO])
 	ui.end_stick()
+	# left before a landed fish reached the hand: the request it filled still says so (q(134))
+	if world != w and catch_toast != "": ui.toast_success_when_clear(take_catch_toast(), false, true)
 	world = w
 	session.space = space_of(w)   # before the read below, which tells the server where the player is
 	if session.space in ["map", "pond", "outpost"]: ui.cook_page_from_today = ""   # left home: Today's stove page goes (q(99))
@@ -410,6 +415,36 @@ static func trap_cards(v: Dictionary, events: Array) -> Array:
 		if not hit.is_empty() and int(energy[r]) > 0: hit[0].extras["energy"] = int(energy[r])
 	return cards
 
+## q(134): a taken request's grown count (the server's request_progress) in words — {float: `Fresh Greens 3/5`} while it
+## is short (a basket's item `Market Basket · Carrot 5/6`, a resident's plots `Five Little Plots · Plots 3/5`), {toast:
+## `Fresh Greens · 5/5` / `Deliver at the Stall`, two lines as a check-in's} on the one that fills it; {} for a request
+## the view no longer has.
+static func progress_said(v: Dictionary, ev: Dictionary) -> Dictionary:
+	var id := str(ev.get("id", ""))
+	var r := P0Logic.PinReason.request_of(v, id)
+	if r.is_empty(): return {}
+	var title := str(r.get("title", ""))
+	var qty := int(ev.get("qty", r.get("qty", 1)))
+	if bool(ev.get("done", false)): return {toast = "%s · %d/%d\n%s" % [title, qty, qty, str(r.get("deliver", ""))]}
+	var have := int(ev.get("have", 0))
+	var item := str(ev.get("item", ""))
+	if item != "": return {float = "%s · %s %d/%d" % [title, P0Logic.item_name(v, item), have, qty]}
+	var taken: Array = P0Logic.PinReason.taken(v).filter(func(t): return str(t.get("id", "")) == id)
+	if not taken.is_empty() and str(taken[0].get("kind", "")) == "sow":
+		return {float = "%s · %s %d/%d" % [title, str(r.get("need_name", "Plots")), have, qty]}
+	return {float = "%s %d/%d" % [title, have, qty]}
+
+## A filled request's toast comes after the reply's cards (q(134) ⑤): a level-up's banner is deferred, so the toast
+## waits this long, then for the cards to close. A landed fish's and a trap's wait for their own cards (_on_state).
+const REQUEST_TOAST_AFTER_S := 0.55
+
+## The filled request's toast a landed catch's reply held (catch_toast), handed over once: the world shows it after the
+## catch's card.
+func take_catch_toast() -> String:
+	var held := catch_toast
+	catch_toast = ""
+	return held
+
 ## The floats a landed catch's reply held for the world (catch_floats), handed over once: the world lets them rise.
 func take_catch_floats() -> Array:
 	var held := catch_floats
@@ -450,6 +485,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	last_catch_extras = {}
 	var settles_catch := events.any(func(e): return str(e.get("kind", "")) == "catch")
 	var world_lands := false   # the world shows this reply's landed fish: its floats wait for the hand
+	var filled_toast := ""     # a request this reply filled (q(134)): said after the reply's cards, below
 	# A first's bonus XP is said by its own line, not added into the XP float: the first cook's and catch's on their
 	# card's strip (Li Bai, int6 C11), the first harvest's as `First harvest! +10 XP · Radish` (§4.8.6).
 	var first_cook_xp: Array = []
@@ -647,6 +683,12 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				if str(ev.get("from", "")) == "taught":
 					ui.resident_affinity({"resident": str(ev.get("resident", "")), "delta": 0}, "Let me show you a dish.")
 				ui.toast_success(("Recipe Card · %s" if str(ev.get("from", "")) == "card" else "Learned · %s") % page)
+			"request_progress":   # q(134): a taken request's count grew — its line over the items, or the toast when full
+				var said := progress_said(v, ev)
+				if said.has("float"):
+					floats.append({kind = "request", key = "request:%s:%s" % [str(ev.get("id", "")), str(ev.get("item", ""))],
+						text = str(said.float), tone = UiFloatText.Tone.ITEM})
+				elif said.has("toast"): filled_toast = str(said.toast)
 			"visit":   # Stamp Run checked in (不知火舞 / 李白 on #224): once, after the entry's cover and a keeper's greeting
 				ui.toast_success_when_clear(P0Logic.visit_toast(v, str(ev.get("id", ""))))
 			"title":   # a story request's title (§9.4.4 Trusted)
@@ -700,12 +742,22 @@ func _on_state(v: Dictionary, events: Array) -> void:
 		var cards := trap_cards_now
 		if not cards.is_empty():
 			var landed_s := UiItemFly.FLIGHT_S + UiItemFly.DELAY_STEP_S * (mini(trap_got.size(), UiItemFly.MAX_PER_BATCH) - 1)
+			var toast := filled_toast   # a request the trap filled: after its cards (周瑜 on #302)
+			filled_toast = ""
 			get_tree().create_timer(landed_s + TRAP_CARD_AFTER_S).timeout.connect(func() -> void:
-				for k in cards: ui.queue_card(ui.show_catch.bind(str(k.fish), int(k.rarity), int(k.xp), k.extras, TRAP_CARD_TITLE)))
+				for k in cards: ui.queue_card(ui.show_catch.bind(str(k.fish), int(k.rarity), int(k.xp), k.extras, TRAP_CARD_TITLE))
+				if toast != "": ui.toast_success_when_clear(toast, false, true))
 	# Any catch resets what is held: a player who left the pond mid-arc never let the last fish's floats rise, and an
 	# escape after that must not float them (刘邦 on #154).
 	if settles_catch: catch_floats = floats if world_lands else []
 	if world_lands: floats = []
+	# A request this reply filled says so after the reply's cards (q(134) ⑤; 周瑜 on #302): a landed fish's after its
+	# Caught! card (held with its floats: the pond lets it go, take_catch_toast), a trap's after its In your trap! cards
+	# (their timer, above), anything else REQUEST_TOAST_AFTER_S on (a level-up's banner comes deferred). Bound to the UI
+	# (哪吒 on #188): a world left within the wait still gets it; held, it waits for a TipCard on screen too.
+	if settles_catch: catch_toast = filled_toast if world_lands else ""
+	if filled_toast != "" and not world_lands:
+		get_tree().create_timer(REQUEST_TOAST_AFTER_S).timeout.connect(ui.toast_success_when_clear.bind(filled_toast, false, true))
 	if wave_s > 0.0:
 		var lines := floats
 		get_tree().create_timer(wave_s).timeout.connect(func(): ui.queue_floats(lines, at))
