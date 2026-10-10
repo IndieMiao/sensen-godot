@@ -167,3 +167,22 @@ func test_the_trap_cards_come_after_the_flights_and_keep_their_xp_off_the_float(
 	var second: UiRewardMoment = rt.ui.find_children("*", "UiRewardMoment", true, false).filter(func(m): return not m.is_queued_for_deletion()).front()
 	assert_array([second.event, second.item_name, second.strip, second.note]).is_equal(["In your trap!", "River Perch", "First catch! +30 XP", "Fish-dex 2/20"])
 	assert_int(second.rewards.size()).is_equal(1)   # the first Fine's +20 Energy
+
+## No new kind but the city's first fish (a trap set in Tokyo, collected before any rod catch there; 苏烈 on #290): no
+## card, so New city!'s XP is not hidden — it counts in the collect's `+N XP`, as on a rod's catch of a known kind.
+func test_a_new_city_without_a_new_kind_keeps_its_xp_in_the_float() -> void:
+	var rt: P0Runtime = auto_free(P0Runtime.new())
+	add_child(rt)
+	await get_tree().process_frame
+	var v := _first_view()
+	rt.session.view = v
+	rt.ui.set_view(v)
+	var events := [{"kind": "item", "id": "fish_crucian", "delta": 1}, {"kind": "xp", "skill": "fishing", "amount": 2, "percent": 100},
+		{"kind": "first", "what": "fishing_city:gn-1850147", "xp": 10, "name": "Tokyo"}, {"kind": "xp", "skill": "fishing", "amount": 10, "percent": 100},
+		{"kind": "trap", "action": "collected", "place": "gn-1850147~pond0", "fish": 1, "left": 0}]
+	assert_array(P0Runtime.trap_cards(v, events)).is_empty()
+	rt._on_state(v, events)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var texts: Array = rt.ui.root.get_children().filter(func(c): return c is UiFloatText).map(func(f): return f.text)
+	assert_array(texts).contains(["+12 XP"])

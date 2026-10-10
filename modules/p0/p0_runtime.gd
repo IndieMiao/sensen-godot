@@ -479,9 +479,10 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				# The server emits a first-time bonus as `first` immediately followed by its `xp`.
 				var bonus: bool = i > 0 and str(events[i - 1].get("kind", "")) == "first" and int(events[i - 1].xp) == int(ev.amount)
 				var what := str(events[i - 1].get("what", "")) if bonus else ""
-				# (a trap's New city! too: its card says it, not the trap's `+N XP`, q(124) ①)
+				# (a trap's New city! too when a card says it, not the trap's `+N XP`, q(124) ①; with no new kind there is no
+				# card, so it stays in that XP, as a rod's catch of a known kind does — 苏烈 on #290)
 				if bonus and (str(ev.skill) == "cooking" or what.begins_with("catch:") or what.begins_with("harvest:") \
-						or (not trap_got.is_empty() and what.begins_with("fishing_city:"))):
+						or (not trap_cards_now.is_empty() and what.begins_with("fishing_city:"))):
 					first_cook_xp.append(ev)
 				if what.begins_with("cook:") and not cook_card:
 					floats.append({kind = "first", key = what, text = "First cooked · +%d Cooking XP" % int(ev.amount), tone = UiFloatText.Tone.XP})
