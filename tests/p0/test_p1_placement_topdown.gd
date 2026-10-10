@@ -99,3 +99,6 @@ func test_the_player_comes_back_on_the_nearest_free_cell_by_walking() -> void:
 	assert_that(P0Farm.free_cell_near(g, c, [c, c + Vector2i(0, -1)])).is_equal(c + Vector2i(0, -2))
 	g.set_solid(c + Vector2i(0, -1), true)
 	assert_that(P0Farm.free_cell_near(g, c, [c])).is_equal(c)   # walled in: stays
+	# Decorate's pieces are solid in the grid: their own cells are still crossed on the way out (苏烈 on #261)
+	g.set_solid(c, true)
+	assert_that(P0Farm.free_cell_near(g, c, [c, c + Vector2i(0, -1)])).is_equal(c + Vector2i(0, -2))
