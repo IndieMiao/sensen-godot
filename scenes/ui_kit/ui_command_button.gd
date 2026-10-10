@@ -31,6 +31,9 @@ var compact := false: set = set_compact
 var label := "": set = set_label
 ## Non-empty = unavailable; this text replaces the label on the button (LOCK-10).
 var reason := "": set = set_reason
+## The reason is shown right next to the key (the placement bar's caption over a three-key row, too narrow for
+## `Outside your yard`; 不知火舞 on 241 fcbd30a7): unavailable keeps the verb in the blocked look, a tap still says why.
+var reason_beside := false: set = set_reason_beside
 var phase: CommandLifecycle.State = CommandLifecycle.State.IDLE: set = set_phase
 ## Full-width rows with a long reason (ResidentDialogue Choices=Stacked): the label may use the side padding,
 ## as the main draws it (a 200 px reason in a 208 button on NPC-5).
@@ -67,6 +70,7 @@ func set_kind(v: Kind) -> void: kind = v; _apply()
 func set_compact(v: bool) -> void: compact = v; _apply()
 func set_label(v: String) -> void: label = v; _apply()
 func set_reason(v: String) -> void: reason = v; _apply()
+func set_reason_beside(v: bool) -> void: reason_beside = v; _apply()
 func set_phase(v: CommandLifecycle.State) -> void: phase = v; _apply()
 func set_fit_text(v: bool) -> void: fit_text = v; _fit()
 func set_sends(v: bool) -> void: sends = v; _apply()
@@ -137,7 +141,7 @@ func _apply() -> void:
 	if sends: disabled = is_offline()   # only ours: a caller may disable a plain one itself
 	if is_offline() or is_unavailable():
 		theme_type_variation = UiTokens.BUTTON_CMD_BLOCKED_COMPACT if compact else UiTokens.BUTTON_CMD_BLOCKED
-		text = OFFLINE_TEXT if is_offline() else reason
+		text = OFFLINE_TEXT if is_offline() else (label if reason_beside else reason)
 	else:
 		theme_type_variation = _VARIATIONS[kind][i]
 		text = label

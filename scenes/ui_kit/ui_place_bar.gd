@@ -7,7 +7,9 @@ extends Control
 ##   confirm      the main key's verb, "Build" / "Move" / "Place"
 ##   reason       non-empty = the spot is not valid: the main key shows it in the blocked look ("Plot occupied")
 ##   secondary    an optional middle key in the secondary look ("Rotate" for 2×1 / 3×2 decor, 不知火舞 on 284
-##                ee15926a): Cancel · Rotate · Place share the width equally; "" = the two-key bar (sprinklers)
+##                ee15926a): Cancel · Rotate · Place share the width equally; "" = the two-key bar (sprinklers).
+##                Three keys leave no room for a reason on the main key (fcbd30a7): it greys keeping its verb and the
+##                reason takes the caption pill's place until the spot is valid again
 ## Signals: confirmed (the main key on a valid spot), cancelled, secondary_pressed; a tap on a blocked main key says
 ## why (unavailable).
 
@@ -81,9 +83,14 @@ func _layout() -> void:
 
 func set_caption(v: String) -> void:
 	caption = v
+	_show_caption()
+
+## The pill: the caption, or with three keys the reason the spot is not valid.
+func _show_caption() -> void:
 	if _caption == null: return
-	_caption.text = v
-	_pill.visible = v != ""
+	var t := reason if secondary != "" and reason != "" else caption
+	_caption.text = t
+	_pill.visible = t != ""
 	_layout()
 
 func set_confirm(v: String) -> void:
@@ -93,6 +100,7 @@ func set_confirm(v: String) -> void:
 func set_reason(v: String) -> void:
 	reason = v
 	if _ok != null: _ok.reason = v
+	_show_caption()
 
 func set_secondary(v: String) -> void:
 	secondary = v
@@ -100,6 +108,8 @@ func set_secondary(v: String) -> void:
 	_second.label = v
 	_second.visible = v != ""
 	_ok.size_flags_stretch_ratio = 1.0 if v != "" else _MAIN_RATIO
+	_ok.reason_beside = v != ""
+	_show_caption()
 
 func set_safe_bottom(v: float) -> void:
 	safe_bottom = v

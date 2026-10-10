@@ -131,8 +131,21 @@ func test_the_bar_takes_an_optional_middle_key() -> void:
 	assert_float(bar._second.size.x).is_equal_approx(bar._cancel.size.x, 1.0)
 	bar._second.activated.emit()
 	assert_array(turned).is_equal([true])
-	ui.set_placement({"secondary": ""})   # a square piece selected next: back to two keys
+	# fcbd30a7: a bad spot greys the main key keeping its verb; the reason replaces the caption, a tap still says why
+	var said := []
+	bar.unavailable.connect(func(r): said.append(r))
+	ui.set_placement({"caption": "Garden Bench · 3/20 placed", "reason": "Outside your yard"})
+	assert_str(bar._ok.text).is_equal("Place")
+	assert_bool(bar._ok.is_unavailable()).is_true()
+	assert_str(bar._caption.text).is_equal("Outside your yard")
+	bar._ok.pressed.emit()
+	assert_array(said).is_equal(["Outside your yard"])
+	ui.set_placement({"reason": ""})
+	assert_str(bar._caption.text).is_equal("Garden Bench · 3/20 placed")
+	ui.set_placement({"reason": "Space taken", "secondary": ""})   # a square piece selected next: back to two keys
 	assert_bool(bar._second.visible).is_false()
+	assert_str(bar._ok.text).is_equal("Space taken")   # the two-key bar keeps the reason on its key
+	assert_str(bar._caption.text).is_equal("Garden Bench · 3/20 placed")
 
 ## A press on the scene in placement mode moves the preview (placement_point) and summons no stick.
 func test_placement_presses_move_the_preview_not_the_player() -> void:
