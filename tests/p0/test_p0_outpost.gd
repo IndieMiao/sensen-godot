@@ -691,3 +691,18 @@ func test_the_opening_shot_shows_the_player_and_the_keeper_with_the_whole_name_t
 			assert_bool(Rect2(Vector2.ZERO, view).has_point(at)).override_failure_message("%s keeper %s" % [o.id, at]).is_true()
 		var head := r.cam.unproject_position((r.npcs.npc_keeper.root as Node3D).to_global(OutpostScript.NAME_OVER_HEAD))
 		assert_bool(band.has_point(head)).override_failure_message("%s tag anchor %s" % [o.id, head]).is_true()
+
+## SGODOT-280: a generated city's keeper is not in outpost_npcs.json — they stand at the counter in their look preset
+## (world.keeper_looks, role × climate × 3), under their own name plate.
+func test_a_generated_keeper_wears_their_look_preset() -> void:
+	var r := Sample.new()
+	r.setup({"outpost_id": "sh_tea_1"})
+	r.keeper = {"role": "Tea Host", "name": "Ola", "look": "tea_temperate_1"}
+	add_child(r)
+	auto_free(r)
+	assert_bool(r.npcs.has("npc_keeper")).is_true()
+	assert_str(str(r.npcs.npc_keeper.name)).is_equal("Ola")
+	var look: Dictionary = P0Logic.content().world.keeper_looks.tea_temperate_1
+	var rig: AvatarRig = (r.npcs.npc_keeper.root as Node).find_children("*", "AvatarRig", true, false)[0]
+	var worn: Dictionary = rig.get("_desired")
+	for slot in look: assert_str(str(worn.get(StringName(slot), ""))).is_equal(str(look[slot]))

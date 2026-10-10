@@ -1,0 +1,48 @@
+{
+  "_note": "P1 钓鱼第二段（周瑜，SGODOT-283；方案 §6.2.6–6.2.7、§6.3.1、§6.4，李白 q(109)）：Coast 模板；碳素竿（可收至 Legendary，提竿窗口 +0.8 s，绿带 +5 个百分点，条外损耗 ×0.9，咬钩随机幅 1.8 s）；亮片（Fishing Lv5、6 金币、每日 10 枚（账号级）、地区鱼权重 ×2）；天气（城市 × 当地日期哈希，晴 50 / 雨 30 / 风 20，城市当地 04:00 换日）与全服种子。鱼塘的鱼不再列在 sites 里，而是由鱼表的栖息 + 本城 2 种地区鱼 + 时段推出来（server/src/p0/fishing_world.ts，客户端 modules/p0/p0_fish_world.gd）。Clover Pond 改为 Coast 这一项在主文件 fishing.places 里。",
+  "fishing": {
+    "sites": {
+      "coast": {
+        "name": "Coast",
+        "template": "Coast",
+        "weights": [30, 35, 25, 10]
+      }
+    },
+    "rods": [
+      {
+        "id": "rod_carbon",
+        "name": "Carbon Rod",
+        "reach": 4,
+        "level": 6,
+        "price": 350,
+        "hook_bonus_ms": 800,
+        "band_bonus": 0.05,
+        "loss_mult": 0.9,
+        "bite_spread_ms": 1800
+      }
+    ],
+    "baits": {
+      "bait_lure": {
+        "shift": [-15, -5, 15, 5],
+        "wait": 1,
+        "regional_mult": 2
+      }
+    },
+    "regional": {
+      "seed": "gensen-p1",
+      "weather": {
+        "odds": { "sun": 50, "rain": 30, "wind": 20 },
+        "rollover_hour": 4
+      }
+    }
+  },
+  "goods": {
+    "bait_lure": {
+      "name": "Spinner Lure",
+      "price": 6,
+      "skill": "fishing",
+      "gate": 5,
+      "daily": 10
+    }
+  }
+}

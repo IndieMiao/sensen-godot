@@ -19,11 +19,14 @@ import { haveTotal, stored } from './storage.js';
 import { mineView, settleMine } from './mine.js';
 import { gatherView } from './gathering.js';
 import { workbenchView } from './workbench.js';
-import { coveredPlots, facilitiesView, facilityAt, plotCount } from './garden.js';
+import { coveredPlots, cropGrowH, facilitiesView, facilityAt, plotCount } from './garden.js';
+import { homeClimate } from './travel.js';
 import { restReadyIn } from './presence.js';
 import { inboxView, settleParcels } from './parcels.js';
 import { cookbookView, masteredCount } from './cookbook.js';
 import { mapMarkers } from './markers.js';
+import { everFish, pondAt, pondFishIds } from './fishing_world.js';
+import { homeCluster } from './travel.js';
 import { decorView } from './decor.js';
 
 /** opts.online: players in the P0 outpost rooms right now (SGODOT-227), for the Tea Host's answer; null when not known. */
@@ -100,11 +103,17 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     fishing: {
       sites: Object.fromEntries(Object.entries(f.sites).map(([id, site]) => [id, { name: site.name, template: site.template }])),
       // q(36): every catalog pond with its template; place = the pond the player is at (null away from ponds).
-      places: Object.fromEntries(Object.entries(f.places).map(([id, p]) => [id, {
-        name: p.name, site: p.site, template: f.sites[p.site]?.template ?? '', beginner: p.beginner === true }])),
+      // SGODOT-283: and what that pond is like now — its time of day and today's weather in its city — and every fish
+      // it can ever give there (habitat × the city's regional fish), for the pond card and its Details list.
+      places: Object.fromEntries(Object.entries(f.places).map(([id, p]) => {
+        const pond = pondAt(c, id, now);
+        return [id, { name: p.name, site: p.site, template: f.sites[p.site]?.template ?? '', beginner: p.beginner === true,
+          daypart: pond.part, weather: pond.weather, fish: [...pondFishIds(c, id)] }];
+      })),
       place: s.presence.place ?? null,
       rod: (rodById(c, s.gear.rod) ?? f.rods[0]).name, rod_reach: (rodById(c, s.gear.rod) ?? f.rods[0]).reach,
       hook_bonus_ms: (rodById(c, s.gear.rod) ?? f.rods[0]).hook_bonus_ms, band_bonus: (rodById(c, s.gear.rod) ?? f.rods[0]).band_bonus,
+      loss_mult: (rodById(c, s.gear.rod) ?? f.rods[0]).loss_mult ?? 1,   // Carbon Rod 0.9: the minigame's out-of-band loss
       cast_energy: f.cast_energy,
       cast: s.cast ? { rarity: fishById(c, s.cast.fish)!.rarity, site: s.cast.site, bite_in: Math.max(0, s.cast.at + s.cast.bite_ms - now),
         hook_ms: f.hook_window_ms + (rodById(c, s.gear.rod)?.hook_bonus_ms ?? 0), breaks: s.cast.breaks, bait: s.cast.bait } : null,
@@ -176,7 +185,9 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
       ...Object.entries(c.materials).map(([id, m]) => [id, m.name]), ...Object.entries(c.drinks.items).map(([id, d]) => [id, d.name]),
       ...Object.entries(c.specialty).map(([id, sp]) => [id, sp.name]), ...c.bag_upgrades.map(u => [u.id, u.name]),
       ...Object.entries(c.supplies).map(([id, x]) => [id, x.name])]),
-    crops: c.crops.map(crop => ({ id: crop.id, seed: crop.seed, energy: crop.energy, grow_h: crop.grow_h, level: crop.level })),
+    // grow_h is this farm's: a regional crop away from its zone ripens in off_zone_grow_h (§5.2.3, `native` false).
+    crops: c.crops.map(crop => ({ id: crop.id, seed: crop.seed, energy: crop.energy, grow_h: cropGrowH(c, s, crop), level: crop.level,
+      ...(crop.regional ? { zone: crop.zone, native: crop.zone === homeClimate(c, s) } : {}) })),
     firsts: s.firsts,
     req_done: s.req_done,   // requests handed in (newest last, ≤ 20): the first session's Deliver row ticks on Pond Catch (q(58))
   };
@@ -282,7 +293,7 @@ function quotaView(c: P0Content, s: P0State, q: QuotaId, now: number) {
 /** One counter (§9.11): what it sells with every gate as a fact, and which kinds it buys back at what rate / quota. */
 function shopView(c: P0Content, s: P0State, shop: ShopId) {
   return {
-    buy: catalog(c, shop).map(id => {
+    buy: catalog(c, shop, s).map(id => {
       const o = offerOf(c, id)!;
       const unlocked = !o.skill || skillLevel(c, s, o.skill) >= o.gate;
       return {
@@ -291,7 +302,7 @@ function shopView(c: P0Content, s: P0State, shop: ShopId) {
         xp_to_go: o.skill ? Math.max(0, c.skills[o.skill][o.gate - 1] - s.skills[o.skill]) : 0,
         homestead: o.homestead ?? null, homestead_ok: !o.homestead || s.homestead.level >= o.homestead,
         once: o.once, owned: o.once && owns(c, s, id),
-        left: o.daily ? Math.max(0, o.daily - (s.day.bought[id] ?? 0)) : null,
+        left: o.daily ? Math.max(0, o.daily - (s.day.bought[id] ?? 0)) : null, daily: o.daily || null,
         materials: (o.materials ?? []).map(([m, n]) => ({ id: m, name: itemName(c, m), need: n, have: haveTotal(s, m) })),
         in_bag: count(s.bag, id),
       };
@@ -410,7 +421,7 @@ function keepersView(c: P0Content, s: P0State, now: number, online: number | nul
   const fishing = skillLevel(c, s, 'fishing');
   const reed = c.fishing.rods.find(r => r.id === 'rod_reed');
   const nextFish = Object.fromEntries(Object.entries(c.fishing.sites).map(([site, def]) => {
-    const above = def.fish.map(f => fishById(c, f)!).filter(f => f.level > fishing).sort((a, b) => a.level - b.level)[0];
+    const above = everFish(c, def, homeCluster(c)).filter(f => f.level > fishing).sort((a, b) => a.level - b.level)[0];
     return [site, above ? { id: above.id, level: above.level } : null];
   }));
   const tea = { cups_left: left, full, greet: left <= 0 ? 'cups_out' : full ? 'full' : 'cups_left', online };

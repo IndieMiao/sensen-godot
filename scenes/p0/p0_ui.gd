@@ -28,6 +28,8 @@ signal tackle_requested()      # FISH-5 rod variant "Tackle Shop"
 ## "release"); the world turns it into a spot. The bar's main key and Cancel come back as placement_done(ok).
 signal placement_point(screen: Vector2, phase: String)
 signal placement_done(ok: bool)
+## The placement bar's optional middle key (`Rotate`, Decorate's 2×1 / 3×2 decor; spec.secondary).
+signal placement_secondary
 ## Two fingers in placement mode moved the picture by `px` (screen), about `at`: the world pans its camera.
 signal placement_pan(px: Vector2, at: Vector2)
 ## A field recipe's Build on the workbench (SGODOT-241): the world opens placement mode for it.
@@ -3077,8 +3079,9 @@ class _TouchPad extends Control:
 ## The modal edit shell (plan q(23): the LOCK-01 / 02 exception) the sprinkler's Build and Move use, and later Decorate
 ## and Plot Marks: a press on the scene summons no stick, it moves the preview (placement_point); the HUD keeps only
 ## its first row; the quick bar, the main key, the switch key, the radial and world markers step aside; the bottom bar
-## has Cancel and the main key. What is placed, where it may stand and what the main key sends belong to the caller:
-## spec = {confirm: "Build", caption: "", reason: ""}; update them with set_placement as the preview moves.
+## has Cancel and the main key (and, for decor that turns, a middle key: placement_secondary). What is placed, where it
+## may stand and what the keys send belong to the caller: spec = {confirm: "Build", caption: "", reason: "",
+## secondary: ""}; update them with set_placement as the preview moves.
 var _place_bar: UiPlaceBar
 
 func placing() -> bool: return _place_bar != null and is_instance_valid(_place_bar)
@@ -3095,6 +3098,7 @@ func begin_placement(spec: Dictionary) -> void:
 	_place_bar.safe_bottom = safe_bottom()
 	_place_bar.confirmed.connect(func(): placement_done.emit(true))
 	_place_bar.cancelled.connect(func(): placement_done.emit(false))
+	_place_bar.secondary_pressed.connect(func(): placement_secondary.emit())
 	_place_bar.unavailable.connect(func(r: String): toast(r))
 	_kit.add_child(_place_bar)
 	set_placement(spec)
@@ -3110,6 +3114,7 @@ func set_placement(spec: Dictionary) -> void:
 	if spec.has("confirm"): _place_bar.confirm = str(spec.confirm)
 	if spec.has("caption"): _place_bar.caption = str(spec.caption)
 	if spec.has("reason"): _place_bar.reason = str(spec.reason)
+	if spec.has("secondary"): _place_bar.secondary = str(spec.secondary)
 
 ## Back to the world's controls (after the main key's command is sent, or Cancel).
 func end_placement() -> void:

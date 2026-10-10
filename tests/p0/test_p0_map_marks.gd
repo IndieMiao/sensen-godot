@@ -61,7 +61,10 @@ func test_the_fish_list_is_easiest_first_with_caught_ones_marked() -> void:
 	var rows := PondCard.fish_rows(_view(1, ["fish_crucian"]), "pond_san_francisco_03")
 	var ids := rows.map(func(r): return str(r.id))
 	assert_array(ids).contains(["fish_crucian", "fish_koi"])
-	assert_str(str(ids[-1])).is_equal("fish_koi")   # Golden Koi, the hardest, last: its silhouette tells Old Kai's quest
+	# easiest first: Golden Koi (Lv4) after every Lv1–3 fish — its silhouette tells Old Kai's quest — and P1's River Eel
+	# (Lv9, night only, SGODOT-283) last
+	assert_int(ids.find("fish_koi")).is_greater(ids.find("fish_perch"))
+	assert_str(str(ids[-1])).is_equal("fish_eel")
 	assert_bool(rows.filter(func(r): return r.id == "fish_crucian")[0].caught).is_true()
 	assert_bool(rows.filter(func(r): return r.id == "fish_koi")[0].caught).is_false()
 	assert_float(P0PlaceSheet.km_between(Vector2(31.2, 121.4), Vector2(31.2, 121.4))).is_equal(0.0)

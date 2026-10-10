@@ -12,7 +12,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadP0Content } from '../src/p0/content.js';
 import { registerP0Online } from '../src/p0/online/hub.js';
-import { loadOutposts } from '../src/p0/online/outposts.js';
+import { generatedOutpostSpec, loadOutposts } from '../src/p0/online/outposts.js';
+import { cityPlaces } from '../src/p0/world.js';
 import { OutpostRooms } from '../src/p0/online/rooms.js';
 import { registerP0Routes } from '../src/p0/routes.js';
 import { P0Store } from '../src/p0/store.js';
@@ -51,7 +52,13 @@ const eventDir = process.env.P0_EVENT_DIR ?? path.join(path.dirname(stateFile), 
 const log = new P0EventLog(eventDir === '' ? undefined : eventDir);
 // Outpost rooms (SGODOT-227): WebSocket /v1/p0/online and GET /v1/p0/presence, in memory only. The same rooms
 // give the Tea Host's "N online" in the state view (SGODOT-228).
-const rooms = new OutpostRooms(loadOutposts());
+// Generated outposts (SGODOT-280) get a room on first join, sized and walled like the room their art stands in for.
+const outpostTable = loadOutposts();
+const generatedRoom = generatedOutpostSpec(outpostTable, id => {
+  const cut = id.indexOf('~');
+  return cityPlaces(content, id.slice(0, cut))?.detail.outposts.find(o => o.id === id);
+});
+const rooms = new OutpostRooms(outpostTable, Date.now, generatedRoom);
 registerP0Routes(app, { content, store, now: Date.now, dev, log, presence: () => rooms.total() });
 // The WebSocket upgrade checks the guard's demo keys itself: the guard's onRequest hook does not see it (SGODOT-232 D1).
 // v5: joining an outpost room needs a pass for its city, as entering it does (requirePass; the entered outpost passes).

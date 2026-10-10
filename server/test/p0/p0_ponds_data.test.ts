@@ -3,6 +3,7 @@
  * and pondFor compare it (profile.city lower-cased: "san francisco", never a region id); one beginner pond, a Pond with
  * Pond Crucian (q(32), §6.3.3). */
 import { readFileSync } from 'node:fs';
+import { pondFishIds } from '../../src/p0/fishing_world.js';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_P0_CONTENT, loadP0Content } from '../../src/p0/content.js';
@@ -37,6 +38,6 @@ describe("P0's pond data (SGODOT-270)", () => {
     expect(beginners.map(([id]) => id)).toEqual(['pond_san_francisco_03']);
     const site = c.fishing.sites[beginners[0][1].site];
     expect(site.template).toBe('Pond');
-    expect(site.fish).toContain('fish_crucian');
+    expect(pondFishIds(c, beginners[0][0])).toContain('fish_crucian');
   });
 });

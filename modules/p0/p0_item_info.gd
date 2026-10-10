@@ -321,7 +321,7 @@ static func tokens(view: Dictionary, item_id: String, context: StringName, opts 
 		homestead_gate = ("Homestead Lv%d needed" % int(offer.homestead)) if offer.get("homestead", null) != null else "",
 		xp_hint = "",
 		# A buy row's line 2 (FARM-6 482:46): what the item does, in a few words.
-		use = {"seed": ("Ready in " + hours(float(crop.grow_h))) if crop.has("grow_h") else "", "bait": "Bites come faster",
+		use = {"seed": _seed_use(crop), "bait": "Bites come faster",
 			"fert": "Grows faster"}.get(kind, _offer_use(view, offer)),
 		region_line = "",
 		pin_verb = "Unpin" if opts.get("pinned", false) else "Pin",
@@ -431,6 +431,13 @@ const NEW_FOR_YOU := "◆ New for you"
 ## opts.new_ids: the offers new to this visit (P0Ui.stall_new_ids, through the counter drawer's opts).
 static func _new_offer(item_id: String, opts: Dictionary) -> bool:
 	return (opts.get("new_ids", []) as Array).has(item_id)
+
+## A seed row's line 2: how long it takes on this farm. A regional crop away from its climate zone ripens ×1.5 there
+## (the view's grow_h is already that time) and says so (§5.2.3, glossary off_zone_penalty `not native`).
+static func _seed_use(crop: Dictionary) -> String:
+	if not crop.has("grow_h"): return ""
+	var line := "Ready in " + hours(float(crop.grow_h))
+	return line + (SEP + "not native" if crop.has("native") and not bool(crop.native) else "")
 
 static func _stock_line(offer: Dictionary, count: int) -> String:
 	var bag := "Bag ×%d" % count
