@@ -340,6 +340,76 @@
     "lat": 34.040844,
     "lng": -118.219243,
     "why": "Los Angeles · Clover Tackle Shop stood on Hollenbeck Lake (34.040526, -118.21805; 司空震's six-city check on farm-dev 303ce619, 2026-10-10). Moved 116 m west to the houses across the Golden State Fwy between it and S Boyle Ave: 111 m from the lake (OSM relation 3244050), 94 m from Clover Cove, 40 m from the freeway."
+   },
+   "gn-5128581~pond0": {
+    "lat": 40.729478,
+    "lng": -74.013998,
+    "why": "New York · Blossom Pond stood on water (40.73032, -74.026693; 司空震's six-city check, 286 16ffaf67, 2026-10-10). Moved 1075 m to land 28 m from water by ESA WorldCover 2021 (tools/world_water_check.ts), keeping the placement rules."
+   },
+   "gn-5128581~pond2": {
+    "lat": 40.692192,
+    "lng": -74.013947,
+    "why": "New York · Reed Cove stood on water (40.692641, -74.013947; 司空震's six-city check, 286 16ffaf67, 2026-10-10). Moved 50 m to land 23 m from water by ESA WorldCover 2021 (tools/world_water_check.ts), keeping the placement rules."
+   },
+   "gn-5128581~tackle0": {
+    "lat": 40.729984,
+    "lng": -74.013229,
+    "why": "New York · Blossom Tackle Shop stood on water (40.731021, -74.028876; found by tools/world_water_check.ts, 2026-10-10). Moved 1325 m to land 75 m from water by ESA WorldCover 2021 (tools/world_water_check.ts), keeping the placement rules."
+   },
+   "gn-5128581~tackle2": {
+    "lat": 40.691273,
+    "lng": -74.013436,
+    "why": "New York · Reed Tackle Shop stood on water (40.693412, -74.011807; 司空震's six-city check, 286 16ffaf67, 2026-10-10). Moved 275 m to land 62 m from water by ESA WorldCover 2021 (tools/world_water_check.ts), keeping the placement rules."
+   },
+   "gn-5128581~tackle5": {
+    "lat": 40.702814,
+    "lng": -74.061255,
+    "why": "New York · Clover Tackle Shop stood 34 m from water (40.702943, -74.061012; found by tools/world_water_check.ts, 2026-10-10). Moved 25 m to land 62 m from water by ESA WorldCover 2021 (tools/world_water_check.ts), keeping the placement rules."
+   },
+   "gn-5128581~market0": {
+    "lat": 40.727091,
+    "lng": -74.01067,
+    "why": "New York · Bridge Market Square stood on water (40.727091, -74.022524; 司空震's six-city check, 286 16ffaf67, 2026-10-10). Moved 1000 m to land 63 m from water by ESA WorldCover 2021 (tools/world_water_check.ts), keeping the placement rules."
+   },
+   "gn-5128581~tea0": {
+    "lat": 40.746897,
+    "lng": -74.008496,
+    "why": "New York · Oak Tea House stood on water (40.739592, -74.018137; 司空震's six-city check, 286 16ffaf67, 2026-10-10). Moved 1150 m to land 70 m from water by ESA WorldCover 2021 (tools/world_water_check.ts), keeping the placement rules."
+   },
+   "gn-5128581~tea1": {
+    "lat": 40.685654,
+    "lng": -74.007886,
+    "why": "New York · Willow Tea House stood on water (40.687389, -74.008499; 司空震's six-city check, 286 16ffaf67, 2026-10-10). Moved 200 m to land 65 m from water by ESA WorldCover 2021 (tools/world_water_check.ts), keeping the placement rules."
+   },
+   "gn-5128581~tea3": {
+    "lat": 40.66819,
+    "lng": -74.065678,
+    "why": "New York · Bridge Tea House stood on water (40.671739, -74.039142; 司空震's six-city check, 286 16ffaf67, 2026-10-10). Moved 2275 m to land 63 m from water by ESA WorldCover 2021 (tools/world_water_check.ts), keeping the placement rules."
+   },
+   "gn-5128581~market2": {
+    "lat": 40.670061,
+    "lng": -74.068719,
+    "why": "New York · Meadow Market Square stood on water (40.67343, -74.061026; 司空震's six-city check, 286 16ffaf67, 2026-10-10). Moved 750 m to land 74 m from water by ESA WorldCover 2021 (tools/world_water_check.ts), keeping the placement rules."
+   },
+   "gn-5128581~post1": {
+    "lat": 40.767962,
+    "lng": -73.995891,
+    "why": "New York · Orchard Travel Post stood 23 m from water (40.767673, -73.996345; found by tools/world_water_check.ts, 2026-10-10). Moved 50 m to land 63 m from water by ESA WorldCover 2021 (tools/world_water_check.ts), keeping the placement rules."
+   },
+   "gn-2130741~pond0": {
+    "lat": 44.016074,
+    "lng": 144.289008,
+    "why": "Abashiri · Pebble Pond stood on water (44.02006, 144.300896; 司空震's six-city check, 286 16ffaf67, 2026-10-10). Moved 1050 m to land 46 m from water by ESA WorldCover 2021 (tools/world_water_check.ts), keeping the placement rules."
+   },
+   "gn-3925033~pond2": {
+    "lat": -10.903242,
+    "lng": -61.965346,
+    "why": "Ji Paraná · Pebble Creek stood on water (-10.903531, -61.964996; found by tools/world_water_check.ts, 2026-10-10). Moved 50 m to land 20 m from water by ESA WorldCover 2021 (tools/world_water_check.ts), keeping the placement rules."
+   },
+   "gn-3925033~cabin0": {
+    "lat": -10.886138,
+    "lng": -61.946701,
+    "why": "Ji Paraná · Coral Trading Post stood 13 m from water (-10.886328, -61.946286; 司空震's six-city check, 286 16ffaf67, 2026-10-10). Moved 50 m to land 61 m from water by ESA WorldCover 2021 (tools/world_water_check.ts), keeping the placement rules."
    }
   },
   "room": {
