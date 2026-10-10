@@ -497,7 +497,7 @@ describe('save v4', () => {
     delete gear.picks; delete gear.pick;
     old.v = 3;
     const s = upgradeState(c, old as unknown as P0State, T0);
-    expect(s.v).toBe(4);
+    expect(s.v).toBe(5);
     expect(s.gear).toMatchObject({ picks: ['pick_starter'], pick: 'pick_starter' });
     expect(s.gather).toEqual({ ready_at: {}, last_at: 0 });
     expect(s.mine).toEqual({ run: null, count: 0, ended: null, swing_at: 0 });
