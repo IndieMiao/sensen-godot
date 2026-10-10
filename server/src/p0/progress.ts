@@ -17,6 +17,7 @@ export type P0Event =
   | { kind: 'plate'; ids: string[]; cabinet: boolean }
   | { kind: 'parcel'; id: string; qty: number; key: string; waiting: boolean; expires_in?: number; gift?: true }   // a reward that did not fit the bag (§10.4.8)
   | { kind: 'coins'; delta: number }
+  | { kind: 'recipe'; page: string; from: 'card' }   // a recipe card bought: the page is Tasted (§7.16.1)
   | { kind: 'milestone'; id: string; title: string; coins: number; cabinet: number; decor: string | null }   // Cookbook milestone (§7.6.1)
   | { kind: 'first'; what: string; xp: number; name?: string }   // name: the city of a fishing_city first (v5 keys are cluster ids)
   | { kind: 'level'; skill: Skill; level: number; energy: number; gifts: [string, number][] }
@@ -39,6 +40,7 @@ export type P0Event =
   | { kind: 'gift_meal'; resident: string; dish: string; given: boolean; to?: 'parcel' }   // to: the bag was full, so it waits in the Inbox
   | { kind: 'recipe'; page: string; from: 'taught' | 'request' | 'card'; resident?: string }   // a page turned Tasted (§7.5.3; 哪吒's shape, card = Recipe Card)
   | { kind: 'visit'; id: string; place: string }   // an explore request checked in at its outpost (§9.6.3)
+  | { kind: 'decor'; action: 'placed' | 'moved' | 'stored'; uid: number; item: string; x: number; y: number; rot: number }   // Decorate (SGODOT-284)
   | { kind: 'title'; id: string; resident: string }   // a story request's title (§9.4.4 Trusted)
   | { kind: 'sale'; item: string; qty: number; asked: number; coins: number; shop: string; quota: string | null }
   | { kind: 'mine'; action: 'enter' | 'continue' | 'floor' | 'torch' | 'rock' | 'cleared' | 'express' | 'express_unlocked'

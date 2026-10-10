@@ -1,8 +1,11 @@
 /** P0 command reducer: one command → new state + events, or a typed refusal. Never mutates the input. */
 import { cropById, cropBySeed, rodById, type P0Content } from './content.js';
 import { add, count, room, take } from './bag.js';
+import { barter } from './barter.js';
+import { settleCards } from './cards.js';
 import { burners, collectPot, cookAll, eatDish, startPot, recordHeat, settleStove } from './cooking.js';
 import { boardCommand, noteVisit, settleBoards, tracked } from './boards.js';
+import { moveDecor, placeDecor, storeDecor } from './decor.js';
 import { expireGiftMeals, giftResident, learn, noteSown, residentRequestCommand, talk } from './residents.js';
 import { castLine, reelLine, type FishCommand } from './fishing.js';
 import { upgradeHomestead } from './homestead.js';
@@ -17,7 +20,7 @@ import { claimParcel, PARCEL_LIMIT, settleParcels } from './parcels.js';
 import { dayKey, maxEnergy, scaledXp, settleEnergy, skillLevel, xpPercent } from './rules.js';
 import { buyback, buyItem, drink, moveStorage, offerOf, sellItem, setLock } from './shops.js';
 import { emptyDay, type P0State, type Plot } from './state.js';
-import { noteDelivery, noteEntered, requirePass, returnHome, settleExplorer, travel } from './travel.js';
+import { noteDelivery, noteEntered, requirePass, returnHome, settleExplorer, settleHere, travel } from './travel.js';
 
 export type { P0Event } from './progress.js';
 
@@ -41,6 +44,7 @@ type P0CommandBody =
   | FishCommand
   | { type: 'cook'; items?: string[]; recipe?: string; stove?: number; double?: boolean }   // stove: 0-based (Lv4 / Lv8); double: Big Pot
   | { type: 'collect'; taps?: number[]; eat?: boolean; pot?: number }   // eat: COOK-4 Eat, the main portion straight from the pot
+  | { type: 'barter'; item: string; mineral: string; shop?: string }   // Market Square barter (§8.4.5)
   | { type: 'cook_all' }   // Cook All (Cooking Lv8): fill every free stove and queue with known pages
   | { type: 'heat'; taps: number[]; pot?: number }   // heat taps as they happen, kept on the pot (Queue ×2 keeps a pot on its own)
   // pot: the pot's id (pot / queue events, view.cooking.stove.id). With Queue ×2 send it on every heat and collect:
@@ -49,6 +53,9 @@ type P0CommandBody =
   | { type: 'cabinet_take'; item: string }   // Warming Cabinet `Take one` (§7.7)
   | { type: 'accept' | 'deliver' | 'drop'; request: string }
   | { type: 'homestead_upgrade' }
+  | { type: 'place_decor'; item: string; x: number; y: number; rot?: number }   // Decorate (SGODOT-284)
+  | { type: 'move_decor'; uid: number; x: number; y: number; rot?: number }
+  | { type: 'store_decor'; uid: number }
   | { type: 'talk'; resident: string }
   | { type: 'gift'; resident: string; item: string }
   | { type: 'learn'; resident: string }   // Recipe lesson on the dialogue bar (§7.5.3)
@@ -77,6 +84,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
   const events: P0Event[] = [];
   settleEnergy(c, s, now);
   rollDay(c, s, now);
+  settleCards(c, s);   // today's recipe cards are fixed on the first command of the day
   settleBoards(c, s, now);
   // Queue ×2: a done pot makes way for the waiting one, as the view shows; heat / collect naming the pot on the stove
   // bring its taps first, and the settle after the command keeps it if it is done.
@@ -93,6 +101,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
   if (refused) return fail(refused.code, refused.detail);
   notePresence(c, s, cmd.space, now, events, cmd.place);   // before the command: a session gap of ≥ 2 h already counts as having left
   noteEntered(s, cmd.space, cmd.place);
+  settleHere(c, s, castAt ? castAt[0] : cmd.space, castAt ? castAt[1] : cmd.place, now);   // the city the player stands in
   noteVisit(s, cmd.space, cmd.place, events);   // a tracked explore request checks in where the player is (§9.6.3)
   settleExplorer(c, s, now, events);   // a stamp counted from today on (2 a day) earns its medal today
   const plotOf = (id: unknown) => (Number.isInteger(id) ? s.plots.find(p => p.id === id) : undefined);
@@ -101,7 +110,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
     const f = Number.isInteger(id) ? facilityAt(s, id as number) : undefined;
     return f ? fail('plot_occupied', { plot: id, facility: f.kind }) : null;
   };
-  const growH = (crop: string) => { const x = cropById(c, crop); return x ? cropGrowH(c, x) : 0; };
+  const growH = (crop: string) => { const x = cropById(c, crop); return x ? cropGrowH(c, s, x) : 0; };
 
   switch (cmd.type) {
     case 'till': {
@@ -141,7 +150,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
         plot.xp_pct = pct;
         delete plot.ready_at; delete plot.fert;
         // §5.7: under a sprinkler it grows as it is sown (−15%, locked now), no Water step.
-        if (watered.has(plot.id)) { plot.state = 'growing'; plot.ready_at = now + growMs(c, s, plot, cropGrowH(c, crop)); }
+        if (watered.has(plot.id)) { plot.state = 'growing'; plot.ready_at = now + growMs(c, s, plot, cropGrowH(c, s, crop)); }
       }
       break;
     }
@@ -161,7 +170,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       events.push({ kind: 'item', id: item, delta: -1 });
       plot.fert = true;
       if (plot.state === 'growing') {
-        const grow = cropGrowH(c, cropById(c, plot.crop)!) * 3_600_000;
+        const grow = cropGrowH(c, s, cropById(c, plot.crop)!) * 3_600_000;
         plot.ready_at = Math.max(now, plot.ready_at! - Math.round(grow * (1 - fert.grow_mult)));
       }
       break;
@@ -174,7 +183,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       if (plot.state !== 'sown' || !plot.crop) return fail('wrong_state', { state: plot.state });
       const crop = cropById(c, plot.crop)!;
       plot.state = 'growing';
-      plot.ready_at = now + growMs(c, s, plot, cropGrowH(c, crop));
+      plot.ready_at = now + growMs(c, s, plot, cropGrowH(c, s, crop));
       break;
     }
     case 'harvest': {
@@ -252,6 +261,13 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       if (refusal) return fail(refusal.code, refusal.detail);
       break;
     }
+    case 'place_decor': case 'move_decor': case 'store_decor': {   // Decorate (SGODOT-284): at home only
+      if (cmd.space !== undefined && cmd.space !== 'home') return fail('not_home');
+      const refusal = cmd.type === 'place_decor' ? placeDecor(c, s, cmd, events) : cmd.type === 'move_decor' ? moveDecor(c, s, cmd, events)
+        : storeDecor(c, s, cmd, events);
+      if (refusal) return fail(refusal.code, refusal.detail);
+      break;
+    }
     case 'homestead_upgrade': {
       const refusal = upgradeHomestead(c, s, now, events);
       if (refusal) return fail(refusal.code, refusal.detail);
@@ -281,6 +297,11 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
         : cmd.type === 'cook' ? startPot(c, s, cmd, now, events)
         : cmd.type === 'collect' ? collectPot(c, s, cmd, now, events, maxEnergy(c, s))
         : eatDish(c, s, cmd, now, events, maxEnergy(c, s));
+      if (refusal) return fail(refusal.code, refusal.detail);
+      break;
+    }
+    case 'barter': {
+      const refusal = barter(c, s, cmd, events);
       if (refusal) return fail(refusal.code, refusal.detail);
       break;
     }

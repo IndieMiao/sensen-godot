@@ -8,6 +8,7 @@
 import type { Crop, P0Content, WorkbenchRecipe } from './content.js';
 import type { Refusal } from './fishing.js';
 import { stepAt } from './homestead.js';
+import { homeClimate } from './travel.js';
 import type { P0Event } from './progress.js';
 import { skillLevel } from './rules.js';
 import type { Facility, P0State, Plot } from './state.js';
@@ -46,8 +47,8 @@ export function facilityAt(s: P0State, plot: number): Facility | undefined {
 
 /** A crop's open-field hours on this farm: a regional crop away from its climate zone takes off_zone_grow_h (×1.5,
  * §5.2.3 "not native"; the greenhouse lifts it later). The farm is always at home, wherever the player is. */
-export function cropGrowH(c: P0Content, crop: Crop): number {
-  return crop.regional && crop.zone !== c.profile.climate && crop.off_zone_grow_h ? crop.off_zone_grow_h : crop.grow_h;
+export function cropGrowH(c: P0Content, s: P0State, crop: Crop): number {
+  return crop.regional && crop.zone !== homeClimate(c, s) && crop.off_zone_grow_h ? crop.off_zone_grow_h : crop.grow_h;
 }
 
 /** Ripening time in ms for a crop that starts growing now on `plot` (§5.7 / §5.5: covered −15%, Compost −20%, ≤ −35%). */

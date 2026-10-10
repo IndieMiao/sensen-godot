@@ -1547,8 +1547,10 @@ func _update_fog() -> void:
 func _update_bubbles() -> void:
 	var detail: bool = host.city_detail_visible()
 	var area := Rect2(-global_position, get_viewport_rect().size).grow(60)
+	var listed := {}
 	for r in host.city_regions():
 		var id := str(r.id)
+		listed[id] = true
 		if not bubbles.has(id): bubbles[id] = _make_bubble(id)
 		var bubble: Dictionary = bubbles[id]
 		var overview: Dictionary = CityMapData.city(id).get("overview", {})
@@ -1562,6 +1564,12 @@ func _update_bubbles() -> void:
 			var st: Dictionary = bubble_state.call(id)
 			bubble.count.text = str(st.get("text", ""))
 			bubble.count.visible = bubble.count.text != ""
+			# The line keeps a text line's height with the glyph alone (P0's home city at 0 online), so the bubble's
+			# bottom does not move as the count comes and goes (不知火舞 on #238). Measured here, in the tree, with the
+			# label's own theme font.
+			var line := bubble.count.get_parent() as Control
+			var text_h: float = bubble.count.get_theme_font("font").get_height(bubble.count.get_theme_font_size("font_size"))
+			if line.custom_minimum_size.y != text_h: line.custom_minimum_size.y = text_h
 			var glyph := str(st.get("icon", ""))
 			bubble.icon.visible = glyph != ""
 			if glyph != "": bubble.icon.texture = GameUi.icon(glyph)
@@ -1578,7 +1586,10 @@ func _update_bubbles() -> void:
 		node.position = point + Vector2(-node.size.x * 0.5, 6)
 		bubble.dot.position = point - Vector2(5, 5)
 		bubble.dot.visible = true
+	# A bubble built for an earlier list (another zoom, another camera city) that this one no longer has hides with its
+	# dot; left visible it would stay frozen where it was drawn, over the new city (李元芳 / 司空震, SGODOT-275).
 	for id in bubbles:
+		if not listed.has(id): bubbles[id].node.visible = false
 		if not bubbles[id].node.visible: bubbles[id].dot.visible = false
 
 func _make_bubble(id: String) -> Dictionary:

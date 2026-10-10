@@ -83,7 +83,10 @@ does the same, so this is not game code. `-feature -Vulkan` makes Godot fall bac
 the host GPU:
 
 ```sh
+lsusb   # no phone may be plugged in: a newly started adb server takes over any USB phone it finds
 export ANDROID_ADB_SERVER_PORT=5071   # a private adb server; leave 5037 and other sessions' servers alone
+# Don't scan 5555+ for other people's emulators; an emulator started with the variable above registers itself.
+export ADB_LOCAL_TRANSPORT_MAX_PORT=5553
 nohup ~/Android/Sdk/emulator/emulator -avd Pixel_API_36 -port 5594 -no-window -no-audio -no-boot-anim \
   -no-snapshot-save -gpu host -feature -Vulkan -memory 4096 -cores 4 > /tmp/emu-5594.log 2>&1 &
 adb -P 5071 start-server
@@ -93,7 +96,7 @@ adb -P 5071 -s emulator-5594 shell settings put secure immersive_mode_confirmati
 
 Record the qemu PID. Stop the emulator with `adb -P 5071 -s emulator-5594 emu kill` (its data is kept), then
 `adb -P 5071 kill-server`. Godot's Android export stops "its" adb server on exit, so restart the private one
-after every export.
+after every export, with `ADB_LOCAL_TRANSPORT_MAX_PORT=5553` set again.
 
 **QA package.** The P0 presets build arm64 only. For the emulator, export `Android P0` with `x86_64` turned on
 in a temporary copy of `export_presets.cfg`, and restore the file afterwards, as `tools/p0/build_demo_apk.sh`

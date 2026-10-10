@@ -3,6 +3,7 @@ import type { Family, P0Content, Skill } from './content.js';
 import { maxEnergy } from './rules.js';
 import { addPlots } from './garden.js';
 import { clusterOf, clusterOfCityName, freshTravel, homeCluster, type TravelState } from './travel.js';
+import { placeOf } from './world.js';
 
 export type PlotState = 'wild' | 'tilled' | 'sown' | 'growing';
 export interface Plot {
@@ -88,7 +89,7 @@ export interface ResidentState {
   lesson_at?: number;            // when they last taught a page (§7.5.3: one a week from Familiar)
 }
 
-export interface Homestead { level: number; plaque: { level: number; at: number }[] }
+export interface Homestead { level: number; plaque: { level: number; at: number }[]; bartered?: Record<string, number> }   // bartered: minerals got by barter toward the next level
 
 /** One mine run (§13.3, SGODOT-231; floors 3–5 SGODOT-275): floors[i] is floor i + 1; drops derive from the run seed.
  * mobs: each monster's HP left on that floor (content order); hp: the player's HP in the mine; express: started by Floor 5 ·
@@ -127,6 +128,8 @@ export interface P0Day {
   sys_done: number;                     // system requests completed today (§9.6.4)
   gift_meal: string | null;             // resident who gave today's gift meal (§3.4.5)
   mine_runs: number;                    // mine runs started today (§13.3.1, ≤ 2)
+  barters?: number;                     // barters today (§8.4.5, ≤ 6)
+  cards?: string[];                     // today's recipe cards on the Homestead Stall shelf, drawn once a day (§7.16.1, SGODOT-282)
   xp: Partial<Record<Skill, number>>;   // XP earned today per skill, for the anti-script cap (§4.3.4)
   mishaps: number;                      // failed pots today (the blessing's first 10 refund their ingredients, §7.5.2)
 }
@@ -170,6 +173,7 @@ export interface P0State {
   gather: { ready_at: Record<string, number>; last_at: number };   // §13.2: when each spot can be gathered again; last tap (tempo)
   mine: MineState;
   storage_auto: { at: number; items: [string, number][] } | null;   // last auto-store on coming home (q(40)), floated once by the client
+  decor?: { placed: import('./decor.js').PlacedDecor[]; count: number };   // P1 Decorate (SGODOT-284): the yard's pieces and the uid counter
   travel: TravelState;           // home / current city, visited cities, stamps, Day Pass (v5, SGODOT-275)
   seen?: string[];   // map markers' ◆ already looked at: item:<id> / talk:<resident> (SGODOT-232, q(48))
   facilities?: Facility[];       // P1 (SGODOT-239): facilities on plots
@@ -301,7 +305,7 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
   // and a cast still out there comes in as a line in before the bite would — the Energy back, no fish, no XP, an unused
   // teaching pin returned. Old casts without a place are left alone.
   // v5: "the home city's" becomes "a city the player holds a pass for" (home, or a Day Pass bought before).
-  const home = (id: string) => { const k = c.fishing.places[id] ? clusterOf(c, id) : null; return !!k && (k === s.travel.home || !!s.travel.passes[k]); };
+  const home = (id: string) => { const k = placeOf(c, id) ? clusterOf(c, id) : null; return !!k && (k === s.travel.home || !!s.travel.passes[k]); };
   if (s.presence.place && !home(s.presence.place)) s.presence.place = null;
   const cast = s.cast;
   if (cast?.place && !home(cast.place)) {

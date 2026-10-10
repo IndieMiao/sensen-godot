@@ -10,6 +10,7 @@ import type { P0Event } from './progress.js';
 import type { P0State } from './state.js';
 import { noteSeenAt } from './markers.js';
 import { clusterOf } from './travel.js';
+import { placeOf } from './world.js';
 
 const AWAY = new Set(['pond', 'outpost', 'mine']);
 
@@ -52,7 +53,7 @@ export function notePlace(c: P0Content, s: P0State, space: unknown, place: unkno
   if (space !== 'pond') { s.presence.place = null; return; }
   if (place === undefined || place === null || place === '') return;
   // v5: a known pond in a city the player's pass covers (home always); the pass itself is checked by requirePass.
-  const p = typeof place === 'string' ? c.fishing.places[place] : undefined;
+  const p = typeof place === 'string' ? placeOf(c, place) : undefined;   // hand-written or generated (SGODOT-280)
   const cluster = p ? clusterOf(c, place as string) : null;
   s.presence.place = p && cluster && (cluster === s.travel.home || s.travel.passes[cluster]) ? place as string : null;
 }

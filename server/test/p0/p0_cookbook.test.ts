@@ -23,16 +23,18 @@ function cookOnce(s: P0State, items: string[], at = T0) {
 const page = (s: P0State, id: string) => viewOf(c, s, T0).cooking.cookbook.find(p => p.id === id)!;
 
 describe('Cookbook pages (§7.5.1, q(39))', () => {
-  it('lists 48 pages in order: 14 P0 pages and 34 silhouettes; the two starting pages are Tasted', () => {
+  it('lists 48 pages in order: 47 cookable (#9 is bought); the two starting pages are Tasted', () => {
     const v = viewOf(c, fresh(), T0).cooking;
     expect(v.cookbook.map(p => p.n)).toEqual(Array.from({ length: 48 }, (_, i) => i + 1));
-    expect(v.cookbook.filter(p => p.p0)).toHaveLength(14);
+    expect(v.cookbook.filter(p => p.p0)).toHaveLength(47);
     expect(v).toMatchObject({ pages_total: 48, discovered: 0, conveniences: [], third_slot: { level: 4, xp_to_go: 220 } });
     expect(v.cookbook.filter(p => p.state === 'tasted').map(p => p.id)).toEqual(['dish_grilled_crucian', 'dish_radish_salad']);
     const hidden = v.cookbook.find(p => p.id === 'dish_carrot_cake')!;
     expect(hidden).toMatchObject({ state: 'hidden', name: null, in: ['?', '?'], families: ['F', 'F'], learn: ['experiment', 'card', 'taught'] });
-    const silhouette = v.cookbook.find(p => p.n === 3)!;
-    expect(silhouette).toMatchObject({ id: 'dish_carp_cakes', p0: false, name: null, families: ['W', 'W'], can_cook: false });
+    const hidden2 = v.cookbook.find(p => p.n === 8)!;   // Cabbage Stew: Hidden, its families from its ingredients
+    expect(hidden2).toMatchObject({ id: 'dish_cabbage_stew', p0: true, name: null, families: ['F', 'F'], can_cook: false });
+    expect(v.cookbook.find(p => p.n === 9)).toMatchObject({ id: 'dish_travel_biscuits', p0: false, slots: 0, buy: { at: 'travel_post', price: 40, daily: 3 } });
+    expect(v.cookbook.find(p => p.n === 47)).toMatchObject({ rarity: 4, buff: 'buff_creel', regional: true });   // P3 slot: Buff · coming later
     expect(v.cookbook.find(p => p.id === 'dish_fisher_stew')).toMatchObject({ slots: 3, lock: { level: 4, xp_to_go: 220 } });
   });
 

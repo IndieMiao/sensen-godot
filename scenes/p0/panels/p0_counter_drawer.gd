@@ -259,7 +259,9 @@ func refresh(view_: Dictionary, force := false) -> void:
 ## everything else the server lists, which on a Market includes its city's regional seed (P1 §5.2.3).
 func offers() -> Array:
 	var all: Array = view.get("shops", {}).get(role, {}).get("buy", [])
-	if role != "market": return all
+	# Decor (SGODOT-284) is on the stall's own Decor page once it is drawn (不知火舞); until then not on the Buy shelf.
+	var decor: Dictionary = P0Logic.content().get("decor", {}).get("items", {})
+	if role != "market": return all.filter(func(o): return not decor.has(str(o.get("id", ""))))
 	var specialty: Array = P0Logic.content().get("market", {}).get("specialty", [])
 	var want := section == "specialty"
 	return all.filter(func(o): return specialty.has(str(o.get("id", ""))) == want)

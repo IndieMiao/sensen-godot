@@ -3,6 +3,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { CityClusters } from './clusters.js';
+import { cityPlaces } from './world.js';
 
 export type Skill = 'farming' | 'fishing' | 'cooking';
 export const SKILLS: readonly Skill[] = ['farming', 'fishing', 'cooking'];
@@ -27,9 +28,9 @@ export interface Fish {
 export interface Rod { id: string; name: string; reach: number; level: number; price: number; hook_bonus_ms: number; band_bonus: number }
 export interface FishSite { name: string; template: string; weights: number[]; fish: string[] }
 /** A pond on the map (assets/p0/p0_ponds.json id): its fishing template follows the point, not its shape (q(36)). */
-export interface FishPlace { name: string; site: string; city: string; beginner?: boolean; at?: [number, number] }   // at: the pond list's point
+export interface FishPlace { name: string; site: string; city: string; cluster?: string; beginner?: boolean; at?: [number, number] }   // at: the pond list's point; cluster: SGODOT-280
 /** An outpost on the P0 map (assets/p0/p0_outposts.json, SGODOT-227): its role and the residents who live there. */
-export interface OutpostDef { id: string; role: string; residents: string[] }
+export interface OutpostDef { id: string; role: string; residents: string[]; cluster?: string }
 
 export interface CookTier {
   energy: number; ms: number; heats: number[]; gold: number; spin_ms: number;
@@ -43,7 +44,15 @@ export type Convenience = 'cook_again' | 'clue_double' | 'hearty_mishap' | 'stea
   // P1 (SGODOT-282, §4.6.3 Lv7–10)
   | 'steady_hand_2' | 'fast_mastery' | 'cook_all' | 'provisions_plus' | 'chefs_touch' | 'title_chef' | 'lucky_double';
 /** A P0 Cookbook page that can be cooked (§7.14.0); n = its page number in the 48-page Cookbook. */
-export interface Recipe { n?: number; id: string; name: string; in: string[]; known?: boolean; style?: string; learn?: Learn[]; regional?: boolean; card_zone?: string; card_zones?: string[] }
+export interface Recipe {
+  n?: number; id: string; name: string; in: string[]; known?: boolean; style?: string; learn?: Learn[];
+  // P1 (SGODOT-282, Li Bai's 48 pages): rarity as the plan's table (used when an ingredient is not in this build);
+  // families = each slot's family for the silhouette; cookable: false = buy-only (#9 Travel Biscuits).
+  rarity?: number; families?: string[]; cookable?: boolean; buy?: { at: string; price: number; daily: number };
+  card_price?: number; card_zone?: string; card_zones?: string[];   // recipe cards (§7.16.1): Market climate / Stall home climates
+  teach?: string[]; buff?: string; regional?: boolean;              // residents who teach it (§7.16.3); Legendary Buff (P3)
+  no_gift?: boolean; no_request?: boolean; no_buyback?: boolean;
+}
 /** A page outside P0 (§7.14.1–7.14.4): only its silhouette shows, slots = the family of each slot. */
 export interface SilhouettePage { n: number; id: string; name: string; rarity: number; slots: string[]; style: string; learn: Learn[] }
 
@@ -150,6 +159,9 @@ export interface P0Content {
     chefs_sign_gold?: number;                 // Chef's Sign (Lv10): every dish's gold zone + this (0.05 = 5 points)
     plots?: [number, number][];               // plots the homestead has: Lv1 30, Lv3 40 (P1 q(59) §1.1; absent = P0's start)
     sprinkler_max?: { base: number; per_level: number; max: number };   // sprinklers that may stand: 3 + level, at most max
+    // Barter (§8.4.5, SGODOT-282): at the Market Square keeper, `give` of this climate's regional crops or fish for 1
+    // mineral; a mineral at most `level_share` of the next level's need by barter; at most `daily` a day.
+    barter?: { give: number; minerals: string[]; level_share: number; daily: number; items: Record<string, string[]> };   // items: climate → ids
     per_level: { energy: number; meals: number };
     board_slots: [number, number][];          // [from Homestead level, Stall Board slots]
     levels: { level: number; coins: number; skills: number; materials: [string, number][]; unlocks: string[] }[];
@@ -200,6 +212,9 @@ export interface P0Content {
     cook_all_per_page?: number;                   // Cook All (Lv8): at most this many pots of one page (q(4))
     // Cookbook milestones past Home Cook (§7.6.1, SGODOT-282): titles at Discovered / Mastered counts, once each;
     // coins paid, cabinet = Warming Cabinet portions added, decor = the yard piece it gives (placed with Decorate).
+    // Recipe cards (§7.16.1, SGODOT-282): a card makes a page Tasted. The Homestead Stall shows `stall_daily` cards a
+    // day from `stall` (pages not yet in the Cookbook); Market sells `market` cards of its climate. Prices by rarity.
+    cards?: { prices?: Record<string, number>; stall_daily: number };   // the pool and prices are on the recipes (card_price / card_zone / card_zones)
     milestones?: { id: string; title: string; discovered?: number; mastered?: number; coins?: number; cabinet?: number; decor?: string }[];
     quick_fire: number;                          // Quick Fire: cooking time and heat times × this (§4.6.3 Lv6)
     trial_refunds: number;                       // failed pots a day that refund their ingredients in the blessing (§7.5.2)
@@ -242,13 +257,15 @@ export function loadP0Content(file = DEFAULT_P0_CONTENT): P0Content {
   mergeContentDir(c as unknown as Record<string, unknown>, path.join(dir, 'content'));
   const outposts = path.join(dir, 'p0_outposts.json');
   if (existsSync(outposts)) {
-    c.outposts = (JSON.parse(readFileSync(outposts, 'utf8')).outposts as { id: string; role: string; residents?: string[] }[])
-      .map(o => ({ id: o.id, role: o.role, residents: o.residents ?? [] }));
+    c.outposts = (JSON.parse(readFileSync(outposts, 'utf8')).outposts as { id: string; role: string; residents?: string[]; cluster?: string }[])
+      .map(o => ({ id: o.id, role: o.role, residents: o.residents ?? [], ...(o.cluster ? { cluster: o.cluster } : {}) }));
   }
   // v5 (SGODOT-278): the frozen city clusters beside the content (亚瑟's build_clusters.mjs), with the server's member table.
   const clusters = path.join(dir, 'city_clusters.json');
   // Not enumerable: a structuredClone of the content (tests) leaves it out instead of copying a class without methods.
   if (existsSync(clusters)) Object.defineProperty(c, 'clusters', { value: CityClusters.load(clusters), enumerable: false, writable: true, configurable: true });
+  // SGODOT-280: generated cities for travel.ts cityInfo (GET /v1/p0/city/:cluster). Not enumerable, like clusters.
+  Object.defineProperty(c, 'cityPlaces', { value: (id: string) => cityPlaces(c, id), enumerable: false, writable: true, configurable: true });
   const ponds = path.join(dir, 'p0_ponds.json');
   if (existsSync(ponds)) {
     for (const l of JSON.parse(readFileSync(ponds, 'utf8')).locations as { id: string; lat: number; lng: number }[]) {
@@ -346,6 +363,8 @@ export function itemName(c: P0Content, id: string): string {
   if (c.materials[id]) return c.materials[id].name;
   if (c.drinks.items[id]) return c.drinks.items[id].name;
   if (c.specialty[id]) return c.specialty[id].name;
+  const decor = (c as { decor?: { items: Record<string, { name: string }> } }).decor?.items[id];   // Decorate (SGODOT-284)
+  if (decor) return decor.name;
   if (c.supplies[id]) return c.supplies[id].name;
   if (id.startsWith('facility_') && c.facilities?.kinds[id.slice(9)]) return c.facilities.kinds[id.slice(9)].name;
   const upgrade = c.bag_upgrades.find(u => u.id === id);

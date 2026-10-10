@@ -23,3 +23,19 @@ export function loadOutposts(file = DEFAULT_P0_OUTPOSTS): OutpostEntry[] {
   }
   return data.outposts;
 }
+
+/**
+ * The room spec of a generated outpost (SGODOT-280, `gn-1850147~market0`): its capacity from the generator, and the walls
+ * and seats of the hand-written room its art stands in for (the placeholder rooms until the five layouts are designed,
+ * world_gen.json `room`). Undefined for an id the generator does not know.
+ */
+export function generatedOutpostSpec(table: OutpostEntry[], detail: (outpost: string) => { role: string; art: string; capacity: number } | undefined) {
+  const byArt = new Map(table.map(o => [o.art, o]));
+  return (outpost: string): OutpostSpec | undefined => {
+    if (outpost.indexOf('~') <= 0) return undefined;
+    const d = detail(outpost);
+    const room = d ? byArt.get(d.art) : undefined;
+    if (!d || !room || !ROLES.includes(d.role as OutpostRole)) return undefined;
+    return { id: outpost, role: d.role as OutpostRole, capacity: d.capacity, bounds: room.bounds, seats: room.seats };
+  };
+}

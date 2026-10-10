@@ -378,6 +378,34 @@ func placement_pan(d: Vector3) -> void:
 	if not _placing_cam or _fly_left > 0.0: return
 	_focus = _yard_clamp(_focus + Vector3(d.x, 0, d.z))
 
+## A finger held in placement mode (the preview's, Vector2.INF when lifted): within EDGE_PX of a screen edge it pans
+## the camera that way, faster nearer the edge (up to EDGE_SPEED m/s); the bar's card counts as the bottom edge
+## (不知火舞 on 241). Shared by the sprinkler and Decorate; true when the camera moved, so the caller re-snaps its
+## preview to the ground now under the finger.
+const EDGE_PX := 48.0
+const EDGE_SPEED := 6.0
+
+func placement_edge(finger: Vector2, dt: float) -> bool:
+	if not _placing_cam or finger == Vector2.INF or dt <= 0.0: return false
+	var view := get_viewport().get_visible_rect().size
+	var bar := P0Runtime.ensure().ui.placement_bar_rect()
+	var bottom := bar.position.y if bar.has_area() else view.y
+	var push := Vector2(edge_push(finger.x, 0.0, view.x), edge_push(finger.y, 0.0, bottom))
+	if push == Vector2.ZERO: return false
+	# Screen right / down as ground directions (the camera's own axes on the ground plane).
+	var right := cam.global_basis.x
+	var down := -cam.global_basis.y
+	right.y = 0.0
+	down.y = 0.0
+	placement_pan((right.normalized() * push.x + down.normalized() * push.y) * EDGE_SPEED * dt)
+	return true
+
+## −1..1 toward the nearer edge of [lo, hi] for a finger within EDGE_PX of it, 0 elsewhere (0 at the band's inner side).
+static func edge_push(x: float, lo: float, hi: float) -> float:
+	if x < lo + EDGE_PX: return -clampf((lo + EDGE_PX - x) / EDGE_PX, 0.0, 1.0)
+	if x > hi - EDGE_PX: return clampf((x - (hi - EDGE_PX)) / EDGE_PX, 0.0, 1.0)
+	return 0.0
+
 ## The ground shift that moves the picture by `px` on screen (a two-finger drag): the ground under the old point.
 func placement_drag(px: Vector2, at: Vector2) -> void:
 	var a = ElasticZoom.ground_at(cam, at, _focus.y)
@@ -731,16 +759,21 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"plaque": p0_tap(cam.unproject_position(_plaque + Vector3(0, 0.35, 0)))   # PLAQUE-READ
 		"mailbox": p0_tap(cam.unproject_position(_mailbox + MAILBOX_HIT))   # the Inbox through the Mailbox's own tap (234 C)
 		"mouth": p0_tap(cam.unproject_position(_mine + Vector3(0, 1.6, 0)))   # the mine mouth's model, high on the arch (int11 ②)
-		"cardtap", "cardnew":   # a real tap on the mouth's EntryCard: its main button / New run (SGODOT-266)
+		"cardtap", "cardnew", "cardexpress":   # a real tap on the mouth's EntryCard: main / New run / Express (SGODOT-266, 288)
 			var e: UiEntryCard = _materials._entry if _materials.card_open() else null
-			if e != null: p0_tap((e.main_rect() if step[0] == "cardtap" else e.second_rect()).get_center() - rt.ui.root.global_position)
+			var r: Rect2 = (e.main_rect() if step[0] == "cardtap" else e.second_rect() if step[0] == "cardnew" else e.third_rect()) if e != null else Rect2()
+			if e != null: p0_tap(r.get_center() - rt.ui.root.global_position)
 		"zoomto": _zoom = clampf(float(step[1]), 0.8, 1.4)   # zoomto:0.8 (widest) … 1.4 (closest)
 		# P1 placement (SGODOT-241): build:<recipe> opens it as the Facilities card's Build does; placeat:<plot> moves
-		# the preview as a finger on that bed would; placeok / placecancel press the bar; factap:<id> taps a sprinkler.
+		# the preview as a finger on that bed would; placeok / placecancel press the bar; placesecond:<label> shows its
+		# middle key, placereason:<text> / placeconfirm:<verb> set its reason and main key; factap:<id> taps a sprinkler.
 		"build": _facilities.begin_build(step[1] if step.size() > 1 else "craft_sprinkler")
 		"placeat": rt.ui.placement_point.emit(cam.unproject_position(bp.cell_to_world(P0Garden.cell_of(int(step[1]))) + Vector3(0, P0Garden.BED_H, 0)), "drag")
 		"placeok": rt.ui.placement_done.emit(true)
 		"placecancel": rt.ui.placement_done.emit(false)
+		"placesecond": rt.ui.set_placement({"secondary": step[1] if step.size() > 1 else ""})   # the bar's middle key (Decorate's Rotate)
+		"placereason": rt.ui.set_placement({"reason": step[1] if step.size() > 1 else ""})   # a refusal as Decorate's would read
+		"placeconfirm": rt.ui.set_placement({"confirm": step[1]})
 		"factap":
 			for f in rt.session.current().get("facilities", []):
 				if int(f.get("id", 0)) == int(step[1]): _facilities.open_card(f)

@@ -1,0 +1,304 @@
+{
+ "_note": "Global generation (SGODOT-280, plan v2 §9.3.2 / §6.3.3 / §9.4.3). tiers, placement, tea_words, keeper_names, name_rules and wild are 李白's outposts.json (SGODOT-281, 47fafcea) as-is; seed, ponds, area_tier, coastal and room are the generator's own (后裔). Generated places are frozen by id (<cluster>~<kind><n>): a change here that moves an existing city must bump world.revision.",
+ "world": {
+  "revision": 1,
+  "seed": "journey-p1-world-20261010-v1",
+  "tiers": [
+   {
+    "tier": "S",
+    "pop_max": 500000,
+    "area_max_km2": 150,
+    "trading_post": 1
+   },
+   {
+    "tier": "M1",
+    "pop_max": 1500000,
+    "area_max_km2": 600,
+    "tea": 2,
+    "tackle_max": 2,
+    "market": 1,
+    "travel": 1
+   },
+   {
+    "tier": "M2",
+    "pop_max": 3000000,
+    "area_max_km2": 1200,
+    "tea": 3,
+    "tackle_max": 3,
+    "market": 2,
+    "travel": 2
+   },
+   {
+    "tier": "L1",
+    "pop_max": 8000000,
+    "area_max_km2": 2000,
+    "tea": 4,
+    "tackle_max": 4,
+    "market": 2,
+    "travel": 2
+   },
+   {
+    "tier": "L2",
+    "pop_max": 15000000,
+    "area_max_km2": 3000,
+    "tea": 5,
+    "tackle_max": 5,
+    "market": 3,
+    "travel": 2
+   },
+   {
+    "tier": "L3",
+    "pop_max": null,
+    "area_max_km2": null,
+    "tea": 6,
+    "tackle_max": 6,
+    "market": 3,
+    "travel": 2
+   }
+  ],
+  "placement": {
+   "market_1": {
+    "from_centre_km": [
+     1,
+     2
+    ],
+    "beginner_pond_max_m": 800
+   },
+   "travel_1": {
+    "from_centre_max_km": 1,
+    "grid_m": 500
+   },
+   "tea": {
+    "density_grid_km": 1,
+    "min_apart_km": 3,
+    "snap_poi_m": 100
+   },
+   "tackle": {
+    "shore_max_m": 300,
+    "prefer": "beginner_pond"
+   },
+   "market_n": {
+    "from_market_1_min_km": 5
+   },
+   "same_kind_min_km": 3,
+   "other_kind_min_m": 300,
+   "water_min_m": 50,
+   "farm_exclusion_m": 300
+  },
+  "rooms": {
+   "indoor_cap": 12,
+   "market_cap": 30
+  },
+  "tea_words": {
+   "Tropical": [
+    "Palm",
+    "Reef",
+    "Monsoon",
+    "Mango",
+    "Lagoon",
+    "Coral",
+    "Banyan",
+    "Breeze"
+   ],
+   "Subtropical": [
+    "Bamboo",
+    "Camphor",
+    "Lotus",
+    "Osmanthus",
+    "Tea Hill",
+    "Magnolia",
+    "Pagoda",
+    "Harbour"
+   ],
+   "Temperate": [
+    "Oak",
+    "Maple",
+    "Mill",
+    "Meadow",
+    "Chestnut",
+    "Willow",
+    "Bridge",
+    "Orchard"
+   ],
+   "Cool": [
+    "Birch",
+    "Pine",
+    "Fjord",
+    "Frost",
+    "Spruce",
+    "Moss",
+    "Lantern",
+    "Reindeer"
+   ]
+  },
+  "keeper_names": {
+   "Tropical": [
+    "Ama",
+    "Kofi",
+    "Nia",
+    "Tane",
+    "Lani",
+    "Ravi",
+    "Sefa",
+    "Ines"
+   ],
+   "Subtropical": [
+    "Mei",
+    "Lin",
+    "Jun",
+    "Rosa",
+    "Hiro",
+    "Ana",
+    "Wen",
+    "Bao"
+   ],
+   "Temperate": [
+    "Ola",
+    "Finn",
+    "Maya",
+    "Leo",
+    "Ida",
+    "Noor",
+    "Tom",
+    "Elsa"
+   ],
+   "Cool": [
+    "Sigrid",
+    "Bjorn",
+    "Anya",
+    "Eero",
+    "Maren",
+    "Ivar",
+    "Lumi",
+    "Sven"
+   ]
+  },
+  "keeper_frozen": {
+   "san francisco": {
+    "tea": "Ama",
+    "tackle": "Finn",
+    "market": "Mei",
+    "travel": "Sigrid"
+   }
+  },
+  "name_rules": {
+   "tea": "<气候带词池> Tea House",
+   "tackle_market_travel": [
+    "区级行政区",
+    "街区（细一级优先）",
+    "簇内卫星城",
+    "词池"
+   ],
+   "max_chars": 24,
+   "no_numbers": true
+  },
+  "wild": {
+   "grid_deg": 0.5,
+   "town_min_pop": 10000,
+   "terrain_words": [
+    "Tundra",
+    "Taiga",
+    "Steppe",
+    "Dune",
+    "Savanna",
+    "Rainforest",
+    "Highland",
+    "Reef",
+    "Coast"
+   ],
+   "residents": [
+    "res_pip",
+    "res_granny_wu"
+   ]
+  },
+  "ponds": {
+   "_note": "§6.3.3: 3 from a cluster's first 500,000 people, one more per 500,000 more, at most 6. Ponds 1–3 sit on the 2.5 km ring at 0° / 120° / 240° (rotated by the cluster's hash), 4–6 on the 5 km ring between them. Pond 1 (nearest the centre) is the beginner Pond; 2 River; 3 Coast for a coastal cluster, else River; 4–6 by hash, at least one Pond kept.",
+   "base": 3,
+   "per_pop": 500000,
+   "max": 6,
+   "ring_km": [
+    2.5,
+    5.0
+   ],
+   "words": [
+    "Willow",
+    "Clover",
+    "Fern",
+    "Pebble",
+    "Reed",
+    "Blossom"
+   ],
+   "suffix": {
+    "pond": "Pond",
+    "river": "Creek",
+    "coast": "Cove"
+   },
+   "templates": [
+    "crescent",
+    "gourd",
+    "meander"
+   ]
+  },
+  "area_tier": {
+   "_note": "Built-up area has no data source yet: the tier is the population tier, raised to these for the cities the plan names as L3 by area (§9.3.2: Los Angeles, Tokyo–Yokohama). Keyed by cluster id.",
+   "gn-5368361": "L3",
+   "gn-1850147": "L3"
+  },
+  "coastal": {
+   "_note": "Coastline within 20 km of the cluster centre (§6.3.3) and the residents' city traits (§9.4.3: coast, big river, highland). No geodata source offline yet: listed by hand for the acceptance cities and the plan's examples; any other cluster has none.",
+   "gn-5391959": [
+    "coast"
+   ],
+   "gn-5368361": [
+    "coast"
+   ],
+   "gn-1796236": [
+    "coast",
+    "river"
+   ],
+   "gn-1816670": [],
+   "gn-5128581": [
+    "coast",
+    "river"
+   ],
+   "gn-1850147": [
+    "coast",
+    "river"
+   ]
+  },
+  "room": {
+   "_note": "Placeholder rooms until the five outpost layouts are designed (SGODOT-275 item 7): each role uses the P0 room of its kind; the S-tier trading post uses the tea house's.",
+   "tea": {
+    "art": "coffee_shop",
+    "anchors": "res://assets/p0/outposts/tea.anchors.json",
+    "category": "Tea house · Hot tea"
+   },
+   "tackle": {
+    "art": "farm_tools_store",
+    "anchors": "res://assets/p0/outposts/tackle.anchors.json",
+    "category": "Tackle shop · Rods and bait"
+   },
+   "market": {
+    "art": "fruit_shop",
+    "anchors": "res://assets/p0/outposts/market.anchors.json",
+    "category": "Market square · Requests"
+   },
+   "post": {
+    "art": "post_office",
+    "anchors": "res://assets/p0/outposts/post.anchors.json",
+    "category": "Travel post · Coffee"
+   },
+   "cabin": {
+    "art": "coffee_shop",
+    "anchors": "res://assets/p0/outposts/tea.anchors.json",
+    "category": "Trading post · All counters"
+   }
+  },
+  "keeper_roles": {
+   "tea": "Tea Host",
+   "tackle": "Tackle Keeper",
+   "market": "Market Keeper",
+   "post": "Post Clerk"
+  }
+ }
+}

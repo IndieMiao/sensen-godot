@@ -224,3 +224,119 @@ func test_the_swing_waits_past_the_servers_tempo() -> void:
 	v.mine["weapon"] = {"attack": 3, "speed": 2.0}
 	c.sync_p0(v, 4, mover)
 	assert_float(1.0 / float(c.weapon({}).speed)).is_equal_approx(0.5 + Combat.TEMPO_MARGIN_S, 0.0001)
+
+# ---- landing on a floor with monsters (李元芳 R5 on SGODOT-288)
+
+## Express straight to Floor 5 met the elite with the key on `Mine · No rocks here`: a floor with a monster up lands on
+## Combat; a cleared one, and floors 1–2, on Mining.
+func test_a_floor_with_monsters_up_lands_on_combat() -> void:
+	var floors := _five([true, true, true, true, true])
+	assert_str(P0MaterialLogic.landing_mode(_view(_run(floors)), 5)).is_equal("combat")
+	assert_str(P0MaterialLogic.landing_mode(_view(_run(floors)), 3)).is_equal("combat")
+	assert_str(P0MaterialLogic.landing_mode(_view(_run(floors)), 2)).is_equal("mine")
+	floors[2].mobs = [{"kind": "mob_slime", "hp": 0, "max": 9}]
+	assert_str(P0MaterialLogic.landing_mode(_view(_run(floors)), 3)).is_equal("mine")
+	assert_int(P0MaterialLogic.mobs_up(_view(_run(floors)), 4)).is_equal(3)
+	assert_str(P0MaterialLogic.landing_mode(_view(null), 5)).is_equal("mine")   # no run: nothing to fight
+
+## The monsters hold still 2 s on arrival (the old mine's grace was 1.5 s).
+func test_monsters_hold_still_on_arrival() -> void:
+	var Combat = load("res://modules/mining/p0_mine_combat.gd")
+	var bp := Layout_bp()
+	var mover := PlayerMover.new(bp, BlueprintGrid.new(bp))
+	mover.position = load("res://modules/mining/mine_layout.gd").SPAWN
+	var c: Node3D = auto_free(Combat.new())
+	add_child(c)
+	c.sync_p0(_view(_run(_five([true, true, true, true, true]))), 5, mover)
+	assert_float(c.grace).is_equal(Combat.LANDING_GRACE_S)
+	assert_float(Combat.LANDING_GRACE_S).is_greater_equal(2.0)
+
+# ---- the lunge band (不知火舞 785a6a5b, 上官婉儿 c8a7507a, 李白 on SGODOT-288)
+
+## A wind-up lays the band along the locked direction, sweeping from the feet to the lunge's reach; Body squashes, the
+## root (bars, shadow, band) does not; the leap follows the band.
+func test_a_wind_up_lays_the_band_along_the_locked_lunge() -> void:
+	var Combat = load("res://modules/mining/p0_mine_combat.gd")
+	var bp := Layout_bp()
+	var mover := PlayerMover.new(bp, BlueprintGrid.new(bp))
+	mover.position = load("res://modules/mining/mine_layout.gd").SPAWN
+	var c: Node3D = auto_free(Combat.new())
+	add_child(c)
+	c.sync_p0(_view(_run(_five([true, true, true, true, true]))), 5, mover)
+	c.grace = 0.0
+	var e: Dictionary = c.enemies.values()[0]
+	(e.mover as PlayerMover).position = mover.position + Vector3(0, 0, -2.0)   # within the elite's 2.4 m reach
+	e.node.position = e.mover.position
+	c.step(0.016, mover, false)
+	assert_str(str(e.phase)).is_equal("windup")
+	var band: Node3D = e.node.get_node("Band")
+	assert_bool(band.visible).is_true()
+	assert_vector(e.band_dir).is_equal_approx(Vector3(0, 0, 1), Vector3(0.01, 0.01, 0.01))   # towards the player
+	assert_vector((e.node.get_node("Body") as Node3D).scale).is_equal(Combat.SQUASH)
+	assert_vector(e.node.scale).is_equal(Vector3.ONE)
+	var early: float = (band.get_node("Strip") as Node3D).scale.z
+	# the band itself points at the player, not only band_dir (苏烈 on #239): its local +z, in the world, is the lunge
+	var along: Vector3 = band.global_transform.basis.z.normalized()
+	assert_vector(along).is_equal_approx(Vector3(0, 0, 1), Vector3(0.01, 0.01, 0.01))
+	mover.position += Vector3(3, 0, 0)   # the player steps aside: the band keeps its line
+	for i in 30: c.step(0.016, mover, false)
+	assert_vector(e.band_dir).is_equal_approx(Vector3(0, 0, 1), Vector3(0.01, 0.01, 0.01))
+	assert_float((band.get_node("Strip") as Node3D).scale.z).is_greater(early)
+	assert_vector(band.global_transform.basis.z.normalized()).is_equal_approx(Vector3(0, 0, 1), Vector3(0.01, 0.01, 0.01))
+	while str(e.phase) == "windup": c.step(0.016, mover, false)
+	assert_str(str(e.phase)).is_equal("dash")
+	assert_bool(band.visible).is_true()   # through the lunge (不知火舞 7d4f0231)
+	var laid: Vector3 = band.global_position
+	while str(e.phase) == "dash": c.step(0.016, mover, false)
+	assert_vector(band.global_position).is_equal_approx(laid, Vector3(0.001, 0.001, 0.001))   # where the wind-up laid it
+	assert_bool(band.visible).is_true()   # fading
+	for i in 12: c.step(0.016, mover, false)   # past the 0.15 s fade
+	assert_bool(band.visible).is_false()
+
+func test_the_band_reaches_as_far_as_the_lunge_hits() -> void:
+	var Combat = load("res://modules/mining/p0_mine_combat.gd")
+	var c: Node3D = auto_free(Combat.new())
+	var elite: Dictionary = c.band_of("elite_slime")
+	assert_float(elite.reach).is_equal_approx(6.2 * 0.42 + 0.65 + 0.35, 0.001)
+	assert_float(elite.width).is_equal_approx(2.0, 0.001)
+	assert_float(c.band_of("slime").reach).is_less(elite.reach)   # a slime's is shorter
+
+## Every way onto a floor with a monster up — the mouth's Continue run / Enter mine (_ready), stairs, the elevator,
+## Express (_go_floor) — lands on Attack with the monsters held still: both come from the floor's view, not the way
+## in (李元芳 R5 retest on SGODOT-288). The scene's own _ready / _go_floor call landing_mode and sync_p0 sets the grace.
+func test_continue_run_lands_like_express() -> void:
+	var src := FileAccess.get_file_as_string("res://scenes/p0/p0_mine.gd")
+	var ready_at := src.find("func _ready()")
+	var go_at := src.find("func _go_floor(")
+	assert_int(src.find("landing_mode(", ready_at)).is_between(ready_at, src.find("\nfunc ", ready_at + 5))
+	assert_int(src.find("landing_mode(", go_at)).is_between(go_at, src.find("\nfunc ", go_at + 5))
+	var Combat = load("res://modules/mining/p0_mine_combat.gd")
+	var bp := Layout_bp()
+	var mover := PlayerMover.new(bp, BlueprintGrid.new(bp))
+	var c: Node3D = auto_free(Combat.new())
+	add_child(c)
+	var v := _view(_run(_five([true, true, true, true, true])))
+	c.sync_p0(v, 5, mover)   # a fresh mine scene's first frame (Continue run lands here)
+	assert_float(c.grace).is_equal(Combat.LANDING_GRACE_S)
+	c.grace = 0.5
+	c.sync_p0(v, 5, mover)   # the same floor's later frames keep counting down
+	assert_float(c.grace).is_equal(0.5)
+	assert_str(P0MaterialLogic.landing_mode(v, 5)).is_equal("combat")
+
+## A lunge across the room: the band points where the player stood when the wind-up began, whichever way that is.
+func test_the_band_points_along_the_lunge_in_any_direction() -> void:
+	var Combat = load("res://modules/mining/p0_mine_combat.gd")
+	var bp := Layout_bp()
+	var mover := PlayerMover.new(bp, BlueprintGrid.new(bp))
+	var c: Node3D = auto_free(Combat.new())
+	add_child(c)
+	c.sync_p0(_view(_run(_five([true, true, true, true, true]))), 5, mover)
+	c.grace = 0.0
+	var e: Dictionary = c.enemies.values()[0]
+	mover.position = load("res://modules/mining/mine_layout.gd").SPAWN
+	(e.mover as PlayerMover).position = mover.position + Vector3(1.4, 0, -1.4)   # diagonal to the player, inside the room
+	e.node.position = e.mover.position
+	c.step(0.016, mover, false)
+	assert_str(str(e.phase)).is_equal("windup")
+	var want: Vector3 = (mover.position - (e.node as Node3D).position).normalized()
+	assert_vector(e.node.get_node("Band").global_transform.basis.z.normalized()).is_equal_approx(want, Vector3(0.02, 0.02, 0.02))

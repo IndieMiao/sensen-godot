@@ -74,13 +74,20 @@ describe('regional seeds at the Market (§5.2.3)', () => {
 
 describe('regional crops on the home farm (§5.2.3)', () => {
   it('ripen in their own time at home and ×1.5 away from their zone (Pumpkin 20 h, Pineapple 36 h here)', () => {
-    expect(cropGrowH(c, crop('crop_pumpkin'))).toBe(20);
-    expect(cropGrowH(c, crop('crop_pineapple'))).toBe(36);
-    expect(cropGrowH(c, crop('crop_radish'))).toBe(crop('crop_radish').grow_h);
+    expect(cropGrowH(c, f5(), crop('crop_pumpkin'))).toBe(20);
+    expect(cropGrowH(c, f5(), crop('crop_pineapple'))).toBe(36);
+    expect(cropGrowH(c, f5(), crop('crop_radish'))).toBe(crop('crop_radish').grow_h);
     const v = viewOf(c, f5(), T0).crops;
     expect(v.find(x => x.id === 'crop_pumpkin')).toMatchObject({ grow_h: 20, zone: 'Temperate', native: true });
     expect(v.find(x => x.id === 'crop_pineapple')).toMatchObject({ grow_h: 36, zone: 'Tropical', native: false });
     expect(v.find(x => x.id === 'crop_radish')).not.toHaveProperty('native');
+  });
+
+  it('judge native by the home city, not profile.climate (哪吒 on #235): a Singapore home grows Pineapple in 24 h', () => {
+    const s = { ...f5(), travel: { ...f5().travel, home: SINGAPORE, here: SINGAPORE } };
+    expect(cropGrowH(c, s, crop('crop_pineapple'))).toBe(24);
+    expect(cropGrowH(c, s, crop('crop_pumpkin'))).toBe(30);
+    expect(viewOf(c, s, T0).crops.find(x => x.id === 'crop_pineapple')).toMatchObject({ grow_h: 24, native: true });
   });
 
   it('cost 4 Energy to sow and start their own clock when watered', () => {

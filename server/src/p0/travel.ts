@@ -80,6 +80,14 @@ export const freshTravel = (c: P0Content): TravelState => {
  * the clusters are absent. */
 export function climateAt(c: P0Content, s: P0State, place?: unknown): string {
   const cluster = (typeof place === 'string' && place !== '' ? clusterOf(c, place) : null) ?? s.travel?.here;
+  return climateOfCluster(c, cluster);
+}
+
+/** The farm's climate zone: its home city's (the farm never travels; 哪吒 on #235: not profile.climate, once a home
+ * may be another city). */
+export const homeClimate = (c: P0Content, s?: P0State): string => climateOfCluster(c, s?.travel?.home);
+
+function climateOfCluster(c: P0Content, cluster: string | null | undefined): string {
   const z = cluster ? clusterById(c, cluster)?.climate : undefined;
   return z ? z[0].toUpperCase() + z.slice(1) : c.profile.climate;
 }
@@ -107,8 +115,9 @@ export function preview(c: P0Content, s: P0State, cluster: string) {
 
 /** A city's places for GET /v1/p0/city/:cluster and the silhouette card. Shell: home returns the hand-written tables;
  * generated cities come from 后裔's cityPlaces(cluster) (SGODOT-280) once it lands. */
-export function cityInfo(c: P0Content, cluster: string): { ponds: string[]; outposts: string[]; residents: number; fish: { fish: string; level: number }[] } {
-  const gen = (c as P0Content & { cityPlaces?: (id: string) => ReturnType<typeof cityInfo> }).cityPlaces;
+export interface CityInfo { ponds: string[]; outposts: string[]; residents: number; fish: { fish: string; level: number }[]; detail?: unknown }
+export function cityInfo(c: P0Content, cluster: string): CityInfo {
+  const gen = (c as P0Content & { cityPlaces?: (id: string) => CityInfo }).cityPlaces;
   if (cluster !== homeCluster(c) && gen) return gen(cluster);
   if (cluster !== homeCluster(c)) return { ponds: [], outposts: [], residents: 0, fish: [] };
   const ponds = Object.keys(c.fishing.places).filter(id => clusterOf(c, id) === cluster);
@@ -184,6 +193,29 @@ export function settleExplorer(c: P0Content, s: P0State, now: number, events: P0
     s.travel.explorer = n;
     grantOnce(c, s, now, `explorer_${n}`, e, events);
   }
+}
+
+/**
+ * Where the player is follows what they do (李元芳's cold start, 2026-10-10): the city they stand in is the one their
+ * scene is in, not only the last `travel` / `return_home`. Called with every command and state read, after requirePass:
+ * - the homestead's spaces (home: the farm and its kitchen; mine) are the home city;
+ * - entering a pond or an outpost (its pass already checked) puts the player in that place's city;
+ * - otherwise (the map, a read without a space) a city whose Day Pass ran out lets go: back home, unless the player is
+ *   still in a place there they entered with the pass (never cut off, §11.5.1).
+ * Quiet: no event, no welcome (the client's own Go home says Welcome home). True when `here` changed.
+ */
+const HOMESTEAD_SPACES = new Set(['home', 'mine']);
+export function settleHere(c: P0Content, s: P0State, space: unknown, place: unknown, now: number): boolean {
+  const t = s.travel, was = t.here;
+  if (typeof space === 'string' && HOMESTEAD_SPACES.has(space)) t.here = t.home;
+  else if ((space === 'pond' || space === 'outpost') && typeof place === 'string' && place !== '') {
+    const cluster = clusterOf(c, place);
+    if (cluster && covers(s, cluster, now)) t.here = cluster;
+  } else if (t.here !== t.home && !covers(s, t.here, now)) {
+    const inside = s.presence.entered ? clusterOf(c, s.presence.entered) : null;
+    if (inside !== t.here) t.here = t.home;
+  }
+  return t.here !== was;
 }
 
 /** return_home {}: free, instant, needs no pass; passes are kept. */

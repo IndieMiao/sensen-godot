@@ -61,8 +61,24 @@ export function deriveRarity(c: P0Content, parts: { family: string; rarity: numb
   return c.cooking.derive[top - 1][Math.min(families, 3) - 1];
 }
 
+/** A page's rarity, derived from its ingredients (§7.4.1); the table's rarity when one is not in this build yet. */
 export function recipeRarity(c: P0Content, recipe: Recipe): number {
-  return deriveRarity(c, recipe.in.map(t => tokenInfo(c, t)!));
+  const parts = recipe.in.map(t => tokenInfo(c, t));
+  if (parts.length === 0 || parts.some(p => !p)) return recipe.rarity ?? 1;
+  return deriveRarity(c, parts as { family: string; rarity: number }[]);
+}
+
+/**
+ * Whether a page can be cooked in this build (SGODOT-282): every ingredient it names exists (P1 crops and fish come
+ * with their lines) and it is not buy-only (#9 Travel Biscuits). Other pages stay in the Cookbook as silhouettes.
+ */
+export function cookable(c: P0Content, recipe: Recipe): boolean {
+  return recipe.cookable !== false && recipe.in.length > 0 && recipe.in.every(t => tokenInfo(c, t) !== null);
+}
+
+/** The pages the stove works with. */
+export function cookablePages(c: P0Content): Recipe[] {
+  return c.cooking.recipes.filter(r => cookable(c, r));
 }
 
 export function tokenMatches(c: P0Content, token: string, id: string): boolean {
@@ -91,7 +107,7 @@ function fits(c: P0Content, recipe: Recipe, items: string[]): boolean {
 /** Specific-ingredient pages win over tag pages; among tag pages the fewest wildcards win (§7.2.3). */
 export function matchRecipe(c: P0Content, items: string[]): Recipe | null {
   const wild = (r: Recipe) => r.in.filter(t => TAG.test(t)).length;
-  return c.cooking.recipes.filter(r => fits(c, r, items)).sort((a, b) => wild(a) - wild(b))[0] ?? null;
+  return cookablePages(c).filter(r => fits(c, r, items)).sort((a, b) => wild(a) - wild(b))[0] ?? null;
 }
 
 /**
@@ -138,7 +154,7 @@ export function ingredientsFor(c: P0Content, s: P0State, recipe: Recipe): string
  */
 function keptForLater(c: P0Content, s: P0State, recipe: Recipe): (id: string) => boolean {
   const ids = new Set<string>();
-  for (const r of c.cooking.recipes) {
+  for (const r of cookablePages(c)) {
     if (r.id === recipe.id || !s.cookbook.includes(r.id)) continue;
     for (const t of r.in) if (!TAG.test(t)) ids.add(t);
   }
@@ -182,6 +198,7 @@ export function startPot(c: P0Content, s: P0State, cmd: { items?: unknown; recip
   if (cmd.recipe !== undefined) {
     const recipe = recipeById(c, String(cmd.recipe));
     if (!recipe || !s.cookbook.includes(recipe.id)) return { code: 'unknown_recipe' };
+    if (!cookable(c, recipe)) return { code: 'not_cookable_page', detail: { recipe: recipe.id } };
     const picked = ingredientsFor(c, s, recipe);
     // Never falls back to another page: what was picked must fit the chosen one.
     if (!picked || !fits(c, recipe, picked)) return { code: 'missing_ingredients', detail: { recipe: recipe.id } };
@@ -246,7 +263,7 @@ export function startPot(c: P0Content, s: P0State, cmd: { items?: unknown; recip
 export function cookAll(c: P0Content, s: P0State, now: number, events: P0Event[]): Refusal | null {
   if (!hasConvenience(c, s, 'cook_all')) return { code: 'locked', detail: { convenience: 'cook_all' } };
   const most = c.cooking.cook_all_per_page ?? 2;
-  const pages = c.cooking.recipes.filter(r => s.cookbook.includes(r.id) && recipeRarity(c, r) < 4)
+  const pages = cookablePages(c).filter(r => s.cookbook.includes(r.id) && recipeRarity(c, r) < 4)
     .sort((a, b) => recipeRarity(c, b) - recipeRarity(c, a) || (a.n ?? 99) - (b.n ?? 99));
   let placed = 0;
   for (const page of pages) {
