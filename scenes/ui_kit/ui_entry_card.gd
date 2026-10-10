@@ -11,7 +11,9 @@ extends Control
 ##           reason as the label) still takes the tap and the owner toasts the line (LOCK-10, 5181bba0);
 ##   second  an optional Dismiss-style text button, 44 high, 15 Bold secondary: `New run · 2 Energy` (warning short
 ##           of Energy; the reason, still secondary, when it can't);
-##   note    C10 secondary under the second: `Current run will end`, only while the second can be done.
+##   third   an optional second Dismiss-style button under it, the same look: the mine mouth's `Floor 5 · Express ·
+##           Free` (P1, MINE-GATE-EXPRESS row 58; q(108): with a run open it stacks under New run);
+##   note    C10 secondary under the second (and third): `Current run will end`, only while one of them can be done.
 ## Placement: WorldAnchor puts the pointer tip on the facility; point_at() keeps the pointer on it near the screen
 ## edges; the owner lifts the card clear of the player (WorldAnchor.lift_clear). `passive` cards take no touches on the P0 scene (苏烈 on
 ## #45): the scene layer under them sees the press, so the joystick can start on the card, and the owner resolves a
@@ -19,6 +21,7 @@ extends Control
 
 signal pressed            # the main button
 signal second_pressed     # the secondary text button
+signal third_pressed      # the second text button under it (Express)
 
 enum State { AVAILABLE, UNAVAILABLE }
 
@@ -39,6 +42,8 @@ var amber := false: set = set_amber
 var second := "": set = set_second
 var second_state: State = State.AVAILABLE: set = set_second_state
 var second_amber := false: set = set_second_amber
+var third := "": set = set_third
+var third_state: State = State.AVAILABLE: set = set_third_state
 var note := "": set = set_note
 var passive := false: set = set_passive
 
@@ -50,6 +55,8 @@ var _title_fact: Label
 var _main: Button
 var _second_row: CenterContainer
 var _second: Label
+var _third_row: CenterContainer
+var _third: Label
 var _note: Label
 var _pointer: UiPointer
 var _aim := NAN
@@ -97,6 +104,13 @@ func _init(action_ := "", state_: State = State.AVAILABLE) -> void:
 	_second = UiKit.label("", UiTokens.STYLE_BUTTON_B15, UiTokens.COLOR_SECONDARY)
 	_second.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_second_row.add_child(_second)
+	_third_row = CenterContainer.new()   # the same Dismiss row
+	_third_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_third_row.custom_minimum_size.y = UiTokens.SIZE_TOUCH
+	col.add_child(_third_row)
+	_third = UiKit.label("", UiTokens.STYLE_BUTTON_B15, UiTokens.COLOR_SECONDARY)
+	_third.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_third_row.add_child(_third)
 	_note = UiKit.label("", UiTokens.STYLE_C10_B, UiTokens.COLOR_SECONDARY)
 	_note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	col.add_child(_note)
@@ -125,6 +139,10 @@ func set_second_state(v: State) -> void:
 	if v != second_state: second_state = v; _refresh()
 func set_second_amber(v: bool) -> void:
 	if v != second_amber: second_amber = v; _refresh()
+func set_third(v: String) -> void:
+	if v != third: third = v; _refresh()
+func set_third_state(v: State) -> void:
+	if v != third_state: third_state = v; _refresh()
 func set_note(v: String) -> void:
 	if v != note: note = v; _refresh()
 
@@ -148,8 +166,11 @@ func _refresh() -> void:
 	_second.text = second
 	var ink := UiTokens.COLOR_WARNING if second_amber and second_state == State.AVAILABLE else UiTokens.COLOR_SECONDARY
 	_second.add_theme_color_override(&"font_color", ink)
+	_third_row.visible = third != ""
+	_third.text = third
 	_note.text = note
-	_note.visible = note != "" and second != "" and second_state == State.AVAILABLE   # only when it can be done
+	# only when one of them can be done
+	_note.visible = note != "" and ((second != "" and second_state == State.AVAILABLE) or (third != "" and third_state == State.AVAILABLE))
 
 ## The card's 44 high pill (radius 22) over the theme's CommandButton boxes; short of Energy, Kind=need-energy: the
 ## warning tint and a warning label. Styled from the theme the button has now, so the card restyles once themed.
@@ -189,6 +210,7 @@ func _restyle() -> void:
 func is_amber() -> bool: return _main.has_theme_color_override(&"font_color")
 func main_text() -> String: return _main.text
 func second_shown() -> bool: return _second_row.visible
+func third_shown() -> bool: return _third_row.visible
 func note_shown() -> bool: return _note.visible
 
 ## The card's touch area in global space, grown to the 44 px touch height when the card is shorter.
@@ -201,19 +223,22 @@ func hit_rect() -> Rect2:
 ## button's height is the CommandButton's).
 func main_rect() -> Rect2: return _main.get_global_rect()
 func second_rect() -> Rect2: return _second_row.get_global_rect() if _second_row.visible else Rect2()
+func third_rect() -> Rect2: return _third_row.get_global_rect() if _third_row.visible else Rect2()
 
-## What a real tap at a global point hits: "main", "second", "card" (the card around them: nothing happens) or ""
+## What a real tap at a global point hits: "main", "second", "third", "card" (the card around them: nothing happens) or ""
 ## (off the card). Emits the button's signal.
 func tap_at(global_pos: Vector2) -> String:
 	if not visible or not hit_rect().has_point(global_pos): return ""
 	var on := _part_at(global_pos)
 	if on == "main": pressed.emit()
 	elif on == "second": second_pressed.emit()
+	elif on == "third": third_pressed.emit()
 	return on
 
 func _part_at(global_pos: Vector2) -> String:
 	if main_rect().has_point(global_pos): return "main"
 	if second_rect().has_point(global_pos): return "second"
+	if third_rect().has_point(global_pos): return "third"
 	return "card"
 
 func _get_minimum_size() -> Vector2:
@@ -261,3 +286,4 @@ func _on_input(e: InputEvent) -> void:
 	if tap and _part_at(at) == _down_on:
 		if _down_on == "main": pressed.emit()
 		elif _down_on == "second": second_pressed.emit()
+		elif _down_on == "third": third_pressed.emit()

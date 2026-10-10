@@ -305,6 +305,11 @@
       "seed_chamomile",
       "seed_chili",
       "seed_tomato",
+      "seed_cabbage",
+      "seed_corn",
+      "seed_cucumber",
+      "seed_strawberry",
+      "seed_melon",
       "bait_worm",
       "fert_compost"
     ]

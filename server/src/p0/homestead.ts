@@ -78,7 +78,7 @@ export function upgradeHomestead(c: P0Content, s: P0State, now: number, events: 
   const max = maxEnergy(c, s);
   const gain = gainEnergy(c, s, now, max - s.energy.value, events, 'homestead');
   events.push({ kind: 'homestead', level: next.level, energy: gain, unlocks: next.unlocks });
-  // P1 (q(59) §1.1): Lv3 brings 10 wild plots (30–39), dropped in with the fence (HOME-2 `Plots +10`).
+  // P1 (q(59) §1.1): Lv3 brings 10 wild plots (30–39, homestead.plots), dropped in with the fence (HOME-2's plots_40 line).
   const added = addPlots(c, s);
   if (added.length > 0) events.push({ kind: 'plots_added', plots: added, reason: 'homestead' });
   return null;

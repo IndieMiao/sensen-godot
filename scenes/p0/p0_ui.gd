@@ -24,6 +24,14 @@ signal panel_requested(panel: String)
 signal recenter()
 signal place_pressed()
 signal tackle_requested()      # FISH-5 rod variant "Tackle Shop"
+## Placement mode (P1, SGODOT-241): a press / drag / release on the scene, in screen points (phase "press", "drag",
+## "release"); the world turns it into a spot. The bar's main key and Cancel come back as placement_done(ok).
+signal placement_point(screen: Vector2, phase: String)
+signal placement_done(ok: bool)
+## Two fingers in placement mode moved the picture by `px` (screen), about `at`: the world pans its camera.
+signal placement_pan(px: Vector2, at: Vector2)
+## A field recipe's Build on the workbench (SGODOT-241): the world opens placement mode for it.
+signal placement_requested(recipe: String)
 
 const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
 const P0Travel := preload("res://modules/p0/p0_travel.gd")   # where the player is in the world (SGODOT-275)
@@ -38,6 +46,9 @@ var quick_store := "user://p0_quickbar.json"   # per-action pins / removals (tes
 const _KEY_ABOVE_BAR := 40.0        # BAR-1 482:18: ActionKey bottom at y 668, quick bar top at 708
 const _BADGE_CARD_GAP := 4.0        # a card over a facility that also shows a badge sits this far above it (the mine's EntryCard)
 const ACTION_SURFACES := ["farm", "pond", "mine"]   # spaces with the action key group (SGODOT-231: the mine, Mining)
+## The actions the world also offers on the switch key besides the current one (SGODOT-288: mine floors 3–5 offer
+## Mining and Combat; the world sets it, P0Mine._go_floor). Empty: only the current action.
+var actions_here: Array = []
 ## A-08 ghost slot per action: [id prefix of the family, ghost icon, noun] (q(44): Seeds / Bait / Torch in P0).
 const GHOST_FAMILY := {
 	"farm": ["seed_", "seed_radish", "Seeds"],
@@ -95,6 +106,8 @@ var _dev_box: Control
 var _creel: UiCreelBadge
 var _status: PanelContainer     # SGODOT-231 mine status line (Rocks 2/6), where the creel sits while fishing
 var _status_text: Label
+var _hp: UiHpBar                # SGODOT-288 HPBar on mine floors 3–5, where the status line sits (it moves right)
+var _elite_hp: UiHpBar          # EnemyHP Kind=Elite under it while the elite fights (COMBAT-ELITE)
 var player_screen := Vector2(180, 320)   # set by the farm / pond each frame (mid-body): the radial fans out from it
 var _modal: Control
 var modal_kind := ""            # "stall", "bag", "inbox", "card", ... — which drawer is open
@@ -204,6 +217,13 @@ func _build_bar() -> void:
 	_status.add_child(_status_text)
 	_status.hide()
 	_kit.add_child(_status)   # kit theme for the C11XB type style
+	_hp = UiHpBar.new(UiHpBar.Kind.PLAYER)
+	_hp.position = _creel.position
+	_hp.hide()
+	_kit.add_child(_hp)
+	_elite_hp = UiHpBar.new(UiHpBar.Kind.ELITE)
+	_elite_hp.hide()
+	_kit.add_child(_elite_hp)
 
 func _build_fab() -> void:
 	_keys = UiActionKey.new()
@@ -326,6 +346,26 @@ func set_place(text: String) -> void:
 
 ## One status line under the HUD where the creel sits while fishing (SGODOT-231: the mine's "Rocks 2/6", "Run 1/2
 ## today" for its first 3 s). "" hides it; changing action clears it.
+## SGODOT-288 (COMBAT-1 / COMBAT-ELITE): the player's mine HP over the status line's spot, which then sits to its right
+## (x 187 of 360, MINE-3); hp < 0 hides it. The elite's card under it while one fights ({} hides it).
+const _STATUS_RIGHT_OF_HP := 187.0
+func set_hp(hp: int, maximum: int, elite := {}) -> void:
+	if not is_node_ready(): return
+	var on := hp >= 0 and surface in ACTION_SURFACES
+	_hp.visible = on
+	if on: _hp.set_hp(hp, maximum)
+	_status.position.x = _STATUS_RIGHT_OF_HP if on else _creel.position.x
+	var boss := on and not elite.is_empty()
+	_elite_hp.visible = boss
+	if boss:
+		_elite_hp.title = str(elite.get("name", "Elite Slime"))
+		_elite_hp.set_hp(int(elite.get("hp", 0)), int(elite.get("max", 1)))
+		_elite_hp.position = Vector2(roundf((root.size.x - _elite_hp.get_combined_minimum_size().x) * 0.5) if root else 16.0,
+			_creel.position.y + _hp.get_combined_minimum_size().y + UiTokens.SPACE_WITHIN)
+
+func hp_bar() -> UiHpBar: return _hp
+func elite_bar() -> UiHpBar: return _elite_hp
+
 func set_status_line(text: String) -> void:
 	if not is_node_ready():
 		_pending["status"] = text   # the mine sets it on its first frame, maybe before the HUD exists (苏烈, #39)
@@ -336,6 +376,7 @@ func set_status_line(text: String) -> void:
 ## Which world the HUD sits on (§10.2.4): action spaces show everything; rooms are facility spaces
 ## (no quick bar, main action or switch key); the map shows only toasts and cards.
 func set_surface(name: String) -> void:
+	if placing(): end_placement()   # a world change ends placement (nothing was sent)
 	surface = name
 	if not is_node_ready():
 		_pending["surface"] = name
@@ -378,7 +419,7 @@ func set_mode(mode: String, place := "") -> void:
 	_bar_sig = []
 	_auto_pick = true
 	# SGODOT-231: the mine shows the pickaxe; set_action's `tool` swaps in the equipped one.
-	_mode_tool = P0Logic.icon("rod" if mode == "fish" else "pickaxe" if mode == "mine" else "hoe")
+	_mode_tool = P0Logic.icon("rod" if mode == "fish" else "pickaxe" if mode == "mine" else "sword" if mode == "combat" else "hoe")
 	_keys.tool_icon = _mode_tool
 	_creel.visible = mode == "fish"
 	set_status_line("")
@@ -387,7 +428,9 @@ func set_mode(mode: String, place := "") -> void:
 func _refresh_bar() -> void:
 	var store := _quick_for(bar_mode)
 	# SGODOT-231: Mining's bar holds only what helps underground (a torch); seeds and bait never show there.
+	# Combat's bar holds Healing Potions (§13.3.8), which P1 does not have yet: empty, and no ghost (GHOST_FAMILY).
 	var ids := P0MaterialLogic.mine_bar(view, _bar_ids, store.pins, store.removed) if bar_mode == "mine" \
+		else ([] as Array) if bar_mode == "combat" \
 		else P0Logic.quick_bar(view, _bar_ids, bar_mode, store.pins, store.removed)
 	if bar_mode == "fish":
 		if selected_bait != "" and not ids.has(selected_bait): selected_bait = ""
@@ -429,7 +472,7 @@ func _refresh_bar() -> void:
 	# takes it (LOCK-05 v1.10), else the free end; five occupied slots leave no room, so no ghost. A tap opens the Bag
 	# (ghost_tapped). TODO(SGODOT-225 bag drawer): open on the family tab (Seeds → Seeds, Bait → Tackle).
 	var family: Array = GHOST_FAMILY.get(bar_mode, GHOST_FAMILY.farm)   # q(44): Seeds / Bait / Torch
-	if not counts.any(func(n): return int(n) > 0):
+	if not counts.any(func(n): return int(n) > 0) and bar_mode != "combat":
 		var ghost := {ghost = true, icon = P0Logic.icon(family[1]), title = family[2]}
 		var gap := slots.find({})
 		if gap >= 0: slots[gap] = ghost
@@ -2138,6 +2181,7 @@ func show_level_up(ev: Dictionary, first := false) -> void:
 
 func _banner_action(id: String) -> void:
 	match id:
+		"show_workbench": show_spot.emit("workbench")   # Farming Lv6 (q(59) §1.6): moves the camera, opens nothing
 		"use_bait":   # puts the gift bait on the hook, in place (the quick bar's bait slot, q(44))
 			for s in _bag_slots():
 				var bait := str(s.get("id", ""))
@@ -2162,7 +2206,8 @@ func open_radial() -> void:
 	var options := []
 	for it in [["farm", "hoe", "Farming", "No plots here"], ["fish", "fish", "Fishing", "No water nearby"],
 			["mine", "pickaxe", "Mining", "Enter the mine"], ["combat", "sword", "Combat", "Mine floors 3–5"]]:
-		options.append({id = it[0], name = it[2], icon = P0Logic.icon(it[1]), available = it[0] == bar_mode, reason = it[3]})
+		options.append({id = it[0], name = it[2], icon = P0Logic.icon(it[1]),
+			available = it[0] == bar_mode or actions_here.has(it[0]), reason = it[3]})
 	_radial.options = options
 	_radial.selected = bar_mode
 	_radial.open()   # around the screen centre (247, LOCK-03 v2)
@@ -2381,7 +2426,10 @@ func open_workbench(tab := "") -> P0WorkbenchDrawer:
 	d.safe_bottom = safe_bottom()
 	d.close_requested.connect(close_modal)
 	d.tab_changed.connect(func(t: String): workbench_tab = t)
-	d.command_requested.connect(func(cmd: Dictionary): command.emit(cmd))
+	d.command_requested.connect(func(cmd: Dictionary):
+		# A Facilities card's Build (SGODOT-241) opens placement mode in the world; nothing is sent until its Build.
+		if str(cmd.get("type", "")) == "place_start": placement_requested.emit(str(cmd.get("recipe", "")))
+		else: command.emit(cmd))
 	d.unavailable_requested.connect(func(reason: String): toast(reason))
 	d.source_requested.connect(_show_need_source)
 	_open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
@@ -2954,6 +3002,10 @@ class _TouchPad extends Control:
 	func _notification(what: int) -> void:
 		if what in [NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_APPLICATION_FOCUS_OUT] and _arb.is_pinching(): end_stick()
 	func _gui_input(e: InputEvent) -> void:
+		# Placement mode (SGODOT-241): one finger moves the preview; no stick, no tap, no pinch.
+		if ui.placing():
+			_placement_input(e)
+			return
 		if e is InputEventMouseButton and e.pressed and e.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
 			ui.zoom.emit(0.9 if e.button_index == MOUSE_BUTTON_WHEEL_UP else 1.1, get_global_transform_with_canvas() * e.position)
 			ui.zoom_end.emit()
@@ -2973,6 +3025,43 @@ class _TouchPad extends Control:
 				# two agree, so keep this pair in step if the layer ever moves (刘邦 on #47).
 				&"pinch": ui.zoom.emit(o.factor, get_global_transform_with_canvas() * o.center)
 				&"pinch_end": ui.zoom_end.emit()
+	# Placement mode (SGODOT-241; 不知火舞 on 241): one finger moves the preview (placement_point); two fingers pan and
+	# pinch the camera as in the world (placement_pan / zoom). Touch on a phone, its emulated mouse on a desktop.
+	var _place_touches := {}   # index → screen point, while placing
+	var _place_two := false     # two fingers down: the camera's, the preview stays
+	func _placement_input(e: InputEvent) -> void:
+		var xf := get_global_transform_with_canvas()
+		if e is InputEventScreenTouch:
+			if e.pressed: _place_touches[e.index] = xf * e.position
+			else: _place_touches.erase(e.index)
+			if _place_touches.size() >= 2: _place_two = true
+			elif _place_touches.is_empty():
+				if _place_two: ui.zoom_end.emit()
+				_place_two = false
+			return
+		if e is InputEventScreenDrag:
+			if not _place_touches.has(e.index) or _place_touches.size() < 2: return
+			var before := _centre_spread()
+			_place_touches[e.index] = xf * e.position
+			var after := _centre_spread()
+			ui.placement_pan.emit(after.centre - before.centre, after.centre)
+			if before.spread > 0.0 and after.spread > 0.0: ui.zoom.emit(before.spread / after.spread, after.centre)
+			return
+		if _place_two: return   # the mouse twin of a two-finger gesture moves nothing
+		if e is InputEventMouse:
+			var at: Vector2 = xf * (e as InputEventMouse).position
+			if e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT:
+				ui.placement_point.emit(at, "press" if e.pressed else "release")
+			elif e is InputEventMouseMotion and (e.button_mask & MOUSE_BUTTON_MASK_LEFT) != 0:
+				ui.placement_point.emit(at, "drag")
+			elif e is InputEventMouseButton and e.pressed and e.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
+				ui.zoom.emit(0.9 if e.button_index == MOUSE_BUTTON_WHEEL_UP else 1.1, at)
+				ui.zoom_end.emit()
+	func _centre_spread() -> Dictionary:
+		var pts: Array = _place_touches.values()
+		if pts.size() < 2: return {centre = Vector2.ZERO, spread = 0.0}
+		return {centre = ((pts[0] as Vector2) + (pts[1] as Vector2)) * 0.5, spread = (pts[0] as Vector2).distance_to(pts[1])}
+
 	func _draw() -> void:
 		var start := _arb.origin()
 		var now := _arb.position()
@@ -2983,3 +3072,80 @@ class _TouchPad extends Control:
 		var k := start + ((now - start).limit_length(radius))
 		draw_circle(k, radius * 0.45, Color(0.98, 0.97, 0.94, 0.95))
 		draw_circle(k, radius * 0.3, Color(0.5, 0.78, 0.42))
+
+# ---------------------------------------------------------------- placement mode (P1, SGODOT-241)
+## The modal edit shell (plan q(23): the LOCK-01 / 02 exception) the sprinkler's Build and Move use, and later Decorate
+## and Plot Marks: a press on the scene summons no stick, it moves the preview (placement_point); the HUD keeps only
+## its first row; the quick bar, the main key, the switch key, the radial and world markers step aside; the bottom bar
+## has Cancel and the main key. What is placed, where it may stand and what the main key sends belong to the caller:
+## spec = {confirm: "Build", caption: "", reason: ""}; update them with set_placement as the preview moves.
+var _place_bar: UiPlaceBar
+
+func placing() -> bool: return _place_bar != null and is_instance_valid(_place_bar)
+
+func begin_placement(spec: Dictionary) -> void:
+	if placing(): end_placement()
+	close_modal()
+	if _radial.is_open(): _radial.close()
+	_bar.cancel_drag()
+	joystick.emit(Vector2.ZERO)
+	(pad as _TouchPad).end_stick()
+	_place_bar = UiPlaceBar.new()
+	_place_bar.theme = UiKit.theme()
+	_place_bar.safe_bottom = safe_bottom()
+	_place_bar.confirmed.connect(func(): placement_done.emit(true))
+	_place_bar.cancelled.connect(func(): placement_done.emit(false))
+	_place_bar.unavailable.connect(func(r: String): toast(r))
+	_kit.add_child(_place_bar)
+	set_placement(spec)
+	_keys.visible = false
+	_bar.visible = false
+	_creel.visible = false
+	_status.visible = false
+	hud.set_row2_shown(false)
+	for m in _icons.values() + _name_bars.values() + _npc_tags.values() + _badges.values(): (m as Control).visible = false
+
+func set_placement(spec: Dictionary) -> void:
+	if not placing(): return
+	if spec.has("confirm"): _place_bar.confirm = str(spec.confirm)
+	if spec.has("caption"): _place_bar.caption = str(spec.caption)
+	if spec.has("reason"): _place_bar.reason = str(spec.reason)
+
+## Back to the world's controls (after the main key's command is sent, or Cancel).
+func end_placement() -> void:
+	if not placing(): return
+	(pad as _TouchPad)._place_touches.clear()
+	(pad as _TouchPad)._place_two = false
+	_place_bar.queue_free()
+	_place_bar = null
+	hud.set_row2_shown(true)
+	var was := surface
+	surface = ""
+	set_surface(was)
+
+## The bar's card on screen, where the scene stops taking placement touches.
+func placement_bar_rect() -> Rect2:
+	if not placing(): return Rect2()
+	return Rect2(_place_bar.get_global_rect().position + _place_bar.card_rect().position, _place_bar.card_rect().size)
+
+## A facility's status card (P1, SGODOT-241; q(59) §4): `Sprinkler · Waters 8 plots` and one button (Move); the
+## caller highlights what it covers while the card shows (modal_kind "facility"). Sits where the quick bar was.
+## spec = {title, lead, icon, button}; on_button runs after the card closes.
+func open_facility_card(spec: Dictionary, on_button: Callable) -> UiInfoSheet:
+	var card := {id = "facility", title = str(spec.get("title", "")), lead = str(spec.get("lead", "")),
+		icon = spec.get("icon", null), facts = [], buttons = [{id = &"move", label = str(spec.get("button", "Move")), kind = &"secondary"}]}
+	var sheet := UiInfoSheet.new()
+	sheet.theme = UiKit.theme()
+	sheet.rules = func(_id, _ctx, _o): return card
+	sheet.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+	sheet.offset_left = UiTokens.SPACE_PAGE
+	sheet.offset_right = -UiTokens.SPACE_PAGE
+	sheet.offset_bottom = -bottom_pad()
+	sheet.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	sheet.action_requested.connect(func(_action: StringName, _id: String, _payload: Dictionary):
+		close_modal()
+		on_button.call())
+	_open_modal(sheet, 0.0, true)
+	modal_kind = "facility"
+	sheet.open("facility", &"facility")
+	return sheet
