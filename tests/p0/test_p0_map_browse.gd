@@ -51,6 +51,14 @@ func test_clusters_are_map_regions_and_curated_cities_keep_theirs() -> void:
 	assert_bool(float(b[0]) < 35.68 and float(b[2]) > 35.68 and float(b[1]) < 139.69 and float(b[3]) > 139.69).is_true()
 	assert_int(P0Map.city_min_population(2.0)).is_greater(P0Map.city_min_population(5.0))
 	assert_int(P0Map.city_min_population(7.5)).is_equal(0)
+	# The whole world (the farthest zoom: west -180, east 180) walks the population list, not every grid cell (蒙恬 on #216).
+	var t := Time.get_ticks_usec()
+	var world := P0Clusters.in_box(-85.0, -180.0, 85.0, 180.0, 3000000, 200)
+	assert_int(Time.get_ticks_usec() - t).is_less(3000)
+	assert_int(world.size()).is_greater(20)
+	assert_bool(world.all(func(c): return int(c.population) >= 3000000)).is_true()
+	var pacific := P0Clusters.in_box(-50.0, 170.0, 50.0, -170.0, 3000000, 200)   # across the antimeridian
+	assert_bool(pacific.all(func(c): return float(c.lng) >= 170.0 or float(c.lng) <= -170.0)).is_true()
 
 func test_the_country_zoom_shows_large_cities_apart_and_any_of_them_is_a_city() -> void:
 	var m := _map()

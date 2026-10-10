@@ -103,8 +103,9 @@ static func _curated_regions() -> Dictionary:
 ## The cluster a map region id stands for: a curated region by its geonames_id (san_francisco → gn-5391959), a
 ## cluster id as itself; "" for anything else.
 static func cluster_of_region(region_id: String) -> String:
-	for id in _curated_regions():
-		if str(_curated_regions()[id].id) == region_id: return id
+	var curated := _curated_regions()
+	for id in curated:
+		if str(curated[id].id) == region_id: return id
 	return region_id if not get_cluster(region_id).is_empty() else ""
 
 ## A cluster's radius as the city directory sizes cities (server/tools/build_cities.mjs radiusKm).
@@ -134,7 +135,8 @@ static func in_box(south: float, west: float, north: float, east: float, min_pop
 		var lng := float(c.lng)
 		var in_lng := (lng >= west and lng <= east) if west <= east else (lng >= west or lng <= east)
 		return lat >= south and lat <= north and in_lng
-	if (north - south) * (fposmod(east - west, 360.0)) > 400.0:
+	var width := 360.0 if east == west else east - west + (360.0 if east < west else 0.0)   # the whole world: west -180, east 180
+	if (north - south) * width > 400.0:
 		for c in _list:
 			if int(c.population) < min_pop: break
 			if inside.call(c): out.append(c)
