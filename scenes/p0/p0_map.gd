@@ -300,7 +300,7 @@ func _sync_here() -> void:
 	_marks_sig = ""   # the homestead's mark moves between the avatar and its pin
 
 ## The place card spec (q(80), P0PlaceSheet): an outpost — its name, data category, Distance, Online now (no row at
-## 0), Go; the homestead — Homestead, Your farm, Distance, Go home · Free. At the place the player is at: no Distance,
+## 0), Go; the homestead — Homestead, Your farm, Distance, Go home. At the place the player is at: no Distance,
 ## Back to <name>. {} for a place P0 does not know.
 func place_card(entry: Dictionary) -> Dictionary:
 	var id := str(entry.get("id", ""))
@@ -308,7 +308,7 @@ func place_card(entry: Dictionary) -> Dictionary:
 	var distance := ["Distance", P0PlaceSheet.distance_text(P0PlaceSheet.km_between(_origin(), to))]
 	if id == HOME_PIN:
 		return P0PlaceSheet.for_here({"title": "Homestead", "subtitle": "Your farm", "reason": PinReason.reason(_view(), id),
-			"facts": [distance], "primary": "Go home · Free"}, not away())
+			"facts": [distance], "primary": "Go home"}, not away())   # a 0-Energy action is the verb alone (q(122))
 	var o := P0Outposts.find(id)
 	if o.is_empty(): return {}
 	var facts: Array = [distance]
@@ -379,7 +379,7 @@ func _city_action(action: String) -> void:
 
 ## The home key (SGODOT-261, the user's call; 不知火舞 keeps 197): from anywhere — at a pond or an outpost the camera
 ## follows the player there and the homestead is lost among the pins — the camera flies back to the homestead and, on
-## landing, selects it, as a tap on its pin does away (its card: Homestead · Go home · Free) and on the avatar at home.
+## landing, selects it, as a tap on its pin does away (its card: Homestead · Go home) and on the avatar at home.
 func go_home_view() -> void:
 	if city_map == null or rt == null: return
 	_fly("home", home_lat, home_lng, SHOW_ZOOM, func():
@@ -678,6 +678,13 @@ func _fill_city_card(cluster: String) -> void:
 		rt.ui.close_modal()
 		open_travel(cluster, P0CityPlaces.city(cluster).get("preview", {})))
 
+## "Trip 6 · Intercontinental": a city's trip tier, the server's (its preview) when it is in, else the client's.
+static func trip_state(view: Dictionary, cluster: String, city: Dictionary) -> String:
+	var pv: Dictionary = city.get("preview", {}) if city.get("preview") is Dictionary else {}
+	var trip := P0Travel.trip(view, cluster)
+	if pv.has("trip"): trip = {trip = int(pv.trip), name = str(pv.get("trip_name", trip.get("name", "")))}
+	return "Trip %d · %s" % [int(trip.get("trip", 1)), str(trip.get("name", ""))]
+
 ## The silhouette card's spec (pure, tested): `city` = P0CityPlaces.city (its preview carries the server's counts and UTC
 ## offset), {} before it is in. Counts and local time stay "–" until then.
 static func city_card(view: Dictionary, cluster: String, city: Dictionary) -> Dictionary:
@@ -765,11 +772,13 @@ func open_arrival_card(cluster: String) -> void:
 		return
 	var c := P0Clusters.get_cluster(cluster)
 	var pond := P0CityPlaces.beginner_pond(cluster)
-	# Nearby (不知火舞 on #248): the market square nearest to where the player stands (the city's overview on landing)
+	# the market square nearest to where the player stands (the city's overview on landing; 不知火舞 on #248)
 	var outpost := P0CityPlaces.nearest_outpost(cluster, Vector2(center_lat, center_lng))
 	var climate := str(c.get("climate", "")).capitalize()   # the table's "temperate" → "Temperate" (§11.9.3 bands)
 	var spec := {
-		"title": str(c.get("name", "")), "state": "Nearby", "effect": "Choose your first local activity.",
+		# the trip tier as the silhouette card writes it, never "Nearby" for a city across the ocean (司空震 286 16ffaf67)
+		"title": str(c.get("name", "")), "state": trip_state(_view(), cluster, P0CityPlaces.city(cluster)),
+		"effect": "Choose your first local activity.",
 		"rows": [
 			{"icon": P0Logic.icon("pond"), "title": "Local pond", "effect": "Pond Crucian for every level"},
 			{"icon": P0Logic.icon("home"), "title": "Outpost", "effect": ("%s seeds and local requests" % climate) if climate != "" else "Local requests"},
@@ -1004,7 +1013,7 @@ func _take_after_leave() -> bool:
 		_on_city_pond_requested.call_deferred(pond)
 		return true
 	match next:
-		"farm": _open_my_farm.call_deferred()      # FISH-4 Go home · Free
+		"farm": _open_my_farm.call_deferred()      # FISH-4 Go home
 		"tackle": show_place.call_deferred("outpost:tackle")   # FISH-5 Tackle Shop: the camera goes to Old Kai's pin
 		_:
 			# Show on map (SGODOT-225): P0Runtime._leave_then("show:<target>") from Today, NeedSource, the Energy card.

@@ -10,7 +10,7 @@ const P0Outposts := preload("res://modules/p0/p0_outposts.gd")
 
 ## cluster → {ponds: [GenPond], outposts: [GenOutpost], fish, residents, tier, climate} as the server sent it.
 static var _cities: Dictionary = {}
-static var _pending: Dictionary = {}   # cluster → true while its read is out
+static var _pending: Dictionary = {}   # cluster → [done callables] while its read is out: every asker hears the answer
 ## generated id → its entry (ponds: a SystemPonds location; outposts: a p0_outposts-shaped entry).
 static var _ponds: Dictionary = {}
 static var _outposts: Dictionary = {}
@@ -29,8 +29,12 @@ static func fetch(session: Node, cluster: String, done := Callable()) -> void:
 	if _cities.has(cluster):
 		if done.is_valid(): done.call(_cities[cluster])
 		return
-	if _pending.has(cluster): return
-	_pending[cluster] = true
+	# A read already out (the map's camera city asked first, then the silhouette card): wait for it, never drop the
+	# callback (李元芳 0.2.0: the card stayed at "–" until opened again).
+	if _pending.has(cluster):
+		if done.is_valid(): (_pending[cluster] as Array).append(done)
+		return
+	_pending[cluster] = [done] if done.is_valid() else []
 	var path := "/p0/city/" + cluster.uri_encode()
 	var t: Variant = session.get("transport")
 	if t is Callable and (t as Callable).is_valid():   # tests answer with accept()
@@ -41,18 +45,17 @@ static func fetch(session: Node, cluster: String, done := Callable()) -> void:
 	session.add_child(http)
 	http.request_completed.connect(func(result: int, code: int, _h: PackedStringArray, body: PackedByteArray):
 		http.queue_free()
-		_pending.erase(cluster)
-		if result != HTTPRequest.RESULT_SUCCESS or code != 200: return
-		var data = JSON.parse_string(body.get_string_from_utf8())
-		if data is Dictionary and data.get("city") is Dictionary:
-			accept(cluster, data.city)
-			if done.is_valid(): done.call(_cities[cluster]))
+		var data = JSON.parse_string(body.get_string_from_utf8()) if result == HTTPRequest.RESULT_SUCCESS and code == 200 else null
+		if data is Dictionary and data.get("city") is Dictionary: accept(cluster, data.city)
+		else: _pending.erase(cluster))   # failed: the next ask reads again (its callers wait for that one)
 	if http.request(str(session.get("base_url")) + path, session.call("_headers")) != OK:
 		http.queue_free()
 		_pending.erase(cluster)
 
 ## A city's answer (the route's `city`: ponds / outposts ids, residents, fish, detail {ponds, outposts}, preview).
+## Every caller waiting on it is told, in the order they asked.
 static func accept(cluster: String, city_: Dictionary) -> void:
+	var waiting: Array = _pending.get(cluster, [])
 	_pending.erase(cluster)
 	var detail: Dictionary = city_.get("detail", {}) if city_.get("detail") is Dictionary else {}
 	var out := {ponds = [], outposts = [], fish = city_.get("fish", []), residents = int(city_.get("residents", 0)),
@@ -68,6 +71,7 @@ static func accept(cluster: String, city_: Dictionary) -> void:
 		_outposts[entry.id] = entry
 		out.outposts.append(entry)
 	_cities[cluster] = out
+	for done in waiting: if (done as Callable).is_valid(): (done as Callable).call(out)
 
 ## A generated pond as a SystemPonds location: registered so SystemPonds.location / site / blueprint know it.
 static func pond_entry(cluster: String, p: Dictionary) -> Dictionary:

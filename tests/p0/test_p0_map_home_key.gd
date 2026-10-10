@@ -2,7 +2,7 @@ extends GdUnitTestSuite
 ## SGODOT-261 (the user's call, for the demo; 不知火舞 keeps 197): away from home the map's camera follows the player to
 ## the pond or outpost, and among many pins the homestead is hard to find. A home key over the recenter key — the same
 ## 44 round key, i-home, 12 apart — flies the camera back to the homestead and selects it, as a tap on its pin does
-## (away: Go home · Free) and on the avatar at home (Back to Homestead). It gives way to an open sheet with the recenter key.
+## (away: Go home) and on the avatar at home (Back to Homestead). It gives way to an open sheet with the recenter key.
 ## SGODOT-267 (the user: no jump; 不知火舞): it flies the city's flight, 0.6–1.2 s, and selects on landing; a touch on the
 ## map stops it where it is with nothing selected, and a press of the key while it flies is ignored.
 
@@ -95,7 +95,7 @@ func test_away_the_home_key_flies_home_and_selects_the_homestead() -> void:
 		await _card(m)
 		_at_home(m)
 		assert_str(str(city.selected.get("id", ""))).is_equal("home")
-		assert_str(_primary(rt)).is_equal("Go home · Free")
+		assert_str(_primary(rt)).is_equal("Go home")
 		await _close(rt)
 		assert_dict(city.selected).is_empty()   # closing the card clears the pin, as after a tap on it
 	rt.here = saved
