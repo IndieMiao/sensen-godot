@@ -1,0 +1,306 @@
+{
+  "_note": "P1 新增作物 12 种（李白，SGODOT-281；方案 §5.2.2–5.2.4）：通用一年生 5（卷心菜、玉米、黄瓜、草莓、甜瓜）、地区 4（菠萝 / 甘薯 / 南瓜 / 甜菜根，只在本气候带 Market 卖、每人每气候带每日 10 枚、异带露天成熟 × 1.5）、多年生果实 3（苹果、柑橘、葡萄，perennial 写树苗与再生）。字段沿用 crops；新增 sold_at / zone（首字母大写，同 profile.climate） / off_zone_grow_h / seed_daily / regional / perennial，由种田线（刘邦）接入。P0 的 8 种不在本文件（片段只增不改）。",
+  "crops": [
+    {
+      "id": "crop_cabbage",
+      "name": "Cabbage",
+      "seed": "seed_cabbage",
+      "seed_name": "Cabbage Seeds",
+      "tier": 2,
+      "energy": 3,
+      "level": 5,
+      "gate": 5,
+      "seed_price": 10,
+      "grow_h": 12,
+      "yield": 1,
+      "price": 13,
+      "xp": 3,
+      "first_xp": 15,
+      "ingr": [
+        "F",
+        1
+      ],
+      "sold_at": "stall"
+    },
+    {
+      "id": "crop_corn",
+      "name": "Corn",
+      "seed": "seed_corn",
+      "seed_name": "Corn Seeds",
+      "tier": 3,
+      "energy": 4,
+      "level": 5,
+      "gate": 5,
+      "seed_price": 11,
+      "grow_h": 16,
+      "yield": 3,
+      "price": 5,
+      "xp": 4,
+      "first_xp": 20,
+      "ingr": [
+        "F",
+        2
+      ],
+      "sold_at": "stall"
+    },
+    {
+      "id": "crop_cucumber",
+      "name": "Cucumber",
+      "seed": "seed_cucumber",
+      "seed_name": "Cucumber Seeds",
+      "tier": 2,
+      "energy": 3,
+      "level": 6,
+      "gate": 6,
+      "seed_price": 7,
+      "grow_h": 9,
+      "yield": 2,
+      "price": 5,
+      "xp": 3,
+      "first_xp": 15,
+      "ingr": [
+        "F",
+        1
+      ],
+      "sold_at": "stall"
+    },
+    {
+      "id": "crop_strawberry",
+      "name": "Strawberry",
+      "seed": "seed_strawberry",
+      "seed_name": "Strawberry Seeds",
+      "tier": 4,
+      "energy": 6,
+      "level": 8,
+      "gate": 8,
+      "seed_price": 17,
+      "grow_h": 20,
+      "yield": 3,
+      "price": 8,
+      "xp": 6,
+      "first_xp": 30,
+      "ingr": [
+        "O",
+        3
+      ],
+      "sold_at": "stall"
+    },
+    {
+      "id": "crop_melon",
+      "name": "Melon",
+      "seed": "seed_melon",
+      "seed_name": "Melon Seeds",
+      "tier": 4,
+      "energy": 6,
+      "level": 9,
+      "gate": 9,
+      "seed_price": 20,
+      "grow_h": 24,
+      "yield": 1,
+      "price": 27,
+      "xp": 6,
+      "first_xp": 30,
+      "ingr": [
+        "O",
+        3
+      ],
+      "sold_at": "stall"
+    },
+    {
+      "id": "crop_pineapple",
+      "name": "Pineapple",
+      "seed": "seed_pineapple",
+      "seed_name": "Pineapple Seeds",
+      "tier": 3,
+      "energy": 4,
+      "level": 5,
+      "gate": 5,
+      "seed_price": 20,
+      "grow_h": 24,
+      "yield": 1,
+      "price": 25,
+      "xp": 4,
+      "first_xp": 20,
+      "ingr": [
+        "O",
+        3
+      ],
+      "sold_at": "market",
+      "zone": "Tropical",
+      "off_zone_grow_h": 36,
+      "seed_daily": 10,
+      "regional": true
+    },
+    {
+      "id": "crop_sweet_potato",
+      "name": "Sweet Potato",
+      "seed": "seed_sweet_potato",
+      "seed_name": "Sweet Potato Seeds",
+      "tier": 3,
+      "energy": 4,
+      "level": 5,
+      "gate": 5,
+      "seed_price": 15,
+      "grow_h": 16,
+      "yield": 2,
+      "price": 10,
+      "xp": 4,
+      "first_xp": 20,
+      "ingr": [
+        "F",
+        3
+      ],
+      "sold_at": "market",
+      "zone": "Subtropical",
+      "off_zone_grow_h": 24,
+      "seed_daily": 10,
+      "regional": true
+    },
+    {
+      "id": "crop_pumpkin",
+      "name": "Pumpkin",
+      "seed": "seed_pumpkin",
+      "seed_name": "Pumpkin Seeds",
+      "tier": 3,
+      "energy": 4,
+      "level": 5,
+      "gate": 5,
+      "seed_price": 17,
+      "grow_h": 20,
+      "yield": 1,
+      "price": 22,
+      "xp": 4,
+      "first_xp": 20,
+      "ingr": [
+        "F",
+        3
+      ],
+      "sold_at": "market",
+      "zone": "Temperate",
+      "off_zone_grow_h": 30,
+      "seed_daily": 10,
+      "regional": true
+    },
+    {
+      "id": "crop_beet",
+      "name": "Beetroot",
+      "seed": "seed_beet",
+      "seed_name": "Beetroot Seeds",
+      "tier": 3,
+      "energy": 4,
+      "level": 5,
+      "gate": 5,
+      "seed_price": 13,
+      "grow_h": 14,
+      "yield": 2,
+      "price": 9,
+      "xp": 4,
+      "first_xp": 20,
+      "ingr": [
+        "F",
+        3
+      ],
+      "sold_at": "market",
+      "zone": "Cool",
+      "off_zone_grow_h": 21,
+      "seed_daily": 10,
+      "regional": true
+    },
+    {
+      "id": "crop_apple",
+      "name": "Apple",
+      "seed": "seed_apple",
+      "seed_name": "Apple Sapling",
+      "tier": 4,
+      "energy": 6,
+      "level": 7,
+      "gate": 7,
+      "seed_price": 40,
+      "grow_h": 48,
+      "yield": 2,
+      "price": 3,
+      "xp": 6,
+      "first_xp": 15,
+      "ingr": [
+        "O",
+        2
+      ],
+      "sold_at": "market",
+      "perennial": {
+        "plant": "tree_apple",
+        "plant_name": "Apple Tree",
+        "regrow_h": 48,
+        "harvest_energy": 2,
+        "harvest_xp": 2,
+        "footprint": [
+          2,
+          2
+        ]
+      }
+    },
+    {
+      "id": "crop_citrus",
+      "name": "Citrus",
+      "seed": "seed_citrus",
+      "seed_name": "Citrus Sapling",
+      "tier": 4,
+      "energy": 6,
+      "level": 9,
+      "gate": 9,
+      "seed_price": 80,
+      "grow_h": 72,
+      "yield": 2,
+      "price": 5,
+      "xp": 6,
+      "first_xp": 15,
+      "ingr": [
+        "O",
+        3
+      ],
+      "sold_at": "market",
+      "perennial": {
+        "plant": "tree_citrus",
+        "plant_name": "Citrus Tree",
+        "regrow_h": 48,
+        "harvest_energy": 2,
+        "harvest_xp": 2,
+        "footprint": [
+          2,
+          2
+        ]
+      }
+    },
+    {
+      "id": "crop_grape",
+      "name": "Grapes",
+      "seed": "seed_grape",
+      "seed_name": "Grapevine Cutting",
+      "tier": 4,
+      "energy": 6,
+      "level": 9,
+      "gate": 9,
+      "seed_price": 60,
+      "grow_h": 60,
+      "yield": 3,
+      "price": 3,
+      "xp": 6,
+      "first_xp": 15,
+      "ingr": [
+        "O",
+        3
+      ],
+      "sold_at": "market",
+      "perennial": {
+        "plant": "vine_grape",
+        "plant_name": "Grapevine",
+        "regrow_h": 48,
+        "harvest_energy": 2,
+        "harvest_xp": 2,
+        "footprint": [
+          1,
+          1
+        ]
+      }
+    }
+  ]
+}
