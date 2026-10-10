@@ -137,7 +137,7 @@ func test_a_market_quota_short_of_the_stack_sells_what_fits() -> void:
 	assert_str(s.quota.note).is_equal("all San Francisco markets · resets in 9h 12m")
 
 ## The Market Square (SGODOT-284, 不知火舞 on 240): this city's climate's regional crops and fish at 0.8, 60 coins a
-## day for the city; it lists only what it takes (LOCK-15), says Regional on its line and Buy-back full when spent.
+## day for the city; it lists only what it takes (LOCK-15), says Regional on its line and Limit reached when spent.
 func _market_view(used: int) -> Dictionary:
 	var v := _view()
 	v.items["crop_pumpkin"] = {"name": "Pumpkin", "kind": "crop", "sell": 22, "rarity": 1}
@@ -152,7 +152,7 @@ func _market_view(used: int) -> Dictionary:
 func test_the_market_buys_only_its_regional_crops_and_fish() -> void:
 	var v := _market_view(20)
 	var s := P0ItemInfo.spec(v, "crop_pumpkin", &"counter_sell", {counter = "market"})
-	assert_bool(s.facts.has("17 each")).is_true()   # ⌊22 × 0.8⌋
+	assert_array(s.facts).is_equal(["17 each"])   # ⌊22 × 0.8⌋; no count line, the corner says ×4 (不知火舞 on 246)
 	assert_array(_labels(s)).is_equal(["secondary:Sell", "primary:Sell 2 · 34 coins"])   # 40 coins left: 2 of 4
 	assert_str(s.quota.text).is_equal("Regional buy-back today 20/60")
 	assert_str(s.quota.note).is_equal("this city · resets in 9h 12m")
@@ -161,8 +161,8 @@ func test_the_market_buys_only_its_regional_crops_and_fish() -> void:
 		assert_bool(P0ItemInfo.flags(v, id, &"counter_sell", {counter = "market"}).sold_here).is_false()
 	assert_str(P0CounterDrawer.quota_text(v, "market")).is_equal("Regional buy-back today 20/60\nthis city · resets in 9h 12m")
 	v = _market_view(50)   # 10 coins left can't pay for a 17-coin Pumpkin
-	assert_array(_labels(P0ItemInfo.spec(v, "crop_pumpkin", &"counter_sell", {counter = "market"}))).is_equal(["unavailable:Buy-back full · 9h 12m"])
-	assert_array(_labels(P0ItemInfo.spec(v, "fish_salmon", &"counter_sell", {counter = "market"}))).is_equal(["unavailable:Buy-back full · 9h 12m"])
+	assert_array(_labels(P0ItemInfo.spec(v, "crop_pumpkin", &"counter_sell", {counter = "market"}))).is_equal(["unavailable:Limit reached · 9h 12m"])
+	assert_array(_labels(P0ItemInfo.spec(v, "fish_salmon", &"counter_sell", {counter = "market"}))).is_equal(["unavailable:Limit reached · 9h 12m"])
 
 func test_locked_stack_shows_locked_and_unlock_only() -> void:
 	var v := _view()

@@ -335,9 +335,6 @@ static func tokens(view: Dictionary, item_id: String, context: StringName, opts 
 		gift_near_label = ("Gift to %s" % str(opts.near.name)) if str(opts.get("near", {}).get("name", "")) != "" else "",
 		sell_all_label = _sell_all_label(count, sellable, here),
 		quota_resets_in = P0Logic.span(float(quota.get("resets_in", 0))) if quota.has("resets_in") else "",
-		# the grey button once the allowance is spent: the market's regional buy-back reads Buy-back full (不知火舞 on 240)
-		limit_label = SEP.join(PackedStringArray(["Buy-back full" if _regional(view, item_id, opts) else "Limit reached",
-			P0Logic.span(float(quota.get("resets_in", 0))) if quota.has("resets_in") else ""])).trim_suffix(SEP),
 		stock_line = NEW_FOR_YOU if _new_offer(item_id, opts) else _stock_line(offer, count),
 		gate_text = ("%s Lv%d needed" % [str(offer.get("skill", "")).capitalize(), int(offer.get("gate", 0))]) if offer.has("gate") else "",
 		# Daily stock comes back at the day's rollover, the same moment as Rest (view.rest.resets_in).
