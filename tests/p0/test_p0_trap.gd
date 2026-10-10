@@ -52,7 +52,10 @@ func test_prompt_fact_and_today() -> void:
 
 func test_toasts_and_refusals() -> void:
 	assert_str(P0Trap.event_toast({"action": "set"})).is_equal("Fish Trap set · 1 fish every 8h")
-	assert_str(P0Trap.event_toast({"action": "collected", "left": 1})).is_equal("1 left in the trap")
+	assert_str(P0Trap.event_toast({"action": "collected", "left": 1})).is_equal("")   # a float now (q(124) ①)
+	assert_str(P0Trap.left_line({"action": "collected", "left": 1})).is_equal("1 left in the trap")
+	assert_str(P0Trap.left_line({"action": "collected", "left": 0})).is_equal("")
+	assert_str(P0Trap.left_line({"action": "taken_back", "left": 0})).is_equal("")
 	assert_str(P0Trap.event_toast({"action": "collected", "left": 0})).is_equal("")
 	assert_str(P0Trap.event_toast({"action": "taken_back"})).is_equal("Fish Trap back in your bag")
 	assert_str(str(P0Trap.refusal_text({"type": "set_trap"}, "trap_slots", {"used": 1, "slots": 1, "next_level": 8}))).is_equal("Traps 1/1 · Fishing Lv8 adds 1")
@@ -79,7 +82,7 @@ func test_collect_closes_the_card_and_hides_the_strip_for_the_collect() -> void:
 	assert_bool(pond._trap_open).is_false()           # the card went at once
 	assert_bool(pond.collecting_trap()).is_true()     # the strip and button hide while it plays
 	assert_array(pond.sent).is_equal([{"type": "collect_trap"}])
-	pond._trap_hidden_until = Time.get_ticks_msec() - 1
+	pond._trap_hidden_s = 0.0   # the window run out (p0_frame counts it down in game time)
 	assert_bool(pond.collecting_trap()).is_false()    # … then back, as Fish Trap · 0/3
 	pond._trap_open = true
 	pond._press_trap({"label": "Take back", "enabled": true, "cmd": {"type": "collect_trap", "take_back": true}})
@@ -88,3 +91,24 @@ func test_collect_closes_the_card_and_hides_the_strip_for_the_collect() -> void:
 	assert_bool(pond.collecting_trap()).is_false()    # a grey Collect sends nothing and hides nothing
 	var src := FileAccess.get_file_as_string("res://scenes/p0/p0_pond.gd")
 	assert_str(src).contains("not _trap_open and not collecting_trap()")   # the strip / button's show
+
+## TRAP-COLLECT-2 / -3 (289): a collect's fish by kind in the order they came, one line `Pond Crucian ×2 · Common Carp ×1`;
+## nothing for a reply with no trap catch.
+func test_a_trap_catch_reads_as_one_line_by_kind() -> void:
+	var ev := [{"kind": "item", "id": "fish_crucian", "delta": 1}, {"kind": "xp", "skill": "fishing", "amount": 2},
+		{"kind": "item", "id": "fish_carp", "delta": 1}, {"kind": "item", "id": "fish_crucian", "delta": 1},
+		{"kind": "trap", "action": "collected", "place": FERN, "fish": 3, "left": 0}]
+	var got := P0Runtime.trap_fish(ev)
+	assert_array(got).is_equal([{"id": "fish_crucian", "count": 2}, {"id": "fish_carp", "count": 1}])
+	var names := {"names": {"fish_crucian": "Pond Crucian", "fish_carp": "Common Carp"}}   # the view names its items
+	assert_array(P0Runtime.trap_parts(names, got).map(func(p): return [p.kind, p.text])).is_equal([["item", "Pond Crucian ×2"], ["item", "Common Carp ×1"]])
+	assert_array(P0Runtime.trap_fish(ev.slice(0, 4))).is_empty()   # a cast's catch: no trap event
+	assert_array(P0Runtime.trap_fish([{"kind": "trap", "action": "set", "place": FERN, "fish": 0}])).is_empty()
+
+## TRAP-COLLECT-2: while a trap's fish fly in, the creel badge counts without them, each landing counts its own in.
+func test_the_creel_counts_each_fish_in_as_it_lands() -> void:
+	var v := {"bag": {"free": 17, "slots": [{"id": "fish_crucian", "qty": 2}, {"id": "fish_carp", "qty": 1}, {"id": "bait_worm", "qty": 2}]}}
+	assert_str(P0Logic.creel_line(v)).is_equal("Creel 3 · 17 free")
+	var flying := [{"id": "fish_crucian", "count": 2}, {"id": "fish_carp", "count": 1}]
+	assert_str(P0Logic.creel_line(v, flying)).is_equal("Creel 0 · 19 free")      # both stacks came with this catch
+	assert_str(P0Logic.creel_line(v, flying.slice(1))).is_equal("Creel 2 · 18 free")   # the crucians landed (TRAP-COLLECT-2)

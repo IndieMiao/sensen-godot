@@ -12,6 +12,9 @@ extends Control
 ## 650 → 1100 ms (quad in). The peak is never wider than 336 (peak = min(×1.3, 336 ÷ width)). stack_index n
 ## starts 28·n higher and 60·n ms later, at most 3 lines. bump(text) merges an update into a live line: ×1.0 →
 ## ×1.12 → ×1.0 in 200 ms, the line holds its height and the fade restarts 650 ms after the bump.
+## `bounds` (left, right in the parent's space; set before play): the pill stays inside them at every scale of its
+## motion (不知火舞 on #284, 289 46e61588: the screen's side margins) — at rest it moves in to fit, its peak is never
+## wider than the span, and it grows from the point that keeps it in (the side it is pushed against stays put).
 ## Laid out at the peak size and scaled down, so the ×1.3 peak stays sharp. Emits `finished`, then frees itself.
 
 signal finished
@@ -55,6 +58,7 @@ var text := "": set = set_text
 var tone: Tone = Tone.XP
 var layout: Layout = Layout.HUG
 var icon: Texture2D
+var bounds := Vector2(-INF, INF)
 
 var _pill: PanelContainer
 var _icon_rect: TextureRect
@@ -64,6 +68,8 @@ var _peak := _PEAK              # the pop's peak, capped by width
 var _tween: Tween
 var _fade: Tween
 var _base_y := 0.0
+var _pivot_frac := 0.5          # where along the width the pill grows from (bounds may move it off the middle)
+var _centre_x := NAN            # the bottom centre asked for at rest; NAN until play()
 
 func _init(text_: String = "", tone_: Tone = Tone.XP, icon_: Texture2D = null, layout_: Layout = Layout.HUG) -> void:
 	tone = tone_
@@ -138,16 +144,38 @@ func _fit() -> void:
 	var old := pivot_offset
 	size = _pill.get_combined_minimum_size()
 	_pill.size = size
-	pivot_offset = Vector2(size.x * 0.5, size.y)
+	pivot_offset = Vector2(size.x * _pivot_frac, size.y)
 	if old != Vector2.ZERO: position += old - pivot_offset
-	# The pop's peak never makes the pill wider than 336 on screen.
-	_peak = minf(_PEAK, _PEAK_MAX_W / maxf(1.0, size.x * _unit))
+	# The pop's peak never makes the pill wider than 336 on screen, nor wider than its bounds.
+	_peak = minf(_PEAK, minf(_PEAK_MAX_W, bounds.y - bounds.x) / maxf(1.0, size.x * _unit))
+	if not is_nan(_centre_x): _hold()
+
+## Keeps the pill inside `bounds` at rest and at its largest (the peak, or a bump): the rest centre moves in until the
+## pill fits, then the point it grows from is picked so neither side passes its bound as it scales.
+func _hold() -> void:
+	var w := size.x * _unit
+	var cx := _centre_x
+	var p := cx
+	if is_finite(bounds.x) and is_finite(bounds.y):
+		cx = clampf(cx, bounds.x + w * 0.5, maxf(bounds.x + w * 0.5, bounds.y - w * 0.5))
+		var l := cx - w * 0.5
+		var r := cx + w * 0.5
+		p = cx
+		if _peak > 1.0:   # grown ×k from p the pill spans [p − (p − l)·k, p + (r − p)·k]; a bump never passes the peak
+			var lo := (r * _peak - bounds.y) / (_peak - 1.0)
+			p = clampf(cx, lo, maxf(lo, (l * _peak - bounds.x) / (_peak - 1.0)))
+		_pivot_frac = clampf((p - l) / maxf(1.0, w), 0.0, 1.0)
+		p = l + w * _pivot_frac
+	pivot_offset = Vector2(size.x * _pivot_frac, size.y)
+	position.x = p - pivot_offset.x
 
 ## Shows the float with its bottom centre at `at` (in the parent's space), the `stack_index`th line of one moment.
 func play(at: Vector2, stack_index := 0) -> void:
+	_centre_x = at.x
 	_relayout()
 	var n := clampi(stack_index, 0, _STACK_MAX - 1)
 	position = at - pivot_offset - Vector2(0, _STACK_RISE * n)
+	_hold()
 	_base_y = position.y
 	scale = Vector2.ONE * _unit * _START
 	modulate.a = 0.0
@@ -170,7 +198,7 @@ func bump(new_text: String) -> void:
 	scale = Vector2.ONE * _unit
 	modulate.a = 1.0
 	_tween = create_tween()
-	_tween.tween_property(self, ^"scale", Vector2.ONE * _unit * _BUMP, UiKit.secs(_BUMP_MS * 0.5)) \
+	_tween.tween_property(self, ^"scale", Vector2.ONE * _unit * minf(_BUMP, _peak), UiKit.secs(_BUMP_MS * 0.5)) \
 		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	_tween.tween_property(self, ^"scale", Vector2.ONE * _unit, UiKit.secs(_BUMP_MS * 0.5)) \
 		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
