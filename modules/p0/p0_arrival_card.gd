@@ -39,6 +39,14 @@ static func open(ui: Node, spec: Dictionary, go: Callable, kind := "arrival_card
 			b.pressed.connect(r.pressed)
 			row.name = "ItemRow"
 			b.add_child(row)
+			# a › at the right says the row opens something (不知火舞 on #256), as a NavigationRow's chevron
+			var chevron := UiKit.label(UiNavButton.CHEVRON, UiTokens.STYLE_TITLE_B20, UiTokens.COLOR_INFO)
+			chevron.name = "Chevron"
+			chevron.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			chevron.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+			chevron.set_anchors_and_offsets_preset(Control.PRESET_RIGHT_WIDE)
+			chevron.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+			b.add_child(chevron)
 			# a Button does not lay out its children: it takes the row's height, and the row its width
 			row.minimum_size_changed.connect(func(): b.custom_minimum_size.y = row.get_combined_minimum_size().y)
 			b.resized.connect(func(): row.size = Vector2(b.size.x, row.get_combined_minimum_size().y))

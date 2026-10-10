@@ -85,7 +85,7 @@ func test_the_passport_lists_home_and_the_cities_reached_newest_first() -> void:
 	var page := P0Travel.city_page(v, TOKYO)
 	assert_array(page.facts).is_equal([["Visits", "1/5"], ["Local trades", "0/3"]])
 	assert_array(page.rows.map(func(r): return [str(r.title), str(r.state)])).is_equal([["Visited", "Complete"], ["Regular", ""], ["Local", ""]])
-	assert_array(page.rows[2].facts).is_equal([["Visits needed", "10"]])
+	assert_array(page.rows[2].facts).is_equal([["Visits", "1/10"]])
 	assert_str(str(P0Travel.city_page(v, "gn-5368361").rows[1].state)).is_equal("Complete")
 
 func test_san_diego_reads_san_diego_on_its_cluster() -> void:

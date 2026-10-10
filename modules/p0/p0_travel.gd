@@ -170,5 +170,5 @@ static func city_page(view: Dictionary, cluster: String) -> Dictionary:
 			{icon = "home", title = "Regular", state = "Complete" if regular else "", effect = "Keep visiting and trading",
 				facts = [] if regular else [["Visits", "%d/%d" % [mini(n, REGULAR_VISITS), REGULAR_VISITS]], ["Local trades", "%d/%d" % [mini(trades, REGULAR_TRADES), REGULAR_TRADES]]]},
 			{icon = "fish", title = "Local", state = "", effect = "Catch both regional fish and learn a regional recipe",
-				facts = [["Visits needed", str(LOCAL_VISITS)]]},
+				facts = [["Visits", "%d/%d" % [mini(n, LOCAL_VISITS), LOCAL_VISITS]]]},   # as the progress above (不知火舞 on #256)
 		]}
