@@ -1,6 +1,7 @@
 /** Fishing at the homestead pond (plan §6): cast pre-pays energy, the fish is drawn server-side, gates run level → rod → reel. */
 import { fishById, rodById, type Fish, type FishSite, type P0Content } from './content.js';
 import { add, count, freeSlots, room, take } from './bag.js';
+import { clusterById, clusterOf, homeCluster } from './travel.js';
 import { firstXp, energyDetail, gainEnergy, gainXp, grantOnce, spendEnergy, type P0Event } from './progress.js';
 import { draw, maxEnergy, scaledXp, skillLevel, xpPercent } from './rules.js';
 import type { P0State } from './state.js';
@@ -98,13 +99,15 @@ export function reelLine(c: P0Content, s: P0State, cmd: { outcome?: string }, no
     events.push({ kind: 'catch', fish: fish.id, rarity: fish.rarity, result: 'landed', refund: 0 });
     gainXp(c, s, now, 'fishing', scaledXp(s, c.fishing.catch_xp[fish.rarity - 1], cast.xp_pct), cast.xp_pct, events);
     // q(37): the first catch in a city counts the site's city from the server's table, never a city the client names.
-    const city = c.fishing.places[cast.place ?? '']?.city ?? '';
+    // v5: keyed by the place's city cluster (fishing_city:gn-5391959); the event names the city for the client.
+    const city = cast.place ? clusterOf(c, cast.place) ?? '' : '';
+    const cityName = clusterById(c, city)?.name || (city === homeCluster(c) ? c.profile.city : '');
     for (const [key, xp] of [[`catch:${fish.id}`, c.fishing.first_xp[fish.rarity - 1]], ['landed', c.fishing.first_landed_xp],
       [`fishing_city:${city}`, city ? c.fishing.first_city_xp : 0]] as const) {
       if (xp <= 0) continue;
       if (s.firsts.includes(key)) continue;
       s.firsts.push(key);
-      firstXp(c, s, now, 'fishing', key, xp, events);
+      firstXp(c, s, now, 'fishing', key, xp, events, key.startsWith('fishing_city:') ? cityName : undefined);
     }
     grantOnce(c, s, now, `first_fish_${fish.rarity}`, c.rewards.first_fish[fish.rarity - 1] ?? 0, events);
     const kinds = Object.keys(s.fishing.caught).length;
