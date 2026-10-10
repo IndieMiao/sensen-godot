@@ -133,10 +133,19 @@ func test_going_home_from_another_city_sends_return_home_and_welcomes_home() -> 
 	var rt: P0Runtime = m.rt
 	var sent: Array = []
 	rt.session.sent.connect(func(cmd): sent.append(cmd))
+	rt.ui.clear_toast()   # the runtime's UI is shared across the suite: no Welcome back left from the arrival test
 	var saved := _with_travel(rt, {home = SF, here = TOKYO, passes = {}, visits = {TOKYO: {n = 1}}, stamps = [],
 		fallback = {near3 = [], near10 = []}, explorer = 0})
 	m._return_home()
 	assert_array(sent.map(func(c): return str(c.get("type", "")))).contains(["return_home"])
+	assert_str(await _toast_within(rt.ui, 1.0)).is_equal("Welcome home")
+	# 司空震 on 286: going home opens the farm behind a loading cover; the welcome waits for it to go
+	rt.ui.clear_toast()
+	rt._arrive = {path = "res://scenes/p0/p0_farm.tscn", place = "Homestead", shot = null, t0 = Time.get_ticks_msec()}
+	rt.toast_on_arrival("Welcome home")
+	for i in 3: await get_tree().process_frame
+	assert_str(rt.ui.toast_text()).is_empty()   # not under the cover
+	rt._end_arrival()
 	assert_str(rt.ui.toast_text()).is_equal("Welcome home")
 	rt.session.view = saved
 	sent.clear()
@@ -160,5 +169,5 @@ func test_away_the_home_citys_bubble_goes_home_not_a_trip() -> void:
 	m.fly_to_city("san_francisco")
 	assert_str(rt.ui.modal_kind).is_not_equal("travel_card")
 	assert_array(sent.map(func(c): return str(c.get("type", "")))).is_equal(["return_home"])
-	assert_str(rt.ui.toast_text()).is_equal("Welcome home")
+	assert_str(await _toast_within(rt.ui, 1.0)).is_equal("Welcome home")
 	rt.session.view = saved

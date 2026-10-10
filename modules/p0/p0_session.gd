@@ -81,8 +81,14 @@ func current() -> Dictionary:
 	if view.is_empty(): return view
 	return P0Logic.project(view, float(Time.get_ticks_msec() - _received_ms))
 
+## One more read once the request on the wire is settled (a space entered while it was out: its read must carry it).
+var _refresh_queued := false
+func refresh_after() -> void:
+	_refresh_queued = true
+
 ## The read also says where the player is, so entering a space counts even before the first command (q(41)).
 func refresh() -> void:
+	_refresh_queued = false
 	var query := ("?space=" + space.uri_encode() if space != "" else "") + ("&place=" + place.uri_encode() if space != "" and place != "" else "")
 	_request(HTTPClient.METHOD_GET, "/p0/state" + query, {}, {})
 
@@ -165,11 +171,13 @@ func _finish(result: int, code: int, raw: PackedByteArray, cmd: Dictionary) -> v
 	var outcome := _handle(result, code, raw, cmd)
 	busy = false
 	if outcome.network:
+		_refresh_queued = false   # the runtime's own retry reads again; a queued read would only fail the same way
 		# Later UI commands were based on what the player saw before the failure: drop them.
 		for q in _queue.filter(func(q): return q.key != ""): command_settled.emit(q.key, false, "network")
 		_queue = _queue.filter(func(q): return q.key == "")
 	if str(entry.get("key", "")) != "": command_settled.emit(entry.key, outcome.ok, outcome.code)
 	if not busy and not _queue.is_empty(): _post(_queue.pop_front())
+	elif not busy and _refresh_queued: refresh()
 
 func _handle(result: int, code: int, raw: PackedByteArray, cmd: Dictionary) -> Dictionary:
 	var block := blocked_reply(result, code, raw)

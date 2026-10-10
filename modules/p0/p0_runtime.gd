@@ -161,7 +161,10 @@ func attach(w: Node) -> void:
 	ui.space = session.space
 	session.place = str(w.call("p0_place")) if w.has_method("p0_place") else ""   # which pond (q(36))
 	if session.space not in ["", "map"]: here = {"space": session.space, "place": session.place}
-	if not session.busy and not session.view.is_empty(): session.refresh()   # entering a space reads fresh state
+	# Entering a space reads fresh state, with this space: the server settles where the player is from it (#233). A read
+	# still on the wire left before this space was set (the cold start's first one): read again once it is back.
+	if not session.busy and not session.view.is_empty(): session.refresh()
+	elif session.busy: session.refresh_after()
 	var attach_ms := mark("attach " + str(w.name))
 	if _spot_after_room != "" and w.has_method("p0_show_spot"):   # stepped out of the farmhouse to show a farm spot
 		w.call_deferred("p0_show_spot", _spot_after_room)
@@ -875,6 +878,19 @@ func _end_arrival() -> void:
 	_arrive = {}
 	_arrive_s = -1.0
 	ui.hide_screen([P0SysScreen.Kind.SCENE, P0SysScreen.Kind.PLACE_FAIL])
+	_flush_arrival_toast()
+
+## A toast for the place being opened (Go home's `Welcome home`, 司空震 on 286): said once its loading cover is gone, not
+## under it. Without a trip on its way it shows now; one that never arrives drops it after ARRIVE_FAIL_S.
+var _arrival_toast := {}
+func toast_on_arrival(text: String) -> void:
+	_arrival_toast = {text = text, t0 = Time.get_ticks_msec()}
+	_flush_arrival_toast.call_deferred()   # after this frame's open_instance has set its cover (or not)
+
+func _flush_arrival_toast() -> void:
+	if _arrival_toast.is_empty() or not _arrive.is_empty(): return
+	if Time.get_ticks_msec() - int(_arrival_toast.t0) <= int(ARRIVE_FAIL_S * 1000.0): ui.toast(str(_arrival_toast.text))
+	_arrival_toast = {}
 
 ## Couldn't get there (q(78)): an error, a 5xx without the maintenance code, or 20 s without an answer.
 func _arrival_failed() -> void:

@@ -79,3 +79,26 @@ func test_settles_report_refusals() -> void:
 	session.send(buy, P0Session.ui_key(buy))
 	_reply(7, false, "no_coins")
 	assert_array(settled).is_equal([[false, "no_coins"]])
+
+## 李元芳's cold start (SGODOT-278): the first read leaves before the farm is attached (no space); the farm attaching
+## while it is out asks for one more read, sent once it is back and carrying ?space=home, so the server settles where
+## the player is (#233) without waiting 30 s.
+func test_a_space_entered_while_a_read_is_out_reads_again_with_it() -> void:
+	session.refresh()
+	assert_str(str(sent[0].path)).is_equal("/p0/state")
+	session.space = "home"
+	assert_bool(session.busy).is_true()
+	session.refresh_after()
+	assert_int(sent.size()).is_equal(1)   # not while the first is out
+	_reply(8)
+	assert_int(sent.size()).is_equal(2)
+	assert_str(str(sent[1].path)).is_equal("/p0/state?space=home")
+	_reply(8)
+	assert_int(sent.size()).is_equal(2)   # once
+
+func test_a_read_queued_behind_a_failed_one_is_dropped() -> void:
+	session.refresh()
+	session.space = "home"
+	session.refresh_after()
+	_fail()
+	assert_int(sent.size()).is_equal(1)   # the runtime's retry reads again, not this
