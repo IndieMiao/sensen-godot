@@ -158,3 +158,72 @@ func test_the_measured_width_is_the_toast_labels() -> void:
 	await get_tree().process_frame
 	var label: Label = ui._toasts._label
 	assert_float(label.size.x).is_equal_approx(ui.toast_text_width(), 1.0)
+
+# ---------------------------------------------------------------- the filled toast's turn (q(134) ⑤; 周瑜 on #302)
+const DONE := {"kind": "request_progress", "id": "req_pond_catch", "have": 2, "qty": 2, "done": true}
+const SAID := "Pond Catch · 2/2\nDeliver at the Stall"
+
+class LandingWorld extends Node:   # a world that shows a landed fish itself (the pond's p0_event)
+	func p0_event(_ev: Dictionary, _v: Dictionary) -> bool: return true
+
+func _rt() -> P0Runtime:
+	var rt: P0Runtime = auto_free(P0Runtime.new())
+	add_child(rt)
+	return rt
+
+func _rt_view() -> Dictionary:
+	return _view().merged({"energy": {"value": 140, "max": 200}, "coins": 52, "bag": {"capacity": 25, "free": 23,
+		"slots": [{"id": "fish_crucian", "qty": 2}]}, "skills": {"fishing": {"level": 5}}, "items": {"fish_crucian": {"rarity": 1}},
+		"fishing": {"dex": [{"id": "fish_crucian", "caught": 1}]}})
+
+## Anything but a catch: the toast after REQUEST_TOAST_AFTER_S (a level-up's banner comes deferred), not at once.
+func test_a_filled_request_toasts_after_the_reply() -> void:
+	var rt := _rt()
+	await get_tree().process_frame
+	var v := _rt_view()
+	rt.session.view = v
+	rt.ui.set_view(v)
+	rt._on_state(v, [{"kind": "item", "id": "fish_crucian", "delta": 1}, DONE])
+	await get_tree().process_frame
+	assert_str(rt.ui.toast_text()).is_empty()
+	await get_tree().create_timer(P0Runtime.REQUEST_TOAST_AFTER_S + 0.1).timeout
+	assert_str(rt.ui.toast_text()).is_equal(SAID)
+
+## A landed fish the world shows: the toast is held with its floats for the pond's settle (after the Caught! card), and
+## a world left before the fish reached the hand still says it.
+func test_a_landed_fish_holds_its_toast_for_the_pond() -> void:
+	var rt := _rt()
+	await get_tree().process_frame
+	var v := _rt_view()
+	rt.session.view = v
+	rt.ui.set_view(v)
+	rt.world = auto_free(LandingWorld.new())
+	rt._on_state(v, [{"kind": "item", "id": "fish_crucian", "delta": 1},
+		{"kind": "catch", "fish": "fish_crucian", "rarity": 1, "result": "landed", "refund": 0}, DONE])
+	await get_tree().create_timer(P0Runtime.REQUEST_TOAST_AFTER_S + 0.1).timeout
+	assert_str(rt.ui.toast_text()).is_empty()   # not before the fish is in the hand
+	assert_str(rt.catch_toast).is_equal(SAID)
+	rt.attach(auto_free(Node.new()))   # left mid-arc
+	assert_str(rt.catch_toast).is_empty()
+	assert_str(rt.ui.toast_text()).is_equal(SAID)
+
+## A trap that fills it: after its In your trap! card, not before.
+func test_a_trap_toasts_after_its_card() -> void:
+	var rt := _rt()
+	await get_tree().process_frame
+	var v := _rt_view()
+	rt.session.view = v
+	rt.ui.set_view(v)
+	rt._on_state(v, [{"kind": "item", "id": "fish_crucian", "delta": 1}, {"kind": "xp", "skill": "fishing", "amount": 2, "percent": 100},
+		{"kind": "first", "what": "catch:fish_crucian", "xp": 15}, {"kind": "xp", "skill": "fishing", "amount": 15, "percent": 100},
+		{"kind": "trap", "action": "collected", "place": "pond_san_francisco_03", "fish": 1, "left": 0}, DONE])
+	await get_tree().create_timer(P0Runtime.REQUEST_TOAST_AFTER_S + 0.1).timeout
+	assert_str(rt.ui.toast_text()).is_empty()   # the card's timer has not run yet
+	for i in 40:
+		if rt.ui.has_modal(): break
+		await get_tree().create_timer(0.05).timeout
+	assert_bool(rt.ui.has_modal()).is_true()   # In your trap!
+	assert_str(rt.ui.toast_text()).is_empty()
+	rt.ui.close_modal()
+	await get_tree().process_frame
+	assert_str(rt.ui.toast_text()).is_equal(SAID)

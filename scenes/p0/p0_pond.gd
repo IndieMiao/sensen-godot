@@ -273,7 +273,11 @@ func _settle(ev: Dictionary, delay: float, first_xp: int) -> void:
 	if str(ev.get("result", "")) == "landed": at = over_head()   # a request's progress is among the reply's floats (q(134))
 	rt.ui.queue_floats(floats, at)
 	rt.last_first_catch_xp = first_xp
-	rt._on_catch(ev, rt.last_xp_lines, at, CARD_AFTER_FLOATS_S if not floats.is_empty() else 0.0)
+	var card_after := CARD_AFTER_FLOATS_S if not floats.is_empty() else 0.0
+	rt._on_catch(ev, rt.last_xp_lines, at, card_after)
+	# a request this fish filled: its toast after the Caught! card (q(134) ⑤; bound to the UI, 哪吒 on #188)
+	var filled := rt.take_catch_toast()
+	if filled != "": get_tree().create_timer(card_after + 0.05).timeout.connect(rt.ui.toast_success_when_clear.bind(filled, false, true))
 
 # ---------------------------------------------------------------- the pond's ! (q(103), SGODOT-268)
 ## A pond wearing the Request ! says why once per visit: an Info toast with the pin card's reason line
