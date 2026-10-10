@@ -41,7 +41,7 @@ extends RefCounted
 
 const CONTEXTS: Array[StringName] = [&"bag", &"gear", &"counter_buy", &"counter_sell", &"gift", &"storage", &"workbench"]
 const RULES_PATH := "res://modules/p0/item_info_rules.json"
-const KINDS := ["seed", "crop", "fish", "dish", "bait", "rod", "pick", "tool"]
+const KINDS := ["seed", "crop", "fish", "dish", "bait", "rod", "pick", "tool", "trap"]
 const SEP := " · "
 const _MYSTERY := "dish_mystery"
 const _TAKE_SOME := 10   # F-07 storage: Take 10 + Take all
@@ -70,7 +70,7 @@ static func tab_of(view: Dictionary, item_id: String) -> StringName:
 	var k := str(P0Logic.item(view, item_id).get("kind", ""))
 	if k == "": k = item_id.split("_")[0]
 	var tab = {"seed": &"seeds", "fert": &"seeds", "fish": &"fish", "crop": &"produce", "dish": &"dishes", "bait": &"tackle",
-		"rod": &"tackle", "pick": &"tackle", "material": &"materials", "torch": &"materials"}.get(k, null)
+		"trap": &"tackle", "rod": &"tackle", "pick": &"tackle", "material": &"materials", "torch": &"materials"}.get(k, null)
 	if tab != null: return tab
 	return &"materials" if P0Logic.content().get("materials", {}).has(item_id) else &""
 

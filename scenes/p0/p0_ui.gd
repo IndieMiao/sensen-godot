@@ -438,7 +438,8 @@ func _refresh_bar() -> void:
 		if selected_bait != "" and not ids.has(selected_bait): selected_bait = ""
 		# The last bait went on a hook: the slot stays pinned at 0, the hook goes empty (李白 q(44) ④).
 		if selected_bait != "" and P0Logic.bag_count(view, selected_bait) <= 0:
-			toast_when_clear("Out of %s · no bait on the hook" % P0Logic.item_name(view, selected_bait))
+			if not selected_bait.begins_with("trap_"):   # a Fish Trap set in the water leaves the bar quietly
+				toast_when_clear("Out of %s · no bait on the hook" % P0Logic.item_name(view, selected_bait))
 			selected_bait = ""
 		_creel.text = P0Logic.creel_line(view)
 		_creel.state = UiCreelBadge.state_for(int(view.get("bag", {}).get("free", 0)))
@@ -491,7 +492,10 @@ func _on_slot_tapped(id: String) -> void:
 		if _bar.haptics and OS.has_feature("mobile"): Input.vibrate_handheld(10)
 		toast("Craft at Workbench" if bar_mode == "mine" else "Buy at Homestead Stall")   # q(44) refill hints
 		return
-	if bar_mode == "fish":
+	if bar_mode == "fish" and id.begins_with("trap_"):
+		# The Fish Trap (SGODOT-283): selecting it turns the key into Set Trap; tap again for the rod. No toast.
+		selected_bait = "" if selected_bait == id else id
+	elif bar_mode == "fish":
 		# Tapping bait only sets the current bait (0 Energy, nothing consumed); tap again to fish without bait.
 		selected_bait = "" if selected_bait == id else id
 		toast(("%s on the hook · used at the bite" % P0Logic.item_name(view, id)) if selected_bait != "" else "No bait")

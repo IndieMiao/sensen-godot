@@ -1,5 +1,6 @@
 /** P0 command reducer: one command → new state + events, or a typed refusal. Never mutates the input. */
 import { cropById, cropBySeed, rodById, type P0Content } from './content.js';
+import { collectTrap, setTrap } from './fish_trap.js';
 import { add, count, room, take } from './bag.js';
 import { barter } from './barter.js';
 import { settleCards } from './cards.js';
@@ -29,6 +30,7 @@ export type { P0Event } from './progress.js';
 export type P0Command = P0CommandBody & { expect_seq?: number; space?: string; place?: string };
 
 type P0CommandBody =
+  | { type: 'set_trap' } | { type: 'collect_trap'; take_back?: boolean }   // Fish Trap (SGODOT-283), at the pond the player is at
   | { type: 'till'; plot: number }
   | { type: 'sow'; plot?: number; plots?: number[]; seed: string }   // plots: up to 3 with the Row Hoe (§9.11.2)
   | { type: 'fertilize'; plot: number; item?: string }
@@ -288,6 +290,11 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
     }
     case 'heat': {
       const refusal = recordHeat(c, s, cmd);
+      if (refusal) return fail(refusal.code, refusal.detail);
+      break;
+    }
+    case 'set_trap': case 'collect_trap': {   // Fish Trap (SGODOT-283): at the pond the player is at
+      const refusal = cmd.type === 'set_trap' ? setTrap(c, s, now, events) : collectTrap(c, s, cmd, now, events);
       if (refusal) return fail(refusal.code, refusal.detail);
       break;
     }

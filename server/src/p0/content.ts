@@ -341,7 +341,7 @@ export function recipeById(c: P0Content, id: string): Recipe | undefined { retur
 /** Bag kind from the id prefix: seed_*, crop_*, fish_*, dish_*, bait_*, fert_*, torch (stacks of 20, §13.1.2), anything else is a material. */
 export function itemKind(id: string): string {
   const head = id.split('_')[0];
-  return ['seed', 'crop', 'fish', 'dish', 'bait', 'rod', 'fert', 'torch'].includes(head) ? head : 'material';
+  return ['seed', 'crop', 'fish', 'dish', 'bait', 'rod', 'fert', 'torch', 'trap'].includes(head) ? head : 'material';   // trap_fish: P1
 }
 
 /** Dish stacks carry their quality in the id: dish_x (Plain), dish_x@good, dish_x@perfect (§7.2.5). */

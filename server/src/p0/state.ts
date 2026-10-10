@@ -161,6 +161,7 @@ export interface P0State {
   rewards: string[];             // one-time rewards already granted
   day: P0Day;
   fishing: { casts: number; bites: number; caught: Record<string, number>; seen: string[] };
+  traps?: import('./fish_trap.js').Trap[];   // P1 Fish Traps in the water (SGODOT-283); absent on older saves
   cast: Cast | null;
   stove: Pot | null;
   queue: Pot | null;             // Queue ×2 (Cooking Lv5): the pot waiting behind the one on the stove

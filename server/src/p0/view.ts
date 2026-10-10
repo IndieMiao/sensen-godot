@@ -25,6 +25,7 @@ import { inboxView, settleParcels } from './parcels.js';
 import { cookbookView, masteredCount } from './cookbook.js';
 import { mapMarkers } from './markers.js';
 import { everFish, pondAt, pondFishIds } from './fishing_world.js';
+import { trapsView } from './fish_trap.js';
 import { homeCluster } from './travel.js';
 import { decorView } from './decor.js';
 
@@ -121,6 +122,7 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
       dex: c.fish.map(fish => ({ id: fish.id, rarity: fish.rarity, level: fish.level, where: fish.where, caught: s.fishing.caught[fish.id] ?? 0,
         seen: s.fishing.seen.includes(fish.id), cook: fish.cook !== false })),
       baits: Object.keys(f.baits).map(id => ({ id, have: count(s.bag, id) })),
+      trap: trapsView(c, s, now),   // Fish Traps (SGODOT-283): {traps [{place, fish, keep, next_in}], slots, next_level, have, here}
     },
     cooking: {
       slots: cookSlots(c, s),
