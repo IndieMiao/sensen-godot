@@ -58,7 +58,7 @@ var _trap_open := false
 ## 1.4 s: the cage up, the fish to the creel, the float), then comes back as `Fish Trap · 0/3`. The cage and fish
 ## animation follows 安其拉's frames when they pass; the card and the strip are settled.
 const COLLECT_HIDE_MS := 1400
-var _trap_hidden_until := 0
+var _trap_hidden_s := 0.0   # what is left of it, in game time (frames, not the wall clock: a recording keeps it too)
 var _trap_mark := Vector2.INF   # the cage's point on screen this frame (its strip's, its floats' and flights' start)
 var _hint_req := ""     # the request this pond's ! is for (q(103)): its progress floats and its completion toast
 var _hint_have := -1    # that request's count before the next catch
@@ -162,6 +162,7 @@ func p0_tap(screen: Vector2) -> void:
 		actor.mover.set_target_position(point)
 
 func p0_frame(v: Dictionary, dt: float) -> void:
+	_trap_hidden_s = maxf(0.0, _trap_hidden_s - dt)
 	if panel.visible:   # the fishing presentation owns the rig; the camera only pans to frame the cast
 		_frame_fishing(dt)
 		return
@@ -673,7 +674,7 @@ func _press_trap(b: Dictionary) -> void:
 	var cmd: Dictionary = b.get("cmd", {})
 	if str(cmd.get("type", "")) == "collect_trap" and not bool(cmd.get("take_back", false)):
 		_close_trap_card()
-		_trap_hidden_until = Time.get_ticks_msec() + COLLECT_HIDE_MS
+		_trap_hidden_s = COLLECT_HIDE_MS / 1000.0
 	p0_action(cmd)
 
 ## Where a trap's catch floats rise (P0Runtime: over the cage, TRAP-COLLECT-3), INF without a trap here.
@@ -698,7 +699,7 @@ func p0_trap_flights(got: Array) -> void:
 	if not flying.is_empty(): rt.ui.creel_flying(flying)
 
 ## The collect playing (COLLECT_HIDE_MS after Collect): the trap shows no strip or button.
-func collecting_trap() -> bool: return Time.get_ticks_msec() < _trap_hidden_until
+func collecting_trap() -> bool: return _trap_hidden_s > 0.0
 
 func _close_trap_card() -> void:
 	_trap_open = false

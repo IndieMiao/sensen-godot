@@ -1136,6 +1136,11 @@ const FLOAT_ORDER := ["energy", "xp", "first", "item", "saved", "request", "coin
 ## coins float per reply (each plot's `+1 Radish`, each bed's `−2 Energy`).
 const FLOAT_MERGE_KINDS := ["xp"]
 const FLOAT_MAX_LINES := 3
+## Item lines hold at most two items: more go on to another line of their own above (q(124) ①; 不知火舞 on #284 3b425f91:
+## `River Perch ×1 · Common Carp ×1` / `Arctic Char ×1`, every line its own float of the same height, no ` ·` left at
+## a line's end, within FLOAT_MAX_LINES). Cook All's costs and a row's crops read the same way.
+const FLOAT_SPLIT_KINDS := ["item"]
+const FLOAT_ITEMS_PER_LINE := 2
 ## A line of a kind still up — before its fade starts (UiFloatText 650 ms) — takes the next reply's amount in place;
 ## while the action key is held (a held harvest, a labour beat apart) for as long as the line is still there.
 const _FLOAT_MERGE_MS := 650
@@ -1158,13 +1163,27 @@ func float_lines(parts: Array, at: Vector2) -> Array:
 	var order: Array = FLOAT_ORDER.filter(func(k): return kinds.has(k))
 	for k in kinds:
 		if not order.has(k): order.append(k)
+	var rows: Array = []   # [{kind, parts}] from the bottom: a kind's line, or an item line's pair (FLOAT_ITEMS_PER_LINE)
+	for k in order:
+		var all: Dictionary = kinds[k]
+		if not (k in FLOAT_SPLIT_KINDS and all.size() > FLOAT_ITEMS_PER_LINE):
+			rows.append({kind = k, parts = all})
+			continue
+		var keys: Array = all.keys()
+		var pairs: Array = []
+		for j in range(0, keys.size(), FLOAT_ITEMS_PER_LINE):
+			var pair := {}
+			for key in keys.slice(j, j + FLOAT_ITEMS_PER_LINE): pair[key] = all[key]
+			pairs.append({kind = k, parts = pair})
+		pairs.reverse()   # the first pair reads on top
+		rows.append_array(pairs)
 	var shown: Array = []
 	var fresh: Array = []   # [{kind, text, tone, icon, merged, overflow}] lines that need a new float
 	var now := int(float_clock.call())
-	for i in mini(order.size(), FLOAT_MAX_LINES):
-		var k: String = order[i]
-		var merged: Dictionary = kinds[k]
-		var extra: Array = order.slice(FLOAT_MAX_LINES) if i == FLOAT_MAX_LINES - 1 else []
+	for i in mini(rows.size(), FLOAT_MAX_LINES):
+		var k: String = rows[i].kind
+		var merged: Dictionary = rows[i].parts
+		var extra: Array = rows.slice(FLOAT_MAX_LINES) if i == FLOAT_MAX_LINES - 1 else []
 		if extra.is_empty() and k in FLOAT_MERGE_KINDS:
 			var live: Dictionary = _live_floats.get(k, {})
 			var node: UiFloatText = live.get("node") if not live.is_empty() and is_instance_valid(live.get("node")) else null
@@ -1177,7 +1196,7 @@ func float_lines(parts: Array, at: Vector2) -> Array:
 				shown.append(live.node)
 				continue
 		var text := _float_line_text(merged)
-		for e in extra: text += " · " + _float_line_text(kinds[e])   # the overflow joins the last line
+		for e in extra: text += " · " + _float_line_text(e.parts)   # the overflow joins the last line
 		var first: Dictionary = merged.values()[0]
 		var tone: int = first.get("tone", UiFloatText.Tone.ITEM)
 		# Energy is coloured by what it adds up to; a line of text parts only (a floor fee) keeps its own tone.

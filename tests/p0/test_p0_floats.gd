@@ -209,3 +209,20 @@ func test_a_wide_float_stays_inside_the_screen() -> void:
 	assert_float(centre_x - half).is_greater_equal(UiTokens.SPACE_PAGE - 0.5)
 	var mid: UiFloatText = ui.float_lines([{kind = "coins", key = "coins", amount = 5, fmt = "%s coins"}], Vector2(180, 420))[0]
 	assert_float(mid.position.x + mid.pivot_offset.x).is_equal_approx(180.0, 0.5)
+
+## Item lines hold two items at most (q(124) ①; 不知火舞 on #284): a third goes on a float line of its own above, the
+## first pair on top, every line its own float; XP stays at the bottom and the lines count to the cap of three.
+func test_three_items_make_two_lines_of_their_own() -> void:
+	var ui := P0Ui.new()
+	ui.quick_store = STORE
+	add_child(auto_free(ui))
+	await get_tree().process_frame
+	ui.set_view({"energy": {"value": 140, "max": 200}, "coins": 52, "bag": {"capacity": 25, "slots": []}, "skills": {}})
+	ui.set_surface("pond")
+	var parts := [{kind = "xp", key = "trap_xp", amount = 7, fmt = "%s XP", tone = UiFloatText.Tone.XP}]
+	for n in ["River Perch ×1", "Common Carp ×1", "Arctic Char ×1"]: parts.append({kind = "item", key = n, text = n})
+	var lines: Array = ui.float_lines(parts, Vector2(180, 420))
+	assert_array(lines.map(func(f): return (f as UiFloatText).text)).is_equal(["+7 XP", "Arctic Char ×1", "River Perch ×1 · Common Carp ×1"])
+	var heights: Array = lines.map(func(f): return (f as UiFloatText).shown_size().y)
+	assert_float(float(heights[1])).is_equal_approx(float(heights[2]), 0.5)   # one line each, the same height
+	assert_bool((lines[2] as UiFloatText).text.ends_with("·")).is_false()

@@ -375,9 +375,11 @@ static func trap_fish(events: Array) -> Array:
 		else: hit[0].count = int(hit[0].count) + int(e.delta)
 	return out
 
-## The trap's line (TRAP-COLLECT-3; fish always `Name ×N`, 不知火舞 2d55f7fe): `Pond Crucian ×2 · Common Carp ×1`.
-static func trap_line(v: Dictionary, got: Array) -> String:
-	return " · ".join(got.map(func(f): return "%s ×%d" % [P0Logic.item_name(v, str(f.id)), int(f.count)]))
+## The trap's catch as item float parts, one a kind (TRAP-COLLECT-3; fish always `Name ×N`, 不知火舞 2d55f7fe, q(124) ⑦):
+## float_lines joins them `Pond Crucian ×2 · Common Carp ×1`, two to a line (a third kind goes on a line above).
+static func trap_parts(v: Dictionary, got: Array) -> Array:
+	return got.map(func(f): return {kind = "item", key = "trap:" + str(f.id), text = "%s ×%d" % [P0Logic.item_name(v, str(f.id)), int(f.count)],
+		tone = UiFloatText.Tone.ITEM, icon = P0Logic.icon(str(f.id))})
 
 ## The floats a landed catch's reply held for the world (catch_floats), handed over once: the world lets them rise.
 func take_catch_floats() -> Array:
@@ -619,8 +621,10 @@ func _on_state(v: Dictionary, events: Array) -> void:
 		floats.append(harvest_result(int(short[0].get("got", 0)), int(short[0].get("of", 0))))
 		_harvest_stopped(v)
 	if not trap_got.is_empty():
-		floats.append({kind = "item", key = "trap_fish", text = trap_line(v, trap_got), tone = UiFloatText.Tone.ITEM,
-			icon = P0Logic.icon(str(trap_got[0].id))})
+		floats.append_array(trap_parts(v, trap_got))
+		for e in events:   # a partial collect: `1 left in the trap` over it (q(124) ①; the result's place, q(124) ⑦)
+			var left := P0Logic.P0Trap.left_line(e) if str(e.get("kind", "")) == "trap" else ""
+			if left != "": floats.append({kind = "result", key = "trap_left", text = left, tone = UiFloatText.Tone.ITEM})
 		_call("p0_trap_flights", [trap_got.slice(0, UiItemFly.MAX_PER_BATCH)])
 	# Any catch resets what is held: a player who left the pond mid-arc never let the last fish's floats rise, and an
 	# escape after that must not float them (刘邦 on #154).
