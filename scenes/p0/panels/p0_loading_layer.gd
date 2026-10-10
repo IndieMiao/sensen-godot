@@ -55,7 +55,7 @@ func failed() -> void:
 static func destination(path: String, args: Dictionary) -> String:
 	match path.get_file():
 		"p0_farm.tscn": return P0City.chip("Homestead")
-		"p0_pond.tscn": return P0City.chip(str(P0Ponds.location(str(args.get("pond_id", ""))).get("name", "Pond")))
-		"p0_outpost.tscn": return P0City.chip(str(P0Outposts.find(str(args.get("outpost_id", ""))).get("name", "Outpost")))
+		"p0_pond.tscn": return P0City.chip_for(str(P0Ponds.location(str(args.get("pond_id", ""))).get("name", "Pond")), str(args.get("pond_id", "")))
+		"p0_outpost.tscn": return P0City.chip_for(str(P0Outposts.find(str(args.get("outpost_id", ""))).get("name", "Outpost")), str(args.get("outpost_id", "")))
 		"p0_mine.tscn": return P0City.chip("Mine · Floor %d" % int(args.get("floor", 1)))
 	return ""

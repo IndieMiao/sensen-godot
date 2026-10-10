@@ -51,7 +51,10 @@ func test_every_chip_writes_chip_city_when_the_content_sets_it() -> void:
 	assert_str(P0LoadingLayer.destination("res://scenes/p0/p0_outpost.tscn", {"outpost_id": "sh_tea_1"})) \
 		.is_equal("XY · " + str(P0Outposts.find("sh_tea_1").name))
 	var room := FileAccess.get_file_as_string("res://scenes/p0/rooms/p0_room.gd")
-	assert_bool(room.contains("set_place(P0City.chip(place_name))")).is_true()   # the rooms' chip goes through P0City too
+	assert_bool(room.contains("set_place(P0City.chip_for(place_name")).is_true()   # the rooms' chip goes through P0City too
+	assert_str(P0City.chip_for("Homestead", "")).is_equal("XY · Homestead")   # a home place: chip()
+	# another city's place (a generated id, SGODOT-280) names its own city
+	assert_str(P0City.chip_for("Tokyo Market Square", "gn-1850147~market0")).is_equal("Tokyo · Tokyo Market Square")
 	assert_bool(room.contains('" · " + place_name')).is_false()
 	if had == null: profile.erase("chip_city")
 	else: profile["chip_city"] = had

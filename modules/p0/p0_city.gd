@@ -36,5 +36,14 @@ static func chip(place: String, short := false) -> String:
 	var city := short_name() if short else str(_profile().get("chip_city", city_name()))
 	return "%s · %s" % [city, place]
 
+## "Tokyo · Tokyo Market Square": a place of another city (a generated id `gn-1850147~market0`, SGODOT-280) names its
+## own city; a home place names home as chip() does. The place chip keeps the space for a place of the city the player
+## arrived in (P0Travel.place).
+static func chip_for(place: String, id: String) -> String:
+	var cut := id.find("~")
+	if cut <= 0: return chip(place)
+	var c: Dictionary = load("res://modules/p0/p0_clusters.gd").get_cluster(id.substr(0, cut))
+	return "%s · %s" % [str(c.get("name", city_name())), place] if not c.is_empty() else chip(place)
+
 static func _profile() -> Dictionary:
 	return P0Logic.content().get("profile", {})
