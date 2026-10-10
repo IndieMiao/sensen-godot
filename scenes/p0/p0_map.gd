@@ -66,6 +66,7 @@ func _open_my_farm() -> void:
 
 func _on_city_pond_requested(entry: Dictionary) -> void:
 	if AppRouter.top_instance() != null or AppRouter._navigation_pending: return
+	if _travel_first(entry): return
 	var pond := P0Ponds.location(str(entry.get("id", "")))
 	if pond.is_empty(): return
 	_reset_gesture()
@@ -90,6 +91,9 @@ func _install_city_map() -> void:
 		city_map.destination_style = _destination_style
 		city_map.host_card = _own_card
 		city_map.kept_pin = _kept_pin   # where the player is keeps its pin; the rest give way (SGODOT-269)
+		city_map.fog_holes = fog_holes   # §11.7: the world greyed but for the cities explored (SGODOT-275)
+		city_map.bubble_state = func(region_id: String) -> String:
+			return P0Travel.fog(_view(), P0Clusters.cluster_of_region(region_id))
 		_style_locate(city_map.recenter)
 		_style_locate(city_map.home_key, "home")   # the home key over it: the same key, i-home (SGODOT-261)
 		city_map.home_key.visible = true
@@ -138,6 +142,7 @@ func _pin_tag(entry: Dictionary) -> String:
 
 func _on_entry_selected(entry: Dictionary) -> void:
 	if rt == null: return
+	if _travel_first(entry): return
 	if str(entry.get("kind", "")) == "place":
 		var spec := place_card(entry)
 		if spec.is_empty(): return
@@ -243,6 +248,7 @@ func _set_outpost_places() -> void:
 	city_map.set_places(places)
 
 func _on_place_requested(entry: Dictionary) -> void:
+	if _travel_first(entry): return
 	var outpost := P0Outposts.find(str(entry.get("id", "")))
 	if outpost.is_empty(): return
 	city_map.dismiss_overlays()
@@ -724,6 +730,44 @@ func on_arrival(ev: Dictionary) -> void:
 		float(overview.get("bearing", 0.0)), func(): rt.ui.toast(welcome), P0Travel.flight_s(int(ev.get("trip", 1))))
 	_flight = _focus_tween
 	_flight_kind = "travel"
+
+## The city a pin is in: its `cluster` (generated places, SGODOT-280: also the prefix of their id, `gn-1850147~pond0`),
+## else the home city (P0's hand-written places).
+static func cluster_of_entry(entry: Dictionary, home: String) -> String:
+	var c := str(entry.get("cluster", ""))
+	if c != "": return c
+	var id := str(entry.get("id", ""))
+	return id.substr(0, id.find("~")) if id.find("~") > 0 else home
+
+## §11.7.2: a pond or outpost of a city the player holds no pass for is not entered — its tap opens that city's travel
+## card (the server would refuse with pass_required anyway). True when it did.
+func _travel_first(entry: Dictionary) -> bool:
+	if not str(entry.get("kind", "")) in ["pond", "place"] or str(entry.get("id", "")) == HOME_PIN: return false
+	var cluster := cluster_of_entry(entry, P0Travel.home(_view()))
+	if P0Travel.covers(_view(), cluster): return false
+	if city_map: city_map.clear_selection()
+	open_travel(cluster)
+	return true
+
+## The fog's holes (§11.7.3): one round every explored city near the screen, a little wider than its radius, in the city
+## view's pixels; the farthest at most MapFogLayer.MAX_HOLES. Asked each frame; projection only, no list work.
+func fog_holes() -> Array:
+	if city_map == null: return []
+	var vp := get_viewport().get_visible_rect().size if is_inside_tree() else Vector2(360, 800)
+	var scale := vp.y / _map_logical_height() * 512.0 * pow(2.0, zoom + _zoom_elastic)   # px per unit of Web Mercator
+	var out: Array = []
+	for cluster in P0Travel.explored(_view()):
+		var c := P0Clusters.get_cluster(cluster)
+		if c.is_empty(): continue
+		var p = geo_to_screen(float(c.lat), float(c.lng))
+		if p == null: continue
+		var km := P0Clusters.radius_km(int(c.population)) * 1.15
+		var r := km / (40075.0 * maxf(0.05, cos(deg_to_rad(float(c.lat))))) * scale
+		var at: Vector2 = (p as Vector2) - city_map.global_position
+		if not Rect2(Vector2.ZERO, vp).grow(r + 2.0).has_point(at): continue   # only holes that reach the screen
+		out.append({at = at, r = r})
+		if out.size() >= 64: break
+	return out
 
 ## Going home from another city (q(108)): free and instant — `return_home`, then the farm as ever. Welcome home
 ## floats; no stamp, no Energy. At home it does nothing.
