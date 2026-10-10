@@ -42,6 +42,12 @@ const LOOKS := {
 ## Windmill's sails are their own file on its `rotor` socket (manifest sockets), turning about their axle. A piece with
 ## no model yet keeps its LOOKS shape (the Recipe Stand).
 const SAILS := "deco_windmill_sails"
+## The Fountain's bubbling (q(131): `Bubbles away`; the model has flat water only): per basin [its water's height, its
+## radius, the ring sources' distance from the middle, how many, how far a ring grows], in the model's metres — measured
+## on deco_fountain.glb's water: the upper basin at 0.725 m, 0.26 across the middle; the lower at 0.255 m, 0.51.
+const RIPPLES := {"deco_fountain": [[0.725, 0.26, 0.0, 1, 0.22], [0.255, 0.51, 0.38, 3, 0.12]]}
+const RippleShader := preload("res://scenes/p0/p0_fountain_ripples.gdshader")
+static var _ripple_mats := {}   # "id:i" → its basin's material, shared by every Fountain
 const SAIL_TURN_S := 9.0                                   # one turn of the sails
 static var _sockets := {}                                  # "id:name" → position, from the farm art manifest
 
@@ -113,8 +119,8 @@ func _sync(list: Array) -> void:
 	_list = list
 	_draw_pieces()
 	var cells := {}
-	for p in list:
-		for c in P0Decor.cells(str(p.get("id", "")), Vector2i(int(p.get("x", 0)), int(p.get("y", 0))), int(p.get("rot", 0))):
+	for p in list:   # the Pergola's middle line stays open (q(131) ②)
+		for c in P0Decor.solid_cells(str(p.get("id", "")), Vector2i(int(p.get("x", 0)), int(p.get("y", 0))), int(p.get("rot", 0))):
 			cells["%d,%d" % [c.x, c.y]] = c
 	# Solid like a facility (49b11f91 ③): only cells the yard's mask lets one walk on are switched, and back.
 	for k in _solid.keys():
@@ -127,7 +133,8 @@ func _sync(list: Array) -> void:
 		_solid[k] = cells[k]
 
 ## The placed pieces drawn: one MultiMesh per kind with a model (the lifted one left out), and one node each for the
-## Windmills' sails and the pieces still shapes. Rebuilt when the view's pieces or the lifted one change.
+## Windmills' sails, the Fountains' ripples and the pieces still shapes. Rebuilt when the view's pieces or the lifted
+## one change.
 func _draw_pieces() -> void:
 	for n in _batches.values(): (n as Node3D).queue_free()
 	_batches.clear()
@@ -140,13 +147,13 @@ func _draw_pieces() -> void:
 	for p in _list:
 		var uid := int(p.get("uid", 0))
 		var id := str(p.get("id", ""))
-		if uid == _hidden or (has_model(id) and id != "deco_windmill"): continue
+		if uid == _hidden or (has_model(id) and not _has_extra(id)): continue
 		var at := Vector2i(int(p.get("x", 0)), int(p.get("y", 0)))
 		var rot := int(p.get("rot", 0))
 		var key := "%d:%s:%d:%d:%d" % [uid, id, at.x, at.y, rot]
 		keep[key] = true
 		if _singles.has(key): continue   # the sails keep turning through a rebuild of the batches
-		var node := _sails_on(id, rot, farm.bp.cell_m) if id == "deco_windmill" else art(id, rot, farm.bp.cell_m)
+		var node := _extra_on(id, rot, farm.bp.cell_m) if has_model(id) else art(id, rot, farm.bp.cell_m)
 		node.position = centre(id, at, rot)
 		farm.add_child(node)
 		_singles[key] = node
@@ -168,11 +175,12 @@ static func batch_transforms(list: Array, hidden: int, cell: float, centre_of: C
 		(out.get_or_add(id, []) as Array).append(Transform3D(basis, centre_of.call(id, at, rot)))
 	return out
 
-## The cells the yard's pieces take (the sent ones too): the shell brings the player back off them when Decorate ends,
+## The cells the yard's pieces stand solid on (the sent ones too; a Pergola's middle line is open, q(131) ②): the shell
+## brings the player back off them when Decorate ends,
 ## on the nearest free cell by walking (刘邦's P0Farm.free_cell_near, #261; 不知火舞 on 284).
 func taken_cells() -> Array:
 	var out: Array = []
-	for p in P0Decor.placed(_view()): out.append_array(P0Decor.cells(str(p.id), Vector2i(int(p.x), int(p.y)), int(p.get("rot", 0))))
+	for p in P0Decor.placed(_view()): out.append_array(P0Decor.solid_cells(str(p.id), Vector2i(int(p.x), int(p.y)), int(p.get("rot", 0))))
 	return out
 
 ## The middle of a piece's cells on the ground.
@@ -250,6 +258,45 @@ static func _model(id: String, rot: int, cell: float) -> Node3D:
 	body.add_child(FarmArt.instance(id))
 	if id == "deco_windmill": body.add_child(_sails(socket(id, "rotor")))
 	return root
+
+## A placed piece's own part beside its kind's batch: a Windmill's sails, a Fountain's ripples.
+static func _has_extra(id: String) -> bool: return id == "deco_windmill" or RIPPLES.has(id)
+
+static func _extra_on(id: String, rot: int, cell: float) -> Node3D:
+	return _sails_on(id, rot, cell) if id == "deco_windmill" else _ripples_on(id, rot, cell)
+
+## A Fountain's ripples alone, one quad on each basin's water, turned and scaled as its body in the batch.
+static func _ripples_on(id: String, rot: int, cell: float) -> Node3D:
+	var root := Node3D.new()
+	root.name = "Ripples_" + id
+	var body := Node3D.new()
+	body.rotation.y = -rot * PI / 2.0
+	body.scale = Vector3.ONE * cell / 0.65
+	root.add_child(body)
+	var basins: Array = RIPPLES.get(id, [])
+	for i in basins.size(): body.add_child(_ripple(id, i, basins[i]))
+	return root
+
+## One basin's rings: a quad a hair over its water, the ripple shader on it (its material shared by every Fountain).
+static func _ripple(id: String, i: int, b: Array) -> MeshInstance3D:
+	var key := "%s:%d" % [id, i]
+	if not _ripple_mats.has(key):
+		var mat := ShaderMaterial.new()
+		mat.shader = RippleShader
+		mat.set_shader_parameter("basin", float(b[1]))
+		mat.set_shader_parameter("source_r", float(b[2]))
+		mat.set_shader_parameter("sources", int(b[3]))
+		mat.set_shader_parameter("reach", float(b[4]))
+		_ripple_mats[key] = mat
+	var quad := PlaneMesh.new()
+	quad.size = Vector2.ONE * float(b[1]) * 2.0
+	var m := MeshInstance3D.new()
+	m.name = "Ripple%d" % i
+	m.mesh = quad
+	m.position.y = float(b[0]) + 0.004
+	m.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	m.material_override = _ripple_mats[key]
+	return m
 
 ## A Windmill's sails alone, where a placed one's body is drawn in its kind's batch.
 static func _sails_on(id: String, rot: int, cell: float) -> Node3D:
