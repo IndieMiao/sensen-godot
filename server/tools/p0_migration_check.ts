@@ -5,7 +5,7 @@
  *   - fields an upgrade changed or added, per field, with counts (only the expected ones may change);
  *   - that upgrading an upgraded save changes nothing (idempotent) and that it survives a JSON round trip;
  *   - that P0Store keeps a .v<old>.bak copy and reloads its own file unchanged (run on a temp copy).
- * Usage: tsx tools/p0_migration_check.ts <state.json> [--expect travel,v] [--out report.json]
+ * Usage: tsx tools/p0_migration_check.ts <state.json> [--expect v,travel,firsts] [--out report.json]
  * Exit 1 when a field outside --expect changed, or an upgrade is not idempotent.
  */
 import { copyFileSync, existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
@@ -20,7 +20,7 @@ const args = process.argv.slice(2);
 const file = args[0];
 if (!file || !existsSync(file)) { console.error('usage: p0_migration_check.ts <state.json> [--expect a,b] [--out f]'); process.exit(2); }
 const opt = (k: string) => { const i = args.indexOf(k); return i > 0 ? args[i + 1] : undefined; };
-const expect = new Set((opt('--expect') ?? 'v,travel').split(','));
+const expect = new Set((opt('--expect') ?? 'v,travel,firsts').split(','));
 const now = Date.now();
 const c = loadP0Content();
 const saved = JSON.parse(readFileSync(file, 'utf8')) as Record<string, P0State>;
@@ -38,6 +38,13 @@ for (const [id, raw] of Object.entries(saved)) {
     if (isDeepStrictEqual(a, b)) continue;
     (a === undefined ? added : changed)[k] = ((a === undefined ? added : changed)[k] ?? 0) + 1;
     if (!expect.has(k)) unexpected.push({ player: id, field: k });
+    // firsts may change only by the v5 rename of fishing_city:<name> → fishing_city:<cluster>, one for one.
+    if (k === 'firsts') {
+      const other = (l: unknown) => (l as string[]).filter(f => !f.startsWith('fishing_city:'));
+      const cities = (l: unknown) => (l as string[]).filter(f => f.startsWith('fishing_city:'));
+      if (!isDeepStrictEqual(other(a), other(b)) || new Set(cities(a).map(x => x)).size < cities(b).length || cities(b).some(f => !f.startsWith('fishing_city:gn-')))
+        unexpected.push({ player: id, field: 'firsts (beyond the fishing_city rename)' });
+    }
   }
   const again = upgradeState(c, JSON.parse(JSON.stringify(up)), now);
   if (!isDeepStrictEqual(JSON.parse(JSON.stringify(again)), JSON.parse(JSON.stringify(up)))) notIdempotent.push(id);

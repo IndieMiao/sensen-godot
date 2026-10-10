@@ -1,7 +1,7 @@
 /** P0 player state (one homestead per player; no compatibility with the old farm state). */
 import type { P0Content, Skill } from './content.js';
 import { maxEnergy } from './rules.js';
-import { freshTravel, type TravelState } from './travel.js';
+import { clusterOf, clusterOfCityName, freshTravel, homeCluster, type TravelState } from './travel.js';
 
 export type PlotState = 'wild' | 'tilled' | 'sown' | 'growing';
 export interface Plot {
@@ -93,7 +93,9 @@ export interface MineState {
 
 /** Where the player's commands come from (q(41)): when they last left the homestead, for Rest's 2 h rule. */
 /** place: the catalog pond the player is at, only while in a pond space (cast reads its template from it, q(36)). */
-export interface Presence { left_at: number | null; last_at: number; space: string | null; place?: string | null }
+export interface Presence { left_at: number | null; last_at: number; space: string | null; place?: string | null;
+  entered?: string | null;   // the pond / outpost entered with a valid pass (v5): commands there are not re-checked
+}
 
 export interface P0Day {
   key: string; rest: number;
@@ -244,6 +246,24 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
   }
   if (s.v < 5) {   // SGODOT-275: cross-city travel. Everyone starts at home, nothing visited, no stamps, no pass
     s.travel ??= freshTravel(c);
+    // The first-catch-in-a-city key moves from the city name to its cluster, so San Francisco's is not paid again.
+    s.firsts = s.firsts.map(f => {
+      if (!f.startsWith('fishing_city:') || f.startsWith('fishing_city:gn-')) return f;
+      const id = clusterOfCityName(c, f.slice('fishing_city:'.length));
+      return id ? `fishing_city:${id}` : f;
+    });
+    s.firsts = [...new Set(s.firsts)];
+  }
+  s.travel ??= freshTravel(c);   // a v5 save from a build without the block cannot exist, but never read one without it
+  // Until players choose a home (P2 second version), everyone's home is the content's city: a moved home moves saves
+  // home too (as SGODOT-270 did), and the frozen fallback list is made again for it (§11.2.3 "换城后重算一次").
+  if (s.travel.home !== homeCluster(c)) {
+    const fresh = freshTravel(c);
+    s.travel.home = fresh.home; s.travel.here = fresh.home; s.travel.fallback = fresh.fallback;
+  }
+  if (!s.travel.fallback.near10.length) {   // made before the cluster table was there: fill it once it is (§11.2.3)
+    const f = freshTravel(c).fallback;
+    if (f.near10.length) s.travel.fallback = f;
   }
   s.req_done ??= [];
   s.cabinet ??= [];
@@ -258,7 +278,8 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
   // from the map, or left in another city, as notePlace judges) is let go when the save loads: the place is forgotten,
   // and a cast still out there comes in as a line in before the bite would — the Energy back, no fish, no XP, an unused
   // teaching pin returned. Old casts without a place are left alone.
-  const home = (id: string) => c.fishing.places[id]?.city === c.profile.city.toLowerCase();
+  // v5: "the home city's" becomes "a city the player holds a pass for" (home, or a Day Pass bought before).
+  const home = (id: string) => { const k = c.fishing.places[id] ? clusterOf(c, id) : null; return !!k && (k === s.travel.home || !!s.travel.passes[k]); };
   if (s.presence.place && !home(s.presence.place)) s.presence.place = null;
   const cast = s.cast;
   if (cast?.place && !home(cast.place)) {

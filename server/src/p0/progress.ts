@@ -17,7 +17,7 @@ export type P0Event =
   | { kind: 'plate'; ids: string[]; cabinet: boolean }
   | { kind: 'parcel'; id: string; qty: number; key: string; waiting: boolean; expires_in?: number; gift?: true }   // a reward that did not fit the bag (§10.4.8)
   | { kind: 'coins'; delta: number }
-  | { kind: 'first'; what: string; xp: number }
+  | { kind: 'first'; what: string; xp: number; name?: string }   // name: the city of a fishing_city first (v5 keys are cluster ids)
   | { kind: 'level'; skill: Skill; level: number; energy: number; gifts: [string, number][] }
   | { kind: 'cast'; bite_in: number; rarity: number; breaks: 'level' | 'rod' | null; bait: string | null }
   | { kind: 'catch'; fish: string; rarity: number; result: 'landed' | 'escaped' | 'broke_free' | 'cancelled'; refund: number;
@@ -30,6 +30,7 @@ export type P0Event =
   | { kind: 'dish'; pot?: number; dish: string; quality: number; qty: number; first: boolean; mystery: boolean; hits: number; auto?: true; none?: true; trial_left?: number }
   | { kind: 'meal'; dish: string; nominal: number; counted: number; gain: number; meals: number; cap: number }
   | { kind: 'reward'; id: string; energy: number }
+  | { kind: 'arrival'; cluster: string; first: boolean; stamp: import('./travel.js').TravelStamp | null; energy: number; pass_until: number; km: number; trip: number }
   | { kind: 'request'; id: string; status: 'accepted' | 'done' | 'dropped'; coins: number; bonus?: number }
   | { kind: 'homestead'; level: number; energy: number; unlocks: string[] }
   | { kind: 'drink'; item: string; gain: number; price: number; left: number }
@@ -107,9 +108,9 @@ export function gainXp(c: P0Content, s: P0State, now: number, skill: Skill, amou
  * A first-time XP bonus (first cast, first catch of a species, first harvest, first pot of a page): the `first` event
  * says what it paid after the daily cap, and is left out when the cap took it all.
  */
-export function firstXp(c: P0Content, s: P0State, now: number, skill: Skill, what: string, xp: number, events: P0Event[]): void {
+export function firstXp(c: P0Content, s: P0State, now: number, skill: Skill, what: string, xp: number, events: P0Event[], name?: string): void {
   const paid = Math.max(0, Math.min(xp, c.skill_daily_cap - (s.day.xp[skill] ?? 0)));
-  if (paid > 0) events.push({ kind: 'first', what, xp: paid });
+  if (paid > 0) events.push({ kind: 'first', what, xp: paid, ...(name ? { name } : {}) });
   gainXp(c, s, now, skill, xp, 100, events);
 }
 

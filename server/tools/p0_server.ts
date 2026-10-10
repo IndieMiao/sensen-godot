@@ -17,6 +17,7 @@ import { OutpostRooms } from '../src/p0/online/rooms.js';
 import { registerP0Routes } from '../src/p0/routes.js';
 import { P0Store } from '../src/p0/store.js';
 import { SAVE_VERSION } from '../src/p0/state.js';
+import { requirePass } from '../src/p0/travel.js';
 import { AppearanceCatalog } from '../src/realtime/appearance.js';
 import { guardOptionsFromEnv, registerP0Guard, snapshotState, trustProxyFromEnv } from '../src/p0/guard.js';
 import { registerP0Admin } from '../src/p0/admin.js';
@@ -53,7 +54,14 @@ const log = new P0EventLog(eventDir === '' ? undefined : eventDir);
 const rooms = new OutpostRooms(loadOutposts());
 registerP0Routes(app, { content, store, now: Date.now, dev, log, presence: () => rooms.total() });
 // The WebSocket upgrade checks the guard's demo keys itself: the guard's onRequest hook does not see it (SGODOT-232 D1).
-registerP0Online(app, { rooms, keys: guard.keys, gate, appearances: new AppearanceCatalog(path.join(root, 'assets/farm/data/regions.json')) });
+// v5: joining an outpost room needs a pass for its city, as entering it does (requirePass; the entered outpost passes).
+const pass = (player: string, outpost: string) => {
+  const s = store.peek(player);
+  if (!s) return null;
+  const r = requirePass(content, s, 'outpost', outpost, Date.now() + s.clock_ms, s.presence.entered === outpost ? 'rejoin' : undefined);
+  return r ? r.code.toUpperCase() : null;
+};
+registerP0Online(app, { rooms, keys: guard.keys, gate, pass, appearances: new AppearanceCatalog(path.join(root, 'assets/farm/data/regions.json')) });
 const startedAt = Date.now();
 app.get('/v1/healthz', async () => {
   const g = gate.state();

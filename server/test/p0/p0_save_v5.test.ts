@@ -6,7 +6,6 @@ import { describe, expect, it } from 'vitest';
 import { loadP0Content } from '../../src/p0/content.js';
 import { freshState, SAVE_VERSION, upgradeState, type P0State } from '../../src/p0/state.js';
 import { P0Store } from '../../src/p0/store.js';
-import { homeCluster } from '../../src/p0/travel.js';
 
 const c = loadP0Content();
 const now = Date.parse('2026-10-10T03:00:00Z');
@@ -23,17 +22,24 @@ describe('save v5 (SGODOT-275)', () => {
   it('new players start at home with nothing visited', () => {
     const s = freshState(c, 'p0-new', now);
     expect(s.v).toBe(SAVE_VERSION);
-    expect(s.travel).toEqual({ home: homeCluster(c), at: homeCluster(c), visited: {}, stamps: [], pass: null });
+    expect(s.travel).toEqual({ home: 'gn-5391959', here: 'gn-5391959', passes: {}, visits: {}, stamps: [], fallback: { near3: [], near10: [] }, explorer: 0 });
   });
 
   it('a v4 save gains the travel block and nothing else changes', () => {
     const raw = v4();
     const up = upgradeState(c, structuredClone(raw), now);
     expect(up.v).toBe(5);
-    expect(up.travel).toEqual({ home: homeCluster(c), at: homeCluster(c), visited: {}, stamps: [], pass: null });
-    const { v: _a, travel: _b, ...rest } = up;
+    expect(up.travel).toEqual({ home: 'gn-5391959', here: 'gn-5391959', passes: {}, visits: {}, stamps: [], fallback: { near3: [], near10: [] }, explorer: 0 });
+    const { v: _a, travel: _b, ...rest } = up;   // (no fishing_city keys in this save)
     const { v: _c, ...was } = raw;
     expect(rest).toEqual(was);
+  });
+
+  it('the first-catch-in-a-city key moves to the cluster id', () => {
+    const raw = v4();
+    raw.firsts.push('fishing_city:san francisco', 'fishing_city:shanghai', 'fishing_city:gn-5391959');
+    const up = upgradeState(c, raw, now);
+    expect(up.firsts.filter(f => f.startsWith('fishing_city:'))).toEqual(['fishing_city:gn-5391959', 'fishing_city:gn-1796236']);
   });
 
   it('upgrading twice is the same as once', () => {
@@ -44,8 +50,8 @@ describe('save v5 (SGODOT-275)', () => {
 
   it('a v5 save keeps its travel block', () => {
     const s = freshState(c, 'p0-been', now);
-    s.travel.visited.tokyo = { first_at: now, visits: 2 };
-    s.travel.stamps.push('tokyo');
+    s.travel.visits['gn-1850147'] = { n: 2, first_at: now, last_at: now, deliveries: 0, delivered_day: '' };
+    s.travel.stamps.push({ cluster: 'gn-1850147', kind: 'climate', at: now, counted_on: '2026-10-09' });
     expect(upgradeState(c, structuredClone(s), now).travel).toEqual(s.travel);
   });
 
