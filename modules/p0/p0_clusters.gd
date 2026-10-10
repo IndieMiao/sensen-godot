@@ -86,3 +86,67 @@ static func nearest(lat: float, lng: float, max_km := 60.0) -> String:
 					best_km = d
 					best = c.id
 	return best
+
+# ---------------------------------------------------------------- the map's regions (SGODOT-275 browse)
+
+## The curated map regions (regions.json, with their own city files) by the cluster they alias (geonames_id).
+static var _curated: Dictionary = {}
+
+static func _curated_regions() -> Dictionary:
+	if _curated.is_empty():
+		var regions := FarmRegions.load_default()
+		if regions != null:
+			for r in regions.regions:
+				if str(r.get("geonames_id", "")) != "": _curated[str(r.geonames_id)] = r
+	return _curated
+
+## The cluster a map region id stands for: a curated region by its geonames_id (san_francisco → gn-5391959), a
+## cluster id as itself; "" for anything else.
+static func cluster_of_region(region_id: String) -> String:
+	var curated := _curated_regions()
+	for id in curated:
+		if str(curated[id].id) == region_id: return id
+	return region_id if not get_cluster(region_id).is_empty() else ""
+
+## A cluster's radius as the city directory sizes cities (server/tools/build_cities.mjs radiusKm).
+static func radius_km(population: int) -> float:
+	return 45.0 if population >= 5000000 else 30.0 if population >= 1000000 else 20.0 if population >= 300000 else 12.0
+
+## The map region a cluster is shown as: its curated region where there is one (its authored city, landmarks), else
+## a region built from the cluster (centre, radius, bounds of one radius around it) with the cluster id as its id.
+static func region(cluster: String) -> Dictionary:
+	if _curated_regions().has(cluster): return _curated_regions()[cluster]
+	var c := get_cluster(cluster)
+	if c.is_empty(): return {}
+	var r := radius_km(int(c.population))
+	var dlat := r / 111.0
+	var dlng := r / (111.0 * maxf(0.1, cos(deg_to_rad(float(c.lat)))))
+	return {id = cluster, name = c.name, timezone = c.timezone, center = [c.lat, c.lng], radius_km = r,
+		placement_bounds = [c.lat - dlat, c.lng - dlng, c.lat + dlat, c.lng + dlng], street_zoom = 16, pitch = 45,
+		candidates = [], country = c.country, country_code = c.country_code, global = true, cluster = cluster}
+
+## Clusters whose centre is inside a lat/lng box, most populous first, at least `min_pop` people, at most `limit`.
+## Wide boxes walk the population-ordered list and stop at `min_pop`; narrow ones read the grid cells.
+static func in_box(south: float, west: float, north: float, east: float, min_pop: int, limit: int) -> Array:
+	_load()
+	var out: Array = []
+	var inside := func(c: Dictionary) -> bool:
+		var lat := float(c.lat)
+		var lng := float(c.lng)
+		var in_lng := (lng >= west and lng <= east) if west <= east else (lng >= west or lng <= east)
+		return lat >= south and lat <= north and in_lng
+	var width := 360.0 if east == west else east - west + (360.0 if east < west else 0.0)   # the whole world: west -180, east 180
+	if (north - south) * width > 400.0:
+		for c in _list:
+			if int(c.population) < min_pop: break
+			if inside.call(c): out.append(c)
+			if out.size() >= limit: break
+		return out
+	var a := _cell(south, west)
+	var b := _cell(north, east if east >= west else east + 360.0)
+	for i in range(a.x, b.x + 1):
+		for j in range(a.y, b.y + 1):
+			for c in _grid.get(Vector2i(i, wrapi(j, -180, 180)), []):
+				if int(c.population) >= min_pop and inside.call(c): out.append(c)
+	out.sort_custom(func(x, y): return int(x.population) > int(y.population) or (int(x.population) == int(y.population) and str(x.id) < str(y.id)))
+	return out.slice(0, limit)
