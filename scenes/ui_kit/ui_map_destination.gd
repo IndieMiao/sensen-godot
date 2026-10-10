@@ -34,6 +34,13 @@ var label_shift := 0.0: set = set_label_shift
 var label_above := false: set = set_label_above
 ## The gap between the disc's top and a name over it (above_gap_for).
 var above_gap := LABEL_GAP: set = set_above_gap
+## A place of a city the fog still covers (MAP-2 2107:33077, 不知火舞 on #281; P1, the P0 pin is untouched): a 32 px
+## surface disc with a 1 px border-colour edge, the 18 px type glyph in color/secondary, no name, the whole pin at 55 %.
+## Its point stays at the disc's centre and its tap area is the pin's as ever.
+var silhouette := false: set = set_silhouette
+const SILHOUETTE_DISC := 32.0
+const SILHOUETTE_ICON := 18.0
+const SILHOUETTE_ALPHA := 0.55
 
 var _pin: Control
 var _disc: Panel
@@ -95,8 +102,37 @@ func set_name_shown(v: bool) -> void:
 	if v == name_shown: return
 	name_shown = v
 	if _label_box == null: return
-	_label_box.visible = text != "" and v
+	_label_box.visible = text != "" and v and not silhouette
 	_layout()
+
+func set_silhouette(v: bool) -> void:
+	if v == silhouette: return
+	silhouette = v
+	if _disc == null: return
+	var d := SILHOUETTE_DISC if v else DISC
+	_disc.size = Vector2(d, d)
+	_disc.position = Vector2.ONE * (DISC - d) * 0.5   # centred where the full disc is: the point does not move
+	_disc.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_SURFACE, d * 0.5,
+		UiTokens.COLOR_BORDER if v else UiTokens.COLOR_PRIMARY, UiTokens.STROKE_DEFAULT))
+	var side := SILHOUETTE_ICON if v else ICON
+	_icon.custom_minimum_size = Vector2(side, side)   # first: a size under the old minimum would be clamped back up
+	_icon.size = Vector2(side, side)
+	_icon.position = Vector2.ONE * (DISC - side) * 0.5
+	_icon.material = _ink() if v else null   # the glyph as a one-colour silhouette
+	modulate.a = SILHOUETTE_ALPHA if v else 1.0
+	_label_box.visible = text != "" and name_shown and not v
+	_layout()
+
+## A canvas material drawing a texture's shape in color/secondary (its alpha kept): the silhouette's glyph.
+static var _ink_mat: ShaderMaterial
+static func _ink() -> ShaderMaterial:
+	if _ink_mat == null:
+		var sh := Shader.new()
+		sh.code = "shader_type canvas_item;\nuniform vec4 ink : source_color;\nvoid fragment() { COLOR = vec4(ink.rgb, texture(TEXTURE, UV).a * ink.a); }"
+		_ink_mat = ShaderMaterial.new()
+		_ink_mat.shader = sh
+		_ink_mat.set_shader_parameter("ink", UiTokens.COLOR_SECONDARY)
+	return _ink_mat
 
 ## The map sets every pin's fields each frame (CityMapView._place_candidate): only a change restyles or lays out.
 var _plate_on := -1   # the plate last drawn (-1: none yet)
@@ -186,7 +222,7 @@ func footprint() -> Rect2:
 
 func _layout() -> void:
 	if _label_box == null: return
-	var l := label_size()
+	var l := label_size() if not silhouette else Vector2.ZERO
 	var w := maxf(DISC, l.x)
 	custom_minimum_size = Vector2(w, DISC + (LABEL_GAP + l.y if l.y > 0.0 else 0.0))
 	size = custom_minimum_size

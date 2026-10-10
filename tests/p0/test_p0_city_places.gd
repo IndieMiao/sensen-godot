@@ -214,4 +214,54 @@ func test_show_on_map_says_when_the_citys_read_fails() -> void:
 	assert_bool(P0CityPlaces.has_city(TOKYO)).is_false()
 	m.show_place("outpost:gn-1850147~market0")   # tries again
 	assert_int(asked.size()).is_equal(2)
+	# left the map while the read was out (a world over it): no banner there (不知火舞 on #282)
+	var other := Node.new()
+	add_child(auto_free(other))
+	rt.world = other
+	rt.ui.show_sys(UiSysBanner.Kind.CMD_FAIL, "earlier", 30.0)
+	P0CityPlaces.fail(TOKYO)
+	assert_str(rt.ui.sys_text()).is_equal("earlier")
+	rt.world = m
 	rt.ui.close_modal()
+
+## MAP-2 (2107:32861, 不知火舞 on #281): a place of a city the fog covers is its silhouette — no disc, no name, the 18 px
+## glyph in color/secondary at 55 %; it takes the tap (its silhouette card) and turns full colour once the city is explored.
+func test_a_fogged_citys_places_are_silhouettes_until_explored() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved: Dictionary = rt.session.view
+	var v := saved.duplicate(true)
+	v["now"] = 1_000_000_000.0
+	v["travel"] = {"home": SF, "here": SF, "passes": {}, "visits": {}, "stamps": [], "fallback": {"near3": [], "near10": []}, "explorer": 0}
+	rt.session.view = v
+	P0CityPlaces.accept(TOKYO, CITY)
+	var tokyo_market := P0Outposts.place_entry(P0Outposts.find("gn-1850147~market0"))
+	var home_market := P0Outposts.place_entry(P0Outposts.by_role("market"))
+	assert_bool(bool(m._destination_style(tokyo_market).get("silhouette", false))).is_true()
+	assert_bool(bool(m._destination_style({"kind": "pond", "id": "gn-1850147~pond0"}).get("silhouette", false))).is_true()
+	assert_bool(bool(m._destination_style(home_market).get("silhouette", false))).is_false()   # home: full colour, P0's pin
+	var pin := UiMapDestination.new(P0Logic.icon("board"), "Tokyo Market Square")
+	add_child(auto_free(pin))
+	pin.silhouette = true
+	assert_vector(pin._disc.size).is_equal(Vector2(32, 32))   # 2107:33077: a 32 px surface disc, 1 px border edge
+	var box := pin._disc.get_theme_stylebox("panel") as UiStyleBox
+	assert_that(box.bg_color).is_equal(UiTokens.COLOR_SURFACE)
+	assert_that(box.border_color).is_equal(UiTokens.COLOR_BORDER)
+	assert_vector(pin._disc.position + pin._disc.size * 0.5).is_equal(Vector2.ONE * UiMapDestination.DISC * 0.5)   # same point
+	assert_bool(pin._label_box.visible).is_false()
+	assert_float(pin.modulate.a).is_equal_approx(0.55, 0.001)
+	await get_tree().process_frame
+	assert_vector(pin._icon.size).is_equal(Vector2(18, 18))
+	assert_object(pin._icon.material).is_not_null()
+	pin.silhouette = false   # explored: the pin as ever
+	assert_vector(pin._disc.size).is_equal(Vector2(40, 40))
+	assert_object(pin._icon.material).is_null()
+	assert_float(pin.modulate.a).is_equal(1.0)
+	# exploring the city drops its silhouettes (the style cache follows the visits)
+	rt.session.view.travel.visits = {TOKYO: {"n": 1}}
+	assert_bool(bool(m._destination_style(tokyo_market).get("silhouette", false))).is_false()
+	assert_bool(m._travel_first(tokyo_market)).is_true()   # still no pass here: a tap opens its card
+	rt.ui.close_modal()
+	rt.session.view = saved

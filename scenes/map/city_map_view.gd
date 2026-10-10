@@ -1229,6 +1229,7 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int,
 		var pin: UiMapDestination = marker.dest
 		pin.icon = dest.get("icon", null)
 		pin.plate = bool(dest.get("plate", false))
+		pin.silhouette = bool(dest.get("silhouette", false))   # a fogged city's place: the glyph alone (MAP-2)
 		pin.text = _label_text(entry)
 		pin.name_shown = label_fits
 		pin.above_gap = above_gap
@@ -1376,7 +1377,8 @@ func _over_avatar(entry: Dictionary) -> bool:
 ## over the anchor), label_h, label_w, art_w}.
 func _pin_metrics(entry: Dictionary, is_sel := false) -> Dictionary:
 	if not _destination(entry).is_empty():
-		var ls := UiMapDestination.label_size_for(_label_text(entry))
+		# a silhouette pin has no name: nothing of it packs under the disc
+		var ls := Vector2.ZERO if bool(_destination(entry).get("silhouette", false)) else UiMapDestination.label_size_for(_label_text(entry))
 		return {width = UiMapDestination.DISC, art_side = UiMapDestination.DISC, top = UiMapDestination.DISC,
 			label_h = ls.y, label_w = ls.x, art_w = UiMapDestination.DISC}
 	var width := 82.0 if entry.kind == "landmark" else 78.0 if entry.kind == "resident" else 48.0
@@ -1550,6 +1552,7 @@ func _update_fog() -> void:
 func _update_bubbles() -> void:
 	var detail: bool = host.city_detail_visible()
 	var area := Rect2(-global_position, get_viewport_rect().size).grow(60)
+	var clear_rects: Array = bubble_clear_rects.call() if bubble_clear_rects.is_valid() else []   # once a frame (蒙恬 on #281)
 	var listed := {}
 	for r in host.city_regions():
 		var id := str(r.id)
@@ -1593,7 +1596,7 @@ func _update_bubbles() -> void:
 		if bubble_clear_rects.is_valid():
 			var at := Rect2(node.position + global_position, node.size)   # screen px
 			var screen := Rect2(Vector2.ZERO, get_viewport_rect().size)
-			if not screen.encloses(at) or (bubble_clear_rects.call() as Array).any(func(r): return (r as Rect2).intersects(at)):
+			if not screen.encloses(at) or clear_rects.any(func(r): return (r as Rect2).intersects(at)):
 				node.visible = false   # the dot stays: the city is still there
 	# A bubble built for an earlier list (another zoom, another camera city) that this one no longer has hides with its
 	# dot; left visible it would stay frozen where it was drawn, over the new city (李元芳 / 司空震, SGODOT-275).
