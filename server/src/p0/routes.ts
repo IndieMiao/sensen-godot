@@ -55,6 +55,8 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
     const cluster = String((req.params as { cluster?: unknown }).cluster ?? '');
     if (!/^gn-\d{1,12}$/.test(cluster) || (!clusterById(c, cluster) && cluster !== homeCluster(c))) return reply.code(404).send({ ok: false, code: 'unknown_city' });
     const s = store.get(player, deps.now());
+    // The generator's place details (SGODOT-280: ponds and outposts with their points and art) go out here, per city, and
+    // never in the state view; the home city's hand-written places are in the client already.
     return reply.send({ ok: true, city: { ...cityInfo(c, cluster), preview: preview(c, s, cluster) } });
   });
 
