@@ -1535,7 +1535,14 @@ func _update_fog() -> void:
 	if fog == null: return
 	if fog.get_index() != 0: move_child(fog, 0)   # under the bubbles and pins added at 0 since
 	var on := fog_holes.is_valid()
-	fog.apply(fog_holes.call() if on else [], float(host.zoom) + float(host._zoom_elastic), on)
+	# The view sits inside the HUD's safe-area margins; the veil spans the whole screen, edge to edge, so it is placed
+	# at the screen origin and the holes (this view's px) are shifted by the same offset.
+	var at := -global_position
+	if fog.position != at or fog.size != get_viewport_rect().size:
+		fog.set_anchors_preset(Control.PRESET_TOP_LEFT)
+		fog.position = at
+		fog.size = get_viewport_rect().size
+	fog.apply(fog_holes.call() if on else [], float(host.zoom) + float(host._zoom_elastic), on, -at)
 
 func _update_bubbles() -> void:
 	var detail: bool = host.city_detail_visible()

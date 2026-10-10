@@ -76,6 +76,12 @@ func test_the_veil_holes_the_explored_cities_only_at_every_zoom() -> void:
 	assert_bool(fog.visible).is_true()
 	assert_int(fog.get_index()).is_equal(0)   # under every pin, bubble and name
 	assert_int(fog.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
+	# edge to edge: the view sits inside the safe-area margins, the veil covers the whole screen and its holes stay
+	# on the cities (a hole's centre in the shader is the city's screen point)
+	assert_vector(fog.get_global_rect().position).is_equal(Vector2.ZERO)
+	assert_vector(fog.get_global_rect().size).is_equal(Vector2(360, 800))
+	var packed: Array = (fog.material as ShaderMaterial).get_shader_parameter("holes")
+	assert_float(Vector2(packed[0].x, packed[0].y).distance_to(sf as Vector2)).is_less(40.0)
 	_look(m, 37.7558, -122.4345, 15.0)
 	m.city_map._update_fog()
 	assert_bool(fog.visible).is_true()   # street zoom too (不知火舞 on #227): the home city's hole covers the screen

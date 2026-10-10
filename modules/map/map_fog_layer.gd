@@ -22,23 +22,26 @@ func _init() -> void:
 	material = _mat
 
 func _ready() -> void:
-	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)   # the host may place it over the whole screen instead
 
-## Holes in this layer's pixels and the zoom; hidden when the zoom clears it or the host has no fog. The shader is only
-## fed when something changed (the same holes array, the same strength: nothing to do).
+## Holes in the host's pixels ({at, r}), shifted by `offset` into this layer's (the host draws inside the safe area, the
+## veil covers the whole screen); hidden when the host has no fog. The shader is only fed when something changed.
 var _applied: Array = []
 var _applied_k := -1.0
+var _applied_offset := Vector2.INF
 
-func apply(new_holes: Array, _zoom: float, enabled: bool) -> void:
+func apply(new_holes: Array, _zoom: float, enabled: bool, offset := Vector2.ZERO) -> void:
 	var k := 1.0 if enabled else 0.0
 	visible = k > 0.0
 	if not visible: return
-	if is_same(new_holes, _applied) and k == _applied_k and _mat.get_shader_parameter("size") == size: return
+	if is_same(new_holes, _applied) and k == _applied_k and offset == _applied_offset and _mat.get_shader_parameter("size") == size:
+		return
 	_applied = new_holes
 	_applied_k = k
+	_applied_offset = offset
 	holes = new_holes.slice(0, MAX_HOLES)
 	var packed: Array = []
-	for h in holes: packed.append(Vector4(h.at.x, h.at.y, float(h.r), 0.0))
+	for h in holes: packed.append(Vector4(h.at.x + offset.x, h.at.y + offset.y, float(h.r), 0.0))
 	while packed.size() < MAX_HOLES: packed.append(Vector4.ZERO)
 	_mat.set_shader_parameter("holes", packed)
 	_mat.set_shader_parameter("count", holes.size())
