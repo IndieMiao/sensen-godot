@@ -6,8 +6,11 @@ import { describe, expect, it } from 'vitest';
 import { loadP0Content } from '../../src/p0/content.js';
 import { freshState, SAVE_VERSION, upgradeState, type P0State } from '../../src/p0/state.js';
 import { P0Store } from '../../src/p0/store.js';
+import { freshTravel } from '../../src/p0/travel.js';
 
 const c = loadP0Content();
+/** San Francisco's frozen fallback lists from the homestead (亚瑟's #213): Hayward, Concord, Fairfield … Chico. */
+const SF_FALLBACK = freshTravel(c).fallback;
 const now = Date.parse('2026-10-10T03:00:00Z');
 /** A v4 save as the live server writes it today: the current shape without the travel block. */
 const v4 = (player = 'p0-test'): P0State => {
@@ -20,16 +23,18 @@ const v4 = (player = 'p0-test'): P0State => {
 
 describe('save v5 (SGODOT-275)', () => {
   it('new players start at home with nothing visited', () => {
+    expect(SF_FALLBACK.near3).toHaveLength(3);
+    expect(SF_FALLBACK.near10).toHaveLength(10);
     const s = freshState(c, 'p0-new', now);
     expect(s.v).toBe(SAVE_VERSION);
-    expect(s.travel).toEqual({ home: 'gn-5391959', here: 'gn-5391959', passes: {}, visits: {}, stamps: [], fallback: { near3: [], near10: [] }, explorer: 0 });
+    expect(s.travel).toEqual({ home: 'gn-5391959', here: 'gn-5391959', passes: {}, visits: {}, stamps: [], fallback: SF_FALLBACK, explorer: 0 });
   });
 
   it('a v4 save gains the travel block and nothing else changes', () => {
     const raw = v4();
     const up = upgradeState(c, structuredClone(raw), now);
     expect(up.v).toBe(5);
-    expect(up.travel).toEqual({ home: 'gn-5391959', here: 'gn-5391959', passes: {}, visits: {}, stamps: [], fallback: { near3: [], near10: [] }, explorer: 0 });
+    expect(up.travel).toEqual({ home: 'gn-5391959', here: 'gn-5391959', passes: {}, visits: {}, stamps: [], fallback: SF_FALLBACK, explorer: 0 });
     const { v: _a, travel: _b, ...rest } = up;   // (no fishing_city keys in this save)
     const { v: _c, ...was } = raw;
     expect(rest).toEqual(was);

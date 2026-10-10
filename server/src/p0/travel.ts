@@ -3,16 +3,12 @@
  * Save v5 adds the travel block; the shape and the error codes follow 亚瑟's technical note (275, comment 0fc0bc5e):
  * every key is a city cluster id (`gn-<GeoNames id>` of the cluster's seed city, San Francisco gn-5391959).
  */
-import { existsSync, readFileSync } from 'node:fs';
+import type { CityClusters, CityCluster } from './clusters.js';
 import type { P0Content } from './content.js';
 import { gainEnergy, grantOnce, type P0Event } from './progress.js';
 import { dayKey, maxEnergy } from './rules.js';
 import type { P0State } from './state.js';
 
-export interface Cluster {
-  id: string; name: string; cc: string; country: string; lat: number; lng: number; pop: number;
-  climate: string; continent: string; tz: string;
-}
 export interface TravelPass { kind: 'day'; from: number; until: number }
 export interface TravelVisit { n: number; first_at: number; last_at: number; deliveries: number; delivered_day: string }
 export interface TravelStamp { cluster: string; kind: 'landmark' | 'climate'; at: number; counted_on: string }
@@ -31,32 +27,12 @@ const DAY_PASS_MS = 24 * 3_600_000;
 const FIRST_VISIT_ENERGY = 10;
 const FIRST_VISITS_PER_DAY = 2;
 const EXPLORER: [number, number][] = [[3, 30], [10, 50], [30, 70], [100, 100]];
-const TRIP_EDGES = [30, 100, 500, 1_600, 4_000, 10_000];   // km, Trip 1–6 upper bounds (表 11-1)
-export const TRIP_NAMES = ['Local', 'Nearby', 'Regional', 'Long Haul', 'Continental', 'Intercontinental', 'Antipodal'];
 
-type WithClusters = P0Content & { clusters?: Map<string, Cluster>; landmarks?: Record<string, string> };
+type WithClusters = P0Content & { clusters?: CityClusters; landmarks?: Record<string, string> };
 
-/** The frozen cluster table (assets/p0/city_clusters.tsv, built by 亚瑟's build_clusters.mjs), read by header. */
-export function loadClusters(file: string): Map<string, Cluster> {
-  const out = new Map<string, Cluster>();
-  if (!existsSync(file)) return out;
-  let cols: string[] = [];
-  for (const line of readFileSync(file, 'utf8').split('\n')) {
-    if (!line.trim()) continue;
-    if (line.startsWith('#')) { const h = line.replace(/^#\s*/, '').split('\t'); if (h.includes('id')) cols = h; continue; }
-    const f = line.split('\t');
-    const get = (k: string) => f[cols.indexOf(k)] ?? '';
-    const id = cols.length ? get('id') : f[0];
-    if (!id) continue;
-    out.set(id, { id, name: get('name'), cc: get('country_code') || get('cc'), country: get('country'),
-      lat: Number(get('lat')), lng: Number(get('lng')), pop: Number(get('population') || get('pop')),
-      climate: get('climate'), continent: get('continent'), tz: get('timezone') || get('tz') });
-  }
-  return out;
-}
-
-const clusters = (c: P0Content) => (c as WithClusters).clusters ?? new Map<string, Cluster>();
-export const clusterById = (c: P0Content, id: string): Cluster | undefined => clusters(c).get(id);
+/** The frozen city clusters (亚瑟's CityClusters, assets/p0/city_clusters.json), attached by loadP0Content. */
+const clusters = (c: P0Content) => (c as WithClusters).clusters;
+export const clusterById = (c: P0Content, id: string): CityCluster | undefined => clusters(c)?.get(id);
 
 /** The home cluster of this content's profile (regions.json alias → gn- id). */
 export const homeCluster = (c: P0Content): string => HOME_ALIAS[c.profile.city.toLowerCase()] ?? `city:${c.profile.city.toLowerCase()}`;
@@ -65,7 +41,7 @@ export const homeCluster = (c: P0Content): string => HOME_ALIAS[c.profile.city.t
 export const clusterOfCityName = (c: P0Content, city: string): string | null => {
   const k = city.toLowerCase();
   if (HOME_ALIAS[k]) return HOME_ALIAS[k];
-  for (const cl of clusters(c).values()) if (cl.name.toLowerCase() === k) return cl.id;
+  for (const cl of clusters(c)?.byId.values() ?? []) if (cl.name.toLowerCase() === k) return cl.id;
   return null;
 };
 
@@ -83,24 +59,16 @@ export function clusterOf(c: P0Content, place: string): string | null {
   return homeCluster(c);   // a hand-written outpost without its cluster field yet: the home city's
 }
 
-function farmPoint(c: P0Content): [number, number] | null {
-  if (c.profile.farm_at) return c.profile.farm_at;
+function farmPoint(c: P0Content): { lat: number; lng: number } | null {
+  if (c.profile.farm_at) return { lat: c.profile.farm_at[0], lng: c.profile.farm_at[1] };
   const h = clusterById(c, homeCluster(c));
-  return h ? [h.lat, h.lng] : null;
-}
-export function km(a: [number, number], b: [number, number]): number {
-  const r = Math.PI / 180, dLat = (b[0] - a[0]) * r, dLng = (b[1] - a[1]) * r;
-  const h = Math.sin(dLat / 2) ** 2 + Math.cos(a[0] * r) * Math.cos(b[0] * r) * Math.sin(dLng / 2) ** 2;
-  return 2 * 6371 * Math.asin(Math.min(1, Math.sqrt(h)));
+  return h ? { lat: h.lat, lng: h.lng } : null;
 }
 
-/** §11.2.3: the 3 / 10 nearest clusters of ≥ 100k people outside the home cluster, from the farm. */
+/** §11.2.3: frozen into the save when the block is made (CityClusters.fallback); empty without the table. */
 export function fallbackOf(c: P0Content): { near3: string[]; near10: string[] } {
-  const at = farmPoint(c), home = homeCluster(c);
-  if (!at) return { near3: [], near10: [] };
-  const near = [...clusters(c).values()].filter(cl => cl.id !== home && cl.pop >= 100_000)
-    .map(cl => ({ id: cl.id, d: km(at, [cl.lat, cl.lng]) })).sort((x, y) => x.d - y.d || (x.id < y.id ? -1 : 1)).slice(0, 10).map(x => x.id);
-  return { near3: near.slice(0, 3), near10: near };
+  const at = farmPoint(c), cl = clusters(c);
+  return at && cl ? cl.fallback(homeCluster(c), at) : { near3: [], near10: [] };
 }
 
 export const freshTravel = (c: P0Content): TravelState => {
@@ -108,14 +76,11 @@ export const freshTravel = (c: P0Content): TravelState => {
   return { home, here: home, passes: {}, visits: {}, stamps: [], fallback: fallbackOf(c), explorer: 0 };
 };
 
-/** Distance from the home farm and the Trip band (1–7), the lower of distance and fallback (表 11-1, 11-2). */
-export function tripOf(c: P0Content, s: P0State, cluster: string): { km: number; trip: number } {
-  const cl = clusterById(c, cluster), at = farmPoint(c);
-  const d = cl && at ? Math.round(km(at, [cl.lat, cl.lng])) : 0;
-  let trip = cluster === s.travel.home ? 1 : TRIP_EDGES.findIndex(e => d <= e) + 1 || 7;
-  if (s.travel.fallback.near3.includes(cluster)) trip = 1;
-  else if (s.travel.fallback.near10.includes(cluster)) trip = Math.min(trip, 2);
-  return { km: d, trip };
+/** Distance from the home farm and the Trip band, by CityClusters.trip (the same rule as the client's P0Clusters). */
+export function tripOf(c: P0Content, s: P0State, cluster: string): { km: number; trip: number; name: string } {
+  const at = farmPoint(c), cl = clusters(c);
+  if (!at || !cl?.get(cluster)) return { km: 0, trip: 1, name: 'Local' };
+  return cl.trip(cluster, s.travel.home, at, s.travel.fallback);
 }
 
 /** Home is always covered; elsewhere a Day Pass still running (second home and guest passes come later). */
@@ -125,9 +90,9 @@ export const covers = (s: P0State, cluster: string, now: number): boolean =>
 /** What the confirm panel needs (§11.8.2). Costs stay 0 in the first version; the fields are there for the paid one. */
 export function preview(c: P0Content, s: P0State, cluster: string) {
   const cl = clusterById(c, cluster);
-  const { km: d, trip } = tripOf(c, s, cluster);
+  const { km: d, trip, name: tripName } = tripOf(c, s, cluster);
   const info = cityInfo(c, cluster);
-  return { cluster, name: cl?.name ?? '', country: cl?.country ?? '', km: d, trip, trip_name: TRIP_NAMES[trip - 1],
+  return { cluster, name: cl?.name ?? '', country: cl?.country ?? '', km: d, trip, trip_name: tripName,
     cost: { energy: 0, coins: 0, item: null }, first_visit: !s.travel.visits[cluster],
     fishing: info.fish, counts: { ponds: info.ponds.length, outposts: info.outposts.length, residents: info.residents } };
 }

@@ -6,21 +6,13 @@ import { applyP0, type P0Command, type P0Result } from '../../src/p0/reducer.js'
 import { registerP0Routes } from '../../src/p0/routes.js';
 import { freshState, type P0State } from '../../src/p0/state.js';
 import { P0Store } from '../../src/p0/store.js';
-import { noteEntered, requirePass, tripOf, type Cluster } from '../../src/p0/travel.js';
+import { noteEntered, requirePass, tripOf } from '../../src/p0/travel.js';
 
-const SF = 'gn-5391959', OAK = 'gn-5378538', SJ = 'gn-5392171', LA = 'gn-5368361', TOKYO = 'gn-1850147', NYC = 'gn-5128581', LDN = 'gn-2643743';
-const cl = (id: string, name: string, lat: number, lng: number, pop: number): Cluster =>
-  ({ id, name, cc: 'XX', country: 'X', lat, lng, pop, climate: 'temperate', continent: 'x', tz: 'UTC' });
-const base = loadP0Content();
-const c: P0Content = structuredClone(base);
-(c as P0Content & { clusters: Map<string, Cluster> }).clusters = new Map([
-  cl(SF, 'San Francisco', 37.77, -122.42, 864_000), cl(OAK, 'Oakland', 37.80, -122.27, 420_000),
-  cl(SJ, 'San Jose', 37.34, -121.89, 1_000_000), cl(LA, 'Los Angeles', 34.05, -118.24, 3_900_000),
-  cl(TOKYO, 'Tokyo', 35.69, 139.69, 8_300_000), cl(NYC, 'New York City', 40.71, -74.0, 8_100_000),
-  cl(LDN, 'London', 51.5, -0.12, 8_900_000),
-  // seven cities 800–1,500 km out fill the nearest-10 list, so Tokyo, New York and London are priced by distance
-  ...[0, 1, 2, 3, 4, 5, 6].map(i => cl(`gn-90000${i}`, `Filler ${i}`, 42 + i, -116 + i * 0.2, 200_000)),
-].map(x => [x.id, x]));
+const SF = 'gn-5391959', LA = 'gn-5368361', TOKYO = 'gn-1850147', NYC = 'gn-5128581', LDN = 'gn-2643743';
+const HAYWARD_ETC = 3;   // San Francisco's nearest 3 (Hayward, Concord, Fairfield) are Trip 1
+// The real frozen clusters (亚瑟's #213), so trips here are the ones players will see.
+const c: P0Content = structuredClone(loadP0Content());
+Object.defineProperty(c, 'clusters', { value: (loadP0Content() as P0Content & { clusters?: unknown }).clusters });
 const TOKYO_POND = `${TOKYO}~pond0`;
 c.fishing.places[TOKYO_POND] = { ...c.fishing.places.pond_san_francisco_03, city: 'tokyo' } as never;
 const T = Date.parse('2026-10-10T18:00:00Z');   // 11:00 in San Francisco
@@ -31,13 +23,14 @@ const run = (s: P0State, cmd: P0Command, at = T): P0Result => applyP0(c, s, cmd,
 function step(s: P0State, cmd: P0Command, at = T) { const r = run(s, cmd, at); if (!r.ok) throw new Error(r.code); return r; }
 
 describe('travel (SGODOT-278)', () => {
-  it('fresh saves freeze the fallback list from the farm', () => {
+  it('fresh saves freeze the fallback list from the farm; trips follow table 11-4', () => {
     const s = fresh();
-    expect(s.travel.fallback.near3).toEqual([OAK, SJ, LA]);
-    expect(tripOf(c, s, OAK)).toMatchObject({ trip: 1 });
-    expect(tripOf(c, s, TOKYO)).toMatchObject({ trip: 6 });
-    expect(tripOf(c, s, LA)).toMatchObject({ trip: 1 });   // 559 km, but one of the nearest 3
-    expect(tripOf(c, s, LDN).trip).toBe(6);
+    expect(s.travel.fallback.near3).toHaveLength(HAYWARD_ETC);
+    expect(s.travel.fallback.near10).toHaveLength(10);
+    expect(tripOf(c, s, s.travel.fallback.near3[0]).trip).toBe(1);
+    expect(tripOf(c, s, LA)).toMatchObject({ trip: 4, name: 'Long Haul' });
+    expect(tripOf(c, s, TOKYO)).toMatchObject({ trip: 6, name: 'Intercontinental' });
+    expect(tripOf(c, s, SF)).toEqual({ km: 0, trip: 1, name: 'Local' });
   });
 
   it('a first visit: Day Pass, stamp, +10 Energy, arrival event; free', () => {

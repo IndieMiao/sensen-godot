@@ -2,7 +2,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { loadClusters, type Cluster } from './travel.js';
+import { CityClusters } from './clusters.js';
 
 export type Skill = 'farming' | 'fishing' | 'cooking';
 export const SKILLS: readonly Skill[] = ['farming', 'fishing', 'cooking'];
@@ -180,9 +180,10 @@ export function loadP0Content(file = DEFAULT_P0_CONTENT): P0Content {
     c.outposts = (JSON.parse(readFileSync(outposts, 'utf8')).outposts as { id: string; role: string; residents?: string[] }[])
       .map(o => ({ id: o.id, role: o.role, residents: o.residents ?? [] }));
   }
-  // v5 (SGODOT-278): the frozen city cluster table, when it is there (亚瑟's build_clusters.mjs).
-  const clusters = path.join(dir, 'city_clusters.tsv');
-  (c as P0Content & { clusters?: Map<string, Cluster> }).clusters = loadClusters(clusters);
+  // v5 (SGODOT-278): the frozen city clusters beside the content (亚瑟's build_clusters.mjs), with the server's member table.
+  const clusters = path.join(dir, 'city_clusters.json');
+  // Not enumerable: a structuredClone of the content (tests) leaves it out instead of copying a class without methods.
+  if (existsSync(clusters)) Object.defineProperty(c, 'clusters', { value: CityClusters.load(clusters), enumerable: false, writable: true, configurable: true });
   const ponds = path.join(dir, 'p0_ponds.json');
   if (existsSync(ponds)) {
     for (const l of JSON.parse(readFileSync(ponds, 'utf8')).locations as { id: string; lat: number; lng: number }[]) {
