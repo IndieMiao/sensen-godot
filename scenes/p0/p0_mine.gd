@@ -586,13 +586,8 @@ func _show_card(v: Dictionary) -> void:
 	var box: AABB = f.box
 	var at: Vector3 = f.at
 	var top := cam.unproject_position(Vector3(box.get_center().x, box.end.y + 0.15, box.get_center().z) if box.size != Vector3.ZERO else at + Vector3(0, 1.9, 0))
-	var size := _entry.get_combined_minimum_size()
-	var r := WorldAnchor.place(size, top - Vector2(0, UiTokens.SPACE_WITHIN), Rect2(Vector2.ZERO, rt.ui.root.size), UiTokens.SPACE_WITHIN, true)
-	# Never over the player: lifted clear of the body by 4, no higher than under the HUD (不知火舞 on #190).
-	r = WorldAnchor.lift_clear(r, actor.screen_box(cam), P0FarmMaterials.BODY_GAP, rt.ui.card_top())
-	_entry.size = size
-	_entry.position = r.position
-	_entry.point_at(top.x - r.position.x)
+	# Under the HUD, never over the player (不知火舞 on #190).
+	rt.ui.place_card(_entry, top, actor.screen_box(cam), P0FarmMaterials.BODY_GAP)
 
 ## The fee button: grey says why (LOCK-10), amber opens the Energy card for this floor, else the floor (2 Energy).
 func _on_card_pressed() -> void:

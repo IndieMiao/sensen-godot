@@ -1063,6 +1063,27 @@ func open_marker_area() -> Rect2:
 const CARD_UNDER_HUD := 8.0
 func card_top() -> float: return UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H + safe_top() + CARD_UNDER_HUD
 
+## A world card a tap opens — the mine mouth's, a mine floor's, a trap's EntryCard — placed as TapCard: its pointer's tip
+## SPACE_WITHIN over `point` and still on it, the card inside card_area(), lifted clear of the player's `body` by `gap`
+## (WorldAnchor.lift_clear, 不知火舞 on #190).
+func place_card(card: UiEntryCard, point: Vector2, body: Rect2, gap: float) -> void:
+	var size := card.get_combined_minimum_size()
+	var r := WorldAnchor.place(size, point - Vector2(0, UiTokens.SPACE_WITHIN), card_area(), UiTokens.SPACE_WITHIN, true)
+	r = WorldAnchor.lift_clear(r, body, gap, card_top())
+	card.size = size
+	card.position = r.position
+	card.point_at(point.x - r.position.x)
+
+## Where those cards may sit: the marker band as it is with the HUD and the quick bar in their places (open_marker_area),
+## its top at card_top(). The cards are passive (the world's p0_tap resolves their taps), so one over a HUD chip lost its
+## taps to the chip: on a short screen the mine mouth's four-row card rose over the location chip and `Continue run ·
+## Free` opened the map (李元芳, 0.2.1 smoke d83191bb). The whole screen only before the HUD has laid out.
+func card_area() -> Rect2:
+	var band := open_marker_area()
+	if not band.has_area(): return Rect2(Vector2.ZERO, root.size)
+	var top := card_top() - UiTokens.SPACE_WITHIN   # WorldAnchor.place keeps SPACE_WITHIN inside the area
+	return Rect2(band.position.x, top, band.size.x, maxf(0.0, band.end.y - top))
+
 ## Where world markers may sit (LOCK-07): below the two-row HUD and above the quick bar. A finger card is passive, so
 ## one lying under a HUD chip lost its tap to the chip (int5 hand test 8: the Homestead card slid under Energy and
 ## opened the Energy panel); a card clamps into this band instead, a badge outside it hides.

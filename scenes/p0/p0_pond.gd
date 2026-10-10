@@ -631,12 +631,7 @@ func _show_trap_card(v: Dictionary, mark: Vector2) -> void:
 	_trap_card.state = UiEntryCard.State.AVAILABLE if bool(main.enabled) else UiEntryCard.State.UNAVAILABLE
 	_trap_card.second = str(second.label)
 	_trap_card.second_state = UiEntryCard.State.AVAILABLE if bool(second.enabled) else UiEntryCard.State.UNAVAILABLE
-	var size := _trap_card.get_combined_minimum_size()
-	var r := WorldAnchor.place(size, mark - Vector2(0, UiTokens.SPACE_WITHIN), Rect2(Vector2.ZERO, rt.ui.root.size), UiTokens.SPACE_WITHIN, true)
-	r = WorldAnchor.lift_clear(r, actor.screen_box(cam), P0FarmMaterials.BODY_GAP, rt.ui.card_top())
-	_trap_card.size = size
-	_trap_card.position = r.position
-	_trap_card.point_at(mark.x - r.position.x)
+	rt.ui.place_card(_trap_card, mark, actor.screen_box(cam), P0FarmMaterials.BODY_GAP)
 
 ## A card button: grey says why (LOCK-10), else its command.
 func _press_trap(b: Dictionary) -> void:
