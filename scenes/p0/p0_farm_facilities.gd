@@ -12,8 +12,6 @@ const HEAD := Vector3(0, 0.55, 0)
 const SNAP_PX := 70.0           # a finger this close to a bed's centre on screen points at that bed
 const COVER_TINT := Color(0.55, 0.78, 0.95, 0.55)   # Coverage: light blue (q(59) §1.5)
 const BAD_TINT := Color(0.86, 0.36, 0.30, 0.65)
-const EDGE_PX := 48.0           # a finger this close to a screen edge pans the camera that way (不知火舞 on 241)
-const EDGE_SPEED := 6.0         # m/s at the very edge, less further in
 
 var farm: Node3D                # p0_farm.gd: bp, cam, actor
 var rt: P0Runtime
@@ -25,7 +23,7 @@ var _preview: Node3D
 var _cells: Array = []          # preview / highlight squares, reused
 var _overlay: Array = []        # Coverage Overlay outlines, reused
 var _highlight := -1            # a tapped sprinkler: its covered plots show until the card closes
-var _finger := Vector2.INF      # placement: where the finger holds (edge pan), INF when lifted
+var _finger := Vector2.INF      # placement: where the finger holds (the farm's edge pan), INF when lifted
 
 func setup(farm_node: Node3D) -> P0FarmFacilities:
 	farm = farm_node
@@ -190,28 +188,11 @@ func plot_at_screen(v: Dictionary, screen: Vector2) -> int:
 func _on_pan(px: Vector2, at: Vector2) -> void:
 	if not placing.is_empty(): farm.placement_drag(px, at)
 
-## A finger held within EDGE_PX of a screen edge pans the camera that way, faster nearer the edge (up to EDGE_SPEED);
-## the preview keeps snapping to the bed under the finger as the ground moves under it.
-func _edge_pan(v: Dictionary, dt: float) -> void:
-	if placing.is_empty() or _finger == Vector2.INF or dt <= 0.0: return
-	var size := farm.get_viewport().get_visible_rect().size
-	var bar := rt.ui.placement_bar_rect()
-	var bottom := bar.position.y if bar.has_area() else size.y
-	var push := Vector2(edge_push(_finger.x, 0.0, size.x), edge_push(_finger.y, 0.0, bottom))
-	if push == Vector2.ZERO: return
-	# Screen right / down as ground directions (the camera's own axes on the ground plane).
-	var right := (farm.cam as Camera3D).global_basis.x
-	var down := -(farm.cam as Camera3D).global_basis.y
-	right.y = 0.0
-	down.y = 0.0
-	farm.placement_pan((right.normalized() * push.x + down.normalized() * push.y) * EDGE_SPEED * dt)
-	_snap(_finger)
-
-## −1..1 toward the nearer edge of [lo, hi] for a finger within EDGE_PX of it, 0 elsewhere (0 at the band's inner side).
-static func edge_push(x: float, lo: float, hi: float) -> float:
-	if x < lo + EDGE_PX: return -clampf((lo + EDGE_PX - x) / EDGE_PX, 0.0, 1.0)
-	if x > hi - EDGE_PX: return clampf((x - (hi - EDGE_PX)) / EDGE_PX, 0.0, 1.0)
-	return 0.0
+## A finger held at a screen edge pans the camera (the farm's placement_edge); the preview keeps snapping to the bed
+## under the finger as the ground moves under it.
+func _edge_pan(_v: Dictionary, dt: float) -> void:
+	if placing.is_empty(): return
+	if farm.placement_edge(_finger, dt): _snap(_finger)
 
 func _show_spot(v: Dictionary, id: int) -> void:
 	var reason := spot_reason(v, id, int(placing.facility))
