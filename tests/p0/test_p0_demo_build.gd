@@ -29,25 +29,29 @@ func test_the_demo_preset_asks_for_internet_and_vibrate() -> void:
 	assert_bool(bool(cfg.get_value(section + ".options", "permissions/vibrate", false))).is_true()
 
 ## Settings › Legal › Licenses (q(129)): licenses.json and every text a row opens are plain files, which the export
-## takes only through the demo preset's include_filter; one left out reads blank on the phone (a QA export, 10-11).
-## The build script checks the APK as well (build.json legal_ok).
-func test_the_demo_preset_ships_every_license_text() -> void:
+## takes only through the preset's include_filter; one left out reads blank on the phone (a QA export from the Journey
+## "Android" preset, 10-11). Every preset that builds P0 (custom feature p0: Android P0 today, an iOS one later) must
+## ship them; the Journey presets do not build P0 and are not checked. The build script checks the APK too (legal_ok).
+func test_every_p0_preset_ships_every_license_text() -> void:
 	var cfg := ConfigFile.new()
 	assert_int(cfg.load("res://export_presets.cfg")).is_equal(OK)
-	var filters: Array[String] = []
-	for s in cfg.get_sections():
-		if str(cfg.get_value(s, "name", "")) == "Android P0":
-			for f in str(cfg.get_value(s, "include_filter", "")).split(","):
-				if f.strip_edges() != "": filters.append(f.strip_edges())
-	assert_array(filters).is_not_empty()
 	var files: Array[String] = [P0Legal.DATA]
 	for g in P0Legal.groups():
 		for r in g.get("rows", []):
 			var t := str(r.get("text", ""))
 			if t.begins_with("res://"): files.append(t)
 	assert_int(files.size()).is_greater(1)
-	for path in files:
-		assert_bool(FileAccess.file_exists(path)).override_failure_message("%s is not in the repository" % path).is_true()
-		var rel := path.trim_prefix("res://")
-		var shipped := filters.any(func(f: String) -> bool: return rel.matchn(f.trim_prefix("res://")) or rel.get_file().matchn(f))
-		assert_bool(shipped).override_failure_message("%s is not in the Android P0 include_filter" % rel).is_true()
+	var p0_presets := 0
+	for s in cfg.get_sections():
+		if s.ends_with(".options") or not ("p0" in str(cfg.get_value(s, "custom_features", "")).split(",")): continue
+		p0_presets += 1
+		var name := str(cfg.get_value(s, "name", s))
+		var filters: Array[String] = []
+		for f in str(cfg.get_value(s, "include_filter", "")).split(","):
+			if f.strip_edges() != "": filters.append(f.strip_edges())
+		for path in files:
+			assert_bool(FileAccess.file_exists(path)).override_failure_message("%s is not in the repository" % path).is_true()
+			var rel := path.trim_prefix("res://")
+			var shipped := filters.any(func(f: String) -> bool: return rel.matchn(f.trim_prefix("res://")) or rel.get_file().matchn(f))
+			assert_bool(shipped).override_failure_message("%s is not in the %s include_filter" % [rel, name]).is_true()
+	assert_int(p0_presets).is_greater_equal(1)
