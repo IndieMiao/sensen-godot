@@ -11,8 +11,9 @@ extends Control
 ## finger lifts, so the owner can repeat while it is held. On touchscreens it reads ScreenTouch of any finger
 ## (the right thumb is often the second finger, which Godot does not emulate as a mouse); on desktop the mouse.
 ## Zero-Energy actions carry no price (LOCK-02 "0 体力的动作不写价"): pass "" as `cost`. With no second line the verb
-## sits in the middle of the key; a verb wider than VERB_ALONE_MAX breaks at a space onto two centred lines at its own
-## size (`Light` / `Torch`; q(122), 不知火舞 on #264, the frames of row 67).
+## sits in the middle of the key; a verb wider than VERB_ALONE_MAX breaks between two words onto two centred lines at
+## its own size (`Light` / `Torch`; q(122), 不知火舞 on #264, the frames of row 67). A count `×N` stays with the word
+## before it (`Harvest ×5` is one line); a verb that cannot break and is too wide steps its font down as any copy.
 ## Both lines keep the full copy: text wider than the 80 px box steps its font size down (to _MIN_FONT) instead of
 ## being clipped or ellipsised ("Need 2 Energy", "Ready in 3h 59m").
 
@@ -95,6 +96,7 @@ func _text(style: StringName, top: float, h: float) -> Label:
 func _refresh() -> void:
 	if _verb == null: return
 	var s := drawn_state()
+	_verb.remove_theme_font_size_override(&"font_size")   # measured at its own size, not a step an earlier copy took (苏烈 on #264)
 	_verb.text = _verb_lines()
 	_cost.text = cost
 	_cost.visible = cost != ""
@@ -107,8 +109,8 @@ func _refresh() -> void:
 	modulate.a = UiTokens.OPACITY_SCENE_ACTION_PENDING if s == State.PENDING else 1.0
 	queue_redraw()
 
-## The verb as drawn: alone on the key and wider than VERB_ALONE_MAX, broken at the space that leaves the narrower
-## longest line (`Light\nTorch`); otherwise as it is. Needs the theme's font (in the tree).
+## The verb as drawn: alone on the key and wider than VERB_ALONE_MAX, broken between two words where the longer line is
+## shortest (`Light\nTorch`); never before a count `×N`; otherwise as it is. Needs the theme's font (in the tree).
 func _verb_lines() -> String:
 	if cost != "" or not verb.contains(" ") or not _verb.is_inside_tree(): return verb
 	var font := _verb.get_theme_font(&"font")
@@ -119,6 +121,7 @@ func _verb_lines() -> String:
 	var best := verb
 	var widest := INF
 	for i in range(1, words.size()):
+		if words[i].begins_with("×"): continue   # `Harvest ×5`: the count keeps to its word
 		var a := " ".join(words.slice(0, i))
 		var b := " ".join(words.slice(i))
 		var m := maxf(float(w.call(a)), float(w.call(b)))

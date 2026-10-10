@@ -56,11 +56,24 @@ func test_a_verb_alone_sits_in_the_middle_and_breaks_at_a_space() -> void:
 	assert_bool(k._verb.has_theme_font_size_override(&"font_size")).is_false()   # not shrunk
 	k.verb = "Set Trap"   # fits on one line
 	assert_str(k._verb.text).is_equal("Set Trap")
+	# a count keeps to its word (不知火舞 on #264): Harvest ×5 is one line at its size; Harvest ×10 steps its font down
+	k.verb = "Harvest ×5"
+	assert_str(k._verb.text).is_equal("Harvest ×5")
+	assert_bool(k._verb.has_theme_font_size_override(&"font_size")).is_false()
+	assert_float(k._verb.get_rect().get_center().y).is_equal_approx(mid, 0.5)
+	k.verb = "Harvest ×10"
+	assert_str(k._verb.text).is_equal("Harvest ×10")
 	# with a second line the verb keeps its place over it and is never broken
 	k.verb = "Light Torch"
 	k.cost = "2 Energy"
 	assert_str(k._verb.text).is_equal("Light Torch")
 	assert_float(k._verb.offset_top).is_equal(UiSceneAction._VERB_TOP)
+	# a verb shrunk to fit over a second line, which then goes: broken at its own size, not the shrunk one
+	k.verb = "Harvest the field"
+	assert_bool(k._verb.has_theme_font_size_override(&"font_size")).is_true()
+	k.cost = ""
+	assert_int(k._verb.get_line_count()).is_equal(2)
+	assert_bool(k._verb.has_theme_font_size_override(&"font_size")).is_false()
 
 func test_long_copy_steps_its_font_down_instead_of_clipping() -> void:
 	var k := _host(UiSceneAction.new()) as UiSceneAction
