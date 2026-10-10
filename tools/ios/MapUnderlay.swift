@@ -184,7 +184,11 @@ class MapUnderlay: NSObject {
             queryCityPois(requestId: p[1])
         case "TELEM" where p.count >= 2:
             // The SDK reads this key (EventsManager) and passes it on to Mapbox Common's telemetry; it keeps the choice.
-            UserDefaults.standard.set(p[1] != "0", forKey: "MGLMapboxMetricsEnabled")
+            // Sent again with LANG's repeats: only a change is written.
+            let on = p[1] != "0"
+            if UserDefaults.standard.object(forKey: "MGLMapboxMetricsEnabled") as? Bool != on {
+                UserDefaults.standard.set(on, forKey: "MGLMapboxMetricsEnabled")
+            }
         default:
             NSLog("[MapUnderlay] unknown command: \(p.first ?? "")")
         }

@@ -1602,19 +1602,23 @@ func end_stick() -> void:
 func has_modal() -> bool: return _modal != null or (_radial != null and _radial.is_open())
 
 ## The top (UI px) of the card open over the world, for what keeps above it (the map's credit line, q(133) v3): INF
-## with none, 0 for a page that covers the world (a page or drawer that takes the touch over the whole screen).
+## with none, 0 for a page that covers the world. Only what stands on the screen's bottom edge counts: a page, a drawer
+## or a card's panel (its × over it does not, nor a moment or banner shown mid-screen, 周瑜 on #309).
 func modal_top() -> float:
 	if _modal == null or not is_instance_valid(_modal) or _modal.get_child_count() == 0: return INF
 	var content := _modal.get_child(_modal.get_child_count() - 1) as Control
 	if content == null: return INF
-	if content.mouse_filter == Control.MOUSE_FILTER_STOP: return content.get_global_rect().position.y
+	var screen := root.get_viewport_rect().size
+	var low := func(r: Rect2) -> bool: return r.end.y >= screen.y - 2.0 and r.size.x >= screen.x * 0.5
+	if content.mouse_filter == Control.MOUSE_FILTER_STOP:
+		var r := content.get_global_rect()
+		return r.position.y if low.call(r) else INF
 	var top := INF
-	var wide := root.get_viewport_rect().size.x * 0.5
-	for c in content.get_children():   # a card: a holder over the whole screen, its panel low in it (its × over it is not)
+	for c in content.get_children():   # a card: a holder over the whole screen, its panel low in it
 		if not (c is Control) or not (c as Control).visible or (c as Control).mouse_filter != Control.MOUSE_FILTER_STOP: continue
 		var r := (c as Control).get_global_rect()
-		if r.size.x >= wide: top = minf(top, r.position.y)
-	return top if top < INF else 0.0
+		if low.call(r): top = minf(top, r.position.y)
+	return top
 
 ## Who speaks in the open modal (NPC-G1, #57): "keeper" under a keeper's greeting card, the resident's id under their
 ## dialogue bar, "" under anything else. Read from the modal itself, so a bar reached any way counts — a dish card's

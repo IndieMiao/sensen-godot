@@ -82,3 +82,34 @@ func test_the_floor_is_the_cards_panel_not_its_close_key() -> void:
 	for b in holder.find_children("*", "Button", false, false):   # the × sits over the card: not the floor
 		if (b as Control).size.x < 60.0: assert_float((b as Control).get_global_rect().position.y).is_less(ui.modal_top())
 	ui.close_modal()
+
+## 周瑜 on #309: only what stands on the screen's bottom edge is a floor — a moment or banner shown mid-screen as the
+## modal is none (the line stays down), a page over the whole screen hides it.
+func test_only_a_card_on_the_bottom_edge_is_a_floor() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var ui: P0Ui = m.rt.ui
+	var mid := Control.new()   # a reward moment over the middle of the screen
+	mid.mouse_filter = Control.MOUSE_FILTER_STOP
+	mid.position = Vector2(40, 300)
+	mid.size = Vector2(280, 160)
+	ui._open_modal(mid)
+	await get_tree().process_frame
+	assert_float(ui.modal_top()).is_equal(INF)
+	var page := Control.new()   # a page over the whole screen
+	page.mouse_filter = Control.MOUSE_FILTER_STOP
+	page.set_anchors_preset(Control.PRESET_FULL_RECT)
+	ui._open_modal(page)
+	await get_tree().process_frame
+	assert_float(ui.modal_top()).is_equal(0.0)
+	ui.close_modal()
+
+## iOS: the switch's TELEM line follows the saved choice (MapBridgeIOS sends it again once the map is up).
+func test_the_telem_line_follows_the_saved_choice() -> void:
+	var was := MapUsage.saved()
+	MapUsage.set_enabled(false)
+	assert_str(MapUsage.telem_packet()).is_equal("TELEM|0")
+	MapUsage.set_enabled(true)
+	assert_str(MapUsage.telem_packet()).is_equal("TELEM|1")
+	MapUsage.set_enabled(was)
