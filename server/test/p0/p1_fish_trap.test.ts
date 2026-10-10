@@ -209,3 +209,47 @@ describe('Fish-dex milestones (§6.9.2)', () => {
     expect(all.ev).toContainEqual(expect.objectContaining({ kind: 'milestone', id: 'fishdex_20', coins: 300, title: 'Fish-dex complete' }));
   });
 });
+
+describe('a kind first got from a trap (q(124) ①: `In your trap!`)', () => {
+  const SF = 'gn-5391959';
+  const withFish = (fish: string[], firsts: string[] = []) => {
+    let s = buy(fresh(5));
+    s = step(s, { type: 'set_trap', ...at(FERN) }).s;
+    settleTrap(c, s, s.traps![0], T0 + 24 * H);
+    s.traps![0].fish = fish;
+    s.firsts = [...firsts];
+    return s;
+  };
+  const firsts = (ev: P0Event[]) => ev.filter(e => e.kind === 'first').map(e => (e as { what: string; xp: number }).what);
+
+  it('gets the catch\'s one-time firsts — First catch! by rarity, the city\'s first, a first Fine\'s Energy — not the rod\'s first landed', () => {
+    const r = step(withFish(['fish_crucian', 'fish_perch', 'fish_crucian']), { type: 'collect_trap', ...at(FERN) }, T0 + 24 * H);
+    expect(firsts(r.ev)).toEqual(['catch:fish_crucian', `fishing_city:${SF}`, 'catch:fish_perch']);
+    expect(r.ev).toContainEqual(expect.objectContaining({ kind: 'first', what: 'catch:fish_crucian', xp: c.fishing.first_xp[0] }));
+    expect(r.ev).toContainEqual(expect.objectContaining({ kind: 'first', what: 'catch:fish_perch', xp: c.fishing.first_xp[1] }));
+    expect(r.ev).toContainEqual(expect.objectContaining({ kind: 'first', what: `fishing_city:${SF}`, xp: c.fishing.first_city_xp, name: 'San Francisco' }));
+    expect(r.ev).toContainEqual(expect.objectContaining({ kind: 'reward', id: 'first_fish_2', energy: c.rewards.first_fish[1] }));
+    expect(r.s.firsts).not.toContain('landed');
+    // each first's XP comes right after it (the client tells a first's bonus from the trap's own XP by that)
+    for (const [i, e] of r.ev.entries()) if (e.kind === 'first') expect(r.ev[i + 1]).toMatchObject({ kind: 'xp', skill: 'fishing', amount: (e as { xp: number }).xp });
+    // the trap's own XP is still half the catch XP per fish (§6.8): three events besides the firsts' (zero ones skipped or not)
+    const own = r.ev.filter((e, i) => e.kind === 'xp' && r.ev[i - 1]?.kind !== 'first');
+    expect(own.length).toBe(3);
+  });
+
+  it('once, whichever comes first: a kind a rod caught gets nothing again from a trap, and the other way round', () => {
+    const rodFirst = step(withFish(['fish_carp'], ['catch:fish_carp', `fishing_city:${SF}`]), { type: 'collect_trap', ...at(FERN) }, T0 + 24 * H);
+    expect(firsts(rodFirst.ev)).toEqual([]);
+    expect(rodFirst.ev.filter(e => e.kind === 'reward' && String((e as { id: string }).id).startsWith('first_fish_'))).toEqual([]);
+    // the trap's first carp, then a carp on the rod: no second First catch!
+    let s = step(withFish(['fish_carp']), { type: 'collect_trap', ...at(FERN) }, T0 + 24 * H).s;
+    s.energy.value = 100;
+    const now = T0 + 25 * H;
+    s = step(s, { type: 'cast', ...at(FERN) }, now).s;
+    s.cast!.breaks = null;
+    s.cast!.fish = 'fish_carp';
+    const reel = step(s, { type: 'reel', outcome: 'landed', ...at(FERN) }, s.cast!.at + s.cast!.bite_ms + 1);
+    expect(reel.ev).toContainEqual(expect.objectContaining({ kind: 'catch', fish: 'fish_carp', result: 'landed' }));
+    expect(firsts(reel.ev)).toEqual(['landed']);   // the rod's own first landed fish, nothing the trap already gave
+  });
+});

@@ -109,24 +109,33 @@ export function reelLine(c: P0Content, s: P0State, cmd: { outcome?: string }, no
     events.push({ kind: 'item', id: fish.id, delta: 1 });
     events.push({ kind: 'catch', fish: fish.id, rarity: fish.rarity, result: 'landed', refund: 0 });
     gainXp(c, s, now, 'fishing', scaledXp(s, c.fishing.catch_xp[fish.rarity - 1], cast.xp_pct), cast.xp_pct, events);
-    // q(37): the first catch in a city counts the site's city from the server's table, never a city the client names.
-    // v5: keyed by the place's city cluster (fishing_city:gn-5391959); the event names the city for the client.
-    const city = cast.place ? clusterOf(c, cast.place) ?? '' : '';
-    const cityName = clusterById(c, city)?.name || (city === homeCluster(c) ? c.profile.city : '');
-    for (const [key, xp] of [[`catch:${fish.id}`, c.fishing.first_xp[fish.rarity - 1]], ['landed', c.fishing.first_landed_xp],
-      [`fishing_city:${city}`, city ? c.fishing.first_city_xp : 0]] as const) {
-      if (xp <= 0) continue;
-      if (s.firsts.includes(key)) continue;
-      s.firsts.push(key);
-      firstXp(c, s, now, 'fishing', key, xp, events, key.startsWith('fishing_city:') ? cityName : undefined);
-    }
-    grantOnce(c, s, now, `first_fish_${fish.rarity}`, c.rewards.first_fish[fish.rarity - 1] ?? 0, events);
+    firstCatch(c, s, now, fish, cast.place, events, true);
     noteFishdex(c, s, now, events);
     return null;
   }
   if (!['cancel', 'escaped', 'landed'].includes(outcome)) return { code: 'bad_outcome' };
   settleFailure(c, s, now, events, outcome === 'landed' ? 'broke_free' : 'escaped');
   return null;
+}
+
+/**
+ * A fish's one-time firsts, each given once on whichever comes first, a rod's catch or a Fish Trap's (q(124) ①: the
+ * reward is never smaller nor given twice because the fish came from a trap): `First catch!` of its kind (first_xp by
+ * rarity), the first catch in a city and the first Fine / Rare fish's Energy. The first fish ever landed is a rod's
+ * (`rod`). q(37): the city is the place's cluster from the server's table, never a city the client names; v5 keys it
+ * by cluster (fishing_city:gn-5391959) and the event names the city for the client.
+ */
+export function firstCatch(c: P0Content, s: P0State, now: number, fish: Fish, place: string | undefined, events: P0Event[], rod: boolean): void {
+  const city = place ? clusterOf(c, place) ?? '' : '';
+  const cityName = clusterById(c, city)?.name || (city === homeCluster(c) ? c.profile.city : '');
+  for (const [key, xp] of [[`catch:${fish.id}`, c.fishing.first_xp[fish.rarity - 1]], ['landed', rod ? c.fishing.first_landed_xp : 0],
+    [`fishing_city:${city}`, city ? c.fishing.first_city_xp : 0]] as const) {
+    if (xp <= 0) continue;
+    if (s.firsts.includes(key)) continue;
+    s.firsts.push(key);
+    firstXp(c, s, now, 'fishing', key, xp, events, key.startsWith('fishing_city:') ? cityName : undefined);
+  }
+  grantOnce(c, s, now, `first_fish_${fish.rarity}`, c.rewards.first_fish[fish.rarity - 1] ?? 0, events);
 }
 
 /**
