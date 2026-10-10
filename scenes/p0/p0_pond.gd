@@ -54,6 +54,11 @@ var _trap_walk := false
 var _trap_card: UiEntryCard
 var _trap_data: Dictionary = {}
 var _trap_open := false
+## Collect (不知火舞 on 289 b3a79614): the card goes at once and the trap's strip hides while the collect plays (about
+## 1.4 s: the cage up, the fish to the creel, the float), then comes back as `Fish Trap · 0/3`. The cage and fish
+## animation follows 安其拉's frames when they pass; the card and the strip are settled.
+const COLLECT_HIDE_MS := 1400
+var _trap_hidden_until := 0
 var _hint_req := ""     # the request this pond's ! is for (q(103)): its progress floats and its completion toast
 var _hint_have := -1    # that request's count before the next catch
 
@@ -597,7 +602,7 @@ func _trap_frame(v: Dictionary) -> void:
 	var p := P0Trap.prompt(v, p0_place())
 	var mark := cam.unproject_position(_trap_float.position + Vector3(0, 0.6, 0))
 	var status := UiStatusBadge.State.READY if bool(p.ready) else -1
-	var show := not rt.ui.has_modal() and not _trap_open
+	var show := not rt.ui.has_modal() and not _trap_open and not collecting_trap()
 	if show and _near_trap():
 		rt.ui.name_bar(TRAP_ID, P0Logic.icon(TRAP_ID), str(p.text), str(p.fact), mark, true, -1, false, status, mark)
 	else:
@@ -663,7 +668,14 @@ func _press_trap(b: Dictionary) -> void:
 	if not bool(b.get("enabled", false)):
 		if str(b.get("toast", "")) != "": rt.ui.toast(str(b.toast))
 		return
-	p0_action(b.get("cmd", {}))
+	var cmd: Dictionary = b.get("cmd", {})
+	if str(cmd.get("type", "")) == "collect_trap" and not bool(cmd.get("take_back", false)):
+		_close_trap_card()
+		_trap_hidden_until = Time.get_ticks_msec() + COLLECT_HIDE_MS
+	p0_action(cmd)
+
+## The collect playing (COLLECT_HIDE_MS after Collect): the trap shows no strip or button.
+func collecting_trap() -> bool: return Time.get_ticks_msec() < _trap_hidden_until
 
 func _close_trap_card() -> void:
 	_trap_open = false
