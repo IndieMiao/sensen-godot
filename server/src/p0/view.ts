@@ -18,7 +18,8 @@ import { haveTotal, stored } from './storage.js';
 import { mineView, settleMine } from './mine.js';
 import { gatherView } from './gathering.js';
 import { workbenchView } from './workbench.js';
-import { coveredPlots, facilitiesView, facilityAt, plotCount } from './garden.js';
+import { coveredPlots, cropGrowH, facilitiesView, facilityAt, plotCount } from './garden.js';
+import { homeClimate } from './travel.js';
 import { restReadyIn } from './presence.js';
 import { inboxView, settleParcels } from './parcels.js';
 import { cookbookView, masteredCount } from './cookbook.js';
@@ -183,7 +184,9 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
       ...Object.entries(c.materials).map(([id, m]) => [id, m.name]), ...Object.entries(c.drinks.items).map(([id, d]) => [id, d.name]),
       ...Object.entries(c.specialty).map(([id, sp]) => [id, sp.name]), ...c.bag_upgrades.map(u => [u.id, u.name]),
       ...Object.entries(c.supplies).map(([id, x]) => [id, x.name])]),
-    crops: c.crops.map(crop => ({ id: crop.id, seed: crop.seed, energy: crop.energy, grow_h: crop.grow_h, level: crop.level })),
+    // grow_h is this farm's: a regional crop away from its zone ripens in off_zone_grow_h (§5.2.3, `native` false).
+    crops: c.crops.map(crop => ({ id: crop.id, seed: crop.seed, energy: crop.energy, grow_h: cropGrowH(c, s, crop), level: crop.level,
+      ...(crop.regional ? { zone: crop.zone, native: crop.zone === homeClimate(c, s) } : {}) })),
     firsts: s.firsts,
     req_done: s.req_done,   // requests handed in (newest last, ≤ 20): the first session's Deliver row ticks on Pond Catch (q(58))
   };
@@ -287,7 +290,7 @@ function quotaView(c: P0Content, s: P0State, q: QuotaId, now: number) {
 /** One counter (§9.11): what it sells with every gate as a fact, and which kinds it buys back at what rate / quota. */
 function shopView(c: P0Content, s: P0State, shop: ShopId) {
   return {
-    buy: catalog(c, shop).map(id => {
+    buy: catalog(c, shop, s).map(id => {
       const o = offerOf(c, id)!;
       const unlocked = !o.skill || skillLevel(c, s, o.skill) >= o.gate;
       return {
@@ -296,7 +299,7 @@ function shopView(c: P0Content, s: P0State, shop: ShopId) {
         xp_to_go: o.skill ? Math.max(0, c.skills[o.skill][o.gate - 1] - s.skills[o.skill]) : 0,
         homestead: o.homestead ?? null, homestead_ok: !o.homestead || s.homestead.level >= o.homestead,
         once: o.once, owned: o.once && owns(c, s, id),
-        left: o.daily ? Math.max(0, o.daily - (s.day.bought[id] ?? 0)) : null,
+        left: o.daily ? Math.max(0, o.daily - (s.day.bought[id] ?? 0)) : null, daily: o.daily || null,
         materials: (o.materials ?? []).map(([m, n]) => ({ id: m, name: itemName(c, m), need: n, have: haveTotal(s, m) })),
         in_bag: count(s.bag, id),
       };

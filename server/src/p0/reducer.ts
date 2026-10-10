@@ -15,7 +15,7 @@ import { notePresence, restReadyIn } from './presence.js';
 import { isMineCommand, mineCommand, settleMine, type MineCommand } from './mine.js';
 import { gather, storeMaterials } from './gathering.js';
 import { craft } from './workbench.js';
-import { coveredPlots, facilityAt, growMs, moveFacility, place } from './garden.js';
+import { coveredPlots, cropGrowH, facilityAt, growMs, moveFacility, place } from './garden.js';
 import { claimParcel, PARCEL_LIMIT, settleParcels } from './parcels.js';
 import { dayKey, maxEnergy, scaledXp, settleEnergy, skillLevel, xpPercent } from './rules.js';
 import { buyback, buyItem, drink, moveStorage, offerOf, sellItem, setLock } from './shops.js';
@@ -110,7 +110,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
     const f = Number.isInteger(id) ? facilityAt(s, id as number) : undefined;
     return f ? fail('plot_occupied', { plot: id, facility: f.kind }) : null;
   };
-  const growH = (crop: string) => cropById(c, crop)?.grow_h ?? 0;
+  const growH = (crop: string) => { const x = cropById(c, crop); return x ? cropGrowH(c, s, x) : 0; };
 
   switch (cmd.type) {
     case 'till': {
@@ -150,7 +150,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
         plot.xp_pct = pct;
         delete plot.ready_at; delete plot.fert;
         // §5.7: under a sprinkler it grows as it is sown (−15%, locked now), no Water step.
-        if (watered.has(plot.id)) { plot.state = 'growing'; plot.ready_at = now + growMs(c, s, plot, crop.grow_h); }
+        if (watered.has(plot.id)) { plot.state = 'growing'; plot.ready_at = now + growMs(c, s, plot, cropGrowH(c, s, crop)); }
       }
       break;
     }
@@ -170,7 +170,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       events.push({ kind: 'item', id: item, delta: -1 });
       plot.fert = true;
       if (plot.state === 'growing') {
-        const grow = cropById(c, plot.crop)!.grow_h * 3_600_000;
+        const grow = cropGrowH(c, s, cropById(c, plot.crop)!) * 3_600_000;
         plot.ready_at = Math.max(now, plot.ready_at! - Math.round(grow * (1 - fert.grow_mult)));
       }
       break;
@@ -183,7 +183,7 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       if (plot.state !== 'sown' || !plot.crop) return fail('wrong_state', { state: plot.state });
       const crop = cropById(c, plot.crop)!;
       plot.state = 'growing';
-      plot.ready_at = now + growMs(c, s, plot, crop.grow_h);
+      plot.ready_at = now + growMs(c, s, plot, cropGrowH(c, s, crop));
       break;
     }
     case 'harvest': {

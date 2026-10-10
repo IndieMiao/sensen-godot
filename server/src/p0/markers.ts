@@ -43,7 +43,7 @@ const residentHome = (c: P0Content, id: string) => c.outposts?.find(o => o.resid
 export function newKeysAt(c: P0Content, s: P0State, o: OutpostDef): { key: string; item?: string; resident?: string }[] {
   const out: { key: string; item?: string; resident?: string }[] = [];
   if (o.role === 'tackle' || o.role === 'market') {
-    for (const id of catalog(c, o.role as ShopId)) {
+    for (const id of catalog(c, o.role as ShopId, s, o.id)) {
       const offer = offerOf(c, id);
       if (!offer?.skill || offer.gate < 2 || skillLevel(c, s, offer.skill) < offer.gate) continue;
       if (offer.once && owns(c, s, id)) continue;
