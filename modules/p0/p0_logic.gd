@@ -1561,8 +1561,43 @@ const P1_UNLOCKS := {
 	"stall_upgrade": {"icon": "board", "text": "Homestead Stall upgraded", "note": "new look"},
 }
 
-## The farmhouse look each level brings (§8.3.1 stages 2–4), shown as HOME-1's look line.
-const LOOKS := {"porch": "Porch", "kitchen_extension": "Kitchen extension", "master_farmhouse": "Master farmhouse"}
+## Homestead looks (§8.3.1, LOOK-PICK, SGODOT-282): content homestead.looks, one stage per look level, its id the
+## level's unlock id — {id, level, name, a, b}, a timber and b stone (q(112)). HOME-1's icon per stage (Figma 2201:33545).
+const LOOK_ICONS := {"fence": "mailbox", "porch": "door", "kitchen_extension": "kitchen", "master_farmhouse": "home"}
+## What changes' look row (q(115) ①): `Porch · Timber or Stone` with this note (q(117): `pick when you upgrade` ran past
+## the row at the frame's size).
+const LOOK_NOTE := "pick one"
+const MAX_LEVEL_LINE := "Max level · Homestead Master"   # Lv10's HOME-1, under the title (q(115) ②)
+
+static func look_stages() -> Array:
+	return content().get("homestead", {}).get("looks", [])
+
+static func look_stage(id: String) -> Dictionary:
+	for l in look_stages(): if str(l.get("id", "")) == id: return l
+	return {}
+
+## The look picked on a stage, from the view (homestead.looks[].look): "a" / "b", or "" while the stage is not reached.
+static func look_of(view: Dictionary, id: String) -> String:
+	var h: Dictionary = view.get("homestead", {})
+	for l in h.get("looks", []):
+		if str(l.get("id", "")) == id: return str(l.look) if l.get("look", null) != null else ""
+	var stage := look_stage(id)   # an older view without looks: a once reached (q(24))
+	return "a" if not stage.is_empty() and int(h.get("level", 1)) >= int(stage.level) else ""
+
+## HOME-1's Looks section (e2d76a7c, Figma 2201:33545): a row per stage in level order. Reached: the stage name and the
+## look on it with › (`Porch` … `Stone Porch ›`), a tap opens LOOK-PICK — at home only, where the farmhouse is in view;
+## away it reads without ›. Not reached: grey, `Homestead Lv8`, no ›. Empty until the first stage (Lv3).
+## [{id, icon, name, value, reached, open}]
+static func look_rows(view: Dictionary, at_home := true) -> Array:
+	var out: Array = []
+	for l in look_stages():
+		var id := str(l.id)
+		var look := look_of(view, id)
+		var reached := look != ""
+		out.append({"id": id, "icon": str(LOOK_ICONS.get(id, "home")), "name": str(l.name), "reached": reached,
+			"open": reached and at_home,
+			"value": (str(l.get(look, "")) + (" ›" if at_home else "")) if reached else "Homestead Lv%d" % int(l.level)})
+	return out if out.any(func(r): return bool(r.reached)) else []
 
 ## HOME-1 (Figma 482:152, §8.6.1, LOCK-10) from view.homestead facts: title, the look line, NEED-TILEs in order
 ## materials → coins → skills, what changes, and the button (the first gap is written on it). Lv1–10 (P1, SGODOT-282).
@@ -1572,15 +1607,21 @@ static func home_panel(view: Dictionary, at_home := true) -> Dictionary:
 	var level := int(h.get("level", 1))
 	var next = h.get("next", null)
 	var out := {"title": "Homestead Lv%d" % level, "look": "", "tiles": [], "changes": [], "label": "Upgrade",
-		"reason": "", "tap": "", "footer": "Upgrading is free of Energy · fills Energy to the new max", "max": next == null}
+		"reason": "", "tap": "", "footer": "Upgrading is free of Energy · fills Energy to the new max", "max": next == null,
+		"subtitle": "", "button": true, "looks": look_rows(view, at_home)}
 	if next == null:
-		out.reason = "Highest level for now"
+		# Lv10 (q(115) ②): `Max level · Homestead Master` under the title and no Upgrade; P0's cap keeps its grey button.
+		if level >= 10:
+			out.subtitle = MAX_LEVEL_LINE
+			out.button = false
+		else:
+			out.reason = "Highest level for now"
 		return out
 	out.title = "Homestead Lv%d → Lv%d" % [level, int(next.level)]
 	var unlocks: Array = next.get("unlocks", [])
-	if unlocks.has("fence"): out.look = "Lv%d look · Full fence" % int(next.level)
-	for u in LOOKS:   # §8.3.1 looks at Lv5 / 8 / 10; the A / B choice comes with Decorate (SGODOT-282)
-		if unlocks.has(u): out.look = "Lv%d look · %s" % [int(next.level), LOOKS[u]]
+	for u in unlocks:   # §8.3.1 looks at Lv3 / 5 / 8 / 10 (q(115): `Lv5 look · Porch`, never Look A / B)
+		var stage := look_stage(str(u))
+		if not stage.is_empty(): out.look = "Lv%d look · %s" % [int(next.level), str(stage.name)]
 	for m in next.get("materials", []):
 		out.tiles.append({"id": str(m.id), "name": str(m.name), "have": int(m.have), "need": int(m.need), "icon": str(m.id)})
 	out.tiles.append({"id": "coins", "name": "Coins", "have": int(next.coins.have), "need": int(next.coins.need), "icon": "coin"})
@@ -1598,6 +1639,8 @@ static func home_panel(view: Dictionary, at_home := true) -> Dictionary:
 				out.changes.append({"icon": "bag", "text": "Bag Upgrade I for sale · 150 coins",
 					"note": "Bag %d → %d" % [int(view.get("bag", {}).get("capacity", 25)), int(view.get("bag", {}).get("capacity", 25)) + 5]})
 			"board_slot_3": out.changes.append({"icon": "board", "text": "Stall Board · 3rd slot", "note": "now %d" % board_now})
+			_ when not look_stage(str(u)).is_empty():   # q(115) ①: `Porch · Timber or Stone` · pick one
+				out.changes.append({"icon": str(LOOK_ICONS.get(str(u), "home")), "text": "%s · Timber or Stone" % str(look_stage(str(u)).name), "note": LOOK_NOTE})
 			_:
 				var line := P1_UNLOCKS.get(str(u), {}) as Dictionary
 				if not line.is_empty(): out.changes.append(line.duplicate())

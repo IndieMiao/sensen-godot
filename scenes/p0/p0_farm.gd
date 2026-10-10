@@ -11,6 +11,7 @@ const FarmArt = preload("res://modules/farm/farm_art.gd")
 const MineArt = preload("res://modules/mining/mine_art.gd")
 const GardenScenery = preload("res://scenes/p0/p0_garden_scenery.gd")
 const Fence = preload("res://scenes/p0/p0_fence.gd")
+const Looks = preload("res://scenes/p0/p0_looks.gd")
 const HomePanel = preload("res://scenes/p0/home/p0_home_panel.gd")
 const SIGN_BADGE := Vector3(0, 1.15, 0)   # the Homestead sign's mark, just above the board
 const SIGN_NEAR := 2.6                    # metres: the sign's and the plaque's finger cards show this close
@@ -67,6 +68,7 @@ var _front_cell := Vector2i(-1, -1)
 var _plot_sig := ""
 var _sync_t := 0.0
 var _fence: Node3D   # p0_fence.gd: front stretch always, the ring from Homestead Lv3
+var _looks: Node3D   # p0_looks.gd: Porch, Kitchen Wing and the Lv10 house by the view's looks
 var _sign := Vector3.ZERO   # Homestead sign right of the farmhouse door (WorldBadges · Farm 1135:79267): HOME-1
 var _plaque := Vector3.ZERO   # Upgrade Plaque left of the door (1510:97492), shown from the first upgrade: PLAQUE-READ
 var _plaque_node: Node3D
@@ -165,7 +167,8 @@ func _build_world() -> void:
 	var props := Node3D.new()
 	props.name = "Props"
 	add_child(props)
-	props.add_child(FarmProps.build("house", _house, 1.0, STYLE))
+	var house := FarmProps.build("house", _house, 1.0, STYLE)
+	props.add_child(house)
 	props.add_child(FarmProps.build("storage", bp.cell_to_world(bp.anchor("storage")), 1.0, STYLE))
 	props.add_child(FarmProps.build("well", bp.cell_to_world(bp.anchor("well")), 1.0, STYLE))
 	# The bench is two cells wide: its centre sits half a cell right of its anchor cell, facing the field (+z).
@@ -186,6 +189,9 @@ func _build_world() -> void:
 	add_child(_fence)
 	_fence.build(bp)
 	P0Garden.block_points(bp, P0Garden.fence_block_points(bp))   # the yard fence in front of the house collides
+	_looks = Looks.new()   # the Homestead looks beside and as the farmhouse (LOOK-PICK, SGODOT-282)
+	add_child(_looks)
+	_looks.build(bp, house, STYLE, _fence, P0Runtime.ensure().ui)   # before rt is set (_ready builds the world first)
 	# The Homestead sign: its own tap target beside the door, not the door (LOCK-11 / LOCK-07).
 	_sign = P0Garden.sign_point(bp)
 	props.add_child(FarmArt.instance("sign", _sign, 0.8))
@@ -465,6 +471,7 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 	rt.ui.player_screen = cam.unproject_position(actor.position + Vector3(0, 0.9, 0))   # the radial fans out from here
 	_sync_plots(v, dt)
 	_fence.sync(v)
+	_looks.sync(v)
 	if _facilities == null and bp != null and cam != null and actor != null:
 		_facilities = P0FarmFacilities.new().setup(self)
 		add_child(_facilities)
@@ -764,6 +771,22 @@ func p0_dev(step: PackedStringArray) -> bool:
 			var r: Rect2 = (e.main_rect() if step[0] == "cardtap" else e.second_rect() if step[0] == "cardnew" else e.third_rect()) if e != null else Rect2()
 			if e != null: p0_tap(r.get_center() - rt.ui.root.global_position)
 		"zoomto": _zoom = clampf(float(step[1]), 0.8, 1.4)   # zoomto:0.8 (widest) … 1.4 (closest)
+		# LOOK-PICK (SGODOT-282): lookpick:<stage>[:home] opens the card as after the level-up (or from HOME-1);
+		# lookpick-b / lookpick-a tap a card; lookuse presses Use; lookclose ✕; lookparts prints the stages' parts.
+		"lookpick": P0LookPick.open(rt.ui, step[1], not (step.size() > 2 and step[2] == "home"))
+		"lookpick-a", "lookpick-b":
+			var card := rt.ui.find_children("*", "P0LookPick", true, false)
+			if not card.is_empty(): (card[0] as P0LookPick).pick(step[0].right(1))
+		"lookuse", "lookclose":
+			var card := rt.ui.find_children("*", "P0LookPick", true, false)
+			if not card.is_empty():
+				if step[0] == "lookuse": (card[0] as P0LookPick).use()
+				else: (card[0] as P0LookPick).dismiss()
+		"lookparts":
+			var out := {"fence": _fence.look, "house": str(_looks._house.mesh.resource_path) if _looks._house.mesh else ""}
+			for st in _looks.STAGES: out[st] = [_looks.shown(st), (_looks.parts(st) as Array).map(func(n): return [str(n.name), cam.unproject_position((n as Node3D).global_position)])]
+			out["house_screen"] = cam.unproject_position(_house + Vector3(0, 1.0, 0))
+			print("P0_LOOKS ", out)
 		# P1 placement (SGODOT-241): build:<recipe> opens it as the Facilities card's Build does; placeat:<plot> moves
 		# the preview as a finger on that bed would; placeok / placecancel press the bar; placesecond:<label> shows its
 		# middle key, placereason:<text> / placeconfirm:<verb> set its reason and main key; factap:<id> taps a sprinkler.

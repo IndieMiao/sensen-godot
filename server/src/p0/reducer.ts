@@ -8,7 +8,7 @@ import { boardCommand, noteVisit, settleBoards, tracked } from './boards.js';
 import { moveDecor, placeDecor, storeDecor } from './decor.js';
 import { expireGiftMeals, giftResident, learn, noteSown, residentRequestCommand, talk } from './residents.js';
 import { castLine, reelLine, type FishCommand } from './fishing.js';
-import { upgradeHomestead } from './homestead.js';
+import { setLook, upgradeHomestead } from './homestead.js';
 import { takeFromCabinet } from './kitchen_storage.js';
 import { firstXp, energyDetail, gainXp, spendEnergy, type P0Event } from './progress.js';
 import { notePresence, restReadyIn } from './presence.js';
@@ -53,6 +53,7 @@ type P0CommandBody =
   | { type: 'cabinet_take'; item: string }   // Warming Cabinet `Take one` (§7.7)
   | { type: 'accept' | 'deliver' | 'drop'; request: string }
   | { type: 'homestead_upgrade' }
+  | { type: 'set_look'; stage: string; look: 'a' | 'b' }   // LOOK-PICK (SGODOT-282): a Homestead look stage, free
   | { type: 'place_decor'; item: string; x: number; y: number; rot?: number }   // Decorate (SGODOT-284)
   | { type: 'move_decor'; uid: number; x: number; y: number; rot?: number }
   | { type: 'store_decor'; uid: number }
@@ -274,6 +275,11 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
       if (refusal) return fail(refusal.code, refusal.detail);
       // q(46): the Spice Rack takes the bag's seasonings (Spice Rack · seasonings off your bag); from now on they are stored.
       if (c.homestead.levels.find(l => l.level === s.homestead.level)?.unlocks.includes('spice_rack')) storeMaterials(c, s, now, events, 'spice_rack');
+      break;
+    }
+    case 'set_look': {
+      const refusal = setLook(c, s, cmd, events);
+      if (refusal) return fail(refusal.code, refusal.detail);
       break;
     }
     case 'place': case 'move_facility': {

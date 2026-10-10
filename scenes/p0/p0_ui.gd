@@ -34,6 +34,9 @@ signal placement_secondary
 signal placement_pan(px: Vector2, at: Vector2)
 ## A field recipe's Build on the workbench (SGODOT-241): the world opens placement mode for it.
 signal placement_requested(recipe: String)
+## LOOK-PICK (SGODOT-282): a look tapped on the card shows on the real farmhouse — the farm swaps that stage's parts;
+## look "" ends the preview (the view's look again, once a set_look it was waiting for has landed).
+signal look_previewed(stage: String, look: String)
 
 const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
 const P0Travel := preload("res://modules/p0/p0_travel.gd")   # where the player is in the world (SGODOT-275)
