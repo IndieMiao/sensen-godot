@@ -1548,7 +1548,7 @@ const HOME_AWAY_TAP := "Upgrade at home · Going home is free"
 ## copy; SGODOT-282). Travel tiers, looks and room tiers are announced by their own lines, not here.
 const P1_UNLOCKS := {
 	"second_stove": {"icon": "kitchen", "text": "Second Stove", "note": "two dishes at once"},
-	"notice_board": {"icon": "board", "text": "Notice Board", "note": "by the farmhouse door"},
+	"notice_board": {"icon": "board", "text": "Notice Board", "note": "at the Homestead Stall"},   # §9: the stall's board (Figma HOME-1-LV5)
 	"big_pot": {"icon": "kitchen", "text": "Big Pot · Double", "note": "two portions, one round of heat"},
 	"bag_upgrade_2": {"icon": "bag", "text": "Bag Upgrade II for sale · 400 coins", "note": "Bag 30 → 35"},
 	"third_stove": {"icon": "kitchen", "text": "Third Stove", "note": "Warming Cabinet keeps 12"},

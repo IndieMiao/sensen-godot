@@ -43,6 +43,8 @@ func test_the_next_look_level_lists_its_stage_timber_or_stone() -> void:
 	var row: Dictionary = p.changes.filter(func(c): return str(c.text).ends_with("Timber or Stone"))[0]
 	assert_str("%s · %s" % [row.text, row.note]).is_equal("Porch · Timber or Stone · pick one")
 	assert_str(str(row.icon)).is_equal("door")
+	var board: Dictionary = p.changes.filter(func(c): return str(c.text) == "Notice Board")[0]
+	assert_str(str(board.note)).is_equal("at the Homestead Stall")   # §9, Figma HOME-1-LV5 (不知火舞 on #250)
 
 func test_a_reached_looks_row_opens_the_card_with_the_current_look() -> void:
 	var ui := _ui(_view(5, {"porch": "b"}))
