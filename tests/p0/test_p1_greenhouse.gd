@@ -95,3 +95,40 @@ func test_a_greenhouse_moved_over_its_own_plots_is_not_in_its_own_way() -> void:
 func test_the_greenhouse_strip_reads_its_cut() -> void:
 	var p := P0FarmFacilities.greenhouse_prompt({"id": 4.0, "kind": "greenhouse"})
 	assert_that([p.text, p.fact, p.button]).is_equal(["Greenhouse", "−25%", true])
+
+## SGODOT-294's model (#296 / #303): base, roof and glass on one origin at the block's middle, on the ground; the glass
+## on its own alpha-blended copy of the farm material (0.25, both faces, no shadow), the shared one left opaque; the
+## placement preview is the base alone.
+func test_the_greenhouse_is_the_294_model_with_its_own_glass() -> void:
+	var bp := P0Garden.blueprint()
+	var covers := [0.0, 1.0, 2.0, 3.0, 6.0, 7.0, 8.0, 9.0, 12.0, 13.0, 14.0, 15.0, 18.0, 19.0, 20.0, 21.0]
+	var gh: Node3D = auto_free(P0FarmFacilities.greenhouse_art(bp, covers))
+	assert_array(gh.get_children().map(func(n): return str(n.name))).is_equal(["GreenhouseBase", "GreenhouseRoof", "GreenhouseGlass"])
+	var mid := (bp.cell_to_world(P0Garden.cell_of(0)) + bp.cell_to_world(P0Garden.cell_of(21))) * 0.5
+	assert_vector(gh.position).is_equal_approx(Vector3(mid.x, 0.0, mid.z), Vector3.ONE * 0.001)
+	for n in gh.get_children(): assert_object((n as MeshInstance3D).mesh).is_not_null()
+	var glass := gh.get_child(2) as MeshInstance3D
+	var mat := glass.material_override as StandardMaterial3D
+	assert_object(mat).is_not_same(P0FarmFacilities.FarmArt.material())
+	assert_that([mat.transparency, mat.cull_mode, mat.albedo_color.a, glass.cast_shadow]).is_equal([
+		BaseMaterial3D.TRANSPARENCY_ALPHA, BaseMaterial3D.CULL_DISABLED, P0FarmFacilities.GLASS_ALPHA,
+		GeometryInstance3D.SHADOW_CASTING_SETTING_OFF])
+	assert_that([P0FarmFacilities.FarmArt.material().transparency, P0FarmFacilities.FarmArt.material().albedo_color.a]).is_equal(
+		[BaseMaterial3D.TRANSPARENCY_DISABLED, 1.0])   # the farm's shared material stays opaque
+	assert_object(gh.get_meta("glass")).is_same(mat)
+	var preview: Node3D = auto_free(P0FarmFacilities.greenhouse_art(bp, covers, false))
+	assert_array(preview.get_children().map(func(n): return str(n.name))).is_equal(["GreenhouseBase"])
+
+## Its four posts stand on the walkway crossings at the block's corners (±2.60 m, 不知火舞 on 294 c92e7e18): those cells
+## are walkable ground, no bed, and become solid; the beds under the glass stay walkable.
+func test_the_posts_take_the_four_walkway_crossings() -> void:
+	var bp := P0Garden.blueprint()
+	var covers := [0.0, 1.0, 2.0, 3.0, 6.0, 7.0, 8.0, 9.0, 12.0, 13.0, 14.0, 15.0, 18.0, 19.0, 20.0, 21.0]
+	var posts := P0FarmFacilities.post_cells(bp, covers)
+	assert_array(posts).contains_exactly_in_any_order([Vector2i(3, 2), Vector2i(11, 2), Vector2i(3, 10), Vector2i(11, 10)])
+	for c in posts:
+		assert_int(P0Garden.id_of(c)).is_equal(-1)
+		assert_bool(bp.is_walkable(c)).is_true()
+	# the block anchored on the right (plot 4: columns 4–7) keeps its posts on the field too
+	var right := [4.0, 5.0, 30.0, 31.0, 10.0, 11.0, 32.0, 33.0, 16.0, 17.0, 34.0, 35.0, 22.0, 23.0, 36.0, 37.0]
+	assert_array(P0FarmFacilities.post_cells(bp, right)).contains_exactly_in_any_order([Vector2i(11, 2), Vector2i(19, 2), Vector2i(11, 10), Vector2i(19, 10)])
