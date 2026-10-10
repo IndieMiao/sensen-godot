@@ -3,7 +3,7 @@
   "_note": "P0's ponds (SGODOT-270: P0 moves to San Francisco). The six San Francisco points Journey's server already serves, copied field for field from server/data/ponds/locations.json; assets/ponds/catalog.json stays frozen (its sha256 is Journey's catalog_revision). Both sides read this file: the client registers the entries with SystemPonds (server-only ponds on bundled templates), the server takes each fishing place's map point from it. Templates (Pond / River) are not here but on content.fishing.places (q(36): the template follows the point, not the shape).",
   "locations": [
     {
-      "id": "pond_san_francisco_01",
+      "id": "pond_san_francisco_01", "cluster": "gn-5391959",
       "region_id": "gn-5391959",
       "name": "Willow Pond",
       "kind": "pond",
@@ -17,7 +17,7 @@
       "enabled": true
     },
     {
-      "id": "pond_san_francisco_02",
+      "id": "pond_san_francisco_02", "cluster": "gn-5391959",
       "region_id": "gn-5391959",
       "name": "Clover Pond",
       "kind": "pond",
@@ -31,7 +31,7 @@
       "enabled": true
     },
     {
-      "id": "pond_san_francisco_03",
+      "id": "pond_san_francisco_03", "cluster": "gn-5391959",
       "region_id": "gn-5391959",
       "name": "Fern Pond",
       "kind": "pond",
@@ -45,7 +45,7 @@
       "enabled": true
     },
     {
-      "id": "pond_san_francisco_04",
+      "id": "pond_san_francisco_04", "cluster": "gn-5391959",
       "region_id": "gn-5391959",
       "name": "Pebble Pond",
       "kind": "pond",
@@ -59,7 +59,7 @@
       "enabled": true
     },
     {
-      "id": "pond_san_francisco_05",
+      "id": "pond_san_francisco_05", "cluster": "gn-5391959",
       "region_id": "gn-5391959",
       "name": "Reed Pond",
       "kind": "pond",
@@ -73,7 +73,7 @@
       "enabled": true
     },
     {
-      "id": "pond_san_francisco_06",
+      "id": "pond_san_francisco_06", "cluster": "gn-5391959",
       "region_id": "gn-5391959",
       "name": "Blossom Pond",
       "kind": "pond",
