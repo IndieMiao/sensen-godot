@@ -110,6 +110,20 @@ static func first_outpost(cluster: String, role := "market") -> Dictionary:
 	for o in outposts: if str(o.get("role", "")) == role: return o
 	return outposts[0] if not outposts.is_empty() else {}
 
+## The city's market square nearest to `at` (lat, lng), else its nearest outpost: the arrival card's "Nearby" outpost.
+static func nearest_outpost(cluster: String, at: Vector2, role := "market") -> Dictionary:
+	var best := {}
+	var best_km := INF
+	for pass_role in [role, ""]:
+		for o in city(cluster).get("outposts", []):
+			if pass_role != "" and str(o.get("role", "")) != pass_role: continue
+			var km: float = load("res://modules/p0/p0_clusters.gd").distance_km(at.x, at.y, float(o.lat), float(o.lng))
+			if km < best_km:
+				best_km = km
+				best = o
+		if not best.is_empty(): return best
+	return best
+
 ## Tests.
 static func clear() -> void:
 	for id in _ponds: SystemPonds._remote.erase(id)

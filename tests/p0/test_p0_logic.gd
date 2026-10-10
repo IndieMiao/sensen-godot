@@ -65,7 +65,7 @@ func test_main_action_follows_the_plot_in_front() -> void:
 	assert_str(str(P0Logic.main_action(v, {"id": 3, "state": "ready"}, "").verb)).is_equal("Harvest")
 	var growing := P0Logic.main_action(v, {"id": 3, "state": "growing", "ready_in": 4320000}, "seed_radish")
 	assert_bool(bool(growing.enabled)).is_false()
-	assert_str(str(growing.sub)).is_equal("Ready in 1h 12m")
+	assert_str(str(growing.sub)).is_equal("1h 12m")   # two units drop `Ready in` (≤ 80 px, 不知火舞 on 241)
 
 func test_short_energy_turns_amber_and_opens_the_card() -> void:
 	var v := _view()

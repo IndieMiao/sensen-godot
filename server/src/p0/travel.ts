@@ -28,7 +28,7 @@ const FIRST_VISIT_ENERGY = 10;
 const FIRST_VISITS_PER_DAY = 2;
 const EXPLORER: [number, number][] = [[3, 30], [10, 50], [30, 70], [100, 100]];
 
-type WithClusters = P0Content & { clusters?: CityClusters; landmarks?: Record<string, string> };
+type WithClusters = P0Content & { clusters?: CityClusters };
 
 /** The frozen city clusters (亚瑟's CityClusters, assets/p0/city_clusters.json), attached by loadP0Content. */
 const clusters = (c: P0Content) => (c as WithClusters).clusters;
@@ -104,13 +104,27 @@ export const covers = (s: P0State, cluster: string, now: number): boolean =>
   cluster === s.travel.home || (s.travel.passes[cluster]?.until ?? 0) > now;
 
 /** What the confirm panel needs (§11.8.2). Costs stay 0 in the first version; the fields are there for the paid one. */
-export function preview(c: P0Content, s: P0State, cluster: string) {
+export function preview(c: P0Content, s: P0State, cluster: string, now = Date.now()) {
   const cl = clusterById(c, cluster);
   const { km: d, trip, name: tripName } = tripOf(c, s, cluster);
   const info = cityInfo(c, cluster);
   return { cluster, name: cl?.name ?? '', country: cl?.country ?? '', km: d, trip, trip_name: tripName,
     cost: { energy: 0, coins: 0, item: null }, first_visit: !s.travel.visits[cluster],
+    climate: cl?.climate ?? '', utc_offset_min: utcOffsetMin(cl?.timezone, now),   // the silhouette card (MAP-3-FREE, §11.8.3)
     fishing: info.fish, counts: { ponds: info.ponds.length, outposts: info.outposts.length, residents: info.residents } };
+}
+
+/** A city's UTC offset in minutes now (the clients carry no tz database: they add it to their own clock for the card's
+ * "Local time 09:12"); null when the zone is unknown. */
+export function utcOffsetMin(zone: string | undefined, now: number): number | null {
+  if (!zone) return null;
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', { timeZone: zone, hourCycle: 'h23', year: 'numeric', month: 'numeric', day: 'numeric',
+      hour: 'numeric', minute: 'numeric', second: 'numeric' }).formatToParts(new Date(now));
+    const n = (t: string) => Number(parts.find(p => p.type === t)?.value ?? 0);
+    const local = Date.UTC(n('year'), n('month') - 1, n('day'), n('hour'), n('minute'), n('second'));
+    return Math.round((local - Math.floor(now / 1000) * 1000) / 60_000);
+  } catch { return null; }
 }
 
 /** A city's places for GET /v1/p0/city/:cluster and the silhouette card. Shell: home returns the hand-written tables;
@@ -139,7 +153,7 @@ export function requirePass(c: P0Content, s: P0State, space: unknown, place: unk
   if (kind !== 'cast' && s.presence.entered === place) return null;
   const expired = !!s.travel.passes[cluster];
   return { code: expired ? 'trip_expired' : 'pass_required',
-    detail: { message: expired ? 'Trip expired' : 'Pass required', preview: preview(c, s, cluster) } };
+    detail: { message: expired ? 'Trip expired' : 'Pass required', preview: preview(c, s, cluster, now) } };
 }
 
 /** Remember the place the player is in, once its pass has been checked (so a pass running out never kicks them). */
@@ -174,7 +188,7 @@ export function travel(c: P0Content, s: P0State, to: unknown, now: number, event
       on = new Date(Date.parse(`${on}T00:00:00Z`) + 86_400_000).toISOString().slice(0, 10);
       n = t.stamps.filter(x => x.counted_on === on).length;
     }
-    stamp = { cluster: to, kind: (c as WithClusters).landmarks?.[to] ? 'landmark' : 'climate', at: now, counted_on: on };
+    stamp = { cluster: to, kind: c.travel?.landmarks?.[to] ? 'landmark' : 'climate', at: now, counted_on: on };   // 表 11-18
     t.stamps.push(stamp);
     if (on === today) energy = gainEnergy(c, s, now, FIRST_VISIT_ENERGY, events, 'first_visit', maxEnergy(c, s) + c.rewards.max_over);
     settleExplorer(c, s, now, events);

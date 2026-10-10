@@ -6,7 +6,7 @@ import { applyP0, type P0Command, type P0Result } from '../../src/p0/reducer.js'
 import { registerP0Routes } from '../../src/p0/routes.js';
 import { freshState, type P0State } from '../../src/p0/state.js';
 import { P0Store } from '../../src/p0/store.js';
-import { noteEntered, requirePass, tripOf } from '../../src/p0/travel.js';
+import { noteEntered, requirePass, tripOf, preview, utcOffsetMin } from '../../src/p0/travel.js';
 
 const SF = 'gn-5391959', LA = 'gn-5368361', TOKYO = 'gn-1850147', NYC = 'gn-5128581', LDN = 'gn-2643743';
 const HAYWARD_ETC = 3;   // San Francisco's nearest 3 (Hayward, Concord, Fairfield) are Trip 1
@@ -45,6 +45,22 @@ describe('travel (SGODOT-278)', () => {
     expect(s.energy.value).toBe(110);
     expect(s.coins).toBe(s0.coins);
     expect(r.events).toContainEqual(expect.objectContaining({ kind: 'arrival', cluster: TOKYO, first: true, energy: 10, pass_until: T + DAY }));
+  });
+
+  it('the silhouette card\'s preview: climate and the city\'s own local time (MAP-3-FREE)', () => {
+    const p = preview(c, fresh(), TOKYO, T);   // Tokyo is UTC+9, no daylight saving
+    expect(p).toMatchObject({ cluster: TOKYO, name: 'Tokyo', climate: 'temperate', utc_offset_min: 540 });
+    expect(utcOffsetMin('America/Los_Angeles', T)).toBe(-420);   // October: PDT
+    expect(utcOffsetMin('Not/AZone', T)).toBeNull();
+  });
+
+  it('a city with a landmark (表 11-18) gets a landmark stamp; San Diego\'s cluster reads San Diego (travel_p2)', () => {
+    const r = step(fresh(), { type: 'travel', to: LA });
+    expect(r.state.travel.stamps[0]).toMatchObject({ cluster: LA, kind: 'landmark' });
+    expect(c.travel?.landmarks?.[LA]).toEqual({ landmark: 'Hollywood Sign', stamp: 'stamp_los_angeles' });
+    const sd = loadP0Content();   // the clusters are attached by the loader (not copied by structuredClone)
+    expect((sd as P0Content & { clusters: { get(id: string): { name: string } } }).clusters.get('gn-3981609').name).toBe('San Diego');
+    expect(Object.keys(c.travel?.landmarks ?? {})).toHaveLength(18);
   });
 
   it('travel again while there is a no-op; a return visit gets no stamp or Energy; return_home keeps the pass', () => {
