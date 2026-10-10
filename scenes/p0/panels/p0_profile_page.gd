@@ -15,7 +15,7 @@ signal back_pressed
 signal edit_look_pressed
 signal skill_pressed(skill: String)
 signal settings_pressed
-## A Collections tile was tapped: "fish" (the Fish-dex, FISH-6) or "pages" (the Cookbook).
+## A Collections tile was tapped: "fish" (the Fish-dex, FISH-6), "pages" (the Cookbook) or "cities" (the Passport).
 signal collection_pressed(key: String)
 ## The farm card was tapped: HOME-1 (§10.6.2, int11).
 signal farm_pressed
@@ -154,8 +154,17 @@ static func profile_data(view: Dictionary) -> Dictionary:
 		collections = [
 			{key = "fish", name = "Fish", have = dex.filter(func(f): return int(f.get("caught", 0)) > 0).size(), need = dex.size(), icon = "fish_crucian"},
 			{key = "pages", name = "Pages", have = book.x, need = book.y, icon = "recipe_card"},   # as the Cookbook tab (q(100))
+			# Cities (PROFILE-1, q(100)): cities reached, toward the Explorer medal next (§11.9.2: 3 / 10 / 30 / 100); opens PASS-1
+			{key = "cities", name = "Cities", have = cities_have(view), need = cities_need(view), icon = "passport"},
 		],
 	}
+
+## Cities reached by travel (the home city not counted) and the next Explorer medal's count (3 / 10 / 30 / 100).
+const EXPLORER := [3, 10, 30, 100]
+static func cities_have(view: Dictionary) -> int: return (view.get("travel", {}).get("visits", {}) as Dictionary).size()
+static func cities_need(view: Dictionary) -> int:
+	for n in EXPLORER: if cities_have(view) < n: return n
+	return EXPLORER[-1]
 
 ## Progress within the current level, 0..1 (1 at the top level).
 static func skill_progress(s: Dictionary) -> float:

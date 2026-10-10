@@ -40,6 +40,7 @@ signal look_previewed(stage: String, look: String)
 
 const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
 const P0Travel := preload("res://modules/p0/p0_travel.gd")   # where the player is in the world (SGODOT-275)
+const P0ArrivalCard := preload("res://modules/p0/p0_arrival_card.gd")   # the sheet the Passport and city pages use
 const _RESIDENT_SHEET_H := 443.0   # RES-PIP: Sheet 443 of 800
 const _CLOSE_ABOVE_SHEET := 6.0    # RES-PIP: Close · 44 px sits 6 above the sheet, 16 in from the right
 const _CLOSE_ABOVE_SPECIALTY := 2.0   # MARKET-SPECIALTY: Close 44 at (300, 617), the sheet at y 663
@@ -2634,7 +2635,10 @@ func open_profile(look_saved := false) -> void:
 		open_skills(func(): open_profile()))
 	page.edit_look_pressed.connect(edit_look)
 	page.collection_pressed.connect(func(key: String):
-		if key == "fish":
+		if key == "cities":
+			_over_profile = true
+			open_passport(func(): open_profile())
+		elif key == "fish":
 			_over_profile = true
 			open_fishdex(func(): open_profile())
 		elif can_request_panel(): request_panel("cookbook"))
@@ -2972,6 +2976,28 @@ func open_fishdex(back := Callable(), animate := true) -> void:
 		else: open_fish_card(id, again))
 	_open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
 	modal_kind = "fishdex"
+	_modal_back = back
+
+## PASS-1 (Figma 482:429, §11.9.3): the Passport — cities visited, today's counted first visits, home and every city
+## reached with its stamp; a city opens its page (PASS-2). Over the profile (Back to it), as the Fish-dex.
+func open_passport(back := Callable()) -> void:
+	var spec := P0Travel.passport(view)
+	for r in spec.rows:
+		r["icon"] = load(str(r.stamp)) if str(r.get("stamp", "")) != "" else P0Logic.icon(str(r.icon))
+		if str(r.state) != "Home":
+			var cluster := str(r.cluster)
+			r["pressed"] = func(): open_city_page(cluster, func(): open_passport(back))
+	spec["dismiss"] = "Back"
+	P0ArrivalCard.open(self, spec, func(): pass, "passport")
+	_modal_back = back
+
+## PASS-2 (Figma 482:431, §11.9.1): a city's three tiers and its counts.
+func open_city_page(cluster: String, back := Callable()) -> void:
+	if modal_kind != "": close_modal()
+	var spec := P0Travel.city_page(view, cluster)
+	for r in spec.rows: r["icon"] = load(str(r.stamp)) if str(r.get("stamp", "")) != "" else P0Logic.icon(str(r.icon))
+	spec["dismiss"] = "Back"
+	P0ArrivalCard.open(self, spec, func(): pass, "city_page")
 	_modal_back = back
 
 ## A Fish-dex cell's card (FISH-6 单格详情, P0): the fish, its rarity, `Caught ×3 · Pond · River` and the XP it

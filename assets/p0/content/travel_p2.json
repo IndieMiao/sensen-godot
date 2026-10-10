@@ -1,3 +1,84 @@
 {
-  "_note": "Content fragments (SGODOT-275, cross-city plan §6 on the 275 card). From P1 on, new data goes in a file of its own here, never into p0_content.json: <line>_<topic>.json in lower case (farm_*, fish_*, mine_*, cook_*, homestead_*, residents_*, requests_*, world_*, travel_*), shaped like the main table with the same top-level keys. The server (loadP0Content) and the client (P0Logic.content) merge the files in name order: objects key by key, arrays of objects with an id append by id; a key, an id or a scalar already there is an error, so a fragment adds and never changes an entry. Changing an existing entry is done in p0_content.json by the line that owns that block. Keys starting with _ are skipped. This file holds the travel line's data (亚瑟 / 蒙恬)."
+  "_note": "Content fragments (SGODOT-275, cross-city plan §6 on the 275 card). From P1 on, new data goes in a file of its own here, never into p0_content.json: <line>_<topic>.json in lower case (farm_*, fish_*, mine_*, cook_*, homestead_*, residents_*, requests_*, world_*, travel_*), shaped like the main table with the same top-level keys. The server (loadP0Content) and the client (P0Logic.content) merge the files in name order: objects key by key, arrays of objects with an id append by id; a key, an id or a scalar already there is an error, so a fragment adds and never changes an entry. Changing an existing entry is done in p0_content.json by the line that owns that block. Keys starting with _ are skipped. This file holds the travel line's data (亚瑟 / 蒙恬).",
+  "travel": {
+    "landmarks": {
+      "gn-5368361": {
+        "landmark": "Hollywood Sign",
+        "stamp": "stamp_los_angeles"
+      },
+      "gn-5391959": {
+        "landmark": "Golden Gate Bridge",
+        "stamp": "stamp_san_francisco"
+      },
+      "gn-3981609": {
+        "landmark": "Balboa Park",
+        "stamp": "stamp_san_diego"
+      },
+      "gn-5746545": {
+        "landmark": "Powell's Books",
+        "stamp": "stamp_portland"
+      },
+      "gn-5809844": {
+        "landmark": "Space Needle",
+        "stamp": "stamp_seattle"
+      },
+      "gn-5807212": {
+        "landmark": "Hurricane Ridge",
+        "stamp": "stamp_port_angeles"
+      },
+      "gn-5506956": {
+        "landmark": "Las Vegas Strip",
+        "stamp": "stamp_las_vegas"
+      },
+      "gn-5419384": {
+        "landmark": "Red Rocks Amphitheatre",
+        "stamp": "stamp_denver"
+      },
+      "gn-4887398": {
+        "landmark": "Cloud Gate",
+        "stamp": "stamp_chicago"
+      },
+      "gn-4705692": {
+        "landmark": "Space Center Houston",
+        "stamp": "stamp_league_city"
+      },
+      "gn-4726206": {
+        "landmark": "San Antonio River Walk",
+        "stamp": "stamp_san_antonio"
+      },
+      "gn-5128581": {
+        "landmark": "Statue of Liberty",
+        "stamp": "stamp_new_york_city"
+      },
+      "gn-4140963": {
+        "landmark": "Washington Monument",
+        "stamp": "stamp_washington"
+      },
+      "gn-4151352": {
+        "landmark": "Walt Disney World",
+        "stamp": "stamp_clermont"
+      },
+      "gn-4167147": {
+        "landmark": "Universal Studios Florida",
+        "stamp": "stamp_orlando"
+      },
+      "gn-4164138": {
+        "landmark": "South Beach",
+        "stamp": "stamp_miami"
+      },
+      "gn-4930956": {
+        "landmark": "Freedom Trail",
+        "stamp": "stamp_boston"
+      },
+      "gn-4560349": {
+        "landmark": "Independence Hall",
+        "stamp": "stamp_philadelphia"
+      }
+    },
+    "cluster_names": {
+      "gn-3981609": "San Diego"
+    },
+    "_landmarks": "Landmark stamps (plan v2 §11.9.3 表 11-18, SGODOT-275): cluster id → its landmark and stamp art (assets/p0/stamps/<stamp>.png, 安其拉 from Figma 299:2955, 256 px). Mapped by the landmark's nearest member city (亚瑟: Space Center Houston stays with League City, 4.9 km, not Houston 34.8 km). Other first visits get a climate stamp.",
+    "_cluster_names": "A cluster's display name where its seed city is not the one players look for (亚瑟): gn-3981609's seed is Tijuana (more populous), its other member San Diego; the id stays frozen."
+  }
 }

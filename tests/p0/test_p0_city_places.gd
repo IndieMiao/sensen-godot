@@ -107,4 +107,39 @@ func test_a_first_visit_lands_on_three_things_to_do() -> void:
 	assert_str(str(link.get("label"))).is_equal("Show local pond")   # a NavigationRow (its text is the Button's)
 	var primary := rt.ui.root.find_child("Primary", true, false)
 	assert_str(str(primary.get("label"))).is_equal("Visit the outpost")
+	assert_object(rt.ui.root.find_child("Handle", true, false)).is_not_null()   # the sheet's grip (不知火舞 on #248)
 	rt.ui.close_modal()
+
+## The arrival card's Visit the outpost goes to the market square nearest where the player landed (Nearby, 不知火舞 on #248).
+func test_visit_the_outpost_is_the_nearest_market_square() -> void:
+	var two: Dictionary = CITY.duplicate(true)
+	two.detail.outposts.append({"id": "gn-1850147~market2", "role": "market", "name": "Oak Market Square", "lat": 35.7453, "lng": 139.7130,
+		"category": "Market square · Requests", "keeper": {"role": "Market Keeper", "name": "Ivy", "look": "market_temperate_0"},
+		"residents": [], "art": "fruit_shop", "anchors": "res://assets/p0/outposts/market.anchors.json", "capacity": 30})
+	P0CityPlaces.accept(TOKYO, two)
+	assert_str(str(P0CityPlaces.nearest_outpost(TOKYO, Vector2(35.745, 139.713)).id)).is_equal("gn-1850147~market2")
+	assert_str(str(P0CityPlaces.nearest_outpost(TOKYO, Vector2(35.684, 139.712)).id)).is_equal("gn-1850147~market0")
+
+## PASS-1 (不知火舞 on #256): a city row that opens its page ends in ›; the home row has none and takes no tap.
+func test_the_passports_city_rows_open_their_pages_and_say_so() -> void:
+	var rt := P0Runtime.ensure()
+	await get_tree().process_frame
+	rt.ui.close_modal()
+	var saved: Dictionary = rt.ui.view
+	var v := saved.duplicate(true)
+	v["travel"] = {"home": SF, "here": SF, "today": "2026-10-10", "passes": {}, "stamps": [],
+		"visits": {TOKYO: {"n": 2, "first_at": 1.0, "deliveries": 0}}}
+	rt.ui.view = v
+	rt.ui.open_passport()
+	assert_str(rt.ui.modal_kind).is_equal("passport")
+	var tokyo := rt.ui.root.find_child("Row_Tokyo", true, false)
+	assert_object(tokyo).is_instanceof(Button)
+	assert_object(tokyo.find_child("Chevron", false, false)).is_not_null()
+	var home := rt.ui.root.find_child("Row_San_Francisco", true, false)
+	assert_bool(home is Button).is_false()
+	(tokyo as Button).pressed.emit()
+	assert_str(rt.ui.modal_kind).is_equal("city_page")
+	var texts: Array = rt.ui.root.find_children("*", "Label", true, false).filter(func(l): return (l as Label).is_visible_in_tree()).map(func(l): return (l as Label).text)
+	assert_array(texts).contains(["2/10"])   # Local: Visits 2/10
+	rt.ui.close_modal()
+	rt.ui.view = saved
