@@ -1,0 +1,3 @@
+The Mapbox Maps SDK is used under the Mapbox Terms of Service.
+
+https://www.mapbox.com/legal/tos
