@@ -500,13 +500,21 @@ func _sync_plots(v: Dictionary, dt: float) -> void:
 	_sync_trees(v)
 
 ## P1 trees (q(118)): a tree's bed is solid (§5.6: not walkable, as the old woody crop); only the cells that change flip,
-## the path grid is never rebuilt for it.
+## the path grid is never rebuilt for it. A tree planted on the bed the player stands on blocks once they step off it
+## (哪吒 on #252: never trap the player; the plot sync runs at least once a second).
 var _tree_cells := {}
 func _sync_trees(v: Dictionary) -> void:
 	if grid == null: return
+	var here := bp.world_to_cell(actor.position)
 	var now := {}
 	for p in v.get("plots", []): if p.get("tree", false): now[int(p.id)] = true
-	for id in now: if not _tree_cells.has(id): grid.set_solid(P0Garden.cell_of(id), true)
+	for id in now.keys():
+		if _tree_cells.has(id): continue
+		if P0Garden.cell_of(id) == here:
+			now.erase(id)   # not solid yet: try again next sync
+			_sync_t = minf(_sync_t, 0.25)
+			continue
+		grid.set_solid(P0Garden.cell_of(id), true)
 	for id in _tree_cells: if not now.has(id): grid.set_solid(P0Garden.cell_of(id), false)
 	_tree_cells = now
 

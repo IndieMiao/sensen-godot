@@ -495,13 +495,15 @@ static func main_action(view: Dictionary, plot: Dictionary, seed_id: String, row
 		return a
 	var plot_id := int(plot.get("id", -1))
 	var tree := bool(plot.get("tree", false))
-	# P1 trees (q(118), 不知火舞 on 241 7a42…/e7be829b): Orchard Feed only feeds a picked tree, regrowing, not fed yet.
-	if seed_id == "fert_orchard":
-		if tree and str(plot.get("state", "")) == "growing" and int(plot.get("picks", 0)) > 0 and not plot.get("fert", false):
-			return {"icon": "compost", "verb": "Fertilize", "sub": "Free", "enabled": true, "amber": false,
-				"cmd": {"type": "fertilize", "plot": plot_id, "item": seed_id}, "need": 0}
+	# P1 trees (q(118), 不知火舞 on 241): Orchard Feed feeds a picked tree, regrowing, not fed yet; any other tree goes by
+	# its state (ripe: Pick, its first ripening or fed: Growing — 哪吒 on #252); no tree underfoot greys the key with
+	# `No tree here`.
+	if seed_id == "fert_orchard" and not tree:
 		return {"icon": "compost", "verb": "Fertilize", "sub": "No tree here", "enabled": false, "amber": false, "cmd": {}, "need": 0,
 			"toast": "No tree here"}
+	if seed_id == "fert_orchard" and str(plot.get("state", "")) == "growing" and int(plot.get("picks", 0)) > 0 and not plot.get("fert", false):
+		return {"icon": "compost", "verb": "Fertilize", "sub": "Free", "enabled": true, "amber": false,
+			"cmd": {"type": "fertilize", "plot": plot_id, "item": seed_id}, "need": 0}
 	if tree: return _tree_action(view, plot)
 	if bool(crop_for_seed(view, seed_id).get("perennial", false)) and str(plot.get("state", "")) in ["tilled", "wild"]:
 		return _plant_action(view, plot_id, seed_id)

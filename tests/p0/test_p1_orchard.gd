@@ -32,10 +32,16 @@ func test_orchard_feed_only_feeds_a_picked_regrowing_tree() -> void:
 	var tree := {"id": 9, "state": "growing", "crop": "crop_apple", "tree": true, "picks": 1, "ready_in": 3600000}
 	var a := P0Logic.main_action(v, tree, "fert_orchard")
 	assert_that([a.verb, a.sub, a.enabled, a.cmd]).is_equal(["Fertilize", "Free", true, {"type": "fertilize", "plot": 9, "item": "fert_orchard"}])
-	for no in [{"id": 9, "state": "growing", "crop": "crop_apple", "tree": true, "picks": 0}, tree.merged({"fert": true}),
-			{"id": 2, "state": "growing", "crop": "crop_radish"}, {"id": 3, "state": "tilled"}]:
+	for no in [{"id": 2, "state": "growing", "crop": "crop_radish"}, {"id": 3, "state": "tilled"}, {"id": 4, "state": "wild"}]:
 		var b := P0Logic.main_action(v, no, "fert_orchard")
 		assert_that([b.verb, b.sub, b.enabled]).is_equal(["Fertilize", "No tree here", false])
+	# 哪吒 on #252: with Orchard Feed in hand a tree that can't take it goes by its state — ripe is picked, its first
+	# ripening or already fed shows how long it has
+	var ripe := P0Logic.main_action(v, tree.merged({"state": "ready"}, true), "fert_orchard")
+	assert_that([ripe.verb, ripe.sub, ripe.enabled]).is_equal(["Pick", "2 Energy", true])
+	for wait in [tree.merged({"picks": 0}, true), tree.merged({"fert": true}, true)]:
+		var g := P0Logic.main_action(v, wait, "fert_orchard")
+		assert_that([g.verb, g.enabled]).is_equal(["Growing", false])
 
 func test_a_picked_tree_regrowing_stays_grown() -> void:
 	var v := _view()
