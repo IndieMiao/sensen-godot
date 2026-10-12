@@ -198,7 +198,8 @@ export interface P0Content {
   };
   bag_upgrades: { id: string; name: string; homestead: number; price: number; materials: [string, number][]; capacity: number; requires?: string }[];   // requires: the tier before (II after I)
   drinks: { energy: number; prices: number[]; daily: number; items: Record<string, { name: string; shop: ShopId }> };
-  specialty: Record<string, { name: string; price: number; shop: ShopId; to: 'storage' }>;
+  specialty: Record<string, { name: string; price: number; shop: ShopId; to: 'storage'; cluster?: string }>;
+  city_postcard?: { price: number };   // SGODOT-296: every M-tier-and-up city's postcard (cityPostcard)
   /** A counter's buy-back by item kind; regional: only the regional items of the counter's own climate (§9.13.1: the
    * Market Square takes its climate's regional crops and fish), their quota counted per city (per_city, §11.7.3). */
   shops: Record<ShopId, { sells: string; buys: Record<string, { rate: number; quota: QuotaId | null; regional?: boolean }> }>;
@@ -366,6 +367,26 @@ export function rodById(c: P0Content, id: string): Rod | undefined { return c.fi
 export function recipeById(c: P0Content, id: string): Recipe | undefined { return c.cooking.recipes.find(r => r.id === id); }
 
 /** Bag kind from the id prefix: seed_*, crop_*, fish_*, dish_*, bait_*, fert_*, torch (stacks of 20, §13.1.2), anything else is a material. */
+/**
+ * SGODOT-296: a city's postcard id. A cluster with its own specialty entry (San Francisco, Shanghai: `cluster`) keeps
+ * that old id, so an account that bought one owns it already; any other cluster's is postcard_<cluster id>, stable from
+ * the id alone (never the world revision or a placing order).
+ */
+export function cityPostcardId(c: P0Content, cluster: string): string {
+  const own = Object.entries(c.specialty).find(([, sp]) => sp.cluster === cluster);
+  return own ? own[0] : `postcard_${cluster}`;
+}
+
+/** The cluster a derived postcard id (postcard_<cluster id>) is for, or null: not one, an unknown cluster, or a cluster
+ * whose postcard has its own old id (no second San Francisco postcard). */
+export function cityPostcardCluster(c: P0Content, id: string): { id: string; name: string } | null {
+  if (!id.startsWith('postcard_gn-')) return null;
+  const cluster = id.slice('postcard_'.length);
+  const cl = (c as P0Content & { clusters?: { get(id: string): { id: string; name: string } | undefined } }).clusters?.get(cluster);
+  if (!cl || cityPostcardId(c, cluster) !== id) return null;
+  return { id: cl.id, name: cl.name };
+}
+
 export function itemKind(id: string): string {
   const head = id.split('_')[0];
   return ['seed', 'crop', 'fish', 'dish', 'bait', 'rod', 'fert', 'torch', 'trap'].includes(head) ? head : 'material';   // trap_fish: P1
@@ -403,6 +424,8 @@ export function itemName(c: P0Content, id: string): string {
   if (c.materials[id]) return c.materials[id].name;
   if (c.drinks.items[id]) return c.drinks.items[id].name;
   if (c.specialty[id]) return c.specialty[id].name;
+  const card = cityPostcardCluster(c, id);
+  if (card) return `${card.name} Postcard`;
   const decor = (c as { decor?: { items: Record<string, { name: string }> } }).decor?.items[id];   // Decorate (SGODOT-284)
   if (decor) return decor.name;
   if (c.supplies[id]) return c.supplies[id].name;

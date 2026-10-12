@@ -4,7 +4,8 @@
  * TODO(P1): the P0 server has no position; `shop` only says which counter's rules apply. Check room membership via
  * /v1/p0/online later (SGODOT-227).
  */
-import { cropBySeed, dishParts, itemKind, rodById, sellPriceOf, SHOPS, type P0Content, type QuotaId, type ShopId, type Skill } from './content.js';
+import { cityPostcardCluster, cityPostcardId, cropBySeed, dishParts, itemKind, rodById, sellPriceOf, SHOPS, type P0Content, type QuotaId, type ShopId, type Skill } from './content.js';
+import { cityPlaces } from './world.js';
 import { add, count, room, take } from './bag.js';
 import { buyCard, isCard } from './cards.js';
 import { coinsNeeded } from './homestead.js';
@@ -30,8 +31,41 @@ export function catalog(c: P0Content, shop: ShopId, s?: P0State, place?: unknown
   if (shop === 'homestead') return [...c.stall.buy, ...c.bag_upgrades.map(u => u.id),
     ...Object.entries(decorOf(c)?.items ?? {}).filter(([, d]) => d.buy).map(([id]) => id)];
   if (shop === 'tackle') return c.tackle.buy;
-  if (shop === 'market') return [...c.market.buy, ...regionalSeeds(c, s, place), ...orchardShelf(c), ...c.market.specialty];
+  if (shop === 'market') return [...c.market.buy, ...regionalSeeds(c, s, place), ...orchardShelf(c), ...specialtyAt(c, s, place)];
   return [];
+}
+
+/** A city sells its postcard (SGODOT-296) from M tier up: home always, a generated city unless it is an S-tier town. */
+function postcardCity(c: P0Content, cluster: string): boolean {
+  return cluster === homeCluster(c) || (cityPlaces(c, cluster)?.tier ?? 'S') !== 'S';
+}
+
+/** Whether an outpost id is its city's Market Square 1: a generated `<cluster>~market0`, or home's first market. */
+function marketOne(c: P0Content, id: string, cluster: string): boolean {
+  if (cluster === homeCluster(c)) return (c.outposts ?? []).find(o => o.role === 'market' && clusterOf(c, o.id) === cluster)?.id === id;
+  return id === `${cluster}~market0`;
+}
+
+/**
+ * The City Specialty shelf (SGODOT-296, 不知火舞's spec): its city's postcard, only on Market Square 1 of a city of M
+ * tier and up. The place is the command's, else the outpost the player is in (the client sends none; presence knows
+ * it); a known place that is not such a square sells none. With no outpost at all (an older client, the farm), the
+ * city the player is in: one city's postcard, never another's.
+ */
+export function specialtyAt(c: P0Content, s?: P0State, place?: unknown): string[] {
+  const at = typeof place === 'string' && place !== '' ? place : s?.presence?.entered ?? null;
+  if (at) {
+    const cluster = clusterOf(c, at);
+    if (!cluster || !marketOne(c, at, cluster) || !postcardCity(c, cluster)) return [];
+    return [cityPostcardId(c, cluster)];
+  }
+  const cluster = s?.travel?.here ?? homeCluster(c);
+  return postcardCity(c, cluster) ? [cityPostcardId(c, cluster)] : [];
+}
+
+/** A postcard (SGODOT-296): an old specialty entry or a derived postcard_<cluster id>; the view marks its row. */
+export function isSpecialty(c: P0Content, id: string): boolean {
+  return !!c.specialty[id] || !!cityPostcardCluster(c, id);
 }
 
 /** §5.2.4 / §5.5: a Market sells the saplings (Lv7 / Lv9) and Orchard Feed (goods with shop: market) in every city. */
@@ -69,6 +103,8 @@ export function offerOf(c: P0Content, id: string): Offer | null {
   if (deco) return { price: deco.price, skill: null, gate: 0, daily: 1, to: 'storage', once: false, floor: true, homestead: deco.homestead, pieces: deco.pieces };
   const sp = c.specialty[id];
   if (sp) return { price: sp.price, skill: null, gate: 0, daily: 0, to: 'storage', once: true, floor: true };
+  // SGODOT-296: another city's postcard, once per account into Farm Storage (catalog decides where it is sold)
+  if (cityPostcardCluster(c, id)) return { price: c.city_postcard?.price ?? 100, skill: null, gate: 0, daily: 0, to: 'storage', once: true, floor: true };
   return null;
 }
 

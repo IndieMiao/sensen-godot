@@ -191,7 +191,8 @@ func _on_facility(n: String) -> void:
 		_open_resident(str(npcs[n].id), str(npcs[n].name))
 	# Boards and shelves are facilities, not keepers: they open the market counter directly (LOCK-16 / 07).
 	elif n == "use_market_board": _open_entry("open_counter", ["market", counter_opts("board")], "Market Board")
-	elif n == "use_specialty_shelf": _open_entry("open_counter", ["market", counter_opts("specialty")], "City Specialty")
+	elif n == "use_specialty_shelf":   # only where this city sells its postcard (SGODOT-296); else a prop
+		if rt and P0CounterDrawer.has_specialty(rt.session.view): _open_entry("open_counter", ["market", counter_opts("specialty")], "City Specialty")
 	elif n == "use_fish_board": _open_entry("open_bite_board", [outpost], "Bite Board")   # SGODOT-283 e61cda10 ③
 
 ## LOCK-16: keepers greet first, Trade opens the counter (SGODOT-224's open_keeper_greeting(role, ctx)).
@@ -320,7 +321,8 @@ func _marker(n: String, view: Dictionary) -> Dictionary:
 	if n == "use_market_board":
 		var open := int(view.get("keepers", {}).get("market", {}).get("board_open", 0))
 		return {kind = "facility", icon = P0Logic.icon("board"), name = "Market Board", badge = "request" if open > 0 else ""}
-	if n == "use_specialty_shelf": return {kind = "facility", icon = P0Logic.icon("postcard"), name = "City Specialty"}
+	if n == "use_specialty_shelf":
+		return {kind = "facility", icon = P0Logic.icon("postcard"), name = "City Specialty"} if P0CounterDrawer.has_specialty(view) else {}
 	if n == "use_fish_board": return {kind = "facility", icon = P0Logic.icon("board"), name = "Bite Board"}
 	return super._marker(n, view)
 

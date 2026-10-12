@@ -123,7 +123,7 @@ describe('Market and Homestead Stall goods (§9.11.1–9.11.5)', () => {
     expect(refuse(r.s, { type: 'sow', plots: [3, 4, 5, 6], seed: 'seed_radish' })).toMatchObject({ ok: false, code: 'bad_plot', detail: { most: 3 } });
     expect(step(r.s, { type: 'equip', item: 'hoe_starter' }).s.gear.hoe).toBe('hoe_starter');
   });
-  it('the San Francisco Postcard goes to farm storage, once; the Shanghai one is no longer sold (q(106))', () => {
+  it('the San Francisco Postcard goes to farm storage, once; the Shanghai one is not sold in San Francisco (q(106), 296)', () => {
     let s = fresh();
     expect(refuse(s, { type: 'buy', item: 'postcard_shanghai', qty: 1, shop: 'market' })).toMatchObject({ ok: false, code: 'bad_item' });
     s = step(s, { type: 'buy', item: 'postcard_san_francisco', qty: 1, shop: 'market' }).s;
