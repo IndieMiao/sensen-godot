@@ -108,6 +108,15 @@ func test_city_specialty_is_its_own_short_sheet() -> void:
 	assert_str(row._effect.text).is_equal("Goes to your Farm Storage")
 	assert_str(row._gate.text).is_equal("Stock 1/1")
 	assert_float(row.get_global_rect().position.y).is_equal(714.0)
+	# a market that buys back (SGODOT-284, this view's market sells) still shows no bag on this sheet: its height counts
+	# the rows only, and a Bag row under them ran off the screen (0.2.2, Joey on 296)
+	assert_bool(P0CounterDrawer.has_bag_half(_view(), "market")).is_true()
+	assert_bool(d._bag_half.visible).is_false()
+	assert_float(d.get_global_rect().end.y).is_less_equal(800.0)
+	# its Buy page keeps the bag half and its Sell scope
+	var buy := _drawer("market", {"keeper": "Mei", "place": "Mission Market Square"})
+	await _settle()
+	assert_bool(buy._bag_half.visible).is_true()
 
 func test_buy_reports_the_item_and_stepper_count() -> void:
 	var d := _drawer("homestead")
