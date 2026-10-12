@@ -111,6 +111,13 @@ func lock(on: bool) -> void:
 	state = "locked" if on else "idle"
 	if not on: _play("idle", true)
 
+## Stop where one stands, in the idle pose this very frame (play_motion applies it at once): for a presentation that
+## keeps the pose it finds as its base — a Cast on the move froze the run clip mid-stride, one foot up (Joey, 296 #8).
+func stand_still() -> void:
+	mover.stop()
+	if state == "move": state = "idle"
+	_play("idle", true)
+
 ## The player on screen through `camera` (SGODOT-266, 不知火舞 on #190), for UI that keeps off them: from the feet to the
 ## top of the head — the outfit's own top (hair, a hat) once the rig has drawn, else HEAD_M — and HALF_WIDTH_M either side
 ## of the body's axis (P0Pond's player box for the reel gauge). Not the rig's box projected whole: its rest-pose arms
