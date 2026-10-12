@@ -205,7 +205,7 @@ func test_today_rows_lead_with_the_guide_and_drop_their_generic_twins() -> void:
 	v.stall.board.requests[0].status = "accepted"
 	v.bag.slots = [{"id": "fish_crucian", "qty": 1}]
 	var rows := P0Logic.today_rows(v)
-	# Catch (not "Pond Catch · Pond Crucian 0/2"), Cook it (not "1 fish · the stove is free"), then the radishes' timer
+	# Catch (not "Pond Catch · Pond Crucian 0/2"), Cook it (not "Cook with 1 fish"), then the radishes' timer
 	assert_that(_lines(rows)).is_equal(["Catch 2 Pond Crucian · Fern Pond", "Cook it: Grilled Crucian", "Radishes ready in 3h 54m"])
 	assert_that(rows.map(func(r): return r.focus)).is_equal([true, false, false])
 
@@ -257,7 +257,7 @@ func test_the_waiting_recipe_is_the_third_line_and_keeps_its_fish() -> void:
 	assert_str(str(P0KitchenLogic.waiting_on_crops(_soup(_session_end(), 1)).crop)).is_equal("crop_radish")   # F1: soonest
 	# More fish than it needs: the stove-free line counts the rest (3 − 1); the soup line falls to the 4th place.
 	var more := _lines(P0Logic.today_rows(_soup(_session_end(), 3)))
-	assert_str(str(more[0])).is_equal("2 fish · the stove is free")
+	assert_str(str(more[0])).is_equal("Cook with 2 fish")
 	# Fewer (none): the soup is short of a fish and a crop, two kinds — no waiting line; the lettuce comes back.
 	var none := _lines(P0Logic.today_rows(_soup(_session_end(), 0)))
 	assert_bool(none.any(func(l): return str(l).contains("Fresh Fish Soup"))).is_false()
@@ -277,7 +277,7 @@ func test_two_kinds_short_no_line_and_of_two_waiting_the_first_ripe() -> void:
 func test_the_waiting_line_goes_once_its_crop_is_ripe_and_the_stove_line_comes_back() -> void:
 	var lines := _lines(P0Logic.today_rows(_soup(_session_end("ready"), 1)))
 	assert_bool(lines.any(func(l): return str(l).contains("· when "))).is_false()   # Harvest now; the lettuce is not waited on
-	assert_bool(lines.has("1 fish · the stove is free")).is_true()   # its fish are free again
+	assert_bool(lines.has("Cook with 1 fish")).is_true()   # its fish are free again
 	var v := _soup(_session_end(), 1)
 	v.bag.slots.append({"id": "crop_radish", "qty": 1})
 	v.cooking.cookbook[-1].can_cook = true

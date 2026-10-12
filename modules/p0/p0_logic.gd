@@ -692,7 +692,7 @@ static func today_line(view: Dictionary) -> String:
 	var fish := 0
 	for st in view.get("bag", {}).get("slots", []):
 		if str(st.get("id", "")).begins_with("fish_") and item(view, str(st.id)).get("cook", true): fish += int(st.get("qty", 0))
-	if fish > 0: return "%d fish · the stove is free" % fish
+	if fish > 0: return "Cook with %d fish" % fish
 	if best_crop != "": return "%s ready in %s" % [plural(item_name(view, best_crop)), span(best_ms)]
 	if any_sown: return "Water what you sowed"
 	return "Sow your first plot"
@@ -1246,7 +1246,7 @@ static func next_line(view: Dictionary, skill: String, level: int) -> String:
 
 ## The keys of the rows that light the Today icon's red dot (q(107)): something to do now — a request to hand in, a
 ## harvest, a dish at the stove, a new recipe or slot, the first session's Sow / Catch / Deliver / Cook. Never a
-## countdown, an info row, a request still short, `N fish · the stove is free` or `Water N sown plots` (their
+## countdown, an info row, a request still short, `Cook with N fish` or `Water N sown plots` (their
 ## `dot` is ""), nor a row ticked done or short of Energy. A key is the kind and its object, e.g. `deliver:<request>`.
 static func today_dots(rows: Array) -> Array:
 	var out: Array = []
@@ -1340,7 +1340,7 @@ static func today_rows(view: Dictionary) -> Array:
 		for st in view.get("bag", {}).get("slots", []):
 			if str(st.get("id", "")).begins_with("fish_") and item(view, str(st.id)).get("cook", true): fish += int(st.get("qty", 0))
 		fish -= int(wait.get("fish", 0))
-		if fish > 0 and not guided_stove: now_rows.append(_row("%d fish · the stove is free" % fish, "pot", "stove"))
+		if fish > 0 and not guided_stove: now_rows.append(_row("Cook with %d fish" % fish, "pot", "stove"))
 	var trap := P0Trap.today_row(view)   # full Fish Traps (SGODOT-283): a harvestable row with the red dot (q(107))
 	if not trap.is_empty(): now_rows.append(_row(str(trap.line), str(trap.icon), str(trap.go), str(trap.dot)))
 	now_rows.append_array(progress)
