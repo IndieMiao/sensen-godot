@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dd3ugn8f8p0ps"
-path="res://.godot/imported/plane_fill.svg-0827c2a20dc1caf17d95fde37b989ac4.ctex"
+uid="uid://ci7phhqd0kbu3"
+path="res://.godot/imported/i-plane.svg-bd850d9426b031267e2a9549efd237df.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ui/icons/game/plane_fill.svg"
-dest_files=["res://.godot/imported/plane_fill.svg-0827c2a20dc1caf17d95fde37b989ac4.ctex"]
+source_file="res://assets/ui/icons/game/i-plane.svg"
+dest_files=["res://.godot/imported/i-plane.svg-bd850d9426b031267e2a9549efd237df.ctex"]
 
 [params]
 

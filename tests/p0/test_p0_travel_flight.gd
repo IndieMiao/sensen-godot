@@ -283,3 +283,7 @@ func test_the_route_bows_up_and_fades_with_the_flight() -> void:
 	assert_float(P0TravelFlight.plane_progress(0.5)).is_equal(0.0)
 	assert_float(P0TravelFlight.plane_progress(2.5)).is_equal(1.0)
 	assert_float(P0TravelFlight.plane_progress(1.5)).is_equal_approx(0.75, 1e-4)   # fast, then slowing
+	# the plane is i-plane (279 a4ab1287), nose right: drawn at the route's heading as it is
+	var cover := P0TravelCover.new()
+	assert_str(str(cover._plane.get_meta("ui_source", ""))).ends_with("i-plane.svg")
+	cover.free()
