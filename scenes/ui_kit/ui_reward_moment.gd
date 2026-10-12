@@ -51,7 +51,7 @@ var item_name := "": set = set_item_name
 ## 1–4 shows the rarity dot and word; 0 hides the tags row (fish and dishes have rarity, crops do not).
 var rarity := 0: set = set_rarity
 ## Rarity word from content rarity_names (Common / Fine / Rare / Legendary). With rarity 0 it is a plain fact line
-## under the name, no dot (the No dish card's `9 left today`: the name line ellipsizes, this one keeps the number).
+## under the name, no dot (the No dish card's `9 refunds left today`: the name line ellipsizes, this one keeps the number).
 var rarity_word := "": set = set_rarity_word
 ## 0 Plain (no badge), 1 Good, 2 Perfect.
 var quality := 0: set = set_quality

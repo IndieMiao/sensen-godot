@@ -951,8 +951,13 @@ static func rarity_name(view: Dictionary, rarity: int) -> String:
 ## dish at all (李白 2026-10-08), so the card says so and offers no Eat.
 static func mystery_card(ev: Dictionary) -> Dictionary:
 	if bool(ev.get("none", false)):
-		return {title = "No dish this time", sub = "Ingredients back (%d left today)" % int(ev.get("trial_left", 0)), eat = false}
+		return {title = "No dish this time", sub = "Ingredients back (%s)" % refunds_left(int(ev.get("trial_left", 0))), eat = false}
 	return {title = "Mystery Dish", sub = "Hmm… not a dish. Try another mix.", eat = true}
+
+## The Newcomer Blessing's count on a failed pot's card: `8 refunds left today`, `1 refund left today` (Joey on 296:
+## `8 left today` did not say what was left).
+static func refunds_left(n: int) -> String:
+	return "%d refund%s left today" % [n, "" if n == 1 else "s"]
 
 static func dish_label(view: Dictionary, id: String) -> String:
 	var info := item(view, id)

@@ -277,7 +277,9 @@ func test_dish_cards_say_new_recipe_mystery_or_ready() -> void:
 	var none := P0KitchenLogic.dish_card(v, {"dish": "dish_mystery", "mystery": true, "qty": 0, "none": true, "trial_left": 7}, 0, false)
 	assert_str(none.event).is_equal("No dish this time")
 	assert_str(none.item_name).is_equal("Ingredients back")
-	assert_str(none.rarity_word).is_equal("7 left today")   # its own line under the name (int6 C14: the count was cut off)
+	assert_str(none.rarity_word).is_equal("7 refunds left today")   # its own line under the name (int6 C14: the count was cut off)
+	none = P0KitchenLogic.dish_card(v, {"dish": "dish_mystery", "mystery": true, "qty": 0, "none": true, "trial_left": 1}, 0, false)
+	assert_str(none.rarity_word).is_equal("1 refund left today")
 	assert_bool(none.none).is_true()
 
 func test_keep_room_spares_a_retry_that_would_be_refused() -> void:
