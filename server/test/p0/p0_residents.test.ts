@@ -119,7 +119,9 @@ describe('Pip and Old Kai requests (§9.4.3; Li Bai b7d8b665, 719ce953)', () => 
     let s = fresh();
     expect(pip(s)).toMatchObject({ request_state: 'open', request: { id: 'req_res_pip_1', kind: 'fish', qty: 1, have: 0 } });
     expect(refuse(s, { type: 'deliver', request: 'req_res_pip_1' })).toMatchObject({ ok: false, code: 'not_accepted' });
+    expect(pip(s).request).toMatchObject({ accepted_at: null });   // not tracked yet
     s = step(s, { type: 'accept', request: 'req_res_pip_1' }).s;
+    expect(pip(s).request).toMatchObject({ accepted_at: T0 });     // q(143): the save's req.at
     s.bag.push({ id: 'fish_perch', qty: 1 });   // Fine: not what Pip asked for
     expect(refuse(s, { type: 'deliver', request: 'req_res_pip_1' })).toMatchObject({ ok: false, code: 'not_enough', detail: { need: 1, have: 0 } });
     s.bag.push({ id: 'fish_carp', qty: 1 });

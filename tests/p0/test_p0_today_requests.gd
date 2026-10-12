@@ -126,3 +126,63 @@ func test_a_tap_on_a_tap_row_presses_it() -> void:
 			e.position = at[0] if down else at[1]
 			row.gui_input.emit(e)
 	assert_array(got).is_equal([0])
+
+## q(143) (不知火舞, 奕星): the short request tracked last keeps a row in Today, so `Tracking · it shows in Today` holds.
+## Three rows that can be done now: it takes the 3rd. Fewer: it stays where it was. Several short: the latest by
+## accepted_at; none known (an older server or save): the first in board order. Three deliveries keep their rows.
+func _full(pip_at, dusk_at) -> Dictionary:
+	var v := _view(4)
+	v["firsts"] = ["harvest:crop_radish"]
+	v.bag.slots = [{"id": "fish_crucian", "qty": 2}]
+	v["plots"] = [{"state": "ready", "crop": "crop_radish"}, {"state": "sown", "crop": "crop_radish"},
+		{"state": "growing", "crop": "crop_radish", "ready_in": 3600000}]
+	v.residents = {"res_pip": {"request": {"id": "req_res_pip_2", "kind": "sow", "have": 3, "qty": 5, "ready": false, "accepted_at": pip_at},
+		"request_state": "accepted"}}
+	v["boards"] = {"stall": {"slots": []}, "market": {"slots": [{"id": "req_dusk", "title": "Dusk Haul", "kind": "fish", "rarity": 2,
+		"items": [], "have": 1, "qty": 4, "status": "accepted", "accepted_at": dusk_at}]}}
+	return v
+
+func test_the_latest_tracked_short_request_keeps_the_third_row() -> void:
+	# Pip's tracked after Dusk Haul: Pip's row takes the 3rd (the stove's), Dusk Haul does not fit
+	assert_array(_lines(_full(2000, 1000))).is_equal(["Harvest 1 Radish", "Water 1 sown plot", "Five Little Plots · Plots 3/5"])
+	# Dusk Haul's tracked last: it does
+	assert_array(_lines(_full(1000, 2000))).is_equal(["Harvest 1 Radish", "Water 1 sown plot", "Dusk Haul · Fine fish 1/4"])
+	# no time from the server (an older server, or a save from before it): the first in board order, the Market Board's
+	assert_array(_lines(_full(null, null))).is_equal(["Harvest 1 Radish", "Water 1 sown plot", "Dusk Haul · Fine fish 1/4"])
+	var v := _full(null, 5000)
+	v.residents.res_pip.request.erase("accepted_at")
+	assert_array(_lines(v)).is_equal(["Harvest 1 Radish", "Water 1 sown plot", "Dusk Haul · Fine fish 1/4"])
+
+func test_with_room_the_rows_keep_their_places() -> void:
+	var v := _full(2000, 1000)
+	v.plots = [{"state": "sown", "crop": "crop_radish"}]
+	v.bag.slots = []
+	# both short rows fit after the now row, in board order (Market Board, then the residents'), whatever was tracked last
+	assert_array(_lines(v)).is_equal(["Water 1 sown plot", "Dusk Haul · Fine fish 1/4", "Five Little Plots · Plots 3/5"])
+
+## An info row in the 3rd place (`Farming Lv3 at your first harvest`, after the row it comes from) gives way too: it goes
+## with its source and is no task (不知火舞).
+func test_an_info_row_in_the_third_place_gives_way() -> void:
+	var v := _full(2000, 1000)
+	v.firsts = []
+	v.skills.farming = {"level": 2, "xp": 95, "next": 100}
+	v.bag.slots = []
+	v.plots = [{"state": "sown", "crop": "crop_radish"}, {"state": "growing", "crop": "crop_radish", "ready_in": 3600000}]
+	v.boards.stall.slots = [{"id": "a", "title": "Crate A", "kind": "crop", "items": ["crop_radish"], "have": 2, "qty": 2,
+		"ready": true, "status": "accepted", "accepted_at": 1}]
+	assert_array(_lines(v)).is_equal(["Crate A · Deliver at the Stall", "Water 1 sown plot", "Five Little Plots · Plots 3/5"])
+	# without the rule the 3rd would be the info row (the same view with nothing tracked short)
+	v.residents = {}
+	v.boards.market.slots = []
+	assert_str(str(_lines(v)[2])).is_equal("Farming Lv3 at your first harvest")
+
+## Three rows handing something in: none gives way (handing one in frees a row).
+func test_three_deliveries_keep_their_rows() -> void:
+	var v := _full(9000, 1000)
+	v.boards.stall.slots = [
+		{"id": "a", "title": "Crate A", "kind": "crop", "items": ["crop_radish"], "have": 2, "qty": 2, "ready": true, "status": "accepted", "accepted_at": 1},
+		{"id": "b", "title": "Crate B", "kind": "crop", "items": ["crop_radish"], "have": 2, "qty": 2, "ready": true, "status": "accepted", "accepted_at": 2}]
+	v.boards.market.slots[0].merge({"have": 4, "ready": true}, true)
+	var rows := P0Logic.today_rows(v)
+	assert_array(rows.map(func(r): return str(r.dot).begins_with("deliver:"))).is_equal([true, true, true])
+	assert_bool(rows.any(func(r): return r.line.begins_with("Five Little Plots"))).is_false()
