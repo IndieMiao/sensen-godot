@@ -456,6 +456,19 @@ func anchor() -> Vector2:
 	return at if at is Vector2 else get_viewport().get_visible_rect().size * Vector2(0.5, 0.42)
 
 # ---------------------------------------------------------------- server results
+## Energy held while a cross-city flight is in the air (q(147) ⑥): its float parts, let go on landing.
+var travel_floats: Array = []
+
+## The flight is down (landed, skipped, or cut short — the map left, suspended, the app in the background): the
+## place chip and the HUD's Energy follow the view again and the held Energy floats, with the welcome (不知火舞 on 299).
+func release_travel() -> void:
+	ui.hold_here("")
+	ui.hold_energy({})
+	if travel_floats.is_empty(): return
+	var parts := travel_floats
+	travel_floats = []
+	ui.queue_floats(parts, anchor())
+
 func _on_state(v: Dictionary, events: Array) -> void:
 	var before: Dictionary = ui.view
 	ui.set_view(v)   # cards built below read the fresh view (Fish-dex, creel, meals)
@@ -480,6 +493,11 @@ func _on_state(v: Dictionary, events: Array) -> void:
 		at = ui.inbox_float_at()
 		ui.inbox_claim_done()
 	var floats: Array = []   # this reply's float parts: one float_lines call orders, merges and caps them (q(49) ①)
+	# Arriving by air (q(147) ⑥, 不知火舞 on 299): the arrival's Energy — its float and the HUD's value — waits for the
+	# flight to land (release_travel), with its welcome; so does any Energy that comes while it flies.
+	var by_air := world != null and world.has_method("on_arrival") \
+		and (events.any(func(e): return str(e.get("kind", "")) == "arrival") or bool(_call("travelling", [])))
+	if by_air and not before.is_empty() and not ui.energy_held(): ui.hold_energy(before.get("energy", {}))
 	var xp_lines: Array = []
 	last_first_catch_xp = 0
 	last_catch_extras = {}
@@ -571,6 +589,9 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				# Inside the mine a floor fee is said by the mine's own float ("Floor 2 · −2 Energy", q(46)), not twice.
 				if str(ev.get("reason", "")) == "mine_floor" and str(_call("p0_surface", [])) == "mine": continue
 				var part := {kind = "energy", key = "energy", amount = dlt, fmt = "%s Energy"}
+				if by_air:
+					travel_floats.append(part)
+					continue
 				# Row Hoe's Sow ×3 says its beds: `−6 Energy · 3 plots` (q(124) ③); the seeds it took count them
 				if str(ev.get("reason", "")) == "sow":
 					var beds: int = -events.filter(func(e): return str(e.get("kind", "")) == "item" and str(e.get("id", "")).begins_with("seed_")) \
@@ -749,6 +770,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				if toast != "": ui.toast_success_when_clear(toast, false, true))
 	# Any catch resets what is held: a player who left the pond mid-arc never let the last fish's floats rise, and an
 	# escape after that must not float them (刘邦 on #154).
+	if by_air and not bool(_call("travelling", [])): release_travel()   # no flight took off after all: nothing waits
 	if settles_catch: catch_floats = floats if world_lands else []
 	if world_lands: floats = []
 	# A request this reply filled says so after the reply's cards (q(134) ⑤; 周瑜 on #302): a landed fish's after its

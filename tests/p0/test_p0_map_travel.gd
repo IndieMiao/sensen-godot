@@ -94,7 +94,7 @@ func test_an_arrival_flies_there_and_the_player_stands_in_that_city() -> void:
 	var at: Vector2 = m._origin()
 	assert_float(at.x).is_equal_approx(float(tokyo.lat), 1e-4)
 	assert_float(at.y).is_equal_approx(float(tokyo.lng), 1e-4)
-	assert_str(await _toast_within(rt.ui, 7.0)).is_equal("Welcome to Tokyo · Stamp collected")   # Trip 6: a 5 s flight, then the welcome
+	assert_str(await _toast_within(rt.ui, 7.0)).is_equal("Welcome to Tokyo · Stamp collected")   # q(147): a fixed 3 s flight at any Trip, then the welcome
 	rt.ui.clear_toast()
 	m.on_arrival({kind = "arrival", cluster = TOKYO, first = false, trip = 6, km = 8815})
 	assert_str(await _toast_within(rt.ui, 7.0)).is_equal("Welcome back")   # q(108): a return only floats Welcome back

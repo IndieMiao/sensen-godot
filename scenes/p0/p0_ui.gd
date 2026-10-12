@@ -311,6 +311,28 @@ func set_view(v: Dictionary) -> void:
 	_refresh_bar()
 
 
+var _hold_here := ""
+var _hold_energy := {}
+
+## While the map flies the player to another city (q(147) ⑤, SGODOT-299) the place chip reads the city they left
+## (`cluster`); "" lets it follow the view again, as on landing.
+func hold_here(cluster: String) -> void:
+	if cluster == _hold_here: return
+	_hold_here = cluster
+	_hud_hash = 0
+	_refresh_hud()
+
+func energy_held() -> bool:
+	return not _hold_energy.is_empty()
+
+## ...and the HUD's Energy reads what it was before the arrival (q(147) ⑥: a first visit's +10 comes with the landing);
+## {} lets it follow the view again.
+func hold_energy(energy: Dictionary) -> void:
+	if energy == _hold_energy: return
+	_hold_energy = energy.duplicate()
+	_hud_hash = 0
+	_refresh_hud()
+
 ## HUD from the view, the next action's cost (Low = short of it) and where the player actually is: the
 ## kitchen is the farmhouse's stove corner, so the chip reads "San Francisco · Farmhouse" there (LOCK-06).
 func _refresh_hud() -> void:
@@ -319,8 +341,16 @@ func _refresh_hud() -> void:
 	# chips would still take taps.
 	hud.visible = not view.is_empty()
 	if view.is_empty(): return
-	var place := P0Travel.place(view, P0Logic.place_info(_place_text, "Farmhouse" if modal_kind == "kitchen" else ""), space)   # arrived in another city: Tokyo · Arrived (q(108))
-	var state := P0Logic.hud_state(view, {"next_cost": int(fab_state().get("need", 0)), "place": place})
+	var seen := view
+	if _hold_here != "" or not _hold_energy.is_empty():   # flying to another city (q(147) ⑤ ⑥): until it lands
+		seen = view.duplicate()
+		if _hold_here != "":   # the chip keeps the city left
+			var travel: Dictionary = (view.get("travel", {}) as Dictionary).duplicate()
+			travel["here"] = _hold_here
+			seen["travel"] = travel
+		if not _hold_energy.is_empty(): seen["energy"] = _hold_energy   # and Energy what it was
+	var place := P0Travel.place(seen, P0Logic.place_info(_place_text, "Farmhouse" if modal_kind == "kitchen" else ""), space)   # arrived in another city: Tokyo · Arrived (q(108))
+	var state := P0Logic.hud_state(seen, {"next_cost": int(fab_state().get("need", 0)), "place": place})
 	var dots: Array = state.get("today_dots", [])
 	state.erase("today_dots")
 	if dots != _dot_keys:   # only when the rows change: the seen keys are a file

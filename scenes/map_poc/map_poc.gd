@@ -490,6 +490,10 @@ func _maybe_reanchor() -> void:
 	center_world = Vector3.ZERO
 	_reposition_pawns()
 
+## The player's own pawn hidden (P0's cross-city flight: the avatar leaves with the take-off and stands in the city
+## ahead on landing, q(147) v2).
+var hide_self := false
+
 func _update_pawns(d: float) -> void:
 	var s := maxf(d / CHAR_DIST_PER_SCALE, 0.001)
 	var cull_r := d * CULL_FACTOR
@@ -500,6 +504,7 @@ func _update_pawns(d: float) -> void:
 		# ready 门禁：装配完成+首帧姿态应用前绝不显示——半成品蒙皮网格在地图
 		# 缩放（~25×）下会渲染成通天拉伸毛刺（2026-08-29 真机截图实证）。
 		var vis: bool = p.ready and n.position.distance_to(center_world) <= cull_r and city_detail_visible()
+		if p.cohort == "self" and hide_self: vis = false
 		if city_map and str(p.cohort).begins_with("farm:"):
 			vis = vis and farm_markers.selected_id == str(p.cohort).trim_prefix("farm:")
 		if city_map and p.cohort == "self" and farm_markers and farm_markers.anchor_shift.has("self") \
