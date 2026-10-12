@@ -8,6 +8,8 @@ extends GdUnitTestSuite
 const P0_MAP := "res://scenes/p0/p0_map.tscn"
 const P0Map := preload("res://scenes/p0/p0_map.gd")
 const P0Travel := preload("res://modules/p0/p0_travel.gd")
+const MapFogLayer := preload("res://modules/map/map_fog_layer.gd")
+const P0Clusters := preload("res://modules/p0/p0_clusters.gd")
 const SF := "gn-5391959"
 const TOKYO := "gn-1850147"
 const LA := "gn-5368361"
@@ -95,10 +97,49 @@ func test_the_veil_holes_the_explored_cities_only_at_every_zoom() -> void:
 	assert_int(m.fog_holes().size()).is_greater(0)
 	rt.session.view = saved
 
+## SGODOT-298 (the user, 10-12: the fog's circles did not zoom with the map): from z 8 the map tilts, and the camera's
+## perspective draws a city's ground circle as an ellipse, narrower on the far side; a circle of the flat scale missed
+## it (z 11: its far edge at 0.60 of the map's, its near edge 1.29). The hole's edge now runs through the ground circle
+## wherever the map draws it, flat or tilted.
+func test_a_holes_edge_follows_the_ground_at_every_zoom() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved := _travel(rt, {home = SF, here = SF, visits = {}, passes = {}, stamps = [], fallback = {near3 = [], near10 = []}, explorer = 0})
+	var c: Dictionary = P0Clusters.get_cluster(P0Clusters.cluster_of_region(SF))
+	var km: float = P0Clusters.radius_km(int(c.population)) * 1.15
+	var lat := float(c.lat)
+	var lng := float(c.lng)
+	for z in [6.0, 9.5, 10.5, 11.0]:
+		_look(m, lat, lng, z)
+		m._set_zoom(z)   # the map's own tilt and bearing at this zoom (_look lays it flat)
+		m._update_cameras()
+		var holes: Array = m.fog_holes()
+		assert_int(holes.size()).is_equal(1)
+		var hole: Dictionary = holes[0]
+		var spread := Vector2(INF, 0.0)   # the rim's nearest and farthest from the city, px
+		for k in 8:
+			var th := TAU * k / 8.0
+			var q = m.geo_to_screen(lat + km / 111.32 * sin(th), lng + km / (111.32 * cos(deg_to_rad(lat))) * cos(th))
+			var rim: Vector2 = (q as Vector2) - m.city_map.global_position
+			var off := _edge_off(hole, rim)
+			assert_float(absf(off)).override_failure_message("z %.1f: the hole's edge %.1f px off the ground at %d" % [z, off, k]).is_less(1.5)
+			var d := rim.distance_to(hole.at)
+			spread = Vector2(minf(spread.x, d), maxf(spread.y, d))
+		if z >= 10.5: assert_float(spread.x / spread.y).is_less(0.75)   # tilted: the far side is drawn narrower
+	rt.session.view = saved
+
+## How far `p` lies outside a hole's edge (px, negative inside): its conic's, or a plain circle's.
+func _edge_off(hole: Dictionary, p: Vector2) -> float:
+	if not hole.has("conic"): return p.distance_to(hole.at) - float(hole.r)
+	var fog_layer = MapFogLayer   # untyped: the conic arrives with SGODOT-298
+	return fog_layer.edge_distance(hole, p)
+
 func test_the_hole_edge_is_a_fixed_24_px() -> void:
 	var sh: Shader = load("res://modules/map/shaders/map_fog.gdshader")
 	assert_str(sh.code).contains("uniform float feather = 24.0")
-	assert_str(sh.code).contains("min(feather, max(1.0, h.z))")
+	assert_str(sh.code).contains("min(feather, max(1.0, k.w))")   # k.w: the hole's smallest radius (SGODOT-298)
 
 func test_city_bubbles_say_their_state() -> void:
 	var m := _map()
@@ -213,8 +254,6 @@ func test_a_bubble_under_the_hud_is_not_drawn_but_its_dot_is() -> void:
 		var at := Rect2((b.node as Control).position + m.city_map.global_position, (b.node as Control).size)
 		for r in rects: assert_bool((r as Rect2).intersects(at)).override_failure_message("%s under the chrome" % id).is_false()
 
-## 李元芳 0.2.1 smoke (286 bfae88c7): at the country view a visited city right by home (Chico) has its bubble where the
-## player's avatar stands; the bubble draws over the avatar and takes the tap — the avatar no longer does.
 ## 李元芳 0.2.1 smoke (293 378fd255): at the country view, away in LA, home's bubble (San Francisco) sits over the
 ## bottom of Chico's. A tap on the part of Chico's bubble that shows took home's 6 px margin and went home; the bubble
 ## drawn under the finger takes it now, and the margin only answers taps off every bubble.
@@ -260,6 +299,8 @@ func test_a_tap_on_a_bubble_that_shows_is_not_taken_by_a_neighbours_margin() -> 
 	rt.ui.close_modal()
 	rt.session.view = saved
 
+## 李元芳 0.2.1 smoke (286 bfae88c7): at the country view a visited city right by home (Chico) has its bubble where the
+## player's avatar stands; the bubble draws over the avatar and takes the tap — the avatar no longer does.
 func test_a_city_bubble_over_the_avatar_takes_the_tap() -> void:
 	var m := _map()
 	for i in 3: await get_tree().process_frame
