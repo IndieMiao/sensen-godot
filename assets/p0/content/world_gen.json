@@ -1,7 +1,7 @@
 {
  "_note": "Global generation (SGODOT-280, plan v2 §9.3.2 / §6.3.3 / §9.4.3). tiers, placement, tea_words, keeper_names, name_rules and wild are 李白's outposts.json (SGODOT-281, 47fafcea) as-is; seed, ponds, area_tier, coastal and room are the generator's own (后裔). Generated places are frozen by id (<cluster>~<kind><n>): a change here that moves an existing city must bump world.revision.",
  "world": {
-  "revision": 1,
+  "revision": 2,
   "seed": "journey-p1-world-20261010-v1",
   "tiers": [
    {
@@ -505,9 +505,9 @@
     "why": "Los Angeles · Clover Tackle Shop stood on Hollenbeck Lake (34.040526, -118.21805; 司空震's six-city check on farm-dev 303ce619, 2026-10-10). Moved 116 m west to the houses across the Golden State Fwy between it and S Boyle Ave: 111 m from the lake (OSM relation 3244050), 94 m from Clover Cove, 40 m from the freeway."
    },
    "gn-5128581~pond0": {
-    "lat": 40.729478,
-    "lng": -74.013998,
-    "why": "New York · Blossom Pond stood on water (40.73032, -74.026693; 司空震's six-city check, 286 16ffaf67, 2026-10-10). Moved 1075 m to land 28 m from water by ESA WorldCover 2021 (tools/world_water_check.ts), keeping the placement rules."
+    "lat": 40.729257,
+    "lng": -74.013947,
+    "why": "New York · Blossom Pond stood on water (40.73032, -74.026693; 司空震's six-city check, 286 16ffaf67, 2026-10-10). Moved 1075 m to land 28 m from water by ESA WorldCover 2021 (tools/world_water_check.ts), keeping the placement rules. q(144) (2026-10-12): moved 25 m to (40.729257, -74.013947), 28 m from water, so its tackle shop stands 100–300 m off and other outposts ≥ 300 m (tools/world_water_groups.ts)."
    },
    "gn-5128581~pond2": {
     "lat": 40.692192,
@@ -595,9 +595,9 @@
     "why": "Qingdao · Hawthorn Tackle Shop: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (36.024643, 120.401670); moved 6319 m with its group (pond, tackle shop, Market Square 1) to land 212 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
    },
    "gn-2274895~pond3": {
-    "lat": 6.312003,
-    "lng": -10.817095,
-    "why": "Monrovia · Lorikeet Pond: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (6.278745, -10.836412); moved 4270 m with its group (pond, tackle shop, Market Square 1) to land 29 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+    "lat": 6.310715,
+    "lng": -10.815244,
+    "why": "Monrovia · Lorikeet Pond: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (6.278745, -10.836412); moved 4270 m with its group (pond, tackle shop, Market Square 1) to land 29 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11). q(144) (2026-10-12): moved 250 m to (6.310715, -10.815244), 33 m from water, so its tackle shop stands 100–300 m off and other outposts ≥ 300 m (tools/world_water_groups.ts)."
    },
    "gn-2521978~pond0": {
     "lat": 38.345488,
@@ -650,9 +650,9 @@
     "why": "Onitsha · Mango Market Square: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (6.147340, 6.767813); moved 329 m with its group (pond, tackle shop, Market Square 1) to land 67 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
    },
    "gn-2523920~pond0": {
-    "lat": 38.13286,
-    "lng": 13.371438,
-    "why": "Palermo · Cowslip Pond: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (38.133604, 13.382246); moved 949 m with its group (pond, tackle shop, Market Square 1) to land 28 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+    "lat": 38.131888,
+    "lng": 13.370724,
+    "why": "Palermo · Cowslip Pond: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (38.133604, 13.382246); moved 949 m with its group (pond, tackle shop, Market Square 1) to land 28 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11). q(144) (2026-10-12): moved 125 m to (38.131888, 13.370724), 24 m from water, so its tackle shop stands 100–300 m off and other outposts ≥ 300 m (tools/world_water_groups.ts)."
    },
    "gn-2523920~tackle0": {
     "lat": 38.132782,
@@ -680,9 +680,9 @@
     "why": "Dagupan · Palm Market Square: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (16.055134, 120.319377); moved 1794 m with its group (pond, tackle shop, Market Square 1) to land 65 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
    },
    "gn-1886762~pond0": {
-    "lat": 29.977984,
-    "lng": 122.20656,
-    "why": "Zhoushan · Yuzu Pond: moved 1074 m from (29.968474, 122.204624) to land 87 m from water with its group, every placement rule kept and no pin within 100 m of a pond — off the tidal flats and the bridge into the shore park north of Binhai Avenue (the flats drawn as an area no place may take) (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+    "lat": 29.978214,
+    "lng": 122.205829,
+    "why": "Zhoushan · Yuzu Pond: moved 1074 m from (29.968474, 122.204624) to land 87 m from water with its group, every placement rule kept and no pin within 100 m of a pond — off the tidal flats and the bridge into the shore park north of Binhai Avenue (the flats drawn as an area no place may take) (tools/world_water_groups.ts, map-checked, 2026-10-11). q(144) (2026-10-12): moved 75 m to (29.978214, 122.205829), 81 m from water, so its tackle shop stands 100–300 m off and other outposts ≥ 300 m (tools/world_water_groups.ts)."
    },
    "gn-1886762~tackle0": {
     "lat": 29.979107,
@@ -695,9 +695,9 @@
     "why": "Zhoushan · Pagoda Market Square: moved 665 m from (29.971437, 122.209508) to land 105 m from water with its group, every placement rule kept and no pin within 100 m of a pond — off the tidal flats and the bridge into the shore park north of Binhai Avenue (the flats drawn as an area no place may take) (tools/world_water_groups.ts, map-checked, 2026-10-11)."
    },
    "gn-2346229~pond0": {
-    "lat": 4.97434,
-    "lng": 8.315799,
-    "why": "Calabar · Canoe Pond: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (4.973248, 8.309583); moved 699 m with its group (pond, tackle shop, Market Square 1) to land 33 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+    "lat": 4.975062,
+    "lng": 8.316662,
+    "why": "Calabar · Canoe Pond: one of the places the water table (q(126)) left on the water or held back so the rules hold, at (4.973248, 8.309583); moved 699 m with its group (pond, tackle shop, Market Square 1) to land 33 m from water where every placement rule holds (tools/world_water_groups.ts, map-checked, 2026-10-11). q(144) (2026-10-12): moved 125 m to (4.975062, 8.316662), 33 m from water, so its tackle shop stands 100–300 m off and other outposts ≥ 300 m (tools/world_water_groups.ts)."
    },
    "gn-2346229~tackle0": {
     "lat": 4.974789,
@@ -805,9 +805,9 @@
     "why": "Monrovia · Firefly Tackle Shop: moved 2129 m from (6.306670, -10.774230) to land 662 m from water with its group, every placement rule kept and no pin within 100 m of a pond — the beginner group had no spot within 10 km while other tackle shops kept their 3 km, so those groups moved out to make room (tools/world_water_groups.ts, map-checked, 2026-10-11)."
    },
    "gn-2274895~pond0": {
-    "lat": 6.29327,
-    "lng": -10.79319,
-    "why": "Monrovia · Hummingbird Pond: moved 1748 m from (6.278085, -10.797283) to land 37 m from water with its group, every placement rule kept and no pin within 100 m of a pond — the beginner group had no spot within 10 km while other tackle shops kept their 3 km, so those groups moved out to make room (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+    "lat": 6.295005,
+    "lng": -10.793658,
+    "why": "Monrovia · Hummingbird Pond: moved 1748 m from (6.278085, -10.797283) to land 37 m from water with its group, every placement rule kept and no pin within 100 m of a pond — the beginner group had no spot within 10 km while other tackle shops kept their 3 km, so those groups moved out to make room (tools/world_water_groups.ts, map-checked, 2026-10-11). q(144) (2026-10-12): moved 200 m to (6.295005, -10.793658), 177 m from water, so its tackle shop stands 100–300 m off and other outposts ≥ 300 m (tools/world_water_groups.ts)."
    },
    "gn-2274895~tackle0": {
     "lat": 6.294223,
@@ -838,6 +838,36 @@
     "lat": 18.463605,
     "lng": -69.896259,
     "why": "Santo Domingo · Palm Market Square: moved 1341 m from (18.454376, -69.888080) to land 78 m from water with its group, every placement rule kept and no pin within 100 m of a pond — the beginner group had no spot within 10 km while Turtle Tackle Shop kept its 3 km, so it moved out to make room (tools/world_water_groups.ts, map-checked, 2026-10-11)."
+   },
+   "gn-5368361~pond2": {
+    "lat": 34.041748,
+    "lng": -118.219829,
+    "why": "Los Angeles · Dragonfly Cove: from (34.041524, -118.219853). q(144) (2026-10-12): moved 25 m to (34.041748, -118.219829), 213 m from water, so its tackle shop stands 100–300 m off and other outposts ≥ 300 m (tools/world_water_groups.ts)."
+   },
+   "gn-361058~pond2": {
+    "lat": 31.213996,
+    "lng": 29.885824,
+    "why": "Alexandria · Mantis Creek: the q(144) rerun (revision 2) left its group on the water at (31.219596, 29.899866) — on land in 0.2.1; moved 1473 m with its group to land 40 m from water, every rule kept (tools/world_water_groups.ts, 2026-10-12)."
+   },
+   "gn-361058~tackle2": {
+    "lat": 31.213024,
+    "lng": 29.885168,
+    "why": "Alexandria · Mantis Tackle Shop: the q(144) rerun (revision 2) left its group on the water at (31.218365, 29.898336) — on land in 0.2.1; moved 1386 m with its group to land 62 m from water, every rule kept (tools/world_water_groups.ts, 2026-10-12)."
+   },
+   "gn-304531~pond0": {
+    "lat": 36.79465,
+    "lng": 34.638122,
+    "why": "Mersin · Foxglove Pond: the q(144) rerun (revision 2) left its group on the water at (36.790495, 34.647108); moved 924 m with its group to the port's west pier, 28 m from water, every rule kept. The whole waterfront here is container port (land by q(126) ⑥): look again by hand (tools/world_water_groups.ts, 2026-10-12)."
+   },
+   "gn-304531~tackle0": {
+    "lat": 36.797304,
+    "lng": 34.638706,
+    "why": "Mersin · Foxglove Tackle Shop: the q(144) rerun (revision 2) left its group on the water at (36.792201, 34.646404); moved 890 m with its group to the port's west pier, 67 m from water, every rule kept. The whole waterfront here is container port (land by q(126) ⑥): look again by hand (tools/world_water_groups.ts, 2026-10-12)."
+   },
+   "gn-304531~market0": {
+    "lat": 36.798144,
+    "lng": 34.633759,
+    "why": "Mersin · Mill Market Square: the q(144) rerun (revision 2) left its group on the water at (36.794812, 34.645449); moved 1105 m with its group to the port's west pier, 63 m from water, every rule kept. The whole waterfront here is container port (land by q(126) ⑥): look again by hand (tools/world_water_groups.ts, 2026-10-12)."
    }
   },
   "room": {

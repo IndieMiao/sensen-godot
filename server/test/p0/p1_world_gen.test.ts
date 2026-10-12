@@ -92,6 +92,13 @@ describe('global generation (SGODOT-280)', () => {
         if (a === b) continue;
         expect(km(a, b)).toBeGreaterThanOrEqual(a.role === b.role ? 3 - 1e-6 : 0.3 - 1e-6);
       }
+      // q(144): a pond is a place of another kind — every outpost ≥ 300 m from every pond, a tackle shop 100–300 m from
+      // its own (Market Square 2 used to stand on pond 5 in 262 big cities)
+      for (const a of o) for (const p of city.detail.ponds) {
+        const own = a.role === 'tackle' && a.nearest?.name === p.name, d = km(a, p);
+        if (own) expect(d * 1000, `${a.id} by its pond`).toBeGreaterThanOrEqual(100 - 1e-3);
+        else expect(d, `${a.id}–${p.id}`).toBeGreaterThanOrEqual(0.3 - 1e-6);
+      }
       const post0 = o.find(x => x.id === `${cl.id}~post0`)!, market0 = o.find(x => x.id === `${cl.id}~market0`)!;
       expect(km(cl, post0)).toBeLessThanOrEqual(1);
       expect(km(cl, market0)).toBeGreaterThanOrEqual(1 - 1e-6);
@@ -108,6 +115,15 @@ describe('global generation (SGODOT-280)', () => {
       }
     }
     expect(checked).toBe(clusters.byId.size - 1);   // every cluster but the home city
+  });
+
+  it('keeps Market Square 2 off pond 5 (q(144)): Taipei\'s Tea Hill Market Square and Hong Kong\'s Lagoon Market Square stand apart', () => {
+    for (const id of ['gn-1668341', 'gn-1819729']) {
+      const d = generateCity(c, clusters.get(id)!, { water: false }).detail;
+      const square = d.outposts.find(o => o.id === `${id}~market1`)!, pond = d.ponds.find(p => p.id === `${id}~pond4`)!;
+      expect(km(square, pond)).toBeGreaterThanOrEqual(0.3);   // was 0 m: the same point
+      expect(km(clusters.get(id)!, square)).toBeGreaterThanOrEqual(5 - 0.01);   // still on its ring
+    }
   });
 
   it('never names an outpost after its own city (q(32)): Tokyo has no "Tokyo Market Square"', () => {
@@ -254,7 +270,9 @@ describe('global generation (SGODOT-280)', () => {
     expect(la.outposts.find(o => o.id === `${LA}~tackle2`))
       .toMatchObject({ lat: 34.040844, lng: -118.219243, nearest: { name: la.ponds[2].name } });
     // New York's beginner pond, its shop and Market Square 1 came off the Hudson together (司空震, 286 16ffaf67)
-    expect(placeOf(c, `${NYC}~pond0`)).toMatchObject({ beginner: true, at: [40.729478, -74.013998] });
+    const nyc = (w.overrides as Record<string, PlaceFix>)[`${NYC}~pond0`];
+    expect(placeOf(c, `${NYC}~pond0`)).toMatchObject({ beginner: true, at: [nyc.lat, nyc.lng] });
+    expect(km({ lat: nyc.lat!, lng: nyc.lng! }, { lat: 40.729478, lng: -74.013998 })).toBeLessThan(0.1);   // nudged 25 m for q(144)
     // A renamed pond (before the freeze) keeps its tackle shop pointing at it; a point without both lat and lng is ignored.
     const tokyo = structuredClone(generateCity(c, clusters.get(TOKYO)!).detail);
     const [pond, shop] = [tokyo.ponds[0], tokyo.outposts.find(o => o.id === `${TOKYO}~tackle0`)!];
