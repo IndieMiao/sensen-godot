@@ -111,13 +111,13 @@ func test_a_freely_placed_card_shrinks_to_its_content() -> void:
 	assert_float(r.size.y).is_less(400.0)
 
 func test_a_fact_line_without_rarity_shows_under_the_name_without_a_dot() -> void:
-	# The No dish card (int6 C14): "Ingredients back" on the name line, "9 left today" on its own line, whole.
+	# The No dish card (int6 C14): "Ingredients back" on the name line, "9 refunds left today" on its own line, whole.
 	var r := _card({tone = UiRewardMoment.Tone.NEUTRAL, event = "No dish this time", item_name = "Ingredients back",
-		rarity_word = "9 left today", primary = "OK"})
+		rarity_word = "9 refunds left today", primary = "OK"})
 	await _settle()
-	assert_array(_texts(r)).contains(["Ingredients back", "9 left today"])
+	assert_array(_texts(r)).contains(["Ingredients back", "9 refunds left today"])
 	assert_bool(r._dot.visible).is_false()
-	var rarity: Label = r.find_children("*", "Label", true, false).filter(func(l): return (l as Label).text == "9 left today")[0]
+	var rarity: Label = r.find_children("*", "Label", true, false).filter(func(l): return (l as Label).text == "9 refunds left today")[0]
 	assert_float(rarity.size.x).is_greater_equal(rarity.get_minimum_size().x)   # not cut
 
 ## The one-time strip breaks between its rewards, never inside one (不知火舞 on 289 73b6029e: `+10` / `XP` split across

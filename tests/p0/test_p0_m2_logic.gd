@@ -133,7 +133,7 @@ func test_got_away_lines_for_level_and_rod_gates() -> void:
 func test_a_refunded_mystery_pot_says_no_dish() -> void:
 	var none := P0Logic.mystery_card({"kind": "dish", "mystery": true, "qty": 0, "none": true, "trial_left": 9})
 	assert_str(str(none.title)).is_equal("No dish this time")
-	assert_str(str(none.sub)).is_equal("Ingredients back (9 left today)")
+	assert_str(str(none.sub)).is_equal("Ingredients back (9 refunds left today)")
 	assert_bool(bool(none.eat)).is_false()
 	var dish := P0Logic.mystery_card({"kind": "dish", "mystery": true, "qty": 1})
 	assert_str(str(dish.title)).is_equal("Mystery Dish")

@@ -636,8 +636,9 @@ static func dish_card(view: Dictionary, ev: Dictionary, first_xp: int, from_stov
 	# Newcomer Blessing: a failed pot gives its ingredients back and no dish (q(48) A; S5 none: true).
 	if bool(ev.get("none", false)):
 		return {tone = UiRewardMoment.Tone.NEUTRAL, event = "No dish this time", icon = P0Logic.icon("dish_mystery"),
-			# "Ingredients back (9 left today)" on two lines: the name line ellipsizes, and the count is the point (int6 C14).
-			item_name = "Ingredients back", rarity = 0, rarity_word = "%d left today" % int(ev.get("trial_left", 0)), quality = 0,
+			# "Ingredients back" / "9 refunds left today" on two lines: the name line ellipsizes, and the count is the point
+			# (int6 C14). The count names what it counts (Joey on 296: `8 left today` read as nothing, trying a new dish).
+			item_name = "Ingredients back", rarity = 0, rarity_word = P0Logic.refunds_left(int(ev.get("trial_left", 0))), quality = 0,
 			strip = "", note = "", none = true, dish_id = ""}
 	if bool(ev.get("mystery", false)):
 		return {tone = UiRewardMoment.Tone.NEUTRAL, event = "Mystery Dish", icon = P0Logic.icon("dish_mystery"),
