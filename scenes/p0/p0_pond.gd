@@ -215,6 +215,7 @@ func _open_panel(plan: Dictionary) -> void:
 	panel.open_p0(rt, str(entry.id), site_spec, plan.target, site, P0City.chip_for(str(entry.get("name", "Pond")), str(entry.id)))
 
 func _begin_fishing(_id: String) -> void:
+	actor.stand_still()   # the presentation keeps the pose it finds as its base: never a run's half step (296 #8)
 	actor.lock(true)
 	rt.ui.set_surface("busy")
 	view = FishingPresentation.new()
@@ -513,6 +514,8 @@ func p0_dev(step: PackedStringArray) -> bool:
 				_reopen()
 		"cast": _go_cast(Vector3.INF)
 		"castat": _go_cast(Vector3(float(step[1]), 0, float(step[2])))   # castat:x:z — a cast at that water point
+		"stick": p0_joystick(Vector2(float(step[1]), float(step[2])))   # stick:x:y — held until stick:0:0 (Cast on the move)
+		"tapwater": p0_tap(cam.unproject_position(FishingModel.default_target(str(entry.id), actor.position, site_spec)))   # a tap on the water in front
 		# Fish Trap shots (SGODOT-283): picktrap selects it on the bar; settrap sets it; traptap walks to it and opens
 		# its card; trapcard opens the card where the player stands
 		"picktrap": rt.ui.selected_bait = TRAP_ID
