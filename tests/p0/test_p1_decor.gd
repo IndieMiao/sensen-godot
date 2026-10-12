@@ -1,4 +1,5 @@
 extends GdUnitTestSuite
+const P0Farm := preload("res://scenes/p0/p0_farm.gd")
 ## Decorate (SGODOT-284): the server judges a spot with content decor.yard; it must agree with the garden the client
 ## draws (P0Garden), so a piece never stands on a bed, in the house or on a facility the player can see, and the client
 ## (P0Decor) judges a spot as the server does. Pieces are solid: a yard filled with them still lets the player walk to
@@ -24,9 +25,7 @@ func test_every_footprint_and_plot_of_the_garden_is_off_the_yard() -> void:
 		var c := P0Garden.PLOT_ORIGIN + grid * 2
 		assert_bool(_in("field", c)).override_failure_message("plot %d at %s" % [id, str(c)]).is_true()
 	var walk: Array = _yard().get("walk", [])
-	# the player's walk rect less the row and the column the fence ring stands on and behind (test below)
-	assert_that(Rect2i(int(walk[0]), int(walk[1]), int(walk[2]), int(walk[3]))).is_equal(
-		Rect2i(P0Garden.WALK_RECT.position, P0Garden.WALK_RECT.size - Vector2i.ONE))
+	assert_that(Rect2i(int(walk[0]), int(walk[1]), int(walk[2]), int(walk[3]))).is_equal(P0Garden.WALK_RECT)   # q(145)
 	var bp := P0Garden.blueprint()   # the front fence, the sign, the plaque and the mailbox are objects too
 	for p in P0Garden.fence_block_points(bp) + [P0Garden.sign_point(bp), P0Garden.plaque_point(bp), P0Garden.mailbox_point(bp)]:
 		var c := bp.world_to_cell(p)
@@ -388,3 +387,29 @@ func test_no_piece_stands_on_or_behind_the_fence_ring() -> void:
 	for y in range(0, 20): assert_str(P0Decor.reason(v, "deco_planter", Vector2i(19, y))).is_equal(P0Decor.REASONS.decor_outside)
 	assert_str(P0Decor.reason(v, "deco_fountain", Vector2i(5, 18))).is_equal(P0Decor.REASONS.decor_outside)   # the smoke's spot
 	assert_str(P0Decor.reason(v, "deco_fountain", Vector2i(13, 17))).is_equal("")   # just inside the wall is fine
+
+## q(145): the player walks inside the fence ring too, whatever the level — no walking through the back wall to row
+## 19 or along the east one in column 19; the exit and the spawn stay open, and a player standing past the ring (row
+## or column 19) comes back to the nearest walkable cell on entering the farm.
+func test_the_player_walks_inside_the_fence_ring() -> void:
+	var bp := P0Garden.blueprint()
+	var r: Dictionary = P0Garden.FENCE_RING
+	var half := bp.cell_m * 0.5
+	for y in range(0, bp.grid.y):
+		for x in range(0, bp.grid.x):
+			var c := Vector2i(x, y)
+			if not bp.is_walkable(c): continue
+			var p := bp.cell_to_world(c)
+			var inside := p.x - half >= float(r.west) - 0.001 and p.x + half <= float(r.east) + 0.001 \
+				and p.z - half >= float(r.back) - 0.001 and p.z + half <= float(r.front) + 0.001
+			assert_bool(inside).override_failure_message("walkable cell %d,%d is on or past the fence" % [x, y]).is_true()
+	for k in [P0Garden.ANCHORS.spawn, P0Garden.ANCHORS.exit]: assert_bool(bp.is_walkable(k)).is_true()
+	var grid := BlueprintGrid.new(bp)
+	assert_array(grid.path(Vector2i(13, 17), Vector2i(13, 19))).is_empty()   # through the back wall
+	assert_array(grid.path(Vector2i(17, 14), Vector2i(19, 14))).is_empty()   # onto the east wall
+	assert_that(P0Farm.landing_cell(grid, Vector2i(13, 19))).is_equal(Vector2i(13, 18))
+	assert_that(P0Farm.landing_cell(grid, Vector2i(19, 10))).is_equal(Vector2i(18, 10))
+	var corner: Vector2i = P0Farm.landing_cell(grid, Vector2i(19, 19))
+	assert_bool(bp.is_walkable(corner)).is_true()
+	assert_int(maxi(19 - corner.x, 19 - corner.y)).is_less_equal(2)   # just inside the corner
+	assert_that(P0Farm.landing_cell(grid, P0Garden.ANCHORS.spawn)).is_equal(P0Garden.ANCHORS.spawn)   # where one may stand: there

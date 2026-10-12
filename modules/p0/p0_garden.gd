@@ -42,8 +42,10 @@ const FOOTPRINTS := {
 	"spot_clay_bank": Rect2i(2, 7, 1, 1), "spot_herb_patch": Rect2i(3, 17, 1, 1), "workbench": Rect2i(16, 16, 3, 1),
 	"spot_old_tree": Rect2i(2, 10, 1, 1),
 }
-## Scenery trees stand outside the walkable yard, so they are not footprints.
-const WALK_RECT := Rect2i(1, 0, 19, 20)
+## Scenery trees stand outside the walkable yard, so they are not footprints. The yard ends inside the Homestead fence
+## ring (FENCE_RING: its back stretch between rows 18 and 19, its east one in column 19), whatever the level — a wall
+## one sees is never walked through or on (q(145)); the same rect as Decorate's (decor.yard.walk).
+const WALK_RECT := Rect2i(1, 0, 18, 19)
 const CROP_CODES := {
 	"crop_radish": "R", "crop_lettuce": "L", "crop_carrot": "C", "crop_chamomile": "H",
 	"crop_herb": "B", "crop_potato": "P", "crop_chili": "I", "crop_tomato": "M",
