@@ -290,3 +290,19 @@ func test_a_market_drawer_closed_mid_measure_stops_quietly() -> void:
 	ui.close_modal()
 	for i in 4: await get_tree().process_frame
 	assert_bool(is_instance_valid(d)).is_false()
+
+## q(151) in the drawer itself: a row built before the drawer has the game's theme keeps its keys' 44 touch row (they
+## stretched to 52, Buy's 34 drawn at y 25–59 over the hairline; Joey on 296), Buy drawn 68 × 34 at y 21 like the
+## Stepper's surface.
+func test_the_rows_keys_keep_their_44_touch_row_in_the_drawer() -> void:
+	var d := _drawer("homestead")
+	await _settle()
+	for id in ["seed_radish", "seed_lettuce"]:
+		var row: UiShopRow = d._rows[id]
+		var o := row.get_global_rect().position
+		var buy := Rect2(row.buy.get_global_rect().position - o, row.buy.size)
+		assert_that([buy.position, buy.size, row.stepper.size.y]).is_equal([Vector2(260, 16), Vector2(76, 44), 44.0])
+		var sb := row.buy.get_theme_stylebox(&"normal") as UiStyleBox
+		var top := buy.position.y + (buy.size.y - sb.visual_height) * 0.5
+		assert_that([top, sb.visual_height, buy.size.x - sb.inset.x - sb.inset.z]).is_equal([21.0, 34.0, 68.0])
+		assert_float(top + sb.visual_height).is_less(row.size.y - UiTokens.STROKE_DEFAULT)   # 55, above the hairline
