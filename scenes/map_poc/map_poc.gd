@@ -449,9 +449,23 @@ func _apply_world_delta(delta: Vector3) -> void:
 		center_lat + (-delta.z) / MapGeoMath.M_PER_DEG_LAT, -85.051129, 85.051129)
 	center_lng += delta.x / (MapGeoMath.M_PER_DEG_LAT * cos(deg_to_rad(anchor_lat)))
 	center_lng = wrapf(center_lng, -180.0, 180.0)
+	_constrain_lat()
 	_clamp_to_bounds()
 
+## Mapbox keeps the world's top and bottom edges on the screen (its default HEIGHT_ONLY constraint): far out, it stops
+## its camera where an edge meets the screen's (at z 2 about 73°, well short of 85°). The authoritative centre stops
+## there too, or everything drawn from it — city bubbles, pins, avatars — slides on south of the map that stopped,
+## then off the screen, and only comes back after dragging that far back (李元芳 on 286 14c60178: London in Algeria).
+## Flat (the low zooms where it matters); tilted, the latitudes this reaches are polar.
+func _constrain_lat() -> void:
+	if not is_inside_tree(): return   # no screen yet to keep the world's edges on
+	var half := _map_logical_height() * 0.5 / (512.0 * pow(2.0, zoom + _zoom_elastic))
+	var y := MapGeoMath.mercator_y(center_lat)
+	var c := 0.5 if half >= 0.5 else clampf(y, half, 1.0 - half)
+	if absf(c - y) > 1e-12: center_lat = rad_to_deg(atan(sinh(PI * (1.0 - 2.0 * c))))
+
 func _update_cameras() -> void:
+	if city_map: _constrain_lat()   # a centre set straight (a flight, a city) agrees with the map as well
 	var d := _place_camera()
 	_update_pawns(d)
 	if marker_layer:
@@ -1167,6 +1181,7 @@ func _reset_gesture() -> void:
 
 func _set_zoom(v: float) -> void:
 	zoom = clampf(v, _minimum_zoom(), STREET_ZOOM_MAX if street_mode else 20.0)
+	if city_map: _constrain_lat()   # zooming out by a pole: the edge comes in, the centre moves off it
 	if street_mode and v != zoom:
 		_zoom_elastic = clampf((v - zoom) * 0.35, -0.16, 0.16)
 		_zoom_vel = 0
