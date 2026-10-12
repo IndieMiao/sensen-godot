@@ -130,6 +130,14 @@ func test_a_holes_edge_follows_the_ground_at_every_zoom() -> void:
 		if z >= 10.5: assert_float(spread.x / spread.y).is_less(0.75)   # tilted: the far side is drawn narrower
 	rt.session.view = saved
 
+## A circle reaching past the horizon maps to a hyperbola, not an ellipse: no tilted hole then, the host's flat circle
+## stands (哪吒 on #319). The same map with the circle short of the horizon gives its ellipse.
+func test_a_circle_past_the_horizon_keeps_the_flat_hole() -> void:
+	var ground := [Vector2(1, 0), Vector2(0, 1), Vector2(-1, 0), Vector2(0, -1)]
+	var screen := [Vector2(1, 0), Vector2(0, 2), Vector2(-1, 0), Vector2(0, -1.0 / 1.5)]   # w = 1 − y / 2: the horizon at y = 2
+	assert_dict(MapFogLayer.ground_hole(Vector2.ZERO, ground, screen, 3.0, [])).is_empty()
+	assert_dict(MapFogLayer.ground_hole(Vector2.ZERO, ground, screen, 1.5, [])).is_not_empty()
+
 ## How far `p` lies outside a hole's edge (px, negative inside): its conic's, or a plain circle's.
 func _edge_off(hole: Dictionary, p: Vector2) -> float:
 	if not hole.has("conic"): return p.distance_to(hole.at) - float(hole.r)

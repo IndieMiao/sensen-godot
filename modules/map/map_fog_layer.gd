@@ -99,6 +99,9 @@ static func ground_hole(at: Vector2, ground: Array, screen: Array, radius: float
 	var f: float = c[8]
 	if f >= 0.0: return {}   # the city's own point is not inside: not a map the camera draws
 	var conic := PackedFloat64Array([c[0] / -f, c[1] / -f, c[4] / -f, c[2] / -f, c[5] / -f])
+	# Not an ellipse (a hyperbola, A·C − B² ≤ 0): part of the circle lies behind the camera, which four points on the
+	# axes miss when the map is turned (哪吒 on #319); the host keeps its flat circle there.
+	if conic[0] * conic[2] - conic[1] * conic[1] <= 0.0: return {}
 	var far := 0.0
 	var near := INF
 	for v in rim:
