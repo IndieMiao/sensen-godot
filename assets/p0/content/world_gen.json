@@ -843,6 +843,31 @@
     "lat": 34.041748,
     "lng": -118.219829,
     "why": "Los Angeles · Dragonfly Cove: from (34.041524, -118.219853). q(144) (2026-10-12): moved 25 m to (34.041748, -118.219829), 213 m from water, so its tackle shop stands 100–300 m off and other outposts ≥ 300 m (tools/world_water_groups.ts)."
+   },
+   "gn-361058~pond2": {
+    "lat": 31.213996,
+    "lng": 29.885824,
+    "why": "Alexandria · Mantis Creek: the q(144) rerun (revision 2) left its group on the water at (31.219596, 29.899866) — on land in 0.2.1; moved 1473 m with its group to land 40 m from water, every rule kept (tools/world_water_groups.ts, 2026-10-12)."
+   },
+   "gn-361058~tackle2": {
+    "lat": 31.213024,
+    "lng": 29.885168,
+    "why": "Alexandria · Mantis Tackle Shop: the q(144) rerun (revision 2) left its group on the water at (31.218365, 29.898336) — on land in 0.2.1; moved 1386 m with its group to land 62 m from water, every rule kept (tools/world_water_groups.ts, 2026-10-12)."
+   },
+   "gn-304531~pond0": {
+    "lat": 36.79465,
+    "lng": 34.638122,
+    "why": "Mersin · Foxglove Pond: the q(144) rerun (revision 2) left its group on the water at (36.790495, 34.647108); moved 924 m with its group to the port's west pier, 28 m from water, every rule kept. The whole waterfront here is container port (land by q(126) ⑥): look again by hand (tools/world_water_groups.ts, 2026-10-12)."
+   },
+   "gn-304531~tackle0": {
+    "lat": 36.797304,
+    "lng": 34.638706,
+    "why": "Mersin · Foxglove Tackle Shop: the q(144) rerun (revision 2) left its group on the water at (36.792201, 34.646404); moved 890 m with its group to the port's west pier, 67 m from water, every rule kept. The whole waterfront here is container port (land by q(126) ⑥): look again by hand (tools/world_water_groups.ts, 2026-10-12)."
+   },
+   "gn-304531~market0": {
+    "lat": 36.798144,
+    "lng": 34.633759,
+    "why": "Mersin · Mill Market Square: the q(144) rerun (revision 2) left its group on the water at (36.794812, 34.645449); moved 1105 m with its group to the port's west pier, 63 m from water, every rule kept. The whole waterfront here is container port (land by q(126) ⑥): look again by hand (tools/world_water_groups.ts, 2026-10-12)."
    }
   },
   "room": {
