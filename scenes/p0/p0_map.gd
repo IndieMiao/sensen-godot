@@ -315,7 +315,7 @@ func home_entry() -> Dictionary:
 ## The avatar stands where the player is (the place chip, P0Runtime.here) and the farm wears its pin while away.
 ## Cheap to call every frame: it acts when the place or the homestead's point changes.
 func _sync_here() -> void:
-	if rt == null or city_map == null: return
+	if rt == null or city_map == null or travelling(): return   # the avatar stays in the city left until it lands
 	var at := _origin()
 	var sig := "%s|%s|%s|%.7f|%.7f" % [rt.here.get("space", ""), rt.here.get("place", ""), P0Travel.here(_view()), home_lat, home_lng]
 	if sig == _here_sig: return
@@ -689,6 +689,9 @@ func _map_logical_height() -> float:
 
 func _exit_tree() -> void:
 	CityMapData.set_region_provider(Callable())
+	if travelling():   # left mid-flight: nothing more to show here, but the chip must not stay held
+		_trip = {}
+		if rt != null: rt.ui.hold_here("")
 	super._exit_tree()
 
 # ---------------------------------------------------------------- travel (SGODOT-275, §11.8; the free first version)
@@ -790,37 +793,123 @@ func open_travel(cluster: String, preview := {}) -> void:
 	P0PlaceSheet.open(rt.ui, spec, func():
 		rt.ui.close_modal()
 		_origin_before = _origin()
+		_here_before = P0Travel.here(_view())
 		rt.session.send({"type": "travel", "to": cluster}), Callable(), Callable(), "travel_card")
 
-var _origin_before := Vector2.ZERO   # where the player stood when Fly was pressed: the arrival flight starts there
+var _origin_before := Vector2.ZERO   # where the player stood when Fly was pressed: the flight frames it with the city ahead
+var _here_before := ""   # the city they stood in then: the place chip keeps it until the flight lands (q(147) ⑤)
 
-## The server's arrival (events {kind: "arrival"}): the camera flies to the city's overview (3–5 s by Trip, §11.8.4)
-## and lands with the welcome (q(108): a first visit is stamped, its +10 Energy floats as Energy does; a return only
-## floats Welcome back). The avatar stands there from now on (_sync_here reads view.travel).
+## The server's arrival (events {kind: "arrival"}): the camera flies to the city's overview and lands with the welcome
+## (q(108): a first visit is stamped, its +10 Energy floats as Energy does; a return only floats Welcome back). The
+## flight is q(147)'s fixed 3 s (SGODOT-299): up from where the camera is — no jump back to the city left first — until
+## the city left and the one ahead are both in view, along, down to the overview; a cover takes every touch meanwhile,
+## a tap after its first 0.5 s or Back lands it. The place chip and the avatar keep the city left until it lands.
 func on_arrival(ev: Dictionary) -> void:
 	var cluster := str(ev.get("cluster", ""))
 	var c := P0Clusters.get_cluster(cluster)
 	if c.is_empty(): return
 	var r := P0Clusters.region(cluster)
 	var overview: Dictionary = CityMapData.city(str(r.get("id", ""))).get("overview", {})
-	# §11.8.4: from where the player was (the homestead, or the last city) up and along to the city's overview.
-	var from := _origin_before
+	var left := _origin_before if _origin_before != Vector2.ZERO else Vector2(center_lat, center_lng)
 	_origin_before = Vector2.ZERO   # one arrival per Fly: a later arrival (another device) starts from where it lands
-	_here_sig = ""
-	_sync_here()
-	if from != Vector2.ZERO:
-		center_lat = from.x
-		center_lng = from.y
+	var held := _here_before
+	_here_before = ""
 	var first := bool(ev.get("first", false))
 	var welcome := ("Welcome to %s · Stamp collected" % str(c.name)) if first else "Welcome back"
 	_switch_city(r)
 	_load_city_places(cluster)   # its ponds and outposts, read while the camera flies
-	_fly_to(float(overview.get("lat", c.lat)), float(overview.get("lng", c.lng)), float(overview.get("zoom", 11.0)),
-		float(overview.get("bearing", 0.0)), func():
+	_travel_fly({lat = float(overview.get("lat", c.lat)), lng = float(overview.get("lng", c.lng)),
+		zoom = float(overview.get("zoom", 11.0)), bearing = float(overview.get("bearing", 0.0))}, left, held, str(c.name),
+		int(ev.get("km", 0)), func():
 			rt.ui.toast(welcome)
-			if first: open_arrival_card(cluster), P0Travel.flight_s(int(ev.get("trip", 1))))
+			if first: open_arrival_card(cluster))
+
+## The cross-city flight under way (q(147)): its plan, how far it is, the cover, what landing does, the city left.
+var _trip := {}
+
+## to: the overview ahead ({lat, lng, zoom, bearing}, kept in f64 so it lands exactly there).
+func _travel_fly(to: Dictionary, left: Vector2, held: String, city: String, km: int, land: Callable) -> void:
+	if not _trip.is_empty(): _travel_land()   # one at a time: an earlier one lands first
+	_reset_gesture()
+	_city_bounds()
+	if _flight != null: _flight.kill()
+	var vp := get_viewport().get_visible_rect().size
+	var view := Vector2(vp.x * _map_logical_height() / maxf(1.0, vp.y), _map_logical_height())
+	var plan := P0TravelFlight.plan(center_lat, center_lng, zoom + _zoom_elastic, city_bearing, left, float(to.lat),
+		float(to.lng), float(to.zoom), float(to.bearing), view)
+	_zoom_elastic = 0.0
+	var cover := P0TravelCover.new()
+	add_child(cover)
+	var top := 120.0
+	if rt != null and rt.ui.open_marker_area().has_area(): top = rt.ui.open_marker_area().position.y + 8.0
+	cover.open(city, km, top)
+	cover.skip_requested.connect(_skip_travel)
+	if rt != null and held != "": rt.ui.hold_here(held)
+	_focus_tween = create_tween()
+	_focus_tween.tween_method(_travel_at, 0.0, P0TravelFlight.TOTAL_S, P0TravelFlight.TOTAL_S)
+	_focus_tween.tween_callback(_travel_land)
+	_trip = {plan = plan, to = to, t = 0.0, cover = cover, land = land, tween = _focus_tween}
 	_flight = _focus_tween
 	_flight_kind = "travel"
+
+func _travel_at(t: float) -> void:
+	if _trip.is_empty(): return
+	_trip.t = t
+	var at: Vector4 = (_trip.plan as P0TravelFlight).sample(t)
+	center_lat = at.x
+	center_lng = at.y
+	city_bearing = at.w
+	_set_zoom(at.z)
+	_camera_dirty = true
+	if is_instance_valid(_trip.cover): (_trip.cover as P0TravelCover).show_progress(t)
+
+## Whether a cross-city flight is under way (the cover is up).
+func travelling() -> bool:
+	return not _trip.is_empty()
+
+## A flight whose tween anything else stopped (MapPoc's gesture reset, another flight) lands at once: the cover never
+## outlives its flight (asked each frame).
+func _travel_watch() -> void:
+	if _trip.is_empty(): return
+	var tween = _trip.get("tween")
+	if not (tween is Tween) or not (tween as Tween).is_valid() or not (tween as Tween).is_running(): _travel_land()
+
+## Sent to the background or losing focus mid-flight: it lands (the gesture reset would stop it anyway).
+func _notification(what: int) -> void:
+	if what in [NOTIFICATION_APPLICATION_FOCUS_OUT, NOTIFICATION_APPLICATION_PAUSED] and travelling(): _travel_land()
+
+## Covered by another scene mid-flight: it lands first.
+func suspend() -> void:
+	if travelling(): _travel_land()
+	super.suspend()
+
+## A tap on the cover after its first 0.5 s, or Back: straight down to the city's overview, then as on landing.
+func _skip_travel() -> void:
+	if _trip.is_empty() or float(_trip.t) < P0TravelFlight.UP_S: return
+	_travel_land()
+
+## Down: the camera at the overview, the cover gone, the chip and the avatar in the new city, then the welcome. Also
+## how every other way out ends a flight (skipped, the map suspended or left, the app sent to the background, the
+## tween stopped by anything else), so the cover never stays up.
+func _travel_land() -> void:
+	if _trip.is_empty(): return
+	var trip := _trip
+	_trip = {}
+	if _focus_tween != null and _focus_tween.is_valid(): _focus_tween.kill()
+	var to: Dictionary = trip.to
+	center_lat = float(to.lat)
+	center_lng = float(to.lng)
+	city_bearing = float(to.bearing)
+	_set_zoom(float(to.zoom))
+	_camera_dirty = true
+	if is_instance_valid(trip.cover):   # off at once: the map takes touches again this frame
+		var cover := trip.cover as Node
+		if cover.get_parent() != null: cover.get_parent().remove_child(cover)
+		cover.queue_free()
+	if rt != null: rt.ui.hold_here("")
+	_here_sig = ""
+	_sync_here()
+	if (trip.land as Callable).is_valid() and is_inside_tree(): (trip.land as Callable).call()
 
 ## MAP-7-FREE (§11.8.4 step 7, Figma 482:412): a first visit lands on "3 things to do here" — the local pond, an
 ## outpost and the new stamp. Show local pond only moves the camera to the beginner pond's pin (LOCK-08, the player taps
@@ -1160,6 +1249,9 @@ func p0_surface() -> String: return "map"
 ## (its city card, relocation, a farm selection). #92 brought P0's HUD and Bag to the map without this, so Bag, Today,
 ## the Inbox and the place cards could not be closed with Back there.
 func is_back_navigation_locked() -> bool:
+	if travelling():   # q(147): Back lands a flight (after its first 0.5 s); it never leaves the map mid-air
+		_skip_travel()
+		return true
 	if rt != null and rt.ui.close_top_layer(): return true
 	return super.is_back_navigation_locked()
 
@@ -1168,6 +1260,7 @@ func is_back_navigation_locked() -> bool:
 ## city_pin_markers), so a badge and its pin never disagree (亚瑟 on 234).
 func p0_frame(view: Dictionary, _dt: float) -> void:
 	if city_map == null: return
+	_travel_watch()
 	MapUsage.last_view = Vector3(center_lat, center_lng, zoom)   # Licenses › Mapbox › Improve this map (q(133) v3)
 	_sync_here()
 	# The recenter key gives way to an open sheet (不知火舞 on 234 A2: it showed under the card's ×).
