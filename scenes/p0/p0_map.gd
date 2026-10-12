@@ -1377,6 +1377,7 @@ func p0_dev(step: PackedStringArray) -> bool:
 			else: tap.call()
 		"fly":   # fly:gn-1850147 — the travel card's Fly for that city (review shots, SGODOT-280): travel, then the arrival
 			_origin_before = _origin()
+			_here_before = P0Travel.here(_view())
 			rt.session.send({"type": "travel", "to": step[1]})
 		"citycard":   # citycard:gn-1850147 — that city's silhouette card (MAP-3-FREE), as a tap on its bubble
 			open_city_card(step[1])
