@@ -215,6 +215,51 @@ func test_a_bubble_under_the_hud_is_not_drawn_but_its_dot_is() -> void:
 
 ## 李元芳 0.2.1 smoke (286 bfae88c7): at the country view a visited city right by home (Chico) has its bubble where the
 ## player's avatar stands; the bubble draws over the avatar and takes the tap — the avatar no longer does.
+## 李元芳 0.2.1 smoke (293 378fd255): at the country view, away in LA, home's bubble (San Francisco) sits over the
+## bottom of Chico's. A tap on the part of Chico's bubble that shows took home's 6 px margin and went home; the bubble
+## drawn under the finger takes it now, and the margin only answers taps off every bubble.
+func test_a_tap_on_a_bubble_that_shows_is_not_taken_by_a_neighbours_margin() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	rt.ui.close_modal()
+	var chico := ""
+	for c in load("res://modules/p0/p0_clusters.gd").in_box(39.5, -122.1, 39.9, -121.6, 0, 50):
+		if str(c.get("name", "")) == "Chico": chico = str(c.id)
+	assert_str(chico).is_not_empty()
+	var saved := _travel(rt, {home = SF, here = LA, visits = {chico: {n = 1}, LA: {n = 1}}, passes = {}, stamps = [],
+		fallback = {near3 = [], near10 = []}, explorer = 0})
+	_look(m, 38.8, -122.1, 3.0)
+	m._sync_farm_markers()
+	m.city_map._update_bubbles()
+	var home_id := ""
+	for id in m.city_map.bubbles:
+		if m.city_map.bubbles[id].node.visible and m.city_map.bubbles[id].name.text == "San Francisco": home_id = str(id)
+	assert_str(home_id).is_not_empty()
+	assert_bool(m.city_map.bubbles[chico].node.visible).is_true()
+	var home: Rect2 = m.city_map.bubbles[home_id].node.get_global_rect()
+	var mine: Rect2 = m.city_map.bubbles[chico].node.get_global_rect()
+	# just above home's bubble, on Chico's: drawn there is Chico's alone, within home's old 6 px margin
+	var on_chico := Vector2(mine.get_center().x, home.position.y - 3.0)
+	assert_bool(mine.has_point(on_chico) and not home.has_point(on_chico)).is_true()
+	# just left of home's bubble, off every bubble: the margin still takes it
+	var off_all := Vector2(home.position.x - 3.0, home.get_center().y)
+	assert_bool(mine.has_point(off_all) or m.farm_markers._avatar_targets["self"].get_global_rect().has_point(off_all)).is_false()
+	for c in m.city_map.city_requested.get_connections(): m.city_map.city_requested.disconnect(c.callable)
+	var asked: Array = []
+	m.city_map.city_requested.connect(func(id): asked.append(str(id)))
+	for at in [on_chico, off_all]:
+		for pressed in [true, false]:
+			var tap := InputEventScreenTouch.new()
+			tap.position = at
+			tap.pressed = pressed
+			m._unhandled_input(tap)
+		m._last_tap_ms = 0
+	assert_array(asked).is_equal([chico, home_id])
+	rt.ui.close_modal()
+	rt.session.view = saved
+
 func test_a_city_bubble_over_the_avatar_takes_the_tap() -> void:
 	var m := _map()
 	for i in 3: await get_tree().process_frame
