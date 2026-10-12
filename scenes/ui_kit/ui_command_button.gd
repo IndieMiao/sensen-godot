@@ -41,6 +41,9 @@ var fit_text := false: set = set_fit_text
 ## The caller's width (a board row's 152, a shop row's 76): kept through every redraw — a label change, PENDING and
 ## back, Offline on and off — instead of being set on custom_minimum_size, which each redraw resets (亚瑟 on #84).
 var min_width := 0.0: set = set_min_width
+## The visible key drawn narrower than its touch area, this far in from each side (Compact/Shop action: a 68 × 34 key in
+## its 76 × 44 touch area, q(151)); 0 draws the whole width. Kept through every state, as fit_text is.
+var visual_inset_x := 0.0: set = set_visual_inset_x
 
 ## Sends a server command when activated: greys to `Offline` while offline, and the command it sends is tracked
 ## (P0Ui.track_pressed: SUBMITTING / PENDING, F-08).
@@ -75,6 +78,7 @@ func set_phase(v: CommandLifecycle.State) -> void: phase = v; _apply()
 func set_fit_text(v: bool) -> void: fit_text = v; _fit()
 func set_sends(v: bool) -> void: sends = v; _apply()
 func set_min_width(v: float) -> void: min_width = v; _apply()
+func set_visual_inset_x(v: float) -> void: visual_inset_x = v; _fit()
 
 ## Offline on or off for every command button on screen (and the ones built while it lasts).
 static func set_offline(tree: SceneTree, v: bool) -> void:
@@ -98,17 +102,22 @@ var _fitting := false
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_THEME_CHANGED and not _fitting: _fit()
 
-## Narrow side padding on top of whatever variation is current (re-run when the variation changes).
+## Narrow side padding and the visible key's side inset on top of whatever variation is current (re-run when the
+## variation changes).
 func _fit() -> void:
 	_fitting = true
 	for st in _STYLES: remove_theme_stylebox_override(st)
-	if fit_text:
+	if fit_text or visual_inset_x > 0.0:
 		for st in _STYLES:
 			var sb := get_theme_stylebox(st)
 			if sb == null: continue
 			var t := sb.duplicate() as StyleBox
-			t.content_margin_left = minf(t.content_margin_left, _FIT_PAD)
-			t.content_margin_right = minf(t.content_margin_right, _FIT_PAD)
+			if fit_text:
+				t.content_margin_left = minf(t.content_margin_left, _FIT_PAD)
+				t.content_margin_right = minf(t.content_margin_right, _FIT_PAD)
+			if visual_inset_x > 0.0 and t is UiStyleBox:
+				var u := t as UiStyleBox
+				u.inset = Vector4(visual_inset_x, u.inset.y, visual_inset_x, u.inset.w)
 			add_theme_stylebox_override(st, t)
 	_fitting = false
 
@@ -151,4 +160,4 @@ func _apply() -> void:
 	else:
 		custom_minimum_size = Vector2(maxf(UiTokens.SIZE_TOUCH, min_width), UiTokens.SIZE_COMMAND)
 	modulate.a = UiTokens.OPACITY_PENDING if phase == CommandLifecycle.State.PENDING else 1.0
-	if fit_text: _fit()
+	if fit_text or visual_inset_x > 0.0: _fit()

@@ -42,6 +42,7 @@ func test_available_row_has_a_stepper_and_an_outlined_buy() -> void:
 	r.show_spec(_spec([{id = &"buy", label = "Buy", kind = &"secondary", payload = {}}]), false, 5)
 	await _settle()
 	assert_float(r.size.y).is_equal(58.0)
+	_assert_key_inside_its_touch_area(r)
 	assert_object(r.stepper).is_not_null()
 	assert_int(r.stepper.max_value).is_equal(5)
 	assert_int(r.buy.kind).is_equal(UiCommandButton.Kind.SECONDARY)
@@ -89,3 +90,48 @@ func test_a_new_row_draws_its_gate_line_in_new_ink() -> void:
 	row.show_spec({id = "seed_radish", icon = SEED, title = "Radish Seeds", facts = ["Ready in 4h", "Bag ×2"],
 		price = {text = "4 coins", line = ""}, buttons = []})
 	assert_object(row._gate.get_theme_color(&"font_color")).is_equal(UiTokens.COLOR_SECONDARY)
+
+## q(151) (Compact/Shop action): Buy's touch area is 76 × 44 at y 16, the key drawn in it 68 × 34 — 5 above and below,
+## 4 in from each side — so it ends at 55, clear of the hairline at the row's foot (Joey on 296: it read as cut). The
+## grey key and the Stepper are drawn 34 high in their 44 too.
+func _drawn(c: Control, st: StringName) -> Rect2:
+	var sb := c.get_theme_stylebox(st) as UiStyleBox
+	var r := Rect2(Vector2.ZERO, c.size)
+	r = Rect2(r.position + Vector2(sb.inset.x, sb.inset.y), r.size - Vector2(sb.inset.x + sb.inset.z, sb.inset.y + sb.inset.w))
+	if sb.visual_height > 0.0 and r.size.y > sb.visual_height:
+		r.position.y += (r.size.y - sb.visual_height) * 0.5
+		r.size.y = sb.visual_height
+	return r
+
+func _assert_key_inside_its_touch_area(r: UiShopRow) -> void:
+	var top := r.buy.get_global_rect().position - r.get_global_rect().position
+	assert_vector(r.buy.size).is_equal(Vector2(76, 44))
+	assert_float(top.y).is_equal(16.0)
+	for st in [&"normal", &"hover", &"pressed"]:
+		var d := _drawn(r.buy, st)
+		assert_that([d.position, d.size]).is_equal([Vector2(4, 5), Vector2(68, 34)])
+	assert_float(top.y + 5.0 + 34.0).is_less(r.size.y - UiTokens.STROKE_DEFAULT)   # 55, above the hairline
+
+func test_the_buy_key_keeps_its_drawn_size_through_offline_and_back() -> void:
+	var r := _host(UiShopRow.new()) as UiShopRow
+	r.show_spec(_spec([{id = &"buy", label = "Buy", kind = &"secondary", payload = {}}]), false, 5)
+	await _settle()
+	UiCommandButton.set_offline(get_tree(), true)
+	await _settle()
+	assert_str(r.buy.text).is_equal("Offline")
+	assert_that(_drawn(r.buy, &"normal").size).is_equal(Vector2(68, 34))   # the grey look, the same size
+	UiCommandButton.set_offline(get_tree(), false)
+	await _settle()
+	assert_that(_drawn(r.buy, &"normal").size).is_equal(Vector2(68, 34))
+
+func test_a_grey_key_and_the_stepper_are_drawn_34_high() -> void:
+	var r := _host(UiShopRow.new()) as UiShopRow
+	r.show_spec(_spec([{id = &"buy", label = "Farming Lv8 needed", kind = &"unavailable", payload = {}}]), false, 5)
+	await _settle()
+	var d := _drawn(r.buy, &"normal")
+	assert_that([r.buy.size.y, d.position.y, d.size.y]).is_equal([44.0, 5.0, 34.0])
+	var s := _host(UiShopRow.new()) as UiShopRow
+	s.show_spec(_spec([{id = &"buy", label = "Buy", kind = &"secondary", payload = {}}]), false, 5)
+	await _settle()
+	var surface := s.stepper.get_child(0) as Control
+	assert_that([s.stepper.size.y, surface.position.y, surface.size.y]).is_equal([44.0, 5.0, 34.0])

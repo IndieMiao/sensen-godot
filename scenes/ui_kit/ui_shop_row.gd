@@ -13,7 +13,10 @@ signal quantity_changed(item_id: String, qty: int)
 
 # ShopProduct detailed: icon 32 at (0, 13), text column at x 40, title y 2, effect y 21, gate y 38;
 # price right-aligned in a 76 px box at x 260; › at x 240; stepper at (180, 16); Buy 76 × 44 at (260, 16).
+# Compact/Shop action (q(151)): 76 × 44 is the touch area, the key drawn inside it 68 × 34, 5 above and below (the
+# theme's compact keys draw 34 high); the Stepper's surface and the grey keys are 34 high in their 44 too.
 const _H := 58.0
+const _BUY_VISIBLE_W := 68.0
 const _ICON := 32.0
 const _ICON_GLYPH := 28.0
 const _TEXT_X := 40.0
@@ -59,6 +62,10 @@ func _init() -> void:
 	_actions.alignment = BoxContainer.ALIGNMENT_END
 	_actions.add_theme_constant_override(&"separation", int(UiTokens.SPACE_QUICK_BAR_GAP))
 	add_child(_actions)
+	# Its 44 is set by _layout. A key built before the row has the game's theme measures taller (52), the box takes that
+	# and kept it once the theme came: the keys stretched to 52, Buy's 34 drawn at y 25–59, over the hairline (Joey on
+	# 296). Lay out again whenever what the keys need changes.
+	_actions.minimum_size_changed.connect(_layout)
 	var divider := ColorRect.new()
 	divider.color = UiTokens.COLOR_BORDER
 	divider.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -112,6 +119,7 @@ func show_spec(spec: Dictionary, once := false, stock := 99) -> void:
 	if not available: buy.reason = str(b.get("label", ""))
 	buy.sends = true   # Buy is a server command: Offline while offline (§10.7.1)
 	buy.min_width = _PRICE_W if available else 0.0
+	if available: buy.visual_inset_x = (_PRICE_W - _BUY_VISIBLE_W) * 0.5
 	buy.activated.connect(func(): bought.emit(item_id, stepper.value if stepper else 1))
 	_actions.add_child(buy)
 	_layout()
