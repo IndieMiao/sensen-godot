@@ -39,7 +39,8 @@ static func plan(from_lat: float, from_lng: float, from_zoom: float, from_bearin
 	if absf(dy) > 1e-9: fit = minf(fit, log(0.55 * view.y / (512.0 * absf(dy))) / log(2.0))
 	f._z0 = from_zoom
 	f._z1 = to_zoom
-	f._top = clampf(fit, TOP_MIN_ZOOM, minf(from_zoom, to_zoom) - 1.0)
+	var high := minf(from_zoom, to_zoom) - 1.0   # a step out at least; from far out already (z ≈ 2) it may be under 1.5 (周瑜 on #325)
+	f._top = clampf(fit, minf(TOP_MIN_ZOOM, high), high)
 	f._b0 = from_bearing
 	f._turn = wrapf(to_bearing - from_bearing, -180.0, 180.0)
 	return f
@@ -70,6 +71,12 @@ func sample(t: float) -> Vector4:
 ## The highest the camera goes (the overview of both ends).
 func top_zoom() -> float:
 	return _top
+
+## How far along the route the plane is at `t` seconds (0 at the city left, 1 at the city ahead): 0.5–2.5 s, eased as
+## the camera's flight (fast, then slowing); the km on the pill rolls with it (q(147) v2).
+static func plane_progress(t: float) -> float:
+	var s := clampf((t - UP_S) / FLY_S, 0.0, 1.0)
+	return 1.0 - (1.0 - s) * (1.0 - s)
 
 static func _ease(s: float) -> float:
 	return s * s * (3.0 - 2.0 * s)

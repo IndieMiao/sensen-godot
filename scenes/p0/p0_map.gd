@@ -691,6 +691,7 @@ func _exit_tree() -> void:
 	CityMapData.set_region_provider(Callable())
 	if travelling():   # left mid-flight: nothing more to show here, but the chip and Energy must not stay held
 		_trip = {}
+		_show_self(true)
 		if rt != null: rt.release_travel()
 	super._exit_tree()
 
@@ -850,7 +851,8 @@ func _travel_fly(to: Dictionary, left: Vector2, held: String, city: String, km: 
 	_focus_tween = create_tween()
 	_focus_tween.tween_method(_travel_at, 0.0, P0TravelFlight.TOTAL_S, P0TravelFlight.TOTAL_S)
 	_focus_tween.tween_callback(_travel_land)
-	_trip = {plan = plan, to = to, t = 0.0, cover = cover, land = land, tween = _focus_tween}
+	_trip = {plan = plan, to = to, t = 0.0, cover = cover, land = land, tween = _focus_tween, left = left}
+	_show_self(false)   # the avatar leaves with the take-off (v2)
 	_flight = _focus_tween
 	_flight_kind = "travel"
 
@@ -863,7 +865,17 @@ func _travel_at(t: float) -> void:
 	city_bearing = at.w
 	_set_zoom(at.z)
 	_camera_dirty = true
-	if is_instance_valid(_trip.cover): (_trip.cover as P0TravelCover).show_progress(t)
+	if not is_instance_valid(_trip.cover): return
+	var cover := _trip.cover as P0TravelCover
+	cover.show_progress(t)
+	# the route and its plane between the two cities, where the map draws them now (§11.8 / MAP-7, v2)
+	var from = geo_to_screen(float(_trip.left.x), float(_trip.left.y))
+	var to = geo_to_screen(float(_trip.to.lat), float(_trip.to.lng))
+	cover.show_route(from if from != null else Vector2.INF, to if to != null else Vector2.INF, t)
+
+func _show_self(on: bool) -> void:
+	hide_self = not on
+	if farm_markers: farm_markers.visible = on
 
 ## Whether a cross-city flight is under way (the cover is up).
 func travelling() -> bool:
@@ -909,6 +921,7 @@ func _travel_land() -> void:
 		if cover.get_parent() != null: cover.get_parent().remove_child(cover)
 		cover.queue_free()
 	if rt != null: rt.release_travel()   # the chip and Energy follow the view, the held +10 floats, with the welcome
+	_show_self(true)   # the avatar stands in the city ahead, as the chip changes
 	_here_sig = ""
 	_sync_here()
 	if (trip.land as Callable).is_valid() and is_inside_tree(): (trip.land as Callable).call()

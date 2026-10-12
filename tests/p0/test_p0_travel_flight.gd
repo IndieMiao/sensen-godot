@@ -87,11 +87,16 @@ func test_an_arrival_rises_from_where_the_camera_is_and_lands_in_3_s() -> void:
 	assert_str(cover.distance.text).is_equal("0 km")
 	assert_float(cover.hint.modulate.a).is_equal(0.0)   # no Tap to skip in the first 0.5 s
 	assert_str(_chip_city(rt)).is_equal("San Francisco")   # the chip keeps the city left (q(147) ⑤)
+	assert_bool(m.hide_self).is_true()   # the avatar leaves with the take-off (v2)
+	assert_bool(m.farm_markers.visible).is_false()
 	await get_tree().create_timer(1.5).timeout
 	assert_bool(m.travelling()).is_true()
 	assert_float(m.zoom).is_less(8.0)   # up at the overview of both cities
 	assert_float(cover.hint.modulate.a).is_equal(1.0)
 	assert_str(cover.distance.text).is_not_equal("0 km")
+	var pose: Array = cover.plane_pose()   # the plane on its way, between the two cities' dots
+	assert_bool(pose[0] != Vector2.INF).is_true()
+	assert_bool(cover.from_at != Vector2.INF and cover.to_at != Vector2.INF).is_true()
 	await get_tree().create_timer(2.0).timeout   # 3.5 s in: landed
 	assert_bool(m.travelling()).is_false()
 	assert_bool(is_instance_valid(cover) and cover.is_inside_tree()).is_false()
@@ -99,6 +104,8 @@ func test_an_arrival_rises_from_where_the_camera_is_and_lands_in_3_s() -> void:
 	assert_float(m.center_lat).is_equal_approx(float(o.lat), 1e-6)
 	assert_float(m.zoom).is_equal_approx(float(o.zoom), 1e-6)
 	assert_str(_chip_city(rt)).is_equal("Los Angeles")
+	assert_bool(m.hide_self).is_false()   # it stands in the city ahead, as the chip changes
+	assert_bool(m.farm_markers.visible).is_true()
 	assert_str(rt.ui.toast_text()).is_equal("Welcome back")
 	rt.ui.clear_toast()
 	rt.session.view = saved
@@ -256,3 +263,23 @@ func test_leaving_mid_flight_lets_the_held_energy_go() -> void:
 	m.free()
 	rt.session.view = saved
 	rt.ui.set_view(saved)
+
+## v2 (不知火舞 on 299): the route bows up by a fifth of the two cities' distance; it and the plane fade in over 0.2 s
+## at 0.5 s and out over the landing; the plane flies it 0.5–2.5 s, the km rolling with it.
+func test_the_route_bows_up_and_fades_with_the_flight() -> void:
+	var a := Vector2(0, 100)
+	var b := Vector2(200, 100)
+	var c := P0TravelCover.arc_control(a, b)
+	var mid := P0TravelCover.arc_at(a, c, b, 0.5)
+	assert_float(mid.x).is_equal_approx(100.0, 1e-4)
+	assert_float(100.0 - mid.y).is_equal_approx(40.0, 1e-4)   # up, a fifth of 200
+	var c2 := P0TravelCover.arc_control(b, a)   # the other way: still up
+	assert_float(P0TravelCover.arc_at(b, c2, a, 0.5).y).is_equal_approx(60.0, 1e-4)
+	assert_float(P0TravelCover.route_alpha(0.4)).is_equal(0.0)
+	assert_float(P0TravelCover.route_alpha(0.6)).is_equal_approx(0.5, 1e-4)
+	assert_float(P0TravelCover.route_alpha(1.5)).is_equal(1.0)
+	assert_float(P0TravelCover.route_alpha(2.75)).is_equal_approx(0.5, 1e-4)
+	assert_float(P0TravelCover.route_alpha(3.0)).is_equal(0.0)
+	assert_float(P0TravelFlight.plane_progress(0.5)).is_equal(0.0)
+	assert_float(P0TravelFlight.plane_progress(2.5)).is_equal(1.0)
+	assert_float(P0TravelFlight.plane_progress(1.5)).is_equal_approx(0.75, 1e-4)   # fast, then slowing

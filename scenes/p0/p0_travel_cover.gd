@@ -1,7 +1,12 @@
 class_name P0TravelCover
 extends CanvasLayer
 ## The cross-city flight's cover (q(147), SGODOT-299; 不知火舞 on 299 31c4ceb5): over the map and the HUD while the camera
-## flies, so the map, its pins and the HUD's keys take nothing. A cream pill 8 px under the HUD's second row names the
+## flies, so the map, its pins and the HUD's keys take nothing. The route and its plane (§11.8 / MAP-7, the user on 10-12;
+## 不知火舞's v2 on 299) draw on their own layer, over the map's pins and bubbles and under the HUD and the pill: an arc
+## from the city left to the city ahead bowing up by a fifth of their distance, re-drawn every frame from where the map
+## puts them, primary green dashed (3 px, 8 / 6, round ends), an 8 px dot at each end in a 2 px cream ring; it fades in
+## over 0.2 s at 0.5 s and out over the landing's 0.5 s. The plane (28 px, ink, a 4 px cream outline under it) flies it
+## 0.5–2.5 s, nose along it. A cream pill 8 px under the HUD's second row names the
 ## city ahead (14 Bold) over its distance rolling from 0 to the real km (q(132): `1,758 km`); under it `Tap to skip`
 ## (11, secondary) once the take-off's first 0.5 s are past — a tap anywhere then asks to land (skip_requested), the
 ## press that sent Fly is not taken for one.
@@ -17,6 +22,16 @@ var title: Label
 var distance: Label
 var hint: Label
 var pill: PanelContainer
+## Under P0Ui (10), over the map's own HUD (its pins and bubbles).
+const ROUTE_LAYER := 5
+
+var route_view: Control
+## The two cities where the map draws them (screen px; INF while it cannot) and the flight's seconds.
+var from_at := Vector2.INF
+var to_at := Vector2.INF
+var _t := 0.0
+var _plane: Texture2D
+var _halo: Texture2D
 var _km := 0
 var _skippable := false
 
@@ -29,6 +44,18 @@ func _init() -> void:
 	shield.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	shield.gui_input.connect(_on_input)
 	add_child(shield)
+	var under := CanvasLayer.new()
+	under.name = "RouteLayer"
+	under.layer = ROUTE_LAYER
+	add_child(under)
+	route_view = Control.new()
+	route_view.name = "Route"
+	route_view.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	route_view.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	route_view.draw.connect(_draw_route)
+	under.add_child(route_view)
+	_plane = GameUi.icon("plane_fill")
+	_halo = GameUi.icon("plane_halo")
 	var column := VBoxContainer.new()
 	column.name = "Column"
 	column.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -77,13 +104,95 @@ func open(city: String, km: int, top: float) -> void:
 	(get_node("Shield/Column") as Control).offset_top = top
 	show_progress(0.0)
 
-## t: the flight's seconds so far. The distance rolls up with the take-off and the flight (in place before landing);
+## t: the flight's seconds so far. The distance rolls up with the plane, 0.5–2.5 s (in place before landing);
 ## the hint and skipping come in after the take-off's first 0.5 s.
 func show_progress(t: float) -> void:
-	var p := clampf(t / (P0TravelFlight.UP_S + P0TravelFlight.FLY_S), 0.0, 1.0)
-	distance.text = "%s km" % P0Travel.grouped(roundi(_km * (1.0 - (1.0 - p) * (1.0 - p))))
+	distance.text = "%s km" % P0Travel.grouped(roundi(_km * P0TravelFlight.plane_progress(t)))   # with the plane (v2)
 	_skippable = t >= P0TravelFlight.UP_S
 	hint.modulate.a = 1.0 if _skippable else 0.0
+
+## Where the map draws the two cities now (INF: not drawn), at `t` seconds of the flight.
+func show_route(from: Vector2, to: Vector2, t: float) -> void:
+	from_at = from
+	to_at = to
+	_t = t
+	route_view.queue_redraw()
+
+const ROUTE_COLOR := UiTokens.COLOR_PRIMARY
+const CREAM := Color("FBF8EF")
+const ROUTE_WIDTH := 3.0
+const DASH := 8.0
+const GAP := 6.0
+const END_DOT := 4.0   # radius: 8 px across, in a 2 px cream ring
+const PLANE_SIZE := 28.0
+
+## The arc's control point: a quadratic curve through `a` and `b` whose middle stands a fifth of their distance above
+## the straight line between them (screen y runs down: "above" is the normal pointing up).
+static func arc_control(a: Vector2, b: Vector2) -> Vector2:
+	var d := b - a
+	var length := d.length()
+	if length < 0.001: return a
+	var n := Vector2(d.y, -d.x) / length
+	if n.y > 0.0 or (is_zero_approx(n.y) and n.x > 0.0): n = -n
+	return (a + b) * 0.5 + n * 0.2 * length * 2.0   # the curve's middle is halfway to its control point
+
+static func arc_at(a: Vector2, c: Vector2, b: Vector2, s: float) -> Vector2:
+	return a * (1.0 - s) * (1.0 - s) + c * 2.0 * (1.0 - s) * s + b * s * s
+
+static func arc_tangent(a: Vector2, c: Vector2, b: Vector2, s: float) -> Vector2:
+	return (c - a) * 2.0 * (1.0 - s) + (b - c) * 2.0 * s
+
+## The route's and the plane's opacity at `t`: in over 0.2 s from 0.5 s, out over the landing's 0.5 s.
+static func route_alpha(t: float) -> float:
+	if t < P0TravelFlight.UP_S: return 0.0
+	var a := clampf((t - P0TravelFlight.UP_S) / 0.2, 0.0, 1.0)
+	var landing := P0TravelFlight.UP_S + P0TravelFlight.FLY_S
+	if t > landing: a = minf(a, 1.0 - clampf((t - landing) / P0TravelFlight.DOWN_S, 0.0, 1.0))
+	return a
+
+## Where the plane is now (INF when it is not drawn) and its heading, radians.
+func plane_pose() -> Array:
+	if from_at == Vector2.INF or to_at == Vector2.INF or route_alpha(_t) <= 0.0: return [Vector2.INF, 0.0]
+	var c := arc_control(from_at, to_at)
+	var s := P0TravelFlight.plane_progress(_t)
+	return [arc_at(from_at, c, to_at, s), arc_tangent(from_at, c, to_at, s).angle()]
+
+func _draw_route() -> void:
+	var alpha := route_alpha(_t)
+	if alpha <= 0.0 or from_at == Vector2.INF or to_at == Vector2.INF: return
+	var c := arc_control(from_at, to_at)
+	var color := Color(ROUTE_COLOR, alpha)
+	# dashes along the curve, 8 on / 6 off, round ends
+	var points: Array = []
+	for i in 65: points.append(arc_at(from_at, c, to_at, i / 64.0))
+	var walked := 0.0
+	for i in range(1, points.size()):
+		var p0: Vector2 = points[i - 1]
+		var p1: Vector2 = points[i]
+		var seg := p0.distance_to(p1)
+		var at := 0.0
+		while at < seg:
+			var phase := fmod(walked + at, DASH + GAP)
+			var step := minf(seg - at, (DASH - phase) if phase < DASH else (DASH + GAP - phase))
+			if phase < DASH:
+				var u := p0.lerp(p1, at / seg)
+				var v := p0.lerp(p1, (at + step) / seg)
+				route_view.draw_line(u, v, color, ROUTE_WIDTH, true)
+				route_view.draw_circle(u, ROUTE_WIDTH * 0.5, color)
+				route_view.draw_circle(v, ROUTE_WIDTH * 0.5, color)
+			at += maxf(step, 0.01)
+		walked += seg
+	for end in [from_at, to_at]:
+		route_view.draw_circle(end, END_DOT + 2.0, Color(CREAM, alpha))
+		route_view.draw_circle(end, END_DOT, color)
+	var pose := plane_pose()
+	if pose[0] == Vector2.INF or _plane == null: return
+	# Lucide's plane points up and right (−45° on screen): turned by +45° its nose runs along the route
+	route_view.draw_set_transform(pose[0], float(pose[1]) + PI / 4.0, Vector2.ONE)
+	var box := Rect2(Vector2.ONE * -PLANE_SIZE * 0.5, Vector2.ONE * PLANE_SIZE)
+	if _halo != null: route_view.draw_texture_rect(_halo, box, false, Color(1, 1, 1, alpha))
+	route_view.draw_texture_rect(_plane, box, false, Color(1, 1, 1, alpha))
+	route_view.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 func skippable() -> bool:
 	return _skippable
