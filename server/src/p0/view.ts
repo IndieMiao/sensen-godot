@@ -7,7 +7,7 @@ import { burners, cookAllPlan, cookSlots, mealValue, recipeRarity, settleStove }
 import { sellPrice, stallOffer } from './reducer.js';
 import { blessed, dayKey, foodCap, maxEnergy, nextTickIn, regenMs, settleEnergy, skillLevel, untilRollover } from './rules.js';
 import { emptyDay, type P0State } from './state.js';
-import { catalog, drinkPrice, offerOf, owns, quotaKey, quotaScope, regionalOf, walletNeed } from './shops.js';
+import { catalog, drinkPrice, isSpecialty, offerOf, owns, quotaKey, quotaScope, regionalOf, walletNeed } from './shops.js';
 import { BOARDS, farFish, farTries, handIn, haveForRequest, heldSlot, lockedTemplate, payout, settleBoards, slotCount } from './boards.js';
 import { expireGiftMeals, lessonState, progressOf, requestOpensIn, requestState, residentState, stageIndex } from './residents.js';
 import { floorPrice, haveFor, matches } from './requests.js';
@@ -194,7 +194,10 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
       ...Object.entries(c.tools.names), [c.cooking.mystery.id, c.cooking.mystery.name],
       ...Object.entries(c.materials).map(([id, m]) => [id, m.name]), ...Object.entries(c.drinks.items).map(([id, d]) => [id, d.name]),
       ...Object.entries(c.specialty).map(([id, sp]) => [id, sp.name]), ...c.bag_upgrades.map(u => [u.id, u.name]),
-      ...Object.entries(c.supplies).map(([id, x]) => [id, x.name])]),
+      ...Object.entries(c.supplies).map(([id, x]) => [id, x.name]),
+      // SGODOT-296: city postcards the account has or this Market sells (postcard_<cluster id>: `Tokyo Postcard`)
+      ...[...new Set([...s.owned, ...Object.keys(s.storage), ...catalog(c, 'market', s)])].filter(id => isSpecialty(c, id))
+        .map(id => [id, itemName(c, id)])]),
     // grow_h is this farm's: a regional crop away from its zone ripens in off_zone_grow_h (§5.2.3, `native` false).
     crops: c.crops.map(crop => ({ id: crop.id, seed: crop.seed, energy: crop.energy, grow_h: cropGrowH(c, s, crop), level: crop.level,
       ...(crop.regional ? { zone: crop.zone, native: crop.zone === homeClimate(c, s) } : {}),
@@ -318,6 +321,7 @@ function shopView(c: P0Content, s: P0State, shop: ShopId) {
         xp_to_go: o.skill ? Math.max(0, c.skills[o.skill][o.gate - 1] - s.skills[o.skill]) : 0,
         homestead: o.homestead ?? null, homestead_ok: !o.homestead || s.homestead.level >= o.homestead,
         once: o.once, owned: o.once && owns(c, s, id),
+        ...(shop === 'market' && isSpecialty(c, id) ? { specialty: true } : {}),   // the City Specialty shelf's row (SGODOT-296)
         left: o.daily ? Math.max(0, o.daily - (s.day.bought[id] ?? 0)) : null, daily: o.daily || null,
         materials: (o.materials ?? []).map(([m, n]) => ({ id: m, name: itemName(c, m), need: n, have: haveTotal(s, m) })),
         in_bag: count(s.bag, id),

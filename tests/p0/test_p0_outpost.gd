@@ -313,7 +313,11 @@ func test_room_prompts_are_names_and_icons_only() -> void:
 	assert_str(str(board.name)).is_equal("Market Board")
 	assert_str(str(board.badge)).is_equal("request")
 	assert_str(str(market._marker("use_market_board", {"keepers": {"market": {"board_open": 0}}}).badge)).is_equal("")
-	assert_str(str(market._marker("use_specialty_shelf", {}).name)).is_equal("City Specialty")
+	# the City Specialty crate is a facility only where the server lists this city's postcard (SGODOT-296: Market
+	# Square 1 from M tier up); elsewhere — Market Square 2 / 3, an older view — it is a prop
+	var sells := {"shops": {"market": {"buy": [{"id": "postcard_gn-5355933", "specialty": true}]}}}
+	assert_str(str(market._marker("use_specialty_shelf", sells).name)).is_equal("City Specialty")
+	assert_dict(market._marker("use_specialty_shelf", {"shops": {"market": {"buy": [{"id": "seed_carrot", "specialty": false}]}}})).is_empty()
 	for r in [tea, market, _room("sh_tackle_1"), _room("sh_post_1")]:
 		for n in r._tappable():
 			var m: Dictionary = r._marker(n, {})

@@ -2653,15 +2653,21 @@
       "name": "San Francisco Postcard",
       "price": 100,
       "shop": "market",
-      "to": "storage"
+      "to": "storage",
+      "cluster": "gn-5391959"
     },
     "postcard_shanghai": {
       "name": "Shanghai Postcard",
       "price": 100,
       "shop": "market",
       "to": "storage",
-      "_kept": "No longer sold (SGODOT-270, q(106): P0 moved to San Francisco); kept so a save that bought one still names it."
+      "cluster": "gn-1796236",
+      "_kept": "Shanghai's own postcard again (SGODOT-296): its cluster's Market Square 1 sells this id, never a new postcard_gn-1796236, so an account that bought one in P0 owns it already."
     }
+  },
+  "city_postcard": {
+    "_note": "SGODOT-296 (不知火舞's spec): the City Specialty shelf of every M-tier-and-up city's Market Square 1 sells that city's postcard: `<City> Postcard`, this price, once per account, into Farm Storage. Its id is postcard_<cluster id> (stable: from the cluster id alone, never the world revision or a placing order), except the cities above with their own entry (`cluster`), which keep their old ids. Market Squares 2 and 3, S-tier towns and the wild sell none (the crate stays as a prop).",
+    "price": 100
   },
   "shops": {
     "homestead": {

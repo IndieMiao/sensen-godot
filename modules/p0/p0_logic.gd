@@ -416,6 +416,7 @@ const ICON_ALIAS := {"fert_compost": "compost", "facility_compost_bin": "compost
 
 static func icon(id: String) -> Texture2D:
 	id = base_id(id)   # a dish's quality (`dish_x@good`) has the dish's own art; the stars say the quality (286 5d27bd93)
+	if id.begins_with("postcard_"): id = "postcard"   # every city's postcard (SGODOT-296) has the one postcard art for now
 	var path := ICON_DIR % str(ICON_ALIAS.get(id, DISH_STANDIN.get(id, id)))
 	if ResourceLoader.exists(path): return load(path)
 	# a fish without its own art yet (P1's twelve, SGODOT-283) shows the fish silhouette, not the sprout (不知火舞 69310899)
@@ -459,6 +460,9 @@ static func crop_for_seed(view: Dictionary, seed_id: String) -> Dictionary:
 static func item_name(view: Dictionary, id: String) -> String:
 	var names: Dictionary = view.get("names", {})
 	if not names.has(id) and P0Decor.is_decor(id): return P0Decor.name_of(id)   # Decorate's pieces (SGODOT-284)
+	if not names.has(id) and id.begins_with("postcard_gn-"):   # a city's postcard the view has not named (SGODOT-296)
+		var cl := P0Clusters.get_cluster(id.trim_prefix("postcard_"))
+		if not cl.is_empty(): return "%s Postcard" % str(cl.get("name", ""))
 	if names.has(id) or base_id(id) == id: return str(names.get(id, id))
 	# A dish stack with its quality (`dish_x@good`, §7.2.5): the dish's name, never the raw id; the quality shows as stars
 	# beside it (the item card's state line, dish_label) — 李元芳 on 286 5d27bd93.

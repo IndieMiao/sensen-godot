@@ -277,8 +277,9 @@ func refresh(view_: Dictionary, force := false) -> void:
 	if sheet.is_open(): sheet.refresh()
 	_quota.text = quota_text(view, role, grid.selected_id if sheet.is_open() else "")
 
-## The offers on the current page: the market's City Specialty shelf (content market.specialty), or the Buy shelf —
-## everything else the server lists, which on a Market includes its city's regional seed (P1 §5.2.3).
+## The offers on the current page: the market's City Specialty shelf (rows the server marks `specialty`: this city's
+## postcard, only on its Market Square 1 from M tier up, SGODOT-296; an older server's content market.specialty), or
+## the Buy shelf — everything else the server lists, which on a Market includes its city's regional seed (P1 §5.2.3).
 func offers() -> Array:
 	var all: Array = view.get("shops", {}).get(role, {}).get("buy", [])
 	# Decor (SGODOT-284) is on the stall's own Decor page (FARM-6-DECOR), cheapest first; never on the Buy shelf.
@@ -287,9 +288,18 @@ func offers() -> Array:
 		pieces.sort_custom(func(a, b): return int(a.get("price", 0)) < int(b.get("price", 0)))
 		return pieces
 	if role != "market": return all.filter(func(o): return not P0Decor.is_decor(str(o.get("id", ""))))
-	var specialty: Array = P0Logic.content().get("market", {}).get("specialty", [])
 	var want := section == "specialty"
-	return all.filter(func(o): return specialty.has(str(o.get("id", ""))) == want)
+	return all.filter(func(o): return is_specialty(o) == want)
+
+## A City Specialty row: the server's mark, else (an older server) the content's specialty list.
+static func is_specialty(o: Dictionary) -> bool:
+	if o.has("specialty"): return bool(o.specialty)
+	return P0Logic.content().get("market", {}).get("specialty", []).has(str(o.get("id", "")))
+
+## Whether this Market sells a City Specialty here (SGODOT-296): the server lists one only where the player stands on
+## Market Square 1 of a city of M tier and up; elsewhere the crate is a prop.
+static func has_specialty(view: Dictionary) -> bool:
+	return view.get("shops", {}).get("market", {}).get("buy", []).any(func(o): return is_specialty(o))
 
 func _fill_shelf() -> void:
 	var list := offers()
