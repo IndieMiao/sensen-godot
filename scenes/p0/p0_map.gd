@@ -689,9 +689,9 @@ func _map_logical_height() -> float:
 
 func _exit_tree() -> void:
 	CityMapData.set_region_provider(Callable())
-	if travelling():   # left mid-flight: nothing more to show here, but the chip must not stay held
+	if travelling():   # left mid-flight: nothing more to show here, but the chip and Energy must not stay held
 		_trip = {}
-		if rt != null: rt.ui.hold_here("")
+		if rt != null: rt.release_travel()
 	super._exit_tree()
 
 # ---------------------------------------------------------------- travel (SGODOT-275, §11.8; the free first version)
@@ -807,7 +807,9 @@ var _here_before := ""   # the city they stood in then: the place chip keeps it 
 func on_arrival(ev: Dictionary) -> void:
 	var cluster := str(ev.get("cluster", ""))
 	var c := P0Clusters.get_cluster(cluster)
-	if c.is_empty(): return
+	if c.is_empty():
+		if rt != null: rt.release_travel()   # no flight: nothing held waits for one
+		return
 	var r := P0Clusters.region(cluster)
 	var overview: Dictionary = CityMapData.city(str(r.get("id", ""))).get("overview", {})
 	var left := _origin_before if _origin_before != Vector2.ZERO else Vector2(center_lat, center_lng)
@@ -906,7 +908,7 @@ func _travel_land() -> void:
 		var cover := trip.cover as Node
 		if cover.get_parent() != null: cover.get_parent().remove_child(cover)
 		cover.queue_free()
-	if rt != null: rt.ui.hold_here("")
+	if rt != null: rt.release_travel()   # the chip and Energy follow the view, the held +10 floats, with the welcome
 	_here_sig = ""
 	_sync_here()
 	if (trip.land as Callable).is_valid() and is_inside_tree(): (trip.land as Callable).call()

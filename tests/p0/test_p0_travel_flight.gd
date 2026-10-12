@@ -199,3 +199,60 @@ func test_the_flight_frames_both_cities_at_its_top() -> void:
 	assert_float(end.x).is_equal_approx(34.05, 1e-4)
 	assert_float(end.z).is_equal_approx(11.0, 1e-6)
 	assert_float(P0TravelFlight.TOTAL_S).is_equal(3.0)
+
+## q(147) ⑥ (不知火舞 on 299): a first visit's +10 Energy — its float and the HUD's value — comes with the landing, not
+## as the flight takes off; a skip lets it go at once with the welcome.
+func test_the_arrivals_energy_waits_for_the_landing() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved := _ready_to_arrive(m)
+	var before: Dictionary = rt.session.view.duplicate(true)
+	before["energy"] = {value = 200, max = 200}
+	before["travel"]["here"] = SF
+	rt.ui.set_view(before)
+	var after := before.duplicate(true)
+	after["energy"] = {value = 210, max = 200}
+	after["travel"]["here"] = LA
+	rt.session.view = after
+	rt._on_state(after, [{kind = "energy", delta = 10, reason = "first_visit"},
+		{kind = "arrival", cluster = LA, first = true, trip = 4, km = 559}])
+	assert_bool(m.travelling()).is_true()
+	rt.ui.set_view(after)
+	assert_int(int(rt.ui.hud.data.energy)).is_equal(200)   # still what it was in the air
+	assert_int(rt.travel_floats.size()).is_equal(1)
+	await get_tree().create_timer(0.7).timeout
+	_tap(_cover(m))
+	assert_bool(m.travelling()).is_false()
+	rt.ui.set_view(after)
+	assert_int(int(rt.ui.hud.data.energy)).is_equal(210)
+	assert_array(rt.travel_floats).is_empty()   # let go with the welcome
+	assert_str(rt.ui.toast_text()).is_equal("Welcome to Los Angeles · Stamp collected")
+	rt.ui.clear_toast()
+	rt.ui.close_modal()
+	rt.session.view = saved
+	rt.ui.set_view(saved)
+
+## Cut short (the map left mid-flight), the held Energy still floats and the HUD follows the view.
+func test_leaving_mid_flight_lets_the_held_energy_go() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved := _ready_to_arrive(m)
+	var before: Dictionary = rt.session.view.duplicate(true)
+	before["energy"] = {value = 200, max = 200}
+	rt.ui.set_view(before)
+	var after := before.duplicate(true)
+	after["energy"] = {value = 210, max = 200}
+	rt.session.view = after
+	rt._on_state(after, [{kind = "energy", delta = 10, reason = "first_visit"},
+		{kind = "arrival", cluster = LA, first = true, trip = 4, km = 559}])
+	assert_bool(rt.ui.energy_held()).is_true()
+	m.get_parent().remove_child(m)
+	assert_bool(rt.ui.energy_held()).is_false()
+	assert_array(rt.travel_floats).is_empty()
+	m.free()
+	rt.session.view = saved
+	rt.ui.set_view(saved)
