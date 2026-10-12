@@ -76,6 +76,17 @@ describe('Stall Board (§9.6, §14.1.2)', () => {
     expect(viewOf(c, s, T0 + 30 * 24 * H).boards.stall.slots[0]).toMatchObject({ id: 'req_pond_catch' });
   });
 
+  it('a tracked request carries when it was tracked; older saves without it read null (q(143))', () => {
+    let s = fresh();
+    s.boards.stall[1] = { req: req({ id: 'r1' }), refill_at: 0 };
+    expect(viewOf(c, s, T0).boards.stall.slots[1]).toMatchObject({ id: 'r1', status: 'open', accepted_at: null });
+    s = step(s, { type: 'accept', request: 'r1' }, T0 + 5 * 60_000).s;
+    expect(s.boards.stall[1].req).toMatchObject({ status: 'accepted', accepted_at: T0 + 5 * 60_000 });
+    expect(viewOf(c, s, T0 + H).boards.stall.slots[1]).toMatchObject({ id: 'r1', status: 'accepted', accepted_at: T0 + 5 * 60_000 });
+    delete s.boards.stall[1].req!.accepted_at;   // a save from before q(143): tracked, no time
+    expect(viewOf(c, s, T0 + H).boards.stall.slots[1]).toMatchObject({ status: 'accepted', accepted_at: null });
+  });
+
   it('tracks at most 3 requests at once', () => {
     let s = fresh();
     s.homestead.level = 3;

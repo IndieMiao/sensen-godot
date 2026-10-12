@@ -75,6 +75,7 @@ export interface BoardRequest {
   visit?: { place: string; done: boolean };   // explore (Stamp Run): the outpost to check in at, and whether the player has
   where?: 'not_home';   // Far Pond (q(128)): fish the home city's ponds don't have (boards.ts farFish)
   qty: number; bonus: number; drawn_at: number; status: 'open' | 'accepted';
+  accepted_at?: number;   // when the player tracked it (q(143): Today keeps the latest tracked one); absent on older saves
 }
 /** A board slot: a request, or empty until refill_at. */
 export interface BoardSlot { req: BoardRequest | null; refill_at: number }

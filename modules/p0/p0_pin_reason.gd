@@ -133,6 +133,7 @@ static func taken(view: Dictionary) -> Array:
 				"need_name": _need_name(view, str(r.get("kind", "")), items, r.get("rarity", null)),
 				"have": int(r.get("have", 0)), "qty": int(r.get("qty", 1)),
 				"ready": bool(r.get("ready", int(r.get("have", 0)) >= int(r.get("qty", 1)))),
+				"accepted_at": accepted_at(r),   # q(143): when it was tracked (0 on an older server or save)
 				"deliver": "Deliver at the Stall" if board == "stall" else "Deliver at %s" % _outpost_name("market"),
 				"deliver_go": "stall" if board == "stall" else "outpost:market"})
 	var residents: Dictionary = P0Logic.content().get("residents", {})
@@ -147,8 +148,15 @@ static func taken(view: Dictionary) -> Array:
 			if str(d.get("id", "")) == str(r.id): def = d
 		var need: Dictionary = def.get("need", {})
 		out.append(r.merged({"kind": str(q.get("kind", need.get("kind", ""))), "items": [str(r.item)] if str(r.item) != "" else [],
-			"rarity": q.get("rarity", need.get("rarity", null)), "deliver_go": "outpost:" + _resident_role(str(rid))}))
+			"rarity": q.get("rarity", need.get("rarity", null)), "deliver_go": "outpost:" + _resident_role(str(rid)),
+			"accepted_at": accepted_at(q)}))
 	return out
+
+## When a taken request was tracked (q(143), the view's `accepted_at`, ms); 0 when the server or the save has none, as
+## the earliest.
+static func accepted_at(r: Dictionary) -> float:
+	var at = r.get("accepted_at", null)
+	return float(at) if at != null else 0.0
 
 ## The role of the outpost a resident lives at (p0_outposts.json residents): Old Kai at the Tackle Shop, Pip at the post.
 static func _resident_role(rid: String) -> String:

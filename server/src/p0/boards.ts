@@ -349,6 +349,7 @@ export function boardCommand(c: P0Content, s: P0State, type: 'accept' | 'deliver
     if (r.status === 'accepted') return { code: 'already_accepted' };
     if (tracked(s) >= c.requests.track_max) return { code: 'track_limit', detail: { max: c.requests.track_max } };
     r.status = 'accepted';
+    r.accepted_at = now;   // q(143): Today keeps a row for the latest tracked request
     events.push({ kind: 'request', id, status: 'accepted', coins: 0 });
     return null;
   }

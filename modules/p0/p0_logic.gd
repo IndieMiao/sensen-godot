@@ -1287,11 +1287,19 @@ static func today_rows(view: Dictionary) -> Array:
 	# on their boards. One ready to hand in can be done now and leads; one still short follows what else can be done now,
 	# before the countdowns. The first session shows its tutorial request alone (the guide's row).
 	var progress: Array = []
+	var latest = null   # q(143): the short request tracked last keeps a row (Tracking · it shows in Today)
+	var latest_at := -1.0
 	if not P0Guide.first_phase(view):
 		var deliveries: Array = []
 		for r in PinReason.taken(view):
 			if bool(r.ready): deliveries.append(_row("%s · %s" % [str(r.title), str(r.deliver)], "board", str(r.deliver_go), "deliver:" + str(r.id)))
-			else: progress.append(_request_row(view, r))
+			else:
+				var row := _request_row(view, r)
+				progress.append(row)
+				# the latest accepted_at; none known (0, an older server or save): the first in board order
+				if float(r.accepted_at) > latest_at:
+					latest_at = float(r.accepted_at)
+					latest = row
 		now_rows = deliveries + now_rows
 	var ready := {}
 	var sown := 0
@@ -1373,6 +1381,11 @@ static func today_rows(view: Dictionary) -> Array:
 			best = "%s Lv%d · %d XP to go" % [key.capitalize(), int(sk.get("level", 1)) + 1, gap]   # q(69)
 	if rows.size() < 3 and best != "": rows.append(_row(best, "xp", ""))
 	if rows.is_empty(): rows.append(_first_sow_row(view))
+	# q(143) ①②: on the final three, the latest tracked short request takes the 3rd row when it is not there — over an
+	# info or waiting-recipe row too — unless that row hands something in (three deliveries: one handed in frees a row).
+	if latest != null and rows.size() >= 3 and not rows.slice(0, 3).any(func(r): return is_same(r, latest)) \
+			and not str(rows[2].get("dot", "")).begins_with("deliver:"):
+		rows[2] = latest
 	return P0Guide.focus_first(rows.slice(0, 3))
 
 ## `dot`: the row's key for the Today icon's red dot (q(107)), "" for a row that never lights it.

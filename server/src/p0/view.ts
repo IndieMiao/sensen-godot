@@ -383,6 +383,7 @@ function requestView(c: P0Content, s: P0State, r: BoardRequest, now: number) {
     qty: r.qty, have: Math.min(each, r.qty), ready: parts !== null,
     coins: estimate.base + estimate.bonus, base: estimate.base, bonus: estimate.bonus,
     status: r.status,
+    accepted_at: r.status === 'accepted' ? r.accepted_at ?? null : null,   // q(143); null on saves from before it
     expires_in: r.status === 'open' && r.id !== c.requests.tutorial.id ? Math.max(0, r.drawn_at + c.requests.expire_h * 3_600_000 - now) : null,
   };
 }
@@ -434,6 +435,7 @@ function residentView(c: P0Content, s: P0State, id: string, now: number) {
       item: st.req.need.id ?? null, style: st.req.need.style ?? null,   // P1: one named item, or dishes of one style
       have: Math.min(st.req.qty, progressOf(c, s, id, st.req)),
       ready: st.state === 'accepted' && progressOf(c, s, id, st.req) >= st.req.qty,
+      accepted_at: st.state === 'accepted' ? r.req?.at ?? null : null,   // q(143): when it was tracked (the save's req.at)
     },
     request_state: st.state,   // open | accepted | wait (next player day) | stage (need_stage) | none
     need_stage: st.need_stage ?? null,
