@@ -1590,15 +1590,22 @@ func activate_place_at(screen: Vector2) -> bool:
 			return true
 	return false
 
+## A tap on a city bubble (the region and country views) opens that city before anything drawn under it: the bubbles
+## draw over the players' avatars, so a visited city right by home (Chico) takes the tap, not the avatar (李元芳 0.2.1
+## smoke, 286 bfae88c7); false when the tap is not on one or the street view is up.
+func activate_bubble_at(screen: Vector2) -> bool:
+	if host.city_detail_visible(): return false
+	var local := screen - global_position
+	for id in bubbles:
+		var node: Control = bubbles[id].node
+		if node.visible and Rect2(node.position, node.size).grow(6).has_point(local):
+			city_requested.emit(str(id))
+			return true
+	return false
+
 func activate_at(screen: Vector2) -> bool:
 	var local := screen - global_position
-	if not host.city_detail_visible():
-		for id in bubbles:
-			var node: Control = bubbles[id].node
-			if node.visible and Rect2(node.position, node.size).grow(6).has_point(local):
-				city_requested.emit(str(id))
-				return true
-		return false
+	if not host.city_detail_visible(): return activate_bubble_at(screen)
 	for marker in displayed:
 		if _hits_point(marker.get("hit", [marker.rect]), local): select(marker.entry); return true
 	return false
