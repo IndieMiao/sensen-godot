@@ -229,6 +229,9 @@ func _build_world() -> void:
 	actor = P0Actor.new()
 	add_child(actor)
 	actor.setup(bp, grid, cam)
+	# never on a cell one cannot walk (q(145) ④: the yard shrank inside the fence ring): the nearest free one by walking
+	var stand := landing_cell(grid, bp.world_to_cell(actor.position))
+	if stand != bp.world_to_cell(actor.position): actor.teleport(bp.cell_to_world(stand))
 	# The beds the homestead has (garden.plots, 30 or 40): read from the session's last view, never current() — that
 	# copies the whole view, and this runs every frame (亚瑟 on #215; the map's heat in 260 was the same copy).
 	actor.ground_height = func(p: Vector3) -> float:
@@ -450,6 +453,20 @@ func _step_actor_fade(dt: float) -> void:
 		gi.transparency = _actor_fade   # 0 again leaves the transparent pipeline
 		gi.cast_shadow = _actor_shadows[id] if _actor_fade < 0.5 else GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	if _actor_fade == 0.0: _actor_shadows.clear()
+
+## Where the player stands on entering the farm (q(145) ④): `from` when one may walk there, else the nearest free cell
+## by walking; a spot walled in on every side (the yard's corner past the fence ring) takes the nearest free cell.
+static func landing_cell(g: BlueprintGrid, from: Vector2i) -> Vector2i:
+	var to := free_cell_near(g, from, [])
+	if g.bp.in_bounds(to) and not g.astar.is_point_solid(to): return to
+	var dist := INF
+	for y in g.bp.grid.y:
+		for x in g.bp.grid.x:
+			var c := Vector2i(x, y)
+			if g.astar.is_point_solid(c) or Vector2(c - from).length_squared() >= dist: continue
+			dist = Vector2(c - from).length_squared()
+			to = c
+	return to
 
 ## The free cell nearest `from` by walking (4-way, like the paths): solid cells are walls (fences, the house), `taken`
 ## ones can be crossed even when solid (Decorate's pieces are, 苏烈 on #261: the player walks out of the piece) but not
