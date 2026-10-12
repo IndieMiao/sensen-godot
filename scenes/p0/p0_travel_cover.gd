@@ -5,8 +5,8 @@ extends CanvasLayer
 ## 不知火舞's v2 on 299) draw on their own layer, over the map's pins and bubbles and under the HUD and the pill: an arc
 ## from the city left to the city ahead bowing up by a fifth of their distance, re-drawn every frame from where the map
 ## puts them, primary green dashed (3 px, 8 / 6, round ends), an 8 px dot at each end in a 2 px cream ring; it fades in
-## over 0.2 s at 0.5 s and out over the landing's 0.5 s. The plane (28 px, ink, a 4 px cream outline under it) flies it
-## 0.5–2.5 s, nose along it. A cream pill 8 px under the HUD's second row names the
+## over 0.2 s at 0.5 s and out over the landing's 0.5 s. The plane (i-plane, 279 a4ab1287: a top view, nose right, ink
+## in a cream outline, 28 px) flies it 0.5–2.5 s, nose along it. A cream pill 8 px under the HUD's second row names the
 ## city ahead (14 Bold) over its distance rolling from 0 to the real km (q(132): `1,758 km`); under it `Tap to skip`
 ## (11, secondary) once the take-off's first 0.5 s are past — a tap anywhere then asks to land (skip_requested), the
 ## press that sent Fly is not taken for one.
@@ -31,7 +31,6 @@ var from_at := Vector2.INF
 var to_at := Vector2.INF
 var _t := 0.0
 var _plane: Texture2D
-var _halo: Texture2D
 var _km := 0
 var _skippable := false
 
@@ -54,8 +53,7 @@ func _init() -> void:
 	route_view.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	route_view.draw.connect(_draw_route)
 	under.add_child(route_view)
-	_plane = GameUi.icon("plane_fill")
-	_halo = GameUi.icon("plane_halo")
+	_plane = GameUi.icon("i-plane")
 	var column := VBoxContainer.new()
 	column.name = "Column"
 	column.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -187,10 +185,9 @@ func _draw_route() -> void:
 		route_view.draw_circle(end, END_DOT, color)
 	var pose := plane_pose()
 	if pose[0] == Vector2.INF or _plane == null: return
-	# Lucide's plane points up and right (−45° on screen): turned by +45° its nose runs along the route
-	route_view.draw_set_transform(pose[0], float(pose[1]) + PI / 4.0, Vector2.ONE)
+	# i-plane's nose points right (0°): turned by the route's heading its nose runs along it
+	route_view.draw_set_transform(pose[0], float(pose[1]), Vector2.ONE)
 	var box := Rect2(Vector2.ONE * -PLANE_SIZE * 0.5, Vector2.ONE * PLANE_SIZE)
-	if _halo != null: route_view.draw_texture_rect(_halo, box, false, Color(1, 1, 1, alpha))
 	route_view.draw_texture_rect(_plane, box, false, Color(1, 1, 1, alpha))
 	route_view.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
