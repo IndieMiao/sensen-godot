@@ -1593,8 +1593,9 @@ func activate_place_at(screen: Vector2) -> bool:
 ## A tap on a city bubble (the region and country views) opens that city before anything drawn under it: the bubbles
 ## draw over the players' avatars, so a visited city right by home (Chico) takes the tap, not the avatar (李元芳 0.2.1
 ## smoke, 286 bfae88c7); false when the tap is not on one or the street view is up. The bubble drawn on top under the
-## finger takes it; with `slop`, a tap just off every bubble (6 px) takes the nearest edge's, so the margin never
-## reaches over a neighbour that is drawn there (home's bubble over Chico's at the country view, 293 378fd255).
+## finger takes it; with `slop`, a tap just off every bubble goes to the topmost one whose 6 px margin holds it, so the
+## margin never reaches over a neighbour that is drawn there (home's bubble over Chico's at the country view, 293
+## 378fd255).
 func activate_bubble_at(screen: Vector2, slop := false) -> bool:
 	if host.city_detail_visible(): return false
 	var local := screen - global_position

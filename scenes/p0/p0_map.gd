@@ -9,6 +9,7 @@ extends "res://scenes/map_poc/map_poc.gd"
 const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
 const P0Clusters := preload("res://modules/p0/p0_clusters.gd")   # every city cluster (SGODOT-275)
 const P0Travel := preload("res://modules/p0/p0_travel.gd")   # where the player is in the world (SGODOT-275)
+const MapFogLayer := preload("res://modules/map/map_fog_layer.gd")   # the fog's holes as the map draws the ground (SGODOT-298)
 const P0_FARM := "res://scenes/p0/p0_farm.tscn"
 const P0_POND := "res://scenes/p0/p0_pond.tscn"
 static var P0_REGION := P0City.region()   # the home city's map region (SGODOT-270: from content, san_francisco)
@@ -886,9 +887,9 @@ func _travel_first(entry: Dictionary) -> bool:
 	open_city_card(cluster)   # unexplored: the silhouette card first (MAP-3-FREE); visited: its travel card
 	return true
 
-## The fog's holes (§11.7.3): one round every explored city near the screen, a little wider than its radius, in the city
-## view's pixels; the farthest at most MapFogLayer.MAX_HOLES. Asked each frame; projection only, no list work.
-## Rebuilt only when the camera or the explored list changes, so a still map costs nothing (SGODOT-260).
+## The fog's holes (§11.7.3): one round every explored city near the screen, a little wider than its radius on the
+## ground, in the city view's pixels; the farthest at most MapFogLayer.MAX_HOLES. Asked each frame; projection only, no
+## list work. Rebuilt only when the camera or the explored list changes, so a still map costs nothing (SGODOT-260).
 var _fog_key := ""
 var _fog_holes: Array = []
 
@@ -909,11 +910,32 @@ func fog_holes() -> Array:
 		var km := P0Clusters.radius_km(int(c.population)) * 1.15
 		var r := km / (40075.0 * maxf(0.05, cos(deg_to_rad(float(c.lat))))) * scale
 		var at: Vector2 = (p as Vector2) - city_map.global_position
-		if not Rect2(Vector2.ZERO, vp).grow(r + 2.0).has_point(at): continue   # only holes that reach the screen
-		out.append({at = at, r = r})
+		var hole := _ground_hole(float(c.lat), float(c.lng), km, at)
+		if hole.is_empty(): hole = {at = at, r = r}   # its ground off the camera (up close): the flat circle covers
+		if not Rect2(Vector2.ZERO, vp).grow(float(hole.r) + 2.0).has_point(at): continue   # only holes that reach the screen
+		out.append(hole)
 		if out.size() >= 64: break
 	_fog_holes = out
 	return out
+
+## A city's hole as the map draws its ground (SGODOT-298: from z 8 the map tilts and a circle of the flat scale missed
+## it): four points half its radius out, then the rim at its radius, east / north / west / south, in km on the ground.
+## {} when one of them is behind the camera.
+func _ground_hole(lat: float, lng: float, km: float, at: Vector2) -> Dictionary:
+	var ground: Array = []
+	var screen: Array = []
+	var rim: Array = []
+	for reach in [0.5, 1.0]:
+		for dir in [Vector2(1, 0), Vector2(0, 1), Vector2(-1, 0), Vector2(0, -1)]:
+			var g: Vector2 = dir * km * reach
+			var q = geo_to_screen(lat + g.y / 111.32, lng + g.x / (111.32 * maxf(0.05, cos(deg_to_rad(lat)))))
+			if q == null: return {}
+			var v: Vector2 = (q as Vector2) - city_map.global_position - at
+			if reach < 1.0:
+				ground.append(Vector2(g.x, -g.y))   # the screen's y runs south
+				screen.append(v)
+			else: rim.append(v)
+	return MapFogLayer.ground_hole(at, ground, screen, km, rim)
 
 ## Going home from another city (q(108)): free and instant — `return_home`, then the farm as ever. Welcome home
 ## floats; no stamp, no Energy. At home it does nothing.
