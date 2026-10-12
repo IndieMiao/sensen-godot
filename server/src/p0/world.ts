@@ -227,15 +227,17 @@ export function outpostCounts(w: WorldContent, tier: Tier, ponds: number): Recor
  * Outposts (§9.3.2 placement): Travel Post 1 by the centre, Market Square 1 between 1 and 2 km out and ≤ 800 m from
  * the beginner pond (on the pond's side), tackle shops beside ponds (≤ 300 m from the shore, the beginner pond's
  * first), tea houses and further squares and posts spread on rings around the centre. Same kind ≥ 3 km apart,
- * different kinds ≥ 300 m: a candidate that breaks either turns round its ring until it fits. S tier: one trading post.
+ * different kinds ≥ 300 m, and a pond counts as another kind (q(144): Market Square 2 used to land on pond 5, both on
+ * the 5 km ring at one bearing) — a tackle shop keeps its own pond at 200 m. A candidate that breaks any of these
+ * turns round its ring until it fits. S tier: one trading post.
  */
 export function genOutposts(w: WorldContent, cl: CityCluster, tier: Tier, ponds: GenPond[]): GenOutpost[] {
   const seed = w.seed, pl = w.placement;
   const out: GenOutpost[] = [];
   const used = new Set<string>();
   const sameKm = pl.same_kind_min_km, otherKm = pl.other_kind_min_m / 1000;
-  const fits = (p: { lat: number; lng: number }, role: Role) =>
-    out.every(o => km(o, p) >= (o.role === role ? sameKm : otherKm));
+  const fits = (p: { lat: number; lng: number }, role: Role, ownPond?: GenPond) =>
+    out.every(o => km(o, p) >= (o.role === role ? sameKm : otherKm)) && ponds.every(q => q === ownPond || km(q, p) >= otherKm);
   const put = (role: Role, index: number, at: { lat: number; lng: number }, name: string, extra: Partial<GenOutpost> = {}) => {
     const room = w.room[extra.cabin ? 'cabin' : role];
     out.push({ id: `${cl.id}~${extra.cabin ? 'cabin' : role}${index}`, role, name, ...at, category: room.category,
@@ -276,7 +278,7 @@ export function genOutposts(w: WorldContent, cl: CityCluster, tier: Tier, ponds:
   for (const p of [...ponds].sort((a, b) => Number(b.beginner) - Number(a.beginner))) {
     if (out.filter(o => o.role === 'tackle').length >= n.tackle) break;
     const at = offset(p.lat, p.lng, Math.min(0.2, pl.tackle.shore_max_m / 1000), turn(`tackle:${p.id}`));
-    if (!fits(at, 'tackle')) continue;
+    if (!fits(at, 'tackle', p)) continue;
     const i = out.filter(o => o.role === 'tackle').length;
     put('tackle', i, at, `${p.name.split(' ')[0]} Tackle Shop`, { nearest: { name: p.name, site: p.site } });
   }

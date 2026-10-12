@@ -190,16 +190,23 @@ export function ruleOk(cl: CityCluster, places: Place[], me: Place, at: { lat: n
   const outs = places.filter(p => p.kind === 'outpost') as (GenOutpost & { kind: 'outpost' })[];
   const beginner = ponds.find(p => p.beginner)!;
   if (me.kind === 'pond') {
+    // q(144): ≥ 300 m from every outpost but its own tackle shop, which follows the pond (placed after it, 100–300 m)
+    for (const x of outs) {
+      if (x.role === 'tackle' && x.nearest?.name === me.name) continue;
+      if (km(x, at) < 0.3 - 1e-6) return false;
+    }
     const d = km(cl, at);
     if (me.beginner) return ponds.every(p => p === me || km(cl, p) >= d - 0.01);
     return d >= km(cl, beginner) - 0.01;
   }
   const o = me;
   for (const x of outs) if (x !== o && km(x, at) < (x.role === o.role ? 3 : 0.3) + 1e-6) return false;
+  // q(144): a pond is a place of another kind (≥ 300 m), except a tackle shop's own pond (100–300 m)
+  const own = o.role === 'tackle' ? ponds.find(p => p.name === o.nearest?.name) : undefined;
+  for (const q of ponds) if (q !== own && km(q, at) < 0.3 - 1e-6) return false;
   if (o.cabin) return true;
   if (o.role === 'tackle') {
-    const pond = ponds.find(p => p.name === o.nearest?.name);
-    if (!pond || km(pond, at) > 0.3) return false;
+    if (!own || km(own, at) > 0.3 || km(own, at) < 0.1) return false;
   }
   if (o.id.endsWith('~market0')) { const d = km(cl, at); if (d < 1 || d > 2 || km(beginner, at) > 0.8) return false; }
   if (o.id.endsWith('~post0') && km(cl, at) > 1) return false;
