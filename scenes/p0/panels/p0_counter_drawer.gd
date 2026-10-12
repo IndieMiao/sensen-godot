@@ -257,7 +257,9 @@ func refresh(view_: Dictionary, force := false) -> void:
 		_decor_line.visible = section == "decor"
 		_decor_line.text = P0Decor.header_line(view) if section == "decor" else ""
 	var buys := has_bag_half(view, role)
-	_bag_half.visible = buys and shows_shelf
+	# City Specialty is its own short sheet with no bag (MARKET-SPECIALTY, q(48)), even where the market buys back
+	# (SGODOT-284): its height counts its rows only, so a bag half there runs off the screen (0.2.2, Joey on 296).
+	_bag_half.visible = buys and shows_shelf and section != "specialty"
 	if not _bag_half.visible: return
 	# The Decor page sells nothing back: the bag below only shows (no scope, no Sell card; 不知火舞 on 284 263ca1d6 ②).
 	_scope.visible = section != "decor"
