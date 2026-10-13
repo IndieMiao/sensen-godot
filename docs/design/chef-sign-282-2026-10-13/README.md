@@ -1,29 +1,29 @@
-# SGODOT-282 · Chef's Sign · v1.2
+# SGODOT-282 · Chef's Sign · v1.3
 
-刘备 · 2026-10-13 · review candidate for 0.2.5. Technical review: 上官婉儿;
-visual acceptance: 不知火舞. PR base is `wp-3d-scene`.
+刘备 · 2026-10-13 · target 0.2.5 · [PR #356](https://github.com/IndieMiao/sensen-godot/pull/356), base `wp-3d-scene`.
 
-Two freestanding hanging signs use the farm's flat opaque vertex colors and
-unmodified `FarmArt.material()`. A has a warm wooden foot; B replaces only the
-foot with three pale grey stone blocks. The post, arm, chains and complete board
-are shared geometry. The sign shows a cream chef's hat, crossed fork and spoon,
-and one small gold star on deep warm red with a thin gold frame. No lettering,
-textures, grain, noise, decals, extra material or runtime effects.
+At final anchor `(5,14)`, the previous 0.60 m board entered the mine path
+`(4,14)` by 0.357 m. Per 上官婉儿's v1.3 specification and 不知火舞's option ②,
+both variants now have a 0.50 m board, shorter arm and uniformly scaled icons.
+The model pivot remains the post foot-bottom centre; 哪吒 applies the requested
+approximately +0.18 m X offset during placement.
 
-## Review images
+A retains its warm wooden foot; B uses three pale grey stone blocks. Both share
+the same post, arm, chains and red/gold board, with a cream chef's hat, crossed
+fork and spoon, and one small gold star. Flat opaque vertex colors use unchanged
+`FarmArt.material()`, with no lettering or textures.
 
-- [A / wood · 43° pitch, 14.5° yaw, existing character](chef_sign_a-43deg.png)
-- [B / stone · same camera and character](chef_sign_b-43deg.png)
-- [Board front / +Z · real chain connections](chef-sign-front.png)
-- [True top view / actual 0.65 m grid](chef-sign-top-grid.png)
+## Current review images
 
-All four are actual 1600 × 1400 Godot 4.7.2 Vulkan Mobile SubViewport captures
-on the Deck's AMD Custom GPU 0405 (RADV VANGOGH), with existing farm sun/ambient
-settings. Captions, grid, ground and character are isolated review fixtures.
-The front detail intentionally crops the lower post. These are desktop art
-checks; Android, physical-phone performance and final farm placement are not
-claimed. Source concept and amendments are retained in
-[the editable source directory](../../../tools/art/source/chef_sign_282/).
+- [Both variants / 43° pitch, 14.5° yaw, existing character](v1.3/chef-sign-v1.3-43deg.png)
+- [True top view / 0.65 m grid / labelled (4,14) path and (5,14) anchor](v1.3/chef-sign-v1.3-top-grid.png)
+
+These are actual 1800 × 1400 Godot 4.7.2 Vulkan Mobile captures on the Deck's
+AMD Custom GPU 0405 (RADV VANGOGH), using existing farm lighting and material.
+The top view uses B's larger foot, with a +0.18 m offset in the review fixture.
+Labels and dimensions show the remaining 77 mm path intrusion. Final bench
+occlusion/click regions require the integrated farm view. These are desktop art
+checks, not Android or physical-phone performance measurements.
 
 ## Dimensions and integration
 
@@ -32,62 +32,61 @@ claimed. Source concept and amendments are retained in
 | `chef_sign_a.glb` | 1,362 triangles, 1 mesh, 1 surface |
 | `chef_sign_b.glb` | 1,450 triangles, 1 mesh, 1 surface |
 | Total height / arm top | 1.74 / 1.70 |
-| Board outer width × height × frame depth | 0.60 × 0.45 × 0.05 |
+| Board outer width × height × frame depth | 0.50 × 0.45 × 0.05 |
 | Board bottom / top | 1.06 / 1.51 |
-| `board_center` | (-0.382, 1.285, 0), identity basis |
+| Board outer / inner X edge | -0.582 / -0.082 |
+| `board_center` | (-0.332, 1.285, 0), identity basis |
+| Decorated board `overhang_bounds` | (-0.582,1.06,-0.025) → (-0.082,1.51,0.035) |
+| Arm X extent | -0.505 → +0.055 |
 | Foot A / B XZ projection | 0.26 × 0.26 / 0.28 × 0.28 |
 | Pivot / front | Post foot-bottom centre (0,0,0) / +Z |
 | Footprint metadata | 0.65 m, one anchor cell |
-| Collision box | Centre (0,0.87,0), size (0.28,1.74,0.28) |
-| A full bounds | (-0.682,0,-0.13) → (0.13,1.74,0.13) |
-| B full bounds | (-0.682,0,-0.14) → (0.14,1.74,0.14) |
+| Post/foot collision box | Centre (0,0.87,0), size (0.28,1.74,0.28) |
+| A full bounds | (-0.582,0,-0.13) → (0.13,1.74,0.13) |
+| B full bounds | (-0.582,0,-0.14) → (0.14,1.74,0.14) |
 
-The frame itself is 0.05 m thick; raised icon relief reaches Z = +0.038,
-for a complete decorated board depth of 0.063 m. The arm extends 0.54 m beyond
-the post's left face. Both short hanging chains have a solid eye bolt into the
-arm and another into the frame, with an alternating-plane link between them.
+The complete emblem group, including relief depth, is scaled uniformly by 5/6
+about the board centre and red front plane. Frame thickness, rim width, corner
+radii, board height and bottom remain unchanged. The outer hanger and its
+attached eye bolts move inward by 0.10 m with the shortened arm; both short
+chains retain real eye-bolt connections into the arm and board.
 
-`manifest.json` records bounds, triangles, surfaces, footprint, board bottom,
-board size/centre, collider and suspended overhang bounds. Only the post/foot
-blocks movement; never derive a collider from the whole asset AABB. The 1.06 m
-board bottom follows the requested gameplay collision policy; it is not full
-head clearance for an H = 1.745 m character.
+**Direction choice:** directly authored -X arm, +Z front and positive runtime
+scale. No additional mirror or 180° Y turn is needed. Feet and post have no
+directional detailing. **Placement choice:** follow the v1.3 width and +0.18 m
+runtime offset. The board then reaches X = -0.402 relative to the anchor-cell
+centre, or **0.077 m into path (4,14)** past the -0.325 m boundary. B's foot
+reaches X = +0.320, leaving 0.005 m before the right cell edge. The remaining
+path intrusion is the accepted v1.3 compromise, not a full head-clearance claim.
+The board bottom is 1.06 m versus the fixture character's 1.745 m height.
 
-**v1.2 choice: directly authored left arm.** For anchor `(6,14)`, use normal
-positive scale and keep +Z facing the default camera. No additional X mirror or
-180° Y turn is needed. The reflection is baked in the source coordinates with
-outward winding/normals recalculated, including the eye bolts and chains. The
-fork/spoon swap sides; the icon remains readable. Feet and post have no
-directional texture or detailing.
-
-**Dimension/footprint choice:** preserve the specified 0.60 m wide side-hanging
-board and centred post pivot. Consequently its elevated silhouette extends
-0.357 m beyond the anchor cell's left edge (X = -0.325). The one-cell footprint
-describes the post anchor, not a false claim that the whole silhouette fits in
-that square. The top view shows adjacent clear lawn beneath the overhang and a
-separate clear path row. 哪吒 must check this overhang at `(6,14)` against the
-actual bench, path, porch eave and occupied cells when replacing the placeholder.
-The final upgraded farm layout is not part of this art review fixture.
+哪吒 must check bench occlusion and click overlap in the actual default farm
+camera. If overlap occurs, reduce the rightward offset until the bench is clear,
+accepting greater path intrusion as the specification directs. The GLBs contain
+no placement translation; the one-cell footprint refers to the post anchor.
+Only post/foot collision is used, never the whole suspended asset AABB.
 
 `FarmArt.instance()` / `mesh_for()` extract only the merged mesh. To retain the
 `board_center` empty, instantiate the full GLB PackedScene and assign
 `FarmArt.material()` to its single MeshInstance3D, or reconstruct the empty from
 the manifest socket transform. Import files disable automatic LODs and unused
-tangents to retain the small silhouettes.
+tangents. Named editable parts and the authoritative specification are in
+[the source directory](../../../tools/art/source/chef_sign_282/).
 
 ## Validation and reproduction
 
-- [Godot validation](validation.json): 46 checks passed, including imported
-  bounds, board size/bottom, foot dimensions, pivot, marker, budget, left arm,
-  shared material and saved captures. Imported dimension tolerance: 0.1 mm.
-- [Independent GLB audit](glb-validation.json): 29 checks passed, including
-  actual binary topology, zero degenerate triangles, outward normals after
-  reflection, no textures, positive scales and matching A/B non-foot geometry,
-  normals and colors at 10 micrometre / 5 decimal precision.
-- [Rebuild record](reproducibility.json): two consecutive exports produce
+- [Godot validation](v1.3/validation.json): 48 checks passed; actual imported
+  dimensions, marker/pivot, budget, material, fixture path intrusion and foot
+  containment, with 0.1 mm dimension tolerance.
+- [Independent GLB audit](v1.3/glb-validation.json): 29 checks passed; binary
+  topology, zero degenerate triangles, outward normals, no textures, positive
+  scale and matching A/B non-foot geometry/colors/normals.
+- [Revision audit](v1.3/revision-validation.json): compared against v1.2 commit
+  `877beca6`; actual emblem vertices match uniform 5/6 scaling within 1 micrometre,
+  foot geometry/pivots retained, 111 existing art/import files and the other 38
+  manifest entries unchanged.
+- [Rebuild record](v1.3/reproducibility.json): two consecutive exports produce
   byte-identical GLBs and manifest.
-- [Preservation record](preservation.json): 109 existing farm art files and all
-  38 prior manifest entries match art target commit `749f098b`.
 
 ```sh
 blender --background --factory-startup --python "$PWD/tools/art/build_chef_sign.py"
@@ -98,16 +97,17 @@ godot --path output/chef-sign-282/project
 ```
 
 Use an active display for the last command. Captures and Godot checks appear in
-`output/chef-sign-282/captures`; the independent binary audit is in
+`output/chef-sign-282/v1.3/captures`; the independent binary audit appears in
 `output/chef-sign-282/glb-validation.json`. The isolated project has only the
-Avatar autoload, fixture outfit and a separate user-data directory. No gameplay
-rules, production save, farm placement code or shared material were changed.
+Avatar autoload, fixture outfit and a separate user-data directory.
 
-## Plane delivery
+## Delivery history
 
-The four screenshots are attached to SGODOT-282 with the prefix
-`SGODOT-282_Chef-Sign_v1.2_`. Every upload and completion write supplied 刘备's
-`virtual_user_id = 0fb1de1f-ead5-443b-9537-54cbac113260`. All four were downloaded
-back and SHA-256 matched; the visible uploader was verified as that identity.
-[Delivery receipt](delivery-verification.json) records the attachment IDs and hashes.
-Technical/visual approval and integration remain separate review steps.
+上官婉儿 confirmed v1.2 technical and visual acceptance before requesting this
+placement revision. [The v1.2 record](v1.2-README.md), four screenshots and their
+Plane receipts remain archived; their older dimensions/anchor are historical.
+The two current screenshots use attachment prefix `SGODOT-282_Chef-Sign_v1.3_`
+and 刘备's `virtual_user_id = 0fb1de1f-ead5-443b-9537-54cbac113260`.
+The [v1.3 delivery receipt](v1.3/delivery-verification.json) records verified
+uploader identity and download SHA-256 matches. Final farm placement is handed
+to 哪吒 for the integrated bench/click check and review image.

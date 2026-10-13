@@ -19,7 +19,7 @@ func check(ok: bool, what: String):
 func vector(values): return Vector3(values[0],values[1],values[2])
 
 func _run():
-	out=ProjectSettings.globalize_path("res://../captures")
+	out=ProjectSettings.globalize_path("res://../v1.3/captures")
 	DirAccess.make_dir_recursive_absolute(out)
 	var manifest=JSON.parse_string(FileAccess.get_file_as_string("res://assets/farm/art/manifest.json"))
 	for id in IDS:
@@ -60,9 +60,11 @@ func _run():
 			if gold_vertex:
 				if not have_frame: frame=AABB(p,Vector3.ZERO);have_frame=true
 				else: frame=frame.expand(p)
-		check(absf(frame.position.y-entry.board_bottom)<.0001 and absf(frame.size.x-.60)<.0001 and absf(frame.size.y-.45)<.0001,id+": exported board width / height / bottom (0.1 mm import tolerance)")
+		check(absf(frame.position.y-entry.board_bottom)<.0001 and absf(frame.size.x-.50)<.0001 and absf(frame.size.y-.45)<.0001,id+": v1.3 exported board 0.50 x 0.45 m / bottom (0.1 mm tolerance)")
 		check(frame.size.z>=.0499 and frame.size.z<=.064,id+": solid frame depth including relief")
-		check(frame.end.x<0 and box.position.x<-.6 and scene.scale==Vector3.ONE,id+": v1.2 arm to left, positive scale")
+		check(absf(frame.position.x+.582)<.0001 and absf(frame.end.x+.082)<.0001 and scene.scale==Vector3.ONE,id+": v1.3 left board edges, positive scale")
+		var intrusion=-.325-(frame.position.x+.18)
+		check(absf(intrusion-.077)<.0001,id+": +0.18 m fixture shift leaves 77 mm path intrusion")
 		var feet=AABB();var have_feet=false
 		for p in arrays[Mesh.ARRAY_VERTEX]:
 			if p.y<=.21:
@@ -70,13 +72,14 @@ func _run():
 				else: feet=feet.expand(p)
 		check(feet.size.x<=.30001 and feet.size.z<=.30001,id+": foot projection <= 0.30 m square")
 		check(absf(feet.get_center().x)<.00001 and absf(feet.get_center().z)<.00001,id+": pivot at foot centre")
+		check(feet.end.x+.18<=.32501,id+": shifted foot remains inside anchor cell")
 		var collider=entry.collider
 		check(vector(collider.size).x<=.30 and vector(collider.size).z<=.30 and vector(collider.at).x==0 and vector(collider.at).z==0,id+": only post collider, no suspended board box")
 		check(is_equal_approx(entry.footprint,.65) and entry.footprint_cells==[1.0,1.0],id+": one 0.65 m anchor cell")
-		report.assets.append({"id":id,"triangles":entry.triangles,"bounds":entry.bounds,"board_bounds":[[frame.position.x,frame.position.y,frame.position.z],[frame.end.x,frame.end.y,frame.end.z]],"foot_size":[feet.size.x,feet.size.y,feet.size.z],"collider":collider})
+		report.assets.append({"id":id,"triangles":entry.triangles,"bounds":entry.bounds,"board_bounds":[[frame.position.x,frame.position.y,frame.position.z],[frame.end.x,frame.end.y,frame.end.z]],"foot_size":[feet.size.x,feet.size.y,feet.size.z],"collider":collider,"fixture_right_shift":.18,"path_intrusion":intrusion,"foot_right_clearance":.325-(feet.end.x+.18)})
 		scene.free()
 	check(Art.material().vertex_color_use_as_albedo and not Art.material().vertex_color_is_srgb and is_equal_approx(Art.material().roughness,.9),"Unmodified shared FarmArt.material()")
-	vp=SubViewport.new();vp.size=Vector2i(1600,1400);vp.own_world_3d=true
+	vp=SubViewport.new();vp.size=Vector2i(1800,1400);vp.own_world_3d=true
 	vp.msaa_3d=Viewport.MSAA_4X;vp.render_target_update_mode=SubViewport.UPDATE_ALWAYS
 	get_tree().root.add_child(vp);world=Node3D.new();vp.add_child(world)
 	var env=WorldEnvironment.new();env.environment=Environment.new()
@@ -97,7 +100,7 @@ func _run():
 	for child in rig.get_children():
 		if child is RigActivity: child.free()
 	rig.assembler=AvatarAssemblerMerged.new();world.add_child(rig)
-	rig.position=Vector3(.73,0,0);rig.apply_config(Avatar.slot_table.default_config())
+	rig.position=Vector3(1.20,0,0);rig.apply_config(Avatar.slot_table.default_config())
 	var ticks=0
 	while rig.is_busy() and ticks<900: await get_tree().process_frame;ticks+=1
 	check(not rig.is_busy(),"Existing scale avatar assembled")
@@ -105,40 +108,47 @@ func _run():
 	cam=Camera3D.new();cam.projection=Camera3D.PROJECTION_ORTHOGONAL;cam.keep_aspect=Camera3D.KEEP_WIDTH
 	cam.near=.1;cam.far=70;cam.current=true;world.add_child(cam)
 	var canvas=CanvasLayer.new();vp.add_child(canvas)
-	var footer=ColorRect.new();footer.position=Vector2(0,1280);footer.size=Vector2(1600,120)
+	var footer=ColorRect.new();footer.position=Vector2(0,1280);footer.size=Vector2(1800,120)
 	footer.color=Color("e7eddf");canvas.add_child(footer)
 	title=Label.new();title.position=Vector2(60,45);title.add_theme_font_size_override("font_size",32)
 	title.add_theme_color_override("font_color",Color("394532"));canvas.add_child(title)
 	note=Label.new();note.position=Vector2(60,1300);note.add_theme_font_size_override("font_size",23)
 	note.add_theme_color_override("font_color",Color("4a503f"));canvas.add_child(note)
-	for i in 2:
-		signs[i].visible=true
-		pose(Vector3(.03,.86,0),3.05,43,14.5)
-		title.text="CHEF'S SIGN / "+("A - TIMBER" if i==0 else "B - STONE FOOT")+" / 43 DEG"
-		note.text="SGODOT-282 / LIU BEI / GODOT MOBILE\nH = 1.74 M / BOARD BOTTOM = 1.06 M / AVATAR H = 1.745 M / YAW = 14.5 DEG"
-		await capture(IDS[i]+"-43deg")
-		signs[i].visible=false
-	rig.visible=false;signs[0].visible=true
-	pose(Vector3(-.365,1.365,0),1.23,0,0)
-	title.text="CHEF'S SIGN / FRONT (+Z)"
-	note.text="ACTUAL GLB / 0.60 x 0.45 M BOARD / 0.05 M FRAME\nCREAM TOQUE / CROSSED FORK + SPOON / ONE GOLD STAR / NO LETTERING"
-	await capture("chef-sign-front")
-	# Actual metre grid: centered anchor cell, adjacent lawn and a separate path row.
+	signs[0].position.x=-.95;signs[1].position.x=.45
+	signs[0].visible=true;signs[1].visible=true
+	pose(Vector3(-.10,.86,0),4.05,43,14.5)
+	title.text="CHEF'S SIGN / V1.3 / TIMBER + STONE / 43 DEG"
+	note.text="SGODOT-282 / LIU BEI / 43 DEG PITCH + 14.5 DEG YAW / AVATAR H = 1.745 M\nBOARD 0.50 x 0.45 x 0.05 M / BOTTOM 1.06 M / ICONS UNIFORMLY SCALED 5/6"
+	await capture("chef-sign-v1.3-43deg")
+	rig.visible=false;signs[0].visible=false
+	signs[1].position=Vector3(.18,0,0)
+	# Fixture only: (5,14) is the origin cell; (4,14) is directly left.
+	# The actual GLB pivot remains at its own foot. No shift is baked into it.
 	var grid=Node3D.new();world.add_child(grid)
 	for ix in range(-3,3):
 		for iz in range(-2,3):
 			var col=Color("bdcca9") if (ix+iz)%2==0 else Color("c8d3b6")
 			if ix==0 and iz==0: col=Color("e8d89c")
-			if iz==1: col=Color("cabda2")
+			if ix==-1: col=Color("cabda2")
 			box(grid,Vector3(ix*.65,-.004,iz*.65),Vector3(.643,.006,.643),col)
 	# Footprint/collider outline at ground level; it does not enclose the hanging board.
 	for side in [-1,1]:
-		box(grid,Vector3(side*.14,.003,0),Vector3(.008,.007,.28),Color("6689a1"))
-		box(grid,Vector3(0,.003,side*.14),Vector3(.28,.007,.008),Color("6689a1"))
-	pose(Vector3(-.24,0,.11),2.30,90,0)
-	title.text="CHEF'S SIGN / TRUE TOP VIEW / 0.65 M GRID"
-	note.text="GOLD CELL = POST ANCHOR / BLUE = 0.28 M POST COLLIDER\nV1.2: BOARD OVERHANGS LEFT LAWN (-X); TAN PATH ROW (+Z) REMAINS CLEAR"
-	await capture("chef-sign-top-grid")
+		box(grid,Vector3(.18+side*.14,.003,0),Vector3(.008,.007,.28),Color("6689a1"))
+		box(grid,Vector3(.18,.003,side*.14),Vector3(.28,.007,.008),Color("6689a1"))
+	pose(Vector3(-.28,0,0),2.20,90,0)
+	title.text="CHEF'S SIGN / V1.3 / TRUE TOP VIEW / 0.65 M GRID"
+	note.text="B (LARGEST FOOT) / POST SHIFT +0.18 M IS IN THIS FIXTURE ONLY; GLB PIVOT UNCHANGED\nBOARD ENTERS (4,14) BY 0.077 M / FOOT RIGHT MARGIN 0.005 M / FINAL BENCH + HIT TEST: INTEGRATION"
+	label_at(canvas,"(4,14) MINE PATH",Vector3(-.65,0,-.26),Color("5e4535"))
+	label_at(canvas,"(5,14) SIGN ANCHOR",Vector3(0,0,-.26),Color("5e4535"))
+	line_at(canvas,Vector3(-.325,0,-.325),Vector3(-.325,0,.325),Color("a6573d"),4)
+	# Dimension overlays come from actual world positions in the unrotated fixture.
+	line_at(canvas,Vector3(-.402,0,.16),Vector3(-.325,0,.16),Color("9b382d"),3)
+	for x in [-.402,-.325]: line_at(canvas,Vector3(x,0,.145),Vector3(x,0,.175),Color("9b382d"),3)
+	label_at(canvas,"77 mm into path",Vector3(-.50,0,.21),Color("9b382d"))
+	line_at(canvas,Vector3(0,0,.22),Vector3(.18,0,.22),Color("456880"),3)
+	for x in [0,.18]: line_at(canvas,Vector3(x,0,.205),Vector3(x,0,.235),Color("456880"),3)
+	label_at(canvas,"post +0.18 m",Vector3(.09,0,.28),Color("456880"))
+	await capture("chef-sign-v1.3-top-grid")
 	report.renderer=RenderingServer.get_current_rendering_method()
 	report.adapter=RenderingServer.get_video_adapter_name()
 	report.failures=report.checks.filter(func(item):return not item.passed)
@@ -154,6 +164,16 @@ func box(parent, at, size, color):
 
 func pose(focus, size, pitch, yaw):
 	cam.size=size;cam.rotation_degrees=Vector3(-pitch,yaw,0);cam.position=focus+cam.basis.z*20
+
+func label_at(parent, text, at, color):
+	var label=Label.new();label.text=text;label.size=Vector2(410,38)
+	label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+	label.add_theme_font_size_override("font_size",26);label.add_theme_color_override("font_color",color)
+	label.position=cam.unproject_position(at)-Vector2(205,19);parent.add_child(label)
+
+func line_at(parent, a, b, color, width):
+	var line=Line2D.new();line.points=PackedVector2Array([cam.unproject_position(a),cam.unproject_position(b)])
+	line.default_color=color;line.width=width;parent.add_child(line)
 
 func capture(id):
 	for i in 8: await RenderingServer.frame_post_draw

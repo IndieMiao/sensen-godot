@@ -21,7 +21,8 @@ import build_decor_assets as kit
 kit.v = lambda p: Vector((-p[0], -p[2], p[1]))
 
 SOURCE = kit.ROOT / "tools/art/source/chef_sign_282"
-BOARD = (.382, 1.285, 0)
+BOARD = (.332, 1.285, 0)
+ICON_SCALE = .50 / .60
 PALETTE = {
     "chef_red": "983f35", "chef_red_edge": "80382f",
     "chef_gold": "e6b954", "chef_gold_edge": "bb8b3e",
@@ -80,11 +81,24 @@ def ring(name, x, y, plane):
     return kit.mesh(name,vertices,faces,"chef_iron",True)
 
 
+def emblem(name, points, center, back, front, color, edge=None, inset=0):
+    """Uniform v1.3 icon-group scale about board centre, attached to red face.
+
+    Keep X/Y/Z proportions, including relief depth, at 5/6 of v1.2. The board
+    and its gold rim retain their independent height, depth and border width.
+    """
+    cx,cy,_ = BOARD
+    center=(cx+(center[0]-cx)*ICON_SCALE,cy+(center[1]-cy)*ICON_SCALE)
+    points=[(x*ICON_SCALE,y*ICON_SCALE) for x,y in points]
+    return relief(name,points,center,.020+(back-.020)*ICON_SCALE,
+                  .020+(front-.020)*ICON_SCALE,color,edge,inset*ICON_SCALE)
+
+
 def board():
     cx,cy,_ = BOARD
     # The gold frame is a true 0.05 m deep annulus, not a floating line decal.
-    outer = rounded_rect(.60,.45,.052)
-    inner = rounded_rect(.568,.418,.038)
+    outer = rounded_rect(.50,.45,.052)
+    inner = rounded_rect(.468,.418,.038)
     n = len(outer)
     rings = [(outer,-.025),(outer,.019),(inner,.025),(inner,-.025)]
     verts = [(cx+x,cy+y,z) for points,z in rings for x,y in points]
@@ -95,7 +109,7 @@ def board():
     obj.data.materials.append(kit.MATS["chef_gold_edge"])
     for poly in obj.data.polygons:
         if poly.index < n or poly.index >= 3*n: poly.material_index=1
-    relief("Board / deep warm red inset",rounded_rect(.570,.420,.039),(cx,cy),-.024,.020,
+    relief("Board / deep warm red inset",rounded_rect(.470,.420,.039),(cx,cy),-.024,.020,
            "chef_red","chef_red_edge")
     # Single continuous white toque silhouette: no text or fine surface noise.
     hat = [(-.064,-.080),(.064,-.080),(.072,-.015),(.094,-.010),(.116,.006),
@@ -104,11 +118,11 @@ def board():
            (-.041,.081),(-.063,.088),(-.086,.083),(-.107,.067),(-.116,.043),
            (-.111,.020),(-.095,.000),(-.071,-.006)]
     hat=[(x*1.05,y*.78) for x,y in hat]
-    relief("Emblem / cream chef toque",hat,(cx,1.375),.019,.035,"chef_white","chef_white_shade",.003)
+    emblem("Emblem / cream chef toque",hat,(cx,1.375),.019,.035,"chef_white","chef_white_shade",.003)
     # Low, broad cuff and two short folds; the silhouette does the recognition work.
-    relief("Emblem / toque cuff",rounded_rect(.133,.023,.008,3),(cx,1.324),.034,.038,"chef_white_shade")
+    emblem("Emblem / toque cuff",rounded_rect(.133,.023,.008,3),(cx,1.324),.034,.038,"chef_white_shade")
     for x in [-.032,.032]:
-        relief("Emblem / short toque fold",rounded_rect(.009,.027,.004,3),(cx+x,1.349),.034,.037,"chef_white_shade")
+        emblem("Emblem / short toque fold",rounded_rect(.009,.027,.004,3),(cx+x,1.349),.034,.037,"chef_white_shade")
     fork = [(-.010,-.106),(.010,-.106),(.010,.012),(.030,.035),(.038,.056),
             (.038,.105),(.025,.105),(.025,.065),(.009,.065),(.009,.108),
             (-.004,.108),(-.004,.065),(-.020,.065),(-.020,.105),
@@ -119,24 +133,24 @@ def board():
     for name,points,degrees,z in [("fork",fork,46,.034),("spoon",spoon,-46,.030)]:
         a = math.radians(degrees)
         points = [(x*math.cos(a)-y*math.sin(a),x*math.sin(a)+y*math.cos(a)) for x,y in points]
-        relief("Emblem / crossed gold "+name,points,(cx,1.199),.019,z,"chef_gold","chef_gold_edge",.0015)
+        emblem("Emblem / crossed gold "+name,points,(cx,1.199),.019,z,"chef_gold","chef_gold_edge",.0015)
     star = []
     for i in range(10):
         a = math.pi/2+i*math.pi/5
         r = .024 if i%2==0 else .011
         star.append((r*math.cos(a),r*math.sin(a)))
-    relief("Emblem / one small gold star",star,(cx,1.108),.019,.032,"chef_gold","chef_gold_edge")
+    emblem("Emblem / one small gold star",star,(cx,1.108),.019,.032,"chef_gold","chef_gold_edge")
 
 
 def sign(variant):
     name = "chef_sign_"+variant
     kit.begin(name,[1,1],1500,generator="tools/art/build_chef_sign.py",
         pivot="post foot bottom centre",front="+Z",footprint=.65,
-        board_bottom=1.06,board_size=[.60,.45,.05],board_center=[-BOARD[0],BOARD[1],BOARD[2]],
+        board_bottom=1.06,board_size=[.50,.45,.05],board_center=[-BOARD[0],BOARD[1],BOARD[2]],
         collider={"shape":"box","at":[0,.87,0],"size":[.28,1.74,.28]},
         collision_note="Post and foot only; suspended board/arm have no collision.",
-        placement_note="v1.2 anchor (6,14): arm directly to -X / camera-left, +Z front, positive scale. One 0.65 m anchor cell; overhang must avoid path/crop/occupied cells.",
-        arm_direction="-X",overhang_bounds=[[-.682,1.06,-.025],[-.082,1.51,.038]],
+        placement_note="v1.3 anchor (5,14), -X arm / +Z front / positive scale. Runtime +X offset about 0.18 m is NOT baked into model: leaves 0.077 m board intrusion into path (4,14). Integrator checks bench/click overlap; reduce offset if necessary per spec.",
+        arm_direction="-X",overhang_bounds=[[-.582,1.06,-.025],[-.082,1.51,.035]],
         variant="warm wood foot" if variant=="a" else "three pale grey stone foot blocks")
     # Join about the identical post in both variants. This also keeps Blender's
     # custom-normal encoding identical when the different feet are merged.
@@ -148,9 +162,9 @@ def sign(variant):
         kit.box("Foot / stone front left",(-.071,.10,.057),(.138,.20,.166),"chef_stone_light",.014)
         kit.box("Foot / stone front right",(.071,.10,.057),(.138,.20,.166),"chef_stone",.014)
         kit.box("Foot / stone rear block",(0,.10,-.084),(.28,.20,.112),"chef_stone_light",.014)
-    kit.box("Structure / lateral wood arm",(.275,1.65,0),(.66,.10,.11),"wood_light",.012)
+    kit.box("Structure / lateral wood arm",(.225,1.65,0),(.56,.10,.11),"wood_light",.012)
     kit.beam("Structure / short supporting knee",(.045,1.49,0),(.145,1.606,0),.046,"wood",depth=.07,radius=.006)
-    for i,x in enumerate([.192,.562]):
+    for i,x in enumerate([.192,.462]):
         kit.rod("Hanger %d / upper eye bolt shank"%i,(x,1.600,0),(x,1.618,0),.009,"chef_iron",6)
         ring("Hanger %d / arm eye"%i,x,1.585,"XY")
         ring("Hanger %d / interlocking short link"%i,x,1.555,"YZ")

@@ -1122,10 +1122,10 @@
     "chef_sign_a": {
       "triangles": 1362,
       "surfaces": 1,
-      "bytes": 78124,
+      "bytes": 78228,
       "bounds_blender": [
         [
-          -0.682,
+          -0.582,
           -0.13,
           0.0
         ],
@@ -1137,7 +1137,7 @@
       ],
       "bounds": [
         [
-          -0.682,
+          -0.582,
           0.0,
           -0.13
         ],
@@ -1157,7 +1157,7 @@
       "sockets": {
         "board_center": {
           "position": [
-            -0.382,
+            -0.332,
             1.285,
             0
           ],
@@ -1168,12 +1168,12 @@
       "footprint": 0.65,
       "board_bottom": 1.06,
       "board_size": [
-        0.6,
+        0.5,
         0.45,
         0.05
       ],
       "board_center": [
-        -0.382,
+        -0.332,
         1.285,
         0
       ],
@@ -1191,18 +1191,18 @@
         ]
       },
       "collision_note": "Post and foot only; suspended board/arm have no collision.",
-      "placement_note": "v1.2 anchor (6,14): arm directly to -X / camera-left, +Z front, positive scale. One 0.65 m anchor cell; overhang must avoid path/crop/occupied cells.",
+      "placement_note": "v1.3 anchor (5,14), -X arm / +Z front / positive scale. Runtime +X offset about 0.18 m is NOT baked into model: leaves 0.077 m board intrusion into path (4,14). Integrator checks bench/click overlap; reduce offset if necessary per spec.",
       "arm_direction": "-X",
       "overhang_bounds": [
         [
-          -0.682,
+          -0.582,
           1.06,
           -0.025
         ],
         [
           -0.082,
           1.51,
-          0.038
+          0.035
         ]
       ],
       "variant": "warm wood foot"
@@ -1210,10 +1210,10 @@
     "chef_sign_b": {
       "triangles": 1450,
       "surfaces": 1,
-      "bytes": 85564,
+      "bytes": 85668,
       "bounds_blender": [
         [
-          -0.682,
+          -0.582,
           -0.14,
           0.0
         ],
@@ -1225,7 +1225,7 @@
       ],
       "bounds": [
         [
-          -0.682,
+          -0.582,
           0.0,
           -0.14
         ],
@@ -1245,7 +1245,7 @@
       "sockets": {
         "board_center": {
           "position": [
-            -0.382,
+            -0.332,
             1.285,
             0
           ],
@@ -1256,12 +1256,12 @@
       "footprint": 0.65,
       "board_bottom": 1.06,
       "board_size": [
-        0.6,
+        0.5,
         0.45,
         0.05
       ],
       "board_center": [
-        -0.382,
+        -0.332,
         1.285,
         0
       ],
@@ -1279,18 +1279,18 @@
         ]
       },
       "collision_note": "Post and foot only; suspended board/arm have no collision.",
-      "placement_note": "v1.2 anchor (6,14): arm directly to -X / camera-left, +Z front, positive scale. One 0.65 m anchor cell; overhang must avoid path/crop/occupied cells.",
+      "placement_note": "v1.3 anchor (5,14), -X arm / +Z front / positive scale. Runtime +X offset about 0.18 m is NOT baked into model: leaves 0.077 m board intrusion into path (4,14). Integrator checks bench/click overlap; reduce offset if necessary per spec.",
       "arm_direction": "-X",
       "overhang_bounds": [
         [
-          -0.682,
+          -0.582,
           1.06,
           -0.025
         ],
         [
           -0.082,
           1.51,
-          0.038
+          0.035
         ]
       ],
       "variant": "three pale grey stone foot blocks"
