@@ -138,6 +138,22 @@ static func _badge(got: int) -> String:
 		if got >= int(m.get("kinds", 0)) and str(m.get("badge", "")) != "": badge = str(m.badge)
 	return badge
 
+## A Fish-dex milestone's card (§6.9.2; 不知火舞 on 283), {} for another id: {event, item_name, icon, strip}.
+##   10 kinds  `Fish-dex 10/20` · the kind that made it · `+30 Energy · +100 coins`
+##   20 kinds  `Fish-dex complete` · `20/20` · `+50 Energy · +300 coins · Badge` (its badge: the star till 安其拉's mark)
+static func milestone_card(view: Dictionary, id: String, fish: String, energy: int, coins: int, badge: String) -> Dictionary:
+	if not id.begins_with("fishdex_"): return {}
+	var n := int(id.trim_prefix("fishdex_"))
+	var total: int = (view.get("fishing", {}).get("dex", []) as Array).size()
+	var gifts := PackedStringArray()
+	if energy > 0: gifts.append("+%d Energy" % energy)
+	if coins > 0: gifts.append("+%d coins" % coins)
+	if badge != "":
+		gifts.append("Badge")
+		return {event = badge, item_name = "%d/%d" % [n, total], icon = "star", strip = " · ".join(gifts)}
+	return {event = "Fish-dex %d/%d" % [n, total], item_name = P0Logic.item_name(view, fish) if fish != "" else "",
+		icon = fish if fish != "" else "fish_crucian", strip = " · ".join(gifts)}
+
 ## A milestone's coins (content fishing.dex_milestones, P1), 0 when none.
 static func _milestone_coins(kinds: int) -> int:
 	for m in P0Logic.content().get("fishing", {}).get("dex_milestones", []):

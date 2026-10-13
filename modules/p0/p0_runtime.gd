@@ -558,19 +558,24 @@ func _on_state(v: Dictionary, events: Array) -> void:
 						and trap_cards_now.any(func(k): return int(k.extras.get("energy", 0)) > 0):
 					card_energy.append(events[i - 1])
 				if str(ev.id).begins_with("first_fish_"): last_catch_extras["energy"] = int(ev.energy)
-				# Home Cook's +50 Energy is on its title card (不知火舞 on 282), not floated too: grantOnce puts its own Energy
-				# just before it (reason reward, the same amount); at the cap it puts none, so the event before is another's
-				if str(ev.id).begins_with("cookbook_") and int(ev.energy) > 0 and i > 0 and str(events[i - 1].get("kind", "")) == "energy" \
-						and str(events[i - 1].get("reason", "")) == "reward" and int(events[i - 1].get("delta", 0)) == int(ev.energy):
+				# Home Cook's +50 Energy is on its title card (不知火舞 on 282), a Fish-dex milestone's on its card (283), not floated
+				# too: grantOnce puts its own Energy just before it (reason reward, the same amount); at the cap it puts none, so
+				# the event before is another's
+				if (str(ev.id).begins_with("cookbook_") or str(ev.id).begins_with("fishdex_")) and int(ev.energy) > 0 and i > 0 \
+						and str(events[i - 1].get("kind", "")) == "energy" and str(events[i - 1].get("reason", "")) == "reward" \
+						and int(events[i - 1].get("delta", 0)) == int(ev.energy):
 					card_energy.append(events[i - 1])
+				if str(ev.id).begins_with("fishdex_"): _dex_energy[str(ev.id)] = int(ev.energy)
 			"milestone":
-				# a Cookbook title's coins (Line Cook +100) are on its card: noteMilestones puts them just before it
-				if not str(ev.get("id", "")).begins_with("fishdex_") and int(ev.get("coins", 0)) > 0 and i > 0 \
+				# a Cookbook title's coins (Line Cook +100) and a Fish-dex milestone's (+100 at 10 kinds) are on its card:
+				# noteMilestones / noteFishdex put them just before it
+				if int(ev.get("coins", 0)) > 0 and i > 0 \
 						and str(events[i - 1].get("kind", "")) == "coins" and int(events[i - 1].get("delta", 0)) == int(ev.coins):
 					card_coins.append(events[i - 1])
 			"first":
 				var what := str(ev.what)
 				if what.begins_with("catch:"):
+					_dex_fish = what.trim_prefix("catch:")   # a new kind: the one a Fish-dex milestone's card names
 					xp_lines.append("First catch! +%d XP" % int(ev.xp))
 					last_first_catch_xp = int(ev.xp)
 				elif what.begins_with("cook:"): xp_lines.append("New recipe! · First cooked · +%d Cooking XP" % int(ev.xp))
@@ -847,9 +852,16 @@ func _on_catch(ev: Dictionary, _xp_lines: Array, at := Vector2.INF, card_after :
 		"cancelled":
 			ui.toast("Line in · Energy back")
 
-## A Fish-dex milestone (`milestone` event, id fishdex_N; SGODOT-283, 周瑜): its card and badge.
-func _on_fishdex_milestone(_ev: Dictionary, _v: Dictionary) -> void:
-	pass
+## A Fish-dex milestone (`milestone` event, id fishdex_N; SGODOT-283, §6.9.2; 不知火舞 on 283): a RewardMoment Milestone
+## after the catch's own card and floats (q(49)) — `Fish-dex 10/20` over the kind that made it, `+30 Energy · +100 coins`;
+## at 20 `Fish-dex complete` · `20/20` · `+50 Energy · +300 coins · Badge`. Its Energy and coins are on it, not floated.
+var _dex_fish := ""            # the reply's newest kind (its first catch), for the card's name
+var _dex_energy := {}          # fishdex_N → the Energy its reward granted
+func _on_fishdex_milestone(ev: Dictionary, v: Dictionary) -> void:
+	var id := str(ev.get("id", ""))
+	var spec := P0FishDex.milestone_card(v, id, _dex_fish, int(_dex_energy.get(id, 0)), int(ev.get("coins", 0)), str(ev.get("title", "")))
+	_dex_energy.erase(id)
+	if not spec.is_empty(): ui.queue_card.call_deferred(func(): ui.show_dex_milestone(spec))
 
 func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 	if str(cmd.get("type", "")).begins_with("claim_parcel"): ui.inbox_claim_done()   # no items come: none float from it (亚瑟 on #93)
