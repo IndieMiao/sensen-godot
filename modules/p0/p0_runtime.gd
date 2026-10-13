@@ -558,8 +558,10 @@ func _on_state(v: Dictionary, events: Array) -> void:
 						and trap_cards_now.any(func(k): return int(k.extras.get("energy", 0)) > 0):
 					card_energy.append(events[i - 1])
 				if str(ev.id).begins_with("first_fish_"): last_catch_extras["energy"] = int(ev.energy)
-				# Home Cook's +50 Energy is on its title card (不知火舞 on 282), not floated too
-				if str(ev.id).begins_with("cookbook_") and i > 0 and str(events[i - 1].get("kind", "")) == "energy":
+				# Home Cook's +50 Energy is on its title card (不知火舞 on 282), not floated too: grantOnce puts its own Energy
+				# just before it (reason reward, the same amount); at the cap it puts none, so the event before is another's
+				if str(ev.id).begins_with("cookbook_") and int(ev.energy) > 0 and i > 0 and str(events[i - 1].get("kind", "")) == "energy" \
+						and str(events[i - 1].get("reason", "")) == "reward" and int(events[i - 1].get("delta", 0)) == int(ev.energy):
 					card_energy.append(events[i - 1])
 			"milestone":
 				# a Cookbook title's coins (Line Cook +100) are on its card: noteMilestones puts them just before it

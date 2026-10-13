@@ -100,6 +100,19 @@ func test_home_cook_comes_after_the_dish_card_and_its_energy_is_not_floated_too(
 	rt.ui.close_modal()
 	await get_tree().process_frame
 
+## At the Energy cap grantOnce gives Home Cook nothing and puts no Energy of its own: the Energy just before it is another's
+## (a meal eaten in the same reply) and still floats (刘邦 on #357).
+func test_at_the_cap_another_energy_before_home_cook_still_floats() -> void:
+	var r := await _farmhouse()
+	r.get("kitchen").phase = "serve"
+	rt.session.state_changed.emit(rt.session.view, [_dish(), {"kind": "energy", "delta": 30, "reason": "eat"},
+		{"kind": "reward", "id": "cookbook_8", "energy": 0}])
+	for i in 3: await get_tree().process_frame
+	var floats: Array = rt.ui.root.find_children("*", "UiFloatText", true, false).map(func(f): return (f as UiFloatText).text)
+	assert_bool(floats.any(func(t): return str(t).contains("+30 Energy"))).is_true()
+	rt.ui.close_modal()
+	await get_tree().process_frame
+
 func test_line_cooks_coins_are_on_its_card_not_floated() -> void:
 	var r := await _farmhouse()
 	r.get("kitchen").phase = "serve"

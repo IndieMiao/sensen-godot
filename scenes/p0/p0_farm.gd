@@ -1037,7 +1037,7 @@ func _screen_rect(n: Node) -> Rect2:
 func _show_chef_sign(on: bool) -> void:
 	if _chef_sign_node.visible == on: return
 	_chef_sign_node.visible = on
-	if bp.is_walkable(P0Garden.CHEF_SIGN_CELL) or not on: grid.set_solid(P0Garden.CHEF_SIGN_CELL, on)
+	if bp.is_walkable(P0Garden.CHEF_SIGN_CELL): grid.set_solid(P0Garden.CHEF_SIGN_CELL, on)   # a cell the plan blocks stays blocked
 
 ## Its card (不知火舞 on 282): the facilities' small card — `Chef's Sign`, `Master Chef · Homestead Lv10`, and HOME-1's
 ## Lv10 line for what it does.
