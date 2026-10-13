@@ -3127,6 +3127,7 @@ func show_banner(spec: Dictionary, on_action := Callable()) -> UiMomentBanner:
 	var b := UiMomentBanner.new()
 	b.kind = UiMomentBanner.Kind.COMPLETE if str(spec.get("kind", "")) == "complete" else UiMomentBanner.Kind.LEVEL_UP
 	b.level = str(spec.get("level", ""))
+	if spec.get("icon", null) is Texture2D: b.icon = spec.icon   # art in the disc's place (the Fish-dex badge)
 	b.title = str(spec.get("title", ""))
 	b.subtitle = str(spec.get("subtitle", ""))
 	b.rewards = (spec.get("rewards", []) as Array).map(func(r): return UiFloatText.pill(str(r.text), int(r.tone), r.get("icon", null)))
@@ -3175,9 +3176,13 @@ func show_title(spec: Dictionary) -> void:
 	show_moment(m)
 
 ## A Fish-dex milestone (§6.9.2; 不知火舞 on 283): the same RewardMoment Milestone as a Cookbook title, no buttons —
-## `Fish-dex 10/20` over the kind that made it, or `Fish-dex complete` · `20/20` (P0FishDex.milestone_card). Queued after
-## the catch's card like a level-up.
+## `Fish-dex 10/20` over the kind that made it; the whole dex a full MomentBanner instead (283 DEX-COMPLETE: the badge,
+## `Fish-dex complete` · `20/20`, pills `+50 Energy` `+300 coins` `Badge`, ≤ 3 s, no button). P0FishDex.milestone_card.
+## Queued after the catch's card like a level-up.
 func show_dex_milestone(spec: Dictionary) -> void:
+	if bool(spec.get("banner", false)):
+		show_banner(spec)
+		return
 	var m := UiRewardMoment.new()
 	m.tone = UiRewardMoment.Tone.MILESTONE
 	m.event = str(spec.get("event", ""))

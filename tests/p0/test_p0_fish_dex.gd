@@ -201,10 +201,12 @@ func test_the_complete_dex_shows_its_badge_by_the_heading() -> void:
 	v.fishing.dex = []
 	for i in 20: v.fishing.dex.append({"id": "fish_x%d" % i, "rarity": 1, "level": 1, "caught": 1})
 	assert_str(P0FishDex.dex_data(v).badge).is_equal("Fish-dex complete")
-	assert_array(P0FishDex.dex_data(v).next).is_equal(["Fish-dex complete", ""])   # all found: no rod line under it
+	# all found: no rod line under it, what the whole dex gave (283 FISH-6-COMPLETE)
+	assert_array(P0FishDex.dex_data(v).next).is_equal(["Fish-dex complete", "+50 Energy · +300 coins · Badge"])
 	ui.set_view(v)
 	ui.open_fishdex()
 	await await_idle_frame()
 	var badge := _dex().find_child("DexBadge", true, false) as TextureRect
 	assert_object(badge).is_not_null()
-	assert_vector(badge.size).is_equal(Vector2(16, 16))
+	assert_vector(badge.size).is_equal(Vector2(22, 22))   # 安其拉's mark, 22 (283 FISH-6-COMPLETE)
+	assert_str(str(badge.texture.get_meta("ui_source", ""))).is_equal("res://assets/ui/icons/game/i-badge-fishdex.svg")

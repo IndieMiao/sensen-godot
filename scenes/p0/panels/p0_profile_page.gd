@@ -124,9 +124,12 @@ func refresh(view_: Dictionary) -> void:
 	for c in d.collections:
 		var tile := UiNeedTile.new(str(c.name), int(c.have), int(c.need), UiNeedTile.Size.M, P0Logic.icon(str(c.icon)), true)
 		var key := str(c.get("key", ""))
+		if bool(c.get("badge", false)): tile.add_corner(P0FishDex.badge_icon(), _CORNER_BADGE)   # the whole Fish-dex (283 PROFILE-1-DEX)
 		tile.pressed.connect(func(): collection_pressed.emit(key))
 		tiles.append(tile)
 	col.add_child(UiNeedTile.group(tiles))
+
+const _CORNER_BADGE := 20.0   # the Fish-dex badge on the Fish tile's ring (283 PROFILE-1-DEX)
 
 ## Everything the page shows, from the server view (pure; tested).
 static func profile_data(view: Dictionary) -> Dictionary:
@@ -151,7 +154,8 @@ static func profile_data(view: Dictionary) -> Dictionary:
 			level_line = "Level %d" % int(farm.level) if farm.has("level") else "",
 			status = _farm_status(view)},
 		collections = [
-			{key = "fish", name = "Fish", have = dex.filter(func(f): return int(f.get("caught", 0)) > 0).size(), need = dex.size(), icon = "fish_crucian"},
+			{key = "fish", name = "Fish", have = dex.filter(func(f): return int(f.get("caught", 0)) > 0).size(), need = dex.size(), icon = "fish_crucian",
+				badge = P0FishDex._badge(dex.filter(func(f): return int(f.get("caught", 0)) > 0).size()) != ""},   # its badge once all are caught
 			{key = "pages", name = "Pages", have = book.x, need = book.y, icon = "recipe_card"},   # as the Cookbook tab (q(100))
 			# Cities (PROFILE-1, q(100)): cities reached, toward the Explorer medal next (§11.9.2: 3 / 10 / 30 / 100); opens PASS-1
 			{key = "cities", name = "Cities", have = cities_have(view), need = cities_need(view), icon = "passport"},
