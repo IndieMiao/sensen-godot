@@ -1173,7 +1173,12 @@ static func level_banner(view: Dictionary, ev: Dictionary, first := false) -> Di
 			if id.begins_with("bait_") and bait == "": bait = id
 	var opens := level_unlocks(view, skill, lv)
 	var subtitle := ("New for you · " + ", ".join(opens)) if not opens.is_empty() else ""
-	if skill == "fishing": subtitle = fishing_unlock_line(view, lv)
+	# Fishing's banner reads like the other two, `New for you · ` and its milestone row (q(178) ⑥); a fish's one time only
+	# (`(night)`) is the Tip's Today changes there (q(176)). Lv2, the first session's, keeps `Fine fish now stay on the hook`
+	# (the break-free card it answers); a level with nothing new keeps its fish line.
+	if skill == "fishing":
+		if lv == 2 or opens.is_empty(): subtitle = fishing_unlock_line(view, lv)
+		else: subtitle = "New for you · " + ", ".join(opens.map(func(o): return _without_time(str(o))))
 	if skill == "cooking" and lv == 4:
 		title += " · 3rd slot"
 		subtitle = "Three-ingredient dishes now possible"
@@ -1201,6 +1206,11 @@ const FISHING_CONVENIENCE_NAMES := {"three_day_forecast": "3-day Forecast", "gif
 	"quick_recast": "Quick Recast", "creel_15": "Bigger Creel"}
 ## A fish that bites at one time only, as the milestone row names it (q(178) ④: `River Eel (night)`, the Lv9 night fishing).
 const ONLY_AT_ROW := {"night_only": "night", "dawn_dusk_only": "dawn & dusk"}
+
+## A milestone row's item without its `(night)` (the banner leaves the time to its Tip, q(178) ⑥).
+static func _without_time(item: String) -> String:
+	for w in ONLY_AT_ROW.values(): item = item.trim_suffix(" (%s)" % w)
+	return item
 
 static func level_unlocks(view: Dictionary, skill: String, level: int) -> Array:
 	var out: Array = []

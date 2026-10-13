@@ -184,3 +184,11 @@ func test_a_title_key_is_not_listed_as_a_convenience() -> void:
 	conv.erase("title_master_angler")
 	assert_bool(row.any(func(x): return str(x).begins_with("title_"))).is_false()
 	assert_array(row).contains(["3rd Fish Trap", "Bigger Creel"])
+
+## The Skills page's levels for Fishing's conveniences are the rules' own levels where a rule has one (奕星 on q(178)):
+## the Bigger Creel is content fishing.creel (#386), Quick Recast fishing.quick_recast (#388).
+func test_the_conveniences_levels_match_their_rules() -> void:
+	var f: Dictionary = P0Logic.content().get("fishing", {})
+	var conv: Dictionary = f.get("conveniences", {})
+	assert_int(int(conv.get("creel_15", 0))).is_equal(int(f.get("creel", {}).get("level", -1)))
+	if f.has("quick_recast"): assert_int(int(conv.get("quick_recast", 0))).is_equal(int(f.quick_recast.get("level", -1)))

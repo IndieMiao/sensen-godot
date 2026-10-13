@@ -206,3 +206,17 @@ func test_the_nine_day_changing_levels_say_so_and_the_trap_levels_are_named_ahea
 	assert_str(P0Logic.level_banner(v, {"skill": "fishing", "level": 7, "energy": 0, "gifts": []}).tip) \
 		.is_equal("Next Lv8 · 2nd Fish Trap, Biting now · %d XP" % (int(th[7]) - int(th[6])))
 	assert_str(P0Logic.level_banner(v, {"skill": "fishing", "level": 3, "energy": 0, "gifts": []}).tip).starts_with("Next Lv4 · ")
+
+## q(178) ⑥: Fishing's banner subtitle is `New for you · ` and the level's milestone row, as Farming and Cooking — Lv9
+## without the row's `(night)` (its Tip says it); Lv2, the first session's, keeps `Fine fish now stay on the hook`.
+func test_fishing_banners_say_new_for_you_as_their_milestone_row() -> void:
+	var v := _view()
+	for f in P0Logic.content().get("fish", []): v.names[str(f.id)] = str(f.name)   # as the server's view names them
+	var sub := func(lv: int) -> String: return str(P0Logic.level_banner(v, {"skill": "fishing", "level": lv, "energy": 0, "gifts": []}).subtitle)
+	assert_str(sub.call(2)).is_equal("Fine fish now stay on the hook")
+	assert_str(sub.call(3)).is_equal("New for you · Reed Rod, Regional fish, 3-day Forecast")
+	assert_str(sub.call(7)).is_equal("New for you · Silver Sturgeon, Gift Clues")
+	assert_str(sub.call(8)).is_equal("New for you · 2nd Fish Trap, Biting now")
+	assert_str(sub.call(9)).is_equal("New for you · River Eel, Quick Recast")
+	assert_str(sub.call(10)).is_equal("New for you · 3rd Fish Trap, Bigger Creel")
+	assert_str(P0Logic.level_banner(v, {"skill": "farming", "level": 6, "energy": 0, "gifts": []}).subtitle).starts_with("New for you · ")
