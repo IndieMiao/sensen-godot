@@ -1,7 +1,7 @@
 /** What the client receives: the settled state plus everything it would otherwise have to re-derive. */
 import { cropBySeed, dishId, fishById, ingredient, itemKind, itemName, QUALITIES, rodById, SHOPS, SKILLS, type BoardId, type P0Content, type QuotaId, type ShopId, recipeById } from './content.js';
 import { count, freeSlots } from './bag.js';
-import { barterItems, barterRoom } from './barter.js';
+import { barterItems, barterRoom, barterShare } from './barter.js';
 import { cardPage, cardPrice, marketCards, stallCards } from './cards.js';
 import { burners, cookAllPlan, cookSlots, mealValue, recipeRarity, settleStove } from './cooking.js';
 import { sellPrice, stallOffer } from './reducer.js';
@@ -79,7 +79,7 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
         ...(b.gift ? { from: b.gift.from, expires_in: untilRollover(c, now) } : {}) })),
     },
     drinks: drinksView(c, s, now),
-    shops: Object.fromEntries(SHOPS.map(shop => [shop, shopView(c, s, shop)])),
+    shops: Object.fromEntries(SHOPS.map(shop => [shop, shopView(c, s, shop, now)])),
     quotas: Object.fromEntries((Object.keys(c.quotas) as QuotaId[]).map(q => [q, quotaView(c, s, q, now)])),
     storage: { items: Object.entries(s.storage).map(([id, qty]) => ({ id, name: itemName(c, id), qty })),
       auto: s.storage_auto },   // last auto-store on coming home (q(40)): the client floats it once per new `at`
@@ -310,7 +310,7 @@ function quotaView(c: P0Content, s: P0State, q: QuotaId, now: number) {
 }
 
 /** One counter (§9.11): what it sells with every gate as a fact, and which kinds it buys back at what rate / quota. */
-function shopView(c: P0Content, s: P0State, shop: ShopId) {
+function shopView(c: P0Content, s: P0State, shop: ShopId, now: number) {
   return {
     buy: catalog(c, shop, s).map(id => {
       const o = offerOf(c, id)!;
@@ -330,12 +330,14 @@ function shopView(c: P0Content, s: P0State, shop: ShopId) {
     // regional: only this climate's regional items (`items` lists them), as the Market Square takes them (§9.13.1)
     sell: Object.entries(c.shops[shop].buys).map(([kind, r]) => ({ kind, rate: r.rate, quota: r.quota,
       ...(r.regional ? { regional: true, items: regionalItems(c, kind, climateAt(c, s)) } : {}) })),
-    // Barter at the Market Square keeper (§8.4.5): give n regional items for 1 mineral; room = how many more of each
-    // the next level lets come by barter.
+    // Barter at the Market Square keeper (§8.4.5): give n regional items of this city's climate for 1 mineral; have
+    // counts no Gifted stack; room = how many more of each the next level lets come by barter, of `share` in all;
+    // resets_in = when today's barters come back (`Limit reached · 9h 12m`).
     barter: shop === 'market' && c.homestead.barter ? {
       give: c.homestead.barter.give, daily: c.homestead.barter.daily, left: Math.max(0, c.homestead.barter.daily - (s.day.barters ?? 0)),
-      items: barterItems(c).map(id => ({ id, name: itemName(c, id), have: count(s.bag, id) })),
-      minerals: c.homestead.barter.minerals.map(id => ({ id, name: itemName(c, id), room: barterRoom(c, s, id) })),
+      resets_in: untilRollover(c, now),
+      items: barterItems(c, climateAt(c, s)).map(id => ({ id, name: itemName(c, id), have: count(s.bag, id, 'skip') })),
+      minerals: c.homestead.barter.minerals.map(id => ({ id, name: itemName(c, id), room: barterRoom(c, s, id), share: barterShare(c, s, id) })),
     } : null,
     // Recipe cards on this counter today (§7.16.1): the Stall's daily two, Market's climate cards. Bought = in the Cookbook.
     cards: (shop === 'homestead' ? stallCards(c, s) : shop === 'market' ? marketCards(c, c.profile.climate) : []).map(id => {
