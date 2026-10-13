@@ -943,16 +943,17 @@ func _marker_spots(spots: Dictionary) -> Dictionary: return spots
 ##      kept 22 off the screen's sides: the door never moves, then the stoves (the farmhouse lays out their row first),
 ##      the Spice Rack, the Warming Cabinet, then the rest (seats, pieces). Pushed to exactly 44 it moves on smoothly as
 ##      the view moves, so it never jumps at the 44 line.
-##   ② Buttons under the open strip (grown by 14, their radius) line up 6 above it, 44 apart, in that order; where that
-##      row does not fit (under the HUD, or wider than the screen) they stand beside the strip instead. One that joined the
-##      row stays in it until it is 4 px clear (18, as q(146)), so a button on the edge does not hop in and out. Never
-##      hidden: by the stove one often taps the rack next to it.
+##   ② Buttons whose disc comes within 14 of the open strip (their centre within 28) line up 6 above it, 44 apart, in
+##      that order; where that row does not fit (under the HUD, or wider than the screen) they stand beside the strip
+##      instead. One that joined the row stays in it until 4 px further clear (32, as q(146)), so a button on the edge does
+##      not hop in and out. Never hidden: by the stove one often taps the rack next to it. (不知火舞 282 cc517f08: from
+##      the disc's edge, not where it touches.)
 ##   Every change of place eases in 0.12 s.
 const SPREAD_GAP := 44.0
 const SPREAD_HOLD := 4.0       # q(146): out of the strip's row only once this much further clear
 const SPREAD_SIDE := 22.0
 const SPREAD_EASE_S := 0.12
-const STRIP_REACH := 14.0      # a button's radius: its disc touches the strip
+const STRIP_REACH := 28.0      # a button's centre this near the strip: its disc's edge within 14 of it
 const STRIP_ABOVE := 6.0
 const BUTTON_R := 14.0
 
@@ -968,13 +969,16 @@ static func spread_rank(n: String) -> int:
 ## `in_row` last frame's row. Returns {spots, row: {name: true}}.
 static func spread(spots: Dictionary, buttons: Array, strip: Rect2, screen: Rect2, top: float, in_row := {}) -> Dictionary:
 	var out := spots.duplicate()
-	var order := buttons.duplicate()
+	# a button off the screen is not drawn (P0Ui.world_icon): left where it is, out of both rules
+	var order := buttons.filter(func(n): return screen.has_point(spots[n]))
 	order.sort_custom(func(a, b):
 		var ra := spread_rank(str(a))
 		var rb := spread_rank(str(b))
 		return ra < rb or (ra == rb and (spots[a] as Vector2).x < (spots[b] as Vector2).x))
 	var lo := screen.position.x + SPREAD_SIDE
 	var hi := screen.end.x - SPREAD_SIDE
+	for n in order:   # judged where they are drawn: the UI keeps every button 22 off the sides (P0Ui._keep_off_sides)
+		out[n] = Vector2(clampf((out[n] as Vector2).x, lo, hi), (out[n] as Vector2).y)
 	# ② the row over the open strip
 	var row := {}
 	var under: Array = []
@@ -982,7 +986,7 @@ static func spread(spots: Dictionary, buttons: Array, strip: Rect2, screen: Rect
 		for n in order:
 			if n == "exit": continue
 			var reach := STRIP_REACH + (SPREAD_HOLD if in_row.has(n) else 0.0)
-			if strip.grow(reach).has_point(spots[n]): under.append(n)
+			if strip.grow(reach).has_point(out[n]): under.append(n)
 	if not under.is_empty():
 		var y := strip.position.y - STRIP_ABOVE - BUTTON_R
 		var width := float(under.size() - 1) * SPREAD_GAP

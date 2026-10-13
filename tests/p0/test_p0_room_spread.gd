@@ -1,8 +1,9 @@
 extends GdUnitTestSuite
 ## Prompt buttons kept apart in every room (不知火舞 on 282): ① of two folded buttons nearer than 44, the later in
 ## spread_rank moves out along the line to 44 (door, stoves, Spice Rack, Warming Cabinet, the rest), 22 off the screen's
-## sides; ② buttons under the open strip line up 6 above it, 44 apart, or beside it where that row does not fit; a button
-## in that row stays until 4 px clear; nothing is hidden, and each change of place eases in 0.12 s.
+## sides; ② buttons whose disc comes within 14 of the open strip (centre within 28) line up 6 above it, 44 apart, or beside
+## it where that row does not fit; a button in that row stays until 4 px further clear (32); nothing is hidden, and each
+## change of place eases in 0.12 s.
 
 const SCREEN := Rect2(0, 0, 360, 800)
 const TOP := 100.0
@@ -48,6 +49,17 @@ func test_buttons_under_the_open_strip_line_up_above_it() -> void:
 	assert_float((laid.spots.use_spice_rack as Vector2).x - (laid.spots.use_stove_1 as Vector2).x).is_equal_approx(44.0, 0.01)   # stoves first
 	assert_float(((laid.spots.use_stove_1 as Vector2).x + (laid.spots.use_spice_rack as Vector2).x) * 0.5).is_equal_approx(strip.get_center().x, 0.01)
 	assert_dict(laid.row).is_equal({"use_spice_rack": true, "use_stove_1": true})
+	# 不知火舞 282 cc517f08: by the cabinet, stove 1's disc 5 px off the strip's right end (its centre 19 px) — near enough to join
+	var near := _spread({"use_stove_1": Vector2(338.0, 374.7)}, ["use_stove_1"], strip)
+	assert_float((near.spots.use_stove_1 as Vector2).y).is_equal(y)
+	# … judged where it is drawn: a spot past the screen's side is drawn 22 in, so it joins too (the shot: 338 drawn)
+	var past := _spread({"use_stove_1": Vector2(352.0, 374.7)}, ["use_stove_1"], strip)
+	assert_float((past.spots.use_stove_1 as Vector2).y).is_equal(y)
+	var mid := Rect2(100, 345, 150, 32)
+	var off := _spread({"use_stove_1": Vector2(mid.end.x + 29.0, 360.0)}, ["use_stove_1"], mid)
+	assert_vector(off.spots.use_stove_1).is_equal(Vector2(mid.end.x + 29.0, 360.0))   # 29 off: its disc 15 clear, stays
+	var gone := _spread({"use_stove_1": Vector2(400.0, 360.0)}, ["use_stove_1"], strip)
+	assert_vector(gone.spots.use_stove_1).is_equal(Vector2(400.0, 360.0))   # off the screen: not drawn, left alone
 	var low: Dictionary = P0Room.spread(spots, spots.keys(), strip, SCREEN, 340.0).spots   # the HUD reaches 340: beside it
 	for n in spots: assert_bool(strip.grow(14.0).has_point(low[n])).override_failure_message(n).is_false()
 	assert_float((low.use_stove_1 as Vector2).y).is_equal(strip.get_center().y)
@@ -64,13 +76,13 @@ func test_beside_the_strip_they_split_left_and_right() -> void:
 
 func test_a_button_in_the_row_stays_until_4_px_clear() -> void:
 	var strip := Rect2(100, 300, 150, 32)
-	var edge := Vector2(175, strip.end.y + 14.0 + 2.0)   # 2 px clear of the strip's reach
+	var edge := Vector2(175, strip.end.y + 28.0 + 2.0)   # 2 px clear of the strip's reach
 	var fresh := _spread({"use_bench": edge}, ["use_bench"], strip)
 	assert_vector(fresh.spots.use_bench).is_equal(edge)   # never in the row: stays put
 	var held := _spread({"use_bench": edge}, ["use_bench"], strip, {"use_bench": true})
 	assert_float((held.spots.use_bench as Vector2).y).is_equal(strip.position.y - 20.0)   # was in the row: stays in it
 	var clear := _spread({"use_bench": edge + Vector2(0, 3)}, ["use_bench"], strip, {"use_bench": true})
-	assert_vector(clear.spots.use_bench).is_equal(edge + Vector2(0, 3))   # 5 px clear: out
+	assert_vector(clear.spots.use_bench).is_equal(edge + Vector2(0, 3))   # 5 px clear of 28 (33): out
 
 ## The farmhouse at Lv3, its rack and cabinet buttons as drawn: 44 apart once eased (0.12 s), the rack where it was.
 func test_the_farmhouse_draws_its_rack_and_cabinet_apart() -> void:
