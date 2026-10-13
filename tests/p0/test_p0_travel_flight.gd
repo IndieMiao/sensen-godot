@@ -505,3 +505,38 @@ func test_a_first_visits_city_reads_unexplored_until_it_lands() -> void:
 	rt.ui.close_modal()
 	rt.session.view = saved
 	rt.ui.set_view(saved)
+
+## q(156): when both ends fit, the camera holds the overview through the 2 s flight and only the plane moves (it reaches
+## the city ahead as the flight ends); the 0.5 s landing pans and zooms in, the city ahead sliding to the centre without
+## leaving the view. A pair that does not fit even at the floor pans along as before. Still 3 s.
+func test_both_ends_in_view_the_camera_holds_the_overview_through_the_flight() -> void:
+	var view := Vector2(360, 800)
+	var safe := Rect2(32, 140, 296, 560)
+	var sf := Vector2(37.77, -122.42)
+	var tokyo := Vector2(35.68, 139.69)
+	var f := P0TravelFlight.plan(sf.x, sf.y, 9.0, 0.0, sf, tokyo.x, tokyo.y, 11.0, 0.0, view, safe)
+	assert_bool(f.holds()).is_true()
+	var top := f.sample(P0TravelFlight.UP_S)
+	for t in [0.8, 1.5, 2.2, P0TravelFlight.UP_S + P0TravelFlight.FLY_S - 0.01]:
+		var at := f.sample(t)
+		assert_float(at.x).is_equal_approx(top.x, 1e-6)   # held
+		assert_float(at.y).is_equal_approx(top.y, 1e-6)
+		assert_float(at.z).is_equal_approx(top.z, 1e-6)
+	assert_float(P0TravelFlight.plane_progress(P0TravelFlight.UP_S + P0TravelFlight.FLY_S)).is_equal(1.0)   # there as the flight ends
+	# the landing: Tokyo's point on screen moves to the centre, nearer every step, and stays in view
+	var b := Vector2(MapGeoMath.mercator_x(tokyo.y), MapGeoMath.mercator_y(tokyo.x))
+	var last := INF
+	for i in 11:
+		var t := P0TravelFlight.UP_S + P0TravelFlight.FLY_S + P0TravelFlight.DOWN_S * i / 10.0
+		var at := f.sample(t)
+		var c := Vector2(MapGeoMath.mercator_x(at.y), MapGeoMath.mercator_y(at.x))
+		var d := Vector2(fposmod(b.x - c.x + 0.5, 1.0) - 0.5, b.y - c.y) * 512.0 * pow(2.0, at.z)
+		assert_bool(Rect2(-view * 0.5, view).has_point(d)).override_failure_message("Tokyo off screen at %.2f s" % t).is_true()
+		assert_float(d.length()).is_less_equal(last + 0.5)
+		last = d.length()
+	assert_float(last).is_less(1.0)   # at the centre on landing
+	# San Francisco to Cape Town does not fit even at 0.8: it pans along
+	var cape := Vector2(-33.92, 18.42)
+	var g := P0TravelFlight.plan(sf.x, sf.y, 9.0, 0.0, sf, cape.x, cape.y, 11.0, 0.0, view, safe)
+	assert_bool(g.holds()).is_false()
+	assert_float(absf(g.sample(1.0).y - g.sample(2.0).y)).is_greater(1e-3)   # its centre moves through the flight
