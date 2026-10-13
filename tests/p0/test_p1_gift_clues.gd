@@ -77,7 +77,7 @@ func test_the_card_reads_who_likes_it_under_the_rarity_line() -> void:
 	assert_bool(line.visible).is_false()
 
 ## RESIDENT-GIFT: `♥ +2` green on the tint, `♥ +1` on white, `−2` on the grey keys' fill; 17 high, 2 above the cell;
-## the rows 31 apart and the first 22 down; the key `Gift · +2`. Before Lv7: no marks, rows 12 apart, `Gift`.
+## the rows 31 apart and the first 22 down; the key `Gift · +2`; no ♥ on the cells. Before Lv7: no marks, rows 12 apart, `Gift`.
 func test_the_gift_drawer_marks_what_each_dish_adds() -> void:
 	var ui: P0Ui = auto_free(P0Ui.new())
 	ui.quick_store = STORE
@@ -91,6 +91,9 @@ func test_the_gift_drawer_marks_what_each_dish_adds() -> void:
 	var gains := {}
 	for it in d.grid.shown_items(): gains[str(it.id)] = it.get("gain", null)
 	assert_dict(gains).is_equal({"dish_grilled_crucian": 2, "dish_fish_soup": 1, "dish_mystery": -2})
+	# no ♥ on its cells, only the marks (不知火舞 on 283: the bag's ♥ may be someone else's)
+	assert_bool(d.grid.shown_items().any(func(it): return bool(it.get("liked", false)))).is_false()
+	assert_bool(d.grid.cells().any(func(c): return (c.find_child("Liked", true, false) as Control).visible)).is_false()
 	assert_that([d.grid.row_room, d.grid.top_room]).is_equal([19.0, 22.0])
 	var marks := {}
 	var cells := d.grid.find_children("*", "UiItemCell", true, false).filter(func(c): return (c as Control).visible and (c as UiItemCell).gain != null)

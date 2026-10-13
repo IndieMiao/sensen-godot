@@ -188,10 +188,13 @@ func set_gear_slot(v: String) -> void:
 func items() -> Array:
 	var out := bag_items(view, sort) + storage_items(view, category, place)
 	# The gift drawer (RESIDENT-GIFT 1216:83527, Gift Clues from Fishing Lv7): each dish carries what giving it adds
-	# (`♥ +3`, the Mystery Dish `−2`); with the marks the rows make room for them (31 apart, the first 22 down).
+	# (`♥ +3`, the Mystery Dish `−2`); with the marks the rows make room for them (31 apart, the first 22 down). No ♥ on
+	# its cells: that one says someone likes the dish, maybe not this resident, and beside `♥ +1` it would read as theirs
+	# (不知火舞 on 283).
 	var marks := false
 	if not gift_to.is_empty():
 		for it in out:
+			it.erase("liked")
 			var pts = gift_points(view, str(gift_to.get("id", "")), str(it.id))
 			if pts != null:
 				it["gain"] = pts
