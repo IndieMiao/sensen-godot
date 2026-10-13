@@ -348,3 +348,17 @@ func test_greeting_card_and_keeper_bar_take_the_keepers_look() -> void:
 	var drawer := P0CounterDrawer.new(_view(), "market", ctx)
 	add_child(auto_free(drawer))
 	assert_object(drawer.keeper_bar.portrait).is_same(P0CounterDrawer.keeper_portrait("Ezra", false, "market_temperate_1"))
+
+## 上官婉儿 on #339: the drawn pictures are bounded — the most recent 8 cards and 24 heads (about 12 MB); a texture handed
+## out stays valid after its entry is evicted, and asking again draws a fresh one.
+func test_keeper_portrait_cache_is_bounded() -> void:
+	var portraits = load("res://modules/p0/p0_keeper_portraits.gd")
+	var looks: Array = P0Logic.content().get("world", {}).get("keeper_looks", {}).keys().filter(func(k): return not str(k).begins_with("_"))
+	assert_int(looks.size()).is_greater(30)
+	var first := P0CounterDrawer.keeper_portrait("Ezra", true, str(looks[0]))
+	for look in looks: P0CounterDrawer.keeper_portrait("Ezra", true, str(look))
+	for look in looks: P0CounterDrawer.keeper_portrait("Ezra", false, str(look))
+	assert_int(portraits.kept(true)).is_less_equal(8)
+	assert_int(portraits.kept(false)).is_less_equal(24)
+	assert_object(first).is_not_null()   # still valid for whoever shows it
+	assert_object(P0CounterDrawer.keeper_portrait("Ezra", true, str(looks[0]))).is_not_same(first)   # evicted: drawn again

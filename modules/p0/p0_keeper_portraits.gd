@@ -4,7 +4,8 @@ extends Node
 ## (world.keeper_looks). texture() answers at once with a blank picture that the renderer fills in a few frames later;
 ## the card and the bar show it as soon as it is drawn (a TextureRect redraws when its texture changes). The four
 ## hand-painted keepers (Ama, Finn, Mei, Sigrid) keep their art: P0CounterDrawer.keeper_portrait asks here only when no
-## file exists. Drawn once per look and use, kept for the session (48 looks × card / head at most).
+## file exists. Drawn once per look and use; the most recent CARD_LIMIT cards and HEAD_LIMIT heads are kept (a card is
+## ~770 KB, a head ~270 KB: about 12 MB at most, 上官婉儿 on #339), an older one is drawn again when asked for.
 ##
 ## The stage is AvatarFocusButton's (one rig in its own SubViewport, orthographic camera, a soft sun and ambient):
 ##   card  300 × 660, the whole figure, for the greeting card's 100 × 220 portrait;
@@ -14,9 +15,11 @@ const CARD := Vector2i(300, 660)
 const HEAD := Vector2i(264, 264)
 const TURN := 0.32   # a three-quarter view, as the painted keepers stand
 const CARD_SKY := Color("e4f1ee")   # the card's backdrop: the painted cards stand in a scene, never on white
+const CARD_LIMIT := 8
+const HEAD_LIMIT := 24
 
-static var _cache: Dictionary = {}   # "<look>|card" / "<look>|head" → ImageTexture (blank until drawn)
-static var _queue: Array[String] = []
+static var _cache: Dictionary = {}   # "<look>|card" / "<look>|head" → ImageTexture (blank until drawn), oldest first
+static var _queue: Array[Dictionary] = []   # {key, tex}: a texture already handed out is drawn even if evicted meanwhile
 static var _host: Node = null
 static var drawn := 0   # pictures drawn this session (tests, shots)
 
@@ -28,15 +31,31 @@ var _busy := false
 static func texture(look: String, card: bool) -> Texture2D:
 	if look == "": return null
 	var key := "%s|%s" % [look, "card" if card else "head"]
-	if _cache.has(key): return _cache[key]
+	if _cache.has(key):
+		var hit: ImageTexture = _cache[key]
+		_cache.erase(key)   # most recently used last
+		_cache[key] = hit
+		return hit
 	if not _slots(look).size(): return null
 	var size := CARD if card else HEAD
 	var blank := Image.create(size.x, size.y, false, Image.FORMAT_RGBA8)   # transparent until drawn
 	var tex := ImageTexture.create_from_image(blank)
 	_cache[key] = tex
-	_queue.append(key)
+	_trim(card)
+	_queue.append({"key": key, "tex": tex})
 	_wake()
 	return tex
+
+## Keep the most recent CARD_LIMIT cards / HEAD_LIMIT heads; a card or bar still showing an evicted one keeps it.
+static func _trim(card: bool) -> void:
+	var suffix := "|card" if card else "|head"
+	var mine := _cache.keys().filter(func(k): return str(k).ends_with(suffix))
+	while mine.size() > (CARD_LIMIT if card else HEAD_LIMIT): _cache.erase(mine.pop_front())
+
+## How many pictures of a use are kept (tests).
+static func kept(card: bool) -> int:
+	var suffix := "|card" if card else "|head"
+	return _cache.keys().filter(func(k): return str(k).ends_with(suffix)).size()
 
 static func _slots(look: String) -> Dictionary:
 	return P0Logic.content().get("world", {}).get("keeper_looks", {}).get(look, {})
@@ -56,8 +75,8 @@ func _drain() -> void:
 	if _busy or not is_inside_tree(): return
 	_busy = true
 	while not _queue.is_empty():
-		var key: String = _queue.pop_front()
-		await _draw(key)
+		var job: Dictionary = _queue.pop_front()
+		await _draw(str(job.key), job.tex)
 	_busy = false
 
 func _stage(size: Vector2i) -> void:
@@ -95,11 +114,10 @@ func _backdrop(card: bool) -> void:
 	env.background_mode = Environment.BG_COLOR if card else Environment.BG_CLEAR_COLOR   # clear colour is the engine's grey
 	env.background_color = CARD_SKY
 
-func _draw(key: String) -> void:
+func _draw(key: String, tex: ImageTexture) -> void:
 	var parts := key.split("|")
 	var look := parts[0]
 	var card := parts[1] == "card"
-	var tex: ImageTexture = _cache.get(key)
 	var slots := _slots(look)
 	if tex == null or slots.is_empty(): return
 	_stage(CARD if card else HEAD)
