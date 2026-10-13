@@ -77,10 +77,10 @@ export function grantItems(c: P0Content, s: P0State, now: number, key: string, s
       continue;
     }
     // A gift stack never merges with others, so it needs an empty slot of its own.
-    const put = Math.min(qty, gift ? (freeSlots(s) > 0 ? stackLimit(c, id) : 0) : room(c, s, id));
+    const put = Math.min(qty, gift ? (freeSlots(s) > 0 ? stackLimit(c, id, s) : 0) : room(c, s, id));
     if (put > 0) { add(c, s, id, put, gift); bagged[id] = (bagged[id] ?? 0) + put; }
     for (let left = qty - put; left > 0;) {
-      const amount = Math.min(left, stackLimit(c, id));
+      const amount = Math.min(left, stackLimit(c, id, s));
       const p = { key: `${key}:${index++}`, id, qty: amount, ...(gift ? { gift: { ...gift } } : {}), source, created_at: now };
       const waiting = s.inbox.parcels.length >= PARCEL_LIMIT;
       const end = lifetimeEnd(c, s, p, now);

@@ -299,7 +299,7 @@ export function compost(c: P0Content, s: P0State, cmd: { item?: unknown; qty?: u
   const have = count(s.bag, item, 'skip');
   if (have < qty) return { code: 'not_enough', detail: { item, have, need: qty } };
   const out = 'fert_compost';
-  const trial = { bag: structuredClone(s.bag), bag_cap: s.bag_cap };
+  const trial = { bag: structuredClone(s.bag), bag_cap: s.bag_cap, skills: s.skills };
   take(trial.bag, item, qty, 'skip');
   if (room(c, trial, out) < qty) return { code: 'bag_full', detail: { need: qty } };
   take(s.bag, item, qty, 'skip');
