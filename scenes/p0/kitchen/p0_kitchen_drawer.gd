@@ -3,7 +3,7 @@ extends UiDrawer
 ## The cooking drawer, LOCK-20 v5 (SGODOT-226; Figma COOK-2a Cookbook / COOK-2b Experiment, 360×480 from y 320):
 ##   heading   `Stove 1/1` · `Cooking Lv1` · `Empty` (q(31) order) and the 44 px close
 ##   modes     SegmentTab `Cookbook n/N` | `Experiment`
-##   Cookbook  filter chips, the selected page's Compact/Kitchen/Recipe card with Cook (or the gap on the button,
+##   Cookbook  the title strip (COOK-TITLES), filter chips, the selected page's Compact/Kitchen/Recipe card with Cook (or the gap on the button,
 ##             LOCK-10; unknown pages only `Try in Experiment ›`), and the five-column page grid
 ##   Experiment `From your bag` · `n / m slots used`, family chips, the bag as kitchen cells (tap = into the
 ##             pot, no detail card, F-07; tap again = back), `Info ›` and Cook
@@ -23,6 +23,18 @@ const _HEAD_H := 18.0
 const _CLOSE_OVERHANG := 10.0
 const _GAP := 4.0
 const _GRID_GAP := 8.0
+## The Cookbook's title strip (COOK-TITLES 2575:132633 / states 2575:133159; 安其拉, 不知火舞 on 302 2d6a2e9d): a card between
+## the mode tabs and the filter chips (where the chips were), as wide as they are, 53 high, radius 12, a 1 px border on
+## surfaceRaised, the text 11 in;
+## `Home Cook · Line Cook 12/20 · Head Chef · Master Chef` — reached in ink, the next with its count ExtraBold, the rest and
+## every ` · ` grey — a 1 px rule 4 under it, then `Muscle Memory 6/10` (grey; reached: the name alone, in ink). Read only.
+## 6 above the chips: the chips, the recipe card and the grid move down 59, the grid's bottom stays. On a screen too narrow
+## for the line it wraps at a ` · ` and the card grows (安其拉's suggestion).
+const _TITLES_RADIUS := 12.0
+const _TITLES_PAD := Vector2(11.0, 6.0)   # Figma 11 / 7 to 15-high lines; Nunito 11 sets 16 high here, so 6 keeps the card 53
+const _TITLES_ROW_GAP := 4.0              # line, rule, line
+const _TITLES_BELOW := 6.0                # to the filter chips
+const TITLE_GREY := Color("A9ACA6")       # Figma's unbound grey (P0CityRow.UNVISITED_INK)
 const _RECIPE := Vector2(336, 72)
 const _RECIPE_BUTTON := Vector2(90, 44)
 const _RECIPE_BUTTON_AT := Vector2(238, 28)   # Cook at (250, 470) in a card at (12, 442)
@@ -86,6 +98,10 @@ var _bag: UiInventoryGrid
 var _slots_used: Label
 var _cook: UiCommandButton
 var _foot: HBoxContainer   # Experiment's Cook row
+var _titles: PanelContainer   # the Cookbook's title strip
+var _title_line: HFlowContainer
+var _muscle_rule: ColorRect
+var _muscle: HBoxContainer
 var _pot_energy: Label
 var _tried: Label
 
@@ -146,6 +162,7 @@ func refresh() -> void:
 	_fit_heading()
 	var count: Label = _modes.tabs()[0].find_child("Count", true, false)
 	if count: count.text = P0KitchenLogic.cookbook_count(view)
+	_refresh_titles()
 	_refresh_cookbook()
 	_refresh_experiment()
 
@@ -215,6 +232,7 @@ func _build_cookbook() -> VBoxContainer:
 	var v := VBoxContainer.new()
 	v.add_theme_constant_override(&"separation", int(_GAP))
 	v.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	v.add_child(_build_titles())
 	# The filter chips, and Cook All at the strip's right end from Cooking Lv8 (§16 COOK-1): `Nothing to cook` greyed
 	# when no known page has its ingredients (D-10, LOCK-10: the gap on the button, no empty sheet).
 	var strip := HBoxContainer.new()
@@ -238,6 +256,78 @@ func _build_cookbook() -> VBoxContainer:
 	_pages.on_select = func(item: Dictionary): _select_page(str(item.id))
 	v.add_child(_pages)
 	return v
+
+func _build_titles() -> Control:
+	var wrap := MarginContainer.new()
+	wrap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	wrap.add_theme_constant_override(&"margin_bottom", int(_TITLES_BELOW - _GAP))
+	_titles = PanelContainer.new()
+	_titles.name = "CookbookTitles"
+	_titles.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_titles.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_SURFACE_RAISED, _TITLES_RADIUS, UiTokens.COLOR_BORDER,
+		UiTokens.STROKE_DEFAULT).with_margins(_TITLES_PAD.x, _TITLES_PAD.y, _TITLES_PAD.x, _TITLES_PAD.y))
+	wrap.add_child(_titles)
+	var col := VBoxContainer.new()
+	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	col.add_theme_constant_override(&"separation", int(_TITLES_ROW_GAP))
+	_titles.add_child(col)
+	_title_line = HFlowContainer.new()
+	_title_line.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_title_line.add_theme_constant_override(&"h_separation", 0)
+	_title_line.add_theme_constant_override(&"v_separation", 0)
+	col.add_child(_title_line)
+	_muscle_rule = ColorRect.new()
+	_muscle_rule.color = UiTokens.COLOR_BORDER
+	_muscle_rule.custom_minimum_size.y = 1.0
+	_muscle_rule.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	col.add_child(_muscle_rule)
+	_muscle = HBoxContainer.new()
+	_muscle.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_muscle.add_theme_constant_override(&"separation", 0)
+	col.add_child(_muscle)
+	return wrap
+
+## The strip from the view: each title its own unit with the ` · ` after it, so a wrapped line breaks between titles.
+func _refresh_titles() -> void:
+	for box in [_title_line, _muscle]:
+		for c in box.get_children():   # out of the tree and freed now: plain labels, nothing waits on them
+			box.remove_child(c)
+			c.free()
+	var items := P0KitchenLogic.title_strip(view)
+	for i in items.size():
+		var t: Dictionary = items[i]
+		var unit := HBoxContainer.new()
+		unit.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		unit.add_theme_constant_override(&"separation", 0)
+		var next := str(t.state) == "next"
+		var text := str(t.title) + (" %d/%d" % [int(t.have), int(t.need)] if next else "")
+		unit.add_child(_title_label(text, UiTokens.STYLE_C11_XB if next else UiTokens.STYLE_C11_B,
+			TITLE_GREY if str(t.state) == "later" else UiTokens.COLOR_TEXT))
+		if i < items.size() - 1: unit.add_child(_title_label(" · ", UiTokens.STYLE_C11_B, TITLE_GREY))
+		_title_line.add_child(unit)
+	var m := P0KitchenLogic.muscle_item(view)
+	_muscle_rule.visible = not m.is_empty()
+	_muscle.visible = not m.is_empty()
+	if m.is_empty(): return
+	if bool(m.reached): _muscle.add_child(_title_label(str(m.title), UiTokens.STYLE_C11_B))
+	else:
+		_muscle.add_child(_title_label(str(m.title) + " ", UiTokens.STYLE_C11_B, TITLE_GREY))
+		_muscle.add_child(_title_label("%d/%d" % [int(m.have), int(m.need)], UiTokens.STYLE_C11_XB, TITLE_GREY))
+
+static func _title_label(text: String, style: StringName, color := UiTokens.COLOR_TEXT) -> Label:
+	var l := UiKit.label(text, style, color)
+	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return l
+
+## The strip's texts in order, each [text, state] (tests, shots): the titles line, then Muscle Memory's parts.
+func title_texts() -> Array:
+	var out: Array = []
+	for unit in _title_line.get_children():
+		for l in unit.get_children(): out.append((l as Label).text)
+	if _muscle.visible:
+		out.append("|")
+		for l in _muscle.get_children(): out.append((l as Label).text)
+	return out
 
 func _build_recipe() -> Control:
 	var wrap := Control.new()
