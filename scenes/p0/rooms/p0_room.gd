@@ -989,11 +989,13 @@ static func spread(spots: Dictionary, buttons: Array, strip: Rect2, screen: Rect
 		if y - BUTTON_R >= top and width <= hi - lo:
 			var x0 := clampf(strip.get_center().x - width * 0.5, lo, hi - width)
 			for k in under.size(): out[under[k]] = Vector2(x0 + k * SPREAD_GAP, y)
-		else:   # beside the strip: left where there is room, else right, outward 44 apart
-			var left := strip.position.x - STRIP_ABOVE - BUTTON_R >= lo
+		else:   # beside the strip, outward 44 apart: as many on the left as fit there, the rest on the right (never stacked)
+			var left_x := strip.position.x - STRIP_ABOVE - BUTTON_R
+			var right_x := strip.end.x + STRIP_ABOVE + BUTTON_R
+			var left_room := maxi(0, floori((left_x - lo) / SPREAD_GAP) + 1) if left_x >= lo else 0
 			for k in under.size():
-				var x := (strip.position.x - STRIP_ABOVE - BUTTON_R - k * SPREAD_GAP) if left else (strip.end.x + STRIP_ABOVE + BUTTON_R + k * SPREAD_GAP)
-				out[under[k]] = Vector2(clampf(x, lo, hi), strip.get_center().y)
+				var x := (left_x - k * SPREAD_GAP) if k < left_room else (right_x + (k - left_room) * SPREAD_GAP)
+				out[under[k]] = Vector2(minf(x, hi), strip.get_center().y)
 		for n in under: row[n] = true
 	# ① two too close: the later one moves out along the line, to 44
 	var placed: Array = []
@@ -1025,6 +1027,8 @@ func _spread_markers(marks: Dictionary, spots: Dictionary) -> Dictionary:
 	var laid := spread(spots, buttons, _card_rect, screen, _safe_top() + HUD_BOTTOM, _in_row)
 	_in_row = laid.row
 	var out: Dictionary = laid.spots
+	for n in _spread_off.keys():   # a button gone from the screen starts afresh when it returns
+		if not out.has(n): _spread_off.erase(n)
 	for n in out.keys():   # each drawn offset eases to its new place in 0.12 s
 		var raw: Vector2 = spots[n]
 		var to: Vector2 = (out[n] as Vector2) - raw

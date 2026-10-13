@@ -52,6 +52,16 @@ func test_buttons_under_the_open_strip_line_up_above_it() -> void:
 	for n in spots: assert_bool(strip.grow(14.0).has_point(low[n])).override_failure_message(n).is_false()
 	assert_float((low.use_stove_1 as Vector2).y).is_equal(strip.get_center().y)
 
+## Beside the strip with little room on its left (刘邦 on #379): as many as fit there, the rest on its right, none stacked.
+func test_beside_the_strip_they_split_left_and_right() -> void:
+	var strip := Rect2(60, 300, 200, 32)   # its left has room for one (x 40), not two
+	var spots := {"use_spice_rack": Vector2(100, 310), "use_warming_cabinet": Vector2(150, 310), "use_bench": Vector2(200, 310)}
+	var out: Dictionary = P0Room.spread(spots, spots.keys(), strip, SCREEN, 320.0).spots   # the HUD to 320: no row above
+	assert_vector(out.use_spice_rack).is_equal(Vector2(40, 316))
+	assert_vector(out.use_warming_cabinet).is_equal(Vector2(280, 316))
+	assert_vector(out.use_bench).is_equal(Vector2(324, 316))
+	for n in spots: assert_bool(strip.grow(14.0).has_point(out[n])).override_failure_message(n).is_false()
+
 func test_a_button_in_the_row_stays_until_4_px_clear() -> void:
 	var strip := Rect2(100, 300, 150, 32)
 	var edge := Vector2(175, strip.end.y + 14.0 + 2.0)   # 2 px clear of the strip's reach
