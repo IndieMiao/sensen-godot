@@ -51,7 +51,7 @@ const POI_CACHE_LIMIT := 400
 const PACK_MARGIN := 8.0
 ## A pin wearing a map marker (q(48): Deliverable ✓ > Request ! > New ◆) is packed before the others, so the marker
 ## above it is not packed away with it (蒙恬 on C30). Entries carry it as `marker`.
-const MARKER_ORDER := {"deliverable": 0, "request": 1, "new": 2}
+const MARKER_ORDER := {"deliverable": 0, "request": 1, "new": 2, "event": 3}   # Event ★ (§9.3.3) last
 ## The render priority of an outpost pin or a pin wearing a marker: over other art, under the selected pin (2).
 const PLACE_PRIORITY := 1
 const REAPPEAR_COOLDOWN_MS := 400

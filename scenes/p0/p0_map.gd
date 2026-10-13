@@ -1448,7 +1448,8 @@ func p0_frame(view: Dictionary, _dt: float) -> void:
 	city_map.set_marks(list)
 	if farm_markers: farm_markers.set_mark("self", CityMapView.status_badge(home) if home != "" and not away() else null)
 
-const MARK_STATES := {"deliver": "deliverable", "request": "request", "new": "new"}
+## The server's kinds → UiStatusBadge states; the event venue's purple ★ (§9.3.3) last.
+const MARK_STATES := {"deliver": "deliverable", "request": "request", "new": "new", "event": "event"}
 
 ## The pins' marks [{id, state}]: the server's view.map_markers whenever it sends them (蒙恬, SGODOT-232 U6), else
 ## the ones the client knows before then (tutorial_marks). The homestead's goes on the farm pin (home_mark).

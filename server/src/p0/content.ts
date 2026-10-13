@@ -139,8 +139,18 @@ export interface ResidentDef {
   teaches?: string[];
 }
 
+/** An ops event at a place (§9.3.3, content/map_events.json): its pin wears the purple ★ while it is lit (markers.ts). */
+export interface EventVenue {
+  id: string;
+  place: string;   // a pond or outpost id, as the map markers' places
+  name: string;
+  starts: string;   // ISO 8601, UTC
+  ends: string;
+}
+
 export interface P0Content {
   outposts?: OutpostDef[];   // loaded from p0_outposts.json beside the table (loadP0Content)
+  event_venues?: EventVenue[];   // §9.3.3, content/map_events.json: empty in the prototype (only the field is kept)
   version: string;
   energy: { max_base: number; regen_ms: number; bonus_zone: number; rest_amount: number; rest_away_h: number };
   day: { utc_offset_hours: number; rollover_hour: number };   // the offset is the fallback when profile.timezone is absent

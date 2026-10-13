@@ -1,0 +1,4 @@
+{
+  "_note": "Event venues (plan §9.3.3 光色标记, SGODOT-275 P1 exit): ops may light any pond or outpost as an event venue — a purple ★ on its pin from 2 h before the event starts until it ends (§16 marker_event), with an event card to come; its rewards are only decor, titles and stamps, never output, XP or coins. The prototype keeps only the field: the table ships empty and no event exists. An entry: {id, place (a pond or outpost id), name, starts, ends (ISO 8601, UTC)}.",
+  "event_venues": []
+}
