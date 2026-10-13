@@ -10,7 +10,6 @@ signal city_pressed(cluster: String)
 
 const CityRow := preload("res://scenes/p0/panels/p0_city_row.gd")
 const HEIGHT := 447.0
-const _TOP := 12.0      # the title's box: its ink 20 under the sheet's top, as the frame has it
 const _HEAD_GAP := 4     # title to subtitle
 
 var rows: Array = []
@@ -20,11 +19,7 @@ var _scroll: TouchScrollContainer
 ## rows_: P0Travel.nearby(view); home: the home city's name.
 func _init(rows_: Array = [], home := "") -> void:
 	super(HEIGHT)
-	pad = UiTokens.SPACE_PAGE
-	var top := Control.new()
-	top.custom_minimum_size.y = _TOP - UiTokens.SPACE_PAGE
-	top.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	body.add_child(top)
+	pad = UiTokens.SPACE_PAGE   # the title's box starts at the pad, 16 under the sheet's top: its ink at about 20
 	var head := VBoxContainer.new()
 	head.name = "Head"
 	head.add_theme_constant_override(&"separation", _HEAD_GAP)
