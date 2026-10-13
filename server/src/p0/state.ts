@@ -168,7 +168,8 @@ export interface P0State {
   firsts: string[];              // e.g. harvest:crop_radish, catch:fish_crucian, cook:dish_grilled_crucian
   rewards: string[];             // one-time rewards already granted
   day: P0Day;
-  fishing: { casts: number; bites: number; caught: Record<string, number>; seen: string[] };
+  fishing: { casts: number; bites: number; caught: Record<string, number>; seen: string[];
+    quick?: string };   // Quick Recast (Fishing Lv9, §4.6.2): the pond whose last rod catch landed; its next cast bites sooner
   traps?: import('./fish_trap.js').Trap[];   // P1 Fish Traps in the water (SGODOT-283); absent on older saves
   cast: Cast | null;
   stove: Pot | null;

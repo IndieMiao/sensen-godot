@@ -174,6 +174,7 @@ export interface P0Content {
     places: Record<string, FishPlace>;
     baits: Record<string, { shift: number[]; wait: number; regional_mult?: number }>;   // regional_mult: Spinner Lure 2 (§6.4.2)
     creel?: { level: number; stack: number };   // P1 (content/fishing_p1.json): from this Fishing level a fish slot holds `stack` (§4.6.2 Lv10: 10 → 15)
+    quick_recast?: { level: number; wait: number };   // P1 (content/fishing_p1.json): §4.6.2 Lv9 — after a landed fish, the next cast at that pond waits ×wait
   };
   goods: Record<string, { name: string; price: number; skill: Skill; gate: number; daily: number; grow_mult?: number;
     regrow_mult?: number; shop?: 'market' }>;   // P1: Orchard Feed halves a tree's regrowth; shop: sold at the Market
