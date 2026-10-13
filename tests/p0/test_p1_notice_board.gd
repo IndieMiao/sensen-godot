@@ -175,3 +175,32 @@ func test_a_marked_pond_says_why_instead_of_its_bite() -> void:
 	assert_object(row.find_child("Reason", true, false)).is_not_null()
 	assert_object(row.find_child("Line", true, false)).is_null()
 	assert_object(row.find_child("Trap", true, false)).is_not_null()   # the trap stays beside it (the frame's `2/3`)
+
+# ---------------------------------------------------------------- the player's own home (view.home, SGODOT-303)
+func _homed(v: Dictionary, h: Dictionary) -> Dictionary:
+	v["home"] = h
+	return v
+
+const SF_SET := {"market": "sh_market_1", "tea": "sh_tea_1", "tackle": "sh_tackle_1", "post": "sh_post_1", "pond": "pond_san_francisco_03"}
+
+## The home's name, set and farm come from view.home: the same board for San Francisco; its own beginner pond leads.
+func test_the_board_reads_the_players_home() -> void:
+	var v := _homed(_view(), {"city": "gn-5391959", "name": "San Francisco", "set": SF_SET, "farm": {"lat": 37.7558, "lng": -122.4345}})
+	var m: Dictionary = P0NoticeBoard.model(v)
+	assert_array(m.ponds.map(func(p): return p.id)).is_equal(["pond_san_francisco_03", "pond_san_francisco_06"])
+	assert_array(m.outposts.map(func(o): return o.id)).is_equal(["sh_market_1", "sh_tea_1", "sh_tackle_1", "sh_post_1"])
+	var other := SF_SET.duplicate()
+	other.pond = "pond_san_francisco_06"
+	v = _homed(_view(), {"city": "gn-5391959", "name": "Frisco", "set": other, "farm": {"lat": 37.7558, "lng": -122.4345}})
+	m = P0NoticeBoard.model(v)
+	assert_str(str(m.ponds[0].id)).is_equal("pond_san_francisco_06")   # the home set's beginner pond first
+	assert_str(str(m.subtitle)).is_equal("Frisco · Today · tap a place to see it on the map")   # the home's own name
+
+## Another city's ponds are not this home's; without view.home (an older server) the written city's board.
+func test_another_home_city_lists_none_of_san_franciscos_ponds_and_an_old_view_falls_back() -> void:
+	var m: Dictionary = P0NoticeBoard.model(_homed(_view(), {"city": "gn-1850147", "name": "Tokyo", "set": {}, "farm": {"lat": 35.68, "lng": 139.76}}))
+	assert_array(m.ponds).is_empty()
+	assert_str(str(m.subtitle)).starts_with("Tokyo · Today")
+	var old: Dictionary = P0NoticeBoard.home({})
+	assert_array([old.city, old.name, old.set]).is_equal(["", "San Francisco", {}])
+	assert_that(old.farm).is_equal(P0City.farm_at())

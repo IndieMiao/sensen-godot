@@ -6,7 +6,8 @@ extends RefCounted
 ## nearest the homestead first) and an `Outposts` section (each home outpost by its short name, its kind or the reason
 ## its pin is marked (q(103)), and who is in, none at 0 (q(72)); market, tea house, tackle shop, travel post, then any
 ## other nearest first). A tap on a row flies the map to that pin and moves nobody (q(31), k(1)). Built from the view
-## and the presence counts the map already polls: no server field. Pure and static. Preloaded, no class_name (as P0City).
+## and the presence counts the map already polls: no server field. Home is the player's own (view.home, SGODOT-303).
+## Pure and static. Preloaded, no class_name (as P0City).
 
 const Board := preload("res://modules/p0/p0_bite_board.gd")
 const Ponds := preload("res://modules/p0/p0_ponds.gd")
@@ -26,35 +27,64 @@ static func model(view: Dictionary, online: Dictionary = {}) -> Dictionary:
 	var level := int(view.get("skills", {}).get("fishing", {}).get("level", 1))
 	var caught: Dictionary = view.get("fishing", {}).get("caught", {})
 	var places: Dictionary = view.get("fishing", {}).get("places", {})
-	var home := P0City.farm_at()
-	var beginner := P0City.beginner_pond()
+	var h := home(view)
+	var at: Vector2 = h.farm
+	var beginner := str(h.set.get("pond", P0City.beginner_pond()))
 	var ponds: Array = []
 	for p in Ponds.all():
 		var id := str(p.get("id", ""))
-		if not places.has(id): continue
+		# the home city's ponds the view knows (a generated home's are not in view.fishing.places yet, as the Bite Board's)
+		if not places.has(id) or (h.city != "" and str(p.get("region_id", p.get("cluster", ""))) != h.city): continue
 		var place: Dictionary = places[id]
 		var trap := P0Logic.P0Trap.pond_fact(view, id)
 		var why := P0Logic.PinReason.reason(view, id)   # a marked pond says why instead (NOTICE-BOARD 2608:133862)
 		ponds.append({id = id, name = Map.short_name(str(place.get("name", p.get("name", id)))), icon = "pond",
 			line = str(why.get("text", "")) if not why.is_empty() else bite_line(place, level, caught), reason = why,
 			trap = str(trap[1]) if trap.size() > 1 else "", go = "pond:" + id,
-			_first = id == beginner, _km = _km(home, p)})
+			_first = id == beginner, _km = _km(at, p)})
 	ponds.sort_custom(_before)
 	var outposts: Array = []
-	for o in P0Outposts.all():
+	for o in _home_outposts(h):
 		var id := str(o.get("id", ""))
 		var why := P0Logic.PinReason.reason(view, id)
 		var role := str(o.get("role", ""))
 		outposts.append({id = id, name = Map.short_name(str(o.get("name", id))), icon = str(Map.PIN_ICONS.get(role, "travel")),
 			line = str(why.get("text", "")) if not why.is_empty() else str(o.get("category", "")), reason = why,
 			online = int(online.get(id, 0)), go = "outpost:" + id,
-			_rank = ROLE_ORDER.find(role) if ROLE_ORDER.has(role) else ROLE_ORDER.size(), _km = _km(home, o)})
+			_rank = ROLE_ORDER.find(role) if ROLE_ORDER.has(role) else ROLE_ORDER.size(), _km = _km(at, o)})
 	outposts.sort_custom(func(a, b): return a._rank < b._rank if a._rank != b._rank else a._km < b._km)
 	for list in [ponds, outposts]:
 		for r in list:
 			for k in ["_first", "_rank", "_km"]: r.erase(k)
-	return {title = "Notice Board", subtitle = "%s · Today · tap a place to see it on the map" % P0City.city_name(),
+	return {title = "Notice Board", subtitle = "%s · Today · tap a place to see it on the map" % h.name,
 		ponds = ponds, outposts = outposts}
+
+## The player's home (SGODOT-303, view.home): {city, name, set, farm}. Its city's cluster and name, its home set
+## (market / tea / tackle / post / the beginner pond) and the farm's point; the written city's where the view has none
+## (an older server), or a field is missing.
+static func home(view: Dictionary) -> Dictionary:
+	var h: Dictionary = view.get("home", {}) if view.get("home", {}) is Dictionary else {}
+	var farm = h.get("farm", null)
+	var set_ = h.get("set", null)
+	return {city = str(h.get("city", "")), name = str(h.get("name", "")) if str(h.get("name", "")) != "" else P0City.city_name(),
+		set = set_ if set_ is Dictionary else {},
+		farm = Vector2(float(farm.get("lat", 0.0)), float(farm.get("lng", 0.0))) if farm is Dictionary else P0City.farm_at()}
+
+## The outposts the board lists: the home set's four, then any other of the home city (P0Outposts: the written city's
+## table, a generated city's once read); without a home set, the written city's table.
+static func _home_outposts(h: Dictionary) -> Array:
+	var set_: Dictionary = h.set
+	if set_.is_empty(): return P0Outposts.all()
+	var out: Array = []
+	var ids := {}
+	for role in ROLE_ORDER:
+		var o := P0Outposts.find(str(set_.get(role, "")))
+		if o.is_empty() or ids.has(str(o.id)): continue
+		ids[str(o.id)] = true
+		out.append(o)
+	for o in P0Outposts.all():
+		if not ids.has(str(o.get("id", ""))) and (h.city == "" or str(o.get("cluster", "")) == h.city): out.append(o)
+	return out
 
 ## A pond's best bite today: the Bite Board keeper's sentence for that pond's fish (q(119): the landable fish with the
 ## highest factor now and today, its time and weather words), without the bait — `Rainbow Trout bite in the rain`.
