@@ -7,9 +7,12 @@ extends GdUnitTestSuite
 ## chip.
 
 const P0_MAP := "res://scenes/p0/p0_map.tscn"
+const P0Map := preload("res://scenes/p0/p0_map.gd")
 const P0Clusters := preload("res://modules/p0/p0_clusters.gd")
 const SF := "gn-5391959"
 const LA := "gn-5368361"
+const TOKYO := "gn-1850147"
+const P0CityPlaces := preload("res://modules/p0/p0_city_places.gd")
 
 func before_test() -> void:
 	Net.use_transport(FakeTransport.new([]).callable())
@@ -295,3 +298,45 @@ func test_the_route_bows_up_and_fades_with_the_flight() -> void:
 	var cover := P0TravelCover.new()
 	assert_str(str(cover._plane.get_meta("ui_source", ""))).ends_with("i-plane.svg")
 	cover.free()
+
+## q(152) ② (§11.8.4 steps 5 then 7): a first visit lands with its stamp toast and +10 Energy; 1.5 s later the stamp
+## has gone and the arrival card slides up, so the toast never lies over the card. A return only floats Welcome back.
+func test_a_first_visit_stamps_first_and_its_card_comes_after() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved := _ready_to_arrive(m)
+	P0CityPlaces.accept(TOKYO, load("res://tests/p0/test_p0_city_places.gd").CITY)   # its places read, as on a phone
+	m.on_arrival({kind = "arrival", cluster = TOKYO, first = true, trip = 6, km = 8271})
+	await get_tree().create_timer(0.7).timeout
+	_tap(_cover(m))   # down at once
+	assert_str(rt.ui.toast_text()).is_equal("Welcome to Tokyo · Stamp collected")
+	assert_str(rt.ui.modal_kind).is_not_equal("arrival_card")   # the stamp first
+	await get_tree().create_timer(P0Map.STAMP_S * 0.5).timeout
+	assert_str(rt.ui.modal_kind).is_not_equal("arrival_card")   # still the stamp's beat
+	await get_tree().create_timer(P0Map.STAMP_S * 0.5 + 0.3).timeout
+	assert_str(rt.ui.modal_kind).is_equal("arrival_card")   # then the card
+	rt.ui.close_modal()
+	rt.ui.clear_toast()
+	rt.session.view = saved
+	rt.ui.set_view(saved)
+
+## Leaving the map while the stamp says itself: no card comes, and nothing errs.
+func test_leaving_during_the_stamp_brings_no_card() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved := _ready_to_arrive(m)
+	P0CityPlaces.accept(TOKYO, load("res://tests/p0/test_p0_city_places.gd").CITY)
+	m.on_arrival({kind = "arrival", cluster = TOKYO, first = true, trip = 6, km = 8271})
+	await get_tree().create_timer(0.7).timeout
+	_tap(_cover(m))
+	m.get_parent().remove_child(m)
+	m.free()
+	await get_tree().create_timer(P0Map.STAMP_S + 0.3).timeout
+	assert_str(rt.ui.modal_kind).is_not_equal("arrival_card")
+	rt.ui.clear_toast()
+	rt.session.view = saved
+	rt.ui.set_view(saved)

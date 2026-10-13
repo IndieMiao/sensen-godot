@@ -824,8 +824,25 @@ func on_arrival(ev: Dictionary) -> void:
 	_travel_fly({lat = float(overview.get("lat", c.lat)), lng = float(overview.get("lng", c.lng)),
 		zoom = float(overview.get("zoom", 11.0)), bearing = float(overview.get("bearing", 0.0))}, left, held, str(c.name),
 		int(ev.get("km", 0)), func():
-			rt.ui.toast(welcome)
-			if first: open_arrival_card(cluster))
+			# §11.8.4 steps 5 then 7 (q(152) ②): a first visit's stamp says itself for 1.5 s with its +10 Energy, then
+			# goes, and only then the card slides up, so the toast never lies over it; a return only floats Welcome back.
+			if not first:
+				rt.ui.toast(welcome)
+				return
+			rt.ui.toast(welcome, STAMP_S)
+			_arrival_card_after_stamp(cluster))
+
+## The stamp's beat of the arrival (§11.8.4 ≤ 1.5 s, q(152) ②): its toast's time, after which the arrival card comes.
+const STAMP_S := 1.5
+var _card_token := 0
+
+## The first visit's card once the stamp has said itself — unless the map is gone, another flight is in the air, or
+## another arrival has come meanwhile (each waits for its own stamp).
+func _arrival_card_after_stamp(cluster: String) -> void:
+	_card_token += 1
+	var token := _card_token
+	get_tree().create_timer(STAMP_S).timeout.connect(func():
+		if is_inside_tree() and token == _card_token and not travelling(): open_arrival_card(cluster))
 
 ## The cross-city flight under way (q(147)): its plan, how far it is, the cover, what landing does, the city left.
 var _trip := {}
