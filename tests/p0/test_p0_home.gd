@@ -22,7 +22,7 @@ func test_home_panel_matches_the_page_14_sample() -> void:
 	assert_array(p.tiles.map(func(t): return str(t.name))).is_equal(["Timber", "Stone", "Reeds", "Clay", "Rock Salt", "Coins", "Skills"])
 	assert_int(int(p.tiles[5].need)).is_equal(440)   # price + the 40-coin floor (q(10))
 	assert_array(p.changes.map(func(c): return str(c.text))).is_equal(
-		["Max Energy 220 · Meals 220 a day", "Warming Cabinet", "Bag Upgrade I for sale · 150 coins", "Stall Board · 3rd slot",
+		["Max Energy 220 · Meals 220 a day", "Warming Cabinet", "Bag Upgrade I · 150 coins", "Stall Board · 3rd slot",
 		"Fence & Mailbox · Timber or Stone"])
 	assert_array(p.changes.map(func(c): return str(c.note))).is_equal(["now 210", "keeps 6 dishes by the stove", "Bag 25 → 30", "now 2", "pick one"])
 	assert_str(str(p.reason)).is_equal("Need 6 more Timber")
@@ -56,7 +56,7 @@ func test_p1_levels_list_the_kitchen_and_bag_unlocks() -> void:
 	var p := P0Logic.home_panel(v)
 	assert_str(str(p.title)).is_equal("Homestead Lv5 → Lv6")
 	assert_array(p.changes.slice(1).map(func(c): return "%s · %s" % [c.text, c.note])).is_equal(
-		["Big Pot · Double · two portions, one round of heat", "Bag Upgrade II for sale · 400 coins · Bag 35 · after Upgrade I"])
+		["Big Pot · Double · two portions, one round of heat", "Bag Upgrade II · 400 coins · Bag 35 · after Upgrade I"])
 	v.homestead.next.unlocks = ["second_stove", "long_haul_ticket"]
 	assert_array(P0Logic.home_panel(v).changes.slice(1).map(func(c): return str(c.text))).is_equal(["Second Stove"])
 	v.homestead.next.level = 5
@@ -105,7 +105,7 @@ func test_home_moment_matches_the_page_14_banner() -> void:
 	var m := P0Logic.home_moment({"energy": {"max": 220}}, {"kind": "homestead", "level": 3, "unlocks": ["warming_cabinet", "bag_upgrade_1", "board_slot_3", "fence"]})
 	assert_str(str(m.title)).is_equal("Homestead Lv3")
 	assert_str(str(m.subtitle)).is_equal("Max Energy 220 · Energy full")
-	assert_str(str(m.detail)).is_equal("Warming Cabinet\nBag Upgrade I for sale · 150 coins")
+	assert_str(str(m.detail)).is_equal("Warming Cabinet\nBag Upgrade I · 150 coins")
 
 func test_material_icons_exist() -> void:
 	for id in ["wood", "stone", "fiber", "clay", "rock_salt", "coin", "star", "energy", "kitchen", "bag", "board"]:
@@ -397,7 +397,7 @@ func test_bag_upgrade_notes_follow_the_tiers_the_player_has() -> void:
 	v.homestead.next.level = 9
 	v.homestead.next.unlocks = ["bag_upgrade_3"]
 	assert_array(P0Logic.home_panel(v).changes.slice(1).map(func(c): return "%s · %s" % [c.text, c.note])).is_equal(
-		["Bag Upgrade III for sale · 1,000 coins · Bag 35 → 40"])
+		["Bag Upgrade III · 1,000 coins · Bag 35 → 40"])
 
 ## Lv8 promises no stall look until the stall has its model (不知火舞 on 282, 李元芳's c62a6ed9 ③): neither HOME-1 nor the banner.
 func test_lv8_says_nothing_of_the_stall_yet() -> void:

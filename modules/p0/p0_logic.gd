@@ -1690,9 +1690,9 @@ const P1_UNLOCKS := {
 	"second_stove": {"icon": "kitchen", "text": "Second Stove", "note": "two dishes at once"},
 	"notice_board": {"icon": "board", "text": "Notice Board", "note": "at the Homestead Stall"},   # §9: the stall's board (Figma HOME-1-LV5)
 	"big_pot": {"icon": "kitchen", "text": "Big Pot · Double", "note": "two portions, one round of heat"},
-	"bag_upgrade_2": {"icon": "bag", "text": "Bag Upgrade II for sale · 400 coins"},   # note: bag_tier_note
+	"bag_upgrade_2": {"icon": "bag", "text": "Bag Upgrade II · 400 coins"},   # note: bag_tier_note
 	"third_stove": {"icon": "kitchen", "text": "Third Stove", "note": "Warming Cabinet keeps 12"},
-	"bag_upgrade_3": {"icon": "bag", "text": "Bag Upgrade III for sale · 1,000 coins"},   # note: bag_tier_note
+	"bag_upgrade_3": {"icon": "bag", "text": "Bag Upgrade III · 1,000 coins"},   # note: bag_tier_note
 	"chefs_sign": {"icon": "kitchen", "text": "Chef's Sign", "note": "every dish's gold zone +5"},
 	"title_homestead_master": {"icon": "star", "text": "Homestead Master", "note": "title"},
 	"old_tree": {"icon": "wood", "text": "Old Tree", "note": "Hardwood · 1 per round"},
@@ -1797,7 +1797,7 @@ static func home_panel(view: Dictionary, at_home := true) -> Dictionary:
 			"clay_bank": out.changes.append({"icon": "clay", "text": "Clay Bank", "note": "Clay next to the Reed Bank"})
 			"warming_cabinet": out.changes.append({"icon": "kitchen", "text": "Warming Cabinet", "note": "keeps 6 dishes by the stove"})
 			"bag_upgrade_1":
-				out.changes.append({"icon": "bag", "text": "Bag Upgrade I for sale · 150 coins", "note": bag_tier_note(view, "bag_upgrade_1")})
+				out.changes.append({"icon": "bag", "text": "Bag Upgrade I · 150 coins", "note": bag_tier_note(view, "bag_upgrade_1")})
 			"bag_upgrade_2", "bag_upgrade_3":
 				var line := (P1_UNLOCKS[str(u)] as Dictionary).duplicate()
 				line["note"] = bag_tier_note(view, str(u))
@@ -1860,7 +1860,7 @@ static func home_moment(view: Dictionary, ev: Dictionary) -> Dictionary:
 			"spice_rack": lines.append("Spice Rack · seasonings off your bag")
 			"clay_bank": lines.append("Clay Bank opened")   # gathering spot (SGODOT-231, q(45))
 			"warming_cabinet": lines.append("Warming Cabinet")
-			"bag_upgrade_1": lines.append("Bag Upgrade I for sale · 150 coins")
+			"bag_upgrade_1": lines.append("Bag Upgrade I · 150 coins")
 			_:
 				var line := P1_UNLOCKS.get(str(u), {}) as Dictionary
 				if not line.is_empty(): lines.append(str(line.text))
