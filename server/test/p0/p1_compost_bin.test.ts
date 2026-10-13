@@ -28,18 +28,18 @@ function f7(): P0State {
   s.storage = { wood: 20, stone: 20 };
   return upgradeState(c, s, T0);
 }
-const build = (s: P0State, x = 5, y = 14) => step(s, { type: 'place', recipe: 'craft_compost_bin', x, y, space: 'home' });
+const build = (s: P0State, x = 4, y = 15) => step(s, { type: 'place', recipe: 'craft_compost_bin', x, y, space: 'home' });
 const crops = (s: P0State, id: string, qty: number) => { s.bag.push({ id, qty }); return s; };
 
 describe('the Compost Bin on the yard (q(118) ③)', () => {
   it('is built at Farming Lv7 on a yard cell for 6 Timber and 4 Stone, and stands there', () => {
     const s = build(f7());
     expect(s.storage).toEqual({ wood: 14, stone: 16 });
-    expect(s.facilities).toEqual([{ id: 1, kind: 'compost_bin', plot: -1, cell: [5, 14] }]);
-    expect(viewOf(c, s, T0).facilities).toEqual([{ id: 1, kind: 'compost_bin', plot: -1, covers: [], cell: [5, 14] }]);
+    expect(s.facilities).toEqual([{ id: 1, kind: 'compost_bin', plot: -1, cell: [4, 15] }]);
+    expect(viewOf(c, s, T0).facilities).toEqual([{ id: 1, kind: 'compost_bin', plot: -1, covers: [], cell: [4, 15] }]);
     const low = f7();
     low.skills.farming = LV7 - 1;
-    expect(refused(low, { type: 'place', recipe: 'craft_compost_bin', x: 5, y: 14 })).toMatchObject({ code: 'skill_level_required', detail: { level: 7 } });
+    expect(refused(low, { type: 'place', recipe: 'craft_compost_bin', x: 4, y: 15 })).toMatchObject({ code: 'skill_level_required', detail: { level: 7 } });
   });
 
   it('keeps to the yard: not on the field, a path or a yard object; one only', () => {
@@ -54,12 +54,12 @@ describe('the Compost Bin on the yard (q(118) ③)', () => {
 
   it('and decor keep out of each other\'s cells; it moves for free to another free cell', () => {
     let s = build(f7());
-    expect(spotBlock(c, s, 'deco_planter', 5, 14, 0)?.code).toBe('decor_overlap');   // a piece can't go on the bin
+    expect(spotBlock(c, s, 'deco_planter', 4, 15, 0)?.code).toBe('decor_overlap');   // a piece can't go on the bin
     s.decor = { placed: [{ uid: 1, id: 'deco_planter', x: 6, y: 14, rot: 0 }], count: 1 };
     expect(refused(s, { type: 'move_facility', facility: 1, x: 6, y: 14 }).code).toBe('decor_overlap');   // nor the bin on a piece
-    expect(refused(s, { type: 'move_facility', facility: 1, x: 5, y: 14 }).code).toBe('same_plot');
-    s = step(s, { type: 'move_facility', facility: 1, x: 4, y: 15, space: 'home' });
-    expect(s.facilities?.[0].cell).toEqual([4, 15]);
+    expect(refused(s, { type: 'move_facility', facility: 1, x: 4, y: 15 }).code).toBe('same_plot');
+    s = step(s, { type: 'move_facility', facility: 1, x: 5, y: 15, space: 'home' });
+    expect(s.facilities?.[0].cell).toEqual([5, 15]);
     expect(s.storage).toEqual({ wood: 14, stone: 16 });   // moving is free
   });
 });
