@@ -138,7 +138,7 @@ export function collectTrap(c: P0Content, s: P0State, cmd: { take_back?: unknown
 /** How many of these Collect would take now: each fish in turn onto a matching stack or a free slot, one that does not
  * fit skipped and the rest still tried — collectTrap's own walk, on a copy of the bag (苏烈 on #249). */
 function fitsCount(c: P0Content, s: P0State, ids: string[]): number {
-  const bag = { bag: s.bag.map(b => ({ ...b })), bag_cap: s.bag_cap };
+  const bag = { bag: s.bag.map(b => ({ ...b })), bag_cap: s.bag_cap, skills: s.skills };   // the skills: the creel's 15 at Lv10
   let n = 0;
   for (const id of ids) {
     if (room(c, bag, id) < 1) continue;
@@ -154,7 +154,7 @@ function fitsAll(c: P0Content, s: P0State, ids: string[]): boolean {
   for (const id of ids) need[id] = (need[id] ?? 0) + 1;
   let slots = Math.max(0, s.bag_cap - s.bag.length);
   for (const [id, n] of Object.entries(need)) {
-    const limit = stackLimit(c, id);
+    const limit = stackLimit(c, id, s);
     const partial = s.bag.filter(b => b.id === id && !b.gift).reduce((a, b) => a + Math.max(0, limit - b.qty), 0);
     slots -= Math.ceil(Math.max(0, n - partial) / limit);
     if (slots < 0) return false;

@@ -1,9 +1,10 @@
 /** Bag (25 slots, 30 after Bag Upgrade I; stacking by kind, §10.3.3 / §10.4.3). One BagStack per occupied slot. */
 import { itemKind, type P0Content } from './content.js';
+import { levelFor } from './rules.js';
 import type { BagStack } from './state.js';
 
-/** Anything with a bag and its current capacity (the player state). */
-export interface BagHolder { bag: BagStack[]; bag_cap: number }
+/** Anything with a bag and its current capacity (the player state); its skills, when known, for the creel's stack. */
+export interface BagHolder { bag: BagStack[]; bag_cap: number; skills?: { fishing?: number } }
 
 /** Which stacks an operation may use: a resident's gift meal can be eaten and given to a resident, never sold or handed in. */
 export type GiftUse = 'any' | 'skip';
@@ -13,18 +14,25 @@ const usable = (b: BagStack, gifts: GiftUse) => gifts === 'any' || !b.gift;
 export function count(bag: BagStack[], id: string, gifts: GiftUse = 'any'): number {
   return bag.filter(b => b.id === id && usable(b, gifts)).reduce((n, b) => n + b.qty, 0);
 }
-export function stackLimit(c: P0Content, id: string): number { return c.bag.stack[itemKind(id)] ?? 99; }
+/** How many one slot holds (§10.3.3 by kind). A fish slot holds `fishing.creel.stack` from Fishing Lv`creel.level` (§4.6.2
+ * Lv10: the creel 10 → 15 a slot), read from the player's level each time: nothing in the save changes. Without the
+ * player (`s`), the kind's base. */
+export function stackLimit(c: P0Content, id: string, s?: BagHolder): number {
+  const kind = itemKind(id), base = c.bag.stack[kind] ?? 99, creel = c.fishing.creel;
+  if (kind === 'fish' && creel && s?.skills && levelFor(c.skills.fishing, s.skills.fishing ?? 0) >= creel.level) return Math.max(base, creel.stack);
+  return base;
+}
 export function freeSlots(s: BagHolder): number { return Math.max(0, s.bag_cap - s.bag.length); }
 
 /** How many more of id fit: partial plain stacks plus empty slots (gift stacks never take more). */
 export function room(c: P0Content, s: BagHolder, id: string): number {
-  const limit = stackLimit(c, id);
+  const limit = stackLimit(c, id, s);
   const partial = s.bag.filter(b => b.id === id && !b.gift).reduce((n, b) => n + (limit - b.qty), 0);
   return partial + freeSlots(s) * limit;
 }
 
 export function add(c: P0Content, s: BagHolder, id: string, qty: number, gift?: BagStack['gift']): void {
-  const limit = stackLimit(c, id);
+  const limit = stackLimit(c, id, s);
   const same = (b: BagStack) => b.id === id && (gift ? b.gift?.from === gift.from && b.gift.day === gift.day : !b.gift);
   for (const b of s.bag) if (same(b) && qty > 0) { const put = Math.min(qty, limit - b.qty); b.qty += put; qty -= put; }
   while (qty > 0 && s.bag.length < s.bag_cap) {

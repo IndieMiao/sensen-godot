@@ -49,6 +49,10 @@
         "rollover_hour": 4
       }
     },
+    "creel": {
+      "level": 10,
+      "stack": 15
+    },
     "trap": {
       "every_h": 8,
       "keep": 3,
