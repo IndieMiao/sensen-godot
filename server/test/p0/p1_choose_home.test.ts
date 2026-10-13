@@ -161,7 +161,7 @@ describe('farm spots (q(160) ②)', () => {
       expect(rows, city).toHaveLength(3);
       const hoods = rows.map(r => r.hood);
       expect(new Set(hoods).size, city).toBe(3);
-      for (const h of hoods) expect(h, city).toMatch(/^[\p{Script=Latin}\p{N}\s'’.&()-]{2,40}$/u);   // English card text; long names as they are (不知火舞)
+      for (const h of hoods) expect(h, city).toMatch(/^[\p{Script=Latin}\p{N}\s'’.&()-]{2,22}$/u);   // English card text, 22 at most (不知火舞)
       for (const h of hoods) expect(h, city).not.toMatch(/\b(park|hill|market|center|centre)\b|parken$/i);   // districts, not parks or landmarks
       expect(homeSpots(c, city, 'player-spot-01')!.map(s => s.hood)).toEqual(hoods);
       const zone = clusterById(c, city)?.climate ?? 'temperate';

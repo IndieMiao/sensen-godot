@@ -71,6 +71,15 @@ async function curl(url: string, file?: string): Promise<Buffer> {
 
 /** A label as a card line takes it: a Tokyo chōme number (`Sendagaya 5`) and Mexico's `Colonia ` go. */
 const clean = (n: string) => n.replace(/\s+\d+$/, '').replace(/^Colonia\s+/, '').trim();
+/** A card line takes HOOD_MAX characters (不知火舞 on 303 135b886d): a longer name loses a generic tail or head
+ * (`Alvarado Terrace Historic District` → `Alvarado Terrace`, `Pueblo de la Magdalena Mixiuhca` → `Magdalena
+ * Mixiuhca`); still longer, it is not used (the next label within HOOD_M, else another spot). */
+const HOOD_MAX = 22;
+const fit = (n: string) => {
+  if (n.length <= HOOD_MAX) return n;
+  const t = n.replace(/\s+(Historic District|District|Neighbou?rhood)$/i, '').replace(/^(Pueblo de la|Pueblo de|Colonia)\s+/i, '').trim();
+  return t.length <= HOOD_MAX ? t : '';
+};
 const HOOD_M = 800;
 /** Park, hill and landmark labels are not districts (不知火舞, 303): `Saint James Park`, `Lady Hill Park`, `Henderson Hill`. */
 const NOT_A_DISTRICT = /\b(park|parque|parc|hill|hills|mount|mountain|peak|garden|gardens|market|cemetery|stadium|airport|station|university|campus|center|centre)\b|parken$/i;
@@ -90,7 +99,7 @@ async function labelsNear(p: { lat: number; lng: number }): Promise<string[]> {
   const labels = (JSON.parse((await curl(url)).toString()) as { features?: { properties: Record<string, unknown> & { tilequery: { distance: number } } }[] }).features ?? [];
   return labels.filter(f => ['suburb', 'quarter', 'neighbourhood'].includes(String(f.properties.type)) && f.properties.tilequery.distance <= HOOD_M)
     .sort((a, b) => a.properties.tilequery.distance - b.properties.tilequery.distance)
-    .map(f => clean(String(f.properties.name_en ?? f.properties.name ?? ''))).filter(n => n && LATIN.test(n) && !NOT_A_DISTRICT.test(n));
+    .map(f => fit(clean(String(f.properties.name_en ?? f.properties.name ?? '')))).filter(n => n && LATIN.test(n) && !NOT_A_DISTRICT.test(n));
 }
 
 /** App text is English (the user, 2026-09-04): a district name in another script is passed over. */
