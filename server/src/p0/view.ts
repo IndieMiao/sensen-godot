@@ -9,7 +9,7 @@ import { blessed, dayKey, foodCap, maxEnergy, nextTickIn, regenMs, settleEnergy,
 import { emptyDay, type P0State } from './state.js';
 import { catalog, drinkPrice, isSpecialty, offerOf, owns, quotaKey, quotaScope, regionalOf, walletNeed } from './shops.js';
 import { BOARDS, farFish, farTries, handIn, haveForRequest, heldSlot, lockedTemplate, payout, settleBoards, slotCount } from './boards.js';
-import { expireGiftMeals, lessonState, progressOf, requestOpensIn, requestState, residentState, stageIndex } from './residents.js';
+import { expireGiftMeals, kindredGifts, lessonState, progressOf, requestOpensIn, requestState, residentState, stageIndex } from './residents.js';
 import { floorPrice, haveFor, matches } from './requests.js';
 import type { BoardRequest, Pot } from './state.js';
 import { bigPot, boardSlots, chefSignGold, coinsNeeded, lookOf, nextLevel, skillsTotal, stoveCount, unlocked, upgradeBlock } from './homestead.js';
@@ -90,7 +90,8 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     workbench: workbenchView(c, s),
     homestead: homesteadView(c, s),
     profile: { name: c.profile.name, city: c.profile.city, climate: c.profile.climate, since_ms: s.created_at,
-      farm: { name: c.profile.farm_name, level: s.homestead.level } },
+      farm: { name: c.profile.farm_name, level: s.homestead.level },
+      titles: s.rewards.filter(k => k.startsWith('title:')).map(k => k.slice('title:'.length)) },   // in the order earned (q(171))
     boards: Object.fromEntries(BOARDS.map(b => [b, boardView(c, s, b, now)])),
     residents: Object.fromEntries(Object.keys(c.residents).map(id => [id, residentView(c, s, id, now)])),
     keepers: keepersView(c, s, now, opts.online ?? null),
@@ -448,6 +449,8 @@ function residentView(c: P0Content, s: P0State, id: string, now: number) {
     next_in: st.state === 'wait' ? requestOpensIn(c, s, id, now) : null,
     // §7.5.3 Recipe lesson: ready = `learn` teaches `recipe` now; wait = next_in ms; stage = from need_stage; none
     lesson: { state: lesson.state, recipe: lesson.recipe ?? null, next_in: lesson.next_in ?? null, need_stage: lesson.need_stage ?? null },
+    // q(171): their postcard in the Passport once Kindred gave it — `Postcard from Pip`, its text, when; null before
+    kindred: r.kindred_at !== undefined ? { ...kindredGifts(c, id), at: r.kindred_at } : null,
   };
 }
 

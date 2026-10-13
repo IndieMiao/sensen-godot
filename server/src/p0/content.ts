@@ -221,6 +221,9 @@ export interface P0Content {
     lesson?: { stage: string; every_days: number };
     /** §9.6.1: a resident's next request opens this long after the last one is done (24 h; P0's one_per_day = the player day). */
     next_request_h?: number;
+    /** q(171): what first reaching Kindred gives, `{name}` the resident's — `Postcard from Pip` into the Passport (its text
+     * their Kindred line) and the title `Pip's Best Friend`. */
+    kindred?: { postcard: string; title: string };
     gift: { loved_fine: number; liked: number; any: number; perfect: number; cap: number; mystery: number; chef_touch: { cooking: number; bonus: number; cap: number } };
     mystery_line: string;
   };
