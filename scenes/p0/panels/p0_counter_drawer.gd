@@ -382,6 +382,29 @@ func _fill_barter() -> void:
 		row.show_spec({id = str(r.id), icon = P0Logic.icon(str(r.id)), title = str(r.title), facts = [str(r.effect), str(r.gate)],
 			price = {text = str(r.price)}, buttons = [key_], info = true}, true)
 
+## The › card for a row (不知火舞 on 284): the row's item as an InfoSheet spec — its name and icon, the row's use line
+## under the name (`+10 bag slots`), the materials as NeedTiles, the price beside the row's own key (Buy, or the grey
+## reason). {} for an item no row shows.
+func info_card(item_id: String) -> Dictionary:
+	var row := row_of(item_id)
+	if row == null: return {}
+	var s := row.spec()
+	var facts: Array = s.get("facts", [])
+	return {id = item_id, title = str(s.get("title", "")), icon = s.get("icon", null), rarity_text = str(facts[0]) if not facts.is_empty() else "",
+		needs = s.get("needs", []), facts = [str(s.get("price", {}).get("text", ""))], buttons = (s.get("buttons", []) as Array).slice(0, 1),
+		info = false}
+
+## The shelf's or the Barter group's row for an item, null when none shows it.
+func row_of(item_id: String) -> UiShopRow:
+	if _rows.has(item_id): return _rows[item_id]
+	if is_instance_valid(barter): return barter.get_node_or_null("Barter_" + item_id) as UiShopRow
+	return null
+
+## The row's own key, as a tap on it: Buy with its count, a barter with its item (the › card's key).
+func press_row(item_id: String) -> void:
+	var row := row_of(item_id)
+	if row != null and row.buy != null and not row.buy.is_unavailable() and not row.buy.is_offline(): row.buy.activated.emit()
+
 ## The Barter group's height (its heading and rows), 0 where there is none: a short drawer counts it.
 func barter_height() -> float:
 	return 0.0 if P0Barter.header(view).is_empty() or role != "market" else _BARTER_HEAD_H + P0Barter.rows(view).size() * _ROW_H

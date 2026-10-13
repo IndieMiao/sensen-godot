@@ -25,6 +25,8 @@ extends PanelContainer
 ##   need: {name, have, need, icon, note}   a NeedTile M in its count state ("Farming XP 32/50") with the note
 ##                         beside it ("18 XP to go · harvest 9 radishes")
 ##   info_row: {title, qty, lines}          Compact/Information row ("Carrot Seeds ×5" / "Level-up gift" / "At Lv2")
+##   needs: [{name, have, need, icon}]      a group of NeedTile M, as many a row as fit (the counter's › card: a buy's
+##                         materials, `Hardwood 0/4`; 不知火舞 on 284)
 
 signal action_requested(action: StringName, item_id: String, payload: Dictionary)
 signal unavailable_requested(action: StringName, item_id: String, reason: String)
@@ -305,6 +307,18 @@ func _build_blocks() -> void:
 		note.visible = note.text != ""
 		row.add_child(note)
 		_blocks.add_child(row)
+	var needs: Array = _spec.get("needs", [])
+	if not needs.is_empty():   # a buy's materials (the counter's › card): NeedTile M each, as many a row as fit (5)
+		var tiles: Array = []
+		for n in needs:
+			var t := UiNeedTile.new(str(n.get("name", "")), int(n.get("have", 0)), maxi(1, int(n.get("need", 1))), UiNeedTile.Size.M,
+				n.get("icon", null))
+			t.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			tiles.append(t)
+		var group := UiNeedTile.group(tiles)
+		group.name = "Needs"
+		group.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_blocks.add_child(group)
 	var info: Dictionary = _spec.get("info_row", {})
 	if not info.is_empty():
 		var box := VBoxContainer.new()

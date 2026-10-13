@@ -2141,6 +2141,20 @@ const _COUNTER_FLOW := ["counter", "board_request", "board_drop", "board_dropped
 func counter_drawer() -> P0CounterDrawer:
 	return _counter if modal_kind in _COUNTER_FLOW and is_instance_valid(_counter) else null
 
+## A counter row's › (不知火舞 on 284): its card over the counter (UiInfoSheet.layered: Back or a tap outside closes it
+## first) — name, use line, the materials as NeedTiles, the price and the row's own key, which does what the row's does.
+func counter_info(d: P0CounterDrawer, id: String) -> UiInfoSheet:
+	if d.info_card(id).is_empty() or _modal == null: return null
+	var sheet := UiInfoSheet.layered(_modal, Vector2(UiTokens.SIZE_QUICK_BAR_X, UiTokens.SPACE_PAGE + safe_bottom()))
+	sheet.theme = UiKit.theme()
+	sheet.rules = func(_i: String, _c: StringName, _o: Dictionary) -> Dictionary: return d.info_card(id)
+	sheet.action_requested.connect(func(_a: StringName, _i: String, _p: Dictionary):
+		sheet.close()
+		d.press_row(id))
+	sheet.unavailable_requested.connect(func(_a: StringName, _i: String, reason: String): toast(reason))
+	sheet.open(id, &"counter_info")
+	return sheet
+
 func open_counter(role: String, opts := {}) -> void:
 	if opts.has("ctx"): _counter_ctx[role] = opts.ctx
 	var ctx: Dictionary = _counter_ctx.get(role, {}).duplicate()
@@ -2154,6 +2168,7 @@ func open_counter(role: String, opts := {}) -> void:
 	d.safe_bottom = safe_bottom()
 	d.close_requested.connect(close_modal)
 	d.action_requested.connect(func(a: StringName, id: String, p: Dictionary): _counter_action(role, a, id, p))
+	d.info_requested.connect(func(id: String): counter_info(d, id))   # a row's › (不知火舞 on 284: it opened nothing)
 	d.section_changed.connect(func(sec: String):
 		if sec == "board": _fill_board(d)
 		if sec == "buy" and role == "homestead": _mark_stall_seen())
