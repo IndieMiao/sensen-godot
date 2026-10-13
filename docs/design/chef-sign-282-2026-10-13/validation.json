@@ -1,0 +1,327 @@
+{
+	"adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+	"assets": [
+		{
+			"board_bounds": [
+				[
+					-0.681999981403351,
+					1.05998349189758,
+					-0.0250002294778824
+				],
+				[
+					-0.0820108652114868,
+					1.50999128818512,
+					0.0339981615543365
+				]
+			],
+			"bounds": [
+				[
+					-0.682,
+					0.0,
+					-0.13
+				],
+				[
+					0.13,
+					1.74,
+					0.13
+				]
+			],
+			"collider": {
+				"at": [
+					0.0,
+					0.87,
+					0.0
+				],
+				"shape": "box",
+				"size": [
+					0.28,
+					1.74,
+					0.28
+				]
+			},
+			"foot_size": [
+				0.260010957717896,
+				0.139975279569626,
+				0.259999990463257
+			],
+			"id": "chef_sign_a",
+			"triangles": 1362.0
+		},
+		{
+			"board_bounds": [
+				[
+					-0.681999981403351,
+					1.05998349189758,
+					-0.0250006914138794
+				],
+				[
+					-0.0820096135139465,
+					1.50999128818512,
+					0.0339986234903336
+				]
+			],
+			"bounds": [
+				[
+					-0.682,
+					0.0,
+					-0.14
+				],
+				[
+					0.14,
+					1.74,
+					0.14
+				]
+			],
+			"collider": {
+				"at": [
+					0.0,
+					0.87,
+					0.0
+				],
+				"shape": "box",
+				"size": [
+					0.28,
+					1.74,
+					0.28
+				]
+			},
+			"foot_size": [
+				0.280008018016815,
+				0.199979856610298,
+				0.279999971389771
+			],
+			"id": "chef_sign_b",
+			"triangles": 1450.0
+		}
+	],
+	"captures": [
+		{
+			"camera_size": 3.04999995231628,
+			"id": "chef_sign_a-43deg",
+			"pitch": 42.9999961853027,
+			"size": [
+				1600,
+				1400
+			],
+			"yaw": 14.4999990463257
+		},
+		{
+			"camera_size": 3.04999995231628,
+			"id": "chef_sign_b-43deg",
+			"pitch": 42.9999961853027,
+			"size": [
+				1600,
+				1400
+			],
+			"yaw": 14.4999990463257
+		},
+		{
+			"camera_size": 1.23000001907349,
+			"id": "chef-sign-front",
+			"pitch": 0.0,
+			"size": [
+				1600,
+				1400
+			],
+			"yaw": 0.0
+		},
+		{
+			"camera_size": 2.29999995231628,
+			"id": "chef-sign-top-grid",
+			"pitch": 90.0,
+			"size": [
+				1600,
+				1400
+			],
+			"yaw": 0.0
+		}
+	],
+	"checks": [
+		{
+			"check": "chef_sign_a: one merged mesh",
+			"passed": true
+		},
+		{
+			"check": "chef_sign_a: one surface via FarmArt",
+			"passed": true
+		},
+		{
+			"check": "chef_sign_a: triangle budget / manifest",
+			"passed": true
+		},
+		{
+			"check": "chef_sign_a: actual bounds match manifest",
+			"passed": true
+		},
+		{
+			"check": "chef_sign_a: total height 1.6-1.8 m",
+			"passed": true
+		},
+		{
+			"check": "chef_sign_a: foot at ground",
+			"passed": true
+		},
+		{
+			"check": "chef_sign_a: baked identity transforms",
+			"passed": true
+		},
+		{
+			"check": "chef_sign_a: opaque vertex colors",
+			"passed": true
+		},
+		{
+			"check": "chef_sign_a: no UV payload",
+			"passed": true
+		},
+		{
+			"check": "chef_sign_a: board_center empty retained",
+			"passed": true
+		},
+		{
+			"check": "chef_sign_a: marker at board centre",
+			"passed": true
+		},
+		{
+			"check": "chef_sign_a: marker +Z facing",
+			"passed": true
+		},
+		{
+			"check": "chef_sign_a: board bottom >= 1.0 m",
+			"passed": true
+		},
+		{
+			"check": "chef_sign_a: exported board width / height / bottom (0.1 mm import tolerance)",
+			"passed": true
+		},
+		{
+			"check": "chef_sign_a: solid frame depth including relief",
+			"passed": true
+		},
+		{
+			"check": "chef_sign_a: v1.2 arm to left, positive scale",
+			"passed": true
+		},
+		{
+			"check": "chef_sign_a: foot projection <= 0.30 m square",
+			"passed": true
+		},
+		{
+			"check": "chef_sign_a: pivot at foot centre",
+			"passed": true
+		},
+		{
+			"check": "chef_sign_a: only post collider, no suspended board box",
+			"passed": true
+		},
+		{
+			"check": "chef_sign_a: one 0.65 m anchor cell",
+			"passed": true
+		},
+		{
+			"check": "chef_sign_b: one merged mesh",
+			"passed": true
+		},
+		{
+			"check": "chef_sign_b: one surface via FarmArt",
+			"passed": true
+		},
+		{
+			"check": "chef_sign_b: triangle budget / manifest",
+			"passed": true
+		},
+		{
+			"check": "chef_sign_b: actual bounds match manifest",
+			"passed": true
+		},
+		{
+			"check": "chef_sign_b: total height 1.6-1.8 m",
+			"passed": true
+		},
+		{
+			"check": "chef_sign_b: foot at ground",
+			"passed": true
+		},
+		{
+			"check": "chef_sign_b: baked identity transforms",
+			"passed": true
+		},
+		{
+			"check": "chef_sign_b: opaque vertex colors",
+			"passed": true
+		},
+		{
+			"check": "chef_sign_b: no UV payload",
+			"passed": true
+		},
+		{
+			"check": "chef_sign_b: board_center empty retained",
+			"passed": true
+		},
+		{
+			"check": "chef_sign_b: marker at board centre",
+			"passed": true
+		},
+		{
+			"check": "chef_sign_b: marker +Z facing",
+			"passed": true
+		},
+		{
+			"check": "chef_sign_b: board bottom >= 1.0 m",
+			"passed": true
+		},
+		{
+			"check": "chef_sign_b: exported board width / height / bottom (0.1 mm import tolerance)",
+			"passed": true
+		},
+		{
+			"check": "chef_sign_b: solid frame depth including relief",
+			"passed": true
+		},
+		{
+			"check": "chef_sign_b: v1.2 arm to left, positive scale",
+			"passed": true
+		},
+		{
+			"check": "chef_sign_b: foot projection <= 0.30 m square",
+			"passed": true
+		},
+		{
+			"check": "chef_sign_b: pivot at foot centre",
+			"passed": true
+		},
+		{
+			"check": "chef_sign_b: only post collider, no suspended board box",
+			"passed": true
+		},
+		{
+			"check": "chef_sign_b: one 0.65 m anchor cell",
+			"passed": true
+		},
+		{
+			"check": "Unmodified shared FarmArt.material()",
+			"passed": true
+		},
+		{
+			"check": "Existing scale avatar assembled",
+			"passed": true
+		},
+		{
+			"check": "Capture saved: chef_sign_a-43deg",
+			"passed": true
+		},
+		{
+			"check": "Capture saved: chef_sign_b-43deg",
+			"passed": true
+		},
+		{
+			"check": "Capture saved: chef-sign-front",
+			"passed": true
+		},
+		{
+			"check": "Capture saved: chef-sign-top-grid",
+			"passed": true
+		}
+	],
+	"failures": [],
+	"renderer": "mobile"
+}

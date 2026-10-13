@@ -1,0 +1,161 @@
+{
+  "assets": [
+    {
+      "id": "chef_sign_a",
+      "triangles": 1362,
+      "bounds": [
+        [
+          -0.6819999814033508,
+          0.0,
+          -0.12999999523162842
+        ],
+        [
+          0.12999999523162842,
+          1.7400000095367432,
+          0.12999999523162842
+        ]
+      ],
+      "sha256": "f3e79521f1c47e9ea3c923168ba666003da74e8c560e19affb9a1aa60fef32c3",
+      "bytes": 78124,
+      "shared_non_foot_triangles": 1304
+    },
+    {
+      "id": "chef_sign_b",
+      "triangles": 1450,
+      "bounds": [
+        [
+          -0.6819999814033508,
+          0.0,
+          -0.14000000059604645
+        ],
+        [
+          0.14000000059604645,
+          1.7400000095367432,
+          0.14000000059604645
+        ]
+      ],
+      "sha256": "a43e30df1f398a68222fd7c137edfe5cb3d46f344af6c353f0bb1cc4603c510c",
+      "bytes": 85564,
+      "shared_non_foot_triangles": 1304
+    }
+  ],
+  "checks": [
+    {
+      "check": "chef_sign_a: exactly one mesh",
+      "passed": true
+    },
+    {
+      "check": "chef_sign_a: exactly one primitive / surface",
+      "passed": true
+    },
+    {
+      "check": "chef_sign_a: one material and no textures",
+      "passed": true
+    },
+    {
+      "check": "chef_sign_a: positions / normals / colors only",
+      "passed": true
+    },
+    {
+      "check": "chef_sign_a: triangles / budget",
+      "passed": true
+    },
+    {
+      "check": "chef_sign_a: opaque vertex color (VEC3 defaults alpha to 1)",
+      "passed": true
+    },
+    {
+      "check": "chef_sign_a: measured GLB bounds match manifest",
+      "passed": true
+    },
+    {
+      "check": "chef_sign_a: grounded and height in range",
+      "passed": true
+    },
+    {
+      "check": "chef_sign_a: no negative / non-unit scale",
+      "passed": true
+    },
+    {
+      "check": "chef_sign_a: exact board_center empty",
+      "passed": true
+    },
+    {
+      "check": "chef_sign_a: post-only collider",
+      "passed": true
+    },
+    {
+      "check": "chef_sign_a: single anchor cell / board bottom",
+      "passed": true
+    },
+    {
+      "check": "chef_sign_a: no zero-area triangles",
+      "passed": true
+    },
+    {
+      "check": "chef_sign_a: reflected winding agrees with normals",
+      "passed": true
+    },
+    {
+      "check": "chef_sign_b: exactly one mesh",
+      "passed": true
+    },
+    {
+      "check": "chef_sign_b: exactly one primitive / surface",
+      "passed": true
+    },
+    {
+      "check": "chef_sign_b: one material and no textures",
+      "passed": true
+    },
+    {
+      "check": "chef_sign_b: positions / normals / colors only",
+      "passed": true
+    },
+    {
+      "check": "chef_sign_b: triangles / budget",
+      "passed": true
+    },
+    {
+      "check": "chef_sign_b: opaque vertex color (VEC3 defaults alpha to 1)",
+      "passed": true
+    },
+    {
+      "check": "chef_sign_b: measured GLB bounds match manifest",
+      "passed": true
+    },
+    {
+      "check": "chef_sign_b: grounded and height in range",
+      "passed": true
+    },
+    {
+      "check": "chef_sign_b: no negative / non-unit scale",
+      "passed": true
+    },
+    {
+      "check": "chef_sign_b: exact board_center empty",
+      "passed": true
+    },
+    {
+      "check": "chef_sign_b: post-only collider",
+      "passed": true
+    },
+    {
+      "check": "chef_sign_b: single anchor cell / board bottom",
+      "passed": true
+    },
+    {
+      "check": "chef_sign_b: no zero-area triangles",
+      "passed": true
+    },
+    {
+      "check": "chef_sign_b: reflected winding agrees with normals",
+      "passed": true
+    },
+    {
+      "check": "A/B: all non-foot triangles / normals / colors identical (10 micrometre precision)",
+      "passed": true
+    }
+  ],
+  "failures": []
+}

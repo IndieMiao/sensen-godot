@@ -1,0 +1,9 @@
+{
+  "blender": "5.2.2 LTS",
+  "consecutive_exports_byte_identical": true,
+  "files": {
+    "chef_sign_a.glb": "f3e79521f1c47e9ea3c923168ba666003da74e8c560e19affb9a1aa60fef32c3",
+    "chef_sign_b.glb": "a43e30df1f398a68222fd7c137edfe5cb3d46f344af6c353f0bb1cc4603c510c",
+    "manifest.json": "aad86bca1962e6dcb3156022e8deab9c35aecd1766748bf502a5e3b0c032b01e"
+  }
+}

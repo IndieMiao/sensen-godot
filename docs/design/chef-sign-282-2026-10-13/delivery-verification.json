@@ -1,0 +1,38 @@
+[
+  {
+    "name": "SGODOT-282_Chef-Sign_v1.2_chef_sign_a-43deg.png",
+    "attachment_id": "ed3b1203-d69a-4d1a-b29e-a8494b1571bb",
+    "sha256": "27b4a50221c2c99fdb4036f0b1f600ce594cba8f172e4f3ecc5afbd479adec7b",
+    "bytes": 235609,
+    "download_matches": true,
+    "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+    "uploader_verified": true
+  },
+  {
+    "name": "SGODOT-282_Chef-Sign_v1.2_chef_sign_b-43deg.png",
+    "attachment_id": "0b5d0b27-644b-4693-833d-9752dabf0d4b",
+    "sha256": "07a2e77c07c4f327055a67e8ad02d0ff6c2d12fecd77da9583ffdc2d8d07fb31",
+    "bytes": 236353,
+    "download_matches": true,
+    "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+    "uploader_verified": true
+  },
+  {
+    "name": "SGODOT-282_Chef-Sign_v1.2_chef-sign-front.png",
+    "attachment_id": "4701f341-4261-4b98-b989-d2830d31bb6b",
+    "sha256": "cba7b94c3e70291d573d739c711b6e4a28aa68e8c98ea1393110781ee65b13f0",
+    "bytes": 65029,
+    "download_matches": true,
+    "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+    "uploader_verified": true
+  },
+  {
+    "name": "SGODOT-282_Chef-Sign_v1.2_chef-sign-top-grid.png",
+    "attachment_id": "d84cc163-2798-4f3f-9e35-3b4c05b4141e",
+    "sha256": "ebac9d56b9619adbd4635a6dd4fbc86f325b43dc1d49b3f06cb705d73287f2ac",
+    "bytes": 78214,
+    "download_matches": true,
+    "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+    "uploader_verified": true
+  }
+]
