@@ -25,7 +25,7 @@ import { orchardView, treeOf } from './orchard.js';
 import { restReadyIn } from './presence.js';
 import { inboxView, settleParcels } from './parcels.js';
 import { cookbookView, masteredCount } from './cookbook.js';
-import { mapMarkers } from './markers.js';
+import { litEvents, mapMarkers } from './markers.js';
 import { everFish, forecast, pondAt, pondFishIds, timeWord } from './fishing_world.js';
 import { trapsView } from './fish_trap.js';
 import { homeCluster } from './travel.js';
@@ -56,6 +56,8 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     inbox: inboxView(s, now),   // §10.4.8 parcels; the Inbox panel comes with stage 4, the bell reads `badge`
     // Map pin markers (§9.5.2, q(48)): one per place, deliver > request > new; the map draws the first five on screen
     map_markers: mapMarkers(c, s, now),
+    // §9.3.3 event venues lit now (from 2 h before until the end; their ★ is in map_markers): empty in the prototype
+    event_venues: litEvents(c, now).map(e => ({ id: e.id, place: e.place, name: e.name, starts: e.starts, ends: e.ends })),
     // Cross-city (v5, SGODOT-278, note 0fc0bc5e §2): home / here / passes / visits / stamps / fallback / explorer
     travel: { ...s.travel, today: dayKey(c, now) },   // today: the day key stamps count on (Passport: first visits today 1/2)
     decor: decorView(c, s),   // Decorate (SGODOT-284): {placed, cap, used, stored}; catalog and yard are in the content
