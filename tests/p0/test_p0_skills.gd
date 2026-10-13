@@ -40,7 +40,8 @@ func test_each_track_says_its_level_what_is_next_and_its_xp() -> void:
 	# and the Spinner Lure where they open (§6.4).
 	assert_array(fishing.milestones.map(func(m): return m.line)).is_equal([
 		"Lv2 · River Perch, Largemouth Bass, Rainbow Trout, Mackerel, Worm Bait", "Lv3 · Reed Rod, Regional fish",
-		"Lv4 · Golden Koi, Catfish", "Lv5 · Sea Bass, Spinner Lure, Fish Trap", "Lv6 · Carbon Rod", "Lv7 · Silver Sturgeon", "Lv9 · River Eel"])
+		"Lv4 · Golden Koi, Catfish", "Lv5 · Sea Bass, Spinner Lure, Fish Trap", "Lv6 · Carbon Rod", "Lv7 · Silver Sturgeon",
+		"Lv8 · 2nd Fish Trap", "Lv9 · River Eel", "Lv10 · 3rd Fish Trap"])   # the traps Lv8 and Lv10 add (§4.6.2; 286 e89ae800)
 	assert_str(d.tracks[2].next).is_equal("Next: third ingredient slot")
 	var v := _view()
 	v.skills.farming = {"level": 4, "xp": 412}

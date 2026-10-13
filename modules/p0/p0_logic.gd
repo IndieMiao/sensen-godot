@@ -1135,8 +1135,10 @@ const CONVENIENCE_NAMES := {"cook_again": "Cook Again", "clue_double": "Double C
 	"steady_hand_2": "Steady Hand II", "fast_mastery": "Fast Mastery", "cook_all": "Cook All", "provisions_plus": "Bigger Provisions",
 	"chefs_touch": "Chef's Touch", "title_chef": "Chef title", "lucky_double": "Lucky Double"}
 const LEVEL_TIP := "Levels unlock gear, fish and seeds. Basics never lock."
-## Levels that change the day say so on the banner's Tip instead of the next level (§4.8.3, q(69)).
-const DAY_CHANGES := {"cooking:4": "Today changes: 3-ingredient dishes", "farming:6": "Today changes: no more watering"}
+## Levels that change the day say so on the banner's Tip instead of the next level (§4.8.3, q(69)). Fishing Lv4 from
+## §14's fishing copy (`Today changes: River is your water now`: §4.6.2 Lv4, the day moves from the Pond to the River).
+const DAY_CHANGES := {"cooking:4": "Today changes: 3-ingredient dishes", "farming:6": "Today changes: no more watering",
+	"fishing:4": "Today changes: River is your water now"}
 ## The day-changing level's action (q(59) §1.6): [label, banner action id].
 const DAY_ACTIONS := {"farming:6": ["Show Workbench", "show_workbench"]}
 
@@ -1228,6 +1230,11 @@ static func level_unlocks(view: Dictionary, skill: String, level: int) -> Array:
 				if str(g.get("skill", "")) == "fishing" and int(g.get("gate", 1)) == level and not out.has(name): out.append(name)
 			for r in content().get("fishing", {}).get("rods", []):
 				if int(r.get("level", 1)) == level and int(r.get("price", 0)) > 0: out.append(str(r.get("name", "")))
+			# a level that adds a trap (content fishing.trap.slots, §4.6.2: Lv8 the 2nd, Lv10 the 3rd; the first is the
+			# Fish Trap itself, bought at Lv5 above): `2nd Fish Trap` (SGODOT-286 e89ae800: Lv8 and Lv10 had no row)
+			for at in content().get("fishing", {}).get("trap", {}).get("slots", []):
+				if int(at[0]) == level and int(at[1]) >= 2:
+					out.append("%s %s" % [P0KitchenLogic.ordinal(int(at[1])), str(goods.get("trap_fish", {}).get("name", "Fish Trap"))])
 			if regional: out.append(REGIONAL_FISH)
 		"cooking":
 			var conv: Dictionary = content().get("cooking", {}).get("conveniences", {})
