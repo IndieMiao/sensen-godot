@@ -1,7 +1,8 @@
 extends P0Room
-## The farmhouse interior (plan §7.7 / q(14)): Homestead Lv1–4 live in the Basic Room, whose stove corner is the
-## P0 kitchen; the place chip reads "San Francisco · Farmhouse" (LOCK-06 K-1). Entered from the farm (the door card's
-## Kitchen row, or walking into the doorway); its door leaves back to the farm.
+## The farmhouse interior (plan §7.7 / §8.3.1, q(14)): Homestead Lv1–4 live in the Basic Room, whose stove corner is the
+## P0 kitchen, Lv5–9 in the Standard Room and Lv10 in the Deluxe Room (ROOMS); the place chip reads
+## "San Francisco · Farmhouse" (LOCK-06 K-1). Entered from the farm (the door card's Kitchen row, or walking into the
+## doorway); its door leaves back to the farm.
 ## Placeholder period: the accepted Basic Room art with assets/p0/rooms/farmhouse.anchors.json; the final
 ## farmhouse_lv1 (SGODOT-213) swaps the art and brings the anchors in its own layout.json.
 ## Cooking is the 3D stove stage (P0Kitchen, LOCK-20 v5): tap the stove → walk there → the cooking drawer.
@@ -14,7 +15,24 @@ const STOVES := ["use_stove_1", "use_stove_2", "use_stove_3"]
 const RACK := "use_spice_rack"
 const CABINET := "use_warming_cabinet"
 const CABINET_GLOW := Color("ffb87a")   # the cabinet's warm inner light (placeholder; the art brings its own)
-const CABINET_GLOW_AT := Vector3(-2.13, 0.75, -1.69)   # in front of the cabinet door
+const CABINET_GLOW_AT := Vector3(0, 1.1133, 0.795)   # in front of the cabinet door, in the placeholder's own units
+## The room by Homestead level (§8.3.1, q(14); content homestead.rooms [[1, basic], [5, standard], [10, deluxe]]), only ever
+## up. Each kit's kitchen corner keeps the P0 names — stoves 1–3 on its cooker, the Spice Rack, the Warming Cabinet — so the
+## kitchen, the stage and the sheets work the same in all three; `hits` is hit_nodes (the art that takes each one's tap).
+## Basic: the P0 placeholder anchors on the hearth. Standard (282 c62a6ed9 ②; 上官婉儿 on 282): the stoves on the range
+## cooker's burners (1 front left, 2 front right, 3 back right), the Spice Rack is the shelf over the sink, the Warming
+## Cabinet the Basic Room's placeholder on the west wall facing the camera, as there. Deluxe: its layout.json's kitchen hooks (the range cooker, the
+## fittings along the west wall), the file adding badges, stands and shots; the rack and cabinet are inside the one
+## kitchen_fittings model, so they take taps round their anchors.
+const ROOMS := {
+	"basic": {art = "basic_room", anchors = "res://assets/p0/rooms/farmhouse.anchors.json",
+		hits = {STOVE: "hearth", RACK: "spice_rack", CABINET: "warming_cabinet"}},
+	"standard": {art = "standard_room_5", anchors = "res://assets/p0/rooms/farmhouse_standard.anchors.json",
+		hits = {STOVE: "range_cooker", RACK: "wall_shelf", CABINET: "warming_cabinet"}},
+	"deluxe": {art = "deluxe_room_10", anchors = "res://assets/p0/rooms/farmhouse_deluxe.anchors.json",
+		hits = {STOVE: "range_cooker"}},
+}
+var room_kind := "basic"
 
 var kitchen: P0Kitchen
 ## Heat reminders already given (pot id → ring index): once per ring (b84a5e01 ④).
@@ -32,6 +50,31 @@ func _init() -> void:
 	# The stove is its body and pot only; the shelf on the wall beside it and the cabinet under that are their own,
 	# and where they overlap the smaller takes the tap (int6 C8). The final farmhouse_lv1 art renames these nodes.
 	hit_nodes = {STOVE: "hearth", RACK: "spice_rack", CABINET: "warming_cabinet"}
+
+## The room for a Homestead level: the last of content homestead.rooms it has reached ("basic" below them all).
+static func room_for(lv: int) -> String:
+	var kind := "basic"
+	for r in P0Logic.content().get("homestead", {}).get("rooms", []):
+		if lv >= int(r[0]) and ROOMS.has(str(r[1])): kind = str(r[1])
+	return kind
+
+## The room is chosen before the art is built: by the player's Homestead level (tests and previews set `level`).
+func _ready() -> void:
+	if use_runtime: level = int(P0Runtime.ensure().session.current().get("homestead", {}).get("level", 1))
+	use_room(room_for(level))
+	super()
+
+func use_room(kind: String) -> void:
+	room_kind = kind
+	var r: Dictionary = ROOMS[kind]
+	anchors_path = str(r.anchors)
+	hit_nodes = (r.hits as Dictionary).duplicate()
+	use_art(str(r.art))
+
+## The fire that burns brighter while a pot cooks: the Basic Room's, whose stove is its hearth; the Standard and Deluxe
+## stoves are range cookers across the room from their fireplaces, so theirs stays as it is.
+func stove_fire() -> Node:
+	return art.get("fire") as Node if room_kind == "basic" and "fire" in art else null
 
 ## Stove i for a use_stove_N anchor, -1 for anything else.
 static func stove_of(n: String) -> int: return STOVES.find(n)
@@ -65,8 +108,11 @@ func card_pick(marks: Dictionary) -> String:
 ## and Warming Cabinet buttons; with a strip open it stays at its own pot and the other stoves' buttons line up above it.
 const STOVE_ROW_GAP := 44.0
 func _marker_spots(spots: Dictionary) -> Dictionary:
+	# only the stoves on screen: the row is kept on screen, and would pull off-screen ones to its edge with no stove there
+	# (the Deluxe Room's door is far from its cooker)
+	var screen := get_viewport().get_visible_rect()
 	var shown: Array = []
-	for i in STOVES.size(): if spots.has(STOVES[i]): shown.append(i)
+	for i in STOVES.size(): if spots.has(STOVES[i]) and screen.has_point(spots[STOVES[i]]): shown.append(i)
 	if shown.size() < 2: return spots
 	var open := STOVES.find(_card) if stove_of(_card) >= 0 else -1
 	var strip := _strip_rect if open >= 0 and shown.has(open) else Rect2()
@@ -86,8 +132,9 @@ var _strip_rect := Rect2()   # the open stove strip on screen last frame (the ot
 ## The row (pure, tested). Folded: 1 / 2 / 3 left to right, 44 apart, centred on the stoves' mean x at their highest
 ## y, kept on screen, then moved right as a whole until every button is 44 or more from each `avoid` spot (the Spice
 ## Rack and Warming Cabinet buttons). With stove `open`'s strip showing (`strip`, its rect last frame): that stove keeps
-## its own spot, and the others, in order, are centred over the strip, 44 apart, 6 px above its top edge (before the
-## strip has a rect, its first frame, the open stove still keeps its spot and the rest take their folded places).
+## its own spot, and the others, in order, are centred over the strip, 44 apart, 6 px above its top edge, moved the
+## shorter way, left or right, to keep 44 from those buttons too (before the strip has a rect, its first frame, the open
+## stove still keeps its spot and the rest take their folded places).
 const ROW_MARGIN := 22.0
 const ABOVE_STRIP := 6.0
 const STOVE_BUTTON := 28.0   # UiWorldIconButton's disc
@@ -109,19 +156,31 @@ static func stove_row(spots: Dictionary, shown: Array, open: int, strip: Rect2, 
 	var shift := 0.0
 	if xs.min() < ROW_MARGIN: shift = ROW_MARGIN - xs.min()
 	elif xs.max() > screen_w - ROW_MARGIN: shift = screen_w - ROW_MARGIN - xs.max()
-	if row.size() == shown.size():
-		for _pass in 8:   # right, as a whole, past whichever of the rack / cabinet a button is too close to
-			var more := 0.0
-			for x in xs:
-				for a in avoid:
-					var dy := absf(y - (a as Vector2).y)
-					if dy >= STOVE_ROW_GAP or Vector2(x + shift, y).distance_to(a) >= STOVE_ROW_GAP - 0.01: continue
-					more = maxf(more, (a as Vector2).x + sqrt(STOVE_ROW_GAP * STOVE_ROW_GAP - dy * dy) - (x + shift))
-			if more <= 0.0: break
-			shift += more
+	if row.size() == shown.size():   # right, as a whole, past whichever of the rack / cabinet a button is too close to
+		shift += _clear_of(xs, shift, y, avoid, 1.0)
+	elif not avoid.is_empty():   # over an open strip too (the Standard Room's shelf sits beside its cooker, 282): the shorter way
+		var right := _clear_of(xs, shift, y, avoid, 1.0)
+		var left := _clear_of(xs, shift, y, avoid, -1.0)
+		shift += -left if left < right and float(xs.min()) + shift - left >= ROW_MARGIN else right
 	for k in row.size(): out[STOVES[row[k]]] = Vector2(xs[k] + shift, y)
 	if shown.has(open): out[STOVES[open]] = spots[STOVES[open]]   # the open strip never moves (its first frame too)
 	return out
+
+## How far the row at `xs` + `shift` must move (dir 1 right, −1 left) for every button to be 44 or more from each `avoid` spot.
+static func _clear_of(xs: Array, shift: float, y: float, avoid: Array, dir: float) -> float:
+	var extra := 0.0
+	for _pass in 8:
+		var more := 0.0
+		for x in xs:
+			var at := float(x) + shift + extra * dir
+			for a in avoid:
+				var dy := absf(y - (a as Vector2).y)
+				if dy >= STOVE_ROW_GAP or Vector2(at, y).distance_to(a) >= STOVE_ROW_GAP - 0.01: continue
+				var reach := sqrt(STOVE_ROW_GAP * STOVE_ROW_GAP - dy * dy)
+				more = maxf(more, ((a as Vector2).x + reach - at) if dir > 0.0 else (at - ((a as Vector2).x - reach)))
+		if more <= 0.0: break
+		extra += more
+	return extra
 
 ## The hearth's box takes the tap for every stove on it (int6 C8): with several, the pot nearest the finger wins.
 func pick(screen: Vector2) -> String:
@@ -146,13 +205,14 @@ func _dress_art() -> void:
 	if use_runtime: level = int(P0Runtime.ensure().session.current().get("homestead", {}).get("level", 1))
 	super()
 	if art.has_node("warming_cabinet"):
+		var cabinet := art.get_node("warming_cabinet") as Node3D
 		var glow := OmniLight3D.new()
 		glow.name = "warming_cabinet_glow"   # a module of its own: shown with the cabinet
 		glow.light_color = CABINET_GLOW
 		glow.light_energy = 0.9
 		glow.omni_range = 1.1
 		glow.shadow_enabled = false
-		glow.position = CABINET_GLOW_AT
+		glow.position = cabinet.transform * CABINET_GLOW_AT   # wherever the room stands it
 		art.add_child(glow)
 		module_levels[glow.name] = module_levels.get("warming_cabinet", 3)
 
@@ -223,7 +283,9 @@ func open_sheet(kind: String) -> void:
 		if actor: actor.visible = true)
 	if actor: actor.visible = false
 	var h := P0StorageSheet.RACK_H if kind == "rack" else P0StorageSheet.CABINET_H
-	focus("cam_kitchen_corner", {band = band_below_hud(1.0 - h / 800.0 - 0.02), size = view_size() * 0.38, release_on_move = false})
+	# the shot on its own corner (the Standard Room's rack and cabinet stand apart), else the shared one
+	var shot := "cam_spice_rack" if kind == "rack" else "cam_warming_cabinet"
+	focus(shot if anchor(shot) else "cam_kitchen_corner", {band = band_below_hud(1.0 - h / 800.0 - 0.02), size = view_size() * 0.38, release_on_move = false})
 
 ## Empty → the cooking drawer; cooking → watch the pot; ready → the dish comes out and COOK-P0-9 asks Eat or Keep
 ## (unwatched rings are misses: Plain); portions left on the stove (no room earlier) → the same card for them.
@@ -413,6 +475,8 @@ func p0_dev(step: PackedStringArray) -> bool:
 				if stove_of(step[1]) > 0: at = Vector3(target.global_position.x, at.y, at.z)   # in front of that pot
 				actor.teleport(Vector3(at.x, floor_y, at.z))
 				actor.face(target.global_position)
+				_focus = actor.position   # as if walked there: the view comes along (the Deluxe Room's stoves are far from its door)
+				_follow.held = false
 		"stoveprobe":   # where each stove's anchor and badge land on screen and whether its prompt shows (282 shots)
 			for i in _stove_count():
 				var m := anchor(STOVES[i])

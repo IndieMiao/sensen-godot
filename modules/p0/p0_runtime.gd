@@ -530,7 +530,8 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	# A first's bonus XP is said by its own line, not added into the XP float: the first cook's and catch's on their
 	# card's strip (Li Bai, int6 C11), the first harvest's as `First harvest! +10 XP · Radish` (§4.8.6).
 	var first_cook_xp: Array = []
-	var card_energy: Array = []   # a trap's first-fish Energy events its card says (q(124) ①)
+	var card_energy: Array = []   # a trap's first-fish Energy events its card says (q(124) ①); a Cookbook title's too
+	var card_coins: Array = []    # a Cookbook title's coins, said on its card (+100 coins)
 	# Harvest ×N's first harvest goes into its XP line (`+20 XP · 5 plants · First harvest`, q(124) ②), no line of its own.
 	var folded_first: Array = []   # those firsts' xp events
 	# …the first cook's only when that card comes (a normal serve at the stove); a Queue ×2 turn-over or a pot kept on its
@@ -580,6 +581,16 @@ func _on_state(v: Dictionary, events: Array) -> void:
 						and trap_cards_now.any(func(k): return int(k.extras.get("energy", 0)) > 0):
 					card_energy.append(events[i - 1])
 				if str(ev.id).begins_with("first_fish_"): last_catch_extras["energy"] = int(ev.energy)
+				# Home Cook's +50 Energy is on its title card (不知火舞 on 282), not floated too: grantOnce puts its own Energy
+				# just before it (reason reward, the same amount); at the cap it puts none, so the event before is another's
+				if str(ev.id).begins_with("cookbook_") and int(ev.energy) > 0 and i > 0 and str(events[i - 1].get("kind", "")) == "energy" \
+						and str(events[i - 1].get("reason", "")) == "reward" and int(events[i - 1].get("delta", 0)) == int(ev.energy):
+					card_energy.append(events[i - 1])
+			"milestone":
+				# a Cookbook title's coins (Line Cook +100) are on its card: noteMilestones puts them just before it
+				if not str(ev.get("id", "")).begins_with("fishdex_") and int(ev.get("coins", 0)) > 0 and i > 0 \
+						and str(events[i - 1].get("kind", "")) == "coins" and int(events[i - 1].get("delta", 0)) == int(ev.coins):
+					card_coins.append(events[i - 1])
 			"first":
 				var what := str(ev.what)
 				if what.begins_with("catch:"):
@@ -601,7 +612,8 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	var first_level := not before.is_empty() and ["farming", "fishing", "cooking"].all(func(k):
 		return int(before.get("skills", {}).get(k, {}).get("level", 1)) <= 1)
 	for ev in events:
-		if hushed.call(ev) and str(ev.get("kind", "")) not in ["level", "first", "mishap", "queue", "pot", "cabinet", "plate"]: continue
+		# a title keeps its card away from the kitchen too, as a level-up keeps its banner
+		if hushed.call(ev) and str(ev.get("kind", "")) not in ["level", "first", "mishap", "queue", "pot", "cabinet", "plate", "milestone", "reward"]: continue
 		match str(ev.get("kind", "")):
 			"arrival": _call("on_arrival", [ev])   # SGODOT-275: the map flies there and welcomes (q(108))
 			"energy":
@@ -650,7 +662,16 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				if int(ev.delta) > 0 and (claimed or (not crafted and not iid.begins_with("seed_") and not iid.begins_with("dish_") and not iid.begins_with("fish_"))):
 					floats.append({kind = "item", key = iid, amount = int(ev.delta), fmt = "%s " + P0Logic.item_name(v, iid),
 						tone = UiFloatText.Tone.ITEM, icon = P0Logic.icon(iid)})
+			"reward", "milestone":
+				# Cookbook titles (§7.6.1): a card after the dish card, as a level-up's banner (deferred: COOK-4 first);
+				# a Fish-dex milestone is 周瑜's (SGODOT-283).
+				if str(ev.get("kind", "")) == "milestone" and str(ev.get("id", "")).begins_with("fishdex_"):
+					_on_fishdex_milestone(ev, v)
+					continue
+				var title := P0KitchenLogic.title_card(v, ev)
+				if not title.is_empty(): ui.queue_card.call_deferred(func(): ui.show_title(title))
 			"coins":
+				if card_coins.any(func(x): return is_same(x, ev)): continue
 				# A request delivered from the counter drawer: its row floats the coins from its button (BOARD-DONE).
 				if ui.modal_kind == "counter" and events.any(func(e): return str(e.get("kind", "")) == "request" and str(e.get("status", "")) == "done"): continue
 				floats.append({kind = "coins", key = "coins", amount = int(ev.delta), fmt = "%s coins", tone = UiFloatText.Tone.COINS})
@@ -848,6 +869,10 @@ func _on_catch(ev: Dictionary, _xp_lines: Array, at := Vector2.INF, card_after :
 			ui.float_text("It got away · " + P0Logic.refund_line(v, ev).trim_prefix("+"), where, UiFloatText.Tone.ENERGY_GAIN)
 		"cancelled":
 			ui.toast("Line in · Energy back")
+
+## A Fish-dex milestone (`milestone` event, id fishdex_N; SGODOT-283, 周瑜): its card and badge.
+func _on_fishdex_milestone(_ev: Dictionary, _v: Dictionary) -> void:
+	pass
 
 func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 	if str(cmd.get("type", "")).begins_with("claim_parcel"): ui.inbox_claim_done()   # no items come: none float from it (亚瑟 on #93)

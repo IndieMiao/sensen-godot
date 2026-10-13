@@ -283,6 +283,9 @@ func refresh(view_: Dictionary, force := false) -> void:
 ## the Buy shelf — everything else the server lists, which on a Market includes its city's regional seed (P1 §5.2.3).
 func offers() -> Array:
 	var all: Array = view.get("shops", {}).get(role, {}).get("buy", [])
+	# Today's Recipe Cards close the Buy page (§9.11.1 the Stall's daily two, §9.11.2 the Market's regional cards; 282).
+	if section == "buy" and role in ["homestead", "market"]:
+		all = all + (view.get("shops", {}).get(role, {}).get("cards", []) as Array)
 	# Decor (SGODOT-284) is on the stall's own Decor page (FARM-6-DECOR), cheapest first; never on the Buy shelf.
 	if role == "homestead" and section == "decor":
 		var pieces := all.filter(func(o): return P0Decor.is_decor(str(o.get("id", ""))))
@@ -328,7 +331,8 @@ func _show_row(id: String) -> void:
 	if o.is_empty() or not _rows.has(id): return
 	var qty := int(_qty.get(id, 1))
 	var spec := P0ItemInfo.spec(view, id, &"counter_buy", _opts(qty))
-	var once := bool(o.get("once", false)) or str(o.get("to", "")) in ["gear", "bag_cap"] or P0Decor.is_decor(id)   # decor: 1 a day, no stepper
+	var once := bool(o.get("once", false)) or str(o.get("to", "")) in ["gear", "bag_cap"] or P0Decor.is_decor(id) \
+		or P0ItemInfo.is_card(id)   # decor: 1 a day; a Recipe Card: once; no stepper
 	(_rows[id] as UiShopRow).show_spec(spec, once, int(o.left) if o.get("left", null) != null else 99)
 
 ## The P0 market's drawer (no bag half, q(48)): as tall as its content, not the fixed 420.

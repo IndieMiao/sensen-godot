@@ -52,6 +52,10 @@ static func sign(view: Dictionary) -> Dictionary:
 static func plaque(_view: Dictionary) -> Dictionary:
 	return _p("board", "Upgrade Plaque", "", -1, false, false)
 
+## The Chef's Sign (Homestead Lv10; 不知火舞 on 282): its name strip `Chef's Sign`, no fact.
+static func chef_sign(_view: Dictionary) -> Dictionary:
+	return _p("kitchen", "Chef's Sign", "", -1, false, false)
+
 ## Rest bench (FARM-7, q(62)): what resting gives now — `+60 Energy`, or less near full (REST-NEARFULL `+25 Energy`).
 ## Only when it can be used is it the normal strip; otherwise Dimmed with the reason as its one fact (不知火舞 on #59):
 ## used today `Rested today`; not yet (q(41): 2 h away from home first) the Countdown state with `in 1h 12m`, or

@@ -187,6 +187,16 @@ func test_crowded_stove_buttons_go_in_a_row() -> void:
 	assert_vector(one.use_stove_1).is_equal(spots.use_stove_1)
 	assert_float(one.use_stove_3.x - one.use_stove_2.x).is_equal_approx(44.0, 0.01)
 	assert_float((one.use_stove_2.x + one.use_stove_3.x) * 0.5).is_equal_approx(s1.get_center().x, 0.01)
+	# stove 1 open in the Standard Room (282): the Spice Rack's button sits where stove 2's lines up over the strip — the row
+	# moves the shorter way (here left) to keep 44 from it, still over the strip
+	var two := {"use_stove_1": Vector2(235.3, 374.7), "use_stove_2": Vector2(247.0, 382.2)}
+	var shelf := Vector2(209.0, 338.8)
+	var strip1 := Rect2(101.3, 358.7, 150, 32)
+	var apart: Dictionary = FH.stove_row(two, [0, 1], 0, strip1, 360.0, [shelf])
+	assert_float((apart.use_stove_2 as Vector2).distance_to(shelf)).is_greater_equal(43.99)
+	assert_float(apart.use_stove_2.x).is_less(strip1.get_center().x)
+	assert_bool(strip1.position.x <= apart.use_stove_2.x and apart.use_stove_2.x <= strip1.end.x).is_true()
+	assert_vector(apart.use_stove_1).is_equal(two.use_stove_1)
 	# the strip's first frame (no rect yet): the open stove still keeps its own spot
 	var first: Dictionary = FH.stove_row(spots, [0, 1, 2], 2, Rect2(), 360.0)
 	assert_vector(first.use_stove_3).is_equal(spots.use_stove_3)

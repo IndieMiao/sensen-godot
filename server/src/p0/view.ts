@@ -9,7 +9,7 @@ import { blessed, dayKey, foodCap, maxEnergy, nextTickIn, regenMs, settleEnergy,
 import { emptyDay, type P0State } from './state.js';
 import { catalog, drinkPrice, isSpecialty, offerOf, owns, quotaKey, quotaScope, regionalOf, walletNeed } from './shops.js';
 import { BOARDS, farFish, farTries, handIn, haveForRequest, heldSlot, lockedTemplate, payout, settleBoards, slotCount } from './boards.js';
-import { expireGiftMeals, lessonState, progressOf, requestOpensIn, requestState, residentState, stageIndex } from './residents.js';
+import { expireGiftMeals, giftClues, giftPointsView, lessonState, progressOf, requestOpensIn, requestState, residentState, stageIndex } from './residents.js';
 import { floorPrice, haveFor, matches } from './requests.js';
 import type { BoardRequest, Pot } from './state.js';
 import { bigPot, boardSlots, chefSignGold, coinsNeeded, lookOf, nextLevel, skillsTotal, stoveCount, unlocked, upgradeBlock } from './homestead.js';
@@ -20,7 +20,7 @@ import { gatherView } from './gathering.js';
 import { workbenchView } from './workbench.js';
 import { compostView, coveredPlots, cropGrowH, facilitiesView, facilityAt, greenhousePlots, plotCount } from './garden.js';
 import { climateAt, clusterById, clusterOf, homeClimate } from './travel.js';
-import { cityPlaces } from './world.js';
+import { cityPlaces, clusterAdmin } from './world.js';
 import { orchardView, treeOf } from './orchard.js';
 import { restReadyIn } from './presence.js';
 import { inboxView, settleParcels } from './parcels.js';
@@ -60,7 +60,9 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     // §9.3.3 event venues lit now (from 2 h before until the end; their ★ is in map_markers): empty in the prototype
     event_venues: litEvents(c, now).map(e => ({ id: e.id, place: e.place, name: e.name, starts: e.starts, ends: e.ends })),
     // Cross-city (v5, SGODOT-278, note 0fc0bc5e §2): home / here / passes / visits / stamps / fallback / explorer
-    travel: { ...s.travel, today: dayKey(c, s, now) },   // today: the day key stamps count on (Passport: first visits today 1/2)
+    travel: { ...s.travel, today: dayKey(c, s, now),   // today: the day key stamps count on (Passport: first visits today 1/2)
+      // MAP-8 Nearby cities: the state or province of each near10 city (`Salinas · California`); none for a city without
+      admins: Object.fromEntries(s.travel.fallback.near10.map(id => [id, clusterAdmin(id)]).filter(([, a]) => a)) },
     decor: decorView(c, s),   // Decorate (SGODOT-284): {placed, cap, used, stored}; catalog and yard are in the content
     skills,
     plots: s.plots.map(p => ({
@@ -93,6 +95,7 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     profile: { name: c.profile.name, city: homeFacts(c, s).name, climate: homeFacts(c, s).climate, since_ms: s.created_at,
       farm: { name: c.profile.farm_name, level: s.homestead.level } },
     boards: Object.fromEntries(BOARDS.map(b => [b, boardView(c, s, b, now)])),
+    gift_clues: giftClues(c, s),   // Fishing Lv7 Gift Clues (q(167)): bag dishes → the met residents who love / like them
     residents: Object.fromEntries(Object.keys(c.residents).map(id => [id, residentView(c, s, id, now)])),
     keepers: keepersView(c, s, now, opts.online ?? null),
     // away_ready_in: ms until Rest opens by the 2 h away rule (0 = open, null = not left yet), q(41).
@@ -449,6 +452,7 @@ function residentView(c: P0Content, s: P0State, id: string, now: number) {
     next_in: st.state === 'wait' ? requestOpensIn(c, s, id, now) : null,
     // §7.5.3 Recipe lesson: ready = `learn` teaches `recipe` now; wait = next_in ms; stage = from need_stage; none
     lesson: { state: lesson.state, recipe: lesson.recipe ?? null, next_in: lesson.next_in ?? null, need_stage: lesson.need_stage ?? null },
+    gift_points: giftPointsView(c, s, id),   // Fishing Lv7 Gift Clues: bag dish → what giving it adds (the drawer's ♥ +3)
   };
 }
 
