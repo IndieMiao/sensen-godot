@@ -1585,6 +1585,10 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"zoom":
 			_set_zoom(float(step[1]))
 			_camera_dirty = true
+		"zoomto":   # zoomto:9:2.5 — a smooth zoom to 9 over 2.5 s, as a pinch would (h1 review videos)
+			create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT).tween_method(func(z: float):
+				_set_zoom(z)
+				_camera_dirty = true, zoom, float(step[1]), float(step[2]) if step.size() > 2 else 2.0)
 		"marks":   # marks:sh_market_1=request|sh_tea_1=deliver — map marks on those pins, for shots (q(146) review)
 			_dev_marks = []
 			for pair in step[1].split("|", false):
