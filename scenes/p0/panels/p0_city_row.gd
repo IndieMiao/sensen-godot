@@ -8,6 +8,8 @@ extends Button
 ##     `68 km · Trip 2 · Nearby` (BodyR14, secondary); the band's glyph 10 in its colour — information, not state, so
 ##     coloured either way — and `Temperate` (C13B, secondary).
 ##   StampSlot 28 (StampSlot below) and a `›` at the right, 16 in.
+##   A long name (272 clusters run to 20 letters or more) keeps the slot and the `›` in: the state gives way first
+##   (hidden when the two don't fit whole), then the name ends in an ellipsis; the second line too, for a long tier.
 ## P0's own (it reads P0Travel's rows), so it lives with the P0 panels; the bands' colours are the frame's (not yet
 ## design tokens). Preloaded, no class_name (a new global class needs an editor import).
 
@@ -126,6 +128,7 @@ func _text() -> VBoxContainer:
 	first.add_theme_constant_override(&"separation", 0)
 	var city := UiKit.label(str(row.get("name", "")), UiTokens.STYLE_ROW_TITLE_XB15)
 	city.name = "Name"
+	city.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	first.add_child(city)
 	var region := str(row.get("region", ""))
 	if region != "":
@@ -135,9 +138,13 @@ func _text() -> VBoxContainer:
 		r.clip_text = true
 		r.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		first.add_child(r)
+		first.resized.connect(func(): _fit_first(first, city, r))
+	else:
+		city.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	text.add_child(first)
 	var trip := UiKit.label(trip_line(row), UiTokens.STYLE_BODY_R14, UiTokens.COLOR_SECONDARY)
 	trip.name = "Trip"
+	trip.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	text.add_child(trip)
 	var climate := HBoxContainer.new()
 	climate.name = "Climate"
@@ -159,6 +166,17 @@ func _text() -> VBoxContainer:
 	climate.add_child(UiKit.label(str(row.get("climate", "")), UiTokens.STYLE_C13_B, UiTokens.COLOR_SECONDARY))
 	text.add_child(climate)
 	return text
+
+## The name and ` · state` side by side while both fit whole; else the state hides and the name takes the line, its
+## end an ellipsis when it still runs over.
+static func _fit_first(first: HBoxContainer, city: Label, region: Label) -> void:
+	var w := func(l: Label) -> float:
+		return l.get_theme_font(&"font").get_string_size(l.text, HORIZONTAL_ALIGNMENT_LEFT, -1, l.get_theme_font_size(&"font_size")).x
+	var name_w: float = w.call(city)
+	var both := name_w + float(w.call(region)) <= first.size.x
+	region.visible = both
+	city.custom_minimum_size.x = ceilf(name_w) if both else 0.0
+	city.size_flags_horizontal = Control.SIZE_FILL if both else Control.SIZE_EXPAND_FILL
 
 ## `68 km · Trip 2 · Nearby` (the passport's and the city card's own line, §11.8.2).
 static func trip_line(r: Dictionary) -> String:

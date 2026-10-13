@@ -152,3 +152,29 @@ func test_a_row_reads_visited_landmark_seal_and_never_visited() -> void:
 	for band in ["temperate", "subtropical", "tropical", "cool"]: assert_object(GameUi.icon("i-climate-" + band)).is_not_null()
 	assert_object(GameUi.icon("i-stamp-seal")).is_not_null()
 	assert_float(sj.custom_minimum_size.y).is_equal(72.0)
+
+## A long name (周瑜 on #361: 272 clusters run to 20 letters or more) in the drawer's 328: the state gives way, the name
+## ends in an ellipsis, and the slot and the `›` stay inside the row. A short one keeps its state beside it.
+func test_a_long_name_hides_the_state_and_keeps_the_slot_in() -> void:
+	var long := _row({cluster = "gn-3651297", name = "Santo Domingo de los Colorados", region = "Santo Domingo de los Tsáchilas",
+		km = 4021, trip = 6, trip_name = "Long Haul", climate = "Tropical", visited = false, stamped = false, landmark = ""})
+	var short := _row({cluster = "x", name = "San Jose", region = "California", km = 68, trip = 2, trip_name = "Nearby",
+		climate = "Temperate", visited = true, stamped = true, landmark = ""})
+	for row in [long, short]: (row as Control).size = Vector2(328, 72)
+	for i in 3: await get_tree().process_frame
+	for row in [long, short]:
+		var edge := (row as Control).get_global_rect().end.x
+		assert_float(edge).is_equal(328.0)
+		assert_bool((row.get("slot") as Control).get_global_rect().end.x <= edge).is_true()
+		assert_bool((row.find_child("Chevron", true, false) as Control).get_global_rect().end.x <= edge).is_true()
+	assert_bool((long.find_child("Region", true, false) as Label).visible).is_false()
+	var name_l: Label = long.find_child("Name", true, false)
+	assert_int(name_l.text_overrun_behavior).is_equal(TextServer.OVERRUN_TRIM_ELLIPSIS)
+	var full := name_l.get_theme_font(&"font").get_string_size(name_l.text, HORIZONTAL_ALIGNMENT_LEFT, -1, name_l.get_theme_font_size(&"font_size")).x
+	assert_bool(name_l.size.x < full).is_true()   # cut, with its ellipsis
+	assert_bool(name_l.get_global_rect().end.x <= (long.get("slot") as Control).get_global_rect().position.x).is_true()
+	assert_int((long.find_child("Trip", true, false) as Label).text_overrun_behavior).is_equal(TextServer.OVERRUN_TRIM_ELLIPSIS)
+	var region: Label = short.find_child("Region", true, false)
+	assert_bool(region.visible).is_true()
+	var sj: Label = short.find_child("Name", true, false)
+	assert_float(region.get_global_rect().position.x).is_equal_approx(sj.get_global_rect().end.x, 0.01)   # straight after the name
