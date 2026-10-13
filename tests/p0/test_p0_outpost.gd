@@ -706,6 +706,8 @@ func test_a_generated_keeper_wears_their_look_preset() -> void:
 	var r := Sample.new()
 	r.setup({"outpost_id": "sh_tea_1"})
 	r.keeper = {"role": "Tea Host", "name": "Ola", "look": "tea_temperate_1"}
+	var portraits = load("res://modules/p0/p0_keeper_portraits.gd")
+	portraits._cache.erase("tea_temperate_1|card")   # drawn for no earlier test
 	add_child(r)
 	auto_free(r)
 	assert_bool(r.npcs.has("npc_keeper")).is_true()
@@ -714,7 +716,8 @@ func test_a_generated_keeper_wears_their_look_preset() -> void:
 	var rig: AvatarRig = (r.npcs.npc_keeper.root as Node).find_children("*", "AvatarRig", true, false)[0]
 	var worn: Dictionary = rig.get("_desired")
 	for slot in look: assert_str(str(worn.get(StringName(slot), ""))).is_equal(str(look[slot]))
-	# SGODOT-300: their greeting card's figure and keeper bar head are asked for as the outpost opens, before either shows
-	var portraits = load("res://modules/p0/p0_keeper_portraits.gd")
+	# SGODOT-300: their greeting card's figure is asked for a moment after the outpost opens (not in the frames that build
+	# it, 上官婉儿 on #343), before the card shows; the keeper bar's head waits for the counter
+	assert_bool(portraits.cached("tea_temperate_1", true)).is_false()
+	await get_tree().create_timer(OutpostScript.PORTRAIT_AFTER_S + 0.2).timeout
 	assert_bool(portraits.cached("tea_temperate_1", true)).is_true()
-	assert_bool(portraits.cached("tea_temperate_1", false)).is_true()

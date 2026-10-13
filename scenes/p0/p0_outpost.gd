@@ -8,6 +8,9 @@ extends P0Room
 
 const OnlineCrowd = preload("res://modules/net/online_crowd.gd")
 const NPCS_PATH := "res://assets/p0/outpost_npcs.json"
+## A generated keeper's greeting card figure is asked for this long after the room opens, out of the frames that build
+## it (上官婉儿 on #343): drawn by the time the keeper is tapped. The keeper bar's head waits for the counter.
+const PORTRAIT_AFTER_S := 0.8
 ## Drawn in the art but without a P0 use: no finger card, no tap (§17.2.1; SGODOT-227 5a63a8ec).
 ## The Tackle Shop's board is the Bite Board since P1 (SGODOT-283): a facility, not decor.
 const DECOR := ["use_fee_board", "use_stamp_desk", "use_coffee_pot"]
@@ -143,8 +146,7 @@ func _spawn_npcs() -> void:
 		if looks.has(str(keeper.look)):
 			data = data.duplicate()
 			data[cast.npc_keeper] = {"name": str(keeper.get("name", "")), "scale": 1.0, "slots": looks[str(keeper.look)]}
-			# their portraits are drawn now, so the greeting card and the counter's keeper bar open on them (SGODOT-300)
-			for card in [true, false]: P0CounterDrawer.keeper_portrait(str(keeper.get("name", "")), card, str(keeper.look))
+			if is_inside_tree(): get_tree().create_timer(PORTRAIT_AFTER_S).timeout.connect(_ask_keeper_card)   # SGODOT-300
 	for id in outpost.get("residents", []):
 		var def: Dictionary = data.get(str(id), {})
 		if def.has("anchor"): cast[str(def.anchor)] = str(id)
@@ -164,6 +166,9 @@ func _spawn_npcs() -> void:
 		rig.apply_config(OnlineAppearance.config({"version": 1, "slots": def.get("slots", {})}, true))   # NPC-only parts (SGODOT-229) too
 		# The name rides over the head as the UI's NpcNameTag (SGODOT-250, LOCK-16 v2), not a Label3D: see _marker.
 		npcs[n] = {"id": str(cast[n]), "name": str(def.get("name", "")), "root": root}
+
+func _ask_keeper_card() -> void:
+	if keeper.has("look"): P0CounterDrawer.keeper_portrait(str(keeper.get("name", "")), true, str(keeper.look))
 
 # ---------------------------------------------------------------- taps
 func _tappable() -> PackedStringArray:

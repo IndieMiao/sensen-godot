@@ -4,7 +4,8 @@ extends Node
 ## (world.keeper_looks). texture() answers at once with a blank picture that the renderer fills in a few frames later;
 ## the card and the bar show it as soon as it is drawn (a TextureRect redraws when its texture changes). The four
 ## hand-painted keepers (Ama, Finn, Mei, Sigrid) keep their art: P0CounterDrawer.keeper_portrait asks here only when no
-## file exists; a generated keeper's outpost asks for both as it opens, so they are drawn before the card or bar is.
+## file exists; a generated keeper's outpost asks for the card a moment after it opens (p0_outpost.gd PORTRAIT_AFTER_S),
+## so the greeting card opens on it; the bar's head is drawn when the counter opens.
 ## Drawn once per look and use; the most recent CARD_LIMIT cards and HEAD_LIMIT heads are kept (a card is
 ## ~770 KB, a head ~270 KB: about 12 MB at most, 上官婉儿 on #339), an older one is drawn again when asked for.
 ##
