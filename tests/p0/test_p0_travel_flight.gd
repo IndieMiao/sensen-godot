@@ -96,10 +96,18 @@ func test_an_arrival_rises_from_where_the_camera_is_and_lands_in_3_s() -> void:
 	assert_str(cover.distance.text).is_not_equal("0 km")
 	var pose: Array = cover.plane_pose()   # the plane on its way, between the two cities' dots
 	assert_bool(pose[0] != Vector2.INF).is_true()
+	# q(152) ④: the route in the city view, over its fog and under its pins and bubbles; the plane over them
+	var route := cover.route_view
+	assert_object(route.get_parent()).is_same(m.city_map)
+	assert_int(route.z_index).is_less(0)
+	assert_int((m.city_map.fog as CanvasItem).z_index).is_less(route.z_index)
+	assert_int((cover.plane_view.get_parent() as CanvasLayer).layer).is_equal(P0TravelCover.ROUTE_LAYER)
 	assert_bool(cover.from_at != Vector2.INF and cover.to_at != Vector2.INF).is_true()
 	await get_tree().create_timer(2.0).timeout   # 3.5 s in: landed
 	assert_bool(m.travelling()).is_false()
 	assert_bool(is_instance_valid(cover) and cover.is_inside_tree()).is_false()
+	await get_tree().process_frame
+	assert_bool(is_instance_valid(route)).is_false()   # the adopted route went with the cover
 	var o := _overview()
 	assert_float(m.center_lat).is_equal_approx(float(o.lat), 1e-6)
 	assert_float(m.zoom).is_equal_approx(float(o.zoom), 1e-6)
