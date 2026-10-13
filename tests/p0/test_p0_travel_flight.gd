@@ -386,3 +386,45 @@ func test_the_map_goes_out_past_its_floor_only_in_the_air() -> void:
 	rt.ui.clear_toast()
 	rt.session.view = saved
 	rt.ui.set_view(saved)
+
+## q(152) ①: every way home (the place chip here; the Homestead card's Go home and the home city's bubble come to the
+## same _open_my_farm) flies the same 3 s from another city, the pill saying Homestead, landing by the homestead's pin;
+## nothing is sent until it lands. At home it opens the farm as ever, no flight.
+func test_going_home_from_another_city_flies_first() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved := _ready_to_arrive(m)   # in Los Angeles
+	var sent: Array = []
+	rt.session.sent.connect(func(cmd): sent.append(str(cmd.get("type", ""))))
+	m.p0_return("farm")   # the place chip's way home
+	assert_bool(m.travelling()).is_true()
+	assert_str(_cover(m).title.text).is_equal("Homestead")
+	assert_array(sent).is_empty()
+	assert_str(_chip_city(rt)).is_equal("Los Angeles")   # the city left, until it lands
+	AppRouter._navigation_pending = true   # the farm goes as far as the router: the test stays on the map
+	await get_tree().create_timer(0.7).timeout
+	_tap(_cover(m))   # down at once
+	AppRouter._navigation_pending = false
+	assert_bool(m.travelling()).is_false()
+	assert_float(m.center_lat).is_equal_approx(m.home_lat, 1e-6)
+	assert_float(m.zoom).is_equal_approx(P0Map.SHOW_ZOOM, 1e-6)
+	assert_array(sent).is_equal(["return_home"])
+	assert_str(_chip_city(rt)).is_equal("San Francisco")
+	rt.ui.hold_here("")
+	rt.ui.clear_toast()
+	# at home: the farm opens as ever, no flight
+	rt.session.view = saved
+	rt.ui.set_view(saved)
+	AppRouter._navigation_pending = false
+	sent.clear()
+	var home_view: Dictionary = saved.duplicate(true)
+	home_view["travel"] = {home = SF, here = SF, passes = {}, visits = {}, stamps = [], fallback = {near3 = [], near10 = []}, explorer = 0}
+	rt.session.view = home_view
+	AppRouter._navigation_pending = true
+	m._enter_farm()   # as _open_my_farm does at home (the router held: it goes no further)
+	AppRouter._navigation_pending = false
+	assert_bool(m.travelling()).is_false()
+	rt.session.view = saved
+	rt.ui.set_view(saved)

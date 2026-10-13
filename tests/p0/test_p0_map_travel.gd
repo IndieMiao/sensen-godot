@@ -159,6 +159,7 @@ func test_going_home_from_another_city_sends_return_home_and_welcomes_home() -> 
 	assert_str(rt.ui.toast_text()).is_empty()
 
 ## 蒙恬 on #220: away in another city, the home city's bubble is going home (return_home, Welcome home), not a trip.
+## q(152) ①: it flies home first — nothing is sent in the air; on landing return_home goes and the farm opens.
 func test_away_the_home_citys_bubble_goes_home_not_a_trip() -> void:
 	var m := _map()
 	for i in 3: await get_tree().process_frame
@@ -172,8 +173,19 @@ func test_away_the_home_citys_bubble_goes_home_not_a_trip() -> void:
 		fallback = {near3 = [], near10 = []}, explorer = 0})
 	m.fly_to_city("san_francisco")
 	assert_str(rt.ui.modal_kind).is_not_equal("travel_card")
+	assert_bool(m.travelling()).is_true()
+	assert_array(sent).is_empty()   # nothing in the air (苏烈: a flight cut short leaves the player where they are)
+	var cover: P0TravelCover = m.find_children("*", "P0TravelCover", true, false)[0]
+	assert_str(cover.title.text).is_equal("Homestead")
+	AppRouter._navigation_pending = true   # the farm it opens goes as far as the router: the test stays on the map
+	await get_tree().create_timer(3.3).timeout   # landed
+	AppRouter._navigation_pending = false
+	assert_bool(m.travelling()).is_false()
 	assert_array(sent.map(func(c): return str(c.get("type", "")))).is_equal(["return_home"])
+	rt.ui.set_view(rt.session.view)
+	assert_str(str(rt.ui.hud.data.place.city)).is_equal("San Francisco")   # the chip says home from the landing
 	assert_str(await _toast_within(rt.ui, 1.0)).is_equal("Welcome home")
+	rt.ui.hold_here("")
 	rt.session.view = saved
 
 ## MAP-3-FREE (§11.8.3, Figma 482:403): climate, trip and local time, then the city's ponds / outposts / residents from

@@ -341,6 +341,7 @@ func _refresh_hud() -> void:
 	# chips would still take taps.
 	hud.visible = not view.is_empty()
 	if view.is_empty(): return
+	if _hold_here != "" and _hold_here == P0Travel.here(view): _hold_here = ""   # the server has caught up (home's flight)
 	var seen := view
 	if _hold_here != "" or not _hold_energy.is_empty():   # flying to another city (q(147) ⑤ ⑥): until it lands
 		seen = view.duplicate()
