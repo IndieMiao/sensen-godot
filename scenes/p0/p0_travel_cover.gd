@@ -2,7 +2,9 @@ class_name P0TravelCover
 extends CanvasLayer
 ## The cross-city flight's cover (q(147), SGODOT-299; 不知火舞 on 299 31c4ceb5): over the map and the HUD while the camera
 ## flies, so the map, its pins and the HUD's keys take nothing. The route and its plane (§11.8 / MAP-7, the user on 10-12;
-## 不知火舞's v2 on 299) draw on their own layer, over the map's pins and bubbles and under the HUD and the pill: an arc
+## 不知火舞's v2 on 299; q(152) ④ for the layers): the route is drawn in the map's own view, over the fog and under the
+## pins and city bubbles (adopt_route: the host puts it there); the plane on its own layer over the pins and bubbles,
+## under the HUD and the pill. The route is an arc
 ## from the city left to the city ahead bowing up by a fifth of their distance, re-drawn every frame from where the map
 ## puts them, primary green dashed (3 px, 8 / 6, round ends), an 8 px dot at each end in a 2 px cream ring; it fades in
 ## over 0.2 s at 0.5 s and out over the landing's 0.5 s. The plane (i-plane, 279 a4ab1287: a top view, nose right, ink
@@ -22,10 +24,15 @@ var title: Label
 var distance: Label
 var hint: Label
 var pill: PanelContainer
-## Under P0Ui (10), over the map's own HUD (its pins and bubbles).
+## The plane's: under P0Ui (10), over the map's own HUD (its pins and bubbles).
 const ROUTE_LAYER := 5
+## The route's z in the host's view: over its fog (FOG_Z), under its pins and bubbles (0) (q(152) ④).
+const ROUTE_Z := -1
+const FOG_Z := -2
 
+## The route and its end dots (in the host's view once adopted) and the plane (on ROUTE_LAYER).
 var route_view: Control
+var plane_view: Control
 ## The two cities where the map draws them (screen px; INF while it cannot) and the flight's seconds.
 var from_at := Vector2.INF
 var to_at := Vector2.INF
@@ -52,7 +59,13 @@ func _init() -> void:
 	route_view.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	route_view.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	route_view.draw.connect(_draw_route)
-	under.add_child(route_view)
+	under.add_child(route_view)   # until a host adopts it
+	plane_view = Control.new()
+	plane_view.name = "Plane"
+	plane_view.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	plane_view.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	plane_view.draw.connect(_draw_plane)
+	under.add_child(plane_view)
 	_plane = GameUi.icon("i-plane")
 	var column := VBoxContainer.new()
 	column.name = "Column"
@@ -114,7 +127,26 @@ func show_route(from: Vector2, to: Vector2, t: float) -> void:
 	from_at = from
 	to_at = to
 	_t = t
-	route_view.queue_redraw()
+	if is_instance_valid(route_view): route_view.queue_redraw()
+	plane_view.queue_redraw()
+
+## The route moves into `view` (the map's city view), between its fog and its pins: drawn there under the bubbles, and
+## freed with this cover.
+func adopt_route(view: Control) -> void:
+	if not is_instance_valid(route_view) or route_view.get_parent() == view: return
+	route_view.get_parent().remove_child(route_view)
+	view.add_child(route_view)
+	route_view.z_index = ROUTE_Z
+	var fog = view.get("fog")
+	if fog is CanvasItem and (fog as CanvasItem).z_index > FOG_Z: (fog as CanvasItem).z_index = FOG_Z
+
+func _exit_tree() -> void:
+	if is_instance_valid(route_view) and route_view.get_parent() != null and not is_ancestor_of(route_view):
+		route_view.queue_free()   # adopted by the map's view: it goes with the cover
+
+## A screen point in `v`'s own coordinates (the adopted route sits in a view inset by the safe area).
+static func _local(v: CanvasItem, p: Vector2) -> Vector2:
+	return v.get_global_transform().affine_inverse() * p
 
 const ROUTE_COLOR := UiTokens.COLOR_PRIMARY
 const CREAM := Color("FBF8EF")
@@ -158,11 +190,13 @@ func plane_pose() -> Array:
 func _draw_route() -> void:
 	var alpha := route_alpha(_t)
 	if alpha <= 0.0 or from_at == Vector2.INF or to_at == Vector2.INF: return
-	var c := arc_control(from_at, to_at)
+	var a := _local(route_view, from_at)
+	var b := _local(route_view, to_at)
+	var c := arc_control(a, b)
 	var color := Color(ROUTE_COLOR, alpha)
 	# dashes along the curve, 8 on / 6 off, round ends
 	var points: Array = []
-	for i in 65: points.append(arc_at(from_at, c, to_at, i / 64.0))
+	for i in 65: points.append(arc_at(a, c, b, i / 64.0))
 	var walked := 0.0
 	for i in range(1, points.size()):
 		var p0: Vector2 = points[i - 1]
@@ -180,16 +214,19 @@ func _draw_route() -> void:
 				route_view.draw_circle(v, ROUTE_WIDTH * 0.5, color)
 			at += maxf(step, 0.01)
 		walked += seg
-	for end in [from_at, to_at]:
+	for end in [a, b]:
 		route_view.draw_circle(end, END_DOT + 2.0, Color(CREAM, alpha))
 		route_view.draw_circle(end, END_DOT, color)
+
+func _draw_plane() -> void:
+	var alpha := route_alpha(_t)
 	var pose := plane_pose()
 	if pose[0] == Vector2.INF or _plane == null: return
 	# i-plane's nose points right (0°): turned by the route's heading its nose runs along it
-	route_view.draw_set_transform(pose[0], float(pose[1]), Vector2.ONE)
+	plane_view.draw_set_transform(_local(plane_view, pose[0]), float(pose[1]), Vector2.ONE)
 	var box := Rect2(Vector2.ONE * -PLANE_SIZE * 0.5, Vector2.ONE * PLANE_SIZE)
-	route_view.draw_texture_rect(_plane, box, false, Color(1, 1, 1, alpha))
-	route_view.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+	plane_view.draw_texture_rect(_plane, box, false, Color(1, 1, 1, alpha))
+	plane_view.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 func skippable() -> bool:
 	return _skippable

@@ -843,6 +843,7 @@ func _travel_fly(to: Dictionary, left: Vector2, held: String, city: String, km: 
 	_zoom_elastic = 0.0
 	var cover := P0TravelCover.new()
 	add_child(cover)
+	if city_map: cover.adopt_route(city_map)   # the route under the pins and city bubbles, over the fog (q(152) ④)
 	var top := 120.0
 	if rt != null and rt.ui.open_marker_area().has_area(): top = rt.ui.open_marker_area().position.y + 8.0
 	cover.open(city, km, top)
