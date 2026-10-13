@@ -2544,6 +2544,23 @@ func open_bite_board(outpost: Dictionary) -> UiDrawer:
 func bite_board() -> UiDrawer:
 	return _bite_board if is_instance_valid(_bite_board) and modal_kind == "bite_board" else null
 
+## MAP-8 Nearby cities (q(159); Figma row 85, 不知火舞 on MAP-8): the map's `Nearby cities ›` pill opens it — the ten
+## cities nearest home, nearest first (P0Travel.nearby), with a Close 44 six above the sheet. A row's tap calls
+## `pick` with its city (the map closes this and flies there, P0Map.open_nearby_city).
+const NearbyDrawer := preload("res://scenes/p0/panels/p0_nearby_drawer.gd")
+
+func open_nearby_cities(pick: Callable) -> UiDrawer:
+	var home := str(P0Clusters.get_cluster(P0Travel.home(view)).get("name", ""))
+	var d: UiDrawer = NearbyDrawer.new(P0Travel.nearby(view), home)
+	d.theme = UiKit.theme()
+	d.safe_bottom = safe_bottom()
+	d.close_requested.connect(close_modal)
+	d.connect(&"city_pressed", func(cluster: String): pick.call(cluster))
+	_open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
+	_close_above(d, _CLOSE_ABOVE_SHEET, UiTokens.SPACE_PAGE)
+	modal_kind = "nearby"
+	return d
+
 ## A pond's card from the Bite Board (the map's card: P0PondCard.info, P0PlaceSheet), its Distance from this shop. Go
 ## leaves the room for that pond (go_pond); Details › lists its fish; Back and a tap outside return to the board, ×
 ## closes both.
