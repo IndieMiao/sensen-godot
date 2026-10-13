@@ -279,6 +279,10 @@ func _settle(ev: Dictionary, delay: float, first_xp: int) -> void:
 	# a request this fish filled: its toast after the Caught! card (q(134) ⑤; bound to the UI, 哪吒 on #188)
 	var filled := rt.take_catch_toast()
 	if filled != "": get_tree().create_timer(card_after + 0.05).timeout.connect(rt.ui.toast_success_when_clear.bind(filled, false, true))
+	# a Fish-dex milestone this fish made: its card after the Caught! card (q(49); 苏烈 on #353), bound to the UI as the toast
+	for c in rt.take_catch_cards():
+		if card_after > 0.0: get_tree().create_timer(card_after + 0.05).timeout.connect(rt.ui.queue_card.bind(c))
+		else: rt.ui.queue_card(c)
 
 # ---------------------------------------------------------------- the pond's ! (q(103), SGODOT-268)
 ## A pond wearing the Request ! says why once per visit: an Info toast with the pin card's reason line

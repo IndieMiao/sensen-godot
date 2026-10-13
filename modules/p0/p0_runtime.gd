@@ -42,6 +42,9 @@ var catch_floats: Array = []
 ## …and the toast of a request that catch filled (q(134) ⑤; 周瑜 on #302): it waits for the same hand, then for the
 ## catch's Caught! card (take_catch_toast).
 var catch_toast := ""
+## The Fish-dex milestone card a landed catch's reply held (q(49); 苏烈 on #353): the world queues it after the catch's
+## Caught! card (take_catch_cards).
+var catch_cards: Array = []
 const TRAP_CARD_TITLE := "In your trap!"   # q(124) ①: a landed fish's card is `Caught!`
 const TRAP_CARD_AFTER_S := 0.3              # after the last fish lands in the creel
 var last_catch_extras := {}   # the same response's New city XP and first-fish Energy, for the Caught! card
@@ -160,6 +163,8 @@ func attach(w: Node) -> void:
 	ui.end_stick()
 	# left before a landed fish reached the hand: the request it filled still says so (q(134))
 	if world != w and catch_toast != "": ui.toast_success_when_clear(take_catch_toast(), false, true)
+	if world != w:   # …and a Fish-dex milestone it made still gets its card
+		for c in take_catch_cards(): ui.queue_card(c)
 	world = w
 	session.space = space_of(w)   # before the read below, which tells the server where the player is
 	if session.space in ["map", "pond", "outpost"]: ui.cook_page_from_today = ""   # left home: Today's stove page goes (q(99))
@@ -445,6 +450,13 @@ func take_catch_toast() -> String:
 	catch_toast = ""
 	return held
 
+## The Fish-dex milestone card a landed catch's reply held (catch_cards), handed over once: the world queues it after
+## the catch's Caught! card.
+func take_catch_cards() -> Array:
+	var held := catch_cards
+	catch_cards = []
+	return held
+
 ## The floats a landed catch's reply held for the world (catch_floats), handed over once: the world lets them rise.
 func take_catch_floats() -> Array:
 	var held := catch_floats
@@ -504,6 +516,7 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	var settles_catch := events.any(func(e): return str(e.get("kind", "")) == "catch")
 	var world_lands := false   # the world shows this reply's landed fish: its floats wait for the hand
 	var filled_toast := ""     # a request this reply filled (q(134)): said after the reply's cards, below
+	var dex_cards: Array = []  # a Fish-dex milestone's card: after the catch's own card (q(49)), below
 	# A first's bonus XP is said by its own line, not added into the XP float: the first cook's and catch's on their
 	# card's strip (Li Bai, int6 C11), the first harvest's as `First harvest! +10 XP · Radish` (§4.8.6).
 	var first_cook_xp: Array = []
@@ -648,7 +661,8 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				# Cookbook titles (§7.6.1): a card after the dish card, as a level-up's banner (deferred: COOK-4 first);
 				# a Fish-dex milestone is 周瑜's (SGODOT-283).
 				if str(ev.get("kind", "")) == "milestone" and str(ev.get("id", "")).begins_with("fishdex_"):
-					_on_fishdex_milestone(ev, v)
+					var dex_card := _fishdex_card(ev, v)
+					if dex_card.is_valid(): dex_cards.append(dex_card)
 					continue
 				var title := P0KitchenLogic.title_card(v, ev)
 				if not title.is_empty(): ui.queue_card.call_deferred(func(): ui.show_title(title))
@@ -791,8 +805,11 @@ func _on_state(v: Dictionary, events: Array) -> void:
 			var landed_s := UiItemFly.FLIGHT_S + UiItemFly.DELAY_STEP_S * (mini(trap_got.size(), UiItemFly.MAX_PER_BATCH) - 1)
 			var toast := filled_toast   # a request the trap filled: after its cards (周瑜 on #302)
 			filled_toast = ""
+			var dex := dex_cards        # a Fish-dex milestone the trap made: after its In your trap! cards (苏烈 on #353)
+			dex_cards = []
 			get_tree().create_timer(landed_s + TRAP_CARD_AFTER_S).timeout.connect(func() -> void:
 				for k in cards: ui.queue_card(ui.show_catch.bind(str(k.fish), int(k.rarity), int(k.xp), k.extras, TRAP_CARD_TITLE))
+				for c in dex: ui.queue_card(c)
 				if toast != "": ui.toast_success_when_clear(toast, false, true))
 	# Any catch resets what is held: a player who left the pond mid-arc never let the last fish's floats rise, and an
 	# escape after that must not float them (刘邦 on #154).
@@ -804,6 +821,15 @@ func _on_state(v: Dictionary, events: Array) -> void:
 	# (their timer, above), anything else REQUEST_TOAST_AFTER_S on (a level-up's banner comes deferred). Bound to the UI
 	# (哪吒 on #188): a world left within the wait still gets it; held, it waits for a TipCard on screen too.
 	if settles_catch: catch_toast = filled_toast if world_lands else ""
+	# A Fish-dex milestone (q(49); 苏烈 on #353): a landed fish's after its Caught! card (held for the world's settle, as
+	# the toast), a trap's after its In your trap! cards (their timer, above), anything else at the end of the frame — after
+	# the Caught! card a fish the world does not show queues in this loop (_on_catch) and a level-up's deferred banner.
+	if settles_catch:
+		for c in take_catch_cards(): ui.queue_card(c)   # one a fish left in the air still comes
+		if world_lands:
+			catch_cards = dex_cards
+			dex_cards = []
+	for c in dex_cards: ui.queue_card.call_deferred(c)
 	if filled_toast != "" and not world_lands:
 		get_tree().create_timer(REQUEST_TOAST_AFTER_S).timeout.connect(ui.toast_success_when_clear.bind(filled_toast, false, true))
 	if wave_s > 0.0:
@@ -855,13 +881,14 @@ func _on_catch(ev: Dictionary, _xp_lines: Array, at := Vector2.INF, card_after :
 ## A Fish-dex milestone (`milestone` event, id fishdex_N; SGODOT-283, §6.9.2; 不知火舞 on 283): a RewardMoment Milestone
 ## after the catch's own card and floats (q(49)) — `Fish-dex 10/20` over the kind that made it, `+30 Energy · +100 coins`;
 ## at 20 `Fish-dex complete` · `20/20` · `+50 Energy · +300 coins · Badge`. Its Energy and coins are on it, not floated.
+## The card to queue (bound to the UI: a world left before its turn still shows it), or an empty Callable.
 var _dex_fish := ""            # the reply's newest kind (its first catch), for the card's name
 var _dex_energy := {}          # fishdex_N → the Energy its reward granted
-func _on_fishdex_milestone(ev: Dictionary, v: Dictionary) -> void:
+func _fishdex_card(ev: Dictionary, v: Dictionary) -> Callable:
 	var id := str(ev.get("id", ""))
 	var spec := P0FishDex.milestone_card(v, id, _dex_fish, int(_dex_energy.get(id, 0)), int(ev.get("coins", 0)), str(ev.get("title", "")))
 	_dex_energy.erase(id)
-	if not spec.is_empty(): ui.queue_card.call_deferred(func(): ui.show_dex_milestone(spec))
+	return Callable() if spec.is_empty() else ui.show_dex_milestone.bind(spec)
 
 func _on_refused(code: String, detail: Dictionary, cmd: Dictionary) -> void:
 	if str(cmd.get("type", "")).begins_with("claim_parcel"): ui.inbox_claim_done()   # no items come: none float from it (亚瑟 on #93)

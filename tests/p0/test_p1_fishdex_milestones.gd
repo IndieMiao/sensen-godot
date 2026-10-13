@@ -66,3 +66,62 @@ func test_other_energy_still_floats() -> void:
 	for i in 3: await get_tree().process_frame
 	assert_bool(_floats().any(func(t): return t.contains("+20 Energy"))).is_true()
 	assert_object(_card()).is_null()
+
+# ---------------------------------------------------------------- after the catch's own card (q(49); 苏烈 on #353)
+class LandingWorld extends Node:   # a world that shows a landed fish itself (the pond's p0_event with its panel open)
+	func p0_event(_ev: Dictionary, _v: Dictionary) -> bool: return true
+
+const CATCH := {"kind": "catch", "fish": "fish_snakehead", "rarity": 1, "result": "landed", "refund": 0}
+
+func _shown() -> Array:
+	return rt.ui.root.find_children("*", "UiRewardMoment", true, false).filter(func(m): return not m.is_queued_for_deletion()) \
+		.map(func(m): return str((m as UiRewardMoment).event))
+
+## A rod's 10th kind: the card is held while the fish flies, and the pond's settle queues it after the Caught! card.
+func test_a_rods_milestone_comes_after_its_caught_card() -> void:
+	var v := _view(10)
+	rt.session.view = v
+	rt.ui.set_view(v)
+	rt.world = auto_free(LandingWorld.new())
+	rt._on_state(v, [CATCH, {"kind": "xp", "skill": "fishing", "amount": 2, "percent": 100}] + _events(10, 30, 100))
+	for i in 3: await get_tree().process_frame
+	assert_array(_shown()).is_empty()   # not while the fish is in the air
+	assert_int(rt.catch_cards.size()).is_equal(1)
+	var stub := GDScript.new()
+	stub.source_code = "extends \"res://scenes/p0/p0_pond.gd\"\nfunc _ready() -> void: pass\nfunc _exit_tree() -> void: pass\nfunc over_head() -> Vector2: return Vector2(180, 300)\n"
+	stub.reload()
+	var pond: Node3D = auto_free(Node3D.new())
+	pond.set_script(stub)
+	pond.rt = rt
+	pond.cam = Camera3D.new()
+	pond.add_child(pond.cam)
+	pond.panel = auto_free(P0FishingPanel.new())
+	pond.panel.visible = false
+	add_child(pond)
+	pond._settle(CATCH, 0.0, 10)   # the fish in the hand: floats, then the Caught! card CARD_AFTER_FLOATS_S on
+	await get_tree().create_timer(pond.CARD_AFTER_FLOATS_S + 0.2).timeout
+	assert_array(_shown()).is_equal(["Caught!"])
+	assert_int(rt.ui._card_queue.size()).is_equal(1)   # the milestone waits its turn
+	rt.ui.close_modal()
+	for i in 3: await get_tree().process_frame
+	assert_array(_shown()).is_equal(["Fish-dex 10/20"])
+	rt.ui.close_modal()
+	await get_tree().process_frame
+
+## A trap's 10th kind: after its In your trap! card, which comes once the fish is in the creel.
+func test_a_traps_milestone_comes_after_its_in_your_trap_card() -> void:
+	var v := _view(10)
+	rt.session.view = v
+	rt.ui.set_view(v)
+	rt._on_state(v, [{"kind": "item", "id": "fish_snakehead", "delta": 1}, {"kind": "xp", "skill": "fishing", "amount": 2, "percent": 100}] \
+		+ _events(10, 30, 100) + [{"kind": "trap", "action": "collected", "place": "pond_san_francisco_03", "fish": 1, "left": 0}])
+	for i in 3: await get_tree().process_frame
+	assert_array(_shown()).is_empty()   # not before the trap's card
+	await get_tree().create_timer(UiItemFly.FLIGHT_S + P0Runtime.TRAP_CARD_AFTER_S + 0.15).timeout
+	assert_array(_shown()).is_equal(["In your trap!"])
+	assert_int(rt.ui._card_queue.size()).is_equal(1)
+	rt.ui.close_modal()
+	for i in 3: await get_tree().process_frame
+	assert_array(_shown()).is_equal(["Fish-dex 10/20"])
+	rt.ui.close_modal()
+	await get_tree().process_frame
