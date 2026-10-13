@@ -33,7 +33,7 @@ describe('Kindred gives a postcard and a title (q(171))', () => {
     expect(v.residents.res_pip.kindred).toEqual({ postcard: 'Postcard from Pip', text: c.residents.res_pip.lines.Kindred,
       title: "Pip's Best Friend", at: T0 });
     expect(v.residents.res_pip.kindred!.text).not.toBe('');
-    expect(v.profile.titles).toEqual(["Pip's Best Friend"]);
+    expect(r.s.rewards).toContain("title:Pip's Best Friend");   // kept beside a request's title (刘邦 derives the list)
     expect(r.s.bag.some(b => b.id.includes('postcard'))).toBe(false);   // into the Passport, never the bag
   });
 
@@ -43,14 +43,14 @@ describe('Kindred gives a postcard and a title (q(171))', () => {
     expect(next.ev.some(e => e.kind === 'affinity')).toBe(true);
     expect(kindred(next.ev)).toEqual([]);
     expect(next.s.residents.res_pip.kindred_at).toBe(T0);
-    expect(viewOf(c, next.s, T0 + DAY).profile.titles).toEqual(["Pip's Best Friend"]);
+    expect(next.s.rewards.filter(k => k === "title:Pip's Best Friend")).toHaveLength(1);
   });
 
   it('below Kindred nothing is given; the view says null', () => {
     const r = step(fresh(140), { type: 'talk', resident: 'res_pip' });
     expect(kindred(r.ev)).toEqual([]);
     expect(viewOf(c, r.s, T0).residents.res_pip.kindred).toBeNull();
-    expect(viewOf(c, r.s, T0).profile.titles).toEqual([]);
+    expect(r.s.rewards.filter(k => k.startsWith('title:'))).toEqual([]);
   });
 
   it('a gift that crosses 150 gives them too, at its time', () => {
@@ -72,6 +72,6 @@ describe('Kindred gives a postcard and a title (q(171))', () => {
     const s = fresh(148);
     s.rewards.push('title:Route Buddy');
     const r = step(s, { type: 'talk', resident: 'res_pip' });
-    expect(viewOf(c, r.s, T0).profile.titles).toEqual(['Route Buddy', "Pip's Best Friend"]);
+    expect(r.s.rewards.filter(k => k.startsWith('title:'))).toEqual(['title:Route Buddy', "title:Pip's Best Friend"]);
   });
 });

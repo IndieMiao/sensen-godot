@@ -90,8 +90,7 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     workbench: workbenchView(c, s),
     homestead: homesteadView(c, s),
     profile: { name: c.profile.name, city: c.profile.city, climate: c.profile.climate, since_ms: s.created_at,
-      farm: { name: c.profile.farm_name, level: s.homestead.level },
-      titles: s.rewards.filter(k => k.startsWith('title:')).map(k => k.slice('title:'.length)) },   // in the order earned (q(171))
+      farm: { name: c.profile.farm_name, level: s.homestead.level } },
     boards: Object.fromEntries(BOARDS.map(b => [b, boardView(c, s, b, now)])),
     residents: Object.fromEntries(Object.keys(c.residents).map(id => [id, residentView(c, s, id, now)])),
     keepers: keepersView(c, s, now, opts.online ?? null),
