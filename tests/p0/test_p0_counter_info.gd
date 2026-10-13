@@ -45,6 +45,18 @@ func test_the_chevron_opens_the_items_card_over_the_counter() -> void:
 	var tiles := sheet.find_child("Needs", true, false).find_children("*", "UiNeedTile", true, false)
 	assert_array(tiles.map(func(t): return [(t as UiNeedTile).item_name, (t as UiNeedTile).size_class])).is_equal(
 		[["Reeds", UiNeedTile.Size.M], ["Timber", UiNeedTile.Size.M]])
+	# a tile tapped says where it comes from, as on HOME-1 (LOCK-10; 不知火舞 on 284 a5fd65e4)
+	(tiles[0] as UiNeedTile).pressed.emit()
+	await get_tree().process_frame
+	var src := ui.root.find_children("*", "Label", true, false).map(func(l): return (l as Label).text)
+	assert_array(src).contains([str(P0Logic.need_source(ui.view, "fiber").text)])
+	var pop: UiNeedSource = ui.root.find_children("*", "UiNeedSource", true, false)[0]
+	var up := InputEventMouseButton.new()   # a tap anywhere lets the line go (as on HOME-1); the card stays
+	up.button_index = MOUSE_BUTTON_LEFT
+	up.pressed = false
+	(pop.get_parent() as Control).gui_input.emit(up)
+	await get_tree().process_frame
+	assert_bool(sheet.is_open()).is_true()
 	# over the counter, not instead of it: Back closes the card first
 	assert_str(ui.modal_kind).is_equal("counter")
 	ui.close_top_layer()

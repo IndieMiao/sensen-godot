@@ -25,13 +25,15 @@ extends PanelContainer
 ##   need: {name, have, need, icon, note}   a NeedTile M in its count state ("Farming XP 32/50") with the note
 ##                         beside it ("18 XP to go · harvest 9 radishes")
 ##   info_row: {title, qty, lines}          Compact/Information row ("Carrot Seeds ×5" / "Level-up gift" / "At Lv2")
-##   needs: [{name, have, need, icon}]      a group of NeedTile M, as many a row as fit (the counter's › card: a buy's
-##                         materials, `Hardwood 0/4`; 不知火舞 on 284)
+##   needs: [{id, name, have, need, icon}]  a group of NeedTile M, as many a row as fit (the counter's › card: a buy's
+##                         materials, `Hardwood 0/4`; 不知火舞 on 284); a tap on one emits need_pressed
 
 signal action_requested(action: StringName, item_id: String, payload: Dictionary)
 signal unavailable_requested(action: StringName, item_id: String, reason: String)
 signal info_requested(item_id: String)
 signal closed
+## A tile of the `needs` group was tapped (LOCK-10: a tap on a NEED-TILE shows where the item comes from).
+signal need_pressed(item_id: String, tile: UiNeedTile)
 
 ## LockToggle 1539:97939 (F-07, 安其拉 10-08): outline open lock in secondary ink / solid closed lock in text ink.
 const LOCK_OPEN_GLYPH := preload("res://assets/ui/kit_icons/lock_open.svg")
@@ -313,7 +315,8 @@ func _build_blocks() -> void:
 		for n in needs:
 			var t := UiNeedTile.new(str(n.get("name", "")), int(n.get("have", 0)), maxi(1, int(n.get("need", 1))), UiNeedTile.Size.M,
 				n.get("icon", null))
-			t.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			var id := str(n.get("id", ""))
+			t.pressed.connect(func(): need_pressed.emit(id, t))   # the owner shows the source line (不知火舞 on 284 a5fd65e4)
 			tiles.append(t)
 		var group := UiNeedTile.group(tiles)
 		group.name = "Needs"

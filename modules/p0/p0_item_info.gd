@@ -116,7 +116,7 @@ static func spec(view: Dictionary, item_id: String, context: StringName, opts :=
 	# Gift Clues (Fishing Lv7, q(167); 302 b308ee14): who of the residents met likes this dish, under the rarity line.
 	if kind == "dish": out.liked_by = P0Logic.liked_by_line(view, item_id)
 	if context == &"counter_buy":   # the › card's NeedTiles: what the buy takes (Bag Upgrades), however far the gate is
-		out.needs = (_offer(view, item_id, opts).get("materials", []) as Array).map(func(m): return {name = str(m.get("name", "")),
+		out.needs = (_offer(view, item_id, opts).get("materials", []) as Array).map(func(m): return {id = str(m.get("id", "")), name = str(m.get("name", "")),
 			have = int(m.get("have", 0)), need = int(m.get("need", 0)), icon = P0Logic.icon(str(m.get("id", "")))})
 	if rule.is_empty(): return out
 	for line in rule.get("facts", []):

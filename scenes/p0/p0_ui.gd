@@ -2142,7 +2142,8 @@ func counter_drawer() -> P0CounterDrawer:
 	return _counter if modal_kind in _COUNTER_FLOW and is_instance_valid(_counter) else null
 
 ## A counter row's › (不知火舞 on 284): its card over the counter (UiInfoSheet.layered: Back or a tap outside closes it
-## first) — name, use line, the materials as NeedTiles, the price and the row's own key, which does what the row's does.
+## first) — name, use line, the materials as NeedTiles (a tap: where it comes from, LOCK-10), the price and the row's own
+## key, which does what the row's does.
 func counter_info(d: P0CounterDrawer, id: String) -> UiInfoSheet:
 	if d.info_card(id).is_empty() or _modal == null: return null
 	var sheet := UiInfoSheet.layered(_modal, Vector2(UiTokens.SIZE_QUICK_BAR_X, UiTokens.SPACE_PAGE + safe_bottom()))
@@ -2152,6 +2153,7 @@ func counter_info(d: P0CounterDrawer, id: String) -> UiInfoSheet:
 		sheet.close()
 		d.press_row(id))
 	sheet.unavailable_requested.connect(func(_a: StringName, _i: String, reason: String): toast(reason))
+	sheet.need_pressed.connect(func(item: String, tile: UiNeedTile): _show_need_source(tile, item))   # LOCK-10
 	sheet.open(id, &"counter_info")
 	return sheet
 
