@@ -1039,7 +1039,7 @@ func _show_chef_sign(on: bool) -> void:
 	_chef_sign_node.visible = on
 	if bp.is_walkable(P0Garden.CHEF_SIGN_CELL): grid.set_solid(P0Garden.CHEF_SIGN_CELL, on)   # a cell the plan blocks stays blocked
 
-## Its card (不知火舞 on 282): the facilities' small card — `Chef's Sign`, `Master Chef · Homestead Lv10`, and HOME-1's
+## Its card (不知火舞 on 282): the facilities' small card — `Chef's Sign`, `Homestead Lv10`, and HOME-1's
 ## Lv10 line for what it does.
 func open_chef_sign() -> void:
 	actor.face(_chef_sign)
@@ -1047,7 +1047,7 @@ func open_chef_sign() -> void:
 
 static func chef_sign_card() -> Dictionary:
 	var note := str(P0Logic.P1_UNLOCKS.chefs_sign.note)
-	return {"title": "Chef's Sign", "lead": "Master Chef · Homestead Lv10", "icon": P0Logic.icon("kitchen"),
+	return {"title": "Chef's Sign", "lead": "Homestead Lv10", "icon": P0Logic.icon("kitchen"),
 		"facts": [note.left(1).to_upper() + note.substr(1)], "button": ""}
 
 ## Placeholder Chef's Sign (上官婉儿: a post, an arm and a hanging board, 1.7 m, the board's foot ≥ 1.0 m up, one cell; the

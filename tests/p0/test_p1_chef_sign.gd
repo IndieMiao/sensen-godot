@@ -28,7 +28,7 @@ func test_the_placeholder_is_a_post_and_a_board_up_off_the_ground() -> void:
 
 func test_its_card_reads_its_title_level_and_homes_line_without_a_button() -> void:
 	var card: Dictionary = load("res://scenes/p0/p0_farm.gd").chef_sign_card()
-	assert_that([card.title, card.lead, card.facts, card.button]).is_equal(["Chef's Sign", "Master Chef · Homestead Lv10",
+	assert_that([card.title, card.lead, card.facts, card.button]).is_equal(["Chef's Sign", "Homestead Lv10",
 		["Every dish's gold zone +5"], ""])
 	assert_str(str(P0WorldPrompts.chef_sign({}).text)).is_equal("Chef's Sign")
 	var ui := P0Ui.new()
