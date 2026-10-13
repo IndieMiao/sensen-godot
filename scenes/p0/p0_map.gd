@@ -876,7 +876,7 @@ const STAMP_S := 1.5
 var _card_token := 0
 
 ## The first visit's card once the stamp has said itself — unless the map is gone, another flight is in the air, or
-## another arrival has come meanwhile (each waits for its own stamp).
+## another flight has set off meanwhile (a return, a revisit or home: _travel_fly moves the token on).
 func _arrival_card_after_stamp(cluster: String) -> void:
 	_card_token += 1
 	var token := _card_token
@@ -893,6 +893,7 @@ var _trip := {}
 func _travel_fly(to: Dictionary, left: Vector2, held: String, ahead: String, city: String, km: int, land: Callable,
 		first_in_air := "") -> void:
 	if not _trip.is_empty(): _travel_land()   # one at a time: an earlier one lands first
+	_card_token += 1   # a first visit's card still waiting for its stamp stays away: this flight lands elsewhere (哪吒 on #338)
 	_reset_gesture()
 	_city_bounds()
 	if _flight != null: _flight.kill()
