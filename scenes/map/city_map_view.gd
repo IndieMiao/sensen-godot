@@ -167,6 +167,8 @@ var _dest_kept_names: Array = []
 var _dest_always: Array = []
 ## The view's own controls draw over the pins' names (UiMapDestination.NAME_Z): the keys, credit line and cards.
 const CHROME_Z := 2
+## The fog's z: under everything this view draws, the flight's route (P0TravelCover.ROUTE_Z −1, q(152) ④) too.
+const FOG_Z := -2
 ## Two discs nearer than this (centre to centre, px) cannot both show: the lower-ranked one hides (q(137)). A pin or
 ## name shown last pass hides only at DEST_HOLD px more overlap (no flicker on the edge while panning and zooming).
 const DEST_NEAR := 36.0
@@ -261,6 +263,7 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	fog = MapFogLayer.new()
+	fog.z_index = FOG_Z
 	add_child(fog)
 	var city_name := str(host.region.get("name", "Los Angeles")) if host else "Los Angeles"
 	var city := flat_button("chevron-down", L10n.text(city_name), "MapCity")
