@@ -189,3 +189,30 @@ func test_a_hidden_bubble_comes_back_4_px_clear_and_a_dot_under_a_bubble_gives_i
 		(v.bubbles[id].dot as Node).queue_free()
 		v.bubbles.erase(id)
 	await get_tree().process_frame
+
+## 周瑜 on #346: the visited are not held to the 30-bubble cap — past 30 of them on screen, the rest still list and keep
+## their dots (q(153) ①); only the other cities stop at the cap.
+func test_every_visited_city_on_screen_keeps_its_dot_past_the_cap() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var many: Array = P0Clusters.in_box(34.0, -123.0, 40.0, -117.0, 0, 400).map(func(c): return str(c.id))
+	many.erase(SF)
+	assert_int(many.size()).is_greater(m.CITY_BUBBLES + 5)
+	var saved := _travel(rt, _trip(SF, SF, many.slice(0, m.CITY_BUBBLES + 5)))
+	_look(m, 37.0, -120.0, 5.5)
+	var on_screen: Array = []
+	for c in many.slice(0, m.CITY_BUBBLES + 5):
+		var p = m.geo_to_screen(float(P0Clusters.get_cluster(c).lat), float(P0Clusters.get_cluster(c).lng))
+		if p != null and Rect2(Vector2.ZERO, Vector2(360, 800)).grow(60).has_point((p as Vector2) - m.city_map.global_position): on_screen.append(c)
+	assert_int(on_screen.size()).is_greater(m.CITY_BUBBLES)
+	var ids: Array = m.city_regions().map(func(r): return P0Clusters.cluster_of_region(str(r.id)))
+	for c in on_screen: assert_array(ids).contains([c])
+	m.city_map._update_bubbles()
+	var area := Rect2(-m.city_map.global_position, Vector2(360, 800)).grow(60)
+	for c in on_screen:
+		var b: Dictionary = m.city_map.bubbles[str(P0Clusters.region(c).id)]
+		if area.has_point((b.dot as Control).position + Vector2(5, 5)):
+			assert_bool((b.dot as Control).visible).override_failure_message("%s's dot gone" % c).is_true()
+	rt.session.view = saved
