@@ -95,7 +95,7 @@ func _ready() -> void:
 	stage.name = "Stage"
 	stage.cam = room.cam
 	stage.glow_light = room.room.find_child("HearthGlow", true, false)
-	stage.fire_fx = room.art.get("fire") as Node if "fire" in room.art else null
+	stage.fire_fx = room.call("stove_fire") if room.has_method("stove_fire") else null
 	var mouth := room.anchor(drop_name())
 	if mouth: mouth.add_child(stage)
 	else: room.add_child(stage)

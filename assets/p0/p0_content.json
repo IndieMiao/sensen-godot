@@ -2430,7 +2430,10 @@
             4
           ]
         ],
-        "unlocks": []
+        "unlocks": [
+          "orchard_8",
+          "sprinklers_10"
+        ]
       },
       {
         "level": 8,

@@ -88,9 +88,11 @@ func test_validation_reports_each_naming_rule() -> void:
 	assert_int(errors.size()).is_equal(7)
 
 func test_the_placeholder_anchor_files_pass_validation() -> void:
-	# Each file against its own room kit: an outpost's art (p0_outposts.json), else the Basic Room (SGODOT-227).
+	# Each file against its own room kit: an outpost's art (p0_outposts.json), the farmhouse's rooms (282), else the Basic
+	# Room (SGODOT-227).
 	var kit_of := {}
 	for o in P0Outposts.all(): kit_of[str(o.anchors)] = str(o.get("art", "basic_room"))
+	for kind in FARMHOUSE.ROOMS: kit_of[str(FARMHOUSE.ROOMS[kind].anchors)] = str(FARMHOUSE.ROOMS[kind].art)
 	for path in _anchor_files("res://assets/p0"):
 		var layout := P0RoomAnchors.read_json("res://assets/rooms/%s/layout.json" % kit_of.get(path, "basic_room"))
 		var modules: Array = layout.get("assets", []).map(func(a): return str(a.name)) + layout.get("instances", []).map(func(a): return str(a.name))
@@ -342,6 +344,7 @@ func test_the_room_camera_keeps_its_kits_yaw_at_the_farms_pitch() -> void:
 func test_the_room_shows_the_player_at_the_farms_scale_and_pans_inside_its_art() -> void:
 	var r := _farmhouse(1, true)
 	_assert_player_scale_framing(r, "farmhouse")
+	for lv in [5, 10]: _assert_player_scale_framing(_farmhouse(lv, true), "farmhouse Lv%d" % lv)   # Standard / Deluxe Room (282)
 	assert_float(r.view_size()).is_greater(r.cam.size)   # push-ins still frame from the whole room
 	r.frame_all()   # straight onto the player at the door, the view stopped at the art's edge
 	assert_bool(r._fits).override_failure_message("wider than the band at the player's scale").is_false()
