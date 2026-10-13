@@ -649,7 +649,17 @@ func p0_joystick(v: Vector2) -> void:
 	if actor: actor.set_input(v)
 	if v != Vector2.ZERO and _materials: _materials.cancel_walk()   # a tapped walk to the mine mouth stops (266)
 
+var _dev_aim := Vector3.INF   # aimcell (shots): steer the joystick straight at this point, logging the player each frame
+
 func p0_frame(v: Dictionary, dt: float) -> void:
+	if _dev_aim != Vector3.INF:
+		var to := Vector3(_dev_aim.x - actor.position.x, 0, _dev_aim.z - actor.position.z)
+		if to.length() < 0.05:
+			p0_joystick(Vector2.ZERO)
+			_dev_aim = Vector3.INF
+		else:
+			p0_joystick((cam.unproject_position(actor.position + to.normalized()) - cam.unproject_position(actor.position)).normalized())
+		print("P0_AIM %d %s" % [Engine.get_frames_drawn(), actor.position])
 	actor.step(dt)
 	_door_check()
 	_follow(dt)
@@ -1045,11 +1055,13 @@ func _screen_rect(n: Node) -> Rect2:
 			first = false
 	return r
 
-## The Chef's Sign up from Homestead Lv10: shown, and its cell solid (a post one walks round), back if it ever goes.
+## The Chef's Sign up from Homestead Lv10: shown, and its cell solid (a post one walks round) with the path cell under its
+## board (P0Garden.CHEF_SIGN_BOARD_CELL), back if it ever goes.
 func _show_chef_sign(on: bool) -> void:
 	if _chef_sign_node.visible == on: return
 	_chef_sign_node.visible = on
-	if bp.is_walkable(P0Garden.CHEF_SIGN_CELL): grid.set_solid(P0Garden.CHEF_SIGN_CELL, on)   # a cell the plan blocks stays blocked
+	for c in [P0Garden.CHEF_SIGN_CELL, P0Garden.CHEF_SIGN_BOARD_CELL]:   # its post's cell and the path under its board
+		if bp.is_walkable(c): grid.set_solid(c, on)   # a cell the plan blocks stays blocked
 
 ## Its card (不知火舞 on 282): the facilities' small card — `Chef's Sign`, `Homestead Lv10`, and HOME-1's
 ## Lv10 line for what it does.
@@ -1140,6 +1152,22 @@ func p0_dev(step: PackedStringArray) -> bool:
 			_focus = actor.position
 		"face":
 			actor.face(actor.position + Vector3(float(step[1]), 0, float(step[2])))
+		"pathcells":   # pathcells:x0:y0:x1:y1 — the cells the player's path between two cells crosses (282 shots: the Chef's Sign)
+			var path := grid.point_path(bp.cell_to_world(Vector2i(int(step[1]), int(step[2]))), bp.cell_to_world(Vector2i(int(step[3]), int(step[4]))))
+			var cells: Array = []
+			for i in path.size():
+				var c := bp.world_to_cell(path[i])
+				if cells.is_empty() or cells[-1] != c: cells.append(c)
+				if i > 0:   # the cells between points too, sampled every 5 cm
+					var a: Vector3 = path[i - 1]
+					var n := maxi(1, ceili(a.distance_to(path[i]) / 0.05))
+					for k in n:
+						var m := bp.world_to_cell(a.lerp(path[i], float(k) / n))
+						if cells[-1] != m and not cells.has(m): cells.append(m)
+			print("P0_PATHCELLS ", step.slice(1), " ", cells)
+		"aimcell": _dev_aim = bp.cell_to_world(Vector2i(int(step[1]), int(step[2])))   # aimcell:x:y — walk straight there (shots)
+		"tapcell":   # tapcell:x:y — a tap on the ground there (the player walks to it)
+			p0_tap(cam.unproject_position(bp.cell_to_world(Vector2i(int(step[1]), int(step[2])))))
 		"farmhouse": enter_farmhouse()
 		"democrops":
 			# Visual check only: every P0 crop at every stage across the first rows (no server state).

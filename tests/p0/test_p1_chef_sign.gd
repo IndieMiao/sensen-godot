@@ -40,6 +40,27 @@ func test_the_sign_is_the_timber_or_stone_model_after_lv10s_look() -> void:
 	assert_vector(farm.CHEF_SIGN_HIT).is_equal(Vector3(-0.332, 1.285, 0))   # board_center
 	assert_float(farm.CHEF_SIGN_SHIFT.x).is_between(0.0, 0.185)
 
+## B (不知火舞 282 33835f54; 上官婉儿 56fa9620): its board hangs over the mine path's (4,14) at shoulder height, so with the
+## sign up that cell is not walked; the door, the spawn and the bench still reach both cells before the mine mouth, never
+## through it. The farm's grid as it stands: the yard fence's front, the Homestead sign, the mailbox, then the sign's cells.
+func test_with_the_sign_up_the_way_to_the_mine_goes_round_its_board() -> void:
+	var bp := P0Garden.blueprint()
+	P0Garden.block_points(bp, P0Garden.fence_block_points(bp))
+	P0Garden.block_points(bp, [P0Garden.sign_point(bp), P0Garden.mailbox_point(bp)])
+	var grid := BlueprintGrid.new(bp)
+	for c in [P0Garden.CHEF_SIGN_CELL, P0Garden.CHEF_SIGN_BOARD_CELL]: grid.set_solid(c, true)
+	var board := P0Garden.CHEF_SIGN_BOARD_CELL
+	assert_bool(P0Decor.yard().get("paths", []).any(func(r): return Rect2i(int(r[0]), int(r[1]), int(r[2]), int(r[3])).has_point(board))).is_true()   # still a path to decor
+	for from in [Vector2i(9, 14), P0Garden.ANCHORS.spawn, Vector2i(6, 15)]:   # the door's walkway, the spawn, before the bench
+		for to in [Vector2i(3, 13), Vector2i(3, 14)]:   # the cells before the mine mouth
+			var path := grid.point_path(bp.cell_to_world(from), bp.cell_to_world(to))
+			assert_array(path).override_failure_message("%s → %s" % [from, to]).is_not_empty()
+			for i in range(1, path.size()):   # every 5 cm along it
+				var a: Vector3 = path[i - 1]
+				for k in 20:
+					var c := bp.world_to_cell(a.lerp(path[i], k / 20.0))
+					assert_bool(c == board).override_failure_message("%s → %s crosses %s" % [from, to, board]).is_false()
+
 func test_its_card_reads_its_title_level_and_homes_line_without_a_button() -> void:
 	var card: Dictionary = load("res://scenes/p0/p0_farm.gd").chef_sign_card()
 	assert_that([card.title, card.lead, card.facts, card.button]).is_equal(["Chef's Sign", "Homestead Lv10",
