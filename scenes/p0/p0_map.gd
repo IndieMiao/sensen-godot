@@ -900,13 +900,21 @@ func _travel_fly(to: Dictionary, left: Vector2, held: String, city: String, km: 
 	_focus_tween = create_tween()
 	_focus_tween.tween_method(_travel_at, 0.0, P0TravelFlight.TOTAL_S, P0TravelFlight.TOTAL_S)
 	_focus_tween.tween_callback(_travel_land)
-	_trip = {plan = plan, to = to, t = 0.0, cover = cover, land = land, tween = _focus_tween, left = left}
+	_trip = {plan = plan, to = to, t = 0.0, cover = cover, land = land, tween = _focus_tween, left = left,
+		start_us = Time.get_ticks_usec()}
 	_show_self(false)   # the avatar leaves with the take-off (v2)
 	_flight = _focus_tween
 	_flight_kind = "travel"
 
-func _travel_at(t: float) -> void:
+## The tween only calls this each frame: where the flight is comes from the clock, so it takes 3 s of real time even
+## when frames are slow — the engine caps a frame's step (about 0.13 s), and a tween stepped by it stretched the flight
+## on a slow device (李元芳 on 279 45546042: 4.9 s on the emulator; 9.5 s at 400 ms a frame). It lands on time.
+func _travel_at(_step: float) -> void:
 	if _trip.is_empty(): return
+	var t := minf((Time.get_ticks_usec() - int(_trip.start_us)) / 1e6, P0TravelFlight.TOTAL_S)
+	if t >= P0TravelFlight.TOTAL_S:
+		_travel_land()
+		return
 	_trip.t = t
 	var at: Vector4 = (_trip.plan as P0TravelFlight).sample(t)
 	center_lat = at.x

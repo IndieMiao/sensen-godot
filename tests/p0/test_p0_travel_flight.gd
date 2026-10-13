@@ -428,3 +428,28 @@ func test_going_home_from_another_city_flies_first() -> void:
 	assert_bool(m.travelling()).is_false()
 	rt.session.view = saved
 	rt.ui.set_view(saved)
+
+## 李元芳 on 279 45546042: the flight takes 3 s of real time even when frames are slow (the engine caps a frame's step,
+## so a flight stepped by frames stretched — 9.5 s at 400 ms a frame).
+class SlowFrames extends Node:
+	func _process(_d: float) -> void: OS.delay_msec(400)
+
+func test_the_flight_takes_3_s_of_real_time_on_slow_frames() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved := _ready_to_arrive(m)
+	var slow := SlowFrames.new()
+	add_child(auto_free(slow))
+	var t0 := Time.get_ticks_msec()
+	_arrive(m)
+	while m.travelling() and Time.get_ticks_msec() - t0 < 12000: await get_tree().process_frame
+	var took := Time.get_ticks_msec() - t0
+	slow.queue_free()
+	assert_bool(m.travelling()).is_false()
+	assert_int(took).is_less(3000 + 900)   # 3 s, give or take a slow frame or two
+	assert_float(m.zoom).is_equal_approx(float(_overview().zoom), 1e-6)   # landed where it lands
+	rt.ui.clear_toast()
+	rt.session.view = saved
+	rt.ui.set_view(saved)
