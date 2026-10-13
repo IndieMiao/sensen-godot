@@ -22,6 +22,7 @@
 import { BOARDS, handIn, slotCount } from './boards.js';
 import { pondFishIds } from './fishing_world.js';
 import type { EventVenue, Need, OutpostDef, P0Content, ShopId } from './content.js';
+import { homeFacts, type Homed } from './home.js';
 import { matches } from './requests.js';
 import { progressOf, requestState, stageIndex } from './residents.js';
 import { skillLevel } from './rules.js';
@@ -82,15 +83,16 @@ function fishFor(c: P0Content, items: string[], need: Pick<Need, 'kind' | 'rarit
   return c.fish.filter(f => matches(c, need, [], f.id)).map(f => f.id);
 }
 
-/** The pond a tracked fish request points to: the beginner pond if it has one of them, else the nearest to the farm. */
-export function pondFor(c: P0Content, fish: string[]): string | null {
-  const city = c.profile.city.toLowerCase();
+/** The pond a tracked fish request points to: the beginner pond if it has one of them, else the nearest to the farm.
+ * Of the hand-written ponds, in the home city (a generated home's ponds: SGODOT-303's home set). */
+export function pondFor(c: P0Content, s: Homed, fish: string[]): string | null {
+  const home = homeFacts(c, s), city = home.name.toLowerCase();
   const fits = Object.entries(c.fishing.places)
     .filter(([id, p]) => p.city === city && fish.some(f => pondFishIds(c, id).has(f)));
   const beginner = fits.find(([, p]) => p.beginner);
   if (beginner) return beginner[0];
-  const farm = c.profile.farm_at;
-  const dist = (at?: [number, number]) => (farm && at ? (at[0] - farm[0]) ** 2 + ((at[1] - farm[1]) * Math.cos(farm[0] * Math.PI / 180)) ** 2 : Infinity);
+  const farm = home.farm;
+  const dist = (at?: [number, number]) => (farm && at ? (at[0] - farm.lat) ** 2 + ((at[1] - farm.lng) * Math.cos(farm.lat * Math.PI / 180)) ** 2 : Infinity);
   return fits.sort((a, b) => dist(a[1].at) - dist(b[1].at))[0]?.[0] ?? null;
 }
 
@@ -118,7 +120,7 @@ export function mapMarkers(c: P0Content, s: P0State, now: number): MapMarker[] {
       if (handIn(c, s, r)) all.push({ place, kind: 'deliver', why: { request: r.id, ...(tracked ? { tracked: true as const } : {}) } });
       else if (tracked && r.kind === 'visit' && r.visit) all.push({ place: r.visit.place, kind: 'request', why: { request: r.id, tracked: true } });   // Stamp Run: go there
       else if (tracked && r.kind === 'fish' && r.where !== 'not_home') {   // only the fish the player can land yet (q(104)); Far Pond: ponds elsewhere, no pin
-        const pond = pondFor(c, landable(c, s, fishFor(c, r.items, { kind: 'fish', rarity: r.rarity })));
+        const pond = pondFor(c, s, landable(c, s, fishFor(c, r.items, { kind: 'fish', rarity: r.rarity })));
         if (pond) all.push({ place: pond, kind: 'request', why: { request: r.id, tracked: true } });
       } else if (!tracked && board === 'market') {
         const m: MapMarker = { place, kind: 'request', why: { request: r.id } };
@@ -135,7 +137,7 @@ export function mapMarkers(c: P0Content, s: P0State, now: number): MapMarker[] {
     const ready = q.need.kind !== 'sow' || tracked ? progressOf(c, s, id, q) >= q.qty : false;
     if (ready) all.push({ place, kind: 'deliver', why: { request: q.id, resident: id, ...(tracked ? { tracked: true as const } : {}) } });
     else if (tracked && q.need.kind === 'fish') {
-      const pond = pondFor(c, landable(c, s, fishFor(c, q.need.id ? [q.need.id] : [], q.need)));
+      const pond = pondFor(c, s, landable(c, s, fishFor(c, q.need.id ? [q.need.id] : [], q.need)));
       if (pond) all.push({ place: pond, kind: 'request', why: { request: q.id, resident: id, tracked: true } });
     } else if (!tracked && (q.need.kind !== 'fish' || landable(c, s, fishFor(c, q.need.id ? [q.need.id] : [], q.need)).length)) {
       all.push({ place, kind: 'request', why: { request: q.id, resident: id } });

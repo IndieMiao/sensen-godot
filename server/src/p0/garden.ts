@@ -295,7 +295,7 @@ export function compost(c: P0Content, s: P0State, cmd: { item?: unknown; qty?: u
   if (!cropById(c, item)) return { code: 'not_a_crop', detail: { item } };
   if (!Number.isInteger(qty) || qty < 1) return { code: 'bad_qty' };
   const used = s.day.compost ?? 0;
-  if (used + qty > cap) return { code: 'limit_reached', detail: { used, cap, resets_in: untilRollover(c, now) } };
+  if (used + qty > cap) return { code: 'limit_reached', detail: { used, cap, resets_in: untilRollover(c, s, now) } };
   const have = count(s.bag, item, 'skip');
   if (have < qty) return { code: 'not_enough', detail: { item, have, need: qty } };
   const out = 'fert_compost';
@@ -315,7 +315,7 @@ export function compostView(c: P0Content, s: P0State, now: number) {
   const bin = (s.facilities ?? []).find(f => c.facilities.kinds[f.kind]?.daily);
   if (!bin) return null;
   const cap = c.facilities.kinds[bin.kind].daily!, used = s.day.compost ?? 0;
-  return { cap, used, left: Math.max(0, cap - used), resets_in: untilRollover(c, now) };
+  return { cap, used, left: Math.max(0, cap - used), resets_in: untilRollover(c, s, now) };
 }
 
 export function fieldRecipeView(c: P0Content, s: P0State, r: WorkbenchRecipe) {

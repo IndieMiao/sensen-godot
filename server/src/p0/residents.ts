@@ -58,7 +58,7 @@ const nextGap = (c: P0Content) => (c.affinity.next_request_h ?? 24) * H;
 /** When the resident's next request opens (state wait), in ms from now. */
 export function requestOpensIn(c: P0Content, s: P0State, id: string, now: number): number {
   const def = residentDef(c, id)!, r = residentState(s, id);
-  if (def.one_per_day || r.done_at === undefined) return untilRollover(c, now);
+  if (def.one_per_day || r.done_at === undefined) return untilRollover(c, s, now);
   return Math.max(0, r.done_at + nextGap(c) - now);
 }
 

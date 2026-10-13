@@ -14,7 +14,8 @@ import { handOver, haveFor, floorPrice, noteDone, payBonus, pick, rarityOf } fro
 import { skillLevel, untilRollover } from './rules.js';
 import { catalog } from './shops.js';
 import type { BoardRequest, BoardSlot, P0State } from './state.js';
-import { clusterById, clusterOf, homeCluster, noteDelivery, rankedCities } from './travel.js';
+import { clusterById, clusterOf, homeClimate, homeOf, noteDelivery, rankedCities, writtenCluster } from './travel.js';
+import { homeFacts, type Homed } from './home.js';
 import { cityPlaces, genPonds, type WorldContent } from './world.js';
 
 const H = 3_600_000;
@@ -30,15 +31,15 @@ function gateMet(c: P0Content, s: P0State, t: RequestTemplate): boolean {
 }
 
 /** §9.6.1: regional templates are drawn only where their climate is (P1: the home climate until travel lands). */
-function climateMet(c: P0Content, t: RequestTemplate): boolean {
-  return !t.climate?.length || t.climate.includes(c.profile.climate);
+function climateMet(c: P0Content, s: P0State, t: RequestTemplate): boolean {
+  return !t.climate?.length || t.climate.includes(homeClimate(c, s));
 }
 
 export function eligible(c: P0Content, s: P0State, board: BoardId): string[] {
   return c.requests.boards[board].templates.filter(id => {
     const t = c.requests.templates[id];
-    return t.enabled !== false && gateMet(c, s, t) && climateMet(c, t)
-      && (!t.need.regional || regionalPool(c, t.need).length > 0) && (t.need.kind !== 'visit' || visitOpen(c, s, board, t.need))
+    return t.enabled !== false && gateMet(c, s, t) && climateMet(c, s, t)
+      && (!t.need.regional || regionalPool(c, s, t.need).length > 0) && (t.need.kind !== 'visit' || visitOpen(c, s, board, t.need))
       && (t.need.where !== 'not_home' || farTries(c, s).length > 0);
   });
 }
@@ -74,9 +75,9 @@ export function crossTarget(c: P0Content, cluster: string, role: string): string
 }
 
 /** The home city's 2 regional fish (§6.2.5: content fishing.regional.curated by city name; generated cities come with 280). */
-function cityFish(c: P0Content): string[] {
+function cityFish(c: P0Content, s: Homed): string[] {
   const curated = (c.fishing as { regional?: { curated?: Record<string, string[]> } }).regional?.curated ?? {};
-  return curated[c.profile.city.toLowerCase()] ?? [];
+  return curated[homeFacts(c, s).name.toLowerCase()] ?? [];
 }
 
 /** Items a player can get somewhere today: a crop whose seed some counter sells, a fish some pond or river holds, a dish
@@ -93,13 +94,13 @@ export function obtainable(c: P0Content, id: string): boolean {
 }
 
 /** §9.6.3 regional: the items one regional template may ask for, home climate first; only those the player can get. */
-export function regionalPool(c: P0Content, need: Need): string[] {
-  const zone = c.profile.climate, rv = need.regional;
+export function regionalPool(c: P0Content, s: Homed, need: Need): string[] {
+  const zone = homeClimate(c, s), rv = need.regional;
   const inZone = (z: string | string[] | undefined) => (Array.isArray(z) ? z.includes(zone) : z === zone);
   let ids: string[] = [];
   if (need.kind === 'crop') ids = c.crops.filter(cr => cr.regional && (rv === 'other_zone' ? cr.zone && cr.zone !== zone : inZone(cr.zone))).map(cr => cr.id);
   if (need.kind === 'fish') {
-    ids = rv === 'city' ? cityFish(c)
+    ids = rv === 'city' ? cityFish(c, s)
       : c.fish.filter(f => f.regional && (rv === 'other_zone' ? !inZone(f.zones) : inZone(f.zones))).map(f => f.id);
   }
   if (need.kind === 'dish') {
@@ -183,7 +184,7 @@ function drawRequest(c: P0Content, s: P0State, board: BoardId, slot: number, at:
     const places = visitPlaces(c, board);
     visit = { place: places[Math.floor(draw() * places.length)], done: false };
   } else if (t.need.regional) {   // regional: one of the climate's / city's items
-    const pool = regionalPool(c, t.need);
+    const pool = regionalPool(c, s, t.need);
     items = [pool[Math.floor(draw() * pool.length)]];
   } else if (t.need.id) items = [t.need.id];   // a template naming one crop, fish or material asks for exactly that
   // A crop request by rarity or family takes any such crop the player can grow (李白's Fine Produce, Orchard Basket).
@@ -249,21 +250,28 @@ export function noteVisit(c: P0Content, s: P0State, space: unknown, place: unkno
   }
 }
 
-const farCache = new WeakMap<P0Content, string[]>();
+const farCache = new WeakMap<P0Content, Map<string, string[]>>();   // per home city
 /**
  * Far Pond (q(128) 甲; the user, 2026-10-10: what is in the bag counts, wherever and whenever it was caught): every fish
  * the home city's ponds don't have — neither one its ponds can ever give (each site's habitat × the city's regional
  * fish) nor one of its 2 regional fish. San Francisco: other cities' regional fish, and the Coast fish (no Coast site).
  */
-export function farFish(c: P0Content): string[] {
-  let ids = farCache.get(c);
+export function farFish(c: P0Content, s: Homed): string[] {
+  const home = homeOf(c, s);
+  let byHome = farCache.get(c);
+  if (!byHome) farCache.set(c, byHome = new Map());
+  let ids = byHome.get(home);
   if (!ids) {
-    const home = homeCluster(c), pool = new Set(pondRegional(c, home));
-    for (const [id, p] of Object.entries(c.fishing.places)) {
-      const site = c.fishing.sites[p.site];
-      if (site && pondCity(c, id).cluster === home) for (const f of everFish(c, site, home)) pool.add(f.id);
+    const pool = new Set(pondRegional(c, home));
+    // the written city's ponds are the hand-written ones; another home's, its generated ones (SGODOT-303)
+    const sites = home === writtenCluster(c)
+      ? Object.entries(c.fishing.places).filter(([id]) => pondCity(c, id).cluster === home).map(([, p]) => p.site)
+      : (cityPlaces(c, home)?.detail.ponds ?? []).map(p => p.site);
+    for (const name of sites) {
+      const site = c.fishing.sites[name];
+      if (site) for (const f of everFish(c, site, home)) pool.add(f.id);
     }
-    farCache.set(c, ids = c.fish.map(f => f.id).filter(id => !pool.has(id)));
+    byHome.set(home, ids = c.fish.map(f => f.id).filter(id => !pool.has(id)));
   }
   return ids;
 }
@@ -286,7 +294,7 @@ export function farTries(c: P0Content, s: P0State): string[] {
   let out = byLevel.get(level);
   if (out) return out;
   out = [];
-  const w = (c as P0Content & { world?: WorldContent }).world, far = new Set(farFish(c)), sites = new Set(Object.keys(c.fishing.sites));
+  const w = (c as P0Content & { world?: WorldContent }).world, far = new Set(farFish(c, s)), sites = new Set(Object.keys(c.fishing.sites));
   for (const city of ranked) {
     if (out.length >= FAR_TRIES || !w) break;
     const cl = clusterById(c, city.id);
@@ -303,7 +311,7 @@ export function farTries(c: P0Content, s: P0State): string[] {
 
 /** The units a request's need counts in the bag now (its card's have): Far Pond the fish its home city's ponds don't have. */
 export function haveForRequest(c: P0Content, s: P0State, r: BoardRequest): number {
-  if (r.where === 'not_home') return farFish(c).length ? haveFor(c, s, { kind: 'fish' }, farFish(c)) : 0;
+  if (r.where === 'not_home') return farFish(c, s).length ? haveFor(c, s, { kind: 'fish' }, farFish(c, s)) : 0;
   return haveFor(c, s, { kind: r.kind, rarity: r.rarity, style: r.style, family: r.family }, r.items);
 }
 
@@ -320,7 +328,7 @@ export function tracked(s: P0State): number {
 /** The bag units a board request would take now, or null when short. A visit takes nothing: it is ready once checked in. */
 export function handIn(c: P0Content, s: P0State, r: BoardRequest): [string, number][] | null {
   if (r.kind === 'visit') return r.visit?.done ? [] : null;
-  if (r.where === 'not_home') return farFish(c).length ? pick(c, s, { kind: 'fish' }, farFish(c), r.qty) : null;   // Far Pond: cheapest first
+  if (r.where === 'not_home') return farFish(c, s).length ? pick(c, s, { kind: 'fish' }, farFish(c, s), r.qty) : null;   // Far Pond: cheapest first
   if (r.items.length > 1) {   // Market Basket: N of each of the drawn crops
     const out: [string, number][] = [];
     for (const item of r.items) {
@@ -360,7 +368,7 @@ export function boardCommand(c: P0Content, s: P0State, type: 'accept' | 'deliver
     return null;
   }
   if (s.day.sys_done >= c.quotas.sys_requests.cap)
-    return { code: 'daily_limit', detail: { cap: c.quotas.sys_requests.cap, resets_in: untilRollover(c, now) } };
+    return { code: 'daily_limit', detail: { cap: c.quotas.sys_requests.cap, resets_in: untilRollover(c, s, now) } };
   const parts = handIn(c, s, r);
   if (!parts && r.kind === 'visit') return { code: 'not_visited', detail: { place: r.visit?.place ?? null } };
   if (!parts) {

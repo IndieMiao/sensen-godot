@@ -10,7 +10,7 @@ import { add } from './bag.js';
 import { itemName } from './content.js';
 import { putInStorage } from './storage.js';
 import { notePresence } from './presence.js';
-import { cityInfo, clusterById, homeCluster, noteEntered, preview, requirePass, settleHere } from './travel.js';
+import { cityInfo, clusterById, writtenCluster, noteEntered, preview, requirePass, settleHere } from './travel.js';
 import { noteVisit } from './boards.js';
 import { commandFields, uiEvent, type P0EventLog } from './telemetry.js';
 
@@ -53,7 +53,7 @@ export function registerP0Routes(app: FastifyInstance, deps: P0RouteDeps): void 
     const player = playerOf(req.headers);
     if (!player) return reply.code(400).send({ ok: false, code: 'bad_player' });
     const cluster = String((req.params as { cluster?: unknown }).cluster ?? '');
-    if (!/^gn-\d{1,12}$/.test(cluster) || (!clusterById(c, cluster) && cluster !== homeCluster(c))) return reply.code(404).send({ ok: false, code: 'unknown_city' });
+    if (!/^gn-\d{1,12}$/.test(cluster) || (!clusterById(c, cluster) && cluster !== writtenCluster(c))) return reply.code(404).send({ ok: false, code: 'unknown_city' });
     const s = store.get(player, deps.now());
     // The generator's place details (SGODOT-280: ponds and outposts with their points and art) go out here, per city, and
     // never in the state view; the home city's hand-written places are in the client already.

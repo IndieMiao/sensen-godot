@@ -148,7 +148,7 @@ describe('P0 rest and player day (§3.4.3 / §3.1.1)', () => {
     expect(s.energy.value).toBe(160);
     expect(applyP0(c, s, { type: 'rest' }, T0 + H)).toMatchObject({ ok: false, code: 'rest_used' });
     const nextDay = T0 + 18 * H + MIN; // past 04:00 Shanghai
-    expect(dayKey(c, nextDay)).not.toBe(dayKey(c, T0));
+    expect(dayKey(c, null, nextDay)).not.toBe(dayKey(c, null, T0));
     s.energy = { value: 50, tick_ms: nextDay };
     expect(applyP0(c, s, { type: 'rest' }, nextDay).ok).toBe(true);
   });

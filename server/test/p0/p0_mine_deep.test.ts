@@ -209,7 +209,7 @@ describe('the elite, Run complete and quartz once a day (§13.3.4)', () => {
     const s = fresh();
     const run = step(s, { type: 'mine_enter' }, T0).s.mine.run!;
     const tally = (kills: number) => {
-      s.mine.elite = kills ? { day: dayKey(c, T0), kills } : undefined;
+      s.mine.elite = kills ? { day: dayKey(c, s, T0), kills } : undefined;
       const n: Record<string, number> = {};
       for (let seed = 0; seed < 4000; seed++) {
         const [id] = mobLoot(c, s, { ...run, seed }, 5, 0, T0)!;
@@ -230,7 +230,7 @@ describe('the elite, Run complete and quartz once a day (§13.3.4)', () => {
     ({ s, t } = clear(s, 4, t));
     s = step(s, { type: 'mine_floor', floor: 5, ...IN }, t += STEP).s;
     ({ s, t } = kill(s, 5, 0, t));
-    expect(s.mine.elite).toEqual({ day: dayKey(c, t), kills: 1 });
+    expect(s.mine.elite).toEqual({ day: dayKey(c, s, t), kills: 1 });
     expect(viewOf(c, s, t).mine.elite_quartz_today).toBe(false);
     expect(viewOf(c, s, T0 + 20 * H).mine.elite_quartz_today).toBe(true);   // past 04:00
   });
@@ -296,7 +296,7 @@ describe('Express (§13.3.1, §13.3.9)', () => {
   it('a third run of the day by Express is refused (no_runs)', () => {
     const s = fresh();
     s.mine.express = true;
-    s.day = { ...s.day, key: dayKey(c, T0), mine_runs: 2 };
+    s.day = { ...s.day, key: dayKey(c, s, T0), mine_runs: 2 };
     expect(refuse(s, { type: 'mine_express', space: 'home' }, T0).code).toBe('no_runs');
   });
 });

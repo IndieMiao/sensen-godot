@@ -77,7 +77,7 @@ describe('Barter (§8.4.5)', () => {
 
   it('a Gifted stack never goes: not counted, not taken', () => {
     const s = at(4);
-    s.bag = [{ id: 'crop_pumpkin', qty: 5, gift: { from: 'res_pip', day: dayKey(c, T0) } } as never, { id: 'crop_pumpkin', qty: 1 }];
+    s.bag = [{ id: 'crop_pumpkin', qty: 5, gift: { from: 'res_pip', day: dayKey(c, s, T0) } } as never, { id: 'crop_pumpkin', qty: 1 }];
     expect(barterView(s).items).toEqual(expect.arrayContaining([{ id: 'crop_pumpkin', name: 'Pumpkin', have: 1 }]));
     expect(run(s, trade('stone'))).toMatchObject({ ok: false, code: 'not_enough', detail: { item: 'crop_pumpkin', need: 2, have: 1 } });
     s.bag.push({ id: 'crop_pumpkin', qty: 1 });
