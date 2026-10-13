@@ -1118,6 +1118,182 @@
       "runtime_opacity_normal": 0.25,
       "runtime_opacity_inside": 0.1,
       "material_note": "Duplicate FarmArt.material() for alpha at runtime; single-sided outward geometry. No baked transparency or reflection."
+    },
+    "chef_sign_a": {
+      "triangles": 1362,
+      "surfaces": 1,
+      "bytes": 78228,
+      "bounds_blender": [
+        [
+          -0.582,
+          -0.13,
+          0.0
+        ],
+        [
+          0.13,
+          0.13,
+          1.74
+        ]
+      ],
+      "bounds": [
+        [
+          -0.582,
+          0.0,
+          -0.13
+        ],
+        [
+          0.13,
+          1.74,
+          0.13
+        ]
+      ],
+      "generator": "tools/art/build_chef_sign.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 1500,
+      "pivot": "post foot bottom centre",
+      "sockets": {
+        "board_center": {
+          "position": [
+            -0.332,
+            1.285,
+            0
+          ],
+          "front": "+Z"
+        }
+      },
+      "front": "+Z",
+      "footprint": 0.65,
+      "board_bottom": 1.06,
+      "board_size": [
+        0.5,
+        0.45,
+        0.05
+      ],
+      "board_center": [
+        -0.332,
+        1.285,
+        0
+      ],
+      "collider": {
+        "shape": "box",
+        "at": [
+          0,
+          0.87,
+          0
+        ],
+        "size": [
+          0.28,
+          1.74,
+          0.28
+        ]
+      },
+      "collision_note": "Post and foot only; suspended board/arm have no collision.",
+      "placement_note": "v1.3 anchor (5,14), -X arm / +Z front / positive scale. Runtime +X offset about 0.18 m is NOT baked into model: leaves 0.077 m board intrusion into path (4,14). Integrator checks bench/click overlap; reduce offset if necessary per spec.",
+      "arm_direction": "-X",
+      "overhang_bounds": [
+        [
+          -0.582,
+          1.06,
+          -0.025
+        ],
+        [
+          -0.082,
+          1.51,
+          0.035
+        ]
+      ],
+      "variant": "warm wood foot"
+    },
+    "chef_sign_b": {
+      "triangles": 1450,
+      "surfaces": 1,
+      "bytes": 85668,
+      "bounds_blender": [
+        [
+          -0.582,
+          -0.14,
+          0.0
+        ],
+        [
+          0.14,
+          0.14,
+          1.74
+        ]
+      ],
+      "bounds": [
+        [
+          -0.582,
+          0.0,
+          -0.14
+        ],
+        [
+          0.14,
+          1.74,
+          0.14
+        ]
+      ],
+      "generator": "tools/art/build_chef_sign.py",
+      "footprint_cells": [
+        1,
+        1
+      ],
+      "triangle_limit": 1500,
+      "pivot": "post foot bottom centre",
+      "sockets": {
+        "board_center": {
+          "position": [
+            -0.332,
+            1.285,
+            0
+          ],
+          "front": "+Z"
+        }
+      },
+      "front": "+Z",
+      "footprint": 0.65,
+      "board_bottom": 1.06,
+      "board_size": [
+        0.5,
+        0.45,
+        0.05
+      ],
+      "board_center": [
+        -0.332,
+        1.285,
+        0
+      ],
+      "collider": {
+        "shape": "box",
+        "at": [
+          0,
+          0.87,
+          0
+        ],
+        "size": [
+          0.28,
+          1.74,
+          0.28
+        ]
+      },
+      "collision_note": "Post and foot only; suspended board/arm have no collision.",
+      "placement_note": "v1.3 anchor (5,14), -X arm / +Z front / positive scale. Runtime +X offset about 0.18 m is NOT baked into model: leaves 0.077 m board intrusion into path (4,14). Integrator checks bench/click overlap; reduce offset if necessary per spec.",
+      "arm_direction": "-X",
+      "overhang_bounds": [
+        [
+          -0.582,
+          1.06,
+          -0.025
+        ],
+        [
+          -0.082,
+          1.51,
+          0.035
+        ]
+      ],
+      "variant": "three pale grey stone foot blocks"
     }
   }
 }
