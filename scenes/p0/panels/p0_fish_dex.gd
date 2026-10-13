@@ -164,6 +164,7 @@ static func _milestone_coins(kinds: int) -> int:
 ## otherwise only the rod's reach, which is what holds the rest back (P0's eight fish never reach 10 kinds; no
 ## "N more to find", the NeedTile already says it — 不知火舞 233 walkthrough).
 static func _next_line(view: Dictionary, got: int, total: int) -> Array:
+	if total > 0 and got >= total and _badge(got) != "": return [_badge(got), ""]   # all found: the badge, not the rod
 	for m in P0Logic.content().get("rewards", {}).get("fishdex", []):
 		if int(m[0]) > got and int(m[0]) <= total:
 			var coins := _milestone_coins(int(m[0]))   # P1: the coins with it (§6.9.2)
@@ -218,7 +219,7 @@ func _fish_cell(f: Dictionary) -> Control:
 		hint.name = "Signpost"
 		hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		hint.max_lines_visible = 2
+		hint.max_lines_visible = 3   # `Coast · dawn & dusk · Lv1` takes three in a 52 cell; never cut
 		hint.custom_minimum_size.x = UiTokens.SIZE_INVENTORY_CELL
 		box.add_child(hint)
 	return box

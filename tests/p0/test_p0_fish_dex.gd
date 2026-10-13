@@ -201,6 +201,7 @@ func test_the_complete_dex_shows_its_badge_by_the_heading() -> void:
 	v.fishing.dex = []
 	for i in 20: v.fishing.dex.append({"id": "fish_x%d" % i, "rarity": 1, "level": 1, "caught": 1})
 	assert_str(P0FishDex.dex_data(v).badge).is_equal("Fish-dex complete")
+	assert_array(P0FishDex.dex_data(v).next).is_equal(["Fish-dex complete", ""])   # all found: no rod line under it
 	ui.set_view(v)
 	ui.open_fishdex()
 	await await_idle_frame()
