@@ -498,8 +498,8 @@
    ]
   },
   "home": {
-   "_note": "Choosing a home (SGODOT-303, q(160)–q(161)). cities: the open list beyond the written city (San Francisco is always open), the first step's hand-checked cities, each of M1 tier and up with a full home set; spot: 3 spots round the beginner pond, pond_km from it, apart_km between them, scatter_m per player (the 300 m from outposts and ponds is placement.farm_exclusion_m); change: one free change within days of the account or before Homestead before_level. Read by server/src/p0/home_city.ts.",
-   "cities": [],
+   "_note": "Choosing a home (SGODOT-303, q(160)–q(161)). cities: the open list beyond the written city (San Francisco is always open), the first step's hand-checked cities (temperate New York City, London, Tokyo; subtropical Los Angeles, Miami, Shanghai; tropical Singapore, Mexico City, Hong Kong; cool Stockholm, Copenhagen, Helsinki), each of M1 tier and up with a full home set; spot: 3 spots round the beginner pond, pond_km from it, apart_km between them, scatter_m per player (the 300 m from outposts and ponds is placement.farm_exclusion_m); change: one free change within days of the account or before Homestead before_level. Read by server/src/p0/home_city.ts.",
+   "cities": ["gn-5128581", "gn-2643743", "gn-1850147", "gn-5368361", "gn-4164138", "gn-1796236", "gn-1880252", "gn-3530597", "gn-1819729", "gn-2673730", "gn-2618425", "gn-658225"],
    "spot": { "pond_km": [0.5, 3], "apart_km": 1, "scatter_m": [100, 200] },
    "change": { "days": 7, "before_level": 2 }
   },

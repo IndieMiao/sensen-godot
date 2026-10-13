@@ -1,0 +1,228 @@
+{
+ "_note": "Farm spots for the home pick (SGODOT-303, q(160) ②): per open city, 3 base spots on built-up land ≥ 250 m from water, with district names (Mapbox). Made by server/tools/home_spots.ts run; read by server/src/p0/home_city.ts.",
+ "seed": "journey-p1-world-20261010-v1",
+ "revision": 2,
+ "cities": {
+  "gn-1796236": [
+   {
+    "lat": 31.195007,
+    "lng": 121.445629,
+    "hood": "Xujiahui"
+   },
+   {
+    "lat": 31.208589,
+    "lng": 121.424934,
+    "hood": "Niuqiaobang"
+   },
+   {
+    "lat": 31.216707,
+    "lng": 121.447849,
+    "hood": "Nanjing Xilu"
+   }
+  ],
+  "gn-1819729": [
+   {
+    "lat": 22.275756,
+    "lng": 114.158016,
+    "hood": "Mid-Levels"
+   },
+   {
+    "lat": 22.285645,
+    "lng": 114.140358,
+    "hood": "Sai Ying Pun"
+   },
+   {
+    "lat": 22.297931,
+    "lng": 114.170766,
+    "hood": "Tsim Sha Tsui"
+   }
+  ],
+  "gn-1850147": [
+   {
+    "lat": 35.669565,
+    "lng": 139.720996,
+    "hood": "Minami Aoyama"
+   },
+   {
+    "lat": 35.684863,
+    "lng": 139.703956,
+    "hood": "Sendagaya"
+   },
+   {
+    "lat": 35.691093,
+    "lng": 139.726646,
+    "hood": "Katamachi"
+   }
+  ],
+  "gn-1880252": [
+   {
+    "lat": 1.29881,
+    "lng": 103.842131,
+    "hood": "Oxley"
+   },
+   {
+    "lat": 1.289176,
+    "lng": 103.821465,
+    "hood": "Henderson Hill"
+   },
+   {
+    "lat": 1.310208,
+    "lng": 103.824235,
+    "hood": "Lady Hill Park"
+   }
+  ],
+  "gn-2618425": [
+   {
+    "lat": 55.637189,
+    "lng": 12.57976,
+    "hood": "Elmegården"
+   },
+   {
+    "lat": 55.65571,
+    "lng": 12.54109,
+    "hood": "Sydhavnen"
+   },
+   {
+    "lat": 55.662419,
+    "lng": 12.578804,
+    "hood": "Ballonparken"
+   }
+  ],
+  "gn-2643743": [
+   {
+    "lat": 51.518024,
+    "lng": -0.072142,
+    "hood": "Spitalfields"
+   },
+   {
+    "lat": 51.50553,
+    "lng": -0.100816,
+    "hood": "Southwark"
+   },
+   {
+    "lat": 51.525874,
+    "lng": -0.104338,
+    "hood": "Clerkenwell"
+   }
+  ],
+  "gn-2673730": [
+   {
+    "lat": 59.317127,
+    "lng": 18.032706,
+    "hood": "Hornstull"
+   },
+   {
+    "lat": 59.335872,
+    "lng": 18.003443,
+    "hood": "Kristineberg"
+   },
+   {
+    "lat": 59.340771,
+    "lng": 18.042392,
+    "hood": "Sabbatsberg"
+   }
+  ],
+  "gn-3530597": [
+   {
+    "lat": 19.431993,
+    "lng": -99.107006,
+    "hood": "Miguel Hidalgo"
+   },
+   {
+    "lat": 19.41415,
+    "lng": -99.093758,
+    "hood": "Ignacio Zaragoza"
+   },
+   {
+    "lat": 19.412251,
+    "lng": -99.116767,
+    "hood": "Álvaro Obregón"
+   }
+  ],
+  "gn-4164138": [
+   {
+    "lat": 25.802309,
+    "lng": -80.216748,
+    "hood": "Civic Center"
+   },
+   {
+    "lat": 25.791418,
+    "lng": -80.195796,
+    "hood": "Wynwood"
+   },
+   {
+    "lat": 25.78038,
+    "lng": -80.218348,
+    "hood": "Grapeland"
+   }
+  ],
+  "gn-5128581": [
+   {
+    "lat": 40.720905,
+    "lng": -74.037583,
+    "hood": "Newport"
+   },
+   {
+    "lat": 40.740148,
+    "lng": -74.005649,
+    "hood": "Meatpacking District"
+   },
+   {
+    "lat": 40.722969,
+    "lng": -73.999575,
+    "hood": "SoHo"
+   }
+  ],
+  "gn-5368361": [
+   {
+    "lat": 34.032403,
+    "lng": -118.278411,
+    "hood": "Saint James Park"
+   },
+   {
+    "lat": 34.052872,
+    "lng": -118.26942,
+    "hood": "Westlake"
+   },
+   {
+    "lat": 34.036186,
+    "lng": -118.252523,
+    "hood": "Fashion District"
+   }
+  ],
+  "gn-5391959": [
+   {
+    "lat": 37.752817,
+    "lng": -122.41498,
+    "hood": "Mission District"
+   },
+   {
+    "lat": 37.753227,
+    "lng": -122.440856,
+    "hood": "Noe Valley"
+   },
+   {
+    "lat": 37.772044,
+    "lng": -122.425694,
+    "hood": "Hayes Valley"
+   }
+  ],
+  "gn-658225": [
+   {
+    "lat": 60.178571,
+    "lng": 24.917593,
+    "hood": "Töölö"
+   },
+   {
+    "lat": 60.201258,
+    "lng": 24.907475,
+    "hood": "Vanha Ruskeasuo"
+   },
+   {
+    "lat": 60.190956,
+    "lng": 24.947285,
+    "hood": "Alppiharju"
+   }
+  ]
+ }
+}
