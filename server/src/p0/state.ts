@@ -2,7 +2,7 @@
 import type { Family, P0Content, Skill } from './content.js';
 import { maxEnergy } from './rules.js';
 import { addPlots } from './garden.js';
-import { clusterOf, clusterOfCityName, freshTravel, homeCluster, type TravelState } from './travel.js';
+import { clusterOf, clusterOfCityName, fallbackOf, freshTravel, writtenCluster, type TravelState } from './travel.js';
 import { placeOf } from './world.js';
 
 export type PlotState = 'wild' | 'tilled' | 'sown' | 'growing';
@@ -289,14 +289,15 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
     s.firsts = [...new Set(s.firsts)];
   }
   s.travel ??= freshTravel(c);   // a v5 save from a build without the block cannot exist, but never read one without it
-  // Until players choose a home (P2 second version), everyone's home is the content's city: a moved home moves saves
-  // home too (as SGODOT-270 did), and the frozen fallback list is made again for it (§11.2.3 "换城后重算一次").
-  if (s.travel.home !== homeCluster(c)) {
+  // Until players choose a home (SGODOT-303), everyone's home is the written city (the content's): a moved written city
+  // moves saves home too (as SGODOT-270 did), and the frozen fallback list is made again for it (§11.2.3 "换城后重算一次").
+  // Everything else reads the save's home (home.ts), so letting a chosen home stay is the one change left here.
+  if (s.travel.home !== writtenCluster(c)) {
     const fresh = freshTravel(c);
     s.travel.home = fresh.home; s.travel.here = fresh.home; s.travel.fallback = fresh.fallback;
   }
   if (!s.travel.fallback.near10.length) {   // made before the cluster table was there: fill it once it is (§11.2.3)
-    const f = freshTravel(c).fallback;
+    const f = fallbackOf(c, s.travel.home);
     if (f.near10.length) s.travel.fallback = f;
   }
   s.req_done ??= [];

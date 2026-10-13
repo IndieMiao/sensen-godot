@@ -3,8 +3,9 @@
  * Save v5 adds the travel block; the shape and the error codes follow 亚瑟's technical note (275, comment 0fc0bc5e):
  * every key is a city cluster id (`gn-<GeoNames id>` of the cluster's seed city, San Francisco gn-5391959).
  */
-import type { CityClusters, CityCluster } from './clusters.js';
+import type { CityClusters } from './clusters.js';
 import type { P0Content } from './content.js';
+import { clusterById, clustersOf as clusters, HOME_ALIAS, homeFacts, writtenCluster, type Homed } from './home.js';
 import { gainEnergy, grantOnce, type P0Event } from './progress.js';
 import { dayKey, maxEnergy } from './rules.js';
 import type { P0State } from './state.js';
@@ -22,20 +23,12 @@ export interface TravelState {
   explorer: number;                              // the highest Explorer medal granted: 0 / 3 / 10 / 30 / 100
 }
 
-export const HOME_ALIAS: Record<string, string> = { 'san francisco': 'gn-5391959', shanghai: 'gn-1796236', 'los angeles': 'gn-5368361' };
 const DAY_PASS_MS = 24 * 3_600_000;
 const FIRST_VISIT_ENERGY = 10;
 const FIRST_VISITS_PER_DAY = 2;
 const EXPLORER: [number, number][] = [[3, 30], [10, 50], [30, 70], [100, 100]];
 
-type WithClusters = P0Content & { clusters?: CityClusters };
-
-/** The frozen city clusters (亚瑟's CityClusters, assets/p0/city_clusters.json), attached by loadP0Content. */
-const clusters = (c: P0Content) => (c as WithClusters).clusters;
-export const clusterById = (c: P0Content, id: string): CityCluster | undefined => clusters(c)?.get(id);
-
-/** The home cluster of this content's profile (regions.json alias → gn- id). */
-export const homeCluster = (c: P0Content): string => HOME_ALIAS[c.profile.city.toLowerCase()] ?? `city:${c.profile.city.toLowerCase()}`;
+export { clusterById, HOME_ALIAS, homeOf, writtenCluster } from './home.js';
 
 /** A city name a save or a place used before v5 (`san francisco`) → its cluster. */
 export const clusterOfCityName = (c: P0Content, city: string): string | null => {
@@ -56,13 +49,7 @@ export function clusterOf(c: P0Content, place: string): string | null {
   if (!known) return null;
   if (known.cluster) return known.cluster;
   if (pond?.city) return clusterOfCityName(c, pond.city);
-  return homeCluster(c);   // a hand-written outpost without its cluster field yet: the home city's
-}
-
-function farmPoint(c: P0Content): { lat: number; lng: number } | null {
-  if (c.profile.farm_at) return { lat: c.profile.farm_at[0], lng: c.profile.farm_at[1] };
-  const h = clusterById(c, homeCluster(c));
-  return h ? { lat: h.lat, lng: h.lng } : null;
+  return writtenCluster(c);   // a hand-written outpost without its cluster field yet: the written city's
 }
 
 const ranks = new WeakMap<CityClusters, Map<string, { id: string; km: number; trip: number }[]>>();
@@ -72,7 +59,7 @@ const ranks = new WeakMap<CityClusters, Map<string, { id: string; km: number; tr
  * Cached per home and fallback; empty without the clusters table.
  */
 export function rankedCities(c: P0Content, s: P0State): { id: string; km: number; trip: number }[] {
-  const at = farmPoint(c), cl = clusters(c);
+  const at = homeFacts(c, s).farm, cl = clusters(c);
   if (!at || !cl) return [];
   let byHome = ranks.get(cl);
   if (!byHome) ranks.set(cl, byHome = new Map());
@@ -87,15 +74,17 @@ export function rankedCities(c: P0Content, s: P0State): { id: string; km: number
   return list;
 }
 
-/** §11.2.3: frozen into the save when the block is made (CityClusters.fallback); empty without the table. */
-export function fallbackOf(c: P0Content): { near3: string[]; near10: string[] } {
-  const at = farmPoint(c), cl = clusters(c);
-  return at && cl ? cl.fallback(homeCluster(c), at) : { near3: [], near10: [] };
+/** §11.2.3: frozen into the save when the block is made (CityClusters.fallback), for its home farm; empty without the
+ * table. */
+export function fallbackOf(c: P0Content, home: string): { near3: string[]; near10: string[] } {
+  const at = homeFacts(c, { travel: { home } }).farm, cl = clusters(c);
+  return at && cl ? cl.fallback(home, at) : { near3: [], near10: [] };
 }
 
+/** A new save's travel block: home is the written city until players choose one (SGODOT-303). */
 export const freshTravel = (c: P0Content): TravelState => {
-  const home = homeCluster(c);
-  return { home, here: home, passes: {}, visits: {}, stamps: [], fallback: fallbackOf(c), explorer: 0 };
+  const home = writtenCluster(c);
+  return { home, here: home, passes: {}, visits: {}, stamps: [], fallback: fallbackOf(c, home), explorer: 0 };
 };
 
 /** The climate zone (`Temperate`, as profile.climate) of a place's city, or of the city the player is in; home's when
@@ -107,7 +96,7 @@ export function climateAt(c: P0Content, s: P0State, place?: unknown): string {
 
 /** The farm's climate zone: its home city's (the farm never travels; 哪吒 on #235: not profile.climate, once a home
  * may be another city). */
-export const homeClimate = (c: P0Content, s?: P0State): string => climateOfCluster(c, s?.travel?.home);
+export const homeClimate = (c: P0Content, s?: Homed): string => homeFacts(c, s).climate;
 
 function climateOfCluster(c: P0Content, cluster: string | null | undefined): string {
   const z = cluster ? clusterById(c, cluster)?.climate : undefined;
@@ -116,7 +105,7 @@ function climateOfCluster(c: P0Content, cluster: string | null | undefined): str
 
 /** Distance from the home farm and the Trip band, by CityClusters.trip (the same rule as the client's P0Clusters). */
 export function tripOf(c: P0Content, s: P0State, cluster: string): { km: number; trip: number; name: string } {
-  const at = farmPoint(c), cl = clusters(c);
+  const at = homeFacts(c, s).farm, cl = clusters(c);
   if (!at || !cl?.get(cluster)) return { km: 0, trip: 1, name: 'Local' };
   return cl.trip(cluster, s.travel.home, at, s.travel.fallback);
 }
@@ -149,13 +138,13 @@ export function utcOffsetMin(zone: string | undefined, now: number): number | nu
   } catch { return null; }
 }
 
-/** A city's places for GET /v1/p0/city/:cluster and the silhouette card. Shell: home returns the hand-written tables;
+/** A city's places for GET /v1/p0/city/:cluster and the silhouette card. Shell: the written city returns the hand-written tables;
  * generated cities come from 后裔's cityPlaces(cluster) (SGODOT-280) once it lands. */
 export interface CityInfo { ponds: string[]; outposts: string[]; residents: number; fish: { fish: string; level: number }[]; detail?: unknown }
 export function cityInfo(c: P0Content, cluster: string): CityInfo {
   const gen = (c as P0Content & { cityPlaces?: (id: string) => CityInfo }).cityPlaces;
-  if (cluster !== homeCluster(c) && gen) return gen(cluster);
-  if (cluster !== homeCluster(c)) return { ponds: [], outposts: [], residents: 0, fish: [] };
+  if (cluster !== writtenCluster(c) && gen) return gen(cluster);
+  if (cluster !== writtenCluster(c)) return { ponds: [], outposts: [], residents: 0, fish: [] };
   const ponds = Object.keys(c.fishing.places).filter(id => clusterOf(c, id) === cluster);
   const outposts = (c.outposts ?? []).filter(o => clusterOf(c, o.id) === cluster);
   return { ponds, outposts: outposts.map(o => o.id), residents: new Set(outposts.flatMap(o => o.residents)).size, fish: [] };
@@ -202,7 +191,7 @@ export function travel(c: P0Content, s: P0State, to: unknown, now: number, event
   t.here = to;
   let stamp: TravelStamp | null = null, energy = 0;
   if (first && !t.stamps.some(x => x.cluster === to)) {
-    const today = dayKey(c, now);
+    const today = dayKey(c, s, now);
     const countedToday = t.stamps.filter(x => x.counted_on === today).length;
     // Days already filled push the stamp to the next day with room (2 a day, §11.9.2).
     let on = today;
@@ -222,7 +211,7 @@ export function travel(c: P0Content, s: P0State, to: unknown, now: number, event
 /** Explorer medals (§11.9.2) by the stamps counted up to today: after travel, and on any command, so a stamp
  * pushed to tomorrow earns its medal tomorrow without another trip (亚瑟 on #206). */
 export function settleExplorer(c: P0Content, s: P0State, now: number, events: P0Event[]): void {
-  const today = dayKey(c, now);
+  const today = dayKey(c, s, now);
   const counted = s.travel.stamps.filter(x => x.counted_on <= today).length;
   for (const [n, e] of EXPLORER) {
     if (counted < n || s.travel.explorer >= n) continue;
@@ -262,7 +251,7 @@ export function returnHome(s: P0State): void { s.travel.here = s.travel.home; }
 export function noteDelivery(c: P0Content, s: P0State, now: number, city: string = s.travel.here): void {
   const v = s.travel.visits[city];
   if (city === s.travel.home || !v || !covers(s, city, now)) return;
-  const today = dayKey(c, now);
+  const today = dayKey(c, s, now);
   if (v.delivered_day === today) return;
   v.delivered_day = today; v.deliveries += 1;
 }

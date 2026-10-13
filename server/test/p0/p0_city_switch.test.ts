@@ -22,34 +22,34 @@ const H = 3_600_000;
 
 describe('the 04:00 rollover in the home time zone (SGODOT-270)', () => {
   it('San Francisco: the player day turns at 04:00 Pacific time', () => {
-    expect(dayKey(sf, Date.UTC(2026, 9, 9, 10, 59))).toBe('2026-10-08');   // 03:59 PDT
-    expect(dayKey(sf, Date.UTC(2026, 9, 9, 11, 0))).toBe('2026-10-09');    // 04:00 PDT
-    expect(untilRollover(sf, Date.UTC(2026, 9, 9, 14))).toBe(21 * H);       // 07:00 PDT → 04:00 tomorrow
+    expect(dayKey(sf, null, Date.UTC(2026, 9, 9, 10, 59))).toBe('2026-10-08');   // 03:59 PDT
+    expect(dayKey(sf, null, Date.UTC(2026, 9, 9, 11, 0))).toBe('2026-10-09');    // 04:00 PDT
+    expect(untilRollover(sf, null, Date.UTC(2026, 9, 9, 14))).toBe(21 * H);       // 07:00 PDT → 04:00 tomorrow
   });
 
   it('follows daylight saving: 04:00 PDT before 1 November, 04:00 PST after; 14 March 2027 back to PDT', () => {
-    expect(rolloverAfter(sf, '2026-10-30')).toBe(Date.UTC(2026, 9, 31, 11));   // 04:00 PDT = 11:00 UTC
-    expect(rolloverAfter(sf, '2026-10-31')).toBe(Date.UTC(2026, 10, 1, 12));   // DST ends 02:00 → 04:00 PST = 12:00 UTC
-    expect(untilRollover(sf, Date.UTC(2026, 10, 1, 8))).toBe(4 * H);          // 01:00 PDT, before the switch: 25 h day
-    expect(rolloverAfter(sf, '2027-03-13')).toBe(Date.UTC(2027, 2, 14, 11));   // DST starts 02:00 → 04:00 PDT = 11:00 UTC
-    expect(dayKey(sf, Date.UTC(2026, 10, 1, 11, 30))).toBe('2026-10-31');     // 03:30 PST: still the 31st's day
-    expect(dayKey(sf, Date.UTC(2026, 10, 1, 12))).toBe('2026-11-01');
+    expect(rolloverAfter(sf, null, '2026-10-30')).toBe(Date.UTC(2026, 9, 31, 11));   // 04:00 PDT = 11:00 UTC
+    expect(rolloverAfter(sf, null, '2026-10-31')).toBe(Date.UTC(2026, 10, 1, 12));   // DST ends 02:00 → 04:00 PST = 12:00 UTC
+    expect(untilRollover(sf, null, Date.UTC(2026, 10, 1, 8))).toBe(4 * H);          // 01:00 PDT, before the switch: 25 h day
+    expect(rolloverAfter(sf, null, '2027-03-13')).toBe(Date.UTC(2027, 2, 14, 11));   // DST starts 02:00 → 04:00 PDT = 11:00 UTC
+    expect(dayKey(sf, null, Date.UTC(2026, 10, 1, 11, 30))).toBe('2026-10-31');     // 03:30 PST: still the 31st's day
+    expect(dayKey(sf, null, Date.UTC(2026, 10, 1, 12))).toBe('2026-11-01');
   });
 
   it('without a time zone the fixed offset still applies (Shanghai, UTC+8)', () => {
     const sh: P0Content = { ...shanghai, profile: { ...shanghai.profile, timezone: undefined } };
-    expect(dayKey(sh, Date.UTC(2026, 9, 8, 19, 59))).toBe('2026-10-08');   // 03:59 CST
-    expect(dayKey(sh, Date.UTC(2026, 9, 8, 20, 0))).toBe('2026-10-09');    // 04:00 CST
-    expect(rolloverAfter(sh, '2026-10-09')).toBe(Date.UTC(2026, 9, 9, 20));
+    expect(dayKey(sh, null, Date.UTC(2026, 9, 8, 19, 59))).toBe('2026-10-08');   // 03:59 CST
+    expect(dayKey(sh, null, Date.UTC(2026, 9, 8, 20, 0))).toBe('2026-10-09');    // 04:00 CST
+    expect(rolloverAfter(sh, null, '2026-10-09')).toBe(Date.UTC(2026, 9, 9, 20));
   });
 
   it('switching between 19:00 and 04:00 Beijing time keeps today\'s key (no extra daily reset)', () => {
     const sh = withZone('Asia/Shanghai');
     for (const h of [11, 14, 19.99]) {   // UTC hours: 19:00, 22:00 and 03:59 Beijing
       const t = Date.UTC(2026, 9, 9) + h * H;
-      expect(dayKey(sf, t)).toBe(dayKey(sh, t));
+      expect(dayKey(sf, null, t)).toBe(dayKey(sh, null, t));
     }
-    expect(dayKey(sf, Date.UTC(2026, 9, 9, 21))).not.toBe(dayKey(sh, Date.UTC(2026, 9, 9, 21)));   // 05:00 Beijing: differs
+    expect(dayKey(sf, null, Date.UTC(2026, 9, 9, 21))).not.toBe(dayKey(sh, null, Date.UTC(2026, 9, 9, 21)));   // 05:00 Beijing: differs
   });
 });
 

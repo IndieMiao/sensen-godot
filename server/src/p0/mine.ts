@@ -41,9 +41,9 @@ const FROM_OUTSIDE = new Set(['mine_enter', 'mine_new_run', 'mine_express']);
  */
 export function settleMine(c: P0Content, s: P0State, now: number): void {
   const run = s.mine.run;
-  if (run && run.day !== dayKey(c, now)) {
+  if (run && run.day !== dayKey(c, s, now)) {
     s.mine.run = null;
-    s.mine.ended = { reason: 'reset', at: rolloverAfter(c, run.day) };
+    s.mine.ended = { reason: 'reset', at: rolloverAfter(c, s, run.day) };
   }
 }
 
@@ -109,7 +109,7 @@ export function rockDrop(c: P0Content, s: P0State, run: MineRun, floor: number, 
 
 /** Elite kills so far this player day (its quartz drops on the first, §13.3.4). */
 function eliteKillsToday(c: P0Content, s: P0State, now: number): number {
-  return s.mine.elite?.day === dayKey(c, now) ? s.mine.elite.kills : 0;
+  return s.mine.elite?.day === dayKey(c, s, now) ? s.mine.elite.kills : 0;
 }
 
 /**
@@ -151,7 +151,7 @@ function newRun(c: P0Content, s: P0State, now: number, express: boolean): MineRu
   const seed = createHash('sha256').update(`${s.player}:run:${id}`).digest().readUInt32BE(0);
   const last = c.mine.floors.length;
   const run: MineRun = {
-    id, seed, day: dayKey(c, now), hp: c.mine.combat.hp, ...(express ? { express: true } : {}),
+    id, seed, day: dayKey(c, s, now), hp: c.mine.combat.hp, ...(express ? { express: true } : {}),
     floors: c.mine.floors.map((def, i) => ({
       paid: express ? i + 1 === last : i === 0, broken: [], lit: false,
       mobs: (def.mobs ?? []).map(k => c.mine.monsters[k].hp),
@@ -165,7 +165,7 @@ function newRun(c: P0Content, s: P0State, now: number, express: boolean): MineRu
 
 function noRunsLeft(c: P0Content, s: P0State, now: number): Refusal | null {
   return s.day.mine_runs >= c.mine.runs_per_day
-    ? { code: 'no_runs', detail: { used: s.day.mine_runs, limit: c.mine.runs_per_day, resets_in: untilRollover(c, now) } } : null;
+    ? { code: 'no_runs', detail: { used: s.day.mine_runs, limit: c.mine.runs_per_day, resets_in: untilRollover(c, s, now) } } : null;
 }
 
 function startRun(c: P0Content, s: P0State, now: number, events: P0Event[]): Refusal | null {
@@ -311,7 +311,7 @@ function attack(c: P0Content, s: P0State, run: MineRun, n: number, cmd: { target
     const elite = !!c.mine.monsters[kinds[i]].once_a_day;
     const loot = mobLoot(c, s, run, n, i, now);   // judged before this kill counts toward the day
     if (elite) {
-      const day = dayKey(c, now);
+      const day = dayKey(c, s, now);
       s.mine.elite = { day, kills: eliteKillsToday(c, s, now) + 1 };
     }
     if (loot) giveLoot(c, s, loot[0], loot[1], events);
@@ -341,7 +341,7 @@ function attack(c: P0Content, s: P0State, run: MineRun, n: number, cmd: { target
 export function mineView(c: P0Content, s: P0State, now: number) {
   const run = s.mine.run;
   return {
-    runs: { used: s.day.mine_runs, limit: c.mine.runs_per_day, resets_in: untilRollover(c, now) },
+    runs: { used: s.day.mine_runs, limit: c.mine.runs_per_day, resets_in: untilRollover(c, s, now) },
     ended: s.mine.ended,
     completed: s.mine.completed ?? null,
     floor_energy: c.mine.floor_energy, rock_energy: c.mine.rock_energy, rocks: c.mine.rocks,

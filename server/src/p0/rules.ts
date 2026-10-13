@@ -1,5 +1,6 @@
 /** Pure P0 rules: energy (plan §3.1), levels (§4.5), level-difference XP (§4.2.1), player day (§3.1.1). */
 import type { P0Content, Skill } from './content.js';
+import { homeFacts, type Homed } from './home.js';
 import type { P0State } from './state.js';
 
 /** §8.3.2: 200 + 10 × (Homestead Lv − 1). */
@@ -78,12 +79,12 @@ export function scaledXp(s: P0State, base: number, percent: number): number {
 
 const zones = new Map<string, Intl.DateTimeFormat>();
 /**
- * The home city's UTC offset at an instant, in ms. content.profile.timezone (an IANA name, e.g. America/Los_Angeles)
- * follows daylight saving; without it the fixed day.utc_offset_hours applies (SGODOT-270: San Francisco moves between −7
- * and −8 hours).
+ * The player's home city's UTC offset at an instant, in ms. Its time zone (an IANA name, e.g. America/Los_Angeles: the
+ * written city's content.profile.timezone, another home's cluster's) follows daylight saving; without one the fixed
+ * day.utc_offset_hours applies (SGODOT-270: San Francisco moves between −7 and −8 hours; SGODOT-303: each home its own).
  */
-function homeOffset(c: P0Content, at: number): number {
-  const tz = c.profile.timezone;
+function homeOffset(c: P0Content, s: Homed, at: number): number {
+  const tz = homeFacts(c, s).timezone;
   if (!tz) return c.day.utc_offset_hours * 3_600_000;
   let f = zones.get(tz);
   if (!f) {
@@ -95,18 +96,18 @@ function homeOffset(c: P0Content, at: number): number {
 }
 
 /** Player day key: home-city time shifted back by the 04:00 rollover (§3.1.1). */
-export function dayKey(c: P0Content, now: number): string {
-  return new Date(now + homeOffset(c, now) - c.day.rollover_hour * 3_600_000).toISOString().slice(0, 10);
+export function dayKey(c: P0Content, s: Homed, now: number): string {
+  return new Date(now + homeOffset(c, s, now) - c.day.rollover_hour * 3_600_000).toISOString().slice(0, 10);
 }
 
 /** The home-time 04:00 that ends player day `day` (YYYY-MM-DD): the next day's rollover, as an instant. */
-export function rolloverAfter(c: P0Content, day: string): number {
+export function rolloverAfter(c: P0Content, s: Homed, day: string): number {
   const local = Date.parse(`${day}T00:00:00Z`) + 86_400_000 + c.day.rollover_hour * 3_600_000;   // 04:00 the next day, home clock
-  const guess = local - homeOffset(c, local);
-  return local - homeOffset(c, guess);   // the offset in force at that moment (04:00 is clear of the 02:00 DST switch)
+  const guess = local - homeOffset(c, s, local);
+  return local - homeOffset(c, s, guess);   // the offset in force at that moment (04:00 is clear of the 02:00 DST switch)
 }
 
 /** Milliseconds until the next 04:00 rollover. */
-export function untilRollover(c: P0Content, now: number): number {
-  return rolloverAfter(c, dayKey(c, now)) - now;
+export function untilRollover(c: P0Content, s: Homed, now: number): number {
+  return rolloverAfter(c, s, dayKey(c, s, now)) - now;
 }

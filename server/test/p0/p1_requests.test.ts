@@ -150,7 +150,7 @@ describe('regional templates (§9.6.3; drawn only once one of their items can be
 
   it('home climate, home city and other climates pick their own items', () => {
     const k = opened();
-    const pools = (need: Parameters<typeof regionalPool>[1]) => regionalPool(k, need);
+    const pools = (need: Parameters<typeof regionalPool>[2]) => regionalPool(k, null, need);
     expect(pools({ kind: 'crop', regional: 'zone' })).toEqual(['crop_pumpkin']);   // San Francisco is Temperate
     expect(pools({ kind: 'fish', regional: 'city' })).toEqual(['fish_arctic_char', 'fish_salmon']);   // San Francisco's two (q(109))
     expect(pools({ kind: 'crop', regional: 'other_zone' })).toEqual([]);            // the other climates' seeds are not on sale here
