@@ -362,3 +362,32 @@ func test_keeper_portrait_cache_is_bounded() -> void:
 	assert_int(portraits.kept(false)).is_less_equal(24)
 	assert_object(first).is_not_null()   # still valid for whoever shows it
 	assert_object(P0CounterDrawer.keeper_portrait("Ezra", true, str(looks[0]))).is_not_same(first)   # evicted: drawn again
+
+## 不知火舞 on #339: the card's figure is 84–88 % of its height, the shoes 10–14 px (of the 220) above its foot, centred
+## on its outline; a figure too wide for that (a wide hat) touches the sides instead, never cut.
+func test_keeper_card_frames_the_figure_by_its_outline() -> void:
+	var portraits = load("res://modules/p0/p0_keeper_portraits.gd")
+	const W := 300.0
+	const H := 660.0
+	# a figure 400 px tall, off to the left and high in a first picture 2 m tall
+	var outline := Rect2i(60, 90, 110, 400)
+	var frame: Dictionary = portraits.card_frame(outline, 2.0)
+	var per_px := 2.0 / H
+	var at := func(frame: Dictionary, x: float, y: float) -> Vector2:   # a first-picture pixel in the final picture
+		return Vector2(W * 0.5 + ((x - W * 0.5) * per_px - float(frame.right)) / float(frame.size) * H,
+			H * 0.5 + ((y - H * 0.5) * per_px - float(frame.down)) / float(frame.size) * H)
+	var top: Vector2 = at.call(frame, outline.position.x, outline.position.y)
+	var feet: Vector2 = at.call(frame, outline.end.x, outline.end.y)
+	var share := (feet.y - top.y) / H
+	assert_float(share).is_between(0.84, 0.88)
+	assert_float((H - feet.y) / 3.0).is_between(10.0, 14.0)   # 3× the 220 portrait
+	assert_float((top.x + feet.x) * 0.5).is_equal_approx(W * 0.5, 0.5)
+	# a wide hat: the width decides, the figure spans it exactly
+	var wide := Rect2i(20, 150, 260, 300)
+	frame = portraits.card_frame(wide, 2.0)
+	var left: Vector2 = at.call(frame, wide.position.x, wide.position.y)
+	var right: Vector2 = at.call(frame, wide.end.x, wide.end.y)
+	assert_float(left.x).is_equal_approx(0.0, 0.5)
+	assert_float(right.x).is_equal_approx(W, 0.5)
+	assert_float((H - right.y) / 3.0).is_between(10.0, 14.0)
+	assert_float((right.y - left.y) / H).is_less(0.84)

@@ -8,15 +8,19 @@ extends Node
 ## ~770 KB, a head ~270 KB: about 12 MB at most, 上官婉儿 on #339), an older one is drawn again when asked for.
 ##
 ## The stage is AvatarFocusButton's (one rig in its own SubViewport, orthographic camera, a soft sun and ambient):
-##   card  300 × 660, the whole figure, for the greeting card's 100 × 220 portrait;
+##   card  300 × 660, the whole figure, for the greeting card's 100 × 220 portrait (3×): framed from a first clear
+##         picture's outline, since the rig's bounds run well past what is drawn (64 % of the height when framed by them);
 ##   head  264 × 264, the head in a circle, for the keeper bar's 36 px head (2× for sharpness).
 
 const CARD := Vector2i(300, 660)
 const HEAD := Vector2i(264, 264)
 const TURN := 0.32   # a three-quarter view, as the painted keepers stand
 const CARD_SKY := Color("e4f1ee")   # the card's backdrop: the painted cards stand in a scene, never on white
+const FIGURE := 0.86   # hat to shoes, of the card's height (不知火舞 on #339: 84–88 %)
+const FEET_GAP := 12.0 / 220.0   # the shoes this far above the card's foot (10–14 px of the 220)
 const CARD_LIMIT := 8
 const HEAD_LIMIT := 24
+const BUSY_FRAMES := 120   # a part that never loads is drawn without, not waited on for ever (周瑜 on #339)
 
 static var _cache: Dictionary = {}   # "<look>|card" / "<look>|head" → ImageTexture (blank until drawn), oldest first
 static var _queue: Array[Dictionary] = []   # {key, tex}: a texture already handed out is drawn even if evicted meanwhile
@@ -107,12 +111,60 @@ func _stage(size: Vector2i) -> void:
 	_viewport.size = size
 	_viewport.render_target_update_mode = SubViewport.UPDATE_DISABLED
 
-## The card's picture stands on a soft backdrop; the round head stays clear for the bar's ring.
-func _backdrop(card: bool) -> void:
-	_viewport.transparent_bg = not card
+## The card's picture stands on a soft backdrop; the round head, and the card's first picture, stay clear.
+func _backdrop(sky: bool) -> void:
+	_viewport.transparent_bg = not sky
 	var env := (_viewport.get_child(0) as WorldEnvironment).environment
-	env.background_mode = Environment.BG_COLOR if card else Environment.BG_CLEAR_COLOR   # clear colour is the engine's grey
+	env.background_mode = Environment.BG_COLOR if sky else Environment.BG_CLEAR_COLOR   # clear colour is the engine's grey
 	env.background_color = CARD_SKY
+
+func _aim(focus: Vector3, size: float, lift: float) -> void:
+	_camera.size = size
+	_camera.position = focus + Vector3(0, lift, 2.4)
+	_camera.look_at(focus, Vector3.UP)
+
+func _render() -> Image:
+	_viewport.render_target_update_mode = SubViewport.UPDATE_ONCE
+	await RenderingServer.frame_post_draw
+	_viewport.render_target_update_mode = SubViewport.UPDATE_DISABLED
+	return _viewport.get_texture().get_image()
+
+## The card's camera from the figure's outline (pixels) in a first picture taken with camera size `size` (metres of
+## height): {size, right, down}, the size and how far the camera moves in its own plane so the figure is FIGURE of the
+## height, its shoes FEET_GAP above the foot and its outline centred; a figure too wide for that (a wide hat) fills the
+## width instead, touching the sides, never cut.
+static func card_frame(outline: Rect2i, size: float) -> Dictionary:
+	var per_px := size / CARD.y
+	var aspect := float(CARD.x) / float(CARD.y)
+	var final := maxf(outline.size.y * per_px / FIGURE, outline.size.x * per_px / aspect)
+	return {
+		"size": final,
+		"right": (outline.position.x + outline.size.x * 0.5 - CARD.x * 0.5) * per_px,
+		"down": (outline.end.y - CARD.y * 0.5) * per_px - (0.5 - FEET_GAP) * final,
+	}
+
+## The whole figure on the card: a clear picture finds what is drawn (wider again if it touches an edge), then the
+## camera is set by card_frame and the picture taken on the backdrop.
+func _card(bounds: AABB) -> Image:
+	var aspect := float(CARD.x) / float(CARD.y)
+	var size := maxf(bounds.size.y, bounds.size.x / aspect) * 1.15
+	var outline := Rect2i()
+	_backdrop(false)
+	for attempt in 3:
+		_aim(bounds.get_center(), size, 0.05)
+		var clear := await _render()
+		if clear == null or clear.is_empty(): return null
+		outline = clear.get_used_rect()
+		if outline.size.x <= 0 or outline.size.y <= 0: return null   # nothing drawn
+		if outline.position.x > 0 and outline.position.y > 0 and outline.end.x < CARD.x and outline.end.y < CARD.y: break
+		size *= 1.5
+	var frame := card_frame(outline, size)
+	var right := _camera.global_transform.basis.x
+	var up := _camera.global_transform.basis.y
+	_camera.size = frame.size
+	_camera.position += right * float(frame.right) - up * float(frame.down)
+	_backdrop(true)
+	return await _render()
 
 func _draw(key: String, tex: ImageTexture) -> void:
 	var parts := key.split("|")
@@ -121,7 +173,6 @@ func _draw(key: String, tex: ImageTexture) -> void:
 	var slots := _slots(look)
 	if tex == null or slots.is_empty(): return
 	_stage(CARD if card else HEAD)
-	_backdrop(card)
 	var rig := Avatar.create_rig()
 	for child in rig.get_children():   # a still picture: no distance polling
 		if child is RigActivity:
@@ -130,33 +181,27 @@ func _draw(key: String, tex: ImageTexture) -> void:
 	rig.rotation.y = TURN
 	_viewport.add_child(rig)
 	rig.apply_config(OnlineAppearance.config({"version": 1, "slots": slots}, true))
-	while rig.is_busy(): await get_tree().process_frame
+	var frames := 0
+	while rig.is_busy() and frames < BUSY_FRAMES:
+		frames += 1
+		await get_tree().process_frame
 	rig.play_motion("idle")
 	var animation := rig.get_node_or_null("AnimationPlayer") as AnimationPlayer
 	if animation: animation.pause()
 	await get_tree().process_frame
 	var bounds := DressingCamera.merged_aabb(rig)
+	var picture: Image
 	if card:
-		# the whole figure, feet to hat, filling the 100 × 220 portrait as the painted keepers do (a wide hat may touch
-		# the sides; the height decides)
-		var aspect := float(CARD.x) / float(CARD.y)
-		_camera.size = maxf(bounds.size.y * 1.04, bounds.size.x / aspect * 0.92)
-		var focus := bounds.get_center() + Vector3.DOWN * 0.01
-		_camera.position = focus + Vector3(0, 0.05, 2.4)
-		_camera.look_at(focus, Vector3.UP)
+		picture = await _card(bounds)
 	else:
 		var head := Vector3(0, 1.15, 0)
 		if rig.skeleton:
 			var bone := rig.skeleton.find_bone("Head_M")
 			if bone >= 0: head = rig.skeleton.global_transform * rig.skeleton.get_bone_global_pose(bone).origin
-		_camera.size = clampf(bounds.end.y - head.y + 0.55, 0.88, 1.35)
-		var focus := head + Vector3.UP * (_camera.size * 0.5 - 0.40)
-		_camera.position = focus + Vector3(0, 0.02, 2.4)
-		_camera.look_at(focus, Vector3.UP)
-	_viewport.render_target_update_mode = SubViewport.UPDATE_ONCE
-	await RenderingServer.frame_post_draw
-	_viewport.render_target_update_mode = SubViewport.UPDATE_DISABLED
-	var picture := _viewport.get_texture().get_image()
+		var size := clampf(bounds.end.y - head.y + 0.55, 0.88, 1.35)
+		_backdrop(false)
+		_aim(head + Vector3.UP * (size * 0.5 - 0.40), size, 0.02)
+		picture = await _render()
 	_viewport.remove_child(rig)
 	rig.free()
 	if picture == null or picture.is_empty(): return
