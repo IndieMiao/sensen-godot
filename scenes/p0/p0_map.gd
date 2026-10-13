@@ -59,13 +59,37 @@ func _resolve_farm_choice() -> Dictionary:
 func _server_has_no_farm() -> bool:
 	return false
 
+## Into the farm — every way home comes here: the Homestead card's Go home, the place chip, the home city's bubble, the
+## avatar's own pin, a world's "farm" on the way back. From another city it flies home first (q(152) ①).
 func _open_my_farm() -> void:
 	if AppRouter.top_instance() != null or AppRouter._navigation_pending: return
+	if city_map != null and rt != null and P0Travel.away(_view()) and not travelling():
+		_fly_home()
+		return
+	_enter_farm()
+
+func _enter_farm() -> void:
 	_return_home()
 	_clear_farm_selection()
 	_reset_gesture()
 	P0Runtime.nav_started()
 	AppRouter.open_instance(P0_FARM, {})
+
+## q(152) ① (不知火舞 on 299 9cbdf991): home from another city is the same 3 s flight as going out — up from where the
+## camera is, along, down to the homestead's pin at the zoom its pin's card shows (SHOW_ZOOM) — the pill saying
+## Homestead and how far. Nothing is sent before it lands (苏烈: the server moves `here` home with return_home or the
+## farm's own read, so a flight cut short leaves the player where they are); on landing the chip says Homestead, then
+## the farm opens as ever and Welcome home floats (q(108)): no stamp, no Energy, no card.
+func _fly_home() -> void:
+	var held := P0Travel.here(_view())
+	var home := Vector2(home_lat, home_lng)
+	var km := roundi(P0PlaceSheet.km_between(_origin(), home))
+	var hr := P0Clusters.region(P0Clusters.cluster_of_region(P0_REGION))
+	var bearing := float(CityMapData.city(str(hr.get("id", ""))).get("overview", {}).get("bearing", city_bearing)) if not hr.is_empty() else city_bearing
+	if not hr.is_empty(): _switch_city(hr)
+	_travel_fly({lat = home.x, lng = home.y, zoom = SHOW_ZOOM, bearing = bearing}, _origin(), held, "Homestead", km, func():
+		rt.ui.hold_here(P0Travel.home(_view()))   # Homestead from the landing; the server's here follows with return_home
+		_enter_farm())
 
 func _on_city_pond_requested(entry: Dictionary) -> void:
 	if AppRouter.top_instance() != null or AppRouter._navigation_pending: return
@@ -1123,8 +1147,9 @@ func fly_to_city(id: String) -> void:
 	_regions_key = ""
 	var cluster := P0Clusters.cluster_of_region(str(r.id))
 	if cluster == "" or cluster == P0Travel.here(_view()) or rt == null: return
-	# Home is never a trip (q(108)): from another city the home city's bubble goes home, as the homestead's Go home.
-	if cluster == P0Travel.home(_view()): _return_home()
+	# Home is never a trip (q(108)): from another city the home city's bubble goes home, as the homestead's Go home —
+	# flying there first (q(152) ①).
+	if cluster == P0Travel.home(_view()): _open_my_farm()
 	else: open_city_card(cluster)
 
 ## At most this many city bubbles, at least this far apart on screen (px), most populous first.
