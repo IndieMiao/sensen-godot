@@ -1189,7 +1189,8 @@ func fly_to_city(id: String) -> void:
 	if cluster == P0Travel.home(_view()): _open_my_farm()
 	else: open_city_card(cluster)
 
-## At most this many city bubbles, at least this far apart on screen (px), most populous first.
+## At most this many city bubbles, at least this far apart on screen (px), most populous first — the visited on screen
+## besides, whatever their number (q(153) ①: their dots always show).
 const CITY_BUBBLES := 30
 const BUBBLE_GAP := 72.0
 var _regions_key := ""
@@ -1238,8 +1239,7 @@ func city_regions() -> Array:
 		var pa := int(P0Clusters.get_cluster(a).get("population", 0))
 		var pb := int(P0Clusters.get_cluster(b).get("population", 0))
 		return pa > pb if pa != pb else str(a) < str(b))
-	for cluster in visited:
-		if out.size() >= CITY_BUBBLES: break
+	for cluster in visited:   # every one on screen: their dots always stay (周瑜 on #346), the cap is for the rest
 		add.call(P0Clusters.region(cluster), BUBBLE_VISITED)
 	if not region.is_empty(): add.call(region, BUBBLE_OTHER)   # the camera's city
 	var box := _view_box(vp, z)
