@@ -221,7 +221,7 @@
                                   "rect": [
                                     58,
                                     121,
-                                    76,
+                                    80,
                                     18
                                   ],
                                   "variation": "C12XB",
@@ -230,16 +230,16 @@
                                 {
                                   "type": "HBoxContainer",
                                   "rect": [
-                                    142,
+                                    146,
                                     108,
-                                    178,
+                                    174,
                                     44
                                   ],
                                   "children": [
                                     {
                                       "type": "UiNavButton",
                                       "rect": [
-                                        142,
+                                        146,
                                         108,
                                         44,
                                         44
@@ -250,9 +250,9 @@
                                     {
                                       "type": "UiCommandButton",
                                       "rect": [
-                                        194,
+                                        198,
                                         108,
-                                        126,
+                                        122,
                                         44
                                       ],
                                       "variation": "CmdPrimaryCompact",
@@ -479,7 +479,7 @@
                                   "rect": [
                                     58,
                                     263,
-                                    69,
+                                    77,
                                     18
                                   ],
                                   "variation": "C12XB",
@@ -488,18 +488,18 @@
                                 {
                                   "type": "HBoxContainer",
                                   "rect": [
-                                    135,
+                                    143,
                                     250,
-                                    185,
+                                    177,
                                     44
                                   ],
                                   "children": [
                                     {
                                       "type": "UiCommandButton",
                                       "rect": [
-                                        135,
+                                        143,
                                         250,
-                                        55,
+                                        51,
                                         44
                                       ],
                                       "variation": "CmdSecondaryCompact",
@@ -508,9 +508,9 @@
                                     {
                                       "type": "UiCommandButton",
                                       "rect": [
-                                        198,
+                                        202,
                                         250,
-                                        122,
+                                        118,
                                         44
                                       ],
                                       "variation": "CmdPrimaryCompact",
@@ -713,7 +713,7 @@
                                   "rect": [
                                     58,
                                     377,
-                                    101,
+                                    109,
                                     18
                                   ],
                                   "variation": "C12XB",
@@ -722,18 +722,18 @@
                                 {
                                   "type": "HBoxContainer",
                                   "rect": [
-                                    167,
+                                    175,
                                     364,
-                                    153,
+                                    145,
                                     44
                                   ],
                                   "children": [
                                     {
                                       "type": "UiCommandButton",
                                       "rect": [
-                                        167,
+                                        175,
                                         364,
-                                        73,
+                                        69,
                                         44
                                       ],
                                       "variation": "CmdBlockedCompact",
@@ -742,9 +742,9 @@
                                     {
                                       "type": "UiCommandButton",
                                       "rect": [
-                                        248,
+                                        252,
                                         364,
-                                        72,
+                                        68,
                                         44
                                       ],
                                       "variation": "CmdSecondaryCompact",
@@ -969,7 +969,7 @@
                                   "rect": [
                                     58,
                                     504,
-                                    71,
+                                    79,
                                     18
                                   ],
                                   "variation": "C12XB",
@@ -978,18 +978,18 @@
                                 {
                                   "type": "HBoxContainer",
                                   "rect": [
-                                    137,
+                                    145,
                                     491,
-                                    183,
+                                    175,
                                     44
                                   ],
                                   "children": [
                                     {
                                       "type": "UiCommandButton",
                                       "rect": [
-                                        137,
+                                        145,
                                         491,
-                                        66,
+                                        62,
                                         44
                                       ],
                                       "variation": "CmdSecondaryCompact",
@@ -998,9 +998,9 @@
                                     {
                                       "type": "UiCommandButton",
                                       "rect": [
-                                        211,
+                                        215,
                                         491,
-                                        109,
+                                        105,
                                         44
                                       ],
                                       "variation": "CmdBlockedCompact",

@@ -137,7 +137,8 @@ func _buttons(th: Theme) -> void:
 		for compact in [false, true]:
 			var radius := r("compactCommand") if compact else pill
 			var mk := func(fill: Color, line: Color) -> StyleBox:
-				var b := _margins(_box(fill, radius, line, w), float(t.space.page), 0.0)
+				# Compact keys pad 14 a side (space.keyCompact, BARTER-2 2570:132291), the full-size ones the page's 16
+				var b := _margins(_box(fill, radius, line, w), float(t.space.keyCompact if compact else t.space.page), 0.0)
 				if compact: b.visual_height = s("commandCompact")
 				return b
 			_button(th, "Cmd%s%s" % [k, "Compact" if compact else ""],
