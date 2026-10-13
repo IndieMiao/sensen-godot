@@ -7,6 +7,7 @@ import { describe, expect, it } from 'vitest';
 import { loadP0Content } from '../../src/p0/content.js';
 import { applyP0, type P0Command, type P0Event } from '../../src/p0/reducer.js';
 import { freshState, type P0State } from '../../src/p0/state.js';
+import { notePresence } from '../../src/p0/presence.js';
 
 const c = loadP0Content();
 const T0 = Date.UTC(2026, 9, 13, 20);
@@ -74,5 +75,19 @@ describe('Quick Recast (Fishing Lv9, §4.6.2)', () => {
       const lost = fishOnce(player(9), outcome);
       expect(lost.s.fishing.quick).toBeUndefined();
     }
+  });
+
+  it('leaving the pond ends it: a read from another space (the map, home) and back, the first cast waits as usual', () => {
+    const landed = fishOnce(player(9), 'landed');
+    expect(landed.s.fishing.quick).toBe(FERN);
+    const stayed = structuredClone(landed.s);
+    notePresence(c, stayed, 'pond', landed.end + S, null, FERN);   // still at Fern Pond: kept
+    expect(stayed.fishing.quick).toBe(FERN);
+    const away = structuredClone(landed.s);
+    notePresence(c, away, 'map', landed.end + S, null);   // the state read on entering the map
+    expect(away.fishing.quick).toBeUndefined();
+    notePresence(c, away, 'pond', landed.end + 24 * H, null, FERN);   // back the next day
+    const back = nextBite(away, landed.end + 24 * H + S);
+    expect(back.got).toBe(back.usual);
   });
 });
