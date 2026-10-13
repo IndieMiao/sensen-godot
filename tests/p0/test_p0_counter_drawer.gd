@@ -199,7 +199,21 @@ func test_keeper_greeting_passes_ctx_and_trade_opens_the_counter() -> void:
 	var card: UiDialogueCard = ui._modal.find_children("*", "UiDialogueCard", true, false)[0]
 	assert_str(card.title).is_equal("Tackle Keeper · Finn")
 	assert_str(card.place).is_equal("Minds the tackle · Mission Tackle Shop")
-	(card.content.get_child(0) as UiCommandButton).activated.emit()   # Trade · see the rods
+	# q(154) (LOCK-16 复议 197 e508cd27): `Trade` and the question only — no `Just passing by` — and a Close 44 8 above
+	# the card's top-right corner, as on the resident's bar; it closes the card
+	assert_array(card.content.get_children().map(func(b): return [b.get_class(), (b as Button).text])).is_equal(
+		[["Button", "Trade"], ["Button", "Where are they biting?"]])
+	assert_int(ui._modal.find_children("*", "UiDismissButton", true, false).size()).is_equal(0)
+	await await_idle_frame()
+	var close: UiCloseButton = ui._modal.find_children("*", "UiCloseButton", true, false)[0]
+	var c := card.get_global_rect()
+	var x := close.get_global_rect()
+	assert_that([x.end.x, x.end.y, x.size]).is_equal([c.end.x, c.position.y - 8.0, Vector2(44, 44)])
+	close.pressed.emit()
+	assert_str(ui.modal_kind).is_not_equal("greeting")
+	ui.open_keeper_greeting("tackle", TACKLE_CTX)
+	card = ui._modal.find_children("*", "UiDialogueCard", true, false)[0]
+	(card.content.get_child(0) as UiCommandButton).activated.emit()   # Trade
 	assert_str(ui.modal_kind).is_equal("counter")
 	assert_str(ui._counter.keeper_bar.place).is_equal("Mission Tackle Shop")
 

@@ -1558,10 +1558,10 @@ static func _request_gap(view: Dictionary, req: Dictionary) -> String:
 ## given; `greet` is the greeting card's line, `counter` the keeper bar's over the counter drawer (附录 B 掌柜问候 · P0's
 ## counter lines: the greeting card's question never sits on the counter, 不知火舞 #56).
 const _KEEPER_COPY := {
-	"tea": {"does": "Pours the tea", "trade": "order tea", "question": "Any news in town?"},
-	"post": {"does": "Runs the post", "trade": "get a coffee", "question": "Who needs help today?"},
-	"tackle": {"does": "Minds the tackle", "trade": "see the rods", "question": "Where are they biting?"},
-	"market": {"does": "Keeps the stall", "trade": "open the stall", "question": "What's fresh today?"},
+	"tea": {"does": "Pours the tea", "question": "Any news in town?"},
+	"post": {"does": "Runs the post", "question": "Who needs help today?"},
+	"tackle": {"does": "Minds the tackle", "question": "Where are they biting?"},
+	"market": {"does": "Keeps the stall", "question": "What's fresh today?"},
 }
 const _CUPS_OUT := "That's three cups today. Come back tomorrow."
 
@@ -1616,8 +1616,8 @@ static func keeper_lines(view: Dictionary, role: String, ctx := {}) -> Dictionar
 	var place := str(ctx.get("place", ""))
 	return {
 		"line": ("%s · %s" % [str(copy.get("does", "")), place]) if place != "" else str(copy.get("does", "")),
-		"greet": greet, "counter": counter if counter != "" else greet, "trade": "Trade · " + str(copy.get("trade", "")),
-		"question": str(copy.get("question", "")), "answer": answer, "leave": "Just passing by",
+		"greet": greet, "counter": counter if counter != "" else greet, "trade": "Trade",   # one word on every keeper (q(154), Joey on 296)
+		"question": str(copy.get("question", "")), "answer": answer,   # no `Just passing by`: the card's ✕ closes it (q(154))
 	}
 
 ## Small counts in keeper speech ("sows three plots"), digits from ten up.
