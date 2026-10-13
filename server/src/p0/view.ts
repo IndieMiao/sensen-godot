@@ -20,7 +20,7 @@ import { gatherView } from './gathering.js';
 import { workbenchView } from './workbench.js';
 import { compostView, coveredPlots, cropGrowH, facilitiesView, facilityAt, greenhousePlots, plotCount } from './garden.js';
 import { climateAt, clusterById, clusterOf, homeClimate } from './travel.js';
-import { cityPlaces } from './world.js';
+import { cityPlaces, clusterAdmin } from './world.js';
 import { orchardView, treeOf } from './orchard.js';
 import { restReadyIn } from './presence.js';
 import { inboxView, settleParcels } from './parcels.js';
@@ -60,7 +60,9 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     // §9.3.3 event venues lit now (from 2 h before until the end; their ★ is in map_markers): empty in the prototype
     event_venues: litEvents(c, now).map(e => ({ id: e.id, place: e.place, name: e.name, starts: e.starts, ends: e.ends })),
     // Cross-city (v5, SGODOT-278, note 0fc0bc5e §2): home / here / passes / visits / stamps / fallback / explorer
-    travel: { ...s.travel, today: dayKey(c, s, now) },   // today: the day key stamps count on (Passport: first visits today 1/2)
+    travel: { ...s.travel, today: dayKey(c, s, now),   // today: the day key stamps count on (Passport: first visits today 1/2)
+      // MAP-8 Nearby cities: the state or province of each near10 city (`Salinas · California`); none for a city without
+      admins: Object.fromEntries(s.travel.fallback.near10.map(id => [id, clusterAdmin(id)]).filter(([, a]) => a)) },
     decor: decorView(c, s),   // Decorate (SGODOT-284): {placed, cap, used, stored}; catalog and yard are in the content
     skills,
     plots: s.plots.map(p => ({

@@ -1201,6 +1201,12 @@ func _show_city_places(_city: Dictionary, cluster: String) -> void:
 	city_map.preload_ponds(P0CityPlaces.city(cluster).get("ponds", []))
 	_set_outpost_places()
 
+## MAP-8 Nearby cities (the user on 10-13; 不知火舞's rows): a row's tap closes the sheet and flies the camera to that
+## city, its card opening as a bubble's tap opens it (fly_to_city). The rows are P0Travel.nearby.
+func open_nearby_city(cluster: String) -> void:
+	if rt != null and rt.ui.has_modal(): rt.ui.close_modal()
+	fly_to_city(cluster)
+
 ## Any city by its region or cluster id, not only those around the camera (a bubble, later the destination lists):
 ## map_poc.fly_to_city looks it up in city_regions(), so it is in the list while it does.
 func fly_to_city(id: String) -> void:
