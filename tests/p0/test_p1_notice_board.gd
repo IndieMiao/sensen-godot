@@ -104,6 +104,7 @@ func test_a_marked_row_and_late_online_counts() -> void:
 	var market := d.find_child("Row_sh_market_1", true, false) as Node
 	assert_object(market.find_child("Reason", true, false)).is_not_null()
 	assert_object(market.find_child("Line", true, false)).is_null()
+	assert_object((d.find_child("Row_pond_san_francisco_03", true, false) as Node).find_child("Reason", true, false)).is_null()
 	d.call("set_online", {"sh_market_1": 2})
 	await get_tree().process_frame   # the old rows go at the end of the frame
 	market = d.find_child("Row_sh_market_1", true, false) as Node
@@ -154,3 +155,17 @@ func test_the_placeholder_and_its_strip() -> void:
 	var board := b.get_node("Board") as MeshInstance3D
 	assert_float(board.position.y - (board.mesh as BoxMesh).size.y * 0.5).is_greater_equal(0.6)   # off the grass
 	assert_str(str(P0WorldPrompts.notice_board({}).text)).is_equal("Notice Board")
+
+## A marked pond says why too, in place of its bite (NOTICE-BOARD 2608:133862: `Pond Catch · Pond Crucian 0/2`).
+func test_a_marked_pond_says_why_instead_of_its_bite() -> void:
+	var v := _view()
+	v["map_markers"] = [{"place": "pond_san_francisco_03", "kind": "request", "why": {}}]
+	var fern: Dictionary = P0NoticeBoard.model(v).ponds[0]
+	assert_str(str(fern.line)).is_equal(str(P0Logic.PinReason.reason(v, "pond_san_francisco_03").text))
+	assert_bool((fern.reason as Dictionary).is_empty()).is_false()
+	var d := _drawer(v)
+	for i in 2: await get_tree().process_frame
+	var row := d.find_child("Row_pond_san_francisco_03", true, false) as Node
+	assert_object(row.find_child("Reason", true, false)).is_not_null()
+	assert_object(row.find_child("Line", true, false)).is_null()
+	assert_object(row.find_child("Trap", true, false)).is_not_null()   # the trap stays beside it (the frame's `2/3`)

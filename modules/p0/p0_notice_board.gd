@@ -19,7 +19,7 @@ const ROLE_ORDER := ["market", "tea", "tackle", "post"]   # the home set's four,
 static func unlocked(view: Dictionary) -> bool:
 	return bool(view.get("homestead", {}).get("unlocks", {}).get("notice_board", false))
 
-## {title, subtitle, ponds: [{id, name, icon, line, trap, go}], outposts: [{id, name, icon, line, reason, online, go}]};
+## {title, subtitle, ponds: [{id, name, icon, line, reason, trap, go}], outposts: [{id, name, icon, line, reason, online, go}]};
 ## `online` is the presence count per outpost id (all its rooms), as the map holds it. `trap` is `2/3` or "";
 ## `reason` is PinReason.reason (its `text` is then the line), {} when the pin wears no mark.
 static func model(view: Dictionary, online: Dictionary = {}) -> Dictionary:
@@ -34,8 +34,10 @@ static func model(view: Dictionary, online: Dictionary = {}) -> Dictionary:
 		if not places.has(id): continue
 		var place: Dictionary = places[id]
 		var trap := P0Logic.P0Trap.pond_fact(view, id)
+		var why := P0Logic.PinReason.reason(view, id)   # a marked pond says why instead (NOTICE-BOARD 2608:133862)
 		ponds.append({id = id, name = Map.short_name(str(place.get("name", p.get("name", id)))), icon = "pond",
-			line = bite_line(place, level, caught), trap = str(trap[1]) if trap.size() > 1 else "", go = "pond:" + id,
+			line = str(why.get("text", "")) if not why.is_empty() else bite_line(place, level, caught), reason = why,
+			trap = str(trap[1]) if trap.size() > 1 else "", go = "pond:" + id,
 			_first = id == beginner, _km = _km(home, p)})
 	ponds.sort_custom(_before)
 	var outposts: Array = []

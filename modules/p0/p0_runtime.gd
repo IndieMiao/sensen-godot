@@ -1443,6 +1443,7 @@ func _dev_shot(dt: float) -> void:
 			"licensetext": ui.open_license_text(step[1] if step.size() > 1 else "worldcover",
 				func(): ui.open_licenses(func(): ui.open_settings(func(): ui.open_profile())))
 			"noticeboard": ui.open_notice_board()   # the stall's Notice Board (q(164) shots)
+			"noticeonline": ui.set_notice_online({"sh_market_1": 4, "sh_tea_1": 3, "sh_tackle_1": 3, "sh_post_1": 2})   # shots: who is in, as the frame
 			"pagebottom":
 				for sc in ui.root.find_children("*", "ScrollContainer", true, false): (sc as ScrollContainer).scroll_vertical = 100000
 			"editlook": ui.edit_look()   # the profile's Edit look ›: the dressing room above the current world (KEEP-P0-2)
