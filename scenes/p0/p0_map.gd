@@ -134,6 +134,8 @@ func _install_city_map() -> void:
 		_style_locate(city_map.recenter)
 		_style_locate(city_map.home_key, "home")   # the home key over it: the same key, i-home (SGODOT-261)
 		city_map.home_key.visible = true
+		nearby_key = _make_nearby_key()
+		city_map.add_child(nearby_key)
 	if city_map and not city_map.bundled_ponds:
 		city_map.preload_ponds(P0Ponds.all())
 		_set_outpost_places()
@@ -656,7 +658,7 @@ func bubble_clear_rects() -> Array:
 	var top := rt.ui.safe_top() + UiTokens.SIZE_HUD_TOP + UiTokens.SIZE_HUD_H
 	var bar := vp.y - rt.ui.safe_bottom() - UiTokens.SIZE_QUICK_BAR_BOTTOM - UiTokens.SIZE_QUICK_BAR_H
 	var out: Array = [Rect2(0, 0, vp.x, top), Rect2(0, bar, vp.x, vp.y - bar)]
-	for key in [city_map.recenter, city_map.home_key] if city_map else []:
+	for key in [city_map.recenter, city_map.home_key, nearby_key] if city_map else []:
 		if key and (key as Control).is_visible_in_tree(): out.append((key as Control).get_global_rect())
 	return out
 
@@ -1201,6 +1203,48 @@ func _show_city_places(_city: Dictionary, cluster: String) -> void:
 	city_map.preload_ponds(P0CityPlaces.city(cluster).get("ponds", []))
 	_set_outpost_places()
 
+## MAP-8's way in (Figma MAP-8-ENTRY 2539:130770; q(159)): a `Nearby cities ›` pill at the bottom left, in Bag's row —
+## 12 from the left, 196 × 44, 10 under the quick bar's top (y 718 of 800) — cream surface, radius pill, a float
+## shadow, the words C13XB in color/info. It opens the Nearby cities drawer; it gives way to an open sheet with the right-hand keys.
+const NEARBY_KEY_SIZE := Vector2(196, 44)
+const NEARBY_KEY_LEFT := 12.0
+const NEARBY_KEY_UNDER_BAR := 10.0
+var nearby_key: Button
+
+func _make_nearby_key() -> Button:
+	var b := Button.new()
+	b.name = "MapNearby"
+	b.focus_mode = Control.FOCUS_NONE
+	b.theme = UiKit.theme()
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = UiTokens.COLOR_SURFACE
+	sb.set_corner_radius_all(UiTokens.RADIUS_PILL)
+	sb.shadow_color = UiTokens.COLOR_SHADOW_FLOAT
+	sb.shadow_size = UiTokens.SIZE_SHADOW_FLOAT_RADIUS
+	sb.shadow_offset = Vector2(0, UiTokens.SIZE_SHADOW_FLOAT_OFFSET_Y)
+	for state in [&"normal", &"hover", &"pressed", &"focus", &"disabled", &"hover_pressed"]: b.add_theme_stylebox_override(state, sb)
+	var words := UiKit.label("Nearby cities ›", UiTokens.STYLE_C13_XB, UiTokens.COLOR_INFO)
+	words.name = "Words"
+	words.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	words.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	words.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	words.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	b.add_child(words)
+	b.size = NEARBY_KEY_SIZE
+	b.pressed.connect(open_nearby_cities)
+	return b
+
+func _place_nearby_key(shown: bool) -> void:
+	if nearby_key == null: return
+	if nearby_key.visible != shown: nearby_key.visible = shown
+	# in Bag's row: the quick bar's top as the HUD lays it out (the map's view sits inset, its own bottom is not it)
+	var at := Vector2(NEARBY_KEY_LEFT, rt.ui.open_marker_area().end.y + NEARBY_KEY_UNDER_BAR)
+	if nearby_key.global_position != at: nearby_key.global_position = at
+
+func open_nearby_cities() -> void:
+	if rt == null or travelling(): return
+	rt.ui.open_nearby_cities(open_nearby_city)
+
 ## MAP-8 Nearby cities (the user on 10-13; 不知火舞's rows): a row's tap closes the sheet and flies the camera to that
 ## city, its card opening as a bubble's tap opens it (fly_to_city). The rows are P0Travel.nearby.
 func open_nearby_city(cluster: String) -> void:
@@ -1444,6 +1488,7 @@ func p0_frame(view: Dictionary, _dt: float) -> void:
 	var key_shown := not rt.ui.has_modal()
 	if city_map.recenter.visible != key_shown: city_map.recenter.visible = key_shown
 	if city_map.home_key.visible != key_shown: city_map.home_key.visible = key_shown   # the home key with it
+	_place_nearby_key(key_shown)
 	var list := _marks_now(view)
 	var home := home_mark(view)
 	# Away, the homestead's ✓ hangs on its pin (deliverable, the highest mark, so first); at home on the avatar.
@@ -1568,6 +1613,7 @@ func p0_dev(step: PackedStringArray) -> bool:
 			_origin_before = _origin()
 			_here_before = P0Travel.here(_view())
 			rt.session.send({"type": "travel", "to": step[1]})
+		"nearby": open_nearby_cities()   # the Nearby cities drawer (MAP-8), as a tap on its pill
 		"citycard":   # citycard:gn-1850147 — that city's silhouette card (MAP-3-FREE), as a tap on its bubble
 			open_city_card(step[1])
 		"arrivalcard":   # arrivalcard:gn-1850147 — the first visit's card (MAP-7-FREE) for that city
