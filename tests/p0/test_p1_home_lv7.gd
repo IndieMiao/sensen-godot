@@ -22,6 +22,7 @@ func test_lv7_is_where_the_orchard_and_the_sprinklers_reach_their_most() -> void
 func test_home_1_and_the_banner_say_them() -> void:
 	var p := P0Logic.home_panel(_view())
 	assert_array(p.changes.map(func(c): return str(c.text))).is_equal(["Max Energy 260 · Meals 260 a day", "Orchard 8/8", "Sprinklers 10/10"])
+	assert_array(p.changes.slice(1).map(func(c): return str(c.note))).is_equal(["+1 slot", "+1 sprinkler"])   # q(172)
 	var m := P0Logic.home_moment(_view(), {"level": 7, "unlocks": ["orchard_8", "sprinklers_10"]})
 	assert_str(str(m.detail)).is_equal("Orchard 8/8\nSprinklers 10/10")
 	# and the 8 plots on the field's edge (q(172) ①), as Lv3's `Plots 40 · 10 more to till`
