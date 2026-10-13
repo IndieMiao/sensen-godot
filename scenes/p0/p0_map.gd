@@ -73,7 +73,10 @@ func _enter_farm() -> void:
 	_clear_farm_selection()
 	_reset_gesture()
 	P0Runtime.nav_started()
-	AppRouter.open_instance(P0_FARM, {})
+	open_farm.call()
+
+## How the farm opens (tests hold it to stay on the map).
+var open_farm := func(): AppRouter.open_instance(P0_FARM, {})
 
 ## q(152) ① (不知火舞 on 299 9cbdf991): home from another city is the same 3 s flight as going out — up from where the
 ## camera is, along, down to the homestead's pin at the zoom its pin's card shows (SHOW_ZOOM) — the pill saying
@@ -87,7 +90,11 @@ func _fly_home() -> void:
 	var hr := P0Clusters.region(P0Clusters.cluster_of_region(P0_REGION))
 	var bearing := float(CityMapData.city(str(hr.get("id", ""))).get("overview", {}).get("bearing", city_bearing)) if not hr.is_empty() else city_bearing
 	if not hr.is_empty(): _switch_city(hr)
+	if rt.ui.has_modal(): rt.ui.close_modal()   # no card stays over the flight (周瑜 on #341)
 	_travel_fly({lat = home.x, lng = home.y, zoom = SHOW_ZOOM, bearing = bearing}, _origin(), held, "Homestead", km, func():
+		# landed with another scene over the map (it was suspended) or another way out under way: not home yet — the
+		# player is where they were, and goes home again from there (周瑜 on #341)
+		if AppRouter.top_instance() != null or AppRouter._navigation_pending: return
 		rt.ui.hold_here(P0Travel.home(_view()))   # Homestead from the landing; the server's here follows with return_home
 		_enter_farm())
 
@@ -900,13 +907,24 @@ func _travel_fly(to: Dictionary, left: Vector2, held: String, city: String, km: 
 	_focus_tween = create_tween()
 	_focus_tween.tween_method(_travel_at, 0.0, P0TravelFlight.TOTAL_S, P0TravelFlight.TOTAL_S)
 	_focus_tween.tween_callback(_travel_land)
-	_trip = {plan = plan, to = to, t = 0.0, cover = cover, land = land, tween = _focus_tween, left = left}
+	_trip = {plan = plan, to = to, t = 0.0, cover = cover, land = land, tween = _focus_tween, left = left,
+		start_us = Time.get_ticks_usec()}
 	_show_self(false)   # the avatar leaves with the take-off (v2)
 	_flight = _focus_tween
 	_flight_kind = "travel"
 
-func _travel_at(t: float) -> void:
+## The tween only calls this each frame: where the flight is comes from the clock, so it takes 3 s of real time even
+## when frames are slow — the engine caps a frame's step (about 0.13 s), and a tween stepped by it stretched the flight
+## on a slow device (李元芳 on 279 45546042: 4.9 s on the emulator; 9.5 s at 400 ms a frame). It lands on time.
+## Recording frames (P0_SHOT_FRAMES, a fixed frame rate) the clock runs faster than the frames saved, so a video takes
+## the tween's own time there, frame for frame (不知火舞 on 299: it cut before landing).
+func _travel_at(step: float) -> void:
 	if _trip.is_empty(): return
+	var clock := (Time.get_ticks_usec() - int(_trip.start_us)) / 1e6
+	var t := minf(step if OS.has_environment("P0_SHOT_FRAMES") else clock, P0TravelFlight.TOTAL_S)
+	if t >= P0TravelFlight.TOTAL_S:
+		_travel_land()
+		return
 	_trip.t = t
 	var at: Vector4 = (_trip.plan as P0TravelFlight).sample(t)
 	center_lat = at.x
@@ -978,9 +996,10 @@ func _travel_land() -> void:
 		if cover.get_parent() != null: cover.get_parent().remove_child(cover)
 		cover.queue_free()
 	if rt != null: rt.release_travel()   # the chip and Energy follow the view, the held +10 floats, with the welcome
-	_show_self(true)   # the avatar stands in the city ahead, as the chip changes
 	_here_sig = ""
 	_sync_here()
+	_sync_farm_markers()   # where it stands now, laid out before it shows: no frame of it at the city left (不知火舞 on 299)
+	_show_self(true)   # the avatar stands in the city ahead, as the chip changes
 	if (trip.land as Callable).is_valid() and is_inside_tree(): (trip.land as Callable).call()
 
 ## MAP-7-FREE (§11.8.4 step 7, Figma 482:412): a first visit lands on "3 things to do here" — the local pond, an

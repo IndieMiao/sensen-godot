@@ -177,9 +177,8 @@ func test_away_the_home_citys_bubble_goes_home_not_a_trip() -> void:
 	assert_array(sent).is_empty()   # nothing in the air (苏烈: a flight cut short leaves the player where they are)
 	var cover: P0TravelCover = m.find_children("*", "P0TravelCover", true, false)[0]
 	assert_str(cover.title.text).is_equal("Homestead")
-	AppRouter._navigation_pending = true   # the farm it opens goes as far as the router: the test stays on the map
+	m.open_farm = func(): pass   # the farm opens as far as this: the test stays on the map
 	await get_tree().create_timer(3.3).timeout   # landed
-	AppRouter._navigation_pending = false
 	assert_bool(m.travelling()).is_false()
 	assert_array(sent.map(func(c): return str(c.get("type", "")))).is_equal(["return_home"])
 	rt.ui.set_view(rt.session.view)

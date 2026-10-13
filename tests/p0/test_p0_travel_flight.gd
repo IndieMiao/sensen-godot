@@ -403,10 +403,9 @@ func test_going_home_from_another_city_flies_first() -> void:
 	assert_str(_cover(m).title.text).is_equal("Homestead")
 	assert_array(sent).is_empty()
 	assert_str(_chip_city(rt)).is_equal("Los Angeles")   # the city left, until it lands
-	AppRouter._navigation_pending = true   # the farm goes as far as the router: the test stays on the map
+	m.open_farm = func(): pass   # the farm opens as far as this: the test stays on the map
 	await get_tree().create_timer(0.7).timeout
 	_tap(_cover(m))   # down at once
-	AppRouter._navigation_pending = false
 	assert_bool(m.travelling()).is_false()
 	assert_float(m.center_lat).is_equal_approx(m.home_lat, 1e-6)
 	assert_float(m.zoom).is_equal_approx(P0Map.SHOW_ZOOM, 1e-6)
@@ -426,5 +425,57 @@ func test_going_home_from_another_city_flies_first() -> void:
 	m._enter_farm()   # as _open_my_farm does at home (the router held: it goes no further)
 	AppRouter._navigation_pending = false
 	assert_bool(m.travelling()).is_false()
+	rt.session.view = saved
+	rt.ui.set_view(saved)
+
+## 李元芳 on 279 45546042: the flight takes 3 s of real time even when frames are slow (the engine caps a frame's step,
+## so a flight stepped by frames stretched — 9.5 s at 400 ms a frame).
+class SlowFrames extends Node:
+	func _process(_d: float) -> void: OS.delay_msec(400)
+
+func test_the_flight_takes_3_s_of_real_time_on_slow_frames() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved := _ready_to_arrive(m)
+	var slow := SlowFrames.new()
+	add_child(auto_free(slow))
+	var t0 := Time.get_ticks_msec()
+	_arrive(m)
+	while m.travelling() and Time.get_ticks_msec() - t0 < 12000: await get_tree().process_frame
+	var took := Time.get_ticks_msec() - t0
+	slow.queue_free()
+	assert_bool(m.travelling()).is_false()
+	assert_int(took).is_less(3000 + 900)   # 3 s, give or take a slow frame or two
+	assert_float(m.zoom).is_equal_approx(float(_overview().zoom), 1e-6)   # landed where it lands
+	rt.ui.clear_toast()
+	rt.session.view = saved
+	rt.ui.set_view(saved)
+
+## 周瑜 on #341: a home flight that lands while another way out is under way (or another scene is over the map) does not
+## go home — nothing is sent, the farm does not open; and a card open when it takes off is closed first.
+func test_a_home_flight_landing_mid_navigation_goes_nowhere() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved := _ready_to_arrive(m)   # in Los Angeles
+	var sent: Array = []
+	rt.session.sent.connect(func(cmd): sent.append(str(cmd.get("type", ""))))
+	var opened := [0]
+	m.open_farm = func(): opened[0] += 1
+	m._open_place_card(m.home_entry(), m.place_card(m.home_entry()))
+	assert_bool(rt.ui.has_modal()).is_true()
+	m.p0_return("farm")
+	assert_bool(rt.ui.has_modal()).is_false()   # the card is gone before it flies
+	await get_tree().create_timer(0.7).timeout
+	AppRouter._navigation_pending = true   # another way out under way as it lands
+	_tap(_cover(m))
+	AppRouter._navigation_pending = false
+	assert_bool(m.travelling()).is_false()
+	assert_array(sent).is_empty()
+	assert_int(opened[0]).is_equal(0)
+	assert_str(_chip_city(rt)).is_equal("Los Angeles")   # still where they were
 	rt.session.view = saved
 	rt.ui.set_view(saved)
