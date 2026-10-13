@@ -127,7 +127,8 @@ export function giftPoints(c: P0Content, s: P0State, def: ResidentDef, item: str
  * which residents like a dish and the gift drawer what a gift would add. */
 export const GIFT_CLUES_LEVEL = 7;
 
-/** A resident the player has met: talked to at least once (or already has affinity, from before chat_day was kept). */
+/** A resident the player has met: talked to at least once, or has affinity without a chat on record (gifts and requests
+ * open from the talk bar today, so this covers affinity from any other source). */
 export function metResident(s: P0State, id: string): boolean {
   const r = s.residents?.[id];
   return !!r && (r.chat_day !== '' || r.affinity > 0);
