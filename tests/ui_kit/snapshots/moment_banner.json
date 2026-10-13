@@ -111,6 +111,15 @@
                                   ],
                                   "variation": "TitleXB20",
                                   "text": "2"
+                                },
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    16,
+                                    92,
+                                    48,
+                                    48
+                                  ]
                                 }
                               ]
                             },
@@ -391,6 +400,15 @@
                                   ],
                                   "variation": "TitleXB20",
                                   "text": "2"
+                                },
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    16,
+                                    372,
+                                    48,
+                                    48
+                                  ]
                                 }
                               ]
                             },
