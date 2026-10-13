@@ -1068,9 +1068,10 @@ func open_notice_board() -> void:
 	actor.face(_notice)
 	rt.ui.open_notice_board()
 
-## Placeholder Notice Board (until 上官婉儿's prop): two wood posts 1.5 m, a cork board 0.9 × 0.6 between them from
-## 0.7 m up, a plank roof over it, and three paper notes on the board's face (+Z, to the camera); one cell, foot at the
-## anchor. Its outline is not the Homestead sign's or the Chef's Sign's.
+## Placeholder Notice Board (until 上官婉儿's prop; her sizes on #375): two wood posts 1.5 m at x ±0.28, a cork board
+## 0.56 × 0.6 between them from 0.7 m up, a 0.7 plank roof, three paper notes on the board's face (+Z, to the camera);
+## one cell, foot at the anchor. Narrower than the cell: the stall's seed crate next door reaches 0.33 from its middle.
+## Its outline is not the Homestead sign's or the Chef's Sign's. (The prop's board hangs at 1.17: NOTICE_HIT then.)
 static func notice_board_prop(at: Vector3) -> Node3D:
 	var root := Node3D.new()
 	root.name = "NoticeBoard"
@@ -1085,13 +1086,13 @@ static func notice_board_prop(at: Vector3) -> Node3D:
 	paper.albedo_color = Color(0.97, 0.94, 0.86)
 	paper.roughness = 0.85
 	var parts := [
-		["PostL", Vector3(0.07, 1.5, 0.07), Vector3(-0.44, 0.75, 0), wood],
-		["PostR", Vector3(0.07, 1.5, 0.07), Vector3(0.44, 0.75, 0), wood],
-		["Board", Vector3(0.9, 0.6, 0.05), Vector3(0, 1.0, 0), cork],
-		["Roof", Vector3(1.08, 0.05, 0.22), Vector3(0, 1.53, 0), wood],
-		["Note1", Vector3(0.2, 0.24, 0.01), Vector3(-0.24, 1.05, 0.03), paper],
-		["Note2", Vector3(0.18, 0.18, 0.01), Vector3(0.04, 0.92, 0.03), paper],
-		["Note3", Vector3(0.2, 0.22, 0.01), Vector3(0.26, 1.08, 0.03), paper],
+		["PostL", Vector3(0.06, 1.5, 0.06), Vector3(-0.28, 0.75, 0), wood],
+		["PostR", Vector3(0.06, 1.5, 0.06), Vector3(0.28, 0.75, 0), wood],
+		["Board", Vector3(0.56, 0.6, 0.05), Vector3(0, 1.0, 0), cork],
+		["Roof", Vector3(0.7, 0.05, 0.22), Vector3(0, 1.53, 0), wood],
+		["Note1", Vector3(0.13, 0.2, 0.01), Vector3(-0.16, 1.06, 0.03), paper],
+		["Note2", Vector3(0.12, 0.15, 0.01), Vector3(0.0, 0.92, 0.03), paper],
+		["Note3", Vector3(0.13, 0.18, 0.01), Vector3(0.16, 1.09, 0.03), paper],
 	]
 	for p in parts:
 		var m := MeshInstance3D.new()

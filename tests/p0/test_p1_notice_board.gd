@@ -154,6 +154,12 @@ func test_the_placeholder_and_its_strip() -> void:
 	for n in ["PostL", "PostR", "Board", "Roof"]: assert_object(b.get_node(n)).is_not_null()
 	var board := b.get_node("Board") as MeshInstance3D
 	assert_float(board.position.y - (board.mesh as BoxMesh).size.y * 0.5).is_greater_equal(0.6)   # off the grass
+	# 上官婉儿 on #375: below the roof it stays inside 0.32 of its middle — the stall's seed crate next door reaches 0.33
+	for m in b.get_children():
+		var half := (m as MeshInstance3D).position.x
+		var w: float = ((m as MeshInstance3D).mesh as BoxMesh).size.x * 0.5
+		var limit := 0.35 if str(m.name) == "Roof" else 0.32
+		assert_float(absf(half) + w).override_failure_message("%s reaches %.3f" % [m.name, absf(half) + w]).is_less_equal(limit)
 	assert_str(str(P0WorldPrompts.notice_board({}).text)).is_equal("Notice Board")
 
 ## A marked pond says why too, in place of its bite (NOTICE-BOARD 2608:133862: `Pond Catch · Pond Crucian 0/2`).
