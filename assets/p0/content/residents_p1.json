@@ -1,5 +1,5 @@
 {
-  "_note": "Residents line, P1 (SGODOT-284; 苏烈, copy is a draft for 李白). The other ten residents of §9.4.3 with lines for every stage, 3–4 personal requests each, a Common gift meal and a teaching pool (§7.16.3; P0 pages until the 48-page table lands); two more requests each for Pip and Old Kai; affinity.lesson = §7.5.3 Taught (one page a week from Familiar), affinity.next_request_h = §9.6.1 (the next personal request 24 h after the last; Pip and Old Kai keep one_per_day). likes may be a rarity and up (Fine+ / Rare+). Requests may carry reward {item, recipe, title}.",
+  "_note": "Residents line, P1 (SGODOT-284; 苏烈; copy final per 李白's q(170): American spelling, no promises of P2-only features, request text matches the ask). The other ten residents of §9.4.3 with lines for every stage, 3–4 personal requests each, a Common gift meal and a teaching pool (§7.16.3; P0 pages until the 48-page table lands); two more requests each for Pip and Old Kai; affinity.lesson = §7.5.3 Taught (one page a week from Familiar), affinity.next_request_h = §9.6.1 (the next personal request 24 h after the last; Pip and Old Kai keep one_per_day). likes may be a rarity and up (Fine+ / Rare+). Requests may carry reward {item, recipe, title}.",
   "affinity": {
     "lesson": {
       "stage": "Familiar",
@@ -70,7 +70,7 @@
         {
           "id": "req_res_kai_3",
           "title": "The Smoker's Secret",
-          "text": "Smoked trout, the old way. Bring me one and I'll tell you a secret.",
+          "text": "Smoked trout, the old way. Show me you've got it.",
           "stage": "Trusted",
           "need": {
             "kind": "dish",
@@ -79,7 +79,7 @@
           "qty": 1,
           "coins": 80,
           "reward": {
-            "title": "Harbour Hand"
+            "title": "Harbor Hand"
           }
         }
       ],
@@ -165,7 +165,7 @@
           "qty": 3,
           "coins": 80,
           "reward": {
-            "title": "Granny's Favourite",
+            "title": "Granny's Favorite",
             "recipe": "dish_beet_fish_soup"
           }
         }
@@ -210,7 +210,7 @@
         "Stranger": "New in town? So am I. I'm always new in town.",
         "Acquainted": "I've seen markets you wouldn't believe.",
         "Familiar": "Here, from the road. Don't ask where.",
-        "Trusted": "Long trips need the right papers. I'll show you how.",
+        "Trusted": "Long trips go easier with a friend who's been.",
         "Kindred": "Wherever you go, I've probably been. Ask me anything.",
         "mystery": "Interesting. I'll… trade it on."
       },
@@ -270,7 +270,7 @@
       ],
       "lines": {
         "Stranger": "Ahoy! River's calm today.",
-        "Acquainted": "Neighbour towns are cheaper by the river road, you know.",
+        "Acquainted": "Neighbor towns are closer than you think. Go see one.",
         "Familiar": "Sing with me! No? Then eat with me.",
         "Trusted": "The river tells stories, if you listen.",
         "Kindred": "Any time you need a crossing, my friend.",
@@ -292,7 +292,7 @@
         {
           "id": "req_res_rafa_2",
           "title": "Fine Waters",
-          "text": "The good river fish, a Fine one. Can you?",
+          "text": "Two Fine fish. The river has the good ones.",
           "stage": "Acquainted",
           "need": {
             "kind": "fish",
@@ -348,7 +348,7 @@
       ],
       "lines": {
         "Stranger": "Mind your head. Low ceilings down there.",
-        "Acquainted": "Copper runs in the second floor. Look for the green.",
+        "Acquainted": "See the green in the rock? That's copper.",
         "Familiar": "Salt-grilled. The miner's lunch.",
         "Trusted": "Forty years down there. You're the first I'd take along.",
         "Kindred": "The mine's yours as much as mine now.",
@@ -426,7 +426,7 @@
         "Stranger": "Welcome in! Grab a seat anywhere.",
         "Acquainted": "You look like you need a proper meal.",
         "Familiar": "Veggie plate, on the house. Eat!",
-        "Trusted": "Weekend cooking at the tea table. You should come.",
+        "Trusted": "I always save you a seat at the tea table.",
         "Kindred": "My kitchen is your kitchen.",
         "mystery": "Oh! Um. I'll… display it?"
       },
@@ -457,7 +457,7 @@
         {
           "id": "req_res_hana_3",
           "title": "Tea Time",
-          "text": "A pot of fruit tea for the afternoon crowd.",
+          "text": "Two pots of fruit tea for the afternoon crowd.",
           "stage": "Acquainted",
           "need": {
             "kind": "dish",
@@ -497,10 +497,10 @@
       ],
       "lines": {
         "Stranger": "Trains run on time. So should you.",
-        "Acquainted": "Permits and tickets: the materials are all out there.",
+        "Acquainted": "Every trip starts at a station. Where to next?",
         "Familiar": "Grilled skewers. Station lunch.",
-        "Trusted": "I'll stamp anything you bring me. Almost.",
-        "Kindred": "First class, for you. Always.",
+        "Trusted": "Your passport's filling up. I've been counting.",
+        "Kindred": "This station's always open for you.",
         "mystery": "This is… not on the timetable."
       },
       "requests": [
@@ -559,7 +559,7 @@
       ],
       "lines": {
         "Stranger": "The light's on. Come in from the wind.",
-        "Acquainted": "Fish bite better after rain. Watch the sky.",
+        "Acquainted": "Some fish bite better in the rain. Watch the sky.",
         "Familiar": "Tea's warm. Sit with me a while.",
         "Trusted": "Some nights you can see the big ones' shadows.",
         "Kindred": "The stars look better with company.",
@@ -639,7 +639,7 @@
       "lines": {
         "Stranger": "Oh! A visitor. Please, look around.",
         "Acquainted": "Every stamp tells where someone has been.",
-        "Familiar": "I catalogued your last gift. It was delicious.",
+        "Familiar": "I'd catalog your cooking, but I'd rather eat it.",
         "Trusted": "I'd like your help with a special exhibit.",
         "Kindred": "Your name is in the founders' book now.",
         "mystery": "I'll… label it 'experimental'."
@@ -672,7 +672,7 @@
         {
           "id": "req_res_tomo_3",
           "title": "The Rare Exhibit",
-          "text": "A Rare fish. The centrepiece.",
+          "text": "A Rare fish. The centerpiece.",
           "stage": "Trusted",
           "need": {
             "kind": "fish",
@@ -704,7 +704,7 @@
         "Stranger": "Careful of the seedlings. Hello.",
         "Acquainted": "Compost early, water late. That's the trick.",
         "Familiar": "A salad from the nursery corner.",
-        "Trusted": "I'll show you how the regional seeds like their soil.",
+        "Trusted": "Regional seeds grow fine here. Just give them time.",
         "Kindred": "Half of this garden is yours now.",
         "mystery": "I'll put it in the compost. Lovingly."
       },
@@ -777,9 +777,9 @@
       ],
       "lines": {
         "Stranger": "FRESH BREAD! Oh — hello, didn't see you there.",
-        "Acquainted": "Weekend market's the best. You'll see.",
+        "Acquainted": "Best bread in the square. Don't tell the others.",
         "Familiar": "Took this off the stove for you. Eat while it's hot!",
-        "Trusted": "Big orders this weekend. I need a partner.",
+        "Trusted": "Big orders today. I need a partner.",
         "Kindred": "You're market family now!",
         "mystery": "HA! Well, it's food. Probably."
       },
@@ -824,7 +824,7 @@
         },
         {
           "id": "req_res_nadia_4",
-          "title": "Weekend Market",
+          "title": "Market Day",
           "text": "Two stews. The whole square will be here.",
           "stage": "Trusted",
           "need": {
