@@ -700,9 +700,8 @@ static func _dialogue_cards() -> Control:
 		"Morning! Row Hoes just came in — sows three plots at once, Farming Lv4. Anything I can get you?")
 	c.portrait_size = UiDialogueCard.KEEPER_PORTRAIT
 	c.place = "Keeps the stall · Mission Market Square"
-	c.content.add_child(UiCommandButton.new("Trade · open the stall"))
+	c.content.add_child(UiCommandButton.new("Trade"))
 	c.content.add_child(UiCommandButton.new("What's fresh today?", UiCommandButton.Kind.SECONDARY))
-	c.content.add_child(UiDismissButton.new("Just passing by"))
 	return _captioned(_at_336(c), "keeper layout: Role · Name, place line, no profile link")
 
 static func _resident_bars() -> Control:

@@ -7,7 +7,7 @@ extends PanelContainer
 ##             under it (keepers)
 ##   extra     an optional row under the identity (the resident's affinity)
 ##   bubble    the one line, in a white speech bubble whose tail points at the portrait
-##   content   the options (Gift / Request, or Trade / ask / Just passing by)
+##   content   the options (Gift / Request, or Trade / ask; a keeper's card closes by the ✕ above it, q(154))
 ## With `profile_link` on, tapping the portrait or the identity emits `identity_pressed` (the RES-* profile is a
 ## secondary page, never the first screen, LOCK-18).
 

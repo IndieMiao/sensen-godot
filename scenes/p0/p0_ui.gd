@@ -2083,8 +2083,10 @@ func _show_need_source(tile: Control, id: String) -> void:
 	layer.theme = UiKit.theme()
 
 ## Keeper greeting (KeeperGreeting 1205:83238, LOCK-16; NPC-G1 / G1-2 / G1-3 / G1-4): every keeper greets first.
-## `Role · Name`, `Does it · Place`, the line (P0Logic.keeper_lines, facts from view.keepers), then Trade (the counter),
-## the question (its answer replaces the line) and Just passing by. role = the counter id ("tackle", "tea", "post",
+## `Role · Name`, `Does it · Place`, the line (P0Logic.keeper_lines, facts from view.keepers), then Trade (the counter)
+## and the question (its answer replaces the line); a Close 44 sits 8 above the card's top-right corner, as on the
+## resident's bar, and a tap outside or Back closes it too (q(154), LOCK-16 复议 197 e508cd27: Joey on 296 — `Just passing
+## by` took a whole row to close the card, `Trade · open the stall` a sentence for a button). role = the counter id ("tackle", "tea", "post",
 ## "market"); ctx = the outpost's keeper ctx {keeper, place, nearest} (SGODOT-227), passed through untouched and kept
 ## for the counter's keeper bar.
 func open_keeper_greeting(role: String, ctx := {}) -> void:
@@ -2105,15 +2107,13 @@ func open_keeper_greeting(role: String, ctx := {}) -> void:
 		var ask := UiCommandButton.new(str(lines.question), UiCommandButton.Kind.SECONDARY)
 		ask.activated.connect(func(): card.line = str(lines.answer))
 		card.content.add_child(ask)
-	var bye := UiDismissButton.new(str(lines.leave))
-	bye.pressed.connect(close_modal)
-	card.content.add_child(bye)
 	card.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
 	card.offset_left = UiTokens.SIZE_QUICK_BAR_X
 	card.offset_right = -UiTokens.SIZE_QUICK_BAR_X
 	card.offset_bottom = -bottom_pad()
 	card.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	_open_modal(card, 0.0, true)
+	_close_above(card, _CLOSE_ABOVE_CARD)
 	modal_kind = "greeting"
 
 ## The tackle shop before the outposts open it with their ctx (the map's tackle pin, P0_SHOT "kai").
