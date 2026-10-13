@@ -73,6 +73,8 @@ const nearestSeed = r => {
   const span = Math.min(180, Math.ceil(CLUSTER_KM / (111 * CELL * Math.max(0.05, Math.cos(r.lat * rad)))));
   let best = null, bestKm = Infinity;
   for (let di = -1; di <= 1; di++) for (let dj = -span; dj <= span; dj++) for (const s of seeds.get(cellKey(i + di, j + dj)) ?? []) {
+    // never into a smaller seed: a SPLIT_OUT seed stands before the merge, and a bigger neighbour must not join it (亚瑟 on #387)
+    if (s.pop < r.pop || (s.pop === r.pop && s.id > r.id)) continue;
     const d = km(r, s);
     if (d <= CLUSTER_KM && (d < bestKm || (d === bestKm && s.id < best.id))) { best = s; bestKm = d; }
   }
@@ -93,9 +95,9 @@ if (existsSync(MEMBERS)) {
     if (byId.has(city) && byId.has(cluster)) of.set(city, cluster);
   }
 }
+const fresh = of.size === 0;   // before SPLIT_OUT, so a build from nothing says built
 for (const { id } of SPLIT_OUT) if (byId.has(id)) of.set(id, id);
 for (const id of new Set(of.values())) addSeed(byId.get(id));
-const fresh = of.size === 0;
 
 // Most populous first (ties by id): deterministic. On a fresh build a city within 30 km of an earlier seed joins it
 // (the greedy merge); on a rebuild only cities new to the directory are placed, the same way.
