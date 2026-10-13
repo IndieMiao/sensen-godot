@@ -307,6 +307,7 @@ func set_view(v: Dictionary) -> void:
 	if compost_bin() != null: _compost.refresh(v)
 	if inbox() != null: _inbox.refresh(v)
 	if bite_board() != null: _bite_board.refresh(v)
+	if notice_board() != null: _notice_board.refresh(v)
 	_refresh_hud()
 	_refresh_bar()
 
@@ -2541,6 +2542,39 @@ func open_bite_board(outpost: Dictionary) -> UiDrawer:
 ## The open Bite Board, or null.
 func bite_board() -> UiDrawer:
 	return _bite_board if is_instance_valid(_bite_board) and modal_kind == "bite_board" else null
+
+## The Homestead Stall's Notice Board (q(164), SGODOT-284; 不知火舞's spec): from Homestead Lv5 the board by the stall
+## opens it, read-only. A row closes it and the map flies to that pin (show_on_map), moving nobody (q(31), k(1)).
+## The outposts' online counts are the map's (GET /p0/presence): the runtime asks on opening (notice_board_opened)
+## and hands them over (set_notice_online); until then no person badge shows.
+const NoticeBoardDrawer := preload("res://scenes/p0/panels/p0_notice_board_drawer.gd")
+signal notice_board_opened
+var _notice_board: UiDrawer
+var notice_online := {}   # outpost id → who is in, the last counts asked for
+
+func open_notice_board() -> UiDrawer:
+	var d: UiDrawer = NoticeBoardDrawer.new(view, notice_online)
+	d.theme = UiKit.theme()
+	d.safe_bottom = safe_bottom()
+	d.close_requested.connect(close_modal)
+	d.connect(&"place_pressed", func(go: String):
+		close_modal()
+		show_on_map.emit(map_target(go)))
+	_open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
+	_close_above(d, _CLOSE_ABOVE_SHEET, UiTokens.SPACE_PAGE)
+	_notice_board = d
+	modal_kind = "notice_board"
+	notice_board_opened.emit()
+	return d
+
+## The open Notice Board, or null.
+func notice_board() -> UiDrawer:
+	return _notice_board if is_instance_valid(_notice_board) and modal_kind == "notice_board" else null
+
+## The outposts' online counts came: the open board's person badges follow.
+func set_notice_online(online: Dictionary) -> void:
+	notice_online = online
+	if notice_board() != null: _notice_board.call("set_online", online)
 
 ## A pond's card from the Bite Board (the map's card: P0PondCard.info, P0PlaceSheet), its Distance from this shop. Go
 ## leaves the room for that pond (go_pond); Details › lists its fish; Back and a tap outside return to the board, ×

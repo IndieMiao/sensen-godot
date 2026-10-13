@@ -55,3 +55,77 @@ func test_ponds_after_the_beginner_go_nearest_home_first() -> void:
 	# Blossom 1.5 km, Reed 4.3 km just before Pebble 4.4 km (without cos(lat) they swap), Willow, Clover
 	assert_array(ids).is_equal(["pond_san_francisco_03", "pond_san_francisco_06", "pond_san_francisco_05",
 		"pond_san_francisco_04", "pond_san_francisco_01", "pond_san_francisco_02"])
+
+# ---------------------------------------------------------------- the drawer (不知火舞's spec on 284)
+const Drawer := preload("res://scenes/p0/panels/p0_notice_board_drawer.gd")
+
+func _drawer(v: Dictionary, online := {}) -> UiDrawer:
+	var top := CanvasLayer.new()
+	add_child(auto_free(top))
+	var host := Control.new()
+	host.theme = UiKit.theme()
+	host.size = Vector2(360, 800)
+	top.add_child(host)
+	var d: UiDrawer = Drawer.new(v, online)
+	d.animate = false
+	host.add_child(d)
+	return d
+
+func _text(d: Node, path: String) -> String: return (d.find_child(path, true, false) as Label).text
+
+## Head, the two sections, a 64 row per place: icon, short name, line, the trap and online badges, the `›`.
+func test_the_drawer_reads_as_the_spec() -> void:
+	var d := _drawer(_view(), {"sh_tea_1": 3})
+	for i in 3: await get_tree().process_frame
+	assert_str(_text(d, "Title")).is_equal("Notice Board")
+	assert_str(_text(d, "Subtitle")).is_equal("San Francisco · Today · tap a place to see it on the map")
+	assert_object(d.find_child("Section_Ponds", true, false)).is_not_null()
+	assert_object(d.find_child("Section_Outposts", true, false)).is_not_null()
+	var fern := d.find_child("Row_pond_san_francisco_03", true, false) as Button
+	assert_float(fern.custom_minimum_size.y).is_equal(64.0)
+	assert_str((fern.find_child("Name", true, false) as Label).text).is_equal("Fern")
+	assert_str((fern.find_child("Line", true, false) as Label).text).is_equal("Rainbow Trout bite in the rain")
+	assert_str(((fern.find_child("Trap", true, false) as Node).find_child("Count", true, false) as Label).text).is_equal("2/3")
+	assert_object(fern.find_child("Online", true, false)).is_null()
+	var tea := d.find_child("Row_sh_tea_1", true, false) as Button
+	assert_str(((tea.find_child("Online", true, false) as Node).find_child("Count", true, false) as Label).text).is_equal("3")
+	assert_object((d.find_child("Row_sh_post_1", true, false) as Node).find_child("Online", true, false)).is_null()   # 0: none
+	var went := []
+	d.connect(&"place_pressed", func(go: String): went.append(go))
+	tea.pressed.emit()
+	assert_array(went).is_equal(["outpost:sh_tea_1"])
+
+## A marked pin's row carries its mark and reason (q(103)); the online counts come later and add their badge.
+func test_a_marked_row_and_late_online_counts() -> void:
+	var v := _view()
+	v["map_markers"] = [{"place": "sh_market_1", "kind": "request", "why": {}}]
+	var d := _drawer(v)
+	for i in 2: await get_tree().process_frame
+	var market := d.find_child("Row_sh_market_1", true, false) as Node
+	assert_object(market.find_child("Reason", true, false)).is_not_null()
+	assert_object(market.find_child("Line", true, false)).is_null()
+	d.call("set_online", {"sh_market_1": 2})
+	market = d.find_child("Row_sh_market_1", true, false) as Node
+	assert_str(((market.find_child("Online", true, false) as Node).find_child("Count", true, false) as Label).text).is_equal("2")
+
+## From the P0 UI: a row closes the board and asks the map for that pin; nothing else moves.
+func test_a_row_closes_the_board_and_shows_the_pin_on_the_map() -> void:
+	var ui := P0Ui.new()
+	ui.quick_store = "user://test_p1_notice_board.json"
+	add_child(auto_free(ui))
+	await get_tree().process_frame
+	ui.set_view(_view())
+	var asked := [0]
+	ui.notice_board_opened.connect(func(): asked[0] += 1)
+	var shown := []
+	ui.show_on_map.connect(func(t: String): shown.append(t))
+	var d := ui.open_notice_board()
+	assert_str(ui.modal_kind).is_equal("notice_board")
+	assert_int(asked[0]).is_equal(1)
+	ui.set_notice_online({"sh_tea_1": 4})
+	await get_tree().process_frame
+	assert_str(((d.find_child("Row_sh_tea_1", true, false) as Node).find_child("Count", true, false) as Label).text).is_equal("4")
+	(d.find_child("Row_pond_san_francisco_06", true, false) as Button).pressed.emit()
+	assert_bool(ui.notice_board() == null).is_true()
+	assert_array(shown).is_equal(["pond:pond_san_francisco_06"])
+	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_p1_notice_board.json"))
