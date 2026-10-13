@@ -2115,8 +2115,7 @@
       ],
       "level_share": 0.5,
       "daily": 6,
-      "_items": "climate → regional crops and fish that can be bartered; filled with Li Bai's regional data (SGODOT-281)",
-      "items": {}
+      "_items": "what can be bartered: the market's climate's regional crops and fish, from the regional data (barter.ts barterItems; 李白 on 284, SGODOT-284)"
     },
     "per_level": {
       "energy": 10,
