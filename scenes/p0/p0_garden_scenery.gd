@@ -9,6 +9,16 @@ const FarmScenery = preload("res://modules/farm/farm_scenery.gd")
 
 var field_rect := Rect2()   # world xz rect covering every bed, for scatter exclusion
 var rock_points: Array = []  # scattered rocks; the farm makes their cells solid
+var _sand: Node3D            # the sand under the field
+var _sand_front := Rect2()   # the field with Homestead Lv7's front row (40–47) and the walkway before row 0
+
+## The sand under the field, grown over Homestead Lv7's front row and its walkway from the moment the view has those beds
+## (不知火舞 282 bf7c124b: one patch, as the Lv3 columns' was; at Lv1–6 that row stays grass).
+func show_front_row(on: bool) -> void:
+	var r := _sand_front if on else field_rect
+	var size := r.size + Vector2(0.7, 0.7)
+	_sand.position = Vector3(r.get_center().x, 0.003, r.get_center().y)
+	_sand.scale = Vector3(size.x / 1.26, 1, size.y / 1.26)
 
 func build(bp: FarmBlueprint, style: String) -> void:
 	name = "GardenScenery"
@@ -18,11 +28,13 @@ func build(bp: FarmBlueprint, style: String) -> void:
 	var half := 0.47
 	field_rect = Rect2(Vector2(first.x - half, last.z - half), Vector2(last.x - first.x + half * 2, first.z - last.z + half * 2))
 	# Sandy garden path under the beds, a little wider than the field (the old 9-plot garden used 3.1×).
-	var path_size := field_rect.size + Vector2(0.7, 0.7)
-	var path := Art.instance("path_tile", Vector3(field_rect.get_center().x, 0.003, field_rect.get_center().y))
-	path.scale = Vector3(path_size.x / 1.26, 1, path_size.y / 1.26)
-	path.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	add_child(path)
+	_sand = Art.instance("path_tile", Vector3.ZERO)
+	_sand.name = "FieldSand"
+	_sand.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	add_child(_sand)
+	var lv7_row := bp.cell_to_world(P0Garden.cell_of(P0Garden.GRID_PLOTS))   # Homestead Lv7's row, in front of row 0
+	_sand_front = Rect2(field_rect.position, field_rect.size + Vector2(0, lv7_row.z - first.z))
+	show_front_row(false)
 	var house := bp.cell_to_world(bp.anchor("house"))
 	var spawn := bp.cell_to_world(bp.anchor("spawn"))
 	# Stepping stones: field → front door, and the entrance → field.

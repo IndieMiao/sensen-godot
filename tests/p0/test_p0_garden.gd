@@ -83,3 +83,20 @@ func test_every_p0_crop_has_a_plant() -> void:
 		var code := str(P0Garden.CROP_CODES.get(str(crop.id), ""))
 		assert_str(code).is_not_empty()
 		assert_bool(CropField.CROPS.has(code)).is_true()
+
+## q(172) A (不知火舞 282 bf7c124b): from Homestead Lv7 the field's sand grows over the new front row and the walkway before
+## row 0 — one patch, its edges as before; at Lv1–6 that row is grass.
+func test_the_sand_reaches_the_front_row_only_from_lv7() -> void:
+	var bp := P0Garden.blueprint()
+	var scenery: Node3D = auto_free(load("res://scenes/p0/p0_garden_scenery.gd").new())
+	add_child(scenery)
+	scenery.build(bp, "cottage")
+	var sand: Node3D = scenery.get_node("FieldSand")
+	var front_edge := func() -> float: return sand.position.z + sand.scale.z * 1.26 * 0.5   # its edge nearest the camera
+	var row := bp.cell_to_world(P0Garden.cell_of(40)).z
+	assert_float(front_edge.call()).is_less(row)   # Lv1–6: grass under the row
+	scenery.show_front_row(true)
+	assert_float(front_edge.call()).is_greater(row + 0.47)   # Lv7: the row's beds stand on sand, its front margin as row 0's
+	var back := sand.position.z - sand.scale.z * 1.26 * 0.5
+	scenery.show_front_row(false)
+	assert_float(sand.position.z - sand.scale.z * 1.26 * 0.5).is_equal_approx(back, 0.001)   # the back edge never moves

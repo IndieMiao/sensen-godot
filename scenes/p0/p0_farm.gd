@@ -73,6 +73,7 @@ var _looks: Node3D   # p0_looks.gd: Porch, Kitchen Wing and the Lv10 house by th
 var _sign := Vector3.ZERO   # Homestead sign right of the farmhouse door (WorldBadges · Farm 1135:79267): HOME-1
 var _plaque := Vector3.ZERO   # Upgrade Plaque left of the door (1510:97492), shown from the first upgrade: PLAQUE-READ
 var _plaque_node: Node3D
+var _scenery: Node3D   # p0_garden_scenery.gd: the sand under the field grows over Lv7's front row
 var _chef_sign := Vector3.ZERO   # the Chef's Sign's post foot (Homestead Lv10), left of the door path: P0Garden.CHEF_SIGN_CELL
 var _chef_sign_node: Node3D
 var _chef_sign_look := ""        # the model shown: "a" timber / "b" stone
@@ -196,10 +197,10 @@ func _build_world() -> void:
 	props.add_child(mine)
 	_materials = P0FarmMaterials.new().setup(self, _mine, mine)
 	add_child(_materials)
-	var scenery := GardenScenery.new()
-	add_child(scenery)
-	scenery.build(bp, STYLE)
-	P0Garden.block_points(bp, scenery.rock_points)   # rocks collide; crops and bushes don't
+	_scenery = GardenScenery.new()
+	add_child(_scenery)
+	_scenery.build(bp, STYLE)
+	P0Garden.block_points(bp, _scenery.rock_points)   # rocks collide; crops and bushes don't
 	_fence = Fence.new()
 	add_child(_fence)
 	_fence.build(bp)
@@ -714,6 +715,7 @@ func _sync_plots(v: Dictionary, dt: float) -> void:
 		if id >= 0 and id < P0Garden.plot_count(v): beds.multimesh.set_instance_color(id, P0Garden.bed_tint(str(p.get("state", ""))))
 	# P1 (q(59) §1.1): beds 30–39 stand from Homestead Lv3 (the view's garden.plots); before that the batch draws 30.
 	beds.multimesh.visible_instance_count = P0Garden.plot_count(v)
+	_scenery.show_front_row(P0Garden.plot_count(v) > P0Garden.GRID_PLOTS)   # Lv7's row gets the field's sand (q(172) A)
 	_sync_trees(v)
 
 ## P1 trees (q(118)): a tree's bed is solid (§5.6: not walkable, as the old woody crop); only the cells that change flip,
