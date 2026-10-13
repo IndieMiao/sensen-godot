@@ -55,6 +55,7 @@ func test_the_home_key_sits_over_the_recenter_key_and_gives_way_to_a_sheet() -> 
 
 ## Presses the home key and waits for the landing (the card): the seconds it took, or -1 if it never landed.
 func _fly_home(m: Node) -> float:
+	await get_tree().process_frame   # timed from a fresh frame: the flight's first step is a frame's, never a long hitch's
 	var started := Time.get_ticks_msec()
 	m.city_map.home_key.pressed.emit()
 	await _card(m)

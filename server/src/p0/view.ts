@@ -25,17 +25,18 @@ import { orchardView, treeOf } from './orchard.js';
 import { restReadyIn } from './presence.js';
 import { inboxView, settleParcels } from './parcels.js';
 import { cookbookView, masteredCount } from './cookbook.js';
-import { mapMarkers } from './markers.js';
+import { litEvents, mapMarkers } from './markers.js';
 import { everFish, forecast, pondAt, pondFishIds, timeWord } from './fishing_world.js';
 import { trapsView } from './fish_trap.js';
-import { homeCluster } from './travel.js';
+import { homeOf } from './travel.js';
+import { homeFacts } from './home.js';
 import { decorView } from './decor.js';
 
 /** opts.online: players in the P0 outpost rooms right now (SGODOT-227), for the Tea Host's answer; null when not known. */
 export function viewOf(c: P0Content, input: P0State, now: number, opts: { online?: number | null } = {}) {
   const s = structuredClone(input);
   settleEnergy(c, s, now);
-  if (s.day.key !== dayKey(c, now)) s.day = emptyDay(dayKey(c, now));
+  if (s.day.key !== dayKey(c, s, now)) s.day = emptyDay(dayKey(c, s, now));
   expireGiftMeals(s);
   settleBoards(c, s, now);   // same draw as the next command makes (both start from the stored rng)
   settleStove(c, s, now, []);   // Queue ×2: show the waiting pot already fired, as the next command will
@@ -56,8 +57,10 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     inbox: inboxView(s, now),   // §10.4.8 parcels; the Inbox panel comes with stage 4, the bell reads `badge`
     // Map pin markers (§9.5.2, q(48)): one per place, deliver > request > new; the map draws the first five on screen
     map_markers: mapMarkers(c, s, now),
+    // §9.3.3 event venues lit now (from 2 h before until the end; their ★ is in map_markers): empty in the prototype
+    event_venues: litEvents(c, now).map(e => ({ id: e.id, place: e.place, name: e.name, starts: e.starts, ends: e.ends })),
     // Cross-city (v5, SGODOT-278, note 0fc0bc5e §2): home / here / passes / visits / stamps / fallback / explorer
-    travel: { ...s.travel, today: dayKey(c, now) },   // today: the day key stamps count on (Passport: first visits today 1/2)
+    travel: { ...s.travel, today: dayKey(c, s, now) },   // today: the day key stamps count on (Passport: first visits today 1/2)
     decor: decorView(c, s),   // Decorate (SGODOT-284): {placed, cap, used, stored}; catalog and yard are in the content
     skills,
     plots: s.plots.map(p => ({
@@ -76,7 +79,7 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
       capacity: s.bag_cap, free: freeSlots(s),
       // Every slot says locked / gifted (the item-info rules gate Lock and Gift on these fields, SGODOT-224).
       slots: s.bag.map(b => ({ id: b.id, qty: b.qty, locked: s.locked.includes(b.id), gifted: !!b.gift,
-        ...(b.gift ? { from: b.gift.from, expires_in: untilRollover(c, now) } : {}) })),
+        ...(b.gift ? { from: b.gift.from, expires_in: untilRollover(c, s, now) } : {}) })),
     },
     drinks: drinksView(c, s, now),
     shops: Object.fromEntries(SHOPS.map(shop => [shop, shopView(c, s, shop)])),
@@ -87,13 +90,13 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     gather: gatherView(c, s, now),
     workbench: workbenchView(c, s),
     homestead: homesteadView(c, s),
-    profile: { name: c.profile.name, city: c.profile.city, climate: c.profile.climate, since_ms: s.created_at,
+    profile: { name: c.profile.name, city: homeFacts(c, s).name, climate: homeFacts(c, s).climate, since_ms: s.created_at,
       farm: { name: c.profile.farm_name, level: s.homestead.level } },
     boards: Object.fromEntries(BOARDS.map(b => [b, boardView(c, s, b, now)])),
     residents: Object.fromEntries(Object.keys(c.residents).map(id => [id, residentView(c, s, id, now)])),
     keepers: keepersView(c, s, now, opts.online ?? null),
     // away_ready_in: ms until Rest opens by the 2 h away rule (0 = open, null = not left yet), q(41).
-    rest: { used: s.day.rest, limit: 1, resets_in: untilRollover(c, now), amount: c.energy.rest_amount,
+    rest: { used: s.day.rest, limit: 1, resets_in: untilRollover(c, s, now), amount: c.energy.rest_amount,
       away_h: c.energy.rest_away_h, away_ready_in: restReadyIn(c, s, now) },
     stall: {
       keeper: c.stall.keeper,
@@ -184,7 +187,7 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
           reach: rodById(c, id)?.reach ?? null };
       }),
     },
-    meals: { used: s.day.meals, cap: foodCap(c, s, now), resets_in: untilRollover(c, now), eaten: s.day.eaten },
+    meals: { used: s.day.meals, cap: foodCap(c, s, now), resets_in: untilRollover(c, s, now), eaten: s.day.eaten },
     items: Object.fromEntries(bagIds(c, s).map(id => [id, itemInfo(c, s, id)])),
     rarity_names: c.rarity_names,
     prices: Object.fromEntries(c.crops.map(crop => [crop.id, crop.price])),
@@ -293,7 +296,7 @@ function homesteadView(c: P0Content, s: P0State) {
 function drinksView(c: P0Content, s: P0State, now: number) {
   const max = maxEnergy(c, s), price = drinkPrice(c, s);
   return {
-    used: s.day.drinks, limit: c.drinks.daily, left: c.drinks.daily - s.day.drinks, resets_in: untilRollover(c, now),
+    used: s.day.drinks, limit: c.drinks.daily, left: c.drinks.daily - s.day.drinks, resets_in: untilRollover(c, s, now),
     price, need: price === null ? null : coinsNeeded(c, price), energy: c.drinks.energy,
     gain: Math.max(0, Math.min(c.drinks.energy, max - s.energy.value)), full: s.energy.value >= max,
     items: Object.entries(c.drinks.items).map(([id, d]) => ({ id, name: d.name, shop: d.shop })),
@@ -303,10 +306,10 @@ function drinksView(c: P0Content, s: P0State, now: number) {
 function quotaView(c: P0Content, s: P0State, q: QuotaId, now: number) {
   // a per-city quota shows the city the player is in (§11.7.3: one count per account × city cluster), and its scope
   // names it (NPC-3 482:120: `all San Francisco markets`)
-  const city = s.travel?.here ?? homeCluster(c);
+  const city = s.travel?.here ?? homeOf(c, s);
   const used = q === 'request_bonus' ? s.day.bonus : q === 'sys_requests' ? s.day.sys_done
     : s.day.quota[quotaKey(c, q, city)] ?? 0;
-  return { used, cap: c.quotas[q].cap, resets_in: untilRollover(c, now), scope: quotaScope(c, q, city) };
+  return { used, cap: c.quotas[q].cap, resets_in: untilRollover(c, s, now), scope: quotaScope(c, q, city) };
 }
 
 /** One counter (§9.11): what it sells with every gate as a fact, and which kinds it buys back at what rate / quota. */
@@ -334,11 +337,11 @@ function shopView(c: P0Content, s: P0State, shop: ShopId) {
     // the next level lets come by barter.
     barter: shop === 'market' && c.homestead.barter ? {
       give: c.homestead.barter.give, daily: c.homestead.barter.daily, left: Math.max(0, c.homestead.barter.daily - (s.day.barters ?? 0)),
-      items: barterItems(c).map(id => ({ id, name: itemName(c, id), have: count(s.bag, id) })),
+      items: barterItems(c, s).map(id => ({ id, name: itemName(c, id), have: count(s.bag, id) })),
       minerals: c.homestead.barter.minerals.map(id => ({ id, name: itemName(c, id), room: barterRoom(c, s, id) })),
     } : null,
     // Recipe cards on this counter today (§7.16.1): the Stall's daily two, Market's climate cards. Bought = in the Cookbook.
-    cards: (shop === 'homestead' ? stallCards(c, s) : shop === 'market' ? marketCards(c, c.profile.climate) : []).map(id => {
+    cards: (shop === 'homestead' ? stallCards(c, s) : shop === 'market' ? marketCards(c, homeClimate(c, s)) : []).map(id => {
       const page = cardPage(id), price = cardPrice(c, id) ?? 0, recipe = recipeById(c, page);
       return { id, page, name: recipe?.name ?? page, rarity: recipe ? recipeRarity(c, recipe) : 1, price, need: coinsNeeded(c, price),
         owned: s.cookbook.includes(page) };
@@ -347,9 +350,9 @@ function shopView(c: P0Content, s: P0State, shop: ShopId) {
 }
 
 /** Ids a request could take, cheapest floor first: the fixed items, or every crop / fish / dish that fits its kind and rarity. */
-function candidates(c: P0Content, r: BoardRequest): string[] {
+function candidates(c: P0Content, s: P0State, r: BoardRequest): string[] {
   if (r.items.length || r.kind === 'visit') return r.items;
-  if (r.where === 'not_home') return [...farFish(c)].sort((a, b) => floorPrice(c, a) - floorPrice(c, b));   // Far Pond: q(128) estimates at the cheapest
+  if (r.where === 'not_home') return [...farFish(c, s)].sort((a, b) => floorPrice(c, a) - floorPrice(c, b));   // Far Pond: q(128) estimates at the cheapest
   const ids = r.kind === 'fish' ? c.fish.map(f => f.id) : r.kind === 'dish' ? c.cooking.recipes.map(x => x.id) : c.crops.map(x => x.id);
   return ids.filter(id => matches(c, { kind: r.kind, rarity: r.rarity, style: r.style, family: r.family }, [], id)).sort((a, b) => floorPrice(c, a) - floorPrice(c, b));
 }
@@ -373,7 +376,7 @@ function requestView(c: P0Content, s: P0State, r: BoardRequest, now: number) {
   const each = r.kind === 'visit' ? (r.visit?.done ? 1 : 0)
     : r.items.length > 1 ? Math.min(...r.items.map(i => haveFor(c, s, { kind: r.kind as 'crop' }, [i])))
     : haveForRequest(c, s, r);
-  const cheapest = candidates(c, r)[0];
+  const cheapest = candidates(c, s, r)[0];
   const estimate = parts ? payout(c, r, parts)
     : { base: r.items.length > 1 ? r.items.reduce((n, i) => n + floorPrice(c, i) * r.qty, 0) : (cheapest ? floorPrice(c, cheapest) : 0) * r.qty, bonus: r.bonus };
   return {
@@ -459,7 +462,7 @@ function keepersView(c: P0Content, s: P0State, now: number, online: number | nul
   const fishing = skillLevel(c, s, 'fishing');
   const reed = c.fishing.rods.find(r => r.id === 'rod_reed');
   const nextFish = Object.fromEntries(Object.entries(c.fishing.sites).map(([site, def]) => {
-    const above = everFish(c, def, homeCluster(c)).filter(f => f.level > fishing).sort((a, b) => a.level - b.level)[0];
+    const above = everFish(c, def, homeOf(c, s)).filter(f => f.level > fishing).sort((a, b) => a.level - b.level)[0];
     return [site, above ? { id: above.id, level: above.level } : null];
   }));
   const tea = { cups_left: left, full, greet: left <= 0 ? 'cups_out' : full ? 'full' : 'cups_left', online };

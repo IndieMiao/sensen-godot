@@ -30,8 +30,8 @@ function record(s: P0State, p: Parcel | Omit<Parcel, 'expires_at'>, at: number, 
 }
 
 /** A resident's gift meal is gone at the player-day rollover (§3.4.5), even as a parcel. */
-function lifetimeEnd(c: P0Content, p: Omit<Parcel, 'expires_at'>, now: number): number {
-  return p.gift ? Math.min(now + PARCEL_LIFETIME_MS, now + untilRollover(c, now)) : now + PARCEL_LIFETIME_MS;
+function lifetimeEnd(c: P0Content, s: P0State, p: Omit<Parcel, 'expires_at'>, now: number): number {
+  return p.gift ? Math.min(now + PARCEL_LIFETIME_MS, now + untilRollover(c, s, now)) : now + PARCEL_LIFETIME_MS;
 }
 
 /**
@@ -51,8 +51,8 @@ export function settleParcels(c: P0Content, s: P0State, now: number): boolean {
   while (s.inbox.parcels.length < PARCEL_LIMIT && s.inbox.waiting.length > 0) {
     const p = s.inbox.waiting.shift()!;
     changed = true;
-    if (p.gift && untilRollover(c, p.created_at) <= now - p.created_at) { record(s, p, now, 'returned'); continue; }
-    s.inbox.parcels.push({ ...p, expires_at: lifetimeEnd(c, p, now) });
+    if (p.gift && untilRollover(c, s, p.created_at) <= now - p.created_at) { record(s, p, now, 'returned'); continue; }
+    s.inbox.parcels.push({ ...p, expires_at: lifetimeEnd(c, s, p, now) });
   }
   return changed;
 }
@@ -83,7 +83,7 @@ export function grantItems(c: P0Content, s: P0State, now: number, key: string, s
       const amount = Math.min(left, stackLimit(c, id));
       const p = { key: `${key}:${index++}`, id, qty: amount, ...(gift ? { gift: { ...gift } } : {}), source, created_at: now };
       const waiting = s.inbox.parcels.length >= PARCEL_LIMIT;
-      const end = lifetimeEnd(c, p, now);
+      const end = lifetimeEnd(c, s, p, now);
       if (waiting) s.inbox.waiting.push(p);
       else s.inbox.parcels.push({ ...p, expires_at: end });
       // expires_in: a gift meal's parcel is gone at 04:00, so its float must not promise 24 h.

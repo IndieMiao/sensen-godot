@@ -4,18 +4,22 @@ extends GdUnitTestSuite
 
 const P0Map := preload("res://scenes/p0/p0_map.gd")
 
+## The event venue's purple ★ (§9.3.3, SGODOT-275 P1 exit) comes last, as the server orders it; a kind the map does not
+## know stays off.
 func test_server_markers_become_pin_marks_in_their_order() -> void:
 	var view := {"map_markers": [
 		{"place": "sh_market_1", "kind": "deliver", "why": {"request": "mk_1"}},
 		{"place": "pond_san_francisco_03", "kind": "request", "why": {"request": "req_tutorial", "tracked": true}},
 		{"place": "home", "kind": "deliver", "why": {"request": "st_1"}},
 		{"place": "sh_tackle_1", "kind": "new", "why": {"item": "rod_reed"}},
-		{"place": "sh_tea_1", "kind": "event"},
+		{"place": "sh_tea_1", "kind": "event", "why": {"event": "ev_derby"}},
+		{"place": "sh_post_1", "kind": "locked"},
 	]}
 	assert_array(P0Map.marks_from(view)).is_equal([
 		{"id": "sh_market_1", "state": "deliverable"},
 		{"id": "pond_san_francisco_03", "state": "request"},
 		{"id": "sh_tackle_1", "state": "new"},
+		{"id": "sh_tea_1", "state": "event"},
 	])
 	assert_array(P0Map.marks_from({})).is_empty()
 

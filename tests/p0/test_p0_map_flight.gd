@@ -60,6 +60,7 @@ func test_the_recenter_key_flies_to_the_player_at_the_locate_zoom() -> void:
 	map.fly_to(map.home_lat + 0.01, map.home_lng + 0.01)
 	map._set_zoom(13.3)
 	var from := _here()
+	await get_tree().process_frame   # timed from a fresh frame: the flight's first step is a frame's, never a long hitch's
 	var started := Time.get_ticks_msec()
 	map._city_action("recenter")
 	await get_tree().create_timer(0.25).timeout
@@ -79,6 +80,7 @@ func test_the_recenter_key_comes_in_from_the_state_view_and_waits_out_a_cross_ci
 	map.center_lat = 38.3
 	map.center_lng = -121.2
 	map._set_zoom(6.0)
+	await get_tree().process_frame   # timed from a fresh frame: the flight's first step is a frame's, never a long hitch's
 	var started := Time.get_ticks_msec()
 	map._city_action("recenter")
 	var took := await _landed(started)
@@ -99,6 +101,7 @@ func test_the_recenter_key_comes_in_from_the_state_view_and_waits_out_a_cross_ci
 ## Show on map flies to the pin and selects it on landing — its card, as before (LOCK-08) — never while it flies.
 func test_show_on_map_flies_and_selects_the_pin_on_landing() -> void:
 	var post := P0Outposts.by_role("post")
+	await get_tree().process_frame   # timed from a fresh frame: the flight's first step is a frame's, never a long hitch's
 	var started := Time.get_ticks_msec()
 	rt.ui.show_on_map.emit("outpost:post")
 	await get_tree().create_timer(0.25).timeout

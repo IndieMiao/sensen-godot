@@ -198,6 +198,18 @@ func test_a_server_reply_that_marks_a_pin_lays_the_pins_out() -> void:
 	assert_bool(city._shown_last.has(poi)).override_failure_message("the marked pin is still packed away").is_true()
 	rt.session.view = saved
 
+## An event venue the server lights (§9.3.3, SGODOT-275 P1 exit): its pin wears the purple ★, as any marked pin wears
+## its mark; gone with the event, gone from the pin.
+func test_a_lit_event_venue_wears_the_purple_star() -> void:
+	await _settle()
+	var saved := rt.session.view
+	var lit := saved.duplicate(true)
+	lit["map_markers"] = [{"place": TEA, "kind": "event", "why": {"event": "ev_test"}}]
+	assert_bool(await _lays_out(func(): rt.session.view = lit, 3)).is_true()
+	assert_str((city.markers[TEA].dest as UiMapDestination).mark).is_equal("event")
+	assert_bool(await _lays_out(func(): rt.session.view = saved, 3)).is_true()
+	assert_str((city.markers[TEA].dest as UiMapDestination).mark).is_empty()
+
 ## The outposts' online counts (P0 presence): their pins are replaced (set_places) and their count says the new one
 ## (q(137) ③: the top-right count).
 func test_new_online_counts_lay_the_pins_out() -> void:

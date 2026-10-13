@@ -435,7 +435,7 @@ export function sellPrice(c: P0Content, id: string): number | null {
 }
 
 function rollDay(c: P0Content, s: P0State, now: number): void {
-  const key = dayKey(c, now);
+  const key = dayKey(c, s, now);
   if (s.day.key !== key) s.day = emptyDay(key);
   expireGiftMeals(s);
 }

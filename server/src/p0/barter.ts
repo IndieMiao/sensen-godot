@@ -5,14 +5,15 @@
 import type { P0Content } from './content.js';
 import { count, take } from './bag.js';
 import { nextLevel } from './homestead.js';
+import { homeClimate } from './travel.js';
 import type { P0Event } from './progress.js';
 import type { P0State } from './state.js';
 import { putInStorage } from './storage.js';
 import type { Refusal } from './fishing.js';
 
 /** Regional crops and fish this home climate can barter. */
-export function barterItems(c: P0Content): string[] {
-  return c.homestead.barter?.items[c.profile.climate] ?? [];
+export function barterItems(c: P0Content, s: P0State): string[] {
+  return c.homestead.barter?.items[homeClimate(c, s)] ?? [];
 }
 
 /** How many of a mineral the next level still lets the player get by barter. */
@@ -29,7 +30,7 @@ export function barter(c: P0Content, s: P0State, cmd: { item?: unknown; mineral?
   if (cmd.shop !== 'market') return { code: 'wrong_shop', detail: { shop: 'market' } };
   const item = String(cmd.item ?? ''), mineral = String(cmd.mineral ?? '');
   if (!b.minerals.includes(mineral)) return { code: 'not_barterable', detail: { mineral } };
-  if (!barterItems(c).includes(item)) return { code: 'not_barterable', detail: { item } };
+  if (!barterItems(c, s).includes(item)) return { code: 'not_barterable', detail: { item } };
   const done = s.day.barters ?? 0;
   if (done >= b.daily) return { code: 'barter_limit', detail: { daily: b.daily } };
   if (barterRoom(c, s, mineral) < 1) return { code: 'barter_share', detail: { mineral } };

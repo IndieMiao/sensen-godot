@@ -11,7 +11,9 @@
  *   requests stay off the map; the Stall Board's ! hangs on the farm's own stall, not on the home pin.
  * - new ◆: what a level opened at an outpost that the player has not walked in to see since (Worm Bait and the Reed Rod
  *   at the tackle shop, the Row Hoe at the market square) and a resident's second page of talk at Acquainted. Entering
- *   the outpost marks them seen (noteSeenAt, from presence). No locked or star pins in P0.
+ *   the outpost marks them seen (noteSeenAt, from presence). No locked pins in P0.
+ * - event ★ (§9.3.3, SGODOT-275 P1 exit): a place the event venue table (content/map_events.json) lights, from 2 h before
+ *   its event starts until it ends; after every other kind. The table ships empty: only the field is kept for now.
  * First session (q(48)): until Pond Catch is handed in, only tracked markers show (Reed Pond's !, then home's ✓), so
  * minutes 5–9 have one goal. `more` counts the other reasons at the same place behind the one shown, for the pin card's
  * ` · +N more` (q(103)); the Market Board's open slots are one reason (the card writes `Market Board · 2 requests`). A resident's open fish request lights their outpost only once the player can land such a
@@ -19,21 +21,32 @@
  */
 import { BOARDS, handIn, slotCount } from './boards.js';
 import { pondFishIds } from './fishing_world.js';
-import type { Need, OutpostDef, P0Content, ShopId } from './content.js';
+import type { EventVenue, Need, OutpostDef, P0Content, ShopId } from './content.js';
+import { homeFacts, type Homed } from './home.js';
 import { matches } from './requests.js';
 import { progressOf, requestState, stageIndex } from './residents.js';
 import { skillLevel } from './rules.js';
 import { catalog, offerOf, owns } from './shops.js';
 import type { P0State } from './state.js';
 
-export type MarkerKind = 'deliver' | 'request' | 'new';
+export type MarkerKind = 'deliver' | 'request' | 'new' | 'event';
 export interface MapMarker {
   place: string; kind: MarkerKind;
-  why: { request?: string; resident?: string; item?: string; tracked?: true };
+  why: { request?: string; resident?: string; item?: string; event?: string; tracked?: true };
   more?: number;   // other reasons at this place behind this one (q(103) ` · +N more`); absent when none
 }
 
-const RANK: Record<MarkerKind, number> = { deliver: 0, request: 1, new: 2 };
+const RANK: Record<MarkerKind, number> = { deliver: 0, request: 1, new: 2, event: 3 };
+/** An event venue's ★ comes on this long before its event starts (§16 marker_event: "in progress or within 2 h"). */
+export const EVENT_LEAD_MS = 2 * 3_600_000;
+
+/** The event venues lit at `now`: from EVENT_LEAD_MS before their start until their end; a bad date never lights. */
+export function litEvents(c: P0Content, now: number): EventVenue[] {
+  return (c.event_venues ?? []).filter(e => {
+    const from = Date.parse(e.starts) - EVENT_LEAD_MS, to = Date.parse(e.ends);
+    return Number.isFinite(from) && Number.isFinite(to) && now >= from && now < to;
+  });
+}
 const ACQUAINTED = 1;   // c.affinity.stages[1]: the second page of talk opens here
 
 const outpostOf = (c: P0Content, role: string) => c.outposts?.find(o => o.role === role)?.id ?? null;
@@ -70,15 +83,16 @@ function fishFor(c: P0Content, items: string[], need: Pick<Need, 'kind' | 'rarit
   return c.fish.filter(f => matches(c, need, [], f.id)).map(f => f.id);
 }
 
-/** The pond a tracked fish request points to: the beginner pond if it has one of them, else the nearest to the farm. */
-export function pondFor(c: P0Content, fish: string[]): string | null {
-  const city = c.profile.city.toLowerCase();
+/** The pond a tracked fish request points to: the beginner pond if it has one of them, else the nearest to the farm.
+ * Of the hand-written ponds, in the home city (a generated home's ponds: SGODOT-303's home set). */
+export function pondFor(c: P0Content, s: Homed, fish: string[]): string | null {
+  const home = homeFacts(c, s), city = home.name.toLowerCase();
   const fits = Object.entries(c.fishing.places)
     .filter(([id, p]) => p.city === city && fish.some(f => pondFishIds(c, id).has(f)));
   const beginner = fits.find(([, p]) => p.beginner);
   if (beginner) return beginner[0];
-  const farm = c.profile.farm_at;
-  const dist = (at?: [number, number]) => (farm && at ? (at[0] - farm[0]) ** 2 + ((at[1] - farm[1]) * Math.cos(farm[0] * Math.PI / 180)) ** 2 : Infinity);
+  const farm = home.farm;
+  const dist = (at?: [number, number]) => (farm && at ? (at[0] - farm.lat) ** 2 + ((at[1] - farm.lng) * Math.cos(farm.lat * Math.PI / 180)) ** 2 : Infinity);
   return fits.sort((a, b) => dist(a[1].at) - dist(b[1].at))[0]?.[0] ?? null;
 }
 
@@ -106,7 +120,7 @@ export function mapMarkers(c: P0Content, s: P0State, now: number): MapMarker[] {
       if (handIn(c, s, r)) all.push({ place, kind: 'deliver', why: { request: r.id, ...(tracked ? { tracked: true as const } : {}) } });
       else if (tracked && r.kind === 'visit' && r.visit) all.push({ place: r.visit.place, kind: 'request', why: { request: r.id, tracked: true } });   // Stamp Run: go there
       else if (tracked && r.kind === 'fish' && r.where !== 'not_home') {   // only the fish the player can land yet (q(104)); Far Pond: ponds elsewhere, no pin
-        const pond = pondFor(c, landable(c, s, fishFor(c, r.items, { kind: 'fish', rarity: r.rarity })));
+        const pond = pondFor(c, s, landable(c, s, fishFor(c, r.items, { kind: 'fish', rarity: r.rarity })));
         if (pond) all.push({ place: pond, kind: 'request', why: { request: r.id, tracked: true } });
       } else if (!tracked && board === 'market') {
         const m: MapMarker = { place, kind: 'request', why: { request: r.id } };
@@ -123,7 +137,7 @@ export function mapMarkers(c: P0Content, s: P0State, now: number): MapMarker[] {
     const ready = q.need.kind !== 'sow' || tracked ? progressOf(c, s, id, q) >= q.qty : false;
     if (ready) all.push({ place, kind: 'deliver', why: { request: q.id, resident: id, ...(tracked ? { tracked: true as const } : {}) } });
     else if (tracked && q.need.kind === 'fish') {
-      const pond = pondFor(c, landable(c, s, fishFor(c, q.need.id ? [q.need.id] : [], q.need)));
+      const pond = pondFor(c, s, landable(c, s, fishFor(c, q.need.id ? [q.need.id] : [], q.need)));
       if (pond) all.push({ place: pond, kind: 'request', why: { request: q.id, resident: id, tracked: true } });
     } else if (!tracked && (q.need.kind !== 'fish' || landable(c, s, fishFor(c, q.need.id ? [q.need.id] : [], q.need)).length)) {
       all.push({ place, kind: 'request', why: { request: q.id, resident: id } });
@@ -135,14 +149,15 @@ export function mapMarkers(c: P0Content, s: P0State, now: number): MapMarker[] {
       all.push({ place: o.id, kind: 'new', why: { ...(k.item ? { item: k.item } : {}), ...(k.resident ? { resident: k.resident } : {}) } });
     }
   }
-  // one marker per place, the strongest; then deliver > request > new, tracked first within a kind
+  for (const e of litEvents(c, now)) all.push({ place: e.place, kind: 'event', why: { event: e.id } });
+  // one marker per place, the strongest; then deliver > request > new > event, tracked first within a kind
   const order = (m: MapMarker) => RANK[m.kind] * 2 + (m.why.tracked ? 0 : 1);
   const best = new Map<string, MapMarker>(), reasons = new Map<string, Set<string>>();
   const kept = firstSession(c, s) ? all.filter(m => m.why.tracked) : all;
   for (const m of kept.sort((a, b) => order(a) - order(b))) {
     if (!best.has(m.place)) best.set(m.place, m);
     if (!reasons.has(m.place)) reasons.set(m.place, new Set());
-    reasons.get(m.place)!.add(reason.get(m) ?? `${m.kind}:${m.why.request ?? ''}:${m.why.resident ?? ''}:${m.why.item ?? ''}`);
+    reasons.get(m.place)!.add(reason.get(m) ?? `${m.kind}:${m.why.request ?? ''}:${m.why.resident ?? ''}:${m.why.item ?? ''}:${m.why.event ?? ''}`);
   }
   return [...best.values()].map(m => {
     const more = reasons.get(m.place)!.size - 1;

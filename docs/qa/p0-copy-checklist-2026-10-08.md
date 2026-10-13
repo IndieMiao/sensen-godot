@@ -116,6 +116,7 @@
 | 驿站柜台 | 只卖咖啡，问候卡主键只写 `Trade`（q(154)）；盖章台只作摆设 |
 | 集市委托板 ★ | `Dusk Haul · Market Board` / `4 Fine fish · any kind` / `36 coins`（P0 不写 `+1 city stamp`）；`Market Basket` / `3 crops · 6 each`（q(46)） |
 | 居民 ★ | 头顶名字条只写名字 `Pip` / `Old Kai`（q(62)）；Pip `Could you catch me a fish? Any kind is fine.`（对话条与委托卡同句）；Old Kai 需求行 `Rare fish · Golden Koi · Pond 0/1`；奖励行 `+5 Friendship · 20 coins` / `+5 Friendship · 50 coins`（q(46)）；赠餐 toast `Pip gave you Carrot Cake · in your bag`（菜进背包、没有吃，不写体力，q(94)）；好感进度 `52/90 · next Trusted`，最高档 Kindred 只写 `157`、进度条满格，资料卡 Friendship 行同样 `157`（q(91)） |
+| P1 居民台词与委托 | 十位 P1 居民按 `residents_p1.json`，以 q(170) 定稿为准：不出现 `Weekend cooking` / `Weekend market` / `right papers` / `Permits and tickets` / `cheaper by the river`；Nadia 第 4 条委托标题 `Market Day`；称号 `Harbor Hand` / `Granny's Favorite`；美式拼写（`Neighbor`、`centerpiece`、`catalog`）（q(170)） |
 | 饮品满体力 ★ | 灰 `Energy full`（q(48)） |
 | Stamp Run 与奖励上限 ★ | 签到 toast `Stamp Run · Checked in` / `Deliver at Mission Market Square`；完成奖上限用完时卡上奖励行 `0 coins · Bonus resets in 9h 12m`，板角 `Bonus today 100/100`（q(110)） |
 

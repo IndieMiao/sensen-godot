@@ -122,11 +122,11 @@ describe('map pin markers (§9.5.2, q(48); SGODOT-232)', () => {
   });
 
   it('picks the beginner pond when its template has the fish, else the pond nearest the farm', () => {
-    expect(pondFor(c, ['fish_crucian'])).toBe('pond_san_francisco_03');   // Fern Pond (beginner, Pond template)
-    expect(pondFor(c, ['fish_koi'])).toBe('pond_san_francisco_03');       // Golden Koi lives in Pond only
-    expect(pondFor(c, ['fish_trout'])).toBe('pond_san_francisco_06');     // River only: Blossom Pond is the nearest River pond (1.46 km)
-    expect(pondFor(c, ['fish_mackerel'])).toBe('pond_san_francisco_02');   // Coast only: Clover Pond, Coast from P1 (q(109))
-    expect(pondFor(c, ['fish_tilapia'])).toBeNull();                 // another climate's regional fish: no pond here
+    expect(pondFor(c, null, ['fish_crucian'])).toBe('pond_san_francisco_03');   // Fern Pond (beginner, Pond template)
+    expect(pondFor(c, null, ['fish_koi'])).toBe('pond_san_francisco_03');       // Golden Koi lives in Pond only
+    expect(pondFor(c, null, ['fish_trout'])).toBe('pond_san_francisco_06');     // River only: Blossom Pond is the nearest River pond (1.46 km)
+    expect(pondFor(c, null, ['fish_mackerel'])).toBe('pond_san_francisco_02');   // Coast only: Clover Pond, Coast from P1 (q(109))
+    expect(pondFor(c, null, ['fish_tilapia'])).toBeNull();                 // another climate's regional fish: no pond here
   });
 
   it('one marker per place, deliver before request before new; old saves get an empty seen list', () => {
@@ -170,5 +170,51 @@ describe('map pin markers (§9.5.2, q(48); SGODOT-232)', () => {
     s.skills.fishing = 480;   // Lv4
     expect(mapMarkers(c, s, T0).find(m => m.why.request === 'req_res_kai_1'))
       .toEqual({ place: 'pond_san_francisco_03', kind: 'request', why: { request: 'req_res_kai_1', resident: 'res_old_kai', tracked: true } });
+  });
+});
+
+describe('event venues: the purple ★ (§9.3.3; SGODOT-275 P1 exit)', () => {
+  const H = 3_600_000;
+  /** The content with these venues, for one call (the table ships empty). */
+  function withVenues<T>(venues: NonNullable<typeof c.event_venues>, run: () => T): T {
+    const was = c.event_venues;
+    c.event_venues = venues;
+    try { return run(); } finally { c.event_venues = was; }
+  }
+  const venue = { id: 'ev_test', place: 'pond_san_francisco_01', name: 'Fishing Derby', starts: new Date(T0 + 3 * H).toISOString(), ends: new Date(T0 + 5 * H).toISOString() };
+
+  it('ships an empty table: no event marker, no lit venue in the view', () => {
+    expect(c.event_venues).toEqual([]);
+    const s = afterTutorial();
+    expect(mapMarkers(c, s, T0).some(m => m.kind === 'event')).toBe(false);
+    expect(viewOf(c, s, T0).event_venues).toEqual([]);
+  });
+
+  it('lights its place from 2 h before the start until the end, in the view too', () => {
+    const s = afterTutorial();
+    const lit = (now: number) => withVenues([venue], () => mapMarkers(c, s, now).filter(m => m.kind === 'event').map(m => `${m.place}:${m.why.event}`));
+    expect(lit(T0 + 1 * H - 1)).toEqual([]);   // more than 2 h before
+    expect(lit(T0 + 1 * H)).toEqual(['pond_san_francisco_01:ev_test']);
+    expect(lit(T0 + 4 * H)).toEqual(['pond_san_francisco_01:ev_test']);   // under way
+    expect(lit(T0 + 5 * H)).toEqual([]);   // over
+    expect(withVenues([venue], () => viewOf(c, s, T0 + 4 * H).event_venues)).toEqual([
+      { id: 'ev_test', place: 'pond_san_francisco_01', name: 'Fishing Derby', starts: venue.starts, ends: venue.ends }]);
+  });
+
+  it('comes after every other kind, and a place keeps its stronger marker', () => {
+    const s = afterTutorial();
+    const at4 = T0 + 4 * H;
+    const others = mapMarkers(c, s, at4);
+    const place = others[0]?.place;
+    expect(place).toBeTruthy();   // some outpost or pond already marked (a resident's !)
+    const ms = withVenues([venue, { ...venue, id: 'ev_there', place: place! }], () => mapMarkers(c, s, at4));
+    expect(ms.at(-1)).toMatchObject({ kind: 'event', place: 'pond_san_francisco_01' });
+    expect(ms.find(m => m.place === place)?.kind).toBe(others[0].kind);   // its ! stays; the ★ only counts as one more
+    expect(ms.find(m => m.place === place)?.more).toBe((others[0].more ?? 0) + 1);
+  });
+
+  it('a venue with a bad date never lights', () => {
+    const s = afterTutorial();
+    expect(withVenues([{ ...venue, starts: 'soon' }], () => mapMarkers(c, s, T0 + 4 * H).some(m => m.kind === 'event'))).toBe(false);
   });
 });

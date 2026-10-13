@@ -20,7 +20,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { CityCluster, Climate } from './clusters.js';
 import type { FishPlace, P0Content } from './content.js';
-import { homeCluster } from './travel.js';
+import { writtenCluster } from './travel.js';
 import { regionalFish as pondRegionalFish } from './fishing_world.js';
 
 export type Tier = 'S' | 'M1' | 'M2' | 'L1' | 'L2' | 'L3';
@@ -469,7 +469,7 @@ export function cityPlaces(c: P0Content, cluster: string): CityPlaces | null {
   const hit = cache.get(cluster);
   if (hit) { cache.delete(cluster); cache.set(cluster, hit); return hit; }
   const cl = (c as P0Content & { clusters?: { get(id: string): CityCluster | undefined } }).clusters?.get(cluster);
-  if (!cl || !worldOf(c) || cluster === homeCluster(c)) return null;   // the home city keeps its hand-written tables
+  if (!cl || !worldOf(c) || cluster === writtenCluster(c)) return null;   // the home city keeps its hand-written tables
   const made = generateCity(c, cl);
   cache.set(cluster, made);
   if (cache.size > CACHE_MAX) cache.delete(cache.keys().next().value!);
