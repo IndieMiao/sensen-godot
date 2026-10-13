@@ -1282,7 +1282,7 @@ func p0_frame(view: Dictionary, _dt: float) -> void:
 	var key_shown := not rt.ui.has_modal()
 	if city_map.recenter.visible != key_shown: city_map.recenter.visible = key_shown
 	if city_map.home_key.visible != key_shown: city_map.home_key.visible = key_shown   # the home key with it
-	var list := pin_marks(view)
+	var list := _marks_now(view)
 	var home := home_mark(view)
 	# Away, the homestead's ✓ hangs on its pin (deliverable, the highest mark, so first); at home on the avatar.
 	if away() and home != "": list.push_front({"id": HOME_PIN, "state": home})
@@ -1296,6 +1296,12 @@ const MARK_STATES := {"deliver": "deliverable", "request": "request", "new": "ne
 
 ## The pins' marks [{id, state}]: the server's view.map_markers whenever it sends them (蒙恬, SGODOT-232 U6), else
 ## the ones the client knows before then (tutorial_marks). The homestead's goes on the farm pin (home_mark).
+## Review shots' marks (marks:sh_market_1=request|sh_tea_1=deliver), over the view's; none outside a shot.
+var _dev_marks: Array = []
+
+func _marks_now(view: Dictionary) -> Array:
+	return _dev_marks.duplicate() if not _dev_marks.is_empty() else pin_marks(view)
+
 static func pin_marks(view: Dictionary) -> Array:
 	return marks_from(view) if view.has("map_markers") else tutorial_marks(view)
 
@@ -1326,7 +1332,7 @@ static func tutorial_marks(view: Dictionary) -> Array:
 func city_pin_markers() -> Dictionary:
 	var v: Dictionary = rt.session.view if rt != null and rt.session != null else {}   # every frame: no copy (_pond_info)
 	var out := {}
-	var list := pin_marks(v)
+	var list := _marks_now(v)
 	if away() and home_mark(v) != "": list.push_front({"id": HOME_PIN, "state": home_mark(v)})
 	for m in list:
 		if not out.has(str(m.id)): out[str(m.id)] = str(m.state)
@@ -1370,6 +1376,11 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"zoom":
 			_set_zoom(float(step[1]))
 			_camera_dirty = true
+		"marks":   # marks:sh_market_1=request|sh_tea_1=deliver — map marks on those pins, for shots (q(146) review)
+			_dev_marks = []
+			for pair in step[1].split("|", false):
+				var kv := pair.split("=")
+				_dev_marks.append({"id": kv[0], "state": str(MARK_STATES.get(kv[1], kv[1]))})
 		"online":   # online:sh_tea_1:3 — the presence count an outpost pin says, for shots
 			_online[step[1]] = int(step[2])
 			_set_outpost_places()

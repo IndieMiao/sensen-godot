@@ -163,6 +163,8 @@ var _dest_names_now: Dictionary = {}
 var _dest_texts: Dictionary = {}
 ## The names of the always-in MapDestinations this pass (q(137) ⑤: they never give way, so no disc sits on them).
 var _dest_kept_names: Array = []
+## The always-in MapDestinations this pass, highest priority first (q(146)).
+var _dest_always: Array = []
 ## The view's own controls draw over the pins' names (UiMapDestination.NAME_Z): the keys, credit line and cards.
 const CHROME_Z := 2
 ## Two discs nearer than this (centre to centre, px) cannot both show: the lower-ranked one hides (q(137)). A pin or
@@ -1146,6 +1148,7 @@ func _update_markers() -> void:
 	_dest_names_now.clear()
 	_dest_texts.clear()
 	_dest_kept_names.clear()
+	_dest_always.clear()
 	var blockers := _player_blockers()
 	var bodies := _player_blockers(true)   # what a space pin gives way to: the avatars' bodies (SGODOT-269)
 	var now := Time.get_ticks_msec()
@@ -1173,6 +1176,7 @@ func _update_markers() -> void:
 		_set_marker_shown(markers[id], shown.has(id))
 		if not keep.has(id): _free_marker(id)
 	_apply_marks(shown)
+	_stack_always()
 	_raise_selected()
 	if _hidden_until.size() > 256:
 		for id in _hidden_until.keys():
@@ -1263,10 +1267,14 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int,
 		# The always-in kinds keep theirs.
 		# q(141): of the pins on screen with one short name only the highest-ranked says it (the always-in kinds keep
 		# theirs); the card says each whole.
+		# q(146): the always-in kinds among themselves give way too — they pack first, by their own priority (selected >
+		# where the player is > marked, by kind), so what is packed before one is higher: its name hides whole on such a
+		# disc or name, and comes back once they part (4 px). Other pins' discs and the avatars still never hide it.
 		var held := label_rect.grow(-DEST_HOLD * 0.5) if _dest_names_last.has(id) else label_rect
 		var same_name := _dest_texts.has(_dest_text(entry))
-		label_fits = not is_selected and c.label_w > 0.0 and (always or not (same_name or _hits(_dest_discs, held)
-			or _hits(_dest_names, held) or _hits(bodies, held)))
+		var under := _hits(_dest_discs, held) or _hits(_dest_names, held)
+		label_fits = not is_selected and c.label_w > 0.0 and (not under if always else not (same_name or under
+			or _hits(bodies, held)))
 	elif entry.kind == "landmark":
 		label_fits = is_selected or not _hits(occupied, Rect2(c.point - Vector2(c.width * 0.5, -3), Vector2(c.width, 20)))
 	elif entry.kind == "place":
@@ -1280,6 +1288,7 @@ func _place_candidate(c: Dictionary, occupied: Array, blockers: Array, now: int,
 	if not _destination(entry).is_empty() and c.k != 1.0:
 		label_rect = Rect2(c.point + (label_rect.position - c.point) * c.k, label_rect.size * c.k)
 	if dest_pin:
+		if always: _dest_always.append(id)   # q(146): their discs draw in this order, the first on top
 		# Its disc (scaled when selected) and its name, if shown: the lower-ranked pins and every POI after it keep
 		# clear of them, and My Farm's label gives way to the name (不知火舞 on #83).
 		occupied.append(c.bounds)
@@ -1410,6 +1419,23 @@ func _set_marker_shown(marker: Dictionary, on: bool) -> void:
 func _raise_selected() -> void:
 	_raise(str(selected.get("id", "")))
 
+## q(146): the always-in discs stacked by priority, the highest on top, so its mark shows whole where they pile up (the
+## selected one goes over all after, _raise_selected). Only moved when out of order.
+func _stack_always() -> void:
+	var ordered := true
+	for i in range(1, _dest_always.size()):
+		if not markers.has(_dest_always[i]) or not markers.has(_dest_always[i - 1]): continue
+		if (markers[_dest_always[i]].node as Node).get_index() > (markers[_dest_always[i - 1]].node as Node).get_index():
+			ordered = false
+			break
+	if ordered and (_dest_always.is_empty() or _is_top(_dest_always[0])): return
+	for i in range(_dest_always.size() - 1, -1, -1): _raise(_dest_always[i])
+
+func _is_top(id: String) -> bool:
+	if not markers.has(id): return true
+	var at := (markers[id].node as Node).get_index()
+	return markers.values().all(func(m): return (m.node as Node).get_index() <= at)
+
 ## A pin's node over every other pin's (the pins are not the view's only children: a count of pins is no index).
 func _raise(id: String) -> void:
 	if not markers.has(id): return
@@ -1462,11 +1488,15 @@ func _pack_key(c: Dictionary) -> Array:
 		float(c.entry.get("rank", 5)),
 		c.id]
 
-## A MapDestination's packing rank (q(137)): 0 for the always-in kinds (a marked pin, where the player is), else its
-## style's (P0: 1 beginner pond … 7 silhouette), 1 when it gives none.
+## A MapDestination's packing rank (q(137) / q(146)): the always-in kinds first, where the player is (0), then the marked
+## ones by their kind's rank (100 +), then the rest by it (200 +); the kind's rank is the style's (P0: 1 beginner pond …
+## 7 silhouette), 1 when it gives none. The mark itself (✓ / ! / ◆) does not order them. The selected pin goes before
+## all of them (_pack_key).
 func _dest_rank(entry: Dictionary) -> int:
-	if _marker_of(entry) != "" or (kept_pin.is_valid() and bool(kept_pin.call(entry))): return 0
-	return int(_destination(entry).get("rank", 1))
+	var kind := int(_destination(entry).get("rank", 1))
+	if kept_pin.is_valid() and bool(kept_pin.call(entry)): return 0
+	if _marker_of(entry) != "": return 100 + kind
+	return 200 + kind
 
 ## A MapDestination's name: its style's (P0's short name, q(137)) or the whole label.
 func _dest_text(entry: Dictionary) -> String:
