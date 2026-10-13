@@ -123,6 +123,54 @@ export function giftPoints(c: P0Content, s: P0State, def: ResidentDef, item: str
   return { delta: Math.min(delta, cap), verdict };
 }
 
+/** Gift Clues (§4.6.2 Fishing Lv7 `gift_clue_highlight`; q(167), 不知火舞 on 284): from this Fishing level the bag shows
+ * which residents like a dish and the gift drawer what a gift would add. */
+export const GIFT_CLUES_LEVEL = 7;
+
+/** A resident the player has met: talked to at least once, or has affinity without a chat on record (gifts and requests
+ * open from the talk bar today, so this covers affinity from any other source). */
+export function metResident(s: P0State, id: string): boolean {
+  const r = s.residents?.[id];
+  return !!r && (r.chat_day !== '' || r.affinity > 0);
+}
+
+/** The dishes in the bag a resident can be given (a known recipe or the Mystery Dish, Gifted stacks too, §12.4). */
+function bagDishes(c: P0Content, s: P0State): string[] {
+  const ids = new Set<string>();
+  for (const b of s.bag) {
+    const base = dishParts(b.id).base;
+    if (itemKind(b.id) === 'dish' && (base === c.cooking.mystery.id || recipeById(c, base))) ids.add(b.id);
+  }
+  return [...ids];
+}
+
+/**
+ * view.gift_clues (q(167)): each dish in the bag that a resident the player has met loves or likes (giftPoints'
+ * verdict; a dish anyone takes, and the Mystery Dish, are not clues), residents in content order — what the bag's ♥
+ * and `Liked by Hana · Old Kai` read. Null below Fishing Lv7.
+ */
+export function giftClues(c: P0Content, s: P0State): Record<string, { resident: string; verdict: 'loved' | 'liked' }[]> | null {
+  if (skillLevel(c, s, 'fishing') < GIFT_CLUES_LEVEL) return null;
+  const out: Record<string, { resident: string; verdict: 'loved' | 'liked' }[]> = {};
+  for (const item of bagDishes(c, s)) {
+    if (dishParts(item).base === c.cooking.mystery.id) continue;
+    for (const [id, def] of Object.entries(c.residents)) {
+      if (!metResident(s, id)) continue;
+      const { verdict } = giftPoints(c, s, def, item);
+      if (verdict === 'loved' || verdict === 'liked') (out[item] ??= []).push({ resident: id, verdict });
+    }
+  }
+  return out;
+}
+
+/** view.residents[id].gift_points: what giving each dish in the bag to this resident adds (giftPoints' delta, the
+ * Mystery Dish's −2 too) — the gift drawer's `♥ +3` and `Gift · +3`. Null below Fishing Lv7. */
+export function giftPointsView(c: P0Content, s: P0State, id: string): Record<string, number> | null {
+  const def = residentDef(c, id);
+  if (!def || skillLevel(c, s, 'fishing') < GIFT_CLUES_LEVEL) return null;
+  return Object.fromEntries(bagDishes(c, s).map(item => [item, giftPoints(c, s, def, item).delta]));
+}
+
 export function giftResident(c: P0Content, s: P0State, cmd: { resident?: unknown; item?: unknown }, events: P0Event[]): Refusal | null {
   const id = String(cmd.resident ?? ''), item = String(cmd.item ?? '');
   const def = residentDef(c, id);

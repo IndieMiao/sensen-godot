@@ -9,7 +9,7 @@ import { blessed, dayKey, foodCap, maxEnergy, nextTickIn, regenMs, settleEnergy,
 import { emptyDay, type P0State } from './state.js';
 import { catalog, drinkPrice, isSpecialty, offerOf, owns, quotaKey, quotaScope, regionalOf, walletNeed } from './shops.js';
 import { BOARDS, farFish, farTries, handIn, haveForRequest, heldSlot, lockedTemplate, payout, settleBoards, slotCount } from './boards.js';
-import { expireGiftMeals, lessonState, progressOf, requestOpensIn, requestState, residentState, stageIndex } from './residents.js';
+import { expireGiftMeals, giftClues, giftPointsView, lessonState, progressOf, requestOpensIn, requestState, residentState, stageIndex } from './residents.js';
 import { floorPrice, haveFor, matches } from './requests.js';
 import type { BoardRequest, Pot } from './state.js';
 import { bigPot, boardSlots, chefSignGold, coinsNeeded, lookOf, nextLevel, skillsTotal, stoveCount, unlocked, upgradeBlock } from './homestead.js';
@@ -95,6 +95,7 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     profile: { name: c.profile.name, city: homeFacts(c, s).name, climate: homeFacts(c, s).climate, since_ms: s.created_at,
       farm: { name: c.profile.farm_name, level: s.homestead.level } },
     boards: Object.fromEntries(BOARDS.map(b => [b, boardView(c, s, b, now)])),
+    gift_clues: giftClues(c, s),   // Fishing Lv7 Gift Clues (q(167)): bag dishes → the met residents who love / like them
     residents: Object.fromEntries(Object.keys(c.residents).map(id => [id, residentView(c, s, id, now)])),
     keepers: keepersView(c, s, now, opts.online ?? null),
     // away_ready_in: ms until Rest opens by the 2 h away rule (0 = open, null = not left yet), q(41).
@@ -451,6 +452,7 @@ function residentView(c: P0Content, s: P0State, id: string, now: number) {
     next_in: st.state === 'wait' ? requestOpensIn(c, s, id, now) : null,
     // §7.5.3 Recipe lesson: ready = `learn` teaches `recipe` now; wait = next_in ms; stage = from need_stage; none
     lesson: { state: lesson.state, recipe: lesson.recipe ?? null, next_in: lesson.next_in ?? null, need_stage: lesson.need_stage ?? null },
+    gift_points: giftPointsView(c, s, id),   // Fishing Lv7 Gift Clues: bag dish → what giving it adds (the drawer's ♥ +3)
   };
 }
 
