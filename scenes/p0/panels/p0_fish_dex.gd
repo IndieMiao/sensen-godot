@@ -11,6 +11,9 @@ extends UiDrawer
 ##               35 %). A fish caught since the dex was last opened rings once in color/new (1699:102396).
 ## A cell tap emits cell_pressed; the P0 UI opens the gate card for a silhouette held back by level or rod (q(57)),
 ## else the fish card. Everything comes from the server view (dex_data is pure and tested).
+## P1 (§6.9.1–6.9.2, 不知火舞 on 283, q row by 李白): from Fishing Lv8 a silhouette says where to go under its name
+## (`River · night · Lv9`); the next reward names its coins too (`+30 Energy · +100 coins`); `Fish-dex complete` (20
+## kinds) puts a small badge right of the heading.
 
 signal cell_pressed(fish_id: String)
 signal close_pressed
@@ -25,6 +28,13 @@ const _MILESTONE_H := 77.0   # 安其拉 1699:102375: 40 → 77 with the NeedTil
 const _MILESTONE_PAD := Vector2(8.0, 4.0)
 const _MILESTONE_TEXT_X := 100.0
 const _SILHOUETTE := "fish_unknown"
+const _BADGE := 16.0
+const _BADGE_GAP := 6.0
+## From this Fishing level a silhouette says where to go (§6.9.1 路标; 不知火舞 on 283).
+const SIGNPOST_LEVEL := 8
+## Only a fish that bites at one time alone says it: the others are only likelier then (不知火舞 on 283).
+const _ONLY_AT := {"night_only": "night", "dawn_dusk_only": "dawn & dusk"}
+const FishWorld := preload("res://modules/p0/p0_fish_world.gd")
 
 var cells := {}   # fish id -> UiItemCell
 var _fresh: Array = []
@@ -41,6 +51,18 @@ func _init(view: Dictionary = {}, fresh: Array = []) -> void:
 	title.set_anchors_and_offsets_preset(Control.PRESET_LEFT_WIDE)
 	title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	heading.add_child(title)
+	if str(d.badge) != "":   # Fish-dex complete: a small badge right of the heading (安其拉's mark to come; the star till then)
+		var badge := TextureRect.new()
+		badge.name = "DexBadge"
+		badge.texture = P0Logic.icon("star")
+		badge.tooltip_text = str(d.badge)
+		badge.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		badge.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		badge.custom_minimum_size = Vector2.ONE * _BADGE
+		badge.size = badge.custom_minimum_size
+		badge.position = Vector2(title.get_minimum_size().x + _BADGE_GAP, (_HEADING_H - _BADGE) * 0.5)
+		badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		heading.add_child(badge)
 	var close := UiNavButton.new("Close", true)
 	close.chevron = false   # Compact/Navigation `Close`: nowhere to go, no ›
 	close.pressed.connect(func(): close_pressed.emit())
@@ -83,6 +105,7 @@ func _ready() -> void:
 static func dex_data(view: Dictionary) -> Dictionary:
 	var dex: Array = view.get("fishing", {}).get("dex", [])
 	var got := dex.filter(func(f): return int(f.get("caught", 0)) > 0).size()
+	var signposts := int(view.get("skills", {}).get("fishing", {}).get("level", 1)) >= SIGNPOST_LEVEL
 	var sections := []
 	for r in [1, 2, 3, 4]:
 		var fish := []
@@ -90,16 +113,45 @@ static func dex_data(view: Dictionary) -> Dictionary:
 			if int(f.get("rarity", 1)) != r: continue
 			var n := int(f.get("caught", 0))
 			fish.append({id = str(f.id), name = P0Logic.item_name(view, str(f.id)), caught = n,
-				icon = str(f.id) if n > 0 else _SILHOUETTE})
+				icon = str(f.id) if n > 0 else _SILHOUETTE,
+				hint = signpost(FishWorld._fish(str(f.id))) if signposts and n <= 0 else ""})
 		if not fish.is_empty(): sections.append({name = P0Logic.rarity_name(view, r), fish = fish})
-	return {got = got, total = dex.size(), next = _next_line(view, got, dex.size()), sections = sections}
+	return {got = got, total = dex.size(), next = _next_line(view, got, dex.size()), sections = sections,
+		badge = _badge(got)}
+
+## Where an uncaught fish is (from Lv8): its first water, the one time it bites at if it bites at one alone, its level —
+## `River · night · Lv9`, `Pond · Lv5`; no weather (a day's, and the Bite Board's to say). "" for an unknown fish.
+static func signpost(f: Dictionary) -> String:
+	if f.is_empty(): return ""
+	var parts := PackedStringArray()
+	var where: Array = f.get("where", [])
+	if not where.is_empty(): parts.append(str(where[0]).capitalize())
+	var t = f.get("time", null)
+	if t is String and _ONLY_AT.has(t): parts.append(str(_ONLY_AT[t]))
+	parts.append("Lv%d" % int(f.get("level", 1)))
+	return " · ".join(parts)
+
+## The badge a reached Fish-dex milestone gives (content fishing.dex_milestones: `Fish-dex complete` at 20), else "".
+static func _badge(got: int) -> String:
+	var badge := ""
+	for m in P0Logic.content().get("fishing", {}).get("dex_milestones", []):
+		if got >= int(m.get("kinds", 0)) and str(m.get("badge", "")) != "": badge = str(m.badge)
+	return badge
+
+## A milestone's coins (content fishing.dex_milestones, P1), 0 when none.
+static func _milestone_coins(kinds: int) -> int:
+	for m in P0Logic.content().get("fishing", {}).get("dex_milestones", []):
+		if int(m.get("kinds", 0)) == kinds: return int(m.get("coins", 0))
+	return 0
 
 ## The next Fish-dex reward (content rewards.fishdex [[kinds, Energy]]) when this season's fish can reach it;
 ## otherwise only the rod's reach, which is what holds the rest back (P0's eight fish never reach 10 kinds; no
 ## "N more to find", the NeedTile already says it — 不知火舞 233 walkthrough).
 static func _next_line(view: Dictionary, got: int, total: int) -> Array:
 	for m in P0Logic.content().get("rewards", {}).get("fishdex", []):
-		if int(m[0]) > got and int(m[0]) <= total: return ["Next at %d kinds" % int(m[0]), "+%d Energy" % int(m[1])]
+		if int(m[0]) > got and int(m[0]) <= total:
+			var coins := _milestone_coins(int(m[0]))   # P1: the coins with it (§6.9.2)
+			return ["Next at %d kinds" % int(m[0]), "+%d Energy" % int(m[1]) + (" · +%d coins" % coins if coins > 0 else "")]
 	var f: Dictionary = view.get("fishing", {})
 	return ["%s lands up to %s fish" % [str(f.get("rod", "Starter Rod")), P0Logic.rarity_name(view, int(f.get("rod_reach", 2)))], ""]
 
@@ -145,6 +197,14 @@ func _fish_cell(f: Dictionary) -> Control:
 	name.max_lines_visible = 2
 	name.custom_minimum_size = Vector2(UiTokens.SIZE_INVENTORY_CELL, _NAME_H)
 	box.add_child(name)
+	if str(f.get("hint", "")) != "":   # Lv8: where to go, under the silhouette's name (安其拉's frame to come)
+		var hint := UiKit.label(str(f.hint), UiTokens.STYLE_C9_B, UiTokens.COLOR_MUTED)
+		hint.name = "Signpost"
+		hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		hint.max_lines_visible = 2
+		hint.custom_minimum_size.x = UiTokens.SIZE_INVENTORY_CELL
+		box.add_child(hint)
 	return box
 
 static func _spacer(h: float, w := 0.0) -> Control:

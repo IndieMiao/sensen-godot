@@ -51,7 +51,8 @@ func test_the_dex_reads_sections_kinds_and_what_is_next() -> void:
 	assert_array(d.next).is_equal(["Starter Rod lands up to Fine fish", ""])
 	var v := _view()
 	for i in 16: v.fishing.dex.append({"id": "fish_x%d" % i, "rarity": 1, "level": 1, "caught": 1 if i < 7 else 0})
-	assert_array(P0FishDex.dex_data(v).next).is_equal(["Next at 10 kinds", "+%d Energy" % int(P0Logic.content().rewards.fishdex[0][1])])
+	# P1 (§6.9.2): the coins with it, from fishing.dex_milestones
+	assert_array(P0FishDex.dex_data(v).next).is_equal(["Next at 10 kinds", "+%d Energy · +100 coins" % int(P0Logic.content().rewards.fishdex[0][1])])
 
 func test_caught_cells_count_and_the_rest_are_silhouettes() -> void:
 	ui.open_fishdex()
@@ -167,3 +168,42 @@ func test_a_cookbook_guide_shows_only_when_a_host_opens_it() -> void:
 	assert_array(sheet.spec().buttons.map(func(b): return b.label)).is_equal(["Cookbook"])
 	sheet.action_requested.emit(&"guide", "gate", {"go": "cookbook"})
 	assert_array(asked).is_equal(["cookbook"])
+
+## P1 路标 (§6.9.1; 不知火舞 on 283): from Fishing Lv8 an uncaught fish says where to go under its name — its first water,
+## the one time it bites at if only then, its level; no weather. Before Lv8, and for a caught fish, nothing.
+func test_from_lv8_a_silhouette_says_where_to_go() -> void:
+	var fish := func(id: String) -> Dictionary: return preload("res://modules/p0/p0_fish_world.gd")._fish(id)
+	assert_str(P0FishDex.signpost(fish.call("fish_eel"))).is_equal("River · night · Lv9")
+	assert_str(P0FishDex.signpost(fish.call("fish_snakehead"))).is_equal("Pond · Lv5")   # only likelier at night: no time
+	assert_str(P0FishDex.signpost(fish.call("fish_smelt"))).is_equal("Coast · dawn & dusk · Lv1")
+	assert_str(P0FishDex.signpost(fish.call("fish_trout"))).is_equal("River · Lv2")   # no weather (the Bite Board's)
+	assert_str(P0FishDex.signpost({})).is_equal("")
+	var hints := func(v: Dictionary) -> Dictionary:
+		var out := {}
+		for sec in P0FishDex.dex_data(v).sections:
+			for f in sec.fish: out[str(f.id)] = str(f.hint)
+		return out
+	assert_dict(hints.call(_view())).is_equal({"fish_crucian": "", "fish_carp": "", "fish_perch": "", "fish_koi": ""})
+	var v := _view()
+	v.skills.fishing.level = 8
+	assert_dict(hints.call(v)).is_equal({"fish_crucian": "", "fish_carp": "Pond · Lv1", "fish_perch": "", "fish_koi": "Pond · Lv4"})
+	ui.set_view(v)
+	ui.open_fishdex()
+	await await_idle_frame()
+	var cell: Control = _dex().cells["fish_koi"].get_parent()
+	assert_str((cell.find_child("Signpost", true, false) as Label).text).is_equal("Pond · Lv4")
+	assert_object(_dex().cells["fish_crucian"].get_parent().find_child("Signpost", true, false)).is_null()
+
+## `Fish-dex complete` (20 kinds): a small badge right of the heading; none before.
+func test_the_complete_dex_shows_its_badge_by_the_heading() -> void:
+	assert_str(P0FishDex.dex_data(_view()).badge).is_equal("")
+	var v := _view()
+	v.fishing.dex = []
+	for i in 20: v.fishing.dex.append({"id": "fish_x%d" % i, "rarity": 1, "level": 1, "caught": 1})
+	assert_str(P0FishDex.dex_data(v).badge).is_equal("Fish-dex complete")
+	ui.set_view(v)
+	ui.open_fishdex()
+	await await_idle_frame()
+	var badge := _dex().find_child("DexBadge", true, false) as TextureRect
+	assert_object(badge).is_not_null()
+	assert_vector(badge.size).is_equal(Vector2(16, 16))

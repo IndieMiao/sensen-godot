@@ -46,6 +46,19 @@ func test_condition_line_and_tags() -> void:
 	assert_str(Board.tags(Board.FishWorld._fish("fish_seabass"))).is_equal("Dawn & dusk ×2 · Windy ×1.5")
 	assert_str(Board.tags(Board.FishWorld._fish("fish_crucian"))).is_equal("")
 
+## From Fishing Lv8 the pond card says Biting now (不知火舞 on 283): the fish in the pool now, best factor first, at most 2
+## named, ` · +N more` for the rest, no factors; an uncaught regional fish is `?`.
+func test_biting_now_lists_the_pool_now_best_first() -> void:
+	assert_str(Board.biting_now(FERN, 9, {"fish_arctic_char": 1})).is_equal("Arctic Char, Largemouth Bass · +%d more" % (_landable_now(FERN, 9) - 2))
+	assert_bool(Board.biting_now(FERN, 9, {}).begins_with("?, Largemouth Bass")).is_true()   # an uncaught regional
+	assert_str(Board.biting_now({}, 9, {})).is_equal("")
+
+func _landable_now(place: Dictionary, level: int) -> int:
+	var part := Board.part_now(place)
+	return (place.fish as Array).filter(func(id):
+		var f: Dictionary = preload("res://modules/p0/p0_fish_world.gd")._fish(str(id))
+		return not f.is_empty() and int(f.get("level", 1)) <= level and preload("res://modules/p0/p0_fish_world.gd").bites_at(f, part)).size()
+
 func test_biting_more_now_best_two_and_plus_n() -> void:
 	# Dusk in the rain at Lv9: Bass dusk 2, Trout no (not in a Pond), Carp rain 1.5, Char (regional) dusk 2, Catfish rain 1.5,
 	# Eel night only (out); Koi sun only (out)
