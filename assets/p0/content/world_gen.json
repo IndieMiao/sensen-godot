@@ -867,7 +867,7 @@
    "gn-304531~market0": {
     "lat": 36.798144,
     "lng": 34.633759,
-    "why": "Mersin · Mill Market Square: the q(144) rerun (revision 2) left its group on the water at (36.794812, 34.645449); moved 1105 m with its group to the port's west pier, 63 m from water, every rule kept. The whole waterfront here is container port (land by q(126) ⑥): look again by hand (tools/world_water_groups.ts, 2026-10-12)."
+    "why": "Mersin · Mill Market Square: the q(144) rerun (revision 2) left its group on the water at (36.794812, 34.645449); moved 1105 m with its group to the shore by the convention centre (Mersin Kongre ve Sergi Sarayı), next to Atatürk Parkı and west of the container port, 63 m from water, every rule kept; pond and tackle shop beside it since #326 (tools/world_water_groups.ts, map-checked with 不知火舞 on 280, 2026-10-12)."
    },
    "gn-304531~tackle1": {
     "lat": 36.818097,
