@@ -919,6 +919,7 @@ func tick(dt: float) -> void:
 	if _layout_wanted(): _update_markers()
 	else: _show_selected_art()   # a portrait drawn while the map is still
 	_update_bubbles()
+	_move_ghosts()
 	_update_fog()
 	_update_credits()
 	_update_header()
@@ -1395,6 +1396,7 @@ func _set_marker_shown(marker: Dictionary, on: bool) -> void:
 	if marker.get("pop_tween") is Tween: (marker.pop_tween as Tween).kill()
 	var tween := create_tween()
 	marker.pop_tween = tween
+	_drop_ghost(marker.get("ghost", {}))
 	if on:
 		marker.node.visible = true
 		if marker.has("sprite"):
@@ -1403,18 +1405,109 @@ func _set_marker_shown(marker: Dictionary, on: bool) -> void:
 		tween.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 		tween.tween_method(func(v: float):
 			marker.pop = v
-			_apply_marker_scale(marker), float(marker.get("pop", 0.0)), 1.0, 0.22)
+			_apply_marker_scale(marker), float(marker.get("pop", 0.0)), 1.0, POP_IN_S)
 	else:
-		# 标签立即让位；世界空间贴图快速缩没（比弹入快），拖动中也不会漂移。
+		# 标签立即让位；世界空间贴图快速缩没（比弹入快），拖动中也不会漂移。A MapDestination's disc shrinks as a ghost (h1).
+		if marker.has("dest") and marker.node.visible: marker.ghost = _ghost_pin(marker)
 		marker.node.visible = false
 		tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 		tween.tween_method(func(v: float):
 			marker.pop = v
-			_apply_marker_scale(marker), float(marker.get("pop", 1.0)), 0.0, 0.12)
+			_apply_marker_scale(marker), float(marker.get("pop", 1.0)), 0.0, POP_OUT_S)
 		tween.tween_callback(func():
 			if marker.has("sprite"):
 				marker.sprite.visible = false
 				marker.shadow.visible = false)
+
+## A going MapDestination's disc, as it is drawn (its scale, its silhouette), without its name or marks, shrinking into
+## its point where the pin was drawn.
+func _ghost_pin(marker: Dictionary) -> Dictionary:
+	var pin: UiMapDestination = marker.dest
+	var node := Control.new()
+	node.name = "PinGhost"
+	node.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var disc := UiMapDestination.new(pin.icon, "", pin.plate)
+	disc.theme = UiKit.theme()
+	disc.name_shown = false
+	disc.silhouette = pin.silhouette
+	disc.focus = pin.focus
+	node.add_child(disc)
+	disc.position = -disc.anchor_offset()
+	node.position = marker.node.position
+	node.scale = marker.node.scale
+	add_child(node, true)
+	move_child(node, (marker.node as Node).get_index())
+	return _shrink_ghost(node, float(marker.entry.get("lat", 0.0)), float(marker.entry.get("lng", 0.0)), Vector2.ZERO)
+
+## h1: a city bubble and its dot come and go as the pins do — out of the city's point (the bubble from its top middle,
+## where it hangs from the dot), into it — and only when one really shows or hides: _update_bubbles has settled them
+## for this frame (q(153)'s 4 px hold keeps them off the line), so a pass that keeps one shown or hidden plays nothing.
+func _pop_bubbles() -> void:
+	for id in bubbles:
+		var b: Dictionary = bubbles[id]
+		var node: Control = b.node
+		_pop(b, "node", node, Vector2(node.size.x * 0.5, -BUBBLE_DROP))
+		var dot: Control = b.dot
+		_pop(b, "dot", dot, dot.size * 0.5)
+
+func _pop(b: Dictionary, key: String, node: Control, pivot: Vector2) -> void:
+	var on := node.visible
+	if on == bool(b.get(key + "_on", false)): return
+	b[key + "_on"] = on
+	# The bubble itself is placed whole at once, for its tap and everything that reads its rect; a ghost of it does the
+	# moving, over it while it comes (the bubble clear till then), in its place as it goes.
+	var old: Dictionary = b.get(key + "_ghost", {})
+	var from := (old.node as Control).scale.x if _ghosts.has(old) and is_instance_valid(old.node) else (0.001 if on else 1.0)
+	_drop_ghost(old)
+	node.modulate.a = 1.0
+	var geo = b.get("geo")
+	if not (geo is Vector2): return
+	var ghost := node.duplicate() as Control
+	ghost.name = ("BubbleGhost" if key == "node" else "DotGhost")
+	ghost.visible = true
+	ghost.pivot_offset = pivot
+	ghost.position = node.position
+	ghost.scale = Vector2.ONE * from
+	add_child(ghost, true)
+	ghost.size = node.size   # a duplicated container comes out taller than its words (88 for 40)
+	move_child(ghost, node.get_index() + 1)
+	if on:
+		node.modulate.a = 0.0
+		b[key + "_ghost"] = _ghost_tween(ghost, (geo as Vector2), -pivot, true, func():
+			if is_instance_valid(node): node.modulate.a = 1.0)
+	else:
+		b[key + "_ghost"] = _ghost_tween(ghost, (geo as Vector2), -pivot, false)
+
+func _shrink_ghost(node: Control, lat: float, lng: float, offset: Vector2) -> Dictionary:
+	return _ghost_tween(node, Vector2(lat, lng), offset, false)
+
+## A ghost growing out of its point (TRANS_BACK, POP_IN_S, `done` after) or shrinking into it (TRANS_QUAD, POP_OUT_S),
+## freed at the end.
+func _ghost_tween(node: Control, geo: Vector2, offset: Vector2, grow: bool, done := Callable()) -> Dictionary:
+	var g := {node = node, lat = geo.x, lng = geo.y, offset = offset}
+	var tween := create_tween()
+	if grow: tween.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	else: tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tween.tween_property(node, "scale", Vector2.ONE * (1.0 if grow else 0.001), POP_IN_S if grow else POP_OUT_S)
+	tween.tween_callback(func():
+		_drop_ghost(g, false)
+		if done.is_valid(): done.call())
+	g.tween = tween
+	_ghosts.append(g)
+	return g
+
+func _drop_ghost(g: Dictionary, kill := true) -> void:
+	if g.is_empty() or not _ghosts.has(g): return
+	_ghosts.erase(g)
+	if kill and g.tween is Tween: (g.tween as Tween).kill()   # not from its own last step
+	if is_instance_valid(g.node): (g.node as Node).queue_free()
+
+## Each ghost on its point as the map moves (the pins and bubbles it stood in for are placed every pass; a hidden one
+## is not), so a drag never leaves one behind.
+func _move_ghosts() -> void:
+	for g in _ghosts:
+		var projected = host.geo_to_screen(float(g.lat), float(g.lng))
+		if projected != null and is_instance_valid(g.node): (g.node as Control).position = (projected as Vector2) - global_position + (g.offset as Vector2)
 
 ## 选中项压在其他标记之上：贴图/剪影提升渲染优先级，名牌移到标记层顶。
 ## The selected pin's 2D node over every other pin's, pins made after it was selected included: a MapDestination's
@@ -1732,6 +1825,7 @@ func _update_bubbles() -> void:
 		var overview: Dictionary = CityMapData.city(id).get("overview", {})
 		var projected = host.geo_to_screen(float(overview.get("lat", r.center[0])), float(overview.get("lng", r.center[1])))
 		var point: Vector2 = (projected as Vector2) - global_position if projected != null else Vector2(-1e6, -1e6)
+		bubble.geo = Vector2(float(overview.get("lat", r.center[0])), float(overview.get("lng", r.center[1])))   # a ghost's point (h1)
 		var node: Control = bubble.node
 		node.visible = not detail and area.has_point(point)
 		bubble.dot.visible = false
@@ -1755,9 +1849,20 @@ func _update_bubbles() -> void:
 			bubbles[id].dot.visible = false
 		elif not bubbles[id].node.visible and not bubble_clear_rects.is_valid(): bubbles[id].dot.visible = false   # Journey: as before
 	if not states.is_empty(): _yield_bubbles(order, states)
+	_pop_bubbles()
 
 ## How far under its city's point a bubble hangs, px.
 const BUBBLE_DROP := 6.0
+
+## How long a pin or a city bubble takes to come (TRANS_BACK, out of its point) and to go (TRANS_QUAD, into it): the POI
+## art's beat (7dbe7eb), every pin's and bubble's since h1 (the user on 10-13 via 奕星; 不知火舞 on 279). A name or a
+## mark comes with its pin, scaled with it, and goes at once (as a POI's label); only the disc or the bubble shrinks.
+const POP_IN_S := 0.22
+const POP_OUT_S := 0.12
+
+## What is going: {node, lat, lng, offset, tween} — a stand-in shrinking into its point, kept on it as the map moves
+## (_move_ghosts), then freed. The pin or bubble itself hides at once, so its taps and the layout never see it go.
+var _ghosts: Array = []
 
 ## Where region `r`'s bubble stands, reading as it would now (q(157): the flight frames both ends' bubbles whole): its
 ## city's point [lat, lng] and the bubble's rect from that point, px.
