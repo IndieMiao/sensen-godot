@@ -1633,6 +1633,9 @@ func activate_bubble_at(screen: Vector2, slop := false) -> bool:
 	for id in bubbles:
 		var node: Control = bubbles[id].node
 		if node.visible: shown.append({"id": str(id), "rect": Rect2(node.position, node.size), "z": node.get_index()})
+		# a city's dot opens it as its bubble does (q(153) ①); a dot is drawn under every bubble
+		var dot: Control = bubbles[id].dot
+		if dot.visible: shown.append({"id": str(id), "rect": Rect2(dot.position, dot.size).grow(4), "z": dot.get_index()})
 	shown.sort_custom(func(a, b): return a.z > b.z)   # drawn last first
 	for grow in ([0.0, 6.0] if slop else [0.0]):
 		for b in shown:
@@ -1715,9 +1718,12 @@ func _update_bubbles() -> void:
 	var area := Rect2(-global_position, get_viewport_rect().size).grow(60)
 	var clear_rects: Array = bubble_clear_rects.call() if bubble_clear_rects.is_valid() else []   # once a frame (蒙恬 on #281)
 	var listed := {}
+	var order: Array = []   # the host's priority, highest first
+	var states := {}
 	for r in host.city_regions():
 		var id := str(r.id)
 		listed[id] = true
+		order.append(id)
 		if not bubbles.has(id): bubbles[id] = _make_bubble(id)
 		var bubble: Dictionary = bubbles[id]
 		var overview: Dictionary = CityMapData.city(id).get("overview", {})
@@ -1730,6 +1736,7 @@ func _update_bubbles() -> void:
 		bubble.name.text = L10n.text(str(r.get("name", id)))
 		if bubble_state.is_valid():
 			var st: Dictionary = bubble_state.call(id)
+			states[id] = st
 			bubble.count.text = str(st.get("text", ""))
 			bubble.count.visible = bubble.count.text != ""
 			# The line keeps a text line's height with the glyph alone (P0's home city at 0 online), so the bubble's
@@ -1766,6 +1773,49 @@ func _update_bubbles() -> void:
 			bubbles[id].node.visible = false
 			bubbles[id].dot.visible = false
 		elif not bubbles[id].node.visible and not bubble_clear_rects.is_valid(): bubbles[id].dot.visible = false   # Journey: as before
+	if not states.is_empty(): _yield_bubbles(order, states)
+
+## q(153) (不知火舞 on 293 8f407417 / e5ec0cc0), the host's bubbles in its priority order (highest first): a bubble that
+## runs into a higher city's bubble or dot hides whole, its dot staying for the cities that keep theirs (`dot_stays`:
+## visited and up); one that `keeps` (the city just opened, where the player is, home) never hides. Hidden last pass, a
+## bubble comes back only 4 px clear of them, so it does not flicker on the line. Then they stack by priority, the
+## highest on top, every dot under every bubble (a lower city's dot under a higher bubble never cuts its words).
+const BUBBLE_HOLD := 4.0
+var _bubbles_last := {}
+
+func _yield_bubbles(order: Array, states: Dictionary) -> void:
+	var taken: Array = []
+	var shown_now := {}
+	for id in order:
+		var b: Dictionary = bubbles[id]
+		var st: Dictionary = states.get(id, {})
+		var node: Control = b.node
+		if node.visible and not bool(st.get("keeps", false)):
+			var r := Rect2(node.position, node.size)
+			var probe := r if _bubbles_last.has(id) else r.grow(BUBBLE_HOLD)
+			if taken.any(func(t): return (t as Rect2).intersects(probe)):
+				node.visible = false
+				if not bool(st.get("dot_stays", false)): b.dot.visible = false   # the rest give way whole
+		if node.visible:
+			taken.append(Rect2(node.position, node.size))
+			shown_now[id] = true
+		if b.dot.visible: taken.append(Rect2(b.dot.position, b.dot.size))
+	_bubbles_last = shown_now
+	_stack_bubbles(order)
+
+func _stack_bubbles(order: Array) -> void:
+	var nodes: Array = []
+	for id in order: nodes.append(bubbles[id].dot)
+	for i in range(order.size() - 1, -1, -1): nodes.append(bubbles[order[i]].node)
+	var at: Array = nodes.map(func(n): return (n as Node).get_index())
+	var ordered := true
+	for k in range(1, at.size()):
+		if int(at[k]) <= int(at[k - 1]):
+			ordered = false
+			break
+	if ordered: return
+	var base: int = at.min()
+	for k in nodes.size(): move_child(nodes[k], base + k)
 
 func _make_bubble(id: String) -> Dictionary:
 	var node := PanelContainer.new()

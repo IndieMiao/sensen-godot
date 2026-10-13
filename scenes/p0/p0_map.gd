@@ -738,6 +738,7 @@ func _exit_tree() -> void:
 func open_city_card(cluster: String) -> void:
 	var c := P0Clusters.get_cluster(cluster)
 	if c.is_empty() or rt == null: return
+	_mark_opened(cluster)   # a pin's city too (_travel_first)
 	if P0Travel.fog(_view(), cluster) != "unexplored":
 		open_travel(cluster)
 		return
@@ -1044,6 +1045,13 @@ func _show_generated(entry: Dictionary) -> void:
 ## A city bubble's line (不知火舞 on #227): the home city its players online with a house; an explored city Visited;
 ## the rest Unexplored. Second Home is not shown in this version (it comes with the paid second version).
 func city_bubble(region_id: String) -> Dictionary:
+	var tier := int(_bubble_tiers.get(region_id, BUBBLE_OTHER))
+	var out := _city_bubble_face(region_id)
+	out["dot_stays"] = tier <= BUBBLE_VISITED   # q(153) ①
+	out["keeps"] = tier <= BUBBLE_HOME   # q(153) ②: never gives way
+	return out
+
+func _city_bubble_face(region_id: String) -> Dictionary:
 	var cluster := P0Clusters.cluster_of_region(region_id)
 	if cluster == P0Travel.home(_view()):
 		var online := 0
@@ -1174,6 +1182,7 @@ func fly_to_city(id: String) -> void:
 	_asked = {}
 	_regions_key = ""
 	var cluster := P0Clusters.cluster_of_region(str(r.id))
+	_mark_opened(cluster)
 	if cluster == "" or cluster == P0Travel.here(_view()) or rt == null: return
 	# Home is never a trip (q(108)): from another city the home city's bubble goes home, as the homestead's Go home —
 	# flying there first (q(152) ①).
@@ -1194,39 +1203,66 @@ func city_regions() -> Array:
 	var vp := get_viewport().get_visible_rect().size if is_inside_tree() else Vector2(360, 800)
 	var z := zoom + _zoom_elastic
 	var step := 360.0 / pow(2.0, z) / 4.0   # a quarter of a 512 px tile's width in degrees
-	var key := "%.1f|%d|%d|%s|%dx%d|%d" % [z, roundi(center_lat / step), roundi(center_lng / step), str(region.get("id", "")), vp.x, vp.y,
-		P0Travel.explored(_view()).hash()]
+	var here := P0Travel.here(_view())
+	var key := "%.1f|%d|%d|%s|%dx%d|%d|%s|%s" % [z, roundi(center_lat / step), roundi(center_lng / step), str(region.get("id", "")), vp.x, vp.y,
+		P0Travel.explored(_view()).hash(), _opened_city, here]
 	if key == _regions_key: return _regions
 	_regions_key = key
 	var out: Array = []
 	var ids := {}
 	var placed: Array = []
-	var add := func(r: Dictionary) -> void:
+	_bubble_tiers.clear()
+	var at_screen := func(cluster: String) -> Variant:   # the city's point in this view, null when off it
+		var c := P0Clusters.get_cluster(cluster)
+		if c.is_empty(): return null
+		var p = geo_to_screen(float(c.lat), float(c.lng))
+		if p == null or not Rect2(Vector2.ZERO, vp).grow(60).has_point((p as Vector2) - (city_map.global_position if city_map else Vector2.ZERO)): return null
+		return p
+	var add := func(r: Dictionary, tier: int, at = null) -> void:
 		if r.is_empty() or ids.has(str(r.id)): return
 		ids[str(r.id)] = true
 		out.append(r)
-	add.call(P0Clusters.region(P0Clusters.cluster_of_region(P0_REGION)))
-	if not region.is_empty(): add.call(region)
-	add.call(_asked)
-	# Visited cities at any zoom, whatever their size (不知火舞 on #216): the player's own map of where they have been.
-	for cluster in P0Travel.explored(_view()):
+		_bubble_tiers[str(r.id)] = tier
+		var p = at if at != null else at_screen.call(P0Clusters.cluster_of_region(str(r.id)))
+		if p != null: placed.append(p)   # the rest keep 72 px clear of it
+	# q(153): by priority — the city just opened, where the player is, home, the visited (most populous first), then the
+	# rest; the bubbles draw and give way in this order (CityMapView._yield_bubbles)
+	if not _asked.is_empty(): add.call(_asked, BUBBLE_OPENED)
+	if _opened_city != "": add.call(P0Clusters.region(_opened_city), BUBBLE_OPENED)
+	if here != "": add.call(P0Clusters.region(here), BUBBLE_HERE)
+	add.call(P0Clusters.region(P0Clusters.cluster_of_region(P0_REGION)), BUBBLE_HOME)
+	# Visited cities at any zoom, whatever their size (不知火舞 on #216): the player's own map of where they have been —
+	# their dots always, their bubbles as they fit (q(153))
+	var visited: Array = P0Travel.explored(_view()).filter(func(cl): return at_screen.call(cl) != null)
+	visited.sort_custom(func(a, b):
+		var pa := int(P0Clusters.get_cluster(a).get("population", 0))
+		var pb := int(P0Clusters.get_cluster(b).get("population", 0))
+		return pa > pb if pa != pb else str(a) < str(b))
+	for cluster in visited:
 		if out.size() >= CITY_BUBBLES: break
-		var c := P0Clusters.get_cluster(cluster)
-		if c.is_empty(): continue
-		var p = geo_to_screen(float(c.lat), float(c.lng))
-		if p == null or not Rect2(Vector2.ZERO, vp).grow(60).has_point((p as Vector2) - (city_map.global_position if city_map else Vector2.ZERO)): continue
-		placed.append(p)
-		add.call(P0Clusters.region(cluster))
+		add.call(P0Clusters.region(cluster), BUBBLE_VISITED)
+	if not region.is_empty(): add.call(region, BUBBLE_OTHER)   # the camera's city
 	var box := _view_box(vp, z)
 	for c in P0Clusters.in_box(box.x, box.y, box.z, box.w, city_min_population(z), 200):
 		if out.size() >= CITY_BUBBLES: break
 		var p = geo_to_screen(float(c.lat), float(c.lng))
 		if p == null: continue
-		if placed.any(func(q: Vector2): return q.distance_to(p) < BUBBLE_GAP): continue
-		placed.append(p)
-		add.call(P0Clusters.region(str(c.id)))
+		if placed.any(func(q: Vector2): return q.distance_to(p) < BUBBLE_GAP): continue   # clear of every city above too
+		add.call(P0Clusters.region(str(c.id)), BUBBLE_OTHER, p)
 	_regions = out
 	return out
+
+## q(153)'s tiers, highest first: the city just opened, where the player is, home — their bubbles never give way — then
+## the visited — their dots always stay, their bubbles give way to higher ones — then the rest, which give way entirely.
+enum { BUBBLE_OPENED, BUBBLE_HERE, BUBBLE_HOME, BUBBLE_VISITED, BUBBLE_OTHER }
+var _bubble_tiers := {}
+## The city whose card a bubble or a pin last opened (q(153): its bubble first).
+var _opened_city := ""
+
+func _mark_opened(cluster: String) -> void:
+	if cluster == _opened_city: return
+	_opened_city = cluster
+	_regions_key = ""
 
 ## The lat/lng box the map shows, a fifth wider each way and at least a city's radius (0.5°) beyond the edges, so a
 ## city whose centre is just off screen is still the camera city (south, west, north, east); from the Web Mercator
