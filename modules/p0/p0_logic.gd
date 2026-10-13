@@ -1194,10 +1194,12 @@ static func level_banner(view: Dictionary, ev: Dictionary, first := false) -> Di
 
 ## What a skill level opens this season: Farming — the crops of that gate (main ingredients first), then other stall
 ## goods and tools (Compost, Row Hoe); Fishing — the fish of that level; Cooking — the conveniences of that level.
-const FARMING_CONVENIENCE_NAMES := {"harvest_all": "Harvest All", "seed_saver": "Seed Saver"}
+const FARMING_CONVENIENCE_NAMES := {"harvest_all": "Harvest All", "seed_saver": "Seed Saver"}   # §4.6.1 / glossary (Plot Marks, Sow Again … come later)
 ## Fishing's conveniences (content fishing.conveniences; §4.6.2, q(178) ③): the 3-day Forecast, Gift Clues and the pond
-## card's Biting now (q(168)). Quick Recast comes once it is made (q(178) ④).
-const FISHING_CONVENIENCE_NAMES := {"three_day_forecast": "3-day Forecast", "gift_clue_highlight": "Gift Clues", "biting_now": "Biting now"}   # §4.6.1 / glossary (Plot Marks, Sow Again … come later)
+## card's Biting now (q(168)). Quick Recast comes once it is made (q(178) ⑤).
+const FISHING_CONVENIENCE_NAMES := {"three_day_forecast": "3-day Forecast", "gift_clue_highlight": "Gift Clues", "biting_now": "Biting now"}
+## A fish that bites at one time only, as the milestone row names it (q(178) ④: `River Eel (night)`, the Lv9 night fishing).
+const ONLY_AT_ROW := {"night_only": "night", "dawn_dusk_only": "dawn & dusk"}
 
 static func level_unlocks(view: Dictionary, skill: String, level: int) -> Array:
 	var out: Array = []
@@ -1224,6 +1226,10 @@ static func level_unlocks(view: Dictionary, skill: String, level: int) -> Array:
 			# The fish, then gear and goods the level opens (Worm Bait at Lv2, the Reed Rod at Lv3), then `Regional fish`
 			# last, as §14 writes it (`Next Lv3 · Reed Rod, Regional fish`).
 			out = skill_unlocks(view, "fishing", level)
+			for f in content().get("fish", []):   # a fish of one time only says when (q(178) ④: `River Eel (night)`)
+				var only := str(ONLY_AT_ROW.get(str(f.get("time", "")), "")) if f.get("time", null) is String else ""
+				var at := out.find(item_name(view, str(f.id)))
+				if only != "" and int(f.get("level", 1)) == level and at >= 0: out[at] = "%s (%s)" % [out[at], only]
 			var regional := out.has(REGIONAL_FISH)
 			out.erase(REGIONAL_FISH)
 			for o in view.get("stall", {}).get("buy", []):
