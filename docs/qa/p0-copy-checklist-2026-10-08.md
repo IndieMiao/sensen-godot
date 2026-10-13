@@ -51,6 +51,7 @@
 | 采集点 ★ | 名字条 `Timber Grove`（其他写名字，如 `Reed Bank`）/ 没好 `Timber Grove · Ready in 2h 10m` / 未开 `Clay Bank · Homestead Lv2`（q(46)、q(62)）；P0 共 5 处，没有 Old Tree（q(43)） |
 | 采集与入库飘字 ★ | 进仓库 `+6 Timber · Stored` / 进背包 `+2 Worm Bait` / 回家入库 `Stored · 12 Stone · 3 Copper Ore`（数字在前、不带 ×，q(46)） |
 | 农舍门牌 / 升级面板 ★ | 名字条：农舍 `Farmhouse`、门牌 `Homestead Lv1`、木牌 `Upgrade Plaque`（q(62)）；标题 `Homestead Lv1 → Lv2`；What changes `Max Energy 210 · Meals 210 a day` / `Spice Rack · seasonings off your bag` / `Clay Bank · Clay next to the Reed Bank`；满级 `Highest level for now`（q(46)，P0 临时封顶）；Lv10 满级标题下 `Max level · Homestead Master`（q(115)）；横幅 `Homestead Lv2` / `Clay Bank opened`；不在家（从个人页远程打开）时升级按钮灰显 `At home`，点它出 toast `Upgrade at home · Going home is free`，不写 `Go home to upgrade · Free`（q(93)） |
+| 升级面板 Lv4–10（P1） | 背包扩容行：买过前一档 `Bag 30 → 35` / `Bag 35 → 40`，没买 `Bag 35 · after Upgrade I` / `Bag 40 · after Upgrade II`；扩容正文 `Bag Upgrade I · 150 coins` / `Bag Upgrade II · 400 coins` / `Bag Upgrade III · 1,000 coins`（不写 for sale）；Lv8 暂不出 `Homestead Stall upgraded · new look`（驿站模型到了再加回）（q(174)） |
 | 信箱 ★ | 名字条 `Mailbox`；有在列包裹时小牌 `Parcel`，背包满也挂（q(50)、q(62)、q(79)） |
 
 ## 3. 鱼塘与钓鱼
