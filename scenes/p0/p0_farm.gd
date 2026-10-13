@@ -490,8 +490,9 @@ static func landing_cell(g: BlueprintGrid, from: Vector2i) -> Vector2i:
 	var to := free_cell_near(g, from, [])
 	if g.bp.in_bounds(to) and not g.astar.is_point_solid(to): return to
 	var dist := INF
-	for y in g.bp.grid.y:
-		for x in g.bp.grid.x:
+	var o := g.bp.grid_origin   # the grid may start before row 0 (q(172) A)
+	for y in range(o.y, o.y + g.bp.grid.y):
+		for x in range(o.x, o.x + g.bp.grid.x):
 			var c := Vector2i(x, y)
 			if g.astar.is_point_solid(c) or Vector2(c - from).length_squared() >= dist: continue
 			dist = Vector2(c - from).length_squared()
