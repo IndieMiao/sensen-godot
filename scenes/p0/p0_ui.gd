@@ -3172,6 +3172,18 @@ func show_title(spec: Dictionary) -> void:
 	m.strip = str(spec.get("strip", ""))
 	show_moment(m)
 
+## A Fish-dex milestone (§6.9.2; 不知火舞 on 283): the same RewardMoment Milestone as a Cookbook title, no buttons —
+## `Fish-dex 10/20` over the kind that made it, or `Fish-dex complete` · `20/20` (P0FishDex.milestone_card). Queued after
+## the catch's card like a level-up.
+func show_dex_milestone(spec: Dictionary) -> void:
+	var m := UiRewardMoment.new()
+	m.tone = UiRewardMoment.Tone.MILESTONE
+	m.event = str(spec.get("event", ""))
+	m.icon = P0Logic.icon(str(spec.get("icon", "fish_crucian")))
+	m.item_name = str(spec.get("item_name", ""))
+	m.strip = str(spec.get("strip", ""))
+	show_moment(m)
+
 ## FISH-5 / 5-2 · a gate fish broke free, once per species (§4.8.6, q(55) / q(57)): `Too strong` (Fishing level) or
 ## `Too heavy for your rod` / the fish · rarity / what it needs / the Energy back as it really came back (the
 ## protection's `Energy refunded (8 left today)`, else `+3 Energy back`). No buttons: where to go next lives on the

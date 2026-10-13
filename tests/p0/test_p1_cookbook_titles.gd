@@ -128,5 +128,8 @@ func test_line_cooks_coins_are_on_its_card_not_floated() -> void:
 func test_a_fish_dex_milestone_is_left_to_its_own_handler() -> void:
 	rt.session.state_changed.emit(rt.session.view, [{"kind": "milestone", "id": "fishdex_10", "title": "", "coins": 0, "cabinet": 0, "decor": null}])
 	for i in 2: await get_tree().process_frame
-	assert_bool(rt.ui.has_modal()).is_false()   # no Cookbook card for it (SGODOT-283 handles its own)
-	assert_int(rt.ui._card_queue.size()).is_equal(0)
+	# no Cookbook card for it: SGODOT-283's own Fish-dex card (test_p1_fishdex_milestones.gd)
+	var cards := rt.ui.root.find_children("*", "UiRewardMoment", true, false)
+	assert_bool(cards.all(func(m): return str((m as UiRewardMoment).event).begins_with("Fish-dex"))).is_true()
+	rt.ui.close_modal()
+	await get_tree().process_frame
