@@ -93,8 +93,8 @@ describe('placing in the yard', () => {
     expect(spotBlock(c, s, 'deco_fountain', 5, 18, 0)).toMatchObject({ code: 'decor_outside' });   // on the back wall
     expect(spotBlock(c, s, 'deco_planter', 19, 14, 0)).toMatchObject({ code: 'decor_outside' });   // on the east wall
     expect(spotBlock(c, s, 'deco_pergola', 4, 17, 0)).toMatchObject({ code: 'decor_overlap' });   // 3 × 2 would reach the tree at (6, 17)
-    // the garden's own dressing is taken (不知火舞 on 290): the sign by the gate, a bush, a tree, a rock
-    for (const [x, y, what] of [[7, 1, 'sign'], [1, 0, 'bush'], [12, 18, 'tree'], [16, 18, 'rock']] as const)
+    // the garden's own dressing is taken (不知火舞 on 290): the sign by the gate (right of it from q(172)), a bush, a tree, a rock
+    for (const [x, y, what] of [[11, 0, 'sign'], [1, 0, 'bush'], [12, 18, 'tree'], [16, 18, 'rock']] as const)
       expect(spotBlock(c, s, 'deco_planter', x, y, 0), what).toMatchObject({ code: 'decor_overlap' });
   });
 

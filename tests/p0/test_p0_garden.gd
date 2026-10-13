@@ -10,7 +10,7 @@ func test_plot_ids_and_cells_are_a_bijection_on_spaced_beds() -> void:
 		# beds stand two cells apart, so every bed has a walkway beside it
 		assert_int(P0Garden.id_of(c + Vector2i(1, 0))).is_equal(-1)
 		assert_int(P0Garden.id_of(c + Vector2i(0, 1))).is_equal(-1)
-	assert_int(seen.size()).is_equal(40)   # P1: all 40 laid out; the view's garden.plots shows 30 or 40
+	assert_int(seen.size()).is_equal(48)   # all 48 laid out (q(172): 40–47 from Homestead Lv7); the view's garden.plots shows 30, 40 or 48
 
 ## P1 (q(59) §1.1): the client grid is the server's (content.garden.plots: the sprinkler's coverage is judged there).
 ## 0–29 keep their P0 cells; 30–39 are two columns right of the field, row by row.
@@ -23,6 +23,9 @@ func test_the_garden_grid_matches_the_content_table() -> void:
 	for id in 30: assert_vector(P0Garden.cell_of(id)).is_equal(P0Garden.PLOT_ORIGIN + Vector2i((id % 6) * 2, (id / 6) * 2))
 	assert_vector(P0Garden.cell_of(30)).is_equal(P0Garden.cell_of(5) + Vector2i(2, 0))
 	assert_vector(P0Garden.cell_of(39)).is_equal(P0Garden.cell_of(29) + Vector2i(4, 0))
+	# Homestead Lv7 (q(172), layout C3, 不知火舞 282 2fbd63f7): six in front of the first row, two on the left edge
+	assert_array(range(40, 48).map(func(i): return P0Garden.cell_of(i))).is_equal([Vector2i(2, 1), Vector2i(4, 1), Vector2i(6, 1),
+		Vector2i(8, 1), Vector2i(12, 1), Vector2i(14, 1), Vector2i(2, 3), Vector2i(2, 9)])
 
 ## At Homestead Lv1–2 the place of beds 30–39 is plain ground: walking there never steps up onto a bed (哪吒 on #215).
 func test_no_bed_to_step_on_where_the_homestead_has_none_yet() -> void:

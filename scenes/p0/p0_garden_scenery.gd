@@ -14,7 +14,7 @@ func build(bp: FarmBlueprint, style: String) -> void:
 	name = "GardenScenery"
 	var cell := bp.cell_m
 	var first := bp.cell_to_world(P0Garden.cell_of(0))
-	var last := bp.cell_to_world(P0Garden.cell_of(P0Garden.plot_count() - 1))
+	var last := bp.cell_to_world(P0Garden.cell_of(P0Garden.GRID_PLOTS - 1))   # the field's far corner (Lv7's 40–47 lie outside it)
 	var half := 0.47
 	field_rect = Rect2(Vector2(first.x - half, last.z - half), Vector2(last.x - first.x + half * 2, first.z - last.z + half * 2))
 	# Sandy garden path under the beds, a little wider than the field (the old 9-plot garden used 3.1×).
@@ -44,7 +44,10 @@ func build(bp: FarmBlueprint, style: String) -> void:
 		tints.append(Color.WHITE.lerp(Color(0.58, 0.75, 0.80), smoothstep(10.0, 14.0, -p.z)))
 	add_child(Art.batch("tree_0", trees, true, tints))
 	# The fence depends on the Homestead level: p0_fence.gd (SGODOT-228).
-	add_child(Art.instance("sign", Vector3(spawn.x - 1.35, 0, spawn.z + 0.25), 0.93))
+	# the entrance sign right of the way in, at (11,0) (q(172): Homestead Lv7's front beds took its old place left of the
+	# path, 不知火舞 282 2fbd63f7 丙; facing as before); Decorate's objects hold that cell
+	var sign_at := bp.cell_to_world(Vector2i(11, 0))
+	add_child(Art.instance("sign", Vector3(sign_at.x, 0, sign_at.z), 0.93))
 	var shrubs: Array = []
 	for p in [Vector3(house.x - 1.75, 0, house.z - 0.9), Vector3(house.x + 1.85, 0, house.z - 1.0), Vector3(12.2, 0, -6.3),
 		Vector3(0.9, 0, -4.2), Vector3(12.7, 0, -1.4), Vector3(1.0, 0, -0.6)]:
@@ -57,6 +60,9 @@ func build(bp: FarmBlueprint, style: String) -> void:
 	var keep_clear := [Rect2(field_rect.position - Vector2(0.45, 0.45), field_rect.size + Vector2(0.9, 0.9)),
 		Rect2(Vector2(house.x - 0.6, field_rect.position.y - 1.8), Vector2(1.2, 1.9)),
 		Rect2(Vector2(spawn.x - 0.7, spawn.z - 1.4), Vector2(1.4, 2.2))]
+	for id in range(P0Garden.GRID_PLOTS, P0Garden.MAX_PLOTS):   # Homestead Lv7's beds on the field's edge (q(172)), each
+		var bed := bp.cell_to_world(P0Garden.cell_of(id))
+		keep_clear.append(Rect2(Vector2(bed.x, bed.z) - Vector2.ONE * (half + 0.45), Vector2.ONE * (half + 0.45) * 2))
 	var spots := [house, bp.cell_to_world(bp.anchor("storage")),
 		bp.cell_to_world(bp.anchor("well")), bp.cell_to_world(bp.anchor("mine"))]
 	for key in P0Garden.ANCHORS:   # SGODOT-231: gathering spots and the workbench stay clear of scatter

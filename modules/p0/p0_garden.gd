@@ -12,7 +12,14 @@ const COLUMNS := 6                    # P0's field; plots 0–29
 const ROWS := 5
 const EXTRA_COLUMNS := 2              # P1 (q(59)): plots 30–39, right of the field, from Homestead Lv3
 const P0_PLOTS := COLUMNS * ROWS
-const MAX_PLOTS := (COLUMNS + EXTRA_COLUMNS) * ROWS
+const GRID_PLOTS := (COLUMNS + EXTRA_COLUMNS) * ROWS   # 40: the field's own lattice, plots 0–39
+## Homestead Lv7 (q(172)): 8 more beds, 40–47, on the same 2-cell lattice just outside the field — row −1 is the strip
+## between the first row and the front fence, col −1 the left edge — where no path, gathering spot or object stands, so
+## the beds keep their walkways and sprinklers / Harvest All work on them as on the rest; [col, row] as
+## content.garden.plots 40–47 (the test holds the two equal). Layout C3 (不知火舞 282 2fbd63f7): six in front, (2,3) and (2,9).
+const EDGE_PLOTS := [Vector2i(-1, -1), Vector2i(0, -1), Vector2i(1, -1), Vector2i(2, -1), Vector2i(4, -1), Vector2i(5, -1),
+	Vector2i(-1, 0), Vector2i(-1, 3)]
+const MAX_PLOTS := 48
 const PLOT_ORIGIN := Vector2i(4, 3)   # plot 0 sits nearest the camera, on the left
 const BED_H := 0.15                   # soil bed thickness (plot.glb top), crops grow from here
 
@@ -65,6 +72,7 @@ static func plot_count(view = null) -> int:
 ## [col, row] of a plot on the garden grid: content.garden.plots[id].
 static func grid_of(plot_id: int) -> Vector2i:
 	if plot_id < P0_PLOTS: return Vector2i(plot_id % COLUMNS, plot_id / COLUMNS)
+	if plot_id >= GRID_PLOTS: return EDGE_PLOTS[plot_id - GRID_PLOTS]
 	var k := plot_id - P0_PLOTS
 	return Vector2i(COLUMNS + k % EXTRA_COLUMNS, k / EXTRA_COLUMNS)
 
@@ -74,10 +82,12 @@ static func cell_of(plot_id: int) -> Vector2i:
 ## -1 when the cell is not a plot.
 static func id_of(cell: Vector2i) -> int:
 	var d := cell - PLOT_ORIGIN
-	if d.x < 0 or d.y < 0 or d.x % 2 != 0 or d.y % 2 != 0: return -1
+	if d.x % 2 != 0 or d.y % 2 != 0: return -1
 	var col := d.x / 2
 	var row := d.y / 2
-	if row >= ROWS: return -1
+	if col < 0 or row < 0 or row >= ROWS:
+		var edge := EDGE_PLOTS.find(Vector2i(col, row))
+		return GRID_PLOTS + edge if edge >= 0 else -1
 	if col < COLUMNS: return row * COLUMNS + col
 	if col < COLUMNS + EXTRA_COLUMNS: return P0_PLOTS + row * EXTRA_COLUMNS + col - COLUMNS
 	return -1
@@ -102,6 +112,7 @@ static func blueprint() -> FarmBlueprint:
 		for col in COLUMNS: cells.append(cell_of(row * COLUMNS + col))
 		for col in EXTRA_COLUMNS: cells.append(cell_of(P0_PLOTS + row * EXTRA_COLUMNS + col))
 		beds.append({"id": "row%d" % row, "cells": cells})
+	beds.append({"id": "edge", "cells": EDGE_PLOTS.map(func(g): return PLOT_ORIGIN + g * 2)})   # Homestead Lv7's 40–47
 	bp.anchors["beds"] = beds
 	for key in FarmBlueprint.MASK_NAMES: bp.masks[key] = []
 	for y in GRID.y:

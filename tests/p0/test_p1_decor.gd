@@ -414,3 +414,12 @@ func test_the_player_walks_inside_the_fence_ring() -> void:
 	assert_bool(bp.is_walkable(corner)).is_true()
 	assert_int(maxi(19 - corner.x, 19 - corner.y)).is_less_equal(2)   # just inside the corner
 	assert_that(P0Farm.landing_cell(grid, P0Garden.ANCHORS.spawn)).is_equal(P0Garden.ANCHORS.spawn)   # where one may stand: there
+
+## q(172): Homestead Lv7's beds on the field's edge (40–47) are off Decorate from Lv7, as the field is; before it their
+## cells are yard (the server sends what stood there back to storage at the upgrade); the walkways between stay open.
+func test_lv7_beds_on_the_edge_are_off_the_yard_from_lv7() -> void:
+	var bed := P0Garden.cell_of(41)   # (4,1), in front of the first row
+	assert_str(P0Decor.reason_cells({"garden": {"plots": 40}}, [bed], {})).is_equal("")
+	assert_str(P0Decor.reason_cells({"garden": {"plots": 48}}, [bed], {})).is_equal(P0Decor.REASONS.decor_outside)
+	assert_str(P0Decor.reason_cells({"garden": {"plots": 48}}, [P0Garden.cell_of(47)], {})).is_equal(P0Decor.REASONS.decor_outside)
+	assert_str(P0Decor.reason_cells({"garden": {"plots": 48}}, [bed + Vector2i(1, 0)], {})).is_equal("")   # the walkway beside

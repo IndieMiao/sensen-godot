@@ -1744,6 +1744,7 @@ const P1_UNLOCKS := {
 	"orchard_8": {"icon": "crop_apple", "text": "Orchard 8/8", "note": ""},
 	"sprinklers_10": {"icon": "facility_sprinkler", "text": "Sprinklers 10/10", "note": ""},
 	"plots_40": {"icon": "field", "text": "Plots 40", "note": "10 more to till"},
+	"plots_48": {"icon": "field", "text": "Plots 48", "note": "8 more to till"},   # Lv7 (q(172)): 40–47 on the field's edge
 	"warming_cabinet_12": {"icon": "kitchen", "text": "Warming Cabinet 12", "note": "keeps 12 dishes"},
 }
 # Lv8's `stall_upgrade` has no line (不知火舞 on 282, 李元芳's c62a6ed9 ③): the stall is still the crate stand-in, with no
