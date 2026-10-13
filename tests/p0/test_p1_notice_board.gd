@@ -130,3 +130,27 @@ func test_a_row_closes_the_board_and_shows_the_pin_on_the_map() -> void:
 	assert_bool(ui.notice_board() == null).is_true()
 	assert_array(shown).is_equal(["pond:pond_san_francisco_06"])
 	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_p1_notice_board.json"))
+
+# ---------------------------------------------------------------- the board by the stall (q(164) ①)
+## Its cell is yard beside the stall: walkable, no bed, no path, nothing else's; a yard object so no decor goes there.
+func test_its_cell_is_yard_beside_the_stall_off_the_field_the_paths_and_the_others() -> void:
+	var c := P0Garden.NOTICE_BOARD_CELL
+	var yard: Dictionary = P0Decor.yard()
+	var inside := func(rects: Array) -> bool:
+		return rects.any(func(r): return Rect2i(int(r[0]), int(r[1]), int(r[2]), int(r[3])).has_point(c))
+	assert_bool(P0Garden.WALK_RECT.has_point(c)).is_true()
+	assert_bool(inside.call(yard.get("field", []))).is_false()
+	assert_bool(inside.call(yard.get("paths", []))).is_false()
+	assert_bool(inside.call(yard.get("objects", []))).is_true()   # no decor on it (the server's rules too)
+	for k in P0Garden.FOOTPRINTS: assert_bool((P0Garden.FOOTPRINTS[k] as Rect2i).has_point(c)).is_false()
+	assert_bool(c != P0Garden.CHEF_SIGN_CELL and c != P0Garden.MAILBOX_CELL and c != P0Garden.SIGN_CELL).is_true()
+	assert_int(absi(c.x - P0Garden.ANCHORS.storage.x) + absi(c.y - P0Garden.ANCHORS.storage.y)).is_equal(1)   # beside the stall
+	assert_bool(P0Garden.blueprint().is_walkable(c)).is_true()
+
+## The placeholder: a board on two posts with a roof, not the sign's outline; its strip `Notice Board`.
+func test_the_placeholder_and_its_strip() -> void:
+	var b: Node3D = auto_free(load("res://scenes/p0/p0_farm.gd").notice_board_prop(Vector3.ZERO))
+	for n in ["PostL", "PostR", "Board", "Roof"]: assert_object(b.get_node(n)).is_not_null()
+	var board := b.get_node("Board") as MeshInstance3D
+	assert_float(board.position.y - (board.mesh as BoxMesh).size.y * 0.5).is_greater_equal(0.6)   # off the grass
+	assert_str(str(P0WorldPrompts.notice_board({}).text)).is_equal("Notice Board")
