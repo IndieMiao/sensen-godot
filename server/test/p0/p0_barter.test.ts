@@ -61,7 +61,7 @@ describe('Barter (§8.4.5)', () => {
     const temperate = barterItems(c, 'Temperate');
     expect(temperate).toEqual(expect.arrayContaining(['crop_pumpkin', 'fish_smelt', 'fish_arctic_char', 'fish_salmon']));
     for (const id of ['crop_radish', 'fish_crucian', 'crop_pineapple', 'fish_tilapia']) expect(temperate).not.toContain(id);
-    expect(barterView(at(4)).items).toEqual(expect.arrayContaining([{ id: 'crop_pumpkin', name: 'Pumpkin', have: 40 }]));
+    expect(barterView(at(4)).items).toEqual(expect.arrayContaining([{ id: 'crop_pumpkin', name: 'Pumpkin', have: 40, spare: 40 }]));
     expect(run(at(4), trade('stone', 'market', 'crop_radish'))).toMatchObject({ ok: false, code: 'not_barterable' });
     // at a market in Singapore (tropical) Singapore's go and the pumpkin does not (as its buyback, §9.13.1)
     const flown = run(at(4), { type: 'travel', to: SINGAPORE });   // a Day Pass there (free in the first version)
@@ -78,11 +78,28 @@ describe('Barter (§8.4.5)', () => {
   it('a Gifted stack never goes: not counted, not taken', () => {
     const s = at(4);
     s.bag = [{ id: 'crop_pumpkin', qty: 5, gift: { from: 'res_pip', day: dayKey(c, s, T0) } } as never, { id: 'crop_pumpkin', qty: 1 }];
-    expect(barterView(s).items).toEqual(expect.arrayContaining([{ id: 'crop_pumpkin', name: 'Pumpkin', have: 1 }]));
+    expect(barterView(s).items).toEqual(expect.arrayContaining([{ id: 'crop_pumpkin', name: 'Pumpkin', have: 1, spare: 1 }]));
     expect(run(s, trade('stone'))).toMatchObject({ ok: false, code: 'not_enough', detail: { item: 'crop_pumpkin', need: 2, have: 1 } });
     s.bag.push({ id: 'crop_pumpkin', qty: 1 });
     const r = run(s, trade('stone'));
     expect(r.ok).toBe(true);
     if (r.ok) expect(r.state.bag.find(b => b.gift)?.qty).toBe(5);   // the gift stays
+  });
+});
+
+describe('what the pick may take, and the top level (q(166) review)', () => {
+  it('a locked stack is spare 0; a tracked request keeps back what it needs, as Sell All', () => {
+    const s = at(4);
+    const item = () => barterView(s).items.find(i => i.id === 'crop_pumpkin')!;
+    expect(item()).toMatchObject({ have: 40, spare: 40 });
+    s.boards.market = [{ req: { status: 'accepted', kind: 'crop', items: ['crop_pumpkin'], qty: 30 } } as never];
+    expect(item()).toMatchObject({ have: 40, spare: 10 });
+    s.locked.push('crop_pumpkin');
+    expect(item()).toMatchObject({ have: 40, spare: 0 });
+  });
+
+  it('at the top level there is no barter group: nothing left to climb to', () => {
+    const s = at(10);
+    expect(viewOf(c, s, T0).shops.market.barter).toBeNull();
   });
 });

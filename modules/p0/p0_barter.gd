@@ -28,14 +28,16 @@ static func limit_reached(view: Dictionary) -> bool:
 	var b := block(view)
 	return not b.is_empty() and int(b.get("left", 0)) <= 0
 
-## The regional item a barter takes now: the one the bag holds most of, if it holds enough (ties: the list's order);
-## {} when none has `give`.
+## The regional item a barter takes now: the one with the most to spare, if `give` of it can go (the server takes `give`
+## of one kind; ties: the list's order); {} when none can. `spare` (q(166) review) leaves out a locked stack and what a
+## tracked request needs, as Sell All keeps back; an older server without it: what the bag holds.
 static func pick(view: Dictionary) -> Dictionary:
 	var b := block(view)
 	var give := int(b.get("give", 2))
 	var best := {}
 	for it in b.get("items", []):
-		if int(it.get("have", 0)) >= give and (best.is_empty() or int(it.have) > int(best.have)): best = it
+		var n := int(it.get("spare", it.get("have", 0)))
+		if n >= give and (best.is_empty() or n > int(best.get("spare", best.get("have", 0)))): best = it
 	return best
 
 ## One row per mineral: {id, title, effect (`For 2 Sweet Potato` / `For 2 regional items`, the grey key's word,
@@ -49,6 +51,9 @@ static func rows(view: Dictionary) -> Array:
 	var out: Array = []
 	for m in b.get("minerals", []):
 		var room := int(m.get("room", 0))
+		# A mineral the next level does not need (share 0) is no `Level quota used`: left out until 不知火舞 words it
+		# (q(166) review); at the top level the server sends no group at all.
+		if m.has("share") and int(m.share) <= 0: continue
 		var row := {id = str(m.get("id", "")), title = str(m.get("name", "")),
 			effect = ("For %d %s" % [give, str(item.name)]) if not item.is_empty() else ("For %d regional items" % give),
 			gate = "%d of %d left this level" % [room, int(m.get("share", room))],

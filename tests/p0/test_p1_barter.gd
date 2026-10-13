@@ -117,3 +117,16 @@ func test_a_barters_reply_toasts_instead_of_floating() -> void:
 	assert_int(rt.ui._toasts.current_severity()).is_equal(ToastLayer.Severity.SUCCESS)
 	var floats := rt.ui.root.get_children().filter(func(c): return c is UiFloatText and not c.is_queued_for_deletion())
 	assert_array(floats.map(func(f): return f.text)).is_empty()
+
+
+## q(166) review: the pick takes only what can spare `give` of one kind (a locked stack, a tracked request's share kept
+## back: the server's `spare`); a mineral the next level does not need gets no row (not `Level quota used`).
+func test_the_pick_takes_what_can_spare_two_and_unneeded_minerals_go() -> void:
+	var v := _view(2, [{"id": "crop_sweet_potato", "name": "Sweet Potato", "have": 9, "spare": 1},
+		{"id": "fish_tilapia", "name": "Tilapia", "have": 3, "spare": 3}])
+	assert_str(str(P0Barter.pick(v).id)).is_equal("fish_tilapia")   # 9 held, but only 1 to spare
+	v.shops.market.barter.items[1].spare = 1
+	assert_bool(P0Barter.pick(v).is_empty()).is_true()
+	v.shops.market.barter.minerals.append({"id": "quartz", "name": "Quartz", "room": 0, "share": 0})
+	assert_array(P0Barter.rows(v).map(func(r): return r.id)).is_equal(["stone", "clay"])   # clay: 0 of 4 left → Level quota used
+	assert_str(str(P0Barter.rows(v)[1].reason)).is_equal("Level quota used")
