@@ -916,9 +916,12 @@ func _travel_fly(to: Dictionary, left: Vector2, held: String, city: String, km: 
 ## The tween only calls this each frame: where the flight is comes from the clock, so it takes 3 s of real time even
 ## when frames are slow — the engine caps a frame's step (about 0.13 s), and a tween stepped by it stretched the flight
 ## on a slow device (李元芳 on 279 45546042: 4.9 s on the emulator; 9.5 s at 400 ms a frame). It lands on time.
-func _travel_at(_step: float) -> void:
+## Recording frames (P0_SHOT_FRAMES, a fixed frame rate) the clock runs faster than the frames saved, so a video takes
+## the tween's own time there, frame for frame (不知火舞 on 299: it cut before landing).
+func _travel_at(step: float) -> void:
 	if _trip.is_empty(): return
-	var t := minf((Time.get_ticks_usec() - int(_trip.start_us)) / 1e6, P0TravelFlight.TOTAL_S)
+	var clock := (Time.get_ticks_usec() - int(_trip.start_us)) / 1e6
+	var t := minf(step if OS.has_environment("P0_SHOT_FRAMES") else clock, P0TravelFlight.TOTAL_S)
 	if t >= P0TravelFlight.TOTAL_S:
 		_travel_land()
 		return
@@ -993,9 +996,10 @@ func _travel_land() -> void:
 		if cover.get_parent() != null: cover.get_parent().remove_child(cover)
 		cover.queue_free()
 	if rt != null: rt.release_travel()   # the chip and Energy follow the view, the held +10 floats, with the welcome
-	_show_self(true)   # the avatar stands in the city ahead, as the chip changes
 	_here_sig = ""
 	_sync_here()
+	_sync_farm_markers()   # where it stands now, laid out before it shows: no frame of it at the city left (不知火舞 on 299)
+	_show_self(true)   # the avatar stands in the city ahead, as the chip changes
 	if (trip.land as Callable).is_valid() and is_inside_tree(): (trip.land as Callable).call()
 
 ## MAP-7-FREE (§11.8.4 step 7, Figma 482:412): a first visit lands on "3 things to do here" — the local pond, an
