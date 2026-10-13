@@ -797,7 +797,7 @@
   "card/counter_buy": {
     "facts": [
       "{card_line}",
-      "Adds the page to your Cookbook"
+      "New Cookbook page"
     ],
     "price": true,
     "buttons": [

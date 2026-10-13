@@ -208,8 +208,8 @@ static func card_page(item_id: String) -> String: return item_id.trim_prefix(CAR
 static func _card_line(view: Dictionary, offer: Dictionary, opts: Dictionary) -> String:
 	var rarity := int(offer.get("rarity", 0))
 	var word := P0Logic.rarity_name(view, rarity) if rarity > 0 else ""
-	var name := "Regional Recipe Card" if _counter(opts) == "market" else "Recipe Card"
-	return ("%s · %s" % [name, word]) if word != "" else name
+	if _counter(opts) != "market": return word
+	return ("Regional · %s" % word) if word != "" else "Regional"
 
 ## The shop's offer row for a Buy list: view.shops[role].buy (SGODOT-228), else the older stall / tackle lists.
 static func _offer(view: Dictionary, item_id: String, opts: Dictionary) -> Dictionary:
@@ -382,8 +382,8 @@ static func tokens(view: Dictionary, item_id: String, context: StringName, opts 
 		footprint = P0Decor.footprint(item_id) if kind == "decor" else "",
 		decor_line = P0Decor.line(item_id) if kind == "decor" else "",
 		decor_third = _decor_third(view, item_id, offer) if kind == "decor" else "",
-		# Recipe Cards (§9.11.1 / §9.11.2, appendix B): `Recipe Card · Fine` at the stall, `Regional Recipe Card · Rare`
-		# at the Market (their rarity), then what buying it does.
+		# Recipe Cards (§9.11.1 / §9.11.2): the rarity alone — `Fine` at the stall, `Regional · Legendary` for the
+		# Market's regional cards — beside a grey `Need 240 more coins` the row stays one line each (不知火舞 on 282).
 		card_line = _card_line(view, offer, opts) if kind == "card" else "",
 	}
 	var src := str(t.source)

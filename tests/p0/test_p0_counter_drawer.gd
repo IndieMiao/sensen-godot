@@ -393,8 +393,8 @@ func test_keeper_card_frames_the_figure_by_its_outline() -> void:
 	assert_float((right.y - left.y) / H).is_less(0.84)
 
 ## Recipe Cards (§9.11.1 / §9.11.2; 282, P1 exit ⑦): today's cards close the Buy page — the Stall's daily two, the
-## Market's regional ones — on the counter's product row: the dish on the title, the card's icon, `Recipe Card · Fine`
-## (`Regional Recipe Card · Rare` at the Market), its price, one Buy and no stepper. Bought (the page in the Cookbook) it
+## Market's regional ones — on the counter's product row: the dish on the title, the card's icon, its rarity (`Fine`,
+## `Regional · Rare` at the Market) and `New Cookbook page`, its price, one Buy and no stepper (不知火舞 on 282). Bought (the page in the Cookbook) it
 ## stays on the shelf greyed `In Cookbook`; short of coins `Need 30 more coins`. Buy sends the counter's buy.
 func _with_cards() -> Dictionary:
 	var v := _view()
@@ -415,7 +415,7 @@ func test_todays_recipe_cards_close_the_buy_page() -> void:
 	var ids := _row_ids(d)
 	assert_array(ids.slice(ids.size() - 2)).is_equal(["recipe_card_dish_fish_soup", "recipe_card_dish_grilled_fish"])
 	var soup: UiShopRow = d._rows["recipe_card_dish_fish_soup"]
-	assert_array(_row_texts(soup)).is_equal(["Fresh Fish Soup", "Recipe Card · Fine", "Adds the page to your Cookbook", "80 coins", "Buy", true])
+	assert_array(_row_texts(soup)).is_equal(["Fresh Fish Soup", "Fine", "New Cookbook page", "80 coins", "Buy", true])
 	assert_object(soup._icon.texture).is_same(P0Logic.icon("recipe_card"))
 	assert_str(str(_row_texts(d._rows["recipe_card_dish_grilled_fish"])[4])).is_equal("In Cookbook")
 	var got := []
@@ -434,7 +434,7 @@ func test_a_market_sells_its_regional_cards_and_short_coins_grey_the_key() -> vo
 	await _settle()
 	assert_bool(_row_ids(d).has("recipe_card_dish_crispy_smelt")).is_true()
 	assert_array(_row_texts(d._rows["recipe_card_dish_crispy_smelt"])).is_equal(
-		["Crispy Smelt", "Regional Recipe Card · Rare", "Adds the page to your Cookbook", "200 coins", "Need 30 more coins", true])
+		["Crispy Smelt", "Regional · Rare", "New Cookbook page", "200 coins", "Need 30 more coins", true])
 	# City Specialty shows no card
 	var s := _drawer("market", {"keeper": "Mei", "place": "Mission Market Square"}, "specialty", v)
 	await _settle()
