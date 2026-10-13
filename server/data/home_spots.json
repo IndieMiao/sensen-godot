@@ -22,18 +22,18 @@
   ],
   "gn-1819729": [
    {
-    "lat": 22.275756,
-    "lng": 114.158016,
+    "lat": 22.274179,
+    "lng": 114.157615,
     "hood": "Mid-Levels"
    },
    {
-    "lat": 22.285645,
-    "lng": 114.140358,
-    "hood": "Sai Ying Pun"
+    "lat": 22.28568,
+    "lng": 114.138919,
+    "hood": "Shek Tong Tsui"
    },
    {
-    "lat": 22.297931,
-    "lng": 114.170766,
+    "lat": 22.297806,
+    "lng": 114.171041,
     "hood": "Tsim Sha Tsui"
    }
   ],
@@ -63,29 +63,29 @@
    {
     "lat": 1.289176,
     "lng": 103.821465,
-    "hood": "Henderson Hill"
+    "hood": "Alexandra North"
    },
    {
     "lat": 1.310208,
     "lng": 103.824235,
-    "hood": "Lady Hill Park"
+    "hood": "Nassim"
    }
   ],
   "gn-2618425": [
    {
-    "lat": 55.637189,
-    "lng": 12.57976,
-    "hood": "Elmegården"
+    "lat": 55.645335,
+    "lng": 12.58586,
+    "hood": "Sundbyvester"
    },
    {
-    "lat": 55.65571,
-    "lng": 12.54109,
-    "hood": "Sydhavnen"
+    "lat": 55.657483,
+    "lng": 12.548566,
+    "hood": "Frederiks Brygge"
    },
    {
-    "lat": 55.662419,
-    "lng": 12.578804,
-    "hood": "Ballonparken"
+    "lat": 55.66453,
+    "lng": 12.582884,
+    "hood": "Islands Brygge"
    }
   ],
   "gn-2643743": [
@@ -141,14 +141,14 @@
   ],
   "gn-4164138": [
    {
-    "lat": 25.802309,
-    "lng": -80.216748,
-    "hood": "Civic Center"
+    "lat": 25.803052,
+    "lng": -80.210894,
+    "hood": "Wynwood"
    },
    {
     "lat": 25.791418,
     "lng": -80.195796,
-    "hood": "Wynwood"
+    "hood": "Edgewater"
    },
    {
     "lat": 25.78038,
@@ -158,26 +158,26 @@
   ],
   "gn-5128581": [
    {
-    "lat": 40.720905,
-    "lng": -74.037583,
-    "hood": "Newport"
+    "lat": 40.747423,
+    "lng": -74.00625,
+    "hood": "Chelsea"
    },
    {
-    "lat": 40.740148,
-    "lng": -74.005649,
-    "hood": "Meatpacking District"
+    "lat": 40.732904,
+    "lng": -73.991266,
+    "hood": "Union Square"
    },
    {
-    "lat": 40.722969,
-    "lng": -73.999575,
-    "hood": "SoHo"
+    "lat": 40.722366,
+    "lng": -74.009143,
+    "hood": "Hudson Square"
    }
   ],
   "gn-5368361": [
    {
     "lat": 34.032403,
     "lng": -118.278411,
-    "hood": "Saint James Park"
+    "hood": "South Los Angeles"
    },
    {
     "lat": 34.052872,

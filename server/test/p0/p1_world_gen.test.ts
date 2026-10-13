@@ -269,10 +269,11 @@ describe('global generation (SGODOT-280)', () => {
     const la = cityPlaces(c, LA)!.detail;
     expect(la.outposts.find(o => o.id === `${LA}~tackle2`))
       .toMatchObject({ lat: 34.040844, lng: -118.219243, nearest: { name: la.ponds[2].name } });
-    // New York's beginner pond, its shop and Market Square 1 came off the Hudson together (司空震, 286 16ffaf67)
+    // New York's beginner pond, its shop and Market Square 1 came off the Hudson together (司空震, 286 16ffaf67), then off
+    // Pier 40 into the West Village for the first home cities (SGODOT-303, 303 582765b3)
     const nyc = (w.overrides as Record<string, PlaceFix>)[`${NYC}~pond0`];
     expect(placeOf(c, `${NYC}~pond0`)).toMatchObject({ beginner: true, at: [nyc.lat, nyc.lng] });
-    expect(km({ lat: nyc.lat!, lng: nyc.lng! }, { lat: 40.729478, lng: -74.013998 })).toBeLessThan(0.1);   // nudged 25 m for q(144)
+    expect(km({ lat: nyc.lat!, lng: nyc.lng! }, { lat: 40.734, lng: -74.0078 })).toBeLessThan(0.1);
     // A renamed pond (before the freeze) keeps its tackle shop pointing at it; a point without both lat and lng is ignored.
     const tokyo = structuredClone(generateCity(c, clusters.get(TOKYO)!).detail);
     const [pond, shop] = [tokyo.ponds[0], tokyo.outposts.find(o => o.id === `${TOKYO}~tackle0`)!];

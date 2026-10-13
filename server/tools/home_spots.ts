@@ -11,7 +11,9 @@
  *          scattered spot ≥ 50 m from water and inside the rules. <out>/check.tsv; exit 1 on any failure.
  *   maps   one Mapbox static map per city: P beginner pond, m / t / k / s its market, tea house, tackle shop and post,
  *          1–3 the spots. For 不知火舞's acceptance.
- *   npx tsx tools/home_spots.ts run|check|maps [--cities gn-1,gn-2] [--out output/home-spots]
+ *   npx tsx tools/home_spots.ts run|check|maps [--cities gn-1,gn-2] [--out output/home-spots] [--avoid file.json]
+ * --avoid: {cluster: [[[lat, lng], …], …]} polygons a spot may not stand in (New York: across the Hudson, in New Jersey;
+ * 不知火舞 on 303), the format world_water_groups.ts takes.
  * The Mapbox token is read from mapbox_token.txt and never printed.
  */
 import { execFile } from 'node:child_process';
@@ -42,6 +44,15 @@ const token = () => readFileSync(path.join(ROOT, 'mapbox_token.txt'), 'utf8').tr
 const nameOf = (id: string) => (id === writtenCluster(c) ? c.profile.city : clusterById(c, id)?.name ?? id);
 const exKm = ((w.placement as { farm_exclusion_m?: number }).farm_exclusion_m ?? 300) / 1000;
 const scKm = rules.spot.scatter_m[1] / 1000;
+const avoid: Record<string, [number, number][][]> = opt('avoid') ? JSON.parse(readFileSync(opt('avoid')!, 'utf8')) : {};
+const inside = (poly: [number, number][], p: { lat: number; lng: number }) => {
+  let hit = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const [ai, bi] = poly[i], [aj, bj] = poly[j];
+    if ((bi > p.lng) !== (bj > p.lng) && p.lat < ((aj - ai) * (p.lng - bi)) / (bj - bi) + ai) hit = !hit;
+  }
+  return hit;
+};
 
 async function curl(url: string, file?: string): Promise<Buffer> {
   for (let i = 0; ; i++) {
@@ -57,6 +68,8 @@ async function curl(url: string, file?: string): Promise<Buffer> {
 /** A label as a card line takes it: a Tokyo chōme number (`Sendagaya 5`) and Mexico's `Colonia ` go. */
 const clean = (n: string) => n.replace(/\s+\d+$/, '').replace(/^Colonia\s+/, '').trim();
 const HOOD_MAX = 20;
+/** Park, hill and landmark labels are not districts (不知火舞, 303): `Saint James Park`, `Lady Hill Park`, `Henderson Hill`. */
+const NOT_A_DISTRICT = /\b(park|parque|parc|hill|hills|mount|mountain|peak|garden|gardens|market|cemetery|stadium|airport|station|university|campus|center|centre)\b|parken$/i;
 
 /** The district name a point shows on the map: the nearest suburb / quarter / neighbourhood label (Mapbox Streets
  * place_label, English) within 1.5 km, else 3 km, not already used in the city, a short one (≤ 20) first; else
@@ -67,7 +80,7 @@ async function hoodOf(p: { lat: number; lng: number }, used: Set<string>): Promi
     const labels = (JSON.parse((await curl(url)).toString()) as { features?: { properties: Record<string, unknown> & { tilequery: { distance: number } } }[] }).features ?? [];
     const names = labels.filter(f => ['suburb', 'quarter', 'neighbourhood'].includes(String(f.properties.type)))
       .sort((a, b) => a.properties.tilequery.distance - b.properties.tilequery.distance)
-      .map(f => clean(String(f.properties.name_en ?? f.properties.name ?? ''))).filter(n => n && LATIN.test(n) && !used.has(n));
+      .map(f => clean(String(f.properties.name_en ?? f.properties.name ?? ''))).filter(n => n && LATIN.test(n) && !NOT_A_DISTRICT.test(n) && !used.has(n));
     const near = names.find(n => n.length <= HOOD_MAX) ?? names[0];
     if (near) return near;
   }
@@ -75,7 +88,7 @@ async function hoodOf(p: { lat: number; lng: number }, used: Set<string>): Promi
     const url = `https://api.mapbox.com/search/geocode/v6/reverse?longitude=${p.lng}&latitude=${p.lat}&types=${type}&language=en&limit=1&access_token=${token()}`;
     const body = JSON.parse((await curl(url)).toString()) as { features?: { properties?: { name?: string } }[] };
     const name = clean(body.features?.[0]?.properties?.name ?? '');
-    if (name && LATIN.test(name) && !used.has(name)) return name;
+    if (name && LATIN.test(name) && !NOT_A_DISTRICT.test(name) && !used.has(name)) return name;
   }
   return '';
 }
@@ -117,27 +130,62 @@ async function pick(cluster: string): Promise<{ lat: number; lng: number; hood: 
   for (let deg = 0; deg < 360; deg += 5) {
     for (let d = rules.spot.pond_km[0] + scKm; d <= rules.spot.pond_km[1] - scKm + 1e-9; d += 0.1) {
       const at = offset(pond.lat, pond.lng, d, deg), dry = dryM(map, at);
-      if (dry >= DRY_M && classAt(map, at) === BUILT_UP && blocks.every(b => km(at, b) >= exKm + scKm) && discDry(map, at, scKm)) found.push({ at, deg, d, dry });
+      if (dry >= DRY_M && classAt(map, at) === BUILT_UP && blocks.every(b => km(at, b) >= exKm + scKm) && !(avoid[cluster] ?? []).some(poly => inside(poly, at))
+        && discDry(map, at, scKm)) found.push({ at, deg, d, dry });
     }
   }
   // Toward 3 directions 120° apart from the city's own bearing; the best-scoring fit that has a district name of its own.
-  const base = hash32(w.seed, cluster, 'home:spots') % 360, rows: { lat: number; lng: number; hood: string; deg: number; d: number; dry: number }[] = [];
-  const used = new Set<string>([nameOf(cluster)]);
-  for (let k = 0; k < 3; k++) {
-    const want = base + 120 * k;
-    const fits = found.filter(f => rows.every(o => km(f.at, o) >= rules.spot.apart_km + 2 * scKm && turnGap(f.deg, o.deg) >= MIN_TURN));
-    if (!fits.length) return `no room for spot ${k + 1} (${found.length} dry built-up candidates)`;
-    const score = (f: typeof found[number]) => turnGap(f.deg, want) / 20 + Math.abs(f.d - 1.4) / 0.4 - Math.min(f.dry, 600) / 1000;
-    let row: typeof rows[number] | null = null;
-    for (const f of fits.sort((a, b) => score(a) - score(b)).slice(0, 12)) {
-      const hood = await hoodOf(f.at, used);
-      if (hood) { row = { lat: f.at.lat, lng: f.at.lng, hood, deg: f.deg, d: Math.round(f.d * 100) / 100, dry: Math.round(f.dry) }; break; }
+  // Greedy, so a first spot can shut the others out (Manhattan between two rivers): the bearing turns 15° at a time.
+  const base = hash32(w.seed, cluster, 'home:spots') % 360;
+  let why = '';
+  for (let turn = 0; turn < 360; turn += 15) {
+    const rows: { lat: number; lng: number; hood: string; deg: number; d: number; dry: number }[] = [], used = new Set<string>([nameOf(cluster)]);
+    for (let k = 0; k < 3 && !why; k++) {
+      const want = base + turn + 120 * k;
+      const fits = found.filter(f => rows.every(o => km(f.at, o) >= rules.spot.apart_km + 2 * scKm && turnGap(f.deg, o.deg) >= MIN_TURN));
+      if (!fits.length) { why = `no room for spot ${k + 1} (${found.length} dry built-up candidates)`; break; }
+      const score = (f: typeof found[number]) => turnGap(f.deg, want) / 20 + Math.abs(f.d - 1.4) / 0.4 - Math.min(f.dry, 600) / 1000;
+      let row: typeof rows[number] | null = null;
+      for (const f of fits.sort((a, b) => score(a) - score(b)).slice(0, 40)) {
+        const hood = await hoodOf(f.at, used);
+        if (hood) { row = { lat: f.at.lat, lng: f.at.lng, hood, deg: f.deg, d: Math.round(f.d * 100) / 100, dry: Math.round(f.dry) }; break; }
+      }
+      if (!row) { why = `no named district for spot ${k + 1}`; break; }
+      used.add(row.hood);
+      rows.push(row);
     }
-    if (!row) return `no named district for spot ${k + 1}`;
-    used.add(row.hood);
-    rows.push(row);
+    if (rows.length === 3) return rows;
+    if (turn + 15 < 360) why = '';
   }
-  return rows;
+  // Still none: every three of the best few per 10° that keep the spacing, the widest spread first, then the score; a
+  // spot without a district name of its own leaves the pool and the search runs again.
+  const score = (f: typeof found[number]) => Math.abs(f.d - 1.4) / 0.4 - Math.min(f.dry, 600) / 1000;
+  const bins = new Map<number, typeof found>();
+  for (const f of found) bins.set(Math.floor(f.deg / 10), [...(bins.get(Math.floor(f.deg / 10)) ?? []), f]);
+  let pool = [...bins.values()].flatMap(b => b.sort((a, b2) => score(a) - score(b2)).slice(0, 3));
+  const named = new Map<typeof found[number], string>();
+  for (let round = 0; round < 20; round++) {
+    let best: { t: typeof found; spread: number; sum: number } | null = null;
+    for (let i = 0; i < pool.length; i++) for (let j = i + 1; j < pool.length; j++) for (let k = j + 1; k < pool.length; k++) {
+      const t = [pool[i], pool[j], pool[k]];
+      if (t.some((a, x) => t.some((b, y) => x < y && (km(a.at, b.at) < rules.spot.apart_km + 2 * scKm || turnGap(a.deg, b.deg) < MIN_TURN)))) continue;
+      const spread = Math.floor(Math.min(turnGap(t[0].deg, t[1].deg), turnGap(t[1].deg, t[2].deg), turnGap(t[0].deg, t[2].deg)) / 15);
+      const sum = t.reduce((a, f) => a + score(f), 0);
+      if (!best || spread > best.spread || (spread === best.spread && sum < best.sum)) best = { t, spread, sum };
+    }
+    if (!best) return why;
+    const used = new Set<string>([nameOf(cluster)]), rows: { lat: number; lng: number; hood: string; deg: number; d: number; dry: number }[] = [];
+    let missing: typeof found[number] | null = null;
+    for (const f of best.t.sort((a, b) => a.deg - b.deg)) {
+      const hood = named.get(f) ?? await hoodOf(f.at, used);
+      if (!hood || used.has(hood)) { missing = f; break; }
+      named.set(f, hood); used.add(hood);
+      rows.push({ lat: f.at.lat, lng: f.at.lng, hood, deg: f.deg, d: Math.round(f.d * 100) / 100, dry: Math.round(f.dry) });
+    }
+    if (!missing) return rows;
+    pool = pool.filter(f => f !== missing);
+  }
+  return why;
 }
 
 async function main() {
