@@ -573,3 +573,151 @@ func test_a_high_latitude_flight_lands_from_the_overview_the_map_shows() -> void
 		var d := Vector2(fposmod(b.x - c.x + 0.5, 1.0) - 0.5, b.y - c.y) * 512.0 * pow(2.0, at.z)
 		var eased := s * s * (3.0 - 2.0 * s)
 		assert_float(d.distance_to(start * (1.0 - eased))).override_failure_message("off by %.1f px at %.1f" % [d.distance_to(start * (1.0 - eased)), s]).is_less(1.0)
+
+## q(157) ② (不知火舞 on 299): both cities' bubbles stand whole at the top — 8 in from the screen's sides, over the safe
+## area's bottom — so a pair whose bubbles reach out goes further out than its dots alone need. San Francisco – Tokyo
+## fits only at the floor (z 0.8) with San Francisco's bubble: the search reaches the floor itself (周瑜 / 亚瑟: steps
+## summed as floats stopped at 0.85 from z 11, and such a pair panned instead of holding).
+func test_the_top_frames_both_bubbles_whole_down_to_the_floor_itself() -> void:
+	var view := Vector2(360, 800)
+	var safe := Rect2(32, 160, 296, 412)
+	var within := Rect2(8, 160, 344, 412)
+	var sf := Vector2(37.77, -122.42)
+	var tokyo := Vector2(35.68, 139.69)
+	var bubbles := [[sf, Rect2(-49, 6, 98, 40)], [tokyo, Rect2(-35, 6, 70, 40)]]
+	var bare := P0TravelFlight.plan(sf.x, sf.y, 11.0, 0.0, sf, tokyo.x, tokyo.y, 11.0, 0.0, view, safe)
+	assert_bool(bare.holds()).is_true()
+	assert_float(bare.top_zoom()).is_greater(0.9)   # the dots alone
+	var f := P0TravelFlight.plan(sf.x, sf.y, 11.0, 0.0, sf, tokyo.x, tokyo.y, 11.0, 0.0, view, safe, bubbles, within)
+	assert_bool(f.holds()).is_true()
+	assert_float(f.top_zoom()).is_equal_approx(P0TravelFlight.TOP_MIN_ZOOM, 1e-6)
+	var top := f.sample(P0TravelFlight.UP_S + 1.0)
+	var c := Vector2(MapGeoMath.mercator_x(top.y), MapGeoMath.mercator_y(top.x))
+	var scale := 512.0 * pow(2.0, top.z)
+	for b in bubbles:
+		var p := Vector2(MapGeoMath.mercator_x((b[0] as Vector2).y), MapGeoMath.mercator_y((b[0] as Vector2).x))
+		var at := view * 0.5 + Vector2(fposmod(p.x - c.x + 0.5, 1.0) - 0.5, p.y - c.y) * scale
+		var r: Rect2 = b[1]
+		assert_bool(within.encloses(Rect2(at + r.position, r.size))).override_failure_message("%s's bubble cut" % b[0]).is_true()
+		assert_bool(safe.has_point(at)).is_true()
+
+const SALINAS := "gn-5391295"
+
+## q(157) (李元芳 on 279 eaf31aca): San Francisco → Salinas, due south, held its overview with Salinas under the home key
+## and its bubble not drawn. The safe area's bottom is 8 over the home key now; at the top both ends stand over it and
+## both cities' bubbles show whole, clear of the right-hand keys.
+func test_a_trip_south_frames_both_ends_and_their_bubbles_over_the_keys() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved: Dictionary = rt.session.view
+	var v := saved.duplicate(true)
+	v["now"] = 1_000_000_000.0
+	v["travel"] = {home = SF, here = SALINAS, passes = {}, visits = {SALINAS: {n = 1}}, stamps = [], fallback = {near3 = [], near10 = []}, explorer = 0}
+	rt.session.view = v
+	rt.ui.set_view(v)
+	m.center_lat = 37.77
+	m.center_lng = -122.42
+	m._set_zoom(11.0)
+	m._origin_before = Vector2(37.77, -122.42)
+	m._here_before = SF
+	m.on_arrival({kind = "arrival", cluster = SALINAS, first = false, trip = 2, km = 138})
+	var home_key: Rect2 = m.city_map.home_key.get_global_rect()
+	var keys := home_key.merge(m.city_map.recenter.get_global_rect())
+	assert_float(m.safe_bottom()).is_less_equal(home_key.position.y - 8.0)
+	assert_bool((m._trip.plan as P0TravelFlight).holds()).is_true()
+	m._trip.start_us = Time.get_ticks_usec() - 1_500_000   # 1.5 s in: the top
+	m._travel_at(0.0)
+	m.city_map._update_bubbles()
+	var vp: Vector2 = m.get_viewport().get_visible_rect().size
+	for cluster in [SF, SALINAS]:
+		var id := str(P0Clusters.region(cluster).id)
+		var node: Control = m.city_map.bubbles[id].node
+		assert_bool(node.visible).override_failure_message("%s's bubble not drawn" % id).is_true()
+		var r := node.get_global_rect()
+		assert_float(r.position.x).is_greater_equal(8.0 - 0.5)
+		assert_float(r.end.x).is_less_equal(vp.x - 8.0 + 0.5)
+		assert_float(r.end.y).is_less_equal(m.safe_bottom() + 0.5)
+		assert_bool(r.intersects(keys)).is_false()
+	for p in [Vector2(37.77, -122.42), Vector2(36.67774, -121.6555)]:
+		var at = m.geo_to_screen(p.x, p.y)
+		assert_float((at as Vector2).y).is_less(m.safe_bottom())
+	m._travel_land()
+	rt.ui.clear_toast()
+	rt.session.view = saved
+	rt.ui.set_view(saved)
+	await get_tree().process_frame   # the cover goes
+
+## q(157) (不知火舞 on 299): in the air the city left counts as where the player is and the city ahead as the one just
+## opened (q(153)), so neither's bubble gives way — Los Angeles, only visited, too; on landing they read as ever.
+func test_in_the_air_neither_ends_bubble_gives_way() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved: Dictionary = rt.session.view
+	var v := saved.duplicate(true)
+	v["now"] = 1_000_000_000.0
+	v["travel"] = {home = SF, here = TOKYO, passes = {}, visits = {LA: {n = 1}, TOKYO: {n = 1}}, stamps = [], fallback = {near3 = [], near10 = []}, explorer = 0}
+	rt.session.view = v
+	rt.ui.set_view(v)
+	m._origin_before = Vector2(34.05, -118.24)
+	m._here_before = LA
+	m.on_arrival({kind = "arrival", cluster = TOKYO, first = false, trip = 4, km = 8800})
+	var keeps := func(cluster: String) -> bool:
+		m.city_regions()
+		return bool(m.city_bubble(str(P0Clusters.region(cluster).id)).keeps)
+	assert_bool(keeps.call(LA)).is_true()
+	assert_bool(keeps.call(TOKYO)).is_true()
+	m._travel_land()
+	assert_bool(keeps.call(LA)).is_false()   # visited again
+	assert_bool(keeps.call(TOKYO)).is_true()   # where the player is
+	rt.ui.clear_toast()
+	rt.session.view = saved
+	rt.ui.set_view(saved)
+	await get_tree().process_frame   # the cover goes
+
+const RENO := "gn-5511077"
+
+## 周瑜 on #348: a first visit's city ahead reads Unexplored all through the flight (q(147) ⑤), so its bubble is
+## measured so for the top's fit too — measured as Visited (narrower), a short-named city near the side could have its
+## wider Unexplored bubble run past the 8 px margin. San Francisco → Reno, a first visit: the bubble the flight measured
+## reads Unexplored and is the one it shows at the top, whole.
+func test_a_first_visits_city_ahead_is_measured_as_it_shows_unexplored() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved: Dictionary = rt.session.view
+	var v := saved.duplicate(true)
+	v["now"] = 1_000_000_000.0
+	v["travel"] = {home = SF, here = RENO, passes = {}, visits = {RENO: {n = 1}}, stamps = [], fallback = {near3 = [], near10 = []}, explorer = 0}
+	rt.session.view = v
+	rt.ui.set_view(v)
+	m.center_lat = 37.77
+	m.center_lng = -122.42
+	m._set_zoom(11.0)
+	m._origin_before = Vector2(37.77, -122.42)
+	m._here_before = SF
+	m.on_arrival({kind = "arrival", cluster = RENO, first = true, trip = 2, km = 300})
+	var b: Dictionary = m.city_map.bubbles[str(P0Clusters.region(RENO).id)]
+	assert_str(b.count.text).is_equal("Unexplored")   # as the flight measured it, before any frame
+	var measured: Vector2 = (b.node as Control).size
+	m._trip.start_us = Time.get_ticks_usec() - 1_500_000   # 1.5 s in: the top
+	m._travel_at(0.0)
+	m.city_map._update_bubbles()
+	assert_str(b.count.text).is_equal("Unexplored")
+	assert_bool((b.node as Control).visible).is_true()
+	assert_vector((b.node as Control).size).is_equal(measured)   # the one it shows
+	var r := (b.node as Control).get_global_rect()
+	var vp: Vector2 = m.get_viewport().get_visible_rect().size
+	assert_float(r.position.x).is_greater_equal(8.0 - 0.5)
+	assert_float(r.end.x).override_failure_message("Reno's bubble ends at %.1f of %.0f" % [r.end.x, vp.x]).is_less_equal(vp.x - 8.0 + 0.5)
+	assert_float(r.end.y).is_less_equal(m.safe_bottom() + 0.5)
+	m._travel_land()
+	rt.ui.clear_toast()
+	await get_tree().create_timer(1.8).timeout   # past the stamp's beat: its card, closed
+	rt.ui.close_modal()
+	rt.session.view = saved
+	rt.ui.set_view(saved)
