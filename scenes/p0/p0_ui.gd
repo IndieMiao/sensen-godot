@@ -1831,8 +1831,10 @@ func _drop_modal() -> void:
 	var was_kitchen := modal_kind == "kitchen"
 	modal_kind = ""
 	if was_kitchen: _refresh_hud()   # back out of the farmhouse
-	_keys.visible = surface in ACTION_SURFACES
-	_bar.visible = _bar_shown()
+	# Placement mode keeps the main key, the switch key and the quick bar away until it ends (q(23); 不知火舞 on 284:
+	# a closed piece card brought `Till` and ⇄ back under Decorate's Done); end_placement puts them back.
+	_keys.visible = surface in ACTION_SURFACES and not placing()
+	_bar.visible = _bar_shown() and not placing()
 
 func _open_modal(content: Control, dim := 0.32, hide_controls := false) -> void:
 	_bar.cancel_drag()   # a drawer or card opening cancels a slot drag (LOCK-04 v1.10)
