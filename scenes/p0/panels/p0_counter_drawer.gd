@@ -27,6 +27,7 @@ signal section_changed(section: String)
 signal fitted
 
 const P0KeeperPortraits := preload("res://modules/p0/p0_keeper_portraits.gd")   # SGODOT-300
+const P0Barter := preload("res://modules/p0/p0_barter.gd")   # q(166): the market's Barter group
 const HEIGHT := 696.0           # drawer top at y 104 of 800 (FARM-6, NPC-2-2)
 const HEIGHT_DRINKS := 276.0    # NPC-6 / NPC-7-P0: keeper bar at y 540 (16 under the top, clear of the handle; 不知火舞 on 265)
 ## A counter that buys nothing back (the P0 market, sell []): keeper bar, tabs and its rows only, until fit_height()
@@ -42,6 +43,7 @@ const DRINK_NOTES := {"tea": "Counts across all tea houses · %d cups a day", "p
 const DRINK_SHORT := {"tea": "Tea", "post": "Coffee"}
 const SHELF_ROWS := 4           # FARM-6: four product rows, then the divider at y 428
 const _ROW_H := 58.0
+const _BARTER_HEAD_H := 30.0   # BARTER-1: `Barter · 2 for 1 · 4/6 today` over its four rows
 const _TOP_KEEPER := 16.0       # keeper bar at y 120: under the drawer handle (8–12) with 4 to spare (不知火舞 on 265, A)
 const _TOP_STALL := 0.0         # stall title row (44, Close) at y 104, its chips right under it
 const _GAP := 8.0
@@ -84,6 +86,8 @@ var _scope: HBoxContainer        # the scope chip and buy-back line (none on the
 var _decor_line: Label           # the Decor page's fact line under the stall's title (`Decor 12/24 · Goes to Farm Storage`)
 var _drinks: VBoxContainer
 var _rows := {}   # item id -> UiShopRow
+var barter: VBoxContainer   # the market's Barter group, the Buy shelf's last part (q(166)); null elsewhere
+var _barter_key := 0
 var _qty := {}    # item id -> stepper count
 var _fit_frames := 0   # frames left before fit_height() measures (both pages laid out)
 var _key := 0
@@ -121,7 +125,8 @@ func _init(view_: Dictionary = {}, role_ := "homestead", ctx_ := {}, section_ :=
 		return
 	_shelf_box = TouchScrollContainer.new()
 	_shelf_box.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	_shelf_box.custom_minimum_size.y = (offers().size() if section == "specialty" or is_short() else SHELF_ROWS) * _ROW_H
+	_shelf_box.custom_minimum_size.y = (offers().size() if section == "specialty" or is_short() else SHELF_ROWS) * _ROW_H \
+		+ (barter_height() if is_short() else 0.0)
 	body.add_child(_shelf_box)
 	shelf = VBoxContainer.new()
 	shelf.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -320,6 +325,63 @@ func _fill_shelf() -> void:
 			shelf.add_child(row)
 			_rows[id] = row
 	for id in ids: _show_row(str(id))
+	_fill_barter()
+
+## The market's Barter group at the end of its Buy shelf (§8.4.5, q(166); BARTER-1 2567:131803, BARTER-2 2570:132291,
+## BARTER-LIST 2569:132290): `Barter · 2 for 1` (C14 XB) with ` · 4/6 today` (C12 B secondary; the day's six used:
+## ` · Limit reached · resets in 9h 12m` in danger), then a ShopProduct detailed row per mineral (P0Barter.rows):
+## `For 2 Pumpkin`, `3 of 6 left this level`, `2 items`, `Barter` — or the grey key with its reason. No stepper: one
+## barter a press. Its key reports `barter` with the regional item P0Barter picked.
+func _fill_barter() -> void:
+	var head: Dictionary = P0Barter.header(view) if role == "market" and section == "buy" else {}
+	if head.is_empty():
+		if is_instance_valid(barter): barter.queue_free()
+		barter = null
+		return
+	if not is_instance_valid(barter) or barter.is_queued_for_deletion():   # the shelf's rebuild freed it
+		barter = VBoxContainer.new()
+		barter.name = "Barter"
+		barter.add_theme_constant_override(&"separation", 0)
+		shelf.add_child(barter)
+		_barter_key = 0
+	shelf.move_child(barter, -1)
+	var rows := P0Barter.rows(view)
+	var key := [head, rows].hash()
+	if key == _barter_key: return
+	_barter_key = key
+	for c in barter.get_children():
+		c.hide()
+		c.queue_free()
+	var top := HBoxContainer.new()
+	top.name = "Head"
+	top.custom_minimum_size.y = _BARTER_HEAD_H
+	top.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	top.add_theme_constant_override(&"separation", 0)
+	var title := UiKit.label(str(head.title), UiTokens.STYLE_C14_XB)
+	title.name = "Title"
+	title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	top.add_child(title)
+	var quota := UiKit.label(" · " + str(head.quota), UiTokens.STYLE_C12_B,
+		UiTokens.COLOR_DANGER if bool(head.red) else UiTokens.COLOR_SECONDARY)
+	quota.name = "Quota"
+	quota.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	top.add_child(quota)
+	barter.add_child(top)
+	for r in rows:
+		var row := UiShopRow.new()
+		row.name = "Barter_" + str(r.id)
+		var cmd: Dictionary = r.cmd
+		row.bought.connect(func(mineral: String, _qty: int):
+			if not cmd.is_empty(): action_requested.emit(&"barter", mineral, {item = str(cmd.item)}))
+		row.info_requested.connect(func(item: String): info_requested.emit(item))
+		barter.add_child(row)
+		var key_ := {label = str(r.button), kind = &"secondary"} if str(r.reason) == "" else {label = str(r.reason), kind = &"unavailable"}
+		row.show_spec({id = str(r.id), icon = P0Logic.icon(str(r.id)), title = str(r.title), facts = [str(r.effect), str(r.gate)],
+			price = {text = str(r.price)}, buttons = [key_], info = true}, true)
+
+## The Barter group's height (its heading and rows), 0 where there is none: a short drawer counts it.
+func barter_height() -> float:
+	return 0.0 if P0Barter.header(view).is_empty() or role != "market" else _BARTER_HEAD_H + P0Barter.rows(view).size() * _ROW_H
 
 func _show_row(id: String) -> void:
 	var o := {}
@@ -342,7 +404,7 @@ func is_short() -> bool:
 ## refresh. Counted in _process, so a drawer freed meanwhile simply stops (no awaited resume on a freed instance).
 func fit_height() -> void:
 	if not is_short() or not is_inside_tree(): return
-	_shelf_box.custom_minimum_size.y = maxi(1, offers().size()) * _ROW_H
+	_shelf_box.custom_minimum_size.y = maxi(1, offers().size()) * _ROW_H + barter_height()
 	var shelf_page := section != "board"
 	_shelf_box.visible = true
 	board.visible = true

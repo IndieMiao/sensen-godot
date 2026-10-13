@@ -49,5 +49,7 @@ export function barter(c: P0Content, s: P0State, cmd: { item?: unknown; mineral?
   events.push({ kind: 'item', id: mineral, delta: 1 });
   s.day.barters = done + 1;
   s.homestead.bartered = { ...(s.homestead.bartered ?? {}), [mineral]: (s.homestead.bartered?.[mineral] ?? 0) + 1 };
+  // the reply says it was a barter: the client's toast `+1 Stone · −2 Pumpkin` instead of the floats (q(166) ⑤)
+  events.push({ kind: 'barter', item, give: b.give, mineral, left: b.daily - s.day.barters });
   return null;
 }

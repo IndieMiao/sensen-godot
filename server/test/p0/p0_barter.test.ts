@@ -33,6 +33,7 @@ describe('Barter (§8.4.5)', () => {
     expect(r.state.storage.quartz).toBe(1);
     expect(r.state.day.barters).toBe(1);
     expect(r.events).toEqual(expect.arrayContaining([{ kind: 'item', id: 'crop_pumpkin', delta: -2 }, { kind: 'item', id: 'quartz', delta: 1 }]));
+    expect(r.events.at(-1)).toEqual({ kind: 'barter', item: 'crop_pumpkin', give: 2, mineral: 'quartz', left: 5 });   // the client's toast
   });
 
   it('at most half of the next level\'s need per mineral, counted until the next upgrade', () => {
