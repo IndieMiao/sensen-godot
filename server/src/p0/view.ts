@@ -349,8 +349,8 @@ function shopView(c: P0Content, s: P0State, shop: ShopId, now: number) {
       }),
       minerals: c.homestead.barter.minerals.map(id => ({ id, name: itemName(c, id), room: barterRoom(c, s, id), share: barterShare(c, s, id) })),
     } : null,
-    // Recipe cards on this counter today (§7.16.1): the Stall's daily two, Market's climate cards. Bought = in the Cookbook.
-    cards: (shop === 'homestead' ? stallCards(c, s) : shop === 'market' ? marketCards(c, homeClimate(c, s)) : []).map(id => {
+    // Recipe cards on this counter today (§7.16.1): the Stall's daily two (home), a Market's city's climate cards (q(182)).
+    cards: (shop === 'homestead' ? stallCards(c, s) : shop === 'market' ? marketCards(c, climateAt(c, s)) : []).map(id => {
       const page = cardPage(id), price = cardPrice(c, id) ?? 0, recipe = recipeById(c, page);
       return { id, page, name: recipe?.name ?? page, rarity: recipe ? recipeRarity(c, recipe) : 1, price, need: coinsNeeded(c, price),
         owned: s.cookbook.includes(page) };
