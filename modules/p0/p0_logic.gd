@@ -1094,8 +1094,11 @@ static func unlock_line(view: Dictionary, skill: String, level: int) -> String:
 	return ""
 
 ## Cooking conveniences by key (§7.2.2 / §4.6.3): the names the level banner and SKILL-1 use.
+## P1 adds Lv7–10's (the glossary, 李元芳 on 286: SKILL-1 showed their ids), and Lv10's title Chef.
 const CONVENIENCE_NAMES := {"cook_again": "Cook Again", "clue_double": "Double Clue", "hearty_mishap": "Hearty Mishap",
-	"steady_hand_1": "Steady Hand I", "queue_two": "Queue ×2", "quick_fire": "Quick Fire"}
+	"steady_hand_1": "Steady Hand I", "queue_two": "Queue ×2", "quick_fire": "Quick Fire",
+	"steady_hand_2": "Steady Hand II", "fast_mastery": "Fast Mastery", "cook_all": "Cook All", "provisions_plus": "Bigger Provisions",
+	"chefs_touch": "Chef's Touch", "title_chef": "Chef", "lucky_double": "Lucky Double"}
 const LEVEL_TIP := "Levels unlock gear, fish and seeds. Basics never lock."
 ## Levels that change the day say so on the banner's Tip instead of the next level (§4.8.3, q(69)).
 const DAY_CHANGES := {"cooking:4": "Today changes: 3-ingredient dishes", "farming:6": "Today changes: no more watering"}
@@ -1696,6 +1699,10 @@ const P1_UNLOCKS := {
 	"chefs_sign": {"icon": "kitchen", "text": "Chef's Sign", "note": "every dish's gold zone +5"},
 	"title_homestead_master": {"icon": "star", "text": "Homestead Master", "note": "title"},
 	"old_tree": {"icon": "wood", "text": "Old Tree", "note": "Hardwood · 1 per round"},
+	# Lv7 (P1 exit C18, 李白 q(172)): the orchard and the sprinklers reach their most (perennial_slots 1 + level up to 8,
+	# sprinkler_max 3 + level up to 10), §8.6.2's lines; their notes come with q(172)
+	"orchard_8": {"icon": "crop_apple", "text": "Orchard 8/8", "note": ""},
+	"sprinklers_10": {"icon": "facility_sprinkler", "text": "Sprinklers 10/10", "note": ""},
 	"plots_40": {"icon": "field", "text": "Plots 40", "note": "10 more to till"},
 	"warming_cabinet_12": {"icon": "kitchen", "text": "Warming Cabinet 12", "note": "keeps 12 dishes"},
 	"stall_upgrade": {"icon": "board", "text": "Homestead Stall upgraded", "note": "new look"},
