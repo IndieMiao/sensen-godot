@@ -36,8 +36,12 @@ var room_kind := "basic"
 const SCENE := "res://scenes/p0/rooms/p0_farmhouse.tscn"
 ## Upgraded inside (HOME-1 from Profile's farm card is at home here too) to a level with the next room: once the
 ## level-up's banner and look cards are gone and the stove is idle, the farmhouse opens again in its new room behind the
-## loading cover, the player at its door. Once; tests swap the call.
-var reopen := func(): AppRouter.replace_top_instance(self, SCENE, {})
+## loading cover, the player at its door. Once the router takes it (true); while it is busy, the next frame tries again
+## (刘邦 on #380). Tests swap the call.
+var reopen := func() -> bool:
+	if not AppRouter.can_replace(self): return false
+	AppRouter.replace_top_instance(self, SCENE, {})
+	return true
 var _reopening := false
 
 var kitchen: P0Kitchen
@@ -83,8 +87,7 @@ func check_room(v: Dictionary) -> void:
 	if _reopening or rt == null or not v.has("homestead"): return
 	if room_for(int(v.homestead.get("level", level))) == room_kind: return
 	if rt.ui.has_modal() or not rt.ui._card_queue.is_empty() or (kitchen != null and kitchen.busy()): return
-	_reopening = true
-	reopen.call()
+	_reopening = bool(reopen.call())
 
 ## The fire that burns brighter while a pot cooks: the Basic Room's, whose stove is its hearth; the Standard and Deluxe
 ## stoves are range cookers across the room from their fireplaces, so theirs stays as it is.

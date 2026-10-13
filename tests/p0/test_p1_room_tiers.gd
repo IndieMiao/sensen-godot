@@ -112,7 +112,10 @@ func test_an_upgrade_inside_reopens_the_farmhouse_in_its_next_room() -> void:
 	var r := _farmhouse(4)
 	r.rt = rt
 	var calls := [0]
-	r.set("reopen", func(): calls[0] += 1)
+	var router_busy := [true]
+	r.set("reopen", func() -> bool:
+		calls[0] += 1
+		return not router_busy[0])
 	r.call("check_room", {"homestead": {"level": 4}})
 	assert_int(calls[0]).is_equal(0)   # the same room
 	var banner := Control.new()
@@ -124,14 +127,19 @@ func test_an_upgrade_inside_reopens_the_farmhouse_in_its_next_room() -> void:
 	rt.ui._card_queue.clear()
 	await get_tree().process_frame
 	r.call("check_room", {"homestead": {"level": 5}})
-	assert_int(calls[0]).is_equal(1)
+	assert_int(calls[0]).is_equal(1)   # the router busy (another way in or out under way): not taken …
+	router_busy[0] = false
 	r.call("check_room", {"homestead": {"level": 5}})
-	assert_int(calls[0]).is_equal(1)   # once
+	assert_int(calls[0]).is_equal(2)   # … so the next frame tries again, and it is taken
+	r.call("check_room", {"homestead": {"level": 5}})
+	assert_int(calls[0]).is_equal(2)   # once taken, never again
 	var std := _farmhouse(6)
 	std.rt = rt
-	std.set("reopen", func(): calls[0] += 10)
+	std.set("reopen", func() -> bool:
+		calls[0] += 10
+		return true)
 	std.call("check_room", {"homestead": {"level": 9}})
-	assert_int(calls[0]).is_equal(1)   # Lv6 → Lv9: still the Standard Room
+	assert_int(calls[0]).is_equal(2)   # Lv6 → Lv9: still the Standard Room
 
 static func _aabb(n: Node3D) -> AABB:
 	var out := AABB()
