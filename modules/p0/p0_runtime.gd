@@ -1609,6 +1609,7 @@ func _dev_shot(dt: float) -> void:
 				ui.close_modal()
 				ui.show_spot.emit(step[1])
 			"radial": ui.open_radial()
+			"closemodal": ui.close_modal()   # the card or sheet on top, as its ✕ (shots: a LOOK-PICK after an upgrade, 282)
 			"kitchen", "put":   # the farmhouse owns the cooking drawer (P0Farmhouse.p0_dev); elsewhere there is no stove
 				if not bool(_call("p0_dev", [step])): push_warning("P0_SHOT: %s works in the farmhouse only" % step[0])
 			"cook": session.send({"type": "cook", "recipe": step[1]})
