@@ -2855,7 +2855,7 @@
     },
     "res_old_kai": {
       "name": "Old Kai",
-      "role": "Harbour Elder",
+      "role": "Harbor Elder",
       "portrait": "kai",
       "likes": "Grilled",
       "gift_meal": "dish_grilled_crucian",
