@@ -100,26 +100,38 @@ describe('farm spots (q(160) ②)', () => {
   // Every 60th city of M1 and up, plus the named ones: the rules hold everywhere a home can be.
   const cities = [SF, TOKYO, NYC, ...[...clustersOf(c)!.byId.values()].filter(cl => tierOf(w, cl) !== 'S').filter((_, i) => i % 60 === 0).map(cl => cl.id)];
 
+  /** q(160) ②'s rules for one player's 3 spots in a city that can be a home. */
+  const keepsRules = (city: string, player: string) => {
+    const spots = homeSpots(c, city, player);
+    expect(spots, `${city} ${player}`).toHaveLength(3);
+    const set = citySet(c, city)!, pond = cityPonds(c, city).find(p => p.id === set.pond)!.at!;
+    const blocks = [...cityOutposts(c, city), ...cityPonds(c, city)].flatMap(p => (p.at ? [p.at] : []));
+    for (const s of spots!) {
+      expect(s.km).toBeGreaterThanOrEqual(0.5);
+      expect(s.km).toBeLessThanOrEqual(3);
+      expect(Math.abs(km(s, pond) - s.km)).toBeLessThan(0.001);
+      for (const b of blocks) expect(km(s, b), `${city} ${player} #${s.spot}`).toBeGreaterThanOrEqual(0.3);
+      expect(s.pond.id).toBe(set.pond);
+    }
+    for (let i = 0; i < 3; i++) for (let j = i + 1; j < 3; j++) expect(km(spots![i], spots![j]), `${city} ${player}`).toBeGreaterThanOrEqual(1);
+    expect(new Set(spots!.map(s => s.toward)).size, `${city} ${player}`).toBe(3);
+  };
+
   it('3 spots, 0.5–3 km from the beginner pond, 300 m clear of every outpost and pond, 1 km apart, in different directions', () => {
     let checked = 0;
     for (const city of cities) {
-      const spots = homeSpots(c, city, 'player-spot-01');
-      if (!citySet(c, city)) { expect(spots).toBeNull(); continue; }
-      expect(spots, city).toHaveLength(3);
-      const set = citySet(c, city)!, pond = cityPonds(c, city).find(p => p.id === set.pond)!.at!;
-      const blocks = [...cityOutposts(c, city), ...cityPonds(c, city)].flatMap(p => (p.at ? [p.at] : []));
-      for (const s of spots!) {
-        expect(s.km).toBeGreaterThanOrEqual(0.5);
-        expect(s.km).toBeLessThanOrEqual(3);
-        expect(Math.abs(km(s, pond) - s.km)).toBeLessThan(0.001);
-        for (const b of blocks) expect(km(s, b), `${city} #${s.spot}`).toBeGreaterThanOrEqual(0.3);
-        expect(s.pond.id).toBe(set.pond);
-      }
-      for (let i = 0; i < 3; i++) for (let j = i + 1; j < 3; j++) expect(km(spots![i], spots![j])).toBeGreaterThanOrEqual(1);
-      expect(new Set(spots!.map(s => s.toward)).size).toBe(3);
+      if (!citySet(c, city)) { expect(homeSpots(c, city, 'player-spot-01')).toBeNull(); continue; }
+      keepsRules(city, 'player-spot-01');
       checked++;
     }
     expect(checked).toBeGreaterThan(20);
+  });
+
+  it('every city of the offline table keeps the rules for any player (周瑜 on #371: 4 players a city)', () => {
+    const table = spotTable()!;
+    for (const city of Object.keys(table.cities)) {
+      for (const player of ['player-rule-0001', 'player-rule-0002', 'player-rule-0003', 'player-rule-0004']) keepsRules(city, player);
+    }
   });
 
   it('the same player gets the same spots; each player is 100–200 m off the city\'s point', () => {
