@@ -1,0 +1,13 @@
+{
+  "byte_identical_glbs_and_manifest": true,
+  "first_export_sha256": {
+    "chef_sign_a.glb": "791b4165428c883f26aeafdec3fef65e7d872e39772ba64ef59fc5b96082130a",
+    "chef_sign_b.glb": "4aa4bce928d98e5f3d9131bbf76db888d3935e03924a4ea70eac99631c7ee708",
+    "manifest.json": "11f0bf784c70af76efc5a11869e63ada468e1b212b895fef439a59ba75d6aa34"
+  },
+  "second_export_sha256": {
+    "chef_sign_a.glb": "791b4165428c883f26aeafdec3fef65e7d872e39772ba64ef59fc5b96082130a",
+    "chef_sign_b.glb": "4aa4bce928d98e5f3d9131bbf76db888d3935e03924a4ea70eac99631c7ee708",
+    "manifest.json": "11f0bf784c70af76efc5a11869e63ada468e1b212b895fef439a59ba75d6aa34"
+  }
+}
