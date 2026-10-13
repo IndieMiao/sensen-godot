@@ -28,6 +28,8 @@ const PinReason := preload("res://modules/p0/p0_pin_reason.gd")   # why a pin we
 const PRESENCE_S := 15.0
 ## Show on map lands this close (the outpost / pond pins and the homestead read at this zoom).
 const SHOW_ZOOM := 15.5
+## Where the recenter key lands (q(158)): a step wider than SHOW_ZOOM, a pin's, so the places round the player show too.
+const LOCATE_ZOOM := 14.0
 
 var rt: P0Runtime
 var _presence: HTTPRequest
@@ -429,13 +431,15 @@ func _on_presence(result: int, code: int, _h: PackedStringArray, body: PackedByt
 	_online = online
 	_set_outpost_places()
 
-## The city view's own controls: the recenter key brings the camera back to the player without changing the zoom
-## (不知火舞 on 234); outfits are not in P0 (their button is gone with the old chrome).
+## The city view's own controls: the recenter key brings the camera back to the player at LOCATE_ZOOM from any zoom
+## (q(158), the user on 301; it kept the zoom before, 不知火舞 on 234); outfits are not in P0 (their button is gone with
+## the old chrome).
 func _city_action(action: String) -> void:
 	match action:
-		"recenter":   # back to the player, the zoom kept, nothing selected (LOCK-24; flies since SGODOT-267)
+		"recenter":   # back to the player at LOCATE_ZOOM, nothing selected (LOCK-24, q(158); flies since SGODOT-267)
+			if travelling(): return   # not during a cross-city flight
 			var at := _origin()
-			_fly("recenter", at.x, at.y, zoom)
+			_fly("recenter", at.x, at.y, LOCATE_ZOOM)
 		"home": go_home_view()
 		"outfit": rt.ui.toast("Outfits come later")
 		_: super._city_action(action)

@@ -1,7 +1,8 @@
 extends GdUnitTestSuite
 ## SGODOT-267 (the user's call: no jumps; 不知火舞 keeps 197 LOCK-24 / LOCK-08): the map's own camera moves — the home
 ## key, the recenter key and Show on map — fly the city's flight (MapFlight, cubic in-out), 0.35 s per unit of path
-## between 0.6 and 1.2 s, and land as they did before: the recenter key keeps the zoom and selects nothing; Show on map
+## between 0.6 and 1.2 s, and land as they did before: the recenter key lands at LOCATE_ZOOM from any zoom (q(158); it
+## kept the zoom before) and selects nothing; Show on map
 ## selects its pin (its card) on landing, the homestead only flown to; the home key's own suite covers it. A touch on the
 ## map stops a flight where it is with nothing landing; the same move asked again while it flies is ignored and another
 ## one takes over.
@@ -50,8 +51,9 @@ func _touch() -> void:   # a finger down on empty map and lifted without a tap o
 	up.canceled = true
 	map._unhandled_input(up)
 
-## The recenter key flies back to the player (here at the Tea House), keeps the zoom and selects nothing.
-func test_the_recenter_key_flies_to_the_player_and_keeps_the_zoom() -> void:
+## The recenter key flies back to the player (here at the Tea House) at LOCATE_ZOOM (q(158), the user on 301) and
+## selects nothing.
+func test_the_recenter_key_flies_to_the_player_at_the_locate_zoom() -> void:
 	var tea := P0Outposts.by_role("tea")
 	rt.here = {"space": "outpost", "place": str(tea.id)}
 	map._sync_here()
@@ -67,9 +69,32 @@ func test_the_recenter_key_flies_to_the_player_and_keeps_the_zoom() -> void:
 	assert_float(took).is_between(0.6 - 0.05, 1.2 + 0.15)
 	assert_float(map.center_lat).is_equal_approx(float(tea.lat), 1e-5)
 	assert_float(map.center_lng).is_equal_approx(float(tea.lng), 1e-5)
-	assert_float(map.zoom).is_equal_approx(13.3, 1e-6)
+	assert_float(map.zoom).is_equal_approx(map.LOCATE_ZOOM, 1e-6)
 	assert_dict(map.city_map.selected).is_empty()
 	assert_bool(rt.ui.has_modal()).is_false()
+
+## q(158): from any zoom — the state view far out too — the recenter key lands on the player at LOCATE_ZOOM, in the same
+## capped flight; during a cross-city flight it does nothing.
+func test_the_recenter_key_comes_in_from_the_state_view_and_waits_out_a_cross_city_flight() -> void:
+	map.center_lat = 38.3
+	map.center_lng = -121.2
+	map._set_zoom(6.0)
+	var started := Time.get_ticks_msec()
+	map._city_action("recenter")
+	var took := await _landed(started)
+	assert_float(took).is_less(1.2 + 0.15)
+	assert_float(map.center_lat).is_equal_approx(map.home_lat, 1e-5)
+	assert_float(map.center_lng).is_equal_approx(map.home_lng, 1e-5)
+	assert_float(map.zoom).is_equal_approx(map.LOCATE_ZOOM, 1e-6)
+	map.center_lat = 38.3
+	map.center_lng = -121.2
+	map._set_zoom(6.0)
+	map._trip = {to_city = "gn-1850147"}   # in the air (P0TravelFlight's own suite flies it for real)
+	map._city_action("recenter")
+	assert_float(map.center_lat).is_equal_approx(38.3, 1e-9)
+	assert_float(map.zoom).is_equal_approx(6.0, 1e-6)
+	assert_bool(map._flight != null and map._flight.is_running()).is_false()   # nothing took off
+	map._trip = {}
 
 ## Show on map flies to the pin and selects it on landing — its card, as before (LOCK-08) — never while it flies.
 func test_show_on_map_flies_and_selects_the_pin_on_landing() -> void:

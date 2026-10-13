@@ -1,7 +1,7 @@
 extends GdUnitTestSuite
 ## MAP-1 (§10.6.1, SGODOT-234 A1; 不知火舞 on 234): on the map P0's two-row HUD and Bag replace the map's own chrome —
 ## no city title, filters, place list, compass, Map / Farm / Me dock or + / −; the recenter key sits right over Bag,
-## 12 apart, and keeps the zoom. The place chip names where the player is and takes them back there. Pin cards: the
+## 12 apart, and flies back at LOCATE_ZOOM (q(158)). The place chip names where the player is and takes them back there. Pin cards: the
 ## homestead's says Go home, ponds and outposts Go, the place the player is at Back to <name> (q(80)).
 
 const P0_MAP := "res://scenes/p0/p0_map.tscn"
@@ -41,7 +41,7 @@ func test_the_maps_own_chrome_gives_way_to_the_hud_and_bag() -> void:
 	assert_float(city.content_bottom()).is_equal_approx(bag_top, 0.5)
 	assert_str(m.own_farm_name).is_equal("Homestead")
 
-func test_recenter_brings_the_camera_home_and_keeps_the_zoom() -> void:
+func test_recenter_brings_the_camera_home_at_the_locate_zoom() -> void:
 	var m := _map()
 	for i in 3: await get_tree().process_frame
 	m.set_process(false)
@@ -52,7 +52,7 @@ func test_recenter_brings_the_camera_home_and_keeps_the_zoom() -> void:
 	await _landed(m)   # it flies (SGODOT-267)
 	assert_float(m.center_lat).is_equal_approx(m.home_lat, 1e-6)
 	assert_float(m.center_lng).is_equal_approx(m.home_lng, 1e-6)
-	assert_float(m.zoom).is_equal_approx(13.3, 1e-6)
+	assert_float(m.zoom).is_equal_approx(m.LOCATE_ZOOM, 1e-6)   # q(158): from any zoom
 
 ## q(80): the homestead's and the outposts' cards are P0PlaceSheet. At home the avatar is the homestead's mark: its card
 ## reads Back to Homestead, no Distance. Away, the farm wears a Homestead pin whose card says Go home with
