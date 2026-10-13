@@ -12,12 +12,19 @@ static func block(view: Dictionary) -> Dictionary:
 	return b if b is Dictionary else {}
 
 ## The group's heading: `Barter · 2 for 1 · 4/6 today` (barters done today of the day's six, as the buy-back line's
-## `Buy-back today 30/60`); "" without a barter block (an older server, or not the market).
+## `Buy-back today 30/60`); with the six used it reads `Limit reached · resets in 9h 12m` in the danger colour, as a
+## counter's quota line (q(166) ⑤, q(121)); "" without a barter block (an older server, or not the market).
 static func header(view: Dictionary) -> String:
 	var b := block(view)
 	if b.is_empty(): return ""
+	if limit_reached(view): return "Limit reached · resets in %s" % P0Logic.span(float(b.get("resets_in", 0)))
 	var daily := int(b.get("daily", 6))
 	return "Barter · %d for 1 · %d/%d today" % [int(b.get("give", 2)), daily - int(b.get("left", daily)), daily]
+
+## The day's barters are used: the heading turns red and every row's key greys with the wait.
+static func limit_reached(view: Dictionary) -> bool:
+	var b := block(view)
+	return not b.is_empty() and int(b.get("left", 0)) <= 0
 
 ## The regional item a barter takes now: the one the bag holds most of, if it holds enough (ties: the list's order);
 ## {} when none has `give`.
@@ -44,7 +51,7 @@ static func rows(view: Dictionary) -> Array:
 			effect = ("For %d %s" % [give, str(item.name)]) if not item.is_empty() else ("For %d regional crops or fish" % give),
 			gate = "%d of %d left this level" % [room, int(m.get("share", room))],
 			price = "%d items" % give, button = "Barter", reason = "", cmd = {}}
-		if int(b.get("left", 0)) <= 0: row.reason = MAX_LEFT_REASON % P0Logic.span(float(b.get("resets_in", 0)))
+		if limit_reached(view): row.reason = MAX_LEFT_REASON % P0Logic.span(float(b.get("resets_in", 0)))
 		elif room <= 0: row.reason = "Level quota used"
 		elif item.is_empty(): row.reason = "Need %d regional items" % give
 		else: row.cmd = {"type": "barter", "item": str(item.id), "mineral": row.id, "shop": "market"}

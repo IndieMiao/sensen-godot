@@ -26,6 +26,9 @@ func test_the_grey_keys() -> void:
 	var none := P0Barter.rows(_view(2, [{"id": "crop_sweet_potato", "name": "Sweet Potato", "have": 1}]))
 	assert_str(str(none[0].effect)).is_equal("For 2 regional crops or fish")
 	assert_str(str(none[0].reason)).is_equal("Need 2 regional items")
+	assert_str(P0Barter.header(_view(0))).is_equal("Limit reached · resets in 9h 12m")   # q(166) ⑤: the heading too, red
+	assert_bool(P0Barter.limit_reached(_view(0))).is_true()
+	assert_bool(P0Barter.limit_reached(_view(2))).is_false()
 	var used := P0Barter.rows(_view(0))
 	assert_str(str(used[0].reason)).is_equal("Limit reached · 9h 12m")   # q(121): the day's six, and when they come back
 	assert_str(str(used[1].reason)).is_equal("Limit reached · 9h 12m")   # the day's limit says first
