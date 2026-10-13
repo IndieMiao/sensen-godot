@@ -113,6 +113,8 @@ static func spec(view: Dictionary, item_id: String, context: StringName, opts :=
 		out.title = str(_offer(view, item_id, opts).get("name", P0Logic.item_name(view, card_page(item_id))))
 		out.icon = P0Logic.icon("recipe_card")
 		out.quantity = 0
+	# Gift Clues (Fishing Lv7, q(167); 302 b308ee14): who of the residents met likes this dish, under the rarity line.
+	if kind == "dish": out.liked_by = P0Logic.liked_by_line(view, item_id)
 	if rule.is_empty(): return out
 	for line in rule.get("facts", []):
 		var text := fill(str(line), t)
@@ -210,6 +212,12 @@ static func _card_line(view: Dictionary, offer: Dictionary, opts: Dictionary) ->
 	var word := P0Logic.rarity_name(view, rarity) if rarity > 0 else ""
 	if _counter(opts) != "market": return word
 	return ("Regional · %s" % word) if word != "" else "Regional"
+## The gift drawer's key: `Gift · +3` with the resident's points for this dish (Gift Clues, Fishing Lv7), `Gift · −2`
+## for the Mystery Dish, `Gift` without them (q(167); RESIDENT-GIFT 1216:83527).
+static func _gift_label(target: Dictionary) -> String:
+	if not target.has("preview"): return "Gift"
+	var n := int(target.preview)
+	return "Gift · %s" % (("+%d" % n) if n >= 0 else ("−%d" % -n))
 
 ## The shop's offer row for a Buy list: view.shops[role].buy (SGODOT-228), else the older stall / tackle lists.
 static func _offer(view: Dictionary, item_id: String, opts: Dictionary) -> Dictionary:
@@ -351,7 +359,7 @@ static func tokens(view: Dictionary, item_id: String, context: StringName, opts 
 		gifted_line = "Gifted · can't be sold · can eat · can gift to a Resident" if stack.get("gifted", false) else "",
 		expires_line = ("Expires in " + P0Logic.span(float(stack.expires_in))) if stack.has("expires_in") else "",
 		affinity_line = "",
-		gift_label = ("Gift · +%d" % int(opts.target.preview)) if opts.get("target", {}).has("preview") else "Gift",
+		gift_label = _gift_label(opts.get("target", {})),
 		gift_near_label = ("Gift to %s" % str(opts.near.name)) if str(opts.get("near", {}).get("name", "")) != "" else "",
 		sell_all_label = _sell_all_label(count, sellable, here),
 		quota_resets_in = P0Logic.span(float(quota.get("resets_in", 0))) if quota.has("resets_in") else "",

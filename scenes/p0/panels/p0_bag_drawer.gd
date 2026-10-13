@@ -52,6 +52,9 @@ var bar_full := func(_id: String) -> bool: return false
 ## Gift drawer (RESIDENT-GIFT): {kind: "resident", id, name, likes}. The header becomes `Gift to <name>` and the
 ## count only (Bag side, no Gear: WP1b), the Dishes chip is preselected, and the card uses the &"gift" rules.
 var gift_to := {}
+## The gift drawer's marks over the cells (UiItemCell.GAIN_H + GAIN_GAP above each cell; the first row 3 more down).
+const GAIN_ROOM := UiItemCell.GAIN_H + UiItemCell.GAIN_GAP
+const GAIN_TOP := GAIN_ROOM + 3.0
 
 var quick_row: MarginContainer
 var header: UiBagHeader
@@ -183,7 +186,20 @@ func set_gear_slot(v: String) -> void:
 ## Bag stacks as grid items: {id, icon, qty, rarity, kind}, in the chosen sort order, then Farm Storage stacks
 ## on the storage tabs.
 func items() -> Array:
-	return bag_items(view, sort) + storage_items(view, category, place)
+	var out := bag_items(view, sort) + storage_items(view, category, place)
+	# The gift drawer (RESIDENT-GIFT 1216:83527, Gift Clues from Fishing Lv7): each dish carries what giving it adds
+	# (`♥ +3`, the Mystery Dish `−2`); with the marks the rows make room for them (31 apart, the first 22 down).
+	var marks := false
+	if not gift_to.is_empty():
+		for it in out:
+			var pts = gift_points(view, str(gift_to.get("id", "")), str(it.id))
+			if pts != null:
+				it["gain"] = pts
+				marks = true
+	if grid != null:
+		grid.row_room = GAIN_ROOM if marks else 0.0
+		grid.top_room = GAIN_TOP if marks else 0.0
+	return out
 
 ## Farm Storage stacks for a tab: {id = "storage:<item>", item, icon, qty, kind, stored = true}. Only at home,
 ## only on Seeds / Materials / Tackle, and only when the server sends storage and the item-info rules have the
@@ -219,6 +235,18 @@ static func hint_for(cat: String, has_storage: bool) -> String:
 	if cat == "Decor": return "At home · no slot limit"   # STORE-DECOR: pieces only ever wait in Farm Storage
 	return "%s · Bag first, then Farm Storage" % cat if has_storage else "Select an item to see its details."
 
+## The gift drawer's target for a dish: the resident, with `preview` = what giving it adds (Gift Clues, Fishing Lv7:
+## view.residents[id].gift_points, so the key reads `Gift · +3`); without the points (before Lv7) the key says `Gift`.
+static func gift_target(view: Dictionary, gift_to: Dictionary, item: String) -> Dictionary:
+	var pts = gift_points(view, str(gift_to.get("id", "")), item)
+	return gift_to.merged({preview = pts}) if pts != null else gift_to
+
+## What giving `item` to the resident adds (♥ +3, −2 for the Mystery Dish), or null before Fishing Lv7 / not listed.
+static func gift_points(view: Dictionary, resident: String, item: String) -> Variant:
+	var pts = view.get("residents", {}).get(resident, {}).get("gift_points", null)
+	if not pts is Dictionary or not (pts as Dictionary).has(item): return null
+	return int(pts[item])
+
 static func bag_items(view: Dictionary, sort_by := "Type") -> Array:
 	var out := []
 	for s in view.get("bag", {}).get("slots", []):
@@ -226,7 +254,8 @@ static func bag_items(view: Dictionary, sort_by := "Type") -> Array:
 		var it := P0Logic.item(view, id)
 		out.append({id = id, icon = P0Logic.icon(str(it.get("base", id))), qty = int(s.get("qty", 0)),
 			rarity = int(it.get("rarity", 0)) if id.begins_with("fish_") or id.begins_with("dish_") else 0,
-			kind = P0ItemInfo.kind_of(view, id), tab = P0ItemInfo.tab_of(view, id)})
+			kind = P0ItemInfo.kind_of(view, id), tab = P0ItemInfo.tab_of(view, id),
+			liked = not P0Logic.liked_by(view, id).is_empty()})   # Gift Clues (Fishing Lv7, q(167)): a ♥ on the cell
 	if sort_by == "Type":
 		var order := func(it: Dictionary) -> int:
 			for i in CATEGORIES.size():
@@ -315,7 +344,7 @@ func _build_bag() -> void:
 		if bool(it.get("stored", false)): sheet.open(str(it.item), &"storage", {place = place})
 		elif gift_to.is_empty(): sheet.open(str(it.id), &"bag", {place = place, pinned = bool(pinned.call(str(it.id))),
 			bar_full = bool(bar_full.call(str(it.id))), near = near})
-		else: sheet.open(str(it.id), &"gift", {place = place, target = gift_to})
+		else: sheet.open(str(it.id), &"gift", {place = place, target = gift_target(view, gift_to, str(it.id))})
 		_hint.visible = false
 	grid.selection_cleared.connect(func():
 		sheet.close()
