@@ -1195,9 +1195,10 @@ static func level_banner(view: Dictionary, ev: Dictionary, first := false) -> Di
 ## What a skill level opens this season: Farming — the crops of that gate (main ingredients first), then other stall
 ## goods and tools (Compost, Row Hoe); Fishing — the fish of that level; Cooking — the conveniences of that level.
 const FARMING_CONVENIENCE_NAMES := {"harvest_all": "Harvest All", "seed_saver": "Seed Saver"}   # §4.6.1 / glossary (Plot Marks, Sow Again … come later)
-## Fishing's conveniences (content fishing.conveniences; §4.6.2, q(178) ③): the 3-day Forecast, Gift Clues and the pond
-## card's Biting now (q(168)). Quick Recast comes once it is made (q(178) ⑤).
-const FISHING_CONVENIENCE_NAMES := {"three_day_forecast": "3-day Forecast", "gift_clue_highlight": "Gift Clues", "biting_now": "Biting now"}
+## Fishing's conveniences (content fishing.conveniences; §4.6.2, q(178) ③ / ⑤, f090617f): the 3-day Forecast, Gift Clues,
+## the pond card's Biting now (q(168)), Quick Recast and the Bigger Creel (15 a slot at Lv10, fishing.creel).
+const FISHING_CONVENIENCE_NAMES := {"three_day_forecast": "3-day Forecast", "gift_clue_highlight": "Gift Clues", "biting_now": "Biting now",
+	"quick_recast": "Quick Recast", "creel_15": "Bigger Creel"}
 ## A fish that bites at one time only, as the milestone row names it (q(178) ④: `River Eel (night)`, the Lv9 night fishing).
 const ONLY_AT_ROW := {"night_only": "night", "dawn_dusk_only": "dawn & dusk"}
 
@@ -1250,8 +1251,8 @@ static func level_unlocks(view: Dictionary, skill: String, level: int) -> Array:
 			if regional: out.append(REGIONAL_FISH)
 			# then the level's conveniences, as Farming and Cooking list theirs (q(178) ③: `Lv8 · 2nd Fish Trap, Biting now`)
 			var conv: Dictionary = content().get("fishing", {}).get("conveniences", {})
-			for k in conv:
-				if int(conv[k]) == level: out.append(str(FISHING_CONVENIENCE_NAMES.get(k, k)))
+			for k in conv:   # a title key is the title's (q(179): its own `… title` line), not a convenience (刘邦 on #366)
+				if int(conv[k]) == level and not str(k).begins_with("title_"): out.append(str(FISHING_CONVENIENCE_NAMES.get(k, k)))
 		"cooking":
 			var conv: Dictionary = content().get("cooking", {}).get("conveniences", {})
 			for k in conv:

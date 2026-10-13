@@ -4,7 +4,9 @@
     "conveniences": {
       "three_day_forecast": 3,
       "gift_clue_highlight": 7,
-      "biting_now": 8
+      "biting_now": 8,
+      "quick_recast": 9,
+      "creel_15": 10
     },
     "sites": {
       "coast": {

@@ -41,7 +41,7 @@ func test_each_track_says_its_level_what_is_next_and_its_xp() -> void:
 	assert_array(fishing.milestones.map(func(m): return m.line)).is_equal([
 		"Lv2 · River Perch, Largemouth Bass, Rainbow Trout, Mackerel, Worm Bait", "Lv3 · Reed Rod, Regional fish, 3-day Forecast",
 		"Lv4 · Golden Koi, Catfish", "Lv5 · Sea Bass, Spinner Lure, Fish Trap", "Lv6 · Carbon Rod", "Lv7 · Silver Sturgeon, Gift Clues",
-		"Lv8 · 2nd Fish Trap, Biting now", "Lv9 · River Eel (night)", "Lv10 · 3rd Fish Trap"])   # q(178): the traps Lv8 and Lv10 add, the conveniences
+		"Lv8 · 2nd Fish Trap, Biting now", "Lv9 · River Eel (night), Quick Recast", "Lv10 · 3rd Fish Trap, Bigger Creel"])   # q(178): the traps Lv8 and Lv10 add, the conveniences
 	assert_str(d.tracks[2].next).is_equal("Next: third ingredient slot")
 	var v := _view()
 	v.skills.farming = {"level": 4, "xp": 412}
@@ -174,3 +174,13 @@ func test_milestones_unfold_in_place_and_the_drawer_comes_back_to_the_profile() 
 	ui.close_top_layer()
 	await await_idle_frame()
 	assert_str(ui.modal_kind).is_equal("profile")
+
+## A title key among Fishing's conveniences (Master Angler, q(179)) is the title's own line, never listed by its id here
+## (刘邦 on #366).
+func test_a_title_key_is_not_listed_as_a_convenience() -> void:
+	var conv: Dictionary = P0Logic.content().get("fishing", {}).get("conveniences", {})
+	conv["title_master_angler"] = 10
+	var row := P0Logic.level_unlocks(_view(), "fishing", 10)
+	conv.erase("title_master_angler")
+	assert_bool(row.any(func(x): return str(x).begins_with("title_"))).is_false()
+	assert_array(row).contains(["3rd Fish Trap", "Bigger Creel"])
