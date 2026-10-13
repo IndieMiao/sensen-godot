@@ -3,6 +3,8 @@ extends GdUnitTestSuite
 ## path as one faces the house, on a yard cell that is no bed, no path and nothing else's; up only from Lv10, then solid;
 ## its strip `Chef's Sign`, and a tap opens the facilities' small card with HOME-1's Lv10 line, no button.
 
+const FarmArt = preload("res://modules/farm/farm_art.gd")
+
 func test_its_cell_is_yard_left_of_the_door_path_off_the_field_and_the_paths() -> void:
 	var c := P0Garden.CHEF_SIGN_CELL
 	var yard: Dictionary = P0Decor.yard()
@@ -19,12 +21,45 @@ func test_its_cell_is_yard_left_of_the_door_path_off_the_field_and_the_paths() -
 	var bp := P0Garden.blueprint()
 	assert_bool(bp.is_walkable(c)).is_true()
 
-func test_the_placeholder_is_a_post_and_a_board_up_off_the_ground() -> void:
-	var s: Node3D = auto_free(load("res://scenes/p0/p0_farm.gd").chef_sign_prop(Vector3.ZERO))
-	var board := s.get_node("Board") as MeshInstance3D
-	var post := s.get_node("Post") as MeshInstance3D
-	assert_float(post.position.y + (post.mesh as BoxMesh).size.y * 0.5).is_equal_approx(1.7, 0.01)   # 1.7 m tall
-	assert_float(board.position.y - (board.mesh as BoxMesh).size.y * 0.5).is_greater_equal(1.0)   # its foot ≥ 1.0 m up
+## 刘备's models (#356 / #376): timber chef_sign_a, stone chef_sign_b after Lv10's look (上官婉儿 on 282), timber by
+## default; 1.74 m, the 0.50 m board 1.06 m up on an arm out to −X, its centre where the strip's tap is; the post right of
+## the cell's centre (at most 0.185: B's foot is 5 mm from the cell's edge; 0.08 keeps the board off the bench on screen).
+func test_the_sign_is_the_timber_or_stone_model_after_lv10s_look() -> void:
+	var farm = load("res://scenes/p0/p0_farm.gd")
+	var a: MeshInstance3D = auto_free(farm.chef_sign_mesh("a"))
+	var b: MeshInstance3D = auto_free(farm.chef_sign_mesh("b"))
+	var plain: MeshInstance3D = auto_free(farm.chef_sign_mesh(""))
+	assert_object(a.mesh).is_same(FarmArt.mesh_for("chef_sign_a"))
+	assert_object(b.mesh).is_same(FarmArt.mesh_for("chef_sign_b"))
+	assert_object(plain.mesh).is_same(a.mesh)
+	for m in [a, b]:
+		var box := (m as MeshInstance3D).mesh.get_aabb()
+		assert_float(box.end.y).is_equal_approx(1.74, 0.01)
+		assert_float(box.position.x).is_equal_approx(-0.582, 0.01)   # the board's outer edge, out to −X
+		assert_bool(box.has_point(farm.CHEF_SIGN_HIT)).is_true()
+	assert_vector(farm.CHEF_SIGN_HIT).is_equal(Vector3(-0.332, 1.285, 0))   # board_center
+	assert_float(farm.CHEF_SIGN_SHIFT.x).is_between(0.0, 0.185)
+
+## B (不知火舞 282 33835f54; 上官婉儿 56fa9620): its board hangs over the mine path's (4,14) at shoulder height, so with the
+## sign up that cell is not walked; the door, the spawn and the bench still reach both cells before the mine mouth, never
+## through it. The farm's grid as it stands: the yard fence's front, the Homestead sign, the mailbox, then the sign's cells.
+func test_with_the_sign_up_the_way_to_the_mine_goes_round_its_board() -> void:
+	var bp := P0Garden.blueprint()
+	P0Garden.block_points(bp, P0Garden.fence_block_points(bp))
+	P0Garden.block_points(bp, [P0Garden.sign_point(bp), P0Garden.mailbox_point(bp)])
+	var grid := BlueprintGrid.new(bp)
+	for c in [P0Garden.CHEF_SIGN_CELL, P0Garden.CHEF_SIGN_BOARD_CELL]: grid.set_solid(c, true)
+	var board := P0Garden.CHEF_SIGN_BOARD_CELL
+	assert_bool(P0Decor.yard().get("paths", []).any(func(r): return Rect2i(int(r[0]), int(r[1]), int(r[2]), int(r[3])).has_point(board))).is_true()   # still a path to decor
+	for from in [Vector2i(9, 14), P0Garden.ANCHORS.spawn, Vector2i(6, 15)]:   # the door's walkway, the spawn, before the bench
+		for to in [Vector2i(3, 13), Vector2i(3, 14)]:   # the cells before the mine mouth
+			var path := grid.point_path(bp.cell_to_world(from), bp.cell_to_world(to))
+			assert_array(path).override_failure_message("%s → %s" % [from, to]).is_not_empty()
+			for i in range(1, path.size()):   # every 5 cm along it
+				var a: Vector3 = path[i - 1]
+				for k in 20:
+					var c := bp.world_to_cell(a.lerp(path[i], k / 20.0))
+					assert_bool(c == board).override_failure_message("%s → %s crosses %s" % [from, to, board]).is_false()
 
 func test_its_card_reads_its_title_level_and_homes_line_without_a_button() -> void:
 	var card: Dictionary = load("res://scenes/p0/p0_farm.gd").chef_sign_card()

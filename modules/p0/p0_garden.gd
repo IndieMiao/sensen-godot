@@ -243,6 +243,10 @@ static func plaque_point(bp: FarmBlueprint) -> Vector3:
 ## front fence (row 13) and the plaque; one cell nearer, the board lay over the bench. Off the mine path (x 3–4).
 ## Anchor `chef_sign`: the post's foot, +Z toward the camera. A yard object (no decor on it); solid once the sign is up.
 const CHEF_SIGN_CELL := Vector2i(5, 14)
+## The mine path's cell under its hanging board (0.15 m from the board's edge to the cell's middle at shoulder height):
+## not walked while the sign stands, so no one passes through the board (不知火舞 282 33835f54, B; 上官婉儿 56fa9620) —
+## the way to the mine goes by (4,13) or (4,15). Still a path to decor (nothing is placed on it).
+const CHEF_SIGN_BOARD_CELL := Vector2i(4, 14)
 
 static func chef_sign_point(bp: FarmBlueprint) -> Vector3:
 	return bp.cell_to_world(CHEF_SIGN_CELL)
