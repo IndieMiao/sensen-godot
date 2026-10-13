@@ -677,3 +677,47 @@ func test_in_the_air_neither_ends_bubble_gives_way() -> void:
 	rt.session.view = saved
 	rt.ui.set_view(saved)
 	await get_tree().process_frame   # the cover goes
+
+const RENO := "gn-5511077"
+
+## 周瑜 on #348: a first visit's city ahead reads Unexplored all through the flight (q(147) ⑤), so its bubble is
+## measured so for the top's fit too — measured as Visited (narrower), a short-named city near the side could have its
+## wider Unexplored bubble run past the 8 px margin. San Francisco → Reno, a first visit: the bubble the flight measured
+## reads Unexplored and is the one it shows at the top, whole.
+func test_a_first_visits_city_ahead_is_measured_as_it_shows_unexplored() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved: Dictionary = rt.session.view
+	var v := saved.duplicate(true)
+	v["now"] = 1_000_000_000.0
+	v["travel"] = {home = SF, here = RENO, passes = {}, visits = {RENO: {n = 1}}, stamps = [], fallback = {near3 = [], near10 = []}, explorer = 0}
+	rt.session.view = v
+	rt.ui.set_view(v)
+	m.center_lat = 37.77
+	m.center_lng = -122.42
+	m._set_zoom(11.0)
+	m._origin_before = Vector2(37.77, -122.42)
+	m._here_before = SF
+	m.on_arrival({kind = "arrival", cluster = RENO, first = true, trip = 2, km = 300})
+	var b: Dictionary = m.city_map.bubbles[str(P0Clusters.region(RENO).id)]
+	assert_str(b.count.text).is_equal("Unexplored")   # as the flight measured it, before any frame
+	var measured: Vector2 = (b.node as Control).size
+	m._trip.start_us = Time.get_ticks_usec() - 1_500_000   # 1.5 s in: the top
+	m._travel_at(0.0)
+	m.city_map._update_bubbles()
+	assert_str(b.count.text).is_equal("Unexplored")
+	assert_bool((b.node as Control).visible).is_true()
+	assert_vector((b.node as Control).size).is_equal(measured)   # the one it shows
+	var r := (b.node as Control).get_global_rect()
+	var vp: Vector2 = m.get_viewport().get_visible_rect().size
+	assert_float(r.position.x).is_greater_equal(8.0 - 0.5)
+	assert_float(r.end.x).override_failure_message("Reno's bubble ends at %.1f of %.0f" % [r.end.x, vp.x]).is_less_equal(vp.x - 8.0 + 0.5)
+	assert_float(r.end.y).is_less_equal(m.safe_bottom() + 0.5)
+	m._travel_land()
+	rt.ui.clear_toast()
+	await get_tree().create_timer(1.8).timeout   # past the stamp's beat: its card, closed
+	rt.ui.close_modal()
+	rt.session.view = saved
+	rt.ui.set_view(saved)

@@ -863,10 +863,7 @@ func on_arrival(ev: Dictionary) -> void:
 				rt.ui.toast(welcome)
 				return
 			rt.ui.toast(welcome, STAMP_S)
-			_arrival_card_after_stamp(cluster))
-	# q(147) ⑤ "it changes on landing": a first visit's city still reads Unexplored, its bubble and its fog hole, until
-	# the flight lands, with the chip and the stamp (不知火舞 on #340)
-	if first and travelling(): _trip.first_in_air = cluster
+			_arrival_card_after_stamp(cluster), cluster if first else "")
 
 ## The stamp's beat of the arrival (§11.8.4 ≤ 1.5 s, q(152) ②): its toast's time, after which the arrival card comes.
 const STAMP_S := 1.5
@@ -884,8 +881,11 @@ func _arrival_card_after_stamp(cluster: String) -> void:
 var _trip := {}
 
 ## to: the overview ahead ({lat, lng, zoom, bearing}, kept in f64 so it lands exactly there); held / ahead: the city
-## left and the city ahead (clusters).
-func _travel_fly(to: Dictionary, left: Vector2, held: String, ahead: String, city: String, km: int, land: Callable) -> void:
+## left and the city ahead (clusters); first_in_air: the city ahead on a first visit — q(147) ⑤ "it changes on landing":
+## it still reads Unexplored, its bubble and its fog hole, until the flight lands, with the chip and the stamp (不知火舞
+## on #340).
+func _travel_fly(to: Dictionary, left: Vector2, held: String, ahead: String, city: String, km: int, land: Callable,
+		first_in_air := "") -> void:
 	if not _trip.is_empty(): _travel_land()   # one at a time: an earlier one lands first
 	_reset_gesture()
 	_city_bounds()
@@ -910,6 +910,7 @@ func _travel_fly(to: Dictionary, left: Vector2, held: String, ahead: String, cit
 		var bottom := safe_bottom()
 		safe = Rect2(Vector2(SAFE_SIDE, pill_bottom) * k, Vector2(vp.x - SAFE_SIDE * 2.0, bottom - pill_bottom) * k)
 		within = Rect2(Vector2(BUBBLE_EDGE, pill_bottom) * k, Vector2(vp.x - BUBBLE_EDGE * 2.0, bottom - pill_bottom) * k)
+		_trip = {first_in_air = first_in_air}   # the bubbles measured as they read in the air (周瑜 on #348)
 		for cluster in [held, ahead]:
 			var r := P0Clusters.region(cluster) if cluster != "" and city_map else {}
 			if r.is_empty(): continue
@@ -924,7 +925,7 @@ func _travel_fly(to: Dictionary, left: Vector2, held: String, ahead: String, cit
 	_focus_tween.tween_method(_travel_at, 0.0, P0TravelFlight.TOTAL_S, P0TravelFlight.TOTAL_S)
 	_focus_tween.tween_callback(_travel_land)
 	_trip = {plan = plan, to = to, t = 0.0, cover = cover, land = land, tween = _focus_tween, left = left,
-		start_us = Time.get_ticks_usec(), from_city = held, to_city = ahead}
+		start_us = Time.get_ticks_usec(), from_city = held, to_city = ahead, first_in_air = first_in_air}
 	_regions_key = ""   # in the air the two ends lead the bubbles (q(157))
 	_show_self(false)   # the avatar leaves with the take-off (v2)
 	_flight = _focus_tween
