@@ -1711,9 +1711,9 @@ const P1_UNLOCKS := {
 	"second_stove": {"icon": "kitchen", "text": "Second Stove", "note": "two dishes at once"},
 	"notice_board": {"icon": "board", "text": "Notice Board", "note": "at the Homestead Stall"},   # §9: the stall's board (Figma HOME-1-LV5)
 	"big_pot": {"icon": "kitchen", "text": "Big Pot · Double", "note": "two portions, one round of heat"},
-	"bag_upgrade_2": {"icon": "bag", "text": "Bag Upgrade II for sale · 400 coins", "note": "Bag 30 → 35"},
+	"bag_upgrade_2": {"icon": "bag", "text": "Bag Upgrade II · 400 coins"},   # note: bag_tier_note
 	"third_stove": {"icon": "kitchen", "text": "Third Stove", "note": "Warming Cabinet keeps 12"},
-	"bag_upgrade_3": {"icon": "bag", "text": "Bag Upgrade III for sale · 1,000 coins", "note": "Bag 35 → 40"},
+	"bag_upgrade_3": {"icon": "bag", "text": "Bag Upgrade III · 1,000 coins"},   # note: bag_tier_note
 	"chefs_sign": {"icon": "kitchen", "text": "Chef's Sign", "note": "every dish's gold zone +5"},
 	"title_homestead_master": {"icon": "star", "text": "Homestead Master", "note": "title"},
 	"old_tree": {"icon": "wood", "text": "Old Tree", "note": "Hardwood · 1 per round"},
@@ -1723,8 +1723,29 @@ const P1_UNLOCKS := {
 	"sprinklers_10": {"icon": "facility_sprinkler", "text": "Sprinklers 10/10", "note": ""},
 	"plots_40": {"icon": "field", "text": "Plots 40", "note": "10 more to till"},
 	"warming_cabinet_12": {"icon": "kitchen", "text": "Warming Cabinet 12", "note": "keeps 12 dishes"},
-	"stall_upgrade": {"icon": "board", "text": "Homestead Stall upgraded", "note": "new look"},
 }
+# Lv8's `stall_upgrade` has no line (不知火舞 on 282, 李元芳's c62a6ed9 ③): the stall is still the crate stand-in, with no
+# Lv8 look to show, so HOME-1 and the banner promise nothing yet; it comes back with the stall's model.
+
+## A Bag Upgrade's What changes note (不知火舞 on 282, 李元芳's c62a6ed9 ④): the tiers are fixed (content bag_upgrades: I to
+## 30, II to 35 after I, III to 40 after II), so `Bag 30 → 35` from the tier before once it is bought, else
+## `Bag 35 · after Upgrade I`; the first tier from the bag as it is (`Bag 25 → 30`).
+static func bag_tier_note(view: Dictionary, id: String) -> String:
+	var tier := _bag_tier(id)
+	if tier.is_empty(): return ""
+	var to := int(tier.get("capacity", 0))
+	var now := int(view.get("bag", {}).get("capacity", 25))
+	var before_id := str(tier.get("requires", ""))
+	if before_id == "": return "Bag %d → %d" % [now, to]
+	var before := _bag_tier(before_id)
+	var owned := str(view.get("homestead", {}).get("unlocks", {}).get(before_id, "")) == "owned" or now >= int(before.get("capacity", 0))
+	if owned: return "Bag %d → %d" % [int(before.get("capacity", now)), to]
+	return "Bag %d · after %s" % [to, str(before.get("name", "")).trim_prefix("Bag ")]
+
+static func _bag_tier(id: String) -> Dictionary:
+	for t in content().get("bag_upgrades", []):
+		if str(t.get("id", "")) == id: return t
+	return {}
 
 ## Homestead looks (§8.3.1, LOOK-PICK, SGODOT-282): content homestead.looks, one stage per look level, its id the
 ## level's unlock id — {id, level, name, a, b}, a timber and b stone (q(112)). HOME-1's icon per stage (Figma 2201:33545).
@@ -1801,8 +1822,11 @@ static func home_panel(view: Dictionary, at_home := true) -> Dictionary:
 			"clay_bank": out.changes.append({"icon": "clay", "text": "Clay Bank", "note": "Clay next to the Reed Bank"})
 			"warming_cabinet": out.changes.append({"icon": "kitchen", "text": "Warming Cabinet", "note": "keeps 6 dishes by the stove"})
 			"bag_upgrade_1":
-				out.changes.append({"icon": "bag", "text": "Bag Upgrade I for sale · 150 coins",
-					"note": "Bag %d → %d" % [int(view.get("bag", {}).get("capacity", 25)), int(view.get("bag", {}).get("capacity", 25)) + 5]})
+				out.changes.append({"icon": "bag", "text": "Bag Upgrade I · 150 coins", "note": bag_tier_note(view, "bag_upgrade_1")})
+			"bag_upgrade_2", "bag_upgrade_3":
+				var line := (P1_UNLOCKS[str(u)] as Dictionary).duplicate()
+				line["note"] = bag_tier_note(view, str(u))
+				out.changes.append(line)
 			"board_slot_3": out.changes.append({"icon": "board", "text": "Stall Board · 3rd slot", "note": "now %d" % board_now})
 			_ when not look_stage(str(u)).is_empty():   # q(115) ①: `Porch · Timber or Stone` · pick one
 				out.changes.append({"icon": str(LOOK_ICONS.get(str(u), "home")), "text": "%s · Timber or Stone" % str(look_stage(str(u)).name), "note": LOOK_NOTE})
@@ -1861,7 +1885,7 @@ static func home_moment(view: Dictionary, ev: Dictionary) -> Dictionary:
 			"spice_rack": lines.append("Spice Rack · seasonings off your bag")
 			"clay_bank": lines.append("Clay Bank opened")   # gathering spot (SGODOT-231, q(45))
 			"warming_cabinet": lines.append("Warming Cabinet")
-			"bag_upgrade_1": lines.append("Bag Upgrade I for sale · 150 coins")
+			"bag_upgrade_1": lines.append("Bag Upgrade I · 150 coins")
 			_:
 				var line := P1_UNLOCKS.get(str(u), {}) as Dictionary
 				if not line.is_empty(): lines.append(str(line.text))
