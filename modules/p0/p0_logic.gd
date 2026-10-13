@@ -457,6 +457,21 @@ static func crop_for_seed(view: Dictionary, seed_id: String) -> Dictionary:
 		if str(c.get("seed", "")) == seed_id: return c
 	return {}
 
+## Gift Clues (Fishing Lv7, q(167)): the residents met who like this dish, in content order — view.gift_clues
+## {dish: [{resident, verdict}]}, null before Lv7. Names, [] when none.
+static func liked_by(view: Dictionary, item_id: String) -> Array:
+	var clues = view.get("gift_clues", null)
+	if not clues is Dictionary: return []
+	var residents: Dictionary = content().get("residents", {})
+	return ((clues as Dictionary).get(item_id, []) as Array).map(func(c): return str(residents.get(str(c.get("resident", "")), {}).get("name", c.get("resident", ""))))
+
+## The dish card's line: `Liked by Hana · Old Kai`, at most two names, then ` · +1 more` (302 b308ee14); "" when none.
+static func liked_by_line(view: Dictionary, item_id: String) -> String:
+	var names := liked_by(view, item_id)
+	if names.is_empty(): return ""
+	var line := "Liked by " + " · ".join(PackedStringArray(names.slice(0, 2)))
+	return line + (" · +%d more" % (names.size() - 2) if names.size() > 2 else "")
+
 static func item_name(view: Dictionary, id: String) -> String:
 	var names: Dictionary = view.get("names", {})
 	if not names.has(id) and P0Decor.is_decor(id): return P0Decor.name_of(id)   # Decorate's pieces (SGODOT-284)

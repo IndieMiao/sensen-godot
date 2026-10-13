@@ -18,6 +18,8 @@ extends PanelContainer
 ##   unavailable_requested(action, item_id, reason)  a greyed button was tapped (they stay tappable, LOCK-10); the
 ##                                       owner may say why or where, e.g. a Toast for `Gift to a resident` (225).
 ##   info_requested(item_id)             the › in the title row: open the item's page (Fish-dex / Cookbook / about).
+##   liked_by: String     Gift Clues (Fishing Lv7, q(167); 302 b308ee14): `Liked by Hana · Old Kai` under the state line,
+##                        a coral ♥ first, in the fact lines' type; "" hides it
 ## Optional spec blocks (the gate card, SKILL-2 482:169 / §4.8.7, SGODOT-233), in this order under the state line:
 ##   lead: String          one ExtraBold line in text ink ("Farming Lv2 unlocks Carrot and Herb")
 ##   need: {name, have, need, icon, note}   a NeedTile M in its count state ("Farming XP 32/50") with the note
@@ -47,6 +49,9 @@ const _GLYPH := 14.0
 const _BUTTON_ROW_Y := 38.0   # the 44 touch row starts at y 38, over the end of the state line (y 42)
 # SKILL-2 sheet content (482:169): blocks 8 apart, the NeedTile and its note 10 apart, the info row's lines 3 apart.
 const _BLOCK_GAP := 8.0
+const HEART_GLYPH := preload("res://assets/p0/icons/heart.svg")   # solid #E07A5F (StatusBadge Gift's coral)
+const _LIKED_ICON := 12.0
+const _LIKED_GAP := 4.0
 const _NEED_GAP := 10.0
 const _INFO_GAP := 3.0
 
@@ -65,6 +70,8 @@ var _lock: Control
 var _chevron: Label
 var _lift: MarginContainer
 var _state: Label
+var _liked: HBoxContainer   # Gift Clues: ♥ Liked by …
+var _liked_label: Label
 var _facts: VBoxContainer
 var _blocks: VBoxContainer   # lead, need and info_row (gate card); empty for an item card
 var _medallion: Panel
@@ -102,6 +109,16 @@ func _init() -> void:
 	col.add_child(_title_row())
 	_state = UiKit.label("", UiTokens.STYLE_C10_B, UiTokens.COLOR_SECONDARY)
 	col.add_child(_state)
+	_liked = HBoxContainer.new()
+	_liked.name = "LikedBy"
+	_liked.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_liked.add_theme_constant_override(&"separation", int(_LIKED_GAP))
+	var heart := UiKit.icon(HEART_GLYPH, _LIKED_ICON)
+	heart.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_liked.add_child(heart)
+	_liked_label = UiKit.label("", UiTokens.STYLE_C12_B, UiTokens.COLOR_SECONDARY)
+	_liked.add_child(_liked_label)
+	col.add_child(_liked)
 	_blocks = VBoxContainer.new()
 	_blocks.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_blocks.add_theme_constant_override(&"separation", int(_BLOCK_GAP))
@@ -219,6 +236,8 @@ func refresh() -> void:
 	var stars := (" " + "★".repeat(q)) if q > 0 else ""   # `Fine ★★`, the stars together as dish_label (不知火舞 on #263)
 	_state.text = str(_spec.get("rarity_text", "")) + stars
 	_state.visible = _state.text != ""
+	_liked_label.text = str(_spec.get("liked_by", ""))
+	_liked.visible = _liked_label.text != ""
 	_build_blocks()
 	var facts: Array = _spec.get("facts", [])
 	for c in _facts.get_children():
@@ -256,7 +275,8 @@ func _place_last_fact() -> void:
 	_overflow.text = "" if beside else _last_fact
 	_overflow.visible = _overflow.text != ""
 	var lines := _facts.get_children().filter(func(c): return (c as Control).visible).size() + _blocks.get_child_count()
-	var text_h: float = (_title.get_parent() as Control).get_combined_minimum_size().y + (_state.get_combined_minimum_size().y if _state.visible else 0.0)
+	var text_h: float = (_title.get_parent() as Control).get_combined_minimum_size().y + (_state.get_combined_minimum_size().y if _state.visible else 0.0) \
+		+ (_liked.get_combined_minimum_size().y if _liked.visible else 0.0)
 	var overlap := maxf(0.0, _PAD_T + text_h - _BUTTON_ROW_Y)
 	if lines > 0: overlap = (UiTokens.SIZE_TOUCH - UiTokens.SIZE_COMMAND_COMPACT) * 0.5
 	_lift.add_theme_constant_override(&"margin_top", -int(overlap))
