@@ -22,7 +22,9 @@
 import { BOARDS, handIn, slotCount } from './boards.js';
 import { pondFishIds } from './fishing_world.js';
 import type { EventVenue, Need, OutpostDef, P0Content, ShopId } from './content.js';
-import { homeFacts, type Homed } from './home.js';
+import { homeFacts, homeOf, type Homed } from './home.js';
+import { cityOutposts, cityPonds, homeSetOf } from './home_city.js';
+import { clusterOf } from './travel.js';
 import { matches } from './requests.js';
 import { progressOf, requestState, stageIndex } from './residents.js';
 import { skillLevel } from './rules.js';
@@ -49,8 +51,9 @@ export function litEvents(c: P0Content, now: number): EventVenue[] {
 }
 const ACQUAINTED = 1;   // c.affinity.stages[1]: the second page of talk opens here
 
-const outpostOf = (c: P0Content, role: string) => c.outposts?.find(o => o.role === role)?.id ?? null;
-const residentHome = (c: P0Content, id: string) => c.outposts?.find(o => o.residents.includes(id))?.id ?? null;
+/** Where a resident's pin goes: their outpost in the player's home city (Pip: home's travel post, q(162) ③). */
+const residentHome = (c: P0Content, s: P0State, id: string) =>
+  id === 'res_pip' ? homeSetOf(c, s)?.post ?? null : cityOutposts(c, homeOf(c, s)).find(o => o.residents.includes(id))?.id ?? null;
 
 /** The ◆ keys an outpost holds right now: level-gated goods on its counter not yet owned, residents at Acquainted. */
 export function newKeysAt(c: P0Content, s: P0State, o: OutpostDef): { key: string; item?: string; resident?: string }[] {
@@ -71,7 +74,7 @@ export function newKeysAt(c: P0Content, s: P0State, o: OutpostDef): { key: strin
 
 /** Walking into an outpost looks at what is new there (q(48): seen once in the shop). */
 export function noteSeenAt(c: P0Content, s: P0State, place: string): void {
-  const o = c.outposts?.find(x => x.id === place);
+  const city = clusterOf(c, place), o = city ? cityOutposts(c, city).find(x => x.id === place) : undefined;
   if (!o) return;
   s.seen ??= [];
   for (const { key } of newKeysAt(c, s, o)) if (!s.seen.includes(key)) s.seen.push(key);
@@ -84,16 +87,15 @@ function fishFor(c: P0Content, items: string[], need: Pick<Need, 'kind' | 'rarit
 }
 
 /** The pond a tracked fish request points to: the beginner pond if it has one of them, else the nearest to the farm.
- * Of the hand-written ponds, in the home city (a generated home's ponds: SGODOT-303's home set). */
+ * Of the home city's ponds: the written city's hand-written ones, another home's generated (SGODOT-303). */
 export function pondFor(c: P0Content, s: Homed, fish: string[]): string | null {
-  const home = homeFacts(c, s), city = home.name.toLowerCase();
-  const fits = Object.entries(c.fishing.places)
-    .filter(([id, p]) => p.city === city && fish.some(f => pondFishIds(c, id).has(f)));
-  const beginner = fits.find(([, p]) => p.beginner);
-  if (beginner) return beginner[0];
+  const home = homeFacts(c, s), set = homeSetOf(c, s);
+  const fits = cityPonds(c, home.cluster).filter(p => fish.some(f => pondFishIds(c, p.id).has(f)));
+  const beginner = fits.find(p => p.id === set?.pond) ?? fits.find(p => p.beginner);
+  if (beginner) return beginner.id;
   const farm = home.farm;
-  const dist = (at?: [number, number]) => (farm && at ? (at[0] - farm.lat) ** 2 + ((at[1] - farm.lng) * Math.cos(farm.lat * Math.PI / 180)) ** 2 : Infinity);
-  return fits.sort((a, b) => dist(a[1].at) - dist(b[1].at))[0]?.[0] ?? null;
+  const dist = (at: { lat: number; lng: number } | null) => (farm && at ? (at.lat - farm.lat) ** 2 + ((at.lng - farm.lng) * Math.cos(farm.lat * Math.PI / 180)) ** 2 : Infinity);
+  return fits.sort((a, b) => dist(a.at) - dist(b.at))[0]?.id ?? null;
 }
 
 /** Of these fish, the ones the player can land now somewhere in P0 (its level reached, a pond or river has it). */
@@ -112,7 +114,7 @@ export function mapMarkers(c: P0Content, s: P0State, now: number): MapMarker[] {
   const all: MapMarker[] = [];
   const reason = new Map<MapMarker, string>();   // what counts as one reason for `more`: the Market Board's open slots share one
   for (const board of BOARDS) {
-    const place = board === 'stall' ? 'home' : outpostOf(c, 'market');
+    const place = board === 'stall' ? 'home' : homeSetOf(c, s)?.market ?? null;
     for (const slot of (s.boards[board] ?? []).slice(0, slotCount(c, s, board))) {   // the slots the board shows
       const r = slot.req;
       if (!r || !place) continue;
@@ -130,7 +132,7 @@ export function mapMarkers(c: P0Content, s: P0State, now: number): MapMarker[] {
     }
   }
   for (const id of Object.keys(c.residents)) {
-    const place = residentHome(c, id);
+    const place = residentHome(c, s, id);
     const st = requestState(c, s, id, now);
     if (!place || !st.req || (st.state !== 'open' && st.state !== 'accepted')) continue;
     const q = st.req, tracked = st.state === 'accepted';
@@ -143,7 +145,7 @@ export function mapMarkers(c: P0Content, s: P0State, now: number): MapMarker[] {
       all.push({ place, kind: 'request', why: { request: q.id, resident: id } });
     }
   }
-  for (const o of c.outposts ?? []) {
+  for (const o of cityOutposts(c, homeOf(c, s))) {
     for (const k of newKeysAt(c, s, o)) {
       if (s.seen?.includes(k.key)) continue;
       all.push({ place: o.id, kind: 'new', why: { ...(k.item ? { item: k.item } : {}), ...(k.resident ? { resident: k.resident } : {}) } });

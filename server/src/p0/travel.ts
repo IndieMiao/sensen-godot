@@ -5,7 +5,7 @@
  */
 import type { CityClusters } from './clusters.js';
 import type { P0Content } from './content.js';
-import { clusterById, clustersOf as clusters, HOME_ALIAS, homeFacts, writtenCluster, type Homed } from './home.js';
+import { clusterById, clustersOf as clusters, HOME_ALIAS, homeFacts, writtenCluster, type Homed, type HomeSet } from './home.js';
 import { gainEnergy, grantOnce, type P0Event } from './progress.js';
 import { dayKey, maxEnergy } from './rules.js';
 import type { P0State } from './state.js';
@@ -21,14 +21,22 @@ export interface TravelState {
   stamps: TravelStamp[];                         // first-visit order
   fallback: { near3: string[]; near10: string[] };   // frozen when the block is made (§11.2.3); empty until clusters load
   explorer: number;                              // the highest Explorer medal granted: 0 / 3 / 10 / 30 / 100
+  // Choosing a home (q(160)–q(163), SGODOT-303): optional, no save version. A save without them chose San Francisco
+  // and farms at content.profile.farm_at (q(163) ③).
+  farm_at?: [number, number];                    // the homestead's map point, the picked spot (q(160) ②)
+  home_set?: HomeSet;                            // home's outposts and beginner pond, frozen when the home is picked
+  home_chosen_at?: number;                       // when the home was picked or last changed
+  home_changes?: number;                         // free changes used (q(161): one)
+  pending?: true;                                // a new player who has not picked yet: plays from the written city meanwhile
 }
+
 
 const DAY_PASS_MS = 24 * 3_600_000;
 const FIRST_VISIT_ENERGY = 10;
 const FIRST_VISITS_PER_DAY = 2;
 const EXPLORER: [number, number][] = [[3, 30], [10, 50], [30, 70], [100, 100]];
 
-export { clusterById, HOME_ALIAS, homeOf, writtenCluster } from './home.js';
+export { clusterById, HOME_ALIAS, homeOf, writtenCluster, type HomeSet } from './home.js';
 
 /** A city name a save or a place used before v5 (`san francisco`) → its cluster. */
 export const clusterOfCityName = (c: P0Content, city: string): string | null => {
@@ -76,15 +84,16 @@ export function rankedCities(c: P0Content, s: P0State): { id: string; km: number
 
 /** §11.2.3: frozen into the save when the block is made (CityClusters.fallback), for its home farm; empty without the
  * table. */
-export function fallbackOf(c: P0Content, home: string): { near3: string[]; near10: string[] } {
-  const at = homeFacts(c, { travel: { home } }).farm, cl = clusters(c);
+export function fallbackOf(c: P0Content, home: string, farm_at?: [number, number]): { near3: string[]; near10: string[] } {
+  const at = homeFacts(c, { travel: { home, farm_at } }).farm, cl = clusters(c);
   return at && cl ? cl.fallback(home, at) : { near3: [], near10: [] };
 }
 
-/** A new save's travel block: home is the written city until players choose one (SGODOT-303). */
-export const freshTravel = (c: P0Content): TravelState => {
+/** A new save's travel block: home is the written city until the player picks one; `pending` asks the client to offer
+ * the pick (SGODOT-303: only a client that can show it, so an older one's new player is San Francisco's, q(163) ⑤). */
+export const freshTravel = (c: P0Content, pending = false): TravelState => {
   const home = writtenCluster(c);
-  return { home, here: home, passes: {}, visits: {}, stamps: [], fallback: fallbackOf(c, home), explorer: 0 };
+  return { home, here: home, passes: {}, visits: {}, stamps: [], fallback: fallbackOf(c, home), explorer: 0, ...(pending ? { pending: true as const } : {}) };
 };
 
 /** The climate zone (`Temperate`, as profile.climate) of a place's city, or of the city the player is in; home's when

@@ -23,6 +23,7 @@ import { dayKey, maxEnergy, scaledXp, settleEnergy, skillLevel, xpPercent } from
 import { buyback, buyItem, drink, moveStorage, offerOf, sellItem, setLock } from './shops.js';
 import { emptyDay, type P0State, type Plot } from './state.js';
 import { noteDelivery, noteEntered, requirePass, returnHome, settleExplorer, settleHere, travel } from './travel.js';
+import { chooseHome } from './home_city.js';
 import { noteProgress, takenCounts } from './request_progress.js';
 
 export type { P0Event } from './progress.js';
@@ -75,7 +76,8 @@ type P0CommandBody =
   | { type: 'claim_parcels'; keys: string[] }   // Claim all: the keys on screen, so a retry never takes a newer parcel
   | { type: 'read_inbox'; keys: string[] }
   | { type: 'travel'; to: string }   // v5 (SGODOT-278): free in the first version, a 24 h Day Pass
-  | { type: 'return_home' };
+  | { type: 'return_home' }
+  | { type: 'choose_home' | 'change_home'; city: string; spot: number };   // SGODOT-303 (home_city.ts): pick a home, change it once
 
 export type P0Result =
   | { ok: true; state: P0State; events: P0Event[] }
@@ -403,6 +405,11 @@ export function applyP0(c: P0Content, input: P0State, cmd: P0Command, now: numbe
     }
     case 'return_home': {
       returnHome(s);
+      break;
+    }
+    case 'choose_home': case 'change_home': {
+      const refusal = chooseHome(c, s, cmd, now, events);
+      if (refusal) return fail(refusal.code, refusal.detail);
       break;
     }
     case 'read_inbox': {

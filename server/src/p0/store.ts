@@ -19,9 +19,10 @@ export class P0Store {
       for (const [id, state] of Object.entries(saved)) this.players.set(id, upgradeState(c, state));
     }
   }
-  get(player: string, now: number): P0State {
+  /** opts.pending: a new save asks to pick a home (SGODOT-303), when the creating client can offer it. */
+  get(player: string, now: number, opts: { pending?: boolean } = {}): P0State {
     let s = this.players.get(player);
-    if (!s) { s = freshState(this.c, player, now); this.players.set(player, s); this.flush(); }
+    if (!s) { s = freshState(this.c, player, now, undefined, opts); this.players.set(player, s); this.flush(); }
     // Expired parcels pay out on any read, so the coins are saved even if the next command is refused.
     if (settleParcels(this.c, s, now + s.clock_ms)) this.flush();
     return s;
@@ -31,7 +32,7 @@ export class P0Store {
   peek(player: string): P0State | undefined { return this.players.get(player); }
   all(): P0State[] { return [...this.players.values()]; }
   put(state: P0State): void { this.players.set(state.player, state); this.flush(); }
-  reset(player: string, now: number): P0State { const s = freshState(this.c, player, now); this.put(s); return s; }
+  reset(player: string, now: number, opts: { pending?: boolean } = {}): P0State { const s = freshState(this.c, player, now, undefined, opts); this.put(s); return s; }
   private flush(): void {
     if (!this.file) return;
     const tmp = `${this.file}.tmp`;

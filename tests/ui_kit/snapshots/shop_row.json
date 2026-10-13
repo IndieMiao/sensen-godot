@@ -483,7 +483,7 @@
               "rect": [
                 40,
                 207,
-                147,
+                151,
                 24
               ],
               "variation": "C11B",
@@ -494,7 +494,7 @@
               "rect": [
                 40,
                 224,
-                147,
+                151,
                 24
               ],
               "variation": "C10B",
@@ -523,9 +523,9 @@
                 {
                   "type": "UiCommandButton",
                   "rect": [
-                    195,
+                    199,
                     202,
-                    133,
+                    129,
                     44
                   ],
                   "variation": "CmdBlockedCompact",
@@ -795,7 +795,7 @@
               "rect": [
                 40,
                 323,
-                133,
+                137,
                 24
               ],
               "variation": "C11B",
@@ -806,7 +806,7 @@
               "rect": [
                 40,
                 340,
-                133,
+                137,
                 24
               ],
               "variation": "C10B",
@@ -835,9 +835,9 @@
                 {
                   "type": "UiCommandButton",
                   "rect": [
-                    181,
+                    185,
                     318,
-                    147,
+                    143,
                     44
                   ],
                   "variation": "CmdBlockedCompact",

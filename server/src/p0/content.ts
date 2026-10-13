@@ -40,7 +40,7 @@ export interface FishSite { name: string; template: string; weights: number[] }
 /** A pond on the map (assets/p0/p0_ponds.json id): its fishing template follows the point, not its shape (q(36)). */
 export interface FishPlace { name: string; site: string; city: string; cluster?: string; beginner?: boolean; at?: [number, number] }   // at: the pond list's point; cluster: SGODOT-280
 /** An outpost on the P0 map (assets/p0/p0_outposts.json, SGODOT-227): its role and the residents who live there. */
-export interface OutpostDef { id: string; role: string; residents: string[]; cluster?: string }
+export interface OutpostDef { id: string; role: string; residents: string[]; cluster?: string; lat?: number; lng?: number }
 
 /** A Homestead look stage (LOOK-PICK, SGODOT-282): picked at `level`, a (timber) or b (stone). */
 export interface HomesteadLook { id: string; level: number; name: string; a: string; b: string }
@@ -303,8 +303,9 @@ export function loadP0Content(file = DEFAULT_P0_CONTENT): P0Content {
   mergeContentDir(c as unknown as Record<string, unknown>, path.join(dir, 'content'));
   const outposts = path.join(dir, 'p0_outposts.json');
   if (existsSync(outposts)) {
-    c.outposts = (JSON.parse(readFileSync(outposts, 'utf8')).outposts as { id: string; role: string; residents?: string[]; cluster?: string }[])
-      .map(o => ({ id: o.id, role: o.role, residents: o.residents ?? [], ...(o.cluster ? { cluster: o.cluster } : {}) }));
+    c.outposts = (JSON.parse(readFileSync(outposts, 'utf8')).outposts as { id: string; role: string; residents?: string[]; cluster?: string; lat?: number; lng?: number }[])
+      .map(o => ({ id: o.id, role: o.role, residents: o.residents ?? [], ...(o.cluster ? { cluster: o.cluster } : {}),
+        ...(typeof o.lat === 'number' && typeof o.lng === 'number' ? { lat: o.lat, lng: o.lng } : {}) }));   // lat/lng: SGODOT-303's 300 m
   }
   // v5 (SGODOT-278): the frozen city clusters beside the content (亚瑟's build_clusters.mjs), with the server's member table.
   const clusters = path.join(dir, 'city_clusters.json');

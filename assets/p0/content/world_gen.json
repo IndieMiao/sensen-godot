@@ -497,6 +497,12 @@
     "coast"
    ]
   },
+  "home": {
+   "_note": "Choosing a home (SGODOT-303, q(160)–q(161)). cities: the open list beyond the written city (San Francisco is always open), the first step's hand-checked cities, each of M1 tier and up with a full home set; spot: 3 spots round the beginner pond, pond_km from it, apart_km between them, scatter_m per player (the 300 m from outposts and ponds is placement.farm_exclusion_m); change: one free change within days of the account or before Homestead before_level. Read by server/src/p0/home_city.ts.",
+   "cities": [],
+   "spot": { "pond_km": [0.5, 3], "apart_km": 1, "scatter_m": [100, 200] },
+   "change": { "days": 7, "before_level": 2 }
+  },
   "overrides": {
    "_note": "q(114) ⑤: hand fixes by place id, laid over the generated city after everything else is placed, so nothing else in the city moves. A pin that landed in the sea or a lake gets a point on land at least 50 m from the water (a tackle shop within 300 m of its pond); before the freeze the same table takes a hand rename (`name`). `why`: what was wrong, who saw it, and the checks on the new point. Re-check the whole table once there is water data. Names in `why` are the ones the place had when it was found (q(125) later renamed generated ponds and their tackle shops; the id is what counts).",
    "gn-5368361~tackle2": {

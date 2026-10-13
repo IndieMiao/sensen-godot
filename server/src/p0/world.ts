@@ -344,7 +344,7 @@ export function regionalFish(c: P0Content, cl: CityCluster): { fish: string; lev
   return pondRegionalFish(c, cl.id).map(f => ({ fish: f, level: level(f) }));
 }
 
-const worldOf = (c: P0Content) => (c as P0Content & { world?: WorldContent }).world;
+export const worldOf = (c: P0Content) => (c as P0Content & { world?: WorldContent }).world;
 
 /** A cluster's generated places, from the content's world block and the frozen cluster table. Throws for an unknown cluster. */
 /**

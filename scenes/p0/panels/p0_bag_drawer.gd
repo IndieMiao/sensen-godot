@@ -124,7 +124,7 @@ func refresh(view_: Dictionary, force := false) -> void:
 	_bag_box.visible = side == "bag"
 	_gear_box.visible = side == "gear"
 	grid.capacity = int(bag.get("capacity", 25))
-	grid.items = items()
+	_show_items()
 	_hint.visible = not sheet.is_open()
 	_hint.text = hint_for(category, not storage_items(view, category, place).is_empty())
 	var full := bag_full_text(view) if gift_to.is_empty() else ""
@@ -154,14 +154,14 @@ func set_category(v: String) -> void:
 	sort = str(_sorts.get(v, saved_sort(v) if persist else SORTS[0]))
 	header.sort_label = sort
 	grid.filter = func(it: Dictionary) -> bool: return in_category(it, category)
-	grid.items = items()
+	_show_items()
 	_hint.text = hint_for(category, not storage_items(view, category, place).is_empty())
 
 func set_sort(v: String) -> void:
 	sort = v
 	_sorts[category] = v
 	header.sort_label = v
-	grid.items = items()
+	_show_items()
 	if persist:
 		var cfg := ConfigFile.new()
 		cfg.load(_PREFS)
@@ -191,18 +191,24 @@ func items() -> Array:
 	# (`♥ +3`, the Mystery Dish `−2`); with the marks the rows make room for them (31 apart, the first 22 down). No ♥ on
 	# its cells: that one says someone likes the dish, maybe not this resident, and beside `♥ +1` it would read as theirs
 	# (不知火舞 on 283).
-	var marks := false
+	# Green when the dish is one this resident loves or likes, whatever it adds (不知火舞 on 283).
 	if not gift_to.is_empty():
+		var who := str(gift_to.get("id", ""))
 		for it in out:
 			it.erase("liked")
-			var pts = gift_points(view, str(gift_to.get("id", "")), str(it.id))
+			var pts = gift_points(view, who, str(it.id))
 			if pts != null:
 				it["gain"] = pts
-				marks = true
-	if grid != null:
-		grid.row_room = GAIN_ROOM if marks else 0.0
-		grid.top_room = GAIN_TOP if marks else 0.0
+				it["gain_hit"] = P0Logic.gift_hit(view, who, str(it.id))
 	return out
+
+## The grid's items, and room over the rows when any carries a mark (哪吒 on #358: not a side effect of items()).
+func _show_items() -> void:
+	var list := items()
+	var marks := list.any(func(it): return it.has("gain"))
+	grid.row_room = GAIN_ROOM if marks else 0.0
+	grid.top_room = GAIN_TOP if marks else 0.0
+	grid.items = list
 
 ## Farm Storage stacks for a tab: {id = "storage:<item>", item, icon, qty, kind, stored = true}. Only at home,
 ## only on Seeds / Materials / Tackle, and only when the server sends storage and the item-info rules have the
@@ -258,7 +264,7 @@ static func bag_items(view: Dictionary, sort_by := "Type") -> Array:
 		out.append({id = id, icon = P0Logic.icon(str(it.get("base", id))), qty = int(s.get("qty", 0)),
 			rarity = int(it.get("rarity", 0)) if id.begins_with("fish_") or id.begins_with("dish_") else 0,
 			kind = P0ItemInfo.kind_of(view, id), tab = P0ItemInfo.tab_of(view, id),
-			liked = not P0Logic.liked_by(view, id).is_empty()})   # Gift Clues (Fishing Lv7, q(167)): a ♥ on the cell
+			liked = P0Logic.style_liked(view, id)})   # Gift Clues (Fishing Lv7, q(167)): a ♥ on the cell for a style liked
 	if sort_by == "Type":
 		var order := func(it: Dictionary) -> int:
 			for i in CATEGORIES.size():

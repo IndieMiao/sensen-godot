@@ -101,7 +101,8 @@ Object.assign(radius, {
 });
 const objectHeader = await node('483:196');
 const itemRow = await node('483:228');
-Object.assign(space, { quickBarGap: 4, hudRowGap: child(hud, 'HUD second row').itemSpacing, itemRowGap: itemRow.itemSpacing });
+// keyCompact: the Compact command keys' side padding (BARTER-2 2570:132291 Command surface; 不知火舞, 2026-10-13), no variable of its own
+Object.assign(space, { quickBarGap: 4, keyCompact: 14, hudRowGap: child(hud, 'HUD second row').itemSpacing, itemRowGap: itemRow.itemSpacing });
 const stroke = {
   default: (await node('483:336')).strokeWeight,
   cellHairline: invDefault.strokeWeight,

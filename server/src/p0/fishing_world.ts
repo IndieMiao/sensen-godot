@@ -13,6 +13,7 @@
 import { createHash } from 'node:crypto';
 import type { Fish, FishSite, P0Content } from './content.js';
 import { clusterById, clusterOf, writtenCluster, HOME_ALIAS } from './travel.js';
+import { placeOf } from './world.js';
 
 export type Daypart = 'day' | 'dawn_dusk' | 'night';
 export type Weather = 'sun' | 'rain' | 'wind';
@@ -173,6 +174,11 @@ export function everFish(c: P0Content, site: FishSite, cluster: string): Fish[] 
  * river has it" means for requests, map markers and the regional request pool (苏烈's obtainable, #224). */
 export function pondFishIds(c: P0Content, place?: string): Set<string> {
   const ids = new Set<string>();
+  if (place && !c.fishing.places[place]) {   // a generated pond (a home that is not the written city, SGODOT-303)
+    const p = placeOf(c, place), site = p && c.fishing.sites[p.site];
+    if (site) for (const f of everFish(c, site, p.cluster ?? clusterOf(c, place) ?? writtenCluster(c))) ids.add(f.id);
+    return ids;
+  }
   for (const [id, p] of Object.entries(c.fishing.places)) {
     if (place && id !== place) continue;
     const site = c.fishing.sites[p.site];
