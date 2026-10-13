@@ -51,8 +51,8 @@ static func rows(view: Dictionary) -> Array:
 	var out: Array = []
 	for m in b.get("minerals", []):
 		var room := int(m.get("room", 0))
-		# A mineral the next level does not need (share 0) is no `Level quota used`: left out until 不知火舞 words it
-		# (q(166) review); at the top level the server sends no group at all.
+		# A mineral the next level does not need (share 0) has no row, never `Level quota used` (q(166) 27629135,
+		# 不知火舞: what cannot be bartered takes no line); at the top level the server sends no group at all.
 		if m.has("share") and int(m.share) <= 0: continue
 		var row := {id = str(m.get("id", "")), title = str(m.get("name", "")),
 			effect = ("For %d %s" % [give, str(item.name)]) if not item.is_empty() else ("For %d regional items" % give),
