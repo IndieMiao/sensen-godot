@@ -1,10 +1,11 @@
 class_name P0TravelFlight
 extends RefCounted
 ## The cross-city flight's camera (q(147), SGODOT-299; 不知火舞 on 299 31c4ceb5, 62931cdb): a fixed 3 s, whatever the
-## Trip — up 0.5 s from where the camera is until the city left and the city ahead are both in view (at most country
-## or continent), along 2.0 s to the city ahead (fast, then slowing), down 0.5 s to its overview (q(25)). Up and down
-## ease in and out. No jump back to the city left first: the camera may already be over the city ahead (a bubble's
-## browse), and it rises from there.
+## Trip — up 0.5 s from where the camera is until the city left and the city ahead are both in view (q(152) ③), then
+## 2.0 s where only the plane flies and the camera holds that overview (q(156); a pair that does not fit even at the
+## floor pans along instead, fast then slowing), down 0.5 s to the city's overview (q(25)). Up and down ease in and
+## out. No jump back to the city left first: the camera may already be over the city ahead (a bubble's browse), and it
+## rises from there.
 
 const UP_S := 0.5
 const FLY_S := 2.0
@@ -25,6 +26,8 @@ var _top := 0.0
 var _z1 := 0.0
 var _b0 := 0.0
 var _turn := 0.0
+## Both ends fit at the top (q(156)): the camera holds the overview through the flight and only the plane moves.
+var _hold := false
 
 ## from_*: the camera now; left: the city left (lat, lng); to_*: the overview ahead. view: the map's logical size;
 ## safe: where both ends must stand at the top, in the same units (q(152) ③: 32 in from each side, from the pill's
@@ -50,6 +53,7 @@ static func plan(from_lat: float, from_lng: float, from_zoom: float, from_bearin
 	while z >= low:
 		if frames(a, f._c1, f._mid, z, view, area):
 			f._top = z
+			f._hold = true
 			break
 		z -= FIT_STEP
 	f._b0 = from_bearing
@@ -78,12 +82,20 @@ func sample(t: float) -> Vector4:
 	elif t < UP_S + FLY_S:
 		var s := (t - UP_S) / FLY_S
 		s = 1.0 - (1.0 - s) * (1.0 - s)   # fast, then slowing
-		c = _mid.lerp(_wrap_near(_c1, _mid), s)
+		# q(156): both ends in view, the camera holds there and only the plane flies; only a pair that does not fit
+		# even at the floor pans along with it
+		c = _mid if _hold else _mid.lerp(_wrap_near(_c1, _mid), s)
 		z = _top
 	else:
 		var s := _ease(clampf((t - UP_S - FLY_S) / DOWN_S, 0.0, 1.0))
-		c = _c1
 		z = lerpf(_top, _z1, s)
+		if _hold:
+			# down from the held overview toward the city ahead: its point slides from where the overview shows it to the
+			# screen's centre as the zoom grows (its offset on screen shrinking smoothly), so it never leaves the view
+			var c1 := _wrap_near(_c1, _mid)
+			c = c1 - (c1 - _mid) * pow(2.0, _top - z) * (1.0 - s)
+		else:
+			c = _c1
 	if t >= TOTAL_S:
 		c = _c1
 		z = _z1
@@ -93,6 +105,10 @@ func sample(t: float) -> Vector4:
 ## The highest the camera goes (the overview of both ends).
 func top_zoom() -> float:
 	return _top
+
+## Whether the camera holds the overview through the flight (both ends fit, q(156)).
+func holds() -> bool:
+	return _hold
 
 ## How far along the route the plane is at `t` seconds (0 at the city left, 1 at the city ahead): 0.5–2.5 s, eased as
 ## the camera's flight (fast, then slowing); the km on the pill rolls with it (q(147) v2).
