@@ -73,7 +73,10 @@ func _enter_farm() -> void:
 	_clear_farm_selection()
 	_reset_gesture()
 	P0Runtime.nav_started()
-	AppRouter.open_instance(P0_FARM, {})
+	open_farm.call()
+
+## How the farm opens (tests hold it to stay on the map).
+var open_farm := func(): AppRouter.open_instance(P0_FARM, {})
 
 ## q(152) ① (不知火舞 on 299 9cbdf991): home from another city is the same 3 s flight as going out — up from where the
 ## camera is, along, down to the homestead's pin at the zoom its pin's card shows (SHOW_ZOOM) — the pill saying
@@ -87,7 +90,11 @@ func _fly_home() -> void:
 	var hr := P0Clusters.region(P0Clusters.cluster_of_region(P0_REGION))
 	var bearing := float(CityMapData.city(str(hr.get("id", ""))).get("overview", {}).get("bearing", city_bearing)) if not hr.is_empty() else city_bearing
 	if not hr.is_empty(): _switch_city(hr)
+	if rt.ui.has_modal(): rt.ui.close_modal()   # no card stays over the flight (周瑜 on #341)
 	_travel_fly({lat = home.x, lng = home.y, zoom = SHOW_ZOOM, bearing = bearing}, _origin(), held, "Homestead", km, func():
+		# landed with another scene over the map (it was suspended) or another way out under way: not home yet — the
+		# player is where they were, and goes home again from there (周瑜 on #341)
+		if AppRouter.top_instance() != null or AppRouter._navigation_pending: return
 		rt.ui.hold_here(P0Travel.home(_view()))   # Homestead from the landing; the server's here follows with return_home
 		_enter_farm())
 
