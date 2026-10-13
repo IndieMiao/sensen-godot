@@ -793,5 +793,29 @@
       }
     ],
     "lock": true
+  },
+  "card/counter_buy": {
+    "facts": [
+      "{card_line}",
+      "Adds the page to your Cookbook"
+    ],
+    "price": true,
+    "buttons": [
+      {
+        "id": "buy",
+        "label": "Buy",
+        "kind": "secondary",
+        "unless": [
+          {
+            "when": "owned",
+            "label": "In Cookbook"
+          },
+          {
+            "when": "!can_afford",
+            "label": "Need {coins_short} more coins"
+          }
+        ]
+      }
+    ]
   }
 }

@@ -58,6 +58,7 @@ static func rules() -> Dictionary:
 
 static func kind_of(view: Dictionary, item_id: String) -> String:
 	if P0Decor.is_decor(item_id): return "decor"   # Decorate (SGODOT-284): yard pieces live in Farm Storage
+	if is_card(item_id): return "card"   # a Recipe Card on a counter (§9.11.1 / §9.11.2): it turns its page Tasted
 	var k := str(P0Logic.item(view, item_id).get("kind", ""))
 	if k == "":
 		var head := item_id.split("_")[0]
@@ -108,6 +109,10 @@ static func spec(view: Dictionary, item_id: String, context: StringName, opts :=
 		price = {},
 		quota = {},
 	}
+	if kind == "card":   # the dish it teaches on the title (the server names it), the card's own icon (282, P1 exit ⑦)
+		out.title = str(_offer(view, item_id, opts).get("name", P0Logic.item_name(view, card_page(item_id))))
+		out.icon = P0Logic.icon("recipe_card")
+		out.quantity = 0
 	if rule.is_empty(): return out
 	for line in rule.get("facts", []):
 		var text := fill(str(line), t)
@@ -195,12 +200,24 @@ static func _stack(view: Dictionary, item_id: String) -> Dictionary:
 
 static func _counter(opts: Dictionary) -> String: return str(opts.get("counter", "homestead"))
 
+## Recipe Cards (§9.11.1 / §9.11.2): `recipe_card_<page>`, bought once at the counter that shelves it, its page Tasted.
+const CARD := "recipe_card_"
+static func is_card(item_id: String) -> bool: return item_id.begins_with(CARD)
+static func card_page(item_id: String) -> String: return item_id.trim_prefix(CARD)
+
+static func _card_line(view: Dictionary, offer: Dictionary, opts: Dictionary) -> String:
+	var rarity := int(offer.get("rarity", 0))
+	var word := P0Logic.rarity_name(view, rarity) if rarity > 0 else ""
+	var name := "Regional Recipe Card" if _counter(opts) == "market" else "Recipe Card"
+	return ("%s · %s" % [name, word]) if word != "" else name
+
 ## The shop's offer row for a Buy list: view.shops[role].buy (SGODOT-228), else the older stall / tackle lists.
 static func _offer(view: Dictionary, item_id: String, opts: Dictionary) -> Dictionary:
 	var role := _counter(opts)
 	var lists := []
 	var shop: Dictionary = view.get("shops", {}).get(role, {})
 	if shop.has("buy"): lists.append(shop.buy)
+	if shop.has("cards"): lists.append(shop.cards)   # today's Recipe Cards on this counter: {id, page, name, rarity, price, need, owned}
 	lists.append(view.get("tackle", {}).get("buy", []) if role == "tackle" else view.get("stall", {}).get("buy", []))
 	for l in lists:
 		for o in l:
@@ -365,6 +382,9 @@ static func tokens(view: Dictionary, item_id: String, context: StringName, opts 
 		footprint = P0Decor.footprint(item_id) if kind == "decor" else "",
 		decor_line = P0Decor.line(item_id) if kind == "decor" else "",
 		decor_third = _decor_third(view, item_id, offer) if kind == "decor" else "",
+		# Recipe Cards (§9.11.1 / §9.11.2, appendix B): `Recipe Card · Fine` at the stall, `Regional Recipe Card · Rare`
+		# at the Market (their rarity), then what buying it does.
+		card_line = _card_line(view, offer, opts) if kind == "card" else "",
 	}
 	var src := str(t.source)
 	t.count_source = ("%s · %s" % [t.count, src]) if src != "" and t.count != "" else ""
