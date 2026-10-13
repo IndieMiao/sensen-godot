@@ -33,6 +33,12 @@ const ROOMS := {
 		hits = {STOVE: "range_cooker"}},
 }
 var room_kind := "basic"
+const SCENE := "res://scenes/p0/rooms/p0_farmhouse.tscn"
+## Upgraded inside (HOME-1 from Profile's farm card is at home here too) to a level with the next room: once the
+## level-up's banner and look cards are gone and the stove is idle, the farmhouse opens again in its new room behind the
+## loading cover, the player at its door. Once; tests swap the call.
+var reopen := func(): AppRouter.replace_top_instance(self, SCENE, {})
+var _reopening := false
 
 var kitchen: P0Kitchen
 ## Heat reminders already given (pot id → ring index): once per ring (b84a5e01 ④).
@@ -70,6 +76,15 @@ func use_room(kind: String) -> void:
 	anchors_path = str(r.anchors)
 	hit_nodes = (r.hits as Dictionary).duplicate()
 	use_art(str(r.art))
+
+## The room the view's Homestead level has (room_for) against the one built: reopen into it once nothing is up — no
+## card, banner or sheet, none queued, the stove idle.
+func check_room(v: Dictionary) -> void:
+	if _reopening or rt == null or not v.has("homestead"): return
+	if room_for(int(v.homestead.get("level", level))) == room_kind: return
+	if rt.ui.has_modal() or not rt.ui._card_queue.is_empty() or (kitchen != null and kitchen.busy()): return
+	_reopening = true
+	reopen.call()
 
 ## The fire that burns brighter while a pot cooks: the Basic Room's, whose stove is its hearth; the Standard and Deluxe
 ## stoves are range cookers across the room from their fireplaces, so theirs stays as it is.
@@ -341,6 +356,7 @@ func p0_event(ev: Dictionary, v: Dictionary) -> bool:
 
 func _room_frame(v: Dictionary, _dt: float) -> void:
 	if _sheet and rt and rt.session.view.get("seq", -1) != _sheet.view.get("seq", -2): _sheet.refresh(rt.session.current())
+	check_room(v)
 	if kitchen == null: return
 	kitchen.sync_view(v)
 	var st = P0KitchenLogic.stove(v, kitchen.stove_index)
@@ -539,6 +555,7 @@ func p0_dev(step: PackedStringArray) -> bool:
 			if kitchen.drawer and kitchen.drawer.tab != "experiment": kitchen.drawer.tab = "experiment"
 			kitchen._on_ingredient(step[1], Vector2.INF)
 		"keep": if kitchen.phase == "card": rt.ui.close_modal()
+		"roomkind": print("P0_ROOM_KIND ", room_kind, " Lv", level)   # which room this farmhouse built (282 shots)
 		"rack": open_sheet("rack")
 		"cabinet": open_sheet("cabinet")
 		"level":
