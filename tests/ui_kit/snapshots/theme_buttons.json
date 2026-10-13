@@ -119,7 +119,7 @@
               "rect": [
                 0,
                 412,
-                51,
+                47,
                 44
               ],
               "variation": "CmdPrimaryCompact",
@@ -128,9 +128,9 @@
             {
               "type": "Button",
               "rect": [
-                57,
+                53,
                 412,
-                51,
+                47,
                 44
               ],
               "variation": "CmdSecondaryCompact",
@@ -139,9 +139,9 @@
             {
               "type": "Button",
               "rect": [
-                114,
+                106,
                 412,
-                51,
+                47,
                 44
               ],
               "variation": "CmdBlockedCompact",
