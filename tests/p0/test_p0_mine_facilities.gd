@@ -163,3 +163,14 @@ func test_the_player_box_is_the_figure_on_screen() -> void:
 	var head: Vector2 = mine.cam.unproject_position(mine.actor.position + Vector3.UP * P0Actor.HEAD_M)
 	assert_float(r.position.y).is_equal_approx(head.y, 8.0)   # the outfit's own top once drawn, else HEAD_M
 	assert_float(r.size.y / px_per_m).is_between(0.8, 1.8)     # the figure's own height on screen, in metres across
+
+## Joey 296 #16: a slime's leap that lands while another command is still on the wire (a swing, a rock, the 30 s read)
+## was dropped — no hit sent, no HP gone. It queues now and goes behind that one; still one hit at a time.
+func test_a_hit_while_a_command_is_on_the_wire_still_goes() -> void:
+	await _open(_view([_floor(1, true, CLEARED), _floor(2, true, CLEARED), _floor(3)]), 3)
+	rt.session.send({"type": "mine_rock", "floor": 3, "rock": 0})   # on the wire: this runtime never answers
+	assert_bool(rt.session.busy).is_true()
+	mine._on_contact(preload("res://modules/mining/p0_mine_combat.gd").mob_id(0))
+	assert_array(_sent("mine_attack")).is_equal([{"type": "mine_attack", "floor": 3, "hurt_by": 0}])   # queued behind it
+	mine._on_contact(preload("res://modules/mining/p0_mine_combat.gd").mob_id(1))
+	assert_int(_sent("mine_attack").size()).is_equal(1)   # one hit at a time: the next waits for its settle

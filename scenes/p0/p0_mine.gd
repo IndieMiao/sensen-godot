@@ -395,10 +395,12 @@ func _grip_sword() -> void:
 ## Whether the sword is in hand now (tests and shots).
 func sword_shown() -> bool: return is_instance_valid(_sword) and _sword.visible
 
-## A slime's leap reached the player (MineCombat.contact): the server settles the hit (the 1 s window there too).
+## A slime's leap reached the player (MineCombat.contact): the server settles the hit (the 1 s window there too). A command
+## still on the wire (a swing, a rock, the 30 s read, a counter) never drops it: it waits behind that one and goes with
+## the state seen then — dropped, the leap landed and no HP went (Joey, 296 #16).
 func _on_contact(id: String) -> void:
 	if _hurt_pending and Time.get_ticks_msec() - _hurt_sent_ms > HURT_STALE_MS: _hurt_pending = false
-	if _hurt_pending or _completing or _ko or rt.session.busy: return
+	if _hurt_pending or _completing or _ko: return
 	if not rt.session.send({"type": "mine_attack", "floor": floor_n, "hurt_by": Combat.mob_index(id)}, HURT_KEY): return
 	_hurt_pending = true
 	_hurt_sent_ms = Time.get_ticks_msec()

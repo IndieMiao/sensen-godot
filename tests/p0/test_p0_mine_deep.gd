@@ -203,14 +203,18 @@ func test_a_hit_with_no_reply_at_all_is_freed_after_the_stale_time() -> void:
 	var P0Mine = load("res://scenes/p0/p0_mine.gd")
 	var mine = auto_free(P0Mine.new())   # not in the tree: only its contact
 	mine.rt = rt
-	rt.session.busy = true   # nothing is sent: only the pending flag is under test
+	rt.session.busy = true   # a command on the wire: a new hit queues behind it (296 #16), nothing posts
+	var sent: Array = []
+	rt.session.sent.connect(func(cmd): sent.append(cmd))
 	mine._hurt_pending = true
 	mine._hurt_sent_ms = Time.get_ticks_msec() - 1000
 	mine._on_contact("slime_1")
-	assert_bool(mine._hurt_pending).is_true()
-	mine._hurt_sent_ms = Time.get_ticks_msec() - P0Mine.HURT_STALE_MS - 1
+	assert_array(sent).is_empty()   # the hit before is still awaited: this one waits
+	var stale: int = Time.get_ticks_msec() - P0Mine.HURT_STALE_MS - 1
+	mine._hurt_sent_ms = stale
 	mine._on_contact("slime_1")
-	assert_bool(mine._hurt_pending).is_false()
+	assert_int(sent.size()).is_equal(1)   # freed after the stale time: the next hit goes
+	assert_int(mine._hurt_sent_ms).is_greater(stale)
 	rt.session.busy = false
 
 ## The swing waits a little past the server's tempo (0.5 s for speed 2), so jitter never has a shown swing refused.
@@ -376,7 +380,7 @@ func test_the_knock_out_moment_holds_the_fight_at_zero() -> void:
 	assert_str(fight).contains("_completing or _ko)")
 	assert_str(fight).contains("(0 if _ko else")
 	var contact := src.substr(src.find("func _on_contact("), 300)
-	assert_str(contact).contains("_ko or")
+	assert_str(contact).contains("or _ko: return")
 	assert_str(src.substr(src.find("func _swing()"), 160)).contains("or _ko:")
 	var P0Mine = load("res://scenes/p0/p0_mine.gd")
 	var mine = auto_free(P0Mine.new())
