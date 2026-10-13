@@ -8,7 +8,7 @@ var _obstacles: Array[AABB] = []
 
 func _init(p_bp: FarmBlueprint) -> void:
 	bp = p_bp
-	astar.region = Rect2i(0, 0, bp.grid.x, bp.grid.y)
+	astar.region = Rect2i(bp.grid_origin, bp.grid)
 	astar.cell_size = Vector2.ONE
 	astar.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_NEVER
 	astar.default_compute_heuristic = AStarGrid2D.HEURISTIC_MANHATTAN
@@ -16,7 +16,7 @@ func _init(p_bp: FarmBlueprint) -> void:
 	astar.update()
 	for j in bp.grid.y:
 		for i in bp.grid.x:
-			var c := Vector2i(i, j)
+			var c := bp.grid_origin + Vector2i(i, j)
 			if not bp.is_walkable(c):
 				astar.set_point_solid(c, true)
 				var half := bp.cell_m * 0.5

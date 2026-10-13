@@ -257,8 +257,10 @@ func _build_world() -> void:
 	# copies the whole view, and this runs every frame (亚瑟 on #215; the map's heat in 260 was the same copy).
 	actor.ground_height = func(p: Vector3) -> float:
 		return P0Garden.BED_H if P0Garden.on_bed(bp, p, rt.session.view if rt != null and rt.session != null else null) else 0.0
-	# Opening shot like the polished farm: cottage on top, beds below, the player at the front edge.
-	_focus = actor.position.lerp(_house, 0.42)
+	# Opening shot like the polished farm: cottage on top, beds below, the player at the front edge. Framed from the old
+	# walk-in point, so the picture is the one it was (q(172) A moved the spawn 1.3 m nearer the camera: framed from it the
+	# farmhouse's mark rose 9 px into the HUD; this way the player just stands 46 px lower, well above the quick bar).
+	_focus = opening_point(bp, _house)
 	_cam_follow.hold()   # the opening shot stays until the player first moves
 	_opening = true
 	_place_camera()
@@ -347,6 +349,12 @@ func _fit_opening() -> void:
 
 ## `focus` moved along the ground, away from the camera, by as much as the mark needs to sit MARK_ROOM below the area's
 ## top — at most what keeps `feet` FEET_ROOM above its bottom (opening_shift). `cam` is placed at `focus` already.
+## Where the opening shot is framed from: the field's front walkway the player used to walk in at (9, 1), 42 % of the way to
+## the farmhouse.
+const OPENING_CELL := Vector2i(9, 1)
+static func opening_point(bp: FarmBlueprint, house: Vector3) -> Vector3:
+	return bp.cell_to_world(OPENING_CELL).lerp(house, 0.42)
+
 static func opening_focus(cam: Camera3D, focus: Vector3, mark: Vector3, feet: Vector3, area: Rect2) -> Vector3:
 	var dy := opening_shift(cam.unproject_position(mark).y, cam.unproject_position(feet).y, area)
 	if dy <= 0.0: return focus

@@ -77,7 +77,7 @@ describe('placing in the yard', () => {
     expect(refuse(s, { type: 'place_decor', item: 'deco_planter', x: 12, y: 16, ...HOME })).toMatchObject({ ok: false, code: 'decor_overlap' }); // the mailbox
     expect(refuse(s, { type: 'place_decor', item: 'deco_planter', x: 6, y: 13, ...HOME })).toMatchObject({ ok: false, code: 'decor_overlap' });  // the front fence
     // q(120): Keep the path clear — two cells wide to the map exit, the door, the stall, the mine mouth, the workbench
-    for (const [x, y, where] of [[9, 1, 'spawn'], [10, 0, 'exit'], [8, 14, 'door'], [10, 13, 'door'], [13, 14, 'stall'], [4, 13, 'mine'], [17, 15, 'workbench']] as const)
+    for (const [x, y, where] of [[9, -1, 'spawn'], [10, -2, 'exit'], [8, 14, 'door'], [10, 13, 'door'], [13, 14, 'stall'], [4, 13, 'mine'], [17, 15, 'workbench']] as const)
       expect(refuse(s, { type: 'place_decor', item: 'deco_planter', x, y, ...HOME }), where).toMatchObject({ ok: false, code: 'decor_path' });
     expect(refuse(s, { type: 'place_decor', item: 'deco_bench', x: 4, y: 15, ...HOME })).toMatchObject({ ok: true });   // just off the mine path
     expect(refuse(s, { type: 'place_decor', item: 'deco_bench', x: 3, y: 14, ...HOME })).toMatchObject({ ok: false, code: 'decor_path' });   // on it (4, 14 would reach the Chef's Sign's cell)
@@ -93,8 +93,8 @@ describe('placing in the yard', () => {
     expect(spotBlock(c, s, 'deco_fountain', 5, 18, 0)).toMatchObject({ code: 'decor_outside' });   // on the back wall
     expect(spotBlock(c, s, 'deco_planter', 19, 14, 0)).toMatchObject({ code: 'decor_outside' });   // on the east wall
     expect(spotBlock(c, s, 'deco_pergola', 4, 17, 0)).toMatchObject({ code: 'decor_overlap' });   // 3 × 2 would reach the tree at (6, 17)
-    // the garden's own dressing is taken (不知火舞 on 290): the sign by the gate (right of it from q(172)), a bush, a tree, a rock
-    for (const [x, y, what] of [[11, 0, 'sign'], [1, 0, 'bush'], [12, 18, 'tree'], [16, 18, 'rock']] as const)
+    // the garden's own dressing is taken (不知火舞 on 290): the sign by the gate (two rows nearer from q(172) A), a bush, a tree, a rock
+    for (const [x, y, what] of [[7, -1, 'sign'], [1, 0, 'bush'], [12, 18, 'tree'], [16, 18, 'rock']] as const)
       expect(spotBlock(c, s, 'deco_planter', x, y, 0), what).toMatchObject({ code: 'decor_overlap' });
   });
 

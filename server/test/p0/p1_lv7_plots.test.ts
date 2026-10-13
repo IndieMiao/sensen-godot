@@ -4,8 +4,8 @@ import { addPlots, bedCells, plotCount, plotYardCell } from '../../src/p0/garden
 import { applyP0, type P0Command, type P0Event } from '../../src/p0/reducer.js';
 import { freshState, upgradeState, type P0State } from '../../src/p0/state.js';
 
-// q(172) (SGODOT-282): Homestead Lv7 brings 8 more plots, 40–47, on the field's lattice just outside it — six in front
-// of the first row (row −1), two on the left edge (col −1). What stood on them makes way: a decor piece goes back to Farm
+// q(172) A (SGODOT-282; 用户, 不知火舞 282 4ddb69db): Homestead Lv7 brings 8 more plots, 40–47, a whole row in front of the
+// field (row −1, y 1), the yard's front having moved two rows toward the camera at every level. What stood on them makes way: a decor piece goes back to Farm
 // Storage (q(120)'s `… · back in Farm Storage`), the Compost Bin moves beside the workbench; Decorate keeps off the
 // beds from then on. Harvest All takes the front row like any other.
 const c = loadP0Content();
@@ -34,8 +34,8 @@ function step(s: P0State, cmd: P0Command, now = T0): { s: P0State; ev: P0Event[]
 const cellKey = (id: number) => plotYardCell(c, id)!.join(',');
 
 describe('Homestead Lv7: plots 40–47 (q(172))', () => {
-  it('sit on the yard cells of layout C3: (2,1) (4,1) (6,1) (8,1) (12,1) (14,1), then (2,3) (2,9)', () => {
-    expect([40, 41, 42, 43, 44, 45, 46, 47].map(cellKey)).toEqual(['2,1', '4,1', '6,1', '8,1', '12,1', '14,1', '2,3', '2,9']);
+  it('sit on y 1, x 4–18, left to right', () => {
+    expect([40, 41, 42, 43, 44, 45, 46, 47].map(cellKey)).toEqual(['4,1', '6,1', '8,1', '10,1', '12,1', '14,1', '16,1', '18,1']);
     expect(cellKey(0)).toBe('4,3');   // plot 0 where P0Garden.PLOT_ORIGIN puts it
     expect(plotCount(c, at(6))).toBe(40);
     expect(plotCount(c, at(7))).toBe(48);
@@ -43,19 +43,19 @@ describe('Homestead Lv7: plots 40–47 (q(172))', () => {
 
   it('the upgrade adds them wild; a piece on one goes back to Farm Storage, the Compost Bin moves beside the workbench', () => {
     const s = ready(at(6));
-    s.decor = { placed: [{ uid: 1, id: 'deco_planter', x: 4, y: 1, rot: 0 }, { uid: 2, id: 'deco_lantern', x: 3, y: 1, rot: 0 }], count: 2 };
-    s.facilities = [{ id: 1, kind: 'compost_bin', plot: -1, cell: [2, 3] }];
+    s.decor = { placed: [{ uid: 1, id: 'deco_planter', x: 4, y: 1, rot: 0 }, { uid: 2, id: 'deco_lantern', x: 5, y: 1, rot: 0 }], count: 2 };
+    s.facilities = [{ id: 1, kind: 'compost_bin', plot: -1, cell: [8, 1] }];
     s.facility_count = 1;
     const { s: after, ev } = step(s, { type: 'homestead_upgrade' });
     expect(after.plots.filter(p => p.id >= 40).map(p => [p.id, p.state])).toEqual([40, 41, 42, 43, 44, 45, 46, 47].map(id => [id, 'wild']));
     expect(ev).toContainEqual({ kind: 'plots_added', plots: [40, 41, 42, 43, 44, 45, 46, 47], reason: 'homestead' });
-    // the planter on bed 41 goes back; the lantern in the walkway beside it stays
+    // the planter on bed 40 goes back; the lantern in the walkway beside it stays
     expect(after.decor!.placed.map(p => p.uid)).toEqual([2]);
     expect(after.storage.deco_planter).toBe(1);
     expect(ev).toContainEqual({ kind: 'decor', action: 'stored', uid: 1, item: 'deco_planter', x: 4, y: 1, rot: 0, reason: 'plots' });
-    // the Compost Bin on bed 46 moves to a legal yard cell beside the workbench (its three cells 16–18, row 16)
+    // the Compost Bin on bed 42 moves to a legal yard cell beside the workbench (its three cells 16–18, row 16)
     const bin = after.facilities![0];
-    expect(bin.cell).not.toEqual([2, 3]);
+    expect(bin.cell).not.toEqual([8, 1]);
     expect(Math.abs(bin.cell![1] - 16)).toBeLessThanOrEqual(1);
     expect(bedCells(c, after).has(bin.cell!.join(','))).toBe(false);
     expect(ev).toContainEqual(expect.objectContaining({ kind: 'facility', action: 'moved', facility: 1, facility_kind: 'compost_bin',
@@ -69,8 +69,11 @@ describe('Homestead Lv7: plots 40–47 (q(172))', () => {
     const seven = at(7);
     seven.storage = { deco_planter: 2 };
     expect(applyP0(c, seven, { type: 'place_decor', item: 'deco_planter', x: 4, y: 1, ...HOME }, T0)).toMatchObject({ ok: false, code: 'decor_outside' });
-    expect(applyP0(c, seven, { type: 'place_decor', item: 'deco_planter', x: 2, y: 9, ...HOME }, T0)).toMatchObject({ ok: false, code: 'decor_outside' });
+    expect(applyP0(c, seven, { type: 'place_decor', item: 'deco_planter', x: 18, y: 1, ...HOME }, T0)).toMatchObject({ ok: false, code: 'decor_outside' });
     expect(applyP0(c, seven, { type: 'place_decor', item: 'deco_planter', x: 3, y: 1, ...HOME }, T0)).toMatchObject({ ok: true });
+    // the yard's new front rows are yard at every level (q(172) A), the way out x 9–10 kept clear
+    expect(applyP0(c, six, { type: 'place_decor', item: 'deco_planter', x: 4, y: -2, ...HOME }, T0)).toMatchObject({ ok: true });
+    expect(applyP0(c, six, { type: 'place_decor', item: 'deco_planter', x: 9, y: -1, ...HOME }, T0)).toMatchObject({ ok: false, code: 'decor_path' });
   });
 
   it('Harvest All takes the front row (row −1) as any other', () => {

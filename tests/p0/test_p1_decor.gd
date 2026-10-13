@@ -49,7 +49,7 @@ func test_a_spot_is_judged_as_the_server_does() -> void:
 	assert_str(P0Decor.reason(v, "deco_planter", Vector2i(0, 18))).is_equal("Outside your yard")   # off the yard
 	for at in [Vector2i(9, 16), Vector2i(12, 16), Vector2i(6, 13)]:   # the house, the mailbox, the front fence
 		assert_str(P0Decor.reason(v, "deco_planter", at)).override_failure_message(str(at)).is_equal("Space taken")
-	for at in [Vector2i(9, 1), Vector2i(10, 0), Vector2i(8, 14), Vector2i(10, 13), Vector2i(13, 14), Vector2i(4, 13), Vector2i(17, 15)]:
+	for at in [Vector2i(9, -1), Vector2i(10, -2), Vector2i(8, 14), Vector2i(10, 13), Vector2i(13, 14), Vector2i(4, 13), Vector2i(17, 15)]:
 		assert_str(P0Decor.reason(v, "deco_planter", at)).override_failure_message(str(at)).is_equal("Keep the path clear")
 	assert_str(P0Decor.reason(v, "deco_bench", Vector2i(4, 15))).is_equal("")
 	assert_str(P0Decor.reason(v, "deco_bench", Vector2i(3, 14))).is_equal("Keep the path clear")   # (4, 14) would reach the Chef's Sign's cell
@@ -96,8 +96,9 @@ func test_a_yard_full_of_decor_walls_nothing_off() -> void:
 	var grid := BlueprintGrid.new(bp)
 	var v := {"decor": {"placed": [], "cap": 999, "stored": {}}}
 	var n := 0
-	for y in bp.grid.y:
-		for x in bp.grid.x:
+	var o := bp.grid_origin   # rows from −2: the yard's front (q(172) A)
+	for y in range(o.y, o.y + bp.grid.y):
+		for x in range(o.x, o.x + bp.grid.x):
 			if P0Decor.reason(v, "deco_planter", Vector2i(x, y)) != "": continue
 			n += 1
 			v.decor.placed.append({"uid": n, "id": "deco_planter", "x": x, "y": y, "rot": 0})
@@ -105,8 +106,8 @@ func test_a_yard_full_of_decor_walls_nothing_off() -> void:
 	assert_int(n).is_greater(60)   # plenty of yard is left to decorate
 	var from: Vector2i = P0Garden.ANCHORS.spawn
 	var reach := func(target: Vector3, within: float) -> bool:
-		for y in bp.grid.y:
-			for x in bp.grid.x:
+		for y in range(o.y, o.y + bp.grid.y):
+			for x in range(o.x, o.x + bp.grid.x):
 				var c := Vector2i(x, y)
 				if bp.cell_to_world(c).distance_to(target) > within or grid.astar.is_point_solid(c): continue
 				if c == from or not grid.path(from, c).is_empty(): return true
@@ -418,7 +419,7 @@ func test_the_player_walks_inside_the_fence_ring() -> void:
 ## q(172): Homestead Lv7's beds on the field's edge (40–47) are off Decorate from Lv7, as the field is; before it their
 ## cells are yard (the server sends what stood there back to storage at the upgrade); the walkways between stay open.
 func test_lv7_beds_on_the_edge_are_off_the_yard_from_lv7() -> void:
-	var bed := P0Garden.cell_of(41)   # (4,1), in front of the first row
+	var bed := P0Garden.cell_of(41)   # (6,1), in the field's new front row
 	assert_str(P0Decor.reason_cells({"garden": {"plots": 40}}, [bed], {})).is_equal("")
 	assert_str(P0Decor.reason_cells({"garden": {"plots": 48}}, [bed], {})).is_equal(P0Decor.REASONS.decor_outside)
 	assert_str(P0Decor.reason_cells({"garden": {"plots": 48}}, [P0Garden.cell_of(47)], {})).is_equal(P0Decor.REASONS.decor_outside)

@@ -44,10 +44,8 @@ func build(bp: FarmBlueprint, style: String) -> void:
 		tints.append(Color.WHITE.lerp(Color(0.58, 0.75, 0.80), smoothstep(10.0, 14.0, -p.z)))
 	add_child(Art.batch("tree_0", trees, true, tints))
 	# The fence depends on the Homestead level: p0_fence.gd (SGODOT-228).
-	# the entrance sign right of the way in, at (11,0) (q(172): Homestead Lv7's front beds took its old place left of the
-	# path, 不知火舞 282 2fbd63f7 丙; facing as before); Decorate's objects hold that cell
-	var sign_at := bp.cell_to_world(Vector2i(11, 0))
-	add_child(Art.instance("sign", Vector3(sign_at.x, 0, sign_at.z), 0.93))
+	# the entrance sign left of the way in, by the spawn: (7, −1) since the yard's front moved (q(172) A); Decorate's objects hold it
+	add_child(Art.instance("sign", Vector3(spawn.x - 1.35, 0, spawn.z + 0.25), 0.93))
 	var shrubs: Array = []
 	for p in [Vector3(house.x - 1.75, 0, house.z - 0.9), Vector3(house.x + 1.85, 0, house.z - 1.0), Vector3(12.2, 0, -6.3),
 		Vector3(0.9, 0, -4.2), Vector3(12.7, 0, -1.4), Vector3(1.0, 0, -0.6)]:
@@ -68,12 +66,16 @@ func build(bp: FarmBlueprint, style: String) -> void:
 	for key in P0Garden.ANCHORS:   # SGODOT-231: gathering spots and the workbench stay clear of scatter
 		if str(key).begins_with("spot_") or key == "workbench": spots.append(bp.cell_to_world(bp.anchor(key)))
 	for i in 420:
-		var point := Vector3(rng.randf_range(-3.0, 16.0), 0.01, rng.randf_range(-16.0, -11.5) if i < 220 else rng.randf_range(-11.5, 2.5))
+		# the front band reaches 2.4 m past the fence, which moved 1.3 m nearer (q(172) A; 上官婉儿 on 282 c2a5bc4f: z +2.5 → +3.8)
+		var point := Vector3(rng.randf_range(-3.0, 16.0), 0.01, rng.randf_range(-16.0, -11.5) if i < 220 else rng.randf_range(-11.5, 3.8))
 		var flat := Vector2(point.x, point.z)
 		if keep_clear.any(func(r: Rect2): return r.has_point(flat)): continue
 		if spots.any(func(s: Vector3): return Vector2(s.x, s.z).distance_to(flat) < (1.7 if s == house else 0.95)): continue
 		var asset := "grass_clump"
-		if i % 11 == 0: asset = "rock"
+		# a rock blocks its cell: none in the yard's front rows y −2…0 (the way in, x 9–10, runs through them; 上官婉儿 c2a5bc4f)
+		var front := bp.world_to_cell(point)
+		var front_row := P0Garden.WALK_RECT.has_point(front) and front.y <= 0
+		if i % 11 == 0 and not front_row: asset = "rock"
 		elif i % 5 == 0: asset = "daisy"
 		elif i % 9 == 0: asset = "pink_flower"
 		elif i % 13 == 0: asset = "blue_flower"

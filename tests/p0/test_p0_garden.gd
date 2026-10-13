@@ -23,9 +23,9 @@ func test_the_garden_grid_matches_the_content_table() -> void:
 	for id in 30: assert_vector(P0Garden.cell_of(id)).is_equal(P0Garden.PLOT_ORIGIN + Vector2i((id % 6) * 2, (id / 6) * 2))
 	assert_vector(P0Garden.cell_of(30)).is_equal(P0Garden.cell_of(5) + Vector2i(2, 0))
 	assert_vector(P0Garden.cell_of(39)).is_equal(P0Garden.cell_of(29) + Vector2i(4, 0))
-	# Homestead Lv7 (q(172), layout C3, 不知火舞 282 2fbd63f7): six in front of the first row, two on the left edge
-	assert_array(range(40, 48).map(func(i): return P0Garden.cell_of(i))).is_equal([Vector2i(2, 1), Vector2i(4, 1), Vector2i(6, 1),
-		Vector2i(8, 1), Vector2i(12, 1), Vector2i(14, 1), Vector2i(2, 3), Vector2i(2, 9)])
+	# Homestead Lv7 (q(172) A, 不知火舞 282 4ddb69db): a whole row in front of the field, y 1, x 4–18, left to right
+	assert_array(range(40, 48).map(func(i): return P0Garden.cell_of(i))).is_equal([Vector2i(4, 1), Vector2i(6, 1), Vector2i(8, 1),
+		Vector2i(10, 1), Vector2i(12, 1), Vector2i(14, 1), Vector2i(16, 1), Vector2i(18, 1)])
 
 ## At Homestead Lv1–2 the place of beds 30–39 is plain ground: walking there never steps up onto a bed (哪吒 on #215).
 func test_no_bed_to_step_on_where_the_homestead_has_none_yet() -> void:
