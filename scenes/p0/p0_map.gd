@@ -862,6 +862,9 @@ func on_arrival(ev: Dictionary) -> void:
 				return
 			rt.ui.toast(welcome, STAMP_S)
 			_arrival_card_after_stamp(cluster))
+	# q(147) ⑤ "it changes on landing": a first visit's city still reads Unexplored, its bubble and its fog hole, until
+	# the flight lands, with the chip and the stamp (不知火舞 on #340)
+	if first and travelling(): _trip.first_in_air = cluster
 
 ## The stamp's beat of the arrival (§11.8.4 ≤ 1.5 s, q(152) ②): its toast's time, after which the arrival card comes.
 const STAMP_S := 1.5
@@ -1047,7 +1050,12 @@ func city_bubble(region_id: String) -> Dictionary:
 		for n in _online.values(): online += int(n)
 		# nobody online: the house alone, like an outpost pin's bare name (q(72): 0 tells nothing, only looks empty)
 		return {text = "%d online" % online if online > 0 else "", icon = "house"}
+	if cluster == _first_in_air(): return {text = "Unexplored"}   # changes on landing (q(147) ⑤)
 	return {text = "Unexplored" if P0Travel.fog(_view(), cluster) == "unexplored" else "Visited"}
+
+## The city a first visit is flying to, still unexplored to the eye until it lands; "" otherwise.
+func _first_in_air() -> String:
+	return str(_trip.get("first_in_air", "")) if travelling() else ""
 
 ## The city a pin is in: its `cluster` (generated places, SGODOT-280: also the prefix of their id, `gn-1850147~pond0`),
 ## else the home city (P0's hand-written places).
@@ -1077,6 +1085,7 @@ func fog_holes() -> Array:
 	if city_map == null: return []
 	var vp := get_viewport().get_visible_rect().size if is_inside_tree() else Vector2(360, 800)
 	var explored := P0Travel.explored(_view())
+	if _first_in_air() != "": explored = explored.filter(func(c): return c != _first_in_air())   # its hole opens on landing
 	var key := "%.7f|%.7f|%.4f|%.2f|%.2f|%s|%d" % [center_lat, center_lng, zoom + _zoom_elastic, bearing, pitch, vp, explored.hash()]
 	if key == _fog_key: return _fog_holes
 	_fog_key = key

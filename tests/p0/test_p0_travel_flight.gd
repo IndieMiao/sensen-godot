@@ -479,3 +479,29 @@ func test_a_home_flight_landing_mid_navigation_goes_nowhere() -> void:
 	assert_str(_chip_city(rt)).is_equal("Los Angeles")   # still where they were
 	rt.session.view = saved
 	rt.ui.set_view(saved)
+
+## q(147) ⑤ (不知火舞 on #340): a first visit's city changes on landing, with the chip and the stamp — in the air its
+## bubble still says Unexplored and the fog has no hole for it, though the server's reply already counts the visit.
+func test_a_first_visits_city_reads_unexplored_until_it_lands() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved := _ready_to_arrive(m)   # the server's view: here = LA, LA visited (the arrival's own reply)
+	var region := str(P0Clusters.region(LA).id)
+	assert_str(str(m.city_bubble(region).text)).is_equal("Visited")
+	m.on_arrival({kind = "arrival", cluster = LA, first = true, trip = 4, km = 559})
+	assert_str(str(m.city_bubble(region).text)).is_equal("Unexplored")   # in the air
+	m._fog_key = ""
+	var la := P0Clusters.get_cluster(LA)
+	var la_at = m.geo_to_screen(float(la.lat), float(la.lng))
+	for h in m.fog_holes():
+		if la_at != null: assert_float((h.at as Vector2).distance_to((la_at as Vector2) - m.city_map.global_position)).is_greater(1.0)
+	await get_tree().create_timer(0.7).timeout
+	_tap(_cover(m))   # down
+	assert_str(str(m.city_bubble(region).text)).is_equal("Visited")   # with the chip and the stamp
+	rt.ui.clear_toast()
+	await get_tree().create_timer(1.8).timeout   # past the stamp's beat: its card, closed
+	rt.ui.close_modal()
+	rt.session.view = saved
+	rt.ui.set_view(saved)
