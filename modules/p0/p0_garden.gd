@@ -237,6 +237,15 @@ const PLAQUE_CELL := Vector2i(7, 14)
 static func plaque_point(bp: FarmBlueprint) -> Vector3:
 	return bp.cell_to_world(PLAQUE_CELL)
 
+## The Chef's Sign (Homestead Lv10, §7.7; SGODOT-282): a free-standing hanging sign on a post (上官婉儿's prop shape,
+## 不知火舞 on 282) left of the door path as one faces the house, in the row the plaque stands on, left of it: the cells
+## nearer the door are the path (x 8–10) and the porch's (Lv5) and the plaque's (x 6–7, rows 13–14). Anchor `chef_sign`:
+## the post's foot, +Z toward the camera. Solid, one cell, only once the sign is up.
+const CHEF_SIGN_CELL := Vector2i(6, 14)
+
+static func chef_sign_point(bp: FarmBlueprint) -> Vector3:
+	return bp.cell_to_world(CHEF_SIGN_CELL)
+
 ## The farmhouse Mailbox (§12.5.2, q(24); SGODOT-234 C): by the house's right wall, between the Homestead sign and the
 ## stall (about 1.45 m from each), clear of the door path, the fence and the field. Solid, one cell.
 const MAILBOX_CELL := Vector2i(12, 16)

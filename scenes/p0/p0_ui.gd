@@ -3506,7 +3506,8 @@ func placement_bar_rect() -> Rect2:
 
 ## A facility's status card (P1, SGODOT-241; q(59) §4): `Sprinkler · Waters 8 plots` and one button (Move); the
 ## caller highlights what it covers while the card shows (modal_kind "facility"). Sits where the quick bar was.
-## spec = {title, lead, icon, button, kind (&"secondary"), second, close, reason}; on_button runs after the card closes.
+## spec = {title, lead, icon, facts, button, kind (&"secondary"), second, close, reason}; on_button runs after the card closes;
+## button "" (with no reason) leaves the card without one (the Chef's Sign only says what it does).
 ## A placed decor's card (DECOR-CARD, Figma 2191:33239) has a primary Move, the text button `Store` (spec.second,
 ## on_second) and a ✕ over its corner (spec.close). spec.reason greys the main button with it, LOCK-10 (a greenhouse
 ## with crops under it: `Move · Harvest first`, 李白); a tap says why.
@@ -3515,9 +3516,10 @@ func open_facility_card(spec: Dictionary, on_button: Callable, on_second := Call
 	var reason := str(spec.get("reason", ""))
 	var buttons: Array = [{id = &"move", label = reason if reason != "" else str(spec.get("button", "Move")),
 		kind = &"unavailable" if reason != "" else StringName(spec.get("kind", &"secondary"))}]
+	if str(spec.get("button", "Move")) == "" and reason == "": buttons = []   # a card that only says (the Chef's Sign)
 	if str(spec.get("second", "")) != "": buttons.append({id = &"second", label = str(spec.second), kind = &"nav", chevron = false})
 	var card := {id = "facility", title = str(spec.get("title", "")), lead = str(spec.get("lead", "")),
-		icon = spec.get("icon", null), facts = [], buttons = buttons}
+		icon = spec.get("icon", null), facts = spec.get("facts", []), buttons = buttons}
 	var sheet := UiInfoSheet.new()
 	sheet.theme = UiKit.theme()
 	sheet.rules = func(_id, _ctx, _o): return card

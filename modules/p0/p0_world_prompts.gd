@@ -49,6 +49,10 @@ static func sign(view: Dictionary) -> Dictionary:
 	return _p("level_up", "Homestead Lv%d" % int(h.get("level", 1)), "", UiStatusBadge.State.READY if lit else -1)
 
 ## Upgrade Plaque: no mark; only the strip when it is the nearest (PLAQUE-READ).
+## The Chef's Sign (Homestead Lv10; 不知火舞 on 282): its name strip `Chef's Sign`, no fact.
+static func chef_sign(_view: Dictionary) -> Dictionary:
+	return _p("kitchen", "Chef's Sign", "", -1, false, false)
+
 static func plaque(_view: Dictionary) -> Dictionary:
 	return _p("board", "Upgrade Plaque", "", -1, false, false)
 
