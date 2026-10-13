@@ -875,7 +875,7 @@ static func _milestone(view: Dictionary, id: String) -> Dictionary:
 
 ## The Cookbook's title strip (COOK-5: a line under the filter chips): Home Cook, then the Discovered milestones in
 ## order, each {title, state, have, need}: reached (ink), the next one with its count (`Line Cook 12/20`), the rest later
-## (grey, the name only). Muscle Memory counts Mastered pages, its own axis: muscle_line.
+## (grey, the name only). Muscle Memory counts Mastered pages, its own axis: muscle_item.
 static func title_strip(view: Dictionary) -> Array:
 	var have := int(cooking(view).get("discovered", 0))
 	var home := int((P0Logic.content().get("rewards", {}).get("cookbook", [[8, 50]]) as Array)[0][0])
