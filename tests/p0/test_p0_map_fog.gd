@@ -157,7 +157,12 @@ func test_city_bubbles_say_their_state() -> void:
 	var saved := _travel(rt, {home = SF, here = SF, visits = {TOKYO: {n = 1}}, second_homes = [LA], passes = {}, stamps = [],
 		fallback = {near3 = [], near10 = []}, explorer = 0})
 	m._online = {"sh_tea_1": 3, "sh_market_1": 2}
-	var state: Callable = m.city_map.bubble_state
+	# what a bubble says (its face); its place in q(153)'s order (dot_stays / keeps) is checked in test_p0_map_bubbles
+	var state := func(id: String) -> Dictionary:
+		var d: Dictionary = m.city_map.bubble_state.call(id)
+		d.erase("dot_stays")
+		d.erase("keeps")
+		return d
 	assert_dict(state.call("san_francisco")).is_equal({text = "5 online", icon = "house"})
 	assert_dict(state.call(TOKYO)).is_equal({text = "Visited"})
 	assert_dict(state.call("los_angeles")).is_equal({text = "Visited"})   # a Second Home reads Visited this version
@@ -262,10 +267,11 @@ func test_a_bubble_under_the_hud_is_not_drawn_but_its_dot_is() -> void:
 		var at := Rect2((b.node as Control).position + m.city_map.global_position, (b.node as Control).size)
 		for r in rects: assert_bool((r as Rect2).intersects(at)).override_failure_message("%s under the chrome" % id).is_false()
 
-## 李元芳 0.2.1 smoke (293 378fd255): at the country view, away in LA, home's bubble (San Francisco) sits over the
-## bottom of Chico's. A tap on the part of Chico's bubble that shows took home's 6 px margin and went home; the bubble
-## drawn under the finger takes it now, and the margin only answers taps off every bubble.
-func test_a_tap_on_a_bubble_that_shows_is_not_taken_by_a_neighbours_margin() -> void:
+## 李元芳 0.2.1 smoke (293 378fd255): at the country view, away in LA, home's bubble (San Francisco) sat over the
+## bottom of Chico's, and a tap on the part of Chico's that showed went home. q(153) (不知火舞 on 293 e5ec0cc0): Chico's
+## bubble runs into home's and hides whole, its dot staying; a tap on the dot opens Chico, and home's margin only
+## answers taps off every bubble and dot.
+func test_a_visited_citys_bubble_gives_way_to_homes_and_its_dot_takes_the_tap() -> void:
 	var m := _map()
 	for i in 3: await get_tree().process_frame
 	m.set_process(false)
@@ -284,19 +290,18 @@ func test_a_tap_on_a_bubble_that_shows_is_not_taken_by_a_neighbours_margin() -> 
 	for id in m.city_map.bubbles:
 		if m.city_map.bubbles[id].node.visible and m.city_map.bubbles[id].name.text == "San Francisco": home_id = str(id)
 	assert_str(home_id).is_not_empty()
-	assert_bool(m.city_map.bubbles[chico].node.visible).is_true()
+	assert_bool(m.city_map.bubbles[chico].node.visible).is_false()   # no half bubble under home's
+	assert_bool(m.city_map.bubbles[chico].dot.visible).is_true()
 	var home: Rect2 = m.city_map.bubbles[home_id].node.get_global_rect()
-	var mine: Rect2 = m.city_map.bubbles[chico].node.get_global_rect()
-	# just above home's bubble, on Chico's: drawn there is Chico's alone, within home's old 6 px margin
-	var on_chico := Vector2(mine.get_center().x, home.position.y - 3.0)
-	assert_bool(mine.has_point(on_chico) and not home.has_point(on_chico)).is_true()
-	# just left of home's bubble, off every bubble: the margin still takes it
-	var off_all := Vector2(home.position.x - 3.0, home.get_center().y)
-	assert_bool(mine.has_point(off_all) or m.farm_markers._avatar_targets["self"].get_global_rect().has_point(off_all)).is_false()
+	var dot: Rect2 = m.city_map.bubbles[chico].dot.get_global_rect()
+	assert_bool(home.intersects(dot)).is_false()
+	var on_dot := dot.get_center()
+	var off_all := Vector2(home.position.x - 3.0, home.get_center().y)   # just left of home's bubble
+	assert_bool(dot.grow(4).has_point(off_all) or m.farm_markers._avatar_targets["self"].get_global_rect().has_point(off_all)).is_false()
 	for c in m.city_map.city_requested.get_connections(): m.city_map.city_requested.disconnect(c.callable)
 	var asked: Array = []
 	m.city_map.city_requested.connect(func(id): asked.append(str(id)))
-	for at in [on_chico, off_all]:
+	for at in [on_dot, off_all]:
 		for pressed in [true, false]:
 			var tap := InputEventScreenTouch.new()
 			tap.position = at
