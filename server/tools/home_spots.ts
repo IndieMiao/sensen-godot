@@ -11,9 +11,9 @@
  *          scattered spot ≥ 50 m from water and inside the rules. <out>/check.tsv; exit 1 on any failure.
  *   maps   one Mapbox static map per city: P beginner pond, m / t / k / s its market, tea house, tackle shop and post,
  *          1–3 the spots. For 不知火舞's acceptance.
- *   npx tsx tools/home_spots.ts run|check|maps [--cities gn-1,gn-2] [--out output/home-spots] [--avoid file.json]
- * --avoid: {cluster: [[[lat, lng], …], …]} polygons a spot may not stand in (New York: across the Hudson, in New Jersey;
- * 不知火舞 on 303), the format world_water_groups.ts takes.
+ *   npx tsx tools/home_spots.ts run|check|maps [--cities gn-1,gn-2] [--out output/home-spots]
+ * Hand input in server/data/home_spots_hand.json (不知火舞's calls on 303): avoid, polygons a spot may not stand in (New
+ * York: across the Hudson, in New Jersey); pins, a spot moved near a point (Hong Kong: Wan Chai, not across the harbour).
  * The Mapbox token is read from mapbox_token.txt and never printed.
  */
 import { execFile } from 'node:child_process';
@@ -44,7 +44,11 @@ const token = () => readFileSync(path.join(ROOT, 'mapbox_token.txt'), 'utf8').tr
 const nameOf = (id: string) => (id === writtenCluster(c) ? c.profile.city : clusterById(c, id)?.name ?? id);
 const exKm = ((w.placement as { farm_exclusion_m?: number }).farm_exclusion_m ?? 300) / 1000;
 const scKm = rules.spot.scatter_m[1] / 1000;
-const avoid: Record<string, [number, number][][]> = opt('avoid') ? JSON.parse(readFileSync(opt('avoid')!, 'utf8')) : {};
+/** server/data/home_spots_hand.json: polygons no spot may stand in, and pinned spots (不知火舞's calls on 303). */
+interface Pin { replace_near: [number, number]; near: [number, number]; why: string }
+const HAND = path.join(ROOT, 'server/data/home_spots_hand.json');
+const hand = (existsSync(HAND) ? JSON.parse(readFileSync(HAND, 'utf8')) : {}) as { avoid?: Record<string, [number, number][][]>; pins?: Record<string, Pin[]> };
+const avoid = hand.avoid ?? {};
 const inside = (poly: [number, number][], p: { lat: number; lng: number }) => {
   let hit = false;
   for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
@@ -67,30 +71,26 @@ async function curl(url: string, file?: string): Promise<Buffer> {
 
 /** A label as a card line takes it: a Tokyo chōme number (`Sendagaya 5`) and Mexico's `Colonia ` go. */
 const clean = (n: string) => n.replace(/\s+\d+$/, '').replace(/^Colonia\s+/, '').trim();
-const HOOD_MAX = 20;
+const HOOD_M = 800;
 /** Park, hill and landmark labels are not districts (不知火舞, 303): `Saint James Park`, `Lady Hill Park`, `Henderson Hill`. */
 const NOT_A_DISTRICT = /\b(park|parque|parc|hill|hills|mount|mountain|peak|garden|gardens|market|cemetery|stadium|airport|station|university|campus|center|centre)\b|parken$/i;
 
-/** The district name a point shows on the map: the nearest suburb / quarter / neighbourhood label (Mapbox Streets
- * place_label, English) within 1.5 km, else 3 km, not already used in the city, a short one (≤ 20) first; else
- * reverse geocoding's neighbourhood or locality. */
+/** The district name a point shows on the map: the nearest usable suburb / quarter / neighbourhood label (Mapbox
+ * Streets place_label, English; not a park or landmark, not already used in the city) within HOOD_M. None: '' (the
+ * spot is passed over), never a farther name (不知火舞 on 303 575cdbfe: Miami's `Grapeland` stood 3 km off). */
+const labelCache = new Map<string, string[]>();
 async function hoodOf(p: { lat: number; lng: number }, used: Set<string>): Promise<string> {
-  for (const radius of [1500, 3000]) {
-    const url = `https://api.mapbox.com/v4/mapbox.mapbox-streets-v8/tilequery/${p.lng},${p.lat}.json?radius=${radius}&limit=50&layers=place_label&access_token=${token()}`;
-    const labels = (JSON.parse((await curl(url)).toString()) as { features?: { properties: Record<string, unknown> & { tilequery: { distance: number } } }[] }).features ?? [];
-    const names = labels.filter(f => ['suburb', 'quarter', 'neighbourhood'].includes(String(f.properties.type)))
-      .sort((a, b) => a.properties.tilequery.distance - b.properties.tilequery.distance)
-      .map(f => clean(String(f.properties.name_en ?? f.properties.name ?? ''))).filter(n => n && LATIN.test(n) && !NOT_A_DISTRICT.test(n) && !used.has(n));
-    const near = names.find(n => n.length <= HOOD_MAX) ?? names[0];
-    if (near) return near;
-  }
-  for (const type of ['neighborhood', 'locality']) {
-    const url = `https://api.mapbox.com/search/geocode/v6/reverse?longitude=${p.lng}&latitude=${p.lat}&types=${type}&language=en&limit=1&access_token=${token()}`;
-    const body = JSON.parse((await curl(url)).toString()) as { features?: { properties?: { name?: string } }[] };
-    const name = clean(body.features?.[0]?.properties?.name ?? '');
-    if (name && LATIN.test(name) && !NOT_A_DISTRICT.test(name) && !used.has(name)) return name;
-  }
-  return '';
+  const key = `${p.lat},${p.lng}`;
+  if (!labelCache.has(key)) labelCache.set(key, await labelsNear(p));
+  return labelCache.get(key)!.find(n => !used.has(n)) ?? '';
+}
+/** The usable district labels within HOOD_M of a point, nearest first. */
+async function labelsNear(p: { lat: number; lng: number }): Promise<string[]> {
+  const url = `https://api.mapbox.com/v4/mapbox.mapbox-streets-v8/tilequery/${p.lng},${p.lat}.json?radius=${HOOD_M}&limit=50&layers=place_label&access_token=${token()}`;
+  const labels = (JSON.parse((await curl(url)).toString()) as { features?: { properties: Record<string, unknown> & { tilequery: { distance: number } } }[] }).features ?? [];
+  return labels.filter(f => ['suburb', 'quarter', 'neighbourhood'].includes(String(f.properties.type)) && f.properties.tilequery.distance <= HOOD_M)
+    .sort((a, b) => a.properties.tilequery.distance - b.properties.tilequery.distance)
+    .map(f => clean(String(f.properties.name_en ?? f.properties.name ?? ''))).filter(n => n && LATIN.test(n) && !NOT_A_DISTRICT.test(n));
 }
 
 /** App text is English (the user, 2026-09-04): a district name in another script is passed over. */
@@ -119,6 +119,47 @@ function homeBox(points: { lat: number; lng: number }[], marginKm: number) {
 
 const turnGap = (a: number, b: number) => { const d = Math.abs(((a - b) % 360 + 360) % 360); return Math.min(d, 360 - d); };
 
+type Row = { lat: number; lng: number; hood: string; deg: number; d: number; dry: number };
+type Found = { at: { lat: number; lng: number }; deg: number; d: number; dry: number };
+/** A pin (home_spots_hand.json): the spot nearest replace_near gives way to the candidate nearest near (≤ 700 m) with a
+ * district name of its own within HOOD_M. The direction rule there is the exact one, not MIN_TURN: two spots' bearings
+ * apart by 45° plus the most each player's scatter can turn it, so the card's compass words still differ (Hong Kong
+ * Island has land only west, south and east of the pond). A spot the pinned one leaves too close gives way the same way. */
+async function pinned(cluster: string, rows: Row[], found: Found[]): Promise<Row[] | string> {
+  const turnOf = (d: number) => (Math.asin(Math.min(1, scKm / d)) * 180) / Math.PI;
+  const ok = (a: { lat: number; lng: number; deg: number; d: number }, b: { lat: number; lng: number; deg: number; d: number }) =>
+    km(a, b) >= rules.spot.apart_km + 2 * scKm && turnGap(a.deg, b.deg) >= 45 + turnOf(a.d) + turnOf(b.d);
+  const asRow = (f: Found, hood: string): Row => ({ lat: f.at.lat, lng: f.at.lng, hood, deg: f.deg, d: Math.round(f.d * 100) / 100, dry: Math.round(f.dry) });
+  const flat = (f: Found) => ({ ...f.at, deg: f.deg, d: f.d });
+  for (const pin of hand.pins?.[cluster] ?? []) {
+    const [rl, rg] = pin.replace_near, near = { lat: pin.near[0], lng: pin.near[1] };
+    const i = rows.map((r, k) => [km(r, { lat: rl, lng: rg }), k]).sort((a, b) => a[0] - b[0])[0][1];
+    const score = (f: Found) => Math.abs(f.d - 1.4) / 0.4 - Math.min(f.dry, 600) / 1000;
+    let done: Row[] | null = null;
+    for (const f of found.filter(f => km(f.at, near) <= 0.7).sort((a, b) => km(a.at, near) - km(b.at, near)).slice(0, 30)) {
+      const others = rows.filter((_, k) => k !== i);
+      const hood = await hoodOf(f.at, new Set([nameOf(cluster), ...others.map(r => r.hood)]));
+      if (!hood) continue;
+      const pin1 = asRow(f, hood), kept: Row[] = [];
+      for (const o of others) if (ok(flat(f), o) && kept.every(k => ok(k, o))) kept.push(o);
+      while (kept.length < 2) {   // a spot left too close or turned the same way: the best one that fits, named
+        const fits = found.filter(g => ok(flat(g), flat(f)) && kept.every(k => ok(flat(g), k))).sort((a, b) => score(a) - score(b));
+        let next: Row | null = null;
+        for (const g of fits.slice(0, 60)) {
+          const h = await hoodOf(g.at, new Set([nameOf(cluster), hood, ...kept.map(k => k.hood)]));
+          if (h) { next = asRow(g, h); break; }
+        }
+        if (!next) break;
+        kept.push(next);
+      }
+      if (kept.length === 2) { done = [...kept, pin1].sort((a, b) => a.deg - b.deg); break; }
+    }
+    if (!done) return `pin near ${pin.near.join(', ')}: no named spot within 700 m that two others fit`;
+    rows = done;
+  }
+  return rows;
+}
+
 async function pick(cluster: string): Promise<{ lat: number; lng: number; hood: string; deg: number; d: number; dry: number }[] | string> {
   const set = citySet(c, cluster);
   if (!set) return 'no home set';
@@ -146,7 +187,7 @@ async function pick(cluster: string): Promise<{ lat: number; lng: number; hood: 
       if (!fits.length) { why = `no room for spot ${k + 1} (${found.length} dry built-up candidates)`; break; }
       const score = (f: typeof found[number]) => turnGap(f.deg, want) / 20 + Math.abs(f.d - 1.4) / 0.4 - Math.min(f.dry, 600) / 1000;
       let row: typeof rows[number] | null = null;
-      for (const f of fits.sort((a, b) => score(a) - score(b)).slice(0, 40)) {
+      for (const f of fits.sort((a, b) => score(a) - score(b)).slice(0, 120)) {
         const hood = await hoodOf(f.at, used);
         if (hood) { row = { lat: f.at.lat, lng: f.at.lng, hood, deg: f.deg, d: Math.round(f.d * 100) / 100, dry: Math.round(f.dry) }; break; }
       }
@@ -154,36 +195,44 @@ async function pick(cluster: string): Promise<{ lat: number; lng: number; hood: 
       used.add(row.hood);
       rows.push(row);
     }
-    if (rows.length === 3) return rows;
+    if (rows.length === 3) return pinned(cluster, rows, found);
     if (turn + 15 < 360) why = '';
   }
-  // Still none: every three of the best few per 10° that keep the spacing, the widest spread first, then the score; a
-  // spot without a district name of its own leaves the pool and the search runs again.
+  // Still none: every three of the best few named spots per 10° (a district label within HOOD_M) that keep the
+  // spacing, the widest spread first, then the score. The direction rule is MIN_TURN first; where no three keep it
+  // (Miami: named districts lie only north and northeast), the exact one — bearings apart by 45° plus the most each
+  // player's scatter can turn them — which still keeps the cards' compass words apart.
   const score = (f: typeof found[number]) => Math.abs(f.d - 1.4) / 0.4 - Math.min(f.dry, 600) / 1000;
+  const named: typeof found = [];
+  for (const f of found) if (await hoodOf(f.at, new Set([nameOf(cluster)]))) named.push(f);
   const bins = new Map<number, typeof found>();
-  for (const f of found) bins.set(Math.floor(f.deg / 10), [...(bins.get(Math.floor(f.deg / 10)) ?? []), f]);
-  let pool = [...bins.values()].flatMap(b => b.sort((a, b2) => score(a) - score(b2)).slice(0, 3));
-  const named = new Map<typeof found[number], string>();
-  for (let round = 0; round < 20; round++) {
-    let best: { t: typeof found; spread: number; sum: number } | null = null;
-    for (let i = 0; i < pool.length; i++) for (let j = i + 1; j < pool.length; j++) for (let k = j + 1; k < pool.length; k++) {
-      const t = [pool[i], pool[j], pool[k]];
-      if (t.some((a, x) => t.some((b, y) => x < y && (km(a.at, b.at) < rules.spot.apart_km + 2 * scKm || turnGap(a.deg, b.deg) < MIN_TURN)))) continue;
-      const spread = Math.floor(Math.min(turnGap(t[0].deg, t[1].deg), turnGap(t[1].deg, t[2].deg), turnGap(t[0].deg, t[2].deg)) / 15);
-      const sum = t.reduce((a, f) => a + score(f), 0);
-      if (!best || spread > best.spread || (spread === best.spread && sum < best.sum)) best = { t, spread, sum };
+  for (const f of named) bins.set(Math.floor(f.deg / 10), [...(bins.get(Math.floor(f.deg / 10)) ?? []), f]);
+  const turnOf = (d: number) => (Math.asin(Math.min(1, scKm / d)) * 180) / Math.PI;
+  for (const exact of [false, true]) {
+    let pool = [...bins.values()].flatMap(b => b.sort((a, b2) => score(a) - score(b2)).slice(0, 5));
+    const apart = (a: typeof found[number], b: typeof found[number]) => km(a.at, b.at) >= rules.spot.apart_km + 2 * scKm
+      && turnGap(a.deg, b.deg) >= (exact ? 45 + turnOf(a.d) + turnOf(b.d) : MIN_TURN);
+    for (let round = 0; round < 20; round++) {
+      let best: { t: typeof found; spread: number; sum: number } | null = null;
+      for (let i = 0; i < pool.length; i++) for (let j = i + 1; j < pool.length; j++) for (let k = j + 1; k < pool.length; k++) {
+        const t = [pool[i], pool[j], pool[k]];
+        if (!apart(t[0], t[1]) || !apart(t[1], t[2]) || !apart(t[0], t[2])) continue;
+        const spread = Math.floor(Math.min(turnGap(t[0].deg, t[1].deg), turnGap(t[1].deg, t[2].deg), turnGap(t[0].deg, t[2].deg)) / 15);
+        const sum = t.reduce((a, f) => a + score(f), 0);
+        if (!best || spread > best.spread || (spread === best.spread && sum < best.sum)) best = { t, spread, sum };
+      }
+      if (!best) break;
+      const used = new Set<string>([nameOf(cluster)]), rows: Row[] = [];
+      let missing: typeof found[number] | null = null;
+      for (const f of best.t.sort((a, b) => a.deg - b.deg)) {
+        const hood = await hoodOf(f.at, used);
+        if (!hood) { missing = f; break; }
+        used.add(hood);
+        rows.push({ lat: f.at.lat, lng: f.at.lng, hood, deg: f.deg, d: Math.round(f.d * 100) / 100, dry: Math.round(f.dry) });
+      }
+      if (!missing) return pinned(cluster, rows, found);
+      pool = pool.filter(f => f !== missing);
     }
-    if (!best) return why;
-    const used = new Set<string>([nameOf(cluster)]), rows: { lat: number; lng: number; hood: string; deg: number; d: number; dry: number }[] = [];
-    let missing: typeof found[number] | null = null;
-    for (const f of best.t.sort((a, b) => a.deg - b.deg)) {
-      const hood = named.get(f) ?? await hoodOf(f.at, used);
-      if (!hood || used.has(hood)) { missing = f; break; }
-      named.set(f, hood); used.add(hood);
-      rows.push({ lat: f.at.lat, lng: f.at.lng, hood, deg: f.deg, d: Math.round(f.d * 100) / 100, dry: Math.round(f.dry) });
-    }
-    if (!missing) return rows;
-    pool = pool.filter(f => f !== missing);
   }
   return why;
 }
