@@ -117,7 +117,7 @@ static func dex_data(view: Dictionary) -> Dictionary:
 				hint = signpost(FishWorld._fish(str(f.id))) if signposts and n <= 0 else ""})
 		if not fish.is_empty(): sections.append({name = P0Logic.rarity_name(view, r), fish = fish})
 	return {got = got, total = dex.size(), next = _next_line(view, got, dex.size()), sections = sections,
-		badge = _badge(got)}
+		badge = badge_for(got)}
 
 ## Where an uncaught fish is (from Lv8): its first water, the one time it bites at if it bites at one alone, its level —
 ## `River · night · Lv9`, `Pond · Lv5`; no weather (a day's, and the Bite Board's to say). "" for an unknown fish.
@@ -132,7 +132,7 @@ static func signpost(f: Dictionary) -> String:
 	return " · ".join(parts)
 
 ## The badge a reached Fish-dex milestone gives (content fishing.dex_milestones: `Fish-dex complete` at 20), else "".
-static func _badge(got: int) -> String:
+static func badge_for(got: int) -> String:
 	var badge := ""
 	for m in P0Logic.content().get("fishing", {}).get("dex_milestones", []):
 		if got >= int(m.get("kinds", 0)) and str(m.get("badge", "")) != "": badge = str(m.badge)
@@ -185,7 +185,7 @@ static func _milestone_coins(kinds: int) -> int:
 ## otherwise only the rod's reach, which is what holds the rest back (P0's eight fish never reach 10 kinds; no
 ## "N more to find", the NeedTile already says it — 不知火舞 233 walkthrough).
 static func _next_line(view: Dictionary, got: int, total: int) -> Array:
-	if total > 0 and got >= total and _badge(got) != "": return [_badge(got), complete_gifts()]   # all found: the badge and what it gave
+	if total > 0 and got >= total and badge_for(got) != "": return [badge_for(got), complete_gifts()]   # all found: the badge and what it gave
 	for m in P0Logic.content().get("rewards", {}).get("fishdex", []):
 		if int(m[0]) > got and int(m[0]) <= total:
 			var coins := _milestone_coins(int(m[0]))   # P1: the coins with it (§6.9.2)

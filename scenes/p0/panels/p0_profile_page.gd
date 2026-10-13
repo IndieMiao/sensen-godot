@@ -145,6 +145,7 @@ static func profile_data(view: Dictionary) -> Dictionary:
 	var farm: Dictionary = p.get("farm", {})
 	var name := str(p.get("name", ""))
 	var dex: Array = view.get("fishing", {}).get("dex", [])
+	var caught := dex.filter(func(f): return int(f.get("caught", 0)) > 0).size()
 	var book := P0KitchenLogic.cookbook_progress(view)   # discovered pages / the pages shown (q(100))
 	return {
 		name = name if name != "" else "You",
@@ -154,8 +155,8 @@ static func profile_data(view: Dictionary) -> Dictionary:
 			level_line = "Level %d" % int(farm.level) if farm.has("level") else "",
 			status = _farm_status(view)},
 		collections = [
-			{key = "fish", name = "Fish", have = dex.filter(func(f): return int(f.get("caught", 0)) > 0).size(), need = dex.size(), icon = "fish_crucian",
-				badge = P0FishDex._badge(dex.filter(func(f): return int(f.get("caught", 0)) > 0).size()) != ""},   # its badge once all are caught
+			{key = "fish", name = "Fish", have = caught, need = dex.size(), icon = "fish_crucian",
+				badge = P0FishDex.badge_for(caught) != ""},   # its badge once all are caught (283 PROFILE-1-DEX)
 			{key = "pages", name = "Pages", have = book.x, need = book.y, icon = "recipe_card"},   # as the Cookbook tab (q(100))
 			# Cities (PROFILE-1, q(100)): cities reached, toward the Explorer medal next (§11.9.2: 3 / 10 / 30 / 100); opens PASS-1
 			{key = "cities", name = "Cities", have = cities_have(view), need = cities_need(view), icon = "passport"},
