@@ -149,6 +149,7 @@ func refresh() -> void:
 			c.stored = bool(it.get("stored", false))
 			c.liked = bool(it.get("liked", false))
 			c.gain = it.get("gain", null)
+			c.gain_hit = bool(it.get("gain_hit", false))
 		else:
 			c.icon = null
 			c.quantity = ""
@@ -162,6 +163,7 @@ func refresh() -> void:
 			c.stored = false
 			c.liked = false
 			c.gain = null
+			c.gain_hit = false
 	if selected_id != "" and _item(selected_id).is_empty():
 		clear_selection()
 	else:

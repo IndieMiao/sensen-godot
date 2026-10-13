@@ -98,7 +98,8 @@ const _LIKED_ICON := 14.0
 const _LIKED_INSET := 4.0
 const HEART_GLYPH := preload("res://assets/p0/icons/heart.svg")   # solid #E07A5F, the HP bar's heart
 ## The gift drawer's mark (RESIDENT-GIFT 1216:83527; 不知火舞 on 302 b308ee14): what giving this dish adds, a 17 px pill
-## centred 2 above the cell — `♥ +3` green on the primary tint at +2 and up, `♥ +1` grey ink on white, `−2` (the Mystery
+## centred 2 above the cell — `♥ +3` green on the primary tint when the dish is one this resident loves or likes
+## (gain_hit; 不知火舞 on 283: by the hit, not the number), any other `♥ +2` / `♥ +1` grey ink on white, `−2` (the Mystery
 ## Dish, no ♥) on the grey keys' fill; ExtraBold 10, padding 5 / 1, radius 8, a 1 px edgeStrong outline (Figma's unbound #D1CCC2, 不知火舞: the nearest token); kept while selected.
 const GAIN_H := 17.0
 const GAIN_GAP := 2.0
@@ -138,6 +139,8 @@ var stored := false: set = set_stored
 var liked := false: set = set_liked
 ## INVENTORY, the gift drawer: what giving this dish adds (int; null hides the mark), drawn over the cell.
 var gain = null: set = set_gain
+## The gift drawer: the dish is one this resident loves or likes — its mark is green.
+var gain_hit := false: set = set_gain_hit
 ## KITCHEN unknown pages: each slot's family, e.g. ["W", "S"] — one dot per slot in its colour (FAMILY_COLORS).
 var families: Array = []: set = set_families
 ## KITCHEN unknown pages: per slot, the clue that lit it — the ingredient's own icon, or family_icon() when the clue
@@ -207,6 +210,7 @@ func set_rack(v: bool) -> void: rack = v; _refresh()
 func set_stored(v: bool) -> void: stored = v; _refresh()
 func set_liked(v: bool) -> void: liked = v; _refresh()
 func set_gain(v) -> void: gain = v; _refresh()
+func set_gain_hit(v: bool) -> void: gain_hit = v; _refresh()
 func set_families(v: Array) -> void:
 	if v == families: return   # a grid refresh sets them on every cell
 	families = v
@@ -542,9 +546,10 @@ func _paint_gain(empty: bool) -> void:
 	_gain.visible = gain != null and not empty
 	if not _gain.visible: return
 	var n := int(gain)
-	var bg := UiTokens.COLOR_PRIMARY_TINT if n >= 2 else (UiTokens.COLOR_SURFACE_RAISED if n >= 0 else UiTokens.COLOR_DISABLED)
+	var hit := gain_hit and n > 0
+	var bg := UiTokens.COLOR_PRIMARY_TINT if hit else (UiTokens.COLOR_SURFACE_RAISED if n >= 0 else UiTokens.COLOR_DISABLED)
 	_gain.add_theme_stylebox_override(&"panel", UiStyleBox.make(bg, 8.0, _GAIN_OUTLINE, UiTokens.STROKE_DEFAULT).with_margins(5.0, 1.0, 5.0, 1.0))
-	_gain_label.add_theme_color_override(&"font_color", UiTokens.COLOR_PRIMARY if n >= 2 else UiTokens.COLOR_SECONDARY)
+	_gain_label.add_theme_color_override(&"font_color", UiTokens.COLOR_PRIMARY if hit else UiTokens.COLOR_SECONDARY)
 	_gain_label.text = ("♥ +%d" % n) if n >= 0 else ("−%d" % -n)
 
 ## Kitchen/Cell: DEFAULT keeps the plain cell (status label); the other
