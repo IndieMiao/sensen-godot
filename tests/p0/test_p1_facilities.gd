@@ -123,6 +123,28 @@ func test_placement_mode_takes_the_screen_and_gives_it_back() -> void:
 	assert_bool(ui._keys.visible).is_true()
 	assert_bool(ui.hud._row2.visible).is_true()
 
+## A card or drawer closing in placement mode (Decorate's piece card, the Compost Bin's, a drawer that opened Decorate)
+## leaves the main key, the switch key and the quick bar away (不知火舞 on 284, Figma DECOR-NONE-SELECTED 2243:33040 /
+## DECOR-PLACE: only Done or the place bar at the bottom; q(23): no labour while placing). Ending placement brings
+## them back.
+func test_a_card_closing_while_placing_keeps_the_farm_keys_away() -> void:
+	var ui := await _ui()
+	ui.begin_placement({"confirm": "Done"})
+	await await_idle_frame()
+	var card := ui.open_facility_card({"title": "Garden Lantern", "lead": "1×1 · Classic lamp", "button": "Move"}, func(): pass)
+	await await_idle_frame()
+	assert_object(card).is_not_null()
+	ui.close_modal()
+	await await_idle_frame()
+	assert_bool(ui.placing()).is_true()
+	assert_bool(ui._keys.visible).override_failure_message("the main key and ⇄ came back").is_false()
+	assert_bool(ui._bar.visible).override_failure_message("the quick bar came back").is_false()
+	assert_bool(ui._creel.visible).is_false()
+	assert_bool(ui._place_bar.visible).is_true()
+	ui.end_placement()
+	await await_idle_frame()
+	assert_bool(ui._keys.visible and ui._bar.visible).is_true()
+
 ## Decorate's 2×1 / 3×2 decor (不知火舞 on 284 ee15926a): spec.secondary adds a middle key in the secondary look,
 ## Cancel · Rotate · Place equally wide; it says placement_secondary. Without it the bar keeps its two keys.
 func test_the_bar_takes_an_optional_middle_key() -> void:
