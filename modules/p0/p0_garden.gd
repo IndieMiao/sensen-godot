@@ -238,10 +238,11 @@ static func plaque_point(bp: FarmBlueprint) -> Vector3:
 	return bp.cell_to_world(PLAQUE_CELL)
 
 ## The Chef's Sign (Homestead Lv10, §7.7; SGODOT-282): a free-standing hanging sign on a post (上官婉儿's prop shape,
-## 不知火舞 on 282) left of the door path as one faces the house, in the row the plaque stands on, left of it: the cells
-## nearer the door are the path (x 8–10) and the porch's (Lv5) and the plaque's (x 6–7, rows 13–14). Anchor `chef_sign`:
-## the post's foot, +Z toward the camera. Solid, one cell, only once the sign is up.
-const CHEF_SIGN_CELL := Vector2i(6, 14)
+## 不知火舞 on 282) left of the door, in the plaque's row, two cells left of it: the board hangs to the post's left, on the
+## grass left of the bench, clear of it on screen and tapped apart from it. Nearer the door are the path (x 8–10), the Lv3
+## front fence (row 13) and the plaque; one cell nearer, the board lay over the bench. Off the mine path (x 3–4).
+## Anchor `chef_sign`: the post's foot, +Z toward the camera. A yard object (no decor on it); solid once the sign is up.
+const CHEF_SIGN_CELL := Vector2i(5, 14)
 
 static func chef_sign_point(bp: FarmBlueprint) -> Vector3:
 	return bp.cell_to_world(CHEF_SIGN_CELL)

@@ -3,7 +3,7 @@ extends GdUnitTestSuite
 ## path as one faces the house, on a yard cell that is no bed, no path and nothing else's; up only from Lv10, then solid;
 ## its strip `Chef's Sign`, and a tap opens the facilities' small card with HOME-1's Lv10 line, no button.
 
-func test_its_cell_is_free_yard_left_of_the_door_path() -> void:
+func test_its_cell_is_yard_left_of_the_door_path_off_the_field_and_the_paths() -> void:
 	var c := P0Garden.CHEF_SIGN_CELL
 	var yard: Dictionary = P0Decor.yard()
 	var inside := func(rects: Array) -> bool:
@@ -11,9 +11,10 @@ func test_its_cell_is_free_yard_left_of_the_door_path() -> void:
 	assert_bool(P0Garden.WALK_RECT.has_point(c)).is_true()
 	assert_bool(inside.call(yard.get("field", []))).is_false()
 	assert_bool(inside.call(yard.get("paths", []))).is_false()
-	assert_bool(inside.call(yard.get("objects", []))).is_false()
+	assert_bool(inside.call(yard.get("objects", []))).is_true()   # its cell is a yard object: no decor on it (the server's too)
 	for k in P0Garden.FOOTPRINTS: assert_bool((P0Garden.FOOTPRINTS[k] as Rect2i).has_point(c)).is_false()
 	assert_int(c.x).is_less(P0Garden.PLAQUE_CELL.x)   # left of the plaque, so left of the path (x 8–10)
+	assert_int(c.x).is_greater(4)   # off the mine path (x 3–4)
 	assert_int(c.y).is_equal(P0Garden.PLAQUE_CELL.y)
 	var bp := P0Garden.blueprint()
 	assert_bool(bp.is_walkable(c)).is_true()

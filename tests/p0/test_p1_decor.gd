@@ -27,7 +27,8 @@ func test_every_footprint_and_plot_of_the_garden_is_off_the_yard() -> void:
 	var walk: Array = _yard().get("walk", [])
 	assert_that(Rect2i(int(walk[0]), int(walk[1]), int(walk[2]), int(walk[3]))).is_equal(P0Garden.WALK_RECT)   # q(145)
 	var bp := P0Garden.blueprint()   # the front fence, the sign, the plaque and the mailbox are objects too
-	for p in P0Garden.fence_block_points(bp) + [P0Garden.sign_point(bp), P0Garden.plaque_point(bp), P0Garden.mailbox_point(bp)]:
+	for p in P0Garden.fence_block_points(bp) + [P0Garden.sign_point(bp), P0Garden.plaque_point(bp), P0Garden.mailbox_point(bp),
+			P0Garden.chef_sign_point(bp)]:
 		var c := bp.world_to_cell(p)
 		assert_bool(_in("objects", c) or _in("field", c)).override_failure_message("object at %s" % str(c)).is_true()
 	for k in [P0Garden.ANCHORS.spawn, P0Garden.ANCHORS.exit]: assert_bool(_in("paths", k)).is_true()
@@ -51,7 +52,7 @@ func test_a_spot_is_judged_as_the_server_does() -> void:
 	for at in [Vector2i(9, 1), Vector2i(10, 0), Vector2i(8, 14), Vector2i(10, 13), Vector2i(13, 14), Vector2i(4, 13), Vector2i(17, 15)]:
 		assert_str(P0Decor.reason(v, "deco_planter", at)).override_failure_message(str(at)).is_equal("Keep the path clear")
 	assert_str(P0Decor.reason(v, "deco_bench", Vector2i(4, 15))).is_equal("")
-	assert_str(P0Decor.reason(v, "deco_bench", Vector2i(4, 14))).is_equal("Keep the path clear")
+	assert_str(P0Decor.reason(v, "deco_bench", Vector2i(3, 14))).is_equal("Keep the path clear")   # (4, 14) would reach the Chef's Sign's cell
 	v.decor.placed = [{"uid": 1, "id": "deco_bench", "x": 6, "y": 18, "rot": 0}]   # 2 × 1: cells 6–7, 18
 	assert_str(P0Decor.reason(v, "deco_planter", Vector2i(7, 18))).is_equal("Space taken")
 	assert_str(P0Decor.reason(v, "deco_bench", Vector2i(7, 18), 0, 1)).is_equal("")   # moving the bench itself

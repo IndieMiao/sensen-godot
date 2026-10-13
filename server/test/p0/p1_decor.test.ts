@@ -80,7 +80,7 @@ describe('placing in the yard', () => {
     for (const [x, y, where] of [[9, 1, 'spawn'], [10, 0, 'exit'], [8, 14, 'door'], [10, 13, 'door'], [13, 14, 'stall'], [4, 13, 'mine'], [17, 15, 'workbench']] as const)
       expect(refuse(s, { type: 'place_decor', item: 'deco_planter', x, y, ...HOME }), where).toMatchObject({ ok: false, code: 'decor_path' });
     expect(refuse(s, { type: 'place_decor', item: 'deco_bench', x: 4, y: 15, ...HOME })).toMatchObject({ ok: true });   // just off the mine path
-    expect(refuse(s, { type: 'place_decor', item: 'deco_bench', x: 4, y: 14, ...HOME })).toMatchObject({ ok: false, code: 'decor_path' });   // one cell on it
+    expect(refuse(s, { type: 'place_decor', item: 'deco_bench', x: 3, y: 14, ...HOME })).toMatchObject({ ok: false, code: 'decor_path' });   // on it (4, 14 would reach the Chef's Sign's cell)
     expect(refuse(s, { type: 'place_decor', item: 'deco_planter', x: 0, y: 18, ...HOME })).toMatchObject({ ok: false, code: 'decor_outside' });  // off the yard
     s = step(s, { type: 'place_decor', item: 'deco_bench', x: 6, y: 18, ...HOME }).s;   // 2 × 1: cells 6–7, 18
     expect(refuse(s, { type: 'place_decor', item: 'deco_planter', x: 7, y: 18, ...HOME })).toMatchObject({ ok: false, code: 'decor_overlap' });
