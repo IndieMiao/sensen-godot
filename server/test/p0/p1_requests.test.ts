@@ -189,8 +189,8 @@ describe('Stamp Run (§9.6.3 explore: check in at another outpost)', () => {
     expect(eligible(c, s, 'market')).not.toContain('req_sys_explore_outpost');
     s.homestead.level = 2;
     expect(eligible(c, s, 'market')).toContain('req_sys_explore_outpost');
-    expect(visitPlaces(c, 'market')).not.toContain('sh_market_1');
-    expect(visitPlaces(c, 'market').length).toBe(3);
+    expect(visitPlaces(c, 'market', null)).not.toContain('sh_market_1');
+    expect(visitPlaces(c, 'market', null).length).toBe(3);
   });
 
   it('a tracked Stamp Run checks in when the player enters its outpost, then pays 40 at the board', () => {

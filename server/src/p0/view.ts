@@ -26,6 +26,7 @@ import { restReadyIn } from './presence.js';
 import { inboxView, settleParcels } from './parcels.js';
 import { cookbookView, masteredCount } from './cookbook.js';
 import { litEvents, mapMarkers } from './markers.js';
+import { homeView } from './home_city.js';
 import { everFish, forecast, pondAt, pondFishIds, timeWord } from './fishing_world.js';
 import { trapsView } from './fish_trap.js';
 import { homeOf } from './travel.js';
@@ -59,6 +60,7 @@ export function viewOf(c: P0Content, input: P0State, now: number, opts: { online
     map_markers: mapMarkers(c, s, now),
     // §9.3.3 event venues lit now (from 2 h before until the end; their ★ is in map_markers): empty in the prototype
     event_venues: litEvents(c, now).map(e => ({ id: e.id, place: e.place, name: e.name, starts: e.starts, ends: e.ends })),
+    home: homeView(c, s, now),   // SGODOT-303: home city, pending pick, home set, the free change's window (home_city.ts)
     // Cross-city (v5, SGODOT-278, note 0fc0bc5e §2): home / here / passes / visits / stamps / fallback / explorer
     travel: { ...s.travel, today: dayKey(c, s, now),   // today: the day key stamps count on (Passport: first visits today 1/2)
       // MAP-8 Nearby cities: the state or province of each near10 city (`Salinas · California`); none for a city without
