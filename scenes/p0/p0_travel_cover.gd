@@ -26,9 +26,8 @@ var hint: Label
 var pill: PanelContainer
 ## The plane's: under P0Ui (10), over the map's own HUD (its pins and bubbles).
 const ROUTE_LAYER := 5
-## The route's z in the host's view: over its fog (FOG_Z), under its pins and bubbles (0) (q(152) ④).
+## The route's z in the host's view: over its fog (CityMapView.FOG_Z −2), under its pins and bubbles (0) (q(152) ④).
 const ROUTE_Z := -1
-const FOG_Z := -2
 
 ## The route and its end dots (in the host's view once adopted) and the plane (on ROUTE_LAYER).
 var route_view: Control
@@ -137,8 +136,6 @@ func adopt_route(view: Control) -> void:
 	route_view.get_parent().remove_child(route_view)
 	view.add_child(route_view)
 	route_view.z_index = ROUTE_Z
-	var fog = view.get("fog")
-	if fog is CanvasItem and (fog as CanvasItem).z_index > FOG_Z: (fog as CanvasItem).z_index = FOG_Z
 
 func _exit_tree() -> void:
 	if is_instance_valid(route_view) and route_view.get_parent() != null and not is_ancestor_of(route_view):

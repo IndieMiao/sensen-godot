@@ -2195,6 +2195,8 @@ func _counter_action(role: String, action: StringName, id: String, payload: Dict
 		&"buy": command.emit({"type": "buy", "item": id, "qty": int(payload.get("qty", 1)), "shop": role})
 		&"sell": command.emit({"type": "sell", "item": id, "qty": payload.get("qty", 1), "shop": role})
 		&"drink": command.emit({"type": "drink", "item": id, "shop": role})
+		# q(166): 2 regional items for 1 mineral; the server reads the climate where the player stands
+		&"barter": command.emit({"type": "barter", "item": str(payload.get("item", "")), "mineral": id, "shop": role})
 		&"lock", &"unlock": command.emit({"type": String(action), "item": id})
 		_: push_warning("P0 counter: no command for %s" % action)
 
@@ -3202,6 +3204,18 @@ func show_title(spec: Dictionary) -> void:
 	m.tone = UiRewardMoment.Tone.MILESTONE
 	m.event = str(spec.get("event", ""))
 	m.icon = P0Logic.icon("cookbook")
+	m.item_name = str(spec.get("item_name", ""))
+	m.strip = str(spec.get("strip", ""))
+	show_moment(m)
+
+## A Fish-dex milestone (§6.9.2; 不知火舞 on 283): the same RewardMoment Milestone as a Cookbook title, no buttons —
+## `Fish-dex 10/20` over the kind that made it, or `Fish-dex complete` · `20/20` (P0FishDex.milestone_card). Queued after
+## the catch's card like a level-up.
+func show_dex_milestone(spec: Dictionary) -> void:
+	var m := UiRewardMoment.new()
+	m.tone = UiRewardMoment.Tone.MILESTONE
+	m.event = str(spec.get("event", ""))
+	m.icon = P0Logic.icon(str(spec.get("icon", "fish_crucian")))
 	m.item_name = str(spec.get("item_name", ""))
 	m.strip = str(spec.get("strip", ""))
 	show_moment(m)

@@ -133,6 +133,30 @@ static func biting_more(place: Dictionary, level: int, caught: Dictionary) -> St
 	if rows.size() > 2: text += " · +%d" % (rows.size() - 2)
 	return text
 
+## From Fishing Lv8 the pond card's line is Biting now instead (§4.6.2, §6.2.x; 不知火舞 on 283, q row by 李白): the
+## landable fish in the pool now, best factor first (time now × today's weather, as Biting more), at most 2 named and
+## ` · +N more` for the rest, no factors; an uncaught regional fish is `?`. "" when none (the row hides).
+const BITING_NOW_LEVEL := 8
+static func biting_now(place: Dictionary, level: int, caught: Dictionary) -> String:
+	var part := part_now(place)
+	var weather := str(place.get("weather", ""))
+	var rows: Array = []
+	for id in place.get("fish", []):
+		var f := FishWorld._fish(str(id))
+		if f.is_empty() or int(f.get("level", 1)) > level or not FishWorld.bites_at(f, part): continue
+		var t = f.get("time", null)
+		var k := float(t.get(part, 1.0)) if t is Dictionary and part != "day" else 1.0
+		rows.append({"f": f, "k": k * float(f.get("weather", {}).get(weather, 1.0))})
+	if rows.is_empty(): return ""
+	rows.sort_custom(func(a, b): return float(a.k) > float(b.k) if not is_equal_approx(float(a.k), float(b.k)) else str(a.f.id) < str(b.f.id))
+	var names := PackedStringArray()
+	for r in rows.slice(0, 2):
+		var hide := bool(r.f.get("regional", false)) and int(caught.get(str(r.f.id), 0)) <= 0
+		names.append("?" if hide else str(r.f.get("name", r.f.id)))
+	var text := ", ".join(names)
+	if rows.size() > 2: text += " · +%d more" % (rows.size() - 2)
+	return text
+
 ## The Forecast fact (Lv3+): [[day, weather icon]] × 3, from the view's place.forecast; [] below Lv3.
 static func forecast(place: Dictionary, level: int) -> Array:
 	if level < FORECAST_LEVEL: return []

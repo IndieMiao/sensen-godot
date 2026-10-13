@@ -25,8 +25,13 @@ static func info(view: Dictionary, pond_id: String, km: float) -> Dictionary:
 	var facts: Array = [["Distance", distance], ["Recommended", "Outleveled" if outleveled(view, pond_id) else str(RECOMMENDED.get(template, ""))]]
 	var now: Dictionary = view.get("fishing", {}).get("places", {}).get(pond_id, {})
 	var level := int(view.get("skills", {}).get("fishing", {}).get("level", 1))
-	var more := Board.biting_more(now, level, view.get("fishing", {}).get("caught", {}))
-	if more != "": facts.append(["Biting more", more])
+	var caught: Dictionary = view.get("fishing", {}).get("caught", {})
+	if level >= Board.BITING_NOW_LEVEL:   # one line: Biting now replaces Biting more from Lv8 (不知火舞 on 283)
+		var now_fish := Board.biting_now(now, level, caught)
+		if now_fish != "": facts.append(["Biting now", now_fish])
+	else:
+		var more := Board.biting_more(now, level, caught)
+		if more != "": facts.append(["Biting more", more])
 	var days := Board.forecast(now, level)
 	if not days.is_empty(): facts.append(["Forecast", days])   # [[day, weather icon]] × 3: the sheet draws the icons
 	var trap := Trap.pond_fact(view, pond_id)
