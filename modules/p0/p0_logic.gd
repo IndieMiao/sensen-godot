@@ -1135,10 +1135,13 @@ const CONVENIENCE_NAMES := {"cook_again": "Cook Again", "clue_double": "Double C
 	"steady_hand_2": "Steady Hand II", "fast_mastery": "Fast Mastery", "cook_all": "Cook All", "provisions_plus": "Bigger Provisions",
 	"chefs_touch": "Chef's Touch", "title_chef": "Chef title", "lucky_double": "Lucky Double"}
 const LEVEL_TIP := "Levels unlock gear, fish and seeds. Basics never lock."
-## Levels that change the day say so on the banner's Tip instead of the next level (§4.8.3, q(69)). Fishing Lv4 from
-## §14's fishing copy (`Today changes: River is your water now`: §4.6.2 Lv4, the day moves from the Pond to the River).
+## Levels that change the day say so on the banner's Tip instead of the next level (§4.8.3, q(69)); the nine of them
+## (Farming 6 / 7 / 8, Fishing 4 / 5 / 6 / 8 / 9, Cooking 4) as q(176) words them, from §4.6's "the day's difference".
 const DAY_CHANGES := {"cooking:4": "Today changes: 3-ingredient dishes", "farming:6": "Today changes: no more watering",
-	"fishing:4": "Today changes: River is your water now"}
+	"farming:7": "Today changes: fruit every two days", "farming:8": "Today changes: grow any climate's crops",
+	"fishing:4": "Today changes: River is your water now", "fishing:5": "Today changes: traps fish for you",
+	"fishing:6": "Today changes: Coast is your water now", "fishing:8": "Today changes: two traps to check",
+	"fishing:9": "Today changes: eels bite at night"}
 ## The day-changing level's action (q(59) §1.6): [label, banner action id].
 const DAY_ACTIONS := {"farming:6": ["Show Workbench", "show_workbench"]}
 
@@ -1191,7 +1194,10 @@ static func level_banner(view: Dictionary, ev: Dictionary, first := false) -> Di
 
 ## What a skill level opens this season: Farming — the crops of that gate (main ingredients first), then other stall
 ## goods and tools (Compost, Row Hoe); Fishing — the fish of that level; Cooking — the conveniences of that level.
-const FARMING_CONVENIENCE_NAMES := {"harvest_all": "Harvest All", "seed_saver": "Seed Saver"}   # §4.6.1 / glossary (Plot Marks, Sow Again … come later)
+const FARMING_CONVENIENCE_NAMES := {"harvest_all": "Harvest All", "seed_saver": "Seed Saver"}
+## Fishing's conveniences (content fishing.conveniences; §4.6.2, q(178) ③): the 3-day Forecast, Gift Clues and the pond
+## card's Biting now (q(168)). Quick Recast comes once it is made (q(178) ④).
+const FISHING_CONVENIENCE_NAMES := {"three_day_forecast": "3-day Forecast", "gift_clue_highlight": "Gift Clues", "biting_now": "Biting now"}   # §4.6.1 / glossary (Plot Marks, Sow Again … come later)
 
 static func level_unlocks(view: Dictionary, skill: String, level: int) -> Array:
 	var out: Array = []
@@ -1231,11 +1237,15 @@ static func level_unlocks(view: Dictionary, skill: String, level: int) -> Array:
 			for r in content().get("fishing", {}).get("rods", []):
 				if int(r.get("level", 1)) == level and int(r.get("price", 0)) > 0: out.append(str(r.get("name", "")))
 			# a level that adds a trap (content fishing.trap.slots, §4.6.2: Lv8 the 2nd, Lv10 the 3rd; the first is the
-			# Fish Trap itself, bought at Lv5 above): `2nd Fish Trap` (SGODOT-286 e89ae800: Lv8 and Lv10 had no row)
+			# Fish Trap itself, bought at Lv5 above): `2nd Fish Trap` (q(178) ①; 286 e89ae800: Lv8 and Lv10 had no row)
 			for at in content().get("fishing", {}).get("trap", {}).get("slots", []):
 				if int(at[0]) == level and int(at[1]) >= 2:
 					out.append("%s %s" % [P0KitchenLogic.ordinal(int(at[1])), str(goods.get("trap_fish", {}).get("name", "Fish Trap"))])
 			if regional: out.append(REGIONAL_FISH)
+			# then the level's conveniences, as Farming and Cooking list theirs (q(178) ③: `Lv8 · 2nd Fish Trap, Biting now`)
+			var conv: Dictionary = content().get("fishing", {}).get("conveniences", {})
+			for k in conv:
+				if int(conv[k]) == level: out.append(str(FISHING_CONVENIENCE_NAMES.get(k, k)))
 		"cooking":
 			var conv: Dictionary = content().get("cooking", {}).get("conveniences", {})
 			for k in conv:

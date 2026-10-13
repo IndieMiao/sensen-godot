@@ -187,16 +187,22 @@ func test_floats_rise_under_a_moment_card() -> void:
 	var f: Node = ui.root.get_children().filter(func(c): return c is UiFloatText).back()
 	assert_int(f.get_index()).is_less(ui._modal.get_index())
 
-## Fishing Lv4 changes the day (§4.6.2: the day moves to the River; §14's copy): its Tip says so instead of the next
-## level. Lv7 and Lv9 name the trap the next level adds (`Next Lv10 · 3rd Fish Trap`, not a bare `Next Lv10 · 886 XP`;
-## 286 e89ae800).
-func test_fishing_lv4_changes_the_day_and_the_trap_levels_are_named_ahead() -> void:
+## The nine levels that change the day (q(176)): their Tip says so instead of the next level. The others still name the
+## next one, the traps too (`Next Lv8 · 2nd Fish Trap, Biting now`, not a bare `Next Lv8 · 550 XP`; 286 e89ae800, q(178)).
+func test_the_nine_day_changing_levels_say_so_and_the_trap_levels_are_named_ahead() -> void:
 	var v := _view()
-	var four := P0Logic.level_banner(v, {"skill": "fishing", "level": 4, "energy": 0, "gifts": []})
-	assert_str(four.tip).is_equal("Today changes: River is your water now")
+	var said := {}
+	for key in ["farming:6", "farming:7", "farming:8", "fishing:4", "fishing:5", "fishing:6", "fishing:8", "fishing:9", "cooking:4"]:
+		var parts: PackedStringArray = key.split(":")
+		said[key] = P0Logic.level_banner(v, {"skill": parts[0], "level": int(parts[1]), "energy": 0, "gifts": []}).tip
+	assert_dict(said).is_equal({"farming:6": "Today changes: no more watering", "farming:7": "Today changes: fruit every two days",
+		"farming:8": "Today changes: grow any climate's crops", "fishing:4": "Today changes: River is your water now",
+		"fishing:5": "Today changes: traps fish for you", "fishing:6": "Today changes: Coast is your water now",
+		"fishing:8": "Today changes: two traps to check", "fishing:9": "Today changes: eels bite at night",
+		"cooking:4": "Today changes: 3-ingredient dishes"})
+	for t in said.values(): assert_int((t as String).length()).is_less_equal(39)   # q(176): fits the Tip line
 	var th: Array = P0Logic.content().get("skills", {}).get("fishing", [])
-	v.skills.fishing = {"level": 9, "xp": int(th[8])}
-	var nine := P0Logic.level_banner(v, {"skill": "fishing", "level": 9, "energy": 0, "gifts": []})
-	assert_str(nine.tip).is_equal("Next Lv10 · 3rd Fish Trap · %d XP" % (int(th[9]) - int(th[8])))
 	v.skills.fishing = {"level": 7, "xp": int(th[6])}
-	assert_str(P0Logic.level_banner(v, {"skill": "fishing", "level": 7, "energy": 0, "gifts": []}).tip).starts_with("Next Lv8 · 2nd Fish Trap · ")
+	assert_str(P0Logic.level_banner(v, {"skill": "fishing", "level": 7, "energy": 0, "gifts": []}).tip) \
+		.is_equal("Next Lv8 · 2nd Fish Trap, Biting now · %d XP" % (int(th[7]) - int(th[6])))
+	assert_str(P0Logic.level_banner(v, {"skill": "fishing", "level": 3, "energy": 0, "gifts": []}).tip).starts_with("Next Lv4 · ")
