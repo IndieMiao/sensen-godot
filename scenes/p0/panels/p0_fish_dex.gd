@@ -28,8 +28,11 @@ const _MILESTONE_H := 77.0   # 安其拉 1699:102375: 40 → 77 with the NeedTil
 const _MILESTONE_PAD := Vector2(8.0, 4.0)
 const _MILESTONE_TEXT_X := 100.0
 const _SILHOUETTE := "fish_unknown"
-const _BADGE := 24.0   # the Fish-dex badge in the heading row, at (64, 1) of it (283 FISH-6-COMPLETE, Figma 9c93e46e)
-const _BADGE_AT := Vector2(64, 1)
+## The Fish-dex badge in the heading row (283 FISH-6-COMPLETE; 不知火舞 9c93e46e / 382b72c2): 24, 6 right of the title's
+## ink (Figma's x 64 = its 58 + 6: the gap is the intent), y 1.
+const _BADGE := 24.0
+const _BADGE_GAP := 6.0
+const _BADGE_Y := 1.0
 ## From this Fishing level a silhouette says where to go (§6.9.1 路标; 不知火舞 on 283).
 const SIGNPOST_LEVEL := 8
 ## Only a fish that bites at one time alone says it: the others are only likelier then (不知火舞 on 283).
@@ -60,7 +63,10 @@ func _init(view: Dictionary = {}, fresh: Array = []) -> void:
 		badge.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		badge.custom_minimum_size = Vector2.ONE * _BADGE
 		badge.size = badge.custom_minimum_size
-		badge.position = _BADGE_AT
+		# the title's ink width as it is drawn: its font comes with the drawer's theme after this, so follow its minimum size
+		var follow := func(): badge.position = Vector2(title.get_minimum_size().x + _BADGE_GAP, _BADGE_Y)
+		title.minimum_size_changed.connect(follow)
+		follow.call()
 		badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		heading.add_child(badge)
 	var close := UiNavButton.new("Close", true)

@@ -208,6 +208,7 @@ func test_the_complete_dex_shows_its_badge_by_the_heading() -> void:
 	await await_idle_frame()
 	var badge := _dex().find_child("DexBadge", true, false) as TextureRect
 	assert_object(badge).is_not_null()
-	assert_vector(badge.size).is_equal(Vector2(24, 24))   # 安其拉's mark, 24 at (64, 1) of the heading row (283 9c93e46e)
-	assert_vector(badge.position).is_equal(Vector2(64, 1))
+	assert_vector(badge.size).is_equal(Vector2(24, 24))   # 安其拉's mark, 24, 6 right of the title's ink, y 1 (283 382b72c2)
+	var title := _dex().find_children("*", "Label", true, false).filter(func(l): return (l as Label).text == "Fish-dex").front() as Label
+	assert_vector(badge.position).is_equal(Vector2(title.get_minimum_size().x + 6, 1))
 	assert_str(str(badge.texture.get_meta("ui_source", ""))).is_equal("res://assets/ui/icons/game/i-badge-fishdex.svg")
