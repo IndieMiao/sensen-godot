@@ -4,7 +4,8 @@ extends Node
 ## (world.keeper_looks). texture() answers at once with a blank picture that the renderer fills in a few frames later;
 ## the card and the bar show it as soon as it is drawn (a TextureRect redraws when its texture changes). The four
 ## hand-painted keepers (Ama, Finn, Mei, Sigrid) keep their art: P0CounterDrawer.keeper_portrait asks here only when no
-## file exists. Drawn once per look and use; the most recent CARD_LIMIT cards and HEAD_LIMIT heads are kept (a card is
+## file exists; a generated keeper's outpost asks for both as it opens, so they are drawn before the card or bar is.
+## Drawn once per look and use; the most recent CARD_LIMIT cards and HEAD_LIMIT heads are kept (a card is
 ## ~770 KB, a head ~270 KB: about 12 MB at most, 上官婉儿 on #339), an older one is drawn again when asked for.
 ##
 ## The stage is AvatarFocusButton's (one rig in its own SubViewport, orthographic camera, a soft sun and ambient):
@@ -18,6 +19,7 @@ const TURN := 0.32   # a three-quarter view, as the painted keepers stand
 const CARD_SKY := Color("e4f1ee")   # the card's backdrop: the painted cards stand in a scene, never on white
 const FIGURE := 0.86   # hat to shoes, of the card's height (不知火舞 on #339: 84–88 %)
 const FEET_GAP := 12.0 / 220.0   # the shoes this far above the card's foot (10–14 px of the 220)
+const WIDE := 0.98   # a figure that fills the width keeps a hair's margin: its anti-aliased edge is never cut (周瑜 on #339)
 const CARD_LIMIT := 8
 const HEAD_LIMIT := 24
 const BUSY_FRAMES := 120   # a part that never loads is drawn without, not waited on for ever (周瑜 on #339)
@@ -55,6 +57,10 @@ static func _trim(card: bool) -> void:
 	var suffix := "|card" if card else "|head"
 	var mine := _cache.keys().filter(func(k): return str(k).ends_with(suffix))
 	while mine.size() > (CARD_LIMIT if card else HEAD_LIMIT): _cache.erase(mine.pop_front())
+
+## Whether a look's picture is kept (tests).
+static func cached(look: String, card: bool) -> bool:
+	return _cache.has("%s|%s" % [look, "card" if card else "head"])
 
 ## How many pictures of a use are kept (tests).
 static func kept(card: bool) -> int:
@@ -131,12 +137,12 @@ func _render() -> Image:
 
 ## The card's camera from the figure's outline (pixels) in a first picture taken with camera size `size` (metres of
 ## height): {size, right, down}, the size and how far the camera moves in its own plane so the figure is FIGURE of the
-## height, its shoes FEET_GAP above the foot and its outline centred; a figure too wide for that (a wide hat) fills the
-## width instead, touching the sides, never cut.
+## height, its shoes FEET_GAP above the foot and its outline centred; a figure too wide for that (a wide hat) fills
+## WIDE of the width instead, never cut.
 static func card_frame(outline: Rect2i, size: float) -> Dictionary:
 	var per_px := size / CARD.y
 	var aspect := float(CARD.x) / float(CARD.y)
-	var final := maxf(outline.size.y * per_px / FIGURE, outline.size.x * per_px / aspect)
+	var final := maxf(outline.size.y * per_px / FIGURE, outline.size.x * per_px / aspect / WIDE)
 	return {
 		"size": final,
 		"right": (outline.position.x + outline.size.x * 0.5 - CARD.x * 0.5) * per_px,

@@ -143,6 +143,8 @@ func _spawn_npcs() -> void:
 		if looks.has(str(keeper.look)):
 			data = data.duplicate()
 			data[cast.npc_keeper] = {"name": str(keeper.get("name", "")), "scale": 1.0, "slots": looks[str(keeper.look)]}
+			# their portraits are drawn now, so the greeting card and the counter's keeper bar open on them (SGODOT-300)
+			for card in [true, false]: P0CounterDrawer.keeper_portrait(str(keeper.get("name", "")), card, str(keeper.look))
 	for id in outpost.get("residents", []):
 		var def: Dictionary = data.get(str(id), {})
 		if def.has("anchor"): cast[str(def.anchor)] = str(id)

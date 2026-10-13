@@ -382,12 +382,12 @@ func test_keeper_card_frames_the_figure_by_its_outline() -> void:
 	assert_float(share).is_between(0.84, 0.88)
 	assert_float((H - feet.y) / 3.0).is_between(10.0, 14.0)   # 3× the 220 portrait
 	assert_float((top.x + feet.x) * 0.5).is_equal_approx(W * 0.5, 0.5)
-	# a wide hat: the width decides, the figure spans it exactly
+	# a wide hat: the width decides, the figure spans 98 % of it (a pixel or so each side, 周瑜 on #339)
 	var wide := Rect2i(20, 150, 260, 300)
 	frame = portraits.card_frame(wide, 2.0)
 	var left: Vector2 = at.call(frame, wide.position.x, wide.position.y)
 	var right: Vector2 = at.call(frame, wide.end.x, wide.end.y)
-	assert_float(left.x).is_equal_approx(0.0, 0.5)
-	assert_float(right.x).is_equal_approx(W, 0.5)
+	assert_float(left.x).is_between(2.0, 4.0)
+	assert_float(right.x).is_between(W - 4.0, W - 2.0)
 	assert_float((H - right.y) / 3.0).is_between(10.0, 14.0)
 	assert_float((right.y - left.y) / H).is_less(0.84)

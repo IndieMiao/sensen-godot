@@ -714,3 +714,7 @@ func test_a_generated_keeper_wears_their_look_preset() -> void:
 	var rig: AvatarRig = (r.npcs.npc_keeper.root as Node).find_children("*", "AvatarRig", true, false)[0]
 	var worn: Dictionary = rig.get("_desired")
 	for slot in look: assert_str(str(worn.get(StringName(slot), ""))).is_equal(str(look[slot]))
+	# SGODOT-300: their greeting card's figure and keeper bar head are asked for as the outpost opens, before either shows
+	var portraits = load("res://modules/p0/p0_keeper_portraits.gd")
+	assert_bool(portraits.cached("tea_temperate_1", true)).is_true()
+	assert_bool(portraits.cached("tea_temperate_1", false)).is_true()
