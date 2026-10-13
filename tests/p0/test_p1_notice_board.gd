@@ -105,6 +105,7 @@ func test_a_marked_row_and_late_online_counts() -> void:
 	assert_object(market.find_child("Reason", true, false)).is_not_null()
 	assert_object(market.find_child("Line", true, false)).is_null()
 	d.call("set_online", {"sh_market_1": 2})
+	await get_tree().process_frame   # the old rows go at the end of the frame
 	market = d.find_child("Row_sh_market_1", true, false) as Node
 	assert_str(((market.find_child("Online", true, false) as Node).find_child("Count", true, false) as Label).text).is_equal("2")
 
