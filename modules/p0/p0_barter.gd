@@ -38,9 +38,9 @@ static func pick(view: Dictionary) -> Dictionary:
 		if int(it.get("have", 0)) >= give and (best.is_empty() or int(it.have) > int(best.have)): best = it
 	return best
 
-## One row per mineral: {id, title, effect (`For 2 Sweet Potato` / `For 2 regional crops or fish`), gate
-## (`3 of 6 left this level`), price (`2 items`), button (`Barter`), reason ("" when it can go; else the grey key's
-## words), cmd ({} when it cannot)}.
+## One row per mineral: {id, title, effect (`For 2 Sweet Potato` / `For 2 regional items`, the grey key's word,
+## 不知火舞 on #364), gate (`3 of 6 left this level`), price (`2 items`), button (`Barter`), reason ("" when it can go;
+## else the grey key's words), cmd ({} when it cannot)}.
 static func rows(view: Dictionary) -> Array:
 	var b := block(view)
 	if b.is_empty(): return []
@@ -50,7 +50,7 @@ static func rows(view: Dictionary) -> Array:
 	for m in b.get("minerals", []):
 		var room := int(m.get("room", 0))
 		var row := {id = str(m.get("id", "")), title = str(m.get("name", "")),
-			effect = ("For %d %s" % [give, str(item.name)]) if not item.is_empty() else ("For %d regional crops or fish" % give),
+			effect = ("For %d %s" % [give, str(item.name)]) if not item.is_empty() else ("For %d regional items" % give),
 			gate = "%d of %d left this level" % [room, int(m.get("share", room))],
 			price = "%d items" % give, button = "Barter", reason = "", cmd = {}}
 		if limit_reached(view): row.reason = MAX_LEFT_REASON % P0Logic.span(float(b.get("resets_in", 0)))

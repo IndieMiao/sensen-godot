@@ -26,7 +26,7 @@ func test_the_group_reads_as_the_spec() -> void:
 
 func test_the_grey_keys() -> void:
 	var none := P0Barter.rows(_view(2, [{"id": "crop_sweet_potato", "name": "Sweet Potato", "have": 1}]))
-	assert_str(str(none[0].effect)).is_equal("For 2 regional crops or fish")
+	assert_str(str(none[0].effect)).is_equal("For 2 regional items")
 	assert_str(str(none[0].reason)).is_equal("Need 2 regional items")
 	assert_that(P0Barter.header(_view(0))).is_equal({title = "Barter · 2 for 1", quota = "Limit reached · resets in 9h 12m", red = true})   # BARTER-2: the quota part, red
 	assert_bool(P0Barter.limit_reached(_view(0))).is_true()
