@@ -340,3 +340,49 @@ func test_leaving_during_the_stamp_brings_no_card() -> void:
 	rt.ui.clear_toast()
 	rt.session.view = saved
 	rt.ui.set_view(saved)
+
+## q(152) ③: far trips frame both ends in the safe area at the top — out as far as it takes, down to z 0.8 (near a
+## whole-world view); a pair that does not fit even there stops at 0.8. The camera's centre far out is kept off the
+## world's edges as Mapbox keeps it (#327), and the fit allows for that.
+func test_a_long_trip_frames_both_ends_in_the_safe_area_down_to_0_8() -> void:
+	var view := Vector2(360, 800)
+	var safe := Rect2(32, 140, 296, 560)
+	var sf := Vector2(37.77, -122.42)
+	var tokyo := Vector2(35.68, 139.69)
+	var f := P0TravelFlight.plan(sf.x, sf.y, 9.0, 0.0, sf, tokyo.x, tokyo.y, 11.0, 0.0, view, safe)
+	assert_float(f.top_zoom()).is_greater_equal(P0TravelFlight.TOP_MIN_ZOOM)
+	assert_float(f.top_zoom()).is_less(2.0)   # past the city map's floor
+	var a := Vector2(MapGeoMath.mercator_x(sf.y), MapGeoMath.mercator_y(sf.x))
+	var b := Vector2(MapGeoMath.mercator_x(tokyo.y), MapGeoMath.mercator_y(tokyo.x))
+	var mid := Vector2(a.x + (fposmod(b.x - a.x + 0.5, 1.0) - 0.5) * 0.5, (a.y + b.y) * 0.5)
+	assert_bool(P0TravelFlight.frames(a, b, mid, f.top_zoom(), view, safe)).is_true()
+	assert_bool(P0TravelFlight.frames(a, b, mid, f.top_zoom() + 0.1, view, safe)).is_false()   # the closest that does
+	# San Francisco to Cape Town does not fit even at 0.8: it stops there
+	var cape := Vector2(-33.92, 18.42)
+	var g := P0TravelFlight.plan(sf.x, sf.y, 9.0, 0.0, sf, cape.x, cape.y, 11.0, 0.0, view, safe)
+	assert_float(g.top_zoom()).is_equal_approx(P0TravelFlight.TOP_MIN_ZOOM, 1e-6)
+	assert_float(P0TravelFlight.TOTAL_S).is_equal(3.0)   # however far: 3 s
+
+## The map goes past its floor (z 2) only in the air, and lands on the city's overview.
+func test_the_map_goes_out_past_its_floor_only_in_the_air() -> void:
+	var m := _map()
+	for i in 3: await get_tree().process_frame
+	m.set_process(false)
+	var rt: P0Runtime = m.rt
+	var saved := _ready_to_arrive(m)
+	assert_float(m._minimum_zoom()).is_equal(2.0)
+	m.center_lat = 37.77
+	m.center_lng = -122.42
+	m._set_zoom(9.0)
+	P0CityPlaces.accept(TOKYO, load("res://tests/p0/test_p0_city_places.gd").CITY)
+	m.on_arrival({kind = "arrival", cluster = TOKYO, first = false, trip = 6, km = 8271})
+	assert_float(m._minimum_zoom()).is_less(2.0)
+	await get_tree().create_timer(1.0).timeout   # at the top
+	assert_float(m.zoom).is_less(2.0)
+	await get_tree().create_timer(2.4).timeout   # landed
+	assert_bool(m.travelling()).is_false()
+	assert_float(m._minimum_zoom()).is_equal(2.0)
+	assert_float(m.zoom).is_greater_equal(2.0)
+	rt.ui.clear_toast()
+	rt.session.view = saved
+	rt.ui.set_view(saved)

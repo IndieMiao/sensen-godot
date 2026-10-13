@@ -11,8 +11,11 @@ const FLY_S := 2.0
 const DOWN_S := 0.5
 const TOTAL_S := UP_S + FLY_S + DOWN_S
 
-## The overview is never further out than this, nor closer in than a step under the nearer of the two ends.
-const TOP_MIN_ZOOM := 1.5
+## The overview is never further out than this (q(152) ③: near a whole-world view; a pair nearly opposite on the globe
+## stops here, its route coming in from the edge), nor closer in than a step under the nearer of the two ends.
+const TOP_MIN_ZOOM := 0.8
+## How finely the overview's zoom is searched.
+const FIT_STEP := 0.05
 
 var _c0: Vector2   # mercator x, y
 var _mid: Vector2
@@ -23,9 +26,11 @@ var _z1 := 0.0
 var _b0 := 0.0
 var _turn := 0.0
 
-## from_*: the camera now; left: the city left (lat, lng); to_*: the overview ahead. view: the map's logical size.
+## from_*: the camera now; left: the city left (lat, lng); to_*: the overview ahead. view: the map's logical size;
+## safe: where both ends must stand at the top, in the same units (q(152) ③: 32 in from each side, from the pill's
+## bottom to the Bag key's top); none: the middle 70 % × 55 %.
 static func plan(from_lat: float, from_lng: float, from_zoom: float, from_bearing: float, left: Vector2,
-		to_lat: float, to_lng: float, to_zoom: float, to_bearing: float, view: Vector2) -> P0TravelFlight:
+		to_lat: float, to_lng: float, to_zoom: float, to_bearing: float, view: Vector2, safe := Rect2()) -> P0TravelFlight:
 	var f := P0TravelFlight.new()
 	f._c0 = _merc(from_lat, from_lng)
 	f._c1 = _merc(to_lat, to_lng)
@@ -33,17 +38,34 @@ static func plan(from_lat: float, from_lng: float, from_zoom: float, from_bearin
 	var dx := fposmod(f._c1.x - a.x + 0.5, 1.0) - 0.5   # the short way round
 	var dy := f._c1.y - a.y
 	f._mid = Vector2(a.x + dx * 0.5, a.y + dy * 0.5)
-	# both ends in view, with room for the pill and the HUD: 70 % of the width, 55 % of the height
-	var fit := INF
-	if absf(dx) > 1e-9: fit = minf(fit, log(0.7 * view.x / (512.0 * absf(dx))) / log(2.0))
-	if absf(dy) > 1e-9: fit = minf(fit, log(0.55 * view.y / (512.0 * absf(dy))) / log(2.0))
 	f._z0 = from_zoom
 	f._z1 = to_zoom
-	var high := minf(from_zoom, to_zoom) - 1.0   # a step out at least; from far out already (z ≈ 2) it may be under 1.5 (周瑜 on #325)
-	f._top = clampf(fit, minf(TOP_MIN_ZOOM, high), high)
+	# The closest zoom (a step out at least) that shows both ends in the safe area, the camera over their middle as the
+	# map draws it far out — its centre kept off the world's top and bottom edges as Mapbox keeps it (#327).
+	var area := safe if safe.has_area() else Rect2(view * Vector2(0.15, 0.225), view * Vector2(0.7, 0.55))
+	var high := minf(from_zoom, to_zoom) - 1.0   # from far out already (z ≈ 2) it may be under the floor (周瑜 on #325)
+	var low := minf(TOP_MIN_ZOOM, high)
+	f._top = low
+	var z := high
+	while z >= low:
+		if frames(a, f._c1, f._mid, z, view, area):
+			f._top = z
+			break
+		z -= FIT_STEP
 	f._b0 = from_bearing
 	f._turn = wrapf(to_bearing - from_bearing, -180.0, 180.0)
 	return f
+
+## Whether at zoom `z`, the camera over `mid` (Mercator x, y; its y kept off the world's edges), both `a` and `b` stand in
+## `area` of a `view` (the map's logical size).
+static func frames(a: Vector2, b: Vector2, mid: Vector2, z: float, view: Vector2, area: Rect2) -> bool:
+	var scale := 512.0 * pow(2.0, z)
+	var half := view.y * 0.5 / scale
+	var c := Vector2(mid.x, 0.5 if half >= 0.5 else clampf(mid.y, half, 1.0 - half))
+	for p in [a, b]:
+		var d := Vector2(fposmod((p as Vector2).x - c.x + 0.5, 1.0) - 0.5, (p as Vector2).y - c.y)
+		if not area.has_point(view * 0.5 + d * scale): return false
+	return true
 
 ## The camera at `t` seconds: Vector4(lat, lng, zoom, bearing).
 func sample(t: float) -> Vector4:

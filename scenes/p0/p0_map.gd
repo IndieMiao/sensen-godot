@@ -855,15 +855,22 @@ func _travel_fly(to: Dictionary, left: Vector2, held: String, city: String, km: 
 	if _flight != null: _flight.kill()
 	var vp := get_viewport().get_visible_rect().size
 	var view := Vector2(vp.x * _map_logical_height() / maxf(1.0, vp.y), _map_logical_height())
-	var plan := P0TravelFlight.plan(center_lat, center_lng, zoom + _zoom_elastic, city_bearing, left, float(to.lat),
-		float(to.lng), float(to.zoom), float(to.bearing), view)
-	_zoom_elastic = 0.0
 	var cover := P0TravelCover.new()
 	add_child(cover)
 	if city_map: cover.adopt_route(city_map)   # the route under the pins and city bubbles, over the fog (q(152) ④)
 	var top := 120.0
 	if rt != null and rt.ui.open_marker_area().has_area(): top = rt.ui.open_marker_area().position.y + 8.0
 	cover.open(city, km, top)
+	# q(152) ③: both ends in the safe area at the top — 32 in from each side, from the pill's bottom to the Bag key's top
+	# (the bottom of the area markers may use), in the map's logical units
+	var safe := Rect2()
+	if rt != null and rt.ui.open_marker_area().has_area():
+		var k := _map_logical_height() / maxf(1.0, vp.y)
+		var pill_bottom := top + cover.pill.get_combined_minimum_size().y
+		safe = Rect2(Vector2(SAFE_SIDE, pill_bottom) * k, Vector2(vp.x - SAFE_SIDE * 2.0, rt.ui.open_marker_area().end.y - pill_bottom) * k)
+	var plan := P0TravelFlight.plan(center_lat, center_lng, zoom + _zoom_elastic, city_bearing, left, float(to.lat),
+		float(to.lng), float(to.zoom), float(to.bearing), view, safe)
+	_zoom_elastic = 0.0
 	cover.skip_requested.connect(_skip_travel)
 	if rt != null and held != "": rt.ui.hold_here(held)
 	_focus_tween = create_tween()
@@ -894,6 +901,14 @@ func _travel_at(t: float) -> void:
 func _show_self(on: bool) -> void:
 	hide_self = not on
 	if farm_markers: farm_markers.visible = on
+
+## The flight's safe area's side margin (q(152) ③), UI px.
+const SAFE_SIDE := 32.0
+
+## In the air the map may go out past the city map's floor (z 2) to fit a long trip's two ends (q(152) ③, z 0.8).
+func _minimum_zoom() -> float:
+	var floor_z := super._minimum_zoom()
+	return minf(P0TravelFlight.TOP_MIN_ZOOM, floor_z) if travelling() else floor_z
 
 ## Whether a cross-city flight is under way (the cover is up).
 func travelling() -> bool:
