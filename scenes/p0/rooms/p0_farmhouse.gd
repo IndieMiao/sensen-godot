@@ -21,7 +21,7 @@ const CABINET_GLOW_AT := Vector3(0, 1.1133, 0.795)   # in front of the cabinet d
 ## kitchen, the stage and the sheets work the same in all three; `hits` is hit_nodes (the art that takes each one's tap).
 ## Basic: the P0 placeholder anchors on the hearth. Standard (282 c62a6ed9 ②; 上官婉儿 on 282): the stoves on the range
 ## cooker's burners (1 front left, 2 front right, 3 back right), the Spice Rack is the shelf over the sink, the Warming
-## Cabinet the Basic Room's placeholder by the east wall. Deluxe: its layout.json's kitchen hooks (the range cooker, the
+## Cabinet the Basic Room's placeholder on the west wall facing the camera, as there. Deluxe: its layout.json's kitchen hooks (the range cooker, the
 ## fittings along the west wall), the file adding badges, stands and shots; the rack and cabinet are inside the one
 ## kitchen_fittings model, so they take taps round their anchors.
 const ROOMS := {

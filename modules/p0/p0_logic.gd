@@ -1094,11 +1094,12 @@ static func unlock_line(view: Dictionary, skill: String, level: int) -> String:
 	return ""
 
 ## Cooking conveniences by key (§7.2.2 / §4.6.3): the names the level banner and SKILL-1 use.
-## P1 adds Lv7–10's (the glossary, 李元芳 on 286: SKILL-1 showed their ids), and Lv10's title Chef.
+## P1 adds Lv7–10's (the glossary, 李元芳 on 286: SKILL-1 showed their ids), and Lv10's title Chef (`Chef title`, after the
+## level's conveniences, 不知火舞 on 282).
 const CONVENIENCE_NAMES := {"cook_again": "Cook Again", "clue_double": "Double Clue", "hearty_mishap": "Hearty Mishap",
 	"steady_hand_1": "Steady Hand I", "queue_two": "Queue ×2", "quick_fire": "Quick Fire",
 	"steady_hand_2": "Steady Hand II", "fast_mastery": "Fast Mastery", "cook_all": "Cook All", "provisions_plus": "Bigger Provisions",
-	"chefs_touch": "Chef's Touch", "title_chef": "Chef", "lucky_double": "Lucky Double"}
+	"chefs_touch": "Chef's Touch", "title_chef": "Chef title", "lucky_double": "Lucky Double"}
 const LEVEL_TIP := "Levels unlock gear, fish and seeds. Basics never lock."
 ## Levels that change the day say so on the banner's Tip instead of the next level (§4.8.3, q(69)).
 const DAY_CHANGES := {"cooking:4": "Today changes: 3-ingredient dishes", "farming:6": "Today changes: no more watering"}
@@ -1197,7 +1198,9 @@ static func level_unlocks(view: Dictionary, skill: String, level: int) -> Array:
 		"cooking":
 			var conv: Dictionary = content().get("cooking", {}).get("conveniences", {})
 			for k in conv:
-				if int(conv[k]) == level: out.append(str(CONVENIENCE_NAMES.get(k, k)))
+				if int(conv[k]) == level and not str(k).begins_with("title_"): out.append(str(CONVENIENCE_NAMES.get(k, k)))
+			for k in conv:   # the level's title last: `Lucky Double, Chef title` (不知火舞 on 282)
+				if int(conv[k]) == level and str(k).begins_with("title_"): out.append(str(CONVENIENCE_NAMES.get(k, k)))
 			if level == 4: out.push_front("third ingredient slot")   # SKILL-1 482:167
 	return out
 

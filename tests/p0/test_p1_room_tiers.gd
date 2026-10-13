@@ -68,12 +68,22 @@ func test_the_cabinet_glow_and_the_cooking_fire_follow_the_room() -> void:
 	var standard := _farmhouse(5)
 	var cab := standard.art.get_node("warming_cabinet") as Node3D
 	var glow := standard.art.get_node("warming_cabinet_glow") as Node3D
-	assert_float(cab.position.x - glow.position.x).is_equal_approx(0.477, 0.002)   # it faces −X, into the room
+	assert_float(glow.position.x - cab.position.x).is_equal_approx(0.477, 0.002)   # it faces +X, as in the Basic Room
 	assert_float(glow.position.z).is_equal_approx(cab.position.z, 0.002)
 	assert_object(standard.call("stove_fire")).is_null()
 	var deluxe := _farmhouse(10)
 	assert_bool(deluxe.art.has_node("warming_cabinet_glow")).is_false()
 	assert_object(deluxe.call("stove_fire")).is_null()
+
+## The cabinet shows its door, not its back (不知火舞 on 282: by the Standard Room's east wall it faced away from the camera).
+func test_the_warming_cabinet_faces_the_camera() -> void:
+	for lv in [3, 5]:
+		var r := _farmhouse(lv)
+		var cab := r.art.get_node("warming_cabinet") as Node3D
+		var front := cab.global_transform.basis.z.normalized()
+		var to_cam := Vector3(r._cam_dir.x, 0.0, r._cam_dir.z).normalized()
+		assert_float(front.dot(to_cam)).override_failure_message("Lv%d: the cabinet's back to the camera" % lv).is_greater(0.3)
+		assert_array(r.grid.point_path(r.actor.position, r.anchor("stand_warming_cabinet").global_position)).is_not_empty()
 
 ## Opening the rack's or the cabinet's sheet frames that one: the Standard Room's stand apart.
 func test_each_corner_sheet_has_its_own_shot_in_the_bigger_rooms() -> void:

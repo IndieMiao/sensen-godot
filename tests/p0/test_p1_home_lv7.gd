@@ -30,6 +30,6 @@ func test_the_cooking_page_names_every_level() -> void:
 	var by_level := {}
 	for lv in [7, 8, 9, 10]: by_level[lv] = P0Logic.level_unlocks(view, "cooking", lv)
 	assert_dict(by_level).is_equal({7: ["Steady Hand II", "Fast Mastery"], 8: ["Cook All", "Bigger Provisions"],
-		9: ["Chef's Touch"], 10: ["Chef", "Lucky Double"]})
+		9: ["Chef's Touch"], 10: ["Lucky Double", "Chef title"]})
 	for k in P0Logic.content().cooking.conveniences:   # never an id: every key in the content has its name
 		assert_bool(P0Logic.CONVENIENCE_NAMES.has(k)).override_failure_message(k).is_true()
