@@ -725,6 +725,10 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				first_level = false
 				ui.queue_card.call_deferred(func(): ui.show_level_up(lv, first))
 				session.report({"kind": "level_banner", "skill": str(lv.skill), "level": int(lv.level)})
+				# a title the level brings (Farming Lv10 Master Gardener, §4.8.3): its card after the banner (SGODOT-275)
+				for t in P0Logic.level_titles(str(lv.skill), int(lv.level)):
+					var card := P0Logic.title_card(str(lv.skill), int(lv.level), str(t))
+					ui.queue_card.call_deferred(func(): ui.show_title(card))
 			"affinity":   # SGODOT-225 / 228: first chat of the day, gifts, requests
 				var reply := P0Logic.resident_reply(str(ev.get("resident", "")), str(ev.get("verdict", "")))
 				# On the resident's open bar: the Affinity pill over it and the answer in the bubble (RES-KAI-TALK).
