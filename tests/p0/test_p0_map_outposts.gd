@@ -520,8 +520,9 @@ func test_the_selected_pin_draws_over_pins_made_after_it() -> void:
 	assert_int((city.markers["sh_market_1"].node as Node).get_index()).is_equal(top)
 	city.selected = {}
 
-## q(137) ④⑤: the selected pin shows with its name hidden (its card says it whole); a marked pin is always in and so is
-## its name, under its disc; a pin they touch gives way. Every pin stays on its point.
+## q(137) ④⑤: the selected pin shows with its name hidden (its card says it whole); a marked pin is always in, its name
+## under its disc; a pin they touch gives way. Every pin stays on its point. q(146): between always-in pins the higher
+## goes first — the selected disc on the marked pin's name hides that name (its disc stays) until it is deselected.
 func test_a_selected_pin_hides_its_name_and_a_marked_one_keeps_its() -> void:
 	var m := _map()
 	for i in 3: await get_tree().process_frame
@@ -543,8 +544,8 @@ func test_a_selected_pin_hides_its_name_and_a_marked_one_keeps_its() -> void:
 	var home_pin: UiMapDestination = city.markers["home"].dest
 	assert_array(city.displayed.map(func(mk): return str(mk.entry.id))).contains([NEAREST_POND, "home"])
 	assert_bool(home_pin.name_shown).is_false()   # selected: the card says Homestead
-	assert_bool(reed_pin.name_shown).is_true()    # marked: its name never gives way
-	assert_bool(reed_pin.label_above).is_false()  # under its disc only (q(137) ①)
+	assert_bool(reed_pin.name_shown).is_false()   # q(146): under the selected (higher) disc, the marked name hides
+	assert_bool(reed_pin.label_above).is_false()  # under its disc only (q(137) ①), never moved above instead
 	city.selected = {}
 	_look_fresh(m, at, 15.0)
 	assert_bool(reed_pin.name_shown).is_true()
