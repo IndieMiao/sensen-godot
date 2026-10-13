@@ -57,6 +57,25 @@ describe('saves that never picked a home (q(163) ③)', () => {
     expect(upgradeState(opened, structuredClone(p), T0).travel).toEqual(p.travel);
   });
 
+  it('a pick an older server moved back to San Francisco comes back on load (蒙恬 on #371: a rollback to 0.2.5)', () => {
+    const p = picked(TOKYO, 1);
+    // what 0.2.5's upgradeState does to it: home and here back to the written city, its fields it does not know kept
+    const rolled = structuredClone(p);
+    rolled.travel = { ...rolled.travel, home: SF, here: SF, fallback: fallbackOf(c, SF) };
+    const up = upgradeState(opened, rolled, T0);
+    expect(up.travel).toMatchObject({ home: TOKYO, here: TOKYO, farm_at: p.travel.farm_at, home_set: p.travel.home_set, home_chosen_at: T0 });
+    expect(up.travel.fallback).toEqual(p.travel.fallback);
+    // travelling when it came back: here stays where the player is
+    const away = structuredClone(p);
+    away.travel = { ...away.travel, home: SF, here: NYC, fallback: fallbackOf(c, SF) };
+    expect(upgradeState(opened, away, T0).travel).toMatchObject({ home: TOKYO, here: NYC });
+    // a save that picked San Francisco, and one that never picked, are left alone
+    const sf = picked(SF, 0);
+    expect(upgradeState(opened, structuredClone(sf), T0).travel).toEqual(sf.travel);
+    const never = freshState(c, 'player-old-0004', T0, 3);
+    expect(upgradeState(c, structuredClone(never), T0).travel).toEqual(never.travel);
+  });
+
   it('a new save asks to pick only when its client can offer the pick', () => {
     const store = new P0Store(c);
     expect(store.get('player-new-0001', T0).travel.pending).toBeUndefined();

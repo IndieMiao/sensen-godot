@@ -299,6 +299,20 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
     t.home = fresh.home; t.here = fresh.home; t.fallback = fresh.fallback;
     delete t.farm_at; delete t.home_set; delete t.home_chosen_at;
   }
+  // A server from before SGODOT-303 (a rollback to 0.2.5) moved a picked home back to the written city and kept the
+  // pick's fields it did not know (蒙恬 on #371): the frozen home set says where the player chose, so home goes back
+  // there, with its fallback list. A pick in a city the table no longer knows is dropped instead.
+  const picked = t.home_set ? clusterOf(c, t.home_set.pond) : null;
+  if (picked && picked !== t.home) {
+    if (t.home_chosen_at && (picked === writtenCluster(c) || clusterById(c, picked))) {
+      if (t.here === t.home) t.here = picked;
+      t.home = picked;
+      delete t.passes[picked];
+      t.fallback = fallbackOf(c, picked, t.farm_at);
+    } else {
+      delete t.farm_at; delete t.home_set; delete t.home_chosen_at;
+    }
+  }
   if (!s.travel.fallback.near10.length) {   // made before the cluster table was there: fill it once it is (§11.2.3)
     const f = fallbackOf(c, s.travel.home, s.travel.farm_at);
     if (f.near10.length) s.travel.fallback = f;
