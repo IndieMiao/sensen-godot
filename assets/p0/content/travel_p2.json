@@ -10,7 +10,7 @@
         "landmark": "Golden Gate Bridge",
         "stamp": "stamp_san_francisco"
       },
-      "gn-3981609": {
+      "gn-5391811": {
         "landmark": "Balboa Park",
         "stamp": "stamp_san_diego"
       },
@@ -75,10 +75,6 @@
         "stamp": "stamp_philadelphia"
       }
     },
-    "cluster_names": {
-      "gn-3981609": "San Diego"
-    },
-    "_landmarks": "Landmark stamps (plan v2 §11.9.3 表 11-18, SGODOT-275): cluster id → its landmark and stamp art (assets/p0/stamps/<stamp>.png, 安其拉 from Figma 299:2955, 256 px). Mapped by the landmark's nearest member city (亚瑟: Space Center Houston stays with League City, 4.9 km, not Houston 34.8 km). Other first visits get a climate stamp.",
-    "_cluster_names": "A cluster's display name where its seed city is not the one players look for (亚瑟): gn-3981609's seed is Tijuana (more populous), its other member San Diego; the id stays frozen."
+    "_landmarks": "Landmark stamps (plan v2 §11.9.3 表 11-18, SGODOT-275): cluster id → its landmark and stamp art (assets/p0/stamps/<stamp>.png, 安其拉 from Figma 299:2955, 256 px). Mapped by the landmark's nearest member city (亚瑟: Space Center Houston stays with League City, 4.9 km, not Houston 34.8 km). Other first visits get a climate stamp."
   }
 }

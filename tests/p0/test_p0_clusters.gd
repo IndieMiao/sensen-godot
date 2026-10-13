@@ -9,7 +9,7 @@ const LA := "gn-5368361"
 const FARM := Vector2(37.7558, -122.4345)   # the San Francisco homestead
 
 func test_the_cluster_table_matches_the_server() -> void:
-	assert_int(P0Clusters.count()).is_equal(12490)
+	assert_int(P0Clusters.count()).is_equal(12491)   # San Diego split out of Tijuana (SGODOT-280)
 	var sf := P0Clusters.get_cluster(SF)
 	assert_str(str(sf.name)).is_equal("San Francisco")
 	assert_str(str(sf.climate)).is_equal("temperate")

@@ -9,7 +9,8 @@ const SF = 'gn-5391959', TOKYO = 'gn-1850147', LA = 'gn-5368361', SHANGHAI = 'gn
 
 describe('P0 city clusters (SGODOT-275)', () => {
   it('merges each metro area within 30 km into its most populous city, as the plan examples', () => {
-    expect(cl.byId.size).toBe(12490);
+    expect(cl.byId.size).toBe(12491);   // 12,490 + San Diego split out of Tijuana (SGODOT-280, build_clusters.mjs SPLIT_OUT)
+    expect(cl.ofCity('gn-5391811')).toBe('gn-5391811');   // San Diego (28 km from Tijuana, another country) is its own
     expect(cl.ofCity('gn-5378538')).toBe(SF);        // Oakland → San Francisco
     expect(cl.ofCity('gn-1848354')).toBe(TOKYO);     // Yokohama → Tokyo
     expect(cl.ofCity('gn-3085128')).toBe('gn-3096472');   // Sosnowiec → Katowice

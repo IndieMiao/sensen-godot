@@ -54,12 +54,15 @@ describe('travel (SGODOT-278)', () => {
     expect(utcOffsetMin('Not/AZone', T)).toBeNull();
   });
 
-  it('a city with a landmark (表 11-18) gets a landmark stamp; San Diego\'s cluster reads San Diego (travel_p2)', () => {
+  it('a city with a landmark (表 11-18) gets a landmark stamp; San Diego is a cluster of its own, Tijuana reads Tijuana (SGODOT-280)', () => {
     const r = step(fresh(), { type: 'travel', to: LA });
     expect(r.state.travel.stamps[0]).toMatchObject({ cluster: LA, kind: 'landmark' });
     expect(c.travel?.landmarks?.[LA]).toEqual({ landmark: 'Hollywood Sign', stamp: 'stamp_los_angeles' });
     const sd = loadP0Content();   // the clusters are attached by the loader (not copied by structuredClone)
-    expect((sd as P0Content & { clusters: { get(id: string): { name: string } } }).clusters.get('gn-3981609').name).toBe('San Diego');
+    const table = (sd as P0Content & { clusters: { get(id: string): { name: string; country_code: string } | undefined } }).clusters;
+    expect(table.get('gn-5391811')).toMatchObject({ name: 'San Diego', country_code: 'US' });
+    expect(table.get('gn-3981609')).toMatchObject({ name: 'Tijuana', country_code: 'MX' });
+    expect(c.travel?.landmarks?.['gn-5391811']).toEqual({ landmark: 'Balboa Park', stamp: 'stamp_san_diego' });
     expect(Object.keys(c.travel?.landmarks ?? {})).toHaveLength(18);
   });
 
