@@ -935,6 +935,9 @@ static func project(view: Dictionary, elapsed_ms: float) -> Dictionary:
 		st["ready_in"] = maxf(0.0, float(st.get("ready_in", 0)) - elapsed_ms)
 	var cast = v.get("fishing", {}).get("cast", null)
 	if cast is Dictionary: cast["bite_in"] = maxf(0.0, float(cast.get("bite_in", 0)) - elapsed_ms)
+	# a trap's next fish counts down (its name strip `· next in 5h 12m`, q(109) ⑦); the next read brings the fish itself
+	for t in v.get("fishing", {}).get("trap", {}).get("traps", []):
+		if t is Dictionary and t.get("next_in", null) != null: t["next_in"] = maxf(0.0, float(t.next_in) - elapsed_ms)
 	for parcel in v.get("inbox", {}).get("parcels", []):
 		parcel["left"] = maxf(0.0, float(parcel.get("left", 0)) - elapsed_ms)
 	return v

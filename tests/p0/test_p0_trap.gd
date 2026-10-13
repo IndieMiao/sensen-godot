@@ -186,3 +186,16 @@ func test_a_new_city_without_a_new_kind_keeps_its_xp_in_the_float() -> void:
 	await get_tree().process_frame
 	var texts: Array = rt.ui.root.get_children().filter(func(c): return c is UiFloatText).map(func(f): return f.text)
 	assert_array(texts).contains(["+12 XP"])
+
+## The float's name strip (q(109) ⑦; 李元芳 on 283 bb480451): `Fish Trap · 2/3`, empty `Fish Trap · 0/3 · next in 5h 12m`,
+## full (stopped) `Fish Trap · 3/3 · Full`; the wait counts down as the view is advanced to now (P0Logic.project).
+func test_the_name_strip_says_when_the_next_fish_comes_or_that_it_is_full() -> void:
+	var trap := func(fish: int, next_in): return {"fishing": {"trap": {"traps": [{"place": FERN, "fish": fish, "keep": 3, "next_in": next_in}]}}}
+	assert_str(str(P0Trap.prompt(trap.call(0, (5 * 60 + 12) * 60000), FERN).fact)).is_equal("0/3 · next in 5h 12m")
+	assert_str(str(P0Trap.prompt(trap.call(2, 3600000), FERN).fact)).is_equal("2/3")
+	assert_str(str(P0Trap.prompt(trap.call(3, null), FERN).fact)).is_equal("3/3 · Full")
+	assert_str(str(P0Trap.prompt(trap.call(0, null), FERN).fact)).is_equal("0/3")   # an older server without next_in
+	var later := P0Logic.project(trap.call(0, (5 * 60 + 12) * 60000), 72 * 60000.0)   # 1h 12m on
+	assert_str(str(P0Trap.prompt(later, FERN).fact)).is_equal("0/3 · next in 4h")
+	var past := P0Logic.project(trap.call(0, 60000), 5 * 60000.0)   # its fish is due: the next read brings it
+	assert_str(str(P0Trap.prompt(past, FERN).fact)).is_equal("0/3 · next in 1m")
