@@ -460,10 +460,29 @@ static func crop_for_seed(view: Dictionary, seed_id: String) -> Dictionary:
 ## Gift Clues (Fishing Lv7, q(167)): the residents met who like this dish, in content order — view.gift_clues
 ## {dish: [{resident, verdict}]}, null before Lv7. Names, [] when none.
 static func liked_by(view: Dictionary, item_id: String) -> Array:
+	var residents: Dictionary = content().get("residents", {})
+	return clue_residents(view, item_id).map(func(r): return str(residents.get(r, {}).get("name", r)))
+
+## The ids of the residents met who love or like this dish (view.gift_clues; [] before Fishing Lv7).
+static func clue_residents(view: Dictionary, item_id: String) -> Array:
 	var clues = view.get("gift_clues", null)
 	if not clues is Dictionary: return []
-	var residents: Dictionary = content().get("residents", {})
-	return ((clues as Dictionary).get(item_id, []) as Array).map(func(c): return str(residents.get(str(c.get("resident", "")), {}).get("name", c.get("resident", ""))))
+	return ((clues as Dictionary).get(item_id, []) as Array).map(func(c): return str(c.get("resident", "")))
+
+## A resident who likes by rarity alone (`Fine+` Hana, `Rare+` Mira and Tomo), not by a dish's style.
+static func likes_by_rarity(resident: String) -> bool:
+	return str(content().get("residents", {}).get(resident, {}).get("likes", "")).ends_with("+")
+
+## The bag cell's ♥: a resident met likes this dish's style (Pip's Dessert, Old Kai's Grilled). A liking by rarity alone
+## (Hana's `Fine+`) marks no cell — any Fine dish would wear it — only the card's `Liked by …` and the gift drawer's mark
+## (不知火舞 on 283, q(167)).
+static func style_liked(view: Dictionary, item_id: String) -> bool:
+	return clue_residents(view, item_id).any(func(r): return not likes_by_rarity(r))
+
+## The gift drawer's green mark: this dish is one this resident loves or likes (in their gift_clues), whatever it adds —
+## a Perfect dish they do not care for gives +2 on white (不知火舞 on 283, q(167)).
+static func gift_hit(view: Dictionary, resident: String, item_id: String) -> bool:
+	return clue_residents(view, item_id).has(resident)
 
 ## The dish card's line: `Liked by Hana · Old Kai`, at most two names, then ` · +1 more` (302 b308ee14); "" when none.
 static func liked_by_line(view: Dictionary, item_id: String) -> String:
