@@ -56,7 +56,7 @@ func test_p1_levels_list_the_kitchen_and_bag_unlocks() -> void:
 	var p := P0Logic.home_panel(v)
 	assert_str(str(p.title)).is_equal("Homestead Lv5 → Lv6")
 	assert_array(p.changes.slice(1).map(func(c): return "%s · %s" % [c.text, c.note])).is_equal(
-		["Big Pot · Double · two portions, one round of heat", "Bag Upgrade II for sale · 400 coins · Bag 30 → 35"])
+		["Big Pot · Double · two portions, one round of heat", "Bag Upgrade II for sale · 400 coins · Bag 35 · after Upgrade I"])
 	v.homestead.next.unlocks = ["second_stove", "long_haul_ticket"]
 	assert_array(P0Logic.home_panel(v).changes.slice(1).map(func(c): return str(c.text))).is_equal(["Second Stove"])
 	v.homestead.next.level = 5
@@ -380,3 +380,101 @@ func test_a_prompt_tap_names_its_facility_while_the_world_handles_it() -> void:
 	assert_str(ui.tapped_card).is_equal("")                       # only while the tap is handled
 	ui._tap_at(ui.root.global_position + Vector2(20, 700), false)  # a scene tap carries no card
 	assert_str(str(seen[-1][0])).is_equal("")
+
+## Bag Upgrade notes from content (不知火舞 on 282, 李元芳's c62a6ed9 ④): the tiers are fixed — I to 30, II to 35 after I,
+## III to 40 after II — so `Bag 30 → 35` once the tier before is bought, else `Bag 35 · after Upgrade I`.
+func test_bag_upgrade_notes_follow_the_tiers_the_player_has() -> void:
+	var v := _view(5)
+	assert_str(P0Logic.bag_tier_note(v, "bag_upgrade_1")).is_equal("Bag 25 → 30")
+	assert_str(P0Logic.bag_tier_note(v, "bag_upgrade_2")).is_equal("Bag 35 · after Upgrade I")
+	assert_str(P0Logic.bag_tier_note(v, "bag_upgrade_3")).is_equal("Bag 40 · after Upgrade II")
+	v.homestead.unlocks["bag_upgrade_1"] = "owned"
+	v.bag.capacity = 30
+	assert_str(P0Logic.bag_tier_note(v, "bag_upgrade_2")).is_equal("Bag 30 → 35")
+	assert_str(P0Logic.bag_tier_note(v, "bag_upgrade_3")).is_equal("Bag 40 · after Upgrade II")
+	v.homestead.unlocks["bag_upgrade_2"] = "owned"
+	v.bag.capacity = 35
+	v.homestead.next.level = 9
+	v.homestead.next.unlocks = ["bag_upgrade_3"]
+	assert_array(P0Logic.home_panel(v).changes.slice(1).map(func(c): return "%s · %s" % [c.text, c.note])).is_equal(
+		["Bag Upgrade III for sale · 1,000 coins · Bag 35 → 40"])
+
+## Lv8 promises no stall look until the stall has its model (不知火舞 on 282, 李元芳's c62a6ed9 ③): neither HOME-1 nor the banner.
+func test_lv8_says_nothing_of_the_stall_yet() -> void:
+	var v := _view(7)
+	v.homestead.next.level = 8
+	v.homestead.next.unlocks = ["third_stove", "warming_cabinet_12", "stall_upgrade", "kitchen_extension"]
+	var texts: Array = P0Logic.home_panel(v).changes.map(func(c): return str(c.text))
+	assert_array(texts).is_equal(["Max Energy 220 · Meals 220 a day", "Third Stove", "Warming Cabinet 12", "Kitchen Wing · Timber or Stone"])
+	var m := P0Logic.home_moment(v, {"level": 8, "unlocks": ["third_stove", "warming_cabinet_12", "stall_upgrade", "kitchen_extension"]})
+	assert_str(str(m.detail)).not_contains("Stall")
+
+## HOME-1 scrolls as every other sheet (李元芳's c62a6ed9 ①): a drag from a need tile moves it; a fade over its bottom edge
+## while more lies below, gone at the end; the last row 24 above the end.
+func test_home_1_scrolls_from_a_tile_and_fades_where_more_lies_below() -> void:
+	if DisplayServer.is_touchscreen_available(): return
+	var v := _view(5)
+	v.homestead.next.level = 6
+	v.homestead.next.unlocks = ["big_pot", "bag_upgrade_2"]
+	var vp := SubViewport.new()   # the frame: 360 × 800
+	vp.size = Vector2i(360, 800)
+	add_child(auto_free(vp))
+	var ui := P0Ui.new()
+	vp.add_child(ui)
+	ui.set_view(v)
+	HomePanel.open(ui)
+	for i in 4: await get_tree().process_frame
+	var scroll: ScrollContainer = ui.find_child("Scroll", true, false)
+	assert_object(scroll).is_instanceof(TouchScrollContainer)
+	var fade: Control = ui.find_child("ScrollFade", true, false)
+	var bar := scroll.get_v_scroll_bar()
+	assert_bool(bar.max_value > bar.page).is_true()   # the frame: Lv6's rows run past the sheet
+	assert_bool(fade.visible).is_true()
+	assert_float(fade.size.y).is_equal(HomePanel.FADE_H)
+	assert_float(fade.get_global_rect().end.y).is_equal_approx(scroll.get_global_rect().end.y, 0.5)
+	# a drag that starts on a need tile scrolls the sheet
+	var emulate := Input.emulate_touch_from_mouse
+	Input.emulate_touch_from_mouse = true
+	var tile: Control = ui.find_children("*", "UiNeedTile", true, false)[0]
+	var at := tile.get_global_rect().get_center()
+	_press(vp, at, true)
+	for step in 8:
+		_move(vp, at - Vector2(0, 20.0 * (step + 1)), Vector2(0, -20))
+		await get_tree().process_frame
+	_press(vp, at - Vector2(0, 160), false)
+	await get_tree().process_frame
+	Input.emulate_touch_from_mouse = emulate
+	assert_int(scroll.scroll_vertical).is_greater(0)
+	# at the end: no fade, the last row 24 above the scroll's end
+	scroll.scroll_vertical = int(bar.max_value)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	assert_bool(fade.visible).is_false()
+	var body := scroll.get_child(0) as VBoxContainer
+	var rows := body.get_children().filter(func(c): return (c as Control).visible and (c as Control).size.y > 0.0)
+	var last := rows[rows.size() - 2] as Control   # before the end pad
+	assert_float(body.size.y - last.get_rect().end.y).is_equal(HomePanel.END_PAD)
+
+func _press(vp: Viewport, at: Vector2, down: bool) -> void:
+	var t := InputEventScreenTouch.new()
+	t.position = at
+	t.pressed = down
+	vp.push_input(t, true)
+	var m := InputEventMouseButton.new()
+	m.position = at
+	m.global_position = at
+	m.button_index = MOUSE_BUTTON_LEFT
+	m.pressed = down
+	vp.push_input(m, true)
+
+func _move(vp: Viewport, at: Vector2, rel: Vector2) -> void:
+	var d := InputEventScreenDrag.new()
+	d.position = at
+	d.relative = rel
+	vp.push_input(d, true)
+	var m := InputEventMouseMotion.new()
+	m.position = at
+	m.global_position = at
+	m.relative = rel
+	m.button_mask = MOUSE_BUTTON_MASK_LEFT
+	vp.push_input(m, true)

@@ -9,6 +9,12 @@ const SHEET_TOP := 194.0        # sheet edge on the 360 × 800 frame; scrolling 
 const MOMENT_TOP := 108.0
 const MOMENT_S := 3.0           # the first Homestead upgrade: 3 s; later ones MOMENT_LATER_S (§8.1.2 ②); tap to skip
 const MOMENT_LATER_S := 1.5
+## The scroll's foot (不知火舞 on 282, 李元芳's c62a6ed9 ①): a 24 px fade, surface to clear, over its bottom edge while more
+## lies below — the rows no longer stop flush on the Upgrade key, as if What changes ended there — and 24 under the last
+## row, clear of the fade once scrolled to the end.
+const FADE_H := 24.0
+const END_PAD := 24.0
+const BODY_GAP := 8
 
 ## HOME-1 over the farm. at_home false (the Profile farm card away from home: ui.space != "home") greys the button
 ## with `At home` and a tap says `Upgrade at home · Going home is free`; the tiles, What changes and the sources still
@@ -32,15 +38,23 @@ static func open(ui: P0Ui, at_home := true) -> void:
 	panel.add_child(col)
 	var body := VBoxContainer.new()
 	body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	body.add_theme_constant_override(&"separation", 8)
+	body.add_theme_constant_override(&"separation", BODY_GAP)
 	if bool(model.max):
 		col.add_child(body)
 	else:
-		var scroll := ScrollContainer.new()
-		scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		# the shared touch scroll (0.10.3): a drag from a need tile scrolls too and cancels its tap (李元芳 on 282: a plain
+		# ScrollContainer only moved from the text, so Lv4+ read as if Max Energy were all that changed)
+		var frame := Control.new()
+		frame.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		col.add_child(frame)
+		var scroll := TouchScrollContainer.new()
+		scroll.name = "Scroll"
+		scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-		col.add_child(scroll)
+		frame.add_child(scroll)
 		scroll.add_child(body)
+		frame.add_child(_fade(scroll))
 	body.add_child(UiKit.label(str(model.title), UiTokens.STYLE_C14_XB))
 	if str(model.subtitle) != "":   # Lv10: `Max level · Homestead Master` (q(115) ②)
 		body.add_child(UiKit.label(str(model.subtitle), UiTokens.STYLE_C12_B, UiTokens.COLOR_SECONDARY))
@@ -77,6 +91,10 @@ static func open(ui: P0Ui, at_home := true) -> void:
 		looks.add_child(UiKit.label("Looks", UiTokens.STYLE_C12_XB))
 		for r in model.looks: looks.add_child(_look_row(ui, r))
 		body.add_child(looks)
+	if not bool(model.max):
+		var end := Control.new()   # END_PAD under the last row: the body's gap plus this
+		end.custom_minimum_size = Vector2(0, END_PAD - BODY_GAP)
+		body.add_child(end)
 	if bool(model.button): _add_button(ui, col, panel, model)
 	if not bool(model.max):
 		var foot := UiKit.label(str(model.footer), UiTokens.STYLE_C11_B, UiTokens.COLOR_SECONDARY)
@@ -97,6 +115,31 @@ static func open(ui: P0Ui, at_home := true) -> void:
 	col.add_child(close)
 	ui._open_modal(panel, 0.3, true)
 	ui.modal_kind = "homestead"
+
+## FADE_H over the scroll's bottom edge, shown while the scroll can still go down.
+static func _fade(scroll: ScrollContainer) -> Control:
+	var grad := Gradient.new()
+	grad.colors = PackedColorArray([Color(UiTokens.COLOR_SURFACE, 0.0), UiTokens.COLOR_SURFACE])
+	var tex := GradientTexture2D.new()
+	tex.gradient = grad
+	tex.width = 4
+	tex.height = int(FADE_H)
+	tex.fill_from = Vector2(0, 0)
+	tex.fill_to = Vector2(0, 1)
+	var fade := TextureRect.new()
+	fade.name = "ScrollFade"
+	fade.texture = tex
+	fade.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	fade.stretch_mode = TextureRect.STRETCH_SCALE
+	fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	fade.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	fade.offset_top = -FADE_H
+	var bar := scroll.get_v_scroll_bar()
+	var paint := func(_v = null) -> void: fade.visible = bar.value + bar.page < bar.max_value - 1.0
+	bar.changed.connect(paint)
+	bar.value_changed.connect(paint)
+	fade.visible = false
+	return fade
 
 ## The Upgrade button (the first gap on it, LOCK-10); none at Lv10 (q(115) ②).
 static func _add_button(ui: P0Ui, col: Control, panel: Control, model: Dictionary) -> void:
