@@ -14,7 +14,7 @@ import { maxEnergy, skillLevel, untilRollover } from './rules.js';
 import type { P0State } from './state.js';
 import { missing, putInStorage, stored, takeStorageFirst } from './storage.js';
 import type { Refusal } from './fishing.js';
-import { clusterById, clusterOf, homeCluster } from './travel.js';
+import { clusterById, clusterOf, homeOf, writtenCluster } from './travel.js';
 import { decorOf, isDecor } from './decor.js';
 import { climateAt } from './travel.js';
 
@@ -37,12 +37,12 @@ export function catalog(c: P0Content, shop: ShopId, s?: P0State, place?: unknown
 
 /** A city sells its postcard (SGODOT-296) from M tier up: home always, a generated city unless it is an S-tier town. */
 function postcardCity(c: P0Content, cluster: string): boolean {
-  return cluster === homeCluster(c) || (cityPlaces(c, cluster)?.tier ?? 'S') !== 'S';
+  return cluster === writtenCluster(c) || (cityPlaces(c, cluster)?.tier ?? 'S') !== 'S';
 }
 
 /** Whether an outpost id is its city's Market Square 1: a generated `<cluster>~market0`, or home's first market. */
 function marketOne(c: P0Content, id: string, cluster: string): boolean {
-  if (cluster === homeCluster(c)) return (c.outposts ?? []).find(o => o.role === 'market' && clusterOf(c, o.id) === cluster)?.id === id;
+  if (cluster === writtenCluster(c)) return (c.outposts ?? []).find(o => o.role === 'market' && clusterOf(c, o.id) === cluster)?.id === id;
   return id === `${cluster}~market0`;
 }
 
@@ -59,7 +59,7 @@ export function specialtyAt(c: P0Content, s?: P0State, place?: unknown): string[
     if (!cluster || !marketOne(c, at, cluster) || !postcardCity(c, cluster)) return [];
     return [cityPostcardId(c, cluster)];
   }
-  const cluster = s?.travel?.here ?? homeCluster(c);
+  const cluster = s?.travel?.here ?? writtenCluster(c);
   return postcardCity(c, cluster) ? [cityPostcardId(c, cluster)] : [];
 }
 
@@ -164,7 +164,7 @@ export function drink(c: P0Content, s: P0State, cmd: { item?: unknown; shop?: un
   if (!def) return { code: 'bad_item' };
   if (shopOf(cmd.shop) !== def.shop) return { code: 'wrong_shop', detail: { shop: def.shop } };
   const price = drinkPrice(c, s);
-  if (price === null) return { code: 'drink_limit', detail: { resets_in: untilRollover(c, now) } };
+  if (price === null) return { code: 'drink_limit', detail: { resets_in: untilRollover(c, s, now) } };
   const max = maxEnergy(c, s);
   if (s.energy.value >= max) return { code: 'energy_full' };
   if (s.coins < coinsNeeded(c, price)) return { code: 'no_coins', detail: { need: coinsNeeded(c, price) - s.coins } };
@@ -203,15 +203,15 @@ export function quotaKey(c: P0Content, q: QuotaId, cluster: string): string {
 
 /** The city a counter command is at: its place's cluster, else the city the player is in (home before v5 travel). */
 export function counterCity(c: P0Content, s: P0State, place: unknown): string {
-  return (typeof place === 'string' && place !== '' ? clusterOf(c, place) : null) ?? s.travel?.here ?? homeCluster(c);
+  return (typeof place === 'string' && place !== '' ? clusterOf(c, place) : null) ?? s.travel?.here ?? homeOf(c, s);
 }
 
 /** A quota's scope line, naming the city a per-city one counts (NPC-3 482:120: `all San Francisco markets`). */
 export function quotaScope(c: P0Content, q: QuotaId, cluster: string): string {
-  return c.quotas[q].scope.replace('{city}', cluster === homeCluster(c) ? c.profile.city : clusterById(c, cluster)?.name ?? c.profile.city);
+  return c.quotas[q].scope.replace('{city}', cluster === writtenCluster(c) ? c.profile.city : clusterById(c, cluster)?.name ?? c.profile.city);
 }
 
-export function quotaLeft(c: P0Content, s: P0State, q: QuotaId, cluster = homeCluster(c)): number {
+export function quotaLeft(c: P0Content, s: P0State, q: QuotaId, cluster = homeOf(c, s)): number {
   return Math.max(0, c.quotas[q].cap - (s.day.quota[quotaKey(c, q, cluster)] ?? 0));
 }
 
@@ -242,7 +242,7 @@ export function sellItem(c: P0Content, s: P0State, cmd: { item?: unknown; qty?: 
   let n = want;
   if (price.quota) {
     n = Math.min(want, Math.floor(quotaLeft(c, s, price.quota, city) / price.unit));
-    if (n < 1) return { code: 'limit_reached', detail: { quota: price.quota, resets_in: untilRollover(c, now) } };
+    if (n < 1) return { code: 'limit_reached', detail: { quota: price.quota, resets_in: untilRollover(c, s, now) } };
   }
   const coins = n * price.unit;
   take(s.bag, id, n, 'skip');

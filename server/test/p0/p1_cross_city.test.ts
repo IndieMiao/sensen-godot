@@ -142,7 +142,7 @@ describe('Far Pond (q(128) 甲)', () => {
     expect(r).not.toHaveProperty('abroad');
     // San Francisco: other cities' regional fish; not its own 2 (Arctic Char, Salmon), nor what its 6 ponds give — Clover
     // Pond is a Coast pond, so Grey Mullet and Mackerel are home fish
-    const far = farFish(c);
+    const far = farFish(c, null);
     expect(far).toEqual(expect.arrayContaining(['fish_tilapia', 'fish_smelt']));
     for (const id of ['fish_crucian', 'fish_mullet', 'fish_mackerel', 'fish_seabass', 'fish_arctic_char', 'fish_salmon']) expect(far).not.toContain(id);
     // the card estimates at the cheapest of them (Tilapia / Smelt, floor 3): 3 × 3 + 20 = 29 for three
@@ -177,7 +177,7 @@ describe('Far Pond (q(128) 甲)', () => {
   it('is drawn only when one is landable within Trip 3 at the player\'s Fishing level; that list is its example line', () => {
     const c = only('req_sys_explore_pond');
     const s = fresh(c);
-    const tries = farTries(c, s), far = farFish(c);
+    const tries = farTries(c, s), far = farFish(c, s);
     expect(tries.length).toBeGreaterThanOrEqual(1);
     expect(tries.length).toBeLessThanOrEqual(3);
     for (const id of tries) {
@@ -192,7 +192,7 @@ describe('Far Pond (q(128) 甲)', () => {
     expect(farTries(c, s)).toBe(tries);
     // nothing landable at this level within Trip 3: no Far Pond on the board
     const none = only('req_sys_explore_pond');
-    for (const f of none.fish) if (farFish(none).includes(f.id)) f.level = 11;
+    for (const f of none.fish) if (farFish(none, null).includes(f.id)) f.level = 11;
     const blank = fresh(none);
     expect(farTries(none, blank)).toEqual([]);
     expect(blank.boards.market[0].req).toBeNull();
