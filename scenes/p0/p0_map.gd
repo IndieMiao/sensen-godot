@@ -804,7 +804,7 @@ static func city_card(view: Dictionary, cluster: String, city: Dictionary) -> Di
 		var t := Time.get_datetime_dict_from_unix_time(int(P0Travel.now_ms(view) / 1000.0) + int(offset) * 60)
 		local = "%02d:%02d" % [int(t.hour), int(t.minute)]
 	return {
-		"title": str(c.get("name", "")), "state": "Unexplored", "effect": "Preview the city before travelling.",
+		"title": str(c.get("name", "")), "state": "Unexplored", "effect": "Preview the city before traveling.",
 		"facts": [["Climate", str(c.get("climate", "")).capitalize()], ["Trip", "%d · %s" % [int(trip.get("trip", 1)), str(trip.get("name", ""))]],
 			["Local time", local]],
 		"rows": [

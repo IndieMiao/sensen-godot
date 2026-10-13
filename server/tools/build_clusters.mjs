@@ -6,9 +6,8 @@
 // so a rebuild keeps every existing assignment and only places cities that are new to the directory (joining the
 // nearest existing seed within 30 km, else seeding a cluster of their own). Delete the outputs to start over.
 //
-// SPLIT_OUT lists cities the greedy merge put in another country's cluster that are big enough to be cities of their
-// own: each becomes its own seed (its id is its key), the rest of the build unchanged. A city new to the directory
-// near one may then join it.
+// SPLIT_OUT is a hand list (q(187)): each city on it is taken out of the cluster the merge put it in and seeds its own
+// (its id is its key); the rest of the build is unchanged. A city new to the directory near one may then join it.
 //
 //   node server/tools/build_clusters.mjs
 //   → assets/p0/city_clusters.json        (client + server: one row per cluster; JSON so it ships in the APK)
@@ -81,7 +80,7 @@ const nearestSeed = r => {
   return best;
 };
 
-// Cities taken out of the cluster the merge put them in, each its own cluster from then on (SGODOT-280).
+// The hand list of q(187) (SGODOT-280): cities taken out of the cluster the merge put them in, each its own from then on.
 const SPLIT_OUT = [
   { id: 'gn-5391811', why: 'San Diego (US, 1.4 M) had joined Tijuana (MX) 28 km away; players went to "San Diego" and stood in Tijuana' },
 ];
