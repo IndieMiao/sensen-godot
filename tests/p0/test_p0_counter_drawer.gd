@@ -320,3 +320,31 @@ func test_the_rows_keys_keep_their_44_touch_row_in_the_drawer() -> void:
 		var top := buy.position.y + (buy.size.y - sb.visual_height) * 0.5
 		assert_that([top, sb.visual_height, buy.size.x - sb.inset.x - sb.inset.z]).is_equal([21.0, 34.0, 68.0])
 		assert_float(top + sb.visual_height).is_less(row.size.y - UiTokens.STROKE_DEFAULT)   # 55, above the hairline
+
+## SGODOT-300: a generated city's keeper has no painted art; the greeting card and the counter's keeper bar get a
+## portrait drawn from the keeper's look preset (blank until drawn: headless tests draw nothing). The four painted
+## P0 keepers keep their art.
+func test_keeper_portraits_fall_back_to_the_look() -> void:
+	var painted := P0CounterDrawer.keeper_portrait("Mei", true, "market_temperate_0")
+	assert_object(painted).is_not_null()
+	assert_bool(painted is ImageTexture).override_failure_message("Mei keeps her painted card").is_false()
+	var card := P0CounterDrawer.keeper_portrait("Ezra", true, "market_temperate_0")
+	var head := P0CounterDrawer.keeper_portrait("Ezra", false, "market_temperate_0")
+	assert_bool(card is ImageTexture).is_true()
+	assert_vector(Vector2(card.get_size())).is_equal(Vector2(300, 660))
+	assert_vector(Vector2(head.get_size())).is_equal(Vector2(264, 264))
+	assert_object(P0CounterDrawer.keeper_portrait("Ezra", true, "market_temperate_0")).is_same(card)   # drawn once
+	assert_object(P0CounterDrawer.keeper_portrait("Ezra", true, "")).is_null()   # no look, no art: as before
+	assert_object(P0CounterDrawer.keeper_portrait("Ezra", true, "no_such_look")).is_null()
+
+func test_greeting_card_and_keeper_bar_take_the_keepers_look() -> void:
+	var ui := _ui()
+	await await_idle_frame()
+	ui.set_view(_view())
+	var ctx := {"keeper": "Ezra", "place": "Chestnut Market Square", "look": "market_temperate_1"}
+	ui.open_keeper_greeting("market", ctx)
+	var card: UiDialogueCard = ui._modal.find_children("*", "UiDialogueCard", true, false)[0]
+	assert_object(card.portrait).is_same(P0CounterDrawer.keeper_portrait("Ezra", true, "market_temperate_1"))
+	var drawer := P0CounterDrawer.new(_view(), "market", ctx)
+	add_child(auto_free(drawer))
+	assert_object(drawer.keeper_bar.portrait).is_same(P0CounterDrawer.keeper_portrait("Ezra", false, "market_temperate_1"))

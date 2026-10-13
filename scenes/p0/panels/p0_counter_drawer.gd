@@ -26,6 +26,7 @@ signal section_changed(section: String)
 ## fit_height() has settled the short market drawer's height.
 signal fitted
 
+const P0KeeperPortraits := preload("res://modules/p0/p0_keeper_portraits.gd")   # SGODOT-300
 const HEIGHT := 696.0           # drawer top at y 104 of 800 (FARM-6, NPC-2-2)
 const HEIGHT_DRINKS := 276.0    # NPC-6 / NPC-7-P0: keeper bar at y 540 (16 under the top, clear of the handle; 不知火舞 on 265)
 ## A counter that buys nothing back (the P0 market, sell []): keeper bar, tabs and its rows only, until fit_height()
@@ -161,7 +162,7 @@ func _build_head() -> void:
 		keeper_bar = UiKeeperBar.new(UiKeeperBar.role_of(role))
 		var who: Array = KEEPERS.get(role, ["", ""])
 		var name := str(ctx.get("keeper", who[1]))
-		keeper_bar.portrait = keeper_portrait(name)
+		keeper_bar.portrait = keeper_portrait(name, false, str(ctx.get("look", "")))
 		keeper_bar.title = "%s's %s" % [name, str(SHOP_NOUN.get(role, ""))]
 		keeper_bar.place = str(ctx.get("place", ""))
 		keeper_bar.keeper = "%s · %s" % [str(ctx.get("role", who[0])), name]
@@ -440,9 +441,12 @@ static func quota_text(view: Dictionary, role: String, selected := "") -> String
 	return str(q.get("text", "")) + ("\n" + str(q.note) if str(q.get("note", "")) != "" else "")
 
 ## The keeper's 44 px head (assets/p0/art/keepers/<name>_head.jpg), null for a name without art.
-static func keeper_portrait(name: String, card := false) -> Texture2D:
+## A keeper's portrait: the painted art for the four P0 keepers (Ama, Finn, Mei, Sigrid), else one drawn from the
+## keeper's look preset (SGODOT-300: a generated city's Ezra, Hugo …), filled in a few frames after it is asked for.
+static func keeper_portrait(name: String, card := false, look := "") -> Texture2D:
 	var path := "res://assets/p0/art/keepers/%s_%s.jpg" % [name.to_lower(), "card" if card else "head"]
-	return load(path) if ResourceLoader.exists(path) else null
+	if ResourceLoader.exists(path): return load(path)
+	return P0KeeperPortraits.texture(look, card)
 
 static func _gap(parent: Control, h: float) -> Control:
 	var c := Control.new()
