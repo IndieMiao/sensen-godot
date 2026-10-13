@@ -26,10 +26,9 @@ func test_the_fish_tile_wears_the_badge_once_all_are_caught() -> void:
 	var corners := page.find_children("Corner", "TextureRect", true, false)
 	assert_int(corners.size()).is_equal(1)
 	var c := corners[0] as TextureRect
-	assert_vector(c.size).is_equal(Vector2(20, 20))
+	assert_vector(c.size).is_equal(Vector2(22, 22))
 	assert_object(c.texture).is_same(P0FishDex.badge_icon())
-	# its centre 2 left of and 8 below the 48 ring's top-right corner (PROFILE-1-DEX)
-	assert_vector(c.position + c.size * 0.5).is_equal(Vector2(48 - 2, 8))
+	assert_vector(c.position).is_equal(Vector2(36, -2))   # from the ring's top-left (Figma 9c93e46e: (51, −2) of the tile)
 	var none := _page(_view(19))
 	await get_tree().process_frame
 	assert_int(none.find_children("Corner", "TextureRect", true, false).size()).is_equal(0)
@@ -43,6 +42,7 @@ func test_a_banner_with_art_drops_its_disc_and_mark() -> void:
 	var art: Array = b.find_children("*", "TextureRect", true, false).filter(func(t): return (t as TextureRect).texture == P0FishDex.badge_icon())
 	assert_int(art.size()).is_equal(1)
 	assert_bool((art[0] as TextureRect).visible).is_true()
-	assert_vector((art[0] as TextureRect).custom_minimum_size).is_equal(Vector2(48, 48))
+	assert_vector((art[0] as TextureRect).size).is_equal(Vector2(52, 52))   # 52 at (15, 20) of the banner (9c93e46e)
+	assert_vector((art[0] as TextureRect).position).is_equal(Vector2(-1, 0))
 	b.icon = null   # back to the check
 	assert_bool((art[0] as TextureRect).visible).is_false()

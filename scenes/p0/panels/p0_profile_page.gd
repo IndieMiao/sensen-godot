@@ -124,12 +124,15 @@ func refresh(view_: Dictionary) -> void:
 	for c in d.collections:
 		var tile := UiNeedTile.new(str(c.name), int(c.have), int(c.need), UiNeedTile.Size.M, P0Logic.icon(str(c.icon)), true)
 		var key := str(c.get("key", ""))
-		if bool(c.get("badge", false)): tile.add_corner(P0FishDex.badge_icon(), _CORNER_BADGE)   # the whole Fish-dex (283 PROFILE-1-DEX)
+		if bool(c.get("badge", false)): tile.add_corner(P0FishDex.badge_icon(), _CORNER_BADGE, _CORNER_AT)   # the whole Fish-dex (283 PROFILE-1-DEX)
 		tile.pressed.connect(func(): collection_pressed.emit(key))
 		tiles.append(tile)
 	col.add_child(UiNeedTile.group(tiles))
 
-const _CORNER_BADGE := 20.0   # the Fish-dex badge on the Fish tile's ring (283 PROFILE-1-DEX)
+## The Fish-dex badge on the Fish tile (283 PROFILE-1-DEX, Figma 9c93e46e): 22 at (51, −2) of the NeedTile M frame, its
+## ring 15 in — (36, −2) from the ring, so a wider label line does not move it.
+const _CORNER_BADGE := 22.0
+const _CORNER_AT := Vector2(36, -2)
 
 ## Everything the page shows, from the server view (pure; tested).
 static func profile_data(view: Dictionary) -> Dictionary:

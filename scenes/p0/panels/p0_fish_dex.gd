@@ -28,8 +28,8 @@ const _MILESTONE_H := 77.0   # 安其拉 1699:102375: 40 → 77 with the NeedTil
 const _MILESTONE_PAD := Vector2(8.0, 4.0)
 const _MILESTONE_TEXT_X := 100.0
 const _SILHOUETTE := "fish_unknown"
-const _BADGE := 22.0   # the Fish-dex badge right of the heading (283 FISH-6-COMPLETE)
-const _BADGE_GAP := 6.0
+const _BADGE := 24.0   # the Fish-dex badge in the heading row, at (64, 1) of it (283 FISH-6-COMPLETE, Figma 9c93e46e)
+const _BADGE_AT := Vector2(64, 1)
 ## From this Fishing level a silhouette says where to go (§6.9.1 路标; 不知火舞 on 283).
 const SIGNPOST_LEVEL := 8
 ## Only a fish that bites at one time alone says it: the others are only likelier then (不知火舞 on 283).
@@ -60,7 +60,7 @@ func _init(view: Dictionary = {}, fresh: Array = []) -> void:
 		badge.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		badge.custom_minimum_size = Vector2.ONE * _BADGE
 		badge.size = badge.custom_minimum_size
-		badge.position = Vector2(title.get_minimum_size().x + _BADGE_GAP, (_HEADING_H - _BADGE) * 0.5)
+		badge.position = _BADGE_AT
 		badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		heading.add_child(badge)
 	var close := UiNavButton.new("Close", true)

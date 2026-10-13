@@ -4,8 +4,8 @@ extends PanelContainer
 ## level-up, HOME-2, a crafted tool. 328 wide, top to bottom:
 ##   accent  6 px: gold for LEVEL_UP, primary for COMPLETE
 ##   head    disc 48 (LEVEL_UP: gold with the level number; COMPLETE: primary tint with a check; `icon` set: that art
-##           alone in its place, no disc — the Fish-dex badge, 283 DEX-COMPLETE) · title (22 ExtraBold) over the subtitle
-##           (13 Bold, secondary)
+##           alone over its place, 52 at (15, 20) of the banner, no disc — the Fish-dex badge, 283 DEX-COMPLETE / 9c93e46e)
+##           · title (22 ExtraBold) over the subtitle (13 Bold, secondary)
 ##   rewards UiFloatText pills, centred (at most three; [] hides the row)
 ##   detail  13 Bold, centred ("" hides it)
 ##   tip     12 Bold, secondary, centred ("" hides it)
@@ -27,6 +27,7 @@ const _HEAD_TOP := 4.0
 const _HEAD_GAP := 12.0
 const _DISC := 48.0
 const _DISC_ICON := 26.0
+const _ART := 52.0   # `icon` art over the disc's place: 52 at (15, 20) of the banner, the disc's 48 at (16, 20)
 const _TITLE_GAP := 2.0
 const _TITLE_SIZE := 22   # 22 ExtraBold: the Title XB20 style one step up (title and disc number)
 const _REWARD_GAP := 8.0
@@ -96,8 +97,13 @@ func _init() -> void:
 	_check.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_check.self_modulate = UiTokens.COLOR_PRIMARY
 	_disc.add_child(_check)
-	_art = UiKit.icon(null, _DISC)
-	_disc.add_child(_art)
+	var holder := Control.new()   # the art overflows the disc's 48 by a pixel left and 4 right / below; the title stays put
+	holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_disc.add_child(holder)
+	_art = UiKit.icon(null, _ART)
+	_art.size = Vector2(_ART, _ART)
+	_art.position = Vector2(-1, 0)
+	holder.add_child(_art)
 	var titles := VBoxContainer.new()
 	titles.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	titles.size_flags_horizontal = Control.SIZE_EXPAND_FILL
