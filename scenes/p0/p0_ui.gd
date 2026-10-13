@@ -3144,6 +3144,17 @@ func show_catch(fish_id: String, rarity: int, first_xp: int, extras := {}, event
 	m.note = "Fish-dex %d/%d" % [dex.filter(func(d): return int(d.get("caught", 0)) > 0).size() - int(extras.get("dex_back", 0)), dex.size()]
 	show_moment(m)
 
+## A Cookbook title (§7.6.1; 不知火舞 on 282): RewardMoment Milestone, no buttons — the title, `Cookbook 20/48`, `New title ·
+## +100 coins · Recipe Stand` (P0KitchenLogic.title_card). Queued after the dish card like a level-up.
+func show_title(spec: Dictionary) -> void:
+	var m := UiRewardMoment.new()
+	m.tone = UiRewardMoment.Tone.MILESTONE
+	m.event = str(spec.get("event", ""))
+	m.icon = P0Logic.icon("cookbook")
+	m.item_name = str(spec.get("item_name", ""))
+	m.strip = str(spec.get("strip", ""))
+	show_moment(m)
+
 ## FISH-5 / 5-2 · a gate fish broke free, once per species (§4.8.6, q(55) / q(57)): `Too strong` (Fishing level) or
 ## `Too heavy for your rod` / the fish · rarity / what it needs / the Energy back as it really came back (the
 ## protection's `Energy refunded (8 left today)`, else `+3 Energy back`). No buttons: where to go next lives on the
