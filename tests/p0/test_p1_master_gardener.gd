@@ -1,7 +1,7 @@
 extends GdUnitTestSuite
 ## Master Gardener (Farming Lv10, §4.6.1 / §4.8.3; SGODOT-275): a skill's title is a `title_*` key among its conveniences
 ## in content, at its level (farming.conveniences.title_master_gardener 10); its name lives in one table,
-## P0Logic.TITLE_NAMES. The Lv10 banner lists it last as `… title` (`Seed Saver, Master Gardener title`), and a
+## P0Logic.TITLE_NAMES. The Lv10 banner lists it last as `… title` (`2nd Greenhouse, Seed Saver, Master Gardener title`), and a
 ## RewardMoment Milestone follows the banner: `Master Gardener` · `Farming Lv10` · `New title`, the hoe.
 
 var rt: P0Runtime
@@ -19,7 +19,7 @@ func test_the_levels_bring_their_titles_by_name() -> void:
 	assert_array(P0Logic.level_titles("farming", 9)).is_empty()
 	assert_array(P0Logic.level_titles("cooking", 10)).is_equal(["title_chef"])
 	# the level's line names it from TITLE_NAMES, never the key
-	assert_array(P0Logic.level_unlocks({}, "farming", 10)).is_equal(["Seed Saver", "Master Gardener title"])
+	assert_array(P0Logic.level_unlocks({}, "farming", 10)).is_equal(["2nd Greenhouse", "Seed Saver", "Master Gardener title"])
 	assert_array(P0Logic.level_unlocks({}, "cooking", 10)).is_equal(["Lucky Double", "Chef title"])
 	var card := P0Logic.title_card("farming", 10, "title_master_gardener")
 	assert_that([card.event, card.item_name, card.strip]).is_equal(["Master Gardener", "Farming Lv10", "New title"])

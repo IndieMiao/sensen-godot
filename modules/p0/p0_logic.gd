@@ -1223,6 +1223,11 @@ static func level_unlocks(view: Dictionary, skill: String, level: int) -> Array:
 				out.append(item_name(view, id))
 			var hoe: Dictionary = content().get("tools", {}).get("row_hoe", {})
 			if int(hoe.get("gate", 0)) == level: out.append(item_name(view, str(hoe.get("id", ""))))
+			# a level that allows another of a facility (content facilities.kinds.<kind>.cap_by_farming, §4.6.1: the Greenhouse
+			# 1 at Lv8, 2 at Lv10): `2nd Greenhouse`, as q(178)'s `2nd Fish Trap` (q(179)); the first comes with its blueprint below
+			for kind in content().get("facilities", {}).get("kinds", {}).values():
+				for at in kind.get("cap_by_farming", []):
+					if int(at[0]) == level and int(at[1]) >= 2: out.append("%s %s" % [P0KitchenLogic.ordinal(int(at[1])), str(kind.get("name", ""))])
 			# P1 conveniences (content farming.conveniences: Seed Saver at Lv10, §4.6.1)
 			var conv: Dictionary = content().get("farming", {}).get("conveniences", {})
 			for k in conv:
