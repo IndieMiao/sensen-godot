@@ -16,6 +16,7 @@ import { catalog } from './shops.js';
 import type { BoardRequest, BoardSlot, P0State } from './state.js';
 import { clusterById, clusterOf, homeClimate, homeOf, noteDelivery, rankedCities, writtenCluster } from './travel.js';
 import { homeFacts, type Homed } from './home.js';
+import { homeSetOf } from './home_city.js';
 import { cityPlaces, genPonds, type WorldContent } from './world.js';
 
 const H = 3_600_000;
@@ -47,7 +48,7 @@ export function eligible(c: P0Content, s: P0State, board: BoardId): string[] {
 /** An explore template can be drawn: a home outpost to send the player to (Stamp Run), or a city elsewhere with one. */
 function visitOpen(c: P0Content, s: P0State, board: BoardId, need: Need): boolean {
   const v = need.visit;
-  if (!v || v.where === 'same_city') return visitPlaces(c, board).length > 0;
+  if (!v || v.where === 'same_city') return visitPlaces(c, board, s).length > 0;
   return crossCities(c, s, v).some(id => crossTarget(c, id, v.role ?? 'market') !== null);
 }
 
@@ -110,11 +111,12 @@ export function regionalPool(c: P0Content, s: Homed, need: Need): string[] {
   return ids.filter(id => obtainable(c, id));
 }
 
-/** §9.6.3 explore (Stamp Run): the home city's outposts a board request may send the player to — not the board's own
- * (the Market Board hangs in the market square). */
-export function visitPlaces(c: P0Content, board: BoardId): string[] {
-  const own = board === 'market' ? 'market' : null;
-  return (c.outposts ?? []).filter(o => o.role !== own).map(o => o.id);
+/** §9.6.3 explore (Stamp Run): the home set's outposts a board request may send the player to (SGODOT-303) — not the
+ * board's own (the Market Board hangs in the market square). */
+export function visitPlaces(c: P0Content, board: BoardId, s: Homed): string[] {
+  const set = homeSetOf(c, s);
+  if (!set) return [];
+  return (board === 'market' ? [set.tackle, set.tea, set.post] : [set.tackle, set.tea, set.post, set.market]);
 }
 
 /** What an empty board shows while no template is open yet: the lowest gate (e.g. Market Basket · Farming Lv4). */
@@ -181,7 +183,7 @@ function drawRequest(c: P0Content, s: P0State, board: BoardId, slot: number, at:
     }
     if (!visit) return null;
   } else if (t.need.kind === 'visit') {   // explore: one outpost to check in at, no items
-    const places = visitPlaces(c, board);
+    const places = visitPlaces(c, board, s);
     visit = { place: places[Math.floor(draw() * places.length)], done: false };
   } else if (t.need.regional) {   // regional: one of the climate's / city's items
     const pool = regionalPool(c, s, t.need);
