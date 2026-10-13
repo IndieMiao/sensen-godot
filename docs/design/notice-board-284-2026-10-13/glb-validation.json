@@ -1,0 +1,192 @@
+{
+  "checks": [
+    {
+      "check": "One GLB mesh and one surface",
+      "passed": true
+    },
+    {
+      "check": "One material, zero textures",
+      "passed": true
+    },
+    {
+      "check": "Position, normal and vertex color only",
+      "passed": true
+    },
+    {
+      "check": "Triangle budget and manifest",
+      "passed": true
+    },
+    {
+      "check": "Opaque vertex colors",
+      "passed": true
+    },
+    {
+      "check": "Exported palette exactly equals copied source values",
+      "passed": true
+    },
+    {
+      "check": "Exact palette provenance: post_wood",
+      "passed": true
+    },
+    {
+      "check": "Exact palette provenance: frame_wood",
+      "passed": true
+    },
+    {
+      "check": "Exact palette provenance: cork_wood",
+      "passed": true
+    },
+    {
+      "check": "Exact palette provenance: roof_green",
+      "passed": true
+    },
+    {
+      "check": "Exact palette provenance: roof_edge",
+      "passed": true
+    },
+    {
+      "check": "Exact palette provenance: paper_ivory",
+      "passed": true
+    },
+    {
+      "check": "Exact palette provenance: paper_milk",
+      "passed": true
+    },
+    {
+      "check": "Exact palette provenance: paper_yellow",
+      "passed": true
+    },
+    {
+      "check": "Exact palette provenance: pin_red",
+      "passed": true
+    },
+    {
+      "check": "Exact palette provenance: pin_gold",
+      "passed": true
+    },
+    {
+      "check": "Roof green also exists exactly in well.glb",
+      "passed": true
+    },
+    {
+      "check": "Actual board region including pin heads protrudes <= 0.012 m from cork",
+      "passed": true
+    },
+    {
+      "check": "Zero degenerate triangles",
+      "passed": true
+    },
+    {
+      "check": "Triangle winding agrees with shading normals",
+      "passed": true
+    },
+    {
+      "check": "Identity scale and orientation in GLB nodes",
+      "passed": true
+    },
+    {
+      "check": "Exact socket: board_center",
+      "passed": true
+    },
+    {
+      "check": "Exact socket: mark",
+      "passed": true
+    },
+    {
+      "check": "Actual GLB triangle/BVH intersections = 0: storage",
+      "passed": true
+    },
+    {
+      "check": "Actual GLB triangle/BVH intersections = 0: well",
+      "passed": true
+    },
+    {
+      "check": "Overlap detector positive control: shifted storage intersects left post",
+      "passed": true
+    },
+    {
+      "check": "Four named editable blank papers and four round pins",
+      "passed": true
+    },
+    {
+      "check": "Paper dimensions and 0.005 m depth: Paper 1 / blank paper_ivory",
+      "passed": true
+    },
+    {
+      "check": "Paper tilt within 8 degrees: Paper 1 / blank paper_ivory",
+      "passed": true
+    },
+    {
+      "check": "Paper dimensions and 0.005 m depth: Paper 2 / blank paper_yellow",
+      "passed": true
+    },
+    {
+      "check": "Paper tilt within 8 degrees: Paper 2 / blank paper_yellow",
+      "passed": true
+    },
+    {
+      "check": "Paper dimensions and 0.005 m depth: Paper 3 / blank paper_milk",
+      "passed": true
+    },
+    {
+      "check": "Paper tilt within 8 degrees: Paper 3 / blank paper_milk",
+      "passed": true
+    },
+    {
+      "check": "Paper dimensions and 0.005 m depth: Paper 4 / blank paper_ivory",
+      "passed": true
+    },
+    {
+      "check": "Paper tilt within 8 degrees: Paper 4 / blank paper_ivory",
+      "passed": true
+    },
+    {
+      "check": "All editable construction objects named",
+      "passed": true
+    }
+  ],
+  "neighbours": [
+    {
+      "asset": "storage",
+      "offset": [
+        -0.65,
+        0,
+        0
+      ],
+      "triangles": 472,
+      "intersecting_triangle_pairs": 0,
+      "sha256": "cd27e5cae4917990801ce83d602fb1d530a7b4c2aa4ae25d4645e27b2ba7910f"
+    },
+    {
+      "asset": "well",
+      "offset": [
+        0,
+        0,
+        1.3
+      ],
+      "triangles": 3264,
+      "intersecting_triangle_pairs": 0,
+      "sha256": "e60fbb69d8c988886f43c3c7f5db205652bc62bb65407d9aea6b166d42904926"
+    }
+  ],
+  "maximum_board_relief_m": 0.0118042328953743,
+  "positive_control_intersections": 127,
+  "asset": {
+    "triangles": 1012,
+    "surfaces": 1,
+    "sha256": "1bd8b8226045aaf99c5e72b64d882568dd27b11ed03f84521bdd6d41156a2d5d",
+    "bounds": [
+      [
+        -0.35,
+        0.0,
+        -0.13
+      ],
+      [
+        0.35,
+        1.595,
+        0.13
+      ]
+    ]
+  },
+  "failures": []
+}
