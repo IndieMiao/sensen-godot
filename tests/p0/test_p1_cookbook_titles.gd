@@ -74,8 +74,8 @@ func test_the_title_strip_marks_reached_the_next_with_its_count_and_the_rest_lat
 		["Head Chef", "later"], ["Master Chef", "later"]])   # Muscle Memory is not on this line (its own axis)
 	assert_that([strip[1].have, strip[1].need]).is_equal([12, 20])
 	assert_str(P0KitchenLogic.title_strip(_view(5, 0))[0].state).is_equal("next")
-	assert_str(P0KitchenLogic.muscle_line(_view(12, 6))).is_equal("Muscle Memory 6/10")
-	assert_str(P0KitchenLogic.muscle_line(_view(12, 10, ["muscle_memory"]))).is_equal("")
+	assert_dict(P0KitchenLogic.muscle_item(_view(12, 6))).is_equal({title = "Muscle Memory", have = 6, need = 10, reached = false})
+	assert_bool(P0KitchenLogic.muscle_item(_view(12, 10, ["muscle_memory"])).reached).is_true()   # kept, in ink, no count
 
 # ---------------------------------------------------------------- after the dish card, said once
 
@@ -133,3 +133,72 @@ func test_a_fish_dex_milestone_is_left_to_its_own_handler() -> void:
 	assert_bool(cards.all(func(m): return str((m as UiRewardMoment).event).begins_with("Fish-dex"))).is_true()
 	rt.ui.close_modal()
 	await get_tree().process_frame
+
+# ---------------------------------------------------------------- the Cookbook's title strip
+
+func _drawer(v: Dictionary) -> P0KitchenDrawer:
+	var host := Control.new()
+	host.theme = UiKit.theme()
+	host.size = Vector2(360, 800)
+	add_child(auto_free(host))
+	var d := P0KitchenDrawer.new(v)
+	d.animate = false   # in place at once: rects measured across frames compare
+	host.add_child(d)
+	for i in 3: await get_tree().process_frame
+	return d
+
+## COOK-TITLES 2575:132633 (安其拉; 不知火舞 on 302): a 336 × 53 card where the chips were under the mode tabs, the chips 6
+## under it — so they, the recipe card and the grid move down 59 — and the grid's bottom where it was.
+func test_the_title_strip_sits_between_the_tabs_and_the_chips() -> void:
+	var d: P0KitchenDrawer = await _drawer(_view(12, 6))
+	var titles := d.get("_titles") as Control
+	var chips_of := func() -> Rect2: return (d.find_child("CookAll", true, false) as Control).get_parent().get_global_rect()
+	var card := titles.get_global_rect()
+	var tabs := (d.get("_modes") as Control).get_global_rect()
+	var chips: Rect2 = chips_of.call()
+	var grid := (d.get("_pages") as Control).get_global_rect()
+	titles.get_parent().visible = false   # the drawer as it was
+	for i in 2: await get_tree().process_frame
+	var chips_before: Rect2 = chips_of.call()
+	var grid_before := (d.get("_pages") as Control).get_global_rect()
+	assert_that([card.position.x, card.size.x, card.size.y]).is_equal([tabs.position.x, 336.0, 53.0])
+	assert_float(card.position.y).is_equal_approx(chips_before.position.y, 0.01)
+	assert_float(chips.position.y - card.end.y).is_equal_approx(6.0, 0.01)
+	assert_float(chips.position.y - chips_before.position.y).is_equal_approx(59.0, 0.01)
+	assert_float(grid.position.y - grid_before.position.y).is_equal_approx(59.0, 0.01)
+	assert_float(grid.end.y).is_equal_approx(grid_before.end.y, 0.01)
+
+## The words and their weights: reached in ink, the next with its count ExtraBold, the rest and every ` · ` grey; Muscle
+## Memory after the rule, grey with its count, then the name alone in ink.
+func test_the_title_strip_reads_how_far_the_cookbook_is() -> void:
+	var d: P0KitchenDrawer = await _drawer(_view(12, 6))
+	assert_array(d.title_texts()).is_equal(["Home Cook", " · ", "Line Cook 12/20", " · ", "Head Chef", " · ", "Master Chef",
+		"|", "Muscle Memory ", "6/10"])
+	var line: HFlowContainer = d.get("_title_line")
+	var label := func(i: int, k: int) -> Label: return line.get_child(i).get_child(k) as Label
+	assert_that([label.call(0, 0).theme_type_variation, label.call(1, 0).theme_type_variation, label.call(2, 0).theme_type_variation]).is_equal(
+		[UiTokens.STYLE_C11_B, UiTokens.STYLE_C11_XB, UiTokens.STYLE_C11_B])
+	assert_that(label.call(0, 0).get_theme_color(&"font_color")).is_equal(UiTokens.COLOR_TEXT)   # reached
+	assert_that(label.call(1, 0).get_theme_color(&"font_color")).is_equal(UiTokens.COLOR_TEXT)   # next
+	assert_that(label.call(2, 0).get_theme_color(&"font_color")).is_equal(P0KitchenDrawer.TITLE_GREY)   # later
+	assert_that(label.call(0, 1).get_theme_color(&"font_color")).is_equal(P0KitchenDrawer.TITLE_GREY)   # the dot
+	# all of the first line on one line at 360 wide, the rule 4 under it, Muscle Memory 4 under the rule
+	assert_float(line.size.y).is_equal(16.0)   # one line (Nunito 11 sets 16 high)
+	var rule := (d.get("_muscle_rule") as Control).get_global_rect()
+	assert_float(rule.size.y).is_equal(1.0)
+	assert_float(rule.position.y - line.get_global_rect().end.y).is_equal(4.0)
+	# reached
+	d.view = _view(48, 10, ["line_cook", "head_chef", "master_chef", "muscle_memory"])
+	d.refresh()
+	await get_tree().process_frame
+	assert_array(d.title_texts()).is_equal(["Home Cook", " · ", "Line Cook", " · ", "Head Chef", " · ", "Master Chef", "|", "Muscle Memory"])
+	assert_that((d.get("_muscle") as Node).get_child(0).get_theme_color(&"font_color")).is_equal(UiTokens.COLOR_TEXT)
+	# a view without the milestones (an older server): Home Cook alone, no rule
+	var plain := _view(5, 0)
+	plain.cooking.erase("milestones")
+	d.view = plain
+	d.refresh()
+	await get_tree().process_frame
+	assert_array(d.title_texts()).is_equal(["Home Cook 5/8"])
+	assert_bool((d.get("_muscle_rule") as Control).visible).is_false()
+

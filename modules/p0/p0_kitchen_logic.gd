@@ -892,9 +892,10 @@ static func title_strip(view: Dictionary) -> Array:
 		else: t.state = "later"
 	return out
 
-## `Muscle Memory 6/10` (the Mastered pages toward it), "" once it is reached or without the milestone.
-static func muscle_line(view: Dictionary) -> String:
+## The strip's last item, after its divider (COOK-TITLES 2575:133159): Muscle Memory and the Mastered pages toward it,
+## {title, have, need, reached} — `Muscle Memory 6/10` grey until reached, then the name alone in ink; {} without it.
+static func muscle_item(view: Dictionary) -> Dictionary:
 	for m in cooking(view).get("milestones", []):
-		if str(m.get("counts", "")) == "mastered" and not bool(m.get("reached", false)):
-			return "%s %d/%d" % [str(m.title), int(cooking(view).get("mastered_count", 0)), int(m.need)]
-	return ""
+		if str(m.get("counts", "")) == "mastered":
+			return {title = str(m.title), have = int(cooking(view).get("mastered_count", 0)), need = int(m.need), reached = bool(m.get("reached", false))}
+	return {}
