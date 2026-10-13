@@ -91,7 +91,8 @@ func _fly_home() -> void:
 	var bearing := float(CityMapData.city(str(hr.get("id", ""))).get("overview", {}).get("bearing", city_bearing)) if not hr.is_empty() else city_bearing
 	if not hr.is_empty(): _switch_city(hr)
 	if rt.ui.has_modal(): rt.ui.close_modal()   # no card stays over the flight (周瑜 on #341)
-	_travel_fly({lat = home.x, lng = home.y, zoom = SHOW_ZOOM, bearing = bearing}, _origin(), held, "Homestead", km, func():
+	_travel_fly({lat = home.x, lng = home.y, zoom = SHOW_ZOOM, bearing = bearing}, _origin(), held, P0Travel.home(_view()),
+		"Homestead", km, func():
 		# landed with another scene over the map (it was suspended) or another way out under way: not home yet — the
 		# player is where they were, and goes home again from there (周瑜 on #341)
 		if AppRouter.top_instance() != null or AppRouter._navigation_pending: return
@@ -854,8 +855,8 @@ func on_arrival(ev: Dictionary) -> void:
 	_switch_city(r)
 	_load_city_places(cluster)   # its ponds and outposts, read while the camera flies
 	_travel_fly({lat = float(overview.get("lat", c.lat)), lng = float(overview.get("lng", c.lng)),
-		zoom = float(overview.get("zoom", 11.0)), bearing = float(overview.get("bearing", 0.0))}, left, held, str(c.name),
-		int(ev.get("km", 0)), func():
+		zoom = float(overview.get("zoom", 11.0)), bearing = float(overview.get("bearing", 0.0))}, left, held, cluster,
+		str(c.name), int(ev.get("km", 0)), func():
 			# §11.8.4 steps 5 then 7 (q(152) ②): a first visit's stamp says itself for 1.5 s with its +10 Energy, then
 			# goes, and only then the card slides up, so the toast never lies over it; a return only floats Welcome back.
 			if not first:
@@ -882,8 +883,9 @@ func _arrival_card_after_stamp(cluster: String) -> void:
 ## The cross-city flight under way (q(147)): its plan, how far it is, the cover, what landing does, the city left.
 var _trip := {}
 
-## to: the overview ahead ({lat, lng, zoom, bearing}, kept in f64 so it lands exactly there).
-func _travel_fly(to: Dictionary, left: Vector2, held: String, city: String, km: int, land: Callable) -> void:
+## to: the overview ahead ({lat, lng, zoom, bearing}, kept in f64 so it lands exactly there); held / ahead: the city
+## left and the city ahead (clusters).
+func _travel_fly(to: Dictionary, left: Vector2, held: String, ahead: String, city: String, km: int, land: Callable) -> void:
 	if not _trip.is_empty(): _travel_land()   # one at a time: an earlier one lands first
 	_reset_gesture()
 	_city_bounds()
@@ -896,15 +898,25 @@ func _travel_fly(to: Dictionary, left: Vector2, held: String, city: String, km: 
 	var top := 120.0
 	if rt != null and rt.ui.open_marker_area().has_area(): top = rt.ui.open_marker_area().position.y + 8.0
 	cover.open(city, km, top)
-	# q(152) ③: both ends in the safe area at the top — 32 in from each side, from the pill's bottom to the Bag key's top
-	# (the bottom of the area markers may use), in the map's logical units
+	# q(152) ③ / q(157) ①: both ends in the safe area at the top — 32 in from each side, from the pill's bottom to 8 over
+	# the right-hand keys' topmost (the home key; the Bag key's top without it), in the map's logical units; and q(157)
+	# ②: both cities' bubbles whole, over that bottom and 8 in from each side
 	var safe := Rect2()
+	var within := Rect2()
+	var bubbles: Array = []
 	if rt != null and rt.ui.open_marker_area().has_area():
 		var k := _map_logical_height() / maxf(1.0, vp.y)
 		var pill_bottom := top + cover.pill.get_combined_minimum_size().y
-		safe = Rect2(Vector2(SAFE_SIDE, pill_bottom) * k, Vector2(vp.x - SAFE_SIDE * 2.0, rt.ui.open_marker_area().end.y - pill_bottom) * k)
+		var bottom := safe_bottom()
+		safe = Rect2(Vector2(SAFE_SIDE, pill_bottom) * k, Vector2(vp.x - SAFE_SIDE * 2.0, bottom - pill_bottom) * k)
+		within = Rect2(Vector2(BUBBLE_EDGE, pill_bottom) * k, Vector2(vp.x - BUBBLE_EDGE * 2.0, bottom - pill_bottom) * k)
+		for cluster in [held, ahead]:
+			var r := P0Clusters.region(cluster) if cluster != "" and city_map else {}
+			if r.is_empty(): continue
+			var e: Array = city_map.bubble_extent(r)
+			bubbles.append([e[0], Rect2((e[1] as Rect2).position * k, (e[1] as Rect2).size * k)])
 	var plan := P0TravelFlight.plan(center_lat, center_lng, zoom + _zoom_elastic, city_bearing, left, float(to.lat),
-		float(to.lng), float(to.zoom), float(to.bearing), view, safe)
+		float(to.lng), float(to.zoom), float(to.bearing), view, safe, bubbles, within)
 	_zoom_elastic = 0.0
 	cover.skip_requested.connect(_skip_travel)
 	if rt != null and held != "": rt.ui.hold_here(held)
@@ -912,7 +924,8 @@ func _travel_fly(to: Dictionary, left: Vector2, held: String, city: String, km: 
 	_focus_tween.tween_method(_travel_at, 0.0, P0TravelFlight.TOTAL_S, P0TravelFlight.TOTAL_S)
 	_focus_tween.tween_callback(_travel_land)
 	_trip = {plan = plan, to = to, t = 0.0, cover = cover, land = land, tween = _focus_tween, left = left,
-		start_us = Time.get_ticks_usec()}
+		start_us = Time.get_ticks_usec(), from_city = held, to_city = ahead}
+	_regions_key = ""   # in the air the two ends lead the bubbles (q(157))
 	_show_self(false)   # the avatar leaves with the take-off (v2)
 	_flight = _focus_tween
 	_flight_kind = "travel"
@@ -947,6 +960,18 @@ func _travel_at(step: float) -> void:
 func _show_self(on: bool) -> void:
 	hide_self = not on
 	if farm_markers: farm_markers.visible = on
+
+## The flight's safe area's bottom, screen px (q(157) ①): 8 over the right-hand keys' topmost — the home key — or the
+## Bag key's top (the bottom of the area markers may use) where that is higher or there is no key.
+func safe_bottom() -> float:
+	var bottom := rt.ui.open_marker_area().end.y
+	if city_map and is_instance_valid(city_map.home_key):
+		bottom = minf(bottom, city_map.home_key.get_global_rect().position.y - SAFE_OVER_KEYS)
+	return bottom
+
+const SAFE_OVER_KEYS := 8.0
+## How far in from the screen's sides a city's bubble stands at the flight's top (q(157) ②), UI px.
+const BUBBLE_EDGE := 8.0
 
 ## The flight's safe area's side margin (q(152) ③), UI px.
 const SAFE_SIDE := 32.0
@@ -1205,8 +1230,12 @@ func city_regions() -> Array:
 	var z := zoom + _zoom_elastic
 	var step := 360.0 / pow(2.0, z) / 4.0   # a quarter of a 512 px tile's width in degrees
 	var here := P0Travel.here(_view())
+	var opened := _opened_city
+	if travelling():   # q(157): in the air the city left is where the player is and the city ahead the one opened
+		if str(_trip.get("from_city", "")) != "": here = str(_trip.from_city)
+		if str(_trip.get("to_city", "")) != "": opened = str(_trip.to_city)
 	var key := "%.1f|%d|%d|%s|%dx%d|%d|%s|%s" % [z, roundi(center_lat / step), roundi(center_lng / step), str(region.get("id", "")), vp.x, vp.y,
-		P0Travel.explored(_view()).hash(), _opened_city, here]
+		P0Travel.explored(_view()).hash(), opened, here]
 	if key == _regions_key: return _regions
 	_regions_key = key
 	var out: Array = []
@@ -1229,7 +1258,7 @@ func city_regions() -> Array:
 	# q(153): by priority — the city just opened, where the player is, home, the visited (most populous first), then the
 	# rest; the bubbles draw and give way in this order (CityMapView._yield_bubbles)
 	if not _asked.is_empty(): add.call(_asked, BUBBLE_OPENED)
-	if _opened_city != "": add.call(P0Clusters.region(_opened_city), BUBBLE_OPENED)
+	if opened != "": add.call(P0Clusters.region(opened), BUBBLE_OPENED)
 	if here != "": add.call(P0Clusters.region(here), BUBBLE_HERE)
 	add.call(P0Clusters.region(P0Clusters.cluster_of_region(P0_REGION)), BUBBLE_HOME)
 	# Visited cities at any zoom, whatever their size (不知火舞 on #216): the player's own map of where they have been —

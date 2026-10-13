@@ -1733,32 +1733,10 @@ func _update_bubbles() -> void:
 		node.visible = not detail and area.has_point(point)
 		bubble.dot.visible = false
 		if not node.visible: continue
-		bubble.name.text = L10n.text(str(r.get("name", id)))
-		if bubble_state.is_valid():
-			var st: Dictionary = bubble_state.call(id)
-			states[id] = st
-			bubble.count.text = str(st.get("text", ""))
-			bubble.count.visible = bubble.count.text != ""
-			# The line keeps a text line's height with the glyph alone (P0's home city at 0 online), so the bubble's
-			# bottom does not move as the count comes and goes (不知火舞 on #238). Measured here, in the tree, with the
-			# label's own theme font.
-			var line := bubble.count.get_parent() as Control
-			var text_h: float = bubble.count.get_theme_font("font").get_height(bubble.count.get_theme_font_size("font_size"))
-			if line.custom_minimum_size.y != text_h: line.custom_minimum_size.y = text_h
-			var glyph := str(st.get("icon", ""))
-			bubble.icon.visible = glyph != ""
-			if glyph != "": bubble.icon.texture = GameUi.icon(glyph)
-			var box := node.get_theme_stylebox("panel") as StyleBoxFlat
-			if box != null:
-				box.border_color = Color("609f28")
-				box.set_border_width_all(2 if bool(st.get("outline", false)) else 0)
-		else:
-			var count := int(host.city_farm_counts.get(id, -1))
-			bubble.count.text = L10n.count_text("%d farm", "%d farms", count) if count >= 0 else ""
-			bubble.count.visible = count >= 0
-		node.size = node.get_combined_minimum_size()
+		var st := _fill_bubble(bubble, id, r)
+		if bubble_state.is_valid(): states[id] = st
 		# 气泡挂在城市点下方，自己的头像站在点上方，两者在同一城市也不互相遮挡。
-		node.position = point + Vector2(-node.size.x * 0.5, 6)
+		node.position = point + Vector2(-node.size.x * 0.5, BUBBLE_DROP)
 		bubble.dot.position = point - Vector2(5, 5)
 		bubble.dot.visible = true
 		if bubble_clear_rects.is_valid():
@@ -1774,6 +1752,53 @@ func _update_bubbles() -> void:
 			bubbles[id].dot.visible = false
 		elif not bubbles[id].node.visible and not bubble_clear_rects.is_valid(): bubbles[id].dot.visible = false   # Journey: as before
 	if not states.is_empty(): _yield_bubbles(order, states)
+
+## How far under its city's point a bubble hangs, px.
+const BUBBLE_DROP := 6.0
+
+## Where region `r`'s bubble stands, reading as it would now (q(157): the flight frames both ends' bubbles whole): its
+## city's point [lat, lng] and the bubble's rect from that point, px.
+func bubble_extent(r: Dictionary) -> Array:
+	var id := str(r.id)
+	if not bubbles.has(id):
+		bubbles[id] = _make_bubble(id)
+		bubbles[id].node.visible = false
+		bubbles[id].dot.visible = false
+	var node: Control = bubbles[id].node
+	_fill_bubble(bubbles[id], id, r)
+	var overview: Dictionary = CityMapData.city(id).get("overview", {})
+	var at := Vector2(float(overview.get("lat", r.center[0])), float(overview.get("lng", r.center[1])))
+	return [at, Rect2(Vector2(-node.size.x * 0.5, BUBBLE_DROP), node.size)]
+
+## A bubble's words for region `r` — its name and the host's line (bubble_state; Journey: its farms) — and its size; the
+## host's state ({} without one).
+func _fill_bubble(bubble: Dictionary, id: String, r: Dictionary) -> Dictionary:
+	var node: Control = bubble.node
+	var st := {}
+	bubble.name.text = L10n.text(str(r.get("name", id)))
+	if bubble_state.is_valid():
+		st = bubble_state.call(id)
+		bubble.count.text = str(st.get("text", ""))
+		bubble.count.visible = bubble.count.text != ""
+		# The line keeps a text line's height with the glyph alone (P0's home city at 0 online), so the bubble's
+		# bottom does not move as the count comes and goes (不知火舞 on #238). Measured here, in the tree, with the
+		# label's own theme font.
+		var line := bubble.count.get_parent() as Control
+		var text_h: float = bubble.count.get_theme_font("font").get_height(bubble.count.get_theme_font_size("font_size"))
+		if line.custom_minimum_size.y != text_h: line.custom_minimum_size.y = text_h
+		var glyph := str(st.get("icon", ""))
+		bubble.icon.visible = glyph != ""
+		if glyph != "": bubble.icon.texture = GameUi.icon(glyph)
+		var box := node.get_theme_stylebox("panel") as StyleBoxFlat
+		if box != null:
+			box.border_color = Color("609f28")
+			box.set_border_width_all(2 if bool(st.get("outline", false)) else 0)
+	else:
+		var count := int(host.city_farm_counts.get(id, -1))
+		bubble.count.text = L10n.count_text("%d farm", "%d farms", count) if count >= 0 else ""
+		bubble.count.visible = count >= 0
+	node.size = node.get_combined_minimum_size()
+	return st
 
 ## q(153) (不知火舞 on 293 8f407417 / e5ec0cc0), the host's bubbles in its priority order (highest first): a bubble that
 ## runs into a higher city's bubble or dot hides whole, its dot staying for the cities that keep theirs (`dot_stays`:

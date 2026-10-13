@@ -35,10 +35,12 @@ var _turn := 0.0
 var _hold := false
 
 ## from_*: the camera now; left: the city left (lat, lng); to_*: the overview ahead. view: the map's logical size;
-## safe: where both ends must stand at the top, in the same units (q(152) ③: 32 in from each side, from the pill's
-## bottom to the Bag key's top); none: the middle 70 % × 55 %.
+## safe: where both ends must stand at the top, in the same units (q(152) ③ / q(157) ①: 32 in from each side, from the
+## pill's bottom to 8 over the right-hand keys); none: the middle 70 % × 55 %. bubbles: [[lat, lng], Rect2 from that
+## point] — the two cities' bubbles, which stand whole in `within` at the top too (q(157) ②).
 static func plan(from_lat: float, from_lng: float, from_zoom: float, from_bearing: float, left: Vector2,
-		to_lat: float, to_lng: float, to_zoom: float, to_bearing: float, view: Vector2, safe := Rect2()) -> P0TravelFlight:
+		to_lat: float, to_lng: float, to_zoom: float, to_bearing: float, view: Vector2, safe := Rect2(),
+		bubbles := [], within := Rect2()) -> P0TravelFlight:
 	var f := P0TravelFlight.new()
 	f._c0 = _merc(from_lat, from_lng)
 	f._c1 = _merc(to_lat, to_lng)
@@ -51,16 +53,20 @@ static func plan(from_lat: float, from_lng: float, from_zoom: float, from_bearin
 	# The closest zoom (a step out at least) that shows both ends in the safe area, the camera over their middle as the
 	# map draws it far out — its centre kept off the world's top and bottom edges as Mapbox keeps it (#327).
 	var area := safe if safe.has_area() else Rect2(view * Vector2(0.15, 0.225), view * Vector2(0.7, 0.55))
+	var marks: Array = []   # [Mercator point, rect from it]
+	for b in bubbles: marks.append([_merc((b[0] as Vector2).x, (b[0] as Vector2).y), b[1]])
 	var high := minf(from_zoom, to_zoom) - 1.0   # from far out already (z ≈ 2) it may be under the floor (周瑜 on #325)
 	var low := minf(TOP_MIN_ZOOM, high)
 	f._top = low
-	var z := high
-	while z >= low:
-		if frames(a, f._c1, f._mid, z, view, area):
+	# by whole steps down to the floor itself: steps summed as floats came out a hair under it, and a pair fitting only
+	# at the floor never got tried there
+	var steps := maxi(0, ceili((high - low) / FIT_STEP - 1e-6))
+	for i in steps + 1:
+		var z := maxf(low, high - i * FIT_STEP)
+		if frames(a, f._c1, f._mid, z, view, area, marks, within):
 			f._top = z
 			f._hold = true
 			break
-		z -= FIT_STEP
 	f._view = view
 	f._held = kept(f._mid, f._top, view)
 	f._b0 = from_bearing
@@ -68,13 +74,17 @@ static func plan(from_lat: float, from_lng: float, from_zoom: float, from_bearin
 	return f
 
 ## Whether at zoom `z`, the camera over `mid` (Mercator x, y; its y kept off the world's edges), both `a` and `b` stand in
-## `area` of a `view` (the map's logical size).
-static func frames(a: Vector2, b: Vector2, mid: Vector2, z: float, view: Vector2, area: Rect2) -> bool:
+## `area` of a `view` (the map's logical size), and each of `marks` ([Mercator point, rect from it]) wholly in `within`.
+static func frames(a: Vector2, b: Vector2, mid: Vector2, z: float, view: Vector2, area: Rect2, marks := [],
+		within := Rect2()) -> bool:
 	var scale := 512.0 * pow(2.0, z)
 	var c := kept(mid, z, view)
+	var at := func(p: Vector2) -> Vector2: return view * 0.5 + Vector2(fposmod(p.x - c.x + 0.5, 1.0) - 0.5, p.y - c.y) * scale
 	for p in [a, b]:
-		var d := Vector2(fposmod((p as Vector2).x - c.x + 0.5, 1.0) - 0.5, (p as Vector2).y - c.y)
-		if not area.has_point(view * 0.5 + d * scale): return false
+		if not area.has_point(at.call(p)): return false
+	for m in marks:
+		var r: Rect2 = m[1]
+		if not within.encloses(Rect2(at.call(m[0]) + r.position, r.size)): return false
 	return true
 
 ## A camera centre (Mercator x, y) as the map shows it at zoom `z` in a `view` (logical size): its y kept so the world's
