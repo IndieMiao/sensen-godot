@@ -20,7 +20,12 @@ const FIT_STEP := 0.05
 
 var _c0: Vector2   # mercator x, y
 var _mid: Vector2
+## The camera over the two ends at the top as the map shows it: _mid with its y kept off the world's edges (周瑜 on
+## #345: far out at a high latitude the map moved the centre toward the equator, and the landing, reckoned from _mid,
+## did not run from where the camera stood).
+var _held: Vector2
 var _c1: Vector2
+var _view := Vector2.ZERO
 var _z0 := 0.0
 var _top := 0.0
 var _z1 := 0.0
@@ -56,6 +61,8 @@ static func plan(from_lat: float, from_lng: float, from_zoom: float, from_bearin
 			f._hold = true
 			break
 		z -= FIT_STEP
+	f._view = view
+	f._held = kept(f._mid, f._top, view)
 	f._b0 = from_bearing
 	f._turn = wrapf(to_bearing - from_bearing, -180.0, 180.0)
 	return f
@@ -64,27 +71,32 @@ static func plan(from_lat: float, from_lng: float, from_zoom: float, from_bearin
 ## `area` of a `view` (the map's logical size).
 static func frames(a: Vector2, b: Vector2, mid: Vector2, z: float, view: Vector2, area: Rect2) -> bool:
 	var scale := 512.0 * pow(2.0, z)
-	var half := view.y * 0.5 / scale
-	var c := Vector2(mid.x, 0.5 if half >= 0.5 else clampf(mid.y, half, 1.0 - half))
+	var c := kept(mid, z, view)
 	for p in [a, b]:
 		var d := Vector2(fposmod((p as Vector2).x - c.x + 0.5, 1.0) - 0.5, (p as Vector2).y - c.y)
 		if not area.has_point(view * 0.5 + d * scale): return false
 	return true
 
-## The camera at `t` seconds: Vector4(lat, lng, zoom, bearing).
+## A camera centre (Mercator x, y) as the map shows it at zoom `z` in a `view` (logical size): its y kept so the world's
+## top and bottom edges stay off the screen (Mapbox's HEIGHT_ONLY, mirrored by map_poc._constrain_lat).
+static func kept(c: Vector2, z: float, view: Vector2) -> Vector2:
+	var half := view.y * 0.5 / (512.0 * pow(2.0, z))
+	return Vector2(c.x, 0.5 if half >= 0.5 else clampf(c.y, half, 1.0 - half))
+
+## The camera at `t` seconds: Vector4(lat, lng, zoom, bearing) — always a centre the map shows as it is asked.
 func sample(t: float) -> Vector4:
 	var c: Vector2
 	var z: float
 	if t < UP_S:
 		var s := _ease(t / UP_S)
-		c = _c0.lerp(_wrap_near(_mid, _c0), s)
+		c = _c0.lerp(_wrap_near(_held, _c0), s)
 		z = lerpf(_z0, _top, s)
 	elif t < UP_S + FLY_S:
 		var s := (t - UP_S) / FLY_S
 		s = 1.0 - (1.0 - s) * (1.0 - s)   # fast, then slowing
 		# q(156): both ends in view, the camera holds there and only the plane flies; only a pair that does not fit
 		# even at the floor pans along with it
-		c = _mid if _hold else _mid.lerp(_wrap_near(_c1, _mid), s)
+		c = _held if _hold else _held.lerp(_wrap_near(_c1, _held), s)
 		z = _top
 	else:
 		var s := _ease(clampf((t - UP_S - FLY_S) / DOWN_S, 0.0, 1.0))
@@ -92,13 +104,14 @@ func sample(t: float) -> Vector4:
 		if _hold:
 			# down from the held overview toward the city ahead: its point slides from where the overview shows it to the
 			# screen's centre as the zoom grows (its offset on screen shrinking smoothly), so it never leaves the view
-			var c1 := _wrap_near(_c1, _mid)
-			c = c1 - (c1 - _mid) * pow(2.0, _top - z) * (1.0 - s)
+			var c1 := _wrap_near(_c1, _held)
+			c = c1 - (c1 - _held) * pow(2.0, _top - z) * (1.0 - s)
 		else:
 			c = _c1
 	if t >= TOTAL_S:
 		c = _c1
 		z = _z1
+	if _view != Vector2.ZERO: c = kept(c, z, _view)
 	var ll := _geo(c)
 	return Vector4(ll.x, ll.y, z, _b0 + _turn * clampf(t / TOTAL_S, 0.0, 1.0))
 

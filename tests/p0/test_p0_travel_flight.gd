@@ -540,3 +540,36 @@ func test_both_ends_in_view_the_camera_holds_the_overview_through_the_flight() -
 	var g := P0TravelFlight.plan(sf.x, sf.y, 9.0, 0.0, sf, cape.x, cape.y, 11.0, 0.0, view, safe)
 	assert_bool(g.holds()).is_false()
 	assert_float(absf(g.sample(1.0).y - g.sample(2.0).y)).is_greater(1e-3)   # its centre moves through the flight
+
+## 周瑜 on #345: far out at a high latitude the map keeps the world's top edge off the screen and moves the centre
+## toward the equator; the flight held and landed from the centre it asked for, not the one shown, so the city ahead
+## did not come in from where the overview showed it. Every sample is now a centre the map shows as asked, and the
+## landing runs from the overview as shown: the city ahead's offset on screen shrinks from there to nothing.
+func test_a_high_latitude_flight_lands_from_the_overview_the_map_shows() -> void:
+	var view := Vector2(360, 800)
+	var safe := Rect2(32, 140, 296, 560)
+	var reykjavik := Vector2(64.15, -21.94)
+	var vancouver := Vector2(49.28, -123.12)
+	var f := P0TravelFlight.plan(reykjavik.x, reykjavik.y, 9.0, 0.0, reykjavik, vancouver.x, vancouver.y, 11.0, 0.0, view, safe)
+	assert_bool(f.holds()).is_true()
+	var a := Vector2(MapGeoMath.mercator_x(reykjavik.y), MapGeoMath.mercator_y(reykjavik.x))
+	var b := Vector2(MapGeoMath.mercator_x(vancouver.y), MapGeoMath.mercator_y(vancouver.x))
+	var mid := Vector2(a.x + (fposmod(b.x - a.x + 0.5, 1.0) - 0.5) * 0.5, (a.y + b.y) * 0.5)
+	var held := P0TravelFlight.kept(mid, f.top_zoom(), view)
+	assert_float(held.y - mid.y).is_greater(0.01)   # the case: the map moves this overview's centre
+	var merc := func(at: Vector4) -> Vector2: return Vector2(MapGeoMath.mercator_x(at.y), MapGeoMath.mercator_y(at.x))
+	for i in 91:
+		var t := P0TravelFlight.TOTAL_S * i / 90.0
+		var at := f.sample(t)
+		var c: Vector2 = merc.call(at)
+		assert_float(absf(P0TravelFlight.kept(c, at.z, view).y - c.y)).override_failure_message("moved at %.2f s" % t).is_less(1e-6)
+	var top: Vector2 = merc.call(f.sample(P0TravelFlight.UP_S + 0.5))
+	assert_float(absf(top.y - held.y)).is_less(1e-5)   # held where the map shows it
+	var start := (b - held) * 512.0 * pow(2.0, f.top_zoom())   # Vancouver on screen at the top
+	for i in 11:
+		var s := i / 10.0
+		var at := f.sample(P0TravelFlight.UP_S + P0TravelFlight.FLY_S + P0TravelFlight.DOWN_S * s)
+		var c: Vector2 = merc.call(at)
+		var d := Vector2(fposmod(b.x - c.x + 0.5, 1.0) - 0.5, b.y - c.y) * 512.0 * pow(2.0, at.z)
+		var eased := s * s * (3.0 - 2.0 * s)
+		assert_float(d.distance_to(start * (1.0 - eased))).override_failure_message("off by %.1f px at %.1f" % [d.distance_to(start * (1.0 - eased)), s]).is_less(1.0)
