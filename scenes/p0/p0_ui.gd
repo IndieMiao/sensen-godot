@@ -2098,7 +2098,7 @@ func open_keeper_greeting(role: String, ctx := {}) -> void:
 	var lines := P0Logic.keeper_lines(view, role, c)
 	var who: Array = P0CounterDrawer.KEEPERS.get(role, ["", ""])
 	var name := str(c.get("keeper", who[1]))
-	var card := UiDialogueCard.new(P0CounterDrawer.keeper_portrait(name, true), "%s · %s" % [str(c.get("role", who[0])), name], "",
+	var card := UiDialogueCard.new(P0CounterDrawer.keeper_portrait(name, true, str(c.get("look", ""))), "%s · %s" % [str(c.get("role", who[0])), name], "",
 		str(lines.greet))
 	card.theme = UiKit.theme()
 	card.portrait_size = UiDialogueCard.KEEPER_PORTRAIT

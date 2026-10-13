@@ -320,3 +320,74 @@ func test_the_rows_keys_keep_their_44_touch_row_in_the_drawer() -> void:
 		var top := buy.position.y + (buy.size.y - sb.visual_height) * 0.5
 		assert_that([top, sb.visual_height, buy.size.x - sb.inset.x - sb.inset.z]).is_equal([21.0, 34.0, 68.0])
 		assert_float(top + sb.visual_height).is_less(row.size.y - UiTokens.STROKE_DEFAULT)   # 55, above the hairline
+
+## SGODOT-300: a generated city's keeper has no painted art; the greeting card and the counter's keeper bar get a
+## portrait drawn from the keeper's look preset (blank until drawn: headless tests draw nothing). The four painted
+## P0 keepers keep their art.
+func test_keeper_portraits_fall_back_to_the_look() -> void:
+	var painted := P0CounterDrawer.keeper_portrait("Mei", true, "market_temperate_0")
+	assert_object(painted).is_not_null()
+	assert_bool(painted is ImageTexture).override_failure_message("Mei keeps her painted card").is_false()
+	var card := P0CounterDrawer.keeper_portrait("Ezra", true, "market_temperate_0")
+	var head := P0CounterDrawer.keeper_portrait("Ezra", false, "market_temperate_0")
+	assert_bool(card is ImageTexture).is_true()
+	assert_vector(Vector2(card.get_size())).is_equal(Vector2(300, 660))
+	assert_vector(Vector2(head.get_size())).is_equal(Vector2(264, 264))
+	assert_object(P0CounterDrawer.keeper_portrait("Ezra", true, "market_temperate_0")).is_same(card)   # drawn once
+	assert_object(P0CounterDrawer.keeper_portrait("Ezra", true, "")).is_null()   # no look, no art: as before
+	assert_object(P0CounterDrawer.keeper_portrait("Ezra", true, "no_such_look")).is_null()
+
+func test_greeting_card_and_keeper_bar_take_the_keepers_look() -> void:
+	var ui := _ui()
+	await await_idle_frame()
+	ui.set_view(_view())
+	var ctx := {"keeper": "Ezra", "place": "Chestnut Market Square", "look": "market_temperate_1"}
+	ui.open_keeper_greeting("market", ctx)
+	var card: UiDialogueCard = ui._modal.find_children("*", "UiDialogueCard", true, false)[0]
+	assert_object(card.portrait).is_same(P0CounterDrawer.keeper_portrait("Ezra", true, "market_temperate_1"))
+	var drawer := P0CounterDrawer.new(_view(), "market", ctx)
+	add_child(auto_free(drawer))
+	assert_object(drawer.keeper_bar.portrait).is_same(P0CounterDrawer.keeper_portrait("Ezra", false, "market_temperate_1"))
+
+## 上官婉儿 on #339: the drawn pictures are bounded — the most recent 8 cards and 24 heads (about 12 MB); a texture handed
+## out stays valid after its entry is evicted, and asking again draws a fresh one.
+func test_keeper_portrait_cache_is_bounded() -> void:
+	var portraits = load("res://modules/p0/p0_keeper_portraits.gd")
+	var looks: Array = P0Logic.content().get("world", {}).get("keeper_looks", {}).keys().filter(func(k): return not str(k).begins_with("_"))
+	assert_int(looks.size()).is_greater(30)
+	var first := P0CounterDrawer.keeper_portrait("Ezra", true, str(looks[0]))
+	for look in looks: P0CounterDrawer.keeper_portrait("Ezra", true, str(look))
+	for look in looks: P0CounterDrawer.keeper_portrait("Ezra", false, str(look))
+	assert_int(portraits.kept(true)).is_less_equal(8)
+	assert_int(portraits.kept(false)).is_less_equal(24)
+	assert_object(first).is_not_null()   # still valid for whoever shows it
+	assert_object(P0CounterDrawer.keeper_portrait("Ezra", true, str(looks[0]))).is_not_same(first)   # evicted: drawn again
+
+## 不知火舞 on #339: the card's figure is 84–88 % of its height, the shoes 10–14 px (of the 220) above its foot, centred
+## on its outline; a figure too wide for that (a wide hat) touches the sides instead, never cut.
+func test_keeper_card_frames_the_figure_by_its_outline() -> void:
+	var portraits = load("res://modules/p0/p0_keeper_portraits.gd")
+	const W := 300.0
+	const H := 660.0
+	# a figure 400 px tall, off to the left and high in a first picture 2 m tall
+	var outline := Rect2i(60, 90, 110, 400)
+	var frame: Dictionary = portraits.card_frame(outline, 2.0)
+	var per_px := 2.0 / H
+	var at := func(frame: Dictionary, x: float, y: float) -> Vector2:   # a first-picture pixel in the final picture
+		return Vector2(W * 0.5 + ((x - W * 0.5) * per_px - float(frame.right)) / float(frame.size) * H,
+			H * 0.5 + ((y - H * 0.5) * per_px - float(frame.down)) / float(frame.size) * H)
+	var top: Vector2 = at.call(frame, outline.position.x, outline.position.y)
+	var feet: Vector2 = at.call(frame, outline.end.x, outline.end.y)
+	var share := (feet.y - top.y) / H
+	assert_float(share).is_between(0.84, 0.88)
+	assert_float((H - feet.y) / 3.0).is_between(10.0, 14.0)   # 3× the 220 portrait
+	assert_float((top.x + feet.x) * 0.5).is_equal_approx(W * 0.5, 0.5)
+	# a wide hat: the width decides, the figure spans it exactly
+	var wide := Rect2i(20, 150, 260, 300)
+	frame = portraits.card_frame(wide, 2.0)
+	var left: Vector2 = at.call(frame, wide.position.x, wide.position.y)
+	var right: Vector2 = at.call(frame, wide.end.x, wide.end.y)
+	assert_float(left.x).is_equal_approx(0.0, 0.5)
+	assert_float(right.x).is_equal_approx(W, 0.5)
+	assert_float((H - right.y) / 3.0).is_between(10.0, 14.0)
+	assert_float((right.y - left.y) / H).is_less(0.84)

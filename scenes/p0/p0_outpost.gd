@@ -204,6 +204,7 @@ func _open_keeper() -> void:
 ## name, the place ("Keeps the stall · Mission Market Square") and, for the tackle shop, the pond it names.
 func keeper_ctx() -> Dictionary:
 	var ctx := {"keeper": str(keeper.get("name", "")), "place": place_name}
+	if keeper.has("look"): ctx["look"] = str(keeper.look)   # a generated keeper's portrait is drawn from it (SGODOT-300)
 	if outpost.has("nearest"): ctx["nearest"] = (outpost.nearest as Dictionary).duplicate()
 	return ctx
 
