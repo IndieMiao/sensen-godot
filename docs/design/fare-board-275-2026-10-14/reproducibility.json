@@ -1,0 +1,24 @@
+{
+  "blender": "5.2.2 LTS",
+  "artifacts": [
+    {
+      "path": "assets/rooms/post_office/fare_board.glb",
+      "first_sha256": "e5cc02fec20e0f1d2e8f1ac4adf491bf23403ce67f406bd211815ac0a9538d98",
+      "second_sha256": "e5cc02fec20e0f1d2e8f1ac4adf491bf23403ce67f406bd211815ac0a9538d98",
+      "byte_identical": true
+    },
+    {
+      "path": "tools/art/source/fare_board_275/asset-contract.json",
+      "first_sha256": "6727d2d5d992181c37091dbf7eca82018f1c8896b22f4f8c6fb71faa967a853b",
+      "second_sha256": "6727d2d5d992181c37091dbf7eca82018f1c8896b22f4f8c6fb71faa967a853b",
+      "byte_identical": true
+    },
+    {
+      "path": "tools/art/source/fare_board_275/atlas-swatches.json",
+      "first_sha256": "b2acd1a5f8c11ba214d7c9627c8b1b8f04e36f7298700755712d4bd967dcd738",
+      "second_sha256": "b2acd1a5f8c11ba214d7c9627c8b1b8f04e36f7298700755712d4bd967dcd738",
+      "byte_identical": true
+    }
+  ],
+  "all_byte_identical": true
+}

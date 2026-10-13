@@ -1,0 +1,179 @@
+{
+  "atlas": "assets/rooms/post_office/room_albedo_ao.png",
+  "atlas_sha256": "dbae34e9aaeb7553c7264ef841e939ba43b6d462ad60eb18ba1e2132021ffbd9",
+  "size": [
+    2048,
+    2048
+  ],
+  "swatches": {
+    "wood": {
+      "source_asset": "assets/rooms/post_office/sorting_cabinet.glb",
+      "source_sha256": "e469c7c1f13834cdb18c12c7d4fb0f97d9d15ccfb232533f509df45221b1b1c5",
+      "pixel_xy_top_left": [
+        789,
+        1031
+      ],
+      "gltf_uv": [
+        0.385498046875,
+        0.503662109375
+      ],
+      "rgb8": [
+        129,
+        66,
+        39
+      ],
+      "safe_patch_radius_px": 3,
+      "patch_rgb_min": [
+        127,
+        64,
+        38
+      ],
+      "patch_rgb_max": [
+        130,
+        66,
+        40
+      ]
+    },
+    "board": {
+      "source_asset": "assets/rooms/post_office/postal_blue_door.glb",
+      "source_sha256": "edef9197d2f9597363a075674146b40bc94c287f057b5729d8a8b41fcdf8bdf2",
+      "pixel_xy_top_left": [
+        329,
+        455
+      ],
+      "gltf_uv": [
+        0.160888671875,
+        0.222412109375
+      ],
+      "rgb8": [
+        38,
+        71,
+        85
+      ],
+      "safe_patch_radius_px": 3,
+      "patch_rgb_min": [
+        37,
+        70,
+        84
+      ],
+      "patch_rgb_max": [
+        38,
+        72,
+        86
+      ]
+    },
+    "cream": {
+      "source_asset": "assets/rooms/post_office/post_office_sign.glb",
+      "source_sha256": "d1e2a1944761fc589988fa44f4ba44f1b2966a06c84799821cfc3a173e89bcfc",
+      "pixel_xy_top_left": [
+        1376,
+        415
+      ],
+      "gltf_uv": [
+        0.672119140625,
+        0.202880859375
+      ],
+      "rgb8": [
+        235,
+        220,
+        192
+      ],
+      "safe_patch_radius_px": 3,
+      "patch_rgb_min": [
+        235,
+        220,
+        192
+      ],
+      "patch_rgb_max": [
+        235,
+        220,
+        192
+      ]
+    },
+    "red": {
+      "source_asset": "assets/rooms/post_office/post_office_sign.glb",
+      "source_sha256": "d1e2a1944761fc589988fa44f4ba44f1b2966a06c84799821cfc3a173e89bcfc",
+      "pixel_xy_top_left": [
+        692,
+        1263
+      ],
+      "gltf_uv": [
+        0.338134765625,
+        0.616943359375
+      ],
+      "rgb8": [
+        166,
+        56,
+        48
+      ],
+      "safe_patch_radius_px": 3,
+      "patch_rgb_min": [
+        165,
+        56,
+        48
+      ],
+      "patch_rgb_max": [
+        166,
+        56,
+        48
+      ]
+    },
+    "mustard": {
+      "source_asset": "assets/rooms/post_office/postal_blue_door.glb",
+      "source_sha256": "edef9197d2f9597363a075674146b40bc94c287f057b5729d8a8b41fcdf8bdf2",
+      "pixel_xy_top_left": [
+        1445,
+        421
+      ],
+      "gltf_uv": [
+        0.705810546875,
+        0.205810546875
+      ],
+      "rgb8": [
+        155,
+        123,
+        70
+      ],
+      "safe_patch_radius_px": 3,
+      "patch_rgb_min": [
+        109,
+        86,
+        47
+      ],
+      "patch_rgb_max": [
+        155,
+        123,
+        70
+      ]
+    },
+    "teal": {
+      "source_asset": "assets/rooms/post_office/world_map.glb",
+      "source_sha256": "d69fed52c53acff5e8800b15bd17e80e6401f394ee563bf685b3c495693025a5",
+      "pixel_xy_top_left": [
+        1208,
+        1086
+      ],
+      "gltf_uv": [
+        0.590087890625,
+        0.530517578125
+      ],
+      "rgb8": [
+        84,
+        138,
+        156
+      ],
+      "safe_patch_radius_px": 3,
+      "patch_rgb_min": [
+        84,
+        137,
+        155
+      ],
+      "patch_rgb_max": [
+        84,
+        138,
+        156
+      ]
+    }
+  },
+  "choice": "Existing world_map has no red or mustard regions; red uses postal sign, mustard uses door brass, teal uses map. Existing shared atlas only, unchanged."
+}

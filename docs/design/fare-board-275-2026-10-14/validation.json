@@ -1,0 +1,1172 @@
+{
+  "issue": "SGODOT-275",
+  "specification": "v1.1",
+  "author": "刘备",
+  "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+  "date": "2026-10-14",
+  "validation_scope": "Desktop Godot Vulkan Mobile art review; actual room placement and mesh audit; no P0 UI, Android or physical-phone acceptance",
+  "actual_imported_asset": {
+    "bounds": [
+      [
+        -0.449999988079071,
+        -0.324999988079071,
+        0.0
+      ],
+      [
+        0.449999988079071,
+        0.324999988079071,
+        0.0700000002980232
+      ]
+    ],
+    "size": [
+      0.899999976158142,
+      0.649999976158142,
+      0.0700000002980232
+    ],
+    "sockets": {
+      "board_center": [
+        0.0,
+        0.0,
+        0.05
+      ],
+      "mark": [
+        0.0,
+        0.45,
+        0.0
+      ]
+    },
+    "surfaces": 1,
+    "triangles": 674,
+    "uv_max_error": 0.0
+  },
+  "all_checks_passed": true,
+  "check_count": 69,
+  "reports": {
+    "glb": {
+      "checks": [
+        {
+          "check": "Existing atlas SHA-256 unchanged",
+          "passed": true
+        },
+        {
+          "check": "One merged mesh / one surface",
+          "passed": true
+        },
+        {
+          "check": "Single RoomKit_SharedAtlas material",
+          "passed": true
+        },
+        {
+          "check": "Kit convention: no duplicate embedded texture; runtime binds shared atlas",
+          "passed": true
+        },
+        {
+          "check": "Positions/normals/UV only; no vertex colors or extra texture channels",
+          "passed": true
+        },
+        {
+          "check": "Exported triangle count / budget",
+          "passed": true
+        },
+        {
+          "check": "Actual GLB dimensions 0.90 x 0.65 x 0.07",
+          "passed": true
+        },
+        {
+          "check": "Back centre pivot and forward +Z geometry",
+          "passed": true
+        },
+        {
+          "check": "Identity exported node scales and orientations",
+          "passed": true
+        },
+        {
+          "check": "Exact empty: board_center",
+          "passed": true
+        },
+        {
+          "check": "Exact empty: mark",
+          "passed": true
+        },
+        {
+          "check": "No degenerate mesh triangles",
+          "passed": true
+        },
+        {
+          "check": "Triangle winding agrees with shading normals",
+          "passed": true
+        },
+        {
+          "check": "Every exported UV is one of the six existing swatch centres",
+          "passed": true
+        },
+        {
+          "check": "Each triangle samples one constant atlas point: no wood grain / no UV interpolation across islands",
+          "passed": true
+        },
+        {
+          "check": "UV lies within actual source asset triangle: wood",
+          "passed": true
+        },
+        {
+          "check": "7x7 atlas footprint contains no black/blank pixels: wood",
+          "passed": true
+        },
+        {
+          "check": "UV lies within actual source asset triangle: board",
+          "passed": true
+        },
+        {
+          "check": "7x7 atlas footprint contains no black/blank pixels: board",
+          "passed": true
+        },
+        {
+          "check": "UV lies within actual source asset triangle: cream",
+          "passed": true
+        },
+        {
+          "check": "7x7 atlas footprint contains no black/blank pixels: cream",
+          "passed": true
+        },
+        {
+          "check": "UV lies within actual source asset triangle: red",
+          "passed": true
+        },
+        {
+          "check": "7x7 atlas footprint contains no black/blank pixels: red",
+          "passed": true
+        },
+        {
+          "check": "UV lies within actual source asset triangle: mustard",
+          "passed": true
+        },
+        {
+          "check": "7x7 atlas footprint contains no black/blank pixels: mustard",
+          "passed": true
+        },
+        {
+          "check": "UV lies within actual source asset triangle: teal",
+          "passed": true
+        },
+        {
+          "check": "7x7 atlas footprint contains no black/blank pixels: teal",
+          "passed": true
+        },
+        {
+          "check": "No penetrating triangle overlap: room_shell",
+          "passed": true
+        },
+        {
+          "check": "No penetrating triangle overlap: window_wall",
+          "passed": true
+        },
+        {
+          "check": "Nine wall rays confirm solid mounting surface at X=-3.21",
+          "passed": true
+        },
+        {
+          "check": "No penetrating triangle overlap: post_office_sign",
+          "passed": true
+        },
+        {
+          "check": "Board top below actual postal sign by >= 0.1 m",
+          "passed": true
+        },
+        {
+          "check": "No penetrating triangle overlap: postal_counter",
+          "passed": true
+        },
+        {
+          "check": "No penetrating triangle overlap: magazine_rack",
+          "passed": true
+        },
+        {
+          "check": "No penetrating triangle overlap: counter_computer",
+          "passed": true
+        },
+        {
+          "check": "No penetrating triangle overlap: sorting_cabinet",
+          "passed": true
+        },
+        {
+          "check": "Positive control detects deliberately misplaced board inside counter",
+          "passed": true
+        },
+        {
+          "check": "Seven named blank bars and seven colored dots",
+          "passed": true
+        },
+        {
+          "check": "No text objects or curves in editable source",
+          "passed": true
+        },
+        {
+          "check": "Actual bar height 0.030 m: Row 1 / blank ivory bar",
+          "passed": true
+        },
+        {
+          "check": "Actual bar height 0.030 m: Row 2 / blank ivory bar",
+          "passed": true
+        },
+        {
+          "check": "Actual bar height 0.030 m: Row 3 / blank ivory bar",
+          "passed": true
+        },
+        {
+          "check": "Actual bar height 0.030 m: Row 4 / blank ivory bar",
+          "passed": true
+        },
+        {
+          "check": "Actual bar height 0.030 m: Row 5 / blank ivory bar",
+          "passed": true
+        },
+        {
+          "check": "Actual bar height 0.030 m: Row 6 / blank ivory bar",
+          "passed": true
+        },
+        {
+          "check": "Actual bar height 0.030 m: Row 7 / blank ivory bar",
+          "passed": true
+        },
+        {
+          "check": "Seven actual bar centres have 0.065 m pitch",
+          "passed": true
+        }
+      ],
+      "swatches": [
+        {
+          "name": "wood",
+          "source_asset": "assets/rooms/post_office/sorting_cabinet.glb",
+          "source_triangle": 806,
+          "gltf_uv": [
+            0.385498046875,
+            0.503662109375
+          ],
+          "pixel_xy": [
+            789,
+            1031
+          ],
+          "rgb8": [
+            129,
+            66,
+            39
+          ],
+          "safe_radius_px": 3
+        },
+        {
+          "name": "board",
+          "source_asset": "assets/rooms/post_office/postal_blue_door.glb",
+          "source_triangle": 319,
+          "gltf_uv": [
+            0.160888671875,
+            0.222412109375
+          ],
+          "pixel_xy": [
+            329,
+            455
+          ],
+          "rgb8": [
+            38,
+            71,
+            85
+          ],
+          "safe_radius_px": 3
+        },
+        {
+          "name": "cream",
+          "source_asset": "assets/rooms/post_office/post_office_sign.glb",
+          "source_triangle": 529,
+          "gltf_uv": [
+            0.672119140625,
+            0.202880859375
+          ],
+          "pixel_xy": [
+            1376,
+            415
+          ],
+          "rgb8": [
+            235,
+            220,
+            192
+          ],
+          "safe_radius_px": 3
+        },
+        {
+          "name": "red",
+          "source_asset": "assets/rooms/post_office/post_office_sign.glb",
+          "source_triangle": 5034,
+          "gltf_uv": [
+            0.338134765625,
+            0.616943359375
+          ],
+          "pixel_xy": [
+            692,
+            1263
+          ],
+          "rgb8": [
+            166,
+            56,
+            48
+          ],
+          "safe_radius_px": 3
+        },
+        {
+          "name": "mustard",
+          "source_asset": "assets/rooms/post_office/postal_blue_door.glb",
+          "source_triangle": 180,
+          "gltf_uv": [
+            0.705810546875,
+            0.205810546875
+          ],
+          "pixel_xy": [
+            1445,
+            421
+          ],
+          "rgb8": [
+            155,
+            123,
+            70
+          ],
+          "safe_radius_px": 3
+        },
+        {
+          "name": "teal",
+          "source_asset": "assets/rooms/post_office/world_map.glb",
+          "source_triangle": 591,
+          "gltf_uv": [
+            0.590087890625,
+            0.530517578125
+          ],
+          "pixel_xy": [
+            1208,
+            1086
+          ],
+          "rgb8": [
+            84,
+            138,
+            156
+          ],
+          "safe_radius_px": 3
+        }
+      ],
+      "intersections": [
+        {
+          "name": "room_shell",
+          "raw_contact_pairs": 0,
+          "flush_wall_contact_pairs": 0,
+          "penetrating_pairs": 0
+        },
+        {
+          "name": "window_wall",
+          "raw_contact_pairs": 48,
+          "flush_wall_contact_pairs": 48,
+          "penetrating_pairs": 0
+        },
+        {
+          "name": "post_office_sign",
+          "raw_contact_pairs": 0,
+          "flush_wall_contact_pairs": 0,
+          "penetrating_pairs": 0
+        },
+        {
+          "name": "postal_counter",
+          "raw_contact_pairs": 0,
+          "flush_wall_contact_pairs": 0,
+          "penetrating_pairs": 0
+        },
+        {
+          "name": "magazine_rack",
+          "raw_contact_pairs": 0,
+          "flush_wall_contact_pairs": 0,
+          "penetrating_pairs": 0
+        },
+        {
+          "name": "counter_computer",
+          "raw_contact_pairs": 0,
+          "flush_wall_contact_pairs": 0,
+          "penetrating_pairs": 0
+        },
+        {
+          "name": "sorting_cabinet",
+          "raw_contact_pairs": 0,
+          "flush_wall_contact_pairs": 0,
+          "penetrating_pairs": 0
+        }
+      ],
+      "wall_plane_errors_m": [
+        2.0027160640978536e-07,
+        2.0027160640978536e-07,
+        2.0027160640978536e-07,
+        2.0027160640978536e-07,
+        2.0027160640978536e-07,
+        2.0027160640978536e-07,
+        2.0027160640978536e-07,
+        2.0027160640978536e-07,
+        2.0027160640978536e-07
+      ],
+      "sign_vertical_gap_m": 0.48500001430511475,
+      "positive_control_pairs": 129,
+      "asset": {
+        "triangles": 674,
+        "surfaces": 1,
+        "bounds": [
+          [
+            -0.44999998807907104,
+            -0.32499998807907104,
+            0.0
+          ],
+          [
+            0.44999998807907104,
+            0.32500001788139343,
+            0.07000000029802322
+          ]
+        ],
+        "sha256": "e5cc02fec20e0f1d2e8f1ac4adf491bf23403ce67f406bd211815ac0a9538d98"
+      },
+      "failures": []
+    },
+    "godot": {
+      "adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+      "asset": {
+        "bounds": [
+          [
+            -0.449999988079071,
+            -0.324999988079071,
+            0.0
+          ],
+          [
+            0.449999988079071,
+            0.324999988079071,
+            0.0700000002980232
+          ]
+        ],
+        "size": [
+          0.899999976158142,
+          0.649999976158142,
+          0.0700000002980232
+        ],
+        "sockets": {
+          "board_center": [
+            0.0,
+            0.0,
+            0.05
+          ],
+          "mark": [
+            0.0,
+            0.45,
+            0.0
+          ]
+        },
+        "surfaces": 1,
+        "triangles": 674,
+        "uv_max_error": 0.0
+      },
+      "captures": [
+        {
+          "camera_size": 14.4746294021606,
+          "id": "fare-board-room-43deg",
+          "pitch": 42.9999961853027,
+          "size": [
+            1800,
+            1400
+          ],
+          "yaw": 45.7062835693359
+        },
+        {
+          "camera_size": 1.37000000476837,
+          "id": "fare-board-front",
+          "pitch": 0.0,
+          "size": [
+            1800,
+            1400
+          ],
+          "yaw": 0.0
+        },
+        {
+          "camera_size": 1.29999995231628,
+          "id": "fare-board-side",
+          "pitch": 0.0,
+          "size": [
+            1800,
+            1400
+          ],
+          "yaw": 90.0
+        }
+      ],
+      "checks": [
+        {
+          "check": "One actual imported MeshInstance3D",
+          "passed": true
+        },
+        {
+          "check": "One imported surface",
+          "passed": true
+        },
+        {
+          "check": "Actual imported triangles <= 800 and match contract",
+          "passed": true
+        },
+        {
+          "check": "Actual imported dimensions 0.90 x 0.65 x 0.07 m",
+          "passed": true
+        },
+        {
+          "check": "Back-centre pivot at zero and +Z front",
+          "passed": true
+        },
+        {
+          "check": "Root and mesh identity transforms",
+          "passed": true
+        },
+        {
+          "check": "Empty imported: board_center",
+          "passed": true
+        },
+        {
+          "check": "Socket position and identity basis: board_center",
+          "passed": true
+        },
+        {
+          "check": "Empty imported: mark",
+          "passed": true
+        },
+        {
+          "check": "Socket position and identity basis: mark",
+          "passed": true
+        },
+        {
+          "check": "Every imported vertex has atlas UV",
+          "passed": true
+        },
+        {
+          "check": "Actual imported UVs stay at the six verified existing atlas swatch centres",
+          "passed": true
+        },
+        {
+          "check": "RoomKit_SharedAtlas material name",
+          "passed": true
+        },
+        {
+          "check": "Actual Post Office sorting cabinet present",
+          "passed": true
+        },
+        {
+          "check": "Reuse actual room shared atlas material",
+          "passed": true
+        },
+        {
+          "check": "Fare Board uses same runtime material object as room kit",
+          "passed": true
+        },
+        {
+          "check": "Approved wall pose and actual height extent",
+          "passed": true
+        },
+        {
+          "check": "Existing character assembled at public counter approach",
+          "passed": true
+        },
+        {
+          "check": "25 face samples unobstructed by actual room, counter, monitor and plants at default angles",
+          "passed": true
+        },
+        {
+          "check": "Capture saved: fare-board-room-43deg",
+          "passed": true
+        },
+        {
+          "check": "Capture saved: fare-board-front",
+          "passed": true
+        },
+        {
+          "check": "Capture saved: fare-board-side",
+          "passed": true
+        }
+      ],
+      "detail_cast_shadows": false,
+      "failures": [],
+      "placement": {
+        "position": [
+          -3.21000003814697,
+          1.64999997615814,
+          -1.64999997615814
+        ],
+        "world_bounds": [
+          [
+            -3.21000003814697,
+            1.32500004768372,
+            -2.09999990463257
+          ],
+          [
+            -3.14000010490417,
+            1.97499990463257,
+            -1.20000004768372
+          ]
+        ],
+        "yaw": 90.0
+      },
+      "renderer": "mobile",
+      "visibility": {
+        "occluded": 0,
+        "pitch": 43,
+        "samples": 25,
+        "yaw": 45.7062886716275
+      }
+    },
+    "preservation": {
+      "base_commit": "ec5f9bde9865bbc4244668a3f887e21b6d628d63",
+      "existing_files": [
+        {
+          "path": "assets/rooms/post_office/asset_stats.json",
+          "sha256": "7c2cd233533e675a35fb40f8d06d48fedafaff3431752983e9d9c6291199ce87",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/back_wall.glb",
+          "sha256": "f70680f864537e3a30f8fed056ba963781bbc05be31bdee834c5ca6a04eba3ef",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/back_wall.glb.import",
+          "sha256": "7b940dea5feedf1eb67da8ee81cbf689f822856e7364f700f00a2785861ceace",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/blue_entry_mat.glb",
+          "sha256": "abcfd0cea4ccdc5262926dd42fed46ce20be23070533ce74b32f7dc673035b32",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/blue_entry_mat.glb.import",
+          "sha256": "93a4fca7abdf4e69858b2cd9fb2b2dcda0d4b53227e8ef28712a4ca4fcdebb23",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/blue_parcel.glb",
+          "sha256": "5ffb59ee51986ff8f5b3f605ac46f031e739d283055f7dccec0185b95d3f8c45",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/blue_parcel.glb.import",
+          "sha256": "0d5290cbb0df91e85cf51a0f87024a7caf45af5b492bd8bbeb4d6d80d6dac355",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/brown_parcel.glb",
+          "sha256": "b84318f1cfc6445c4d163757a68cd6d401b20f63d5b949022303b46475d45bd5",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/brown_parcel.glb.import",
+          "sha256": "ab290d85f5d803111dcb9856a647125fcaa18267474b1237d393c71e4d2747bd",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/cabinet_plant.glb",
+          "sha256": "f7ac26182d3a481919bff8729c9c25df9f39b3cfeb4b6ff978f93ab7877c5afe",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/cabinet_plant.glb.import",
+          "sha256": "189d42fe5bc819b546b2c17bbec4ea853adbf9b666af1ffecdbab0bd458bc324",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/corner_letter_crate.glb",
+          "sha256": "86e5aa5a81ed5d31899d7adfa1381d5deb9e735af56dc01bed38e02f2604dd46",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/corner_letter_crate.glb.import",
+          "sha256": "9cd115da2ebddd088c9c4d1306ae19ebb1b4eca6213d04592a350f8f21c287b0",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/counter_bell.glb",
+          "sha256": "7aadef05000b7c1ccdf899ea2c31851a05c9d12b775e8fbc6878df1b43006307",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/counter_bell.glb.import",
+          "sha256": "abbf019703e84b80d0d4e507d575ce1d007b0b21b46604128695ad4508bb596d",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/counter_computer.glb",
+          "sha256": "8deaa80a156f3cc67fec5d9fb0bc4766d39694fb238ecb6bc49bdad545467547",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/counter_computer.glb.import",
+          "sha256": "ff4bc7a7998d266c997ccb0f93ee75e9f3dec5bf6896e2a326e644184e2cb4a1",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/counter_dressing.glb",
+          "sha256": "cd4834e92def454fa678adcedf7c6376ee4b834b7103586974f6e50695569956",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/counter_dressing.glb.import",
+          "sha256": "92f2a92e246680b65987d20ac8e8b81bc79578865aa36c1ebbe3f3798d370cbc",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/counter_mail_tray.glb",
+          "sha256": "b48c98db12cdc7eb7eb0fb6b567dc4322e0bc59530d2ddea3e100953a8e87c45",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/counter_mail_tray.glb.import",
+          "sha256": "6bf568abea69e1010f87adbb712fd35d36abf869de85ab69b07c4ac2d42d40fb",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/counter_plant.glb",
+          "sha256": "b8926ae25c002b7799df3f95f25ba61a5904eb650adc2f9a4d14fb4a0ec3eadc",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/counter_plant.glb.import",
+          "sha256": "ce26862acdf06c3cd56e7c99a2dc9bf3dbd405efbd7c5c9bbb77494c1c92f8f1",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/counter_stamps.glb",
+          "sha256": "47fbddd2a51c7b7ccefbf5e73b7556f8ee61244d7658beffc94d9a45b816c5cd",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/counter_stamps.glb.import",
+          "sha256": "1f5ecd27bc1dddefe3f66e75ec008af347070278838d52dd056e93df81dc6966",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/desk_airmail.glb",
+          "sha256": "ffed848b7bf70a3010dd782f092bdc5b1e5e304bbe11f51590c334869adf83b2",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/desk_airmail.glb.import",
+          "sha256": "17d20cd237a13d9c779c42af10fe36f444334ca0902e825fadbeff24bef728c6",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/door_lamp_glow.glb",
+          "sha256": "1d627b25e2a839335b63610992958050cb20bcc0ebadad01212afe43be7fdb1c",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/door_lamp_glow.glb.import",
+          "sha256": "0ab835214a250594b970fa816b47e87e8fcac29961af4ed6dc3da2e59dfa8fb6",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/door_light.glb",
+          "sha256": "091ae13cf5362701f9bfda8a1224c1cf1f222b7e7321a5906209477808a98416",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/door_light.glb.import",
+          "sha256": "29a540fe57447b63d41e9b3365925d31a3fdf0aa4d7e41f61b9a11ea044a88cf",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/door_notice.glb",
+          "sha256": "8dc5ec12d7cde41c2ba794b667344e1afbeb535c3418b0810495a0f51ba092e0",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/door_notice.glb.import",
+          "sha256": "5c88ee061e742c551de15a9a61b5c86a3cc26dab3f385c3c8acb6dc2c29d76f1",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/entry_rug.glb",
+          "sha256": "c95cd4b53322fe7ac3990645bab7a355d974e32ad49d65cf25656879a3ebcdbf",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/entry_rug.glb.import",
+          "sha256": "5bc649588e6555dddda61cffc7ee721d13463fdf3ecc860171b4befcebecd704",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/floor_plant.glb",
+          "sha256": "47779dbf5b35102c7f082ce44feb21f459bad1e7e2a086c0307ffb6bb87fed54",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/floor_plant.glb.import",
+          "sha256": "061973f4bcc27bd90f3fccc51dc58dd1262561a8e61215a277f3d99033d6e1f9",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/front_floor_runner.glb",
+          "sha256": "46bcca591ae908ed2f4b1fa95507f0d4be13e5d48fc60e3ef528f326971c2f65",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/front_floor_runner.glb.import",
+          "sha256": "03ff171c26843c74a32dd67c92dfe98eed3d95bb75cde038fa16961d1d252128",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/layout.json",
+          "sha256": "03187342c8a64f1e875d9a421379afeca8e35cc24a2d35197655b0ca0196b829",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/magazine_rack.glb",
+          "sha256": "96fac20342e9c8bfc722da2dccfa4bfbc4f9c9c07c7ac7aa1c241da2b7a48f27",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/magazine_rack.glb.import",
+          "sha256": "d44014633e1790fb87ab1d577cb1b2692d660711e1ccfb393a569a11735ade65",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/mail_sacks.glb",
+          "sha256": "5bdf686f73b5fe15626992a59fbbd04f8268d923502255025b0226941cb3f435",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/mail_sacks.glb.import",
+          "sha256": "9695ab0e819f603cd41420fa963bfaf8c0d8239cf090da7839eeda8d350ce536",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/mail_stack.glb",
+          "sha256": "62ee7853b4ac969ca4abd46c46a5093680f2ca47944156e1281bdbcb47ad9f2b",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/mail_stack.glb.import",
+          "sha256": "667a0d72fcab674c56b4273f453750338704fe4ca3dd190cd8dcec7bf1a180eb",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/packing_dressing.glb",
+          "sha256": "e2a65ae92014f9b0ae0ac7efd700abe4a896cd5ed9388684f8833beecd94bd2c",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/packing_dressing.glb.import",
+          "sha256": "82afa95878b419f89d6aef10deda83451bdd380687c8dc4eba30dc06d1c199de",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/packing_mat.glb",
+          "sha256": "3eed2a897938476722602c6d6da29dd47e616e453abda27ccf42de594f68f612",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/packing_mat.glb.import",
+          "sha256": "ed24fd616838988e31685c98a049d765e36b602a0ee649415cea375457427e81",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/packing_parcel.glb",
+          "sha256": "250e33c43f43853182f83eaab0bd1a6b555fd4193b5e6779a932b54a4d673537",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/packing_parcel.glb.import",
+          "sha256": "e7ce03fc5c5d6411f24ebcc236b8fc02a2237ddbbcedcf4c36c9d10e9e1f1ccd",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/packing_rug.glb",
+          "sha256": "07c70ee87822f29e99bc052170b1cf3af1bf7e10c3568e3a31e8a1d307cc385c",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/packing_rug.glb.import",
+          "sha256": "1b0e212ce8813f87ec4e82e23f7e7ff5b2a4cd7b19d8a90b678c2e1ec45064e0",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/packing_stool.glb",
+          "sha256": "ce0ce5aee253ad43a2146e19b45635385bef713114417e4dca469881ec3978d8",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/packing_stool.glb.import",
+          "sha256": "2a426024719550d0948470eec81390ca7cfa46444e807c2a637a019881cbe1a4",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/packing_supplies.glb",
+          "sha256": "e1ec133e72d60aa018ff1561f1aa29378b1520f71b11a8c87a825cd641a197a9",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/packing_supplies.glb.import",
+          "sha256": "131d2ecbc2b8821baf60402dd22e0ddf60253684eeca89fdbbc7ed1db19fb7b0",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/packing_table.glb",
+          "sha256": "6cd01c14257e7f67dedcf1076c7f7287c33931561bfe25e7980e8f2012cb57f3",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/packing_table.glb.import",
+          "sha256": "ab497c47c3007ce8ab9265549162e5f707eb9d759d0207bb0c90bf20f1964925",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/parcel_shelf_plant.glb",
+          "sha256": "483f987b6d587370dac855518cc0f13ae02405297423aa130b37e6aa41755795",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/parcel_shelf_plant.glb.import",
+          "sha256": "86d2a72a7a3bf8cddc537bb52f55286584d1d53757091b8e8c688cb5822f94ac",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/parcel_shelf_stock.glb",
+          "sha256": "4d06953ecae1d751241170355585b13f74c5126440fca4b9726392c62f1e86c7",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/parcel_shelf_stock.glb.import",
+          "sha256": "f6c7a6079e25adb0095876333177829e77aa9e208614a06c0e14e051d31ede0e",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/parcel_shelves.glb",
+          "sha256": "9401605487eaa692f090b022bec968b8af4f547e13d28c69d34021df0e143100",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/parcel_shelves.glb.import",
+          "sha256": "f73b87646ea20d886ee359e0221b14334ddcb764c15ac573e3472d0f681421b3",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/post_office_sign.glb",
+          "sha256": "d1e2a1944761fc589988fa44f4ba44f1b2966a06c84799821cfc3a173e89bcfc",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/post_office_sign.glb.import",
+          "sha256": "f9ad8171c7a621b3238f9ab690725f2a4f01ca232172646b5c782c896f2d54ec",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/postal_blue_door.glb",
+          "sha256": "edef9197d2f9597363a075674146b40bc94c287f057b5729d8a8b41fcdf8bdf2",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/postal_blue_door.glb.import",
+          "sha256": "994d035a624c62a06e3c0e824255475f635c694494c06454c253b08f1bb2fe55",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/postal_counter.glb",
+          "sha256": "187ea9c7f1d58fd3cf48310919371a65b18ab6a8e8e84e875e973dffee9b8f60",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/postal_counter.glb.import",
+          "sha256": "3404c94810d304091f65618030f65949f86c0e57b5deb78efe8523e4e00a884a",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/postal_door_frame.glb",
+          "sha256": "9855bf5b9c551052e5ce7840719117175bfc26ca84b8c1819d1d3545b80245ed",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/postal_door_frame.glb.import",
+          "sha256": "1614a234a892ccdbefe26b37014a6f03ad9bb391209a60c903dad1ba983c9e25",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/postal_door_glass.glb",
+          "sha256": "741a02506d661f39b069b348bcebfbc33bcaa3e882630f42d45681377722f642",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/postal_door_glass.glb.import",
+          "sha256": "4d7f0ea97aa8a6fb99454e1901db3c58bf8b9161ff502a6880d6664b5034de09",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/postal_scale.glb",
+          "sha256": "c4328a90730b8b265405d5a2694a841a1df4293da62757e903d8994e059779a0",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/postal_scale.glb.import",
+          "sha256": "3b1a813ccb39769069ee9147adf6c0245a185b4c4c4b2cfceb6eeea0f24aea87",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/red_post_box.glb",
+          "sha256": "23a2cf6d2bfa4ee756c6ceafd87d15cee1eb7f2e409ed8237d578e54f4d1b73c",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/red_post_box.glb.import",
+          "sha256": "72daafd8660241c89d7d15a3a38c4e464a8ece1bd33d4a499482942c16533689",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/room_albedo_ao.png",
+          "sha256": "dbae34e9aaeb7553c7264ef841e939ba43b6d462ad60eb18ba1e2132021ffbd9",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/room_albedo_ao.png.import",
+          "sha256": "a4a2c50ac50aa16ed78582833c6aaa4517b1144305819c0df6d210d7438a7475",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/room_shell.glb",
+          "sha256": "7ddf63c77d1968ddb552c515c1fd5c19c295458af7de139aab352c6c5c4b7149",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/room_shell.glb.import",
+          "sha256": "9f5564e724ce9f4256ff2f3180230c056a5d7497e536ab9efe3594b29e8ce35f",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/sorted_letters.glb",
+          "sha256": "0b8ebff6bed6928c03d865acad04751af15d8d59689a42b04c99c328f43f7e1c",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/sorted_letters.glb.import",
+          "sha256": "153aa74939907076075e0e97684678485feb3856317dc922c26540ac0f839106",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/sorting_cabinet.glb",
+          "sha256": "e469c7c1f13834cdb18c12c7d4fb0f97d9d15ccfb232533f509df45221b1b1c5",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/sorting_cabinet.glb.import",
+          "sha256": "9f89ace1c7935b8e5050410abed465f077ad76c548698893ec5d6a30f7bd5983",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/underdesk_boxes.glb",
+          "sha256": "2779ad15627d2cc96ac8a19b972cf5b3c94b7370f5c14043dacd1fe94b08fb2c",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/underdesk_boxes.glb.import",
+          "sha256": "a14acc05f2c27811f3d5ee4139c546822e78503081353ae9b46512e8f68594a6",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/wall_clock.glb",
+          "sha256": "9104951fd03bd18502665463f1a093f977368e039f5236273242db663fcab7dd",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/wall_clock.glb.import",
+          "sha256": "18b1635549c4581100494403759c2929265a9ac73ee74f0ef170575dcf99db4e",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/wall_dressing.glb",
+          "sha256": "5ab2d546a1e6513f2a852448b104a9cf70adf679e8bbf2adc819e5c7de751aad",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/wall_dressing.glb.import",
+          "sha256": "f9e45cf60b0a75b1d41be3f8da2c378a176b3682178f31bc1074fca6d48e2ec7",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/window_wall.glb",
+          "sha256": "c35c3761d2267922dd8bff3e09e89b671f58726f8eaa153e044f3bb522ef1fd0",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/window_wall.glb.import",
+          "sha256": "ae2f379842715d8efee6f47602055eb91f72b0b3b2b96e752c9d68640856a25e",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/world_map.glb",
+          "sha256": "d69fed52c53acff5e8800b15bd17e80e6401f394ee563bf685b3c495693025a5",
+          "unchanged": true
+        },
+        {
+          "path": "assets/rooms/post_office/world_map.glb.import",
+          "sha256": "5c0be5399c89e35dd5cc6dcba03e4fb39c438193d51f687fff6feec6bb57d787",
+          "unchanged": true
+        },
+        {
+          "path": "scenes/post_office/post_office_art.gd",
+          "sha256": "490c23797edde7c0fd6e6e1dc9541253c8651dbfa2f176d7ee569f4198390d1f",
+          "unchanged": true
+        },
+        {
+          "path": "scenes/post_office/post_office_art.tscn",
+          "sha256": "a3b382821ec73abeeb3b17e3fd179322993a7469da4e6c78ea43575f7b716bac",
+          "unchanged": true
+        },
+        {
+          "path": "tools/art/build_post_office.py",
+          "sha256": "0d27f7fb72efdbcda6db3a3f3266d4bc7902b46ba52d64bdacfe98e262579c17",
+          "unchanged": true
+        },
+        {
+          "path": "tools/art/scene_room_pipeline.py",
+          "sha256": "1db9442e5c250e781d79a03d8575a209dc24b40462ae1aefeb6dac5e36858ef5",
+          "unchanged": true
+        }
+      ],
+      "all_unchanged": true,
+      "import_parameters_exactly_match": "post_office_sign.glb.import",
+      "review_asset_and_import_byte_identical": true
+    },
+    "reproducibility": {
+      "blender": "5.2.2 LTS",
+      "artifacts": [
+        {
+          "path": "assets/rooms/post_office/fare_board.glb",
+          "first_sha256": "e5cc02fec20e0f1d2e8f1ac4adf491bf23403ce67f406bd211815ac0a9538d98",
+          "second_sha256": "e5cc02fec20e0f1d2e8f1ac4adf491bf23403ce67f406bd211815ac0a9538d98",
+          "byte_identical": true
+        },
+        {
+          "path": "tools/art/source/fare_board_275/asset-contract.json",
+          "first_sha256": "6727d2d5d992181c37091dbf7eca82018f1c8896b22f4f8c6fb71faa967a853b",
+          "second_sha256": "6727d2d5d992181c37091dbf7eca82018f1c8896b22f4f8c6fb71faa967a853b",
+          "byte_identical": true
+        },
+        {
+          "path": "tools/art/source/fare_board_275/atlas-swatches.json",
+          "first_sha256": "b2acd1a5f8c11ba214d7c9627c8b1b8f04e36f7298700755712d4bd967dcd738",
+          "second_sha256": "b2acd1a5f8c11ba214d7c9627c8b1b8f04e36f7298700755712d4bd967dcd738",
+          "byte_identical": true
+        }
+      ],
+      "all_byte_identical": true
+    }
+  },
+  "artifacts": {
+    "fare-board-side.png": "ab7af77227e8cadca2dd48c0fe6e821aaed86f60d2f07596ce8da4d5d20c4950",
+    "fare-board-room-43deg.png": "154ec0c52222f02ce5e63ee1fe9755afc550370d6b1fdb0504cd1a57b2c90cf7",
+    "fare-board-front.png": "31a7b4a75070dc08f9db982b0bbc389472b3797aabba2dc9b749d0b5abca23cb"
+  },
+  "decisions": [
+    "Seven rows follow the specification, not the six-row reference image.",
+    "Thin cornice plus two brass round-head screws.",
+    "mark local Y=0.45 follows the explicit v1.1 coordinate; 0.125 m above board top.",
+    "Map has no red/mustard swatches: use existing postal sign red and door brass; teal from map. No atlas modification.",
+    "GLB follows kit convention: external RoomKit_SharedAtlas is bound at runtime. No embedded texture."
+  ],
+  "integration": "Arthur places via post.anchors.json props at (-3.21,1.65,-1.65), yaw 90; preserve full GLB empties and bind actual kit shared material. layout.json remains byte-identical."
+}

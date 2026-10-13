@@ -1,0 +1,55 @@
+{
+  "asset": "assets/rooms/post_office/fare_board.glb",
+  "triangles": 674,
+  "surfaces": 1,
+  "bounds": [
+    [
+      -0.44999998807907104,
+      -0.32499998807907104,
+      -0.0
+    ],
+    [
+      0.44999998807907104,
+      0.32500001788139343,
+      0.07000000029802322
+    ]
+  ],
+  "pivot": "back face centre",
+  "front": "+Z",
+  "board_face_z": 0.05,
+  "sockets": {
+    "board_center": [
+      0,
+      0,
+      0.05
+    ],
+    "mark": [
+      0,
+      0.45,
+      0
+    ]
+  },
+  "placement": {
+    "position": [
+      -3.21,
+      1.65,
+      -1.65
+    ],
+    "yaw_degrees": 90
+  },
+  "row_count": 7,
+  "row_pitch": 0.065,
+  "row_height": 0.03,
+  "row_lengths": [
+    0.57,
+    0.49,
+    0.42,
+    0.54,
+    0.37,
+    0.46,
+    0.31
+  ],
+  "material": "RoomKit_SharedAtlas",
+  "atlas": "assets/rooms/post_office/room_albedo_ao.png",
+  "atlas_sha256": "dbae34e9aaeb7553c7264ef841e939ba43b6d462ad60eb18ba1e2132021ffbd9"
+}

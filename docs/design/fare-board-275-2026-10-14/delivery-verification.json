@@ -1,0 +1,38 @@
+[
+  {
+    "name": "SGODOT-275_Fare-Board_v1.1_fare-board-room-43deg.png",
+    "attachment_id": "2f27f2eb-0e7d-4158-9da6-0b1ba58130e4",
+    "sha256": "154ec0c52222f02ce5e63ee1fe9755afc550370d6b1fdb0504cd1a57b2c90cf7",
+    "bytes": 1333765,
+    "download_matches": true,
+    "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+    "uploader_verified": true
+  },
+  {
+    "name": "SGODOT-275_Fare-Board_v1.1_fare-board-front.png",
+    "attachment_id": "a678a648-ea46-4c6e-a6a5-1d6b33174ab1",
+    "sha256": "31a7b4a75070dc08f9db982b0bbc389472b3797aabba2dc9b749d0b5abca23cb",
+    "bytes": 57309,
+    "download_matches": true,
+    "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+    "uploader_verified": true
+  },
+  {
+    "name": "SGODOT-275_Fare-Board_v1.1_fare-board-side.png",
+    "attachment_id": "0230b8b4-db1b-4e33-adcc-7eddcc43f39c",
+    "sha256": "ab7af77227e8cadca2dd48c0fe6e821aaed86f60d2f07596ce8da4d5d20c4950",
+    "bytes": 36115,
+    "download_matches": true,
+    "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+    "uploader_verified": true
+  },
+  {
+    "name": "SGODOT-275_Fare-Board_v1.1_validation.json",
+    "attachment_id": "1532a579-31ba-43e2-ba12-31ce4b612e95",
+    "sha256": "8666d198a09dbf3b27fb4958738ab408ffe7e33a3fae589c3dccb6b57615ded1",
+    "bytes": 38885,
+    "download_matches": true,
+    "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+    "uploader_verified": true
+  }
+]

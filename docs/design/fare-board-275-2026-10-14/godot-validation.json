@@ -1,0 +1,188 @@
+{
+	"adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+	"asset": {
+		"bounds": [
+			[
+				-0.449999988079071,
+				-0.324999988079071,
+				0.0
+			],
+			[
+				0.449999988079071,
+				0.324999988079071,
+				0.0700000002980232
+			]
+		],
+		"size": [
+			0.899999976158142,
+			0.649999976158142,
+			0.0700000002980232
+		],
+		"sockets": {
+			"board_center": [
+				0.0,
+				0.0,
+				0.05
+			],
+			"mark": [
+				0.0,
+				0.45,
+				0.0
+			]
+		},
+		"surfaces": 1,
+		"triangles": 674,
+		"uv_max_error": 0.0
+	},
+	"captures": [
+		{
+			"camera_size": 14.4746294021606,
+			"id": "fare-board-room-43deg",
+			"pitch": 42.9999961853027,
+			"size": [
+				1800,
+				1400
+			],
+			"yaw": 45.7062835693359
+		},
+		{
+			"camera_size": 1.37000000476837,
+			"id": "fare-board-front",
+			"pitch": 0.0,
+			"size": [
+				1800,
+				1400
+			],
+			"yaw": 0.0
+		},
+		{
+			"camera_size": 1.29999995231628,
+			"id": "fare-board-side",
+			"pitch": 0.0,
+			"size": [
+				1800,
+				1400
+			],
+			"yaw": 90.0
+		}
+	],
+	"checks": [
+		{
+			"check": "One actual imported MeshInstance3D",
+			"passed": true
+		},
+		{
+			"check": "One imported surface",
+			"passed": true
+		},
+		{
+			"check": "Actual imported triangles <= 800 and match contract",
+			"passed": true
+		},
+		{
+			"check": "Actual imported dimensions 0.90 x 0.65 x 0.07 m",
+			"passed": true
+		},
+		{
+			"check": "Back-centre pivot at zero and +Z front",
+			"passed": true
+		},
+		{
+			"check": "Root and mesh identity transforms",
+			"passed": true
+		},
+		{
+			"check": "Empty imported: board_center",
+			"passed": true
+		},
+		{
+			"check": "Socket position and identity basis: board_center",
+			"passed": true
+		},
+		{
+			"check": "Empty imported: mark",
+			"passed": true
+		},
+		{
+			"check": "Socket position and identity basis: mark",
+			"passed": true
+		},
+		{
+			"check": "Every imported vertex has atlas UV",
+			"passed": true
+		},
+		{
+			"check": "Actual imported UVs stay at the six verified existing atlas swatch centres",
+			"passed": true
+		},
+		{
+			"check": "RoomKit_SharedAtlas material name",
+			"passed": true
+		},
+		{
+			"check": "Actual Post Office sorting cabinet present",
+			"passed": true
+		},
+		{
+			"check": "Reuse actual room shared atlas material",
+			"passed": true
+		},
+		{
+			"check": "Fare Board uses same runtime material object as room kit",
+			"passed": true
+		},
+		{
+			"check": "Approved wall pose and actual height extent",
+			"passed": true
+		},
+		{
+			"check": "Existing character assembled at public counter approach",
+			"passed": true
+		},
+		{
+			"check": "25 face samples unobstructed by actual room, counter, monitor and plants at default angles",
+			"passed": true
+		},
+		{
+			"check": "Capture saved: fare-board-room-43deg",
+			"passed": true
+		},
+		{
+			"check": "Capture saved: fare-board-front",
+			"passed": true
+		},
+		{
+			"check": "Capture saved: fare-board-side",
+			"passed": true
+		}
+	],
+	"detail_cast_shadows": false,
+	"failures": [],
+	"placement": {
+		"position": [
+			-3.21000003814697,
+			1.64999997615814,
+			-1.64999997615814
+		],
+		"world_bounds": [
+			[
+				-3.21000003814697,
+				1.32500004768372,
+				-2.09999990463257
+			],
+			[
+				-3.14000010490417,
+				1.97499990463257,
+				-1.20000004768372
+			]
+		],
+		"yaw": 90.0
+	},
+	"renderer": "mobile",
+	"visibility": {
+		"occluded": 0,
+		"pitch": 43,
+		"samples": 25,
+		"yaw": 45.7062886716275
+	}
+}
