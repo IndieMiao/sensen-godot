@@ -73,11 +73,20 @@ var _looks: Node3D   # p0_looks.gd: Porch, Kitchen Wing and the Lv10 house by th
 var _sign := Vector3.ZERO   # Homestead sign right of the farmhouse door (WorldBadges · Farm 1135:79267): HOME-1
 var _plaque := Vector3.ZERO   # Upgrade Plaque left of the door (1510:97492), shown from the first upgrade: PLAQUE-READ
 var _plaque_node: Node3D
-var _chef_sign := Vector3.ZERO   # the Chef's Sign's post (Homestead Lv10), left of the door path: P0Garden.CHEF_SIGN_CELL
+var _chef_sign := Vector3.ZERO   # the Chef's Sign's post foot (Homestead Lv10), left of the door path: P0Garden.CHEF_SIGN_CELL
 var _chef_sign_node: Node3D
-const CHEF_SIGN_MARK := Vector3(-0.34, 1.95, 0)   # its strip over the board
-const CHEF_SIGN_HIT := Vector3(-0.34, 1.25, 0)    # the board's middle
+var _chef_sign_look := ""        # the model shown: "a" timber / "b" stone
+## 刘备's chef_sign_a / _b (#356 / #376; 上官婉儿 v1.3): pivot at the post's foot, +Z front, its arm out to −X. The post
+## stands right of the anchor cell's centre — v1.3 asked about 0.18 m, but in the default camera the board then covered
+## the bench's left edge by 3 px and its middle fell inside the bench's 44 px tap (42.5 px from the seat), so a tap on the
+## board opened the bench; at 0.08 m the board clears the bench by about 2 px and its middle is 47 px from the seat (the
+## spec's rule: less shift until the bench is clear, the board reaching further into the mine path (4,14), 0.177 m). The
+## cell stays solid (the post's collider is all that blocks).
+const CHEF_SIGN_SHIFT := Vector3(0.08, 0, 0)
+const CHEF_SIGN_MARK := Vector3(-0.332, 1.95, 0)   # its strip over the board (board top 1.51, arm 1.70)
+const CHEF_SIGN_HIT := Vector3(-0.332, 1.285, 0)   # the board's centre (the model's board_center socket)
 const CHEF_SIGN_TAP_PX := 40.0
+const CHEF_SIGN_BOARD := AABB(Vector3(-0.582, 1.06, -0.025), Vector3(0.5, 0.45, 0.06))   # the board with its emblem (manifest)
 var _mailbox := Vector3.ZERO   # the farmhouse Mailbox (§12.5.2; SGODOT-234 C): opens the Inbox, as the bell does
 var _door := Vector3.ZERO     # the walkway cell in front of the farmhouse door
 var _door_armed := false
@@ -209,9 +218,11 @@ func _build_world() -> void:
 	_plaque_node.rotation.y = 0.35
 	_plaque_node.visible = false
 	props.add_child(_plaque_node)
-	# The Chef's Sign (Homestead Lv10): a placeholder post and hanging board until 上官婉儿's prop lands at `chef_sign`.
-	_chef_sign = P0Garden.chef_sign_point(bp)
-	_chef_sign_node = chef_sign_prop(_chef_sign)
+	# The Chef's Sign (Homestead Lv10): its model put in by the look it shows (_chef_sign_model).
+	_chef_sign = P0Garden.chef_sign_point(bp) + CHEF_SIGN_SHIFT
+	_chef_sign_node = Node3D.new()
+	_chef_sign_node.name = "ChefSign"
+	_chef_sign_node.position = _chef_sign
 	_chef_sign_node.visible = false
 	props.add_child(_chef_sign_node)
 	_mailbox = P0Garden.mailbox_point(bp)
@@ -978,6 +989,7 @@ func _prompts(v: Dictionary) -> void:
 	_plaque_node.visible = not v.get("homestead", {}).get("plaque", []).is_empty()
 	world_prompt("plaque", P0WorldPrompts.plaque(v), _plaque, Vector3(0, 0.85, 0), Vector3(0, 0.35, 0), _plaque_node.visible)
 	_show_chef_sign(bool(v.get("homestead", {}).get("unlocks", {}).get("chefs_sign", false)))
+	if _chef_sign_node.visible: _chef_sign_model(_looks.shown(Looks.HOUSE_STAGE) if _looks else "")
 	world_prompt("chef_sign", P0WorldPrompts.chef_sign(v), _chef_sign, CHEF_SIGN_MARK, CHEF_SIGN_HIT, _chef_sign_node.visible)
 	world_prompt("bench", P0WorldPrompts.bench(v), _bench, Vector3(0, 0.95, 0), Vector3(0, 0.35, 0))
 	world_prompt("mailbox", P0WorldPrompts.mailbox(v), _mailbox, MAILBOX_MARK, MAILBOX_HIT)
@@ -1050,36 +1062,25 @@ static func chef_sign_card() -> Dictionary:
 	return {"title": "Chef's Sign", "lead": "Homestead Lv10", "icon": P0Logic.icon("kitchen"),
 		"facts": [note.left(1).to_upper() + note.substr(1)], "button": ""}
 
-## Placeholder Chef's Sign (上官婉儿: a post, an arm and a hanging board, 1.7 m, the board's foot ≥ 1.0 m up, one cell; the
-## foot at the anchor, +Z to the camera): wood post 1.7 m, an arm 0.6 m to the left — away from the door path and the
-## bench behind (不知火舞 on 282) — a 0.56 × 0.4 board on two chains.
-static func chef_sign_prop(at: Vector3) -> Node3D:
-	var root := Node3D.new()
-	root.name = "ChefSign"
-	root.position = at
-	var wood := StandardMaterial3D.new()
-	wood.albedo_color = Color(0.48, 0.33, 0.2)
-	wood.roughness = 0.9
-	var board_mat := StandardMaterial3D.new()
-	board_mat.albedo_color = Color(0.93, 0.86, 0.68)
-	board_mat.roughness = 0.85
-	var parts := [
-		["Post", Vector3(0.08, 1.7, 0.08), Vector3(0, 0.85, 0), wood],
-		["Arm", Vector3(0.62, 0.06, 0.06), Vector3(-0.3, 1.64, 0), wood],
-		["Board", Vector3(0.56, 0.4, 0.04), Vector3(-0.34, 1.25, 0), board_mat],
-		["ChainL", Vector3(0.015, 0.16, 0.015), Vector3(-0.54, 1.53, 0), wood],
-		["ChainR", Vector3(0.015, 0.16, 0.015), Vector3(-0.14, 1.53, 0), wood],
-	]
-	for p in parts:
-		var m := MeshInstance3D.new()
-		m.name = str(p[0])
-		var box := BoxMesh.new()
-		box.size = p[1]
-		m.mesh = box
-		m.position = p[2]
-		m.material_override = p[3]
-		root.add_child(m)
-	return root
+## The Chef's Sign's model after the Master Farmhouse look it came with at Lv10 (上官婉儿 on 282: it follows Lv10's a / b),
+## LOOK-PICK's preview of it too: stone (b) chef_sign_b, else timber chef_sign_a.
+func _chef_sign_model(look: String) -> void:
+	var want := "b" if look == "b" else "a"
+	if want == _chef_sign_look and _chef_sign_node.get_child_count() > 0: return
+	_chef_sign_look = want
+	for c in _chef_sign_node.get_children():
+		_chef_sign_node.remove_child(c)
+		c.free()
+	_chef_sign_node.add_child(chef_sign_mesh(want))
+
+## A box's bounds on screen (shots: placement by numbers).
+func _box_on_screen(at: Vector3, size: Vector3) -> Rect2:
+	var r := Rect2(cam.unproject_position(at), Vector2.ZERO)
+	for i in 8: r = r.expand(cam.unproject_position(at + Vector3(size.x * (i & 1), size.y * ((i >> 1) & 1), size.z * ((i >> 2) & 1))))
+	return r
+
+static func chef_sign_mesh(look: String) -> MeshInstance3D:
+	return FarmArt.instance("chef_sign_b" if look == "b" else "chef_sign_a")
 
 ## Basic Room's bench (648 tris; q(30)) with the room's shared atlas material.
 func _bench_prop(at: Vector3) -> Node3D:
@@ -1163,8 +1164,9 @@ func p0_dev(step: PackedStringArray) -> bool:
 			print("P0_CHEFSIGN ", JSON.stringify({visible = _chef_sign_node.visible, chefs_sign = rt.session.view.get("homestead", {}).get("unlocks", {}).get("chefs_sign", null),
 				board = at.call(_chef_sign + CHEF_SIGN_HIT), foot = at.call(_chef_sign), top = at.call(_chef_sign + Vector3(0, 1.7, 0)),
 				plaque = at.call(_plaque), sign = at.call(_sign), door = at.call(_door), bench = at.call(_bench), actor = at.call(actor.position),
-				board_rect = _screen_rect(_chef_sign_node.get_node("Board")), bench_rect = _screen_rect(find_child("Bench", true, false)),
-				bench_seat = at.call(_bench + Vector3(0, 0.35, 0))}))
+				board_rect = _box_on_screen(_chef_sign + CHEF_SIGN_BOARD.position, CHEF_SIGN_BOARD.size), bench_rect = _screen_rect(find_child("Bench", true, false)),
+				bench_seat = at.call(_bench + Vector3(0, 0.35, 0)), unit_x = at.call(_chef_sign + Vector3.RIGHT) - at.call(_chef_sign),
+				shift = CHEF_SIGN_SHIFT.x, look = _chef_sign_look}))
 		"mailbox": p0_tap(cam.unproject_position(_mailbox + MAILBOX_HIT))   # the Inbox through the Mailbox's own tap (234 C)
 		"mouth": p0_tap(cam.unproject_position(_mine + Vector3(0, 1.6, 0)))   # the mine mouth's model, high on the arch (int11 ②)
 		"cardtap", "cardnew", "cardexpress":   # a real tap on the mouth's EntryCard: main / New run / Express (SGODOT-266, 288)

@@ -3,6 +3,8 @@ extends GdUnitTestSuite
 ## path as one faces the house, on a yard cell that is no bed, no path and nothing else's; up only from Lv10, then solid;
 ## its strip `Chef's Sign`, and a tap opens the facilities' small card with HOME-1's Lv10 line, no button.
 
+const FarmArt = preload("res://modules/farm/farm_art.gd")
+
 func test_its_cell_is_yard_left_of_the_door_path_off_the_field_and_the_paths() -> void:
 	var c := P0Garden.CHEF_SIGN_CELL
 	var yard: Dictionary = P0Decor.yard()
@@ -19,12 +21,24 @@ func test_its_cell_is_yard_left_of_the_door_path_off_the_field_and_the_paths() -
 	var bp := P0Garden.blueprint()
 	assert_bool(bp.is_walkable(c)).is_true()
 
-func test_the_placeholder_is_a_post_and_a_board_up_off_the_ground() -> void:
-	var s: Node3D = auto_free(load("res://scenes/p0/p0_farm.gd").chef_sign_prop(Vector3.ZERO))
-	var board := s.get_node("Board") as MeshInstance3D
-	var post := s.get_node("Post") as MeshInstance3D
-	assert_float(post.position.y + (post.mesh as BoxMesh).size.y * 0.5).is_equal_approx(1.7, 0.01)   # 1.7 m tall
-	assert_float(board.position.y - (board.mesh as BoxMesh).size.y * 0.5).is_greater_equal(1.0)   # its foot ≥ 1.0 m up
+## 刘备's models (#356 / #376): timber chef_sign_a, stone chef_sign_b after Lv10's look (上官婉儿 on 282), timber by
+## default; 1.74 m, the 0.50 m board 1.06 m up on an arm out to −X, its centre where the strip's tap is; the post right of
+## the cell's centre (at most 0.185: B's foot is 5 mm from the cell's edge; 0.08 keeps the board off the bench on screen).
+func test_the_sign_is_the_timber_or_stone_model_after_lv10s_look() -> void:
+	var farm = load("res://scenes/p0/p0_farm.gd")
+	var a: MeshInstance3D = auto_free(farm.chef_sign_mesh("a"))
+	var b: MeshInstance3D = auto_free(farm.chef_sign_mesh("b"))
+	var plain: MeshInstance3D = auto_free(farm.chef_sign_mesh(""))
+	assert_object(a.mesh).is_same(FarmArt.mesh_for("chef_sign_a"))
+	assert_object(b.mesh).is_same(FarmArt.mesh_for("chef_sign_b"))
+	assert_object(plain.mesh).is_same(a.mesh)
+	for m in [a, b]:
+		var box := (m as MeshInstance3D).mesh.get_aabb()
+		assert_float(box.end.y).is_equal_approx(1.74, 0.01)
+		assert_float(box.position.x).is_equal_approx(-0.582, 0.01)   # the board's outer edge, out to −X
+		assert_bool(box.has_point(farm.CHEF_SIGN_HIT)).is_true()
+	assert_vector(farm.CHEF_SIGN_HIT).is_equal(Vector3(-0.332, 1.285, 0))   # board_center
+	assert_float(farm.CHEF_SIGN_SHIFT.x).is_between(0.0, 0.185)
 
 func test_its_card_reads_its_title_level_and_homes_line_without_a_button() -> void:
 	var card: Dictionary = load("res://scenes/p0/p0_farm.gd").chef_sign_card()
