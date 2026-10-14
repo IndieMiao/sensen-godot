@@ -127,6 +127,7 @@ func _init() -> void:
 	ui.recenter.connect(func(): _call("p0_recenter", []))
 	ui.show_spot.connect(_show_spot)
 	ui.show_on_map.connect(_show_on_map)
+	ui.notice_board_opened.connect(_ask_presence)   # the Notice Board's online counts (q(164))
 	ui.can_show_spot = func() -> bool: return is_instance_valid(world) and world.has_method("p0_show_spot")
 	ui.near_resident = func() -> String:   # an outpost's resident within reach (Gift to <Name>, SGODOT-225)
 		return str(world.call("p0_near_resident")) if is_instance_valid(world) and world.has_method("p0_near_resident") else ""
@@ -275,6 +276,28 @@ func _show_spot(where: String) -> void:
 		leave_room()
 		return
 	_call("p0_show_spot", [where])
+
+## The outposts' online counts for the Notice Board (q(164)): one GET /p0/presence, as the map polls it; a failure
+## leaves the board without person badges (nobody shown is never wrong for a moment).
+var _presence: HTTPRequest
+func _ask_presence() -> void:
+	if not is_instance_valid(_presence):
+		_presence = HTTPRequest.new()
+		_presence.timeout = 8.0
+		add_child(_presence)
+		_presence.request_completed.connect(_on_presence)
+	if _presence.get_http_client_status() != HTTPClient.STATUS_DISCONNECTED or session.base_url == "": return
+	var headers := PackedStringArray(["x-p0-player: " + session.player_id])
+	if session.access_key != "": headers.append("x-p0-key: " + session.access_key)   # the demo server's key
+	_presence.request(session.base_url + "/p0/presence", headers)
+
+func _on_presence(result: int, code: int, _h: PackedStringArray, body: PackedByteArray) -> void:
+	if result != HTTPRequest.RESULT_SUCCESS or code != 200: return
+	var data = JSON.parse_string(body.get_string_from_utf8())
+	if not (data is Dictionary) or not (data.get("outposts") is Dictionary): return
+	var online := {}
+	for id in data.outposts: online[str(id)] = int(data.outposts[id].get("online", 0))
+	ui.set_notice_online(online)
 
 ## Show on map: from a world, back to the map, which points at the pin on resume (p0_map.show_place); on the map
 ## itself the map points at it at once (蒙恬 on #44).
@@ -1471,6 +1494,8 @@ func _dev_shot(dt: float) -> void:
 			"mapdata": ui.open_map_data(func(): ui.open_licenses(func(): ui.open_settings(func(): ui.open_profile())))   # q(133) v3
 			"licensetext": ui.open_license_text(step[1] if step.size() > 1 else "worldcover",
 				func(): ui.open_licenses(func(): ui.open_settings(func(): ui.open_profile())))
+			"noticeboard": ui.open_notice_board()   # the stall's Notice Board (q(164) shots)
+			"noticeonline": ui.set_notice_online({"sh_market_1": 4, "sh_tea_1": 3, "sh_tackle_1": 3, "sh_post_1": 2})   # shots: who is in, as the frame
 			"pagebottom":
 				for sc in ui.root.find_children("*", "ScrollContainer", true, false): (sc as ScrollContainer).scroll_vertical = 100000
 			"barterpress":   # barterpress:stone — that mineral's Barter key in the open market drawer (q(166) shots)

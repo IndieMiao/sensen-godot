@@ -267,6 +267,15 @@ const CHEF_SIGN_BOARD_CELL := Vector2i(4, 14)
 static func chef_sign_point(bp: FarmBlueprint) -> Vector3:
 	return bp.cell_to_world(CHEF_SIGN_CELL)
 
+## The Notice Board (Homestead Lv5, q(164); SGODOT-284): beside the Homestead Stall, off the beds, the paths, the bench,
+## the Chef's Sign and every facility (苏烈 / 哪吒's two candidates, 不知火舞 picks: A (15, 15) right of the stall, under
+## the well; B (13, 15) left of it, between the farmhouse and the stall). Anchor `notice_board`: its foot, +Z toward the
+## camera. A yard object (no decor on it); solid once it is up.
+const NOTICE_BOARD_CELL := Vector2i(15, 15)
+
+static func notice_board_point(bp: FarmBlueprint) -> Vector3:
+	return bp.cell_to_world(NOTICE_BOARD_CELL)
+
 ## The farmhouse Mailbox (§12.5.2, q(24); SGODOT-234 C): by the house's right wall, between the Homestead sign and the
 ## stall (about 1.45 m from each), clear of the door path, the fence and the field. Solid, one cell.
 const MAILBOX_CELL := Vector2i(12, 16)

@@ -5,6 +5,7 @@ extends Node3D
 ## Ponds are on the map; the kitchen is inside the farmhouse (P0Room, SGODOT-226); nothing here is greybox.
 
 const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
+const P0NoticeBoardLogic := preload("res://modules/p0/p0_notice_board.gd")   # the stall's Notice Board (q(164))
 const FarmProps = preload("res://modules/farm/farm_props.gd")
 const FarmCamera = preload("res://modules/farm/farm_camera.gd")
 const FarmArt = preload("res://modules/farm/farm_art.gd")
@@ -87,6 +88,11 @@ const CHEF_SIGN_SHIFT := Vector3(0.08, 0, 0)
 const CHEF_SIGN_MARK := Vector3(-0.332, 1.95, 0)   # its strip over the board (board top 1.51, arm 1.70)
 const CHEF_SIGN_HIT := Vector3(-0.332, 1.285, 0)   # the board's centre (the model's board_center socket)
 const CHEF_SIGN_TAP_PX := 40.0
+var _notice := Vector3.ZERO   # the Notice Board's foot (Homestead Lv5, q(164)) beside the stall: P0Garden.NOTICE_BOARD_CELL
+var _notice_node: Node3D
+const NOTICE_MARK := Vector3(0, 1.75, 0)   # its strip over the board (the model's `mark` socket)
+const NOTICE_HIT := Vector3(0, 1.17, 0)    # the board's centre (the model's `board_center` socket, c8ab943e)
+const NOTICE_TAP_PX := 40.0
 const CHEF_SIGN_BOARD := AABB(Vector3(-0.582, 1.06, -0.025), Vector3(0.5, 0.45, 0.06))   # the board with its emblem (manifest)
 var _mailbox := Vector3.ZERO   # the farmhouse Mailbox (§12.5.2; SGODOT-234 C): opens the Inbox, as the bell does
 var _door := Vector3.ZERO     # the walkway cell in front of the farmhouse door
@@ -226,6 +232,11 @@ func _build_world() -> void:
 	_chef_sign_node.position = _chef_sign
 	_chef_sign_node.visible = false
 	props.add_child(_chef_sign_node)
+	# The Notice Board (Homestead Lv5, q(164)): 刘备's model (#395) at the `notice_board` anchor.
+	_notice = P0Garden.notice_board_point(bp)
+	_notice_node = notice_board_prop(_notice)
+	_notice_node.visible = false
+	props.add_child(_notice_node)
 	_mailbox = P0Garden.mailbox_point(bp)
 	props.add_child(_mailbox_prop(_mailbox))
 	P0Garden.block_points(bp, [_mailbox])
@@ -957,6 +968,9 @@ func p0_tap(screen: Vector2) -> void:
 	# the Chef's Sign's board after the bench: where the two overlap on screen the bench takes the tap (不知火舞 on 282)
 	elif _chef_sign_node.visible and cam.unproject_position(_chef_sign + CHEF_SIGN_HIT).distance_to(screen) < CHEF_SIGN_TAP_PX:
 		open_chef_sign()
+	# the Notice Board beside the stall, before it: its board is the smaller target (q(164) ①)
+	elif _notice_node.visible and cam.unproject_position(_notice + NOTICE_HIT).distance_to(screen) < NOTICE_TAP_PX:
+		open_notice_board()
 	elif cam.unproject_position(_stall + Vector3(0, 0.4, 0)).distance_to(screen) < 56:
 		actor.face(_stall)
 		rt.ui.open_stall()
@@ -976,6 +990,7 @@ func _tap_card(id: String) -> bool:
 			actor.face(_plaque)
 			HomePanel.plaque(rt.ui)
 		"chef_sign": open_chef_sign()
+		"notice_board": open_notice_board()
 		"stall":
 			actor.face(_stall)
 			rt.ui.open_stall()
@@ -1012,6 +1027,8 @@ func _prompts(v: Dictionary) -> void:
 	_show_chef_sign(bool(v.get("homestead", {}).get("unlocks", {}).get("chefs_sign", false)))
 	if _chef_sign_node.visible: _chef_sign_model(_looks.shown(Looks.HOUSE_STAGE) if _looks else "")
 	world_prompt("chef_sign", P0WorldPrompts.chef_sign(v), _chef_sign, CHEF_SIGN_MARK, CHEF_SIGN_HIT, _chef_sign_node.visible)
+	_show_notice_board(P0NoticeBoardLogic.unlocked(v))
+	world_prompt("notice_board", P0WorldPrompts.notice_board(v), _notice, NOTICE_MARK, NOTICE_HIT, _notice_node.visible)
 	world_prompt("bench", P0WorldPrompts.bench(v), _bench, Vector3(0, 0.95, 0), Vector3(0, 0.35, 0))
 	world_prompt("mailbox", P0WorldPrompts.mailbox(v), _mailbox, MAILBOX_MARK, MAILBOX_HIT)
 	if _facilities: _facilities.prompts(v)
@@ -1046,6 +1063,7 @@ func _card_candidates() -> Array:
 		["mailbox", _mailbox, SIGN_NEAR]]
 	if _plaque_node.visible: out.append(["plaque", _plaque, SIGN_NEAR])
 	if _chef_sign_node.visible: out.append(["chef_sign", _chef_sign, SIGN_NEAR])
+	if _notice_node.visible: out.append(["notice_board", _notice, SIGN_NEAR])
 	out.append_array(_materials.card_candidates())   # SGODOT-231: the five gathering spots and the workbench
 	if _facilities: out.append_array(_facilities.card_candidates())   # P1: greenhouses (`Greenhouse · −25%`)
 	return out
@@ -1073,6 +1091,23 @@ func _show_chef_sign(on: bool) -> void:
 	_chef_sign_node.visible = on
 	for c in [P0Garden.CHEF_SIGN_CELL, P0Garden.CHEF_SIGN_BOARD_CELL]:   # its post's cell and the path under its board
 		if bp.is_walkable(c): grid.set_solid(c, on)   # a cell the plan blocks stays blocked
+
+## The Notice Board up from Homestead Lv5 (q(164) ①): shown, and its cell solid, as the Chef's Sign.
+func _show_notice_board(on: bool) -> void:
+	if _notice_node.visible == on: return
+	_notice_node.visible = on
+	if bp.is_walkable(P0Garden.NOTICE_BOARD_CELL): grid.set_solid(P0Garden.NOTICE_BOARD_CELL, on)
+
+## A tap on it opens the board (P0Ui.open_notice_board): read-only, a row flies the map to that pin.
+func open_notice_board() -> void:
+	actor.face(_notice)
+	rt.ui.open_notice_board()
+
+## The Notice Board's model (刘备, #395; 上官婉儿 284 c8ab943e, 不知火舞 48f7ac45): two posts with a cork board, a gable
+## roof and four pinned sheets, 1.595 m; its pivot the ground midpoint between the posts, +Z to the camera, at the anchor.
+## Inside its cell below the roof (feet ±0.30; the stall's seed crate next door reaches 0.33).
+static func notice_board_prop(at: Vector3) -> Node3D:
+	return FarmArt.instance("notice_board", at)
 
 ## Its card (不知火舞 on 282): the facilities' small card — `Chef's Sign`, `Homestead Lv10`, and HOME-1's
 ## Lv10 line for what it does.
@@ -1198,6 +1233,7 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"sign": p0_tap(cam.unproject_position(_sign + Vector3(0, 0.45, 0)))   # HOME-1 through the sign's own tap
 		"plaque": p0_tap(cam.unproject_position(_plaque + Vector3(0, 0.35, 0)))   # PLAQUE-READ
 		"chefsign": p0_tap(cam.unproject_position(_chef_sign + CHEF_SIGN_HIT))   # the Chef's Sign's card (282 shots)
+		"noticetap": p0_tap(cam.unproject_position(_notice + NOTICE_HIT))   # the Notice Board through its own tap (q(164) shots)
 		"chefsignprobe":   # where the Chef's Sign and its neighbours are on screen (282 shots: placement by numbers)
 			var at := func(p: Vector3) -> Vector2: return cam.unproject_position(p)
 			print("P0_CHEFSIGN ", JSON.stringify({visible = _chef_sign_node.visible, chefs_sign = rt.session.view.get("homestead", {}).get("unlocks", {}).get("chefs_sign", null),
