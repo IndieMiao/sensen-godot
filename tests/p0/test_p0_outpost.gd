@@ -738,21 +738,27 @@ func test_a_generated_keeper_gives_way_to_a_residents_hair() -> void:
 		"residents": ["res_hana", "res_lena"]}]}})
 	assert_str(str(P0Outposts.find("gn-testlena~tea0").keeper.look)).is_equal("tea_subtropical_1")
 
-## 不知火舞 on 284 (caf5520a): the keeper sets (world.keeper_looks, role × climate × 3) — a resident's hair and cloth
-## are theirs, no keeper set wears both; no cloth28 (the uniform) and no hairhat20 (the novelty hood), as for the
-## residents; the three sets of a role and climate have three different hairs, so a resident's hair always leaves two
+## 不知火舞 on 284 (caf5520a): the keeper sets (world.keeper_looks, role × climate × 3) — a resident's hair style and
+## cloth are theirs, no keeper set wears both (a hair colour variant is the same style); no cloth28 (the uniform) and
+## no hairhat20 (the novelty hood), as for the residents; the three sets of a role and climate have three different hairs, so a resident's hair always leaves two
 ## to give way to (P0CityPlaces.keeper_look).
 func test_the_keeper_sets_leave_the_residents_their_looks() -> void:
 	var looks: Dictionary = P0Logic.content().world.keeper_looks
 	var npcs: Dictionary = P0RoomAnchors.read_json(OutpostScript.NPCS_PATH).get("npcs", {})
+	# a pooled keeper set against the residents by hair style and cloth, the style as P0CityPlaces.hair_style reads it
+	# (a colour variant is the same style). A hand-written keeper (Ama, Finn, Sigrid, Mei: their own counter art and
+	# NPC-only parts) is told apart by its part ids, as every NPC is (test_npc_outfits_name_real_parts_and_stay_distinct):
+	# Ama's brown bun is not Granny Wu's white one (不知火舞 on 284, 7808013f)
+	var combo_of := func(slots: Dictionary) -> String:
+		return "%s+%s" % [P0CityPlaces.hair_style(str(slots.get("hairHat", ""))), slots.get("cloth", "")]
 	var theirs := {}
 	for id in npcs:
-		if str(id).begins_with("res_"): theirs["%s+%s" % [npcs[id].slots.get("hairHat", ""), npcs[id].slots.get("cloth", "")]] = id
+		if str(id).begins_with("res_"): theirs[combo_of.call(npcs[id].slots)] = id
 	var groups := {}
 	for k in looks:
 		if not looks[k] is Dictionary: continue
 		var l: Dictionary = looks[k]
-		var combo := "%s+%s" % [l.get("hairHat", ""), l.get("cloth", "")]
+		var combo: String = combo_of.call(l)
 		assert_bool(theirs.has(combo)).override_failure_message("%s wears %s's %s" % [k, theirs.get(combo, ""), combo]).is_false()
 		assert_array([l.get("hairHat", ""), l.get("cloth", "")]).override_failure_message(k).not_contains(["hairhat20", "cloth28"])
 		var stem := str(k).substr(0, str(k).rfind("_"))
