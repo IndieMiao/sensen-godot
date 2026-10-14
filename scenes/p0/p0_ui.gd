@@ -2561,6 +2561,20 @@ func open_nearby_cities(pick: Callable) -> UiDrawer:
 	modal_kind = "nearby"
 	return d
 
+## q(165) the Travel Post's Fare Board: Trip fares, read only (P0FareBoardDrawer: the seven tiers, every fare Free while
+## travel is), with a Close 44 six above the sheet as MAP-8's.
+const FareBoardDrawer := preload("res://scenes/p0/panels/p0_fare_board_drawer.gd")
+
+func open_fare_board() -> UiDrawer:
+	var d: UiDrawer = FareBoardDrawer.new(P0Travel.fares())
+	d.theme = UiKit.theme()
+	d.safe_bottom = safe_bottom()
+	d.close_requested.connect(close_modal)
+	_open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
+	_close_above(d, _CLOSE_ABOVE_SHEET, UiTokens.SPACE_PAGE)
+	modal_kind = "fare_board"
+	return d
+
 ## A pond's card from the Bite Board (the map's card: P0PondCard.info, P0PlaceSheet), its Distance from this shop. Go
 ## leaves the room for that pond (go_pond); Details › lists its fish; Back and a tap outside return to the board, ×
 ## closes both.

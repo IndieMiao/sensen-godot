@@ -9,8 +9,9 @@ extends P0Room
 const OnlineCrowd = preload("res://modules/net/online_crowd.gd")
 const NPCS_PATH := "res://assets/p0/outpost_npcs.json"
 ## Drawn in the art but without a P0 use: no finger card, no tap (§17.2.1; SGODOT-227 5a63a8ec).
-## The Tackle Shop's board is the Bite Board since P1 (SGODOT-283): a facility, not decor.
-const DECOR := ["use_fee_board", "use_stamp_desk", "use_coffee_pot"]
+## The Tackle Shop's board is the Bite Board since P1 (SGODOT-283), and the Travel Post's Stamp Desk and Fare Board are
+## its read-only counters since q(165): facilities, not decor.
+const DECOR := ["use_coffee_pot"]
 ## Tapping the counter is tapping the keeper (LOCK-15 / 16).
 const COUNTERS := ["use_counter", "use_stall_1", "npc_keeper"]
 ## Furniture that seats: its seat_ anchors are seat_<group>_<n>.
@@ -194,6 +195,9 @@ func _on_facility(n: String) -> void:
 	elif n == "use_specialty_shelf":   # only where this city sells its postcard (SGODOT-296); else a prop
 		if rt and P0CounterDrawer.has_specialty(rt.session.view): _open_entry("open_counter", ["market", counter_opts("specialty")], "City Specialty")
 	elif n == "use_fish_board": _open_entry("open_bite_board", [outpost], "Bite Board")   # SGODOT-283 e61cda10 ③
+	# q(165): the Stamp Desk opens the Passport (PASS-1, as from the profile; Back returns here), the Fare Board Trip fares
+	elif n == "use_stamp_desk": _open_entry("open_passport", [], "Stamp Desk")
+	elif n == "use_fee_board": _open_entry("open_fare_board", [], "Fare Board")
 
 ## LOCK-16: keepers greet first, Trade opens the counter (SGODOT-224's open_keeper_greeting(role, ctx)).
 func _open_keeper() -> void:
@@ -325,6 +329,8 @@ func _marker(n: String, view: Dictionary) -> Dictionary:
 	if n == "use_specialty_shelf":
 		return {kind = "facility", icon = P0Logic.icon("postcard"), name = "City Specialty"} if P0CounterDrawer.has_specialty(view) else {}
 	if n == "use_fish_board": return {kind = "facility", icon = P0Logic.icon("board"), name = "Bite Board"}
+	if n == "use_stamp_desk": return {kind = "facility", icon = P0Logic.icon("stamp"), name = "Stamp Desk"}   # q(62) / q(165)
+	if n == "use_fee_board": return {kind = "facility", icon = P0Logic.icon("board"), name = "Fare Board"}   # q(165)
 	return super._marker(n, view)
 
 # ---------------------------------------------------------------- seats (茶桌 / 长椅, LOCK-30: the card says Sit)
@@ -445,6 +451,7 @@ func p0_dev(step: PackedStringArray) -> bool:
 		"stand": _stand_up()
 		"nomarks": _dev_no_marks = true   # acceptance shots: finger cards off, name tags stay
 		"biteboard": if rt: rt.ui.open_bite_board(outpost)   # the Bite Board as after tapping the board (SGODOT-283 shots)
+		"fareboard": if rt: rt.ui.open_fare_board()   # Trip fares as after tapping the Fare Board (q(165) shots)
 		"bitepond": if rt: rt.ui.open_board_pond(outpost, step[1])   # bitepond:<pond id> — a row's pond card
 		"bitescroll":   # bitescroll — the open board scrolled to its end
 			if rt and rt.ui.bite_board(): (rt.ui.bite_board().find_child("Scroll", true, false) as ScrollContainer).scroll_vertical = 100000
