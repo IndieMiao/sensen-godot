@@ -812,9 +812,9 @@ static func _affinity_stages() -> Control:
 	return v
 
 static func _resident_profiles() -> Control:
-	var face := AtlasTexture.new()   # the face square of Pip's portrait, as the P0 UI crops it (P0Ui.FACE_CROPS)
-	face.atlas = load("res://assets/p0/art/pip-portrait.jpg")
-	face.region = Rect2(30, 163, 232, 232)
+	var face := AtlasTexture.new()   # the face square of Pip's render card, as the P0 UI crops it (portrait_crops.json)
+	face.atlas = load("res://assets/p0/art/residents/pip_card.jpg")
+	face.region = Rect2(68, 50, 169, 169)
 	var d := {face = face, name = "Pip", role = "Courier Kid", stage = "Familiar", stage_index = 2,
 		friendship = "52/90", likes = "Dessert", likes_icon = _tex("dish_carrot_cake")}
 	var page := UiResidentProfile.new(d)

@@ -1,8 +1,9 @@
 extends Control
 ## PostcardStamp (Figma 2615:134287; q(171), 不知火舞 on 284): a resident's postcard as a postage stamp — perforated
 ## paper, the picture inset in it, and on an earned one a round postmark over its lower right corner.
-##   earned    the resident's face (P0Ui.resident_face, the portrait's crop) — or, until their portrait art exists, their
-##             initial in ExtraBold primary on primaryTint (不知火舞: never the grey silhouette, that reads unearned)
+##   earned    the resident's render card at its stamp crop (P0Ui.resident_crop, portrait_crops.json; 上官婉儿 #405) — or,
+##             until their card exists, their initial in ExtraBold primary on primaryTint (不知火舞: never the grey
+##             silhouette, that reads unearned)
 ##   unearned  a grey silhouette on grey paper, no postmark
 ## Sizes: PASSPORT 34 × 42 (PASS-POSTCARDS' cells), CARD 40 × 50 (the arrival card's item, KINDRED-PIP). Display only.
 ## Preloaded, no class_name (a new global class needs an editor import).
@@ -33,8 +34,8 @@ func _init(resident_ := "", earned_ := false, size_ := PASSPORT) -> void:
 	size = size_
 	if earned:
 		var key := str(P0Logic.content().get("residents", {}).get(resident, {}).get("portrait", ""))
-		face = P0Ui.resident_face(key) if key != "" else null
-		if face == null:   # no portrait art yet: the initial (不知火舞 on 284)
+		face = P0Ui.resident_crop(key, "stamp")
+		if face == null:   # no card yet: the initial (不知火舞 on 284)
 			_initial = UiKit.label(load("res://modules/p0/p0_kindred.gd").initial(resident), UiTokens.STYLE_ROW_TITLE_XB15, UiTokens.COLOR_PRIMARY)
 			_initial.name = "Initial"
 			_initial.add_theme_font_size_override(&"font_size", _INITIAL_SIZE)

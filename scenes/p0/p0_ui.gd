@@ -2826,22 +2826,33 @@ func _close_above(content: Control, gap: float, inset := 0.0) -> void:
 	_modal.add_child(close)
 	follow.call()
 
-## The resident's portrait (assets/p0/art/<key>-portrait.jpg), or none.
+## A resident's render card (上官婉儿 #405: 300 × 660, the outfit they wear in the rooms) and its crops,
+## portrait_crops.json {key: {stamp: [x, y, w, h], face: [x, y, w, h]}} in the card's own pixels.
+const CARD_PATH := "res://assets/p0/art/residents/%s_card.jpg"
+const CROPS_PATH := "res://assets/p0/art/residents/portrait_crops.json"
+
+## The resident's half-body picture for the dialogue bar and the request card: their illustration where they have
+## one (assets/p0/art/<key>-portrait.jpg: Pip and Kai keep theirs, 不知火舞), else their render card, else none.
 static func _portrait(key: String) -> Texture2D:
-	var path := "res://assets/p0/art/%s-portrait.jpg" % key
-	return load(path) if key != "" and ResourceLoader.exists(path) else null
+	if key == "": return null
+	for path in ["res://assets/p0/art/%s-portrait.jpg" % key, CARD_PATH % key]:
+		if ResourceLoader.exists(path): return load(path)
+	return null
 
-## The face square of a resident's portrait for the round profile face (不知火舞 on 235 B1): centred on the face, its
-## top at the hat's top, in the portrait's own pixels; a portrait without a crop is used whole.
-const FACE_CROPS := {"kai": Rect2(37, 56, 340, 340), "pip": Rect2(30, 163, 232, 232)}
+## A crop of the resident's render card: `face` for the round profile face, `stamp` for the postcard stamp (上官婉儿 /
+## 不知火舞 on 284: every one from the cards, Pip's and Kai's too); null without the card or its crop.
+static func resident_crop(key: String, kind: String) -> Texture2D:
+	var path := CARD_PATH % key
+	if key == "" or not ResourceLoader.exists(path): return null
+	var r = P0RoomAnchors.read_json(CROPS_PATH).get(key, {}).get(kind, null)
+	if not r is Array or (r as Array).size() != 4: return null
+	var crop := AtlasTexture.new()
+	crop.atlas = load(path)
+	crop.region = Rect2(float(r[0]), float(r[1]), float(r[2]), float(r[3]))
+	return crop
 
-static func resident_face(key: String) -> Texture2D:
-	var art := _portrait(key)
-	if art == null or not FACE_CROPS.has(key): return art
-	var face := AtlasTexture.new()
-	face.atlas = art
-	face.region = FACE_CROPS[key]
-	return face
+## The round profile face (不知火舞 on 235 B1): the card's face square.
+static func resident_face(key: String) -> Texture2D: return resident_crop(key, "face")
 
 ## Request on the bar: an open request shows the card (Accept / Not now); an accepted one that is ready
 ## delivers. The bar's button carries the gap or the wait, so it never dead-ends (LOCK-10 / 18).

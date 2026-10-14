@@ -48,14 +48,18 @@ func test_the_postcards_page_lists_the_open_residents_in_the_tables_order() -> v
 	var kai: Dictionary = p.cells[table.find("res_old_kai")]
 	assert_array([kai.earned, kai.name, kai.text]).is_equal([false, "", ""])
 
-## Earned: the face where the portrait exists, else the initial (never the grey silhouette); unearned: grey, no initial.
+## Earned: the render card at its stamp crop where the card exists (上官婉儿 #405), else the initial (never the grey
+## silhouette); unearned: grey, no initial.
 func test_the_stamp_shows_a_face_an_initial_or_the_silhouette() -> void:
 	var pip: Control = auto_free(Stamp.new("res_pip", true))
-	assert_object(pip.get("face")).is_not_null()
+	var face := pip.get("face") as AtlasTexture
+	assert_that([face.atlas.resource_path, face.region]).is_equal(["res://assets/p0/art/residents/pip_card.jpg", Rect2(65, 46, 175, 219)])
 	assert_object(pip.find_child("Initial", false, false)).is_null()
-	var hana: Control = auto_free(Stamp.new("res_hana", true))
-	assert_object(hana.get("face")).is_null()
-	assert_str((hana.find_child("Initial", false, false) as Label).text).is_equal("H")
+	var hana: Control = auto_free(Stamp.new("res_hana", true))   # a resident without an illustration: their card
+	assert_str((hana.get("face") as AtlasTexture).atlas.resource_path).is_equal("res://assets/p0/art/residents/hana_card.jpg")
+	var wu: Control = auto_free(Stamp.new("res_granny_wu", true))   # no card yet
+	assert_object(wu.get("face")).is_null()
+	assert_str((wu.find_child("Initial", false, false) as Label).text).is_equal("G")
 	var none: Control = auto_free(Stamp.new("res_hana", false))
 	assert_object(none.find_child("Initial", false, false)).is_null()
 	assert_vector(pip.custom_minimum_size).is_equal(Stamp.PASSPORT)
@@ -166,3 +170,20 @@ func test_a_held_postcard_is_never_hidden() -> void:
 	assert_bool(ids.has("res_mira")).is_false()
 	var table: Array = P0Logic.content().get("residents", {}).keys()
 	assert_array(ids).is_equal(table.filter(func(id): return ids.has(id)))   # still the table's order
+
+## The dialogue bar and the request card: the illustration where a resident has one (Pip, Kai: 不知火舞 keeps them),
+## else the render card; nobody's a vector placeholder once their card is in.
+func test_the_dialogue_bar_keeps_the_illustrations_and_takes_the_cards() -> void:
+	assert_str(P0Ui._portrait("pip").resource_path).is_equal("res://assets/p0/art/pip-portrait.jpg")
+	assert_str(P0Ui._portrait("kai").resource_path).is_equal("res://assets/p0/art/kai-portrait.jpg")
+	for key in ["hana", "sam", "lena", "rafa", "tomo", "theo", "nadia"]:
+		assert_str(P0Ui._portrait(key).resource_path).is_equal("res://assets/p0/art/residents/%s_card.jpg" % key)
+	assert_object(P0Ui._portrait("granny_wu")).is_null()
+	assert_object(P0Ui._portrait("")).is_null()
+	# every card has both crops, inside its 300 × 660
+	var crops: Dictionary = P0RoomAnchors.read_json(P0Ui.CROPS_PATH)
+	for key in ["pip", "kai", "hana", "sam", "lena", "rafa", "tomo", "theo", "nadia"]:
+		for kind in ["stamp", "face"]:
+			var r := (P0Ui.resident_crop(key, kind) as AtlasTexture).region
+			assert_bool(Rect2(0, 0, 300, 660).encloses(r)).override_failure_message("%s %s %s" % [key, kind, r]).is_true()
+	assert_int(crops.size()).is_greater_equal(9)
