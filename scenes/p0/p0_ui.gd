@@ -3179,12 +3179,13 @@ func show_catch(fish_id: String, rarity: int, first_xp: int, extras := {}, event
 	show_moment(m)
 
 ## A Cookbook title (§7.6.1; 不知火舞 on 282): RewardMoment Milestone, no buttons — the title, `Cookbook 20/48`, `New title ·
-## +100 coins · Recipe Stand` (P0KitchenLogic.title_card). Queued after the dish card like a level-up.
+## +100 coins · Recipe Stand` (P0KitchenLogic.title_card). Queued after the dish card like a level-up. A skill's Lv10
+## title too (P0Logic.title_card: `Master Gardener` · `Farming Lv10` · `New title`, its skill's icon; SGODOT-275).
 func show_title(spec: Dictionary) -> void:
 	var m := UiRewardMoment.new()
 	m.tone = UiRewardMoment.Tone.MILESTONE
 	m.event = str(spec.get("event", ""))
-	m.icon = P0Logic.icon("cookbook")
+	m.icon = spec.get("icon", P0Logic.icon("cookbook"))   # a skill's title (P0Logic.title_card) brings its skill's icon
 	m.item_name = str(spec.get("item_name", ""))
 	m.strip = str(spec.get("strip", ""))
 	show_moment(m)
