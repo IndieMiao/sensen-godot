@@ -86,7 +86,7 @@ func frame(v: Dictionary, card := "") -> void:
 	if _to_mouth and not farm.actor.mover.is_moving():   # arrived: the stick cancels the walk (cancel_walk)
 		_to_mouth = false
 		if near: _at_mouth()
-	if _card_open and (not near or P0MaterialLogic.mine_runs_spent(v)): _card_open = false   # walked off: the card folds
+	if _card_open and not near: _card_open = false   # walked off: the card folds
 	var top := cam.unproject_position(mouth + Vector3(0, 1.9, 0))
 	# A world prompt like the other facilities, with or without an unfinished run (Figma MINE-P0-5, 不知火舞 on #190: the
 	# Run 1/2 badge is gone): the pickaxe button within 8 m, the strip `The mine · Runs today 1/2` when it holds the
@@ -131,7 +131,9 @@ static func _show_card(e: UiEntryCard, c: Dictionary) -> void:
 	e.state = UiEntryCard.State.AVAILABLE if bool(main.get("enabled", false)) else UiEntryCard.State.UNAVAILABLE
 	e.amber = bool(main.get("amber", false))
 	var second: Dictionary = c.get("second", {})
-	e.second = str(second.get("label", ""))
+	var pill := bool(second.get("pill", false))   # 2/2: the grey `Resets in …` pill in New run's place (EXPRESS-4)
+	e.pill = str(second.get("label", "")) if pill else ""
+	e.second = "" if pill else str(second.get("label", ""))
 	e.second_state = UiEntryCard.State.AVAILABLE if bool(second.get("enabled", false)) else UiEntryCard.State.UNAVAILABLE
 	e.second_amber = bool(second.get("amber", false))
 	var express: Dictionary = c.get("express", {})   # Floor 5 · Express · Free (P1), under New run when a run is open
@@ -183,8 +185,9 @@ func tap(screen: Vector2) -> bool:
 
 ## A tap on the mouth — its model, button or strip (不知火舞 on 231, int11 ②; SGODOT-266) — walks the player up to it
 ## (the stick on the way cancels); there its EntryCard opens with the fee button (`Enter mine · 2 Energy`, or
-## `Continue run · Free` and `New run`): the tap itself never spends Energy. With today's runs used up and none
-## unfinished the MINE-P0-8 drawer opens instead.
+## `Continue run · Free` and `New run`): the tap itself never spends Energy. With today's runs used up it is the card
+## too, with its grey `Resets in …` pill (MINE-GATE-EXPRESS-3 / -4; the P0 MINE-P0-8 drawer for that state is gone,
+## 不知火舞 on 286, q(196)).
 func tap_mouth() -> void:
 	if near_mouth():
 		_at_mouth()
@@ -197,9 +200,7 @@ func tap_mouth() -> void:
 
 func _at_mouth() -> void:
 	farm.actor.face(mouth)
-	var v := rt.session.current()
-	if P0MaterialLogic.mine_runs_spent(v): P0MaterialCards.open_mine_sheet(rt.ui, v)
-	else: _card_open = true
+	_card_open = true
 
 ## Walkable points by the mouth, well inside MOUTH_REACH, nearest the player first (the mouth's own cell is the gate).
 static func mouth_stands(grid: BlueprintGrid, at: Vector3, from: Vector3) -> Array:

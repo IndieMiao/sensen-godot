@@ -165,7 +165,8 @@ func test_at_the_mouth_the_card_carries_the_fee() -> void:
 	await _end(farm)
 
 ## With a run: Continue run · Free, New run under it; short of Energy the main is amber and opens the Energy card;
-## today's runs used up with none unfinished: MINE-P0-8, no card.
+## today's runs used up: the card still (MINE-GATE-EXPRESS-3 / -4, 不知火舞 B7 on 286 — the P0 MINE-P0-8 drawer for
+## that state is gone), its grey pill `Resets in …` toasting the whole line; with the run in hand Continue run over it.
 func test_the_mouth_card_states() -> void:
 	var sent: Array = []
 	var run := {"id": 1, "deepest": 1, "can_new_run": false, "new_run_block": "clear_floor_2", "floors": [{"floor": 1, "paid": true}]}
@@ -187,10 +188,26 @@ func test_the_mouth_card_states() -> void:
 	assert_str(farm.rt.ui.modal_kind).is_equal("energy")
 	farm.rt.ui.close_modal()
 	assert_array(sent).is_empty()
-	farm.rt.session.view = _mouth_view(null, 200, 2)
+	farm.rt.session.view = _mouth_view(null, 200, 2)   # no run, 2/2: the card stays, the pill alone (EXPRESS-3)
 	m.frame(farm.rt.session.current())
-	assert_bool(m.card_open()).is_false()   # nothing to enter today: the card folds
-	m.tap_mouth()
-	assert_str(farm.rt.ui.modal_kind).is_not_empty()   # MINE-P0-8
-	assert_bool(m.card_open()).is_false()
+	assert_bool(m.card_open()).is_true()
+	m.close_card()
+	m.tap_mouth()   # a fresh tap in this state opens the card too, not a drawer
+	m.frame(farm.rt.session.current())
+	assert_bool(m.card_open()).is_true()
+	assert_str(card.main_text()).starts_with("Resets in ")
+	assert_bool(card.state == UiEntryCard.State.UNAVAILABLE).is_true()
+	assert_bool(card.second_shown() or card.third_shown() or card.pill_text() != "").is_false()
+	card.pressed.emit()
+	assert_str(farm.rt.ui.toast_text()).starts_with("Mine runs today 2/2 · Resets in ")
+	assert_str(farm.rt.ui.modal_kind).is_empty()   # no MINE-P0-8 drawer
+	run.new_run_block = "no_runs"
+	farm.rt.session.view = _mouth_view(run, 200, 2)   # the run in hand, 2/2: Continue run over the pill (EXPRESS-4)
+	m.frame(farm.rt.session.current())
+	assert_str(card.main_text()).is_equal("Continue run · Free")
+	assert_str(card.pill_text()).starts_with("Resets in ")
+	assert_bool(card.second_shown() or card.third_shown() or card.note_shown()).is_false()   # no New run, Express or note
+	card.second_pressed.emit()   # the pill's tap
+	assert_str(farm.rt.ui.toast_text()).starts_with("Mine runs today 2/2 · Resets in ")
+	assert_array(sent).is_empty()
 	await _end(farm)

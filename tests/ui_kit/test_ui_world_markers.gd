@@ -114,6 +114,28 @@ func test_entry_card_reads_title_main_then_second() -> void:
 	assert_float(c.pointer_tip_x()).is_equal_approx(c._card.size.x * 0.5, 0.5)
 	assert_float(c.get_combined_minimum_size().y).is_equal(c._card.size.y + UiTokens.SIZE_POINTER_H)
 
+## MINE-GATE-EXPRESS-4 (不知火舞 B7 on 286): the grey pill in the second's place — CmdBlocked, as big as the main —
+## instead of the text button, and a tap on it is the second's.
+func test_entry_card_pill_takes_the_seconds_place() -> void:
+	var c := _host(UiEntryCard.new("Continue run · Free")) as UiEntryCard
+	c.title = "The mine"
+	c.title_fact = "Runs today 2/2"
+	c.second = "New run · 2 Energy"
+	c.pill = "Resets in 9h 12m"
+	await _settle()
+	assert_str(c.pill_text()).is_equal("Resets in 9h 12m")
+	assert_bool(c.second_shown()).is_false()
+	assert_str(str(c._pill.theme_type_variation)).is_equal(str(UiTokens.BUTTON_CMD_BLOCKED))
+	assert_float(c._pill.size.y).is_equal_approx(c._main.size.y, 0.5)
+	assert_float(c._pill.size.x).is_equal_approx(c._main.size.x, 0.5)
+	var hit := []
+	c.second_pressed.connect(func(): hit.append("second"))
+	assert_str(c.tap_at(c._pill.get_global_rect().get_center())).is_equal("second")
+	assert_array(hit).is_equal(["second"])
+	c.pill = ""
+	await _settle()
+	assert_bool(c.second_shown()).is_true()   # back to the text button
+
 ## A ladder's card: no title, one button (the destination is on it).
 func test_a_ladder_card_is_one_button_without_a_title() -> void:
 	var c := _host(UiEntryCard.new("Floor 2 · 2 Energy")) as UiEntryCard
