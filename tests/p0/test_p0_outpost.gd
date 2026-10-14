@@ -724,16 +724,44 @@ func test_a_generated_keeper_gives_way_to_a_residents_hair() -> void:
 	var looks: Dictionary = P0Logic.content().world.keeper_looks
 	assert_str(str(looks.tea_subtropical_0.hairHat)).is_equal("hairhat41")   # Lena's
 	assert_str(P0CityPlaces.keeper_look("tea_subtropical_0", ["res_hana", "res_lena"])).is_equal("tea_subtropical_1")
-	assert_str(P0CityPlaces.keeper_look("market_subtropical_2", ["res_tomo"])).is_equal("market_subtropical_1")   # Tomo's hairhat0
+	assert_str(str(looks.market_subtropical_0.hairHat)).is_equal("hairhat0")   # Tomo's
+	assert_str(P0CityPlaces.keeper_look("market_subtropical_0", ["res_tomo"])).is_equal("market_subtropical_1")
 	assert_str(P0CityPlaces.keeper_look("tea_subtropical_1", ["res_hana", "res_lena"])).is_equal("tea_subtropical_1")   # no clash
 	assert_str(P0CityPlaces.keeper_look("tea_subtropical_0", [])).is_equal("tea_subtropical_0")
-	# Tomo's hairhat0 and Theo's hairhat43 take all three subtropical market sets: the given one stays
-	assert_str(P0CityPlaces.keeper_look("market_subtropical_2", ["res_tomo", "res_theo"])).is_equal("market_subtropical_2")
+	# Tomo's, Theo's and Nadia's hair take all three subtropical market sets: the given one stays
+	assert_str(P0CityPlaces.keeper_look("market_subtropical_2", ["res_tomo", "res_theo", "res_nadia"])).is_equal("market_subtropical_2")
 	P0CityPlaces.accept("gn-testlena", {"detail": {"outposts": [{"id": "gn-testlena~tea0", "role": "tea", "name": "Test Tea House",
 		"art": "coffee_shop", "anchors": "res://assets/p0/outposts/tea.anchors.json", "category": "Tea house", "lat": 1.0,
 		"lng": 1.0, "capacity": 12, "keeper": {"role": "Host", "name": "Bea", "look": "tea_subtropical_0"},
 		"residents": ["res_hana", "res_lena"]}]}})
 	assert_str(str(P0Outposts.find("gn-testlena~tea0").keeper.look)).is_equal("tea_subtropical_1")
+
+## 不知火舞 on 284 (caf5520a): the keeper sets (world.keeper_looks, role × climate × 3) — a resident's hair and cloth
+## are theirs, no keeper set wears both; no cloth28 (the uniform) and no hairhat20 (the novelty hood), as for the
+## residents; the three sets of a role and climate have three different hairs, so a resident's hair always leaves two
+## to give way to (P0CityPlaces.keeper_look).
+func test_the_keeper_sets_leave_the_residents_their_looks() -> void:
+	var looks: Dictionary = P0Logic.content().world.keeper_looks
+	var npcs: Dictionary = P0RoomAnchors.read_json(OutpostScript.NPCS_PATH).get("npcs", {})
+	var theirs := {}
+	for id in npcs:
+		if str(id).begins_with("res_"): theirs["%s+%s" % [npcs[id].slots.get("hairHat", ""), npcs[id].slots.get("cloth", "")]] = id
+	var groups := {}
+	for k in looks:
+		if not looks[k] is Dictionary: continue
+		var l: Dictionary = looks[k]
+		var combo := "%s+%s" % [l.get("hairHat", ""), l.get("cloth", "")]
+		assert_bool(theirs.has(combo)).override_failure_message("%s wears %s's %s" % [k, theirs.get(combo, ""), combo]).is_false()
+		assert_array([l.get("hairHat", ""), l.get("cloth", "")]).override_failure_message(k).not_contains(["hairhat20", "cloth28"])
+		var stem := str(k).substr(0, str(k).rfind("_"))
+		if not groups.has(stem): groups[stem] = []
+		groups[stem].append(str(l.get("hairHat", "")))
+	assert_int(groups.size()).is_equal(16)
+	for stem in groups:
+		var hairs: Array = groups[stem]
+		var distinct := {}
+		for h in hairs: distinct[h] = true
+		assert_int(distinct.size()).override_failure_message("%s: %s" % [stem, hairs]).is_equal(3)
 
 ## 不知火舞 on 284: no keeper set and no resident is the player's default hairhat0 + cloth0. Tomo waits for his
 ## darker hairhat0 (上官婉儿's colour, with 刘备's batch); he is the one left.
