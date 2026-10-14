@@ -10,7 +10,7 @@ func test_plot_ids_and_cells_are_a_bijection_on_spaced_beds() -> void:
 		# beds stand two cells apart, so every bed has a walkway beside it
 		assert_int(P0Garden.id_of(c + Vector2i(1, 0))).is_equal(-1)
 		assert_int(P0Garden.id_of(c + Vector2i(0, 1))).is_equal(-1)
-	assert_int(seen.size()).is_equal(40)   # P1: all 40 laid out; the view's garden.plots shows 30 or 40
+	assert_int(seen.size()).is_equal(48)   # all 48 laid out (q(172): 40–47 from Homestead Lv7); the view's garden.plots shows 30, 40 or 48
 
 ## P1 (q(59) §1.1): the client grid is the server's (content.garden.plots: the sprinkler's coverage is judged there).
 ## 0–29 keep their P0 cells; 30–39 are two columns right of the field, row by row.
@@ -23,6 +23,9 @@ func test_the_garden_grid_matches_the_content_table() -> void:
 	for id in 30: assert_vector(P0Garden.cell_of(id)).is_equal(P0Garden.PLOT_ORIGIN + Vector2i((id % 6) * 2, (id / 6) * 2))
 	assert_vector(P0Garden.cell_of(30)).is_equal(P0Garden.cell_of(5) + Vector2i(2, 0))
 	assert_vector(P0Garden.cell_of(39)).is_equal(P0Garden.cell_of(29) + Vector2i(4, 0))
+	# Homestead Lv7 (q(172) A, 不知火舞 282 4ddb69db): a whole row in front of the field, y 1, x 4–18, left to right
+	assert_array(range(40, 48).map(func(i): return P0Garden.cell_of(i))).is_equal([Vector2i(4, 1), Vector2i(6, 1), Vector2i(8, 1),
+		Vector2i(10, 1), Vector2i(12, 1), Vector2i(14, 1), Vector2i(16, 1), Vector2i(18, 1)])
 
 ## At Homestead Lv1–2 the place of beds 30–39 is plain ground: walking there never steps up onto a bed (哪吒 on #215).
 func test_no_bed_to_step_on_where_the_homestead_has_none_yet() -> void:
@@ -80,3 +83,20 @@ func test_every_p0_crop_has_a_plant() -> void:
 		var code := str(P0Garden.CROP_CODES.get(str(crop.id), ""))
 		assert_str(code).is_not_empty()
 		assert_bool(CropField.CROPS.has(code)).is_true()
+
+## q(172) A (不知火舞 282 bf7c124b): from Homestead Lv7 the field's sand grows over the new front row and the walkway before
+## row 0 — one patch, its edges as before; at Lv1–6 that row is grass.
+func test_the_sand_reaches_the_front_row_only_from_lv7() -> void:
+	var bp := P0Garden.blueprint()
+	var scenery: Node3D = auto_free(load("res://scenes/p0/p0_garden_scenery.gd").new())
+	add_child(scenery)
+	scenery.build(bp, "cottage")
+	var sand: Node3D = scenery.get_node("FieldSand")
+	var front_edge := func() -> float: return sand.position.z + sand.scale.z * 1.26 * 0.5   # its edge nearest the camera
+	var row := bp.cell_to_world(P0Garden.cell_of(40)).z
+	assert_float(front_edge.call()).is_less(row)   # Lv1–6: grass under the row
+	scenery.show_front_row(true)
+	assert_float(front_edge.call()).is_greater(row + 0.47)   # Lv7: the row's beds stand on sand, its front margin as row 0's
+	var back := sand.position.z - sand.scale.z * 1.26 * 0.5
+	scenery.show_front_row(false)
+	assert_float(sand.position.z - sand.scale.z * 1.26 * 0.5).is_equal_approx(back, 0.001)   # the back edge never moves

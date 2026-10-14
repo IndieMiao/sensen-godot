@@ -1,7 +1,7 @@
 /** P0 player state (one homestead per player; no compatibility with the old farm state). */
 import type { Family, P0Content, Skill } from './content.js';
 import { maxEnergy } from './rules.js';
-import { addPlots } from './garden.js';
+import { addPlots, clearNewBeds } from './garden.js';
 import { clusterById, clusterOf, clusterOfCityName, fallbackOf, freshTravel, writtenCluster, type TravelState } from './travel.js';
 import { placeOf } from './world.js';
 
@@ -334,7 +334,7 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
   // (30–39, wild; 0–29 never move). No version of their own, like the inbox: a fill beside v5's travel block.
   s.facilities ??= [];
   s.facility_count ??= s.facilities.reduce((m, f) => Math.max(m, f.id), 0);
-  addPlots(c, s);
+  clearNewBeds(c, s, addPlots(c, s), []);   // a save already at Lv7: pieces on the new beds back to storage (q(172))
   // SGODOT-275: floors 3–5. A run saved with floors 1–2 gets the deeper floors unpaid (their monsters are met at full HP
   // by mine.floorMobs); its HP starts full (mine.runHp). No version of its own: the fields are additive.
   const run = s.mine?.run;

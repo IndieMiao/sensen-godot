@@ -42,7 +42,9 @@ const sow = (s: P0State, id: number, seed = 'seed_radish') => {
 describe('the garden grid and 40 plots (q(59) §1.1)', () => {
   it('0–29 keep P0\'s 6 × 5 places; 30–39 are two new columns on the right, row by row', () => {
     expect(c.garden.plots.slice(0, 30)).toEqual(Array.from({ length: 30 }, (_, i) => [i % 6, Math.floor(i / 6)]));
-    expect(c.garden.plots.slice(30)).toEqual([[6, 0], [7, 0], [6, 1], [7, 1], [6, 2], [7, 2], [6, 3], [7, 3], [6, 4], [7, 4]]);
+    expect(c.garden.plots.slice(30, 40)).toEqual([[6, 0], [7, 0], [6, 1], [7, 1], [6, 2], [7, 2], [6, 3], [7, 3], [6, 4], [7, 4]]);
+    // Homestead Lv7 (q(172) A): 40–47 a whole row in front of the field, row −1, left to right
+    expect(c.garden.plots.slice(40)).toEqual([[0, -1], [1, -1], [2, -1], [3, -1], [4, -1], [5, -1], [6, -1], [7, -1]]);
   });
 
   it('Homestead Lv1–2 has 30 plots; the Lv3 upgrade adds 30–39 as wild, says so, and moves nothing', () => {
@@ -63,10 +65,10 @@ describe('the garden grid and 40 plots (q(59) §1.1)', () => {
   });
 
   it('the plot count is the Homestead table\'s (homestead.plots), never past the garden grid', () => {
-    expect(c.homestead.plots).toEqual([[1, 30], [3, 40]]);
-    for (const [level, n] of [[1, 30], [2, 30], [3, 40], [10, 40]]) expect(plotCount(c, { ...fresh(), homestead: { level, plaque: [] } })).toBe(n);
+    expect(c.homestead.plots).toEqual([[1, 30], [3, 40], [7, 48]]);
+    for (const [level, n] of [[1, 30], [2, 30], [3, 40], [6, 40], [7, 48], [10, 48]]) expect(plotCount(c, { ...fresh(), homestead: { level, plaque: [] } })).toBe(n);
     const big = { ...c, homestead: { ...c.homestead, plots: [[1, 30], [3, 60]] as [number, number][] } };
-    expect(plotCount(big, { ...fresh(), homestead: { level: 3, plaque: [] } })).toBe(40);
+    expect(plotCount(big, { ...fresh(), homestead: { level: 3, plaque: [] } })).toBe(48);
   });
 
   it('a save already at Lv3 gets its 10 plots when it loads (T14), once', () => {
@@ -94,9 +96,13 @@ describe('the garden grid and 40 plots (q(59) §1.1)', () => {
 describe('sprinklers (q(59) §1.4)', () => {
   it('cover the 8 plots around them on the grid, fewer at an edge, across old and new plots', () => {
     expect(coverOf(c, 'sprinkler', 7).sort((a, b) => a - b)).toEqual([0, 1, 2, 6, 8, 12, 13, 14]);
-    expect(coverOf(c, 'sprinkler', 0).sort((a, b) => a - b)).toEqual([1, 6, 7]);
-    expect(coverOf(c, 'sprinkler', 5).sort((a, b) => a - b)).toEqual([4, 10, 11, 30, 32]);
-    expect(coverOf(c, 'sprinkler', 30).sort((a, b) => a - b)).toEqual([5, 11, 31, 32, 33]);
+    expect(coverOf(c, 'sprinkler', 0, 40).sort((a, b) => a - b)).toEqual([1, 6, 7]);
+    // from Homestead Lv7 the corner sprinkler reaches the new front row too (q(172))
+    expect(coverOf(c, 'sprinkler', 0, 48).sort((a, b) => a - b)).toEqual([1, 6, 7, 40, 41]);
+    expect(coverOf(c, 'sprinkler', 5, 40).sort((a, b) => a - b)).toEqual([4, 10, 11, 30, 32]);
+    expect(coverOf(c, 'sprinkler', 5, 48).sort((a, b) => a - b)).toEqual([4, 10, 11, 30, 32, 44, 45, 46]);
+    expect(coverOf(c, 'sprinkler', 30, 40).sort((a, b) => a - b)).toEqual([5, 11, 31, 32, 33]);
+    expect(coverOf(c, 'sprinkler', 30, 48).sort((a, b) => a - b)).toEqual([5, 11, 31, 32, 33, 45, 46, 47]);
   });
 
   it('cover only the plots the homestead has: an edge sprinkler at Lv2 waters none of 30–39', () => {

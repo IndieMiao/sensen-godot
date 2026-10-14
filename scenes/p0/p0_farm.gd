@@ -73,6 +73,7 @@ var _looks: Node3D   # p0_looks.gd: Porch, Kitchen Wing and the Lv10 house by th
 var _sign := Vector3.ZERO   # Homestead sign right of the farmhouse door (WorldBadges · Farm 1135:79267): HOME-1
 var _plaque := Vector3.ZERO   # Upgrade Plaque left of the door (1510:97492), shown from the first upgrade: PLAQUE-READ
 var _plaque_node: Node3D
+var _scenery: Node3D   # p0_garden_scenery.gd: the sand under the field grows over Lv7's front row
 var _chef_sign := Vector3.ZERO   # the Chef's Sign's post foot (Homestead Lv10), left of the door path: P0Garden.CHEF_SIGN_CELL
 var _chef_sign_node: Node3D
 var _chef_sign_look := ""        # the model shown: "a" timber / "b" stone
@@ -196,10 +197,10 @@ func _build_world() -> void:
 	props.add_child(mine)
 	_materials = P0FarmMaterials.new().setup(self, _mine, mine)
 	add_child(_materials)
-	var scenery := GardenScenery.new()
-	add_child(scenery)
-	scenery.build(bp, STYLE)
-	P0Garden.block_points(bp, scenery.rock_points)   # rocks collide; crops and bushes don't
+	_scenery = GardenScenery.new()
+	add_child(_scenery)
+	_scenery.build(bp, STYLE)
+	P0Garden.block_points(bp, _scenery.rock_points)   # rocks collide; crops and bushes don't
 	_fence = Fence.new()
 	add_child(_fence)
 	_fence.build(bp)
@@ -257,8 +258,10 @@ func _build_world() -> void:
 	# copies the whole view, and this runs every frame (亚瑟 on #215; the map's heat in 260 was the same copy).
 	actor.ground_height = func(p: Vector3) -> float:
 		return P0Garden.BED_H if P0Garden.on_bed(bp, p, rt.session.view if rt != null and rt.session != null else null) else 0.0
-	# Opening shot like the polished farm: cottage on top, beds below, the player at the front edge.
-	_focus = actor.position.lerp(_house, 0.42)
+	# Opening shot like the polished farm: cottage on top, beds below, the player at the front edge. Framed from the old
+	# walk-in point, so the picture is the one it was (q(172) A moved the spawn 1.3 m nearer the camera: framed from it the
+	# farmhouse's mark rose 9 px into the HUD; this way the player just stands 46 px lower, well above the quick bar).
+	_focus = opening_point(bp, _house)
 	_cam_follow.hold()   # the opening shot stays until the player first moves
 	_opening = true
 	_place_camera()
@@ -347,6 +350,12 @@ func _fit_opening() -> void:
 
 ## `focus` moved along the ground, away from the camera, by as much as the mark needs to sit MARK_ROOM below the area's
 ## top — at most what keeps `feet` FEET_ROOM above its bottom (opening_shift). `cam` is placed at `focus` already.
+## Where the opening shot is framed from: the field's front walkway the player used to walk in at (9, 1), 42 % of the way to
+## the farmhouse.
+const OPENING_CELL := Vector2i(9, 1)
+static func opening_point(bp: FarmBlueprint, house: Vector3) -> Vector3:
+	return bp.cell_to_world(OPENING_CELL).lerp(house, 0.42)
+
 static func opening_focus(cam: Camera3D, focus: Vector3, mark: Vector3, feet: Vector3, area: Rect2) -> Vector3:
 	var dy := opening_shift(cam.unproject_position(mark).y, cam.unproject_position(feet).y, area)
 	if dy <= 0.0: return focus
@@ -481,8 +490,9 @@ static func landing_cell(g: BlueprintGrid, from: Vector2i) -> Vector2i:
 	var to := free_cell_near(g, from, [])
 	if g.bp.in_bounds(to) and not g.astar.is_point_solid(to): return to
 	var dist := INF
-	for y in g.bp.grid.y:
-		for x in g.bp.grid.x:
+	var o := g.bp.grid_origin   # the grid may start before row 0 (q(172) A)
+	for y in range(o.y, o.y + g.bp.grid.y):
+		for x in range(o.x, o.x + g.bp.grid.x):
 			var c := Vector2i(x, y)
 			if g.astar.is_point_solid(c) or Vector2(c - from).length_squared() >= dist: continue
 			dist = Vector2(c - from).length_squared()
@@ -706,6 +716,7 @@ func _sync_plots(v: Dictionary, dt: float) -> void:
 		if id >= 0 and id < P0Garden.plot_count(v): beds.multimesh.set_instance_color(id, P0Garden.bed_tint(str(p.get("state", ""))))
 	# P1 (q(59) §1.1): beds 30–39 stand from Homestead Lv3 (the view's garden.plots); before that the batch draws 30.
 	beds.multimesh.visible_instance_count = P0Garden.plot_count(v)
+	_scenery.show_front_row(P0Garden.plot_count(v) > P0Garden.GRID_PLOTS)   # Lv7's row gets the field's sand (q(172) A)
 	_sync_trees(v)
 
 ## P1 trees (q(118)): a tree's bed is solid (§5.6: not walkable, as the old woody crop); only the cells that change flip,

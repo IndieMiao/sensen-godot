@@ -1740,10 +1740,11 @@ const P1_UNLOCKS := {
 	"title_homestead_master": {"icon": "star", "text": "Homestead Master", "note": "title"},
 	"old_tree": {"icon": "wood", "text": "Old Tree", "note": "Hardwood · 1 per round"},
 	# Lv7 (P1 exit C18, 李白 q(172)): the orchard and the sprinklers reach their most (perennial_slots 1 + level up to 8,
-	# sprinkler_max 3 + level up to 10), §8.6.2's lines; their notes come with q(172)
-	"orchard_8": {"icon": "crop_apple", "text": "Orchard 8/8", "note": ""},
-	"sprinklers_10": {"icon": "facility_sprinkler", "text": "Sprinklers 10/10", "note": ""},
+	# sprinkler_max 3 + level up to 10), §8.6.2's lines; notes q(172) (李白 fac20ed1, 不知火舞)
+	"orchard_8": {"icon": "crop_apple", "text": "Orchard 8/8", "note": "+1 slot"},
+	"sprinklers_10": {"icon": "facility_sprinkler", "text": "Sprinklers 10/10", "note": "+1 sprinkler"},
 	"plots_40": {"icon": "field", "text": "Plots 40", "note": "10 more to till"},
+	"plots_48": {"icon": "field", "text": "Plots 48", "note": "8 more to till"},   # Lv7 (q(172)): 40–47 on the field's edge
 	"warming_cabinet_12": {"icon": "kitchen", "text": "Warming Cabinet 12", "note": "keeps 12 dishes"},
 }
 # Lv8's `stall_upgrade` has no line (不知火舞 on 282, 李元芳's c62a6ed9 ③): the stall is still the crate stand-in, with no
