@@ -127,7 +127,6 @@ func _init(view_: Dictionary = {}, tab_ := "cookbook") -> void:
 	tab = tab_
 	refresh()
 
-
 func set_queue_mode(v: bool) -> void:
 	queue_mode = v
 	if _cook:
