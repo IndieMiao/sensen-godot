@@ -1,0 +1,312 @@
+{
+	"adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+	"assets": [
+		{
+			"board_bounds": [
+				[
+					-0.2800053358078,
+					0.949990570545197,
+					0.0199974030256271
+				],
+				[
+					0.27999472618103,
+					1.3899998664856,
+					0.0699978619813919
+				]
+			],
+			"bounds": [
+				[
+					-0.349999994039536,
+					0.0,
+					-0.129999995231628
+				],
+				[
+					0.35000005364418,
+					1.59500002861023,
+					0.129999995231628
+				]
+			],
+			"collider": {
+				"at": [
+					0.0,
+					0.8,
+					0.0
+				],
+				"shape": "box",
+				"size": [
+					0.62,
+					1.6,
+					0.14
+				]
+			},
+			"cork_face_z": 0.0599961876869202,
+			"id": "notice_board",
+			"roof_bounds": [
+				[
+					-0.349999994039536,
+					1.47228705883026,
+					-0.129999995231628
+				],
+				[
+					0.35000005364418,
+					1.59500002861023,
+					0.129999995231628
+				]
+			],
+			"sockets": {
+				"board_center": {
+					"front": "+Z",
+					"position": [
+						0.0,
+						1.17,
+						0.06
+					]
+				},
+				"mark": {
+					"front": "+Z",
+					"position": [
+						0.0,
+						1.75,
+						0.0
+					]
+				}
+			},
+			"structure_bounds": [
+				[
+					-0.300000756978989,
+					0.0,
+					-0.050002433359623
+				],
+				[
+					0.299990147352219,
+					1.55498814582825,
+					0.0499984622001648
+				]
+			],
+			"surfaces": 1,
+			"triangles": 1012
+		}
+	],
+	"captures": [
+		{
+			"camera_size": 3.84999990463257,
+			"id": "notice-board-43deg",
+			"pitch": 42.9999961853027,
+			"size": [
+				1800,
+				1400
+			],
+			"yaw": 14.4999990463257
+		},
+		{
+			"camera_size": 1.05999994277954,
+			"id": "notice-board-front",
+			"pitch": 0.0,
+			"size": [
+				1800,
+				1400
+			],
+			"yaw": 0.0
+		},
+		{
+			"camera_size": 3.40000009536743,
+			"id": "notice-board-top-grid",
+			"pitch": 90.0,
+			"size": [
+				1800,
+				1400
+			],
+			"yaw": 0.0
+		}
+	],
+	"checks": [
+		{
+			"check": "One merged mesh in imported PackedScene",
+			"passed": true
+		},
+		{
+			"check": "One surface",
+			"passed": true
+		},
+		{
+			"check": "Actual triangle count matches manifest and <= 1200",
+			"passed": true
+		},
+		{
+			"check": "Actual bounds match manifest",
+			"passed": true
+		},
+		{
+			"check": "Ground pivot and roof total height 1.55-1.60 m (mark empty excluded)",
+			"passed": true
+		},
+		{
+			"check": "Identity root and mesh transforms",
+			"passed": true
+		},
+		{
+			"check": "No UV/texture payload",
+			"passed": true
+		},
+		{
+			"check": "Opaque vertex colors",
+			"passed": true
+		},
+		{
+			"check": "Empty retained: board_center",
+			"passed": true
+		},
+		{
+			"check": "Socket position and +Z basis: board_center",
+			"passed": true
+		},
+		{
+			"check": "Empty retained: mark",
+			"passed": true
+		},
+		{
+			"check": "Socket position and +Z basis: mark",
+			"passed": true
+		},
+		{
+			"check": "Actual solid frame 0.56 x 0.44 x 0.05 m",
+			"passed": true
+		},
+		{
+			"check": "Actual frame bottom 0.95 and top 1.39 m",
+			"passed": true
+		},
+		{
+			"check": "Cork face recessed 0.01 m",
+			"passed": true
+		},
+		{
+			"check": "Actual post/foot projection within X +/-0.31 and Z +/-0.07",
+			"passed": true
+		},
+		{
+			"check": "Structure centred at ground midpoint",
+			"passed": true
+		},
+		{
+			"check": "Post section/centre side -1",
+			"passed": true
+		},
+		{
+			"check": "Post section/centre side 1",
+			"passed": true
+		},
+		{
+			"check": "Canopy width <= 0.70 and depth 0.26 m",
+			"passed": true
+		},
+		{
+			"check": "Eave >= 1.46 m and overhang <= 0.10 m",
+			"passed": true
+		},
+		{
+			"check": "Paper relief inside 0.012 m limit",
+			"passed": true
+		},
+		{
+			"check": "Collider contract: 0.62 x 1.60 x 0.14 m",
+			"passed": true
+		},
+		{
+			"check": "One 0.65 m anchor cell",
+			"passed": true
+		},
+		{
+			"check": "No triangle intersections with actual storage at prescribed cell (zero candidate pairs)",
+			"passed": true
+		},
+		{
+			"check": "Separated occupied volumes exclude containment: storage",
+			"passed": true
+		},
+		{
+			"check": "No triangle intersections with actual well at prescribed cell (zero candidate pairs)",
+			"passed": true
+		},
+		{
+			"check": "Separated occupied volumes exclude containment: well",
+			"passed": true
+		},
+		{
+			"check": "Unmodified FarmArt.material()",
+			"passed": true
+		},
+		{
+			"check": "Existing scale avatar assembled",
+			"passed": true
+		},
+		{
+			"check": "43 degree roof visibility: 20 cork samples unobstructed by actual roof triangles",
+			"passed": true
+		},
+		{
+			"check": "Capture saved: notice-board-43deg",
+			"passed": true
+		},
+		{
+			"check": "Capture saved: notice-board-front",
+			"passed": true
+		},
+		{
+			"check": "Capture saved: notice-board-top-grid",
+			"passed": true
+		}
+	],
+	"failures": [],
+	"neighbours": [
+		{
+			"actual_bounds": [
+				[
+					-0.969999969005585,
+					0.0150000005960464,
+					-0.280000001192093
+				],
+				[
+					-0.329999983310699,
+					0.517000019550323,
+					0.297499984502792
+				]
+			],
+			"clearance_axis": "X below neighbour top",
+			"clearance_m": 0.0299992263317108,
+			"id": "storage",
+			"relative_position": [
+				-0.649999976158142,
+				0.0,
+				0.0
+			],
+			"triangle_aabb_candidate_pairs": 0,
+			"triangles": 472
+		},
+		{
+			"actual_bounds": [
+				[
+					-0.405623435974121,
+					0.0,
+					0.954999923706055
+				],
+				[
+					0.476999998092651,
+					0.975590705871582,
+					1.64499998092651
+				]
+			],
+			"clearance_axis": "Z entire mesh",
+			"clearance_m": 0.824999928474426,
+			"id": "well",
+			"relative_position": [
+				0.0,
+				0.0,
+				1.29999995231628
+			],
+			"triangle_aabb_candidate_pairs": 0,
+			"triangles": 3264
+		}
+	],
+	"renderer": "mobile"
+}

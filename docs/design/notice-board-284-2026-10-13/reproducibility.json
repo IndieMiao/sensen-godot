@@ -1,0 +1,13 @@
+{
+  "byte_identical_glb_manifest_palette": true,
+  "first_export": {
+    "assets/farm/art/notice_board.glb": "1bd8b8226045aaf99c5e72b64d882568dd27b11ed03f84521bdd6d41156a2d5d",
+    "assets/farm/art/manifest.json": "03499007c2c25a2610447b1c9e37c15f4da648d429bfea35fe1323a5f3b82385",
+    "tools/art/source/notice_board_284/palette-provenance.json": "79b853a0a6bc98ea6141c954e40d408ecfb13aa1480d03b1e7daddb3c25c839e"
+  },
+  "second_export": {
+    "assets/farm/art/notice_board.glb": "1bd8b8226045aaf99c5e72b64d882568dd27b11ed03f84521bdd6d41156a2d5d",
+    "assets/farm/art/manifest.json": "03499007c2c25a2610447b1c9e37c15f4da648d429bfea35fe1323a5f3b82385",
+    "tools/art/source/notice_board_284/palette-provenance.json": "79b853a0a6bc98ea6141c954e40d408ecfb13aa1480d03b1e7daddb3c25c839e"
+  }
+}

@@ -1,0 +1,122 @@
+{
+  "post_wood": {
+    "asset": "assets/farm/art/deco_bench.glb",
+    "sha256": "51618bd43aa6c45be1b13a23587589a44cffd4da14e42f4ce0cb8b5b76217599",
+    "source_vertex": 0,
+    "linear_rgba": [
+      0.3915724754333496,
+      0.19120168685913086,
+      0.06480326503515244,
+      1.0
+    ],
+    "approximate_srgb_hex": "a87948"
+  },
+  "frame_wood": {
+    "asset": "assets/farm/art/deco_bench.glb",
+    "sha256": "51618bd43aa6c45be1b13a23587589a44cffd4da14e42f4ce0cb8b5b76217599",
+    "source_vertex": 290,
+    "linear_rgba": [
+      0.13563333451747894,
+      0.08228270709514618,
+      0.040915198624134064,
+      1.0
+    ],
+    "approximate_srgb_hex": "675139"
+  },
+  "cork_wood": {
+    "asset": "assets/farm/art/storage.glb",
+    "sha256": "cd27e5cae4917990801ce83d602fb1d530a7b4c2aa4ae25d4645e27b2ba7910f",
+    "source_vertex": 0,
+    "linear_rgba": [
+      0.5972017645835876,
+      0.35153260827064514,
+      0.13563333451747894,
+      1.0
+    ],
+    "approximate_srgb_hex": "cba067"
+  },
+  "roof_green": {
+    "asset": "assets/farm/art/storage.glb",
+    "sha256": "cd27e5cae4917990801ce83d602fb1d530a7b4c2aa4ae25d4645e27b2ba7910f",
+    "source_vertex": 504,
+    "linear_rgba": [
+      0.05612849071621895,
+      0.20507873594760895,
+      0.12743768095970154,
+      1.0
+    ],
+    "approximate_srgb_hex": "437d64"
+  },
+  "roof_edge": {
+    "asset": "assets/farm/art/storage.glb",
+    "sha256": "cd27e5cae4917990801ce83d602fb1d530a7b4c2aa4ae25d4645e27b2ba7910f",
+    "source_vertex": 521,
+    "linear_rgba": [
+      0.03578576445579529,
+      0.13075177371501923,
+      0.08125027269124985,
+      1.0
+    ],
+    "approximate_srgb_hex": "356551"
+  },
+  "paper_ivory": {
+    "asset": "assets/farm/art/sign.glb",
+    "sha256": "75254b93305b1b9c85bbd77fcbec8f1acc017e724d8c3258d0ea3054606f3350",
+    "source_vertex": 292,
+    "linear_rgba": [
+      1.0,
+      0.9046611785888672,
+      0.6444796919822693,
+      1.0
+    ],
+    "approximate_srgb_hex": "fff4d2"
+  },
+  "paper_milk": {
+    "asset": "assets/farm/art/chef_sign_a.glb",
+    "sha256": "791b4165428c883f26aeafdec3fef65e7d872e39772ba64ef59fc5b96082130a",
+    "source_vertex": 1194,
+    "linear_rgba": [
+      1.0,
+      0.8962693810462952,
+      0.7230551242828369,
+      1.0
+    ],
+    "approximate_srgb_hex": "fff3dd"
+  },
+  "paper_yellow": {
+    "asset": "assets/farm/art/sign.glb",
+    "sha256": "75254b93305b1b9c85bbd77fcbec8f1acc017e724d8c3258d0ea3054606f3350",
+    "source_vertex": 437,
+    "linear_rgba": [
+      0.8796223998069763,
+      0.6172065734863281,
+      0.09758734703063965,
+      1.0
+    ],
+    "approximate_srgb_hex": "f1ce58"
+  },
+  "pin_red": {
+    "asset": "assets/farm/art/chef_sign_a.glb",
+    "sha256": "791b4165428c883f26aeafdec3fef65e7d872e39772ba64ef59fc5b96082130a",
+    "source_vertex": 904,
+    "linear_rgba": [
+      0.2158605009317398,
+      0.039546236395835876,
+      0.028426039963960648,
+      1.0
+    ],
+    "approximate_srgb_hex": "80382f"
+  },
+  "pin_gold": {
+    "asset": "assets/farm/art/chef_sign_a.glb",
+    "sha256": "791b4165428c883f26aeafdec3fef65e7d872e39772ba64ef59fc5b96082130a",
+    "source_vertex": 684,
+    "linear_rgba": [
+      0.7912979125976562,
+      0.48514994978904724,
+      0.08865558356046677,
+      1.0
+    ],
+    "approximate_srgb_hex": "e6b954"
+  }
+}
