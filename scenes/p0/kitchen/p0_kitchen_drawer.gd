@@ -72,12 +72,9 @@ const _DOUBLE_ROW := 32.0
 signal unavailable(reason: String)
 ## Double was switched (the pot card above the drawer shows ×2 on its slots and its corner tag).
 signal double_changed(on: bool)
-## Cook All (Cooking Lv8, §16 COOK-1, q(124)): the kitchen opens its sheet.
-signal cook_all_requested
-## Cook All's row (B7 ⑨, COOK-ALL-ENTRY 2691:154923 / -OFF 2691:155077; 不知火舞 on 286): under the mode tabs, above the
-## title strip, 34 high and 4 apart, the button right-aligned (its 44 px hit 5 over the row's top and bottom). It left the
-## filter row, which keeps all six chips; the grid's bottom stays where it was, the grid 38 shorter.
-const _COOK_ALL_ROW_H := 34.0
+## Cook All has no key here: paused (user 10-15; 0.2.8 brings a cook-this-page-in-batches on the recipe card), and the
+## filter row keeps all six chips where its key used to squeeze Rare / Legendary out (B7 ⑨). The kitchen's sheet and
+## firing (P0Kitchen.open_cook_all) stay for 0.2.8.
 
 var _stove: Label
 var _level: Label
@@ -97,8 +94,6 @@ var _effect_parts: Array = []   # `+40 Energy`, `15 s`, `Soup`: as many as fit t
 var _recipe_button: UiCommandButton
 var _recipe_nav: UiNavButton
 var _pages: UiInventoryGrid
-var _cook_all: UiCommandButton   # its own row on top of the Cookbook page, from Cooking Lv8 (P0KitchenLogic.cook_all)
-var _cook_all_row: Control
 var _book_chips: Control   # the Cookbook's filter chips (in their scroll window)
 var _bag: UiInventoryGrid
 var _slots_used: Label
@@ -132,16 +127,9 @@ func _init(view_: Dictionary = {}, tab_ := "cookbook") -> void:
 	tab = tab_
 	refresh()
 
-## Shown from Cooking Lv8 (greyed `Nothing to cook` included), not while queueing; its row goes with it, no empty row.
-func _show_cook_all() -> void:
-	if _cook_all == null: return
-	var all := P0KitchenLogic.cook_all(view)
-	_cook_all_row.visible = not all.is_empty() and not queue_mode
-	if _cook_all_row.visible: _cook_all.reason = str(all.button)
 
 func set_queue_mode(v: bool) -> void:
 	queue_mode = v
-	_show_cook_all()
 	if _cook:
 		_cook.label = _verb()
 		_cook.reason = P0KitchenLogic.experiment_reason(view, pot, queue_mode, stove_index)
@@ -246,24 +234,6 @@ func _build_cookbook() -> VBoxContainer:
 	var v := VBoxContainer.new()
 	v.add_theme_constant_override(&"separation", int(_GAP))
 	v.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	# Cook All's row (`Nothing to cook` greyed when no known page has its ingredients, D-10, LOCK-10: the gap on the
-	# button, no empty sheet): the button keeps its 44 hit, grown leftwards from the row's right edge.
-	_cook_all_row = Control.new()
-	_cook_all_row.name = "CookAllRow"
-	_cook_all_row.custom_minimum_size.y = _COOK_ALL_ROW_H
-	_cook_all_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_cook_all_row.visible = false
-	_cook_all = UiCommandButton.new("Cook All", UiCommandButton.Kind.SECONDARY, true)
-	_cook_all.name = "CookAll"
-	_cook_all.activated.connect(func(): cook_all_requested.emit())
-	_cook_all.unavailable_pressed.connect(func(r: String): unavailable.emit(r))
-	_cook_all.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	_cook_all.grow_horizontal = Control.GROW_DIRECTION_BEGIN
-	var over := (UiTokens.SIZE_TOUCH - _COOK_ALL_ROW_H) / 2.0
-	_cook_all.offset_top = -over
-	_cook_all.offset_bottom = _COOK_ALL_ROW_H + over
-	_cook_all_row.add_child(_cook_all)
-	v.add_child(_cook_all_row)
 	v.add_child(_build_titles())
 	# The filter chips, all six: All · Can cook · Common · Fine · Rare · Legendary (2318:125476).
 	var chips := _chips(P0KitchenLogic.COOKBOOK_CHIPS, func(i: int):
@@ -446,7 +416,6 @@ static func _text(parent: Control, style: StringName, color: Color, r: Rect2) ->
 	return l
 
 func _refresh_cookbook() -> void:
-	_show_cook_all()
 	var order := P0KitchenLogic.cookbook_order(view, cookbook_chip)
 	_pages.capacity = order.size()
 	_pages.items = order.map(func(p): return P0KitchenLogic.page_cell(view, p))
