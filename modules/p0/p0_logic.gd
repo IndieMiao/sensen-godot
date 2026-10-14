@@ -412,7 +412,7 @@ const DISH_STANDIN := {
 	"dish_eel_skewers": "dish_mullet_skewers", "dish_herb_salmon": "dish_herb_baked_perch", "dish_pineapple_fish": "dish_bass_tomato_stew",
 	"dish_sweet_potato_cakes": "dish_carrot_cake", "dish_pumpkin_chowder": "dish_fisher_stew", "dish_beet_fish_soup": "dish_fish_soup"}
 
-const ICON_ALIAS := {"fert_compost": "compost", "facility_compost_bin": "compost", "tool_row_hoe": "hoe", "bag_upgrade_1": "bag", "postcard_san_francisco": "postcard", "postcard_shanghai": "postcard", "wild_herb": "crop_herb", "drink_hot_tea": "dish_fruit_tea", "drink_coffee": "dish_fruit_tea"}
+const ICON_ALIAS := {"fert_compost": "compost", "facility_compost_bin": "compost", "tool_row_hoe": "hoe", "bag_upgrade_1": "bag", "bag_upgrade_2": "bag", "bag_upgrade_3": "bag", "postcard_san_francisco": "postcard", "postcard_shanghai": "postcard", "wild_herb": "crop_herb", "drink_hot_tea": "dish_fruit_tea", "drink_coffee": "dish_fruit_tea"}
 
 static func icon(id: String) -> Texture2D:
 	id = base_id(id)   # a dish's quality (`dish_x@good`) has the dish's own art; the stars say the quality (286 5d27bd93)
@@ -1824,6 +1824,14 @@ static func bag_tier_note(view: Dictionary, id: String) -> String:
 	var owned := str(view.get("homestead", {}).get("unlocks", {}).get(before_id, "")) == "owned" or now >= int(before.get("capacity", 0))
 	if owned: return "Bag %d → %d" % [int(before.get("capacity", now)), to]
 	return "Bag %d · after %s" % [to, str(before.get("name", "")).trim_prefix("Bag ")]
+
+## A Bag Upgrade's own slots: its capacity less the tier before it (Upgrade I: the bag's starting 25) — +5 each, whatever
+## the bag holds now (不知火舞 on 283, q(194): the buy row, its › card and the full-bag row say the same).
+static func bag_tier_slots(id: String) -> int:
+	var tier := _bag_tier(id)
+	if tier.is_empty(): return 0
+	var before := _bag_tier(str(tier.get("requires", "")))
+	return int(tier.get("capacity", 0)) - int(before.get("capacity", content().get("bag", {}).get("capacity", 25)))
 
 static func _bag_tier(id: String) -> Dictionary:
 	for t in content().get("bag_upgrades", []):

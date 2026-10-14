@@ -43,6 +43,7 @@ const CONTEXTS: Array[StringName] = [&"bag", &"gear", &"counter_buy", &"counter_
 const RULES_PATH := "res://modules/p0/item_info_rules.json"
 const KINDS := ["seed", "crop", "fish", "dish", "bait", "rod", "pick", "tool", "trap"]
 const SEP := " · "
+const _P0Travel := preload("res://modules/p0/p0_travel.gd")   # grouped(): a panel's coin price from 1,000 has its commas (不知火舞 on #409)
 const _MYSTERY := "dish_mystery"
 const _TAKE_SOME := 10   # F-07 storage: Take 10 + Take all
 ## Server kinds the card treats as another kind's rules (刘邦 / 周瑜: torches are materials here).
@@ -370,7 +371,7 @@ static func tokens(view: Dictionary, item_id: String, context: StringName, opts 
 		gate_text = ("%s Lv%d needed" % [str(offer.get("skill", "")).capitalize(), int(offer.get("gate", 0))]) if offer.has("gate") else "",
 		# Daily stock comes back at the day's rollover, the same moment as Rest (view.rest.resets_in).
 		restock_in = P0Logic.span(float(view.get("rest", {}).get("resets_in", 0))) if view.get("rest", {}).has("resets_in") else "",
-		coins_short = str(maxi(0, int(offer.get("need", int(offer.get("price", 0)))) + int(offer.get("price", 0)) * (maxi(1, int(opts.get("qty", 1))) - 1) - int(view.get("coins", 0)))),
+		coins_short = _P0Travel.grouped(maxi(0, int(offer.get("need", int(offer.get("price", 0)))) + int(offer.get("price", 0)) * (maxi(1, int(opts.get("qty", 1))) - 1) - int(view.get("coins", 0)))),
 		rod_effect = _rod_effect(view, rod),
 		# A buy row has room for the reach only (NPC-2-2 `Lands up to Rare fish`); the card says the bite window too.
 		rod_reach = ("Lands up to %s fish" % P0Logic.rarity_name(view, int(rod.reach))) if rod.has("reach") else "",
@@ -453,10 +454,10 @@ static func _offer_use(view: Dictionary, offer: Dictionary) -> String:
 	match str(offer.get("to", "")):
 		"storage": return "Goes to your Farm Storage"
 		"bag_cap":
-			for up in P0Logic.content().get("bag_upgrades", []):
-				if str(up.get("id", "")) != str(offer.get("id", "")): continue
-				var more := int(up.get("capacity", 0)) - int(view.get("bag", {}).get("capacity", 25))
-				return ("+%d bag slots" % more) if more > 0 else ""
+			# the tier's own slots (+5), not its capacity less the bag's now: Upgrade II, bought only after I, said `+10`
+			# to a bag still at 25 (不知火舞 on 283, q(194))
+			var more := P0Logic.bag_tier_slots(str(offer.get("id", "")))
+			return ("+%d bag slots" % more) if more > 0 else ""
 	return ""
 
 ## A buy row's materials line (不知火舞 on 284, q(174)): the full list ran past the row beside a grey key (`Hardwood 0/4 ·
@@ -514,7 +515,8 @@ static func _price(view: Dictionary, item_id: String, opts: Dictionary) -> Dicti
 	if offer.is_empty(): return {}
 	var each := int(offer.get("price", 0))
 	var qty := maxi(1, int(opts.get("qty", 1)))
-	return {each = each, total = each * qty, text = "%d coins" % (each * qty), line = ("%d × %d coins" % [qty, each]) if qty > 1 else ""}
+	return {each = each, total = each * qty, text = "%s coins" % _P0Travel.grouped(each * qty),
+		line = ("%d × %s coins" % [qty, _P0Travel.grouped(each)]) if qty > 1 else ""}
 
 static func _quota(view: Dictionary, item_id: String, kind: String, opts: Dictionary) -> Dictionary:
 	return _quota_line(_quota_of(view, item_id, opts), "" if _regional(view, item_id, opts) else kind, _counter(opts))

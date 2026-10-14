@@ -359,11 +359,57 @@ func test_full_bag_shows_where_more_room_comes_from() -> void:
 	v.bag.slots = [{"id": "seed_radish", "qty": 5}, {"id": "fish_crucian", "qty": 1}]
 	v["homestead"] = {"unlocks": {"bag_upgrade_1": "locked"}}
 	var up: Dictionary = P0Logic.content().bag_upgrades[0]
-	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("Bag full · +%d slots at Homestead Lv%d" % [int(up.capacity) - 2, int(up.homestead)])
+	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("Bag full · +%d slots at Homestead Lv%d" % [P0Logic.bag_tier_slots(str(up.id)), int(up.homestead)])   # its own +5 (q(194))
 	v.homestead.unlocks.bag_upgrade_1 = "for_sale"
-	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("Bag full · +%d slots · %s" % [int(up.capacity) - 2, str(up.name)])
+	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("Bag full · +%d slots · %s" % [P0Logic.bag_tier_slots(str(up.id)), str(up.name)])
 	v.homestead.unlocks.bag_upgrade_1 = "owned"
 	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("")
 	v.homestead.unlocks.bag_upgrade_1 = "locked"
 	v.bag.capacity = 25
 	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("")   # room left: no row
+
+## P1 exit C13: the next tier not yet bought, not only Upgrade I — I owned at 30, II says Lv6 until it is for sale, then
+## III Lv9; nothing once all three are bought, or when the view does not say a tier's state.
+func test_full_bag_points_at_the_next_upgrade_after_the_first() -> void:
+	var v := _view()
+	v.bag.capacity = 30
+	v.bag.slots = []
+	for i in 30: v.bag.slots.append({"id": "seed_radish", "qty": 1})
+	v["homestead"] = {"unlocks": {"bag_upgrade_1": "owned", "bag_upgrade_2": "locked", "bag_upgrade_3": "locked"}}
+	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("Bag full · +5 slots at Homestead Lv6")
+	v.homestead.unlocks.bag_upgrade_2 = "for_sale"
+	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("Bag full · +5 slots · Bag Upgrade II")
+	v.homestead.unlocks.bag_upgrade_2 = "owned"
+	v.bag.capacity = 35
+	for i in 5: v.bag.slots.append({"id": "seed_radish", "qty": 1})
+	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("Bag full · +5 slots at Homestead Lv9")
+	v.homestead.unlocks.bag_upgrade_3 = "for_sale"
+	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("Bag full · +5 slots · Bag Upgrade III")
+	v.homestead.unlocks.bag_upgrade_3 = "owned"
+	v.bag.capacity = 40
+	for i in 5: v.bag.slots.append({"id": "seed_radish", "qty": 1})
+	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("")   # every tier bought
+	v.homestead.unlocks = {"bag_upgrade_1": "owned"}   # an older server: no state for II
+	v.bag.capacity = 30
+	v.bag.slots.resize(30)
+	assert_str(P0BagDrawer.bag_full_text(v)).is_equal("")
+
+## q(194) (不知火舞 on 283): each Bag Upgrade adds its own 5 — the buy row's line 2 (and so its › card) says `+5 bag slots`
+## for II and III too, even to a bag still at 25 (it said `+10` / `+15`, the capacity less the bag's now).
+func test_each_bag_upgrade_says_its_own_five_slots() -> void:
+	assert_array(["bag_upgrade_1", "bag_upgrade_2", "bag_upgrade_3"].map(func(id): return P0Logic.bag_tier_slots(id))).is_equal([5, 5, 5])
+	var v := _view()
+	v.bag.capacity = 25
+	for id in ["bag_upgrade_1", "bag_upgrade_2", "bag_upgrade_3"]:
+		assert_str(P0ItemInfo._offer_use(v, {"id": id, "to": "bag_cap"})).override_failure_message(id).is_equal("+5 bag slots")
+
+## 不知火舞 on #409: every tier wears the bag's icon (not the sprout stand-in), and a panel's coin price from 1,000 has
+## its comma, as HOME-1's `Bag Upgrade III · 1,000 coins`.
+func test_bag_upgrades_wear_the_bag_and_prices_have_commas() -> void:
+	for id in ["bag_upgrade_1", "bag_upgrade_2", "bag_upgrade_3"]:
+		assert_str(P0Logic.icon(id).resource_path).override_failure_message(id).is_equal(P0Logic.icon("bag").resource_path)
+	var v := {"coins": 0, "stall": {"buy": [{"id": "bag_upgrade_3", "price": 1000, "to": "bag_cap"}]}}   # the Homestead Stall's row
+	var s := P0ItemInfo.spec(v, "bag_upgrade_3", &"counter_buy")
+	assert_str(str(s.price.text)).is_equal("1,000 coins")
+	assert_array(s.buttons.map(func(b): return str(b.label))).contains(["Need 1,000 more coins"])
+	assert_str(str(P0ItemInfo.spec(v, "bag_upgrade_3", &"counter_buy", {"qty": 2}).price.line)).is_equal("2 × 1,000 coins")
