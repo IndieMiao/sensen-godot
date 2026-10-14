@@ -14,6 +14,6 @@
     "res_lena": {"name": "Lena", "scale": 1.0, "anchor": "npc_lena", "slots": {"hairHat": "hairhat41", "glass": "glass1", "cloth": "cloth1_1", "shoes": "shoes1"}},
     "res_rafa": {"name": "Rafa", "scale": 1.0, "anchor": "npc_rafa", "slots": {"hairHat": "hairhat51", "cloth": "cloth1_1", "shoes": "shoes4"}},
     "res_tomo": {"name": "Tomo", "scale": 1.0, "anchor": "npc_tomo", "slots": {"hairHat": "hairhat0_npc_tomo", "glass": "glass0", "cloth": "cloth0", "shoes": "shoes2", "messengerBag": "messengerbag3"}},
-    "res_granny_wu": {"name": "Granny Wu", "scale": 1.0, "anchor": "npc_granny_wu", "slots": {"hairHat": "hairhat80_npc_granny_wu", "cloth": "cloth11", "shoes": "shoes3"}}
+    "res_granny_wu": {"name": "Granny Wu", "scale": 1.0, "anchor": "npc_granny_wu", "slots": {"hairHat": "hairhat80_npc_granny_wu", "cloth": "cloth11", "shoes": "shoes5"}}
   }
 }
