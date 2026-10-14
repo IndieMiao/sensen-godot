@@ -4,7 +4,8 @@ extends PanelContainer
 ## of a result moment, a compact centred card (280) under the in-scene reveal. The reveal itself (plate, glow,
 ## sparkles, the leaping fish) belongs to the caller; this card only lays out the result.
 ##   line 1  event: Caught! / New recipe! / Dish ready / Mystery Dish / Home Cook (tone colours it)
-##   line 2  the item: icon disc, name, rarity dot + word, ★ quality badge (Plain shows none)
+##   line 2  the item: icon disc, name, rarity dot + word, ★ quality badge (Plain shows none); `item_art` set: that
+##           control alone in the disc's place, no disc (a Kindred postcard's stamp, q(171) KINDRED-PIP)
 ##   rewards repeat rewards as float pills (UiFloatText.pill controls built by the caller), at most two
 ##   strip   a one-time reward: First catch! +15 XP · First cooked · +20 Cooking XP · Cookbook 2/48; a strip too long
 ##           for a line breaks between its rewards at « · », never inside one (strip_lines)
@@ -47,6 +48,8 @@ const RARITY_COLORS := [UiTokens.COLOR_RARITY_COMMON, UiTokens.COLOR_RARITY_FINE
 var tone: Tone = Tone.REWARD: set = set_tone
 var event := "": set = set_event
 var icon: Texture2D: set = set_icon
+## A control shown in the disc's place instead of the icon (the disc's ground goes; null: the icon disc).
+var item_art: Control: set = set_item_art
 var item_name := "": set = set_item_name
 ## 1–4 shows the rarity dot and word; 0 hides the tags row (fish and dishes have rarity, crops do not).
 var rarity := 0: set = set_rarity
@@ -60,6 +63,8 @@ var quality := 0: set = set_quality
 var rewards: Array = []: set = set_rewards
 var strip := "": set = set_strip
 var strip_icon: Texture2D: set = set_strip_icon
+## The strip icon's side: 18, or 14 for the affinity heart (a Kindred card, 不知火舞 on 284).
+var strip_icon_size := 18.0: set = set_strip_icon_size
 ## Primary command; "" hides the whole actions block (catch cards).
 var primary := "": set = set_primary
 ## Unavailable reason (LOCK-10): replaces the primary label, the button stays tappable.
@@ -190,12 +195,23 @@ func _build_actions() -> Control:
 func set_tone(v: Tone) -> void: tone = v; _refresh()
 func set_event(v: String) -> void: event = v; _refresh()
 func set_icon(v: Texture2D) -> void: icon = v; _refresh()
+func set_item_art(v: Control) -> void:
+	if item_art and is_instance_valid(item_art) and item_art != v and item_art.get_parent() == _disc:
+		_disc.remove_child(item_art)
+		item_art.queue_free()
+	item_art = v
+	if _disc and item_art and item_art.get_parent() == null:
+		item_art.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		item_art.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		_disc.add_child(item_art)
+	_refresh()
 func set_item_name(v: String) -> void: item_name = v; _refresh()
 func set_rarity(v: int) -> void: rarity = v; _refresh()
 func set_rarity_word(v: String) -> void: rarity_word = v; _refresh()
 func set_quality(v: int) -> void: quality = v; _refresh()
 func set_strip(v: String) -> void: strip = v; _refresh()
 func set_strip_icon(v: Texture2D) -> void: strip_icon = v; _refresh()
+func set_strip_icon_size(v: float) -> void: strip_icon_size = v; _refresh()
 func set_primary(v: String) -> void: primary = v; _refresh()
 func set_primary_reason(v: String) -> void: primary_reason = v; _refresh()
 func set_secondary(v: String) -> void: secondary = v; _refresh()
@@ -237,7 +253,7 @@ static func strip_lines(text: String, font: Font, size: int, width: float) -> St
 ## The strip's text inside the card: its inner width less the strip's padding and, with one, the icon and its gap.
 func _fit_strip() -> void:
 	if _strip_text == null: return
-	var width := WIDTH - _PAD_X * 2.0 - _STRIP_PAD.x - _STRIP_PAD.z - ((_STRIP_ICON + _STRIP_GAP) if strip_icon != null else 0.0)
+	var width := WIDTH - _PAD_X * 2.0 - _STRIP_PAD.x - _STRIP_PAD.z - ((strip_icon_size + _STRIP_GAP) if strip_icon != null else 0.0)
 	_strip_text.text = strip_lines(strip, _strip_text.get_theme_font(&"font"), _strip_text.get_theme_font_size(&"font_size"), width)
 
 ## A clipped label has no natural width, so give the name its text width up to NAME_MAX_W (then …): short names
@@ -258,8 +274,10 @@ func _refresh() -> void:
 	_event.visible = event != ""
 	_event.add_theme_color_override(&"font_color", [UiTokens.COLOR_PRIMARY, UiTokens.COLOR_SECONDARY, UiTokens.COLOR_TEXT][tone])
 	var disc_bg: Color = [UiTokens.COLOR_PRIMARY_TINT, UiTokens.COLOR_DISABLED, UiTokens.COLOR_QUALITY_GOLD][tone]
-	_disc.add_theme_stylebox_override(&"panel", UiStyleBox.make(disc_bg, _DISC * 0.5))
+	var art := item_art != null and is_instance_valid(item_art)
+	_disc.add_theme_stylebox_override(&"panel", StyleBoxEmpty.new() if art else UiStyleBox.make(disc_bg, _DISC * 0.5))
 	_icon.texture = icon
+	_icon.visible = not art
 	_name.text = item_name
 	_fit_name()
 	_tags.visible = rarity > 0 or quality > 0 or rarity_word != ""
@@ -273,6 +291,7 @@ func _refresh() -> void:
 	_fit_strip()
 	_strip_icon.texture = strip_icon
 	_strip_icon.visible = strip_icon != null
+	_strip_icon.custom_minimum_size = Vector2(strip_icon_size, strip_icon_size)
 	_actions.visible = primary != "" or secondary != "" or note != ""
 	_primary.label = primary
 	_primary.reason = primary_reason

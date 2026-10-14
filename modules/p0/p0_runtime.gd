@@ -13,6 +13,7 @@ extends Node
 ## p0_until(name) -> bool.
 
 const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
+const P0Kindred := preload("res://modules/p0/p0_kindred.gd")   # Kindred's postcard and title (q(171))
 const P0Barter := preload("res://modules/p0/p0_barter.gd")   # the market's Barter (q(166))
 const HomePanel = preload("res://scenes/p0/home/p0_home_panel.gd")
 const MAP_SCENE := "res://scenes/p0/p0_map.tscn"
@@ -790,6 +791,9 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				ui.toast_success_when_clear(P0Logic.visit_toast(v, str(ev.get("id", ""))))
 			"title":   # a story request's title (§9.4.4 Trusted)
 				ui.toast_success("New title · %s" % str(ev.get("id", "")))
+			"kindred":   # q(171) ③: their postcard and title, a Milestone card after the affinity float (end of the frame)
+				var kc := P0Kindred.card(v, ev)
+				ui.queue_card.call_deferred(func(): ui.show_kindred(kc))
 			"homestead":
 				# HOME-2 (SGODOT-228): HOME-1 closes, the MomentBanner says what changed; the farm swaps the fence.
 				if ui.modal_kind == "homestead": ui.close_modal()
@@ -1496,6 +1500,10 @@ func _dev_shot(dt: float) -> void:
 				func(): ui.open_licenses(func(): ui.open_settings(func(): ui.open_profile())))
 			"noticeboard": ui.open_notice_board()   # the stall's Notice Board (q(164) shots)
 			"noticeonline": ui.set_notice_online({"sh_market_1": 4, "sh_tea_1": 3, "sh_tackle_1": 3, "sh_post_1": 2})   # shots: who is in, as the frame
+			"passport": ui.open_passport(Callable(), step[1] if step.size() > 1 else "cities")   # passport[:postcards] (q(171) shots)
+			"passportpage": if ui.passport(): ui.passport().call("show_page", step[1])
+			"passportclose": if ui.passport(): (ui.passport().find_child("Close", true, false) as BaseButton).pressed.emit()
+			"kindredcard": ui.show_kindred(P0Kindred.card(session.current(), {"resident": step[1]}))   # kindredcard:res_pip
 			"pagebottom":
 				for sc in ui.root.find_children("*", "ScrollContainer", true, false): (sc as ScrollContainer).scroll_vertical = 100000
 			"barterpress":   # barterpress:stone — that mineral's Barter key in the open market drawer (q(166) shots)

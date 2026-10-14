@@ -308,6 +308,7 @@ func set_view(v: Dictionary) -> void:
 	if inbox() != null: _inbox.refresh(v)
 	if bite_board() != null: _bite_board.refresh(v)
 	if notice_board() != null: _notice_board.refresh(v)
+	if passport() != null: _passport.call("refresh", v)
 	_refresh_hud()
 	_refresh_bar()
 
@@ -3215,6 +3216,21 @@ func show_catch(fish_id: String, rarity: int, first_xp: int, extras := {}, event
 ## A Cookbook title (§7.6.1; 不知火舞 on 282): RewardMoment Milestone, no buttons — the title, `Cookbook 20/48`, `New title ·
 ## +100 coins · Recipe Stand` (P0KitchenLogic.title_card). Queued after the dish card like a level-up. A skill's Lv10
 ## title too (P0Logic.title_card: `Master Gardener` · `Farming Lv10` · `New title`, its skill's icon; SGODOT-275).
+## Kindred (q(171) ③; KINDRED-PIP 2620:134209): RewardMoment Milestone, no buttons, folded away as a title card —
+## `Kindred · Pip`, their postcard's stamp in the item's place, `Postcard from Pip`, the strip `New title · Pip's Best
+## Friend` with the affinity float's heart at 14; no pills (P0Kindred.card).
+const PostcardStamp := preload("res://scenes/p0/panels/p0_postcard_stamp.gd")
+func show_kindred(spec: Dictionary) -> void:
+	var m := UiRewardMoment.new()
+	m.tone = UiRewardMoment.Tone.MILESTONE
+	m.event = str(spec.get("event", ""))
+	m.item_art = PostcardStamp.new(str(spec.get("resident", "")), true, PostcardStamp.CARD)
+	m.item_name = str(spec.get("item_name", ""))
+	m.strip = str(spec.get("strip", ""))
+	m.strip_icon = UiFloatText.HEART   # the affinity float's heart, color/float-affinity, 14 (不知火舞 on 284)
+	m.strip_icon_size = 14.0
+	show_moment(m)
+
 func show_title(spec: Dictionary) -> void:
 	var m := UiRewardMoment.new()
 	m.tone = UiRewardMoment.Tone.MILESTONE
@@ -3387,18 +3403,34 @@ func open_fishdex(back := Callable(), animate := true) -> void:
 	modal_kind = "fishdex"
 	_modal_back = back
 
-## PASS-1 (Figma 482:429, §11.9.3): the Passport — cities visited, today's counted first visits, home and every city
-## reached with its stamp; a city opens its page (PASS-2). Over the profile (Back to it), as the Fish-dex.
-func open_passport(back := Callable()) -> void:
+## The Passport (§11.9.3; PASS-POSTCARDS 2627:134311, 不知火舞 on 284): a drawer with its pages on Filter pills —
+## `Cities` (cities visited, today's counted first visits, home and every city reached with its stamp; a city opens
+## its page, PASS-2, whose Back comes here) and `Postcards` (q(171) ⑥). Close goes back where it was opened from (the
+## profile), else closes (the Stamp Desk): the old bottom Back is Close now. `page`: "cities" or "postcards".
+const PassportDrawer := preload("res://scenes/p0/panels/p0_passport_drawer.gd")
+var _passport: UiDrawer
+
+func open_passport(back := Callable(), page := "cities") -> UiDrawer:
 	var spec := P0Travel.passport(view)
 	for r in spec.rows:
 		r["icon"] = load(str(r.stamp)) if str(r.get("stamp", "")) != "" else P0Logic.icon(str(r.icon))
 		if str(r.state) != "Home":
 			var cluster := str(r.cluster)
 			r["pressed"] = func(): open_city_page(cluster, func(): open_passport(back))
-	spec["dismiss"] = "Back"
-	P0ArrivalCard.open(self, spec, func(): pass, "passport")
+	var d: UiDrawer = PassportDrawer.new(spec, view, page)
+	d.theme = UiKit.theme()
+	d.safe_bottom = safe_bottom()
+	d.close_requested.connect(back_modal)
+	d.connect(&"close_pressed", back_modal)
+	_open_modal(d, UiTokens.OPACITY_SCRIM_DRAWER, true)
+	modal_kind = "passport"
 	_modal_back = back
+	_passport = d
+	return d
+
+## The open Passport, or null.
+func passport() -> UiDrawer:
+	return _passport if is_instance_valid(_passport) and modal_kind == "passport" else null
 
 ## PASS-2 (Figma 482:431, §11.9.1): a city's three tiers and its counts.
 func open_city_page(cluster: String, back := Callable()) -> void:
