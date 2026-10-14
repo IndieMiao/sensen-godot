@@ -717,6 +717,64 @@ func test_a_generated_keeper_wears_their_look_preset() -> void:
 	var worn: Dictionary = rig.get("_desired")
 	for slot in look: assert_str(str(worn.get(StringName(slot), ""))).is_equal(str(look[slot]))
 
+## 不知火舞 on 284: a generated keeper never wears the hair of a resident in the same room — the set gives way to the
+## first of its role and climate's three that does not (all three do: it stays); the entry carries it, so the room and
+## the keeper's portrait agree.
+func test_a_generated_keeper_gives_way_to_a_residents_hair() -> void:
+	var looks: Dictionary = P0Logic.content().world.keeper_looks
+	assert_str(str(looks.tea_subtropical_0.hairHat)).is_equal("hairhat41")   # Lena's
+	assert_str(P0CityPlaces.keeper_look("tea_subtropical_0", ["res_hana", "res_lena"])).is_equal("tea_subtropical_1")
+	assert_str(str(looks.market_subtropical_0.hairHat)).is_equal("hairhat0")   # Tomo's
+	assert_str(P0CityPlaces.keeper_look("market_subtropical_0", ["res_tomo"])).is_equal("market_subtropical_1")
+	assert_str(P0CityPlaces.keeper_look("tea_subtropical_1", ["res_hana", "res_lena"])).is_equal("tea_subtropical_1")   # no clash
+	assert_str(P0CityPlaces.keeper_look("tea_subtropical_0", [])).is_equal("tea_subtropical_0")
+	# Tomo's, Theo's and Nadia's hair take all three subtropical market sets: the given one stays
+	assert_str(P0CityPlaces.keeper_look("market_subtropical_2", ["res_tomo", "res_theo", "res_nadia"])).is_equal("market_subtropical_2")
+	P0CityPlaces.accept("gn-testlena", {"detail": {"outposts": [{"id": "gn-testlena~tea0", "role": "tea", "name": "Test Tea House",
+		"art": "coffee_shop", "anchors": "res://assets/p0/outposts/tea.anchors.json", "category": "Tea house", "lat": 1.0,
+		"lng": 1.0, "capacity": 12, "keeper": {"role": "Host", "name": "Bea", "look": "tea_subtropical_0"},
+		"residents": ["res_hana", "res_lena"]}]}})
+	assert_str(str(P0Outposts.find("gn-testlena~tea0").keeper.look)).is_equal("tea_subtropical_1")
+
+## 不知火舞 on 284 (caf5520a): the keeper sets (world.keeper_looks, role × climate × 3) — a resident's hair and cloth
+## are theirs, no keeper set wears both; no cloth28 (the uniform) and no hairhat20 (the novelty hood), as for the
+## residents; the three sets of a role and climate have three different hairs, so a resident's hair always leaves two
+## to give way to (P0CityPlaces.keeper_look).
+func test_the_keeper_sets_leave_the_residents_their_looks() -> void:
+	var looks: Dictionary = P0Logic.content().world.keeper_looks
+	var npcs: Dictionary = P0RoomAnchors.read_json(OutpostScript.NPCS_PATH).get("npcs", {})
+	var theirs := {}
+	for id in npcs:
+		if str(id).begins_with("res_"): theirs["%s+%s" % [npcs[id].slots.get("hairHat", ""), npcs[id].slots.get("cloth", "")]] = id
+	var groups := {}
+	for k in looks:
+		if not looks[k] is Dictionary: continue
+		var l: Dictionary = looks[k]
+		var combo := "%s+%s" % [l.get("hairHat", ""), l.get("cloth", "")]
+		assert_bool(theirs.has(combo)).override_failure_message("%s wears %s's %s" % [k, theirs.get(combo, ""), combo]).is_false()
+		assert_array([l.get("hairHat", ""), l.get("cloth", "")]).override_failure_message(k).not_contains(["hairhat20", "cloth28"])
+		var stem := str(k).substr(0, str(k).rfind("_"))
+		if not groups.has(stem): groups[stem] = []
+		groups[stem].append(str(l.get("hairHat", "")))
+	assert_int(groups.size()).is_equal(16)
+	for stem in groups:
+		var hairs: Array = groups[stem]
+		var distinct := {}
+		for h in hairs: distinct[h] = true
+		assert_int(distinct.size()).override_failure_message("%s: %s" % [stem, hairs]).is_equal(3)
+
+## 不知火舞 on 284: no keeper set and no resident is the player's default hairhat0 + cloth0. Tomo waits for his
+## darker hairhat0 (上官婉儿's colour, with 刘备's batch); he is the one left.
+func test_no_npc_wears_the_players_default_outfit() -> void:
+	var looks: Dictionary = P0Logic.content().world.keeper_looks
+	var keepers: Array = looks.keys().filter(func(k): return looks[k] is Dictionary and str(looks[k].get("hairHat", "")) == "hairhat0" \
+		and str(looks[k].get("cloth", "")) == "cloth0")
+	assert_array(keepers).is_empty()
+	var npcs: Dictionary = P0RoomAnchors.read_json(OutpostScript.NPCS_PATH).get("npcs", {})
+	var residents: Array = npcs.keys().filter(func(k): return str(npcs[k].slots.get("hairHat", "")) == "hairhat0" \
+		and str(npcs[k].slots.get("cloth", "")) == "cloth0")
+	assert_array(residents).is_equal(["res_tomo"])
+
 ## The S-tier trading post (the cabin, world_gen.json room.cabin) on the tea house's kit with its own anchors: Pip at the
 ## tea house's first resident spot and its s_order resident (Old Kai or Theo now) at the second — it read the tea
 ## house's anchors before and showed none of them (苏烈 / 上官婉儿 on 284). The server still names the tea house's file,
@@ -744,3 +802,36 @@ func test_the_cabin_shows_pip_and_its_second_resident() -> void:
 		"art": str(room.art), "anchors": "res://assets/p0/outposts/tea.anchors.json", "category": "Tea house", "lat": 1.0,
 		"lng": 1.0, "capacity": 12, "keeper": {"role": "Host", "name": "Bea", "look": ""}, "residents": []}]}})
 	assert_str(str(P0Outposts.find("gn-testtea~tea0").anchors)).is_equal("res://assets/p0/outposts/tea.anchors.json")
+
+## Every resident world_gen places (world.residents: fixed, rank once its room is built, the S-tier s_order) wears a
+## look in outpost_npcs.json and has its spot in every room kind it can be placed in — else the room shows nobody
+## where the server put them (SGODOT-284: Rafa and Tomo came without a look, the cabin without Pip's spot). Granny Wu
+## waits for her NPC-only parts (刘备); she is the one name left to add.
+func test_every_placed_resident_has_a_look_and_a_spot_in_its_rooms() -> void:
+	var world: Dictionary = P0Logic.content().get("world", {})
+	var rules: Dictionary = world.get("residents", {})
+	var rooms: Dictionary = world.get("room", {})
+	var kinds := {}   # resident → {room kind: true}
+	var add := func(id: String, kind: String) -> void:
+		if not rooms.has(kind): return   # a room not built yet (Ivo's mine_hut): nobody is placed there
+		if not kinds.has(id): kinds[id] = {}
+		kinds[id][kind] = true
+	for at in rules.get("fixed", {}): add.call(str(rules.fixed[at]), str(at).split(":")[0])
+	add.call(str(rules.get("fixed", {}).get("post", "")), "cabin")   # Pip in every trading post too
+	var built := {}   # a ranked resident → their own room is built
+	for r in rules.get("rank", []):
+		var kind := str(r.get("at", "")).split(":")[0]
+		built[str(r.id)] = rooms.has(kind)
+		add.call(str(r.id), kind)
+	for r in rules.get("s_order", []):
+		if built.get(str(r.id), true): add.call(str(r.id), "cabin")   # one whose own room is not built waits (Ivo, #403)
+	var npcs: Dictionary = P0RoomAnchors.read_json(OutpostScript.NPCS_PATH).get("npcs", {})
+	var missing: Array = kinds.keys().filter(func(id): return not npcs.has(id))
+	assert_array(missing).is_equal(["res_granny_wu"])
+	for id in kinds:
+		if not npcs.has(id): continue
+		var spot := str(npcs[id].get("anchor", ""))
+		for kind in kinds[id]:
+			var file := str(rooms[kind].get("client_anchors", rooms[kind].anchors))   # this client's own, where it has one (#404)
+			var names: Array = P0RoomAnchors.read_json(file).get("anchors", []).map(func(a): return str(a.name))
+			assert_array(names).override_failure_message("%s has no %s in the %s room" % [id, spot, kind]).contains([spot, spot.replace("npc_", "stand_")])
