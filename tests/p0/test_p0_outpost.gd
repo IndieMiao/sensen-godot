@@ -744,3 +744,36 @@ func test_the_cabin_shows_pip_and_its_second_resident() -> void:
 		"art": str(room.art), "anchors": "res://assets/p0/outposts/tea.anchors.json", "category": "Tea house", "lat": 1.0,
 		"lng": 1.0, "capacity": 12, "keeper": {"role": "Host", "name": "Bea", "look": ""}, "residents": []}]}})
 	assert_str(str(P0Outposts.find("gn-testtea~tea0").anchors)).is_equal("res://assets/p0/outposts/tea.anchors.json")
+
+## Every resident world_gen places (world.residents: fixed, rank once its room is built, the S-tier s_order) wears a
+## look in outpost_npcs.json and has its spot in every room kind it can be placed in — else the room shows nobody
+## where the server put them (SGODOT-284: Rafa and Tomo came without a look, the cabin without Pip's spot). Granny Wu
+## waits for her NPC-only parts (刘备); she is the one name left to add.
+func test_every_placed_resident_has_a_look_and_a_spot_in_its_rooms() -> void:
+	var world: Dictionary = P0Logic.content().get("world", {})
+	var rules: Dictionary = world.get("residents", {})
+	var rooms: Dictionary = world.get("room", {})
+	var kinds := {}   # resident → {room kind: true}
+	var add := func(id: String, kind: String) -> void:
+		if not rooms.has(kind): return   # a room not built yet (Ivo's mine_hut): nobody is placed there
+		if not kinds.has(id): kinds[id] = {}
+		kinds[id][kind] = true
+	for at in rules.get("fixed", {}): add.call(str(rules.fixed[at]), str(at).split(":")[0])
+	add.call(str(rules.get("fixed", {}).get("post", "")), "cabin")   # Pip in every trading post too
+	var built := {}   # a ranked resident → their own room is built
+	for r in rules.get("rank", []):
+		var kind := str(r.get("at", "")).split(":")[0]
+		built[str(r.id)] = rooms.has(kind)
+		add.call(str(r.id), kind)
+	for r in rules.get("s_order", []):
+		if built.get(str(r.id), true): add.call(str(r.id), "cabin")   # one whose own room is not built waits (Ivo, #403)
+	var npcs: Dictionary = P0RoomAnchors.read_json(OutpostScript.NPCS_PATH).get("npcs", {})
+	var missing: Array = kinds.keys().filter(func(id): return not npcs.has(id))
+	assert_array(missing).is_equal(["res_granny_wu"])
+	for id in kinds:
+		if not npcs.has(id): continue
+		var spot := str(npcs[id].get("anchor", ""))
+		for kind in kinds[id]:
+			var file := str(rooms[kind].get("client_anchors", rooms[kind].anchors))   # this client's own, where it has one (#404)
+			var names: Array = P0RoomAnchors.read_json(file).get("anchors", []).map(func(a): return str(a.name))
+			assert_array(names).override_failure_message("%s has no %s in the %s room" % [id, spot, kind]).contains([spot, spot.replace("npc_", "stand_")])

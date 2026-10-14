@@ -1,5 +1,5 @@
 {
-  "_note": "Xuhui Market Square on the Fruit Shop kit (SGODOT-227 scene integration; placeholder until SGODOT-218). Room metres of assets/rooms/fruit_shop/layout.json, floor top y 0.05. The produce table backs onto the display hutch, so Mei keeps the stall from its right end by the scale (the spot behind the table's middle is hidden from the room camera). Tapping the stall is tapping her. The Market Board is the orchard sign on the left wall; City Specialty is the fig crate by the door. Spawn and exit at the front steps; the door's prompt sits on the steps (badge_exit).",
+  "_note": "Xuhui Market Square on the Fruit Shop kit (SGODOT-227 scene integration; placeholder until SGODOT-218). Room metres of assets/rooms/fruit_shop/layout.json, floor top y 0.05. The produce table backs onto the display hutch, so Mei keeps the stall from its right end by the scale (the spot behind the table's middle is hidden from the room camera). Tapping the stall is tapping her. Tomo, who lives alone at a generated city's second Market Square (world_gen rank market:1), stands at Nadia's spot (SGODOT-284). The Market Board is the orchard sign on the left wall; City Specialty is the fig crate by the door. Spawn and exit at the front steps; the door's prompt sits on the steps (badge_exit).",
   "anchors": [
     {"name": "use_stall_1", "position": [2.0, 1.1, -1.27], "module": "produce_display_table"},
     {"name": "stand_stall_1", "position": [2.2, 0.05, -0.5], "yaw_degrees": 0},
@@ -14,6 +14,8 @@
     {"name": "stand_nadia", "position": [0.3, 0.05, 0.3], "yaw_degrees": 0},
     {"name": "npc_theo", "position": [1.4, 0.05, -0.2], "yaw_degrees": 180},
     {"name": "stand_theo", "position": [1.4, 0.05, 0.5], "yaw_degrees": 0},
+    {"name": "npc_tomo", "position": [0.3, 0.05, -0.4], "yaw_degrees": 180},
+    {"name": "stand_tomo", "position": [0.3, 0.05, 0.3], "yaw_degrees": 0},
     {"name": "spawn", "position": [0.15, 0.05, 2.05], "yaw_degrees": 0},
     {"name": "exit", "position": [0.15, 0.05, 2.65]},
     {"name": "badge_exit", "position": [0.15, 0.0, 3.4]}
