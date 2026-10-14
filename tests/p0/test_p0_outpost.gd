@@ -739,24 +739,21 @@ func test_a_generated_keeper_gives_way_to_a_residents_hair() -> void:
 	assert_str(str(P0Outposts.find("gn-testlena~tea0").keeper.look)).is_equal("tea_subtropical_1")
 
 ## 不知火舞 on 284 (caf5520a): the keeper sets (world.keeper_looks, role × climate × 3) — a resident's hair style and
-## cloth are theirs, no keeper set and no hand-written keeper wears both (a hair colour variant is the same style:
-## Ama's bun and Granny Wu's); no cloth28 (the uniform) and no hairhat20 (the novelty hood), as for the
-## residents; the three sets of a role and climate have three different hairs, so a resident's hair always leaves two
+## cloth are theirs, no keeper set wears both (a hair colour variant is the same style); no cloth28 (the uniform) and
+## no hairhat20 (the novelty hood), as for the residents; the three sets of a role and climate have three different hairs, so a resident's hair always leaves two
 ## to give way to (P0CityPlaces.keeper_look).
 func test_the_keeper_sets_leave_the_residents_their_looks() -> void:
 	var looks: Dictionary = P0Logic.content().world.keeper_looks
 	var npcs: Dictionary = P0RoomAnchors.read_json(OutpostScript.NPCS_PATH).get("npcs", {})
-	# a hair style and a cloth, the style as P0CityPlaces.hair_style reads it (a colour variant is the same style)
+	# a pooled keeper set against the residents by hair style and cloth, the style as P0CityPlaces.hair_style reads it
+	# (a colour variant is the same style). A hand-written keeper (Ama, Finn, Sigrid, Mei: their own counter art and
+	# NPC-only parts) is told apart by its part ids, as every NPC is (test_npc_outfits_name_real_parts_and_stay_distinct):
+	# Ama's brown bun is not Granny Wu's white one (不知火舞 on 284, 7808013f)
 	var combo_of := func(slots: Dictionary) -> String:
 		return "%s+%s" % [P0CityPlaces.hair_style(str(slots.get("hairHat", ""))), slots.get("cloth", "")]
 	var theirs := {}
 	for id in npcs:
 		if str(id).begins_with("res_"): theirs[combo_of.call(npcs[id].slots)] = id
-	# the hand-written keepers too (Ama, Finn, Sigrid, Mei): Ama's cloth11 under Granny Wu's bun style was hers
-	for id in npcs:
-		if str(id).begins_with("res_"): continue
-		var mine: String = combo_of.call(npcs[id].slots)
-		assert_bool(theirs.has(mine)).override_failure_message("%s wears %s's %s" % [id, theirs.get(mine, ""), mine]).is_false()
 	var groups := {}
 	for k in looks:
 		if not looks[k] is Dictionary: continue
