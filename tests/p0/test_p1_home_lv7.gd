@@ -35,7 +35,16 @@ func test_the_cooking_page_names_every_level() -> void:
 	var view := {}
 	var by_level := {}
 	for lv in [7, 8, 9, 10]: by_level[lv] = P0Logic.level_unlocks(view, "cooking", lv)
-	assert_dict(by_level).is_equal({7: ["Steady Hand II", "Fast Mastery"], 8: ["Cook All", "Bigger Provisions"],
+	# Lv8 opens nothing for now (user 10-15): Cook All is paused (0.2.8's batch cook), Bigger Provisions waits for P2's
+	# Provisions — so the page has no Lv8 row (§4.8.7), Lv7's banner reads `Next Lv8 · N XP`, Lv8's has no New for you
+	assert_dict(by_level).is_equal({7: ["Steady Hand II", "Fast Mastery"], 8: [],
 		9: ["Chef's Touch"], 10: ["Lucky Double", "Chef title"]})
+	var v := {"skills": {"cooking": {"level": 7, "xp": 1000}}}
+	assert_str(str(P0Logic.level_banner(v, {"skill": "cooking", "level": 7}).tip)).is_equal("Next Lv8 · 350 XP")
+	var eight := P0Logic.level_banner({"skills": {"cooking": {"level": 8, "xp": 1400}}}, {"skill": "cooking", "level": 8})
+	assert_that([eight.subtitle, eight.tip]).is_equal(["", "Next Lv9 · Chef's Touch · 300 XP"])
+	var cook: Dictionary = P0SkillsDrawer.skills_data({"skills": {"cooking": {"level": 7, "xp": 1000}}}).tracks[2]
+	assert_str(str(cook.next)).is_equal("Next: Lv8 · 350 XP to go")   # SKILL-1's empty-level line
+	assert_array(cook.milestones.map(func(m): return str(m.line).get_slice(" · ", 0))).not_contains(["Lv8"])
 	for k in P0Logic.content().cooking.conveniences:   # never an id: every key in the content has its name (a title's in TITLE_NAMES)
 		assert_bool(P0Logic.CONVENIENCE_NAMES.has(k) or P0Logic.TITLE_NAMES.has(k)).override_failure_message(k).is_true()
