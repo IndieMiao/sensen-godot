@@ -651,6 +651,87 @@
 			"thumb": "res://assets/avatar/thumbs/hairhat36_npc_pip.png",
 			"tier": 0,
 			"unity_guid": "d4f6b64264dd2d74598f8af604f7e578"
+		},
+		{
+			"attach": "socket",
+			"id": "hairhat80_npc_granny_wu",
+			"offset": {
+				"pos": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"rot": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/hairhat80_npc_granny_wu.res",
+			"slot": "hairHat",
+			"thumb": "res://assets/avatar/thumbs/hairhat80_npc_granny_wu.png",
+			"tier": 0,
+			"unity_guid": ""
+		},
+		{
+			"attach": "socket",
+			"id": "hairhat_npc_ivo",
+			"offset": {
+				"pos": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"rot": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/hairhat_npc_ivo.res",
+			"slot": "hairHat",
+			"thumb": "res://assets/avatar/thumbs/hairhat_npc_ivo.png",
+			"tier": 0,
+			"unity_guid": ""
+		},
+		{
+			"attach": "socket",
+			"id": "mask16_npc_ivo",
+			"offset": {
+				"pos": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"rot": [
+					0.0,
+					0.0,
+					0.0
+				],
+				"scale": [
+					1.0,
+					1.0,
+					1.0
+				]
+			},
+			"pack": "builtin",
+			"res": "res://assets/avatar/parts/mask16_npc_ivo.res",
+			"slot": "mask",
+			"thumb": "res://assets/avatar/thumbs/mask16_npc_ivo.png",
+			"tier": 0,
+			"unity_guid": ""
 		}
 	],
 	"version": 1
