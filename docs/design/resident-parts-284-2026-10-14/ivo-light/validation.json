@@ -1,0 +1,371 @@
+{
+  "issue": "SGODOT-284",
+  "request": "q(171)",
+  "author": "刘备",
+  "virtual_user_id": "0fb1de1f-ead5-443b-9537-54cbac113260",
+  "date": "2026-10-14",
+  "runtime_pr": 407,
+  "art_pr": 412,
+  "runtime_head": "00ab44bed29e77a8629ecf361cbe2e99ad68f16d",
+  "scope": "Restore Ivo hat whole-mesh flat lighting to emission_strength=0.3; README links point to wp-3d-scene. No FBX or PNG changes.",
+  "tests": {
+    "head": "00ab44bed29e77a8629ecf361cbe2e99ad68f16d",
+    "cases": 38,
+    "suites": 8,
+    "errors": 0,
+    "failures": 0,
+    "flaky": 0,
+    "skipped": 0,
+    "orphans": 0,
+    "exit_code": 0,
+    "paths": [
+      "tests/catalog",
+      "tests/pipeline",
+      "tests/assembly/test_socket_placement.gd"
+    ],
+    "report_source": "reports/report_6/results.xml",
+    "qa_user_dir": "SensenResident284QA"
+  },
+  "runtime_tree_clean_after_tests": true,
+  "import_validation": {
+    "checks": [
+      {
+        "check": "hairhat80_npc_granny_wu: imported node paths, types of frames and bone rest transforms match base",
+        "passed": true
+      },
+      {
+        "check": "hairhat80_npc_granny_wu: original FBX root name retained",
+        "passed": true
+      },
+      {
+        "check": "hairhat80_npc_granny_wu: one extracted static mesh and one surface",
+        "passed": true
+      },
+      {
+        "check": "hairhat80_npc_granny_wu: extracted triangles match actual FBX import",
+        "passed": true
+      },
+      {
+        "check": "hairhat80_npc_granny_wu: texture resolution equals base",
+        "passed": true
+      },
+      {
+        "check": "hairhat80_npc_granny_wu: extracted mesh transform exactly matches base",
+        "passed": true
+      },
+      {
+        "check": "hairhat80_npc_granny_wu: no compensating recipe offset or scale",
+        "passed": true
+      },
+      {
+        "check": "hairhat80_npc_granny_wu: actual NPC catalog lookup succeeds",
+        "passed": true
+      },
+      {
+        "check": "hairhat_npc_ivo: imported node paths, types of frames and bone rest transforms match base",
+        "passed": true
+      },
+      {
+        "check": "hairhat_npc_ivo: original FBX root name retained",
+        "passed": true
+      },
+      {
+        "check": "hairhat_npc_ivo: one extracted static mesh and one surface",
+        "passed": true
+      },
+      {
+        "check": "hairhat_npc_ivo: extracted triangles match actual FBX import",
+        "passed": true
+      },
+      {
+        "check": "hairhat_npc_ivo: texture resolution equals base",
+        "passed": true
+      },
+      {
+        "check": "hairhat_npc_ivo: extracted mesh transform exactly matches base",
+        "passed": true
+      },
+      {
+        "check": "hairhat_npc_ivo: no compensating recipe offset or scale",
+        "passed": true
+      },
+      {
+        "check": "hairhat_npc_ivo: actual NPC catalog lookup succeeds",
+        "passed": true
+      },
+      {
+        "check": "mask16_npc_ivo: imported node paths, types of frames and bone rest transforms match base",
+        "passed": true
+      },
+      {
+        "check": "mask16_npc_ivo: original FBX root name retained",
+        "passed": true
+      },
+      {
+        "check": "mask16_npc_ivo: one extracted static mesh and one surface",
+        "passed": true
+      },
+      {
+        "check": "mask16_npc_ivo: extracted triangles match actual FBX import",
+        "passed": true
+      },
+      {
+        "check": "mask16_npc_ivo: texture resolution equals base",
+        "passed": true
+      },
+      {
+        "check": "mask16_npc_ivo: extracted mesh transform exactly matches base",
+        "passed": true
+      },
+      {
+        "check": "mask16_npc_ivo: no compensating recipe offset or scale",
+        "passed": true
+      },
+      {
+        "check": "mask16_npc_ivo: actual NPC catalog lookup succeeds",
+        "passed": true
+      },
+      {
+        "check": "hairhat0_npc_tomo: imported node paths, types of frames and bone rest transforms match base",
+        "passed": true
+      },
+      {
+        "check": "hairhat0_npc_tomo: original FBX root name retained",
+        "passed": true
+      },
+      {
+        "check": "hairhat0_npc_tomo: one extracted static mesh and one surface",
+        "passed": true
+      },
+      {
+        "check": "hairhat0_npc_tomo: extracted triangles match actual FBX import",
+        "passed": true
+      },
+      {
+        "check": "hairhat0_npc_tomo: texture resolution equals base",
+        "passed": true
+      },
+      {
+        "check": "hairhat0_npc_tomo: extracted mesh transform exactly matches base",
+        "passed": true
+      },
+      {
+        "check": "hairhat0_npc_tomo: no compensating recipe offset or scale",
+        "passed": true
+      },
+      {
+        "check": "hairhat0_npc_tomo: actual NPC catalog lookup succeeds",
+        "passed": true
+      },
+      {
+        "check": "Tomo: original FBX byte-identical",
+        "passed": true
+      },
+      {
+        "check": "Tomo: imported geometry, UVs and normals exactly match hairhat0",
+        "passed": true
+      },
+      {
+        "check": "Tomo: excluded from player catalog",
+        "passed": true
+      },
+      {
+        "check": "Ivo hat retains the standard 0.3 flat-light floor",
+        "passed": true
+      },
+      {
+        "check": "Ivo hat within largest existing runtime hairHat budget",
+        "passed": true
+      }
+    ],
+    "existing_hairhat_triangles": {
+      "hairhat0": 1468,
+      "hairhat12_npc_mei": 2784,
+      "hairhat20": 670,
+      "hairhat36_npc_pip": 1214,
+      "hairhat36_npc_sigrid": 1360,
+      "hairhat41": 2312,
+      "hairhat43": 1156,
+      "hairhat51": 1103,
+      "hairhat70": 586,
+      "hairhat71_npc_kai": 648,
+      "hairhat80_npc_ama": 764
+    },
+    "failures": [],
+    "hairhat_budget": 2784,
+    "parts": {
+      "hairhat0_npc_tomo": {
+        "meshes": [
+          {
+            "albedo": "res://assets/avatar/source/hairhat0_npc_tomo/T_tomo_hairHat_D.png",
+            "bounds": "[P: (-0.235986, -0.006991, -0.252073), S: (0.466144, 0.46161, 0.461818)]",
+            "emission_strength": 0.6,
+            "name": "hairHat",
+            "surfaces": 1,
+            "transform": "[X: (0.0, 0.999936, 0.011353), Y: (0.0, -0.011353, 0.999936), Z: (1.0, 0.0, 0.0), O: (0.0, 0.0, 0.0)]"
+          }
+        ],
+        "offset_pos": "(0.0, 0.0, 0.0)",
+        "offset_rot_deg": "(0.0, 0.0, 0.0)",
+        "offset_scale": "(1.0, 1.0, 1.0)",
+        "texture_size": [
+          512,
+          512
+        ],
+        "triangles": 1468
+      },
+      "hairhat80_npc_granny_wu": {
+        "meshes": [
+          {
+            "albedo": "res://assets/avatar/source/hairhat80_npc_granny_wu/T_granny_wu_hairHat_D.png",
+            "bounds": "[P: (-0.227801, -0.017155, -0.336759), S: (0.455602, 0.580321, 0.526078)]",
+            "emission_strength": 0.6,
+            "name": "hairHat",
+            "surfaces": 1,
+            "transform": "[X: (0.0, 0.999936, 0.011353), Y: (0.0, -0.011353, 0.999936), Z: (1.0, 0.0, 0.0), O: (0.0, 0.0, 0.0)]"
+          }
+        ],
+        "offset_pos": "(0.0, 0.0, 0.0)",
+        "offset_rot_deg": "(0.0, 0.0, 0.0)",
+        "offset_scale": "(1.0, 1.0, 1.0)",
+        "texture_size": [
+          512,
+          512
+        ],
+        "triangles": 764
+      },
+      "hairhat_npc_ivo": {
+        "meshes": [
+          {
+            "albedo": "res://assets/avatar/source/hairhat_npc_ivo/T_ivo_hairHat_D.png",
+            "bounds": "[P: (-0.258, 0.037024, -0.267525), S: (0.516, 0.375992, 0.565161)]",
+            "emission_strength": 0.3,
+            "name": "hairHat",
+            "surfaces": 1,
+            "transform": "[X: (0.0, 0.999936, 0.011353), Y: (0.0, -0.011353, 0.999936), Z: (1.0, 0.0, 0.0), O: (0.0, 0.0, 0.0)]"
+          }
+        ],
+        "offset_pos": "(0.0, 0.0, 0.0)",
+        "offset_rot_deg": "(0.0, 0.0, 0.0)",
+        "offset_scale": "(1.0, 1.0, 1.0)",
+        "texture_size": [
+          512,
+          512
+        ],
+        "triangles": 1423
+      },
+      "mask16_npc_ivo": {
+        "meshes": [
+          {
+            "albedo": "res://assets/avatar/source/mask16_npc_ivo/T_ivo_mask_D.png",
+            "bounds": "[P: (-0.18522, -0.021052, 0.023631), S: (0.367891, 0.074289, 0.172069)]",
+            "emission_strength": 0.3,
+            "name": "mask",
+            "surfaces": 1,
+            "transform": "[X: (0.0, 0.999936, 0.011353), Y: (0.0, -0.011353, 0.999936), Z: (1.0, 0.0, 0.0), O: (0.0, 0.0, 0.0)]"
+          }
+        ],
+        "offset_pos": "(0.0, 0.0, 0.0)",
+        "offset_rot_deg": "(0.0, 0.0, 0.0)",
+        "offset_scale": "(1.0, 1.0, 1.0)",
+        "texture_size": [
+          512,
+          512
+        ],
+        "triangles": 320
+      }
+    }
+  },
+  "preservation_summary": {
+    "base": "7575a81b366ded5a016dc25749eb0412e9598a16",
+    "changed_files": [
+      "assets/avatar/parts/hairhat_npc_ivo_scene.tscn",
+      "assets/avatar/source/README_284.md",
+      "assets/avatar/source/recipes_284.json"
+    ],
+    "unchanged_file_count": 424,
+    "manifest_before": 43,
+    "manifest_after": 43,
+    "manifest_byte_identical": true,
+    "reextracted_ids": [
+      "hairhat_npc_ivo"
+    ],
+    "manifest_note": "Removed only Ivo hat, ran --append, checked every entry exact, then retained original entry order/bytes.",
+    "scene_note": "Re-extraction differs only in emission_strength and random unique_id values; original node IDs retained after exact normalized-text check.",
+    "scene_only_material_emission_changed": true,
+    "fbx_png_unchanged": true,
+    "npc_only_unchanged": true
+  },
+  "looks": {
+    "res_ivo": {
+      "slots": {
+        "hairHat": "hairhat_npc_ivo",
+        "mask": "mask16_npc_ivo",
+        "cloth": "cloth1_npc_ivo",
+        "shoes": "shoes3"
+      }
+    }
+  },
+  "renderer": {
+    "godot": "4.7.2",
+    "backend": "Vulkan Mobile",
+    "adapter": "AMD Custom GPU 0405 (RADV VANGOGH)",
+    "windowed": true,
+    "physical_phone": false
+  },
+  "decisions": {
+    "emission_strength": 0.3,
+    "interpretation": "Whole-mesh flat-light floor, no separate lamp glow or light.",
+    "smoothness": 0.05,
+    "fbx_and_textures": "unchanged",
+    "manifest": "All entries verified identical after --append; original order retained.",
+    "scene": "Only emission changed; original random node IDs retained."
+  },
+  "portrait_crops_match_previous": true,
+  "portrait_script": {
+    "portrait_baker_sha256": "01549959f4e8a31c03583933878a871a5720c346c4787619103e4c1126c5f903",
+    "portrait_baker_committed": false,
+    "portrait_ids": [
+      "res_ivo"
+    ],
+    "windowed": true,
+    "command": "godot --path . --script res://tools/art/bake_resident_portraits.gd -- --looks=output/resident-parts-284-ivo-light/looks-new.json --ids=res_ivo --out=output/resident-parts-284-ivo-light/portraits"
+  },
+  "images": {
+    "cards.png": {
+      "sha256": "4ec2c8e275901ee4b95f45ab63322ae781c671b535a8a04fd15eed5137c65565",
+      "pixels": [
+        166,
+        346
+      ]
+    },
+    "ivo_card.jpg": {
+      "sha256": "b04047d7209249eef03d29afa41e4b007ded41529d21c19d9d96b68a5d68e89d",
+      "pixels": [
+        300,
+        660
+      ]
+    },
+    "ivo_stamp_32x40.png": {
+      "sha256": "9b63086e00eac9dfbd4b8e4be6318906e93f02e146bf9db1e24e33386d3a306c",
+      "pixels": [
+        32,
+        40
+      ]
+    },
+    "ivo_stamp_96x120.png": {
+      "sha256": "92d06f860fa96cf8153efad74e05742f22d8f54fb3611f8e0f17a69b603e4f49",
+      "pixels": [
+        96,
+        120
+      ]
+    },
+    "stamps.png": {
+      "sha256": "c65e99fab78c262828de2ed5da5bb4778a0fb9ca7a6f01fc78001a16a9e42037",
+      "pixels": [
+        120,
+        196
+      ]
+    }
+  }
+}

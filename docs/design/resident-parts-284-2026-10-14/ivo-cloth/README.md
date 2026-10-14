@@ -1,5 +1,9 @@
 # SGODOT-284 / q(171) · Ivo canvas clothing and revised footwear
 
+**Later hat correction:** [Latest Ivo card and postage heads](../ivo-light/README.md)
+use `emission_strength=0.3` as the shader's whole-mesh flat-light floor.
+The clothing and footwear here remain current; these earlier Ivo images used 0.
+
 刘备 · 2026-10-14. This revision replaces Ivo's rejected cloth42 outfit with
 `cloth1_npc_ivo`, following 不知火舞's acceptance comment
 `87e87ff2-ddef-4f65-b9bf-f2c309acda69` and 上官婉儿's assignment.

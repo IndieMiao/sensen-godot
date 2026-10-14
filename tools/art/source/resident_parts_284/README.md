@@ -24,6 +24,13 @@ reproduces the PNG; `ivo-cloth-texture-validation.json` records palette curves,
 region masks and preservation. Granny Wu's accepted hair remains unchanged.
 [Latest clothing review and commands](../../../../docs/design/resident-parts-284-2026-10-14/ivo-cloth/README.md).
 
+The subsequent cross-review correction restores Ivo's hat material
+`emission_strength=0.3`; this shader parameter supplies flat base lighting to
+the entire mesh. The lamp has no separate glow/light effect. Geometry and PNGs
+are unchanged, and smoothness stays 0.05. The recipe in #407 is authoritative;
+the import verifier now checks 0.3. See the
+[latest Ivo lighting review](../../../../docs/design/resident-parts-284-2026-10-14/ivo-light/README.md).
+
 `geometry-validation.json` records exact non-geometry FBX preservation and the
 beard's 1/3 vertical extent; `texture-validation.json` records the luminance
 curves and unchanged alpha. The generator derives all edits from unchanged base

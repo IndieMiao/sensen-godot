@@ -1,5 +1,10 @@
 # SGODOT-284 / q(171) · Granny Wu / Ivo NPC parts
 
+**Latest Ivo lighting correction:** [Hat flat-light floor restored to 0.3](ivo-light/README.md),
+with a new full card, actual/3× postage heads and tests on runtime head `00ab44be`.
+The zero-emission material in the older reviews below is superseded; the lamp
+still has no separate light or glow effect.
+
 **Latest clothing revision:** [Ivo canvas shirt / charcoal shorts and revised footwear](ivo-cloth/README.md).
 Ivo now uses `cloth1_npc_ivo + shoes3`; Granny Wu uses `cloth11 + shoes5`.
 This supersedes the original cloth42 and footwear choices shown below. The new

@@ -49,7 +49,7 @@ func run():
 			check(var_to_bytes(base_mesh.surface_get_arrays(0))==var_to_bytes(new_mesh.surface_get_arrays(0)),"Tomo: imported geometry, UVs and normals exactly match hairhat0")
 			check(avatar.catalog.parts_for_slot(&"hairHat",false).all(func(p):return p.id!="hairhat0_npc_tomo"),"Tomo: excluded from player catalog")
 		before.free();after.free()
-	check(report.parts.hairhat_npc_ivo.meshes[0].emission_strength==0.0,"Ivo lamp/hat material has zero emission")
+	check(is_equal_approx(report.parts.hairhat_npc_ivo.meshes[0].emission_strength,0.3),"Ivo hat retains the standard 0.3 flat-light floor")
 	var maximum=0;var existing={}
 	for meta in avatar.catalog.parts_for_slot(&"hairHat",true):
 		if meta.id in ["hairhat_npc_ivo","hairhat80_npc_granny_wu","hairhat0_npc_tomo"]:continue
@@ -57,7 +57,10 @@ func run():
 	report.existing_hairhat_triangles=existing;report.hairhat_budget=maximum
 	check(report.parts.hairhat_npc_ivo.triangles<=maximum,"Ivo hat within largest existing runtime hairHat budget")
 	report.failures=report.checks.filter(func(x):return not x.passed)
-	DirAccess.make_dir_recursive_absolute("output/resident-parts-284")
-	FileAccess.open("output/resident-parts-284/godot-validation.json",FileAccess.WRITE).store_string(JSON.stringify(report,"\t")+"\n")
+	var output_dir="output/resident-parts-284"
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--out="):output_dir=arg.trim_prefix("--out=")
+	DirAccess.make_dir_recursive_absolute(output_dir)
+	FileAccess.open(output_dir+"/godot-validation.json",FileAccess.WRITE).store_string(JSON.stringify(report,"\t")+"\n")
 	print("RESIDENT_IMPORT_QA ",report.checks.size()," checks; ",report.failures.size()," failures")
 	quit(0 if report.failures.is_empty() else 1)
