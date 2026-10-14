@@ -52,6 +52,24 @@ func test_the_stamp_desk_and_the_fare_board_are_counters_with_their_names() -> v
 	r._on_facility("use_fee_board")
 	assert_array(r.opened).is_equal([["open_passport", []], ["open_fare_board", []]])
 
+## SGODOT-275 (刘备's fare_board.glb, #396): the Fare Board is its own board on the left wall under the POST OFFICE sign,
+## on the kit's shared atlas; its tap and name strip at the model's board_center.
+func test_the_fare_board_is_its_own_board_and_taps_at_its_centre() -> void:
+	var r := Post.new()
+	r.setup({"outpost_id": "sh_post_1"})
+	add_child(auto_free(r))
+	var board := r.art.get_node_or_null("fare_board") as Node3D
+	assert_object(board).is_not_null()
+	assert_vector(board.position).is_equal(Vector3(-3.208, 1.65, -1.65))
+	assert_float(rad_to_deg(board.rotation.y)).is_equal_approx(90.0, 0.001)
+	var meshes := board.find_children("*", "MeshInstance3D", true, false)
+	assert_int(meshes.size()).is_equal(1)
+	assert_object(((meshes[0] as MeshInstance3D).material_override as StandardMaterial3D).albedo_texture).is_same(load("res://assets/rooms/post_office/room_albedo_ao.png"))
+	var centre := board.find_child("board_center", true, false) as Node3D
+	assert_object(centre).is_not_null()
+	assert_vector(r.anchor("use_fee_board").global_position).is_equal_approx(centre.global_position, Vector3.ONE * 0.001)
+	assert_bool(r._tappable().has("use_fee_board")).is_true()
+
 func _map() -> Node:
 	var viewport := SubViewport.new()
 	viewport.size = Vector2i(360, 800)
