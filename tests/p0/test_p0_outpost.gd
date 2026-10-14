@@ -722,7 +722,7 @@ func test_a_generated_keeper_wears_their_look_preset() -> void:
 ## the keeper's portrait agree.
 func test_a_generated_keeper_gives_way_to_a_residents_hair() -> void:
 	var looks: Dictionary = P0Logic.content().world.keeper_looks
-	assert_str(str(looks.tea_subtropical_0.hairHat)).is_equal("hairhat41")   # Lena's
+	assert_str(str(looks.tea_subtropical_0.hairHat)).is_equal("hairhat41_npc_auburn")   # Lena's style, in auburn: still hers
 	assert_str(P0CityPlaces.keeper_look("tea_subtropical_0", ["res_hana", "res_lena"])).is_equal("tea_subtropical_1")
 	assert_str(str(looks.market_subtropical_0.hairHat)).is_equal("hairhat0")   # Tomo's style (his is the darker variant)
 	assert_str(P0CityPlaces.hair_style("hairhat0_npc_tomo")).is_equal("hairhat0")
@@ -740,8 +740,9 @@ func test_a_generated_keeper_gives_way_to_a_residents_hair() -> void:
 
 ## 不知火舞 on 284 (caf5520a): the keeper sets (world.keeper_looks, role × climate × 3) — a resident's hair style and
 ## cloth are theirs, no keeper set wears both (a hair colour variant is the same style); no cloth28 (the uniform) and
-## no hairhat20 (the novelty hood), as for the residents; the three sets of a role and climate have three different hairs, so a resident's hair always leaves two
-## to give way to (P0CityPlaces.keeper_look).
+## no hairhat20 (the novelty hood), as for the residents; the three sets of a role and climate have three different hair
+## styles (the two NPC-only colours, hairhat41_npc_auburn and hairhat43_npc_black, count as their style), so a
+## resident's hair always leaves two to give way to (P0CityPlaces.keeper_look); each colour is worn by 7 sets.
 func test_the_keeper_sets_leave_the_residents_their_looks() -> void:
 	var looks: Dictionary = P0Logic.content().world.keeper_looks
 	var npcs: Dictionary = P0RoomAnchors.read_json(OutpostScript.NPCS_PATH).get("npcs", {})
@@ -763,8 +764,10 @@ func test_the_keeper_sets_leave_the_residents_their_looks() -> void:
 		assert_array([l.get("hairHat", ""), l.get("cloth", "")]).override_failure_message(k).not_contains(["hairhat20", "cloth28"])
 		var stem := str(k).substr(0, str(k).rfind("_"))
 		if not groups.has(stem): groups[stem] = []
-		groups[stem].append(str(l.get("hairHat", "")))
+		groups[stem].append(P0CityPlaces.hair_style(str(l.get("hairHat", ""))))   # by style: a colour variant is the same hair
 	assert_int(groups.size()).is_equal(16)
+	for colour in ["hairhat41_npc_auburn", "hairhat43_npc_black"]:   # 上官婉儿 284 df21e0ee
+		assert_int(looks.values().filter(func(l): return l is Dictionary and str(l.get("hairHat", "")) == colour).size()).is_equal(7)
 	for stem in groups:
 		var hairs: Array = groups[stem]
 		var distinct := {}
