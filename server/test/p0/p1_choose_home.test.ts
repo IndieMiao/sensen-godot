@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 import { visitPlaces } from '../../src/p0/boards.js';
 import { loadP0Content, type P0Content } from '../../src/p0/content.js';
 import { clustersOf, homeFacts } from '../../src/p0/home.js';
-import { citySet, citySpots, cityOutposts, cityPonds, homeCities, homeSpots, homeStatus, livesIn } from '../../src/p0/home_city.js';
+import { citySet, citySpots, cityOutposts, cityPonds, homeCities, homeRules, homeSpots, homeStatus, livesIn, spotTable } from '../../src/p0/home_city.js';
 import { pondFor } from '../../src/p0/markers.js';
 import { pondFishIds } from '../../src/p0/fishing_world.js';
 import { applyP0, type P0Command } from '../../src/p0/reducer.js';
@@ -22,8 +22,8 @@ const c: P0Content = loadP0Content();
 const w = (c as P0Content & { world: WorldContent }).world;
 const T0 = Date.parse('2026-10-13T15:00:00Z');
 const DAY = 86_400_000;
-const SF = 'gn-5391959', TOKYO = 'gn-1850147', NYC = 'gn-5128581', LONDON = 'gn-2643743';
-/** The content with Tokyo, New York and London on the open list (the first step's hand-checked list comes with PR C). */
+const SF = 'gn-5391959', TOKYO = 'gn-1850147', NYC = 'gn-5128581', LONDON = 'gn-2643743', OSAKA = 'gn-1853909';
+/** The content with only Tokyo, New York and London on the open list (the shipped list is checked on its own below). */
 const opened: P0Content = (() => {
   const o = Object.create(Object.getPrototypeOf(c), Object.getOwnPropertyDescriptors(c)) as P0Content & { world: WorldContent };
   o.world = { ...w, home: { ...(w as { home?: object }).home, cities: [TOKYO, NYC, LONDON] } } as WorldContent;
@@ -97,19 +97,20 @@ describe('home sets and which cities can be picked (q(160) ①, q(162))', () => 
 
   it('San Francisco is always open; others need the list (M1 and up); S-tier towns are travel only', () => {
     expect(homeStatus(c, SF)).toBe('open');
-    expect(homeStatus(c, TOKYO)).toBe('not_open');
+    expect(homeStatus(c, OSAKA)).toBe('not_open');
     expect(homeStatus(opened, TOKYO)).toBe('open');
+    expect(homeStatus(opened, 'gn-1796236')).toBe('not_open');   // Shanghai: on the shipped list, not on this one
     const town = [...clustersOf(c)!.byId.values()].find(cl => tierOf(w, cl) === 'S')!;
     expect(homeStatus(opened, town.id)).toBe('small');
     expect(homeStatus(c, 'gn-0')).toBeNull();
   });
 
   it('the pick page lists the open cities and finds others by name, greyed with the reason', () => {
-    expect(homeCities(c).open.map(r => r.id)).toEqual([SF]);
+    expect(homeCities(c).open.map(r => r.id)).toEqual([SF, ...homeRules(c).cities]);
     const { open, matches } = homeCities(opened, 'tok');
     expect(open.map(r => r.id)).toEqual([SF, TOKYO, NYC, LONDON]);
     expect(matches[0]).toMatchObject({ id: TOKYO, name: clusterById(c, TOKYO)!.name, status: 'open' });
-    expect(homeCities(c, 'tok').matches[0].status).toBe('not_open');
+    expect(homeCities(c, 'osa').matches.find(r => r.id === OSAKA)?.status).toBe('not_open');
     expect(homeCities(c, 't').matches).toEqual([]);   // two letters at least
   });
 });
@@ -118,26 +119,38 @@ describe('farm spots (q(160) ②)', () => {
   // Every 60th city of M1 and up, plus the named ones: the rules hold everywhere a home can be.
   const cities = [SF, TOKYO, NYC, ...[...clustersOf(c)!.byId.values()].filter(cl => tierOf(w, cl) !== 'S').filter((_, i) => i % 60 === 0).map(cl => cl.id)];
 
+  /** q(160) ②'s rules for one player's 3 spots in a city that can be a home. */
+  const keepsRules = (city: string, player: string) => {
+    const spots = homeSpots(c, city, player);
+    expect(spots, `${city} ${player}`).toHaveLength(3);
+    const set = citySet(c, city)!, pond = cityPonds(c, city).find(p => p.id === set.pond)!.at!;
+    const blocks = [...cityOutposts(c, city), ...cityPonds(c, city)].flatMap(p => (p.at ? [p.at] : []));
+    for (const s of spots!) {
+      expect(s.km).toBeGreaterThanOrEqual(0.5);
+      expect(s.km).toBeLessThanOrEqual(3);
+      expect(Math.abs(km(s, pond) - s.km)).toBeLessThan(0.001);
+      for (const b of blocks) expect(km(s, b), `${city} ${player} #${s.spot}`).toBeGreaterThanOrEqual(0.3);
+      expect(s.pond.id).toBe(set.pond);
+    }
+    for (let i = 0; i < 3; i++) for (let j = i + 1; j < 3; j++) expect(km(spots![i], spots![j]), `${city} ${player}`).toBeGreaterThanOrEqual(1);
+    expect(new Set(spots!.map(s => s.toward)).size, `${city} ${player}`).toBe(3);
+  };
+
   it('3 spots, 0.5–3 km from the beginner pond, 300 m clear of every outpost and pond, 1 km apart, in different directions', () => {
     let checked = 0;
     for (const city of cities) {
-      const spots = homeSpots(c, city, 'player-spot-01');
-      if (!citySet(c, city)) { expect(spots).toBeNull(); continue; }
-      expect(spots, city).toHaveLength(3);
-      const set = citySet(c, city)!, pond = cityPonds(c, city).find(p => p.id === set.pond)!.at!;
-      const blocks = [...cityOutposts(c, city), ...cityPonds(c, city)].flatMap(p => (p.at ? [p.at] : []));
-      for (const s of spots!) {
-        expect(s.km).toBeGreaterThanOrEqual(0.5);
-        expect(s.km).toBeLessThanOrEqual(3);
-        expect(Math.abs(km(s, pond) - s.km)).toBeLessThan(0.001);
-        for (const b of blocks) expect(km(s, b), `${city} #${s.spot}`).toBeGreaterThanOrEqual(0.3);
-        expect(s.pond.id).toBe(set.pond);
-      }
-      for (let i = 0; i < 3; i++) for (let j = i + 1; j < 3; j++) expect(km(spots![i], spots![j])).toBeGreaterThanOrEqual(1);
-      expect(new Set(spots!.map(s => s.toward)).size).toBe(3);
+      if (!citySet(c, city)) { expect(homeSpots(c, city, 'player-spot-01')).toBeNull(); continue; }
+      keepsRules(city, 'player-spot-01');
       checked++;
     }
     expect(checked).toBeGreaterThan(20);
+  });
+
+  it('every city of the offline table keeps the rules for any player (周瑜 on #371: 4 players a city)', () => {
+    const table = spotTable()!;
+    for (const city of Object.keys(table.cities)) {
+      for (const player of ['player-rule-0001', 'player-rule-0002', 'player-rule-0003', 'player-rule-0004']) keepsRules(city, player);
+    }
   });
 
   it('the same player gets the same spots; each player is 100–200 m off the city\'s point', () => {
@@ -151,13 +164,37 @@ describe('farm spots (q(160) ②)', () => {
       });
     }
     expect(homeSpots(c, TOKYO, 'player-spot-02')).not.toEqual(homeSpots(c, TOKYO, 'player-spot-01'));
+    const geometry = citySpots(c, OSAKA)!;   // a city off the table: the rules alone
+    homeSpots(c, OSAKA, 'player-spot-01')!.forEach((s, k) => expect(km(s, geometry[k].at) * 1000).toBeLessThanOrEqual(201));
   });
 
-  it('the card line: distance and the pond\'s direction', () => {
+  it('the shipped open list (q(160) ①): every city has its 3 checked spots with district names, for this world', () => {
+    const table = spotTable()!;
+    expect(table).toMatchObject({ seed: w.seed, revision: w.revision });
+    const open = [SF, ...homeRules(c).cities];
+    expect(Object.keys(table.cities).sort()).toEqual([...open].sort());
+    const zones = new Map<string, number>();
+    for (const city of open) {
+      expect(homeStatus(c, city), city).toBe('open');
+      const rows = table.cities[city];
+      expect(rows, city).toHaveLength(3);
+      const hoods = rows.map(r => r.hood);
+      expect(new Set(hoods).size, city).toBe(3);
+      for (const h of hoods) expect(h, city).toMatch(/^[\p{Script=Latin}\p{N}\s'’.&()-]{2,22}$/u);   // English card text, 22 at most (不知火舞)
+      for (const h of hoods) expect(h, city).not.toMatch(/\b(park|hill|market|center|centre)\b|parken$/i);   // districts, not parks or landmarks
+      expect(homeSpots(c, city, 'player-spot-01')!.map(s => s.hood)).toEqual(hoods);
+      const zone = clusterById(c, city)?.climate ?? 'temperate';
+      zones.set(zone, (zones.get(zone) ?? 0) + 1);
+    }
+    for (const zone of ['tropical', 'subtropical', 'temperate', 'cool']) expect(zones.get(zone) ?? 0, zone).toBeGreaterThanOrEqual(2);
+  });
+
+  it('the card line: district, distance and the pond\'s direction (`Mission District · 1.2 km to Fern Pond · northeast`)', () => {
     const s = homeSpots(c, SF, 'player-spot-01')![0];
     expect(s.pond.name).toBe('Fern Pond');
     expect(['north', 'northeast', 'east', 'southeast', 'south', 'southwest', 'west', 'northwest']).toContain(s.toward);
-    expect(s.hood).toBeNull();   // district names come with the offline data (PR C)
+    expect(s.hood).toBe('Mission District');
+    expect(homeSpots(c, OSAKA, 'player-spot-01')![0].hood).toBeNull();   // off the table: no district name
   });
 });
 
@@ -181,7 +218,7 @@ describe('choose_home (q(160), q(163))', () => {
   });
 
   it('refuses a city that is not open, and a spot that is not 0–2', () => {
-    expect(run(c, freshState(c, 'player-pick-02', T0, 7, { pending: true }), { type: 'choose_home', city: TOKYO, spot: 0 }))
+    expect(run(c, freshState(c, 'player-pick-02', T0, 7, { pending: true }), { type: 'choose_home', city: OSAKA, spot: 0 }))
       .toMatchObject({ ok: false, code: 'home_not_open', detail: { status: 'not_open' } });
     expect(run(opened, pending(), { type: 'choose_home', city: TOKYO, spot: 3 })).toMatchObject({ ok: false, code: 'bad_spot' });
     expect(run(opened, freshState(opened, 'player-old-0003', T0, 3), { type: 'choose_home', city: TOKYO, spot: 0 }))

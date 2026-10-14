@@ -7,8 +7,12 @@
  * Spots (q(160) ②): three directions 120° apart round the city's beginner pond; 0.5–3 km from it; at least 300 m from
  * every outpost and pond centre (§9.3.2 farm exclusion, placement.farm_exclusion_m); at least 1 km apart; each
  * player's spot scattered 100–200 m off the city's, the same for the same player every time. Land (≥ 50 m from water)
- * and the district name need data the server does not hold at run time; they come offline, as the water table did.
+ * and the district name need data the server does not hold at run time: tools/home_spots.ts finds them offline, as the
+ * water table was made, into server/data/home_spots.json; a city without rows there falls back to the geometry alone.
  */
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import type { P0Content } from './content.js';
 import { clusterById, clustersOf, homeFacts, homeOf, writtenCluster, type Homed, type HomeSet } from './home.js';
 import type { P0Event } from './progress.js';
@@ -97,18 +101,37 @@ function toward(a: Point, b: Point): string {
   return COMPASS[Math.round(((deg + 360) % 360) / 45) % 8];
 }
 
-/** The city's three spots before a player's scatter; null when the city cannot be a home or a direction has no room. */
-export function citySpots(c: P0Content, cluster: string): { at: Point; pond: CityPond }[] | null {
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
+/** server/data/home_spots.json (tools/home_spots.ts): per city, 3 base spots on built-up land at least 250 m from
+ * water (so a scattered spot keeps q(160)'s 50 m), with district names, for the world seed and revision. */
+export interface SpotTable { seed: string; revision: number; cities: Record<string, { lat: number; lng: number; hood: string }[]> }
+let spotFile: SpotTable | null | undefined;
+export function spotTable(): SpotTable | null {
+  if (spotFile === undefined) {
+    try { spotFile = JSON.parse(readFileSync(path.join(ROOT, 'server/data/home_spots.json'), 'utf8')) as SpotTable; }
+    catch { spotFile = null; }
+  }
+  return spotFile;
+}
+
+/**
+ * The city's three spots before a player's scatter: the offline table's (a table made for another world is not used;
+ * p1_choose_home.test.ts fails on it), else found here from the rules alone. Null when the city cannot be a home or a
+ * direction has no room.
+ */
+export function citySpots(c: P0Content, cluster: string, table = spotTable()): { at: Point; pond: CityPond; hood: string | null }[] | null {
   const set = citySet(c, cluster), w = worldOf(c);
   const pond = set && cityPonds(c, cluster).find(p => p.id === set.pond);
   if (!pond?.at || !w) return null;
+  const rows = table && table.seed === w.seed && table.revision === w.revision ? table.cities[cluster] : undefined;
+  if (rows?.length === 3) return rows.map(r => ({ at: { lat: r.lat, lng: r.lng }, pond, hood: r.hood }));
   const r = homeRules(c).spot, ex = exclusionKm(c), sc = r.scatter_m[1] / 1000;
   const blocks = [...cityOutposts(c, cluster), ...cityPonds(c, cluster)].flatMap(p => (p.at ? [p.at] : []));
   // Distances try the middle of the band first; the scatter must stay inside it, and keep the exclusion and the spacing.
   const dists = [1.2, 1.6, 0.9, 2.0, 2.4, 0.7, 2.8].filter(d => d - sc >= r.pond_km[0] && d + sc <= r.pond_km[1]);
   const turns = [0, 15, -15, 30, -30, 45, -45];
   const base = hash32(w.seed, cluster, 'home:spots') % 360;
-  const out: { at: Point; pond: CityPond }[] = [];
+  const out: { at: Point; pond: CityPond; hood: string | null }[] = [];
   for (let k = 0; k < 3; k++) {
     let found: Point | null = null;
     for (const t of turns) {
@@ -119,7 +142,7 @@ export function citySpots(c: P0Content, cluster: string): { at: Point; pond: Cit
       if (found) break;
     }
     if (!found) return null;
-    out.push({ at: found, pond });
+    out.push({ at: found, pond, hood: null });
   }
   return out;
 }
@@ -129,12 +152,12 @@ export function homeSpots(c: P0Content, cluster: string, player: string): HomeSp
   const spots = citySpots(c, cluster), w = worldOf(c);
   if (!spots || !w) return null;
   const [lo, hi] = homeRules(c).spot.scatter_m;
-  return spots.map(({ at, pond }, k) => {
+  return spots.map(({ at, pond, hood }, k) => {
     const turn = hash32(w.seed, cluster, `home:spot:${player}:${k}`) % 360;
     const m = lo + (hash32(w.seed, cluster, `home:spot-m:${player}:${k}`) / 0x1_0000_0000) * (hi - lo);
     const p = offset(at.lat, at.lng, m / 1000, turn);
     return { spot: k, lat: p.lat, lng: p.lng, km: Math.round(km(p, pond.at!) * 1000) / 1000, toward: toward(p, pond.at!),
-      pond: { id: pond.id, name: pond.name }, hood: null };
+      pond: { id: pond.id, name: pond.name }, hood };
   });
 }
 
