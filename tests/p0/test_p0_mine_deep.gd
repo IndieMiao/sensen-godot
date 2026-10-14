@@ -56,9 +56,17 @@ func test_express_greys_with_new_run_for_the_same_reason() -> void:
 	var card := P0MaterialLogic.mine_mouth_card(_view(_run(_five(), "clear_floor_2"), true, 1))
 	assert_bool(bool(card.express.enabled)).is_false()
 	assert_str(str(card.express.toast)).is_equal("New run · Clear Floor 2 first")
+	# 2/2 (MINE-GATE-EXPRESS-4, 不知火舞 B7 on 286; q(196)): Express is a run of the day too, so it is not offered at all,
+	# nor New run — the grey pill `Resets in …` takes New run's place, its tap the whole line; no note
 	var spent := P0MaterialLogic.mine_mouth_card(_view(_run(_five(), "no_runs"), true, 2))
-	assert_bool(bool(spent.express.enabled)).is_false()
-	assert_str(str(spent.express.toast)).starts_with("Mine runs today 2/2")
+	assert_dict(spent.express).is_empty()
+	assert_that([spent.main.label, spent.second.label, spent.second.enabled, spent.second.pill, spent.note]).is_equal(
+		["Continue run · Free", "Resets in 9h 12m", false, true, ""])
+	assert_str(str(spent.second.toast)).is_equal("Mine runs today 2/2 · Resets in 9h 12m")
+	# no run at 2/2 (EXPRESS-3): the pill alone, no Enter mine, no Express
+	var none := P0MaterialLogic.mine_mouth_card(_view(null, true, 2))
+	assert_that([none.main.label, none.main.enabled, none.express, none.second]).is_equal(["Resets in 9h 12m", false, {}, {}])
+	assert_str(str(none.main.toast)).is_equal("Mine runs today 2/2 · Resets in 9h 12m")
 
 # ---- the elevator (row 58: `Floor 5` · `Express · Free`, no note)
 

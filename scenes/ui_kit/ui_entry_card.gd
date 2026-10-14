@@ -11,6 +11,8 @@ extends Control
 ##           reason as the label) still takes the tap and the owner toasts the line (LOCK-10, 5181bba0);
 ##   second  an optional Dismiss-style text button, 44 high, 15 Bold secondary: `New run · 2 Energy` (warning short
 ##           of Energy; the reason, still secondary, when it can't);
+##   pill    instead of the second, a grey CommandButton (Kind=unavailable) as big as the main: the mine mouth's
+##           `Resets in 9h 12m` under `Continue run · Free` at 2/2 (MINE-GATE-EXPRESS-4); its tap is the second's;
 ##   third   an optional second Dismiss-style button under it, the same look: the mine mouth's `Floor 5 · Express ·
 ##           Free` (P1, MINE-GATE-EXPRESS row 58; q(108): with a run open it stacks under New run);
 ##   note    C10 secondary under the second (and third): `Current run will end`, only while one of them can be done.
@@ -42,6 +44,7 @@ var amber := false: set = set_amber
 var second := "": set = set_second
 var second_state: State = State.AVAILABLE: set = set_second_state
 var second_amber := false: set = set_second_amber
+var pill := "": set = set_pill
 var third := "": set = set_third
 var third_state: State = State.AVAILABLE: set = set_third_state
 var note := "": set = set_note
@@ -53,6 +56,7 @@ var _title_row: HBoxContainer
 var _title: Label
 var _title_fact: Label
 var _main: Button
+var _pill: Button
 var _second_row: CenterContainer
 var _second: Label
 var _third_row: CenterContainer
@@ -97,6 +101,15 @@ func _init(action_ := "", state_: State = State.AVAILABLE) -> void:
 	_main.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_main.custom_minimum_size = Vector2(UiTokens.SIZE_TOUCH, _BUTTON_H)
 	col.add_child(_main)
+	_pill = Button.new()   # the main's CommandButton look, always CmdBlocked (Kind=unavailable)
+	_pill.name = "Pill"
+	_pill.focus_mode = Control.FOCUS_NONE
+	_pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_pill.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_pill.custom_minimum_size = Vector2(UiTokens.SIZE_TOUCH, _BUTTON_H)
+	_pill.theme_type_variation = UiTokens.BUTTON_CMD_BLOCKED
+	_pill.visible = false
+	col.add_child(_pill)
 	_second_row = CenterContainer.new()   # Dismiss: 44 high, the text centred
 	_second_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_second_row.custom_minimum_size.y = UiTokens.SIZE_TOUCH
@@ -139,6 +152,8 @@ func set_second_state(v: State) -> void:
 	if v != second_state: second_state = v; _refresh()
 func set_second_amber(v: bool) -> void:
 	if v != second_amber: second_amber = v; _refresh()
+func set_pill(v: String) -> void:
+	if v != pill: pill = v; _refresh()
 func set_third(v: String) -> void:
 	if v != third: third = v; _refresh()
 func set_third_state(v: State) -> void:
@@ -162,7 +177,9 @@ func _refresh() -> void:
 	_main.text = action
 	_main.theme_type_variation = UiTokens.BUTTON_CMD_BLOCKED if state == State.UNAVAILABLE else UiTokens.BUTTON_CMD_PRIMARY
 	_restyle()
-	_second_row.visible = second != ""
+	_pill.visible = pill != ""
+	_pill.text = pill
+	_second_row.visible = second != "" and pill == ""
 	_second.text = second
 	var ink := UiTokens.COLOR_WARNING if second_amber and second_state == State.AVAILABLE else UiTokens.COLOR_SECONDARY
 	_second.add_theme_color_override(&"font_color", ink)
@@ -206,10 +223,12 @@ func _notification(what: int) -> void:
 ## Once the card has its theme: the amber from it, as the card is then (not as it was when the theme arrived).
 func _restyle() -> void:
 	if _main != null: _style_amber(_main, amber and state == State.AVAILABLE)
+	if _pill != null: _style_amber(_pill, false)   # the same 44 pill shape, grey
 
 func is_amber() -> bool: return _main.has_theme_color_override(&"font_color")
 func main_text() -> String: return _main.text
 func second_shown() -> bool: return _second_row.visible
+func pill_text() -> String: return _pill.text if _pill.visible else ""
 func third_shown() -> bool: return _third_row.visible
 func note_shown() -> bool: return _note.visible
 
@@ -222,7 +241,9 @@ func hit_rect() -> Rect2:
 ## The main button's and the second row's touch areas in global space (the second row is already 44 high; the
 ## button's height is the CommandButton's).
 func main_rect() -> Rect2: return _main.get_global_rect()
-func second_rect() -> Rect2: return _second_row.get_global_rect() if _second_row.visible else Rect2()
+func second_rect() -> Rect2:
+	if _pill.visible: return _pill.get_global_rect()   # the pill stands in the second's place and takes its tap
+	return _second_row.get_global_rect() if _second_row.visible else Rect2()
 func third_rect() -> Rect2: return _third_row.get_global_rect() if _third_row.visible else Rect2()
 
 ## What a real tap at a global point hits: "main", "second", "third", "card" (the card around them: nothing happens) or ""

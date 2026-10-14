@@ -174,6 +174,7 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 	rt.ui.player_screen = cam.unproject_position(actor.position + Vector3(0, 0.9, 0))   # the radial fans out from here
 	rt.ui.set_action(_action_state(v))
 	_trap_frame(v)
+	rt.ui.set_trap_slots(P0Trap.slots_line(v) if rt.ui.selected_bait == TRAP_ID else "")   # TRAP-2 (B7 on 286)
 	# At the pond: "Your creel is your bag…" (§14.2 minute 5–9); "Casting uses 5 Energy" comes with the first cast (P0Guide).
 	if not rt.ui.has_modal(): rt.ui.teach("creel")
 

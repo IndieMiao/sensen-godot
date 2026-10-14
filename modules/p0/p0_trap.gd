@@ -46,6 +46,14 @@ static func set_key(view: Dictionary, place: String) -> Dictionary:
 	return {"icon": ID, "verb": "Set Trap", "sub": "Free", "enabled": true, "amber": false,
 		"cmd": {"type": "set_trap"}, "need": 0}
 
+## The pill at the right of the creel row while the trap is picked on the Fishing bar (TRAP-2, 不知火舞 B7 on 286):
+## `Trap slots 0/1` — traps in the water / how many the level allows; "" before Fishing Lv5 gives a slot.
+static func slots_line(view: Dictionary) -> String:
+	var t := _t(view)
+	var slots := int(t.get("slots", 0))
+	if slots <= 0: return ""
+	return "Trap slots %d/%d" % [(t.get("traps", []) as Array).size(), slots]
+
 ## q(177) ②: the toast a tap on the greyed key, or the server's refusal, gives at a pond outside the home city.
 const HOME_PONDS_ONLY := "Traps go in your home city's ponds"
 
