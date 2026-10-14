@@ -67,6 +67,8 @@ var _sword_id := ""
 var _ko_waiting := false
 var _ko := false   # knocked out: the moment before leaving — the fight frozen, the bar at 0 %
 var _completing := false     # Run complete: the banner, then out to the mouth
+var _hp_shown := -1          # the HP bar as last set (Run complete keeps it while the elite's card goes)
+var _hp_max := 100
 var _rocks := {}            # rock index → Node3D (gone once broken)
 var _previews := {}         # rock index → Sprite3D torch preview
 var _breaking := {}         # rock index → true while its break plays (the view may already say broken)
@@ -325,7 +327,9 @@ func p0_frame(v: Dictionary, dt: float) -> void:
 	if _leaving: return
 	if v.get("mine", {}).get("run", null) == null:
 		_kick_out()
-		if _completing: _follow(dt)   # the banner holds the floor in view; nothing else moves
+		if _completing:   # the banner holds the floor in view; nothing else moves, the last numbers run out
+			_follow(dt)
+			if combat: combat.fade(dt)
 		return
 	actor.step(dt)
 	if not _walk.is_empty() and not actor.mover.is_moving():
@@ -357,8 +361,9 @@ func _fight(v: Dictionary, dt: float) -> void:
 	_hold_sword(str(v.get("mine", {}).get("weapon", {}).get("id", "")))
 	var run: Dictionary = v.get("mine", {}).get("run", {})
 	var fighting := floor_n >= 3 and run is Dictionary and not run.is_empty()
-	rt.ui.set_hp((0 if _ko else int(run.get("hp", -1))) if fighting else -1, int(v.get("mine", {}).get("hp_max", 100)),
-		combat.elite_hp().merged({"name": "Elite Slime"}) if fighting and not combat.elite_hp().is_empty() else {})
+	_hp_shown = (0 if _ko else int(run.get("hp", -1))) if fighting else -1
+	_hp_max = int(v.get("mine", {}).get("hp_max", 100))
+	rt.ui.set_hp(_hp_shown, _hp_max, combat.elite_hp().merged({"name": "Elite Slime"}) if fighting and not combat.elite_hp().is_empty() else {})
 
 ## The Combat slot's sword (its model from the view's mine.weapon.id), in the right hand from the slash's peak to its end.
 func _hold_sword(id: String) -> void:
@@ -663,6 +668,8 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				_elevator_to = -1
 			"hurt": combat.hurt(actor.mover, Combat.mob_id(int(e.get("mob", 0))), int(e.get("damage", 0)))
 			"defeat":
+				# down at once, as a sync to 0 HP shows it: the elite's fall ends the run and leaves no run to sync from
+				if combat and int(e.get("floor", floor_n)) == floor_n: combat.down(int(e.get("mob", -1)))
 				# the last one down on a floor with rocks left: back to Mining (Floor 3–4); Floor 5 completes the run
 				if rt.ui.bar_mode == "combat" and P0MaterialLogic.mobs_up(v, floor_n) == 0 and rock_count(floor_n) > 0:
 					rt.ui.set_mode("mine")
@@ -752,6 +759,7 @@ func _knocked_out() -> void:
 const COMPLETE_S := 2.5
 func _run_complete(v: Dictionary, events: Array) -> void:
 	_completing = true
+	rt.ui.set_hp(_hp_shown, _hp_max)   # the elite is down (its defeat above): its card goes, the player's bar stays
 	var loot = null
 	for e in events:
 		if str(e.get("kind", "")) == "mine" and str(e.get("action", "")) == "defeat" and str(e.get("mob_kind", "")) == "mob_elite_slime":

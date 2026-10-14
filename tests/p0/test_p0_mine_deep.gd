@@ -345,6 +345,36 @@ func test_the_band_points_along_the_lunge_in_any_direction() -> void:
 	var want: Vector3 = (mover.position - (e.node as Node3D).position).normalized()
 	assert_vector(e.node.get_node("Band").global_transform.basis.z.normalized()).is_equal_approx(want, Vector3(0.02, 0.02, 0.02))
 
+## The elite whose fall completes the run (李元芳 B6, 283 86d07bd5): that reply's view has no run left to sync from, so
+## the defeat itself puts it down — its last number rises and it is gone, its HUD card with it — instead of standing at
+## its last HP under the Run complete banner until the mine is left.
+func test_the_elite_goes_down_when_its_fall_completes_the_run() -> void:
+	var Combat = load("res://modules/mining/p0_mine_combat.gd")
+	var bp := Layout_bp()
+	var mover := PlayerMover.new(bp, BlueprintGrid.new(bp))
+	var c: Node3D = auto_free(Combat.new())
+	add_child(c)
+	var floors := _five([true, true, true, true, true])
+	floors[4] = _floor(5, true, [ELITE.merged({"hp": 3}, true)], 0)
+	c.sync_p0(_view(_run(floors)), 5, mover)
+	assert_dict(c.elite_hp()).is_equal({"hp": 3, "max": 36})
+	var node: Node3D = c.enemies.values()[0].node
+	c.down(0)
+	assert_dict(c.elite_hp()).is_empty()
+	assert_bool(node.visible).is_false()
+	assert_array(c._numbers.map(func(n): return n.label.text)).is_equal(["3"])
+	var y: float = c._numbers[0].label.position.y
+	c.fade(0.1)   # what the scene runs while the banner holds the fight
+	assert_float(c._numbers[0].label.position.y).is_greater(y)
+	for i in 8: c.fade(0.1)
+	assert_array(c._numbers).is_empty()
+	c.down(0)   # it is down already: nothing more
+	assert_array(c._numbers).is_empty()
+	var src := FileAccess.get_file_as_string("res://scenes/p0/p0_mine.gd")
+	assert_str(src.substr(src.find("\"defeat\":", src.find("func _on_state(")), 220)).contains("combat.down(")
+	assert_str(src.substr(src.find("if _completing:", src.find("func p0_frame(")), 160)).contains("combat.fade(dt)")
+	assert_str(src.substr(src.find("func _run_complete("), 200)).contains("rt.ui.set_hp(_hp_shown, _hp_max)")
+
 ## q(116): the second elite of the day says `Quartz · first kill each day`; a reply with both the elite's fall (complete)
 ## and the player's (knocked_out) is a win — the scene only handles knocked_out without a complete beside it.
 func test_quartz_line_and_the_win_over_a_fall() -> void:
