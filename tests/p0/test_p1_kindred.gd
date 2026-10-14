@@ -117,12 +117,12 @@ func test_the_passport_has_cities_and_postcards_pages() -> void:
 	var line := page.find_child("Cell_res_pip", true, false).find_child("Line", true, false) as Label
 	assert_int(line.get_line_count()).is_less_equal(3)
 	# the frame's type (不知火舞 on 284): the line Bold Italic 10 (C10B), the name ExtraBold 12 (C12XB); the cells as tall
-	# as the name and the longest line need, Pip's being one of the three-line ones
+	# as the name and the longest line need at the cells' width (Pip's is one of the longest; how many lines it takes
+	# follows the window: three on a phone's 360, two in a 640 headless one — 周瑜 on #414)
 	assert_int(line.get_theme_font_size(&"font_size")).is_equal(10)
 	assert_object(line.get_theme_font(&"font")).is_same(UiKit.bold_italic())
 	var who := page.find_child("Cell_res_pip", true, false).find_child("Name", true, false) as Label
 	assert_int(who.get_theme_font_size(&"font_size")).is_equal(12)
-	assert_int(line.get_line_count()).is_equal(3)
 	assert_float(heights[0]).is_equal_approx(12 + Stamp.PASSPORT.y + 4 + who.get_minimum_size().y + 4 + line.get_minimum_size().y + 12, 1.0)
 	var pip := page.find_child("Cell_res_pip", true, false)
 	assert_str((pip.find_child("Name", true, false) as Label).text).is_equal("Pip")
