@@ -5,7 +5,7 @@
  */
 import type { CityClusters } from './clusters.js';
 import type { P0Content } from './content.js';
-import { clusterById, clustersOf as clusters, HOME_ALIAS, homeFacts, writtenCluster, type Homed, type HomeSet } from './home.js';
+import { clusterById, clustersOf as clusters, HOME_ALIAS, homeBase, homeFacts, writtenCluster, type DayHold, type Homed, type HomeSet } from './home.js';
 import { gainEnergy, grantOnce, type P0Event } from './progress.js';
 import { dayKey, maxEnergy } from './rules.js';
 import type { P0State } from './state.js';
@@ -28,6 +28,7 @@ export interface TravelState {
   home_chosen_at?: number;                       // when the home was picked or last changed
   home_changes?: number;                         // free changes used (q(161): one)
   pending?: true;                                // a new player who has not picked yet: plays from the written city meanwhile
+  day_hold?: DayHold;                            // q(173): the day a home change carries over (rules.dayKey)
 }
 
 
@@ -67,7 +68,7 @@ const ranks = new WeakMap<CityClusters, Map<string, { id: string; km: number; tr
  * Cached per home and fallback; empty without the clusters table.
  */
 export function rankedCities(c: P0Content, s: P0State): { id: string; km: number; trip: number }[] {
-  const at = homeFacts(c, s).farm, cl = clusters(c);
+  const at = homeBase(c, s), cl = clusters(c);   // q(184): the home's base point, one ranking a city
   if (!at || !cl) return [];
   let byHome = ranks.get(cl);
   if (!byHome) ranks.set(cl, byHome = new Map());
@@ -82,10 +83,10 @@ export function rankedCities(c: P0Content, s: P0State): { id: string; km: number
   return list;
 }
 
-/** §11.2.3: frozen into the save when the block is made (CityClusters.fallback), for its home farm; empty without the
- * table. */
-export function fallbackOf(c: P0Content, home: string, farm_at?: [number, number]): { near3: string[]; near10: string[] } {
-  const at = homeFacts(c, { travel: { home, farm_at } }).farm, cl = clusters(c);
+/** §11.2.3: frozen into the save when the block is made (CityClusters.fallback), from the home's base point (q(184));
+ * empty without the table. */
+export function fallbackOf(c: P0Content, home: string): { near3: string[]; near10: string[] } {
+  const at = homeBase(c, { travel: { home } }), cl = clusters(c);
   return at && cl ? cl.fallback(home, at) : { near3: [], near10: [] };
 }
 
@@ -112,9 +113,9 @@ function climateOfCluster(c: P0Content, cluster: string | null | undefined): str
   return z ? z[0].toUpperCase() + z.slice(1) : c.profile.climate;
 }
 
-/** Distance from the home farm and the Trip band, by CityClusters.trip (the same rule as the client's P0Clusters). */
+/** Distance from the home's base point (q(184)) and the Trip band, by CityClusters.trip (the client's P0Clusters rule). */
 export function tripOf(c: P0Content, s: P0State, cluster: string): { km: number; trip: number; name: string } {
-  const at = homeFacts(c, s).farm, cl = clusters(c);
+  const at = homeBase(c, s), cl = clusters(c);
   if (!at || !cl?.get(cluster)) return { km: 0, trip: 1, name: 'Local' };
   return cl.trip(cluster, s.travel.home, at, s.travel.fallback);
 }

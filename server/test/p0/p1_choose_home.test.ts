@@ -209,7 +209,7 @@ describe('choose_home (q(160), q(163))', () => {
     expect(t).toMatchObject({ home: TOKYO, here: TOKYO, farm_at: [spot.lat, spot.lng], home_set: citySet(c, TOKYO), home_chosen_at: T0 });
     expect(t.pending).toBeUndefined();
     expect(t.home_changes).toBeUndefined();   // the first pick is not the free change
-    expect(t.fallback).toEqual(fallbackOf(c, TOKYO, t.farm_at));
+    expect(t.fallback).toEqual(fallbackOf(c, TOKYO));   // from Tokyo's base point (q(184)), whatever the spot
     expect(homeFacts(c, r.state).farm).toEqual({ lat: spot.lat, lng: spot.lng });
     expect(dayKey(c, r.state, Date.UTC(2026, 9, 13, 18, 59))).toBe('2026-10-13');   // 03:59 in Tokyo
     expect(dayKey(c, r.state, Date.UTC(2026, 9, 13, 19, 0))).toBe('2026-10-14');    // 04:00 in Tokyo
@@ -304,7 +304,7 @@ describe('routes (SGODOT-303)', () => {
     expect(list.open.map((r: { id: string }) => r.id)).toEqual([SF, TOKYO, NYC, LONDON]);
     expect(list.matches.some((r: { id: string; status: string }) => r.id === NYC && r.status === 'open')).toBe(true);
     const spots = (await app.inject({ method: 'GET', url: `/v1/p0/home/spots/${NYC}`, headers })).json();
-    expect(spots).toEqual({ ok: true, city: NYC, spots: homeSpots(opened, NYC, 'player-route-01') });
+    expect(spots).toEqual({ ok: true, city: NYC, spots: homeSpots(opened, NYC, 'player-route-01'), resets_at: null });   // a first pick carries no day
     const shut = (await app.inject({ method: 'GET', url: '/v1/p0/home/spots/gn-1796236', headers })).json();
     expect(shut).toMatchObject({ ok: false, code: 'home_not_open', detail: { status: 'not_open' } });
     expect((await app.inject({ method: 'GET', url: '/v1/p0/home/spots/gn-0', headers })).statusCode).toBe(404);

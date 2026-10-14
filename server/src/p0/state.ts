@@ -3,6 +3,7 @@ import type { Family, P0Content, Skill } from './content.js';
 import { maxEnergy } from './rules.js';
 import { addPlots, clearNewBeds } from './garden.js';
 import { clusterById, clusterOf, clusterOfCityName, fallbackOf, freshTravel, writtenCluster, type TravelState } from './travel.js';
+import { recallAwayTraps } from './fish_trap.js';
 import { placeOf } from './world.js';
 
 export type PlotState = 'wild' | 'tilled' | 'sown' | 'growing';
@@ -309,13 +310,14 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
       if (t.here === t.home) t.here = picked;
       t.home = picked;
       delete t.passes[picked];
-      t.fallback = fallbackOf(c, picked, t.farm_at);
+      t.fallback = fallbackOf(c, picked);
     } else {
       delete t.farm_at; delete t.home_set; delete t.home_chosen_at;
     }
   }
+  if (t.day_hold && now >= t.day_hold.until) delete t.day_hold;   // q(173): the carried day is over
   if (!s.travel.fallback.near10.length) {   // made before the cluster table was there: fill it once it is (§11.2.3)
-    const f = fallbackOf(c, s.travel.home, s.travel.farm_at);
+    const f = fallbackOf(c, s.travel.home);
     if (f.near10.length) s.travel.fallback = f;
   }
   s.req_done ??= [];
@@ -341,6 +343,7 @@ export function upgradeState(c: P0Content, raw: P0State, now = Date.now()): P0St
   const run = s.mine?.run;
   if (run) while (run.floors.length < c.mine.floors.length) run.floors.push({ paid: false, broken: [], lit: false });
   s.day = { ...emptyDay(s.day?.key ?? ''), ...s.day };
+  recallAwayTraps(c, s, now, []);   // q(177) ③: a trap left outside home (a home put back after a rollback, #393), once every field is filled
   s.v = SAVE_VERSION;
   return s;
 }

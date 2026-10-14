@@ -14,7 +14,10 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { P0Content } from './content.js';
-import { clusterById, clustersOf, homeFacts, homeOf, writtenCluster, type Homed, type HomeSet } from './home.js';
+import { clusterById, clustersOf, homeFacts, homeOf, writtenCluster, type DayHold, type Homed, type HomeSet } from './home.js';
+import { recallAwayTraps } from './fish_trap.js';
+import { carryGiftParcels } from './parcels.js';
+import { dayKey, rolloverAfter } from './rules.js';
 import type { P0Event } from './progress.js';
 import { letGoAway, type P0State } from './state.js';
 import { clusterOf, fallbackOf } from './travel.js';
@@ -161,6 +164,20 @@ export function homeSpots(c: P0Content, cluster: string, player: string): HomeSp
   });
 }
 
+/**
+ * q(173) ①: the day a change of home carries over. The key stays the old home's day until both its own end (the old
+ * home's next 04:00) has come and the new home's calendar has turned past it, then the day turns at the first such
+ * 04:00 of the new home (the very instant, when that is one): 24–49 h, never shorter, never back a date. `start` is
+ * when the day began on the old clock, so times earlier in it read the same key.
+ */
+export function dayHoldFor(c: P0Content, s: P0State, city: string, now: number): DayHold {
+  const key = dayKey(c, s, now), before = new Date(Date.parse(`${key}T00:00:00Z`) - 86_400_000).toISOString().slice(0, 10);
+  const start = rolloverAfter(c, s, before), end = rolloverAfter(c, s, key), next: Homed = { travel: { home: city } };
+  let until = rolloverAfter(c, next, dayKey(c, next, end - 1));   // the new home's first 04:00 at or after the old end
+  while (dayKey(c, next, until) <= key) until = rolloverAfter(c, next, dayKey(c, next, until));
+  return { key, start, until };
+}
+
 /** Whether the free change is still open (q(161) ①): one, within `days` of the account or before Homestead Lv`before_level`. */
 export function changeOpen(c: P0Content, s: P0State, now: number): { open: boolean; until: number } {
   const r = homeRules(c).change, until = s.created_at + r.days * 86_400_000;
@@ -189,6 +206,9 @@ export function chooseHome(c: P0Content, s: P0State, cmd: { type: 'choose_home' 
   const at = homeSpots(c, city, s.player)?.[spot], set = citySet(c, city);
   if (!at || !set) return { code: 'home_not_open', detail: { city, status: 'no_spot' } };
   const from = t.home, dropped: string[] = [];
+  // q(173) ③: a first pick (a new player, nothing played) turns to the new home's day at once; a change carries its day.
+  const hold = cmd.type === 'change_home' ? dayHoldFor(c, s, city, now) : null;
+  const oldEnd = hold ? rolloverAfter(c, s, hold.key) : 0;
   if (from !== city) {
     for (const [id, r] of Object.entries(s.residents)) {
       if (r.req && !livesIn(c, city, id)) { dropped.push(r.req.id); r.req = null; }
@@ -204,8 +224,10 @@ export function chooseHome(c: P0Content, s: P0State, cmd: { type: 'choose_home' 
   t.home_chosen_at = now;
   if (cmd.type === 'change_home') t.home_changes = (t.home_changes ?? 0) + 1;
   delete t.pending;
-  t.fallback = fallbackOf(c, city, t.farm_at);
+  t.fallback = fallbackOf(c, city);
+  if (hold) { t.day_hold = hold; carryGiftParcels(s, oldEnd, hold.until); }
   letGoAway(c, s);
+  recallAwayTraps(c, s, now, events);   // q(177) ③
   events.push({ kind: 'home', action: cmd.type === 'choose_home' ? 'chosen' : 'changed', city, from, spot, dropped });
   return null;
 }

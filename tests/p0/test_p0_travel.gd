@@ -2,6 +2,8 @@ extends GdUnitTestSuite
 ## SGODOT-275: P0Travel reads view.travel in the shape the cross-city plan froze (275 comments 0fc0bc5e, v1.1).
 
 const P0Travel := preload("res://modules/p0/p0_travel.gd")
+const P0City := preload("res://modules/p0/p0_city.gd")
+const P0Clusters := preload("res://modules/p0/p0_clusters.gd")
 const SF := "gn-5391959"
 const TOKYO := "gn-1850147"
 const HOUR := 3600000.0
@@ -54,6 +56,15 @@ func test_the_browse_tier_matches_the_server_rule() -> void:
 	var v := _view({home = SF, here = SF})
 	assert_int(int(P0Travel.trip(v, TOKYO).trip)).is_equal(6)
 	assert_int(int(P0Travel.trip(v, SF).trip)).is_equal(1)
+
+func test_trips_measure_from_the_home_base_point() -> void:
+	# q(184): San Francisco's content point; another home's cluster centre, whatever farm spot the player picked
+	assert_that(P0Travel.home_base(_view({home = SF, here = SF}))).is_equal(P0City.farm_at())
+	var tokyo: Dictionary = P0Clusters.get_cluster(TOKYO)
+	var v := _view({home = TOKYO, here = TOKYO, farm_at = [35.68, 139.70]})
+	assert_that(P0Travel.home_base(v)).is_equal(Vector2(float(tokyo.lat), float(tokyo.lng)))
+	assert_int(int(P0Travel.trip(v, TOKYO).km)).is_equal(0)
+	assert_int(int(P0Travel.trip(v, SF).trip)).is_equal(6)
 
 func test_the_travel_card_lines() -> void:
 	assert_str(P0Travel.grouped(1758)).is_equal("1,758")

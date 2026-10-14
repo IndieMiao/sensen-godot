@@ -24,7 +24,11 @@ export const writtenCluster = (c: P0Content): string => HOME_ALIAS[c.profile.cit
 export interface HomeSet { market: string; tea: string; tackle: string; post: string; pond: string }
 
 /** Anything carrying a save's travel block (a P0State); null or without one: the written city. */
-export type Homed = { travel?: { home?: string; farm_at?: [number, number]; home_set?: HomeSet } } | null | undefined;
+export type Homed = { travel?: { home?: string; farm_at?: [number, number]; home_set?: HomeSet; day_hold?: DayHold } } | null | undefined;
+
+/** q(173): the day a changed home carries over — its key, from the instant it began on the old clock until the first
+ * 04:00 of the new home after the old one's end and on a later date. */
+export interface DayHold { key: string; start: number; until: number }
 
 /** The player's home city: the save's. */
 export const homeOf = (c: P0Content, s: Homed): string => s?.travel?.home || writtenCluster(c);
@@ -36,6 +40,12 @@ export interface HomeFacts {
   timezone: string | undefined;               // IANA; undefined: day.utc_offset_hours applies
   farm: { lat: number; lng: number } | null;  // the homestead's map point; null without a cluster table
 }
+
+/** The home's base point (q(184)): what Trip distances, tiers and the nearest 3 / 10 fallback are measured from, the
+ * same for every player of a city — the written city's content point, another city's centre. The picked farm point
+ * places only the home pin. */
+export const homeBase = (c: P0Content, s: Homed): { lat: number; lng: number } | null =>
+  homeFacts(c, { travel: { home: homeOf(c, s) } }).farm;
 
 /** The player's home city's facts. The farm point is the picked spot (travel.farm_at), else the written one or the centre. */
 export function homeFacts(c: P0Content, s: Homed): HomeFacts {
