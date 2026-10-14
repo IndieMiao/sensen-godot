@@ -1,0 +1,76 @@
+{
+ "cloth0": {
+  "slots": {
+   "hairHat": "hairhat20",
+   "cloth": "cloth0",
+   "shoes": "shoes1"
+  }
+ },
+ "cloth1": {
+  "slots": {
+   "hairHat": "hairhat20",
+   "cloth": "cloth1",
+   "shoes": "shoes1"
+  }
+ },
+ "cloth1_1": {
+  "slots": {
+   "hairHat": "hairhat20",
+   "cloth": "cloth1_1",
+   "shoes": "shoes1"
+  }
+ },
+ "cloth11": {
+  "slots": {
+   "hairHat": "hairhat20",
+   "cloth": "cloth11",
+   "shoes": "shoes1"
+  }
+ },
+ "cloth28": {
+  "slots": {
+   "hairHat": "hairhat20",
+   "cloth": "cloth28",
+   "shoes": "shoes1"
+  }
+ },
+ "cloth42": {
+  "slots": {
+   "hairHat": "hairhat20",
+   "cloth": "cloth42",
+   "shoes": "shoes1"
+  }
+ },
+ "cloth28_messengerbag1": {
+  "slots": {
+   "hairHat": "hairhat20",
+   "cloth": "cloth28",
+   "shoes": "shoes1",
+   "messengerBag": "messengerbag1"
+  }
+ },
+ "cloth28_messengerbag2": {
+  "slots": {
+   "hairHat": "hairhat20",
+   "cloth": "cloth28",
+   "shoes": "shoes1",
+   "messengerBag": "messengerbag2"
+  }
+ },
+ "cloth28_messengerbag3": {
+  "slots": {
+   "hairHat": "hairhat20",
+   "cloth": "cloth28",
+   "shoes": "shoes1",
+   "messengerBag": "messengerbag3"
+  }
+ },
+ "cloth28_messengerbag4": {
+  "slots": {
+   "hairHat": "hairhat20",
+   "cloth": "cloth28",
+   "shoes": "shoes1",
+   "messengerBag": "messengerbag4"
+  }
+ }
+}

@@ -1,0 +1,5 @@
+{
+  "res_lena": {"slots": {"hairHat": "hairhat41", "glass": "glass1", "cloth": "cloth1_1", "shoes": "shoes1"}},
+  "res_rafa": {"slots": {"hairHat": "hairhat51", "cloth": "cloth1_1", "shoes": "shoes4"}},
+  "res_tomo": {"slots": {"hairHat": "hairhat0", "glass": "glass0", "cloth": "cloth0", "shoes": "shoes2", "messengerBag": "messengerbag3"}}
+}
