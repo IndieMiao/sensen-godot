@@ -1270,7 +1270,7 @@
    },
    "market_subtropical_2": {
     "hairHat": "hairhat0",
-    "cloth": "cloth0",
+    "cloth": "cloth1",
     "shoes": "shoes5"
    },
    "market_temperate_0": {
@@ -1363,7 +1363,7 @@
     "cloth": "cloth42",
     "shoes": "shoes4"
    },
-   "_note": "Placeholder keeper looks (§9.3.2: 4 roles × 4 climates × 3 variants) from the public parts only — the named P0 keepers and residents keep their NPC-only parts. 上官婉儿 replaces these with designed sets; the keys stay."
+   "_note": "Placeholder keeper looks (§9.3.2: 4 roles × 4 climates × 3 variants) from the public parts only — the named P0 keepers and residents keep their NPC-only parts. 上官婉儿 replaces these with designed sets; the keys stay. Never the player's default hairhat0 + cloth0 (不知火舞 on 284: market_subtropical_2 wears cloth1); a set whose hair is a resident's of the same room gives way to the first of its three that is not (P0CityPlaces.keeper_look)."
   }
  }
 }

@@ -8,6 +8,9 @@ extends RefCounted
 
 const P0Outposts := preload("res://modules/p0/p0_outposts.gd")
 
+## The residents' looks, as the outpost room reads them (p0_outpost.gd NPCS_PATH).
+const NPCS_PATH := "res://assets/p0/outpost_npcs.json"
+
 ## cluster → {ponds: [GenPond], outposts: [GenOutpost], fish, residents, tier, climate} as the server sent it.
 static var _cities: Dictionary = {}
 static var _pending: Dictionary = {}   # cluster → [done callables] while its read is out: every asker hears the answer
@@ -116,7 +119,29 @@ static func outpost_entry(cluster: String, o: Dictionary) -> Dictionary:
 	var kind := "cabin" if bool(o.get("cabin", false)) else str(o.get("role", ""))
 	var own := str(P0Logic.content().get("world", {}).get("room", {}).get(kind, {}).get("client_anchors", ""))
 	if own != "": entry["anchors"] = own
+	if entry.get("keeper") is Dictionary and str(entry.keeper.get("look", "")) != "":
+		entry["keeper"] = (entry.keeper as Dictionary).duplicate()
+		entry.keeper["look"] = keeper_look(str(entry.keeper.look), entry.get("residents", []))
 	return entry
+
+## A generated keeper's look set (world.keeper_looks `<role>_<climate>_<n>`), unless its hair is a resident's of the
+## same room: then the first of the role and climate's three sets that is not, the given one when all three are
+## (不知火舞 on 284: Lena under tea_subtropical_0's hairhat41, Tomo under market_subtropical_2's hairhat0). The room,
+## the keeper bar and the greeting card's portrait all read the entry, so they wear the same one.
+static func keeper_look(look: String, residents: Array) -> String:
+	var looks: Dictionary = P0Logic.content().get("world", {}).get("keeper_looks", {})
+	var npcs: Dictionary = P0RoomAnchors.read_json(NPCS_PATH).get("npcs", {})
+	var hair := {}
+	for id in residents:
+		var h := str(npcs.get(str(id), {}).get("slots", {}).get("hairHat", ""))
+		if h != "": hair[h] = true
+	var clashes := func(k: String) -> bool: return hair.has(str((looks.get(k, {}) as Dictionary).get("hairHat", "")))
+	if hair.is_empty() or not clashes.call(look): return look
+	var stem := look.substr(0, look.rfind("_"))
+	for i in 3:
+		var k := "%s_%d" % [stem, i]
+		if looks.has(k) and not clashes.call(k): return k
+	return look
 
 static func pond(id: String) -> Dictionary: return _ponds.get(id, {})
 static func outpost(id: String) -> Dictionary: return _outposts.get(id, {})

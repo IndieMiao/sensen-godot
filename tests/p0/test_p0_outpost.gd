@@ -717,6 +717,36 @@ func test_a_generated_keeper_wears_their_look_preset() -> void:
 	var worn: Dictionary = rig.get("_desired")
 	for slot in look: assert_str(str(worn.get(StringName(slot), ""))).is_equal(str(look[slot]))
 
+## 不知火舞 on 284: a generated keeper never wears the hair of a resident in the same room — the set gives way to the
+## first of its role and climate's three that does not (all three do: it stays); the entry carries it, so the room and
+## the keeper's portrait agree.
+func test_a_generated_keeper_gives_way_to_a_residents_hair() -> void:
+	var looks: Dictionary = P0Logic.content().world.keeper_looks
+	assert_str(str(looks.tea_subtropical_0.hairHat)).is_equal("hairhat41")   # Lena's
+	assert_str(P0CityPlaces.keeper_look("tea_subtropical_0", ["res_hana", "res_lena"])).is_equal("tea_subtropical_1")
+	assert_str(P0CityPlaces.keeper_look("market_subtropical_2", ["res_tomo"])).is_equal("market_subtropical_1")   # Tomo's hairhat0
+	assert_str(P0CityPlaces.keeper_look("tea_subtropical_1", ["res_hana", "res_lena"])).is_equal("tea_subtropical_1")   # no clash
+	assert_str(P0CityPlaces.keeper_look("tea_subtropical_0", [])).is_equal("tea_subtropical_0")
+	# Tomo's hairhat0 and Theo's hairhat43 take all three subtropical market sets: the given one stays
+	assert_str(P0CityPlaces.keeper_look("market_subtropical_2", ["res_tomo", "res_theo"])).is_equal("market_subtropical_2")
+	P0CityPlaces.accept("gn-testlena", {"detail": {"outposts": [{"id": "gn-testlena~tea0", "role": "tea", "name": "Test Tea House",
+		"art": "coffee_shop", "anchors": "res://assets/p0/outposts/tea.anchors.json", "category": "Tea house", "lat": 1.0,
+		"lng": 1.0, "capacity": 12, "keeper": {"role": "Host", "name": "Bea", "look": "tea_subtropical_0"},
+		"residents": ["res_hana", "res_lena"]}]}})
+	assert_str(str(P0Outposts.find("gn-testlena~tea0").keeper.look)).is_equal("tea_subtropical_1")
+
+## 不知火舞 on 284: no keeper set and no resident is the player's default hairhat0 + cloth0. Tomo waits for his
+## darker hairhat0 (上官婉儿's colour, with 刘备's batch); he is the one left.
+func test_no_npc_wears_the_players_default_outfit() -> void:
+	var looks: Dictionary = P0Logic.content().world.keeper_looks
+	var keepers: Array = looks.keys().filter(func(k): return looks[k] is Dictionary and str(looks[k].get("hairHat", "")) == "hairhat0" \
+		and str(looks[k].get("cloth", "")) == "cloth0")
+	assert_array(keepers).is_empty()
+	var npcs: Dictionary = P0RoomAnchors.read_json(OutpostScript.NPCS_PATH).get("npcs", {})
+	var residents: Array = npcs.keys().filter(func(k): return str(npcs[k].slots.get("hairHat", "")) == "hairhat0" \
+		and str(npcs[k].slots.get("cloth", "")) == "cloth0")
+	assert_array(residents).is_equal(["res_tomo"])
+
 ## The S-tier trading post (the cabin, world_gen.json room.cabin) on the tea house's kit with its own anchors: Pip at the
 ## tea house's first resident spot and its s_order resident (Old Kai or Theo now) at the second — it read the tea
 ## house's anchors before and showed none of them (苏烈 / 上官婉儿 on 284). The server still names the tea house's file,
