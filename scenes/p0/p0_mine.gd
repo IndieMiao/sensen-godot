@@ -759,7 +759,10 @@ func _knocked_out() -> void:
 const COMPLETE_S := 2.5
 func _run_complete(v: Dictionary, events: Array) -> void:
 	_completing = true
-	rt.ui.set_hp(_hp_shown, _hp_max)   # the elite is down (its defeat above): its card goes, the player's bar stays
+	# the elite is down (its defeat above): its card goes, and with it the floor's line (`Elite Slime`, Floor 5 has no
+	# rocks) — nothing refreshes them now the run is over; the player's bar stays
+	rt.ui.set_hp(_hp_shown, _hp_max)
+	rt.ui.set_status_line("")
 	var loot = null
 	for e in events:
 		if str(e.get("kind", "")) == "mine" and str(e.get("action", "")) == "defeat" and str(e.get("mob_kind", "")) == "mob_elite_slime":

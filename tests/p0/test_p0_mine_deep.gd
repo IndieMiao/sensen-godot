@@ -373,7 +373,9 @@ func test_the_elite_goes_down_when_its_fall_completes_the_run() -> void:
 	var src := FileAccess.get_file_as_string("res://scenes/p0/p0_mine.gd")
 	assert_str(src.substr(src.find("\"defeat\":", src.find("func _on_state(")), 220)).contains("combat.down(")
 	assert_str(src.substr(src.find("if _completing:", src.find("func p0_frame(")), 160)).contains("combat.fade(dt)")
-	assert_str(src.substr(src.find("func _run_complete("), 200)).contains("rt.ui.set_hp(_hp_shown, _hp_max)")
+	var complete := src.substr(src.find("func _run_complete("), 400)
+	assert_str(complete).contains("rt.ui.set_hp(_hp_shown, _hp_max)")
+	assert_str(complete).contains("rt.ui.set_status_line(\"\")")
 
 ## q(116): the second elite of the day says `Quartz · first kill each day`; a reply with both the elite's fall (complete)
 ## and the player's (knocked_out) is a win — the scene only handles knocked_out without a complete beside it.
