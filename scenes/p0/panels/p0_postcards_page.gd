@@ -2,7 +2,7 @@ extends VBoxContainer
 ## The Passport's Postcards page (PASS-POSTCARDS 2627:134311; q(171) ⑥, 不知火舞 on 284): `Postcards · 3/12`, then
 ## a cell per resident, three to a row, in the residents table's order (P0Kindred.postcards):
 ##   earned    surfaceRaised, a 1 px border: the PostcardStamp (their face, or their initial), the name (C14 XB) and
-##             their Kindred line in curly quotes (C12 B italic, secondary), uncut
+##             their Kindred line in curly quotes (C11 B italic, secondary), uncut
 ##   unearned  no fill, a dashed border: the grey stamp and `Kindred · ?` (C12 B, secondary)
 ## Every cell is as tall as the longest Kindred line of all the residents needs (3 lines now), earned or not, so the
 ## grid never shifts as postcards come. Read-only: a cell does nothing. Built from the view (refresh follows it).
@@ -35,6 +35,7 @@ func _init(view_: Dictionary = {}) -> void:
 	grid.add_theme_constant_override(&"h_separation", int(GAP))
 	grid.add_theme_constant_override(&"v_separation", int(GAP))
 	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	grid.resized.connect(_fit)   # the cells' width is known once the page is laid out
 	add_child(grid)
 	refresh(view_)
 
@@ -52,21 +53,34 @@ func refresh(v: Dictionary) -> void:
 	for cell in model.cells: grid.add_child(_cell(cell))
 	_fit.call_deferred()
 
-## Every cell to the height the longest Kindred line needs at the cells' width (all residents, earned or not).
+## Every cell to the height the longest Kindred line needs at the cells' width (all residents, earned or not). Run
+## again whenever the grid's width changes; the cells keep the width the grid gives them.
 func _fit() -> void:
 	if not is_inside_tree() or grid.get_child_count() == 0: return
 	var w := (grid.size.x - GAP * (COLS - 1)) / COLS
 	if w <= 0.0: return
 	var text_w := w - _PAD.x - _PAD.z
 	var font := _italic()
-	var fsize := get_theme_font_size(&"font_size", UiTokens.STYLE_C12_B)
+	# the sizes the cell's own labels get from the theme: read off probes styled the same way (a type variation's
+	# size is not found by name from here)
+	var probe := UiKit.label("x", UiTokens.STYLE_C11_B)
+	var name_probe := UiKit.label("x", UiTokens.STYLE_C14_XB)
+	probe.visible = false
+	name_probe.visible = false
+	add_child(probe)
+	add_child(name_probe)
+	var fsize := probe.get_theme_font_size(&"font_size")
+	var name_h := name_probe.get_minimum_size().y
+	remove_child(probe)
+	remove_child(name_probe)
+	probe.free()
+	name_probe.free()
 	var tallest := 0.0
 	for id in P0Logic.content().get("residents", {}):
 		var line := quoted(str(P0Logic.content().residents[id].get("lines", {}).get("Kindred", "")))
 		tallest = maxf(tallest, font.get_multiline_string_size(line, HORIZONTAL_ALIGNMENT_CENTER, text_w, fsize).y)
-	var name_h := get_theme_font(&"font", UiTokens.STYLE_C14_XB).get_height(get_theme_font_size(&"font_size", UiTokens.STYLE_C14_XB))
 	var h := _PAD.y + Stamp.PASSPORT.y + _STACK + name_h + _STACK + tallest + _PAD.w
-	for c in grid.get_children(): (c as Control).custom_minimum_size = Vector2(w, ceilf(h))
+	for c in grid.get_children(): (c as Control).custom_minimum_size.y = ceilf(h)
 
 ## `“Best friend on the whole route. Don't tell the pigeons.”`
 static func quoted(line: String) -> String:
@@ -95,7 +109,7 @@ func _cell(c: Dictionary) -> PanelContainer:
 		who.name = "Name"
 		who.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		col.add_child(who)
-		var line := UiKit.label(quoted(str(c.text)), UiTokens.STYLE_C12_B, UiTokens.COLOR_SECONDARY)
+		var line := UiKit.label(quoted(str(c.text)), UiTokens.STYLE_C11_B, UiTokens.COLOR_SECONDARY)
 		line.name = "Line"
 		line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART

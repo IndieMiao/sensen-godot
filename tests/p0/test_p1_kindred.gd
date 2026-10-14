@@ -102,6 +102,10 @@ func test_the_passport_has_cities_and_postcards_pages() -> void:
 	assert_int(cells.size()).is_equal(12)
 	var heights := cells.map(func(c): return (c as Control).custom_minimum_size.y)
 	assert_bool(heights.all(func(h): return is_equal_approx(h, heights[0]) and h > Stamp.PASSPORT.y)).is_true()
+	# as tall as the longest Kindred line needs at the cells' own width (q(171) ⑥), no taller: four lines of 11 at most
+	var line := page.find_child("Cell_res_pip", true, false).find_child("Line", true, false) as Label
+	assert_int(line.get_line_count()).is_less_equal(3)
+	assert_float(heights[0]).is_less_equal(12 + Stamp.PASSPORT.y + 4 + 22 + 4 + 4 * 16 + 12)
 	var pip := page.find_child("Cell_res_pip", true, false)
 	assert_str((pip.find_child("Name", true, false) as Label).text).is_equal("Pip")
 	assert_str((pip.find_child("Line", true, false) as Label).text).is_equal("“Best friend on the whole route. Don't tell the pigeons.”")

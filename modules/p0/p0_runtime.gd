@@ -1500,6 +1500,10 @@ func _dev_shot(dt: float) -> void:
 				func(): ui.open_licenses(func(): ui.open_settings(func(): ui.open_profile())))
 			"noticeboard": ui.open_notice_board()   # the stall's Notice Board (q(164) shots)
 			"noticeonline": ui.set_notice_online({"sh_market_1": 4, "sh_tea_1": 3, "sh_tackle_1": 3, "sh_post_1": 2})   # shots: who is in, as the frame
+			"passport": ui.open_passport(Callable(), step[1] if step.size() > 1 else "cities")   # passport[:postcards] (q(171) shots)
+			"passportpage": if ui.passport(): ui.passport().call("show_page", step[1])
+			"passportclose": if ui.passport(): (ui.passport().find_child("Close", true, false) as BaseButton).pressed.emit()
+			"kindredcard": ui.show_kindred(P0Kindred.card(session.current(), {"resident": step[1]}))   # kindredcard:res_pip
 			"pagebottom":
 				for sc in ui.root.find_children("*", "ScrollContainer", true, false): (sc as ScrollContainer).scroll_vertical = 100000
 			"barterpress":   # barterpress:stone — that mineral's Barter key in the open market drawer (q(166) shots)
