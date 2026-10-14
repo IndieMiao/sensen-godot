@@ -1,6 +1,6 @@
 extends GdUnitTestSuite
 ## SGODOT-235 B3: the mine and gathering-spot cards on the new shells — ElevatorPanel (MINE-P0-6), and bottom Sheets
-## with Close above for "The mine" (MINE-P0-1 / P0-8), New run (MINE-P0-7) and a spot that opens later (MAT-3).
+## with Close above for New run (MINE-P0-7) and a spot that opens later (MAT-3).
 
 const STORE := "user://test_p0_material_cards.json"
 
@@ -52,20 +52,6 @@ func test_elevator_panel_rows_pick_or_say_why() -> void:
 	p.row(2).pressed.emit()
 	assert_str(ui.toast_text()).is_equal("Floor 2 · Clear Floor 1 first")
 	assert_int(picked.size()).is_equal(2)
-
-func test_mine_sheet_is_a_drawer_with_info_and_only_a_grey_reason_when_no_run_is_left() -> void:
-	ui.set_view(_view())
-	var d := P0MaterialCards.open_mine_sheet(ui, ui.view)
-	await await_idle_frame()
-	assert_object(d).is_instanceof(UiDrawer)
-	assert_str(ui.modal_kind).is_equal("mine_sheet")
-	assert_that(_labels(d)).contains(["The mine", "Entrance", "Runs today", "0/2"])
-	assert_array(d.find_children("*", "UiCommandButton", true, false)).is_empty()   # a run can start: info only
-	assert_float(d.height).is_greater(100.0)
-	ui.set_view(_view(null, 2))
-	d = P0MaterialCards.open_mine_sheet(ui, ui.view)
-	var b: UiCommandButton = d.find_children("*", "UiCommandButton", true, false)[0]
-	assert_str(b.reason).is_not_empty()   # Mine runs today 2/2 · Resets in …, still tappable (LOCK-10)
 
 func test_new_run_starts_with_the_destructive_command_or_keeps_with_dismiss() -> void:
 	ui.set_view(_view({"id": 1, "deepest": 2, "floors": [_floor(1, true, true), _floor(2, true, true)]}, 1))

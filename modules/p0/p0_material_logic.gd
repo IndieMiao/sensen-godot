@@ -114,12 +114,6 @@ static func _express_button(mine: Dictionary, entry: Dictionary) -> Dictionary:
 static func _button(label: String, cmd: Dictionary, enabled := true, amber := false, need := 0, verb := "") -> Dictionary:
 	return {"label": label, "enabled": enabled, "amber": amber, "cmd": cmd, "need": need, "verb": verb, "toast": "" if enabled else label}
 
-## Today's runs are used up and none is left unfinished (the mouth card's MINE-GATE-EXPRESS-3; it opened MINE-P0-8 in P0).
-static func mine_runs_spent(view: Dictionary) -> bool:
-	var mine: Dictionary = view.get("mine", {})
-	var runs: Dictionary = mine.get("runs", {})
-	return mine.get("run", null) == null and int(runs.get("used", 0)) >= int(runs.get("limit", 2))
-
 ## The mouth card's second button with an unfinished run (MINE-P0-5, mine_mouth_card): `New run · 2 Energy` to start
 ## over. {show, label, line2, enabled, amber, cmd}; line2, the note under it, is empty when unavailable (the reason is
 ## the label).
@@ -182,22 +176,6 @@ static func reset_notice(view: Dictionary, shown_at: float) -> String:
 	var ended = view.get("mine", {}).get("ended", null)
 	if ended == null or float(ended.get("at", 0)) <= shown_at: return ""
 	return "Run ended at daily reset"
-
-## "The mine" sheet from tapping the mouth (MINE-P0-1 / P0-8): {title, subtitle, line, facts: [[k, v]], button}.
-## button {label, enabled}: only when no run is possible today (Mine runs today 2/2 · Resets in 9h 12m, grey).
-static func mine_sheet(view: Dictionary) -> Dictionary:
-	var mine: Dictionary = view.get("mine", {})
-	var runs: Dictionary = mine.get("runs", {})
-	var used := int(runs.get("used", 0))
-	var limit := int(runs.get("limit", 2))
-	var sheet := {"title": "The mine", "subtitle": "Entrance", "line": "Mine five floors. Slimes from Floor 3.",
-		"facts": [["Runs today", "%d/%d" % [used, limit]]], "button": {}}
-	if mine.get("run", null) == null and used >= limit:
-		sheet.subtitle = "No run · Runs today %d/%d" % [used, limit]
-		sheet.line = ""
-		sheet.facts = []
-		sheet.button = {"label": _runs_line(mine), "enabled": false}
-	return sheet
 
 ## New run confirmation (MINE-P0-7), opened from the EntryCard: {title, subtitle, facts, cost, note, confirm, keep}.
 ## No "Unmined rocks…" line: a new run needs floor 2 cleared, so nothing is left to lose (Li Bai, 231 3f6b8fb5).

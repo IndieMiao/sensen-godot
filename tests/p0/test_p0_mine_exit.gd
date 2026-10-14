@@ -1,8 +1,8 @@
 extends GdUnitTestSuite
 ## User int11 (SGODOT-231, 不知火舞): ① the mine's exits — the elevator's Ground, the exit ladder, the 04:00 kick-out —
 ## go back to the farm under the mine, not to the map; ② a tap on the mouth walks up to it and opens its EntryCard, whose
-## button carries the fee (SGODOT-266, LOCK-21 复议: never the main key, never the tap itself), or opens MINE-P0-8 with
-## today's runs used up.
+## button carries the fee (SGODOT-266, LOCK-21 复议: never the main key, never the tap itself) — with today's runs used
+## up too, its grey `Resets in …` pill (MINE-GATE-EXPRESS-3 / -4).
 
 const P0Mine := preload("res://scenes/p0/p0_mine.gd")
 const PROBE := "res://tests/fixtures/scenes/stack_probe.tscn"
@@ -31,11 +31,6 @@ func test_leaving_the_mine_pops_only_the_mine() -> void:
 	assert_bool(AppRouter.top_instance() == farm).is_true()
 	assert_bool(is_instance_valid(mine_layer)).is_false()
 	assert_bool(P0Runtime.room_leaves_for_map(1, true)).is_false()   # the mine on the farm root: also just one layer
-
-func test_runs_spent_only_without_a_run_and_with_none_left() -> void:
-	assert_bool(P0MaterialLogic.mine_runs_spent({"mine": {"runs": {"used": 2, "limit": 2}}})).is_true()
-	assert_bool(P0MaterialLogic.mine_runs_spent({"mine": {"runs": {"used": 1, "limit": 2}}})).is_false()
-	assert_bool(P0MaterialLogic.mine_runs_spent({"mine": {"run": {"floor": 2}, "runs": {"used": 2, "limit": 2}}})).is_false()
 
 ## Where a tap from afar walks to: walkable cells by the mouth, inside the reach where its card stays, nearest the
 ## player first.
