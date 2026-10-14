@@ -99,5 +99,8 @@ func test_the_passport_lists_home_and_the_cities_reached_newest_first() -> void:
 	assert_array(page.rows[2].facts).is_equal([["Visits", "1/10"]])
 	assert_str(str(P0Travel.city_page(v, "gn-5368361").rows[1].state)).is_equal("Complete")
 
-func test_san_diego_reads_san_diego_on_its_cluster() -> void:
-	assert_str(str(load("res://modules/p0/p0_clusters.gd").get_cluster("gn-3981609").name)).is_equal("San Diego")   # travel.cluster_names
+func test_san_diego_is_a_cluster_of_its_own() -> void:
+	# SGODOT-280: San Diego split out of Tijuana's cluster (build_clusters.mjs SPLIT_OUT); each reads its own name
+	var clusters = load("res://modules/p0/p0_clusters.gd")
+	assert_str(str(clusters.get_cluster("gn-5391811").name)).is_equal("San Diego")
+	assert_str(str(clusters.get_cluster("gn-3981609").name)).is_equal("Tijuana")

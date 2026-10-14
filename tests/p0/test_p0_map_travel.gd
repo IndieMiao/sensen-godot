@@ -198,7 +198,7 @@ func test_the_silhouette_card_reads_the_city_and_fills_in_its_places() -> void:
 	var empty: Dictionary = P0Map.city_card(rt.session.view, TOKYO, {})
 	assert_str(str(empty.title)).is_equal("Tokyo")
 	assert_str(str(empty.state)).is_equal("Unexplored")
-	assert_str(str(empty.effect)).is_equal("Preview the city before travelling.")
+	assert_str(str(empty.effect)).is_equal("Preview the city before traveling.")
 	assert_array(empty.facts.map(func(f): return str(f[0]))).is_equal(["Climate", "Trip", "Local time"])
 	assert_str(str(empty.facts[0][1])).is_equal("Temperate")
 	assert_str(str(empty.facts[1][1])).is_equal("6 · Intercontinental")

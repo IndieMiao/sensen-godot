@@ -1,7 +1,7 @@
 {
  "_note": "Farm spots for the home pick (SGODOT-303, q(160) ②): per open city, 3 base spots on built-up land ≥ 250 m from water, with district names (Mapbox). Made by server/tools/home_spots.ts run; read by server/src/p0/home_city.ts.",
  "seed": "journey-p1-world-20261010-v1",
- "revision": 2,
+ "revision": 3,
  "cities": {
   "gn-1796236": [
    {

@@ -6,6 +6,9 @@
 // so a rebuild keeps every existing assignment and only places cities that are new to the directory (joining the
 // nearest existing seed within 30 km, else seeding a cluster of their own). Delete the outputs to start over.
 //
+// SPLIT_OUT is a hand list (q(187)): each city on it is taken out of the cluster the merge put it in and seeds its own
+// (its id is its key); the rest of the build is unchanged. A city new to the directory near one may then join it.
+//
 //   node server/tools/build_clusters.mjs
 //   → assets/p0/city_clusters.json        (client + server: one row per cluster; JSON so it ships in the APK)
 //   → server/data/city_cluster_members.tsv (server only: city id → cluster id)
@@ -69,11 +72,20 @@ const nearestSeed = r => {
   const span = Math.min(180, Math.ceil(CLUSTER_KM / (111 * CELL * Math.max(0.05, Math.cos(r.lat * rad)))));
   let best = null, bestKm = Infinity;
   for (let di = -1; di <= 1; di++) for (let dj = -span; dj <= span; dj++) for (const s of seeds.get(cellKey(i + di, j + dj)) ?? []) {
+    // never into a smaller seed: a SPLIT_OUT seed stands before the merge, and a bigger neighbour must not join it (亚瑟 on #387)
+    if (s.pop < r.pop || (s.pop === r.pop && s.id > r.id)) continue;
     const d = km(r, s);
     if (d <= CLUSTER_KM && (d < bestKm || (d === bestKm && s.id < best.id))) { best = s; bestKm = d; }
   }
   return best;
 };
+
+// The hand list of q(187) (SGODOT-280): cities taken out of the cluster the merge put them in, each its own from then on.
+const SPLIT_OUT = [
+  { id: 'gn-5391811', why: 'San Diego (US, 1.4 M) had joined Tijuana (MX) 28 km away; players went to "San Diego" and stood in Tijuana' },
+  { id: 'gn-1843163', why: 'Ganghwa-gun (KR) had joined Kaesong (KP); North Korean cities do not open (SGODOT-305), Ganghwa does' },
+  { id: 'gn-2036579', why: 'Ji\'an, Jilin (CN) had joined Manp\'o (KP); North Korean cities do not open (SGODOT-305), Ji\'an does' },
+];
 
 // Frozen assignments from the last build.
 const of = new Map();
@@ -84,8 +96,9 @@ if (existsSync(MEMBERS)) {
     if (byId.has(city) && byId.has(cluster)) of.set(city, cluster);
   }
 }
+const fresh = of.size === 0;   // before SPLIT_OUT, so a build from nothing says built
+for (const { id } of SPLIT_OUT) if (byId.has(id)) of.set(id, id);
 for (const id of new Set(of.values())) addSeed(byId.get(id));
-const fresh = of.size === 0;
 
 // Most populous first (ties by id): deterministic. On a fresh build a city within 30 km of an earlier seed joins it
 // (the greedy merge); on a rebuild only cities new to the directory are placed, the same way.

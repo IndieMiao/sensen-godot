@@ -1,7 +1,7 @@
 {
  "_note": "Global generation (SGODOT-280, plan v2 §9.3.2 / §6.3.3 / §9.4.3). tiers, placement, tea_words, keeper_names, name_rules and wild are 李白's outposts.json (SGODOT-281, 47fafcea) as-is; seed, ponds, area_tier, coastal and room are the generator's own (后裔). Generated places are frozen by id (<cluster>~<kind><n>): a change here that moves an existing city must bump world.revision.",
  "world": {
-  "revision": 2,
+  "revision": 3,
   "seed": "journey-p1-world-20261010-v1",
   "tiers": [
    {
@@ -108,7 +108,7 @@
     "Tea Hill",
     "Magnolia",
     "Pagoda",
-    "Harbour"
+    "Harbor"
    ],
    "Temperate": [
     "Oak",
@@ -970,6 +970,36 @@
     "lat": 60.1845,
     "lng": 24.96,
     "why": "SGODOT-303 (2026-10-13, the first home cities' check, 303 582765b3): off Mustikkamaa island onto the mainland, Sörnäinen; moved 1766 m from (60.178866, 24.98987), keeping the placement rules."
+   },
+   "gn-5391811~pond0": {
+    "lat": 32.706,
+    "lng": -117.15,
+    "why": "SGODOT-280 (San Diego split out of Tijuana, 2026-10-13): generated on the North Island naval air station's edge; into Logan Heights, still the pond nearest the centre (1.75 km, under Tortoise and Sampan Creeks' 2.5 km)"
+   },
+   "gn-5391811~tackle0": {
+    "lat": 32.7045,
+    "lng": -117.152,
+    "why": "SGODOT-280 (San Diego split, 2026-10-13): off North Island with Gardenia Pond, 250 m from it, 3 km from Tortoise Tackle Shop in Balboa Park"
+   },
+   "gn-5391811~market0": {
+    "lat": 32.711,
+    "lng": -117.155,
+    "why": "SGODOT-280 (San Diego split, 2026-10-13): generated on the bay's water; into East Village, 1 km from the centre, 730 m from Gardenia Pond"
+   },
+   "gn-5391811~tea0": {
+    "lat": 32.7275,
+    "lng": -117.166,
+    "why": "SGODOT-280 (San Diego split, 2026-10-13): generated on the airport's runway; into Little Italy"
+   },
+   "gn-3981609~pond3": {
+    "lat": 32.5335,
+    "lng": -117.0395,
+    "why": "SGODOT-280 (Tijuana without San Diego, 2026-10-13): generated against the San Ysidro / El Chaparral border crossing; 1 km into Zona Centro"
+   },
+   "gn-2036579~pond1": {
+    "lat": 41.145,
+    "lng": 126.218,
+    "why": "SGODOT-305 (Ji'an split out of Manp'o, 2026-10-14): generated across the Yalu in North Korea; onto the Chinese bank, north-east of the town"
    }
   },
   "room": {
