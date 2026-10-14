@@ -343,11 +343,12 @@ func test_resident_profile_sheet_from_the_name_on_the_bar() -> void:
 	var d := P0Ui.resident_profile_data(_resident_view(), "res_pip")
 	assert_that([d.name, d.role, d.stage, d.friendship, d.likes, d.details]).is_equal(["Pip", "Courier Kid", "Acquainted", "12/30", "Dessert", false])
 	assert_object(d.face).is_not_null()
-	# 不知火舞 on 235 B1: the dialogue bar's portrait, its face square (hat top to chin), not a vector placeholder.
-	assert_str((d.face as AtlasTexture).atlas.resource_path).is_equal("res://assets/p0/art/pip-portrait.jpg")
-	assert_that((d.face as AtlasTexture).region).is_equal(P0Ui.FACE_CROPS.pip)
+	# 不知火舞 on 235 B1, 上官婉儿 #405: the face square of the resident's render card (portrait_crops.json `face`),
+	# not a vector placeholder — Pip's and Kai's too, though their dialogue bars keep the illustration.
+	assert_str((d.face as AtlasTexture).atlas.resource_path).is_equal("res://assets/p0/art/residents/pip_card.jpg")
+	assert_that((d.face as AtlasTexture).region).is_equal(Rect2(68, 50, 169, 169))
 	var kai := P0Ui.resident_face("kai") as AtlasTexture
-	assert_that([kai.atlas.resource_path, kai.region]).is_equal(["res://assets/p0/art/kai-portrait.jpg", P0Ui.FACE_CROPS.kai])
+	assert_that([kai.atlas.resource_path, kai.region]).is_equal(["res://assets/p0/art/residents/kai_card.jpg", Rect2(71, 50, 164, 164)])
 	assert_object(d.likes_icon).is_not_null()
 	ui.open_resident("res_pip")
 	(ui.find_children("*", "UiResidentBar", true, false)[0] as UiResidentBar).identity_pressed.emit()
