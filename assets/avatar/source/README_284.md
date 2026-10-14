@@ -1,7 +1,7 @@
 # SGODOT-284 / q(171) · Granny Wu, Ivo and Tomo NPC parts
 
 刘备 · 2026-10-14. Specification and 不知火舞's final decisions:
-[spec-v1.1.md in the wp-3d-scene art branch](https://github.com/IndieMiao/sensen-godot/blob/wp-3d-scene-liubei-parts-284/tools/art/source/resident_parts_284/spec-v1.1.md).
+[spec-v1.1.md in the wp-3d-scene art branch](https://github.com/IndieMiao/sensen-godot/blob/wp-3d-scene/tools/art/source/resident_parts_284/spec-v1.1.md).
 The design reference supplies color/shape direction; existing part scale and
 FBX frames remain authoritative. Review base: `farm-dev`, `a8e0b548`.
 
@@ -27,7 +27,10 @@ first render exposed a gap above the retained hair. The beard keeps its original
 width/depth and topology, scales vertical geometry by 1/3 and fits the jaw by a
 2 cm mesh-space lift. Neither adjustment changes any FBX node or socket transform.
 The original hairHat runtime maximum is 2784 triangles; the helmet uses 1423.
-Its ivory lamp face has `emission_strength=0`, with no light or glow object.
+The hat uses `emission_strength=0.3`, matching the base hairHat material. In
+`avatar_toon.gdshader` this is the whole mesh's flat-light floor; the ivory lamp
+face has no separate light or glow effect. The 0.3 correction follows 后裔's
+cross-review and 上官婉儿's clarification; `smoothness=0.05` is retained.
 
 Granny Wu's original luminance curves become silver #E4E0D8 / shade #B9B4AC and
 red #A63830 / shade #7A2A25, preserving hair shading. Ivo's beard uses #A9A49C /
@@ -82,14 +85,15 @@ production portraits are integrated separately by 上官婉儿 / 苏烈.
 ## Art sources and review (在 wp-3d-scene)
 
 按 10-08 美术整合规则，审阅图、验证 JSON、生成/审核脚本和 Blender 源文件在
-**wp-3d-scene**，不随运行时 PR #407 进入 farm-dev。对应提交分支为
-[`wp-3d-scene-liubei-parts-284`](https://github.com/IndieMiao/sensen-godot/tree/wp-3d-scene-liubei-parts-284)，
+**wp-3d-scene**，不随运行时 PR #407 进入 farm-dev。合并后的长期材料入口为
+[`wp-3d-scene`](https://github.com/IndieMiao/sensen-godot/tree/wp-3d-scene)，
 审阅材料从已检查的 `1e8da88e` 原样迁移。
 
-- [Review images, validation and delivery receipts](https://github.com/IndieMiao/sensen-godot/blob/wp-3d-scene-liubei-parts-284/docs/design/resident-parts-284-2026-10-14/README.md).
-- [Ivo canvas clothing and revised footwear review](https://github.com/IndieMiao/sensen-godot/blob/wp-3d-scene-liubei-parts-284/docs/design/resident-parts-284-2026-10-14/ivo-cloth/README.md).
-- [Tomo's final warm brown images and validation](https://github.com/IndieMiao/sensen-godot/blob/wp-3d-scene-liubei-parts-284/docs/design/resident-parts-284-2026-10-14/tomo/README.md).
-- [Named Blender sources and specification](https://github.com/IndieMiao/sensen-godot/tree/wp-3d-scene-liubei-parts-284/tools/art/source/resident_parts_284).
+- [Review images, validation and delivery receipts](https://github.com/IndieMiao/sensen-godot/blob/wp-3d-scene/docs/design/resident-parts-284-2026-10-14/README.md).
+- [Ivo hat flat-light correction and latest portraits](https://github.com/IndieMiao/sensen-godot/blob/wp-3d-scene/docs/design/resident-parts-284-2026-10-14/ivo-light/README.md).
+- [Ivo canvas clothing and revised footwear review](https://github.com/IndieMiao/sensen-godot/blob/wp-3d-scene/docs/design/resident-parts-284-2026-10-14/ivo-cloth/README.md).
+- [Tomo's final warm brown images and validation](https://github.com/IndieMiao/sensen-godot/blob/wp-3d-scene/docs/design/resident-parts-284-2026-10-14/tomo/README.md).
+- [Named Blender sources and specification](https://github.com/IndieMiao/sensen-godot/tree/wp-3d-scene/tools/art/source/resident_parts_284).
 - Art scripts in that branch: `tools/art/build_resident_parts_284.py`,
   `prepare_resident_parts_review.py`, `recolor_resident_parts_284.py`,
   `recolor_tomo_284.py`, `recolor_ivo_cloth_284.py`,
