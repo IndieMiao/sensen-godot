@@ -1139,7 +1139,7 @@
   },
   "keeper_looks": {
    "tea_tropical_0": {
-    "hairHat": "hairhat70",
+    "hairHat": "hairhat41_npc_auburn",
     "cloth": "cloth0",
     "shoes": "shoes0"
    },
@@ -1154,7 +1154,7 @@
     "shoes": "shoes4"
    },
    "tea_subtropical_0": {
-    "hairHat": "hairhat41",
+    "hairHat": "hairhat41_npc_auburn",
     "cloth": "cloth1",
     "shoes": "shoes1"
    },
@@ -1164,7 +1164,7 @@
     "shoes": "shoes3"
    },
    "tea_subtropical_2": {
-    "hairHat": "hairhat0",
+    "hairHat": "hairhat43_npc_black",
     "cloth": "cloth42",
     "shoes": "shoes5"
    },
@@ -1214,7 +1214,7 @@
     "shoes": "shoes1"
    },
    "tackle_subtropical_0": {
-    "hairHat": "hairhat51",
+    "hairHat": "hairhat41_npc_auburn",
     "cloth": "cloth11",
     "shoes": "shoes4"
    },
@@ -1229,12 +1229,12 @@
     "shoes": "shoes2"
    },
    "tackle_temperate_0": {
-    "hairHat": "hairhat70",
+    "hairHat": "hairhat43_npc_black",
     "cloth": "cloth42",
     "shoes": "shoes5"
    },
    "tackle_temperate_1": {
-    "hairHat": "hairhat41",
+    "hairHat": "hairhat41_npc_auburn",
     "cloth": "cloth0",
     "shoes": "shoes1"
    },
@@ -1249,7 +1249,7 @@
     "shoes": "shoes0"
    },
    "tackle_cool_1": {
-    "hairHat": "hairhat43",
+    "hairHat": "hairhat43_npc_black",
     "cloth": "cloth1_1",
     "shoes": "shoes2"
    },
@@ -1264,12 +1264,12 @@
     "shoes": "shoes0"
    },
    "market_tropical_1": {
-    "hairHat": "hairhat41",
+    "hairHat": "hairhat41_npc_auburn",
     "cloth": "cloth11",
     "shoes": "shoes2"
    },
    "market_tropical_2": {
-    "hairHat": "hairhat0",
+    "hairHat": "hairhat43_npc_black",
     "cloth": "cloth1_1",
     "shoes": "shoes4"
    },
@@ -1294,7 +1294,7 @@
     "shoes": "shoes2"
    },
    "market_temperate_1": {
-    "hairHat": "hairhat51",
+    "hairHat": "hairhat41_npc_auburn",
     "cloth": "cloth1",
     "shoes": "shoes4"
    },
@@ -1314,7 +1314,7 @@
     "shoes": "shoes5"
    },
    "market_cool_2": {
-    "hairHat": "hairhat0",
+    "hairHat": "hairhat43_npc_black",
     "cloth": "cloth1_1",
     "shoes": "shoes1"
    },
@@ -1329,12 +1329,12 @@
     "shoes": "shoes5"
    },
    "post_tropical_2": {
-    "hairHat": "hairhat43",
+    "hairHat": "hairhat43_npc_black",
     "cloth": "cloth42",
     "shoes": "shoes1"
    },
    "post_subtropical_0": {
-    "hairHat": "hairhat41",
+    "hairHat": "hairhat41_npc_auburn",
     "cloth": "cloth11",
     "shoes": "shoes4"
    },
@@ -1374,11 +1374,11 @@
     "shoes": "shoes2"
    },
    "post_cool_2": {
-    "hairHat": "hairhat43",
+    "hairHat": "hairhat43_npc_black",
     "cloth": "cloth42",
     "shoes": "shoes4"
    },
-   "_note": "Placeholder keeper looks (§9.3.2: 4 roles × 4 climates × 3 variants) from the public parts only — the named P0 keepers and residents keep their NPC-only parts. 上官婉儿 replaces these with designed sets; the keys stay. Rules (不知火舞 on 284): never the player's default hairhat0 + cloth0, no cloth28 and no hairhat20 (as for the residents); a resident's hair + cloth is theirs, no set wears both (sets may repeat across roles); the three sets of a role and climate have three different hairs, so a set whose hair is a resident's of the same room gives way to the first of its three that is not (P0CityPlaces.keeper_look)."
+   "_note": "Placeholder keeper looks (§9.3.2: 4 roles × 4 climates × 3 variants) from the public parts only — the named P0 keepers and residents keep their NPC-only parts. Two NPC-only hair colours spread them out: hairhat41_npc_auburn and hairhat43_npc_black (刘备's parts, #419; 上官婉儿 284 493b93da / df21e0ee, 不知火舞 6f4a6c01); the keys stay. Rules (不知火舞 on 284): never the player's default hairhat0 + cloth0, no cloth28 and no hairhat20 (as for the residents); a resident's hair + cloth is theirs, no set wears both (sets may repeat across roles); the three sets of a role and climate have three different hairs, so a colour variant is the same hair style, and a set whose hair style is a resident's of the same room gives way to the first of its three that is not (P0CityPlaces.keeper_look)."
   }
  }
 }
