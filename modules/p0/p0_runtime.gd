@@ -13,6 +13,7 @@ extends Node
 ## p0_until(name) -> bool.
 
 const P0City := preload("res://modules/p0/p0_city.gd")   # the P0 home city (SGODOT-270)
+const P0Kindred := preload("res://modules/p0/p0_kindred.gd")   # Kindred's postcard and title (q(171))
 const P0Barter := preload("res://modules/p0/p0_barter.gd")   # the market's Barter (q(166))
 const HomePanel = preload("res://scenes/p0/home/p0_home_panel.gd")
 const MAP_SCENE := "res://scenes/p0/p0_map.tscn"
@@ -790,6 +791,9 @@ func _on_state(v: Dictionary, events: Array) -> void:
 				ui.toast_success_when_clear(P0Logic.visit_toast(v, str(ev.get("id", ""))))
 			"title":   # a story request's title (§9.4.4 Trusted)
 				ui.toast_success("New title · %s" % str(ev.get("id", "")))
+			"kindred":   # q(171) ③: their postcard and title, a Milestone card after the affinity float (end of the frame)
+				var kc := P0Kindred.card(v, ev)
+				ui.queue_card.call_deferred(func(): ui.show_kindred(kc))
 			"homestead":
 				# HOME-2 (SGODOT-228): HOME-1 closes, the MomentBanner says what changed; the farm swaps the fence.
 				if ui.modal_kind == "homestead": ui.close_modal()

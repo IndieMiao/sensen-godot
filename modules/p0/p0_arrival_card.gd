@@ -27,33 +27,7 @@ static func open(ui: Node, spec: Dictionary, go: Callable, kind := "arrival_card
 		"effect": str(spec.get("effect", ""))}))
 	for f in spec.get("facts", []): col.add_child(UiFactRow.new(str(f[0]), str(f[1])))
 	for r in spec.get("rows", []):
-		var row := UiItemRow.new({"icon": r.get("icon", null), "title": str(r.get("title", "")),
-			"state": str(r.get("state", "")), "effect": str(r.get("effect", "")),
-			"quantity": str(r.get("quantity", "")), "quantity_label": str(r.get("unit", ""))})
-		row.name = "Row_" + str(r.get("title", "")).replace(" ", "_")
-		if r.get("pressed") is Callable:   # a row that opens something (the Passport's cities): the row inside a flat button
-			var b := Button.new()
-			b.flat = true
-			b.focus_mode = Control.FOCUS_NONE
-			b.name = row.name
-			b.pressed.connect(r.pressed)
-			row.name = "ItemRow"
-			b.add_child(row)
-			# a › at the right says the row opens something (不知火舞 on #256), as a NavigationRow's chevron
-			var chevron := UiKit.label(UiNavButton.CHEVRON, UiTokens.STYLE_TITLE_B20, UiTokens.COLOR_INFO)
-			chevron.name = "Chevron"
-			chevron.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			chevron.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-			chevron.set_anchors_and_offsets_preset(Control.PRESET_RIGHT_WIDE)
-			chevron.grow_horizontal = Control.GROW_DIRECTION_BEGIN
-			b.add_child(chevron)
-			# a Button does not lay out its children: it takes the row's height, and the row its width
-			row.minimum_size_changed.connect(func(): b.custom_minimum_size.y = row.get_combined_minimum_size().y)
-			b.resized.connect(func(): row.size = Vector2(b.size.x, row.get_combined_minimum_size().y))
-			b.custom_minimum_size.y = row.get_combined_minimum_size().y
-			col.add_child(b)
-		else:
-			col.add_child(row)
+		col.add_child(row(r))
 		for f in r.get("facts", []): col.add_child(UiFactRow.new(str(f[0]), str(f[1])))
 	for link in spec.get("links", []):
 		var nav := UiNavButton.new(str(link[0]))
@@ -80,6 +54,35 @@ static func open(ui: Node, spec: Dictionary, go: Callable, kind := "arrival_card
 	ui._open_modal(holder, 0.0, false)
 	ui.modal_kind = kind
 	return holder
+
+## One item row ({icon, title, state?, effect, quantity?, unit?, pressed?}): a row that opens something (the Passport's
+## cities) is the row inside a flat button with a › at its right (不知火舞 on #256, as a NavigationRow's chevron).
+## The Passport drawer's Cities page builds its rows here too.
+static func row(r: Dictionary) -> Control:
+	var item := UiItemRow.new({"icon": r.get("icon", null), "title": str(r.get("title", "")),
+		"state": str(r.get("state", "")), "effect": str(r.get("effect", "")),
+		"quantity": str(r.get("quantity", "")), "quantity_label": str(r.get("unit", ""))})
+	item.name = "Row_" + str(r.get("title", "")).replace(" ", "_")
+	if not (r.get("pressed") is Callable): return item
+	var b := Button.new()
+	b.flat = true
+	b.focus_mode = Control.FOCUS_NONE
+	b.name = item.name
+	b.pressed.connect(r.pressed)
+	item.name = "ItemRow"
+	b.add_child(item)
+	var chevron := UiKit.label(UiNavButton.CHEVRON, UiTokens.STYLE_TITLE_B20, UiTokens.COLOR_INFO)
+	chevron.name = "Chevron"
+	chevron.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	chevron.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	chevron.set_anchors_and_offsets_preset(Control.PRESET_RIGHT_WIDE)
+	chevron.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	b.add_child(chevron)
+	# a Button does not lay out its children: it takes the row's height, and the row its width
+	item.minimum_size_changed.connect(func(): b.custom_minimum_size.y = item.get_combined_minimum_size().y)
+	b.resized.connect(func(): item.size = Vector2(b.size.x, item.get_combined_minimum_size().y))
+	b.custom_minimum_size.y = item.get_combined_minimum_size().y
+	return b
 
 ## The sheet's grip, centred over the header: UiDrawer's handle (its size and colour), display only.
 static func _handle() -> Control:
