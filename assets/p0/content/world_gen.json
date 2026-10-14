@@ -973,7 +973,7 @@
    }
   },
   "room": {
-   "_note": "Placeholder rooms until the five outpost layouts are designed (SGODOT-275 item 7): each role uses the P0 room of its kind; the S-tier trading post uses the tea house's kit with its own anchors (cabin.anchors.json: Pip and its s_order resident in the tea house's two resident spots).",
+   "_note": "Placeholder rooms until the five outpost layouts are designed (SGODOT-275 item 7): each role uses the P0 room of its kind; the S-tier trading post uses the tea house's kit. `anchors` is what the server names to every client; `client_anchors` is the file this client reads instead (the trading post's cabin.anchors.json: Pip and its s_order resident in the tea house's two resident spots), kept apart because 0.2.5 and older have no such file — fold it into `anchors` once they are gone.",
    "tea": {
     "art": "coffee_shop",
     "anchors": "res://assets/p0/outposts/tea.anchors.json",
@@ -996,7 +996,8 @@
    },
    "cabin": {
     "art": "coffee_shop",
-    "anchors": "res://assets/p0/outposts/cabin.anchors.json",
+    "anchors": "res://assets/p0/outposts/tea.anchors.json",
+    "client_anchors": "res://assets/p0/outposts/cabin.anchors.json",
     "category": "Trading post · All counters"
    }
   },
