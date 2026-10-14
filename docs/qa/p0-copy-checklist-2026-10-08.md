@@ -146,6 +146,7 @@
 | 位置 | 应出现 |
 |---|---|
 | 背包 | `Bag 19/25 · 6 slots free` / 7 个 Tab `All / Seeds / Fish / Produce / Dishes / Materials / Tackle` / 仓库堆 `Take 10 / Take all` / 不在家 `At home` |
+| 背包满提示行（BAG-5，P1） | 第一个还没买的扩容档：没到等级 `Bag full · +5 slots at Homestead Lv3` / `Lv6` / `Lv9`；到了等级 `Bag full · +5 slots · Bag Upgrade I` / `Bag Upgrade II` / `Bag Upgrade III`；三档都买了不出；柜台扩容行与 › 详情卡的效果句每档都是本档增量 `+5 bag slots`；Bag Upgrade 三档都用背包图标；柜台与详情卡金币价 ≥ 1,000 加千分位 `1,000 coins` / `2 × 1,000 coins` / `Need 1,000 more coins`（q(194)） |
 | 料理详情卡 Gift ★ | 身边有居民 `Gift to Pip` / `Gift to Old Kai`；其他地方灰 `Gift to a resident`，点了 toast `Find a resident at an outpost to gift this dish`；今天已送过 `Gift already given today`（q(63)） |
 | Gear ★ | `Bag | Gear`；Fishing 槽只有 Starter Rod / Reed Rod，P0 不列 Carbon Rod（q(46)） |
 | 个人页 | P0 子集（PROFILE-1-P0）：`Profile` / `Edit look ›` / `San Francisco · <climate> · Since Oct 2` / 三张技能卡 / 农场卡（农场名 + `Level 2`）/ `Collections`：`Fish n/N` · `Pages n/N`（Pages 数做出过的页，和 Cookbook 页签同一个数，q(100)）；P0 不出 `Edit` / `Following` / `Followers` / `Mutual` / `Close Friends` / `All skills ›`（q(94)） |
